@@ -11,6 +11,10 @@ namespace slib
 	{
 	}
 	
+	UIApp::~UIApp()
+	{
+	}
+
 	Ref<UIApp> UIApp::getApp()
 	{
 		return CastRef<UIApp>(Application::getApp());

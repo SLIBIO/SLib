@@ -10,6 +10,10 @@ namespace slib
 		m_flagChecked = sl_false;
 	}
 	
+	MenuItem::~MenuItem()
+	{
+	}
+
 	Ref<Menu> MenuItem::getParent() const
 	{
 		return m_parent;
@@ -148,12 +152,20 @@ namespace slib
 		flagChecked = sl_false;
 	}
 	
+	MenuItemParam::~MenuItemParam()
+	{
+	}
+
 	SLIB_DEFINE_OBJECT(Menu, Object)
 	
 	Menu::Menu()
 	{
 	}
 	
+	Menu::~Menu()
+	{
+	}
+
 	sl_uint32 Menu::getMenuItemsCount() const
 	{
 		return (sl_uint32)(m_items.getCount());

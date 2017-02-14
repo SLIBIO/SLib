@@ -7,6 +7,7 @@ Don't include this file directly from your own source
 
 namespace slib
 {
+
 	class GLRenderEngine;
 	
 	class SLIB_EXPORT _SLIB_RENDER_ENTRIES_CLASS
@@ -229,4 +230,5 @@ namespace slib
 		static void loadEntries(sl_bool flagReload = sl_false);
 		
 	};
+
 }

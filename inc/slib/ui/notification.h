@@ -9,12 +9,19 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT PushNotificationMessage
 	{
 	public:
 		String title;
 		String body;
 		Map<String, Variant> data;
+
+	public:
+		PushNotificationMessage();
+
+		~PushNotificationMessage();
+
 	};
 	
 	class SLIB_EXPORT PushNotification
@@ -28,7 +35,8 @@ namespace slib
 		
 	private:
 		static void _initToken();
-	};	
+	};
+
 }
 
 #endif

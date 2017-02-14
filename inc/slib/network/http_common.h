@@ -36,6 +36,7 @@
 
 namespace slib
 {
+
 	enum class HttpStatus
 	{
 		Unknown = 0,
@@ -458,6 +459,11 @@ namespace slib
 	class SLIB_EXPORT IHttpContentReaderListener
 	{
 	public:
+		IHttpContentReaderListener();
+
+		virtual ~IHttpContentReaderListener();
+
+	public:
 		virtual void onCompleteReadHttpContent(void* dataRemained, sl_uint32 sizeRemained, sl_bool flagError) = 0;
 		
 	};
@@ -510,6 +516,7 @@ namespace slib
 		Ptr<IHttpContentReaderListener> m_listener;
 		
 	};
+
 }
 
 #endif

@@ -1,4 +1,5 @@
 #include "../../../inc/slib/core/asset.h"
+
 #include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/system.h"
 #include "../../../inc/slib/core/app.h"
@@ -8,57 +9,64 @@
 
 #if defined(SLIB_PLATFORM_IS_DESKTOP) || defined(SLIB_PLATFORM_IS_APPLE)
 
-SLIB_NAMESPACE_BEGIN
-sl_bool Assets::isBasedOnFileSystem()
+namespace slib
 {
-	return sl_true;
-}
+
+	sl_bool Assets::isBasedOnFileSystem()
+	{
+		return sl_true;
+	}
 
 #if defined(SLIB_PLATFORM_IS_APPLE)
-String Assets::getFilePath(const String& path)
-{
-	return Apple::getAssetFilePath(path);
-}
-#else
-String Assets::getFilePath(const String& path)
-{
-	String s = File::makeSafeFilePath(path);
-	if (s.isNotEmpty()) {
-		return Application::getApplicationDirectory() + "/" + s;
+	String Assets::getFilePath(const String& path)
+	{
+		return Apple::getAssetFilePath(path);
 	}
-	return sl_null;
-}
+#else
+	String Assets::getFilePath(const String& path)
+	{
+		String s = File::makeSafeFilePath(path);
+		if (s.isNotEmpty()) {
+			return Application::getApplicationDirectory() + "/" + s;
+		}
+		return sl_null;
+	}
 #endif
 
-Memory Assets::readAllBytes(const String& path)
-{
-	Memory ret;
-	String s = Assets::getFilePath(path);
-	if (s.isNotEmpty()) {
-		ret = File::readAllBytes(s);
+	Memory Assets::readAllBytes(const String& path)
+	{
+		Memory ret;
+		String s = Assets::getFilePath(path);
+		if (s.isNotEmpty()) {
+			ret = File::readAllBytes(s);
+		}
+		return ret;
 	}
-	return ret;
 }
-SLIB_NAMESPACE_END
 
-#elif defined(SLIB_PLATFORM_IS_ANDROID)
+#endif
 
-SLIB_NAMESPACE_BEGIN
-sl_bool Assets::isBasedOnFileSystem()
+
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+
+namespace slib
 {
-	return sl_false;
-}
+	sl_bool Assets::isBasedOnFileSystem()
+	{
+		return sl_false;
+	}
 
-String Assets::getFilePath(const String& path)
-{
-	return sl_null;
-}
+	String Assets::getFilePath(const String& path)
+	{
+		return sl_null;
+	}
 
-Memory Assets::readAllBytes(const String& path)
-{
-	return Android::readAllBytesFromAsset(path);
+	Memory Assets::readAllBytes(const String& path)
+	{
+		return Android::readAllBytesFromAsset(path);
+	}
+
 }
-SLIB_NAMESPACE_END
 
 #endif
 

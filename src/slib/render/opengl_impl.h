@@ -734,6 +734,7 @@ namespace slib
 			case PrimitiveType::Point:
 				return GL_POINTS;
 		}
+		return GL_TRIANGLES;
 	}
 	
 	void GL_BASE::drawPrimitives(PrimitiveType type, sl_uint32 countVertices, sl_uint32 startIndex)
@@ -764,7 +765,7 @@ namespace slib
 			sl_uint32 width = bitmapData.width;
 			sl_uint32 height = bitmapData.height;
 			GL_ENTRY(glBindTexture)(GL_TEXTURE_2D, texture);
-			if (bitmapData.format == BitmapFormat::RGBA && (bitmapData.pitch == 0 || bitmapData.pitch == width << 2)) {
+			if (bitmapData.format == BitmapFormat::RGBA && (bitmapData.pitch == 0 || bitmapData.pitch == (sl_int32)(width << 2))) {
 				GL_ENTRY(glTexImage2D)(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, bitmapData.data);
 			} else {
 				sl_uint32 size = width * height;
@@ -886,7 +887,7 @@ namespace slib
 	{
 		sl_uint32 width = bitmapData.width;
 		sl_uint32 height = bitmapData.height;
-		if (bitmapData.format == BitmapFormat::RGBA && (bitmapData.pitch == 0 || bitmapData.pitch == width << 2)) {
+		if (bitmapData.format == BitmapFormat::RGBA && (bitmapData.pitch == 0 || bitmapData.pitch == (sl_int32)(width << 2))) {
 			GL_ENTRY(glTexSubImage2D)(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, bitmapData.data);
 		} else {
 			sl_uint32 size = width * height;
@@ -1044,14 +1045,12 @@ namespace slib
 	}
 	
 /*****************************************
- OpenGL Engine
- ******************************************/
+ 			OpenGL Engine
+******************************************/
 	
 	class GL_ENGINE : public GLRenderEngine
 	{
 	public:
-		sl_uint64 m_threadUniqueId;
-		
 		CList<sl_uint32> m_listDirtyBufferHandles;
 		CList<sl_uint32> m_listDirtyTextureHandles;
 		struct _ProgramHandle {
@@ -1108,11 +1107,6 @@ namespace slib
 		}
 		
 	public:
-		SLIB_INLINE sl_bool isEngineThread()
-		{
-			return m_threadUniqueId == Thread::getCurrentThreadUniqueId();
-		}
-		
 		void freeDirtyHandles()
 		{
 			{
@@ -1164,6 +1158,9 @@ namespace slib
 		public:
 			_RenderProgramInstance()
 			{
+				vertexShader = -1;
+				fragmentShader = -1;
+				program = -1;
 			}
 			
 			~_RenderProgramInstance()
@@ -1248,6 +1245,7 @@ namespace slib
 		public:
 			_VertexBufferInstance()
 			{
+				handle = -1;
 			}
 			
 			~_VertexBufferInstance()
@@ -1297,6 +1295,7 @@ namespace slib
 		public:
 			_IndexBufferInstance()
 			{
+				handle = -1;
 			}
 			
 			~_IndexBufferInstance()
@@ -1346,6 +1345,7 @@ namespace slib
 		public:
 			_TextureInstance()
 			{
+				handle = -1;
 			}
 			
 			~_TextureInstance()
@@ -1665,8 +1665,8 @@ namespace slib
 		}
 		
 /*************************************************
- OpenGL entry points
- **************************************************/
+			OpenGL entry points
+**************************************************/
 		
 		// override
 		Ref<Texture> createTextureFromName(sl_uint32 target, sl_uint32 name, sl_bool flagDeleteOnRelease)
@@ -1920,6 +1920,7 @@ namespace slib
 	{
 		return new GL_ENGINE();
 	}
+	
 }
 
 #endif

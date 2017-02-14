@@ -7,6 +7,7 @@
 
 namespace slib
 {
+
 	class UIAnimationLoop : public AnimationLoop
 	{
 		SLIB_DECLARE_OBJECT
@@ -39,7 +40,8 @@ namespace slib
 	private:
 		sl_bool m_flagRunning;
 		
-	};	
+	};
+
 }
 
 #endif

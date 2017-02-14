@@ -9,6 +9,7 @@
 
 namespace slib
 {
+
 	struct TextLine {
 		String16 text;
 		sl_ui_len width;
@@ -77,6 +78,7 @@ namespace slib
 		SimpleTextBox m_textBox;
 		
 	};
+
 }
 
 #endif

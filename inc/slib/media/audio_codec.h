@@ -28,7 +28,7 @@ namespace slib
 		sl_uint32 getChannelsCount() const;
 		
 		sl_uint32 getBitrate();
-		
+
 		virtual void setBitrate(sl_uint32 bitrate);
 		
 	protected:

@@ -7,12 +7,15 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT ScrollView : public View
 	{
 		SLIB_DECLARE_OBJECT
 		
 	public:
 		ScrollView();
+
+		~ScrollView();
 		
 	public:
 		Ref<View> getContentView();
@@ -97,6 +100,8 @@ namespace slib
 	public:
 		HorizontalScrollView();
 		
+		~HorizontalScrollView();
+
 	};
 	
 	class VerticalScrollView : public ScrollView
@@ -104,7 +109,10 @@ namespace slib
 	public:
 		VerticalScrollView();
 		
-	};	
+		~VerticalScrollView();
+
+	};
+
 }
 
 #endif

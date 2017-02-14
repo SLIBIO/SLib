@@ -9,6 +9,7 @@
 
 namespace slib
 {
+
 	enum class TextureFilterMode
 	{
 		Point,
@@ -114,7 +115,8 @@ namespace slib
 	protected:
 		AtomicRef<Referable> m_linkedObject;
 		
-	};	
+	};
+
 }
     
 #endif

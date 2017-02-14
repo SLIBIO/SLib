@@ -1,7 +1,8 @@
 #include "../../../inc/slib/core/ptr.h"
 
-SLIB_NAMESPACE_BEGIN
+namespace slib
+{
 
-const _Ptr_Const _Ptr_Null = {0, 0, 0};
+	const _Ptr_Const _Ptr_Null = {0, 0, 0};
 
-SLIB_NAMESPACE_END
+}

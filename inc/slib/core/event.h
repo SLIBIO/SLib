@@ -5,37 +5,38 @@
 
 #include "ref.h"
 
-SLIB_NAMESPACE_BEGIN
-
-class SLIB_EXPORT Event : public Referable
+namespace slib
 {
-	SLIB_DECLARE_OBJECT
 	
-protected:
-	Event();
-	
-	~Event();
+	class SLIB_EXPORT Event : public Referable
+	{
+		SLIB_DECLARE_OBJECT
 
-public:
-	static Ref<Event> create(sl_bool flagAutoReset = sl_true);
-	
-public:
-	void set();
-	
-	void reset();
-	
-	// milliseconds. negative means INFINITE
-	sl_bool wait(sl_int32 timeout = -1);
+	protected:
+		Event();
 
-protected:
-	virtual void __set() = 0;
+		~Event();
 	
-	virtual void __reset() = 0;
+	public:
+		static Ref<Event> create(sl_bool flagAutoReset = sl_true);
+
+	public:
+		void set();
+
+		void reset();
+
+		// milliseconds. negative means INFINITE
+		sl_bool wait(sl_int32 timeout = -1);
 	
-	virtual sl_bool __wait(sl_int32 timeout) = 0;
+	protected:
+		virtual void __set() = 0;
 
-};
+		virtual void __reset() = 0;
 
-SLIB_NAMESPACE_END
+		virtual sl_bool __wait(sl_int32 timeout) = 0;
+	
+	};
+
+}
 
 #endif

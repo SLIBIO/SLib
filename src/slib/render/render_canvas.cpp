@@ -5,6 +5,7 @@
 #include "../../../inc/slib/math/transform2d.h"
 #include "../../../inc/slib/graphics/util.h"
 #include "../../../inc/slib/graphics/font_atlas.h"
+#include "../../../inc/slib/core/string_buffer.h"
 #include "../../../inc/slib/core/variant.h"
 #include "../../../inc/slib/core/safe_static.h"
 
@@ -13,7 +14,7 @@
 
 namespace slib
 {
-	RenderCanvasClip::RenderCanvasClip(): flagTransform(sl_false)
+	RenderCanvasClip::RenderCanvasClip(): type(RenderCanvasClipType::Rectangle), rx(0), ry(0), flagTransform(sl_false)
 	{
 	}
 	
@@ -103,9 +104,6 @@ namespace slib
 				RenderCanvasClip* clip = clips[i];
 				Rectangle& r = clip->region;
 				clipRects[i] = Vector4(r.left, r.top, r.right, r.bottom);
-				if (clip->type == RenderCanvasClipType::Ellipse) {
-					clip = clip;
-				}
 				if (clip->flagTransform) {
 					clipTransforms[i] = transform * clip->transform;
 				} else {
@@ -361,6 +359,8 @@ namespace slib
 	
 	RenderCanvas::RenderCanvas()
 	{
+		m_width = 0;
+		m_height = 0;
 	}
 	
 	RenderCanvas::~RenderCanvas()
@@ -719,7 +719,6 @@ namespace slib
 	void RenderCanvas::drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor)
 	{
 		if (fillColor.a > 0) {
-			Rectangle _rect = rect;
 			if (pen.isNotNull()) {
 				sl_real penWidth = pen->getWidth();
 				_fillRectangle(Rectangle(rect.left + penWidth, rect.top + penWidth, rect.right - penWidth, rect.bottom - penWidth), fillColor);
@@ -1074,4 +1073,5 @@ namespace slib
 	void RenderCanvas::_setAntiAlias(sl_bool flag)
 	{
 	}
+	
 }

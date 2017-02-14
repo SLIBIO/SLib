@@ -9,11 +9,17 @@
 
 namespace slib
 {
+
 	class TcpDatagramClient;
 	class TcpDatagramServer;
 	
 	class SLIB_EXPORT ITcpDatagramListener
 	{
+	public:
+		ITcpDatagramListener();
+
+		virtual ~ITcpDatagramListener();
+
 	public:
 		virtual void onReceiveFrom(TcpDatagramClient* client, void* data, sl_uint32 sizeReceived) = 0;
 		
@@ -184,7 +190,8 @@ namespace slib
 		
 		friend class TcpDatagramClient;
 		
-	};	
+	};
+
 }
 
 #endif

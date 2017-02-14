@@ -3,6 +3,7 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(ScrollView, View)
 	
 	ScrollView::ScrollView()
@@ -17,6 +18,10 @@ namespace slib
 		
 	}
 	
+	ScrollView::~ScrollView()
+	{
+	}
+
 	Ref<View> ScrollView::getContentView()
 	{
 		return m_viewContent;
@@ -251,9 +256,19 @@ namespace slib
 		setVerticalScrolling(sl_false);
 	}
 	
+	HorizontalScrollView::~HorizontalScrollView()
+	{
+	}
+
+
 	VerticalScrollView::VerticalScrollView()
 	{
 		setHorizontalScrolling(sl_false);
 		setVerticalScrolling(sl_true);
 	}
+
+	VerticalScrollView::~VerticalScrollView()
+	{
+	}
+
 }

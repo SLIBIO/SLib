@@ -9,6 +9,7 @@
 
 namespace slib
 {
+
 	class HttpService;
 	class HttpServiceConnection;
 	
@@ -174,6 +175,11 @@ namespace slib
 	class SLIB_EXPORT IHttpServiceProcessor
 	{
 	public:
+		IHttpServiceProcessor();
+
+		virtual ~IHttpServiceProcessor();
+
+	public:
 		virtual sl_bool onHttpRequest(const Ref<HttpServiceContext>& context) = 0;
 	};
 	
@@ -288,7 +294,8 @@ namespace slib
 		
 		HttpServiceParam m_param;
 		
-	};	
+	};
+
 }
 
 #endif

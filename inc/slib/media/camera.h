@@ -61,7 +61,8 @@ namespace slib
 		
 		static List<CameraInfo> getCamerasList();
 		
-	};	
+	};
+
 }
 
 #endif

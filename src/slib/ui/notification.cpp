@@ -3,6 +3,15 @@
 
 namespace slib
 {
+
+	PushNotificationMessage::PushNotificationMessage()
+	{
+	}
+
+	PushNotificationMessage::~PushNotificationMessage()
+	{
+	}
+
 	SLIB_SAFE_STATIC_GETTER(String, _getDeviceToken)
 	SLIB_SAFE_STATIC_GETTER(Function<void (String)>, _getTokenRefreshCallback)
 	SLIB_SAFE_STATIC_GETTER(Function<void(PushNotificationMessage&)>, _getNotificationReceivedCallback)
@@ -51,4 +60,5 @@ namespace slib
 		}
 		return sl_null;
 	}
+
 }

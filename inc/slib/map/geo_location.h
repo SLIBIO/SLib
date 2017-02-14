@@ -5,82 +5,65 @@
 
 #include "latlon.h"
 
-SLIB_MAP_NAMESPACE_BEGIN
-
-class SLIB_EXPORT GeoLocation
+namespace slib
 {
-public:
-	double latitude;
-	double longitude;
-	double altitude; // Unit: m
+	
+	class SLIB_EXPORT GeoLocation
+	{
+	public:
+		double latitude;
+		double longitude;
+		double altitude; // Unit: m
+	
+	public:
+		constexpr GeoLocation()
+		 : latitude(0), longitude(0), altitude(0)
+		{}
 
-public:
-	GeoLocation();
+		constexpr GeoLocation(const GeoLocation& other)
+		: latitude(other.latitude), longitude(other.longitude), altitude(other.altitude)
+		{}
 
-	GeoLocation(const GeoLocation& other);
-	
-	GeoLocation(double latitude, double longitude, double altitude = 0);
-	
-	GeoLocation(const LatLon& latlon, double altitude = 0);
-	
-public:
-	GeoLocation& operator=(const GeoLocation& other);
-	
-	GeoLocation& operator=(const LatLon& other);
-	
-	sl_bool operator==(const GeoLocation& other) const;
-	
-	sl_bool operator!=(const GeoLocation& other) const;
+		constexpr GeoLocation(double _latitude, double _longitude, double _altitude)
+		: latitude(_latitude), longitude(_longitude), altitude(_altitude)
+		{}
 
-public:
-	LatLon& getLatLon();
-	
-	const LatLon& getLatLon() const;
-	
-	void setLatLon(const LatLon& v);
-	
-	void setLatLon(double latitude, double longitude);
+		constexpr GeoLocation(const LatLon& latlon, double _altitude)
+		: latitude(latlon.latitude), longitude(latlon.longitude), altitude(_altitude)
+		{}
 
-	void normalize();
+	public:
+		GeoLocation& operator=(const GeoLocation& other);
 
-	GeoLocation lerp(const GeoLocation& target, float factor) const;
+		GeoLocation& operator=(const LatLon& other);
+
+		sl_bool operator==(const GeoLocation& other) const;
+
+		sl_bool operator!=(const GeoLocation& other) const;
 	
-};
+	public:
+		LatLon& getLatLon();
 
+		const LatLon& getLatLon() const;
 
-SLIB_INLINE GeoLocation::GeoLocation()
-{
+		void setLatLon(const LatLon& v);
+
+		void setLatLon(double latitude, double longitude);
+	
+		void normalize();
+	
+		GeoLocation lerp(const GeoLocation& target, float factor) const;
+
+	};
+	
+	template <>
+	SLIB_INLINE GeoLocation Interpolation<GeoLocation>::interpolate(const GeoLocation& a, const GeoLocation& b, float factor)
+	{
+		return a.lerp(b, factor);
+	}
+
 }
 
-SLIB_INLINE GeoLocation::GeoLocation(const GeoLocation& other)
-: latitude(other.latitude), longitude(other.longitude), altitude(other.altitude)
-{
-}
-
-SLIB_INLINE GeoLocation::GeoLocation(double _latitude, double _longitude, double _altitude)
-: latitude(_latitude), longitude(_longitude), altitude(_altitude)
-{
-}
-
-SLIB_INLINE GeoLocation::GeoLocation(const LatLon& latlon, double _altitude)
-: latitude(latlon.latitude), longitude(latlon.longitude), altitude(_altitude)
-{
-}
-
-SLIB_INLINE GeoLocation& GeoLocation::operator=(const GeoLocation& other)
-{
-	latitude = other.latitude;
-	longitude = other.longitude;
-	altitude = other.altitude;
-	return *this;
-}
-
-template <>
-SLIB_INLINE GeoLocation Interpolation<GeoLocation>::interpolate(const GeoLocation& a, const GeoLocation& b, float factor)
-{
-	return a.lerp(b, factor);
-}
-
-SLIB_MAP_NAMESPACE_END
+#include "detail/geo_location.h"
 
 #endif

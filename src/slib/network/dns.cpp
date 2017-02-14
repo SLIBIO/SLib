@@ -347,6 +347,8 @@ namespace slib
 		_messageLength = 0;
 		_dataOffset = 0;
 		_dataLength = 0;
+
+		_TTL = 0;
 	}
 
 	DnsResponseRecord::~DnsResponseRecord()
@@ -521,6 +523,8 @@ namespace slib
 
 	DnsPacket::DnsPacket()
 	{
+		id = 0;
+		flagQuestion = sl_false;
 	}
 
 	DnsPacket::~DnsPacket()
@@ -699,6 +703,14 @@ namespace slib
 				DnsClient
 *************************************************************/
 
+	IDnsClientListener::IDnsClientListener()
+	{
+	}
+
+	IDnsClientListener::~IDnsClientListener()
+	{
+	}
+
 	DnsClientParam::DnsClientParam()
 	{
 	}
@@ -781,6 +793,15 @@ namespace slib
 	{
 	}
 
+
+	IDnsServerListener::IDnsServerListener()
+	{
+	}
+
+	IDnsServerListener::~IDnsServerListener()
+	{
+	}
+
 	DnsServerParam::DnsServerParam()
 	{
 		portDns = SLIB_NETWORK_DNS_PORT;
@@ -821,6 +842,9 @@ namespace slib
 		m_flagRunning = sl_false;
 
 		m_lastForwardId = 0;
+
+		m_flagEncryptDefaultForward = sl_false;
+		m_flagProxy = sl_false;
 	}
 
 	DnsServer::~DnsServer()
@@ -828,7 +852,7 @@ namespace slib
 		release();
 	}
 
-	#define TAG_SERVER "DnsServer"
+#define TAG_SERVER "DnsServer"
 
 	Ref<DnsServer> DnsServer::create(const DnsServerParam& param)
 	{

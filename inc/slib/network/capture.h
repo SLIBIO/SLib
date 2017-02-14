@@ -23,6 +23,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT NetCapturePacket
 	{
 	public:
@@ -58,6 +59,11 @@ namespace slib
 	
 	class SLIB_EXPORT INetCaptureListener
 	{
+	public:
+		INetCaptureListener();
+
+		virtual ~INetCaptureListener();
+
 	public:
 		virtual void onCapturePacket(NetCapture* capture, NetCapturePacket* packet) = 0;
 		
@@ -187,7 +193,8 @@ namespace slib
 		sl_uint8 m_address[8];
 		sl_uint8 m_protocol[2];
 		
-	};	
+	};
+
 }
 
 #endif

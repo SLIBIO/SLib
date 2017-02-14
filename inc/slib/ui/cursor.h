@@ -7,10 +7,16 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT Cursor : public Object
 	{
 		SLIB_DECLARE_OBJECT
 		
+	public:
+		Cursor();
+
+		~Cursor();
+
 	public:
 		static Ref<Cursor> getArrow();
 		
@@ -34,7 +40,8 @@ namespace slib
 		
 		static void hide();
 		
-	};	
+	};
+
 }
 
 #endif

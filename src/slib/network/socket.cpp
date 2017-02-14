@@ -29,6 +29,7 @@ typedef int SOCKET;
 
 namespace slib
 {
+
 	void L2PacketInfo::setMacAddress(const MacAddress& address)
 	{
 		lenHardwareAddress = 6;
@@ -36,7 +37,7 @@ namespace slib
 		hardwareAddress[6] = 0;
 		hardwareAddress[7] = 0;
 	}
-	
+
 	sl_bool L2PacketInfo::getMacAddress(MacAddress* address)
 	{
 		if (lenHardwareAddress == 6) {
@@ -48,14 +49,14 @@ namespace slib
 			return sl_false;
 		}
 	}
-	
+
 	void L2PacketInfo::clearAddress()
 	{
 		lenHardwareAddress = 0;
 		Base::zeroMemory(hardwareAddress, 8);
 	}
-	
-	
+
+
 	SLIB_INLINE static sl_uint32 _Socket_apply_address(SocketType type, sockaddr_storage& addr, SocketAddress in)
 	{
 		if (in.ip.isIPv4() && (type == SocketType::Tcp || type == SocketType::Udp || type == SocketType::Raw)) {
@@ -68,7 +69,7 @@ namespace slib
 		}
 		return 0;
 	}
-	
+
 	void Socket::initializeSocket()
 	{
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -85,7 +86,7 @@ namespace slib
 		//signal(SIGPIPE, SIG_IGN);
 #endif
 	}
-	
+
 	SLIB_INLINE static void _Socket_close(sl_socket socket)
 	{
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -94,25 +95,25 @@ namespace slib
 		::close((SOCKET)socket);
 #endif
 	}
-	
+
 	SLIB_DEFINE_ROOT_OBJECT(Socket)
-	
+
 	Socket::Socket()
 	{
 		m_socket = SLIB_SOCKET_INVALID_HANDLE;
 		m_type = SocketType::None;
 		m_lastError = SocketError::None;
 	}
-	
+
 	Socket::~Socket()
 	{
 		close();
 	}
-	
+
 	Ref<Socket> Socket::open(SocketType type, sl_uint32 _protocol)
 	{
 		initializeSocket();
-		
+
 		int af = 0;
 		int st = 0;
 		int protocol = 0;
@@ -151,7 +152,7 @@ namespace slib
 		else {
 			return sl_null;
 		}
-		
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 		sl_socket handle = (sl_socket)(::WSASocketW(af, st, protocol, NULL, 0, WSA_FLAG_OVERLAPPED));
 #else
@@ -174,47 +175,47 @@ namespace slib
 		}
 		return sl_null;
 	}
-	
+
 	Ref<Socket> Socket::openTcp()
 	{
 		return open(SocketType::Tcp);
 	}
-	
+
 	Ref<Socket> Socket::openUdp()
 	{
 		return open(SocketType::Udp);
 	}
-	
+
 	Ref<Socket> Socket::openRaw(NetworkInternetProtocol internetProtocol)
 	{
 		return open(SocketType::Raw, (sl_uint32)internetProtocol);
 	}
-	
+
 	Ref<Socket> Socket::openTcp_IPv6()
 	{
 		return open(SocketType::TcpIPv6);
 	}
-	
+
 	Ref<Socket> Socket::openUdp_IPv6()
 	{
 		return open(SocketType::UdpIPv6);
 	}
-	
+
 	Ref<Socket> Socket::openRaw_IPv6(NetworkInternetProtocol internetProtocol)
 	{
 		return open(SocketType::RawIPv6, (sl_uint32)internetProtocol);
 	}
-	
+
 	Ref<Socket> Socket::openPacketRaw(NetworkLinkProtocol linkProtocol)
 	{
 		return open(SocketType::PacketRaw, (sl_uint32)linkProtocol);
 	}
-	
+
 	Ref<Socket> Socket::openPacketDatagram(NetworkLinkProtocol linkProtocol)
 	{
 		return open(SocketType::PacketDatagram, (sl_uint32)linkProtocol);
 	}
-	
+
 	void Socket::close()
 	{
 		if (m_socket != SLIB_SOCKET_INVALID_HANDLE) {
@@ -224,22 +225,22 @@ namespace slib
 		m_type = SocketType::None;
 		m_lastError = SocketError::None;
 	}
-	
+
 	sl_bool Socket::isOpened() const
 	{
 		return m_socket != SLIB_SOCKET_INVALID_HANDLE;
 	}
-	
+
 	sl_socket Socket::getHandle() const
 	{
 		return m_socket;
 	}
-	
+
 	SocketType Socket::getType() const
 	{
 		return m_type;
 	}
-	
+
 	String Socket::getTypeText() const
 	{
 		switch (getType()) {
@@ -290,47 +291,47 @@ namespace slib
 			}
 		}
 	}
-	
+
 	sl_bool Socket::isTcp() const
 	{
 		return m_type == SocketType::Tcp || m_type == SocketType::TcpIPv6;
 	}
-	
+
 	sl_bool Socket::isUdp() const
 	{
 		return m_type == SocketType::Udp || m_type == SocketType::UdpIPv6;
 	}
-	
+
 	sl_bool Socket::isRaw() const
 	{
 		return m_type == SocketType::Raw || m_type == SocketType::RawIPv6;
 	}
-	
+
 	sl_bool Socket::isPacket() const
 	{
 		return m_type == SocketType::PacketRaw || m_type == SocketType::PacketDatagram;
 	}
-	
+
 	sl_bool Socket::isIPv4() const
 	{
 		return m_type == SocketType::Tcp || m_type == SocketType::Udp || m_type == SocketType::Raw;
 	}
-	
+
 	sl_bool Socket::isIPv6() const
 	{
 		return m_type == SocketType::TcpIPv6 || m_type == SocketType::UdpIPv6 || m_type == SocketType::RawIPv6;
 	}
-	
+
 	SocketError Socket::getLastError() const
 	{
 		return m_lastError;
 	}
-	
+
 	String Socket::getLastErrorMessage() const
 	{
 		return getErrorMessage(m_lastError);
 	}
-	
+
 	sl_bool Socket::shutdown(SocketShutdownMode mode)
 	{
 		if (isOpened()) {
@@ -350,7 +351,7 @@ namespace slib
 			return sl_false;
 		}
 	}
-	
+
 	sl_bool Socket::bind(const SocketAddress& address)
 	{
 		if (isOpened()) {
@@ -398,7 +399,7 @@ namespace slib
 			return sl_false;
 		}
 	}
-	
+
 	sl_bool Socket::listen()
 	{
 		if (isOpened()) {
@@ -418,7 +419,7 @@ namespace slib
 			return sl_false;
 		}
 	}
-	
+
 	sl_bool Socket::accept(Ref<Socket>& socketClient, SocketAddress& address)
 	{
 		if (isOpened()) {
@@ -454,7 +455,7 @@ namespace slib
 			return sl_false;
 		}
 	}
-	
+
 	sl_bool Socket::connect(const SocketAddress& address)
 	{
 		if (isOpened()) {
@@ -470,15 +471,10 @@ namespace slib
 				} else {
 					SocketError e = _checkError();
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-					if (e == SocketError::WouldBlock)
+					return (e == SocketError::WouldBlock);
 #else
-						if (e == SocketError::InProgress)
+					return (e == SocketError::InProgress);
 #endif
-						{
-							return sl_true;
-						} else {
-							return sl_false;
-						}
 				}
 			} else {
 				_setError(SocketError::ConnectToInvalidAddress);
@@ -489,7 +485,7 @@ namespace slib
 			return sl_false;
 		}
 	}
-	
+
 	sl_bool Socket::connectAndWait(const SocketAddress& address, sl_int32 timeout)
 	{
 		setNonBlockingMode(sl_true);
@@ -505,7 +501,7 @@ namespace slib
 		}
 		return sl_false;
 	}
-	
+
 	sl_int32 Socket::send(const void* buf, sl_uint32 size)
 	{
 		if (isOpened()) {
@@ -538,7 +534,7 @@ namespace slib
 			return -1;
 		}
 	}
-	
+
 	sl_int32 Socket::receive(void* buf, sl_uint32 size)
 	{
 		if (isOpened()) {
@@ -567,7 +563,7 @@ namespace slib
 			return -1;
 		}
 	}
-	
+
 	sl_int32 Socket::sendTo(const SocketAddress& address, const void* buf, sl_uint32 size)
 	{
 		if (isOpened()) {
@@ -602,7 +598,7 @@ namespace slib
 			return -1;
 		}
 	}
-	
+
 	sl_int32 Socket::receiveFrom(SocketAddress& address, void* buf, sl_uint32 size)
 	{
 		if (isOpened()) {
@@ -639,7 +635,7 @@ namespace slib
 			return -1;
 		}
 	}
-	
+
 	sl_int32 Socket::sendPacket(const void* buf, sl_uint32 size, const L2PacketInfo& info)
 	{
 #if defined(SLIB_PLATFORM_IS_LINUX)
@@ -651,7 +647,7 @@ namespace slib
 				_setError(SocketError::SendPacketIsNotSupported);
 				return -1;
 			}
-			
+
 			sockaddr_ll addr;
 			addr.sll_family = AF_PACKET;
 			addr.sll_protocol = htons((sl_uint16)(info.protocol));
@@ -684,7 +680,7 @@ namespace slib
 #endif
 		return -1;
 	}
-	
+
 	sl_int32 Socket::receivePacket(const void* buf, sl_uint32 size, L2PacketInfo& info)
 	{
 #if defined(SLIB_PLATFORM_IS_LINUX)
@@ -727,7 +723,7 @@ namespace slib
 #endif
 		return -1;
 	}
-	
+
 	sl_bool _Socket_setNonBlocking(SOCKET fd, sl_bool flagEnable)
 	{
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -742,7 +738,7 @@ namespace slib
 #	endif
 #endif
 	}
-	
+
 	sl_bool Socket::setNonBlockingMode(sl_bool flagEnable)
 	{
 		if (isOpened()) {
@@ -752,7 +748,7 @@ namespace slib
 		}
 		return sl_false;
 	}
-	
+
 	sl_bool _Socket_setPromiscuousMode(SOCKET fd, const char* deviceName, sl_bool flagEnable)
 	{
 #if defined(SLIB_PLATFORM_IS_LINUX)
@@ -776,7 +772,7 @@ namespace slib
 		return sl_false;
 #endif
 	}
-	
+
 	sl_bool Socket::setPromiscuousMode(const String& _deviceName, sl_bool flagEnable)
 	{
 		if (isOpened()) {
@@ -789,7 +785,7 @@ namespace slib
 		}
 		return sl_false;
 	}
-	
+
 	sl_bool Socket::getLocalAddress(SocketAddress& out)
 	{
 		if (isOpened()) {
@@ -1048,7 +1044,7 @@ namespace slib
 		m_lastError = code;
 		return code;
 	}
-		
+
 	SocketError Socket::_checkError()
 	{
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -1057,7 +1053,7 @@ namespace slib
 		int err = errno;
 #endif
 		SocketError ret = SocketError::None;
-		
+
 		switch (err) {
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAEWOULDBLOCK:
@@ -1069,19 +1065,19 @@ namespace slib
 #endif
 				ret = _setError(SocketError::WouldBlock);
 				break;
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAENETDOWN:
 				ret = _setError(SocketError::NetworkDown);
 				break;
 #endif
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAENETRESET:
 				ret = _setError(SocketError::NetworkReset);
 				break;
 #endif
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAECONNRESET:
 #else
@@ -1089,7 +1085,7 @@ namespace slib
 #endif
 				ret = _setError(SocketError::ConnectionReset);
 				break;
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAECONNABORTED:
 #else
@@ -1097,7 +1093,7 @@ namespace slib
 #endif
 				ret = _setError(SocketError::ConnectionAbort);
 				break;
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAECONNREFUSED:
 #else
@@ -1105,8 +1101,8 @@ namespace slib
 #endif
 				ret = _setError(SocketError::ConnectionRefused);
 				break;
-				
-				
+
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAETIMEDOUT:
 #else
@@ -1114,7 +1110,7 @@ namespace slib
 #endif
 				ret = _setError(SocketError::Timeout);
 				break;
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAENOTSOCK:
 #else
@@ -1123,8 +1119,8 @@ namespace slib
 #endif
 				ret = _setError(SocketError::NotSocket);
 				break;
-				
-				
+
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAEADDRINUSE:
 #else
@@ -1132,7 +1128,7 @@ namespace slib
 #endif
 				ret = _setError(SocketError::AddressAlreadyInUse);
 				break;
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAENOBUFS:
 #else
@@ -1140,7 +1136,7 @@ namespace slib
 #endif
 				ret = _setError(SocketError::NoBufs);
 				break;
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSA_NOT_ENOUGH_MEMORY:
 #else
@@ -1148,7 +1144,7 @@ namespace slib
 #endif
 				ret = _setError(SocketError::NoMem);
 				break;
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAEINPROGRESS:
 #else
@@ -1156,7 +1152,7 @@ namespace slib
 #endif
 				ret = _setError(SocketError::InProgress);
 				break;
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAEDESTADDRREQ:
 #else
@@ -1164,7 +1160,7 @@ namespace slib
 #endif
 				ret = _setError(SocketError::DestinationAddressRequired);
 				break;
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAEPFNOSUPPORT:
 #else
@@ -1172,7 +1168,7 @@ namespace slib
 #endif
 				ret = _setError(SocketError::ProtocolFamilyNotSupported);
 				break;
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAEAFNOSUPPORT:
 #else
@@ -1180,7 +1176,7 @@ namespace slib
 #endif
 				ret = _setError(SocketError::AddressFamilyNotSupported);
 				break;
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAEADDRNOTAVAIL:
 #else
@@ -1188,7 +1184,7 @@ namespace slib
 #endif
 				ret = _setError(SocketError::AddressNotAvailable);
 				break;
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAENOTCONN:
 #else
@@ -1196,7 +1192,7 @@ namespace slib
 #endif
 				ret = _setError(SocketError::NotConnected);
 				break;
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAESHUTDOWN:
 #else
@@ -1204,7 +1200,7 @@ namespace slib
 #endif
 				ret = _setError(SocketError::Shutdown);
 				break;
-				
+
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			case WSAEACCES:
 #else
@@ -1212,19 +1208,19 @@ namespace slib
 #endif
 				ret = _setError(SocketError::Access);
 				break;
-				
+
 			default:
 				ret = _setError((SocketError)((sl_uint32)(SocketError::Unknown) + err));
 				break;
 		}
 		return ret;
 	}
-	
+
 	void Socket::_setClosedError()
 	{
 		_setError(SocketError::Closed);
 	}
-	
+
 	String Socket::getErrorMessage(SocketError error)
 	{
 		switch (error) {
@@ -1264,7 +1260,7 @@ namespace slib
 				return "SHUTDOWN - Cannot send after socket shutdown";
 			case SocketError::Access:
 				return "ACCESS - Permission denied";
-				
+
 			case SocketError::Closed:
 				return "Socket is closed";
 			case SocketError::BindInvalidAddress:
@@ -1303,14 +1299,15 @@ namespace slib
 		}
 		return String("Not Defined Error: ") + (sl_uint32)error;
 	}
-		
+
 	void Socket::clearError()
 	{
 		_setError(SocketError::None);
 	}
-	
+
 	sl_bool Socket::isListening() const
 	{
 		return getOption_IsListening();
 	}
+
 }

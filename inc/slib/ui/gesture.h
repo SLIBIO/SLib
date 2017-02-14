@@ -7,6 +7,7 @@
 
 namespace slib
 {
+
 	enum class GestureType
 	{
 		SwipeLeft = 0,
@@ -44,6 +45,8 @@ namespace slib
 	public:
 		GestureDetector(const Ref<View>& view);
 		
+		~GestureDetector();
+
 	public:
 		void enable(GestureType type);
 		
@@ -60,7 +63,8 @@ namespace slib
 		Ref<GestureRecognizer> m_recognizers[(int)(GestureType::Count)];
 		
 		friend class GestureRecognizer;
-	};	
+	};
+
 }
 
 #endif

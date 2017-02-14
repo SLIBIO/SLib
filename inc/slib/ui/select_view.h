@@ -7,10 +7,16 @@
 
 namespace slib
 {
+
 	class SelectView;
 	
 	class SLIB_EXPORT ISelectViewListener
 	{
+	public:
+		ISelectViewListener();
+
+		virtual ~ISelectViewListener();
+
 	public:
 		virtual void onSelectItem(SelectView* view, sl_uint32 index) = 0;
 		
@@ -23,6 +29,8 @@ namespace slib
 	public:
 		SelectView();
 		
+		~SelectView();
+
 	public:
 		sl_uint32 getItemsCount();
 		
@@ -145,7 +153,8 @@ namespace slib
 		
 		Color m_textColor;
 		
-	};	
+	};
+
 }
 
 #endif

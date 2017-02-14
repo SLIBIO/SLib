@@ -12,6 +12,11 @@ namespace slib
 	class SLIB_EXPORT IListViewAdapter
 	{
 	public:
+		IListViewAdapter();
+
+		virtual ~IListViewAdapter();
+
+	public:
 		virtual sl_uint64 getItemsCount(ListView* lv) = 0;
 		
 		virtual Ref<View> getView(ListView* lv, sl_uint64 index, View* original) = 0;
@@ -109,7 +114,8 @@ namespace slib
 		
 		friend class _ListContentView;
 		
-	};	
+	};
+
 }
 
 #endif

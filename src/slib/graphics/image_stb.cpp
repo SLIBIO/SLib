@@ -12,25 +12,26 @@
 
 #include "../../../inc/thirdparty/stb/stbi_ext/etc1_utils.c"
 
-SLIB_GRAPHICS_NAMESPACE_BEGIN
-
-Ref<Image> Image_STB::loadImage(const void* content, sl_size size)
+namespace slib
 {
-	Ref<Image> ret;
-	int width;
-	int height;
-	int channels;
-	unsigned char *map = stbi_load_from_memory((stbi_uc*)content, (int)size, &width, &height, &channels, 4);
-	if (map) {
-		ret = Image::create(width, height);
-		if (ret.isNotNull()) {
-			Base::copyMemory(ret->getColors(), map, width * height * 4);
-		}
-		stbi_image_free(map);
-	}
-	return ret;
-}
 
-SLIB_GRAPHICS_NAMESPACE_END
+	Ref<Image> Image_STB::loadImage(const void* content, sl_size size)
+	{
+		Ref<Image> ret;
+		int width;
+		int height;
+		int channels;
+		unsigned char *map = stbi_load_from_memory((stbi_uc*)content, (int)size, &width, &height, &channels, 4);
+		if (map) {
+			ret = Image::create(width, height);
+			if (ret.isNotNull()) {
+				Base::copyMemory(ret->getColors(), map, width * height * 4);
+			}
+			stbi_image_free(map);
+		}
+		return ret;
+	}
+
+}
 
 #endif

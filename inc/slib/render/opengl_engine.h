@@ -7,6 +7,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT GLRenderEngine : public RenderEngine
 	{
 		SLIB_DECLARE_OBJECT
@@ -106,6 +107,7 @@ namespace slib
 		virtual void setUniformTextureSamplerArray(sl_int32 uniformLocation, const sl_reg* values, sl_uint32 count) = 0;
 		
 	};
+
 }
 
 #endif

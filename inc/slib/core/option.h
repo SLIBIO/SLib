@@ -24,8 +24,8 @@
 #define SLIB_PLATFORM_IOS_SIMULATOR	0x08220000
 // Android Platforms
 #define SLIB_PLATFORM_ANDROID		0x0A010000
-
-#define SLIB_PLATFORM_BLACKBERRY    0x0B010000
+// Tizen Platform
+#define SLIB_PLATFORM_TIZEN		    0x0B010000
 
 #define SLIB_PLATFORM_TYPE			(SLIB_PLATFORM & 0xFFFF0000)
 #define SLIB_PLATFORM_VERSION		(SLIB_PLATFORM & 0x0000FFFF)
@@ -77,8 +77,8 @@
 #		endif
 #	elif defined(__ANDROID__)
 #		define SLIB_PLATFORM			SLIB_PLATFORM_ANDROID
-#   elif defined(__unix__) && defined(__QNX__)
-#       define SLIB_PLATFORM            SLIB_PLATFORM_BLACKBERRY
+#	elif defined(TIZEN_DEPRECATION)
+#		define SLIB_PLATFORM			SLIB_PLATFORM_TIZEN
 #	elif defined(__unix__) && defined(BSD)
 #		define SLIB_PLATFORM			SLIB_PLATFORM_FREEBSD
 #	elif defined(__unix__) && defined(__sun) && defined(__SVR4)
@@ -161,11 +161,11 @@
 #	define SLIB_PLATFORM_IS_MOBILE
 #	define SLIB_PLATFORM_USE_JNI
 #endif
-#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_BLACKBERRY)
-#   define SLIB_PLATFORM_IS_BLACKBERRY
-#   define SLIB_PLATFORM_IS_UNIX
-#   define SLIB_PLATFORM_IS_QT
-#   define SLIB_PLATFORM_IS_MOBILE
+#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_TIZEN)
+#	define SLIB_PLATFORM_IS_TIZEN
+#	define SLIB_PLATFORM_IS_LINUX
+#	define SLIB_PLATFORM_IS_UNIX
+#	define SLIB_PLATFORM_IS_MOBILE
 #endif
 
 
@@ -231,6 +231,11 @@
 #	define SLIB_IF_PLATFORM_IS_IOS(Y, N) N
 #endif
 
+#if defined(SLIB_PLATFORM_IS_TIZEN)
+#	define SLIB_IF_PLATFORM_IS_TIZEN(Y, N) Y
+#else
+#	define SLIB_IF_PLATFORM_IS_TIZEN(Y, N) N
+#endif
 
 /*************************************
 	Compiler Definition
@@ -368,4 +373,4 @@
 #	define SLIB_IF_ARCH_IS_X64(Y, N) N
 #endif
 
-#endif // CHECKHEADER_SLIB_OPTION
+#endif

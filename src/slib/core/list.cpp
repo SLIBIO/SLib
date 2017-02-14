@@ -1,11 +1,19 @@
 #include "../../../inc/slib/core/list.h"
 
-SLIB_NAMESPACE_BEGIN
+namespace slib
+{
 
-SLIB_DEFINE_ROOT_OBJECT(IIteratorBase)
+	SLIB_DEFINE_ROOT_OBJECT(IIteratorBase)
 
-const char _List_ClassID[] = "list";
+	IIteratorBase::IIteratorBase()
+	{
+	}
 
-SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_LIST(Ref<Referable>)
+	IIteratorBase::~IIteratorBase()
+	{
+	}
 
-SLIB_NAMESPACE_END
+
+	const char _List_ClassID[] = "list";
+
+}

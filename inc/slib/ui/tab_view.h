@@ -7,12 +7,19 @@
 
 namespace slib
 {
+
 	class TabView;
 	
 	class SLIB_EXPORT ITabViewListener
 	{
 	public:
+		ITabViewListener();
+
+		virtual ~ITabViewListener();
+
+	public:
 		virtual void onSelectTab(TabView* view, sl_uint32 index) = 0;
+
 	};
 	
 	class TabViewItem
@@ -22,6 +29,11 @@ namespace slib
 		
 		AtomicRef<View> contentView;
 		
+	public:
+		TabViewItem();
+
+		~TabViewItem();
+
 	};
 	
 	class SLIB_EXPORT TabView : public ViewGroup
@@ -31,6 +43,8 @@ namespace slib
 	public:
 		TabView();
 		
+		~TabView();
+
 	public:
 		sl_uint32 getTabsCount();
 		
@@ -210,7 +224,8 @@ namespace slib
 		sl_ui_pos m_labelMarginRight;
 		sl_ui_pos m_labelMarginBottom;
 		
-	};	
+	};
+
 }
 
 #endif

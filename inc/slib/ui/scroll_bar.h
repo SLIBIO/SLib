@@ -12,7 +12,13 @@ namespace slib
 	class SLIB_EXPORT IScrollBarListener
 	{
 	public:
+		IScrollBarListener();
+
+		virtual ~IScrollBarListener();
+
+	public:
 		virtual void onChange(ScrollBar* scrollBar, sl_scroll_pos value) = 0;
+
 	};
 	
 	class SLIB_EXPORT ScrollBar : public View
@@ -22,6 +28,8 @@ namespace slib
 	public:
 		ScrollBar(LayoutOrientation orientation = LayoutOrientation::Horizontal);
 		
+		~ScrollBar();
+
 	public:
 		LayoutOrientation getOrientation();
 		
@@ -158,7 +166,8 @@ namespace slib
 		sl_scroll_pos m_valueDown;
 		sl_bool m_flagHoverThumb;
 		
-	};	
+	};
+
 }
 
 #endif

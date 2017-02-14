@@ -25,6 +25,7 @@ sudo setcap 'cap_net_admin=+iep' path/to/executable
 
 namespace slib
 {
+
 	class SLIB_EXPORT NetFilterPacket
 	{
 	public:
@@ -41,7 +42,7 @@ namespace slib
 	public:
 		NetFilterPacket();
 		
-		~NetFilterPacket();
+		virtual ~NetFilterPacket();
 		
 	public:
 		virtual sl_bool getSourceMacAddress(MacAddress& address) = 0;
@@ -61,6 +62,11 @@ namespace slib
 	class NetFilter;
 	class SLIB_EXPORT INetFilterListener
 	{
+	public:
+		INetFilterListener();
+
+		virtual ~INetFilterListener();
+
 	public:
 		virtual void onFilterPacket(NetFilter* filter, NetFilterPacket* packet) = 0;
 		
@@ -112,7 +118,8 @@ namespace slib
 		Ptr<INetFilterListener> m_listener;
 		Function<void(NetFilter*, NetFilterPacket*)> m_onFilterPacket;
 		
-	};	
+	};
+
 }
 
 #endif

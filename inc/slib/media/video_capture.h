@@ -26,6 +26,11 @@ namespace slib
 	class SLIB_EXPORT IVideoCaptureListener
 	{
 	public:
+		IVideoCaptureListener();
+
+		virtual ~IVideoCaptureListener();
+
+	public:
 		virtual void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame) = 0;
 		
 	};

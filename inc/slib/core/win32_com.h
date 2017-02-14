@@ -10,17 +10,18 @@
 #include "object.h"
 #include "memory.h"
 
-SLIB_NAMESPACE_BEGIN
-
-class Win32_COM
+namespace slib
 {
-public:
-	static Memory readAllBytesFromStream(IStream* stream);
-};
+
+	class Win32_COM
+	{
+	public:
+		static Memory readAllBytesFromStream(IStream* stream);
+	};
+
+}
 
 #define SLIB_WIN32_COM_SAFE_RELEASE(x) {if (x) {x->Release(); x=NULL;}}
-
-SLIB_NAMESPACE_END
 
 #endif
 

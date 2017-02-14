@@ -3,6 +3,14 @@
 namespace slib
 {
 	SLIB_DEFINE_OBJECT(Cursor, Object)
+
+	Cursor::Cursor()
+	{
+	}
+
+	Cursor::~Cursor()
+	{
+	}
 	
 #if !defined(SLIB_PLATFORM_IS_WIN32) && !defined(SLIB_PLATFORM_IS_OSX)
 	

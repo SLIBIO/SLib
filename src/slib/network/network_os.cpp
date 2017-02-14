@@ -75,7 +75,8 @@ namespace slib
 }
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-#if defined(SLIB_PLATFORM_IS_DESKTOP)
+#	if defined(SLIB_PLATFORM_IS_DESKTOP)
+
 #include <winsock2.h>
 #include <ws2ipdef.h>
 #include <ws2tcpip.h>
@@ -85,7 +86,7 @@ namespace slib
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "ws2_32.lib")
 
-namespace slib::
+namespace slib
 {
 
 	template <>
@@ -183,7 +184,7 @@ namespace slib::
 
 }
 
-#endif
+#	endif
 
 #elif defined(SLIB_PLATFORM_IS_ANDROID)
 
@@ -265,13 +266,13 @@ namespace slib
 #include <ifaddrs.h>
 #include <net/if.h>
 
-#if defined(SLIB_PLATFORM_IS_APPLE)
-#define	IFT_ETHER	0x6		/* Ethernet CSMACD */
-#include <net/if_dl.h>
-#endif
-#if defined(SLIB_PLATFORM_IS_LINUX)
-#include <linux/if_packet.h>
-#endif
+#	if defined(SLIB_PLATFORM_IS_APPLE)
+#		define	IFT_ETHER	0x6		/* Ethernet CSMACD */
+#		include <net/if_dl.h>
+#	endif
+#	if defined(SLIB_PLATFORM_IS_LINUX)
+#		include <linux/if_packet.h>
+#	endif
 
 namespace slib
 {
@@ -316,7 +317,7 @@ namespace slib
 						ip = s.ip.getIPv6();
 						pdev->addresses_IPv6.add_NoLock(ip);
 					}
-#if defined(SLIB_PLATFORM_IS_APPLE)
+#	if defined(SLIB_PLATFORM_IS_APPLE)
 					else if (adapter->ifa_addr->sa_family == AF_LINK) {
 						sockaddr_dl* addr = (sockaddr_dl*)(adapter->ifa_addr);
 						if (addr->sdl_type == IFT_ETHER) {
@@ -324,15 +325,15 @@ namespace slib
 							pdev->macAddress.setBytes(base);
 						}
 					}
-#endif
-#if defined(SLIB_PLATFORM_IS_LINUX)
+#	endif
+#	if defined(SLIB_PLATFORM_IS_LINUX)
 					else if (adapter->ifa_addr->sa_family == AF_PACKET) {
 						sockaddr_ll* addr = (sockaddr_ll*)(adapter->ifa_addr);
 						if (addr->sll_halen == 6) {
 							pdev->macAddress.setBytes((sl_uint8*)(addr->sll_addr));
 						}
 					}
-#endif
+#	endif
 				}
 				adapter = adapter->ifa_next;
 			}
@@ -346,101 +347,105 @@ namespace slib
 #endif
 
 #if defined(SLIB_PLATFORM_IS_UNIX)
+
 #include <netdb.h>
 #include <net/if.h>
+
 #endif
 
-SLIB_NETWORK_NAMESPACE_BEGIN
-sl_uint32 Network::getInterfaceIndexFromName(const String& name)
+namespace slib
 {
-#if defined(SLIB_PLATFORM_IS_WINDOWS)
-	Socket::initializeSocket();
-#endif
-	sl_uint32 n = if_nametoindex(name.getData());
-	return n;
-}
 
-String Network::getInterfaceNameFromIndex(sl_uint32 index)
-{
+	sl_uint32 Network::getInterfaceIndexFromName(const String& name)
+	{
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-	Socket::initializeSocket();
+		Socket::initializeSocket();
 #endif
-	char buf[256];
-	char* s = if_indextoname(index, buf);
-	if (s) {
-		return String(s);
-	} else {
-		return sl_null;
+		sl_uint32 n = if_nametoindex(name.getData());
+		return n;
 	}
-}
 
-List<IPAddress> Network::getIPAddressesFromHostName(const String& hostName)
-{
-	Socket::initializeSocket();
+	String Network::getInterfaceNameFromIndex(sl_uint32 index)
+	{
+#if defined(SLIB_PLATFORM_IS_WINDOWS)
+		Socket::initializeSocket();
+#endif
+		char buf[256];
+		char* s = if_indextoname(index, buf);
+		if (s) {
+			return String(s);
+		} else {
+			return sl_null;
+		}
+	}
 
-	List<IPAddress> ret;
+	List<IPAddress> Network::getIPAddressesFromHostName(const String& hostName)
+	{
+		Socket::initializeSocket();
 
-	addrinfo *addrs = sl_null;
+		List<IPAddress> ret;
 
-	SocketAddress sa;
-	int iRet = getaddrinfo(hostName.getData(), sl_null, sl_null, &addrs);
-	if (iRet == 0) {
-		addrinfo* addr = addrs;
-		while (addr) {
-			sl_int32 lenAddr = (sl_int32)(addr->ai_addrlen);
-			if (lenAddr > 0) {
-				sa.ip.setNone();
-				sa.setSystemSocketAddress(addr->ai_addr, lenAddr);
-				if (sa.ip.isNotNone()) {
-					ret.add_NoLock(sa.ip);
+		addrinfo *addrs = sl_null;
+
+		SocketAddress sa;
+		int iRet = getaddrinfo(hostName.getData(), sl_null, sl_null, &addrs);
+		if (iRet == 0) {
+			addrinfo* addr = addrs;
+			while (addr) {
+				sl_int32 lenAddr = (sl_int32)(addr->ai_addrlen);
+				if (lenAddr > 0) {
+					sa.ip.setNone();
+					sa.setSystemSocketAddress(addr->ai_addr, lenAddr);
+					if (sa.ip.isNotNone()) {
+						ret.add_NoLock(sa.ip);
+					}
 				}
+				addr = addr->ai_next;
 			}
-			addr = addr->ai_next;
+			if (addrs) {
+				freeaddrinfo(addrs);
+			}
 		}
-		if (addrs) {
-			freeaddrinfo(addrs);
-		}
+		return ret;
 	}
-	return ret;
-}
 
-IPAddress Network::getIPAddressFromHostName(const String& hostName)
-{
-	ListElements<IPAddress> list(getIPAddressesFromHostName(hostName));
-	sl_size i;
-	for (i = 0; i < list.count; i++) {
-		if (list[i].isIPv4()) {
-			return list[i];
+	IPAddress Network::getIPAddressFromHostName(const String& hostName)
+	{
+		ListElements<IPAddress> list(getIPAddressesFromHostName(hostName));
+		sl_size i;
+		for (i = 0; i < list.count; i++) {
+			if (list[i].isIPv4()) {
+				return list[i];
+			}
 		}
-	}
-	for (i = 0; i < list.count; i++) {
-		if (list[i].isIPv6()) {
-			return list[i];
+		for (i = 0; i < list.count; i++) {
+			if (list[i].isIPv6()) {
+				return list[i];
+			}
 		}
+		return IPAddress::none();
 	}
-	return IPAddress::none();
-}
 
-IPv4Address Network::getIPv4AddressFromHostName(const String& hostName)
-{
-	ListElements<IPAddress> list(getIPAddressesFromHostName(hostName));
-	for (sl_size i = 0; i < list.count; i++) {
-		if (list[i].isIPv4()) {
-			return list[i].getIPv4();
+	IPv4Address Network::getIPv4AddressFromHostName(const String& hostName)
+	{
+		ListElements<IPAddress> list(getIPAddressesFromHostName(hostName));
+		for (sl_size i = 0; i < list.count; i++) {
+			if (list[i].isIPv4()) {
+				return list[i].getIPv4();
+			}
 		}
+		return IPv4Address::zero();
 	}
-	return IPv4Address::zero();
-}
 
-IPv6Address Network::getIPv6AddressFromHostName(const String& hostName)
-{
-	ListElements<IPAddress> list(getIPAddressesFromHostName(hostName));
-	for (sl_size i = 0; i < list.count; i++) {
-		if (list[i].isIPv6()) {
-			return list[i].getIPv6();
+	IPv6Address Network::getIPv6AddressFromHostName(const String& hostName)
+	{
+		ListElements<IPAddress> list(getIPAddressesFromHostName(hostName));
+		for (sl_size i = 0; i < list.count; i++) {
+			if (list[i].isIPv6()) {
+				return list[i].getIPv6();
+			}
 		}
+		return IPv6Address::zero();
 	}
-	return IPv6Address::zero();
-}
 
-SLIB_NETWORK_NAMESPACE_END
+}

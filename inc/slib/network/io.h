@@ -8,6 +8,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT TcpStream : public Object, public IStream, public IClosable
 	{
 		SLIB_DECLARE_OBJECT
@@ -36,7 +37,8 @@ namespace slib
 	protected:
 		AtomicRef<Socket> m_socket;
 		
-	};	
+	};
+
 }
 
 #endif

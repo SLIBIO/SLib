@@ -5,6 +5,7 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(VideoView, RenderView)
 	
 	VideoView::VideoView()
@@ -184,4 +185,5 @@ namespace slib
 			}
 		}
 	}
+
 }

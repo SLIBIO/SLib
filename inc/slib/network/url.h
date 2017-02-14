@@ -13,6 +13,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT Url
 	{
 	public:
@@ -44,7 +45,8 @@ namespace slib
 		
 		static String decodeUriByUTF8(const String& value);
 		
-	};	
+	};
+
 }
 
 #endif

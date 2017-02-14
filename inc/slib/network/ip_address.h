@@ -9,6 +9,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT IPv4Address
 	{
 	public:
@@ -29,23 +30,15 @@ namespace slib
 		};
 		
 	public:
-		SLIB_INLINE IPv4Address() = default;
+		constexpr IPv4Address(): a(0), b(0), c(0), d(0) {}
 		
-		constexpr IPv4Address(const IPv4Address& other):
-	 a(other.a), b(other.b), c(other.c), d(other.d)
-		{}
+		constexpr IPv4Address(const IPv4Address& other): a(other.a), b(other.b), c(other.c), d(other.d) {}
 		
-		constexpr IPv4Address(sl_uint8 const addr[4]):
-	 a(addr[0]), b(addr[1]), c(addr[2]), d(addr[3])
-		{}
+		constexpr IPv4Address(sl_uint8 const addr[4]): a(addr[0]), b(addr[1]), c(addr[2]), d(addr[3]) {}
 		
-		constexpr IPv4Address(sl_uint8 _a, sl_uint8 _b, sl_uint8 _c, sl_uint8 _d):
-	 a(_a), b(_b), c(_c), d(_d)
-		{}
+		constexpr IPv4Address(sl_uint8 _a, sl_uint8 _b, sl_uint8 _c, sl_uint8 _d): a(_a), b(_b), c(_c), d(_d) {}
 		
-		constexpr IPv4Address(sl_uint32 addr):
-	 a((sl_uint8)(addr >> 24)), b((sl_uint8)(addr >> 16)), c((sl_uint8)(addr >> 8)), d((sl_uint8)(addr))
-		{}
+		constexpr IPv4Address(sl_uint32 addr): a((sl_uint8)(addr >> 24)), b((sl_uint8)(addr >> 16)), c((sl_uint8)(addr >> 8)), d((sl_uint8)(addr)) {}
 		
 		IPv4Address(const String& address);
 		
@@ -342,9 +335,7 @@ namespace slib
 		sl_uint8 m[_SLIB_NET_IPADDRESS_SIZE];
 		
 	public:
-		SLIB_INLINE IPAddress():
-	 type(IPAddressType::None)
-		{}
+		SLIB_INLINE IPAddress(): type(IPAddressType::None) {}
 		
 		IPAddress(const IPAddress& other);
 		
@@ -448,99 +439,8 @@ namespace slib
 		sl_uint32 operator()(const IPAddress& a) const;
 	};
 	
-	SLIB_NETWORK_NAMESPACE_END
-	
-	
-	SLIB_NETWORK_NAMESPACE_BEGIN
-	
-	SLIB_INLINE sl_uint32 IPv4Address::getInt() const
-	{
-		return ((sl_uint32)(a) << 24) | ((sl_uint32)(b) << 16) | ((sl_uint32)(c) << 8) | ((sl_uint32)(d));
-	}
-	
-	SLIB_INLINE void IPv4Address::setInt(sl_uint32 addr)
-	{
-		a = (sl_uint8)(addr >> 24);
-		b = (sl_uint8)(addr >> 16);
-		c = (sl_uint8)(addr >> 8);
-		d = (sl_uint8)(addr);
-	}
-	
-	SLIB_INLINE const IPv4Address& IPv4Address::zero()
-	{
-		return *(reinterpret_cast<IPv4Address const*>(&_zero));
-	}
-	
-	SLIB_INLINE sl_bool IPv4Address::isZero() const
-	{
-		return getInt() == 0;
-	}
-	
-	SLIB_INLINE sl_bool IPv4Address::isNotZero() const
-	{
-		return getInt() != 0;
-	}
-	
-	SLIB_INLINE IPv4Address& IPv4Address::operator=(sl_uint32 addr)
-	{
-		a = (sl_uint8)(addr >> 24);
-		b = (sl_uint8)(addr >> 16);
-		c = (sl_uint8)(addr >> 8);
-		d = (sl_uint8)(addr);
-		return *this;
-	}
-	
-	SLIB_INLINE sl_bool IPv4Address::operator==(const IPv4Address& other) const
-	{
-		return getInt() == other.getInt();
-	}
-	
-	SLIB_INLINE sl_bool IPv4Address::operator==(sl_uint32 addr) const
-	{
-		return getInt() == addr;
-	}
-	
-	SLIB_INLINE sl_bool IPv4Address::operator!=(const IPv4Address& other) const
-	{
-		return getInt() != other.getInt();
-	}
-	
-	SLIB_INLINE sl_bool IPv4Address::operator!=(sl_uint32 addr) const
-	{
-		return getInt() != addr;
-	}
-	
-	
-	SLIB_INLINE const IPv6Address& IPv6Address::zero()
-	{
-		return *(reinterpret_cast<IPv6Address const*>(&_zero));
-	}
-	
-	SLIB_INLINE const IPv6Address& IPv6Address::getLoopback()
-	{
-		return *(reinterpret_cast<IPv6Address const*>(&_loopback));
-	}
-	
-	
-	SLIB_INLINE const IPAddress& IPAddress::none()
-	{
-		return *(reinterpret_cast<IPAddress const*>(&_none));
-	}
-	
-	SLIB_INLINE void IPAddress::setNone()
-	{
-		type = IPAddressType::None;
-	}
-	
-	SLIB_INLINE sl_bool IPAddress::isNone() const
-	{
-		return type == IPAddressType::None;
-	}
-	
-	SLIB_INLINE sl_bool IPAddress::isNotNone() const
-	{
-		return type != IPAddressType::None;
-	}
 }
+
+#include "detail/ip_address.h"
 
 #endif

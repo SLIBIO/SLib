@@ -1019,140 +1019,141 @@ namespace slib
 		return _OSX_Window::create(param);
 	}
 
-	SLIB_UI_NAMESPACE_END
+}
 
-	@implementation _slib_OSX_Window
+@implementation _slib_OSX_Window
 
-	- (BOOL)canBecomeKeyWindow
-	{
-		return YES;
-	}
+- (BOOL)canBecomeKeyWindow
+{
+	return YES;
+}
 
-	- (BOOL)windowShouldClose:(id)sender
-	{
-		BOOL ret = YES;
-		m_flagClosing = sl_true;
-		slib::Ref<slib::_OSX_Window> window = m_window;
-		if (window.isNotNull()) {
-			if (window->onClose()) {
-				window->close();
-				ret = YES;
-			} else {
-				ret = NO;
-			}
-		}
-		m_flagClosing = sl_false;
-		return ret;
-	}
-
-	- (void)windowWillClose:(NSNotification *)notification
-	{
-		slib::Ref<slib::_OSX_Window> window = m_window;
-		if (window.isNotNull()) {
-			slib::UI::dispatchToUiThread(SLIB_FUNCTION_REF(slib::_OSX_Window, release, window));
+- (BOOL)windowShouldClose:(id)sender
+{
+	BOOL ret = YES;
+	m_flagClosing = sl_true;
+	slib::Ref<slib::_OSX_Window> window = m_window;
+	if (window.isNotNull()) {
+		if (window->onClose()) {
+			window->close();
+			ret = YES;
+		} else {
+			ret = NO;
 		}
 	}
+	m_flagClosing = sl_false;
+	return ret;
+}
 
-	- (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)frameSize
-	{
-		slib::Ref<slib::_OSX_Window> window = m_window;
-		if (window.isNotNull()) {
-			slib::UISize size((sl_ui_pos)(frameSize.width), (sl_ui_pos)(frameSize.height));
-			if (size.x < 0) {
-				size.x = 0;
-			}
-			if (size.y < 0) {
-				size.y = 0;
-			}
-			window->onResizing(size);
-			frameSize.width = (CGFloat)(size.x);
-			frameSize.height = (CGFloat)(size.y);
+- (void)windowWillClose:(NSNotification *)notification
+{
+	slib::Ref<slib::_OSX_Window> window = m_window;
+	if (window.isNotNull()) {
+		slib::UI::dispatchToUiThread(SLIB_FUNCTION_REF(slib::_OSX_Window, release, window));
+	}
+}
+
+- (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)frameSize
+{
+	slib::Ref<slib::_OSX_Window> window = m_window;
+	if (window.isNotNull()) {
+		slib::UISize size((sl_ui_pos)(frameSize.width), (sl_ui_pos)(frameSize.height));
+		if (size.x < 0) {
+			size.x = 0;
 		}
-		return frameSize;
-	}
-
-	- (void)windowDidResize:(NSNotification *)notification
-	{
-		slib::Ref<slib::_OSX_Window> window = m_window;
-		if (window.isNotNull()) {
-			NSSize size = self.frame.size;
-			window->onResize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
+		if (size.y < 0) {
+			size.y = 0;
 		}
+		window->onResizing(size);
+		frameSize.width = (CGFloat)(size.x);
+		frameSize.height = (CGFloat)(size.y);
 	}
+	return frameSize;
+}
 
-	- (void)windowDidMove:(NSNotification *)notification
-	{
-		slib::Ref<slib::_OSX_Window> window = m_window;
-		if (window.isNotNull()) {
-			window->onMove();
-		}
+- (void)windowDidResize:(NSNotification *)notification
+{
+	slib::Ref<slib::_OSX_Window> window = m_window;
+	if (window.isNotNull()) {
+		NSSize size = self.frame.size;
+		window->onResize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
 	}
+}
 
-	- (void)windowWillMiniaturize:(NSNotification *)notification
-	{
-		slib::Ref<slib::_OSX_Window> window = m_window;
-		if (window.isNotNull()) {
-			window->onMinimize();
-		}
+- (void)windowDidMove:(NSNotification *)notification
+{
+	slib::Ref<slib::_OSX_Window> window = m_window;
+	if (window.isNotNull()) {
+		window->onMove();
 	}
+}
 
-	- (void)windowDidDeminiaturize:(NSNotification *)notification
-	{
-		slib::Ref<slib::_OSX_Window> window = m_window;
-		if (window.isNotNull()) {
-			window->onDeminimize();
-		}
+- (void)windowWillMiniaturize:(NSNotification *)notification
+{
+	slib::Ref<slib::_OSX_Window> window = m_window;
+	if (window.isNotNull()) {
+		window->onMinimize();
 	}
+}
 
-	- (void)windowDidEnterFullScreen:(NSNotification *)notification
-	{
-		slib::Ref<slib::_OSX_Window> window = m_window;
-		if (window.isNotNull()) {
-			window->onMaximize();
-		}
+- (void)windowDidDeminiaturize:(NSNotification *)notification
+{
+	slib::Ref<slib::_OSX_Window> window = m_window;
+	if (window.isNotNull()) {
+		window->onDeminimize();
 	}
+}
 
-	- (void)windowDidExitFullScreen:(NSNotification *)notification
-	{
-		slib::Ref<slib::_OSX_Window> window = m_window;
-		if (window.isNotNull()) {
-			window->onDemaximize();
-		}
+- (void)windowDidEnterFullScreen:(NSNotification *)notification
+{
+	slib::Ref<slib::_OSX_Window> window = m_window;
+	if (window.isNotNull()) {
+		window->onMaximize();
 	}
+}
 
-	- (BOOL)acceptsFirstResponder
-	{
-		return TRUE;
+- (void)windowDidExitFullScreen:(NSNotification *)notification
+{
+	slib::Ref<slib::_OSX_Window> window = m_window;
+	if (window.isNotNull()) {
+		window->onDemaximize();
 	}
+}
 
-	- (void)sendEvent:(NSEvent *)event
-	{
-		if (event.type == NSEventTypeKeyDown) {
-			id view = [self firstResponder];
-			if ([view isKindOfClass:[NSTextView class]]) {
-				// Find NSTextField
-				NSView* t = view;
+- (BOOL)acceptsFirstResponder
+{
+	return TRUE;
+}
+
+- (void)sendEvent:(NSEvent *)event
+{
+	if (event.type == NSEventTypeKeyDown) {
+		id view = [self firstResponder];
+		if ([view isKindOfClass:[NSTextView class]]) {
+			// Find NSTextField
+			NSView* t = view;
+			t = t.superview;
+			if (!([t isKindOfClass:[NSTextField class]])) {
 				t = t.superview;
-				if (!([t isKindOfClass:[NSTextField class]])) {
-					t = t.superview;
-				}
-				if ([t isKindOfClass:[NSTextField class]]) {
-					int c = event.keyCode;
-					// Tab, Return, Escape
-					if (c == 0x30 || c == 0x24 || c == 0x35) {
-						// NSTextField can't get keyDown event, so we manually invoke this event
-						[t keyDown:event];
-						return;
-					}
+			}
+			if ([t isKindOfClass:[NSTextField class]]) {
+				int c = event.keyCode;
+				// Tab, Return, Escape
+				if (c == 0x30 || c == 0x24 || c == 0x35) {
+					// NSTextField can't get keyDown event, so we manually invoke this event
+					[t keyDown:event];
+					return;
 				}
 			}
 		}
-		[super sendEvent:event];
 	}
+	[super sendEvent:event];
+}
 
-	@end
+@end
 
-	SLIB_UI_NAMESPACE_BEGIN
+namespace slib
+{
 
 	Ref<WindowInstance> UIPlatform::createWindowInstance(NSWindow* window)
 	{

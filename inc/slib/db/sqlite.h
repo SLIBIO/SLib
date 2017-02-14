@@ -3,16 +3,23 @@
 
 #include "database.h"
 
-SLIB_DB_NAMESPACE_BEGIN
-
-class SLIB_EXPORT SQLiteDatabase : public Database
+namespace slib
 {
-	SLIB_DECLARE_OBJECT
 
-public:
-	static Ref<SQLiteDatabase> connect(const String& filePath);
-};
+	class SLIB_EXPORT SQLiteDatabase : public Database
+	{
+		SLIB_DECLARE_OBJECT
 
-SLIB_DB_NAMESPACE_END
+	protected:
+		SQLiteDatabase();
+
+		~SQLiteDatabase();
+
+	public:
+		static Ref<SQLiteDatabase> connect(const String& filePath);
+
+	};
+
+}
 
 #endif

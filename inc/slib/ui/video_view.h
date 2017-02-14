@@ -10,6 +10,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT VideoView : public RenderView
 	{
 		SLIB_DECLARE_OBJECT
@@ -55,7 +56,8 @@ namespace slib
 		
 		MediaPlayerRenderVideoParam m_renderVideoParam;
 		
-	};	
+	};
+
 }
 
 #endif

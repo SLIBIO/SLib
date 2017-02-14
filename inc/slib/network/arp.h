@@ -28,6 +28,7 @@
 
 namespace slib
 {
+
 	enum class ArpOperation
 	{
 		Request = 1,
@@ -105,6 +106,7 @@ namespace slib
 		sl_uint8 _operation[2];
 		
 	};
+
 }
 
 #endif

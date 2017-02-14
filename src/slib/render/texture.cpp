@@ -5,6 +5,7 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(TextureInstance, RenderBaseObjectInstance)
 	
 	TextureInstance::TextureInstance()
@@ -237,4 +238,5 @@ namespace slib
 	{
 		m_linkedObject = object;
 	}
+	
 }

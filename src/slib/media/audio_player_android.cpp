@@ -6,21 +6,22 @@
 
 #include "../../../inc/slib/media/opensl_es.h"
 
-SLIB_MEDIA_NAMESPACE_BEGIN
-
-Ref<AudioPlayer> AudioPlayer::create(const AudioPlayerParam& param)
+namespace slib
 {
-	return OpenSL_ES::createPlayer(param);
-}
 
-List<AudioPlayerInfo> AudioPlayer::getPlayersList()
-{
-	AudioPlayerInfo ret;
-	SLIB_STATIC_STRING(s, "Internal Speaker");
-	ret.name = s;
-	return List<AudioPlayerInfo>::createFromElement(ret);
-}
+	Ref<AudioPlayer> AudioPlayer::create(const AudioPlayerParam& param)
+	{
+		return OpenSL_ES::createPlayer(param);
+	}
 
-SLIB_MEDIA_NAMESPACE_END
+	List<AudioPlayerInfo> AudioPlayer::getPlayersList()
+	{
+		AudioPlayerInfo ret;
+		SLIB_STATIC_STRING(s, "Internal Speaker");
+		ret.name = s;
+		return List<AudioPlayerInfo>::createFromElement(ret);
+	}
+
+}
 
 #endif

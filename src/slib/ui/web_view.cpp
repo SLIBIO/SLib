@@ -2,6 +2,15 @@
 
 namespace slib
 {
+
+	IWebViewListener::IWebViewListener()
+	{
+	}
+
+	IWebViewListener::~IWebViewListener()
+	{
+	}
+
 	void IWebViewListener::onStartLoad(WebView* view, const String& url)
 	{
 	}
@@ -23,6 +32,10 @@ namespace slib
 		m_flagOfflineContent = sl_false;
 	}
 	
+	WebView::~WebView()
+	{
+	}
+
 	void WebView::loadURL(const String& url)
 	{
 		m_flagOfflineContent = sl_false;
@@ -194,4 +207,5 @@ namespace slib
 	}
 	
 #endif
+
 }

@@ -19,6 +19,8 @@ namespace slib
 		
 		RadioButton(sl_uint32 nCategories, ButtonCategory* categories);
 
+		~RadioButton();
+
 	public:
 		// override
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
@@ -40,6 +42,8 @@ namespace slib
 	public:
 		RadioGroup();
 		
+		~RadioGroup();
+
 	public:
 		void add(const Ref<RadioButton>& view);
 		

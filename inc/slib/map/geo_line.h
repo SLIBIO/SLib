@@ -5,29 +5,30 @@
 
 #include "latlon.h"
 
-SLIB_MAP_NAMESPACE_BEGIN
-
-class SLIB_EXPORT GeoLine
+namespace slib
 {
-public:
-	LatLon point1;
-	LatLon point2;
 	
-public:
-	GeoLine();
-	
-	GeoLine(const GeoLine& other);
-	
-	GeoLine(const LatLon& pt1, const LatLon& pt2);
-	
-public:
-	GeoLine& operator=(const GeoLine& other);
-	
-public:
-	sl_bool intersectGeoLine(const GeoLine& otherLine, LatLon* outIntersectPoint = sl_null) const;
-	
-};
+	class SLIB_EXPORT GeoLine
+	{
+	public:
+		LatLon point1;
+		LatLon point2;
 
-SLIB_MAP_NAMESPACE_END
+	public:
+		GeoLine();
+
+		GeoLine(const GeoLine& other);
+
+		GeoLine(const LatLon& pt1, const LatLon& pt2);
+
+	public:
+		GeoLine& operator=(const GeoLine& other);
+
+	public:
+		sl_bool intersectGeoLine(const GeoLine& otherLine, LatLon* outIntersectPoint = sl_null) const;
+
+	};
+
+}
 
 #endif

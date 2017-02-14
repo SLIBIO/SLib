@@ -7,6 +7,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT LinearView : public ViewGroup
 	{
 		SLIB_DECLARE_OBJECT
@@ -14,6 +15,8 @@ namespace slib
 	public:
 		LinearView();
 		
+		~LinearView();
+
 	public:
 		LayoutOrientation getOrientation();
 		
@@ -43,13 +46,20 @@ namespace slib
 	{
 	public:
 		VerticalLinearView();
+
+		~VerticalLinearView();
+
 	};
 	
 	class SLIB_EXPORT HorizontalLinearView : public LinearView
 	{
 	public:
 		HorizontalLinearView();
-	};	
+
+		~HorizontalLinearView();
+
+	};
+
 }
 
 #endif

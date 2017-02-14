@@ -9,6 +9,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT RenderView : public View
 	{
 		SLIB_DECLARE_OBJECT

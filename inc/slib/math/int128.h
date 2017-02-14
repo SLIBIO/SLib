@@ -8,319 +8,284 @@
 #include "../core/string.h"
 #include "../core/parse.h"
 
-SLIB_MATH_NAMESPACE_BEGIN
-
-class SLIB_EXPORT Uint128
+namespace slib
 {
-public:
-	sl_uint64 high;
-	sl_uint64 low;
-
-public:
-	Uint128();
-
-	Uint128(const Uint128& num);
-
-	Uint128(sl_uint64 num);
-
-private:
-	static const sl_uint64 _zero[2];
-
-public:
-	static const Uint128& zero();
 	
-	sl_bool isZero() const;
-	
-	sl_bool isNotZero() const;
-	
-	void setZero();
-
-	int compare(const Uint128& other) const;
-	
-	static sl_bool div(const Uint128& a, const Uint128& b, Uint128* quotient = sl_null, Uint128* remainder = sl_null);
-
-	Uint128 div(const Uint128& other) const;
-	
-	Uint128 div(sl_uint64 num) const;
-	
-	Uint128 mod(const Uint128& other) const;
-	
-	sl_uint64 mod(sl_uint64 num) const;
-	
-	void shiftRight();
-	
-	void shiftLeft();
-	
-	void makeNegative();
-	
-	void makeBitwiseNot();
-
-public:
-	Uint128& operator=(const Uint128& other);
-	
-	Uint128& operator=(sl_uint64 num);
-
-	
-	sl_bool operator==(const Uint128& other) const;
-	
-	sl_bool operator==(sl_uint64 num) const;
-	
-	friend sl_bool operator==(sl_uint64 num, const Uint128& v);
-	
-	sl_bool operator!=(const Uint128& other) const;
-	
-	sl_bool operator!=(sl_uint64 num) const;
-	
-	friend sl_bool operator!=(sl_uint64 num, const Uint128& v);
-	
-	sl_bool operator>=(const Uint128& other) const;
-	
-	sl_bool operator>=(sl_uint64 num) const;
-	
-	friend sl_bool operator>=(sl_uint64 num, const Uint128& v);
-
-	sl_bool operator<=(const Uint128& other) const;
-	
-	sl_bool operator<=(sl_uint64 num) const;
-	
-	friend sl_bool operator<=(sl_uint64 num, const Uint128& v);
-	
-	sl_bool operator>(const Uint128& other) const;
-	
-	sl_bool operator>(sl_uint64 num) const;
-	
-	friend sl_bool operator>(sl_uint64 num, const Uint128& v);
-	
-	sl_bool operator<(const Uint128& other) const;
-	
-	sl_bool operator<(sl_uint64 num) const;
-	
-	friend sl_bool operator<(sl_uint64 num, const Uint128& v);
-
-	
-	Uint128 operator+(const Uint128& other) const;
-	
-	Uint128 operator+(sl_uint64 num) const;
-	
-	friend Uint128 operator+(sl_uint64 num, const Uint128& v);
-	
-	Uint128& operator+=(const Uint128& other);
-	
-	Uint128& operator+=(sl_uint32 num);
-
-	Uint128& operator++();
-	
-	Uint128 operator++(int);
-	
-	
-	Uint128 operator-(const Uint128& other) const;
-	
-	Uint128 operator-(sl_uint64 num) const;
-	
-	friend Uint128 operator-(sl_uint64 num, const Uint128& v);
-
-	Uint128& operator-=(const Uint128& other);
-	
-	Uint128& operator-=(sl_uint64 num);
-	
-	Uint128& operator--();
-	
-	Uint128 operator--(int);
-	
-	
-	Uint128 operator*(const Uint128& other) const;
-	
-	Uint128 operator*(sl_uint64 num) const;
-	
-	friend Uint128 operator*(sl_uint64 num, const Uint128& v);
-	
-	Uint128& operator*=(const Uint128& other);
-	
-	Uint128& operator*=(sl_uint64 num);
-	
-	
-	Uint128 operator/(const Uint128& other) const;
-	
-	Uint128 operator/(sl_uint64 num) const;
-	
-	friend Uint128 operator/(sl_uint64 num, const Uint128& v);
-
-	Uint128& operator/=(const Uint128& other);
-	
-	Uint128& operator/=(sl_uint64 num);
-
-	
-	Uint128 operator%(const Uint128& other) const;
-	
-	Uint128 operator%(sl_uint64 num) const;
-	
-	friend Uint128 operator%(sl_uint64 num, const Uint128& v);
-
-	Uint128& operator%=(const Uint128& other);
-	
-	Uint128& operator%=(sl_uint64 num);
-
-	
-	Uint128 operator&(const Uint128& other) const;
-	
-	Uint128 operator&(sl_uint64 num) const;
-	
-	friend Uint128 operator&(sl_uint64 num, const Uint128& v);
-	
-	Uint128& operator&=(const Uint128& other);
-	
-	Uint128& operator&=(sl_uint32 num);
-
-	
-	Uint128 operator|(const Uint128& other) const;
-	
-	Uint128 operator|(sl_uint64 num) const;
-	
-	friend Uint128 operator|(sl_uint64 num, const Uint128& v);
-	
-	Uint128& operator|=(const Uint128& other);
-	
-	Uint128& operator|=(sl_uint32 num);
-
-	
-	Uint128 operator^(const Uint128& other) const;
-	
-	Uint128 operator^(sl_uint64 num) const;
-	
-	friend Uint128 operator^(sl_uint64 num, const Uint128& v);
-
-	Uint128& operator^=(const Uint128& other);
-	
-	Uint128& operator^=(sl_uint32 num);
-
-	
-	Uint128 operator>>(sl_uint32 n) const;
-	
-	Uint128& operator>>=(sl_uint32 n);
-
-	
-	Uint128 operator<<(sl_uint32 n) const;
-	
-	Uint128& operator<<=(sl_uint32 n);
-
-	
-	Uint128 operator-() const;
-
-	Uint128 operator~() const;
-
-public:
-	sl_uint32 getMostSignificantBits() const;
-	
-	sl_uint32 getLeastSignificantBits() const;
-	
-	// 16 bytes
-	void getBytesBE(void* buf);
-	
-	// 16 bytes
-	void setBytesBE(const void* buf);
-	
-	// 16 bytes
-	void getBytesLE(void* buf);
-
-	// 16 bytes
-	void setBytesLE(const void* buf);
-
-	static Uint128 fromString(const String& str, sl_uint32 radix = 10);
-	
-	String toString(sl_uint32 radix = 10) const;
-
-	static Uint128 fromHexString(const String& str);
-	
-	String toHexString() const;
-	
-	
-	template <class ST>
-	static sl_bool parse(const ST& str, Uint128* _out, sl_uint32 radix = 10)
+	class SLIB_EXPORT Uint128
 	{
-		return ParseInt(str, _out, radix);
-	}
+	public:
+		sl_uint64 high;
+		sl_uint64 low;
 	
-	template <class ST>
-	sl_bool parse(const ST& str, sl_uint32 radix = 10)
+	public:
+		constexpr Uint128(): high(0), low(0) {}
+
+		constexpr Uint128(const Uint128& num): high(num.high), low(num.low) {}
+
+		constexpr Uint128(sl_uint64 num): high(0), low(num) {}
+
+	private:
+		static const sl_uint64 _zero[2];
+	
+	public:
+		static const Uint128& zero();
+
+		constexpr sl_bool isZero() const
+		{
+			return high == 0 && low == 0;
+		}
+
+		constexpr sl_bool isNotZero() const
+		{
+			return high != 0 || low != 0;
+		}
+
+		void setZero();
+	
+		int compare(const Uint128& other) const;
+
+		static sl_bool div(const Uint128& a, const Uint128& b, Uint128* quotient = sl_null, Uint128* remainder = sl_null);
+	
+		Uint128 div(const Uint128& other) const;
+
+		Uint128 div(sl_uint64 num) const;
+
+		Uint128 mod(const Uint128& other) const;
+
+		sl_uint64 mod(sl_uint64 num) const;
+
+		void shiftRight();
+
+		void shiftLeft();
+
+		void makeNegative();
+
+		void makeBitwiseNot();
+	
+	public:
+		Uint128& operator=(const Uint128& other);
+
+		Uint128& operator=(sl_uint64 num);
+	
+
+		sl_bool operator==(const Uint128& other) const;
+
+		sl_bool operator==(sl_uint64 num) const;
+
+		friend sl_bool operator==(sl_uint64 num, const Uint128& v);
+
+		sl_bool operator!=(const Uint128& other) const;
+
+		sl_bool operator!=(sl_uint64 num) const;
+
+		friend sl_bool operator!=(sl_uint64 num, const Uint128& v);
+
+		sl_bool operator>=(const Uint128& other) const;
+
+		sl_bool operator>=(sl_uint64 num) const;
+
+		friend sl_bool operator>=(sl_uint64 num, const Uint128& v);
+	
+		sl_bool operator<=(const Uint128& other) const;
+
+		sl_bool operator<=(sl_uint64 num) const;
+
+		friend sl_bool operator<=(sl_uint64 num, const Uint128& v);
+
+		sl_bool operator>(const Uint128& other) const;
+
+		sl_bool operator>(sl_uint64 num) const;
+
+		friend sl_bool operator>(sl_uint64 num, const Uint128& v);
+
+		sl_bool operator<(const Uint128& other) const;
+
+		sl_bool operator<(sl_uint64 num) const;
+
+		friend sl_bool operator<(sl_uint64 num, const Uint128& v);
+	
+
+		Uint128 operator+(const Uint128& other) const;
+
+		Uint128 operator+(sl_uint64 num) const;
+
+		friend Uint128 operator+(sl_uint64 num, const Uint128& v);
+
+		Uint128& operator+=(const Uint128& other);
+
+		Uint128& operator+=(sl_uint32 num);
+	
+		Uint128& operator++();
+
+		Uint128 operator++(int);
+
+
+		Uint128 operator-(const Uint128& other) const;
+
+		Uint128 operator-(sl_uint64 num) const;
+
+		friend Uint128 operator-(sl_uint64 num, const Uint128& v);
+	
+		Uint128& operator-=(const Uint128& other);
+
+		Uint128& operator-=(sl_uint64 num);
+
+		Uint128& operator--();
+
+		Uint128 operator--(int);
+
+
+		Uint128 operator*(const Uint128& other) const;
+
+		Uint128 operator*(sl_uint64 num) const;
+
+		friend Uint128 operator*(sl_uint64 num, const Uint128& v);
+
+		Uint128& operator*=(const Uint128& other);
+
+		Uint128& operator*=(sl_uint64 num);
+
+
+		Uint128 operator/(const Uint128& other) const;
+
+		Uint128 operator/(sl_uint64 num) const;
+
+		friend Uint128 operator/(sl_uint64 num, const Uint128& v);
+	
+		Uint128& operator/=(const Uint128& other);
+
+		Uint128& operator/=(sl_uint64 num);
+	
+
+		Uint128 operator%(const Uint128& other) const;
+
+		Uint128 operator%(sl_uint64 num) const;
+
+		friend Uint128 operator%(sl_uint64 num, const Uint128& v);
+	
+		Uint128& operator%=(const Uint128& other);
+
+		Uint128& operator%=(sl_uint64 num);
+	
+
+		Uint128 operator&(const Uint128& other) const;
+
+		Uint128 operator&(sl_uint64 num) const;
+
+		friend Uint128 operator&(sl_uint64 num, const Uint128& v);
+
+		Uint128& operator&=(const Uint128& other);
+
+		Uint128& operator&=(sl_uint32 num);
+	
+
+		Uint128 operator|(const Uint128& other) const;
+
+		Uint128 operator|(sl_uint64 num) const;
+
+		friend Uint128 operator|(sl_uint64 num, const Uint128& v);
+
+		Uint128& operator|=(const Uint128& other);
+
+		Uint128& operator|=(sl_uint32 num);
+	
+
+		Uint128 operator^(const Uint128& other) const;
+
+		Uint128 operator^(sl_uint64 num) const;
+
+		friend Uint128 operator^(sl_uint64 num, const Uint128& v);
+	
+		Uint128& operator^=(const Uint128& other);
+
+		Uint128& operator^=(sl_uint32 num);
+	
+
+		Uint128 operator>>(sl_uint32 n) const;
+
+		Uint128& operator>>=(sl_uint32 n);
+	
+
+		Uint128 operator<<(sl_uint32 n) const;
+
+		Uint128& operator<<=(sl_uint32 n);
+	
+
+		Uint128 operator-() const;
+	
+		Uint128 operator~() const;
+	
+	public:
+		sl_uint32 getMostSignificantBits() const;
+
+		sl_uint32 getLeastSignificantBits() const;
+
+		// 16 bytes
+		void getBytesBE(void* buf);
+
+		// 16 bytes
+		void setBytesBE(const void* buf);
+
+		// 16 bytes
+		void getBytesLE(void* buf);
+	
+		// 16 bytes
+		void setBytesLE(const void* buf);
+	
+		static Uint128 fromString(const String& str, sl_uint32 radix = 10);
+
+		String toString(sl_uint32 radix = 10) const;
+	
+		static Uint128 fromHexString(const String& str);
+
+		String toHexString() const;
+
+
+		template <class ST>
+		static sl_bool parse(const ST& str, Uint128* _out, sl_uint32 radix = 10)
+		{
+			return ParseInt(str, _out, radix);
+		}
+
+		template <class ST>
+		sl_bool parse(const ST& str, sl_uint32 radix = 10)
+		{
+			return ParseInt(str, this, radix);
+		}
+	
+	};
+	
+	template <>
+	sl_reg IntParser<Uint128, sl_char8>::parse(Uint128* _out, sl_uint32 radix, const sl_char8 *sz, sl_size posBegin, sl_size len);
+	
+	template <>
+	sl_reg IntParser<Uint128, sl_char16>::parse(Uint128* _out, sl_uint32 radix, const sl_char16 *sz, sl_size posBegin, sl_size len);
+	
+	
+	template <>
+	class Compare<Uint128>
 	{
-		return ParseInt(str, this, radix);
-	}
+	public:
+		int operator()(const Uint128& a, const Uint128& b) const;
+	};
+	
+	template <>
+	class Equals<Uint128>
+	{
+	public:
+		sl_bool operator()(const Uint128& a, const Uint128& b) const;
+	};
+	
+	template <>
+	class Hash<Uint128>
+	{
+	public:
+		sl_uint32 operator()(const Uint128& a) const;
+	};
 
-};
-
-template <>
-sl_reg IntParser<Uint128, sl_char8>::parse(Uint128* _out, sl_uint32 radix, const sl_char8 *sz, sl_size posBegin, sl_size len);
-
-template <>
-sl_reg IntParser<Uint128, sl_char16>::parse(Uint128* _out, sl_uint32 radix, const sl_char16 *sz, sl_size posBegin, sl_size len);
-
-
-template <>
-class Compare<Uint128>
-{
-public:
-	int operator()(const Uint128& a, const Uint128& b) const;
-};
-
-template <>
-class Equals<Uint128>
-{
-public:
-	sl_bool operator()(const Uint128& a, const Uint128& b) const;
-};
-
-template <>
-class Hash<Uint128>
-{
-public:
-	sl_uint32 operator()(const Uint128& a) const;
-};
-
-
-SLIB_MATH_NAMESPACE_END
-
-
-SLIB_MATH_NAMESPACE_BEGIN
-
-SLIB_INLINE Uint128::Uint128() = default;
-
-SLIB_INLINE Uint128::Uint128(const Uint128& num) = default;
-
-SLIB_INLINE Uint128::Uint128(sl_uint64 num) : high(0), low(num)
-{
 }
 
-SLIB_INLINE Uint128& Uint128::operator=(const Uint128& other) = default;
-
-SLIB_INLINE const Uint128& Uint128::zero()
-{
-	return *((Uint128*)((void*)_zero));
-}
-
-SLIB_INLINE sl_bool Uint128::isZero() const
-{
-	return high == 0 && low == 0;
-}
-
-SLIB_INLINE sl_bool Uint128::isNotZero() const
-{
-	return high != 0 || low != 0;
-}
-
-SLIB_INLINE void Uint128::setZero()
-{
-	high = 0;
-	low = 0;
-}
-
-SLIB_INLINE Uint128& Uint128::operator=(sl_uint64 num)
-{
-	high = 0;
-	low = num;
-	return *this;
-}
-
-SLIB_MATH_NAMESPACE_END
+#include "detail/int128.h"
 
 #endif
 

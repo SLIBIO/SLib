@@ -7,6 +7,7 @@
 
 namespace slib
 {
+
 	enum class UIAction
 	{
 		Unknown = 0x0000,
@@ -276,16 +277,18 @@ namespace slib
 	public:
 		int value;
 		SLIB_MEMBERS_OF_PRIMITIVE_WRAPPER(DialogResult, int, value)
-		
+
 	public:
-		SLIB_INLINE DialogResult() = default;
-		
 		enum {
 			Ok = 0,
 			Yes = 0,
 			No = 1,
 			Cancel = 2
 		};
+
+	public:
+		constexpr DialogResult(): value(Ok) {}
+
 	};
 	
 	enum class UIAttachMode
@@ -345,6 +348,7 @@ namespace slib
 		Sentences = 2,
 		AllCharacters = 3
 	};
+
 }
 
 #endif

@@ -1,15 +1,16 @@
 #include "../../../inc/slib/device/information.h"
 
-SLIB_DEVICE_NAMESPACE_BEGIN
-
-sl_uint32 DeviceInformation::getScreenWidth()
+namespace slib
 {
-	return (sl_uint32)(getScreenSize().x);
-}
 
-sl_uint32 DeviceInformation::getScreenHeight()
-{
-	return (sl_uint32)(getScreenSize().y);
-}
+	sl_uint32 DeviceInformation::getScreenWidth()
+	{
+		return (sl_uint32)(getScreenSize().x);
+	}
 
-SLIB_DEVICE_NAMESPACE_END
+	sl_uint32 DeviceInformation::getScreenHeight()
+	{
+		return (sl_uint32)(getScreenSize().y);
+	}
+
+}

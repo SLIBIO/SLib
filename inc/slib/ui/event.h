@@ -13,7 +13,7 @@
 #include "../math/matrix3.h"
 
 namespace slib
-	{
+{
 
 	class Window;
 	class View;
@@ -335,6 +335,11 @@ namespace slib
 	class SLIB_EXPORT IViewListener
 	{
 	public:
+		IViewListener();
+
+		virtual ~IViewListener();
+
+	public:
 		virtual void onMouseEvent(View* view, UIEvent* ev);
 		
 		virtual void onTouchEvent(View* view, UIEvent* ev);
@@ -359,6 +364,11 @@ namespace slib
 
 	class SLIB_EXPORT IWindowListener
 	{
+	public:
+		IWindowListener();
+
+		virtual ~IWindowListener();
+
 	public:
 		virtual void onClose(Window* window, UIEvent* ev);
 		
@@ -387,6 +397,11 @@ namespace slib
 	class SLIB_EXPORT UIEventLogListener : public Referable, public IWindowListener, public IViewListener
 	{
 	public:
+		UIEventLogListener();
+
+		~UIEventLogListener();
+
+	public:
 		void onMouseEvent(View* view, UIEvent* ev);
 		
 		void onMouseWheelEvent(View* view, UIEvent* ev);
@@ -400,6 +415,8 @@ namespace slib
 		void onSetCursor(View* view, UIEvent* ev);
 		
 		void onSwipe(View* view, GestureEvent* ev);
+
+		void onResize(View* view, sl_ui_len width, sl_ui_len height);
 		
 		
 		// window related events
@@ -412,7 +429,7 @@ namespace slib
 		void onDeactivate(Window* window);
 		
 		void onMove(Window* window);
-		
+
 		void onResize(Window* window, sl_ui_len width, sl_ui_len height);
 		
 		void onMinimize(Window* window);

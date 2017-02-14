@@ -2,6 +2,7 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(MobileGame, MobileApp)
 	
 	MobileGame::MobileGame()
@@ -17,6 +18,10 @@ namespace slib
 		
 	}
 	
+	MobileGame::~MobileGame()
+	{
+	}
+
 	Ref<MobileGame> MobileGame::getApp()
 	{
 		return CastRef<MobileGame>(Application::getApp());
@@ -43,4 +48,9 @@ namespace slib
 		setDispatchingEventsToRenderingThread(sl_true);
 		
 	}
+
+	MobileGameView::~MobileGameView()
+	{
+	}
+
 }

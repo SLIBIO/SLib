@@ -20,6 +20,11 @@ namespace slib
 	class IMediaPlayerListener
 	{
 	public:
+		IMediaPlayerListener();
+
+		virtual ~IMediaPlayerListener();
+
+	public:
 		virtual void onReadyToPlay(MediaPlayer* player);
 		
 	};
@@ -152,7 +157,8 @@ namespace slib
 		sl_bool m_flagSelfAlive;
 		sl_bool m_flagAutoRepeat;
 		
-	};	
+	};
+
 }
 
 #endif

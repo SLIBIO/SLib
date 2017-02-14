@@ -8,7 +8,7 @@ namespace slib
 {
 
 /*******************************
-	RenderProgram
+		RenderProgram
 *******************************/
 	
 	SLIB_DEFINE_OBJECT(RenderProgramInstance, RenderBaseObjectInstance)
@@ -63,8 +63,8 @@ namespace slib
 	
 	
 /*******************************
- RenderProgramState
- *******************************/
+ 		RenderProgramState
+*******************************/
 	
 	RenderProgramState::RenderProgramState()
 	{
@@ -159,8 +159,8 @@ namespace slib
 	}
 	
 /*******************************
- _RenderProgramTemplate
- *******************************/
+	_RenderProgramTemplate
+*******************************/
 	
 	sl_bool _RenderProgramTemplate::onInit(RenderEngine* _engine, RenderProgramState* _state)
 	{
@@ -260,7 +260,7 @@ namespace slib
 	
 /*******************************
  RenderProgram2D_PositionTexture
- *******************************/
+*******************************/
 	String RenderProgram2D_PositionTexture::getGLSLVertexShader(RenderEngine* engine)
 	{
 		String source;
@@ -296,7 +296,7 @@ namespace slib
 	
 /*******************************
  RenderProgram2D_PositionTextureYUV
- *******************************/
+*******************************/
 	String RenderProgram2D_PositionTextureYUV::getGLSLFragmentShader(RenderEngine* engine)
 	{
 		String source = SLIB_STRINGIFY(
@@ -316,7 +316,7 @@ namespace slib
 	
 /*******************************
  RenderProgram2D_PositionTextureOES
- *******************************/
+*******************************/
 	String RenderProgram2D_PositionTextureOES::getGLSLFragmentShader(RenderEngine* engine)
 	{
 		String source = "#extension GL_OES_EGL_image_external : require\n";
@@ -335,7 +335,7 @@ namespace slib
 	
 /*******************************
  RenderProgram2D_PositionColor
- *******************************/
+*******************************/
 	String RenderProgram2D_PositionColor::getGLSLVertexShader(RenderEngine* engine)
 	{
 		String source = SLIB_STRINGIFY(
@@ -366,7 +366,7 @@ namespace slib
 	
 /*******************************
  RenderProgram2D_Position
- *******************************/
+*******************************/
 	String RenderProgram2D_Position::getGLSLVertexShader(RenderEngine* engine)
 	{
 		String source = SLIB_STRINGIFY(
@@ -394,7 +394,7 @@ namespace slib
 	
 /*******************************
  RenderProgram3D_PositionNormalColor
- *******************************/
+*******************************/
 	String RenderProgram3D_PositionNormalColor::getGLSLVertexShader(RenderEngine* engine)
 	{
 		String source = SLIB_STRINGIFY(
@@ -433,7 +433,7 @@ namespace slib
 	
 /*******************************
  RenderProgram3D_PositionColor
- *******************************/
+*******************************/
 	String RenderProgram3D_PositionColor::getGLSLVertexShader(RenderEngine* engine)
 	{
 		String source = SLIB_STRINGIFY(
@@ -465,7 +465,7 @@ namespace slib
 	
 /*******************************
  RenderProgram3D_PositionNormalTexture
- *******************************/
+*******************************/
 	String RenderProgram3D_PositionNormalTexture::getGLSLVertexShader(RenderEngine* engine)
 	{
 		String source = SLIB_STRINGIFY(
@@ -510,7 +510,7 @@ namespace slib
 	
 /*******************************
  RenderProgram3D_PositionTexture
- *******************************/
+*******************************/
 	String RenderProgram3D_PositionTexture::getGLSLVertexShader(RenderEngine* engine)
 	{
 		String source = SLIB_STRINGIFY(
@@ -543,7 +543,7 @@ namespace slib
 	
 /*******************************
  RenderProgram3D_PositionNormal
- *******************************/
+*******************************/
 	String RenderProgram3D_PositionNormal::getGLSLVertexShader(RenderEngine* engine)
 	{
 		String source = SLIB_STRINGIFY(
@@ -582,7 +582,7 @@ namespace slib
 	
 /*******************************
  RenderProgram3D_Position
- *******************************/
+*******************************/
 	String RenderProgram3D_Position::getGLSLVertexShader(RenderEngine* engine)
 	{
 		String source = SLIB_STRINGIFY(
@@ -606,4 +606,5 @@ namespace slib
 									   );
 		return source;
 	}
+	
 }

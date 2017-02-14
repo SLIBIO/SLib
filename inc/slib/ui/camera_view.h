@@ -9,6 +9,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT CameraView : public VideoView, public IVideoCaptureListener
 	{
 		SLIB_DECLARE_OBJECT
@@ -16,6 +17,8 @@ namespace slib
 	public:
 		CameraView();
 		
+		~CameraView();
+
 	public:
 		virtual void start(const CameraParam& param);
 		
@@ -30,7 +33,8 @@ namespace slib
 	protected:
 		AtomicRef<Camera> m_camera;
 		
-	};	
+	};
+
 }
 
 #endif

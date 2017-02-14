@@ -61,13 +61,14 @@
 	_SLIB_RENDER_EGL_ENTRY(EGLBoolean, eglWaitSync, EGLDisplay dpy, EGLSync sync, EGLint flags) \
 */
 
-SLIB_RENDER_NAMESPACE_BEGIN
-struct _EGL_EntryPoints
+namespace slib
 {
-	_SLIB_RENDER_EGL_ENTRIES
-};
-extern _EGL_EntryPoints _EGL_ENTRIES;
-SLIB_RENDER_NAMESPACE_END
+	struct _EGL_EntryPoints
+	{
+		_SLIB_RENDER_EGL_ENTRIES
+	};
+	extern _EGL_EntryPoints _EGL_ENTRIES;
+}
 
 #define _EGL_ENTRY(name) _EGL_ENTRIES.name
 

@@ -6,100 +6,102 @@
 #include "object.h"
 #include "string.h"
 
-SLIB_NAMESPACE_BEGIN
-
-enum class AppType
+namespace slib
 {
-	UI = 0,
-	Service = 1
-};
 
-class GlobalUniqueInstance;
+	enum class AppType
+	{
+		UI = 0,
+		Service = 1
+	};
+	
+	class GlobalUniqueInstance;
+	
+	class SLIB_EXPORT Application : public Object
+	{
+		SLIB_DECLARE_OBJECT
 
-class SLIB_EXPORT Application : public Object
-{
-	SLIB_DECLARE_OBJECT
-	
-public:
-	Application();
-	
-	~Application();
-	
-public:
-	virtual AppType getAppType() = 0;
-	
-	String getExecutablePath();
+	public:
+		Application();
 
-	String getCommandLine();
-	
-	List<String> getArguments();
+		~Application();
 
-	String getCommand(sl_uint32 index = 0);
-	
-	void run(const String& commandLine);
-	
-	void run(int argc, const char * argv[]);
+	public:
+		virtual AppType getAppType() = 0;
 
-	void run();
+		String getExecutablePath();
+	
+		String getCommandLine();
 
-	void dispatchQuitApp();
+		List<String> getArguments();
 	
-	sl_bool isUniqueInstanceRunning();
-	
-	virtual String getUniqueInstanceId();
-	
-	void setUniqueInstanceId(const String& _id);
-	
-	virtual sl_bool isCrashRecoverySupport();
-	
-	void setCrashRecoverySupport(sl_bool flagSupport);
+		String getCommand(sl_uint32 index = 0);
 
-protected:
-	virtual void doRun();
+		void run(const String& commandLine);
 
-	virtual void onRunApp() = 0;
+		void run(int argc, const char * argv[]);
 	
-	virtual void onQuitApp();
+		void run();
+	
+		void dispatchQuitApp();
 
-public:
-	static Ref<Application> getApp();
-	
-	static void setApp(Application* app);
-	
-	
-	static void setEnvironmentPath(const String& key, const String& path);
-	
-	static String getEnvironmentPath(const String& key);
-	
-	static String parseEnvironmentPath(const String& path);
+		sl_bool isUniqueInstanceRunning();
 
-	
-	static String getApplicationPath();
-	
-	static String getApplicationDirectory();
-	
-	static void setApplicationDirectory(const String& path);
-	
-	static String findFileAndSetAppPath(const String& filePath, sl_uint32 nDeep = SLIB_UINT32_MAX);
-	
-	
-	static List<String> breakCommandLine(const String& commandLine);
-	
-	static String buildCommandLine(const String* argv, sl_size argc);
-	
-protected:
-	String m_executablePath;
-	String m_commandLine;
-	List<String> m_arguments;
-	
-	AtomicString m_uniqueInstanceId;
-	Ref<GlobalUniqueInstance> m_uniqueInstance;
-	
-	sl_bool m_flagCrashRecoverySupport;
-	
-};
+		virtual String getUniqueInstanceId();
 
-SLIB_NAMESPACE_END
+		void setUniqueInstanceId(const String& _id);
+
+		virtual sl_bool isCrashRecoverySupport();
+
+		void setCrashRecoverySupport(sl_bool flagSupport);
+	
+	protected:
+		virtual void doRun();
+	
+		virtual void onRunApp() = 0;
+
+		virtual void onQuitApp();
+	
+	public:
+		static Ref<Application> getApp();
+
+		static void setApp(Application* app);
+
+
+		static void setEnvironmentPath(const String& key, const String& path);
+
+		static String getEnvironmentPath(const String& key);
+
+		static String parseEnvironmentPath(const String& path);
+	
+
+		static String getApplicationPath();
+
+		static String getApplicationDirectory();
+
+		static void setApplicationDirectory(const String& path);
+
+		static String findFileAndSetAppPath(const String& filePath, sl_uint32 nDeep = SLIB_UINT32_MAX);
+
+
+		static List<String> breakCommandLine(const String& commandLine);
+
+		static String buildCommandLine(const String* argv, sl_size argc);
+
+	protected:
+		String m_executablePath;
+		String m_commandLine;
+		List<String> m_arguments;
+
+		AtomicString m_uniqueInstanceId;
+		Ref<GlobalUniqueInstance> m_uniqueInstance;
+
+		sl_bool m_flagCrashRecoverySupport;
+
+	};
+	
+}
+
 
 #define SLIB_DECLARE_APPLICATION(CLASS) \
 	SLIB_DECLARE_OBJECT \
@@ -140,6 +142,5 @@ public: \
 	slib::Ref<CLASS> CLASS::getApp() { \
 		return slib::CastRef<CLASS>(slib::Application::getApp()); \
 	}
-
 
 #endif

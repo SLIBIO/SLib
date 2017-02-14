@@ -5,41 +5,42 @@
 
 #include "timer.h"
 
-SLIB_NAMESPACE_BEGIN
-
-class DispatchLoop;
-
-class SLIB_EXPORT Dispatch
+namespace slib
 {
-public:
-	static sl_bool dispatch(const Ref<DispatchLoop>& loop, const Function<void()>& task);
 	
-	static sl_bool dispatch(const Function<void()>& task);
+	class DispatchLoop;
 	
-	static sl_bool setTimeout(const Ref<DispatchLoop>& loop, const Function<void()>& task, sl_uint64 delay_ms);
-	
-	static sl_bool setTimeout(const Function<void()>& task, sl_uint64 delay_ms);
+	class SLIB_EXPORT Dispatch
+	{
+	public:
+		static sl_bool dispatch(const Ref<DispatchLoop>& loop, const Function<void()>& task);
 
-	static Ref<Timer> setInterval(const Ref<DispatchLoop>& loop, const Function<void()>& task, sl_uint64 interval_ms);
-	
-	static Ref<Timer> setInterval(const Function<void()>& task, sl_uint64 interval_ms);
-	
-};
+		static sl_bool dispatch(const Function<void()>& task);
 
-class SLIB_EXPORT Dispatcher : public Object
-{
-	SLIB_DECLARE_OBJECT
-	
-public:
-	Dispatcher();
-	
-	~Dispatcher();
-	
-public:
-	virtual sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms = 0) = 0;
-	
-};
+		static sl_bool setTimeout(const Ref<DispatchLoop>& loop, const Function<void()>& task, sl_uint64 delay_ms);
 
-SLIB_NAMESPACE_END
+		static sl_bool setTimeout(const Function<void()>& task, sl_uint64 delay_ms);
+	
+		static Ref<Timer> setInterval(const Ref<DispatchLoop>& loop, const Function<void()>& task, sl_uint64 interval_ms);
+
+		static Ref<Timer> setInterval(const Function<void()>& task, sl_uint64 interval_ms);
+
+	};
+	
+	class SLIB_EXPORT Dispatcher : public Object
+	{
+		SLIB_DECLARE_OBJECT
+
+	public:
+		Dispatcher();
+
+		~Dispatcher();
+
+	public:
+		virtual sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms = 0) = 0;
+
+	};
+
+}
 
 #endif

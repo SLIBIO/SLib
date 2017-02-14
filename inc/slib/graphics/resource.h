@@ -8,8 +8,6 @@
 #include "../core/list.h"
 #include "../core/resource.h"
 
-SLIB_GRAPHICS_NAMESPACE_BEGIN
-
 #define SLIB_DECLARE_IMAGE_RESOURCE(NAME) \
 	namespace NAME { \
 		slib::Ref<slib::Image> getImage(const slib::Locale& locale, sl_uint32 requiredWidth = 0, sl_uint32 requiredHeight = 0); \
@@ -138,44 +136,6 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 #define SLIB_DEFINE_DRAWABLE_RESOURCE_MAP_BEGIN SLIB_DEFINE_RESOURCE_MAP_BEGIN(slib::Ref<slib::Drawable>)
 #define SLIB_DEFINE_DRAWABLE_RESOURCE_MAP_END SLIB_DEFINE_RESOURCE_MAP_END(slib::Ref<slib::Drawable>)
 
-
-struct _ImageResourceEntry
-{
-	sl_bool flagValid;
-	
-	sl_uint32 width;
-	sl_uint32 height;
-	
-	const sl_uint8* source_bytes;
-	sl_uint32 source_size;
-	
-	sl_int32 lock;
-	void* image;
-	sl_bool flag_load;
-	
-	Ref<Image> getImage();
-	Ref<Image> getMatchingImage(sl_uint32 width, sl_uint32 height);
-	
-};
-
-class _ImageResourceFreeStatic
-{
-public:
-	_ImageResourceFreeStatic(_ImageResourceEntry* entries);
-	
-	~_ImageResourceFreeStatic();
-	
-private:
-	_ImageResourceEntry* m_entries;
-	
-};
-
-Ref<Image> _ImageResource_getImage(_ImageResourceEntry* entries, sl_uint32 requiredWidth, sl_uint32 requiredHeight);
-
-List< Ref<Image> > _ImageResource_getImages(_ImageResourceEntry* entries);
-
-Ref<Drawable> _ImageResource_get(_ImageResourceEntry* entries, sl_uint32 width, sl_uint32 height);
-
-SLIB_GRAPHICS_NAMESPACE_END
+#include "detail/resource.h"
 
 #endif

@@ -7,6 +7,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT SplitView : public View
 	{
 		SLIB_DECLARE_OBJECT
@@ -165,13 +166,20 @@ namespace slib
 	{
 	public:
 		VerticalSplitView();
+
+		~VerticalSplitView();
+
 	};
 	
 	class SLIB_EXPORT HorizontalSplitView : public SplitView
 	{
 	public:
 		HorizontalSplitView();
-	};	
+
+		~HorizontalSplitView();
+
+	};
+
 }
 
 #endif

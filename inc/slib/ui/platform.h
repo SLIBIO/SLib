@@ -20,6 +20,7 @@
 
 namespace slib
 {
+
 	class Screen;
 	class ViewInstance;
 	class View;
@@ -138,6 +139,7 @@ namespace slib
 		static void _registerWindowInstance(const void* handle, WindowInstance* instance);
 		static void _removeWindowInstance(const void* handle);
 	};
+
 }
 
 #if defined(SLIB_PLATFORM_IS_WIN32)

@@ -9,6 +9,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT IndexBufferInstance : public RenderBaseObjectInstance
 	{
 		SLIB_DECLARE_OBJECT
@@ -60,7 +61,8 @@ namespace slib
 		Memory m_mem;
 		sl_bool m_flagStatic;
 		
-	};	
+	};
+
 }
 
 #endif

@@ -7,6 +7,7 @@
 
 namespace slib
 {
+
 	class Window;
 	class Menu;
 	
@@ -17,6 +18,8 @@ namespace slib
 	public:
 		UIApp();
 		
+		~UIApp();
+
 	public:
 		static Ref<UIApp> getApp();
 		
@@ -57,7 +60,8 @@ namespace slib
 		AtomicRef<Window> m_mainWindow;
 		AtomicRef<Menu> m_mainMenu;
 		
-	};	
+	};
+
 }
 
 #endif

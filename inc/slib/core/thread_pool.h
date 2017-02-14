@@ -7,48 +7,49 @@
 #include "thread.h"
 #include "dispatch.h"
 
-SLIB_NAMESPACE_BEGIN
-
-class SLIB_EXPORT ThreadPool : public Dispatcher
+namespace slib
 {
-	SLIB_DECLARE_OBJECT
 	
-private:
-	ThreadPool();
+	class SLIB_EXPORT ThreadPool : public Dispatcher
+	{
+		SLIB_DECLARE_OBJECT
+
+	private:
+		ThreadPool();
+
+		~ThreadPool();
+
+	public:
+		static Ref<ThreadPool> create(sl_uint32 minThreads = 0, sl_uint32 maxThreads = 30);
 	
-	~ThreadPool();
+	public:
+		void release();
+
+		sl_bool isRunning();
+
+		sl_uint32 getThreadsCount();
 	
-public:
-	static Ref<ThreadPool> create(sl_uint32 minThreads = 0, sl_uint32 maxThreads = 30);
+		sl_bool addTask(const Function<void()>& task);
 
-public:
-	void release();
+		// override
+		sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms = 0);
 	
-	sl_bool isRunning();
+	public:
+		SLIB_PROPERTY(sl_uint32, MinimumThreadsCount)
+		SLIB_PROPERTY(sl_uint32, MaximumThreadsCount)
+		SLIB_PROPERTY(sl_uint32, ThreadStackSize)
 	
-	sl_uint32 getThreadsCount();
-
-	sl_bool addTask(const Function<void()>& task);
+	protected:
+		void onRunWorker();
 	
-	// override
-	sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms = 0);
-
-public:
-	SLIB_PROPERTY(sl_uint32, MinimumThreadsCount)
-	SLIB_PROPERTY(sl_uint32, MaximumThreadsCount)
-	SLIB_PROPERTY(sl_uint32, ThreadStackSize)
-
-protected:
-	void onRunWorker();
-
-protected:
-	CList< Ref<Thread> > m_threadWorkers;
-	LinkedQueue< Function<void()> > m_tasks;
-
-	sl_bool m_flagRunning;
+	protected:
+		CList< Ref<Thread> > m_threadWorkers;
+		LinkedQueue< Function<void()> > m_tasks;
 	
-};
+		sl_bool m_flagRunning;
 
-SLIB_NAMESPACE_END
+	};
+
+}
 
 #endif

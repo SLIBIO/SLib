@@ -6,12 +6,13 @@
 #include "../core/object.h"
 #include "../core/list.h"
 
+#define SLIB_MAX_RENDER_ENGINE_COUNT_PER_OBJECT 4
+
 namespace slib
 {
+
 	class RenderEngine;
 	class RenderBaseObject;
-	
-#define SLIB_MAX_RENDER_ENGINE_COUNT_PER_OBJECT 4
 	
 	class SLIB_EXPORT RenderBaseObjectInstance : public Object
 	{
@@ -70,6 +71,7 @@ namespace slib
 		AtomicRef<RenderBaseObjectInstance> m_instances[SLIB_MAX_RENDER_ENGINE_COUNT_PER_OBJECT];
 		
 	};
+
 }
 
 #endif

@@ -7,6 +7,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT ImageView : public View
 	{
 		SLIB_DECLARE_OBJECT
@@ -14,6 +15,8 @@ namespace slib
 	public:
 		ImageView();
 		
+		~ImageView();
+
 	public:
 		static Ref<ImageView> create(sl_ui_len width, sl_ui_len height, const Ref<Drawable>& drawable);
 		
@@ -44,7 +47,8 @@ namespace slib
 		ScaleMode m_scaleMode;
 		Alignment m_gravity;
 		
-	};	
+	};
+
 }
 
 #endif

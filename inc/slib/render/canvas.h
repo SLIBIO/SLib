@@ -11,6 +11,7 @@
 
 namespace slib
 {
+
 	enum class RenderCanvasClipType
 	{
 		Rectangle,
@@ -191,7 +192,8 @@ namespace slib
 		Ref<RenderCanvasState> m_state;
 		LinkedStack< Ref<RenderCanvasState> > m_stackStates;
 		
-	};	
+	};
+
 }
 
 #endif

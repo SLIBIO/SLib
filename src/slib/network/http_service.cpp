@@ -11,8 +11,9 @@
 
 namespace slib
 {
+
 /**********************************************
-	HttpServiceContext
+			HttpServiceContext
 **********************************************/
 
 	SLIB_DEFINE_OBJECT(HttpServiceContext, Object)
@@ -139,7 +140,7 @@ namespace slib
 	}
 
 /******************************************************
-	HttpServiceConnection
+			HttpServiceConnection
 ******************************************************/
 #define SIZE_READ_BUF 0x10000
 #define SIZE_COPY_BUF 0x10000
@@ -279,7 +280,7 @@ namespace slib
 				context->m_requestHeaderReader.clear();
 				Memory header = context->getRawRequestHeader();
 				sl_reg iRet = context->parseRequestPacket(header.getData(), header.getSize());
-				if (iRet != context->m_requestHeader.getSize()) {
+				if (iRet != (sl_reg)(context->m_requestHeader.getSize())) {
 					sendResponse_BadRequest();
 					return;
 				}
@@ -483,7 +484,7 @@ namespace slib
 	}
 
 /******************************************************
-	HttpServiceConnectionProvider
+			HttpServiceConnectionProvider
 ******************************************************/
 
 	HttpServiceConnectionProvider::HttpServiceConnectionProvider()
@@ -578,8 +579,17 @@ namespace slib
 	};
 
 /******************************************************
-	HttpService
+					HttpService
 ******************************************************/
+
+	IHttpServiceProcessor::IHttpServiceProcessor()
+	{
+	}
+
+	IHttpServiceProcessor::~IHttpServiceProcessor()
+	{
+	}
+
 	HttpServiceParam::HttpServiceParam()
 	{
 		port = 80;
@@ -916,7 +926,7 @@ namespace slib
 				context->setResponseContentRangeUnsatisfied(totalLength);
 				return sl_false;
 			}
-			if (indexSplit == range.getLength() - 1) {
+			if (indexSplit == (sl_reg)(range.getLength()) - 1) {
 				outLength = totalLength - n1;
 			} else {
 				if (n2 >= totalLength) {

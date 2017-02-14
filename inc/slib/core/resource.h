@@ -9,18 +9,21 @@
 #include "memory.h"
 #include "safe_static.h"
 
-SLIB_NAMESPACE_BEGIN
-
-class Resources
+namespace slib
 {
-public:
-	static Locale getCurrentLocale();
 	
-	static void setCurrentLocale(const Locale& locale);
-	
-	static String makeResourceName(const String& path);
+	class Resources
+	{
+	public:
+		static Locale getCurrentLocale();
 
-};
+		static void setCurrentLocale(const Locale& locale);
+
+		static String makeResourceName(const String& path);
+	
+	};
+
+}
 
 #define SLIB_DECLARE_STRING_RESOURCE(NAME) \
 	namespace NAME { \
@@ -107,7 +110,5 @@ public:
 #define SLIB_DECLARE_RAW_RESOURCE_MAP SLIB_DECLARE_RESOURCE_MAP(slib::Memory)
 #define SLIB_DEFINE_RAW_RESOURCE_MAP_BEGIN SLIB_DEFINE_RESOURCE_MAP_BEGIN(slib::Memory)
 #define SLIB_DEFINE_RAW_RESOURCE_MAP_END SLIB_DEFINE_RESOURCE_MAP_END(slib::Memory)
-
-SLIB_NAMESPACE_END
 
 #endif

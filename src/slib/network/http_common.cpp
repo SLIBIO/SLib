@@ -128,9 +128,9 @@ namespace slib
 	}
 
 
-	#define DEFINE_HTTP_HEADER(name, value) \
-		SLIB_STATIC_STRING(static_##name, value); \
-		const String& HttpHeaders::name = static_##name;
+#define DEFINE_HTTP_HEADER(name, value) \
+	SLIB_STATIC_STRING(static_##name, value); \
+	const String& HttpHeaders::name = static_##name;
 
 	DEFINE_HTTP_HEADER(ContentLength, "Content-Length")
 	DEFINE_HTTP_HEADER(ContentType, "Content-Type")
@@ -209,7 +209,7 @@ namespace slib
 
 
 /***********************************************************************
-	HttpRequest
+							HttpRequest
 ***********************************************************************/
 
 	HttpRequest::HttpRequest()
@@ -672,7 +672,7 @@ namespace slib
 
 
 /***********************************************************************
-	HttpResponse
+							HttpResponse
 ***********************************************************************/
 
 	HttpResponse::HttpResponse()
@@ -977,7 +977,7 @@ namespace slib
 	}
 
 /***********************************************************************
-	HttpOutputBuffer
+						HttpOutputBuffer
 ***********************************************************************/
 	HttpOutputBuffer::HttpOutputBuffer()
 	{
@@ -1028,7 +1028,7 @@ namespace slib
 	}
 
 /***********************************************************************
-	HttpHeaderReader
+						HttpHeaderReader
 ***********************************************************************/
 	HttpHeaderReader::HttpHeaderReader()
 	{
@@ -1114,8 +1114,17 @@ namespace slib
 	}
 
 /***********************************************************************
-	HttpContentReader
+						HttpContentReader
 ***********************************************************************/
+
+	IHttpContentReaderListener::IHttpContentReaderListener()
+	{
+	}
+
+	IHttpContentReaderListener::~IHttpContentReaderListener()
+	{
+	}
+
 	HttpContentReader::HttpContentReader()
 	{
 		m_flagDecompressing = sl_false;
@@ -1135,6 +1144,7 @@ namespace slib
 		_HttpContentReader_Persistent()
 		{
 			m_sizeRead = 0;
+			m_sizeTotal = 0;
 		}
 
 		Memory filterRead(void* data, sl_uint32 size, Referable* refData)

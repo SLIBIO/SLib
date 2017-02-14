@@ -114,6 +114,10 @@ namespace slib
 		
 	}
 
+	CheckBox::~CheckBox()
+	{
+	}
+
 	sl_bool CheckBox::isChecked()
 	{
 		if (isNativeWidget()) {

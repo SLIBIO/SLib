@@ -3,20 +3,22 @@
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
 #include "../../../inc/slib/media/camera.h"
+
 #include "../../../inc/slib/media/dshow.h"
 
-SLIB_MEDIA_NAMESPACE_BEGIN
-
-Ref<Camera> Camera::create(const CameraParam& param)
+namespace slib
 {
-	return DirectShow::createCamera(param);
-}
 
-List<CameraInfo> Camera::getCamerasList()
-{
-	return DirectShow::getCamerasList();
-}
+	Ref<Camera> Camera::create(const CameraParam& param)
+	{
+		return DirectShow::createCamera(param);
+	}
 
-SLIB_MEDIA_NAMESPACE_END
+	List<CameraInfo> Camera::getCamerasList()
+	{
+		return DirectShow::getCamerasList();
+	}
+
+}
 
 #endif

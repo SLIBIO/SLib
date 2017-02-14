@@ -146,6 +146,7 @@
 
 namespace slib
 {
+
 	enum class IcmpType
 	{
 		EchoReply = 0,
@@ -256,7 +257,8 @@ namespace slib
 	public:
 		sl_uint32 operator()(const IcmpEchoAddress& a) const;
 		
-	};	
+	};
+
 }
 
 #endif

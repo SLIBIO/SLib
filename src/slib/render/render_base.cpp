@@ -4,6 +4,7 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(RenderBaseObjectInstance, Object)
 	
 	RenderBaseObjectInstance::RenderBaseObjectInstance()
@@ -48,6 +49,7 @@ namespace slib
 	{
 		return m_flagUpdated;
 	}
+	
 	
 	SLIB_DEFINE_OBJECT(RenderBaseObject, Object)
 	
@@ -138,4 +140,5 @@ namespace slib
 		}
 		return sl_null;
 	}
+
 }

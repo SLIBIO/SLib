@@ -61,6 +61,14 @@ namespace slib
 	}
 
 
+	IAsyncTcpSocketListener::IAsyncTcpSocketListener()
+	{
+	}
+
+	IAsyncTcpSocketListener::~IAsyncTcpSocketListener()
+	{
+	}
+
 	void IAsyncTcpSocketListener::onError(AsyncTcpSocket* socketListen)
 	{
 	}
@@ -310,6 +318,14 @@ namespace slib
 	}
 
 
+	IAsyncTcpServerListener::IAsyncTcpServerListener()
+	{
+	}
+
+	IAsyncTcpServerListener::~IAsyncTcpServerListener()
+	{
+	}
+
 	void IAsyncTcpServerListener::onError(AsyncTcpServer* socketListen)
 	{
 	}
@@ -364,8 +380,8 @@ namespace slib
 		}
 	
 #if defined(SLIB_PLATFORM_IS_UNIX)
-	// Sometimes, the previously bound port is remaining used state even after exit on Unix system.
-	// So, we set ReuseAddress flag on Server sockets to avoid this issue
+		// Sometimes, the previously bound port is remaining used state even after exit on Unix system.
+		// So, we set ReuseAddress flag on Server sockets to avoid this issue
 		socket->setOption_ReuseAddress(sl_true);
 #endif
 		if (socket->listen()) {
@@ -528,6 +544,14 @@ namespace slib
 		}
 	}
 
+
+	IAsyncUdpSocketListener::IAsyncUdpSocketListener()
+	{
+	}
+
+	IAsyncUdpSocketListener::~IAsyncUdpSocketListener()
+	{
+	}
 
 	AsyncUdpSocketParam::AsyncUdpSocketParam()
 	{

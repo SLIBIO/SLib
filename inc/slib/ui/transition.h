@@ -7,6 +7,7 @@
 
 namespace slib
 {
+
 	enum class TransitionType
 	{
 		None = 0,
@@ -38,9 +39,13 @@ namespace slib
 		
 	public:
 		Transition();
+
 		Transition(const Transition& other);
+
 		Transition& operator=(const Transition& other);
 		
+		~Transition();
+
 	public:
 		static Ref<Animation> start(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Function<void()>& onStop);
 		
@@ -50,7 +55,8 @@ namespace slib
 		
 		static Ref<Animation> createPopupAnimation(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Function<void()>& onStop);
 		
-	};	
+	};
+
 }
 
 #endif

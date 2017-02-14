@@ -2,6 +2,7 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(LinearView, ViewGroup)
 	
 	LinearView::LinearView()
@@ -14,6 +15,10 @@ namespace slib
 		
 	}
 	
+	LinearView::~LinearView()
+	{
+	}
+
 	LayoutOrientation LinearView::getOrientation()
 	{
 		return m_orientation;
@@ -314,8 +319,17 @@ namespace slib
 		setOrientation(LayoutOrientation::Vertical, UIUpdateMode::Init);
 	}
 	
+	VerticalLinearView::~VerticalLinearView()
+	{
+	}
+
 	HorizontalLinearView::HorizontalLinearView()
 	{
 		setOrientation(LayoutOrientation::Horizontal, UIUpdateMode::Init);
 	}
+
+	HorizontalLinearView::~HorizontalLinearView()
+	{
+	}
+
 }

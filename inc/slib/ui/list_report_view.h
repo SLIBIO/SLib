@@ -7,10 +7,16 @@
 
 namespace slib
 {
+
 	class ListReportView;
 	
 	class SLIB_EXPORT IListReportViewListener
 	{
+	public:
+		IListReportViewListener();
+
+		virtual ~IListReportViewListener();
+
 	public:
 		virtual void onSelectRow(ListReportView* view, sl_uint32 row);
 		
@@ -32,12 +38,16 @@ namespace slib
 		
 	public:
 		ListReportViewColumn();
+
+		~ListReportViewColumn();
+
 	};
 	
 	class ListReportViewCell
 	{
 	public:
 		AtomicString text;
+
 	};
 	
 	class SLIB_EXPORT ListReportView : public View
@@ -47,6 +57,8 @@ namespace slib
 	public:
 		ListReportView();
 		
+		~ListReportView();
+
 	public:
 		sl_uint32 getColumnsCount();
 		

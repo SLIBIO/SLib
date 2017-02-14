@@ -133,11 +133,11 @@ namespace slib
 
 	};
 
+}
+
 #define SLIB_UI_CALLBACK(...) slib::UI::getCallbackOnUiThread(SLIB_BIND(void(), __VA_ARGS__))
 #define SLIB_UI_CALLBACK_CLASS(...) slib::UI::getCallbackOnUiThread(SLIB_BIND_CLASS(void(), __VA_ARGS__))
 #define SLIB_UI_CALLBACK_REF(...) slib::UI::getCallbackOnUiThread(SLIB_BIND_REF(void(), __VA_ARGS__))
 #define SLIB_UI_CALLBACK_WEAKREF(...) slib::UI::getCallbackOnUiThread(SLIB_BIND_WEAKREF(void(), __VA_ARGS__))
-
-}
 
 #endif

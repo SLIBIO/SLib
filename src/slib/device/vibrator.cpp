@@ -2,13 +2,14 @@
 
 #if defined(SLIB_PLATFORM_IS_DESKTOP)
 
-SLIB_DEVICE_NAMESPACE_BEGIN
-
-sl_bool Vibrator::vibrate(sl_int32 millisec)
+namespace slib
 {
-	return sl_false;
-}
 
-SLIB_DEVICE_NAMESPACE_END
+	sl_bool Vibrator::vibrate(sl_int32 millisec)
+	{
+		return sl_false;
+	}
+
+}
 
 #endif

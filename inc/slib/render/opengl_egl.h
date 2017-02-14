@@ -7,6 +7,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT EGL
 	{
 	public:
@@ -19,7 +20,8 @@ namespace slib
 		
 		static void loadEntries(sl_bool flagReload = sl_false);
 		
-	};	
+	};
+
 }
 
 #endif

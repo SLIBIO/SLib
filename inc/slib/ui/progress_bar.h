@@ -7,12 +7,15 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT ProgressBar : public View
 	{
 		SLIB_DECLARE_OBJECT
 		
 	public:
 		ProgressBar(LayoutOrientation orientation = LayoutOrientation::Horizontal);
+
+		~ProgressBar();
 		
 	public:
 		LayoutOrientation getOrientation();
@@ -114,7 +117,8 @@ namespace slib
 		AtomicRef<Drawable> m_progress;
 		AtomicRef<Drawable> m_progress2;
 		
-	};	
+	};
+
 }
 
 #endif

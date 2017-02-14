@@ -2,11 +2,21 @@
 
 #include "../../../inc/slib/network/url.h"
 #include "../../../inc/slib/core/json.h"
-#include "../../../inc/slib/core/log.h"
+#include "../../../inc/slib/core/string_buffer.h"
 #include "../../../inc/slib/core/safe_static.h"
+#include "../../../inc/slib/core/log.h"
 
 namespace slib
 {
+
+	IUrlRequestListener::IUrlRequestListener()
+	{
+	}
+
+	IUrlRequestListener::~IUrlRequestListener()
+	{
+	}
+
 	void IUrlRequestListener::onComplete(UrlRequest *request)
 	{
 	}
@@ -56,6 +66,11 @@ namespace slib
 		
 		m_responseStatus = HttpStatus::Unknown;
 		
+		m_method = HttpMethod::GET;
+		m_flagSelfAlive = sl_false;
+		m_flagStoreResponseContent = sl_true;
+		m_flagUseBackgroundSession = sl_false;
+
 	}
 	
 	UrlRequest::~UrlRequest()
@@ -621,4 +636,5 @@ namespace slib
 		}
 		return body;
 	}
+	
 }

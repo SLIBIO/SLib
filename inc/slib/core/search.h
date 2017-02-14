@@ -3,67 +3,19 @@
 
 #include "definition.h"
 
-SLIB_NAMESPACE_BEGIN
-
-class SLIB_EXPORT BinarySearch
+namespace slib
 {
-public:
-	template < class T1, class T2, class COMPARE=Compare<T1, T2> >
-	static sl_bool search(const T1* list, sl_size size, const T2& what, sl_size* pIndexPrev = sl_null, const COMPARE& compare = COMPARE());
 
-};
+	class SLIB_EXPORT BinarySearch
+	{
+	public:
+		template < class T1, class T2, class COMPARE=Compare<T1, T2> >
+		static sl_bool search(const T1* list, sl_size size, const T2& what, sl_size* pIndexPrev = sl_null, const COMPARE& compare = COMPARE());
 
-template <class T1, class T2, class COMPARE>
-sl_bool BinarySearch::search(const T1* list, sl_size size, const T2& what, sl_size* pIndexPrev, const COMPARE& compare)
-{
-	if (size == 0) {
-		if (pIndexPrev) {
-			*pIndexPrev = 0;
-		}
-		return sl_false;
-	}
-	sl_size index = 0;
-	sl_size start = 0;
-	sl_size end = size - 1;
-	while (1) {
-		if (start == end) {
-			int c = compare(list[start], what);
-			if (c == 0) {
-				if (pIndexPrev) {
-					*pIndexPrev = start;
-				}
-				return sl_true;
-			} else if (c < 0) {
-				index = start + 1;
-			} else {
-				index = start;
-			}
-			break;
-		} else {
-			sl_size mid = (start + end) / 2;
-			int c = compare(list[mid], what);
-			if (c == 0) {
-				if (pIndexPrev) {
-					*pIndexPrev = mid;
-				}
-				return sl_true;
-			} else if (c < 0) {
-				start = mid + 1;
-			} else {
-				if (start >= mid) {
-					index = mid;
-					break;
-				}
-				end = mid - 1;
-			}
-		}
-	}
-	if (pIndexPrev) {
-		*pIndexPrev = index;
-	}
-	return sl_false;
+	};
+
 }
 
-SLIB_NAMESPACE_END
+#include "detail/search.h"
 
 #endif

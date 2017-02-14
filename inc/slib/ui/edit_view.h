@@ -7,10 +7,16 @@
 
 namespace slib
 {
+
 	class EditView;
 	
 	class SLIB_EXPORT IEditViewListener
 	{
+	public:
+		IEditViewListener();
+
+		virtual ~IEditViewListener();
+
 	public:
 		virtual String onChange(EditView* edit, const String& newValue);
 		
@@ -24,6 +30,8 @@ namespace slib
 		
 	public:
 		EditView();
+
+		~EditView();
 		
 	public:
 		String getText();
@@ -143,6 +151,8 @@ namespace slib
 	public:
 		PasswordView();
 		
+		~PasswordView();
+
 	public:
 		// override
 		sl_bool isMultiLine();
@@ -163,6 +173,8 @@ namespace slib
 	public:
 		TextArea();
 		
+		~TextArea();
+
 	public:
 		// override
 		sl_bool isMultiLine();
@@ -174,7 +186,8 @@ namespace slib
 		// override
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
 		
-	};	
+	};
+
 }
 
 #endif

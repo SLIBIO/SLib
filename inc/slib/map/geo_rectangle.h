@@ -5,31 +5,32 @@
 
 #include "latlon.h"
 
-SLIB_MAP_NAMESPACE_BEGIN
-
-class SLIB_EXPORT GeoRectangle
+namespace slib
 {
-public:
-	LatLon bottomLeft;
-	LatLon topRight;
-
-public:
-	GeoRectangle();
-
-	GeoRectangle(const GeoRectangle& other);
-
-	GeoRectangle(const LatLon& pt1, const LatLon& pt2);
 	
-public:
-	GeoRectangle& operator=(const GeoRectangle& other);
+	class SLIB_EXPORT GeoRectangle
+	{
+	public:
+		LatLon bottomLeft;
+		LatLon topRight;
 
-public:
-	sl_bool contains(const LatLon& pt) const;
+	public:
+		GeoRectangle();
 
-	sl_bool isValid() const;
+		GeoRectangle(const GeoRectangle& other);
+
+		GeoRectangle(const LatLon& pt1, const LatLon& pt2);
+
+	public:
+		GeoRectangle& operator=(const GeoRectangle& other);
+
+	public:
+		sl_bool contains(const LatLon& pt) const;
 	
-};
+		sl_bool isValid() const;
 
-SLIB_MAP_NAMESPACE_END
+	};
+
+}
 
 #endif

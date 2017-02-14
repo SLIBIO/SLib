@@ -7,6 +7,14 @@ namespace slib
 	EditView
  ***********************/
 
+	IEditViewListener::IEditViewListener()
+	{
+	}
+
+	IEditViewListener::~IEditViewListener()
+	{
+	}
+
 	String IEditViewListener::onChange(EditView* edit, const String& newValue)
 	{
 		return String::null();
@@ -32,6 +40,10 @@ namespace slib
 		m_keyboardType = UIKeyboardType::Default;
 		m_autoCapitalizationType = UIAutoCapitalizationType::None;
 		m_flagAutoDismissKeyboard = sl_true;
+	}
+
+	EditView::~EditView()
+	{
 	}
 
 	String EditView::getText()
@@ -268,6 +280,10 @@ namespace slib
 	{
 	}
 
+	PasswordView::~PasswordView()
+	{
+	}
+
 	sl_bool PasswordView::isMultiLine()
 	{
 		return sl_false;
@@ -287,6 +303,10 @@ namespace slib
 	{
 		m_flagMultiLine = sl_true;
 		setReturnKeyType(UIReturnKeyType::Return);
+	}
+
+	TextArea::~TextArea()
+	{
 	}
 
 	sl_bool TextArea::isMultiLine()
@@ -314,15 +334,7 @@ namespace slib
 	{
 	}
 
-	void EditView::_getTextAlignment_NW()
-	{
-	}
-
 	void EditView::_setTextAlignment_NW(Alignment align)
-	{
-	}
-
-	void EditView::_getHintText_NW()
 	{
 	}
 
@@ -330,15 +342,7 @@ namespace slib
 	{
 	}
 
-	void EditView::_isReadOnly_NW()
-	{
-	}
-
 	void EditView::_setReadOnly_NW(sl_bool flag)
-	{
-	}
-
-	void EditView::_isMultiLine_NW()
 	{
 	}
 

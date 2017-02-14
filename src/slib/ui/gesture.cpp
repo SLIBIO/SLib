@@ -6,7 +6,8 @@
 
 namespace slib
 {
-	GestureEvent::GestureEvent()
+
+	GestureEvent::GestureEvent(): type(GestureType::SwipeLeft)
 	{
 	}
 	
@@ -123,6 +124,10 @@ namespace slib
 	{
 	}
 	
+	GestureDetector::~GestureDetector()
+	{
+	}
+
 	void GestureDetector::enable(GestureType type)
 	{
 		ObjectLocker lock(this);
@@ -216,4 +221,5 @@ namespace slib
 	}
 	
 #endif
+
 }

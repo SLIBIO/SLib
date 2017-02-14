@@ -6,79 +6,80 @@
 
 #include "../../../inc/slib/core/thread.h"
 
-SLIB_NAMESPACE_BEGIN
-
-SLIB_THREAD Thread* _gt_threadCurrent = sl_null;
-Thread* Thread::_nativeGetCurrentThread()
+namespace slib
 {
-	return _gt_threadCurrent;
-}
 
-void Thread::_nativeSetCurrentThread(Thread* thread)
-{
-	_gt_threadCurrent = thread;
-}
-
-SLIB_THREAD sl_uint64 _gt_threadUniqueId = 0;
-sl_uint64 Thread::_nativeGetCurrentThreadUniqueId()
-{
-	return _gt_threadUniqueId;
-}
-
-void Thread::_nativeSetCurrentThreadUniqueId(sl_uint64 n)
-{
-	_gt_threadUniqueId = n;
-}
-
-static DWORD CALLBACK _ThreadProc(LPVOID lpParam)
-{
-	Thread* pThread = (Thread*)lpParam;
-	pThread->_run();
-	pThread->decreaseReference();
-	return 0;
-}
-
-void Thread::_nativeStart(sl_uint32 stackSize)
-{
-	DWORD threadID = 0;
-	this->increaseReference();
-	m_handle = (void*)(CreateThread(NULL, stackSize, _ThreadProc, (LPVOID)this, 0, &threadID));
-	if (!m_handle) {
-		this->decreaseReference();
+	SLIB_THREAD Thread* _gt_threadCurrent = sl_null;
+	Thread* Thread::_nativeGetCurrentThread()
+	{
+		return _gt_threadCurrent;
 	}
-}
 
-void Thread::_nativeSetPriority()
-{
-	HANDLE hThread = (HANDLE)m_handle;
-	if (hThread) {
-		switch (m_priority) {
-		case ThreadPriority::Normal:
-			SetThreadPriority(hThread, THREAD_PRIORITY_NORMAL);
-			break;
-		case ThreadPriority::AboveNormal:
-			SetThreadPriority(hThread, THREAD_PRIORITY_ABOVE_NORMAL);
-			break;
-		case ThreadPriority::Highest:
-			SetThreadPriority(hThread, THREAD_PRIORITY_HIGHEST);
-			break;
-		case ThreadPriority::BelowNormal:
-			SetThreadPriority(hThread, THREAD_PRIORITY_BELOW_NORMAL);
-			break;
-		case ThreadPriority::Lowest:
-			SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
-			break;
+	void Thread::_nativeSetCurrentThread(Thread* thread)
+	{
+		_gt_threadCurrent = thread;
+	}
+
+	SLIB_THREAD sl_uint64 _gt_threadUniqueId = 0;
+	sl_uint64 Thread::_nativeGetCurrentThreadUniqueId()
+	{
+		return _gt_threadUniqueId;
+	}
+
+	void Thread::_nativeSetCurrentThreadUniqueId(sl_uint64 n)
+	{
+		_gt_threadUniqueId = n;
+	}
+
+	static DWORD CALLBACK _ThreadProc(LPVOID lpParam)
+	{
+		Thread* pThread = (Thread*)lpParam;
+		pThread->_run();
+		pThread->decreaseReference();
+		return 0;
+	}
+
+	void Thread::_nativeStart(sl_uint32 stackSize)
+	{
+		DWORD threadID = 0;
+		this->increaseReference();
+		m_handle = (void*)(CreateThread(NULL, stackSize, _ThreadProc, (LPVOID)this, 0, &threadID));
+		if (!m_handle) {
+			this->decreaseReference();
 		}
 	}
-}
 
-void Thread::_nativeClose()
-{
-	if (m_handle) {
-		CloseHandle((HANDLE)m_handle);
+	void Thread::_nativeSetPriority()
+	{
+		HANDLE hThread = (HANDLE)m_handle;
+		if (hThread) {
+			switch (m_priority) {
+			case ThreadPriority::Normal:
+				SetThreadPriority(hThread, THREAD_PRIORITY_NORMAL);
+				break;
+			case ThreadPriority::AboveNormal:
+				SetThreadPriority(hThread, THREAD_PRIORITY_ABOVE_NORMAL);
+				break;
+			case ThreadPriority::Highest:
+				SetThreadPriority(hThread, THREAD_PRIORITY_HIGHEST);
+				break;
+			case ThreadPriority::BelowNormal:
+				SetThreadPriority(hThread, THREAD_PRIORITY_BELOW_NORMAL);
+				break;
+			case ThreadPriority::Lowest:
+				SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
+				break;
+			}
+		}
 	}
-}
 
-SLIB_NAMESPACE_END
+	void Thread::_nativeClose()
+	{
+		if (m_handle) {
+			CloseHandle((HANDLE)m_handle);
+		}
+	}
+
+}
 
 #endif

@@ -17,9 +17,10 @@ Motion tracking algorithm based on least-squares linear regression.
 
 #include "../core/time.h"
 
+#define SLIB_MOTION_TRACKER_HISTORY_SIZE 20
+
 namespace slib
 {
-#define SLIB_MOTION_TRACKER_HISTORY_SIZE 20
 	
 	class UIEvent;
 	
@@ -75,6 +76,7 @@ namespace slib
 		sl_bool m_flagValidTrack;
 		
 	};
+
 }
 
 #endif

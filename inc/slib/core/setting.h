@@ -6,31 +6,39 @@
 #include "map.h"
 #include "variant.h"
 
-SLIB_NAMESPACE_BEGIN
-
-class SLIB_EXPORT IniSetting
+namespace slib
 {
-private:
-	HashMap<String, String> m_mapValues;
-
-public:
-	void initialize();
 	
-	sl_bool parseFromUtf8TextFile(const String& filePath);
+	class SLIB_EXPORT IniSetting : public Object
+	{
+		SLIB_DECLARE_OBJECT
+
+	public:
+		IniSetting();
+
+		~IniSetting();
+
+	public:
+		void initialize();
+
+		sl_bool parseFromUtf8TextFile(const String& filePath);
+
+		sl_bool parseFromText(const String& text);
+
+		Variant getValue(const String& name);
+
+	private:
+		HashMap<String, String> m_mapValues;
+
+	};
 	
-	sl_bool parseFromText(const String& text);
+	class SLIB_EXPORT SettingUtil
+	{
+	public:
+		static sl_bool parseUint32Range(const String& str, sl_uint32* from = sl_null, sl_uint32* to = sl_null);
 	
-	Variant getValue(const String& name);
+	};
 
-};
-
-class SLIB_EXPORT SettingUtil
-{
-public:
-	static sl_bool parseUint32Range(const String& str, sl_uint32* from = sl_null, sl_uint32* to = sl_null);
-
-};
-
-SLIB_NAMESPACE_END
+}
 
 #endif

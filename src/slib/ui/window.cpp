@@ -16,9 +16,7 @@ namespace slib
 		flagDialog = sl_false;
 		flagModal = sl_false;
 		
-	#if defined(SLIB_PLATFORM_IS_ANDROID)
 		activity = sl_null;
-	#endif
 	}
 
 	WindowInstanceParam::~WindowInstanceParam()
@@ -43,7 +41,7 @@ namespace slib
 		return frame;
 	}
 
-	#define CHECK_INSTANCE(instance) (instance.isNotNull() && !(instance->isClosed()))
+#define CHECK_INSTANCE(instance) (instance.isNotNull() && !(instance->isClosed()))
 
 	SLIB_DEFINE_OBJECT(Window, Object)
 
@@ -855,10 +853,10 @@ namespace slib
 			
 			dispatchCreate();
 			
-	#if defined(SLIB_PLATFORM_IS_OSX) || defined(SLIB_PLATFORM_IS_IOS)
+#if defined(SLIB_PLATFORM_IS_OSX) || defined(SLIB_PLATFORM_IS_IOS)
 			UIRect frame = window->getFrame();
 			dispatchResize(frame.getWidth(), frame.getHeight());
-	#endif
+#endif
 
 		} else {
 			dispatchCreateFailed();
@@ -1138,6 +1136,14 @@ namespace slib
 
 
 	SLIB_DEFINE_OBJECT(WindowInstance, Object)
+
+	WindowInstance::WindowInstance()
+	{
+	}
+
+	WindowInstance::~WindowInstance()
+	{
+	}
 
 	Ref<Window> WindowInstance::getWindow()
 	{

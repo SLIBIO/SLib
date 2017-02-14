@@ -12,6 +12,14 @@
 namespace slib
 {
 
+	IViewPagerListener::IViewPagerListener()
+	{
+	}
+
+	IViewPagerListener::~IViewPagerListener()
+	{
+	}
+
 	void IViewPagerListener::onPageAction(ViewPager* navigation, View* page, UIPageAction action)
 	{
 	}
@@ -42,6 +50,10 @@ namespace slib
 		m_popTransitionDuration = 0.5f;
 		
 		m_countActiveTransitionAnimations = 0;
+	}
+
+	ViewPager::~ViewPager()
+	{
 	}
 
 	sl_size ViewPager::getPagesCount()
@@ -796,6 +808,10 @@ namespace slib
 		m_popupBackgroundColor = Color::zero();
 		
 		m_countActiveTransitionAnimations = 0;
+	}
+
+	ViewPage::~ViewPage()
+	{
 	}
 
 	Ref<ViewPager> ViewPage::getPager()

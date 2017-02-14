@@ -10,10 +10,16 @@
 
 namespace slib
 {
+
 	class PickerView;
 	
 	class SLIB_EXPORT IPickerViewListener
 	{
+	public:
+		IPickerViewListener();
+
+		virtual ~IPickerViewListener();
+
 	public:
 		virtual void onSelectItem(PickerView* view, sl_uint32 index) = 0;
 		
@@ -26,6 +32,8 @@ namespace slib
 	public:
 		PickerView();
 		
+		~PickerView();
+
 	public:
 		sl_uint32 getItemsCount();
 		
@@ -133,7 +141,8 @@ namespace slib
 		sl_real m_speedFlow;
 		Time m_timeFlowFrameBefore;
 		
-	};	
+	};
+
 }
 
 #endif

@@ -7,10 +7,16 @@
 
 namespace slib
 {
+
 	class WebView;
 	
 	class SLIB_EXPORT IWebViewListener
 	{
+	public:
+		IWebViewListener();
+
+		virtual ~IWebViewListener();
+
 	public:
 		// return sl_false to cancel the loading
 		virtual void onStartLoad(WebView* view, const String& url);
@@ -19,6 +25,7 @@ namespace slib
 		
 		// [Javascript] window.slib_send(msg, param);
 		virtual void onMessageFromJavaScript(WebView* view, const String& msg, const String& param);
+
 	};
 	
 	class SLIB_EXPORT WebView : public View
@@ -28,6 +35,8 @@ namespace slib
 	public:
 		WebView();
 		
+		~WebView();
+
 	public:
 		virtual void loadURL(const String& url);
 		
@@ -104,6 +113,7 @@ namespace slib
 		AtomicString m_lastErrorMessage;
 		
 	};
+
 }
 
 #endif

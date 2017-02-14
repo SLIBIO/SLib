@@ -3,9 +3,6 @@
 
 #include "../core/definition.h"
 
-#define SLIB_UI_NAMESPACE_BEGIN		SLIB_NAMESPACE_BEGIN
-#define SLIB_UI_NAMESPACE_END		SLIB_NAMESPACE_END
-
 #include "../math/rectangle.h"
 #include "../math/point.h"
 

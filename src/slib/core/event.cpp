@@ -1,42 +1,44 @@
 #include "../../../inc/slib/core/event.h"
+
 #include "../../../inc/slib/core/thread.h"
 
-SLIB_NAMESPACE_BEGIN
-
-SLIB_DEFINE_ROOT_OBJECT(Event)
-
-Event::Event()
+namespace slib
 {
-}
 
-Event::~Event()
-{
-}
+	SLIB_DEFINE_ROOT_OBJECT(Event)
 
-void Event::set()
-{
-	__set();
-}
+	Event::Event()
+	{
+	}
 
-void Event::reset()
-{
-	__reset();
-}
+	Event::~Event()
+	{
+	}
 
-sl_bool Event::wait(sl_int32 timeout)
-{
-	Ref<Thread> thread = Thread::getCurrent();
-	if (thread.isNotNull()) {
-		if (thread->isStopping()) {
-			return sl_false;
+	void Event::set()
+	{
+		__set();
+	}
+
+	void Event::reset()
+	{
+		__reset();
+	}
+
+	sl_bool Event::wait(sl_int32 timeout)
+	{
+		Ref<Thread> thread = Thread::getCurrent();
+		if (thread.isNotNull()) {
+			if (thread->isStopping()) {
+				return sl_false;
+			}
+			thread->setWaitingEvent(this);
 		}
-		thread->setWaitingEvent(this);
+		sl_bool ret = __wait(timeout);
+		if (thread.isNotNull()) {
+			thread->clearWaitingEvent();
+		}
+		return ret;
 	}
-	sl_bool ret = __wait(timeout);
-	if (thread.isNotNull()) {
-		thread->clearWaitingEvent();
-	}
-	return ret;
-}
 
-SLIB_NAMESPACE_END
+}

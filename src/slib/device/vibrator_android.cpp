@@ -6,22 +6,23 @@
 
 #include "../../../inc/slib/core/platform_android.h"
 
-SLIB_DEVICE_NAMESPACE_BEGIN
-
-SLIB_JNI_BEGIN_CLASS(_JAndroidVibrator, "slib/platform/android/device/Vibrator")
-	SLIB_JNI_STATIC_METHOD(vibrate, "vibrate", "(Landroid/app/Activity;I)Z");
-SLIB_JNI_END_CLASS
-
-sl_bool Vibrator::vibrate(sl_int32 millisec)
+namespace slib
 {
-	jobject jactivity = Android::getCurrentActivity();
-	if (jactivity) {
-		sl_bool ret = _JAndroidVibrator::vibrate.callBoolean(sl_null, jactivity, millisec);
-		return ret;
-	}
-	return sl_false;
-}
 
-SLIB_DEVICE_NAMESPACE_END
+	SLIB_JNI_BEGIN_CLASS(_JAndroidVibrator, "slib/platform/android/device/Vibrator")
+		SLIB_JNI_STATIC_METHOD(vibrate, "vibrate", "(Landroid/app/Activity;I)Z");
+	SLIB_JNI_END_CLASS
+
+	sl_bool Vibrator::vibrate(sl_int32 millisec)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			sl_bool ret = _JAndroidVibrator::vibrate.callBoolean(sl_null, jactivity, millisec);
+			return ret;
+		}
+		return sl_false;
+	}
+
+}
 
 #endif

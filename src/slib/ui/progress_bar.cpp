@@ -5,6 +5,7 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(ProgressBar, View)
 	
 	class _ProgressBar_Static
@@ -44,6 +45,10 @@ namespace slib
 		}
 	}
 	
+	ProgressBar::~ProgressBar()
+	{
+	}
+
 	LayoutOrientation ProgressBar::getOrientation()
 	{
 		return m_orientation;
@@ -387,4 +392,5 @@ namespace slib
 	void ProgressBar::dispatchChangeSecondary(float value)
 	{
 	}
+
 }

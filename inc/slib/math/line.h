@@ -6,92 +6,80 @@
 #include "point.h"
 #include "matrix3.h"
 
-SLIB_MATH_NAMESPACE_BEGIN
-
 /*
 	ax + by + c = 0
 */
-template <class T>
-class SLIB_EXPORT LineT
+
+namespace slib
 {
-public:
-	T a;
-	T b;
-	T c;
 	
-public:
-	LineT() = default;
-	
-	LineT(const LineT<T>& other) = default;
-	
-	template <class O>
-	LineT(const LineT<O>& other);
-	
-	LineT(T a, T b, T c);
-	
-	LineT(const PointT<T>& point, const Vector2T<T>& dir);
-	
-public:
-	Vector2T<T> getDirection() const;
-	
-	Vector2T<T> getNormal() const;
-	
-	Vector2T<T> projectOriginOnNormalized() const;
-	
-	Vector2T<T> projectOrigin() const;
-	
-	T getDistanceFromPointOnNormalized(const PointT<T>& pos) const;
-	
-	T getDistanceFromPoint(const PointT<T>& pos) const;
-	
-	Vector2T<T> projectPointOnNormalized(const PointT<T>& pos) const;
-	
-	Vector2T<T> projectPoint(const PointT<T>& pos) const;
-	
-	void setFromPointAndDirection(const PointT<T>& point, const Vector2T<T>& dir);
-	
-	void setFromPointAndNormal(const PointT<T>& point, const Vector2T<T>& normal);
-	
-	void normalize();
-	
-	void transform(const Matrix3T<T>& mat);
-	
-public:
-	LineT<T>& operator=(const LineT<T>& other) = default;
-	
-	template <class O>
-	LineT<T>& operator=(const LineT<O>& other);
-	
-};
+	template <class T>
+	class SLIB_EXPORT LineT
+	{
+	public:
+		T a;
+		T b;
+		T c;
 
-extern template class LineT<float>;
-extern template class LineT<double>;
-typedef LineT<sl_real> Line;
-typedef LineT<float> Linef;
-typedef LineT<double> Linelf;
+	public:
+		LineT() = default;
 
-SLIB_MATH_NAMESPACE_END
+		constexpr LineT(const LineT<T>& other)
+		 : a((T)(other.a)), b((T)(other.b)), c((T)(other.c))
+		{}
 
+		template <class O>
+		constexpr LineT(const LineT<O>& other)
+		 : a((T)(other.a)), b((T)(other.b)), c((T)(other.c))
+		{}
 
-SLIB_MATH_NAMESPACE_BEGIN
+		constexpr LineT(T _a, T _b, T _c)
+		 : a(_a), b(_b), c(_c)
+		{}
 
-template <class T>
-template <class O>
-SLIB_INLINE LineT<T>::LineT(const LineT<O>& other)
-: a((T)(other.a)), b((T)(other.b)), c((T)(other.c))
-{
+		LineT(const PointT<T>& point, const Vector2T<T>& dir);
+
+	public:
+		Vector2T<T> getDirection() const;
+
+		Vector2T<T> getNormal() const;
+
+		Vector2T<T> projectOriginOnNormalized() const;
+
+		Vector2T<T> projectOrigin() const;
+
+		T getDistanceFromPointOnNormalized(const PointT<T>& pos) const;
+
+		T getDistanceFromPoint(const PointT<T>& pos) const;
+
+		Vector2T<T> projectPointOnNormalized(const PointT<T>& pos) const;
+
+		Vector2T<T> projectPoint(const PointT<T>& pos) const;
+
+		void setFromPointAndDirection(const PointT<T>& point, const Vector2T<T>& dir);
+
+		void setFromPointAndNormal(const PointT<T>& point, const Vector2T<T>& normal);
+
+		void normalize();
+
+		void transform(const Matrix3T<T>& mat);
+
+	public:
+		LineT<T>& operator=(const LineT<T>& other) = default;
+
+		template <class O>
+		LineT<T>& operator=(const LineT<O>& other);
+
+	};
+	
+	extern template class LineT<float>;
+	extern template class LineT<double>;
+	typedef LineT<sl_real> Line;
+	typedef LineT<float> Linef;
+	typedef LineT<double> Linelf;
+
 }
 
-template <class T>
-template <class O>
-SLIB_INLINE LineT<T>& LineT<T>::operator=(const LineT<O>& other)
-{
-	a = (T)(other.a);
-	b = (T)(other.b);
-	c = (T)(other.c);
-	return *this;
-}
-
-SLIB_MATH_NAMESPACE_END
+#include "detail/line.h"
 
 #endif

@@ -2,6 +2,7 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(VertexBufferInstance, RenderBaseObjectInstance)
 	
 	VertexBufferInstance::VertexBufferInstance()
@@ -109,4 +110,5 @@ namespace slib
 	{
 		return Ref<VertexBufferInstance>::from(RenderBaseObject::getInstance(engine));
 	}
+	
 }

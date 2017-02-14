@@ -3,8 +3,9 @@
 
 #include "definition.h"
 
-SLIB_WEB_NAMESPACE_BEGIN
+namespace slib
+{
 
-SLIB_WEB_NAMESPACE_END
+}
 
 #endif

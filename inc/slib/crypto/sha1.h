@@ -11,53 +11,54 @@
 	Output: 160bits (20 bytes)
 */
 
-SLIB_CRYPTO_NAMESPACE_BEGIN
-
-class SLIB_EXPORT SHA1 : public CryptoHash
+namespace slib
 {
-public:
-	SHA1();
 	
-	~SHA1();
+	class SLIB_EXPORT SHA1 : public CryptoHash
+	{
+	public:
+		SHA1();
 
-public:
-	// override
-	void start();
+		~SHA1();
 	
-	// override
-	void update(const void* input, sl_size n);
-	
-	// override
-	void finish(void* output);
-	
-public: /* common functions for CryptoHash */
-	static void hash(const void* input, sl_size n, void* output);
-	
-	static sl_uint32 getHashSize();
-	
-	static void hash(const String& s, void* output);
-	
-	static void hash(const Memory& data, void* output);
-	
-	static Memory hash(const void* input, sl_size n);
-	
-	static Memory hash(const String& s);
-	
-	static Memory hash(const Memory& data);
-	
-	sl_uint32 getSize() const;
+	public:
+		// override
+		void start();
 
-private:
-	void _updateSection(const sl_uint8* input);
+		// override
+		void update(const void* input, sl_size n);
 
-private:
-	sl_size sizeTotalInput;
-	sl_uint32 rdata_len;
-	sl_uint8 rdata[64];
-	sl_uint32 h[5];
+		// override
+		void finish(void* output);
+
+	public: /* common functions for CryptoHash */
+		static void hash(const void* input, sl_size n, void* output);
+
+		static sl_uint32 getHashSize();
+
+		static void hash(const String& s, void* output);
+
+		static void hash(const Memory& data, void* output);
+
+		static Memory hash(const void* input, sl_size n);
+
+		static Memory hash(const String& s);
+
+		static Memory hash(const Memory& data);
+
+		sl_uint32 getSize() const;
 	
-};
+	private:
+		void _updateSection(const sl_uint8* input);
+	
+	private:
+		sl_size sizeTotalInput;
+		sl_uint32 rdata_len;
+		sl_uint8 rdata[64];
+		sl_uint32 h[5];
 
-SLIB_CRYPTO_NAMESPACE_END
+	};
+
+}
 
 #endif

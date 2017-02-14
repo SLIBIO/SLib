@@ -3,17 +3,18 @@
 
 #include "definition.h"
 
-SLIB_NAMESPACE_BEGIN
-
-enum class MapPutMode
+namespace slib
 {
-	AddOrReplace = 0,
-	ReplaceExisting = 1,
-	AddNew = 2,
-	AddAlways = 3,
-	Default = AddOrReplace
-};
 
-SLIB_NAMESPACE_END
+	enum class MapPutMode
+	{
+		AddOrReplace = 0,
+		ReplaceExisting = 1,
+		AddNew = 2,
+		AddAlways = 3,
+		Default = AddOrReplace
+	};
+
+}
 
 #endif

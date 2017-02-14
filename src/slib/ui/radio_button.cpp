@@ -98,6 +98,10 @@ namespace slib
 	{
 	}
 
+	RadioButton::~RadioButton()
+	{
+	}
+
 	void RadioButton::dispatchClick(UIEvent* ev)
 	{
 		CheckBox::dispatchClick(ev);
@@ -116,6 +120,10 @@ namespace slib
 	SLIB_DEFINE_OBJECT(RadioGroup, Object)
 
 	RadioGroup::RadioGroup()
+	{
+	}
+
+	RadioGroup::~RadioGroup()
 	{
 	}
 

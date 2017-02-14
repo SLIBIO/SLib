@@ -8,264 +8,200 @@
 
 #include "../core/interpolation.h"
 
-SLIB_MATH_NAMESPACE_BEGIN
-
 #define SLIB_MATH_MATRIX_DETERMINANT3(m00,m01,m02,m10,m11,m12,m20,m21,m22) ((m00)*SLIB_MATH_MATRIX_DETERMINANT2(m11,m12,m21,m22)-(m01)*SLIB_MATH_MATRIX_DETERMINANT2(m10,m12,m20,m22)+(m02)*SLIB_MATH_MATRIX_DETERMINANT2(m10,m11,m20,m21))
 
-template <class T>
-class SLIB_EXPORT Matrix3T
+namespace slib
 {
-public:
-	T m00; T m01; T m02;
-	T m10; T m11; T m12;
-	T m20; T m21; T m22;
+	
+	template <class T>
+	class SLIB_EXPORT Matrix3T
+	{
+	public:
+		T m00; T m01; T m02;
+		T m10; T m11; T m12;
+		T m20; T m21; T m22;
+	
+	public:
+		SLIB_INLINE Matrix3T() = default;
+	
+		constexpr Matrix3T(const Matrix3T<T>& other):
+		 m00(other.m00), m01(other.m01), m02(other.m02),
+		 m10(other.m10), m11(other.m11), m12(other.m12),
+		 m20(other.m20), m21(other.m21), m22(other.m22)
+		{}
 
-public:
-	SLIB_INLINE Matrix3T() = default;
+		template <class O>
+		constexpr Matrix3T(const Matrix3T<O>& other):
+		 m00((T)(other.m00)), m01((T)(other.m01)), m02((T)(other.m02)),
+		 m10((T)(other.m10)), m11((T)(other.m11)), m12((T)(other.m12)),
+		 m20((T)(other.m20)), m21((T)(other.m21)), m22((T)(other.m22))
+		{}
+	
+		constexpr Matrix3T(
+			T _m00, T _m01, T _m02,
+			T _m10, T _m11, T _m12,
+			T _m20, T _m21, T _m22
+		):
+		 m00(_m00), m01(_m01), m02(_m02),
+		 m10(_m10), m11(_m11), m12(_m12),
+		 m20(_m20), m21(_m21), m22(_m22)
+		{}
+	
+		constexpr Matrix3T(const Vector3T<T>& row0, const Vector3T<T>& row1, const Vector3T<T>& row2):
+		 m00(row0.x), m01(row0.y), m02(row0.z),
+		 m10(row1.x), m11(row1.y), m12(row1.z),
+		 m20(row2.x), m21(row2.y), m22(row2.z)
+		{}
 
-	constexpr Matrix3T(const Matrix3T<T>& other):
-	 m00(other.m00), m01(other.m01), m02(other.m02),
-	 m10(other.m10), m11(other.m11), m12(other.m12),
-	 m20(other.m20), m21(other.m21), m22(other.m22)
-	{}
-	
-	template <class O>
-	constexpr Matrix3T(const Matrix3T<O>& other):
-	 m00((T)(other.m00)), m01((T)(other.m01)), m02((T)(other.m02)),
-	 m10((T)(other.m10)), m11((T)(other.m11)), m12((T)(other.m12)),
-	 m20((T)(other.m20)), m21((T)(other.m21)), m22((T)(other.m22))
-	{}
+	public:
+		static const Matrix3T<T>& zero();
 
-	constexpr Matrix3T(
-		T _m00, T _m01, T _m02,
-		T _m10, T _m11, T _m12,
-		T _m20, T _m21, T _m22
-	):
-	 m00(_m00), m01(_m01), m02(_m02),
-	 m10(_m10), m11(_m11), m12(_m12),
-	 m20(_m20), m21(_m21), m22(_m22)
-	{}
+		static const Matrix3T<T>& one();
 
-	constexpr Matrix3T(const Vector3T<T>& row0, const Vector3T<T>& row1, const Vector3T<T>& row2):
-	 m00(row0.x), m01(row0.y), m02(row0.z),
-	 m10(row1.x), m11(row1.y), m12(row1.z),
-	 m20(row2.x), m21(row2.y), m22(row2.z)
-	{}
-	
-public:
-	static const Matrix3T<T>& zero();
-	
-	static const Matrix3T<T>& one();
-	
-	static const Matrix3T<T>& identity();
-	
-	static const Matrix3T<T>& fromArray(const T arr[9]);
-	
-	static Matrix3T<T>& fromArray(T arr[9]);
-	
-public:
-	Vector3T<T> getRow0() const;
-	
-	void setRow0(const Vector3T<T>& v);
+		static const Matrix3T<T>& identity();
 
-	Vector3T<T> getRow1() const;
-	
-	void setRow1(const Vector3T<T>& v);
-	
-	Vector3T<T> getRow2() const;
-	
-	void setRow2(const Vector3T<T>& v);
+		static const Matrix3T<T>& fromArray(const T arr[9]);
 
-	Vector3T<T> getRow(sl_uint32 index) const;
-	
-	void setRow(sl_uint32 index, const Vector3T<T>& v);
-	
-	Vector3T<T> getColumn0() const;
-	
-	void setColumn0(const Vector3T<T>& v);
-	
-	Vector3T<T> getColumn1() const;
-	
-	void setColumn1(const Vector3T<T>& v);
-	
-	Vector3T<T> getColumn2() const;
-	
-	void setColumn2(const Vector3T<T>& v);
+		static Matrix3T<T>& fromArray(T arr[9]);
 
-	Vector3T<T> getColumn(sl_uint32 index) const;
-	
-	void setColumn(sl_uint32 index, const Vector3T<T>& v);
+	public:
+		Vector3T<T> getRow0() const;
 
-	T getElement(sl_uint32 row, sl_uint32 column) const;
+		void setRow0(const Vector3T<T>& v);
 	
-	void setElement(sl_uint32 row, sl_uint32 column, const T& v);
-	
-	
-	void add(const Matrix3T<T>& other);
-	
-	void subtract(const Matrix3T<T>& other);
-	
-	void multiply(T value);
-	
-	void divide(T value);
-	
-	Vector3T<T> multiplyLeft(const Vector3T<T>& v) const;
-	
-	Vector3T<T> multiplyRight(const Vector3T<T>& v) const;
-	
-	Vector2T<T> transformPosition(T x, T y) const;
-	
-	Vector2T<T> transformPosition(const Vector2T<T>& v) const;
-	
-	Vector2T<T> transformDirection(T x, T y) const;
-	
-	Vector2T<T> transformDirection(const Vector2T<T>& v) const;
-	
-	void multiply(const Matrix3T<T>& m);
-	
-	T getDeterminant() const;
-	
-	void makeInverse();
-	
-	Matrix3T<T> inverse() const;
-	
-	void makeTranspose();
-	
-	Matrix3T<T> transpose() const;
-	
-	void makeInverseTranspose();
-	
-	Matrix3T<T> inverseTranspose() const;
+		Vector3T<T> getRow1() const;
 
-	Matrix3T<T> lerp(const Matrix3T<T>& target, float factor) const;
+		void setRow1(const Vector3T<T>& v);
 
-public:
-	Matrix3T<T>& operator=(const Matrix3T<T>& other) = default;
-	
-	template <class O>
-	Matrix3T<T>& operator=(const Matrix3T<O>& other);
-	
-	Matrix3T<T> operator+(const Matrix3T<T>& other) const;
-	
-	Matrix3T<T>& operator+=(const Matrix3T<T>& other);
-	
-	Matrix3T<T> operator-(const Matrix3T<T>& other) const;
-	
-	Matrix3T<T>& operator-=(const Matrix3T<T>& other);
-	
-	Matrix3T<T> operator-() const;
+		Vector3T<T> getRow2() const;
 
-	Matrix3T<T> operator*(T value) const;
+		void setRow2(const Vector3T<T>& v);
 	
-	Matrix3T<T>& operator*=(T value);
-	
-	Matrix3T<T> operator/(T value) const;
-	
-	Matrix3T<T>& operator/=(T value);
+		Vector3T<T> getRow(sl_uint32 index) const;
 
-	Vector3T<T> operator*(const Vector3T<T>& v) const;
+		void setRow(sl_uint32 index, const Vector3T<T>& v);
+
+		Vector3T<T> getColumn0() const;
+
+		void setColumn0(const Vector3T<T>& v);
+
+		Vector3T<T> getColumn1() const;
+
+		void setColumn1(const Vector3T<T>& v);
+
+		Vector3T<T> getColumn2() const;
+
+		void setColumn2(const Vector3T<T>& v);
 	
-	Matrix3T<T> operator*(const Matrix3T<T>& other) const;
+		Vector3T<T> getColumn(sl_uint32 index) const;
+
+		void setColumn(sl_uint32 index, const Vector3T<T>& v);
 	
-	Matrix3T<T>& operator*=(const Matrix3T<T>& other);
-	
-	sl_bool operator==(const Matrix3T<T>& other) const;
-	
-	sl_bool operator!=(const Matrix3T<T>& other) const;
-	
-private:
-	static T _zero[9];
-	static T _one[9];
-	static T _identity[9];
+		T getElement(sl_uint32 row, sl_uint32 column) const;
 
-};
-
-extern template class Matrix3T<float>;
-extern template class Matrix3T<double>;
-typedef Matrix3T<sl_real> Matrix3;
-typedef Matrix3T<float> Matrix3f;
-typedef Matrix3T<double> Matrix3lf;
-
-template <class T>
-Matrix3T<T> operator*(T value, const Matrix3T<T>& m);
-
-template <class T>
-Vector3T<T> operator*(const Vector3T<T>& v, const Matrix3T<T>& m);
-
-template <class T>
-class Interpolation< Matrix3T<T> >
-{
-public:
-	static Matrix3T<T> interpolate(const Matrix3T<T>& a, const Matrix3T<T>& b, float factor);
-};
-
-SLIB_MATH_NAMESPACE_END
+		void setElement(sl_uint32 row, sl_uint32 column, const T& v);
 
 
-SLIB_MATH_NAMESPACE_BEGIN
+		void add(const Matrix3T<T>& other);
 
-template <class T>
-SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::zero()
-{
-	return *(reinterpret_cast<Matrix3T<T> const*>(&_zero));
+		void subtract(const Matrix3T<T>& other);
+
+		void multiply(T value);
+
+		void divide(T value);
+
+		Vector3T<T> multiplyLeft(const Vector3T<T>& v) const;
+
+		Vector3T<T> multiplyRight(const Vector3T<T>& v) const;
+
+		Vector2T<T> transformPosition(T x, T y) const;
+
+		Vector2T<T> transformPosition(const Vector2T<T>& v) const;
+
+		Vector2T<T> transformDirection(T x, T y) const;
+
+		Vector2T<T> transformDirection(const Vector2T<T>& v) const;
+
+		void multiply(const Matrix3T<T>& m);
+
+		T getDeterminant() const;
+
+		void makeInverse();
+
+		Matrix3T<T> inverse() const;
+
+		void makeTranspose();
+
+		Matrix3T<T> transpose() const;
+
+		void makeInverseTranspose();
+
+		Matrix3T<T> inverseTranspose() const;
+	
+		Matrix3T<T> lerp(const Matrix3T<T>& target, float factor) const;
+	
+	public:
+		Matrix3T<T>& operator=(const Matrix3T<T>& other) = default;
+
+		template <class O>
+		Matrix3T<T>& operator=(const Matrix3T<O>& other);
+
+		Matrix3T<T> operator+(const Matrix3T<T>& other) const;
+
+		Matrix3T<T>& operator+=(const Matrix3T<T>& other);
+
+		Matrix3T<T> operator-(const Matrix3T<T>& other) const;
+
+		Matrix3T<T>& operator-=(const Matrix3T<T>& other);
+
+		Matrix3T<T> operator-() const;
+	
+		Matrix3T<T> operator*(T value) const;
+
+		Matrix3T<T>& operator*=(T value);
+
+		Matrix3T<T> operator/(T value) const;
+
+		Matrix3T<T>& operator/=(T value);
+	
+		Vector3T<T> operator*(const Vector3T<T>& v) const;
+
+		Matrix3T<T> operator*(const Matrix3T<T>& other) const;
+
+		Matrix3T<T>& operator*=(const Matrix3T<T>& other);
+
+		sl_bool operator==(const Matrix3T<T>& other) const;
+
+		sl_bool operator!=(const Matrix3T<T>& other) const;
+
+	private:
+		static T _zero[9];
+		static T _one[9];
+		static T _identity[9];
+	
+	};
+	
+	extern template class Matrix3T<float>;
+	extern template class Matrix3T<double>;
+	typedef Matrix3T<sl_real> Matrix3;
+	typedef Matrix3T<float> Matrix3f;
+	typedef Matrix3T<double> Matrix3lf;
+	
+	template <class T>
+	Matrix3T<T> operator*(T value, const Matrix3T<T>& m);
+	
+	template <class T>
+	Vector3T<T> operator*(const Vector3T<T>& v, const Matrix3T<T>& m);
+	
+	template <class T>
+	class Interpolation< Matrix3T<T> >
+	{
+	public:
+		static Matrix3T<T> interpolate(const Matrix3T<T>& a, const Matrix3T<T>& b, float factor);
+	};
+
 }
 
-template <class T>
-SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::one()
-{
-	return *(reinterpret_cast<Matrix3T<T> const*>(&_one));
-}
-
-template <class T>
-SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::identity()
-{
-	return *(reinterpret_cast<Matrix3T<T> const*>(&_identity));
-}
-
-template <class T>
-SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::fromArray(const T arr[9])
-{
-	return *(reinterpret_cast<Matrix3T<T> const*>(arr));
-}
-
-template <class T>
-SLIB_INLINE Matrix3T<T>& Matrix3T<T>::fromArray(T arr[9])
-{
-	return *(reinterpret_cast<Matrix3T<T>*>(arr));
-}
-
-template <class T>
-template <class O>
-Matrix3T<T>& Matrix3T<T>::operator=(const Matrix3T<O>& other)
-{
-	m00 = (T)(other.m00); m01 = (T)(other.m01); m02 = (T)(other.m02);
-	m10 = (T)(other.m10); m11 = (T)(other.m11); m12 = (T)(other.m12);
-	m20 = (T)(other.m20); m21 = (T)(other.m21); m22 = (T)(other.m22);
-	return *this;
-}
-
-
-template <class T>
-Matrix3T<T> operator*(T value, const Matrix3T<T>& m)
-{
-	Matrix3T<T> ret(m);
-	ret.multiply(value);
-	return ret;
-}
-
-template <class T>
-Vector3T<T> operator*(const Vector3T<T>& v, const Matrix3T<T>& m)
-{
-	return m.multiplyLeft(v);
-}
-
-
-template <class T>
-SLIB_INLINE Matrix3T<T> Interpolation< Matrix3T<T> >::interpolate(const Matrix3T<T>& a, const Matrix3T<T>& b, float factor)
-{
-	return a.lerp(b, factor);
-}
-
-SLIB_MATH_NAMESPACE_END
+#include "detail/matrix3.h"
 
 #endif

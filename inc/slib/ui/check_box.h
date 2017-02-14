@@ -17,6 +17,8 @@ namespace slib
 		
 		CheckBox(sl_uint32 nCategories, ButtonCategory* categories);
 		
+		~CheckBox();
+
 	public:
 		sl_bool isChecked();
 		

@@ -33,6 +33,11 @@ namespace slib
 	class SLIB_EXPORT IAudioRecorderListener
 	{
 	public:
+		IAudioRecorderListener();
+
+		virtual ~IAudioRecorderListener();
+
+	public:
 		virtual void onRecordAudio(AudioRecorder* recorder, const AudioData& audio) = 0;
 	};
 	

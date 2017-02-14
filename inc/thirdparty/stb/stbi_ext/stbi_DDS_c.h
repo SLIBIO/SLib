@@ -260,7 +260,7 @@ static int stbi__dds_info( stbi__context *s, int *x, int *y, int *comp, int *isc
 	   return 0;
 	}
 	flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-	if( (header.dwFlags & flags) != flags ) {
+	if( ((int)(header.dwFlags) & flags) != flags ) {
 	   stbi__rewind( s );
 	   return 0;
 	}
@@ -358,7 +358,7 @@ static stbi_uc * stbi__dds_load(stbi__context *s, int *x, int *y, int *comp, int
 	if( header.dwMagic != (('D' << 0) | ('D' << 8) | ('S' << 16) | (' ' << 24)) ) return NULL;
 	if( header.dwSize != 124 ) return NULL;
 	flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-	if( (header.dwFlags & flags) != flags ) return NULL;
+	if( ((int)(header.dwFlags) & flags) != flags ) return NULL;
 	/*	According to the MSDN spec, the dwFlags should contain
 		DDSD_LINEARSIZE if it's compressed, or DDSD_PITCH if
 		uncompressed.  Some DDS writers do not conform to the

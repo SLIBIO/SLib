@@ -1,6 +1,7 @@
-#include "../../../inc/slib/core/definition.h"
-
 #include "../../../inc/slib/network/capture.h"
+
+#if defined(SLIB_PLATFORM_IS_UNIX) || defined(SLIB_PLATFORM_IS_WIN32)
+
 #include "../../../inc/slib/network/socket_address.h"
 
 #include "../../../inc/slib/core/thread.h"
@@ -20,7 +21,6 @@
 namespace slib
 {
 
-#if defined(SLIB_PLATFORM_IS_UNIX) || defined(SLIB_PLATFORM_IS_WIN32)
 	class _NetPcapCapture : public NetCapture
 	{
 	public:
@@ -316,7 +316,12 @@ namespace slib
 		return sl_false;
 	}
 
+}
+
 #else
+
+namespace slib
+{
 
 	Ref<NetCapture> NetCapture::createPcap(const NetCaptureParam& param)
 	{
@@ -328,7 +333,7 @@ namespace slib
 		List<NetCaptureDevice> list;
 		return list;
 	}
+	
+}
 
 #endif
-
-}

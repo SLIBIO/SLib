@@ -10,6 +10,7 @@
 
 namespace slib
 {
+
 	class RenderDrawable : public Drawable
 	{
 		SLIB_DECLARE_OBJECT
@@ -65,7 +66,8 @@ namespace slib
 		AtomicString m_fragmentShader;
 		AtomicRef<RenderProgram2D_Position> m_program;
 		
-	};	
+	};
+
 }
 
 #endif

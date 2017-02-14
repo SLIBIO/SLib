@@ -7,43 +7,51 @@
 #include "ref.h"
 #include "mutex.h"
 
-SLIB_NAMESPACE_BEGIN
-
-class SLIB_EXPORT Object : public Referable
+namespace slib
 {
-	SLIB_DECLARE_OBJECT
 	
-private:
-	Mutex m_locker;
+	class SLIB_EXPORT Object : public Referable
+	{
+		SLIB_DECLARE_OBJECT
 
-public:
-	Mutex* getLocker() const;
+	public:
+		Object();
+
+		~Object();
+
+	public:
+		Mutex* getLocker() const;
+
+		void lock() const;
 	
-	void lock() const;
-
-	void unlock() const;
-
-	sl_bool tryLock() const;
-
-};
-
-class SLIB_EXPORT ObjectLocker : public MutexLocker
-{
-public:
-	ObjectLocker();
+		void unlock() const;
 	
-	ObjectLocker(const Object* object);
+		sl_bool tryLock() const;
+	
+	private:
+		Mutex m_locker;
 
-	ObjectLocker(const Object* object1, const Object* object2);
+	};
 	
-public:
-	void lock(const Object* object);
-	
-	void lock(const Object* object1, const Object* object2);
-	
-};
+	class SLIB_EXPORT ObjectLocker : public MutexLocker
+	{
+	public:
+		ObjectLocker();
 
-SLIB_NAMESPACE_END
+		ObjectLocker(const Object* object);
+	
+		ObjectLocker(const Object* object1, const Object* object2);
+
+		~ObjectLocker();
+
+	public:
+		void lock(const Object* object);
+
+		void lock(const Object* object1, const Object* object2);
+
+	};
+
+}
 
 #endif
 

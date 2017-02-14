@@ -6,13 +6,12 @@
 
 #include "../../../inc/slib/core/platform_windows.h"
 
-SLIB_MEDIA_NAMESPACE_BEGIN
-
-Ref<MediaPlayer> MediaPlayer::_createNative(const MediaPlayerParam& param)
+namespace slib
 {
-	return sl_null;
+	Ref<MediaPlayer> MediaPlayer::_createNative(const MediaPlayerParam& param)
+	{
+		return sl_null;
+	}
 }
-
-SLIB_MEDIA_NAMESPACE_END
 
 #endif

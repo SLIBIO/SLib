@@ -13,7 +13,7 @@
 #define GL_ENTRY(x) _GLES_ENTRY(x)
 #include "opengl_impl.h"
 
-#if defined (SLIB_PLATFORM_IS_WIN32)
+#	if defined (SLIB_PLATFORM_IS_WIN32)
 
 #include <Windows.h>
 
@@ -61,7 +61,7 @@ namespace slib
 	}
 }
 
-#else
+#	else
 
 namespace slib
 {
@@ -79,7 +79,7 @@ namespace slib
 	}
 }
 
-#endif
+#	endif
 
 #else
 

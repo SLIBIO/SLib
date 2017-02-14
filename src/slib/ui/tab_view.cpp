@@ -2,12 +2,31 @@
 
 #include "../../../inc/slib/ui/core.h"
 
+#define MAX_TABS_COUNT 100
+
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(TabView, ViewGroup)
 	
-#define MAX_TABS_COUNT 100
-	
+	ITabViewListener::ITabViewListener()
+	{
+	}
+
+	ITabViewListener::~ITabViewListener()
+	{
+	}
+
+
+	TabViewItem::TabViewItem()
+	{
+	}
+
+	TabViewItem::~TabViewItem()
+	{
+	}
+
+
 	TabView::TabView()
 	{
 		setCreatingNativeWidget(sl_true);
@@ -38,6 +57,10 @@ namespace slib
 		
 	}
 	
+	TabView::~TabView()
+	{
+	}
+
 	sl_uint32 TabView::getTabsCount()
 	{
 		return (sl_uint32)(m_items.getCount());
@@ -563,8 +586,8 @@ namespace slib
 			UIPoint pt = ev->getPoint();
 			ObjectLocker lock(this);
 			ListLocker<TabViewItem> items(m_items);
-			sl_uint32 n = (sl_uint32)(items.count);
-			for (sl_uint32 i = 0; i < n; i++) {
+			sl_int32 n = (sl_int32)(items.count);
+			for (sl_int32 i = 0; i < n; i++) {
 				if (getTabRegion(i).containsPoint(pt)) {
 					if (i != m_indexHover) {
 						m_indexHover = i;
@@ -600,7 +623,7 @@ namespace slib
 		if (m_indexSelected == index) {
 			background = m_selectedTabBackground;
 			labelColor = m_selectedLabelColor;
-		} else if (m_indexHover == index) {
+		} else if (m_indexHover == (sl_int32)index) {
 			background = m_hoverTabBackground;
 			labelColor = m_hoverLabelColor;
 		} else {

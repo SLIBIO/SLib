@@ -85,6 +85,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\sort.h" />
     <ClInclude Include="..\..\..\inc\slib\core\spin_lock.h" />
     <ClInclude Include="..\..\..\inc\slib\core\string.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\string_buffer.h" />
     <ClInclude Include="..\..\..\inc\slib\core\system.h" />
     <ClInclude Include="..\..\..\inc\slib\core\thread.h" />
     <ClInclude Include="..\..\..\inc\slib\core\thread_pool.h" />

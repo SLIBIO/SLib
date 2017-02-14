@@ -17,6 +17,10 @@ namespace slib
 
 	AlertDialog::AlertDialog(const AlertDialog& other) = default;
 
+	AlertDialog::~AlertDialog()
+	{
+	}
+
 	class _AlertDialog_RunOnUIThread
 	{
 	public:
@@ -461,6 +465,10 @@ namespace slib
 	}
 
 	FileDialog::FileDialog(const FileDialog& other) = default;
+
+	FileDialog::~FileDialog()
+	{
+	}
 
 	void FileDialog::addFilter(const String& title, const String& patterns)
 	{

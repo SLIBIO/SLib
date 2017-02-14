@@ -4,6 +4,7 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(SelectView, View)
 	
 	enum
@@ -86,6 +87,14 @@ namespace slib
 	
 	SLIB_SAFE_STATIC_GETTER(_SelectView_DefaultResources, _SelectView_getDefaultResources)
 	
+	ISelectViewListener::ISelectViewListener()
+	{
+	}
+
+	ISelectViewListener::~ISelectViewListener()
+	{
+	}
+
 	SelectView::SelectView()
 	{
 		setCreatingNativeWidget(sl_true);
@@ -109,6 +118,10 @@ namespace slib
 		
 	}
 	
+	SelectView::~SelectView()
+	{
+	}
+
 	sl_uint32 SelectView::getItemsCount()
 	{
 		return (sl_uint32)(m_titles.getCount());
@@ -500,4 +513,5 @@ namespace slib
 	}
 	
 #endif
+
 }

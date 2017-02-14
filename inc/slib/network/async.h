@@ -9,11 +9,17 @@
 
 namespace slib
 {
+
 	class AsyncTcpSocket;
 	class AsyncTcpSocketInstance;
 	
 	class SLIB_EXPORT IAsyncTcpSocketListener
 	{
+	public:
+		IAsyncTcpSocketListener();
+
+		virtual ~IAsyncTcpSocketListener();
+
 	public:
 		virtual void onConnect(AsyncTcpSocket* socket, const SocketAddress& address, sl_bool flagError) = 0;
 		
@@ -98,6 +104,11 @@ namespace slib
 	class SLIB_EXPORT IAsyncTcpServerListener
 	{
 	public:
+		IAsyncTcpServerListener();
+
+		virtual ~IAsyncTcpServerListener();
+
+	public:
 		virtual void onAccept(AsyncTcpServer* socketListen, const Ref<Socket>& socketAccept, const SocketAddress& address) = 0;
 		
 		virtual void onError(AsyncTcpServer* socketListen);
@@ -176,6 +187,11 @@ namespace slib
 	class SLIB_EXPORT IAsyncUdpSocketListener
 	{
 	public:
+		IAsyncUdpSocketListener();
+
+		virtual ~IAsyncUdpSocketListener();
+
+	public:
 		virtual void onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceived) = 0;
 		
 	};
@@ -253,6 +269,7 @@ namespace slib
 		friend class AsyncUdpSocketInstance;
 		
 	};
+
 }
 
 #endif

@@ -712,8 +712,17 @@ namespace slib
 		setOrientation(LayoutOrientation::Vertical, UIUpdateMode::Init);
 	}
 	
+	VerticalSplitView::~VerticalSplitView()
+	{
+	}
+
 	HorizontalSplitView::HorizontalSplitView()
 	{
 		setOrientation(LayoutOrientation::Horizontal, UIUpdateMode::Init);
 	}
+
+	HorizontalSplitView::~HorizontalSplitView()
+	{
+	}
+
 }

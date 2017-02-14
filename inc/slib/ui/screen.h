@@ -8,14 +8,21 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT Screen : public Object
 	{
 		SLIB_DECLARE_OBJECT
 		
 	public:
+		Screen();
+
+		~Screen();
+
+	public:
 		virtual UIRect getRegion() = 0;
 		
 	};
+
 }
 
 #endif

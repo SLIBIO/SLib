@@ -8,6 +8,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT SocketEvent : public Event
 	{
 		SLIB_DECLARE_OBJECT
@@ -62,7 +63,8 @@ namespace slib
 	protected:
 		Ref<Socket> m_socket;
 		
-	};	
+	};
+
 }
 
 #endif

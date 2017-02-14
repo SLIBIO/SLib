@@ -2,6 +2,7 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(IndexBufferInstance, RenderBaseObjectInstance)
 	
 	IndexBufferInstance::IndexBufferInstance()
@@ -109,4 +110,5 @@ namespace slib
 	{
 		return Ref<IndexBufferInstance>::from(RenderBaseObject::getInstance(engine));
 	}
+	
 }

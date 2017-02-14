@@ -12,6 +12,7 @@ typedef int sl_socket;
 
 namespace slib
 {
+
 	enum class L2PacketType
 	{
 		Host = 0,
@@ -272,7 +273,8 @@ namespace slib
 		sl_socket m_socket;
 		SocketError m_lastError;
 		
-	};	
+	};
+
 }
 
 #endif

@@ -1,12 +1,28 @@
 #include "../../../inc/slib/core/array.h"
 #include "../../../inc/slib/core/array2d.h"
 
-SLIB_NAMESPACE_BEGIN
+namespace slib
+{
+	
+	SLIB_DEFINE_ROOT_OBJECT(CArrayBase)
 
-SLIB_DEFINE_ROOT_OBJECT(CArrayBase)
+	CArrayBase::CArrayBase()
+	{		
+	}
 
-SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_ARRAY(sl_uint8)
+	CArrayBase::~CArrayBase()
+	{		
+	}
 
-SLIB_DEFINE_ROOT_OBJECT(CArray2DBase)
+	
+	SLIB_DEFINE_ROOT_OBJECT(CArray2DBase)
+	
+	CArray2DBase::CArray2DBase()
+	{
+	}
 
-SLIB_NAMESPACE_END
+	CArray2DBase::~CArray2DBase()
+	{
+	}
+
+}

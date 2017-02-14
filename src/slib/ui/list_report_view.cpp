@@ -2,6 +2,15 @@
 
 namespace slib
 {
+
+	IListReportViewListener::IListReportViewListener()
+	{
+	}
+
+	IListReportViewListener::~IListReportViewListener()
+	{
+	}
+
 	void IListReportViewListener::onSelectRow(ListReportView* view, sl_uint32 row)
 	{
 	}
@@ -25,6 +34,9 @@ namespace slib
 		headerAlign = Alignment::MiddleCenter;
 	}
 	
+	ListReportViewColumn::~ListReportViewColumn()
+	{
+	}
 	
 	SLIB_DEFINE_OBJECT(ListReportView, View)
 	
@@ -38,6 +50,10 @@ namespace slib
 		m_selectedRow = -1;
 	}
 	
+	ListReportView::~ListReportView()
+	{
+	}
+
 	sl_uint32 ListReportView::getColumnsCount()
 	{
 		return (sl_uint32)(m_columns.getCount());

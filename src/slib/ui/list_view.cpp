@@ -26,6 +26,15 @@ namespace slib
 		
 	};
 	
+
+	IListViewAdapter::IListViewAdapter()
+	{
+	}
+
+	IListViewAdapter::~IListViewAdapter()
+	{
+	}
+
 	sl_ui_len IListViewAdapter::getAverageItemHeight(ListView* lv)
 	{
 		return 0;

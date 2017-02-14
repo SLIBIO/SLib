@@ -59,6 +59,7 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(ScrollBar, View)
 	
 	class _ScrollBar_Static
@@ -84,6 +85,14 @@ namespace slib
 	
 	SLIB_SAFE_STATIC_GETTER(_ScrollBar_Static, _ScrollBar_getStatic)
 	
+	IScrollBarListener::IScrollBarListener()
+	{
+	}
+
+	IScrollBarListener::~IScrollBarListener()
+	{
+	}
+
 	ScrollBar::ScrollBar(LayoutOrientation orientation)
 	{
 		m_orientation = orientation;
@@ -112,6 +121,10 @@ namespace slib
 		
 	}
 	
+	ScrollBar::~ScrollBar()
+	{
+	}
+
 	LayoutOrientation ScrollBar::getOrientation()
 	{
 		return m_orientation;

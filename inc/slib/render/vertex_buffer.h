@@ -9,6 +9,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT VertexBufferInstance : public RenderBaseObjectInstance
 	{
 		SLIB_DECLARE_OBJECT
@@ -61,6 +62,7 @@ namespace slib
 		sl_bool m_flagStatic;
 		
 	};
+
 }
 
 #endif

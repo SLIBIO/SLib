@@ -20,6 +20,7 @@
 
 namespace slib
 {
+
 	class _NatTablePort
 	{
 	public:
@@ -117,7 +118,8 @@ namespace slib
 		HashMap<IcmpEchoAddress, IcmpEchoElement> m_mapIcmpEchoOutgoing;
 		HashMap<sl_uint32, IcmpEchoElement> m_mapIcmpEchoIncoming;
 		
-	};	
+	};
+
 }
 
 #endif

@@ -1,0 +1,22 @@
+#ifndef CHECKHEADER_SLIB_MATH_DETAIL_PLANE
+#define CHECKHEADER_SLIB_MATH_DETAIL_PLANE
+
+#include "../plane.h"
+
+namespace slib
+{
+
+	template <class T>
+	template <class O>
+	SLIB_INLINE PlaneT<T>& PlaneT<T>::operator=(const PlaneT<O>& other)
+	{
+		a = (T)(other.a);
+		b = (T)(other.b);
+		c = (T)(other.c);
+		d = (T)(other.d);
+		return *this;
+	}
+
+}
+
+#endif

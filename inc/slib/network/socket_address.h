@@ -10,6 +10,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT SocketAddress
 	{
 	public:
@@ -121,7 +122,8 @@ namespace slib
 	{
 	public:
 		sl_uint32 operator()(const SocketAddress& a) const;
-	};	
+	};
+
 }
 
 #endif

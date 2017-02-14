@@ -24,6 +24,7 @@
 #include "core/spin_lock.h"
 #include "core/mutex.h"
 #include "core/string.h"
+#include "core/string_buffer.h"
 #include "core/memory.h"
 #include "core/time.h"
 #include "core/variant.h"

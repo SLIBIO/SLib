@@ -7,34 +7,35 @@
 
 #include "java.h"
 
-SLIB_NAMESPACE_BEGIN
-
-class SLIB_EXPORT Android
+namespace slib
 {
-public:
-	static void initialize(JavaVM* jvm);
-
 	
-	static jobject getCurrentActivity();
+	class SLIB_EXPORT Android
+	{
+	public:
+		static void initialize(JavaVM* jvm);
+
+
+		static jobject getCurrentActivity();
+
+		static void setCurrentActivity(jobject activity);
 	
-	static void setCurrentActivity(jobject activity);
 
+		static void finishActivity();
+
+		static void finishActivity(jobject activity);
 	
-	static void finishActivity();
+
+		static jobject openAssetFile(const String& path);
+
+		static Memory readAllBytesFromAsset(const String& path);
 	
-	static void finishActivity(jobject activity);
-
 	
-	static jobject openAssetFile(const String& path);
+		static void dismissKeyboard();
 	
-	static Memory readAllBytesFromAsset(const String& path);
+	};
 
-
-	static void dismissKeyboard();
-
-};
-
-SLIB_NAMESPACE_END
+}
 
 #endif
 

@@ -1,9 +1,8 @@
 #include "../../../inc/slib/ui/motion_tracker.h"
 
 #include "../../../inc/slib/ui/event.h"
+#include "../../../inc/slib/core/math.h"
 
-namespace slib
-{
 #define MOVEMENT_ZERO_MOVEMENT 5
 	
 #define MAX_TRACK_HORIZON 0.2f
@@ -13,6 +12,9 @@ namespace slib
 #define MAX_DEGREE 4
 #define HISTORY_SIZE SLIB_MOTION_TRACKER_HISTORY_SIZE
 	
+namespace slib
+{
+
 	MotionTracker::MotionTracker() : MotionTracker(1)
 	{
 	}
@@ -31,6 +33,7 @@ namespace slib
 		m_nHistory = 0;
 		m_flagRefreshTrack = sl_true;
 		m_flagValidTrack = sl_false;
+		m_currentConfidence = 0;
 	}
 	
 	MotionTracker::~MotionTracker()
@@ -287,4 +290,5 @@ namespace slib
 		m_flagRefreshTrack = sl_false;
 		
 	}
+
 }

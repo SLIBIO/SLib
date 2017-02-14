@@ -18,6 +18,7 @@ namespace slib
 
 namespace slib
 {
+
 	class _UrlRequestShared
 	{
 	public:
@@ -237,7 +238,8 @@ namespace slib
 	Ref<UrlRequest> UrlRequest::_create(const UrlRequestParam& param, const String& url, const String& downloadFilePath)
 	{
 		return Ref<UrlRequest>::from(_UrlRequest::create(param, url, downloadFilePath));
-	}	
+	}
+	
 }
 
 @implementation _Slib_UrlRequestListener

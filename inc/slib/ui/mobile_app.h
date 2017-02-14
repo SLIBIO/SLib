@@ -10,6 +10,7 @@
 
 namespace slib
 {
+
 	class MobileMainWindow;
 	
 	class SLIB_EXPORT MobileApp : public UIApp
@@ -19,6 +20,8 @@ namespace slib
 	public:
 		MobileApp();
 		
+		~MobileApp();
+
 	public:
 		static Ref<MobileApp> getApp();
 		
@@ -125,11 +128,14 @@ namespace slib
 	public:
 		MobileMainWindow();
 		
+		~MobileMainWindow();
+
 	protected:
 		// override
 		void onResize(sl_ui_len width, sl_ui_len height);
 		
-	};	
+	};
+
 }
 
 #endif

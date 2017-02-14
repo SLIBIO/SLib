@@ -5,6 +5,7 @@
 
 namespace slib
 {
+
 	sl_uint16 TCP_IP::calculateOneComplementSum(const void* data, sl_size size, sl_uint32 add)
 	{
 		sl_uint32 sum = add;
@@ -684,4 +685,5 @@ namespace slib
 		}
 		return ret;
 	}
+	
 }

@@ -35,6 +35,11 @@ namespace slib
 	class SLIB_EXPORT IAudioPlayerBufferListener
 	{
 	public:
+		IAudioPlayerBufferListener();
+
+		virtual ~IAudioPlayerBufferListener();
+
+	public:
 		virtual void onRequireAudioData(AudioPlayerBuffer* player, sl_size requestedSamplesCount) = 0;
 	};
 	

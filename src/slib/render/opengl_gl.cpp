@@ -2,6 +2,7 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(GLRenderEngine, RenderEngine)
 	
 	GLRenderEngine::GLRenderEngine()
@@ -23,6 +24,7 @@ namespace slib
 		String name(_name);
 		return getUniformLocation(program, name.getData());
 	}
+
 }
 
 #if defined(SLIB_RENDER_SUPPORT_OPENGL_GL)
@@ -38,7 +40,7 @@ namespace slib
 #define GL_ENTRY(x) _GL_ENTRY(x)
 #include "opengl_impl.h"
 
-#if defined (SLIB_PLATFORM_IS_WIN32)
+#	if defined (SLIB_PLATFORM_IS_WIN32)
 
 namespace slib
 {
@@ -105,7 +107,7 @@ namespace slib
 	}
 }
 
-#else
+#	else
 
 namespace slib
 {
@@ -123,7 +125,7 @@ namespace slib
 	}
 }
 
-#endif
+#	endif
 
 #else
 

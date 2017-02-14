@@ -5,15 +5,16 @@
 
 #include "../core/object.h"
 
-SLIB_DEVICE_NAMESPACE_BEGIN
-
-class SLIB_EXPORT Vibrator
+namespace slib
 {
-public:
-	static sl_bool vibrate(sl_int32 millisec = 500);
 	
-};
+	class SLIB_EXPORT Vibrator
+	{
+	public:
+		static sl_bool vibrate(sl_int32 millisec = 500);
 
-SLIB_DEVICE_NAMESPACE_END
+	};
+
+}
 
 #endif

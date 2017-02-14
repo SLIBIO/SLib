@@ -3,6 +3,7 @@
 #if defined(SLIB_PLATFORM_IS_IOS)
 
 #include "../../../inc/slib/device/sensor.h"
+
 #include "../../../inc/slib/core/safe_static.h"
 
 #import <Foundation/Foundation.h>
@@ -12,9 +13,10 @@
 
 #define G 9.81f
 
-SLIB_DEVICE_NAMESPACE_BEGIN
-class _Sensor;
-SLIB_DEVICE_NAMESPACE_END
+namespace slib
+{
+	class _Sensor;
+}
 
 @interface _Slib_iOS_Sensor : NSObject <CLLocationManagerDelegate>{
 	
@@ -35,137 +37,137 @@ SLIB_DEVICE_NAMESPACE_END
 
 @end
 
-SLIB_DEVICE_NAMESPACE_BEGIN
-
-class _Sensor_Shared
+namespace slib
 {
-public:
-	CMMotionManager* defaultMotion;
-	
-public:
-	_Sensor_Shared()
-	{
-		defaultMotion = [[CMMotionManager alloc] init];
-	}
-	
-};
 
-SLIB_SAFE_STATIC_GETTER(_Sensor_Shared, _getSensor_Shared)
-
-class _Sensor : public Sensor
-{
-public:
-	_Slib_iOS_Sensor* m_sensor;
-    
-public:
-	_Sensor()
+	class _Sensor_Shared
 	{
-	}
+	public:
+		CMMotionManager* defaultMotion;
+		
+	public:
+		_Sensor_Shared()
+		{
+			defaultMotion = [[CMMotionManager alloc] init];
+		}
+		
+	};
 
-	~_Sensor()
-	{
-		stop();
-	}
+	SLIB_SAFE_STATIC_GETTER(_Sensor_Shared, _getSensor_Shared)
 
-public:
-	static Ref<_Sensor> create(const SensorParam& param)
+	class _Sensor : public Sensor
 	{
-		_Slib_iOS_Sensor* sensor = [[_Slib_iOS_Sensor alloc] initWithParam:&param];
-		if(sensor != nil){
-			Ref<_Sensor> ret = new _Sensor;
-			if(ret.isNotNull()) {
-				ret->_init(param);
-				ret->m_sensor = sensor;
-				sensor->m_sensor = ret;
-				if(param.flagAutoStart) {
-					ret->start();
+	public:
+		_Slib_iOS_Sensor* m_sensor;
+		
+	public:
+		_Sensor()
+		{
+		}
+
+		~_Sensor()
+		{
+			stop();
+		}
+
+	public:
+		static Ref<_Sensor> create(const SensorParam& param)
+		{
+			_Slib_iOS_Sensor* sensor = [[_Slib_iOS_Sensor alloc] initWithParam:&param];
+			if(sensor != nil){
+				Ref<_Sensor> ret = new _Sensor;
+				if(ret.isNotNull()) {
+					ret->_init(param);
+					ret->m_sensor = sensor;
+					sensor->m_sensor = ret;
+					if(param.flagAutoStart) {
+						ret->start();
+					}
+					return ret;
 				}
-				return ret;
+			}
+			return sl_null;
+		}
+
+		// override
+		sl_bool _start()
+		{
+			if ([m_sensor start]) {
+				return sl_true;
+			}
+			return sl_false;
+		}
+
+		// override
+		void _stop()
+		{
+			[m_sensor stop];
+		}
+		
+		void onChangeLocation(double latitude, double longitude, double altitude)
+		{
+			_onLocationChanged(GeoLocation(latitude, longitude, altitude));
+		}
+
+		void onChangeCompass(float declination)
+		{
+			_onCompassChanged(declination);
+		}
+
+		void onChangeAccelerometer(float xAccel, float yAccel, float zAccel)
+		{
+			_onAccelerometerChanged(xAccel, yAccel, zAccel);
+		}
+		
+		void setRunningLocation(sl_bool flag)
+		{
+			m_flagRunningLocation = flag;
+		}
+		
+		void setRunningCompass(sl_bool flag)
+		{
+			m_flagRunningCompass = flag;
+		}
+		
+		void setRunningAccelerometer(sl_bool flag)
+		{
+			m_flagRunningAccelerometer = flag;
+		}
+	};
+
+	Ref<Sensor> Sensor::create(const SensorParam& param)
+	{
+		return _Sensor::create(param);
+	}
+
+	sl_bool Sensor::isAvailableLocation()
+	{
+		return sl_true;
+	}
+
+	sl_bool Sensor::isAvailableCompass()
+	{
+		_Sensor_Shared* shared = _getSensor_Shared();
+		if (shared) {
+			if (shared->defaultMotion.magnetometerAvailable) {
+				return sl_true;
 			}
 		}
-		return sl_null;
+		return sl_false;
 	}
 
-	// override
-	sl_bool _start()
+	sl_bool Sensor::isAvailableAccelerometer()
 	{
-		if ([m_sensor start]) {
-            return sl_true;
-        }
-        return sl_false;
-	}
-
-	// override
-	void _stop()
-	{
-		[m_sensor stop];
-	}
-	
-	void onChangeLocation(double latitude, double longitude, double altitude)
-	{
-		_onLocationChanged(GeoLocation(latitude, longitude, altitude));
-	}
-
-	void onChangeCompass(float declination)
-	{
-		_onCompassChanged(declination);
-	}
-
-	void onChangeAccelerometer(float xAccel, float yAccel, float zAccel)
-	{
-		_onAccelerometerChanged(xAccel, yAccel, zAccel);
-	}
-	
-	void setRunningLocation(sl_bool flag)
-	{
-		m_flagRunningLocation = flag;
-	}
-	
-	void setRunningCompass(sl_bool flag)
-	{
-		m_flagRunningCompass = flag;
-	}
-	
-	void setRunningAccelerometer(sl_bool flag)
-	{
-		m_flagRunningAccelerometer = flag;
-	}
-};
-
-Ref<Sensor> Sensor::create(const SensorParam& param)
-{
-	return _Sensor::create(param);
-}
-
-sl_bool Sensor::isAvailableLocation()
-{
-	return sl_true;
-}
-
-sl_bool Sensor::isAvailableCompass()
-{
-	_Sensor_Shared* shared = _getSensor_Shared();
-	if (shared) {
-		if (shared->defaultMotion.magnetometerAvailable) {
-			return sl_true;
+		_Sensor_Shared* shared = _getSensor_Shared();
+		if (shared) {
+			if (shared->defaultMotion.accelerometerAvailable) {
+				return sl_true;
+			}
 		}
+		return sl_false;
 	}
-	return sl_false;
+
 }
-
-sl_bool Sensor::isAvailableAccelerometer()
-{
-	_Sensor_Shared* shared = _getSensor_Shared();
-	if (shared) {
-		if (shared->defaultMotion.accelerometerAvailable) {
-			return sl_true;
-		}
-	}
-	return sl_false;
-}
-
-
-SLIB_DEVICE_NAMESPACE_END
 
 @implementation _Slib_iOS_Sensor
 -(id) initWithParam:(const slib::SensorParam *)param
@@ -290,8 +292,8 @@ SLIB_DEVICE_NAMESPACE_END
 - (void)locationManager:(CLLocationManager *)manager
 	   didFailWithError:(NSError *)error
 {
-	
 }
+
 @end
 
 #endif

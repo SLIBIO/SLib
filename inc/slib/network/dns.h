@@ -108,6 +108,7 @@
 
 namespace slib
 {
+
 	enum class DnsOpcode
 	{
 		Query = 0,
@@ -430,6 +431,11 @@ namespace slib
 	class SLIB_EXPORT IDnsClientListener
 	{
 	public:
+		IDnsClientListener();
+
+		virtual ~IDnsClientListener();
+
+	public:
 		virtual void onDnsAnswer(DnsClient* client, const SocketAddress& serverAddress, const DnsPacket& packet) = 0;
 	};
 	
@@ -511,6 +517,11 @@ namespace slib
 	
 	class SLIB_EXPORT IDnsServerListener
 	{
+	public:
+		IDnsServerListener();
+
+		virtual ~IDnsServerListener();
+
 	public:
 		virtual void resolveDnsHost(DnsServer* server, DnsResolveHostParam& param) = 0;
 		
@@ -619,6 +630,7 @@ namespace slib
 		Ptr<IDnsServerListener> m_listener;
 		
 	};
+
 }
     
 #endif

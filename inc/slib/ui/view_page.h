@@ -11,11 +11,17 @@
 
 namespace slib
 {
+
 	class ViewPage;
 	class ViewPager;
 
 	class SLIB_EXPORT IViewPagerListener
 	{
+	public:
+		IViewPagerListener();
+
+		virtual ~IViewPagerListener();
+
 	public:
 		virtual void onPageAction(ViewPager* pager, View* page, UIPageAction action);
 		
@@ -30,6 +36,8 @@ namespace slib
 	public:
 		ViewPager();
 		
+		~ViewPager();
+
 	public:
 		sl_size getPagesCount();
 		
@@ -180,6 +188,8 @@ namespace slib
 	public:
 		ViewPage();
 		
+		~ViewPage();
+
 	public:
 		Ref<ViewPager> getPager();
 		

@@ -7,99 +7,87 @@
 #include "line3.h"
 #include "matrix4.h"
 
-SLIB_MATH_NAMESPACE_BEGIN
-
 /*
 	ax + by + cz + d = 0
  */
-template <class T>
-class SLIB_EXPORT PlaneT
+
+namespace slib
 {
-public:
-	T a;
-	T b;
-	T c;
-	T d;
-	
-public:
-	SLIB_INLINE PlaneT() = default;
-	
-	constexpr PlaneT(const PlaneT<T>& other):
-	 a(other.a), b(other.b), c(other.c), d(other.d)
-	{}
-	
-	template <class O>
-	constexpr PlaneT(const PlaneT<O>& other):
-	 a((T)(other.a)), b((T)(other.b)), c((T)(other.c)), d((T)(other.d))
-	{}
-	
-	constexpr PlaneT(T _a, T _b, T _c, T _d):
-	 a(_a), b(_b), c(_c), d(_d)
-	{}
-	
-	PlaneT(const Vector3T<T>& point, const Vector3T<T>& normal);
-	
-public:
-	Vector3T<T> getNormal() const;
-	
-	Vector3T<T> projectOriginOnNormalized() const;
-	
-	Vector3T<T> projectOrigin() const;
-	
-	T getDistanceFromPointOnNormalized(const Vector3T<T>& pos) const;
-	
-	T getDistanceFromPoint(const Vector3T<T>& pos) const;
-	
-	Vector3T<T> projectPointOnNormalized(const Vector3T<T>& pos) const;
-	
-	Vector3T<T> projectPoint(const Vector3T<T>& pos) const;
-	
-	void setFromPointAndNormal(const Vector3T<T>& point, const Vector3T<T>& normal);
-	
-	void normalize();
-	
-	void transform(const Matrix4T<T>& mat);
-	
-	// return sl_true when the plane intersects to the line segment
-	sl_bool intersectLine(
-		const Line3T<T>& line,
-		Vector3T<T>* outIntersectPoint = sl_null,
-		sl_bool* pFlagParallel = sl_null,
-		sl_bool* pFlagExtendPoint1 = sl_null,
-		sl_bool* pFlagExtendPoint2 = sl_null) const;
-	
-	sl_bool intersectPlane(const PlaneT<T>& plane, Line3T<T>* outIntersectLine = sl_null, sl_bool* pFlagParallel = sl_null) const;
-	
-public:
-	PlaneT<T>& operator=(const PlaneT<T>& other) = default;
-	
-	template <class O>
-	PlaneT<T>& operator=(const PlaneT<O>& other);
 
-};
+	template <class T>
+	class SLIB_EXPORT PlaneT
+	{
+	public:
+		T a;
+		T b;
+		T c;
+		T d;
 
-extern template class PlaneT<float>;
-extern template class PlaneT<double>;
-typedef PlaneT<sl_real> Plane;
-typedef PlaneT<float> Planef;
-typedef PlaneT<double> Planelf;
+	public:
+		SLIB_INLINE PlaneT() = default;
 
-SLIB_MATH_NAMESPACE_END
+		constexpr PlaneT(const PlaneT<T>& other):
+		 a(other.a), b(other.b), c(other.c), d(other.d)
+		{}
 
+		template <class O>
+		constexpr PlaneT(const PlaneT<O>& other):
+		 a((T)(other.a)), b((T)(other.b)), c((T)(other.c)), d((T)(other.d))
+		{}
 
-SLIB_MATH_NAMESPACE_BEGIN
+		constexpr PlaneT(T _a, T _b, T _c, T _d):
+		 a(_a), b(_b), c(_c), d(_d)
+		{}
 
-template <class T>
-template <class O>
-SLIB_INLINE PlaneT<T>& PlaneT<T>::operator=(const PlaneT<O>& other)
-{
-	a = (T)(other.a);
-	b = (T)(other.b);
-	c = (T)(other.c);
-	d = (T)(other.d);
-	return *this;
+		PlaneT(const Vector3T<T>& point, const Vector3T<T>& normal);
+
+	public:
+		Vector3T<T> getNormal() const;
+
+		Vector3T<T> projectOriginOnNormalized() const;
+
+		Vector3T<T> projectOrigin() const;
+
+		T getDistanceFromPointOnNormalized(const Vector3T<T>& pos) const;
+
+		T getDistanceFromPoint(const Vector3T<T>& pos) const;
+
+		Vector3T<T> projectPointOnNormalized(const Vector3T<T>& pos) const;
+
+		Vector3T<T> projectPoint(const Vector3T<T>& pos) const;
+
+		void setFromPointAndNormal(const Vector3T<T>& point, const Vector3T<T>& normal);
+
+		void normalize();
+
+		void transform(const Matrix4T<T>& mat);
+
+		// return sl_true when the plane intersects to the line segment
+		sl_bool intersectLine(
+			const Line3T<T>& line,
+			Vector3T<T>* outIntersectPoint = sl_null,
+			sl_bool* pFlagParallel = sl_null,
+			sl_bool* pFlagExtendPoint1 = sl_null,
+			sl_bool* pFlagExtendPoint2 = sl_null) const;
+
+		sl_bool intersectPlane(const PlaneT<T>& plane, Line3T<T>* outIntersectLine = sl_null, sl_bool* pFlagParallel = sl_null) const;
+
+	public:
+		PlaneT<T>& operator=(const PlaneT<T>& other) = default;
+
+		template <class O>
+		PlaneT<T>& operator=(const PlaneT<O>& other);
+	
+	};
+	
+	extern template class PlaneT<float>;
+	extern template class PlaneT<double>;
+	typedef PlaneT<sl_real> Plane;
+	typedef PlaneT<float> Planef;
+	typedef PlaneT<double> Planelf;
+
 }
 
-SLIB_MATH_NAMESPACE_END
+#include "detail/plane.h"
 
 #endif

@@ -92,6 +92,8 @@ namespace slib
 		
 		AlertDialog(const AlertDialog& other);
 		
+		~AlertDialog();
+
 	public:
 		DialogResult run();
 		
@@ -152,6 +154,8 @@ namespace slib
 		
 		FileDialog(const FileDialog& other);
 		
+		~FileDialog();
+
 	public:
 		sl_bool run();
 

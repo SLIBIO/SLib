@@ -8,6 +8,7 @@
 
 namespace slib
 {
+
 	class MobileGameView;
 	
 	class SLIB_EXPORT MobileGame : public MobileApp
@@ -17,6 +18,8 @@ namespace slib
 	public:
 		MobileGame();
 		
+		~MobileGame();
+
 	public:
 		static Ref<MobileGame> getApp();
 		
@@ -38,7 +41,10 @@ namespace slib
 	public:
 		MobileGameView();
 		
-	};	
+		~MobileGameView();
+
+	};
+
 }
 
 #endif

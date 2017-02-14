@@ -3,13 +3,6 @@
 
 #include "option.h"
 
-#define SLIB_NAMESPACE_BEGIN namespace slib {
-#define SLIB_NAMESPACE_END }
-
-/************************************************************************/
-/* SLIB Native Type Declarations                                        */
-/************************************************************************/
-
 #if defined(SLIB_COMPILER_IS_VC)
 
 #	if defined (_DEBUG)
@@ -121,10 +114,11 @@ typedef sl_uint32			sl_char32;
 #endif
 
 
-SLIB_NAMESPACE_BEGIN
+namespace slib
+{
 	SLIB_INLINE void _blank_proc(const void*) {}
 	void _abort(const char* msg, const char* file, sl_uint32 line);
-SLIB_NAMESPACE_END
+}
 
 #define SLIB_UNUSED(x)					slib::_blank_proc(&x);
 

@@ -1,9 +1,17 @@
 #include "../../../inc/slib/network/datagram.h"
 
+#define DATAGRAM_BUF_SIZE 4096
+
 namespace slib
 {
 
-	#define DATAGRAM_BUF_SIZE 4096
+	ITcpDatagramListener::ITcpDatagramListener()
+	{
+	}
+
+	ITcpDatagramListener::~ITcpDatagramListener()
+	{
+	}
 
 	void ITcpDatagramListener::onConnect(TcpDatagramClient* client)
 	{
@@ -44,6 +52,9 @@ namespace slib
 	{
 		m_flagOpened = sl_false;
 		m_flagAutoReconnect = sl_false;
+
+		m_autoReconnectIntervalSeconds = 5;
+		m_maxWaitingBytesForSending = 1024000;
 	}
 
 	TcpDatagramClient::~TcpDatagramClient()
@@ -320,6 +331,7 @@ namespace slib
 
 	TcpDatagramServer::TcpDatagramServer()
 	{
+		m_maxWaitingBytesForSending = 1024000;
 	}
 
 	TcpDatagramServer::~TcpDatagramServer()

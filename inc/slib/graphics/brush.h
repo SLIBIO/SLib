@@ -8,52 +8,53 @@
 
 #include "../core/object.h"
 
-SLIB_GRAPHICS_NAMESPACE_BEGIN
-
-class SLIB_EXPORT BrushDesc
+namespace slib
 {
-public:
-	BrushStyle style;
-	Color color;
 	
-public:
-	BrushDesc();
-	
-	~BrushDesc();
-	
-};
+	class SLIB_EXPORT BrushDesc
+	{
+	public:
+		BrushStyle style;
+		Color color;
 
-class SLIB_EXPORT Brush : public Referable
-{
-	SLIB_DECLARE_OBJECT
-	
-protected:
-	Brush();
-	
-	~Brush();
-	
-public:
-	static Ref<Brush> getDefault();
-	
-	static Ref<Brush> create(const BrushDesc& desc);
-	
-	static Ref<Brush> createSolidBrush(const Color& color);
-	
-public:
-	void getDesc(BrushDesc& desc);
-	
-	BrushStyle getStyle();
-	
-	Color getColor();
-	
-protected:
-	BrushDesc m_desc;
-	
-	Ref<Referable> m_platformObject;
-	SpinLock m_lock;
-	
-};
+	public:
+		BrushDesc();
 
-SLIB_GRAPHICS_NAMESPACE_END
+		~BrushDesc();
+
+	};
+	
+	class SLIB_EXPORT Brush : public Referable
+	{
+		SLIB_DECLARE_OBJECT
+
+	protected:
+		Brush();
+
+		~Brush();
+
+	public:
+		static Ref<Brush> getDefault();
+
+		static Ref<Brush> create(const BrushDesc& desc);
+
+		static Ref<Brush> createSolidBrush(const Color& color);
+
+	public:
+		void getDesc(BrushDesc& desc);
+
+		BrushStyle getStyle();
+
+		Color getColor();
+
+	protected:
+		BrushDesc m_desc;
+
+		Ref<Referable> m_platformObject;
+		SpinLock m_lock;
+
+	};
+
+}
 
 #endif

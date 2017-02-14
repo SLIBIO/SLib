@@ -2,9 +2,7 @@
 #define CHECKHEADER_SLIB_GRAPHICS_DEFINITION
 
 #include "../core/definition.h"
-#include "config.h"
 
-#define SLIB_GRAPHICS_NAMESPACE_BEGIN		SLIB_NAMESPACE_BEGIN
-#define SLIB_GRAPHICS_NAMESPACE_END			SLIB_NAMESPACE_END
+#include "config.h"
 
 #endif

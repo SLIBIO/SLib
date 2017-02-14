@@ -10,6 +10,10 @@ namespace slib
 		m_gravity = Alignment::MiddleCenter;
 	}
 	
+	ImageView::~ImageView()
+	{
+	}
+
 	Ref<ImageView> ImageView::create(sl_ui_len width, sl_ui_len height, const Ref<slib::Drawable> &drawable)
 	{
 		Ref<ImageView> ret = new ImageView;
@@ -87,4 +91,5 @@ namespace slib
 			}
 		}
 	}
+
 }

@@ -2,12 +2,17 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(CameraView, VideoView)
 	
 	CameraView::CameraView()
 	{
 	}
 	
+	CameraView::~CameraView()
+	{
+	}
+
 	void CameraView::start(const CameraParam& _param)
 	{
 		stop();
@@ -29,4 +34,5 @@ namespace slib
 	{
 		updateCurrentFrame(frame);
 	}
+
 }

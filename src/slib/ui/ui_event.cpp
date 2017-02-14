@@ -2,13 +2,16 @@
 
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/core/hashtable.h"
+#include "../../../inc/slib/core/string_buffer.h"
 #include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/safe_static.h"
 
 namespace slib
 {
 
-	TouchPoint::TouchPoint() = default;
+	TouchPoint::TouchPoint(): pressure(0), phase(TouchPhase::Move)
+	{
+	}
 
 	TouchPoint::TouchPoint(const TouchPoint& other) = default;
 
@@ -186,7 +189,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 		flagPassToNext = 0x4,
 	};
 
-	UIEvent::UIEvent() : m_flags(0), m_action(UIAction::Unknown), m_time(0)
+	UIEvent::UIEvent() : m_flags(0), m_action(UIAction::Unknown), m_time(0), m_systemKeycode(0), m_deltaX(0), m_deltaY(0)
 	{
 	}
 
@@ -808,6 +811,15 @@ sl_bool UIEvent::is##NAME##Key() const \
 		return Keycode::Unknown;
 	}
 
+
+	IViewListener::IViewListener()
+	{
+	}
+
+	IViewListener::~IViewListener()
+	{
+	}
+
 	void IViewListener::onMouseEvent(View* view, UIEvent* event)
 	{
 	}
@@ -845,6 +857,15 @@ sl_bool UIEvent::is##NAME##Key() const \
 	}
 
 	void IViewListener::onSwipe(View* view, GestureEvent* ev)
+	{
+	}
+
+
+	IWindowListener::IWindowListener()
+	{
+	}
+
+	IWindowListener::~IWindowListener()
 	{
 	}
 
@@ -894,6 +915,14 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 
 	// UIEventLogListener implementation
+	UIEventLogListener::UIEventLogListener()
+	{
+	}
+
+	UIEventLogListener::~UIEventLogListener()
+	{
+	}
+
 	void UIEventLogListener::onMouseEvent(View* view, UIEvent* event)
 	{
 		processMouse("View", event);
@@ -927,6 +956,11 @@ sl_bool UIEvent::is##NAME##Key() const \
 	void UIEventLogListener::onSwipe(View* view, GestureEvent* ev)
 	{
 		Log("View", "OnSwipe");
+	}
+
+	void UIEventLogListener::onResize(View* view, sl_ui_len width, sl_ui_len height)
+	{
+		Log("View", String::format("onResize (%d, %d)", width, height));
 	}
 
 	void UIEventLogListener::onClose(Window* window, UIEvent* ev)

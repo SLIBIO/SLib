@@ -11,10 +11,16 @@
 
 namespace slib
 {
+
 	class UrlRequest;
 	
 	class SLIB_EXPORT IUrlRequestListener
 	{
+	public:
+		IUrlRequestListener();
+
+		virtual ~IUrlRequestListener();
+
 	public:
 		virtual void onComplete(UrlRequest* request);
 		
@@ -230,7 +236,8 @@ namespace slib
 		sl_bool m_flagClosed;
 		sl_bool m_flagError;
 		
-	};	
+	};
+
 }
 
 #endif

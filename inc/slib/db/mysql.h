@@ -9,43 +9,51 @@
 
 #if defined(SLIB_DATABASE_SUPPORT_MYSQL)
 
-SLIB_DB_NAMESPACE_BEGIN
-
-class SLIB_EXPORT MySQL_Param
+namespace slib
 {
-public:
-	String host;
-	sl_uint32 port;
-	String user;
-	String password;
-	String db;
-
-	sl_bool flagAutoReconnect;
-	sl_bool flagMultipleStatements;
-
-public:
-	MySQL_Param();
 	
-};
+	class SLIB_EXPORT MySQL_Param
+	{
+	public:
+		String host;
+		sl_uint32 port;
+		String user;
+		String password;
+		String db;
 
-class SLIB_EXPORT MySQL_Database : public Database
-{
-	SLIB_DECLARE_OBJECT
+		sl_bool flagAutoReconnect;
+		sl_bool flagMultipleStatements;
+
+	public:
+		MySQL_Param();
+
+		~MySQL_Param();
+
+	};
+
+	class SLIB_EXPORT MySQL_Database : public Database
+	{
+		SLIB_DECLARE_OBJECT
+
+	protected:
+		MySQL_Database();
+
+		~MySQL_Database();
 	
-public:
-	static Ref<MySQL_Database> connect(const MySQL_Param& param);
+	public:
+		static Ref<MySQL_Database> connect(const MySQL_Param& param);
+
+		static Ref<MySQL_Database> connect(const MySQL_Param& param, String& outErrorMessage);
 	
-	static Ref<MySQL_Database> connect(const MySQL_Param& param, String& outErrorMessage);
-
-public:
-	virtual sl_bool ping() = 0;
-
-public:
-	static void initThread();
+	public:
+		virtual sl_bool ping() = 0;
 	
-};
+	public:
+		static void initThread();
 
-SLIB_DB_NAMESPACE_END
+	};
+
+}
 
 #endif
 

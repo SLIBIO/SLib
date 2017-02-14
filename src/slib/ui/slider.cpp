@@ -5,6 +5,15 @@
 
 namespace slib
 {
+
+	ISliderListener::ISliderListener()
+	{
+	}
+
+	ISliderListener::~ISliderListener()
+	{
+	}
+
 	void ISliderListener::onChange(Slider *slider, float value)
 	{
 	}
@@ -60,6 +69,10 @@ namespace slib
 		setFocusable(sl_true);
 	}
 	
+	Slider::~Slider()
+	{
+	}
+
 	Ref<Drawable> Slider::getThumbDrawable()
 	{
 		return m_thumb;

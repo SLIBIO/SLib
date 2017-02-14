@@ -12,6 +12,7 @@
 
 namespace slib
 {
+
 	class Menu;
 	
 	class MenuItem : public Object
@@ -21,6 +22,8 @@ namespace slib
 	protected:
 		MenuItem();
 		
+		~MenuItem();
+
 	public:
 		Ref<Menu> getParent() const;
 		
@@ -97,6 +100,8 @@ namespace slib
 	public:
 		MenuItemParam();
 		
+		~MenuItemParam();
+
 	};
 	
 	class Menu : public Object
@@ -106,6 +111,8 @@ namespace slib
 	protected:
 		Menu();
 		
+		~Menu();
+
 	public:
 		static Ref<Menu> create();
 		
@@ -152,7 +159,8 @@ namespace slib
 	protected:
 		CList< Ref<MenuItem> > m_items;
 		
-	};	
+	};
+
 }
 
 #endif

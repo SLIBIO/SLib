@@ -4,12 +4,39 @@
 #include "../../../inc/slib/core/queue_channel.h"
 #include "../../../inc/slib/core/linked_object.h"
 
-SLIB_NAMESPACE_BEGIN
+namespace slib
+{
 
-SLIB_DEFINE_OBJECT(CLinkedListBase, Object)
+	SLIB_DEFINE_OBJECT(CLinkedListBase, Object)
 
-SLIB_DEFINE_OBJECT(LoopQueueBase, Object)
+	CLinkedListBase::CLinkedListBase()
+	{
+	}
 
-SLIB_DEFINE_OBJECT(LinkedObjectListBase, Object)
+	CLinkedListBase::~CLinkedListBase()
+	{
+	}
 
-SLIB_NAMESPACE_END
+
+	SLIB_DEFINE_OBJECT(LoopQueueBase, Object)
+
+	LoopQueueBase::LoopQueueBase()
+	{
+	}
+
+	LoopQueueBase::~LoopQueueBase()
+	{
+	}
+
+
+	SLIB_DEFINE_OBJECT(LinkedObjectListBase, Object)
+
+	LinkedObjectListBase::LinkedObjectListBase()
+	{
+	}
+
+	LinkedObjectListBase::~LinkedObjectListBase()
+	{
+	}
+
+}

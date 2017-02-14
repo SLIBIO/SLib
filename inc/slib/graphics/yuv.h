@@ -3,17 +3,18 @@
 
 #include "definition.h"
 
-SLIB_GRAPHICS_NAMESPACE_BEGIN
-
-class SLIB_EXPORT YUV
+namespace slib
 {
-public:
-	static void convertRGBToYUV(sl_uint8 R, sl_uint8 G, sl_uint8 B, sl_uint8& Y, sl_uint8& U, sl_uint8& V);
 	
-	static void convertYUVToRGB(sl_uint8 Y, sl_uint8 U, sl_uint8 V, sl_uint8& R, sl_uint8& G, sl_uint8& B);
-	
-};
+	class SLIB_EXPORT YUV
+	{
+	public:
+		static void convertRGBToYUV(sl_uint8 R, sl_uint8 G, sl_uint8 B, sl_uint8& Y, sl_uint8& U, sl_uint8& V);
 
-SLIB_GRAPHICS_NAMESPACE_END
+		static void convertYUVToRGB(sl_uint8 Y, sl_uint8 U, sl_uint8 V, sl_uint8& R, sl_uint8& G, sl_uint8& B);
+
+	};
+
+}
 
 #endif

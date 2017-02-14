@@ -6,6 +6,7 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(MobileApp, UIApp)
 	
 	MobileApp::MobileApp()
@@ -24,6 +25,10 @@ namespace slib
 		
 	}
 	
+	MobileApp::~MobileApp()
+	{
+	}
+
 	Ref<MobileApp> MobileApp::getApp()
 	{
 		return CastRef<MobileApp>(Application::getApp());
@@ -382,8 +387,13 @@ namespace slib
 		SLIB_REFERABLE_CONSTRUCTOR;
 	}
 	
+	MobileMainWindow::~MobileMainWindow()
+	{
+	}
+
 	void MobileMainWindow::onResize(sl_ui_len width, sl_ui_len height)
 	{
 		MobileApp::dispatchResizeToApp(width, height);
 	}
+
 }

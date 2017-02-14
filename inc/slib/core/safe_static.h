@@ -50,31 +50,7 @@
 	SLIB_SAFE_STATIC_DESTRUCTOR(TYPE, NAME)
 
 
-SLIB_NAMESPACE_BEGIN
-
-template <class T>
-class _SafeStaticDestructor
-{
-public:
-	T* object;
-	volatile sl_bool flagFreed;
-	
-public:
-	SLIB_INLINE _SafeStaticDestructor(T* p)
-	: object(p), flagFreed(sl_false)
-	{
-	}
-	
-	~_SafeStaticDestructor()
-	{
-		flagFreed = sl_true;
-		object->~T();
-	}
-	
-};
-
-SLIB_NAMESPACE_END
-
+#include "detail/safe_static.h"
 
 #endif
 

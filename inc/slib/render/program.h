@@ -11,6 +11,7 @@
 
 namespace slib
 {
+
 	class Primitive;
 	class RenderEngine;
 	class GLRenderEngine;
@@ -248,8 +249,8 @@ namespace slib
 		
 	};
 
-	#define SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, location, VertexData, member) \
-		engine->setVertexFloatArrayAttribute(location, (sl_uint32)(sl_size)(&(((VertexData*)0)->member)), sizeof(((VertexData*)0)->member) / sizeof(float), sizeof(VertexData));
+#define SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, location, VertexData, member) \
+	engine->setVertexFloatArrayAttribute(location, (sl_uint32)(sl_size)(&(((VertexData*)0)->member)), sizeof(((VertexData*)0)->member) / sizeof(float), sizeof(VertexData));
 
 
 	struct RenderVertex2D_PositionTexture
@@ -516,6 +517,7 @@ namespace slib
 		String getGLSLFragmentShader(RenderEngine* engine);
 		
 	};
+
 }
 
 #endif

@@ -2,6 +2,7 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(RenderDrawable, Drawable)
 	
 	RenderDrawable::RenderDrawable()
@@ -142,4 +143,5 @@ namespace slib
 			canvas->drawRectangle(rectDst, scope.getState(), param);
 		}
 	}
+	
 }

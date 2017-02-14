@@ -18,6 +18,7 @@
 
 namespace slib
 {
+
 	enum class PrimitiveType
 	{
 		Triangle = 0,
@@ -133,7 +134,13 @@ namespace slib
 	class SLIB_EXPORT IRenderCallback
 	{
 	public:
+		IRenderCallback();
+
+		virtual ~IRenderCallback();
+
+	public:
 		virtual void onFrame(RenderEngine* engine) = 0;
+
 	};
 	
 	class SLIB_EXPORT RendererParam
@@ -469,7 +476,8 @@ namespace slib
 		Ref<RenderProgram> m_program;
 		StateType* m_state;
 		
-	};	
+	};
+
 }
 
 #endif

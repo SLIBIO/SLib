@@ -3,6 +3,7 @@
 
 namespace slib
 {
+
 	sl_ui_len _g_ui_resource_screenWidth = 0;
 	sl_ui_len _g_ui_resource_screenHeight = 0;
 	sl_ui_len _g_ui_resource_defaultScreenWidth = 0;
@@ -62,8 +63,13 @@ namespace slib
 		m_sp = sp;
 		m_countRecursiveLayout = 0;
 		m_flagInitialized = sl_false;
+		m_contentView = sl_null;
 	}
 	
+	UILayoutResource::~UILayoutResource()
+	{
+	}
+
 	Ref<View> UILayoutResource::getContent()
 	{
 		return m_contentView;
@@ -116,6 +122,10 @@ namespace slib
 		m_contentView = view.get();
 	}
 	
+	WindowLayoutResource::~WindowLayoutResource()
+	{
+	}
+
 	UISize WindowLayoutResource::getContentSize()
 	{
 		return getClientSize();
@@ -143,6 +153,10 @@ namespace slib
 		m_contentView = this;
 	}
 	
+	ViewLayoutResource::~ViewLayoutResource()
+	{
+	}
+
 	UISize ViewLayoutResource::getContentSize()
 	{
 		return getSize();
@@ -164,6 +178,10 @@ namespace slib
 		m_contentView = this;
 	}
 	
+	PageLayoutResource::~PageLayoutResource()
+	{
+	}
+
 	UISize PageLayoutResource::getContentSize()
 	{
 		return getSize();

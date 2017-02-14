@@ -1,7 +1,8 @@
 #include "../../../inc/slib/core/function.h"
 
-SLIB_NAMESPACE_BEGIN
+namespace slib
+{
 
-SLIB_DEFINE_ROOT_OBJECT(CallableBase)
+	SLIB_DEFINE_ROOT_OBJECT(CallableBase)
 
-SLIB_NAMESPACE_END
+}

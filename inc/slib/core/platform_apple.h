@@ -17,42 +17,43 @@
 #endif
 #endif
 
-SLIB_NAMESPACE_BEGIN
-
-// specific functions for OSX & iOS
-class SLIB_EXPORT Apple
+namespace slib
 {
-public:
-#ifdef __OBJC__
-	static NSString* getNSStringFromString(const String& str, NSString* def = @"");
-	
-	static NSString* getNSStringFromString16(const String16& str, NSString* def = @"");
 
-	static String getStringFromNSString(NSString* str);
+	// specific functions for OSX & iOS
+	class SLIB_EXPORT Apple
+	{
+	public:
+#ifdef __OBJC__
+		static NSString* getNSStringFromString(const String& str, NSString* def = @"");
+
+		static NSString* getNSStringFromString16(const String16& str, NSString* def = @"");
 	
-	static String16 getString16FromNSString(NSString* str);
-	
-	static String getFilePathFromNSURL(NSURL* url);
-	
-	static Memory getMemoryFromNSData(NSData* data);
-	
-	static NSData* getNSDataFromMemory(const Memory& memory);
+		static String getStringFromNSString(NSString* str);
+
+		static String16 getString16FromNSString(NSString* str);
+
+		static String getFilePathFromNSURL(NSURL* url);
+
+		static Memory getMemoryFromNSData(NSData* data);
+
+		static NSData* getNSDataFromMemory(const Memory& memory);
 	
 #endif
-	
-	static String getAssetFilePath(const String& path);
-	
-	static String getSystemVersion();
-	
-	static sl_uint32 getSystemMajorVersion();
-	
-	static sl_uint32 getSystemMinorVersion();
-	
-	static String getMainBundlePath();
 
-};
+		static String getAssetFilePath(const String& path);
 
-SLIB_NAMESPACE_END
+		static String getSystemVersion();
+
+		static sl_uint32 getSystemMajorVersion();
+
+		static sl_uint32 getSystemMinorVersion();
+
+		static String getMainBundlePath();
+	
+	};
+
+}
 
 #endif // APPLE
 

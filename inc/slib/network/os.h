@@ -9,6 +9,7 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT NetworkInterfaceInfo
 	{
 	public:
@@ -56,7 +57,8 @@ namespace slib
 		
 		static IPv6Address getIPv6AddressFromHostName(const String& hostName);
 		
-	};	
+	};
+
 }
 
 #endif

@@ -9,391 +9,418 @@
 
 #include "../math/bigint.h"
 
-SLIB_NAMESPACE_BEGIN
-
-enum class SeekPosition
+namespace slib
 {
-	Current = 1,
-	Begin = 2,
-	End = 3
-};
+	
+	enum class SeekPosition
+	{
+		Current = 1,
+		Begin = 2,
+		End = 3
+	};
+	
+	class SLIB_EXPORT IReader
+	{
+	public:
+		IReader();
 
-class SLIB_EXPORT IReader
-{
-public:
-	IReader();
-	
-	~IReader();
-	
-public:
-	virtual sl_reg read(void* buf, sl_size size);
-	
-	virtual sl_int32 read32(void* buf, sl_uint32 size);
+		virtual ~IReader();
 
-public:
-	sl_reg readFully(void* buf, sl_size size);
+	public:
+		virtual sl_reg read(void* buf, sl_size size);
 
-	sl_bool readInt8(sl_int8* output);
+		virtual sl_int32 read32(void* buf, sl_uint32 size);
 	
-	sl_int8 readInt8(sl_int8 def = 0);
+	public:
+		sl_reg readFully(void* buf, sl_size size);
 	
-	sl_bool readUint8(sl_uint8* output);
-	
-	sl_uint8 readUint8(sl_uint8 def = 0);
-	
-	sl_bool readInt16(sl_int16* output, sl_bool flagBigEndian = sl_false);
-	
-	sl_int16 readInt16(sl_int16 def = 0, sl_bool flagBigEndian = sl_false);
+		sl_bool readInt8(sl_int8* output);
 
-	sl_bool readUint16(sl_uint16* output, sl_bool flagBigEndian = sl_false);
-	
-	sl_uint16 readUint16(sl_uint16 def = 0, sl_bool flagBigEndian = sl_false);
+		sl_int8 readInt8(sl_int8 def = 0);
 
-	sl_bool readInt32(sl_int32* output, sl_bool flagBigEndian = sl_false);
-	
-	sl_int32 readInt32(sl_int32 def = 0, sl_bool flagBigEndian = sl_false);
-	
-	sl_bool readUint32(sl_uint32* output, sl_bool flagBigEndian = sl_false);
-	
-	sl_uint32 readUint32(sl_uint32 def = 0, sl_bool flagBigEndian = sl_false);
-	
-	sl_bool readInt64(sl_int64* output, sl_bool flagBigEndian = sl_false);
-	
-	sl_int64 readInt64(sl_int64 def = 0, sl_bool flagBigEndian = sl_false);
+		sl_bool readUint8(sl_uint8* output);
 
-	sl_bool readUint64(sl_uint64* output, sl_bool flagBigEndian = sl_false);
+		sl_uint8 readUint8(sl_uint8 def = 0);
 
-	sl_uint64 readUint64(sl_uint64 def = 0, sl_bool flagBigEndian = sl_false);
-	
-	sl_bool readFloat(float* output, sl_bool flagBigEndian = sl_false);
-	
-	float readFloat(float def = 0, sl_bool flagBigEndian = sl_false);
+		sl_bool readInt16(sl_int16* output, sl_bool flagBigEndian = sl_false);
 
-	sl_bool readDouble(double* output, sl_bool flagBigEndian = sl_false);
+		sl_int16 readInt16(sl_int16 def = 0, sl_bool flagBigEndian = sl_false);
 	
-	double readDouble(double def = 0, sl_bool flagBigEndian = sl_false);
-	
-	//  CVLI (Chain Variable Length Integer)
-	sl_bool readUint32CVLI(sl_uint32* output);
-	
-	sl_uint32 readUint32CVLI(sl_uint32 def = 0);
-	
-	sl_bool readInt32CVLI(sl_int32* output);
-	
-	sl_int32 readInt32CVLI(sl_int32 def = 0);
+		sl_bool readUint16(sl_uint16* output, sl_bool flagBigEndian = sl_false);
 
-	//  CVLI (Chain Variable Length Integer)
-	sl_bool readUint64CVLI(sl_uint64* output);
+		sl_uint16 readUint16(sl_uint16 def = 0, sl_bool flagBigEndian = sl_false);
+	
+		sl_bool readInt32(sl_int32* output, sl_bool flagBigEndian = sl_false);
 
-	sl_uint64 readUint64CVLI(sl_uint64 def = 0);
-	
-	sl_bool readInt64CVLI(sl_int64* output);
-	
-	sl_int64 readInt64CVLI(sl_int64 def = 0);
-	
-	sl_bool readSizeCVLI(sl_size* output);
-	
-	sl_size readSizeCVLI(sl_size def = 0);
-	
-	sl_bool readIntCVLI(sl_reg* output);
-	
-	sl_reg readIntCVLI(sl_reg def = 0);
-	
-	Memory readToMemory(sl_size size);
+		sl_int32 readInt32(sl_int32 def = 0, sl_bool flagBigEndian = sl_false);
 
-	sl_bool readSectionData(void* data, sl_size& size);
-	
-	sl_bool readSection(Memory* output, sl_size maxSize = SLIB_SIZE_MAX);
-	
-	Memory readSection(const Memory& def, sl_size maxSize = SLIB_SIZE_MAX);
+		sl_bool readUint32(sl_uint32* output, sl_bool flagBigEndian = sl_false);
 
-	Memory readSection(sl_size maxLen = SLIB_SIZE_MAX);
-	
-	// maxLen means the maximum length of utf-8 string
-	sl_bool readStringSection(String* output, sl_size maxLen = SLIB_SIZE_MAX);
-	
-	// maxLen means the maximum length of utf-8 string
-	String readStringSection(const String& def, sl_size maxLen = SLIB_SIZE_MAX);
-	
-	String readStringSection(sl_size maxLen = SLIB_SIZE_MAX);
+		sl_uint32 readUint32(sl_uint32 def = 0, sl_bool flagBigEndian = sl_false);
 
-	sl_bool readBigInt(BigInt* v, sl_size maxLen = SLIB_SIZE_MAX);
-	
-	BigInt readBigInt(const BigInt& def, sl_size maxLen = SLIB_SIZE_MAX);
-	
-	BigInt readBigInt(sl_size maxLen = SLIB_SIZE_MAX);
-	
-	sl_bool readTime(Time* output);
-	
-	Time readTime();
-	
-	Time readTime(Time def);
+		sl_bool readInt64(sl_int64* output, sl_bool flagBigEndian = sl_false);
 
-	String readTextUTF8(sl_size size);
+		sl_int64 readInt64(sl_int64 def = 0, sl_bool flagBigEndian = sl_false);
 	
-	String16 readTextUTF16(sl_size size, sl_bool flagBigEndian = sl_false);
+		sl_bool readUint64(sl_uint64* output, sl_bool flagBigEndian = sl_false);
 	
-	String readText(sl_size size, Charset* outCharset = sl_null);
-	
-	String16 readText16(sl_size size, Charset* outCharset = sl_null);
-	
-};
+		sl_uint64 readUint64(sl_uint64 def = 0, sl_bool flagBigEndian = sl_false);
 
+		sl_bool readFloat(float* output, sl_bool flagBigEndian = sl_false);
 
-class SLIB_EXPORT IWriter
-{
-public:
-	IWriter();
+		float readFloat(float def = 0, sl_bool flagBigEndian = sl_false);
 	
-	~IWriter();
-	
-public:
-	virtual sl_reg write(const void* buf, sl_size size);
-	
-	virtual sl_int32 write32(const void* buf, sl_uint32 size);
+		sl_bool readDouble(double* output, sl_bool flagBigEndian = sl_false);
 
-public:
-	sl_reg writeFully(const void* buf, sl_size size);
+		double readDouble(double def = 0, sl_bool flagBigEndian = sl_false);
 
-	sl_bool writeInt8(sl_int8 value);
-	
-	sl_bool writeUint8(sl_uint8 value);
-	
-	sl_bool writeInt16(sl_int16 value, sl_bool flagBigEndian = sl_false);
-	
-	sl_bool writeUint16(sl_uint16 value, sl_bool flagBigEndian = sl_false);
-	
-	sl_bool writeInt32(sl_int32 value, sl_bool flagBigEndian = sl_false);
-	
-	sl_bool writeUint32(sl_uint32 value, sl_bool flagBigEndian = sl_false);
-	
-	sl_bool writeInt64(sl_int64 value, sl_bool flagBigEndian = sl_false);
-	
-	sl_bool writeUint64(sl_uint64 value, sl_bool flagBigEndian = sl_false);
-	
-	sl_bool writeFloat(float value, sl_bool flagBigEndian = sl_false);
+		//  CVLI (Chain Variable Length Integer)
+		sl_bool readUint32CVLI(sl_uint32* output);
 
-	sl_bool writeDouble(double value, sl_bool flagBigEndian = sl_false);
+		sl_uint32 readUint32CVLI(sl_uint32 def = 0);
 
-	//  CVLI (Chain Variable Length Integer)
-	sl_bool writeUint32CVLI(sl_uint32 value);
+		sl_bool readInt32CVLI(sl_int32* output);
+
+		sl_int32 readInt32CVLI(sl_int32 def = 0);
 	
-	sl_bool writeInt32CVLI(sl_int32 value);
-
-	sl_bool writeUint64CVLI(sl_uint64 value);
+		//  CVLI (Chain Variable Length Integer)
+		sl_bool readUint64CVLI(sl_uint64* output);
 	
-	sl_bool writeInt64CVLI(sl_int64 value);
+		sl_uint64 readUint64CVLI(sl_uint64 def = 0);
+
+		sl_bool readInt64CVLI(sl_int64* output);
+
+		sl_int64 readInt64CVLI(sl_int64 def = 0);
+
+		sl_bool readSizeCVLI(sl_size* output);
+
+		sl_size readSizeCVLI(sl_size def = 0);
+
+		sl_bool readIntCVLI(sl_reg* output);
+
+		sl_reg readIntCVLI(sl_reg def = 0);
+
+		Memory readToMemory(sl_size size);
 	
-	sl_bool writeSizeCVLI(sl_size value);
+		sl_bool readSectionData(void* data, sl_size& size);
+
+		sl_bool readSection(Memory* output, sl_size maxSize = SLIB_SIZE_MAX);
+
+		Memory readSection(const Memory& def, sl_size maxSize = SLIB_SIZE_MAX);
 	
-	sl_bool writeIntCVLI(sl_reg value);
+		Memory readSection(sl_size maxLen = SLIB_SIZE_MAX);
+
+		// maxLen means the maximum length of utf-8 string
+		sl_bool readStringSection(String* output, sl_size maxLen = SLIB_SIZE_MAX);
+
+		// maxLen means the maximum length of utf-8 string
+		String readStringSection(const String& def, sl_size maxLen = SLIB_SIZE_MAX);
+
+		String readStringSection(sl_size maxLen = SLIB_SIZE_MAX);
 	
-	sl_size writeFromMemory(const Memory& mem);
+		sl_bool readBigInt(BigInt* v, sl_size maxLen = SLIB_SIZE_MAX);
+
+		BigInt readBigInt(const BigInt& def, sl_size maxLen = SLIB_SIZE_MAX);
+
+		BigInt readBigInt(sl_size maxLen = SLIB_SIZE_MAX);
+
+		sl_bool readTime(Time* output);
+
+		Time readTime();
+
+		Time readTime(Time def);
 	
-	sl_bool writeSection(const void* mem, sl_size size);
+		String readTextUTF8(sl_size size);
+
+		String16 readTextUTF16(sl_size size, sl_bool flagBigEndian = sl_false);
+
+		String readText(sl_size size, Charset* outCharset = sl_null);
+
+		String16 readText16(sl_size size, Charset* outCharset = sl_null);
+
+	};
 	
-	sl_bool writeSection(const Memory& mem);
-
-	// maxLen means the maximum length of utf-8 string
-	sl_bool writeStringSection(const String& str, sl_size maxLen = SLIB_SIZE_MAX);
-
-	sl_bool writeBigInt(const BigInt& v, sl_size maxLen = SLIB_SIZE_MAX);
-
-	sl_bool writeTime(const Time& t);
-
-	sl_bool writeTextUTF8(const String& text, sl_bool flagWriteByteOrderMark = sl_false);
 	
-	sl_bool writeTextUTF16LE(const String16& text, sl_bool flagWriteByteOrderMark = sl_false);
+	class SLIB_EXPORT IWriter
+	{
+	public:
+		IWriter();
+
+		virtual ~IWriter();
+
+	public:
+		virtual sl_reg write(const void* buf, sl_size size);
+
+		virtual sl_int32 write32(const void* buf, sl_uint32 size);
 	
-	sl_bool writeTextUTF16BE(const String16& text, sl_bool flagWriteByteOrderMark = sl_false);
+	public:
+		sl_reg writeFully(const void* buf, sl_size size);
 	
-};
+		sl_bool writeInt8(sl_int8 value);
 
-class SLIB_EXPORT IStream : public IReader, public IWriter
-{
-};
+		sl_bool writeUint8(sl_uint8 value);
 
-class SLIB_EXPORT ISeekable
-{
-public:
-	virtual sl_uint64 getPosition() = 0;
+		sl_bool writeInt16(sl_int16 value, sl_bool flagBigEndian = sl_false);
+
+		sl_bool writeUint16(sl_uint16 value, sl_bool flagBigEndian = sl_false);
+
+		sl_bool writeInt32(sl_int32 value, sl_bool flagBigEndian = sl_false);
+
+		sl_bool writeUint32(sl_uint32 value, sl_bool flagBigEndian = sl_false);
+
+		sl_bool writeInt64(sl_int64 value, sl_bool flagBigEndian = sl_false);
+
+		sl_bool writeUint64(sl_uint64 value, sl_bool flagBigEndian = sl_false);
+
+		sl_bool writeFloat(float value, sl_bool flagBigEndian = sl_false);
 	
-	virtual sl_uint64 getSize() = 0;
+		sl_bool writeDouble(double value, sl_bool flagBigEndian = sl_false);
 	
-	virtual sl_bool seek(sl_int64 offset, SeekPosition pos) = 0;
+		//  CVLI (Chain Variable Length Integer)
+		sl_bool writeUint32CVLI(sl_uint32 value);
 
-public:
-	sl_bool seekToBegin();
+		sl_bool writeInt32CVLI(sl_int32 value);
 	
-	sl_bool seekToEnd();
+		sl_bool writeUint64CVLI(sl_uint64 value);
 
-};
+		sl_bool writeInt64CVLI(sl_int64 value);
 
-class SLIB_EXPORT IResizable
-{
-public:
-	virtual sl_bool setSize(sl_uint64 size) = 0;
-};
+		sl_bool writeSizeCVLI(sl_size value);
 
-class SLIB_EXPORT IClosable
-{
-public:
-	virtual void close() = 0;
-};
+		sl_bool writeIntCVLI(sl_reg value);
 
-class SLIB_EXPORT IO : public Object, public IStream, public ISeekable, public IResizable, public IClosable
-{
-	SLIB_DECLARE_OBJECT
-};
+		sl_size writeFromMemory(const Memory& mem);
 
-class SLIB_EXPORT MemoryIO : public IO
-{
-public:
-	MemoryIO(sl_size size = 0, sl_bool flagResizable = sl_true);
+		sl_bool writeSection(const void* mem, sl_size size);
+
+		sl_bool writeSection(const Memory& mem);
 	
-	MemoryIO(const Memory& mem, sl_bool flagResizable = sl_true);
+		// maxLen means the maximum length of utf-8 string
+		sl_bool writeStringSection(const String& str, sl_size maxLen = SLIB_SIZE_MAX);
 	
-	MemoryIO(const void* data, sl_size size, sl_bool flagResizable = sl_true);
-
-	~MemoryIO();
-
-public:
-	void init(const void* data, sl_size size, sl_bool flagResizable = sl_true);
-
-	void init(const Memory& mem, sl_bool flagResizable = sl_true);
+		sl_bool writeBigInt(const BigInt& v, sl_size maxLen = SLIB_SIZE_MAX);
 	
-	void init(sl_size size = 0, sl_bool flagResizable = sl_true);
+		sl_bool writeTime(const Time& t);
 	
-	sl_size getOffset();
+		sl_bool writeTextUTF8(const String& text, sl_bool flagWriteByteOrderMark = sl_false);
+
+		sl_bool writeTextUTF16LE(const String16& text, sl_bool flagWriteByteOrderMark = sl_false);
+
+		sl_bool writeTextUTF16BE(const String16& text, sl_bool flagWriteByteOrderMark = sl_false);
+
+	};
 	
-	sl_size getLength();
+	class SLIB_EXPORT IStream : public IReader, public IWriter
+	{
+	public:
+		IStream();
+
+		~IStream();
+
+	};
 	
-	char* getBuffer();
+	class SLIB_EXPORT ISeekable
+	{
+	public:
+		ISeekable();
 
-	// override
-	void close();
+		virtual ~ISeekable();
 
-	// override
-	sl_reg read(void* buf, sl_size size);
+	public:
+		virtual sl_uint64 getPosition() = 0;
 
-	// override
-	sl_reg write(const void* buf, sl_size size);
+		virtual sl_uint64 getSize() = 0;
+
+		virtual sl_bool seek(sl_int64 offset, SeekPosition pos) = 0;
 	
-	// override
-	sl_uint64 getPosition();
+	public:
+		sl_bool seekToBegin();
+
+		sl_bool seekToEnd();
 	
-	// override
-	sl_uint64 getSize();
+	};
 	
-	// override
-	sl_bool seek(sl_int64 offset, SeekPosition pos = SeekPosition::Current);
+	class SLIB_EXPORT IResizable
+	{
+	public:
+		IResizable();
 
-	// override
-	sl_bool setSize(sl_uint64 size);
+		virtual ~IResizable();
 
-public:
-	SLIB_BOOLEAN_PROPERTY(AutoExpandable)
-
-protected:
-	void* m_buf;
-	sl_size m_size;
-	sl_size m_offset;
-
-};
-
-class SLIB_EXPORT MemoryReader : public Object, public IReader, public ISeekable
-{
-public:
-	MemoryReader(const Memory& mem);
-
-	MemoryReader(const void* buf, sl_size size);
+	public:
+		virtual sl_bool setSize(sl_uint64 size) = 0;
+	};
 	
-	~MemoryReader();
+	class SLIB_EXPORT IClosable
+	{
+	public:
+		IClosable();
 
-public:
-	void init(const Memory& mem);
-	
-	void init(const void* buf, sl_size size);
+		virtual ~IClosable();
 
-	sl_size getOffset();
+	public:
+		virtual void close() = 0;
+	};
 	
-	sl_size getLength();
-	
-	char* getBuffer();
-	
-	// override
-	sl_reg read(void* buf, sl_size size);
-	
-	// override
-	sl_uint64 getPosition();
-	
-	// override
-	sl_uint64 getSize();
-	
-	// override
-	sl_bool seek(sl_int64 offset, SeekPosition pos);
-	
-protected:
-	const void* m_buf;
-	sl_size m_size;
-	sl_size m_offset;
-	Memory m_mem;
+	class SLIB_EXPORT IO : public Object, public IStream, public ISeekable, public IResizable, public IClosable
+	{
+		SLIB_DECLARE_OBJECT
 
-};
+	public:
+		IO();
 
-class SLIB_EXPORT MemoryWriter : public Object, public IWriter, public ISeekable
-{
-public:
-	// write-only/appending memory
-	MemoryWriter();
+		~IO();
+
+	};
 	
-	MemoryWriter(const Memory& mem);
+	class SLIB_EXPORT MemoryIO : public IO
+	{
+	public:
+		MemoryIO(sl_size size = 0, sl_bool flagResizable = sl_true);
+
+		MemoryIO(const Memory& mem, sl_bool flagResizable = sl_true);
+
+		MemoryIO(const void* data, sl_size size, sl_bool flagResizable = sl_true);
 	
-	MemoryWriter(void* buf, sl_size size);
+		~MemoryIO();
 	
-	~MemoryWriter();
-
-public:
-	void init();
+	public:
+		void init(const void* data, sl_size size, sl_bool flagResizable = sl_true);
 	
-	void init(const Memory& mem);
+		void init(const Memory& mem, sl_bool flagResizable = sl_true);
+
+		void init(sl_size size = 0, sl_bool flagResizable = sl_true);
+
+		sl_size getOffset();
+
+		sl_size getLength();
+
+		char* getBuffer();
 	
-	void init(void* buf, sl_size size);
+		// override
+		void close();
 	
-	// override
-	sl_reg write(const void* buf, sl_size size);
+		// override
+		sl_reg read(void* buf, sl_size size);
 	
-	sl_reg write(const Memory& mem);
+		// override
+		sl_reg write(const void* buf, sl_size size);
 
-	// override
-	sl_bool seek(sl_int64 offset, SeekPosition pos);
+		// override
+		sl_uint64 getPosition();
 
-	Memory getData();
+		// override
+		sl_uint64 getSize();
 
-	MemoryBuffer& getMemoryBuffer();
-
-	sl_size getOffset();
-
-	sl_size getLength();
-
-	char* getBuffer();
-
-	// override
-	sl_uint64 getPosition();
+		// override
+		sl_bool seek(sl_int64 offset, SeekPosition pos = SeekPosition::Current);
 	
-	// override
-	sl_uint64 getSize();
-
+		// override
+		sl_bool setSize(sl_uint64 size);
 	
-protected:
-	void* m_buf;
-	sl_size m_size;
-	sl_size m_offset;
-	Memory m_mem;
-	MemoryBuffer m_buffer;
+	public:
+		SLIB_BOOLEAN_PROPERTY(AutoExpandable)
+	
+	protected:
+		void* m_buf;
+		sl_size m_size;
+		sl_size m_offset;
+	
+	};
+	
+	class SLIB_EXPORT MemoryReader : public Object, public IReader, public ISeekable
+	{
+	public:
+		MemoryReader(const Memory& mem);
+	
+		MemoryReader(const void* buf, sl_size size);
 
-};
+		~MemoryReader();
+	
+	public:
+		void init(const Memory& mem);
 
+		void init(const void* buf, sl_size size);
+	
+		sl_size getOffset();
+
+		sl_size getLength();
+
+		char* getBuffer();
+
+		// override
+		sl_reg read(void* buf, sl_size size);
+
+		// override
+		sl_uint64 getPosition();
+
+		// override
+		sl_uint64 getSize();
+
+		// override
+		sl_bool seek(sl_int64 offset, SeekPosition pos);
+
+	protected:
+		const void* m_buf;
+		sl_size m_size;
+		sl_size m_offset;
+		Memory m_mem;
+	
+	};
+	
+	class SLIB_EXPORT MemoryWriter : public Object, public IWriter, public ISeekable
+	{
+	public:
+		// write-only/appending memory
+		MemoryWriter();
+
+		MemoryWriter(const Memory& mem);
+
+		MemoryWriter(void* buf, sl_size size);
+
+		~MemoryWriter();
+	
+	public:
+		void init();
+
+		void init(const Memory& mem);
+
+		void init(void* buf, sl_size size);
+
+		// override
+		sl_reg write(const void* buf, sl_size size);
+
+		sl_reg write(const Memory& mem);
+	
+		// override
+		sl_bool seek(sl_int64 offset, SeekPosition pos);
+	
+		Memory getData();
+	
+		MemoryBuffer& getMemoryBuffer();
+	
+		sl_size getOffset();
+	
+		sl_size getLength();
+	
+		char* getBuffer();
+	
+		// override
+		sl_uint64 getPosition();
+
+		// override
+		sl_uint64 getSize();
+	
+
+	protected:
+		void* m_buf;
+		sl_size m_size;
+		sl_size m_offset;
+		Memory m_mem;
+		MemoryBuffer m_buffer;
+	
+	};
+	
 /*
 		DatagramStream
 
@@ -403,35 +430,35 @@ protected:
 	Datagram2-Content
 	...
 */
-
-class SLIB_EXPORT DatagramStream : public Object
-{
-public:
-	DatagramStream();
 	
-	~DatagramStream();
+	class SLIB_EXPORT DatagramStream : public Object
+	{
+	public:
+		DatagramStream();
 
-public:
-	void clear();
+		~DatagramStream();
 	
-	sl_bool parse(const void* data, sl_size size, LinkedQueue<Memory>& datagrams);
-	
-	Memory build(const void* datagram, sl_uint32 size);
-	
-	Memory build(MemoryBuffer& buf);
+	public:
+		void clear();
 
-public:
-	SLIB_PROPERTY(sl_uint32, MaxDatagramSize)
+		sl_bool parse(const void* data, sl_size size, LinkedQueue<Memory>& datagrams);
 
-protected:
-	MemoryBuffer m_buf;
-	sl_uint32 m_lenCurrentDatagram;
-	sl_uint32 m_posCurrentDatagram;
-	sl_uint8 m_bufSize[4];
-	sl_uint32 m_lenBufSize;
+		Memory build(const void* datagram, sl_uint32 size);
+
+		Memory build(MemoryBuffer& buf);
 	
-};
+	public:
+		SLIB_PROPERTY(sl_uint32, MaxDatagramSize)
+	
+	protected:
+		MemoryBuffer m_buf;
+		sl_uint32 m_lenCurrentDatagram;
+		sl_uint32 m_posCurrentDatagram;
+		sl_uint8 m_bufSize[4];
+		sl_uint32 m_lenBufSize;
 
-SLIB_NAMESPACE_END
+	};
+
+}
 
 #endif

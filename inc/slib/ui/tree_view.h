@@ -9,11 +9,17 @@
 
 namespace slib
 {
+
 	class TreeView;
 	class TreeViewItem;
 	
 	class SLIB_EXPORT ITreeViewListener
 	{
+	public:
+		ITreeViewListener();
+
+		virtual ~ITreeViewListener();
+
 	public:
 		virtual void onSelectItem(TreeView* view, TreeViewItem* item);
 		
@@ -28,6 +34,8 @@ namespace slib
 	public:
 		TreeViewItem();
 		
+		~TreeViewItem();
+
 	public:
 		String getId();
 		
@@ -163,6 +171,8 @@ namespace slib
 	public:
 		TreeView();
 		
+		~TreeView();
+
 	public:
 		Ref<TreeViewItem> getRootItem();
 		
@@ -322,6 +332,7 @@ namespace slib
 		friend class TreeViewItem;
 		friend class _TreeContentView;
 	};
+
 }
 
 #endif

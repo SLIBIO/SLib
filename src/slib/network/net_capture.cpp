@@ -15,7 +15,7 @@
 
 namespace slib
 {
-	NetCapturePacket::NetCapturePacket()
+	NetCapturePacket::NetCapturePacket(): data(sl_null), length(0)
 	{
 	}
 	
@@ -23,7 +23,7 @@ namespace slib
 	{
 	}
 	
-	NetCaptureDeviceInfo::NetCaptureDeviceInfo()
+	NetCaptureDeviceInfo::NetCaptureDeviceInfo(): flagLoopback(sl_false)
 	{
 	}
 	
@@ -31,6 +31,14 @@ namespace slib
 	{
 	}
 	
+	INetCaptureListener::INetCaptureListener()
+	{
+	}
+
+	INetCaptureListener::~INetCaptureListener()
+	{
+	}
+
 	NetCaptureParam::NetCaptureParam()
 	{
 		flagPromiscuous = sl_false;
@@ -99,6 +107,9 @@ namespace slib
 	public:
 		_NetRawPacketCapture()
 		{
+			m_deviceType = NetworkLinkDeviceType::Ethernet;
+			m_ifaceIndex = 0;
+
 			m_flagInit = sl_false;
 			m_flagRunning = sl_false;
 		}
@@ -266,7 +277,7 @@ namespace slib
 				}
 				Ref<Socket> socket = m_socket;
 				if (socket.isNotNull()) {
-					sl_int32 ret = socket->sendPacket(buf, size, info);
+					sl_uint32 ret = socket->sendPacket(buf, size, info);
 					if (ret == size) {
 						return sl_true;
 					}
@@ -487,7 +498,7 @@ namespace slib
 						socket = m_socketICMP;
 					}
 					if (socket.isNotNull()) {
-						sl_int32 ret = socket->sendTo(address, buf, size);
+						sl_uint32 ret = socket->sendTo(address, buf, size);
 						if (ret == size) {
 							return sl_true;
 						}
@@ -564,4 +575,5 @@ namespace slib
 	{
 		return ((sl_uint8*)this) + HeaderSize;
 	}
+	
 }

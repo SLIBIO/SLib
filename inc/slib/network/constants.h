@@ -5,6 +5,7 @@
 
 namespace slib
 {
+
 	// EtherType
 	enum class NetworkLinkProtocol
 	{
@@ -41,6 +42,7 @@ namespace slib
 		IRTP = 28, // Internet Reliable Transaction Protocol, RFC 938
 		Raw = 0xFF // Reserved for Socket api, for sendind the raw ip packets of any kind of protocols (sending only, not receiving)
 	};
+
 }
 
 #endif

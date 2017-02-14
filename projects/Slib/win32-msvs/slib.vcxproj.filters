@@ -896,6 +896,9 @@
     <ClInclude Include="..\..\..\inc\slib\core\preference.h">
       <Filter>inc\core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\string_buffer.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">

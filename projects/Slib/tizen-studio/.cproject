@@ -1,0 +1,862 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="org.tizen.nativecore.config.sbi.gcc45.lib.debug.930619274">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="org.tizen.nativecore.config.sbi.gcc45.lib.debug.930619274" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/Slib"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/Slib/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="slib" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.tizen.nativecore.NativeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="a" artifactName="slib" buildArtefactType="org.tizen.nativecore.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.tizen.nativecore.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -f" description="" errorParsers="org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GmakeErrorParser;org.tizen.nativecore.NativeErrorParser;org.eclipse.cdt.core.CWDLocator;org.eclipse.cdt.core.MakeErrorParser" id="org.tizen.nativecore.config.sbi.gcc45.lib.debug.930619274" name="Debug" parent="org.tizen.nativecore.config.sbi.gcc45.lib.debug">
+					<folderInfo id="org.tizen.nativecore.config.sbi.gcc45.lib.debug.930619274." name="/" resourcePath="">
+						<toolChain errorParsers="" id="org.tizen.nativecore.toolchain.sbi.gcc45.lib.debug.150232196" name="Tizen Native Toolchain" nonInternalBuilderId="org.tizen.nativecore.target.sbi.gnu.builder" superClass="org.tizen.nativecore.toolchain.sbi.gcc45.lib.debug">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="org.tizen.nativeide.target.sbi.gnu.platform.base.1704324873" osList="linux,win32" superClass="org.tizen.nativeide.target.sbi.gnu.platform.base"/>
+							<builder autoBuildTarget="all" buildPath="${workspace_loc:/Slib}/Debug" cleanBuildTarget="clean" command="ninja" enableAutoBuild="true" errorParsers="" id="org.eclipse.cdt.build.core.internal.builder.436397408" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
+							<tool command="i386-linux-gnueabi-ar" errorParsers="" id="org.tizen.nativecore.tool.sbi.gnu.archiver.1481793768" name="Archiver" superClass="org.tizen.nativecore.tool.sbi.gnu.archiver"/>
+							<tool command="i386-linux-gnueabi-g++" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="org.tizen.nativecore.tool.sbi.gnu.cpp.compiler.1556182876" name="C++ Compiler" superClass="org.tizen.nativecore.tool.sbi.gnu.cpp.compiler">
+								<option id="gnu.cpp.compiler.option.optimization.level.1976838511" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option defaultValue="gnu.cpp.compiler.debugging.level.max" id="sbi.gnu.cpp.compiler.option.debugging.level.core.542582520" name="Debug level" superClass="sbi.gnu.cpp.compiler.option.debugging.level.core" valueType="enumerated"/>
+								<option defaultValue="false" id="sbi.gnu.cpp.compiler.option.misc.pic.core.1047729042" name="-fPIC option" superClass="sbi.gnu.cpp.compiler.option.misc.pic.core" valueType="boolean"/>
+								<option id="sbi.gnu.cpp.compiler.option.175697900" name="Tizen-Target" superClass="sbi.gnu.cpp.compiler.option" valueType="userObjs">
+									<listOptionValue builtIn="false" value="mobile-2.4-emulator.core_gcc49.i386.core.staticLib"/>
+								</option>
+								<option id="sbi.gnu.cpp.compiler.option.frameworks_inc.core.178059986" name="Tizen-Frameworks-Include-Path" superClass="sbi.gnu.cpp.compiler.option.frameworks_inc.core" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/libxml2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/appcore-agent&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/appfw&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/attach-panel&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/badge&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/base&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/cairo&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/calendar-service2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ckm&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/contacts-svc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/content&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/context-service&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dali&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dali-toolkit&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dbus-1.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/device&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dlog&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-buffer-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-con-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-file-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-imf-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-imf-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-input-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-input-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-ipc-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-x-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/e_dbus-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/edje-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eet-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efl-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efl-extension&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efreet-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eina-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eina-1/eina&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eio-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eldbus-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/elementary-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/embryo-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eo-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eom&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ethumb-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ethumb-client-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ewebkit2-0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/feedback&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/fontconfig&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/freetype2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/geofence&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/gio-unix-2.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/glib-2.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/harfbuzz&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/json-glib-1.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/location&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/maps&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/media&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/media-content&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/messaging&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/metadata-editor&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/minicontrol&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/minizip&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/network&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/notification&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/phonenumber-utils&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/sensor&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/shortcut&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/storage&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/system&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/telephony&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ui&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/web&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/widget_service&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/widget_viewer_evas&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/wifi-direct&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/lib/dbus-1.0/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/lib/glib-2.0/include&quot;"/>
+								</option>
+								<option id="sbi.gnu.cpp.compiler.option.frameworks_cflags.core.914645704" name="Tizen-Frameworks-Other-Cflags" superClass="sbi.gnu.cpp.compiler.option.frameworks_cflags.core" valueType="stringList">
+									<listOptionValue builtIn="false" value="${TC_COMPILER_MISC}"/>
+									<listOptionValue builtIn="false" value="${RS_COMPILER_MISC}"/>
+									<listOptionValue builtIn="false" value="--sysroot=&quot;${SBI_SYSROOT}&quot;"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.include.paths.1113982908" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/libxml2"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/appcore-agent"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/appfw"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/attach-panel"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/badge"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/base"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/cairo"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/calendar-service2"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ckm"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/contacts-svc"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/content"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/context-service"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/dali"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/dali-toolkit"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/dbus-1.0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/device"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/dlog"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-buffer-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-con-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-evas-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-file-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-imf-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-imf-evas-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-input-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-input-evas-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-ipc-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-x-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/e_dbus-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/edje-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eet-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/efl-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/efl-extension"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/efreet-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eina-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eina-1/eina"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eio-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eldbus-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/elementary-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/embryo-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eo-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eom"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ethumb-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ethumb-client-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/evas-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ewebkit2-0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/feedback"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/fontconfig"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/freetype2"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/geofence"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/gio-unix-2.0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/glib-2.0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/harfbuzz"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/json-glib-1.0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/location"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/maps"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/media"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/media-content"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/messaging"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/metadata-editor"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/minicontrol"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/minizip"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/network"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/notification"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/phonenumber-utils"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/sensor"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/shortcut"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/storage"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/system"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/telephony"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ui"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/web"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/widget_service"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/widget_viewer_evas"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/wifi-direct"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/lib/dbus-1.0/include"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/lib/glib-2.0/include"/>
+								</option>
+								<option id="sbi.gnu.cpp.compiler.option.frameworks.core.66032592" name="Tizen-Frameworks" superClass="sbi.gnu.cpp.compiler.option.frameworks.core" valueType="userObjs">
+									<listOptionValue builtIn="false" value="Native_API"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.dialect.std.1573617044" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" value="gnu.cpp.compiler.dialect.c++11" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.other.other.2127295885" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1441998120" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool command="i386-linux-gnueabi-gcc" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="org.tizen.nativecore.tool.sbi.gnu.c.compiler.1882631236" name="C Compiler" superClass="org.tizen.nativecore.tool.sbi.gnu.c.compiler">
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.1327862908" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
+								<option defaultValue="gnu.c.debugging.level.max" id="sbi.gnu.c.compiler.option.debugging.level.core.1108899115" name="Debug level" superClass="sbi.gnu.c.compiler.option.debugging.level.core" valueType="enumerated"/>
+								<option defaultValue="false" id="sbi.gnu.c.compiler.option.misc.pic.core.1169306568" name="-fPIC option" superClass="sbi.gnu.c.compiler.option.misc.pic.core" valueType="boolean"/>
+								<option id="sbi.gnu.c.compiler.option.1534579914" name="Tizen-Target" superClass="sbi.gnu.c.compiler.option" valueType="userObjs">
+									<listOptionValue builtIn="false" value="mobile-2.4-emulator.core_gcc49.i386.core.staticLib"/>
+								</option>
+								<option id="sbi.gnu.c.compiler.option.frameworks_inc.core.163517032" name="Tizen-Frameworks-Include-Path" superClass="sbi.gnu.c.compiler.option.frameworks_inc.core" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/libxml2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/appcore-agent&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/appfw&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/attach-panel&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/badge&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/base&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/cairo&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/calendar-service2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ckm&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/contacts-svc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/content&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/context-service&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dali&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dali-toolkit&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dbus-1.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/device&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dlog&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-buffer-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-con-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-file-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-imf-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-imf-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-input-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-input-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-ipc-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-x-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/e_dbus-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/edje-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eet-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efl-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efl-extension&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efreet-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eina-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eina-1/eina&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eio-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eldbus-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/elementary-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/embryo-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eo-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eom&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ethumb-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ethumb-client-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ewebkit2-0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/feedback&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/fontconfig&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/freetype2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/geofence&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/gio-unix-2.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/glib-2.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/harfbuzz&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/json-glib-1.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/location&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/maps&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/media&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/media-content&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/messaging&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/metadata-editor&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/minicontrol&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/minizip&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/network&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/notification&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/phonenumber-utils&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/sensor&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/shortcut&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/storage&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/system&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/telephony&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ui&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/web&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/widget_service&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/widget_viewer_evas&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/wifi-direct&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/lib/dbus-1.0/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/lib/glib-2.0/include&quot;"/>
+								</option>
+								<option id="sbi.gnu.c.compiler.option.frameworks_cflags.core.1050169174" name="Tizen-Frameworks-Other-Cflags" superClass="sbi.gnu.c.compiler.option.frameworks_cflags.core" valueType="stringList">
+									<listOptionValue builtIn="false" value="${TC_COMPILER_MISC}"/>
+									<listOptionValue builtIn="false" value="${RS_COMPILER_MISC}"/>
+									<listOptionValue builtIn="false" value="--sysroot=&quot;${SBI_SYSROOT}&quot;"/>
+								</option>
+								<option id="gnu.c.compiler.option.include.paths.767438198" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/libxml2"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/appcore-agent"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/appfw"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/attach-panel"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/badge"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/base"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/cairo"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/calendar-service2"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ckm"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/contacts-svc"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/content"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/context-service"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/dali"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/dali-toolkit"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/dbus-1.0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/device"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/dlog"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-buffer-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-con-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-evas-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-file-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-imf-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-imf-evas-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-input-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-input-evas-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-ipc-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-x-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/e_dbus-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/edje-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eet-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/efl-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/efl-extension"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/efreet-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eina-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eina-1/eina"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eio-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eldbus-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/elementary-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/embryo-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eo-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eom"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ethumb-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ethumb-client-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/evas-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ewebkit2-0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/feedback"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/fontconfig"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/freetype2"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/geofence"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/gio-unix-2.0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/glib-2.0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/harfbuzz"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/json-glib-1.0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/location"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/maps"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/media"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/media-content"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/messaging"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/metadata-editor"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/minicontrol"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/minizip"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/network"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/notification"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/phonenumber-utils"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/sensor"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/shortcut"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/storage"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/system"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/telephony"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ui"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/web"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/widget_service"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/widget_viewer_evas"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/wifi-direct"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/lib/dbus-1.0/include"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/lib/glib-2.0/include"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/libxml2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/appcore-agent&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/appfw&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/attach-panel&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/badge&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/base&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/cairo&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/calendar-service2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ckm&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/contacts-svc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/content&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/context-service&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dali&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dali-toolkit&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dbus-1.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/device&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dlog&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-buffer-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-con-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-file-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-imf-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-imf-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-input-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-input-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-ipc-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-x-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/e_dbus-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/edje-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eet-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efl-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efl-extension&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efreet-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eina-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eina-1/eina&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eio-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eldbus-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/elementary-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/embryo-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eo-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eom&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ethumb-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ethumb-client-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ewebkit2-0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/feedback&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/fontconfig&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/freetype2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/geofence&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/gio-unix-2.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/glib-2.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/harfbuzz&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/json-glib-1.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/location&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/maps&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/media&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/media-content&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/messaging&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/metadata-editor&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/minicontrol&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/minizip&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/network&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/notification&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/phonenumber-utils&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/sensor&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/shortcut&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/storage&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/system&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/telephony&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ui&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/web&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/widget_service&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/widget_viewer_evas&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/wifi-direct&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/lib/dbus-1.0/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/lib/glib-2.0/include&quot;"/>
+								</option>
+								<option id="sbi.gnu.c.compiler.option.frameworks.core.1894791552" name="Tizen-Frameworks" superClass="sbi.gnu.c.compiler.option.frameworks.core" valueType="userObjs">
+									<listOptionValue builtIn="false" value="Native_API"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.82438735" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="org.tizen.nativeide.tool.sbi.gnu.c.linker.base.712565138" name="C Linker" superClass="org.tizen.nativeide.tool.sbi.gnu.c.linker.base">
+								<option defaultValue="true" id="gnu.c.link.option.shared.1938120897" name="Shared (-shared)" superClass="gnu.c.link.option.shared" valueType="boolean"/>
+							</tool>
+							<tool command="i386-linux-gnueabi-g++" id="org.tizen.nativecore.tool.sbi.gnu.cpp.linker.1876811918" name="C++ Linker" superClass="org.tizen.nativecore.tool.sbi.gnu.cpp.linker">
+								<option defaultValue="false" id="sbi.gnu.cpp.linker.option.shared_flag.core.446927716" name="Linker.Shared" superClass="sbi.gnu.cpp.linker.option.shared_flag.core" valueType="boolean"/>
+								<option defaultValue="false" id="sbi.gnu.cpp.linker.option.noundefined.core.1939431272" name="Report unresolved symbol references (-Wl,--no-undefined)" superClass="sbi.gnu.cpp.linker.option.noundefined.core" valueType="boolean"/>
+								<option id="sbi.gnu.cpp.linker.option.frameworks_lflags.core.1266470534" name="Tizen-Frameworks-Other-Lflags" superClass="sbi.gnu.cpp.linker.option.frameworks_lflags.core" valueType="stringList">
+									<listOptionValue builtIn="false" value="${TC_LINKER_MISC}"/>
+									<listOptionValue builtIn="false" value="${RS_LINKER_MISC}"/>
+									<listOptionValue builtIn="false" value="--sysroot=&quot;${SBI_SYSROOT}&quot;"/>
+									<listOptionValue builtIn="false" value="-L&quot;${SBI_SYSROOT}/usr/lib&quot;"/>
+									<listOptionValue builtIn="false" value="$(RS_LIBRARIES)"/>
+								</option>
+								<option id="gnu.cpp.link.option.paths.559159512" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/lib}&quot;"/>
+								</option>
+							</tool>
+							<tool command="i386-linux-gnueabi-as" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="org.tizen.nativeapp.tool.sbi.gnu.assembler.base.1885170898" name="Assembler" superClass="org.tizen.nativeapp.tool.sbi.gnu.assembler.base">
+								<option id="gnu.both.asm.option.include.paths.9458273" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/libxml2"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/appcore-agent"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/appfw"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/attach-panel"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/badge"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/base"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/cairo"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/calendar-service2"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ckm"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/contacts-svc"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/content"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/context-service"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/dali"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/dali-toolkit"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/dbus-1.0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/device"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/dlog"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-buffer-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-con-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-evas-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-file-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-imf-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-imf-evas-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-input-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-input-evas-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-ipc-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ecore-x-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/e_dbus-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/edje-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eet-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/efl-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/efl-extension"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/efreet-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eina-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eina-1/eina"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eio-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eldbus-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/elementary-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/embryo-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eo-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/eom"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ethumb-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ethumb-client-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/evas-1"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ewebkit2-0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/feedback"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/fontconfig"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/freetype2"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/geofence"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/gio-unix-2.0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/glib-2.0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/harfbuzz"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/json-glib-1.0"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/location"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/maps"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/media"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/media-content"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/messaging"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/metadata-editor"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/minicontrol"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/minizip"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/network"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/notification"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/phonenumber-utils"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/sensor"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/shortcut"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/storage"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/system"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/telephony"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/ui"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/web"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/widget_service"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/widget_viewer_evas"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/include/wifi-direct"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/lib/dbus-1.0/include"/>
+									<listOptionValue builtIn="false" value="/Volumes/MacData/SDK/Tizen/Studio/platforms/tizen-2.4/mobile/rootstraps/mobile-2.4-emulator.core/usr/lib/glib-2.0/include"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.2095868488" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool errorParsers="" id="org.tizen.nativecore.tool.fnmapgen.1550541108" name="C FN-Map Generator" superClass="org.tizen.nativecore.tool.fnmapgen"/>
+							<tool errorParsers="" id="org.tizen.nativecore.tool.fnmapgen.cpp.2108526447" name="C++ FN-Map Generator" superClass="org.tizen.nativecore.tool.fnmapgen.cpp"/>
+							<tool errorParsers="" id="org.tizen.nativecore.tool.ast.1463304662" name="C Static Analyzer" superClass="org.tizen.nativecore.tool.ast"/>
+							<tool errorParsers="" id="org.tizen.nativecore.tool.ast.cpp.1988401566" name="C++ Static Analyzer" superClass="org.tizen.nativecore.tool.ast.cpp"/>
+							<tool errorParsers="" id="org.tizen.nativecore.tool.sbi.gnu.archiver.mergelib.293843887" name="Archive Generator" superClass="org.tizen.nativecore.tool.sbi.gnu.archiver.mergelib"/>
+							<tool errorParsers="" id="org.tizen.nativecore.tool.sbi.po.compiler.1999200929" name="PO Resource Compiler" superClass="org.tizen.nativecore.tool.sbi.po.compiler"/>
+							<tool errorParsers="org.tizen.nativecore.NativeErrorParser" id="org.tizen.nativecore.tool.sbi.edc.compiler.100968612" name="EDC Resource Compiler" superClass="org.tizen.nativecore.tool.sbi.edc.compiler"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="res"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="shared"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="org.tizen.nativecore.config.sbi.gcc45.lib.release.627362303">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="org.tizen.nativecore.config.sbi.gcc45.lib.release.627362303" moduleId="org.eclipse.cdt.core.settings" name="Release">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.tizen.nativecore.NativeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="a" artifactName="slib" buildArtefactType="org.tizen.nativecore.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.tizen.nativecore.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -f" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;" id="org.tizen.nativecore.config.sbi.gcc45.lib.release.627362303" name="Release" parent="org.tizen.nativecore.config.sbi.gcc45.lib.release">
+					<folderInfo id="org.tizen.nativecore.config.sbi.gcc45.lib.release.627362303." name="/" resourcePath="">
+						<toolChain id="org.tizen.nativecore.toolchain.sbi.gcc45.lib.release.254376828" name="Tizen Native Toolchain" superClass="org.tizen.nativecore.toolchain.sbi.gcc45.lib.release">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="org.tizen.nativeide.target.sbi.gnu.platform.base.1374972244" osList="linux,win32" superClass="org.tizen.nativeide.target.sbi.gnu.platform.base"/>
+							<builder buildPath="${workspace_loc:/Slib}/Release" id="org.tizen.nativecore.target.sbi.gnu.builder.1284107" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Tizen Application Builder" superClass="org.tizen.nativecore.target.sbi.gnu.builder"/>
+							<tool id="org.tizen.nativecore.tool.sbi.gnu.archiver.2004063148" name="Archiver" superClass="org.tizen.nativecore.tool.sbi.gnu.archiver"/>
+							<tool command="clang++" id="org.tizen.nativecore.tool.sbi.gnu.cpp.compiler.2092098447" name="C++ Compiler" superClass="org.tizen.nativecore.tool.sbi.gnu.cpp.compiler">
+								<option id="gnu.cpp.compiler.option.optimization.level.701036419" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option defaultValue="gnu.cpp.compiler.debugging.level.none" id="sbi.gnu.cpp.compiler.option.debugging.level.core.839125241" name="Debug level" superClass="sbi.gnu.cpp.compiler.option.debugging.level.core" valueType="enumerated"/>
+								<option defaultValue="false" id="sbi.gnu.cpp.compiler.option.misc.pic.core.532491470" name="-fPIC option" superClass="sbi.gnu.cpp.compiler.option.misc.pic.core" valueType="boolean"/>
+								<option id="sbi.gnu.cpp.compiler.option.1111530171" name="Tizen-Target" superClass="sbi.gnu.cpp.compiler.option" valueType="userObjs">
+									<listOptionValue builtIn="false" value="mobile-2.4-emulator.core_llvm37.i386.core.app"/>
+								</option>
+								<option id="sbi.gnu.cpp.compiler.option.frameworks_inc.core.649657197" name="Tizen-Frameworks-Include-Path" superClass="sbi.gnu.cpp.compiler.option.frameworks_inc.core" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/libxml2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/appcore-agent&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/appfw&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/attach-panel&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/badge&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/base&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/cairo&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/calendar-service2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ckm&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/contacts-svc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/content&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/context-service&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dali&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dali-toolkit&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dbus-1.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/device&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dlog&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-buffer-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-con-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-file-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-imf-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-imf-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-input-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-input-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-ipc-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-x-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/e_dbus-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/edje-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eet-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efl-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efl-extension&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efreet-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eina-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eina-1/eina&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eio-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eldbus-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/elementary-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/embryo-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eo-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eom&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ethumb-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ethumb-client-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ewebkit2-0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/feedback&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/fontconfig&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/freetype2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/geofence&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/gio-unix-2.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/glib-2.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/harfbuzz&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/json-glib-1.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/location&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/maps&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/media&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/media-content&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/messaging&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/metadata-editor&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/minicontrol&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/minizip&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/network&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/notification&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/phonenumber-utils&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/sensor&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/shortcut&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/storage&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/system&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/telephony&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ui&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/web&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/widget_service&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/widget_viewer_evas&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/wifi-direct&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/lib/dbus-1.0/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/lib/glib-2.0/include&quot;"/>
+								</option>
+								<option id="sbi.gnu.cpp.compiler.option.frameworks_cflags.core.1278527343" name="Tizen-Frameworks-Other-Cflags" superClass="sbi.gnu.cpp.compiler.option.frameworks_cflags.core" valueType="stringList">
+									<listOptionValue builtIn="false" value="${TC_COMPILER_MISC}"/>
+									<listOptionValue builtIn="false" value="${RS_COMPILER_MISC}"/>
+									<listOptionValue builtIn="false" value="--sysroot=&quot;${SBI_SYSROOT}&quot;"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.include.paths.1180760928" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/inc}&quot;"/>
+								</option>
+								<option id="sbi.gnu.cpp.compiler.option.frameworks.core.1087282960" name="Tizen-Frameworks" superClass="sbi.gnu.cpp.compiler.option.frameworks.core" valueType="userObjs">
+									<listOptionValue builtIn="false" value="Native_API"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.other.other.1968355567" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 –std=c++0x" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1565766001" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool command="clang" id="org.tizen.nativecore.tool.sbi.gnu.c.compiler.1931233028" name="C Compiler" superClass="org.tizen.nativecore.tool.sbi.gnu.c.compiler">
+								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.204524476" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
+								<option defaultValue="gnu.c.debugging.level.default" id="sbi.gnu.c.compiler.option.debugging.level.core.687084014" name="Debug level" superClass="sbi.gnu.c.compiler.option.debugging.level.core" valueType="enumerated"/>
+								<option defaultValue="false" id="sbi.gnu.c.compiler.option.misc.pic.core.255697633" name="-fPIC option" superClass="sbi.gnu.c.compiler.option.misc.pic.core" valueType="boolean"/>
+								<option id="sbi.gnu.c.compiler.option.202838552" name="Tizen-Target" superClass="sbi.gnu.c.compiler.option" valueType="userObjs">
+									<listOptionValue builtIn="false" value="mobile-2.4-emulator.core_llvm37.i386.core.app"/>
+								</option>
+								<option id="sbi.gnu.c.compiler.option.frameworks_inc.core.1285141493" name="Tizen-Frameworks-Include-Path" superClass="sbi.gnu.c.compiler.option.frameworks_inc.core" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/libxml2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/appcore-agent&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/appfw&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/attach-panel&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/badge&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/base&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/cairo&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/calendar-service2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ckm&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/contacts-svc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/content&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/context-service&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dali&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dali-toolkit&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dbus-1.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/device&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/dlog&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-buffer-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-con-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-file-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-imf-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-imf-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-input-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-input-evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-ipc-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ecore-x-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/e_dbus-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/edje-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eet-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efl-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efl-extension&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/efreet-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eina-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eina-1/eina&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eio-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eldbus-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/elementary-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/embryo-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eo-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/eom&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ethumb-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ethumb-client-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/evas-1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ewebkit2-0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/feedback&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/fontconfig&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/freetype2&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/geofence&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/gio-unix-2.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/glib-2.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/harfbuzz&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/json-glib-1.0&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/location&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/maps&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/media&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/media-content&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/messaging&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/metadata-editor&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/minicontrol&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/minizip&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/network&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/notification&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/phonenumber-utils&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/sensor&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/shortcut&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/storage&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/system&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/telephony&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/ui&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/web&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/widget_service&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/widget_viewer_evas&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/include/wifi-direct&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/lib/dbus-1.0/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${SBI_SYSROOT}/usr/lib/glib-2.0/include&quot;"/>
+								</option>
+								<option id="sbi.gnu.c.compiler.option.frameworks_cflags.core.285572540" name="Tizen-Frameworks-Other-Cflags" superClass="sbi.gnu.c.compiler.option.frameworks_cflags.core" valueType="stringList">
+									<listOptionValue builtIn="false" value="${TC_COMPILER_MISC}"/>
+									<listOptionValue builtIn="false" value="${RS_COMPILER_MISC}"/>
+									<listOptionValue builtIn="false" value="--sysroot=&quot;${SBI_SYSROOT}&quot;"/>
+								</option>
+								<option id="gnu.c.compiler.option.include.paths.504823477" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/inc}&quot;"/>
+								</option>
+								<option id="sbi.gnu.c.compiler.option.frameworks.core.286272176" name="Tizen-Frameworks" superClass="sbi.gnu.c.compiler.option.frameworks.core" valueType="userObjs">
+									<listOptionValue builtIn="false" value="Native_API"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.774386980" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="org.tizen.nativeide.tool.sbi.gnu.c.linker.base.52555202" name="C Linker" superClass="org.tizen.nativeide.tool.sbi.gnu.c.linker.base"/>
+							<tool command="clang++" id="org.tizen.nativecore.tool.sbi.gnu.cpp.linker.1073373199" name="C++ Linker" superClass="org.tizen.nativecore.tool.sbi.gnu.cpp.linker">
+								<option defaultValue="false" id="sbi.gnu.cpp.linker.option.shared_flag.core.1142043190" name="Linker.Shared" superClass="sbi.gnu.cpp.linker.option.shared_flag.core" valueType="boolean"/>
+								<option defaultValue="false" id="sbi.gnu.cpp.linker.option.noundefined.core.8572559" name="Report unresolved symbol references (-Wl,--no-undefined)" superClass="sbi.gnu.cpp.linker.option.noundefined.core" valueType="boolean"/>
+								<option id="sbi.gnu.cpp.linker.option.frameworks_lflags.core.1834349128" name="Tizen-Frameworks-Other-Lflags" superClass="sbi.gnu.cpp.linker.option.frameworks_lflags.core" valueType="stringList">
+									<listOptionValue builtIn="false" value="${TC_LINKER_MISC}"/>
+									<listOptionValue builtIn="false" value="${RS_LINKER_MISC}"/>
+									<listOptionValue builtIn="false" value="--sysroot=&quot;${SBI_SYSROOT}&quot;"/>
+									<listOptionValue builtIn="false" value="-L&quot;${SBI_SYSROOT}/usr/lib&quot;"/>
+									<listOptionValue builtIn="false" value="$(RS_LIBRARIES)"/>
+								</option>
+								<option id="gnu.cpp.link.option.paths.498728793" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/lib}&quot;"/>
+								</option>
+							</tool>
+							<tool command="i386-linux-gnueabi-as" id="org.tizen.nativeapp.tool.sbi.gnu.assembler.base.2062116277" name="Assembler" superClass="org.tizen.nativeapp.tool.sbi.gnu.assembler.base">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1530849149" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="org.tizen.nativecore.tool.fnmapgen.1446780460" name="C FN-Map Generator" superClass="org.tizen.nativecore.tool.fnmapgen"/>
+							<tool id="org.tizen.nativecore.tool.fnmapgen.cpp.1174309541" name="C++ FN-Map Generator" superClass="org.tizen.nativecore.tool.fnmapgen.cpp"/>
+							<tool id="org.tizen.nativecore.tool.ast.210448925" name="C Static Analyzer" superClass="org.tizen.nativecore.tool.ast"/>
+							<tool id="org.tizen.nativecore.tool.ast.cpp.1548846598" name="C++ Static Analyzer" superClass="org.tizen.nativecore.tool.ast.cpp"/>
+							<tool id="org.tizen.nativecore.tool.sbi.gnu.archiver.mergelib.625339141" name="Archive Generator" superClass="org.tizen.nativecore.tool.sbi.gnu.archiver.mergelib"/>
+							<tool id="org.tizen.nativecore.tool.sbi.po.compiler.311804930" name="PO Resource Compiler" superClass="org.tizen.nativecore.tool.sbi.po.compiler"/>
+							<tool id="org.tizen.nativecore.tool.sbi.edc.compiler.832462857" name="EDC Resource Compiler" superClass="org.tizen.nativecore.tool.sbi.edc.compiler"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="res"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="shared"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="Slib.org.tizen.nativecore.target.sbi.gcc45.lib.443967469" name="Tizen Native Static Library" projectType="org.tizen.nativecore.target.sbi.gcc45.lib"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="org.tizen.nativecore.config.sbi.gcc45.lib.release.627362303">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="org.tizen.nativecore.config.sbi.gcc45.lib.debug.930619274">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/Slib"/>
+		</configuration>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/Slib"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+</cproject>

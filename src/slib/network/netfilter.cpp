@@ -1,5 +1,3 @@
-#include "../../../inc/slib/core/definition.h"
-
 #include "../../../inc/slib/network/netfilter.h"
 
 #define TAG "NetFilter"
@@ -8,13 +6,23 @@
 namespace slib
 {
 
-	NetFilterPacket::NetFilterPacket()
+	NetFilterPacket::NetFilterPacket(): data(sl_null), length(0), deviceIn(0), deviceOut(0), physicalDeviceIn(0), physicalDeviceOut(0), queueNumber(0)
 	{
 	}
 
 	NetFilterPacket::~NetFilterPacket()
 	{
 	}
+
+
+	INetFilterListener::INetFilterListener()
+	{
+	}
+
+	INetFilterListener::~INetFilterListener()
+	{
+	}
+
 
 	NetFilterParam::NetFilterParam()
 	{
@@ -75,7 +83,7 @@ namespace slib
 		sl_uint32 id;
 		sl_bool flagVerdict;
 		
-		_Linux_NetFilterPacket()
+		_Linux_NetFilterPacket(nfq_q_handle* _queue, nfq_data* _data, sl_uint32 _id): queue(_queue), nfad(_data), id(_id)
 		{
 			flagVerdict = sl_false;
 		}
@@ -134,6 +142,8 @@ namespace slib
 
 		_Linux_NetFilterQueue()
 		{
+			m_queueNumber = 0;
+			m_filter = sl_null;
 			m_queue = sl_null;
 		}
 
@@ -163,6 +173,8 @@ namespace slib
 	public:
 		_Linux_NetFilter()
 		{	
+			m_handle = sl_null;
+
 			m_flagInit = sl_false;
 			m_flagRunning = sl_false;
 		}
@@ -320,10 +332,7 @@ namespace slib
 			sl_uint8* payload;
 			int lenPayload = nfq_get_payload(data, &payload);
 			if (lenPayload > 0) {
-				_Linux_NetFilterPacket packet;
-				packet.queue = queue->m_queue;
-				packet.id = id;
-				packet.nfad = data;
+				_Linux_NetFilterPacket packet(queue->m_queue, data, id);
 				packet.data = payload;
 				packet.length = lenPayload;
 				packet.queueNumber = queue->m_queueNumber;

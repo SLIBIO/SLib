@@ -686,311 +686,314 @@ namespace slib
 		size.height = h;
 	}
 
-	SLIB_UI_NAMESPACE_END
+}
 
-	@implementation Slib_OSX_ViewBase
-	- (BOOL)isFlipped
-	{
-		return TRUE;
-	}
+@implementation Slib_OSX_ViewBase
+- (BOOL)isFlipped
+{
+	return TRUE;
+}
 
-	- (BOOL)isOpaque
-	{
-		return m_flagOpaque ? YES : NO;
-	}
-	@end
+- (BOOL)isOpaque
+{
+	return m_flagOpaque ? YES : NO;
+}
+@end
 
-	@implementation Slib_OSX_ViewHandle
-	- (id)init
-	{
-		self = [super init];
-		if (self != nil) {
-			[self updateTrackingAreas];
-		}
-		return self;
-	}
-
-	- (id)initWithFrame:(NSRect)frame
-	{
-		self = [super initWithFrame:frame];
-		if (self != nil) {
-			[self updateTrackingAreas];
-		}
-		return self;
-	}
-
-	- (void)setFrame:(NSRect)frame
-	{
-		[super setFrame:frame];
+@implementation Slib_OSX_ViewHandle
+- (id)init
+{
+	self = [super init];
+	if (self != nil) {
 		[self updateTrackingAreas];
 	}
+	return self;
+}
 
-	- (void)updateTrackingAreas
-	{
-		if (m_trackingArea != nil) {
-			[self removeTrackingArea:m_trackingArea];
+- (id)initWithFrame:(NSRect)frame
+{
+	self = [super initWithFrame:frame];
+	if (self != nil) {
+		[self updateTrackingAreas];
+	}
+	return self;
+}
+
+- (void)setFrame:(NSRect)frame
+{
+	[super setFrame:frame];
+	[self updateTrackingAreas];
+}
+
+- (void)updateTrackingAreas
+{
+	if (m_trackingArea != nil) {
+		[self removeTrackingArea:m_trackingArea];
+	}
+	NSRect rc = [self bounds];
+	m_trackingArea = [[NSTrackingArea alloc] initWithRect:rc options: (NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect) owner:self userInfo:nil];
+	if (m_trackingArea != nil) {
+		[self addTrackingArea:m_trackingArea];
+		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+		if (instance.isNotNull()) {
+			NSPoint mouseLocation = [[self window] mouseLocationOutsideOfEventStream];
+			mouseLocation = [self convertPoint: mouseLocation fromView: nil];
+			if (NSPointInRect(mouseLocation, [self bounds])) {
+				instance->onEventMouse(slib::UIAction::MouseEnter, mouseLocation);
+			} else {
+				instance->onEventMouse(slib::UIAction::MouseLeave, mouseLocation);
+			}
 		}
-		NSRect rc = [self bounds];
-		m_trackingArea = [[NSTrackingArea alloc] initWithRect:rc options: (NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect) owner:self userInfo:nil];
-		if (m_trackingArea != nil) {
-			[self addTrackingArea:m_trackingArea];
-			slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-			if (instance.isNotNull()) {
-				NSPoint mouseLocation = [[self window] mouseLocationOutsideOfEventStream];
-				mouseLocation = [self convertPoint: mouseLocation fromView: nil];
-				if (NSPointInRect(mouseLocation, [self bounds])) {
-					instance->onEventMouse(slib::UIAction::MouseEnter, mouseLocation);
-				} else {
-					instance->onEventMouse(slib::UIAction::MouseLeave, mouseLocation);
+	}
+	[super updateTrackingAreas];
+}
+
+- (BOOL)acceptsFirstResponder
+{
+	return TRUE;
+}
+
+- (void)drawRect:(NSRect)dirtyRect
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onDraw(dirtyRect);
+	}
+}
+
+- (void)keyDown:(NSEvent*)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagStopPropagation = instance->onEventKey(sl_true, theEvent);
+		if (flagStopPropagation) {
+			return;
+		}
+	}
+	[[self nextResponder] keyDown:theEvent];
+}
+
+- (void)keyUp:(NSEvent*)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagStopPropagation = instance->onEventKey(sl_false, theEvent);
+		if (flagStopPropagation) {
+			return;
+		}
+	}
+	[[self nextResponder] keyUp:theEvent];
+}
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::LeftButtonDown, theEvent);
+		if (flagStopPropagation) {
+			return;
+		}
+	}
+	[[self nextResponder] mouseDown:theEvent];
+}
+
+- (void)mouseUp:(NSEvent *)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onEventMouse(slib::UIAction::LeftButtonUp, theEvent);
+		NSInteger clicks = [theEvent clickCount];
+		if (clicks == 2) {
+			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::LeftButtonDoubleClick, theEvent);
+			if (flagStopPropagation) {
+				return;
+			}
+		}
+	}
+	[[self nextResponder] mouseUp:theEvent];
+}
+
+- (void)mouseDragged:(NSEvent *)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::LeftButtonDrag, theEvent);
+		if (flagStopPropagation) {
+			return;
+		}
+	}
+	[[self nextResponder] mouseDragged:theEvent];
+}
+
+- (void)rightMouseDown:(NSEvent *)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::RightButtonDown, theEvent);
+		if (flagStopPropagation) {
+			return;
+		}
+	}
+	[[self nextResponder] rightMouseDown:theEvent];
+}
+
+- (void)rightMouseUp:(NSEvent *)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onEventMouse(slib::UIAction::RightButtonUp, theEvent);
+		NSInteger clicks = [theEvent clickCount];
+		if (clicks == 2) {
+			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::RightButtonDoubleClick, theEvent);
+			if (flagStopPropagation) {
+				return;
+			}
+		}
+	}
+	[[self nextResponder] rightMouseUp:theEvent];
+}
+
+- (void)rightMouseDragged:(NSEvent *)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::RightButtonDrag, theEvent);
+		if (flagStopPropagation) {
+			return;
+		}
+	}
+	[[self nextResponder] rightMouseDragged:theEvent];
+}
+
+- (void)otherMouseDown:(NSEvent *)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MiddleButtonDown, theEvent);
+		if (flagStopPropagation) {
+			return;
+		}
+	}
+	[[self nextResponder] otherMouseDown:theEvent];
+}
+
+- (void)otherMouseUp:(NSEvent *)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onEventMouse(slib::UIAction::MiddleButtonUp, theEvent);
+		NSInteger clicks = [theEvent clickCount];
+		if (clicks == 2) {
+			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MiddleButtonDoubleClick, theEvent);
+			if (flagStopPropagation) {
+				return;
+			}
+		}
+	}
+	[[self nextResponder] otherMouseUp:theEvent];
+}
+
+- (void)otherMouseDragged:(NSEvent *)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MiddleButtonDrag, theEvent);
+		if (flagStopPropagation) {
+			return;
+		}
+	}
+	[[self nextResponder] otherMouseDragged:theEvent];
+}
+
+- (void)mouseMoved:(NSEvent *)theEvent
+{
+	[[self window] invalidateCursorRectsForView:self];
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MouseMove, theEvent);
+		if (flagStopPropagation) {
+			return;
+		}
+	}
+	[[self nextResponder] mouseMoved:theEvent];
+}
+
+- (void)mouseEntered:(NSEvent *)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MouseEnter, theEvent);
+		if (flagStopPropagation) {
+			return;
+		}
+	}
+	[[self nextResponder] mouseEntered:theEvent];
+}
+
+- (void)mouseExited:(NSEvent *)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MouseLeave, theEvent);
+		if (flagStopPropagation) {
+			return;
+		}
+	}
+	[[self nextResponder] mouseExited:theEvent];
+}
+
+- (void)scrollWheel:(NSEvent *)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagStopPropagation = instance->onEventMouseWheel(theEvent);
+		if (flagStopPropagation) {
+			return;
+		}
+	}
+	[[self nextResponder] scrollWheel:theEvent];
+}
+
+- (void)cursorUpdate:(NSEvent *)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagNoDefault = instance->onEventUpdateCursor(theEvent);
+		if (flagNoDefault) {
+			return;
+		}
+	}
+	[super cursorUpdate: theEvent];
+}
+
+- (NSView *)hitTest:(NSPoint)aPoint
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		slib::Ref<slib::View> view = instance->getView();
+		if (view.isNotNull()) {
+			if (!(view->isEnabled())) {
+				return nil;
+			}
+			if (view->isCapturingChildInstanceEvents()) {
+				if (view->hitTestForCapturingChildInstanceEvents(slib::UIPoint((sl_ui_pos)(aPoint.x), (sl_ui_pos)(aPoint.y)))) {
+					return self;
 				}
 			}
 		}
-		[super updateTrackingAreas];
 	}
+	return [super hitTest:aPoint];
+}
 
-	- (BOOL)acceptsFirstResponder
-	{
-		return TRUE;
-	}
+@end
 
-	- (void)drawRect:(NSRect)dirtyRect
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			instance->onDraw(dirtyRect);
-		}
-	}
-
-	- (void)keyDown:(NSEvent*)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			sl_bool flagStopPropagation = instance->onEventKey(sl_true, theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
-		}
-		[[self nextResponder] keyDown:theEvent];
-	}
-
-	- (void)keyUp:(NSEvent*)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			sl_bool flagStopPropagation = instance->onEventKey(sl_false, theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
-		}
-		[[self nextResponder] keyUp:theEvent];
-	}
-
-	- (void)mouseDown:(NSEvent *)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::LeftButtonDown, theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
-		}
-		[[self nextResponder] mouseDown:theEvent];
-	}
-
-	- (void)mouseUp:(NSEvent *)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			instance->onEventMouse(slib::UIAction::LeftButtonUp, theEvent);
-			NSInteger clicks = [theEvent clickCount];
-			if (clicks == 2) {
-				sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::LeftButtonDoubleClick, theEvent);
-				if (flagStopPropagation) {
-					return;
-				}
-			}
-		}
-		[[self nextResponder] mouseUp:theEvent];
-	}
-
-	- (void)mouseDragged:(NSEvent *)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::LeftButtonDrag, theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
-		}
-		[[self nextResponder] mouseDragged:theEvent];
-	}
-
-	- (void)rightMouseDown:(NSEvent *)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::RightButtonDown, theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
-		}
-		[[self nextResponder] rightMouseDown:theEvent];
-	}
-
-	- (void)rightMouseUp:(NSEvent *)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			instance->onEventMouse(slib::UIAction::RightButtonUp, theEvent);
-			NSInteger clicks = [theEvent clickCount];
-			if (clicks == 2) {
-				sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::RightButtonDoubleClick, theEvent);
-				if (flagStopPropagation) {
-					return;
-				}
-			}
-		}
-		[[self nextResponder] rightMouseUp:theEvent];
-	}
-
-	- (void)rightMouseDragged:(NSEvent *)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::RightButtonDrag, theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
-		}
-		[[self nextResponder] rightMouseDragged:theEvent];
-	}
-
-	- (void)otherMouseDown:(NSEvent *)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MiddleButtonDown, theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
-		}
-		[[self nextResponder] otherMouseDown:theEvent];
-	}
-
-	- (void)otherMouseUp:(NSEvent *)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			instance->onEventMouse(slib::UIAction::MiddleButtonUp, theEvent);
-			NSInteger clicks = [theEvent clickCount];
-			if (clicks == 2) {
-				sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MiddleButtonDoubleClick, theEvent);
-				if (flagStopPropagation) {
-					return;
-				}
-			}
-		}
-		[[self nextResponder] otherMouseUp:theEvent];
-	}
-
-	- (void)otherMouseDragged:(NSEvent *)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MiddleButtonDrag, theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
-		}
-		[[self nextResponder] otherMouseDragged:theEvent];
-	}
-
-	- (void)mouseMoved:(NSEvent *)theEvent
-	{
-		[[self window] invalidateCursorRectsForView:self];
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MouseMove, theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
-		}
-		[[self nextResponder] mouseMoved:theEvent];
-	}
-
-	- (void)mouseEntered:(NSEvent *)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MouseEnter, theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
-		}
-		[[self nextResponder] mouseEntered:theEvent];
-	}
-
-	- (void)mouseExited:(NSEvent *)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MouseLeave, theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
-		}
-		[[self nextResponder] mouseExited:theEvent];
-	}
-
-	- (void)scrollWheel:(NSEvent *)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			sl_bool flagStopPropagation = instance->onEventMouseWheel(theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
-		}
-		[[self nextResponder] scrollWheel:theEvent];
-	}
-
-	- (void)cursorUpdate:(NSEvent *)theEvent
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			sl_bool flagNoDefault = instance->onEventUpdateCursor(theEvent);
-			if (flagNoDefault) {
-				return;
-			}
-		}
-		[super cursorUpdate: theEvent];
-	}
-
-	- (NSView *)hitTest:(NSPoint)aPoint
-	{
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			slib::Ref<slib::View> view = instance->getView();
-			if (view.isNotNull()) {
-				if (!(view->isEnabled())) {
-					return nil;
-				}
-				if (view->isCapturingChildInstanceEvents()) {
-					if (view->hitTestForCapturingChildInstanceEvents(slib::UIPoint((sl_ui_pos)(aPoint.x), (sl_ui_pos)(aPoint.y)))) {
-						return self;
-					}
-				}
-			}
-		}
-		return [super hitTest:aPoint];
-	}
-
-	@end
 
 /******************************************
 				UIPlatform
 ******************************************/
-	SLIB_UI_NAMESPACE_BEGIN
+
+namespace slib
+{
 
 	Ref<ViewInstance> UIPlatform::createViewInstance(NSView* handle, sl_bool flagFreeOnRelease)
 	{

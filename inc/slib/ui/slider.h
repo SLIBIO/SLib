@@ -7,10 +7,16 @@
 
 namespace slib
 {
+
 	class Slider;
 	
 	class SLIB_EXPORT ISliderListener
 	{
+	public:
+		ISliderListener();
+
+		virtual ~ISliderListener();
+
 	public:
 		virtual void onChange(Slider* slider, float value);
 		
@@ -25,6 +31,8 @@ namespace slib
 	public:
 		Slider(LayoutOrientation orientation = LayoutOrientation::Horizontal);
 		
+		~Slider();
+
 	public:
 		Ref<Drawable> getThumbDrawable();
 		
@@ -123,7 +131,8 @@ namespace slib
 		int m_indexHoverThumb;
 		int m_indexPressedThumb;
 		
-	};	
+	};
+
 }
 
 #endif

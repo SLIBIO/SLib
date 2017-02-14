@@ -8,8 +8,17 @@
 
 namespace slib
 {
+
 	SLIB_DEFINE_OBJECT(PickerView, View)
 	
+	IPickerViewListener::IPickerViewListener()
+	{
+	}
+
+	IPickerViewListener::~IPickerViewListener()
+	{
+	}
+
 	PickerView::PickerView()
 	{
 		setCreatingNativeWidget(sl_true);
@@ -23,8 +32,14 @@ namespace slib
 		m_flagCircular = sl_false;
 		m_yOffset = 0;
 		m_timeFlowFrameBefore.setZero();
+
+		m_speedFlow = 0;
 	}
 	
+	PickerView::~PickerView()
+	{
+	}
+
 	sl_uint32 PickerView::getItemsCount()
 	{
 		return (sl_uint32)(m_titles.getCount());
@@ -323,7 +338,7 @@ namespace slib
 				index = 0;
 			}
 		}
-		if (m_indexSelected != index) {
+		if (m_indexSelected != (sl_uint32)index) {
 			m_indexSelected = index;
 			dispatchSelectItem(index);
 		}
@@ -470,4 +485,5 @@ namespace slib
 	}
 	
 #endif
+
 }

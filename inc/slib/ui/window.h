@@ -15,6 +15,7 @@
 
 namespace slib
 {
+
 	class Screen;
 	class View;
 	class ViewInstance;
@@ -431,6 +432,11 @@ namespace slib
 	{
 		SLIB_DECLARE_OBJECT
 		
+	public:
+		WindowInstance();
+
+		~WindowInstance();
+
 	public:
 		Ref<Window> getWindow();
 		

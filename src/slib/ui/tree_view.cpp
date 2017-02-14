@@ -2,6 +2,15 @@
 
 namespace slib
 {
+
+	ITreeViewListener::ITreeViewListener()
+	{
+	}
+
+	ITreeViewListener::~ITreeViewListener()
+	{
+	}
+
 	void ITreeViewListener::onSelectItem(TreeView* view, TreeViewItem* item)
 	{
 	}
@@ -48,6 +57,12 @@ namespace slib
 		m_height = 0;
 		
 		m_frame.setZero();
+
+		m_bottomChildren = 0;
+	}
+
+	TreeViewItem::~TreeViewItem()
+	{
 	}
 	
 	String TreeViewItem::getId()
@@ -499,6 +514,10 @@ namespace slib
 		m_iconExpanded = new _TreeView_DefaultIdentIcon(sl_false);
 	}
 	
+	TreeView::~TreeView()
+	{
+	}
+
 	Ref<TreeViewItem> TreeView::getRootItem()
 	{
 		return m_root;

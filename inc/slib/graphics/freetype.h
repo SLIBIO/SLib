@@ -13,68 +13,69 @@
 struct FT_LibraryRec_;
 struct FT_FaceRec_;
 
-SLIB_GRAPHICS_NAMESPACE_BEGIN
-
-class Image;
-
-class _FreeTypeLibrary;
-
-class SLIB_EXPORT FreeType : public Object
+namespace slib
 {
-	SLIB_DECLARE_OBJECT
 	
-public:
-	FreeType();
+	class Image;
+
+	class _FreeTypeLibrary;
+
+	class SLIB_EXPORT FreeType : public Object
+	{
+		SLIB_DECLARE_OBJECT
+
+	public:
+		FreeType();
+
+		~FreeType();
+
+	public:
+		static Ref<FreeType> loadFromMemory(const Memory& mem, sl_uint32 indexFace = 0);
+
+		static Ref<FreeType> loadFromFile(const String& fontFilePath, sl_uint32 index = 0);
+
+	public:
+		sl_uint32 getFacesCount();
+
+		sl_uint32 getGlyphsCount();
+
+		// set size in pixels
+		sl_bool setSize(sl_uint32 width, sl_uint32 height);
+
+		void setSize(sl_uint32 size);
+
+		Size getStringExtent(const sl_char16* sz, sl_uint32 len);
+
+		Size getStringExtent(const String16& text);
+
+		// draw starting at left-bottom corner
+		void drawString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, const Color& color);
 	
-	~FreeType();
+		void drawString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color);
 	
-public:
-	static Ref<FreeType> loadFromMemory(const Memory& mem, sl_uint32 indexFace = 0);
+		void strokeString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, const Color& color, sl_uint32 lineWidth);
 	
-	static Ref<FreeType> loadFromFile(const String& fontFilePath, sl_uint32 index = 0);
+		void strokeString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color, sl_uint32 lineWidth);
 	
-public:
-	sl_uint32 getFacesCount();
+		void strokeStringInside(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, const Color& color, sl_uint32 lineWidth);
 	
-	sl_uint32 getGlyphsCount();
-
-	// set size in pixels
-	sl_bool setSize(sl_uint32 width, sl_uint32 height);
+		void strokeStringInside(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color, sl_uint32 lineWidth);
 	
-	void setSize(sl_uint32 size);
-
-	Size getStringExtent(const sl_char16* sz, sl_uint32 len);
-
-	Size getStringExtent(const String16& text);
-
-	// draw starting at left-bottom corner
-	void drawString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, const Color& color);
-
-	void drawString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color);
-
-	void strokeString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, const Color& color, sl_uint32 lineWidth);
-
-	void strokeString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color, sl_uint32 lineWidth);
-
-	void strokeStringInside(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, const Color& color, sl_uint32 lineWidth);
-
-	void strokeStringInside(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color, sl_uint32 lineWidth);
-
-	void strokeStringOutside(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, const Color& color, sl_uint32 lineWidth);
-
-	void strokeStringOutside(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color, sl_uint32 lineWidth);
-
-protected:
-	void _strokeString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, sl_bool flagBorder, sl_bool flagOutside, sl_uint32 radius, const Color& color);
+		void strokeStringOutside(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, const Color& color, sl_uint32 lineWidth);
 	
-protected:
-	Ref<_FreeTypeLibrary> m_libraryRef;
-	FT_LibraryRec_* m_library;
-	FT_FaceRec_* m_face;
-	Memory m_mem;
+		void strokeStringOutside(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color, sl_uint32 lineWidth);
 	
-};
+	protected:
+		void _strokeString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, sl_bool flagBorder, sl_bool flagOutside, sl_uint32 radius, const Color& color);
 
-SLIB_GRAPHICS_NAMESPACE_END
+	protected:
+		Ref<_FreeTypeLibrary> m_libraryRef;
+		FT_LibraryRec_* m_library;
+		FT_FaceRec_* m_face;
+		Memory m_mem;
+
+	};
+
+}
 
 #endif

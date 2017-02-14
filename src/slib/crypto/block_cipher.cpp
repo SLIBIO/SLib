@@ -6,7 +6,8 @@
 
 #include "../../../inc/slib/crypto/aes.h"
 
-SLIB_CRYPTO_NAMESPACE_BEGIN
+namespace slib
+{
 
 /*
 				BlockCipherPadding_PKCS7
@@ -24,72 +25,72 @@ SLIB_CRYPTO_NAMESPACE_BEGIN
 	only applicable up to 256-bytes
 */
 
-void BlockCipherPadding_PKCS7::addPadding(void* buf, sl_size padding)
-{
-	sl_uint8* c = (sl_uint8*)buf;
-	sl_uint8 n = (sl_uint8)padding;
-	for (sl_uint8 i = 0; i < n; i++) {
-		c[i] = n;
-	}
-}
-
-sl_uint32 BlockCipherPadding_PKCS7::removePadding(const void* buf, sl_uint32 blockSize)
-{
-	sl_uint8* c = (sl_uint8*)buf;
-	sl_uint8 n = c[blockSize - 1];
-	for (sl_uint32 i = blockSize - n; i < blockSize - 1; i++) {
-		if (c[i] != n) {
-			return 0;
+	void BlockCipherPadding_PKCS7::addPadding(void* buf, sl_size padding)
+	{
+		sl_uint8* c = (sl_uint8*)buf;
+		sl_uint8 n = (sl_uint8)padding;
+		for (sl_uint8 i = 0; i < n; i++) {
+			c[i] = n;
 		}
 	}
-	if (blockSize < n) {
-		return 0;
+
+	sl_uint32 BlockCipherPadding_PKCS7::removePadding(const void* buf, sl_uint32 blockSize)
+	{
+		sl_uint8* c = (sl_uint8*)buf;
+		sl_uint8 n = c[blockSize - 1];
+		for (sl_uint32 i = blockSize - n; i < blockSize - 1; i++) {
+			if (c[i] != n) {
+				return 0;
+			}
+		}
+		if (blockSize < n) {
+			return 0;
+		}
+		return n;
 	}
-	return n;
-}
 
 
 /**************************************
 			BlockCipher_Blocks
 ***************************************/
 
-// Output Size = (size / block) * block
-template <class BlockCipher>
-sl_size BlockCipher_Blocks<BlockCipher>::encryptBlocks(const BlockCipher* crypto, const void* _src, void* _dst, sl_size size)
-{
-	const char* src = (const char*)(_src);
-	char* dst = (char*)(_dst);
-	sl_uint32 block = crypto->getBlockSize();
-	if (size % block != 0) {
-		return 0;
+	// Output Size = (size / block) * block
+	template <class BlockCipher>
+	sl_size BlockCipher_Blocks<BlockCipher>::encryptBlocks(const BlockCipher* crypto, const void* _src, void* _dst, sl_size size)
+	{
+		const char* src = (const char*)(_src);
+		char* dst = (char*)(_dst);
+		sl_uint32 block = crypto->getBlockSize();
+		if (size % block != 0) {
+			return 0;
+		}
+		sl_size n = size / block;
+		for (sl_size i = 0; i < n; i++) {
+			crypto->encryptBlock(src, dst);
+			src += block;
+			dst += block;
+		}
+		return size;
 	}
-	sl_size n = size / block;
-	for (sl_size i = 0; i < n; i++) {
-		crypto->encryptBlock(src, dst);
-		src += block;
-		dst += block;
-	}
-	return size;
-}
 
-// Output Size = (size / block) * block
-template <class BlockCipher>
-sl_size BlockCipher_Blocks<BlockCipher>::decryptBlocks(const BlockCipher* crypto, const void* _src, void* _dst, sl_size size)
-{
-	const char* src = (const char*)(_src);
-	char* dst = (char*)(_dst);
-	sl_uint32 block = crypto->getBlockSize();
-	if (size % block != 0) {
-		return 0;
+	// Output Size = (size / block) * block
+	template <class BlockCipher>
+	sl_size BlockCipher_Blocks<BlockCipher>::decryptBlocks(const BlockCipher* crypto, const void* _src, void* _dst, sl_size size)
+	{
+		const char* src = (const char*)(_src);
+		char* dst = (char*)(_dst);
+		sl_uint32 block = crypto->getBlockSize();
+		if (size % block != 0) {
+			return 0;
+		}
+		sl_size n = size / block;
+		for (sl_size i = 0; i < n; i++) {
+			crypto->decryptBlock(src, dst);
+			src += block;
+			dst += block;
+		}
+		return size;
 	}
-	sl_size n = size / block;
-	for (sl_size i = 0; i < n; i++) {
-		crypto->decryptBlock(src, dst);
-		src += block;
-		dst += block;
-	}
-	return size;
-}
 
 
 /**************************************
@@ -98,57 +99,57 @@ sl_size BlockCipher_Blocks<BlockCipher>::decryptBlocks(const BlockCipher* crypto
 	Electronic codebook (ECB)
 ***************************************/
 
-// Output Size = (size / block + 1) * block (< size + block)
-template <class BlockCipher, class Padding>
-sl_size BlockCipher_ECB<BlockCipher, Padding>::encrypt(const BlockCipher* crypto, const void* _src, sl_size size, void* _dst)
-{
-	const char* src = (const char*)(_src);
-	char* dst = (char*)(_dst);
-	sl_uint32 block = crypto->getBlockSize();
-	if (block > 256) {
-		return 0;
+	// Output Size = (size / block + 1) * block (< size + block)
+	template <class BlockCipher, class Padding>
+	sl_size BlockCipher_ECB<BlockCipher, Padding>::encrypt(const BlockCipher* crypto, const void* _src, sl_size size, void* _dst)
+	{
+		const char* src = (const char*)(_src);
+		char* dst = (char*)(_dst);
+		sl_uint32 block = crypto->getBlockSize();
+		if (block > 256) {
+			return 0;
+		}
+		sl_size n = size / block;
+		for (sl_size i = 0; i < n; i++) {
+			crypto->encryptBlock(src, dst);
+			src += block;
+			dst += block;
+		}
+		char last[256];
+		sl_size p = n * block;
+		sl_uint32 m = (sl_uint32)(size - p);
+		Base::copyMemory(last, src, m);
+		Padding::addPadding(last + m, block - m);
+		crypto->encryptBlock(last, dst);
+		return p + block;
 	}
-	sl_size n = size / block;
-	for (sl_size i = 0; i < n; i++) {
-		crypto->encryptBlock(src, dst);
-		src += block;
-		dst += block;
-	}
-	char last[256];
-	sl_size p = n * block;
-	sl_uint32 m = (sl_uint32)(size - p);
-	Base::copyMemory(last, src, m);
-	Padding::addPadding(last + m, block - m);
-	crypto->encryptBlock(last, dst);
-	return p + block;
-}
 
-// destination buffer size must equals to or greater than size
-template <class BlockCipher, class Padding>
-sl_size BlockCipher_ECB<BlockCipher, Padding>::decrypt(const BlockCipher* crypto, const void* _src, sl_size size, void* _dst)
-{
-	const char* src = (const char*)(_src);
-	char* dst = (char*)(_dst);
-	sl_uint32 block = crypto->getBlockSize();
-	if (block > 256) {
-		return 0;
+	// destination buffer size must equals to or greater than size
+	template <class BlockCipher, class Padding>
+	sl_size BlockCipher_ECB<BlockCipher, Padding>::decrypt(const BlockCipher* crypto, const void* _src, sl_size size, void* _dst)
+	{
+		const char* src = (const char*)(_src);
+		char* dst = (char*)(_dst);
+		sl_uint32 block = crypto->getBlockSize();
+		if (block > 256) {
+			return 0;
+		}
+		if (size % block != 0) {
+			return 0;
+		}
+		sl_size n = size / block;
+		for (sl_size i = 0; i < n; i++) {
+			crypto->decryptBlock(src, dst);
+			src += block;
+			dst += block;
+		}
+		sl_uint32 padding = Padding::removePadding(dst - block, block);
+		if (padding > 0) {
+			return size - padding;
+		} else {
+			return 0;
+		}
 	}
-	if (size % block != 0) {
-		return 0;
-	}
-	sl_size n = size / block;
-	for (sl_size i = 0; i < n; i++) {
-		crypto->decryptBlock(src, dst);
-		src += block;
-		dst += block;
-	}
-	sl_uint32 padding = Padding::removePadding(dst - block, block);
-	if (padding > 0) {
-		return size - padding;
-	} else {
-		return 0;
-	}
-}
 
 
 /**************************************
@@ -157,120 +158,120 @@ sl_size BlockCipher_ECB<BlockCipher, Padding>::decrypt(const BlockCipher* crypto
 	Cipher-block chaining (CBC)
 ***************************************/
 
-template <class BlockCipher, class Padding>
-sl_size BlockCipher_CBC<BlockCipher, Padding>::encrypt(const BlockCipher* crypto, const void* _iv, const void* _src, sl_size size, void* _dst)
-{
-	const char* src = (const char*)(_src);
-	char* dst = (char*)(_dst);
-	const char* iv = (const char*)_iv;
-	sl_uint32 block = crypto->getBlockSize();
-	if (block > 256) {
-		return 0;
-	}
-	sl_size n = size / block;
-	char msg[256];
-	for (sl_size i = 0; i < n; i++) {
-		for (sl_uint32 k = 0; k < block; k++) {
-			msg[k] = src[k] ^ iv[k];
-		}
-		crypto->encryptBlock(msg, dst);
-		iv = dst;
-		src += block;
-		dst += block;
-	}
-	sl_size p = n * block;
+	template <class BlockCipher, class Padding>
+	sl_size BlockCipher_CBC<BlockCipher, Padding>::encrypt(const BlockCipher* crypto, const void* _iv, const void* _src, sl_size size, void* _dst)
 	{
-		sl_uint32 m = (sl_uint32)(size - p);
-		for (sl_uint32 k = 0; k < m; k++) {
-			msg[k] = src[k] ^ iv[k];
+		const char* src = (const char*)(_src);
+		char* dst = (char*)(_dst);
+		const char* iv = (const char*)_iv;
+		sl_uint32 block = crypto->getBlockSize();
+		if (block > 256) {
+			return 0;
 		}
-		Padding::addPadding(msg + m, block - m);
-		for (sl_uint32 k = m; k < block; k++) {
-			msg[k] = msg[k] ^ iv[k];
+		sl_size n = size / block;
+		char msg[256];
+		for (sl_size i = 0; i < n; i++) {
+			for (sl_uint32 k = 0; k < block; k++) {
+				msg[k] = src[k] ^ iv[k];
+			}
+			crypto->encryptBlock(msg, dst);
+			iv = dst;
+			src += block;
+			dst += block;
 		}
-		crypto->encryptBlock(msg, dst);
-	}
-	return p + block;
-}
-
-// Output Size = (size / block + 2) * block (< size + block*2)
-template <class BlockCipher, class Padding>
-sl_size BlockCipher_CBC<BlockCipher, Padding>::encrypt(const BlockCipher* crypto, const void* src, sl_size size, void* dst)
-{
-	sl_uint32 block = crypto->getBlockSize();
-	Math::randomMemory(dst, block);
-	return encrypt(crypto, dst, src, size, ((char*)dst) + block) + block;
-}
-
-template <class BlockCipher, class Padding>
-Memory BlockCipher_CBC<BlockCipher, Padding>::encrypt(const BlockCipher* crypto, const void* src, sl_size size)
-{
-	sl_uint32 block = crypto->getBlockSize();
-	Memory mem = Memory::create(size + block * 2);
-	if (mem.isNotEmpty()) {
-		sl_size n = encrypt(crypto, src, size, mem.getData());
-		if (n) {
-			return mem.sub(0, n);
+		sl_size p = n * block;
+		{
+			sl_uint32 m = (sl_uint32)(size - p);
+			for (sl_uint32 k = 0; k < m; k++) {
+				msg[k] = src[k] ^ iv[k];
+			}
+			Padding::addPadding(msg + m, block - m);
+			for (sl_uint32 k = m; k < block; k++) {
+				msg[k] = msg[k] ^ iv[k];
+			}
+			crypto->encryptBlock(msg, dst);
 		}
+		return p + block;
 	}
-	return sl_null;
-}
 
-// destination buffer size must equals to or greater than size
-template <class BlockCipher, class Padding>
-sl_size BlockCipher_CBC<BlockCipher, Padding>::decrypt(const BlockCipher* crypto, const void* _iv, const void* _src, sl_size size, void* _dst)
-{
-	const char* src = (const char*)(_src);
-	char* dst = (char*)(_dst);
-	const char* iv = (const char*)_iv;
-	sl_uint32 block = crypto->getBlockSize();
-	if (block > 256) {
-		return 0;
+	// Output Size = (size / block + 2) * block (< size + block*2)
+	template <class BlockCipher, class Padding>
+	sl_size BlockCipher_CBC<BlockCipher, Padding>::encrypt(const BlockCipher* crypto, const void* src, sl_size size, void* dst)
+	{
+		sl_uint32 block = crypto->getBlockSize();
+		Math::randomMemory(dst, block);
+		return encrypt(crypto, dst, src, size, ((char*)dst) + block) + block;
 	}
-	if (size % block != 0) {
-		return 0;
-	}
-	sl_size n = size / block;
-	for (sl_size i = 0; i < n; i++) {
-		crypto->decryptBlock(src, dst);
-		for (sl_uint32 k = 0; k < block; k++) {
-			dst[k] ^= iv[k];
+
+	template <class BlockCipher, class Padding>
+	Memory BlockCipher_CBC<BlockCipher, Padding>::encrypt(const BlockCipher* crypto, const void* src, sl_size size)
+	{
+		sl_uint32 block = crypto->getBlockSize();
+		Memory mem = Memory::create(size + block * 2);
+		if (mem.isNotEmpty()) {
+			sl_size n = encrypt(crypto, src, size, mem.getData());
+			if (n) {
+				return mem.sub(0, n);
+			}
 		}
-		iv = src;
-		src += block;
-		dst += block;
+		return sl_null;
 	}
-	sl_uint32 padding = Padding::removePadding(dst - block, block);
-	if (padding > 0) {
-		return size - padding;
-	} else {
-		return 0;
-	}
-}
 
-// destination buffer size must equals to or greater than size
-template <class BlockCipher, class Padding>
-sl_size BlockCipher_CBC<BlockCipher, Padding>::decrypt(const BlockCipher* crypto, const void* src, sl_size size, void* dst)
-{
-	sl_uint32 block = crypto->getBlockSize();
-	if (size < (sl_size)block) {
-		return 0;
-	}
-	return decrypt(crypto, src, ((char*)src) + block, size - block, dst);
-}
-
-template <class BlockCipher, class Padding>
-Memory BlockCipher_CBC<BlockCipher, Padding>::decrypt(const BlockCipher* crypto, const void* src, sl_size size)
-{
-	Memory mem = Memory::create(size);
-	if (mem.isNotEmpty()) {
-		sl_size n = decrypt(crypto, src, size, mem.getData());
-		if (n) {
-			return mem.sub(0, n);
+	// destination buffer size must equals to or greater than size
+	template <class BlockCipher, class Padding>
+	sl_size BlockCipher_CBC<BlockCipher, Padding>::decrypt(const BlockCipher* crypto, const void* _iv, const void* _src, sl_size size, void* _dst)
+	{
+		const char* src = (const char*)(_src);
+		char* dst = (char*)(_dst);
+		const char* iv = (const char*)_iv;
+		sl_uint32 block = crypto->getBlockSize();
+		if (block > 256) {
+			return 0;
+		}
+		if (size % block != 0) {
+			return 0;
+		}
+		sl_size n = size / block;
+		for (sl_size i = 0; i < n; i++) {
+			crypto->decryptBlock(src, dst);
+			for (sl_uint32 k = 0; k < block; k++) {
+				dst[k] ^= iv[k];
+			}
+			iv = src;
+			src += block;
+			dst += block;
+		}
+		sl_uint32 padding = Padding::removePadding(dst - block, block);
+		if (padding > 0) {
+			return size - padding;
+		} else {
+			return 0;
 		}
 	}
-	return sl_null;
-}
+
+	// destination buffer size must equals to or greater than size
+	template <class BlockCipher, class Padding>
+	sl_size BlockCipher_CBC<BlockCipher, Padding>::decrypt(const BlockCipher* crypto, const void* src, sl_size size, void* dst)
+	{
+		sl_uint32 block = crypto->getBlockSize();
+		if (size < (sl_size)block) {
+			return 0;
+		}
+		return decrypt(crypto, src, ((char*)src) + block, size - block, dst);
+	}
+
+	template <class BlockCipher, class Padding>
+	Memory BlockCipher_CBC<BlockCipher, Padding>::decrypt(const BlockCipher* crypto, const void* src, sl_size size)
+	{
+		Memory mem = Memory::create(size);
+		if (mem.isNotEmpty()) {
+			sl_size n = decrypt(crypto, src, size, mem.getData());
+			if (n) {
+				return mem.sub(0, n);
+			}
+		}
+		return sl_null;
+	}
 
 
 /**************************************
@@ -279,82 +280,82 @@ Memory BlockCipher_CBC<BlockCipher, Padding>::decrypt(const BlockCipher* crypto,
 		Counter Mode (CTR)
 ***************************************/
 
-template <class BlockCipher>
-sl_size BlockCipher_CTR<BlockCipher>::encrypt(const BlockCipher* crypto, const void* _input, sl_size _size, void* _output, void* _counter, sl_uint32 offset)
-{
-	if (_size == 0) {
-		return 0;
-	}
-	sl_uint8 mask[SLIB_CRYPTO_BLOCK_CIPHER_BLOCK_MAX_LEN];
-	
-	sl_uint32 sizeBlock = crypto->getBlockSize();
-	if (sizeBlock > SLIB_CRYPTO_BLOCK_CIPHER_BLOCK_MAX_LEN || offset > sizeBlock) {
-		return 0;
-	}
-	
-	sl_uint8* counter = (sl_uint8*)(_counter);
-	const sl_uint8* input = (const sl_uint8*)_input;
-	sl_uint8* output = (sl_uint8*)_output;
-	sl_size size = _size;
-	sl_size i, n;
-	
-	if (offset) {
-		crypto->encryptBlock(counter, mask);
-		n = sizeBlock - offset;
-		if (size > n) {
+	template <class BlockCipher>
+	sl_size BlockCipher_CTR<BlockCipher>::encrypt(const BlockCipher* crypto, const void* _input, sl_size _size, void* _output, void* _counter, sl_uint32 offset)
+	{
+		if (_size == 0) {
+			return 0;
+		}
+		sl_uint8 mask[SLIB_CRYPTO_BLOCK_CIPHER_BLOCK_MAX_LEN];
+		
+		sl_uint32 sizeBlock = crypto->getBlockSize();
+		if (sizeBlock > SLIB_CRYPTO_BLOCK_CIPHER_BLOCK_MAX_LEN || offset > sizeBlock) {
+			return 0;
+		}
+		
+		sl_uint8* counter = (sl_uint8*)(_counter);
+		const sl_uint8* input = (const sl_uint8*)_input;
+		sl_uint8* output = (sl_uint8*)_output;
+		sl_size size = _size;
+		sl_size i, n;
+		
+		if (offset) {
+			crypto->encryptBlock(counter, mask);
+			n = sizeBlock - offset;
+			if (size > n) {
+				for (i = 0; i < n; i++) {
+					output[i] = input[i] ^ mask[i + offset];
+				}
+				size -= n;
+				input += n;
+				output += n;
+				MIO::increaseBE(counter, sizeBlock);
+			} else {
+				for (i = 0; i < size; i++) {
+					output[i] = input[i] ^ mask[i + offset];
+				}
+				return size;
+			}
+		}
+		while (size > 0) {
+			crypto->encryptBlock(counter, mask);
+			n = SLIB_MIN(sizeBlock, size);
 			for (i = 0; i < n; i++) {
-				output[i] = input[i] ^ mask[i + offset];
+				output[i] = input[i] ^ mask[i];
 			}
 			size -= n;
 			input += n;
 			output += n;
 			MIO::increaseBE(counter, sizeBlock);
-		} else {
-			for (i = 0; i < size; i++) {
-				output[i] = input[i] ^ mask[i + offset];
-			}
-			return size;
 		}
+		return _size;
 	}
-	while (size > 0) {
-		crypto->encryptBlock(counter, mask);
-		n = SLIB_MIN(sizeBlock, size);
-		for (i = 0; i < n; i++) {
-			output[i] = input[i] ^ mask[i];
+
+	template <class BlockCipher>
+	sl_size BlockCipher_CTR<BlockCipher>::encrypt(const BlockCipher* crypto, const void* iv, sl_uint64 counter, sl_uint32 offset, const void* input, sl_size size, void* output)
+	{
+		if (size == 0) {
+			return 0;
 		}
-		size -= n;
-		input += n;
-		output += n;
-		MIO::increaseBE(counter, sizeBlock);
+		sl_uint32 sizeBlock = crypto->getBlockSize();
+		if (sizeBlock < 16) {
+			return 0;
+		}
+		sl_uint8 IV[SLIB_CRYPTO_BLOCK_CIPHER_BLOCK_MAX_LEN];
+		Base::copyMemory(IV, iv, sizeBlock - 8);
+		MIO::writeUint64BE(IV + sizeBlock - 8, counter);
+		return encrypt(crypto, input, size, output, IV, offset);
 	}
-	return _size;
-}
 
-template <class BlockCipher>
-sl_size BlockCipher_CTR<BlockCipher>::encrypt(const BlockCipher* crypto, const void* iv, sl_uint64 counter, sl_uint32 offset, const void* input, sl_size size, void* output)
-{
-	if (size == 0) {
-		return 0;
+	template <class BlockCipher>
+	sl_size BlockCipher_CTR<BlockCipher>::encrypt(const BlockCipher* crypto, const void* iv, sl_uint64 pos, const void* input, sl_size size, void* output)
+	{
+		sl_uint32 sizeBlock = crypto->getBlockSize();
+		if (sizeBlock < 16) {
+			return 0;
+		}
+		return encrypt(crypto, iv, pos / sizeBlock, (sl_uint32)(pos % sizeBlock), input, size, output);
 	}
-	sl_uint32 sizeBlock = crypto->getBlockSize();
-	if (sizeBlock < 16) {
-		return 0;
-	}
-	sl_uint8 IV[SLIB_CRYPTO_BLOCK_CIPHER_BLOCK_MAX_LEN];
-	Base::copyMemory(IV, iv, sizeBlock - 8);
-	MIO::writeUint64BE(IV + sizeBlock - 8, counter);
-	return encrypt(crypto, input, size, output, IV, offset);
-}
-
-template <class BlockCipher>
-sl_size BlockCipher_CTR<BlockCipher>::encrypt(const BlockCipher* crypto, const void* iv, sl_uint64 pos, const void* input, sl_size size, void* output)
-{
-	sl_uint32 sizeBlock = crypto->getBlockSize();
-	if (sizeBlock < 16) {
-		return 0;
-	}
-	return encrypt(crypto, iv, pos / sizeBlock, (sl_uint32)(pos % sizeBlock), input, size, output);
-}
 
 
 #define DEFINE_BLOCKCIPHER(CLASS) \
@@ -389,8 +390,6 @@ sl_size BlockCipher_CTR<BlockCipher>::encrypt(const BlockCipher* crypto, const v
 	sl_size CLASS::encrypt_CTR(const void* iv, sl_uint64 pos, const void* input, sl_size size, void* output) const \
 	{ return BlockCipher_CTR<CLASS>::encrypt(this, iv, pos, input, size, output); }
 
-DEFINE_BLOCKCIPHER(AES);
+	DEFINE_BLOCKCIPHER(AES);
 
-
-SLIB_CRYPTO_NAMESPACE_END
-
+}

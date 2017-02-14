@@ -7,12 +7,14 @@
 
 namespace slib
 {
+
 	class SLIB_EXPORT WGL
 	{
 	public:
 		static Ref<Renderer> createRenderer(void* windowHandle, const RendererParam& param);
 		
 	};
+
 }
 
 #endif

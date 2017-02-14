@@ -7,8 +7,8 @@
 
 namespace slib
 {
-	Primitive::Primitive()
-	: type(PrimitiveType::Triangle), countElements(0)
+
+	Primitive::Primitive(): type(PrimitiveType::Triangle), countElements(0)
 	{
 	}
 	
@@ -17,8 +17,7 @@ namespace slib
 	}
 	
 	
-	EnginePrimitive::EnginePrimitive(const Primitive& primitive)
-	: Primitive(primitive)
+	EnginePrimitive::EnginePrimitive(const Primitive& primitive): Primitive(primitive)
 	{
 	}
 	
@@ -57,6 +56,14 @@ namespace slib
 	}
 	
 	
+	IRenderCallback::IRenderCallback()
+	{
+	}
+
+	IRenderCallback::~IRenderCallback()
+	{
+	}
+
 	RendererParam::RendererParam()
 	{
 		nRedBits = 8;
@@ -756,4 +763,5 @@ namespace slib
 	{
 		return m_nCountDrawnPrimitivesOnLastScene;
 	}
+	
 }
