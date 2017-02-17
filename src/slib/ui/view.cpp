@@ -132,31 +132,22 @@ namespace slib
 	{
 	}
 
-	Ref<View::LayoutAttributes> View::_initializeLayoutAttributes()
+	void View::_initializeLayoutAttributes()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
-			return attrs;
+			return;
 		}
-		
 		ObjectLocker lock(this);
-		
-		attrs = m_layoutAttributes;
 		if (attrs.isNotNull()) {
-			return attrs;
+			return;
 		}
 		attrs = new LayoutAttributes;
 		if (attrs.isNull()) {
-			return sl_null;
+			return;
 		}
-		
 		attrs->frame = m_frame;
 		attrs->requestedFrame = m_frame;
-		
-		m_layoutAttributes = attrs;
-		
-		return attrs;
-		
 	}
 
 	View::TransformAttributes::TransformAttributes()
@@ -188,28 +179,17 @@ namespace slib
 	{
 	}
 
-	Ref<View::TransformAttributes> View::_initializeTransformAttributes()
+	void View::_initializeTransformAttributes()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
-			return attrs;
+			return;
 		}
-
 		ObjectLocker lock(this);
-		
-		attrs = m_transformAttributes;
 		if (attrs.isNotNull()) {
-			return attrs;
+			return;
 		}
 		attrs = new TransformAttributes;
-		if (attrs.isNull()) {
-			return sl_null;
-		}
-		
-		m_transformAttributes = attrs;
-		
-		return attrs;
-		
 	}
 
 	View::DrawAttributes::DrawAttributes()
@@ -245,29 +225,17 @@ namespace slib
 	{
 	}
 
-	Ref<View::DrawAttributes> View::_initializeDrawAttributes()
+	void View::_initializeDrawAttributes()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
-			return attrs;
+			return;
 		}
-
 		ObjectLocker lock(this);
-		
-		attrs = m_drawAttributes;
 		if (attrs.isNotNull()) {
-			return attrs;
+			return;
 		}
-		
 		attrs = new DrawAttributes;
-		if (attrs.isNull()) {
-			return sl_null;
-		}
-		
-		m_drawAttributes = attrs;
-		
-		return attrs;
-		
 	}
 
 	View::ScrollAttributes::ScrollAttributes()
@@ -303,27 +271,17 @@ namespace slib
 	{
 	}
 
-	Ref<View::ScrollAttributes> View::_initializeScrollAttributes()
+	void View::_initializeScrollAttributes()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
-			return attrs;
+			return;
 		}
-
 		ObjectLocker lock(this);
-		
-		attrs = m_scrollAttributes;
 		if (attrs.isNotNull()) {
-			return attrs;
+			return;
 		}
 		attrs = new ScrollAttributes;
-		if (attrs.isNull()) {
-			return sl_null;
-		}
-		
-		m_scrollAttributes = attrs;
-		
-		return attrs;
 	}
 
 	View::EventAttributes::EventAttributes()
@@ -334,27 +292,17 @@ namespace slib
 	{
 	}
 
-	Ref<View::EventAttributes> View::_initializeEventAttributes()
+	void View::_initializeEventAttributes()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
-			return attrs;
+			return;
 		}
-
 		ObjectLocker lock(this);
-		
-		attrs = m_eventAttributes;
 		if (attrs.isNotNull()) {
-			return attrs;
+			return;
 		}
 		attrs = new EventAttributes;
-		if (attrs.isNull()) {
-			return sl_null;
-		}
-		
-		m_eventAttributes = attrs;
-		
-		return attrs;
 	}
 
 	Ref<ViewInstance> View::getViewInstance()
@@ -606,7 +554,7 @@ namespace slib
 		return m_children.duplicate();
 	}
 
-	CList< Ref<View> >& View::_getChildren()
+	List< Ref<View> > View::_getChildren()
 	{
 		return m_children;
 	}
@@ -864,11 +812,12 @@ namespace slib
 		Ref<ViewInstance> instance = m_instance;
 		Ref<View> parent = getParent();
 		if (parent.isNotNull()) {
-			ObjectLocker lock(&(parent->m_children));
-			sl_reg index = parent->m_children.indexOf_NoLock(this);
+			List< Ref<View> > children = parent->m_children;
+			MutexLocker lock(children.getLocker());
+			sl_reg index = children.indexOf_NoLock(this);
 			if (index >= 0) {
-				parent->m_children.removeAt_NoLock(index);
-				parent->m_children.add_NoLock(this);
+				children.removeAt_NoLock(index);
+				children.add_NoLock(this);
 				if (instance.isNull()) {
 					if (mode == UIUpdateMode::Redraw) {
 						invalidateBoundsInParent();
@@ -1132,7 +1081,7 @@ namespace slib
 			_setFrame_NI(frame);
 		}
 		
-		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (layoutAttrs.isNotNull()) {
 			layoutAttrs->frame = frame;
 			layoutAttrs->requestedFrame = frame;
@@ -1261,7 +1210,7 @@ namespace slib
 		frame.fixSizeError();
 
 		if (mode != UIUpdateMode::Init) {
-			Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+			Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 			if (layoutAttrs.isNotNull()) {
 				Ref<View> parent = m_parent;
 				if (parent.isNotNull()) {
@@ -1488,7 +1437,7 @@ namespace slib
 		if (m_flagHover != flagState) {
 			m_flagHover = flagState;
 			if (mode == UIUpdateMode::Redraw) {
-				Ref<DrawAttributes> attrs = m_drawAttributes;
+				Ref<DrawAttributes>& attrs = m_drawAttrs;
 				if (attrs.isNotNull()) {
 					if (attrs->backgroundHover.isNotNull() && attrs->background != attrs->backgroundHover) {
 						invalidate();
@@ -1510,7 +1459,7 @@ namespace slib
 
 	void View::measureLayout()
 	{
-		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (layoutAttrs.isNull()) {
 			return;
 		}
@@ -1553,7 +1502,7 @@ namespace slib
 
 	sl_ui_len View::getMeasuredWidth()
 	{
-		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (layoutAttrs.isNotNull()) {
 			if (layoutAttrs->widthMode == SizeMode::Wrapping) {
 				return layoutAttrs->measuredWidth;
@@ -1569,7 +1518,7 @@ namespace slib
 
 	void View::setMeasuredWidth(sl_ui_len width)
 	{
-		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (layoutAttrs.isNotNull()) {
 			layoutAttrs->measuredWidth = width;
 		}
@@ -1577,7 +1526,7 @@ namespace slib
 
 	sl_ui_len View::getMeasuredHeight()
 	{
-		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (layoutAttrs.isNotNull()) {
 			if (layoutAttrs->heightMode == SizeMode::Wrapping) {
 				return layoutAttrs->measuredHeight;
@@ -1593,7 +1542,7 @@ namespace slib
 
 	void View::setMeasuredHeight(sl_ui_len height)
 	{
-		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (layoutAttrs.isNotNull()) {
 			layoutAttrs->measuredHeight = height;
 		}
@@ -1601,7 +1550,7 @@ namespace slib
 
 	void View::_prepareLayout(ViewPrepareLayoutParam& param)
 	{
-		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (layoutAttrs.isNull()) {
 			return;
 		}
@@ -1891,7 +1840,7 @@ namespace slib
 
 	void View::_makeLayout(sl_bool flagApplyLayout)
 	{
-		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (layoutAttrs.isNotNull()) {
 			if (flagApplyLayout) {
 				if (!(layoutAttrs->frame.isAlmostEqual(m_frame))) {
@@ -1935,7 +1884,7 @@ namespace slib
 					ListLocker< Ref<View> > children(m_children);
 					for (sl_size i = 0; i < children.count; i++) {
 						Ref<View>& child = children[i];
-						if (child.isNotNull() && child->m_layoutAttributes.isNotNull()) {
+						if (child.isNotNull() && child->m_layoutAttrs.isNotNull()) {
 							child->_prepareLayout(param);
 							child->setLayoutFrameUpdated(sl_false);
 						}
@@ -1953,7 +1902,7 @@ namespace slib
 					for (sl_size i = 0; i < children.count; i++) {
 						Ref<View>& child = children[i];
 						if (child.isNotNull()) {
-							Ref<LayoutAttributes> childLayoutAttrs = child->m_layoutAttributes;
+							Ref<LayoutAttributes>& childLayoutAttrs = child->m_layoutAttrs;
 							if (childLayoutAttrs.isNotNull() && !(child->isLayoutFrameUpdated())) {
 								child->_prepareLayout(param);
 								if (child->isOnPrepareLayoutEnabled()) {
@@ -1983,7 +1932,7 @@ namespace slib
 
 	void View::_measureRelativeBoundWidth()
 	{
-		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (layoutAttrs.isNull()) {
 			return;
 		}
@@ -2041,7 +1990,7 @@ namespace slib
 		if (leftMode == PositionMode::OtherStart || leftMode == PositionMode::OtherEnd) {
 			Ref<View> referView = layoutAttrs->leftReferingView;
 			if (referView.isNotNull()) {
-				Ref<LayoutAttributes> referLayoutAttrs = referView->m_layoutAttributes;
+				Ref<LayoutAttributes>& referLayoutAttrs = referView->m_layoutAttrs;
 				if (referLayoutAttrs.isNull()) {
 					if (leftMode == PositionMode::OtherStart) {
 						outerWidth += referView->m_frame.left - parentPaddingLeft;
@@ -2080,7 +2029,7 @@ namespace slib
 		if (rightMode == PositionMode::OtherStart || rightMode == PositionMode::OtherEnd) {
 			Ref<View> referView = layoutAttrs->rightReferingView;
 			if (referView.isNotNull()) {
-				Ref<LayoutAttributes> referLayoutAttrs = referView->m_layoutAttributes;
+				Ref<LayoutAttributes>& referLayoutAttrs = referView->m_layoutAttrs;
 				if (referLayoutAttrs.isNull()) {
 					layoutAttrs->flagBadRelativeBoundWidth = sl_true;
 					return;
@@ -2124,7 +2073,7 @@ namespace slib
 
 	void View::_measureRelativeBoundHeight()
 	{
-		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (layoutAttrs.isNull()) {
 			return;
 		}
@@ -2181,7 +2130,7 @@ namespace slib
 		if (topMode == PositionMode::OtherStart || topMode == PositionMode::OtherEnd) {
 			Ref<View> referView = layoutAttrs->topReferingView;
 			if (referView.isNotNull()) {
-				Ref<LayoutAttributes> referLayoutAttrs = referView->m_layoutAttributes;
+				Ref<LayoutAttributes>& referLayoutAttrs = referView->m_layoutAttrs;
 				if (referLayoutAttrs.isNull()) {
 					if (topMode == PositionMode::OtherStart) {
 						outerHeight += referView->m_frame.top - parentPaddingTop;
@@ -2221,7 +2170,7 @@ namespace slib
 		if (bottomMode == PositionMode::OtherStart || bottomMode == PositionMode::OtherEnd) {
 			Ref<View> referView = layoutAttrs->bottomReferingView;
 			if (referView.isNotNull()) {
-				Ref<LayoutAttributes> referLayoutAttrs = referView->m_layoutAttributes;
+				Ref<LayoutAttributes>& referLayoutAttrs = referView->m_layoutAttrs;
 				if (referLayoutAttrs.isNull()) {
 					layoutAttrs->flagBadRelativeBoundHeight = sl_true;
 					return;
@@ -2279,7 +2228,7 @@ namespace slib
 			Ref<View>& child = children[i];
 			if (child.isNotNull()) {
 				if (child->getVisibility() != Visibility::Gone) {
-					Ref<LayoutAttributes> layoutAttrs = child->m_layoutAttributes;
+					Ref<LayoutAttributes>& layoutAttrs = child->m_layoutAttrs;
 					if (layoutAttrs.isNotNull()) {
 						layoutAttrs->flagInvalidRelativeBoundWidth = sl_true;
 						layoutAttrs->flagInvalidRelativeBoundHeight = sl_true;
@@ -2292,7 +2241,7 @@ namespace slib
 			if (child.isNotNull()) {
 				if (child->getVisibility() != Visibility::Gone) {
 					if (child->getVisibility() != Visibility::Gone) {
-						Ref<LayoutAttributes> layoutAttrs = child->m_layoutAttributes;
+						Ref<LayoutAttributes>& layoutAttrs = child->m_layoutAttrs;
 						if (layoutAttrs.isNotNull()) {
 							if (flagHorizontal) {
 								child->_measureRelativeBoundWidth();
@@ -2384,7 +2333,7 @@ namespace slib
 			return;
 		}
 		m_flagInvalidLayout = sl_true;
-		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (layoutAttrs.isNotNull()) {
 			if (layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
 				layoutAttrs->flagInvalidMeasure = sl_true;
@@ -2420,14 +2369,9 @@ namespace slib
 		}
 	}
 
-	void View::resetLayout(UIUpdateMode mode)
-	{
-		m_layoutAttributes.setNull();
-	}
-
 	UIRect View::getLayoutFrame()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->frame;
 		}
@@ -2436,7 +2380,7 @@ namespace slib
 
 	void View::setLayoutFrame(const UIRect& _rect)
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			UIRect rect = _rect;
 			rect.right = rect.left + Math::clamp(rect.right - rect.left, attrs->minWidth, attrs->maxWidth);
@@ -2450,7 +2394,7 @@ namespace slib
 
 	sl_bool View::isLayoutFrameUpdated()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagUpdatedLayoutFrame;
 		}
@@ -2459,7 +2403,7 @@ namespace slib
 
 	void View::setLayoutFrameUpdated(sl_bool flag)
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagUpdatedLayoutFrame = flag;
 		}
@@ -2467,7 +2411,7 @@ namespace slib
 
 	sl_bool View::isOnPrepareLayoutEnabled()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagOnPrepareLayout;
 		}
@@ -2476,7 +2420,8 @@ namespace slib
 
 	void View::setOnPrepareLayoutEnabled(sl_bool flagEnabled, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagOnPrepareLayout = flagEnabled;
 		}
@@ -2484,7 +2429,7 @@ namespace slib
 
 	sl_bool View::isOnMakeLayoutEnabled()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagOnMakeLayout;
 		}
@@ -2493,7 +2438,8 @@ namespace slib
 
 	void View::setOnMakeLayoutEnabled(sl_bool flagEnabled, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagOnMakeLayout = flagEnabled;
 		}
@@ -2501,7 +2447,7 @@ namespace slib
 
 	SizeMode View::getWidthMode()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->widthMode;
 		}
@@ -2510,7 +2456,7 @@ namespace slib
 
 	SizeMode View::getHeightMode()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->heightMode;
 		}
@@ -2519,7 +2465,7 @@ namespace slib
 
 	sl_bool View::isWidthFixed()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->widthMode == SizeMode::Fixed;
 		}
@@ -2528,7 +2474,7 @@ namespace slib
 
 	void View::setWidthFixed(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->widthMode = SizeMode::Fixed;
 			invalidateLayoutFromResize(mode);
@@ -2537,7 +2483,7 @@ namespace slib
 
 	sl_bool View::isHeightFixed()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->heightMode == SizeMode::Fixed;
 		}
@@ -2546,7 +2492,7 @@ namespace slib
 
 	void View::setHeightFixed(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->heightMode = SizeMode::Fixed;
 			invalidateLayoutFromResize(mode);
@@ -2555,7 +2501,7 @@ namespace slib
 
 	void View::setSizeFixed(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->widthMode = SizeMode::Fixed;
 			attrs->heightMode = SizeMode::Fixed;
@@ -2565,7 +2511,7 @@ namespace slib
 
 	sl_real View::getWidthWeight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->widthWeight;
 		}
@@ -2574,7 +2520,7 @@ namespace slib
 
 	sl_bool View::isHeightWeight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->heightMode == SizeMode::Weight;
 		}
@@ -2583,7 +2529,7 @@ namespace slib
 
 	sl_bool View::isWidthFilling()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->widthMode == SizeMode::Filling;
 		}
@@ -2592,7 +2538,8 @@ namespace slib
 
 	void View::setWidthFilling(sl_real weight, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->widthMode = SizeMode::Filling;
 			attrs->widthWeight = weight;
@@ -2602,7 +2549,7 @@ namespace slib
 
 	sl_bool View::isHeightFilling()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->heightMode == SizeMode::Filling;
 		}
@@ -2611,7 +2558,8 @@ namespace slib
 
 	void View::setHeightFilling(sl_real weight, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->heightMode = SizeMode::Filling;
 			attrs->heightWeight = weight;
@@ -2621,7 +2569,8 @@ namespace slib
 
 	void View::setSizeFilling(sl_real widthWeight, sl_real heightWeight, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->widthMode = SizeMode::Filling;
 			attrs->widthWeight = widthWeight;
@@ -2633,7 +2582,7 @@ namespace slib
 
 	sl_bool View::isWidthWrapping()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->widthMode == SizeMode::Wrapping;
 		}
@@ -2642,7 +2591,8 @@ namespace slib
 
 	void View::setWidthWrapping(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->widthMode = SizeMode::Wrapping;
 			invalidateLayoutFromResizeContent(mode);
@@ -2651,7 +2601,7 @@ namespace slib
 
 	sl_bool View::isHeightWrapping()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->heightMode == SizeMode::Wrapping;
 		}
@@ -2660,7 +2610,8 @@ namespace slib
 
 	void View::setHeightWrapping(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->heightMode = SizeMode::Wrapping;
 			invalidateLayoutFromResizeContent(mode);
@@ -2669,7 +2620,8 @@ namespace slib
 
 	void View::setSizeWrapping(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->widthMode = SizeMode::Wrapping;
 			attrs->heightMode = SizeMode::Wrapping;
@@ -2679,7 +2631,7 @@ namespace slib
 
 	sl_bool View::isWidthWeight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->widthMode == SizeMode::Weight;
 		}
@@ -2688,7 +2640,8 @@ namespace slib
 
 	void View::setWidthWeight(sl_real weight, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->widthMode = SizeMode::Weight;
 			attrs->widthWeight = weight;
@@ -2698,7 +2651,7 @@ namespace slib
 
 	sl_real View::getHeightWeight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->heightWeight;
 		}
@@ -2707,7 +2660,8 @@ namespace slib
 
 	void View::setHeightWeight(sl_real weight, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->heightMode = SizeMode::Weight;
 			attrs->heightWeight = weight;
@@ -2717,7 +2671,8 @@ namespace slib
 
 	void View::setSizeWeight(sl_real widthWeight, sl_real heightWeight, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->widthMode = SizeMode::Weight;
 			attrs->widthWeight = widthWeight;
@@ -2729,7 +2684,7 @@ namespace slib
 
 	sl_bool View::isLayoutLeftFixed()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->leftMode == PositionMode::Fixed;
 		}
@@ -2738,7 +2693,7 @@ namespace slib
 
 	void View::setLayoutLeftFixed(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->leftMode = PositionMode::Fixed;
 			invalidateParentLayout(mode);
@@ -2747,7 +2702,7 @@ namespace slib
 
 	sl_bool View::isAlignParentLeft()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->leftMode == PositionMode::ParentEdge;
 		}
@@ -2756,7 +2711,8 @@ namespace slib
 
 	void View::setAlignParentLeft(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->leftMode = PositionMode::ParentEdge;
 			invalidateParentLayout(mode);
@@ -2765,7 +2721,7 @@ namespace slib
 
 	sl_bool View::isAlignLeft()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->leftMode == PositionMode::OtherStart;
 		}
@@ -2777,7 +2733,8 @@ namespace slib
 		if (view.isNull()) {
 			return;
 		}
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->leftMode = PositionMode::OtherStart;
 			attrs->leftReferingView = view;
@@ -2787,7 +2744,7 @@ namespace slib
 
 	sl_bool View::isRightOf()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->leftMode == PositionMode::OtherEnd;
 		}
@@ -2799,7 +2756,8 @@ namespace slib
 		if (view.isNull()) {
 			return;
 		}
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->leftMode = PositionMode::OtherEnd;
 			attrs->leftReferingView = view;
@@ -2809,7 +2767,7 @@ namespace slib
 
 	Ref<View> View::getLayoutLeftReferingView()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->leftReferingView;
 		}
@@ -2818,7 +2776,7 @@ namespace slib
 
 	sl_bool View::isLayoutRightFixed()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->rightMode == PositionMode::Fixed;
 		}
@@ -2827,7 +2785,7 @@ namespace slib
 
 	void View::setLayoutRightFixed(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->rightMode = PositionMode::Fixed;
 			invalidateParentLayout(mode);
@@ -2836,7 +2794,7 @@ namespace slib
 
 	sl_bool View::isAlignParentRight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->rightMode == PositionMode::ParentEdge;
 		}
@@ -2845,7 +2803,8 @@ namespace slib
 
 	void View::setAlignParentRight(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->rightMode = PositionMode::ParentEdge;
 			invalidateParentLayout(mode);
@@ -2854,7 +2813,7 @@ namespace slib
 
 	sl_bool View::isAlignRight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->rightMode == PositionMode::OtherEnd;
 		}
@@ -2866,7 +2825,8 @@ namespace slib
 		if (view.isNull()) {
 			return;
 		}
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->rightMode = PositionMode::OtherEnd;
 			attrs->rightReferingView = view;
@@ -2876,7 +2836,7 @@ namespace slib
 
 	sl_bool View::isLeftOf()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->rightMode == PositionMode::OtherStart;
 		}
@@ -2888,7 +2848,8 @@ namespace slib
 		if (view.isNull()) {
 			return;
 		}
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->rightMode = PositionMode::OtherStart;
 			attrs->rightReferingView = view;
@@ -2898,7 +2859,7 @@ namespace slib
 
 	Ref<View> View::getLayoutRightReferingView()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->rightReferingView;
 		}
@@ -2907,7 +2868,7 @@ namespace slib
 
 	sl_bool View::isLayoutTopFixed()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->topMode == PositionMode::Fixed;
 		}
@@ -2916,7 +2877,7 @@ namespace slib
 
 	void View::setLayoutTopFixed(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->topMode = PositionMode::Fixed;
 			invalidateParentLayout(mode);
@@ -2926,7 +2887,7 @@ namespace slib
 
 	sl_bool View::isAlignParentTop()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->topMode == PositionMode::ParentEdge;
 		}
@@ -2935,7 +2896,8 @@ namespace slib
 
 	void View::setAlignParentTop(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->topMode = PositionMode::ParentEdge;
 			invalidateParentLayout(mode);
@@ -2944,7 +2906,7 @@ namespace slib
 
 	sl_bool View::isAlignTop()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->topMode == PositionMode::OtherStart;
 		}
@@ -2956,7 +2918,8 @@ namespace slib
 		if (view.isNull()) {
 			return;
 		}
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->topMode = PositionMode::OtherStart;
 			attrs->topReferingView = view;
@@ -2966,7 +2929,7 @@ namespace slib
 
 	sl_bool View::isBelow()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->topMode == PositionMode::OtherEnd;
 		}
@@ -2978,7 +2941,8 @@ namespace slib
 		if (view.isNull()) {
 			return;
 		}
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->topMode = PositionMode::OtherEnd;
 			attrs->topReferingView = view;
@@ -2988,7 +2952,7 @@ namespace slib
 
 	Ref<View> View::getLayoutTopReferingView()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->topReferingView;
 		}
@@ -2997,7 +2961,7 @@ namespace slib
 
 	sl_bool View::isLayoutBottomFixed()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->bottomMode == PositionMode::Fixed;
 		}
@@ -3006,7 +2970,7 @@ namespace slib
 
 	void View::setLayoutBottomFixed(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->bottomMode = PositionMode::Fixed;
 			invalidateParentLayout(mode);
@@ -3015,7 +2979,7 @@ namespace slib
 
 	sl_bool View::isAlignParentBottom()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->bottomMode == PositionMode::ParentEdge;
 		}
@@ -3024,7 +2988,8 @@ namespace slib
 
 	void View::setAlignParentBottom(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->bottomMode = PositionMode::ParentEdge;
 			invalidateParentLayout(mode);
@@ -3033,7 +2998,7 @@ namespace slib
 
 	sl_bool View::isAlignBottom()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->bottomMode == PositionMode::OtherEnd;
 		}
@@ -3045,7 +3010,8 @@ namespace slib
 		if (view.isNotNull()) {
 			return;
 		}
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->bottomMode = PositionMode::OtherEnd;
 			attrs->bottomReferingView = view;
@@ -3055,7 +3021,7 @@ namespace slib
 
 	sl_bool View::isAbove()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->bottomMode == PositionMode::OtherStart;
 		}
@@ -3067,7 +3033,8 @@ namespace slib
 		if (view.isNotNull()) {
 			return;
 		}
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->bottomMode = PositionMode::OtherStart;
 			attrs->bottomReferingView = view;
@@ -3077,7 +3044,7 @@ namespace slib
 
 	Ref<View> View::getLayoutBottomReferingView()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->bottomReferingView;
 		}
@@ -3086,7 +3053,7 @@ namespace slib
 
 	sl_bool View::isCenterHorizontal()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->leftMode == PositionMode::CenterInParent;
 		}
@@ -3095,7 +3062,8 @@ namespace slib
 
 	void View::setCenterHorizontal(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->leftMode = PositionMode::CenterInParent;
 			invalidateParentLayout(mode);
@@ -3104,7 +3072,7 @@ namespace slib
 
 	sl_bool View::isCenterVertical()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->topMode == PositionMode::CenterInParent;
 		}
@@ -3113,7 +3081,8 @@ namespace slib
 
 	void View::setCenterVertical(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->topMode = PositionMode::CenterInParent;
 			invalidateParentLayout(mode);
@@ -3122,7 +3091,8 @@ namespace slib
 
 	void View::setCenterInParent(UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->leftMode = PositionMode::CenterInParent;
 			attrs->topMode = PositionMode::CenterInParent;
@@ -3132,7 +3102,7 @@ namespace slib
 
 	sl_bool View::isAlignCenterHorizontal()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->leftMode == PositionMode::CenterInOther;
 		}
@@ -3144,7 +3114,8 @@ namespace slib
 		if (view.isNotNull()) {
 			return;
 		}
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->leftMode = PositionMode::CenterInOther;
 			attrs->leftReferingView = view;
@@ -3154,7 +3125,7 @@ namespace slib
 
 	sl_bool View::isAlignCenterVertical()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->topMode == PositionMode::CenterInOther;
 		}
@@ -3166,7 +3137,8 @@ namespace slib
 		if (view.isNotNull()) {
 			return;
 		}
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->topMode = PositionMode::CenterInOther;
 			attrs->topReferingView = view;
@@ -3176,7 +3148,7 @@ namespace slib
 
 	sl_ui_len View::getMinimumWidth()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->minWidth;
 		}
@@ -3185,7 +3157,8 @@ namespace slib
 
 	void View::setMinimumWidth(sl_ui_len width, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			if (width < 0) {
 				width = 0;
@@ -3197,7 +3170,7 @@ namespace slib
 
 	sl_ui_len View::getMaximumWidth()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->maxWidth;
 		}
@@ -3206,7 +3179,8 @@ namespace slib
 
 	void View::setMaximumWidth(sl_ui_len width, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			if (width < 0) {
 				width = DEFAULT_MAX_SIZE;
@@ -3218,7 +3192,7 @@ namespace slib
 
 	sl_ui_len View::getMinimumHeight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->minHeight;
 		}
@@ -3227,7 +3201,8 @@ namespace slib
 
 	void View::setMinimumHeight(sl_ui_len height, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			if (height < 0) {
 				height = 0;
@@ -3239,7 +3214,7 @@ namespace slib
 
 	sl_ui_len View::getMaximumHeight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->maxHeight;
 		}
@@ -3248,7 +3223,8 @@ namespace slib
 
 	void View::setMaximumHeight(sl_ui_len height, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			if (height < 0) {
 				height = DEFAULT_MAX_SIZE;
@@ -3260,7 +3236,7 @@ namespace slib
 
 	AspectRatioMode View::getAspectRatioMode()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->aspectRatioMode;
 		}
@@ -3269,7 +3245,8 @@ namespace slib
 
 	void View::setAspectRatioMode(AspectRatioMode aspectRatioMode, UIUpdateMode updateMode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->aspectRatioMode = aspectRatioMode;
 			invalidateLayoutFromResize(updateMode);
@@ -3278,7 +3255,7 @@ namespace slib
 
 	sl_real View::getAspectRatio()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->aspectRatio;
 		}
@@ -3287,7 +3264,8 @@ namespace slib
 
 	void View::setAspectRatio(sl_real ratio, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			if (ratio < 0) {
 				ratio = 1;
@@ -3299,7 +3277,7 @@ namespace slib
 
 	sl_ui_pos View::getMarginLeft()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->marginLeft;
 		}
@@ -3308,7 +3286,8 @@ namespace slib
 
 	void View::setMarginLeft(sl_ui_pos marginLeft, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->marginLeft = marginLeft;
 			if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
@@ -3320,7 +3299,7 @@ namespace slib
 
 	sl_ui_pos View::getMarginTop()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->marginTop;
 		}
@@ -3329,7 +3308,8 @@ namespace slib
 
 	void View::setMarginTop(sl_ui_pos marginTop, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->marginTop = marginTop;
 			if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
@@ -3341,7 +3321,7 @@ namespace slib
 
 	sl_ui_pos View::getMarginRight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->marginRight;
 		}
@@ -3350,7 +3330,8 @@ namespace slib
 
 	void View::setMarginRight(sl_ui_pos marginRight, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->marginRight = marginRight;
 			invalidateParentLayout(mode);
@@ -3359,7 +3340,7 @@ namespace slib
 
 	sl_ui_pos View::getMarginBottom()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->marginBottom;
 		}
@@ -3368,7 +3349,8 @@ namespace slib
 
 	void View::setMarginBottom(sl_ui_pos marginBottom, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->marginBottom = marginBottom;
 			invalidateParentLayout(mode);
@@ -3377,7 +3359,8 @@ namespace slib
 
 	void View::setMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->marginLeft = left;
 			attrs->marginTop = top;
@@ -3389,7 +3372,8 @@ namespace slib
 
 	void View::setMargin(sl_ui_pos margin, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->marginLeft = margin;
 			attrs->marginTop = margin;
@@ -3401,7 +3385,7 @@ namespace slib
 
 	sl_bool View::isRelativeMarginLeft()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagRelativeMarginLeft;
 		}
@@ -3410,7 +3394,7 @@ namespace slib
 
 	sl_real View::getRelativeMarginLeftWeight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->relativeMarginLeftWeight;
 		}
@@ -3419,7 +3403,8 @@ namespace slib
 
 	void View::setRelativeMarginLeft(sl_real weight, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagRelativeMarginLeft = sl_true;
 			attrs->relativeMarginLeftWeight = weight;
@@ -3432,7 +3417,7 @@ namespace slib
 
 	sl_ui_pos View::getAbsoluteMarginLeft()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull() && !(attrs->flagRelativeMarginLeft)) {
 			if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
 				return 0;
@@ -3444,7 +3429,8 @@ namespace slib
 
 	void View::setAbsoluteMarginLeft(sl_ui_pos margin, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagRelativeMarginLeft = sl_false;
 			attrs->marginLeft = margin;
@@ -3457,7 +3443,7 @@ namespace slib
 
 	sl_bool View::isRelativeMarginTop()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagRelativeMarginTop;
 		}
@@ -3466,7 +3452,7 @@ namespace slib
 
 	sl_real View::getRelativeMarginTopWeight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->relativeMarginTopWeight;
 		}
@@ -3475,7 +3461,8 @@ namespace slib
 
 	void View::setRelativeMarginTop(sl_real weight, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagRelativeMarginTop = sl_true;
 			attrs->relativeMarginTopWeight = weight;
@@ -3488,7 +3475,7 @@ namespace slib
 
 	sl_ui_pos View::getAbsoluteMarginTop()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull() && !(attrs->flagRelativeMarginTop)) {
 			if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
 				return 0;
@@ -3500,7 +3487,8 @@ namespace slib
 
 	void View::setAbsoluteMarginTop(sl_ui_pos margin, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagRelativeMarginTop = sl_false;
 			attrs->marginTop = margin;
@@ -3513,7 +3501,7 @@ namespace slib
 
 	sl_bool View::isRelativeMarginRight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagRelativeMarginRight;
 		}
@@ -3522,7 +3510,7 @@ namespace slib
 
 	sl_real View::getRelativeMarginRightWeight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->relativeMarginRightWeight;
 		}
@@ -3531,7 +3519,8 @@ namespace slib
 
 	void View::setRelativeMarginRight(sl_real weight, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagRelativeMarginRight = sl_true;
 			attrs->relativeMarginRightWeight = weight;
@@ -3541,7 +3530,7 @@ namespace slib
 
 	sl_ui_pos View::getAbsoluteMarginRight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull() && !(attrs->flagRelativeMarginRight)) {
 			if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
 				return 0;
@@ -3553,7 +3542,8 @@ namespace slib
 
 	void View::setAbsoluteMarginRight(sl_ui_pos margin, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagRelativeMarginRight = sl_false;
 			attrs->marginRight = margin;
@@ -3563,7 +3553,7 @@ namespace slib
 
 	sl_bool View::isRelativeMarginBottom()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagRelativeMarginBottom;
 		}
@@ -3572,7 +3562,7 @@ namespace slib
 
 	sl_real View::getRelativeMarginBottomWeight()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->relativeMarginBottomWeight;
 		}
@@ -3581,7 +3571,8 @@ namespace slib
 
 	void View::setRelativeMarginBottom(sl_real weight, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagRelativeMarginBottom = sl_true;
 			attrs->relativeMarginBottomWeight = weight;
@@ -3591,7 +3582,7 @@ namespace slib
 
 	sl_ui_pos View::getAbsoluteMarginBottom()
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull() && !(attrs->flagRelativeMarginBottom)) {
 			if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
 				return 0;
@@ -3603,7 +3594,8 @@ namespace slib
 
 	void View::setAbsoluteMarginBottom(sl_ui_pos margin, UIUpdateMode mode)
 	{
-		Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
+		_initializeLayoutAttributes();
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagRelativeMarginBottom = sl_false;
 			attrs->marginBottom = margin;
@@ -3613,7 +3605,7 @@ namespace slib
 
 	void View::applyRelativeMargins(sl_ui_len parentWidth, sl_ui_len parentHeight)
 	{
-		Ref<LayoutAttributes> attrs = m_layoutAttributes;
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			if (attrs->flagRelativeMarginLeft) {
 				attrs->marginLeft = (sl_ui_pos)((sl_real)parentWidth * attrs->relativeMarginLeftWeight);
@@ -3700,7 +3692,7 @@ namespace slib
 
 	sl_bool View::getFinalTransform(Matrix3* _out)
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNull()) {
 			return sl_false;
 		}
@@ -3795,7 +3787,7 @@ namespace slib
 
 	sl_bool View::getFinalInverseTransform(Matrix3* _out)
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNull()) {
 			return sl_false;
 		}
@@ -3822,7 +3814,7 @@ namespace slib
 
 	const Matrix3& View::getTransform()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull() && attrs->flagTransform) {
 			return attrs->transform;
 		}
@@ -3831,7 +3823,8 @@ namespace slib
 
 	void View::setTransform(const Matrix3& matrix, UIUpdateMode mode)
 	{
-		Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+		_initializeTransformAttributes();
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagTransform = sl_true;
 			attrs->transform = matrix;
@@ -3841,7 +3834,7 @@ namespace slib
 
 	void View::resetTransform(UIUpdateMode mode)
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull() && attrs->flagTransform) {
 			attrs->flagTransform = sl_false;
 			_applyFinalTransform(mode);
@@ -3850,7 +3843,7 @@ namespace slib
 
 	sl_bool View::getFinalTranslationRotationScale(Vector2* translation, sl_real* rotation, Vector2* scale, Vector2* anchor)
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNull()) {
 			return sl_false;
 		}
@@ -3874,7 +3867,7 @@ namespace slib
 
 	sl_real View::getTranslationX()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->translation.x;
 		}
@@ -3883,7 +3876,7 @@ namespace slib
 
 	sl_real View::getTranslationY()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->translation.y;
 		}
@@ -3892,7 +3885,7 @@ namespace slib
 
 	const Vector2& View::getTranslation()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->translation;
 		}
@@ -3901,7 +3894,8 @@ namespace slib
 
 	void View::setTranslationX(sl_real tx, UIUpdateMode mode)
 	{
-		Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+		_initializeTransformAttributes();
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			attrs->translation.x = tx;
 			_applyCalcTransform(mode);
@@ -3910,7 +3904,8 @@ namespace slib
 
 	void View::setTranslationY(sl_real ty, UIUpdateMode mode)
 	{
-		Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+		_initializeTransformAttributes();
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			attrs->translation.y = ty;
 			_applyCalcTransform(mode);
@@ -3919,7 +3914,8 @@ namespace slib
 
 	void View::setTranslation(sl_real tx, sl_real ty, UIUpdateMode mode)
 	{
-		Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+		_initializeTransformAttributes();
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			attrs->translation.x = tx;
 			attrs->translation.y = ty;
@@ -3934,7 +3930,7 @@ namespace slib
 
 	sl_real View::getScaleX()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->scale.x;
 		}
@@ -3943,7 +3939,7 @@ namespace slib
 
 	sl_real View::getScaleY()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->scale.y;
 		}
@@ -3952,7 +3948,7 @@ namespace slib
 
 	const Vector2& View::getScale()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->scale;
 		}
@@ -3962,7 +3958,8 @@ namespace slib
 
 	void View::setScaleX(sl_real sx, UIUpdateMode mode)
 	{
-		Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+		_initializeTransformAttributes();
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			attrs->scale.x = sx;
 			_applyCalcTransform(mode);
@@ -3971,7 +3968,8 @@ namespace slib
 
 	void View::setScaleY(sl_real sy, UIUpdateMode mode)
 	{
-		Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+		_initializeTransformAttributes();
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			attrs->scale.y = sy;
 			_applyCalcTransform(mode);
@@ -3980,7 +3978,8 @@ namespace slib
 
 	void View::setScale(sl_real sx, sl_real sy, UIUpdateMode mode)
 	{
-		Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+		_initializeTransformAttributes();
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			attrs->scale.x = sx;
 			attrs->scale.y = sy;
@@ -4000,7 +3999,7 @@ namespace slib
 
 	sl_real View::getRotation()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->rotationAngle;
 		}
@@ -4009,7 +4008,8 @@ namespace slib
 
 	void View::setRotation(sl_real radian, UIUpdateMode mode)
 	{
-		Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+		_initializeTransformAttributes();
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			attrs->rotationAngle = radian;
 			_applyCalcTransform(mode);
@@ -4018,7 +4018,7 @@ namespace slib
 
 	sl_real View::getAnchorOffsetX()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->anchorOffset.x;
 		}
@@ -4027,7 +4027,7 @@ namespace slib
 
 	sl_real View::getAnchorOffsetY()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->anchorOffset.y;
 		}
@@ -4036,7 +4036,7 @@ namespace slib
 
 	const Vector2& View::getAnchorOffset()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->anchorOffset;
 		}
@@ -4045,7 +4045,8 @@ namespace slib
 
 	void View::setAnchorOffsetX(sl_real x, UIUpdateMode mode)
 	{
-		Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+		_initializeTransformAttributes();
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			attrs->anchorOffset.x = x;
 			_applyCalcTransform(mode);
@@ -4054,7 +4055,8 @@ namespace slib
 
 	void View::setAnchorOffsetY(sl_real y, UIUpdateMode mode)
 	{
-		Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+		_initializeTransformAttributes();
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			attrs->anchorOffset.y = y;
 			_applyCalcTransform(mode);
@@ -4063,7 +4065,8 @@ namespace slib
 
 	void View::setAnchorOffset(sl_real x, sl_real y, UIUpdateMode mode)
 	{
-		Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+		_initializeTransformAttributes();
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			attrs->anchorOffset.x = x;
 			attrs->anchorOffset.y = y;
@@ -4078,7 +4081,7 @@ namespace slib
 
 	void View::_applyCalcTransform(UIUpdateMode mode)
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagTransformCalcInvalid = sl_true;
 			if (!(attrs->flagTransform)) {
@@ -4089,7 +4092,7 @@ namespace slib
 
 	void View::_applyFinalTransform(UIUpdateMode mode)
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagTransformFinalInvalid = sl_true;
 			if (mode != UIUpdateMode::Init) {
@@ -4295,7 +4298,7 @@ namespace slib
 
 	Ref<Drawable> View::getBackground()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->background;
 		}
@@ -4304,7 +4307,8 @@ namespace slib
 
 	void View::setBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->background = drawable;
 			if (mode == UIUpdateMode::Redraw) {
@@ -4315,7 +4319,7 @@ namespace slib
 
 	Ref<Drawable> View::getPressedBackground()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->backgroundPressed;
 		}
@@ -4324,7 +4328,8 @@ namespace slib
 
 	void View::setPressedBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->backgroundPressed = drawable;
 			if (mode == UIUpdateMode::Redraw) {
@@ -4335,7 +4340,7 @@ namespace slib
 
 	Ref<Drawable> View::getHoverBackground()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->backgroundHover;
 		}
@@ -4344,7 +4349,8 @@ namespace slib
 
 	void View::setHoverBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->backgroundHover = drawable;
 			if (mode == UIUpdateMode::Redraw) {
@@ -4355,7 +4361,7 @@ namespace slib
 
 	ScaleMode View::getBackgroundScaleMode()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->backgroundScaleMode;
 		}
@@ -4364,7 +4370,8 @@ namespace slib
 
 	void View::setBackgroundScaleMode(ScaleMode scaleMode, UIUpdateMode updateMode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->backgroundScaleMode = scaleMode;
 			if (updateMode == UIUpdateMode::Redraw) {
@@ -4375,7 +4382,7 @@ namespace slib
 
 	Alignment View::getBackgroundAlignment()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->backgroundAlignment;
 		}
@@ -4384,9 +4391,10 @@ namespace slib
 
 	void View::setBackgroundAlignment(Alignment align, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> draw = _initializeDrawAttributes();
-		if (draw.isNotNull()) {
-			draw->backgroundAlignment = align;
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			attrs->backgroundAlignment = align;
 			if (mode == UIUpdateMode::Redraw) {
 				invalidate();
 			}
@@ -4395,7 +4403,7 @@ namespace slib
 
 	Color View::getBackgroundColor()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->backgroundColor;
 		}
@@ -4404,7 +4412,8 @@ namespace slib
 
 	void View::setBackgroundColor(const Color& color, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->backgroundColor = color;
 			if (isNativeWidget()) {
@@ -4419,7 +4428,7 @@ namespace slib
 
 	Ref<Pen> View::getBorder()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->penBorder;
 		}
@@ -4428,7 +4437,8 @@ namespace slib
 
 	void View::setBorder(const Ref<Pen>& pen, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->penBorder = pen;
 			if (mode == UIUpdateMode::Redraw) {
@@ -4439,7 +4449,7 @@ namespace slib
 
 	Color View::getBorderColor()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->borderColor;
 		}
@@ -4448,7 +4458,8 @@ namespace slib
 
 	void View::setBorderColor(const Color& color, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->borderColor = color;
 			_refreshBorderPen(mode);
@@ -4483,7 +4494,7 @@ namespace slib
 
 	PenStyle View::getBorderStyle()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->borderStyle;
 		}
@@ -4492,7 +4503,8 @@ namespace slib
 
 	void View::setBorderStyle(PenStyle style, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->borderStyle = style;
 			_refreshBorderPen(mode);
@@ -4501,7 +4513,7 @@ namespace slib
 
 	sl_real View::getBorderWidth()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->borderWidth;
 		}
@@ -4510,7 +4522,8 @@ namespace slib
 
 	void View::setBorderWidth(sl_real width, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->borderWidth = width;
 			_refreshBorderPen(mode);
@@ -4519,7 +4532,7 @@ namespace slib
 
 	void View::_refreshBorderPen(UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			sl_real width = attrs->borderWidth;
 			Ref<Pen> pen;
@@ -4532,7 +4545,7 @@ namespace slib
 
 	BoundShape View::getBoundShape()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->boundShape;
 		}
@@ -4541,7 +4554,8 @@ namespace slib
 
 	void View::setBoundShape(BoundShape shape, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->boundShape = shape;
 			if (mode == UIUpdateMode::Redraw) {
@@ -4552,7 +4566,7 @@ namespace slib
 
 	const Size& View::getRoundRectBoundShapeRadius()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->roundRectBoundShapeRadius;
 		}
@@ -4561,7 +4575,8 @@ namespace slib
 
 	void View::setRoundRectBoundShapeRadius(const Size& radius, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->roundRectBoundShapeRadius = radius;
 			if (mode == UIUpdateMode::Redraw) {
@@ -4577,7 +4592,8 @@ namespace slib
 
 	void View::setRoundRectBoundShapeRadiusX(sl_real rx, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->roundRectBoundShapeRadius.x = rx;
 			if (mode == UIUpdateMode::Redraw) {
@@ -4588,7 +4604,8 @@ namespace slib
 
 	void View::setRoundRectBoundShapeRadiusY(sl_real ry, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->roundRectBoundShapeRadius.y = ry;
 			if (mode == UIUpdateMode::Redraw) {
@@ -4604,7 +4621,7 @@ namespace slib
 
 	Ref<GraphicsPath> View::getBoundShapePath()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->boundShapePath;
 		}
@@ -4613,7 +4630,8 @@ namespace slib
 
 	void View::setBoundShapePath(const Ref<GraphicsPath>& path, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->boundShapePath = path;
 			if (mode == UIUpdateMode::Redraw) {
@@ -4624,7 +4642,7 @@ namespace slib
 
 	sl_bool View::isPreDrawEnabled()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagPreDrawEnabled;
 		}
@@ -4633,7 +4651,8 @@ namespace slib
 
 	void View::setPreDrawEnabled(sl_bool flagEnabled, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagPreDrawEnabled = flagEnabled;
 			if (mode == UIUpdateMode::Redraw) {
@@ -4644,7 +4663,7 @@ namespace slib
 
 	sl_bool View::isPostDrawEnabled()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagPostDrawEnabled;
 		}
@@ -4653,7 +4672,8 @@ namespace slib
 
 	void View::setPostDrawEnabled(sl_bool flagEnabled, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagPostDrawEnabled = flagEnabled;
 			if (mode == UIUpdateMode::Redraw) {
@@ -4664,7 +4684,7 @@ namespace slib
 
 	sl_bool View::isAlwaysOnDrawBackground()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagOnDrawBackgroundAlways;
 		}
@@ -4673,7 +4693,8 @@ namespace slib
 
 	void View::setAlwaysOnDrawBackground(sl_bool flagEnabled, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagOnDrawBackgroundAlways = flagEnabled;
 			if (mode == UIUpdateMode::Redraw) {
@@ -4684,7 +4705,7 @@ namespace slib
 
 	sl_bool View::isAlwaysOnDrawBorder()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagOnDrawBorderAlways;
 		}
@@ -4693,7 +4714,8 @@ namespace slib
 
 	void View::setAlwaysOnDrawBorder(sl_bool flagEnabled, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagOnDrawBorderAlways = flagEnabled;
 			if (mode == UIUpdateMode::Redraw) {
@@ -4704,7 +4726,7 @@ namespace slib
 
 	Ref<Font> View::getFont()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			Ref<Font> font = attrs->font;
 			if (font.isNotNull()) {
@@ -4744,7 +4766,8 @@ namespace slib
 
 	void View::setFont(const Ref<Font>& font, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			if (mode != UIUpdateMode::Init) {
 				_setFontInvalidateChildInstances();
@@ -4794,7 +4817,7 @@ namespace slib
 
 	sl_bool View::isUsingFont()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagUsingFont;
 		}
@@ -4803,7 +4826,8 @@ namespace slib
 
 	void View::setUsingFont(sl_bool flag)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagUsingFont = flag;
 		}
@@ -4811,7 +4835,7 @@ namespace slib
 
 	sl_bool View::isOpaque()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagOpaque;
 		}
@@ -4820,7 +4844,8 @@ namespace slib
 
 	void View::setOpaque(sl_bool flag, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagOpaque = flag;
 			Ref<ViewInstance> instance = m_instance;
@@ -4836,7 +4861,7 @@ namespace slib
 
 	sl_real View::getAlpha()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->alpha;
 		}
@@ -4845,7 +4870,8 @@ namespace slib
 
 	void View::setAlpha(sl_real alpha, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->alpha = alpha;
 #if defined(SLIB_PLATFORM_IS_WIN32)
@@ -4869,7 +4895,7 @@ namespace slib
 
 	sl_bool View::isLayer()
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagLayer;
 		}
@@ -4878,7 +4904,8 @@ namespace slib
 
 	void View::setLayer(sl_bool flagLayer, UIUpdateMode mode)
 	{
-		Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagLayer = flagLayer;
 			if (mode == UIUpdateMode::Redraw) {
@@ -4889,27 +4916,29 @@ namespace slib
 
 	void View::invalidateLayer()
 	{
-		Ref<DrawAttributes> draw = m_drawAttributes;
-		if (draw.isNotNull()) {
-			draw->flagInvalidatedLayer = sl_true;
-			draw->flagInvalidatedWholeLayer = sl_true;
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			attrs->flagInvalidatedLayer = sl_true;
+			attrs->flagInvalidatedWholeLayer = sl_true;
 		}
 	}
 
 	void View::invalidateLayer(const UIRect& rect)
 	{
-		Ref<DrawAttributes> draw = m_drawAttributes;
-		if (draw.isNotNull()) {
-			if (draw->flagInvalidatedLayer) {
-				if (!(draw->flagInvalidatedWholeLayer)) {
-					UIRect r = draw->rectInvalidatedLayer;
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			if (attrs->flagInvalidatedLayer) {
+				if (!(attrs->flagInvalidatedWholeLayer)) {
+					UIRect r = attrs->rectInvalidatedLayer;
 					r.mergeRectangle(rect);
-					draw->rectInvalidatedLayer = r;
+					attrs->rectInvalidatedLayer = r;
 				}
 			} else {
-				draw->rectInvalidatedLayer = rect;
-				draw->flagInvalidatedWholeLayer = sl_false;
-				draw->flagInvalidatedLayer = sl_true;
+				attrs->rectInvalidatedLayer = rect;
+				attrs->flagInvalidatedWholeLayer = sl_false;
+				attrs->flagInvalidatedLayer = sl_true;
 			}
 		}
 	}
@@ -4944,7 +4973,7 @@ namespace slib
 
 	Ref<Animation> View::getTransformAnimation()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->m_animationTransform;
 		}
@@ -4954,7 +4983,8 @@ namespace slib
 	void View::setTransformAnimation(const Ref<Animation>& animation, const AnimationFrames<Matrix3>& frames)
 	{
 		if (animation.isNotNull()) {
-			Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+			_initializeTransformAttributes();
+			Ref<TransformAttributes>& attrs = m_transformAttrs;
 			if (attrs.isNotNull()) {
 				animation->addTarget(new ViewTransformAnimationTarget(this, frames));
 				attrs->m_animationTransform = animation;
@@ -4976,7 +5006,8 @@ namespace slib
 	{
 		Ref<Animation> animation = createAnimation(new ViewTransformAnimationTarget(this, frames), duration, onStop, curve, flags);
 		if (animation.isNotNull()) {
-			Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+			_initializeTransformAttributes();
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 			if (attrs.isNotNull()) {
 				attrs->m_animationTransform = animation;
 			}
@@ -4996,7 +5027,7 @@ namespace slib
 
 	Ref<Animation> View::getTranslateAnimation()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->m_animationTranslate;
 		}
@@ -5006,7 +5037,8 @@ namespace slib
 	void View::setTranslateAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames)
 	{
 		if (animation.isNotNull()) {
-			Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+			_initializeTransformAttributes();
+			Ref<TransformAttributes>& attrs = m_transformAttrs;
 			if (attrs.isNotNull()) {
 				animation->addTarget(new ViewTranslateAnimationTarget(this, frames));
 				attrs->m_animationTranslate = animation;
@@ -5028,7 +5060,8 @@ namespace slib
 	{
 		Ref<Animation> animation = createAnimation(new ViewTranslateAnimationTarget(this, frames), duration, onStop, curve, flags);
 		if (animation.isNotNull()) {
-			Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+			_initializeTransformAttributes();
+			Ref<TransformAttributes>& attrs = m_transformAttrs;
 			if (attrs.isNotNull()) {
 				attrs->m_animationTranslate = animation;
 			}
@@ -5048,7 +5081,7 @@ namespace slib
 
 	Ref<Animation> View::getScaleAnimation()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->m_animationScale;
 		}
@@ -5058,7 +5091,8 @@ namespace slib
 	void View::setScaleAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames)
 	{
 		if (animation.isNotNull()) {
-			Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+			_initializeTransformAttributes();
+			Ref<TransformAttributes>& attrs = m_transformAttrs;
 			if (attrs.isNotNull()) {
 				animation->addTarget(new ViewScaleAnimationTarget(this, frames));
 				attrs->m_animationScale = animation;
@@ -5090,7 +5124,8 @@ namespace slib
 	{
 		Ref<Animation> animation = createAnimation(new ViewScaleAnimationTarget(this, frames), duration, onStop, curve, flags);
 		if (animation.isNotNull()) {
-			Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+			_initializeTransformAttributes();
+			Ref<TransformAttributes>& attrs = m_transformAttrs;
 			if (attrs.isNotNull()) {
 				attrs->m_animationScale = animation;
 			}
@@ -5120,7 +5155,7 @@ namespace slib
 
 	Ref<Animation> View::getRotateAnimation()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->m_animationRotate;
 		}
@@ -5130,7 +5165,8 @@ namespace slib
 	void View::setRotateAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames)
 	{
 		if (animation.isNotNull()) {
-			Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+			_initializeTransformAttributes();
+			Ref<TransformAttributes>& attrs = m_transformAttrs;
 			if (attrs.isNotNull()) {
 				animation->addTarget(new ViewRotateAnimationTarget(this, frames));
 				attrs->m_animationRotate = animation;
@@ -5152,7 +5188,8 @@ namespace slib
 	{
 		Ref<Animation> animation = createAnimation(new ViewRotateAnimationTarget(this, frames), duration, onStop, curve, flags);
 		if (animation.isNotNull()) {
-			Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+			_initializeTransformAttributes();
+			Ref<TransformAttributes>& attrs = m_transformAttrs;
 			if (attrs.isNotNull()) {
 				attrs->m_animationRotate = animation;
 			}
@@ -5172,7 +5209,7 @@ namespace slib
 
 	Ref<Animation> View::getFrameAnimation()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->m_animationFrame;
 		}
@@ -5182,7 +5219,8 @@ namespace slib
 	void View::setFrameAnimation(const Ref<Animation>& animation, const AnimationFrames<Rectangle>& frames)
 	{
 		if (animation.isNotNull()) {
-			Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+			_initializeTransformAttributes();
+			Ref<TransformAttributes>& attrs = m_transformAttrs;
 			if (attrs.isNotNull()) {
 				animation->addTarget(new ViewFrameAnimationTarget(this, frames));
 				attrs->m_animationFrame = animation;
@@ -5204,7 +5242,8 @@ namespace slib
 	{
 		Ref<Animation> animation = createAnimation(new ViewFrameAnimationTarget(this, frames), duration, onStop, curve, flags);
 		if (animation.isNotNull()) {
-			Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+			_initializeTransformAttributes();
+			Ref<TransformAttributes>& attrs = m_transformAttrs;
 			if (attrs.isNotNull()) {
 				attrs->m_animationFrame = animation;
 			}
@@ -5224,7 +5263,7 @@ namespace slib
 
 	Ref<Animation> View::getAlphaAnimation()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->m_animationAlpha;
 		}
@@ -5234,7 +5273,8 @@ namespace slib
 	void View::setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames)
 	{
 		if (animation.isNotNull()) {
-			Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+			_initializeTransformAttributes();
+			Ref<TransformAttributes>& attrs = m_transformAttrs;
 			if (attrs.isNotNull()) {
 				animation->addTarget(new ViewAlphaAnimationTarget(this, frames));
 				attrs->m_animationAlpha = animation;
@@ -5256,7 +5296,8 @@ namespace slib
 	{
 		Ref<Animation> animation = createAnimation(new ViewAlphaAnimationTarget(this, frames), duration, onStop, curve, flags);
 		if (animation.isNotNull()) {
-			Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+			_initializeTransformAttributes();
+			Ref<TransformAttributes>& attrs = m_transformAttrs;
 			if (attrs.isNotNull()) {
 				attrs->m_animationAlpha = animation;
 			}
@@ -5276,7 +5317,7 @@ namespace slib
 
 	Ref<Animation> View::getBackgroundColorAnimation()
 	{
-		Ref<TransformAttributes> attrs = m_transformAttributes;
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->m_animationBackgroundColor;
 		}
@@ -5286,7 +5327,8 @@ namespace slib
 	void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const AnimationFrames<Color4f>& frames)
 	{
 		if (animation.isNotNull()) {
-			Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+			_initializeTransformAttributes();
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 			if (attrs.isNotNull()) {
 				animation->addTarget(new ViewBackgroundColorAnimationTarget(this, frames));
 				attrs->m_animationBackgroundColor = animation;
@@ -5308,7 +5350,8 @@ namespace slib
 	{
 		Ref<Animation> animation = createAnimation(new ViewBackgroundColorAnimationTarget(this, frames), duration, onStop, curve, flags);
 		if (animation.isNotNull()) {
-			Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+			_initializeTransformAttributes();
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
 			if (attrs.isNotNull()) {
 				attrs->m_animationBackgroundColor = animation;
 			}
@@ -5328,7 +5371,7 @@ namespace slib
 
 	sl_bool View::isHorizontalScrolling()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagHorz;
 		}
@@ -5337,7 +5380,8 @@ namespace slib
 
 	void View::setHorizontalScrolling(sl_bool flagHorizontal)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagHorz = flagHorizontal;
 		}
@@ -5345,7 +5389,7 @@ namespace slib
 
 	sl_bool View::isVerticalScrolling()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagVert;
 		}
@@ -5354,7 +5398,8 @@ namespace slib
 
 	void View::setVerticalScrolling(sl_bool flagVertical)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagVert = flagVertical;
 		}
@@ -5362,7 +5407,7 @@ namespace slib
 
 	Ref<ScrollBar> View::getHorizontalScrollBar()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->horz;
 		}
@@ -5371,7 +5416,7 @@ namespace slib
 
 	Ref<ScrollBar> View::getVerticalScrollBar()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->vert;
 		}
@@ -5380,7 +5425,8 @@ namespace slib
 
 	void View::setHorizontalScrollBar(const Ref<ScrollBar>& bar, UIUpdateMode mode)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			removeChild(attrs->horz, UIUpdateMode::NoRedraw);
 			attrs->horz = bar;
@@ -5390,7 +5436,8 @@ namespace slib
 
 	void View::setVerticalScrollBar(const Ref<ScrollBar>& bar, UIUpdateMode mode)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			removeChild(attrs->vert, UIUpdateMode::NoRedraw);
 			attrs->vert = bar;
@@ -5434,7 +5481,7 @@ namespace slib
 
 	sl_bool View::isHorizontalScrollBarVisible()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagHorzScrollBarVisible;
 		}
@@ -5443,7 +5490,7 @@ namespace slib
 
 	sl_bool View::isVerticalScrollBarVisible()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagVertScrollBarVisible;
 		}
@@ -5462,7 +5509,8 @@ namespace slib
 
 	void View::setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagHorzScrollBarVisible = flagHorizontal;
 			attrs->flagVertScrollBarVisible = flagVertical;
@@ -5500,7 +5548,7 @@ namespace slib
 
 	sl_scroll_pos View::getScrollX()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->x;
 		}
@@ -5509,7 +5557,7 @@ namespace slib
 
 	sl_scroll_pos View::getScrollY()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->y;
 		}
@@ -5518,7 +5566,7 @@ namespace slib
 
 	ScrollPoint View::getScrollPosition()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return ScrollPoint(attrs->x, attrs->y);
 		}
@@ -5527,7 +5575,8 @@ namespace slib
 
 	void View::scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		
 		if (attrs.isNotNull()) {
 			
@@ -5561,7 +5610,8 @@ namespace slib
 
 	void View::smoothScrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		
 		if (attrs.isNotNull()) {
 			
@@ -5595,7 +5645,8 @@ namespace slib
 
 	void View::setScrollX(sl_scroll_pos x, UIUpdateMode mode)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			scrollTo(x, attrs->y, mode);
 		}
@@ -5603,7 +5654,8 @@ namespace slib
 
 	void View::setScrollY(sl_scroll_pos y, UIUpdateMode mode)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			scrollTo(attrs->x, y, mode);
 		}
@@ -5611,7 +5663,7 @@ namespace slib
 
 	sl_scroll_pos View::getContentWidth()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->contentWidth;
 		}
@@ -5620,7 +5672,7 @@ namespace slib
 
 	sl_scroll_pos View::getContentHeight()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->contentHeight;
 		}
@@ -5629,7 +5681,7 @@ namespace slib
 
 	ScrollPoint View::getContentSize()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return ScrollPoint(attrs->contentWidth, attrs->contentHeight);
 		}
@@ -5638,7 +5690,8 @@ namespace slib
 
 	void View::setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMode mode)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			if (Math::isAlmostZero(width - attrs->contentWidth) && Math::isAlmostZero(height - attrs->contentHeight)) {
 				attrs->contentWidth = width;
@@ -5660,7 +5713,8 @@ namespace slib
 
 	void View::setContentWidth(sl_scroll_pos width, UIUpdateMode mode)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			setContentSize(width, attrs->contentHeight, mode);
 		}
@@ -5668,7 +5722,8 @@ namespace slib
 
 	void View::setContentHeight(sl_scroll_pos height, UIUpdateMode mode)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			setContentSize(attrs->contentWidth, height, mode);
 		}
@@ -5676,7 +5731,7 @@ namespace slib
 
 	ScrollPoint View::getScrollRange()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			ScrollPoint ret(attrs->contentWidth - (sl_scroll_pos)(getWidth()), attrs->contentHeight - (sl_scroll_pos)(getHeight()));
 			if (ret.x < 0) {
@@ -5692,7 +5747,7 @@ namespace slib
 
 	sl_ui_len View::getScrollBarWidth()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->barWidth;
 		}
@@ -5701,7 +5756,8 @@ namespace slib
 
 	void View::setScrollBarWidth(sl_ui_len width, UIUpdateMode mode)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			attrs->barWidth = width;
 			refreshScroll(mode);
@@ -5710,7 +5766,7 @@ namespace slib
 
 	sl_bool View::isContentScrollingByMouse()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagContentScrollingByMouse;
 		}
@@ -5719,7 +5775,8 @@ namespace slib
 
 	void View::setContentScrollingByMouse(sl_bool flag)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagContentScrollingByMouse = flag;
 		}
@@ -5727,7 +5784,7 @@ namespace slib
 
 	sl_bool View::isContentScrollingByTouch()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagContentScrollingByTouch;
 		}
@@ -5736,7 +5793,8 @@ namespace slib
 
 	void View::setContentScrollingByTouch(sl_bool flag)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagContentScrollingByTouch = flag;
 		}
@@ -5744,7 +5802,7 @@ namespace slib
 
 	sl_bool View::isContentScrollingByMouseWheel()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagContentScrollingByMouseWheel;
 		}
@@ -5753,7 +5811,8 @@ namespace slib
 
 	void View::setContentScrollingByMouseWheel(sl_bool flag)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagContentScrollingByMouseWheel = flag;
 		}
@@ -5761,7 +5820,7 @@ namespace slib
 
 	sl_bool View::isContentScrollingByKeyboard()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagContentScrollingByKeyboard;
 		}
@@ -5770,7 +5829,8 @@ namespace slib
 
 	void View::setContentScrollingByKeyboard(sl_bool flag)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagContentScrollingByKeyboard = flag;
 		}
@@ -5778,7 +5838,7 @@ namespace slib
 
 	sl_bool View::isSmoothContentScrolling()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagSmoothContentScrolling;
 		}
@@ -5787,7 +5847,8 @@ namespace slib
 
 	void View::setSmoothContentScrolling(sl_bool flag)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagSmoothContentScrolling = flag;
 		}
@@ -5831,7 +5892,7 @@ namespace slib
 		if (mode == UIUpdateMode::Init) {
 			return;
 		}
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			sl_ui_pos width = getWidth();
 			sl_ui_pos height = getHeight();
@@ -5872,7 +5933,7 @@ namespace slib
 
 	sl_bool View::isPaging()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->flagPaging;
 		}
@@ -5881,7 +5942,8 @@ namespace slib
 
 	void View::setPaging(sl_bool flagPaging)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagPaging = flagPaging;
 			onUpdatePaging();
@@ -5890,7 +5952,7 @@ namespace slib
 
 	sl_ui_len View::getPageWidth()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->pageWidth;
 		}
@@ -5899,7 +5961,8 @@ namespace slib
 
 	void View::setPageWidth(sl_ui_len width)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			attrs->pageWidth = width;
 			onUpdatePaging();
@@ -5908,7 +5971,7 @@ namespace slib
 
 	sl_ui_len View::getPageHeight()
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->pageHeight;
 		}
@@ -5917,7 +5980,8 @@ namespace slib
 
 	void View::setPageHeight(sl_ui_len height)
 	{
-		Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			attrs->pageHeight = height;
 			onUpdatePaging();
@@ -5945,7 +6009,7 @@ namespace slib
 
 	void View::_getScrollBars(Ref<View> views[2])
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			if (attrs->flagValidHorz) {
 				Ref<ScrollBar> bar = attrs->horz;
@@ -5968,7 +6032,7 @@ namespace slib
 
 	void View::_initScrollBars(UIUpdateMode mode)
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			if (attrs->flagHorz && attrs->flagHorzScrollBarVisible) {
 				if (!(attrs->flagInitHorzScrollBar)) {
@@ -5993,7 +6057,7 @@ namespace slib
 
 	sl_bool View::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagFinish, sl_bool flagAnimate)
 	{
-		Ref<ScrollAttributes> attrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNull()) {
 			return sl_false;
 		}
@@ -6445,7 +6509,7 @@ namespace slib
 		sl_uint32 width = getWidth();
 		sl_uint32 height = getHeight();
 		
-		Ref<DrawAttributes> drawAttrs = m_drawAttributes;
+		Ref<DrawAttributes>& drawAttrs = m_drawAttrs;
 
 		if (drawAttrs.isNotNull()) {
 			Rectangle rcClip(0, 0, (sl_real)width, (sl_real)height);
@@ -6477,7 +6541,7 @@ namespace slib
 					onDrawBackground(canvas);
 				}
 			}
-			Ref<ScrollAttributes> scrollAttrs = m_scrollAttributes;
+			Ref<ScrollAttributes>& scrollAttrs = m_scrollAttrs;
 			if (scrollAttrs.isNotNull()) {
 				sl_real scrollX = (sl_real)(scrollAttrs->x);
 				sl_real scrollY = (sl_real)(scrollAttrs->y);
@@ -6486,7 +6550,7 @@ namespace slib
 				}
 			}
 			onDraw(canvas);
-			Ref<EventAttributes> eventAttrs = m_eventAttributes;
+			Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 			if (eventAttrs.isNotNull()) {
 				(eventAttrs->draw)(this, canvas);
 			}
@@ -6502,7 +6566,8 @@ namespace slib
 
 	Ref<Bitmap> View::drawLayer()
 	{
-		Ref<DrawAttributes> drawAttrs = _initializeDrawAttributes();
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& drawAttrs = m_drawAttrs;
 		if (drawAttrs.isNull()) {
 			return sl_null;
 		}
@@ -6609,9 +6674,23 @@ namespace slib
 	void View::runAfterDraw(const Function<void()>& callback, sl_bool flagInvalidate)
 	{
 		if (callback.isNotNull()) {
-			m_runAfterDrawCallbacks.push(callback);
-			if (flagInvalidate) {
-				invalidate();
+			_initializeDrawAttributes();
+			Ref<DrawAttributes>& attrs = m_drawAttrs;
+			if (attrs.isNotNull()) {
+				if (attrs->runAfterDrawCallbacks.isNull()) {
+					ObjectLocker lock(this);
+					if (attrs->runAfterDrawCallbacks.isNull()) {
+						attrs->runAfterDrawCallbacks.pushBack(callback);
+						if (flagInvalidate) {
+							invalidate();
+						}
+						return;
+					}
+				}
+				attrs->runAfterDrawCallbacks.pushBack(callback);
+				if (flagInvalidate) {
+					invalidate();
+				}
 			}
 		}
 	}
@@ -6679,7 +6758,7 @@ namespace slib
 
 	Ptr<IViewListener> View::getEventListener()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->listener;
 		}
@@ -6688,7 +6767,8 @@ namespace slib
 
 	void View::setEventListener(const Ptr<IViewListener>& listener)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->listener = listener;
 		}
@@ -6696,7 +6776,7 @@ namespace slib
 
 	Function<void(View*, Canvas*)> View::getOnDraw()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->draw;
 		}
@@ -6705,7 +6785,8 @@ namespace slib
 
 	void View::setOnDraw(const Function<void(View*, Canvas*)>& callback)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->draw = callback;
 		}
@@ -6713,7 +6794,7 @@ namespace slib
 
 	Function<void(View*, Canvas*)> View::getOnPreDraw()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->preDraw;
 		}
@@ -6722,7 +6803,8 @@ namespace slib
 
 	void View::setOnPreDraw(const Function<void(View*, Canvas*)>& callback)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->preDraw = callback;
 		}
@@ -6730,7 +6812,7 @@ namespace slib
 
 	Function<void(View*, Canvas*)> View::getOnPostDraw()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->postDraw;
 		}
@@ -6739,7 +6821,8 @@ namespace slib
 
 	void View::setOnPostDraw(const Function<void(View*, Canvas*)>& callback)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->postDraw = callback;
 		}
@@ -6747,7 +6830,7 @@ namespace slib
 
 	Function<void(View*, UIEvent*)> View::getOnMouseEvent()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->mouse;
 		}
@@ -6756,7 +6839,8 @@ namespace slib
 
 	void View::setOnMouseEvent(const Function<void(View*, UIEvent*)>& callback)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->mouse = callback;
 		}
@@ -6764,7 +6848,7 @@ namespace slib
 
 	Function<void(View*, UIEvent*)> View::getOnTouchEvent()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->touch;
 		}
@@ -6773,7 +6857,8 @@ namespace slib
 
 	void View::setOnTouchEvent(const Function<void(View*, UIEvent*)>& callback)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->touch = callback;
 		}
@@ -6781,7 +6866,7 @@ namespace slib
 
 	Function<void(View*, UIEvent*)> View::getOnKeyEvent()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->key;
 		}
@@ -6790,7 +6875,8 @@ namespace slib
 
 	void View::setOnKeyEvent(const Function<void(View*, UIEvent*)>& callback)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->key = callback;
 		}
@@ -6798,7 +6884,7 @@ namespace slib
 
 	Function<void(View*, UIEvent*)> View::getOnMouseWheelEvent()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->mouseWheel;
 		}
@@ -6807,7 +6893,8 @@ namespace slib
 
 	void View::setOnMouseWheelEvent(const Function<void(View*, UIEvent*)>& callback)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->mouseWheel = callback;
 		}
@@ -6815,7 +6902,7 @@ namespace slib
 
 	Function<void(View*)> View::getOnClick()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->click;
 		}
@@ -6824,7 +6911,8 @@ namespace slib
 
 	void View::setOnClick(const Function<void(View*)>& callback)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->click = callback;
 		}
@@ -6832,7 +6920,7 @@ namespace slib
 
 	Function<void(View*, UIEvent*)> View::getOnSetCursor()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->setCursor;
 		}
@@ -6841,7 +6929,8 @@ namespace slib
 
 	void View::setOnSetCursor(const Function<void(View*, UIEvent*)>& callback)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->setCursor = callback;
 		}
@@ -6849,7 +6938,7 @@ namespace slib
 
 	Function<void(View*, sl_ui_len, sl_ui_len)> View::getOnResize()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->resize;
 		}
@@ -6858,7 +6947,8 @@ namespace slib
 
 	void View::setOnResize(const Function<void(View*, sl_ui_len, sl_ui_len)>& callback)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->resize = callback;
 		}
@@ -6866,7 +6956,7 @@ namespace slib
 
 	Function<void(View*, sl_scroll_pos, sl_scroll_pos)> View::getOnScroll()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->scroll;
 		}
@@ -6875,7 +6965,8 @@ namespace slib
 
 	void View::setOnScroll(const Function<void(View*, sl_scroll_pos, sl_scroll_pos)>& callback)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->scroll = callback;
 		}
@@ -6883,7 +6974,7 @@ namespace slib
 
 	Function<void(View*, GestureEvent*)> View::getOnSwipe()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->swipe;
 		}
@@ -6892,7 +6983,8 @@ namespace slib
 
 	void View::setOnSwipe(const Function<void(View*, GestureEvent*)>& callback)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->swipe = callback;
 		}
@@ -6900,7 +6992,7 @@ namespace slib
 
 	Function<void(View*, UIEvent*)> View::getOnOK()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->ok;
 		}
@@ -6909,7 +7001,8 @@ namespace slib
 
 	void View::setOnOK(const Function<void(View*, UIEvent*)>& callback)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->ok = callback;
 		}
@@ -6917,7 +7010,7 @@ namespace slib
 
 	Function<void(View*, UIEvent*)> View::getOnCancel()
 	{
-		Ref<EventAttributes> attrs = m_eventAttributes;
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			return attrs->cancel;
 		}
@@ -6926,7 +7019,8 @@ namespace slib
 
 	void View::setOnCancel(const Function<void(View*, UIEvent*)>& callback)
 	{
-		Ref<EventAttributes> attrs = _initializeEventAttributes();
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
 		if (attrs.isNotNull()) {
 			attrs->cancel = callback;
 		}
@@ -6954,7 +7048,7 @@ namespace slib
 				_makeLayout(sl_false);
 			}
 			
-			Ref<DrawAttributes> drawAttrs = m_drawAttributes;
+			Ref<DrawAttributes>& drawAttrs = m_drawAttrs;
 			if (drawAttrs.isNotNull() && drawAttrs->flagPreDrawEnabled) {
 				onPreDraw(canvas);
 				getOnPreDraw()(this, canvas);
@@ -6982,13 +7076,15 @@ namespace slib
 		
 		m_flagCurrentDrawing = sl_false;
 		
-		sl_size n = m_runAfterDrawCallbacks.getCount();
-		Function<void()> callback;
-		while (n > 0 && m_runAfterDrawCallbacks.pop(&callback)) {
-			callback();
-			n--;
+		Ref<DrawAttributes>& drawAttrs = m_drawAttrs;
+		if (drawAttrs.isNotNull()) {
+			sl_size n = drawAttrs->runAfterDrawCallbacks.getCount();
+			Function<void()> callback;
+			while (n > 0 && drawAttrs->runAfterDrawCallbacks.popFront(&callback)) {
+				callback();
+				n--;
+			}
 		}
-		
 	}
 
 	void View::onDraw(Canvas* canvas)
@@ -7011,7 +7107,7 @@ namespace slib
 
 	void View::onDrawBackground(Canvas* canvas)
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			Ref<Drawable> background;
 			if (isPressedState()) {
@@ -7028,7 +7124,7 @@ namespace slib
 
 	void View::onDrawBorder(Canvas* canvas)
 	{
-		Ref<DrawAttributes> attrs = m_drawAttributes;
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			drawBorder(canvas, attrs->penBorder);
 		}
@@ -7206,7 +7302,7 @@ namespace slib
 		
 		ev->resetStates();
 		
-		Ref<EventAttributes> eventAttrs = m_eventAttributes;
+		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->mouse)(this, ev);
 			if (ev->isPreventedDefault()) {
@@ -7409,7 +7505,7 @@ namespace slib
 		
 		ev->resetStates();
 		
-		Ref<EventAttributes> eventAttrs = m_eventAttributes;
+		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->touch)(this, ev);
 			if (ev->isPreventedDefault()) {
@@ -7675,7 +7771,7 @@ namespace slib
 		
 		ev->resetStates();
 		
-		Ref<EventAttributes> eventAttrs = m_eventAttributes;
+		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->mouseWheel)(this, ev);
 			if (ev->isPreventedDefault()) {
@@ -7760,7 +7856,7 @@ namespace slib
 		
 		ev->resetStates();
 		
-		Ref<EventAttributes> eventAttrs = m_eventAttributes;
+		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->key)(this, ev);
 			if (ev->isPreventedDefault()) {
@@ -7833,7 +7929,7 @@ namespace slib
 			return;
 		}
 
-		Ref<EventAttributes> eventAttrs = m_eventAttributes;
+		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->click)(this);
 			if (ev->isPreventedDefault()) {
@@ -7892,7 +7988,7 @@ namespace slib
 		
 		ev->resetStates();
 		
-		Ref<EventAttributes> eventAttrs = m_eventAttributes;
+		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->setCursor)(this, ev);
 			if (ev->isPreventedDefault()) {
@@ -7963,7 +8059,7 @@ namespace slib
 	{
 		refreshScroll(UIUpdateMode::NoRedraw);
 		onResize(width, height);
-		Ref<EventAttributes> eventAttrs = m_eventAttributes;
+		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			PtrLocker<IViewListener> listener(eventAttrs->listener);
 			if (listener.isNotNull()) {
@@ -7980,7 +8076,7 @@ namespace slib
 	void View::dispatchChangeVisibility(Visibility oldVisibility, Visibility newVisibility)
 	{
 		onChangeVisibility(oldVisibility, newVisibility);
-		Ref<EventAttributes> eventAttrs = m_eventAttributes;
+		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			PtrLocker<IViewListener> listener(eventAttrs->listener);
 			if (listener.isNotNull()) {
@@ -7996,7 +8092,7 @@ namespace slib
 	void View::dispatchScroll(sl_scroll_pos x, sl_scroll_pos y)
 	{
 		onScroll(x, y);
-		Ref<EventAttributes> eventAttrs = m_eventAttributes;
+		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			PtrLocker<IViewListener> listener(eventAttrs->listener);
 			if (listener.isNotNull()) {
@@ -8009,7 +8105,7 @@ namespace slib
 	void View::dispatchSwipe(GestureEvent* ev)
 	{
 		onSwipe(ev);
-		Ref<EventAttributes> eventAttrs = m_eventAttributes;
+		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			PtrLocker<IViewListener> listener(eventAttrs->listener);
 			if (listener.isNotNull()) {
@@ -8022,7 +8118,7 @@ namespace slib
 	void View::dispatchOK(UIEvent* ev)
 	{
 		onOK(ev);
-		Ref<EventAttributes> eventAttrs = m_eventAttributes;
+		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->ok)(this, ev);
 		}
@@ -8051,7 +8147,7 @@ namespace slib
 	void View::dispatchCancel(UIEvent* ev)
 	{
 		onCancel(ev);
-		Ref<EventAttributes> eventAttrs = m_eventAttributes;
+		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->cancel)(this, ev);
 		}
@@ -8133,7 +8229,7 @@ namespace slib
 
 	void View::_processContentScrollingEvents(UIEvent* ev)
 	{
-		Ref<ScrollAttributes> scrollAttrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& scrollAttrs = m_scrollAttrs;
 		if (scrollAttrs.isNull()) {
 			return;
 		}
@@ -8330,7 +8426,7 @@ namespace slib
 
 	void View::_startContentScrollingFlow(sl_bool flagSmoothTarget, const Pointlf& speedOrTarget)
 	{
-		Ref<ScrollAttributes> scrollAttrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& scrollAttrs = m_scrollAttrs;
 		if (scrollAttrs.isNull()) {
 			return;
 		}
@@ -8355,7 +8451,7 @@ namespace slib
 			dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(View, _stopContentScrollingFlow, this));
 			return;
 		}
-		Ref<ScrollAttributes> scrollAttrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& scrollAttrs = m_scrollAttrs;
 		if (scrollAttrs.isNull()) {
 			return;
 		}
@@ -8388,7 +8484,7 @@ namespace slib
 
 	void View::_processContentScrollingFlow()
 	{
-		Ref<ScrollAttributes> scrollAttrs = m_scrollAttributes;
+		Ref<ScrollAttributes>& scrollAttrs = m_scrollAttrs;
 		if (scrollAttrs.isNull()) {
 			return;
 		}

@@ -286,9 +286,7 @@ namespace slib
 		void invalidateLayoutFromResizeContent(UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		void invalidateParentLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		void resetLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
-		
+				
 		UIRect getLayoutFrame();
 		
 		void setLayoutFrame(const UIRect& rect);
@@ -1294,7 +1292,7 @@ namespace slib
 	protected:
 		void measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 		
-		CList< Ref<View> >& _getChildren();
+		List< Ref<View> > _getChildren();
 
 	public:
 		void _setFrame_NI(const UIRect& frame);
@@ -1336,7 +1334,7 @@ namespace slib
 		AtomicRef<Cursor> m_cursor;
 		
 		AtomicString m_id;
-		CList< Ref<View> > m_children;
+		AtomicList< Ref<View> > m_children;
 		AtomicList< Ref<View> > m_childrenMultiTouch;
 		AtomicRef<View> m_childMouseMove;
 		AtomicRef<View> m_childMouseDown;
@@ -1425,9 +1423,9 @@ namespace slib
 			~LayoutAttributes();
 			
 		};
-		AtomicRef<LayoutAttributes> m_layoutAttributes;
+		Ref<LayoutAttributes> m_layoutAttrs;
 		
-		Ref<LayoutAttributes> _initializeLayoutAttributes();
+		void _initializeLayoutAttributes();
 
 		class TransformAttributes : public Referable
 		{
@@ -1467,9 +1465,9 @@ namespace slib
 			~TransformAttributes();
 			
 		};
-		AtomicRef<TransformAttributes> m_transformAttributes;
+		Ref<TransformAttributes> m_transformAttrs;
 		
-		Ref<TransformAttributes> _initializeTransformAttributes();
+		void _initializeTransformAttributes();
 		
 		class DrawAttributes : public Referable
 		{
@@ -1507,6 +1505,8 @@ namespace slib
 			sl_bool flagInvalidatedLayer;
 			sl_bool flagInvalidatedWholeLayer;
 			UIRect rectInvalidatedLayer;
+
+			LinkedList< Function<void()> > runAfterDrawCallbacks;
 			
 		public:
 			DrawAttributes();
@@ -1514,9 +1514,9 @@ namespace slib
 			~DrawAttributes();
 			
 		};
-		AtomicRef<DrawAttributes> m_drawAttributes;
+		Ref<DrawAttributes> m_drawAttrs;
 		
-		Ref<DrawAttributes> _initializeDrawAttributes();
+		void _initializeDrawAttributes();
 
 		class ScrollAttributes : public Referable
 		{
@@ -1564,9 +1564,9 @@ namespace slib
 			~ScrollAttributes();
 			
 		};
-		AtomicRef<ScrollAttributes> m_scrollAttributes;
+		Ref<ScrollAttributes> m_scrollAttrs;
 		
-		Ref<ScrollAttributes> _initializeScrollAttributes();
+		void _initializeScrollAttributes();
 		
 		class EventAttributes : public Referable
 		{
@@ -1594,13 +1594,11 @@ namespace slib
 			
 		};
 		
-		AtomicRef<EventAttributes> m_eventAttributes;
+		Ref<EventAttributes> m_eventAttrs;
 		
-		Ref<EventAttributes> _initializeEventAttributes();
+		void _initializeEventAttributes();
 
 		
-		Queue< Function<void()> > m_runAfterDrawCallbacks;
-
 		friend class ListView;
 
 	};

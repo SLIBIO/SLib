@@ -17,10 +17,6 @@
 #include "../../../inc/slib/core/platform_windows.h"
 #endif
 
-#if defined(SLIB_PLATFORM_IS_APPLE)
-#include <libkern/OSAtomic.h>
-#endif
-
 namespace slib
 {
 
@@ -856,10 +852,8 @@ namespace slib
 		SLIB_ASSERT(SLIB_IS_ALIGNED_4(pValue));
 #ifdef SLIB_PLATFORM_IS_WINDOWS
 		return (sl_int32)InterlockedIncrement((LONG*)pValue);
-#elif defined(SLIB_PLATFORM_IS_APPLE)
-		return OSAtomicIncrement32Barrier((int32_t*)pValue);
-#elif defined(SLIB_PLATFORM_IS_UNIX)
-		return __sync_fetch_and_add(pValue, 1) + 1;
+#else
+		return __atomic_add_fetch(pValue, 1, __ATOMIC_RELAXED);
 #endif
 	}
 
@@ -868,10 +862,8 @@ namespace slib
 		SLIB_ASSERT(SLIB_IS_ALIGNED_4(pValue));
 #ifdef SLIB_PLATFORM_IS_WINDOWS
 		return (sl_int32)InterlockedDecrement((LONG*)pValue);
-#elif defined(SLIB_PLATFORM_IS_APPLE)
-		return OSAtomicDecrement32Barrier((int32_t*)pValue);
-#elif defined(SLIB_PLATFORM_IS_UNIX)
-		return __sync_fetch_and_add(pValue, -1) - 1;
+#else
+		return __atomic_add_fetch(pValue, -1, __ATOMIC_RELAXED);
 #endif
 	}
 
@@ -880,10 +872,8 @@ namespace slib
 		SLIB_ASSERT(SLIB_IS_ALIGNED_4(pDst));
 #ifdef SLIB_PLATFORM_IS_WINDOWS
 		return ((sl_int32)InterlockedExchangeAdd((LONG*)pDst, (LONG)value)) + value;
-#elif defined(SLIB_PLATFORM_IS_APPLE)
-		return OSAtomicAdd32Barrier((int32_t)value, (int32_t*)pDst);
-#elif defined(SLIB_PLATFORM_IS_UNIX)
-		return __sync_fetch_and_add(pDst, value) + value;
+#else
+		return __atomic_add_fetch(pDst, value, __ATOMIC_RELAXED);
 #endif
 	}
 
@@ -898,9 +888,7 @@ namespace slib
 		old = ((sl_int32)InterlockedCompareExchange((void**)pDst, (void*)value, (void*)comparand));
 #	endif
 		return old == comparand;
-#elif defined(SLIB_PLATFORM_IS_APPLE)
-		return OSAtomicCompareAndSwap32Barrier((int32_t)comparand, (int32_t)value, (int32_t*)pDst) != false;
-#elif defined(SLIB_PLATFORM_IS_UNIX)
+#else
 		return __sync_bool_compare_and_swap(pDst, comparand, value) != 0;
 #endif
 	}
@@ -916,10 +904,8 @@ namespace slib
 		sl_int64 r = *pValue = *pValue + 1;
 		return r;
 #	endif
-#elif defined(SLIB_PLATFORM_IS_APPLE)
-		return OSAtomicIncrement64Barrier(pValue);
-#elif defined(SLIB_PLATFORM_IS_UNIX)
-		return __sync_fetch_and_add(pValue, 1) + 1;
+#else
+		return __atomic_add_fetch(pValue, 1, __ATOMIC_RELAXED);
 #endif
 	}
 
@@ -934,10 +920,8 @@ namespace slib
 		sl_int64 r = *pValue = *pValue - 1;
 		return r;
 #	endif
-#elif defined(SLIB_PLATFORM_IS_APPLE)
-		return OSAtomicDecrement64Barrier(pValue);
-#elif defined(SLIB_PLATFORM_IS_UNIX)
-		return __sync_fetch_and_add(pValue, -1) - 1;
+#else
+		return __atomic_add_fetch(pValue, -1, __ATOMIC_RELAXED);
 #endif
 	}
 
@@ -952,10 +936,8 @@ namespace slib
 		sl_int64 r = *pDst = *pDst + value;
 		return r;
 #	endif
-#elif defined(SLIB_PLATFORM_IS_APPLE)
-		return OSAtomicAdd64Barrier(value, pDst);
-#elif defined(SLIB_PLATFORM_IS_UNIX)
-		return __sync_fetch_and_add(pDst, value) + value;
+#else
+		return __atomic_add_fetch(pDst, value, __ATOMIC_RELAXED);
 #endif
 	}
 
@@ -975,9 +957,7 @@ namespace slib
 		}
 		return sl_false;
 #	endif
-#elif defined(SLIB_PLATFORM_IS_APPLE)
-		return OSAtomicCompareAndSwap64Barrier(comparand, value, pDst) != false;
-#elif defined(SLIB_PLATFORM_IS_UNIX)
+#else
 		return __sync_bool_compare_and_swap(pDst, comparand, value) != 0;
 #endif
 	}

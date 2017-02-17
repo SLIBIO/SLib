@@ -230,7 +230,7 @@ namespace slib
 	void RenderView::onDrawBackground(Canvas* canvas)
 	{
 		if (isNativeWidget()) {
-			Ref<DrawAttributes> attrs = m_drawAttributes;
+			Ref<DrawAttributes>& attrs = m_drawAttrs;
 			if (attrs.isNotNull()) {
 				Ref<Drawable> background;
 				if (isPressedState()) {

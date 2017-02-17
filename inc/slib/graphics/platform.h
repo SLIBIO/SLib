@@ -20,6 +20,8 @@
 #include "../core/platform_apple.h"
 #include <CoreText/CoreText.h>
 #include <CoreGraphics/CoreGraphics.h>
+#elif defined(SLIB_PLATFORM_IS_TIZEN)
+#include <Evas.h>
 #endif
 
 namespace slib
@@ -107,6 +109,9 @@ namespace slib
 		static void getMatrix3FromCGAffineTransform(Matrix3& _out, const CGAffineTransform& transform);
 
 #	endif
+
+#elif defined(SLIB_PLATFORM_IS_TIZEN)
+
 #endif
 
 	};

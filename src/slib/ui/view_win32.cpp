@@ -17,7 +17,7 @@ namespace slib
 	class _View : public View
 	{
 	public:
-		SLIB_INLINE CList< Ref<View> >& _getChildren()
+		SLIB_INLINE List< Ref<View> > _getChildren()
 		{
 			return View::_getChildren();
 		}

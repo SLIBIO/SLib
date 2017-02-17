@@ -637,7 +637,7 @@ namespace slib
 		ButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
 		Ref<Drawable> background = params.background;
 		if (background.isNull()) {
-			Ref<DrawAttributes> attrs = m_drawAttributes;
+			Ref<DrawAttributes>& attrs = m_drawAttrs;
 			if (attrs.isNotNull()) {
 				switch (m_state) {
 					case ButtonState::Hover:
