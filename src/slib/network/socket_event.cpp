@@ -107,5 +107,21 @@ namespace slib
 	{
 		return m_socket;
 	}
-	
+
+	sl_bool Socket::connectAndWait(const SocketAddress& address, sl_int32 timeout)
+	{
+		setNonBlockingMode(sl_true);
+		if (connect(address)) {
+			Ref<SocketEvent> ev = SocketEvent::createWrite(this);
+			if (ev.isNotNull()) {
+				if (ev->waitEvents(timeout) & SocketEvent::Write) {
+					if (getOption_Error() == 0) {
+						return sl_true;
+					}
+				}
+			}
+		}
+		return sl_false;
+	}
+
 }

@@ -66,7 +66,7 @@ namespace slib
 	
 	Ref<SocketEvent> SocketEvent::create(const Ref<Socket>& socket)
 	{
-		return _Unix_SocketEvent::create(socket);
+		return Ref<SocketEvent>::from(_Unix_SocketEvent::create(socket));
 	}
 
 	sl_bool SocketEvent::__waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* status, sl_uint32 count, sl_int32 timeout)

@@ -464,7 +464,8 @@ namespace slib
 				return sl_false;
 			}
 			sockaddr_storage addr;
-			if (sl_uint32 addr_size = _Socket_apply_address(m_type, addr, address)) {
+			sl_uint32 addr_size = _Socket_apply_address(m_type, addr, address);
+			if (addr_size) {
 				int ret = ::connect((SOCKET)(m_socket), (sockaddr*)&addr, (int)addr_size);
 				if (ret != SOCKET_ERROR) {
 					return sl_true;
@@ -484,22 +485,6 @@ namespace slib
 			_setClosedError();
 			return sl_false;
 		}
-	}
-
-	sl_bool Socket::connectAndWait(const SocketAddress& address, sl_int32 timeout)
-	{
-		setNonBlockingMode(sl_true);
-		if (connect(address)) {
-			Ref<SocketEvent> ev = SocketEvent::createWrite(this);
-			if (ev.isNotNull()) {
-				if (ev->waitEvents(timeout) & SocketEvent::Write) {
-					if (getOption_Error() == 0) {
-						return sl_true;
-					}
-				}
-			}
-		}
-		return sl_false;
 	}
 
 	sl_int32 Socket::send(const void* buf, sl_uint32 size)

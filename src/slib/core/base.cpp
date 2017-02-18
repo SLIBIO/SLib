@@ -14,7 +14,24 @@
 #include <stdio.h>
 
 #ifdef SLIB_PLATFORM_IS_WINDOWS
+
 #include "../../../inc/slib/core/platform_windows.h"
+
+#	if defined(_WIN64) || _WIN32_WINNT >= 0x0502
+#	else
+#		define NOT_SUPPORT_ATOMIC_64BIT
+#	endif
+
+#else
+
+#	if defined(__clang__)
+#		if defined(SLIB_PLATFORM_IS_TIZEN)
+#			if !defined(SLIB_ARCH_IS_64BIT)
+#				define NOT_SUPPORT_ATOMIC_64BIT
+#			endif
+#		endif
+#	endif
+
 #endif
 
 namespace slib
@@ -896,59 +913,55 @@ namespace slib
 	sl_int64 Base::interlockedIncrement64(sl_int64* pValue)
 	{
 		SLIB_ASSERT(SLIB_IS_ALIGNED_8(pValue));
-#ifdef SLIB_PLATFORM_IS_WINDOWS
-#	if defined(_WIN64) || _WIN32_WINNT >= 0x0502
-		return (sl_int64)InterlockedIncrement64((LONGLONG*)pValue);
-#	else
+#ifdef NOT_SUPPORT_ATOMIC_64BIT
 		SpinLocker lock(SpinLockPoolForBase::get(pValue));
 		sl_int64 r = *pValue = *pValue + 1;
 		return r;
-#	endif
 #else
+#	ifdef SLIB_PLATFORM_IS_WINDOWS
+		return (sl_int64)InterlockedIncrement64((LONGLONG*)pValue);
+#	else
 		return __atomic_add_fetch(pValue, 1, __ATOMIC_RELAXED);
+#	endif
 #endif
 	}
 
 	sl_int64 Base::interlockedDecrement64(sl_int64* pValue)
 	{
 		SLIB_ASSERT(SLIB_IS_ALIGNED_8(pValue));
-#ifdef SLIB_PLATFORM_IS_WINDOWS
-#	if defined(_WIN64) || _WIN32_WINNT >= 0x0502
-		return (sl_int64)InterlockedDecrement64((LONGLONG*)pValue);
-#	else
+#ifdef NOT_SUPPORT_ATOMIC_64BIT
 		SpinLocker lock(SpinLockPoolForBase::get(pValue));
 		sl_int64 r = *pValue = *pValue - 1;
 		return r;
-#	endif
 #else
+#	ifdef SLIB_PLATFORM_IS_WINDOWS
+		return (sl_int64)InterlockedDecrement64((LONGLONG*)pValue);
+#	else
 		return __atomic_add_fetch(pValue, -1, __ATOMIC_RELAXED);
+#	endif
 #endif
 	}
 
 	sl_int64 Base::interlockedAdd64(sl_int64* pDst, sl_int64 value)
 	{
 		SLIB_ASSERT(SLIB_IS_ALIGNED_8(pDst));
-#ifdef SLIB_PLATFORM_IS_WINDOWS
-#	if defined(_WIN64) || _WIN32_WINNT >= 0x0502
-		return ((sl_int64)InterlockedExchangeAdd64((LONGLONG*)pDst, (LONGLONG)value)) + value;
-#	else
+#ifdef NOT_SUPPORT_ATOMIC_64BIT
 		SpinLocker lock(SpinLockPoolForBase::get(pDst));
 		sl_int64 r = *pDst = *pDst + value;
 		return r;
-#	endif
 #else
+#	ifdef SLIB_PLATFORM_IS_WINDOWS
+		return ((sl_int64)InterlockedExchangeAdd64((LONGLONG*)pDst, (LONGLONG)value)) + value;
+#	else
 		return __atomic_add_fetch(pDst, value, __ATOMIC_RELAXED);
+#	endif
 #endif
 	}
 
 	sl_bool Base::interlockedCompareExchange64(sl_int64* pDst, sl_int64 value, sl_int64 comparand)
 	{
 		SLIB_ASSERT(SLIB_IS_ALIGNED_8(pDst));
-#ifdef SLIB_PLATFORM_IS_WINDOWS
-#	if defined(_WIN64) || _WIN32_WINNT >= 0x0502
-		sl_int64 old = ((sl_int64)InterlockedCompareExchange64((LONGLONG*)pDst, (LONGLONG)value, (LONGLONG)comparand));
-		return old == comparand;
-#	else
+#ifdef NOT_SUPPORT_ATOMIC_64BIT
 		SpinLocker lock(SpinLockPoolForBase::get(pDst));
 		sl_int64 o = *pDst;
 		if (o == comparand) {
@@ -956,9 +969,13 @@ namespace slib
 			return sl_true;
 		}
 		return sl_false;
-#	endif
 #else
+#	ifdef SLIB_PLATFORM_IS_WINDOWS
+		sl_int64 old = ((sl_int64)InterlockedCompareExchange64((LONGLONG*)pDst, (LONGLONG)value, (LONGLONG)comparand));
+		return old == comparand;
+#	else
 		return __sync_bool_compare_and_swap(pDst, comparand, value) != 0;
+#	endif
 #endif
 	}
 
