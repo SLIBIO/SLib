@@ -1085,6 +1085,7 @@ namespace slib
 		if (layoutAttrs.isNotNull()) {
 			layoutAttrs->frame = frame;
 			layoutAttrs->requestedFrame = frame;
+			layoutAttrs->flagInvalidMeasure = sl_true;
 		}
 		
 		if (!(flagNotResizeWidth && flagNotResizeHeight)) {
