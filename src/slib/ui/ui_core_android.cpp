@@ -113,14 +113,9 @@ namespace slib
 		List< Ref<Screen> > ret;
 		Ref<Screen> screen = UI::getPrimaryScreen();
 		if (screen.isNotNull()) {
-			ret.add(screen);
+			ret.add_NoLock(screen);
 		}
 		return ret;
-	}
-
-	sl_bool UI::isUiThread()
-	{
-		return _AndroidUiThread::isUiThread.callBoolean(sl_null) != 0;
 	}
 
 	void UI::openUrl(const String& _url) {
@@ -129,6 +124,11 @@ namespace slib
 			JniLocal<jstring> jurl = Jni::getJniString(_url);
 			_AndroidUtil::openURL.call(sl_null, jactivity, jurl.get());
 		}
+	}
+	
+	sl_bool UI::isUiThread()
+	{
+		return _AndroidUiThread::isUiThread.callBoolean(sl_null) != 0;
 	}
 
 	void UI::dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMillis)

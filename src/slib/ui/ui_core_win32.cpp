@@ -66,7 +66,7 @@ namespace slib
 			return sl_null;
 		}
 		List< Ref<Screen> > ret;
-		ret.add(ui->m_screenPrimary);
+		ret.add_NoLock(ui->m_screenPrimary);
 		return ret;
 	}
 

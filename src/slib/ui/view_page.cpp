@@ -54,6 +54,14 @@ namespace slib
 
 	ViewPager::~ViewPager()
 	{
+		ListElements< Ref<View> > pages(m_pages);
+		sl_size indexCurrent = m_indexCurrent;
+		if (indexCurrent < pages.count) {
+			dispatchPageAction(pages[indexCurrent].get(), UIPageAction::Pause);
+		}
+		for (sl_size i = 0; i < pages.count; i++) {
+			dispatchPageAction(pages[i].get(), UIPageAction::Pop);
+		}
 	}
 
 	sl_size ViewPager::getPagesCount()
@@ -92,6 +100,7 @@ namespace slib
 		if (page.isNull()) {
 			return;
 		}
+		page->setParent(this);
 		ObjectLocker lock(this);
 		if (mode == UIUpdateMode::Init) {
 			page->setFrame(getBoundsInnerPadding(), mode);
@@ -102,11 +111,15 @@ namespace slib
 				lock.unlock();
 				page->setFrame(getBoundsInnerPadding(), mode);
 				addChild(page, mode);
+				dispatchPageAction(page.get(), UIPageAction::Push);
 				dispatchPageAction(page.get(), UIPageAction::Resume);
 				m_indexCurrent = 0;
-				return;
+			} else {
+				if (m_pages.addIfNotExist_NoLock(page)) {
+					lock.unlock();
+					dispatchPageAction(page.get(), UIPageAction::Push);
+				}
 			}
-			m_pages.addIfNotExist_NoLock(page);
 		}
 	}
 
@@ -118,8 +131,8 @@ namespace slib
 			return;
 		}
 		if (index < n) {
+			Ref<View> oldPage = m_pages.getData()[index];
 			if (index == m_indexCurrent) {
-				Ref<View> oldPage = m_pages.getData()[index];
 				Ref<View> newPage;
 				m_pages.removeAt_NoLock(index);
 				n--;
@@ -137,6 +150,7 @@ namespace slib
 					if (oldPage.isNotNull()) {
 						if (oldPage->getParent().isNotNull()) {
 							dispatchPageAction(oldPage.get(), UIPageAction::Pause);
+							dispatchPageAction(oldPage.get(), UIPageAction::Pop);
 						}
 						removeChild(oldPage, mode);
 					}
@@ -148,6 +162,8 @@ namespace slib
 				}
 			} else {
 				m_pages.removeAt_NoLock(index);
+				lock.unlock();
+				dispatchPageAction(oldPage.get(), UIPageAction::Pop);
 			}
 		}
 	}
@@ -357,6 +373,8 @@ namespace slib
 		if (viewIn.isNull()) {
 			return;
 		}
+
+		viewIn->setParent(this);
 		
 		ObjectLocker lock(this);
 		
@@ -377,6 +395,7 @@ namespace slib
 			_resetAnimationStatus(viewIn);
 			addChild(viewIn, UIUpdateMode::NoRedraw);
 			dispatchPageAction(viewIn.get(), UIPageAction::Push);
+			dispatchPageAction(viewIn.get(), UIPageAction::Resume);
 			dispatchFinishPageAnimation(viewIn.get(), UIPageAction::Push);
 			viewIn->setVisibility(Visibility::Visible, UIUpdateMode::NoRedraw);
 			viewIn->bringToFront();
@@ -424,6 +443,7 @@ namespace slib
 		
 		m_pages.add_NoLock(viewIn);
 		dispatchPageAction(viewIn.get(), UIPageAction::Push);
+		dispatchPageAction(viewIn.get(), UIPageAction::Resume);
 		
 		if (animationPause.isNotNull()) {
 			animationPause->dispatchStartFrame();
@@ -493,6 +513,7 @@ namespace slib
 		
 		if (n == 1) {
 			ScopedCounter counter(&m_countActiveTransitionAnimations);
+			dispatchPageAction(viewOut.get(), UIPageAction::Pause);
 			dispatchPageAction(viewOut.get(), UIPageAction::Pop);
 			dispatchFinishPageAnimation(viewOut.get(), UIPageAction::Pop);
 			removeChild(viewOut);
@@ -530,6 +551,7 @@ namespace slib
 
 		addChild(viewBack, UIUpdateMode::NoRedraw);
 
+		dispatchPageAction(viewOut.get(), UIPageAction::Pause);
 		dispatchPageAction(viewOut.get(), UIPageAction::Pop);
 		dispatchPageAction(viewBack.get(), UIPageAction::Resume);
 		
@@ -863,6 +885,7 @@ namespace slib
 			m_popupState = PopupState::None;
 			Ref<Window> window = getWindow();
 			lock.unlock();
+			dispatchPause();
 			dispatchClose();
 			if (window.isNotNull()) {
 				window->close();
@@ -1137,6 +1160,8 @@ namespace slib
 		
 		dispatchOpen();
 		
+		dispatchResume();
+		
 		if (animation.isNotNull()) {
 			animation->dispatchStartFrame();
 		}
@@ -1180,6 +1205,8 @@ namespace slib
 		
 		Base::interlockedIncrement(&m_countActiveTransitionAnimations);
 		
+		dispatchPause();
+
 		dispatchClose();
 		
 		if (animation.isNotNull()) {
@@ -1293,6 +1320,8 @@ namespace slib
 			
 			dispatchOpen();
 			
+			dispatchResume();
+			
 			return window;
 			
 		}
@@ -1307,6 +1336,7 @@ namespace slib
 			if (_dispatchCloseWindow()) {
 				m_popupState = PopupState::None;
 				lock.unlock();
+				dispatchPause();
 				dispatchClose();
 			} else {
 				ev->preventDefault();
@@ -1549,12 +1579,10 @@ namespace slib
 	{
 		onOpen();
 		getOnOpen()(this);
-		dispatchResume();
 	}
 
 	void ViewPage::dispatchClose()
 	{
-		dispatchPause();
 		onClose();
 		getOnClose()(this);
 	}

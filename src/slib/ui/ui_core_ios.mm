@@ -143,7 +143,6 @@ namespace slib
 	{
 	}
 	
-	__weak UIWindow* _g_slib_ios_keyWindow = nil;
 	UIWindow* UIPlatform::getMainWindow()
 	{
 		_slib_iOS_AppDelegate* app = (_slib_iOS_AppDelegate*)([[UIApplication sharedApplication] delegate]);
@@ -155,23 +154,11 @@ namespace slib
 	
 	UIWindow* UIPlatform::getKeyWindow()
 	{
-		UIWindow* window = _g_slib_ios_keyWindow;
+		UIWindow* window = [[UIApplication sharedApplication] keyWindow];
 		if (window != nil) {
 			return window;
 		}
-		UIApplication* app = [UIApplication sharedApplication];
-		for (UIWindow* win in app.windows) {
-			if (win.windowLevel > UIWindowLevelNormal) {
-				[win makeKeyAndVisible];
-				return win;
-			}
-		}
 		return UIPlatform::getMainWindow();
-	}
-	
-	void UIPlatform::setKeyWindow(UIWindow *window)
-	{
-		_g_slib_ios_keyWindow = window;
 	}
 	
 	CGFloat _g_slib_ios_global_scale_factor = 0;

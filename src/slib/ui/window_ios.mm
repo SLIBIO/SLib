@@ -175,7 +175,6 @@ namespace slib
 					if ([view isKindOfClass:[UIWindow class]]) {
 						UIWindow* window = (UIWindow*)view;
 						[window makeKeyAndVisible];
-						UIPlatform::setKeyWindow(window);
 					} else {
 						[view becomeFirstResponder];
 					}

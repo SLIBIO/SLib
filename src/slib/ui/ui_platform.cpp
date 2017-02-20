@@ -8,6 +8,7 @@
 
 namespace slib
 {
+
 	typedef HashMap<const void*, WeakRef<ViewInstance> > _UiViewInstanceMap;
 	SLIB_SAFE_STATIC_GETTER(_UiViewInstanceMap, _UI_getViewInstances)
 	
@@ -63,4 +64,5 @@ namespace slib
 			map->remove(handle);
 		}
 	}
+
 }
