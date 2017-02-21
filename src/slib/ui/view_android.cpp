@@ -28,7 +28,7 @@ namespace slib
 
 	void JNICALL _AndroidView_nativeOnDraw(JNIEnv* env, jobject _this, jlong jinstance, jobject jcanvas)
 	{
-		Ref<Android_ViewInstance> instance = Android_ViewInstance::getAndroidInstance(jinstance);
+		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 		if (instance.isNotNull()) {
 			Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, jcanvas);
 			if (canvas.isNotNull()) {
@@ -40,7 +40,7 @@ namespace slib
 	jboolean JNICALL _AndroidView_nativeOnKeyEvent(JNIEnv* env, jobject _this, jlong jinstance, jboolean flagDown, int keycode
 		, jboolean flagControl, jboolean flagShift, jboolean flagAlt, jboolean flagWin, jlong time)
 	{
-		Ref<Android_ViewInstance> instance = Android_ViewInstance::getAndroidInstance(jinstance);
+		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 		if (instance.isNotNull()) {
 			UIAction action = flagDown ? UIAction::KeyDown : UIAction::KeyUp;
 			sl_uint32 vkey = keycode;
@@ -72,7 +72,7 @@ namespace slib
 
 	jboolean JNICALL _AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int _action, jobjectArray jpoints, jlong time)
 	{
-		Ref<Android_ViewInstance> instance = Android_ViewInstance::getAndroidInstance(jinstance);
+		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 		if (instance.isNotNull()) {
 			UIAction action = (UIAction)_action;
 			sl_uint32 nPts = Jni::getArrayLength(jpoints);
@@ -106,7 +106,7 @@ namespace slib
 
 	void JNICALL _AndroidView_nativeOnClick(JNIEnv* env, jobject _this, jlong jinstance)
 	{
-		Ref<Android_ViewInstance> instance = Android_ViewInstance::getAndroidInstance(jinstance);
+		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 		if (instance.isNotNull()) {
 			instance->onClick();
 		}
@@ -114,7 +114,7 @@ namespace slib
 
 	jboolean JNICALL _AndroidView_nativeHitTestTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int x, int y)
 	{
-		Ref<Android_ViewInstance> instance = Android_ViewInstance::getAndroidInstance(jinstance);
+		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 		if (instance.isNotNull()) {
 			Ref<View> view = instance->getView();
 			if (view.isNotNull()) {
@@ -133,7 +133,7 @@ namespace slib
 
 	void JNICALL _AndroidView_nativeOnSwipe(JNIEnv* env, jobject _this, jlong jinstance, int type)
 	{
-		Ref<Android_ViewInstance> instance = Android_ViewInstance::getAndroidInstance(jinstance);
+		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 		if (instance.isNotNull()) {
 			instance->onSwipe((GestureType)type);
 		}
@@ -252,12 +252,12 @@ namespace slib
 		return sl_false;
 	}
 
-	Ref<Android_ViewInstance> Android_ViewInstance::getAndroidInstance(jlong jinstance)
+	Ref<Android_ViewInstance> Android_ViewInstance::findInstance(jlong jinstance)
 	{
 		return Ref<Android_ViewInstance>::from(UIPlatform::getViewInstance((jobject)jinstance));
 	}
 
-	Ref<View> Android_ViewInstance::getAndroidView(jlong jinstance)
+	Ref<View> Android_ViewInstance::findView(jlong jinstance)
 	{
 		Ref<ViewInstance> instance = UIPlatform::getViewInstance((jobject)jinstance);
 		if (instance.isNotNull()) {

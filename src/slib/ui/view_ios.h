@@ -10,10 +10,12 @@
 
 namespace slib
 {
+	
 	class iOS_ViewInstance : public ViewInstance
 	{
 	public:
 		iOS_ViewInstance();
+		
 		~iOS_ViewInstance();
 		
 	public:
@@ -92,7 +94,9 @@ namespace slib
 		UISwipeGestureRecognizer* m_gestureSwipeDown;
 		
 		friend GestureDetector;
-	};	
+		
+	};
+	
 }
 
 @interface Slib_iOS_ViewHandle : UIView {

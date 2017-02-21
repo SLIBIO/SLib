@@ -11,7 +11,7 @@ namespace slib
 
 	void JNICALL _AndroidEditView_nativeOnChange(JNIEnv* env, jobject _this, jlong instance)
 	{
-		Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
+		Ref<View> _view = Android_ViewInstance::findView(instance);
 		if (EditView* view = CastInstance<EditView>(_view.get())) {
 			String text = view->getText();
 			String textNew = view->dispatchChange(text);

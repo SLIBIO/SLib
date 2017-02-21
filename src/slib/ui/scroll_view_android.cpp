@@ -56,7 +56,7 @@ namespace slib
 
 	void JNICALL _AndroidScrollView_nativeOnScroll(JNIEnv* env, jobject _this, jlong instance, int x, int y)
 	{
-		Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
+		Ref<View> _view = Android_ViewInstance::findView(instance);
 		if (_ScrollView* view = CastInstance<_ScrollView>(_view.get())) {
 			view->__onScroll(x, y);
 		}

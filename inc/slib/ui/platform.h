@@ -122,13 +122,27 @@ namespace slib
 		
 		static UIWindow* getMainWindow();
 		static UIWindow* getKeyWindow();
-		static void setKeyWindow(UIWindow* window);
 		
 		static CGFloat getGlobalScaleFactor();
 		static void setGlobalScaleFactor(CGFloat factor);
 		
 #		endif
 #	endif
+
+#elif defined(SLIB_PLATFORM_IS_TIZEN)
+
+		static Ref<ViewInstance> createViewInstance(Evas_Object* handle, sl_bool flagFreeOnRelease = sl_true);
+		static void registerViewInstance(Evas_Object* handle, ViewInstance* instance);
+		static Ref<ViewInstance> getViewInstance(Evas_Object* handle);
+		static void removeViewInstance(Evas_Object* handle);
+		static Evas_Object* getViewHandle(ViewInstance* instance);
+		static Evas_Object* getViewHandle(View* view);
+
+		static Ref<WindowInstance> createWindowInstance(Evas_Object* handle);
+		static Ref<WindowInstance> getWindowInstance(Evas_Object* handle);
+		static void removeWindowInstance(Evas_Object* handle);
+		static Evas_Object* getWindowHandle(WindowInstance* instance);
+
 #endif
 		
 	private:

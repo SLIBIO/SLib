@@ -19,6 +19,8 @@ namespace slib
 
 		SLIB_INLINE Tuple(Tuple&& other) = default;
 
+		SLIB_INLINE Tuple() = default;
+
 	public:
 		template <class FUNC, class... ARGS>
 		SLIB_INLINE void invoke(const FUNC& func, ARGS&&... args)

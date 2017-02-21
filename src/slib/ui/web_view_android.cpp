@@ -16,7 +16,7 @@ namespace slib
 
 		static void JNICALL nativeOnStartLoad(JNIEnv* env, jobject _this, jlong instance, jstring jurl)
 		{
-			Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
+			Ref<View> _view = Android_ViewInstance::findView(instance);
 			if (_WebView* view = CastInstance<_WebView>(_view.get())) {
 				String url = Jni::getString(jurl);
 				view->dispatchStartLoad(url);
@@ -25,7 +25,7 @@ namespace slib
 
 		static void JNICALL nativeOnFinishLoad(JNIEnv* env, jobject _this, jlong instance, jstring jurl)
 		{
-			Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
+			Ref<View> _view = Android_ViewInstance::findView(instance);
 			if (_WebView* view = CastInstance<_WebView>(_view.get())) {
 				String url = Jni::getString(jurl);
 				view->dispatchFinishLoad(url, sl_false);
@@ -34,7 +34,7 @@ namespace slib
 
 		static void JNICALL nativeOnErrorLoad(JNIEnv* env, jobject _this, jlong instance, jstring jurl, jstring jerror)
 		{
-			Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
+			Ref<View> _view = Android_ViewInstance::findView(instance);
 			if (_WebView* view = CastInstance<_WebView>(_view.get())) {
 				view->m_lastErrorMessage = Jni::getString(jerror);
 				String url = Jni::getString(jurl);
@@ -44,7 +44,7 @@ namespace slib
 
 		static void JNICALL nativeOnMessage(JNIEnv* env, jobject _this, jlong instance, jstring jmsg, jstring jparam)
 		{
-			Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
+			Ref<View> _view = Android_ViewInstance::findView(instance);
 			if (_WebView* view = CastInstance<_WebView>(_view.get())) {
 				String msg = Jni::getString(jmsg);
 				if (msg.isNotEmpty()) {

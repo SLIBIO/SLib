@@ -8,9 +8,10 @@
 
 namespace slib
 {
+	
 /******************************************
- iOS_ViewInstance
- ******************************************/
+			iOS_ViewInstance
+******************************************/
 	
 	iOS_ViewInstance::iOS_ViewInstance()
 	{
@@ -432,8 +433,9 @@ namespace slib
 	
 	
 /******************************************
- View
- ******************************************/
+				View
+******************************************/
+	
 	Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN

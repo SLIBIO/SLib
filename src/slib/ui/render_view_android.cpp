@@ -18,7 +18,7 @@ namespace slib
 
 	void JNICALL _AndroidGLView_nativeOnCreate(JNIEnv* env, jobject _this, jlong jinstance)
 	{
-		Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(Android_ViewInstance::getAndroidInstance(jinstance));
+		Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(Android_ViewInstance::findInstance(jinstance));
 		if (instance.isNotNull()) {
 			instance->m_renderEngine.setNull();
 		}
@@ -26,7 +26,7 @@ namespace slib
 
 	void JNICALL _AndroidGLView_nativeOnFrame(JNIEnv* env, jobject _this, jlong jinstance, jint width, jint height)
 	{
-		Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(Android_ViewInstance::getAndroidInstance(jinstance));
+		Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(Android_ViewInstance::findInstance(jinstance));
 		if (instance.isNotNull()) {
 			Ref<View> _view = instance->getView();
 			if (RenderView* view = CastInstance<RenderView>(_view.get())) {

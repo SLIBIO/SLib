@@ -15,6 +15,7 @@ namespace slib
 	{
 	public:
 		OSX_ViewInstance();
+		
 		~OSX_ViewInstance();
 		
 	public:

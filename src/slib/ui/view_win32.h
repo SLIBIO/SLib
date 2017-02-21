@@ -16,6 +16,7 @@ namespace slib
 	{
 	public:
 		Win32_ViewInstance();
+		
 		~Win32_ViewInstance();
 
 	public:

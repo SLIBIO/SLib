@@ -15,6 +15,7 @@ namespace slib
 	{
 	public:
 		Android_ViewInstance();
+
 		~Android_ViewInstance();
 		
 	public:
@@ -49,9 +50,9 @@ namespace slib
 		sl_bool applyProperties(View* view, ViewInstance* parent);
 
 	public:
-		static Ref<Android_ViewInstance> getAndroidInstance(jlong jinstance);
+		static Ref<Android_ViewInstance> findInstance(jlong jinstance);
 
-		static Ref<View> getAndroidView(jlong jinstance);
+		static Ref<View> findView(jlong jinstance);
 
 	public:
 		jobject getHandle();

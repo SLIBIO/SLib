@@ -308,7 +308,6 @@ namespace slib
 				_page->dispatchBackPressed(ev);
 				ev->preventDefault();
 			}
-			return;
 		}
 	}
 	
