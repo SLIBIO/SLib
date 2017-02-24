@@ -8,6 +8,10 @@
 #include <android/log.h>
 #endif
 
+#if defined(SLIB_PLATFORM_IS_TIZEN)
+#include <dlog.h>
+#endif
+
 namespace slib
 {
 
@@ -82,10 +86,10 @@ namespace slib
 		{
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 			ObjectLocker lock(this);
-			__android_log_print(ANDROID_LOG_INFO
-								, tag.getData()
-								, "%s"
-								, content.getData());
+			__android_log_print(ANDROID_LOG_INFO, tag.getData(), "%s", content.getData());
+#elif defined(SLIB_PLATFORM_IS_TIZEN)
+			ObjectLocker lock(this);
+			::dlog_print(DLOG_INFO, tag.getData(), "%s", content.getData());
 #else
 			String s = _Log_getLineString(tag, content);
 			Console::println(s);
@@ -97,10 +101,10 @@ namespace slib
 		{
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 			ObjectLocker lock(this);
-			__android_log_print(ANDROID_LOG_ERROR
-								, tag.getData()
-								, "%s"
-								, content.getData());
+			__android_log_print(ANDROID_LOG_ERROR, tag.getData(), "%s", content.getData());
+#elif defined(SLIB_PLATFORM_IS_TIZEN)
+			ObjectLocker lock(this);
+			::dlog_print(DLOG_ERROR, tag.getData(), "%s", content.getData());
 #else
 			log(tag, content);
 #endif

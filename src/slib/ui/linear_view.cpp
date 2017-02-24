@@ -10,6 +10,7 @@ namespace slib
 		SLIB_REFERABLE_CONSTRUCTOR
 		
 		setOnMakeLayoutEnabled(sl_true, UIUpdateMode::Init);
+		setSavingCanvasState(sl_false);
 		
 		m_orientation = LayoutOrientation::Vertical;
 		
@@ -69,7 +70,7 @@ namespace slib
 			measuredHeight = paddingHeight;
 		}
 		
-		ListLocker< Ref<View> > children(_getChildren());
+		ListElements< Ref<View> > children(getChildren());
 		for (sl_size i = 0; i < children.count; i++) {
 			Ref<View>& child = children[i];
 			if (child.isNotNull()) {
@@ -131,7 +132,7 @@ namespace slib
 		sl_uint32 countFullFill = 0;
 		sl_uint32 countPartFill = 0;
 		
-		ListLocker< Ref<View> > children(_getChildren());
+		ListElements< Ref<View> > children(getChildren());
 		sl_size i;
 		for (i = 0; i < children.count; i++) {
 			Ref<View>& child = children[i];

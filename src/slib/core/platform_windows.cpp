@@ -253,6 +253,9 @@ namespace slib
 
 	void Windows::setWindowHorizontalScrollParam(HWND hWnd, sl_int32 nMin, sl_int32 nMax, sl_int32 nPage)
 	{
+		if (nMax < nMin) {
+			nMax = nMin;
+		}
 		SCROLLINFO si;
 		Base::zeroMemory(&si, sizeof(si));
 		si.cbSize = sizeof(si);
@@ -265,6 +268,9 @@ namespace slib
 
 	void Windows::setWindowVerticalScrollParam(HWND hWnd, sl_int32 nMin, sl_int32 nMax, sl_int32 nPage)
 	{
+		if (nMax < nMin) {
+			nMax = nMin;
+		}
 		SCROLLINFO si;
 		Base::zeroMemory(&si, sizeof(si));
 		si.cbSize = sizeof(si);

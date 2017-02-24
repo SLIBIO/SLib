@@ -16,7 +16,7 @@ public class UiGenericView extends View implements IView {
 	private int mLeft, mTop, mRight, mBottom;
 	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
 	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
-
+	
 	UiGestureDetector gestureDetector;
 	
 	public UiGenericView(Context context) {

@@ -7,13 +7,29 @@
 #include "../graphics/platform.h"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
+
 #include "../core/platform_windows.h"
 #include <GdiPlus.h>
+
 #elif defined(SLIB_PLATFORM_IS_ANDROID)
+
 #include "../core/platform_android.h"
+
 #elif defined(SLIB_PLATFORM_IS_APPLE)
+
 #include "../core/platform_apple.h"
 #include <CoreText/CoreText.h>
+
+#elif defined(SLIB_PLATFORM_IS_TIZEN)
+
+enum class TizenViewType
+{
+	Generic = 0,
+	Grid = 1,
+	OpenGL = 2,
+	Window = 3
+};
+
 #endif
 
 #include "event.h"
@@ -131,7 +147,7 @@ namespace slib
 
 #elif defined(SLIB_PLATFORM_IS_TIZEN)
 
-		static Ref<ViewInstance> createViewInstance(Evas_Object* handle, sl_bool flagFreeOnRelease = sl_true);
+		static Ref<ViewInstance> createViewInstance(TizenViewType type, Evas_Object* handle, sl_bool flagFreeOnRelease = sl_true);
 		static void registerViewInstance(Evas_Object* handle, ViewInstance* instance);
 		static Ref<ViewInstance> getViewInstance(Evas_Object* handle);
 		static void removeViewInstance(Evas_Object* handle);

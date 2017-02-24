@@ -179,22 +179,29 @@ namespace slib
 	void UIPlatform::runApp()
 	{
 		_g_main_thread = ::pthread_self();
+
+		::elm_config_accel_preference_set("opengl");
+
 		Ref<Application> app = Application::getApp();
 		if (app.isNull()) {
 			return;
 		}
+
 		ListLocker<String> args = app->getArguments();
 		sl_uint32 n = (sl_uint32)(args.count);
 		SLIB_SCOPED_BUFFER(char*, 64, p, n)
 		for (sl_uint32 i = 0; i < n; i++) {
 			p[i] = args[i].getData();
 		}
+
 		ui_app_lifecycle_callback_s event_callback = {0,};
 		event_callback.create = _ui_callback_app_create;
 		event_callback.resume = _ui_callback_app_resume;
 		event_callback.pause = _ui_callback_app_pause;
 		event_callback.terminate = _ui_callback_app_terminate;
+
 		::ui_app_main(n, p, &event_callback, sl_null);
+
 	}
 
 	void UIPlatform::quitApp()

@@ -211,7 +211,7 @@ namespace slib
 	template <class T, class FT>
 	sl_bool RectangleT<T, FT>::containsRectangle(const RectangleT<T, FT>& other) const
 	{
-		return left <= other.right && right >= other.left && top <= other.bottom && bottom >= other.top;
+		return left <= other.left && right >= other.right && top <= other.top && bottom >= other.bottom;
 	}
 
 	template <class T, class FT>
@@ -228,17 +228,7 @@ namespace slib
 			outIntersect->bottom = _bottom;
 			return _left <= _right && _top <= _bottom;
 		} else {
-			T _left = SLIB_MAX(left, other.left);
-			T _right = SLIB_MIN(right, other.right);
-			if (_left > _right) {
-				return sl_false;
-			}
-			T _top = SLIB_MAX(top, other.top);
-			T _bottom = SLIB_MIN(bottom, other.bottom);
-			if (_top > _bottom) {
-				return sl_false;
-			}
-			return sl_true;
+			return left <= other.right && right >= other.left && top <= other.bottom && bottom >= other.top;
 		}
 	}
 

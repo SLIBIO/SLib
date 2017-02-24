@@ -24,8 +24,6 @@ namespace slib
 		static Ref<OSX_ViewInstance> create(NSView* handle, NSView* parent, View* view);
 		
 	public:
-		void release();
-		
 		static void freeHandle(NSView* handle);
 		
 		NSView* getHandle();
@@ -63,7 +61,13 @@ namespace slib
 		
 		// override
 		void setAlpha(sl_real alpha);
-
+		
+		// override
+		void setClipping(sl_bool flag);
+		
+		// override
+		void setDrawing(sl_bool flag);
+		
 		// override
 		UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
 		
@@ -94,6 +98,9 @@ namespace slib
 		
 		void applyModifiers(UIEvent* ev, NSEvent* event);
 		
+	private:
+		void _release();
+		
 	protected:
 		NSView* m_handle;
 		sl_bool m_flagFreeOnRelease;
@@ -106,6 +113,8 @@ namespace slib
 
 @interface Slib_OSX_ViewBase : NSView {
 	@public sl_bool m_flagOpaque;
+	@public sl_bool m_flagClipping;
+	@public sl_bool m_flagDrawing;
 }
 @end
 

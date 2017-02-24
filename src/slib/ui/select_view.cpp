@@ -100,6 +100,7 @@ namespace slib
 		setCreatingNativeWidget(sl_true);
 		setUsingFont(sl_true);
 		setBorder(sl_true, UIUpdateMode::Init);
+		setSavingCanvasState(sl_false);
 		
 		m_indexSelected = 0;
 		

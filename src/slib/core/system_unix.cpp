@@ -211,8 +211,6 @@ namespace slib
 #if defined(SLIB_DEBUG)
 #	if defined(SLIB_PLATFORM_IS_ANDROID)
 		__assert(file.getData(), line, msg.getData());
-#	elif defined(SLIB_PLATFORM_IS_BLACKBERRY)
-		std::__assert(msg.getData(), file.getData(), line, 0);
 #	else
 		__assert(msg.getData(), file.getData(), line);
 #	endif
@@ -341,8 +339,6 @@ namespace slib
 #if defined(SLIB_DEBUG)
 #	if defined(SLIB_PLATFORM_IS_ANDROID)
 		__assert(file, line, msg);
-#	elif defined(SLIB_PLATFORM_IS_BLACKBERRY)
-		std::__assert(msg, file, line, 0);
 #	else
 		__assert(msg, file, line);
 #	endif
@@ -351,12 +347,9 @@ namespace slib
 
 	void Console::print(const String& s)
 	{
-#if defined(SLIB_PLATFORM_IS_ANDROID)
+#if defined(SLIB_PLATFORM_IS_ANDROID) || defined(SLIB_PLATFORM_IS_TIZEN)
 		SLIB_STATIC_STRING(c, "Console");
 		Logger::getConsoleLogger()->log(c, s);
-#elif defined(SLIB_PLATFORM_IS_BLACKBERRY)
-		String _s = s;
-		qDebug() << _s.getData() << endl;
 #else
 		String _s = s;
 		printf("%s", _s.getData());

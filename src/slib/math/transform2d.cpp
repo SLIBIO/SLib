@@ -50,7 +50,27 @@ namespace slib
 		mat.m20 += v.x;
 		mat.m21 += v.y;
 	}
-
+	
+	template <class T>
+	void Transform2T<T>::preTranslate(Matrix3T<T>& mat, T x, T y)
+	{
+		mat.m20 += (x * mat.m00 + y * mat.m10);
+		mat.m21 += (x * mat.m01 + y * mat.m11);
+	}
+	
+	template <class T>
+	void Transform2T<T>::preTranslate(Matrix3T<T>& mat, const Vector2T<T>& v)
+	{
+		mat.m20 += (v.x * mat.m00 + v.y * mat.m10);
+		mat.m21 += (v.x * mat.m01 + v.y * mat.m11);
+	}
+	
+	template <class T>
+	sl_bool Transform2T<T>::isTranslation(const Matrix3T<T>& mat)
+	{
+		return Math::isAlmostZero(mat.m00 - 1) && Math::isAlmostZero(mat.m11 - 1) && Math::isAlmostZero(mat.m01) && Math::isAlmostZero(mat.m10);
+	}
+	
 	template <class T>
 	void Transform2T<T>::setScaling(Matrix3T<T>& _out, T sx, T sy)
 	{

@@ -9,9 +9,9 @@ namespace slib
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
 		
-		setCreatingChildInstances(sl_true);
-		
+		setCreatingChildInstances(sl_true);		
 		setCapturingChildInstanceEvents(sl_true);
+		setSavingCanvasState(sl_false);
 		
 		m_orientation = LayoutOrientation::Horizontal;
 		

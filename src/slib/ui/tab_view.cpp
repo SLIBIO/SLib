@@ -29,9 +29,14 @@ namespace slib
 
 	TabView::TabView()
 	{
+		
+		SLIB_REFERABLE_CONSTRUCTOR
+		
 		setCreatingNativeWidget(sl_true);
 		setCreatingChildInstances(sl_true);
 		setUsingFont(sl_true);
+		setDrawing(sl_true, UIUpdateMode::Init);
+		setSavingCanvasState(sl_false);
 		
 		m_items.setCount(1);
 		m_indexSelected = 0;

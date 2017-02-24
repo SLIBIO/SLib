@@ -101,14 +101,13 @@ namespace slib
 		{
 			HWND handle = getHandle();
 			if (handle) {
-				Ref<View> viewContent = view->getContentView();
 				Sizei sizeContent = view->getContentSize();
 				Sizei sizeParent = view->getSize();
 				if (view->isHorizontalScrolling()) {
-					Windows::setWindowHorizontalScrollParam(handle, 0, sizeContent.x, sizeParent.x);
+					Windows::setWindowHorizontalScrollParam(handle, 0, sizeContent.x - 1, sizeParent.x);
 				}
 				if (view->isVerticalScrolling()) {
-					Windows::setWindowVerticalScrollParam(handle, 0, sizeContent.y, sizeParent.y);
+					Windows::setWindowVerticalScrollParam(handle, 0, sizeContent.y - 1, sizeParent.y);
 				}
 				__refreshContentPosition(view, sl_false);
 			}

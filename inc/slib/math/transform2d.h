@@ -24,7 +24,13 @@ namespace slib
 		static void translate(Matrix3T<T>& mat, T x, T y);
 
 		static void translate(Matrix3T<T>& mat, const Vector2T<T>& v);
-	
+		
+		static void preTranslate(Matrix3T<T>& mat, T x, T y);
+		
+		static void preTranslate(Matrix3T<T>& mat, const Vector2T<T>& v);
+		
+		static sl_bool isTranslation(const Matrix3T<T>& mat);
+
 
 		static void setScaling(Matrix3T<T>& _out, T sx, T sy);
 

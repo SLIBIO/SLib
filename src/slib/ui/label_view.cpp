@@ -10,6 +10,7 @@ namespace slib
 	LabelView::LabelView()
 	{
 		setCreatingNativeWidget(sl_false);
+		setSavingCanvasState(sl_false);
 		
 		setUsingFont(sl_true);
 		

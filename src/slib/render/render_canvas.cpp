@@ -31,7 +31,15 @@ namespace slib
 	RenderCanvasState::RenderCanvasState(RenderCanvasState* other)
 	: matrix(other->matrix), flagClipRect(other->flagClipRect), clipRect(other->clipRect)
 	{
-		clips.pushAll(&(other->clips));
+		clips = other->clips.duplicate_NoLock();
+	}
+	
+	void RenderCanvasState::copyFrom(RenderCanvasState* other)
+	{
+		matrix = other->matrix;
+		flagClipRect = other->flagClipRect;
+		clipRect = other->clipRect;
+		clips = other->clips.duplicate_NoLock();
 	}
 	
 	RenderCanvasState::~RenderCanvasState()
@@ -79,14 +87,13 @@ namespace slib
 				clips[0] = &storageRectClip;
 				countClips++;
 			}
-			Link<RenderCanvasClip>* clip = state->clips.getBack();
-			while (clip) {
-				clips[countClips] = &(clip->value);
+			ListElements<RenderCanvasClip> stateClips(state->clips);
+			for (sl_size i = 0; i < stateClips.count; i++) {
+				clips[countClips] = &(stateClips[i]);
 				countClips++;
 				if (countClips >= MAX_SHADER_CLIP) {
 					break;
 				}
-				clip = clip->before;
 			}
 		}
 		
@@ -396,11 +403,16 @@ namespace slib
 		return sl_null;
 	}
 	
-	Ref<RenderEngine> RenderCanvas::getEngine()
+	const Ref<RenderEngine>& RenderCanvas::getEngine()
 	{
 		return m_engine;
 	}
 	
+	RenderCanvasState* RenderCanvas::getCurrentState()
+	{
+		return m_state.get();
+	}
+		
 	void RenderCanvas::save()
 	{
 		RenderCanvasState* stateOld = m_state.get();
@@ -428,16 +440,16 @@ namespace slib
 		} else {
 			rect = Rectangle(0, 0, m_width, m_height);
 		}
-		Link<RenderCanvasClip>* link = state->clips.getFront();
-		while (link) {
-			Rectangle r = link->value.region;
-			if (link->value.flagTransform) {
-				r.transform(link->value.transform.inverse());
+		ListElements<RenderCanvasClip> clips(state->clips);
+		for (sl_size i = 0; i < clips.count; i++) {
+			RenderCanvasClip& clip = clips[i];
+			Rectangle r = clip.region;
+			if (clip.flagTransform) {
+				r.transform(clip.transform.inverse());
 			}
 			if (!(rect.intersectRectangle(r, &rect))) {
 				return Rectangle::zero();
 			}
-			link = link->next;
 		}
 		return rect;
 	}
@@ -465,7 +477,7 @@ namespace slib
 		clip.region = rect;
 		clip.rx = radius.x;
 		clip.ry = radius.y;
-		state->clips.push_NoLock(clip);
+		state->clips.add_NoLock(clip);
 	}
 	
 	void RenderCanvas::clipToEllipse(const Rectangle& rect)
@@ -474,57 +486,87 @@ namespace slib
 		RenderCanvasClip clip;
 		clip.type = RenderCanvasClipType::Ellipse;
 		clip.region = rect;
-		state->clips.push_NoLock(clip);
+		state->clips.add_NoLock(clip);
 	}
 	
 	void RenderCanvas::concatMatrix(const Matrix3& matrix)
 	{
 		RenderCanvasState* state = m_state.get();
 		state->matrix = matrix * state->matrix;
-		if (Math::isAlmostZero(matrix.m00 - 1) && Math::isAlmostZero(matrix.m01) && Math::isAlmostZero(matrix.m10) && Math::isAlmostZero(matrix.m11 - 1)) {
-			sl_real tx = matrix.m20;
-			sl_real ty = matrix.m21;
-			if (state->flagClipRect) {
-				state->clipRect.left -= tx;
-				state->clipRect.top -= ty;
-				state->clipRect.right -= tx;
-				state->clipRect.bottom -= ty;
+		ListElements<RenderCanvasClip> clips(state->clips);
+		for (sl_size i = 0; i < clips.count; i++) {
+			RenderCanvasClip& clip = clips[i];
+			if (clip.flagTransform) {
+				clip.transform = matrix * clip.transform;
+			} else {
+				clip.flagTransform = sl_true;
+				clip.transform = matrix;
 			}
-			Link<RenderCanvasClip>* link = state->clips.getFront();
-			while (link) {
-				RenderCanvasClip& clip = link->value;
-				if (clip.flagTransform) {
-					clip.transform = matrix * clip.transform;
-				} else {
-					clip.region.left -= tx;
-					clip.region.top -= ty;
-					clip.region.right -= tx;
-					clip.region.bottom -= ty;
-				}
-				link = link->next;
-			}
-		} else {
-			Link<RenderCanvasClip>* link = state->clips.getFront();
-			while (link) {
-				RenderCanvasClip& clip = link->value;
-				if (clip.flagTransform) {
-					clip.transform = matrix * clip.transform;
-				} else {
-					clip.flagTransform = sl_true;
-					clip.transform = matrix;
-				}
-				link = link->next;
-			}
+		}
+		if (state->flagClipRect) {
 			RenderCanvasClip clip;
 			clip.type = RenderCanvasClipType::Rectangle;
 			clip.region = state->clipRect;
 			clip.flagTransform = sl_true;
 			clip.transform = matrix;
-			state->clips.push_NoLock(clip);
+			state->clips.add_NoLock(clip);
 			state->flagClipRect = sl_false;
 		}
 	}
 	
+	void RenderCanvas::translate(sl_real tx, sl_real ty)
+	{
+		RenderCanvasState* state = m_state.get();
+		Transform2::preTranslate(state->matrix, tx, ty);
+		if (state->flagClipRect) {
+			state->clipRect.left -= tx;
+			state->clipRect.top -= ty;
+			state->clipRect.right -= tx;
+			state->clipRect.bottom -= ty;
+		}
+		ListElements<RenderCanvasClip> clips(state->clips);
+		for (sl_size i = 0; i < clips.count; i++) {
+			RenderCanvasClip& clip = clips[i];
+			if (clip.flagTransform) {
+				Transform2::preTranslate(clip.transform, tx, ty);
+			} else {
+				clip.region.left -= tx;
+				clip.region.top -= ty;
+				clip.region.right -= tx;
+				clip.region.bottom -= ty;
+			}
+		}
+	}
+	
+	void RenderCanvas::translateFromSavedState(RenderCanvasState* savedState, sl_real tx, sl_real ty)
+	{
+		RenderCanvasState* state = m_state.get();
+		state->matrix = savedState->matrix;
+		Transform2::preTranslate(state->matrix, tx, ty);
+		if (savedState->flagClipRect) {
+			state->clipRect.left = savedState->clipRect.left - tx;
+			state->clipRect.top = savedState->clipRect.top - ty;
+			state->clipRect.right = savedState->clipRect.right - tx;
+			state->clipRect.bottom = savedState->clipRect.bottom - ty;
+		}
+		ListElements<RenderCanvasClip> clips(state->clips);
+		ListElements<RenderCanvasClip> savedClips(savedState->clips);
+		sl_size n = Math::min(clips.count, savedClips.count);
+		for (sl_size i = 0; i < n; i++) {
+			RenderCanvasClip& clip = clips[i];
+			RenderCanvasClip& savedClip = savedClips[i];
+			if (savedClip.flagTransform) {
+				clip.transform = savedClip.transform;
+				Transform2::preTranslate(clip.transform, tx, ty);
+			} else {
+				clip.region.left = savedClip.region.left - tx;
+				clip.region.top = savedClip.region.top - ty;
+				clip.region.right = savedClip.region.right - tx;
+				clip.region.bottom = savedClip.region.bottom - ty;
+			}
+		}
+	}
+
 	Size RenderCanvas::measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine)
 	{
 		return measureRenderingText(font, text, flagMultiLine);
@@ -595,7 +637,7 @@ namespace slib
 		}
 		
 		RenderCanvasProgramParam pp;
-		pp.prepare(state, sl_false);
+		pp.prepare(state, !fontItalic);
 		pp.flagUseTexture = sl_true;
 		
 		RenderProgramScope<RenderCanvasProgramState> scope;
@@ -607,53 +649,88 @@ namespace slib
 		sl_real fx = x;
 		
 		for (sl_size i = 0; i < len; i++) {
+			
 			sl_char16 ch = arrChar[i];
+			
 			if (fa->getChar(ch, fac)) {
+				
 				sl_real fw = fac.fontWidth;
+				sl_real fh = fac.fontHeight;
 				sl_real fxn = fx + fw;
+				
 				if (fac.bitmap.isNotNull()) {
+					
+					Rectangle rcDst;
+					rcDst.left = fx;
+					rcDst.right = fxn;
+					rcDst.top = y + (fontHeight - fh);
+					rcDst.bottom  = rcDst.top + fh;
+					
+					Rectangle rcClip;
+					
 					sl_bool flagIgnore = sl_false;
+					sl_bool flagClip = sl_false;
+					
 					if (state->flagClipRect) {
-						if (state->clipRect.left >= fxn || state->clipRect.right <= fx) {
+						if (state->clipRect.right <= fx) {
+							return;
+						}
+						if (state->clipRect.intersectRectangle(rcDst, &rcClip)) {
+							if (!fontItalic) {
+								if (!(state->clipRect.containsRectangle(rcDst))) {
+									flagClip = sl_true;
+								}
+							}
+						} else {
 							flagIgnore = sl_true;
 						}
 					}
 					if (!flagIgnore) {
 						Ref<Texture> texture = Texture::getBitmapRenderingCache(fac.bitmap);
 						if (texture.isNotNull()) {
-							sl_real fh = fac.fontHeight;
-							sl_real fy = y + (fontHeight - fh) / 2;
-							if (!flagBeginScope) {
-								Ref<RenderProgram> program = shared->getProgram(pp);
-								if (!(scope.begin(m_engine.get(), program))) {
-									return;
-								}
-								scope->setColor(Color4f(color.x, color.y, color.z, color.w * getAlpha()));
-								flagBeginScope = sl_true;
-							}
-							Matrix3 mat;
-							if (fontItalic) {
-								sl_real ratio = 0.2f;
-								mat.m00 = fw; mat.m10 = -ratio * fh; mat.m20 = ratio * fh + fx;
-								mat.m01 = 0; mat.m11 = fh; mat.m21 = fy;
-								mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
-							} else {
-								mat.m00 = fw; mat.m10 = 0; mat.m20 = fx;
-								mat.m01 = 0; mat.m11 = fh; mat.m21 = fy;
-								mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
-							}
-							pp.applyToProgramState(scope.getState(), mat);
-							mat *= state->matrix;
-							mat *= m_matViewport;
-							scope->setTransform(mat);
-							if (textureBefore != texture) {
-								scope->setTexture(texture);
-								textureBefore = texture;
-							}
 							sl_real sw = (sl_real)(texture->getWidth());
 							sl_real sh = (sl_real)(texture->getHeight());
-							scope->setRectSrc(Vector4((sl_real)(fac.region.left) / sw, (sl_real)(fac.region.top) / sh, (sl_real)(fac.region.getWidth()) / sw, (sl_real)(fac.region.getHeight()) / sh));
-							m_engine->drawPrimitive(4, shared->vbRectangle, PrimitiveType::TriangleStrip);
+							if (sw > SLIB_EPSILON && sh > SLIB_EPSILON) {
+								if (!flagBeginScope) {
+									Ref<RenderProgram> program = shared->getProgram(pp);
+									if (!(scope.begin(m_engine.get(), program))) {
+										return;
+									}
+									scope->setColor(Color4f(color.x, color.y, color.z, color.w * getAlpha()));
+									flagBeginScope = sl_true;
+								}
+								
+								Rectangle rcSrc;
+								rcSrc.left = (sl_real)(fac.region.left) / sw;
+								rcSrc.top = (sl_real)(fac.region.top) / sh;
+								rcSrc.right = (sl_real)(fac.region.right) / sw;
+								rcSrc.bottom = (sl_real)(fac.region.bottom) / sh;
+								if (flagClip) {
+									rcSrc = GraphicsUtil::transformRectangle(rcSrc, rcDst, rcClip);
+									rcDst = rcClip;
+								}
+								Matrix3 mat;
+								if (fontItalic) {
+									float ratio = 0.2;
+									mat.m00 = fw; mat.m10 = -ratio * fh; mat.m20 = ratio * fh + rcDst.left;
+									mat.m01 = 0; mat.m11 = fh; mat.m21 = rcDst.top;
+									mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
+								} else {
+									mat.m00 = rcDst.getWidth(); mat.m10 = 0; mat.m20 = rcDst.left;
+									mat.m01 = 0; mat.m11 = rcDst.getHeight(); mat.m21 = rcDst.top;
+									mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
+								}
+								pp.applyToProgramState(scope.getState(), mat);
+								mat *= state->matrix;
+								mat *= m_matViewport;
+								scope->setTransform(mat);
+								if (textureBefore != texture) {
+									scope->setTexture(texture);
+									textureBefore = texture;
+								}
+								scope->setRectSrc(Vector4(rcSrc.left, rcSrc.top, rcSrc.getWidth(), rcSrc.getHeight()));
+								m_engine->drawPrimitive(4, shared->vbRectangle, PrimitiveType::TriangleStrip);
+							}
 						}
 					}
 				}

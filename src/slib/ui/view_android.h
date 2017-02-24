@@ -94,6 +94,12 @@ namespace slib
 		void setAlpha(sl_real alpha);
 		
 		// override
+		void setClipping(sl_bool flag);
+		
+		// override
+		void setDrawing(sl_bool flag);
+		
+		// override
 		UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
 
 		// override

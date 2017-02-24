@@ -232,6 +232,18 @@ namespace slib
 		
 		virtual void setEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		sl_bool isClipping();
+		
+		void setClipping(sl_bool flagClipping, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		sl_bool isDrawing();
+		
+		void setDrawing(sl_bool flagDrawing, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		sl_bool isSavingCanvasState();
+		
+		void setSavingCanvasState(sl_bool flagDrawing);
+		
 		
 		sl_bool isHitTestable();
 		
@@ -973,9 +985,9 @@ namespace slib
 		void setSmoothContentScrolling(sl_bool flag);
 
 		
-		sl_bool isMultiTouchMode();
+		sl_bool isTouchMultipleChildren();
 		
-		void setMultiTouchMode(sl_bool flag);
+		void setTouchMultipleChildren(sl_bool flag);
 		
 		sl_bool isPassingEventsToChildren();
 		
@@ -1031,6 +1043,8 @@ namespace slib
 		Ref<Bitmap> drawLayer();
 		
 		void draw(Canvas* canvas);
+		
+		void clipBounds(Canvas* canvas);
 		
 		virtual Size measureText(const String& size, const Ref<Font>& font, sl_bool flagMultiLine = sl_false);
 		
@@ -1182,7 +1196,7 @@ namespace slib
 		
 		sl_bool dispatchTouchEventToChildren(UIEvent* ev, const Ref<View>* children, sl_size count);
 		
-		void dispatchMultiTouchEventToChildren(UIEvent* ev, const Ref<View>* children, sl_size count);
+		void dispatchTouchEventToMultipleChildren(UIEvent* ev, const Ref<View>* children, sl_size count);
 		
 		void dispatchTouchEventToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints = sl_true);
 		
@@ -1292,8 +1306,6 @@ namespace slib
 	protected:
 		void measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 		
-		List< Ref<View> > _getChildren();
-
 	public:
 		void _setFrame_NI(const UIRect& frame);
 		
@@ -1323,6 +1335,9 @@ namespace slib
 		sl_bool m_flagHitTestable;
 		sl_bool m_flagFocusable;
 		sl_bool m_flagInstanceLayer;
+		sl_bool m_flagClipping;
+		sl_bool m_flagDrawing;
+		sl_bool m_flagSavingCanvasState;
 
 		sl_bool m_flagFocused;
 		sl_bool m_flagPressed;
@@ -1335,11 +1350,12 @@ namespace slib
 		
 		AtomicString m_id;
 		AtomicList< Ref<View> > m_children;
-		AtomicList< Ref<View> > m_childrenMultiTouch;
+		AtomicList< Ref<View> > m_childrenCache;
+		List< Ref<View> > m_childrenMultiTouch;
 		AtomicRef<View> m_childMouseMove;
 		AtomicRef<View> m_childMouseDown;
 		UIAction m_actionMouseDown;
-		sl_bool m_flagMultiTouchMode;
+		sl_bool m_flagTouchMultipleChildren;
 		sl_bool m_flagPassEventToChildren;
 		AtomicRef<View> m_childFocused;
 		
@@ -1654,6 +1670,10 @@ namespace slib
 		
 		virtual void setAlpha(sl_real alpha) = 0;
 		
+		virtual void setClipping(sl_bool flag) = 0;
+		
+		virtual void setDrawing(sl_bool flag) = 0;
+
 		virtual UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen) = 0;
 		
 		virtual UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView) = 0;

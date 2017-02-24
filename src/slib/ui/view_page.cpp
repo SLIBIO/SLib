@@ -830,6 +830,9 @@ namespace slib
 		m_popupBackgroundColor = Color::zero();
 		
 		m_countActiveTransitionAnimations = 0;
+		
+		setClipping(sl_true, UIUpdateMode::Init);
+		
 	}
 
 	ViewPage::~ViewPage()

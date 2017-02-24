@@ -12,6 +12,8 @@ namespace slib
 		
 		setCreatingNativeWidget(sl_true);
 		setCreatingChildInstances(sl_false);
+		setClipping(sl_true, UIUpdateMode::Init);
+		setSavingCanvasState(sl_false);
 		
 		setHorizontalScrolling(sl_true);
 		setVerticalScrolling(sl_true);

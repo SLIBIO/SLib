@@ -21,10 +21,10 @@ namespace slib
 
 	OSX_ViewInstance::~OSX_ViewInstance()
 	{
-		release();
+		_release();
 	}
 
-	void OSX_ViewInstance::release()
+	void OSX_ViewInstance::_release()
 	{
 		UIPlatform::removeViewInstance(m_handle);
 		if (m_flagFreeOnRelease) {
@@ -42,29 +42,32 @@ namespace slib
 
 	Ref<OSX_ViewInstance> OSX_ViewInstance::create(NSView* handle, sl_bool flagFreeOnRelease)
 	{
-		Ref<OSX_ViewInstance> ret;
 		if (handle != nil) {
-			ret = new OSX_ViewInstance();
+			Ref<OSX_ViewInstance> ret = new OSX_ViewInstance();
 			if (ret.isNotNull()) {
 				ret->m_handle = handle;
 				ret->m_flagFreeOnRelease = flagFreeOnRelease;
 				UIPlatform::registerViewInstance(handle, ret.get());
+				return ret;
 			} else {
 				if (flagFreeOnRelease) {
 					freeHandle(handle);
 				}
 			}
 		}
-		return ret;
+		return sl_null;
 	}
 
 	Ref<OSX_ViewInstance> OSX_ViewInstance::create(NSView* handle, NSView* parent, View* view)
 	{
-		Ref<OSX_ViewInstance> instance;
 		if (handle != nil) {
-			instance = create(handle, sl_true);
+			
+			Ref<OSX_ViewInstance> instance = create(handle, sl_true);
+			
 			if (instance.isNotNull()) {
+				
 				[handle setHidden:(view->isVisible() ? NO : YES)];
+				
 				if (!(view->isEnabled())) {
 					if ([handle isKindOfClass:[NSControl class]]) {
 						NSControl* control = (NSControl*)(handle);
@@ -73,6 +76,8 @@ namespace slib
 				}
 				if ([handle isKindOfClass:[Slib_OSX_ViewBase class]]) {
 					((Slib_OSX_ViewBase*)handle)->m_flagOpaque = view->isOpaque();
+					((Slib_OSX_ViewBase*)handle)->m_flagClipping = view->isClipping();
+					((Slib_OSX_ViewBase*)handle)->m_flagDrawing = view->isDrawing();
 				}
 				
 				/*****************
@@ -88,9 +93,14 @@ namespace slib
 				if (parent != nil) {
 					[parent addSubview:handle];				
 				}
+				
+				return instance;
+				
 			}
 		}
-		return instance;
+		
+		return sl_null;
+		
 	}
 
 	NSView* OSX_ViewInstance::getHandle()
@@ -262,7 +272,29 @@ namespace slib
 		}
 		
 	}
-
+	
+	void OSX_ViewInstance::setClipping(sl_bool flag)
+	{
+		NSView* handle = m_handle;
+		if (handle != nil) {
+			if ([handle isKindOfClass:[Slib_OSX_ViewBase class]]) {
+				Slib_OSX_ViewBase* control = (Slib_OSX_ViewBase*)handle;
+				control->m_flagClipping = flag;
+			}
+		}
+	}
+	
+	void OSX_ViewInstance::setDrawing(sl_bool flag)
+	{
+		NSView* handle = m_handle;
+		if (handle != nil) {
+			if ([handle isKindOfClass:[Slib_OSX_ViewBase class]]) {
+				Slib_OSX_ViewBase* control = (Slib_OSX_ViewBase*)handle;
+				control->m_flagDrawing = flag;
+			}
+		}
+	}
+	
 	UIPointf OSX_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
 	{
 		NSView* handle = m_handle;
@@ -689,6 +721,7 @@ namespace slib
 }
 
 @implementation Slib_OSX_ViewBase
+
 - (BOOL)isFlipped
 {
 	return TRUE;
@@ -698,6 +731,7 @@ namespace slib
 {
 	return m_flagOpaque ? YES : NO;
 }
+
 @end
 
 @implementation Slib_OSX_ViewHandle
@@ -755,9 +789,11 @@ namespace slib
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		instance->onDraw(dirtyRect);
+	if (m_flagDrawing) {
+		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+		if (instance.isNotNull()) {
+			instance->onDraw(dirtyRect);
+		}
 	}
 }
 

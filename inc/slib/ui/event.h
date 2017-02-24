@@ -154,6 +154,8 @@ namespace slib
 		
 		static Ref<UIEvent> createTouchEvent(UIAction action, const Array<TouchPoint>& points, const Time& time);
 		
+		static Ref<UIEvent> createTouchEvent(UIAction action, const TouchPoint& point, const Time& time);
+		
 		static Ref<UIEvent> createSetCursorEvent(sl_ui_posf x, sl_ui_posf y, const Time& time);
 		
 	public:

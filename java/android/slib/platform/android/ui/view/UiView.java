@@ -261,6 +261,32 @@ public class UiView {
 			});
 		}
 	}
+
+	public static void setClipping(final View view, final boolean flag) {
+		if (view instanceof ViewGroup) {
+			if (UiThread.isUiThread()) {
+				((ViewGroup)view).setClipChildren(flag);
+			} else {
+				view.post(new Runnable() {
+					public void run() {
+						((ViewGroup)view).setClipChildren(flag);
+					}
+				});
+			}			
+		}
+	}
+
+	public static void setDrawing(final View view, final boolean flag) {
+		if (UiThread.isUiThread()) {
+			view.setWillNotDraw(!flag);
+		} else {
+			view.post(new Runnable() {
+				public void run() {
+					view.setWillNotDraw(!flag);
+				}
+			});
+		}			
+	}
 	
 	public static void setLayered(final View view) {
 		try {
@@ -454,6 +480,7 @@ public class UiView {
 	}
 	
 	private static native boolean nativeOnTouchEvent(long instance, int action, UiTouchPoint[] pts, long time);
+	
 	public static boolean onEventTouch(IView view, MotionEvent event) {
 		long instance = view.getInstance();
 		if (instance != 0) {

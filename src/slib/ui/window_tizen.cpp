@@ -42,31 +42,39 @@ namespace slib
 	public:
 		static Ref<_Tizen_Window> create(Evas_Object* window)
 		{
+
 			if (window) {
+
 				Ref<_Tizen_Window> ret = new _Tizen_Window();
+
 				if (ret.isNotNull()) {
+
 					ret->m_window = window;
-					Ref<ViewInstance> content = UIPlatform::createViewInstance(window, sl_false);
+
+					Ref<ViewInstance> content = UIPlatform::createViewInstance(TizenViewType::Window, window, sl_false);
 					if (content.isNotNull()) {
 						content->setWindowContent(sl_true);
 						ret->m_viewContent = content;
 					}
 
 					Base::interlockedIncrement32(&_ui_active_windows_count);
-					::evas_object_smart_callback_add(window, "delete,request", _ui_win_delete_request_cb, window);
-					::eext_object_event_callback_add(window, EEXT_CALLBACK_BACK, _ui_win_back_cb, window);
+					::evas_object_smart_callback_add(window, "delete,request", _ui_win_delete_request_cb, sl_null);
+					::eext_object_event_callback_add(window, EEXT_CALLBACK_BACK, _ui_win_back_cb, sl_null);
 
 					::evas_object_show(window);
 
 					return ret;
+
 				}
+
 			}
+
 			return sl_null;
+
 		}
 		
-		static void _ui_win_delete_request_cb(void* data, Evas_Object* obj, void* event_info)
+		static void _ui_win_delete_request_cb(void* data, Evas_Object* win, void* event_info)
 		{
-			Evas_Object* win = reinterpret_cast<Evas_Object*>(data);
 			Ref<WindowInstance> instance = UIPlatform::getWindowInstance(win);
 			if (instance.isNotNull()) {
 				(static_cast<_Tizen_Window*>(instance.get()))->m_window = sl_null;
@@ -78,9 +86,8 @@ namespace slib
 			}
 		}
 
-		static void _ui_win_back_cb(void* data, Evas_Object* obj, void* event_info)
+		static void _ui_win_back_cb(void* data, Evas_Object* win, void* event_info)
 		{
-			Evas_Object* win = reinterpret_cast<Evas_Object*>(data);
 			if (MobileApp::dispatchBackToApp()) {
 				::elm_win_lower(win);
 			}
@@ -88,7 +95,7 @@ namespace slib
 
 		static Ref<WindowInstance> create(const WindowInstanceParam& param)
 		{
-			Evas_Object* win = ::elm_win_add(NULL, "", ELM_WIN_BASIC);
+			Evas_Object* win = ::elm_win_util_standard_add("", "");
 			if (win) {
 
 				if (!(param.flagFullScreen)) {

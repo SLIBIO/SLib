@@ -23,7 +23,6 @@ public class UiGroupView extends AbsoluteLayout implements IView {
 
 	public UiGroupView(Context context) {
 		super(context);
-		setWillNotDraw(false);
 	}
 	
 	public void onDraw(Canvas canvas) {

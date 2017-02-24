@@ -6,6 +6,10 @@ namespace slib
 	
 	ImageView::ImageView()
 	{
+		SLIB_REFERABLE_CONSTRUCTOR
+		
+		setSavingCanvasState(sl_false);
+		
 		m_scaleMode = ScaleMode::Stretch;
 		m_gravity = Alignment::MiddleCenter;
 	}

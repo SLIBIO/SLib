@@ -112,6 +112,8 @@ namespace slib
 
 #elif defined(SLIB_PLATFORM_IS_TIZEN)
 
+
+
 #endif
 
 	};

@@ -49,6 +49,9 @@ namespace slib
 	
 	Slider::Slider(LayoutOrientation orientation) : ProgressBar(orientation)
 	{
+		
+		SLIB_REFERABLE_CONSTRUCTOR
+		
 		_Slider_Static* s = _Slider_getStatic();
 		if (s) {
 			m_track = s->defaultTrack;

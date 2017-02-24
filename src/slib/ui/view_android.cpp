@@ -159,6 +159,8 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(isEnabled, "isEnabled", "(Landroid/view/View;)Z");
 		SLIB_JNI_STATIC_METHOD(setEnabled, "setEnabled", "(Landroid/view/View;Z)V");
 		SLIB_JNI_STATIC_METHOD(setAlpha, "setAlpha", "(Landroid/view/View;F)V");
+		SLIB_JNI_STATIC_METHOD(setClipping, "setClipping", "(Landroid/view/View;Z)V");
+		SLIB_JNI_STATIC_METHOD(setDrawing, "setDrawing", "(Landroid/view/View;Z)V");
 		SLIB_JNI_STATIC_METHOD(setLayered, "setLayered", "(Landroid/view/View;)V");
 		SLIB_JNI_STATIC_METHOD(convertCoordinateFromScreenToView, "convertCoordinateFromScreenToView", "(Landroid/view/View;II)Landroid/graphics/Point;");
 		SLIB_JNI_STATIC_METHOD(convertCoordinateFromViewToScreen, "convertCoordinateFromViewToScreen", "(Landroid/view/View;II)Landroid/graphics/Point;");
@@ -227,6 +229,8 @@ namespace slib
 			_JAndroidView::setVisible.call(sl_null, jhandle, view->isVisible());
 			_JAndroidView::setEnabled.call(sl_null, jhandle, view->isEnabled());
 			sl_real alpha = view->getAlpha();
+			_JAndroidView::setClipping.call(sl_null, jhandle, view->isClipping());
+			_JAndroidView::setDrawing.call(sl_null, jhandle, view->isDrawing());
 			if (alpha < 0.995f) {
 				_JAndroidView::setAlpha.call(sl_null, jhandle, alpha);
 			}
@@ -360,6 +364,22 @@ namespace slib
 		jobject handle = m_handle.get();
 		if (handle) {
 			_JAndroidView::setAlpha.call(sl_null, handle, (float)alpha);
+		}
+	}
+
+	void Android_ViewInstance::setClipping(sl_bool flag)
+	{
+		jobject handle = m_handle.get();
+		if (handle) {
+			_JAndroidView::setClipping.call(sl_null, handle, flag);
+		}
+	}
+
+	void Android_ViewInstance::setDrawing(sl_bool flag)
+	{
+		jobject handle = m_handle.get();
+		if (handle) {
+			_JAndroidView::setDrawing.call(sl_null, handle, flag);
 		}
 	}
 

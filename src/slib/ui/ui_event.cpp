@@ -257,6 +257,17 @@ sl_bool UIEvent::is##NAME##Key() const \
 		}
 		return ret;
 	}
+	
+	Ref<UIEvent> UIEvent::createTouchEvent(UIAction action, const TouchPoint& point, const Time& time)
+	{
+		Ref<UIEvent> ret = new UIEvent;
+		if (ret.isNotNull()) {
+			ret->setAction(action);
+			ret->setTouchPoint(point);
+			ret->setTime(time);
+		}
+		return ret;
+	}
 
 	Ref<UIEvent> UIEvent::createSetCursorEvent(sl_ui_posf x, sl_ui_posf y, const Time& time)
 	{
@@ -468,9 +479,13 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	TouchPoint UIEvent::getTouchPoint(sl_uint32 index) const
 	{
-		TouchPoint pt;
-		m_points.getAt(index, &pt);
-		return pt;
+		if (index < m_points.getCount()) {
+			TouchPoint pt;
+			m_points.getAt(index, &pt);
+			return pt;
+		} else {
+			return m_point;
+		}
 	}
 
 	void UIEvent::setTouchPoints(const Array<TouchPoint>& points)

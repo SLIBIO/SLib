@@ -14,17 +14,6 @@
 namespace slib
 {
 
-	class _View : public View
-	{
-	public:
-		SLIB_INLINE List< Ref<View> > _getChildren()
-		{
-			return View::_getChildren();
-		}
-
-		friend class Win32_ViewInstance;
-	};
-
 /******************************************
 		Win32_ViewInstance
 ******************************************/
@@ -46,13 +35,15 @@ namespace slib
 	}
 
 	HWND Win32_ViewInstance::createHandle(
-		View* _view, ViewInstance* parent
+		View* view, ViewInstance* parent
 		, LPCWSTR wndClass, LPCWSTR text
 		, int style, int styleEx)
 	{
-		_View* view = (_View*)_view;
+
 		HWND hWndParent = UIPlatform::getViewHandle(parent);
+
 		if (hWndParent) {
+
 			HINSTANCE hInst = ::GetModuleHandleW(NULL);
 			UIRect frame = view->getFrame();
 			style |= WS_CHILD;
@@ -208,6 +199,14 @@ namespace slib
 	void Win32_ViewInstance::setAlpha(sl_real alpha)
 	{
 		::InvalidateRect(m_handle, NULL, TRUE);
+	}
+
+	void Win32_ViewInstance::setClipping(sl_bool flag)
+	{
+	}
+
+	void Win32_ViewInstance::setDrawing(sl_bool flag)
+	{
 	}
 
 	UIPointf Win32_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
@@ -453,7 +452,7 @@ namespace slib
 			return 0;
 		}
 		sl_size count = 0;
-		ListLocker< Ref<View> > children(((_View*)view)->_getChildren());
+		ListElements< Ref<View> > children(view->getChildren());
 		for (sl_size i = 0; i < children.count; i++) {
 			Ref<View>& child = children[i];
 			if (child.isNotNull()) {

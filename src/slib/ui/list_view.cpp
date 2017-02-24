@@ -18,6 +18,14 @@ namespace slib
 		WeakRef<ListView> m_lv;
 		
 	public:
+		_ListContentView()
+		{
+			SLIB_REFERABLE_CONSTRUCTOR
+			
+			setSavingCanvasState(sl_false);
+		}
+		
+	public:
 		// override
 		void dispatchDraw(Canvas* canvas);
 		

@@ -21,8 +21,11 @@ namespace slib
 
 	PickerView::PickerView()
 	{
+		SLIB_REFERABLE_CONSTRUCTOR
+		
 		setCreatingNativeWidget(sl_true);
 		setUsingFont(sl_true);
+		setClipping(sl_true, UIUpdateMode::Init);
 		
 		m_indexSelected = 0;
 		

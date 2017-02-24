@@ -42,7 +42,7 @@ namespace slib
 		Matrix3 matrix;
 		sl_bool flagClipRect;
 		Rectangle clipRect;
-		LinkedQueue<RenderCanvasClip> clips;
+		List<RenderCanvasClip> clips;
 		
 	public:
 		RenderCanvasState();
@@ -50,6 +50,9 @@ namespace slib
 		RenderCanvasState(RenderCanvasState* other);
 		
 		~RenderCanvasState();
+		
+	public:
+		void copyFrom(RenderCanvasState* other);
 		
 	};
 	
@@ -66,7 +69,9 @@ namespace slib
 		static Ref<RenderCanvas> create(const Ref<RenderEngine>& engine, sl_real width, sl_real height);
 		
 	public:
-		Ref<RenderEngine> getEngine();
+		const Ref<RenderEngine>& getEngine();
+		
+		RenderCanvasState* getCurrentState();
 		
 		// override
 		void save();
@@ -91,6 +96,9 @@ namespace slib
 		
 		// override
 		void concatMatrix(const Matrix3& matrix);
+		
+		// override
+		void translate(sl_real dx, sl_real dy);
 		
 		// override
 		Size measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine = sl_false);
@@ -162,9 +170,12 @@ namespace slib
 		void drawTexture(const Rectangle& rectDst, const Ref<Texture>& texture, sl_real alpha = 1);
 		
 		
+		void translateFromSavedState(RenderCanvasState* savedState, sl_real dx, sl_real dy);
+		
 		Matrix3 getTransformMatrixForRectangle(const Rectangle& rect);
 		
 		void drawRectangle(const Rectangle& rect, RenderProgramState2D_Position* programState, const DrawParam& param);
+		
 		
 	protected:
 		// override

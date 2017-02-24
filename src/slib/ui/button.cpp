@@ -65,6 +65,7 @@ namespace slib
 	Button::Button() : Button(2)
 	{
 		setCreatingNativeWidget(sl_true);
+		setSavingCanvasState(sl_false);
 	}
 
 	Button::Button(sl_uint32 nCategories, ButtonCategory* categories)

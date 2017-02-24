@@ -22,10 +22,8 @@ namespace slib
 		static Ref<iOS_ViewInstance> create(UIView* handle, sl_bool flagFreeOnRelease);
 		
 		static Ref<iOS_ViewInstance> create(UIView* handle, UIView* parent, View* view);
-		
+
 	public:
-		void release();
-		
 		static void freeHandle(UIView* handle);
 		
 		UIView* getHandle();
@@ -65,6 +63,12 @@ namespace slib
 		void setAlpha(sl_real alpha);
 		
 		// override
+		void setClipping(sl_bool flag);
+		
+		// override
+		void setDrawing(sl_bool flag);
+		
+		// override
 		UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
 		
 		// override
@@ -84,9 +88,13 @@ namespace slib
 		
 		sl_bool onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event);
 		
+	private:
+		void _release();
+		
 	protected:
 		UIView* m_handle;
 		sl_bool m_flagFreeOnRelease;
+		sl_bool m_flagDrawing;
 		
 		UISwipeGestureRecognizer* m_gestureSwipeLeft;
 		UISwipeGestureRecognizer* m_gestureSwipeRight;
@@ -104,6 +112,7 @@ namespace slib
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 
 }
+
 @end
 
 

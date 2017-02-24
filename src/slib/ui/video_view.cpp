@@ -12,6 +12,8 @@ namespace slib
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
 		
+		setSavingCanvasState(sl_false);
+		
 		setBackgroundColor(Color::Black, UIUpdateMode::Init);
 		
 		setRedrawMode(RedrawMode::WhenDirty);

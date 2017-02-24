@@ -16,14 +16,15 @@ namespace slib
 	iOS_ViewInstance::iOS_ViewInstance()
 	{
 		m_handle = nil;
+		m_flagDrawing = sl_true;
 	}
 	
 	iOS_ViewInstance::~iOS_ViewInstance()
 	{
-		release();
+		_release();
 	}
 	
-	void iOS_ViewInstance::release()
+	void iOS_ViewInstance::_release()
 	{
 		UIPlatform::removeViewInstance(m_handle);
 		if (m_flagFreeOnRelease) {
@@ -41,49 +42,55 @@ namespace slib
 	
 	Ref<iOS_ViewInstance> iOS_ViewInstance::create(UIView* handle, sl_bool flagFreeOnRelease)
 	{
-		Ref<iOS_ViewInstance> ret;
 		if (handle != nil) {
-			ret = new iOS_ViewInstance();
+			Ref<iOS_ViewInstance> ret = new iOS_ViewInstance();
 			if (ret.isNotNull()) {
 				ret->m_handle = handle;
 				ret->m_flagFreeOnRelease = flagFreeOnRelease;
 				UIPlatform::registerViewInstance(handle, ret.get());
+				return ret;
 			} else {
 				if (flagFreeOnRelease) {
 					freeHandle(handle);
 				}
 			}
 		}
-		return ret;
+		return sl_null;
 	}
 	
 	Ref<iOS_ViewInstance> iOS_ViewInstance::create(UIView* handle, UIView* parent, View* view)
 	{
-		Ref<iOS_ViewInstance> instance;
-		
+
 		if (handle != nil) {
 			
-			instance = create(handle, sl_true);
+			Ref<iOS_ViewInstance> instance = create(handle, sl_true);
 			
 			if (instance.isNotNull()) {
 				
-				[handle setClipsToBounds:YES];
 				[handle setMultipleTouchEnabled:YES];
 				
+				instance->m_flagDrawing = view->isDrawing();
+				
+				[handle setClipsToBounds:(view->isClipping() ? YES : NO)];
+				
 				[handle setHidden:(view->isVisible() ? NO : YES)];
+				
 				if (!(view->isEnabled())) {
 					if ([handle isKindOfClass:[UIControl class]]) {
 						UIControl* control = (UIControl*)(handle);
 						[control setEnabled:NO];
 					}
 				}
+				
 				[handle setOpaque:(view->isOpaque() ? YES : NO)];
+				
 				if (!([handle isKindOfClass:[Slib_iOS_ViewHandle class]])) {
 					sl_real alpha = view->getAlpha();
 					if (alpha < 0.995f) {
 						[handle setAlpha: alpha];
 					}
 				}
+				
 				Matrix3 transform;
 				if (view->getFinalTransform(&transform)) {
 					CGAffineTransform t;
@@ -94,9 +101,14 @@ namespace slib
 				if (parent != nil) {
 					[parent addSubview:handle];
 				}
+				
+				return instance;
+				
 			}
 		}
-		return instance;
+		
+		return sl_null;
+		
 	}
 	
 	UIView* iOS_ViewInstance::getHandle()
@@ -111,6 +123,16 @@ namespace slib
 	
 	void iOS_ViewInstance::setFocus()
 	{
+		UIView* handle = m_handle;
+		if (handle != nil) {
+			if (UI::isUiThread()) {
+				[handle becomeFirstResponder];
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[handle becomeFirstResponder];
+				});
+			}
+		}
 	}
 	
 	void iOS_ViewInstance::invalidate()
@@ -269,6 +291,26 @@ namespace slib
 		}
 	}
 	
+	void iOS_ViewInstance::setClipping(sl_bool flag)
+	{
+		UIView* handle = m_handle;
+		if (handle != nil) {
+			if (UI::isUiThread()) {
+				[handle setClipsToBounds:(flag ? YES : NO)];
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[handle setClipsToBounds:(flag ? YES : NO)];
+				});
+			}
+		}
+	}
+	
+	
+	void iOS_ViewInstance::setDrawing(sl_bool flag)
+	{
+		m_flagDrawing = flag;
+	}
+	
 	UIPointf iOS_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
 	{
 		UIView* handle = m_handle;
@@ -358,6 +400,10 @@ namespace slib
 	void iOS_ViewInstance::onDraw(CGRect rectDirty)
 	{
 		
+		if (!m_flagDrawing) {
+			return;
+		}
+		
 		UIView* handle = m_handle;
 		
 		if (handle != nil) {
@@ -387,45 +433,57 @@ namespace slib
 		
 		if (handle != nil) {
 			
-			CGFloat f = UIPlatform::getGlobalScaleFactor();
-			
 			sl_uint32 n = (sl_uint32)([touches count]);
-			Array<TouchPoint> points = Array<TouchPoint>::create(n);
-			if (points.isNotNull()) {
-				TouchPoint* pts = points.getData();
-				sl_uint32 i = 0;
-				for (UITouch* touch in touches) {
-					CGPoint pt = [touch locationInView:handle];
-					sl_real pressure = (sl_real)([touch force]);
-					UITouchPhase _phase = [touch phase];
-					TouchPhase phase;
-					if (_phase == UITouchPhaseBegan) {
-						phase = TouchPhase::Begin;
-					} else if (_phase == UITouchPhaseEnded) {
-						phase = TouchPhase::End;
-					} else if (_phase == UITouchPhaseCancelled) {
-						phase = TouchPhase::Cancel;
-					} else {
-						phase = TouchPhase::Move;
+			
+			if (n > 0) {
+			
+				Array<TouchPoint> points = Array<TouchPoint>::create(n);
+				
+				if (points.isNotNull()) {
+
+					TouchPoint* pts = points.getData();
+					
+					CGFloat f = UIPlatform::getGlobalScaleFactor();
+					
+					sl_uint32 i = 0;
+					for (UITouch* touch in touches) {
+						CGPoint pt = [touch locationInView:handle];
+						sl_real pressure = (sl_real)([touch force]);
+						UITouchPhase _phase = [touch phase];
+						TouchPhase phase;
+						if (_phase == UITouchPhaseBegan) {
+							phase = TouchPhase::Begin;
+						} else if (_phase == UITouchPhaseEnded) {
+							phase = TouchPhase::End;
+						} else if (_phase == UITouchPhaseCancelled) {
+							phase = TouchPhase::Cancel;
+						} else {
+							phase = TouchPhase::Move;
+						}
+						TouchPoint point((sl_ui_posf)(pt.x * f), (sl_ui_posf)(pt.y * f), pressure, phase);
+						pts[i] = point;
+						i++;
+						if (i >= n) {
+							break;
+						}
 					}
-					TouchPoint point((sl_ui_posf)(pt.x * f), (sl_ui_posf)(pt.y * f), pressure, phase);
-					pts[i] = point;
-					i++;
-					if (i >= n) {
-						break;
+					
+					Time t;
+					t.setSecondsCountf(event.timestamp);
+					
+					Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, t);
+					
+					if (ev.isNotNull()) {
+						onTouchEvent(ev.get());
+						if (ev->isStoppedPropagation()) {
+							return sl_true;
+						}
 					}
+
 				}
+				
 			}
 			
-			Time t;
-			t.setSecondsCountf(event.timestamp);
-			Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, t);
-			if (ev.isNotNull()) {
-				onTouchEvent(ev.get());
-				if (ev->isStoppedPropagation()) {
-					return sl_true;
-				}
-			}
 		}
 		
 		return sl_false;
@@ -443,6 +501,7 @@ namespace slib
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
+	
 }
 
 @implementation Slib_iOS_ViewHandle

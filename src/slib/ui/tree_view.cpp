@@ -492,6 +492,7 @@ namespace slib
 		
 		ScrollView::setCreatingNativeWidget(sl_false);
 		setUsingFont(sl_true);
+		setSavingCanvasState(sl_false);
 		
 		_createRootItem();
 		_createContentView();
