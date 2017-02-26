@@ -40,7 +40,7 @@ namespace slib
 		SLIB_JNI_LONG_FIELD(nativeObject);
 
 		SLIB_JNI_NEW(init, "()V");
-		SLIB_JNI_METHOD(show, "show", "(Lslib/platform/android/SlibActivity;)V");
+		SLIB_JNI_METHOD(show, "show", "(Lslib/platform/android/SlibActivity;)Z");
 
 		SLIB_JNI_NATIVE(nativeShowAlertResult, "nativeShowResult", "(JI)V", _AndroidAlert_runShowResult);
 
@@ -51,17 +51,18 @@ namespace slib
 	public:
 		Function<void()> onOk;
 		Function<void()> onCancel;
+		Function<void()> onYes;
 		Function<void()> onNo;
 	};
 
 	typedef HashMap<jlong, Ref<_UiAlertResult> > _UiAlertMap;
 	SLIB_SAFE_STATIC_GETTER(_UiAlertMap, _AndroidUi_alerts)
 
-	void AlertDialog::_show()
+	sl_bool AlertDialog::_show()
 	{
 		_UiAlertMap* alertMap = _AndroidUi_alerts();
 		if (!alertMap) {
-			return;
+			return sl_false;
 		}
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
@@ -69,6 +70,7 @@ namespace slib
 			if (result.isNotNull()) {
 				result->onOk = onOk;
 				result->onCancel = onCancel;
+				result->onYes = onYes;
 				result->onNo = onNo;
 
 				JniLocal<jobject> jalert = _JAndroidAlert::init.newObject(sl_null);
@@ -83,10 +85,14 @@ namespace slib
 					_JAndroidAlert::titleYes.set(jalert, titleYes);
 					_JAndroidAlert::titleNo.set(jalert, titleNo);
 					alertMap->put(lresult, result);
-					_JAndroidAlert::show.call(jalert, jactivity);
+					if (_JAndroidAlert::show.callBoolean(jalert, jactivity)) {
+						return sl_true;
+					}
+					alertMap->remove(lresult);
 				}
 			}
 		}
+		return sl_false;
 	}
 
 	void _AndroidAlert_runShowResult(JNIEnv* env, jobject _this, jlong _alert, int result)
@@ -105,7 +111,7 @@ namespace slib
 				alert->onOk();
 				break;
 			case 2: // Yes
-				alert->onOk();
+				alert->onYes();
 				break;
 			case 3: // No
 				alert->onNo();

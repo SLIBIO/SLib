@@ -18,6 +18,9 @@
 #include <Ecore.h>
 #include <system_info.h>
 
+#pragma GCC diagnostic ignored "-Wextern-c-compat"
+#include <Elementary.h>
+
 #include <pthread.h>
 
 namespace slib
@@ -129,6 +132,7 @@ namespace slib
 			::ecore_timer_loop_add((double)delayMillis / 1000.0, _ui_dispatch_timer_callback, callable);
 		}
 	}
+
 
 	sl_int32 _g_main_loop_level = 0;
 	void UIPlatform::runLoop(sl_uint32 level)

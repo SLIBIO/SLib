@@ -41,6 +41,7 @@ namespace slib
 			titleNo = @"No";
 		}
 		
+		DialogResult result1 = DialogResult::Cancel;
 		DialogResult result2 = DialogResult::Cancel;
 		DialogResult result3 = DialogResult::Cancel;
 
@@ -52,11 +53,13 @@ namespace slib
 			[alert addButtonWithTitle:titleOk];
 			NSButton* btnCancel = [alert addButtonWithTitle:titleCancel];
 			[btnCancel setKeyEquivalent:@"Cancel"];
+			result1 = DialogResult::Ok;
 			result2 = DialogResult::Cancel;
 		} else if (type == AlertDialogType::YesNo) {
 			[alert addButtonWithTitle:titleYes];
 			NSButton* btnNo = [alert addButtonWithTitle:titleNo];
 			[btnNo setKeyEquivalent:@"Don't Save"];
+			result1 = DialogResult::Yes;
 			result2 = DialogResult::No;
 		} else if (type == AlertDialogType::YesNoCancel) {
 			[alert addButtonWithTitle:titleYes];
@@ -64,10 +67,12 @@ namespace slib
 			[btnCancel setKeyEquivalent:@"Cancel"];
 			NSButton* btnNo = [alert addButtonWithTitle:titleNo];
 			[btnNo setKeyEquivalent:@"Don't Save"];
+			result1 = DialogResult::Yes;
 			result2 = DialogResult::Cancel;
 			result3 = DialogResult::No;
 		} else {
 			[alert addButtonWithTitle:titleOk];
+			result1 = DialogResult::Ok;
 		}
 		
 		NSWindow* hParent = UIPlatform::getWindowHandle(parent.get());
@@ -82,7 +87,7 @@ namespace slib
 			result = [alert runModal];
 		}
 		if (result == NSAlertFirstButtonReturn) {
-			return DialogResult::Ok;
+			return result1;
 		} else if (result == NSAlertSecondButtonReturn) {
 			return result2;
 		} else if (result == NSAlertThirdButtonReturn) {
@@ -96,8 +101,9 @@ namespace slib
 		_showByRun();
 	}
 
-	void AlertDialog::_show()
+	sl_bool AlertDialog::_show()
 	{
+		return sl_false;
 	}
 
 

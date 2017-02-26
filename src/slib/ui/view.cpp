@@ -316,18 +316,16 @@ namespace slib
 
 	sl_bool View::isInstance()
 	{
-		Ref<ViewInstance> instance = getViewInstance();
-		if (instance.isNotNull()) {
-			return sl_true;
-		}
-		return sl_false;
+		return m_instance.isNotNull();
 	}
 
 	sl_bool View::isValidInstance()
 	{
-		Ref<ViewInstance> instance = m_instance;
-		if (instance.isNotNull()) {
-			return instance->isValid();
+		if (m_instance.isNotNull()) {
+			Ref<ViewInstance> instance = m_instance;
+			if (instance.isNotNull()) {
+				return instance->isValid();
+			}
 		}
 		return sl_false;
 	}
@@ -400,9 +398,11 @@ namespace slib
 
 	sl_bool View::isNativeWidget()
 	{
-		Ref<ViewInstance> instance = m_instance;
-		if (instance.isNotNull()) {
-			return instance->isNativeWidget();
+		if (m_instance.isNotNull()) {
+			Ref<ViewInstance> instance = m_instance;
+			if (instance.isNotNull()) {
+				return instance->isNativeWidget();
+			}
 		}
 		return sl_false;
 	}
@@ -419,13 +419,17 @@ namespace slib
 
 	Ref<Window> View::getWindow()
 	{
-		Ref<Window> window = m_window;
-		if (window.isNotNull()) {
-			return window;
+		if (m_window.isNotNull()) {
+			Ref<Window> window = m_window;
+			if (window.isNotNull()) {
+				return window;
+			}
 		}
-		Ref<View> parent = m_parent;
-		if (parent.isNotNull()) {
-			return parent->m_window;
+		if (m_parent.isNotNull()) {
+			Ref<View> parent = m_parent;
+			if (parent.isNotNull()) {
+				return parent->getWindow();
+			}
 		}
 		return sl_null;
 	}
@@ -518,23 +522,30 @@ namespace slib
 #else
 					Ref<View>& child = children[i];
 #endif
-					if (child.isNotNull() && child->m_flagCreatingInstance) {
-						switch(child->getAttachMode()) {
-							case UIAttachMode::NotAttach:
-								break;
-							case UIAttachMode::AttachAlways:
-								attachChild(child);
-								break;
-							case UIAttachMode::NotAttachInNativeWidget:
-								if (!(isNativeWidget())) {
+					if (child.isNotNull()) {
+						if (child->m_flagCreatingInstance) {
+							switch(child->getAttachMode()) {
+								case UIAttachMode::NotAttach:
+									break;
+								case UIAttachMode::AttachAlways:
 									attachChild(child);
-								}
-								break;
-							case UIAttachMode::AttachInNativeWidget:
-								if (isNativeWidget()) {
-									attachChild(child);
-								}
-								break;
+									break;
+								case UIAttachMode::NotAttachInNativeWidget:
+									if (!(isNativeWidget())) {
+										attachChild(child);
+									}
+									break;
+								case UIAttachMode::AttachInNativeWidget:
+									if (isNativeWidget()) {
+										attachChild(child);
+									}
+									break;
+							}
+						}
+						if (!m_flagDrawing) {
+							if (!(child->isInstance()) && !(isNativeWidget())) {
+								setDrawing(sl_true, UIUpdateMode::NoRedraw);
+							}
 						}
 					}
 				}
@@ -856,23 +867,34 @@ namespace slib
 			
 			if (mode != UIUpdateMode::Init) {
 				invalidateLayoutFromResizeContent(UIUpdateMode::NoRedraw);
-				if (isInstance() && m_flagCreatingChildInstances && child->m_flagCreatingInstance) {
-					switch(child->getAttachMode()) {
-						case UIAttachMode::NotAttach:
-							break;
-						case UIAttachMode::AttachAlways:
-							attachChild(child);
-							break;
-						case UIAttachMode::NotAttachInNativeWidget:
-							if (!(isNativeWidget())) {
+				if (isInstance()) {
+					sl_bool flagAttach = sl_false;
+					if (m_flagCreatingChildInstances && child->m_flagCreatingInstance) {
+						switch(child->getAttachMode()) {
+							case UIAttachMode::NotAttach:
+								break;
+							case UIAttachMode::AttachAlways:
 								attachChild(child);
-							}
-							break;
-						case UIAttachMode::AttachInNativeWidget:
-							if (isNativeWidget()) {
-								attachChild(child);
-							}
-							break;
+								flagAttach = sl_true;
+								break;
+							case UIAttachMode::NotAttachInNativeWidget:
+								if (!(isNativeWidget())) {
+									attachChild(child);
+									flagAttach = sl_true;
+								}
+								break;
+							case UIAttachMode::AttachInNativeWidget:
+								if (isNativeWidget()) {
+									attachChild(child);
+									flagAttach = sl_true;
+								}
+								break;
+						}
+					}
+					if (!m_flagDrawing) {
+						if (!flagAttach && !(isNativeWidget())) {
+							setDrawing(sl_true, UIUpdateMode::NoRedraw);
+						}
 					}
 				}
 				child->updateAndInvalidateBoundsInParent(UIUpdateMode::NoRedraw);
@@ -6544,11 +6566,6 @@ namespace slib
 				View* child = children[i].get();
 				
 				if (child) {
-					if (IsInstanceOf<ViewPager>(this)) {
-						if (((ViewPager*)this)->getPagesCount() == 6) {
-							child = child;
-						}
-					}
 
 					if (child->isVisible()) {
 						
@@ -6558,8 +6575,8 @@ namespace slib
 						sl_bool flagTranslation = sl_true;
 						if (child->getFinalTransform(&mat)) {
 							if (Transform2::isTranslation(mat)) {
-								offx += mat.m20;
-								offy += mat.m21;
+								offx += (sl_ui_pos)(mat.m20);
+								offy += (sl_ui_pos)(mat.m21);
 							} else {
 								flagTranslation = sl_false;
 							}
@@ -6640,8 +6657,8 @@ namespace slib
 							sl_bool flagTranslation = sl_true;
 							if (child->getFinalTransform(&mat)) {
 								if (Transform2::isTranslation(mat)) {
-									offx += mat.m20;
-									offy += mat.m21;
+									offx += (sl_ui_pos)(mat.m20);
+									offy += (sl_ui_pos)(mat.m21);
 								} else {
 									flagTranslation = sl_false;
 								}
@@ -6684,9 +6701,7 @@ namespace slib
 
 	void View::drawContent(Canvas* canvas)
 	{
-		sl_uint32 width = getWidth();
-		sl_uint32 height = getHeight();
-		
+
 		Ref<DrawAttributes>& drawAttrs = m_drawAttrs;
 		Ref<ScrollAttributes>& scrollAttrs = m_scrollAttrs;
 	
@@ -6722,8 +6737,9 @@ namespace slib
 			}
 		}
 		
-		if (m_children.getCount() > 0) {
-			onDrawChildren(canvas);
+		if (m_children.isNotNull()) {
+			ListElements< Ref<View> > children(getChildren());
+			drawChildren(canvas, children.data, children.count);
 		}
 		
 	}
@@ -7271,14 +7287,16 @@ namespace slib
 				}
 
 			} else {
-				ListElements< Ref<View> > children(getChildren());
-				if (children.count > 0) {
-					if (m_flagClipping) {
-						CanvasStateScope scope(canvas);
-						clipBounds(canvas);
-						drawChildren(canvas, children.data, children.count);
-					} else {
-						drawChildren(canvas, children.data, children.count);
+				if (m_children.isNotNull()) {
+					ListElements< Ref<View> > children(getChildren());
+					if (children.count > 0) {
+						if (m_flagClipping) {
+							CanvasStateScope scope(canvas);
+							clipBounds(canvas);
+							drawChildren(canvas, children.data, children.count);
+						} else {
+							drawChildren(canvas, children.data, children.count);
+						}
 					}
 				}
 			}
@@ -7316,12 +7334,6 @@ namespace slib
 
 	void View::onPostDraw(Canvas* canvas)
 	{
-	}
-
-	void View::onDrawChildren(Canvas* canvas)
-	{
-		ListElements< Ref<View> > children(getChildren());
-		drawChildren(canvas, children.data, children.count);
 	}
 
 	void View::onDrawBackground(Canvas* canvas)

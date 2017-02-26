@@ -9,6 +9,7 @@
 
 namespace slib
 {
+	
 	DialogResult AlertDialog::run()
 	{
 		return _runByShow();
@@ -24,7 +25,7 @@ namespace slib
 		_showOnUiThread();
 	}
 	
-	void AlertDialog::_show()
+	sl_bool AlertDialog::_show()
 	{
 		AlertDialogType type = this->type;
 		NSString* caption = Apple::getNSStringFromString(this->caption);
@@ -47,60 +48,71 @@ namespace slib
 		}
 		Function<void()> onOk = this->onOk;
 		Function<void()> onCancel = this->onCancel;
+		Function<void()> onYes = this->onYes;
 		Function<void()> onNo = this->onNo;
 		
 		UIAlertController* alert = [UIAlertController alertControllerWithTitle:caption message:text preferredStyle:UIAlertControllerStyleAlert];
-		if (type == AlertDialogType::OkCancel) {
-			UIAlertAction* actionOK = [UIAlertAction actionWithTitle:titleOk style:UIAlertActionStyleDefault handler:
-									   ^(UIAlertAction *) {
-										   onOk();
-									   }];
-			UIAlertAction* actionCancel = [UIAlertAction actionWithTitle:titleCancel style:UIAlertActionStyleCancel handler:
+		
+		if (alert != nil) {
+			
+			if (type == AlertDialogType::OkCancel) {
+				UIAlertAction* actionOK = [UIAlertAction actionWithTitle:titleOk style:UIAlertActionStyleDefault handler:
 										   ^(UIAlertAction *) {
-											   onCancel();
+											   onOk();
 										   }];
-			[alert addAction:actionOK];
-			[alert addAction:actionCancel];
-		} else if (type == AlertDialogType::YesNo) {
-			UIAlertAction* actionYes = [UIAlertAction actionWithTitle:titleYes style:UIAlertActionStyleDefault handler:
-										^(UIAlertAction *) {
-											onOk();
-										}];
-			UIAlertAction* actionNo = [UIAlertAction actionWithTitle:titleNo style:UIAlertActionStyleDestructive handler:
-									   ^(UIAlertAction *) {
-										   onNo();
-									   }];
-			[alert addAction:actionYes];
-			[alert addAction:actionNo];
-		} else if (type == AlertDialogType::YesNoCancel) {
-			UIAlertAction* actionYes = [UIAlertAction actionWithTitle:titleYes style:UIAlertActionStyleDefault handler:
-										^(UIAlertAction *) {
-											onOk();
-										}];
-			UIAlertAction* actionNo = [UIAlertAction actionWithTitle:titleNo style:UIAlertActionStyleDestructive handler:
-									   ^(UIAlertAction *) {
-										   onNo();
-									   }];
-			UIAlertAction* actionCancel = [UIAlertAction actionWithTitle:titleCancel style:UIAlertActionStyleCancel handler:
+				UIAlertAction* actionCancel = [UIAlertAction actionWithTitle:titleCancel style:UIAlertActionStyleCancel handler:
+											   ^(UIAlertAction *) {
+												   onCancel();
+											   }];
+				[alert addAction:actionOK];
+				[alert addAction:actionCancel];
+			} else if (type == AlertDialogType::YesNo) {
+				UIAlertAction* actionYes = [UIAlertAction actionWithTitle:titleYes style:UIAlertActionStyleDefault handler:
+											^(UIAlertAction *) {
+												onYes();
+											}];
+				UIAlertAction* actionNo = [UIAlertAction actionWithTitle:titleNo style:UIAlertActionStyleDestructive handler:
 										   ^(UIAlertAction *) {
-											   onCancel();
+											   onNo();
 										   }];
-			[alert addAction:actionYes];
-			[alert addAction:actionNo];
-			[alert addAction:actionCancel];
-		} else {
-			UIAlertAction* actionOK = [UIAlertAction actionWithTitle:titleOk style:UIAlertActionStyleCancel handler:
-									   ^(UIAlertAction *) {
-										   onOk();
-									   }];
-			[alert addAction:actionOK];
+				[alert addAction:actionYes];
+				[alert addAction:actionNo];
+			} else if (type == AlertDialogType::YesNoCancel) {
+				UIAlertAction* actionYes = [UIAlertAction actionWithTitle:titleYes style:UIAlertActionStyleDefault handler:
+											^(UIAlertAction *) {
+												onYes();
+											}];
+				UIAlertAction* actionNo = [UIAlertAction actionWithTitle:titleNo style:UIAlertActionStyleDestructive handler:
+										   ^(UIAlertAction *) {
+											   onNo();
+										   }];
+				UIAlertAction* actionCancel = [UIAlertAction actionWithTitle:titleCancel style:UIAlertActionStyleCancel handler:
+											   ^(UIAlertAction *) {
+												   onCancel();
+											   }];
+				[alert addAction:actionYes];
+				[alert addAction:actionNo];
+				[alert addAction:actionCancel];
+			} else {
+				UIAlertAction* actionOK = [UIAlertAction actionWithTitle:titleOk style:UIAlertActionStyleCancel handler:
+										   ^(UIAlertAction *) {
+											   onOk();
+										   }];
+				[alert addAction:actionOK];
+			}
+			
+			UIWindow* window = UIPlatform::getKeyWindow();
+			if (window != nil) {
+				UIViewController* rootController = [window rootViewController];
+				if (rootController != nil) {
+					[rootController presentViewController:alert animated:YES completion:nil];
+					return sl_true;
+				}
+			}
 		}
 		
-		UIWindow* window = UIPlatform::getKeyWindow();
-		if (window != nil) {
-			UIViewController* rootController = [window rootViewController];
-			[rootController presentViewController:alert animated:YES completion:nil];
-		}
+		return sl_false;
+		
 	}
 	
 	sl_bool FileDialog::run()
@@ -111,7 +123,8 @@ namespace slib
 	sl_bool FileDialog::_run()
 	{
 		return sl_false;
-	}	
+	}
+	
 }
 
 #endif

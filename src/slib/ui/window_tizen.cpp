@@ -9,6 +9,8 @@
 #include "../../../inc/slib/ui/mobile_app.h"
 #include "../../../inc/slib/ui/platform.h"
 
+#include "../../../inc/slib/core/safe_static.h"
+
 #include "view_tizen.h"
 
 #pragma GCC diagnostic ignored "-Wextern-c-compat"
@@ -21,6 +23,9 @@ namespace slib
 {
 
 	static sl_int32 _ui_active_windows_count = 0;
+
+	class _Tizen_Window;
+	SLIB_STATIC_ZERO_INITIALIZED(Ref<_Tizen_Window>, _ui_main_window)
 
 	class _Tizen_Window : public WindowInstance
 	{
@@ -62,6 +67,10 @@ namespace slib
 					::eext_object_event_callback_add(window, EEXT_CALLBACK_BACK, _ui_win_back_cb, sl_null);
 
 					::evas_object_show(window);
+
+					if (_ui_main_window.isNull()) {
+						_ui_main_window = ret;
+					}
 
 					return ret;
 
@@ -386,6 +395,27 @@ namespace slib
 		} else {
 			return sl_null;
 		}
+	}
+
+	Evas_Object* UIPlatform::getWindowHandle(Window* window)
+	{
+		if (window) {
+			Ref<WindowInstance> _instance = window->getWindowInstance();
+			if (_instance.isNotNull()) {
+				_Tizen_Window* instance = static_cast<_Tizen_Window*>(_instance.get());
+				return instance->m_window;
+			}
+		}
+		return sl_null;
+	}
+
+
+	Evas_Object* UIPlatform::getMainWindow()
+	{
+		if (_ui_main_window.isNotNull()) {
+			return _ui_main_window->m_window;
+		}
+		return sl_null;
 	}
 
 }

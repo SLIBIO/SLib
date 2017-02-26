@@ -33,6 +33,8 @@ namespace slib
 		sl_reg decreaseReference();
 
 		sl_reg decreaseReferenceNoFree();
+		
+		sl_reg getReferenceCount();
 
 		void makeNeverFree();
 

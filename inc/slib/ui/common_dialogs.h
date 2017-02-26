@@ -112,12 +112,13 @@ namespace slib
 		
 		Function<void()> onOk;
 		Function<void()> onCancel;
+		Function<void()> onYes;
 		Function<void()> onNo;
 		
 	public:
 		DialogResult _run();
 		
-		void _show();
+		sl_bool _show();
 		
 	protected:
 		DialogResult _runOnUiThread();
@@ -128,6 +129,8 @@ namespace slib
 		
 		void _showByRun();
 		
+		AlertDialog* getReferable();
+
 	};
 
 	enum class FileDialogType

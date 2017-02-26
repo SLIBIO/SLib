@@ -63,6 +63,11 @@ namespace slib
 		}
 		return 1;
 	}
+	
+	sl_reg Referable::getReferenceCount()
+	{
+		return m_nRefCount;
+	}
 
 	sl_reg Referable::decreaseReferenceNoFree()
 	{

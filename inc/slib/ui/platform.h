@@ -158,6 +158,9 @@ namespace slib
 		static Ref<WindowInstance> getWindowInstance(Evas_Object* handle);
 		static void removeWindowInstance(Evas_Object* handle);
 		static Evas_Object* getWindowHandle(WindowInstance* instance);
+		static Evas_Object* getWindowHandle(Window* window);
+
+		static Evas_Object* getMainWindow();
 
 #endif
 		

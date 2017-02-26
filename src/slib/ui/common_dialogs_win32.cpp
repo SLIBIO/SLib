@@ -129,8 +129,9 @@ namespace slib
 		_showByRun();
 	}
 
-	void AlertDialog::_show()
+	sl_bool AlertDialog::_show()
 	{
+		return sl_false;
 	}
 
 

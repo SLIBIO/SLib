@@ -22,7 +22,6 @@ public class Alert {
 	public String titleNo;
 	
 	public long nativeObject;
-	public static final int RESULT_FAIL = -1;
 	public static final int RESULT_OK = 0;
 	public static final int RESULT_CANCEL = 1;
 	public static final int RESULT_YES = 2;
@@ -33,7 +32,7 @@ public class Alert {
 	}
 	
 	private static native void nativeShowResult(long ptr, int result);
-	public void show(final SlibActivity activity) {
+	public boolean show(final SlibActivity activity) {
 		
 		if (!(UiThread.isUiThread())) {
 			activity.runOnUiThread(new Runnable() {
@@ -148,13 +147,13 @@ public class Alert {
 				if (flagRight) {
 					AlertDialog alertDialog = alertDialogBuilder.create();
 					alertDialog.show();
-					return;
+					return true;
 				}
 			} catch (Throwable e) {
 				Logger.exception(e);
 			}
-			nativeShowResult(nativeObject, RESULT_FAIL);
 		}
+		return false;
 	}
 	
 	

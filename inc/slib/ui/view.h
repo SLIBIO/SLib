@@ -1129,8 +1129,6 @@ namespace slib
 		
 		virtual void onPostDraw(Canvas* canvas);
 		
-		virtual void onDrawChildren(Canvas* canvas);
-		
 		virtual void onDrawBackground(Canvas* canvas);
 		
 		virtual void onDrawBorder(Canvas* canvas);

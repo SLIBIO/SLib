@@ -281,9 +281,9 @@ namespace slib
 	public:
 		enum {
 			Ok = 0,
-			Yes = 0,
-			No = 1,
-			Cancel = 2
+			Yes = 1,
+			No = 2,
+			Cancel = 3
 		};
 
 	public:
