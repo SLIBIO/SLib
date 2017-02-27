@@ -837,14 +837,14 @@ namespace slib
 	template <class _T, class EQUALS>
 	sl_bool CList<T>::contains_NoLock(const _T& value, const EQUALS& equals) const
 	{
-		return indexOf_NoLock(value, equals) >= 0;
+		return indexOf_NoLock(value, 0, equals) >= 0;
 	}
 	
 	template <class T>
 	template <class _T, class EQUALS>
 	sl_bool CList<T>::contains(const _T& value, const EQUALS& equals) const
 	{
-		return indexOf(value, equals) >= 0;
+		return indexOf(value, 0, equals) >= 0;
 	}
 	
 	template <class T>
