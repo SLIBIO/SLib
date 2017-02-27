@@ -7208,6 +7208,9 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 											}
 										} else {
 											String str = arg.getString();
+											if (str.isEmpty()) {
+												str = arg.toString();
+											}
 											lenContent = str.getLength();
 											if (lenContent < minWidth) {
 												if (flagAlignLeft) {
@@ -7238,6 +7241,9 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 											}
 										} else {
 											String16 str = arg.getString16();
+											if (str.isEmpty()) {
+												str = arg.toString();
+											}
 											lenContent = str.getLength();
 											if (lenContent < minWidth) {
 												if (flagAlignLeft) {
