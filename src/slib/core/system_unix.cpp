@@ -24,10 +24,6 @@
 #include <sys/time.h>
 #include <sys/syscall.h>
 
-#if defined(SLIB_PLATFORM_IS_APPLE)
-#include <mach/mach.h>
-#endif
-
 #define _PATH_MAX 1024
 
 namespace slib
@@ -115,8 +111,7 @@ namespace slib
 	sl_uint32 System::getThreadId()
 	{
 #if defined(SLIB_PLATFORM_IS_APPLE)
-		int ret = mach_thread_self();
-		mach_port_deallocate(mach_task_self(), ret);
+		int ret = syscall(SYS_thread_selfid);
 		return ret;
 #elif defined(SLIB_PLATFORM_IS_ANDROID)
 		pid_t tid = gettid();
