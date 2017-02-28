@@ -711,7 +711,7 @@ namespace slib
 								}
 								Matrix3 mat;
 								if (fontItalic) {
-									float ratio = 0.2;
+									float ratio = 0.2f;
 									mat.m00 = fw; mat.m10 = -ratio * fh; mat.m20 = ratio * fh + rcDst.left;
 									mat.m01 = 0; mat.m11 = fh; mat.m21 = rcDst.top;
 									mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;

@@ -119,7 +119,7 @@ namespace slib
 	
 	template <class T>
 	template <class _T>
-	CList<T>* CList<T>::createFromElements(const _T* values, sl_size count)
+	CList<T>* CList<T>::createFromArray(const _T* values, sl_size count)
 	{
 		if (count > 0) {
 			CList<T>* ret = new CList<T>(values, count);
@@ -139,7 +139,7 @@ namespace slib
 	template <class _T>
 	CList<T>* CList<T>::createFromArray(const Array<_T>& array)
 	{
-		return createFromElements(array.getData(), array.getCount());
+		return createFromArray(array.getData(), array.getCount());
 	}
 	
 	template <class T>
@@ -156,11 +156,19 @@ namespace slib
 	}
 	
 	template <class T>
+	template <class... ARGS>
+	CList<T>* CList<T>::createFromElements(ARGS&&... _values)
+	{
+		T values[] = {Forward<ARGS>(_values)...};
+		return createFromArray(values, sizeof...(_values));
+	}
+
+	template <class T>
 	template <class _T>
 	CList<T>* CList<T>::createCopy(CList<_T>* other)
 	{
 		if (other) {
-			return createFromElements(other->getData(), other->getCount());
+			return createFromArray(other->getData(), other->getCount());
 		}
 		return sl_null;
 	}
@@ -851,7 +859,7 @@ namespace slib
 	CList<T>* CList<T>::duplicate_NoLock() const
 	{
 		if (m_count > 0) {
-			return createFromElements(m_data, m_count);
+			return createFromArray(m_data, m_count);
 		}
 		return sl_null;
 	}
@@ -1025,6 +1033,22 @@ namespace slib
 	
 	
 	template <class T>
+	List<T>::List(sl_size count): ref(CList<T>::create(count))
+	{
+	}
+	
+	template <class T>
+	List<T>::List(sl_size count, sl_size capacity): ref(CList<T>::create(count, capacity))
+	{
+	}
+	
+	template <class T>
+	template <class _T>
+	List<T>::List(const _T* values, sl_size count): ref(CList<T>::createFromArray(values, count))
+	{
+	}
+
+	template <class T>
 	List<T> List<T>::create()
 	{
 		return CList<T>::create();
@@ -1044,22 +1068,30 @@ namespace slib
 	
 	template <class T>
 	template <class _T>
-	List<T> List<T>::createFromElements(const _T* values, sl_size count)
+	List<T> List<T>::createFromArray(const _T* values, sl_size count)
 	{
-		return CList<T>::createFromElements(values, count);
+		return CList<T>::createFromArray(values, count);
 	}
 	
 	template <class T>
 	template <class _T>
 	List<T> List<T>::createFromArray(const Array<_T>& array)
 	{
-		return createFromElements(array.getData(), array.getCount());
+		return createFromArray(array.getData(), array.getCount());
 	}
 	
 	template <class T>
 	List<T> List<T>::createFromElement(const T& e)
 	{
 		return CList<T>::createFromElement(e);
+	}
+	
+	template <class T>
+	template <class... ARGS>
+	List<T> List<T>::createFromElements(ARGS&&... _values)
+	{
+		T values[] = {Forward<ARGS>(_values)...};
+		return createFromArray(values, sizeof...(_values));
 	}
 	
 	template <class T>
@@ -1358,7 +1390,7 @@ namespace slib
 		if (obj) {
 			return obj->addElements_NoLock(values, count);
 		} else {
-			obj = CList<T>::createFromElements(values, count);
+			obj = CList<T>::createFromArray(values, count);
 			if (obj) {
 				ref = obj;
 				return sl_true;
@@ -1378,7 +1410,7 @@ namespace slib
 		if (obj) {
 			return obj->addElements(values, count);
 		} else {
-			obj = CList<T>::createFromElements(values, count);
+			obj = CList<T>::createFromArray(values, count);
 			if (obj) {
 				ref = obj;
 				return sl_true;
@@ -1868,6 +1900,22 @@ namespace slib
 		}
 	}
 
+
+	template <class T>
+	Atomic< List<T> >::Atomic(sl_size count): ref(CList<T>::create(count))
+	{
+	}
+	
+	template <class T>
+	Atomic< List<T> >::Atomic(sl_size count, sl_size capacity): ref(CList<T>::create(count, capacity))
+	{
+	}
+	
+	template <class T>
+	template <class _T>
+	Atomic< List<T> >::Atomic(const _T* values, sl_size count): ref(CList<T>::createFromArray(values, count))
+	{
+	}
 
 	template <class T>
 	sl_size Atomic< List<T> >::getCount() const

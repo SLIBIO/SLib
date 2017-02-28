@@ -145,16 +145,28 @@ namespace slib
 	
 	public:
 		sl_size getSize() const;
+		
+		sl_bool add_NoLock(const MemoryData& mem);
 
 		sl_bool add(const MemoryData& mem);
+		
+		sl_bool add_NoLock(const Memory& mem);
 	
 		sl_bool add(const Memory& mem);
+		
+		sl_bool addStatic_NoLock(const void* buf, sl_size size);
 
 		sl_bool addStatic(const void* buf, sl_size size);
+		
+		void link_NoLock(MemoryBuffer& buf);
 	
 		void link(MemoryBuffer& buf);
+		
+		void clear_NoLock();
 	
 		void clear();
+		
+		Memory merge_NoLock() const;
 	
 		Memory merge() const;
 	
@@ -172,9 +184,15 @@ namespace slib
 		~MemoryQueue();
 	
 	public:
+		sl_bool pop_NoLock(MemoryData& data);
+		
 		sl_bool pop(MemoryData& data);
+		
+		sl_size pop_NoLock(void* buf, sl_size size);
 	
 		sl_size pop(void* buf, sl_size size);
+		
+		Memory merge_NoLock() const;
 	
 		Memory merge() const;
 	

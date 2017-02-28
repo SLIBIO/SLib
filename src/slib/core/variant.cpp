@@ -129,16 +129,40 @@ namespace slib
 	{
 	}
 
-	Variant::Variant(sl_int32 value)
+	Variant::Variant(short value)
 	{
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = value;
 	}
 
-	Variant::Variant(sl_uint32 value)
+	Variant::Variant(unsigned short value)
 	{
 		_type = VariantType::Uint32;
 		REF_VAR(sl_uint32, _value) = value;
+	}
+	
+	Variant::Variant(int value)
+	{
+		_type = VariantType::Int32;
+		REF_VAR(sl_int32, _value) = value;
+	}
+	
+	Variant::Variant(unsigned int value)
+	{
+		_type = VariantType::Uint32;
+		REF_VAR(sl_uint32, _value) = value;
+	}
+	
+	Variant::Variant(long value)
+	{
+		_type = VariantType::Int32;
+		REF_VAR(sl_int32, _value) = (sl_int32)value;
+	}
+	
+	Variant::Variant(unsigned long value)
+	{
+		_type = VariantType::Uint32;
+		REF_VAR(sl_uint32, _value) = (sl_uint32)value;
 	}
 
 	Variant::Variant(sl_int64 value)
@@ -165,7 +189,7 @@ namespace slib
 		REF_VAR(double, _value) = value;
 	}
 
-	Variant::Variant(const sl_bool value)
+	Variant::Variant(sl_bool value)
 	{
 		_type = VariantType::Boolean;
 		REF_VAR(sl_bool, _value) = value;
@@ -416,15 +440,39 @@ namespace slib
 		return *this;
 	}
 
-	Variant& Variant::operator=(sl_int32 value)
+	Variant& Variant::operator=(short value)
 	{
 		setInt32(value);
 		return *this;
 	}
 
-	Variant& Variant::operator=(sl_uint32 value)
+	Variant& Variant::operator=(unsigned short value)
 	{
 		setUint32(value);
+		return *this;
+	}
+	
+	Variant& Variant::operator=(int value)
+	{
+		setInt32(value);
+		return *this;
+	}
+	
+	Variant& Variant::operator=(unsigned int value)
+	{
+		setUint32(value);
+		return *this;
+	}
+	
+	Variant& Variant::operator=(long value)
+	{
+		setInt32((sl_int32)value);
+		return *this;
+	}
+	
+	Variant& Variant::operator=(unsigned long value)
+	{
+		setUint32((sl_uint32)value);
 		return *this;
 	}
 
@@ -452,7 +500,7 @@ namespace slib
 		return *this;
 	}
 
-	Variant& Variant::operator=(const sl_bool value)
+	Variant& Variant::operator=(sl_bool value)
 	{
 		setBoolean(value);
 		return *this;
@@ -1775,16 +1823,40 @@ namespace slib
 	{
 	}
 
-	Atomic<Variant>::Atomic(sl_int32 value)
+	Atomic<Variant>::Atomic(short value)
 	{
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = value;
 	}
 
-	Atomic<Variant>::Atomic(sl_uint32 value)
+	Atomic<Variant>::Atomic(unsigned short value)
 	{
 		_type = VariantType::Uint32;
 		REF_VAR(sl_uint32, _value) = value;
+	}
+	
+	Atomic<Variant>::Atomic(int value)
+	{
+		_type = VariantType::Int32;
+		REF_VAR(sl_int32, _value) = value;
+	}
+	
+	Atomic<Variant>::Atomic(unsigned int value)
+	{
+		_type = VariantType::Uint32;
+		REF_VAR(sl_uint32, _value) = value;
+	}
+	
+	Atomic<Variant>::Atomic(long value)
+	{
+		_type = VariantType::Int32;
+		REF_VAR(sl_int32, _value) = (sl_int32)value;
+	}
+	
+	Atomic<Variant>::Atomic(unsigned long value)
+	{
+		_type = VariantType::Uint32;
+		REF_VAR(sl_uint32, _value) = (sl_uint32)value;
 	}
 
 	Atomic<Variant>::Atomic(sl_int64 value)
@@ -1811,7 +1883,7 @@ namespace slib
 		REF_VAR(double, _value) = value;
 	}
 
-	Atomic<Variant>::Atomic(const sl_bool value)
+	Atomic<Variant>::Atomic(sl_bool value)
 	{
 		_type = VariantType::Boolean;
 		REF_VAR(sl_bool, _value) = value;
@@ -1960,15 +2032,39 @@ namespace slib
 		return *this;
 	}
 
-	AtomicVariant& Atomic<Variant>::operator=(sl_int32 value)
+	AtomicVariant& Atomic<Variant>::operator=(short value)
 	{
 		setInt32(value);
 		return *this;
 	}
 
-	AtomicVariant& Atomic<Variant>::operator=(sl_uint32 value)
+	AtomicVariant& Atomic<Variant>::operator=(unsigned short value)
 	{
 		setUint32(value);
+		return *this;
+	}
+	
+	AtomicVariant& Atomic<Variant>::operator=(int value)
+	{
+		setInt32(value);
+		return *this;
+	}
+	
+	AtomicVariant& Atomic<Variant>::operator=(unsigned int value)
+	{
+		setUint32(value);
+		return *this;
+	}
+	
+	AtomicVariant& Atomic<Variant>::operator=(long value)
+	{
+		setInt32((sl_int32)value);
+		return *this;
+	}
+	
+	AtomicVariant& Atomic<Variant>::operator=(unsigned long value)
+	{
+		setUint32((sl_uint32)value);
 		return *this;
 	}
 
@@ -1996,7 +2092,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicVariant& Atomic<Variant>::operator=(const sl_bool value)
+	AtomicVariant& Atomic<Variant>::operator=(sl_bool value)
 	{
 		setBoolean(value);
 		return *this;

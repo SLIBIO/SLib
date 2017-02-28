@@ -56,9 +56,17 @@ namespace slib
 	public:
 		Variant(sl_null_t);
 
-		Variant(sl_int32 value);
-
-		Variant(sl_uint32 value);
+		Variant(short value);
+		
+		Variant(unsigned short value);
+		
+		Variant(int value);
+		
+		Variant(unsigned int value);
+		
+		Variant(long value);
+		
+		Variant(unsigned long value);
 
 		Variant(sl_int64 value);
 
@@ -68,7 +76,7 @@ namespace slib
 	
 		Variant(double value);
 
-		Variant(const sl_bool value);
+		Variant(sl_bool value);
 
 		Variant(const String& value);
 
@@ -189,9 +197,17 @@ namespace slib
 
 		Variant& operator=(sl_null_t);
 
-		Variant& operator=(sl_int32 value);
-
-		Variant& operator=(sl_uint32 value);
+		Variant& operator=(short value);
+		
+		Variant& operator=(unsigned short value);
+		
+		Variant& operator=(int value);
+		
+		Variant& operator=(unsigned int value);
+		
+		Variant& operator=(long value);
+		
+		Variant& operator=(unsigned long value);
 
 		Variant& operator=(sl_int64 value);
 
@@ -201,7 +217,7 @@ namespace slib
 
 		Variant& operator=(double value);
 
-		Variant& operator=(const sl_bool value);
+		Variant& operator=(sl_bool value);
 
 		Variant& operator=(const String& value);
 
@@ -475,20 +491,28 @@ namespace slib
 
 	public:
 		Atomic(sl_null_t);
-
-		Atomic(sl_int32 value);
-
-		Atomic(sl_uint32 value);
-
+		
+		Atomic(short value);
+		
+		Atomic(unsigned short value);
+		
+		Atomic(int value);
+		
+		Atomic(unsigned int value);
+		
+		Atomic(long value);
+		
+		Atomic(unsigned long value);
+		
 		Atomic(sl_int64 value);
-
+		
 		Atomic(sl_uint64 value);
 
 		Atomic(float value);
 
 		Atomic(double value);
 
-		Atomic(const sl_bool value);
+		Atomic(sl_bool value);
 
 		Atomic(const String& value);
 	
@@ -554,10 +578,18 @@ namespace slib
 
 		AtomicVariant& operator=(sl_null_t);
 
-		AtomicVariant& operator=(sl_int32 value);
-
-		AtomicVariant& operator=(sl_uint32 value);
-
+		AtomicVariant& operator=(short value);
+		
+		AtomicVariant& operator=(unsigned short value);
+		
+		AtomicVariant& operator=(int value);
+		
+		AtomicVariant& operator=(unsigned int value);
+		
+		AtomicVariant& operator=(long value);
+		
+		AtomicVariant& operator=(unsigned long value);
+		
 		AtomicVariant& operator=(sl_int64 value);
 
 		AtomicVariant& operator=(sl_uint64 value);
@@ -566,7 +598,7 @@ namespace slib
 
 		AtomicVariant& operator=(double value);
 
-		AtomicVariant& operator=(const sl_bool value);
+		AtomicVariant& operator=(sl_bool value);
 
 		AtomicVariant& operator=(const String& value);
 

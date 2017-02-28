@@ -109,6 +109,9 @@ namespace slib
 		Link<T>* pushBack_NoLock(const T& value, sl_size countLimit = 0);
 
 		Link<T>* pushBack(const T& value, sl_size countLimit = 0);
+		
+		template <class _T>
+		void pushBackAll_NoLock(const CLinkedList<_T>* other);
 
 		template <class _T>
 		void pushBackAll(const CLinkedList<_T>* other);
@@ -120,6 +123,9 @@ namespace slib
 		Link<T>* pushFront_NoLock(const T& value, sl_size countLimit = 0);
 
 		Link<T>* pushFront(const T& value, sl_size countLimit = 0);
+		
+		template <class _T>
+		void pushFrontAll_NoLock(const CLinkedList<_T>* other);
 
 		template <class _T>
 		void pushFrontAll(const CLinkedList<_T>* other);
@@ -155,6 +161,8 @@ namespace slib
 
 		template < class _T, class EQUALS = Equals<T, _T> >
 		sl_size removeItemsByValue(const _T& value, List<T>* outValues = sl_null, const EQUALS& equals = EQUALS());
+		
+		void merge_NoLock(CLinkedList<T>* other);
 
 		void merge(CLinkedList<T>* other);
 
@@ -244,6 +252,9 @@ namespace slib
 		Link<T>* pushBack(const T& value, sl_size countLimit = 0);
 
 		template <class _T>
+		void pushBackAll_NoLock(const LinkedList<_T>& other);
+		
+		template <class _T>
 		void pushBackAll(const LinkedList<_T>& other);
 
 		sl_bool popBack_NoLock(T* _out = sl_null) const;
@@ -253,6 +264,9 @@ namespace slib
 		Link<T>* pushFront_NoLock(const T& value, sl_size countLimit = 0);
 
 		Link<T>* pushFront(const T& value, sl_size countLimit = 0);
+		
+		template <class _T>
+		void pushFrontAll_NoLock(const LinkedList<_T>& other);
 
 		template <class _T>
 		void pushFrontAll(const LinkedList<_T>& other);
@@ -288,6 +302,8 @@ namespace slib
 
 		template < class _T, class EQUALS = Equals<T, _T> >
 		sl_size removeItemsByValue(const _T& value, List<T>* outValues = sl_null, const EQUALS& equals = EQUALS()) const;
+		
+		void merge_NoLock(LinkedList<T>& other);
 
 		void merge(LinkedList<T>& other);
 

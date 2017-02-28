@@ -353,6 +353,20 @@ namespace slib
 		return m_size;
 	}
 
+	sl_bool MemoryBuffer::add_NoLock(const MemoryData& mem)
+	{
+		if (mem.size == 0) {
+			return sl_true;
+		}
+		if (mem.data) {
+			if (m_queue.push_NoLock(mem)) {
+				m_size += mem.size;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
 	sl_bool MemoryBuffer::add(const MemoryData& mem)
 	{
 		if (mem.size == 0) {
@@ -360,14 +374,23 @@ namespace slib
 		}
 		if (mem.data) {
 			ObjectLocker lock(this);
-			if (m_queue.push(mem)) {
+			if (m_queue.push_NoLock(mem)) {
 				m_size += mem.size;
 				return sl_true;
 			}
 		}
 		return sl_false;
 	}
-
+	
+	sl_bool MemoryBuffer::add_NoLock(const Memory& mem)
+	{
+		MemoryData data;
+		if (mem.getData(data)) {
+			return add_NoLock(data);
+		}
+		return sl_true;
+	}
+	
 	sl_bool MemoryBuffer::add(const Memory& mem)
 	{
 		MemoryData data;
@@ -375,6 +398,20 @@ namespace slib
 			return add(data);
 		}
 		return sl_true;
+	}
+	
+	sl_bool MemoryBuffer::addStatic_NoLock(const void* buf, sl_size size)
+	{
+		if (size == 0) {
+			return sl_true;
+		}
+		if (buf) {
+			MemoryData data;
+			data.data = (void*)buf;
+			data.size = size;
+			return add_NoLock(data);
+		}
+		return sl_false;
 	}
 
 	sl_bool MemoryBuffer::addStatic(const void* buf, sl_size size)
@@ -390,25 +427,37 @@ namespace slib
 		}
 		return sl_false;
 	}
+	
+	void MemoryBuffer::link_NoLock(MemoryBuffer& buf)
+	{
+		m_size += buf.m_size;
+		buf.m_size = 0;
+		m_queue.merge_NoLock(&(buf.m_queue));
+	}
 
 	void MemoryBuffer::link(MemoryBuffer& buf)
 	{
 		ObjectLocker lock(this, &buf);
 		m_size += buf.m_size;
 		buf.m_size = 0;
-		m_queue.merge(&(buf.m_queue));
+		m_queue.merge_NoLock(&(buf.m_queue));
+	}
+	
+	void MemoryBuffer::clear_NoLock()
+	{
+		m_queue.removeAll_NoLock();
+		m_size = 0;
 	}
 
 	void MemoryBuffer::clear()
 	{
 		ObjectLocker lock(this);
-		m_queue.removeAll();
+		m_queue.removeAll_NoLock();
 		m_size = 0;
 	}
-
-	Memory MemoryBuffer::merge() const
+	
+	Memory MemoryBuffer::merge_NoLock() const
 	{
-		ObjectLocker lock(this);
 		if (m_queue.getCount() == 0) {
 			return sl_null;
 		}
@@ -433,6 +482,15 @@ namespace slib
 		return ret;
 	}
 
+	Memory MemoryBuffer::merge() const
+	{
+		if (m_queue.getCount() == 0) {
+			return sl_null;
+		}
+		ObjectLocker lock(this);
+		return merge_NoLock();
+	}
+
 /*******************************************
 			MemoryBuffer
 *******************************************/
@@ -447,10 +505,9 @@ namespace slib
 	MemoryQueue::~MemoryQueue()
 	{
 	}
-
-	sl_bool MemoryQueue::pop(MemoryData& data)
+	
+	sl_bool MemoryQueue::pop_NoLock(MemoryData& data)
 	{
-		ObjectLocker lock(this);
 		MemoryData mem = m_memCurrent;
 		if (mem.size > 0) {
 			sl_size pos = m_posCurrent;
@@ -464,7 +521,7 @@ namespace slib
 				return sl_true;
 			}
 		} else {
-			if (m_queue.pop(&data)) {
+			if (m_queue.pop_NoLock(&data)) {
 				if (data.size > 0) {
 					m_size -= data.size;
 					return sl_true;
@@ -474,9 +531,14 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_size MemoryQueue::pop(void* _buf, sl_size size)
+	sl_bool MemoryQueue::pop(MemoryData& data)
 	{
 		ObjectLocker lock(this);
+		return pop_NoLock(data);
+	}
+	
+	sl_size MemoryQueue::pop_NoLock(void* _buf, sl_size size)
+	{
 		char* buf = (char*)_buf;
 		sl_size nRead = 0;
 		while (nRead < size) {
@@ -485,7 +547,7 @@ namespace slib
 			m_memCurrent.size = 0;
 			m_posCurrent = 0;
 			if (mem.size == 0) {
-				m_queue.pop(&mem);
+				m_queue.pop_NoLock(&mem);
 				pos = 0;
 			}
 			if (mem.size == 0) {
@@ -511,9 +573,14 @@ namespace slib
 		return nRead;
 	}
 
-	Memory MemoryQueue::merge() const
+	sl_size MemoryQueue::pop(void* buf, sl_size size)
 	{
 		ObjectLocker lock(this);
+		return pop_NoLock(buf, size);
+	}
+	
+	Memory MemoryQueue::merge_NoLock() const
+	{
 		if (m_queue.getCount() == 0) {
 			return m_memCurrent.sub(m_posCurrent);
 		}
@@ -545,6 +612,12 @@ namespace slib
 			}
 		}
 		return ret;
+	}
+
+	Memory MemoryQueue::merge() const
+	{
+		ObjectLocker lock(this);
+		return merge_NoLock();
 	}
 
 }

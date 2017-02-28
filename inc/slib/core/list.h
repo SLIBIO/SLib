@@ -10,6 +10,12 @@
 #include "compare.h"
 #include "sort.h"
 
+namespace std
+{
+	template <class T>
+	class initializer_list;
+}
+
 namespace slib
 {
 	
@@ -40,6 +46,8 @@ namespace slib
 
 		template <class _T>
 		CList(const _T* values, sl_size count);
+		
+		CList(const std::initializer_list<T>& l);
 
 		~CList();
 
@@ -49,14 +57,19 @@ namespace slib
 		static CList<T>* create(sl_size count);
 
 		static CList<T>* create(sl_size count, sl_size capacity);
+		
+		static CList<T>* create(const std::initializer_list<T>& l);
 
 		template <class _T>
-		static CList<T>* createFromElements(const _T* values, sl_size count);
+		static CList<T>* createFromArray(const _T* values, sl_size count);
 
 		template <class _T>
 		static CList<T>* createFromArray(const Array<_T>& array);
 
 		static CList<T>* createFromElement(const T& value);
+		
+		template <class... ARGS>
+		static CList<T>* createFromElements(ARGS&&... values);
 
 		template <class _T>
 		static CList<T>* createCopy(CList<_T>* other);
@@ -105,7 +118,11 @@ namespace slib
 
 		template <class _T>
 		sl_bool insertElements(sl_size index, const _T* values, sl_size count);
-
+		
+		sl_bool insertElements_NoLock(sl_size index, const std::initializer_list<T>& l);
+		
+		sl_bool insertElements(sl_size index, const std::initializer_list<T>& l);
+		
 		template <class _T>
 		sl_bool insertAll(sl_size index, const CList<_T>* other);
 
@@ -118,7 +135,11 @@ namespace slib
 
 		template <class _T>
 		sl_bool addElements(const _T* values, sl_size count);
-
+		
+		sl_bool addElements_NoLock(const std::initializer_list<T>& l);
+		
+		sl_bool addElements(const std::initializer_list<T>& l);
+		
 		template <class _T>
 		sl_bool addAll_NoLock(const CList<_T>* other);
 	
@@ -259,20 +280,35 @@ namespace slib
 		SLIB_REF_WRAPPER(List, CList<T>)
 
 	public:
+		List(sl_size count);
+		
+		List(sl_size count, sl_size capacity);
+		
+		template <class _T>
+		List(const _T* values, sl_size count);
+
+		List(const std::initializer_list<T>& l);
+		
+	public:
 		static List<T> create();
 
 		static List<T> create(sl_size count);
 
 		static List<T> create(sl_size count, sl_size capacity);
+		
+		static List<T> create(const std::initializer_list<T>& l);
 
 		template <class _T>
-		static List<T> createFromElements(const _T* values, sl_size count);
+		static List<T> createFromArray(const _T* values, sl_size count);
 
 		template <class _T>
 		static List<T> createFromArray(const Array<_T>& array);
 
 		static List<T> createFromElement(const T& e);
-
+		
+		template <class... ARGS>
+		static List<T> createFromElements(ARGS&&... args);
+		
 		template <class _T>
 		static List<T> createCopy(const List<_T>& other);
 
@@ -286,7 +322,7 @@ namespace slib
 		sl_bool isEmpty() const;
 
 		sl_bool isNotEmpty() const;
-
+		
 	public:
 		T* getPointerAt(sl_size index) const;
 
@@ -308,6 +344,8 @@ namespace slib
 
 		T& operator[](sl_size_t index) const;
 
+		List<T>& operator=(const std::initializer_list<T>& l);
+
 	public:
 		sl_bool setCount_NoLock(sl_size count);
 
@@ -322,6 +360,10 @@ namespace slib
 
 		template <class _T>
 		sl_bool insertElements(sl_size index, const _T* values, sl_size count) const;
+		
+		sl_bool insertElements_NoLock(sl_size index, const std::initializer_list<T>& l) const;
+		
+		sl_bool insertElements(sl_size index, const std::initializer_list<T>& l) const;
 
 		template <class _T>
 		sl_bool insertAll(sl_size index, const List<_T>& other) const;
@@ -338,6 +380,10 @@ namespace slib
 
 		template <class _T>
 		sl_bool addElements(const _T* values, sl_size count);
+		
+		sl_bool addElements_NoLock(const std::initializer_list<T>& l);
+		
+		sl_bool addElements(const std::initializer_list<T>& l);
 
 		template <class _T>
 		sl_bool addAll_NoLock(const List<_T>& _other);
@@ -452,7 +498,17 @@ namespace slib
 	public:
 		AtomicRef< CList<T> > ref;
 		SLIB_ATOMIC_REF_WRAPPER(CList<T>)
-	
+		
+	public:
+		Atomic(sl_size count);
+		
+		Atomic(sl_size count, sl_size capacity);
+		
+		template <class _T>
+		Atomic(const _T* values, sl_size count);
+
+		Atomic(const std::initializer_list<T>& l);
+
 	public:
 		sl_size getCount() const;
 
@@ -470,6 +526,8 @@ namespace slib
 		sl_bool setAt(sl_size index, const T& value) const;
 
 		T operator[](sl_size_t index) const;
+		
+		Atomic& operator=(const std::initializer_list<T>& l);
 
 	public:
 		sl_bool setCount(sl_size count);
@@ -479,6 +537,8 @@ namespace slib
 		template <class _T>
 		sl_bool insertElements(sl_size index, const _T* values, sl_size count) const;
 
+		sl_bool insertElements(sl_size index, const std::initializer_list<T>& l) const;
+		
 		template <class _T>
 		sl_bool insertAll(sl_size index, const List<_T>& other) const;
 
@@ -489,6 +549,8 @@ namespace slib
 
 		template <class _T>
 		sl_bool addElements(const _T* values, sl_size count);
+		
+		sl_bool addElements(const std::initializer_list<T>& l);
 
 		template <class _T>
 		sl_bool addAll(const List<_T>& _other);

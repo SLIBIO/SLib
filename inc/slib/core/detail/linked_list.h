@@ -190,9 +190,8 @@ namespace slib
 	
 	template <class T>
 	template <class _T>
-	void CLinkedList<T>::pushBackAll(const CLinkedList<_T>* other)
+	void CLinkedList<T>::pushBackAll_NoLock(const CLinkedList<_T>* other)
 	{
-		ObjectLocker lock(this, other);
 		Link<_T>* link = other->getFront();
 		while (link) {
 			if (!(pushBack_NoLock(link->value))) {
@@ -200,6 +199,14 @@ namespace slib
 			}
 			link = link->next;
 		}
+	}
+
+	template <class T>
+	template <class _T>
+	void CLinkedList<T>::pushBackAll(const CLinkedList<_T>* other)
+	{
+		ObjectLocker lock(this, other);
+		pushBackAll_NoLock(other);
 	}
 	
 	template <class T>
@@ -270,9 +277,8 @@ namespace slib
 	
 	template <class T>
 	template <class _T>
-	void CLinkedList<T>::pushFrontAll(const CLinkedList<_T>* other)
+	void CLinkedList<T>::pushFrontAll_NoLock(const CLinkedList<_T>* other)
 	{
-		ObjectLocker lock(this, other);
 		Link<_T>* link = other->getBack();
 		while (link) {
 			if (!(pushFront_NoLock(link->value))) {
@@ -280,6 +286,14 @@ namespace slib
 			}
 			link = link->before;
 		}
+	}
+
+	template <class T>
+	template <class _T>
+	void CLinkedList<T>::pushFrontAll(const CLinkedList<_T>* other)
+	{
+		ObjectLocker lock(this, other);
+		pushFrontAll_NoLock(other);
 	}
 	
 	template <class T>
@@ -471,7 +485,7 @@ namespace slib
 	}
 	
 	template <class T>
-	void CLinkedList<T>::merge(CLinkedList<T>* other)
+	void CLinkedList<T>::merge_NoLock(CLinkedList<T>* other)
 	{
 		if (!other) {
 			return;
@@ -479,7 +493,6 @@ namespace slib
 		if (this == other) {
 			return;
 		}
-		ObjectLocker lock(this, other);
 		Link<T>* _front = other->getFront();
 		Link<T>* _back = other->getBack();
 		if (_front) {
@@ -494,6 +507,19 @@ namespace slib
 			other->init();
 			m_count = countNew;
 		}
+	}
+
+	template <class T>
+	void CLinkedList<T>::merge(CLinkedList<T>* other)
+	{
+		if (!other) {
+			return;
+		}
+		if (this == other) {
+			return;
+		}
+		ObjectLocker lock(this, other);
+		merge_NoLock(other);
 	}
 	
 	template <class T>
@@ -916,6 +942,21 @@ namespace slib
 		}
 		return sl_null;
 	}
+	
+	template <class T>
+	template <class _T>
+	void LinkedList<T>::pushBackAll_NoLock(const LinkedList<_T>& _other)
+	{
+		CLinkedList<T>* other = _other.ref._ptr;
+		if (other) {
+			CLinkedList<T>* obj = ref._ptr;
+			if (obj) {
+				obj->pushBackAll_NoLock(other);
+			} else {
+				ref = other->duplicate_NoLock();
+			}
+		}
+	}
 
 	template <class T>
 	template <class _T>
@@ -982,6 +1023,21 @@ namespace slib
 			}
 		}
 		return sl_null;
+	}
+	
+	template <class T>
+	template <class _T>
+	void LinkedList<T>::pushFrontAll_NoLock(const LinkedList<_T>& _other)
+	{
+		LinkedList<T>* other = _other.ref._ptr;
+		if (other) {
+			CLinkedList<T>* obj = ref._ptr;
+			if (obj) {
+				obj->pushFrontAll_NoLock(other);
+			} else {
+				ref = other->duplicate_NoLock();
+			}
+		}
 	}
 
 	template <class T>
@@ -1138,6 +1194,26 @@ namespace slib
 		}
 		return 0;
 	}
+	
+	template <class T>
+	void LinkedList<T>::merge_NoLock(LinkedList<T>& _other)
+	{
+		CLinkedList<T>* other = _other.ref._ptr;
+		if (!other) {
+			return;
+		}
+		CLinkedList<T>* obj = ref._ptr;
+		if (obj) {
+			obj->merge_NoLock(other);
+		} else {
+			obj = new CLinkedList<T>;
+			if (obj) {
+				obj->init(other);
+				other->init();
+				ref = obj;
+			}
+		}
+	}
 
 	template <class T>
 	void LinkedList<T>::merge(LinkedList<T>& _other)
@@ -1152,6 +1228,7 @@ namespace slib
 		} else {
 			obj = new CLinkedList<T>;
 			if (obj) {
+				ObjectLocker lock(other);
 				obj->init(other);
 				other->init();
 				ref = obj;
