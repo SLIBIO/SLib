@@ -136,6 +136,8 @@ namespace slib
 
 	};
 	
+	
+	// MemoryBuffer is not thread-safe
 	class SLIB_EXPORT MemoryBuffer : public Object
 	{
 	public:
@@ -145,28 +147,16 @@ namespace slib
 	
 	public:
 		sl_size getSize() const;
-		
-		sl_bool add_NoLock(const MemoryData& mem);
 
 		sl_bool add(const MemoryData& mem);
-		
-		sl_bool add_NoLock(const Memory& mem);
 	
 		sl_bool add(const Memory& mem);
-		
-		sl_bool addStatic_NoLock(const void* buf, sl_size size);
 
 		sl_bool addStatic(const void* buf, sl_size size);
-		
-		void link_NoLock(MemoryBuffer& buf);
 	
 		void link(MemoryBuffer& buf);
-		
-		void clear_NoLock();
 	
 		void clear();
-		
-		Memory merge_NoLock() const;
 	
 		Memory merge() const;
 	
@@ -176,7 +166,7 @@ namespace slib
 
 	};
 	
-	class SLIB_EXPORT MemoryQueue : public MemoryBuffer
+	class SLIB_EXPORT MemoryQueue : public Object
 	{
 	public:
 		MemoryQueue();
@@ -184,6 +174,28 @@ namespace slib
 		~MemoryQueue();
 	
 	public:
+		sl_size getSize() const;
+		
+		sl_bool add_NoLock(const MemoryData& mem);
+		
+		sl_bool add(const MemoryData& mem);
+		
+		sl_bool add_NoLock(const Memory& mem);
+		
+		sl_bool add(const Memory& mem);
+		
+		sl_bool addStatic_NoLock(const void* buf, sl_size size);
+		
+		sl_bool addStatic(const void* buf, sl_size size);
+		
+		void link_NoLock(MemoryQueue& buf);
+		
+		void link(MemoryQueue& buf);
+		
+		void clear_NoLock();
+		
+		void clear();
+
 		sl_bool pop_NoLock(MemoryData& data);
 		
 		sl_bool pop(MemoryData& data);
@@ -197,6 +209,8 @@ namespace slib
 		Memory merge() const;
 	
 	private:
+		LinkedQueue<MemoryData> m_queue;
+		sl_size m_size;
 		MemoryData m_memCurrent;
 		sl_size m_posCurrent;
 

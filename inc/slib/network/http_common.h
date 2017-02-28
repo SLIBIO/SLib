@@ -452,7 +452,7 @@ namespace slib
 		
 	protected:
 		sl_char16 m_last[3];
-		MemoryBuffer m_buffer;
+		MemoryQueue m_buffer;
 		
 	};
 	

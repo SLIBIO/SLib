@@ -216,7 +216,7 @@ namespace slib
 		Map<String, String> m_requestHeaders;
 		Map<String, String> m_additionalRequestHeaders;
 		
-		MemoryBuffer m_bufResponseContent;
+		MemoryQueue m_bufResponseContent;
 		HttpStatus m_responseStatus;
 		AtomicString m_responseMessage;
 		AtomicMap<String, String> m_responseHeaders;

@@ -353,42 +353,18 @@ namespace slib
 		return m_size;
 	}
 
-	sl_bool MemoryBuffer::add_NoLock(const MemoryData& mem)
-	{
-		if (mem.size == 0) {
-			return sl_true;
-		}
-		if (mem.data) {
-			if (m_queue.push_NoLock(mem)) {
-				m_size += mem.size;
-				return sl_true;
-			}
-		}
-		return sl_false;
-	}
-	
 	sl_bool MemoryBuffer::add(const MemoryData& mem)
 	{
 		if (mem.size == 0) {
 			return sl_true;
 		}
 		if (mem.data) {
-			ObjectLocker lock(this);
 			if (m_queue.push_NoLock(mem)) {
 				m_size += mem.size;
 				return sl_true;
 			}
 		}
 		return sl_false;
-	}
-	
-	sl_bool MemoryBuffer::add_NoLock(const Memory& mem)
-	{
-		MemoryData data;
-		if (mem.getData(data)) {
-			return add_NoLock(data);
-		}
-		return sl_true;
 	}
 	
 	sl_bool MemoryBuffer::add(const Memory& mem)
@@ -400,20 +376,6 @@ namespace slib
 		return sl_true;
 	}
 	
-	sl_bool MemoryBuffer::addStatic_NoLock(const void* buf, sl_size size)
-	{
-		if (size == 0) {
-			return sl_true;
-		}
-		if (buf) {
-			MemoryData data;
-			data.data = (void*)buf;
-			data.size = size;
-			return add_NoLock(data);
-		}
-		return sl_false;
-	}
-
 	sl_bool MemoryBuffer::addStatic(const void* buf, sl_size size)
 	{
 		if (size == 0) {
@@ -427,36 +389,22 @@ namespace slib
 		}
 		return sl_false;
 	}
-	
-	void MemoryBuffer::link_NoLock(MemoryBuffer& buf)
-	{
-		m_size += buf.m_size;
-		buf.m_size = 0;
-		m_queue.merge_NoLock(&(buf.m_queue));
-	}
 
 	void MemoryBuffer::link(MemoryBuffer& buf)
 	{
-		ObjectLocker lock(this, &buf);
 		m_size += buf.m_size;
 		buf.m_size = 0;
 		m_queue.merge_NoLock(&(buf.m_queue));
 	}
 	
-	void MemoryBuffer::clear_NoLock()
+	void MemoryBuffer::clear()
 	{
 		m_queue.removeAll_NoLock();
 		m_size = 0;
 	}
 
-	void MemoryBuffer::clear()
-	{
-		ObjectLocker lock(this);
-		m_queue.removeAll_NoLock();
-		m_size = 0;
-	}
 	
-	Memory MemoryBuffer::merge_NoLock() const
+	Memory MemoryBuffer::merge() const
 	{
 		if (m_queue.getCount() == 0) {
 			return sl_null;
@@ -482,21 +430,13 @@ namespace slib
 		return ret;
 	}
 
-	Memory MemoryBuffer::merge() const
-	{
-		if (m_queue.getCount() == 0) {
-			return sl_null;
-		}
-		ObjectLocker lock(this);
-		return merge_NoLock();
-	}
-
 /*******************************************
-			MemoryBuffer
+			MemoryQueue
 *******************************************/
 
 	MemoryQueue::MemoryQueue()
 	{
+		m_size = 0;
 		m_memCurrent.data = sl_null;
 		m_memCurrent.size = 0;
 		m_posCurrent = 0;
@@ -504,6 +444,114 @@ namespace slib
 
 	MemoryQueue::~MemoryQueue()
 	{
+	}
+	
+	sl_size MemoryQueue::getSize() const
+	{
+		return m_size;
+	}
+	
+	sl_bool MemoryQueue::add_NoLock(const MemoryData& mem)
+	{
+		if (mem.size == 0) {
+			return sl_true;
+		}
+		if (mem.data) {
+			if (m_queue.push_NoLock(mem)) {
+				m_size += mem.size;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	sl_bool MemoryQueue::add(const MemoryData& mem)
+	{
+		if (mem.size == 0) {
+			return sl_true;
+		}
+		if (mem.data) {
+			ObjectLocker lock(this);
+			if (m_queue.push_NoLock(mem)) {
+				m_size += mem.size;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	sl_bool MemoryQueue::add_NoLock(const Memory& mem)
+	{
+		MemoryData data;
+		if (mem.getData(data)) {
+			return add_NoLock(data);
+		}
+		return sl_true;
+	}
+	
+	sl_bool MemoryQueue::add(const Memory& mem)
+	{
+		MemoryData data;
+		if (mem.getData(data)) {
+			return add(data);
+		}
+		return sl_true;
+	}
+	
+	sl_bool MemoryQueue::addStatic_NoLock(const void* buf, sl_size size)
+	{
+		if (size == 0) {
+			return sl_true;
+		}
+		if (buf) {
+			MemoryData data;
+			data.data = (void*)buf;
+			data.size = size;
+			return add_NoLock(data);
+		}
+		return sl_false;
+	}
+	
+	sl_bool MemoryQueue::addStatic(const void* buf, sl_size size)
+	{
+		if (size == 0) {
+			return sl_true;
+		}
+		if (buf) {
+			MemoryData data;
+			data.data = (void*)buf;
+			data.size = size;
+			return add(data);
+		}
+		return sl_false;
+	}
+	
+	void MemoryQueue::link_NoLock(MemoryQueue& buf)
+	{
+		m_size += buf.m_size;
+		buf.m_size = 0;
+		m_queue.merge_NoLock(&(buf.m_queue));
+	}
+	
+	void MemoryQueue::link(MemoryQueue& buf)
+	{
+		ObjectLocker lock(this, &buf);
+		m_size += buf.m_size;
+		buf.m_size = 0;
+		m_queue.merge_NoLock(&(buf.m_queue));
+	}
+	
+	void MemoryQueue::clear_NoLock()
+	{
+		m_queue.removeAll_NoLock();
+		m_size = 0;
+	}
+	
+	void MemoryQueue::clear()
+	{
+		ObjectLocker lock(this);
+		m_queue.removeAll_NoLock();
+		m_size = 0;
 	}
 	
 	sl_bool MemoryQueue::pop_NoLock(MemoryData& data)

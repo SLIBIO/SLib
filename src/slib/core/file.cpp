@@ -616,7 +616,7 @@ namespace slib
 	void FilePathSegments::parsePath(const String& path)
 	{
 		parentLevel = 0;
-		segments.removeAll();
+		segments.removeAll_NoLock();
 
 		sl_char8* buf = path.getData();
 		sl_size len = path.getLength();
@@ -631,20 +631,20 @@ namespace slib
 			}
 			if (ch == '/' || ch == '\\') {
 				if (pos == 0) {
-					segments.add(String::null());
+					segments.add_NoLock(String::null());
 				} else {
 					sl_size n = pos - start;
 					if (n > 0) {
 						if (n == 1 && buf[start] == '.') {
 						} else if (n == 2 && buf[start] == '.' && buf[start + 1] == '.') {
 							if (segments.getCount() > 0) {
-								segments.popBack();
+								segments.popBack_NoLock();
 							} else {
 								parentLevel++;
 							}
 						} else {
 							String s(buf + start, n);
-							segments.add(s);
+							segments.add_NoLock(s);
 						}
 					}
 				}
@@ -669,7 +669,7 @@ namespace slib
 			}
 		}
 		{
-			ListLocker<String> list(segments);
+			ListElements<String> list(segments);
 			for (sl_size i = 0; i < list.count; i++) {
 				if (!flagFirst) {
 					ret.add(sep);

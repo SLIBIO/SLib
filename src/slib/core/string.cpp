@@ -7544,10 +7544,18 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 	{
 		m_len = 0;
 	}
+	
+	StringBuffer::~StringBuffer()
+	{
+	}
 
 	StringBuffer16::StringBuffer16()
 	{
 		m_len = 0;
+	}
+	
+	StringBuffer16::~StringBuffer16()
+	{
 	}
 
 	sl_size StringBuffer::getLength() const
@@ -7560,23 +7568,6 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return m_len;
 	}
 	
-	sl_bool StringBuffer::add_NoLock(const String& str)
-	{
-		sl_size len = str.getLength();
-		if (len == 0) {
-			return sl_true;
-		}
-		StringData data;
-		data.sz8 = str.getData();
-		data.len = len;
-		data.str8 = str;
-		if (m_queue.push_NoLock(data)) {
-			m_len += len;
-			return sl_true;
-		}
-		return sl_false;
-	}
-
 	sl_bool StringBuffer::add(const String& str)
 	{
 		sl_size len = str.getLength();
@@ -7587,7 +7578,6 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		data.sz8 = str.getData();
 		data.len = len;
 		data.str8 = str;
-		ObjectLocker lock(this);
 		if (m_queue.push_NoLock(data)) {
 			m_len += len;
 			return sl_true;
@@ -7595,23 +7585,6 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return sl_false;
 	}
 	
-	sl_bool StringBuffer16::add_NoLock(const String16& str)
-	{
-		sl_size len = str.getLength();
-		if (len == 0) {
-			return sl_true;
-		}
-		StringData data;
-		data.sz16 = str.getData();
-		data.len = len;
-		data.str16 = str;
-		if (m_queue.push_NoLock(data)) {
-			m_len += len;
-			return sl_true;
-		}
-		return sl_false;
-	}
-
 	sl_bool StringBuffer16::add(const String16& str)
 	{
 		sl_size len = str.getLength();
@@ -7622,7 +7595,6 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		data.sz16 = str.getData();
 		data.len = len;
 		data.str16 = str;
-		ObjectLocker lock(this);
 		if (m_queue.push_NoLock(data)) {
 			m_len += len;
 			return sl_true;
@@ -7630,21 +7602,6 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return sl_false;
 	}
 	
-	sl_bool StringBuffer::add_NoLock(const StringData& data)
-	{
-		sl_size len = data.len;
-		if (len == 0) {
-			return sl_true;
-		}
-		if (data.sz8) {
-			if (m_queue.push_NoLock(data)) {
-				m_len += len;
-				return sl_true;
-			}
-		}
-		return sl_false;
-	}
-
 	sl_bool StringBuffer::add(const StringData& data)
 	{
 		sl_size len = data.len;
@@ -7652,7 +7609,6 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 			return sl_true;
 		}
 		if (data.sz8) {
-			ObjectLocker lock(this);
 			if (m_queue.push_NoLock(data)) {
 				m_len += len;
 				return sl_true;
@@ -7661,21 +7617,6 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return sl_false;
 	}
 	
-	sl_bool StringBuffer16::add_NoLock(const StringData& data)
-	{
-		sl_size len = data.len;
-		if (len == 0) {
-			return sl_true;
-		}
-		if (data.sz16) {
-			if (m_queue.push_NoLock(data)) {
-				m_len += len;
-				return sl_true;
-			}
-		}
-		return sl_false;
-	}
-
 	sl_bool StringBuffer16::add(const StringData& data)
 	{
 		sl_size len = data.len;
@@ -7683,7 +7624,6 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 			return sl_true;
 		}
 		if (data.sz16) {
-			ObjectLocker lock(this);
 			if (m_queue.push_NoLock(data)) {
 				m_len += len;
 				return sl_true;
@@ -7692,28 +7632,12 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return sl_false;
 	}
 	
-	sl_bool StringBuffer::addStatic_NoLock(const sl_char8* buf, sl_size length)
-	{
-		StringData data;
-		data.sz8 = buf;
-		data.len = length;
-		return add_NoLock(data);
-	}
-
 	sl_bool StringBuffer::addStatic(const sl_char8* buf, sl_size length)
 	{
 		StringData data;
 		data.sz8 = buf;
 		data.len = length;
 		return add(data);
-	}
-	
-	sl_bool StringBuffer16::addStatic_NoLock(const sl_char16* buf, sl_size length)
-	{
-		StringData data;
-		data.sz16 = buf;
-		data.len = length;
-		return add_NoLock(data);
 	}
 
 	sl_bool StringBuffer16::addStatic(const sl_char16* buf, sl_size length)
@@ -7723,51 +7647,22 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		data.len = length;
 		return add(data);
 	}
-	
-	void StringBuffer::link_NoLock(StringBuffer& buf)
-	{
-		m_len += buf.m_len;
-		buf.m_len = 0;
-		m_queue.merge_NoLock(&(buf.m_queue));
-	}
 
 	void StringBuffer::link(StringBuffer& buf)
 	{
-		ObjectLocker lock(this, &buf);
 		m_len += buf.m_len;
 		buf.m_len = 0;
 		m_queue.merge_NoLock(&(buf.m_queue));
 	}
 	
-	void StringBuffer16::link_NoLock(StringBuffer16& buf)
-	{
-		m_len += buf.m_len;
-		buf.m_len = 0;
-		m_queue.merge_NoLock(&(buf.m_queue));
-	}
-
 	void StringBuffer16::link(StringBuffer16& buf)
 	{
-		ObjectLocker lock(this, &buf);
 		m_len += buf.m_len;
 		buf.m_len = 0;
 		m_queue.merge_NoLock(&(buf.m_queue));
 	}
 	
-	void StringBuffer::clear_NoLock()
-	{
-		m_queue.removeAll_NoLock();
-		m_len = 0;
-	}
-
 	void StringBuffer::clear()
-	{
-		ObjectLocker lock(this);
-		m_queue.removeAll_NoLock();
-		m_len = 0;
-	}
-	
-	void StringBuffer16::clear_NoLock()
 	{
 		m_queue.removeAll_NoLock();
 		m_len = 0;
@@ -7775,12 +7670,11 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 
 	void StringBuffer16::clear()
 	{
-		ObjectLocker lock(this);
 		m_queue.removeAll_NoLock();
 		m_len = 0;
 	}
 
-	String StringBuffer::merge_NoLock() const
+	String StringBuffer::merge() const
 	{
 		if (m_queue.getCount() == 0) {
 			return String::getEmpty();
@@ -7807,16 +7701,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return ret;
 	}
 	
-	String StringBuffer::merge() const
-	{
-		if (m_queue.getCount() == 0) {
-			return String::getEmpty();
-		}
-		ObjectLocker lock(this);
-		return merge_NoLock();
-	}
-
-	String16 StringBuffer16::merge_NoLock() const
+	String16 StringBuffer16::merge() const
 	{
 		if (m_queue.getCount() == 0) {
 			return String16::getEmpty();
@@ -7843,16 +7728,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return ret;
 	}
 	
-	String16 StringBuffer16::merge() const
-	{
-		if (m_queue.getCount() == 0) {
-			return String16::getEmpty();
-		}
-		ObjectLocker lock(this);
-		return merge_NoLock();
-	}
-
-	Memory StringBuffer::mergeToMemory_NoLock() const
+	Memory StringBuffer::mergeToMemory() const
 	{
 		if (m_queue.getCount() == 0) {
 			return sl_null;
@@ -7875,16 +7751,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return ret;
 	}
 	
-	Memory StringBuffer::mergeToMemory() const
-	{
-		if (m_queue.getCount() == 0) {
-			return sl_null;
-		}
-		ObjectLocker lock(this);
-		return mergeToMemory_NoLock();
-	}
-
-	Memory StringBuffer16::mergeToMemory_NoLock() const
+	Memory StringBuffer16::mergeToMemory() const
 	{
 		if (m_queue.getCount() == 0) {
 			return sl_null;
@@ -7907,13 +7774,4 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return ret;
 	}
 	
-	Memory StringBuffer16::mergeToMemory() const
-	{
-		if (m_queue.getCount() == 0) {
-			return sl_null;
-		}
-		ObjectLocker lock(this);
-		return mergeToMemory_NoLock();
-	}
-
 }

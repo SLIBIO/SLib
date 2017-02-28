@@ -62,7 +62,7 @@ namespace slib
 		HttpHeaderReader m_requestHeaderReader;
 		AtomicMemory m_requestHeader;
 		sl_uint64 m_requestContentLength;
-		MemoryBuffer m_requestBodyBuffer;
+		MemoryQueue m_requestBodyBuffer;
 		AtomicMemory m_requestBody;
 		sl_bool m_flagAsynchronousResponse;
 		

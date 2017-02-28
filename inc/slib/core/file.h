@@ -272,6 +272,7 @@ namespace slib
 
 	};
 	
+	// FilePathSegments is not thread-safe
 	class SLIB_EXPORT FilePathSegments
 	{
 	public:
