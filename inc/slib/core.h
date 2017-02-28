@@ -37,6 +37,7 @@
 #include "core/hashtable.h"
 #include "core/tree.h"
 #include "core/array.h"
+#include "core/array_std.h"
 #include "core/array2d.h"
 #include "core/iterator.h"
 #include "core/list.h"

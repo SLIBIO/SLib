@@ -8,6 +8,12 @@
 #include "new_helper.h"
 #include "compare.h"
 
+namespace std
+{
+	template <class T>
+	class initializer_list;
+}
+
 namespace slib
 {
 	
@@ -59,6 +65,8 @@ namespace slib
 
 		template <class _T>
 		CArray(const _T* data, sl_size count);
+		
+		CArray(const std::initializer_list<T>& l);
 
 		CArray(const T* data, sl_size count, Referable* refer);
 
@@ -69,6 +77,8 @@ namespace slib
 
 		template <class _T>
 		static CArray<T>* create(const _T* data, sl_size count);
+		
+		static CArray<T>* create(const std::initializer_list<T>& l);
 
 		static CArray<T>* createStatic(const T* data, sl_size count, Referable* refer);
 
@@ -167,11 +177,23 @@ namespace slib
 		SLIB_REF_WRAPPER(Array, CArray<T>)
 	
 	public:
+		Array(sl_size count);
+		
+		template <class _T>
+		Array(const _T* data, sl_size count);
+		
+		Array(const std::initializer_list<T>& l);
+		
+		Array(const T* data, sl_size count, Referable* refer);
+		
+	public:
 		static Array<T> create(sl_size count);
 
 		template <class _T>
 		static Array<T> create(const _T* data, sl_size count);
 
+		static Array<T> create(const std::initializer_list<T>& l);
+		
 		static Array<T> createStatic(const T* data, sl_size count);
 
 		static Array<T> createStatic(const T* data, sl_size count, Referable* refer);
@@ -197,6 +219,8 @@ namespace slib
 		sl_bool setAt(sl_size index, const T& value) const;
 
 		T& operator[](sl_size_t index) const;
+		
+		Array<T>& operator=(const std::initializer_list<T>& l);
 
 	public:
 		Array<T> sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const;
@@ -242,7 +266,17 @@ namespace slib
 	public:
 		AtomicRef< CArray<T> > ref;
 		SLIB_ATOMIC_REF_WRAPPER(CArray<T>)
-	
+		
+	public:
+		Atomic(sl_size count);
+		
+		template <class _T>
+		Atomic(const _T* data, sl_size count);
+		
+		Atomic(const std::initializer_list<T>& l);
+		
+		Atomic(const T* data, sl_size count, Referable* refer);
+		
 	public:
 		sl_size getCount() const;
 
@@ -260,6 +294,8 @@ namespace slib
 		sl_bool setAt(sl_size index, const T& value) const;
 
 		T operator[](sl_size_t index) const;
+		
+		Atomic& operator=(const std::initializer_list<T>& l);
 
 	public:
 		Array<T> sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const;

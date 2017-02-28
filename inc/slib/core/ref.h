@@ -39,6 +39,10 @@ namespace slib
 		void makeNeverFree();
 
 	public:
+		static sl_object_type ObjectType();
+		
+		static sl_bool checkObjectType(sl_object_type type);
+		
 		virtual sl_object_type getObjectType() const;
 
 		virtual sl_bool isInstanceOf(sl_object_type type) const;

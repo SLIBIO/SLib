@@ -279,7 +279,7 @@ Microsoft Specific
 				}
 				sl_size n = pos - 1 - k;
 				sl_size m = n / 2;
-				sb.addStatic(sz + start, k + 1 + m - start);
+				sb.addStatic_NoLock(sz + start, k + 1 + m - start);
 				if (n % 2) {
 					start = pos;
 					pos++;
@@ -291,7 +291,7 @@ Microsoft Specific
 #else
 			if (ch == '\\') {
 				if (pos > start) {
-					sb.addStatic(sz + start, pos - start);
+					sb.addStatic_NoLock(sz + start, pos - start);
 				}
 				start = pos + 1;
 				pos++;
@@ -308,17 +308,17 @@ Microsoft Specific
 				if (ch == '\"') {
 					flagQuote = sl_false;
 					if (pos > start) {
-						sb.addStatic(sz + start, pos - start);
+						sb.addStatic_NoLock(sz + start, pos - start);
 					}
 					start = pos + 1;
 				}
 			} else {
 				if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
 					if (pos > start) {
-						sb.addStatic(sz + start, pos - start);
+						sb.addStatic_NoLock(sz + start, pos - start);
 					}
 					start = pos + 1;
-					String s = sb.merge();
+					String s = sb.merge_NoLock();
 					if (s.isNotEmpty()) {
 						ret.add(s);
 					}
@@ -326,7 +326,7 @@ Microsoft Specific
 				} else if (ch == '\"') {
 					flagQuote = sl_true;
 					if (pos > start) {
-						sb.addStatic(sz + start, pos - start);
+						sb.addStatic_NoLock(sz + start, pos - start);
 					}
 					start = pos + 1;
 				}
@@ -335,7 +335,7 @@ Microsoft Specific
 		}
 		if (!flagQuote) {
 			if (pos > start) {
-				sb.addStatic(sz + start, pos - start);
+				sb.addStatic_NoLock(sz + start, pos - start);
 			}
 			String s = sb.merge();
 			if (s.isNotEmpty()) {
@@ -351,15 +351,15 @@ Microsoft Specific
 		for (sl_size i = 0; i < argc; i++) {
 			String s = argv[i];
 			if (i > 0) {
-				commandLine.add(" ");
+				commandLine.add_NoLock(" ");
 			}
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			if (s.contains(" ") || s.contains("\t") || s.contains("\r") || s.contains("\n") || s.contains("\"")) {
-				commandLine.addStatic("\"", 1);
+				commandLine.addStatic_NoLock("\"", 1);
 				ListElements<String> items(s.split("\""));
 				for (sl_size k = 0; k < items.count; k++) {
 					String t = items[k];
-					commandLine.add(t);
+					commandLine.add_NoLock(t);
 					sl_char8* sz = t.getData();
 					sl_size len = t.getLength();
 					sl_size p = 0;
@@ -368,28 +368,28 @@ Microsoft Specific
 							break;
 						}
 					}
-					commandLine.add(String('\\', p));
+					commandLine.add_NoLock(String('\\', p));
 					if (k < items.count - 1) {
-						commandLine.addStatic("\\\"", 2);
+						commandLine.addStatic_NoLock("\\\"", 2);
 					}
 				}
-				commandLine.addStatic("\"", 1);
+				commandLine.addStatic_NoLock("\"", 1);
 			} else {
-				commandLine.add(s);
+				commandLine.add_NoLock(s);
 			}
 #else
 			if (s.contains(" ") || s.contains("\t") || s.contains("\r") || s.contains("\n") || s.contains("\"") || s.contains("\\")) {
 				s = s.replaceAll("\\", "\\\\");
 				s = s.replaceAll("\"", "\\\"");
-				commandLine.addStatic("\"", 1);
-				commandLine.add(s);
-				commandLine.addStatic("\"", 1);
+				commandLine.addStatic_NoLock("\"", 1);
+				commandLine.add_NoLock(s);
+				commandLine.addStatic_NoLock("\"", 1);
 			} else {
-				commandLine.add(s);
+				commandLine.add_NoLock(s);
 			}
 #endif
 		}
-		return commandLine.merge();
+		return commandLine.merge_NoLock();
 	}
 
 }

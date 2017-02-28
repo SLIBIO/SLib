@@ -46,7 +46,23 @@ namespace slib
 		const SpinLock* m_lock;
 
 	};
-
+	
+	class SLIB_EXPORT DualSpinLocker
+	{
+	public:
+		DualSpinLocker(const SpinLock* lock1, const SpinLock* lock2);
+		
+		~DualSpinLocker();
+		
+	public:
+		void unlock();
+		
+	private:
+		const SpinLock* m_lock1;
+		const SpinLock* m_lock2;
+		
+	};
+	
 #define SLIB_SPINLOCK_POOL_SIZE 971
 	
 	template <int CATEGORY>

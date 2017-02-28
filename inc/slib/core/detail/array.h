@@ -424,6 +424,22 @@ namespace slib
 
 
 	template <class T>
+	Array<T>::Array(sl_size count): ref(CArray<T>::create(count))
+	{
+	}
+	
+	template <class T>
+	template <class _T>
+	Array<T>::Array(const _T* data, sl_size count): ref(CArray<T>::create(data, count))
+	{
+	}
+	
+	template <class T>
+	Array<T>::Array(const T* data, sl_size count, Referable* refer): ref(CArray<T>::createStatic(data, count, refer))
+	{
+	}
+
+	template <class T>
 	Array<T> Array<T>::create(sl_size count)
 	{
 		return CArray<T>::create(count);
@@ -678,6 +694,22 @@ namespace slib
 	}
 
 
+	template <class T>
+	Atomic< Array<T> >::Atomic(sl_size count): ref(CArray<T>::create(count))
+	{
+	}
+	
+	template <class T>
+	template <class _T>
+	Atomic< Array<T> >::Atomic(const _T* data, sl_size count): ref(CArray<T>::create(data, count))
+	{
+	}
+	
+	template <class T>
+	Atomic< Array<T> >::Atomic(const T* data, sl_size count, Referable* refer): ref(CArray<T>::createStatic(data, count, refer))
+	{
+	}
+	
 	template <class T>
 	sl_size Atomic< Array<T> >::getCount() const
 	{

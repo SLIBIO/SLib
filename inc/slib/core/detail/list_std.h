@@ -59,6 +59,7 @@ namespace slib
 	List<T>& List<T>::operator=(const std::initializer_list<T>& l)
 	{
 		ref = CList<T>::createFromArray(l.begin(), l.size());
+		return *this;
 	}
 	
 	template <class T>
@@ -95,6 +96,7 @@ namespace slib
 	Atomic< List<T> >& Atomic< List<T> >::operator=(const std::initializer_list<T>& l)
 	{
 		ref = CList<T>::createFromArray(l.begin(), l.size());
+		return *this;
 	}
 	
 	template <class T>

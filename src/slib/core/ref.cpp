@@ -84,6 +84,16 @@ namespace slib
 	{
 		m_nRefCount = -1;
 	}
+	
+	sl_object_type Referable::ObjectType()
+	{
+		return 0;
+	}
+	
+	sl_bool Referable::checkObjectType(sl_object_type type)
+	{
+		return sl_false;
+	}
 
 	sl_object_type Referable::getObjectType() const
 	{
