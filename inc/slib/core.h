@@ -43,6 +43,7 @@
 #include "core/list.h"
 #include "core/list_std.h"
 #include "core/map.h"
+#include "core/map_std.h"
 #include "core/linked_list.h"
 #include "core/queue.h"
 #include "core/queue_channel.h"

@@ -6,7 +6,7 @@
 namespace slib
 {
 	
-	template < class KT, class VT, class KEY_EQUALS >
+	template <class KT, class VT, class KEY_EQUALS>
 	class ListMapKeyIterator : public IIterator<KT>
 	{
 	protected:
