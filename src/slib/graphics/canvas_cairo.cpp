@@ -251,6 +251,11 @@ namespace slib
 
 						Color4f color = _color;
 						::cairo_set_source_rgba(m_graphics, color.x, color.y, color.z, color.w * getAlpha());
+
+						FontMetrics fm;
+						if (_font->getFontMetrics(fm)) {
+							y += (fm.leading + fm.ascent);
+						}
 						::cairo_move_to(m_graphics, x, y);
 
 						::cairo_show_text(m_graphics, text.getData());

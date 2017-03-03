@@ -25,6 +25,8 @@ namespace slib
 
 	FontAtlasChar::FontAtlasChar()
 	{
+		fontWidth = 0;
+		fontHeight = 0;
 	}
 
 	FontAtlasChar::FontAtlasChar(const FontAtlasChar& other) = default;
@@ -38,6 +40,12 @@ namespace slib
 
 	FontAtlas::FontAtlas()
 	{
+		m_planeWidth = PLANE_WIDTH_DEFAULT;
+		m_planeHeight = PLANE_HEIGHT_DEFAULT;
+		m_maxPlanes = MAX_PLANES_DEFAULT;
+		m_fontSourceHeight = 0;
+
+		m_countPlanes = 0;
 		m_currentPlaneY = 0;
 		m_currentPlaneX = 0;
 		m_currentPlaneRowHeight = 0;

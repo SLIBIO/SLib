@@ -12,6 +12,10 @@
 #pragma GCC diagnostic ignored "-Wextern-c-compat"
 #include <Elementary_GL_Helpers.h>
 
+ELEMENTARY_GLVIEW_GLOBAL_DECLARE()
+
+#include <Evas.h>
+
 namespace slib
 {
 
@@ -19,8 +23,25 @@ namespace slib
 	{
 	public:
 		Ref<RenderEngine> m_renderEngine;
+		sl_bool m_flagContinuously;
+		sl_bool m_flagRequestRender;
+		Ecore_Animator* m_timer;
 
 	public:
+		_RenderViewInstance()
+		{
+			m_flagContinuously = sl_false;
+			m_flagRequestRender = sl_false;
+			m_timer = sl_null;
+		}
+
+		~_RenderViewInstance()
+		{
+			if (m_timer) {
+				::ecore_animator_del(m_timer);
+			}
+		}
+
 		static void glInit(Evas_Object* handle)
 		{
 			Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
@@ -49,6 +70,7 @@ namespace slib
 				Ref<View> _view = instance->getView();
 				if (RenderView* view = CastInstance<RenderView>(_view.get())) {
 					view->dispatchFrame(instance->m_renderEngine.get());
+					glFlush();
 				}
 			}
 		}
@@ -57,52 +79,72 @@ namespace slib
 		{
 		}
 
+		static Eina_Bool timer(void* data)
+		{
+			Evas_Object* handle = (Evas_Object*)data;
+			Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
+			if (instance.isNotNull()) {
+				if (instance->m_flagContinuously || instance->m_flagRequestRender) {
+					instance->m_flagRequestRender = sl_false;
+					::elm_glview_changed_set(handle);
+				}
+			}
+			return EINA_TRUE;
+		}
+
 	};
 
 	Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* parent)
 	{
 		Evas_Object* handleParent = UIPlatform::getViewHandle(parent);
+
 		if (handleParent) {
+
 			Evas_Object* handle = ::elm_glview_version_add(handleParent, EVAS_GL_GLES_2_X);
+
 			if (handle) {
-				Ref<Tizen_ViewInstance> ret = Tizen_ViewInstance::create<_RenderViewInstance>(this, parent, TizenViewType::OpenGL, handle, sl_true);
+
+				ELEMENTARY_GLVIEW_GLOBAL_USE(handle);
+
+				Ref<_RenderViewInstance> ret = Tizen_ViewInstance::create<_RenderViewInstance>(this, parent, TizenViewType::OpenGL, handle, sl_true);
+
 				if (ret.isNotNull()) {
+
 					::elm_glview_mode_set(handle, (Elm_GLView_Mode)(ELM_GLVIEW_ALPHA | ELM_GLVIEW_DEPTH));
 					::elm_glview_resize_policy_set(handle, ELM_GLVIEW_RESIZE_POLICY_RECREATE);
+					::elm_glview_render_policy_set(handle, ELM_GLVIEW_RENDER_POLICY_ON_DEMAND);
 					::elm_glview_init_func_set(handle, _RenderViewInstance::glInit);
 					::elm_glview_resize_func_set(handle, _RenderViewInstance::glResize);
 					::elm_glview_render_func_set(handle, _RenderViewInstance::glRender);
 					::elm_glview_del_func_set(handle, _RenderViewInstance::glDelete);
-					if (m_redrawMode == RedrawMode::Continuously) {
-						::elm_glview_render_policy_set(handle, ELM_GLVIEW_RENDER_POLICY_ALWAYS);
-					} else {
-						::elm_glview_render_policy_set(handle, ELM_GLVIEW_RENDER_POLICY_ON_DEMAND);
-					}
+
+					ret->m_flagContinuously = (m_redrawMode == RedrawMode::Continuously);
+					ret->m_timer = ::ecore_animator_add(_RenderViewInstance::timer, handle);
+
 					ret->installTouchEvents();
+
 					return ret;
 				}
 			}
 		}
+
 		return sl_null;
+
 	}
 	
 	void RenderView::_setRedrawMode_NW(RedrawMode mode)
 	{
-		Evas_Object* handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			if (mode == RedrawMode::Continuously) {
-				::elm_glview_render_policy_set(handle, ELM_GLVIEW_RENDER_POLICY_ALWAYS);
-			} else {
-				::elm_glview_render_policy_set(handle, ELM_GLVIEW_RENDER_POLICY_ON_DEMAND);
-			}
+		Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(getViewInstance());
+		if (instance.isNotNull()) {
+			instance->m_flagContinuously = (mode == RedrawMode::Continuously);
 		}
 	}
 	
 	void RenderView::_requestRender_NW()
 	{
-		Evas_Object* handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			::elm_glview_changed_set(handle);
+		Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(getViewInstance());
+		if (instance.isNotNull()) {
+			instance->m_flagRequestRender = sl_true;
 		}
 	}
 	

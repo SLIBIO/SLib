@@ -49,10 +49,10 @@ namespace slib
 				Evas_Object* handleParent = parent->m_handle;
 				if (handleParent) {
 					::elm_grid_pack(handleParent, handle, frame.left, frame.top, frame.getWidth(), frame.getHeight());
-				} else {
-					::evas_object_move(handle, frame.left, frame.top);
-					::evas_object_resize(handle, frame.getWidth(), frame.getHeight());
 				}
+			} else {
+				::evas_object_move(handle, frame.left, frame.top);
+				::evas_object_resize(handle, frame.getWidth(), frame.getHeight());
 			}
 			if (m_type == TizenViewType::Grid) {
 				::elm_grid_size_set(handle, frame.getWidth(), frame.getHeight());

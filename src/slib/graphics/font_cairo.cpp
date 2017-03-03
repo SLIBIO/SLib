@@ -29,7 +29,7 @@ namespace slib
 		if (handle) {
 			cairo_text_extents_t extents;
 			::cairo_scaled_font_text_extents(handle, text.getData(), &extents);
-			return Size((sl_real)(extents.width), (sl_real)(extents.height));
+			return Size((sl_real)(extents.x_advance), getFontHeight());
 		}
 		return Size::zero();
 	}
