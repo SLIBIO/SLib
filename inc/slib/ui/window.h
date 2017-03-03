@@ -266,7 +266,7 @@ namespace slib
 	public:
 		Ref<WindowInstance> getWindowInstance();
 		
-		void attach(const Ref<WindowInstance>& instance);
+		void attach(const Ref<WindowInstance>& instance, sl_bool flagAttachContent = sl_true);
 
 		void detach();
 
@@ -386,6 +386,8 @@ namespace slib
 		Ref<WindowInstance> createWindowInstance(const WindowInstanceParam& param);
 
 		void _create();
+		
+		void _attachContent();
 		
 		void _refreshSize();
 		

@@ -16,6 +16,12 @@
 #define MAX_SAMPLER_COUNT 32
 #define MIN_SAMPLER_COUNT 4
 
+#ifdef SLIB_PLATFORM_IS_TIZEN
+#pragma GCC diagnostic ignored "-Wextern-c-compat"
+#include <Elementary_GL_Helpers.h>
+ELEMENTARY_GLVIEW_GLOBAL_DEFINE()
+#endif
+
 namespace slib
 {
 	void GL_BASE::setViewport(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)

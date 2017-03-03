@@ -21,7 +21,7 @@
 #include <CoreText/CoreText.h>
 #include <CoreGraphics/CoreGraphics.h>
 #elif defined(SLIB_PLATFORM_IS_TIZEN)
-#include <Evas.h>
+#include <cairo.h>
 #endif
 
 namespace slib
@@ -112,7 +112,12 @@ namespace slib
 
 #elif defined(SLIB_PLATFORM_IS_TIZEN)
 
+		static cairo_scaled_font_t* getCairoFont(Font* font);
 
+		static Ref<Canvas> createCanvas(CanvasType type, cairo_t* graphics, sl_uint32 width, sl_uint32 height);
+		static cairo_t* getCanvasHandle(Canvas* canvas);
+
+		static void drawImage(Canvas* canvas, const Rectangle& rectDst, cairo_surface_t* image, const Rectangle& rectSrc, const DrawParam& param);
 
 #endif
 

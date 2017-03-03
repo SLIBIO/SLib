@@ -13,6 +13,7 @@ namespace slib
 		m_time = Time::now();
 		m_alpha = 1;
 		m_flagAntiAlias = sl_true;
+		m_type = CanvasType::Bitmap;
 	}
 
 	Canvas::~Canvas()

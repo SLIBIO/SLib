@@ -156,6 +156,7 @@ namespace slib
 	static bool _ui_callback_app_create(void* data)
 	{
 		Log("App", "Create");
+		::elm_config_accel_preference_set("opengl");
 		UIApp::dispatchStartToApp();
 		MobileApp::dispatchCreateActivityToApp();
 		return true;
@@ -183,8 +184,6 @@ namespace slib
 	void UIPlatform::runApp()
 	{
 		_g_main_thread = ::pthread_self();
-
-		::elm_config_accel_preference_set("opengl");
 
 		Ref<Application> app = Application::getApp();
 		if (app.isNull()) {

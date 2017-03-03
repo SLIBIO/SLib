@@ -24,12 +24,15 @@ namespace slib
 			Begin = 0,
 			Line = 1,
 			BezierCubic = 3,
+			TypeMask = 0x0f,
 			FlagClose = 0x80
 		};
 
 	};
 	
-	class SLIB_EXPORT GraphicsPath : public Object
+	
+	// GraphicsPath is not thread-safe.
+	class SLIB_EXPORT GraphicsPath : public Referable
 	{
 		SLIB_DECLARE_OBJECT
 
@@ -42,6 +45,10 @@ namespace slib
 		static Ref<GraphicsPath> create();
 	
 	public:
+		sl_size getPointsCount();
+
+		GraphicsPathPoint* getPoints();
+
 		void moveTo(sl_real x, sl_real y);
 
 		void moveTo(const Point& pt);
@@ -105,7 +112,7 @@ namespace slib
 		sl_bool _containsPoint_PO(sl_real x, sl_real y);
 	
 	protected:
-		CList<GraphicsPathPoint> points;
+		CList<GraphicsPathPoint> m_points;
 		sl_bool m_flagBegan;
 		Point m_pointBegin;
 		FillMode m_fillMode;

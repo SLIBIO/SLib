@@ -30,6 +30,8 @@ enum class TizenViewType
 	Window = 3
 };
 
+#include <Evas.h>
+
 #endif
 
 #include "event.h"

@@ -7,6 +7,11 @@ namespace slib
 
 	ColorComponentBuffer::ColorComponentBuffer()
 	{
+		width = 0;
+		height = 0;
+		data = sl_null;
+		sample_stride = 0;
+		pitch = 0;
 	}
 
 	ColorComponentBuffer::~ColorComponentBuffer()

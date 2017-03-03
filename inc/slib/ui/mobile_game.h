@@ -25,10 +25,6 @@ namespace slib
 		
 		Ref<MobileGameView> getGameView();
 		
-	public:
-		// override
-		virtual void dispatchResize(sl_ui_len width, sl_ui_len height);
-		
 	private:
 		Ref<MobileGameView> m_gameView;
 		

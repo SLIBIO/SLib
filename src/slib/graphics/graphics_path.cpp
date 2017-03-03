@@ -5,7 +5,7 @@
 namespace slib
 {
 
-	SLIB_DEFINE_OBJECT(GraphicsPath, Object)
+	SLIB_DEFINE_ROOT_OBJECT(GraphicsPath)
 
 	GraphicsPath::GraphicsPath()
 	{
@@ -28,9 +28,18 @@ namespace slib
 		return sl_null;
 	}
 
+	sl_size GraphicsPath::getPointsCount()
+	{
+		return m_points.getCount();
+	}
+
+	GraphicsPathPoint* GraphicsPath::getPoints()
+	{
+		return m_points.getData();
+	}
+
 	void GraphicsPath::moveTo(sl_real x, sl_real y)
 	{
-		ObjectLocker lock(this);
 		m_flagBegan = sl_false;
 		m_pointBegin.x = x;
 		m_pointBegin.y = y;
@@ -43,12 +52,11 @@ namespace slib
 
 	void GraphicsPath::lineTo(sl_real x, sl_real y)
 	{
-		ObjectLocker lock(this);
 		if (!m_flagBegan) {
 			GraphicsPathPoint point;
 			point.pt = m_pointBegin;
 			point.type = GraphicsPathPoint::Begin;
-			points.add_NoLock(point);
+			m_points.add_NoLock(point);
 			_moveTo_PO(point.pt.x, point.pt.y);
 			m_flagBegan = sl_true;
 		}
@@ -56,7 +64,7 @@ namespace slib
 		point.pt.x = x;
 		point.pt.y = y;
 		point.type = GraphicsPathPoint::Line;
-		points.add_NoLock(point);
+		m_points.add_NoLock(point);
 		_lineTo_PO(x, y);
 	}
 
@@ -67,12 +75,11 @@ namespace slib
 
 	void GraphicsPath::cubicTo(sl_real xc1, sl_real yc1, sl_real xc2, sl_real yc2, sl_real xe, sl_real ye)
 	{
-		ObjectLocker lock(this);
 		if (!m_flagBegan) {
 			GraphicsPathPoint point;
 			point.pt = m_pointBegin;
 			point.type = GraphicsPathPoint::Begin;
-			points.add_NoLock(point);
+			m_points.add_NoLock(point);
 			_moveTo_PO(point.pt.x, point.pt.y);
 			m_flagBegan = sl_true;
 		}
@@ -80,15 +87,15 @@ namespace slib
 		point.pt.x = xc1;
 		point.pt.y = yc1;
 		point.type = GraphicsPathPoint::BezierCubic;
-		points.add_NoLock(point);
+		m_points.add_NoLock(point);
 		point.pt.x = xc2;
 		point.pt.y = yc2;
 		point.type = GraphicsPathPoint::BezierCubic;
-		points.add_NoLock(point);
+		m_points.add_NoLock(point);
 		point.pt.x = xe;
 		point.pt.y = ye;
 		point.type = GraphicsPathPoint::BezierCubic;
-		points.add_NoLock(point);
+		m_points.add_NoLock(point);
 		_cubicTo_PO(xc1, yc1, xc2, yc2, xe, ye);
 	}
 
@@ -99,11 +106,10 @@ namespace slib
 
 	void GraphicsPath::closeSubpath()
 	{
-		ObjectLocker lock(this);
 		if (m_flagBegan) {
-			sl_size n = points.getCount();
+			sl_size n = m_points.getCount();
 			if (n > 0) {
-				GraphicsPathPoint* list = points.getData();
+				GraphicsPathPoint* list = m_points.getData();
 				list[n - 1].type |= GraphicsPathPoint::FlagClose;
 				m_pointBegin = list[n - 1].pt;
 				m_flagBegan = sl_false;
@@ -207,20 +213,17 @@ namespace slib
 
 	void GraphicsPath::setFillMode(FillMode mode)
 	{
-		ObjectLocker lock(this);
 		m_fillMode = mode;
 		_setFillMode_PO(mode);
 	}
 
 	Rectangle GraphicsPath::getBounds()
 	{
-		ObjectLocker lock(this);
 		return _getBounds_PO();
 	}
 
 	sl_bool GraphicsPath::containsPoint(sl_real x, sl_real y)
 	{
-		ObjectLocker lock(this);
 		return _containsPoint_PO(x, y);
 	}
 

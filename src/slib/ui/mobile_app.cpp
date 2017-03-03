@@ -19,7 +19,8 @@ namespace slib
 		m_contentView = window->getContentView();
 		
 		m_pager = new ViewPager;
-		m_pager->setOpaque(sl_true);
+		m_pager->setSizeFilling(1, 1, UIUpdateMode::Init);
+		m_pager->setOpaque(sl_true, UIUpdateMode::Init);
 		m_pager->setMinimumPagesCount(1);
 		m_contentView->addChild(m_pager, UIUpdateMode::Init);
 		
@@ -360,7 +361,6 @@ namespace slib
 	void MobileApp::dispatchResize(sl_ui_len width, sl_ui_len height)
 	{
 		UIResource::updateDefaultScreenSize();
-		m_pager->setFrame(0, 0, width, height);
 		if (m_pager->getPagesCount() == 0) {
 			Ref<View> page = m_startupPage;
 			if (page.isNotNull()) {

@@ -346,6 +346,10 @@ namespace slib
 
 	SubDrawable::SubDrawable()
 	{
+		m_x = 0;
+		m_y = 0;
+		m_width = 0;
+		m_height = 0;
 	}
 
 	SubDrawable::~SubDrawable()
@@ -408,6 +412,8 @@ namespace slib
 
 	ScaledDrawable::ScaledDrawable()
 	{
+		m_width = 0;
+		m_height = 0;
 	}
 
 	ScaledDrawable::~ScaledDrawable()
@@ -472,6 +478,8 @@ namespace slib
 
 	ScaledSubDrawable::ScaledSubDrawable()
 	{
+		m_width = 0;
+		m_height = 0;
 	}
 
 	ScaledSubDrawable::~ScaledSubDrawable()
@@ -542,6 +550,9 @@ namespace slib
 
 	FilterDrawable::FilterDrawable()
 	{
+		m_flagUseColorMatrix = sl_false;
+		m_alpha = 1;
+		m_blurRadius = 1;
 	}
 
 	FilterDrawable::~FilterDrawable()
@@ -634,6 +645,10 @@ namespace slib
 
 	NinePiecesDrawable::NinePiecesDrawable()
 	{
+		m_widthLeft = 0;
+		m_widthRight = 0;
+		m_heightTop = 0;
+		m_heightBottom = 0;
 	}
 
 	NinePiecesDrawable::~NinePiecesDrawable()
@@ -737,6 +752,14 @@ namespace slib
 
 	NinePatchDrawable::NinePatchDrawable()
 	{
+		m_widthLeftDst = 0;
+		m_widthRightDst = 0;
+		m_heightTopDst = 0;
+		m_heightBottomDst = 0;
+		m_widthLeftSrc = 0;
+		m_widthRightSrc = 0;
+		m_heightTopSrc = 0;
+		m_heightBottomSrc = 0;
 	}
 
 	NinePatchDrawable::~NinePatchDrawable()
@@ -886,6 +909,10 @@ namespace slib
 
 	HorizontalThreePatchDrawable::HorizontalThreePatchDrawable()
 	{
+		m_widthLeftDst = 0;
+		m_widthRightDst = 0;
+		m_widthLeftSrc = 0;
+		m_widthRightSrc = 0;
 	}
 
 	HorizontalThreePatchDrawable::~HorizontalThreePatchDrawable()
@@ -980,6 +1007,10 @@ namespace slib
 
 	VerticalThreePatchDrawable::VerticalThreePatchDrawable()
 	{
+		m_heightTopDst = 0;
+		m_heightBottomDst = 0;
+		m_heightTopSrc = 0;
+		m_heightBottomSrc = 0;
 	}
 
 	VerticalThreePatchDrawable::~VerticalThreePatchDrawable()

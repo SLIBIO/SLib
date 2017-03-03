@@ -734,33 +734,22 @@ namespace slib
 		return m_instance;
 	}
 
-	void Window::attach(const Ref<WindowInstance>& instance)
+	void Window::attach(const Ref<WindowInstance>& instance, sl_bool flagAttachContent)
 	{
 		ObjectLocker lock(this);
 
 		detach();
 		
 		if (instance.isNotNull()) {
-			
 			instance->setWindow(this);
-			
-			Ref<ViewInstance> contentViewInstance = instance->getContentView();
-			if (contentViewInstance.isNotNull()) {
-				UIRect rect;
-				rect.setLeftTop(UIPoint::zero());
-				rect.setSize(instance->getClientSize());
-				Ref<View> view = m_viewContent;
-				if (view.isNotNull()) {
-					view->removeParent();
-					view->detach();
-					view->setFrame(rect);
-					view->attach(contentViewInstance);
-				}
+			m_instance = instance;
+			if (flagAttachContent) {
+				lock.unlock();
+				_attachContent();
 			}
 		}
-		m_instance = instance;
 	}
-
+	
 	void Window::detach()
 	{
 		ObjectLocker lock(this);
@@ -772,6 +761,7 @@ namespace slib
 
 		Ref<View> view = m_viewContent;
 		if (view.isNotNull()) {
+			view->removeParent();
 			view->detach();
 		}
 		Ref<WindowInstance> instance = m_instance;
@@ -849,19 +839,39 @@ namespace slib
 			
 			window->setVisible(sl_true);
 
-			attach(window);
+			attach(window, sl_false);
 			
-			dispatchCreate();
-			
-#if defined(SLIB_PLATFORM_IS_OSX) || defined(SLIB_PLATFORM_IS_IOS)
-			UIRect frame = window->getFrame();
-			dispatchResize(frame.getWidth(), frame.getHeight());
+#if defined(SLIB_PLATFORM_IS_OSX) || defined(SLIB_PLATFORM_IS_IOS) || defined(SLIB_PLATFORM_IS_TIZEN)
+			UISize sizeClient = getClientSize();
+			dispatchResize(sizeClient.x, sizeClient.y);
 #endif
 
+			dispatchCreate();
+			
 		} else {
 			dispatchCreateFailed();
 		}
 		
+	}
+	
+	void Window::_attachContent()
+	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(SLIB_FUNCTION_REF(Window, _attachContent, this));
+			return;
+		}
+		Ref<WindowInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			Ref<ViewInstance> contentViewInstance = instance->getContentView();
+			if (contentViewInstance.isNotNull()) {
+				Ref<View> view = m_viewContent;
+				if (view.isNotNull()) {
+					view->removeParent();
+					view->detach();
+					view->attach(contentViewInstance);
+				}
+			}
+		}
 	}
 
 	void Window::addView(const Ref<View>& child)
@@ -1041,6 +1051,14 @@ namespace slib
 	void Window::dispatchResize(sl_ui_len width, sl_ui_len height)
 	{
 		_refreshSize();
+		if (width > 0 && height > 0) {
+			Ref<View> viewContent = m_viewContent;
+			if (viewContent.isNotNull()) {
+				if (!(viewContent->isInstance())) {
+					_attachContent();
+				}
+			}
+		}
 		onResize(width, height);
 		PtrLocker<IWindowListener> listener(getEventListener());
 		if (listener.isNotNull()) {

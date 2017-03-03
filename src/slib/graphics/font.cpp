@@ -238,13 +238,4 @@ namespace slib
 		return m_platformObject;
 	}
 
-#if !(defined(SLIB_PLATFORM_IS_APPLE)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
-	
-	Size Font::_measureText_PO(const String& text)
-	{
-		return Size::zero();
-	}
-
-#endif
-
 }

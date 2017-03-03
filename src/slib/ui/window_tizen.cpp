@@ -208,7 +208,7 @@ namespace slib
 		
 		UIRect getFrame()
 		{
-			return UIRect::zero();
+			return UI::getScreenBounds();
 		}
 		
 		sl_bool setFrame(const UIRect& _frame)

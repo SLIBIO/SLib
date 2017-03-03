@@ -18,12 +18,10 @@ namespace slib
 		
 	public:
 		CGContextRef m_graphics;
-		sl_bool m_flagAntiAlias;
 		
 	public:
 		_Quartz_Canvas()
 		{
-			m_flagAntiAlias = sl_true;
 		}
 		
 		~_Quartz_Canvas()
@@ -229,12 +227,12 @@ namespace slib
 		}
 		
 		// override
-		void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen)
+		void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen)
 		{
 			Ref<GraphicsPath> path = GraphicsPath::create();
 			if (path.isNotNull()) {
 				path->addArc(rect, startDegrees, sweepDegrees);
-				drawPath(path, _pen, Ref<Brush>::null());
+				drawPath(path, pen, Ref<Brush>::null());
 			}
 		}
 		
@@ -262,12 +260,12 @@ namespace slib
 		}
 		
 		// override
-		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Ref<Brush>& brush)
 		{
 			Ref<GraphicsPath> path = GraphicsPath::create();
 			if (path.isNotNull()) {
 				path->addRoundRect(rect, radius);
-				drawPath(path, _pen, brush);
+				drawPath(path, pen, brush);
 			}
 		}
 		
@@ -294,7 +292,7 @@ namespace slib
 		}
 		
 		// override
-		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode)
+		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode)
 		{
 			if (countPoints <= 2) {
 				return;
@@ -307,27 +305,27 @@ namespace slib
 				}
 				path->closeSubpath();
 				path->setFillMode(fillMode);
-				drawPath(path, _pen, brush);
+				drawPath(path, pen, brush);
 			}
 		}
 		
 		// override
-		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush)
 		{
 			Ref<GraphicsPath> path = GraphicsPath::create();
 			if (path.isNotNull()) {
 				path->addPie(rect, startDegrees, sweepDegrees);
-				drawPath(path, _pen, brush);
+				drawPath(path, pen, brush);
 			}
 		}
 		
 		// override
-		void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Ref<Brush>& brush)
 		{
 			if (path.isNotNull()) {
 				CGPathRef handle = GraphicsPlatform::getGraphicsPath(path.get());
 				if (handle) {
-					_drawPath(handle, _pen, brush, path->getFillMode());
+					_drawPath(handle, pen, brush, path->getFillMode());
 				}
 			}
 		}
@@ -465,12 +463,10 @@ namespace slib
 				CGContextSetAllowsAntialiasing(m_graphics, YES);
 				CGContextSetShouldAntialias(m_graphics, YES);
 				CGContextSetInterpolationQuality(m_graphics, kCGInterpolationMedium);
-				m_flagAntiAlias = sl_true;
 			} else {
 				CGContextSetAllowsAntialiasing(m_graphics, NO);
 				CGContextSetShouldAntialias(m_graphics, NO);
 				CGContextSetInterpolationQuality(m_graphics, kCGInterpolationNone);
-				m_flagAntiAlias = sl_false;
 			}
 		}
 		

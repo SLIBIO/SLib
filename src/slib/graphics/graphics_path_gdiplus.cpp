@@ -140,7 +140,7 @@ namespace slib
 	public:
 		Gdiplus::GraphicsPath* createHandle()
 		{
-			ListElements<GraphicsPathPoint> points(this->points);
+			ListElements<GraphicsPathPoint> points(m_points);
 			sl_size n = points.count;
 			if (n > 0) {
 				SLIB_SCOPED_BUFFER(Gdiplus::PointF, 1024, pts, n);

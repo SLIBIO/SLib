@@ -5,6 +5,8 @@
 
 #ifdef SLIB_PLATFORM_IS_TIZEN
 
+#include "string.h"
+
 namespace slib
 {
 
@@ -12,6 +14,7 @@ namespace slib
 	class SLIB_EXPORT Tizen
 	{
 	public:
+		static String getAssetFilePath(const String& path);
 
 	};
 

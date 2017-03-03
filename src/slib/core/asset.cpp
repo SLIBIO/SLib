@@ -6,8 +6,9 @@
 
 #include "../../../inc/slib/core/platform_apple.h"
 #include "../../../inc/slib/core/platform_android.h"
+#include "../../../inc/slib/core/platform_tizen.h"
 
-#if defined(SLIB_PLATFORM_IS_DESKTOP) || defined(SLIB_PLATFORM_IS_APPLE)
+#if defined(SLIB_PLATFORM_IS_DESKTOP) || defined(SLIB_PLATFORM_IS_APPLE) || defined(SLIB_PLATFORM_IS_TIZEN)
 
 namespace slib
 {
@@ -21,6 +22,11 @@ namespace slib
 	String Assets::getFilePath(const String& path)
 	{
 		return Apple::getAssetFilePath(path);
+	}
+#elif defined(SLIB_PLATFORM_IS_TIZEN)
+	String Assets::getFilePath(const String& path)
+	{
+		return Tizen::getAssetFilePath(path);
 	}
 #else
 	String Assets::getFilePath(const String& path)

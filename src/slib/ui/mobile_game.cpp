@@ -14,6 +14,9 @@ namespace slib
 		m_contentView->removeAllChildren(UIUpdateMode::Init);
 		m_contentView->addChild(m_gameView, UIUpdateMode::Init);
 		m_contentView = m_gameView;
+		
+		m_gameView->setSizeFilling(1, 1, UIUpdateMode::Init);
+		m_gameView->setOpaque(sl_true, UIUpdateMode::Init);
 		m_gameView->addChild(m_pager, UIUpdateMode::Init);
 		
 	}
@@ -32,11 +35,6 @@ namespace slib
 		return m_gameView;
 	}
 	
-	void MobileGame::dispatchResize(sl_ui_len width, sl_ui_len height)
-	{
-		m_gameView->setFrame(0, 0, width, height);
-		MobileApp::dispatchResize(width, height);
-	}
 	
 	SLIB_DEFINE_OBJECT(MobileGameView, RenderView)
 	
