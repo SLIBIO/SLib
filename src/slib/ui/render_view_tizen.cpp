@@ -9,7 +9,6 @@
 
 #include "view_tizen.h"
 
-#pragma GCC diagnostic ignored "-Wextern-c-compat"
 #include <Elementary_GL_Helpers.h>
 
 ELEMENTARY_GLVIEW_GLOBAL_DECLARE()

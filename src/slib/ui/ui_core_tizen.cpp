@@ -17,8 +17,6 @@
 #include <app.h>
 #include <Ecore.h>
 #include <system_info.h>
-
-#pragma GCC diagnostic ignored "-Wextern-c-compat"
 #include <Elementary.h>
 
 #include <pthread.h>

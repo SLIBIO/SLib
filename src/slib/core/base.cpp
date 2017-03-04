@@ -24,11 +24,9 @@
 
 #else
 
-#	if defined(__clang__)
-#		if defined(SLIB_PLATFORM_IS_TIZEN)
-#			if !defined(SLIB_ARCH_IS_64BIT)
-#				define NOT_SUPPORT_ATOMIC_64BIT
-#			endif
+#	if defined(SLIB_PLATFORM_IS_TIZEN)
+#		if defined(SLIB_ARCH_IS_X86)
+#			define NOT_SUPPORT_ATOMIC_64BIT
 #		endif
 #	endif
 

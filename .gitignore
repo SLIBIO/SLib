@@ -1,13 +1,6 @@
+.vscode
+.DS_Store
+bin
 
-*.sdf
-*.opensdf
-*.suo
-
-obj/
-bin/
-.kdev4/
 project.xcworkspace/
 xcuserdata/
-Debug/
-Release/
-.vscode

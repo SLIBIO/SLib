@@ -13,8 +13,6 @@
 
 #include "view_tizen.h"
 
-#pragma GCC diagnostic ignored "-Wextern-c-compat"
-
 #include <app.h>
 #include <Elementary.h>
 #include <efl_extension.h>

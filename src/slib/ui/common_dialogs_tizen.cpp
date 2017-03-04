@@ -7,7 +7,6 @@
 #include "../../../inc/slib/ui/window.h"
 #include "../../../inc/slib/ui/platform.h"
 
-#pragma GCC diagnostic ignored "-Wextern-c-compat"
 #include <Elementary.h>
 #include <efl_extension.h>
 

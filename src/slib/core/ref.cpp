@@ -142,6 +142,7 @@ namespace slib
 
 	CWeakRef::CWeakRef()
 	{
+		m_object = sl_null;
 		m_flagWeakRef = sl_true;
 	}
 

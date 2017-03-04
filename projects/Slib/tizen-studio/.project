@@ -31,9 +31,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>inc/slib</name>
+			<name>inc</name>
 			<type>2</type>
-			<locationURI>PARENT-3-PROJECT_LOC/inc/slib</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/inc</locationURI>
 		</link>
 		<link>
 			<name>src/core</name>

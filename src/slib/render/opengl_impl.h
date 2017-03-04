@@ -17,7 +17,6 @@
 #define MIN_SAMPLER_COUNT 4
 
 #ifdef SLIB_PLATFORM_IS_TIZEN
-#pragma GCC diagnostic ignored "-Wextern-c-compat"
 #include <Elementary_GL_Helpers.h>
 ELEMENTARY_GLVIEW_GLOBAL_DEFINE()
 #endif

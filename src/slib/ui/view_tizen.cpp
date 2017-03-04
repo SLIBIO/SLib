@@ -6,7 +6,6 @@
 
 #include "../../../inc/slib/ui/core.h"
 
-#pragma GCC diagnostic ignored "-Wextern-c-compat"
 #include <Elementary.h>
 
 namespace slib
