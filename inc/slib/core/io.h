@@ -421,44 +421,6 @@ namespace slib
 	
 	};
 	
-/*
-		DatagramStream
-
-	Datagram1-Length (4 bytes, LE)
-	Datagram1-Content
-	Datagram2-Length (4 bytes, LE)
-	Datagram2-Content
-	...
-*/
-	
-	class SLIB_EXPORT DatagramStream : public Object
-	{
-	public:
-		DatagramStream();
-
-		~DatagramStream();
-	
-	public:
-		void clear();
-
-		sl_bool parse(const void* data, sl_size size, LinkedQueue<Memory>& datagrams);
-
-		Memory build(const void* datagram, sl_uint32 size);
-
-		Memory build(MemoryBuffer& buf);
-	
-	public:
-		SLIB_PROPERTY(sl_uint32, MaxDatagramSize)
-	
-	protected:
-		MemoryBuffer m_buf;
-		sl_uint32 m_lenCurrentDatagram;
-		sl_uint32 m_posCurrentDatagram;
-		sl_uint8 m_bufSize[4];
-		sl_uint32 m_lenBufSize;
-
-	};
-
 }
 
 #endif

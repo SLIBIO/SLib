@@ -184,7 +184,6 @@
 		26C0A3581C133969005690FE /* bitmap_format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A3571C133969005690FE /* bitmap_format.cpp */; };
 		26C267741DB9048200FA8FFD /* render_canvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C267731DB9048200FA8FFD /* render_canvas.cpp */; };
 		26C72AD11E22484F00F7D6D0 /* collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C72AD01E22484F00F7D6D0 /* collection.cpp */; };
-		26C9BEB31CA4674400E597DC /* datagram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C9BEB21CA4674400E597DC /* datagram.cpp */; };
 		26CA8D711C23A61D0049A658 /* system_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26CA8D701C23A61D0049A658 /* system_apple.mm */; };
 		26CB94C91D0126ED00D8A472 /* linear_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CB94C81D0126ED00D8A472 /* linear_view.cpp */; };
 		26CB94CB1D0126F900D8A472 /* tree_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CB94CA1D0126F900D8A472 /* tree_view.cpp */; };
@@ -455,7 +454,6 @@
 		26C0A3571C133969005690FE /* bitmap_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_format.cpp; sourceTree = "<group>"; };
 		26C267731DB9048200FA8FFD /* render_canvas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_canvas.cpp; sourceTree = "<group>"; };
 		26C72AD01E22484F00F7D6D0 /* collection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = collection.cpp; sourceTree = "<group>"; };
-		26C9BEB21CA4674400E597DC /* datagram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = datagram.cpp; sourceTree = "<group>"; };
 		26CA8D701C23A61D0049A658 /* system_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = system_apple.mm; sourceTree = "<group>"; };
 		26CB94C81D0126ED00D8A472 /* linear_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = linear_view.cpp; sourceTree = "<group>"; };
 		26CB94CA1D0126F900D8A472 /* tree_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tree_view.cpp; sourceTree = "<group>"; };
@@ -797,7 +795,6 @@
 			isa = PBXGroup;
 			children = (
 				26B5717C1C9D44930099E69B /* arp.cpp */,
-				26C9BEB21CA4674400E597DC /* datagram.cpp */,
 				266DD3BB1C1181B500D47AB0 /* dns.cpp */,
 				266DD3BC1C1181B500D47AB0 /* ethernet.cpp */,
 				266DD3BE1C1181B500D47AB0 /* http_common.cpp */,
@@ -1131,7 +1128,6 @@
 				266DD3D51C1181B500D47AB0 /* dns.cpp in Sources */,
 				266DD39E1C117AE300D47AB0 /* canvas.cpp in Sources */,
 				266DD3E11C1181B500D47AB0 /* netfilter.cpp in Sources */,
-				26C9BEB31CA4674400E597DC /* datagram.cpp in Sources */,
 				2648D54E1D098AE800819E09 /* ui_platform.cpp in Sources */,
 				26B5717B1C9D44720099E69B /* view_frustum.cpp in Sources */,
 				26B5716E1C9D44720099E69B /* matrix3.cpp in Sources */,

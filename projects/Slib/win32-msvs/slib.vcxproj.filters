@@ -487,9 +487,6 @@
     <ClInclude Include="..\..\..\inc\slib\media\video_frame.h">
       <Filter>inc\media</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\datagram.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\menu.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
@@ -1451,9 +1448,6 @@
       <Filter>src\slib\media</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\network\arp.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\datagram.cpp">
       <Filter>src\slib\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\xml.cpp">
