@@ -7,13 +7,17 @@
 #include "../../../inc/slib/core/variant.h"
 
 #include <app_common.h>
+#include <stdlib.h>
 
 namespace slib
 {
 
 	String Tizen::getAssetFilePath(const String& path)
 	{
-		return String::format("%s/%s", ::app_get_resource_path(), path);
+		char* root = ::app_get_resource_path();
+		String s = String::format("%s/%s", root, path);
+		::free(root);
+		return s;
 	}
 
 }
