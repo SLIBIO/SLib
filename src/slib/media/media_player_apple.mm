@@ -36,6 +36,7 @@ namespace slib
 		AVPlayerStatus m_status;
 		sl_bool m_flagInited;
 		sl_bool m_flagPlaying;
+		sl_real m_volume;
 		
 	public:
 		_AVPlayer()
@@ -43,6 +44,7 @@ namespace slib
 			m_status = AVPlayerStatusUnknown;
 			m_flagInited = sl_false;
 			m_flagPlaying = sl_false;
+			m_volume = 1;
 		}
 		
 		~_AVPlayer()
@@ -165,15 +167,7 @@ namespace slib
 		// override
 		sl_real getVolume()
 		{
-			ObjectLocker lock(this);
-			if (!m_flagInited) {
-				return 0.0;
-			}
-			if (m_status == AVPlayerStatusFailed) {
-				return 0.0;
-			}
-			
-			return m_player.volume;
+			return m_volume;
 		}
 		
 		// override
@@ -183,11 +177,11 @@ namespace slib
 			if (!m_flagInited) {
 				return;
 			}
-			if (m_status == AVPlayerStatusFailed) {
-				return;
+			if (m_status == AVPlayerStatusReadyToPlay) {
+				[m_player setVolume:volume];
 			}
 			
-			[m_player setVolume:volume];
+			m_volume = volume;
 		}
 		
 		// override
@@ -299,6 +293,7 @@ namespace slib
 				if (m_flagPlaying) {
 					[m_player play];
 				}
+				[m_player setVolume:m_volume];
 				lock.unlock();
 				_onReadyToPlay();
 			}
