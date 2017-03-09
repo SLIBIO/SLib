@@ -891,12 +891,20 @@ namespace slib
 		
 	sl_bool Socket::setOption_ReusePort(sl_bool flagEnable)
 	{
+#if defined(SLIB_PLATFORM_IS_TIZEN)
+		return sl_false;
+#else
 		return setOption(SOL_SOCKET, SO_REUSEPORT, flagEnable ? 1 : 0);
+#endif
 	}
 	
 	sl_bool Socket::getOption_ReusePort() const
 	{
+#if defined(SLIB_PLATFORM_IS_TIZEN)
+		return sl_false;
+#else
 		return getOption(SOL_SOCKET, SO_REUSEPORT) != 0;
+#endif
 	}
 	
 

@@ -18,6 +18,8 @@ namespace slib
 		sl_bool m_flagPlaying;
 		sl_bool m_flagPrepared;
 
+		sl_real m_volume;
+
 	public:
 		_MediaPlayer()
 		{
@@ -25,6 +27,7 @@ namespace slib
 			m_flagInited = sl_false;
 			m_flagPlaying = sl_false;
 			m_flagPrepared = sl_false;
+			m_volume = 1;
 		}
 
 		~_MediaPlayer()
@@ -111,6 +114,7 @@ namespace slib
 				if (m_flagPlaying) {
 					::player_start(m_player);
 				}
+				::player_set_volume(m_player, m_volume, m_volume);
 			} else {
 				_release(sl_false);
 			}
@@ -192,10 +196,11 @@ namespace slib
 				return;
 			}
 
-			int errorCode = ::player_pause(m_player);
-
-			if (PLAYER_ERROR_NONE != errorCode) {
-				return;
+			if (m_flagPrepared) {
+				int errorCode = ::player_pause(m_player);
+				if (PLAYER_ERROR_NONE != errorCode) {
+					return;
+				}
 			}
 
 			m_flagPlaying = sl_false;
@@ -211,20 +216,7 @@ namespace slib
 
 		sl_real getVolume()
 		{
-			ObjectLocker lock(this);
-
-			if (!m_flagInited) {
-				return 0.0;
-			}
-
-			float left, right;
-			int errorCode = ::player_get_volume(m_player, &left, &right);
-
-			if (PLAYER_ERROR_NONE != errorCode) {
-				return 0.0;
-			}
-
-			return (left + right) / 2;
+			return m_volume;
 		}
 
 		void setVolume(sl_real volume)
@@ -235,7 +227,11 @@ namespace slib
 				return;
 			}
 
-			::player_set_volume(m_player, volume, volume);
+			if (m_flagPrepared) {
+				::player_set_volume(m_player, volume, volume);
+			}
+
+			m_volume = volume;
 		}
 
 		void renderVideo(MediaPlayerRenderVideoParam& param)

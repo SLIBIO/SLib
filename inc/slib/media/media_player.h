@@ -156,7 +156,7 @@ namespace slib
 	protected:
 		sl_bool m_flagSelfAlive;
 		sl_bool m_flagAutoRepeat;
-		
+
 	};
 
 }
