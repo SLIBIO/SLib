@@ -204,6 +204,10 @@ namespace slib
 		
 		sl_bool getOption_ReuseAddress() const;
 		
+		sl_bool setOption_ReusePort(sl_bool flagEnable);
+		
+		sl_bool getOption_ReusePort() const;
+		
 		sl_bool setOption_SendBufferSize(sl_uint32 size);
 		
 		sl_uint32 getOption_SendBufferSize() const;

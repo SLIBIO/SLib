@@ -888,6 +888,17 @@ namespace slib
 		return getOption(SOL_SOCKET, SO_REUSEADDR) != 0;
 	}
 
+		
+	sl_bool Socket::setOption_ReusePort(sl_bool flagEnable)
+	{
+		return setOption(SOL_SOCKET, SO_REUSEPORT, flagEnable ? 1 : 0);
+	}
+	
+	sl_bool Socket::getOption_ReusePort() const
+	{
+		return getOption(SOL_SOCKET, SO_REUSEPORT) != 0;
+	}
+	
 
 	sl_bool Socket::setOption_SendBufferSize(sl_uint32 size)
 	{
