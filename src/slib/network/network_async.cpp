@@ -592,13 +592,18 @@ namespace slib
 				flagIPv6 = sl_true;
 			}
 			if (flagIPv6) {
-				socket = Socket::openTcp_IPv6();
+				socket = Socket::openUdp_IPv6();
 			} else {
-				socket = Socket::openTcp();
+				socket = Socket::openUdp();
 			}
 			if (socket.isNull()) {
 				return sl_null;
 			}
+#if defined(SLIB_PLATFORM_IS_UNIX)
+			// Sometimes, the previously bound port is remaining used state even after exit on Unix system.
+			// So, we set ReuseAddress flag on Server sockets to avoid this issue
+			socket->setOption_ReuseAddress(sl_true);
+#endif
 			if (param.bindAddress.ip.isNotNone() || param.bindAddress.port != 0) {
 				if (!(socket->bind(param.bindAddress))) {
 					if (param.flagLogError) {
