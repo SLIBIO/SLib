@@ -3,6 +3,8 @@
 
 #include "../ptr.h"
 
+#include <new>
+
 namespace slib
 {
 	

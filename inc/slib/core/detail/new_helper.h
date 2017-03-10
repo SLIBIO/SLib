@@ -3,6 +3,8 @@
 
 #include "../new_helper.h"
 
+#include <new>
+
 namespace slib
 {
 	

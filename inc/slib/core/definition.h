@@ -130,21 +130,6 @@ namespace slib
 #	define SLIB_ABORT(MESSAGE)
 #endif
 
-
-#if !defined(_LIBCPP_NEW) && !defined(_NEW_) && !defined(_NEW)
-#	ifndef __PLACEMENT_NEW_INLINE
-#		define __PLACEMENT_NEW_INLINE
-		SLIB_INLINE void* (operator new)(sl_size_t in_size, void* in_pWhere) { return in_pWhere; }
-		SLIB_INLINE void(operator delete)(void* in_pVoid, void* in_pWhere) {}
-#	endif
-#	ifndef __PLACEMENT_VEC_NEW_INLINE
-#		define __PLACEMENT_VEC_NEW_INLINE
-		SLIB_INLINE void* (operator new[])(sl_size_t in_size, void* in_pWhere) { return in_pWhere; }
-		SLIB_INLINE void(operator delete[])(void* in_pVoid, void* in_pWhere) {}
-#	endif
-#endif
-
-
 /************************************************************************/
 /* Operating System Related Difinitions                                 */
 /************************************************************************/

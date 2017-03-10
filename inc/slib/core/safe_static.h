@@ -5,6 +5,8 @@
 
 #include "spin_lock.h"
 
+#include <new>
+
 /****************************************************************
  C++ 11 introduces thread-safe static local variable initialization.
  But we need customized implementation to check the storage-status on
