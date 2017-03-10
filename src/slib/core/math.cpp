@@ -329,9 +329,24 @@ namespace slib
 	
 	sl_uint32 Math::randomInt()
 	{
+		return ::rand();
+	}
+	
+	double Math::randomByTime()
+	{
+		return (randomIntByTime() % 10000) / 10000.0;
+	}
+	
+	sl_uint32 Math::randomIntByTime()
+	{
 		sl_uint32 dw = System::getTickCount();
-		sl_uint32 n = ::rand() ^ (dw >> 16) ^ (dw & 0xFFFF);
-		return (n % 10000);
+		::srand(dw);
+		return ::rand();
+	}
+	
+	void Math::srand(sl_uint32 seed)
+	{
+		::srand(seed);
 	}
 	
 	void Math::randomMemory(void* _mem, sl_size size)

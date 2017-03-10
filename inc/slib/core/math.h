@@ -338,8 +338,13 @@ namespace slib
 		// random value between 0~1
 		static double random();
 
-		// random value between 0~10000
 		static sl_uint32 randomInt();
+		
+		static double randomByTime();
+		
+		static sl_uint32 randomIntByTime();
+        
+        static void srand(sl_uint32 seed);
 
 		static void randomMemory(void* mem, sl_size size);
 
