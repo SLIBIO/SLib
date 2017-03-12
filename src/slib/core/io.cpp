@@ -1274,6 +1274,11 @@ namespace slib
 	{
 	}
 
+	sl_bool ISeekable::isEOF()
+	{
+		return getPosition() >= getSize();
+	}
+
 	sl_bool ISeekable::seekToBegin()
 	{
 		return seek(0, SeekPosition::Begin);

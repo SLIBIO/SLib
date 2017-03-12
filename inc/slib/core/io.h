@@ -232,8 +232,10 @@ namespace slib
 		virtual sl_uint64 getSize() = 0;
 
 		virtual sl_bool seek(sl_int64 offset, SeekPosition pos) = 0;
-	
+
 	public:
+		sl_bool isEOF();
+
 		sl_bool seekToBegin();
 
 		sl_bool seekToEnd();
