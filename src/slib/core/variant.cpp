@@ -128,6 +128,18 @@ namespace slib
 	Variant::Variant(sl_null_t): _value(0), _type(VariantType::Null)
 	{
 	}
+	
+	Variant::Variant(char value)
+	{
+		_type = VariantType::Int32;
+		REF_VAR(sl_int32, _value) = value;
+	}
+	
+	Variant::Variant(unsigned char value)
+	{
+		_type = VariantType::Uint32;
+		REF_VAR(sl_uint32, _value) = value;
+	}
 
 	Variant::Variant(short value)
 	{
@@ -144,13 +156,13 @@ namespace slib
 	Variant::Variant(int value)
 	{
 		_type = VariantType::Int32;
-		REF_VAR(sl_int32, _value) = value;
+		REF_VAR(sl_int32, _value) = (sl_int32)value;
 	}
 	
 	Variant::Variant(unsigned int value)
 	{
 		_type = VariantType::Uint32;
-		REF_VAR(sl_uint32, _value) = value;
+		REF_VAR(sl_uint32, _value) = (sl_uint32)value;
 	}
 	
 	Variant::Variant(long value)
@@ -514,7 +526,19 @@ namespace slib
 		setNull();
 		return *this;
 	}
-
+	
+	Variant& Variant::operator=(char value)
+	{
+		setInt32(value);
+		return *this;
+	}
+	
+	Variant& Variant::operator=(unsigned char value)
+	{
+		setUint32(value);
+		return *this;
+	}
+	
 	Variant& Variant::operator=(short value)
 	{
 		setInt32(value);
@@ -529,13 +553,13 @@ namespace slib
 	
 	Variant& Variant::operator=(int value)
 	{
-		setInt32(value);
+		setInt32((sl_int32)value);
 		return *this;
 	}
 	
 	Variant& Variant::operator=(unsigned int value)
 	{
-		setUint32(value);
+		setUint32((sl_uint32)value);
 		return *this;
 	}
 	
@@ -1966,6 +1990,18 @@ namespace slib
 	Atomic<Variant>::Atomic(sl_null_t): _value(0), _type(VariantType::Null)
 	{
 	}
+	
+	Atomic<Variant>::Atomic(char value)
+	{
+		_type = VariantType::Int32;
+		REF_VAR(sl_int32, _value) = value;
+	}
+	
+	Atomic<Variant>::Atomic(unsigned char value)
+	{
+		_type = VariantType::Uint32;
+		REF_VAR(sl_uint32, _value) = value;
+	}
 
 	Atomic<Variant>::Atomic(short value)
 	{
@@ -1982,13 +2018,13 @@ namespace slib
 	Atomic<Variant>::Atomic(int value)
 	{
 		_type = VariantType::Int32;
-		REF_VAR(sl_int32, _value) = value;
+		REF_VAR(sl_int32, _value) = (sl_int32)value;
 	}
 	
 	Atomic<Variant>::Atomic(unsigned int value)
 	{
 		_type = VariantType::Uint32;
-		REF_VAR(sl_uint32, _value) = value;
+		REF_VAR(sl_uint32, _value) = (sl_uint32)value;
 	}
 	
 	Atomic<Variant>::Atomic(long value)
@@ -2233,6 +2269,18 @@ namespace slib
 	AtomicVariant& Atomic<Variant>::operator=(sl_null_t)
 	{
 		setNull();
+		return *this;
+	}
+	
+	AtomicVariant& Atomic<Variant>::operator=(char value)
+	{
+		setInt32(value);
+		return *this;
+	}
+	
+	AtomicVariant& Atomic<Variant>::operator=(unsigned char value)
+	{
+		setUint32(value);
 		return *this;
 	}
 

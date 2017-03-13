@@ -55,6 +55,10 @@ namespace slib
 
 	public:
 		Variant(sl_null_t);
+		
+		Variant(char value);
+		
+		Variant(unsigned char value);
 
 		Variant(short value);
 		
@@ -187,6 +191,10 @@ namespace slib
 		Variant& operator=(const AtomicVariant& other);
 
 		Variant& operator=(sl_null_t);
+		
+		Variant& operator=(char value);
+		
+		Variant& operator=(unsigned char value);
 
 		Variant& operator=(short value);
 		
@@ -465,6 +473,10 @@ namespace slib
 	public:
 		Atomic(sl_null_t);
 		
+		Atomic(char value);
+		
+		Atomic(unsigned char value);
+		
 		Atomic(short value);
 		
 		Atomic(unsigned short value);
@@ -544,6 +556,10 @@ namespace slib
 		AtomicVariant& operator=(const Variant& other);
 
 		AtomicVariant& operator=(sl_null_t);
+		
+		AtomicVariant& operator=(char value);
+		
+		AtomicVariant& operator=(unsigned char value);
 
 		AtomicVariant& operator=(short value);
 		

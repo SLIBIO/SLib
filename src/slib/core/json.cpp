@@ -531,37 +531,127 @@ namespace slib
 	{
 		return _in;
 	}
-
-	template <> void Json::fromJson(const Variant& v, sl_int32& _out)
+	
+	template <> void Json::fromJson(const Variant& v, char& _out)
 	{
-		_out = v.getInt32();
+		_out = (char)(v.getInt32());
+	}
+	
+	template <> void Json::fromJson(const Variant& v, char& _out, const char& def)
+	{
+		_out = (char)(v.getInt32(def));
+	}
+	
+	template <> Variant Json::toJson(const char& _in)
+	{
+		return Variant(_in);
+	}
+	
+	template <> void Json::fromJson(const Variant& v, unsigned char& _out)
+	{
+		_out = (unsigned char)(v.getUint32());
+	}
+	
+	template <> void Json::fromJson(const Variant& v, unsigned char& _out, const unsigned char& def)
+	{
+		_out = (unsigned char)(v.getUint32(def));
+	}
+	
+	template <> Variant Json::toJson(const unsigned char& _in)
+	{
+		return Variant(_in);
+	}
+	
+	template <> void Json::fromJson(const Variant& v, short& _out)
+	{
+		_out = (short)(v.getInt32());
+	}
+	
+	template <> void Json::fromJson(const Variant& v, short& _out, const short& def)
+	{
+		_out = (short)(v.getInt32(def));
+	}
+	
+	template <> Variant Json::toJson(const short& _in)
+	{
+		return Variant(_in);
+	}
+	
+	template <> void Json::fromJson(const Variant& v, unsigned short& _out)
+	{
+		_out = (unsigned short)(v.getUint32());
+	}
+	
+	template <> void Json::fromJson(const Variant& v, unsigned short& _out, const unsigned short& def)
+	{
+		_out = (unsigned short)(v.getUint32(def));
+	}
+	
+	template <> Variant Json::toJson(const unsigned short& _in)
+	{
+		return Variant(_in);
+	}
+	
+	template <> void Json::fromJson(const Variant& v, int& _out)
+	{
+		_out = (int)(v.getInt32());
 	}
 
-	template <> void Json::fromJson(const Variant& v, sl_int32& _out, const sl_int32& def)
+	template <> void Json::fromJson(const Variant& v, int& _out, const int& def)
 	{
-		_out = v.getInt32(def);
+		_out = (int)(v.getInt32((sl_int32)def));
 	}
 
-	template <> Variant Json::toJson(const sl_int32& _in)
+	template <> Variant Json::toJson(const int& _in)
 	{
 		return Variant(_in);
 	}
 
-	template <> void Json::fromJson(const Variant& v, sl_uint32& _out)
+	template <> void Json::fromJson(const Variant& v, unsigned int& _out)
 	{
-		_out = v.getUint32();
+		_out = (unsigned int)(v.getUint32());
 	}
 
-	template <> void Json::fromJson(const Variant& v, sl_uint32& _out, const sl_uint32& def)
+	template <> void Json::fromJson(const Variant& v, unsigned int& _out, const unsigned int& def)
 	{
-		_out = v.getUint32(def);
+		_out = (unsigned int)(v.getUint32((sl_uint32)def));
 	}
 
-	template <> Variant Json::toJson(const sl_uint32& _in)
+	template <> Variant Json::toJson(const unsigned int& _in)
 	{
 		return Variant(_in);
 	}
 
+	template <> void Json::fromJson(const Variant& v, long& _out)
+	{
+		_out = (long)(v.getInt32());
+	}
+	
+	template <> void Json::fromJson(const Variant& v, long& _out, const long& def)
+	{
+		_out = (long)(v.getInt32((sl_int32)def));
+	}
+	
+	template <> Variant Json::toJson(const long& _in)
+	{
+		return Variant(_in);
+	}
+	
+	template <> void Json::fromJson(const Variant& v, unsigned long& _out)
+	{
+		_out = (unsigned long)(v.getUint32());
+	}
+	
+	template <> void Json::fromJson(const Variant& v, unsigned long& _out, const unsigned long& def)
+	{
+		_out = (unsigned long)(v.getUint32((sl_uint32)def));
+	}
+	
+	template <> Variant Json::toJson(const unsigned long& _in)
+	{
+		return Variant(_in);
+	}
+	
 	template <> void Json::fromJson(const Variant& v, sl_int64& _out)
 	{
 		_out = v.getInt64();
@@ -590,66 +680,6 @@ namespace slib
 	template <> Variant Json::toJson(const sl_uint64& _in)
 	{
 		return Variant(_in);
-	}
-
-	template <> void Json::fromJson(const Variant& v, sl_int8& _out)
-	{
-		_out = (sl_int8)(v.getInt32());
-	}
-
-	template <> void Json::fromJson(const Variant& v, sl_int8& _out, const sl_int8& def)
-	{
-		_out = (sl_int8)(v.getInt32(def));
-	}
-
-	template <> Variant Json::toJson(const sl_int8& _in)
-	{
-		return Variant((sl_int32)_in);
-	}
-
-	template <> void Json::fromJson(const Variant& v, sl_uint8& _out)
-	{
-		_out = (sl_uint8)(v.getUint32());
-	}
-
-	template <> void Json::fromJson(const Variant& v, sl_uint8& _out, const sl_uint8& def)
-	{
-		_out = (sl_uint8)(v.getUint32(def));
-	}
-
-	template <> Variant Json::toJson(const sl_uint8& _in)
-	{
-		return Variant((sl_uint32)_in);
-	}
-
-	template <> void Json::fromJson(const Variant& v, sl_int16& _out)
-	{
-		_out = (sl_int16)(v.getInt32());
-	}
-
-	template <> void Json::fromJson(const Variant& v, sl_int16& _out, const sl_int16& def)
-	{
-		_out = (sl_int16)(v.getInt32(def));
-	}
-
-	template <> Variant Json::toJson(const sl_int16& _in)
-	{
-		return Variant((sl_int32)_in);
-	}
-
-	template <> void Json::fromJson(const Variant& v, sl_uint16& _out)
-	{
-		_out = (sl_uint16)(v.getUint32());
-	}
-
-	template <> void Json::fromJson(const Variant& v, sl_uint16& _out, const sl_uint16& def)
-	{
-		_out = (sl_uint16)(v.getUint32(def));
-	}
-
-	template <> Variant Json::toJson(const sl_uint16& _in)
-	{
-		return Variant((sl_uint32)_in);
 	}
 
 	template <> void Json::fromJson(const Variant& v, float& _out)
