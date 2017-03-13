@@ -43,7 +43,7 @@ namespace slib
 			m_duration = expiring_duration_ms;
 			m_dispatchLoop = loop;
 			typedef ExpiringMap<KT, VT> _ExpiringMap;
-			m_timer = Timer::createWithLoop(loop, SLIB_FUNCTION_CLASS(_ExpiringMap, _update, this), expiring_duration_ms);
+			m_timer = Timer::startWithLoop(loop, SLIB_FUNCTION_CLASS(_ExpiringMap, _update, this), expiring_duration_ms);
 		}
 	}
 	
@@ -150,7 +150,7 @@ namespace slib
 	}
 
 	template <class KT, class VT>
-	void ExpiringMap<KT, VT>::_update()
+	void ExpiringMap<KT, VT>::_update(Timer* timer)
 	{
 		ObjectLocker lock(this);
 		m_mapBackup = m_mapCurrent;

@@ -26,7 +26,7 @@ namespace slib
 		stop();
 	}
 
-	Ref<Timer> Timer::createWithLoop(const Ref<DispatchLoop>& loop, const Function<void()>& task, sl_uint64 interval_ms, sl_bool flagStart)
+	Ref<Timer> Timer::createWithLoop(const Ref<DispatchLoop>& loop, const Function<void(Timer*)>& task, sl_uint64 interval_ms)
 	{
 		if (task.isNull()) {
 			return sl_null;
@@ -41,15 +41,22 @@ namespace slib
 			ret->m_task = task;
 			ret->m_interval = interval_ms;
 			
-			if (flagStart) {
-				ret->start();
-			}
 			return ret;
 		}
 		return sl_null;
 	}
+	
+	Ref<Timer> Timer::startWithLoop(const Ref<DispatchLoop>& loop, const Function<void(Timer*)>& task, sl_uint64 interval_ms)
+	{
+		Ref<Timer> timer = Timer::createWithLoop(loop, task, interval_ms);
+		if (timer.isNotNull()) {
+			timer->start();
+			return timer;
+		}
+		return sl_null;
+	}
 
-	Ref<Timer> Timer::createWithDispatcher(const Ref<Dispatcher>& dispatcher, const Function<void()>& task, sl_uint64 interval_ms, sl_bool flagStart)
+	Ref<Timer> Timer::createWithDispatcher(const Ref<Dispatcher>& dispatcher, const Function<void(Timer*)>& task, sl_uint64 interval_ms)
 	{
 		if (task.isNull()) {
 			return sl_null;
@@ -64,14 +71,21 @@ namespace slib
 			ret->m_task = task;
 			ret->m_interval = interval_ms;
 			
-			if (flagStart) {
-				ret->start();
-			}
 			return ret;
 		}
 		return sl_null;
 	}
-
+	
+	Ref<Timer> Timer::startWithDispatcher(const Ref<Dispatcher>& dispatcher, const Function<void(Timer*)>& task, sl_uint64 interval_ms)
+	{
+		Ref<Timer> timer = Timer::createWithDispatcher(dispatcher, task, interval_ms);
+		if (timer.isNotNull()) {
+			timer->start();
+			return timer;
+		}
+		return sl_null;
+	}
+	
 	void Timer::start()
 	{
 		ObjectLocker lock(this);
@@ -113,7 +127,7 @@ namespace slib
 		return m_flagStarted;
 	}
 
-	Function<void()> Timer::getTask()
+	Function<void(Timer*)> Timer::getTask()
 	{
 		return m_task;
 	}
@@ -130,7 +144,7 @@ namespace slib
 			sl_int32 n = Base::interlockedIncrement32(&m_nCountRun);
 			if (n <= (sl_int32)(getMaxConcurrentThread())) {
 				lock.unlock();
-				m_task();
+				m_task(this);
 			}
 			Base::interlockedDecrement32(&m_nCountRun);
 		}
@@ -148,7 +162,7 @@ namespace slib
 	void Timer::_runFromDispatcher()
 	{
 		if (m_flagStarted) {
-			m_task();
+			m_task(this);
 		}
 		ObjectLocker lock(this);
 		if (m_flagStarted) {

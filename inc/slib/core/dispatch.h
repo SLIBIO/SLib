@@ -21,9 +21,9 @@ namespace slib
 
 		static sl_bool setTimeout(const Function<void()>& task, sl_uint64 delay_ms);
 	
-		static Ref<Timer> setInterval(const Ref<DispatchLoop>& loop, const Function<void()>& task, sl_uint64 interval_ms);
+		static Ref<Timer> setInterval(const Ref<DispatchLoop>& loop, const Function<void(Timer*)>& task, sl_uint64 interval_ms);
 
-		static Ref<Timer> setInterval(const Function<void()>& task, sl_uint64 interval_ms);
+		static Ref<Timer> setInterval(const Function<void(Timer*)>& task, sl_uint64 interval_ms);
 
 	};
 	

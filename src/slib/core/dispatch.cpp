@@ -36,15 +36,15 @@ namespace slib
 		return Dispatch::setTimeout(DispatchLoop::getDefault(), task, delay_ms);
 	}
 
-	Ref<Timer> Dispatch::setInterval(const Ref<DispatchLoop>& loop, const Function<void()>& task, sl_uint64 interval_ms)
+	Ref<Timer> Dispatch::setInterval(const Ref<DispatchLoop>& loop, const Function<void(Timer*)>& task, sl_uint64 interval_ms)
 	{
 		if (loop.isNotNull()) {
-			return Timer::createWithLoop(loop, task, interval_ms);
+			return Timer::startWithLoop(loop, task, interval_ms);
 		}
 		return sl_null;
 	}
 
-	Ref<Timer> Dispatch::setInterval(const Function<void()>& task, sl_uint64 interval_ms)
+	Ref<Timer> Dispatch::setInterval(const Function<void(Timer*)>& task, sl_uint64 interval_ms)
 	{
 		return Dispatch::setInterval(DispatchLoop::getDefault(), task, interval_ms);
 	}

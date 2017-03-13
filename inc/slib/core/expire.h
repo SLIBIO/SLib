@@ -49,7 +49,7 @@ namespace slib
 		sl_bool containsKey(const KT& key);
 
 	protected:
-		void _update();
+		void _update(Timer* timer);
 
 		void _release();
 	

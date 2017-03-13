@@ -5,6 +5,7 @@
 
 #include "dispatch.h"
 #include "thread.h"
+#include "time.h"
 
 namespace slib
 {

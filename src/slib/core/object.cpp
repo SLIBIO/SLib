@@ -1,5 +1,8 @@
 #include "../../../inc/slib/core/object.h"
-#include "../../../inc/slib/core/linked_object.h"
+
+#include "../../../inc/slib/core/string.h"
+#include "../../../inc/slib/core/map.h"
+#include "../../../inc/slib/core/variant.h"
 
 namespace slib
 {
@@ -33,7 +36,42 @@ namespace slib
 	{
 		return m_locker.tryLock();
 	}
-
+	
+	Variant Object::getProperty(const String& name)
+	{
+		MutexLocker lock(&m_locker);
+		if (m_properties.isNotNull()) {
+			HashMap<String, Variant>* map = static_cast<HashMap<String, Variant>*>(m_properties.get());
+			return map->getValue_NoLock(name);
+		}
+		return Variant::null();
+	}
+	
+	void Object::setProperty(const String& name, const Variant& value)
+	{
+		MutexLocker lock(&m_locker);
+		HashMap<String, Variant>* map;
+		if (m_properties.isNotNull()) {
+			map = static_cast<HashMap<String, Variant>*>(m_properties.get());
+		} else {
+			map = new HashMap<String, Variant>;
+			if (map) {
+				m_properties = map;
+			} else {
+				return;
+			}
+		}
+		map->put_NoLock(name, value);
+	}
+	
+	void Object::clearProperty(const String& name)
+	{
+		MutexLocker lock(&m_locker);
+		if (m_properties.isNotNull()) {
+			HashMap<String, Variant>* map = static_cast<HashMap<String, Variant>*>(m_properties.get());
+			map->remove_NoLock(name);
+		}
+	}
 
 	ObjectLocker::ObjectLocker()
 	{

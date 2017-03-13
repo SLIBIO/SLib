@@ -1,6 +1,7 @@
 #include "../../../inc/slib/core/animation.h"
 
 #include "../../../inc/slib/core/thread.h"
+#include "../../../inc/slib/core/time.h"
 #include "../../../inc/slib/core/scoped.h"
 #include "../../../inc/slib/core/safe_static.h"
 
@@ -73,6 +74,11 @@ namespace slib
 	{
 		return createWithLoop(AnimationLoop::getDefault(), target, duration, onStop, curve, flags);
 	}
+	
+	Ref<Animation> Animation::start(const Ref<AnimationTarget>& target, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createWithLoop(AnimationLoop::getDefault(), target, duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
 
 	Ref<Animation> Animation::createWithLoop(const Ref<AnimationLoop>& loop, float duration)
 	{
@@ -109,7 +115,7 @@ namespace slib
 			if (flags & AnimationFlags::NotSelfAlive) {
 				ret->setSelfAlive(sl_false);
 			}
-			if (!(flags & AnimationFlags::NotStart)) {
+			if (flags & AnimationFlags::AutoStart) {
 				ret->start();
 			}
 			return ret;
@@ -117,6 +123,11 @@ namespace slib
 		return sl_null;
 	}
 
+	Ref<Animation> Animation::startWithLoop(const Ref<AnimationLoop>& loop, const Ref<AnimationTarget>& target, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return Animation::createWithLoop(loop, target, duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
+	
 	Ref<AnimationLoop> Animation::getLoop()
 	{
 		return m_loop;

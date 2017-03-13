@@ -408,7 +408,7 @@ namespace slib
 	{
 		m_speedFlow = speed;
 		m_timeFlowFrameBefore = Time::now();
-		m_timerFlow = createTimer(SLIB_FUNCTION_WEAKREF(PickerView, _animationCallback, this), ANIMATE_FRAME_MS);
+		m_timerFlow = startTimer(SLIB_FUNCTION_WEAKREF(PickerView, _animationCallback, this), ANIMATE_FRAME_MS);
 	}
 	
 	void PickerView::_stopFlow()
@@ -416,7 +416,7 @@ namespace slib
 		m_timerFlow.setNull();
 	}
 	
-	void PickerView::_animationCallback()
+	void PickerView::_animationCallback(Timer* timer)
 	{
 		Time time = Time::now();
 		sl_real ellapsed = (sl_real)((time - m_timeFlowFrameBefore).getSecondsCountf());

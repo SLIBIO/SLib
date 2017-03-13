@@ -246,21 +246,6 @@ namespace slib
 		return n;
 	}
 
-	Variant Thread::getProperty(const String& name)
-	{
-		return m_properties.getValue(name);
-	}
-
-	void Thread::setProperty(const String& name, const Variant& value)
-	{
-		m_properties.put(name, value);
-	}
-
-	void Thread::clearProperty(const String& name)
-	{
-		m_properties.remove(name);
-	}
-
 	Ref<Referable> Thread::getAttachedObject(const String& name)
 	{
 		return m_attachedObjects.getValue(name, Ref<Referable>::null());

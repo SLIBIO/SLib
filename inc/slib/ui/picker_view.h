@@ -109,7 +109,7 @@ namespace slib
 		
 		void _stopFlow();
 		
-		void _animationCallback();
+		void _animationCallback(Timer* timer);
 		
 		
 		void _getSelectedIndex_NW();

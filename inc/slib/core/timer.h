@@ -22,9 +22,13 @@ namespace slib
 		~Timer();
 
 	public:
-		static Ref<Timer> createWithLoop(const Ref<DispatchLoop>& loop, const Function<void()>& task, sl_uint64 interval_ms, sl_bool flagStart = sl_true);
+		static Ref<Timer> createWithLoop(const Ref<DispatchLoop>& loop, const Function<void(Timer*)>& task, sl_uint64 interval_ms);
 
-		static Ref<Timer> createWithDispatcher(const Ref<Dispatcher>& dispatcher, const Function<void()>& task, sl_uint64 interval_ms, sl_bool flagStart = sl_true);
+		static Ref<Timer> startWithLoop(const Ref<DispatchLoop>& loop, const Function<void(Timer*)>& task, sl_uint64 interval_ms);
+		
+		static Ref<Timer> createWithDispatcher(const Ref<Dispatcher>& dispatcher, const Function<void(Timer*)>& task, sl_uint64 interval_ms);
+		
+		static Ref<Timer> startWithDispatcher(const Ref<Dispatcher>& dispatcher, const Function<void(Timer*)>& task, sl_uint64 interval_ms);
 
 	public:
 		void start();
@@ -33,7 +37,7 @@ namespace slib
 
 		sl_bool isStarted();
 
-		Function<void()> getTask();
+		Function<void(Timer*)> getTask();
 
 		sl_uint64 getInterval();
 
@@ -51,7 +55,7 @@ namespace slib
 
 	protected:
 		sl_bool m_flagStarted;
-		Function<void()> m_task;
+		Function<void(Timer*)> m_task;
 		sl_uint64 m_interval;
 		sl_int32 m_nCountRun;
 

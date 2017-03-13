@@ -10,6 +10,9 @@
 namespace slib
 {
 	
+	class Variant;
+	class String;
+	
 	class SLIB_EXPORT Object : public Referable
 	{
 		SLIB_DECLARE_OBJECT
@@ -27,9 +30,16 @@ namespace slib
 		void unlock() const;
 	
 		sl_bool tryLock() const;
+		
+		Variant getProperty(const String& name);
+		
+		void setProperty(const String& name, const Variant& value);
+		
+		void clearProperty(const String& name);
 	
 	private:
 		Mutex m_locker;
+		Ref<Referable> m_properties;
 
 	};
 	

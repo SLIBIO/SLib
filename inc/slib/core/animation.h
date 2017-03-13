@@ -64,7 +64,7 @@ namespace slib
 	public:
 		enum {
 			Default = 0,
-			NotStart = 1,
+			AutoStart = 1,
 			Repeat = 2,
 			AutoReverse = 4,
 			NotNative = 8,
@@ -87,10 +87,14 @@ namespace slib
 		static Ref<Animation> create(float duration);
 
 		static Ref<Animation> create(const Ref<AnimationTarget>& target, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+		
+		static Ref<Animation> start(const Ref<AnimationTarget>& target, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
 
 		static Ref<Animation> createWithLoop(const Ref<AnimationLoop>& loop, float duration);
 
 		static Ref<Animation> createWithLoop(const Ref<AnimationLoop>& loop, const Ref<AnimationTarget>& target, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+		
+		static Ref<Animation> startWithLoop(const Ref<AnimationLoop>& loop, const Ref<AnimationTarget>& target, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
 
 	public:
 		Ref<AnimationLoop> getLoop();

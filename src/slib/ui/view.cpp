@@ -5080,6 +5080,15 @@ namespace slib
 		}
 		return sl_null;
 	}
+	
+	Ref<Animation> View::startAnimation(const Ref<AnimationTarget>& target, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		Ref<AnimationLoop> loop = getAnimationLoop();
+		if (loop.isNotNull()) {
+			return Animation::startWithLoop(loop, target, duration, onStop, curve, flags);
+		}
+		return sl_null;
+	}
 
 	Ref<Animation> View::getTransformAnimation()
 	{
@@ -5124,15 +5133,30 @@ namespace slib
 		}
 		return animation;
 	}
-
+	
+	Ref<Animation> View::startTransformAnimation(const AnimationFrames<Matrix3>& frames, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createTransformAnimation(frames, duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
+	
 	Ref<Animation> View::createTransformAnimation(const Matrix3& startValue, const Matrix3& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
 		return createTransformAnimation(AnimationFrames<Matrix3>(startValue, endValue), duration, onStop, curve, flags);
 	}
+	
+	Ref<Animation> View::startTransformAnimation(const Matrix3& startValue, const Matrix3& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createTransformAnimation(AnimationFrames<Matrix3>(startValue, endValue), duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
 
 	Ref<Animation> View::createTransformAnimationTo(const Matrix3& toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
-		return createTransformAnimation(AnimationFrames<Matrix3>(getTransform(), toValue), duration, onStop, curve, flags);
+		return createTransformAnimation(AnimationFrames<Matrix3>(getTransform(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart);
+	}
+	
+	Ref<Animation> View::startTransformAnimationTo(const Matrix3& toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createTransformAnimation(AnimationFrames<Matrix3>(getTransform(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart | AnimationFlags::AutoStart);
 	}
 
 	Ref<Animation> View::getTranslateAnimation()
@@ -5178,15 +5202,30 @@ namespace slib
 		}
 		return animation;
 	}
-
+	
+	Ref<Animation> View::startTranslateAnimation(const AnimationFrames<Vector2>& frames, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createTranslateAnimation(frames, duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
+	
 	Ref<Animation> View::createTranslateAnimation(const Vector2& startValue, const Vector2& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
 		return createTranslateAnimation(AnimationFrames<Vector2>(startValue, endValue), duration, onStop, curve, flags);
 	}
+	
+	Ref<Animation> View::startTranslateAnimation(const Vector2& startValue, const Vector2& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createTranslateAnimation(AnimationFrames<Vector2>(startValue, endValue), duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
 
 	Ref<Animation> View::createTranslateAnimationTo(const Vector2& toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
-		return createTranslateAnimation(AnimationFrames<Vector2>(getTranslation(), toValue), duration, onStop, curve, flags);
+		return createTranslateAnimation(AnimationFrames<Vector2>(getTranslation(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart);
+	}
+	
+	Ref<Animation> View::startTranslateAnimationTo(const Vector2& toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createTranslateAnimation(AnimationFrames<Vector2>(getTranslation(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart | AnimationFlags::AutoStart);
 	}
 
 	Ref<Animation> View::getScaleAnimation()
@@ -5242,25 +5281,50 @@ namespace slib
 		}
 		return animation;
 	}
-
+	
+	Ref<Animation> View::startScaleAnimation(const AnimationFrames<Vector2>& frames, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createScaleAnimation(frames, duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
+	
 	Ref<Animation> View::createScaleAnimation(const Vector2& startValue, const Vector2& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
 		return createScaleAnimation(AnimationFrames<Vector2>(startValue, endValue), duration, onStop, curve, flags);
 	}
+	
+	Ref<Animation> View::startScaleAnimation(const Vector2& startValue, const Vector2& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createScaleAnimation(AnimationFrames<Vector2>(startValue, endValue), duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
 
 	Ref<Animation> View::createScaleAnimationTo(const Vector2& toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
-		return createScaleAnimation(AnimationFrames<Vector2>(getScale(), toValue), duration, onStop, curve, flags);
+		return createScaleAnimation(AnimationFrames<Vector2>(getScale(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart);
+	}
+	
+	Ref<Animation> View::startScaleAnimationTo(const Vector2& toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createScaleAnimation(AnimationFrames<Vector2>(getScale(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart | AnimationFlags::AutoStart);
 	}
 
 	Ref<Animation> View::createScaleAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
 		return createScaleAnimation(AnimationFrames<Vector2>(Vector2(startValue, startValue), Vector2(endValue, endValue)), duration, onStop, curve, flags);
 	}
-
+	
+	Ref<Animation> View::startScaleAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createScaleAnimation(AnimationFrames<Vector2>(Vector2(startValue, startValue), Vector2(endValue, endValue)), duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
+	
 	Ref<Animation> View::createScaleAnimationTo(sl_real toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
-		return createScaleAnimation(AnimationFrames<Vector2>(getScale(), Vector2(toValue, toValue)), duration, onStop, curve, flags);
+		return createScaleAnimation(AnimationFrames<Vector2>(getScale(), Vector2(toValue, toValue)), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart);
+	}
+	
+	Ref<Animation> View::startScaleAnimationTo(sl_real toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createScaleAnimation(AnimationFrames<Vector2>(getScale(), Vector2(toValue, toValue)), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart | AnimationFlags::AutoStart);
 	}
 
 	Ref<Animation> View::getRotateAnimation()
@@ -5306,17 +5370,32 @@ namespace slib
 		}
 		return animation;
 	}
-
+	
+	Ref<Animation> View::startRotateAnimation(const AnimationFrames<sl_real>& frames, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createRotateAnimation(frames, duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
+	
 	Ref<Animation> View::createRotateAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
 		return createRotateAnimation(AnimationFrames<sl_real>(startValue, endValue), duration, onStop, curve, flags);
 	}
+	
+	Ref<Animation> View::startRotateAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createRotateAnimation(AnimationFrames<sl_real>(startValue, endValue), duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
 
 	Ref<Animation> View::createRotateAnimationTo(sl_real toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
-		return createRotateAnimation(AnimationFrames<sl_real>(getRotation(), toValue), duration, onStop, curve, flags);
+		return createRotateAnimation(AnimationFrames<sl_real>(getRotation(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart);
 	}
-
+	
+	Ref<Animation> View::startRotateAnimationTo(sl_real toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createRotateAnimation(AnimationFrames<sl_real>(getRotation(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart | AnimationFlags::AutoStart);
+	}
+	
 	Ref<Animation> View::getFrameAnimation()
 	{
 		Ref<TransformAttributes>& attrs = m_transformAttrs;
@@ -5360,15 +5439,30 @@ namespace slib
 		}
 		return animation;
 	}
-
+	
+	Ref<Animation> View::startFrameAnimation(const AnimationFrames<Rectangle>& frames, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createFrameAnimation(frames, duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
+	
 	Ref<Animation> View::createFrameAnimation(const Rectangle& startValue, const Rectangle& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
 		return createFrameAnimation(AnimationFrames<Rectangle>(startValue, endValue), duration, onStop, curve, flags);
 	}
+	
+	Ref<Animation> View::startFrameAnimation(const Rectangle& startValue, const Rectangle& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createFrameAnimation(AnimationFrames<Rectangle>(startValue, endValue), duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
 
 	Ref<Animation> View::createFrameAnimationTo(const Rectangle& toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
-		return createFrameAnimation(AnimationFrames<Rectangle>(getFrame(), toValue), duration, onStop, curve, flags);
+		return createFrameAnimation(AnimationFrames<Rectangle>(getFrame(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart);
+	}
+	
+	Ref<Animation> View::startFrameAnimationTo(const Rectangle& toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createFrameAnimation(AnimationFrames<Rectangle>(getFrame(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart | AnimationFlags::AutoStart);
 	}
 
 	Ref<Animation> View::getAlphaAnimation()
@@ -5414,15 +5508,30 @@ namespace slib
 		}
 		return animation;
 	}
-
+	
+	Ref<Animation> View::startAlphaAnimation(const AnimationFrames<sl_real>& frames, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createAlphaAnimation(frames, duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
+	
 	Ref<Animation> View::createAlphaAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
 		return createAlphaAnimation(AnimationFrames<sl_real>(startValue, endValue), duration, onStop, curve, flags);
 	}
+	
+	Ref<Animation> View::startAlphaAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createAlphaAnimation(AnimationFrames<sl_real>(startValue, endValue), duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
 
 	Ref<Animation> View::createAlphaAnimationTo(sl_real toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
-		return createAlphaAnimation(AnimationFrames<sl_real>(getAlpha(), toValue), duration, onStop, curve, flags);
+		return createAlphaAnimation(AnimationFrames<sl_real>(getAlpha(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart);
+	}
+	
+	Ref<Animation> View::startAlphaAnimationTo(sl_real toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createAlphaAnimation(AnimationFrames<sl_real>(getAlpha(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart | AnimationFlags::AutoStart);
 	}
 
 	Ref<Animation> View::getBackgroundColorAnimation()
@@ -5468,15 +5577,30 @@ namespace slib
 		}
 		return animation;
 	}
+	
+	Ref<Animation> View::startBackgroundColorAnimation(const AnimationFrames<Color4f>& frames, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createBackgroundColorAnimation(frames, duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
 
 	Ref<Animation> View::createBackgroundColorAnimation(const Color4f& startValue, const Color4f& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
 		return createBackgroundColorAnimation(AnimationFrames<Color4f>(startValue, endValue), duration, onStop, curve, flags);
 	}
-
+	
+	Ref<Animation> View::startBackgroundColorAnimation(const Color4f& startValue, const Color4f& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createBackgroundColorAnimation(AnimationFrames<Color4f>(startValue, endValue), duration, onStop, curve, flags | AnimationFlags::AutoStart);
+	}
+	
 	Ref<Animation> View::createBackgroundColorAnimationTo(const Color4f& toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
 	{
-		return createBackgroundColorAnimation(AnimationFrames<Color4f>(getBackgroundColor(), toValue), duration, onStop, curve, flags);
+		return createBackgroundColorAnimation(AnimationFrames<Color4f>(getBackgroundColor(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart);
+	}
+	
+	Ref<Animation> View::startBackgroundColorAnimationTo(const Color4f& toValue, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+	{
+		return createBackgroundColorAnimation(AnimationFrames<Color4f>(getBackgroundColor(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart | AnimationFlags::AutoStart);
 	}
 
 	sl_bool View::isHorizontalScrolling()
@@ -6965,11 +7089,16 @@ namespace slib
 		}
 	}
 
-	Ref<Timer> View::createTimer(const Function<void()>& task, sl_uint32 interval_ms, sl_bool flagStart)
+	Ref<Timer> View::createTimer(const Function<void(Timer*)>& task, sl_uint32 interval_ms)
 	{
-		return Timer::createWithDispatcher(getDispatcher(), task, interval_ms, flagStart);
+		return Timer::createWithDispatcher(getDispatcher(), task, interval_ms);
 	}
-
+	
+	Ref<Timer> View::startTimer(const Function<void(Timer*)>& task, sl_uint32 interval_ms)
+	{
+		return Timer::startWithDispatcher(getDispatcher(), task, interval_ms);
+	}
+	
 	Ptr<IViewListener> View::getEventListener()
 	{
 		Ref<EventAttributes>& attrs = m_eventAttrs;
@@ -8720,7 +8849,7 @@ namespace slib
 			scrollAttrs->speedFlow = speedOrTarget;
 		}
 		scrollAttrs->timeFlowFrameBefore = Time::now();
-		scrollAttrs->timerFlow = createTimer(SLIB_FUNCTION_WEAKREF(View, _processContentScrollingFlow, this), SMOOTH_SCROLL_FRAME_MS);
+		scrollAttrs->timerFlow = startTimer(SLIB_FUNCTION_WEAKREF(View, _processContentScrollingFlow, this), SMOOTH_SCROLL_FRAME_MS);
 	}
 
 	void View::_stopContentScrollingFlow()
@@ -8760,7 +8889,7 @@ namespace slib
 		}
 	}
 
-	void View::_processContentScrollingFlow()
+	void View::_processContentScrollingFlow(Timer* timer)
 	{
 		Ref<ScrollAttributes>& scrollAttrs = m_scrollAttrs;
 		if (scrollAttrs.isNull()) {

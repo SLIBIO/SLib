@@ -6,8 +6,9 @@
 #include "mutex.h"
 #include "event.h"
 #include "object.h"
-#include "variant.h"
 #include "function.h"
+#include "string.h"
+#include "map.h"
 
 #define SLIB_THREAD_DEFAULT_STACK_SIZE 1048576 // 1MB
 
@@ -85,12 +86,6 @@ namespace slib
 		static sl_uint64 getCurrentThreadUniqueId();
 	
 
-		Variant getProperty(const String& name);
-
-		void setProperty(const String& name, const Variant& value);
-
-		void clearProperty(const String& name);
-
 		// attached objects are removed when the thread is exited
 		Ref<Referable> getAttachedObject(const String& name);
 
@@ -110,7 +105,6 @@ namespace slib
 		Ref<Event> m_eventExit;
 		AtomicRef<Event> m_eventWaiting;
 	
-		HashMap<String, Variant> m_properties;
 		HashMap< String, Ref<Referable> > m_attachedObjects;
 	
 	private:
