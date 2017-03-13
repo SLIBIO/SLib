@@ -1151,11 +1151,11 @@ namespace slib
 			viewAdd = this;
 		}
 		
-		setVisibility(Visibility::Hidden);
+		setVisibility(Visibility::Hidden, UIUpdateMode::NoRedraw);
 		setTranslation(0, 0, UIUpdateMode::Init);
 		setScale(1, 1, UIUpdateMode::Init);
 		setRotation(0, UIUpdateMode::NoRedraw);
-		setAlpha(1, UIUpdateMode::Redraw);
+		setAlpha(1, UIUpdateMode::NoRedraw);
 		
 		_applyDefaultOpeningPopupTransition(transition);
 		
