@@ -118,75 +118,6 @@ namespace slib
 		}
 	}
 	
-	template <class T>
-	Variant::Variant(const Array<T>& object)
-	{
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Array<T>*>(&_value)) Array<T>(object);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
-	template <class T>
-	Variant::Variant(const AtomicArray<T>& _object)
-	{
-		Array<T> object(_object);
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Array<T>*>(&_value)) Array<T>(object);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
-	template <class T>
-	Variant::Variant(const List<T>& object)
-	{
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<List<T>*>(&_value)) List<T>(object);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
-	template <class T>
-	Variant::Variant(const AtomicList<T>& _object)
-	{
-		List<T> object(_object);
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<List<T>*>(&_value)) List<T>(object);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
-	template <class KT, class VT>
-	Variant::Variant(const Map<KT, VT>& object)
-	{
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Map<KT, VT>*>(&_value)) Map<KT, VT>(object);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
-	template <class KT, class VT>
-	Variant::Variant(const AtomicMap<KT, VT>& _object)
-	{
-		Map<KT, VT> object(_object);
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Map<KT, VT>*>(&_value)) Map<KT, VT>(object);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
 	SLIB_INLINE const Variant& Variant::null()
 	{
 		return *(reinterpret_cast<Variant const*>(&_Variant_Null));
@@ -250,47 +181,6 @@ namespace slib
 		return *this;
 	}
 	
-	template <class T>
-	Variant& Variant::operator=(const Array<T>& object)
-	{
-		setArray(object);
-		return *this;
-	}
-	
-	template <class T>
-	Variant& Variant::operator=(const AtomicArray<T>& object)
-	{
-		setArray(object);
-		return *this;
-	}
-	
-	template <class T>
-	Variant& Variant::operator=(const List<T>& object)
-	{
-		setList(object);
-		return *this;
-	}
-	
-	template <class T>
-	Variant& Variant::operator=(const AtomicList<T>& object)
-	{
-		setList(object);
-		return *this;
-	}
-	
-	template <class KT, class VT>
-	Variant& Variant::operator=(const Map<KT, VT>& object)
-	{
-		setMap(object);
-		return *this;
-	}
-	
-	template <class KT, class VT>
-	Variant& Variant::operator=(const AtomicMap<KT, VT>& object)
-	{
-		setMap(object);
-		return *this;
-	}
 	
 	SLIB_INLINE VariantType Variant::getType() const
 	{
@@ -332,72 +222,6 @@ namespace slib
 		if (weak.isNotNull()) {
 			_type = VariantType::Weak;
 			new (reinterpret_cast<WeakRef<T>*>(&_value)) WeakRef<T>(weak);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
-	template <class T>
-	Array<T> Variant::getArray(const Array<T>& def) const
-	{
-		Ref<Referable> obj(getObject());
-		if (CArray<T>* p = CastInstance< CArray<T> >(obj._ptr)) {
-			return p;
-		}
-		return def;
-	}
-	
-	template <class T>
-	void Variant::setArray(const Array<T>& object)
-	{
-		_free(_type, _value);
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Array<T>*>(&_value)) Array<T>(object);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
-	template <class T>
-	List<T> Variant::getList(const List<T>& def) const
-	{
-		Ref<Referable> obj(getObject());
-		if (CList<T>* p = CastInstance< CList<T> >(obj._ptr)) {
-			return p;
-		}
-		return def;
-	}
-	
-	template <class T>
-	void Variant::setList(const List<T>& object)
-	{
-		_free(_type, _value);
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<List<T>*>(&_value)) List<T>(object);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
-	template <class KT, class VT>
-	Map<KT, VT> Variant::getMap(const Map<KT, VT>& def) const
-	{
-		Ref<Referable> obj(getObject());
-		if (IMap<KT, VT>* p = CastInstance< IMap<KT, VT> >(obj._ptr)) {
-			return p;
-		}
-		return def;
-	}
-	
-	template <class KT, class VT>
-	void Variant::setMap(const Map<KT, VT>& object)
-	{
-		_free(_type, _value);
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Map<KT, VT>*>(&_value)) Map<KT, VT>(object);
 		} else {
 			_type = VariantType::Null;
 		}
@@ -450,75 +274,6 @@ namespace slib
 		}
 	}
 	
-	template <class T>
-	Atomic<Variant>::Atomic(const Array<T>& object)
-	{
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Array<T>*>(&_value)) Array<T>(object);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
-	template <class T>
-	Atomic<Variant>::Atomic(const AtomicArray<T>& _object)
-	{
-		Array<T> object(_object);
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Array<T>*>(&_value)) Array<T>(object);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
-	template <class T>
-	Atomic<Variant>::Atomic(const List<T>& object)
-	{
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<List<T>*>(&_value)) List<T>(object);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
-	template <class T>
-	Atomic<Variant>::Atomic(const AtomicList<T>& _object)
-	{
-		List<T> object(_object);
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<List<T>*>(&_value)) List<T>(object);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
-	template <class KT, class VT>
-	Atomic<Variant>::Atomic(const Map<KT, VT>& object)
-	{
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Map<KT, VT>*>(&_value)) Map<KT, VT>(object);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
-	template <class KT, class VT>
-	Atomic<Variant>::Atomic(const AtomicMap<KT, VT>& _object)
-	{
-		Map<KT, VT> object(_object);
-		if (object.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Map<KT, VT>*>(&_value)) Map<KT, VT>(object);
-		} else {
-			_type = VariantType::Null;
-		}
-	}
-	
 	SLIB_INLINE const AtomicVariant& Atomic<Variant>::null()
 	{
 		return *(reinterpret_cast<AtomicVariant const*>(&_Variant_Null));
@@ -549,48 +304,6 @@ namespace slib
 	AtomicVariant& Atomic<Variant>::operator=(const AtomicWeakRef<T>& weak)
 	{
 		setWeak(weak);
-		return *this;
-	}
-	
-	template <class T>
-	AtomicVariant& Atomic<Variant>::operator=(const Array<T>& object)
-	{
-		setArray(object);
-		return *this;
-	}
-	
-	template <class T>
-	AtomicVariant& Atomic<Variant>::operator=(const AtomicArray<T>& object)
-	{
-		setArray(object);
-		return *this;
-	}
-	
-	template <class T>
-	AtomicVariant& Atomic<Variant>::operator=(const List<T>& object)
-	{
-		setList(object);
-		return *this;
-	}
-	
-	template <class T>
-	AtomicVariant& Atomic<Variant>::operator=(const AtomicList<T>& object)
-	{
-		setList(object);
-		return *this;
-	}
-	
-	template <class KT, class VT>
-	AtomicVariant& Atomic<Variant>::operator=(const Map<KT, VT>& object)
-	{
-		setMap(object);
-		return *this;
-	}
-	
-	template <class KT, class VT>
-	AtomicVariant& Atomic<Variant>::operator=(const AtomicMap<KT, VT>& object)
-	{
-		setMap(object);
 		return *this;
 	}
 	
@@ -640,62 +353,6 @@ namespace slib
 		}
 	}
 	
-	template <class T>
-	Array<T> Atomic<Variant>::getArray(const Array<T>& def) const
-	{
-		Variant var(*this);
-		return var.getArray(def);
-	}
-	
-	template <class T>
-	void Atomic<Variant>::setArray(const Array<T>& object)
-	{
-		if (object.isNotNull()) {
-			sl_int64 v;
-			new (reinterpret_cast<Array<T>*>(&v)) Array<T>(object);
-			_replace(VariantType::Object, v);
-		} else {
-			_replace(VariantType::Null, 0);
-		}
-	}
-	
-	template <class T>
-	List<T> Atomic<Variant>::getList(const List<T>& def) const
-	{
-		Variant var(*this);
-		return var.getList(def);
-	}
-	
-	template <class T>
-	void Atomic<Variant>::setList(const List<T>& object)
-	{
-		if (object.isNotNull()) {
-			sl_int64 v;
-			new (reinterpret_cast<List<T>*>(&v)) List<T>(object);
-			_replace(VariantType::Object, v);
-		} else {
-			_replace(VariantType::Null, 0);
-		}
-	}
-	
-	template <class KT, class VT>
-	Map<KT, VT> Atomic<Variant>::getMap(const Map<KT, VT>& def) const
-	{
-		Variant var(*this);
-		return var.getMap(def);
-	}
-	
-	template <class KT, class VT>
-	void Atomic<Variant>::setMap(const Map<KT, VT>& object)
-	{
-		if (object.isNotNull()) {
-			sl_int64 v;
-			new (reinterpret_cast<Map<KT, VT>*>(&v)) Map<KT, VT>(object);
-			_replace(VariantType::Object, v);
-		} else {
-			_replace(VariantType::Null, 0);
-		}
-	}
 	
 	extern const char _VariantMap_ClassID[];
 	
@@ -794,7 +451,7 @@ namespace slib
 		}
 		return Object::checkObjectType(type);
 	}
-
+	
 }
 
 #endif

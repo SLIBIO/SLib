@@ -293,6 +293,66 @@ namespace slib
 			_type = VariantType::Null;
 		}
 	}
+	
+	Variant::Variant(const VariantList& list)
+	{
+		if (list.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantList, _value) VariantList(list);
+		} else {
+			_type = VariantType::Null;
+		}
+	}
+	
+	Variant::Variant(const Atomic<VariantList>& list)
+	{
+		if (list.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantList, _value) VariantList(list);
+		} else {
+			_type = VariantType::Null;
+		}
+	}
+	
+	Variant::Variant(const VariantMap& list)
+	{
+		if (list.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantMap, _value) VariantMap(list);
+		} else {
+			_type = VariantType::Null;
+		}
+	}
+	
+	Variant::Variant(const Atomic<VariantMap>& list)
+	{
+		if (list.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantMap, _value) VariantMap(list);
+		} else {
+			_type = VariantType::Null;
+		}
+	}
+	
+	Variant::Variant(const VariantMapList& list)
+	{
+		if (list.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantMapList, _value) VariantMapList(list);
+		} else {
+			_type = VariantType::Null;
+		}
+	}
+	
+	Variant::Variant(const Atomic<VariantMapList>& list)
+	{
+		if (list.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantMapList, _value) VariantMapList(list);
+		} else {
+			_type = VariantType::Null;
+		}
+	}
 
 	Variant Variant::fromInt32(sl_int32 value)
 	{
@@ -364,34 +424,49 @@ namespace slib
 		return mem;
 	}
 
-	Variant Variant::fromVariantList(const List<Variant>& value)
+	Variant Variant::fromVariantList(const VariantList& value)
 	{
 		return value;
 	}
 
-	Variant Variant::createVariantList()
+	Variant Variant::fromVariantMap(const VariantMap& value)
+	{
+		return value;
+	}
+	
+	Variant Variant::fromVariantMapList(const VariantMapList& value)
+	{
+		return value;
+	}
+	
+	Variant Variant::createList()
 	{
 		return List<Variant>::create();
 	}
-
-	Variant Variant::fromVariantMap(const Map<String, Variant>& value)
+	
+	Variant Variant::createMap()
 	{
-		return value;
+		return Map<String, Variant>::createHash();
 	}
 
-	Variant Variant::createVariantListMap()
+	Variant Variant::createListMap()
 	{
 		return Map<String, Variant>::createList();
 	}
 
-	Variant Variant::createVariantTreeMap()
+	Variant Variant::createTreeMap()
 	{
 		return Map<String, Variant>::createTree();
 	}
 
-	Variant Variant::createVariantHashMap()
+	Variant Variant::createHashMap()
 	{
 		return Map<String, Variant>::createHash();
+	}
+	
+	Variant Variant::createMapList()
+	{
+		return List< Map<String, Variant> >::create();
 	}
 
 
@@ -563,6 +638,42 @@ namespace slib
 	Variant& Variant::operator=(const AtomicMemory& mem)
 	{
 		setMemory(mem);
+		return *this;
+	}
+	
+	Variant& Variant::operator=(const VariantList& list)
+	{
+		setVariantList(list);
+		return *this;
+	}
+	
+	Variant& Variant::operator=(const Atomic<VariantList>& list)
+	{
+		setVariantList(list);
+		return *this;
+	}
+
+	Variant& Variant::operator=(const VariantMap& map)
+	{
+		setVariantMap(map);
+		return *this;
+	}
+	
+	Variant& Variant::operator=(const Atomic<VariantMap>& map)
+	{
+		setVariantMap(map);
+		return *this;
+	}
+	
+	Variant& Variant::operator=(const VariantMapList& list)
+	{
+		setVariantMapList(list);
+		return *this;
+	}
+	
+	Variant& Variant::operator=(const Atomic<VariantMapList>& list)
+	{
+		setVariantMapList(list);
 		return *this;
 	}
 
@@ -1405,7 +1516,7 @@ namespace slib
 		return IsInstanceOf< CList<Variant> >(getObject());
 	}
 
-	List<Variant> Variant::getVariantList() const
+	VariantList Variant::getVariantList() const
 	{
 		Ref<Referable> obj(getObject());
 		if (CList<Variant>* p = CastInstance< CList<Variant> >(obj._ptr)) {
@@ -1413,13 +1524,24 @@ namespace slib
 		}
 		return sl_null;
 	}
+	
+	void Variant::setVariantList(const VariantList& list)
+	{
+		_Variant_free(_type, _value);
+		if (list.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantList, _value) VariantList(list);
+		} else {
+			_type = VariantType::Null;
+		}
+	}
 
 	sl_bool Variant::isVariantMap() const
 	{
 		return IsInstanceOf< IMap<String, Variant> >(getObject());
 	}
 
-	Map<String, Variant> Variant::getVariantMap() const
+	VariantMap Variant::getVariantMap() const
 	{
 		Ref<Referable> obj(getObject());
 		if (IMap<String, Variant>* p = CastInstance< IMap<String, Variant> >(obj._ptr)) {
@@ -1427,19 +1549,41 @@ namespace slib
 		}
 		return sl_null;
 	}
+	
+	void Variant::setVariantMap(const VariantMap& map)
+	{
+		_Variant_free(_type, _value);
+		if (map.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantMap, _value) VariantMap(map);
+		} else {
+			_type = VariantType::Null;
+		}
+	}
 
 	sl_bool Variant::isVariantMapList() const
 	{
 		return IsInstanceOf< CList< Map<String, Variant> > >(getObject());
 	}
 
-	List< Map<String, Variant> > Variant::getVariantMapList() const
+	VariantMapList Variant::getVariantMapList() const
 	{
 		Ref<Referable> obj(getObject());
 		if (CList< Map<String, Variant> >* p = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
 			return p;
 		}
 		return sl_null;
+	}
+	
+	void Variant::setVariantMapList(const VariantMapList& list)
+	{
+		_Variant_free(_type, _value);
+		if (list.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantMapList, _value) VariantMapList(list);
+		} else {
+			_type = VariantType::Null;
+		}
 	}
 
 	sl_size Variant::getListElementsCount() const
@@ -1987,7 +2131,67 @@ namespace slib
 			_type = VariantType::Null;
 		}
 	}
-
+	
+	Atomic<Variant>::Atomic(const VariantList& list)
+	{
+		if (list.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantList, _value) VariantList(list);
+		} else {
+			_type = VariantType::Null;
+		}
+	}
+	
+	Atomic<Variant>::Atomic(const Atomic<VariantList>& list)
+	{
+		if (list.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantList, _value) VariantList(list);
+		} else {
+			_type = VariantType::Null;
+		}
+	}
+	
+	Atomic<Variant>::Atomic(const VariantMap& list)
+	{
+		if (list.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantMap, _value) VariantMap(list);
+		} else {
+			_type = VariantType::Null;
+		}
+	}
+	
+	Atomic<Variant>::Atomic(const Atomic<VariantMap>& list)
+	{
+		if (list.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantMap, _value) VariantMap(list);
+		} else {
+			_type = VariantType::Null;
+		}
+	}
+	
+	Atomic<Variant>::Atomic(const VariantMapList& list)
+	{
+		if (list.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantMapList, _value) VariantMapList(list);
+		} else {
+			_type = VariantType::Null;
+		}
+	}
+	
+	Atomic<Variant>::Atomic(const Atomic<VariantMapList>& list)
+	{
+		if (list.isNotNull()) {
+			_type = VariantType::Object;
+			new PTR_VAR(VariantMapList, _value) VariantMapList(list);
+		} else {
+			_type = VariantType::Null;
+		}
+	}
+	
 	AtomicVariant& Atomic<Variant>::operator=(AtomicVariant&& other)
 	{
 		if (this != &other) {
@@ -2155,6 +2359,42 @@ namespace slib
 	AtomicVariant& Atomic<Variant>::operator=(const AtomicMemory& mem)
 	{
 		setMemory(mem);
+		return *this;
+	}
+	
+	AtomicVariant& Atomic<Variant>::operator=(const VariantList& list)
+	{
+		setVariantList(list);
+		return *this;
+	}
+	
+	AtomicVariant& Atomic<Variant>::operator=(const Atomic<VariantList>& list)
+	{
+		setVariantList(list);
+		return *this;
+	}
+	
+	AtomicVariant& Atomic<Variant>::operator=(const VariantMap& map)
+	{
+		setVariantMap(map);
+		return *this;
+	}
+	
+	AtomicVariant& Atomic<Variant>::operator=(const Atomic<VariantMap>& map)
+	{
+		setVariantMap(map);
+		return *this;
+	}
+	
+	AtomicVariant& Atomic<Variant>::operator=(const VariantMapList& list)
+	{
+		setVariantMapList(list);
+		return *this;
+	}
+	
+	AtomicVariant& Atomic<Variant>::operator=(const Atomic<VariantMapList>& list)
+	{
+		setVariantMapList(list);
 		return *this;
 	}
 
@@ -2555,22 +2795,44 @@ namespace slib
 		return var.isVariantList();
 	}
 
-	List<Variant> Atomic<Variant>::getVariantList() const
+	VariantList Atomic<Variant>::getVariantList() const
 	{
 		Variant var(*this);
 		return var.getVariantList();
 	}
-
+	
+	void Atomic<Variant>::setVariantList(const VariantList& list)
+	{
+		if (list.isNotNull()) {
+			sl_int64 v;
+			new PTR_VAR(VariantList, v) VariantList(list);
+			_replace(VariantType::Object, v);
+		} else {
+			_replace(VariantType::Null, 0);
+		}
+	}
+	
 	sl_bool Atomic<Variant>::isVariantMap() const
 	{
 		Variant var(*this);
 		return var.isVariantMap();
 	}
 
-	Map<String, Variant> Atomic<Variant>::getVariantMap() const
+	VariantMap Atomic<Variant>::getVariantMap() const
 	{
 		Variant var(*this);
 		return var.getVariantMap();
+	}
+	
+	void Atomic<Variant>::setVariantMap(const VariantMap& map)
+	{
+		if (map.isNotNull()) {
+			sl_int64 v;
+			new PTR_VAR(VariantMap, v) VariantMap(map);
+			_replace(VariantType::Object, v);
+		} else {
+			_replace(VariantType::Null, 0);
+		}
 	}
 
 	sl_bool Atomic<Variant>::isVariantMapList() const
@@ -2579,10 +2841,21 @@ namespace slib
 		return var.isVariantMap();
 	}
 
-	List< Map<String, Variant> > Atomic<Variant>::getVariantMapList() const
+	VariantMapList Atomic<Variant>::getVariantMapList() const
 	{
 		Variant var(*this);
 		return var.getVariantMapList();
+	}
+	
+	void Atomic<Variant>::setVariantMapList(const VariantMapList& list)
+	{
+		if (list.isNotNull()) {
+			sl_int64 v;
+			new PTR_VAR(VariantMapList, v) VariantMapList(list);
+			_replace(VariantType::Object, v);
+		} else {
+			_replace(VariantType::Null, 0);
+		}
 	}
 
 	sl_size Atomic<Variant>::getListElementsCount() const

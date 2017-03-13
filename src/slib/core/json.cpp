@@ -157,19 +157,19 @@ namespace slib
 			}
 			if (buf[pos] == ']') {
 				pos++;
-				return Variant::createVariantList();
+				return Variant::createList();
 			}
-			Variant list = Variant::createVariantList();
+			VariantList list = VariantList::create();
 			while (pos < len) {
 				CT ch = buf[pos];
 				if (ch == ']' || ch == ',') {
-					list.addListElement(Variant::null());
+					list.add_NoLock(Variant::null());
 				} else {
 					Variant item = parseJson();
 					if (flagError) {
 						return sl_null;
 					}
-					list.addListElement(item);
+					list.add_NoLock(item);
 					escapeSpaceAndComments();
 					if (pos == len) {
 						flagError = sl_true;
@@ -208,7 +208,7 @@ namespace slib
 				errorMessage = "Object: Missing character } ";
 				return sl_null;
 			}
-			Variant map = Variant::createVariantHashMap();
+			VariantMap map = VariantMap::createHash();
 			sl_bool flagFirst = sl_true;
 			while (pos < len) {
 				escapeSpaceAndComments();
@@ -289,13 +289,13 @@ namespace slib
 					return sl_null;
 				}
 				if (buf[pos] == '}' || buf[pos] == ',') {
-					map.putField(key, Variant::null());
+					map.put_NoLock(key, Variant::null());
 				} else {
 					Variant item = parseJson();
 					if (flagError) {
 						return sl_null;
 					}
-					map.putField(key, item);
+					map.put_NoLock(key, item);
 				}
 				flagFirst = sl_false;
 			}
@@ -471,12 +471,12 @@ namespace slib
 
 	Variant Json::createList()
 	{
-		return Variant::createVariantList();
+		return Variant::createList();
 	}
 
 	Variant Json::createMap()
 	{
-		return Variant::createVariantListMap();
+		return Variant::createMap();
 	}
 
 	Variant Json::toJson(const sl_char8* _in)

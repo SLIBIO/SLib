@@ -110,23 +110,17 @@ namespace slib
 
 		Variant(const AtomicMemory& mem);
 
-		template <class T>
-		Variant(const Array<T>& object);
+		Variant(const List<Variant>& list);
 
-		template <class T>
-		Variant(const AtomicArray<T>& object);
-	
-		template <class T>
-		Variant(const List<T>& object);
+		Variant(const AtomicList<Variant>& list);
 
-		template <class T>
-		Variant(const AtomicList<T>& object);
+		Variant(const Map<String, Variant>& map);
 
-		template <class KT, class VT>
-		Variant(const Map<KT, VT>& object);
-
-		template <class KT, class VT>
-		Variant(const AtomicMap<KT, VT>& object);
+		Variant(const AtomicMap<String, Variant>& map);
+		
+		Variant(const List< Map<String, Variant> >& list);
+		
+		Variant(const AtomicList< Map<String, Variant> >& list);
 	
 	public:
 		static const Variant& null();
@@ -160,32 +154,29 @@ namespace slib
 		template <class T>
 		static Variant fromRef(const Ref<T>& ref);
 
-		static Variant fromMemory(const Memory& mem);
-
-		template <class T>
-		static Variant fromArray(const Array<T>& value);
-
-		template <class T>
-		static Variant fromList(const List<T>& value);
-
-		static Variant fromVariantList(const List<Variant>& value);
-
-		static Variant createVariantList();
-	
-		template <class KT, class VT>
-		static Variant fromMap(const Map<KT, VT>& value);
-	
-		static Variant fromVariantMap(const Map<String, Variant>& value);
-
-		static Variant createVariantListMap();
-
-		static Variant createVariantTreeMap();
-
-		static Variant createVariantHashMap();
-
 		template <class T>
 		static Variant fromWeakRef(const WeakRef<T>& weak);
+		
+		static Variant fromMemory(const Memory& mem);
+		
+		static Variant createList();
+		
+		static Variant createMap();
+		
+		static Variant createListMap();
+		
+		static Variant createTreeMap();
+		
+		static Variant createHashMap();
+		
+		static Variant createMapList();
+		
+		static Variant fromVariantList(const List<Variant>& value);
 
+		static Variant fromVariantMap(const Map<String, Variant>& value);
+		
+		static Variant fromVariantMapList(const List< Map<String, Variant> >& value);
+		
 	public:
 		Variant& operator=(Variant&& other);
 
@@ -250,25 +241,19 @@ namespace slib
 		Variant& operator=(const Memory& mem);
 
 		Variant& operator=(const AtomicMemory& mem);
-
-		template <class T>
-		Variant& operator=(const Array<T>& object);
-
-		template <class T>
-		Variant& operator=(const AtomicArray<T>& object);
-	
-		template <class T>
-		Variant& operator=(const List<T>& object);
-
-		template <class T>
-		Variant& operator=(const AtomicList<T>& object);
-
-		template <class KT, class VT>
-		Variant& operator=(const Map<KT, VT>& object);
-
-		template <class KT, class VT>
-		Variant& operator=(const AtomicMap<KT, VT>& object);
-
+		
+		Variant& operator=(const List<Variant>& list);
+		
+		Variant& operator=(const AtomicList<Variant>& list);
+		
+		Variant& operator=(const Map<String, Variant>& map);
+		
+		Variant& operator=(const AtomicMap<String, Variant>& map);
+		
+		Variant& operator=(const List< Map<String, Variant> >& list);
+		
+		Variant& operator=(const AtomicList< Map<String, Variant> >& list);
+		
 		Variant operator[](sl_size indexForVariantList) const;
 
 		Variant operator[](const String& keyForVariantMap) const;
@@ -412,37 +397,25 @@ namespace slib
 		Memory getMemory() const;
 
 		void setMemory(const Memory& mem);
-
-		template <class T>
-		Array<T> getArray(const Array<T>& def) const;
-
-		template <class T>
-		void setArray(const Array<T>& array);
-	
-		template <class T>
-		List<T> getList(const List<T>& def) const;
-
-		template <class T>
-		void setList(const List<T>& list);
-
-		template <class KT, class VT>
-		Map<KT, VT> getMap(const Map<KT, VT>& def) const;
-
-		template <class KT, class VT>
-		void setMap(const Map<KT, VT>& map);
-	
+		
 		sl_bool isVariantList() const;
 
 		List<Variant> getVariantList() const;
+		
+		void setVariantList(const List<Variant>& list);
 	
 		sl_bool isVariantMap() const;
 
 		Map<String, Variant> getVariantMap() const;
-
+		
+		void setVariantMap(const Map<String, Variant>& map);
+		
 		sl_bool isVariantMapList() const;
 
 		List< Map<String, Variant> > getVariantMapList() const;
-	
+		
+		void setVariantMapList(const List< Map<String, Variant> >& list);
+
 		sl_size getListElementsCount() const;
 
 		Variant getListElement(sl_size index) const;
@@ -546,23 +519,17 @@ namespace slib
 
 		Atomic(const AtomicMemory& mem);
 
-		template <class T>
-		Atomic(const Array<T>& object);
-
-		template <class T>
-		Atomic(const AtomicArray<T>& object);
-
-		template <class T>
-		Atomic(const List<T>& object);
-
-		template <class T>
-		Atomic(const AtomicList<T>& object);
-	
-		template <class KT, class VT>
-		Atomic(const Map<KT, VT>& object);
-
-		template <class KT, class VT>
-		Atomic(const AtomicMap<KT, VT>& object);
+		Atomic(const List<Variant>& list);
+		
+		Atomic(const AtomicList<Variant>& list);
+		
+		Atomic(const Map<String, Variant>& map);
+		
+		Atomic(const AtomicMap<String, Variant>& map);
+		
+		Atomic(const List< Map<String, Variant> >& list);
+		
+		Atomic(const AtomicList< Map<String, Variant> >& list);
 
 	public:
 		static const AtomicVariant& null();
@@ -631,24 +598,18 @@ namespace slib
 		AtomicVariant& operator=(const Memory& mem);
 
 		AtomicVariant& operator=(const AtomicMemory& mem);
-
-		template <class T>
-		AtomicVariant& operator=(const Array<T>& object);
-
-		template <class T>
-		AtomicVariant& operator=(const AtomicArray<T>& object);
-
-		template <class T>
-		AtomicVariant& operator=(const List<T>& object);
-
-		template <class T>
-		AtomicVariant& operator=(const AtomicList<T>& object);
-	
-		template <class KT, class VT>
-		AtomicVariant& operator=(const Map<KT, VT>& object);
-
-		template <class KT, class VT>
-		AtomicVariant& operator=(const AtomicMap<KT, VT>& object);
+		
+		AtomicVariant& operator=(const List<Variant>& list);
+		
+		AtomicVariant& operator=(const AtomicList<Variant>& list);
+		
+		AtomicVariant& operator=(const Map<String, Variant>& map);
+		
+		AtomicVariant& operator=(const AtomicMap<String, Variant>& map);
+		
+		AtomicVariant& operator=(const List< Map<String, Variant> >& list);
+		
+		AtomicVariant& operator=(const AtomicList< Map<String, Variant> >& list);
 
 		Variant operator[](sl_size indexForVariantList) const;
 
@@ -794,36 +755,24 @@ namespace slib
 
 		void setMemory(const Memory& mem);
 
-		template <class T>
-		Array<T> getArray(const Array<T>& def) const;
-
-		template <class T>
-		void setArray(const Array<T>& array);
-
-		template <class T>
-		List<T> getList(const List<T>& def) const;
-
-		template <class T>
-		void setList(const List<T>& list);
-
-		template <class KT, class VT>
-		Map<KT, VT> getMap(const Map<KT, VT>& def) const;
-
-		template <class KT, class VT>
-		void setMap(const Map<KT, VT>& map);
-
 
 		sl_bool isVariantList() const;
 
 		List<Variant> getVariantList() const;
+		
+		void setVariantList(const List<Variant>& list);
 
 		sl_bool isVariantMap() const;
 
 		Map<String, Variant> getVariantMap() const;
+		
+		void setVariantMap(const Map<String, Variant>& map);
 
 		sl_bool isVariantMapList() const;
 
 		List< Map<String, Variant> > getVariantMapList() const;
+		
+		void setVariantMapList(const List< Map<String, Variant> >& list);
 
 		sl_size getListElementsCount() const;
 
