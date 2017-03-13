@@ -2934,32 +2934,32 @@ namespace slib
 		static wchar_t _static_string_buf_##name[] = L##str; \
 		static slib::_StringContainer16 _static_string_container_##name = {(sl_char16*)_static_string_buf_##name, (sizeof(_static_string_buf_##name)/2)-1, 0, -1}; \
 		static slib::_StringContainer16* _static_string_##name = &_static_string_container_##name; \
-		static slib::String16& name = *(reinterpret_cast<slib::String16*>(&_static_string_##name));
+		static const slib::String16& name = *(reinterpret_cast<slib::String16*>(&_static_string_##name));
 #define SLIB_STATIC_ATOMIC_STRING16(name, str) \
 		static wchar_t _static_string_buf_##name[] = L##str; \
 		static slib::_StringContainer16 _static_string_container_##name = {(sl_char16*)_static_string_buf_##name, (sizeof(_static_string_buf_##name)/2)-1, 0, -1}; \
 		static slib::_String16_Const _static_string_##name = {reinterpret_cast<slib::StringContainer16*>(&_static_string_container_##name), 0}; \
-		static slib::AtomicString16& name = *(reinterpret_cast<slib::AtomicString16*>(&_static_string_##name));
+		static const slib::AtomicString16& name = *(reinterpret_cast<slib::AtomicString16*>(&_static_string_##name));
 #endif
 
 #define SLIB_STATIC_STRING16_BY_ARRAY(name, ...) \
 		static sl_char16 _static_string_buf_##name[] = {__VA_ARGS__, 0}; \
 		static slib::_StringContainer16 _static_string_container_##name = {_static_string_buf_##name, (sizeof(_static_string_buf_##name)/2)-1, 0, -1}; \
 		static slib::_StringContainer16* _static_string_##name = &_static_string_container_##name; \
-		static slib::String16& name = *(reinterpret_cast<slib::String16*>(&_static_string_##name));
+		static const slib::String16& name = *(reinterpret_cast<slib::String16*>(&_static_string_##name));
 
 #define SLIB_STATIC_ATOMIC_STRING16_BY_ARRAY(name, ...) \
 		static sl_char16 _static_string_buf_##name[] = {__VA_ARGS__, 0}; \
 		static slib::_StringContainer16 _static_string_container_##name = {_static_string_buf_##name, (sizeof(_static_string_buf_##name)/2)-1, 0, -1}; \
 		static slib::_String16_Const _static_string_##name = {reinterpret_cast<slib::StringContainer16*>(&_static_string_container_##name), 0}; \
-		static slib::AtomicString16& name = *(reinterpret_cast<slib::AtomicString16*>(&_static_string_##name));
+		static const slib::AtomicString16& name = *(reinterpret_cast<slib::AtomicString16*>(&_static_string_##name));
 
 #define SLIB_STATIC_STRING16_NULL(name) \
 		static slib::_String16_Const _static_string_null_##name = {sl_null, 0}; \
-		static slib::String16& name = *(reinterpret_cast<slib::String16*>(&_static_string_null_##name));
+		static const slib::String16& name = *(reinterpret_cast<slib::String16*>(&_static_string_null_##name));
 
 #define SLIB_STATIC_ATOMIC_STRING16_NULL(name) \
 		static slib::_String16_Const _static_string_null_##name = {sl_null, 0}; \
-		static slib::AtomicString16& name = *(reinterpret_cast<slib::AtomicString16*>(&_static_string_null_##name));
+		static const slib::AtomicString16& name = *(reinterpret_cast<slib::AtomicString16*>(&_static_string_null_##name));
 
 #endif

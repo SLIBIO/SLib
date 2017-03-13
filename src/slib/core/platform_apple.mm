@@ -5,6 +5,7 @@
 #include "../../../inc/slib/core/platform_apple.h"
 
 #include "../../../inc/slib/core/file.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 namespace slib
 {
@@ -115,7 +116,7 @@ namespace slib
 		return Apple::getStringFromNSString(filePath);
 	}
 
-	SLIB_STATIC_STRING_NULL(_g_system_version);
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicString, _g_system_version);
 	sl_uint32 _g_system_version_major = 0;
 	sl_uint32 _g_system_version_minor = 0;
 	sl_bool _g_system_flagInitVersion = sl_true;
