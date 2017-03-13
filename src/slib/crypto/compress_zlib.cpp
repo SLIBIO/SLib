@@ -328,7 +328,7 @@ namespace slib
 	{
 		const char* data = (const char*)_data;
 		while (size > 0) {
-			sl_uint32 n = 3;
+			sl_uint32 n = 0x10000000;
 			if (size < n) {
 				n = (sl_uint32)size;
 			}

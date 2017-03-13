@@ -756,6 +756,19 @@ namespace slib
 		}
 		return sl_null;
 	}
+	
+	Ref<ViewPage> View::getParentPage()
+	{
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			ViewPage* page = CastInstance<ViewPage>(parent.get());
+			if (page) {
+				return page;
+			}
+			return parent->getParentPage();
+		}
+		return sl_null;
+	}
 
 	void View::removeFromParent()
 	{

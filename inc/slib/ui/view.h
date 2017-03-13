@@ -22,6 +22,7 @@ namespace slib
 
 	class Window;
 	class ViewInstance;
+	class ViewPage;
 	class ScrollBar;
 	class MotionTracker;
 
@@ -128,6 +129,8 @@ namespace slib
 		Ref<View> getInstanceView();
 		
 		Ref<ViewInstance> getInstanceViewInstance();
+		
+		Ref<ViewPage> getParentPage();
 		
 		void removeFromParent();
 		
