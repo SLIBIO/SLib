@@ -17,32 +17,21 @@
 namespace slib
 {
 	
-	class SLIB_EXPORT HashPosition
+	template <class KT, class VT>
+	struct HashEntry
 	{
-	public:
-		sl_uint32 index;
-		void* node;
-	
-	public:
-		HashPosition();
-
-		HashPosition(const HashPosition& other);
-	
-	public:
-		HashPosition& operator=(const HashPosition& other);
-	
-		sl_bool operator==(const HashPosition& other) const;
-
-		sl_bool operator!=(const HashPosition& other) const;
-
-		sl_bool isNull() const;
-	
-		sl_bool isNotNull() const;
-	
-		void setNull();
-
+		KT key;
+		VT value;
+		
+		sl_uint32 hash;
+		HashEntry* chain;
+		
+		HashEntry* before;
+		HashEntry* next;
+		
 	};
 	
+
 	template < class KT, class VT, class HASH = Hash<KT>, class KEY_EQUALS = Equals<KT> >
 	class SLIB_EXPORT HashTable
 	{
@@ -56,17 +45,15 @@ namespace slib
 	
 		sl_size getCapacity() const;
 	
-		sl_bool search(const KT& key, HashPosition* position = sl_null, VT* outValue = sl_null) const;
+		HashEntry<KT, VT>* getFirstEntry() const;
+		
+		HashEntry<KT, VT>* getLastEntry() const;
+		
+		HashEntry<KT, VT>* search(const KT& key) const;
 
 		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool searchKeyAndValue(const KT& key, const _VT& value, HashPosition* position = sl_null, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
-	
-		sl_bool getAt(const HashPosition& position, KT* outKey = sl_null, VT* outValue = sl_null) const;
-
-		sl_bool getFirstPosition(HashPosition& position, KT* outKey = sl_null, VT* outValue = sl_null) const;
-
-		sl_bool getNextPosition(HashPosition& position, KT* outKey = sl_null, VT* outValue = sl_null) const;
-
+		HashEntry<KT, VT>* searchKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		
 		sl_bool get(const KT& key, VT* outValue = sl_null) const;
 
 		VT* getItemPointer(const KT& key) const;
@@ -99,17 +86,12 @@ namespace slib
 		sl_bool copyFrom(const HashTable<KT, VT, HASH, KEY_EQUALS>* other);
 
 	private:
-		struct HashEntry
-		{
-			sl_uint32 hash;
-			KT key;
-			VT value;
-			HashEntry* next;
-		};
-
+		typedef HashEntry<KT, VT> Entry;
+		
+		Entry** m_table;
 		sl_size m_nSize;
-
-		HashEntry** m_table;
+		Entry* m_firstEntry;
+		Entry* m_lastEntry;
 
 		sl_uint32 m_nCapacity;
 		sl_uint32 m_nCapacityMin;
@@ -126,10 +108,12 @@ namespace slib
 
 		sl_bool _createTable(sl_uint32 capacity);
 
-		sl_bool _addEntry(sl_uint32 index, sl_uint32 hash, HashEntry* first, const KT& key, const VT& value);
+		sl_bool _addEntry(sl_uint32 hash, const KT& key, const VT& value);
 
+		void _removeEntry(Entry* entry);
+		
 		void _compact();
-
+		
 	};
 
 }

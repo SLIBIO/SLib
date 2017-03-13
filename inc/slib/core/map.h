@@ -454,6 +454,8 @@ namespace slib
 		Map(const std::initializer_list< Pair<KT, VT> >& l);
 		
 	public:
+		static Map<KT, VT> create();
+
 		template < class KEY_EQUALS = Equals<KT> >
 		static Map<KT, VT> createList(const KEY_EQUALS& key_equals = KEY_EQUALS());
 	
@@ -473,6 +475,8 @@ namespace slib
 		static Map<KT, VT> createTree(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare = KEY_COMPARE());
 
 	public:
+		void init();
+		
 		template < class KEY_EQUALS = Equals<KT> >
 		void initList(const KEY_EQUALS& key_equals = KEY_EQUALS());
 
@@ -579,6 +583,8 @@ namespace slib
 		Atomic(const std::initializer_list< Pair<KT, VT> >& l);
 		
 	public:
+		void init();
+		
 		template < class KEY_EQUALS = Equals<KT> >
 		void initList(const KEY_EQUALS& key_equals = KEY_EQUALS());
 

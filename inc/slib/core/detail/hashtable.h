@@ -6,51 +6,6 @@
 namespace slib
 {
 	
-	SLIB_INLINE HashPosition::HashPosition()
-	{
-		index = 0;
-		node = sl_null;
-	}
-	
-	SLIB_INLINE HashPosition::HashPosition(const HashPosition& other)
-	{
-		node = other.node;
-		index = other.index;
-	}
-	
-	SLIB_INLINE HashPosition& HashPosition::operator=(const HashPosition& other)
-	{
-		node = other.node;
-		index = other.index;
-		return *this;
-	}
-	
-	SLIB_INLINE sl_bool HashPosition::operator==(const HashPosition& other) const
-	{
-		return node == other.node && index == other.index;
-	}
-	
-	SLIB_INLINE sl_bool HashPosition::operator!=(const HashPosition& other) const
-	{
-		return node != other.node || index != other.index;
-	}
-	
-	SLIB_INLINE sl_bool HashPosition::isNull() const
-	{
-		return node == sl_null;
-	}
-	
-	SLIB_INLINE sl_bool HashPosition::isNotNull() const
-	{
-		return node != sl_null;
-	}
-	
-	SLIB_INLINE void HashPosition::setNull()
-	{
-		node = sl_null;
-	}
-	
-	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	HashTable<KT, VT, HASH, KEY_EQUALS>::HashTable(sl_uint32 capacity, const HASH& hash, const KEY_EQUALS& equals) : m_hash(hash), m_equals(equals)
 	{
@@ -84,166 +39,86 @@ namespace slib
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::search(const KT& key, HashPosition* position, VT* outValue) const
+	SLIB_INLINE HashEntry<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::getFirstEntry() const
+	{
+		return m_firstEntry;
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_EQUALS>
+	SLIB_INLINE HashEntry<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::getLastEntry() const
+	{
+		return m_lastEntry;
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_EQUALS>
+	HashEntry<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::search(const KT& key) const
 	{
 		if (m_nCapacity == 0) {
-			return sl_false;
+			return sl_null;
 		}
 		sl_uint32 hash = m_hash(key);
 		sl_uint32 index = hash & (m_nCapacity - 1);
-		HashEntry* entry = m_table[index];
+		Entry* entry = m_table[index];
 		while (entry) {
 			if (entry->hash == hash && m_equals(entry->key, key)) {
-				if (position) {
-					position->node = entry;
-					position->index = index;
-				}
-				if (outValue) {
-					*outValue = entry->value;
-				}
-				return sl_true;
+				return entry;
 			}
-			entry = entry->next;
+			entry = entry->chain;
 		}
-		return sl_false;
+		return sl_null;
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	template <class _VT, class VALUE_EQUALS>
-	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::searchKeyAndValue(const KT& key, const _VT& value, HashPosition* position, VT* outValue, const VALUE_EQUALS& value_equals) const
+	HashEntry<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::searchKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
 	{
 		if (m_nCapacity == 0) {
-			return sl_false;
+			return sl_null;
 		}
 		sl_uint32 hash = m_hash(key);
 		sl_uint32 index = hash & (m_nCapacity - 1);
-		HashEntry* entry = m_table[index];
+		Entry* entry = m_table[index];
 		while (entry) {
 			if (entry->hash == hash && m_equals(entry->key, key) && value_equals(entry->value, value)) {
-				if (position) {
-					position->node = entry;
-					position->index = index;
-				}
-				if (outValue) {
-					*outValue = entry->value;
-				}
-				return sl_true;
+				return entry;
 			}
-			entry = entry->next;
+			entry = entry->chain;
 		}
-		return sl_false;
-	}
-
-	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::getAt(const HashPosition& position, KT* outKey, VT* outValue) const
-	{
-		if (m_nCapacity == 0) {
-			return sl_false;
-		}
-		if (position.isNull()) {
-			return sl_false;
-		}
-		HashEntry* entry = (HashEntry*)(position.node);
-		if (outKey) {
-			*outKey = entry->key;
-		}
-		if (outValue) {
-			*outValue = entry->value;
-		}
-		return sl_true;
-	}
-
-	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::getFirstPosition(HashPosition& position, KT* outKey, VT* outValue) const
-	{
-		if (m_nCapacity == 0) {
-			return sl_false;
-		}
-		if (m_nSize == 0) {
-			return sl_false;
-		}
-		for (sl_uint32 i = 0; i < m_nCapacity; i++) {
-			if (HashEntry* entry = m_table[i]) {
-				position.index = i;
-				position.node = (void*)entry;
-				if (outKey) {
-					*outKey = entry->key;
-				}
-				if (outValue) {
-					*outValue = entry->value;
-				}
-				return sl_true;
-			}
-		}
-		return sl_false;
-	}
-
-	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::getNextPosition(HashPosition& position, KT* outKey, VT* outValue) const
-	{
-		if (m_nCapacity == 0) {
-			return sl_false;
-		}
-		if (position.isNull()) {
-			return getFirstPosition(position, outKey, outValue);
-		}
-		HashEntry* entry = (HashEntry*)(position.node);
-		entry = entry->next;
-		if (entry) {
-			position.node = (void*)entry;
-			if (outKey) {
-				*outKey = entry->key;
-			}
-			if (outValue) {
-				*outValue = entry->value;
-			}
-			return sl_true;
-		}
-		for (sl_uint32 i = position.index + 1; i < m_nCapacity; i++) {
-			if (HashEntry* entry = m_table[i]) {
-				position.index = i;
-				position.node = (void*)entry;
-				if (outKey) {
-					*outKey = entry->key;
-				}
-				if (outValue) {
-					*outValue = entry->value;
-				}
-				return sl_true;
-			}
-		}
-		return sl_false;
+		return sl_null;
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::get(const KT& key, VT* value) const
 	{
-		return search(key, sl_null, value);
+		Entry* entry = search(key);
+		if (entry) {
+			if (value) {
+				*value = entry->value;
+			}
+			return sl_true;
+		}
+		return sl_false;
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	VT* HashTable<KT, VT, HASH, KEY_EQUALS>::getItemPointer(const KT& key) const
 	{
-		HashPosition pos;
-		if (search(key, &pos)) {
-			HashEntry* entry = (HashEntry*)(pos.node);
+		Entry* entry = search(key);
+		if (entry) {
 			return &(entry->value);
-		} else {
-			return sl_null;
 		}
+		return sl_null;
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	template <class _VT, class VALUE_EQUALS>
 	VT* HashTable<KT, VT, HASH, KEY_EQUALS>::getItemPointerByKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
 	{
-		HashPosition pos;
-		if (searchKeyAndValue(key, &pos, value, sl_null, value_equals)) {
-			HashEntry* entry = (HashEntry*)(pos.node);
+		Entry* entry = searchKeyAndValue(key, value, value_equals);
+		if (entry) {
 			return &(entry->value);
-		} else {
-			return sl_null;
 		}
+		return sl_null;
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
@@ -255,12 +130,12 @@ namespace slib
 		}
 		sl_uint32 hash = m_hash(key);
 		sl_uint32 index = hash & (m_nCapacity - 1);
-		HashEntry* entry = m_table[index];
+		Entry* entry = m_table[index];
 		while (entry) {
 			if (entry->hash == hash && m_equals(entry->key, key)) {
 				ret.add_NoLock(entry->value);
 			}
-			entry = entry->next;
+			entry = entry->chain;
 		}
 		return ret;
 	}
@@ -275,60 +150,72 @@ namespace slib
 		}
 		sl_uint32 hash = m_hash(key);
 		sl_uint32 index = hash & (m_nCapacity - 1);
-		HashEntry* entry = m_table[index];
+		Entry* entry = m_table[index];
 		while (entry) {
 			if (entry->hash == hash && m_equals(entry->key, key) && value_equals(entry->value, value)) {
 				ret.add_NoLock(entry->value);
 			}
-			entry = entry->next;
+			entry = entry->chain;
 		}
 		return ret;
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::_addEntry(sl_uint32 index, sl_uint32 hash, HashEntry* first, const KT& key, const VT& value)
+	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::_addEntry(sl_uint32 hash, const KT& key, const VT& value)
 	{
-		HashEntry* entry = new HashEntry;
+		sl_uint32 index = hash & (m_nCapacity - 1);
+		
+		Entry* entry = new Entry;
 		if (!entry) {
 			return sl_false;
 		}
-		entry->hash = hash;
 		entry->key = key;
 		entry->value = value;
-		entry->next = first;
+		entry->hash = hash;
+		entry->chain = m_table[index];
+		Entry* last = m_lastEntry;
+		if (last) {
+			last->next = entry;
+		}
+		m_lastEntry = entry;
+		entry->before = last;
+		if (!m_firstEntry) {
+			m_firstEntry = entry;
+		}
+		entry->next = sl_null;
 
 		m_table[index] = entry;
 		m_nSize++;
 	
 		if (m_nSize >= m_nThresholdUp) {
 			// double capacity
-			HashEntry** tableOld = m_table;
+			Entry** tableOld = m_table;
 			sl_uint32 n = m_nCapacity;
 			if (_createTable(n + n)) {
-				HashEntry** table = m_table;
+				Entry** table = m_table;
 				for (sl_uint32 i = 0; i < n; i++) {
-					HashEntry* entry = tableOld[i];
+					Entry* entry = tableOld[i];
 					table[i] = sl_null;
 					table[i | n] = sl_null;
 					if (entry) {
 						sl_uint32 highBitBefore = entry->hash & n;
-						HashEntry* broken = sl_null;
+						Entry* broken = sl_null;
 						table[i | highBitBefore] = entry;
-						while (HashEntry* next = entry->next) {
-							sl_uint32 highBitNext = next->hash & n;
-							if (highBitBefore != highBitNext) {
+						while (Entry* chain = entry->chain) {
+							sl_uint32 highBitChain = chain->hash & n;
+							if (highBitBefore != highBitChain) {
 								if (broken) {
-									broken->next = next;
+									broken->chain = chain;
 								} else {
-									table[i | highBitNext] = next;
+									table[i | highBitChain] = chain;
 								}
 								broken = entry;
-								highBitBefore = highBitNext;
+								highBitBefore = highBitChain;
 							}
-							entry = next;
+							entry = chain;
 						}
 						if (broken) {
-							broken->next = sl_null;
+							broken->chain = sl_null;
 						}
 					}
 				}
@@ -349,11 +236,10 @@ namespace slib
 		}
 
 		sl_uint32 hash = m_hash(key);
-		sl_uint32 index = hash & (m_nCapacity - 1);
-		HashEntry* first = m_table[index];
 
 		if (mode != MapPutMode::AddAlways) {
-			HashEntry* entry = first;
+			sl_uint32 index = hash & (m_nCapacity - 1);
+			Entry* entry = m_table[index];
 			while (entry) {
 				if (entry->hash == hash && m_equals(entry->key, key)) {
 					if (pFlagExist) {
@@ -365,14 +251,14 @@ namespace slib
 					entry->value = value;
 					return sl_true;
 				}
-				entry = entry->next;
+				entry = entry->chain;
 			}
 			if (mode == MapPutMode::ReplaceExisting) {
 				return sl_false;
 			}
 		}
 
-		return _addEntry(index, hash, first, key, value);
+		return _addEntry(hash, key, value);
 
 	}
 	
@@ -388,10 +274,9 @@ namespace slib
 		}
 
 		sl_uint32 hash = m_hash(key);
-		sl_uint32 index = hash & (m_nCapacity - 1);
-		HashEntry* first = m_table[index];
 	
-		HashEntry* entry = first;
+		sl_uint32 index = hash & (m_nCapacity - 1);
+		Entry* entry = m_table[index];
 		while (entry) {
 			if (entry->hash == hash && m_equals(entry->key, key) && value_equals(entry->value, value)) {
 				if (pFlagExist) {
@@ -399,33 +284,51 @@ namespace slib
 				}
 				return sl_false;
 			}
-			entry = entry->next;
+			entry = entry->chain;
 		}
 
-		return _addEntry(index, hash, first, key, value);
+		return _addEntry(hash, key, value);
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	void HashTable<KT, VT, HASH, KEY_EQUALS>::_compact()
 	{
-		HashEntry* entry;
-		HashEntry** link;
+		Entry* entry;
+		Entry** link;
 		if (m_nSize <= m_nThresholdDown) {
 			// half capacity
-			HashEntry** tableOld = m_table;
+			Entry** tableOld = m_table;
 			sl_uint32 n = m_nCapacity >> 1;
 			if (_createTable(n)) {
-				HashEntry** table = m_table;
+				Entry** table = m_table;
 				for (sl_uint32 i = 0; i < n; i++) {
 					table[i] = tableOld[i];
 					link = table + i;
 					while ((entry = *link)) {
-						link = &(entry->next);
+						link = &(entry->chain);
 					}
 					*link = tableOld[i | n];
 				}
 				Base::freeMemory(tableOld);
 			}
+		}
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_EQUALS>
+	void HashTable<KT, VT, HASH, KEY_EQUALS>::_removeEntry(Entry* entry)
+	{
+		m_nSize--;
+		Entry* before = entry->before;
+		Entry* next = entry->next;
+		if (before) {
+			before->next = next;
+		} else {
+			m_firstEntry = next;
+		}
+		if (next) {
+			next->before = before;
+		} else {
+			m_lastEntry = before;
 		}
 	}
 	
@@ -437,20 +340,20 @@ namespace slib
 		}
 		sl_uint32 hash = m_hash(key);
 		sl_uint32 index = hash & (m_nCapacity - 1);
-		HashEntry* entry;
-		HashEntry** link = m_table + index;
+		Entry* entry;
+		Entry** link = m_table + index;
 		while ((entry = *link)) {
 			if (entry->hash == hash && m_equals(entry->key, key)) {
-				*link = entry->next;
-				m_nSize--;
+				*link = entry->chain;
+				_removeEntry(entry);
 				if (outValue) {
 					*outValue = entry->value;
 				}
-				delete entry;
 				_compact();
+				delete entry;
 				return sl_true;
 			} else {
-				link = &(entry->next);
+				link = &(entry->chain);
 			}
 		}
 		return sl_false;
@@ -464,23 +367,23 @@ namespace slib
 		}
 		sl_uint32 hash = m_hash(key);
 		sl_uint32 index = hash & (m_nCapacity - 1);
-		HashEntry* entry;
-		HashEntry** link = m_table + index;
-		HashEntry* entryDelete = sl_null;
-		HashEntry** linkDelete = &entryDelete;
+		Entry* entry;
+		Entry** link = m_table + index;
+		Entry* entryDelete = sl_null;
+		Entry** linkDelete = &entryDelete;
 		sl_size oldSize = m_nSize;
 		while ((entry = *link)) {
 			if (entry->hash == hash && m_equals(entry->key, key)) {
-				*link = entry->next;
-				m_nSize--;
+				*link = entry->chain;
+				_removeEntry(entry);
 				if (outValues) {
 					outValues->add_NoLock(entry->value);
 				}
 				*linkDelete = entry;
-				entry->next = sl_null;
-				linkDelete = &(entry->next);
+				entry->chain = sl_null;
+				linkDelete = &(entry->chain);
 			} else {
-				link = &(entry->next);
+				link = &(entry->chain);
 			}
 		}
 		if (!entryDelete) {
@@ -489,7 +392,7 @@ namespace slib
 		_compact();
 		while (entryDelete) {
 			entry = entryDelete;
-			entryDelete = entryDelete->next;
+			entryDelete = entryDelete->chain;
 			delete entry;
 		}
 		return oldSize - m_nSize;
@@ -504,20 +407,20 @@ namespace slib
 		}
 		sl_uint32 hash = m_hash(key);
 		sl_uint32 index = hash & (m_nCapacity - 1);
-		HashEntry* entry;
-		HashEntry** link = m_table + index;
+		Entry* entry;
+		Entry** link = m_table + index;
 		while ((entry = *link)) {
 			if (entry->hash == hash && m_equals(entry->key, key) && value_equals(entry->value, value)) {
-				*link = entry->next;
-				m_nSize--;
+				*link = entry->chain;
+				_removeEntry(entry);
 				if (outValue) {
 					*outValue = entry->value;
 				}
-				delete entry;
 				_compact();
+				delete entry;
 				return sl_true;
 			} else {
-				link = &(entry->next);
+				link = &(entry->chain);
 			}
 		}
 		return sl_false;
@@ -532,23 +435,23 @@ namespace slib
 		}
 		sl_uint32 hash = m_hash(key);
 		sl_uint32 index = hash & (m_nCapacity - 1);
-		HashEntry* entry;
-		HashEntry** link = m_table + index;
-		HashEntry* entryDelete = sl_null;
-		HashEntry** linkDelete = &entryDelete;
+		Entry* entry;
+		Entry** link = m_table + index;
+		Entry* entryDelete = sl_null;
+		Entry** linkDelete = &entryDelete;
 		sl_size oldSize = m_nSize;
 		while ((entry = *link)) {
 			if (entry->hash == hash && m_equals(entry->key, key) && value_equals(entry->value, value)) {
-				*link = entry->next;
-				m_nSize--;
+				*link = entry->chain;
+				_removeEntry(entry);
 				if (outValues) {
 					outValues->add_NoLock(entry->value);
 				}
 				*linkDelete = entry;
-				entry->next = sl_null;
-				linkDelete = &(entry->next);
+				entry->chain = sl_null;
+				linkDelete = &(entry->chain);
 			} else {
-				link = &(entry->next);
+				link = &(entry->chain);
 			}
 		}
 		if (!entryDelete) {
@@ -557,7 +460,7 @@ namespace slib
 		_compact();
 		while (entryDelete) {
 			entry = entryDelete;
-			entryDelete = entryDelete->next;
+			entryDelete = entryDelete->chain;
 			delete entry;
 		}
 		return oldSize - m_nSize;
@@ -587,24 +490,15 @@ namespace slib
 		if (m_nCapacity == 0) {
 			return sl_true;
 		}
-		for (sl_uint32 i = 0; i < m_nCapacity; i++) {
-			HashEntry* entry = other->m_table[i];
-			HashEntry** link = m_table + i;
-			while (entry) {
-				HashEntry* dst = new HashEntry;
-				if (dst) {
-					dst->hash = entry->hash;
-					dst->key = entry->key;
-					dst->value = entry->value;
-					dst->next = sl_null;
-					*link = dst;
-					link = &(dst->next);
-					entry = entry->next;
-				} else {
-					return sl_false;
-				}
+		
+		Entry* entry = other->m_firstEntry;
+		while (entry) {
+			if (!(_addEntry(entry->hash, entry->key, entry->value))) {
+				return sl_false;
 			}
+			entry = entry->next;
 		}
+		
 		return sl_true;
 	}
 
@@ -623,22 +517,26 @@ namespace slib
 			m_nThresholdUp = 0;
 			m_nThresholdDown = 0;
 		}
+		m_firstEntry = sl_null;
+		m_lastEntry = sl_null;
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	void HashTable<KT, VT, HASH, KEY_EQUALS>::_free()
 	{
-		HashEntry** table = m_table;
+		Entry** table = m_table;
 		sl_uint32 nCapacity = m_nCapacity;
 		m_table = sl_null;
 		m_nCapacity = 0;
+		m_firstEntry = sl_null;
+		m_lastEntry = sl_null;
 		if (table) {
 			for (sl_uint32 i = 0; i < nCapacity; i++) {
-				HashEntry* entry = table[i];
+				Entry* entry = table[i];
 				while (entry) {
-					HashEntry* next = entry->next;
+					Entry* chain = entry->chain;
 					delete entry;
-					entry = next;
+					entry = chain;
 				}
 			}
 			Base::freeMemory(table);
@@ -651,7 +549,7 @@ namespace slib
 		if (capacity > _SLIB_HASHTABLE_MAX_CAPACITY || capacity < m_nCapacityMin) {
 			return sl_false;
 		}
-		HashEntry** table = (HashEntry**)(Base::createMemory(sizeof(HashEntry*)*capacity));
+		Entry** table = (Entry**)(Base::createMemory(sizeof(Entry*)*capacity));
 		if (table) {
 			m_table = table;
 			m_nCapacity = capacity;

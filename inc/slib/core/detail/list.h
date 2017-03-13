@@ -938,7 +938,7 @@ namespace slib
 		}
 		if (count < oldCount) {
 			T* data = m_data;
-			for (sl_size i = count; i < oldCount; i++) {
+			for (sl_reg i = count; i < (sl_reg)oldCount; i++) {
 				(data+i)->~T();
 			}
 			m_count = count;

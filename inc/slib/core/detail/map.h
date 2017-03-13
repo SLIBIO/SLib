@@ -83,7 +83,7 @@ namespace slib
 	{
 	protected:
 		const HashMap<KT, VT, HASH, KEY_EQUALS>* m_map;
-		HashPosition m_pos;
+		HashEntry<KT, VT>* m_entry;
 		sl_size m_index;
 		Ref<Referable> m_refer;
 
@@ -108,7 +108,7 @@ namespace slib
 	{
 	protected:
 		const HashMap<KT, VT, HASH, KEY_EQUALS>* m_map;
-		HashPosition m_pos;
+		HashEntry<KT, VT>* m_entry;
 		sl_size m_index;
 		Ref<Referable> m_refer;
 
@@ -133,7 +133,7 @@ namespace slib
 	{
 	protected:
 		const HashMap<KT, VT, HASH, KEY_EQUALS>* m_map;
-		HashPosition m_pos;
+		HashEntry<KT, VT>* m_entry;
 		sl_size m_index;
 		Ref<Referable> m_refer;
 
@@ -883,14 +883,14 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::contains_NoLock(const KT& key) const
 	{
-		return table.search(key);
+		return table.search(key) != sl_null;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	template <class _VT, class VALUE_EQUALS>
 	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::containsKeyAndValue_NoLock(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
 	{
-		return table.searchKeyAndValue(key, value, sl_null, sl_null, value_equals);
+		return table.searchKeyAndValue(key, value, value_equals) != sl_null;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
@@ -898,7 +898,7 @@ namespace slib
 	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::containsKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
 	{
 		ObjectLocker lock(this);
-		return table.searchKeyAndValue(key, value, sl_null, sl_null, value_equals);
+		return table.searchKeyAndValue(key, value, value_equals) != sl_null;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
@@ -925,13 +925,13 @@ namespace slib
 	{
 		CList<KT>* ret = new CList<KT>;
 		if (ret) {
-			HashPosition pos;
-			KT key;
-			while (table.getNextPosition(pos, &key, sl_null)) {
-				if (!(ret->add_NoLock(key))) {
+			HashEntry<KT, VT>* entry = table.getFirstEntry();
+			while (entry) {
+				if (!(ret->add_NoLock(entry->key))) {
 					delete ret;
 					return sl_null;
 				}
+				entry = entry->next;
 			}
 			return ret;
 		}
@@ -949,13 +949,13 @@ namespace slib
 	{
 		CList<VT>* ret = new CList<VT>;
 		if (ret) {
-			HashPosition pos;
-			VT value;
-			while (table.getNextPosition(pos, sl_null, &value)) {
-				if (!(ret->add_NoLock(value))) {
+			HashEntry<KT, VT>* entry = table.getFirstEntry();
+			while (entry) {
+				if (!(ret->add_NoLock(entry->value))) {
 					delete ret;
 					return sl_null;
 				}
+				entry = entry->next;
 			}
 			return ret;
 		}
@@ -973,13 +973,14 @@ namespace slib
 	{
 		CList< Pair<KT, VT> >* ret = new CList< Pair<KT, VT> >;
 		if (ret) {
-			HashPosition pos;
-			Pair<KT, VT> pair;
-			while (table.getNextPosition(pos, &(pair.key), &(pair.value))) {
+			HashEntry<KT, VT>* entry = table.getFirstEntry();
+			while (entry) {
+				Pair<KT, VT> pair(entry->key, entry->value);
 				if (!(ret->add_NoLock(pair))) {
 					delete ret;
 					return sl_null;
 				}
+				entry = entry->next;
 			}
 			return ret;
 		}
@@ -1218,6 +1219,12 @@ namespace slib
 	
 	
 	template <class KT, class VT>
+	Map<KT, VT> Map<KT, VT>::create()
+	{
+		return IMap<KT, VT>::createDefault();
+	}
+	
+	template <class KT, class VT>
 	template <class KEY_EQUALS>
 	Map<KT, VT> Map<KT, VT>::createList(const KEY_EQUALS& key_equals)
 	{
@@ -1238,6 +1245,12 @@ namespace slib
 		return TreeMap<KT, VT, KEY_COMPARE>::create(key_compare);
 	}
 	
+	template <class KT, class VT>
+	void Map<KT, VT>::init()
+	{
+		ref = IMap<KT, VT>::createDefault();
+	}
+
 	template <class KT, class VT>
 	template <class KEY_EQUALS>
 	void Map<KT, VT>::initList(const KEY_EQUALS& key_equals)
@@ -1688,6 +1701,12 @@ namespace slib
 
 
 	template <class KT, class VT>
+	void Atomic< Map<KT, VT> >::init()
+	{
+		ref = IMap<KT, VT>::createDefault();
+	}
+
+	template <class KT, class VT>
 	template <class KEY_EQUALS>
 	void Atomic< Map<KT, VT> >::initList(const KEY_EQUALS& key_equals)
 	{
@@ -1978,13 +1997,13 @@ namespace slib
 	{
 		if (_out) {
 			Pair<KT, VT> pair;
-			if (m_map->list.getAt(m_index, &pair)) {
+			if (m_map->list.getAt_NoLock(m_index, &pair)) {
 				*_out = pair.key;
 				m_index++;
 				return sl_true;
 			}
 		} else {
-			if (m_map->list.getAt(m_index, sl_null)) {
+			if (m_map->list.getAt_NoLock(m_index, sl_null)) {
 				m_index++;
 				return sl_true;
 			}
@@ -2016,13 +2035,13 @@ namespace slib
 	{
 		if (_out) {
 			Pair<KT, VT> pair;
-			if (m_map->list.getAt(m_index, &pair)) {
+			if (m_map->list.getAt_NoLock(m_index, &pair)) {
 				*_out = pair.value;
 				m_index++;
 				return sl_true;
 			}
 		} else {
-			if (m_map->list.getAt(m_index, sl_null)) {
+			if (m_map->list.getAt_NoLock(m_index, sl_null)) {
 				m_index++;
 				return sl_true;
 			}
@@ -2052,7 +2071,7 @@ namespace slib
 	template <class KT, class VT, class KEY_EQUALS>
 	sl_bool ListMapIterator<KT, VT, KEY_EQUALS>::next(Pair<KT, VT>* _out)
 	{
-		if (m_map->list.getAt(m_index, _out)) {
+		if (m_map->list.getAt_NoLock(m_index, _out)) {
 			m_index++;
 			return sl_true;
 		}
@@ -2068,23 +2087,24 @@ namespace slib
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	HashMapKeyIterator<KT, VT, HASH, KEY_EQUALS>::HashMapKeyIterator(const HashMap<KT, VT, HASH, KEY_EQUALS>* map, Referable* refer)
-	: m_map(map), m_index(0), m_refer(refer)
+	: m_map(map), m_entry(map->table.getFirstEntry()), m_index(0), m_refer(refer)
 	{
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashMapKeyIterator<KT, VT, HASH, KEY_EQUALS>::hasNext()
 	{
-		ObjectLocker lock(m_map);
-		HashPosition pos = m_pos;
-		return m_map->table.getNextPosition(pos);
+		return m_entry != sl_null;
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashMapKeyIterator<KT, VT, HASH, KEY_EQUALS>::next(KT* _out)
 	{
-		ObjectLocker lock(m_map);
-		if (m_map->table.getNextPosition(m_pos, _out, sl_null)) {
+		if (m_entry) {
+			if (_out) {
+				*_out = m_entry->key;
+			}
+			m_entry = m_entry->next;
 			m_index++;
 			return sl_true;
 		}
@@ -2100,23 +2120,24 @@ namespace slib
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	HashMapValueIterator<KT, VT, HASH, KEY_EQUALS>::HashMapValueIterator(const HashMap<KT, VT, HASH, KEY_EQUALS>* map, Referable* refer)
-	: m_map(map), m_index(0), m_refer(refer)
+	: m_map(map), m_entry(map->table.getFirstEntry()), m_index(0), m_refer(refer)
 	{
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashMapValueIterator<KT, VT, HASH, KEY_EQUALS>::hasNext()
 	{
-		ObjectLocker lock(m_map);
-		HashPosition pos = m_pos;
-		return m_map->table.getNextPosition(pos);
+		return m_entry != sl_null;
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashMapValueIterator<KT, VT, HASH, KEY_EQUALS>::next(VT* _out)
 	{
-		ObjectLocker lock(m_map);
-		if (m_map->table.getNextPosition(m_pos, sl_null, _out)) {
+		if (m_entry) {
+			if (_out) {
+				*_out = m_entry->value;
+			}
+			m_entry = m_entry->next;
 			m_index++;
 			return sl_true;
 		}
@@ -2132,23 +2153,25 @@ namespace slib
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	HashMapIterator<KT, VT, HASH, KEY_EQUALS>::HashMapIterator(const HashMap<KT, VT, HASH, KEY_EQUALS>* map, Referable* refer)
-	: m_map(map), m_index(0), m_refer(refer)
+	: m_map(map), m_entry(map->table.getFirstEntry()), m_index(0), m_refer(refer)
 	{
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashMapIterator<KT, VT, HASH, KEY_EQUALS>::hasNext()
 	{
-		ObjectLocker lock(m_map);
-		HashPosition pos = m_pos;
-		return m_map->table.getNextPosition(pos, sl_null, sl_null);
+		return m_entry != sl_null;
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashMapIterator<KT, VT, HASH, KEY_EQUALS>::next(Pair<KT, VT>* _out)
 	{
-		ObjectLocker lock(m_map);
-		if (m_map->table.getNextPosition(m_pos, &(_out->key), &(_out->value))) {
+		if (m_entry) {
+			if (_out) {
+				_out->key = m_entry->key;
+				_out->value = m_entry->value;
+			}
+			m_entry = m_entry->next;
 			m_index++;
 			return sl_true;
 		}
@@ -2171,7 +2194,6 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool TreeMapKeyIterator<KT, VT, KEY_COMPARE>::hasNext()
 	{
-		ObjectLocker lock(m_map);
 		TreePosition pos = m_pos;
 		return m_map->tree.getNextPosition(pos);
 	}
@@ -2179,7 +2201,6 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool TreeMapKeyIterator<KT, VT, KEY_COMPARE>::next(KT* _out)
 	{
-		ObjectLocker lock(m_map);
 		if (m_map->tree.getNextPosition(m_pos, _out, sl_null)) {
 			m_index++;
 			return sl_true;
@@ -2203,7 +2224,6 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool TreeMapValueIterator<KT, VT, KEY_COMPARE>::hasNext()
 	{
-		ObjectLocker lock(m_map);
 		TreePosition pos = m_pos;
 		return m_map->tree.getNextPosition(pos);
 	}
@@ -2211,7 +2231,6 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool TreeMapValueIterator<KT, VT, KEY_COMPARE>::next(VT* _out)
 	{
-		ObjectLocker lock(m_map);
 		if (m_map->tree.getNextPosition(m_pos, sl_null, _out)) {
 			m_index++;
 			return sl_true;
@@ -2235,7 +2254,6 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool TreeMapIterator<KT, VT, KEY_COMPARE>::hasNext()
 	{
-		ObjectLocker lock(m_map);
 		TreePosition pos = m_pos;
 		return m_map->tree.getNextPosition(pos);
 	}
@@ -2243,7 +2261,6 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool TreeMapIterator<KT, VT, KEY_COMPARE>::next(Pair<KT, VT>* _out)
 	{
-		ObjectLocker lock(m_map);
 		if (_out) {
 			if (m_map->tree.getNextPosition(m_pos, &(_out->key), &(_out->value))) {
 				m_index++;
