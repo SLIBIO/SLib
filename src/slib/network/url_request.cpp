@@ -169,7 +169,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete)
+	Ref<UrlRequest> UrlRequest::sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -180,7 +180,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+	Ref<UrlRequest> UrlRequest::sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -236,7 +236,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::postJson(const String& url, const Variant& json, const Function<void(UrlRequest*)>& onComplete)
+	Ref<UrlRequest> UrlRequest::postJson(const String& url, const Json& json, const Function<void(UrlRequest*)>& onComplete)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -246,7 +246,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::postJson(const String& url, const Variant& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+	Ref<UrlRequest> UrlRequest::postJson(const String& url, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -257,7 +257,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::postJson(const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete)
+	Ref<UrlRequest> UrlRequest::postJson(const String& url, const Map<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -268,7 +268,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::postJson(const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+	Ref<UrlRequest> UrlRequest::postJson(const String& url, const Map<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
 	{
 		UrlRequestParam rp;
 		rp.url = url;

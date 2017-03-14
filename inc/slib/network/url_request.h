@@ -7,6 +7,7 @@
 
 #include "../core/string.h"
 #include "../core/variant.h"
+#include "../core/json.h"
 #include "../core/xml.h"
 
 namespace slib
@@ -92,9 +93,9 @@ namespace slib
 		
 		static Ref<UrlRequest> send(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
-		static Ref<UrlRequest> sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete);
+		static Ref<UrlRequest> sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete);
 		
-		static Ref<UrlRequest> sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
+		static Ref<UrlRequest> sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
 		static Ref<UrlRequest> post(const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
 		
@@ -104,13 +105,13 @@ namespace slib
 		
 		static Ref<UrlRequest> post(const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
-		static Ref<UrlRequest> postJson(const String& url, const Variant& json, const Function<void(UrlRequest*)>& onComplete);
+		static Ref<UrlRequest> postJson(const String& url, const Json& json, const Function<void(UrlRequest*)>& onComplete);
 		
-		static Ref<UrlRequest> postJson(const String& url, const Variant& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
+		static Ref<UrlRequest> postJson(const String& url, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
-		static Ref<UrlRequest> postJson(const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete);
+		static Ref<UrlRequest> postJson(const String& url, const Map<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete);
 		
-		static Ref<UrlRequest> postJson(const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
+		static Ref<UrlRequest> postJson(const String& url, const Map<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
 	public:
 		const String& getUrl();
