@@ -12,7 +12,7 @@
 namespace slib
 {
 
-	void Preference::setValue(const String& key, const Variant& value)
+	void Preference::setValue(const String& key, const Json& value)
 	{
 		if (key.isEmpty()) {
 			return;
@@ -28,7 +28,7 @@ namespace slib
 		[defaults synchronize];
 	}
 
-	Variant Preference::getValue(const String& key)
+	Json Preference::getValue(const String& key)
 	{
 		if (key.isEmpty()) {
 			return sl_null;
@@ -41,8 +41,7 @@ namespace slib
 			return sl_null;
 		}
 		
-		Variant value = Json::parseJson(Apple::getStringFromNSString(_value));
-		return value;
+		return Json::parseJson(Apple::getStringFromNSString(_value));
 	}
 
 }

@@ -10,7 +10,7 @@
 namespace slib
 {
 
-	void Preference::setValue(const String& key, const Variant& value)
+	void Preference::setValue(const String& key, const Json& value)
 	{
 		if (key.isEmpty()) {
 			return;
@@ -22,7 +22,7 @@ namespace slib
 		Windows::setRegistryValue(HKEY_CURRENT_USER, "Software\\" + appName, key, value.toJsonString());
 	}
 
-	Variant Preference::getValue(const String& key)
+	Json Preference::getValue(const String& key)
 	{
 		if (key.isEmpty()) {
 			return sl_null;

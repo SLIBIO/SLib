@@ -130,54 +130,15 @@ namespace slib
 	}
 	
 	template <class T>
-	static Variant fromArray(const Array<T>& value)
-	{
-		return value;
-	}
-	
-	template <class T>
-	static Variant fromList(const List<T>& value)
-	{
-		return value;
-	}
-	
-	template <class KT, class VT>
-	static Variant fromMap(const Map<KT, VT>& value)
-	{
-		return value;
-	}
-	
-	template <class T>
-	static Variant fromWeakRef(const WeakRef<T>& weak)
+	Variant Variant::fromWeakRef(const WeakRef<T>& weak)
 	{
 		return weak;
 	}
 	
 	template <class T>
-	Variant& Variant::operator=(const Ref<T>& ref)
+	SLIB_INLINE Variant& Variant::operator=(const T& value)
 	{
-		setObject(ref);
-		return *this;
-	}
-	
-	template <class T>
-	Variant& Variant::operator=(const AtomicRef<T>& ref)
-	{
-		setObject(ref);
-		return *this;
-	}
-	
-	template <class T>
-	Variant& Variant::operator=(const WeakRef<T>& weak)
-	{
-		setWeak(weak);
-		return *this;
-	}
-	
-	template <class T>
-	Variant& Variant::operator=(const AtomicWeakRef<T>& weak)
-	{
-		setWeak(weak);
+		set(value);
 		return *this;
 	}
 	
@@ -196,6 +157,7 @@ namespace slib
 	{
 		return _type != VariantType::Null;
 	}
+	
 	
 	template <class T>
 	Ref<T> Variant::getObject(const Ref<T>& def) const
@@ -227,6 +189,54 @@ namespace slib
 		}
 	}
 	
+	template <class T>
+	void Variant::get(Ref<T>& _out) const
+	{
+		_out = CastRef<T>(getObject());
+	}
+	
+	template <class T>
+	void Variant::set(const Ref<T>& _in)
+	{
+		setObject(_in);
+	}
+	
+	template <class T>
+	void Variant::get(AtomicRef<T>& _out) const
+	{
+		_out = CastRef<T>(getObject());
+	}
+	
+	template <class T>
+	void Variant::set(const AtomicRef<T>& _in)
+	{
+		setObject(_in);
+	}
+	
+	template <class T>
+	void Variant::get(WeakRef<T>& _out) const
+	{
+		_out = CastRef<T>(getObject());
+	}
+	
+	template <class T>
+	void Variant::set(const WeakRef<T>& _in)
+	{
+		setWeak(_in);
+	}
+	
+	template <class T>
+	void Variant::get(AtomicWeakRef<T>& _out) const
+	{
+		_out = CastRef<T>(getObject());
+	}
+	
+	template <class T>
+	void Variant::set(const AtomicWeakRef<T>& _in)
+	{
+		setWeak(_in);
+	}
+
 	
 	template <class T>
 	Atomic<Variant>::Atomic(const Ref<T>& ref)
@@ -280,30 +290,9 @@ namespace slib
 	}
 	
 	template <class T>
-	AtomicVariant& Atomic<Variant>::operator=(const Ref<T>& ref)
+	SLIB_INLINE AtomicVariant& Atomic<Variant>::operator=(const T& value)
 	{
-		setObject(ref);
-		return *this;
-	}
-	
-	template <class T>
-	AtomicVariant& Atomic<Variant>::operator=(const AtomicRef<T>& ref)
-	{
-		setObject(ref);
-		return *this;
-	}
-	
-	template <class T>
-	AtomicVariant& Atomic<Variant>::operator=(const WeakRef<T>& weak)
-	{
-		setWeak(weak);
-		return *this;
-	}
-	
-	template <class T>
-	AtomicVariant& Atomic<Variant>::operator=(const AtomicWeakRef<T>& weak)
-	{
-		setWeak(weak);
+		set(value);
 		return *this;
 	}
 	
@@ -351,6 +340,54 @@ namespace slib
 		} else {
 			_replace(VariantType::Null, 0);
 		}
+	}
+	
+	template <class T>
+	void Atomic<Variant>::get(Ref<T>& _out) const
+	{
+		_out = CastRef<T>(getObject());
+	}
+	
+	template <class T>
+	void Atomic<Variant>::set(const Ref<T>& _in)
+	{
+		setObject(_in);
+	}
+	
+	template <class T>
+	void Atomic<Variant>::get(AtomicRef<T>& _out) const
+	{
+		_out = CastRef<T>(getObject());
+	}
+	
+	template <class T>
+	void Atomic<Variant>::set(const AtomicRef<T>& _in)
+	{
+		setObject(_in);
+	}
+	
+	template <class T>
+	void Atomic<Variant>::get(WeakRef<T>& _out) const
+	{
+		_out = CastRef<T>(getObject());
+	}
+	
+	template <class T>
+	void Atomic<Variant>::set(const WeakRef<T>& _in)
+	{
+		setWeak(_in);
+	}
+	
+	template <class T>
+	void Atomic<Variant>::get(AtomicWeakRef<T>& _out) const
+	{
+		_out = CastRef<T>(getObject());
+	}
+	
+	template <class T>
+	void Atomic<Variant>::set(const AtomicWeakRef<T>& _in)
+	{
+		setWeak(_in);
 	}
 	
 	

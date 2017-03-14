@@ -24,6 +24,7 @@
 #include "core/spin_lock.h"
 #include "core/mutex.h"
 #include "core/string.h"
+#include "core/string_std.h"
 #include "core/string_buffer.h"
 #include "core/memory.h"
 #include "core/time.h"
@@ -81,6 +82,7 @@
 #include "core/setting.h"
 
 #include "core/json.h"
+#include "core/json_std.h"
 #include "core/xml.h"
 #include "core/base64.h"
 

@@ -822,14 +822,14 @@ namespace slib
 
 	void DnsServerParam::parse(const Variant& conf)
 	{
-		portDns = (sl_uint16)conf.getField("dns_port").getUint32(SLIB_NETWORK_DNS_PORT);
-		portEncryption = (sl_uint16)conf.getField("secure_port").getUint32(0);
-		encryptionKey = conf.getField("secure_key").getString();
+		portDns = (sl_uint16)conf.getItem("dns_port").getUint32(SLIB_NETWORK_DNS_PORT);
+		portEncryption = (sl_uint16)conf.getItem("secure_port").getUint32(0);
+		encryptionKey = conf.getItem("secure_key").getString();
 
-		flagProxy = conf.getField("is_proxy").getBoolean(sl_false);
+		flagProxy = conf.getItem("is_proxy").getBoolean(sl_false);
 
 		IPv4Address defaultForwardAddressIp = IPv4Address(8, 8, 4, 4);
-		defaultForwardAddressIp.parse(conf.getField("forward_dns").getString());
+		defaultForwardAddressIp.parse(conf.getItem("forward_dns").getString());
 		defaultForwardAddress = SocketAddress(defaultForwardAddressIp, SLIB_NETWORK_DNS_PORT);
 	}
 

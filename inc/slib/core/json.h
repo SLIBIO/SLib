@@ -37,255 +37,405 @@ namespace slib
 
 	};
 	
-	class SLIB_EXPORT Json
+	class SLIB_EXPORT Json : public Variant
 	{
 	public:
-		static Variant parseJson(const sl_char8* sz, sl_size len, JsonParseParam& param);
+		Json();
+		
+		Json(const Json& other);
+		
+		Json(Json&& other);
+		
+		Json(const Variant& variant);
+		
+		Json(const AtomicVariant& variant);
+		
+		~Json();
+		
+	public:
+		Json(sl_null_t);
+		
+		Json(char value);
+		
+		Json(unsigned char value);
+		
+		Json(short value);
+		
+		Json(unsigned short value);
+		
+		Json(int value);
+		
+		Json(unsigned int value);
+		
+		Json(long value);
+		
+		Json(unsigned long value);
+		
+		Json(sl_int64 value);
+		
+		Json(sl_uint64 value);
+		
+		Json(float value);
+		
+		Json(double value);
+		
+		Json(sl_bool value);
+		
+		Json(const String& value);
+		
+		Json(const String16& value);
+		
+		Json(const AtomicString& value);
+		
+		Json(const AtomicString16& value);
+		
+		Json(const sl_char8* sz8);
+		
+		Json(const sl_char16* sz16);
+		
+		Json(const Time& value);
+		
+		template <class T>
+		Json(const Ref<T>& ref);
+		
+		template <class T>
+		Json(const AtomicRef<T>& ref);
+		
+		template <class T>
+		Json(const WeakRef<T>& weak);
+		
+		template <class T>
+		Json(const AtomicWeakRef<T>& weak);
+		
+		Json(const List<Variant>& list);
+		
+		Json(const AtomicList<Variant>& list);
+		
+		Json(const Map<String, Variant>& map);
+		
+		Json(const AtomicMap<String, Variant>& map);
+		
+		Json(const List< Map<String, Variant> >& list);
+		
+		Json(const AtomicList< Map<String, Variant> >& list);
+		
+		Json(const List<Json>& list);
+		
+		Json(const AtomicList<Json>& list);
+		
+		Json(const Map<String, Json>& map);
+		
+		Json(const AtomicMap<String, Json>& map);
+		
+		Json(const List< Map<String, Json> >& list);
+		
+		Json(const AtomicList< Map<String, Json> >& list);
 
-		static Variant parseJson(const sl_char8* sz, sl_size len);
+		template <class T>
+		Json(const List<T>& list);
+		
+		template <class T>
+		Json(const AtomicList<T>& list);
+		
+		template <class T>
+		Json(const Map<String, T>& map);
+		
+		template <class T>
+		Json(const AtomicMap<String, T>& map);
+		
+		template <class KT, class VT>
+		Json(const Map<KT, VT>& map);
+		
+		template <class KT, class VT>
+		Json(const AtomicMap<KT, VT>& map);
+		
+		Json(const std::initializer_list< Pair<String, Json> >& pairs);
+		
+		Json(const std::initializer_list<Json>& elements);
 
-		static Variant parseJson(const String& json, JsonParseParam& param);
+		template <class T>
+		Json(const T& value);
+		
+	public:
+		static const Json& null();
+		
+		static Json createList();
+		
+		static Json createMap();
+		
+	public:
+		Json& operator=(const Json& json);
+		
+		Json& operator=(Json&& json);
+		
+		Json& operator=(const Variant& variant);
+		
+		Json& operator=(const AtomicVariant& variant);
+		
+		Json& operator=(sl_null_t);
+		
+		Json& operator=(const std::initializer_list< Pair<String, Json> >& pairs);
+		
+		Json& operator=(const std::initializer_list<Json>& elements);
+		
+		template <class T>
+		Json& operator=(const T& value);
 
-		static Variant parseJson(const String& json);
+		Json operator[](sl_size indexForVariantList) const;
+		
+		Json operator[](const String& keyForVariantMap) const;
+		
+	public:
+		static Json parseJson(const sl_char8* sz, sl_size len, JsonParseParam& param);
 
-		static Variant parseJson16(const sl_char16* sz, sl_size len, JsonParseParam& param);
+		static Json parseJson(const sl_char8* sz, sl_size len);
 
-		static Variant parseJson16(const sl_char16* sz, sl_size len);
+		static Json parseJson(const String& json, JsonParseParam& param);
 
-		static Variant parseJson16(const String16& json, JsonParseParam& param);
+		static Json parseJson(const String& json);
 
-		static Variant parseJson16(const String16& json);
+		static Json parseJson16(const sl_char16* sz, sl_size len, JsonParseParam& param);
 
-		static Variant parseJsonFromTextFile(const String& filePath, JsonParseParam& param);
+		static Json parseJson16(const sl_char16* sz, sl_size len);
 
-		static Variant parseJsonFromTextFile(const String& filePath);
+		static Json parseJson16(const String16& json, JsonParseParam& param);
 
-		static Variant parseJsonUtf8(const Memory& mem, JsonParseParam& param);
+		static Json parseJson16(const String16& json);
 
-		static Variant parseJsonUtf8(const Memory& mem);
+		static Json parseJsonFromTextFile(const String& filePath, JsonParseParam& param);
 
-		static Variant parseJson16Utf8(const Memory& mem, JsonParseParam& param);
+		static Json parseJsonFromTextFile(const String& filePath);
 
-		static Variant parseJson16Utf8(const Memory& mem);
+		static Json parseJsonUtf8(const Memory& mem, JsonParseParam& param);
+
+		static Json parseJsonUtf8(const Memory& mem);
+
+		static Json parseJson16Utf8(const Memory& mem, JsonParseParam& param);
+
+		static Json parseJson16Utf8(const Memory& mem);
 	
-		static String toString(const Variant& var);
+		String toString() const;
+		
+	public:
+		sl_bool isJsonList() const;
+		
+		List<Json> getJsonList() const;
+		
+		void setJsonList(const List<Json>& list);
+		
+		sl_bool isJsonMap() const;
+		
+		Map<String, Json> getJsonMap() const;
+		
+		void setJsonMap(const Map<String, Json>& map);
+		
+		sl_bool isJsonMapList() const;
+		
+		List< Map<String, Json> > getJsonMapList() const;
+		
+		void setJsonMapList(const List< Map<String, Json> >& list);
 
-
-		static Variant createList();
-
-		static Variant createMap();
-
-
-		template <class T>
-		static void fromJson(const Variant& v, List<T>& _out);
-
-		template <class T>
-		static void fromJson(const Variant& v, List<T>& _out, const List<T>& def);
-
-		template <class T>
-		static Variant toJson(const List<T>& _in);
-	
-		template <class T>
-		static void fromJson(const Variant& v, AtomicList<T>& _out);
-
-		template <class T>
-		static void fromJson(const Variant& v, AtomicList<T>& _out, const AtomicList<T>& def);
-
-		template <class T>
-		static Variant toJson(const AtomicList<T>& _in);
+		Json getElement(sl_size index) const;
 
 		template <class T>
-		static void fromJson(const Variant& v, Map<String, T>& _out);
+		void getElement(sl_size index, T& _out) const;
+		
+		sl_bool setElement(sl_size index, const Json& value);
+		
+		sl_bool addElement(const Json& value);
+		
+		Json getItem(const String& key) const;
+		
+		template <class T>
+		void getItem(const String& key, T& _out) const;
+
+		sl_bool putItem(const String& key, const Json& value);
+		
+	public:
+		void get(Json& _out) const;
+		void set(const Json& _in);
+		
+		void get(Variant& _out) const;
+		void set(const Variant& _in);
+		
+		void get(AtomicVariant& _out) const;
+		void set(const AtomicVariant& _in);
+		
+		void get(char& _out) const;
+		void get(char& _out, char def) const;
+		void set(char _in);
+		
+		void get(unsigned char& _out) const;
+		void get(unsigned char& _out, unsigned char def) const;
+		void set(unsigned char _in);
+		
+		void get(short& _out) const;
+		void get(short& _out, short def) const;
+		void set(short _in);
+		
+		void get(unsigned short& _out) const;
+		void get(unsigned short& _out, unsigned short def) const;
+		void set(unsigned short _in);
+		
+		void get(int& _out) const;
+		void get(int& _out, int def) const;
+		void set(int _in);
+		
+		void get(unsigned int& _out) const;
+		void get(unsigned int& _out, unsigned int def) const;
+		void set(unsigned int _in);
+		
+		void get(long& _out) const;
+		void get(long& _out, long def) const;
+		void set(long _in);
+		
+		void get(unsigned long& _out) const;
+		void get(unsigned long& _out, unsigned long def) const;
+		void set(unsigned long _in);
+		
+		void get(sl_int64& _out) const;
+		void get(sl_int64& _out, sl_int64 def) const;
+		void set(sl_int64 _in);
+		
+		void get(sl_uint64& _out) const;
+		void get(sl_uint64& _out, sl_uint64 def) const;
+		void set(sl_uint64 _in);
+		
+		void get(float& _out) const;
+		void get(float& _out, float def) const;
+		void set(float _in);
+		
+		void get(double& _out) const;
+		void get(double& _out, double def) const;
+		void set(double _in);
+		
+		void get(bool& _out) const;
+		void get(bool& _out, bool def) const;
+		void set(bool _in);
+		
+		void get(String& _out) const;
+		void get(String& _out, const String& def) const;
+		void set(const String& _in);
+		
+		void get(AtomicString& _out) const;
+		void get(AtomicString& _out, const String& def) const;
+		void set(const AtomicString& _in);
+		
+		void get(String16& _out) const;
+		void get(String16& _out, const String16& def) const;
+		void set(const String16& _in);
+		
+		void get(AtomicString16& _out) const;
+		void get(AtomicString16& _out, const String16& def) const;
+		void set(const AtomicString16& _in);
+		
+		void set(const sl_char8* sz8);
+		void set(const sl_char16* sz16);
+		
+		void get(Time& _out) const;
+		void get(Time& _out, const Time& def) const;
+		void set(const Time& _in);
+		
+		template <class T>
+		void get(Ref<T>& _out) const;
+		template <class T>
+		void set(const Ref<T>& ref);
+		
+		template <class T>
+		void get(AtomicRef<T>& _out) const;
+		template <class T>
+		void set(const AtomicRef<T>& _in);
+		
+		template <class T>
+		void set(const WeakRef<T>& _in);
+		template <class T>
+		void set(const AtomicWeakRef<T>& _in);
+		
+		void get(List<Variant>& _out) const;
+		void set(const List<Variant>& _in);
+		
+		void get(AtomicList<Variant>& _out) const;
+		void set(const AtomicList<Variant>& _in);
+		
+		void get(Map<String, Variant>& _out) const;
+		void set(const Map<String, Variant>& _in);
+		
+		void get(AtomicMap<String, Variant>& _out) const;
+		void set(const AtomicMap<String, Variant>& _in);
+		
+		void get(List< Map<String, Variant> >& _out) const;
+		void set(const List< Map<String, Variant> >& _in);
+		
+		void get(AtomicList< Map<String, Variant> >& _out) const;
+		void set(const AtomicList< Map<String, Variant> >& _in);
+		
+		void get(List<Json>& _out) const;
+		void set(const List<Json>& _in);
+		
+		void get(AtomicList<Json>& _out) const;
+		void set(const AtomicList<Json>& _in);
+		
+		void get(Map<String, Json>& _out) const;
+		void set(const Map<String, Json>& _in);
+		
+		void get(AtomicMap<String, Json>& _out) const;
+		void set(const AtomicMap<String, Json>& _in);
+		
+		void get(List< Map<String, Json> >& _out) const;
+		void set(const List< Map<String, Json> >& _in);
+		
+		void get(AtomicList< Map<String, Json> >& _out) const;
+		void set(const AtomicList< Map<String, Json> >& _in);
 
 		template <class T>
-		static void fromJson(const Variant& v, Map<String, T>& _out, const Map<String, T>& def);
+		void get(List<T>& _out) const;
+		template <class T>
+		void set(const List<T>& _in);
+		
+		template <class T>
+		void get(AtomicList<T>& _out) const;
+		template <class T>
+		void set(const AtomicList<T>& _in);
+		
+		template <class T>
+		void get(Map<String, T>& _out) const;
+		template <class T>
+		void set(const Map<String, T>& _in);
+		
+		template <class T>
+		void get(AtomicMap<String, T>& _out) const;
+		template <class T>
+		void set(const AtomicMap<String, T>& _in);
+		
+		template <class KT, class VT>
+		void get(Map<KT, VT>& _out) const;
+		template <class KT, class VT>
+		void set(const Map<KT, VT>& _in);
+		
+		template <class KT, class VT>
+		void get(AtomicMap<KT, VT>& _out) const;
+		template <class KT, class VT>
+		void set(const AtomicMap<KT, VT>& _in);
 
 		template <class T>
-		static Variant toJson(const Map<String, T>& _in);
-
+		void get(T& _out) const;
 		template <class T>
-		static void fromJson(const Variant& v, AtomicMap<String, T>& _out);
-
-		template <class T>
-		static void fromJson(const Variant& v, AtomicMap<String, T>& _out, const AtomicMap<String, T>& def);
-
-		template <class T>
-		static Variant toJson(const AtomicMap<String, T>& _in);
-
-		template <class T>
-		static void fromJson(const Variant& v, Ref<T>& _out);
-
-		template <class T>
-		static void fromJson(const Variant& v, Ref<T>& _out, const Ref<T>& def);
-
-		template <class T>
-		static Variant toJson(const Ref<T>& _in);
-
-		template <class T>
-		static void fromJson(const Variant& v, AtomicRef<T>& _out);
-
-		template <class T>
-		static void fromJson(const Variant& v, AtomicRef<T>& _out, const AtomicRef<T>& def);
-
-		template <class T>
-		static Variant toJson(const AtomicRef<T>& _in);
-	
-		template <class T>
-		static void fromJson(const Variant& v, WeakRef<T>& _out);
-
-		template <class T>
-		static void fromJson(const Variant& v, WeakRef<T>& _out, const WeakRef<T>& def);
-
-		template <class T>
-		static Variant toJson(const WeakRef<T>& _in);
-
-		template <class T>
-		static void fromJson(const Variant& v, AtomicWeakRef<T>& _out);
-
-		template <class T>
-		static void fromJson(const Variant& v, AtomicWeakRef<T>& _out, const AtomicWeakRef<T>& def);
-
-		template <class T>
-		static Variant toJson(const AtomicWeakRef<T>& _in);
-	
-		static Variant toJson(const sl_char8* _in);
-
-		static Variant toJson(const sl_char16* _in);
-
-		static Variant toJson(const sl_char32* _in);
-
-		template <class T>
-		static void fromJson(const Variant& v, T& _out);
-
-		template <class T>
-		static void fromJson(const Variant& v, T& _out, const T& def);
-
-		template <class T>
-		static Variant toJson(const T& _in);
-
-		template <class T>
-		static void get(const Variant& map, const String& fieldName, T& _out);
-
-		template <class T>
-		static void get(const Variant& map, const String& fieldName, T& _out, const T& def);
-
-		template <class T>
-		static void put(const Variant& map, const String& fieldName, const T& _in);
-
-		template <class T>
-		static void get(const Variant& list, sl_size index, T& _out);
-
-		template <class T>
-		static void get(const Variant& list, sl_size index, T& _out, const T& def);
-
-		template <class T>
-		static void add(const Variant& list, const T& _in);
+		void set(const T& _in);
 
 	};
 	
-	template <> void Json::fromJson(const Variant& v, Variant& _out);
-	template <> void Json::fromJson(const Variant& v, Variant& _out, const Variant& def);
-	template <> Variant Json::toJson(const Variant& _in);
+	SLIB_INLINE Pair<String, Json> operator<<=(const String& str, const Json& v)
+	{
+		return Pair<String, Json>(str, v);
+	}
 	
-	template <> void Json::fromJson(const Variant& v, AtomicVariant& _out);
-	template <> void Json::fromJson(const Variant& v, AtomicVariant& _out, const AtomicVariant& def);
-	template <> Variant Json::toJson(const AtomicVariant& _in);
-	
-	template <> void Json::fromJson(const Variant& v, char& _out);
-	template <> void Json::fromJson(const Variant& v, char& _out, const char& def);
-	template <> Variant Json::toJson(const char& _in);
-	
-	template <> void Json::fromJson(const Variant& v, unsigned char& _out);
-	template <> void Json::fromJson(const Variant& v, unsigned char& _out, const unsigned char& def);
-	template <> Variant Json::toJson(const unsigned char& _in);
-	
-	template <> void Json::fromJson(const Variant& v, short& _out);
-	template <> void Json::fromJson(const Variant& v, short& _out, const short& def);
-	template <> Variant Json::toJson(const short& _in);
-	
-	template <> void Json::fromJson(const Variant& v, unsigned short& _out);
-	template <> void Json::fromJson(const Variant& v, unsigned short& _out, const unsigned short& def);
-	template <> Variant Json::toJson(const unsigned short& _in);
+	typedef List<Json> JsonList;
+	typedef AtomicList<Json> AtomicJsonList;
+	typedef Map<String, Json> JsonMap;
+	typedef AtomicMap<String, Json> AtomicJsonMap;
+	typedef List< Map<String, Json> > JsonMapList;
+	typedef AtomicList< Map<String, Json> > AtomicJsonMapList;
 
-	template <> void Json::fromJson(const Variant& v, int& _out);
-	template <> void Json::fromJson(const Variant& v, int& _out, const int& def);
-	template <> Variant Json::toJson(const int& _in);
-	
-	template <> void Json::fromJson(const Variant& v, unsigned int& _out);
-	template <> void Json::fromJson(const Variant& v, unsigned int& _out, const unsigned int& def);
-	template <> Variant Json::toJson(const unsigned int& _in);
-	
-	template <> void Json::fromJson(const Variant& v, long& _out);
-	template <> void Json::fromJson(const Variant& v, long& _out, const long& def);
-	template <> Variant Json::toJson(const long& _in);
-	
-	template <> void Json::fromJson(const Variant& v, unsigned long& _out);
-	template <> void Json::fromJson(const Variant& v, unsigned long& _out, const unsigned long& def);
-	template <> Variant Json::toJson(const unsigned long& _in);
-
-	template <> void Json::fromJson(const Variant& v, sl_int64& _out);
-	template <> void Json::fromJson(const Variant& v, sl_int64& _out, const sl_int64& def);
-	template <> Variant Json::toJson(const sl_int64& _in);
-	
-	template <> void Json::fromJson(const Variant& v, sl_uint64& _out);
-	template <> void Json::fromJson(const Variant& v, sl_uint64& _out, const sl_uint64& def);
-	template <> Variant Json::toJson(const sl_uint64& _in);
-	
-	template <> void Json::fromJson(const Variant& v, float& _out);
-	template <> void Json::fromJson(const Variant& v, float& _out, const float& def);
-	template <> Variant Json::toJson(const float& _in);
-	
-	template <> void Json::fromJson(const Variant& v, double& _out);
-	template <> void Json::fromJson(const Variant& v, double& _out, const double& def);
-	template <> Variant Json::toJson(const double& _in);
-	
-	template <> void Json::fromJson(const Variant& v, bool& _out);
-	template <> void Json::fromJson(const Variant& v, bool& _out, const bool& def);
-	template <> Variant Json::toJson(const bool& _in);
-	
-	template <> void Json::fromJson(const Variant& v, String& _out);
-	template <> void Json::fromJson(const Variant& v, String& _out, const String& def);
-	template <> Variant Json::toJson(const String& _in);
-	
-	template <> void Json::fromJson(const Variant& v, AtomicString& _out);
-	template <> void Json::fromJson(const Variant& v, AtomicString& _out, const AtomicString& def);
-	template <> Variant Json::toJson(const AtomicString& _in);
-	
-	template <> void Json::fromJson(const Variant& v, String16& _out);
-	template <> void Json::fromJson(const Variant& v, String16& _out, const String16& def);
-	template <> Variant Json::toJson(const String16& _in);
-	
-	template <> void Json::fromJson(const Variant& v, AtomicString16& _out);
-	template <> void Json::fromJson(const Variant& v, AtomicString16& _out, const AtomicString16& def);
-	template <> Variant Json::toJson(const AtomicString16& _in);
-	
-	template <> void Json::fromJson(const Variant& v, Time& _out);
-	template <> void Json::fromJson(const Variant& v, Time& _out, const Time& def);
-	template <> Variant Json::toJson(const Time& _in);
-	
-	template <> void Json::fromJson(const Variant& v, List<Variant>& _out);
-	template <> void Json::fromJson(const Variant& v, List<Variant>& _out, const List<Variant>& def);
-	template <> Variant Json::toJson(const List<Variant>& _in);
-	
-	template <> void Json::fromJson(const Variant& v, AtomicList<Variant>& _out);
-	template <> void Json::fromJson(const Variant& v, AtomicList<Variant>& _out, const AtomicList<Variant>& def);
-	template <> Variant Json::toJson(const AtomicList<Variant>& _in);
-	
-	template <> void Json::fromJson(const Variant& v, Map<String, Variant>& _out);
-	template <> void Json::fromJson(const Variant& v, Map<String, Variant>& _out, const Map<String, Variant>& def);
-	template <> Variant Json::toJson(const Map<String, Variant>& _in);
-	
-	template <> void Json::fromJson(const Variant& v, AtomicMap<String, Variant>& _out);
-	template <> void Json::fromJson(const Variant& v, AtomicMap<String, Variant>& _out, const AtomicMap<String, Variant>& def);
-	template <> Variant Json::toJson(const AtomicMap<String, Variant>& _in);
-	
-	template <> void Json::fromJson(const Variant& v, List< Map<String, Variant> >& _out);
-	template <> void Json::fromJson(const Variant& v, List< Map<String, Variant> >& _out, const List< Map<String, Variant> >& def);
-	template <> Variant Json::toJson(const List< Map<String, Variant> >& _in);
-	
-	template <> void Json::fromJson(const Variant& v, AtomicList< Map<String, Variant> >& _out);
-	template <> void Json::fromJson(const Variant& v, AtomicList< Map<String, Variant> >& _out, const AtomicList< Map<String, Variant> >& def);
-	template <> Variant Json::toJson(const AtomicList< Map<String, Variant> >& _in);
 }
 
 #include "detail/json.h"

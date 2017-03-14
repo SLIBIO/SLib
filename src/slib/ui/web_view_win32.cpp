@@ -757,7 +757,7 @@ namespace slib
 		{
 			String16 name = m_displayName;
 			DWORD size = (DWORD)(name.getLength()) * 2 + 2;
-			sl_char16* buf = (sl_char16*)(::CoTaskMemAlloc(size));
+			OLECHAR* buf = (OLECHAR*)(::CoTaskMemAlloc(size));
 			if (buf) {
 				Base::copyMemory(buf, name.getData(), size);
 				*ppszDisplayName = buf;
@@ -1024,7 +1024,7 @@ namespace slib
 				String16 script = _script;
 				::VariantInit(&(vars[0]));
 				vars[0].vt = VT_BSTR;
-				vars[0].bstrVal = ::SysAllocString(script.getData());
+				vars[0].bstrVal = ::SysAllocString((OLECHAR*)(script.getData()));
 				disp->InvokeEx(dispid, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &params, &var, NULL, NULL);
 				if (var.vt == VT_BSTR) {
 					ret = String((sl_char16*)(var.bstrVal));
@@ -1058,7 +1058,7 @@ namespace slib
 					hr = doc2->get_parentWindow(&win);
 					if (hr == S_OK) {
 						//_WebView_evalJavascript(win, _script);
-						BSTR s = (BSTR)(::SysAllocString(script.getData()));
+						BSTR s = (BSTR)(::SysAllocString((OLECHAR*)(script.getData())));
 						if (s) {
 							VARIANT var;
 							::VariantInit(&var);

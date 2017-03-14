@@ -12,7 +12,7 @@
 namespace slib
 {
 
-	void Preference::setValue(const String& key, const Variant& value)
+	void Preference::setValue(const String& key, const Json& value)
 	{
 		if (key.isEmpty()) {
 			return;
@@ -21,7 +21,7 @@ namespace slib
 		::preference_set_string(key.getData(), json.getData());
 	}
 
-	Variant Preference::getValue(const String& key)
+	Json Preference::getValue(const String& key)
 	{
 		if (key.isEmpty()) {
 			return sl_null;
@@ -30,7 +30,7 @@ namespace slib
 		::preference_get_string(key.getData(), &buf);
 		if (buf) {
 			String s = buf;
-			Variant ret;
+			Json ret;
 			if (s.isNotEmpty()) {
 				ret = Json::parseJson(s);
 			}

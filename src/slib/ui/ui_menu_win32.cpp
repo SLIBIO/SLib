@@ -260,7 +260,7 @@ namespace slib
 			mii.fMask |= MIIM_CHECKMARKS;
 		}
 		String16 text = makeText(param.text, param.shortcutKey, param.secondShortcutKey);
-		mii.dwTypeData = text.getData();
+		mii.dwTypeData = (LPWSTR)(text.getData());
 		if (::InsertMenuItemW(parent->m_hMenu, index, TRUE, &mii)) {
 			Ref<_Win32_MenuItem> ret = new _Win32_MenuItem;
 			if (ret.isNotNull()) {
@@ -328,7 +328,7 @@ namespace slib
 		MENU_ITEM_SET_PROLOG;
 		mii.fMask = MIIM_STRING;
 		String16 text = makeText(m_text, m_shortcutKey, m_secondShortcutKey);
-		mii.dwTypeData = text.getData();
+		mii.dwTypeData = (LPWSTR)(text.getData());
 		::SetMenuItemInfoW(hMenu, index, TRUE, &mii);
 	}
 

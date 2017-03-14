@@ -41,6 +41,20 @@ namespace slib
 	public:
 		constexpr sl_uint32 operator()(wchar_t v) const { return Rehash(v);}
 	};
+	
+	template <>
+	class Hash<char16_t>
+	{
+	public:
+		constexpr sl_uint32 operator()(char16_t v) const { return Rehash(v);}
+	};
+	
+	template <>
+	class Hash<char32_t>
+	{
+	public:
+		constexpr sl_uint32 operator()(char32_t v) const { return Rehash(v);}
+	};
 
 	template <>
 	class Hash<short>

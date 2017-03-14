@@ -1658,7 +1658,8 @@ namespace slib
 			if (buf[pos] != ';') {
 				REPORT_ERROR(_g_xml_error_msg_escape_not_end)
 			}
-			String16 s(&n, 1);
+			sl_char32 _n = n;
+			String16 s(&_n, 1);
 			if (s.isNull()) {
 				REPORT_ERROR(_g_xml_error_msg_memory_lack)
 			}

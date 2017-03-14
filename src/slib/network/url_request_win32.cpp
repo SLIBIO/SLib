@@ -74,7 +74,7 @@ namespace slib
 			comps.dwUserNameLength = lenURL;
 			comps.dwPasswordLength = lenURL;
 			comps.dwUrlPathLength = lenURL;
-			if (::InternetCrackUrlW(url.getData(), lenURL, 0, &comps)) {
+			if (::InternetCrackUrlW((LPCWSTR)(url.getData()), lenURL, 0, &comps)) {
 				if (comps.lpszHostName && (comps.nScheme == INTERNET_SCHEME_HTTP || comps.nScheme == INTERNET_SCHEME_HTTPS)) {
 					if (comps.lpszUrlPath && comps.lpszUrlPath[0]) {
 						path = comps.lpszUrlPath;
@@ -243,7 +243,7 @@ namespace slib
 						ret->m_bufPacket = bufPacket;
 						ret->m_taskId = taskId;
 						session->requests.put(taskId, ret);
-						HINTERNET hRequest = ::HttpOpenRequestW(connection->hConnect, verb.getData(), path, NULL, NULL, NULL, flags, (DWORD_PTR)taskId);
+						HINTERNET hRequest = ::HttpOpenRequestW(connection->hConnect, (LPCWSTR)(verb.getData()), path, NULL, NULL, NULL, flags, (DWORD_PTR)taskId);
 						if (hRequest) {
 							ret->m_hRequest = hRequest;
 							ret->processAsync(hRequest, ERROR_SUCCESS);

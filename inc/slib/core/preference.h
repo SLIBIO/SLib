@@ -12,26 +12,20 @@ namespace slib
 	class SLIB_EXPORT Preference
 	{
 	public:
-		static void setValue(const String& key, const Variant& value);
+		static void setValue(const String& key, const Json& value);
 		
-		template <class T>
-		SLIB_INLINE static void setValue(const String& key, const T& value)
-		{
-			setValue(key, Json::toJson(value));
-		}
-
-		static Variant getValue(const String& key);
+		static Json getValue(const String& key);
 
 		template <class T>
 		SLIB_INLINE static void getValue(const String& key, T& _out)
 		{
-			Json::fromJson(getValue(key), _out);
+			getValue(key).get(_out);
 		}
 		
 		template <class T>
 		SLIB_INLINE static void getValue(const String& key, T& _out, const T& _def)
 		{
-			Json::fromJson(getValue(key), _out, _def);
+			getValue(key).get(_out, _def);
 		}
 
 		// used for Win32 applications

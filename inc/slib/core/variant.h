@@ -128,6 +128,20 @@ namespace slib
 	
 	public:
 		static const Variant& null();
+		
+		
+		static Variant createList();
+		
+		static Variant createMap();
+		
+		static Variant createListMap();
+		
+		static Variant createTreeMap();
+		
+		static Variant createHashMap();
+		
+		static Variant createMapList();
+
 	
 		static Variant fromInt32(sl_int32 value);
 
@@ -163,18 +177,6 @@ namespace slib
 		
 		static Variant fromMemory(const Memory& mem);
 		
-		static Variant createList();
-		
-		static Variant createMap();
-		
-		static Variant createListMap();
-		
-		static Variant createTreeMap();
-		
-		static Variant createHashMap();
-		
-		static Variant createMapList();
-		
 		static Variant fromVariantList(const List<Variant>& value);
 
 		static Variant fromVariantMap(const Map<String, Variant>& value);
@@ -192,75 +194,8 @@ namespace slib
 
 		Variant& operator=(sl_null_t);
 		
-		Variant& operator=(char value);
-		
-		Variant& operator=(unsigned char value);
-
-		Variant& operator=(short value);
-		
-		Variant& operator=(unsigned short value);
-		
-		Variant& operator=(int value);
-		
-		Variant& operator=(unsigned int value);
-		
-		Variant& operator=(long value);
-		
-		Variant& operator=(unsigned long value);
-
-		Variant& operator=(sl_int64 value);
-
-		Variant& operator=(sl_uint64 value);
-
-		Variant& operator=(float value);
-
-		Variant& operator=(double value);
-
-		Variant& operator=(sl_bool value);
-
-		Variant& operator=(const String& value);
-
-		Variant& operator=(const AtomicString& value);
-
-		Variant& operator=(const String16& value);
-
-		Variant& operator=(const AtomicString16& value);
-
-		Variant& operator=(const sl_char8* sz8);
-
-		Variant& operator=(const sl_char16* sz16);
-
-		Variant& operator=(const Time& value);
-
-		Variant& operator=(const void* ptr);
-
 		template <class T>
-		Variant& operator=(const Ref<T>& ref);
-
-		template <class T>
-		Variant& operator=(const AtomicRef<T>& ref);
-
-		template <class T>
-		Variant& operator=(const WeakRef<T>& weak);
-
-		template <class T>
-		Variant& operator=(const AtomicWeakRef<T>& weak);
-	
-		Variant& operator=(const Memory& mem);
-
-		Variant& operator=(const AtomicMemory& mem);
-		
-		Variant& operator=(const List<Variant>& list);
-		
-		Variant& operator=(const AtomicList<Variant>& list);
-		
-		Variant& operator=(const Map<String, Variant>& map);
-		
-		Variant& operator=(const AtomicMap<String, Variant>& map);
-		
-		Variant& operator=(const List< Map<String, Variant> >& list);
-		
-		Variant& operator=(const AtomicList< Map<String, Variant> >& list);
+		Variant& operator=(const T& value);
 		
 		Variant operator[](sl_size indexForVariantList) const;
 
@@ -424,23 +359,153 @@ namespace slib
 		
 		void setVariantMapList(const List< Map<String, Variant> >& list);
 
-		sl_size getListElementsCount() const;
+		sl_size getElementsCount() const;
 
-		Variant getListElement(sl_size index) const;
+		Variant getElement(sl_size index) const;
 	
-		sl_bool setListElement(sl_size index, const Variant& value);
+		sl_bool setElement(sl_size index, const Variant& value);
 	
-		sl_bool addListElement(const Variant& value);
+		sl_bool addElement(const Variant& value);
 	
-		Variant getField(const String& key) const;
+		Variant getItem(const String& key) const;
 	
-		sl_bool putField(const String& key, const Variant& value);
+		sl_bool putItem(const String& key, const Variant& value);
 	
 
 		String toString() const;
 	
 		String toJsonString() const;
+		
+	public:
+		void get(Variant& _out) const;
+		void set(const Variant& _in);
+		
+		void get(AtomicVariant& _out) const;
+		void set(const AtomicVariant& _in);
+		
+		void get(char& _out) const;
+		void get(char& _out, char def) const;
+		void set(char _in);
+		
+		void get(unsigned char& _out) const;
+		void get(unsigned char& _out, unsigned char def) const;
+		void set(unsigned char _in);
+		
+		void get(short& _out) const;
+		void get(short& _out, short def) const;
+		void set(short _in);
+		
+		void get(unsigned short& _out) const;
+		void get(unsigned short& _out, unsigned short def) const;
+		void set(unsigned short _in);
+		
+		void get(int& _out) const;
+		void get(int& _out, int def) const;
+		void set(int _in);
+		
+		void get(unsigned int& _out) const;
+		void get(unsigned int& _out, unsigned int def) const;
+		void set(unsigned int _in);
+		
+		void get(long& _out) const;
+		void get(long& _out, long def) const;
+		void set(long _in);
+		
+		void get(unsigned long& _out) const;
+		void get(unsigned long& _out, unsigned long def) const;
+		void set(unsigned long _in);
+		
+		void get(sl_int64& _out) const;
+		void get(sl_int64& _out, sl_int64 def) const;
+		void set(sl_int64 _in);
+		
+		void get(sl_uint64& _out) const;
+		void get(sl_uint64& _out, sl_uint64 def) const;
+		void set(sl_uint64 _in);
+		
+		void get(float& _out) const;
+		void get(float& _out, float def) const;
+		void set(float _in);
+		
+		void get(double& _out) const;
+		void get(double& _out, double def) const;
+		void set(double _in);
+		
+		void get(bool& _out) const;
+		void get(bool& _out, bool def) const;
+		void set(bool _in);
+		
+		void get(String& _out) const;
+		void get(String& _out, const String& def) const;
+		void set(const String& _in);
+		
+		void get(AtomicString& _out) const;
+		void get(AtomicString& _out, const String& def) const;
+		void set(const AtomicString& _in);
+		
+		void get(String16& _out) const;
+		void get(String16& _out, const String16& def) const;
+		void set(const String16& _in);
+		
+		void get(AtomicString16& _out) const;
+		void get(AtomicString16& _out, const String16& def) const;
+		void set(const AtomicString16& _in);
 
+		void set(const sl_char8* sz8);
+		void set(const sl_char16* sz16);
+		
+		void get(Time& _out) const;
+		void get(Time& _out, const Time& def) const;
+		void set(const Time& _in);
+		
+		void get(void const*& _out) const;
+		void get(void const*& _out, const void* def) const;
+		void set(const void* _in);
+		
+		template <class T>
+		void get(Ref<T>& _out) const;
+		template <class T>
+		void set(const Ref<T>& _in);
+		
+		template <class T>
+		void get(AtomicRef<T>& _out) const;
+		template <class T>
+		void set(const AtomicRef<T>& _in);
+		
+		template <class T>
+		void get(WeakRef<T>& _out) const;
+		template <class T>
+		void set(const WeakRef<T>& _in);
+		
+		template <class T>
+		void get(AtomicWeakRef<T>& _out) const;
+		template <class T>
+		void set(const AtomicWeakRef<T>& _in);
+		
+		void get(Memory& _out) const;
+		void set(const Memory& _in);
+		
+		void get(AtomicMemory& _out) const;
+		void set(const AtomicMemory& _in);
+
+		void get(List<Variant>& _out) const;
+		void set(const List<Variant>& _in);
+		
+		void get(AtomicList<Variant>& _out) const;
+		void set(const AtomicList<Variant>& _in);
+		
+		void get(Map<String, Variant>& _out) const;
+		void set(const Map<String, Variant>& _in);
+		
+		void get(AtomicMap<String, Variant>& _out) const;
+		void set(const AtomicMap<String, Variant>& _in);
+		
+		void get(List< Map<String, Variant> >& _out) const;
+		void set(const List< Map<String, Variant> >& _in);
+		
+		void get(AtomicList< Map<String, Variant> >& _out) const;
+		void set(const AtomicList< Map<String, Variant> >& _in);
+		
 	private:
 		static void _free(VariantType type, sl_uint64 value);
 
@@ -557,76 +622,9 @@ namespace slib
 
 		AtomicVariant& operator=(sl_null_t);
 		
-		AtomicVariant& operator=(char value);
-		
-		AtomicVariant& operator=(unsigned char value);
-
-		AtomicVariant& operator=(short value);
-		
-		AtomicVariant& operator=(unsigned short value);
-		
-		AtomicVariant& operator=(int value);
-		
-		AtomicVariant& operator=(unsigned int value);
-		
-		AtomicVariant& operator=(long value);
-		
-		AtomicVariant& operator=(unsigned long value);
-		
-		AtomicVariant& operator=(sl_int64 value);
-
-		AtomicVariant& operator=(sl_uint64 value);
-
-		AtomicVariant& operator=(float value);
-
-		AtomicVariant& operator=(double value);
-
-		AtomicVariant& operator=(sl_bool value);
-
-		AtomicVariant& operator=(const String& value);
-
-		AtomicVariant& operator=(const AtomicString& value);
-
-		AtomicVariant& operator=(const String16& value);
-
-		AtomicVariant& operator=(const AtomicString16& value);
-	
-		AtomicVariant& operator=(const sl_char8* sz8);
-
-		AtomicVariant& operator=(const sl_char16* sz16);
-
-		AtomicVariant& operator=(const Time& value);
-
-		AtomicVariant& operator=(const void* ptr);
-
 		template <class T>
-		AtomicVariant& operator=(const Ref<T>& ref);
-
-		template <class T>
-		AtomicVariant& operator=(const AtomicRef<T>& ref);
-
-		template <class T>
-		AtomicVariant& operator=(const WeakRef<T>& weak);
-
-		template <class T>
-		AtomicVariant& operator=(const AtomicWeakRef<T>& weak);
-	
-		AtomicVariant& operator=(const Memory& mem);
-
-		AtomicVariant& operator=(const AtomicMemory& mem);
+		AtomicVariant& operator=(const T& value);
 		
-		AtomicVariant& operator=(const List<Variant>& list);
-		
-		AtomicVariant& operator=(const AtomicList<Variant>& list);
-		
-		AtomicVariant& operator=(const Map<String, Variant>& map);
-		
-		AtomicVariant& operator=(const AtomicMap<String, Variant>& map);
-		
-		AtomicVariant& operator=(const List< Map<String, Variant> >& list);
-		
-		AtomicVariant& operator=(const AtomicList< Map<String, Variant> >& list);
-
 		Variant operator[](sl_size indexForVariantList) const;
 
 		Variant operator[](const String& keyForVariantMap) const;
@@ -790,22 +788,153 @@ namespace slib
 		
 		void setVariantMapList(const List< Map<String, Variant> >& list);
 
-		sl_size getListElementsCount() const;
+		sl_size getElementsCount() const;
 
-		Variant getListElement(sl_size index) const;
+		Variant getElement(sl_size index) const;
 
-		sl_bool setListElement(sl_size index, const Variant& value);
+		sl_bool setElement(sl_size index, const Variant& value);
 
-		sl_bool addListElement(const Variant& value);
+		sl_bool addElement(const Variant& value);
 
-		Variant getField(const String& key) const;
+		Variant getItem(const String& key) const;
 
-		sl_bool putField(const String& key, const Variant& value);
+		sl_bool putItem(const String& key, const Variant& value);
 
 
 		String toString() const;
 
 		String toJsonString() const;
+		
+		
+	public:
+		void get(Variant& _out) const;
+		void set(const Variant& _in);
+		
+		void get(AtomicVariant& _out) const;
+		void set(const AtomicVariant& _in);
+		
+		void get(char& _out) const;
+		void get(char& _out, char def) const;
+		void set(char _in);
+		
+		void get(unsigned char& _out) const;
+		void get(unsigned char& _out, unsigned char def) const;
+		void set(unsigned char _in);
+		
+		void get(short& _out) const;
+		void get(short& _out, short def) const;
+		void set(short _in);
+		
+		void get(unsigned short& _out) const;
+		void get(unsigned short& _out, unsigned short def) const;
+		void set(unsigned short _in);
+		
+		void get(int& _out) const;
+		void get(int& _out, int def) const;
+		void set(int _in);
+		
+		void get(unsigned int& _out) const;
+		void get(unsigned int& _out, unsigned int def) const;
+		void set(unsigned int _in);
+		
+		void get(long& _out) const;
+		void get(long& _out, long def) const;
+		void set(long _in);
+		
+		void get(unsigned long& _out) const;
+		void get(unsigned long& _out, unsigned long def) const;
+		void set(unsigned long _in);
+		
+		void get(sl_int64& _out) const;
+		void get(sl_int64& _out, sl_int64 def) const;
+		void set(sl_int64 _in);
+		
+		void get(sl_uint64& _out) const;
+		void get(sl_uint64& _out, sl_uint64 def) const;
+		void set(sl_uint64 _in);
+		
+		void get(float& _out) const;
+		void get(float& _out, float def) const;
+		void set(float _in);
+		
+		void get(double& _out) const;
+		void get(double& _out, double def) const;
+		void set(double _in);
+		
+		void get(bool& _out) const;
+		void get(bool& _out, bool def) const;
+		void set(bool _in);
+		
+		void get(String& _out) const;
+		void get(String& _out, const String& def) const;
+		void set(const String& _in);
+		
+		void get(AtomicString& _out) const;
+		void get(AtomicString& _out, const String& def) const;
+		void set(const AtomicString& _in);
+		
+		void get(String16& _out) const;
+		void get(String16& _out, const String16& def) const;
+		void set(const String16& _in);
+		
+		void get(AtomicString16& _out) const;
+		void get(AtomicString16& _out, const String16& def) const;
+		void set(const AtomicString16& _in);
+		
+		void set(const sl_char8* sz8);
+		void set(const sl_char16* sz16);
+		
+		void get(Time& _out) const;
+		void get(Time& _out, const Time& def) const;
+		void set(const Time& _in);
+		
+		void get(void const*& _out) const;
+		void get(void const*& _out, const void* def) const;
+		void set(const void* ptr);
+		
+		template <class T>
+		void get(Ref<T>& _out) const;
+		template <class T>
+		void set(const Ref<T>& ref);
+		
+		template <class T>
+		void get(AtomicRef<T>& _out) const;
+		template <class T>
+		void set(const AtomicRef<T>& ref);
+		
+		template <class T>
+		void get(WeakRef<T>& _out) const;
+		template <class T>
+		void set(const WeakRef<T>& ref);
+		
+		template <class T>
+		void get(AtomicWeakRef<T>& _out) const;
+		template <class T>
+		void set(const AtomicWeakRef<T>& ref);
+		
+		void get(Memory& _out) const;
+		void set(const Memory& ref);
+		
+		void get(AtomicMemory& _out) const;
+		void set(const AtomicMemory& ref);
+		
+		void get(List<Variant>& _out) const;
+		void set(const List<Variant>& _in);
+		
+		void get(AtomicList<Variant>& _out) const;
+		void set(const AtomicList<Variant>& _in);
+		
+		void get(Map<String, Variant>& _out) const;
+		void set(const Map<String, Variant>& _in);
+		
+		void get(AtomicMap<String, Variant>& _out) const;
+		void set(const AtomicMap<String, Variant>& _in);
+		
+		void get(List< Map<String, Variant> >& _out) const;
+		void set(const List< Map<String, Variant> >& _in);
+		
+		void get(AtomicList< Map<String, Variant> >& _out) const;
+		void set(const AtomicList< Map<String, Variant> >& _in);
 
 	private:
 		void _retain(VariantType& type, sl_uint64& value) const;
@@ -829,8 +958,11 @@ namespace slib
 	};
 
 	typedef List<Variant> VariantList;
+	typedef AtomicList<Variant> AtomicVariantList;
 	typedef Map<String, Variant> VariantMap;
+	typedef AtomicMap<String, Variant> AtomicVariantMap;
 	typedef List< Map<String, Variant> > VariantMapList;
+	typedef AtomicList< Map<String, Variant> > AtomicVariantMapList;
 
 }
 

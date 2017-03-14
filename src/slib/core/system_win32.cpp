@@ -55,7 +55,7 @@ namespace slib
 
 	String System::getCurrentDirectory()
 	{
-		sl_char16 path[_PATH_MAX] = { 0 };
+		WCHAR path[_PATH_MAX] = { 0 };
 		::GetCurrentDirectoryW(_PATH_MAX - 1, path);
 		return String(path);
 	}
@@ -63,7 +63,7 @@ namespace slib
 	sl_bool System::setCurrentDirectory(const String& _dir)
 	{
 		String16 dir = _dir;
-		if (::SetCurrentDirectoryW(dir.getData())) {
+		if (::SetCurrentDirectoryW((LPCWSTR)(dir.getData()))) {
 			return sl_true;
 		}
 		return sl_false;
@@ -291,7 +291,7 @@ namespace slib
 	void Console::print(const String& _s)
 	{
 		String16 s = _s;
-		wprintf(L"%s", s.getData());
+		wprintf(L"%s", (LPCWSTR)(s.getData()));
 		OutputDebugStringW((LPCWSTR)s.getData());
 	}
 

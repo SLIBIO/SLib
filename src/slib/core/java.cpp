@@ -418,7 +418,7 @@ namespace slib
 				sl_uint32 len = (sl_uint32)(env->GetStringLength(str));
 				const jchar* sz = env->GetStringChars(str, sl_null);
 				if (sz) {
-					ret = String16::fromUtf16(sz, len);
+					ret = String16((const char16_t*)sz, len);
 					env->ReleaseStringChars(str, sz);
 				}
 			}

@@ -92,27 +92,20 @@ typedef sl_int32			sl_reg;
 #endif
 
 typedef char				sl_char8;
-#if defined(SLIB_COMPILER_IS_VC)
-typedef wchar_t				sl_char16;
-#else
-typedef sl_uint16			sl_char16;
-#endif
-typedef sl_uint32			sl_char32;
+typedef char16_t			sl_char16;
+typedef char32_t			sl_char32;
 
-// Unicode String Constant Definition
+#define SLIB_UNICODE(quote)	u##quote
+
 #if defined(SLIB_COMPILER_IS_VC)
-#	define SLIB_UNICODE(quote)			(const sl_char16*)(L##quote)
-#	define SLIB_USE_UNICODE16
-#elif defined(SLIB_COMPILER_IS_GCC)
-#	if defined(__SIZEOF_WCHAR_T__) && (__SIZEOF_WCHAR_T__ == 2)
-#		define SLIB_UNICODE(quote)		(const sl_char16*)(L##quote)
-#		define SLIB_USE_UNICODE16
-#	elif defined(__SIZEOF_WCHAR_T__) && (__SIZEOF_WCHAR_T__ == 4)
-#		define SLIB_UNICODE(quote)		(const sl_char32*)(L##quote)
-#		define SLIB_USE_UNICODE32
+#	define SLIB_WCHAR_SIZE(quote)		2
+#else
+#	if defined(__SIZEOF_WCHAR_T__)
+#		define SLIB_WCHAR_SIZE			__SIZEOF_WCHAR_T__
+#	else
+#		define SLIB_WCHAR_SIZE			0
 #	endif
 #endif
-
 
 namespace slib
 {

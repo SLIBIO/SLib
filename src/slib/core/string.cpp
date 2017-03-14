@@ -1000,124 +1000,197 @@ namespace slib
 	}
 
 
-	String::String(const sl_char8* strUtf8)
+	String::String(const char* strUtf8)
 	{
 		m_container = _create(strUtf8, -1);
 	}
 
-	String::String(const sl_char8* strUtf8, sl_reg length)
+	String::String(const char* strUtf8, sl_reg length)
 	{
 		m_container = _create(strUtf8, length);
 	}
 
-	Atomic<String>::Atomic(const sl_char8* strUtf8)
+	Atomic<String>::Atomic(const char* strUtf8)
 	{
 		m_container = String::_create(strUtf8, -1);
 	}
 
-	Atomic<String>::Atomic(const sl_char8* strUtf8, sl_reg length)
+	Atomic<String>::Atomic(const char* strUtf8, sl_reg length)
 	{
 		m_container = String::_create(strUtf8, length);
 	}
 
-	String16::String16(const sl_char8* strUtf8)
+	String16::String16(const char* strUtf8)
 	{
 		m_container = _create(strUtf8, -1);
 	}
 
-	String16::String16(const sl_char8* strUtf8, sl_reg length)
+	String16::String16(const char* strUtf8, sl_reg length)
 	{
 		m_container = _create(strUtf8, length);
 	}
 
-	Atomic<String16>::Atomic(const sl_char8* strUtf8)
+	Atomic<String16>::Atomic(const char* strUtf8)
 	{
 		m_container = String16::_create(strUtf8, -1);
 	}
 
-	Atomic<String16>::Atomic(const sl_char8* strUtf8, sl_reg length)
+	Atomic<String16>::Atomic(const char* strUtf8, sl_reg length)
 	{
 		m_container = String16::_create(strUtf8, length);
 	}
 
+	
+	String::String(const wchar_t* strUnicode)
+	{
+		if (sizeof(wchar_t) == 2) {
+			m_container = _create((sl_char16*)strUnicode, -1);
+		} else {
+			m_container = _create((sl_char32*)strUnicode, -1);
+		}
+	}
+	
+	String::String(const wchar_t* strUnicode, sl_reg length)
+	{
+		if (sizeof(wchar_t) == 2) {
+			m_container = _create((sl_char16*)strUnicode, length);
+		} else {
+			m_container = _create((sl_char32*)strUnicode, length);
+		}
+	}
+	
+	Atomic<String>::Atomic(const wchar_t* strUnicode)
+	{
+		if (sizeof(wchar_t) == 2) {
+			m_container = String::_create((sl_char16*)strUnicode, -1);
+		} else {
+			m_container = String::_create((sl_char32*)strUnicode, -1);
+		}
+	}
+	
+	Atomic<String>::Atomic(const wchar_t* strUnicode, sl_reg length)
+	{
+		if (sizeof(wchar_t) == 2) {
+			m_container = String::_create((sl_char16*)strUnicode, length);
+		} else {
+			m_container = String::_create((sl_char32*)strUnicode, length);
+		}
+	}
+	
+	String16::String16(const wchar_t* strUnicode)
+	{
+		if (sizeof(wchar_t) == 2) {
+			m_container = _create((sl_char16*)strUnicode, -1);
+		} else {
+			m_container = _create((sl_char32*)strUnicode, -1);
+		}
+	}
+	
+	String16::String16(const wchar_t* strUnicode, sl_reg length)
+	{
+		if (sizeof(wchar_t) == 2) {
+			m_container = _create((sl_char16*)strUnicode, length);
+		} else {
+			m_container = _create((sl_char32*)strUnicode, length);
+		}
+	}
+	
+	Atomic<String16>::Atomic(const wchar_t* strUnicode)
+	{
+		if (sizeof(wchar_t) == 2) {
+			m_container = String16::_create((sl_char16*)strUnicode, -1);
+		} else {
+			m_container = String16::_create((sl_char32*)strUnicode, -1);
+		}
+	}
+	
+	Atomic<String16>::Atomic(const wchar_t* strUnicode, sl_reg length)
+	{
+		if (sizeof(wchar_t) == 2) {
+			m_container = String16::_create((sl_char16*)strUnicode, length);
+		} else {
+			m_container = String16::_create((sl_char32*)strUnicode, length);
+		}
+	}
 
-	String::String(const sl_char16* strUtf16)
+	
+	String::String(const char16_t* strUtf16)
 	{
 		m_container = _create(strUtf16, -1);
 	}
 
-	String::String(const sl_char16* strUtf16, sl_reg length)
+	String::String(const char16_t* strUtf16, sl_reg length)
 	{
 		m_container = _create(strUtf16, length);
 	}
 
-	Atomic<String>::Atomic(const sl_char16* strUtf16)
+	Atomic<String>::Atomic(const char16_t* strUtf16)
 	{
 		m_container = String::_create(strUtf16, -1);
 	}
 
-	Atomic<String>::Atomic(const sl_char16* strUtf16, sl_reg length)
+	Atomic<String>::Atomic(const char16_t* strUtf16, sl_reg length)
 	{
 		m_container = String::_create(strUtf16, length);
 	}
 
-	String16::String16(const sl_char16* strUtf16)
+	String16::String16(const char16_t* strUtf16)
 	{
 		m_container = _create(strUtf16, -1);
 	}
 
-	String16::String16(const sl_char16* strUtf16, sl_reg length)
+	String16::String16(const char16_t* strUtf16, sl_reg length)
 	{
 		m_container = _create(strUtf16, length);
 	}
 
-	Atomic<String16>::Atomic(const sl_char16* strUtf16)
+	Atomic<String16>::Atomic(const char16_t* strUtf16)
 	{
 		m_container = String16::_create(strUtf16, -1);
 	}
 
-	Atomic<String16>::Atomic(const sl_char16* strUtf16, sl_reg length)
+	Atomic<String16>::Atomic(const char16_t* strUtf16, sl_reg length)
 	{
 		m_container = String16::_create(strUtf16, length);
 	}
 
 
-	String::String(const sl_char32* strUtf32)
+	String::String(const char32_t* strUtf32)
 	{
 		m_container = _create(strUtf32, -1);
 	}
 
-	String::String(const sl_char32* strUtf32, sl_reg length)
+	String::String(const char32_t* strUtf32, sl_reg length)
 	{
 		m_container = _create(strUtf32, length);
 	}
 
-	Atomic<String>::Atomic(const sl_char32* strUtf32)
+	Atomic<String>::Atomic(const char32_t* strUtf32)
 	{
 		m_container = String::_create(strUtf32, -1);
 	}
 
-	Atomic<String>::Atomic(const sl_char32* strUtf32, sl_reg length)
+	Atomic<String>::Atomic(const char32_t* strUtf32, sl_reg length)
 	{
 		m_container = String::_create(strUtf32, length);
 	}
 
-	String16::String16(const sl_char32* strUtf32)
+	String16::String16(const char32_t* strUtf32)
 	{
 		m_container = _create(strUtf32, -1);
 	}
 
-	String16::String16(const sl_char32* strUtf32, sl_reg length)
+	String16::String16(const char32_t* strUtf32, sl_reg length)
 	{
 		m_container = _create(strUtf32, length);
 	}
 
-	Atomic<String16>::Atomic(const sl_char32* strUtf32)
+	Atomic<String16>::Atomic(const char32_t* strUtf32)
 	{
 		m_container = String16::_create(strUtf32, -1);
 	}
 
-	Atomic<String16>::Atomic(const sl_char32* strUtf32, sl_reg length)
+	Atomic<String16>::Atomic(const char32_t* strUtf32, sl_reg length)
 	{
 		m_container = String16::_create(strUtf32, length);
 	}
@@ -1987,7 +2060,7 @@ namespace slib
 	}
 
 
-	String& String::operator=(const sl_char8* utf8)
+	String& String::operator=(const char* utf8)
 	{
 		if (utf8) {
 			_replaceContainer(_create(utf8, -1));
@@ -1997,7 +2070,7 @@ namespace slib
 		return *this;
 	}
 
-	String16& String16::operator=(const sl_char8* utf8)
+	String16& String16::operator=(const char* utf8)
 	{
 		if (utf8) {
 			_replaceContainer(_create(utf8, -1));
@@ -2007,7 +2080,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString& Atomic<String>::operator=(const sl_char8* utf8)
+	AtomicString& Atomic<String>::operator=(const char* utf8)
 	{
 		if (utf8) {
 			_replaceContainer(String::_create(utf8, -1));
@@ -2017,7 +2090,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString16& Atomic<String16>::operator=(const sl_char8* utf8)
+	AtomicString16& Atomic<String16>::operator=(const char* utf8)
 	{
 		if (utf8) {
 			_replaceContainer(String16::_create(utf8, -1));
@@ -2026,9 +2099,66 @@ namespace slib
 		}
 		return *this;
 	}
+	
+	
+	String& String::operator=(const wchar_t* sz)
+	{
+		if (sz) {
+			if (sizeof(wchar_t) == 2) {
+				_replaceContainer(_create((sl_char16*)sz, -1));
+			} else {
+				_replaceContainer(_create((sl_char32*)sz, -1));
+			}
+		} else {
+			setNull();
+		}
+		return *this;
+	}
+	
+	String16& String16::operator=(const wchar_t* sz)
+	{
+		if (sz) {
+			if (sizeof(wchar_t) == 2) {
+				_replaceContainer(_create((sl_char16*)sz, -1));
+			} else {
+				_replaceContainer(_create((sl_char32*)sz, -1));
+			}
+		} else {
+			setNull();
+		}
+		return *this;
+	}
+	
+	AtomicString& Atomic<String>::operator=(const wchar_t* sz)
+	{
+		if (sz) {
+			if (sizeof(wchar_t) == 2) {
+				_replaceContainer(String::_create((sl_char16*)sz, -1));
+			} else {
+				_replaceContainer(String::_create((sl_char32*)sz, -1));
+			}
+		} else {
+			setNull();
+		}
+		return *this;
+	}
+	
+	AtomicString16& Atomic<String16>::operator=(const wchar_t* sz)
+	{
+		if (sz) {
+			if (sizeof(wchar_t) == 2) {
+				_replaceContainer(String16::_create((sl_char16*)sz, -1));
+			} else {
+				_replaceContainer(String16::_create((sl_char32*)sz, -1));
+			}
+		} else {
+			setNull();
+		}
+		return *this;
+	}
+	
 
-
-	String& String::operator=(const sl_char16* utf16)
+	String& String::operator=(const char16_t* utf16)
 	{
 		if (utf16) {
 			_replaceContainer(_create(utf16, -1));
@@ -2038,7 +2168,7 @@ namespace slib
 		return *this;
 	}
 
-	String16& String16::operator=(const sl_char16* utf16)
+	String16& String16::operator=(const char16_t* utf16)
 	{
 		if (utf16) {
 			_replaceContainer(_create(utf16, -1));
@@ -2048,7 +2178,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString& Atomic<String>::operator=(const sl_char16* utf16)
+	AtomicString& Atomic<String>::operator=(const char16_t* utf16)
 	{
 		if (utf16) {
 			_replaceContainer(String::_create(utf16, -1));
@@ -2058,7 +2188,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString16& Atomic<String16>::operator=(const sl_char16* utf16)
+	AtomicString16& Atomic<String16>::operator=(const char16_t* utf16)
 	{
 		if (utf16) {
 			_replaceContainer(String16::_create(utf16, -1));
@@ -2069,7 +2199,7 @@ namespace slib
 	}
 
 
-	String& String::operator=(const sl_char32* utf32)
+	String& String::operator=(const char32_t* utf32)
 	{
 		if (utf32) {
 			_replaceContainer(_create(utf32, -1));
@@ -2079,7 +2209,7 @@ namespace slib
 		return *this;
 	}
 
-	String16& String16::operator=(const sl_char32* utf32)
+	String16& String16::operator=(const char32_t* utf32)
 	{
 		if (utf32) {
 			_replaceContainer(_create(utf32, -1));
@@ -2089,7 +2219,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString& Atomic<String>::operator=(const sl_char32* utf32)
+	AtomicString& Atomic<String>::operator=(const char32_t* utf32)
 	{
 		if (utf32) {
 			_replaceContainer(String::_create(utf32, -1));
@@ -2099,7 +2229,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString16& Atomic<String16>::operator=(const sl_char32* utf32)
+	AtomicString16& Atomic<String16>::operator=(const char32_t* utf32)
 	{
 		if (utf32) {
 			_replaceContainer(String16::_create(utf32, -1));
@@ -7772,6 +7902,16 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 			}
 		}
 		return ret;
+	}
+	
+	String operator "" _s(const char* sz, std::size_t len)
+	{
+		return String(sz, len);
+	}
+	
+	String operator "" _s(const sl_char16* sz, std::size_t len)
+	{
+		return String(sz, len);
 	}
 	
 }

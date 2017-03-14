@@ -58,7 +58,7 @@ namespace slib
 		NSRange range;
 		range.length = len;
 		range.location = 0;
-		[str getCharacters:ret.getData() range:range];
+		[str getCharacters:((unichar*)(ret.getData())) range:range];
 		return ret;
 	}
 

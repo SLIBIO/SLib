@@ -175,7 +175,7 @@ namespace slib
 				if (_title.isEmpty()) {
 					bi.lpszTitle = L"Browse for folder...";
 				} else {
-					bi.lpszTitle = _title.getData();
+					bi.lpszTitle = (LPWSTR)(_title.getData());
 				}
 				bi.ulFlags = BIF_NEWDIALOGSTYLE;
 				bi.lpfn = _FileDialog_BrowseDirCallback;
@@ -259,7 +259,7 @@ namespace slib
 				fileName = File::getFileName(selectedPath);
 			}
 			if (initialDir.isNotEmpty()) {
-				ofn.lpstrInitialDir = initialDir.getData();
+				ofn.lpstrInitialDir = (LPCWSTR)(initialDir.getData());
 			}
 			if (fileName.isNotEmpty()) {
 				sl_size n = fileName.getLength();
@@ -271,7 +271,7 @@ namespace slib
 
 			String16 _title = title;
 			if (_title.isNotEmpty()) {
-				ofn.lpstrTitle = _title.getData();
+				ofn.lpstrTitle = (LPCWSTR)(_title.getData());
 			}
 
 			ofn.Flags = OFN_DONTADDTORECENT | OFN_EXPLORER;
@@ -292,14 +292,14 @@ namespace slib
 					DWORD attr = ::GetFileAttributesW(sz);
 					if (attr != INVALID_FILE_ATTRIBUTES) {
 						if (attr & FILE_ATTRIBUTE_DIRECTORY) {
-							sl_size len = Base::getStringLength2(sz);
+							sl_size len = Base::getStringLength2((sl_char16*)sz);
 							if (len > 0) {
 								List<String> files;
 								sz[len] = '/';
 								String dir(sz, len + 1);
 								sz += (len + 1);
 								while (1) {
-									len = Base::getStringLength2(sz);
+									len = Base::getStringLength2((sl_char16*)sz);
 									if (len == 0) {
 										break;
 									}

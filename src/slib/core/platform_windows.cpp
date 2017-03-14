@@ -92,7 +92,7 @@ namespace slib
 			SLIB_SCOPED_BUFFER(WCHAR, 1024, buf, len + 2);
 			if (buf) {
 				len = ::GetWindowTextW(hWnd, buf, len + 1);
-				return String::fromUtf16(buf, len);
+				return String(buf, len);
 			}
 		}
 		return sl_null;
@@ -345,7 +345,7 @@ namespace slib
 				return sl_false;
 			}
 			hKey = NULL;
-			::RegOpenKeyExW(hKeyParent, path.getData(), 0, KEY_QUERY_VALUE, &hKey);
+			::RegOpenKeyExW(hKeyParent, (LPCWSTR)(path.getData()), 0, KEY_QUERY_VALUE, &hKey);
 			if (!hKey) {
 				return sl_false;
 			}
@@ -354,7 +354,7 @@ namespace slib
 		DWORD type = 0;
 		DWORD size = 0;
 		sl_bool flagSuccess = sl_false;
-		if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, name.getData(), NULL, &type, NULL, &size)) {
+		if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, NULL, &size)) {
 			if (out) {
 				if (size > 0) {
 					switch (type) {
@@ -362,7 +362,7 @@ namespace slib
 						case REG_MULTI_SZ:
 							{
 								SLIB_SCOPED_BUFFER(BYTE, 512, buf, size);
-								if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, name.getData(), NULL, &type, buf, &size)) {
+								if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, buf, &size)) {
 									Memory mem = Memory::create(buf, size);
 									if (mem.isNotEmpty()) {
 										out->setMemory(mem);
@@ -375,7 +375,7 @@ namespace slib
 						case REG_SZ:
 							{
 								SLIB_SCOPED_BUFFER(BYTE, 512, buf, size);
-								if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, name.getData(), NULL, &type, buf, &size)) {
+								if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, buf, &size)) {
 									String16 s(reinterpret_cast<sl_char16*>(buf), size / 2 - 1);
 									out->setString(s);
 									flagSuccess = sl_true;
@@ -386,7 +386,7 @@ namespace slib
 						case REG_DWORD_BIG_ENDIAN:
 							if (size == 4) {
 								sl_uint32 n;
-								if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, name.getData(), NULL, &type, reinterpret_cast<BYTE*>(&n), &size)) {
+								if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, reinterpret_cast<BYTE*>(&n), &size)) {
 									if (size == 4) {
 										if (type == REG_DWORD) {
 											out->setUint32(n);
@@ -401,7 +401,7 @@ namespace slib
 						case REG_QWORD:
 							if (size == 8) {
 								sl_uint64 n;
-								if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, name.getData(), NULL, &type, reinterpret_cast<BYTE*>(&n), &size)) {
+								if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, reinterpret_cast<BYTE*>(&n), &size)) {
 									if (size == 8) {
 										out->setUint64(n);
 										flagSuccess = sl_true;
@@ -442,9 +442,9 @@ namespace slib
 				return sl_false;
 			}
 			hKey = NULL;
-			::RegOpenKeyExW(hKeyParent, path.getData(), 0, KEY_SET_VALUE, &hKey);
+			::RegOpenKeyExW(hKeyParent, (LPCWSTR)(path.getData()), 0, KEY_SET_VALUE, &hKey);
 			if (!hKey) {
-				::RegCreateKeyExW(hKeyParent, path.getData(), NULL, NULL, 0, KEY_ALL_ACCESS, NULL, &hKey, NULL);
+				::RegCreateKeyExW(hKeyParent, (LPCWSTR)(path.getData()), NULL, NULL, 0, KEY_ALL_ACCESS, NULL, &hKey, NULL);
 				if (!hKey) {
 					return sl_false;
 				}
@@ -454,24 +454,24 @@ namespace slib
 		sl_bool flagSuccess = sl_false;
 		if (value.isInt64() || value.isUint64()) {
 			sl_uint64 n = value.getUint64();
-			if (ERROR_SUCCESS == ::RegSetValueExW(hKey, name.getData(), NULL, REG_QWORD, reinterpret_cast<BYTE*>(&n), 8)) {
+			if (ERROR_SUCCESS == ::RegSetValueExW(hKey, (LPCWSTR)(name.getData()), NULL, REG_QWORD, reinterpret_cast<BYTE*>(&n), 8)) {
 				flagSuccess = sl_true;
 			}
 		} else if (value.isInteger()) {
 			sl_uint32 n = value.getUint32();
-			if (ERROR_SUCCESS == ::RegSetValueExW(hKey, name.getData(), NULL, REG_DWORD, reinterpret_cast<BYTE*>(&n), 4)) {
+			if (ERROR_SUCCESS == ::RegSetValueExW(hKey, (LPCWSTR)(name.getData()), NULL, REG_DWORD, reinterpret_cast<BYTE*>(&n), 4)) {
 				flagSuccess = sl_true;
 			}
 		} else if (value.isMemory()) {
 			Memory mem = value.getMemory();
 			if (mem.isNotNull()) {
-				if (ERROR_SUCCESS == ::RegSetValueExW(hKey, name.getData(), NULL, REG_BINARY, reinterpret_cast<BYTE*>(mem.getData()), (DWORD)(mem.getSize()))) {
+				if (ERROR_SUCCESS == ::RegSetValueExW(hKey, (LPCWSTR)(name.getData()), NULL, REG_BINARY, reinterpret_cast<BYTE*>(mem.getData()), (DWORD)(mem.getSize()))) {
 					flagSuccess = sl_true;
 				}
 			}
 		} else if (value.isString()) {
 			String16 str = value.getString16();
-			if (ERROR_SUCCESS == ::RegSetValueExW(hKey, name.getData(), NULL, REG_SZ, reinterpret_cast<BYTE*>(str.getData()), (DWORD)(str.getLength() + 1) * 2)) {
+			if (ERROR_SUCCESS == ::RegSetValueExW(hKey, (LPCWSTR)(name.getData()), NULL, REG_SZ, reinterpret_cast<BYTE*>(str.getData()), (DWORD)(str.getLength() + 1) * 2)) {
 				flagSuccess = sl_true;
 			}
 		}

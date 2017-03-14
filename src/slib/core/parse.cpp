@@ -324,7 +324,8 @@ namespace slib
 									if (!flagError) {
 										if (sizeof(CT) == 1) {
 											sl_char8 u[6];
-											sl_size nu = Charsets::utf32ToUtf8(&t, 1, u, 6);
+											sl_char32 _t = t;
+											sl_size nu = Charsets::utf32ToUtf8(&_t, 1, u, 6);
 											if (nu > 0) {
 												for (sl_size iu = 0; iu < nu - 1; iu++) {
 													buf[len++] = (CT)(u[iu]);
@@ -335,7 +336,8 @@ namespace slib
 											}
 										} else {
 											sl_char16 u[2];
-											sl_size nu = Charsets::utf32ToUtf16(&t, 1, u, 2);
+											sl_char32 _t = t;
+											sl_size nu = Charsets::utf32ToUtf16(&_t, 1, u, 2);
 											if (nu > 0) {
 												for (sl_size iu = 0; iu < nu - 1; iu++) {
 													buf[len++] = (CT)(u[iu]);
