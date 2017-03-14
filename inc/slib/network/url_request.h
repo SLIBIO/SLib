@@ -136,7 +136,7 @@ namespace slib
 		
 		String getResponseContentAsString();
 		
-		Variant getResponseContentAsJson();
+		Json getResponseContentAsJson();
 		
 		Ref<XmlDocument> getResponseContentAsXml();
 		

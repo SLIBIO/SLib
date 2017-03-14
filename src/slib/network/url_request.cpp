@@ -330,7 +330,7 @@ namespace slib
 		return String::fromUtf(m_bufResponseContent.merge());
 	}
 	
-	Variant UrlRequest::getResponseContentAsJson()
+	Json UrlRequest::getResponseContentAsJson()
 	{
 		Memory mem = m_bufResponseContent.merge();
 		String16 s = String16::fromUtf(mem);
