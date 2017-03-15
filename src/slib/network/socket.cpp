@@ -1212,6 +1212,12 @@ namespace slib
 #endif
 				ret = _setError(SocketError::Access);
 				break;
+				
+#if defined(SLIB_PLATFORM_IS_UNIX)
+			case EPERM:
+				ret = _setError(SocketError::NotPermitted);
+				break;
+#endif
 
 			default:
 				ret = _setError((SocketError)((sl_uint32)(SocketError::Unknown) + err));
@@ -1264,7 +1270,9 @@ namespace slib
 				return "SHUTDOWN - Cannot send after socket shutdown";
 			case SocketError::Access:
 				return "ACCESS - Permission denied";
-
+			case SocketError::NotPermitted:
+				return "EPERM - Operation not permitted";
+				
 			case SocketError::Closed:
 				return "Socket is closed";
 			case SocketError::BindInvalidAddress:

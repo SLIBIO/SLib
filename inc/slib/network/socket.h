@@ -85,6 +85,7 @@ namespace slib
 		NotConnected = 17,
 		Shutdown = 18,
 		Access = 19, /* ex. broadcast error */
+		NotPermitted = 20,
 		
 		Closed = 101,
 		BindInvalidAddress = 102,
