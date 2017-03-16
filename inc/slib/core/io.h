@@ -279,19 +279,19 @@ namespace slib
 	{
 	public:
 		MemoryIO(sl_size size = 0, sl_bool flagResizable = sl_true);
-
-		MemoryIO(const Memory& mem, sl_bool flagResizable = sl_true);
-
+		
 		MemoryIO(const void* data, sl_size size, sl_bool flagResizable = sl_true);
+
+		MemoryIO(const Memory& mem);
 	
 		~MemoryIO();
 	
 	public:
 		void init(const void* data, sl_size size, sl_bool flagResizable = sl_true);
 	
-		void init(const Memory& mem, sl_bool flagResizable = sl_true);
-
 		void init(sl_size size = 0, sl_bool flagResizable = sl_true);
+		
+		void init(const Memory& mem);
 
 		sl_size getOffset();
 
@@ -320,13 +320,22 @@ namespace slib
 		// override
 		sl_bool setSize(sl_uint64 size);
 	
-	public:
-		SLIB_BOOLEAN_PROPERTY(AutoExpandable)
-	
+		sl_bool isResizable();
+		
+	protected:
+		void _init(const void* data, sl_size size, sl_bool flagResizable);
+
+		void _init(sl_size size, sl_bool flagResizable);
+		
+		void _init(const Memory& mem);
+		
+		void _free();
+		
 	protected:
 		void* m_buf;
 		sl_size m_size;
 		sl_size m_offset;
+		sl_bool m_flagResizable;
 	
 	};
 	
@@ -361,7 +370,7 @@ namespace slib
 
 		// override
 		sl_bool seek(sl_int64 offset, SeekPosition pos);
-
+		
 	protected:
 		const void* m_buf;
 		sl_size m_size;
@@ -412,8 +421,7 @@ namespace slib
 
 		// override
 		sl_uint64 getSize();
-	
-
+		
 	protected:
 		void* m_buf;
 		sl_size m_size;

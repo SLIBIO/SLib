@@ -1333,30 +1333,26 @@ namespace slib
 	
 	MemoryIO::MemoryIO(sl_size size, sl_bool flagResizable)
 	{
-		init(size, flagResizable);
+		_init(size, flagResizable);
 	}
-
-	MemoryIO::MemoryIO(const Memory& mem, sl_bool flagResizable)
-	{
-		init(mem);
-	}
-
+	
 	MemoryIO::MemoryIO(const void* data, sl_size size, sl_bool flagResizable)
 	{
-		init(data, size);
+		_init(data, size, flagResizable);
+	}
+
+	MemoryIO::MemoryIO(const Memory& mem)
+	{
+		_init(mem);
 	}
 
 	MemoryIO::~MemoryIO()
 	{
-		close();
+		_free();
 	}
 
-	void MemoryIO::init(const void* data, sl_size size, sl_bool flagResizable)
+	void MemoryIO::_init(const void* data, sl_size size, sl_bool flagResizable)
 	{
-		ObjectLocker lock(this);
-
-		close();
-
 		if (size > 0) {
 			m_buf = Base::createMemory(size);
 			if (m_buf) {
@@ -1372,18 +1368,43 @@ namespace slib
 			m_size = 0;
 		}
 		m_offset = 0;
-
-		setAutoExpandable(flagResizable);
+		m_flagResizable = flagResizable;
 	}
 	
-	void MemoryIO::init(const Memory& mem, sl_bool flagResizable)
+	void MemoryIO::init(const void* data, sl_size size, sl_bool flagResizable)
 	{
-		init(mem.getData(), mem.getSize(), flagResizable);
+		_free();
+		_init(data, size, flagResizable);
 	}
 
+	void MemoryIO::_init(sl_size size, sl_bool flagResizable)
+	{
+		_init(sl_null, size, flagResizable);
+	}
+	
 	void MemoryIO::init(sl_size size, sl_bool flagResizable)
 	{
 		init(sl_null, size, flagResizable);
+	}
+	
+	void MemoryIO::_init(const Memory& mem)
+	{
+		_init(mem.getData(), mem.getSize(), sl_false);
+	}
+
+	void MemoryIO::init(const Memory& mem)
+	{
+		init(mem.getData(), mem.getSize(), sl_false);
+	}
+	
+	void MemoryIO::_free()
+	{
+		if (m_buf) {
+			Base::freeMemory(m_buf);
+			m_buf = sl_null;
+		}
+		m_size = 0;
+		m_offset = 0;
 	}
 
 	sl_size MemoryIO::getOffset()
@@ -1403,13 +1424,7 @@ namespace slib
 
 	void MemoryIO::close()
 	{
-		ObjectLocker lock(this);
-		if (m_buf) {
-			Base::freeMemory(m_buf);
-			m_buf = sl_null;
-		}
-		m_size = 0;
-		m_offset = 0;
+		_free();
 	}
 
 	sl_reg MemoryIO::read(void* buf, sl_size size)
@@ -1417,7 +1432,6 @@ namespace slib
 		if (size == 0) {
 			return 0;
 		}
-		ObjectLocker lock(this);
 		if (m_offset >= m_size) {
 			return -1;
 		}
@@ -1437,13 +1451,12 @@ namespace slib
 		if (size == 0) {
 			return 0;
 		}
-		ObjectLocker lock(this);
 		if (m_offset >= m_size) {
 			return -1;
 		}
 		sl_size limit = m_size - m_offset;
 		if (size > limit) {
-			if (isAutoExpandable()) {
+			if (m_flagResizable) {
 				sl_size n = m_size * 3 / 2;
 				if (n < m_offset + size) {
 					n = m_offset + size;
@@ -1463,7 +1476,6 @@ namespace slib
 
 	sl_bool MemoryIO::seek(sl_int64 offset, SeekPosition pos)
 	{
-		ObjectLocker lock(this);
 		sl_uint64 p = m_offset;
 		if (pos == SeekPosition::Begin) {
 			p = 0;
@@ -1490,8 +1502,10 @@ namespace slib
 
 	sl_bool MemoryIO::setSize(sl_uint64 _size)
 	{
+		if (!m_flagResizable) {
+			return sl_false;
+		}
 		sl_size size = (sl_size)_size;
-		ObjectLocker lock(this);
 		if (size == 0) {
 			close();
 			return sl_true;
@@ -1514,6 +1528,11 @@ namespace slib
 			}
 		}
 	}
+	
+	sl_bool MemoryIO::isResizable()
+	{
+		return m_flagResizable;
+	}
 
 
 /****************************
@@ -1533,19 +1552,17 @@ namespace slib
 	MemoryReader::~MemoryReader()
 	{
 	}
-
+	
 	void MemoryReader::init(const Memory& mem)
 	{
-		ObjectLocker lock(this);
 		m_mem = mem;
 		m_buf = mem.getData();
 		m_size = mem.getSize();
 		m_offset = 0;
 	}
-
+	
 	void MemoryReader::init(const void* buf, sl_size size)
 	{
-		ObjectLocker lock(this);
 		m_buf = buf;
 		m_size = size;
 		m_offset = 0;
@@ -1574,7 +1591,6 @@ namespace slib
 		if (size == 0) {
 			return 0;
 		}
-		ObjectLocker lock(this);
 		if (m_offset >= m_size) {
 			return -1;
 		}
@@ -1591,7 +1607,6 @@ namespace slib
 
 	sl_bool MemoryReader::seek(sl_int64 offset, SeekPosition pos)
 	{
-		ObjectLocker lock(this);
 		sl_uint64 p = m_offset;
 		if (pos == SeekPosition::Begin) {
 			p = 0;
@@ -1639,30 +1654,27 @@ namespace slib
 	MemoryWriter::~MemoryWriter()
 	{
 	}
-
+	
 	void MemoryWriter::init()
 	{
-		ObjectLocker lock(this);
 		m_buf = sl_null;
 		m_size = 0;
 		m_offset = 0;
 	}
-
+	
 	void MemoryWriter::init(const Memory& mem)
 	{
-		ObjectLocker lock(this);
 		m_mem = mem;
 		m_buf = mem.getData();
 		m_size = mem.getSize();
 		m_offset = 0;
 	}
-
+	
 	void MemoryWriter::init(void* buf, sl_size size)
 	{
 		if (!buf) {
 			size = 0;
 		}
-		ObjectLocker lock(this);
 		m_buf = buf;
 		m_size = size;
 		m_offset = 0;
@@ -1673,7 +1685,6 @@ namespace slib
 		if (size == 0) {
 			return 0;
 		}
-		ObjectLocker lock(this);
 		if (m_buf) {
 			if (m_offset >= m_size) {
 				return -1;
@@ -1707,7 +1718,6 @@ namespace slib
 
 	sl_bool MemoryWriter::seek(sl_int64 offset, SeekPosition pos)
 	{
-		ObjectLocker lock(this);
 		if (m_buf) {
 			sl_uint64 p = m_offset;
 			if (pos == SeekPosition::Begin) {
@@ -1728,7 +1738,6 @@ namespace slib
 
 	Memory MemoryWriter::getData()
 	{
-		ObjectLocker lock(this);
 		if (m_buf) {
 			if (m_mem.isNotNull()) {
 				return m_mem;
