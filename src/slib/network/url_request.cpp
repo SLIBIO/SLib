@@ -43,6 +43,7 @@ namespace slib
 		flagUseBackgroundSession = sl_false;
 		flagSelfAlive = sl_true;
 		flagStoreResponseContent = sl_true;
+		flagSynchronous = sl_false;
 	}
 	
 	UrlRequestParam::UrlRequestParam(const UrlRequestParam& other) = default;
@@ -115,7 +116,7 @@ namespace slib
 		rp.onComplete = onComplete;
 		return send(rp);
 	}
-	
+
 	Ref<UrlRequest> UrlRequest::send(const String& url, const Map<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
 	{
 		UrlRequestParam rp;
@@ -277,6 +278,98 @@ namespace slib
 		rp.requestBody = json.toJsonString().toMemory();
 		rp.onComplete = onComplete;
 		rp.dispatcher = dispatcher;
+		return send(rp);
+	}
+	
+	Ref<UrlRequest> UrlRequest::sendSynchronous(const String& url)
+	{
+		UrlRequestParam rp;
+		rp.url = url;
+		rp.method = HttpMethod::GET;
+		rp.flagSynchronous = sl_true;
+		return send(rp);
+	}
+	
+	Ref<UrlRequest> UrlRequest::sendSynchronous(const String& url, const Map<String, Variant>& params)
+	{
+		UrlRequestParam rp;
+		rp.url = url;
+		rp.method = HttpMethod::GET;
+		rp.parameters = params;
+		rp.flagSynchronous = sl_true;
+		return send(rp);
+	}
+	
+	Ref<UrlRequest> UrlRequest::sendSynchronous(HttpMethod method, const String& url)
+	{
+		UrlRequestParam rp;
+		rp.url = url;
+		rp.method = method;
+		rp.flagSynchronous = sl_true;
+		return send(rp);
+	}
+	
+	Ref<UrlRequest> UrlRequest::sendSynchronous(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& body)
+	{
+		UrlRequestParam rp;
+		rp.url = url;
+		rp.method = method;
+		rp.parameters = params;
+		rp.requestBody = _buildRequestBody(body);
+		rp.flagSynchronous = sl_true;
+		return send(rp);
+	}
+	
+	Ref<UrlRequest> UrlRequest::sendJsonSynchronous(HttpMethod method, const String& url, const Map<String, Variant>& params, const Json& json)
+	{
+		UrlRequestParam rp;
+		rp.url = url;
+		rp.method = method;
+		rp.parameters = params;
+		rp.requestBody = json.toJsonString().toMemory();
+		rp.flagSynchronous = sl_true;
+		return send(rp);
+	}
+	
+	Ref<UrlRequest> UrlRequest::postSynchronous(const String& url, const Variant& body)
+	{
+		UrlRequestParam rp;
+		rp.url = url;
+		rp.method = HttpMethod::POST;
+		rp.requestBody = _buildRequestBody(body);
+		rp.flagSynchronous = sl_true;
+		return send(rp);
+	}
+	
+	Ref<UrlRequest> UrlRequest::postSynchronous(const String& url, const Map<String, Variant>& params, const Variant& body)
+	{
+		UrlRequestParam rp;
+		rp.url = url;
+		rp.method = HttpMethod::POST;
+		rp.parameters = params;
+		rp.requestBody = _buildRequestBody(body);
+		rp.flagSynchronous = sl_true;
+		return send(rp);
+	}
+	
+	Ref<UrlRequest> UrlRequest::postJsonSynchronous(const String& url, const Json& json)
+	{
+		UrlRequestParam rp;
+		rp.url = url;
+		rp.method = HttpMethod::POST;
+		rp.requestBody = json.toJsonString().toMemory();
+		rp.flagSynchronous = sl_true;
+		return send(rp);
+	}
+	
+	Ref<UrlRequest> UrlRequest::postJsonSynchronous(const String& url, const Map<String, Variant>& params, const Json& json)
+	{
+		UrlRequestParam rp;
+		rp.url = url;
+		rp.method = HttpMethod::POST;
+		rp.parameters = params;
+		rp.requestBody = json.toJsonString().toMemory();
+		rp.flagSynchronous = sl_true;
 		return send(rp);
 	}
 	
@@ -451,6 +544,12 @@ namespace slib
 			}
 			Ref<UrlRequest> request = _create(param, url, String::null());
 			if (request.isNotNull()) {
+				if (param.flagSynchronous) {
+					Ref<Event>& ev = request->m_eventSync;
+					if (ev.isNotNull()) {
+						ev->wait();
+					}
+				}
 				return request;
 			}
 		}
@@ -484,6 +583,9 @@ namespace slib
 			}
 		}
 		
+		if (param.flagSynchronous) {
+			m_eventSync = Event::create();
+		}
 	}
 	
 	void UrlRequest::_removeFromMap()
@@ -518,6 +620,10 @@ namespace slib
 			}
 		}
 		_removeFromMap();
+		
+		if (m_eventSync.isNotNull()) {
+			m_eventSync->set();
+		}
 	}
 	
 	void UrlRequest::onError()

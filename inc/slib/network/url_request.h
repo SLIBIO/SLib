@@ -53,6 +53,7 @@ namespace slib
 		sl_bool flagUseBackgroundSession;
 		sl_bool flagSelfAlive;
 		sl_bool flagStoreResponseContent;
+		sl_bool flagSynchronous;
 		
 	public:
 		UrlRequestParam();
@@ -82,7 +83,7 @@ namespace slib
 		static Ref<UrlRequest> send(const String& url, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
 		static Ref<UrlRequest> send(const String& url, const Map<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete);
-		
+
 		static Ref<UrlRequest> send(const String& url, const Map<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
 		static Ref<UrlRequest> send(HttpMethod method, const String& url, const Function<void(UrlRequest*)>& onComplete);
@@ -112,6 +113,24 @@ namespace slib
 		static Ref<UrlRequest> postJson(const String& url, const Map<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete);
 		
 		static Ref<UrlRequest> postJson(const String& url, const Map<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
+		
+		static Ref<UrlRequest> sendSynchronous(const String& url);
+		
+		static Ref<UrlRequest> sendSynchronous(const String& url, const Map<String, Variant>& params);
+		
+		static Ref<UrlRequest> sendSynchronous(HttpMethod method, const String& url);
+		
+		static Ref<UrlRequest> sendSynchronous(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& body);
+		
+		static Ref<UrlRequest> sendJsonSynchronous(HttpMethod method, const String& url, const Map<String, Variant>& params, const Json& json);
+		
+		static Ref<UrlRequest> postSynchronous(const String& url, const Variant& body);
+		
+		static Ref<UrlRequest> postSynchronous(const String& url, const Map<String, Variant>& params, const Variant& body);
+		
+		static Ref<UrlRequest> postJsonSynchronous(const String& url, const Json& json);
+		
+		static Ref<UrlRequest> postJsonSynchronous(const String& url, const Map<String, Variant>& params, const Json& json);
 		
 	public:
 		const String& getUrl();
@@ -236,6 +255,8 @@ namespace slib
 		
 		sl_bool m_flagClosed;
 		sl_bool m_flagError;
+		
+		Ref<Event> m_eventSync;
 		
 	};
 
