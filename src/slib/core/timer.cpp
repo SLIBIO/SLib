@@ -25,6 +25,16 @@ namespace slib
 		SLIB_REFERABLE_DESTRUCTOR
 		stop();
 	}
+	
+	Ref<Timer> Timer::create(const Function<void(Timer*)>& task, sl_uint64 interval_ms)
+	{
+		return Timer::createWithLoop(DispatchLoop::getDefault(), task, interval_ms);
+	}
+	
+	Ref<Timer> Timer::start(const Function<void(Timer*)>& task, sl_uint64 interval_ms)
+	{
+		return Timer::startWithLoop(DispatchLoop::getDefault(), task, interval_ms);
+	}
 
 	Ref<Timer> Timer::createWithLoop(const Ref<DispatchLoop>& loop, const Function<void(Timer*)>& task, sl_uint64 interval_ms)
 	{

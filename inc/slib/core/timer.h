@@ -22,6 +22,10 @@ namespace slib
 		~Timer();
 
 	public:
+		static Ref<Timer> create(const Function<void(Timer*)>& task, sl_uint64 interval_ms);
+		
+		static Ref<Timer> start(const Function<void(Timer*)>& task, sl_uint64 interval_ms);
+		
 		static Ref<Timer> createWithLoop(const Ref<DispatchLoop>& loop, const Function<void(Timer*)>& task, sl_uint64 interval_ms);
 
 		static Ref<Timer> startWithLoop(const Ref<DispatchLoop>& loop, const Function<void(Timer*)>& task, sl_uint64 interval_ms);
