@@ -487,6 +487,8 @@ namespace slib
 		void initTree(const KEY_COMPARE& key_compare = KEY_COMPARE());
 
 	public:
+		Map<KT, VT>& operator=(const std::initializer_list< Pair<KT, VT> >& l);
+
 		VT operator[](const KT& key) const;
 
 		sl_size getCount() const;
@@ -595,6 +597,8 @@ namespace slib
 		void initTree(const KEY_COMPARE& key_compare = KEY_COMPARE());
 
 	public:
+		Atomic< Map<KT, VT> >& operator=(const std::initializer_list< Pair<KT, VT> >& l);
+
 		VT operator[](const KT& key) const;
 
 		sl_size getCount() const;

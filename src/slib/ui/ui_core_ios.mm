@@ -192,9 +192,9 @@ namespace slib
 	
 	slib::UIApp::dispatchStartToApp();
 	
-	slib::MobileApp::dispatchCreateActivityToApp();
-	
 	[application registerForRemoteNotifications];
+	
+	slib::MobileApp::dispatchCreateActivityToApp();
 	
 	return YES;
 }

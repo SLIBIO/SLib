@@ -66,7 +66,7 @@ namespace slib
 
 	
 	template <class KT, class VT>
-	Map<KT, VT>::Map(const std::initializer_list< Pair<KT, VT> >& l): ref(HashMap<KT, VT>::create(l))
+	SLIB_INLINE Map<KT, VT>::Map(const std::initializer_list< Pair<KT, VT> >& l): ref(HashMap<KT, VT>::create(l))
 	{
 	}
 	
@@ -90,11 +90,25 @@ namespace slib
 	{
 		return TreeMap<KT, VT, KEY_COMPARE>::create(l, key_compare);
 	}
+
+	template <class KT, class VT>
+	SLIB_INLINE Map<KT, VT>& Map<KT, VT>::operator=(const std::initializer_list< Pair<KT, VT> >& l)
+	{
+		ref = HashMap<KT, VT>::create(l);
+		return *this;
+	}
 	
 	
 	template <class KT, class VT>
 	Atomic< Map<KT, VT> >::Atomic(const std::initializer_list< Pair<KT, VT> >& l): ref(HashMap<KT, VT>::create(l))
 	{
+	}
+	
+	template <class KT, class VT>
+	Atomic< Map<KT, VT> >& Atomic< Map<KT, VT> >::operator=(const std::initializer_list< Pair<KT, VT> >& l)
+	{
+		ref = HashMap<KT, VT>::create(l);
+		return *this;
 	}
 	
 }
