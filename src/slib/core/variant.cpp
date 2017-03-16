@@ -1495,10 +1495,9 @@ namespace slib
 	}
 
 
-#define _MAX_VAR_STRING_LEN 20000
-	static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map, sl_bool flagJSON);
-	static sl_bool _Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list, sl_bool flagJSON);
-	static sl_bool _Variant_getVariantListJsonString(StringBuffer& ret, const List<Variant>& list, sl_bool flagJSON)
+	static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map);
+	static sl_bool _Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list);
+	static sl_bool _Variant_getVariantListJsonString(StringBuffer& ret, const List<Variant>& list)
 	{
 		ListLocker<Variant> l(list);
 		sl_size n = l.count;
@@ -1518,32 +1517,22 @@ namespace slib
 				Ref<Referable> obj(v.getObject());
 				if (obj.isNotNull()) {
 					if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
-						if (!_Variant_getVariantListJsonString(ret, p1, flagJSON)) {
+						if (!_Variant_getVariantListJsonString(ret, p1)) {
 							return sl_false;
 						}
 					} else if (IMap<String, Variant>* p2 = CastInstance< IMap<String, Variant> >(obj._ptr)) {
-						if (!_Variant_getVariantMapJsonString(ret, p2, flagJSON)) {
+						if (!_Variant_getVariantMapJsonString(ret, p2)) {
 							return sl_false;
 						}
 					} else if (CList< Map<String, Variant> >* p3 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
-						if (!_Variant_getVariantMapListJsonString(ret, p3, flagJSON)) {
+						if (!_Variant_getVariantMapListJsonString(ret, p3)) {
 							return sl_false;
 						}
 					}
 				}
 			} else {
-				String valueText;
-				if (flagJSON) {
-					valueText = v.toJsonString();
-				} else {
-					valueText = v.toString();
-				}
+				String valueText = v.toJsonString();
 				if (!(ret.add(valueText))) {
-					return sl_false;
-				}
-			}
-			if (!flagJSON) {
-				if (ret.getLength() > _MAX_VAR_STRING_LEN) {
 					return sl_false;
 				}
 			}
@@ -1554,7 +1543,7 @@ namespace slib
 		return sl_true;
 	}
 
-	static sl_bool _Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list, sl_bool flagJSON)
+	static sl_bool _Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list)
 	{
 		ListLocker< Map<String, Variant> > l(list);
 		sl_size n = l.count;
@@ -1570,13 +1559,8 @@ namespace slib
 					return sl_false;
 				}
 			}
-			if (!_Variant_getVariantMapJsonString(ret, v, flagJSON)) {
+			if (!_Variant_getVariantMapJsonString(ret, v)) {
 				return sl_false;
-			}
-			if (!flagJSON) {
-				if (ret.getLength() > _MAX_VAR_STRING_LEN) {
-					return sl_false;
-				}
 			}
 		}
 		if (!(ret.addStatic("]", 1))) {
@@ -1585,7 +1569,7 @@ namespace slib
 		return sl_true;
 	}
 
-	static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map, sl_bool flagJSON)
+	static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map)
 	{
 		Iterator< Pair<String, Variant> > iterator(map.toIterator());
 		if (!(ret.addStatic("{", 1))) {
@@ -1600,14 +1584,8 @@ namespace slib
 					return sl_false;
 				}
 			}
-			if (flagJSON) {
-				if (!(ret.add(ParseUtil::applyBackslashEscapes(pair.key)))) {
-					return sl_false;
-				}
-			} else {
-				if (!(ret.add(pair.key))) {
-					return sl_false;
-				}
+			if (!(ret.add(ParseUtil::applyBackslashEscapes(pair.key)))) {
+				return sl_false;
 			}
 			if (!(ret.addStatic(": ", 2))) {
 				return sl_false;
@@ -1616,34 +1594,22 @@ namespace slib
 				Ref<Referable> obj(v.getObject());
 				if (obj.isNotNull()) {
 					if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
-						if (!_Variant_getVariantListJsonString(ret, p1, flagJSON)) {
+						if (!_Variant_getVariantListJsonString(ret, p1)) {
 							return sl_false;
 						}
 					} else if (IMap<String, Variant>* p2 = CastInstance< IMap<String, Variant> >(obj._ptr)) {
-						if (!_Variant_getVariantMapJsonString(ret, p2, flagJSON)) {
+						if (!_Variant_getVariantMapJsonString(ret, p2)) {
 							return sl_false;
 						}
 					} else if (CList< Map<String, Variant> >* p3 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
-						if (!_Variant_getVariantMapListJsonString(ret, p3, flagJSON)) {
+						if (!_Variant_getVariantMapListJsonString(ret, p3)) {
 							return sl_false;
 						}
 					}
 				}
 			} else {
-				String valueText;
-				if (!v.isVariantList() && !v.isVariantMap()) {
-					if (flagJSON) {
-						valueText = v.toJsonString();
-					} else {
-						valueText = v.toString();
-					}
-				}
+				String valueText = v.toJsonString();
 				if (!(ret.add(valueText))) {
-					return sl_false;
-				}
-			}
-			if (!flagJSON) {
-				if (ret.getLength() > _MAX_VAR_STRING_LEN) {
 					return sl_false;
 				}
 			}
@@ -1659,10 +1625,7 @@ namespace slib
 	{
 		switch (_type) {
 			case VariantType::Null:
-				{
-					SLIB_STATIC_STRING(s, "<null>");
-					return s;
-				}
+				return String::null();
 			case VariantType::Int32:
 			case VariantType::Uint32:
 			case VariantType::Int64:
@@ -1670,19 +1633,13 @@ namespace slib
 			case VariantType::Float:
 			case VariantType::Double:
 			case VariantType::Boolean:
-				return getString();
 			case VariantType::String8:
-				return "\"" + REF_VAR(String const, _value) + "\"";
 			case VariantType::String16:
-				return "\"" + REF_VAR(String16 const, _value) + "\"";
 			case VariantType::Sz8:
-				return "\"" + String(REF_VAR(sl_char8 const* const, _value)) + "\"";
 			case VariantType::Sz16:
-				return "\"" + String(REF_VAR(sl_char16 const* const, _value)) + "\"";
 			case VariantType::Time:
-				return "\"" + REF_VAR(Time const, _value).toString() + "\"";
 			case VariantType::Pointer:
-				return "#" + String::fromPointerValue(REF_VAR(void const* const, _value));
+				return getString();
 			case VariantType::Object:
 			case VariantType::Weak:
 				{
@@ -1690,24 +1647,24 @@ namespace slib
 					if (obj.isNotNull()) {
 						if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_Variant_getVariantListJsonString(ret, p1, sl_false)) {
-								ret.addStatic(" ...", 4);
+							if (!_Variant_getVariantListJsonString(ret, p1)) {
+								return "<json-error>";
 							}
 							return ret.merge();
 						} else if (IMap<String, Variant>* p2 = CastInstance< IMap<String, Variant> >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_Variant_getVariantMapJsonString(ret, p2, sl_false)) {
-								ret.addStatic(" ...", 4);
+							if (!_Variant_getVariantMapJsonString(ret, p2)) {
+								return "<json-error>";
 							}
 							return ret.merge();
 						} else if (CList< Map<String, Variant> >* p3 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_Variant_getVariantMapListJsonString(ret, p3, sl_false)) {
-								ret.addStatic(" ...", 4);
+							if (!_Variant_getVariantMapListJsonString(ret, p3)) {
+								return "<json-error>";
 							}
 							return ret.merge();
 						} else {
-							return "<object:" + String::fromUtf8(obj->getObjectType()) + ">";
+							return String::format("<object:%s>", obj->getObjectType());
 						}
 					} else {
 						return "<object:null>";
@@ -1748,19 +1705,19 @@ namespace slib
 					if (obj.isNotNull()) {
 						if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_Variant_getVariantListJsonString(ret, p1, sl_true)) {
+							if (!_Variant_getVariantListJsonString(ret, p1)) {
 								return strNull;
 							}
 							return ret.merge();
 						} else if (IMap<String, Variant>* p2 = CastInstance< IMap<String, Variant> >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_Variant_getVariantMapJsonString(ret, p2, sl_true)) {
+							if (!_Variant_getVariantMapJsonString(ret, p2)) {
 								return strNull;
 							}
 							return ret.merge();
 						} else if (CList< Map<String, Variant> >* p3 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_Variant_getVariantMapListJsonString(ret, p3, sl_true)) {
+							if (!_Variant_getVariantMapListJsonString(ret, p3)) {
 								return strNull;
 							}
 							return ret.merge();

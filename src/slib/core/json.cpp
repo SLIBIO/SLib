@@ -695,7 +695,7 @@ namespace slib
 
 	String Json::toString() const
 	{
-		return toJsonString();
+		return Variant::toString();
 	}
 
 	sl_bool Json::isJsonList() const

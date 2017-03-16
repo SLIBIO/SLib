@@ -213,8 +213,6 @@ namespace slib
 		static Json parseJson16Utf8(const Memory& mem, JsonParseParam& param);
 
 		static Json parseJson16Utf8(const Memory& mem);
-	
-		String toString() const;
 		
 	public:
 		sl_bool isJsonList() const;
@@ -422,6 +420,9 @@ namespace slib
 		template <class T>
 		void set(const T& _in);
 
+	protected:
+		String toString() const;
+		
 	};
 	
 	SLIB_INLINE Pair<String, Json> operator<<=(const String& str, const Json& v)
