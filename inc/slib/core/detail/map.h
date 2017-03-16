@@ -330,6 +330,23 @@ namespace slib
 	
 	template <class KT, class VT>
 	template <class _KT, class _VT>
+	void IMap<KT, VT>::putAll_NoLock(IMap<_KT, _VT>* other, MapPutMode mode)
+	{
+		if (!other) {
+			return;
+		}
+		if (this == other) {
+			return;
+		}
+		Iterator< Pair<_KT,_VT> > iterator(other->toIterator());
+		Pair<_KT, _VT> v;
+		while (iterator.next(&v)) {
+			put_NoLock(v.key, v.value, mode);
+		}
+	}
+
+	template <class KT, class VT>
+	template <class _KT, class _VT>
 	void IMap<KT, VT>::putAll(IMap<_KT, _VT>* other, MapPutMode mode)
 	{
 		if (!other) {
@@ -1460,6 +1477,31 @@ namespace slib
 			}
 		}
 		return sl_false;
+	}
+	
+	template <class KT, class VT>
+	template <class _KT, class _VT>
+	void Map<KT, VT>::putAll_NoLock(const Map<_KT, _VT>& other, MapPutMode mode)
+	{
+		IMap<KT, VT>* obj = ref._ptr;
+		if (obj) {
+			obj->putAll_NoLock(other.ref._ptr, mode);
+		} else {
+			if (mode != MapPutMode::ReplaceExisting) {
+				obj = IMap<KT, VT>::createDefault();
+				if (obj) {
+					ref = obj;
+					obj->putAll_NoLock(other.ref._ptr, mode);
+				}
+			}
+		}
+	}
+	
+	template <class KT, class VT>
+	template <class _KT, class _VT>
+	void Map<KT, VT>::putAll_NoLock(const AtomicMap<_KT, _VT>& other, MapPutMode mode)
+	{
+		putAll_NoLock(Map<_KT, _VT>(other), mode);
 	}
 
 	template <class KT, class VT>

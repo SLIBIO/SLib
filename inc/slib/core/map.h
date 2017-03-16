@@ -85,6 +85,9 @@ namespace slib
 		virtual sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null) = 0;
 
 		sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
+		
+		template <class _KT, class _VT>
+		void putAll_NoLock(IMap<_KT, _VT>* other, MapPutMode mode = MapPutMode::Default);
 
 		template <class _KT, class _VT>
 		void putAll(IMap<_KT, _VT>* other, MapPutMode mode = MapPutMode::Default);
@@ -520,6 +523,12 @@ namespace slib
 		sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 
 		sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
+		
+		template <class _KT, class _VT>
+		void putAll_NoLock(const Map<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
+		
+		template <class _KT, class _VT>
+		void putAll_NoLock(const AtomicMap<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
 
 		template <class _KT, class _VT>
 		void putAll(const Map<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);

@@ -153,7 +153,7 @@ namespace slib
 		 =0: incomplete packet
 		 >0: size of the headers (ending with [CR][LF][CR][LF])
 		 */
-		static sl_reg parseHeaders(IMap<String, String>* map, const void* headers, sl_size size);
+		static sl_reg parseHeaders(Map<String, String>& outMap, const void* headers, sl_size size);
 		
 	};
 	
@@ -189,7 +189,7 @@ namespace slib
 		void setRequestVersion(const String& version);
 		
 		
-		const IMap<String, String>& getRequestHeaders() const;
+		const Map<String, String>& getRequestHeaders() const;
 		
 		String getRequestHeader(String name) const;
 		
@@ -247,7 +247,7 @@ namespace slib
 		void setRequestOrigin(const String& origin);
 		
 		
-		const IMap<String, String>& getParameters() const;
+		const Map<String, String>& getParameters() const;
 		
 		String getParameter(const String& name) const;
 		
@@ -255,7 +255,7 @@ namespace slib
 		
 		sl_bool containsParameter(const String& name) const;
 		
-		const IMap<String, String>& getQueryParameters() const;
+		const Map<String, String>& getQueryParameters() const;
 		
 		String getQueryParameter(String name) const;
 		
@@ -263,7 +263,7 @@ namespace slib
 		
 		sl_bool containsQueryParameter(String name) const;
 		
-		const IMap<String, String>& getPostParameters() const;
+		const Map<String, String>& getPostParameters() const;
 		
 		String getPostParameter(String name) const;
 		
@@ -293,16 +293,16 @@ namespace slib
 		
 	protected:
 		HttpMethod m_method;
-		AtomicString m_methodText;
-		AtomicString m_methodTextUpper;
-		AtomicString m_path;
-		AtomicString m_query;
-		AtomicString m_requestVersion;
+		String m_methodText;
+		String m_methodTextUpper;
+		String m_path;
+		String m_query;
+		String m_requestVersion;
 		
-		HashMap<String, String, HashIgnoreCaseString, EqualsIgnoreCaseString> m_requestHeaders;
-		HashMap<String, String> m_parameters;
-		HashMap<String, String> m_queryParameters;
-		HashMap<String, String> m_postParameters;
+		Map<String, String> m_requestHeaders;
+		Map<String, String> m_parameters;
+		Map<String, String> m_queryParameters;
+		Map<String, String> m_postParameters;
 		
 	};
 	
@@ -397,8 +397,8 @@ namespace slib
 		
 	protected:
 		HttpStatus m_responseCode;
-		AtomicString m_responseMessage;
-		AtomicString m_responseVersion;
+		String m_responseMessage;
+		String m_responseVersion;
 		
 		Map<String, String> m_responseHeaders;
 		

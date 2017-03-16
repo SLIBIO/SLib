@@ -89,14 +89,14 @@ namespace slib
 							Pair<String, String> pair;
 							Iterator< Pair<String, String> > iterator = param.requestHeaders.toIterator();
 							while (iterator.next(&pair)) {
-								[req setValue:(Apple::getNSStringFromString(pair.key)) forHTTPHeaderField:(Apple::getNSStringFromString(pair.value))];
+								[req setValue:(Apple::getNSStringFromString(pair.value)) forHTTPHeaderField:(Apple::getNSStringFromString(pair.key))];
 							}
 						}
 						{
 							Pair<String, String> pair;
 							Iterator< Pair<String, String> > iterator = param.additionalRequestHeaders.toIterator();
 							while (iterator.next(&pair)) {
-								[req addValue:(Apple::getNSStringFromString(pair.key)) forHTTPHeaderField:(Apple::getNSStringFromString(pair.value))];
+								[req addValue:(Apple::getNSStringFromString(pair.value)) forHTTPHeaderField:(Apple::getNSStringFromString(pair.key))];
 							}
 						}
 						NSURLSessionTask* task;

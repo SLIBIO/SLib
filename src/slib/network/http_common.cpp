@@ -146,7 +146,7 @@ namespace slib
 	DEFINE_HTTP_HEADER(Origin, "Origin")
 	DEFINE_HTTP_HEADER(AccessControlAllowOrigin, "Access-Control-Allow-Origin")
 
-	sl_reg HttpHeaders::parseHeaders(IMap<String, String>* map, const void* _data, sl_size size)
+	sl_reg HttpHeaders::parseHeaders(Map<String, String>& map, const void* _data, sl_size size)
 	{
 		const sl_char8* data = (const sl_char8*)_data;
 		sl_size posCurrent = 0;
@@ -201,7 +201,7 @@ namespace slib
 			} else {
 				name = String::fromUtf8(data + posStart, posCurrent - posStart);
 			}
-			map->put_NoLock(name, value, MapPutMode::AddAlways);
+			map.put_NoLock(name, value, MapPutMode::AddAlways);
 			posCurrent += 2;
 		}
 		return posCurrent;
@@ -220,6 +220,8 @@ namespace slib
 		SLIB_STATIC_STRING(s2, "GET");
 		m_methodText = s2;
 		m_methodTextUpper = s2;
+		
+		m_requestHeaders.initHash(0, HashIgnoreCaseString(), EqualsIgnoreCaseString());
 	}
 
 	HttpRequest::~HttpRequest()
@@ -285,44 +287,44 @@ namespace slib
 		m_requestVersion = version;
 	}
 
-	const IMap<String, String>& HttpRequest::getRequestHeaders() const
+	const Map<String, String>& HttpRequest::getRequestHeaders() const
 	{
 		return m_requestHeaders;
 	}
 
 	String HttpRequest::getRequestHeader(String name) const
 	{
-		return m_requestHeaders.getValue(name, String::null());
+		return m_requestHeaders.getValue_NoLock(name, String::null());
 	}
 
 	List<String> HttpRequest::getRequestHeaderValues(String name) const
 	{
-		return m_requestHeaders.getValues(name);
+		return m_requestHeaders.getValues_NoLock(name);
 	}
 
 	void HttpRequest::setRequestHeader(String name, String value)
 	{
-		m_requestHeaders.put(name, value);
+		m_requestHeaders.put_NoLock(name, value);
 	}
 
 	void HttpRequest::addRequestHeader(String name, String value)
 	{
-		m_requestHeaders.put(name, value, MapPutMode::AddAlways);
+		m_requestHeaders.put_NoLock(name, value, MapPutMode::AddAlways);
 	}
 
 	sl_bool HttpRequest::containsRequestHeader(String name) const
 	{
-		return m_requestHeaders.contains(name);
+		return m_requestHeaders.contains_NoLock(name);
 	}
 
 	void HttpRequest::removeRequestHeader(String name)
 	{
-		m_requestHeaders.removeItems(name);
+		m_requestHeaders.removeItems_NoLock(name);
 	}
 
 	void HttpRequest::clearRequestHeaders()
 	{
-		m_requestHeaders.removeAll();
+		m_requestHeaders.removeAll_NoLock();
 	}
 
 	sl_uint64 HttpRequest::getRequestContentLengthHeader() const
@@ -438,71 +440,71 @@ namespace slib
 		setRequestHeader(HttpHeaders::Origin, origin);
 	}
 
-	const IMap<String, String>& HttpRequest::getParameters() const
+	const Map<String, String>& HttpRequest::getParameters() const
 	{
 		return m_parameters;
 	}
 
 	String HttpRequest::getParameter(const String& name) const
 	{
-		return m_parameters.getValue(name, String::null());
+		return m_parameters.getValue_NoLock(name, String::null());
 	}
 
 	List<String> HttpRequest::getParameterValues(const String& name) const
 	{
-		return m_parameters.getValues(name);
+		return m_parameters.getValues_NoLock(name);
 	}
 
 	sl_bool HttpRequest::containsParameter(const String& name) const
 	{
-		return m_parameters.contains(name);
+		return m_parameters.contains_NoLock(name);
 	}
 
-	const IMap<String, String>& HttpRequest::getQueryParameters() const
+	const Map<String, String>& HttpRequest::getQueryParameters() const
 	{
 		return m_queryParameters;
 	}
 
 	String HttpRequest::getQueryParameter(String name) const
 	{
-		return m_queryParameters.getValue(name, String::null());
+		return m_queryParameters.getValue_NoLock(name, String::null());
 	}
 
 	List<String> HttpRequest::getQueryParameterValues(String name) const
 	{
-		return m_queryParameters.getValues(name);
+		return m_queryParameters.getValues_NoLock(name);
 	}
 
 	sl_bool HttpRequest::containsQueryParameter(String name) const
 	{
-		return m_queryParameters.contains(name);
+		return m_queryParameters.contains_NoLock(name);
 	}
 
-	const IMap<String, String>& HttpRequest::getPostParameters() const
+	const Map<String, String>& HttpRequest::getPostParameters() const
 	{
 		return m_postParameters;
 	}
 
 	String HttpRequest::getPostParameter(String name) const
 	{
-		return m_postParameters.getValue(name, String::null());
+		return m_postParameters.getValue_NoLock(name, String::null());
 	}
 
 	List<String> HttpRequest::getPostParameterValues(String name) const
 	{
-		return m_postParameters.getValues(name);
+		return m_postParameters.getValues_NoLock(name);
 	}
 
 	sl_bool HttpRequest::containsPostParameter(String name) const
 	{
-		return m_postParameters.contains(name);
+		return m_postParameters.contains_NoLock(name);
 	}
 
 	void HttpRequest::applyPostParameters(const void* data, sl_size size)
 	{
 		Map<String, String> params = parseParameters(data, size);
-		m_postParameters.putAll(params.ref.get());
-		m_parameters.putAll(params.ref.get());
+		m_postParameters.putAll_NoLock(params);
+		m_parameters.putAll_NoLock(params);
 	}
 
 	void HttpRequest::applyPostParameters(const String& str)
@@ -513,8 +515,8 @@ namespace slib
 	void HttpRequest::applyQueryToParameters()
 	{
 		Map<String, String> params = parseParameters(m_query);
-		m_queryParameters.putAll(params.ref.get());
-		m_parameters.putAll(params.ref.get());
+		m_queryParameters.putAll_NoLock(params);
+		m_parameters.putAll_NoLock(params);
 	}
 
 	Map<String, String> HttpRequest::parseParameters(const String& str)
@@ -661,8 +663,7 @@ namespace slib
 		setRequestVersion(String::fromUtf8(data + posStart, posCurrent - posStart));
 		posCurrent += 2;
 
-		ObjectLocker lock(&m_requestHeaders);
-		sl_reg iRet = HttpHeaders::parseHeaders(&m_requestHeaders, data + posCurrent, size - posCurrent);
+		sl_reg iRet = HttpHeaders::parseHeaders(m_requestHeaders, data + posCurrent, size - posCurrent);
 		if (iRet > 0) {
 			return posCurrent + iRet;
 		} else {
@@ -728,37 +729,37 @@ namespace slib
 
 	String HttpResponse::getResponseHeader(String name) const
 	{
-		return m_responseHeaders.getValue(name, String::null());
+		return m_responseHeaders.getValue_NoLock(name, String::null());
 	}
 
 	List<String> HttpResponse::getResponseHeaderValues(String name) const
 	{
-		return m_responseHeaders.getValues(name);
+		return m_responseHeaders.getValues_NoLock(name);
 	}
 
 	void HttpResponse::setResponseHeader(String name, String value)
 	{
-		m_responseHeaders.put(name, value);
+		m_responseHeaders.put_NoLock(name, value);
 	}
 
 	void HttpResponse::addResponseHeader(String name, String value)
 	{
-		m_responseHeaders.put(name, value, MapPutMode::AddAlways);
+		m_responseHeaders.put_NoLock(name, value, MapPutMode::AddAlways);
 	}
 
 	sl_bool HttpResponse::containsResponseHeader(String name) const
 	{
-		return m_responseHeaders.contains(name);
+		return m_responseHeaders.contains_NoLock(name);
 	}
 
 	void HttpResponse::removeResponseHeader(String name)
 	{
-		m_responseHeaders.removeItems(name);
+		m_responseHeaders.removeItems_NoLock(name);
 	}
 
 	void HttpResponse::clearResponseHeaders()
 	{
-		m_responseHeaders.removeAll();
+		m_responseHeaders.removeAll_NoLock();
 	}
 
 	sl_uint64 HttpResponse::getResponseContentLengthHeader() const
@@ -967,8 +968,7 @@ namespace slib
 		setResponseMessage(String::fromUtf8(data + posStart, posCurrent - posStart));
 		posCurrent += 2;
 
-		ObjectLocker lock(m_responseHeaders.ref.get());
-		sl_reg iRet = HttpHeaders::parseHeaders(m_responseHeaders.ref.get(), data + posCurrent, size - posCurrent);
+		sl_reg iRet = HttpHeaders::parseHeaders(m_responseHeaders, data + posCurrent, size - posCurrent);
 		if (iRet > 0) {
 			return posCurrent + iRet;
 		} else {
