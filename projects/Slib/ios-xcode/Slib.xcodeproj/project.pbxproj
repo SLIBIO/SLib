@@ -137,6 +137,7 @@
 		2683BFAE1C39710C0068AC42 /* atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2683BFAD1C39710C0068AC42 /* atomic.cpp */; };
 		268847821E2FEE2700AFA023 /* ui_animation_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 268847811E2FEE2700AFA023 /* ui_animation_apple.mm */; };
 		268916341C182AC8009FD75E /* camera_dshow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268916331C182AC8009FD75E /* camera_dshow.cpp */; };
+		268A13041E7B16340048F2CE /* blowfish.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268A13031E7B16340048F2CE /* blowfish.cpp */; };
 		269222311DC12F600055095F /* image_stb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2692222F1DC12F600055095F /* image_stb.cpp */; };
 		269394CC1D7609EB002B9B03 /* list_report_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269394CB1D7609EB002B9B03 /* list_report_view.cpp */; };
 		2694620A1CAD1C47001B2130 /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269462091CAD1C47001B2130 /* xml.cpp */; };
@@ -406,6 +407,7 @@
 		268847811E2FEE2700AFA023 /* ui_animation_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_animation_apple.mm; sourceTree = "<group>"; };
 		268847831E2FFB1900AFA023 /* ui_animation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ui_animation.h; sourceTree = "<group>"; };
 		268916331C182AC8009FD75E /* camera_dshow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera_dshow.cpp; path = media/camera_dshow.cpp; sourceTree = "<group>"; };
+		268A13031E7B16340048F2CE /* blowfish.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = blowfish.cpp; sourceTree = "<group>"; };
 		2692222F1DC12F600055095F /* image_stb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image_stb.cpp; sourceTree = "<group>"; };
 		269222301DC12F600055095F /* image_stb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image_stb.h; sourceTree = "<group>"; };
 		269394CB1D7609EB002B9B03 /* list_report_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_report_view.cpp; sourceTree = "<group>"; };
@@ -739,6 +741,7 @@
 			children = (
 				266DD3781C117A3100D47AB0 /* aes.cpp */,
 				26B571501C9D442D0099E69B /* block_cipher.cpp */,
+				268A13031E7B16340048F2CE /* blowfish.cpp */,
 				266DD46B1C11934A00D47AB0 /* compress_zlib.cpp */,
 				266DD3791C117A3100D47AB0 /* crypto_hash.cpp */,
 				266DD37A1C117A3100D47AB0 /* gcm.cpp */,
@@ -1099,6 +1102,7 @@
 				26C0A3531C128D80005690FE /* vibrator.cpp in Sources */,
 				266DD3881C117A3100D47AB0 /* sha2.cpp in Sources */,
 				E1D3A4291E14A2FC00007A98 /* preference.cpp in Sources */,
+				268A13041E7B16340048F2CE /* blowfish.cpp in Sources */,
 				266DD3A51C117AE300D47AB0 /* graphics_util.cpp in Sources */,
 				2682C3F11E2D5C6C00E9CB98 /* ui_core_apple.mm in Sources */,
 				A25F2F551B039EF600854DAF /* thread.cpp in Sources */,

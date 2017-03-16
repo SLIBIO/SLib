@@ -153,6 +153,7 @@
 		2682C3FA1E2D639B00E9CB98 /* ui_core_common.h in Headers */ = {isa = PBXBuildFile; fileRef = 2682C3F81E2D639B00E9CB98 /* ui_core_common.h */; };
 		2688DD851C16F6E200973672 /* video_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2688DD841C16F6E200973672 /* video_view.cpp */; };
 		2688DD871C16FBDF00973672 /* camera_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2688DD861C16FBDF00973672 /* camera_view.cpp */; };
+		268A13021E7AE8BD0048F2CE /* blowfish.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268A13011E7AE8BD0048F2CE /* blowfish.cpp */; };
 		26912BC31DEA81D5008C5FFD /* web_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26912BC21DEA81D5008C5FFD /* web_service.cpp */; };
 		2699DC901D43682D0085EE67 /* list_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2699DC8F1D43682D0085EE67 /* list_view.cpp */; };
 		26A4ECCF1CFE7FB700288A0B /* tree_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */; };
@@ -421,6 +422,7 @@
 		2682C3F81E2D639B00E9CB98 /* ui_core_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui_core_common.h; sourceTree = "<group>"; };
 		2688DD841C16F6E200973672 /* video_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_view.cpp; sourceTree = "<group>"; };
 		2688DD861C16FBDF00973672 /* camera_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_view.cpp; sourceTree = "<group>"; };
+		268A13011E7AE8BD0048F2CE /* blowfish.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = blowfish.cpp; sourceTree = "<group>"; };
 		26912BC21DEA81D5008C5FFD /* web_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = web_service.cpp; sourceTree = "<group>"; };
 		2699DC8F1D43682D0085EE67 /* list_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_view.cpp; sourceTree = "<group>"; };
 		26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tree_view.cpp; sourceTree = "<group>"; };
@@ -914,6 +916,7 @@
 			children = (
 				266DD4591C11930800D47AB0 /* aes.cpp */,
 				266F12B21C97A13F00DE26FF /* block_cipher.cpp */,
+				268A13011E7AE8BD0048F2CE /* blowfish.cpp */,
 				266DD4611C11930800D47AB0 /* compress_zlib.cpp */,
 				266DD45A1C11930800D47AB0 /* crypto_hash.cpp */,
 				266DD45C1C11930800D47AB0 /* gcm.cpp */,
@@ -1261,6 +1264,7 @@
 				26D028651C48847E0083F1F3 /* audio_data.cpp in Sources */,
 				2666678A1C5BC5A3007A1B29 /* async_unix.cpp in Sources */,
 				266DD5731C11940A00D47AB0 /* network_io.cpp in Sources */,
+				268A13021E7AE8BD0048F2CE /* blowfish.cpp in Sources */,
 				2620412F1C88AF9300AF48F2 /* map.cpp in Sources */,
 				26CBB02D1DE5EC4F00F5A6F9 /* latlon.cpp in Sources */,
 				266DD56A1C11940A00D47AB0 /* mac_address.cpp in Sources */,

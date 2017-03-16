@@ -9,6 +9,7 @@
 #include "crypto/gcm.h"
 #include "crypto/block_cipher.h"
 #include "crypto/aes.h"
+#include "crypto/blowfish.h"
 
 #include "crypto/rsa.h"
 

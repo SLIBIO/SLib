@@ -896,6 +896,9 @@
     <ClInclude Include="..\..\..\inc\slib\core\string_buffer.h">
       <Filter>inc\core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\crypto\blowfish.h">
+      <Filter>inc\crypto</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -1662,6 +1665,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\preference_win32.cpp">
       <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\crypto\blowfish.cpp">
+      <Filter>src\slib\crypto</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

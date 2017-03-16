@@ -1,45 +1,44 @@
-#ifndef CHECKHEADER_SLIB_CRYPTO_AES
-#define CHECKHEADER_SLIB_CRYPTO_AES
+#ifndef CHECKHEADER_SLIB_CRYPTO_BLOWFISH
+#define CHECKHEADER_SLIB_CRYPTO_BLOWFISH
 
 #include "definition.h"
 
 #include "../core/string.h"
 
 #include "block_cipher.h"
-#include "gcm.h"
 
 /*
-	AES - Advanced Encryption Standard
+	BlowFish
 
-	User Key Size - 128 bits (16 bytes), 192 bits (24 bytes), 256 bits (32 bytes)
-	Block Size - 128 bits (16 bytes)
+	User Key Size - 32 bits to 448 bits
+	Block Size - 64 bits (8 bytes)
 */
 
 namespace slib
 {
 
-	class SLIB_EXPORT AES : public Object
+	class SLIB_EXPORT Blowfish : public Object
 	{
 	public:
-		AES();
+		Blowfish();
 
-		~AES();
+		~Blowfish();
 
 	public:
 		static sl_uint32 getBlockSize();
 
-		sl_bool setKey(const void* key, sl_uint32 lenKey /* 16, 24, 32 bytes */);
+		sl_bool setKey(const void* key, sl_uint32 lenKey /* 4 to 56 bytes */);
 
 		void setKey_SHA256(const String& key);
 		
-		void encrypt(sl_uint32& d0, sl_uint32& d1, sl_uint32& d2, sl_uint32& d3) const;
-	
-		void decrypt(sl_uint32& d0, sl_uint32& d1, sl_uint32& d2, sl_uint32& d3) const;
+		void encrypt(sl_uint32& d0, sl_uint32& d1) const;
 		
-		// 128 bit (16 byte) block
+		void decrypt(sl_uint32& d0, sl_uint32& d1) const;
+
+		// 64 bit (8 byte) block
 		void encryptBlock(const void* src, void* dst) const;
 
-		// 128 bit (16 byte) block
+		// 64 bit (8 byte) block
 		void decryptBlock(const void* src, void* dst) const;
 
 	public: /* common functions for block ciphers */
@@ -74,29 +73,12 @@ namespace slib
 		sl_size encrypt_CTR(const void* iv, sl_uint64 pos, const void* input, sl_size size, void* output) const;
 
 	private:
-		sl_uint32 m_roundKeyEnc[64];
-		sl_uint32 m_roundKeyDec[64];
-		sl_uint32 m_nCountRounds;
+		/* The subkeys used by the blowfish cipher */
+		sl_uint32 m_P[18];
+		sl_uint32 m_S[4][256];
 
 	};
 	
-	class SLIB_EXPORT AES_GCM : public Object, public GCM<AES>
-	{
-	public:
-		AES_GCM();
-
-		~AES_GCM();
-
-	public:
-		void setKey(const void* key, sl_uint32 lenKey /* 16, 24, 32 bytes */);
-	
-		void setKey_SHA256(const String& key);
-
-	private:
-		AES m_cipher;
-
-	};
-
 }
 
 #endif

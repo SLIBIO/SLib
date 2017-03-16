@@ -99,6 +99,7 @@
     <ClInclude Include="..\..\..\inc\slib\crypto.h" />
     <ClInclude Include="..\..\..\inc\slib\crypto\aes.h" />
     <ClInclude Include="..\..\..\inc\slib\crypto\block_cipher.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\blowfish.h" />
     <ClInclude Include="..\..\..\inc\slib\crypto\definition.h" />
     <ClInclude Include="..\..\..\inc\slib\crypto\gcm.h" />
     <ClInclude Include="..\..\..\inc\slib\crypto\hash.h" />
@@ -346,6 +347,7 @@
     <ClCompile Include="..\..\..\src\slib\core\xml.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\aes.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\block_cipher.cpp" />
+    <ClCompile Include="..\..\..\src\slib\crypto\blowfish.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\compress_zlib.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\crypto_hash.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\gcm.cpp" />

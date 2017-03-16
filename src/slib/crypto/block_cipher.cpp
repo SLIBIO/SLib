@@ -5,6 +5,7 @@
 #include "../../../inc/slib/core/math.h"
 
 #include "../../../inc/slib/crypto/aes.h"
+#include "../../../inc/slib/crypto/blowfish.h"
 
 namespace slib
 {
@@ -391,5 +392,6 @@ namespace slib
 	{ return BlockCipher_CTR<CLASS>::encrypt(this, iv, pos, input, size, output); }
 
 	DEFINE_BLOCKCIPHER(AES);
+	DEFINE_BLOCKCIPHER(Blowfish);
 
 }

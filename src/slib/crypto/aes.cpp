@@ -1,4 +1,5 @@
 #include "../../../inc/slib/crypto/aes.h"
+
 #include "../../../inc/slib/crypto/sha2.h"
 #include "../../../inc/slib/core/mio.h"
 
@@ -380,22 +381,15 @@ Roundn (Last):
 	O[2] = (SBOX(_BYTE(I[2] >> 24)) << 24) ^ (SBOX(_BYTE(I[3] >> 16)) << 16) ^ (SBOX(_BYTE(I[0] >> 8)) << 8) ^ (SBOX(_BYTE(I[1]))) ^ W[2]; \
 	O[3] = (SBOX(_BYTE(I[3] >> 24)) << 24) ^ (SBOX(_BYTE(I[0] >> 16)) << 16) ^ (SBOX(_BYTE(I[1] >> 8)) << 8) ^ (SBOX(_BYTE(I[2]))) ^ W[3];
 
-	void AES::encryptBlock(const void* _src, void *_dst) const
+	SLIB_INLINE static void _AES_encipher(const sl_uint32* W, sl_uint32 nRounds, sl_uint32& d0, sl_uint32& d1, sl_uint32& d2, sl_uint32& d3)
 	{
-		const sl_uint8* IN = (const sl_uint8*)_src;
-		sl_uint8* OUT = (sl_uint8*)_dst;
-
-		// add round key (round 0)
-		const sl_uint32* W = m_roundKeyEnc;
-
 		sl_uint32 S1[4]; // status 0
-		sl_uint32 S2[4];  // status 1
-		S1[0] = MIO::readUint32BE(IN) ^ W[0];
-		S1[1] = MIO::readUint32BE(IN + 4) ^ W[1];
-		S1[2] = MIO::readUint32BE(IN + 8) ^ W[2];
-		S1[3] = MIO::readUint32BE(IN + 12) ^ W[3];
-
-		sl_uint32 nRounds = m_nCountRounds;
+		sl_uint32 S2[4]; // status 1
+		S1[0] = d0 ^ W[0];
+		S1[1] = d1 ^ W[1];
+		S1[2] = d2 ^ W[2];
+		S1[3] = d3 ^ W[3];
+		
 		// round 1 ~ round n-1
 		W += 4;
 		_ENC_ROUND(S1, S2); // Round 1
@@ -416,11 +410,34 @@ Roundn (Last):
 			}
 		}
 		_ENC_ROUND_FINAL(S2, S1);
+		
+		d0 = S1[0];
+		d1 = S1[1];
+		d2 = S1[2];
+		d3 = S1[3];
+	}
+	
+	void AES::encrypt(sl_uint32& d0, sl_uint32& d1, sl_uint32& d2, sl_uint32& d3) const
+	{
+		_AES_encipher(m_roundKeyEnc, m_nCountRounds, d0, d1, d2, d3);
+	}
+	
+	void AES::encryptBlock(const void* _src, void *_dst) const
+	{
+		const sl_uint8* IN = (const sl_uint8*)_src;
+		sl_uint8* OUT = (sl_uint8*)_dst;
 
-		MIO::writeUint32BE(OUT, S1[0]);
-		MIO::writeUint32BE(OUT + 4, S1[1]);
-		MIO::writeUint32BE(OUT + 8, S1[2]);
-		MIO::writeUint32BE(OUT + 12, S1[3]);
+		sl_uint32 d0 = MIO::readUint32BE(IN);
+		sl_uint32 d1 = MIO::readUint32BE(IN + 4);
+		sl_uint32 d2 = MIO::readUint32BE(IN + 8);
+		sl_uint32 d3 = MIO::readUint32BE(IN + 12);
+		
+		_AES_encipher(m_roundKeyEnc, m_nCountRounds, d0, d1, d2, d3);
+
+		MIO::writeUint32BE(OUT, d0);
+		MIO::writeUint32BE(OUT + 4, d1);
+		MIO::writeUint32BE(OUT + 8, d2);
+		MIO::writeUint32BE(OUT + 12, d3);
 	}
 
 
@@ -458,23 +475,17 @@ Roundn (Last):
 	O[1] = (SBOX_INV(_BYTE(I[1] >> 24)) << 24) ^ (SBOX_INV(_BYTE(I[0] >> 16)) << 16) ^ (SBOX_INV(_BYTE(I[3] >> 8)) << 8) ^ (SBOX_INV(_BYTE(I[2]))) ^ W[1]; \
 	O[2] = (SBOX_INV(_BYTE(I[2] >> 24)) << 24) ^ (SBOX_INV(_BYTE(I[1] >> 16)) << 16) ^ (SBOX_INV(_BYTE(I[0] >> 8)) << 8) ^ (SBOX_INV(_BYTE(I[3]))) ^ W[2]; \
 	O[3] = (SBOX_INV(_BYTE(I[3] >> 24)) << 24) ^ (SBOX_INV(_BYTE(I[2] >> 16)) << 16) ^ (SBOX_INV(_BYTE(I[1] >> 8)) << 8) ^ (SBOX_INV(_BYTE(I[0]))) ^ W[3];
-
-	void AES::decryptBlock(const void* _src, void *_dst) const
+	
+	
+	SLIB_INLINE static void _AES_decipher(const sl_uint32* W, sl_uint32 nRounds, sl_uint32& d0, sl_uint32& d1, sl_uint32& d2, sl_uint32& d3)
 	{
-		const sl_uint8* IN = (const sl_uint8*)_src;
-		sl_uint8* OUT = (sl_uint8*)_dst;
-
-		// add round key (round 0)
-		const sl_uint32* W = m_roundKeyDec;
-
 		sl_uint32 S1[4]; // status 0
-		sl_uint32 S2[4];  // status 1
-		S1[0] = MIO::readUint32BE(IN) ^ W[0];
-		S1[1] = MIO::readUint32BE(IN + 4) ^ W[1];
-		S1[2] = MIO::readUint32BE(IN + 8) ^ W[2];
-		S1[3] = MIO::readUint32BE(IN + 12) ^ W[3];
-
-		sl_uint32 nRounds = m_nCountRounds;
+		sl_uint32 S2[4]; // status 1
+		S1[0] = d0 ^ W[0];
+		S1[1] = d1 ^ W[1];
+		S1[2] = d2 ^ W[2];
+		S1[3] = d3 ^ W[3];
+		
 		// round 1 ~ round n-1
 		W += 4;
 		_DEC_ROUND(S1, S2); // Round 1
@@ -496,10 +507,33 @@ Roundn (Last):
 		}
 		_DEC_ROUND_FINAL(S2, S1);
 
-		MIO::writeUint32BE(OUT, S1[0]);
-		MIO::writeUint32BE(OUT + 4, S1[1]);
-		MIO::writeUint32BE(OUT + 8, S1[2]);
-		MIO::writeUint32BE(OUT + 12, S1[3]);
+		d0 = S1[0];
+		d1 = S1[1];
+		d2 = S1[2];
+		d3 = S1[3];
+	}
+	
+	void AES::decrypt(sl_uint32& d0, sl_uint32& d1, sl_uint32& d2, sl_uint32& d3) const
+	{
+		_AES_decipher(m_roundKeyDec, m_nCountRounds, d0, d1, d2, d3);
+	}
+	
+	void AES::decryptBlock(const void* _src, void *_dst) const
+	{
+		const sl_uint8* IN = (const sl_uint8*)_src;
+		sl_uint8* OUT = (sl_uint8*)_dst;
+		
+		sl_uint32 d0 = MIO::readUint32BE(IN);
+		sl_uint32 d1 = MIO::readUint32BE(IN + 4);
+		sl_uint32 d2 = MIO::readUint32BE(IN + 8);
+		sl_uint32 d3 = MIO::readUint32BE(IN + 12);
+		
+		_AES_decipher(m_roundKeyDec, m_nCountRounds, d0, d1, d2, d3);
+		
+		MIO::writeUint32BE(OUT, d0);
+		MIO::writeUint32BE(OUT + 4, d1);
+		MIO::writeUint32BE(OUT + 8, d2);
+		MIO::writeUint32BE(OUT + 12, d3);
 	}
 
 	void AES::setKey_SHA256(const String& key)
