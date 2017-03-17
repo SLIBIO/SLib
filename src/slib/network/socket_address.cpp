@@ -162,7 +162,7 @@ namespace slib
 	
 	
 	template <class CT>
-	static sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_reg pos, sl_reg len)
+	static sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_size pos, sl_size len)
 	{
 		if (pos >= len) {
 			return SLIB_PARSE_ERROR;

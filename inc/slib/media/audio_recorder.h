@@ -94,9 +94,9 @@ namespace slib
 	protected:
 		void _init(const AudioRecorderParam& param);
 		
-		Array<sl_int16> _getProcessData(sl_size count);
+		Array<sl_int16> _getProcessData(sl_uint32 count);
 		
-		void _processFrame(sl_int16* s, sl_size count);
+		void _processFrame(sl_int16* s, sl_uint32 count);
 		
 	protected:
 		LoopQueue<sl_int16> m_queue;

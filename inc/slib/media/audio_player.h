@@ -40,7 +40,7 @@ namespace slib
 		virtual ~IAudioPlayerBufferListener();
 
 	public:
-		virtual void onRequireAudioData(AudioPlayerBuffer* player, sl_size requestedSamplesCount) = 0;
+		virtual void onRequireAudioData(AudioPlayerBuffer* player, sl_uint32 requestedSamplesCount) = 0;
 	};
 	
 	class SLIB_EXPORT AudioPlayerBufferParam
@@ -54,7 +54,7 @@ namespace slib
 		sl_bool flagAutoStart;
 		
 		Ptr<IAudioPlayerBufferListener> listener;
-		Function<void(AudioPlayerBuffer*, sl_size)> onRequireAudioData;
+		Function<void(AudioPlayerBuffer*, sl_uint32)> onRequireAudioData;
 		Ref<Event> event;
 		
 	public:
@@ -90,9 +90,9 @@ namespace slib
 	protected:
 		void _init(const AudioPlayerBufferParam& param);
 		
-		Array<sl_int16> _getProcessData(sl_size count);
+		Array<sl_int16> _getProcessData(sl_uint32 count);
 		
-		void _processFrame(sl_int16* s, sl_size count);
+		void _processFrame(sl_int16* s, sl_uint32 count);
 		
 	protected:
 		LoopQueue<sl_int16> m_queue;
@@ -101,7 +101,7 @@ namespace slib
 		AtomicArray<sl_int16> m_processData;
 		
 		Ptr<IAudioPlayerBufferListener> m_listener;
-		Function<void(AudioPlayerBuffer*, sl_size)> m_onRequireAudioData;
+		Function<void(AudioPlayerBuffer*, sl_uint32)> m_onRequireAudioData;
 		Ref<Event> m_event;
 		
 	};

@@ -90,7 +90,7 @@ namespace slib
 		}
 	}
 
-	Array<sl_int16> AudioPlayerBuffer::_getProcessData(sl_size count)
+	Array<sl_int16> AudioPlayerBuffer::_getProcessData(sl_uint32 count)
 	{
 		Array<sl_int16> data = m_processData;
 		if (data.getCount() >= count) {
@@ -102,7 +102,7 @@ namespace slib
 		}
 	}
 
-	void AudioPlayerBuffer::_processFrame(sl_int16* s, sl_size count)
+	void AudioPlayerBuffer::_processFrame(sl_int16* s, sl_uint32 count)
 	{
 		if (m_event.isNotNull()) {
 			m_event->set();
@@ -113,7 +113,7 @@ namespace slib
 			listener->onRequireAudioData(this, count / m_nChannels);
 		}
 		if (!(m_queue.get(s, count))) {
-			for (sl_size i = 0; i < count; i++) {
+			for (sl_uint32 i = 0; i < count; i++) {
 				s[i] = m_lastSample;
 			}
 		}

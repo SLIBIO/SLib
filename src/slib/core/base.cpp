@@ -14,22 +14,11 @@
 #include <stdio.h>
 
 #ifdef SLIB_PLATFORM_IS_WINDOWS
+#	include "../../../inc/slib/core/platform_windows.h"
+#endif
 
-#include "../../../inc/slib/core/platform_windows.h"
-
-#	if defined(_WIN64) || _WIN32_WINNT >= 0x0502
-#	else
-#		define NOT_SUPPORT_ATOMIC_64BIT
-#	endif
-
-#else
-
-#	if defined(SLIB_PLATFORM_IS_TIZEN)
-#		if defined(SLIB_ARCH_IS_X86)
-#			define NOT_SUPPORT_ATOMIC_64BIT
-#		endif
-#	endif
-
+#if defined(SLIB_ARCH_IS_32BIT)
+#	define NOT_SUPPORT_ATOMIC_64BIT
 #endif
 
 namespace slib

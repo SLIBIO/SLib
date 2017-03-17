@@ -92,7 +92,7 @@ namespace slib
 		m_event = param.event;
 	}
 
-	Array<sl_int16> AudioRecorder::_getProcessData(sl_size count)
+	Array<sl_int16> AudioRecorder::_getProcessData(sl_uint32 count)
 	{
 		Array<sl_int16> data = m_processData;
 		if (data.getCount() >= count) {
@@ -104,7 +104,7 @@ namespace slib
 		}
 	}
 
-	void AudioRecorder::_processFrame(sl_int16* s, sl_size count)
+	void AudioRecorder::_processFrame(sl_int16* s, sl_uint32 count)
 	{
 		PtrLocker<IAudioRecorderListener> listener(m_listener);
 		if (listener.isNotNull() || m_onRecordAudio.isNotNull()) {
