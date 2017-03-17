@@ -1263,6 +1263,13 @@ namespace slib
 	}
 	
 	template <class KT, class VT>
+	template <class _KT, class _VT>
+	const Map<KT, VT>& Map<KT, VT>::from(const Map<_KT, _VT>& other)
+	{
+		return *(reinterpret_cast<Map<KT, VT> const*>(&other));
+	}
+
+	template <class KT, class VT>
 	void Map<KT, VT>::init()
 	{
 		ref = IMap<KT, VT>::createDefault();
@@ -1741,6 +1748,13 @@ namespace slib
 		return sl_null;
 	}
 
+	
+	template <class KT, class VT>
+	template <class _KT, class _VT>
+	const Atomic< Map<KT, VT> >& Atomic< Map<KT, VT> >::from(const Atomic< Map<_KT, _VT> >& other)
+	{
+		return *(reinterpret_cast<Atomic< Map<KT, VT> > const*>(&other));
+	}
 
 	template <class KT, class VT>
 	void Atomic< Map<KT, VT> >::init()

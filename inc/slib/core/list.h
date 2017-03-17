@@ -311,6 +311,9 @@ namespace slib
 		
 		template <class _T>
 		static List<T> createCopy(const List<_T>& other);
+		
+		template <class _T>
+		static const List<T>& from(const List<_T>& other);
 
 	public:
 		sl_size getCount() const;
@@ -510,6 +513,9 @@ namespace slib
 		Atomic(const std::initializer_list<T>& l);
 
 	public:
+		template <class _T>
+		static const Atomic< List<T> >& from(const Atomic< List<_T> >& other);
+
 		sl_size getCount() const;
 
 		sl_bool isEmpty() const;

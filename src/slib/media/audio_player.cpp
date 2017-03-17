@@ -50,6 +50,15 @@ namespace slib
 	AudioPlayerBuffer::~AudioPlayerBuffer()
 	{
 	}
+	
+	void AudioPlayerBuffer::_init(const AudioPlayerBufferParam& param)
+	{
+		m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
+		m_nChannels = param.channelsCount;
+		m_listener = param.listener;
+		m_onRequireAudioData = param.onRequireAudioData;
+		m_event = param.event;
+	}
 
 	void AudioPlayerBuffer::write(const AudioData& audioIn)
 	{

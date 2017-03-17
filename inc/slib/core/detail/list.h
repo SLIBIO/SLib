@@ -1102,6 +1102,13 @@ namespace slib
 	}
 	
 	template <class T>
+	template <class _T>
+	SLIB_INLINE const List<T>& List<T>::from(const List<_T>& other)
+	{
+		return *(reinterpret_cast<List<T> const*>(&other));
+	}
+	
+	template <class T>
 	SLIB_INLINE sl_size List<T>::getCount() const
 	{
 		CList<T>* obj = ref._ptr;
@@ -1915,6 +1922,13 @@ namespace slib
 	template <class _T>
 	Atomic< List<T> >::Atomic(const _T* values, sl_size count): ref(CList<T>::createFromArray(values, count))
 	{
+	}
+	
+	template <class T>
+	template <class _T>
+	const Atomic< List<T> >& Atomic< List<T> >::from(const Atomic< List<_T> >& other)
+	{
+		return *(reinterpret_cast<Atomic< List<T> > const*>(&other));
 	}
 
 	template <class T>

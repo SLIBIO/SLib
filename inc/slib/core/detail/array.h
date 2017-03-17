@@ -463,7 +463,14 @@ namespace slib
 	{
 		return CArray<T>::createStatic(data, count, refer);
 	}
-
+	
+	template <class T>
+	template <class _T>
+	const Array<T>& Array<T>::from(const Array<_T>& other)
+	{
+		return *(reinterpret_cast<Array<T> const*>(&other));
+	}
+	
 	template <class T>
 	SLIB_INLINE T* Array<T>::getData() const
 	{
@@ -710,6 +717,13 @@ namespace slib
 	{
 	}
 	
+	template <class T>
+	template <class _T>
+	const Atomic< Array<T> >& Atomic< Array<T> >::from(const Atomic< Array<_T> >& other)
+	{
+		return *(reinterpret_cast<Atomic< Array<T> > const*>(&other));
+	}
+
 	template <class T>
 	sl_size Atomic< Array<T> >::getCount() const
 	{

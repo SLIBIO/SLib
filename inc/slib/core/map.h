@@ -476,7 +476,10 @@ namespace slib
 		
 		template < class KEY_COMPARE = Compare<KT> >
 		static Map<KT, VT> createTree(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare = KEY_COMPARE());
-
+		
+		template <class _KT, class _VT>
+		static const Map<KT, VT>& from(const Map<_KT, _VT>& other);
+		
 	public:
 		void init();
 		
@@ -594,6 +597,9 @@ namespace slib
 		Atomic(const std::initializer_list< Pair<KT, VT> >& l);
 		
 	public:
+		template <class _KT, class _VT>
+		static const Atomic< Map<KT, VT> >& from(const Atomic< Map<_KT, _VT> >& other);
+		
 		void init();
 		
 		template < class KEY_EQUALS = Equals<KT> >

@@ -197,6 +197,9 @@ namespace slib
 		static Array<T> createStatic(const T* data, sl_size count);
 
 		static Array<T> createStatic(const T* data, sl_size count, Referable* refer);
+		
+		template <class _T>
+		static const Array<T>& from(const Array<_T>& other);
 
 	public:
 		T* getData() const;
@@ -278,6 +281,9 @@ namespace slib
 		Atomic(const T* data, sl_size count, Referable* refer);
 		
 	public:
+		template <class _T>
+		static const Atomic< Array<T> >& from(const Atomic< Array<_T> >& other);
+
 		sl_size getCount() const;
 
 		sl_bool isEmpty() const;
