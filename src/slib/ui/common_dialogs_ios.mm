@@ -3,7 +3,9 @@
 #if defined(SLIB_PLATFORM_IS_IOS)
 
 #include "../../../inc/slib/ui/common_dialogs.h"
+
 #include "../../../inc/slib/ui/core.h"
+#include "../../../inc/slib/ui/mobile_app.h"
 
 #include "../../../inc/slib/ui/platform.h"
 
@@ -101,7 +103,21 @@ namespace slib
 				[alert addAction:actionOK];
 			}
 			
-			UIWindow* window = UIPlatform::getKeyWindow();
+			UIWindow* window = nil;
+			Ref<Window> parentWindow = this->parent;
+			if (parentWindow.isNull()) {
+				Ref<MobileApp> app = MobileApp::getApp();
+				if (app.isNotNull()) {
+					parentWindow = app->getMainWindow();
+				}
+			}
+			if (parentWindow.isNotNull()) {
+				Ref<WindowInstance> instance = parentWindow->getWindowInstance();
+				window = UIPlatform::getWindowHandle(instance.get());
+			}
+			if (window == nil) {
+				window = UIPlatform::getKeyWindow();
+			}
 			if (window != nil) {
 				UIViewController* rootController = [window rootViewController];
 				if (rootController != nil) {
