@@ -76,6 +76,7 @@ namespace slib
 
 		static String16 applyBackslashEscapes(const AtomicString16& str, sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
 
+		
 		static String parseBackslashEscapes(const sl_char8* input, sl_size len, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
 
 		static String16 parseBackslashEscapes(const sl_char16* input, sl_size len, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
@@ -88,6 +89,7 @@ namespace slib
 
 		static String16 parseBackslashEscapes(const AtomicString16& str, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
 
+		
 		static sl_size countLineNumber(const sl_char8* input, sl_size len, sl_size* columnLast = sl_null);
 
 		static sl_size countLineNumber(const sl_char16* input, sl_size len, sl_size* columnLast = sl_null);
@@ -100,6 +102,19 @@ namespace slib
 
 		static sl_size countLineNumber(const AtomicString16& str, sl_size pos, sl_size* column = sl_null);
 
+		
+		static sl_reg indexOfLine(const sl_char8* input, sl_size len);
+		
+		static sl_reg indexOfLine(const sl_char16* input, sl_size len);
+
+		static sl_reg indexOfLine(const String& str, sl_reg start = 0);
+		
+		static sl_reg indexOfLine(const String16& str, sl_reg start = 0);
+		
+		static sl_reg indexOfLine(const AtomicString& str, sl_reg start = 0);
+		
+		static sl_reg indexOfLine(const AtomicString16& str, sl_reg start = 0);
+		
 	};
 
 }

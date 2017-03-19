@@ -500,7 +500,7 @@ namespace slib
 	{
 		Ref<ViewInstance> instance = m_instance;
 		if (instance.isNotNull()) {
-			if (m_flagFocused) {
+			if (m_flagFocused && m_flagFocusable) {
 				instance->setFocus();
 			}
 			Ref<GestureDetector> gesture = m_gestureDetector;
@@ -4907,6 +4907,11 @@ namespace slib
 					_setFont_NW(_font);
 				}
 				attrs->font = font;
+				if (mode != UIUpdateMode::Init) {
+					if (isUsingFont()) {
+						invalidateLayoutFromResizeContent(UIUpdateMode::NoRedraw);
+					}
+				}
 			} else {
 				attrs->font = font;
 				if (isUsingFont()) {
@@ -8352,9 +8357,6 @@ namespace slib
 		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->click)(this);
-			if (ev->isPreventedDefault()) {
-				return;
-			}
 			PtrLocker<IViewListener> listener(eventAttrs->listener);
 			if (listener.isNotNull()) {
 				listener->onClick(this, ev);

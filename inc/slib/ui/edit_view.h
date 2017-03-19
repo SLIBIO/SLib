@@ -22,6 +22,8 @@ namespace slib
 		
 		virtual void onReturnKey(EditView* edit);
 		
+		virtual void onDoneEdit(EditView* edit);
+		
 	};
 	
 	class SLIB_EXPORT EditView : public View
@@ -58,6 +60,10 @@ namespace slib
 		
 		virtual void setTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		Color getHintTextColor();
+		
+		virtual void setHintTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
 		UIReturnKeyType getReturnKeyType();
 		
 		void setReturnKeyType(UIReturnKeyType type);
@@ -78,6 +84,12 @@ namespace slib
 		// override
 		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 		
+		// override
+		void onDraw(Canvas* canvas);
+
+		// override
+		void onClick(UIEvent* ev);
+		
 	public:
 		SLIB_PROPERTY(AtomicPtr<IEditViewListener>, Listener)
 		
@@ -85,10 +97,14 @@ namespace slib
 		
 		SLIB_PROPERTY(AtomicFunction<void(EditView*)>, OnReturnKey)
 		
+		SLIB_PROPERTY(AtomicFunction<void(EditView*)>, OnDoneEdit)
+		
 	protected:
 		virtual String onChange(const String& newValue);
 		
 		virtual void onReturnKey();
+		
+		virtual void onDoneEdit();
 		
 	public:
 		// override
@@ -100,6 +116,8 @@ namespace slib
 		virtual String dispatchChange(const String& newValue);
 		
 		virtual void dispatchReturnKey();
+		
+		virtual void dispatchDoneEdit();
 		
 	private:
 		void _getText_NW();
@@ -116,6 +134,8 @@ namespace slib
 		
 		void _setTextColor_NW(const Color& color);
 		
+		void _setHintTextColor_NW(const Color& color);
+		
 		void _setReturnKeyType_NW(UIReturnKeyType type);
 		
 		void _setKeyboardType_NW(UIKeyboardType type);
@@ -131,6 +151,12 @@ namespace slib
 		// override
 		void _setBackgroundColor_NW(const Color& color);
 		
+		String _onChangeEditViewNative(EditView* ev, const String& text);
+		
+		void _onReturnKeyEditViewNative(EditView* ev);
+		
+		void _onDoneEditViewNative(EditView* ev);
+		
 	protected:
 		AtomicString m_text;
 		Alignment m_textAlignment;
@@ -138,10 +164,15 @@ namespace slib
 		sl_bool m_flagReadOnly;
 		sl_bool m_flagMultiLine;
 		Color m_textColor;
+		Color m_hintTextColor;
 		UIReturnKeyType m_returnKeyType;
 		UIKeyboardType m_keyboardType;
 		UIAutoCapitalizationType m_autoCapitalizationType;
 		sl_bool m_flagAutoDismissKeyboard;
+		
+		Ref<Window> m_windowEdit;
+		Ref<EditView> m_editViewNative;
+		
 	};
 	
 	class PasswordView : public EditView

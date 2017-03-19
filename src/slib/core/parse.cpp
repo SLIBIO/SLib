@@ -482,5 +482,72 @@ namespace slib
 		String16 s(str);
 		return countLineNumber(s, pos, column);
 	}
+	
+	
+	template <class CT>
+	SLIB_INLINE sl_reg _ParseUtil_indexOfLine(const CT* input, sl_reg len)
+	{
+		for (sl_reg i = 0; i < len; i++) {
+			CT ch = input[i];
+			if (ch == '\r' || ch == '\n') {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	sl_reg ParseUtil::indexOfLine(const sl_char8* input, sl_size len)
+	{
+		return _ParseUtil_indexOfLine(input, len);
+	}
+	
+	sl_reg ParseUtil::indexOfLine(const sl_char16* input, sl_size len)
+	{
+		return _ParseUtil_indexOfLine(input, len);
+	}
+	
+	template <class CT, class ST>
+	SLIB_INLINE sl_reg _String_indexOfLine(const ST& str, sl_reg start)
+	{
+		sl_reg count = str.getLength();
+		if (count <= 0) {
+			return -1;
+		}
+		if (start < 0) {
+			start = 0;
+		} else {
+			if (start >= count) {
+				return -1;
+			}
+		}
+		CT* sz = str.getData();
+		for (sl_reg i = start; i < count; i++) {
+			CT ch = sz[i];
+			if (ch == '\r' || ch == '\n') {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	sl_reg ParseUtil::indexOfLine(const String& str, sl_reg start)
+	{
+		return _String_indexOfLine<sl_char8, String>(str, start);
+	}
+	
+	sl_reg ParseUtil::indexOfLine(const String16& str, sl_reg start)
+	{
+		return _String_indexOfLine<sl_char16, String16>(str, start);
+	}
+	
+	sl_reg ParseUtil::indexOfLine(const AtomicString& str, sl_reg start)
+	{
+		return _String_indexOfLine<sl_char8, String>(str, start);
+	}
+	
+	sl_reg ParseUtil::indexOfLine(const AtomicString16& str, sl_reg start)
+	{
+		return _String_indexOfLine<sl_char16, String16>(str, start);
+	}
 
 }

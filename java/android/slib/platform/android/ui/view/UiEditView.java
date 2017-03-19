@@ -99,21 +99,8 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 	
-	public static boolean _isBorder(View view) {
-		return true;
-	}
-
 	public static boolean _setBorder(View view, boolean flag) {
 		return false;
-	}
-	
-	public static int _getAlignment(View view) {
-		if (view instanceof TextView) {
-			TextView tv = (TextView)view;
-			int gravity = tv.getGravity();
-			return Util.getSlibAlignment(gravity);
-		}
-		return 0;
 	}
 	
 	public static boolean _setAlignment(final View view, final int align) {
@@ -133,21 +120,6 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 
-	public static String _getHintText(View view) {
-		try {
-			if (view instanceof TextView) {
-				String s = ((TextView)view).getHint().toString();
-				if (s == null) {
-					s = "";
-				}
-				return s;
-			}
-		} catch (Exception e) {
-			Logger.exception(e);
-		}
-		return "";
-	}
-	
 	public static boolean _setHintText(final View view, String text) {
 		if (!(UiThread.isUiThread())) {
 			final String t = text;
@@ -168,13 +140,6 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 	
-	public static boolean _isReadOnly(View view) {
-		if (view instanceof TextView) {
-			return ((TextView)view).isEnabled();
-		}
-		return false;
-	}
-	
 	public static boolean _setReadOnly(final View view, final boolean flag) {
 		if (!(UiThread.isUiThread())) {
 			view.post(new Runnable() {
@@ -191,12 +156,6 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 
-	public static boolean _isMultiLine(View view) {
-		if (view instanceof TextView) {
-			return ((TextView)view).isEnabled();
-		}
-		return false;
-	}
 	public static boolean _setMultiLine(final View view, final boolean flag) {
 		if (!(UiThread.isUiThread())) {
 			view.post(new Runnable() {
@@ -237,6 +196,23 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 
+	public static boolean _setHintTextColor(final View view, final int color) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setHintTextColor(view, color);
+				}
+			});
+			return true;
+		}
+		if (view instanceof TextView) {
+			TextView tv = (TextView)view;
+			tv.setHintTextColor(color);
+			return true;
+		}
+		return false;
+	}
+	
 	public static boolean _setBackgroundColor(final View view, final int color) {
 		if (!(UiThread.isUiThread())) {
 			view.post(new Runnable() {

@@ -644,7 +644,7 @@ CGRect _g_ui_keyboard_scrollview_original_frame;
 	}
 	
 	UIScrollView* scroll = nil;
-	UIView* parent = view.superview;
+	UIView* parent = view;
 	while (parent != nil) {
 		if ([parent isKindOfClass:[UIScrollView class]]) {
 			scroll = (UIScrollView*)parent;
@@ -685,9 +685,11 @@ CGRect _g_ui_keyboard_scrollview_original_frame;
 	if (yText > rcScreen.size.height - kbSize.height) {
 		CGFloat offset = rcScreen.size.height - kbSize.height - yText;
 		if (scroll != nil) {
-			CGPoint pos = scroll.contentOffset;
-			pos.y -= offset;
-			scroll.contentOffset = pos;
+			if (!([scroll isKindOfClass:[UITextView class]])) {
+				CGPoint pos = scroll.contentOffset;
+				pos.y -= offset;
+				scroll.contentOffset = pos;
+			}
 		} else {
 			CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, offset);
 			[UIView animateWithDuration:0.3 animations:^(void) {

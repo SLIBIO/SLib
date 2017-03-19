@@ -266,6 +266,10 @@ namespace slib
 		}
 	}
 
+	void EditView::_setHintTextColor_NW(const Color& color)
+	{
+	}
+
 	void EditView::_setFont_NW(const Ref<Font>& font)
 	{
 		HWND handle = UIPlatform::getViewHandle(this);

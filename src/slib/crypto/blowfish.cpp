@@ -388,7 +388,7 @@ namespace slib
 		sl_uint32 datal = 0;
 		sl_uint32 datar = 0;
 		
-		for (i = 0; i<BLOWFISH_ROUNDS + 2; i += 2) {
+		for (i = 0; i < BLOWFISH_ROUNDS + 2; i += 2) {
 			_Blowfish_encipher(P, S, datal, datar);
 			P[i] = datal;
 			P[i+1] = datar;

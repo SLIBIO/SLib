@@ -1,5 +1,8 @@
 #include "../../../inc/slib/ui/edit_view.h"
 
+#include "../../../inc/slib/ui/mobile_app.h"
+#include "../../../inc/slib/ui/scroll_view.h"
+
 namespace slib
 {
 
@@ -23,11 +26,17 @@ namespace slib
 	void IEditViewListener::onReturnKey(EditView* edit)
 	{
 	}
+	
+	void IEditViewListener::onDoneEdit(EditView* edit)
+	{
+	}
 
 	SLIB_DEFINE_OBJECT(EditView, View)
 
 	EditView::EditView()
 	{
+		SLIB_REFERABLE_CONSTRUCTOR
+		
 		setCreatingNativeWidget(sl_true);
 		setUsingFont(sl_true);
 		setFocusable(sl_true);
@@ -35,6 +44,7 @@ namespace slib
 		m_flagReadOnly = sl_false;
 		m_flagMultiLine = sl_false;
 		m_textColor = Color::Black;
+		m_hintTextColor = Color(180, 180, 180);
 		setBorder(sl_true, UIUpdateMode::Init);
 		m_returnKeyType = UIReturnKeyType::Default;
 		m_keyboardType = UIKeyboardType::Default;
@@ -150,6 +160,23 @@ namespace slib
 			}
 		}
 	}
+	
+	Color EditView::getHintTextColor()
+	{
+		return m_hintTextColor;
+	}
+	
+	void EditView::setHintTextColor(const Color& color, UIUpdateMode mode)
+	{
+		m_hintTextColor = color;
+		if (isNativeWidget()) {
+			_setHintTextColor_NW(color);
+		} else {
+			if (mode == UIUpdateMode::Redraw) {
+				invalidate();
+			}
+		}
+	}
 
 	UIReturnKeyType EditView::getReturnKeyType()
 	{
@@ -224,7 +251,69 @@ namespace slib
 			setMeasuredHeight(height);
 		}
 	}
-
+	
+	void EditView::onDraw(Canvas* canvas)
+	{
+		if (m_text.isEmpty()) {
+			canvas->drawText(m_hintText, getBoundsInnerPadding(), getFont(), m_hintTextColor, m_textAlignment);
+		} else {
+			canvas->drawText(m_text, getBoundsInnerPadding(), getFont(), m_textColor, m_textAlignment);
+		}
+	}
+	
+	void EditView::onClick(UIEvent* ev)
+	{
+#if defined(SLIB_PLATFORM_IS_MOBILE)
+		MobileApp::getApp()->getMainWindow()->setVisible(sl_false);
+		m_windowEdit = new Window;
+		m_windowEdit->setBackgroundColor(Color::White);
+		m_editViewNative = new TextArea;
+		m_editViewNative->setText(m_text, UIUpdateMode::Init);
+		m_editViewNative->setSizeFilling(sl_true, sl_true, UIUpdateMode::Init);
+		m_editViewNative->setBorder(sl_false, UIUpdateMode::Init);
+		m_editViewNative->setGravity(Alignment::TopLeft, UIUpdateMode::Init);
+		m_editViewNative->setMultiLine(sl_true, UIUpdateMode::Init);
+		m_editViewNative->setOnChange(SLIB_FUNCTION_WEAKREF(EditView, _onChangeEditViewNative, this));
+		m_editViewNative->setOnReturnKey(SLIB_FUNCTION_WEAKREF(EditView, _onReturnKeyEditViewNative, this));
+		m_editViewNative->setOnDoneEdit(SLIB_FUNCTION_WEAKREF(EditView, _onDoneEditViewNative, this));
+		m_editViewNative->setFont(getFont());
+		m_windowEdit->addView(m_editViewNative);
+		m_windowEdit->create();
+		m_editViewNative->setFocus();
+#endif
+	}
+	
+	String EditView::_onChangeEditViewNative(EditView* ev, const String& text)
+	{
+		String _text = dispatchChange(text);
+		if (!m_flagMultiLine) {
+			sl_reg index = ParseUtil::indexOfLine(_text);
+			if (index >= 0) {
+				_text = _text.mid(0, index);
+			}
+		}
+		m_text = _text;
+		return _text;
+	}
+	
+	void EditView::_onReturnKeyEditViewNative(EditView* ev)
+	{
+		dispatchReturnKey();
+		if (!m_flagMultiLine) {
+			_onDoneEditViewNative(ev);
+		}
+	}
+	
+	void EditView::_onDoneEditViewNative(EditView* ev)
+	{
+		m_windowEdit->close();
+		MobileApp::getApp()->getMainWindow()->setVisible(sl_true);
+		m_windowEdit.setNull();
+		m_editViewNative.setNull();
+		invalidate();
+		dispatchDoneEdit();
+	}
+	
 	String EditView::onChange(const String& newValue)
 	{
 		return newValue;
@@ -233,7 +322,11 @@ namespace slib
 	void EditView::onReturnKey()
 	{
 	}
-
+	
+	void EditView::onDoneEdit()
+	{
+	}
+	
 	void EditView::dispatchKeyEvent(UIEvent* ev)
 	{
 		View::dispatchKeyEvent(ev);
@@ -268,6 +361,16 @@ namespace slib
 			listener->onReturnKey(this);
 		}
 		getOnReturnKey()(this);
+	}
+	
+	void EditView::dispatchDoneEdit()
+	{
+		onDoneEdit();
+		PtrLocker<IEditViewListener> listener(getListener());
+		if (listener.isNotNull()) {
+			listener->onDoneEdit(this);
+		}
+		getOnDoneEdit()(this);
 	}
 
 /**********************
@@ -351,6 +454,10 @@ namespace slib
 	}
 
 	void EditView::_setTextColor_NW(const Color& color)
+	{
+	}
+	
+	void EditView::_setHintTextColor_NW(const Color& color)
 	{
 	}
 

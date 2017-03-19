@@ -82,7 +82,22 @@ namespace slib
 	}
 	_Slib_iOS_GLView* view = m_view;
 	if (view != nil) {
-		if (view.superview != nil && view.hidden == NO && !(slib::MobileApp::isPaused())) {
+		BOOL flagVisible = NO;
+		UIView* viewCheck = view;
+		for (;;) {
+			if (viewCheck.hidden) {
+				break;
+			} else {
+				UIView* parent = viewCheck.superview;
+				if (parent == nil) {
+					flagVisible = YES;
+					break;
+				}
+				viewCheck = parent;
+			}
+		}
+		if (flagVisible && !(slib::MobileApp::isPaused())) {
+			
 			if (view->m_flagRenderingContinuously || view->m_flagRequestRender) {
 				view->m_flagRequestRender = sl_false;
 				sl_uint32 width = (sl_uint32)(view.frame.size.width * view.contentScaleFactor);

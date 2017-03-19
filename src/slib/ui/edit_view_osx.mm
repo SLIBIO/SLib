@@ -27,6 +27,9 @@
 	
 	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
 
+	
+	@public NSAttributedString* placeholderString;
+	
 }
 @end
 
@@ -35,8 +38,9 @@
 	@public _Slib_OSX_TextArea_TextView* textView;
 	
 	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
-	
+
 }
+
 @end
 
 namespace slib
@@ -45,13 +49,55 @@ namespace slib
 	class _EditView : public EditView
 	{
 	public:
+		void __applyPlaceholder(NSView* handle)
+		{
+			NSAttributedString* attr;
+			
+			String _text = m_hintText;
+			if (_text.isEmpty()) {
+				attr = nil;
+			} else {
+				NSString* text = Apple::getNSStringFromString(_text);
+				NSColor* color = GraphicsPlatform::getNSColorFromColor(m_hintTextColor);
+				NSMutableParagraphStyle* paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+				[paragraphStyle setAlignment:translateAlignment(m_textAlignment)];
+				NSFont* hFont = nil;
+				if ([handle isKindOfClass:[NSTextField class]]) {
+					NSTextField* tv = (NSTextField*)handle;
+					hFont = tv.font;
+				} else if ([handle isKindOfClass:[_Slib_OSX_TextArea class]]) {
+					_Slib_OSX_TextArea* tv = (_Slib_OSX_TextArea*)handle;
+					hFont = tv->textView.font;
+				}
+
+				if (hFont != nil) {
+					attr = [[NSAttributedString alloc] initWithString:text attributes:@{NSForegroundColorAttributeName: color, NSParagraphStyleAttributeName: paragraphStyle, NSFontAttributeName: hFont}];
+				} else {
+					attr = [[NSAttributedString alloc] initWithString:text attributes:@{NSForegroundColorAttributeName: color, NSParagraphStyleAttributeName: paragraphStyle}];
+				}
+			}
+			
+			if ([handle isKindOfClass:[NSTextField class]]) {
+				NSTextField* tv = (NSTextField*)handle;
+				if (attr != [[tv cell] placeholderAttributedString]) {
+					[[tv cell] setPlaceholderAttributedString:attr];
+				}
+			} else if ([handle isKindOfClass:[_Slib_OSX_TextArea class]]) {
+				_Slib_OSX_TextArea* tv = (_Slib_OSX_TextArea*)handle;
+				tv->textView->placeholderString = attr;
+				if (m_text.isEmpty() && attr != nil) {
+					[tv setNeedsDisplay:YES];
+				}
+			}
+		}
+
 		void __applyProperties(NSTextField* handle)
 		{
 			[handle setStringValue:(Apple::getNSStringFromString(m_text))];
 			[handle setAlignment:translateAlignment(m_textAlignment)];
 			[handle setBordered: (isBorder() ? TRUE : FALSE)];
 			[handle setBezeled: (isBorder() ? TRUE : FALSE)];
-			[[handle cell] setPlaceholderString:(Apple::getNSStringFromString(m_hintText))];
+			__applyPlaceholder(handle);
 			[handle setTextColor:(GraphicsPlatform::getNSColorFromColor(m_textColor))];
 			[handle setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
 			[handle setEditable:(m_flagReadOnly?FALSE:TRUE)];
@@ -70,6 +116,7 @@ namespace slib
 			[tv setString:(Apple::getNSStringFromString(m_text))];
 			[tv setAlignment:translateAlignment(m_textAlignment)];
 			[handle setBorderType:(isBorder() ? NSBezelBorder : NSNoBorder)];
+			__applyPlaceholder(handle);
 			[tv setTextColor:(GraphicsPlatform::getNSColorFromColor(m_textColor))];
 			[tv setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
 			[tv setEditable:(m_flagReadOnly?FALSE:TRUE)];
@@ -247,18 +294,22 @@ namespace slib
 				NSTextField* tv = (NSTextField*)handle;
 				if (UI::isUiThread()) {
 					[tv setAlignment:_EditView::translateAlignment(align)];
+					((_EditView*)this)->__applyPlaceholder(handle);
 				} else {
 					dispatch_async(dispatch_get_main_queue(), ^{
 						[tv setAlignment:_EditView::translateAlignment(align)];
+						((_EditView*)this)->__applyPlaceholder(handle);
 					});
 				}
 			} else if ([handle isKindOfClass:[_Slib_OSX_TextArea class]]) {
 				_Slib_OSX_TextArea* tv = (_Slib_OSX_TextArea*)handle;
 				if (UI::isUiThread()) {
 					[tv->textView setAlignment:_EditView::translateAlignment(align)];
+					((_EditView*)this)->__applyPlaceholder(handle);
 				} else {
 					dispatch_async(dispatch_get_main_queue(), ^{
 						[tv->textView setAlignment:_EditView::translateAlignment(align)];
+						((_EditView*)this)->__applyPlaceholder(handle);
 					});
 				}
 			}
@@ -268,20 +319,31 @@ namespace slib
 	void EditView::_setHintText_NW(const String& value)
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
-			NSTextField* tv = (NSTextField*)handle;
-			NSString* s = Apple::getNSStringFromString(value);
+		if (handle != nil) {
 			if (UI::isUiThread()) {
-				[[tv cell] setPlaceholderString:s];
+				((_EditView*)this)->__applyPlaceholder(handle);
 			} else {
 				dispatch_async(dispatch_get_main_queue(), ^{
-					[[tv cell] setPlaceholderString:s];
+					((_EditView*)this)->__applyPlaceholder(handle);
 				});
 			}
 		}
 	}
-
-
+	
+	void EditView::_setHintTextColor_NW(const Color& value)
+	{
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			if (UI::isUiThread()) {
+				((_EditView*)this)->__applyPlaceholder(handle);
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					((_EditView*)this)->__applyPlaceholder(handle);
+				});
+			}
+		}
+	}
+	
 	void EditView::_setReadOnly_NW(sl_bool flag)
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -379,9 +441,11 @@ namespace slib
 				if (hFont != nil) {
 					if (UI::isUiThread()) {
 						[tv setFont:hFont];
+						((_EditView*)this)->__applyPlaceholder(handle);
 					} else {
 						dispatch_async(dispatch_get_main_queue(), ^{
 							[tv setFont:hFont];
+							((_EditView*)this)->__applyPlaceholder(handle);
 						});
 					}
 				}
@@ -391,9 +455,11 @@ namespace slib
 				if (hFont != nil) {
 					if (UI::isUiThread()) {
 						[tv->textView setFont:hFont];
+						((_EditView*)this)->__applyPlaceholder(handle);
 					} else {
 						dispatch_async(dispatch_get_main_queue(), ^{
 							[tv->textView setFont:hFont];
+							((_EditView*)this)->__applyPlaceholder(handle);
 						});
 					}
 				}
@@ -527,6 +593,33 @@ namespace slib
 	}
 	[super keyUp:theEvent];
 }
+
+- (BOOL)becomeFirstResponder
+{
+	if (placeholderString != nil) {
+		[self setNeedsDisplay:YES];
+	}
+	return [super becomeFirstResponder];
+}
+
+- (BOOL)resignFirstResponder
+{
+	if (placeholderString != nil) {
+		[self setNeedsDisplay:YES];
+	}
+	return [super resignFirstResponder];
+}
+
+- (void)drawRect:(NSRect)rect
+{
+	[super drawRect:rect];
+	if (self->placeholderString != nil) {
+		if ([[self string] isEqualToString:@""] && self != [[self window] firstResponder]) {
+			[self->placeholderString drawInRect:[self bounds]];
+		}
+	}
+}
+
 @end
 
 #endif

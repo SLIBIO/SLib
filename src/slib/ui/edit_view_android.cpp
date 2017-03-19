@@ -27,17 +27,13 @@ namespace slib
 
 		SLIB_JNI_STATIC_METHOD(getText, "_getText", "(Landroid/view/View;)Ljava/lang/String;");
 		SLIB_JNI_STATIC_METHOD(setText, "_setText", "(Landroid/view/View;Ljava/lang/String;)Z");
-		SLIB_JNI_STATIC_METHOD(isBorder, "_isBorder", "(Landroid/view/View;)Z");
 		SLIB_JNI_STATIC_METHOD(setBorder, "_setBorder", "(Landroid/view/View;Z)Z");
-		SLIB_JNI_STATIC_METHOD(getAlignment, "_getAlignment", "(Landroid/view/View;)I");
 		SLIB_JNI_STATIC_METHOD(setAlignment, "_setAlignment", "(Landroid/view/View;I)Z");
-		SLIB_JNI_STATIC_METHOD(getHintText, "_getHintText", "(Landroid/view/View;)Ljava/lang/String;");
 		SLIB_JNI_STATIC_METHOD(setHintText, "_setHintText", "(Landroid/view/View;Ljava/lang/String;)Z");
-		SLIB_JNI_STATIC_METHOD(isReadOnly, "_isReadOnly", "(Landroid/view/View;)Z");
 		SLIB_JNI_STATIC_METHOD(setReadOnly, "_setReadOnly", "(Landroid/view/View;Z)Z");
-		SLIB_JNI_STATIC_METHOD(isMultiLine, "_isMultiLine", "(Landroid/view/View;)Z");
 		SLIB_JNI_STATIC_METHOD(setMultiLine, "_setMultiLine", "(Landroid/view/View;Z)Z");
 		SLIB_JNI_STATIC_METHOD(setTextColor, "_setTextColor", "(Landroid/view/View;I)Z");
+		SLIB_JNI_STATIC_METHOD(setHintTextColor, "_setHintTextColor", "(Landroid/view/View;I)Z");
 		SLIB_JNI_STATIC_METHOD(setBackgroundColor, "_setBackgroundColor", "(Landroid/view/View;I)Z");
 		SLIB_JNI_STATIC_METHOD(setFont, "_setFont", "(Landroid/view/View;Lslib/platform/android/ui/UiFont;)Z");
 		SLIB_JNI_STATIC_METHOD(setReturnKeyType, "_setReturnKeyType", "(Landroid/view/View;I)Z");
@@ -61,6 +57,7 @@ namespace slib
 			_JAndroidEditView::setReadOnly.callBoolean(sl_null, handle, m_flagReadOnly);
 			_JAndroidEditView::setMultiLine.callBoolean(sl_null, handle, m_flagMultiLine);
 			_JAndroidEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
+			_JAndroidEditView::setHintTextColor.callBoolean(sl_null, handle, m_hintTextColor.getARGB());
 			_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
 			Ref<Font> font = getFont();
 			jobject jfont = GraphicsPlatform::getNativeFont(font.get());
@@ -180,6 +177,14 @@ namespace slib
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			_JAndroidEditView::setTextColor.callBoolean(sl_null, handle, color.getARGB());
+		}
+	}
+
+	void EditView::_setHintTextColor_NW(const Color& color)
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			_JAndroidEditView::setHintTextColor.callBoolean(sl_null, handle, color.getARGB());
 		}
 	}
 

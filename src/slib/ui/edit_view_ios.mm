@@ -22,7 +22,7 @@
 @property (nonatomic, retain) UIColor *placeholderColor;
 @property (nonatomic, retain) UILabel *placeHolderLabel;
 
--(void) setHintText:(NSString*) hintText;
+-(void) refreshPlaceholder;
 
 @end
 
@@ -114,9 +114,30 @@ namespace slib
 	toolbar.barTintColor = [UIColor colorWithRed:181.0/255 green:187.0/255 blue:193.0/255 alpha:1];\
 	UIBarButtonItem *flex = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:handle action:nil];\
 	UIBarButtonItem* barButtonDone;\
-	barButtonDone = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:handle action:@selector(resignFirstResponder)];\
+	barButtonDone = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:handle action:@selector(_onDoneEdit)];\
 	toolbar.items = [NSArray arrayWithObjects:flex, flex, barButtonDone, nil];\
 	handle.inputAccessoryView = toolbar;
+		
+		void applyPlaceholder(UITextField* handle)
+		{
+			NSAttributedString* attr;
+			String _text = m_hintText;
+			if (_text.isEmpty()) {
+				attr = nil;
+			} else {
+				NSString* text = Apple::getNSStringFromString(_text);
+				UIColor* color = GraphicsPlatform::getUIColorFromColor(m_hintTextColor);
+				NSMutableParagraphStyle* paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+				[paragraphStyle setAlignment:translateAlignment(m_textAlignment)];
+				UIFont* hFont = handle.font;
+				if (hFont != nil) {
+					attr = [[NSAttributedString alloc] initWithString:text attributes:@{NSForegroundColorAttributeName: color, NSParagraphStyleAttributeName: paragraphStyle, NSFontAttributeName: hFont}];
+				} else {
+					attr = [[NSAttributedString alloc] initWithString:text attributes:@{NSForegroundColorAttributeName: color, NSParagraphStyleAttributeName: paragraphStyle}];
+				}
+			}
+			[handle setAttributedPlaceholder: attr];
+		}
 		
 		void applyProperties(UITextField* handle)
 		{
@@ -132,7 +153,7 @@ namespace slib
 			[handle setText:(Apple::getNSStringFromString(m_text))];
 			[handle setTextAlignment:translateAlignment(m_textAlignment)];
 			[handle setBorderStyle:(isBorder()?UITextBorderStyleBezel:UITextBorderStyleNone)];
-			[handle setPlaceholder:(Apple::getNSStringFromString(m_hintText))];
+			applyPlaceholder(handle);
 			[handle setTextColor:(GraphicsPlatform::getUIColorFromColor(m_textColor))];
 			[handle setBackgroundColor:(GraphicsPlatform::getUIColorFromColor(getBackgroundColor()))];
 			[handle setEnabled:(m_flagReadOnly ? NO : YES)];
@@ -168,6 +189,8 @@ namespace slib
 			[handle setBackgroundColor:(GraphicsPlatform::getUIColorFromColor(getBackgroundColor()))];
 			[handle setEditable:(m_flagReadOnly?FALSE:TRUE)];
 			[handle setPlaceholder:(Apple::getNSStringFromString(m_hintText))];
+			[handle setPlaceholderColor:(GraphicsPlatform::getUIColorFromColor(m_hintTextColor))];
+			[handle refreshPlaceholder];
 			[handle setSelectable:TRUE];
 			Ref<Font> font = getFont();
 			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
@@ -237,6 +260,15 @@ namespace slib
 				}
 			}
 		}
+		
+		static void onDoneEdit(iOS_ViewInstance* instance)
+		{
+			Ref<View> _view = instance->getView();
+			if (_EditView* view = CastInstance<_EditView>(_view.get())) {
+				view->dispatchDoneEdit();
+			}
+		}
+
 	};
 	
 	Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* _parent)
@@ -354,6 +386,7 @@ namespace slib
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
 				[tv setTextAlignment:_EditView::translateAlignment(align)];
+				((_EditView*)this)->applyPlaceholder(tv);
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
 				[tv setTextAlignment:_EditView::translateAlignment(align)];
@@ -375,16 +408,39 @@ namespace slib
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
-				NSString* s = Apple::getNSStringFromString(value);
-				[tv setPlaceholder:s];
+				((_EditView*)this)->applyPlaceholder(tv);
 			} else if ([handle isKindOfClass:[_Slib_iOS_TextArea class]]) {
 				_Slib_iOS_TextArea* tv = (_Slib_iOS_TextArea*)handle;
 				NSString* s = Apple::getNSStringFromString(value);
-				[tv setHintText:s];
+				[tv setPlaceholder:s];
+				[tv refreshPlaceholder];
 			}
 		}
 	}
 	
+	void EditView::_setHintTextColor_NW(const Color& value)
+	{
+		if (![NSThread isMainThread]) {
+			Color _value = value;
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_setHintTextColor_NW(_value);
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			if ([handle isKindOfClass:[UITextField class]]) {
+				UITextField* tv = (UITextField*)handle;
+				((_EditView*)this)->applyPlaceholder(tv);
+			} else if ([handle isKindOfClass:[_Slib_iOS_TextArea class]]) {
+				_Slib_iOS_TextArea* tv = (_Slib_iOS_TextArea*)handle;
+				[tv setPlaceholderColor:(GraphicsPlatform::getUIColorFromColor(value))];
+				[tv refreshPlaceholder];
+			}
+		}
+	}
+
 	void EditView::_setReadOnly_NW(sl_bool flag)
 	{
 		if (![NSThread isMainThread]) {
@@ -471,6 +527,7 @@ namespace slib
 				UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
 				if (hFont != nil) {
 					[tv setFont:hFont];
+					((_EditView*)this)->applyPlaceholder(tv);
 				}
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
@@ -577,6 +634,15 @@ namespace slib
 	return NO;
 }
 
+-(void)_onDoneEdit
+{
+	[self resignFirstResponder];
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		slib::_EditView::onDoneEdit(instance.get());
+	}
+}
+
 @end
 
 @implementation _Slib_iOS_TextArea
@@ -592,19 +658,7 @@ namespace slib
 	}
 	return self;
 }
--(void) dealloc
-{
-	
-}
--(void)keyboardWillShow
-{
-	
-}
--(void) setHintText:(NSString *)hintText
-{
-	[self setPlaceholder:hintText];
-	[self refreshPlaceholder];
-}
+
 -(void) refreshPlaceholder {
 	if( [[self placeholder] length] > 0 ) {
 		if (_placeHolderLabel == nil ) {
@@ -633,6 +687,7 @@ namespace slib
 		[[self placeHolderLabel] setAlpha:0.f];
 	}
 }
+
 -(void)textViewDidChange:(UITextView *)textView
 {
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
@@ -651,11 +706,33 @@ namespace slib
 	}
 }
 
+- (void)insertText:(NSString *)text
+{
+	[super insertText:text];
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		if ([text isEqualToString:@"\n"]) {
+			slib::_EditView::onEnterAction(instance.get(), nil, self);
+		}
+	}
+}
+
 - (void)drawRect:(CGRect)rect
 {
 	[self refreshPlaceholder];
 	[super drawRect:rect];
 }
+
+
+-(void)_onDoneEdit
+{
+	[self resignFirstResponder];
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		slib::_EditView::onDoneEdit(instance.get());
+	}
+}
+
 @end
 
 #endif
