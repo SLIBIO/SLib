@@ -863,7 +863,7 @@ namespace slib
 			if (index >= 0) {
 				children.removeAt_NoLock(index);
 				children.add_NoLock(this);
-				m_childrenCache.setNull();
+				parent->m_childrenCache.setNull();
 				if (instance.isNull()) {
 					if (mode == UIUpdateMode::Redraw) {
 						invalidateBoundsInParent();

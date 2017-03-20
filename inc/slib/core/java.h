@@ -25,11 +25,7 @@
 #include "string.h"
 #include "map.h"
 
-#if defined(SLIB_PLATFORM_IS_ANDROID)
 #include <jni.h>
-#elif defined(SLIB_PLATFORM_IS_WIN32)
-#include "../../thirdparty/jni/win32/jni.h"
-#endif
 
 namespace slib
 {

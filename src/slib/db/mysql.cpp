@@ -12,8 +12,8 @@
 
 #if defined(SLIB_DATABASE_SUPPORT_MYSQL)
 
-#include "../../../inc/thirdparty/mysql-connector/mysql.h"
-#include "../../../inc/thirdparty/mysql-connector/errmsg.h"
+#include "../../../inc/thirdparty/mariadb-connector/mysql.h"
+#include "../../../inc/thirdparty/mariadb-connector/errmsg.h"
 
 #include "../../../inc/slib/core/thread.h"
 #include "../../../inc/slib/core/scoped.h"
@@ -120,7 +120,7 @@ namespace slib
 
 			initThread();
 
-			MYSQL* mysql = ::mysql_init(NULL);
+			MYSQL* mysql = ::mysql_init(sl_null);
 
 			if (mysql) {
 
@@ -134,7 +134,7 @@ namespace slib
 					flags |= CLIENT_MULTI_STATEMENTS;
 				}
 
-				if (::mysql_real_connect(mysql, host.getData(), user.getData(), password.getData(), db.getData(), param.port, NULL, flags)) {
+				if (::mysql_real_connect(mysql, host.getData(), user.getData(), password.getData(), db.getData(), param.port, sl_null, flags)) {
 
 					::mysql_set_character_set(mysql, "utf8");
 					::mysql_autocommit(mysql, 1);
@@ -210,8 +210,8 @@ namespace slib
 				m_nColumnNames = (sl_uint32)(m_listColumnNames.getCount());
 				m_columnNames = m_listColumnNames.getData();
 
-				m_row = NULL;
-				m_lengths = NULL;
+				m_row = sl_null;
+				m_lengths = sl_null;
 
 				db->lock();
 			}
@@ -906,7 +906,7 @@ namespace slib
 				m_db = db;
 				m_sql = sql;
 				m_mysql = db->m_mysql;
-				m_statement = NULL;
+				m_statement = sl_null;
 			}
 
 			~_DatabaseStatement()
@@ -935,7 +935,7 @@ namespace slib
 				ObjectLocker lock(m_db.get());
 				if (m_statement) {
 					::mysql_stmt_close(m_statement);
-					m_statement = NULL;
+					m_statement = sl_null;
 				}
 			}
 
@@ -1134,9 +1134,6 @@ namespace slib
 									case MYSQL_TYPE_DATETIME:
 									case MYSQL_TYPE_TIMESTAMP:
 									case MYSQL_TYPE_NEWDATE:
-									case MYSQL_TYPE_TIMESTAMP2:
-									case MYSQL_TYPE_DATETIME2:
-									case MYSQL_TYPE_TIME2:
 										bind[i].buffer_type = MYSQL_TYPE_DATETIME;
 										bind[i].buffer = &(fds[i].time);
 										bind[i].buffer_length = sizeof(MYSQL_TIME);

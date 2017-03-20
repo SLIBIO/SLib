@@ -86,7 +86,6 @@
 		266DD3DE1C1181B500D47AB0 /* nat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C41C1181B500D47AB0 /* nat.cpp */; };
 		266DD3DF1C1181B500D47AB0 /* net_capture_pcap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C51C1181B500D47AB0 /* net_capture_pcap.cpp */; };
 		266DD3E01C1181B500D47AB0 /* net_capture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C61C1181B500D47AB0 /* net_capture.cpp */; };
-		266DD3E11C1181B500D47AB0 /* netfilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C71C1181B500D47AB0 /* netfilter.cpp */; };
 		266DD3E21C1181B500D47AB0 /* network_async_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C91C1181B500D47AB0 /* network_async_unix.cpp */; };
 		266DD3E41C1181B500D47AB0 /* network_async.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CB1C1181B500D47AB0 /* network_async.cpp */; };
 		266DD3E51C1181B500D47AB0 /* network_os.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CC1C1181B500D47AB0 /* network_os.cpp */; };
@@ -350,7 +349,6 @@
 		266DD3C41C1181B500D47AB0 /* nat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = nat.cpp; sourceTree = "<group>"; };
 		266DD3C51C1181B500D47AB0 /* net_capture_pcap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = net_capture_pcap.cpp; sourceTree = "<group>"; };
 		266DD3C61C1181B500D47AB0 /* net_capture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = net_capture.cpp; sourceTree = "<group>"; };
-		266DD3C71C1181B500D47AB0 /* netfilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = netfilter.cpp; sourceTree = "<group>"; };
 		266DD3C91C1181B500D47AB0 /* network_async_unix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_async_unix.cpp; sourceTree = "<group>"; };
 		266DD3CB1C1181B500D47AB0 /* network_async.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_async.cpp; sourceTree = "<group>"; };
 		266DD3CC1C1181B500D47AB0 /* network_os.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_os.cpp; sourceTree = "<group>"; };
@@ -808,7 +806,6 @@
 				266DD3C41C1181B500D47AB0 /* nat.cpp */,
 				266DD3C51C1181B500D47AB0 /* net_capture_pcap.cpp */,
 				266DD3C61C1181B500D47AB0 /* net_capture.cpp */,
-				266DD3C71C1181B500D47AB0 /* netfilter.cpp */,
 				26E5E6EC1E4CDD5500020156 /* network_async.h */,
 				266DD3C91C1181B500D47AB0 /* network_async_unix.cpp */,
 				266DD3CB1C1181B500D47AB0 /* network_async.cpp */,
@@ -1131,7 +1128,6 @@
 				26B571701C9D44720099E69B /* plane.cpp in Sources */,
 				266DD3D51C1181B500D47AB0 /* dns.cpp in Sources */,
 				266DD39E1C117AE300D47AB0 /* canvas.cpp in Sources */,
-				266DD3E11C1181B500D47AB0 /* netfilter.cpp in Sources */,
 				2648D54E1D098AE800819E09 /* ui_platform.cpp in Sources */,
 				26B5717B1C9D44720099E69B /* view_frustum.cpp in Sources */,
 				26B5716E1C9D44720099E69B /* matrix3.cpp in Sources */,

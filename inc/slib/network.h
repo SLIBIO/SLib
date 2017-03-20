@@ -22,7 +22,6 @@
 #include "network/async.h"
 #include "network/io.h"
 #include "network/event.h"
-#include "network/netfilter.h"
 #include "network/capture.h"
 
 #include "network/tcpip.h"

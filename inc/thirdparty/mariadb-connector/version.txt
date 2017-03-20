@@ -1,0 +1,1 @@
+mariadb connector 2.3.2
