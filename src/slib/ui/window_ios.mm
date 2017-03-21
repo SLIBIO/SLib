@@ -103,13 +103,25 @@ namespace slib
 			rect.origin.y = (CGFloat)(_rect.top) / f;
 			rect.size.width = (CGFloat)(_rect.getWidth()) / f;
 			rect.size.height = (CGFloat)(_rect.getHeight()) / f;
-			_slib_iOS_Window* window = [[_slib_iOS_Window alloc] initWithFrame:rect];
+			
+			_slib_iOS_Window* window;
+			sl_bool flagMainWindow = sl_false;
+			static sl_bool flagFirstWindow = sl_true;
+			if (flagFirstWindow) {
+				window = UIPlatform::getMainWindow();
+				flagFirstWindow = sl_false;
+				flagMainWindow = sl_true;
+			} else {
+				window = [[_slib_iOS_Window alloc] initWithFrame:rect];
+			}
 			if (window != nil) {
 				UIScreen* screen = UIPlatform::getScreenHandle(_screen.get());
 				if (screen != nil) {
 					window.screen = screen;
 				}
-				window.windowLevel = UIWindowLevelNormal + 1;
+				if (!flagMainWindow) {
+					window.windowLevel = UIWindowLevelNormal + 1;
+				}
 				_slib_iOS_Window_RootViewController* controller = [[_slib_iOS_Window_RootViewController alloc] init];
 				if (controller != nil) {
 					Slib_iOS_ViewHandle* view = [[Slib_iOS_ViewHandle alloc] init];
