@@ -20,7 +20,7 @@ SQLite, MySQL
 
 - device
 
-Sensor, Vibraotr
+Sensor, Vibrator
 
 
 - graphics
