@@ -141,6 +141,13 @@ namespace slib
 		
 		static void openUrl(const String& url);
 
+
+#if defined(SLIB_PLATFORM_IS_TIZEN)
+		static List<int> getAvailableScreenOrientations();
+
+		static void setAvailableScreenOrientations(const List<int>& orientations);
+#endif
+
 	};
 
 }

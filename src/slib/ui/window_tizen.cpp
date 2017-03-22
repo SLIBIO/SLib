@@ -13,6 +13,7 @@
 #if defined(SLIB_PLATFORM_IS_TIZEN)
 
 #include "../../../inc/slib/ui/window.h"
+
 #include "../../../inc/slib/ui/view.h"
 #include "../../../inc/slib/ui/screen.h"
 #include "../../../inc/slib/ui/core.h"
@@ -72,6 +73,7 @@ namespace slib
 
 					Base::interlockedIncrement32(&_ui_active_windows_count);
 					::evas_object_smart_callback_add(window, "delete,request", _ui_win_delete_request_cb, sl_null);
+					::evas_object_smart_callback_add(window, "wm,rotation,changed", _ui_win_rotate_cb, NULL);
 					::eext_object_event_callback_add(window, EEXT_CALLBACK_BACK, _ui_win_back_cb, sl_null);
 
 					::evas_object_show(window);
@@ -103,6 +105,15 @@ namespace slib
 			}
 		}
 
+		static void _ui_win_rotate_cb(void* data, Evas_Object* win, void* event_info)
+		{
+			Ref<WindowInstance> instance = UIPlatform::getWindowInstance(win);
+			if (instance.isNotNull()) {
+				UISize size = UI::getScreenSize();
+				instance->onResize(size.x, size.y);
+			}
+		}
+
 		static void _ui_win_back_cb(void* data, Evas_Object* win, void* event_info)
 		{
 			if (MobileApp::dispatchBackToApp()) {
@@ -114,6 +125,13 @@ namespace slib
 		{
 			Evas_Object* win = ::elm_win_util_standard_add("", "");
 			if (win) {
+
+				List<int> orientations = UI::getAvailableScreenOrientations();
+				if (orientations.isNotNull()) {
+					if (::elm_win_wm_rotation_supported_get(win)) {
+						::elm_win_wm_rotation_available_rotations_set(win, orientations.getData(), (unsigned int)(orientations.getCount()));
+					}
+				}
 
 				if (!(param.flagFullScreen)) {
 					UIRect screenFrame;

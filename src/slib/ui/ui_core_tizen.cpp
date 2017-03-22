@@ -60,11 +60,30 @@ namespace slib
 		// override
 		UIRect getRegion()
 		{
+			int rotation = 0;
+
+			Evas_Object* win = UIPlatform::getMainWindow();
+			if (win) {
+				rotation = ::elm_win_rotation_get(win);
+			}
+
+			List<int> orientations = UI::getAvailableScreenOrientations();
+			if(orientations.getCount() > 0) {
+				if(orientations.indexOf(rotation) == -1) {
+					rotation = orientations.getValueAt(0);
+				}
+			}
+
 			UIRect ret;
 			ret.left = 0;
 			ret.top = 0;
-			ret.right = (sl_ui_pos)m_width;
-			ret.bottom = (sl_ui_pos)m_height;
+			if (rotation == 90 || rotation == 270) {
+				ret.right = (sl_ui_pos)m_height;
+				ret.bottom = (sl_ui_pos)m_width;
+			} else {
+				ret.right = (sl_ui_pos)m_width;
+				ret.bottom = (sl_ui_pos)m_height;
+			}
 			return ret;
 		}
 	};
