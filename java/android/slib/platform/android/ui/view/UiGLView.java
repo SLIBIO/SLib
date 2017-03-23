@@ -97,13 +97,11 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 	}
 	
 	public boolean onKeyDown(int keycode, KeyEvent event) {
-		UiView.onEventKey(this, true, keycode, event);
-		return true;
+		return UiView.onEventKey(this, true, keycode, event);
 	}
 	
 	public boolean onKeyUp(int keycode, KeyEvent event) {
-		UiView.onEventKey(this, false, keycode, event);
-		return true;
+		return UiView.onEventKey(this, false, keycode, event);
 	}
 	
 	@SuppressLint("ClickableViewAccessibility")

@@ -40,13 +40,11 @@ public class UiGroupView extends AbsoluteLayout implements IView {
 	}
 
 	public boolean onKeyDown(int keycode, KeyEvent event) {
-		UiView.onEventKey(this, true, keycode, event);
-		return true;
+		return UiView.onEventKey(this, true, keycode, event);
 	}
 	
 	public boolean onKeyUp(int keycode, KeyEvent event) {
-		UiView.onEventKey(this, false, keycode, event);
-		return true;
+		return UiView.onEventKey(this, false, keycode, event);
 	}
 	
 	public boolean onInterceptTouchEvent(MotionEvent event) {

@@ -12,20 +12,16 @@ package slib.platform.android.device;
 
 import slib.platform.android.Logger;
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Point;
 import android.os.Build;
-import android.telephony.TelephonyManager;
+import android.provider.Settings.Secure;
 import android.util.DisplayMetrics;
 
 public class DeviceInformation {
-	/*
-		this class need permission "android.permission.VIBRATE"
-	 */
+
 	public static String getDeviceId(Activity context) {
 		try {
-			TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-			return telephonyManager.getDeviceId();
+			return Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
 		} catch (Throwable e) {
 			Logger.exception(e);
 		}

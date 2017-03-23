@@ -87,7 +87,9 @@ public class UiView {
 					}
 				});
 			} else {
-				view.requestFocus();				
+				view.setFocusable(true);
+				view.setFocusableInTouchMode(true);
+				view.requestFocus();
 			}
 		} catch (Exception e) {
 			Logger.exception(e);
@@ -463,8 +465,9 @@ public class UiView {
 	public static boolean onEventKey(IView view, boolean flagDown, int keycode, KeyEvent event) {
 		long instance = view.getInstance();
 		if (instance != 0) {
+			boolean ret;
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				return nativeOnKeyEvent(
+				ret = nativeOnKeyEvent(
 						instance,
 						flagDown, keycode,
 						event.isCtrlPressed(),
@@ -474,7 +477,7 @@ public class UiView {
 						event.getEventTime()
 				);
 			} else {
-				return nativeOnKeyEvent(
+				ret = nativeOnKeyEvent(
 						instance,
 						flagDown,
 						keycode,
@@ -485,6 +488,7 @@ public class UiView {
 						event.getEventTime()
 				);
 			}
+			return ret;
 		}
 		return true;
 	}

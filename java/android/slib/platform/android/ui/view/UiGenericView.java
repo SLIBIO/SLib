@@ -40,14 +40,12 @@ public class UiGenericView extends View implements IView {
 
 	@Override
 	public boolean onKeyDown(int keycode, KeyEvent event) {
-		UiView.onEventKey(this, true, keycode, event);
-		return true;
+		return UiView.onEventKey(this, true, keycode, event);
 	}
 
 	@Override
 	public boolean onKeyUp(int keycode, KeyEvent event) {
-		UiView.onEventKey(this, false, keycode, event);
-		return true;
+		return UiView.onEventKey(this, false, keycode, event);
 	}
 
 	@Override
