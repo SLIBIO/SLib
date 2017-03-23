@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{7f6d0bbb-5741-46f5-8c8d-4b4e11248c64}</UniqueIdentifier>
     </Filter>
@@ -358,9 +354,6 @@
     <ClInclude Include="..\..\..\inc\slib\network\nat.h">
       <Filter>inc\network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\netfilter.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\network\os.h">
       <Filter>inc\network</Filter>
     </ClInclude>
@@ -604,7 +597,6 @@
     <ClInclude Include="..\..\..\inc\slib\map\geo_location.h">
       <Filter>inc\map</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h" />
     <ClInclude Include="..\..\..\inc\slib\core\spin_lock.h">
       <Filter>inc\core</Filter>
     </ClInclude>
@@ -1165,9 +1157,6 @@
     <ClCompile Include="..\..\..\src\slib\network\net_capture_pcap.cpp">
       <Filter>src\slib\network</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\netfilter.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\network\network_async.cpp">
       <Filter>src\slib\network</Filter>
     </ClCompile>
@@ -1669,10 +1658,5 @@
     <ClCompile Include="..\..\..\src\slib\crypto\blowfish.cpp">
       <Filter>src\slib\crypto</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="slib.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
   </ItemGroup>
 </Project>

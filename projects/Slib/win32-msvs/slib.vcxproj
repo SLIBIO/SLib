@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -208,7 +208,6 @@
     <ClInclude Include="..\..\..\inc\slib\network\ip_address.h" />
     <ClInclude Include="..\..\..\inc\slib\network\mac_address.h" />
     <ClInclude Include="..\..\..\inc\slib\network\nat.h" />
-    <ClInclude Include="..\..\..\inc\slib\network\netfilter.h" />
     <ClInclude Include="..\..\..\inc\slib\network\os.h" />
     <ClInclude Include="..\..\..\inc\slib\network\socket.h" />
     <ClInclude Include="..\..\..\inc\slib\network\socket_address.h" />
@@ -288,7 +287,6 @@
     <ClInclude Include="..\..\..\src\slib\ui\ui_core_common.h" />
     <ClInclude Include="..\..\..\src\slib\ui\ui_core_win32.h" />
     <ClInclude Include="..\..\..\src\slib\ui\view_win32.h" />
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\animation.cpp" />
@@ -449,7 +447,6 @@
     <ClCompile Include="..\..\..\src\slib\network\ip_address.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\mac_address.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\nat.cpp" />
-    <ClCompile Include="..\..\..\src\slib\network\netfilter.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\network_async.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\network_async_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\network_io.cpp" />
@@ -671,9 +668,6 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="slib.rc" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -684,26 +678,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>

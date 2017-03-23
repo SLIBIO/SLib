@@ -10,7 +10,7 @@
 
 package slib.platform.android.ui.view;
 
-import com.slib.R;
+import io.slib.R;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.TypedValue;

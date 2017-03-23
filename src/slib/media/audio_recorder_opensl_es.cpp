@@ -230,7 +230,6 @@ namespace slib
 
 		sl_bool onFrame()
 		{
-			sl_int32 currentIndexBuffer = m_indexBuffer;
 			m_indexBuffer = (m_indexBuffer + 1) % 2;
 			if ((*m_bufferQueue)->Enqueue(m_bufferQueue, m_bufFrame + m_indexBuffer * m_nSamplesFrame, m_nSamplesFrame * sizeof(sl_int16)) == SL_RESULT_SUCCESS) {
 				sl_int16* s = m_bufFrame + m_indexBuffer * m_nSamplesFrame;

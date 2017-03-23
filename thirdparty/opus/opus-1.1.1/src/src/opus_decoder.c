@@ -34,7 +34,7 @@
 #endif
 
 #if defined(__GNUC__) && (__GNUC__ >= 2) && !defined(__OPTIMIZE__) && !defined(OPUS_WILL_BE_SLOW)
-# pragma message "You appear to be compiling without optimization, if so opus will be very slow."
+//# pragma message "You appear to be compiling without optimization, if so opus will be very slow."
 #endif
 
 #include <stdarg.h>
