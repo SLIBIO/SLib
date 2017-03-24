@@ -199,8 +199,10 @@ public class UrlRequest {
 		close();
 		if (e != null) {
 			Logger.exception(e);
+			onError(e.getLocalizedMessage());
+		} else {
+			onError("Unknown Error");			
 		}
-		onError();
 	}
 
 	private native void nativeOnInit(long instance);
@@ -233,9 +235,9 @@ public class UrlRequest {
 		nativeOnComplete(instance);
 	}
 
-	private native void nativeOnError(long instance);
-	protected void onError() {
-		nativeOnError(instance);
+	private native void nativeOnError(long instance, String errorMessage);
+	protected void onError(String errorMessage) {
+		nativeOnError(instance, errorMessage);
 	}
 
 }

@@ -15,11 +15,12 @@
 #include "../../../inc/slib/network/url_request.h"
 
 #include "../../../inc/slib/core/safe_static.h"
+#include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/platform_apple.h"
 
 namespace slib
 {
-	class _UrlRequest;
+	class UrlRequest_Impl;
 }
 
 @interface _Slib_UrlRequestListener : NSObject<NSURLSessionTaskDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate> {
@@ -29,7 +30,7 @@ namespace slib
 namespace slib
 {
 
-	class _UrlRequestShared
+	class UrlRequest_Shared
 	{
 	public:
 		NSURLSession* defaultSession;
@@ -37,10 +38,10 @@ namespace slib
 		_Slib_UrlRequestListener* listener;
 		NSOperationQueue* operationQueue;
 		NSFileManager* fileManager;
-		HashMap< NSUInteger, WeakRef<_UrlRequest> > requests;
+		HashMap< NSUInteger, WeakRef<UrlRequest_Impl> > requests;
 		
 	public:
-		_UrlRequestShared()
+		UrlRequest_Shared()
 		{
 			operationQueue = [[NSOperationQueue alloc] init];
 			listener = [[_Slib_UrlRequestListener alloc] init];
@@ -59,29 +60,29 @@ namespace slib
 		
 	};
 	
-	SLIB_SAFE_STATIC_GETTER(_UrlRequestShared, _getUrlRequestShared)
+	SLIB_SAFE_STATIC_GETTER(UrlRequest_Shared, Get_UrlRequestShared)
 	
-	class _UrlRequest : public UrlRequest
+	class UrlRequest_Impl : public UrlRequest
 	{
 	public:
 		NSURLSessionTask* m_task;
 		NSUInteger m_taskId;
 		
 	public:
-		_UrlRequest()
+		UrlRequest_Impl()
 		{
 			m_task = nil;
 			m_taskId = -1;
 		}
 		
-		~_UrlRequest()
+		~UrlRequest_Impl()
 		{
 			clean();
 		}
 		
-		static Ref<_UrlRequest> create(const UrlRequestParam& param, const String& _url, const String& downloadFilePath)
+		static Ref<UrlRequest_Impl> create(const UrlRequestParam& param, const String& _url)
 		{
-			_UrlRequestShared* shared = _getUrlRequestShared();
+			UrlRequest_Shared* shared = Get_UrlRequestShared();
 			if (shared) {
 				NSURLSession* session;
 				if (param.flagUseBackgroundSession) {
@@ -110,7 +111,7 @@ namespace slib
 							}
 						}
 						NSURLSessionTask* task;
-						if (downloadFilePath.isNotEmpty()) {
+						if (param.downloadFilePath.isNotEmpty()) {
 							task = [session downloadTaskWithRequest:req];
 						} else {
 							if (param.requestBody.isNotEmpty()) {
@@ -122,14 +123,13 @@ namespace slib
 							}
 						}
 						if (task != nil) {
-							Ref<_UrlRequest> ret = new _UrlRequest;
+							Ref<UrlRequest_Impl> ret = new UrlRequest_Impl;
 							if (ret.isNotNull()) {
-								ret->_init(param, _url, downloadFilePath);
+								ret->_init(param, _url);
 								ret->m_task = task;
 								NSUInteger taskId = task.taskIdentifier;
 								ret->m_taskId = taskId;
 								shared->requests.put(taskId, ret);
-								[task resume];
 								return ret;
 							}
 						}
@@ -139,6 +139,12 @@ namespace slib
 			return sl_null;
 		}
 		
+		// override
+		void _sendAsync()
+		{
+			[m_task resume];
+		}
+	
 		// override
 		void _cancel()
 		{
@@ -150,19 +156,19 @@ namespace slib
 			if (m_task != nil) {
 				[m_task cancel];
 				m_task = nil;
-				_UrlRequestShared* shared = _getUrlRequestShared();
+				UrlRequest_Shared* shared = Get_UrlRequestShared();
 				if (shared) {
 					shared->requests.remove(m_taskId);
 				}
 			}
 		}
 		
-		static Ref<_UrlRequest> fromTask(NSURLSessionTask* task)
+		static Ref<UrlRequest_Impl> fromTask(NSURLSessionTask* task)
 		{
-			_UrlRequestShared* shared = _getUrlRequestShared();
+			UrlRequest_Shared* shared = Get_UrlRequestShared();
 			if (shared) {
 				NSUInteger taskId = [task taskIdentifier];
-				return shared->requests.getValue(taskId, WeakRef<_UrlRequest>::null());
+				return shared->requests.getValue(taskId, WeakRef<UrlRequest_Impl>::null());
 			}
 			return sl_null;
 		}
@@ -217,7 +223,7 @@ namespace slib
 		
 		void dispatchFinishDownload(NSURL* pathTempFile)
 		{
-			_UrlRequestShared* shared = _getUrlRequestShared();
+			UrlRequest_Shared* shared = Get_UrlRequestShared();
 			if (shared) {
 				NSError* error = nil;
 				NSURL* pathDst = [NSURL fileURLWithPath:Apple::getNSStringFromString(m_downloadFilePath)];
@@ -225,9 +231,14 @@ namespace slib
 				if ([shared->fileManager moveItemAtURL:pathTempFile toURL:pathDst error:&error]) {
 					onComplete();
 				} else {
+					String strError;
 					if (error != nil) {
-						NSLog(@"UrlRequest Error: %@", error.localizedDescription);
+						strError = Apple::getStringFromNSString(error.localizedDescription);
+					} else {
+						strError = String::format("Moving downloaded file failed: %s=>%s", Apple::getStringFromNSString(pathTempFile.absoluteString), m_downloadFilePath);
 					}
+					LogError("UrlRequest", "Error: %s", strError);
+					m_lastErrorMessage = strError;
 					onError();
 				}
 			}
@@ -236,7 +247,9 @@ namespace slib
 		void dispatchComplete(NSError* error)
 		{
 			if (error != nil) {
-				NSLog(@"UrlRequest Error: %@", error.localizedDescription);
+				String strError = Apple::getStringFromNSString(error.localizedDescription);
+				LogError("UrlRequest", "Error: %s", strError);
+				m_lastErrorMessage = strError;
 				onError();
 			} else {
 				onComplete();
@@ -245,9 +258,9 @@ namespace slib
 		
 	};
 	
-	Ref<UrlRequest> UrlRequest::_create(const UrlRequestParam& param, const String& url, const String& downloadFilePath)
+	Ref<UrlRequest> UrlRequest::_create(const UrlRequestParam& param, const String& url)
 	{
-		return Ref<UrlRequest>::from(_UrlRequest::create(param, url, downloadFilePath));
+		return Ref<UrlRequest>::from(UrlRequest_Impl::create(param, url));
 	}
 	
 }
@@ -256,7 +269,7 @@ namespace slib
 
 -(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didSendBodyData:(int64_t)bytesSent totalBytesSent:(int64_t)totalBytesSent totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend
 {
-	slib::Ref<slib::_UrlRequest> req = slib::_UrlRequest::fromTask(task);
+	slib::Ref<slib::UrlRequest_Impl> req = slib::UrlRequest_Impl::fromTask(task);
 	if (req.isNotNull()) {
 		req->dispatchUploadBody(bytesSent, totalBytesSent);
 	}
@@ -264,7 +277,7 @@ namespace slib
 
 -(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler
 {
-	slib::Ref<slib::_UrlRequest> req = slib::_UrlRequest::fromTask(dataTask);
+	slib::Ref<slib::UrlRequest_Impl> req = slib::UrlRequest_Impl::fromTask(dataTask);
 	if (req.isNotNull()) {
 		if (req->dispatchReceiveResponse(response)) {
 			completionHandler(NSURLSessionResponseAllow);
@@ -276,7 +289,7 @@ namespace slib
 
 -(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data
 {
-	slib::Ref<slib::_UrlRequest> req = slib::_UrlRequest::fromTask(dataTask);
+	slib::Ref<slib::UrlRequest_Impl> req = slib::UrlRequest_Impl::fromTask(dataTask);
 	if (req.isNotNull()) {
 		req->dispatchReceiveContent(data);
 	}
@@ -289,7 +302,7 @@ namespace slib
 
 -(void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didWriteData:(int64_t)bytesWritten totalBytesWritten:(int64_t)totalBytesWritten totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
-	slib::Ref<slib::_UrlRequest> req = slib::_UrlRequest::fromTask(downloadTask);
+	slib::Ref<slib::UrlRequest_Impl> req = slib::UrlRequest_Impl::fromTask(downloadTask);
 	if (req.isNotNull()) {
 		req->dispatchDownloadContent(bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
 	}
@@ -297,7 +310,7 @@ namespace slib
 
 -(void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location
 {
-	slib::Ref<slib::_UrlRequest> req = slib::_UrlRequest::fromTask(downloadTask);
+	slib::Ref<slib::UrlRequest_Impl> req = slib::UrlRequest_Impl::fromTask(downloadTask);
 	if (req.isNotNull()) {
 		req->dispatchFinishDownload(location);
 	}
@@ -305,7 +318,7 @@ namespace slib
 
 -(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
 {
-	slib::Ref<slib::_UrlRequest> req = slib::_UrlRequest::fromTask(task);
+	slib::Ref<slib::UrlRequest_Impl> req = slib::UrlRequest_Impl::fromTask(task);
 	if (req.isNotNull()) {
 		req->dispatchComplete(error);
 	}

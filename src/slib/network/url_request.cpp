@@ -13,6 +13,7 @@
 #include "../../../inc/slib/network/url.h"
 #include "../../../inc/slib/core/json.h"
 #include "../../../inc/slib/core/string_buffer.h"
+#include "../../../inc/slib/core/thread_pool.h"
 #include "../../../inc/slib/core/safe_static.h"
 #include "../../../inc/slib/core/log.h"
 
@@ -62,6 +63,25 @@ namespace slib
 	{
 	}
 	
+	void UrlRequestParam::setRequestBodyAsString(const String& str)
+	{
+		requestBody = str.toMemory();
+	}
+	
+	void UrlRequestParam::setRequestBodyAsJson(const Json& json)
+	{
+		requestBody = json.toJsonString().toMemory();
+	}
+	
+	void UrlRequestParam::setRequestBodyAsXml(const Ref<XmlDocument>& xml)
+	{
+		if (xml.isNotNull()) {
+			requestBody = xml->toString().toMemory();
+		} else {
+			requestBody.setNull();
+		}
+	}
+	
 	SLIB_DEFINE_OBJECT(UrlRequest, Object)
 	
 	typedef HashMap< UrlRequest*, Ref<UrlRequest> > _UrlRequestMap;
@@ -90,12 +110,35 @@ namespace slib
 	
 	Ref<UrlRequest> UrlRequest::send(const UrlRequestParam& param)
 	{
-		return _send(param, String::null());
-	}
-	
-	Ref<UrlRequest> UrlRequest::downloadToFile(const String& filePath, const UrlRequestParam& param)
-	{
-		return _send(param, filePath);
+		String url = param.url;
+		if (url.isNotEmpty()) {
+			String url = param.url;
+			if (param.parameters.isNotEmpty()) {
+				if (url.contains('?')) {
+					url += "&";
+				} else {
+					url += "?";
+				}
+				url += _buildParameters(param.parameters);
+			}
+			Ref<UrlRequest> request = _create(param, url);
+			if (request.isNotNull()) {
+				if (param.flagSynchronous) {
+					request->_sendSync();
+				} else {
+					request->_sendAsync();
+				}
+				return request;
+			}
+		}
+		Ref<UrlRequest> request = new UrlRequest;
+		if (request.isNotNull()) {
+			LogError("UrlRequest", "Failed to create request on %s", url);
+			request->_init(param, url);
+			request->onError();
+			return request;
+		}
+		return sl_null;
 	}
 	
 	Ref<UrlRequest> UrlRequest::send(const String& url, const Function<void(UrlRequest*)>& onComplete)
@@ -539,38 +582,58 @@ namespace slib
 		return m_flagError;
 	}
 	
-	Ref<UrlRequest> UrlRequest::_send(const UrlRequestParam& param, const String& downloadFilePath)
+	sl_bool UrlRequest::isClosed()
 	{
-		String url = param.url;
-		if (url.isNotEmpty()) {
-			String url = param.url;
-			if (param.parameters.isNotEmpty()) {
-				if (url.contains('?')) {
-					url += "&";
-				} else {
-					url += "?";
-				}
-				url += _buildParameters(param.parameters);
-			}
-			Ref<UrlRequest> request = _create(param, url, String::null());
-			if (request.isNotNull()) {
-				if (param.flagSynchronous) {
-					Ref<Event>& ev = request->m_eventSync;
-					if (ev.isNotNull()) {
-						ev->wait();
-					}
-				}
-				return request;
-			}
-		}
-		_onCreateError(param, param.url, String::null());
-		return sl_null;
+		return m_flagClosed;
 	}
 	
-	void UrlRequest::_init(const UrlRequestParam& param, const String& url, const String& downloadFilePath)
+	void UrlRequest::_sendSync()
+	{
+		Ref<Event> ev = Event::create();
+		if (ev.isNotNull()) {
+			m_eventSync = ev;
+			_sendAsync();
+			ev->wait();
+			return;
+		}
+		onError();
+	}
+	
+	void UrlRequest::_sendSync_call()
+	{
+		_sendSync();
+	}
+
+	class UrlRequest_AsyncPool
+	{
+	public:
+		Ref<ThreadPool> threadPool;
+		
+	public:
+		UrlRequest_AsyncPool()
+		{
+			threadPool = ThreadPool::create();
+		}
+		
+	};
+	
+	SLIB_SAFE_STATIC_GETTER(UrlRequest_AsyncPool, Get_UrlRequestAsyncPool)
+	
+	void UrlRequest::_sendAsync()
+	{
+		UrlRequest_AsyncPool* pool = Get_UrlRequestAsyncPool();
+		if (pool) {
+			if (pool->threadPool->addTask(SLIB_FUNCTION_WEAKREF(UrlRequest, _sendSync_call, this))) {
+				return;
+			}
+		}
+		onError();
+	}
+		
+	void UrlRequest::_init(const UrlRequestParam& param, const String& url)
 	{
 		m_url = url;
-		m_downloadFilePath = downloadFilePath;
+		m_downloadFilePath = param.downloadFilePath;
 		
 		m_method = param.method;
 		m_requestBody = param.requestBody;
@@ -583,19 +646,16 @@ namespace slib
 		m_onReceiveContent = param.onReceiveContent;
 		m_dispatcher = param.dispatcher;
 		m_flagUseBackgroundSession = param.flagUseBackgroundSession;
-		m_flagSelfAlive = param.flagSelfAlive;
+		m_flagSelfAlive = param.flagSelfAlive && !(param.flagSynchronous);
 		m_flagStoreResponseContent = param.flagStoreResponseContent;
 		
-		if (param.flagSelfAlive) {
+		if (m_flagSelfAlive) {
 			_UrlRequestMap* map = _getUrlRequestMap();
 			if (map) {
 				map->put(this, this);
 			}
 		}
-		
-		if (param.flagSynchronous) {
-			m_eventSync = Event::create();
-		}
+
 	}
 	
 	void UrlRequest::_removeFromMap()
@@ -704,17 +764,7 @@ namespace slib
 	{
 		callback(this);
 	}
-	
-	void UrlRequest::_onCreateError(const UrlRequestParam& param, const String& url, const String& downloadFilePath)
-	{
-		Ref<UrlRequest> req = new UrlRequest;
-		if (req.isNotNull()) {
-			LogError("UrlRequest", "Failed to create request on %s", url);
-			req->_init(param, url, downloadFilePath);
-			req->onError();
-		}
-	}
-	
+		
 	String UrlRequest::_buildParameters(const Map<String, Variant>& params)
 	{
 		StringBuffer sb;

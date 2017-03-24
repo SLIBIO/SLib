@@ -14,71 +14,50 @@
 
 #include "../../../inc/slib/network/url_request.h"
 
-#include "../../../inc/slib/core/thread_pool.h"
 #include "../../../inc/slib/core/safe_static.h"
 #include "../../../inc/slib/core/platform_android.h"
 
 namespace slib
 {
 
-	void JNICALL _JUrlRequest_onInit(JNIEnv* env, jobject _this, jlong jinstance);
-	void JNICALL _JUrlRequest_onUploadBody(JNIEnv* env, jobject _this, jlong jinstance, jint n);
-	void JNICALL _JUrlRequest_onResponse(JNIEnv* env, jobject _this, jlong jinstance, jint status, jstring message, jobjectArray headers);
-	void JNICALL _JUrlRequest_onReceiveContent(JNIEnv* env, jobject _this, jlong jinstance, jbyteArray data, jint n);
-	void JNICALL _JUrlRequest_onDownloadContent(JNIEnv* env, jobject _this, jlong jinstance, jint n);
-	void JNICALL _JUrlRequest_onComplete(JNIEnv* env, jobject _this, jlong jinstance);
-	void JNICALL _JUrlRequest_onError(JNIEnv* env, jobject _this, jlong jinstance);
+	void JNICALL JUrlRequest_onInit(JNIEnv* env, jobject _this, jlong jinstance);
+	void JNICALL JUrlRequest_onUploadBody(JNIEnv* env, jobject _this, jlong jinstance, jint n);
+	void JNICALL JUrlRequest_onResponse(JNIEnv* env, jobject _this, jlong jinstance, jint status, jstring message, jobjectArray headers);
+	void JNICALL JUrlRequest_onReceiveContent(JNIEnv* env, jobject _this, jlong jinstance, jbyteArray data, jint n);
+	void JNICALL JUrlRequest_onDownloadContent(JNIEnv* env, jobject _this, jlong jinstance, jint n);
+	void JNICALL JUrlRequest_onComplete(JNIEnv* env, jobject _this, jlong jinstance);
+	void JNICALL JUrlRequest_onError(JNIEnv* env, jobject _this, jlong jinstance, jstring errorMessage);
 
-	SLIB_JNI_BEGIN_CLASS(_JUrlRequest, "slib/platform/android/network/UrlRequest")
+	SLIB_JNI_BEGIN_CLASS(JUrlRequest, "slib/platform/android/network/UrlRequest")
 		SLIB_JNI_STATIC_METHOD(execute, "execute", "(JLjava/lang/String;Ljava/lang/String;[Ljava/lang/String;[Ljava/lang/String;[BLjava/lang/String;)V")
 		SLIB_JNI_METHOD(close, "close", "()V")
 
-		SLIB_JNI_NATIVE(onInit, "nativeOnInit", "(J)V", _JUrlRequest_onInit)
-		SLIB_JNI_NATIVE(onUploadBody, "nativeOnUploadBody", "(JI)V", _JUrlRequest_onUploadBody)
-		SLIB_JNI_NATIVE(onResponse, "nativeOnResponse", "(JILjava/lang/String;[Ljava/lang/String;)V", _JUrlRequest_onResponse)
-		SLIB_JNI_NATIVE(onReceiveContent, "nativeOnReceiveContent", "(J[BI)V", _JUrlRequest_onReceiveContent)
-		SLIB_JNI_NATIVE(onDownloadContent, "nativeOnDownloadContent", "(JI)V", _JUrlRequest_onDownloadContent)
-		SLIB_JNI_NATIVE(onComplete, "nativeOnComplete", "(J)V", _JUrlRequest_onComplete)
-		SLIB_JNI_NATIVE(onError, "nativeOnError", "(J)V", _JUrlRequest_onError)
+		SLIB_JNI_NATIVE(onInit, "nativeOnInit", "(J)V", JUrlRequest_onInit)
+		SLIB_JNI_NATIVE(onUploadBody, "nativeOnUploadBody", "(JI)V", JUrlRequest_onUploadBody)
+		SLIB_JNI_NATIVE(onResponse, "nativeOnResponse", "(JILjava/lang/String;[Ljava/lang/String;)V", JUrlRequest_onResponse)
+		SLIB_JNI_NATIVE(onReceiveContent, "nativeOnReceiveContent", "(J[BI)V", JUrlRequest_onReceiveContent)
+		SLIB_JNI_NATIVE(onDownloadContent, "nativeOnDownloadContent", "(JI)V", JUrlRequest_onDownloadContent)
+		SLIB_JNI_NATIVE(onComplete, "nativeOnComplete", "(J)V", JUrlRequest_onComplete)
+		SLIB_JNI_NATIVE(onError, "nativeOnError", "(JLjava/lang/String;)V", JUrlRequest_onError)
 	SLIB_JNI_END_CLASS
 
-
-	class _UrlRequestShared
-	{
-	public:
-		Ref<ThreadPool> threadPool;
-
-	public:
-		_UrlRequestShared()
-		{
-			threadPool = ThreadPool::create();
-		}
-
-	};
-
-	SLIB_SAFE_STATIC_GETTER(_UrlRequestShared, _getUrlRequestShared)
-
-	class _UrlRequest : public UrlRequest {
+	class UrlRequest_Impl : public UrlRequest {
 	public:
 		AtomicJniGlobal<jobject> m_jrequest;
 
 	public:
-		_UrlRequest() {
+		UrlRequest_Impl() {
 		}
 
-		~_UrlRequest() {
+		~UrlRequest_Impl() {
 			clear();
 		}
 
-		static Ref<_UrlRequest> create(const UrlRequestParam& param, const String& url, const String& downloadFilePath) {
-			_UrlRequestShared* shared = _getUrlRequestShared();
-			if (shared) {
-				Ref<_UrlRequest> ret = new _UrlRequest;
-				if (ret.isNotNull()) {
-					ret->_init(param, url, downloadFilePath);
-					shared->threadPool->addTask(Function<void()>::bind(&(_UrlRequest::execute), WeakRef<_UrlRequest>(ret)));
-					return ret;
-				}
+		static Ref<UrlRequest_Impl> create(const UrlRequestParam& param, const String& url) {
+			Ref<UrlRequest_Impl> ret = new UrlRequest_Impl;
+			if (ret.isNotNull()) {
+				ret->_init(param, url);
+				return ret;
 			}
 			return sl_null;
 		}
@@ -88,17 +67,15 @@ namespace slib
 			clear();
 		}
 
-		static void execute(const WeakRef<_UrlRequest>& weakReq) {
-			Ref<_UrlRequest> request(weakReq);
-			if (request.isNull()) {
-				return;
-			}
-			JniLocal<jstring> url = Jni::getJniString(request->m_url);
-			JniLocal<jstring> method = Jni::getJniString(HttpMethods::toString(request->m_method));
+		// override
+		void _sendSync()
+		{
+			JniLocal<jstring> url = Jni::getJniString(m_url);
+			JniLocal<jstring> method = Jni::getJniString(HttpMethods::toString(m_method));
 			JniLocal<jobjectArray> jheaders;
 			{
 				CList<String> list;
-				Iterator< Pair<String, String> > iterator = request->m_requestHeaders.toIterator();
+				Iterator< Pair<String, String> > iterator = m_requestHeaders.toIterator();
 				Pair<String, String> pair;
 				while (iterator.next(&pair)) {
 					list.add_NoLock(pair.key);
@@ -112,7 +89,8 @@ namespace slib
 							Jni::setStringArrayElement(jheaders, i, m[i]);
 						}
 					} else {
-						request->onError();
+						m_lastErrorMessage = "Memory Failure";
+						onError();
 						return;
 					}
 				}
@@ -120,7 +98,7 @@ namespace slib
 			JniLocal<jobjectArray> jadditionalHeaders;
 			{
 				CList<String> list;
-				Iterator< Pair<String, String> > iterator = request->m_additionalRequestHeaders.toIterator();
+				Iterator< Pair<String, String> > iterator = m_additionalRequestHeaders.toIterator();
 				Pair<String, String> pair;
 				while (iterator.next(&pair)) {
 					list.add_NoLock(pair.key);
@@ -134,38 +112,40 @@ namespace slib
 							Jni::setStringArrayElement(jadditionalHeaders, i, m[i]);
 						}
 					} else {
-						request->onError();
+						m_lastErrorMessage = "Memory Failure";
+						onError();
 						return;
 					}
 				}
 			}
 			JniLocal<jbyteArray> jbody;
-			if (request->m_requestBody.isNotEmpty()) {
-				Memory mem = request->m_requestBody;
+			if (m_requestBody.isNotEmpty()) {
+				Memory mem = m_requestBody;
 				sl_uint32 n = (sl_uint32)(mem.getSize());
 				jbody = Jni::newByteArray(n);
 				if (jbody.isNotNull()) {
 					Jni::setByteArrayRegion(jbody, 0, n, (jbyte*)(mem.getData()));
 				} else {
-					request->onError();
+					m_lastErrorMessage = "Memory Failure";
+					onError();
 					return;
 				}
 			}
-			JniLocal<jstring> downloadFilePath = Jni::getJniString(request->m_downloadFilePath);
-			request.setNull();
-			_JUrlRequest::execute.call(sl_null, (jlong)((sl_reg)((void*)&weakReq)), url.get(), method.get(), jheaders.get(), jadditionalHeaders.get(), jbody.get(), downloadFilePath.get());
+			JniLocal<jstring> downloadFilePath = Jni::getJniString(m_downloadFilePath);
+			JUrlRequest::execute.call(sl_null, (jlong)((sl_reg)((void*)this)), url.get(), method.get(), jheaders.get(), jadditionalHeaders.get(), jbody.get(), downloadFilePath.get());
 		}
 
 		void clear() {
 			JniGlobal<jobject> jrequest(m_jrequest);
 			if (jrequest.isNotNull()) {
-				_JUrlRequest::close.call(jrequest);
+				JUrlRequest::close.call(jrequest);
 			}
 			m_jrequest.setNull();
 		}
 
 		void dispatchUploadBody(int n)
 		{
+			m_sizeBodySent += n;
 			onUploadBody(n);
 		}
 
@@ -205,6 +185,7 @@ namespace slib
 					onReceiveContent(mem.getData(), n, mem);
 				} else {
 					clear();
+					m_lastErrorMessage = "Memory Failure";
 					onError();
 				}
 			} else {
@@ -224,71 +205,72 @@ namespace slib
 			onComplete();
 		}
 
-		void dispatchError()
+		void dispatchError(jstring errorMessage)
 		{
+			m_lastErrorMessage = Jni::getString(errorMessage);
 			onError();
 		}
 
 	};
 
-	Ref<UrlRequest> UrlRequest::_create(const UrlRequestParam& param, const String& url, const String& downloadFilePath)
+	Ref<UrlRequest> UrlRequest::_create(const UrlRequestParam& param, const String& url)
 	{
-		return Ref<UrlRequest>::from(_UrlRequest::create(param, url, downloadFilePath));
+		return Ref<UrlRequest>::from(UrlRequest_Impl::create(param, url));
 	}
 
-	void JNICALL _JUrlRequest_onInit(JNIEnv* env, jobject _this, jlong jinstance)
+	void JNICALL JUrlRequest_onInit(JNIEnv* env, jobject _this, jlong jinstance)
 	{
-		Ref<_UrlRequest> request(*((WeakRef<_UrlRequest>*)((void*)((sl_reg)jinstance))));
-		if (request.isNotNull()) {
+		UrlRequest_Impl* request = (UrlRequest_Impl*)((void*)((sl_reg)jinstance));
+		if (request) {
 			request->m_jrequest = _this;
 		}
 	}
 
-	void JNICALL _JUrlRequest_onUploadBody(JNIEnv* env, jobject _this, jlong jinstance, jint n)
+	void JNICALL JUrlRequest_onUploadBody(JNIEnv* env, jobject _this, jlong jinstance, jint n)
 	{
-		Ref<_UrlRequest> request(*((WeakRef<_UrlRequest>*)((void*)((sl_reg)jinstance))));
-		if (request.isNotNull()) {
+		UrlRequest_Impl* request = (UrlRequest_Impl*)((void*)((sl_reg)jinstance));
+		if (request) {
 			request->dispatchUploadBody(n);
 		}
 	}
 
-	void JNICALL _JUrlRequest_onResponse(JNIEnv* env, jobject _this, jlong jinstance, jint status, jstring message, jobjectArray headers)
+	void JNICALL JUrlRequest_onResponse(JNIEnv* env, jobject _this, jlong jinstance, jint status, jstring message, jobjectArray headers)
 	{
-		Ref<_UrlRequest> request(*((WeakRef<_UrlRequest>*)((void*)((sl_reg)jinstance))));
-		if (request.isNotNull()) {
+		UrlRequest_Impl* request = (UrlRequest_Impl*)((void*)((sl_reg)jinstance));
+		if (request) {
 			request->dispatchReceiveResponse(status, message, headers);
 		}
 	}
 
-	void JNICALL _JUrlRequest_onReceiveContent(JNIEnv* env, jobject _this, jlong jinstance, jbyteArray data, jint n)
+	void JNICALL JUrlRequest_onReceiveContent(JNIEnv* env, jobject _this, jlong jinstance, jbyteArray data, jint n)
 	{
-		Ref<_UrlRequest> request(*((WeakRef<_UrlRequest>*)((void*)((sl_reg)jinstance))));
-		if (request.isNotNull()) {
+		UrlRequest_Impl* request = (UrlRequest_Impl*)((void*)((sl_reg)jinstance));
+		if (request) {
 			request->dispatchReceiveContent(data, n);
 		}
 	}
 
-	void JNICALL _JUrlRequest_onDownloadContent(JNIEnv* env, jobject _this, jlong jinstance, jint n)
+	void JNICALL JUrlRequest_onDownloadContent(JNIEnv* env, jobject _this, jlong jinstance, jint n)
 	{
-		Ref<_UrlRequest> request(*((WeakRef<_UrlRequest>*)((void*)((sl_reg)jinstance))));
-		if (request.isNotNull()) {
+		UrlRequest_Impl* request = (UrlRequest_Impl*)((void*)((sl_reg)jinstance));
+		if (request) {
 			request->dispatchDownloadContent(n);
 		}
 	}
 
-	void JNICALL _JUrlRequest_onComplete(JNIEnv* env, jobject _this, jlong jinstance)
+	void JNICALL JUrlRequest_onComplete(JNIEnv* env, jobject _this, jlong jinstance)
 	{
-		Ref<_UrlRequest> request(*((WeakRef<_UrlRequest>*)((void*)((sl_reg)jinstance))));
-		if (request.isNotNull()) {
+		UrlRequest_Impl* request = (UrlRequest_Impl*)((void*)((sl_reg)jinstance));
+		if (request) {
 			request->dispatchComplete();
 		}
 	}
 
-	void JNICALL _JUrlRequest_onError(JNIEnv* env, jobject _this, jlong jinstance)
+	void JNICALL JUrlRequest_onError(JNIEnv* env, jobject _this, jlong jinstance, jstring errorMessage)
 	{
-		Ref<_UrlRequest> request(*((WeakRef<_UrlRequest>*)((void*)((sl_reg)jinstance))));
-		if (request.isNotNull()) {
-			request->dispatchError();
+		UrlRequest_Impl* request = (UrlRequest_Impl*)((void*)((sl_reg)jinstance));
+		if (request) {
+			request->dispatchError(errorMessage);
 		}
 	}
 

@@ -31,7 +31,7 @@
 namespace slib
 {
 
-	class _UrlRequestConnection : public Referable
+	class UrlRequest_Connection : public Referable
 	{
 	public:
 		HINTERNET hConnect;
@@ -40,28 +40,28 @@ namespace slib
 		sl_bool flagHttps;
 
 	public:
-		_UrlRequestConnection(HINTERNET _hConnect, sl_int32 _id, const String16& _address, sl_bool _flagHttps) : hConnect(_hConnect), id(_id), address(_address), flagHttps(_flagHttps)
+		UrlRequest_Connection(HINTERNET _hConnect, sl_int32 _id, const String16& _address, sl_bool _flagHttps) : hConnect(_hConnect), id(_id), address(_address), flagHttps(_flagHttps)
 		{
 		}
 
-		~_UrlRequestConnection();
+		~UrlRequest_Connection();
 
 	};
 
-	class _UrlRequest;
+	class UrlRequest_Impl;
 
-	class _UrlRequestSession
+	class UrlRequest_Session
 	{
 	public:
 		HINTERNET hInternet;
-		LinkedQueue< Ref<_UrlRequestConnection> > connectionPool;
+		LinkedQueue< Ref<UrlRequest_Connection> > connectionPool;
 		sl_int32 lastConnectionId;
-		HashMap< sl_int32, WeakRef<_UrlRequestConnection> > connections;
+		HashMap< sl_int32, WeakRef<UrlRequest_Connection> > connections;
 		sl_int32 lastTaskId;
-		HashMap< sl_int32, WeakRef<_UrlRequest> > requests;
+		HashMap< sl_int32, WeakRef<UrlRequest_Impl> > requests;
 
 	public:
-		_UrlRequestSession(INTERNET_STATUS_CALLBACK callback)
+		UrlRequest_Session(INTERNET_STATUS_CALLBACK callback)
 		{
 			lastConnectionId = 0;
 			lastTaskId = 0;
@@ -69,13 +69,13 @@ namespace slib
 			::InternetSetStatusCallbackA(hInternet, callback);
 		}
 
-		~_UrlRequestSession()
+		~UrlRequest_Session()
 		{
 			::InternetSetStatusCallbackA(hInternet, NULL);
 			::InternetCloseHandle(hInternet);
 		}
 
-		Ref<_UrlRequestConnection> getConnection(const String16& url, LPCWSTR& path)
+		Ref<UrlRequest_Connection> getConnection(const String16& url, LPCWSTR& path)
 		{
 			DWORD lenURL = (DWORD)(url.getLength());
 			URL_COMPONENTSW comps = { 0 };
@@ -95,12 +95,12 @@ namespace slib
 					String16 address = url.getData();
 					{
 						ObjectLocker lock(&connectionPool);
-						Link< Ref<_UrlRequestConnection> >* link = connectionPool.getBack();
+						Link< Ref<UrlRequest_Connection> >* link = connectionPool.getBack();
 						while (link) {
-							Ref<_UrlRequestConnection>& r = link->value;
+							Ref<UrlRequest_Connection>& r = link->value;
 							if (r->address.getHashCode() == url.getHashCode() && r->address == url) {
-								Ref<_UrlRequestConnection> connection = link->value;
-								Link< Ref<_UrlRequestConnection> >* before = link->before;
+								Ref<UrlRequest_Connection> connection = link->value;
+								Link< Ref<UrlRequest_Connection> >* before = link->before;
 								connectionPool.removeItem_NoLock(link);
 								return connection;
 							}
@@ -117,7 +117,7 @@ namespace slib
 					sl_int32 connectionId = Base::interlockedIncrement32(&(lastConnectionId)) & 0x7FFFFFFF;
 					HINTERNET hConnect = ::InternetConnectW(hInternet, comps.lpszHostName, comps.nPort, comps.lpszUserName, comps.lpszPassword, INTERNET_SERVICE_HTTP, 0, (DWORD_PTR)(connectionId | 0x80000000));
 					if (hConnect) {
-						Ref<_UrlRequestConnection> ret = new _UrlRequestConnection(hConnect, connectionId, address, comps.nScheme == INTERNET_SCHEME_HTTPS);
+						Ref<UrlRequest_Connection> ret = new UrlRequest_Connection(hConnect, connectionId, address, comps.nScheme == INTERNET_SCHEME_HTTPS);
 						if (ret.isNotNull()) {
 							connections.put(connectionId, ret);
 							return ret;
@@ -131,19 +131,17 @@ namespace slib
 
 	};
 
-	class _UrlRequest;
-
-	class _UrlRequestDownloadStream : public AsyncStream, public IAsyncCopyListener
+	class UrlRequest_DownloadStream : public AsyncStream, public IAsyncCopyListener
 	{
 	public:
-		WeakRef<_UrlRequest> m_request;
+		WeakRef<UrlRequest_Impl> m_request;
 		LinkedQueue< Ref<AsyncStreamRequest> > m_queueBuffers;
 		Ref<AsyncStreamRequest> m_currentBuffer;
 		DWORD m_currentReadSize;
 		sl_bool m_flagCompleteRead;
 
 	public:
-		_UrlRequestDownloadStream(_UrlRequest* request);
+		UrlRequest_DownloadStream(UrlRequest_Impl* request);
 
 	public:
 		// override
@@ -167,19 +165,19 @@ namespace slib
 			return sl_false;
 		}
 
-		void onReadBuffer(_UrlRequest* request, HINTERNET hRequest);
+		void onReadBuffer(UrlRequest_Impl* request, HINTERNET hRequest);
 
-		sl_bool readBuffer(_UrlRequest* request, HINTERNET hRequest, AsyncStreamRequest* buffer);
+		sl_bool readBuffer(UrlRequest_Impl* request, HINTERNET hRequest, AsyncStreamRequest* buffer);
 
 		// override
 		void onAsyncCopyExit(AsyncCopy* task);
 
 	};
 
-	class _UrlRequest : public UrlRequest
+	class UrlRequest_Impl : public UrlRequest
 	{
 	public:
-		Ref<_UrlRequestConnection> m_connection;
+		Ref<UrlRequest_Connection> m_connection;
 		HINTERNET m_hRequest;
 		sl_int32 m_taskId;
 		sl_int32 m_step;
@@ -188,7 +186,7 @@ namespace slib
 		DWORD m_sizeReadPacket;
 
 		AtomicRef<AsyncFile> m_downloadFile;
-		AtomicRef<_UrlRequestDownloadStream> m_downloadStream;
+		AtomicRef<UrlRequest_DownloadStream> m_downloadStream;
 		AtomicRef<AsyncCopy> m_downloadCopy;
 
 		enum {
@@ -196,43 +194,43 @@ namespace slib
 		};
 
 	public:
-		_UrlRequest()
+		UrlRequest_Impl()
 		{
 			m_hRequest = NULL;
 			m_step = STEP_CONNECT;
 			m_sizeReadPacket = 0;
 		}
 
-		~_UrlRequest()
+		~UrlRequest_Impl()
 		{
 			clean();
 		}
 
-		static _UrlRequestSession* getSession()
+		static UrlRequest_Session* getSession()
 		{
-			SLIB_SAFE_STATIC(_UrlRequestSession, session, callbackStatus);
+			SLIB_SAFE_STATIC(UrlRequest_Session, session, callbackStatus);
 			if (SLIB_SAFE_STATIC_CHECK_FREED(session)) {
 				return sl_null;
 			}
 			return &session;
 		}
 
-		static Ref<_UrlRequest> create(const UrlRequestParam& param, const String& url, const String& downloadFilePath)
+		static Ref<UrlRequest_Impl> create(const UrlRequestParam& param, const String& url)
 		{
-			_UrlRequestSession* session = getSession();
+			UrlRequest_Session* session = getSession();
 			if (session) {
 				Memory bufPacket = Memory::create(READ_BUFFER_SIZE);
 				if (bufPacket.isNull()) {
 					return sl_null;
 				}
 				LPCWSTR path;
-				Ref<_UrlRequestConnection> connection = session->getConnection(url, path);
+				Ref<UrlRequest_Connection> connection = session->getConnection(url, path);
 				if (connection.isNotNull()) {
-					Ref<_UrlRequest> ret = new _UrlRequest;
+					Ref<UrlRequest_Impl> ret = new UrlRequest_Impl;
 					if (ret.isNotNull()) {
 						Ref<AsyncFile> fileDownload;
-						if (downloadFilePath.isNotEmpty()) {
-							Ref<File> file = File::openForWrite(downloadFilePath);
+						if (param.downloadFilePath.isNotEmpty()) {
+							Ref<File> file = File::openForWrite(param.downloadFilePath);
 							if (file.isNull()) {
 								return sl_null;
 							}
@@ -247,7 +245,7 @@ namespace slib
 						if (connection->flagHttps) {
 							flags |= INTERNET_FLAG_SECURE;
 						}
-						ret->_init(param, url, downloadFilePath);
+						ret->_init(param, url);
 						ret->m_connection = connection;
 						ret->m_downloadFile = fileDownload;
 						ret->m_bufPacket = bufPacket;
@@ -256,7 +254,6 @@ namespace slib
 						HINTERNET hRequest = ::HttpOpenRequestW(connection->hConnect, (LPCWSTR)(verb.getData()), path, NULL, NULL, NULL, flags, (DWORD_PTR)taskId);
 						if (hRequest) {
 							ret->m_hRequest = hRequest;
-							ret->processAsync(hRequest, ERROR_SUCCESS);
 							return ret;
 						}
 						session->requests.remove(taskId);
@@ -272,12 +269,20 @@ namespace slib
 			clean();
 		}
 
+		// override
+		void _sendAsync()
+		{
+			if (m_hRequest) {
+				processAsync(m_hRequest, ERROR_SUCCESS);
+			}
+		}
+
 		void clean()
 		{
 			if (m_hRequest) {
 				::InternetCloseHandle(m_hRequest);
 				m_hRequest = NULL;
-				_UrlRequestSession* session = getSession();
+				UrlRequest_Session* session = getSession();
 				if (session) {
 					session->requests.remove(m_taskId);
 				}
@@ -293,7 +298,7 @@ namespace slib
 			if (dwContext == 0) {
 				return;
 			}
-			_UrlRequestSession* session = getSession();
+			UrlRequest_Session* session = getSession();
 			if (!session) {
 				return;
 			}
@@ -301,7 +306,7 @@ namespace slib
 			switch (dwInternetStatus) {
 			case INTERNET_STATUS_REQUEST_COMPLETE:
 				if (!(id & 0x80000000)) {
-					Ref<_UrlRequest> request = session->requests.getValue(id, WeakRef<_UrlRequest>::null());
+					Ref<UrlRequest_Impl> request = session->requests.getValue(id, WeakRef<UrlRequest_Impl>::null());
 					if (request.isNotNull()) {
 						INTERNET_ASYNC_RESULT* result = (LPINTERNET_ASYNC_RESULT)lpvStatusInformation;
 						request->processAsync(hInternet, result->dwError);
@@ -310,7 +315,7 @@ namespace slib
 				break;
 			case INTERNET_STATUS_REQUEST_SENT:
 				if (!(id & 0x80000000)) {
-					Ref<_UrlRequest> request = session->requests.getValue(id, WeakRef<_UrlRequest>::null());
+					Ref<UrlRequest_Impl> request = session->requests.getValue(id, WeakRef<UrlRequest_Impl>::null());
 					if (request.isNotNull()) {
 						DWORD dwSize = *((DWORD*)lpvStatusInformation);
 						request->m_sizeBodySent += dwSize;
@@ -391,7 +396,7 @@ namespace slib
 						} else {
 							m_step = STEP_RECEIVE_DATA;
 							if (m_downloadFilePath.isNotEmpty()) {
-								Ref<_UrlRequestDownloadStream> stream = new _UrlRequestDownloadStream(this);
+								Ref<UrlRequest_DownloadStream> stream = new UrlRequest_DownloadStream(this);
 								if (stream.isNotNull()) {
 									m_downloadStream = stream;
 									AsyncCopyParam cp;
@@ -415,7 +420,7 @@ namespace slib
 				case STEP_RECEIVE_DATA:
 					{
 						if (m_downloadFilePath.isNotNull()) {
-							Ref<_UrlRequestDownloadStream> stream = m_downloadStream;
+							Ref<UrlRequest_DownloadStream> stream = m_downloadStream;
 							if (stream.isNotNull()) {
 								stream->onReadBuffer(this, hRequest);
 							}
@@ -472,7 +477,7 @@ namespace slib
 			}
 			m_step = STEP_COMPLETE;
 			onComplete();
-			_UrlRequestSession* session = getSession();
+			UrlRequest_Session* session = getSession();
 			if (session) {
 				session->connectionPool.push(m_connection, MAX_CONNECTION_POOL_SIZE);
 			}
@@ -490,28 +495,28 @@ namespace slib
 			clean();
 		}
 
-		friend class _UrlRequestDownloadStream;
+		friend class UrlRequest_DownloadStream;
 	};
 
-	_UrlRequestDownloadStream::_UrlRequestDownloadStream(_UrlRequest* request) : m_request(request)
+	UrlRequest_DownloadStream::UrlRequest_DownloadStream(UrlRequest_Impl* request) : m_request(request)
 	{
 		m_flagCompleteRead = sl_false;
 	}
 
-	void _UrlRequestDownloadStream::close()
+	void UrlRequest_DownloadStream::close()
 	{
 		ObjectLocker lock(this);
 		m_request.setNull();
 	}
 
-	sl_bool _UrlRequestDownloadStream::isOpened()
+	sl_bool UrlRequest_DownloadStream::isOpened()
 	{
 		return m_request.isNotNull();
 	}
 
-	sl_bool _UrlRequestDownloadStream::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref)
+	sl_bool UrlRequest_DownloadStream::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref)
 	{
-		Ref<_UrlRequest> request(m_request);
+		Ref<UrlRequest_Impl> request(m_request);
 		if (request.isNotNull()) {
 			Ref<AsyncStreamRequest> buf = AsyncStreamRequest::createRead(data, size, ref, callback);
 			if (buf.isNotNull()) {
@@ -528,7 +533,7 @@ namespace slib
 		return sl_false;
 	}
 
-	void _UrlRequestDownloadStream::onReadBuffer(_UrlRequest* request, HINTERNET hRequest)
+	void UrlRequest_DownloadStream::onReadBuffer(UrlRequest_Impl* request, HINTERNET hRequest)
 	{
 		if (m_currentReadSize) {
 			request->onDownloadContent(m_currentReadSize);
@@ -552,7 +557,7 @@ namespace slib
 		}
 	}
 
-	sl_bool _UrlRequestDownloadStream::readBuffer(_UrlRequest* request, HINTERNET hRequest, AsyncStreamRequest* buffer)
+	sl_bool UrlRequest_DownloadStream::readBuffer(UrlRequest_Impl* request, HINTERNET hRequest, AsyncStreamRequest* buffer)
 	{
 		m_currentReadSize = 0;
 		if (::InternetReadFile(hRequest, buffer->data, buffer->size, &m_currentReadSize)) {
@@ -574,9 +579,9 @@ namespace slib
 		}
 	}
 
-	void _UrlRequestDownloadStream::onAsyncCopyExit(AsyncCopy* task)
+	void UrlRequest_DownloadStream::onAsyncCopyExit(AsyncCopy* task)
 	{
-		Ref<_UrlRequest> request(m_request);
+		Ref<UrlRequest_Impl> request(m_request);
 		if (request.isNotNull()) {
 			if (task->isWritingErrorOccured()) {
 				request->processError();
@@ -590,19 +595,19 @@ namespace slib
 		}
 	}
 
-	_UrlRequestConnection::~_UrlRequestConnection()
+	UrlRequest_Connection::~UrlRequest_Connection()
 	{
 		::InternetCloseHandle(hConnect);
-		_UrlRequestSession* session = _UrlRequest::getSession();
+		UrlRequest_Session* session = UrlRequest_Impl::getSession();
 		if (session) {
 			session->connections.remove(id);
 		}
 	}
 
 
-	Ref<UrlRequest> UrlRequest::_create(const UrlRequestParam& param, const String& url, const String& downloadFilePath)
+	Ref<UrlRequest> UrlRequest::_create(const UrlRequestParam& param, const String& url)
 	{
-		return Ref<UrlRequest>::from(_UrlRequest::create(param, url, downloadFilePath));
+		return Ref<UrlRequest>::from(UrlRequest_Impl::create(param, url));
 	}
 
 }

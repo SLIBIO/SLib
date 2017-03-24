@@ -54,6 +54,7 @@ namespace slib
 		Map<String, String> requestHeaders;
 		Map<String, String> additionalRequestHeaders;
 		Memory requestBody;
+		String downloadFilePath;
 		
 		Ptr<IUrlRequestListener> listener;
 		Function<void(UrlRequest*)> onComplete;
@@ -72,6 +73,13 @@ namespace slib
 		
 		~UrlRequestParam();
 		
+	public:
+		void setRequestBodyAsString(const String& str);
+		
+		void setRequestBodyAsJson(const Json& json);
+		
+		void setRequestBodyAsXml(const Ref<XmlDocument>& xml);
+		
 	};
 	
 	class SLIB_EXPORT UrlRequest : public Object
@@ -85,9 +93,7 @@ namespace slib
 		
 	public:
 		static Ref<UrlRequest> send(const UrlRequestParam& param);
-		
-		static Ref<UrlRequest> downloadToFile(const String& filePath, const UrlRequestParam& param);
-		
+
 		static Ref<UrlRequest> send(const String& url, const Function<void(UrlRequest*)>& onComplete);
 		
 		static Ref<UrlRequest> send(const String& url, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
@@ -205,12 +211,20 @@ namespace slib
 		
 		sl_bool isError();
 		
+		String getLastErrorMessage();
+
+		sl_bool isClosed();
+		
 	protected:
-		static Ref<UrlRequest> _send(const UrlRequestParam& param, const String& downloadFilePath);
+		static Ref<UrlRequest> _create(const UrlRequestParam& param, const String& url);
 		
-		static Ref<UrlRequest> _create(const UrlRequestParam& param, const String& url, const String& downloadFilePath);
+		virtual void _sendSync();
 		
-		void _init(const UrlRequestParam& param, const String& url, const String& downloadFilePath);
+		void _sendSync_call();
+		
+		virtual void _sendAsync();
+		
+		void _init(const UrlRequestParam& param, const String& url);
 		
 		void _removeFromMap();
 		
@@ -229,8 +243,6 @@ namespace slib
 		void onUploadBody(sl_uint64 size);
 		
 		void _runCallback(const Function<void(UrlRequest*)>& callback);
-		
-		static void _onCreateError(const UrlRequestParam& param, const String& url, const String& downloadFilePath);
 		
 		static String _buildParameters(const Map<String, Variant>& params);
 		
@@ -265,6 +277,7 @@ namespace slib
 		
 		sl_bool m_flagClosed;
 		sl_bool m_flagError;
+		AtomicString m_lastErrorMessage;
 		
 		Ref<Event> m_eventSync;
 		
