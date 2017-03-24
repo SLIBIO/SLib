@@ -44,13 +44,13 @@ namespace slib
 		return Size::zero();
 	}
 
-	class _Cairo_FontObject : public Referable
+	class Cairo_FontObject : public Referable
 	{
 	public:
 		cairo_scaled_font_t* m_font;
 
 	public:
-		_Cairo_FontObject(const FontDesc& desc)
+		Cairo_FontObject(const FontDesc& desc)
 		{
 			cairo_scaled_font_t* font = sl_null;
 			cairo_font_slant_t slant = desc.flagItalic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL;
@@ -71,7 +71,7 @@ namespace slib
 			m_font = font;
 		}
 
-		~_Cairo_FontObject()
+		~Cairo_FontObject()
 		{
 			if (m_font) {
 				::cairo_scaled_font_destroy(m_font);
@@ -80,23 +80,23 @@ namespace slib
 
 	};
 
-	class _Font : public Font
+	class Font_Ext : public Font
 	{
 	public:
-		_Cairo_FontObject* getPlatformObject()
+		Cairo_FontObject* getPlatformObject()
 		{
 			if (m_platformObject.isNull()) {
 				SpinLocker lock(&m_lock);
 				if (m_platformObject.isNull()) {
-					m_platformObject = new _Cairo_FontObject(m_desc);
+					m_platformObject = new Cairo_FontObject(m_desc);
 				}
 			}
-			return (_Cairo_FontObject*)(m_platformObject.get());;
+			return (Cairo_FontObject*)(m_platformObject.get());;
 		}
 
 		cairo_scaled_font_t* getPlatformHandle()
 		{
-			_Cairo_FontObject* po = getPlatformObject();
+			Cairo_FontObject* po = getPlatformObject();
 			if (po) {
 				return po->m_font;
 			}
@@ -107,7 +107,7 @@ namespace slib
 	cairo_scaled_font_t* GraphicsPlatform::getCairoFont(Font* font)
 	{
 		if (font) {
-			return ((_Font*)font)->getPlatformHandle();
+			return ((Font_Ext*)font)->getPlatformHandle();
 		}
 		return 0;
 	}

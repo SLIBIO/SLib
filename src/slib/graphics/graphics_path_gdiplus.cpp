@@ -54,9 +54,7 @@ namespace slib
 
 		~_Gdiplus_GraphicsPathObject()
 		{
-			if (path) {
-				delete path;
-			}
+			delete path;
 		}
 
 	};

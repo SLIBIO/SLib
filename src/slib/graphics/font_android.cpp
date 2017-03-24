@@ -66,13 +66,13 @@ namespace slib
 		return Size::zero();
 	}
 
-	class _Android_FontObject : public Referable
+	class Android_FontObject : public Referable
 	{
 	public:
 		JniGlobal<jobject> m_font;
 		
 	public:	
-		_Android_FontObject(const FontDesc& desc)
+		Android_FontObject(const FontDesc& desc)
 		{
 			int style = 0;
 			if (desc.flagBold) {
@@ -97,23 +97,23 @@ namespace slib
 
 	};
 
-	class _Font : public Font
+	class Font_Ext : public Font
 	{
 	public:
-		_Android_FontObject* getPlatformObject()
+		Android_FontObject* getPlatformObject()
 		{
 			if (m_platformObject.isNull()) {
 				SpinLocker lock(&m_lock);
 				if (m_platformObject.isNull()) {
-					m_platformObject = new _Android_FontObject(m_desc);
+					m_platformObject = new Android_FontObject(m_desc);
 				}
 			}
-			return (_Android_FontObject*)(m_platformObject.get());;
+			return (Android_FontObject*)(m_platformObject.get());;
 		}
 
 		jobject getPlatformHandle()
 		{
-			_Android_FontObject* po = getPlatformObject();
+			Android_FontObject* po = getPlatformObject();
 			if (po) {
 				return po->m_font.get();
 			}
@@ -124,7 +124,7 @@ namespace slib
 	jobject GraphicsPlatform::getNativeFont(Font* font)
 	{
 		if (font) {
-			return ((_Font*)font)->getPlatformHandle();
+			return ((Font_Ext*)font)->getPlatformHandle();
 		}
 		return 0;
 	}

@@ -25,13 +25,13 @@ namespace slib
 		SLIB_JNI_INT_FIELD(color);
 	SLIB_JNI_END_CLASS
 
-	class _Android_BrushObject : public Referable
+	class Android_BrushObject : public Referable
 	{
 	public:
 		JniGlobal<jobject> m_brush;
 
 	public:
-		_Android_BrushObject(const BrushDesc& desc)
+		Android_BrushObject(const BrushDesc& desc)
 		{
 			JniLocal<jobject> jbrush = _JAndroidBrush::init.newObject(sl_null);
 			if (jbrush.isNotNull()) {
@@ -45,23 +45,23 @@ namespace slib
 		}
 	};
 
-	class _Brush : public Brush
+	class Brush_Ext : public Brush
 	{
 	public:
-		_Android_BrushObject* getPlatformObject()
+		Android_BrushObject* getPlatformObject()
 		{
 			if (m_platformObject.isNull()) {
 				SpinLocker lock(&m_lock);
 				if (m_platformObject.isNull()) {
-					m_platformObject = new _Android_BrushObject(m_desc);
+					m_platformObject = new Android_BrushObject(m_desc);
 				}
 			}
-			return (_Android_BrushObject*)(m_platformObject.get());;
+			return (Android_BrushObject*)(m_platformObject.get());;
 		}
 
 		jobject getPlatformHandle()
 		{
-			_Android_BrushObject* po = getPlatformObject();
+			Android_BrushObject* po = getPlatformObject();
 			if (po) {
 				return po->m_brush.get();
 			}
@@ -72,7 +72,7 @@ namespace slib
 	jobject GraphicsPlatform::getBrushHandle(Brush* brush)
 	{
 		if (brush) {
-			return ((_Brush*)brush)->getPlatformHandle();
+			return ((Brush_Ext*)brush)->getPlatformHandle();
 		}
 		return 0;
 	}

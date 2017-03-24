@@ -35,10 +35,8 @@ namespace slib
 	template <class T>
 	SLIB_INLINE void ScopedPtr<T>::release()
 	{
-		if (ptr) {
-			delete ptr;
-			ptr = sl_null;
-		}
+		delete ptr;
+		ptr = sl_null;
 	}
 	
 	template <class T>

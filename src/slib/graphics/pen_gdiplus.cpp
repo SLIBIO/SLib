@@ -95,9 +95,7 @@ namespace slib
 
 		~_Gdiplus_PenObject()
 		{
-			if (m_pen) {
-				delete m_pen;
-			}
+			delete m_pen;
 		}
 
 	};

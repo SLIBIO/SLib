@@ -72,7 +72,7 @@ namespace slib
 		return ret;
 	}
 
-	class _Apple_FontObject : public Referable
+	class Apple_FontObject : public Referable
 	{
 	public:
 		CTFontRef m_fontCoreText;
@@ -85,7 +85,7 @@ namespace slib
 		SpinLock m_lock;
 		
 	public:
-		_Apple_FontObject()
+		Apple_FontObject()
 		{
 			m_fontCoreText = nil;
 			m_flagCreatedCoreText = sl_false;
@@ -95,7 +95,7 @@ namespace slib
 			m_lastUIScaleFactor = 0;
 		}
 		
-		~_Apple_FontObject()
+		~Apple_FontObject()
 		{
 			if (m_fontCoreText) {
 				CFRelease(m_fontCoreText);
@@ -201,23 +201,23 @@ namespace slib
 
 	};
 
-	class _Font : public Font
+	class Font_Ext : public Font
 	{
 	public:
-		_Apple_FontObject* getPlatformObject()
+		Apple_FontObject* getPlatformObject()
 		{
 			if (m_platformObject.isNull()) {
 				SpinLocker lock(&m_lock);
 				if (m_platformObject.isNull()) {
-					m_platformObject = new _Apple_FontObject;
+					m_platformObject = new Apple_FontObject;
 				}
 			}
-			return (_Apple_FontObject*)(m_platformObject.get());;
+			return (Apple_FontObject*)(m_platformObject.get());;
 		}
 		
 		CTFontRef getCoreText()
 		{
-			_Apple_FontObject* po = getPlatformObject();
+			Apple_FontObject* po = getPlatformObject();
 			if (po) {
 				po->_createCoreText(m_desc);
 				return po->m_fontCoreText;
@@ -227,7 +227,7 @@ namespace slib
 		
 		UIFont* getUI(CGFloat scaleFactor)
 		{
-			_Apple_FontObject* po = getPlatformObject();
+			Apple_FontObject* po = getPlatformObject();
 			if (po) {
 				return po->_createUI(m_desc, scaleFactor);
 			}
@@ -239,7 +239,7 @@ namespace slib
 	CTFontRef GraphicsPlatform::getCoreTextFont(Font* _font)
 	{
 		if (_font) {
-			_Font* font = (_Font*)_font;
+			Font_Ext* font = (Font_Ext*)_font;
 			return font->getCoreText();
 		}
 		return NULL;
@@ -252,7 +252,7 @@ namespace slib
 #endif
 	{
 		if (_font) {
-			_Font* font = (_Font*)_font;
+			Font_Ext* font = (Font_Ext*)_font;
 			return font->getUI(scaleFactor);
 		}
 		return nil;

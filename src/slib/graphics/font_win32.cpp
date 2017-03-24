@@ -22,14 +22,14 @@
 namespace slib
 {
 
-	class _Win32_FontStatic
+	class Win32_FontStatic
 	{
 	public:
 		Gdiplus::Bitmap* image;
 		Gdiplus::Graphics* graphics;
 
 	public:
-		_Win32_FontStatic()
+		Win32_FontStatic()
 		{
 			graphics = sl_null;
 			image = new Gdiplus::Bitmap(1, 1, PixelFormat24bppRGB);
@@ -38,14 +38,10 @@ namespace slib
 			}
 		}
 
-		~_Win32_FontStatic()
+		~Win32_FontStatic()
 		{
-			if (graphics) {
-				delete graphics;
-			}
-			if (image) {
-				delete image;
-			}
+			delete graphics;
+			delete image;
 		}
 	};
 
@@ -73,7 +69,7 @@ namespace slib
 			return Size::zero();
 		}
 
-		SLIB_SAFE_STATIC(_Win32_FontStatic, fs)
+		SLIB_SAFE_STATIC(Win32_FontStatic, fs)
 		if (SLIB_SAFE_STATIC_CHECK_FREED(fs)) {
 			return Size::zero();
 		}
@@ -94,7 +90,7 @@ namespace slib
 
 	}
 
-	class _Win32_FontObject : public Referable
+	class Win32_FontObject : public Referable
 	{
 	public:
 		Gdiplus::Font* m_fontGdiplus;
@@ -106,7 +102,7 @@ namespace slib
 		SpinLock m_lock;
 
 	public:
-		_Win32_FontObject()
+		Win32_FontObject()
 		{
 			m_fontGdiplus = sl_null;
 			m_flagCreatedGdiplus = sl_false;
@@ -115,11 +111,9 @@ namespace slib
 			m_flagCreatedGDI = sl_false;
 		}
 
-		~_Win32_FontObject()
+		~Win32_FontObject()
 		{
-			if (m_fontGdiplus) {
-				delete m_fontGdiplus;
-			}
+			delete m_fontGdiplus;
 			if (m_fontGDI) {
 				::DeleteObject(m_fontGDI);
 			}
@@ -207,23 +201,23 @@ namespace slib
 
 	};
 
-	class _Font : public Font
+	class Font_Ext : public Font
 	{
 	public:
-		_Win32_FontObject* getPlatformObject()
+		Win32_FontObject* getPlatformObject()
 		{
 			if (m_platformObject.isNull()) {
 				SpinLocker lock(&m_lock);
 				if (m_platformObject.isNull()) {
-					m_platformObject = new _Win32_FontObject;
+					m_platformObject = new Win32_FontObject;
 				}
 			}
-			return (_Win32_FontObject*)(m_platformObject.get());;
+			return (Win32_FontObject*)(m_platformObject.get());;
 		}
 
 		Gdiplus::Font* getGdiplus()
 		{
-			_Win32_FontObject* po = getPlatformObject();
+			Win32_FontObject* po = getPlatformObject();
 			if (po) {
 				po->_createGdiplus(m_desc);
 				return po->m_fontGdiplus;
@@ -233,7 +227,7 @@ namespace slib
 
 		HFONT getGDI()
 		{
-			_Win32_FontObject* po = getPlatformObject();
+			Win32_FontObject* po = getPlatformObject();
 			if (po) {
 				po->_createGDI(m_desc);
 				return po->m_fontGDI;
@@ -246,7 +240,7 @@ namespace slib
 	Gdiplus::Font* GraphicsPlatform::getGdiplusFont(Font* _font)
 	{
 		if (_font) {
-			_Font* font = (_Font*)_font;
+			Font_Ext* font = (Font_Ext*)_font;
 			return font->getGdiplus();
 		}
 		return NULL;
@@ -255,7 +249,7 @@ namespace slib
 	HFONT GraphicsPlatform::getGdiFont(Font* _font)
 	{
 		if (_font) {
-			_Font* font = (_Font*)_font;
+			Font_Ext* font = (Font_Ext*)_font;
 			return font->getGDI();
 		}
 		return NULL;
