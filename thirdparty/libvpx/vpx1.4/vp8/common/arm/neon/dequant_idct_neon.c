@@ -10,8 +10,8 @@
 
 #include <arm_neon.h>
 
-static const int16_t cospi8sqrt2minus1 = 20091;
-static const int16_t sinpi8sqrt2       = 35468;
+static const int16_t cospi8sqrt2minus1 = (int16_t)20091;
+static const int16_t sinpi8sqrt2       = (int16_t)35468;
 
 void vp8_dequant_idct_add_neon(
         int16_t *input,

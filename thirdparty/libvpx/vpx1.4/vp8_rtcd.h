@@ -31,10 +31,12 @@
 
 #elif defined(__ANDROID__)
 
-#	if defined(__aarch64__)
+#	if defined(__aarch64__) || defined(__arm64__)
 #		include "platforms/arm64_android/vp8_rtcd.h"
 #	elif defined(__arm__)
 #		include "platforms/armv7_android/vp8_rtcd.h"
+#	elif defined(__i386__)
+#		include "platforms/x86_android/vp8_rtcd.h"
 #	endif
 
 #endif
