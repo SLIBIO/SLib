@@ -99,7 +99,11 @@ namespace slib
 			__android_log_print(ANDROID_LOG_INFO, tag.getData(), "%s", content.getData());
 #elif defined(SLIB_PLATFORM_IS_TIZEN)
 			ObjectLocker lock(this);
-			::dlog_print(DLOG_INFO, tag.getData(), "%s", content.getData());
+			if (content.isNotEmpty()) {
+				::dlog_print(DLOG_INFO, tag.getData(), "%s", content.getData());
+			} else {
+				::dlog_print(DLOG_INFO, tag.getData(), " ");
+			}
 #else
 			String s = _Log_getLineString(tag, content);
 			Console::println(s);
@@ -114,7 +118,11 @@ namespace slib
 			__android_log_print(ANDROID_LOG_ERROR, tag.getData(), "%s", content.getData());
 #elif defined(SLIB_PLATFORM_IS_TIZEN)
 			ObjectLocker lock(this);
-			::dlog_print(DLOG_ERROR, tag.getData(), "%s", content.getData());
+			if (content.isNotEmpty()) {
+				::dlog_print(DLOG_ERROR, tag.getData(), "%s", content.getData());
+			} else {
+				::dlog_print(DLOG_ERROR, tag.getData(), " ");
+			}
 #else
 			log(tag, content);
 #endif
