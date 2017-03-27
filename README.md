@@ -1,8 +1,8 @@
 # SLib.io
 
-SLib.io is a cross-platform library specially designed for UI, rendering and networking solutions.
+SLib.io is a universal cross-platform library, specially designed for the various UI components, OpenGL rendering, and networking solutions.
 
-It can build apps and games for Android/iOS/macOS/Tizen/Win32 platforms, and also HTTP/Socket servers on Linux/macOS/Win32 platforms.
+SLib.io enables software developers to build multi-platform(Android/iOS/MacOS/Tizen/Win32) applications and games under the most effective workflows and the coding conventions of C++, while providing easy-to-use toolkits to develop HTTP/Socket servers on the Linux/MacOS/Win32 platforms.
 
 
 ## Modules
@@ -32,11 +32,9 @@ It can build apps and games for Android/iOS/macOS/Tizen/Win32 platforms, and als
 
 ## Contributing
 
-For contributing PRs and issues, please contact at contact@slib.io
+We sincerely appreciate your support and suggestions. For contributing pull requests, please make sure to contact us at contact@slib.io.
 
 
 ## License
 
-SLib.io is dual-licensed. It is licensed under Mozilla Public License v2.0 but also under a separate proprietary license. If you feel like you really need to purchase a proprietary license for SLib.io, please contact at contact@slib.io
-
-
+SLib.io is dual-licensed. It is currently licensed under the Mozilla Public License v2.0, but also under a separate proprietary license. If you feel like you need to purchase a proprietary license for SLib.io, please contact us at contact@slib.io.
