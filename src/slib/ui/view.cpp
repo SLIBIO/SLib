@@ -3119,7 +3119,7 @@ namespace slib
 
 	void View::setAlignBottom(const Ref<View>& view, UIUpdateMode mode)
 	{
-		if (view.isNotNull()) {
+		if (view.isNull()) {
 			return;
 		}
 		_initializeLayoutAttributes();
@@ -3142,7 +3142,7 @@ namespace slib
 
 	void View::setAbove(const Ref<View>& view, UIUpdateMode mode)
 	{
-		if (view.isNotNull()) {
+		if (view.isNull()) {
 			return;
 		}
 		_initializeLayoutAttributes();
@@ -3223,7 +3223,7 @@ namespace slib
 
 	void View::setAlignCenterHorizontal(const Ref<View>& view, UIUpdateMode mode)
 	{
-		if (view.isNotNull()) {
+		if (view.isNull()) {
 			return;
 		}
 		_initializeLayoutAttributes();
@@ -3246,7 +3246,7 @@ namespace slib
 
 	void View::setAlignCenterVertical(const Ref<View>& view, UIUpdateMode mode)
 	{
-		if (view.isNotNull()) {
+		if (view.isNull()) {
 			return;
 		}
 		_initializeLayoutAttributes();
