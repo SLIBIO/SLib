@@ -1,6 +1,6 @@
 # SLib.io
 
-SLib.io is a universal cross-platform library, specially designed for the various UI components, OpenGL rendering, and networking solutions.
+SLib.io is a universal cross-platform library, specially designed for the various UI components, OpenGL rendering and networking solutions.
 
 SLib.io enables software developers to build multi-platform(Android/iOS/MacOS/Tizen/Win32) applications and games under the most effective workflows and the coding conventions of C++, while providing easy-to-use toolkits to develop HTTP/Socket servers on the Linux/MacOS/Win32 platforms.
 
