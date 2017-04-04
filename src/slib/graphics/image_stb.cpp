@@ -10,8 +10,6 @@
 
 #include "image_stb.h"
 
-#ifdef SLIB_GRAPHICS_IMAGE_USE_STB
-
 #ifdef _MSC_VER
 #pragma warning(disable : 4312)
 #pragma warning(disable : 4996)
@@ -44,4 +42,3 @@ namespace slib
 
 }
 
-#endif

@@ -10,8 +10,6 @@
 
 #include "slib/graphics/image.h"
 
-#ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_PNG
-
 #include "slib/core/file.h"
 
 #include "thirdparty/libpng/png.h"
@@ -145,5 +143,3 @@ namespace slib
 	}
 
 }
-
-#endif

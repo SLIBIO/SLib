@@ -10,8 +10,6 @@
 
 #include "slib/graphics/image.h"
 
-#ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_JPEG
-
 #include "slib/core/file.h"
 #include "slib/core/scoped.h"
 
@@ -210,5 +208,3 @@ namespace slib
 	}
 
 }
-
-#endif

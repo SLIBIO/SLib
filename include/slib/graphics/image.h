@@ -150,7 +150,7 @@ namespace slib
 
 		static Ref<Image> loadFromAsset(const String& path, sl_uint32 width = 0, sl_uint32 height = 0);
 	
-#ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_PNG
+		
 		static Ref<Image> loadFromPNG(const void* content, sl_size size);
 
 		static Memory saveToPNG(const Ref<Image>& image);
@@ -160,9 +160,8 @@ namespace slib
 		static sl_bool saveToPNG(String filePath, const Ref<Image>& image);
 
 		sl_bool saveToPNG(String filePath);
-#endif
-	
-#ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_JPEG
+		
+
 		static Ref<Image> loadFromJPEG(const void* content, sl_size size);
 
 		static Memory saveToJPEG(const Ref<Image>& image, float quality = 0.5f);
@@ -172,8 +171,8 @@ namespace slib
 		static sl_bool saveToJPEG(String filePath, const Ref<Image>& image, float quality = 0.5f);
 
 		sl_bool saveToJPEG(String filePath, float quality = 0.5f);
-#endif
 
+		
 	public:
 		Ref<Drawable> getDrawableCache();
 	

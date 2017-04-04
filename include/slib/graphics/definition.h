@@ -13,6 +13,4 @@
 
 #include "../core/definition.h"
 
-#include "config.h"
-
 #endif

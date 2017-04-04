@@ -1279,31 +1279,9 @@ namespace slib
 		return getFileType(mem.getData(), mem.getSize());
 	}
 
-	Ref<Image> Image::loadFromMemory(const void* _mem, sl_size size, sl_uint32 width, sl_uint32 height)
+	Ref<Image> Image::loadFromMemory(const void* mem, sl_size size, sl_uint32 width, sl_uint32 height)
 	{
-		Ref<Image> ret;
-		sl_uint8* mem = (sl_uint8*)_mem;
-		ImageFileType type = getFileType(mem, size);
-		do {
-#ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_JPEG
-			if (type == ImageFileType::JPEG) {
-				ret = loadFromJPEG(mem, size);
-				break;
-			}
-#endif
-#ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_PNG
-			if (type == ImageFileType::PNG) {
-				ret = loadFromPNG(mem, size);
-				break;
-			}
-#endif
-#ifdef SLIB_GRAPHICS_IMAGE_USE_STB
-			ret = Image_STB::loadImage(mem, size);
-			if (ret.isNotNull()) {
-				break;
-			}
-#endif
-		} while (0);
+		Ref<Image> ret = Image_STB::loadImage(mem, size);
 		if (ret.isNotNull()) {
 			if (width == 0 || height == 0) {
 				return ret;

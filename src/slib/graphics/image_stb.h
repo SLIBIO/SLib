@@ -13,8 +13,6 @@
 
 #include "slib/graphics/image.h"
 
-#ifdef SLIB_GRAPHICS_IMAGE_USE_STB
-
 namespace slib
 {
 
@@ -25,7 +23,5 @@ namespace slib
 	};
 
 }
-
-#endif
 
 #endif
