@@ -407,7 +407,7 @@ namespace slib
 		AlertDialog alert;
 		alert.type = AlertDialogType::YesNo;
 		alert.text = text;
-		alert.onOk = onYes;
+		alert.onYes = onYes;
 		alert.onNo = onNo;
 		alert.show();
 	}
@@ -418,7 +418,7 @@ namespace slib
 		alert.type = AlertDialogType::YesNo;
 		alert.caption = caption;
 		alert.text = text;
-		alert.onOk = onYes;
+		alert.onYes = onYes;
 		alert.onNo = onNo;
 		alert.show();
 	}
@@ -429,7 +429,7 @@ namespace slib
 		alert.type = AlertDialogType::YesNo;
 		
 		alert.text = text;
-		alert.onOk = onYes;
+		alert.onYes = onYes;
 		alert.show();
 	}
 
@@ -439,7 +439,7 @@ namespace slib
 		alert.type = AlertDialogType::YesNo;
 		alert.caption = caption;
 		alert.text = text;
-		alert.onOk = onYes;
+		alert.onYes = onYes;
 		alert.show();
 	}
 
@@ -484,7 +484,7 @@ namespace slib
 		AlertDialog alert;
 		alert.type = AlertDialogType::YesNoCancel;
 		alert.text = text;
-		alert.onOk = onYes;
+		alert.onYes = onYes;
 		alert.onNo = onNo;
 		alert.onCancel = onCancel;
 		alert.show();
@@ -496,7 +496,7 @@ namespace slib
 		alert.type = AlertDialogType::YesNoCancel;
 		alert.caption = caption;
 		alert.text = text;
-		alert.onOk = onYes;
+		alert.onYes = onYes;
 		alert.onNo = onNo;
 		alert.onCancel = onCancel;
 		alert.show();
@@ -507,7 +507,7 @@ namespace slib
 		AlertDialog alert;
 		alert.type = AlertDialogType::YesNoCancel;
 		alert.text = text;
-		alert.onOk = onYes;
+		alert.onYes = onYes;
 		alert.onNo = onNo;
 		alert.show();
 	}
@@ -518,7 +518,7 @@ namespace slib
 		alert.type = AlertDialogType::YesNoCancel;
 		alert.caption = caption;
 		alert.text = text;
-		alert.onOk = onYes;
+		alert.onYes = onYes;
 		alert.onNo = onNo;
 		alert.show();
 	}
