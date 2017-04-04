@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/parse.h"
+#include "slib/core/parse.h"
 
-#include "../../../inc/slib/core/scoped.h"
-#include "../../../inc/slib/core/math.h"
+#include "slib/core/scoped.h"
+#include "slib/core/math.h"
 
 namespace slib
 {

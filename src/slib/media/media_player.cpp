@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/media/media_player.h"
+#include "slib/media/media_player.h"
 
-#include "../../../inc/slib/core/map.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/core/map.h"
+#include "slib/core/safe_static.h"
 
 namespace slib
 {

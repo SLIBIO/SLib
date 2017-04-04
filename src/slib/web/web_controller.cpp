@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/web/controller.h"
+#include "slib/web/controller.h"
 
-#include "../../../inc/slib/web/service.h"
-#include "../../../inc/slib/core/xml.h"
+#include "slib/web/service.h"
+#include "slib/core/xml.h"
 
 namespace slib
 {

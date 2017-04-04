@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/notification.h"
+#include "slib/ui/notification.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 

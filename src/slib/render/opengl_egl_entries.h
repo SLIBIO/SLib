@@ -11,10 +11,10 @@
 #ifndef CHECKHEADER_SLIB_RENDER_OPENGL_EGL_ENTRIES
 #define CHECKHEADER_SLIB_RENDER_OPENGL_EGL_ENTRIES
 
-#include "../../../inc/slib/render/definition.h"
+#include "slib/render/definition.h"
 
-#include "../../../inc/thirdparty/gl/EGL/egl.h"
-#include "../../../inc/thirdparty/gl/EGL/eglext.h"
+#include "thirdparty/gl/EGL/egl.h"
+#include "thirdparty/gl/EGL/eglext.h"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 

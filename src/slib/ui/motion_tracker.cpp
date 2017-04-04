@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/motion_tracker.h"
+#include "slib/ui/motion_tracker.h"
 
-#include "../../../inc/slib/ui/event.h"
-#include "../../../inc/slib/core/math.h"
+#include "slib/ui/event.h"
+#include "slib/core/math.h"
 
 #define MOVEMENT_ZERO_MOVEMENT 5
 	

@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/math/box.h"
+#include "slib/math/box.h"
 
 namespace slib
 {

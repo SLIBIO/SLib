@@ -8,16 +8,16 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 
-#include "../../../inc/slib/media/media_player.h"
+#include "slib/media/media_player.h"
 
-#include "../../../inc/slib/render/opengl.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/render/opengl.h"
+#include "slib/core/safe_static.h"
 
-#include "../../../inc/slib/core/platform_android.h"
+#include "slib/core/platform_android.h"
 
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>

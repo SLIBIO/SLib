@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/edit_view.h"
+#include "slib/ui/edit_view.h"
 
-#include "../../../inc/slib/ui/mobile_app.h"
-#include "../../../inc/slib/ui/scroll_view.h"
+#include "slib/ui/mobile_app.h"
+#include "slib/ui/scroll_view.h"
 
 namespace slib
 {
@@ -19,27 +19,6 @@ namespace slib
 /**********************
 	EditView
  ***********************/
-
-	IEditViewListener::IEditViewListener()
-	{
-	}
-
-	IEditViewListener::~IEditViewListener()
-	{
-	}
-
-	String IEditViewListener::onChange(EditView* edit, const String& newValue)
-	{
-		return String::null();
-	}
-
-	void IEditViewListener::onReturnKey(EditView* edit)
-	{
-	}
-	
-	void IEditViewListener::onDoneEdit(EditView* edit)
-	{
-	}
 
 	SLIB_DEFINE_OBJECT(EditView, View)
 
@@ -352,10 +331,6 @@ namespace slib
 	String EditView::dispatchChange(const String& newValue)
 	{
 		String value = onChange(newValue);
-		PtrLocker<IEditViewListener> listener(getListener());
-		if (listener.isNotNull()) {
-			value = listener->onChange(this, value);
-		}
 		Function<String(EditView*, String)> callback = getOnChange();
 		if (callback.isNotNull()) {
 			value = callback(this, value);
@@ -366,20 +341,12 @@ namespace slib
 	void EditView::dispatchReturnKey()
 	{
 		onReturnKey();
-		PtrLocker<IEditViewListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onReturnKey(this);
-		}
 		getOnReturnKey()(this);
 	}
 	
 	void EditView::dispatchDoneEdit()
 	{
 		onDoneEdit();
-		PtrLocker<IEditViewListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onDoneEdit(this);
-		}
 		getOnDoneEdit()(this);
 	}
 

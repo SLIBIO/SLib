@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/graphics/yuv.h"
+#include "slib/graphics/yuv.h"
 
-#include "../../../inc/slib/core/math.h"
+#include "slib/core/math.h"
 
 #define YUV_YG 18997 /* round(1.164 * 64 * 256 * 256 / 257) */
 #define YUV_YGB 1160 /* 1.164 * 64 * 16 - adjusted for even error distribution */

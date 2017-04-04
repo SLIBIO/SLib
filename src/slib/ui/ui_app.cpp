@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/app.h"
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/window.h"
-#include "../../../inc/slib/ui/menu.h"
+#include "slib/ui/app.h"
+#include "slib/ui/core.h"
+#include "slib/ui/window.h"
+#include "slib/ui/menu.h"
 
 namespace slib
 {

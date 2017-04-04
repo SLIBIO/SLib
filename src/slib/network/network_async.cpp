@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/async.h"
+#include "slib/network/async.h"
 
 #include "network_async.h"
 

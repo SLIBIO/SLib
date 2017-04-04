@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/graphics/image.h"
+#include "slib/graphics/image.h"
 
 #ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_PNG
 
-#include "../../../inc/slib/core/file.h"
+#include "slib/core/file.h"
 
-#include "../../../inc/thirdparty/libpng/png.h"
-#include "../../../inc/thirdparty/libpng/pngstruct.h"
+#include "thirdparty/libpng/png.h"
+#include "thirdparty/libpng/pngstruct.h"
 
 namespace slib
 {

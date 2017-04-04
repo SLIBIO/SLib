@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/setting.h"
+#include "slib/core/setting.h"
 
-#include "../../../inc/slib/core/file.h"
+#include "slib/core/file.h"
 
 namespace slib
 {

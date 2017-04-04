@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/map/geo_rectangle.h"
+#include "slib/geo/geo_rectangle.h"
 
-#include "../../../inc/slib/core/macro.h"
+#include "slib/core/macro.h"
 
 namespace slib
 {

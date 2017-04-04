@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/graphics/path.h"
+#include "slib/graphics/path.h"
 
-#include "../../../inc/slib/math/bezier.h"
+#include "slib/math/bezier.h"
 
 namespace slib
 {

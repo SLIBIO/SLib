@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/graphics/font_atlas.h"
+#include "slib/graphics/font_atlas.h"
 
-#include "../../../inc/slib/core/variant.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/core/variant.h"
+#include "slib/core/safe_static.h"
 
 #define PLANE_SIZE_MIN 32
 #define PLANE_WIDTH_DEFAULT 0

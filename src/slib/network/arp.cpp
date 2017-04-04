@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/arp.h"
+#include "slib/network/arp.h"
 
-#include "../../../inc/slib/core/mio.h"
+#include "slib/core/mio.h"
 
 namespace slib
 {

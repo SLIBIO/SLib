@@ -11,7 +11,7 @@
 #ifndef CHECKHEADER_SLIB_CORE_ASYNC_CONFIG
 #define CHECKHEADER_SLIB_CORE_ASYNC_CONFIG
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 #define ASYNC_USE_IOCP

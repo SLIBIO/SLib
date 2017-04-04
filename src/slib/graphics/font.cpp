@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/graphics/font.h"
+#include "slib/graphics/font.h"
 
-#include "../../../inc/slib/graphics/font_atlas.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/graphics/font_atlas.h"
+#include "slib/core/safe_static.h"
 
 namespace slib
 {

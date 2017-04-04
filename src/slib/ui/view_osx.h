@@ -11,12 +11,12 @@
 #ifndef CHECKHEADER_SLIB_UI_VIEW_OSX
 #define CHECKHEADER_SLIB_UI_VIEW_OSX
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_OSX)
 
-#include "../../../inc/slib/ui/view.h"
-#include "../../../inc/slib/ui/platform.h"
+#include "slib/ui/view.h"
+#include "slib/ui/platform.h"
 
 namespace slib
 {

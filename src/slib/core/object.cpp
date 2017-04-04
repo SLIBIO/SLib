@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/object.h"
+#include "slib/core/object.h"
 
-#include "../../../inc/slib/core/string.h"
-#include "../../../inc/slib/core/map.h"
-#include "../../../inc/slib/core/variant.h"
+#include "slib/core/string.h"
+#include "slib/core/map.h"
+#include "slib/core/variant.h"
 
 namespace slib
 {

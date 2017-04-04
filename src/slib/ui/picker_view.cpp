@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/picker_view.h"
+#include "slib/ui/picker_view.h"
 
-#include "../../../inc/slib/core/safe_static.h"
-#include "../../../inc/slib/core/math.h"
-#include "../../../inc/slib/ui/resource.h"
+#include "slib/core/safe_static.h"
+#include "slib/core/math.h"
+#include "slib/ui/resource.h"
 
 #define ANIMATE_FRAME_MS 15
 
@@ -21,14 +21,6 @@ namespace slib
 
 	SLIB_DEFINE_OBJECT(PickerView, View)
 	
-	IPickerViewListener::IPickerViewListener()
-	{
-	}
-
-	IPickerViewListener::~IPickerViewListener()
-	{
-	}
-
 	PickerView::PickerView()
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
@@ -329,10 +321,6 @@ namespace slib
 	void PickerView::dispatchSelectItem(sl_uint32 index)
 	{
 		onSelectItem(index);
-		PtrLocker<IPickerViewListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onSelectItem(this, index);
-		}
 		getOnSelectItem()(this, index);
 	}
 	

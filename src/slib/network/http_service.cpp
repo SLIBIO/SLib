@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/http_service.h"
+#include "slib/network/http_service.h"
 
-#include "../../../inc/slib/network/url.h"
-#include "../../../inc/slib/core/asset.h"
-#include "../../../inc/slib/core/file.h"
-#include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/json.h"
-#include "../../../inc/slib/core/content_type.h"
+#include "slib/network/url.h"
+#include "slib/core/asset.h"
+#include "slib/core/file.h"
+#include "slib/core/log.h"
+#include "slib/core/json.h"
+#include "slib/core/content_type.h"
 
 #define SERVICE_TAG "HTTP SERVICE"
 

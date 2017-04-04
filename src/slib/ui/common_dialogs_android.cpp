@@ -8,15 +8,15 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 
-#include "../../../inc/slib/ui/common_dialogs.h"
+#include "slib/ui/common_dialogs.h"
 
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/platform.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/ui/core.h"
+#include "slib/ui/platform.h"
+#include "slib/core/safe_static.h"
 
 namespace slib
 {

@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/graphics/bitmap_data.h"
+#include "slib/graphics/bitmap_data.h"
 
-#include "../../../inc/slib/graphics/yuv.h"
+#include "slib/graphics/yuv.h"
 
 namespace slib
 {

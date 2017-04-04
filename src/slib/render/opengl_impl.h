@@ -11,14 +11,14 @@
 #ifndef CHECKHEADER_SLIB_RENDER_OPENGL_IMPL
 #define CHECKHEADER_SLIB_RENDER_OPENGL_IMPL
 
-#include "../../../inc/slib/render/definition.h"
+#include "slib/render/definition.h"
 
-#include "../../../inc/slib/core/endian.h"
-#include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/thread.h"
-#include "../../../inc/slib/core/system.h"
-#include "../../../inc/slib/core/scoped.h"
-#include "../../../inc/slib/graphics/image.h"
+#include "slib/core/endian.h"
+#include "slib/core/log.h"
+#include "slib/core/thread.h"
+#include "slib/core/system.h"
+#include "slib/core/scoped.h"
+#include "slib/graphics/image.h"
 
 #define STACK_BUFFER_COUNT 128
 #define STACK_IMAGE_SIZE 16384

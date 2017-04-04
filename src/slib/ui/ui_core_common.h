@@ -11,7 +11,7 @@
 #ifndef CHECKHEADER_SLIB_UI_CORE_COMMON
 #define CHECKHEADER_SLIB_UI_CORE_COMMON
 
-#include "../../../inc/slib/ui/core.h"
+#include "slib/ui/core.h"
 
 namespace slib
 {

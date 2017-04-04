@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
-#include "../../../inc/slib/ui/edit_view.h"
+#include "slib/ui/edit_view.h"
 
 #include "view_ios.h"
 
@@ -21,6 +21,9 @@
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 	
 }
+
+-(void) onDoneEdit;
+
 @end
 
 @interface _Slib_iOS_TextArea : UITextView<UITextViewDelegate> {
@@ -28,11 +31,14 @@
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 	
 }
+
 @property (nonatomic, retain) NSString *placeholder;
 @property (nonatomic, retain) UIColor *placeholderColor;
 @property (nonatomic, retain) UILabel *placeHolderLabel;
 
 -(void) refreshPlaceholder;
+
+-(void) onDoneEdit;
 
 @end
 
@@ -124,7 +130,7 @@ namespace slib
 	toolbar.barTintColor = [UIColor colorWithRed:181.0/255 green:187.0/255 blue:193.0/255 alpha:1];\
 	UIBarButtonItem *flex = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:handle action:nil];\
 	UIBarButtonItem* barButtonDone;\
-	barButtonDone = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:handle action:@selector(_onDoneEdit)];\
+	barButtonDone = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:handle action:@selector(onDoneEdit)];\
 	toolbar.items = [NSArray arrayWithObjects:flex, flex, barButtonDone, nil];\
 	handle.inputAccessoryView = toolbar;
 		
@@ -644,7 +650,7 @@ namespace slib
 	return NO;
 }
 
--(void)_onDoneEdit
+-(void) onDoneEdit
 {
 	[self resignFirstResponder];
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
@@ -734,7 +740,7 @@ namespace slib
 }
 
 
--(void)_onDoneEdit
+-(void)onDoneEdit
 {
 	[self resignFirstResponder];
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;

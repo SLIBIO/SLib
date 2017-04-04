@@ -8,16 +8,16 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/capture.h"
+#include "slib/network/capture.h"
 
-#include "../../../inc/slib/core/thread.h"
-#include "../../../inc/slib/core/mio.h"
-#include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/network/os.h"
-#include "../../../inc/slib/network/socket.h"
-#include "../../../inc/slib/network/event.h"
-#include "../../../inc/slib/network/tcpip.h"
-#include "../../../inc/slib/network/ethernet.h"
+#include "slib/core/thread.h"
+#include "slib/core/mio.h"
+#include "slib/core/log.h"
+#include "slib/network/os.h"
+#include "slib/network/socket.h"
+#include "slib/network/event.h"
+#include "slib/network/tcpip.h"
+#include "slib/network/ethernet.h"
 
 #define TAG "NetCapture"
 

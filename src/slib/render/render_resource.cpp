@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/render/resource.h"
+#include "slib/render/resource.h"
 
 namespace slib
 {

@@ -11,11 +11,11 @@
 #ifndef CHECKHEADER_SLIB_RENDER_OPENGL_GLES
 #define CHECKHEADER_SLIB_RENDER_OPENGL_GLES
 
-#include "../../../inc/slib/render/definition.h"
+#include "slib/render/definition.h"
 
 #if defined(SLIB_RENDER_SUPPORT_OPENGL_GLES)
 
-#include "../../../inc/thirdparty/gl/GLES3/gl3.h"
+#include "thirdparty/gl/GLES3/gl3.h"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 

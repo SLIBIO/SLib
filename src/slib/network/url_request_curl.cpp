@@ -1,10 +1,10 @@
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_TIZEN)
 
-#include "../../../inc/slib/network/url_request.h"
+#include "slib/network/url_request.h"
 
-#include "../../../inc/slib/core/log.h"
+#include "slib/core/log.h"
 
 #include <curl/curl.h>
 #include <net_connection.h>

@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_TIZEN)
 
-#include "../../../inc/slib/graphics/drawable.h"
+#include "slib/graphics/drawable.h"
 
-#include "../../../inc/slib/graphics/image.h"
-#include "../../../inc/slib/graphics/platform.h"
+#include "slib/graphics/image.h"
+#include "slib/graphics/platform.h"
 
 namespace slib
 {

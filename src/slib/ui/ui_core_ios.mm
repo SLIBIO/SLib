@@ -8,20 +8,20 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/screen.h"
-#include "../../../inc/slib/ui/platform.h"
-#include "../../../inc/slib/ui/mobile_app.h"
-#include "../../../inc/slib/ui/notification.h"
+#include "slib/ui/core.h"
+#include "slib/ui/screen.h"
+#include "slib/ui/platform.h"
+#include "slib/ui/mobile_app.h"
+#include "slib/ui/notification.h"
 
-#include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/json.h"
-#include "../../../inc/slib/core/variant.h"
-#include "../../../inc/slib/core/platform_apple.h"
+#include "slib/core/log.h"
+#include "slib/core/json.h"
+#include "slib/core/variant.h"
+#include "slib/core/platform_apple.h"
 
 @interface _slib_iOS_AppDelegate : UIResponder <UIApplicationDelegate>
 @property (strong, nonatomic) UIWindow *window;

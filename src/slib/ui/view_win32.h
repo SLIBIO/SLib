@@ -11,11 +11,11 @@
 #ifndef CHECKHEADER_SLIB_UI_VIEW_WIN32
 #define CHECKHEADER_SLIB_UI_VIEW_WIN32
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
-#include "../../../inc/slib/ui/view.h"
+#include "slib/ui/view.h"
 
 #include "ui_core_win32.h"
 

@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/linked_list.h"
-#include "../../../inc/slib/core/loop_queue.h"
-#include "../../../inc/slib/core/queue.h"
-#include "../../../inc/slib/core/queue_channel.h"
-#include "../../../inc/slib/core/linked_object.h"
+#include "slib/core/linked_list.h"
+#include "slib/core/loop_queue.h"
+#include "slib/core/queue.h"
+#include "slib/core/queue_channel.h"
+#include "slib/core/linked_object.h"
 
 namespace slib
 {

@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/media/audio_util.h"
+#include "slib/media/audio_util.h"
 
 #define _DEFINE_CONVERT_SAMPLES(TYPE_IN, TYPE_OUT) \
 	void AudioUtil::convertSamples(sl_size count, const TYPE_IN* in, TYPE_OUT* out) \

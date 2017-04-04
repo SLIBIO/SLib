@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/event.h"
+#include "slib/core/event.h"
 
-#include "../../../inc/slib/core/thread.h"
+#include "slib/core/thread.h"
 
 namespace slib
 {

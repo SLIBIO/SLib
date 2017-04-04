@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_TIZEN)
 
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/render_view.h"
-#include "../../../inc/slib/render/opengl.h"
-#include "../../../inc/slib/ui/mobile_app.h"
+#include "slib/ui/core.h"
+#include "slib/ui/render_view.h"
+#include "slib/render/opengl.h"
+#include "slib/ui/mobile_app.h"
 
 #include "view_tizen.h"
 

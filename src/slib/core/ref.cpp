@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/ref.h"
+#include "slib/core/ref.h"
 
 #define _SIGNATURE 0x15181289
 
@@ -27,6 +27,8 @@ namespace slib
 	{
 #ifdef SLIB_DEBUG_REFERENCE
 		m_signature = _SIGNATURE;
+#else
+		SLIB_UNUSED(m_signature);
 #endif
 		m_nRefCount = 0;
 		m_flagWeakRef = sl_false;

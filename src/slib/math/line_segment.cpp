@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/math/line_segment.h"
+#include "slib/math/line_segment.h"
 
 namespace slib
 {

@@ -12,8 +12,8 @@
 
 #if defined(ASYNC_USE_EPOLL)
 
-#include "../../../inc/slib/core/async.h"
-#include "../../../inc/slib/core/pipe.h"
+#include "slib/core/async.h"
+#include "slib/core/pipe.h"
 
 #include <unistd.h>
 #include <sys/epoll.h>

@@ -8,8 +8,8 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/pipe.h"
-#include "../../../inc/slib/core/file.h"
+#include "slib/core/pipe.h"
+#include "slib/core/file.h"
 
 #if defined(SLIB_PLATFORM_IS_UNIX)
 #include <poll.h>

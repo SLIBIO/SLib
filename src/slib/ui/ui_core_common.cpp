@@ -10,7 +10,7 @@
 
 #include "ui_core_common.h"
 
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/core/safe_static.h"
 
 namespace slib
 {

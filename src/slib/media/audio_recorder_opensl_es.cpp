@@ -8,12 +8,12 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/media/opensl_es.h"
+#include "slib/media/opensl_es.h"
 
 #ifdef SLIB_AUDIO_SUPPORT_OPENSL_ES
 
-#include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/ptr.h"
+#include "slib/core/log.h"
+#include "slib/core/ptr.h"
 
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 #include <SLES/OpenSLES.h>

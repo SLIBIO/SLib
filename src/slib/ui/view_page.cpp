@@ -8,35 +8,19 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/view_page.h"
+#include "slib/ui/view_page.h"
 
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/mobile_app.h"
+#include "slib/ui/core.h"
+#include "slib/ui/mobile_app.h"
 
-#include "../../../inc/slib/core/scoped.h"
+#include "slib/core/scoped.h"
 
 #if defined(SLIB_PLATFORM_IS_ANDROID)
-#	include "../../../inc/slib/core/platform_android.h"
+#	include "slib/core/platform_android.h"
 #endif
 
 namespace slib
 {
-
-	IViewPagerListener::IViewPagerListener()
-	{
-	}
-
-	IViewPagerListener::~IViewPagerListener()
-	{
-	}
-
-	void IViewPagerListener::onPageAction(ViewPager* navigation, View* page, UIPageAction action)
-	{
-	}
-
-	void IViewPagerListener::onFinishPageAnimation(ViewPager* navigation, View* page, UIPageAction action)
-	{
-	}
 
 	SLIB_DEFINE_OBJECT(ViewPager, View)
 
@@ -208,7 +192,7 @@ namespace slib
 
 	void ViewPager::_onFinishAnimation(const Ref<View>& view, UIPageAction action)
 	{
-		dispatchFinishPageAnimation(view.get(), action);
+		dispatchEndPageAnimation(view.get(), action);
 		switch (action) {
 			case UIPageAction::Pause:
 			case UIPageAction::Pop:
@@ -406,7 +390,7 @@ namespace slib
 			addChild(viewIn, UIUpdateMode::NoRedraw);
 			dispatchPageAction(viewIn.get(), UIPageAction::Push);
 			dispatchPageAction(viewIn.get(), UIPageAction::Resume);
-			dispatchFinishPageAnimation(viewIn.get(), UIPageAction::Push);
+			dispatchEndPageAnimation(viewIn.get(), UIPageAction::Push);
 			viewIn->setVisibility(Visibility::Visible, UIUpdateMode::NoRedraw);
 			viewIn->bringToFront();
 			return;
@@ -525,7 +509,7 @@ namespace slib
 			ScopedCounter counter(&m_countActiveTransitionAnimations);
 			dispatchPageAction(viewOut.get(), UIPageAction::Pause);
 			dispatchPageAction(viewOut.get(), UIPageAction::Pop);
-			dispatchFinishPageAnimation(viewOut.get(), UIPageAction::Pop);
+			dispatchEndPageAnimation(viewOut.get(), UIPageAction::Pop);
 			removeChild(viewOut);
 			viewOut->setVisibility(Visibility::Hidden, UIUpdateMode::NoRedraw);
 			m_pages.removeAll_NoLock();
@@ -759,12 +743,12 @@ namespace slib
 			transition.curve = m_popTransitionCurve;
 		}
 	}
-
+	
 	void ViewPager::onPageAction(View* page, UIPageAction action)
 	{
 	}
 
-	void ViewPager::onFinishPageAnimation(View* page, UIPageAction action)
+	void ViewPager::onEndPageAnimation(View* page, UIPageAction action)
 	{
 	}
 
@@ -772,10 +756,6 @@ namespace slib
 	{
 		if (page) {
 			onPageAction(page, action);
-			PtrLocker<IViewPagerListener> listener(getListener());
-			if (listener.isNotNull()) {
-				listener->onPageAction(this, page, action);
-			}
 			if (ViewPage* _page = CastInstance<ViewPage>(page)) {
 				_page->dispatchPageAction(this, action);
 			}
@@ -783,16 +763,12 @@ namespace slib
 		}
 	}
 
-	void ViewPager::dispatchFinishPageAnimation(View* page, UIPageAction action)
+	void ViewPager::dispatchEndPageAnimation(View* page, UIPageAction action)
 	{
 		if (page) {
-			onFinishPageAnimation(page, action);
-			PtrLocker<IViewPagerListener> listener(getListener());
-			if (listener.isNotNull()) {
-				listener->onFinishPageAnimation(this, page, action);
-			}
+			onEndPageAnimation(page, action);
 			if (ViewPage* _page = CastInstance<ViewPage>(page)) {
-				_page->dispatchFinishPageAnimation(this, action);
+				_page->dispatchEndPageAnimation(this, action);
 			}
 		}
 	}
@@ -1242,7 +1218,7 @@ namespace slib
 	{
 		ObjectLocker lock(this);
 		
-		dispatchFinishPageAnimation(sl_null, action);
+		dispatchEndPageAnimation(sl_null, action);
 		
 		if (action == UIPageAction::Pop) {
 			
@@ -1554,7 +1530,7 @@ namespace slib
 	{
 	}
 
-	void ViewPage::onFinishPageAnimation(UIPageAction action)
+	void ViewPage::onEndPageAnimation(UIPageAction action)
 	{
 	}
 
@@ -1587,11 +1563,11 @@ namespace slib
 		}
 	}
 
-	void ViewPage::dispatchFinishPageAnimation(ViewPager* pager, UIPageAction action)
+	void ViewPage::dispatchEndPageAnimation(ViewPager* pager, UIPageAction action)
 	{
 		m_pager = pager;
-		onFinishPageAnimation(action);
-		getOnFinishPageAnimation()(this, pager, action);
+		onEndPageAnimation(action);
+		getOnEndPageAnimation()(this, pager, action);
 	}
 
 	void ViewPage::dispatchOpen()

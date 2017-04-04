@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/crypto/block_cipher.h"
+#include "slib/crypto/block_cipher.h"
 
-#include "../../../inc/slib/core/mio.h"
-#include "../../../inc/slib/core/base.h"
-#include "../../../inc/slib/core/math.h"
+#include "slib/core/mio.h"
+#include "slib/core/base.h"
+#include "slib/core/math.h"
 
-#include "../../../inc/slib/crypto/aes.h"
-#include "../../../inc/slib/crypto/blowfish.h"
+#include "slib/crypto/aes.h"
+#include "slib/crypto/blowfish.h"
 
 namespace slib
 {

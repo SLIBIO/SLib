@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_OSX)
 
 #include "view_osx.h"
 
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/view.h"
+#include "slib/ui/core.h"
+#include "slib/ui/view.h"
 
 namespace slib
 {

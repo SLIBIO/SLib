@@ -8,15 +8,15 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/asset.h"
+#include "slib/core/asset.h"
 
-#include "../../../inc/slib/core/file.h"
-#include "../../../inc/slib/core/system.h"
-#include "../../../inc/slib/core/app.h"
+#include "slib/core/file.h"
+#include "slib/core/system.h"
+#include "slib/core/app.h"
 
-#include "../../../inc/slib/core/platform_apple.h"
-#include "../../../inc/slib/core/platform_android.h"
-#include "../../../inc/slib/core/platform_tizen.h"
+#include "slib/core/platform_apple.h"
+#include "slib/core/platform_android.h"
+#include "slib/core/platform_tizen.h"
 
 #if defined(SLIB_PLATFORM_IS_DESKTOP) || defined(SLIB_PLATFORM_IS_APPLE) || defined(SLIB_PLATFORM_IS_TIZEN)
 

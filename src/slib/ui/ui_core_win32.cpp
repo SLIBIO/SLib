@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
@@ -16,11 +16,11 @@
 #include "ui_core_common.h"
 #include "view_win32.h"
 
-#include "../../../inc/slib/ui/screen.h"
-#include "../../../inc/slib/ui/app.h"
-#include "../../../inc/slib/core/queue.h"
-#include "../../../inc/slib/core/dispatch.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/ui/screen.h"
+#include "slib/ui/app.h"
+#include "slib/core/queue.h"
+#include "slib/core/dispatch.h"
+#include "slib/core/safe_static.h"
 
 #include <commctrl.h>
 

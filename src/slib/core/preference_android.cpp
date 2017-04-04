@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 
-#include "../../../inc/slib/core/preference.h"
+#include "slib/core/preference.h"
 
-#include "../../../inc/slib/core/json.h"
-#include "../../../inc/slib/core/platform_android.h"
+#include "slib/core/json.h"
+#include "slib/core/platform_android.h"
 
 namespace slib
 {

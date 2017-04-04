@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/select_view.h"
+#include "slib/ui/select_view.h"
 
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/core/safe_static.h"
 
 namespace slib
 {
@@ -97,14 +97,6 @@ namespace slib
 	
 	SLIB_SAFE_STATIC_GETTER(_SelectView_DefaultResources, _SelectView_getDefaultResources)
 	
-	ISelectViewListener::ISelectViewListener()
-	{
-	}
-
-	ISelectViewListener::~ISelectViewListener()
-	{
-	}
-
 	SelectView::SelectView()
 	{
 		setCreatingNativeWidget(sl_true);
@@ -439,10 +431,6 @@ namespace slib
 	void SelectView::dispatchSelectItem(sl_uint32 index)
 	{
 		onSelectItem(index);
-		PtrLocker<ISelectViewListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onSelectItem(this, index);
-		}
 		getOnSelectItem()(this, index);
 	}
 	

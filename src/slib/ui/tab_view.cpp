@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/tab_view.h"
+#include "slib/ui/tab_view.h"
 
-#include "../../../inc/slib/ui/core.h"
+#include "slib/ui/core.h"
 
 #define MAX_TABS_COUNT 100
 
@@ -19,14 +19,6 @@ namespace slib
 
 	SLIB_DEFINE_OBJECT(TabView, ViewGroup)
 	
-	ITabViewListener::ITabViewListener()
-	{
-	}
-
-	ITabViewListener::~ITabViewListener()
-	{
-	}
-
 
 	TabViewItem::TabViewItem()
 	{
@@ -375,7 +367,7 @@ namespace slib
 			_invalidateTabBar();
 		}
 	}
-	
+
 	Color TabView::getSelectedLabelColor()
 	{
 		return m_selectedLabelColor;
@@ -470,7 +462,7 @@ namespace slib
 	{
 		setLabelMargin(m_labelMarginLeft, m_labelMarginTop, m_labelMarginRight, margin, mode);
 	}
-	
+
 	UIRect TabView::getTabBarRegion()
 	{
 		UISize size = getSize();
@@ -489,7 +481,7 @@ namespace slib
 		ret.fixSizeError();
 		return ret;
 	}
-	
+
 	UIRect TabView::getTabRegion(sl_uint32 index)
 	{
 		UIRect ret;
@@ -519,7 +511,7 @@ namespace slib
 		ret.fixSizeError();
 		return ret;
 	}
-	
+
 	UIRect TabView::getTabContentRegion()
 	{
 		UIRect ret = getBounds();
@@ -566,17 +558,13 @@ namespace slib
 	void TabView::dispatchSelectTab(sl_uint32 index)
 	{
 		onSelectTab(index);
-		PtrLocker<ITabViewListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onSelectTab(this, index);
-		}
 		getOnSelectTab()(this, index);
 	}
-	
+
 	void TabView::onSelectTab(sl_uint32 index)
 	{
 	}
-	
+
 	void TabView::onClick(UIEvent* ev)
 	{
 		UIPoint pt = ev->getPoint();
@@ -718,6 +706,6 @@ namespace slib
 	void TabView::_setFont_NW(const Ref<Font>& font)
 	{
 	}
-	
 #endif
+
 }

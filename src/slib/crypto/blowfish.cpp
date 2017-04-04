@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/crypto/blowfish.h"
+#include "slib/crypto/blowfish.h"
 
-#include "../../../inc/slib/crypto/sha2.h"
-#include "../../../inc/slib/core/mio.h"
+#include "slib/crypto/sha2.h"
+#include "slib/core/mio.h"
 
 /*
 	The Blowfish Encryption Algorithm by Bruce Schneier

@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_OSX)
 
-#include "../../../inc/slib/ui/menu.h"
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/app.h"
-#include "../../../inc/slib/ui/platform.h"
+#include "slib/ui/menu.h"
+#include "slib/ui/core.h"
+#include "slib/ui/app.h"
+#include "slib/ui/platform.h"
 
 @interface _OSX_MenuItemHandle : NSMenuItem
 {

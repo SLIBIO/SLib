@@ -8,21 +8,21 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/capture.h"
+#include "slib/network/capture.h"
 
 #if defined(SLIB_PLATFORM_IS_UNIX) || defined(SLIB_PLATFORM_IS_WIN32)
 
-#include "../../../inc/slib/network/socket_address.h"
+#include "slib/network/socket_address.h"
 
-#include "../../../inc/slib/core/thread.h"
-#include "../../../inc/slib/core/log.h"
+#include "slib/core/thread.h"
+#include "slib/core/log.h"
 
 #define TAG "NetCapture"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
-#include "../../../inc/thirdparty/winpcap/pcap/pcap.h"
+#include "thirdparty/winpcap/pcap/pcap.h"
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-#include "../../../inc/thirdparty/pcap/pcap.h"
+#include "thirdparty/pcap/pcap.h"
 #include <sys/socket.h>
 #endif
 

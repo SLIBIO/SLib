@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/math/matrix2.h"
+#include "slib/math/matrix2.h"
 
 namespace slib
 {

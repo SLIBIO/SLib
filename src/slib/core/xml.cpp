@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/xml.h"
+#include "slib/core/xml.h"
 
-#include "../../../inc/slib/core/file.h"
-#include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/string_buffer.h"
+#include "slib/core/file.h"
+#include "slib/core/log.h"
+#include "slib/core/string_buffer.h"
 
 namespace slib
 {

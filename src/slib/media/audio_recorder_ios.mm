@@ -8,15 +8,15 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
-#include "../../../inc/slib/media/audio_recorder.h"
+#include "slib/media/audio_recorder.h"
 
-#include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/ptr.h"
-#include "../../../inc/slib/core/platform_apple.h"
+#include "slib/core/log.h"
+#include "slib/core/ptr.h"
+#include "slib/core/platform_apple.h"
 
 #import <Foundation/Foundation.h>
 #import <AudioUnit/AudioUnit.h>

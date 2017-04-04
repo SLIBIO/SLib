@@ -8,15 +8,15 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 
 #include <winsock2.h>
 #pragma comment(lib, "ws2_32.lib")
 
-#include "../../../inc/slib/network/event.h"
-#include "../../../inc/slib/core/scoped.h"
+#include "slib/network/event.h"
+#include "slib/core/scoped.h"
 
 namespace slib
 {

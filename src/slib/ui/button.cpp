@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/button.h"
+#include "slib/ui/button.h"
 
-#include "../../../inc/slib/graphics/util.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/graphics/util.h"
+#include "slib/core/safe_static.h"
 
 namespace slib
 {

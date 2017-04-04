@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/content_type.h"
+#include "slib/core/content_type.h"
 
-#include "../../../inc/slib/core/map.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/core/map.h"
+#include "slib/core/safe_static.h"
 
 #define DEFINE_CONTENT_TYPE(name, text) \
 	SLIB_STATIC_STRING(_g_szContentType_##name, text); \

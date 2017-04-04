@@ -8,12 +8,12 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/render/engine.h"
+#include "slib/render/engine.h"
 
-#include "../../../inc/slib/render/program.h"
-#include "../../../inc/slib/graphics/canvas.h"
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/math/transform3d.h"
+#include "slib/render/program.h"
+#include "slib/graphics/canvas.h"
+#include "slib/ui/core.h"
+#include "slib/math/transform3d.h"
 
 namespace slib
 {

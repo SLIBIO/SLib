@@ -8,13 +8,13 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
-#include "../../../inc/slib/media/audio_recorder.h"
+#include "slib/media/audio_recorder.h"
 
-#include "../../../inc/slib/media/dsound.h"
+#include "slib/media/dsound.h"
 
 namespace slib
 {

@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/http_common.h"
+#include "slib/network/http_common.h"
 
-#include "../../../inc/slib/network/url.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/network/url.h"
+#include "slib/core/safe_static.h"
 
 namespace slib
 {

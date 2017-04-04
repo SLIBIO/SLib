@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/url_request.h"
+#include "slib/network/url_request.h"
 
-#include "../../../inc/slib/network/url.h"
-#include "../../../inc/slib/core/json.h"
-#include "../../../inc/slib/core/string_buffer.h"
-#include "../../../inc/slib/core/thread_pool.h"
-#include "../../../inc/slib/core/safe_static.h"
-#include "../../../inc/slib/core/log.h"
+#include "slib/network/url.h"
+#include "slib/core/json.h"
+#include "slib/core/string_buffer.h"
+#include "slib/core/thread_pool.h"
+#include "slib/core/safe_static.h"
+#include "slib/core/log.h"
 
 namespace slib
 {

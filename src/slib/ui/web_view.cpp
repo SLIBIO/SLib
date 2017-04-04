@@ -8,31 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/web_view.h"
+#include "slib/ui/web_view.h"
 
 namespace slib
 {
-
-	IWebViewListener::IWebViewListener()
-	{
-	}
-
-	IWebViewListener::~IWebViewListener()
-	{
-	}
-
-	void IWebViewListener::onStartLoad(WebView* view, const String& url)
-	{
-	}
-	
-	void IWebViewListener::onFinishLoad(WebView* view, const String& url, sl_bool flagFailed)
-	{
-	}
-	
-	void IWebViewListener::onMessageFromJavaScript(WebView* view, const String& msg, const String& param)
-	{
-	}
-	
 	
 	SLIB_DEFINE_OBJECT(WebView, View)
 	
@@ -147,35 +126,23 @@ namespace slib
 	void WebView::dispatchStartLoad(const String& url)
 	{
 		onStartLoad(url);
-		PtrLocker<IWebViewListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onStartLoad(this, url);
-		}
 		getOnStartLoad()(this, url);
 	}
 	
 	void WebView::dispatchFinishLoad(const String& url, sl_bool flagFailed)
 	{
 		onFinishLoad(url, flagFailed);
-		PtrLocker<IWebViewListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onFinishLoad(this, url, flagFailed);
-		}
 		getOnFinishLoad()(this, url, flagFailed);
 	}
 	
 	void WebView::dispatchMessageFromJavaScript(const String& msg, const String& param)
 	{
 		onMessageFromJavaScript(msg, param);
-		PtrLocker<IWebViewListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onMessageFromJavaScript(this, msg, param);
-		}
 		getOnMessageFromJavaScript()(this, msg, param);
 	}
 	
 	
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
+#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID)) && !(defined(SLIB_PLATFORM_IS_TIZEN))
 	
 	Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* parent)
 	{

@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/nat.h"
+#include "slib/network/nat.h"
 
-#include "../../../inc/slib/core/new_helper.h"
+#include "slib/core/new_helper.h"
 
 namespace slib
 {

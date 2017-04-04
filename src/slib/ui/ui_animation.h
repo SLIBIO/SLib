@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/animation.h"
+#include "slib/ui/animation.h"
 
-#include "../../../inc/slib/ui/view.h"
+#include "slib/ui/view.h"
 
 namespace slib
 {

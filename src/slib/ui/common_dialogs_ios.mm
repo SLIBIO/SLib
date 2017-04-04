@@ -8,16 +8,16 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
-#include "../../../inc/slib/ui/common_dialogs.h"
+#include "slib/ui/common_dialogs.h"
 
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/mobile_app.h"
+#include "slib/ui/core.h"
+#include "slib/ui/mobile_app.h"
 
-#include "../../../inc/slib/ui/platform.h"
+#include "slib/ui/platform.h"
 
 namespace slib
 {
@@ -123,7 +123,10 @@ namespace slib
 			}
 			if (parentWindow.isNotNull()) {
 				Ref<WindowInstance> instance = parentWindow->getWindowInstance();
-				window = UIPlatform::getWindowHandle(instance.get());
+				UIView* view = UIPlatform::getWindowHandle(instance.get());
+				if ([view isKindOfClass:[UIWindow class]]) {
+					window = (UIWindow*)view;
+				}
 			}
 			if (window == nil) {
 				window = UIPlatform::getKeyWindow();

@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/definition.h"
+#include "slib/network/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 
@@ -18,8 +18,8 @@
 
 #include "network_async.h"
 
-#include "../../../inc/slib/core/platform_windows.h"
-#include "../../../inc/slib/core/log.h"
+#include "slib/core/platform_windows.h"
+#include "slib/core/log.h"
 
 namespace slib
 {

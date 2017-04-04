@@ -8,8 +8,8 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/split_view.h"
-#include "../../../inc/slib/ui/core.h"
+#include "slib/ui/split_view.h"
+#include "slib/ui/core.h"
 
 namespace slib
 {

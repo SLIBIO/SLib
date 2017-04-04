@@ -8,12 +8,12 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/math/bigint.h"
+#include "slib/math/bigint.h"
 
-#include "../../../inc/slib/core/math.h"
-#include "../../../inc/slib/core/io.h"
-#include "../../../inc/slib/core/mio.h"
-#include "../../../inc/slib/core/scoped.h"
+#include "slib/core/math.h"
+#include "slib/core/io.h"
+#include "slib/core/mio.h"
+#include "slib/core/scoped.h"
 
 #define STACK_BUFFER_SIZE 4096
 

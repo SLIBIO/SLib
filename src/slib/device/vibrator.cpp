@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/device/vibrator.h"
+#include "slib/device/vibrator.h"
 
 #if defined(SLIB_PLATFORM_IS_DESKTOP)
 

@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/ethernet.h"
+#include "slib/network/ethernet.h"
 
-#include "../../../inc/slib/network/tcpip.h"
+#include "slib/network/tcpip.h"
 
 namespace slib
 {

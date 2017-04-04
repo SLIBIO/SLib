@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/render/index_buffer.h"
+#include "slib/render/index_buffer.h"
 
 namespace slib
 {

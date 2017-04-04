@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/crypto/hash.h"
+#include "slib/crypto/hash.h"
 
-#include "../../../inc/slib/crypto/md5.h"
-#include "../../../inc/slib/crypto/sha1.h"
-#include "../../../inc/slib/crypto/sha2.h"
+#include "slib/crypto/md5.h"
+#include "slib/crypto/sha1.h"
+#include "slib/crypto/sha2.h"
 
-#include "../../../inc/slib/core/scoped.h"
-#include "../../../inc/slib/core/mio.h"
+#include "slib/core/scoped.h"
+#include "slib/core/mio.h"
 
 namespace slib
 {

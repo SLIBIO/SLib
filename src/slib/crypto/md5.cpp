@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/crypto/md5.h"
+#include "slib/crypto/md5.h"
 
-#include "../../../inc/slib/core/mio.h"
-#include "../../../inc/slib/core/io.h"
-#include "../../../inc/slib/core/math.h"
+#include "slib/core/mio.h"
+#include "slib/core/io.h"
+#include "slib/core/math.h"
 
 namespace slib
 {

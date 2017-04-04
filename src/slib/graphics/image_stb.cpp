@@ -18,9 +18,9 @@
 #endif
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "../../../inc/thirdparty/stb/stbi_ext/stb_image.h"
+#include "thirdparty/stb/stbi_ext/stb_image.h"
 
-#include "../../../inc/thirdparty/stb/stbi_ext/etc1_utils.c"
+#include "thirdparty/stb/stbi_ext/etc1_utils.c"
 
 namespace slib
 {

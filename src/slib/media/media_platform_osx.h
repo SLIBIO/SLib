@@ -8,12 +8,12 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/media/definition.h"
+#include "slib/media/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_OSX)
 
-#include "../../../inc/slib/core/list.h"
-#include "../../../inc/slib/core/string.h"
+#include "slib/core/list.h"
+#include "slib/core/string.h"
 
 #import <Foundation/Foundation.h>
 #import <CoreAudio/CoreAudio.h>

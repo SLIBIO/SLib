@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/os.h"
+#include "slib/network/os.h"
 
-#include "../../../inc/slib/network/socket.h"
-#include "../../../inc/slib/core/endian.h"
-#include "../../../inc/slib/core/map.h"
+#include "slib/network/socket.h"
+#include "slib/core/endian.h"
+#include "slib/core/map.h"
 
 namespace slib
 {
@@ -198,7 +198,7 @@ namespace slib
 
 #elif defined(SLIB_PLATFORM_IS_ANDROID)
 
-#include "../../../inc/slib/core/platform_android.h"
+#include "slib/core/platform_android.h"
 
 namespace slib
 {

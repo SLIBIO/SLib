@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/map/earth.h"
+#include "slib/geo/earth.h"
 
 namespace slib
 {
@@ -21,7 +21,7 @@ namespace slib
 		double inverseFlattening;
 		double eccentricitySquared;
 	};
-	static _EarthGlobe __earth_globe = {SLIB_MAP_EARTH_RADIUS_EQUATORIAL_WGS84, SLIB_MAP_EARTH_RADIUS_POLAR_WGS84, SLIB_MAP_EARTH_INVERSE_FLATTENING_WGS84, SLIB_MAP_EARTH_ECCENTRICITY_SQUARED_WGS84};
+	static _EarthGlobe __earth_globe = {SLIB_GEO_EARTH_RADIUS_EQUATORIAL_WGS84, SLIB_GEO_EARTH_RADIUS_POLAR_WGS84, SLIB_GEO_EARTH_INVERSE_FLATTENING_WGS84, SLIB_GEO_EARTH_ECCENTRICITY_SQUARED_WGS84};
 	static const Globe& _earth_globe = *((Globe*)((void*)&__earth_globe));
 
 	const Globe& Earth::getGlobe()
@@ -31,17 +31,17 @@ namespace slib
 
 	double Earth::getAverageRadius()
 	{
-		return SLIB_MAP_EARTH_AVERAGE_RADIUS;
+		return SLIB_GEO_EARTH_AVERAGE_RADIUS;
 	}
 
 	double Earth::getEquatorialRadius()
 	{
-		return SLIB_MAP_EARTH_RADIUS_EQUATORIAL_WGS84;
+		return SLIB_GEO_EARTH_RADIUS_EQUATORIAL_WGS84;
 	}
 
 	double Earth::getPolarRadius()
 	{
-		return SLIB_MAP_EARTH_RADIUS_POLAR_WGS84;
+		return SLIB_GEO_EARTH_RADIUS_POLAR_WGS84;
 	}
 
 	Vector3lf Earth::getSurfaceNormal(double latitude, double longitude)
@@ -114,7 +114,7 @@ namespace slib
 	{
 		double radius;
 	};
-	static _EarthSphericalGlobe __earth_spherical_globe = {SLIB_MAP_EARTH_RADIUS_EQUATORIAL_WGS84};
+	static _EarthSphericalGlobe __earth_spherical_globe = {SLIB_GEO_EARTH_RADIUS_EQUATORIAL_WGS84};
 	static const SphericalGlobe& _earth_spherical_globe = *((SphericalGlobe*)((void*)&__earth_spherical_globe));
 
 	const SphericalGlobe& SphericalEarth::getGlobe()
@@ -124,7 +124,7 @@ namespace slib
 
 	double SphericalEarth::getRadius()
 	{
-		return SLIB_MAP_EARTH_RADIUS_EQUATORIAL_WGS84;
+		return SLIB_GEO_EARTH_RADIUS_EQUATORIAL_WGS84;
 	}
 
 	Vector3lf SphericalEarth::getSurfaceNormal(double latitude, double longitude)

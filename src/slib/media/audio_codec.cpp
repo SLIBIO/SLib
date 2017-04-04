@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/media/audio_codec.h"
+#include "slib/media/audio_codec.h"
 
 namespace slib
 {

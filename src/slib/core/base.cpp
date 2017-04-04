@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/base.h"
+#include "slib/core/base.h"
 
-#include "../../../inc/slib/core/system.h"
-#include "../../../inc/slib/core/math.h"
+#include "slib/core/system.h"
+#include "slib/core/math.h"
 
 //#define FORCE_MEM_ALIGNED
 
@@ -24,7 +24,7 @@
 #include <stdio.h>
 
 #ifdef SLIB_PLATFORM_IS_WINDOWS
-#	include "../../../inc/slib/core/platform_windows.h"
+#	include "slib/core/platform_windows.h"
 #endif
 
 #if defined(SLIB_ARCH_IS_32BIT)

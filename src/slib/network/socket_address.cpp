@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/socket_address.h"
+#include "slib/network/socket_address.h"
 
-#include "../../../inc/slib/core/setting.h"
+#include "slib/core/setting.h"
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 #	include <winsock2.h>

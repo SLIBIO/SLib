@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/time.h"
+#include "slib/core/time.h"
 
-#include "../../../inc/slib/core/variant.h"
-#include "../../../inc/slib/core/string_buffer.h"
+#include "slib/core/variant.h"
+#include "slib/core/string_buffer.h"
 
 #define TIME_MILLIS SLIB_INT64(1000)
 #define TIME_MILLISF 1000.0

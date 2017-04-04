@@ -8,12 +8,12 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/socket.h"
+#include "slib/network/socket.h"
 
-#include "../../../inc/slib/network/event.h"
-#include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/event.h"
-#include "../../../inc/slib/core/file.h"
+#include "slib/network/event.h"
+#include "slib/core/log.h"
+#include "slib/core/event.h"
+#include "slib/core/file.h"
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 #	include <winsock2.h>

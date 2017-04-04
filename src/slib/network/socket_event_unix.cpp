@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_UNIX)
 
-#include "../../../inc/slib/network/event.h"
-#include "../../../inc/slib/core/pipe.h"
-#include "../../../inc/slib/core/thread.h"
-#include "../../../inc/slib/core/scoped.h"
+#include "slib/network/event.h"
+#include "slib/core/pipe.h"
+#include "slib/core/thread.h"
+#include "slib/core/scoped.h"
 
 #include <unistd.h>
 #include <poll.h>

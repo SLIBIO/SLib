@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 
@@ -24,13 +24,13 @@ using namespace Windows::Storage;
 using namespace Platform;
 #endif
 
-#include "../../../inc/slib/core/system.h"
+#include "slib/core/system.h"
 
-#include "../../../inc/slib/core/app.h"
-#include "../../../inc/slib/core/file.h"
-#include "../../../inc/slib/core/list.h"
-#include "../../../inc/slib/core/string_buffer.h"
-#include "../../../inc/slib/core/log.h"
+#include "slib/core/app.h"
+#include "slib/core/file.h"
+#include "slib/core/list.h"
+#include "slib/core/string_buffer.h"
+#include "slib/core/log.h"
 
 #define _PATH_MAX 1024
 

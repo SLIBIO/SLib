@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/math/plane.h"
+#include "slib/math/plane.h"
 
-#include "../../../inc/slib/core/math.h"
+#include "slib/core/math.h"
 
 namespace slib
 {

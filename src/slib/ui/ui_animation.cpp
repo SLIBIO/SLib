@@ -10,8 +10,8 @@
 
 #include "ui_animation.h"
 
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/ui/core.h"
+#include "slib/core/safe_static.h"
 
 namespace slib
 {

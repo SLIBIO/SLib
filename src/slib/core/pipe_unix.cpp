@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #ifdef SLIB_PLATFORM_IS_UNIX
 
@@ -16,7 +16,7 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include "../../../inc/slib/core/pipe.h"
+#include "slib/core/pipe.h"
 
 namespace slib
 {

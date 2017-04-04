@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/device/information.h"
+#include "slib/device/information.h"
 
 namespace slib
 {

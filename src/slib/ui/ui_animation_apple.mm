@@ -25,8 +25,8 @@ typedef UIView* NativeView;
 
 #endif
 
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/math/transform2d.h"
+#include "slib/ui/core.h"
+#include "slib/math/transform2d.h"
 
 @interface _NativeAnimationDelegate : NSObject<CAAnimationDelegate>
 {

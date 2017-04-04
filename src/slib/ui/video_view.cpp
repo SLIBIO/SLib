@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/video_view.h"
+#include "slib/ui/video_view.h"
 
-#include "../../../inc/slib/render/canvas.h"
-#include "../../../inc/slib/graphics/image.h"
+#include "slib/render/canvas.h"
+#include "slib/graphics/image.h"
 
 namespace slib
 {

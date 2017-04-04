@@ -14,7 +14,7 @@
 
 #include <windows.h>
 
-#include "../../../inc/slib/core/async.h"
+#include "slib/core/async.h"
 
 namespace slib
 {

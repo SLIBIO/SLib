@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/render/base.h"
+#include "slib/render/base.h"
 
-#include "../../../inc/slib/render/engine.h"
+#include "slib/render/engine.h"
 
 namespace slib
 {

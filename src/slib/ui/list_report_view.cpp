@@ -8,35 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/list_report_view.h"
+#include "slib/ui/list_report_view.h"
 
 namespace slib
 {
 
-	IListReportViewListener::IListReportViewListener()
-	{
-	}
-
-	IListReportViewListener::~IListReportViewListener()
-	{
-	}
-
-	void IListReportViewListener::onSelectRow(ListReportView* view, sl_uint32 row)
-	{
-	}
-	
-	void IListReportViewListener::onClickRow(ListReportView* view, sl_uint32 row, const Point& pt)
-	{
-	}
-	
-	void IListReportViewListener::onRightButtonClickRow(ListReportView* view, sl_uint32 row, const UIPoint& pt)
-	{
-	}
-	
-	void IListReportViewListener::onDoubleClickRow(ListReportView* view, sl_uint32 row, const UIPoint& pt)
-	{
-	}
-	
 	ListReportViewColumn::ListReportViewColumn()
 	{
 		width = 40;
@@ -312,10 +288,6 @@ namespace slib
 	void ListReportView::dispatchSelectRow(sl_uint32 row)
 	{
 		onSelectRow(row);
-		PtrLocker<IListReportViewListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onSelectRow(this, row);
-		}
 		getOnSelectRow()(this, row);
 	}
 	
@@ -326,20 +298,12 @@ namespace slib
 			dispatchClick(ev.get());
 		}
 		onClickRow(row, pt);
-		PtrLocker<IListReportViewListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onClickRow(this, row, pt);
-		}
 		getOnClickRow()(this, row, pt);
 	}
 	
 	void ListReportView::dispatchRightButtonClickRow(sl_uint32 row, const UIPoint& pt)
 	{
 		onRightButtonClickRow(row, pt);
-		PtrLocker<IListReportViewListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onRightButtonClickRow(this, row, pt);
-		}
 		getOnRightButtonClickRow()(this, row, pt);
 	}
 	
@@ -350,10 +314,6 @@ namespace slib
 			dispatchMouseEvent(ev.get());
 		}
 		onDoubleClickRow(row, pt);
-		PtrLocker<IListReportViewListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onDoubleClickRow(this, row, pt);
-		}
 		getOnDoubleClickRow()(this, row, pt);
 	}
 	

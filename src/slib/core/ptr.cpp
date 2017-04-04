@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/ptr.h"
+#include "slib/core/ptr.h"
 
 namespace slib
 {

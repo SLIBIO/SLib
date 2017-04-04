@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/mobile_app.h"
+#include "slib/ui/mobile_app.h"
 
-#include "../../../inc/slib/ui/view.h"
-#include "../../../inc/slib/ui/resource.h"
-#include "../../../inc/slib/ui/animation.h"
+#include "slib/ui/view.h"
+#include "slib/ui/resource.h"
+#include "slib/ui/animation.h"
 
 namespace slib
 {

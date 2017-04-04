@@ -11,7 +11,7 @@
 #ifndef CHECKHEADER_SLIB_GRAPHICS_IMAGE_STB
 #define CHECKHEADER_SLIB_GRAPHICS_IMAGE_STB
 
-#include "../../../inc/slib/graphics/image.h"
+#include "slib/graphics/image.h"
 
 #ifdef SLIB_GRAPHICS_IMAGE_USE_STB
 

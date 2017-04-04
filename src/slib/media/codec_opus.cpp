@@ -8,13 +8,13 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/media/codec_opus.h"
+#include "slib/media/codec_opus.h"
 
-#include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/time.h"
-#include "../../../inc/slib/core/scoped.h"
+#include "slib/core/log.h"
+#include "slib/core/time.h"
+#include "slib/core/scoped.h"
 
-#include "../../../inc/thirdparty/opus/opus.h"
+#include "thirdparty/opus/opus.h"
 
 //#define OPUS_RESET_INTERVAL 10000
 

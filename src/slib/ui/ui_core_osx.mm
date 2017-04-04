@@ -8,15 +8,15 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_OSX)
 
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/screen.h"
-#include "../../../inc/slib/ui/window.h"
-#include "../../../inc/slib/ui/platform.h"
-#include "../../../inc/slib/ui/app.h"
+#include "slib/ui/core.h"
+#include "slib/ui/screen.h"
+#include "slib/ui/window.h"
+#include "slib/ui/platform.h"
+#include "slib/ui/app.h"
 
 @interface _slib_OSX_AppDelegate : NSObject <NSApplicationDelegate>
 @end
@@ -163,7 +163,7 @@ namespace slib
 	void UIPlatform::runApp()
 	{
 		[NSApplication sharedApplication];
-		[NSBundle loadNibNamed:@"MainMenu" owner:NSApp];
+		[[NSBundle mainBundle] loadNibNamed:@"MainMenu" owner:NSApp topLevelObjects:nil];
 		_slib_OSX_AppDelegate * delegate = [[_slib_OSX_AppDelegate alloc] init];
 		[NSApp setDelegate:delegate];
 		

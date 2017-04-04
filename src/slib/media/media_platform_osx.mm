@@ -12,9 +12,9 @@
 
 #if defined(SLIB_PLATFORM_IS_OSX)
 
-#include "../../../inc/slib/core/scoped.h"
-#include "../../../inc/slib/core/platform_apple.h"
-#include "../../../inc/slib/core/log.h"
+#include "slib/core/scoped.h"
+#include "slib/core/platform_apple.h"
+#include "slib/core/log.h"
 
 namespace slib
 {

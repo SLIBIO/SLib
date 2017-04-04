@@ -8,16 +8,16 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/graphics/freetype.h"
+#include "slib/graphics/freetype.h"
 
-#include "../../../inc/slib/graphics/image.h"
+#include "slib/graphics/image.h"
 
-#include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/file.h"
+#include "slib/core/log.h"
+#include "slib/core/file.h"
 
-#include "../../../inc/thirdparty/freetype/include/ft2build.h"
-#include "../../../inc/thirdparty/freetype/include/freetype.h"
-#include "../../../inc/thirdparty/freetype/include/ftstroke.h"
+#include "thirdparty/freetype/freetype-2.5.5/include/ft2build.h"
+#include "thirdparty/freetype/freetype-2.5.5/include/freetype.h"
+#include "thirdparty/freetype/freetype-2.5.5/include/ftstroke.h"
 
 namespace slib
 {

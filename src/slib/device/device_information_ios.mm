@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
-#include "../../../inc/slib/device/information.h"
+#include "slib/device/information.h"
 
-#include "../../../inc/slib/core/variant.h"
-#include "../../../inc/slib/core/platform_apple.h"
+#include "slib/core/variant.h"
+#include "slib/core/platform_apple.h"
 
 #import <UIKit/UIKit.h>
 #import <sys/utsname.h>

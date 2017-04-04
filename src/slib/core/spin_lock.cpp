@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/spin_lock.h"
+#include "slib/core/spin_lock.h"
 
-#include "../../../inc/slib/core/system.h"
+#include "slib/core/system.h"
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 #define USE_CPP_ATOMIC

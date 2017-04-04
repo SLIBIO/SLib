@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/graphics/canvas.h"
+#include "slib/graphics/canvas.h"
 
-#include "../../../inc/slib/graphics/util.h"
-#include "../../../inc/slib/math/transform2d.h"
+#include "slib/graphics/util.h"
+#include "slib/math/transform2d.h"
 
 namespace slib
 {

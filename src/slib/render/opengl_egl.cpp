@@ -8,17 +8,17 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/render/opengl_egl.h"
+#include "slib/render/opengl_egl.h"
 
 #if defined(SLIB_RENDER_SUPPORT_OPENGL_EGL)
 
 #include "opengl_egl_entries.h"
 
-#include "../../../inc/slib/render/engine.h"
-#include "../../../inc/slib/render/opengl.h"
-#include "../../../inc/slib/core/thread.h"
-#include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/platform_windows.h"
+#include "slib/render/engine.h"
+#include "slib/render/opengl.h"
+#include "slib/core/thread.h"
+#include "slib/core/log.h"
+#include "slib/core/platform_windows.h"
 
 namespace slib
 {

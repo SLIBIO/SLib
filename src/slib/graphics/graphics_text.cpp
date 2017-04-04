@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/graphics/text.h"
+#include "slib/graphics/text.h"
 
-#include "../../../inc/slib/graphics/font_atlas.h"
+#include "slib/graphics/font_atlas.h"
 
 namespace slib
 {

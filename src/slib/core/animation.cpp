@@ -8,12 +8,12 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/animation.h"
+#include "slib/core/animation.h"
 
-#include "../../../inc/slib/core/thread.h"
-#include "../../../inc/slib/core/time.h"
-#include "../../../inc/slib/core/scoped.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/core/thread.h"
+#include "slib/core/time.h"
+#include "slib/core/scoped.h"
+#include "slib/core/safe_static.h"
 
 namespace slib
 {

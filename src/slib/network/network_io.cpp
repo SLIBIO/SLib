@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/io.h"
+#include "slib/network/io.h"
 
 namespace slib
 {

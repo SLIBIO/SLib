@@ -8,56 +8,52 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
-#include "../../../inc/slib/ui/window.h"
-#include "../../../inc/slib/ui/view.h"
-#include "../../../inc/slib/ui/screen.h"
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/platform.h"
+#include "slib/ui/window.h"
+#include "slib/ui/view.h"
+#include "slib/ui/screen.h"
+#include "slib/ui/core.h"
+#include "slib/ui/platform.h"
 
 #include "view_ios.h"
 
 namespace slib
 {
-	class _iOS_Window;
+	class iOS_Window;
 }
 
-@interface _slib_iOS_Window : UIWindow {
-@public slib::WeakRef<slib::_iOS_Window> m_window;
-}
-@end
-
-@interface _slib_iOS_Window_RootViewController : UIViewController
+@interface slib_iOS_Window_RootViewController : UIViewController
 {
+	@public slib::WeakRef<slib::iOS_Window> m_window;
 }
 @end
 
 namespace slib
 {
-	class _iOS_Window : public WindowInstance
+	class iOS_Window : public WindowInstance
 	{
 	public:
 		UIView* m_window;
 		AtomicRef<ViewInstance> m_viewContent;
 		
 	public:
-		_iOS_Window()
+		iOS_Window()
 		{
 		}
 		
-		~_iOS_Window()
+		~iOS_Window()
 		{
 			release();
 		}
 		
 	public:
-		static Ref<_iOS_Window> create(UIView* window)
+		static Ref<iOS_Window> create(UIView* window)
 		{
 			if (window != nil) {
-				Ref<_iOS_Window> ret = new _iOS_Window();
+				Ref<iOS_Window> ret = new iOS_Window();
 				if (ret.isNotNull()) {
 					ret->m_window = window;
 					UIView* view;
@@ -104,7 +100,7 @@ namespace slib
 			rect.size.width = (CGFloat)(_rect.getWidth()) / f;
 			rect.size.height = (CGFloat)(_rect.getHeight()) / f;
 			
-			_slib_iOS_Window* window;
+			UIWindow* window;
 			sl_bool flagMainWindow = sl_false;
 			static sl_bool flagFirstWindow = sl_true;
 			if (flagFirstWindow) {
@@ -112,26 +108,26 @@ namespace slib
 				flagFirstWindow = sl_false;
 				flagMainWindow = sl_true;
 			} else {
-				window = [[_slib_iOS_Window alloc] initWithFrame:rect];
+				window = [[UIWindow alloc] initWithFrame:rect];
 			}
 			if (window != nil) {
-				UIScreen* screen = UIPlatform::getScreenHandle(_screen.get());
-				if (screen != nil) {
-					window.screen = screen;
-				}
 				if (!flagMainWindow) {
+					UIScreen* screen = UIPlatform::getScreenHandle(_screen.get());
+					if (screen != nil) {
+						window.screen = screen;
+					}
 					window.windowLevel = UIWindowLevelNormal + 1;
 				}
-				_slib_iOS_Window_RootViewController* controller = [[_slib_iOS_Window_RootViewController alloc] init];
+				slib_iOS_Window_RootViewController* controller = [[slib_iOS_Window_RootViewController alloc] init];
 				if (controller != nil) {
 					Slib_iOS_ViewHandle* view = [[Slib_iOS_ViewHandle alloc] init];
 					if (view != nil) {
 						view.opaque = NO;
 						controller.view = view;
 						window.rootViewController = controller;
-						Ref<_iOS_Window> ret = Ref<_iOS_Window>::from(UIPlatform::createWindowInstance(window));
+						Ref<iOS_Window> ret = Ref<iOS_Window>::from(UIPlatform::createWindowInstance(window));
 						if (ret.isNotNull()) {
-							window->m_window = ret;
+							controller->m_window = ret;
 							ret->setFocus();
 							return ret;
 						}
@@ -584,21 +580,17 @@ namespace slib
 	
 	Ref<WindowInstance> Window::createWindowInstance(const WindowInstanceParam& param)
 	{
-		return _iOS_Window::create(param);
+		return iOS_Window::create(param);
 	}
 }
 
-@implementation _slib_iOS_Window
-
-@end
-
-UIView* _iOS_Window_findFirstResponder(UIView* root)
+UIView* iOS_Window_findFirstResponder(UIView* root)
 {
 	if (root.isFirstResponder) {
 		return root;
 	}
 	for (UIView* subView in root.subviews) {
-		UIView* v = _iOS_Window_findFirstResponder(subView);
+		UIView* v = iOS_Window_findFirstResponder(subView);
 		if (v != nil) {
 			return v;
 		}
@@ -606,27 +598,27 @@ UIView* _iOS_Window_findFirstResponder(UIView* root)
 	return nil;
 }
 
-@implementation _slib_iOS_Window_RootViewController
+@implementation slib_iOS_Window_RootViewController
 
 - (BOOL)prefersStatusBarHidden
 {
 	return NO;
 }
 
-- (void)viewWillTransitionToSize:(CGSize)_size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
 {
-	[super viewWillTransitionToSize:_size withTransitionCoordinator:coordinator];
-	UIWindow* _window = self.view.window;
-	if (_window != nil && [_window isKindOfClass:[_slib_iOS_Window class]]) {
-		_slib_iOS_Window* window = (_slib_iOS_Window*)_window;
-		slib::Ref<slib::_iOS_Window> w = window->m_window;
-		if (w.isNotNull()) {
-			CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
-			CGRect r = window.frame;
-			r.size = _size;
-			window.frame = r;
-			w->onResize((sl_ui_pos)(_size.width * f), (sl_ui_pos)(_size.height * f));
-		}
+	[super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+	UIWindow* window = self.view.window;
+	if (window == nil) {
+		return;
+	}
+	slib::Ref<slib::iOS_Window> w = m_window;
+	if (w.isNotNull()) {
+		CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
+		CGRect r = window.frame;
+		r.size = size;
+		window.frame = r;
+		w->onResize((sl_ui_pos)(size.width * f), (sl_ui_pos)(size.height * f));
 	}
 }
 
@@ -637,7 +629,7 @@ UIView* _iOS_Window_findFirstResponder(UIView* root)
 
 -(UIView*)findFirstResponderText
 {
-	UIView* view = _iOS_Window_findFirstResponder(self.view);
+	UIView* view = iOS_Window_findFirstResponder(self.view);
 	if (view != nil) {
 		if ([view isKindOfClass:[UITextField class]] || [view isKindOfClass:[UITextView class]]) {
 			return view;
@@ -768,7 +760,7 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		ret = _iOS_Window::create(window);
+		ret = iOS_Window::create(window);
 		if (ret.isNotNull()) {
 			UIPlatform::_registerWindowInstance((__bridge void*)window, ret.get());
 		}
@@ -787,7 +779,7 @@ namespace slib
 	
 	UIView* UIPlatform::getWindowHandle(WindowInstance* instance)
 	{
-		_iOS_Window* window = (_iOS_Window*)instance;
+		iOS_Window* window = (iOS_Window*)instance;
 		if (window) {
 			return window->m_window;
 		} else {

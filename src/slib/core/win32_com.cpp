@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 
-#include "../../../inc/slib/core/win32_com.h"
+#include "slib/core/win32_com.h"
 
 namespace slib
 {

@@ -8,17 +8,17 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/media/codec_vpx.h"
+#include "slib/media/codec_vpx.h"
 
-#include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/io.h"
-#include "../../../inc/slib/core/scoped.h"
+#include "slib/core/log.h"
+#include "slib/core/io.h"
+#include "slib/core/scoped.h"
 
-#include "../../../inc/thirdparty/libvpx/vpx_config.h"
-#include "../../../inc/thirdparty/libvpx/vpx/vp8cx.h"
-#include "../../../inc/thirdparty/libvpx/vpx/vp8dx.h"
-#include "../../../inc/thirdparty/libvpx/vpx/vpx_encoder.h"
-#include "../../../inc/thirdparty/libvpx/vpx/vpx_decoder.h"
+#include "thirdparty/libvpx/vpx1.4/vpx_config.h"
+#include "thirdparty/libvpx/vpx1.4/vpx/vp8cx.h"
+#include "thirdparty/libvpx/vpx1.4/vpx/vp8dx.h"
+#include "thirdparty/libvpx/vpx1.4/vpx/vpx_encoder.h"
+#include "thirdparty/libvpx/vpx1.4/vpx/vpx_decoder.h"
 
 typedef vpx_codec_iface_t *(*vpx_codec_interface)(void);
 

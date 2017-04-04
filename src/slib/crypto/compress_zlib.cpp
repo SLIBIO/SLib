@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/crypto/zlib.h"
+#include "slib/crypto/zlib.h"
 
-#include "../../../inc/thirdparty/zlib/zlib.h"
+#include "thirdparty/zlib/zlib.h"
 
 #define STREAM ((z_stream*)(this->m_stream))
 #define GZIP_HEADER ((gz_header*)(this->m_gzipHeader))

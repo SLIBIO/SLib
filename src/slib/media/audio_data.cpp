@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/media/audio_data.h"
+#include "slib/media/audio_data.h"
 
-#include "../../../inc/slib/media/audio_util.h"
-#include "../../../inc/slib/core/endian.h"
+#include "slib/media/audio_util.h"
+#include "slib/core/endian.h"
 
 namespace slib
 {

@@ -8,15 +8,15 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
-#include "../../../inc/slib/ui/menu.h"
+#include "slib/ui/menu.h"
 
-#include "../../../inc/slib/ui/platform.h"
-#include "../../../inc/slib/ui/window.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/ui/platform.h"
+#include "slib/ui/window.h"
+#include "slib/core/safe_static.h"
 
 #include "ui_core_win32.h"
 

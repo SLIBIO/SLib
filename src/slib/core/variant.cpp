@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/variant.h"
+#include "slib/core/variant.h"
 
-#include "../../../inc/slib/core/string_buffer.h"
+#include "slib/core/string_buffer.h"
 
 
 #define PTR_VAR(TYPE, x) (reinterpret_cast<TYPE*>(&x))

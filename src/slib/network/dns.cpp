@@ -8,12 +8,12 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/dns.h"
+#include "slib/network/dns.h"
 
-#include "../../../inc/slib/network/event.h"
-#include "../../../inc/slib/core/scoped.h"
-#include "../../../inc/slib/core/mio.h"
-#include "../../../inc/slib/core/log.h"
+#include "slib/network/event.h"
+#include "slib/core/scoped.h"
+#include "slib/core/mio.h"
+#include "slib/core/log.h"
 
 #define _MAX_NAME SLIB_NETWORK_DNS_NAME_MAX_LENGTH
 

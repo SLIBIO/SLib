@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/media/audio_recorder.h"
+#include "slib/media/audio_recorder.h"
 
-#include "../../../inc/slib/media/audio_format.h"
+#include "slib/media/audio_format.h"
 
 namespace slib
 {

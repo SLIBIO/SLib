@@ -8,16 +8,16 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
 #define GDIPVER 0x0110
 
-#include "../../../inc/slib/graphics/canvas.h"
+#include "slib/graphics/canvas.h"
 
-#include "../../../inc/slib/graphics/platform.h"
-#include "../../../inc/slib/core/queue.h"
+#include "slib/graphics/platform.h"
+#include "slib/core/queue.h"
 
 #pragma comment(lib, "gdiplus.lib")
 

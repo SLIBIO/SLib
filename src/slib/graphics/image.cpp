@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/graphics/image.h"
+#include "slib/graphics/image.h"
 
-#include "../../../inc/slib/core/file.h"
-#include "../../../inc/slib/core/asset.h"
-#include "../../../inc/slib/core/scoped.h"
+#include "slib/core/file.h"
+#include "slib/core/asset.h"
+#include "slib/core/scoped.h"
 
 #include "image_stb.h"
 

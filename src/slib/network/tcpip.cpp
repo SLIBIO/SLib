@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/tcpip.h"
+#include "slib/network/tcpip.h"
 
-#include "../../../inc/slib/network/icmp.h"
-#include "../../../inc/slib/core/mio.h"
+#include "slib/network/icmp.h"
+#include "slib/core/mio.h"
 
 namespace slib
 {

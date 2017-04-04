@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/render/opengl_wgl.h"
+#include "slib/render/opengl_wgl.h"
 
 #if defined(SLIB_RENDER_SUPPORT_OPENGL_WGL) && defined(SLIB_PLATFORM_IS_WIN32)
 
-#include "../../../inc/slib/render/engine.h"
-#include "../../../inc/slib/render/opengl.h"
-#include "../../../inc/slib/core/thread.h"
-#include "../../../inc/slib/core/platform_windows.h"
+#include "slib/render/engine.h"
+#include "slib/render/opengl.h"
+#include "slib/core/thread.h"
+#include "slib/core/platform_windows.h"
 
 #pragma comment (lib, "opengl32.lib")
 

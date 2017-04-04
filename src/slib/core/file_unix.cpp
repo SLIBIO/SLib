@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #ifdef SLIB_PLATFORM_IS_UNIX
 
-#include "../../../inc/slib/core/file.h"
+#include "slib/core/file.h"
 
 #define _FILE_OFFSET_BITS 64
 #include <unistd.h>

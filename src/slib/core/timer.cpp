@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/timer.h"
+#include "slib/core/timer.h"
 
-#include "../../../inc/slib/core/dispatch_loop.h"
-#include "../../../inc/slib/core/system.h"
+#include "slib/core/dispatch_loop.h"
+#include "slib/core/system.h"
 
 namespace slib
 {

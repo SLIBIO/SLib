@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/crypto/gcm.h"
+#include "slib/crypto/gcm.h"
 
-#include "../../../inc/slib/crypto/aes.h"
+#include "slib/crypto/aes.h"
 
 namespace slib
 {

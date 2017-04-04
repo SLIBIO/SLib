@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/label_view.h"
+#include "slib/ui/label_view.h"
 
-#include "../../../inc/slib/core/scoped.h"
-#include "../../../inc/slib/graphics/util.h"
+#include "slib/core/scoped.h"
+#include "slib/graphics/util.h"
 
 namespace slib
 {

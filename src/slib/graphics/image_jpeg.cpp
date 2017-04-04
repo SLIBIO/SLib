@@ -8,12 +8,12 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/graphics/image.h"
+#include "slib/graphics/image.h"
 
 #ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_JPEG
 
-#include "../../../inc/slib/core/file.h"
-#include "../../../inc/slib/core/scoped.h"
+#include "slib/core/file.h"
+#include "slib/core/scoped.h"
 
 #include <stdio.h>
 #include <setjmp.h>
@@ -23,7 +23,7 @@
 #include <malloc.h>
 #endif
 
-#include "../../../inc/thirdparty/libjpeg/jpeglib.h"
+#include "thirdparty/libjpeg/jpeglib.h"
 
 namespace slib
 {

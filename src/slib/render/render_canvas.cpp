@@ -8,16 +8,16 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/render/canvas.h"
+#include "slib/render/canvas.h"
 
-#include "../../../inc/slib/render/engine.h"
-#include "../../../inc/slib/render/opengl.h"
-#include "../../../inc/slib/math/transform2d.h"
-#include "../../../inc/slib/graphics/util.h"
-#include "../../../inc/slib/graphics/font_atlas.h"
-#include "../../../inc/slib/core/string_buffer.h"
-#include "../../../inc/slib/core/variant.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/render/engine.h"
+#include "slib/render/opengl.h"
+#include "slib/math/transform2d.h"
+#include "slib/graphics/util.h"
+#include "slib/graphics/font_atlas.h"
+#include "slib/core/string_buffer.h"
+#include "slib/core/variant.h"
+#include "slib/core/safe_static.h"
 
 #define MAX_PROGRAM_COUNT 256
 #define MAX_SHADER_CLIP 8

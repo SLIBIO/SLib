@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/common_dialogs.h"
+#include "slib/ui/common_dialogs.h"
 
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/window.h"
+#include "slib/ui/core.h"
+#include "slib/ui/window.h"
 
 namespace slib
 {

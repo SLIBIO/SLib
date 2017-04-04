@@ -8,8 +8,8 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/base.h"
-#include "../../../inc/slib/core/mutex.h"
+#include "slib/core/base.h"
+#include "slib/core/mutex.h"
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 #include <windows.h>

@@ -8,9 +8,9 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/url.h"
+#include "slib/network/url.h"
 
-#include "../../../inc/slib/core/scoped.h"
+#include "slib/core/scoped.h"
 
 namespace slib
 {

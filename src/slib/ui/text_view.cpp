@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/text_view.h"
+#include "slib/ui/text_view.h"
 
 namespace slib
 {

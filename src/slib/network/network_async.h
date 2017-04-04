@@ -11,9 +11,9 @@
 #ifndef CHECKHEADER_SLIB_NETWORK_NETWORK_ASYNC_CONFIG
 #define CHECKHEADER_SLIB_NETWORK_NETWORK_ASYNC_CONFIG
 
-#include "../../../inc/slib/network/async.h"
+#include "slib/network/async.h"
 
-#include "../../../inc/slib/core/log.h"
+#include "slib/core/log.h"
 
 #define TAG "AsyncSocket"
 

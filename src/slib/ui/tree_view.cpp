@@ -8,34 +8,23 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/tree_view.h"
+#include "slib/ui/tree_view.h"
 
 namespace slib
 {
 
-	ITreeViewListener::ITreeViewListener()
-	{
-	}
-
-	ITreeViewListener::~ITreeViewListener()
-	{
-	}
-
-	void ITreeViewListener::onSelectItem(TreeView* view, TreeViewItem* item)
-	{
-	}
-	
-	class _TreeContentView : public View
+	class TreeContentViewImpl : public View
 	{
 	public:
 		AtomicWeakRef<TreeView> m_tree;
 		
 	public:
-		_TreeContentView()
+		TreeContentViewImpl()
 		{
 			setFocusable(sl_true);
 		}
 		
+	public:
 		// override
 		void onDraw(Canvas* canvas)
 		{
@@ -53,6 +42,7 @@ namespace slib
 				tree->_processMouseEvent(ev);
 			}
 		}
+		
 	};
 	
 	SLIB_DEFINE_OBJECT(TreeViewItem, Object)
@@ -327,7 +317,7 @@ namespace slib
 	{
 		Ref<View> old = m_customView;
 		m_customView = view;
-		Ref<_TreeContentView> content = _getContentView();
+		Ref<TreeContentViewImpl> content = _getContentView();
 		if (content.isNotNull()) {
 			if (old.isNotNull()) {
 				content->removeChild(old);
@@ -436,7 +426,7 @@ namespace slib
 		}
 	}
 	
-	Ref<_TreeContentView> TreeViewItem::_getContentView()
+	Ref<TreeContentViewImpl> TreeViewItem::_getContentView()
 	{
 		Ref<TreeView> tree = getTreeView();
 		if (tree.isNotNull()) {
@@ -812,7 +802,7 @@ namespace slib
 	void TreeView::onResize(sl_ui_len width, sl_ui_len height)
 	{
 		ScrollView::onResize(width, height);
-		Ref<_TreeContentView> content = m_content;
+		Ref<TreeContentViewImpl> content = m_content;
 		if (content.isNotNull()) {
 			content->setWidth(width, UIUpdateMode::NoRedraw);
 			_relayoutContent(UIUpdateMode::NoRedraw);
@@ -827,10 +817,6 @@ namespace slib
 	void TreeView::dispatchSelectItem(TreeViewItem* item)
 	{
 		onSelectItem(item);
-		PtrLocker<ITreeViewListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onSelectItem(this, item);
-		}
 		getOnSelectItem()(this, item);
 		(item->getOnSelect())(item);
 	}
@@ -847,7 +833,7 @@ namespace slib
 	
 	void TreeView::_createContentView()
 	{
-		Ref<_TreeContentView> view = new _TreeContentView;
+		Ref<TreeContentViewImpl> view = new TreeContentViewImpl;
 		if (view.isNotNull()) {
 			view->m_tree = this;
 			m_content = view;
@@ -857,7 +843,7 @@ namespace slib
 	
 	void TreeView::_relayoutContent(UIUpdateMode mode)
 	{
-		Ref<_TreeContentView> content = m_content;
+		Ref<TreeContentViewImpl> content = m_content;
 		if (content.isNotNull()) {
 			m_flagInvalidLayout = sl_true;
 			if (mode == UIUpdateMode::Redraw) {
@@ -868,7 +854,7 @@ namespace slib
 	
 	void TreeView::_redrawContent()
 	{
-		Ref<_TreeContentView> view = m_content;
+		Ref<TreeContentViewImpl> view = m_content;
 		if (view.isNotNull()) {
 			view->invalidate();
 		}
@@ -902,7 +888,7 @@ namespace slib
 			if (top < 0) {
 				top = 0;
 			}
-			Ref<_TreeContentView> content = m_content;
+			Ref<TreeContentViewImpl> content = m_content;
 			if (content.isNotNull()) {
 				content->setHeight(top, UIUpdateMode::NoRedraw);
 			}
@@ -1072,14 +1058,14 @@ namespace slib
 			return;
 		}
 		if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
-			Ref<_TreeContentView> content = m_content;
+			Ref<TreeContentViewImpl> content = m_content;
 			if (content.isNotNull()) {
 				m_pointBeginTapping = content->convertCoordinateToParent(ev->getPoint());
 				m_flagBeginTapping = sl_true;
 			}
 		} else if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd) {
 			if (m_flagBeginTapping) {
-				Ref<_TreeContentView> content = m_content;
+				Ref<TreeContentViewImpl> content = m_content;
 				if (content.isNotNull()) {
 					if (content->convertCoordinateToParent(ev->getPoint()).getLength2p(m_pointBeginTapping) < 25) {
 						Ref<TreeViewItem> root = m_root;
@@ -1091,7 +1077,7 @@ namespace slib
 			}
 		} else if (action == UIAction::MouseMove) {
 			if (m_flagBeginTapping) {
-				Ref<_TreeContentView> content = m_content;
+				Ref<TreeContentViewImpl> content = m_content;
 				if (content.isNotNull()) {
 					if (content->convertCoordinateToParent(ev->getPoint()).getLength2p(m_pointBeginTapping) > 25) {
 						m_flagBeginTapping = sl_false;

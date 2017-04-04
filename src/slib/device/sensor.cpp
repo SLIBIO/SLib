@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/device/sensor.h"
+#include "slib/device/sensor.h"
 
-#include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/system.h"
+#include "slib/core/log.h"
+#include "slib/core/system.h"
 
 namespace slib
 {

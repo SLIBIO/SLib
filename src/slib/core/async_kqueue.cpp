@@ -12,9 +12,9 @@
 
 #if defined(ASYNC_USE_KQUEUE)
 
-#include "../../../inc/slib/core/async.h"
-#include "../../../inc/slib/core/pipe.h"
-#include "../../../inc/slib/core/system.h"
+#include "slib/core/async.h"
+#include "slib/core/pipe.h"
+#include "slib/core/system.h"
 
 #include <sys/types.h>
 #include <sys/event.h>

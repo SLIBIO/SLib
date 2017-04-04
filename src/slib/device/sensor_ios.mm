@@ -8,13 +8,13 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/definition.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
-#include "../../../inc/slib/device/sensor.h"
+#include "slib/device/sensor.h"
 
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/core/safe_static.h"
 
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>

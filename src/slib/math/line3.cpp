@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/math/line3.h"
+#include "slib/math/line3.h"
 
 namespace slib
 {

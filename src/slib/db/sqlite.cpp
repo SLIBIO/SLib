@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/thirdparty/sqlite/sqlite3.h"
+#include "thirdparty/sqlite/sqlite3.h"
 
-#include "../../../inc/slib/db/sqlite.h"
+#include "slib/db/sqlite.h"
 
-#include "../../../inc/slib/core/file.h"
+#include "slib/core/file.h"
 
 namespace slib
 {	

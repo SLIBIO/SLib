@@ -12,8 +12,8 @@
 
 #if defined(ASYNC_USE_IOCP)
 
-#include "../../../inc/slib/core/async.h"
-#include "../../../inc/slib/core/platform_windows.h"
+#include "slib/core/async.h"
+#include "slib/core/platform_windows.h"
 
 namespace slib
 {

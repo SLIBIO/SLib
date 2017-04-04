@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/render/opengl.h"
+#include "slib/render/opengl.h"
 
 #if defined(SLIB_RENDER_SUPPORT_OPENGL_GLES)
 
 #include "opengl_gles.h"
 
-#include "../../../inc/slib/render/program.h"
-#include "../../../inc/slib/core/queue.h"
+#include "slib/render/program.h"
+#include "slib/core/queue.h"
 
 #define _OPENGL_ES_IMPL
 #define GL_BASE GLES

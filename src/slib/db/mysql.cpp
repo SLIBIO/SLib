@@ -8,17 +8,17 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/db/mysql.h"
+#include "slib/db/mysql.h"
 
 #if defined(SLIB_DATABASE_SUPPORT_MYSQL)
 
-#include "../../../inc/thirdparty/mariadb-connector/mysql.h"
-#include "../../../inc/thirdparty/mariadb-connector/errmsg.h"
+#include "thirdparty/mariadb-connector/mysql.h"
+#include "thirdparty/mariadb-connector/errmsg.h"
 
-#include "../../../inc/slib/core/thread.h"
-#include "../../../inc/slib/core/scoped.h"
-#include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/core/thread.h"
+#include "slib/core/scoped.h"
+#include "slib/core/log.h"
+#include "slib/core/safe_static.h"
 
 #define TAG "MySQL"
 

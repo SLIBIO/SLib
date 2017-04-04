@@ -8,20 +8,20 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/view.h"
+#include "slib/ui/view.h"
 
-#include "../../../inc/slib/ui/window.h"
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/scroll_bar.h"
-#include "../../../inc/slib/ui/render_view.h"
-#include "../../../inc/slib/ui/animation.h"
-#include "../../../inc/slib/ui/resource.h"
+#include "slib/ui/window.h"
+#include "slib/ui/core.h"
+#include "slib/ui/scroll_bar.h"
+#include "slib/ui/render_view.h"
+#include "slib/ui/animation.h"
+#include "slib/ui/resource.h"
 
-#include "../../../inc/slib/core/scoped.h"
-#include "../../../inc/slib/math/transform2d.h"
-#include "../../../inc/slib/graphics/bitmap.h"
-#include "../../../inc/slib/graphics/util.h"
-#include "../../../inc/slib/render/canvas.h"
+#include "slib/core/scoped.h"
+#include "slib/math/transform2d.h"
+#include "slib/graphics/bitmap.h"
+#include "slib/graphics/util.h"
+#include "slib/render/canvas.h"
 
 #include "ui_animation.h"
 
@@ -6117,37 +6117,20 @@ namespace slib
 	}
 
 
-	class _View_ScrollBarListener : public Referable, public IScrollBarListener
+	void View::_onScrollBarChangeValue(ScrollBar* scrollBar, sl_scroll_pos value)
 	{
-	public:
-		WeakRef<View> m_view;
-		
-	public:
-		_View_ScrollBarListener(View* view)
-		{
-			m_view = view;
+		sl_scroll_pos sx = 0;
+		sl_scroll_pos sy = 0;
+		Ref<ScrollBar> horz = getHorizontalScrollBar();
+		if (horz.isNotNull()) {
+			sx = horz->getValue();
 		}
-		
-		// override
-		void onChange(ScrollBar* scrollBar, sl_scroll_pos value)
-		{
-			Ref<View> view = m_view;
-			if (view.isNull()) {
-				return;
-			}
-			sl_scroll_pos sx = 0;
-			sl_scroll_pos sy = 0;
-			Ref<ScrollBar> horz = view->getHorizontalScrollBar();
-			if (horz.isNotNull()) {
-				sx = horz->getValue();
-			}
-			Ref<ScrollBar> vert = view->getVerticalScrollBar();
-			if (vert.isNotNull()) {
-				sy = vert->getValue();
-			}
-			view->scrollTo(sx, sy);
+		Ref<ScrollBar> vert = getVerticalScrollBar();
+		if (vert.isNotNull()) {
+			sy = vert->getValue();
 		}
-	};
+		scrollTo(sx, sy);
+	}
 
 	void View::refreshScroll(UIUpdateMode mode)
 	{
@@ -6166,9 +6149,7 @@ namespace slib
 				barHorz->setPage(width, UIUpdateMode::NoRedraw);
 				barHorz->setValueOfOutRange(attrs->x, UIUpdateMode::NoRedraw);
 				barHorz->setFrame(UIRect(0, height - attrs->barWidth, width, height), UIUpdateMode::NoRedraw);
-				if (barHorz->getListener().isNull()) {
-					barHorz->setListener(Ref<_View_ScrollBarListener>(new _View_ScrollBarListener(this)));
-				}
+				barHorz->setOnChange(SLIB_FUNCTION_WEAKREF(View, _onScrollBarChangeValue, this));
 				attrs->flagValidHorz = barHorz->isValid();
 			}
 			Ref<ScrollBar> barVert = attrs->vert;
@@ -6180,9 +6161,7 @@ namespace slib
 				barVert->setPage(height, UIUpdateMode::NoRedraw);
 				barVert->setValueOfOutRange(attrs->y, UIUpdateMode::NoRedraw);
 				barVert->setFrame(UIRect(width - attrs->barWidth, 0, width, height), UIUpdateMode::NoRedraw);
-				if (barVert->getListener().isNull()) {
-					barVert->setListener(Ref<_View_ScrollBarListener>(new _View_ScrollBarListener(this)));
-				}
+				barVert->setOnChange(SLIB_FUNCTION_WEAKREF(View, _onScrollBarChangeValue, this));
 				attrs->flagValidVert = barVert->isValid();
 			}
 

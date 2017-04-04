@@ -8,8 +8,8 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/charset.h"
-#include "../../../inc/slib/core/base.h"
+#include "slib/core/charset.h"
+#include "slib/core/base.h"
 
 namespace slib
 {

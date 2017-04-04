@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/math.h"
+#include "slib/core/math.h"
 
-#include "../../../inc/slib/core/time.h"
-#include "../../../inc/slib/crypto/sha2.h"
-#include "../../../inc/slib/core/system.h"
+#include "slib/core/time.h"
+#include "slib/crypto/sha2.h"
+#include "slib/core/system.h"
 
 #include <math.h>
 #include <stdlib.h>

@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/graphics/resource.h"
+#include "slib/graphics/resource.h"
 
-#include "../../../inc/slib/graphics/util.h"
-#include "../../../inc/slib/core/scoped.h"
+#include "slib/graphics/util.h"
+#include "slib/core/scoped.h"
 
 namespace slib
 {

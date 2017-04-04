@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/check_box.h"
+#include "slib/ui/check_box.h"
 
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/ui/core.h"
+#include "slib/core/safe_static.h"
 
 namespace slib
 {

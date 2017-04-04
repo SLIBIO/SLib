@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/graphics/bitmap_format.h"
+#include "slib/graphics/bitmap_format.h"
 
 namespace slib
 {

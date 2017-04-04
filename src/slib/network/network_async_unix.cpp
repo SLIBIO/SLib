@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/network/definition.h"
+#include "slib/network/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_UNIX)
 

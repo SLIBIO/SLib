@@ -9,10 +9,10 @@
  */
 
 
-#include "../../../inc/slib/render/program.h"
+#include "slib/render/program.h"
 
-#include "../../../inc/slib/render/engine.h"
-#include "../../../inc/slib/render/opengl.h"
+#include "slib/render/engine.h"
+#include "slib/render/opengl.h"
 
 namespace slib
 {

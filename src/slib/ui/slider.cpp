@@ -8,29 +8,13 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/slider.h"
+#include "slib/ui/slider.h"
 
-#include "../../../inc/slib/core/math.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/core/math.h"
+#include "slib/core/safe_static.h"
 
 namespace slib
 {
-
-	ISliderListener::ISliderListener()
-	{
-	}
-
-	ISliderListener::~ISliderListener()
-	{
-	}
-
-	void ISliderListener::onChange(Slider *slider, float value)
-	{
-	}
-	
-	void ISliderListener::onChangeSecondary(Slider *slider, float value)
-	{
-	}
 	
 	SLIB_DEFINE_OBJECT(Slider, ProgressBar)
 	
@@ -352,20 +336,12 @@ namespace slib
 	void Slider::dispatchChange(float value)
 	{
 		onChange(value);
-		PtrLocker<ISliderListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onChange(this, value);
-		}
 		getOnChange()(this, value);
 	}
 	
 	void Slider::dispatchChangeSecondary(float value)
 	{
 		onChangeSecondary(value);
-		PtrLocker<ISliderListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onChangeSecondary(this, value);
-		}
 		getOnChangeSecondary()(this, value);
 	}
 	

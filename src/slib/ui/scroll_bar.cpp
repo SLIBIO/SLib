@@ -8,10 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/scroll_bar.h"
+#include "slib/ui/scroll_bar.h"
 
-#include "../../../inc/slib/core/math.h"
-#include "../../../inc/slib/core/safe_static.h"
+#include "slib/core/math.h"
+#include "slib/core/safe_static.h"
 
 #define CHECK_STATUS(...) \
 	sl_scroll_pos value = m_value; \
@@ -95,14 +95,6 @@ namespace slib
 	
 	SLIB_SAFE_STATIC_GETTER(_ScrollBar_Static, _ScrollBar_getStatic)
 	
-	IScrollBarListener::IScrollBarListener()
-	{
-	}
-
-	IScrollBarListener::~IScrollBarListener()
-	{
-	}
-
 	ScrollBar::ScrollBar(LayoutOrientation orientation)
 	{
 		
@@ -633,10 +625,6 @@ namespace slib
 	void ScrollBar::dispatchChange(sl_scroll_pos value)
 	{
 		onChange(value);
-		PtrLocker<IScrollBarListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onChange(this, value);
-		}
 		getOnChange()(this, value);
 	}
 	

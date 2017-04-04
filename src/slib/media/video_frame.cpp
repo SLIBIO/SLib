@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/media/video_frame.h"
+#include "slib/media/video_frame.h"
 
 namespace slib
 {

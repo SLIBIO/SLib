@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/dispatch.h"
-#include "../../../inc/slib/core/dispatch_loop.h"
+#include "slib/core/dispatch.h"
+#include "slib/core/dispatch_loop.h"
 
-#include "../../../inc/slib/core/safe_static.h"
-#include "../../../inc/slib/core/system.h"
+#include "slib/core/safe_static.h"
+#include "slib/core/system.h"
 
 namespace slib
 {

@@ -8,14 +8,14 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/core/string.h"
-#include "../../../inc/slib/core/string_buffer.h"
+#include "slib/core/string.h"
+#include "slib/core/string_buffer.h"
 
-#include "../../../inc/slib/core/base.h"
-#include "../../../inc/slib/core/mio.h"
-#include "../../../inc/slib/core/endian.h"
-#include "../../../inc/slib/core/scoped.h"
-#include "../../../inc/slib/core/variant.h"
+#include "slib/core/base.h"
+#include "slib/core/mio.h"
+#include "slib/core/endian.h"
+#include "slib/core/scoped.h"
+#include "slib/core/variant.h"
 
 namespace slib
 {

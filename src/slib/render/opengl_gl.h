@@ -11,7 +11,7 @@
 #ifndef CHECKHEADER_SLIB_RENDER_OPENGL_GL
 #define CHECKHEADER_SLIB_RENDER_OPENGL_GL
 
-#include "../../../inc/slib/render/definition.h"
+#include "slib/render/definition.h"
 
 #if defined(SLIB_RENDER_SUPPORT_OPENGL_GL)
 
@@ -19,7 +19,8 @@
 
 #include <Windows.h>
 #include <gl/gl.h>
-#include "../../../inc/thirdparty/gl/GL/glext.h"
+
+#include "thirdparty/gl/GL/glext.h"
 
 #define _SLIB_RENDER_GL_ENTRY(TYPE, name, ...) \
 	TYPE(__stdcall* name)(__VA_ARGS__);

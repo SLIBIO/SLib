@@ -8,11 +8,11 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "../../../inc/slib/ui/gesture.h"
+#include "slib/ui/gesture.h"
 
-#include "../../../inc/slib/ui/view.h"
-#include "../../../inc/slib/ui/resource.h"
-#include "../../../inc/slib/core/math.h"
+#include "slib/ui/view.h"
+#include "slib/ui/resource.h"
+#include "slib/core/math.h"
 
 namespace slib
 {
