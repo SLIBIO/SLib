@@ -1,5 +1,7 @@
 
+cd $(dirname $0)
 if [[ `uname` == 'Darwin' ]]; then
- echo 'Adding Xcode Preference Custom Path'
- defaults write com.apple.dt.Xcode IDEApplicationwideBuildSettings -dict-add SLIB_PATH "$(dirname "$0")"
+ echo "Adding Xcode Preference Custom Path: $(PWD)"
+ defaults write com.apple.dt.Xcode IDEApplicationwideBuildSettings -dict-add SLIB_PATH "$(PWD)"
+ defaults write com.apple.dt.Xcode IDESourceTreeDisplayNames -dict-add SLIB_PATH "SLIB_PATH"
 fi
