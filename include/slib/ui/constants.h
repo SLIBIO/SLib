@@ -345,7 +345,7 @@ namespace slib
 		Url = 6,
 		WebSearch = 7,
 		Twitter = 8,
-		NumbersAndPunctation = 9,
+		NumbersAndPunctuation = 9,
 		NamePhone = 10,
 		Ascii = 11,
 		AsciiNumpad = 12

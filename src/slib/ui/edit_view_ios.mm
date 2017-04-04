@@ -96,7 +96,7 @@ namespace slib
 					return UIKeyboardTypeWebSearch;
 				case UIKeyboardType::Twitter:
 					return UIKeyboardTypeTwitter;
-				case UIKeyboardType::NumbersAndPunctation:
+				case UIKeyboardType::NumbersAndPunctuation:
 					return UIKeyboardTypeNumbersAndPunctuation;
 				case UIKeyboardType::NamePhone:
 					return UIKeyboardTypeNamePhonePad;
