@@ -1,0 +1,5 @@
+
+if [[ `uname` == 'Darwin' ]]; then
+ echo 'Adding Xcode Preference Custom Path'
+ defaults write com.apple.dt.Xcode IDEApplicationwideBuildSettings -dict-add SLIB_PATH "$(dirname "$0")"
+fi
