@@ -13,10 +13,12 @@ package slib.platform.android;
 import java.util.Vector;
 
 import slib.platform.android.camera.SCamera;
+import slib.platform.android.camera.TakePhoto;
 import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.view.UiGLView;
 import slib.platform.android.ui.window.UiWindow;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -26,6 +28,8 @@ import android.view.WindowManager;
 public class SlibActivity extends Activity {
 
 	boolean flagVisible;
+
+	public static final int REQUEST_IMAGE_CAPTURE = 0x0000ff;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -132,5 +136,11 @@ public class SlibActivity extends Activity {
 			Logger.exception(e);
 		}
 	}
-	
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == REQUEST_IMAGE_CAPTURE) {
+			TakePhoto.onResult(this, resultCode, data);
+		}
+	}
 }

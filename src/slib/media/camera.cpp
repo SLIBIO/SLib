@@ -10,6 +10,8 @@
 
 #include "slib/media/camera.h"
 
+#include "slib/core/safe_static.h"
+
 namespace slib
 {
 
@@ -52,8 +54,27 @@ namespace slib
 	{
 		return deviceId == "BACK";
 	}
-
-
+	
+	TakePhoto::TakePhoto()
+	{
+		
+	}
+	
+	TakePhoto::~TakePhoto()
+	{
+		
+	}
+	
+	TakePhotoParam::TakePhotoParam()
+	{
+		
+	}
+	
+	TakePhotoParam::~TakePhotoParam()
+	{
+		
+	}
+    
 	SLIB_DEFINE_OBJECT(Camera, VideoCapture)
 
 	Camera::Camera()
@@ -63,5 +84,5 @@ namespace slib
 	Camera::~Camera()
 	{
 	}
-
+	
 }

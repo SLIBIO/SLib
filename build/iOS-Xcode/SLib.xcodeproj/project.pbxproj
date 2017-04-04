@@ -260,6 +260,8 @@
 		26D15FA81E93DA35003BD61A /* thirdparty_libvpx_dec.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9AF1B0F2600004A70EE /* thirdparty_libvpx_dec.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		26D15FA91E93DA35003BD61A /* thirdparty_libvpx_enc.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9B01B0F2600004A70EE /* thirdparty_libvpx_enc.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		26D15FAA1E93DA35003BD61A /* thirdparty_libvpx.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9B11B0F2600004A70EE /* thirdparty_libvpx.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		E1C697371E9435810054C285 /* take_photo_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1C697351E9435810054C285 /* take_photo_ios.mm */; };
+		E1C697381E9435810054C285 /* take_photo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1C697361E9435810054C285 /* take_photo.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -684,6 +686,8 @@
 		E17DADEA1E0C9060006161F6 /* gesture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gesture.cpp; sourceTree = "<group>"; };
 		E1B34E9C1E0A909A006217F4 /* picker_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = picker_view.cpp; sourceTree = "<group>"; };
 		E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vibrator_ios.cpp; sourceTree = "<group>"; };
+		E1C697351E9435810054C285 /* take_photo_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = take_photo_ios.mm; path = media/take_photo_ios.mm; sourceTree = "<group>"; };
+		E1C697361E9435810054C285 /* take_photo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = take_photo.cpp; path = media/take_photo.cpp; sourceTree = "<group>"; };
 		E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = sensor_ios.mm; sourceTree = "<group>"; };
 		E1D3A4281E14A2FC00007A98 /* preference.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = preference.cpp; sourceTree = "<group>"; };
 		E1D3A42A1E14A38C00007A98 /* preference_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = preference_apple.mm; sourceTree = "<group>"; };
@@ -898,6 +902,8 @@
 				26ACCB901C4A35DD00330F88 /* codec_vp8.cpp */,
 				26D8AC921E393F1E0092EB81 /* media_player.cpp */,
 				26D8AC911E393F1E0092EB81 /* media_player_apple.mm */,
+				E1C697361E9435810054C285 /* take_photo.cpp */,
+				E1C697351E9435810054C285 /* take_photo_ios.mm */,
 				266DD3601C1170BD00D47AB0 /* video_capture.cpp */,
 				266DD3611C1170BD00D47AB0 /* video_codec.cpp */,
 				26DA34FE1C4B8B2D004DC204 /* video_frame.cpp */,
@@ -1787,7 +1793,9 @@
 				26D15F061E93D887003BD61A /* camera.cpp in Sources */,
 				26D15EFB1E93D887003BD61A /* audio_data.cpp in Sources */,
 				26D15EFF1E93D887003BD61A /* audio_player_ios.mm in Sources */,
+				E1C697371E9435810054C285 /* take_photo_ios.mm in Sources */,
 				26D15F091E93D887003BD61A /* codec_opus.cpp in Sources */,
+				E1C697381E9435810054C285 /* take_photo.cpp in Sources */,
 				26D15F0C1E93D887003BD61A /* media_player_apple.mm in Sources */,
 				26D15F011E93D887003BD61A /* audio_recorder.cpp in Sources */,
 				26D15F081E93D887003BD61A /* camera_dshow.cpp in Sources */,
