@@ -8,8 +8,8 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CHECKHEADER_SLIB_MAP_LATLON
-#define CHECKHEADER_SLIB_MAP_LATLON
+#ifndef CHECKHEADER_SLIB_GEO_LATLON
+#define CHECKHEADER_SLIB_GEO_LATLON
 
 #include "definition.h"
 

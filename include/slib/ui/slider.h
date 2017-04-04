@@ -17,22 +17,6 @@
 
 namespace slib
 {
-
-	class Slider;
-	
-	class SLIB_EXPORT ISliderListener
-	{
-	public:
-		ISliderListener();
-
-		virtual ~ISliderListener();
-
-	public:
-		virtual void onChange(Slider* slider, float value);
-		
-		virtual void onChangeSecondary(Slider* slider, float value);
-		
-	};
 	
 	class SLIB_EXPORT Slider : public ProgressBar
 	{
@@ -125,8 +109,6 @@ namespace slib
 		void _setHoverThumb(int index);
 		
 	public:
-		SLIB_PROPERTY(AtomicPtr<ISliderListener>, Listener);
-		
 		SLIB_PROPERTY(AtomicFunction<void(Slider*, float)>, OnChange)
 		
 		SLIB_PROPERTY(AtomicFunction<void(Slider*, float)>, OnChangeSecondary)

@@ -21,21 +21,8 @@ namespace slib
 {
 
 	class TreeView;
-	class TreeViewItem;
 	
-	class SLIB_EXPORT ITreeViewListener
-	{
-	public:
-		ITreeViewListener();
-
-		virtual ~ITreeViewListener();
-
-	public:
-		virtual void onSelectItem(TreeView* view, TreeViewItem* item);
-		
-	};
-	
-	class _TreeContentView;
+	class TreeContentViewImpl;
 	
 	class SLIB_EXPORT TreeViewItem : public Object
 	{
@@ -147,7 +134,7 @@ namespace slib
 		
 		void _redrawTree();
 		
-		Ref<_TreeContentView> _getContentView();
+		Ref<TreeContentViewImpl> _getContentView();
 		
 	private:
 		AtomicString m_id;
@@ -265,8 +252,6 @@ namespace slib
 		void setTextIndent(sl_ui_pos indent, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 	public:
-		SLIB_PROPERTY(AtomicPtr<ITreeViewListener>, Listener);
-		
 		SLIB_PROPERTY(AtomicFunction<void(TreeView*, TreeViewItem*)>, OnSelectItem)
 		
 	public:
@@ -310,7 +295,7 @@ namespace slib
 		void _processClickItem(TreeViewItem* item);
 		
 	private:
-		Ref<_TreeContentView> m_content;
+		Ref<TreeContentViewImpl> m_content;
 		sl_bool m_flagInvalidLayout;
 		
 		Ref<TreeViewItem> m_root;
@@ -340,7 +325,7 @@ namespace slib
 		UIPointf m_pointBeginTapping;
 		
 		friend class TreeViewItem;
-		friend class _TreeContentView;
+		friend class TreeContentViewImpl;
 	};
 
 }

@@ -18,20 +18,6 @@
 namespace slib
 {
 
-	class TabView;
-	
-	class SLIB_EXPORT ITabViewListener
-	{
-	public:
-		ITabViewListener();
-
-		virtual ~ITabViewListener();
-
-	public:
-		virtual void onSelectTab(TabView* view, sl_uint32 index) = 0;
-
-	};
-	
 	class TabViewItem
 	{
 	public:
@@ -161,8 +147,6 @@ namespace slib
 		virtual UIRect getTabContentRegion();
 		
 	public:
-		SLIB_PROPERTY(AtomicPtr<ITabViewListener>, Listener)
-		
 		SLIB_PROPERTY(AtomicFunction<void(TabView*, sl_uint32)>, OnSelectTab)
 		
 	public:

@@ -8,8 +8,8 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CHECKHEADER_SLIB_MAP_GLOBE
-#define CHECKHEADER_SLIB_MAP_GLOBE
+#ifndef CHECKHEADER_SLIB_GEO_GLOBE
+#define CHECKHEADER_SLIB_GEO_GLOBE
 
 #include "definition.h"
 

@@ -17,26 +17,6 @@
 
 namespace slib
 {
-
-	class ListReportView;
-	
-	class SLIB_EXPORT IListReportViewListener
-	{
-	public:
-		IListReportViewListener();
-
-		virtual ~IListReportViewListener();
-
-	public:
-		virtual void onSelectRow(ListReportView* view, sl_uint32 row);
-		
-		virtual void onClickRow(ListReportView* view, sl_uint32 row, const Point& pt);
-		
-		virtual void onRightButtonClickRow(ListReportView* view, sl_uint32 row, const UIPoint& pt);
-		
-		virtual void onDoubleClickRow(ListReportView* view, sl_uint32 row, const UIPoint& pt);
-		
-	};
 	
 	class ListReportViewColumn
 	{
@@ -108,9 +88,7 @@ namespace slib
 		
 		virtual void removeAllRows(UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-	public:
-		SLIB_PROPERTY(AtomicPtr<IListReportViewListener>, Listener)
-		
+	public:		
 		SLIB_PROPERTY(Function<void(ListReportView*, sl_uint32)>, OnSelectRow)
 		
 		SLIB_PROPERTY(Function<void(ListReportView*, sl_uint32, const UIPoint&)>, OnClickRow)

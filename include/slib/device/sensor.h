@@ -16,7 +16,7 @@
 #include "../core/object.h"
 #include "../core/ptr.h"
 #include "../core/function.h"
-#include "../map/geo_location.h"
+#include "../geo/geo_location.h"
 
 namespace slib
 {

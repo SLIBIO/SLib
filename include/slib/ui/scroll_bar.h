@@ -17,19 +17,6 @@
 
 namespace slib
 {
-	class ScrollBar;
-	
-	class SLIB_EXPORT IScrollBarListener
-	{
-	public:
-		IScrollBarListener();
-
-		virtual ~IScrollBarListener();
-
-	public:
-		virtual void onChange(ScrollBar* scrollBar, sl_scroll_pos value) = 0;
-
-	};
 	
 	class SLIB_EXPORT ScrollBar : public View
 	{
@@ -147,8 +134,6 @@ namespace slib
 		virtual void dispatchChange(sl_scroll_pos value);
 		
 	public:
-		SLIB_PROPERTY(AtomicPtr<IScrollBarListener>, Listener);
-		
 		SLIB_PROPERTY(AtomicFunction<void(ScrollBar*, sl_scroll_pos)>, OnChange)
 		
 	protected:

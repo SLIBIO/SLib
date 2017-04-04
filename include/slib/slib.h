@@ -8,22 +8,24 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CHECKHEADER_SLIB_MAP_DETAIL_GEOLOCATION
-#define CHECKHEADER_SLIB_MAP_DETAIL_GEOLOCATION
+#ifndef CHECKHEADER_SLIB_MAIN_HEADER
+#define CHECKHEADER_SLIB_MAIN_HEADER
 
-#include "../latlon.h"
+#include "core.h"
+#include "crypto.h"
+#include "math.h"
+#include "network.h"
+#include "graphics.h"
 
-namespace slib
-{
-	
-	SLIB_INLINE GeoLocation& GeoLocation::operator=(const GeoLocation& other)
-	{
-		latitude = other.latitude;
-		longitude = other.longitude;
-		altitude = other.altitude;
-		return *this;
-	}
-	
-}
+#include "render.h"
+#include "ui.h"
+#include "media.h"
+#include "device.h"
+#include "db.h"
+#include "web.h"
+
+#include "geo.h"
+
+#include "resource.h"
 
 #endif

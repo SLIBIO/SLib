@@ -17,24 +17,6 @@
 
 namespace slib
 {
-
-	class EditView;
-	
-	class SLIB_EXPORT IEditViewListener
-	{
-	public:
-		IEditViewListener();
-
-		virtual ~IEditViewListener();
-
-	public:
-		virtual String onChange(EditView* edit, const String& newValue);
-		
-		virtual void onReturnKey(EditView* edit);
-		
-		virtual void onDoneEdit(EditView* edit);
-		
-	};
 	
 	class SLIB_EXPORT EditView : public View
 	{
@@ -101,8 +83,6 @@ namespace slib
 		void onClick(UIEvent* ev);
 		
 	public:
-		SLIB_PROPERTY(AtomicPtr<IEditViewListener>, Listener)
-		
 		SLIB_PROPERTY(AtomicFunction<String(EditView*, String)>, OnChange)
 		
 		SLIB_PROPERTY(AtomicFunction<void(EditView*)>, OnReturnKey)

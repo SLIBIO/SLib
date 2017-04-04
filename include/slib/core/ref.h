@@ -71,8 +71,8 @@ namespace slib
 		void _free();
 
 	private:
-#if defined(SLIB_DEBUG_REFERENCE)
 		sl_reg m_signature;
+#if defined(SLIB_DEBUG_REFERENCE)
 		void _checkValid();
 #endif
 

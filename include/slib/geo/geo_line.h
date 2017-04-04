@@ -8,8 +8,8 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CHECKHEADER_SLIB_MAP_GEORECTANGLE
-#define CHECKHEADER_SLIB_MAP_GEORECTANGLE
+#ifndef CHECKHEADER_SLIB_GEO_GEOLINE
+#define CHECKHEADER_SLIB_GEO_GEOLINE
 
 #include "definition.h"
 
@@ -18,26 +18,24 @@
 namespace slib
 {
 	
-	class SLIB_EXPORT GeoRectangle
+	class SLIB_EXPORT GeoLine
 	{
 	public:
-		LatLon bottomLeft;
-		LatLon topRight;
+		LatLon point1;
+		LatLon point2;
 
 	public:
-		GeoRectangle();
+		GeoLine();
 
-		GeoRectangle(const GeoRectangle& other);
+		GeoLine(const GeoLine& other);
 
-		GeoRectangle(const LatLon& pt1, const LatLon& pt2);
-
-	public:
-		GeoRectangle& operator=(const GeoRectangle& other);
+		GeoLine(const LatLon& pt1, const LatLon& pt2);
 
 	public:
-		sl_bool contains(const LatLon& pt) const;
-	
-		sl_bool isValid() const;
+		GeoLine& operator=(const GeoLine& other);
+
+	public:
+		sl_bool intersectGeoLine(const GeoLine& otherLine, LatLon* outIntersectPoint = sl_null) const;
 
 	};
 

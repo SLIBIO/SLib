@@ -8,38 +8,27 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CHECKHEADER_SLIB_UI_SELECT_VIEW
-#define CHECKHEADER_SLIB_UI_SELECT_VIEW
+#ifndef CHECKHEADER_SLIB_UI_PICKER_VIEW
+#define CHECKHEADER_SLIB_UI_PICKER_VIEW
 
 #include "definition.h"
 
 #include "view.h"
+#include "motion_tracker.h"
+
+#include "../core/time.h"
 
 namespace slib
 {
 
-	class SelectView;
-	
-	class SLIB_EXPORT ISelectViewListener
-	{
-	public:
-		ISelectViewListener();
-
-		virtual ~ISelectViewListener();
-
-	public:
-		virtual void onSelectItem(SelectView* view, sl_uint32 index) = 0;
-		
-	};
-	
-	class SLIB_EXPORT SelectView : public View
+	class SLIB_EXPORT PickerView : public View
 	{
 		SLIB_DECLARE_OBJECT
 		
 	public:
-		SelectView();
+		PickerView();
 		
-		~SelectView();
+		~PickerView();
 
 	public:
 		sl_uint32 getItemsCount();
@@ -78,41 +67,13 @@ namespace slib
 		String getSelectedTitle();
 		
 		
-		const UISize& getIconSize();
-		
-		virtual void setIconSize(const UISize& size, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		void setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		void setIconSize(sl_ui_len size, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		sl_ui_len getIconWidth();
-		
-		void setIconWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		sl_ui_len getIconHeight();
-		
-		void setIconHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		
-		Ref<Drawable> getLeftIcon();
-		
-		virtual void setLeftIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		Ref<Drawable> getRightIcon();
-		
-		virtual void setRightIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		
 		Color getTextColor();
 		
 		virtual void setTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		
 	public:
-		SLIB_PROPERTY(AtomicPtr<ISelectViewListener>, Listener)
-		
-		SLIB_PROPERTY(AtomicFunction<void(SelectView*, sl_uint32)>, OnSelectItem)
+		SLIB_PROPERTY(AtomicFunction<void(PickerView*, sl_uint32)>, OnSelectItem)
 		
 	protected:
 		// override
@@ -121,15 +82,7 @@ namespace slib
 		// override
 		void onMouseEvent(UIEvent* ev);
 		
-		// override
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
-		
 		virtual void onSelectItem(sl_uint32 index);
-		
-	protected:
-		UIRect getLeftIconRegion();
-		
-		UIRect getRightIconRegion();
 		
 	public:
 		// override
@@ -138,6 +91,21 @@ namespace slib
 		virtual void dispatchSelectItem(sl_uint32 index);
 		
 	private:
+		void _selectIndexInner(sl_int32 index);
+		
+		sl_uint32 _getCircularIndex(sl_int32 index);
+		
+		sl_ui_len _getLineHeight();
+		
+		void _flow(sl_ui_pos offset);
+		
+		void _startFlow(sl_real speed);
+		
+		void _stopFlow();
+		
+		void _animationCallback(Timer* timer);
+		
+		
 		void _getSelectedIndex_NW();
 		
 		void _select_NW(sl_uint32 index);
@@ -155,13 +123,17 @@ namespace slib
 		AtomicList<String> m_values;
 		AtomicList<String> m_titles;
 		sl_uint32 m_indexSelected;
-		
-		UISize m_iconSize;
-		AtomicRef<Drawable> m_leftIcon;
-		AtomicRef<Drawable> m_rightIcon;
-		int m_clickedIconNo;
-		
 		Color m_textColor;
+		
+		sl_uint32 m_linesHalfCount;
+		sl_bool m_flagCircular;
+		
+		sl_ui_pos m_yOffset;
+		
+		Ref<MotionTracker> m_motionTracker;
+		Ref<Timer> m_timerFlow;
+		sl_real m_speedFlow;
+		Time m_timeFlowFrameBefore;
 		
 	};
 

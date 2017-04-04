@@ -1352,6 +1352,8 @@ namespace slib
 		
 		void _initScrollBars(UIUpdateMode mode);
 		
+		void _onScrollBarChangeValue(ScrollBar* scrollBar, sl_scroll_pos value);
+		
 		sl_bool _scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagFinish, sl_bool flagAnimate);
 		
 		void _processEventForStateAndClick(UIEvent* ev);

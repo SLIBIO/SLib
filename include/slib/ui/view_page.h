@@ -23,21 +23,6 @@ namespace slib
 {
 
 	class ViewPage;
-	class ViewPager;
-
-	class SLIB_EXPORT IViewPagerListener
-	{
-	public:
-		IViewPagerListener();
-
-		virtual ~IViewPagerListener();
-
-	public:
-		virtual void onPageAction(ViewPager* pager, View* page, UIPageAction action);
-		
-		virtual void onFinishPageAnimation(ViewPager* pager, View* page, UIPageAction action);
-		
-	};
 
 	class SLIB_EXPORT ViewPager : public View
 	{
@@ -146,16 +131,15 @@ namespace slib
 		
 		void _applyDefaultPopTransition(Transition& transition);
 		
-		
 	protected:
 		virtual void onPageAction(View* page, UIPageAction action);
 		
-		virtual void onFinishPageAnimation(View* page, UIPageAction action);
+		virtual void onEndPageAnimation(View* page, UIPageAction action);
 		
 	public:
 		virtual void dispatchPageAction(View* page, UIPageAction action);
 		
-		virtual void dispatchFinishPageAnimation(View* page, UIPageAction action);
+		virtual void dispatchEndPageAnimation(View* page, UIPageAction action);
 		
 	public:
 		// override
@@ -168,8 +152,8 @@ namespace slib
 		void onSwipe(GestureEvent* ev);
 		
 	public:
-		SLIB_PROPERTY(AtomicPtr<IViewPagerListener>, Listener)
 		SLIB_PROPERTY(AtomicFunction<void(ViewPager*, View*, UIPageAction)>, OnPageAction)
+		SLIB_PROPERTY(AtomicFunction<void(ViewPager*, View*, UIPageAction)>, OnEndPageAnimation)
 		
 	protected:
 		CList< Ref<View> > m_pages;
@@ -335,7 +319,7 @@ namespace slib
 		
 		virtual void onPageAction(UIPageAction action);
 		
-		virtual void onFinishPageAnimation(UIPageAction action);
+		virtual void onEndPageAnimation(UIPageAction action);
 		
 		// For mobile platforms
 		virtual void onBackPressed(UIEvent* ev);
@@ -345,7 +329,7 @@ namespace slib
 	public:
 		virtual void dispatchPageAction(ViewPager* pager, UIPageAction action);
 		
-		virtual void dispatchFinishPageAnimation(ViewPager* pager, UIPageAction action);
+		virtual void dispatchEndPageAnimation(ViewPager* pager, UIPageAction action);
 		
 		virtual void dispatchOpen();
 		
@@ -383,7 +367,7 @@ namespace slib
 	public:
 		SLIB_PROPERTY(AtomicFunction<void(ViewPage*, ViewPager* pager, UIPageAction action)>, OnPageAction);
 		
-		SLIB_PROPERTY(AtomicFunction<void(ViewPage*, ViewPager* pager, UIPageAction action)>, OnFinishPageAnimation);
+		SLIB_PROPERTY(AtomicFunction<void(ViewPage*, ViewPager* pager, UIPageAction action)>, OnEndPageAnimation);
 		
 		SLIB_PROPERTY(AtomicFunction<void(ViewPage*)>, OnOpen);
 		

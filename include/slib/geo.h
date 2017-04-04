@@ -8,9 +8,13 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CHECKHEADER_SLIB_MAP_DEFINITION
-#define CHECKHEADER_SLIB_MAP_DEFINITION
+#ifndef CHECKHEADER_SLIB_GEO_HEADER
+#define CHECKHEADER_SLIB_GEO_HEADER
 
-#include "../core/definition.h"
+#include "geo/latlon.h"
+#include "geo/geo_location.h"
+#include "geo/geo_rectangle.h"
+#include "geo/globe.h"
+#include "geo/earth.h"
 
 #endif

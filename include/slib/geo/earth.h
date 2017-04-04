@@ -8,21 +8,21 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CHECKHEADER_SLIB_MAP_EARTH
-#define CHECKHEADER_SLIB_MAP_EARTH
+#ifndef CHECKHEADER_SLIB_GEO_EARTH
+#define CHECKHEADER_SLIB_GEO_EARTH
 
 #include "definition.h"
 
 #include "globe.h"
 
 // Based on WGS-84 World Geodetic System (X,Y,Z axes are custom-defined)
-#define SLIB_MAP_EARTH_AVERAGE_RADIUS				6371009.0 // unit - m
-#define SLIB_MAP_EARTH_RADIUS_EQUATORIAL_WGS84		6378137.0 // unit - m
-#define SLIB_MAP_EARTH_RADIUS_POLAR_WGS84			6356752.314245 // unit - m
+#define SLIB_GEO_EARTH_AVERAGE_RADIUS				6371009.0 // unit - m
+#define SLIB_GEO_EARTH_RADIUS_EQUATORIAL_WGS84		6378137.0 // unit - m
+#define SLIB_GEO_EARTH_RADIUS_POLAR_WGS84			6356752.314245 // unit - m
 // first eccentricity squared = 1 - (short_radius / long_radius)^2
-#define SLIB_MAP_EARTH_ECCENTRICITY_SQUARED_WGS84	0.00669437999014
+#define SLIB_GEO_EARTH_ECCENTRICITY_SQUARED_WGS84	0.00669437999014
 // inverse flattening = 1 / (1 - (short_radius / long_radius))
-#define SLIB_MAP_EARTH_INVERSE_FLATTENING_WGS84		298.257223563
+#define SLIB_GEO_EARTH_INVERSE_FLATTENING_WGS84		298.257223563
 
 namespace slib
 {
