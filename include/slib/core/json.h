@@ -440,12 +440,19 @@ namespace slib
 		return Pair<String, Json>(str, v);
 	}
 	
+	SLIB_INLINE Pair<String, Json> operator>>=(const String& str, const Json& v)
+	{
+		return Pair<String, Json>(str, v);
+	}
+	
 	typedef List<Json> JsonList;
 	typedef AtomicList<Json> AtomicJsonList;
 	typedef Map<String, Json> JsonMap;
 	typedef AtomicMap<String, Json> AtomicJsonMap;
 	typedef List< Map<String, Json> > JsonMapList;
 	typedef AtomicList< Map<String, Json> > AtomicJsonMapList;
+	
+	typedef Pair<String, Json> JsonPair;
 
 }
 
