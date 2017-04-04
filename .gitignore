@@ -1,6 +1,4 @@
 .vscode
 .DS_Store
-bin
 
-project.xcworkspace/
-xcuserdata/
+lib

@@ -1,0 +1,8 @@
+.vs
+*.user
+
+Build
+
+*.sdf
+*.opensdf
+*.suo

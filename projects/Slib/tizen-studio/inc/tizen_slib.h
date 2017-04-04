@@ -1,1 +1,0 @@
-// Tizen for SLib.io
