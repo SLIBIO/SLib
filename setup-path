@@ -1,7 +1,7 @@
 #!/bin/sh
 
 cd $(dirname $0)
-SLIB_PATH=`PWD`
+SLIB_PATH=`pwd`
 
 echo "SLIB_PATH=$SLIB_PATH"
 
@@ -16,6 +16,22 @@ else
  echo "Registering Setup Shell into ~/.bash_profile"
  echo "" >> ~/.bash_profile
  echo "source ~/.SLib.io/setup_bash" >> ~/.bash_profile
+fi
+
+if [[ `uname` == 'Linux' ]]; then
+ 
+ if [[ `cat ~/.bashrc` == *"source ~/.SLib.io/setup_bash"* ]]; then
+  echo "Setup Shell was already registered in ~/.bashrc"
+ else
+  echo "Registering Setup Shell into ~/.bashrc"
+  echo "" >> ~/.bashrc
+  echo "source ~/.SLib.io/setup_bash" >> ~/.bashrc
+ fi
+
+ echo "Registering KDevelop environment variable"
+ echo "[Environment Settings][default]" >> ~/.kde/share/config/kdeveloprc
+ echo "SLIB_PATH=$SLIB_PATH" >> ~/.kde/share/config/kdeveloprc
+
 fi
 
 if [[ `uname` == 'Darwin' ]]; then
