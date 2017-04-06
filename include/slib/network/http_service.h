@@ -11,8 +11,10 @@
 #ifndef CHECKHEADER_SLIB_NETWORK_HTTP_SERVICE
 #define CHECKHEADER_SLIB_NETWORK_HTTP_SERVICE
 
-#include "http_common.h"
+#include "definition.h"
 
+#include "http_common.h"
+#include "http_io.h"
 #include "socket_address.h"
 
 #include "../core/thread_pool.h"

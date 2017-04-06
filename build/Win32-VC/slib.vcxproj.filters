@@ -815,5 +815,8 @@
     <ClCompile Include="..\..\src\slib\web\web_service.cpp">
       <Filter>src\web</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\network\http_io.cpp">
+      <Filter>src\network</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

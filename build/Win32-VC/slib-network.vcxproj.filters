@@ -80,5 +80,8 @@
     <ClCompile Include="..\..\src\slib\network\url_request_win32.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\network\http_io.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

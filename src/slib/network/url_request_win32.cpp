@@ -21,6 +21,7 @@
 #include "slib/core/scoped.h"
 #include "slib/core/log.h"
 #include "slib/core/safe_static.h"
+#include "slib/core/async.h"
 
 #include <wininet.h>
 #pragma comment(lib, "wininet.lib")

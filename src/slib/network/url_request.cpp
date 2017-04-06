@@ -15,6 +15,7 @@
 #include "slib/core/string_buffer.h"
 #include "slib/core/thread_pool.h"
 #include "slib/core/safe_static.h"
+#include "slib/core/event.h"
 #include "slib/core/log.h"
 
 namespace slib

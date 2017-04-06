@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\src\slib\network\dns.cpp" />
     <ClCompile Include="..\..\src\slib\network\ethernet.cpp" />
     <ClCompile Include="..\..\src\slib\network\http_common.cpp" />
+    <ClCompile Include="..\..\src\slib\network\http_io.cpp" />
     <ClCompile Include="..\..\src\slib\network\http_service.cpp" />
     <ClCompile Include="..\..\src\slib\network\icmp.cpp" />
     <ClCompile Include="..\..\src\slib\network\ip_address.cpp" />

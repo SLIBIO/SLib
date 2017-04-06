@@ -506,6 +506,8 @@
 		26D9D9F01E96468D005F7BD3 /* window_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5481C11940A00D47AB0 /* window_osx.mm */; };
 		26D9D9F11E964693005F7BD3 /* web_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CBDF001DED5EC700B1B13B /* web_controller.cpp */; };
 		26D9D9F21E964693005F7BD3 /* web_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26912BC21DEA81D5008C5FFD /* web_service.cpp */; };
+		26D9D9F41E968240005F7BD3 /* http_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D9D9F31E968240005F7BD3 /* http_io.cpp */; };
+		26D9D9F51E968240005F7BD3 /* http_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D9D9F31E968240005F7BD3 /* http_io.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -722,6 +724,7 @@
 		26D8AC8C1E393F010092EB81 /* media_player_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = media_player_apple.mm; sourceTree = "<group>"; };
 		26D8AC8D1E393F010092EB81 /* media_player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = media_player.cpp; sourceTree = "<group>"; };
 		26D9D9531E9645CE005F7BD3 /* libslib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libslib.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		26D9D9F31E968240005F7BD3 /* http_io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_io.cpp; sourceTree = "<group>"; };
 		26DA34F91C4B47CF004DC204 /* video_frame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_frame.cpp; sourceTree = "<group>"; };
 		26E376D61C984CC400B178E6 /* vector2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vector2.cpp; sourceTree = "<group>"; };
 		26E376D81C9858A000B178E6 /* vector3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vector3.cpp; sourceTree = "<group>"; };
@@ -971,6 +974,7 @@
 				266DD4BE1C11940A00D47AB0 /* dns.cpp */,
 				266DD4BF1C11940A00D47AB0 /* ethernet.cpp */,
 				266DD4C11C11940A00D47AB0 /* http_common.cpp */,
+				26D9D9F31E968240005F7BD3 /* http_io.cpp */,
 				266DD4C31C11940A00D47AB0 /* http_service.cpp */,
 				266DD4C41C11940A00D47AB0 /* icmp.cpp */,
 				266DD4C51C11940A00D47AB0 /* ip_address.cpp */,
@@ -1933,6 +1937,7 @@
 				26D159631E93A473003BD61A /* http_common.cpp in Sources */,
 				26D159621E93A473003BD61A /* ethernet.cpp in Sources */,
 				26D159691E93A473003BD61A /* net_capture.cpp in Sources */,
+				26D9D9F51E968240005F7BD3 /* http_io.cpp in Sources */,
 				26D159651E93A473003BD61A /* icmp.cpp in Sources */,
 				26D159721E93A473003BD61A /* socket_event_unix.cpp in Sources */,
 				26D159751E93A473003BD61A /* url_request.cpp in Sources */,
@@ -2315,6 +2320,7 @@
 				26D9D9191E9645CE005F7BD3 /* java.cpp in Sources */,
 				26D9D9E21E96468D005F7BD3 /* ui_core_osx.mm in Sources */,
 				26D9D97C1E964675005F7BD3 /* audio_data.cpp in Sources */,
+				26D9D9F41E968240005F7BD3 /* http_io.cpp in Sources */,
 				26D9D91A1E9645CE005F7BD3 /* setting.cpp in Sources */,
 				26D9D91B1E9645CE005F7BD3 /* array.cpp in Sources */,
 				26D9D96B1E96466A005F7BD3 /* font.cpp in Sources */,
