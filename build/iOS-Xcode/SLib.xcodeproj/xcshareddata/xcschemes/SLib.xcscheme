@@ -14,6 +14,20 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "26D9D7F11E9628E0005F7BD3"
+               BuildableName = "libslib.a"
+               BlueprintName = "slib"
+               ReferencedContainer = "container:SLib.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "26D15C5F1E93ACBD003BD61A"
                BuildableName = "libslib-core.a"
                BlueprintName = "slib-core"
