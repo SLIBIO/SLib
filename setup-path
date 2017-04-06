@@ -1,7 +1,50 @@
+#!/bin/sh
 
 cd $(dirname $0)
+SLIB_PATH=`PWD`
+
+echo "SLIB_PATH=$SLIB_PATH"
+
+echo "Creating Bash Setup Shell"
+mkdir ~/.SLib.io
+echo "export SLIB_PATH=$SLIB_PATH" > ~/.SLib.io/setup_bash
+chmod a+x ~/.SLib.io/setup_bash
+
+if [[ `cat ~/.bash_profile` == *"source ~/.SLib.io/setup_bash"* ]]; then
+ echo "Setup Shell was already registered in ~/.bash_profile"
+else
+ echo "Registering Setup Shell into ~/.bash_profile"
+ echo "" >> ~/.bash_profile
+ echo "source ~/.SLib.io/setup_bash" >> ~/.bash_profile
+fi
+
 if [[ `uname` == 'Darwin' ]]; then
- echo "Adding Xcode Preference Custom Path: $(PWD)"
- defaults write com.apple.dt.Xcode IDEApplicationwideBuildSettings -dict-add SLIB_PATH "$(PWD)"
+
+ echo "Registering Xcode Preference Custom Path"
+ defaults write com.apple.dt.Xcode IDEApplicationwideBuildSettings -dict-add SLIB_PATH "$SLIB_PATH"
  defaults write com.apple.dt.Xcode IDESourceTreeDisplayNames -dict-add SLIB_PATH "SLIB_PATH"
+ 
+ echo "Registering launchd environment variable"
+ echo "<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE plist PUBLIC '-//Apple//DTD PLIST 1.0//EN' 'http://www.apple.com/DTDs/PropertyList-1.0.dtd'>
+ <plist version="1.0">
+  <dict>
+  <key>Label</key>
+  <string>io.slib.setup_path</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/launchctl</string>
+    <string>setenv</string>
+    <string>SLIB_PATH</string>
+    <string>$SLIB_PATH</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>ServiceIPC</key>
+  <false/>
+ </dict>
+</plist>" > ~/Library/LaunchAgents/io.slib.setup_path.plist
+
+ launchctl setenv SLIB_PATH $SLIB_PATH
+
 fi
