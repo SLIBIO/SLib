@@ -4,6 +4,7 @@
 
 #include "slib/network/url_request.h"
 
+#include "slib/core/file.h"
 #include "slib/core/log.h"
 
 #include <curl/curl.h>

@@ -1,7 +1,7 @@
 .settings
 
 SA_Report
-Debug_x86
-Release_x86
-Debug_arm
-Release_arm
+Debug-x86
+Release-x86
+Debug-arm
+Release-arm
