@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -frtti")
 
 set (SLIB_PATH ${CMAKE_CURRENT_LIST_DIR}/../../..)
 set (SLIB_OUTPUT_PATH ${SLIB_PATH}/lib/Android/${CMAKE_BUILD_TYPE}-${ANDROID_ABI}/)
