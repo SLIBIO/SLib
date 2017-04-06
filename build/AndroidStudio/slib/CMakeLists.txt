@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.4.1)
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 set (SLIB_PATH ${CMAKE_CURRENT_LIST_DIR}/../../..)
 set (SLIB_OUTPUT_PATH ${SLIB_PATH}/lib/Android/${CMAKE_BUILD_TYPE}-${ANDROID_ABI}/)
 
@@ -69,7 +71,6 @@ set_target_properties (slib-ui
  PROPERTIES
  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
 )
-
 file (GLOB SLIB_MEDIA_FILES
  ${SLIB_PATH}/src/slib/media/*.cpp
 )
@@ -102,18 +103,6 @@ add_library (
  ${SLIB_DB_FILES}
 )
 set_target_properties (slib-db
- PROPERTIES
- ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
-)
-
-file (GLOB SLIB_WEB_FILES
- ${SLIB_PATH}/src/slib/web/*.cpp
-)
-add_library (
- slib-web STATIC
- ${SLIB_WEB_FILES}
-)
-set_target_properties (slib-web
  PROPERTIES
  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
 )
@@ -224,28 +213,20 @@ set_target_properties (vpx
  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
 )
 
-add_library (
- slib_dummy SHARED
- ${CMAKE_CURRENT_LIST_DIR}/dummy.cpp
-)
 
-target_link_libraries (
- slib_dummy
- slib-core
- slib-network
- slib-graphics
- slib-render
- slib-ui
- slib-media
- slib-device
- slib-db
- slib-web
- slib-geo
- zlib
- png
- jpeg
- freetype
- sqlite3
- opus
- vpx
+add_library (
+ slib STATIC
+ ${SLIB_CORE_FILES}
+ ${SLIB_NETWORK_FILES}
+ ${SLIB_GRAPHICS_FILES}
+ ${SLIB_RENDER_FILES}
+ ${SLIB_UI_FILES}
+ ${SLIB_MEDIA_FILES}
+ ${SLIB_DEVICE_FILES}
+ ${SLIB_DB_FILES}
+ ${SLIB_GEO_FILES}
+)
+set_target_properties (slib
+ PROPERTIES
+ ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
 )

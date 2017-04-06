@@ -10,7 +10,7 @@ android {
         versionName "1.0"
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++11 -frtti"
+                targets 'slib', 'slib-core', 'slib-network', 'slib-graphics', 'slib-render', 'slib-ui', 'slib-media', 'slib-device', 'slib-db', 'slib-geo', 'zlib', 'png', 'jpeg', 'freetype', 'sqlite3', 'opus', 'vpx'
             }
         }
         ndk {
@@ -27,7 +27,7 @@ android {
     }
     libraryVariants.all { variant->
         variant.outputs.each { output ->
-            output.outputFile = new File(projectDir.getPath() + "/../../../lib/Android", output.outputFile.name)
+            output.outputFile = new File(projectDir.getPath() + "/../../../lib/Android", "slib.aar")
         }
     }
     sourceSets {
