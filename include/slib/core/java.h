@@ -520,9 +520,9 @@ namespace CLASS \
 
 #define SLIB_JNI_NATIVE(VAR, NAME, SIG, fn) static slib::_JniNativeMethod VAR(&_gcls, NAME, SIG, (const void*)(fn));
 #define SLIB_JNI_NATIVE_IMPL(VAR, NAME, SIG, RET, ...) \
-	RET JNICALL __jniNativeImpl_##VAR(JNIEnv* env, jobject _this, ##__VA_ARGS__); \
-	static slib::_JniNativeMethod VAR(&_gcls, NAME, SIG, (const void*)(__jniNativeImpl_##VAR)); \
-	RET JNICALL __jniNativeImpl_##VAR(JNIEnv* env, jobject _this, ##__VA_ARGS__)
+	RET JNICALL SLib_JniNativeImpl_##VAR(JNIEnv* env, jobject _this, ##__VA_ARGS__); \
+	static slib::_JniNativeMethod VAR(&_gcls, NAME, SIG, (const void*)(SLib_JniNativeImpl_##VAR)); \
+	RET JNICALL SLib_JniNativeImpl_##VAR(JNIEnv* env, jobject _this, ##__VA_ARGS__)
 
 #include "detail/java.h"
 

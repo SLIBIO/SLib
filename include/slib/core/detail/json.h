@@ -133,9 +133,9 @@ namespace slib
 	template <class T>
 	SLIB_INLINE void Json::get(AtomicRef<T>& _out) const
 	{
-		Ref<T> __out;
-		get(__out);
-		_out = __out;
+		Ref<T> t;
+		get(t);
+		_out = t;
 	}
 	
 	template <class T>
@@ -202,9 +202,9 @@ namespace slib
 	template <class T>
 	SLIB_INLINE void Json::get(AtomicList<T>& _out) const
 	{
-		List<T> __out;
-		get(__out);
-		_out = __out;
+		List<T> t;
+		get(t);
+		_out = t;
 	}
 	
 	template <class T>
@@ -260,9 +260,9 @@ namespace slib
 	template <class T>
 	SLIB_INLINE void Json::get(AtomicMap<String, T>& _out) const
 	{
-		Map<String, T> __out;
-		get(__out);
-		_out = __out;
+		Map<String, T> t;
+		get(t);
+		_out = t;
 	}
 	
 	template <class T>
@@ -320,9 +320,9 @@ namespace slib
 	template <class KT, class VT>
 	SLIB_INLINE void Json::get(AtomicMap<KT, VT>& _out) const
 	{
-		Map<KT, VT> __out;
-		get(__out);
-		_out = __out;
+		Map<KT, VT> t;
+		get(t);
+		_out = t;
 	}
 	
 	template <class KT, class VT>

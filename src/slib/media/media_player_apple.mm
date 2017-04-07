@@ -279,7 +279,7 @@ namespace slib
 			m_observer = nil;
 		}
 		
-		void __onReachEnd()
+		void _onReachEnd()
 		{
 			if (m_flagAutoRepeat) {
 				CMTime t;
@@ -293,7 +293,7 @@ namespace slib
 			}
 		}
 
-		void __onStatus()
+		void _onStatus()
 		{
 			m_status = m_player.status;
 			if (m_status == AVPlayerStatusFailed) {
@@ -323,7 +323,7 @@ namespace slib
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
 	slib::Ref<slib::_AVPlayer> player(m_player);
 	if (player.isNotNull()) {
-		player->__onReachEnd();
+		player->_onReachEnd();
 	}
 }
 
@@ -332,7 +332,7 @@ namespace slib
 	if ([keyPath isEqualToString:@"status"]) {
 		slib::Ref<slib::_AVPlayer> player(m_player);
 		if (player.isNotNull()) {
-			player->__onStatus();
+			player->_onStatus();
 		}
 	}
 }

@@ -131,11 +131,11 @@ namespace slib
 		}
 		
 		// override
-		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& __font, const Color& _color)
+		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& in_font, const Color& _color)
 		{		
 			if (text.isNotEmpty()) {
 				
-				Ref<Font> _font = __font;
+				Ref<Font> _font = in_font;
 				if (_font.isNull()) {
 					_font = Font::getDefault();
 				}

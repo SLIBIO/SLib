@@ -57,18 +57,21 @@ namespace slib
 			return ret;
 		}
 		
-		sl_bool __setup(sl_uint32 events)
+		// override
+		sl_bool _native_setup(sl_uint32 events)
 		{
 			m_events = events;
 			return sl_true;
 		}
 		
-		void __set()
+		// override
+		void _native_set()
 		{
 			m_pipe->set();
 		}
 		
-		void __reset()
+		// override
+		void _native_reset()
 		{
 			m_pipe->reset();
 		}
@@ -79,7 +82,7 @@ namespace slib
 		return Ref<SocketEvent>::from(_Unix_SocketEvent::create(socket));
 	}
 
-	sl_bool SocketEvent::__waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* status, sl_uint32 count, sl_int32 timeout)
+	sl_bool SocketEvent::_native_waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* status, sl_uint32 count, sl_int32 timeout)
 	{
 		SLIB_SCOPED_BUFFER(pollfd, 64, fd, 2*count);
 		SLIB_SCOPED_BUFFER(sl_uint32, 64, indexMap, count);

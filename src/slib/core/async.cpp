@@ -52,12 +52,12 @@ namespace slib
 
 	Ref<AsyncIoLoop> AsyncIoLoop::create(sl_bool flagAutoStart)
 	{
-		void* handle = __createHandle();
+		void* handle = _native_createHandle();
 		if (handle) {
 			Ref<AsyncIoLoop> ret = new AsyncIoLoop;
 			if (ret.isNotNull()) {
 				ret->m_handle = handle;
-				ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(AsyncIoLoop, __runLoop, ret.get()));
+				ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(AsyncIoLoop, _native_runLoop, ret.get()));
 				if (ret->m_thread.isNotNull()) {
 					ret->m_flagInit = sl_true;
 					if (flagAutoStart) {
@@ -66,7 +66,7 @@ namespace slib
 					return ret;
 				}
 			}
-			__closeHandle(handle);
+			_native_closeHandle(handle);
 		}
 		return sl_null;
 	}
@@ -82,12 +82,12 @@ namespace slib
 		if (m_flagRunning) {
 			m_flagRunning = sl_false;
 			m_thread->finish();
-			__wake();
+			_native_wake();
 			lock.unlock();
 			m_thread->finishAndWait();
 		}
 		
-		__closeHandle(m_handle);
+		_native_closeHandle(m_handle);
 		
 		m_queueInstancesOrder.removeAll();
 		m_queueInstancesClosing.removeAll();
@@ -138,7 +138,7 @@ namespace slib
 		if (!m_flagRunning) {
 			return;
 		}
-		__wake();
+		_native_wake();
 	}
 
 	sl_bool AsyncIoLoop::attachInstance(AsyncIoInstance* instance, AsyncIoMode mode)
@@ -146,7 +146,7 @@ namespace slib
 		if (m_handle) {
 			if (instance && instance->isOpened()) {
 				ObjectLocker lock(this);
-				return __attachInstance(instance, mode);
+				return _native_attachInstance(instance, mode);
 			}
 		}
 		return sl_false;
@@ -205,7 +205,7 @@ namespace slib
 		Ref<AsyncIoInstance> instance;
 		while (m_queueInstancesClosing.pop(&instance)) {
 			if (instance.isNotNull() && instance->isOpened()) {
-				__detachInstance(instance.get());
+				_native_detachInstance(instance.get());
 				instance->close();
 				m_queueInstancesClosed.push(instance);
 			}

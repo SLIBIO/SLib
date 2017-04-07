@@ -54,7 +54,7 @@ namespace slib
 		}
 
 		// override
-		void __set()
+		void _native_set()
 		{
 			pthread_mutex_lock(&m_mutex);
 			m_signal = sl_true;
@@ -67,7 +67,7 @@ namespace slib
 		}
 
 		// override
-		void __reset()
+		void _native_reset()
 		{
 			pthread_mutex_lock(&m_mutex);
 			m_signal = sl_false;
@@ -75,7 +75,7 @@ namespace slib
 		}
 
 		// override
-		sl_bool __wait(sl_int32 timeout)
+		sl_bool _native_wait(sl_int32 timeout)
 		{
 			sl_bool ret = sl_true;
 

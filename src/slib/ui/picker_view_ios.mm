@@ -33,24 +33,24 @@ namespace slib
 	class _PickerView : public PickerView
 	{
 	public:
-		sl_uint32 __getItemsCount()
+		sl_uint32 _getItemsCount()
 		{
 			return (sl_uint32)(m_titles.getCount());
 		}
 		
-		NSString* __getItemTitle(sl_uint32 row)
+		NSString* _getItemTitle(sl_uint32 row)
 		{
 			String s = m_titles.getValueAt(row);
 			return Apple::getNSStringFromString(s);
 		}
 		
-		void __onSelectItem(_Slib_iOS_PickerView* v, sl_uint32 row)
+		void _onSelectItem(_Slib_iOS_PickerView* v, sl_uint32 row)
 		{
 			m_indexSelected = row;
 			dispatchSelectItem(row);
 		}
 		
-		void __selectItem(_Slib_iOS_PickerView* v, sl_uint32 row)
+		void _selectItem(_Slib_iOS_PickerView* v, sl_uint32 row)
 		{
 			[v selectRow:row inComponent:0 animated:NO];
 		}
@@ -70,7 +70,7 @@ namespace slib
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		if (handle != nil) {
-			((_PickerView*)this)->__selectItem(handle, m_indexSelected);
+			((_PickerView*)this)->_selectItem(handle, m_indexSelected);
 		}
 		return ret;
 	}
@@ -91,7 +91,7 @@ namespace slib
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
 			_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
-			((_PickerView*)this)->__selectItem(v, index);
+			((_PickerView*)this)->_selectItem(v, index);
 		}
 	}
 	
@@ -108,7 +108,7 @@ namespace slib
 		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
 			_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
 			[v reloadAllComponents];
-			((_PickerView*)this)->__selectItem(v, m_indexSelected);
+			((_PickerView*)this)->_selectItem(v, m_indexSelected);
 		}
 	}
 	
@@ -125,7 +125,7 @@ namespace slib
 		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
 			_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
 			[v reloadAllComponents];
-			((_PickerView*)this)->__selectItem(v, m_indexSelected);
+			((_PickerView*)this)->_selectItem(v, m_indexSelected);
 		}
 	}
 	
@@ -194,7 +194,7 @@ namespace slib
 {
 	slib::Ref<slib::PickerView> view = m_view;
 	if (view.isNotNull()) {
-		((slib::_PickerView*)(view.get()))->__onSelectItem(self, (sl_uint32)row);
+		((slib::_PickerView*)(view.get()))->_onSelectItem(self, (sl_uint32)row);
 	}
 }
 
@@ -202,7 +202,7 @@ namespace slib
 {
 	slib::Ref<slib::PickerView> view = m_view;
 	if (view.isNotNull()) {
-		return (NSInteger)(((slib::_PickerView*)(view.get()))->__getItemsCount());
+		return (NSInteger)(((slib::_PickerView*)(view.get()))->_getItemsCount());
 	}
 	return 0;
 }
@@ -216,7 +216,7 @@ namespace slib
 	}
 	slib::Ref<slib::PickerView> picker = m_view;
 	if (picker.isNotNull()) {
-		label.text = ((slib::_PickerView*)(picker.get()))->__getItemTitle((sl_uint32)row);
+		label.text = ((slib::_PickerView*)(picker.get()))->_getItemTitle((sl_uint32)row);
 	}
 	return label;
 }

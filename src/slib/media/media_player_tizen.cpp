@@ -74,11 +74,11 @@ namespace slib
 					ret->m_flagInited = sl_true;
 					ret->_init(param);
 
-					errorCode = ::player_prepare_async(player, _MediaPlayer::__onPrepared, ret.get());
+					errorCode = ::player_prepare_async(player, _MediaPlayer::_onPrepared, ret.get());
 
 					if (PLAYER_ERROR_NONE == errorCode) {
 
-						::player_set_completed_cb(player, _MediaPlayer::__onReachEnd, ret.get());
+						::player_set_completed_cb(player, _MediaPlayer::_onReachEnd, ret.get());
 
 						if (param.flagAutoStart) {
 							ret->resume();
@@ -98,14 +98,14 @@ namespace slib
 		}
 
 	public:
-		static void __onPrepared(void* userData)
+		static void _onPrepared(void* userData)
 		{
 			Ref<_MediaPlayer> player = (_MediaPlayer*)userData;
 			player->_onPrepared();
 
 		}
 
-		static void __onReachEnd(void* userData)
+		static void _onReachEnd(void* userData)
 		{
 			Ref<_MediaPlayer> player = (_MediaPlayer*)userData;
 			player->_onReachEnd();

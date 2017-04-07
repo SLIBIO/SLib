@@ -29,7 +29,7 @@ namespace slib
 		Ref<PipeEvent> eventWake;
 	};
 
-	void* AsyncIoLoop::__createHandle()
+	void* AsyncIoLoop::_native_createHandle()
 	{
 		Ref<PipeEvent> pipe = PipeEvent::create();
 		if (pipe.isNull()) {
@@ -55,14 +55,14 @@ namespace slib
 		return sl_null;
 	}
 
-	void AsyncIoLoop::__closeHandle(void* _handle)
+	void AsyncIoLoop::_native_closeHandle(void* _handle)
 	{
 		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)_handle;
 		::close(handle->kq);
 		delete handle;
 	}
 
-	void AsyncIoLoop::__runLoop()
+	void AsyncIoLoop::_native_runLoop()
 	{
 		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
 
@@ -111,13 +111,13 @@ namespace slib
 
 	}
 
-	void AsyncIoLoop::__wake()
+	void AsyncIoLoop::_native_wake()
 	{
 		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
 		handle->eventWake->set();
 	}
 
-	sl_bool AsyncIoLoop::__attachInstance(AsyncIoInstance* instance, AsyncIoMode mode)
+	sl_bool AsyncIoLoop::_native_attachInstance(AsyncIoInstance* instance, AsyncIoMode mode)
 	{
 		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
 		int hObject = (int)(instance->getHandle());
@@ -149,7 +149,7 @@ namespace slib
 		return sl_false;
 	}
 
-	void AsyncIoLoop::__detachInstance(AsyncIoInstance* instance)
+	void AsyncIoLoop::_native_detachInstance(AsyncIoInstance* instance)
 	{
 		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
 		int hObject = (int)(instance->getHandle());

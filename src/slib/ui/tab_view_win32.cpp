@@ -25,7 +25,7 @@ namespace slib
 	class _TabView : public TabView
 	{
 	public:
-		void __applyTabsCount(HWND hWnd)
+		void _applyTabsCount(HWND hWnd)
 		{
 			ObjectLocker lock(this);
 			sl_uint32 nOrig = (sl_uint32)(::SendMessageW(hWnd, TCM_GETITEMCOUNT, 0, 0));
@@ -50,9 +50,9 @@ namespace slib
 			}
 		}
 
-		void __copyTabs(HWND hWnd, ViewInstance* viewInstance)
+		void _copyTabs(HWND hWnd, ViewInstance* viewInstance)
 		{
-			__applyTabsCount(hWnd);
+			_applyTabsCount(hWnd);
 			ListLocker<TabViewItem> items(m_items);
 			for (sl_size i = 0; i < items.count; i++) {
 				TCITEMW tci;
@@ -62,10 +62,10 @@ namespace slib
 				tci.pszText = (LPWSTR)(label.getData());
 				::SendMessageW(hWnd, TCM_SETITEMW, (WPARAM)i, (LPARAM)&tci);
 			}
-			__selectTab(hWnd, viewInstance, m_indexSelected);
+			_selectTab(hWnd, viewInstance, m_indexSelected);
 		}
 
-		void __setTabLabel(HWND hWnd, sl_uint32 index, const String& _label)
+		void _setTabLabel(HWND hWnd, sl_uint32 index, const String& _label)
 		{
 			TCITEMW tci;
 			Base::zeroMemory(&tci, sizeof(tci));
@@ -75,7 +75,7 @@ namespace slib
 			::SendMessageW(hWnd, TCM_SETITEMW, (WPARAM)index, (LPARAM)(&tci));
 		}
 
-		void __selectTab(HWND hWnd, ViewInstance* viewInstance, sl_uint32 index)
+		void _selectTab(HWND hWnd, ViewInstance* viewInstance, sl_uint32 index)
 		{
 			sl_uint32 n = (sl_uint32)(m_items.getCount());
 			if (index >= n) {
@@ -83,25 +83,25 @@ namespace slib
 			}
 			m_indexSelected = index;
 			::SendMessageW(hWnd, TCM_SETCURSEL, (WPARAM)m_indexSelected, 0);
-			__applyTabContents(hWnd, viewInstance);
+			_applyTabContents(hWnd, viewInstance);
 		}
 
-		sl_uint32 __getSelectedIndex(HWND hWnd)
+		sl_uint32 _getSelectedIndex(HWND hWnd)
 		{
 			return (sl_uint32)(::SendMessageW(hWnd, TCM_GETCURSEL, 0, 0));
 		}
 
-		void __onSelectTab(HWND hWnd, ViewInstance* viewInstance)
+		void _onSelectTab(HWND hWnd, ViewInstance* viewInstance)
 		{
-			sl_uint32 index = __getSelectedIndex(hWnd);
+			sl_uint32 index = _getSelectedIndex(hWnd);
 			m_indexSelected = index;
 			dispatchSelectTab(index);
-			__applyTabContents(hWnd, viewInstance);
+			_applyTabContents(hWnd, viewInstance);
 		}
 
-		void __applyTabContents(HWND hWnd, ViewInstance* viewInstance)
+		void _applyTabContents(HWND hWnd, ViewInstance* viewInstance)
 		{
-			UIRect rc = __getClientBounds(hWnd);
+			UIRect rc = _getClientBounds(hWnd);
 			sl_size sel = m_indexSelected;
 			ListLocker<TabViewItem> items(m_items);
 			for (sl_size i = 0; i < items.count; i++) {
@@ -120,9 +120,9 @@ namespace slib
 			}
 		}
 
-		void __applyClientBounds(HWND hWnd)
+		void _applyClientBounds(HWND hWnd)
 		{
-			UIRect rc = __getClientBounds(hWnd);
+			UIRect rc = _getClientBounds(hWnd);
 			ListLocker<TabViewItem> items(m_items);
 			for (sl_size i = 0; i < items.count; i++) {
 				Ref<View> view = items[i].contentView;
@@ -132,7 +132,7 @@ namespace slib
 			}
 		}
 
-		UIRect __getClientBounds(HWND hWnd)
+		UIRect _getClientBounds(HWND hWnd)
 		{
 			RECT rc;
 			rc.left = -2;
@@ -168,7 +168,7 @@ namespace slib
 				if (_TabView* view = CastInstance<_TabView>(_view.get())) {
 					UINT code = nmhdr->code;
 					if (code == TCN_SELCHANGE) {
-						view->__onSelectTab(handle, this);
+						view->_onSelectTab(handle, this);
 						return sl_true;
 					}
 				}
@@ -199,7 +199,7 @@ namespace slib
 				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 			}
 
-			((_TabView*)this)->__copyTabs(handle, ret.get());
+			((_TabView*)this)->_copyTabs(handle, ret.get());
 		}
 		return ret;
 	}
@@ -208,7 +208,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_TabView*)this)->__applyTabsCount(handle);
+			((_TabView*)this)->_applyTabsCount(handle);
 		}
 	}
 
@@ -216,7 +216,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_TabView*)this)->__applyClientBounds(handle);
+			((_TabView*)this)->_applyClientBounds(handle);
 		}
 	}
 
@@ -224,7 +224,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_TabView*)this)->__setTabLabel(handle, index, text);
+			((_TabView*)this)->_setTabLabel(handle, index, text);
 		}
 	}
 
@@ -233,7 +233,7 @@ namespace slib
 		Ref<ViewInstance> viewInstance = getViewInstance();
 		if (viewInstance.isNotNull()) {
 			HWND handle = UIPlatform::getViewHandle(viewInstance.get());
-			((_TabView*)this)->__applyTabContents(handle, viewInstance.get());
+			((_TabView*)this)->_applyTabContents(handle, viewInstance.get());
 		}
 	}
 
@@ -241,7 +241,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			m_indexSelected = (sl_uint32)(((_TabView*)this)->__getSelectedIndex(handle));
+			m_indexSelected = (sl_uint32)(((_TabView*)this)->_getSelectedIndex(handle));
 		}
 	}
 
@@ -250,7 +250,7 @@ namespace slib
 		Ref<ViewInstance> viewInstance = getViewInstance();
 		if (viewInstance.isNotNull()) {
 			HWND handle = UIPlatform::getViewHandle(viewInstance.get());
-			((_TabView*)this)->__selectTab(handle, viewInstance.get(), index);
+			((_TabView*)this)->_selectTab(handle, viewInstance.get(), index);
 		}
 	}
 
@@ -258,7 +258,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			return ((_TabView*)this)->__getClientBounds(handle).getSize();
+			return ((_TabView*)this)->_getClientBounds(handle).getSize();
 		}
 		return UISize::zero();
 	}

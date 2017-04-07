@@ -116,9 +116,9 @@ namespace slib
 	void UI::openUrl(const String& _url)
 	{
 		if (![NSThread isMainThread]) {
-			String __url = _url;
+			String s = _url;
 			dispatch_async(dispatch_get_main_queue(), ^{
-				openUrl(__url);
+				openUrl(s);
 			});
 			return;
 		}

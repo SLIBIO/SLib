@@ -64,19 +64,19 @@ namespace slib
 		}
 
 		// override
-		void __set()
+		void _native_set()
 		{
 			::SetEvent(m_hEvent);
 		}
 
 		// override
-		void __reset()
+		void _native_reset()
 		{
 			::ResetEvent(m_hEvent);
 		}
 
 		// override
-		sl_bool __wait(sl_int32 timeout)
+		sl_bool _native_wait(sl_int32 timeout)
 		{
 			DWORD t = INFINITE;
 			if (timeout >= 0) {

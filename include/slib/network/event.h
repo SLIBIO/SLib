@@ -64,11 +64,11 @@ namespace slib
 		const Ref<Socket>& getSocket();
 		
 	protected:
-		sl_bool __wait(sl_int32 timeout);
+		sl_bool _native_wait(sl_int32 timeout);
 		
-		virtual sl_bool __setup(sl_uint32 events) = 0;
+		virtual sl_bool _native_setup(sl_uint32 events) = 0;
 		
-		static sl_bool __waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* status, sl_uint32 count, sl_int32 timeout);
+		static sl_bool _native_waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* status, sl_uint32 count, sl_int32 timeout);
 		
 	protected:
 		Ref<Socket> m_socket;

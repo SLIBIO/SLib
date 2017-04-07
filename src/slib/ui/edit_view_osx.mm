@@ -59,7 +59,7 @@ namespace slib
 	class EditView_Impl : public EditView
 	{
 	public:
-		void __applyPlaceholder(NSView* handle)
+		void _applyPlaceholder(NSView* handle)
 		{
 			NSAttributedString* attr;
 			
@@ -101,13 +101,13 @@ namespace slib
 			}
 		}
 
-		void __applyProperties(NSTextField* handle)
+		void _applyProperties(NSTextField* handle)
 		{
 			[handle setStringValue:(Apple::getNSStringFromString(m_text))];
 			[handle setAlignment:translateAlignment(m_textAlignment)];
 			[handle setBordered: (isBorder() ? TRUE : FALSE)];
 			[handle setBezeled: (isBorder() ? TRUE : FALSE)];
-			__applyPlaceholder(handle);
+			_applyPlaceholder(handle);
 			[handle setTextColor:(GraphicsPlatform::getNSColorFromColor(m_textColor))];
 			[handle setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
 			[handle setEditable:(m_flagReadOnly?FALSE:TRUE)];
@@ -120,13 +120,13 @@ namespace slib
 			}
 		}
 		
-		void __applyProperties(SLib_macOS_TextArea* handle)
+		void _applyProperties(SLib_macOS_TextArea* handle)
 		{
 			NSTextView* tv = handle->textView;
 			[tv setString:(Apple::getNSStringFromString(m_text))];
 			[tv setAlignment:translateAlignment(m_textAlignment)];
 			[handle setBorderType:(isBorder() ? NSBezelBorder : NSNoBorder)];
-			__applyPlaceholder(handle);
+			_applyPlaceholder(handle);
 			[tv setTextColor:(GraphicsPlatform::getNSColorFromColor(m_textColor))];
 			[tv setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
 			[tv setEditable:(m_flagReadOnly?FALSE:TRUE)];
@@ -194,7 +194,7 @@ namespace slib
 		SLib_macOS_TextField* handle = [[SLib_macOS_TextField alloc] initWithFrame:frame];
 		if (handle != nil) {
 			handle->m_flagMultiLine = m_flagMultiLine;
-			((EditView_Impl*)this)->__applyProperties(handle);
+			((EditView_Impl*)this)->_applyProperties(handle);
 			[handle setDelegate:handle];
 		}
 		OSX_VIEW_CREATE_INSTANCE_END
@@ -206,7 +206,7 @@ namespace slib
 		OSX_VIEW_CREATE_INSTANCE_BEGIN
 		SLib_macOS_SecureTextField* handle = [[SLib_macOS_SecureTextField alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((EditView_Impl*)this)->__applyProperties(handle);
+			((EditView_Impl*)this)->_applyProperties(handle);
 			[handle setDelegate:handle];
 		}
 		OSX_VIEW_CREATE_INSTANCE_END
@@ -218,7 +218,7 @@ namespace slib
 		OSX_VIEW_CREATE_INSTANCE_BEGIN
 		SLib_macOS_TextArea* handle = [[SLib_macOS_TextArea alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((EditView_Impl*)this)->__applyProperties(handle);
+			((EditView_Impl*)this)->_applyProperties(handle);
 		}
 		OSX_VIEW_CREATE_INSTANCE_END
 		if (handle != nil) {
@@ -304,22 +304,22 @@ namespace slib
 				NSTextField* tv = (NSTextField*)handle;
 				if (UI::isUiThread()) {
 					[tv setAlignment:EditView_Impl::translateAlignment(align)];
-					((EditView_Impl*)this)->__applyPlaceholder(handle);
+					((EditView_Impl*)this)->_applyPlaceholder(handle);
 				} else {
 					dispatch_async(dispatch_get_main_queue(), ^{
 						[tv setAlignment:EditView_Impl::translateAlignment(align)];
-						((EditView_Impl*)this)->__applyPlaceholder(handle);
+						((EditView_Impl*)this)->_applyPlaceholder(handle);
 					});
 				}
 			} else if ([handle isKindOfClass:[SLib_macOS_TextArea class]]) {
 				SLib_macOS_TextArea* tv = (SLib_macOS_TextArea*)handle;
 				if (UI::isUiThread()) {
 					[tv->textView setAlignment:EditView_Impl::translateAlignment(align)];
-					((EditView_Impl*)this)->__applyPlaceholder(handle);
+					((EditView_Impl*)this)->_applyPlaceholder(handle);
 				} else {
 					dispatch_async(dispatch_get_main_queue(), ^{
 						[tv->textView setAlignment:EditView_Impl::translateAlignment(align)];
-						((EditView_Impl*)this)->__applyPlaceholder(handle);
+						((EditView_Impl*)this)->_applyPlaceholder(handle);
 					});
 				}
 			}
@@ -331,10 +331,10 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if (UI::isUiThread()) {
-				((EditView_Impl*)this)->__applyPlaceholder(handle);
+				((EditView_Impl*)this)->_applyPlaceholder(handle);
 			} else {
 				dispatch_async(dispatch_get_main_queue(), ^{
-					((EditView_Impl*)this)->__applyPlaceholder(handle);
+					((EditView_Impl*)this)->_applyPlaceholder(handle);
 				});
 			}
 		}
@@ -345,10 +345,10 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if (UI::isUiThread()) {
-				((EditView_Impl*)this)->__applyPlaceholder(handle);
+				((EditView_Impl*)this)->_applyPlaceholder(handle);
 			} else {
 				dispatch_async(dispatch_get_main_queue(), ^{
-					((EditView_Impl*)this)->__applyPlaceholder(handle);
+					((EditView_Impl*)this)->_applyPlaceholder(handle);
 				});
 			}
 		}
@@ -451,11 +451,11 @@ namespace slib
 				if (hFont != nil) {
 					if (UI::isUiThread()) {
 						[tv setFont:hFont];
-						((EditView_Impl*)this)->__applyPlaceholder(handle);
+						((EditView_Impl*)this)->_applyPlaceholder(handle);
 					} else {
 						dispatch_async(dispatch_get_main_queue(), ^{
 							[tv setFont:hFont];
-							((EditView_Impl*)this)->__applyPlaceholder(handle);
+							((EditView_Impl*)this)->_applyPlaceholder(handle);
 						});
 					}
 				}
@@ -465,11 +465,11 @@ namespace slib
 				if (hFont != nil) {
 					if (UI::isUiThread()) {
 						[tv->textView setFont:hFont];
-						((EditView_Impl*)this)->__applyPlaceholder(handle);
+						((EditView_Impl*)this)->_applyPlaceholder(handle);
 					} else {
 						dispatch_async(dispatch_get_main_queue(), ^{
 							[tv->textView setFont:hFont];
-							((EditView_Impl*)this)->__applyPlaceholder(handle);
+							((EditView_Impl*)this)->_applyPlaceholder(handle);
 						});
 					}
 				}

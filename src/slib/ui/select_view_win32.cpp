@@ -22,7 +22,7 @@ namespace slib
 	class _SelectView : public SelectView
 	{
 	public:
-		void __applyItemsCount(HWND hWnd)
+		void _applyItemsCount(HWND hWnd)
 		{
 			ObjectLocker lock(this);
 			sl_uint32 nOrig = (sl_uint32)(::SendMessageW(hWnd, CB_GETCOUNT, 0, 0));
@@ -46,10 +46,10 @@ namespace slib
 			}
 		}
 
-		void __copyItems(HWND hWnd)
+		void _copyItems(HWND hWnd)
 		{
 			::SendMessageW(hWnd, CB_RESETCONTENT, 0, 0);
-			__applyItemsCount(hWnd);
+			_applyItemsCount(hWnd);
 			sl_uint32 n = (sl_uint32)(m_titles.getCount());
 			if (m_indexSelected >= n) {
 				m_indexSelected = 0;
@@ -59,21 +59,21 @@ namespace slib
 			}
 		}
 
-		void __setItemTitle(HWND hWnd, sl_uint32 index, const String& title)
+		void _setItemTitle(HWND hWnd, sl_uint32 index, const String& title)
 		{
 			String16 s = title;
 			::SendMessageW(hWnd, CB_DELETESTRING, (WPARAM)index, 0);
 			::SendMessageW(hWnd, CB_INSERTSTRING, (WPARAM)index, (LPARAM)(s.getData()));
 		}
 
-		sl_uint32 __getSelectedIndex(HWND hWnd)
+		sl_uint32 _getSelectedIndex(HWND hWnd)
 		{
 			return (sl_uint32)(::SendMessageW(hWnd, CB_GETCURSEL, 0, 0));
 		}
 
-		void __onSelectItem(HWND hWnd)
+		void _onSelectItem(HWND hWnd)
 		{
-			dispatchSelectItem(__getSelectedIndex(hWnd));
+			dispatchSelectItem(_getSelectedIndex(hWnd));
 		}
 
 	};
@@ -93,7 +93,7 @@ namespace slib
 			if (code == CBN_SELCHANGE) {
 				Ref<View> view = getView();
 				if (_SelectView* _view = CastInstance<_SelectView>(view.get())) {
-					_view->__onSelectItem(m_handle);
+					_view->_onSelectItem(m_handle);
 				}
 				return sl_true;
 			}
@@ -121,7 +121,7 @@ namespace slib
 				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 			}
 
-			((_SelectView*)this)->__copyItems(handle);
+			((_SelectView*)this)->_copyItems(handle);
 		}
 		return ret;
 	}
@@ -130,7 +130,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			m_indexSelected = ((_SelectView*)this)->__getSelectedIndex(handle);
+			m_indexSelected = ((_SelectView*)this)->_getSelectedIndex(handle);
 		}
 	}
 
@@ -146,7 +146,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_SelectView*)this)->__applyItemsCount(handle);
+			((_SelectView*)this)->_applyItemsCount(handle);
 		}
 	}
 
@@ -154,7 +154,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_SelectView*)this)->__copyItems(handle);
+			((_SelectView*)this)->_copyItems(handle);
 		}
 	}
 
@@ -162,7 +162,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_SelectView*)this)->__setItemTitle(handle, index, title);
+			((_SelectView*)this)->_setItemTitle(handle, index, title);
 		}
 	}
 

@@ -263,7 +263,7 @@ namespace slib
 			}
 		}
 
-		void __onPrepared()
+		void _onPrepared()
 		{
 			ObjectLocker lock(this);
 			if (!m_flagInited) {
@@ -277,7 +277,7 @@ namespace slib
 			_onReadyToPlay();
 		}
 
-		void __onCompleted()
+		void _onCompleted()
 		{
 		}
 
@@ -291,7 +291,7 @@ namespace slib
 			map->get(instance, &_player);
 			Ref<_Android_MediaPlayer> player = _player;
 			if (player.isNotNull()) {
-				player->__onCompleted();
+				player->_onCompleted();
 			}
 		}
 	}
@@ -304,7 +304,7 @@ namespace slib
 			map->get(instance, &_player);
 			Ref<_Android_MediaPlayer> player = _player;
 			if (player.isNotNull()) {
-				player->__onPrepared();
+				player->_onPrepared();
 			}
 		}
 	}

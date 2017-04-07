@@ -43,7 +43,7 @@ namespace slib
 	class _SelectView : public SelectView
 	{
 	public:
-		void __copyItems(jobject jview)
+		void _copyItems(jobject jview)
 		{
 			ListLocker<String> titles(m_titles);
 			sl_uint32 n = (sl_uint32)(titles.count);
@@ -54,11 +54,11 @@ namespace slib
 				}
 				titles.unlock();
 				_JAndroidSelectView::applyList.call(sl_null, jview, arr.get());
-				__select(jview, m_indexSelected);
+				_select(jview, m_indexSelected);
 			}
 		}
 
-		sl_uint32 __getSelectedIndex(jobject jview)
+		sl_uint32 _getSelectedIndex(jobject jview)
 		{
 			jint n = _JAndroidSelectView::getSelectedIndex.callInt(sl_null, jview);
 			if (n < 0) {
@@ -67,7 +67,7 @@ namespace slib
 			return n;
 		}
 		
-		void __select(jobject jview, sl_uint32 n)
+		void _select(jobject jview, sl_uint32 n)
 		{
 			_JAndroidSelectView::select.call(sl_null, jview, n);
 		}
@@ -84,7 +84,7 @@ namespace slib
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
 
-				((_SelectView*)this)->__copyItems(handle);
+				((_SelectView*)this)->_copyItems(handle);
 
 				Ref<Font> font = getFont();
 				jobject jfont = GraphicsPlatform::getNativeFont(font.get());
@@ -100,7 +100,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			m_indexSelected = ((_SelectView*)this)->__getSelectedIndex(handle);
+			m_indexSelected = ((_SelectView*)this)->_getSelectedIndex(handle);
 		}
 	}
 
@@ -108,7 +108,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_SelectView*)this)->__select(handle, index);
+			((_SelectView*)this)->_select(handle, index);
 		}
 	}
 
@@ -116,7 +116,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_SelectView*)this)->__copyItems(handle);
+			((_SelectView*)this)->_copyItems(handle);
 		}
 	}
 
@@ -124,7 +124,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_SelectView*)this)->__copyItems(handle);
+			((_SelectView*)this)->_copyItems(handle);
 		}
 	}
 
@@ -132,7 +132,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_SelectView*)this)->__copyItems(handle);
+			((_SelectView*)this)->_copyItems(handle);
 		}
 	}
 

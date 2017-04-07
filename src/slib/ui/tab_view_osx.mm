@@ -33,7 +33,7 @@ namespace slib
 	class _TabView : public TabView
 	{
 	public:
-		void __applyTabsCount(NSTabView* tv)
+		void _applyTabsCount(NSTabView* tv)
 		{
 			ObjectLocker lock(this);
 			sl_uint32 nNew = (sl_uint32)(m_items.getCount());
@@ -58,15 +58,15 @@ namespace slib
 			}
 		}
 		
-		void __copyTabs(NSTabView* tv)
+		void _copyTabs(NSTabView* tv)
 		{
 			ListLocker<TabViewItem> items(m_items);
-			__applyTabsCount(tv);
+			_applyTabsCount(tv);
 			for (sl_uint32 i = 0; i < items.count; i++) {
 				NSTabViewItem* t = [tv tabViewItemAtIndex:i];
 				if (t != nil) {
 					[t setLabel:Apple::getNSStringFromString(items[i].label)];
-					__setTabContentView(tv, i, items[i].contentView);
+					_setTabContentView(tv, i, items[i].contentView);
 				}
 			}
 			if ([tv numberOfTabViewItems] > 0) {
@@ -74,7 +74,7 @@ namespace slib
 			}
 		}
 		
-		void __setTabContentView(NSTabView* tv, sl_uint32 index, const Ref<View>& view)
+		void _setTabContentView(NSTabView* tv, sl_uint32 index, const Ref<View>& view)
 		{
 			NSTabViewItem* item = [tv tabViewItemAtIndex:index];
 			if (item == nil) {
@@ -97,12 +97,12 @@ namespace slib
 			[item setView:handle];
 		}
 		
-		void __onSelectTab(NSTabView* tv)
+		void _onSelectTab(NSTabView* tv)
 		{
 			dispatchSelectTab((sl_uint32)([tv indexOfTabViewItem:[tv selectedTabViewItem]]));
 		}
 		
-		void __updateContentViewSize(_Slib_OSX_TabView* tv)
+		void _updateContentViewSize(_Slib_OSX_TabView* tv)
 		{
 			NSRect rc = [tv contentRect];
 			UIRect frame;
@@ -129,7 +129,7 @@ namespace slib
 		_Slib_OSX_TabView* handle = [[_Slib_OSX_TabView alloc] initWithFrame: frame];
 		if (handle != nil) {
 			[handle setDelegate:handle];
-			((_TabView*)this)->__copyTabs(handle);
+			((_TabView*)this)->_copyTabs(handle);
 			
 			Ref<Font> font = getFont();
 			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
@@ -144,7 +144,7 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_Slib_OSX_TabView class]]) {
 			_Slib_OSX_TabView* tv = (_Slib_OSX_TabView*)handle;
-			((_TabView*)this)->__applyTabsCount(tv);
+			((_TabView*)this)->_applyTabsCount(tv);
 		}
 	}
 
@@ -169,7 +169,7 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_Slib_OSX_TabView class]]) {
 			_Slib_OSX_TabView* tv = (_Slib_OSX_TabView*)handle;
-			((_TabView*)this)->__setTabContentView(tv, index, view);
+			((_TabView*)this)->_setTabContentView(tv, index, view);
 		}
 	}
 
@@ -233,7 +233,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::_TabView* _view = slib::CastInstance<slib::_TabView>(view.get())) {
-			_view->__updateContentViewSize(self);
+			_view->_updateContentViewSize(self);
 		}
 	}
 }
@@ -244,7 +244,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::_TabView* _view = slib::CastInstance<slib::_TabView>(view.get())) {
-			_view->__onSelectTab(self);
+			_view->_onSelectTab(self);
 		}
 	}
 }

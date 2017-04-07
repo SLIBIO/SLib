@@ -39,11 +39,11 @@ namespace slib
 	class _ScrollView : public ScrollView
 	{
 	public:
-		void __applyContentSize(_Slib_iOS_ScrollView* sv)
+		void _applyContentSize(_Slib_iOS_ScrollView* sv)
 		{
 			if (![NSThread isMainThread]) {
 				dispatch_async(dispatch_get_main_queue(), ^{
-					__applyContentSize(sv);
+					_applyContentSize(sv);
 				});
 				return;
 			}
@@ -59,11 +59,11 @@ namespace slib
 			[sv setContentSize:CGSizeMake((CGFloat)(size.x) / f, (CGFloat)(size.y) / f)];
 		}
 		
-		void __applyContent(_Slib_iOS_ScrollView* sv)
+		void _applyContent(_Slib_iOS_ScrollView* sv)
 		{
 			if (![NSThread isMainThread]) {
 				dispatch_async(dispatch_get_main_queue(), ^{
-					__applyContent(sv);
+					_applyContent(sv);
 				});
 				return;
 			}
@@ -84,14 +84,14 @@ namespace slib
 					[sv addSubview:handle];
 				}
 			}
-			__applyContentSize(sv);
+			_applyContentSize(sv);
 		}
 		
-		void __applyProperties(_Slib_iOS_ScrollView* handle)
+		void _applyProperties(_Slib_iOS_ScrollView* handle)
 		{
 			if (![NSThread isMainThread]) {
 				dispatch_async(dispatch_get_main_queue(), ^{
-					__applyProperties(handle);
+					_applyProperties(handle);
 				});
 				return;
 			}
@@ -105,10 +105,10 @@ namespace slib
 			handle.showsHorizontalScrollIndicator = isHorizontalScrollBarVisible() ? YES : NO;
 			handle.showsVerticalScrollIndicator = isVerticalScrollBarVisible() ? YES : NO;
 			
-			__applyContent(handle);
+			_applyContent(handle);
 		}
 		
-		static void __onScroll(iOS_ViewInstance* instance, UIScrollView* sv)
+		static void _onScroll(iOS_ViewInstance* instance, UIScrollView* sv)
 		{
 			CGPoint pt= sv.contentOffset;
 			Ref<View> _view = instance->getView();
@@ -125,7 +125,7 @@ namespace slib
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
 		_Slib_iOS_ScrollView* handle = [[_Slib_iOS_ScrollView alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((_ScrollView*)this)->__applyProperties(handle);
+			((_ScrollView*)this)->_applyProperties(handle);
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -143,7 +143,7 @@ namespace slib
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
 			_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
-			((_ScrollView*)this)->__applyContentSize(sv);
+			((_ScrollView*)this)->_applyContentSize(sv);
 		}
 	}
 	
@@ -160,7 +160,7 @@ namespace slib
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
 			_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
-			((_ScrollView*)this)->__applyContent(sv);
+			((_ScrollView*)this)->_applyContent(sv);
 		}
 	}
 	
@@ -280,7 +280,7 @@ namespace slib
 	[super setContentOffset:contentOffset];
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_ScrollView::__onScroll(instance.get(), self);
+		slib::_ScrollView::_onScroll(instance.get(), self);
 	}
 }
 

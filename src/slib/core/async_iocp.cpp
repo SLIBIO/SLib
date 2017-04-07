@@ -24,7 +24,7 @@ namespace slib
 		OVERLAPPED overlappedWake;
 	};
 
-	void* AsyncIoLoop::__createHandle()
+	void* AsyncIoLoop::_native_createHandle()
 	{
 		HANDLE hCompletionPort = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 1);
 		if (hCompletionPort) {
@@ -38,7 +38,7 @@ namespace slib
 		return sl_null;
 	}
 
-	void AsyncIoLoop::__closeHandle(void* _handle)
+	void AsyncIoLoop::_native_closeHandle(void* _handle)
 	{
 		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)_handle;
 		::CloseHandle(handle->hCompletionPort);
@@ -68,7 +68,7 @@ namespace slib
 	}
 
 
-	void AsyncIoLoop::__runLoop()
+	void AsyncIoLoop::_native_runLoop()
 	{
 		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
 
@@ -109,14 +109,14 @@ namespace slib
 
 	}
 
-	void AsyncIoLoop::__wake()
+	void AsyncIoLoop::_native_wake()
 	{
 		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
 		Base::resetMemory(&(handle->overlappedWake), 0, sizeof(OVERLAPPED));
 		::PostQueuedCompletionStatus(handle->hCompletionPort, 0, 0, &(handle->overlappedWake));
 	}
 
-	sl_bool AsyncIoLoop::__attachInstance(AsyncIoInstance* instance, AsyncIoMode mode)
+	sl_bool AsyncIoLoop::_native_attachInstance(AsyncIoInstance* instance, AsyncIoMode mode)
 	{
 		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
 		HANDLE hObject = (HANDLE)(instance->getHandle());
@@ -128,7 +128,7 @@ namespace slib
 		return sl_false;
 	}
 
-	void AsyncIoLoop::__detachInstance(AsyncIoInstance* instance)
+	void AsyncIoLoop::_native_detachInstance(AsyncIoInstance* instance)
 	{
 		HANDLE hObject = (HANDLE)(instance->getHandle());
 		::CancelIo(hObject);

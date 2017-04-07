@@ -37,7 +37,7 @@ namespace slib
 	class _WebView : public WebView
 	{
 	public:
-		void __load(OSWebView* handle)
+		void _load(OSWebView* handle)
 		{
 			NSString* strURL = Apple::getNSStringFromString(m_urlOrigin);
 #ifdef USE_WK_WEB_VIEW
@@ -63,28 +63,28 @@ namespace slib
 			}
 		}
 		
-		void __applyProperties(OSWebView* handle)
+		void _applyProperties(OSWebView* handle)
 		{
-			__load(handle);
+			_load(handle);
 		}
 		
-		void __onStartLoad(OSWebView* handle)
+		void _onStartLoad(OSWebView* handle)
 		{
 			dispatchStartLoad(getURL());
 		}
 		
-		void __onFinishLoad(OSWebView* handle)
+		void _onFinishLoad(OSWebView* handle)
 		{
 			dispatchFinishLoad(getURL(), sl_false);
 		}
 		
-		void __onLoadError(OSWebView* handle, NSError* error)
+		void _onLoadError(OSWebView* handle, NSError* error)
 		{
 			m_lastErrorMessage = Apple::getStringFromNSString([error localizedDescription]);
 			dispatchFinishLoad(getURL(), sl_true);
 		}
 		
-		void __onInvokeMethod(OSWebView* handle, id body)
+		void _onInvokeMethod(OSWebView* handle, id body)
 		{
 			NSString* s = [NSString stringWithFormat:@"%@", body];
 			String msg = Apple::getStringFromNSString(s);
@@ -99,7 +99,7 @@ namespace slib
 			}
 		}
 		
-		void __onInvokeMethod(OSWebView* handle, NSArray* args)
+		void _onInvokeMethod(OSWebView* handle, NSArray* args)
 		{
 			sl_uint32 n = (sl_uint32)([args count]);
 			List<String> params;
@@ -116,7 +116,7 @@ namespace slib
 		}
 		
 #ifndef USE_WK_WEB_VIEW
-		String __callJavaScript(OSWebView* wv, const String& func, const String* params, sl_uint32 nParams)
+		String _callJavaScript(OSWebView* wv, const String& func, const String* params, sl_uint32 nParams)
 		{
 			WebScriptObject* so = [wv windowScriptObject];
 			NSMutableArray* arr = [NSMutableArray new];
@@ -132,7 +132,7 @@ namespace slib
 			return Apple::getStringFromNSString(s);
 		}
 
-		String __getContentHTML(OSWebView* wv)
+		String _getContentHTML(OSWebView* wv)
 		{
 			WebFrame* mainFrame = [wv mainFrame];
 			WebDataSource *source = [mainFrame dataSource];
@@ -148,7 +148,7 @@ namespace slib
 		OSX_VIEW_CREATE_INSTANCE_BEGIN
 		_Slib_OSX_WebView* handle = [[_Slib_OSX_WebView alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((_WebView*)this)->__applyProperties(handle);
+			((_WebView*)this)->_applyProperties(handle);
 		}
 		OSX_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -163,7 +163,7 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 			OSWebView* wv = (OSWebView*)handle;
-			((_WebView*)this)->__load(wv);
+			((_WebView*)this)->_load(wv);
 		}
 	}
 
@@ -343,7 +343,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
 		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
-			view->__onStartLoad(self);
+			view->_onStartLoad(self);
 		}
 	}
 }
@@ -362,7 +362,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
 		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
-			view->__onFinishLoad(self);
+			view->_onFinishLoad(self);
 		}
 	}
 }
@@ -381,7 +381,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
 		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
-			view->__onLoadError(self, error);
+			view->_onLoadError(self, error);
 		}
 	}
 }
@@ -401,7 +401,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
 		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
-			view->__onLoadError(self, error);
+			view->_onLoadError(self, error);
 		}
 	}
 }
@@ -414,7 +414,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
 		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
-			view->__onInvokeMethod(self, body);
+			view->_onInvokeMethod(self, body);
 		}
 	}
 }
@@ -430,7 +430,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
 		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>ckInstance(_view.get())) {
-			view->__onInvokeMethod(self, args);
+			view->_onInvokeMethod(self, args);
 		}
 	}
 	return nil;

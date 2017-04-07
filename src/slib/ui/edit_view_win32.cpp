@@ -134,7 +134,7 @@ namespace slib
 				1 - PasswordView
 				2 - TextArea
 		*/
-		Ref<ViewInstance> __createInstance(ViewInstance* parent, int type)
+		Ref<ViewInstance> _createInstance(ViewInstance* parent, int type)
 		{
 			Win32_UI_Shared* shared = Win32_UI_Shared::get();
 			if (!shared) {
@@ -190,17 +190,17 @@ namespace slib
 
 	Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* parent)
 	{
-		return ((EditView_Impl*)this)->__createInstance(parent, 0);
+		return ((EditView_Impl*)this)->_createInstance(parent, 0);
 	}
 
 	Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* parent)
 	{
-		return ((EditView_Impl*)this)->__createInstance(parent, 1);
+		return ((EditView_Impl*)this)->_createInstance(parent, 1);
 	}
 
 	Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* parent)
 	{
-		return ((EditView_Impl*)this)->__createInstance(parent, 2);
+		return ((EditView_Impl*)this)->_createInstance(parent, 2);
 	}
 
 	void EditView::_getText_NW()

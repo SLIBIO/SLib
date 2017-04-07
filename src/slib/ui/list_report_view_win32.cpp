@@ -33,7 +33,7 @@ namespace slib
 			return 0;
 		}
 
-		void __applyColumnsCount(HWND hWnd)
+		void _applyColumnsCount(HWND hWnd)
 		{
 			ObjectLocker lock(this);
 			sl_uint32 nNew = (sl_uint32)(m_columns.getCount());
@@ -56,9 +56,9 @@ namespace slib
 			}
 		}
 
-		void __copyColumns(HWND hWnd)
+		void _copyColumns(HWND hWnd)
 		{
-			__applyColumnsCount(hWnd);
+			_applyColumnsCount(hWnd);
 			LVCOLUMNW lvc;
 			Base::zeroMemory(&lvc, sizeof(lvc));
 			lvc.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_FMT;
@@ -77,7 +77,7 @@ namespace slib
 			}
 		}
 
-		void __applyRowsCount(HWND hWnd)
+		void _applyRowsCount(HWND hWnd)
 		{
 			sl_uint32 nNew = m_nRows;
 			::SendMessageW(hWnd, LVM_SETITEMCOUNT, (WPARAM)nNew, LVSICF_NOINVALIDATEALL | LVSICF_NOSCROLL);
@@ -189,8 +189,8 @@ namespace slib
 			UINT exStyle = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_ONECLICKACTIVATE | LVS_EX_DOUBLEBUFFER;
 			::SendMessageW(handle, LVM_SETEXTENDEDLISTVIEWSTYLE, exStyle, exStyle);
 
-			((_ListReportView*)this)->__copyColumns(handle);
-			((_ListReportView*)this)->__applyRowsCount(handle);
+			((_ListReportView*)this)->_copyColumns(handle);
+			((_ListReportView*)this)->_applyRowsCount(handle);
 		}
 		return ret;
 	}
@@ -199,7 +199,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_ListReportView*)this)->__applyColumnsCount(handle);
+			((_ListReportView*)this)->_applyColumnsCount(handle);
 		}
 	}
 
@@ -207,7 +207,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_ListReportView*)this)->__applyRowsCount(handle);
+			((_ListReportView*)this)->_applyRowsCount(handle);
 			::InvalidateRect(handle, NULL, TRUE);
 		}
 	}

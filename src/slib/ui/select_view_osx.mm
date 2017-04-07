@@ -30,7 +30,7 @@ namespace slib
 	class _SelectView : public SelectView
 	{
 	public:
-		void __applyItemsCount(NSPopUpButton* v)
+		void _applyItemsCount(NSPopUpButton* v)
 		{
 			ObjectLocker lock(this);
 			sl_uint32 nOrig = (sl_uint32)([v numberOfItems]);
@@ -61,10 +61,10 @@ namespace slib
 			}
 		}
 		
-		void __copyItems(NSPopUpButton* v)
+		void _copyItems(NSPopUpButton* v)
 		{
 			[v removeAllItems];
-			__applyItemsCount(v);
+			_applyItemsCount(v);
 			if (m_indexSelected >= m_titles.getCount()) {
 				m_indexSelected = 0;
 			}
@@ -73,7 +73,7 @@ namespace slib
 			}
 		}
 		
-		void __setItemTitle(NSPopUpButton* v, sl_uint32 index, const String& title)
+		void _setItemTitle(NSPopUpButton* v, sl_uint32 index, const String& title)
 		{
 			NSString* s = Apple::getNSStringFromString(title);
 			if (s == nil) {
@@ -85,14 +85,14 @@ namespace slib
 			}
 		}
 		
-		sl_uint32 __getSelectedIndex(NSPopUpButton* v)
+		sl_uint32 _getSelectedIndex(NSPopUpButton* v)
 		{
 			return (sl_uint32)([v indexOfSelectedItem]);
 		}
 		
-		void __onSelectItem(NSPopUpButton* v)
+		void _onSelectItem(NSPopUpButton* v)
 		{
-			dispatchSelectItem(__getSelectedIndex(v));
+			dispatchSelectItem(_getSelectedIndex(v));
 		}
 	};
 
@@ -102,7 +102,7 @@ namespace slib
 		_Slib_OSX_SelectView* handle = [[_Slib_OSX_SelectView alloc] initWithFrame:frame];
 		if (handle != nil) {
 			[handle setPullsDown:NO];
-			((_SelectView*)this)->__copyItems(handle);
+			((_SelectView*)this)->_copyItems(handle);
 			
 			Ref<Font> font = getFont();
 			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
@@ -119,7 +119,7 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
 			NSPopUpButton* v = (NSPopUpButton*)handle;
-			m_indexSelected = ((_SelectView*)this)->__getSelectedIndex(v);
+			m_indexSelected = ((_SelectView*)this)->_getSelectedIndex(v);
 		}
 	}
 
@@ -137,7 +137,7 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
 			NSPopUpButton* v = (NSPopUpButton*)handle;
-			((_SelectView*)this)->__applyItemsCount(v);
+			((_SelectView*)this)->_applyItemsCount(v);
 		}
 	}
 
@@ -146,7 +146,7 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
 			NSPopUpButton* v = (NSPopUpButton*)handle;
-			((_SelectView*)this)->__copyItems(v);
+			((_SelectView*)this)->_copyItems(v);
 		}
 	}
 
@@ -155,7 +155,7 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
 			NSPopUpButton* v = (NSPopUpButton*)handle;
-			((_SelectView*)this)->__setItemTitle(v, index, title);
+			((_SelectView*)this)->_setItemTitle(v, index, title);
 		}
 	}
 
@@ -190,7 +190,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
-			_view->__onSelectItem(self);
+			_view->_onSelectItem(self);
 		}
 	}
 }

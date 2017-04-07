@@ -31,25 +31,25 @@ namespace slib
 	class _SelectView : public SelectView
 	{
 	public:
-		sl_uint32 __getItemsCount()
+		sl_uint32 _getItemsCount()
 		{
 			return (sl_uint32)(m_titles.getCount());
 		}
 		
-		NSString* __getItemTitle(sl_uint32 row)
+		NSString* _getItemTitle(sl_uint32 row)
 		{
 			String s = m_titles.getValueAt(row);
 			return Apple::getNSStringFromString(s);
 		}
 		
-		void __onSelectItem(_Slib_iOS_SelectView* v, sl_uint32 row)
+		void _onSelectItem(_Slib_iOS_SelectView* v, sl_uint32 row)
 		{
 			m_indexSelected = row;
-			v.text = __getItemTitle(row);
+			v.text = _getItemTitle(row);
 			dispatchSelectItem(row);
 		}
 		
-		void __onStartSelection(_Slib_iOS_SelectView* v)
+		void _onStartSelection(_Slib_iOS_SelectView* v)
 		{
 			sl_uint32 n = m_indexSelected;
 			v->m_selectionBefore = n;
@@ -58,14 +58,14 @@ namespace slib
 			});
 		}
 		
-		void __onCancelSelection(_Slib_iOS_SelectView* v)
+		void _onCancelSelection(_Slib_iOS_SelectView* v)
 		{
-			__onSelectItem(v, v->m_selectionBefore);
+			_onSelectItem(v, v->m_selectionBefore);
 		}
 		
-		void __selectItem(_Slib_iOS_SelectView* v, sl_uint32 row)
+		void _selectItem(_Slib_iOS_SelectView* v, sl_uint32 row)
 		{
-			v.text = __getItemTitle(row);
+			v.text = _getItemTitle(row);
 			[v->m_picker selectRow:row inComponent:0 animated:NO];
 		}
 	};
@@ -75,7 +75,7 @@ namespace slib
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
 		_Slib_iOS_SelectView* handle = [[_Slib_iOS_SelectView alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((_SelectView*)this)->__selectItem(handle, m_indexSelected);
+			((_SelectView*)this)->_selectItem(handle, m_indexSelected);
 			
 			Ref<Font> font = getFont();
 			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
@@ -103,7 +103,7 @@ namespace slib
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
 			_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
-			((_SelectView*)this)->__selectItem(v, index);
+			((_SelectView*)this)->_selectItem(v, index);
 		}
 	}
 	
@@ -278,7 +278,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
-			_view->__onSelectItem(self, (sl_uint32)row);
+			_view->_onSelectItem(self, (sl_uint32)row);
 		}
 	}
 }
@@ -289,7 +289,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
-			return (NSInteger)(_view->__getItemsCount());
+			return (NSInteger)(_view->_getItemsCount());
 		}
 	}
 	return 0;
@@ -301,7 +301,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
-			return _view->__getItemTitle((sl_uint32)row);
+			return _view->_getItemTitle((sl_uint32)row);
 		}
 	}
 	return @"";
@@ -313,7 +313,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
-			if ((NSInteger)(_view->__getItemsCount()) > 0) {
+			if ((NSInteger)(_view->_getItemsCount()) > 0) {
 				return YES;
 			}
 		}
@@ -328,7 +328,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
-			_view->__onStartSelection(self);
+			_view->_onStartSelection(self);
 		}
 	}
 }
@@ -356,7 +356,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
-			_view->__onCancelSelection(self);
+			_view->_onCancelSelection(self);
 		}
 	}
 }

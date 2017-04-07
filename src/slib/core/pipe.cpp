@@ -115,7 +115,7 @@ namespace slib
 		return m_pipe;
 	}
 
-	void PipeEvent::__set()
+	void PipeEvent::_native_set()
 	{
 		SpinLocker lock(&m_lock);
 		if (m_flagSet) {
@@ -126,7 +126,7 @@ namespace slib
 		m_pipe->write(&c, 1);
 	}
 
-	void PipeEvent::__reset()
+	void PipeEvent::_native_reset()
 	{
 		SpinLocker lock(&m_lock);
 		if (!m_flagSet) {
@@ -142,7 +142,7 @@ namespace slib
 		}
 	}
 
-	sl_bool PipeEvent::__wait(sl_int32 timeout)
+	sl_bool PipeEvent::_native_wait(sl_int32 timeout)
 	{
 #if defined(SLIB_PLATFORM_IS_UNIX)
 		pollfd fd;

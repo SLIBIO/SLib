@@ -21,8 +21,8 @@ namespace slib
 		double inverseFlattening;
 		double eccentricitySquared;
 	};
-	static _EarthGlobe __earth_globe = {SLIB_GEO_EARTH_RADIUS_EQUATORIAL_WGS84, SLIB_GEO_EARTH_RADIUS_POLAR_WGS84, SLIB_GEO_EARTH_INVERSE_FLATTENING_WGS84, SLIB_GEO_EARTH_ECCENTRICITY_SQUARED_WGS84};
-	static const Globe& _earth_globe = *((Globe*)((void*)&__earth_globe));
+	static _EarthGlobe _g_earth_globe = {SLIB_GEO_EARTH_RADIUS_EQUATORIAL_WGS84, SLIB_GEO_EARTH_RADIUS_POLAR_WGS84, SLIB_GEO_EARTH_INVERSE_FLATTENING_WGS84, SLIB_GEO_EARTH_ECCENTRICITY_SQUARED_WGS84};
+	static const Globe& _earth_globe = *((Globe*)((void*)&_g_earth_globe));
 
 	const Globe& Earth::getGlobe()
 	{
@@ -114,8 +114,8 @@ namespace slib
 	{
 		double radius;
 	};
-	static _EarthSphericalGlobe __earth_spherical_globe = {SLIB_GEO_EARTH_RADIUS_EQUATORIAL_WGS84};
-	static const SphericalGlobe& _earth_spherical_globe = *((SphericalGlobe*)((void*)&__earth_spherical_globe));
+	static _EarthSphericalGlobe _g_earth_spherical_globe = {SLIB_GEO_EARTH_RADIUS_EQUATORIAL_WGS84};
+	static const SphericalGlobe& _earth_spherical_globe = *((SphericalGlobe*)((void*)&_g_earth_spherical_globe));
 
 	const SphericalGlobe& SphericalEarth::getGlobe()
 	{

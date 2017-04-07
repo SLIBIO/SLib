@@ -56,7 +56,7 @@ namespace slib
 			return ret;
 		}
 
-		sl_bool __setup(sl_uint32 events)
+		sl_bool _native_setup(sl_uint32 events)
 		{
 			sl_uint32 ev = 0;
 			if (events & SocketEvent::Read) {
@@ -75,12 +75,12 @@ namespace slib
 			return sl_true;
 		}
 
-		void __set()
+		void _native_set()
 		{
 			::WSASetEvent(m_hEvent);
 		}
 
-		void __reset()
+		void _native_reset()
 		{
 			::WSAResetEvent(m_hEvent);
 		}
@@ -91,7 +91,7 @@ namespace slib
 		return _Win_SocketEvent::create(socket);
 	}
 
-	sl_bool SocketEvent::__waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* status, sl_uint32 count, sl_int32 timeout)
+	sl_bool SocketEvent::_native_waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* status, sl_uint32 count, sl_int32 timeout)
 	{
 		DWORD t = timeout >= 0 ? timeout : WSA_INFINITE;
 		SLIB_SCOPED_BUFFER(WSAEVENT, 64, hEvents, count);

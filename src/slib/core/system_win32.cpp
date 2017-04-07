@@ -183,14 +183,14 @@ namespace slib
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 	volatile double __signal_fpe_dummy = 0.0f;
-	SIGNAL_HANDLER __signal_crash_handler;
+	SIGNAL_HANDLER _g_signal_crash_handler;
 
 	void _signal_crash_handler(int sig)
 	{
 		if (sig == SIGFPE) {
 			_fpreset();
 		}
-		__signal_crash_handler(sig);
+		_g_signal_crash_handler(sig);
 	}
 
 	LONG WINAPI _seh_crash_handler(PEXCEPTION_POINTERS pExceptionPtrs)
@@ -215,7 +215,7 @@ namespace slib
 		case EXCEPTION_NONCONTINUABLE_EXCEPTION:
 		case EXCEPTION_PRIV_INSTRUCTION:
 		case EXCEPTION_STACK_OVERFLOW:
-			__signal_crash_handler(-1);
+			_g_signal_crash_handler(-1);
 			break;
 		}
 		return EXCEPTION_EXECUTE_HANDLER;
@@ -223,7 +223,7 @@ namespace slib
 
 	void System::setCrashHandler(SIGNAL_HANDLER handler)
 	{
-		__signal_crash_handler = handler;
+		_g_signal_crash_handler = handler;
 		SetUnhandledExceptionFilter(_seh_crash_handler);
 		handler = _signal_crash_handler;
 		signal(SIGFPE, handler);

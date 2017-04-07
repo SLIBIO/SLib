@@ -23,21 +23,21 @@
 
 #define CBIGINT_INT32(o, v) \
 	CBigInt o; \
-	sl_uint32 __m__##o; \
+	sl_uint32 _t_m_##o; \
 	if (v < 0) { \
-		__m__##o = -v; \
+		_t_m_##o = -v; \
 		o.sign = -1; \
 	} else { \
-		__m__##o = v; \
+		_t_m_##o = v; \
 		o.sign = 1; \
 	} \
-	o.setUserDataElements((sl_uint32*)&__m__##o, 1);
+	o.setUserDataElements((sl_uint32*)&_t_m_##o, 1);
 
 #define CBIGINT_UINT32(o, v) \
 	CBigInt o; \
 	o.sign = 1; \
-	sl_uint32 __m__##o = v; \
-	o.setUserDataElements((sl_uint32*)&__m__##o, 1);
+	sl_uint32 _t_m_##o = v; \
+	o.setUserDataElements((sl_uint32*)&_t_m_##o, 1);
 
 #define CBIGINT_INT64(o, v) \
 	CBigInt o; \
@@ -47,18 +47,18 @@
 	} else { \
 		o.sign = 1; \
 	} \
-	sl_uint32 __m__##o[2]; \
-	__m__##o[0] = (sl_uint32)((sl_uint64)v); \
-	__m__##o[1] = (sl_uint32)(((sl_uint64)v) >> 32); \
-	o.setUserDataElements(__m__##o, 2);
+	sl_uint32 _t_m_##o[2]; \
+	_t_m_##o[0] = (sl_uint32)((sl_uint64)v); \
+	_t_m_##o[1] = (sl_uint32)(((sl_uint64)v) >> 32); \
+	o.setUserDataElements(_t_m_##o, 2);
 
 #define CBIGINT_UINT64(o, v) \
 	CBigInt o; \
 	o.sign = 1; \
-	sl_uint32 __m__##o[2]; \
-	__m__##o[0] = (sl_uint32)((sl_uint64)v); \
-	__m__##o[1] = (sl_uint32)(((sl_uint64)v) >> 32); \
-	o.setUserDataElements(__m__##o, 2);
+	sl_uint32 _t_m_##o[2]; \
+	_t_m_##o[0] = (sl_uint32)((sl_uint64)v); \
+	_t_m_##o[1] = (sl_uint32)(((sl_uint64)v) >> 32); \
+	o.setUserDataElements(_t_m_##o, 2);
 
 
 namespace slib
@@ -2061,10 +2061,10 @@ namespace slib
 			return sl_false;
 		}
 		const CBigInt* pE;
-		CBigInt __E;
+		CBigInt _t_E;
 		if (&_E == this) {
-			pE = &__E;
-			if (!__E.copyFrom(_E)) {
+			pE = &_t_E;
+			if (!_t_E.copyFrom(_E)) {
 				return sl_false;
 			}
 		} else {

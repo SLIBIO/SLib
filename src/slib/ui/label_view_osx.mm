@@ -29,7 +29,7 @@ namespace slib
 	class _LabelView : public LabelView
 	{
 	public:
-		void __applyProperties(NSTextField* handle)
+		void _applyProperties(NSTextField* handle)
 		{
 			[handle setStringValue:(Apple::getNSStringFromString(m_text))];
 			[handle setAlignment:translateAlignment(m_textAlignment)];
@@ -74,7 +74,7 @@ namespace slib
 		if (handle != nil) {
 			[handle setEditable:NO];
 			[handle setSelectable:NO];
-			((_LabelView*)this)->__applyProperties(handle);
+			((_LabelView*)this)->_applyProperties(handle);
 		}
 		OSX_VIEW_CREATE_INSTANCE_END
 		return ret;

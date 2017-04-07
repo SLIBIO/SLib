@@ -27,12 +27,12 @@ namespace slib
 
 	void Event::set()
 	{
-		__set();
+		_native_set();
 	}
 
 	void Event::reset()
 	{
-		__reset();
+		_native_reset();
 	}
 
 	sl_bool Event::wait(sl_int32 timeout)
@@ -44,7 +44,7 @@ namespace slib
 			}
 			thread->setWaitingEvent(this);
 		}
-		sl_bool ret = __wait(timeout);
+		sl_bool ret = _native_wait(timeout);
 		if (thread.isNotNull()) {
 			thread->clearWaitingEvent();
 		}

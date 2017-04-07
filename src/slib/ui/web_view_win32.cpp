@@ -95,9 +95,9 @@ namespace slib
 			return ret;
 		}
 
-		void __installExternal();
+		void _installExternal();
 
-		void __onBeforeNavigate2(BSTR szURL, VARIANT_BOOL* pFlagCancel)
+		void _onBeforeNavigate2(BSTR szURL, VARIANT_BOOL* pFlagCancel)
 		{
 			Ref<View> _view = getView();
 			if (WebView* view = CastInstance<WebView>(_view.get())) {
@@ -106,15 +106,15 @@ namespace slib
 			}
 		}
 
-		void __onNavigateComplete(BSTR szURL)
+		void _onNavigateComplete(BSTR szURL)
 		{
 			Ref<View> _view = getView();
 			if (WebView* view = CastInstance<WebView>(_view.get())) {
-				__installExternal();
+				_installExternal();
 			}
 		}
 
-		void __onDocumentComplete(BSTR szURL)
+		void _onDocumentComplete(BSTR szURL)
 		{
 			Ref<View> _view = getView();
 			if (WebView* view = CastInstance<WebView>(_view.get())) {
@@ -494,13 +494,13 @@ namespace slib
 				}
 				break;
 			case DISPID_BEFORENAVIGATE2:
-				m_viewInstance->__onBeforeNavigate2(pDispParams->rgvarg[5].pvarVal->bstrVal, pDispParams->rgvarg[0].pboolVal);
+				m_viewInstance->_onBeforeNavigate2(pDispParams->rgvarg[5].pvarVal->bstrVal, pDispParams->rgvarg[0].pboolVal);
 				break;
 			case DISPID_NAVIGATECOMPLETE2:
-				m_viewInstance->__onNavigateComplete(pDispParams->rgvarg[0].pvarVal->bstrVal);
+				m_viewInstance->_onNavigateComplete(pDispParams->rgvarg[0].pvarVal->bstrVal);
 				break;
 			case DISPID_DOCUMENTCOMPLETE:
-				m_viewInstance->__onDocumentComplete(pDispParams->rgvarg[0].pvarVal->bstrVal);
+				m_viewInstance->_onDocumentComplete(pDispParams->rgvarg[0].pvarVal->bstrVal);
 				break;
 			default:
 				return DISP_E_MEMBERNOTFOUND;
@@ -584,7 +584,7 @@ namespace slib
 		return sl_true;
 	}
 
-	void _Win32_WebViewInstance::__installExternal()
+	void _Win32_WebViewInstance::_installExternal()
 	{
 		HRESULT hr;
 		IHTMLDocument2* doc = getDoc();
@@ -866,7 +866,7 @@ namespace slib
 	class _WebView : public WebView
 	{
 	public:
-		void __init(_Win32_WebViewInstance* instance)
+		void _init(_Win32_WebViewInstance* instance)
 		{
 			IWebBrowser2* browser = instance->m_browser;
 			if (browser) {
@@ -878,7 +878,7 @@ namespace slib
 			}
 		}
 
-		void __load(_Win32_WebViewInstance* instance)
+		void _load(_Win32_WebViewInstance* instance)
 		{
 			IWebBrowser2* browser = instance->m_browser;
 			if (browser) {
@@ -915,8 +915,8 @@ namespace slib
 		Ref<_Win32_WebViewInstance> ret = Win32_ViewInstance::create<_Win32_WebViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
 		if (ret.isNotNull()) {
 			ret->_initialize();
-			((_WebView*)this)->__init(ret.get());
-			((_WebView*)this)->__load(ret.get());
+			((_WebView*)this)->_init(ret.get());
+			((_WebView*)this)->_load(ret.get());
 		}
 		return ret;
 	}
@@ -933,7 +933,7 @@ namespace slib
 	{
 		Ref<ViewInstance> _instance = getViewInstance();
 		if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
-			((_WebView*)this)->__load(instance);
+			((_WebView*)this)->_load(instance);
 		}
 	}
 

@@ -75,13 +75,13 @@ namespace slib
 
 	protected:
 		// override
-		void __set();
+		void _native_set();
 
 		// override
-		void __reset();
+		void _native_reset();
 
 		// override
-		sl_bool __wait(sl_int32 timeout);
+		sl_bool _native_wait(sl_int32 timeout);
 
 	protected:
 		Ref<Pipe> m_pipe;

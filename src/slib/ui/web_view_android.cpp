@@ -22,7 +22,7 @@ namespace slib
 	class _WebView : public WebView
 	{
 	public:
-		void __load(jobject handle);
+		void _load(jobject handle);
 
 		static void JNICALL nativeOnStartLoad(JNIEnv* env, jobject _this, jlong instance, jstring jurl)
 		{
@@ -85,7 +85,7 @@ namespace slib
 
 	SLIB_JNI_END_CLASS
 
-	void _WebView::__load(jobject handle)
+	void _WebView::_load(jobject handle)
 	{
 		JniLocal<jstring> jurl = Jni::getJniString(m_urlOrigin);
 		if (m_flagOfflineContent) {
@@ -105,7 +105,7 @@ namespace slib
 			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
-				((_WebView*)this)->__load(handle);
+				((_WebView*)this)->_load(handle);
 			}
 		}
 		return ret;
@@ -119,7 +119,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_WebView*)this)->__load(handle);
+			((_WebView*)this)->_load(handle);
 		}
 	}
 

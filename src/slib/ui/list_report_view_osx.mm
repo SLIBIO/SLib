@@ -40,7 +40,7 @@ namespace slib
 	class _ListReportView : public ListReportView
 	{
 	public:
-		void __applyColumnsCount(_Slib_OSX_ListReportView* tv)
+		void _applyColumnsCount(_Slib_OSX_ListReportView* tv)
 		{
 			ObjectLocker lock(this);
 			CList<NSTableColumn*>& _columns = tv->m_columns;
@@ -66,11 +66,11 @@ namespace slib
 			}
 		}
 		
-		void __copyColumns(_Slib_OSX_ListReportView* tv)
+		void _copyColumns(_Slib_OSX_ListReportView* tv)
 		{
 			ObjectLocker lock(this);
 			ListLocker<ListReportViewColumn> columns(m_columns);
-			__applyColumnsCount(tv);
+			_applyColumnsCount(tv);
 			for (sl_uint32 i = 0; i < columns.count; i++) {
 				NSTableColumn* tc = tv->m_columns.getValueAt(i, nil);
 				if (tc != nil) {
@@ -85,7 +85,7 @@ namespace slib
 			}
 		}
 		
-		void __applyFont(_Slib_OSX_ListReportView* tv)
+		void _applyFont(_Slib_OSX_ListReportView* tv)
 		{
 			NSFont* font = tv->m_font;
 			if (font != nil) {
@@ -131,9 +131,9 @@ namespace slib
 				Ref<Font> font = getFont();
 				NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 				handle->m_font = hFont;
-				((_ListReportView*)this)->__copyColumns(handle);
+				((_ListReportView*)this)->_copyColumns(handle);
 				[table setRowSizeStyle:NSTableViewRowSizeStyleCustom];
-				((_ListReportView*)this)->__applyFont(handle);
+				((_ListReportView*)this)->_applyFont(handle);
 				
 				[handle setDocumentView:table];
 				[handle setHasVerticalScroller:TRUE];
@@ -158,7 +158,7 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListReportView class]]) {
 			_Slib_OSX_ListReportView* tv = (_Slib_OSX_ListReportView*)handle;
-			((_ListReportView*)this)->__applyColumnsCount(tv);
+			((_ListReportView*)this)->_applyColumnsCount(tv);
 			[tv->table reloadData];
 		}
 	}
@@ -236,7 +236,7 @@ namespace slib
 			_Slib_OSX_ListReportView* tv = (_Slib_OSX_ListReportView*)handle;
 			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 			tv->m_font = hFont;
-			((_ListReportView*)this)->__applyFont(tv);
+			((_ListReportView*)this)->_applyFont(tv);
 			[tv->table reloadData];
 		}
 	}

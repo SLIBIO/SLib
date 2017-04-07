@@ -39,11 +39,11 @@ namespace slib
 		sl_bool wait(sl_int32 timeout = -1);
 	
 	protected:
-		virtual void __set() = 0;
+		virtual void _native_set() = 0;
 
-		virtual void __reset() = 0;
+		virtual void _native_reset() = 0;
 
-		virtual sl_bool __wait(sl_int32 timeout) = 0;
+		virtual sl_bool _native_wait(sl_int32 timeout) = 0;
 	
 	};
 

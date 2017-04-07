@@ -88,12 +88,12 @@ namespace slib
 		LinkedQueue< Ref<AsyncIoInstance> > m_queueInstancesClosed;
 
 	protected:
-		static void* __createHandle();
-		static void __closeHandle(void* handle);
-		void __runLoop();
-		sl_bool __attachInstance(AsyncIoInstance* instance, AsyncIoMode mode);
-		void __detachInstance(AsyncIoInstance* instance);
-		void __wake();
+		static void* _native_createHandle();
+		static void _native_closeHandle(void* handle);
+		void _native_runLoop();
+		sl_bool _native_attachInstance(AsyncIoInstance* instance, AsyncIoMode mode);
+		void _native_detachInstance(AsyncIoInstance* instance);
+		void _native_wake();
 
 	protected:
 		void _stepBegin();

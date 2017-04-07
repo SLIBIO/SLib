@@ -54,7 +54,7 @@ namespace slib
 		Ref<Socket> socket = m_socket;
 		if (socket.isNotNull() && socket->isOpened()) {
 			if (socket->setNonBlockingMode(sl_true)) {
-				return __setup(events);
+				return _native_setup(events);
 			}
 		}
 		return sl_false;
@@ -85,7 +85,7 @@ namespace slib
 		return 0;
 	}
 	
-	sl_bool SocketEvent::__wait(sl_int32 timeout)
+	sl_bool SocketEvent::_native_wait(sl_int32 timeout)
 	{
 		if (waitEvents(timeout) != 0) {
 			return sl_true;
@@ -106,7 +106,7 @@ namespace slib
 			}
 			thread->setWaitingEvent(events[0].get());
 		}
-		sl_bool ret = __waitMultipleEvents(events, status, count, timeout);
+		sl_bool ret = _native_waitMultipleEvents(events, status, count, timeout);
 		if (thread.isNotNull()) {
 			thread->clearWaitingEvent();
 		}

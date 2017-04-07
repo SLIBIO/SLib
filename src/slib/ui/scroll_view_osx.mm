@@ -29,7 +29,7 @@ namespace slib
 	class _ScrollView : public ScrollView
 	{
 	public:
-		void __applyContent(NSScrollView* sv)
+		void _applyContent(NSScrollView* sv)
 		{
 			Ref<View> viewContent = m_viewContent;
 			NSView* handle = nil;
@@ -42,7 +42,7 @@ namespace slib
 			[sv setDocumentView:handle];
 		}
 		
-		void __applyProperties(NSScrollView* handle)
+		void _applyProperties(NSScrollView* handle)
 		{
 			[handle setBorderType:(isBorder()?NSBezelBorder:NSNoBorder)];
 			Color backgroundColor = getBackgroundColor();
@@ -52,10 +52,10 @@ namespace slib
 				handle.drawsBackground = TRUE;
 				handle.backgroundColor = GraphicsPlatform::getNSColorFromColor(backgroundColor);
 			}
-			__applyContent(handle);
+			_applyContent(handle);
 		}
 		
-		static void __onScroll(OSX_ViewInstance* instance, NSScrollView* sv)
+		static void _onScroll(OSX_ViewInstance* instance, NSScrollView* sv)
 		{
 			NSClipView* clip = [sv contentView];
 			if (clip != nil) {
@@ -75,7 +75,7 @@ namespace slib
 		if (handle != nil) {
 			[handle setHasVerticalScroller:(isVerticalScrolling()?YES:NO)];
 			[handle setHasHorizontalScroller:(isHorizontalScrolling()?YES:NO)];
-			((_ScrollView*)this)->__applyProperties(handle);
+			((_ScrollView*)this)->_applyProperties(handle);
 		}
 		OSX_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -90,7 +90,7 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
 			NSScrollView* sv = (NSScrollView*)handle;
-			((_ScrollView*)this)->__applyContent(sv);
+			((_ScrollView*)this)->_applyContent(sv);
 		}
 	}
 
@@ -197,7 +197,7 @@ namespace slib
 - (void)boundDidChange:(NSNotification *)notification {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_ScrollView::__onScroll(instance.get(), self);
+		slib::_ScrollView::_onScroll(instance.get(), self);
 	}
 }
 @end
