@@ -18,7 +18,7 @@
 
 namespace slib
 {
-	class _EditView : public EditView
+	class EditView_Impl : public EditView
 	{
 	public:
 		

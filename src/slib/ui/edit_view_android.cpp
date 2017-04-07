@@ -19,7 +19,7 @@
 namespace slib
 {
 
-	void JNICALL _AndroidEditView_nativeOnChange(JNIEnv* env, jobject _this, jlong instance)
+	void JNICALL Android_EditView_nativeOnChange(JNIEnv* env, jobject _this, jlong instance)
 	{
 		Ref<View> _view = Android_ViewInstance::findView(instance);
 		if (EditView* view = CastInstance<EditView>(_view.get())) {
@@ -31,7 +31,7 @@ namespace slib
 		}
 	}
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidEditView, "slib/platform/android/ui/view/UiEditView")
+	SLIB_JNI_BEGIN_CLASS(JAndroidEditView, "slib/platform/android/ui/view/UiEditView")
 
 		SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;I)Landroid/view/View;");
 
@@ -49,33 +49,33 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(setReturnKeyType, "_setReturnKeyType", "(Landroid/view/View;I)Z");
 		SLIB_JNI_STATIC_METHOD(setInputType, "_setInputType", "(Landroid/view/View;II)Z");
 
-		SLIB_JNI_NATIVE(nativeOnChange, "nativeOnChange", "(J)V", _AndroidEditView_nativeOnChange);
+		SLIB_JNI_NATIVE(nativeOnChange, "nativeOnChange", "(J)V", Android_EditView_nativeOnChange);
 
 	SLIB_JNI_END_CLASS
 
-	class _EditView : public EditView
+	class EditView_Impl : public EditView
 	{
 	public:
 		void applyParameters(jobject handle)
 		{
 			JniLocal<jstring> jtext = Jni::getJniString(m_text);
-			_JAndroidEditView::setText.callBoolean(sl_null, handle, jtext.get());
-			_JAndroidEditView::setBorder.callBoolean(sl_null, handle, isBorder());
-			_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, m_textAlignment.value);
+			JAndroidEditView::setText.callBoolean(sl_null, handle, jtext.get());
+			JAndroidEditView::setBorder.callBoolean(sl_null, handle, isBorder());
+			JAndroidEditView::setAlignment.callBoolean(sl_null, handle, m_textAlignment.value);
 			JniLocal<jstring> jhintText = Jni::getJniString(m_hintText);
-			_JAndroidEditView::setHintText.callBoolean(sl_null, handle, jhintText.get());
-			_JAndroidEditView::setReadOnly.callBoolean(sl_null, handle, m_flagReadOnly);
-			_JAndroidEditView::setMultiLine.callBoolean(sl_null, handle, m_flagMultiLine);
-			_JAndroidEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
-			_JAndroidEditView::setHintTextColor.callBoolean(sl_null, handle, m_hintTextColor.getARGB());
-			_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
+			JAndroidEditView::setHintText.callBoolean(sl_null, handle, jhintText.get());
+			JAndroidEditView::setReadOnly.callBoolean(sl_null, handle, m_flagReadOnly);
+			JAndroidEditView::setMultiLine.callBoolean(sl_null, handle, m_flagMultiLine);
+			JAndroidEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
+			JAndroidEditView::setHintTextColor.callBoolean(sl_null, handle, m_hintTextColor.getARGB());
+			JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
 			Ref<Font> font = getFont();
 			jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 			if (jfont) {
-				_JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
+				JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
 			}
-			_JAndroidEditView::setReturnKeyType.callBoolean(sl_null, handle, (int)m_returnKeyType);
-			_JAndroidEditView::setInputType.callBoolean(sl_null, handle, (int)m_keyboardType, (int)m_autoCapitalizationType);
+			JAndroidEditView::setReturnKeyType.callBoolean(sl_null, handle, (int)m_returnKeyType);
+			JAndroidEditView::setInputType.callBoolean(sl_null, handle, (int)m_keyboardType, (int)m_autoCapitalizationType);
 		}
 	};
 
@@ -84,11 +84,11 @@ namespace slib
 		Ref<Android_ViewInstance> ret;
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
-			JniLocal<jobject> handle = _JAndroidEditView::create.callObject(sl_null, parent->getContext(), 0);
+			JniLocal<jobject> handle = JAndroidEditView::create.callObject(sl_null, parent->getContext(), 0);
 			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
-				((_EditView*)this)->applyParameters(handle);
+				((EditView_Impl*)this)->applyParameters(handle);
 			}
 		}
 		return ret;
@@ -99,11 +99,11 @@ namespace slib
 		Ref<Android_ViewInstance> ret;
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
-			JniLocal<jobject> handle = _JAndroidEditView::create.callObject(sl_null, parent->getContext(), 1);
+			JniLocal<jobject> handle = JAndroidEditView::create.callObject(sl_null, parent->getContext(), 1);
 			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
-				((_EditView*)this)->applyParameters(handle);
+				((EditView_Impl*)this)->applyParameters(handle);
 			}
 		}
 		return ret;
@@ -114,11 +114,11 @@ namespace slib
 		Ref<Android_ViewInstance> ret;
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
-			JniLocal<jobject> handle = _JAndroidEditView::create.callObject(sl_null, parent->getContext(), 2);
+			JniLocal<jobject> handle = JAndroidEditView::create.callObject(sl_null, parent->getContext(), 2);
 			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
-				((_EditView*)this)->applyParameters(handle);
+				((EditView_Impl*)this)->applyParameters(handle);
 			}
 		}
 		return ret;
@@ -128,7 +128,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			m_text = _JAndroidEditView::getText.callString(sl_null, handle);
+			m_text = JAndroidEditView::getText.callString(sl_null, handle);
 		}
 	}
 
@@ -137,7 +137,7 @@ namespace slib
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			JniLocal<jstring> jstr = Jni::getJniString(text);
-			_JAndroidEditView::setText.callBoolean(sl_null, handle, jstr.get());
+			JAndroidEditView::setText.callBoolean(sl_null, handle, jstr.get());
 		}
 	}
 
@@ -145,7 +145,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidEditView::setBorder.callBoolean(sl_null, handle, flag);
+			JAndroidEditView::setBorder.callBoolean(sl_null, handle, flag);
 		}
 	}
 
@@ -153,7 +153,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, align.value);
+			JAndroidEditView::setAlignment.callBoolean(sl_null, handle, align.value);
 		}
 	}
 
@@ -162,7 +162,7 @@ namespace slib
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			JniLocal<jstring> jstr = Jni::getJniString(text);
-			_JAndroidEditView::setHintText.callBoolean(sl_null, handle, jstr.get());
+			JAndroidEditView::setHintText.callBoolean(sl_null, handle, jstr.get());
 		}
 	}
 
@@ -170,7 +170,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidEditView::setReadOnly.callBoolean(sl_null, handle, flag);
+			JAndroidEditView::setReadOnly.callBoolean(sl_null, handle, flag);
 		}
 	}
 
@@ -178,7 +178,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidEditView::setMultiLine.callBoolean(sl_null, handle, flag);
+			JAndroidEditView::setMultiLine.callBoolean(sl_null, handle, flag);
 		}
 	}
 
@@ -186,7 +186,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidEditView::setTextColor.callBoolean(sl_null, handle, color.getARGB());
+			JAndroidEditView::setTextColor.callBoolean(sl_null, handle, color.getARGB());
 		}
 	}
 
@@ -194,7 +194,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidEditView::setHintTextColor.callBoolean(sl_null, handle, color.getARGB());
+			JAndroidEditView::setHintTextColor.callBoolean(sl_null, handle, color.getARGB());
 		}
 	}
 
@@ -202,7 +202,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, color.getARGB());
+			JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, color.getARGB());
 		}
 	}
 
@@ -212,7 +212,7 @@ namespace slib
 		if (handle) {
 			jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 			if (jfont) {
-				_JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
+				JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
 			}
 		}
 	}
@@ -221,7 +221,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidEditView::setReturnKeyType.callBoolean(sl_null, handle, (int)type);
+			JAndroidEditView::setReturnKeyType.callBoolean(sl_null, handle, (int)type);
 		}
 	}
 
@@ -229,7 +229,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidEditView::setInputType.callBoolean(sl_null, handle, (int)type, (int)m_autoCapitalizationType);
+			JAndroidEditView::setInputType.callBoolean(sl_null, handle, (int)type, (int)m_autoCapitalizationType);
 		}
 	}
 
@@ -237,7 +237,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidEditView::setInputType.callBoolean(sl_null, handle, m_keyboardType, (int)type);
+			JAndroidEditView::setInputType.callBoolean(sl_null, handle, m_keyboardType, (int)type);
 		}
 	}
 

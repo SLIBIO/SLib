@@ -19,7 +19,7 @@
 namespace slib
 {
 
-	class _Win32_EditViewInstance : public Win32_ViewInstance
+	class Win32_EditViewInstance : public Win32_ViewInstance
 	{
 		SLIB_DECLARE_OBJECT
 	public:
@@ -28,14 +28,14 @@ namespace slib
 		HBRUSH m_hBrushBackground;
 		
 	public:
-		_Win32_EditViewInstance()
+		Win32_EditViewInstance()
 		{
 			m_hBrushBackground = NULL;
 			m_colorText = Color::zero();
 			m_colorBackground = Color::zero();
 		}
 
-		~_Win32_EditViewInstance()
+		~Win32_EditViewInstance()
 		{
 			if (m_hBrushBackground) {
 				::DeleteObject(m_hBrushBackground);
@@ -125,7 +125,7 @@ namespace slib
 		}
 	};
 
-	class _EditView : public EditView
+	class EditView_Impl : public EditView
 	{
 	public:
 		/*
@@ -165,7 +165,7 @@ namespace slib
 			}		
 			style |= ES_AUTOHSCROLL;
 			String16 text = m_text;
-			Ref<_Win32_EditViewInstance> ret = Win32_ViewInstance::create<_Win32_EditViewInstance>(this, parent, L"EDIT", (LPCWSTR)(text.getData()), style, 0);
+			Ref<Win32_EditViewInstance> ret = Win32_ViewInstance::create<Win32_EditViewInstance>(this, parent, L"EDIT", (LPCWSTR)(text.getData()), style, 0);
 			if (ret.isNotNull()) {
 				
 				HWND handle = ret->getHandle();
@@ -186,21 +186,21 @@ namespace slib
 
 	};
 
-	SLIB_DEFINE_OBJECT(_Win32_EditViewInstance, Win32_ViewInstance)
+	SLIB_DEFINE_OBJECT(Win32_EditViewInstance, Win32_ViewInstance)
 
 	Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* parent)
 	{
-		return ((_EditView*)this)->__createInstance(parent, 0);
+		return ((EditView_Impl*)this)->__createInstance(parent, 0);
 	}
 
 	Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* parent)
 	{
-		return ((_EditView*)this)->__createInstance(parent, 1);
+		return ((EditView_Impl*)this)->__createInstance(parent, 1);
 	}
 
 	Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* parent)
 	{
-		return ((_EditView*)this)->__createInstance(parent, 2);
+		return ((EditView_Impl*)this)->__createInstance(parent, 2);
 	}
 
 	void EditView::_getText_NW()
@@ -271,7 +271,7 @@ namespace slib
 	void EditView::_setTextColor_NW(const Color& color)
 	{
 		Ref<ViewInstance> _instance = getViewInstance();
-		if (_Win32_EditViewInstance* instance = CastInstance<_Win32_EditViewInstance>(_instance.get())) {
+		if (Win32_EditViewInstance* instance = CastInstance<Win32_EditViewInstance>(_instance.get())) {
 			instance->setTextColor(color); 
 		}
 	}
@@ -309,7 +309,7 @@ namespace slib
 	void EditView::_setBackgroundColor_NW(const Color& color)
 	{
 		Ref<ViewInstance> _instance = getViewInstance();
-		if (_Win32_EditViewInstance* instance = CastInstance<_Win32_EditViewInstance>(_instance.get())) {
+		if (Win32_EditViewInstance* instance = CastInstance<Win32_EditViewInstance>(_instance.get())) {
 			instance->setBackgroundColor(color);
 		}
 	}

@@ -16,7 +16,7 @@
 
 #include "view_ios.h"
 
-@interface _Slib_iOS_TextField : UITextField<UITextFieldDelegate> {
+@interface SLib_iOS_TextField : UITextField<UITextFieldDelegate> {
 	
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 	
@@ -26,7 +26,7 @@
 
 @end
 
-@interface _Slib_iOS_TextArea : UITextView<UITextViewDelegate> {
+@interface SLib_iOS_TextArea : UITextView<UITextViewDelegate> {
 	
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 	
@@ -44,7 +44,7 @@
 
 namespace slib
 {
-	class _EditView : public EditView
+	class EditView_Impl : public EditView
 	{
 	public:
 		static ::UIReturnKeyType convertReturnKeyType(UIReturnKeyType type)
@@ -182,7 +182,7 @@ namespace slib
 			[handle setKeyboardType:convertKeyboardType(m_keyboardType)];
 		}
 		
-		void applyProperties(_Slib_iOS_TextArea* handle)
+		void applyProperties(SLib_iOS_TextArea* handle)
 		{
 			if (![NSThread isMainThread]) {
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -241,7 +241,7 @@ namespace slib
 		static void onChangeText(iOS_ViewInstance* instance, UITextField* field, UITextView* area)
 		{
 			Ref<View> _view = instance->getView();
-			if (_EditView* view = CastInstance<_EditView>(_view.get())) {
+			if (EditView_Impl* view = CastInstance<EditView_Impl>(_view.get())) {
 				String text;
 				if (field != nil) {
 					text = Apple::getStringFromNSString([field text]);
@@ -264,7 +264,7 @@ namespace slib
 		static void onEnterAction(iOS_ViewInstance* instance, UITextField* field, UITextView* area)
 		{
 			Ref<View> _view = instance->getView();
-			if (_EditView* view = CastInstance<_EditView>(_view.get())) {
+			if (EditView_Impl* view = CastInstance<EditView_Impl>(_view.get())) {
 				view->dispatchReturnKey();
 				if (view->isAutoDismissKeyboard()) {
 					if (field != nil) {
@@ -280,7 +280,7 @@ namespace slib
 		static void onDoneEdit(iOS_ViewInstance* instance)
 		{
 			Ref<View> _view = instance->getView();
-			if (_EditView* view = CastInstance<_EditView>(_view.get())) {
+			if (EditView_Impl* view = CastInstance<EditView_Impl>(_view.get())) {
 				view->dispatchDoneEdit();
 			}
 		}
@@ -290,10 +290,10 @@ namespace slib
 	Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_iOS_TextField* handle = [[_Slib_iOS_TextField alloc] initWithFrame:frame];
+		SLib_iOS_TextField* handle = [[SLib_iOS_TextField alloc] initWithFrame:frame];
 		
 		if (handle != nil) {
-			((_EditView*)this)->applyProperties(handle);
+			((EditView_Impl*)this)->applyProperties(handle);
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -302,11 +302,11 @@ namespace slib
 	Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_iOS_TextField* handle = [[_Slib_iOS_TextField alloc] initWithFrame:frame];
+		SLib_iOS_TextField* handle = [[SLib_iOS_TextField alloc] initWithFrame:frame];
 		
 		if (handle != nil) {
 			handle.secureTextEntry = TRUE;
-			((_EditView*)this)->applyProperties(handle);
+			((EditView_Impl*)this)->applyProperties(handle);
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -315,9 +315,9 @@ namespace slib
 	Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_iOS_TextArea* handle = [[_Slib_iOS_TextArea alloc] initWithFrame:frame];
+		SLib_iOS_TextArea* handle = [[SLib_iOS_TextArea alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((_EditView*)this)->applyProperties(handle);
+			((EditView_Impl*)this)->applyProperties(handle);
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -401,11 +401,11 @@ namespace slib
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
-				[tv setTextAlignment:_EditView::translateAlignment(align)];
-				((_EditView*)this)->applyPlaceholder(tv);
+				[tv setTextAlignment:EditView_Impl::translateAlignment(align)];
+				((EditView_Impl*)this)->applyPlaceholder(tv);
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
-				[tv setTextAlignment:_EditView::translateAlignment(align)];
+				[tv setTextAlignment:EditView_Impl::translateAlignment(align)];
 			}
 		}
 	}
@@ -424,9 +424,9 @@ namespace slib
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
-				((_EditView*)this)->applyPlaceholder(tv);
-			} else if ([handle isKindOfClass:[_Slib_iOS_TextArea class]]) {
-				_Slib_iOS_TextArea* tv = (_Slib_iOS_TextArea*)handle;
+				((EditView_Impl*)this)->applyPlaceholder(tv);
+			} else if ([handle isKindOfClass:[SLib_iOS_TextArea class]]) {
+				SLib_iOS_TextArea* tv = (SLib_iOS_TextArea*)handle;
 				NSString* s = Apple::getNSStringFromString(value);
 				[tv setPlaceholder:s];
 				[tv refreshPlaceholder];
@@ -448,9 +448,9 @@ namespace slib
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
-				((_EditView*)this)->applyPlaceholder(tv);
-			} else if ([handle isKindOfClass:[_Slib_iOS_TextArea class]]) {
-				_Slib_iOS_TextArea* tv = (_Slib_iOS_TextArea*)handle;
+				((EditView_Impl*)this)->applyPlaceholder(tv);
+			} else if ([handle isKindOfClass:[SLib_iOS_TextArea class]]) {
+				SLib_iOS_TextArea* tv = (SLib_iOS_TextArea*)handle;
 				[tv setPlaceholderColor:(GraphicsPlatform::getUIColorFromColor(value))];
 				[tv refreshPlaceholder];
 			}
@@ -543,7 +543,7 @@ namespace slib
 				UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
 				if (hFont != nil) {
 					[tv setFont:hFont];
-					((_EditView*)this)->applyPlaceholder(tv);
+					((EditView_Impl*)this)->applyPlaceholder(tv);
 				}
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
@@ -568,10 +568,10 @@ namespace slib
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
-				[tv setReturnKeyType:_EditView::convertReturnKeyType(type)];
+				[tv setReturnKeyType:EditView_Impl::convertReturnKeyType(type)];
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
-				[tv setReturnKeyType:_EditView::convertReturnKeyType(type)];
+				[tv setReturnKeyType:EditView_Impl::convertReturnKeyType(type)];
 			}
 		}
 	}
@@ -589,10 +589,10 @@ namespace slib
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
-				[tv setKeyboardType:_EditView::convertKeyboardType(type)];
+				[tv setKeyboardType:EditView_Impl::convertKeyboardType(type)];
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
-				[tv setKeyboardType:_EditView::convertKeyboardType(type)];
+				[tv setKeyboardType:EditView_Impl::convertKeyboardType(type)];
 			}
 		}
 	}
@@ -610,16 +610,16 @@ namespace slib
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
-				[tv setAutocapitalizationType:_EditView::convertAutoCapitalizationType(type)];
+				[tv setAutocapitalizationType:EditView_Impl::convertAutoCapitalizationType(type)];
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
-				[tv setAutocapitalizationType:_EditView::convertAutoCapitalizationType(type)];
+				[tv setAutocapitalizationType:EditView_Impl::convertAutoCapitalizationType(type)];
 			}
 		}
 	}
 }
 
-@implementation _Slib_iOS_TextField
+@implementation SLib_iOS_TextField
 -(id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -634,7 +634,7 @@ namespace slib
 {
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onChangeText(instance.get(), self, nil);
+		slib::EditView_Impl::onChangeText(instance.get(), self, nil);
 	}
 }
 
@@ -645,7 +645,7 @@ namespace slib
 -(BOOL) textFieldShouldReturn:(UITextField *)textField{
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onEnterAction(instance.get(), self, nil);
+		slib::EditView_Impl::onEnterAction(instance.get(), self, nil);
 	}
 	return NO;
 }
@@ -655,13 +655,13 @@ namespace slib
 	[self resignFirstResponder];
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onDoneEdit(instance.get());
+		slib::EditView_Impl::onDoneEdit(instance.get());
 	}
 }
 
 @end
 
-@implementation _Slib_iOS_TextArea
+@implementation SLib_iOS_TextArea
 
 -(id)initWithFrame:(CGRect)frame
 {
@@ -708,7 +708,7 @@ namespace slib
 {
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onChangeText(instance.get(), nil, self);
+		slib::EditView_Impl::onChangeText(instance.get(), nil, self);
 		
 		if([[self placeholder] length] > 0) {
 			[UIView animateWithDuration:0.25f animations:^{
@@ -728,7 +728,7 @@ namespace slib
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		if ([text isEqualToString:@"\n"]) {
-			slib::_EditView::onEnterAction(instance.get(), nil, self);
+			slib::EditView_Impl::onEnterAction(instance.get(), nil, self);
 		}
 	}
 }
@@ -745,7 +745,7 @@ namespace slib
 	[self resignFirstResponder];
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onDoneEdit(instance.get());
+		slib::EditView_Impl::onDoneEdit(instance.get());
 	}
 }
 
