@@ -7,29 +7,53 @@ SLib.io enables software developers to build multi-platform(Android/iOS/MacOS/Ti
 
 ## Modules
 
-- core: Auto Reference Counting, String, List, Map, File, Thread, Synchronizing, Time, Variant, Json, ...
+* core
 
-- crypto: AES, RSA, GZIP, SHA1/2, GCM, MD5, Blowfish, ...
+    Auto Reference Counting, String, List, Map, File, Thread, Synchronizing, Time, Variant, Json, ...
 
-- db: SQLite, MySQL
+* crypto
+   
+    AES, RSA, GZIP, SHA1/2, GCM, MD5, Blowfish, ...
 
-- device: Sensor, Vibrator
+* db
 
-- graphics: Bitmap, Image, Canvas, Font, ...
+    SQLite, MySQL
 
-- math: BigInt, Uint128, Matrix, Vector, Transform, ...
+* device
+    
+    Sensor, Vibrator
 
-- media: MediaPlayer, AudioRecorder, AudioPlayer, Camera, ...
+* graphics
 
-- network: UrlRequest, Socket, Asynchronous I/O, HttpService, ...
+    Bitmap, Image, Canvas, Font, ...
 
-- render: RenderEngine, RenderProgram, VertexBuffer, IndexBuffer, Texture, ...
+* math
 
-- ui: Window, View, ViewGroup, LinearView, ScrollView, Animation, Button, EditView, TabView, WebView, ...
+    BigInt, Uint128, Matrix, Vector, Transform, ...
 
-- web: WebController, WebService
+* media
 
-- geo: LatLon, GeoLocation, GeoLine, GeoRectangle, Globe, Earth
+    MediaPlayer, AudioRecorder, AudioPlayer, Camera, ...
+
+* network
+
+    UrlRequest, Socket, Asynchronous I/O, HttpService, ...
+
+* render
+
+    RenderEngine, RenderProgram, VertexBuffer, IndexBuffer, Texture, ...
+
+* ui
+
+    Window, View, ViewGroup, LinearView, ScrollView, Animation, Button, EditView, TabView, WebView, ...
+
+* web
+
+    WebController, WebService
+
+* geo
+
+    LatLon, GeoLocation, GeoLine, GeoRectangle, Globe, Earth
 
 
 ## Getting Started
@@ -173,11 +197,11 @@ Edit `CMakeLists.txt` in your app module as following.
 
 5. Add following path to `Library Search Paths`
 
-   in iOS
+   on iOS
 
      `$(SLIB_PATH)/lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)`
 
-   in macOS
+   on macOS
 
      `$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)`
 
