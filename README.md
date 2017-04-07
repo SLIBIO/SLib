@@ -117,16 +117,13 @@ Edit the `build.gradle` in your app module as following.
       externalNativeBuild {
         ...
         cmake {
-          ...
           cppFlags "-std=c++11"
           arguments "-DSLIB_PATH=${System.env.SLIB_PATH}"
-          ...
         }
         ...
       }
       ...
     }
-    ...
   }
   ...
   repositories {
@@ -134,19 +131,15 @@ Edit the `build.gradle` in your app module as following.
     flatDir{
        ...
        dirs "${System.env.SLIB_PATH}/lib/Android"
-       ...
     }
-    ...
   }
-  ...
   dependencies {
     ...
     compile ':slib@aar'
-    ...
   }
-  ...
   
 ```
+
 
 Edit `CMakeLists.txt` in your app module as following.
 
@@ -156,7 +149,7 @@ Edit `CMakeLists.txt` in your app module as following.
   link_directories (${SLIB_PATH}/lib/Android/${CMAKE_BUILD_TYPE}-${ANDROID_ABI})
   ...
   target_link_libraries (
-    your-project-module-name
+    your-native-module-name
     ...
     slib
     log GLESv2 OpenSLES
@@ -164,6 +157,35 @@ Edit `CMakeLists.txt` in your app module as following.
   )
   ...
 ```
+
+
+### Xcode (iOS, macOS)
+
+1. Click on the project icon in the inspector (on the left side)
+
+2. Click on the `Build Settings` tab on the right side
+
+3. Find `Search Paths` section
+
+4. Add following path to `Header Search Paths`
+
+   `$(SLIB_PATH)/include`
+
+5. Add following path to `Library Search Paths`
+
+   in iOS
+
+     `$(SLIB_PATH)/lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)`
+
+   in macOS
+
+     `$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)`
+
+6. Find `Linking` section
+
+7. Add following linker flag to `Other Linker Flags`
+
+   `-lslib`
 
 
 ## Contributing
