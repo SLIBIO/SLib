@@ -134,6 +134,8 @@ To make your project more portable, you can copy the include directory and the p
 
 Firstly, open and build the project in the `build/AndroidStudio` directory in the SLib source. After completion of build, you can see the precompiled static libraries and `slib.aar` in the `lib/Android` directory.
 
+`Important:` Use gradle version 2.3.1 or higher.
+
 Edit the `build.gradle` in your app module as following.
 
 ```
