@@ -74,11 +74,11 @@ SLib.io enables software developers to build multi-platform(Android/iOS/MacOS/Ti
 
 ### Build the static libraries
  
- Open the projects in `build` directory using IDEs and then compile for configurations (Debug, Release) and architectures (arm, arm64, i386, x86_64).
+Build Configurations Debug/Release and Platforms arm/arm64/i386/x86/x86_64 for the each project in `build` directory using the appropriate IDE.
  
- Following directories are listed in `build` directory for supported platforms.
+You can see the following projects in `build` directory.
 
-| Directory| Description |
+| Project| Description |
 | ----|----|
 | AndroidStudio | Android Studio project for Android |
 | iOS-Xcode | Xcode project for iOS |
@@ -87,23 +87,25 @@ SLib.io enables software developers to build multi-platform(Android/iOS/MacOS/Ti
 | TizenStudio | Tizen Studio project for Tizen |
 | Linux-KDevelop | KDevelop project for Linux |
  
- After compiling the projects, you can find the static libraries in the `lib` directory in the source tree.
+ After compiling the projects, you can find the static libraries in the `lib` directory.
 
 ### Setup Environment
 
-On macOS and Linux, run the `setup-path` script using Terminal or Finder.
+It's time to setup the environment variables. It is a bit different depending on the platforms.
+
+On macOS and Linux, you'll need to run the `setup-path` script on Terminal or Finder.
 
  ```bash
   ./setup-path
  ```
 
-On Windows, run the `setup-path.bat` batch file using Command Prompt or File Explorer.
+On Windows, you'll need to run the `setup-path.bat` batch file on Command Prompt or File Explorer.
 
  ```bash
   setup-path.bat
  ```
 
-`setup-path` will register current source directory as `SLIB_PATH` environment variable on the Operating System, XCode, and KDevelop.
+`setup-path` will register the current source directory as SLIB-PATH environment variable depending on the Operating Systems and IDEs(XCode and KDevelop).
 
 To get effect of this setup, please quit all running development tools (Xcode, Android Studio, Tizen Studio, ...) and terminals, and then restart the tools. (on macOS, press Command+Q to completely quit the tools)
 
