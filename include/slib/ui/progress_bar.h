@@ -66,11 +66,11 @@ namespace slib
 		
 		sl_bool isDiscrete();
 		
-		void setDiscrete(sl_bool flagDiscrete);
+		void setDiscrete(sl_bool flagDiscrete, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		float getStep();
 		
-		void setStep(float step);
+		void setStep(float step, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		sl_bool isReversed();
 		
