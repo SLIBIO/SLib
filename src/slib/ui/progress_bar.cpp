@@ -212,15 +212,11 @@ namespace slib
 	void ProgressBar::setDiscrete(sl_bool flagDiscrete, UIUpdateMode mode)
 	{
 		m_flagDiscrete = flagDiscrete;
-		if (m_flagDualValues) {
-			if (mode == UIUpdateMode::Init) {
-				setSecondaryValue(m_value2, UIUpdateMode::Init);
-				setValue(m_value, UIUpdateMode::Init);
-			} else {
-				setSecondaryValue(m_value2, UIUpdateMode::NoRedraw);
-				setValue(m_value, mode);
-			}
+		if (mode == UIUpdateMode::Init) {
+			setSecondaryValue(m_value2, UIUpdateMode::Init);
+			setValue(m_value, UIUpdateMode::Init);
 		} else {
+			setSecondaryValue(m_value2, UIUpdateMode::NoRedraw);
 			setValue(m_value, mode);
 		}
 	}
@@ -233,15 +229,11 @@ namespace slib
 	void ProgressBar::setStep(float step, UIUpdateMode mode)
 	{
 		m_step = step;
-		if (m_flagDualValues) {
-			if (mode == UIUpdateMode::Init) {
-				setSecondaryValue(m_value2, UIUpdateMode::Init);
-				setValue(m_value, UIUpdateMode::Init);
-			} else {
-				setSecondaryValue(m_value2, UIUpdateMode::NoRedraw);
-				setValue(m_value, mode);
-			}
+		if (mode == UIUpdateMode::Init) {
+			setSecondaryValue(m_value2, UIUpdateMode::Init);
+			setValue(m_value, UIUpdateMode::Init);
 		} else {
+			setSecondaryValue(m_value2, UIUpdateMode::NoRedraw);
 			setValue(m_value, mode);
 		}
 	}
@@ -408,42 +400,34 @@ namespace slib
 			if (m_flagReversed) {
 				outProgress.left = pos1;
 				outProgress.right = getWidth() - getPaddingRight();
-				outProgress.top = getPaddingTop();
-				outProgress.bottom = getHeight() - getPaddingBottom();
 				outSecondaryProgress.right = outProgress.left;
 				outSecondaryProgress.left = pos2;
-				outSecondaryProgress.top = outProgress.top;
-				outSecondaryProgress.bottom = outProgress.bottom;
 			} else {
 				outProgress.left = getPaddingLeft();
 				outProgress.right = pos1;
-				outProgress.top = getPaddingTop();
-				outProgress.bottom = getHeight() - getPaddingBottom();
 				outSecondaryProgress.left = outProgress.right;
 				outSecondaryProgress.right = pos2;
-				outSecondaryProgress.top = outProgress.top;
-				outSecondaryProgress.bottom = outProgress.bottom;
 			}
+			outProgress.top = getPaddingTop();
+			outProgress.bottom = getHeight() - getPaddingBottom();
+			outSecondaryProgress.top = outProgress.top;
+			outSecondaryProgress.bottom = outProgress.bottom;
 		} else {
 			if (m_flagReversed) {
 				outProgress.top = pos1;
 				outProgress.bottom = getHeight() - getPaddingBottom();
-				outProgress.left = getPaddingLeft();
-				outProgress.right = getWidth() - getPaddingRight();
 				outSecondaryProgress.top = pos2;
 				outSecondaryProgress.bottom = outProgress.top;
-				outSecondaryProgress.left = outProgress.left;
-				outSecondaryProgress.right = outProgress.right;
 			} else {
 				outProgress.top = getPaddingTop();
 				outProgress.bottom = pos1;
-				outProgress.left = getPaddingLeft();
-				outProgress.right = getWidth() - getPaddingRight();
 				outSecondaryProgress.top = outProgress.bottom;
 				outSecondaryProgress.bottom = pos2;
-				outSecondaryProgress.left = outProgress.left;
-				outSecondaryProgress.right = outProgress.right;
 			}
+			outProgress.left = getPaddingLeft();
+			outProgress.right = getWidth() - getPaddingRight();
+			outSecondaryProgress.left = outProgress.left;
+			outSecondaryProgress.right = outProgress.right;
 		}
 	}
 	

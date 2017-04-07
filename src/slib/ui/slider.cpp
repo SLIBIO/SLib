@@ -517,14 +517,22 @@ namespace slib
 			outTrack.bottom = getHeight() - _getEndPadding();
 			outTrack.left = getPaddingLeft();
 			outTrack.right = getWidth() - getPaddingRight();
-			outProgress.top = outTrack.top;
-			outProgress.bottom = pos1;
+			if (isReversed()) {
+				outProgress.top = pos1;
+				outProgress.bottom = outTrack.right;
+				outSecondaryProgress.top = pos2;
+				outSecondaryProgress.bottom = outProgress.top;
+			} else {
+				outProgress.top = outTrack.top;
+				outProgress.bottom = pos1;
+				outSecondaryProgress.top = outProgress.bottom;
+				outSecondaryProgress.bottom = pos2;
+			}
 			outProgress.left = outTrack.left;
 			outProgress.right = outTrack.right;
-			outSecondaryProgress.top = outProgress.bottom;
-			outSecondaryProgress.bottom = pos2;
 			outSecondaryProgress.left = outTrack.left;
 			outSecondaryProgress.right = outTrack.right;
+
 			outThumb.top = pos1 - thumbHeight / 2;
 			outThumb.left = (outTrack.left + outTrack.right) / 2 - thumbWidth / 2;
 			outThumb.bottom = outThumb.top + thumbHeight;
@@ -542,14 +550,22 @@ namespace slib
 			outTrack.right = getWidth() - _getEndPadding();
 			outTrack.top = getPaddingTop();
 			outTrack.bottom = getHeight() - getPaddingBottom();
-			outProgress.left = outTrack.left;
-			outProgress.right = pos1;
+			if (isReversed()) {
+				outProgress.left = pos1;
+				outProgress.right = outTrack.right;
+				outSecondaryProgress.left = pos2;
+				outSecondaryProgress.right = outProgress.left;
+			} else {
+				outProgress.left = outTrack.left;
+				outProgress.right = pos1;
+				outSecondaryProgress.left = outProgress.right;
+				outSecondaryProgress.right = pos2;
+			}
 			outProgress.top = outTrack.top;
 			outProgress.bottom = outTrack.bottom;
-			outSecondaryProgress.left = outProgress.right;
-			outSecondaryProgress.right = pos2;
 			outSecondaryProgress.top = outTrack.top;
 			outSecondaryProgress.bottom = outTrack.bottom;
+			
 			outThumb.left = pos1 - thumbWidth / 2;
 			outThumb.top = (outTrack.top + outTrack.bottom) / 2 - thumbHeight / 2;
 			outThumb.right = outThumb.left + thumbWidth;
