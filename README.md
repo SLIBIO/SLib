@@ -105,13 +105,13 @@ On Windows, you'll need to run the `setup-path.bat` batch file on Command Prompt
   setup-path.bat
  ```
 
-`setup-path` will register the current source directory as SLIB-PATH environment variable depending on the Operating Systems and IDEs(XCode and KDevelop).
+`setup-path` will register the current source directory as `SLIB-PATH` environment variable depending on the Operating Systems and IDEs(XCode and KDevelop).
 
-To get effect of this setup, please quit all running development tools (Xcode, Android Studio, Tizen Studio, ...) and terminals, and then restart the tools. (on macOS, press Command+Q to completely quit the tools)
+After setting up the environment variables, please close all the running IDEs(Xcode, Android Studio, Tizen Studio,...) and reopen them. (on macOS, press Command+Q to completely close the IDEs)
 
 ## Integrating SLib.io with existing C++ projects
 
-Using `SLib.io` with C++ projects is very easy. You just need to setup include and link directories to your existing C++ project.
+It is very easy to integrate `SLib.io` into your existing C++ project. You just need to setup `include` and `lib` directories into your existing C++ project.
 
 | Platform | IDE | Include Directory | Link Directory |
 | ----|----|----|----|
@@ -122,9 +122,9 @@ Using `SLib.io` with C++ projects is very easy. You just need to setup include a
 | Win32 | Visual Studio | $(SLIB_PATH)/include | $(SLIB_PATH)/lib/Win32/$(Configuration)-$(Platform) |
 | Linux | KDevelop, CMake | ${SLIB_PATH}/include | ${SLIB_PATH}/lib/Linux/${CMAKE_BUILD_TYPE}-${CMAKE_HOST_SYSTEM_PROCESSOR} |
 
-You can also integrate SLib.io into any type of C++ projects using similar include and link directory rules.
+You can also integrate SLib.io into any types of C++ projects using similar `include` and `lib` directory rules.
 
-`Important` Your C++ project must be compiled with C++11 support.
+`Important:` Your C++ project must be compiled with C++11 support.
 
 After setup directories, link `slib` library via IDE or set `-lslib` option to the linker.
 
