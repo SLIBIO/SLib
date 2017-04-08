@@ -1355,7 +1355,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	class _Xml_Parser
+	class _private_Xml_Parser
 	{
 	public:
 		String sourceFilePath;
@@ -1376,7 +1376,7 @@ namespace slib
 		String errorMessage;
 		
 	public:
-		_Xml_Parser();
+		_private_Xml_Parser();
 		
 		void escapeWhiteSpaces();
 		
@@ -1412,7 +1412,7 @@ namespace slib
 
 
 	// 1: valid, 2: invalid for starting, 0: invalid
-	const sl_uint8 _XML_check_name_pattern[128] = {
+	const sl_uint8 _g_XML_check_name_pattern[128] = {
 		/*		NUL		SOH		STX		ETX		EOT		ENQ		ACK		BEL		*/
 		/*00*/	0,		0,		0,		0,		0,		0,		0,		0,
 		/*		BS		HT		LF		VT		FF		CR		SO		SI		*/
@@ -1499,7 +1499,7 @@ namespace slib
 
 
 	template <class ST, class CT, class BT>
-	_Xml_Parser<ST, CT, BT>::_Xml_Parser()
+	_private_Xml_Parser<ST, CT, BT>::_private_Xml_Parser()
 	{
 		pos = 0;
 		lineNumber = 1;
@@ -1513,7 +1513,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _Xml_Parser<ST, CT, BT>::escapeWhiteSpaces()
+	void _private_Xml_Parser<ST, CT, BT>::escapeWhiteSpaces()
 	{
 		while (pos < len) {
 			CT ch = buf[pos];
@@ -1525,7 +1525,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _Xml_Parser<ST, CT, BT>::calcLineNumber()
+	void _private_Xml_Parser<ST, CT, BT>::calcLineNumber()
 	{
 		for (sl_size i = posForLineColumn; i < pos; i++) {
 			CT ch = buf[i];
@@ -1548,7 +1548,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _Xml_Parser<ST, CT, BT>::createWhiteSpace(XmlNodeGroup* parent, sl_size posStart, sl_size posEnd)
+	void _private_Xml_Parser<ST, CT, BT>::createWhiteSpace(XmlNodeGroup* parent, sl_size posStart, sl_size posEnd)
 	{
 		if (posEnd <= posStart) {
 			return;
@@ -1577,7 +1577,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _Xml_Parser<ST, CT, BT>::escapeEntity(BT* sb)
+	void _private_Xml_Parser<ST, CT, BT>::escapeEntity(BT* sb)
 	{
 		if (pos < len - 2 && buf[pos] == 'l' && buf[pos+1] == 't' && buf[pos+2] == ';') {
 			static CT sc = '<';
@@ -1656,20 +1656,20 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _Xml_Parser<ST, CT, BT>::parseName(String& name)
+	void _private_Xml_Parser<ST, CT, BT>::parseName(String& name)
 	{
 		if (pos >= len) {
 			REPORT_ERROR(_g_xml_error_msg_name_missing)
 		}
 		sl_uint32 ch = (sl_uint32)(buf[pos]);
-		if (ch < 128 && _XML_check_name_pattern[ch] != 1) {
+		if (ch < 128 && _g_XML_check_name_pattern[ch] != 1) {
 			REPORT_ERROR(_g_xml_error_msg_name_invalid_start)
 		}
 		sl_size start = pos;
 		pos++;
 		while (pos < len) {
 			ch = (sl_uint32)(buf[pos]);
-			if (ch < 128 && _XML_check_name_pattern[ch] == 0) {
+			if (ch < 128 && _g_XML_check_name_pattern[ch] == 0) {
 				break;
 			}
 			pos++;
@@ -1682,7 +1682,7 @@ namespace slib
 
 
 	template <class ST, class CT, class BT>
-	void _Xml_Parser<ST, CT, BT>::parseComment(XmlNodeGroup* parent)
+	void _private_Xml_Parser<ST, CT, BT>::parseComment(XmlNodeGroup* parent)
 	{
 		calcLineNumber();
 		sl_size startLine = lineNumber;
@@ -1731,7 +1731,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _Xml_Parser<ST, CT, BT>::parseCDATA(XmlNodeGroup* parent)
+	void _private_Xml_Parser<ST, CT, BT>::parseCDATA(XmlNodeGroup* parent)
 	{
 		calcLineNumber();
 		sl_size startLine = lineNumber;
@@ -1776,7 +1776,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _Xml_Parser<ST, CT, BT>::parsePI(XmlNodeGroup* parent)
+	void _private_Xml_Parser<ST, CT, BT>::parsePI(XmlNodeGroup* parent)
 	{
 		String target;
 		parseName(target);
@@ -1838,7 +1838,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	SLIB_INLINE void _Xml_Parser<ST, CT, BT>::processPrefix(const String& name, const String& defNamespace, const Map<String, String>& namespaces, String& prefix, String& uri, String& localName)
+	SLIB_INLINE void _private_Xml_Parser<ST, CT, BT>::processPrefix(const String& name, const String& defNamespace, const Map<String, String>& namespaces, String& prefix, String& uri, String& localName)
 	{
 		sl_reg index = name.indexOf(':');
 		if (index >= 0) {
@@ -1852,7 +1852,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _Xml_Parser<ST, CT, BT>::parseAttribute(String& name, String& value)
+	void _private_Xml_Parser<ST, CT, BT>::parseAttribute(String& name, String& value)
 	{
 		parseName(name);
 		if (flagError) {
@@ -1930,7 +1930,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _defNamespace, const Map<String, String>& _namespaces)
+	void _private_Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _defNamespace, const Map<String, String>& _namespaces)
 	{
 		String defNamespace = _defNamespace;
 		Map<String, String> namespaces = _namespaces;
@@ -2107,7 +2107,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _Xml_Parser<ST, CT, BT>::parseText(XmlNodeGroup* parent)
+	void _private_Xml_Parser<ST, CT, BT>::parseText(XmlNodeGroup* parent)
 	{
 		calcLineNumber();
 		sl_size startLine = lineNumber;
@@ -2196,7 +2196,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _Xml_Parser<ST, CT, BT>::parseNodes(XmlNodeGroup* parent, const String& defNamespace, const Map<String, String>& namespaces)
+	void _private_Xml_Parser<ST, CT, BT>::parseNodes(XmlNodeGroup* parent, const String& defNamespace, const Map<String, String>& namespaces)
 	{
 		while (pos < len) {
 			if (buf[pos] == '<') { // Element, Comment, PI, CDATA
@@ -2244,7 +2244,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _Xml_Parser<ST, CT, BT>::parseXml()
+	void _private_Xml_Parser<ST, CT, BT>::parseXml()
 	{
 		CALL_LISTENER(onStartDocument, document.get(), document.get())
 		parseNodes(document.get(), String::null(), Map<String, String>::null());
@@ -2263,11 +2263,11 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	Ref<XmlDocument> _Xml_Parser<ST, CT, BT>::parseXml(const String& sourceFilePath, const CT* buf, sl_size len, XmlParseParam& param)
+	Ref<XmlDocument> _private_Xml_Parser<ST, CT, BT>::parseXml(const String& sourceFilePath, const CT* buf, sl_size len, XmlParseParam& param)
 	{
 		param.flagError = sl_false;
 		
-		_Xml_Parser<ST, CT, BT> parser;
+		_private_Xml_Parser<ST, CT, BT> parser;
 		parser.sourceFilePath = sourceFilePath;
 		parser.buf = buf;
 		parser.len = len;
@@ -2309,7 +2309,7 @@ namespace slib
 
 	Ref<XmlDocument> Xml::parseXml(const sl_char8* sz, sl_size len, XmlParseParam& param)
 	{
-		return _Xml_Parser<String, sl_char8, StringBuffer>::parseXml(String::null(), sz, len, param);
+		return _private_Xml_Parser<String, sl_char8, StringBuffer>::parseXml(String::null(), sz, len, param);
 	}
 
 	Ref<XmlDocument> Xml::parseXml(const sl_char8* sz, sl_size len)
@@ -2320,7 +2320,7 @@ namespace slib
 
 	Ref<XmlDocument> Xml::parseXml(const String& xml, XmlParseParam& param)
 	{
-		return _Xml_Parser<String, sl_char8, StringBuffer>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
+		return _private_Xml_Parser<String, sl_char8, StringBuffer>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
 	}
 
 	Ref<XmlDocument> Xml::parseXml(const String& xml)
@@ -2331,7 +2331,7 @@ namespace slib
 
 	Ref<XmlDocument> Xml::parseXml16(const sl_char16* sz, sl_size len, XmlParseParam& param)
 	{
-		return _Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(String::null(), sz, len, param);
+		return _private_Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(String::null(), sz, len, param);
 	}
 
 	Ref<XmlDocument> Xml::parseXml16(const sl_char16* sz, sl_size len)
@@ -2342,7 +2342,7 @@ namespace slib
 
 	Ref<XmlDocument> Xml::parseXml16(const String16& xml, XmlParseParam& param)
 	{
-		return _Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
+		return _private_Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
 	}
 
 	Ref<XmlDocument> Xml::parseXml16(const String16& xml)
@@ -2354,14 +2354,14 @@ namespace slib
 	Ref<XmlDocument> Xml::parseXmlFromTextFile(const String& filePath, XmlParseParam& param)
 	{
 		String16 xml = File::readAllText16(filePath);
-		return _Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(filePath, xml.getData(), xml.getLength(), param);
+		return _private_Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(filePath, xml.getData(), xml.getLength(), param);
 	}
 
 	Ref<XmlDocument> Xml::parseXmlFromTextFile(const String& filePath)
 	{
 		XmlParseParam param;
 		String16 xml = File::readAllText16(filePath);
-		return _Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(filePath, xml.getData(), xml.getLength(), param);
+		return _private_Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(filePath, xml.getData(), xml.getLength(), param);
 	}
 
 	
@@ -2431,18 +2431,18 @@ namespace slib
 	}
 
 	template <class CT>
-	SLIB_INLINE sl_bool _Xml_checkName(const CT* sz, sl_size len)
+	SLIB_INLINE sl_bool _private_Xml_checkName(const CT* sz, sl_size len)
 	{
 		if (len == 0) {
 			return sl_false;
 		}
 		sl_uint32 ch = (sl_uint32)(sz[0]);
-		if (ch < 128 && _XML_check_name_pattern[ch] != 1) {
+		if (ch < 128 && _g_XML_check_name_pattern[ch] != 1) {
 			return sl_false;
 		}
 		for (sl_size i = 1; i < len; i++) {
 			ch = (sl_uint32)(sz[i]);
-			if (ch < 128 && _XML_check_name_pattern[ch] == 0) {
+			if (ch < 128 && _g_XML_check_name_pattern[ch] == 0) {
 				return sl_false;
 			}
 		}
@@ -2451,12 +2451,12 @@ namespace slib
 
 	sl_bool Xml::checkName(const sl_char8* sz, sl_size len)
 	{
-		return _Xml_checkName(sz, len);
+		return _private_Xml_checkName(sz, len);
 	}
 
 	sl_bool Xml::checkName(const sl_char16* sz, sl_size len)
 	{
-		return _Xml_checkName(sz, len);
+		return _private_Xml_checkName(sz, len);
 	}
 
 	sl_bool Xml::checkName(const String& tagName)
