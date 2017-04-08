@@ -65,11 +65,8 @@ namespace slib
 	{
 	}
 
-
-/************************************************
-			XmlNode
-************************************************/
-
+	
+	
 	SLIB_DEFINE_ROOT_OBJECT(XmlNode)
 
 	XmlNode::XmlNode(XmlNodeType type) : m_type(type), m_positionStartInSource(0), m_positionEndInSource(0), m_lineInSource(1), m_columnInSource(1)
@@ -266,9 +263,6 @@ namespace slib
 		}
 	}
 
-/************************************************
-				XmlNodeGroup
-************************************************/
 
 	SLIB_DEFINE_OBJECT(XmlNodeGroup, XmlNode)
 
@@ -632,9 +626,6 @@ namespace slib
 		return findChildElementByAttribute(name, _id);
 	}
 
-/************************************************
-				XmlElement
-************************************************/
 
 	SLIB_DEFINE_OBJECT(XmlElement, XmlNodeGroup)
 
@@ -700,7 +691,7 @@ namespace slib
 				if (!(output.addStatic("=\"", 2))) {
 					return sl_false;
 				}
-				if (!(Xml::buildEscapedText(attrs[i].value, output))) {
+				if (!(Xml::convertTextToEntities(attrs[i].value, output))) {
 					return sl_false;
 				}
 				if (!(output.addStatic("\"", 1))) {
@@ -925,9 +916,6 @@ namespace slib
 		m_mapAttributes.removeAll_NoLock();
 	}
 
-/************************************************
-				XmlDocument
-************************************************/
 
 	SLIB_DEFINE_OBJECT(XmlDocument, XmlNodeGroup)
 
@@ -996,10 +984,7 @@ namespace slib
 		return flagFoundRoot;
 	}
 
-/************************************************
-				XmlText
-************************************************/
-
+	
 	SLIB_DEFINE_OBJECT(XmlText, XmlNode)
 
 	XmlText::XmlText() : XmlNode(XmlNodeType::Text), m_flagCDATA(sl_false)
@@ -1069,7 +1054,7 @@ namespace slib
 			}
 			return sl_true;
 		} else {
-			return Xml::buildEscapedText(text, output);
+			return Xml::convertTextToEntities(text, output);
 		}
 	}
 
@@ -1093,10 +1078,6 @@ namespace slib
 		m_flagCDATA = flag;
 	}
 
-
-/************************************************
-			XmlProcessingInstruction
-************************************************/
 
 	SLIB_DEFINE_OBJECT(XmlProcessingInstruction, XmlNode)
 
@@ -1197,10 +1178,6 @@ namespace slib
 	}
 
 
-/************************************************
-				XmlComment
-************************************************/
-
 	SLIB_DEFINE_OBJECT(XmlComment, XmlNode)
 
 	XmlComment::XmlComment() : XmlNode(XmlNodeType::Comment)
@@ -1274,10 +1251,7 @@ namespace slib
 		m_comment = comment;
 	}
 
-/************************************************
-				XmlWhiteSpace
-************************************************/
-
+	
 	SLIB_DEFINE_OBJECT(XmlWhiteSpace, XmlNode)
 
 	XmlWhiteSpace::XmlWhiteSpace() : XmlNode(XmlNodeType::WhiteSpace)
@@ -1316,10 +1290,7 @@ namespace slib
 		m_content = content;
 	}
 
-/************************************************
-				Xml Parsing
-************************************************/
-
+	
 	XmlParseParam::XmlParseParam()
 	{
 		flagCreateDocument = sl_true;
@@ -2393,19 +2364,17 @@ namespace slib
 		return _Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(filePath, xml.getData(), xml.getLength(), param);
 	}
 
-/************************************************
-				Xml Utilities
-************************************************/
-	String Xml::makeEscapedText(const String& text)
+	
+	String Xml::convertTextToEntities(const String& text)
 	{
 		StringBuffer buf;
-		if (buildEscapedText(text, buf)) {
+		if (convertTextToEntities(text, buf)) {
 			return buf.merge();
 		}
 		return sl_null;
 	}
 
-	sl_bool Xml::buildEscapedText(const String& text, StringBuffer& output)
+	sl_bool Xml::convertTextToEntities(const String& text, StringBuffer& output)
 	{
 		StringData data;
 		StringData dataEscape;

@@ -554,9 +554,25 @@ namespace slib
 		static Ref<XmlDocument> parseXmlFromTextFile(const String& filePath);
 
 
-		static String makeEscapedText(const String& text);
+		/**
+		 * Convert speical characters (<>&"') to XML entities.
+		 *
+		 * @param[in] text String value containing the original text
+		 *
+		 * @return Converted Text with XML entities for special characters
+		 */
+		static String convertTextToEntities(const String& text);
 
-		static sl_bool buildEscapedText(const String& text, StringBuffer& output);
+		/**
+		 * Convert speical characters (<>&"') to XML entities.
+		 * Converted text will be stored in `output` buffer.
+		 *
+		 * @param[in] text String value containing the original text
+		 * @param[out] output StringBuffer that receives the converted result text
+		 *
+		 * @return true when the conversion is successful
+		 */
+		static sl_bool convertTextToEntities(const String& text, StringBuffer& output);
 
 		static sl_bool checkName(const sl_char8* sz, sl_size len);
 
