@@ -111,7 +111,7 @@ After setting up the environment variables, please close all the running IDEs(Xc
 
 ## Integrating SLib with existing C++ projects
 
-It is very easy to integrate `SLib.io` into your existing C++ project. You just need to setup `include` and `lib` directories into your existing C++ project.
+It is very easy to integrate `SLib` into your existing C++ project. You just need to setup `include` and `lib` directories into your existing C++ project.
 
 | Platform | IDE | Include Directory | Link Directory |
 | ----|----|----|----|
