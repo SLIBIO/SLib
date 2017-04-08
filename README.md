@@ -1,8 +1,8 @@
-# SLib.io
+# SLib
 
-SLib.io is a universal cross-platform library, specially designed for the various UI components, OpenGL rendering and networking solutions.
+SLib is a universal cross-platform library, specially designed for the various UI components, OpenGL rendering and networking solutions.
 
-SLib.io enables software developers to build multi-platform(Android/iOS/MacOS/Tizen/Win32) applications and games under the most effective workflows and the coding conventions of C++, while providing easy-to-use toolkits to develop HTTP/Socket servers on the Linux/MacOS/Win32 platforms.
+SLib enables software developers to build multi-platform(Android/iOS/MacOS/Tizen/Win32) applications and games under the most effective workflows and the coding conventions of C++, while providing easy-to-use toolkits to develop HTTP/Socket servers on the Linux/MacOS/Win32 platforms.
 
 
 ## Modules
@@ -109,7 +109,7 @@ On Windows, you'll need to run the `setup-path.bat` batch file on Command Prompt
 
 After setting up the environment variables, please close all the running IDEs(Xcode, Android Studio, Tizen Studio,...) and reopen them. (on macOS, press Command+Q to completely close the IDEs)
 
-## Integrating SLib.io with existing C++ projects
+## Integrating SLib with existing C++ projects
 
 It is very easy to integrate `SLib.io` into your existing C++ project. You just need to setup `include` and `lib` directories into your existing C++ project.
 
@@ -122,13 +122,13 @@ It is very easy to integrate `SLib.io` into your existing C++ project. You just 
 | Win32 | Visual Studio | $(SLIB_PATH)/include | $(SLIB_PATH)/lib/Win32/$(Configuration)-$(Platform) |
 | Linux | KDevelop, CMake | ${SLIB_PATH}/include | ${SLIB_PATH}/lib/Linux/${CMAKE_BUILD_TYPE}-${CMAKE_HOST_SYSTEM_PROCESSOR} |
 
-You can also integrate SLib.io into any types of C++ projects using similar `include` and `lib` directory rules.
+You can also integrate SLib into any types of C++ projects using similar `include` and `lib` directory rules.
 
 `Important:` Your C++ project must be compiled with C++11 support.
 
 After setup directories, link `slib` library via IDE or set `-lslib` option to the linker.
 
-Your project can also link to the subsets of SLib.io: `slib-core` (core+math+crypto) , `slib-network`, `slib-graphics`, `slib-render`, `slib-ui`, `slib-media`, `slib-device`, `slib-db`, `slib-web`, `slib-geo`
+Your project can also link to the subsets of SLib: `slib-core` (core+math+crypto) , `slib-network`, `slib-graphics`, `slib-render`, `slib-ui`, `slib-media`, `slib-device`, `slib-db`, `slib-web`, `slib-geo`
 
 To make your project more portable, you can copy the include directory and the precompiled static libraries into your project and use the relative path instead of the environment variable.
 
@@ -340,4 +340,4 @@ We sincerely appreciate your support and suggestions. For contributing pull requ
 
 ## License
 
-SLib.io is dual-licensed. It is currently licensed under the Mozilla Public License v2.0, but also under a separate proprietary license. If you feel like you need to purchase a proprietary license for SLib.io, please contact us at contact@slib.io.
+SLib is dual-licensed. It is currently licensed under the Mozilla Public License v2.0, but also under a separate proprietary license. If you feel like you need to purchase a proprietary license for SLib, please contact us at contact@slib.io.
