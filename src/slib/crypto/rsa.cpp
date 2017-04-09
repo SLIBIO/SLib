@@ -176,7 +176,7 @@ namespace slib
 			return sl_false;
 		}
 		sl_uint32 pos;
-		for (pos = 2; pos < len - 1; pos++) {
+		for (pos = 2; pos + 1 < len; pos++) {
 			if (buf[pos] == 0) {
 				break;
 			}

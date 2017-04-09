@@ -53,7 +53,7 @@ namespace slib
 		if (data) {
 			sl_uint32 n = Jni::getArrayLength(data);
 			if (n > 0) {
-				for (sl_uint32 i = 0; i < n - 1; i += 2) {
+				for (sl_uint32 i = 0; i + 1 < n; i += 2) {
 					String key = Jni::getStringArrayElement(data, i);
 					String strValue = Jni::getStringArrayElement(data, i + 1);
 					Variant value;

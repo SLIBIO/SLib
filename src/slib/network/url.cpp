@@ -250,7 +250,7 @@ namespace slib
 			for (sl_size i = 0; i < n; i++) {
 				sl_uint32 v = (sl_uint32)(src[i]);
 				if (v == '%') {
-					if (i < n - 2) {
+					if (i + 2 < n) {
 						sl_uint32 a1 = (sl_uint32)(src[i + 1]);
 						sl_uint32 h1 = SLIB_CHAR_HEX_TO_INT(a1);
 						if (h1 < 16) {

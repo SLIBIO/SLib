@@ -340,7 +340,7 @@ namespace slib
 							flagBlockComment = sl_false;
 						}
 					} else {
-						if (pos <= len - 2 && ch == '/') {
+						if (pos + 2 <= len && ch == '/') {
 							if (buf[pos + 1] == '/') {
 								flagLineComment = sl_true;
 								flagEscape = sl_true;
