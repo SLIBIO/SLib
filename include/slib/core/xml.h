@@ -528,57 +528,188 @@ namespace slib
 
 	};
 	
+	/**
+	 * @class Xml
+	 * @brief provides utilities for parsing and build XML.
+	 */
 	class SLIB_EXPORT Xml
 	{
 	public:
+		/**
+		 * parses XML text (UTF-8 encoding) contained in `xml`
+		 *
+		 * @param[in] xml String value containing XML text
+		 * @param[in] length length of the XML text
+		 * @param[in] param options for XML parsing
+		 *
+		 * @return XmlDocument object on success
+		 * @return nullptr on failure
+		 */
 		static Ref<XmlDocument> parseXml(const char* xml, sl_size length, XmlParseParam& param);
 
+		/**
+		 * parses XML text (UTF-8 encoding) contained in `xml`.
+		 * XML parser uses default option for parsing.
+		 *
+		 * @param[in] xml String value containing XML text
+		 * @param[in] length length of the XML text
+		 *
+		 * @return XmlDocument object on success
+		 * @return nullptr on failure
+		 */
 		static Ref<XmlDocument> parseXml(const char* xml, sl_size length);
 	
+		/**
+		 * parses XML text (UTF-8 encoding) contained in `xml`
+		 *
+		 * @param[in] xml String value containing XML text
+		 * @param[in] param options for XML parsing
+		 *
+		 * @return XmlDocument object on success
+		 * @return nullptr on failure
+		 */
 		static Ref<XmlDocument> parseXml(const String& xml, XmlParseParam& param);
 
+		/**
+		 * parses XML text (UTF-8 encoding) contained in `xml`.
+		 * XML parser uses default option for parsing.
+		 *
+		 * @param[in] xml String value containing XML text
+		 *
+		 * @return XmlDocument object on success
+		 * @return nullptr on failure
+		 */
 		static Ref<XmlDocument> parseXml(const String& xml);
 
 
+		/**
+		 * parses XML text (Unicode) contained in `xml`
+		 *
+		 * @param[in] xml String value containing XML text
+		 * @param[in] length length of the XML text
+		 * @param[in] param options for XML parsing
+		 *
+		 * @return XmlDocument object on success
+		 * @return nullptr on failure
+		 */
 		static Ref<XmlDocument> parseXml16(const sl_char16* xml, sl_size length, XmlParseParam& param);
 
+		/**
+		 * parses XML text (Unicode) contained in `xml`.
+		 * XML parser uses default option for parsing.
+		 *
+		 * @param[in] xml String value containing XML text
+		 * @param[in] length length of the XML text
+		 *
+		 * @return XmlDocument object on success
+		 * @return nullptr on failure
+		 */
 		static Ref<XmlDocument> parseXml16(const sl_char16* xml, sl_size length);
-
+		
+		/**
+		 * parses XML text (Unicode) contained in `xml`
+		 *
+		 * @param[in] xml String value containing XML text
+		 * @param[in] param options for XML parsing
+		 *
+		 * @return XmlDocument object on success
+		 * @return nullptr on failure
+		 */
 		static Ref<XmlDocument> parseXml16(const String16& xml, XmlParseParam& param);
 
+		/**
+		 * parses XML text (Unicode) contained in `xml`.
+		 * XML parser uses default option for parsing.
+		 *
+		 * @param[in] xml String value containing XML text
+		 *
+		 * @return XmlDocument object on success
+		 * @return nullptr on failure
+		 */
 		static Ref<XmlDocument> parseXml16(const String16& xml);
 
-
+		/**
+		 * parses XML text file located in `filePath`.
+		 * The character positions are calculated by UTF-16 encoding.
+		 *
+		 * @param[in] filePath XML text file (UTF-8, UTF-16BE, UTF-16LE)
+		 * @param[in] param options for XML parsing
+		 *
+		 * @return XmlDocument object on success
+		 * @return nullptr on failure
+		 */
 		static Ref<XmlDocument> parseXmlFromTextFile(const String& filePath, XmlParseParam& param);
 
+		/**
+		 * parses XML text file located in `filePath`.
+		 * The character positions are calculated by UTF-16 encoding.
+		 * XML parser uses default option for parsing.
+		 *
+		 * @param[in] filePath XML text file (UTF-8, UTF-16BE, UTF-16LE)
+		 *
+		 * @return XmlDocument object on success
+		 * @return nullptr on failure
+		 */
 		static Ref<XmlDocument> parseXmlFromTextFile(const String& filePath);
 
 
 		/**
-		 * Convert speical characters (<>&"') to XML entities.
+		 * Encodes speical characters (&lt; &gt; &amp; &quot; &apos;) to XML entities.
 		 *
 		 * @param[in] text String value containing the original text
 		 *
-		 * @return Converted Text with XML entities for special characters
+		 * @return Encoded result text with XML entities for special characters
 		 */
-		static String convertTextToEntities(const String& text);
+		static String encodeTextToEntities(const String& text);
 
 		/**
-		 * Convert speical characters (<>&"') to XML entities.
-		 * Converted text will be stored in `output` buffer.
+		 * Encodes speical characters (&lt; &gt; &amp; &quot; &apos;) to XML entities.
+		 * Encoded result text will be stored in `output` buffer.
 		 *
 		 * @param[in] text String value containing the original text
-		 * @param[out] output StringBuffer that receives the converted result text
+		 * @param[out] output StringBuffer that receives the encoded result text
 		 *
-		 * @return true when the conversion is successful
+		 * @return `true` on success
 		 */
-		static sl_bool convertTextToEntities(const String& text, StringBuffer& output);
+		static sl_bool encodeTextToEntities(const String& text, StringBuffer& output);
+		
+		/**
+		 * Decodes XML entities (&amp;lt; &amp;gt; &amp;amp; ...) contained in `text`.
+		 *
+		 * @param[in] text String value that may contain XML entities.
+		 *
+		 * @return decoded text
+		 */
+		static String decodeTextFromEntities(const String& text);
 
-		static sl_bool checkName(const sl_char8* sz, sl_size len);
+		/**
+		 * Check the `name` can be used as XML tag name
+		 *
+		 * @param[in] name XML tag name
+		 * @param[in] len length of the tag name
+		 *
+		 * @return `true` if the `name` is valid for XML tag name
+		 */
+		static sl_bool checkName(const sl_char8* name, sl_size len);
 
-		static sl_bool checkName(const sl_char16* sz, sl_size len);
+		/**
+		 * Check the `name` can be used as XML tag name
+		 *
+		 * @param[in] name XML tag name
+		 * @param[in] len length of the tag name
+		 *
+		 * @return `true` if the `name` is valid for XML tag name
+		 */
+		static sl_bool checkName(const sl_char16* name, sl_size len);
 
-		static sl_bool checkName(const String& tagName);
+		/**
+		 * Check the `name` can be used as XML tag name
+		 *
+		 * @param[in] name XML tag name
+		 *
+		 * @return `true` if the `name` is valid for XML tag name
+		 */
+		static sl_bool checkName(const String& name);
 
 	};
 

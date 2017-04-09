@@ -691,7 +691,7 @@ namespace slib
 				if (!(output.addStatic("=\"", 2))) {
 					return sl_false;
 				}
-				if (!(Xml::convertTextToEntities(attrs[i].value, output))) {
+				if (!(Xml::encodeTextToEntities(attrs[i].value, output))) {
 					return sl_false;
 				}
 				if (!(output.addStatic("\"", 1))) {
@@ -1026,7 +1026,7 @@ namespace slib
 			sl_char8* sz = text.getData();
 			sl_size len = text.getLength();
 			sl_size start = 0;
-			for (sl_size i = 0; i < len - 2; i++) {
+			for (sl_size i = 0; i + 2 < len; i++) {
 				if (sz[i] == ']' && sz[i+1] == ']' && sz[i+2] == '>') {
 					if (i > start) {
 						data.sz8 = sz + start;
@@ -1054,7 +1054,7 @@ namespace slib
 			}
 			return sl_true;
 		} else {
-			return Xml::convertTextToEntities(text, output);
+			return Xml::encodeTextToEntities(text, output);
 		}
 	}
 
@@ -1126,7 +1126,7 @@ namespace slib
 			sl_char8* sz = content.getData();
 			sl_size len = content.getLength();
 			sl_size start = 0;
-			for (sl_size i = 0; i < len - 1; i++) {
+			for (sl_size i = 0; i + 1 < len; i++) {
 				if (sz[i] == '?' && sz[i+1] == '>') {
 					if (i > start) {
 						data.sz8 = sz + start;
@@ -1214,7 +1214,7 @@ namespace slib
 			sl_char8* sz = comment.getData();
 			sl_size len = comment.getLength();
 			sl_size start = 0;
-			for (sl_size i = 0; i < len - 1; i++) {
+			for (sl_size i = 0; i + 1 < len; i++) {
 				if (sz[i] == '-' && sz[i+1] == '-') {
 					if (i > start) {
 						data.sz8 = sz + start;
@@ -1384,7 +1384,7 @@ namespace slib
 		
 		void createWhiteSpace(XmlNodeGroup* parent, sl_size posStart, sl_size posEnd);
 
-		void escapeEntity(BT* buf);
+		void unescapeEntity(BT* buf);
 		
 		void parseName(String& name);
 
@@ -1575,11 +1575,11 @@ namespace slib
 			}
 		}
 	}
-
+	
 	template <class ST, class CT, class BT>
-	void _private_Xml_Parser<ST, CT, BT>::escapeEntity(BT* sb)
+	void _private_Xml_Parser<ST, CT, BT>::unescapeEntity(BT* sb)
 	{
-		if (pos < len - 2 && buf[pos] == 'l' && buf[pos+1] == 't' && buf[pos+2] == ';') {
+		if (pos + 2 < len && buf[pos] == 'l' && buf[pos+1] == 't' && buf[pos+2] == ';') {
 			static CT sc = '<';
 			if (sb) {
 				if (!(sb->addStatic(&sc, 1))) {
@@ -1587,7 +1587,7 @@ namespace slib
 				}
 			}
 			pos += 3;
-		} else if (pos < len - 2 && buf[pos] == 'g' && buf[pos+1] == 't' && buf[pos+2] == ';') {
+		} else if (pos + 2 < len && buf[pos] == 'g' && buf[pos+1] == 't' && buf[pos+2] == ';') {
 			static CT sc = '>';
 			if (sb) {
 				if (!(sb->addStatic(&sc, 1))) {
@@ -1595,7 +1595,7 @@ namespace slib
 				}
 			}
 			pos += 3;
-		} else if (pos < len - 3 && buf[pos] == 'a' && buf[pos+1] == 'm' && buf[pos+2] == 'p' && buf[pos+3] == ';') {
+		} else if (pos + 3 < len && buf[pos] == 'a' && buf[pos+1] == 'm' && buf[pos+2] == 'p' && buf[pos+3] == ';') {
 			static CT sc = '&';
 			if (sb) {
 				if (!(sb->addStatic(&sc, 1))) {
@@ -1603,7 +1603,7 @@ namespace slib
 				}
 			}
 			pos += 4;
-		} else if (pos < len - 4 && buf[pos] == 'a' && buf[pos+1] == 'p' && buf[pos+2] == 'o' && buf[pos+3] == 's' && buf[pos+4] == ';') {
+		} else if (pos + 4 < len && buf[pos] == 'a' && buf[pos+1] == 'p' && buf[pos+2] == 'o' && buf[pos+3] == 's' && buf[pos+4] == ';') {
 			static CT sc = '\'';
 			if (sb) {
 				if (!(sb->addStatic(&sc, 1))) {
@@ -1611,7 +1611,7 @@ namespace slib
 				}
 			}
 			pos += 5;
-		} else if (pos < len - 4 && buf[pos] == 'q' && buf[pos+1] == 'u' && buf[pos+2] == 'o' && buf[pos+3] == 't' && buf[pos+4] == ';') {
+		} else if (pos + 4 < len && buf[pos] == 'q' && buf[pos+1] == 'u' && buf[pos+2] == 'o' && buf[pos+3] == 't' && buf[pos+4] == ';') {
 			static CT sc = '\"';
 			if (sb) {
 				if (!(sb->addStatic(&sc, 1))) {
@@ -1619,15 +1619,15 @@ namespace slib
 				}
 			}
 			pos += 5;
-		} else if (pos < len - 2 && buf[pos] == '#'){
+		} else if (pos + 2 < len && buf[pos] == '#'){
 			pos++;
 			sl_uint32 n;
 			sl_reg parseRes;
 			if (buf[pos] == 'x') {
 				pos++;
-				parseRes = ST::parseUint32(16, &n, buf, pos, len - pos);
+				parseRes = ST::parseUint32(16, &n, buf, pos, len);
 			} else {
-				parseRes = ST::parseUint32(10, &n, buf, pos, len - pos);
+				parseRes = ST::parseUint32(10, &n, buf, pos, len);
 			}
 			if (parseRes == SLIB_PARSE_ERROR) {
 				REPORT_ERROR(_g_xml_error_msg_invalid_escape)
@@ -1639,8 +1639,8 @@ namespace slib
 			if (buf[pos] != ';') {
 				REPORT_ERROR(_g_xml_error_msg_escape_not_end)
 			}
-			sl_char32 _n = n;
-			String16 s(&_n, 1);
+			sl_char32 _n = (sl_char32)n;
+			ST s(&_n, 1);
 			if (s.isNull()) {
 				REPORT_ERROR(_g_xml_error_msg_memory_lack)
 			}
@@ -1689,7 +1689,7 @@ namespace slib
 		sl_size startColumn = columnNumber;
 		sl_size startComment = pos;
 		sl_bool flagEnded = sl_false;
-		while (pos < len - 2) {
+		while (pos + 2 < len) {
 			if (buf[pos] == '-' && buf[pos + 1] == '-') {
 				if (buf[pos + 2] == '>') {
 					if (param.flagCreateCommentNodes) {
@@ -1738,7 +1738,7 @@ namespace slib
 		sl_size startColumn = columnNumber;
 		sl_size startCDATA = pos;
 		sl_bool flagEnded = sl_false;
-		while (pos < len - 2) {
+		while (pos + 2 < len) {
 			if (buf[pos] == ']' && buf[pos + 1] == ']' && buf[pos + 2] == '>') {
 				if (param.flagCreateTextNodes) {
 					String str(buf + startCDATA, pos - startCDATA);
@@ -1800,7 +1800,7 @@ namespace slib
 		sl_size startColumn = columnNumber;
 		sl_size startPI = pos;
 		sl_bool flagEnded = sl_false;
-		while (pos < len - 1) {
+		while (pos + 1 < len) {
 			if (buf[pos] == '?' && buf[pos + 1] == '>') {
 				if (param.flagCreateProcessingInstructionNodes) {
 					String str(buf + startPI, pos - startPI);
@@ -1897,7 +1897,7 @@ namespace slib
 						}
 					}
 					pos++;
-					escapeEntity(&sb);
+					unescapeEntity(&sb);
 					if (flagError) {
 						return;
 					}
@@ -2035,7 +2035,7 @@ namespace slib
 		}
 		sl_bool flagEmptyTag = sl_false;
 		if (buf[pos] == '/') {
-			if (pos < len - 1 && buf[pos+1] == '>') {
+			if (pos + 1 < len && buf[pos+1] == '>') {
 				flagEmptyTag = sl_true;
 				pos += 2;
 			} else {
@@ -2134,7 +2134,7 @@ namespace slib
 					}
 				}
 				pos++;
-				escapeEntity(sb);
+				unescapeEntity(sb);
 				if (flagError) {
 					return;
 				}
@@ -2204,13 +2204,13 @@ namespace slib
 				CT ch = buf[pos];
 				if (ch == '!') { // Comment, CDATA
 					pos++;
-					if (pos < len - 1 && buf[pos] == '-' && buf[pos+1] == '-') { // Comment
+					if (pos + 1 < len && buf[pos] == '-' && buf[pos+1] == '-') { // Comment
 						pos += 2;
 						parseComment(parent);
 						if (flagError) {
 							return;
 						}
-					} else if (pos < len - 6 && buf[pos] == '[' && buf[pos+1] == 'C' && buf[pos+2] == 'D' && buf[pos+3] == 'A' && buf[pos+4] == 'T' && buf[pos+5] == 'A' && buf[pos+6] == '[') { // CDATA
+					} else if (pos + 6 < len && buf[pos] == '[' && buf[pos+1] == 'C' && buf[pos+2] == 'D' && buf[pos+3] == 'A' && buf[pos+4] == 'T' && buf[pos+5] == 'A' && buf[pos+6] == '[') { // CDATA
 						pos += 7;
 						parseCDATA(parent);
 						if (flagError) {
@@ -2365,16 +2365,16 @@ namespace slib
 	}
 
 	
-	String Xml::convertTextToEntities(const String& text)
+	String Xml::encodeTextToEntities(const String& text)
 	{
 		StringBuffer buf;
-		if (convertTextToEntities(text, buf)) {
+		if (encodeTextToEntities(text, buf)) {
 			return buf.merge();
 		}
 		return sl_null;
 	}
 
-	sl_bool Xml::convertTextToEntities(const String& text, StringBuffer& output)
+	sl_bool Xml::encodeTextToEntities(const String& text, StringBuffer& output)
 	{
 		StringData data;
 		StringData dataEscape;
@@ -2428,6 +2428,93 @@ namespace slib
 			}
 		}
 		return sl_true;
+	}
+	
+	String Xml::decodeTextFromEntities(const String& text)
+	{
+		String ret = text.duplicate();
+		
+		if (ret.isNotEmpty()) {
+			
+			sl_char8* buf = text.getData();
+			sl_char8* output = ret.getData();
+			sl_size len = text.getLength();
+			sl_size pos = 0;
+			
+			sl_size posOutput = 0;
+			
+			while (pos < len) {
+				if (buf[pos] == '&' && pos + 1 < len) {
+					pos++;
+					if (pos + 2 < len && buf[pos] == 'l' && buf[pos+1] == 't' && buf[pos+2] == ';') {
+						output[posOutput] = '<';
+						pos += 3;
+						posOutput++;
+					} else if (pos + 2 < len && buf[pos] == 'g' && buf[pos+1] == 't' && buf[pos+2] == ';') {
+						output[posOutput] = '>';
+						pos += 3;
+						posOutput++;
+					} else if (pos + 3 < len && buf[pos] == 'a' && buf[pos+1] == 'm' && buf[pos+2] == 'p' && buf[pos+3] == ';') {
+						output[posOutput] = '&';
+						pos += 4;
+						posOutput++;
+					} else if (pos + 4 < len && buf[pos] == 'a' && buf[pos+1] == 'p' && buf[pos+2] == 'o' && buf[pos+3] == 's' && buf[pos+4] == ';') {
+						output[posOutput] = '\'';
+						pos += 5;
+						posOutput++;
+					} else if (pos + 4 < len && buf[pos] == 'q' && buf[pos+1] == 'u' && buf[pos+2] == 'o' && buf[pos+3] == 't' && buf[pos+4] == ';') {
+						output[posOutput] = '\"';
+						pos += 5;
+						posOutput++;
+					} else if (pos + 2 < len && buf[pos] == '#'){
+						sl_size posOld = pos;
+						do {
+							pos++;
+							sl_uint32 n;
+							sl_reg parseRes;
+							if (buf[pos] == 'x') {
+								pos++;
+								parseRes = String::parseUint32(16, &n, buf, pos, len);
+							} else {
+								parseRes = String::parseUint32(10, &n, buf, pos, len);
+							}
+							if (parseRes != SLIB_PARSE_ERROR) {
+								pos = parseRes;
+								if (pos < len && buf[pos] == ';') {
+									sl_char32 _n = (sl_char32)n;
+									String s(&_n, 1);
+									if (s.isNotEmpty()) {
+										sl_size t = s.getLength();
+										Base::copyMemory(output + posOutput, s.getData(), t);
+										posOutput += t;
+										pos++;
+										break;
+									}
+								}
+							}
+							pos = posOld;
+							output[posOutput] = '&';
+							posOutput++;
+						} while (0);
+					} else {
+						output[posOutput] = '&';
+						posOutput++;
+					}
+				} else {
+					output[posOutput] = buf[pos];
+					posOutput++;
+					pos++;
+				}
+			}
+			
+			output[posOutput] = 0;
+		
+			ret.setLength(posOutput);
+		
+		}
+		
+		return ret;
+		
 	}
 
 	template <class CT>
