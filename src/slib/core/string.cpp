@@ -4087,12 +4087,18 @@ namespace slib
 
 	String String::duplicate() const
 	{
-		return String(getData(), getLength());
+		if (isNotNull()) {
+			return String(getData(), getLength());
+		}
+		return sl_null;
 	}
 
 	String16 String16::duplicate() const
 	{
-		return String16(getData(), getLength());
+		if (isNotNull()) {
+			return String16(getData(), getLength());
+		}
+		return sl_null;
 	}
 
 	String Atomic<String>::duplicate() const
