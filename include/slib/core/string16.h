@@ -1457,7 +1457,7 @@ namespace slib
 		 *
 		 * @return the position after the number if a valid number is found at position of `posBegin`, otherwise returns `SLIB_PARSE_ERROR`.
 		 */
-		static sl_reg parseDouble(double* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX);
+		static sl_reg parseDouble(double* value, const sl_char16* str, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX);
 		
 		/**
 		 * Convert this string to a double number value.
@@ -1466,7 +1466,7 @@ namespace slib
 		 *
 		 * @return `true` if the conversion is success
 		 */
-		sl_bool parseDouble(double* _out) const;
+		sl_bool parseDouble(double* value) const;
 		
 		/**
 		 * Convert this string to a double number value.
@@ -1523,7 +1523,7 @@ namespace slib
 		 *
 		 * @return the position after the boolean keyword if a valid keyword is found at position of `posBegin`, otherwise returns `SLIB_PARSE_ERROR`.
 		 */
-		static sl_reg parseHexString(void* value, const sl_char16* str, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX);
+		static sl_reg parseHexString(void* output, const sl_char16* str, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX);
 		
 		/**
 		 * Parses this hex string and writes the bytes to `output`. Format example, "a1a1a1a1" is converted to 4 bytes of 0xA1.
@@ -1532,7 +1532,7 @@ namespace slib
 		 *
 		 * @return `true` if the conversion is success
 		 */
-		sl_bool parseHexString(void* value) const;
+		sl_bool parseHexString(void* output) const;
 		
 		/**
 		 * @return the string representation of 32 bit integer argument.

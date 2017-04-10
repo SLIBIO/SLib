@@ -1483,7 +1483,7 @@ namespace slib
 		 *
 		 * @return `true` if the conversion is success
 		 */
-		sl_bool parseDouble(double* _out) const;
+		sl_bool parseDouble(double* value) const;
 		
 		/**
 		 * Convert this string to a double number value.
