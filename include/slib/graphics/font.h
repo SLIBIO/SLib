@@ -31,6 +31,7 @@ namespace slib
 		sl_bool flagBold;
 		sl_bool flagItalic;
 		sl_bool flagUnderline;
+		sl_bool flagStrikeout;
 	
 	public:
 		FontDesc();
@@ -62,7 +63,7 @@ namespace slib
 
 		static Ref<Font> create(const FontDesc& desc);
 
-		static Ref<Font> create(String familyName, sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false);
+		static Ref<Font> create(String familyName, sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false, sl_bool flagStrikeout = sl_false);
 	
 		static sl_real getDefaultFontSize();
 
@@ -80,6 +81,8 @@ namespace slib
 		sl_bool isItalic();
 
 		sl_bool isUnderline();
+		
+		sl_bool isStrikeout();
 
 		sl_bool getFontMetrics(FontMetrics& _out);
 

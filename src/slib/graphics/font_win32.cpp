@@ -144,12 +144,15 @@ namespace slib
 			if (desc.flagUnderline) {
 				style |= Gdiplus::FontStyleUnderline;
 			}
+			if (desc.flagStrikeout) {
+				style |= Gdiplus::FontStyleStrikeout;
+			}
 			String16 fontName = desc.familyName;
 			Gdiplus::Font* font = new Gdiplus::Font(
-				(LPCWSTR)(fontName.getData())
-				, desc.size
-				, style
-				, Gdiplus::UnitPixel);
+				(LPCWSTR)(fontName.getData()),
+				desc.size,
+				style,
+				Gdiplus::UnitPixel);
 
 			m_fontGdiplus = font;
 
@@ -188,12 +191,18 @@ namespace slib
 			} else {
 				bUnderline = FALSE;
 			}
+			DWORD bStrikeout;
+			if (desc.flagStrikeout) {
+				bStrikeout = TRUE;
+			} else {
+				bStrikeout = FALSE;
+			}
 			String16 fontName = desc.familyName;
-			HFONT hFont = ::CreateFontW(height, 0, 0, 0, weight, bItalic, bUnderline
-				, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS
-				, ANTIALIASED_QUALITY
-				, DEFAULT_PITCH
-				, (LPCWSTR)(fontName.getData()));
+			HFONT hFont = ::CreateFontW(height, 0, 0, 0, weight, bItalic, bUnderline, bStrikeout,
+				DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+				ANTIALIASED_QUALITY,
+				DEFAULT_PITCH,
+				(LPCWSTR)(fontName.getData()));
 
 			m_fontGDI = hFont;
 

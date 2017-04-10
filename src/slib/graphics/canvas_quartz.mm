@@ -155,15 +155,14 @@ namespace slib
 						CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 						CGColorRef color = CGColorCreate(colorSpace, colorComponents);
 						CFRelease(colorSpace);
-						
 						CFStringRef keys[] = { kCTFontAttributeName, kCTUnderlineStyleAttributeName, kCTForegroundColorAttributeName };
 						CFTypeRef values[] = { font, underline, color };
 						CFDictionaryRef attributes = CFDictionaryCreate(
-																		kCFAllocatorDefault
-																		, (const void**)&keys, (const void**)&values
-																		, sizeof(keys) / sizeof(keys[0])
-																		, &kCFCopyStringDictionaryKeyCallBacks
-																		, &kCFTypeDictionaryValueCallBacks);
+																		kCFAllocatorDefault,
+																		(const void**)&keys, (const void**)&values,
+																		sizeof(keys) / sizeof(keys[0]),
+																		&kCFCopyStringDictionaryKeyCallBacks,
+																		&kCFTypeDictionaryValueCallBacks);
 						if (attributes) {
 							CFAttributedStringRef attrString = CFAttributedStringCreate(kCFAllocatorDefault, string, attributes);
 							if (attrString) {
@@ -183,6 +182,17 @@ namespace slib
 									CGContextSetTextMatrix(m_graphics, trans);
 									
 									CTLineDraw(line, m_graphics);
+									
+									if (_font->isStrikeout()) {
+										CGFloat yStrike = descent + ascent / 2;
+										CGFloat widthStrike = _font->measureText(text).x;
+										CGContextBeginPath(m_graphics);
+										CGContextMoveToPoint(m_graphics, 0, yStrike);
+										CGContextAddLineToPoint(m_graphics, widthStrike, yStrike);
+										CGContextSetRGBStrokeColor(m_graphics, _color.getRedF(), _color.getGreenF(), _color.getBlueF(), _color.getAlphaF());
+										CGContextStrokePath(m_graphics);
+									}
+									
 									CGContextRestoreGState(m_graphics);
 									CFRelease(line);
 								}

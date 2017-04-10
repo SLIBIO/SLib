@@ -22,6 +22,7 @@ namespace slib
 		flagBold = sl_false;
 		flagItalic = sl_false;
 		flagUnderline = sl_false;
+		flagStrikeout = sl_false;
 	}
 
 	FontDesc::~FontDesc()
@@ -74,7 +75,7 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<Font> Font::create(String familyName, sl_real size, sl_bool flagBold, sl_bool flagItalic, sl_bool flagUnderline)
+	Ref<Font> Font::create(String familyName, sl_real size, sl_bool flagBold, sl_bool flagItalic, sl_bool flagUnderline, sl_bool flagStrikeout)
 	{
 		Ref<Font> ret = new Font;
 		if (ret.isNotNull()) {
@@ -83,6 +84,7 @@ namespace slib
 			ret->m_desc.flagBold = flagBold;
 			ret->m_desc.flagItalic = flagItalic;
 			ret->m_desc.flagUnderline = flagUnderline;
+			ret->m_desc.flagStrikeout = flagStrikeout;
 			return ret;
 		}
 		return sl_null;
@@ -116,6 +118,11 @@ namespace slib
 	sl_bool Font::isUnderline()
 	{
 		return m_desc.flagUnderline;
+	}
+	
+	sl_bool Font::isStrikeout()
+	{
+		return m_desc.flagStrikeout;
 	}
 
 	sl_bool Font::getFontMetrics(FontMetrics& _out)

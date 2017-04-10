@@ -736,9 +736,13 @@ namespace slib
 		
 		virtual void setFont(const Ref<Font>& font, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void setFont(const String& fontFamily, sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setFont(const String& fontFamily, sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false, sl_bool flagStrikeout = sl_false, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void setFontAttributes(sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setFontAttributes(sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false, sl_bool flagStrikeout = sl_false, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		sl_real getFontSize();
+		
+		void setFontSize(sl_real size, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 		sl_bool isUsingFont();
 		

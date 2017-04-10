@@ -84,6 +84,9 @@ namespace slib
 			if (desc.flagUnderline) {
 				style |= 4;
 			}
+			if (desc.flagStrikeout) {
+				style |= 8;
+			}
 			float size = (float)(desc.size);
 			JniLocal<jstring> fontName = Jni::getJniString(desc.familyName);
 			JniLocal<jobject> jfont = _JAndroidFont::create.callObject(sl_null, fontName.value, size, style);

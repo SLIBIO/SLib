@@ -734,7 +734,8 @@ namespace slib
 								mat *= state->matrix;
 								mat *= m_matViewport;
 								scope->setTransform(mat);
-								if (textureBefore != texture) {
+								Ref<TextureInstance> textureInstance = m_engine->linkTexture(texture);
+								if (textureBefore != texture || (textureInstance.isNotNull() && textureInstance->_isUpdated())) {
 									scope->setTexture(texture);
 									textureBefore = texture;
 								}
@@ -745,6 +746,20 @@ namespace slib
 					}
 				}
 				fx = fxn;
+			}
+		}
+		
+		if (font->isStrikeout() || font->isUnderline()) {
+			Ref<Pen> pen = Pen::createSolidPen(1, _color);
+			FontMetrics fm;
+			font->getFontMetrics(fm);
+			if (font->isUnderline()) {
+				sl_real yLine = y + fm.leading + fm.ascent;
+				drawLine(Point(x, yLine), Point(fx, yLine), pen);
+			}
+			if (font->isStrikeout()) {
+				sl_real yLine = y + fm.leading + fm.ascent / 2;
+				drawLine(Point(x, yLine), Point(fx, yLine), pen);
 			}
 		}
 		

@@ -270,6 +270,22 @@ namespace slib
 
 						::cairo_show_text(m_graphics, text.getData());
 
+						if (_font->isStrikeout() || _font->isUnderline()) {
+							sl_real width = _font->measureText(text).x;
+							if (_font->isUnderline()) {
+								sl_real yLine = y;
+								::cairo_move_to(m_graphics, 0, yLine);
+								::cairo_line_to(m_graphics, width, yLine);
+								::cairo_stroke(m_graphics);
+							}
+							if (_font->isStrikeout()) {
+								sl_real yLine = y - fm.ascent / 2;
+								::cairo_move_to(m_graphics, 0, yLine);
+								::cairo_line_to(m_graphics, width, yLine);
+								::cairo_stroke(m_graphics);
+							}
+						}
+
 					}
 
 				}
