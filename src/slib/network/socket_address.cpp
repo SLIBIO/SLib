@@ -172,17 +172,17 @@ namespace slib
 	
 	
 	template <class CT>
-	static sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_size pos, sl_size len)
+	static sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_size pos, sl_size posEnd)
 	{
-		if (pos >= len) {
+		if (pos >= posEnd) {
 			return SLIB_PARSE_ERROR;
 		}
 		IPAddress ip;
 		if (sz[0] == '[') {
 			IPv6Address addr;
 			pos++;
-			pos = Parser<IPv6Address, CT>::parse(&addr, sz, pos, len);
-			if (pos == SLIB_PARSE_ERROR || pos >= len) {
+			pos = Parser<IPv6Address, CT>::parse(&addr, sz, pos, posEnd);
+			if (pos == SLIB_PARSE_ERROR || pos >= posEnd) {
 				return SLIB_PARSE_ERROR;
 			}
 			if (sz[pos] != ']') {
@@ -192,13 +192,13 @@ namespace slib
 			ip = addr;
 		} else {
 			IPv4Address addr;
-			pos = Parser<IPv4Address, CT>::parse(&addr, sz, pos, len);
+			pos = Parser<IPv4Address, CT>::parse(&addr, sz, pos, posEnd);
 			if (pos == SLIB_PARSE_ERROR) {
 				return SLIB_PARSE_ERROR;
 			}
 			ip = addr;
 		}
-		if (pos >= len) {
+		if (pos >= posEnd) {
 			return SLIB_PARSE_ERROR;
 		}
 		if (sz[pos] != ':') {
@@ -206,7 +206,7 @@ namespace slib
 		}
 		pos++;
 		sl_uint32 port;
-		pos = StringTypeFromCharType<CT>::Type::parseUint32(10, &port, sz, pos, len);
+		pos = StringTypeFromCharType<CT>::Type::parseUint32(10, &port, sz, pos, posEnd);
 		if (pos == SLIB_PARSE_ERROR) {
 			return SLIB_PARSE_ERROR;
 		}
@@ -218,15 +218,15 @@ namespace slib
 	}
 	
 	template <>
-	sl_reg Parser<SocketAddress, sl_char8>::parse(SocketAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size len)
+	sl_reg Parser<SocketAddress, sl_char8>::parse(SocketAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _SocketAddress_parse(_out, sz, posBegin, len);
+		return _SocketAddress_parse(_out, sz, posBegin, posEnd);
 	}
 	
 	template <>
-	sl_reg Parser<SocketAddress, sl_char16>::parse(SocketAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size len)
+	sl_reg Parser<SocketAddress, sl_char16>::parse(SocketAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _SocketAddress_parse(_out, sz, posBegin, len);
+		return _SocketAddress_parse(_out, sz, posBegin, posEnd);
 	}
 	
 	sl_bool SocketAddress::parseIPv4Range(const String& str, IPv4Address* _from, IPv4Address* _to)

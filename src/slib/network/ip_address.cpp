@@ -208,15 +208,15 @@ namespace slib
 	}
 
 	template <>
-	sl_reg Parser<IPv4Address, sl_char8>::parse(IPv4Address* _out, const sl_char8 *sz, sl_size posBegin, sl_size len)
+	sl_reg Parser<IPv4Address, sl_char8>::parse(IPv4Address* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _IPv4Address_parse(_out, sz, posBegin, len);
+		return _IPv4Address_parse(_out, sz, posBegin, posEnd);
 	}
 
 	template <>
-	sl_reg Parser<IPv4Address, sl_char16>::parse(IPv4Address* _out, const sl_char16 *sz, sl_size posBegin, sl_size len)
+	sl_reg Parser<IPv4Address, sl_char16>::parse(IPv4Address* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _IPv4Address_parse(_out, sz, posBegin, len);
+		return _IPv4Address_parse(_out, sz, posBegin, posEnd);
 	}
 
 
@@ -547,15 +547,15 @@ namespace slib
 	}
 
 	template <>
-	sl_reg Parser<IPv6Address, sl_char8>::parse(IPv6Address* _out, const sl_char8 *sz, sl_size posBegin, sl_size len)
+	sl_reg Parser<IPv6Address, sl_char8>::parse(IPv6Address* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _IPv6Address_parse(_out, sz, posBegin, len);
+		return _IPv6Address_parse(_out, sz, posBegin, posEnd);
 	}
 
 	template <>
-	sl_reg Parser<IPv6Address, sl_char16>::parse(IPv6Address* _out, const sl_char16 *sz, sl_size posBegin, sl_size len)
+	sl_reg Parser<IPv6Address, sl_char16>::parse(IPv6Address* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _IPv6Address_parse(_out, sz, posBegin, len);
+		return _IPv6Address_parse(_out, sz, posBegin, posEnd);
 	}
 
 	IPv6Address& IPv6Address::operator=(const IPv6Address& other) = default;
@@ -725,14 +725,14 @@ namespace slib
 
 
 	template <class CT>
-	static sl_reg _IPAddress_parse(IPAddress* obj, const CT* sz, sl_size posStart, sl_size len)
+	static sl_reg _IPAddress_parse(IPAddress* obj, const CT* sz, sl_size posStart, sl_size posEnd)
 	{
-		if (posStart >= len) {
+		if (posStart >= posEnd) {
 			return SLIB_PARSE_ERROR;
 		}
 		sl_reg index;
 		IPv4Address a4;
-		index = Parser<IPv4Address, CT>::parse(&a4, sz, posStart, len);
+		index = Parser<IPv4Address, CT>::parse(&a4, sz, posStart, posEnd);
 		if (index != SLIB_PARSE_ERROR) {
 			if (obj) {
 				*obj = a4;
@@ -740,7 +740,7 @@ namespace slib
 			return index;
 		}
 		IPv6Address a6;
-		index = Parser<IPv6Address, CT>::parse(&a6, sz, posStart, len);
+		index = Parser<IPv6Address, CT>::parse(&a6, sz, posStart, posEnd);
 		if (index != SLIB_PARSE_ERROR) {
 			if (obj) {
 				*obj = a6;
@@ -751,15 +751,15 @@ namespace slib
 	}
 
 	template <>
-	sl_reg Parser<IPAddress, sl_char8>::parse(IPAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size len)
+	sl_reg Parser<IPAddress, sl_char8>::parse(IPAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _IPAddress_parse(_out, sz, posBegin, len);
+		return _IPAddress_parse(_out, sz, posBegin, posEnd);
 	}
 
 	template <>
-	sl_reg Parser<IPAddress, sl_char16>::parse(IPAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size len)
+	sl_reg Parser<IPAddress, sl_char16>::parse(IPAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _IPAddress_parse(_out, sz, posBegin, len);
+		return _IPAddress_parse(_out, sz, posBegin, posEnd);
 	}
 
 	IPAddress& IPAddress::operator=(const IPAddress& other) = default;

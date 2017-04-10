@@ -189,15 +189,15 @@ namespace slib
 	}
 
 	template <>
-	sl_reg Parser<MacAddress, sl_char8>::parse(MacAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size len)
+	sl_reg Parser<MacAddress, sl_char8>::parse(MacAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _MacAddress_parse(_out, sz, posBegin, len);
+		return _MacAddress_parse(_out, sz, posBegin, posEnd);
 	}
 
 	template <>
-	sl_reg Parser<MacAddress, sl_char16>::parse(MacAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size len)
+	sl_reg Parser<MacAddress, sl_char16>::parse(MacAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _MacAddress_parse(_out, sz, posBegin, len);
+		return _MacAddress_parse(_out, sz, posBegin, posEnd);
 	}
 
 

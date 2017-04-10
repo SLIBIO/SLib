@@ -925,14 +925,14 @@ namespace slib
 		return SLIB_PARSE_ERROR;
 	}
 
-	sl_reg Time::parseElements(sl_int32* outArrayYMDHMS, const sl_char8* sz, sl_size posBegin, sl_size len)
+	sl_reg Time::parseElements(sl_int32* outArrayYMDHMS, const sl_char8* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _Time_parseElements(outArrayYMDHMS, sz, 0, len);
+		return _Time_parseElements(outArrayYMDHMS, sz, 0, posEnd);
 	}
 
-	sl_reg Time::parseElements(sl_int32* outArrayYMDHMS, const sl_char16* sz, sl_size posBegin, sl_size len)
+	sl_reg Time::parseElements(sl_int32* outArrayYMDHMS, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _Time_parseElements(outArrayYMDHMS, sz, 0, len);
+		return _Time_parseElements(outArrayYMDHMS, sz, 0, posEnd);
 	}
 
 	sl_bool Time::parseElements(const String& time, sl_int32* outArrayYMDHMS)
@@ -1005,15 +1005,15 @@ namespace slib
 	}
 
 	template <>
-	sl_reg Parser<Time, sl_char8>::parse(Time* _out, const sl_char8 *sz, sl_size posBegin, sl_size len)
+	sl_reg Parser<Time, sl_char8>::parse(Time* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _Time_parse(_out, sz, posBegin, len);
+		return _Time_parse(_out, sz, posBegin, posEnd);
 	}
 
 	template <>
-	sl_reg Parser<Time, sl_char16>::parse(Time* _out, const sl_char16 *sz, sl_size posBegin, sl_size len)
+	sl_reg Parser<Time, sl_char16>::parse(Time* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _Time_parse(_out, sz, posBegin, len);
+		return _Time_parse(_out, sz, posBegin, posEnd);
 	}
 
 	Time& Time::operator=(const String& time)

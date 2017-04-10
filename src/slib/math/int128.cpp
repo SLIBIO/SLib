@@ -866,15 +866,15 @@ namespace slib
 
 
 	template <>
-	sl_reg IntParser<Uint128, sl_char8>::parse(Uint128* _out, sl_uint32 radix, const sl_char8 *sz, sl_size posBegin, sl_size len)
+	sl_reg IntParser<Uint128, sl_char8>::parse(Uint128* _out, sl_uint32 radix, const sl_char8 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _Uint128_parseString(_out, sz, posBegin, len, radix);
+		return _Uint128_parseString(_out, sz, posBegin, posEnd, radix);
 	}
 
 	template <>
-	sl_reg IntParser<Uint128, sl_char16>::parse(Uint128* _out, sl_uint32 radix, const sl_char16 *sz, sl_size posBegin, sl_size len)
+	sl_reg IntParser<Uint128, sl_char16>::parse(Uint128* _out, sl_uint32 radix, const sl_char16 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _Uint128_parseString(_out, sz, posBegin, len, radix);
+		return _Uint128_parseString(_out, sz, posBegin, posEnd, radix);
 	}
 
 

@@ -5677,14 +5677,14 @@ namespace slib
 		return i;
 	}
 
-	sl_reg String::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char8* sz, sl_size posBegin, sl_size len)
+	sl_reg String::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char8* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseInt(radix, sz, posBegin, len, _out);
+		return _String_parseInt(radix, sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
+	sl_reg String16::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseInt(radix, sz, posBegin, len, _out);
+		return _String_parseInt(radix, sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseInt32(sl_int32 radix, sl_int32* _out) const
@@ -5744,14 +5744,14 @@ namespace slib
 	}
 
 
-	sl_reg String::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char8* sz, sl_size posBegin, sl_size len)
+	sl_reg String::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char8* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseUint(radix, sz, posBegin, len, _out);
+		return _String_parseUint(radix, sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
+	sl_reg String16::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseUint(radix, sz, posBegin, len, _out);
+		return _String_parseUint(radix, sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseUint32(sl_int32 radix, sl_uint32* _out) const
@@ -5811,14 +5811,14 @@ namespace slib
 	}
 
 
-	sl_reg String::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char8* sz, sl_size posBegin, sl_size len)
+	sl_reg String::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char8* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseInt(radix, sz, posBegin, len, _out);
+		return _String_parseInt(radix, sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
+	sl_reg String16::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseInt(radix, sz, posBegin, len, _out);
+		return _String_parseInt(radix, sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseInt64(sl_int32 radix, sl_int64* _out) const
@@ -5878,14 +5878,14 @@ namespace slib
 	}
 
 
-	sl_reg String::parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_size posBegin, sl_size len)
+	sl_reg String::parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseUint(radix, sz, posBegin, len, _out);
+		return _String_parseUint(radix, sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
+	sl_reg String16::parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseUint(radix, sz, posBegin, len, _out);
+		return _String_parseUint(radix, sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseUint64(sl_int32 radix, sl_uint64* _out) const
@@ -6167,14 +6167,14 @@ namespace slib
 		return i;
 	}
 
-	sl_reg String::parseFloat(float* _out, const char* sz, sl_size posBegin, sl_size len)
+	sl_reg String::parseFloat(float* _out, const char* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseFloat(sz, posBegin, len, _out);
+		return _String_parseFloat(sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseFloat(float* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
+	sl_reg String16::parseFloat(float* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseFloat(sz, posBegin, len, _out);
+		return _String_parseFloat(sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseFloat(float* _out) const
@@ -6234,14 +6234,14 @@ namespace slib
 	}
 
 
-	sl_reg String::parseDouble(double* _out, const char* sz, sl_size posBegin, sl_size n)
+	sl_reg String::parseDouble(double* _out, const char* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseFloat(sz, posBegin, n, _out);
+		return _String_parseFloat(sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseDouble(double* _out, const sl_char16* sz, sl_size posBegin, sl_size n)
+	sl_reg String16::parseDouble(double* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseFloat(sz, posBegin, n, _out);
+		return _String_parseFloat(sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseDouble(double* _out) const
@@ -6386,14 +6386,14 @@ namespace slib
 		return i;
 	}
 
-	sl_reg String::parseBoolean(sl_bool* _out, const char* sz, sl_size posBegin, sl_size len)
+	sl_reg String::parseBoolean(sl_bool* _out, const char* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseBoolean(sz, posBegin, len, _out);
+		return _String_parseBoolean(sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseBoolean(sl_bool* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
+	sl_reg String16::parseBoolean(sl_bool* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseBoolean(sz, posBegin, len, _out);
+		return _String_parseBoolean(sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseBoolean(sl_bool* _out) const
@@ -6492,14 +6492,14 @@ namespace slib
 		return i;
 	}
 
-	sl_reg String::parseHexString(void* _out, const char* sz, sl_size posBegin, sl_size len)
+	sl_reg String::parseHexString(void* _out, const char* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseHexString(sz, posBegin, len, _out);
+		return _String_parseHexString(sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseHexString(void* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
+	sl_reg String16::parseHexString(void* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseHexString(sz, posBegin, len, _out);
+		return _String_parseHexString(sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseHexString(void* _out) const

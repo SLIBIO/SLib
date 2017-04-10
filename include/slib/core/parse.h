@@ -24,7 +24,7 @@ namespace slib
 	class Parser
 	{
 	public:
-		static sl_reg parse(ObjectType* _out, CharType const* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+		static sl_reg parse(ObjectType* _out, CharType const* sz, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX);
 
 	};
 
@@ -32,7 +32,7 @@ namespace slib
 	class IntParser
 	{
 	public:
-		static sl_reg parse(ObjectType* _out, sl_uint32 radix, CharType const* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+		static sl_reg parse(ObjectType* _out, sl_uint32 radix, CharType const* sz, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX);
 
 	};
 

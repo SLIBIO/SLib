@@ -349,9 +349,9 @@ namespace slib
 		String format(const sl_char16* fmt) const;
 	
 
-		static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char8* sz, sl_size posStart = 0, sl_size len = SLIB_SIZE_MAX);
+		static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char8* sz, sl_size posStart = 0, sl_size posEnd = SLIB_SIZE_MAX);
 
-		static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char16* sz, sl_size posStart = 0, sl_size len = SLIB_SIZE_MAX);
+		static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char16* sz, sl_size posStart = 0, sl_size posEnd = SLIB_SIZE_MAX);
 
 		static sl_bool parseElements(const String& time, sl_int32* outArrayYMDHMS);
 
@@ -390,10 +390,10 @@ namespace slib
 	};
 	
 	template <>
-	sl_reg Parser<Time, sl_char8>::parse(Time* _out, const sl_char8 *sz, sl_size posBegin, sl_size len);
+	sl_reg Parser<Time, sl_char8>::parse(Time* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd);
 	
 	template <>
-	sl_reg Parser<Time, sl_char16>::parse(Time* _out, const sl_char16 *sz, sl_size posBegin, sl_size len);
+	sl_reg Parser<Time, sl_char16>::parse(Time* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd);
 	
 	class SLIB_EXPORT TimeCounter
 	{

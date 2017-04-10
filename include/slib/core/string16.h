@@ -48,9 +48,9 @@ namespace slib
 		
 	};
 	
-	/** @class String16
-	 * @brief String16 class provides an extensive set of APIs for working with strings, including method for comparing,
-	 searching, and modifying strings.
+	/**
+	 * @class String16
+	 * @brief String16 class provides an extensive set of APIs for working with strings, including method for comparing, searching, and modifying strings.
 	 */
 	class SLIB_EXPORT String16
 	{
@@ -1246,233 +1246,293 @@ namespace slib
 		
 	public:
 		/**
-		 * Parses string argument and outputs a 32 bit integer of the specified radix
+		 * Convert string to a 32 bit integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param _out Pointer to a store where the resulting 32 bit integer is stored.
-		 * @param sz This is a string representation of decimal
-		 * @param posBegin The zero-based index of the first character in this string object.
-		 * @param len The number of characters to parse from this string object.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[out] value Pointer to the result output
+		 * @param[in] str String containing the integer
+		 * @param[in] posBegin Zero-based position of the integer
+		 * @param[in] posEnd Maximum length of the input string. Parser will stop at this position or at null found before this position.
+		 * 
+		 * @return the position after the integer if a valid integer is found at position of `posBegin`, otherwise returns `SLIB_PARSE_ERROR`.
 		 */
-		static sl_reg parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16*sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+		static sl_reg parseInt32(sl_int32 radix, sl_int32* value, const sl_char16* str, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX);
 		
 		/**
-		 * Parses string argument and outputs a 32 bit integer of the specified radix
+		 * Convert this string to a 32 bit integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param _out Pointer to a store where the resulting 32 bit integer is stored.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[out] value Pointer to the result output
+		 *
+		 * @return `true` if this string is valid integer
 		 */
-		sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
+		sl_bool parseInt32(sl_int32 radix, sl_int32* value) const;
 		
 		/**
-		 * Parses string argument and returns a 32 bit integer of the specified radix
+		 * Convert this string to a 32 bit integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param def Returns def if parsing is failed.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[in] def Default return value for the non-integer string
+		 *
+		 * @return Result integer if the conversion is successful, otherwise returns `def`
 		 */
 		sl_int32 parseInt32(sl_int32 radix = 10, sl_int32 def = 0) const;
 		
 		/**
-		 * Parses string argument and outputs an unsigned 32 bit integer of the specified radix
+		 * Convert the string (`str`) to a 32 bit unsigned integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param _out Pointer to a store where the resulting unsigned 32 bit integer is stored.
-		 * @param sz This is a string representation of decimal.
-		 * @param posBegin The zero-based index of the first character in this string object.
-		 * @param len The number of characters to parse from this string object.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[out] value Pointer to the result output
+		 * @param[in] str String containing the integer
+		 * @param[in] posBegin Zero-based position of the integer
+		 * @param[in] posEnd Maximum length of the input string. Parser will stop at this position or at null found before this position.
+		 *
+		 * @return the position after the integer if a valid integer is found at position of `posBegin`, otherwise returns `SLIB_PARSE_ERROR`.
 		 */
-		static sl_reg parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+		static sl_reg parseUint32(sl_int32 radix, sl_uint32* value, const sl_char16* str, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX);
 		
 		/**
-		 * Parses string argument and outputs an unsigned 32 bit integer of the specified radix
+		 * Convert this string to a 32 bit unsigned integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param _out Pointer to a store where the resulting unsigned 32 bit integer is stored.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[out] value Pointer to the result output
+		 *
+		 * @return `true` if this string is valid integer
 		 */
-		sl_bool parseUint32(sl_int32 radix, sl_uint32* _out) const;
+		sl_bool parseUint32(sl_int32 radix, sl_uint32* value) const;
 		
 		/**
-		 * Parses string argument and returns an unsigned 32 bit integer of the specified radix
+		 * Convert this string to a 32 bit unsigned integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param def Returns def if parsing is failed.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[in] def Default return value for the non-integer string
+		 *
+		 * @return Result integer if the conversion is successful, otherwise returns `def`
 		 */
 		sl_uint32 parseUint32(sl_int32 radix = 10, sl_uint32 def = 0) const;
 		
 		/**
-		 * Parses string argument and outputs a 64 bit integer of the specified radix
+		 * Convert the string (`str`) to a 64 bit integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param _out Pointer to a store where the resulting 64 bit integer is stored.
-		 * @param sz This is a string representation of decimal.
-		 * @param posBegin The zero-based index of the first character in this string object.
-		 * @param len The number of characters to parse from this string object.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[out] value Pointer to the result output
+		 * @param[in] str String containing the integer
+		 * @param[in] posBegin Zero-based position of the integer
+		 * @param[in] posEnd Maximum length of the input string. Parser will stop at this position or at null found before this position.
+		 *
+		 * @return the position after the integer if a valid integer is found at position of `posBegin`, otherwise returns `SLIB_PARSE_ERROR`.
 		 */
-		static sl_reg parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+		static sl_reg parseInt64(sl_int32 radix, sl_int64* value, const sl_char16* str, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX);
 		
 		/**
-		 * Parses string argument and outputs a 64 bit integer of the specified radix
+		 * Convert this string to a 64 bit integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param _out Pointer to a store where the resulting 64 bit integer is stored.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[out] value Pointer to the result output
+		 *
+		 * @return `true` if this string is valid integer
 		 */
-		sl_bool parseInt64(sl_int32 radix, sl_int64* _out) const;
+		sl_bool parseInt64(sl_int32 radix, sl_int64* value) const;
 		
 		/**
-		 * Parses string argument and returns a 64 bit integer of the specified radix
+		 * Convert this string to a 64 bit integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param def Returns def if parsing is failed.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[in] def Default return value for the non-integer string
+		 *
+		 * @return Result integer if the conversion is successful, otherwise returns `def`
 		 */
 		sl_int64 parseInt64(sl_int32 radix = 10, sl_int64 def = 0) const;
 		
 		/**
-		 * Parses string argument and outputs an unsigned 64 bit integer of the specified radix
+		 * Convert the string (`str`) to a 64 bit unsigned integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param _out Pointer to a store where the resulting unsigned 64 bit integer is stored.
-		 * @param sz This is a string representation of decimal.
-		 * @param posBegin The zero-based index of the first character in this string object.
-		 * @param len The number of characters to parse from this string object.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[out] value Pointer to the result output
+		 * @param[in] str String containing the integer
+		 * @param[in] posBegin Zero-based position of the integer
+		 * @param[in] posEnd Maximum length of the input string. Parser will stop at this position or at null found before this position.
+		 *
+		 * @return the position after the integer if a valid integer is found at position of `posBegin`, otherwise returns `SLIB_PARSE_ERROR`.
 		 */
-		static sl_reg parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+		static sl_reg parseUint64(sl_int32 radix, sl_uint64* value, const sl_char16* str, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX);
 		
 		/**
-		 * Parses string argument and outputs an unsigned 64 bit integer of the specified radix
+		 * Convert this string to a 64 bit unsigned integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param _out Pointer to a store where the resulting unsigned 64 bit integer is stored.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[out] value Pointer to the result output
+		 *
+		 * @return `true` if this string is valid integer
 		 */
-		sl_bool parseUint64(sl_int32 radix, sl_uint64* _out) const;
+		sl_bool parseUint64(sl_int32 radix, sl_uint64* value) const;
 		
 		/**
-		 * Parses string argument and outputs an unsigned 64 bit integer of the specified radix
+		 * Convert this string to a 64 bit unsigned integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param def Returns def if parsing is failed.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[in] def Default return value for the non-integer string
+		 *
+		 * @return Result integer if the conversion is successful, otherwise returns `def`
 		 */
 		sl_uint64 parseUint64(sl_int32 radix = 10, sl_uint64 def = 0) const;
 		
 		/**
-		 * Parses string argument and outputs an integer of the specified radix
+		 * Convert this string to an integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param _out Pointer to a store where the resulting integer is stored.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[out] value Pointer to the result output
+		 *
+		 * @return `true` if this string is valid integer
 		 */
-		sl_bool parseInt(sl_int32 radix, sl_reg* _out) const;
+		sl_bool parseInt(sl_int32 radix, sl_reg* value) const;
 		
 		/**
-		 * Parses string argument and outputs an integer of the specified radix
+		 * Convert this string to an integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param def Returns def if parsing is failed.
-		 **/
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[in] def Default return value for the non-integer string
+		 *
+		 * @return Result integer if the conversion is successful, otherwise returns `def`
+		 */
 		sl_reg parseInt(sl_int32 radix = 10, sl_reg def = 0) const;
 		
 		/**
-		 * Parses string argument and outputs an unsigned integer of the specified radix
+		 * Convert this string to an unsigned integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param _out Pointer to a store where the resulting unsigned integer is stored.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[out] value Pointer to the result output
+		 *
+		 * @return `true` if this string is valid integer
 		 */
-		sl_bool parseSize(sl_int32 radix, sl_size* _out) const;
+		sl_bool parseSize(sl_int32 radix, sl_size* value) const;
 		
 		/**
-		 * Parses string argument and returns an unsigned integer of the specified radix
+		 * Convert this string to an unsigned integer of the specified radix.
 		 *
-		 * @param radix This would be used to convert String into integer.
-		 * @param def Returns def if parsign is failed.
+		 * @param[in] radix Numerical base used to represent the integer. For example, use 10 for the decimal system.
+		 * @param[in] def Default return value for the non-integer string
+		 *
+		 * @return Result integer if the conversion is successful, otherwise returns `def`
 		 */
 		sl_size parseSize(sl_int32 radix = 10, sl_size def = 0) const;
 		
 		/**
-		 * Parses a string argument and returns a floating point number.
+		 * Convert the string (`str`) to a float number value
 		 *
-		 * @param _out Pointer to a store where the resulting floating point is stored.
-		 * @param sz This is a string representation.
-		 * @param posBegin The zero-based index of the first character in this string object.
-		 * @param len The number of characters to parse from this string object.
+		 * @param[out] value Pointer to the result output
+		 * @param[in] str String to convert
+		 * @param[in] posBegin Zero-based position of the number
+		 * @param[in] posEnd Maximum length of the input string. Parser will stop at this position or at null found before this position.
+		 *
+		 * @return the position after the number if a valid number is found at position of `posBegin`, otherwise returns `SLIB_PARSE_ERROR`.
 		 */
-		static sl_reg parseFloat(float* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+		static sl_reg parseFloat(float* value, const sl_char16* str, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX);
 		
 		/**
-		 * Parses a string argument and returns a floating point number.
+		 * Convert this string to a float number value.
 		 *
-		 * @param _out Pointer to a store where the resulting flfloating pointoat is stored.
+		 * @param[out] value Pointer to the result output
+		 *
+		 * @return `true` if the conversion is success
 		 */
-		sl_bool parseFloat(float* _out) const;
+		sl_bool parseFloat(float* value) const;
 		
 		/**
-		 * Parses string argument and outputs float of the specified radix
+		 * Convert this string to a float number value.
 		 *
-		 * @param def Returns def if parsing is failed.
+		 * @param[in] def Default return value on failure
+		 *
+		 * @return Result value if the conversion is successful, otherwise returns `def`
 		 */
 		float parseFloat(float def = 0) const;
 		
 		/**
-		 * Outputs a new double initialized to the value represented by the specified String
+		 * Convert the string (`str`) to a double number value
 		 *
-		 * @param _out Pointer to a store.
-		 * @param sz The string to be parsed.
-		 * @param posBegin The zero-based index of the first character in this string object.
-		 * @param len The number of characters to parse from this string object.
+		 * @param[out] value Pointer to the result output
+		 * @param[in] str String to convert
+		 * @param[in] posBegin Zero-based position of the number
+		 * @param[in] posEnd Maximum length of the input string. Parser will stop at this position or at null found before this position.
+		 *
+		 * @return the position after the number if a valid number is found at position of `posBegin`, otherwise returns `SLIB_PARSE_ERROR`.
 		 */
-		static sl_reg parseDouble(double* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+		static sl_reg parseDouble(double* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX);
 		
 		/**
-		 * Outputs a new double initialized to the value represented by the specified String
+		 * Convert this string to a double number value.
 		 *
-		 * @param _out Pointer to a store.
+		 * @param[out] value Pointer to the result output
+		 *
+		 * @return `true` if the conversion is success
 		 */
 		sl_bool parseDouble(double* _out) const;
 		
 		/**
-		 * Outputs a new double initialized to the value represented by the specified String
+		 * Convert this string to a double number value.
 		 *
-		 * @param def Returns def if parsing is failed.
+		 * @param[in] def Default return value on failure
+		 *
+		 * @return Result value if the conversion is successful, otherwise returns `def`
 		 */
 		double parseDouble(double def = 0) const;
 		
 		/**
-		 * Parses the string as a boolean.
+		 * Convert the string (`str`) to a boolean value.
+		 * "yes", "YES", "Yes", "true", "TRUE" and "True" are converted to `true`.
+		 * "no", "NO", "No", "false", "FALSE" and "False" are converted to `false`.
 		 *
-		 * @param _out Pointer to a store.
-		 * @param sz The string to be parsed.
-		 * @param posBegin The zero-based index of the first character in this string object.
-		 * @param len The number of characters to parse from this string object.
+		 * @param[out] value Pointer to the result output
+		 * @param[in] str String to convert
+		 * @param[in] posBegin Zero-based position of the boolean keyword
+		 * @param[in] posEnd Maximum length of the input string. Parser will stop at this position or at null found before this position.
+		 *
+		 * @return the position after the boolean keyword if a valid keyword is found at position of `posBegin`, otherwise returns `SLIB_PARSE_ERROR`.
 		 */
-		static sl_reg parseBoolean(sl_bool* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+		static sl_reg parseBoolean(sl_bool* value, const sl_char16* str, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX);
 		
 		/**
-		 * Parses the string as a boolean.
+		 * Convert this string to a boolean value.
+		 * "yes", "YES", "Yes", "true", "TRUE" and "True" are converted to `true`.
+		 * "no", "NO", "No", "false", "FALSE" and "False" are converted to `false`.
 		 *
-		 * @param _out Pointer to a store.
+		 * @param[out] value Pointer to the result output
+		 *
+		 * @return `true` if the conversion is success
 		 */
-		sl_bool parseBoolean(sl_bool* _out) const;
+		sl_bool parseBoolean(sl_bool* value) const;
 		
 		/**
-		 * Parses the string as a boolean.
+		 * Convert this string to a boolean value.
+		 * "yes", "YES", "Yes", "true", "TRUE" and "True" are converted to `true`.
+		 * "no", "NO", "No", "false", "FALSE" and "False" are converted to `false`.
 		 *
-		 * @param def Returns def if parsing is failed.
+		 * @param[in] def Default return value on failure
+		 *
+		 * @return Result value if the conversion is successful, otherwise returns `def`
 		 */
 		sl_bool parseBoolean(sl_bool def = sl_false) const;
 		
 		/**
-		 * Parses the string as a byte array.
+		 * Parses the hex string and writes the bytes to `output`. Format example, "a1a1a1a1" is converted to 4 bytes of 0xA1.
 		 *
-		 * @param _out Pointer to a store.
-		 * @param sz The string to be parsed.
-		 * @param posBegin The zero-based index of the first character in this string object.
-		 * @param len The number of characters to parse from this string object.
+		 * @param[out] output Pointer to the output buffer.
+		 * @param[in] str The string containing the hex string.
+		 * @param[in] posBegin The zero-based index of the first character in this string object.
+		 * @param[in] posEnd Maximum length of the input string. Parser will stop at this position or at null found before this position.
+		 *
+		 * @return the position after the boolean keyword if a valid keyword is found at position of `posBegin`, otherwise returns `SLIB_PARSE_ERROR`.
 		 */
-		static sl_reg parseHexString(void* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+		static sl_reg parseHexString(void* value, const sl_char16* str, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX);
 		
 		/**
-		 * Parses the string as a byte array.
+		 * Parses this hex string and writes the bytes to `output`. Format example, "a1a1a1a1" is converted to 4 bytes of 0xA1.
 		 *
-		 * @param _out Pointer to a store.
+		 * @param[out] output Pointer to the output buffer.
+		 *
+		 * @return `true` if the conversion is success
 		 */
-		sl_bool parseHexString(void* _out) const;
+		sl_bool parseHexString(void* value) const;
 		
 		/**
 		 * @return the string representation of 32 bit integer argument.
