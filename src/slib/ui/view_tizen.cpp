@@ -507,6 +507,15 @@ namespace slib
 		return UIPlatform::_getViewInstance(handle);
 	}
 	
+	Ref<View> UIPlatform::getView(Evas_Object* handle)
+	{
+		Ref<ViewInstance> instance = UIPlatform::_getViewInstance(handle);
+		if (instance.isNotNull()) {
+			return instance->getView();
+		}
+		return sl_null;
+	}
+
 	void UIPlatform::removeViewInstance(Evas_Object* handle)
 	{
 		UIPlatform::_removeViewInstance(handle);

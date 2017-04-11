@@ -162,6 +162,7 @@ namespace slib
 		static Ref<ViewInstance> createViewInstance(TizenViewType type, Evas_Object* handle, sl_bool flagFreeOnRelease = sl_true);
 		static void registerViewInstance(Evas_Object* handle, ViewInstance* instance);
 		static Ref<ViewInstance> getViewInstance(Evas_Object* handle);
+		static Ref<View> getView(Evas_Object* handle);
 		static void removeViewInstance(Evas_Object* handle);
 		static Evas_Object* getViewHandle(ViewInstance* instance);
 		static Evas_Object* getViewHandle(View* view);
