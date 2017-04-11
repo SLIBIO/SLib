@@ -18,7 +18,7 @@
 
 #include "view_osx.h"
 
-@interface _Slib_OSX_GLView : Slib_OSX_ViewHandle {
+@interface SLib_macOS_GLView : Slib_OSX_ViewHandle {
 	
 	@public sl_bool m_flagRenderingContinuously;
 	@public sl_bool m_flagRequestRender;
@@ -40,7 +40,7 @@ namespace slib
 	Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* _parent)
 	{
 		OSX_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_OSX_GLView* handle = [[_Slib_OSX_GLView alloc] initWithFrame:frame];
+		SLib_macOS_GLView* handle = [[SLib_macOS_GLView alloc] initWithFrame:frame];
 		if (handle != nil) {
 			[handle _setRenderContinuously:(m_redrawMode == RedrawMode::Continuously)];
 		}
@@ -52,8 +52,8 @@ namespace slib
 	{
 		ObjectLocker lock(this);
 		NSView* view = UIPlatform::getViewHandle(this);
-		if (view != nil && [view isKindOfClass:[_Slib_OSX_GLView class]]) {
-			_Slib_OSX_GLView* v = (_Slib_OSX_GLView*)view;
+		if (view != nil && [view isKindOfClass:[SLib_macOS_GLView class]]) {
+			SLib_macOS_GLView* v = (SLib_macOS_GLView*)view;
 			[v _setRenderContinuously:(mode == RedrawMode::Continuously)];
 		}
 	}
@@ -61,13 +61,13 @@ namespace slib
 	void RenderView::_requestRender_NW()
 	{
 		NSView* view = UIPlatform::getViewHandle(this);
-		if (view != nil && [view isKindOfClass:[_Slib_OSX_GLView class]]) {
-			_Slib_OSX_GLView* v = (_Slib_OSX_GLView*)view;
+		if (view != nil && [view isKindOfClass:[SLib_macOS_GLView class]]) {
+			SLib_macOS_GLView* v = (SLib_macOS_GLView*)view;
 			[v _requestRender];
 		}
 	}
 
-	void _Ui_OSX_GLView_thread(__weak _Slib_OSX_GLView* _handle)
+	void _macOS_GLView_thread(__weak SLib_macOS_GLView* _handle)
 	{
 		Ref<RenderEngine> engine = GL::createEngine();
 		if (engine.isNull()) {
@@ -96,7 +96,7 @@ namespace slib
 			
 			if (Thread::isNotStoppingCurrent()) {
 				
-				_Slib_OSX_GLView* handle = _handle;
+				SLib_macOS_GLView* handle = _handle;
 				if (handle == nil) {
 					return;
 				}
@@ -184,7 +184,7 @@ namespace slib
 
 }
 
-@implementation _Slib_OSX_GLView
+@implementation SLib_macOS_GLView
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -193,7 +193,7 @@ namespace slib
 		m_flagRequestRender = sl_true;
 		m_flagUpdate = sl_true;
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_surfaceNeedsUpdate:) name:NSViewGlobalFrameDidChangeNotification object:self];
-		m_thread = slib::Thread::start(slib::Function<void()>::bind(&(slib::_Ui_OSX_GLView_thread), self));
+		m_thread = slib::Thread::start(slib::Function<void()>::bind(&(slib::_macOS_GLView_thread), self));
 	}
 	return self;
 }

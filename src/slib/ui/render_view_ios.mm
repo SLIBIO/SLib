@@ -21,7 +21,7 @@
 
 #include <GLKit/GLKit.h>
 
-@interface _Slib_iOS_GLView : GLKView {
+@interface SLib_iOS_GLView : GLKView {
 	
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 	
@@ -44,9 +44,9 @@ namespace slib
 {
 	Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* _parent)
 	{
-		_Slib_iOS_GLView* handle = nil;
+		SLib_iOS_GLView* handle = nil;
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		handle = [[_Slib_iOS_GLView alloc] initWithFrame:frame];
+		handle = [[SLib_iOS_GLView alloc] initWithFrame:frame];
 		IOS_VIEW_CREATE_INSTANCE_END
 		if (handle != nil && ret.isNotNull()) {
 			[handle _init];
@@ -58,8 +58,8 @@ namespace slib
 	void RenderView::_setRedrawMode_NW(RedrawMode mode)
 	{
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_GLView class]]) {
-			_Slib_iOS_GLView* v = (_Slib_iOS_GLView*)handle;
+		if (handle != nil && [handle isKindOfClass:[SLib_iOS_GLView class]]) {
+			SLib_iOS_GLView* v = (SLib_iOS_GLView*)handle;
 			[v _setRenderContinuously:(mode == RedrawMode::Continuously)];
 		}
 	}
@@ -67,30 +67,30 @@ namespace slib
 	void RenderView::_requestRender_NW()
 	{
 		UIView* view = UIPlatform::getViewHandle(this);
-		if (view != nil && [view isKindOfClass:[_Slib_iOS_GLView class]]) {
-			_Slib_iOS_GLView* v = (_Slib_iOS_GLView*)view;
+		if (view != nil && [view isKindOfClass:[SLib_iOS_GLView class]]) {
+			SLib_iOS_GLView* v = (SLib_iOS_GLView*)view;
 			[v _requestRender];
 		}
 	}	
 }
 
-@interface _Slib_iOS_GLViewRenderer : NSObject
+@interface SLib_iOS_GLViewRenderer : NSObject
 {
-	@public __weak _Slib_iOS_GLView* m_view;
+	@public __weak SLib_iOS_GLView* m_view;
 	@public __weak CADisplayLink* m_displayLink;
 	
 	BOOL m_flagRunning;
 }
 @end
 
-@implementation _Slib_iOS_GLViewRenderer
+@implementation SLib_iOS_GLViewRenderer
 
 - (void)onGLRenderFrame
 {
 	if (!m_flagRunning) {
 		return;
 	}
-	_Slib_iOS_GLView* view = m_view;
+	SLib_iOS_GLView* view = m_view;
 	if (view != nil) {
 		BOOL flagVisible = NO;
 		UIView* viewCheck = view;
@@ -147,7 +147,7 @@ namespace slib
 
 @end
 
-@implementation _Slib_iOS_GLView
+@implementation SLib_iOS_GLView
 
 -(void)_init
 {
@@ -166,7 +166,7 @@ namespace slib
 	self.drawableColorFormat = GLKViewDrawableColorFormatRGBA8888;
 	self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
 	
-	_Slib_iOS_GLViewRenderer* renderer = [[_Slib_iOS_GLViewRenderer alloc] init];
+	SLib_iOS_GLViewRenderer* renderer = [[SLib_iOS_GLViewRenderer alloc] init];
 	renderer->m_view = self;
 	m_displayLink = [CADisplayLink displayLinkWithTarget:renderer selector:@selector(onGLRenderFrame)];
 	renderer->m_displayLink = m_displayLink;

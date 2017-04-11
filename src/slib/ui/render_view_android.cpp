@@ -20,23 +20,23 @@
 namespace slib
 {
 
-	class _RenderViewInstance : public Android_ViewInstance
+	class Android_RenderViewInstance : public Android_ViewInstance
 	{
 	public:
 		Ref<RenderEngine> m_renderEngine;
 	};
 
-	void JNICALL _AndroidGLView_nativeOnCreate(JNIEnv* env, jobject _this, jlong jinstance)
+	void JNICALL Android_GLView_nativeOnCreate(JNIEnv* env, jobject _this, jlong jinstance)
 	{
-		Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(Android_ViewInstance::findInstance(jinstance));
+		Ref<Android_RenderViewInstance> instance = Ref<Android_RenderViewInstance>::from(Android_ViewInstance::findInstance(jinstance));
 		if (instance.isNotNull()) {
 			instance->m_renderEngine.setNull();
 		}
 	}
 
-	void JNICALL _AndroidGLView_nativeOnFrame(JNIEnv* env, jobject _this, jlong jinstance, jint width, jint height)
+	void JNICALL Android_GLView_nativeOnFrame(JNIEnv* env, jobject _this, jlong jinstance, jint width, jint height)
 	{
-		Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(Android_ViewInstance::findInstance(jinstance));
+		Ref<Android_RenderViewInstance> instance = Ref<Android_RenderViewInstance>::from(Android_ViewInstance::findInstance(jinstance));
 		if (instance.isNotNull()) {
 			Ref<View> _view = instance->getView();
 			if (RenderView* view = CastInstance<RenderView>(_view.get())) {
@@ -55,15 +55,15 @@ namespace slib
 		}
 	}
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidGLView, "slib/platform/android/ui/view/UiGLView")
+	SLIB_JNI_BEGIN_CLASS(JAndroidGLView, "slib/platform/android/ui/view/UiGLView")
 
 		SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;)Lslib/platform/android/ui/view/UiGLView;")
 
 		SLIB_JNI_STATIC_METHOD(setRenderMode, "_setRenderMode", "(Landroid/view/View;I)Z")
 		SLIB_JNI_STATIC_METHOD(requestRender, "_requestRender", "(Landroid/view/View;)V")
 
-		SLIB_JNI_NATIVE(nativeOnCreate, "nativeOnCreate", "(J)V", _AndroidGLView_nativeOnCreate)
-		SLIB_JNI_NATIVE(nativeOnFrame, "nativeOnFrame", "(JII)V", _AndroidGLView_nativeOnFrame)
+		SLIB_JNI_NATIVE(nativeOnCreate, "nativeOnCreate", "(J)V", Android_GLView_nativeOnCreate)
+		SLIB_JNI_NATIVE(nativeOnFrame, "nativeOnFrame", "(JII)V", Android_GLView_nativeOnFrame)
 
 	SLIB_JNI_END_CLASS
 
@@ -72,11 +72,11 @@ namespace slib
 		Ref<Android_ViewInstance> ret;
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
-			JniLocal<jobject> handle = _JAndroidGLView::create.callObject(sl_null, parent->getContext());
-			ret = Android_ViewInstance::create<_RenderViewInstance>(this, parent, handle.get());
+			JniLocal<jobject> handle = JAndroidGLView::create.callObject(sl_null, parent->getContext());
+			ret = Android_ViewInstance::create<Android_RenderViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
-				_JAndroidGLView::setRenderMode.callBoolean(sl_null, handle, m_redrawMode);
+				JAndroidGLView::setRenderMode.callBoolean(sl_null, handle, m_redrawMode);
 			}
 		}
 		return ret;
@@ -86,7 +86,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidGLView::setRenderMode.callBoolean(sl_null, handle, mode);
+			JAndroidGLView::setRenderMode.callBoolean(sl_null, handle, mode);
 		}
 	}
 
@@ -94,7 +94,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidGLView::requestRender.call(sl_null, handle);
+			JAndroidGLView::requestRender.call(sl_null, handle);
 		}
 	}
 

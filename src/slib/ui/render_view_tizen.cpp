@@ -28,7 +28,7 @@ ELEMENTARY_GLVIEW_GLOBAL_DECLARE()
 namespace slib
 {
 
-	class _RenderViewInstance : public Tizen_ViewInstance
+	class Tizen_RenderViewInstance : public Tizen_ViewInstance
 	{
 	public:
 		Ref<RenderEngine> m_renderEngine;
@@ -37,14 +37,14 @@ namespace slib
 		Ecore_Animator* m_timer;
 
 	public:
-		_RenderViewInstance()
+		Tizen_RenderViewInstance()
 		{
 			m_flagContinuously = sl_false;
 			m_flagRequestRender = sl_false;
 			m_timer = sl_null;
 		}
 
-		~_RenderViewInstance()
+		~Tizen_RenderViewInstance()
 		{
 			if (m_timer) {
 				::ecore_animator_del(m_timer);
@@ -53,7 +53,7 @@ namespace slib
 
 		static void glInit(Evas_Object* handle)
 		{
-			Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
+			Ref<Tizen_RenderViewInstance> instance = Ref<Tizen_RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
 			if (instance.isNotNull()) {
 				instance->m_renderEngine = GLES::createEngine();
 			}
@@ -61,7 +61,7 @@ namespace slib
 
 		static void glResize(Evas_Object* handle)
 		{
-			Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
+			Ref<Tizen_RenderViewInstance> instance = Ref<Tizen_RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
 			if (instance.isNotNull()) {
 				int w = 0;
 				int h = 0;
@@ -74,7 +74,7 @@ namespace slib
 
 		static void glRender(Evas_Object* handle)
 		{
-			Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
+			Ref<Tizen_RenderViewInstance> instance = Ref<Tizen_RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
 			if (instance.isNotNull()) {
 				Ref<View> _view = instance->getView();
 				if (RenderView* view = CastInstance<RenderView>(_view.get())) {
@@ -91,7 +91,7 @@ namespace slib
 		static Eina_Bool timer(void* data)
 		{
 			Evas_Object* handle = (Evas_Object*)data;
-			Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
+			Ref<Tizen_RenderViewInstance> instance = Ref<Tizen_RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
 			if (instance.isNotNull()) {
 				if (instance->m_flagContinuously || instance->m_flagRequestRender) {
 					instance->m_flagRequestRender = sl_false;
@@ -115,20 +115,20 @@ namespace slib
 
 				ELEMENTARY_GLVIEW_GLOBAL_USE(handle);
 
-				Ref<_RenderViewInstance> ret = Tizen_ViewInstance::create<_RenderViewInstance>(this, parent, TizenViewType::OpenGL, handle, sl_true);
+				Ref<Tizen_RenderViewInstance> ret = Tizen_ViewInstance::create<Tizen_RenderViewInstance>(this, parent, TizenViewType::OpenGL, handle, sl_true);
 
 				if (ret.isNotNull()) {
 
 					::elm_glview_mode_set(handle, (Elm_GLView_Mode)(ELM_GLVIEW_ALPHA | ELM_GLVIEW_DEPTH));
 					::elm_glview_resize_policy_set(handle, ELM_GLVIEW_RESIZE_POLICY_RECREATE);
 					::elm_glview_render_policy_set(handle, ELM_GLVIEW_RENDER_POLICY_ON_DEMAND);
-					::elm_glview_init_func_set(handle, _RenderViewInstance::glInit);
-					::elm_glview_resize_func_set(handle, _RenderViewInstance::glResize);
-					::elm_glview_render_func_set(handle, _RenderViewInstance::glRender);
-					::elm_glview_del_func_set(handle, _RenderViewInstance::glDelete);
+					::elm_glview_init_func_set(handle, Tizen_RenderViewInstance::glInit);
+					::elm_glview_resize_func_set(handle, Tizen_RenderViewInstance::glResize);
+					::elm_glview_render_func_set(handle, Tizen_RenderViewInstance::glRender);
+					::elm_glview_del_func_set(handle, Tizen_RenderViewInstance::glDelete);
 
 					ret->m_flagContinuously = (m_redrawMode == RedrawMode::Continuously);
-					ret->m_timer = ::ecore_animator_add(_RenderViewInstance::timer, handle);
+					ret->m_timer = ::ecore_animator_add(Tizen_RenderViewInstance::timer, handle);
 
 					ret->installTouchEvents();
 
@@ -143,7 +143,7 @@ namespace slib
 	
 	void RenderView::_setRedrawMode_NW(RedrawMode mode)
 	{
-		Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(getViewInstance());
+		Ref<Tizen_RenderViewInstance> instance = Ref<Tizen_RenderViewInstance>::from(getViewInstance());
 		if (instance.isNotNull()) {
 			instance->m_flagContinuously = (mode == RedrawMode::Continuously);
 		}
@@ -151,7 +151,7 @@ namespace slib
 	
 	void RenderView::_requestRender_NW()
 	{
-		Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(getViewInstance());
+		Ref<Tizen_RenderViewInstance> instance = Ref<Tizen_RenderViewInstance>::from(getViewInstance());
 		if (instance.isNotNull()) {
 			instance->m_flagRequestRender = sl_true;
 		}

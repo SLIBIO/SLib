@@ -20,17 +20,17 @@
 namespace slib
 {
 
-	class _Win32_RenderViewInstance : public Win32_ViewInstance, public IRenderCallback
+	class Win32_RenderViewInstance : public Win32_ViewInstance, public IRenderCallback
 	{
 	public:
 		AtomicRef<Renderer> m_renderer;
 
 	public:
-		_Win32_RenderViewInstance()
+		Win32_RenderViewInstance()
 		{
 		}
 
-		~_Win32_RenderViewInstance()
+		~Win32_RenderViewInstance()
 		{
 			Ref<Renderer> renderer = m_renderer;
 			if (renderer.isNotNull()) {
@@ -85,7 +85,7 @@ namespace slib
 
 		DWORD styleEx = 0;
 		DWORD style = 0;
-		Ref<_Win32_RenderViewInstance> ret = Win32_ViewInstance::create<_Win32_RenderViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
+		Ref<Win32_RenderViewInstance> ret = Win32_ViewInstance::create<Win32_RenderViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
 		if (ret.isNotNull()) {
 			RenderEngineType engineType = getPreferredEngineType();
 			if (engineType == RenderEngineType::OpenGL_ES) {
@@ -100,7 +100,7 @@ namespace slib
 			}
 			if (engineType == RenderEngineType::OpenGL_ES) {
 				RendererParam rp;
-				rp.callback = WeakRef<_Win32_RenderViewInstance>(ret);
+				rp.callback = WeakRef<Win32_RenderViewInstance>(ret);
 				Ref<Renderer> renderer = EGL::createRenderer((void*)(ret->getHandle()), rp);
 				if (renderer.isNotNull()) {
 					ret->setRenderer(renderer, m_redrawMode);
@@ -108,7 +108,7 @@ namespace slib
 				}
 			} else if (engineType == RenderEngineType::OpenGL) {
 				RendererParam rp;
-				rp.callback = WeakRef<_Win32_RenderViewInstance>(ret);
+				rp.callback = WeakRef<Win32_RenderViewInstance>(ret);
 				Ref<Renderer> renderer = WGL::createRenderer((void*)(ret->getHandle()), rp);
 				if (renderer.isNotNull()) {
 					ret->setRenderer(renderer, m_redrawMode);
@@ -122,7 +122,7 @@ namespace slib
 
 	void RenderView::_setRedrawMode_NW(RedrawMode mode)
 	{
-		Ref<_Win32_RenderViewInstance> instance = Ref<_Win32_RenderViewInstance>::from(getViewInstance());
+		Ref<Win32_RenderViewInstance> instance = Ref<Win32_RenderViewInstance>::from(getViewInstance());
 		if (instance.isNotNull()) {
 			Ref<Renderer> renderer = instance->m_renderer;
 			if (renderer.isNotNull()) {
@@ -133,7 +133,7 @@ namespace slib
 
 	void RenderView::_requestRender_NW()
 	{
-		Ref<_Win32_RenderViewInstance> instance = Ref<_Win32_RenderViewInstance>::from(getViewInstance());
+		Ref<Win32_RenderViewInstance> instance = Ref<Win32_RenderViewInstance>::from(getViewInstance());
 		if (instance.isNotNull()) {
 			Ref<Renderer> renderer = instance->m_renderer;
 			if (renderer.isNotNull()) {
