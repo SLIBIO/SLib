@@ -4935,23 +4935,6 @@ namespace slib
 		}
 	}
 
-#define _APPLY_FONT_PRECISION(f) (sl_real)((sl_int32)((f) + 0.5f))
-
-	void View::setFont(const String& fontFamily, sl_real size, sl_bool flagBold, sl_bool flagItalic, sl_bool flagUnderline, sl_bool flagStrikeout, UIUpdateMode mode)
-	{
-		setFont(Font::create(fontFamily, _APPLY_FONT_PRECISION(size), flagBold, flagItalic, flagUnderline, flagStrikeout), mode);
-	}
-
-	void View::setFontAttributes(sl_real size, sl_bool flagBold, sl_bool flagItalic, sl_bool flagUnderline, sl_bool flagStrikeout, UIUpdateMode mode)
-	{
-		Ref<Font> font = getFont();
-		if (font.isNull()) {
-			setFont(Font::create(UI::getDefaultFontFamily(), _APPLY_FONT_PRECISION(size), flagBold, flagItalic, flagUnderline, flagStrikeout), mode);
-		} else {
-			setFont(Font::create(font->getFamilyName(), _APPLY_FONT_PRECISION(size), flagBold, flagItalic, flagUnderline, flagStrikeout), mode);
-		}
-	}
-	
 	sl_real View::getFontSize()
 	{
 		Ref<Font> font = getFont();
@@ -4966,9 +4949,30 @@ namespace slib
 	{
 		Ref<Font> font = getFont();
 		if (font.isNull()) {
-			setFont(Font::create(UI::getDefaultFontFamily(), _APPLY_FONT_PRECISION(size)), mode);
+			setFont(Font::create(UI::getDefaultFontFamily(), size), mode);
 		} else {
-			setFont(Font::create(font->getFamilyName(), _APPLY_FONT_PRECISION(size)), mode);
+			setFont(Font::create(font->getFamilyName(), size), mode);
+		}
+	}
+	
+	String View::getFontFamily()
+	{
+		
+		Ref<Font> font = getFont();
+		if (font.isNull()) {
+			return UI::getDefaultFontFamily();
+		} else {
+			return font->getFamilyName();
+		}
+	}
+	
+	void View::setFontFamily(const String& fontFamily, UIUpdateMode mode)
+	{
+		Ref<Font> font = getFont();
+		if (font.isNull()) {
+			setFont(Font::create(fontFamily, UI::getDefaultFontSize()), mode);
+		} else {
+			setFont(Font::create(fontFamily, font->getSize()), mode);
 		}
 	}
 
