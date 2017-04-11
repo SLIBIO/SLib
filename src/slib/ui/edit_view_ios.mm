@@ -180,6 +180,7 @@ namespace slib
 			}
 			[handle setReturnKeyType:convertReturnKeyType(m_returnKeyType)];
 			[handle setKeyboardType:convertKeyboardType(m_keyboardType)];
+			[handle setAutocapitalizationType:convertAutoCapitalizationType(m_autoCapitalizationType)];
 		}
 		
 		void applyProperties(SLib_iOS_TextArea* handle)
@@ -215,6 +216,7 @@ namespace slib
 			}
 			[handle setReturnKeyType:convertReturnKeyType(m_returnKeyType)];
 			[handle setKeyboardType:convertKeyboardType(m_keyboardType)];
+			[handle setAutocapitalizationType:convertAutoCapitalizationType(m_autoCapitalizationType)];
 		}
 		
 		static NSTextAlignment translateAlignment(Alignment _align)
