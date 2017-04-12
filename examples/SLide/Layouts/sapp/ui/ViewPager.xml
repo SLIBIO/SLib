@@ -1,0 +1,40 @@
+<sapp version='1'>
+	<layout
+		type='page'
+		name='ViewPagerExample'
+		>		
+		<pager
+			name='scene_pager' 
+			width='100%sw'
+			height='100%sh'
+			swipe='true'
+		>
+			<item>
+				<view
+					width='100%sw'
+					height='100%sh'
+					background='red'
+					/>
+
+			</item>
+
+			<item selected='true'>
+				<group
+					width='100%sw'
+					height='100%sh'
+					background='green'
+				>
+					<label width='wrap' height='wrap' alignCenter='true' text='Swipe' fontSize='20%sw'/>
+				</group>
+			</item>
+
+			<item>
+				<view
+					width='100%sw'
+					height='100%sh'
+					background='blue'/>
+			</item>
+		</pager>
+
+ 	</layout>
+</sapp>
