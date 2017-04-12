@@ -12,6 +12,7 @@
 
 #include "slib/ui/mobile_app.h"
 #include "slib/ui/scroll_view.h"
+#include "slib/ui/resource.h"
 
 namespace slib
 {
@@ -253,22 +254,32 @@ namespace slib
 	void EditView::onClick(UIEvent* ev)
 	{
 #if defined(SLIB_PLATFORM_IS_MOBILE)
-		MobileApp::getApp()->getMainWindow()->setVisible(sl_false);
-		m_windowEdit = new Window;
-		m_windowEdit->setBackgroundColor(Color::White);
-		m_editViewNative = new TextArea;
-		m_editViewNative->setText(m_text, UIUpdateMode::Init);
-		m_editViewNative->setSizeFilling(sl_true, sl_true, UIUpdateMode::Init);
-		m_editViewNative->setBorder(sl_false, UIUpdateMode::Init);
-		m_editViewNative->setGravity(Alignment::TopLeft, UIUpdateMode::Init);
-		m_editViewNative->setMultiLine(sl_true, UIUpdateMode::Init);
-		m_editViewNative->setOnChange(SLIB_FUNCTION_WEAKREF(EditView, _onChangeEditViewNative, this));
-		m_editViewNative->setOnReturnKey(SLIB_FUNCTION_WEAKREF(EditView, _onReturnKeyEditViewNative, this));
-		m_editViewNative->setOnDoneEdit(SLIB_FUNCTION_WEAKREF(EditView, _onDoneEditViewNative, this));
-		m_editViewNative->setFont(getFont());
-		m_windowEdit->addView(m_editViewNative);
-		m_windowEdit->create();
-		m_editViewNative->setFocus();
+		if (!m_flagReadOnly) {
+			m_windowEdit = new Window;
+			m_windowEdit->setBackgroundColor(Color::White);
+			m_editViewNative = new TextArea;
+			m_editViewNative->setText(m_text, UIUpdateMode::Init);
+			m_editViewNative->setSizeFilling(sl_true, sl_true, UIUpdateMode::Init);
+			m_editViewNative->setMargin(UIResource::getScreenMinimum()/20);
+			m_editViewNative->setBorder(sl_false, UIUpdateMode::Init);
+			m_editViewNative->setGravity(Alignment::TopLeft, UIUpdateMode::Init);
+			m_editViewNative->setMultiLine(m_flagMultiLine, UIUpdateMode::Init);
+			m_editViewNative->setOnChange(SLIB_FUNCTION_WEAKREF(EditView, _onChangeEditViewNative, this));
+			m_editViewNative->setOnReturnKey(SLIB_FUNCTION_WEAKREF(EditView, _onReturnKeyEditViewNative, this));
+			m_editViewNative->setOnDoneEdit(SLIB_FUNCTION_WEAKREF(EditView, _onDoneEditViewNative, this));
+			if (m_returnKeyType == UIReturnKeyType::Default && !m_flagMultiLine) {
+				m_editViewNative->setReturnKeyType(UIReturnKeyType::Done);
+			} else {
+				m_editViewNative->setReturnKeyType(m_returnKeyType);
+			}
+			m_editViewNative->setKeyboardType(m_keyboardType);
+			m_editViewNative->setAutoCapitalizationType(m_autoCapitalizationType);
+			m_editViewNative->setFont(Font::create(getFontFamily(), UIResource::getScreenMinimum()/20));
+			m_windowEdit->addView(m_editViewNative);
+			m_windowEdit->create();
+			m_windowEdit->setOnClose(SLIB_FUNCTION_WEAKREF(EditView, _onCloseWindowEditViewNative, this));
+			m_editViewNative->setFocus();
+		}
 #endif
 	}
 	
@@ -296,13 +307,20 @@ namespace slib
 	void EditView::_onDoneEditViewNative(EditView* ev)
 	{
 		m_windowEdit->close();
-		MobileApp::getApp()->getMainWindow()->setVisible(sl_true);
 		m_windowEdit.setNull();
 		m_editViewNative.setNull();
 		invalidate();
 		dispatchDoneEdit();
 	}
 	
+	void EditView::_onCloseWindowEditViewNative(Window* window, UIEvent* ev)
+	{
+		m_windowEdit.setNull();
+		m_editViewNative.setNull();
+		invalidate();
+		dispatchDoneEdit();
+	}
+
 	String EditView::onChange(const String& newValue)
 	{
 		return newValue;
@@ -399,7 +417,7 @@ namespace slib
 	}
 
 
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
+#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID)) && !(defined(SLIB_PLATFORM_IS_TIZEN))
 
 	Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* parent)
 	{
@@ -463,7 +481,7 @@ namespace slib
 #endif
 
 
-#if !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
+#if !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_ANDROID)) && !(defined(SLIB_PLATFORM_IS_TIZEN))
 
 	void EditView::_setReturnKeyType_NW(UIReturnKeyType type)
 	{

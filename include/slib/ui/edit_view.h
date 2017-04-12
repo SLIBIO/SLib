@@ -147,6 +147,8 @@ namespace slib
 		
 		void _onDoneEditViewNative(EditView* ev);
 		
+		void _onCloseWindowEditViewNative(Window* window, UIEvent* ev);
+
 	protected:
 		AtomicString m_text;
 		Alignment m_textAlignment;
