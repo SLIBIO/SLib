@@ -172,9 +172,9 @@ namespace slib
 			if (desc.flagItalic) {
 				traits |= NSFontItalicTrait;
 			}
-			nsFontDesc = [nsFontDesc fontDescriptorWithSymbolicTraits:traits];
-			if (nsFontDesc == nil) {
-				return nil;
+			NSFontDescriptor* nsFontDescWithTraits = [nsFontDesc fontDescriptorWithSymbolicTraits:traits];
+			if (nsFontDescWithTraits != nil) {
+				nsFontDesc = nsFontDescWithTraits;
 			}
 			m_fontUI = [NSFont fontWithDescriptor:nsFontDesc size:size];
 #elif defined(SLIB_PLATFORM_IS_IOS)
@@ -188,13 +188,12 @@ namespace slib
 			if (desc.flagItalic) {
 				traits |= UIFontDescriptorTraitItalic;
 			}
-			uiFontDesc = [uiFontDesc fontDescriptorWithSymbolicTraits:traits];
-			if (uiFontDesc == nil) {
-				return nil;
+			UIFontDescriptor* uiFontDescWithTraits = [uiFontDesc fontDescriptorWithSymbolicTraits:traits];
+			if (uiFontDescWithTraits != nil) {
+				uiFontDesc = uiFontDescWithTraits;
 			}
 			m_fontUI = [UIFont fontWithDescriptor:uiFontDesc size:size];
 #endif
-			
 			m_lastUIScaleFactor = scaleFactor;
 			return m_fontUI;
 		}
