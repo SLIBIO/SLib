@@ -131,6 +131,8 @@ namespace slib
 		
 		void _applyDefaultPopTransition(Transition& transition);
 		
+		static void _runAnimationProc(const Ref<View>& view, const Function<void()>& callback);
+		
 	protected:
 		virtual void onPageAction(View* page, UIPageAction action);
 		
@@ -172,6 +174,8 @@ namespace slib
 		AnimationCurve m_popTransitionCurve;
 		
 		sl_reg m_countActiveTransitionAnimations;
+		
+		friend class ViewPage;
 		
 	};
 

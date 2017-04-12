@@ -7040,6 +7040,10 @@ namespace slib
 
 	void View::runAfterDraw(const Function<void()>& callback, sl_bool flagInvalidate)
 	{
+		if (isNativeWidget()) {
+			UI::dispatchToUiThread(callback);
+			return;
+		}
 		if (callback.isNotNull()) {
 			_initializeDrawAttributes();
 			Ref<DrawAttributes>& attrs = m_drawAttrs;

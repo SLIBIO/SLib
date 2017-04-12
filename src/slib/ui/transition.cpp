@@ -73,58 +73,58 @@ namespace slib
 			case TransitionType::Push:
 			case TransitionType::Slide:
 			case TransitionType::Cover:
-			{
-				sl_real factor;
-				if (type == TransitionType::Push) {
-					factor = 1;
-				} else if (type == TransitionType::Slide) {
-					if (pageAction == UIPageAction::Push || pageAction == UIPageAction::Pop) {
+				{
+					sl_real factor;
+					if (type == TransitionType::Push) {
 						factor = 1;
-					} else {
-						factor = 0.5f;
-					}
-				} else if (type == TransitionType::Cover) {
-					if (pageAction == UIPageAction::Push || pageAction == UIPageAction::Pop) {
-						factor = 1;
+					} else if (type == TransitionType::Slide) {
+						if (pageAction == UIPageAction::Push || pageAction == UIPageAction::Pop) {
+							factor = 1;
+						} else {
+							factor = 0.5f;
+						}
+					} else if (type == TransitionType::Cover) {
+						if (pageAction == UIPageAction::Push || pageAction == UIPageAction::Pop) {
+							factor = 1;
+						} else {
+							factor = 0;
+						}
 					} else {
 						factor = 0;
 					}
-				} else {
-					factor = 0;
-				}
-				sl_real startFactor;
-				sl_real endFactor;
-				if (pageAction == UIPageAction::Push || pageAction == UIPageAction::Resume) {
-					startFactor = factor;
-					endFactor = 0;
-				} else {
-					startFactor = 0;
-					endFactor = -factor;
-				}
-				if (direction == TransitionDirection::FromLeftToRight) {
-					direction = TransitionDirection::FromRightToLeft;
-					startFactor = -startFactor;
-					endFactor = -endFactor;
-				} else if (direction == TransitionDirection::FromTopToBottom) {
-					direction = TransitionDirection::FromBottomToTop;
-					startFactor = -startFactor;
-					endFactor = -endFactor;
-				}
-				if (Math::isAlmostZero(factor)) {
-					animation = view->createAnimation(duration);
-					if (animation.isNotNull()) {
-						animation->setOnStop(onStop);
-					}
-				} else {
-					if (direction == TransitionDirection::FromRightToLeft) {
-						sl_real width = (sl_real)(view->getWidth());
-						animation = view->createTranslateAnimation(Vector2(width * startFactor, 0), Vector2(width * endFactor, 0), duration, onStop, curve);
+					sl_real startFactor;
+					sl_real endFactor;
+					if (pageAction == UIPageAction::Push || pageAction == UIPageAction::Resume) {
+						startFactor = factor;
+						endFactor = 0;
 					} else {
-						sl_real height = (sl_real)(view->getHeight());
-						animation = view->createTranslateAnimation(Vector2(0, height * startFactor), Vector2(0, height * endFactor), duration, onStop, curve);
+						startFactor = 0;
+						endFactor = -factor;
+					}
+					if (direction == TransitionDirection::FromLeftToRight) {
+						direction = TransitionDirection::FromRightToLeft;
+						startFactor = -startFactor;
+						endFactor = -endFactor;
+					} else if (direction == TransitionDirection::FromTopToBottom) {
+						direction = TransitionDirection::FromBottomToTop;
+						startFactor = -startFactor;
+						endFactor = -endFactor;
+					}
+					if (Math::isAlmostZero(factor)) {
+						animation = view->createAnimation(duration);
+						if (animation.isNotNull()) {
+							animation->setOnStop(onStop);
+						}
+					} else {
+						if (direction == TransitionDirection::FromRightToLeft) {
+							sl_real width = (sl_real)(view->getWidth());
+							animation = view->createTranslateAnimation(Vector2(width * startFactor, 0), Vector2(width * endFactor, 0), duration, onStop, curve);
+						} else {
+							sl_real height = (sl_real)(view->getHeight());
+							animation = view->createTranslateAnimation(Vector2(0, height * startFactor), Vector2(0, height * endFactor), duration, onStop, curve);
+						}
 					}
 				}
-			}
 				break;
 			case TransitionType::Zoom:
 				if (pageAction == UIPageAction::Push || pageAction == UIPageAction::Resume) {

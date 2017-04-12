@@ -12,6 +12,7 @@
 
 #include "slib/ui/core.h"
 #include "slib/ui/mobile_app.h"
+#include "slib/ui/render_view.h"
 
 #include "slib/core/scoped.h"
 
@@ -301,7 +302,7 @@ namespace slib
 			_onFinishAnimation(viewIn, UIPageAction::Resume);
 		}
 		
-		viewIn->runAfterDraw([animationPause, animationResume]() {
+		_runAnimationProc(viewIn, [animationPause, animationResume]() {
 			if (animationPause.isNotNull()) {
 				animationPause->start();
 			}
@@ -453,7 +454,7 @@ namespace slib
 			_onFinishAnimation(viewIn, UIPageAction::Push);
 		}
 		
-		viewIn->runAfterDraw([animationPause, animationPush]() {
+		_runAnimationProc(viewIn, [animationPause, animationPush]() {
 			if (animationPause.isNotNull()) {
 				animationPause->start();
 			}
@@ -741,6 +742,27 @@ namespace slib
 		}
 		if (transition.curve == AnimationCurve::Default) {
 			transition.curve = m_popTransitionCurve;
+		}
+	}
+	
+	void ViewPager::_runAnimationProc(const Ref<View>& view, const Function<void()>& callback)
+	{
+		sl_bool flagRender = sl_false;
+		Ref<View> t = view;
+		while (1) {
+			if (IsInstanceOf<RenderView>(t)) {
+				flagRender = sl_true;
+				break;
+			}
+			t = t->getParent();
+			if (t.isNull()) {
+				break;
+			}
+		}
+		if (flagRender) {
+			view->runAfterDraw(callback);
+		} else {
+			view->dispatchToDrawingThread(callback, 10);
 		}
 	}
 	
@@ -1166,7 +1188,7 @@ namespace slib
 		if (animation.isNull()) {
 			_finishPopupAnimation(UIPageAction::Push);
 		} else {
-			runAfterDraw([animation]() {
+			ViewPager::_runAnimationProc(this, [animation]() {
 				animation->start();
 			});
 		}
