@@ -1,0 +1,27 @@
+<sapp version='1'>
+	<layout
+		type='page'
+		name='HelloWorld'
+		background='@drawable/background'
+		backgroundScale='cover'
+		>
+		
+		<linear orientation='vertical'
+			width='wrap'
+			height='wrap'
+			alignCenter='true'
+			background='red'>
+
+			<image src='@drawable/lion'
+				width='15%sw'
+				centerHorizontal='true'/>
+			
+			<label text='Welcome to SLib'
+				width='wrap'
+				height='wrap'
+				marginTop='5%sh'/>
+
+		</linear>
+
+ 	</layout>
+</sapp>
