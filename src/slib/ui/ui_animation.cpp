@@ -72,7 +72,7 @@ namespace slib
 		return ret;
 	}
 	
-#if !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_APPLE)
+#if !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_MACOS)
 	
 	sl_bool UIAnimationLoop::_applyNativeAnimation(Animation* animation)
 	{

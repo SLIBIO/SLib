@@ -8,9 +8,13 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include "slib/core/definition.h"
+
+#if defined(SLIB_PLATFORM_IS_IOS) || defined(SLIB_PLATFORM_IS_MACOS)
+
 #include "ui_animation.h"
 
-#if defined(SLIB_PLATFORM_IS_OSX)
+#if defined(SLIB_PLATFORM_IS_MACOS)
 
 #include "view_osx.h"
 #include <Quartz/Quartz.h>
@@ -28,7 +32,7 @@ typedef UIView* NativeView;
 #include "slib/ui/core.h"
 #include "slib/math/transform2d.h"
 
-@interface _NativeAnimationDelegate : NSObject<CAAnimationDelegate>
+@interface SLib_NativeAnimationDelegate : NSObject<CAAnimationDelegate>
 {
 	@public slib::Function<void()> onStop;
 }
@@ -36,7 +40,7 @@ typedef UIView* NativeView;
 
 namespace slib
 {
-	static void _UIAnimation_setAnimation(CAAnimation* ca, const Ref<Animation>& animation, sl_bool flagGroup)
+	static void _native_UIAnimation_setAnimation(CAAnimation* ca, const Ref<Animation>& animation, sl_bool flagGroup)
 	{
 		if (flagGroup) {
 			ca.duration = animation->getDuration();
@@ -75,7 +79,7 @@ namespace slib
 		
 	}
 	
-	static void _UIAnimation_applyAnimation(NativeView handle, const Ref<Animation>& animation,
+	static void _native_UIAnimation_applyAnimation(NativeView handle, const Ref<Animation>& animation,
 											sl_bool flagTranslate, const Vector2& translateStart, const Vector2& translateEnd,
 											sl_bool flagScale, const Vector2& scaleStart, const Vector2& scaleEnd,
 											sl_bool flagRotate, sl_real rotateStart, sl_real rotateEnd,
@@ -96,7 +100,7 @@ namespace slib
 			ca.fromValue = [NSValue valueWithCGSize:CGSizeMake(translateStart.x / f, translateStart.y / f)];
 			ca.toValue = [NSValue valueWithCGSize:CGSizeMake(translateEnd.x / f, translateEnd.y / f)];
 #endif
-			_UIAnimation_setAnimation(ca, animation, sl_false);
+			_native_UIAnimation_setAnimation(ca, animation, sl_false);
 			[arr addObject:ca];
 		}
 		if (flagScale) {
@@ -104,34 +108,34 @@ namespace slib
 			ca = [CABasicAnimation animationWithKeyPath:@"transform.scale.x"];
 			ca.fromValue = [NSNumber numberWithFloat:scaleStart.x];
 			ca.toValue = [NSNumber numberWithFloat:scaleEnd.x];
-			_UIAnimation_setAnimation(ca, animation, sl_false);
+			_native_UIAnimation_setAnimation(ca, animation, sl_false);
 			[arr addObject:ca];
 			ca = [CABasicAnimation animationWithKeyPath:@"transform.scale.y"];
 			ca.fromValue = [NSNumber numberWithFloat:scaleStart.y];
 			ca.toValue = [NSNumber numberWithFloat:scaleEnd.y];
-			_UIAnimation_setAnimation(ca, animation, sl_false);
+			_native_UIAnimation_setAnimation(ca, animation, sl_false);
 			[arr addObject:ca];
 		}
 		if (flagRotate) {
 			CABasicAnimation* ca = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
 			ca.fromValue = [NSNumber numberWithFloat:rotateStart];
 			ca.toValue = [NSNumber numberWithFloat:rotateEnd];
-			_UIAnimation_setAnimation(ca, animation, sl_false);
+			_native_UIAnimation_setAnimation(ca, animation, sl_false);
 			[arr addObject:ca];
 		}
 		if (flagAlpha) {
 			CABasicAnimation* ca = [CABasicAnimation animationWithKeyPath:@"opacity"];
 			ca.fromValue = [NSNumber numberWithFloat:alphaStart];
 			ca.toValue = [NSNumber numberWithFloat:alphaEnd];
-			_UIAnimation_setAnimation(ca, animation, sl_false);
+			_native_UIAnimation_setAnimation(ca, animation, sl_false);
 			[arr addObject:ca];
 		}
 		
 		group.animations = arr;
 		
-		_UIAnimation_setAnimation(group, animation, sl_true);
+		_native_UIAnimation_setAnimation(group, animation, sl_true);
 		
-		_NativeAnimationDelegate* delegate = [[_NativeAnimationDelegate alloc] init];
+		SLib_NativeAnimationDelegate* delegate = [[SLib_NativeAnimationDelegate alloc] init];
 		delegate->onStop = onStop;
 		group.delegate = delegate;
 		
@@ -207,7 +211,13 @@ namespace slib
 		}
 		
 		NativeView handle = UIPlatform::getViewHandle(viewAnimate.get());
+		
 		if (handle != nil) {
+			
+			CALayer* layer = handle.layer;
+			if (layer == nil) {
+				return sl_false;
+			}
 			
 			Ref<Animation> _animation = animation;
 			Function<void()> onStop = [=]() {
@@ -226,10 +236,10 @@ namespace slib
 				_stopAnimationFromNative(_animation.get());
 			};
 			if (UI::isUiThread()) {
-				_UIAnimation_applyAnimation(handle, _animation, flagTranslate, translateStart, translateEnd, flagScale, scaleStart, scaleEnd, flagRotate, rotateStart, rotateEnd, flagAlpha, alphaStart, alphaEnd, onStop);
+				_native_UIAnimation_applyAnimation(handle, _animation, flagTranslate, translateStart, translateEnd, flagScale, scaleStart, scaleEnd, flagRotate, rotateStart, rotateEnd, flagAlpha, alphaStart, alphaEnd, onStop);
 			} else {
 				dispatch_async(dispatch_get_main_queue(), ^{
-					_UIAnimation_applyAnimation(handle, _animation, flagTranslate, translateStart, translateEnd, flagScale, scaleStart, scaleEnd, flagRotate, rotateStart, rotateEnd, flagAlpha, alphaStart, alphaEnd, onStop);
+					_native_UIAnimation_applyAnimation(handle, _animation, flagTranslate, translateStart, translateEnd, flagScale, scaleStart, scaleEnd, flagRotate, rotateStart, rotateEnd, flagAlpha, alphaStart, alphaEnd, onStop);
 				});
 			}
 			
@@ -256,7 +266,7 @@ namespace slib
 	}	
 }
 
-@implementation _NativeAnimationDelegate
+@implementation SLib_NativeAnimationDelegate
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
 {
@@ -264,3 +274,5 @@ namespace slib
 }
 
 @end
+
+#endif
