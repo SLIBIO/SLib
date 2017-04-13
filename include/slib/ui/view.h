@@ -1312,6 +1312,8 @@ namespace slib
 		
 		void _setFrame(const UIRect& frame, UIUpdateMode mode, sl_bool flagLayouting);
 		
+		void _restrictSize(sl_ui_len& width, sl_ui_len& height);
+		
 		void _prepareLayout(ViewPrepareLayoutParam& param);
 		
 		void _makeLayout(sl_bool flagApplyLayout);

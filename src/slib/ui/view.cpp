@@ -1121,6 +1121,14 @@ namespace slib
 		
 		UIRect frame = _frame;
 		frame.fixSizeError();
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
+		if (layoutAttrs.isNotNull()) {
+			sl_ui_len width = frame.getWidth();
+			sl_ui_len height = frame.getHeight();
+			_restrictSize(width, height);
+			frame.setSize(width, height);
+		}
+
 		UIRect frameOld = m_frame;
 		
 		sl_bool flagNotMoveX = Math::isAlmostZero(frameOld.left - frame.left);
@@ -1138,7 +1146,6 @@ namespace slib
 			_setFrame_NI(frame);
 		}
 		
-		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (layoutAttrs.isNotNull()) {
 			layoutAttrs->frame = frame;
 			layoutAttrs->requestedFrame = frame;
@@ -1659,6 +1666,25 @@ namespace slib
 			layoutAttrs->measuredHeight = height;
 		}
 	}
+	
+	void View::_restrictSize(sl_ui_len& width, sl_ui_len& height)
+	{
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
+		if (layoutAttrs.isNull()) {
+			return;
+		}
+
+		if (layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustWidth) {
+			width = (sl_ui_pos)(height * layoutAttrs->aspectRatio);
+		} else if (layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustHeight) {
+			if (layoutAttrs->aspectRatio > 0.0000001f) {
+				height = (sl_ui_pos)(width / layoutAttrs->aspectRatio);
+			}
+		}
+		width = Math::clamp(width, layoutAttrs->minWidth, layoutAttrs->maxWidth);
+		height = Math::clamp(height, layoutAttrs->minHeight, layoutAttrs->maxHeight);
+
+	}
 
 	void View::_prepareLayout(ViewPrepareLayoutParam& param)
 	{
@@ -1751,16 +1777,7 @@ namespace slib
 				break;
 		}
 		
-		if (layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustWidth) {
-			width = (sl_ui_pos)(height * layoutAttrs->aspectRatio);
-		} else if (layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustHeight) {
-			if (layoutAttrs->aspectRatio > 0.0000001f) {
-				height = (sl_ui_pos)(width / layoutAttrs->aspectRatio);
-			}
-		}
-		
-		width = Math::clamp(width, layoutAttrs->minWidth, layoutAttrs->maxWidth);
-		height = Math::clamp(height, layoutAttrs->minHeight, layoutAttrs->maxHeight);
+		_restrictSize(width, height);
 		
 		if (layoutAttrs->flagRelativeMarginLeft) {
 			layoutAttrs->marginLeft = (sl_ui_pos)((sl_real)parentWidth * layoutAttrs->relativeMarginLeftWeight);
@@ -3361,6 +3378,11 @@ namespace slib
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->aspectRatioMode = aspectRatioMode;
+			if (aspectRatioMode == AspectRatioMode::AdjustWidth) {
+				attrs->widthMode = SizeMode::Fixed;
+			} else if (aspectRatioMode == AspectRatioMode::AdjustHeight) {
+				attrs->heightMode = SizeMode::Fixed;
+			}
 			invalidateLayoutFromResize(updateMode);
 		}
 	}
