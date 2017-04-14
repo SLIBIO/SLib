@@ -260,7 +260,7 @@ namespace slib
 		
 		void setReceiveBufferSize(sl_uint32 size);
 		
-		sl_bool sendTo(const SocketAddress& addressTo, void* data, sl_uint32 size);
+		sl_bool sendTo(const SocketAddress& addressTo, const void* data, sl_uint32 size);
 		
 		sl_bool sendTo(const SocketAddress& addressTo, const Memory& mem);
 		

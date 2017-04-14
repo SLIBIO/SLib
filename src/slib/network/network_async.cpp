@@ -715,7 +715,7 @@ namespace slib
 		}
 	}
 
-	sl_bool AsyncUdpSocket::sendTo(const SocketAddress& addressTo, void* data, sl_uint32 size)
+	sl_bool AsyncUdpSocket::sendTo(const SocketAddress& addressTo, const void* data, sl_uint32 size)
 	{
 		return sendTo(addressTo, Memory::create(data, size));
 	}
