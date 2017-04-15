@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -frtti")
+if (CMAKE_BUILD_TYPE MATCHES Release)
+ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g0")
+ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g0")
+endif ()
 
 set (SLIB_PATH ${CMAKE_CURRENT_LIST_DIR}/../../..)
 set (SLIB_OUTPUT_PATH ${SLIB_PATH}/lib/Android/${CMAKE_BUILD_TYPE}-${ANDROID_ABI}/)
@@ -10,111 +14,41 @@ include_directories (
  ${SLIB_PATH}/thirdparty
 )
 
-file (GLOB SLIB_CORE_FILES
+file (
+ GLOB SLIB_CORE_FILES
  ${SLIB_PATH}/src/slib/core/*.cpp
  ${SLIB_PATH}/src/slib/math/*.cpp
  ${SLIB_PATH}/src/slib/crypto/*.cpp
+ ${SLIB_PATH}/src/slib/network/*.cpp
 )
 add_library (
  slib-core STATIC
  ${SLIB_CORE_FILES}
 )
-set_target_properties (slib-core
+set_target_properties (
+ slib-core
  PROPERTIES
  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
 )
 
-file (GLOB SLIB_NETWORK_FILES
- ${SLIB_PATH}/src/slib/network/*.cpp
-)
-add_library (
- slib-network STATIC
- ${SLIB_NETWORK_FILES}
-)
-set_target_properties (slib-network
- PROPERTIES
- ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
-)
-
-file (GLOB SLIB_GRAPHICS_FILES
+file (
+ GLOB SLIB_EXTRA_FILES
  ${SLIB_PATH}/src/slib/graphics/*.cpp
-)
-add_library (
- slib-graphics STATIC
- ${SLIB_GRAPHICS_FILES}
-)
-set_target_properties (slib-graphics
- PROPERTIES
- ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
-)
-
-file (GLOB SLIB_RENDER_FILES
  ${SLIB_PATH}/src/slib/render/*.cpp
-)
-add_library (
- slib-render STATIC
- ${SLIB_RENDER_FILES}
-)
-set_target_properties (slib-render
- PROPERTIES
- ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
-)
-
-file (GLOB SLIB_UI_FILES
  ${SLIB_PATH}/src/slib/ui/*.cpp
-)
-add_library (
- slib-ui STATIC
- ${SLIB_UI_FILES}
-)
-set_target_properties (slib-ui
- PROPERTIES
- ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
-)
-file (GLOB SLIB_MEDIA_FILES
  ${SLIB_PATH}/src/slib/media/*.cpp
-)
-add_library (
- slib-media STATIC
- ${SLIB_MEDIA_FILES}
-)
-set_target_properties (slib-media
- PROPERTIES
- ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
-)
-
-file (GLOB SLIB_DEVICE_FILES
  ${SLIB_PATH}/src/slib/device/*.cpp
-)
-add_library (
- slib-device STATIC
- ${SLIB_DEVICE_FILES}
-)
-set_target_properties (slib-device
- PROPERTIES
- ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
-)
-
-file (GLOB SLIB_DB_FILES
  ${SLIB_PATH}/src/slib/db/*.cpp
-)
-add_library (
- slib-db STATIC
- ${SLIB_DB_FILES}
-)
-set_target_properties (slib-db
- PROPERTIES
- ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
-)
-
-file (GLOB SLIB_GEO_FILES
  ${SLIB_PATH}/src/slib/geo/*.cpp
 )
+
 add_library (
- slib-geo STATIC
- ${SLIB_GEO_FILES}
+ slib STATIC
+ ${SLIB_CORE_FILES}
+ ${SLIB_EXTRA_FILES}
 )
-set_target_properties (slib-geo
+set_target_properties (
+ slib
  PROPERTIES
  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
 )
@@ -152,7 +86,8 @@ add_library (
  zlib STATIC
  ${SLIB_PATH}/src/thirdparty/thirdparty_zlib.c
 )
-set_target_properties (zlib
+set_target_properties (
+ zlib
  PROPERTIES
  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
 )
@@ -161,7 +96,8 @@ add_library (
  png STATIC
  ${SLIB_PATH}/src/thirdparty/thirdparty_libpng.c
 )
-set_target_properties (png
+set_target_properties (
+ png
  PROPERTIES
  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
 )
@@ -170,7 +106,8 @@ add_library (
  jpeg STATIC
  ${SLIB_PATH}/src/thirdparty/thirdparty_libjpeg.c
 )
-set_target_properties (jpeg
+set_target_properties (
+ jpeg
  PROPERTIES
  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
 )
@@ -179,7 +116,8 @@ add_library (
  freetype STATIC
  ${SLIB_PATH}/src/thirdparty/thirdparty_freetype.c
 )
-set_target_properties (freetype
+set_target_properties (
+ freetype
  PROPERTIES
  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
 )
@@ -188,7 +126,8 @@ add_library (
  sqlite3 STATIC
  ${SLIB_PATH}/src/thirdparty/thirdparty_sqlite3.c
 )
-set_target_properties (sqlite3
+set_target_properties (
+ sqlite3
  PROPERTIES
  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
 )
@@ -197,7 +136,8 @@ add_library (
  opus STATIC
  ${SLIB_PATH}/src/thirdparty/thirdparty_libopus.c
 )
-set_target_properties (opus
+set_target_properties (
+ opus
  PROPERTIES
  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
 )
@@ -208,25 +148,9 @@ add_library (
  ${SLIB_PATH}/src/thirdparty/thirdparty_libvpx_enc.c
  ${SLIB_PATH}/src/thirdparty/thirdparty_libvpx_dec.c
 )
-set_target_properties (vpx
+set_target_properties (
+ vpx
  PROPERTIES
  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
 )
 
-
-add_library (
- slib STATIC
- ${SLIB_CORE_FILES}
- ${SLIB_NETWORK_FILES}
- ${SLIB_GRAPHICS_FILES}
- ${SLIB_RENDER_FILES}
- ${SLIB_UI_FILES}
- ${SLIB_MEDIA_FILES}
- ${SLIB_DEVICE_FILES}
- ${SLIB_DB_FILES}
- ${SLIB_GEO_FILES}
-)
-set_target_properties (slib
- PROPERTIES
- ARCHIVE_OUTPUT_DIRECTORY "${SLIB_OUTPUT_PATH}"
-)

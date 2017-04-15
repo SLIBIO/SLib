@@ -95,162 +95,6 @@
 		26D15DBA1E93AD24003BD61A /* vector3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B571671C9D44720099E69B /* vector3.cpp */; };
 		26D15DBB1E93AD24003BD61A /* vector4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B571681C9D44720099E69B /* vector4.cpp */; };
 		26D15DBC1E93AD24003BD61A /* view_frustum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B571691C9D44720099E69B /* view_frustum.cpp */; };
-		26D15E1D1E93D7D0003BD61A /* arp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B5717C1C9D44930099E69B /* arp.cpp */; };
-		26D15E1E1E93D7D0003BD61A /* dns.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3BB1C1181B500D47AB0 /* dns.cpp */; };
-		26D15E1F1E93D7D0003BD61A /* ethernet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3BC1C1181B500D47AB0 /* ethernet.cpp */; };
-		26D15E201E93D7D0003BD61A /* http_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3BE1C1181B500D47AB0 /* http_common.cpp */; };
-		26D15E211E93D7D0003BD61A /* http_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C01C1181B500D47AB0 /* http_service.cpp */; };
-		26D15E221E93D7D0003BD61A /* icmp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C11C1181B500D47AB0 /* icmp.cpp */; };
-		26D15E231E93D7D0003BD61A /* ip_address.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C21C1181B500D47AB0 /* ip_address.cpp */; };
-		26D15E241E93D7D0003BD61A /* mac_address.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C31C1181B500D47AB0 /* mac_address.cpp */; };
-		26D15E251E93D7D0003BD61A /* nat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C41C1181B500D47AB0 /* nat.cpp */; };
-		26D15E261E93D7D0003BD61A /* net_capture_pcap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C51C1181B500D47AB0 /* net_capture_pcap.cpp */; };
-		26D15E271E93D7D0003BD61A /* net_capture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C61C1181B500D47AB0 /* net_capture.cpp */; };
-		26D15E281E93D7D0003BD61A /* network_async_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C91C1181B500D47AB0 /* network_async_unix.cpp */; };
-		26D15E291E93D7D0003BD61A /* network_async.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CB1C1181B500D47AB0 /* network_async.cpp */; };
-		26D15E2A1E93D7D0003BD61A /* network_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CD1C1181B500D47AB0 /* network_io.cpp */; };
-		26D15E2B1E93D7D0003BD61A /* network_os.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CC1C1181B500D47AB0 /* network_os.cpp */; };
-		26D15E2C1E93D7D0003BD61A /* socket_address.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CF1C1181B500D47AB0 /* socket_address.cpp */; };
-		26D15E2D1E93D7D0003BD61A /* socket_event_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3D01C1181B500D47AB0 /* socket_event_unix.cpp */; };
-		26D15E2E1E93D7D0003BD61A /* socket_event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3D21C1181B500D47AB0 /* socket_event.cpp */; };
-		26D15E2F1E93D7D0003BD61A /* socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3D31C1181B500D47AB0 /* socket.cpp */; };
-		26D15E301E93D7D0003BD61A /* tcpip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3D41C1181B500D47AB0 /* tcpip.cpp */; };
-		26D15E311E93D7D0003BD61A /* url.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2631B77D1DDB14E600729A87 /* url.cpp */; };
-		26D15E321E93D7D0003BD61A /* url_request.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2631B77F1DDB14ED00729A87 /* url_request.cpp */; };
-		26D15E331E93D7D0003BD61A /* url_request_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2631B7811DDB14F200729A87 /* url_request_apple.mm */; };
-		26D15E531E93D803003BD61A /* bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD38C1C117AE300D47AB0 /* bitmap.cpp */; };
-		26D15E541E93D803003BD61A /* bitmap_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A3551C131F8E005690FE /* bitmap_data.cpp */; };
-		26D15E551E93D803003BD61A /* bitmap_format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A3571C133969005690FE /* bitmap_format.cpp */; };
-		26D15E561E93D803003BD61A /* bitmap_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 260107871DACE8BB00C40723 /* bitmap_quartz.mm */; };
-		26D15E571E93D803003BD61A /* brush.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD38D1C117AE300D47AB0 /* brush.cpp */; };
-		26D15E581E93D803003BD61A /* canvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD38E1C117AE300D47AB0 /* canvas.cpp */; };
-		26D15E591E93D803003BD61A /* canvas_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 260107891DACE8C400C40723 /* canvas_quartz.mm */; };
-		26D15E5A1E93D803003BD61A /* color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD38F1C117AE300D47AB0 /* color.cpp */; };
-		26D15E5B1E93D803003BD61A /* drawable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3901C117AE300D47AB0 /* drawable.cpp */; };
-		26D15E5C1E93D803003BD61A /* drawable_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2601078B1DACE8CF00C40723 /* drawable_quartz.mm */; };
-		26D15E5D1E93D803003BD61A /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3921C117AE300D47AB0 /* font.cpp */; };
-		26D15E5E1E93D803003BD61A /* font_atlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2640CB6D1DC27BC7006376AC /* font_atlas.cpp */; };
-		26D15E5F1E93D803003BD61A /* font_freetype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3911C117AE300D47AB0 /* font_freetype.cpp */; };
-		26D15E601E93D803003BD61A /* font_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2601078D1DACE8D900C40723 /* font_apple.mm */; };
-		26D15E611E93D803003BD61A /* graphics_path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3941C117AE300D47AB0 /* graphics_path.cpp */; };
-		26D15E621E93D803003BD61A /* graphics_path_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2601078F1DACE8E900C40723 /* graphics_path_quartz.mm */; };
-		26D15E631E93D803003BD61A /* graphics_platform_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 260107911DACE8F200C40723 /* graphics_platform_apple.mm */; };
-		26D15E641E93D803003BD61A /* graphics_resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266F926F1D51CD7A0040166C /* graphics_resource.cpp */; };
-		26D15E651E93D803003BD61A /* graphics_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BFCFC21E41CFAF00F4493D /* graphics_text.cpp */; };
-		26D15E661E93D803003BD61A /* graphics_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3951C117AE300D47AB0 /* graphics_util.cpp */; };
-		26D15E671E93D803003BD61A /* image_jpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3961C117AE300D47AB0 /* image_jpeg.cpp */; };
-		26D15E681E93D803003BD61A /* image_png.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3971C117AE300D47AB0 /* image_png.cpp */; };
-		26D15E691E93D803003BD61A /* image_stb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2692222F1DC12F600055095F /* image_stb.cpp */; };
-		26D15E6A1E93D803003BD61A /* image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD39A1C117AE300D47AB0 /* image.cpp */; };
-		26D15E6B1E93D803003BD61A /* pen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD39B1C117AE300D47AB0 /* pen.cpp */; };
-		26D15E6C1E93D803003BD61A /* yuv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B571811C9D45A80099E69B /* yuv.cpp */; };
-		26D15E8F1E93D82A003BD61A /* index_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3EE1C118B9900D47AB0 /* index_buffer.cpp */; };
-		26D15E901E93D82A003BD61A /* opengl_gl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3F11C118B9900D47AB0 /* opengl_gl.cpp */; };
-		26D15E911E93D82A003BD61A /* opengl_gles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3F31C118B9900D47AB0 /* opengl_gles.cpp */; };
-		26D15E921E93D82A003BD61A /* render_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3F71C118B9900D47AB0 /* render_base.cpp */; };
-		26D15E931E93D82A003BD61A /* render_canvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C267731DB9048200FA8FFD /* render_canvas.cpp */; };
-		26D15E941E93D82A003BD61A /* render_drawable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267D00891E32AA3B002CC949 /* render_drawable.cpp */; };
-		26D15E951E93D82A003BD61A /* render_engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3F81C118B9900D47AB0 /* render_engine.cpp */; };
-		26D15E961E93D82A003BD61A /* render_program.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3FB1C118B9900D47AB0 /* render_program.cpp */; };
-		26D15E971E93D82A003BD61A /* render_resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266F926D1D51CD5D0040166C /* render_resource.cpp */; };
-		26D15E981E93D82A003BD61A /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3FC1C118B9900D47AB0 /* texture.cpp */; };
-		26D15E991E93D82A003BD61A /* vertex_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3FD1C118B9900D47AB0 /* vertex_buffer.cpp */; };
-		26D15EAD1E93D85D003BD61A /* button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4311C118FF200D47AB0 /* button.cpp */; };
-		26D15EAE1E93D85D003BD61A /* button_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4331C118FF700D47AB0 /* button_ios.mm */; };
-		26D15EAF1E93D85D003BD61A /* camera_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A9B7611C172BCC004C9B0E /* camera_view.cpp */; };
-		26D15EB01E93D85D003BD61A /* check_box.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4351C11901A00D47AB0 /* check_box.cpp */; };
-		26D15EB11E93D85D003BD61A /* common_dialogs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2649C23A1CBBD7BF003E7561 /* common_dialogs.cpp */; };
-		26D15EB21E93D85D003BD61A /* common_dialogs_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2649C23C1CBBD7D4003E7561 /* common_dialogs_ios.mm */; };
-		26D15EB31E93D85D003BD61A /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD41A1C118E4A00D47AB0 /* cursor.cpp */; };
-		26D15EB41E93D85D003BD61A /* edit_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD43B1C1190A600D47AB0 /* edit_view.cpp */; };
-		26D15EB51E93D85D003BD61A /* edit_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD43D1C1190AF00D47AB0 /* edit_view_ios.mm */; };
-		26D15EB61E93D85D003BD61A /* gesture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E17DADEA1E0C9060006161F6 /* gesture.cpp */; };
-		26D15EB71E93D85D003BD61A /* image_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260107B11DAD3E5400C40723 /* image_view.cpp */; };
-		26D15EB81E93D85D003BD61A /* label_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD43F1C1190E800D47AB0 /* label_view.cpp */; };
-		26D15EB91E93D85D003BD61A /* label_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4411C11910F00D47AB0 /* label_view_ios.mm */; };
-		26D15EBA1E93D85D003BD61A /* linear_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CB94C81D0126ED00D8A472 /* linear_view.cpp */; };
-		26D15EBB1E93D85D003BD61A /* list_report_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269394CB1D7609EB002B9B03 /* list_report_view.cpp */; };
-		26D15EBC1E93D85D003BD61A /* list_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266F926B1D51CD450040166C /* list_view.cpp */; };
-		26D15EBD1E93D85D003BD61A /* mobile_app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D5491D096AC400819E09 /* mobile_app.cpp */; };
-		26D15EBE1E93D85D003BD61A /* mobile_game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D54A1D096AC400819E09 /* mobile_game.cpp */; };
-		26D15EBF1E93D85D003BD61A /* motion_tracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1034AB71E0B633E00989BB1 /* motion_tracker.cpp */; };
-		26D15EC01E93D85D003BD61A /* notification.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E105A6A31E1F2EC000ACB371 /* notification.cpp */; };
-		26D15EC11E93D85D003BD61A /* notification_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E15AC4FA1E1F66A60083D3E2 /* notification_ios.mm */; };
-		26D15EC21E93D85D003BD61A /* picker_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1B34E9C1E0A909A006217F4 /* picker_view.cpp */; };
-		26D15EC31E93D85D003BD61A /* picker_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1034AB31E0B492400989BB1 /* picker_view_ios.mm */; };
-		26D15EC41E93D85D003BD61A /* progress_bar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2634DCE61D8A82EA00E8F19E /* progress_bar.cpp */; };
-		26D15EC51E93D85D003BD61A /* radio_button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4451C11914200D47AB0 /* radio_button.cpp */; };
-		26D15EC61E93D85D003BD61A /* render_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4471C11917700D47AB0 /* render_view.cpp */; };
-		26D15EC71E93D85D003BD61A /* render_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4491C11918300D47AB0 /* render_view_ios.mm */; };
-		26D15EC81E93D85D003BD61A /* scroll_bar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FD28F51CFCB67D003E95FB /* scroll_bar.cpp */; };
-		26D15EC91E93D85D003BD61A /* scroll_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD44B1C1191B000D47AB0 /* scroll_view.cpp */; };
-		26D15ECA1E93D85D003BD61A /* scroll_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD44D1C1191B900D47AB0 /* scroll_view_ios.mm */; };
-		26D15ECB1E93D85D003BD61A /* select_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E49B1E1D79AD0A0052D89F /* select_view.cpp */; };
-		26D15ECC1E93D85D003BD61A /* select_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26E49B201D79AD440052D89F /* select_view_ios.mm */; };
-		26D15ECD1E93D85D003BD61A /* slider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260747CB1D9388F60061A3B5 /* slider.cpp */; };
-		26D15ECE1E93D85D003BD61A /* split_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2634DCE41D8A82B200E8F19E /* split_view.cpp */; };
-		26D15ECF1E93D85D003BD61A /* tab_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD44F1C1191D400D47AB0 /* tab_view.cpp */; };
-		26D15ED01E93D85D003BD61A /* text_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B1C99E1DC76BF50092C84F /* text_view.cpp */; };
-		26D15ED11E93D85D003BD61A /* transition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 261B4C841DB10149000A385A /* transition.cpp */; };
-		26D15ED21E93D85D003BD61A /* tree_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CB94CA1D0126F900D8A472 /* tree_view.cpp */; };
-		26D15ED31E93D85D003BD61A /* ui_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265335901E2E96A900199C76 /* ui_animation.cpp */; };
-		26D15ED41E93D85D003BD61A /* ui_animation_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 268847811E2FEE2700AFA023 /* ui_animation_apple.mm */; };
-		26D15ED51E93D85D003BD61A /* ui_app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D5471D096AB000819E09 /* ui_app.cpp */; };
-		26D15ED61E93D85D003BD61A /* ui_core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2774E291B1CBBFD00538A7B /* ui_core.cpp */; };
-		26D15ED71E93D85D003BD61A /* ui_core_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2682C3F01E2D5C6C00E9CB98 /* ui_core_apple.mm */; };
-		26D15ED81E93D85D003BD61A /* ui_core_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2682C3F41E2D639000E9CB98 /* ui_core_common.cpp */; };
-		26D15ED91E93D85D003BD61A /* ui_core_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = A25F2F261B039EF600854DAF /* ui_core_ios.mm */; };
-		26D15EDA1E93D85D003BD61A /* ui_event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F2F291B039EF600854DAF /* ui_event.cpp */; };
-		26D15EDB1E93D85D003BD61A /* ui_event_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2774E271B1CBBF600538A7B /* ui_event_ios.mm */; };
-		26D15EDC1E93D85D003BD61A /* ui_menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2621F7201CCF174B00C4615C /* ui_menu.cpp */; };
-		26D15EDD1E93D85D003BD61A /* ui_platform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D54D1D098AE800819E09 /* ui_platform.cpp */; };
-		26D15EDE1E93D85D003BD61A /* ui_resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266F92691D51CD290040166C /* ui_resource.cpp */; };
-		26D15EDF1E93D85D003BD61A /* video_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A9B7631C172BDE004C9B0E /* video_view.cpp */; };
-		26D15EE01E93D85D003BD61A /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4281C118F6D00D47AB0 /* view.cpp */; };
-		26D15EE11E93D85D003BD61A /* view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD42B1C118F7800D47AB0 /* view_ios.mm */; };
-		26D15EE21E93D85D003BD61A /* view_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BBBECB1D906D4A00735947 /* view_page.cpp */; };
-		26D15EE31E93D85D003BD61A /* web_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4511C1191F300D47AB0 /* web_view.cpp */; };
-		26D15EE41E93D85D003BD61A /* web_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4531C1191FE00D47AB0 /* web_view_ios.mm */; };
-		26D15EE51E93D85D003BD61A /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD42D1C118FA500D47AB0 /* window.cpp */; };
-		26D15EE61E93D85D003BD61A /* window_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD42F1C118FB700D47AB0 /* window_ios.mm */; };
-		26D15EFA1E93D887003BD61A /* audio_codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3591C1170BD00D47AB0 /* audio_codec.cpp */; };
-		26D15EFB1E93D887003BD61A /* audio_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DA34FC1C4B8B1D004DC204 /* audio_data.cpp */; };
-		26D15EFC1E93D887003BD61A /* audio_format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD35A1C1170BD00D47AB0 /* audio_format.cpp */; };
-		26D15EFD1E93D887003BD61A /* audio_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD35B1C1170BD00D47AB0 /* audio_player.cpp */; };
-		26D15EFE1E93D887003BD61A /* audio_player_dsound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 006089E71E2A386400D3CD78 /* audio_player_dsound.cpp */; };
-		26D15EFF1E93D887003BD61A /* audio_player_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD36C1C1171B800D47AB0 /* audio_player_ios.mm */; };
-		26D15F001E93D887003BD61A /* audio_player_opensl_es.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 006089E91E2A386E00D3CD78 /* audio_player_opensl_es.cpp */; };
-		26D15F011E93D887003BD61A /* audio_recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD35C1C1170BD00D47AB0 /* audio_recorder.cpp */; };
-		26D15F021E93D887003BD61A /* audio_recorder_dsound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 006089EB1E2A388600D3CD78 /* audio_recorder_dsound.cpp */; };
-		26D15F031E93D887003BD61A /* audio_recorder_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3721C1171E400D47AB0 /* audio_recorder_ios.mm */; };
-		26D15F041E93D887003BD61A /* audio_recorder_opensl_es.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 006089EC1E2A388600D3CD78 /* audio_recorder_opensl_es.cpp */; };
-		26D15F051E93D887003BD61A /* audio_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B5717E1C9D449E0099E69B /* audio_util.cpp */; };
-		26D15F061E93D887003BD61A /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD35D1C1170BD00D47AB0 /* camera.cpp */; };
-		26D15F071E93D887003BD61A /* camera_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5F51C11E09B00D47AB0 /* camera_apple.mm */; };
-		26D15F081E93D887003BD61A /* camera_dshow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268916331C182AC8009FD75E /* camera_dshow.cpp */; };
-		26D15F091E93D887003BD61A /* codec_opus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD35E1C1170BD00D47AB0 /* codec_opus.cpp */; };
-		26D15F0A1E93D887003BD61A /* codec_vp8.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26ACCB901C4A35DD00330F88 /* codec_vp8.cpp */; };
-		26D15F0B1E93D887003BD61A /* media_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D8AC921E393F1E0092EB81 /* media_player.cpp */; };
-		26D15F0C1E93D887003BD61A /* media_player_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26D8AC911E393F1E0092EB81 /* media_player_apple.mm */; };
-		26D15F0D1E93D887003BD61A /* video_capture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3601C1170BD00D47AB0 /* video_capture.cpp */; };
-		26D15F0E1E93D887003BD61A /* video_codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3611C1170BD00D47AB0 /* video_codec.cpp */; };
-		26D15F0F1E93D887003BD61A /* video_frame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DA34FE1C4B8B2D004DC204 /* video_frame.cpp */; };
-		26D15F341E93D8A8003BD61A /* device_information_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1E4EDAF1DF08924002221C5 /* device_information_ios.mm */; };
-		26D15F351E93D8AC003BD61A /* device_information.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1E4EDB11DF08931002221C5 /* device_information.cpp */; };
-		26D15F361E93D8AC003BD61A /* sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A34D1C128D80005690FE /* sensor.cpp */; };
-		26D15F371E93D8AC003BD61A /* sensor_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */; };
-		26D15F381E93D8AC003BD61A /* vibrator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A34F1C128D80005690FE /* vibrator.cpp */; };
-		26D15F391E93D8AC003BD61A /* vibrator_ios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.cpp */; };
-		26D15F481E93D92E003BD61A /* database_cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF2A1C23051F00AD81D9 /* database_cursor.cpp */; };
-		26D15F491E93D92E003BD61A /* database_statement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF2B1C23051F00AD81D9 /* database_statement.cpp */; };
-		26D15F4A1E93D92E003BD61A /* database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF2C1C23051F00AD81D9 /* database.cpp */; };
-		26D15F4B1E93D92E003BD61A /* sqlite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF2D1C23051F00AD81D9 /* sqlite.cpp */; };
-		26D15F581E93D949003BD61A /* earth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5B3201E90125200F9FB7F /* earth.cpp */; };
-		26D15F591E93D949003BD61A /* geo_line.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5B3211E90125200F9FB7F /* geo_line.cpp */; };
-		26D15F5A1E93D949003BD61A /* geo_location.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5B3221E90125200F9FB7F /* geo_location.cpp */; };
-		26D15F5B1E93D949003BD61A /* geo_rectangle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5B3231E90125200F9FB7F /* geo_rectangle.cpp */; };
-		26D15F5C1E93D949003BD61A /* globe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5B3241E90125200F9FB7F /* globe.cpp */; };
-		26D15F5D1E93D949003BD61A /* latlon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5B3251E90125200F9FB7F /* latlon.cpp */; };
 		26D15F6C1E93D981003BD61A /* thirdparty_zlib.c in Sources */ = {isa = PBXBuildFile; fileRef = A2498C741AFA9C3200C76201 /* thirdparty_zlib.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		26D15F761E93D9A6003BD61A /* thirdparty_libpng.c in Sources */ = {isa = PBXBuildFile; fileRef = A2498C721AFA9C3200C76201 /* thirdparty_libpng.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		26D15F801E93D9BD003BD61A /* thirdparty_libjpeg.c in Sources */ = {isa = PBXBuildFile; fileRef = A2498C701AFA9C3200C76201 /* thirdparty_libjpeg.c */; settings = {COMPILER_FLAGS = "-w"; }; };
@@ -507,85 +351,34 @@
 		26D9D8ED1E962976005F7BD3 /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD42D1C118FA500D47AB0 /* window.cpp */; };
 		26D9D8EE1E962976005F7BD3 /* window_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD42F1C118FB700D47AB0 /* window_ios.mm */; };
 		26D9D9F71E968364005F7BD3 /* http_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D9D9F61E968364005F7BD3 /* http_io.cpp */; };
-		26D9D9F81E968364005F7BD3 /* http_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D9D9F61E968364005F7BD3 /* http_io.cpp */; };
-		E1C697371E9435810054C285 /* take_photo_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1C697351E9435810054C285 /* take_photo_ios.mm */; };
-		E1C697381E9435810054C285 /* take_photo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1C697361E9435810054C285 /* take_photo.cpp */; };
+		26EAB7CD1EA288DA00ED96FA /* arp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B5717C1C9D44930099E69B /* arp.cpp */; };
+		26EAB7CE1EA288DA00ED96FA /* dns.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3BB1C1181B500D47AB0 /* dns.cpp */; };
+		26EAB7CF1EA288DA00ED96FA /* ethernet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3BC1C1181B500D47AB0 /* ethernet.cpp */; };
+		26EAB7D01EA288DA00ED96FA /* http_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3BE1C1181B500D47AB0 /* http_common.cpp */; };
+		26EAB7D11EA288DA00ED96FA /* http_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D9D9F61E968364005F7BD3 /* http_io.cpp */; };
+		26EAB7D21EA288DA00ED96FA /* http_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C01C1181B500D47AB0 /* http_service.cpp */; };
+		26EAB7D31EA288DA00ED96FA /* icmp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C11C1181B500D47AB0 /* icmp.cpp */; };
+		26EAB7D41EA288DA00ED96FA /* ip_address.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C21C1181B500D47AB0 /* ip_address.cpp */; };
+		26EAB7D51EA288DA00ED96FA /* mac_address.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C31C1181B500D47AB0 /* mac_address.cpp */; };
+		26EAB7D61EA288DA00ED96FA /* nat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C41C1181B500D47AB0 /* nat.cpp */; };
+		26EAB7D71EA288DA00ED96FA /* net_capture_pcap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C51C1181B500D47AB0 /* net_capture_pcap.cpp */; };
+		26EAB7D81EA288DA00ED96FA /* net_capture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C61C1181B500D47AB0 /* net_capture.cpp */; };
+		26EAB7D91EA288DA00ED96FA /* network_async_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C91C1181B500D47AB0 /* network_async_unix.cpp */; };
+		26EAB7DA1EA288DA00ED96FA /* network_async.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CB1C1181B500D47AB0 /* network_async.cpp */; };
+		26EAB7DB1EA288DA00ED96FA /* network_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CD1C1181B500D47AB0 /* network_io.cpp */; };
+		26EAB7DC1EA288DA00ED96FA /* network_os.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CC1C1181B500D47AB0 /* network_os.cpp */; };
+		26EAB7DD1EA288DA00ED96FA /* socket_address.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CF1C1181B500D47AB0 /* socket_address.cpp */; };
+		26EAB7DE1EA288DA00ED96FA /* socket_event_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3D01C1181B500D47AB0 /* socket_event_unix.cpp */; };
+		26EAB7DF1EA288DA00ED96FA /* socket_event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3D21C1181B500D47AB0 /* socket_event.cpp */; };
+		26EAB7E01EA288DA00ED96FA /* socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3D31C1181B500D47AB0 /* socket.cpp */; };
+		26EAB7E11EA288DA00ED96FA /* tcpip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3D41C1181B500D47AB0 /* tcpip.cpp */; };
+		26EAB7E21EA288DA00ED96FA /* url.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2631B77D1DDB14E600729A87 /* url.cpp */; };
+		26EAB7E31EA288DA00ED96FA /* url_request.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2631B77F1DDB14ED00729A87 /* url_request.cpp */; };
+		26EAB7E41EA288DA00ED96FA /* url_request_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2631B7811DDB14F200729A87 /* url_request_apple.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		26D15D601E93ACBD003BD61A /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "include/$(PRODUCT_NAME)";
-			dstSubfolderSpec = 16;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15E181E93D7B8003BD61A /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "include/$(PRODUCT_NAME)";
-			dstSubfolderSpec = 16;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15E4E1E93D7E3003BD61A /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "include/$(PRODUCT_NAME)";
-			dstSubfolderSpec = 16;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15E8A1E93D813003BD61A /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "include/$(PRODUCT_NAME)";
-			dstSubfolderSpec = 16;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15EA81E93D830003BD61A /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "include/$(PRODUCT_NAME)";
-			dstSubfolderSpec = 16;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15EF51E93D872003BD61A /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "include/$(PRODUCT_NAME)";
-			dstSubfolderSpec = 16;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15F291E93D88D003BD61A /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "include/$(PRODUCT_NAME)";
-			dstSubfolderSpec = 16;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15F431E93D90A003BD61A /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "include/$(PRODUCT_NAME)";
-			dstSubfolderSpec = 16;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15F531E93D93D003BD61A /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
@@ -857,14 +650,6 @@
 		26CB94CA1D0126F900D8A472 /* tree_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tree_view.cpp; sourceTree = "<group>"; };
 		26CE672A1DE8271500C1371F /* hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hash.cpp; sourceTree = "<group>"; };
 		26D15D641E93ACBD003BD61A /* libslib-core.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libslib-core.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		26D15E1C1E93D7B8003BD61A /* libslib-network.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libslib-network.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		26D15E521E93D7E3003BD61A /* libslib-graphics.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libslib-graphics.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		26D15E8E1E93D813003BD61A /* libslib-render.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libslib-render.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		26D15EAC1E93D830003BD61A /* libslib-ui.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libslib-ui.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		26D15EF91E93D872003BD61A /* libslib-media.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libslib-media.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		26D15F2D1E93D88D003BD61A /* libslib-device.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libslib-device.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		26D15F471E93D90A003BD61A /* libslib-db.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libslib-db.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		26D15F571E93D93D003BD61A /* libslib-geo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libslib-geo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		26D15F6B1E93D963003BD61A /* libzlib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libzlib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		26D15F751E93D98D003BD61A /* libpng.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpng.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		26D15F7F1E93D9B0003BD61A /* libjpeg.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libjpeg.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -956,62 +741,6 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		26D15D5F1E93ACBD003BD61A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15E171E93D7B8003BD61A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15E4D1E93D7E3003BD61A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15E891E93D813003BD61A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15EA71E93D830003BD61A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15EF41E93D872003BD61A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15F281E93D88D003BD61A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15F421E93D90A003BD61A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15F521E93D93D003BD61A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1476,14 +1205,6 @@
 			isa = PBXGroup;
 			children = (
 				26D15D641E93ACBD003BD61A /* libslib-core.a */,
-				26D15E1C1E93D7B8003BD61A /* libslib-network.a */,
-				26D15E521E93D7E3003BD61A /* libslib-graphics.a */,
-				26D15E8E1E93D813003BD61A /* libslib-render.a */,
-				26D15EAC1E93D830003BD61A /* libslib-ui.a */,
-				26D15EF91E93D872003BD61A /* libslib-media.a */,
-				26D15F2D1E93D88D003BD61A /* libslib-device.a */,
-				26D15F471E93D90A003BD61A /* libslib-db.a */,
-				26D15F571E93D93D003BD61A /* libslib-geo.a */,
 				26D15F6B1E93D963003BD61A /* libzlib.a */,
 				26D15F751E93D98D003BD61A /* libpng.a */,
 				26D15F7F1E93D9B0003BD61A /* libjpeg.a */,
@@ -1514,142 +1235,6 @@
 			name = "slib-core";
 			productName = slib;
 			productReference = 26D15D641E93ACBD003BD61A /* libslib-core.a */;
-			productType = "com.apple.product-type.library.static";
-		};
-		26D15DBD1E93D7B8003BD61A /* slib-network */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 26D15E191E93D7B8003BD61A /* Build configuration list for PBXNativeTarget "slib-network" */;
-			buildPhases = (
-				26D15DBE1E93D7B8003BD61A /* Sources */,
-				26D15E171E93D7B8003BD61A /* Frameworks */,
-				26D15E181E93D7B8003BD61A /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "slib-network";
-			productName = slib;
-			productReference = 26D15E1C1E93D7B8003BD61A /* libslib-network.a */;
-			productType = "com.apple.product-type.library.static";
-		};
-		26D15E341E93D7E3003BD61A /* slib-graphics */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 26D15E4F1E93D7E3003BD61A /* Build configuration list for PBXNativeTarget "slib-graphics" */;
-			buildPhases = (
-				26D15E351E93D7E3003BD61A /* Sources */,
-				26D15E4D1E93D7E3003BD61A /* Frameworks */,
-				26D15E4E1E93D7E3003BD61A /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "slib-graphics";
-			productName = slib;
-			productReference = 26D15E521E93D7E3003BD61A /* libslib-graphics.a */;
-			productType = "com.apple.product-type.library.static";
-		};
-		26D15E6D1E93D813003BD61A /* slib-render */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 26D15E8B1E93D813003BD61A /* Build configuration list for PBXNativeTarget "slib-render" */;
-			buildPhases = (
-				26D15E6E1E93D813003BD61A /* Sources */,
-				26D15E891E93D813003BD61A /* Frameworks */,
-				26D15E8A1E93D813003BD61A /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "slib-render";
-			productName = slib;
-			productReference = 26D15E8E1E93D813003BD61A /* libslib-render.a */;
-			productType = "com.apple.product-type.library.static";
-		};
-		26D15E9A1E93D830003BD61A /* slib-ui */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 26D15EA91E93D830003BD61A /* Build configuration list for PBXNativeTarget "slib-ui" */;
-			buildPhases = (
-				26D15E9B1E93D830003BD61A /* Sources */,
-				26D15EA71E93D830003BD61A /* Frameworks */,
-				26D15EA81E93D830003BD61A /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "slib-ui";
-			productName = slib;
-			productReference = 26D15EAC1E93D830003BD61A /* libslib-ui.a */;
-			productType = "com.apple.product-type.library.static";
-		};
-		26D15EE71E93D872003BD61A /* slib-media */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 26D15EF61E93D872003BD61A /* Build configuration list for PBXNativeTarget "slib-media" */;
-			buildPhases = (
-				26D15EE81E93D872003BD61A /* Sources */,
-				26D15EF41E93D872003BD61A /* Frameworks */,
-				26D15EF51E93D872003BD61A /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "slib-media";
-			productName = slib;
-			productReference = 26D15EF91E93D872003BD61A /* libslib-media.a */;
-			productType = "com.apple.product-type.library.static";
-		};
-		26D15F101E93D88D003BD61A /* slib-device */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 26D15F2A1E93D88D003BD61A /* Build configuration list for PBXNativeTarget "slib-device" */;
-			buildPhases = (
-				26D15F111E93D88D003BD61A /* Sources */,
-				26D15F281E93D88D003BD61A /* Frameworks */,
-				26D15F291E93D88D003BD61A /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "slib-device";
-			productName = slib;
-			productReference = 26D15F2D1E93D88D003BD61A /* libslib-device.a */;
-			productType = "com.apple.product-type.library.static";
-		};
-		26D15F3A1E93D90A003BD61A /* slib-db */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 26D15F441E93D90A003BD61A /* Build configuration list for PBXNativeTarget "slib-db" */;
-			buildPhases = (
-				26D15F3B1E93D90A003BD61A /* Sources */,
-				26D15F421E93D90A003BD61A /* Frameworks */,
-				26D15F431E93D90A003BD61A /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "slib-db";
-			productName = slib;
-			productReference = 26D15F471E93D90A003BD61A /* libslib-db.a */;
-			productType = "com.apple.product-type.library.static";
-		};
-		26D15F4C1E93D93D003BD61A /* slib-geo */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 26D15F541E93D93D003BD61A /* Build configuration list for PBXNativeTarget "slib-geo" */;
-			buildPhases = (
-				26D15F4D1E93D93D003BD61A /* Sources */,
-				26D15F521E93D93D003BD61A /* Frameworks */,
-				26D15F531E93D93D003BD61A /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "slib-geo";
-			productName = slib;
-			productReference = 26D15F571E93D93D003BD61A /* libslib-geo.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		26D15F5E1E93D963003BD61A /* zlib */ = {
@@ -1811,14 +1396,6 @@
 			targets = (
 				26D9D7F11E9628E0005F7BD3 /* slib */,
 				26D15C5F1E93ACBD003BD61A /* slib-core */,
-				26D15DBD1E93D7B8003BD61A /* slib-network */,
-				26D15E341E93D7E3003BD61A /* slib-graphics */,
-				26D15E6D1E93D813003BD61A /* slib-render */,
-				26D15E9A1E93D830003BD61A /* slib-ui */,
-				26D15EE71E93D872003BD61A /* slib-media */,
-				26D15F101E93D88D003BD61A /* slib-device */,
-				26D15F3A1E93D90A003BD61A /* slib-db */,
-				26D15F4C1E93D93D003BD61A /* slib-geo */,
 				26D15F5E1E93D963003BD61A /* zlib */,
 				26D15F6D1E93D98D003BD61A /* png */,
 				26D15F771E93D9B0003BD61A /* jpeg */,
@@ -1837,28 +1414,37 @@
 			files = (
 				26D15DA91E93AD24003BD61A /* box.cpp in Sources */,
 				26D15D7F1E93AD05003BD61A /* map.cpp in Sources */,
+				26EAB7CD1EA288DA00ED96FA /* arp.cpp in Sources */,
+				26EAB7D11EA288DA00ED96FA /* http_io.cpp in Sources */,
 				26D15DB11E93AD24003BD61A /* plane.cpp in Sources */,
 				26D15D9C1E93AD05003BD61A /* xml.cpp in Sources */,
 				26D15D6C1E93AD05003BD61A /* atomic.cpp in Sources */,
 				26D15D8A1E93AD05003BD61A /* preference.cpp in Sources */,
+				26EAB7E41EA288DA00ED96FA /* url_request_apple.mm in Sources */,
 				26D15D651E93AD05003BD61A /* animation.cpp in Sources */,
 				26D15DA61E93AD16003BD61A /* sha2.cpp in Sources */,
 				26D15D6D1E93AD05003BD61A /* base.cpp in Sources */,
 				26D15D981E93AD05003BD61A /* thread_pool.cpp in Sources */,
 				26D15DB51E93AD24003BD61A /* transform2d.cpp in Sources */,
+				26EAB7D31EA288DA00ED96FA /* icmp.cpp in Sources */,
 				26D15DB71E93AD24003BD61A /* triangle.cpp in Sources */,
 				26D15D6B1E93AD05003BD61A /* async_unix.cpp in Sources */,
+				26EAB7E01EA288DA00ED96FA /* socket.cpp in Sources */,
 				26D15D8C1E93AD05003BD61A /* ptr.cpp in Sources */,
+				26EAB7CE1EA288DA00ED96FA /* dns.cpp in Sources */,
 				26D15D741E93AD05003BD61A /* event_unix.cpp in Sources */,
 				26D15D7C1E93AD05003BD61A /* list.cpp in Sources */,
 				26D15D961E93AD05003BD61A /* thread.cpp in Sources */,
+				26EAB7D71EA288DA00ED96FA /* net_capture_pcap.cpp in Sources */,
 				26D15DA31E93AD16003BD61A /* md5.cpp in Sources */,
 				26D15DAE1E93AD24003BD61A /* matrix2.cpp in Sources */,
 				26D15D731E93AD05003BD61A /* event.cpp in Sources */,
 				26D15D691E93AD05003BD61A /* async.cpp in Sources */,
 				26D15DB91E93AD24003BD61A /* vector2.cpp in Sources */,
+				26EAB7E31EA288DA00ED96FA /* url_request.cpp in Sources */,
 				26D15D951E93AD05003BD61A /* system_unix.cpp in Sources */,
 				26D15DA21E93AD16003BD61A /* gcm.cpp in Sources */,
+				26EAB7DD1EA288DA00ED96FA /* socket_address.cpp in Sources */,
 				26D15D771E93AD05003BD61A /* function.cpp in Sources */,
 				26D15DB01E93AD24003BD61A /* matrix4.cpp in Sources */,
 				26D15D6F1E93AD05003BD61A /* charset.cpp in Sources */,
@@ -1869,13 +1455,19 @@
 				26D15DB61E93AD24003BD61A /* transform3d.cpp in Sources */,
 				26D15D7E1E93AD05003BD61A /* log.cpp in Sources */,
 				26D15DB31E93AD24003BD61A /* rectangle.cpp in Sources */,
+				26EAB7D01EA288DA00ED96FA /* http_common.cpp in Sources */,
+				26EAB7DF1EA288DA00ED96FA /* socket_event.cpp in Sources */,
 				26D15D9B1E93AD05003BD61A /* variant.cpp in Sources */,
 				26D15D871E93AD05003BD61A /* platform_android.cpp in Sources */,
+				26EAB7D51EA288DA00ED96FA /* mac_address.cpp in Sources */,
 				26D15D6A1E93AD05003BD61A /* async_kqueue.cpp in Sources */,
 				26D15DAA1E93AD24003BD61A /* int128.cpp in Sources */,
+				26EAB7D91EA288DA00ED96FA /* network_async_unix.cpp in Sources */,
 				26D15DB41E93AD24003BD61A /* sphere.cpp in Sources */,
+				26EAB7D21EA288DA00ED96FA /* http_service.cpp in Sources */,
 				26D15DA71E93AD24003BD61A /* bezier.cpp in Sources */,
 				26D15D701E93AD05003BD61A /* collection.cpp in Sources */,
+				26EAB7CF1EA288DA00ED96FA /* ethernet.cpp in Sources */,
 				26D15D8B1E93AD05003BD61A /* preference_apple.mm in Sources */,
 				26D15D7B1E93AD05003BD61A /* json.cpp in Sources */,
 				26D15D7A1E93AD05003BD61A /* java.cpp in Sources */,
@@ -1883,13 +1475,17 @@
 				26D15D671E93AD05003BD61A /* array.cpp in Sources */,
 				26D15DAD1E93AD24003BD61A /* line3.cpp in Sources */,
 				26D15D861E93AD05003BD61A /* pipe_unix.cpp in Sources */,
+				26EAB7DC1EA288DA00ED96FA /* network_os.cpp in Sources */,
 				26D15D751E93AD05003BD61A /* file.cpp in Sources */,
 				26D15D901E93AD05003BD61A /* setting.cpp in Sources */,
 				26D15DB21E93AD24003BD61A /* quaternion.cpp in Sources */,
 				26D15D781E93AD05003BD61A /* hash.cpp in Sources */,
 				26D15D841E93AD05003BD61A /* parse.cpp in Sources */,
+				26EAB7DE1EA288DA00ED96FA /* socket_event_unix.cpp in Sources */,
 				26D15D911E93AD05003BD61A /* spin_lock.cpp in Sources */,
 				26D15DA81E93AD24003BD61A /* bigint.cpp in Sources */,
+				26EAB7DB1EA288DA00ED96FA /* network_io.cpp in Sources */,
+				26EAB7E21EA288DA00ED96FA /* url.cpp in Sources */,
 				26D15D681E93AD05003BD61A /* asset.cpp in Sources */,
 				26D15DA11E93AD16003BD61A /* crypto_hash.cpp in Sources */,
 				26D15DBC1E93AD24003BD61A /* view_frustum.cpp in Sources */,
@@ -1906,14 +1502,18 @@
 				26D15D6E1E93AD05003BD61A /* base64.cpp in Sources */,
 				26D15D971E93AD05003BD61A /* thread_apple.mm in Sources */,
 				26D15D811E93AD05003BD61A /* memory.cpp in Sources */,
+				26EAB7D61EA288DA00ED96FA /* nat.cpp in Sources */,
 				26D15D9D1E93AD16003BD61A /* aes.cpp in Sources */,
+				26EAB7D81EA288DA00ED96FA /* net_capture.cpp in Sources */,
 				26D15D761E93AD05003BD61A /* file_unix.cpp in Sources */,
 				26D15D831E93AD05003BD61A /* object.cpp in Sources */,
 				26D15D661E93AD05003BD61A /* app.cpp in Sources */,
+				26EAB7DA1EA288DA00ED96FA /* network_async.cpp in Sources */,
 				26D15D8D1E93AD05003BD61A /* ref.cpp in Sources */,
 				26D15D791E93AD05003BD61A /* io.cpp in Sources */,
 				26D15DA51E93AD16003BD61A /* sha1.cpp in Sources */,
 				26D15D9E1E93AD16003BD61A /* block_cipher.cpp in Sources */,
+				26EAB7E11EA288DA00ED96FA /* tcpip.cpp in Sources */,
 				26D15DAC1E93AD24003BD61A /* line.cpp in Sources */,
 				26D15D8F1E93AD05003BD61A /* service.cpp in Sources */,
 				26D15DBA1E93AD24003BD61A /* vector3.cpp in Sources */,
@@ -1921,223 +1521,9 @@
 				26D15D7D1E93AD05003BD61A /* locale.cpp in Sources */,
 				26D15DA01E93AD16003BD61A /* compress_zlib.cpp in Sources */,
 				26D15DA41E93AD16003BD61A /* rsa.cpp in Sources */,
+				26EAB7D41EA288DA00ED96FA /* ip_address.cpp in Sources */,
 				26D15DBB1E93AD24003BD61A /* vector4.cpp in Sources */,
 				26D15D721E93AD05003BD61A /* dispatch.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15DBE1E93D7B8003BD61A /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				26D15E271E93D7D0003BD61A /* net_capture.cpp in Sources */,
-				26D15E2D1E93D7D0003BD61A /* socket_event_unix.cpp in Sources */,
-				26D15E2C1E93D7D0003BD61A /* socket_address.cpp in Sources */,
-				26D9D9F81E968364005F7BD3 /* http_io.cpp in Sources */,
-				26D15E291E93D7D0003BD61A /* network_async.cpp in Sources */,
-				26D15E261E93D7D0003BD61A /* net_capture_pcap.cpp in Sources */,
-				26D15E321E93D7D0003BD61A /* url_request.cpp in Sources */,
-				26D15E201E93D7D0003BD61A /* http_common.cpp in Sources */,
-				26D15E2A1E93D7D0003BD61A /* network_io.cpp in Sources */,
-				26D15E1F1E93D7D0003BD61A /* ethernet.cpp in Sources */,
-				26D15E2F1E93D7D0003BD61A /* socket.cpp in Sources */,
-				26D15E311E93D7D0003BD61A /* url.cpp in Sources */,
-				26D15E221E93D7D0003BD61A /* icmp.cpp in Sources */,
-				26D15E301E93D7D0003BD61A /* tcpip.cpp in Sources */,
-				26D15E281E93D7D0003BD61A /* network_async_unix.cpp in Sources */,
-				26D15E331E93D7D0003BD61A /* url_request_apple.mm in Sources */,
-				26D15E1D1E93D7D0003BD61A /* arp.cpp in Sources */,
-				26D15E2E1E93D7D0003BD61A /* socket_event.cpp in Sources */,
-				26D15E211E93D7D0003BD61A /* http_service.cpp in Sources */,
-				26D15E231E93D7D0003BD61A /* ip_address.cpp in Sources */,
-				26D15E251E93D7D0003BD61A /* nat.cpp in Sources */,
-				26D15E2B1E93D7D0003BD61A /* network_os.cpp in Sources */,
-				26D15E241E93D7D0003BD61A /* mac_address.cpp in Sources */,
-				26D15E1E1E93D7D0003BD61A /* dns.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15E351E93D7E3003BD61A /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				26D15E5B1E93D803003BD61A /* drawable.cpp in Sources */,
-				26D15E541E93D803003BD61A /* bitmap_data.cpp in Sources */,
-				26D15E641E93D803003BD61A /* graphics_resource.cpp in Sources */,
-				26D15E621E93D803003BD61A /* graphics_path_quartz.mm in Sources */,
-				26D15E5A1E93D803003BD61A /* color.cpp in Sources */,
-				26D15E6A1E93D803003BD61A /* image.cpp in Sources */,
-				26D15E6C1E93D803003BD61A /* yuv.cpp in Sources */,
-				26D15E601E93D803003BD61A /* font_apple.mm in Sources */,
-				26D15E651E93D803003BD61A /* graphics_text.cpp in Sources */,
-				26D15E581E93D803003BD61A /* canvas.cpp in Sources */,
-				26D15E5D1E93D803003BD61A /* font.cpp in Sources */,
-				26D15E611E93D803003BD61A /* graphics_path.cpp in Sources */,
-				26D15E671E93D803003BD61A /* image_jpeg.cpp in Sources */,
-				26D15E5F1E93D803003BD61A /* font_freetype.cpp in Sources */,
-				26D15E591E93D803003BD61A /* canvas_quartz.mm in Sources */,
-				26D15E661E93D803003BD61A /* graphics_util.cpp in Sources */,
-				26D15E6B1E93D803003BD61A /* pen.cpp in Sources */,
-				26D15E691E93D803003BD61A /* image_stb.cpp in Sources */,
-				26D15E5E1E93D803003BD61A /* font_atlas.cpp in Sources */,
-				26D15E681E93D803003BD61A /* image_png.cpp in Sources */,
-				26D15E531E93D803003BD61A /* bitmap.cpp in Sources */,
-				26D15E5C1E93D803003BD61A /* drawable_quartz.mm in Sources */,
-				26D15E551E93D803003BD61A /* bitmap_format.cpp in Sources */,
-				26D15E631E93D803003BD61A /* graphics_platform_apple.mm in Sources */,
-				26D15E571E93D803003BD61A /* brush.cpp in Sources */,
-				26D15E561E93D803003BD61A /* bitmap_quartz.mm in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15E6E1E93D813003BD61A /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				26D15E991E93D82A003BD61A /* vertex_buffer.cpp in Sources */,
-				26D15E8F1E93D82A003BD61A /* index_buffer.cpp in Sources */,
-				26D15E931E93D82A003BD61A /* render_canvas.cpp in Sources */,
-				26D15E971E93D82A003BD61A /* render_resource.cpp in Sources */,
-				26D15E961E93D82A003BD61A /* render_program.cpp in Sources */,
-				26D15E901E93D82A003BD61A /* opengl_gl.cpp in Sources */,
-				26D15E921E93D82A003BD61A /* render_base.cpp in Sources */,
-				26D15E911E93D82A003BD61A /* opengl_gles.cpp in Sources */,
-				26D15E951E93D82A003BD61A /* render_engine.cpp in Sources */,
-				26D15E941E93D82A003BD61A /* render_drawable.cpp in Sources */,
-				26D15E981E93D82A003BD61A /* texture.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15E9B1E93D830003BD61A /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				26D15EBF1E93D85D003BD61A /* motion_tracker.cpp in Sources */,
-				26D15ED01E93D85D003BD61A /* text_view.cpp in Sources */,
-				26D15EE31E93D85D003BD61A /* web_view.cpp in Sources */,
-				26D15EB31E93D85D003BD61A /* cursor.cpp in Sources */,
-				26D15EDE1E93D85D003BD61A /* ui_resource.cpp in Sources */,
-				26D15EDD1E93D85D003BD61A /* ui_platform.cpp in Sources */,
-				26D15EE51E93D85D003BD61A /* window.cpp in Sources */,
-				26D15EC61E93D85D003BD61A /* render_view.cpp in Sources */,
-				26D15ED51E93D85D003BD61A /* ui_app.cpp in Sources */,
-				26D15EC71E93D85D003BD61A /* render_view_ios.mm in Sources */,
-				26D15EE41E93D85D003BD61A /* web_view_ios.mm in Sources */,
-				26D15EDF1E93D85D003BD61A /* video_view.cpp in Sources */,
-				26D15ECB1E93D85D003BD61A /* select_view.cpp in Sources */,
-				26D15EC41E93D85D003BD61A /* progress_bar.cpp in Sources */,
-				26D15EBA1E93D85D003BD61A /* linear_view.cpp in Sources */,
-				26D15EB81E93D85D003BD61A /* label_view.cpp in Sources */,
-				26D15EC11E93D85D003BD61A /* notification_ios.mm in Sources */,
-				26D15ED91E93D85D003BD61A /* ui_core_ios.mm in Sources */,
-				26D15EB01E93D85D003BD61A /* check_box.cpp in Sources */,
-				26D15ED61E93D85D003BD61A /* ui_core.cpp in Sources */,
-				26D15EDC1E93D85D003BD61A /* ui_menu.cpp in Sources */,
-				26D15ED81E93D85D003BD61A /* ui_core_common.cpp in Sources */,
-				26D15EBC1E93D85D003BD61A /* list_view.cpp in Sources */,
-				26D15EBE1E93D85D003BD61A /* mobile_game.cpp in Sources */,
-				26D15EAD1E93D85D003BD61A /* button.cpp in Sources */,
-				26D15EAF1E93D85D003BD61A /* camera_view.cpp in Sources */,
-				26D15ED11E93D85D003BD61A /* transition.cpp in Sources */,
-				26D15ED21E93D85D003BD61A /* tree_view.cpp in Sources */,
-				26D15EBD1E93D85D003BD61A /* mobile_app.cpp in Sources */,
-				26D15ED71E93D85D003BD61A /* ui_core_apple.mm in Sources */,
-				26D15EB71E93D85D003BD61A /* image_view.cpp in Sources */,
-				26D15EE11E93D85D003BD61A /* view_ios.mm in Sources */,
-				26D15ED41E93D85D003BD61A /* ui_animation_apple.mm in Sources */,
-				26D15EAE1E93D85D003BD61A /* button_ios.mm in Sources */,
-				26D15EC01E93D85D003BD61A /* notification.cpp in Sources */,
-				26D15ECA1E93D85D003BD61A /* scroll_view_ios.mm in Sources */,
-				26D15EBB1E93D85D003BD61A /* list_report_view.cpp in Sources */,
-				26D15EDB1E93D85D003BD61A /* ui_event_ios.mm in Sources */,
-				26D15EE21E93D85D003BD61A /* view_page.cpp in Sources */,
-				26D15EE61E93D85D003BD61A /* window_ios.mm in Sources */,
-				26D15EC81E93D85D003BD61A /* scroll_bar.cpp in Sources */,
-				26D15EB61E93D85D003BD61A /* gesture.cpp in Sources */,
-				26D15EB51E93D85D003BD61A /* edit_view_ios.mm in Sources */,
-				26D15EB91E93D85D003BD61A /* label_view_ios.mm in Sources */,
-				26D15EC21E93D85D003BD61A /* picker_view.cpp in Sources */,
-				26D15ECD1E93D85D003BD61A /* slider.cpp in Sources */,
-				26D15EE01E93D85D003BD61A /* view.cpp in Sources */,
-				26D15EC51E93D85D003BD61A /* radio_button.cpp in Sources */,
-				26D15EB21E93D85D003BD61A /* common_dialogs_ios.mm in Sources */,
-				26D15ED31E93D85D003BD61A /* ui_animation.cpp in Sources */,
-				26D15EB41E93D85D003BD61A /* edit_view.cpp in Sources */,
-				26D15EB11E93D85D003BD61A /* common_dialogs.cpp in Sources */,
-				26D15EC91E93D85D003BD61A /* scroll_view.cpp in Sources */,
-				26D15ECF1E93D85D003BD61A /* tab_view.cpp in Sources */,
-				26D15ECE1E93D85D003BD61A /* split_view.cpp in Sources */,
-				26D15ECC1E93D85D003BD61A /* select_view_ios.mm in Sources */,
-				26D15EDA1E93D85D003BD61A /* ui_event.cpp in Sources */,
-				26D15EC31E93D85D003BD61A /* picker_view_ios.mm in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15EE81E93D872003BD61A /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				26D15F061E93D887003BD61A /* camera.cpp in Sources */,
-				26D15EFB1E93D887003BD61A /* audio_data.cpp in Sources */,
-				26D15EFF1E93D887003BD61A /* audio_player_ios.mm in Sources */,
-				E1C697371E9435810054C285 /* take_photo_ios.mm in Sources */,
-				26D15F091E93D887003BD61A /* codec_opus.cpp in Sources */,
-				E1C697381E9435810054C285 /* take_photo.cpp in Sources */,
-				26D15F0C1E93D887003BD61A /* media_player_apple.mm in Sources */,
-				26D15F011E93D887003BD61A /* audio_recorder.cpp in Sources */,
-				26D15F081E93D887003BD61A /* camera_dshow.cpp in Sources */,
-				26D15F0F1E93D887003BD61A /* video_frame.cpp in Sources */,
-				26D15EFC1E93D887003BD61A /* audio_format.cpp in Sources */,
-				26D15F071E93D887003BD61A /* camera_apple.mm in Sources */,
-				26D15F041E93D887003BD61A /* audio_recorder_opensl_es.cpp in Sources */,
-				26D15F0B1E93D887003BD61A /* media_player.cpp in Sources */,
-				26D15EFA1E93D887003BD61A /* audio_codec.cpp in Sources */,
-				26D15F001E93D887003BD61A /* audio_player_opensl_es.cpp in Sources */,
-				26D15F0A1E93D887003BD61A /* codec_vp8.cpp in Sources */,
-				26D15EFE1E93D887003BD61A /* audio_player_dsound.cpp in Sources */,
-				26D15F021E93D887003BD61A /* audio_recorder_dsound.cpp in Sources */,
-				26D15F0D1E93D887003BD61A /* video_capture.cpp in Sources */,
-				26D15F031E93D887003BD61A /* audio_recorder_ios.mm in Sources */,
-				26D15F0E1E93D887003BD61A /* video_codec.cpp in Sources */,
-				26D15F051E93D887003BD61A /* audio_util.cpp in Sources */,
-				26D15EFD1E93D887003BD61A /* audio_player.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15F111E93D88D003BD61A /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				26D15F381E93D8AC003BD61A /* vibrator.cpp in Sources */,
-				26D15F351E93D8AC003BD61A /* device_information.cpp in Sources */,
-				26D15F371E93D8AC003BD61A /* sensor_ios.mm in Sources */,
-				26D15F341E93D8A8003BD61A /* device_information_ios.mm in Sources */,
-				26D15F391E93D8AC003BD61A /* vibrator_ios.cpp in Sources */,
-				26D15F361E93D8AC003BD61A /* sensor.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15F3B1E93D90A003BD61A /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				26D15F491E93D92E003BD61A /* database_statement.cpp in Sources */,
-				26D15F4B1E93D92E003BD61A /* sqlite.cpp in Sources */,
-				26D15F481E93D92E003BD61A /* database_cursor.cpp in Sources */,
-				26D15F4A1E93D92E003BD61A /* database.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		26D15F4D1E93D93D003BD61A /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				26D15F581E93D949003BD61A /* earth.cpp in Sources */,
-				26D15F5B1E93D949003BD61A /* geo_rectangle.cpp in Sources */,
-				26D15F591E93D949003BD61A /* geo_line.cpp in Sources */,
-				26D15F5D1E93D949003BD61A /* latlon.cpp in Sources */,
-				26D15F5C1E93D949003BD61A /* globe.cpp in Sources */,
-				26D15F5A1E93D949003BD61A /* geo_location.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2460,14 +1846,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_THREADSAFE_STATICS = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -2479,318 +1866,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_THREADSAFE_STATICS = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Release;
-		};
-		26D15E1A1E93D7B8003BD61A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Debug;
-		};
-		26D15E1B1E93D7B8003BD61A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Release;
-		};
-		26D15E501E93D7E3003BD61A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Debug;
-		};
-		26D15E511E93D7E3003BD61A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Release;
-		};
-		26D15E8C1E93D813003BD61A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Debug;
-		};
-		26D15E8D1E93D813003BD61A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Release;
-		};
-		26D15EAA1E93D830003BD61A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Debug;
-		};
-		26D15EAB1E93D830003BD61A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Release;
-		};
-		26D15EF71E93D872003BD61A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Debug;
-		};
-		26D15EF81E93D872003BD61A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Release;
-		};
-		26D15F2B1E93D88D003BD61A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Debug;
-		};
-		26D15F2C1E93D88D003BD61A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Release;
-		};
-		26D15F451E93D90A003BD61A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Debug;
-		};
-		26D15F461E93D90A003BD61A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Release;
-		};
-		26D15F551E93D93D003BD61A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				USE_HEADERMAP = NO;
-				VALID_ARCHS = "arm64 armv7 i386 x86_64";
-			};
-			name = Debug;
-		};
-		26D15F561E93D93D003BD61A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/../../include",
-					"$(PROJECT_DIR)/../../thirdparty",
-				);
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -2802,15 +1888,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -2822,15 +1909,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -2842,15 +1930,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -2862,15 +1951,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -2882,15 +1972,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -2902,15 +1993,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -2922,15 +2014,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -2942,15 +2035,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -2962,15 +2056,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -2982,15 +2077,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -3002,15 +2098,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -3022,15 +2119,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -3042,15 +2140,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -3062,15 +2161,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -3082,15 +2182,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_THREADSAFE_STATICS = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -3102,15 +2202,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_THREADSAFE_STATICS = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../thirdparty",
 				);
+				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
@@ -3207,78 +2309,6 @@
 			buildConfigurations = (
 				26D15D621E93ACBD003BD61A /* Debug */,
 				26D15D631E93ACBD003BD61A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		26D15E191E93D7B8003BD61A /* Build configuration list for PBXNativeTarget "slib-network" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				26D15E1A1E93D7B8003BD61A /* Debug */,
-				26D15E1B1E93D7B8003BD61A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		26D15E4F1E93D7E3003BD61A /* Build configuration list for PBXNativeTarget "slib-graphics" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				26D15E501E93D7E3003BD61A /* Debug */,
-				26D15E511E93D7E3003BD61A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		26D15E8B1E93D813003BD61A /* Build configuration list for PBXNativeTarget "slib-render" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				26D15E8C1E93D813003BD61A /* Debug */,
-				26D15E8D1E93D813003BD61A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		26D15EA91E93D830003BD61A /* Build configuration list for PBXNativeTarget "slib-ui" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				26D15EAA1E93D830003BD61A /* Debug */,
-				26D15EAB1E93D830003BD61A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		26D15EF61E93D872003BD61A /* Build configuration list for PBXNativeTarget "slib-media" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				26D15EF71E93D872003BD61A /* Debug */,
-				26D15EF81E93D872003BD61A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		26D15F2A1E93D88D003BD61A /* Build configuration list for PBXNativeTarget "slib-device" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				26D15F2B1E93D88D003BD61A /* Debug */,
-				26D15F2C1E93D88D003BD61A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		26D15F441E93D90A003BD61A /* Build configuration list for PBXNativeTarget "slib-db" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				26D15F451E93D90A003BD61A /* Debug */,
-				26D15F461E93D90A003BD61A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		26D15F541E93D93D003BD61A /* Build configuration list for PBXNativeTarget "slib-geo" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				26D15F551E93D93D003BD61A /* Debug */,
-				26D15F561E93D93D003BD61A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

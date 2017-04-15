@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\slib\core\async_config.h" />
+    <ClInclude Include="..\..\src\slib\network\network_async.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\slib\core\animation.cpp" />
@@ -108,6 +109,30 @@
     <ClCompile Include="..\..\src\slib\math\vector3.cpp" />
     <ClCompile Include="..\..\src\slib\math\vector4.cpp" />
     <ClCompile Include="..\..\src\slib\math\view_frustum.cpp" />
+    <ClCompile Include="..\..\src\slib\network\arp.cpp" />
+    <ClCompile Include="..\..\src\slib\network\dns.cpp" />
+    <ClCompile Include="..\..\src\slib\network\ethernet.cpp" />
+    <ClCompile Include="..\..\src\slib\network\http_common.cpp" />
+    <ClCompile Include="..\..\src\slib\network\http_io.cpp" />
+    <ClCompile Include="..\..\src\slib\network\http_service.cpp" />
+    <ClCompile Include="..\..\src\slib\network\icmp.cpp" />
+    <ClCompile Include="..\..\src\slib\network\ip_address.cpp" />
+    <ClCompile Include="..\..\src\slib\network\mac_address.cpp" />
+    <ClCompile Include="..\..\src\slib\network\nat.cpp" />
+    <ClCompile Include="..\..\src\slib\network\network_async.cpp" />
+    <ClCompile Include="..\..\src\slib\network\network_async_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\network\network_io.cpp" />
+    <ClCompile Include="..\..\src\slib\network\network_os.cpp" />
+    <ClCompile Include="..\..\src\slib\network\net_capture.cpp" />
+    <ClCompile Include="..\..\src\slib\network\net_capture_pcap.cpp" />
+    <ClCompile Include="..\..\src\slib\network\socket.cpp" />
+    <ClCompile Include="..\..\src\slib\network\socket_address.cpp" />
+    <ClCompile Include="..\..\src\slib\network\socket_event.cpp" />
+    <ClCompile Include="..\..\src\slib\network\socket_event_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\network\tcpip.cpp" />
+    <ClCompile Include="..\..\src\slib\network\url.cpp" />
+    <ClCompile Include="..\..\src\slib\network\url_request.cpp" />
+    <ClCompile Include="..\..\src\slib\network\url_request_win32.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3}</ProjectGuid>
@@ -194,6 +219,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -216,6 +243,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -238,6 +267,9 @@
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -262,6 +294,9 @@
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

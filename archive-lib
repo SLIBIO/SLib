@@ -1,0 +1,5 @@
+#!/bin/sh
+
+rm lib/SLib.zip
+zip -r lib/SLib.zip include licenses setup-path setup-path.bat LICENSE README.md -x "*/.DS_Store"
+zip -r lib/SLib.zip lib -i "*/libslib.a" -i "*/libslib-core.a" -i "*/slib.lib" -i "*/slib-core.lib"
