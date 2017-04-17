@@ -643,8 +643,6 @@ namespace slib
 
 	void Button::onDrawBackground(Canvas* canvas)
 	{
-		Color color = getBackgroundColor();
-		
 		ButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
 		Ref<Drawable> background = params.background;
 		if (background.isNull()) {
@@ -685,10 +683,9 @@ namespace slib
 				if (background.isNotNull()) {
 					background = background->filter(*cm);
 				}
-				color = cm->transformColor(color);
 			}
 		}
-		drawBackground(canvas, color, background);
+		drawBackground(canvas, background);
 
 	}
 
@@ -731,7 +728,6 @@ namespace slib
 			}
 			setMeasuredHeight(height);
 		}
-		
 	}
 
 	void Button::onKeyEvent(UIEvent* ev)

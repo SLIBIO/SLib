@@ -240,19 +240,10 @@ namespace slib
 	void RenderView::onDrawBackground(Canvas* canvas)
 	{
 		if (isNativeWidget()) {
-			Ref<DrawAttributes>& attrs = m_drawAttrs;
-			if (attrs.isNotNull()) {
-				Ref<Drawable> background;
-				if (isPressedState()) {
-					background = attrs->backgroundPressed;
-				} else if (isHoverState()) {
-					background = attrs->backgroundHover;
-				}
-				if (background.isNull()) {
-					background = attrs->background;
-				}
-				if (background.isNotNull()) {
-					drawBackground(canvas, Color::zero(), background);
+			Ref<Drawable> background = getCurrentBackground();
+			if (background.isNotNull()) {
+				if (!(background->isColor())) {
+					drawBackground(canvas, background);
 				}
 			}
 		} else {
@@ -284,11 +275,17 @@ namespace slib
 		
 		// clear
 		{
-			Color color = getBackgroundColor();
-			if (color.a > 0) {
-				color.a = 255;
-				engine->clearColorDepth(color);
-			}
+			do {
+				Color color;
+				if (ColorDrawable::check(getCurrentBackground(), &color)) {
+					if (color.a > 0) {
+						color.a = 255;
+						engine->clearColorDepth(color);
+						break;
+					}
+				}
+				engine->clearDepth();
+			} while (0);
 		}
 		
 		onFrame(engine);

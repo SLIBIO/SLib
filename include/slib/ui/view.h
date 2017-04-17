@@ -654,13 +654,25 @@ namespace slib
 		
 		virtual void setBackground(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		Color getBackgroundColor();
+		
+		void setBackgroundColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
 		Ref<Drawable> getPressedBackground();
 		
 		virtual void setPressedBackground(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		Color getPressedBackgroundColor();
+		
+		void setPressedBackgroundColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
 		Ref<Drawable> getHoverBackground();
 		
 		virtual void setHoverBackground(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		Color getHoverBackgroundColor();
+		
+		void setHoverBackgroundColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		ScaleMode getBackgroundScaleMode();
 		
@@ -669,10 +681,6 @@ namespace slib
 		Alignment getBackgroundAlignment();
 		
 		virtual void setBackgroundAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
-
-		Color getBackgroundColor();
-		
-		virtual void setBackgroundColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		Ref<Pen> getBorder();
 		
@@ -1097,7 +1105,9 @@ namespace slib
 		Ref<GestureDetector> getGestureDetector();
 		
 		
-		void drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable>& background);
+		Ref<Drawable> getCurrentBackground();
+		
+		void drawBackground(Canvas* canvas, const Ref<Drawable>& background);
 		
 		void drawBorder(Canvas* canvas, const Ref<Pen>& pen);
 		
@@ -1562,7 +1572,6 @@ namespace slib
 			AtomicRef<Drawable> backgroundHover;
 			ScaleMode backgroundScaleMode;
 			Alignment backgroundAlignment;
-			Color backgroundColor;
 			
 			AtomicRef<Pen> penBorder;
 			PenStyle borderStyle;

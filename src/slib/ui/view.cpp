@@ -210,7 +210,6 @@ namespace slib
 	{
 		backgroundScaleMode = ScaleMode::Stretch;
 		backgroundAlignment = Alignment::MiddleCenter;
-		backgroundColor = Color::zero();
 		
 		boundShape = BoundShape::Rectangle;
 		
@@ -4448,10 +4447,31 @@ namespace slib
 			if (drawable.isNotNull()) {
 				setDrawing(sl_true, mode == UIUpdateMode::Init ? UIUpdateMode::Init : UIUpdateMode::NoRedraw);
 			}
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
+			if (isNativeWidget()) {
+				Color color;
+				if (ColorDrawable::check(drawable, &color)) {
+					_setBackgroundColor_NW(color);
+				}
+			} else {
+				if (mode == UIUpdateMode::Redraw) {
+					invalidate();
+				}
 			}
 		}
+	}
+	
+	Color View::getBackgroundColor()
+	{
+		Color color;
+		if (ColorDrawable::check(getBackground(), &color)) {
+			return color;
+		}
+		return Color::zero();
+	}
+	
+	void View::setBackgroundColor(const Color& color, UIUpdateMode mode)
+	{
+		setBackground(ColorDrawable::createColorDrawable(color), mode);
 	}
 
 	Ref<Drawable> View::getPressedBackground()
@@ -4477,6 +4497,20 @@ namespace slib
 			}
 		}
 	}
+	
+	Color View::getPressedBackgroundColor()
+	{
+		Color color;
+		if (ColorDrawable::check(getPressedBackground(), &color)) {
+			return color;
+		}
+		return Color::zero();
+	}
+	
+	void View::setPressedBackgroundColor(const Color& color, UIUpdateMode mode)
+	{
+		setPressedBackground(ColorDrawable::createColorDrawable(color), mode);
+	}
 
 	Ref<Drawable> View::getHoverBackground()
 	{
@@ -4500,6 +4534,20 @@ namespace slib
 				invalidate();
 			}
 		}
+	}
+	
+	Color View::getHoverBackgroundColor()
+	{
+		Color color;
+		if (ColorDrawable::check(getPressedBackground(), &color)) {
+			return color;
+		}
+		return Color::zero();
+	}
+	
+	void View::setHoverBackgroundColor(const Color& color, UIUpdateMode mode)
+	{
+		setPressedBackground(ColorDrawable::createColorDrawable(color), mode);
 	}
 
 	ScaleMode View::getBackgroundScaleMode()
@@ -4540,32 +4588,6 @@ namespace slib
 			attrs->backgroundAlignment = align;
 			if (mode == UIUpdateMode::Redraw) {
 				invalidate();
-			}
-		}
-	}
-
-	Color View::getBackgroundColor()
-	{
-		Ref<DrawAttributes>& attrs = m_drawAttrs;
-		if (attrs.isNotNull()) {
-			return attrs->backgroundColor;
-		}
-		return Color::zero();
-	}
-
-	void View::setBackgroundColor(const Color& color, UIUpdateMode mode)
-	{
-		_initializeDrawAttributes();
-		Ref<DrawAttributes>& attrs = m_drawAttrs;
-		if (attrs.isNotNull()) {
-			attrs->backgroundColor = color;
-			setDrawing(sl_true, mode == UIUpdateMode::Init ? UIUpdateMode::Init : UIUpdateMode::NoRedraw);
-			if (isNativeWidget()) {
-				_setBackgroundColor_NW(color);
-			} else {
-				if (mode == UIUpdateMode::Redraw) {
-					invalidate();
-				}
 			}
 		}
 	}
@@ -6666,15 +6688,29 @@ namespace slib
 	{
 		return m_gestureDetector;
 	}
-
-	void View::drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable>& background)
+	
+	Ref<Drawable> View::getCurrentBackground()
 	{
-		Rectangle rc(0, 0, (sl_real)(m_frame.getWidth()), (sl_real)(m_frame.getHeight()));
-		if (color.a > 0) {
-			Ref<Brush> brush = Brush::createSolidBrush(color);
-			canvas->fillRectangle(rc, brush);
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			Ref<Drawable> background;
+			if (isPressedState()) {
+				background = attrs->backgroundPressed;
+			} else if (isHoverState()) {
+				background = attrs->backgroundHover;
+			}
+			if (background.isNull()) {
+				background = attrs->background;
+			}
+			return background;
 		}
+		return sl_null;
+	}
+
+	void View::drawBackground(Canvas* canvas, const Ref<Drawable>& background)
+	{
 		if (background.isNotNull()) {
+			Rectangle rc(0, 0, (sl_real)(m_frame.getWidth()), (sl_real)(m_frame.getHeight()));
 			canvas->draw(rc, background, getBackgroundScaleMode(), getBackgroundAlignment());
 		}
 	}
@@ -6885,7 +6921,7 @@ namespace slib
 		if (m_flagSavingCanvasState || scrollAttrs.isNotNull()) {
 			CanvasStateScope scope(canvas);
 			if (drawAttrs.isNotNull()) {
-				if (drawAttrs->flagOnDrawBackgroundAlways || drawAttrs->backgroundColor.isNotZero() || drawAttrs->background.isNotNull()) {
+				if (drawAttrs->flagOnDrawBackgroundAlways || drawAttrs->background.isNotNull()) {
 					onDrawBackground(canvas);
 				}
 			}
@@ -6903,7 +6939,7 @@ namespace slib
 			}
 		} else {
 			if (drawAttrs.isNotNull()) {
-				if (drawAttrs->flagOnDrawBackgroundAlways || drawAttrs->backgroundColor.isNotZero() || drawAttrs->background.isNotNull()) {
+				if (drawAttrs->flagOnDrawBackgroundAlways || drawAttrs->background.isNotNull()) {
 					onDrawBackground(canvas);
 				}
 			}
@@ -6979,9 +7015,6 @@ namespace slib
 		
 		do {
 			if (isOpaque()) {
-				break;
-			}
-			if (drawAttrs->backgroundColor.a == 255) {
 				break;
 			}
 			bitmap->resetPixels((sl_uint32)(rc.left), (sl_uint32)(rc.top), (sl_uint32)(rc.getWidth()), (sl_uint32)(rc.getHeight()), Color::zero());
@@ -7524,19 +7557,7 @@ namespace slib
 
 	void View::onDrawBackground(Canvas* canvas)
 	{
-		Ref<DrawAttributes>& attrs = m_drawAttrs;
-		if (attrs.isNotNull()) {
-			Ref<Drawable> background;
-			if (isPressedState()) {
-				background = attrs->backgroundPressed;
-			} else if (isHoverState()) {
-				background = attrs->backgroundHover;
-			}
-			if (background.isNull()) {
-				background = attrs->background;
-			}
-			drawBackground(canvas, attrs->backgroundColor, background);
-		}
+		drawBackground(canvas, getCurrentBackground());
 	}
 
 	void View::onDrawBorder(Canvas* canvas)
