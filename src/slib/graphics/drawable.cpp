@@ -161,6 +161,16 @@ namespace slib
 	{
 		return IsInstanceOf<Image>(this);
 	}
+	
+	sl_bool Drawable::isColor()
+	{
+		return ColorDrawable::check(this, sl_null);
+	}
+
+	sl_bool Drawable::getColor(Color* color)
+	{
+		return ColorDrawable::check(this, color);
+	}
 
 	Ref<Drawable> Drawable::filter(const ColorMatrix& colorMatrix, sl_real alpha, sl_real blurRadius)
 	{

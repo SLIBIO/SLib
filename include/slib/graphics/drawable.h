@@ -87,6 +87,10 @@ namespace slib
 		sl_bool isBitmap();
 
 		sl_bool isImage();
+		
+		sl_bool isColor();
+		
+		sl_bool getColor(Color* color = sl_null);
 
 	public:
 		Ref<Drawable> filter(const ColorMatrix& colorMatrix, sl_real alpha = 1, sl_real blurRadius = 0);
