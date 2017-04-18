@@ -140,6 +140,11 @@ namespace slib
 		}
 		getOnReadyToPlay()(this);
 	}
+	
+	void MediaPlayer::_onComplete()
+	{
+		getOnComplete()(this);
+	}
 
 	void MediaPlayer::_init(const MediaPlayerParam& param)
 	{
@@ -147,6 +152,7 @@ namespace slib
 		m_flagSelfAlive = param.flagSelfAlive;
 		setListener(param.listener);
 		setOnReadyToPlay(param.onReadyToPlay);
+		setOnComplete(param.onComplete);
 	}
 
 	void MediaPlayer::_addToMap()

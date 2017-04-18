@@ -55,7 +55,7 @@ namespace slib
 		
 		Ptr<IMediaPlayerListener> listener;
 		Function<void(MediaPlayer*)> onReadyToPlay;
-		
+		Function<void(MediaPlayer*)> onComplete;
 	public:
 		MediaPlayerParam();
 		
@@ -151,8 +151,11 @@ namespace slib
 		
 		SLIB_PROPERTY(AtomicFunction<void(MediaPlayer*)>, OnReadyToPlay)
 		
+		SLIB_PROPERTY(AtomicFunction<void(MediaPlayer*)>, OnComplete)
+		
 	protected:
 		void _onReadyToPlay();
+		void _onComplete();
 		
 	protected:
 		static Ref<MediaPlayer> _createNative(const MediaPlayerParam& param);

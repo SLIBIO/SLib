@@ -281,6 +281,7 @@ namespace slib
 		
 		void _onReachEnd()
 		{
+			_onComplete();
 			if (m_flagAutoRepeat) {
 				CMTime t;
 				t.value = 0;

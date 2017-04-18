@@ -277,8 +277,10 @@ namespace slib
 			_onReadyToPlay();
 		}
 
-		void _onCompleted()
+		void _onReachEnd()
 		{
+			_onComplete();
+			_removeFromMap();
 		}
 
 	};
@@ -291,7 +293,7 @@ namespace slib
 			map->get(instance, &_player);
 			Ref<_Android_MediaPlayer> player = _player;
 			if (player.isNotNull()) {
-				player->_onCompleted();
+				player->_onReachEnd();
 			}
 		}
 	}
