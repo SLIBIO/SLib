@@ -27,6 +27,10 @@ namespace slib
 	void IMediaPlayerListener::onReadyToPlay(MediaPlayer* player)
 	{
 	}
+	
+	void IMediaPlayerListener::onComplete(MediaPlayer* player)
+	{
+	}
 
 
 	MediaPlayerParam::MediaPlayerParam()
@@ -143,6 +147,10 @@ namespace slib
 	
 	void MediaPlayer::_onComplete()
 	{
+		PtrLocker<IMediaPlayerListener> listener(getListener());
+		if (listener.isNotNull()) {
+			listener->onComplete(this);
+		}
 		getOnComplete()(this);
 	}
 
