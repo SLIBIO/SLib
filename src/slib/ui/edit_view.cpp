@@ -17,9 +17,9 @@
 namespace slib
 {
 
-/**********************
-	EditView
- ***********************/
+	/**********************
+		EditView
+	 ***********************/
 
 	SLIB_DEFINE_OBJECT(EditView, View)
 
@@ -368,9 +368,9 @@ namespace slib
 		getOnDoneEdit()(this);
 	}
 
-/**********************
-	PasswordView
-***********************/
+	/**********************
+		PasswordView
+	***********************/
 
 	SLIB_DEFINE_OBJECT(PasswordView, EditView)
 
@@ -390,10 +390,19 @@ namespace slib
 	void PasswordView::setMultiLine(sl_bool flag, UIUpdateMode mode)
 	{
 	}
+	
+	void PasswordView::onDraw(Canvas* canvas)
+	{
+		if (m_text.isEmpty()) {
+			canvas->drawText(m_hintText, getBoundsInnerPadding(), getFont(), m_hintTextColor, m_textAlignment);
+		} else {
+			canvas->drawText(String('*', m_text.getLength()), getBoundsInnerPadding(), getFont(), m_textColor, m_textAlignment);
+		}
+	}
 
-/**********************
-	TextArea
-***********************/
+	/**********************
+		TextArea
+	***********************/
 
 	SLIB_DEFINE_OBJECT(TextArea, EditView)
 

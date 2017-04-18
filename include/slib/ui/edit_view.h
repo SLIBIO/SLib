@@ -187,6 +187,10 @@ namespace slib
 		// override
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
 		
+	protected:
+		// override
+		void onDraw(Canvas* canvas);
+		
 	};
 	
 	class TextArea : public EditView
