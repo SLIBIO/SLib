@@ -128,7 +128,7 @@ You can also integrate SLib into any types of C++ projects using similar `includ
 
 After setup directories, link `slib` library via IDE or set `-lslib` option to the linker.
 
-Your project can also link to the subsets of SLib: `slib-core` (core+math+crypto) , `slib-network`, `slib-graphics`, `slib-render`, `slib-ui`, `slib-media`, `slib-device`, `slib-db`, `slib-web`, `slib-geo`
+Your project can also link to the core subsets of SLib: `slib-core` (core+math+crypto+network).
 
 To make your project more portable, you can copy the include directory and the precompiled static libraries into your project and use the relative path instead of the environment variable.
 
