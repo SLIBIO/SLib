@@ -274,30 +274,31 @@ public class UiEditView extends EditText implements IView {
 		}
 		if (view instanceof TextView) {
 			TextView tv = (TextView)view;
+			int defaultOption = EditorInfo.IME_FLAG_NO_FULLSCREEN;
 			switch (type) {
 				case 0:
-					tv.setImeOptions(EditorInfo.IME_ACTION_DONE);
+					tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_DONE);
 					break;
 				case 1:
 					tv.setImeActionLabel("Return", KeyEvent.KEYCODE_ENTER);
 					break;
 				case 2:
-					tv.setImeOptions(EditorInfo.IME_ACTION_DONE);
+					tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_DONE);
 					break;
 				case 3:
-					tv.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+					tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_SEARCH);
 					break;
 				case 4:
-					tv.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+					tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_NEXT);
 					break;
 				case 5:
 					tv.setImeActionLabel("Continue", KeyEvent.KEYCODE_ENTER);
 					break;
 				case 6:
-					tv.setImeOptions(EditorInfo.IME_ACTION_GO);
+					tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_GO);
 					break;
 				case 7:
-					tv.setImeOptions(EditorInfo.IME_ACTION_SEND);
+					tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_SEND);
 					break;
 				case 8:
 					tv.setImeActionLabel("Join", KeyEvent.KEYCODE_ENTER);
@@ -315,7 +316,7 @@ public class UiEditView extends EditText implements IView {
 					tv.setImeActionLabel("Yahoo", KeyEvent.KEYCODE_ENTER);
 					break;
 				default:
-					tv.setImeOptions(EditorInfo.IME_ACTION_NONE);
+					tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_NONE);
 					break;
 			}
 			return true;
@@ -430,6 +431,7 @@ public class UiEditView extends EditText implements IView {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 			}
 		});
+		this.setImeOptions(EditorInfo.IME_FLAG_NO_FULLSCREEN);
 	}
 
 	@Override
