@@ -147,7 +147,7 @@ namespace slib
 		String readText(sl_size size, Charset* outCharset = sl_null);
 
 		String16 readText16(sl_size size, Charset* outCharset = sl_null);
-
+		
 	};
 	
 	
@@ -283,6 +283,9 @@ namespace slib
 
 		~IO();
 
+	public:
+		String readLine();
+		
 	};
 	
 	class SLIB_EXPORT MemoryIO : public IO

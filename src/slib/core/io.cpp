@@ -9,7 +9,9 @@
  */
 
 #include "slib/core/io.h"
+
 #include "slib/core/mio.h"
+#include "slib/core/string_buffer.h"
 #include "slib/core/thread.h"
 #include "slib/core/scoped.h"
 
@@ -903,7 +905,6 @@ namespace slib
 		return sl_null;
 	}
 
-
 /***************
 	IWriter
 ***************/
@@ -1335,7 +1336,56 @@ namespace slib
 	IO::~IO()
 	{
 	}
-
+	
+	String IO::readLine()
+	{
+		StringBuffer sb;
+#define IO_READLINE_BUF_SIZE 512
+		char buf[IO_READLINE_BUF_SIZE];
+		while (1) {
+			sl_reg n = read(buf, IO_READLINE_BUF_SIZE);
+			if (n > 0) {
+				for (sl_reg i = 0; i < n; i++) {
+					char ch = buf[i];
+					if (ch == '\r' || ch == '\n') {
+						sb.add(String(buf, i));
+						if (ch == '\r') {
+							if (i == IO_READLINE_BUF_SIZE - 1) {
+								if (readUint8('\n') != '\n') {
+									seek(-1, SeekPosition::Current);
+								}
+							} else {
+								if (i + 1 < n && buf[i + 1] == '\n') {
+									if (i + 2 != n) {
+										seek(i + 2 - n, SeekPosition::Current);
+									}
+								} else {
+									if (i + 1 != n) {
+										seek(i + 1 - n, SeekPosition::Current);
+									}
+								}
+							}
+						} else {
+							if (i + 1 != n) {
+								seek(i + 1 - n, SeekPosition::Current);
+							}
+						}
+						return sb.merge();
+					}
+				}
+				if (!(sb.add(String(buf, IO_READLINE_BUF_SIZE)))) {
+					return String::null();
+				}
+			} else {
+				break;
+			}
+		}
+		if (sb.getLength() == 0) {
+			return String::null();
+		} else {
+			return sb.merge();
+		}
+	}
 
 /****************************
 		MemoryIO
