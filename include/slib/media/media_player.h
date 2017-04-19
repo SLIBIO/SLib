@@ -37,6 +37,8 @@ namespace slib
 	public:
 		virtual void onReadyToPlay(MediaPlayer* player);
 		
+		virtual void onComplete(MediaPlayer* player);
+		
 	};
 	
 	class SLIB_EXPORT MediaPlayerParam
@@ -56,6 +58,7 @@ namespace slib
 		Ptr<IMediaPlayerListener> listener;
 		Function<void(MediaPlayer*)> onReadyToPlay;
 		Function<void(MediaPlayer*)> onComplete;
+		
 	public:
 		MediaPlayerParam();
 		
@@ -155,6 +158,7 @@ namespace slib
 		
 	protected:
 		void _onReadyToPlay();
+		
 		void _onComplete();
 		
 	protected:

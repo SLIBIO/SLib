@@ -215,13 +215,23 @@ namespace slib
 		static List<String> getAllDescendantFiles(const String& dirPath);
 	
 
+		Memory readAllBytes(sl_size maxSize = SLIB_SIZE_MAX);
+		
 		static Memory readAllBytes(const String& path, sl_size maxSize = SLIB_SIZE_MAX);
+		
+		String readAllTextUTF8(sl_size maxSize = SLIB_SIZE_MAX);
 
 		static String readAllTextUTF8(const String& path, sl_size maxSize = SLIB_SIZE_MAX);
 
+		String16 readAllTextUTF16(sl_bool flagBigEndian = sl_false, sl_size maxSize = SLIB_SIZE_MAX);
+		
 		static String16 readAllTextUTF16(const String& path, sl_bool flagBigEndian = sl_false, sl_size maxSize = SLIB_SIZE_MAX);
+		
+		String readAllText(Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
 
 		static String readAllText(const String& path, Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
+		
+		String16 readAllText16(Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
 
 		static String16 readAllText16(const String& path, Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
 	

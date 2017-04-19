@@ -9,7 +9,9 @@
  */
 
 #include "slib/core/io.h"
+
 #include "slib/core/mio.h"
+#include "slib/core/string_buffer.h"
 #include "slib/core/thread.h"
 #include "slib/core/scoped.h"
 
@@ -903,7 +905,6 @@ namespace slib
 		return sl_null;
 	}
 
-
 /***************
 	IWriter
 ***************/
@@ -1335,8 +1336,166 @@ namespace slib
 	IO::~IO()
 	{
 	}
-
-
+	
+	String IO::readLine()
+	{
+		StringBuffer sb;
+#define IO_READLINE_BUF_SIZE 512
+		char buf[IO_READLINE_BUF_SIZE];
+		while (1) {
+			sl_reg n = read(buf, IO_READLINE_BUF_SIZE);
+			if (n > 0) {
+				for (sl_reg i = 0; i < n; i++) {
+					char ch = buf[i];
+					if (ch == '\r' || ch == '\n') {
+						sb.add(String(buf, i));
+						if (ch == '\r') {
+							if (i == IO_READLINE_BUF_SIZE - 1) {
+								if (readUint8('\n') != '\n') {
+									seek(-1, SeekPosition::Current);
+								}
+							} else {
+								if (i + 1 < n && buf[i + 1] == '\n') {
+									if (i + 2 != n) {
+										seek(i + 2 - n, SeekPosition::Current);
+									}
+								} else {
+									if (i + 1 != n) {
+										seek(i + 1 - n, SeekPosition::Current);
+									}
+								}
+							}
+						} else {
+							if (i + 1 != n) {
+								seek(i + 1 - n, SeekPosition::Current);
+							}
+						}
+						return sb.merge();
+					}
+				}
+				if (!(sb.add(String(buf, IO_READLINE_BUF_SIZE)))) {
+					return String::null();
+				}
+			} else {
+				break;
+			}
+		}
+		if (sb.getLength() == 0) {
+			return String::null();
+		} else {
+			return sb.merge();
+		}
+	}
+	
+	Memory IO::readAllBytes(sl_size maxSize)
+	{
+#if defined(SLIB_ARCH_IS_64BIT)
+		sl_uint64 size = getSize();
+#else
+		sl_uint64 _size = getSize();
+		if (_size > 0x7fffffff) {
+			_size = 0x7fffffff;
+		}
+		sl_size size = (sl_size)_size;
+#endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
+		if (size == 0) {
+			return sl_null;
+		}
+		Memory ret = Memory::create(size);
+		if (ret.isNotNull()) {
+			char* buf = (char*)(ret.getData());
+			if (seekToBegin()) {
+				if (read(buf, size) == (sl_reg)size) {
+					return ret;
+				}
+			}
+		}
+		return sl_null;
+	}
+	
+	String IO::readAllTextUTF8(sl_size maxSize)
+	{
+#if defined(SLIB_ARCH_IS_64BIT)
+		sl_uint64 size = getSize();
+#else
+		sl_uint64 _size = getSize();
+		if (_size > 0x7fffffff) {
+			return sl_null;
+		}
+		sl_size size = (sl_size)_size;
+#endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
+		if (seekToBegin()) {
+			return readTextUTF8(size);
+		}
+		return sl_null;
+	}
+	
+	String16 IO::readAllTextUTF16(sl_bool flagBigEndian, sl_size maxSize)
+	{
+#if defined(SLIB_ARCH_IS_64BIT)
+		sl_uint64 size = getSize();
+#else
+		sl_uint64 _size = getSize();
+		if (_size > 0x7fffffff) {
+			return sl_null;
+		}
+		sl_size size = (sl_size)_size;
+#endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
+		if (seekToBegin()) {
+			return readTextUTF16(size, flagBigEndian);
+		}
+		return sl_null;
+	}
+	
+	String IO::readAllText(Charset* outCharset, sl_size maxSize)
+	{
+#if defined(SLIB_ARCH_IS_64BIT)
+		sl_uint64 size = getSize();
+#else
+		sl_uint64 _size = getSize();
+		if (_size > 0x7fffffff) {
+			return sl_null;
+		}
+		sl_size size = (sl_size)_size;
+#endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
+		if (seekToBegin()) {
+			return readText(size, outCharset);
+		}
+		return sl_null;
+	}
+	
+	String16 IO::readAllText16(Charset* outCharset, sl_size maxSize)
+	{
+#if defined(SLIB_ARCH_IS_64BIT)
+		sl_uint64 size = getSize();
+#else
+		sl_uint64 _size = getSize();
+		if (_size > 0x7fffffff) {
+			return sl_null;
+		}
+		sl_size size = (sl_size)_size;
+#endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
+		if (seekToBegin()) {
+			return readText16(size, outCharset);
+		}
+		return sl_null;
+	}
+	
 /****************************
 		MemoryIO
 ****************************/

@@ -147,7 +147,7 @@ namespace slib
 		String readText(sl_size size, Charset* outCharset = sl_null);
 
 		String16 readText16(sl_size size, Charset* outCharset = sl_null);
-
+		
 	};
 	
 	
@@ -283,6 +283,19 @@ namespace slib
 
 		~IO();
 
+	public:
+		String readLine();
+	
+		Memory readAllBytes(sl_size maxSize = SLIB_SIZE_MAX);
+		
+		String readAllTextUTF8(sl_size maxSize = SLIB_SIZE_MAX);
+		
+		String16 readAllTextUTF16(sl_bool flagBigEndian = sl_false, sl_size maxSize = SLIB_SIZE_MAX);
+		
+		String readAllText(Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
+		
+		String16 readAllText16(Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
+		
 	};
 	
 	class SLIB_EXPORT MemoryIO : public IO

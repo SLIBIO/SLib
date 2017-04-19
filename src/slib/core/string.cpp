@@ -7288,7 +7288,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 									break;
 								case 'l':
 									if (flagZeroPadded) {
-										content = ST::fromInt32(time.getSecond(), 10, minWidth);
+										content = ST::fromInt32(time.getMillisecond(), 10, minWidth);
 									} else {
 										content = ST::fromInt32(time.getMillisecond());
 									}
