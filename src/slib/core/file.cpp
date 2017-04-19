@@ -228,117 +228,73 @@ namespace slib
 		}
 		return str;
 	}
+	
+	Memory File::readAllBytes(sl_size maxSize)
+	{
+		return IO::readAllBytes(maxSize);
+	}
 
 	Memory File::readAllBytes(const String& path, sl_size maxSize)
 	{
 		Ref<File> file = File::openForRead(path);
 		if (file.isNotNull()) {
-#if defined(SLIB_ARCH_IS_64BIT)
-			sl_uint64 size = file->getSize();
-#else
-			sl_uint64 _size = file->getSize();
-			if (_size > 0x7fffffff) {
-				_size = 0x7fffffff;
-			}
-			sl_size size = (sl_size)_size;
-#endif
-			if (size > maxSize) {
-				size = maxSize;
-			}
-			if (size == 0) {
-				return sl_null;
-			}
-			Memory ret = Memory::create(size);
-			if (ret.isNotNull()) {
-				char* buf = (char*)(ret.getData());
-				if (file->read(buf, size) == (sl_reg)size) {
-					return ret;
-				}
-			}
+			return file->readAllBytes(maxSize);
 		}
 		return sl_null;
 	}
-
+	
+	String File::readAllTextUTF8(sl_size maxSize)
+	{
+		return IO::readAllTextUTF8(maxSize);
+	}
+	
 	String File::readAllTextUTF8(const String& path, sl_size maxSize)
 	{
 		Ref<File> file = File::openForRead(path);
 		if (file.isNotNull()) {
-#if defined(SLIB_ARCH_IS_64BIT)
-			sl_uint64 size = file->getSize();
-#else
-			sl_uint64 _size = file->getSize();
-			if (_size > 0x7fffffff) {
-				return sl_null;
-			}
-			sl_size size = (sl_size)_size;
-#endif
-			if (size > maxSize) {
-				size = maxSize;
-			}
-			return file->readTextUTF8(size);
+			return file->readAllTextUTF8();
 		}
 		return sl_null;
+	}
+	
+	String16 File::readAllTextUTF16(sl_bool flagBigEndian, sl_size maxSize)
+	{
+		return IO::readAllTextUTF16(flagBigEndian, maxSize);
 	}
 
 	String16 File::readAllTextUTF16(const String& path, sl_bool flagBigEndian, sl_size maxSize)
 	{
 		Ref<File> file = File::openForRead(path);
 		if (file.isNotNull()) {
-#if defined(SLIB_ARCH_IS_64BIT)
-			sl_uint64 size = file->getSize();
-#else
-			sl_uint64 _size = file->getSize();
-			if (_size > 0x7fffffff) {
-				return sl_null;
-			}
-			sl_size size = (sl_size)_size;
-#endif
-			if (size > maxSize) {
-				size = maxSize;
-			}
-			return file->readTextUTF16(size, flagBigEndian);
+			return file->readAllTextUTF16(flagBigEndian, maxSize);
 		}
 		return sl_null;
+	}
+	
+	String File::readAllText(Charset* outCharset, sl_size maxSize)
+	{
+		return IO::readAllText(outCharset, maxSize);
 	}
 
 	String File::readAllText(const String& path, Charset* outCharset, sl_size maxSize)
 	{
 		Ref<File> file = File::openForRead(path);
 		if (file.isNotNull()) {
-#if defined(SLIB_ARCH_IS_64BIT)
-			sl_uint64 size = file->getSize();
-#else
-			sl_uint64 _size = file->getSize();
-			if (_size > 0x7fffffff) {
-				return sl_null;
-			}
-			sl_size size = (sl_size)_size;
-#endif
-			if (size > maxSize) {
-				size = maxSize;
-			}
-			return file->readText(size, outCharset);
+			return file->readAllText(outCharset, maxSize);
 		}
 		return sl_null;
 	}
-
+	
+	String16 File::readAllText16(Charset* outCharset, sl_size maxSize)
+	{
+		return IO::readAllText16(outCharset, maxSize);
+	}
+	
 	String16 File::readAllText16(const String& path, Charset* outCharset, sl_size maxSize)
 	{
 		Ref<File> file = File::openForRead(path);
 		if (file.isNotNull()) {
-#if defined(SLIB_ARCH_IS_64BIT)
-			sl_uint64 size = file->getSize();
-#else
-			sl_uint64 _size = file->getSize();
-			if (_size > 0x7fffffff) {
-				return sl_null;
-			}
-			sl_size size = (sl_size)_size;
-#endif
-			if (size > maxSize) {
-				size = maxSize;
-			}
-			return file->readText16(size, outCharset);
+			return file->readAllText16(outCharset, maxSize);
 		}
 		return sl_null;
 	}

@@ -1386,7 +1386,116 @@ namespace slib
 			return sb.merge();
 		}
 	}
-
+	
+	Memory IO::readAllBytes(sl_size maxSize)
+	{
+#if defined(SLIB_ARCH_IS_64BIT)
+		sl_uint64 size = getSize();
+#else
+		sl_uint64 _size = getSize();
+		if (_size > 0x7fffffff) {
+			_size = 0x7fffffff;
+		}
+		sl_size size = (sl_size)_size;
+#endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
+		if (size == 0) {
+			return sl_null;
+		}
+		Memory ret = Memory::create(size);
+		if (ret.isNotNull()) {
+			char* buf = (char*)(ret.getData());
+			if (seekToBegin()) {
+				if (read(buf, size) == (sl_reg)size) {
+					return ret;
+				}
+			}
+		}
+		return sl_null;
+	}
+	
+	String IO::readAllTextUTF8(sl_size maxSize)
+	{
+#if defined(SLIB_ARCH_IS_64BIT)
+		sl_uint64 size = getSize();
+#else
+		sl_uint64 _size = getSize();
+		if (_size > 0x7fffffff) {
+			return sl_null;
+		}
+		sl_size size = (sl_size)_size;
+#endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
+		if (seekToBegin()) {
+			return readTextUTF8(size);
+		}
+		return sl_null;
+	}
+	
+	String16 IO::readAllTextUTF16(sl_bool flagBigEndian, sl_size maxSize)
+	{
+#if defined(SLIB_ARCH_IS_64BIT)
+		sl_uint64 size = getSize();
+#else
+		sl_uint64 _size = getSize();
+		if (_size > 0x7fffffff) {
+			return sl_null;
+		}
+		sl_size size = (sl_size)_size;
+#endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
+		if (seekToBegin()) {
+			return readTextUTF16(size, flagBigEndian);
+		}
+		return sl_null;
+	}
+	
+	String IO::readAllText(Charset* outCharset, sl_size maxSize)
+	{
+#if defined(SLIB_ARCH_IS_64BIT)
+		sl_uint64 size = getSize();
+#else
+		sl_uint64 _size = getSize();
+		if (_size > 0x7fffffff) {
+			return sl_null;
+		}
+		sl_size size = (sl_size)_size;
+#endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
+		if (seekToBegin()) {
+			return readText(size, outCharset);
+		}
+		return sl_null;
+	}
+	
+	String16 IO::readAllText16(Charset* outCharset, sl_size maxSize)
+	{
+#if defined(SLIB_ARCH_IS_64BIT)
+		sl_uint64 size = getSize();
+#else
+		sl_uint64 _size = getSize();
+		if (_size > 0x7fffffff) {
+			return sl_null;
+		}
+		sl_size size = (sl_size)_size;
+#endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
+		if (seekToBegin()) {
+			return readText16(size, outCharset);
+		}
+		return sl_null;
+	}
+	
 /****************************
 		MemoryIO
 ****************************/
