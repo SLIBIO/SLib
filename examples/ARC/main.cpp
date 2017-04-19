@@ -23,7 +23,8 @@ private:
 public:
 	ExampleNode(const String& name, Ref<ExampleNode> parent = nullptr): name(name)
 	{
-		SLIB_REFERABLE_CONSTRUCTOR;
+		SLIB_KEEP_REF;
+		
 		Console::println("Constructor called: %s", name);
 		if (parent != nullptr) {
 			this->parent = parent;
