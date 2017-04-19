@@ -31,8 +31,8 @@ Java_io_slib_examplejni_MainActivity_callCpp(
 	JniGlobal<jobject> activity(thiz);
 
 	/*
-	 * Convert JNI string handle to String C++ object provided by SLib.
-	 * You can also use std::string according to your convenience.
+	 * Convert JNI string handle to a `String` C++ object provided by SLib.
+	 * You can also use `std::string` according to your convenience.
 	 */
 	String strMessage = Jni::getString(jMessage);
 
