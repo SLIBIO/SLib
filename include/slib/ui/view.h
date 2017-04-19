@@ -1372,6 +1372,8 @@ namespace slib
 		
 		sl_bool _scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagFinish, sl_bool flagAnimate);
 		
+		void _cancelPressState();
+		
 		void _processEventForStateAndClick(UIEvent* ev);
 		
 		void _processContentScrollingEvents(UIEvent* ev);

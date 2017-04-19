@@ -930,6 +930,7 @@ namespace slib
 	void View::_removeChild(const Ref<View>& view)
 	{
 		if (view.isNotNull()) {
+			view->_cancelPressState();
 			if (m_flagOnRemoveChild) {
 				onRemoveChild(view.get());
 			}
@@ -1297,6 +1298,9 @@ namespace slib
 		Visibility oldVisibility = m_visibility;
 		m_visibility = visibility;
 		if (oldVisibility != visibility) {
+			if (visibility != Visibility::Visible) {
+				_cancelPressState();
+			}
 			if (mode != UIUpdateMode::Init) {
 				Ref<ViewInstance> instance = m_instance;
 				if (instance.isNotNull()) {
@@ -8226,7 +8230,7 @@ namespace slib
 			
 		}
 	}
-
+	
 	void View::dispatchMouseWheelEvent(UIEvent* ev)
 	{
 		if (!ev) {
@@ -8652,6 +8656,17 @@ namespace slib
 		Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
 		if (ev.isNotNull()) {
 			dispatchCancel(ev.get());
+		}
+	}
+	
+	void View::_cancelPressState()
+	{
+		Ref<View> view = this;
+		while (view.isNotNull()) {
+			if (view->m_flagPressed) {
+				view->setPressedState(sl_false);
+			}
+			view = view->m_childMouseDown;
 		}
 	}
 
