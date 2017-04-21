@@ -902,7 +902,7 @@ namespace slib
 	sl_bool Socket::setOption_ReusePort(sl_bool flagEnable)
 	{
 #if defined(SLIB_PLATFORM_IS_WIN32) || defined(SLIB_PLATFORM_IS_ANDROID) || defined(SLIB_PLATFORM_IS_TIZEN)
-		return sl_false;
+		return setOption(SOL_SOCKET, SO_REUSEADDR, flagEnable ? 1 : 0);
 #else
 		return setOption(SOL_SOCKET, SO_REUSEPORT, flagEnable ? 1 : 0);
 #endif
@@ -911,7 +911,7 @@ namespace slib
 	sl_bool Socket::getOption_ReusePort() const
 	{
 #if defined(SLIB_PLATFORM_IS_WIN32) || defined(SLIB_PLATFORM_IS_ANDROID) || defined(SLIB_PLATFORM_IS_TIZEN)
-		return sl_false;
+		return getOption(SOL_SOCKET, SO_REUSEADDR) != 0;
 #else
 		return getOption(SOL_SOCKET, SO_REUSEPORT) != 0;
 #endif
