@@ -383,8 +383,12 @@ namespace slib
 			}
 			
 #if defined(SLIB_PLATFORM_IS_UNIX)
-			// Sometimes, the previously bound port is remaining used state even after exit on Unix system.
-			// So, we set ReuseAddress flag on Server sockets to avoid this issue
+			/*
+			 * SO_REUSEADDR option allows the server applications to listen on the port that is still
+			 * bound by some TIME_WAIT sockets.
+			 *
+			 * http://stackoverflow.com/questions/14388706/socket-options-so-reuseaddr-and-so-reuseport-how-do-they-differ-do-they-mean-t
+			 */
 			socket->setOption_ReuseAddress(sl_true);
 #endif
 
@@ -610,8 +614,12 @@ namespace slib
 				return sl_null;
 			}
 #if defined(SLIB_PLATFORM_IS_UNIX)
-			// Sometimes, the previously bound port is remaining used state even after exit on Unix system.
-			// So, we set ReuseAddress flag on Server sockets to avoid this issue
+			/*
+			 * SO_REUSEADDR option allows the server applications to listen on the port that is still
+			 * bound by some TIME_WAIT sockets.
+			 *
+			 * http://stackoverflow.com/questions/14388706/socket-options-so-reuseaddr-and-so-reuseport-how-do-they-differ-do-they-mean-t
+			 */
 			socket->setOption_ReuseAddress(sl_true);
 #endif
 			if (param.bindAddress.ip.isNotNone() || param.bindAddress.port != 0) {
