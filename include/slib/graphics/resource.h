@@ -14,9 +14,29 @@
 #include "definition.h"
 
 #include "image.h"
+#include "color.h"
+
 #include "../core/locale.h"
 #include "../core/list.h"
 #include "../core/resource.h"
+
+
+#define SLIB_DECLARE_COLOR_RESOURCE(NAME) \
+	namespace NAME { \
+		slib::Color get(); \
+	}
+
+#define SLIB_DEFINE_COLOR_RESOURCE(NAME, r, g, b, a) \
+	namespace NAME { \
+		slib::Color get() { \
+			return slib::Color(r, g, b, a); \
+		} \
+	}
+
+#define SLIB_DECLARE_COLOR_RESOURCE_MAP SLIB_DECLARE_RESOURCE_MAP(slib::Color)
+#define SLIB_DEFINE_COLOR_RESOURCE_MAP_BEGIN SLIB_DEFINE_RESOURCE_MAP_BEGIN(slib::Color)
+#define SLIB_DEFINE_COLOR_RESOURCE_MAP_END SLIB_DEFINE_RESOURCE_MAP_END(slib::Color)
+
 
 #define SLIB_DECLARE_IMAGE_RESOURCE(NAME) \
 	namespace NAME { \
