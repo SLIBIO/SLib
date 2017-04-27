@@ -773,6 +773,10 @@ namespace slib
 		
 		void invalidateLayer(const UIRect& rect);
 		
+		sl_bool isForcedDraw();
+		
+		void forceDraw(sl_bool flagInvalidate = sl_true);
+		
 		
 		virtual Ref<AnimationLoop> getAnimationLoop();
 		
@@ -1343,7 +1347,7 @@ namespace slib
 		void _refreshBorderPen(UIUpdateMode mode);
 		
 		void _setFontInvalidateChildInstances();
-
+		
 
 		void _resetTransformAnimation();
 		
@@ -1601,6 +1605,8 @@ namespace slib
 			sl_bool flagInvalidatedLayer;
 			sl_bool flagInvalidatedWholeLayer;
 			UIRect rectInvalidatedLayer;
+			
+			sl_bool flagForcedDraw;
 
 			LinkedList< Function<void()> > runAfterDrawCallbacks;
 			

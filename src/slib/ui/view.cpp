@@ -232,6 +232,8 @@ namespace slib
 		flagLayer = sl_false;
 		flagInvalidatedLayer = sl_true;
 		flagInvalidatedWholeLayer = sl_true;
+		
+		flagForcedDraw = sl_false;
 	}
 
 	View::DrawAttributes::~DrawAttributes()
@@ -5152,6 +5154,37 @@ namespace slib
 			}
 		}
 	}
+	
+	sl_bool View::isForcedDraw()
+	{
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->flagForcedDraw;
+		}
+		return sl_false;
+	}
+	
+	void View::forceDraw(sl_bool flagInvalidate)
+	{
+		if (m_instance.isNotNull()) {
+			if (flagInvalidate) {
+				invalidate();
+			}
+			return;
+		}
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			attrs->flagForcedDraw = sl_true;
+		}
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			parent->forceDraw(sl_false);
+		}
+		if (flagInvalidate) {
+			invalidate();
+		}
+	}
 
 	Ref<AnimationLoop> View::getAnimationLoop()
 	{
@@ -6800,7 +6833,7 @@ namespace slib
 						}
 						if (flagTranslation) {
 							UIRect rcInvalidated(rcInvalidatedParent.left - offx, rcInvalidatedParent.top - offy, rcInvalidatedParent.right - offx, rcInvalidatedParent.bottom - offy);
-							if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated)) {
+							if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
 								if (flagTransformed) {
 									currentState->copyFrom(&savedState);
 									flagTransformed = sl_false;
@@ -6816,7 +6849,7 @@ namespace slib
 							rcInvalidated.top -= 1;
 							rcInvalidated.right += 1;
 							rcInvalidated.bottom += 1;
-							if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated)) {
+							if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
 								sl_real ax = (sl_real)(child->getWidth()) / 2;
 								sl_real ay = (sl_real)(child->getHeight()) / 2;
 								mat.m20 = -ax * mat.m00 - ay * mat.m10 + mat.m20 + ax + (sl_real)(offx);
@@ -6858,7 +6891,7 @@ namespace slib
 									offy += (sl_ui_pos)(t.y);
 								}
 								UIRect rcInvalidated(rcInvalidatedParent.left - offx, rcInvalidatedParent.top - offy, rcInvalidatedParent.right - offx, rcInvalidatedParent.bottom - offy);
-								if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated)) {
+								if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
 									CanvasStateScope scope(canvas);
 									canvas->translate((sl_real)(offx), (sl_real)(offy));
 									canvas->setAlpha(alphaParent * child->getAlpha());
@@ -6882,7 +6915,7 @@ namespace slib
 							}
 							if (flagTranslation) {
 								UIRect rcInvalidated(rcInvalidatedParent.left - offx, rcInvalidatedParent.top - offy, rcInvalidatedParent.right - offx, rcInvalidatedParent.bottom - offy);
-								if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated)) {
+								if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
 									CanvasStateScope scope(canvas);
 									canvas->translate((sl_real)(offx), (sl_real)(offy));
 									canvas->setAlpha(alphaParent * child->getAlpha());
@@ -6895,7 +6928,7 @@ namespace slib
 								rcInvalidated.top -= 1;
 								rcInvalidated.right += 1;
 								rcInvalidated.bottom += 1;
-								if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated)) {
+								if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
 									CanvasStateScope scope(canvas);
 									sl_real ax = (sl_real)(child->getWidth()) / 2;
 									sl_real ay = (sl_real)(child->getHeight()) / 2;
@@ -7112,17 +7145,13 @@ namespace slib
 					if (attrs->runAfterDrawCallbacks.isNull()) {
 						attrs->runAfterDrawCallbacks.pushBack(callback);
 						setDrawing(sl_true, UIUpdateMode::NoRedraw);
-						if (flagInvalidate) {
-							invalidate();
-						}
+						forceDraw(flagInvalidate);
 						return;
 					}
 				}
 				setDrawing(sl_true, UIUpdateMode::NoRedraw);
 				attrs->runAfterDrawCallbacks.pushBack(callback);
-				if (flagInvalidate) {
-					invalidate();
-				}
+				forceDraw(flagInvalidate);
 			}
 		}
 	}
@@ -7468,6 +7497,10 @@ namespace slib
 	{
 		
 		Ref<DrawAttributes>& drawAttrs = m_drawAttrs;
+		
+		if (drawAttrs.isNotNull()) {
+			drawAttrs->flagForcedDraw = sl_false;
+		}
 		
 		m_flagCurrentDrawing = sl_true;
 		
