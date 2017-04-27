@@ -100,25 +100,25 @@ namespace slib
 			SLIB_STATIC_STRING(_key_##NAME, #NAME); \
 			map.put_NoLock(_key_##NAME, NAME::get());
 
-#define SLIB_DEFINE_RESOURCE_MAP_END(TYPE) \
+#define SLIB_DEFINE_RESOURCE_MAP_END(TYPE, DEFAULT_VALUE) \
 		} \
 	}; \
 	SLIB_SAFE_STATIC_GETTER(_ResourceMap, _get_resource_map); \
 	TYPE get(const slib::String& name) { \
 		_ResourceMap* map = _get_resource_map(); \
 		if (map) { \
-			return map->map.getValue_NoLock(name, TYPE::null()); \
+			return map->map.getValue_NoLock(name, DEFAULT_VALUE); \
 		} \
-		return sl_null; \
+		return DEFAULT_VALUE; \
 	}
 
 
 #define SLIB_DECLARE_STRING_RESOURCE_MAP SLIB_DECLARE_RESOURCE_MAP(slib::String)
 #define SLIB_DEFINE_STRING_RESOURCE_MAP_BEGIN SLIB_DEFINE_RESOURCE_MAP_BEGIN(slib::String)
-#define SLIB_DEFINE_STRING_RESOURCE_MAP_END SLIB_DEFINE_RESOURCE_MAP_END(slib::String)
+#define SLIB_DEFINE_STRING_RESOURCE_MAP_END SLIB_DEFINE_RESOURCE_MAP_END(slib::String, sl_null)
 
 #define SLIB_DECLARE_RAW_RESOURCE_MAP SLIB_DECLARE_RESOURCE_MAP(slib::Memory)
 #define SLIB_DEFINE_RAW_RESOURCE_MAP_BEGIN SLIB_DEFINE_RESOURCE_MAP_BEGIN(slib::Memory)
-#define SLIB_DEFINE_RAW_RESOURCE_MAP_END SLIB_DEFINE_RESOURCE_MAP_END(slib::Memory)
+#define SLIB_DEFINE_RAW_RESOURCE_MAP_END SLIB_DEFINE_RESOURCE_MAP_END(slib::Memory, sl_null)
 
 #endif
