@@ -114,6 +114,6 @@ namespace slib
 
 }
 
-#include "detail/iterator.h"
+#include "detail/iterator.inc"
 
 #endif

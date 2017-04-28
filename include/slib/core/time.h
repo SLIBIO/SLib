@@ -493,6 +493,6 @@ namespace slib
 
 }
 
-#include "detail/time.h"
+#include "detail/time.inc"
 
 #endif

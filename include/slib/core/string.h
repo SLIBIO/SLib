@@ -54,7 +54,7 @@ namespace slib
 
 }
 
-#include "detail/string8.h"
-#include "detail/string16.h"
+#include "detail/string8.inc"
+#include "detail/string16.inc"
 
 #endif

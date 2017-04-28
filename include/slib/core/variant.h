@@ -976,6 +976,6 @@ namespace slib
 
 }
 
-#include "detail/variant.h"
+#include "detail/variant.inc"
 
 #endif

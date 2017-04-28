@@ -18,11 +18,9 @@
 #include "new_helper.h"
 #include "compare.h"
 
-namespace std
-{
-	template <class T>
-	class initializer_list;
-}
+#ifdef SLIB_SUPPORT_STD_TYPES
+#include <initializer_list>
+#endif
 
 namespace slib
 {
@@ -76,7 +74,9 @@ namespace slib
 		template <class _T>
 		CArray(const _T* data, sl_size count);
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		CArray(const std::initializer_list<T>& l);
+#endif
 
 		CArray(const T* data, sl_size count, Referable* refer);
 
@@ -88,7 +88,9 @@ namespace slib
 		template <class _T>
 		static CArray<T>* create(const _T* data, sl_size count);
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		static CArray<T>* create(const std::initializer_list<T>& l);
+#endif
 
 		static CArray<T>* createStatic(const T* data, sl_size count, Referable* refer);
 
@@ -192,7 +194,9 @@ namespace slib
 		template <class _T>
 		Array(const _T* data, sl_size count);
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		Array(const std::initializer_list<T>& l);
+#endif
 		
 		Array(const T* data, sl_size count, Referable* refer);
 		
@@ -202,7 +206,9 @@ namespace slib
 		template <class _T>
 		static Array<T> create(const _T* data, sl_size count);
 
+#ifdef SLIB_SUPPORT_STD_TYPES
 		static Array<T> create(const std::initializer_list<T>& l);
+#endif
 		
 		static Array<T> createStatic(const T* data, sl_size count);
 
@@ -233,7 +239,9 @@ namespace slib
 
 		T& operator[](sl_size_t index) const;
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		Array<T>& operator=(const std::initializer_list<T>& l);
+#endif
 
 	public:
 		Array<T> sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const;
@@ -286,7 +294,9 @@ namespace slib
 		template <class _T>
 		Atomic(const _T* data, sl_size count);
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		Atomic(const std::initializer_list<T>& l);
+#endif
 		
 		Atomic(const T* data, sl_size count, Referable* refer);
 		
@@ -311,7 +321,9 @@ namespace slib
 
 		T operator[](sl_size_t index) const;
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		Atomic& operator=(const std::initializer_list<T>& l);
+#endif
 
 	public:
 		Array<T> sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const;
@@ -373,6 +385,10 @@ namespace slib
 
 }
 
-#include "detail/array.h"
+#include "detail/array.inc"
+
+#ifdef SLIB_SUPPORT_STD_TYPES
+#include "detail/array_std.inc"
+#endif
 
 #endif

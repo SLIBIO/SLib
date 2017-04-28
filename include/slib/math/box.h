@@ -108,6 +108,6 @@ namespace slib
 
 }
 
-#include "detail/box.h"
+#include "detail/box.inc"
 
 #endif

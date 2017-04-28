@@ -709,6 +709,6 @@ namespace slib
 
 }
 
-#include "detail/ref.h"
+#include "detail/ref.inc"
 
 #endif

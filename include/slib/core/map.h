@@ -19,11 +19,9 @@
 #include "hashtable.h"
 #include "tree.h"
 
-namespace std
-{
-	template <class T>
-	class initializer_list;
-}
+#ifdef SLIB_SUPPORT_STD_TYPES
+#include <initializer_list>
+#endif
 
 namespace slib
 {
@@ -187,12 +185,16 @@ namespace slib
 	public:
 		ListMap(const KEY_EQUALS& equals = KEY_EQUALS());
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		ListMap(const std::initializer_list< Pair<KT, VT> >& l, const KEY_EQUALS& equals = KEY_EQUALS());
+#endif
 		
 	public:
 		static ListMap<KT, VT, KEY_EQUALS>* create(const KEY_EQUALS& key_equals = KEY_EQUALS());
 
+#ifdef SLIB_SUPPORT_STD_TYPES
 		static ListMap<KT, VT, KEY_EQUALS>* create(const std::initializer_list< Pair<KT, VT> >& l, const KEY_EQUALS& key_equals = KEY_EQUALS());
+#endif
 		
 		VT operator[](const KT& key) const;
 
@@ -280,12 +282,16 @@ namespace slib
 	public:
 		HashMap(sl_uint32 capacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		HashMap(const std::initializer_list< Pair<KT, VT> >& l, sl_uint32 capacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
+#endif
 		
 	public:
 		static HashMap<KT, VT, HASH, KEY_EQUALS>* create(sl_uint32 capacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		static HashMap<KT, VT, HASH, KEY_EQUALS>* create(const std::initializer_list< Pair<KT, VT> >& l, sl_uint32 capacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
+#endif
 		
 		VT operator[](const KT& key) const;
 	
@@ -375,12 +381,16 @@ namespace slib
 	public:
 		TreeMap(const KEY_COMPARE& key_compare = KEY_COMPARE());
 	
+#ifdef SLIB_SUPPORT_STD_TYPES
 		TreeMap(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare = KEY_COMPARE());
+#endif
 		
 	public:
 		static TreeMap<KT, VT, KEY_COMPARE>* create(const KEY_COMPARE& key_compare = KEY_COMPARE());
 
+#ifdef SLIB_SUPPORT_STD_TYPES
 		static TreeMap<KT, VT, KEY_COMPARE>* create(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare = KEY_COMPARE());
+#endif
 		
 		VT operator[](const KT& key) const;
 	
@@ -464,7 +474,9 @@ namespace slib
 		SLIB_REF_WRAPPER(Map, IMap<KT, VT>)
 	
 	public:
+#ifdef SLIB_SUPPORT_STD_TYPES
 		Map(const std::initializer_list< Pair<KT, VT> >& l);
+#endif
 		
 	public:
 		static Map<KT, VT> create();
@@ -472,20 +484,26 @@ namespace slib
 		template < class KEY_EQUALS = Equals<KT> >
 		static Map<KT, VT> createList(const KEY_EQUALS& key_equals = KEY_EQUALS());
 	
+#ifdef SLIB_SUPPORT_STD_TYPES
 		template < class KEY_EQUALS = Equals<KT> >
 		static Map<KT, VT> createList(const std::initializer_list< Pair<KT, VT> >& l, const KEY_EQUALS& key_equals = KEY_EQUALS());
+#endif
 		
 		template < class HASH = Hash<KT>, class KEY_EQUALS = Equals<KT> >
 		static Map<KT, VT> createHash(sl_uint32 initialCapacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		template < class HASH = Hash<KT>, class KEY_EQUALS = Equals<KT> >
 		static Map<KT, VT> createHash(const std::initializer_list< Pair<KT, VT> >& l, sl_uint32 initialCapacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
+#endif
 	
 		template < class KEY_COMPARE = Compare<KT> >
 		static Map<KT, VT> createTree(const KEY_COMPARE& key_compare = KEY_COMPARE());
-		
+	
+#ifdef SLIB_SUPPORT_STD_TYPES
 		template < class KEY_COMPARE = Compare<KT> >
 		static Map<KT, VT> createTree(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare = KEY_COMPARE());
+#endif
 		
 		template <class _KT, class _VT>
 		static const Map<KT, VT>& from(const Map<_KT, _VT>& other);
@@ -503,7 +521,9 @@ namespace slib
 		void initTree(const KEY_COMPARE& key_compare = KEY_COMPARE());
 
 	public:
+#ifdef SLIB_SUPPORT_STD_TYPES
 		Map<KT, VT>& operator=(const std::initializer_list< Pair<KT, VT> >& l);
+#endif
 
 		VT operator[](const KT& key) const;
 
@@ -604,7 +624,9 @@ namespace slib
 		SLIB_ATOMIC_REF_WRAPPER(IMap<KT, VT>)
 
 	public:
+#ifdef SLIB_SUPPORT_STD_TYPES
 		Atomic(const std::initializer_list< Pair<KT, VT> >& l);
+#endif
 		
 	public:
 		template <class _KT, class _VT>
@@ -622,7 +644,9 @@ namespace slib
 		void initTree(const KEY_COMPARE& key_compare = KEY_COMPARE());
 
 	public:
+#ifdef SLIB_SUPPORT_STD_TYPES
 		Atomic< Map<KT, VT> >& operator=(const std::initializer_list< Pair<KT, VT> >& l);
+#endif
 
 		VT operator[](const KT& key) const;
 
@@ -679,6 +703,10 @@ namespace slib
 
 }
 
-#include "detail/map.h"
+#include "detail/map.inc"
+
+#ifdef SLIB_SUPPORT_STD_TYPES
+#include "detail/map_std.inc"
+#endif
 
 #endif

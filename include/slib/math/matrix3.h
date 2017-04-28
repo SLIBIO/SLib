@@ -212,6 +212,6 @@ namespace slib
 
 }
 
-#include "detail/matrix3.h"
+#include "detail/matrix3.inc"
 
 #endif

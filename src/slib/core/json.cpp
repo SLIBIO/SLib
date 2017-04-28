@@ -8,11 +8,12 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "slib/core/json.h"
-#include "slib/core/json_std.h"
+#define SLIB_SUPPORT_STD_TYPES
 
-#include "slib/core/list_std.h"
-#include "slib/core/map_std.h"
+#include "slib/core/json.h"
+
+#include "slib/core/list.h"
+#include "slib/core/map.h"
 
 #include "slib/core/file.h"
 #include "slib/core/log.h"

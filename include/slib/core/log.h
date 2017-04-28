@@ -123,6 +123,6 @@ namespace slib
 	
 }
 
-#include "detail/log.h"
+#include "detail/log.inc"
 
 #endif

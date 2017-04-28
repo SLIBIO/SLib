@@ -60,6 +60,6 @@ namespace slib
 
 }
 
-#include "detail/sphere.h"
+#include "detail/sphere.inc"
 
 #endif

@@ -133,6 +133,6 @@ namespace slib
 	
 }
 	
-#include "detail/mac_address.h"
+#include "detail/mac_address.inc"
 
 #endif

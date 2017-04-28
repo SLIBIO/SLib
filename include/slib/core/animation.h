@@ -473,7 +473,7 @@ namespace slib
 
 }
 
-#include "detail/animation.h"
+#include "detail/animation.inc"
 
 #endif
 

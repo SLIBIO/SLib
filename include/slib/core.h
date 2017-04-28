@@ -11,6 +11,12 @@
 #ifndef CHECKHEADER_SLIB_CORE_HEADER
 #define CHECKHEADER_SLIB_CORE_HEADER
 
+#ifndef SLIB_NOT_SUPPORT_STD_TYPES
+#	ifndef SLIB_SUPPORT_STD_TYPES
+#		define SLIB_SUPPORT_STD_TYPES
+#	endif
+#endif
+
 #include "core/definition.h"
 #include "core/constants.h"
 #include "core/base.h"
@@ -34,7 +40,6 @@
 #include "core/spin_lock.h"
 #include "core/mutex.h"
 #include "core/string.h"
-#include "core/string_std.h"
 #include "core/string_buffer.h"
 #include "core/memory.h"
 #include "core/time.h"
@@ -48,13 +53,10 @@
 #include "core/hashtable.h"
 #include "core/tree.h"
 #include "core/array.h"
-#include "core/array_std.h"
 #include "core/array2d.h"
 #include "core/iterator.h"
 #include "core/list.h"
-#include "core/list_std.h"
 #include "core/map.h"
-#include "core/map_std.h"
 #include "core/linked_list.h"
 #include "core/queue.h"
 #include "core/queue_channel.h"
@@ -92,7 +94,6 @@
 #include "core/setting.h"
 
 #include "core/json.h"
-#include "core/json_std.h"
 #include "core/xml.h"
 #include "core/base64.h"
 

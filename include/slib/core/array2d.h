@@ -228,6 +228,6 @@ namespace slib
 
 }
 
-#include "detail/array2d.h"
+#include "detail/array2d.inc"
 
 #endif

@@ -222,6 +222,6 @@ namespace slib
 
 }
 
-#include "detail/tree.h"
+#include "detail/tree.inc"
 
 #endif

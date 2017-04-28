@@ -20,11 +20,9 @@
 #include "compare.h"
 #include "sort.h"
 
-namespace std
-{
-	template <class T>
-	class initializer_list;
-}
+#ifdef SLIB_SUPPORT_STD_TYPES
+#include <initializer_list>
+#endif
 
 namespace slib
 {
@@ -56,8 +54,10 @@ namespace slib
 
 		template <class _T>
 		CList(const _T* values, sl_size count);
-		
+
+#ifdef SLIB_SUPPORT_STD_TYPES
 		CList(const std::initializer_list<T>& l);
+#endif
 
 		~CList();
 
@@ -68,8 +68,10 @@ namespace slib
 
 		static CList<T>* create(sl_size count, sl_size capacity);
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		static CList<T>* create(const std::initializer_list<T>& l);
-
+#endif
+		
 		template <class _T>
 		static CList<T>* createFromArray(const _T* values, sl_size count);
 
@@ -129,9 +131,11 @@ namespace slib
 		template <class _T>
 		sl_bool insertElements(sl_size index, const _T* values, sl_size count);
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		sl_bool insertElements_NoLock(sl_size index, const std::initializer_list<T>& l);
 		
 		sl_bool insertElements(sl_size index, const std::initializer_list<T>& l);
+#endif
 		
 		template <class _T>
 		sl_bool insertAll(sl_size index, const CList<_T>* other);
@@ -146,9 +150,11 @@ namespace slib
 		template <class _T>
 		sl_bool addElements(const _T* values, sl_size count);
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		sl_bool addElements_NoLock(const std::initializer_list<T>& l);
 		
 		sl_bool addElements(const std::initializer_list<T>& l);
+#endif
 		
 		template <class _T>
 		sl_bool addAll_NoLock(const CList<_T>* other);
@@ -297,7 +303,9 @@ namespace slib
 		template <class _T>
 		List(const _T* values, sl_size count);
 
+#ifdef SLIB_SUPPORT_STD_TYPES
 		List(const std::initializer_list<T>& l);
+#endif
 		
 	public:
 		static List<T> create();
@@ -306,7 +314,9 @@ namespace slib
 
 		static List<T> create(sl_size count, sl_size capacity);
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		static List<T> create(const std::initializer_list<T>& l);
+#endif
 
 		template <class _T>
 		static List<T> createFromArray(const _T* values, sl_size count);
@@ -357,7 +367,9 @@ namespace slib
 
 		T& operator[](sl_size_t index) const;
 
+#ifdef SLIB_SUPPORT_STD_TYPES
 		List<T>& operator=(const std::initializer_list<T>& l);
+#endif
 
 	public:
 		sl_bool setCount_NoLock(sl_size count);
@@ -374,9 +386,11 @@ namespace slib
 		template <class _T>
 		sl_bool insertElements(sl_size index, const _T* values, sl_size count) const;
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		sl_bool insertElements_NoLock(sl_size index, const std::initializer_list<T>& l) const;
 		
 		sl_bool insertElements(sl_size index, const std::initializer_list<T>& l) const;
+#endif
 
 		template <class _T>
 		sl_bool insertAll(sl_size index, const List<_T>& other) const;
@@ -394,9 +408,11 @@ namespace slib
 		template <class _T>
 		sl_bool addElements(const _T* values, sl_size count);
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		sl_bool addElements_NoLock(const std::initializer_list<T>& l);
 		
 		sl_bool addElements(const std::initializer_list<T>& l);
+#endif
 
 		template <class _T>
 		sl_bool addAll_NoLock(const List<_T>& _other);
@@ -520,7 +536,9 @@ namespace slib
 		template <class _T>
 		Atomic(const _T* values, sl_size count);
 
+#ifdef SLIB_SUPPORT_STD_TYPES
 		Atomic(const std::initializer_list<T>& l);
+#endif
 
 	public:
 		template <class _T>
@@ -543,7 +561,9 @@ namespace slib
 
 		T operator[](sl_size_t index) const;
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		Atomic& operator=(const std::initializer_list<T>& l);
+#endif
 
 	public:
 		sl_bool setCount(sl_size count);
@@ -553,7 +573,9 @@ namespace slib
 		template <class _T>
 		sl_bool insertElements(sl_size index, const _T* values, sl_size count) const;
 
+#ifdef SLIB_SUPPORT_STD_TYPES
 		sl_bool insertElements(sl_size index, const std::initializer_list<T>& l) const;
+#endif
 		
 		template <class _T>
 		sl_bool insertAll(sl_size index, const List<_T>& other) const;
@@ -566,7 +588,9 @@ namespace slib
 		template <class _T>
 		sl_bool addElements(const _T* values, sl_size count);
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		sl_bool addElements(const std::initializer_list<T>& l);
+#endif
 
 		template <class _T>
 		sl_bool addAll(const List<_T>& _other);
@@ -703,6 +727,10 @@ namespace slib
 	
 }
 
-#include "detail/list.h"
+#include "detail/list.inc"
+
+#ifdef SLIB_SUPPORT_STD_TYPES
+#include "detail/list_std.inc"
+#endif
 
 #endif

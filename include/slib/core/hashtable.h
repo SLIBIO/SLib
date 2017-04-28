@@ -128,6 +128,6 @@ namespace slib
 
 }
 
-#include "detail/hashtable.h"
+#include "detail/hashtable.inc"
 
 #endif

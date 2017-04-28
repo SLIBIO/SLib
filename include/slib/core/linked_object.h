@@ -131,6 +131,6 @@ namespace slib
 
 }
 
-#include "detail/linked_object.h"
+#include "detail/linked_object.inc"
 
 #endif

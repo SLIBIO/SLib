@@ -97,6 +97,6 @@ namespace slib
 	slib::SpinLocker _static_spinlocker_##NAME(&NAME);
 
 
-#include "detail/spin_lock.h"
+#include "detail/spin_lock.inc"
 
 #endif

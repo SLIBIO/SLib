@@ -15,6 +15,10 @@
 
 #include "variant.h"
 
+#ifdef SLIB_SUPPORT_STD_TYPES
+#include <initializer_list>
+#endif
+
 namespace slib
 {
 	
@@ -159,9 +163,11 @@ namespace slib
 		template <class KT, class VT>
 		Json(const AtomicMap<KT, VT>& map);
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		Json(const std::initializer_list< Pair<String, Json> >& pairs);
 		
 		Json(const std::initializer_list<Json>& elements);
+#endif
 
 		template <class T>
 		Json(const T& value);
@@ -184,9 +190,11 @@ namespace slib
 		
 		Json& operator=(sl_null_t);
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
 		Json& operator=(const std::initializer_list< Pair<String, Json> >& pairs);
 		
 		Json& operator=(const std::initializer_list<Json>& elements);
+#endif
 		
 		template <class T>
 		Json& operator=(const T& value);
@@ -456,6 +464,6 @@ namespace slib
 
 }
 
-#include "detail/json.h"
+#include "detail/json.inc"
 
 #endif

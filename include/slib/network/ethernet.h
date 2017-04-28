@@ -90,6 +90,6 @@ namespace slib
 	
 }
 
-#include "detail/ethernet.h"
+#include "detail/ethernet.inc"
 
 #endif

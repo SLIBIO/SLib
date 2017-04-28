@@ -39,6 +39,6 @@ namespace slib
 
 }
 
-#include "detail/compare.h"
+#include "detail/compare.inc"
 
 #endif

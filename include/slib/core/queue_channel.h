@@ -65,6 +65,6 @@ namespace slib
 
 }
 
-#include "detail/queue_channel.h"
+#include "detail/queue_channel.inc"
 
 #endif

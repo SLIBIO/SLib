@@ -111,6 +111,6 @@ namespace slib
 
 }
 
-#include "detail/quaternion.h"
+#include "detail/quaternion.inc"
 
 #endif

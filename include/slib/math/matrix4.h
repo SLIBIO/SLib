@@ -223,6 +223,6 @@ namespace slib
 
 }
 
-#include "detail/matrix4.h"
+#include "detail/matrix4.inc"
 
 #endif

@@ -54,7 +54,7 @@ namespace slib
 
 }
 
-#include "detail/new_helper.h"
+#include "detail/new_helper.inc"
 
 #endif
 

@@ -524,7 +524,7 @@ namespace CLASS \
 	static slib::_JniNativeMethod VAR(&_gcls, NAME, SIG, (const void*)(SLib_JniNativeImpl_##VAR)); \
 	RET JNICALL SLib_JniNativeImpl_##VAR(JNIEnv* env, jobject _this, ##__VA_ARGS__)
 
-#include "detail/java.h"
+#include "detail/java.inc"
 
 #endif
 

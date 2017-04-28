@@ -541,6 +541,6 @@ namespace slib
 
 }
 
-#include "detail/ptr.h"
+#include "detail/ptr.inc"
 
 #endif

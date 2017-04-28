@@ -66,6 +66,6 @@ namespace slib
 
 }
 
-#include "detail/queue.h"
+#include "detail/queue.inc"
 
 #endif

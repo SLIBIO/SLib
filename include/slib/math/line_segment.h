@@ -69,6 +69,6 @@ namespace slib
 
 }
 
-#include "detail/line_segment.h"
+#include "detail/line_segment.inc"
 
 #endif

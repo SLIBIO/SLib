@@ -67,6 +67,6 @@ namespace slib
 
 }
 
-#include "detail/expire.h"
+#include "detail/expire.inc"
 
 #endif

@@ -62,7 +62,7 @@
 	SLIB_SAFE_STATIC_DESTRUCTOR(TYPE, NAME)
 
 
-#include "detail/safe_static.h"
+#include "detail/safe_static.inc"
 
 #endif
 

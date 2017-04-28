@@ -59,6 +59,6 @@ namespace slib
 
 }
 
-#include "detail/latlon.h"
+#include "detail/latlon.inc"
 
 #endif

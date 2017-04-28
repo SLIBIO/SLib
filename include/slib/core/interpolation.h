@@ -28,6 +28,6 @@ namespace slib
 
 #define SLIB_LERP(a, b, factor) (((a) * (1 - factor)) + ((b) * factor))
 
-#include "detail/interpolation.h"
+#include "detail/interpolation.inc"
 
 #endif

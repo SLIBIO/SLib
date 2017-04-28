@@ -398,6 +398,6 @@ namespace slib
 
 }
 
-#include "detail/linked_list.h"
+#include "detail/linked_list.inc"
 
 #endif
