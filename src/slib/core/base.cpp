@@ -13,8 +13,6 @@
 #include "slib/core/system.h"
 #include "slib/core/math.h"
 
-//#define FORCE_MEM_ALIGNED
-
 #if defined(SLIB_PLATFORM_IS_APPLE)
 #include <stdlib.h>
 #else
@@ -22,6 +20,7 @@
 #endif
 
 #include <stdio.h>
+#include <memory.h>
 
 #ifdef SLIB_PLATFORM_IS_WINDOWS
 #	include "slib/core/platform_windows.h"
@@ -36,28 +35,12 @@ namespace slib
 
 	void* Base::createMemory(sl_size size)
 	{
-#ifndef FORCE_MEM_ALIGNED
-		return malloc(size);
-#else
-		sl_reg ptr = (sl_reg)(malloc(size + 16));
-		if (ptr) {
-			sl_reg ptr_aligned = (ptr | 7) + 9;
-			*(char*)(ptr_aligned - 1) = (char)(ptr_aligned - ptr);
-			*(sl_size*)(ptr) = size;
-			return (void*)(ptr_aligned);
-		}
-		return sl_null;
-#endif
+		return ::malloc(size);
 	}
 
 	void Base::freeMemory(void* ptr)
 	{
-#ifndef FORCE_MEM_ALIGNED
-		free(ptr);
-#else
-		sl_reg offset = *((unsigned char*)ptr - 1);
-		free((void*)((sl_reg)ptr - offset));
-#endif
+		::free(ptr);
 	}
 
 	void* Base::reallocMemory(void* ptr, sl_size sizeNew)
@@ -65,21 +48,9 @@ namespace slib
 		if (sizeNew == 0) {
 			freeMemory(ptr);
 			return createMemory(1);
+		} else {
+			return ::realloc(ptr, sizeNew);
 		}
-#ifndef FORCE_MEM_ALIGNED
-		return realloc(ptr, sizeNew);
-#else
-		sl_size sizeOld = *(sl_size*)((sl_reg)ptr - *((unsigned char*)ptr - 1));
-		if (sizeOld == sizeNew) {
-			return ptr;
-		}
-		void* ptrNew = createMemory(sizeNew);
-		if (ptrNew) {
-			copyMemory(ptrNew, ptr, sizeOld);
-			freeMemory(ptr);
-		}
-		return ptrNew;
-#endif
 	}
 
 	void* Base::createZeroMemory(sl_size size)
@@ -93,27 +64,17 @@ namespace slib
 
 	void Base::copyMemory(void* dst, const void* src, sl_size count)
 	{
-		sl_uint8* d = (sl_uint8*)dst;
-		sl_uint8* s = (sl_uint8*)src;
-		for (sl_size i = 0; i < count; i++) {
-			d[i] = s[i];
-		}
+		::memcpy(dst, src, count);
 	}
 
 	void Base::zeroMemory(void* dst, sl_size size)
 	{
-		sl_uint8* d = (sl_uint8*)dst;
-		for (sl_size i = 0; i < size; i++) {
-			d[i] = 0;
-		}
+		::memset(dst, 0, size);
 	}
 
 	void Base::resetMemory(void* dst, sl_uint8 value, sl_size count)
 	{
-		sl_uint8* d = (sl_uint8*)dst;
-		for (sl_size i = 0; i < count; i++) {
-			d[i] = value;
-		}
+		::memset(dst, value, count);
 	}
 
 	void Base::resetMemory2(sl_uint16* dst, sl_uint16 value, sl_size count)
@@ -158,88 +119,44 @@ namespace slib
 		}
 	}
 
-	sl_bool Base::equalsMemory(const void* _m1, const void* _m2, sl_size count)
+	sl_bool Base::equalsMemory(const void* m1, const void* m2, sl_size count)
 	{
-		sl_uint8* m1 = (sl_uint8*)_m1;
-		sl_uint8* m2 = (sl_uint8*)_m2;
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] != m2[i]) {
-				return sl_false;
-			}
-		}
-		return sl_true;
+		return ::memcmp(m1, m2, count) == 0;
 	}
 
 	sl_bool Base::equalsMemory2(const sl_uint16* m1, const sl_uint16* m2, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] != m2[i]) {
-				return sl_false;
-			}
-		}
-		return sl_true;
+		return ::memcmp(m1, m2, count << 1) == 0;
 	}
 
 	sl_bool Base::equalsMemory2(const sl_int16* m1, const sl_int16* m2, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] != m2[i]) {
-				return sl_false;
-			}
-		}
-		return sl_true;
+		return ::memcmp(m1, m2, count << 1) == 0;
 	}
 
 	sl_bool Base::equalsMemory4(const sl_uint32* m1, const sl_uint32* m2, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] != m2[i]) {
-				return sl_false;
-			}
-		}
-		return sl_true;
+		return ::memcmp(m1, m2, count << 2) == 0;
 	}
 
 	sl_bool Base::equalsMemory4(const sl_int32* m1, const sl_int32* m2, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] != m2[i]) {
-				return sl_false;
-			}
-		}
-		return sl_true;
+		return ::memcmp(m1, m2, count << 2) == 0;
 	}
 
 	sl_bool Base::equalsMemory8(const sl_uint64* m1, const sl_uint64* m2, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] != m2[i]) {
-				return sl_false;
-			}
-		}
-		return sl_true;
+		return ::memcmp(m1, m2, count << 3) == 0;
 	}
 
 	sl_bool Base::equalsMemory8(const sl_int64* m1, const sl_int64* m2, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] != m2[i]) {
-				return sl_false;
-			}
-		}
-		return sl_true;
+		return ::memcmp(m1, m2, count << 3) == 0;
 	}
 
 	sl_int32 Base::compareMemory(const sl_uint8* m1, const sl_uint8* m2, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] < m2[i]) {
-				return -1;
-			} else if (m1[i] > m2[i]) {
-				return 1;
-			}
-		}
-		return 0;
+		return ::memcmp(m1, m2, count);
 	}
 
 	sl_int32 Base::compareMemory(const sl_int8* m1, const sl_int8* m2, sl_size count)
@@ -498,24 +415,13 @@ namespace slib
 	}
 
 	const sl_uint8* Base::findMemory(const void* mem, sl_uint8 pattern, sl_size count)
-	{
-		sl_uint8* m = (sl_uint8*)mem;
-		for (sl_size i = 0; i < count; i++) {
-			if (m[i] == pattern) {
-				return m + i;
-			}
-		}
-		return sl_null;
+	{		
+		return (const sl_uint8*)(::memchr(mem, pattern, count));
 	}
 
-	const sl_int8* Base::findMemory(const sl_int8* m, sl_int8 pattern, sl_size count)
+	const sl_int8* Base::findMemory(const sl_int8* mem, sl_int8 pattern, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m[i] == pattern) {
-				return m + i;
-			}
-		}
-		return sl_null;
+		return (const sl_int8*)(::memchr(mem, pattern, count));
 	}
 
 	const sl_uint16* Base::findMemory2(const sl_uint16* m, sl_uint16 pattern, sl_size count)
