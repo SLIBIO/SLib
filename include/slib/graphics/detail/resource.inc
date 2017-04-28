@@ -8,15 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CHECKHEADER_SLIB_GRAPHICS_DETAIL_RESOURCE
-#define CHECKHEADER_SLIB_GRAPHICS_DETAIL_RESOURCE
-
-#include "../resource.h"
-
 namespace slib
 {
 	
-	class _ImageResourceEntry
+	class _private_ImageResourceEntry
 	{
 	public:
 		sl_bool flagValid;
@@ -38,24 +33,22 @@ namespace slib
 
 	};
 	
-	class _ImageResourceFreeStatic
+	class _private_ImageResourceFreeStatic
 	{
 	public:
-		_ImageResourceFreeStatic(_ImageResourceEntry* entries);
+		_private_ImageResourceFreeStatic(_private_ImageResourceEntry* entries);
 
-		~_ImageResourceFreeStatic();
+		~_private_ImageResourceFreeStatic();
 
 	private:
-		_ImageResourceEntry* m_entries;
+		_private_ImageResourceEntry* m_entries;
 
 	};
 	
-	Ref<Image> _ImageResource_getImage(_ImageResourceEntry* entries, sl_uint32 requiredWidth, sl_uint32 requiredHeight);
+	Ref<Image> _private_ImageResource_getImage(_private_ImageResourceEntry* entries, sl_uint32 requiredWidth, sl_uint32 requiredHeight);
 	
-	List< Ref<Image> > _ImageResource_getImages(_ImageResourceEntry* entries);
+	List< Ref<Image> > _private_ImageResource_getImages(_private_ImageResourceEntry* entries);
 	
-	Ref<Drawable> _ImageResource_get(_ImageResourceEntry* entries, sl_uint32 width, sl_uint32 height);
+	Ref<Drawable> _private_ImageResource_get(_private_ImageResourceEntry* entries, sl_uint32 width, sl_uint32 height);
 
 }
-
-#endif
