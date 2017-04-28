@@ -13,13 +13,13 @@
 #include "slib/core/system.h"
 #include "slib/core/math.h"
 
-#if defined(SLIB_PLATFORM_IS_APPLE)
-#include <stdlib.h>
-#else
+#if !defined(SLIB_PLATFORM_IS_APPLE)
 #include <malloc.h>
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <memory.h>
 
 #ifdef SLIB_PLATFORM_IS_WINDOWS
