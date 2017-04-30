@@ -19,19 +19,19 @@ namespace slib
 	class SLIB_EXPORT SpinLock
 	{
 	public:
-		constexpr SpinLock() : m_flagLock(0) {}
+		constexpr SpinLock() noexcept: m_flagLock(0) {}
 
-		constexpr SpinLock(const SpinLock& other) : m_flagLock(0) {}
+		constexpr SpinLock(const SpinLock& other) noexcept: m_flagLock(0) {}
 
 	public:
-		void lock() const;
+		void lock() const noexcept;
 
-		sl_bool tryLock() const;
+		sl_bool tryLock() const noexcept;
 
-		void unlock() const;
+		void unlock() const noexcept;
 	
 	public:
-		SpinLock& operator=(const SpinLock& other);
+		SpinLock& operator=(const SpinLock& other) noexcept;
 	
 	private:
 		sl_int32 m_flagLock;
@@ -41,16 +41,16 @@ namespace slib
 	class SLIB_EXPORT SpinLocker
 	{
 	public:
-		SpinLocker();
+		SpinLocker() noexcept;
 
-		SpinLocker(const SpinLock* lock);
+		SpinLocker(const SpinLock* lock) noexcept;
 
-		~SpinLocker();
+		~SpinLocker() noexcept;
 
 	public:
-		void lock(const SpinLock* lock);
+		void lock(const SpinLock* lock) noexcept;
 
-		void unlock();
+		void unlock() noexcept;
 
 	private:
 		const SpinLock* m_lock;
@@ -60,12 +60,12 @@ namespace slib
 	class SLIB_EXPORT DualSpinLocker
 	{
 	public:
-		DualSpinLocker(const SpinLock* lock1, const SpinLock* lock2);
+		DualSpinLocker(const SpinLock* lock1, const SpinLock* lock2) noexcept;
 		
-		~DualSpinLocker();
+		~DualSpinLocker() noexcept;
 		
 	public:
-		void unlock();
+		void unlock() noexcept;
 		
 	private:
 		const SpinLock* m_lock1;
@@ -79,7 +79,7 @@ namespace slib
 	class SLIB_EXPORT SpinLockPool
 	{
 	public:
-		static SpinLock* get(const void* ptr);
+		static SpinLock* get(const void* ptr) noexcept;
 
 	private:
 		static sl_int32 m_locks[SLIB_SPINLOCK_POOL_SIZE];

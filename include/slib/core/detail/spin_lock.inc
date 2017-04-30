@@ -24,7 +24,7 @@ namespace slib
 	sl_int32 SpinLockPool<CATEGORY>::m_locks[SLIB_SPINLOCK_POOL_SIZE] = { 0 };
 	
 	template <int CATEGORY>
-	SLIB_INLINE SpinLock* SpinLockPool<CATEGORY>::get(const void* ptr)
+	SLIB_INLINE SpinLock* SpinLockPool<CATEGORY>::get(const void* ptr) noexcept
 	{
 		sl_size index = ((sl_size)(ptr)) % SLIB_SPINLOCK_POOL_SIZE;
 		return reinterpret_cast<SpinLock*>(m_locks + index);
