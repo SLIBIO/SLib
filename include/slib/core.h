@@ -45,6 +45,7 @@
 #include "core/time.h"
 #include "core/variant.h"
 
+#include "core/cast.h"
 #include "core/compare.h"
 #include "core/hash.h"
 #include "core/search.h"
