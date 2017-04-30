@@ -50,26 +50,26 @@
 
 #define SLIB_DEFINE_IMAGE_RESOURCE_BEGIN(NAME, WIDTH, HEIGHT) \
 	namespace NAME { \
-		slib::_private_ImageResourceEntry* _getEntries(const slib::Locale& locale); \
+		slib::_priv_ImageResourceEntry* _getEntries(const slib::Locale& locale); \
 		slib::Ref<slib::Image> getImage(const slib::Locale& locale, sl_uint32 requiredWidth, sl_uint32 requiredHeight) { \
-			return slib::_private_ImageResource_getImage(_getEntries(locale), requiredWidth, requiredHeight); \
+			return slib::_priv_ImageResource_getImage(_getEntries(locale), requiredWidth, requiredHeight); \
 		} \
 		slib::Ref<slib::Image> getImage(sl_uint32 requiredWidth, sl_uint32 requiredHeight) { \
-			return slib::_private_ImageResource_getImage(_getEntries(slib::Resources::getCurrentLocale()), requiredWidth, requiredHeight); \
+			return slib::_priv_ImageResource_getImage(_getEntries(slib::Resources::getCurrentLocale()), requiredWidth, requiredHeight); \
 		} \
 		slib::List< slib::Ref<slib::Image> > getImages(const slib::Locale& locale) { \
-			return slib::_private_ImageResource_getImages(_getEntries(locale)); \
+			return slib::_priv_ImageResource_getImages(_getEntries(locale)); \
 		} \
 		slib::List< slib::Ref<slib::Image> > getImages() { \
-			return slib::_private_ImageResource_getImages(_getEntries(slib::Resources::getCurrentLocale())); \
+			return slib::_priv_ImageResource_getImages(_getEntries(slib::Resources::getCurrentLocale())); \
 		} \
 		slib::Ref<slib::Drawable> get(const slib::Locale& locale) { \
-			return slib::_private_ImageResource_get(_getEntries(locale), WIDTH, HEIGHT); \
+			return slib::_priv_ImageResource_get(_getEntries(locale), WIDTH, HEIGHT); \
 		} \
 		slib::Ref<slib::Drawable> get() { \
-			return slib::_private_ImageResource_get(_getEntries(slib::Resources::getCurrentLocale()), WIDTH, HEIGHT); \
+			return slib::_priv_ImageResource_get(_getEntries(slib::Resources::getCurrentLocale()), WIDTH, HEIGHT); \
 		} \
-		slib::_private_ImageResourceEntry* _getEntries(const slib::Locale& locale) { \
+		slib::_priv_ImageResourceEntry* _getEntries(const slib::Locale& locale) { \
 			int lang = (int)(locale.getLanguage()); \
 			SLIB_UNUSED(lang) \
 			slib::Locale localeSource; \
@@ -77,12 +77,12 @@
 
 #define SLIB_DEFINE_IMAGE_RESOURCE_DEFAULT_LIST_BEGIN \
 			{ \
-				static slib::_private_ImageResourceEntry entries[] = { \
+				static slib::_priv_ImageResourceEntry entries[] = { \
 
 #define SLIB_DEFINE_IMAGE_RESOURCE_LIST_BEGIN(LOCALE) \
 			localeSource = SLIB_LOCALE(LOCALE); \
 			if (locale == localeSource || lang == localeSource) { \
-				static slib::_private_ImageResourceEntry entries[] = {
+				static slib::_priv_ImageResourceEntry entries[] = {
 
 #define SLIB_DEFINE_IMAGE_RESOURCE_ITEM(WIDTH, HEIGHT, SIZE, BYTES) \
 					{sl_true, WIDTH, HEIGHT, BYTES, (sl_uint32)(SIZE), 0, 0, sl_false},
@@ -90,7 +90,7 @@
 #define SLIB_DEFINE_IMAGE_RESOURCE_LIST_END \
 					{sl_false, 0, 0, 0, 0, 0, 0, sl_false} \
 				}; \
-				static slib::_private_ImageResourceFreeStatic free_entries(entries); \
+				static slib::_priv_ImageResourceFreeStatic free_entries(entries); \
 				return entries; \
 			}
 
@@ -100,25 +100,25 @@
 
 #define SLIB_DEFINE_IMAGE_RESOURCE_SIMPLE(NAME, WIDTH, HEIGHT, SIZE, BYTES) \
 	namespace NAME { \
-		static slib::_private_ImageResourceEntry entries[2] = { {sl_true, WIDTH, HEIGHT, BYTES, (sl_uint32)(SIZE), 0, 0, sl_false}, {sl_false, 0, 0, 0, 0, 0, 0, sl_false} }; \
-		static slib::_private_ImageResourceFreeStatic free_entries(entries); \
+		static slib::_priv_ImageResourceEntry entries[2] = { {sl_true, WIDTH, HEIGHT, BYTES, (sl_uint32)(SIZE), 0, 0, sl_false}, {sl_false, 0, 0, 0, 0, 0, 0, sl_false} }; \
+		static slib::_priv_ImageResourceFreeStatic free_entries(entries); \
 		slib::Ref<slib::Image> getImage(const slib::Locale& locale, sl_uint32 requiredWidth, sl_uint32 requiredHeight) { \
-			return slib::_private_ImageResource_getImage(entries, requiredWidth, requiredHeight); \
+			return slib::_priv_ImageResource_getImage(entries, requiredWidth, requiredHeight); \
 		} \
 		slib::Ref<slib::Image> getImage(sl_uint32 requiredWidth, sl_uint32 requiredHeight) { \
-			return slib::_private_ImageResource_getImage(entries, requiredWidth, requiredHeight); \
+			return slib::_priv_ImageResource_getImage(entries, requiredWidth, requiredHeight); \
 		} \
 		slib::List< slib::Ref<slib::Image> > getImages(const slib::Locale& locale) { \
-			return slib::_private_ImageResource_getImages(entries); \
+			return slib::_priv_ImageResource_getImages(entries); \
 		} \
 		slib::List< slib::Ref<slib::Image> > getImages() { \
-			return slib::_private_ImageResource_getImages(entries); \
+			return slib::_priv_ImageResource_getImages(entries); \
 		} \
 		slib::Ref<slib::Drawable> get(const slib::Locale& locale) { \
-			return slib::_private_ImageResource_get(entries, WIDTH, HEIGHT); \
+			return slib::_priv_ImageResource_get(entries, WIDTH, HEIGHT); \
 		} \
 		slib::Ref<slib::Drawable> get() { \
-			return slib::_private_ImageResource_get(entries, WIDTH, HEIGHT); \
+			return slib::_priv_ImageResource_get(entries, WIDTH, HEIGHT); \
 		} \
 	}
 

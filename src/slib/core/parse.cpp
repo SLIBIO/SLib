@@ -17,7 +17,7 @@ namespace slib
 {
 
 	template <class ST, class CT>
-	static sl_size _String_applyBackslashEscapes(const ST& s, sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii, CT* buf)
+	static sl_size _priv_ParseUtil_applyBackslashEscapes(const ST& s, sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii, CT* buf)
 	{
 		const CT* ch = s.getData();
 		sl_size len = s.getLength();
@@ -84,8 +84,8 @@ namespace slib
 							sl_uint8 t = (sl_uint8)c;
 							buf[d++] = '\\';
 							buf[d++] = 'x';
-							buf[d++] = _StringConv_radixPatternLower[(t >> 4) & 15];
-							buf[d++] = _StringConv_radixPatternLower[t & 15];
+							buf[d++] = _priv_StringConv_radixPatternLower[(t >> 4) & 15];
+							buf[d++] = _priv_StringConv_radixPatternLower[t & 15];
 						} else {
 							d += 4;
 						}
@@ -94,10 +94,10 @@ namespace slib
 							sl_uint16 t = (sl_uint16)c;
 							buf[d++] = '\\';
 							buf[d++] = 'x';
-							buf[d++] = _StringConv_radixPatternLower[(t >> 12) & 15];
-							buf[d++] = _StringConv_radixPatternLower[(t >> 8) & 15];
-							buf[d++] = _StringConv_radixPatternLower[(t >> 4) & 15];
-							buf[d++] = _StringConv_radixPatternLower[t & 15];
+							buf[d++] = _priv_StringConv_radixPatternLower[(t >> 12) & 15];
+							buf[d++] = _priv_StringConv_radixPatternLower[(t >> 8) & 15];
+							buf[d++] = _priv_StringConv_radixPatternLower[(t >> 4) & 15];
+							buf[d++] = _priv_StringConv_radixPatternLower[t & 15];
 						} else {
 							d += 6;
 						}
@@ -136,7 +136,7 @@ namespace slib
 
 	String ParseUtil::applyBackslashEscapes(const String& str, sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii)
 	{
-		sl_size n = _String_applyBackslashEscapes<String, sl_char8>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, sl_null);
+		sl_size n = _priv_ParseUtil_applyBackslashEscapes<String, sl_char8>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, sl_null);
 		if (n == 0) {
 			return String::getEmpty();
 		}
@@ -144,18 +144,18 @@ namespace slib
 		if (ret.isEmpty()) {
 			return sl_null;
 		}
-		_String_applyBackslashEscapes<String, sl_char8>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, ret.getData());
+		_priv_ParseUtil_applyBackslashEscapes<String, sl_char8>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, ret.getData());
 		return ret;
 	}
 
 	String16 ParseUtil::applyBackslashEscapes(const String16& str, sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii)
 	{
-		sl_size n = _String_applyBackslashEscapes<String16, sl_char16>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, sl_null);
+		sl_size n = _priv_ParseUtil_applyBackslashEscapes<String16, sl_char16>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, sl_null);
 		String16 ret = String16::allocate(n);
 		if (ret.isEmpty()) {
 			return sl_null;
 		}
-		_String_applyBackslashEscapes<String16, sl_char16>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, ret.getData());
+		_priv_ParseUtil_applyBackslashEscapes<String16, sl_char16>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, ret.getData());
 		return ret;
 	}
 
@@ -172,7 +172,7 @@ namespace slib
 	}
 
 	template <class ST, class CT>
-	SLIB_INLINE ST _String_parseBackslashEscapes(const CT* sz, sl_size n, sl_size* lengthParsed, sl_bool* outFlagError)
+	SLIB_INLINE ST _priv_ParseUtil_parseBackslashEscapes(const CT* sz, sl_size n, sl_size* lengthParsed, sl_bool* outFlagError)
 	{
 		if (lengthParsed) {
 			*lengthParsed = 0;
@@ -406,12 +406,12 @@ namespace slib
 
 	String ParseUtil::parseBackslashEscapes(const sl_char8* sz, sl_size n, sl_size* lengthParsed, sl_bool* outFlagError)
 	{
-		return _String_parseBackslashEscapes<String, sl_char8>(sz, n, lengthParsed, outFlagError);
+		return _priv_ParseUtil_parseBackslashEscapes<String, sl_char8>(sz, n, lengthParsed, outFlagError);
 	}
 
 	String16 ParseUtil::parseBackslashEscapes(const sl_char16* sz, sl_size n, sl_size* lengthParsed, sl_bool* outFlagError)
 	{
-		return _String_parseBackslashEscapes<String16, sl_char16>(sz, n, lengthParsed, outFlagError);
+		return _priv_ParseUtil_parseBackslashEscapes<String16, sl_char16>(sz, n, lengthParsed, outFlagError);
 	}
 
 	String ParseUtil::parseBackslashEscapes(const String& str, sl_size* lengthParsed, sl_bool* flagError)
@@ -437,7 +437,7 @@ namespace slib
 	}
 
 	template <class CT>
-	SLIB_INLINE sl_size _String_countLineNumber(const CT* input, sl_size len, sl_size* columnLast)
+	SLIB_INLINE sl_size _priv_ParseUtil_countLineNumber(const CT* input, sl_size len, sl_size* columnLast)
 	{
 		sl_size line = 1;
 		sl_size col = 1;
@@ -463,12 +463,12 @@ namespace slib
 
 	sl_size ParseUtil::countLineNumber(const sl_char8* input, sl_size len, sl_size* columnLast)
 	{
-		return _String_countLineNumber(input, len, columnLast);
+		return _priv_ParseUtil_countLineNumber(input, len, columnLast);
 	}
 
 	sl_size ParseUtil::countLineNumber(const sl_char16* input, sl_size len, sl_size* columnLast)
 	{
-		return _String_countLineNumber(input, len, columnLast);
+		return _priv_ParseUtil_countLineNumber(input, len, columnLast);
 	}
 
 	sl_size ParseUtil::countLineNumber(const String& str, sl_size pos, sl_size* column)
@@ -517,7 +517,7 @@ namespace slib
 	}
 	
 	template <class CT, class ST>
-	SLIB_INLINE sl_reg _String_indexOfLine(const ST& str, sl_reg start)
+	SLIB_INLINE sl_reg _priv_ParseUtil_indexOfLine(const ST& str, sl_reg start)
 	{
 		sl_reg count = str.getLength();
 		if (count <= 0) {
@@ -542,22 +542,22 @@ namespace slib
 	
 	sl_reg ParseUtil::indexOfLine(const String& str, sl_reg start)
 	{
-		return _String_indexOfLine<sl_char8, String>(str, start);
+		return _priv_ParseUtil_indexOfLine<sl_char8, String>(str, start);
 	}
 	
 	sl_reg ParseUtil::indexOfLine(const String16& str, sl_reg start)
 	{
-		return _String_indexOfLine<sl_char16, String16>(str, start);
+		return _priv_ParseUtil_indexOfLine<sl_char16, String16>(str, start);
 	}
 	
 	sl_reg ParseUtil::indexOfLine(const AtomicString& str, sl_reg start)
 	{
-		return _String_indexOfLine<sl_char8, String>(str, start);
+		return _priv_ParseUtil_indexOfLine<sl_char8, String>(str, start);
 	}
 	
 	sl_reg ParseUtil::indexOfLine(const AtomicString16& str, sl_reg start)
 	{
-		return _String_indexOfLine<sl_char16, String16>(str, start);
+		return _priv_ParseUtil_indexOfLine<sl_char16, String16>(str, start);
 	}
 
 }

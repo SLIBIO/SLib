@@ -11,7 +11,7 @@
 namespace slib
 {
 	
-	class _private_ImageResourceEntry
+	class _priv_ImageResourceEntry
 	{
 	public:
 		sl_bool flagValid;
@@ -33,22 +33,22 @@ namespace slib
 
 	};
 	
-	class _private_ImageResourceFreeStatic
+	class _priv_ImageResourceFreeStatic
 	{
 	public:
-		_private_ImageResourceFreeStatic(_private_ImageResourceEntry* entries);
+		_priv_ImageResourceFreeStatic(_priv_ImageResourceEntry* entries);
 
-		~_private_ImageResourceFreeStatic();
+		~_priv_ImageResourceFreeStatic();
 
 	private:
-		_private_ImageResourceEntry* m_entries;
+		_priv_ImageResourceEntry* m_entries;
 
 	};
 	
-	Ref<Image> _private_ImageResource_getImage(_private_ImageResourceEntry* entries, sl_uint32 requiredWidth, sl_uint32 requiredHeight);
+	Ref<Image> _priv_ImageResource_getImage(_priv_ImageResourceEntry* entries, sl_uint32 requiredWidth, sl_uint32 requiredHeight);
 	
-	List< Ref<Image> > _private_ImageResource_getImages(_private_ImageResourceEntry* entries);
+	List< Ref<Image> > _priv_ImageResource_getImages(_priv_ImageResourceEntry* entries);
 	
-	Ref<Drawable> _private_ImageResource_get(_private_ImageResourceEntry* entries, sl_uint32 width, sl_uint32 height);
+	Ref<Drawable> _priv_ImageResource_get(_priv_ImageResourceEntry* entries, sl_uint32 width, sl_uint32 height);
 
 }

@@ -16,7 +16,7 @@
 namespace slib
 {
 
-	Ref<Image> _private_ImageResourceEntry::getImage()
+	Ref<Image> _priv_ImageResourceEntry::getImage()
 	{
 		Ref<Image>& s = *((Ref<Image>*)((void*)&image));
 		if (flag_load) {
@@ -31,7 +31,7 @@ namespace slib
 		return s;
 	}
 
-	Ref<Image> _private_ImageResourceEntry::getMatchingImage(sl_uint32 reqWidth, sl_uint32 reqHeight)
+	Ref<Image> _priv_ImageResourceEntry::getMatchingImage(sl_uint32 reqWidth, sl_uint32 reqHeight)
 	{
 		if (reqWidth == 0 || reqHeight == 0) {
 			return sl_null;
@@ -70,14 +70,14 @@ namespace slib
 		return s;
 	}
 
-	_private_ImageResourceFreeStatic::_private_ImageResourceFreeStatic(_private_ImageResourceEntry* entries)
+	_priv_ImageResourceFreeStatic::_priv_ImageResourceFreeStatic(_priv_ImageResourceEntry* entries)
 	{
 		m_entries = entries;
 	}
 
-	_private_ImageResourceFreeStatic::~_private_ImageResourceFreeStatic()
+	_priv_ImageResourceFreeStatic::~_priv_ImageResourceFreeStatic()
 	{
-		_private_ImageResourceEntry* entry;
+		_priv_ImageResourceEntry* entry;
 		entry = m_entries;
 		while (entry->flagValid) {
 			(*((Ref<Image>*)((void*)&(entry->image)))).Ref<Image>::~Ref();
@@ -86,9 +86,9 @@ namespace slib
 		}
 	}
 
-	Ref<Image> _private_ImageResource_getImage(_private_ImageResourceEntry* entries, sl_uint32 requiredWidth, sl_uint32 requiredHeight)
+	Ref<Image> _priv_ImageResource_getImage(_priv_ImageResourceEntry* entries, sl_uint32 requiredWidth, sl_uint32 requiredHeight)
 	{
-		_private_ImageResourceEntry* entry;
+		_priv_ImageResourceEntry* entry;
 		if (requiredWidth == 0 && requiredHeight == 0) {
 			entry = entries;
 			while (entry->flagValid) {
@@ -98,7 +98,7 @@ namespace slib
 		}
 		
 		sl_uint32 minSize = 0;
-		_private_ImageResourceEntry* minEntry = sl_null;
+		_priv_ImageResourceEntry* minEntry = sl_null;
 		entry = entries;
 		while (entry->flagValid) {
 			sl_uint32 width = entry->width;
@@ -116,7 +116,7 @@ namespace slib
 			return minEntry->getMatchingImage(requiredWidth, requiredHeight);
 		}
 		sl_uint32 maxSize = 0;
-		_private_ImageResourceEntry* maxEntry = sl_null;
+		_priv_ImageResourceEntry* maxEntry = sl_null;
 		entry = entries;
 		while (entry->flagValid) {
 			sl_uint32 width = entry->width;
@@ -136,10 +136,10 @@ namespace slib
 		return sl_null;
 	}
 
-	List< Ref<Image> > _private_ImageResource_getImages(_private_ImageResourceEntry* entries)
+	List< Ref<Image> > _priv_ImageResource_getImages(_priv_ImageResourceEntry* entries)
 	{
 		List< Ref<Image> > ret;
-		_private_ImageResourceEntry* entry;
+		_priv_ImageResourceEntry* entry;
 		entry = entries;
 		while (entry->flagValid) {
 			Ref<Image> image = entry->getImage();
@@ -152,17 +152,17 @@ namespace slib
 	}
 
 
-	class _private_ImageResource_Drawable : public Drawable
+	class _priv_ImageResource_Drawable : public Drawable
 	{
 		SLIB_DECLARE_OBJECT
 		
 	private:
-		_private_ImageResourceEntry* m_entries;
+		_priv_ImageResourceEntry* m_entries;
 		sl_uint32 m_width;
 		sl_uint32 m_height;
 
 	public:
-		_private_ImageResource_Drawable(_private_ImageResourceEntry* entries, sl_uint32 width, sl_uint32 height)
+		_priv_ImageResource_Drawable(_priv_ImageResourceEntry* entries, sl_uint32 width, sl_uint32 height)
 		{
 			m_entries = entries;
 			m_width = width;
@@ -189,7 +189,7 @@ namespace slib
 			sl_int32 width = (sl_int32)(rectDstWhole.getWidth());
 			sl_int32 height = (sl_int32)(rectDstWhole.getHeight());
 			if (width > 0 && height > 0) {
-				Ref<Image> image = _private_ImageResource_getImage(m_entries, width, height);
+				Ref<Image> image = _priv_ImageResource_getImage(m_entries, width, height);
 				if (image.isNotNull()) {
 					float fx = (float)(image->getWidth()) / (float)(m_width);
 					float fy = (float)(image->getHeight()) / (float)(m_height);
@@ -209,7 +209,7 @@ namespace slib
 			sl_int32 width = (sl_int32)(rectDst.getWidth());
 			sl_int32 height = (sl_int32)(rectDst.getHeight());
 			if (width > 0 && height > 0) {
-				Ref<Image> image = _private_ImageResource_getImage(m_entries, width, height);
+				Ref<Image> image = _priv_ImageResource_getImage(m_entries, width, height);
 				if (image.isNotNull()) {
 					canvas->draw(rectDst, image, param);
 				}
@@ -218,20 +218,20 @@ namespace slib
 		
 	};
 
-	SLIB_DEFINE_OBJECT(_private_ImageResource_Drawable, Drawable)
+	SLIB_DEFINE_OBJECT(_priv_ImageResource_Drawable, Drawable)
 
 
-	class _private_ImageResource_SimpleDrawable : public Drawable
+	class _priv_ImageResource_SimpleDrawable : public Drawable
 	{
 		SLIB_DECLARE_OBJECT
 		
 	private:
-		_private_ImageResourceEntry* m_entry;
+		_priv_ImageResourceEntry* m_entry;
 		sl_uint32 m_width;
 		sl_uint32 m_height;
 		
 	public:
-		_private_ImageResource_SimpleDrawable(_private_ImageResourceEntry* entry, sl_uint32 width, sl_uint32 height)
+		_priv_ImageResource_SimpleDrawable(_priv_ImageResourceEntry* entry, sl_uint32 width, sl_uint32 height)
 		{
 			m_entry = entry;
 			m_width = width;
@@ -287,16 +287,16 @@ namespace slib
 		
 	};
 
-	SLIB_DEFINE_OBJECT(_private_ImageResource_SimpleDrawable, Drawable)
+	SLIB_DEFINE_OBJECT(_priv_ImageResource_SimpleDrawable, Drawable)
 
 
-	Ref<Drawable> _private_ImageResource_get(_private_ImageResourceEntry* entries, sl_uint32 width, sl_uint32 height)
+	Ref<Drawable> _priv_ImageResource_get(_priv_ImageResourceEntry* entries, sl_uint32 width, sl_uint32 height)
 	{
 		if (entries->flagValid) {
 			if (!(entries[1].flagValid)) {
-				return new _private_ImageResource_SimpleDrawable(entries, width, height);
+				return new _priv_ImageResource_SimpleDrawable(entries, width, height);
 			} else {
-				return new _private_ImageResource_Drawable(entries, width, height);
+				return new _priv_ImageResource_Drawable(entries, width, height);
 			}
 		}
 		return sl_null;

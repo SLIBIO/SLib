@@ -24,6 +24,6 @@ namespace slib
 	}
 
 
-	const char _List_ClassID[] = "list";
+	const char _priv_List_ClassID[] = "list";
 
 }

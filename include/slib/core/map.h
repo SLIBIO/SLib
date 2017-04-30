@@ -56,12 +56,12 @@ namespace slib
 
 	};
 
-	extern const char _Map_ClassID[];
+	extern const char _priv_Map_ClassID[];
 	
 	template <class KT, class VT>
 	class SLIB_EXPORT IMap : public Object
 	{
-		SLIB_TEMPLATE_OBJECT(Object, _Map_ClassID)
+		SLIB_TEMPLATE_OBJECT(Object, _priv_Map_ClassID)
 	
 	public:
 		static IMap<KT, VT>* createDefault();
