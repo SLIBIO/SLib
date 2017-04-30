@@ -140,37 +140,37 @@ public: \
 
 #define SLIB_DECLARE_OBJECT \
 public: \
-	static sl_object_type ObjectType(); \
-	static sl_bool checkObjectType(sl_object_type type); \
-	virtual sl_object_type getObjectType() const; \
-	virtual sl_bool isInstanceOf(sl_object_type type) const;
+	static sl_object_type ObjectType() noexcept; \
+	static sl_bool checkObjectType(sl_object_type type) noexcept; \
+	virtual sl_object_type getObjectType() const noexcept; \
+	virtual sl_bool isInstanceOf(sl_object_type type) const noexcept;
 
 #define SLIB_DEFINE_OBJECT_TYPE(CLASS) \
 	char _g_objectId_##CLASS[] = #CLASS; \
-	sl_object_type CLASS::ObjectType() { return _g_objectId_##CLASS; } \
+	sl_object_type CLASS::ObjectType() noexcept { return _g_objectId_##CLASS; } \
 
 #define SLIB_DEFINE_ROOT_OBJECT(CLASS) \
 	SLIB_DEFINE_OBJECT_TYPE(CLASS) \
-	sl_bool CLASS::checkObjectType(sl_object_type type) { return type == _g_objectId_##CLASS; } \
-	sl_object_type CLASS::getObjectType() const { return _g_objectId_##CLASS; } \
-	sl_bool CLASS::isInstanceOf(sl_object_type type) const { return type == _g_objectId_##CLASS; }
+	sl_bool CLASS::checkObjectType(sl_object_type type) noexcept { return type == _g_objectId_##CLASS; } \
+	sl_object_type CLASS::getObjectType() const noexcept { return _g_objectId_##CLASS; } \
+	sl_bool CLASS::isInstanceOf(sl_object_type type) const noexcept { return type == _g_objectId_##CLASS; }
 
 #define SLIB_DEFINE_OBJECT(CLASS, BASE) \
 	SLIB_DEFINE_OBJECT_TYPE(CLASS) \
-	sl_bool CLASS::checkObjectType(sl_object_type type) { if (type == _g_objectId_##CLASS) return sl_true; return BASE::checkObjectType(type); } \
-	sl_object_type CLASS::getObjectType() const { return _g_objectId_##CLASS; } \
-	sl_bool CLASS::isInstanceOf(sl_object_type type) const { if (type == _g_objectId_##CLASS) return sl_true; return BASE::checkObjectType(type); }
+	sl_bool CLASS::checkObjectType(sl_object_type type) noexcept { if (type == _g_objectId_##CLASS) return sl_true; return BASE::checkObjectType(type); } \
+	sl_object_type CLASS::getObjectType() const noexcept { return _g_objectId_##CLASS; } \
+	sl_bool CLASS::isInstanceOf(sl_object_type type) const noexcept { if (type == _g_objectId_##CLASS) return sl_true; return BASE::checkObjectType(type); }
 
 #define SLIB_TEMPLATE_OBJECT(BASE, ID) \
 public: \
-	static sl_object_type ObjectType() { return ID; } \
-	static sl_bool checkObjectType(sl_object_type type) { if (type == ID) return sl_true; return BASE::checkObjectType(type); } \
-	sl_object_type getObjectType() const { return ID; } \
-	sl_bool isInstanceOf(sl_object_type type) const { if (type == ID) return sl_true; return BASE::checkObjectType(type); }
+	static sl_object_type ObjectType() noexcept { return ID; } \
+	static sl_bool checkObjectType(sl_object_type type) noexcept { if (type == ID) return sl_true; return BASE::checkObjectType(type); } \
+	sl_object_type getObjectType() const noexcept { return ID; } \
+	sl_bool isInstanceOf(sl_object_type type) const noexcept { if (type == ID) return sl_true; return BASE::checkObjectType(type); }
 
 #define SLIB_REF_WRAPPER_NO_OP(WRAPPER, ...) \
 public: \
-	static sl_object_type ObjectType() { return __VA_ARGS__::ObjectType(); } \
+	static sl_object_type ObjectType() noexcept { return __VA_ARGS__::ObjectType(); } \
 	SLIB_INLINE WRAPPER() {} \
 	SLIB_INLINE WRAPPER(sl_null_t) {} \
 	SLIB_INLINE WRAPPER(__VA_ARGS__* obj) : ref(obj) {} \
@@ -178,7 +178,7 @@ public: \
 	SLIB_INLINE WRAPPER(WRAPPER&& other) : ref(Move(other.ref)) {} \
 	WRAPPER(const Atomic<WRAPPER>& other) : ref(*(reinterpret_cast<const AtomicRef<__VA_ARGS__>*>(&other))) {} \
 	WRAPPER(Atomic<WRAPPER>&& other) : ref(Move(*(reinterpret_cast<AtomicRef<__VA_ARGS__>*>(&other)))) {} \
-	SLIB_INLINE static const WRAPPER& null() { return *(reinterpret_cast<WRAPPER const*>(&_Ref_Null)); } \
+	SLIB_INLINE static const WRAPPER& null() { return *(reinterpret_cast<WRAPPER const*>(&_priv_Ref_Null)); } \
 	SLIB_INLINE sl_bool isNull() const { return ref.isNull(); } \
 	SLIB_INLINE sl_bool isNotNull() const { return ref.isNotNull(); } \
 	void setNull() { ref.setNull(); } \

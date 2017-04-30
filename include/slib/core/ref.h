@@ -31,49 +31,46 @@ namespace slib
 	class SLIB_EXPORT Referable
 	{
 	public:
-		Referable();
+		Referable() noexcept;
 
-		Referable(const Referable& other);
+		Referable(const Referable& other) noexcept;
 
-		virtual ~Referable();
-
-	public:
-		sl_reg increaseReference();
-
-		sl_reg decreaseReference();
-
-		sl_reg decreaseReferenceNoFree();
-		
-		sl_reg getReferenceCount();
-
-		void makeNeverFree();
+		virtual ~Referable() noexcept;
 
 	public:
-		static sl_object_type ObjectType();
-		
-		static sl_bool checkObjectType(sl_object_type type);
-		
-		virtual sl_object_type getObjectType() const;
+		sl_reg increaseReference() noexcept;
 
-		virtual sl_bool isInstanceOf(sl_object_type type) const;
+		sl_reg decreaseReference() noexcept;
+
+		sl_reg decreaseReferenceNoFree() noexcept;
+		
+		sl_reg getReferenceCount() noexcept;
+
+		void makeNeverFree() noexcept;
+
+	public:
+		static sl_object_type ObjectType() noexcept;
+		
+		static sl_bool checkObjectType(sl_object_type type) noexcept;
+		
+		virtual sl_object_type getObjectType() const noexcept;
+
+		virtual sl_bool isInstanceOf(sl_object_type type) const noexcept;
 
 	private:
-		void _clearWeak();
+		void _clearWeak() noexcept;
 
 	public:
-		SLIB_INLINE sl_bool _isWeakRef() const
-		{
-			return m_flagWeakRef;
-		}
+		sl_bool _isWeakRef() const noexcept;
 
-		CWeakRef* _getWeakObject();
+		CWeakRef* _getWeakObject() noexcept;
 
-		void _free();
+		void _free() noexcept;
 
 	private:
 		sl_reg m_signature;
 #if defined(SLIB_DEBUG_REFERENCE)
-		void _checkValid();
+		void _checkValid() noexcept;
 #endif
 
 	private:
@@ -657,29 +654,29 @@ namespace slib
 	{
 		SLIB_DECLARE_OBJECT
 	public:
-		CWeakRef();
+		CWeakRef() noexcept;
 
-		~CWeakRef();
+		~CWeakRef() noexcept;
 
 	public:
 		Referable* m_object;
 		SpinLock m_lock;
 
 	public:
-		static CWeakRef* create(Referable* object);
+		static CWeakRef* create(Referable* object) noexcept;
 
 	public:
-		Ref<Referable> lock();
+		Ref<Referable> lock() noexcept;
 
-		void release();
+		void release() noexcept;
 	};
 	
 	class SLIB_EXPORT ReferableKeeper
 	{
 	public:
-		ReferableKeeper(Referable* object);
+		ReferableKeeper(Referable* object) noexcept;
 
-		~ReferableKeeper();
+		~ReferableKeeper() noexcept;
 
 	private:
 		Referable* m_object;
