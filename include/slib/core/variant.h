@@ -18,6 +18,10 @@
 #include "list.h"
 #include "map.h"
 
+#ifdef SLIB_SUPPORT_STD_TYPES
+#include <string>
+#endif
+
 namespace slib
 {
 	
@@ -66,7 +70,7 @@ namespace slib
 	public:
 		Variant(sl_null_t);
 		
-		Variant(char value);
+		Variant(signed char value);
 		
 		Variant(unsigned char value);
 
@@ -100,10 +104,16 @@ namespace slib
 
 		Variant(const AtomicString16& value);
 
+#ifdef SLIB_SUPPORT_STD_TYPES
+		Variant(const std::string& value);
+		
+		Variant(const std::u16string& value);
+#endif
+		
 		Variant(const sl_char8* sz8);
 
 		Variant(const sl_char16* sz16);
-	
+		
 		Variant(const Time& value);
 
 		Variant(const void* ptr);
@@ -306,7 +316,21 @@ namespace slib
 		void setString(const sl_char8* sz8);
 
 		void setString(const sl_char16* sz16);
-	
+		
+#ifdef SLIB_SUPPORT_STD_TYPES
+		std::string getStdString(const std::string& def) const;
+		
+		std::string getStdString() const;
+		
+		std::u16string getStdString16(const std::u16string& def) const;
+		
+		std::u16string getStdString16() const;
+
+		void setString(const std::string& value);
+		
+		void setString(const std::u16string& value);
+#endif
+
 
 		sl_bool isTime() const;
 
@@ -393,9 +417,9 @@ namespace slib
 		void get(AtomicVariant& _out) const;
 		void set(const AtomicVariant& _in);
 		
-		void get(char& _out) const;
-		void get(char& _out, char def) const;
-		void set(char _in);
+		void get(signed char& _out) const;
+		void get(signed char& _out, signed char def) const;
+		void set(signed char _in);
 		
 		void get(unsigned char& _out) const;
 		void get(unsigned char& _out, unsigned char def) const;
@@ -463,6 +487,16 @@ namespace slib
 
 		void set(const sl_char8* sz8);
 		void set(const sl_char16* sz16);
+		
+#ifdef SLIB_SUPPORT_STD_TYPES
+		void get(std::string& _out) const;
+		void get(std::string& _out, const std::string& def) const;
+		void set(const std::string& _in);
+		
+		void get(std::u16string& _out) const;
+		void get(std::u16string& _out, const std::u16string& def) const;
+		void set(const std::u16string& _in);
+#endif
 		
 		void get(Time& _out) const;
 		void get(Time& _out, const Time& def) const;
@@ -548,7 +582,7 @@ namespace slib
 	public:
 		Atomic(sl_null_t);
 		
-		Atomic(char value);
+		Atomic(signed char value);
 		
 		Atomic(unsigned char value);
 		
@@ -585,6 +619,12 @@ namespace slib
 		Atomic(const sl_char8* sz8);
 
 		Atomic(const sl_char16* sz16);
+		
+#ifdef SLIB_SUPPORT_STD_TYPES
+		Atomic(const std::string& value);
+		
+		Atomic(const std::u16string& value);
+#endif
 
 		Atomic(const Time& value);
 
@@ -751,7 +791,21 @@ namespace slib
 
 		void setString(const sl_char16* sz16);
 	
+#ifdef SLIB_SUPPORT_STD_TYPES
+		std::string getStdString(const std::string& def) const;
+		
+		std::string getStdString() const;
+		
+		std::u16string getStdString16(const std::u16string& def) const;
+		
+		std::u16string getStdString16() const;
+		
+		void setString(const std::string& value);
+		
+		void setString(const std::u16string& value);
+#endif
 
+		
 		sl_bool isObject() const;
 
 		sl_bool isWeak() const;
@@ -823,9 +877,9 @@ namespace slib
 		void get(AtomicVariant& _out) const;
 		void set(const AtomicVariant& _in);
 		
-		void get(char& _out) const;
-		void get(char& _out, char def) const;
-		void set(char _in);
+		void get(signed char& _out) const;
+		void get(signed char& _out, signed char def) const;
+		void set(signed char _in);
 		
 		void get(unsigned char& _out) const;
 		void get(unsigned char& _out, unsigned char def) const;
@@ -893,6 +947,16 @@ namespace slib
 		
 		void set(const sl_char8* sz8);
 		void set(const sl_char16* sz16);
+		
+#ifdef SLIB_SUPPORT_STD_TYPES
+		void get(std::string& _out) const;
+		void get(std::string& _out, const std::string& def) const;
+		void set(const std::string& _in);
+		
+		void get(std::u16string& _out) const;
+		void get(std::u16string& _out, const std::u16string& def) const;
+		void set(const std::u16string& _in);
+#endif
 		
 		void get(Time& _out) const;
 		void get(Time& _out, const Time& def) const;

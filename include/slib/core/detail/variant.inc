@@ -11,14 +11,14 @@
 namespace slib
 {
 	
-	struct _Variant_Const
+	struct _priv_Variant_Const
 	{
 		sl_uint64 value;
 		VariantType type;
 		sl_int32 lock;
 	};
 	
-	extern const _Variant_Const _Variant_Null;
+	extern const _priv_Variant_Const _priv_Variant_Null;
 	
 	template <class... ARGS>
 	String String::format(const sl_char8* szFormat, ARGS&&... args)
@@ -125,7 +125,7 @@ namespace slib
 	
 	SLIB_INLINE const Variant& Variant::null()
 	{
-		return *(reinterpret_cast<Variant const*>(&_Variant_Null));
+		return *(reinterpret_cast<Variant const*>(&_priv_Variant_Null));
 	}
 	
 	template <class T>
@@ -291,7 +291,7 @@ namespace slib
 	
 	SLIB_INLINE const AtomicVariant& Atomic<Variant>::null()
 	{
-		return *(reinterpret_cast<AtomicVariant const*>(&_Variant_Null));
+		return *(reinterpret_cast<AtomicVariant const*>(&_priv_Variant_Null));
 	}
 	
 	template <class T>
@@ -396,99 +396,99 @@ namespace slib
 	}
 	
 	
-	extern const char _VariantMap_ClassID[];
+	extern const char _priv_VariantMap_ClassID[];
 	
 	template <>
-	SLIB_INLINE sl_object_type IMap<String, Variant>::ObjectType()
+	SLIB_INLINE sl_object_type IMap<String, Variant>::ObjectType() noexcept
 	{
-		return _VariantMap_ClassID;
+		return _priv_VariantMap_ClassID;
 	}
 	
 	template <>
-	SLIB_INLINE sl_bool IMap<String, Variant>::checkObjectType(sl_object_type type)
+	SLIB_INLINE sl_bool IMap<String, Variant>::checkObjectType(sl_object_type type) noexcept
 	{
-		if (type == _VariantMap_ClassID || type == _Map_ClassID) {
+		if (type == _priv_VariantMap_ClassID || type == _priv_Map_ClassID) {
 			return sl_true;
 		}
 		return Object::checkObjectType(type);
 	}
 	
 	template <>
-	SLIB_INLINE sl_object_type IMap<String, Variant>::getObjectType() const
+	SLIB_INLINE sl_object_type IMap<String, Variant>::getObjectType() const noexcept
 	{
-		return _VariantMap_ClassID;
+		return _priv_VariantMap_ClassID;
 	}
 	
 	template <>
-	SLIB_INLINE sl_bool IMap<String, Variant>::isInstanceOf(sl_object_type type) const
+	SLIB_INLINE sl_bool IMap<String, Variant>::isInstanceOf(sl_object_type type) const noexcept
 	{
-		if (type == _VariantMap_ClassID || type == _Map_ClassID) {
+		if (type == _priv_VariantMap_ClassID || type == _priv_Map_ClassID) {
 			return sl_true;
 		}
 		return Object::checkObjectType(type);
 	}
 	
 	
-	extern const char _VariantList_ClassID[];
+	extern const char _priv_VariantList_ClassID[];
 	
 	template <>
-	SLIB_INLINE sl_object_type CList<Variant>::ObjectType()
+	SLIB_INLINE sl_object_type CList<Variant>::ObjectType() noexcept
 	{
-		return _VariantList_ClassID;
+		return _priv_VariantList_ClassID;
 	}
 	
 	template <>
-	SLIB_INLINE sl_bool CList<Variant>::checkObjectType(sl_object_type type)
+	SLIB_INLINE sl_bool CList<Variant>::checkObjectType(sl_object_type type) noexcept
 	{
-		if (type == _VariantList_ClassID || type == _List_ClassID) {
+		if (type == _priv_VariantList_ClassID || type == _priv_List_ClassID) {
 			return sl_true;
 		}
 		return Object::checkObjectType(type);
 	}
 	
 	template <>
-	SLIB_INLINE sl_object_type CList<Variant>::getObjectType() const
+	SLIB_INLINE sl_object_type CList<Variant>::getObjectType() const noexcept
 	{
-		return _VariantList_ClassID;
+		return _priv_VariantList_ClassID;
 	}
 	
 	template <>
-	SLIB_INLINE sl_bool CList<Variant>::isInstanceOf(sl_object_type type) const
+	SLIB_INLINE sl_bool CList<Variant>::isInstanceOf(sl_object_type type) const noexcept
 	{
-		if (type == _VariantList_ClassID || type == _List_ClassID) {
+		if (type == _priv_VariantList_ClassID || type == _priv_List_ClassID) {
 			return sl_true;
 		}
 		return Object::checkObjectType(type);
 	}
 	
 	
-	extern const char _VariantMapList_ClassID[];
+	extern const char _priv_VariantMapList_ClassID[];
 	
 	template <>
-	SLIB_INLINE sl_object_type CList< Map<String, Variant> >::ObjectType()
+	SLIB_INLINE sl_object_type CList< Map<String, Variant> >::ObjectType() noexcept
 	{
-		return _VariantMapList_ClassID;
+		return _priv_VariantMapList_ClassID;
 	}
 	
 	template <>
-	SLIB_INLINE sl_bool CList< Map<String, Variant> >::checkObjectType(sl_object_type type)
+	SLIB_INLINE sl_bool CList< Map<String, Variant> >::checkObjectType(sl_object_type type) noexcept
 	{
-		if (type == _VariantMapList_ClassID || type == _Map_ClassID) {
+		if (type == _priv_VariantMapList_ClassID || type == _priv_Map_ClassID) {
 			return sl_true;
 		}
 		return Object::checkObjectType(type);
 	}
 	
 	template <>
-	SLIB_INLINE sl_object_type CList< Map<String, Variant> >::getObjectType() const
+	SLIB_INLINE sl_object_type CList< Map<String, Variant> >::getObjectType() const noexcept
 	{
-		return _VariantMapList_ClassID;
+		return _priv_VariantMapList_ClassID;
 	}
 	
 	template <>
-	SLIB_INLINE sl_bool CList< Map<String, Variant> >::isInstanceOf(sl_object_type type) const
+	SLIB_INLINE sl_bool CList< Map<String, Variant> >::isInstanceOf(sl_object_type type) const noexcept
 	{
-		if (type == _VariantMapList_ClassID || type == _Map_ClassID) {
+		if (type == _priv_VariantMapList_ClassID || type == _priv_Map_ClassID) {
 			return sl_true;
 		}
 		return Object::checkObjectType(type);
