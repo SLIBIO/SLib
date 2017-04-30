@@ -954,7 +954,7 @@ namespace slib
 				sl_uint32 v = _cbigint_div_uint32(a, a, ne, radix, 0);
 				ne = _cbigint_mse(a, ne);
 				if (v < radix) {
-					*s = _StringConv_radixPatternUpper[v];
+					*s = _priv_StringConv_radixPatternUpper[v];
 				} else {
 					*s = '?';
 				}
@@ -1001,7 +1001,7 @@ namespace slib
 			}
 		}
 		sl_size end = pos;
-		const sl_uint8* pattern = radix <= 36 ? _StringConv_radixInversePatternSmall : _StringConv_radixInversePatternBig;
+		const sl_uint8* pattern = radix <= 36 ? _priv_StringConv_radixInversePatternSmall : _priv_StringConv_radixInversePatternBig;
 		for (; end < len; end++) {
 			sl_uint32 c = (sl_uint8)(sz[end]);
 			sl_uint32 v = c < 128 ? pattern[c] : 255;

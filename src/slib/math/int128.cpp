@@ -801,7 +801,7 @@ namespace slib
 				if (div(m, _radix, &m, &r)) {
 					sl_uint32 v = (sl_uint32)(r.low);
 					if (v < radix) {
-						buf[posBuf] = _StringConv_radixPatternUpper[v];
+						buf[posBuf] = _priv_StringConv_radixPatternUpper[v];
 					} else {
 						buf[posBuf] = '?';
 					}
@@ -833,7 +833,7 @@ namespace slib
 		sl_size pos = posBegin;
 		Uint128 m;
 		m.setZero();
-		const sl_uint8* pattern = radix <= 36 ? _StringConv_radixInversePatternSmall : _StringConv_radixInversePatternBig;
+		const sl_uint8* pattern = radix <= 36 ? _priv_StringConv_radixInversePatternSmall : _priv_StringConv_radixInversePatternBig;
 		if (radix == 16) {
 			for (; pos < len; pos++) {
 				sl_uint32 c = (sl_uint8)(sz[pos]);

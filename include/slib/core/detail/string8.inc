@@ -11,14 +11,14 @@
 namespace slib
 {
 	
-	struct _String_Const
+	struct _priv_String_Const
 	{
 		StringContainer* container;
 		sl_int32 lock;
 	};
 	
-	extern const _String_Const _String_Null;
-	extern const _String_Const _String_Empty;
+	extern const _priv_String_Const _priv_String_Null;
+	extern const _priv_String_Const _priv_String_Empty;
 
 	template <>
 	struct StringTypeFromCharType<sl_char8> { typedef String Type; };
@@ -38,18 +38,18 @@ namespace slib
 	
 	SLIB_INLINE const String& String::null()
 	{
-		return *(reinterpret_cast<String const*>(&_String_Null));
+		return *(reinterpret_cast<String const*>(&_priv_String_Null));
 	}
 	
 	SLIB_INLINE const String& String::getEmpty()
 	{
-		return *(reinterpret_cast<String const*>(&_String_Empty));
+		return *(reinterpret_cast<String const*>(&_priv_String_Empty));
 	}
 
 	SLIB_INLINE const String& String::getNotNull() const
 	{
 		if (!m_container) {
-			return *(reinterpret_cast<String const*>(&_String_Empty));
+			return *(reinterpret_cast<String const*>(&_priv_String_Empty));
 		}
 		return *this;
 	}
@@ -115,12 +115,12 @@ namespace slib
 
 	SLIB_INLINE const AtomicString& AtomicString::null()
 	{
-		return *(reinterpret_cast<AtomicString const*>(&_String_Null));
+		return *(reinterpret_cast<AtomicString const*>(&_priv_String_Null));
 	}
 	
 	SLIB_INLINE const AtomicString& AtomicString::getEmpty()
 	{
-		return *(reinterpret_cast<AtomicString const*>(&_String_Empty));
+		return *(reinterpret_cast<AtomicString const*>(&_priv_String_Empty));
 	}
 
 	SLIB_INLINE sl_bool AtomicString::isNull() const
@@ -134,9 +134,9 @@ namespace slib
 	}
 
 
-	extern const char* _StringConv_radixPatternUpper;
-	extern const char* _StringConv_radixPatternLower;
-	extern const sl_uint8* _StringConv_radixInversePatternBig;
-	extern const sl_uint8* _StringConv_radixInversePatternSmall;
+	extern const char* _priv_StringConv_radixPatternUpper;
+	extern const char* _priv_StringConv_radixPatternLower;
+	extern const sl_uint8* _priv_StringConv_radixInversePatternBig;
+	extern const sl_uint8* _priv_StringConv_radixInversePatternSmall;
 
 }
