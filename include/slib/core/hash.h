@@ -39,6 +39,13 @@ namespace slib
 	};
 
 	template <>
+	class Hash<signed char>
+	{
+	public:
+		constexpr sl_uint32 operator()(signed char v) const { return Rehash(v);}
+	};
+
+	template <>
 	class Hash<unsigned char>
 	{
 	public:
