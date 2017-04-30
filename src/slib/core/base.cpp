@@ -21,6 +21,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <memory.h>
+#include <wchar.h>
+
+#include <string>
 
 #ifdef SLIB_PLATFORM_IS_WINDOWS
 #	include "slib/core/platform_windows.h"
@@ -32,6 +35,17 @@
 
 namespace slib
 {
+	
+#if SLIB_WCHAR_SIZE == 2
+	typedef wchar_t _base_char16;
+#else
+	typedef char16_t _base_char16;
+#endif
+#if SLIB_WCHAR_SIZE == 4
+	typedef wchar_t _base_char32;
+#else
+	typedef char32_t _base_char32;
+#endif
 
 	void* Base::createMemory(sl_size size)
 	{
@@ -46,8 +60,8 @@ namespace slib
 	void* Base::reallocMemory(void* ptr, sl_size sizeNew)
 	{
 		if (sizeNew == 0) {
-			freeMemory(ptr);
-			return createMemory(1);
+			::free(ptr);
+			return ::malloc(1);
 		} else {
 			return ::realloc(ptr, sizeNew);
 		}
@@ -55,11 +69,11 @@ namespace slib
 
 	void* Base::createZeroMemory(sl_size size)
 	{
-		void* ret = createMemory(size);
-		if (ret) {
-			zeroMemory(ret, size);
+		void* ptr = ::malloc(size);
+		if (ptr) {
+			::memset(ptr, 0, size);
 		}
-		return ret;
+		return ptr;
 	}
 
 	void Base::copyMemory(void* dst, const void* src, sl_size count)
@@ -79,44 +93,32 @@ namespace slib
 
 	void Base::resetMemory2(sl_uint16* dst, sl_uint16 value, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			dst[i] = value;
-		}
+		std::char_traits<_base_char16>::assign((_base_char16*)dst, count, (_base_char16)value);
 	}
 
 	void Base::resetMemory2(sl_int16* dst, sl_int16 value, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			dst[i] = value;
-		}
+		std::char_traits<_base_char16>::assign((_base_char16*)dst, count, (_base_char16)value);
 	}
 
 	void Base::resetMemory4(sl_uint32* dst, sl_uint32 value, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			dst[i] = value;
-		}
+		std::char_traits<_base_char32>::assign((_base_char32*)dst, count, (_base_char32)value);
 	}
 
 	void Base::resetMemory4(sl_int32* dst, sl_int32 value, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			dst[i] = value;
-		}
+		std::char_traits<_base_char32>::assign((_base_char32*)dst, count, (_base_char32)value);
 	}
 
 	void Base::resetMemory8(sl_uint64* dst, sl_uint64 value, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			dst[i] = value;
-		}
+		std::char_traits<sl_uint64>::assign(dst, count, value);
 	}
 
 	void Base::resetMemory8(sl_int64* dst, sl_int64 value, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			dst[i] = value;
-		}
+		std::char_traits<sl_int64>::assign(dst, count, value);
 	}
 
 	sl_bool Base::equalsMemory(const void* m1, const void* m2, sl_size count)
@@ -161,86 +163,37 @@ namespace slib
 
 	sl_int32 Base::compareMemory(const sl_int8* m1, const sl_int8* m2, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] < m2[i]) {
-				return -1;
-			} else if (m1[i] > m2[i]) {
-				return 1;
-			}
-		}
-		return 0;
+		return std::char_traits<sl_int8>::compare(m1, m2, count);
 	}
 
 	sl_int32 Base::compareMemory2(const sl_uint16* m1, const sl_uint16* m2, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] < m2[i]) {
-				return -1;
-			} else if (m1[i] > m2[i]) {
-				return 1;
-			}
-		}
-		return 0;
+		return std::char_traits<_base_char16>::compare((_base_char16*)m1, (_base_char16*)m2, count);
 	}
 
 	sl_int32 Base::compareMemory2(const sl_int16* m1, const sl_int16* m2, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] < m2[i]) {
-				return -1;
-			} else if (m1[i] > m2[i]) {
-				return 1;
-			}
-		}
-		return 0;
+		return std::char_traits<sl_int16>::compare(m1, m2, count);
 	}
 
 	sl_int32 Base::compareMemory4(const sl_uint32* m1, const sl_uint32* m2, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] < m2[i]) {
-				return -1;
-			} else if (m1[i] > m2[i]) {
-				return 1;
-			}
-		}
-		return 0;
+		return std::char_traits<_base_char32>::compare((_base_char32*)m1, (_base_char32*)m2, count);
 	}
 
 	sl_int32 Base::compareMemory4(const sl_int32* m1, const sl_int32* m2, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] < m2[i]) {
-				return -1;
-			} else if (m1[i] > m2[i]) {
-				return 1;
-			}
-		}
-		return 0;
+		return std::char_traits<sl_int32>::compare(m1, m2, count);
 	}
 
 	sl_int32 Base::compareMemory8(const sl_uint64* m1, const sl_uint64* m2, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] < m2[i]) {
-				return -1;
-			} else if (m1[i] > m2[i]) {
-				return 1;
-			}
-		}
-		return 0;
+		return std::char_traits<sl_uint64>::compare(m1, m2, count);
 	}
 
 	sl_int32 Base::compareMemory8(const sl_int64* m1, const sl_int64* m2, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m1[i] < m2[i]) {
-				return -1;
-			} else if (m1[i] > m2[i]) {
-				return 1;
-			}
-		}
-		return 0;
+		return std::char_traits<sl_int64>::compare(m1, m2, count);
 	}
 
 	sl_bool Base::equalsMemoryZero(const void* _m, sl_size count)
@@ -426,62 +379,32 @@ namespace slib
 
 	const sl_uint16* Base::findMemory2(const sl_uint16* m, sl_uint16 pattern, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m[i] == pattern) {
-				return m + i;
-			}
-		}
-		return sl_null;
+		return (const sl_uint16*)(std::char_traits<_base_char16>::find((_base_char16*)m, count, (_base_char16)pattern));
 	}
 
 	const sl_int16* Base::findMemory2(const sl_int16* m, sl_int16 pattern, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m[i] == pattern) {
-				return m + i;
-			}
-		}
-		return sl_null;
+		return (const sl_int16*)(std::char_traits<_base_char16>::find((_base_char16*)m, count, (_base_char16)pattern));
 	}
 
 	const sl_uint32* Base::findMemory4(const sl_uint32* m, sl_uint32 pattern, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m[i] == pattern) {
-				return m + i;
-			}
-		}
-		return sl_null;
+		return (const sl_uint32*)(std::char_traits<_base_char32>::find((_base_char32*)m, count, (_base_char32)pattern));
 	}
 
 	const sl_int32* Base::findMemory4(const sl_int32* m, sl_int32 pattern, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m[i] == pattern) {
-				return m + i;
-			}
-		}
-		return sl_null;
+		return (const sl_int32*)(std::char_traits<_base_char32>::find((_base_char32*)m, count, (_base_char32)pattern));
 	}
 
 	const sl_uint64* Base::findMemory8(const sl_uint64* m, sl_uint64 pattern, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m[i] == pattern) {
-				return m + i;
-			}
-		}
-		return sl_null;
+		return std::char_traits<sl_uint64>::find(m, count, pattern);
 	}
 
 	const sl_int64* Base::findMemory8(const sl_int64* m, sl_int64 pattern, sl_size count)
 	{
-		for (sl_size i = 0; i < count; i++) {
-			if (m[i] == pattern) {
-				return m + i;
-			}
-		}
-		return sl_null;
+		return std::char_traits<sl_int64>::find(m, count, pattern);
 	}
 
 	const sl_uint8* Base::findMemoryReverse(const void* mem, sl_uint8 pattern, sl_size count)
@@ -578,15 +501,7 @@ namespace slib
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
-		for (sl_reg i = 0; i < count; i++) {
-			if (s1[i] != s2[i]) {
-				return sl_false;
-			}
-			if (s1[i] == 0) {
-				break;
-			}
-		}
-		return sl_true;
+		return ::strncmp(s1, s2, count) == 0;
 	}
 
 	sl_bool Base::equalsString2(const sl_char16 *s1, const sl_char16 *s2, sl_reg count)
@@ -594,6 +509,9 @@ namespace slib
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
+#if SLIB_WCHAR_SIZE == 2
+		return ::wcsncmp((wchar_t*)s1, (wchar_t*)s2, count) == 0;
+#else
 		for (sl_reg i = 0; i < count; i++) {
 			if (s1[i] != s2[i]) {
 				return sl_false;
@@ -603,6 +521,7 @@ namespace slib
 			}
 		}
 		return sl_true;
+#endif
 	}
 
 	sl_bool Base::equalsString4(const sl_char32 *s1, const sl_char32 *s2, sl_reg count)
@@ -610,6 +529,9 @@ namespace slib
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
+#if SLIB_WCHAR_SIZE == 4
+		return ::wcsncmp((wchar_t*)s1, (wchar_t*)s2, count) == 0;
+#else
 		for (sl_reg i = 0; i < count; i++) {
 			if (s1[i] != s2[i]) {
 				return sl_false;
@@ -619,26 +541,15 @@ namespace slib
 			}
 		}
 		return sl_true;
+#endif
 	}
 
 	sl_int32 Base::compareString(const sl_char8 *s1, const sl_char8 *s2, sl_reg count)
 	{
-		const sl_uint8* m1 = (const sl_uint8*)s1;
-		const sl_uint8* m2 = (const sl_uint8*)s2;
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
-		for (sl_reg i = 0; i < count; i++) {
-			if (m1[i] < m2[i]) {
-				return -1;
-			} else if (m1[i] > m2[i]) {
-				return 1;
-			}
-			if (m1[i] == 0) {
-				break;
-			}
-		}
-		return 0;
+		return ::strncmp(s1, s2, count);
 	}
 
 	sl_int32 Base::compareString2(const sl_char16 *s1, const sl_char16 *s2, sl_reg count)
@@ -646,6 +557,9 @@ namespace slib
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
+#if SLIB_WCHAR_SIZE == 2
+		return ::wcsncmp((wchar_t*)s1, (wchar_t*)s2, count);
+#else
 		for (sl_reg i = 0; i < count; i++) {
 			if (s1[i] < s2[i]) {
 				return -1;
@@ -657,6 +571,7 @@ namespace slib
 			}
 		}
 		return 0;
+#endif
 	}
 
 	sl_int32 Base::compareString4(const sl_char32 *s1, const sl_char32 *s2, sl_reg count)
@@ -664,6 +579,9 @@ namespace slib
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
+#if SLIB_WCHAR_SIZE == 4
+		return ::wcsncmp((wchar_t*)s1, (wchar_t*)s2, count);
+#else
 		for (sl_reg i = 0; i < count; i++) {
 			if (s1[i] < s2[i]) {
 				return -1;
@@ -675,6 +593,7 @@ namespace slib
 			}
 		}
 		return 0;
+#endif
 	}
 
 	sl_size Base::copyString(sl_char8* dst, const sl_char8* src, sl_reg count)
@@ -727,12 +646,7 @@ namespace slib
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
-		for (sl_reg i = 0; i < count; i++) {
-			if (sz[i] == 0) {
-				return i;
-			}
-		}
-		return count;
+		return ::strnlen(sz, count);
 	}
 
 	sl_size Base::getStringLength2(const sl_char16* sz, sl_reg count)
@@ -743,12 +657,16 @@ namespace slib
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
+#if SLIB_WCHAR_SIZE == 2
+		return ::wcsnlen((wchar_t*)sz, count);
+#else
 		for (sl_reg i = 0; i < count; i++) {
 			if (sz[i] == 0) {
 				return i;
 			}
 		}
 		return count;
+#endif
 	}
 
 	sl_size Base::getStringLength4(const sl_char32* sz, sl_reg count)
@@ -759,12 +677,16 @@ namespace slib
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
+#if SLIB_WCHAR_SIZE == 4
+		return ::wcsnlen((wchar_t*)sz, count);
+#else
 		for (sl_reg i = 0; i < count; i++) {
 			if (sz[i] == 0) {
 				return i;
 			}
 		}
 		return count;
+#endif
 	}
 
 	sl_int32 Base::interlockedIncrement32(sl_int32* pValue)
