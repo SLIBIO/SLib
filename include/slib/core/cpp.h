@@ -25,6 +25,8 @@ namespace slib
 
 	template <class T> struct RemoveConstReference { typedef T Type; };
 	template <class T> struct RemoveConstReference<T const&> { typedef T Type; };
+	template <class T> struct RemoveConstReference<T&> { typedef T Type; };
+	template <class T> struct RemoveConstReference<T&&> { typedef T Type; };
 
 	template <class T, T v> struct ConstValue { constexpr static T value = v; };
 
@@ -92,7 +94,6 @@ namespace slib
 	
 	template <typename FROM, typename TO>
 	struct IsConvertible : public IsConvertibleHelper<FROM, TO>::type {};
-
 
 }
 
