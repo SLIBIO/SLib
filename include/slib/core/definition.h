@@ -108,7 +108,7 @@ typedef char32_t			sl_char32;
 #define SLIB_UNICODE(quote)	u##quote
 
 #if defined(SLIB_COMPILER_IS_VC)
-#	define SLIB_WCHAR_SIZE(quote)		2
+#	define SLIB_WCHAR_SIZE				2
 #else
 #	if defined(__SIZEOF_WCHAR_T__)
 #		define SLIB_WCHAR_SIZE			__SIZEOF_WCHAR_T__
