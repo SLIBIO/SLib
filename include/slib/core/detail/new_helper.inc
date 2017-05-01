@@ -14,7 +14,7 @@ namespace slib
 {
 	
 	template <class T>
-	SLIB_INLINE T* NewHelper<T>::create()
+	SLIB_INLINE T* NewHelper<T>::create() noexcept
 	{
 		T* data = (T*)(Base::createMemory(sizeof(T)));
 		if (data) {
@@ -24,7 +24,7 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE T* NewHelper<T>::create(sl_size count)
+	SLIB_INLINE T* NewHelper<T>::create(sl_size count) noexcept
 	{
 		T* data = (T*)(Base::createMemory(sizeof(T)*count));
 		if (data) {
@@ -37,7 +37,7 @@ namespace slib
 
 	template <class T>
 	template <class _T>
-	SLIB_INLINE T* NewHelper<T>::create(const _T* other)
+	SLIB_INLINE T* NewHelper<T>::create(const _T* other) noexcept
 	{
 		T* data = (T*)(Base::createMemory(sizeof(T)));
 		if (data) {
@@ -48,7 +48,7 @@ namespace slib
 
 	template <class T>
 	template <class _T>
-	SLIB_INLINE T* NewHelper<T>::create(const _T* other, sl_size count)
+	SLIB_INLINE T* NewHelper<T>::create(const _T* other, sl_size count) noexcept
 	{
 		T* data = (T*)(Base::createMemory(sizeof(T)*count));
 		if (data) {
@@ -60,7 +60,7 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE void NewHelper<T>::free(T* data)
+	SLIB_INLINE void NewHelper<T>::free(T* data) noexcept
 	{
 		if (data) {
 			data->~T();
@@ -69,7 +69,7 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE void NewHelper<T>::free(T* data, sl_size count)
+	SLIB_INLINE void NewHelper<T>::free(T* data, sl_size count) noexcept
 	{
 		if (data) {
 			for (sl_size i = 0; i < count; i++) {
@@ -80,13 +80,13 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE void NewHelper<T>::constructor(T* data)
+	SLIB_INLINE void NewHelper<T>::constructor(T* data) noexcept
 	{
 		new (data) T();
 	}
 
 	template <class T>
-	SLIB_INLINE void NewHelper<T>::constructor(T* data, sl_size count)
+	SLIB_INLINE void NewHelper<T>::constructor(T* data, sl_size count) noexcept
 	{
 		for (sl_size i = 0; i < count; i++) {
 			new (data + i) T();
@@ -95,14 +95,14 @@ namespace slib
 
 	template <class T>
 	template <class _T>
-	SLIB_INLINE void NewHelper<T>::constructor(T* data, const _T* other)
+	SLIB_INLINE void NewHelper<T>::constructor(T* data, const _T* other) noexcept
 	{
 		new (data) T(*other);
 	}
 
 	template <class T>
 	template <class _T>
-	SLIB_INLINE void NewHelper<T>::constructor(T* data, const _T* other, sl_size count)
+	SLIB_INLINE void NewHelper<T>::constructor(T* data, const _T* other, sl_size count) noexcept
 	{
 		for (sl_size i = 0; i < count; i++) {
 			new (data + i) T(other[i]);
@@ -110,7 +110,7 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE void NewHelper<T>::destructor(T* data)
+	SLIB_INLINE void NewHelper<T>::destructor(T* data) noexcept
 	{
 		if (data) {
 			data->~T();
@@ -118,7 +118,7 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE void NewHelper<T>::destructor(T* data, sl_size count)
+	SLIB_INLINE void NewHelper<T>::destructor(T* data, sl_size count) noexcept
 	{
 		for (sl_size i = 0; i < count; i++) {
 			(data+i)->~T();
