@@ -80,6 +80,11 @@ namespace slib
 	{
 		::memcpy(dst, src, count);
 	}
+	
+	void Base::moveMemory(void* dst, const void* src, sl_size count) noexcept
+	{
+		::memmove(dst, src, count);
+	}
 
 	void Base::zeroMemory(void* dst, sl_size size) noexcept
 	{

@@ -33,6 +33,8 @@ namespace slib
 		// Memory Utilities
 		static void copyMemory(void* dst, const void* src, sl_size count) noexcept;
 
+		static void moveMemory(void* dst, const void* src, sl_size count) noexcept;
+		
 		static void zeroMemory(void* dst, sl_size size) noexcept;
 
 
