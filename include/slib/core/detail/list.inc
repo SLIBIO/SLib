@@ -423,6 +423,9 @@ namespace slib
 	template <class T>
 	sl_bool CList<T>::adjustCapacity_NoLock(sl_size count)
 	{
+		if (count < m_count) {
+			count = m_count;
+		}
 		if (m_capacity < count) {
 			sl_size newCapacity = m_capacity * 3 / 2 + 1;
 			if (newCapacity < count) {
@@ -761,19 +764,19 @@ namespace slib
 	template <class T>
 	sl_bool CList<T>::removeAt_NoLock(sl_size index, T* outValue)
 	{
-		sl_size total = m_count;
-		if (index < total) {
+		sl_size count = m_count;
+		if (index < count) {
 			T* m = m_data + index;
 			if (outValue) {
-				*outValue = *m;
+				*outValue = Move(*m);
 			}
-			sl_size n = total - index - 1;
-			while (n) {
-				*(m) = *(m+1);
-				n--;
-				m++;
+			m->~T();
+			if (index + 1 < count) {
+				Base::moveMemory(m, m+1, (count - index - 1) * sizeof(T));
 			}
-			setCount_NoLock(total - 1);
+			count--;
+			m_count = count;
+			adjustCapacity_NoLock(count);
 			return sl_true;
 		}
 		return sl_false;
@@ -787,22 +790,24 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_size CList<T>::removeRange_NoLock(sl_size index, sl_size count)
+	sl_size CList<T>::removeRange_NoLock(sl_size index, sl_size nValues)
 	{
-		sl_size total = m_count;
-		if (index < total && count > 0) {
-			if (count > total - index) {
-				count = total - index;
+		sl_size count = m_count;
+		if (nValues > 0 && index < count) {
+			if (nValues > count - index) {
+				nValues = count - index;
 			}
 			T* dst = m_data + index;
-			T* src = dst + count;
-			sl_size n = total - index - count;
-			while (n) {
-				*(dst++) = *(src++);
-				n--;
+			for (sl_size i = 0; i < nValues; i++) {
+				(dst + i)->~T();
 			}
-			setCount_NoLock(total - count);
-			return count;
+			if (index + nValues < count) {
+				Base::moveMemory(dst, dst + nValues, (count - index - nValues) * sizeof(T));
+			}
+			count -= nValues;
+			m_count = count;
+			adjustCapacity_NoLock(count);
+			return nValues;
 		}
 		return 0;
 	}
@@ -819,16 +824,20 @@ namespace slib
 	sl_bool CList<T>::removeValue_NoLock(const _T& value, T* outValue, const EQUALS& equals)
 	{
 		if (m_data) {
-			sl_size n = m_count;
-			for (sl_size i = 0; i < n; i++) {
-				if (equals(m_data[i], value)) {
+			T* data = m_data;
+			sl_size count = m_count;
+			for (sl_size i = 0; i < count; i++) {
+				if (equals(data[i], value)) {
 					if (outValue) {
-						*outValue = m_data[i];
+						*outValue = Move(data[i]);
 					}
-					for (sl_size j = i + 1; j < n; j++) {
-						m_data[j - 1] = m_data[j];
+					(data + i)->~T();
+					if (i + 1 < count) {
+						Base::moveMemory(data + i, data + i + 1, (count - i - 1) * sizeof(T));
 					}
-					setCount_NoLock(n - 1);
+					count--;
+					m_count = count;
+					adjustCapacity_NoLock(count);
 					return sl_true;
 				}
 			}
@@ -849,23 +858,26 @@ namespace slib
 	sl_size CList<T>::removeElementsByValue_NoLock(const _T& value, List<T>* outValues, const EQUALS& equals)
 	{
 		if (m_data) {
-			sl_size n = m_count;
-			for (sl_size i = 0; i < n;) {
-				if (equals(m_data[i], value)) {
+			T* data = m_data;
+			sl_size count = m_count;
+			for (sl_size i = 0; i < count;) {
+				if (equals(data[i], value)) {
 					if (outValues) {
-						outValues->add_NoLock(m_data[i]);
+						outValues->add_NoLock(Move(data[i]));
 					}
-					for (sl_size j = i + 1; j < n; j++) {
-						m_data[j - 1] = m_data[j];
+					(data + i)->~T();
+					if (i + 1 < count) {
+						Base::moveMemory(data + i, data + i + 1, (count - i - 1) * sizeof(T));
 					}
-					n--;
+					count--;
 				} else {
 					i++;
 				}
 			}
-			if (n < m_count) {
-				setCount_NoLock(n);
-				return m_count - n;
+			if (count < m_count) {
+				m_count = count;
+				adjustCapacity_NoLock(count);
+				return m_count - count;
 			}
 		}
 		return 0;
@@ -897,19 +909,18 @@ namespace slib
 	template <class T>
 	sl_bool CList<T>::popFront_NoLock(T* _out)
 	{
-		sl_size n = m_count;
-		if (n > 0) {
-			T* dst = m_data;
-			T* src = dst + 1;
+		sl_size count = m_count;
+		if (count > 0) {
+			T* data = m_data;
 			if (_out) {
-				*_out = *dst;
+				*_out = Move(*data);
 			}
-			sl_size m = n - 1;
-			while (m) {
-				*(dst++) = *(src++);
-				m--;
-			}
-			return setCount_NoLock(n - 1);
+			data->~T();
+			count--;
+			Base::moveMemory(data, data + 1, count);
+			m_count = count;
+			adjustCapacity_NoLock(count);
+			return sl_true;
 		}
 		return sl_false;
 	}
@@ -922,23 +933,22 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_size CList<T>::popFrontElements_NoLock(sl_size count)
+	sl_size CList<T>::popFrontElements_NoLock(sl_size nElements)
 	{
-		sl_size n = m_count;
-		if (n > 0 && count > 0) {
-			if (count > n) {
-				count = n;
+		sl_size count = m_count;
+		if (nElements > 0 && count > 0) {
+			if (nElements > count) {
+				nElements = count;
 			}
-			T* dst = m_data;
-			T* src = dst + count;
-			sl_size m = n - count;
-			while (m) {
-				*(dst++) = *(src++);
-				m--;
+			T* data = m_data;
+			for (sl_size i = 0; i < nElements; i++) {
+				(data + i)->~T();
 			}
-			if (setCount_NoLock(n - count)) {
-				return count;
-			}
+			count -= nElements;
+			Base::moveMemory(data, data + nElements, count);
+			m_count = count;
+			adjustCapacity_NoLock(count);
+			return nElements;
 		}
 		return 0;
 	}
@@ -953,12 +963,17 @@ namespace slib
 	template <class T>
 	sl_bool CList<T>::popBack_NoLock(T* _out)
 	{
-		sl_size n = m_count;
-		if (n > 0) {
+		sl_size count = m_count;
+		if (count > 0) {
+			T* data = m_data + count - 1;
 			if (_out) {
-				*_out = m_data[n - 1];
+				*_out = Move(*data);
 			}
-			return setCount_NoLock(n - 1);
+			data->~T();
+			count--;
+			m_count = count;
+			adjustCapacity_NoLock(count);
+			return sl_true;
 		}
 		return sl_false;
 	}
@@ -971,16 +986,21 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_size CList<T>::popBackElements_NoLock(sl_size count)
+	sl_size CList<T>::popBackElements_NoLock(sl_size nElements)
 	{
-		sl_size n = m_count;
-		if (n > 0 && count > 0) {
-			if (count > n) {
-				count = n;
+		sl_size count = m_count;
+		if (nElements > 0 && count > 0) {
+			if (nElements > count) {
+				nElements = count;
 			}
-			if (setCount_NoLock(n - count)) {
-				return count;
+			T* data = m_data + count - nElements;
+			for (sl_size i = 0; i < nElements; i++) {
+				(data + i)->~T();
 			}
+			count -= nElements;
+			m_count = count;
+			adjustCapacity_NoLock(count);
+			return nElements;
 		}
 		return 0;
 	}
