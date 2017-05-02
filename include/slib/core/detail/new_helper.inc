@@ -37,11 +37,11 @@ namespace slib
 
 	template <class T>
 	template <class _T>
-	SLIB_INLINE T* NewHelper<T>::create(const _T* other) noexcept
+	SLIB_INLINE T* NewHelper<T>::create(_T&& other) noexcept
 	{
 		T* data = (T*)(Base::createMemory(sizeof(T)));
 		if (data) {
-			new (data) T(*other);
+			new (data) T(Forward<_T>(other));
 		}
 		return data;
 	}

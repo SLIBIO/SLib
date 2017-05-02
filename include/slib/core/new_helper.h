@@ -27,7 +27,7 @@ namespace slib
 		static T* create(sl_size count) noexcept;
 
 		template <class _T>
-		static T* create(const _T* other) noexcept;
+		static T* create(_T&& other) noexcept;
 
 		template <class _T>
 		static T* create(const _T* other, sl_size count) noexcept;
