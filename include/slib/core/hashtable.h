@@ -28,8 +28,9 @@ namespace slib
 {
 	
 	template <class KT, class VT>
-	struct HashEntry
+	class HashEntry
 	{
+	public:
 		KT key;
 		VT value;
 		
@@ -38,6 +39,13 @@ namespace slib
 		
 		HashEntry* before;
 		HashEntry* next;
+		
+	public:
+		template <class _KT, class _VT>
+		SLIB_INLINE HashEntry(_KT&& _key, _VT&& _value)
+		 : key(Forward<_KT>(_key)), value(Forward<_VT>(_value))
+		{
+		}
 		
 	};
 	
@@ -76,10 +84,11 @@ namespace slib
 		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
 		List<VT> getValuesByKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 
-		sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
+		template <class _KT, class _VT>
+		sl_bool put(_KT&& key, _VT&& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class _KT, class _VT, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<_VT>::Type> >
+		sl_bool addIfNewKeyAndValue(_KT&& key, _VT&& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
 		sl_bool remove(const KT& key, VT* outValue = sl_null);
 
@@ -118,7 +127,7 @@ namespace slib
 
 		sl_bool _createTable(sl_uint32 capacity);
 
-		sl_bool _addEntry(sl_uint32 hash, const KT& key, const VT& value);
+		void _addEntry(sl_uint32 hash, Entry* entry);
 
 		void _removeEntry(Entry* entry);
 		

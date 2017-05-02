@@ -166,16 +166,9 @@ namespace slib
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::_addEntry(sl_uint32 hash, const KT& key, const VT& value)
+	void HashTable<KT, VT, HASH, KEY_EQUALS>::_addEntry(sl_uint32 hash, Entry* entry)
 	{
 		sl_uint32 index = hash & (m_nCapacity - 1);
-		
-		Entry* entry = new Entry;
-		if (!entry) {
-			return sl_false;
-		}
-		entry->key = key;
-		entry->value = value;
 		entry->hash = hash;
 		entry->chain = m_table[index];
 		Entry* last = m_lastEntry;
@@ -188,10 +181,10 @@ namespace slib
 			m_firstEntry = entry;
 		}
 		entry->next = sl_null;
-
+		
 		m_table[index] = entry;
 		m_nSize++;
-	
+		
 		if (m_nSize >= m_nThresholdUp) {
 			// double capacity
 			Entry** tableOld = m_table;
@@ -227,11 +220,11 @@ namespace slib
 				Base::freeMemory(tableOld);
 			}
 		}
-		return sl_true;
 	}
-
+	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::put(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
+	template <class _KT, class _VT>
+	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::put(_KT&& key, _VT&& value, MapPutMode mode, sl_bool* pFlagExist)
 	{
 		if (pFlagExist) {
 			*pFlagExist = sl_false;
@@ -253,7 +246,7 @@ namespace slib
 					if (mode == MapPutMode::AddNew) {
 						return sl_false;
 					}
-					entry->value = value;
+					entry->value = Forward<_VT>(value);
 					return sl_true;
 				}
 				entry = entry->chain;
@@ -263,13 +256,18 @@ namespace slib
 			}
 		}
 
-		return _addEntry(hash, key, value);
+		Entry* newEntry = new Entry(Forward<_KT>(key), Forward<_VT>(value));
+		if (newEntry) {
+			_addEntry(hash, newEntry);
+			return sl_true;
+		}
+		return sl_false;
 
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
+	template <class _KT, class _VT, class VALUE_EQUALS>
+	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue(_KT&& key, _VT&& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
 	{
 		if (pFlagExist) {
 			*pFlagExist = sl_false;
@@ -292,7 +290,12 @@ namespace slib
 			entry = entry->chain;
 		}
 
-		return _addEntry(hash, key, value);
+		Entry* newEntry = new Entry(Forward<_KT>(key), Forward<_VT>(value));
+		if (newEntry) {
+			_addEntry(hash, newEntry);
+			return sl_true;
+		}
+		return sl_false;
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
@@ -352,7 +355,7 @@ namespace slib
 				*link = entry->chain;
 				_removeEntry(entry);
 				if (outValue) {
-					*outValue = entry->value;
+					*outValue = Move(entry->value);
 				}
 				_compact();
 				delete entry;
@@ -382,7 +385,7 @@ namespace slib
 				*link = entry->chain;
 				_removeEntry(entry);
 				if (outValues) {
-					outValues->add_NoLock(entry->value);
+					outValues->add_NoLock(Move(entry->value));
 				}
 				*linkDelete = entry;
 				entry->chain = sl_null;
@@ -419,7 +422,7 @@ namespace slib
 				*link = entry->chain;
 				_removeEntry(entry);
 				if (outValue) {
-					*outValue = entry->value;
+					*outValue = Move(entry->value);
 				}
 				_compact();
 				delete entry;
@@ -450,7 +453,7 @@ namespace slib
 				*link = entry->chain;
 				_removeEntry(entry);
 				if (outValues) {
-					outValues->add_NoLock(entry->value);
+					outValues->add_NoLock(Move(entry->value));
 				}
 				*linkDelete = entry;
 				entry->chain = sl_null;
@@ -498,9 +501,11 @@ namespace slib
 		
 		Entry* entry = other->m_firstEntry;
 		while (entry) {
-			if (!(_addEntry(entry->hash, entry->key, entry->value))) {
+			Entry* newEntry = new Entry(entry->key, entry->value);
+			if (!newEntry) {
 				return sl_false;
 			}
+			_addEntry(entry->hash, newEntry);
 			entry = entry->next;
 		}
 		
