@@ -19,7 +19,7 @@ namespace slib
 	template <class T>
 	CArray<T>* CArray<T>::create(const std::initializer_list<T>& l)
 	{
-		return createFromArray(l.begin(), l.size());
+		return create(l.begin(), l.size());
 	}
 	
 	

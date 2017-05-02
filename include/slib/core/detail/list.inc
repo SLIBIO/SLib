@@ -25,8 +25,11 @@ namespace slib
 	CList<T>::CList(sl_size count)
 	{
 		if (count > 0) {
-			T* data = NewHelper<T>::create(count);
+			T* data = Base::createMemory(count * sizeof(T));
 			if (data) {
+				for (sl_size i = 0; i < count; i++) {
+					new (data + i) T();
+				}
 				m_data = data;
 				m_count = count;
 				m_capacity = count;
@@ -45,8 +48,11 @@ namespace slib
 			capacity = count;
 		}
 		if (capacity > 0) {
-			T* data = NewHelper<T>::create(capacity);
+			T* data = Base::createMemory(capacity * sizeof(T));
 			if (data) {
+				for (sl_size i = 0; i < count; i++) {
+					new (data + i) T();
+				}
 				m_data = data;
 				m_count = count;
 				m_capacity = capacity;
@@ -59,12 +65,38 @@ namespace slib
 	}
 	
 	template <class T>
+	CList<T>::CList(sl_size count, sl_size capacity, const T& initialValue)
+	{
+		if (capacity < count) {
+			capacity = count;
+		}
+		if (capacity > 0) {
+			T* data = Base::createMemory(capacity * sizeof(T));
+			if (data) {
+				for (sl_size i = 0; i < count; i++) {
+					new (data + i) T(initialValue);
+				}
+				m_data = data;
+				m_count = count;
+				m_capacity = capacity;
+				return;
+			}
+		}
+		m_data = 0;
+		m_count = 0;
+		m_capacity = 0;
+	}
+
+	template <class T>
 	template <class _T>
 	CList<T>::CList(const _T* values, sl_size count)
 	{
 		if (count > 0) {
-			T* data = NewHelper<T>::create(values, count);
+			T* data = Base::createMemory(count * sizeof(T));
 			if (data) {
+				for (sl_size i = 0; i < count; i++) {
+					new (data + i) T(values[i]);
+				}
 				m_data = data;
 				m_count = count;
 				m_capacity = count;
@@ -79,7 +111,14 @@ namespace slib
 	template <class T>
 	CList<T>::~CList()
 	{
-		NewHelper<T>::free(m_data, m_count);
+		T* data = m_data;
+		sl_size count = m_count;
+		if (data) {
+			for (sl_size i = 0; i < count; i++) {
+				(data+i)->~T();
+			}
+			Base::freeMemory((void*)data);
+		}
 	}
 	
 	template <class T>
@@ -123,8 +162,25 @@ namespace slib
 	}
 	
 	template <class T>
+	CList<T>* CList<T>::create(sl_size count, sl_size capacity, const T& intialValue)
+	{
+		if (count > 0 || capacity > 0) {
+			CList<T>* ret = new CList<T>(count, capacity, intialValue);
+			if (ret) {
+				if (ret->m_capacity > 0) {
+					return ret;
+				}
+				delete ret;
+			}
+		} else {
+			return new CList<T>;
+		}
+		return sl_null;
+	}
+
+	template <class T>
 	template <class _T>
-	CList<T>* CList<T>::createFromArray(const _T* values, sl_size count)
+	CList<T>* CList<T>::create(const _T* values, sl_size count)
 	{
 		if (count > 0) {
 			CList<T>* ret = new CList<T>(values, count);
@@ -142,22 +198,15 @@ namespace slib
 	
 	template <class T>
 	template <class _T>
-	CList<T>* CList<T>::createFromArray(const Array<_T>& array)
+	CList<T>* CList<T>::create(const Array<_T>& array)
 	{
-		return createFromArray(array.getData(), array.getCount());
+		return create(array.getData(), array.getCount());
 	}
 	
 	template <class T>
-	CList<T>* CList<T>::createFromElement(const T& value)
+	CList<T>* CList<T>::createFromElement(const T& value, sl_size count)
 	{
-		CList<T>* ret = new CList<T>(&value, 1);
-		if (ret) {
-			if (ret->m_count > 0) {
-				return ret;
-			}
-			delete ret;
-		}
-		return sl_null;
+		return create(count, count, value);
 	}
 	
 	template <class T>
@@ -165,7 +214,7 @@ namespace slib
 	CList<T>* CList<T>::createFromElements(ARGS&&... _values)
 	{
 		T values[] = {Forward<ARGS>(_values)...};
-		return createFromArray(values, sizeof...(_values));
+		return create(values, sizeof...(_values));
 	}
 
 	template <class T>
@@ -173,7 +222,8 @@ namespace slib
 	CList<T>* CList<T>::createCopy(CList<_T>* other)
 	{
 		if (other) {
-			return createFromArray(other->getData(), other->getCount());
+			ObjectLocker lock(other);
+			return create(other->getData(), other->getCount());
 		}
 		return sl_null;
 	}
@@ -271,21 +321,23 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool CList<T>::setAt_NoLock(sl_size index, const T& value) const
+	template <class _T>
+	sl_bool CList<T>::setAt_NoLock(sl_size index, _T&& value) const
 	{
 		if (index < m_count) {
-			m_data[index] = value;
+			m_data[index] = Forward<_T>(value);
 			return sl_true;
 		}
 		return sl_false;
 	}
 	
 	template <class T>
-	sl_bool CList<T>::setAt(sl_size index, const T& value) const
+	template <class _T>
+	sl_bool CList<T>::setAt(sl_size index, _T&& value) const
 	{
 		ObjectLocker lock(this);
 		if (index < m_count) {
-			m_data[index] = value;
+			m_data[index] = Forward<_T>(value);
 			return sl_true;
 		}
 		return sl_false;
@@ -306,7 +358,29 @@ namespace slib
 	template <class T>
 	sl_bool CList<T>::setCount_NoLock(sl_size count)
 	{
-		return _setCountInner(count);
+		sl_size oldCount = m_count;
+		if (oldCount == count) {
+			return sl_true;
+		}
+		if (count < oldCount) {
+			T* data = m_data;
+			for (sl_reg i = count; i < (sl_reg)oldCount; i++) {
+				(data+i)->~T();
+			}
+			m_count = count;
+			adjustCapacity_NoLock(count);
+			return sl_true;
+		} else {
+			if (adjustCapacity_NoLock(count)) {
+				T* data = m_data;
+				for (sl_reg i = oldCount; i < (sl_reg)count; i++) {
+					new (data + i) T();
+				}
+				m_count = count;
+				return sl_true;
+			}
+		}
+		return sl_false;
 	}
 	
 	template <class T>
@@ -317,54 +391,144 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool CList<T>::insert_NoLock(sl_size index, const T& value)
+	sl_bool CList<T>::setCapacity_NoLock(sl_size capacity)
 	{
-		return insertElements_NoLock(index, &value, 1);
+		if (capacity < m_count) {
+			capacity = m_count;
+		}
+		if (capacity == m_capacity) {
+			return sl_true;
+		}
+		T* data = m_data;
+		if (data) {
+			data = Base::reallocMemory(data, capacity * sizeof(T));
+		} else {
+			data = Base::createMemory(capacity * sizeof(T));
+		}
+		if (data) {
+			m_data = data;
+			m_capacity = capacity;
+			return sl_true;
+		}
+		return sl_false;
 	}
 	
 	template <class T>
-	sl_bool CList<T>::insert(sl_size index, const T& value)
+	sl_bool CList<T>::setCapacity(sl_size capacity)
 	{
-		return insertElements(index, &value, 1);
+		ObjectLocker lock(this);
+		return setCapacity_NoLock(capacity);
+	}
+	
+	template <class T>
+	sl_bool CList<T>::adjustCapacity_NoLock(sl_size count)
+	{
+		if (m_capacity < count) {
+			sl_size newCapacity = m_capacity * 3 / 2 + 1;
+			if (newCapacity < count) {
+				newCapacity = count;
+			}
+			if (newCapacity < SLIB_LIST_CAPACITY_MIN) {
+				newCapacity = SLIB_LIST_CAPACITY_MIN;
+			}
+			T* newData;
+			if (m_data) {
+				newData = (T*)(Base::reallocMemory(m_data, newCapacity * sizeof(T)));
+			} else {
+				newData = (T*)(Base::createMemory(newCapacity * sizeof(T)));
+			}
+			if (newData) {
+				m_data = newData;
+				m_capacity = newCapacity;
+			} else {
+				return sl_false;
+			}
+		} else if (m_capacity > SLIB_LIST_CAPACITY_MIN && count < m_capacity / 2) {
+			sl_size newCapacity = count * 3 / 2 + 1;
+			if (newCapacity < SLIB_LIST_CAPACITY_MIN) {
+				newCapacity = SLIB_LIST_CAPACITY_MIN;
+			}
+			if (newCapacity < m_capacity) {
+				T* newData = (T*)(Base::reallocMemory(m_data, newCapacity * sizeof(T)));
+				if (newData) {
+					m_data = newData;
+					m_capacity = newCapacity;
+				}
+			}
+		}
+		return sl_true;
+	}
+	
+	template <class T>
+	sl_bool CList<T>::adjustCapacity(sl_size count)
+	{
+		ObjectLocker lock(this);
+		return adjustCapacity_NoLock(count);
+	}
+
+	template <class T>
+	sl_bool CList<T>::shrinkToFit_NoLock()
+	{
+		return setCapacity_NoLock(m_count);
+	}
+	
+	template <class T>
+	sl_bool CList<T>::shrinkToFit()
+	{
+		ObjectLocker lock(this);
+		return setCapacity_NoLock(m_count);
+	}
+	
+	template <class T>
+	template <class... ARGS>
+	sl_bool CList<T>::insert_NoLock(sl_size index, ARGS&&... args)
+	{
+		sl_size oldCount = m_count;
+		if (index > oldCount) {
+			index = oldCount;
+		}
+		sl_size newCount = oldCount + 1;
+		if (adjustCapacity_NoLock(newCount)) {
+			T* data = m_data + index;
+			if (index < oldCount) {
+				Base::moveMemory(data + 1, data, (oldCount - index) * sizeof(T));
+			}
+			new (data) T(Forward<ARGS>(args)...);
+			m_count = newCount;
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	template <class... ARGS>
+	sl_bool CList<T>::insert(sl_size index, ARGS&&... args)
+	{
+		ObjectLocker lock(this);
+		return insert_NoLock(index, Forward<ARGS>(args)...);
 	}
 	
 	template <class T>
 	template <class _T>
-	sl_bool CList<T>::insertElements_NoLock(sl_size index, const _T* values, sl_size count)
+	sl_bool CList<T>::insertElements_NoLock(sl_size index, const _T* values, sl_size nValues)
 	{
-		if (count == 0) {
+		if (nValues == 0) {
 			return sl_true;
 		}
 		sl_size oldCount = m_count;
-		if (_setCountInner(oldCount + count)) {
+		if (index > oldCount) {
+			index = oldCount;
+		}
+		sl_size newCount = oldCount + nValues;
+		if (adjustCapacity_NoLock(newCount)) {
+			T* data = m_data + index;
 			if (index < oldCount) {
-				{
-					T* dst = m_data + m_count - 1;
-					const T* src = m_data + oldCount - 1;
-					sl_size n = oldCount - index;
-					while (n) {
-						*(dst--) = *(src--);
-						n--;
-					}
-				}
-				{
-					T* dst = m_data + index;
-					const _T* src = values;
-					sl_size n = count;
-					while (n) {
-						*(dst++) = *(src++);
-						n--;
-					}
-				}
-			} else {
-				T* dst = m_data + oldCount;
-				const _T* src = values;
-				sl_size n = count;
-				while (n) {
-					*(dst++) = *(src++);
-					n--;
-				}
+				Base::moveMemory(data + nValues, data, (oldCount - index) * sizeof(T));
 			}
+			for (sl_size i = 0; i < nValues; i++) {
+				new (data + i) T(values[i]);
+			}
+			m_count = newCount;
 			return sl_true;
 		}
 		return sl_false;
@@ -382,6 +546,54 @@ namespace slib
 	}
 	
 	template <class T>
+	sl_bool CList<T>::insertElements_NoLock(sl_size index, sl_size nValues, const T& value)
+	{
+		if (nValues == 0) {
+			return sl_true;
+		}
+		sl_size oldCount = m_count;
+		if (index > oldCount) {
+			index = oldCount;
+		}
+		sl_size newCount = oldCount + nValues;
+		if (adjustCapacity_NoLock(newCount)) {
+			T* data = m_data + index;
+			if (index < oldCount) {
+				Base::moveMemory(data + nValues, data, (oldCount - index) * sizeof(T));
+			}
+			for (sl_size i = 0; i < nValues; i++) {
+				new (data + i) T(value);
+			}
+			m_count = newCount;
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	sl_bool CList<T>::insertElements(sl_size index, sl_size count, const T& value)
+	{
+		if (count == 0) {
+			return sl_true;
+		}
+		ObjectLocker lock(this);
+		return insertElements_NoLock(index, count, count);
+	}
+
+	template <class T>
+	template <class _T>
+	sl_bool CList<T>::insertAll_NoLock(sl_size index, const CList<_T>* other)
+	{
+		if (!other) {
+			return sl_true;
+		}
+		if (this == other) {
+			return sl_false;
+		}
+		return insertElements_NoLock(index, other->getData(), other->getCount());
+	}
+	
+	template <class T>
 	template <class _T>
 	sl_bool CList<T>::insertAll(sl_size index, const CList<_T>* other)
 	{
@@ -392,78 +604,46 @@ namespace slib
 			return sl_false;
 		}
 		ObjectLocker lock(this, other);
-		sl_size count = other->getCount();
-		if (count == 0) {
-			return sl_true;
-		}
-		_T* otherData = other->getData();
+		return insertElements_NoLock(index, other->getData(), other->getCount());
+	}
+	
+	template <class T>
+	template <class... ARGS>
+	sl_bool CList<T>::add_NoLock(ARGS&&... args)
+	{
 		sl_size oldCount = m_count;
-		if (_setCountInner(oldCount + count)) {
-			if (index < oldCount) {
-				T* dst = m_data + m_count - 1;
-				T* src = m_data + oldCount - 1;
-				sl_size n = oldCount - index;
-				while (n) {
-					*(dst--) = *(src--);
-					n--;
-				}
-				dst = m_data + index;
-				for (sl_size i = 0; i < count; i++) {
-					*(dst++) = otherData[i];
-				}
-			} else {
-				T* dst = m_data + oldCount;
-				const _T* src = otherData;
-				sl_size n = count;
-				while (n) {
-					*(dst++) = *(src++);
-					n--;
-				}
-			}
+		sl_size newCount = oldCount + 1;
+		if (adjustCapacity_NoLock(newCount)) {
+			new (m_data + oldCount) T(Forward<ARGS>(args)...);
+			m_count = newCount;
 			return sl_true;
 		}
 		return sl_false;
 	}
 	
 	template <class T>
-	sl_bool CList<T>::add_NoLock(const T& value)
-	{
-		sl_size oldCount = m_count;
-		if (oldCount < m_capacity) {
-			m_count++;
-			new (m_data + oldCount) T(value);
-		} else {
-			if (!(_setCountInner(oldCount + 1))) {
-				return sl_false;
-			}
-			m_data[oldCount] = value;
-		}
-		return sl_true;
-	}
-	
-	template <class T>
-	sl_bool CList<T>::add(const T& value)
+	template <class... ARGS>
+	sl_bool CList<T>::add(ARGS&&... args)
 	{
 		ObjectLocker lock(this);
-		return add_NoLock(value);
+		return add_NoLock(Forward<ARGS>(args)...);
 	}
 	
 	template <class T>
 	template <class _T>
-	sl_bool CList<T>::addElements_NoLock(const _T* values, sl_size count)
+	sl_bool CList<T>::addElements_NoLock(const _T* values, sl_size nValues)
 	{
-		if (count == 0) {
+		if (nValues == 0) {
 			return sl_true;
 		}
 		sl_size oldCount = m_count;
-		if (_setCountInner(oldCount + count)) {
-			T* dst = m_data + oldCount;
-			const _T* src = values;
-			sl_size n = count;
-			while (n) {
-				*(dst++) = *(src++);
-				n--;
+		sl_size newCount = oldCount + nValues;
+		if (adjustCapacity_NoLock(newCount)) {
+			T* data = m_data + oldCount;
+			for (sl_size i = 0; i < nValues; i++) {
+				new (data + i) T(values[i]);
 			}
+			m_count = newCount;
 			return sl_true;
 		}
 		return sl_false;
@@ -481,6 +661,35 @@ namespace slib
 	}
 	
 	template <class T>
+	sl_bool CList<T>::addElements_NoLock(sl_size nValues, const T& value)
+	{
+		if (nValues == 0) {
+			return sl_true;
+		}
+		sl_size oldCount = m_count;
+		sl_size newCount = oldCount + nValues;
+		if (adjustCapacity_NoLock(newCount)) {
+			T* data = m_data + oldCount;
+			for (sl_size i = 0; i < nValues; i++) {
+				new (data + i) T(value);
+			}
+			m_count = newCount;
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	sl_bool CList<T>::addElements(sl_size count, const T& value)
+	{
+		if (count == 0) {
+			return sl_true;
+		}
+		ObjectLocker lock(this);
+		return addElements_NoLock(count, value);
+	}
+	
+	template <class T>
 	template <class _T>
 	sl_bool CList<T>::addAll_NoLock(const CList<_T>* other)
 	{
@@ -490,20 +699,7 @@ namespace slib
 		if (this == other) {
 			return sl_false;
 		}
-		sl_size count = other->getCount();
-		if (count == 0) {
-			return sl_true;
-		}
-		_T* otherData = other->getData();
-		sl_size oldCount = m_count;
-		if (_setCountInner(oldCount + count)) {
-			T* dst = m_data + oldCount;
-			for (sl_size i = 0; i < count; i++) {
-				*(dst++) = otherData[i];
-			}
-			return sl_true;
-		}
-		return sl_false;
+		return addElements_NoLock(other->getData(), other->getCount());
 	}
 	
 	template <class T>
@@ -517,12 +713,12 @@ namespace slib
 			return sl_false;
 		}
 		ObjectLocker lock(this, other);
-		return addAll_NoLock(other);
+		return addElements_NoLock(other->getData(), other->getCount());
 	}
 	
 	template <class T>
 	template <class _T, class EQUALS>
-	sl_bool CList<T>::addIfNotExist_NoLock(const _T& value, const EQUALS& equals)
+	sl_bool CList<T>::addIfNotExist_NoLock(_T&& value, const EQUALS& equals)
 	{
 		if (indexOf_NoLock(value, 0, equals) < 0) {
 			return add_NoLock(value);
@@ -532,7 +728,7 @@ namespace slib
 	
 	template <class T>
 	template <class _T, class EQUALS>
-	sl_bool CList<T>::addIfNotExist(const _T& value, const EQUALS& equals)
+	sl_bool CList<T>::addIfNotExist(_T&& value, const EQUALS& equals)
 	{
 		ObjectLocker lock(this);
 		if (indexOf_NoLock(value, 0, equals) < 0) {
@@ -577,7 +773,7 @@ namespace slib
 				n--;
 				m++;
 			}
-			_setCountInner(total - 1);
+			setCount_NoLock(total - 1);
 			return sl_true;
 		}
 		return sl_false;
@@ -605,7 +801,7 @@ namespace slib
 				*(dst++) = *(src++);
 				n--;
 			}
-			_setCountInner(total - count);
+			setCount_NoLock(total - count);
 			return count;
 		}
 		return 0;
@@ -632,7 +828,7 @@ namespace slib
 					for (sl_size j = i + 1; j < n; j++) {
 						m_data[j - 1] = m_data[j];
 					}
-					_setCountInner(n - 1);
+					setCount_NoLock(n - 1);
 					return sl_true;
 				}
 			}
@@ -668,7 +864,7 @@ namespace slib
 				}
 			}
 			if (n < m_count) {
-				_setCountInner(n);
+				setCount_NoLock(n);
 				return m_count - n;
 			}
 		}
@@ -687,7 +883,7 @@ namespace slib
 	sl_size CList<T>::removeAll_NoLock()
 	{
 		sl_size count = m_count;
-		_setCountInner(0);
+		setCount_NoLock(0);
 		return count;
 	}
 	
@@ -713,7 +909,7 @@ namespace slib
 				*(dst++) = *(src++);
 				m--;
 			}
-			return _setCountInner(n - 1);
+			return setCount_NoLock(n - 1);
 		}
 		return sl_false;
 	}
@@ -740,7 +936,7 @@ namespace slib
 				*(dst++) = *(src++);
 				m--;
 			}
-			if (_setCountInner(n - count)) {
+			if (setCount_NoLock(n - count)) {
 				return count;
 			}
 		}
@@ -762,7 +958,7 @@ namespace slib
 			if (_out) {
 				*_out = m_data[n - 1];
 			}
-			return _setCountInner(n - 1);
+			return setCount_NoLock(n - 1);
 		}
 		return sl_false;
 	}
@@ -782,7 +978,7 @@ namespace slib
 			if (count > n) {
 				count = n;
 			}
-			if (_setCountInner(n - count)) {
+			if (setCount_NoLock(n - count)) {
 				return count;
 			}
 		}
@@ -864,7 +1060,7 @@ namespace slib
 	CList<T>* CList<T>::duplicate_NoLock() const
 	{
 		if (m_count > 0) {
-			return createFromArray(m_data, m_count);
+			return create(m_data, m_count);
 		}
 		return sl_null;
 	}
@@ -934,66 +1130,6 @@ namespace slib
 		return m_data + m_count;
 	}
 	
-	template <class T>
-	sl_bool CList<T>::_setCountInner(sl_size count)
-	{
-		sl_size oldCount = m_count;
-		if (oldCount == count) {
-			return sl_true;
-		}
-		if (count < oldCount) {
-			T* data = m_data;
-			for (sl_reg i = count; i < (sl_reg)oldCount; i++) {
-				(data+i)->~T();
-			}
-			m_count = count;
-		}
-		if (m_capacity < count) {
-			sl_size newCapacity = m_capacity * 3 / 2 + 1;
-			if (newCapacity < count) {
-				newCapacity = count;
-			}
-			if (newCapacity < SLIB_LIST_CAPACITY_MIN) {
-				newCapacity = SLIB_LIST_CAPACITY_MIN;
-			}
-			T* newData;
-			sl_size size = newCapacity * sizeof(T);
-			if (m_data) {
-				newData = (T*)(Base::reallocMemory(m_data, size));
-				if (!newData) {
-					newData = (T*)(Base::createMemory(size));
-					if (newData) {
-						Base::copyMemory(newData, m_data, m_capacity * sizeof(T));
-						Base::freeMemory(m_data);
-					}
-				}
-			} else {
-				newData = (T*)(Base::createMemory(size));
-			}
-			if (newData) {
-				m_data = newData;
-				m_capacity = newCapacity;
-			} else {
-				return sl_false;
-			}
-		} else if (m_capacity > SLIB_LIST_CAPACITY_MIN && count < m_capacity / 2) {
-			sl_size newCapacity = count * 3 / 2 + 1;
-			if (newCapacity < SLIB_LIST_CAPACITY_MIN) {
-				newCapacity = SLIB_LIST_CAPACITY_MIN;
-			}
-			T* newData = (T*)(Base::reallocMemory(m_data, newCapacity * sizeof(T)));
-			if (newData) {
-				m_data = newData;
-				m_capacity = newCapacity;
-			}
-		}
-		if (count > oldCount) {
-			NewHelper<T>::constructor(m_data + oldCount, count - oldCount);
-			m_count = count;
-		}
-		return sl_true;
-	}
-	
 	
 	template <class T>
 	SLIB_INLINE ListPosition<T>::ListPosition() {};
@@ -1048,8 +1184,13 @@ namespace slib
 	}
 	
 	template <class T>
+	List<T>::List(sl_size count, sl_size capacity, const T& initialValue): ref(CList<T>::create(count, capacity, initialValue))
+	{
+	}
+
+	template <class T>
 	template <class _T>
-	List<T>::List(const _T* values, sl_size count): ref(CList<T>::createFromArray(values, count))
+	List<T>::List(const _T* values, sl_size count): ref(CList<T>::create(values, count))
 	{
 	}
 
@@ -1072,23 +1213,29 @@ namespace slib
 	}
 	
 	template <class T>
-	template <class _T>
-	List<T> List<T>::createFromArray(const _T* values, sl_size count)
+	List<T> List<T>::create(sl_size count, sl_size capacity, const T& initialValue)
 	{
-		return CList<T>::createFromArray(values, count);
+		return CList<T>::create(count, capacity, initialValue);
+	}
+
+	template <class T>
+	template <class _T>
+	List<T> List<T>::create(const _T* values, sl_size count)
+	{
+		return CList<T>::create(values, count);
 	}
 	
 	template <class T>
 	template <class _T>
-	List<T> List<T>::createFromArray(const Array<_T>& array)
+	List<T> List<T>::create(const Array<_T>& array)
 	{
-		return createFromArray(array.getData(), array.getCount());
+		return create(array.getData(), array.getCount());
 	}
 	
 	template <class T>
-	List<T> List<T>::createFromElement(const T& e)
+	List<T> List<T>::createFromElement(const T& e, sl_size count)
 	{
-		return CList<T>::createFromElement(e);
+		return CList<T>::createFromElement(e, count);
 	}
 	
 	template <class T>
@@ -1096,7 +1243,7 @@ namespace slib
 	List<T> List<T>::createFromElements(ARGS&&... _values)
 	{
 		T values[] = {Forward<ARGS>(_values)...};
-		return createFromArray(values, sizeof...(_values));
+		return create(values, sizeof...(_values));
 	}
 	
 	template <class T>
@@ -1172,7 +1319,7 @@ namespace slib
 		}
 		return sl_null;
 	}
-
+	
 	template <class T>
 	sl_bool List<T>::getAt_NoLock(sl_size index, T* _out) const
 	{
@@ -1182,7 +1329,7 @@ namespace slib
 		}
 		return sl_false;
 	}
-
+	
 	template <class T>
 	sl_bool List<T>::getAt(sl_size index, T* _out) const
 	{
@@ -1234,27 +1381,29 @@ namespace slib
 		}
 		return def;
 	}
-
+	
 	template <class T>
-	sl_bool List<T>::setAt_NoLock(sl_size index, const T& value) const
+	template <class _T>
+	sl_bool List<T>::setAt_NoLock(sl_size index, _T&& value) const
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->setAt_NoLock(index, value);
+			return obj->setAt_NoLock(index, Forward<_T>(value));
 		}
 		return sl_false;
 	}
-
+	
 	template <class T>
-	sl_bool List<T>::setAt(sl_size index, const T& value) const
+	template <class _T>
+	sl_bool List<T>::setAt(sl_size index, _T&& value) const
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->setAt(index, value);
+			return obj->setAt(index, Forward<_T>(value));
 		}
 		return sl_false;
 	}
-
+	
 	template <class T>
 	SLIB_INLINE T& List<T>::operator[](sl_size_t index) const
 	{
@@ -1271,10 +1420,10 @@ namespace slib
 			if (count == 0) {
 				return sl_true;
 			}
-			obj = CList<T>::create();
+			obj = CList<T>::create(count);
 			if (obj) {
 				ref = obj;
-				return obj->setCount_NoLock(count);
+				return sl_true;
 			}
 		}
 		return sl_false;
@@ -1290,83 +1439,80 @@ namespace slib
 			if (count == 0) {
 				return sl_true;
 			}
-			obj = CList<T>::create();
+			obj = CList<T>::create(count);
 			if (obj) {
 				ref = obj;
-				return obj->setCount_NoLock(count);
+				return sl_true;
 			}
 		}
 		return sl_false;
 	}
-
+	
 	template <class T>
-	sl_bool List<T>::insert_NoLock(sl_size index, const T& value) const
+	sl_bool List<T>::setCapacity_NoLock(sl_size capacity)
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->insert_NoLock(index, value);
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	sl_bool List<T>::insert(sl_size index, const T& value) const
-	{
-		CList<T>* obj = ref._ptr;
-		if (obj) {
-			return obj->insert(index, value);
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	template <class _T>
-	sl_bool List<T>::insertElements_NoLock(sl_size index, const _T* values, sl_size count) const
-	{
-		CList<T>* obj = ref._ptr;
-		if (obj) {
-			return obj->insertElements_NoLock(index, values, count);
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	template <class _T>
-	sl_bool List<T>::insertElements(sl_size index, const _T* values, sl_size count) const
-	{
-		CList<T>* obj = ref._ptr;
-		if (obj) {
-			return obj->insertElements(index, values, count);
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	template <class _T>
-	sl_bool List<T>::insertAll(sl_size index, const List<_T>& other) const
-	{
-		CList<T>* obj = ref._ptr;
-		if (obj) {
-			return obj->insertAll(index, other.ref._ptr);
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	template <class _T>
-	sl_bool List<T>::insertAll(sl_size index, const AtomicList<_T>& other) const
-	{
-		return insertAll(index, List<_T>(other));
-	}
-
-	template <class T>
-	sl_bool List<T>::add_NoLock(const T& value)
-	{
-		CList<T>* obj = ref._ptr;
-		if (obj) {
-			return obj->add_NoLock(value);
+			return obj->setCapacity_NoLock(capacity);
 		} else {
-			obj = CList<T>::createFromElement(value);
+			if (capacity == 0) {
+				return sl_true;
+			}
+			obj = CList<T>::create(0, capacity);
+			if (obj) {
+				ref = obj;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	sl_bool List<T>::setCapacity(sl_size capacity)
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->setCount(capacity);
+		} else {
+			if (capacity == 0) {
+				return sl_true;
+			}
+			obj = CList<T>::create(0, capacity);
+			if (obj) {
+				ref = obj;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	sl_bool List<T>::shrinkToFit_NoLock() const
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->shrinkToFit_NoLock();
+		}
+	}
+	
+	template <class T>
+	sl_bool List<T>::shrinkToFit() const
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->shrinkToFit();
+		}
+	}
+
+	template <class T>
+	template <class... ARGS>
+	sl_bool List<T>::insert_NoLock(sl_size index, ARGS&&... args)
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->insert_NoLock(index, Forward<ARGS>(args)...);
+		} else {
+			obj = CList<T>::createFromElement(T(Forward<ARGS>(args)...));
 			if (obj) {
 				ref = obj;
 				return sl_true;
@@ -1376,13 +1522,173 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool List<T>::add(const T& value)
+	template <class... ARGS>
+	sl_bool List<T>::insert(sl_size index, ARGS&&... args)
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->add(value);
+			return obj->insert(index, Forward<ARGS>(args)...);
 		} else {
-			obj = CList<T>::createFromElement(value);
+			obj = CList<T>::createFromElement(T(Forward<ARGS>(args)...));
+			if (obj) {
+				ref = obj;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+
+	template <class T>
+	template <class _T>
+	sl_bool List<T>::insertElements_NoLock(sl_size index, const _T* values, sl_size count)
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->insertElements_NoLock(index, values, count);
+		} else {
+			obj = CList<T>::create(values, count);
+			if (obj) {
+				ref = obj;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+
+	template <class T>
+	template <class _T>
+	sl_bool List<T>::insertElements(sl_size index, const _T* values, sl_size count)
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->insertElements(index, values, count);
+		} else {
+			obj = CList<T>::create(values, count);
+			if (obj) {
+				ref = obj;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	sl_bool List<T>::insertElements_NoLock(sl_size index, sl_size count, const T& value)
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->insertElements_NoLock(index, count, value);
+		} else {
+			obj = CList<T>::createFromElement(value, count);
+			if (obj) {
+				ref = obj;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	sl_bool List<T>::insertElements(sl_size index, sl_size count, const T& value)
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->insertElements(index, count, value);
+		} else {
+			obj = CList<T>::createFromElement(value, count);
+			if (obj) {
+				ref = obj;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	template <class _T>
+	sl_bool List<T>::insertAll_NoLock(sl_size index, const List<_T>& _other)
+	{
+		CList<_T>* other = _other.ref._ptr;
+		if (!other) {
+			return sl_true;
+		}
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->insertAll_NoLock(index, other);
+		} else {
+			obj = CList<T>::create(other->getData(), other->getCount());
+			if (obj) {
+				ref = obj;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	template <class _T>
+	sl_bool List<T>::insertAll_NoLock(sl_size index, const AtomicList<_T>& other)
+	{
+		return insertAll_NoLock(index, List<_T>(other));
+	}
+
+	template <class T>
+	template <class _T>
+	sl_bool List<T>::insertAll(sl_size index, const List<_T>& _other)
+	{
+		CList<_T>* other = _other.ref._ptr;
+		if (!other) {
+			return sl_true;
+		}
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->insertAll(index, other);
+		} else {
+			{
+				ObjectLocker lock(other);
+				obj = CList<T>::create(other->getData(), other->getCount());
+			}
+			if (obj) {
+				ref = obj;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+
+	template <class T>
+	template <class _T>
+	sl_bool List<T>::insertAll(sl_size index, const AtomicList<_T>& other)
+	{
+		return insertAll(index, List<_T>(other));
+	}
+
+	template <class T>
+	template <class... ARGS>
+	sl_bool List<T>::add_NoLock(ARGS&&... args)
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->add_NoLock(Forward<ARGS>(args)...);
+		} else {
+			obj = CList<T>::createFromElement(T(Forward<ARGS>(args)...));
+			if (obj) {
+				ref = obj;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+
+	template <class T>
+	template <class... ARGS>
+	sl_bool List<T>::add(ARGS&&... args)
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->add(Forward<ARGS>(args)...);
+		} else {
+			obj = CList<T>::createFromElement(T(Forward<ARGS>(args)...));
 			if (obj) {
 				ref = obj;
 				return sl_true;
@@ -1402,7 +1708,7 @@ namespace slib
 		if (obj) {
 			return obj->addElements_NoLock(values, count);
 		} else {
-			obj = CList<T>::createFromArray(values, count);
+			obj = CList<T>::create(values, count);
 			if (obj) {
 				ref = obj;
 				return sl_true;
@@ -1422,7 +1728,45 @@ namespace slib
 		if (obj) {
 			return obj->addElements(values, count);
 		} else {
-			obj = CList<T>::createFromArray(values, count);
+			obj = CList<T>::create(values, count);
+			if (obj) {
+				ref = obj;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	sl_bool List<T>::addElements_NoLock(sl_size count, const T& value)
+	{
+		if (count == 0) {
+			return sl_true;
+		}
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->addElements_NoLock(count, value);
+		} else {
+			obj = CList<T>::createFromElement(value, count);
+			if (obj) {
+				ref = obj;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	sl_bool List<T>::addElements(sl_size count, const T& value)
+	{
+		if (count == 0) {
+			return sl_true;
+		}
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->addElements(count, value);
+		} else {
+			obj = CList<T>::create(count, value);
 			if (obj) {
 				ref = obj;
 				return sl_true;
@@ -1443,7 +1787,7 @@ namespace slib
 		if (obj) {
 			return obj->addAll_NoLock(other);
 		} else {
-			obj = CList<T>::createCopy(other);
+			obj = CList<T>::create(other->getData(), other->getCount());
 			if (obj) {
 				ref = obj;
 				return sl_true;
@@ -1471,7 +1815,10 @@ namespace slib
 		if (obj) {
 			return obj->addAll(other);
 		} else {
-			obj = CList<T>::createCopy(other);
+			{
+				ObjectLocker lock(other);
+				obj = CList<T>::create(other->getData(), other->getCount());
+			}
 			if (obj) {
 				ref = obj;
 				return sl_true;
@@ -1489,11 +1836,11 @@ namespace slib
 
 	template <class T>
 	template <class _T, class EQUALS>
-	sl_bool List<T>::addIfNotExist_NoLock(const _T& value, const EQUALS& equals)
+	sl_bool List<T>::addIfNotExist_NoLock(_T&& value, const EQUALS& equals)
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->addIfNotExist_NoLock(value, equals);
+			return obj->addIfNotExist_NoLock(Forward<_T>(value), equals);
 		} else {
 			obj = CList<T>::createFromElement(value);
 			if (obj) {
@@ -1506,11 +1853,11 @@ namespace slib
 
 	template <class T>
 	template <class _T, class EQUALS>
-	sl_bool List<T>::addIfNotExist(const _T& value, const EQUALS& equals)
+	sl_bool List<T>::addIfNotExist(_T&& value, const EQUALS& equals)
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->addIfNotExist(value, equals);
+			return obj->addIfNotExist(Forward<_T>(value), equals);
 		} else {
 			obj = CList<T>::createFromElement(value);
 			if (obj) {
@@ -1704,7 +2051,7 @@ namespace slib
 		}
 		return 0;
 	}
-
+	
 	template <class T>
 	sl_bool List<T>::popBack_NoLock(T* _out) const
 	{
@@ -1755,7 +2102,7 @@ namespace slib
 		}
 		return -1;
 	}
-
+	
 	template <class T>
 	template <class _T, class EQUALS>
 	sl_reg List<T>::indexOf(const _T& value, sl_reg start, const EQUALS& equals) const
@@ -1788,7 +2135,7 @@ namespace slib
 		}
 		return -1;
 	}
-
+	
 	template <class T>
 	template <class _T, class EQUALS>
 	sl_bool List<T>::contains_NoLock(const _T& value, const EQUALS& equals) const
@@ -1880,7 +2227,7 @@ namespace slib
 		}
 		return sl_null;
 	}
-
+	
 	template <class T>
 	T* List<T>::begin() const
 	{
@@ -1924,8 +2271,13 @@ namespace slib
 	}
 	
 	template <class T>
+	Atomic< List<T> >::Atomic(sl_size count, sl_size capacity, const T& initialValue): ref(CList<T>::create(count, capacity, initialValue))
+	{
+	}
+
+	template <class T>
 	template <class _T>
-	Atomic< List<T> >::Atomic(const _T* values, sl_size count): ref(CList<T>::createFromArray(values, count))
+	Atomic< List<T> >::Atomic(const _T* values, sl_size count): ref(CList<T>::create(values, count))
 	{
 	}
 	
@@ -1998,11 +2350,12 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool Atomic< List<T> >::setAt(sl_size index, const T& value) const
+	template <class _T>
+	sl_bool Atomic< List<T> >::setAt(sl_size index, _T&& value) const
 	{
 		Ref< CList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->setAt(index, value);
+			return obj->setAt(index, Forward<_T>(value));
 		}
 		return sl_false;
 	}
@@ -2040,64 +2393,164 @@ namespace slib
 		}
 		return sl_false;
 	}
-
+	
 	template <class T>
-	sl_bool Atomic< List<T> >::insert(sl_size index, const T& value) const
+	sl_bool Atomic< List<T> >::setCapacity(sl_size capacity)
 	{
 		Ref< CList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->insert(index, value);
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	template <class _T>
-	sl_bool Atomic< List<T> >::insertElements(sl_size index, const _T* values, sl_size count) const
-	{
-		Ref< CList<T> > obj(ref);
-		if (obj.isNotNull()) {
-			return obj->insertElements(index, values, count);
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	template <class _T>
-	sl_bool Atomic< List<T> >::insertAll(sl_size index, const List<_T>& other) const
-	{
-		Ref< CList<T> > obj(ref);
-		if (obj.isNotNull()) {
-			return obj->insertAll(index, other.ref._ptr);
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	template <class _T>
-	sl_bool Atomic< List<T> >::insertAll(sl_size index, const AtomicList<_T>& other) const
-	{
-		return insertAll(index, List<_T>(other));
-	}
-
-	template <class T>
-	sl_bool Atomic< List<T> >::add(const T& value)
-	{
-		Ref< CList<T> > obj(ref);
-		if (obj.isNotNull()) {
-			return obj->add(value);
+			return obj->setCapacity(capacity);
 		} else {
 			SpinLocker lock(SpinLockPoolForList::get(this));
 			obj = ref;
 			if (obj.isNotNull()) {
 				lock.unlock();
-				return obj->add(value);
+				return obj->setCapacity(capacity);
 			}
 			obj = CList<T>::create();
 			if (obj.isNotNull()) {
 				ref = obj;
 				lock.unlock();
-				return obj->add(value);
+				return obj->setCapacity(capacity);
+			}
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	sl_bool Atomic< List<T> >::shrinkToFit() const
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->shrinkToFit();
+		}
+	}
+	
+	template <class T>
+	template <class... ARGS>
+	sl_bool Atomic< List<T> >::insert(sl_size index, ARGS&&... args)
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->insert(index, Forward<ARGS>(args)...);
+		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				return obj->insert(index, Forward<ARGS>(args)...);
+			}
+			obj = CList<T>::create();
+			if (obj.isNotNull()) {
+				ref = obj;
+				lock.unlock();
+				return obj->insert(index, Forward<ARGS>(args)...);
+			}
+		}
+		return sl_false;
+	}
+
+	template <class T>
+	template <class _T>
+	sl_bool Atomic< List<T> >::insertElements(sl_size index, const _T* values, sl_size count)
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->insertElements(index, values, count);
+		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				return obj->insertElements(index, values, count);
+			}
+			obj = CList<T>::create();
+			if (obj.isNotNull()) {
+				ref = obj;
+				lock.unlock();
+				return obj->insertElements(index, values, count);
+			}
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	sl_bool Atomic< List<T> >::insertElements(sl_size index, sl_size count, const T& value)
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->insertElements(index, count, value);
+		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				return obj->insertElements(index, count, value);
+			}
+			obj = CList<T>::create();
+			if (obj.isNotNull()) {
+				ref = obj;
+				lock.unlock();
+				return obj->insertElements(index, count, value);
+			}
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	template <class _T>
+	sl_bool Atomic< List<T> >::insertAll(sl_size index, const List<_T>& _other)
+	{
+		CList<_T>* other = _other.object;
+		if (!other) {
+			return sl_true;
+		}
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->insertAll(index, other);
+		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				return obj->insertAll(index, other);
+			}
+			obj = CList<T>::create();
+			if (obj.isNotNull()) {
+				ref = obj;
+				lock.unlock();
+				return obj->insertAll(index, other);
+			}
+		}
+		return sl_false;
+	}
+
+	template <class T>
+	template <class _T>
+	sl_bool Atomic< List<T> >::insertAll(sl_size index, const AtomicList<_T>& other)
+	{
+		return insertAll(index, List<_T>(other));
+	}
+
+	template <class T>
+	template <class... ARGS>
+	sl_bool Atomic< List<T> >::add(ARGS&&... args)
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->add(Forward<ARGS>(args)...);
+		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				return obj->add(Forward<ARGS>(args)...);
+			}
+			obj = CList<T>::create();
+			if (obj.isNotNull()) {
+				ref = obj;
+				lock.unlock();
+				return obj->add(Forward<ARGS>(args)...);
 			}
 		}
 		return sl_false;
@@ -2125,6 +2578,32 @@ namespace slib
 				ref = obj;
 				lock.unlock();
 				return obj->addElements(values, count);
+			}
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	sl_bool Atomic< List<T> >::addElements(sl_size count, const T& value)
+	{
+		if (count == 0) {
+			return sl_true;
+		}
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->addElements(count, value);
+		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				return obj->addElements(count, value);
+			}
+			obj = CList<T>::create();
+			if (obj.isNotNull()) {
+				ref = obj;
+				lock.unlock();
+				return obj->addElements(count, value);
 			}
 		}
 		return sl_false;
@@ -2167,23 +2646,23 @@ namespace slib
 
 	template <class T>
 	template <class _T, class EQUALS>
-	sl_bool Atomic< List<T> >::addIfNotExist(const _T& value, const EQUALS& equals)
+	sl_bool Atomic< List<T> >::addIfNotExist(_T&& value, const EQUALS& equals)
 	{
 		Ref< CList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->addIfNotExist(value, equals);
+			return obj->addIfNotExist(Forward<_T>(value), equals);
 		} else {
 			SpinLocker lock(SpinLockPoolForList::get(this));
 			obj = ref;
 			if (obj.isNotNull()) {
 				lock.unlock();
-				return obj->addIfNotExist(value, equals);
+				return obj->addIfNotExist(Forward<_T>(value), equals);
 			}
 			obj = CList<T>::create();
 			if (obj.isNotNull()) {
 				ref = obj;
 				lock.unlock();
-				return obj->addIfNotExist(value, equals);
+				return obj->addIfNotExist(Forward<_T>(value), equals);
 			}
 		}
 		return sl_false;

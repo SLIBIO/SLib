@@ -19,7 +19,7 @@ namespace slib
 	template <class T>
 	CList<T>* CList<T>::create(const std::initializer_list<T>& l)
 	{
-		return createFromArray(l.begin(), l.size());
+		return create(l.begin(), l.size());
 	}
 	
 	template <class T>
@@ -48,31 +48,31 @@ namespace slib
 
 	
 	template <class T>
-	List<T>::List(const std::initializer_list<T>& l) : ref(CList<T>::createFromArray(l.begin(), l.size()))
+	List<T>::List(const std::initializer_list<T>& l) : ref(CList<T>::create(l.begin(), l.size()))
 	{
 	}
 	
 	template <class T>
 	List<T> List<T>::create(const std::initializer_list<T>& l)
 	{
-		return createFromArray(l.begin(), l.size());
+		return create(l.begin(), l.size());
 	}
 	
 	template <class T>
 	List<T>& List<T>::operator=(const std::initializer_list<T>& l)
 	{
-		ref = CList<T>::createFromArray(l.begin(), l.size());
+		ref = CList<T>::create(l.begin(), l.size());
 		return *this;
 	}
 	
 	template <class T>
-	sl_bool List<T>::insertElements_NoLock(sl_size index, const std::initializer_list<T>& l) const
+	sl_bool List<T>::insertElements_NoLock(sl_size index, const std::initializer_list<T>& l)
 	{
 		return insertElements_NoLock(index, l.begin(), l.size());
 	}
 	
 	template <class T>
-	sl_bool List<T>::insertElements(sl_size index, const std::initializer_list<T>& l) const
+	sl_bool List<T>::insertElements(sl_size index, const std::initializer_list<T>& l)
 	{
 		return insertElements(index, l.begin(), l.size());
 	}
@@ -91,19 +91,19 @@ namespace slib
 
 	
 	template <class T>
-	Atomic< List<T> >::Atomic(const std::initializer_list<T>& l) : ref(CList<T>::createFromArray(l.begin(), l.size()))
+	Atomic< List<T> >::Atomic(const std::initializer_list<T>& l) : ref(CList<T>::create(l.begin(), l.size()))
 	{
 	}
 	
 	template <class T>
 	Atomic< List<T> >& Atomic< List<T> >::operator=(const std::initializer_list<T>& l)
 	{
-		ref = CList<T>::createFromArray(l.begin(), l.size());
+		ref = CList<T>::create(l.begin(), l.size());
 		return *this;
 	}
 	
 	template <class T>
-	sl_bool Atomic< List<T> >::insertElements(sl_size index, const std::initializer_list<T>& l) const
+	sl_bool Atomic< List<T> >::insertElements(sl_size index, const std::initializer_list<T>& l)
 	{
 		return insertElements(index, l.begin(), l.size());
 	}
@@ -113,5 +113,5 @@ namespace slib
 	{
 		return addElements(l.begin(), l.size());
 	}
-		
+	
 }

@@ -33,12 +33,12 @@ namespace slib
 	template <class T>
 	using AtomicList = Atomic< List<T> >;
 	
-	extern const char _List_ClassID[];
+	extern const char _priv_List_ClassID[];
 	
 	template <class T>
 	class SLIB_EXPORT CList : public Object
 	{
-		SLIB_TEMPLATE_OBJECT(Object, _List_ClassID)
+		SLIB_TEMPLATE_OBJECT(Object, _priv_List_ClassID)
 
 	protected:
 		T* m_data;
@@ -51,10 +51,12 @@ namespace slib
 		CList(sl_size count);
 
 		CList(sl_size count, sl_size capacity);
+		
+		CList(sl_size count, sl_size capacity, const T& initialValue);
 
 		template <class _T>
 		CList(const _T* values, sl_size count);
-
+		
 #ifdef SLIB_SUPPORT_STD_TYPES
 		CList(const std::initializer_list<T>& l);
 #endif
@@ -67,18 +69,20 @@ namespace slib
 		static CList<T>* create(sl_size count);
 
 		static CList<T>* create(sl_size count, sl_size capacity);
+
+		static CList<T>* create(sl_size count, sl_size capacity, const T& initialValue);
 		
+		template <class _T>
+		static CList<T>* create(const _T* values, sl_size count);
+		
+		template <class _T>
+		static CList<T>* create(const Array<_T>& array);
+
 #ifdef SLIB_SUPPORT_STD_TYPES
 		static CList<T>* create(const std::initializer_list<T>& l);
 #endif
 		
-		template <class _T>
-		static CList<T>* createFromArray(const _T* values, sl_size count);
-
-		template <class _T>
-		static CList<T>* createFromArray(const Array<_T>& array);
-
-		static CList<T>* createFromElement(const T& value);
+		static CList<T>* createFromElement(const T& value, sl_size count = 1);
 		
 		template <class... ARGS>
 		static CList<T>* createFromElements(ARGS&&... values);
@@ -108,9 +112,11 @@ namespace slib
 
 		T getValueAt(sl_size index, const T& def) const;
 
-		sl_bool setAt_NoLock(sl_size index, const T& value) const;
+		template <class _T>
+		sl_bool setAt_NoLock(sl_size index, _T&& value) const;
 
-		sl_bool setAt(sl_size index, const T& value) const;
+		template <class _T>
+		sl_bool setAt(sl_size index, _T&& value) const;
 
 		T const& operator[](sl_size_t index) const;
 
@@ -121,9 +127,23 @@ namespace slib
 
 		sl_bool setCount(sl_size count);
 
-		sl_bool insert_NoLock(sl_size index, const T& value);
+		sl_bool setCapacity_NoLock(sl_size capacity);
+		
+		sl_bool setCapacity(sl_size capacity);
+		
+		sl_bool adjustCapacity_NoLock(sl_size newCount);
+		
+		sl_bool adjustCapacity(sl_size newCount);
+		
+		sl_bool shrinkToFit_NoLock();
+		
+		sl_bool shrinkToFit();
 
-		sl_bool insert(sl_size index, const T& value);
+		template <class... ARGS>
+		sl_bool insert_NoLock(sl_size index, ARGS&&... args);
+		
+		template <class... ARGS>
+		sl_bool insert(sl_size index, ARGS&&... args);
 
 		template <class _T>
 		sl_bool insertElements_NoLock(sl_size index, const _T* values, sl_size count);
@@ -131,6 +151,10 @@ namespace slib
 		template <class _T>
 		sl_bool insertElements(sl_size index, const _T* values, sl_size count);
 		
+		sl_bool insertElements_NoLock(sl_size index, sl_size count, const T& value);
+		
+		sl_bool insertElements(sl_size index, sl_size count, const T& value);
+
 #ifdef SLIB_SUPPORT_STD_TYPES
 		sl_bool insertElements_NoLock(sl_size index, const std::initializer_list<T>& l);
 		
@@ -138,11 +162,16 @@ namespace slib
 #endif
 		
 		template <class _T>
+		sl_bool insertAll_NoLock(sl_size index, const CList<_T>* other);
+		
+		template <class _T>
 		sl_bool insertAll(sl_size index, const CList<_T>* other);
 
-		sl_bool add_NoLock(const T& value);
+		template <class... ARGS>
+		sl_bool add_NoLock(ARGS&&... args);
 
-		sl_bool add(const T& value);
+		template <class... ARGS>
+		sl_bool add(ARGS&&... args);
 	
 		template <class _T>
 		sl_bool addElements_NoLock(const _T* values, sl_size count);
@@ -150,6 +179,10 @@ namespace slib
 		template <class _T>
 		sl_bool addElements(const _T* values, sl_size count);
 		
+		sl_bool addElements_NoLock(sl_size count, const T& value);
+		
+		sl_bool addElements(sl_size count, const T& value);
+
 #ifdef SLIB_SUPPORT_STD_TYPES
 		sl_bool addElements_NoLock(const std::initializer_list<T>& l);
 		
@@ -162,11 +195,11 @@ namespace slib
 		template <class _T>
 		sl_bool addAll(const CList<_T>* other);
 
-		template < class _T, class EQUALS = Equals<T, _T> >
-		sl_bool addIfNotExist_NoLock(const _T& value, const EQUALS& equals = EQUALS());
+		template < class _T, class EQUALS = Equals<T, typename RemoveConstReference<_T>::Type> >
+		sl_bool addIfNotExist_NoLock(_T&& value, const EQUALS& equals = EQUALS());
 
-		template < class _T, class EQUALS = Equals<T, _T> >
-		sl_bool addIfNotExist(const _T& value, const EQUALS& equals = EQUALS());
+		template < class _T, class EQUALS = Equals<T, typename RemoveConstReference<_T>::Type> >
+		sl_bool addIfNotExist(_T&& value, const EQUALS& equals = EQUALS());
 
 		template <class _T>
 		sl_bool addAll_NoLock(const Iterator<_T>& iterator);
@@ -256,10 +289,7 @@ namespace slib
 		T* end();
 
 		T const* end() const;
-
-	protected:
-		sl_bool _setCountInner(sl_size count);
-
+		
 	};
 	
 	template <class T>
@@ -300,6 +330,8 @@ namespace slib
 		
 		List(sl_size count, sl_size capacity);
 		
+		List(sl_size count, sl_size capacity, const T& initialValue);
+		
 		template <class _T>
 		List(const _T* values, sl_size count);
 
@@ -314,17 +346,19 @@ namespace slib
 
 		static List<T> create(sl_size count, sl_size capacity);
 		
+		static List<T> create(sl_size count, sl_size capacity, const T& initialValue);
+		
+		template <class _T>
+		static List<T> create(const _T* values, sl_size count);
+
+		template <class _T>
+		static List<T> create(const Array<_T>& array);
+
 #ifdef SLIB_SUPPORT_STD_TYPES
 		static List<T> create(const std::initializer_list<T>& l);
 #endif
 
-		template <class _T>
-		static List<T> createFromArray(const _T* values, sl_size count);
-
-		template <class _T>
-		static List<T> createFromArray(const Array<_T>& array);
-
-		static List<T> createFromElement(const T& e);
+		static List<T> createFromElement(const T& e, sl_size count = 1);
 		
 		template <class... ARGS>
 		static List<T> createFromElements(ARGS&&... args);
@@ -361,9 +395,11 @@ namespace slib
 
 		T getValueAt(sl_size index, const T& def) const;
 
-		sl_bool setAt_NoLock(sl_size index, const T& value) const;
+		template <class _T>
+		sl_bool setAt_NoLock(sl_size index, _T&& value) const;
 
-		sl_bool setAt(sl_size index, const T& value) const;
+		template <class _T>
+		sl_bool setAt(sl_size index, _T&& value) const;
 
 		T& operator[](sl_size_t index) const;
 
@@ -375,32 +411,54 @@ namespace slib
 		sl_bool setCount_NoLock(sl_size count);
 
 		sl_bool setCount(sl_size count);
+		
+		sl_bool setCapacity_NoLock(sl_size capacity);
+		
+		sl_bool setCapacity(sl_size capacity);
+				
+		sl_bool shrinkToFit_NoLock() const;
+		
+		sl_bool shrinkToFit() const;
 
-		sl_bool insert_NoLock(sl_size index, const T& value) const;
+		template <class... ARGS>
+		sl_bool insert_NoLock(sl_size index, ARGS&&... args);
 
-		sl_bool insert(sl_size index, const T& value) const;
+		template <class... ARGS>
+		sl_bool insert(sl_size index, ARGS&&... args);
 	
 		template <class _T>
-		sl_bool insertElements_NoLock(sl_size index, const _T* values, sl_size count) const;
+		sl_bool insertElements_NoLock(sl_size index, const _T* values, sl_size count);
 
 		template <class _T>
-		sl_bool insertElements(sl_size index, const _T* values, sl_size count) const;
+		sl_bool insertElements(sl_size index, const _T* values, sl_size count);
 		
+		sl_bool insertElements_NoLock(sl_size index, sl_size count, const T& value);
+		
+		sl_bool insertElements(sl_size index, sl_size count, const T& value);
+
 #ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool insertElements_NoLock(sl_size index, const std::initializer_list<T>& l) const;
+		sl_bool insertElements_NoLock(sl_size index, const std::initializer_list<T>& l);
 		
-		sl_bool insertElements(sl_size index, const std::initializer_list<T>& l) const;
+		sl_bool insertElements(sl_size index, const std::initializer_list<T>& l);
 #endif
+		
+		template <class _T>
+		sl_bool insertAll_NoLock(sl_size index, const List<_T>& other);
+		
+		template <class _T>
+		sl_bool insertAll_NoLock(sl_size index, const AtomicList<_T>& other);
 
 		template <class _T>
-		sl_bool insertAll(sl_size index, const List<_T>& other) const;
+		sl_bool insertAll(sl_size index, const List<_T>& other);
 
 		template <class _T>
-		sl_bool insertAll(sl_size index, const AtomicList<_T>& other) const;
+		sl_bool insertAll(sl_size index, const AtomicList<_T>& other);
 
-		sl_bool add_NoLock(const T& value);
+		template <class... ARGS>
+		sl_bool add_NoLock(ARGS&&... args);
 
-		sl_bool add(const T& value);
+		template <class... ARGS>
+		sl_bool add(ARGS&&... args);
 	
 		template <class _T>
 		sl_bool addElements_NoLock(const _T* values, sl_size count);
@@ -408,6 +466,10 @@ namespace slib
 		template <class _T>
 		sl_bool addElements(const _T* values, sl_size count);
 		
+		sl_bool addElements_NoLock(sl_size count, const T& value);
+		
+		sl_bool addElements(sl_size count, const T& value);
+
 #ifdef SLIB_SUPPORT_STD_TYPES
 		sl_bool addElements_NoLock(const std::initializer_list<T>& l);
 		
@@ -426,11 +488,11 @@ namespace slib
 		template <class _T>
 		sl_bool addAll(const AtomicList<_T>& _other);
 
-		template < class _T, class EQUALS = Equals<T, _T> >
-		sl_bool addIfNotExist_NoLock(const _T& value, const EQUALS& equals = EQUALS());
+		template < class _T, class EQUALS = Equals<T, typename RemoveConstReference<_T>::Type> >
+		sl_bool addIfNotExist_NoLock(_T&& value, const EQUALS& equals = EQUALS());
 
-		template < class _T, class EQUALS = Equals<T, _T> >
-		sl_bool addIfNotExist(const _T& value, const EQUALS& equals = EQUALS());
+		template < class _T, class EQUALS = Equals<T, typename RemoveConstReference<_T>::Type> >
+		sl_bool addIfNotExist(_T&& value, const EQUALS& equals = EQUALS());
 
 		template <class _T>
 		sl_bool addAll_NoLock(const Iterator<_T>& iterator);
@@ -533,9 +595,11 @@ namespace slib
 		
 		Atomic(sl_size count, sl_size capacity);
 		
+		Atomic(sl_size count, sl_size capacity, const T& initialValue);
+		
 		template <class _T>
 		Atomic(const _T* values, sl_size count);
-
+		
 #ifdef SLIB_SUPPORT_STD_TYPES
 		Atomic(const std::initializer_list<T>& l);
 #endif
@@ -557,7 +621,8 @@ namespace slib
 
 		T getValueAt(sl_size index, const T& def) const;
 
-		sl_bool setAt(sl_size index, const T& value) const;
+		template <class _T>
+		sl_bool setAt(sl_size index, _T&& value) const;
 
 		T operator[](sl_size_t index) const;
 		
@@ -567,27 +632,37 @@ namespace slib
 
 	public:
 		sl_bool setCount(sl_size count);
+		
+		sl_bool setCapacity(sl_size capacity);
+		
+		sl_bool shrinkToFit() const;
 
-		sl_bool insert(sl_size index, const T& value) const;
+		template <class... ARGS>
+		sl_bool insert(sl_size index, ARGS&&... args);
 
 		template <class _T>
-		sl_bool insertElements(sl_size index, const _T* values, sl_size count) const;
+		sl_bool insertElements(sl_size index, const _T* values, sl_size count);
+		
+		sl_bool insertElements(sl_size index, sl_size count, const T& value);
 
 #ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool insertElements(sl_size index, const std::initializer_list<T>& l) const;
+		sl_bool insertElements(sl_size index, const std::initializer_list<T>& l);
 #endif
 		
 		template <class _T>
-		sl_bool insertAll(sl_size index, const List<_T>& other) const;
+		sl_bool insertAll(sl_size index, const List<_T>& other);
 
 		template <class _T>
-		sl_bool insertAll(sl_size index, const AtomicList<_T>& other) const;
+		sl_bool insertAll(sl_size index, const AtomicList<_T>& other);
 
-		sl_bool add(const T& value);
+		template <class... ARGS>
+		sl_bool add(ARGS&&... args);
 
 		template <class _T>
 		sl_bool addElements(const _T* values, sl_size count);
 		
+		sl_bool addElements(sl_size count, const T& value);
+
 #ifdef SLIB_SUPPORT_STD_TYPES
 		sl_bool addElements(const std::initializer_list<T>& l);
 #endif
@@ -598,8 +673,8 @@ namespace slib
 		template <class _T>
 		sl_bool addAll(const AtomicList<_T>& _other);
 
-		template < class _T, class EQUALS = Equals<T, _T> >
-		sl_bool addIfNotExist(const _T& value, const EQUALS& equals = EQUALS());
+		template < class _T, class EQUALS = Equals<T, typename RemoveConstReference<_T>::Type> >
+		sl_bool addIfNotExist(_T&& value, const EQUALS& equals = EQUALS());
 
 		template <class _T>
 		sl_bool addAll(const Iterator<_T>& iterator);
