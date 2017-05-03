@@ -14,9 +14,14 @@
 #include "definition.h"
 
 #include "variant.h"
+#include "cast.h"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 #include <initializer_list>
+#include <string>
+#include <vector>
+#include <map>
+#include <unordered_map>
 #endif
 
 namespace slib
@@ -69,7 +74,7 @@ namespace slib
 	public:
 		Json(sl_null_t);
 		
-		Json(char value);
+		Json(signed char value);
 		
 		Json(unsigned char value);
 		
@@ -106,6 +111,12 @@ namespace slib
 		Json(const sl_char8* sz8);
 		
 		Json(const sl_char16* sz16);
+		
+#ifdef SLIB_SUPPORT_STD_TYPES
+		Json(const std::string& value);
+
+		Json(const std::u16string& value);
+#endif
 		
 		Json(const Time& value);
 		
@@ -150,12 +161,6 @@ namespace slib
 		
 		template <class T>
 		Json(const AtomicList<T>& list);
-		
-		template <class T>
-		Json(const Map<String, T>& map);
-		
-		template <class T>
-		Json(const AtomicMap<String, T>& map);
 		
 		template <class KT, class VT>
 		Json(const Map<KT, VT>& map);
@@ -277,9 +282,9 @@ namespace slib
 		void get(AtomicVariant& _out) const;
 		void set(const AtomicVariant& _in);
 		
-		void get(char& _out) const;
-		void get(char& _out, char def) const;
-		void set(char _in);
+		void get(signed char& _out) const;
+		void get(signed char& _out, signed char def) const;
+		void set(signed char _in);
 		
 		void get(unsigned char& _out) const;
 		void get(unsigned char& _out, unsigned char def) const;
@@ -348,6 +353,16 @@ namespace slib
 		void set(const sl_char8* sz8);
 		void set(const sl_char16* sz16);
 		
+#ifdef SLIB_SUPPORT_STD_TYPES
+		void get(std::string& _out) const;
+		void get(std::string& _out, const std::string& def) const;
+		void set(const std::string& _in);
+
+		void get(std::u16string& _out) const;
+		void get(std::u16string& _out, const std::u16string& def) const;
+		void set(const std::u16string& _in);
+#endif
+
 		void get(Time& _out) const;
 		void get(Time& _out, const Time& def) const;
 		void set(const Time& _in);
@@ -402,7 +417,7 @@ namespace slib
 		
 		void get(AtomicList< Map<String, Json> >& _out) const;
 		void set(const AtomicList< Map<String, Json> >& _in);
-
+		
 		template <class T>
 		void get(List<T>& _out) const;
 		template <class T>
@@ -413,16 +428,6 @@ namespace slib
 		template <class T>
 		void set(const AtomicList<T>& _in);
 		
-		template <class T>
-		void get(Map<String, T>& _out) const;
-		template <class T>
-		void set(const Map<String, T>& _in);
-		
-		template <class T>
-		void get(AtomicMap<String, T>& _out) const;
-		template <class T>
-		void set(const AtomicMap<String, T>& _in);
-		
 		template <class KT, class VT>
 		void get(Map<KT, VT>& _out) const;
 		template <class KT, class VT>
@@ -432,6 +437,23 @@ namespace slib
 		void get(AtomicMap<KT, VT>& _out) const;
 		template <class KT, class VT>
 		void set(const AtomicMap<KT, VT>& _in);
+		
+#ifdef SLIB_SUPPORT_STD_TYPES
+		template <class T>
+		void get(std::vector<T>& _out) const;
+		template <class T>
+		void set(const std::vector<T>& _in);
+		
+		template <class KT, class VT, class COMPARE, class ALLOC>
+		void get(std::map<KT, VT, COMPARE, ALLOC>& _out) const;
+		template <class KT, class VT, class COMPARE, class ALLOC>
+		void set(const std::map<KT, VT, COMPARE, ALLOC>& _in);
+		
+		template <class KT, class VT, class HASH, class PRED, class ALLOC>
+		void get(std::unordered_map<KT, VT, HASH, PRED, ALLOC>& _out) const;
+		template <class KT, class VT, class HASH, class PRED, class ALLOC>
+		void set(const std::unordered_map<KT, VT, HASH, PRED, ALLOC>& _in);
+#endif
 
 		template <class T>
 		void get(T& _out) const;
@@ -465,5 +487,9 @@ namespace slib
 }
 
 #include "detail/json.inc"
+
+#ifdef SLIB_SUPPORT_STD_TYPES
+#include "detail/json_std.inc"
+#endif
 
 #endif

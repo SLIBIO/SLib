@@ -81,7 +81,7 @@ namespace slib
 	{
 	}
 	
-	Json::Json(char value): Variant(value)
+	Json::Json(signed char value): Variant(value)
 	{
 	}
 	
@@ -154,6 +154,14 @@ namespace slib
 	}
 	
 	Json::Json(const sl_char16* sz16): Variant(sz16)
+	{
+	}
+	
+	Json::Json(const std::string& str): Variant(str)
+	{
+	}
+	
+	Json::Json(const std::u16string& str): Variant(str)
 	{
 	}
 
@@ -822,17 +830,17 @@ namespace slib
 		*this = _in;
 	}
 	
-	void Json::get(char& _out) const
+	void Json::get(signed char& _out) const
 	{
 		_out = (char)(getInt32());
 	}
 	
-	void Json::get(char& _out, char def) const
+	void Json::get(signed char& _out, signed char def) const
 	{
 		_out = (char)(getInt32((sl_int32)def));
 	}
 	
-	void Json::set(char _in)
+	void Json::set(signed char _in)
 	{
 		setInt32((sl_int32)_in);
 	}
