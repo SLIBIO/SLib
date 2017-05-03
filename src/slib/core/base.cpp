@@ -682,16 +682,12 @@ namespace slib
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
-#if SLIB_WCHAR_SIZE == 4
-		return ::wcsnlen((wchar_t*)sz, count);
-#else
 		for (sl_reg i = 0; i < count; i++) {
 			if (sz[i] == 0) {
 				return i;
 			}
 		}
 		return count;
-#endif
 	}
 
 	sl_int32 Base::interlockedIncrement32(sl_int32* pValue) noexcept
