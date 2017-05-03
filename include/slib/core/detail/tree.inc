@@ -11,53 +11,53 @@
 namespace slib
 {
 	
-	SLIB_INLINE sl_bool TreeNode::operator==(const TreeNode& other) const
+	SLIB_INLINE sl_bool BTreeNode::operator==(const BTreeNode& other) const
 	{
 		return position == other.position;
 	}
 	
-	SLIB_INLINE sl_bool TreeNode::operator!=(const TreeNode& other) const
+	SLIB_INLINE sl_bool BTreeNode::operator!=(const BTreeNode& other) const
 	{
 		return position != other.position;
 	}
 	
-	SLIB_INLINE sl_bool TreeNode::isNull() const
+	SLIB_INLINE sl_bool BTreeNode::isNull() const
 	{
 		return position == 0;
 	}
 	
-	SLIB_INLINE sl_bool TreeNode::isNotNull() const
+	SLIB_INLINE sl_bool BTreeNode::isNotNull() const
 	{
 		return position != 0;
 	}
 	
-	SLIB_INLINE void TreeNode::setNull()
+	SLIB_INLINE void BTreeNode::setNull()
 	{
 		position = 0;
 	}
 	
 	
-	SLIB_INLINE sl_bool TreePosition::operator==(const TreePosition& other) const
+	SLIB_INLINE sl_bool BTreePosition::operator==(const BTreePosition& other) const
 	{
 		return node == other.node && item == other.item;
 	}
 	
-	SLIB_INLINE sl_bool TreePosition::operator!=(const TreePosition& other) const
+	SLIB_INLINE sl_bool BTreePosition::operator!=(const BTreePosition& other) const
 	{
 		return node != other.node || item != other.item;
 	}
 	
-	SLIB_INLINE sl_bool TreePosition::isNull() const
+	SLIB_INLINE sl_bool BTreePosition::isNull() const
 	{
 		return node.isNull();
 	}
 	
-	SLIB_INLINE sl_bool TreePosition::isNotNull() const
+	SLIB_INLINE sl_bool BTreePosition::isNotNull() const
 	{
 		return node.isNotNull();
 	}
 	
-	SLIB_INLINE void TreePosition::setNull()
+	SLIB_INLINE void BTreePosition::setNull()
 	{
 		node.setNull();
 	}
@@ -111,15 +111,15 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::search(const KT& key, TreePosition* pos, VT* outValue) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::search(const KT& key, BTreePosition* pos, VT* outValue) const
 	{
 		return searchInNode(key, getRootNode(), pos, outValue);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::searchInNode(const KT& key, const TreeNode& node, TreePosition* pos, VT* outValue) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::searchInNode(const KT& key, const BTreeNode& node, BTreePosition* pos, VT* outValue) const
 	{
-		TreeNode link;
+		BTreeNode link;
 		sl_uint32 item;
 		if (searchItemInNode(key, node, item, link, outValue)) {
 			if (pos) {
@@ -141,7 +141,7 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::searchItemInNode(const KT& key, const TreeNode& node, sl_uint32& pos, TreeNode& link, VT* outValue) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::searchItemInNode(const KT& key, const BTreeNode& node, sl_uint32& pos, BTreeNode& link, VT* outValue) const
 	{
 		pos = 0;
 		NodeDataScope data(this, node);
@@ -175,10 +175,10 @@ namespace slib
 
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class _VT, class VALUE_EQUALS>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::searchKeyAndValue(const KT& key, const _VT& value, TreePosition* pPos, VT* outValue, const VALUE_EQUALS& value_equals) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::searchKeyAndValue(const KT& key, const _VT& value, BTreePosition* pPos, VT* outValue, const VALUE_EQUALS& value_equals) const
 	{
 		List<VT> ret;
-		TreePosition pos;
+		BTreePosition pos;
 		if (search(key, &pos)) {
 			VT v;
 			if (!(getAt(pos, sl_null, &v))) {
@@ -196,7 +196,7 @@ namespace slib
 				}
 				return sl_true;
 			}
-			TreePosition posMid = pos;
+			BTreePosition posMid = pos;
 			KT keyItem;
 			while (getPrevPosition(pos, &keyItem, &v)) {
 				if (m_compare(keyItem, key) == 0) {
@@ -241,12 +241,12 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::getRange(const KT& key, TreePosition* pPosBegin, TreePosition* pPosEnd) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::getRange(const KT& key, BTreePosition* pPosBegin, BTreePosition* pPosEnd) const
 	{
-		TreePosition pos;
+		BTreePosition pos;
 		if (search(key, &pos)) {
-			TreePosition posBegin = pos;
-			TreePosition posEnd = pos;
+			BTreePosition posBegin = pos;
+			BTreePosition posEnd = pos;
 			KT keyItem;
 			while (getPrevPosition(pos, &keyItem)) {
 				if (m_compare(keyItem, key) == 0) {
@@ -275,7 +275,7 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::getAt(const TreePosition& pos, KT* key, VT* value) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::getAt(const BTreePosition& pos, KT* key, VT* value) const
 	{
 		NodeDataScope data(this, pos.node);
 		if (data.isNotNull()) {
@@ -293,7 +293,7 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	VT* BTree<KT, VT, KEY_COMPARE>::getValuePointerAt(const TreePosition& pos) const
+	VT* BTree<KT, VT, KEY_COMPARE>::getValuePointerAt(const BTreePosition& pos) const
 	{
 		NodeDataScope data(this, pos.node);
 		if (data.isNotNull()) {
@@ -311,7 +311,7 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_uint64 BTree<KT, VT, KEY_COMPARE>::getCountInNode(const TreeNode& node) const
+	sl_uint64 BTree<KT, VT, KEY_COMPARE>::getCountInNode(const BTreeNode& node) const
 	{
 		if (node.isNull()) {
 			return 0;
@@ -326,9 +326,9 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::getFirstPosition(TreePosition& pos, KT* key, VT* value ) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::getFirstPosition(BTreePosition& pos, KT* key, VT* value ) const
 	{
-		TreeNode node = getRootNode();
+		BTreeNode node = getRootNode();
 		if (node.isNull()) {
 			return sl_false;
 		}
@@ -337,7 +337,7 @@ namespace slib
 			if (data.isNull()) {
 				return sl_false;
 			}
-			TreeNode first = data->linkFirst;
+			BTreeNode first = data->linkFirst;
 			if (first.isNotNull()) {
 				node = first;
 			} else {
@@ -360,12 +360,12 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::getNextPosition(TreePosition& pos, KT* key, VT* value) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::getNextPosition(BTreePosition& pos, KT* key, VT* value) const
 	{
 		if (pos.isNull()) {
 			return getFirstPosition(pos, key, value);
 		}
-		TreeNode nodeStart = pos.node;
+		BTreeNode nodeStart = pos.node;
 		sl_uint32 itemStart = pos.item;
 		NodeDataScope dataStart(this, nodeStart);
 		if (dataStart.isNull()) {
@@ -374,14 +374,14 @@ namespace slib
 		if (itemStart >= dataStart->countItems) {
 			return sl_false;
 		}
-		TreeNode node = dataStart->links[itemStart];
+		BTreeNode node = dataStart->links[itemStart];
 		if (node.isNotNull()) {
 			while (1) {
 				NodeDataScope data(this, node);
 				if (data.isNull()) {
 					return sl_false;
 				}
-				TreeNode first = data->linkFirst;
+				BTreeNode first = data->linkFirst;
 				if (first.isNotNull()) {
 					node = first;
 				} else {
@@ -403,7 +403,7 @@ namespace slib
 		} else {
 			if (itemStart == dataStart->countItems - 1) {
 				node = nodeStart;
-				TreeNode parent = dataStart->linkParent;
+				BTreeNode parent = dataStart->linkParent;
 				while (1) {
 					if (parent.isNull()) {
 						return sl_false;
@@ -460,9 +460,9 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::getLastPosition(TreePosition& pos, KT* key, VT* value) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::getLastPosition(BTreePosition& pos, KT* key, VT* value) const
 	{
-		TreeNode node = getRootNode();
+		BTreeNode node = getRootNode();
 		if (node.isNull()) {
 			return sl_false;
 		}
@@ -473,14 +473,14 @@ namespace slib
 			}
 			sl_uint32 n = data->countItems;
 			if (n == 0) {
-				TreeNode first = data->linkFirst;
+				BTreeNode first = data->linkFirst;
 				if (first.isNotNull()) {
 					node = first;
 				} else {
 					return sl_false;
 				}
 			} else {
-				TreeNode last = data->links[n - 1];
+				BTreeNode last = data->links[n - 1];
 				if (last.isNotNull()) {
 					node = last;
 				} else {
@@ -500,12 +500,12 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::getPrevPosition(TreePosition& pos, KT* key, VT* value) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::getPrevPosition(BTreePosition& pos, KT* key, VT* value) const
 	{
 		if (pos.isNull()) {
 			return getLastPosition(pos, key, value);
 		}
-		TreeNode nodeStart = pos.node;
+		BTreeNode nodeStart = pos.node;
 		sl_uint32 itemStart = pos.item;
 		NodeDataScope dataStart(this, nodeStart);
 		if (dataStart.isNull()) {
@@ -514,7 +514,7 @@ namespace slib
 		if (itemStart >= dataStart->countItems) {
 			return sl_false;
 		}
-		TreeNode node;
+		BTreeNode node;
 		if (itemStart == 0) {
 			node = dataStart->linkFirst;
 		} else {
@@ -528,14 +528,14 @@ namespace slib
 				}
 				sl_uint32 n = data->countItems;
 				if (n == 0) {
-					TreeNode first = data->linkFirst;
+					BTreeNode first = data->linkFirst;
 					if (first.isNotNull()) {
 						node = first;
 					} else {
 						return sl_false;
 					}
 				} else {
-					TreeNode last = data->links[n - 1];
+					BTreeNode last = data->links[n - 1];
 					if (last.isNotNull()) {
 						node = last;
 					} else {
@@ -554,7 +554,7 @@ namespace slib
 		} else {
 			if (itemStart == 0) {
 				node = nodeStart;
-				TreeNode parent = dataStart->linkParent;
+				BTreeNode parent = dataStart->linkParent;
 				while (1) {
 					if (parent.isNull()) {
 						return sl_false;
@@ -607,7 +607,7 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	VT* BTree<KT, VT, KEY_COMPARE>::getItemPointer(const KT& key) const
 	{
-		TreePosition pos;
+		BTreePosition pos;
 		if (search(key, &pos)) {
 			return getValuePointerAt(pos);
 		}
@@ -618,7 +618,7 @@ namespace slib
 	template <class _VT, class VALUE_EQUALS>
 	VT* BTree<KT, VT, KEY_COMPARE>::getItemPointerByKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
 	{
-		TreePosition pos;
+		BTreePosition pos;
 		if (searchKeyAndValue(key, value, &pos, sl_null, value_equals)) {
 			return getValuePointerAt(pos);
 		}
@@ -629,14 +629,14 @@ namespace slib
 	List<VT> BTree<KT, VT, KEY_COMPARE>::getValues(const KT& key) const
 	{
 		List<VT> ret;
-		TreePosition pos;
+		BTreePosition pos;
 		if (search(key, &pos)) {
 			VT value;
 			if (!(getAt(pos, sl_null, &value))) {
 				return ret;
 			}
 			ret.add_NoLock(value);
-			TreePosition posMid = pos;
+			BTreePosition posMid = pos;
 			KT keyItem;
 			while (getPrevPosition(pos, &keyItem, &value)) {
 				if (m_compare(keyItem, key) == 0) {
@@ -662,13 +662,13 @@ namespace slib
 	List<VT> BTree<KT, VT, KEY_COMPARE>::getValuesByKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
 	{
 		List<VT> ret;
-		TreePosition pos;
+		BTreePosition pos;
 		VT v;
 		if (searchKeyAndValue(key, value, &pos, &v, value_equals)) {
 			if (value_equals(v, value)) {
 				ret.add_NoLock(v);
 			}
-			TreePosition posMid = pos;
+			BTreePosition posMid = pos;
 			KT keyItem;
 			while (getPrevPosition(pos, &keyItem, &v)) {
 				if (m_compare(keyItem, key) == 0) {
@@ -699,7 +699,7 @@ namespace slib
 		if (pFlagExist) {
 			*pFlagExist = sl_false;
 		}
-		TreePosition pos;
+		BTreePosition pos;
 		if (search(key, &pos)) {
 			if (pFlagExist) {
 				*pFlagExist = sl_true;
@@ -721,7 +721,7 @@ namespace slib
 		if (mode == MapPutMode::ReplaceExisting) {
 			return sl_false;
 		}
-		TreeNode link;
+		BTreeNode link;
 		return _insertItemInNode(pos.node, pos.item, link, key, value, link);
 	}
 
@@ -732,21 +732,21 @@ namespace slib
 		if (pFlagExist) {
 			*pFlagExist = sl_false;
 		}
-		TreePosition pos;
+		BTreePosition pos;
 		if (searchKeyAndValue(key, value, &pos, sl_null, value_equals)) {
 			if (pFlagExist) {
 				*pFlagExist = sl_true;
 			}
 			return sl_false;
 		}
-		TreeNode link;
+		BTreeNode link;
 		return _insertItemInNode(pos.node, pos.item, link, key, value, link);
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool BTree<KT, VT, KEY_COMPARE>::remove(const KT& key, VT* outValue)
 	{
-		TreePosition pos;
+		BTreePosition pos;
 		if (search(key, &pos, outValue)) {
 			if (removeAt(pos)) {
 				return sl_true;
@@ -758,7 +758,7 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_size BTree<KT, VT, KEY_COMPARE>::removeItems(const KT& key, List<VT>* outValues)
 	{
-		TreePosition pos;
+		BTreePosition pos;
 		if (outValues) {
 			VT v;
 			if (search(key, &pos, &v)) {
@@ -798,7 +798,7 @@ namespace slib
 	template <class _VT, class VALUE_EQUALS>
 	sl_bool BTree<KT, VT, KEY_COMPARE>::removeKeyAndValue(const KT& key, const _VT& value, VT* outValue, const VALUE_EQUALS& value_equals)
 	{
-		TreePosition pos;
+		BTreePosition pos;
 		if (searchKeyAndValue(key, value, &pos, outValue, value_equals)) {
 			if (removeAt(pos)) {
 				return sl_true;
@@ -811,7 +811,7 @@ namespace slib
 	template <class _VT, class VALUE_EQUALS>
 	sl_size BTree<KT, VT, KEY_COMPARE>::removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
 	{
-		TreePosition pos;
+		BTreePosition pos;
 		if (outValues) {
 			VT v;
 			if (searchKeyAndValue(key, value, &pos, &v, value_equals)) {
@@ -848,7 +848,7 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::removeAt(const TreePosition& pos)
+	sl_bool BTree<KT, VT, KEY_COMPARE>::removeAt(const BTreePosition& pos)
 	{
 		if (pos.node.isNull()) {
 			return sl_false;
@@ -864,13 +864,13 @@ namespace slib
 		if (pos.item >= n) {
 			return sl_false;
 		}
-		TreeNode left;
+		BTreeNode left;
 		if (pos.item == 0) {
 			left = data->linkFirst;
 		} else {
 			left = data->links[pos.item - 1];
 		}
-		TreeNode right = data->links[pos.item];
+		BTreeNode right = data->links[pos.item];
 		if (left.isNull()) {
 			if (pos.item == 0) {
 				data->linkFirst = data->links[0];
@@ -879,7 +879,7 @@ namespace slib
 			}
 		} else {
 			if (right.isNotNull()) {
-				TreePosition nextPos = pos;
+				BTreePosition nextPos = pos;
 				KT keyNext;
 				VT valueNext;
 				if (!getNextPosition(nextPos, &keyNext, &valueNext)) {
@@ -917,7 +917,7 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::removeNode(const TreeNode& node)
+	sl_bool BTree<KT, VT, KEY_COMPARE>::removeNode(const BTreeNode& node)
 	{
 		if (node.isNull()) {
 			return sl_false;
@@ -931,7 +931,7 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_size BTree<KT, VT, KEY_COMPARE>::removeAll()
 	{
-		TreeNode node = getRootNode();
+		BTreeNode node = getRootNode();
 		NodeDataScope data(this, node);
 		sl_size countTotal = (sl_size)(data->countTotal);
 		if (data.isNotNull()) {
@@ -955,7 +955,7 @@ namespace slib
 
 
 	template <class KT, class VT, class KEY_COMPARE>
-	SLIB_INLINE BTree<KT, VT, KEY_COMPARE>::NodeDataScope::NodeDataScope(const BTree* tree, const TreeNode& node)
+	SLIB_INLINE BTree<KT, VT, KEY_COMPARE>::NodeDataScope::NodeDataScope(const BTree* tree, const BTreeNode& node)
 	{
 		this->tree = (BTree*)tree;
 		this->data = tree->readNodeData(node);
@@ -996,7 +996,7 @@ namespace slib
 			if (data->keys) {
 				data->values = NewHelper<VT>::create(m_order);
 				if (data->values) {
-					data->links = NewHelper<TreeNode>::create(m_order);
+					data->links = NewHelper<BTreeNode>::create(m_order);
 					if (data->links) {
 						return data;
 					}
@@ -1015,13 +1015,13 @@ namespace slib
 		if (data) {
 			NewHelper<KT>::free(data->keys, m_order);
 			NewHelper<VT>::free(data->values, m_order);
-			NewHelper<TreeNode>::free(data->links, m_order);
+			NewHelper<BTreeNode>::free(data->links, m_order);
 			delete data;
 		}
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::_insertItemInNode(const TreeNode& node, sl_uint32 at, const TreeNode& after, const KT& key, const VT& value, const TreeNode& link)
+	sl_bool BTree<KT, VT, KEY_COMPARE>::_insertItemInNode(const BTreeNode& node, sl_uint32 at, const BTreeNode& after, const KT& key, const VT& value, const BTreeNode& link)
 	{
 		NodeDataScope data(this, node);
 		if (data.isNull()) {
@@ -1112,7 +1112,7 @@ namespace slib
 					keyTop = key;
 					valueTop = value;
 				}
-				TreeNode parent = data->linkParent;
+				BTreeNode parent = data->linkParent;
 				sl_bool flagCreateRoot = sl_false;
 				if (parent.isNull()) {
 					parent = createNode(sl_null);
@@ -1133,7 +1133,7 @@ namespace slib
 				newData->linkParent = parent;
 				newData->countItems = n - half;
 				newData->countTotal = _getTotalCountInData(newData);
-				TreeNode newNode = createNode(newData);
+				BTreeNode newNode = createNode(newData);
 				if (newNode.isNull()) {
 					_freeNodeData(newData);
 					return sl_false;
@@ -1149,7 +1149,7 @@ namespace slib
 						}
 					}
 					for (i = 0; i < n - half; i++) {
-						TreeNode child = newNodeData->links[i];
+						BTreeNode child = newNodeData->links[i];
 						if (child.isNotNull()) {
 							NodeDataScope dataChild(this, child);
 							if (dataChild.isNotNull()) {
@@ -1181,13 +1181,13 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	void BTree<KT, VT, KEY_COMPARE>::_changeTotalCount(const TreeNode& node, sl_int64 n)
+	void BTree<KT, VT, KEY_COMPARE>::_changeTotalCount(const BTreeNode& node, sl_int64 n)
 	{
 		NodeDataScope data(this, node);
 		if (data.isNotNull()) {
 			data->countTotal += n;
 			writeNodeData(node, data.data);
-			TreeNode parent = data->linkParent;
+			BTreeNode parent = data->linkParent;
 			if (parent.isNotNull()) {
 				_changeTotalCount(parent, n);
 			}
@@ -1197,7 +1197,7 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	void BTree<KT, VT, KEY_COMPARE>::_changeParentTotalCount(NodeData* data, sl_int64 n)
 	{
-		TreeNode parent = data->linkParent;
+		BTreeNode parent = data->linkParent;
 		if (parent.isNotNull()) {
 			_changeTotalCount(parent, n);
 		} else {
@@ -1217,7 +1217,7 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::_removeNode(const TreeNode& node, sl_bool flagUpdateParent)
+	sl_bool BTree<KT, VT, KEY_COMPARE>::_removeNode(const BTreeNode& node, sl_bool flagUpdateParent)
 	{
 		if (node.isNull()) {
 			return sl_false;
@@ -1227,7 +1227,7 @@ namespace slib
 			return sl_false;
 		}
 		if (flagUpdateParent) {
-			TreeNode parent = data->linkParent;
+			BTreeNode parent = data->linkParent;
 			if (parent.isNull()) {
 				return sl_false;
 			}
@@ -1280,15 +1280,15 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	TreeNode BTree<KT, VT, KEY_COMPARE>::getRootNode() const
+	BTreeNode BTree<KT, VT, KEY_COMPARE>::getRootNode() const
 	{
-		TreeNode node;
+		BTreeNode node;
 		node.position = (sl_size)m_rootNode;
 		return node;
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::setRootNode(TreeNode node)
+	sl_bool BTree<KT, VT, KEY_COMPARE>::setRootNode(BTreeNode node)
 	{
 		if (node.isNull()) {
 			return sl_false;
@@ -1298,9 +1298,9 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	TreeNode BTree<KT, VT, KEY_COMPARE>::createNode(NodeData* data)
+	BTreeNode BTree<KT, VT, KEY_COMPARE>::createNode(NodeData* data)
 	{
-		TreeNode node;
+		BTreeNode node;
 		if (data) {
 			node.position = (sl_size)data;
 		} else {
@@ -1314,7 +1314,7 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::deleteNode(TreeNode node)
+	sl_bool BTree<KT, VT, KEY_COMPARE>::deleteNode(BTreeNode node)
 	{
 		if (node.isNull()) {
 			return sl_false;
@@ -1325,14 +1325,14 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	typename BTree<KT, VT, KEY_COMPARE>::NodeData* BTree<KT, VT, KEY_COMPARE>::readNodeData(const TreeNode& node) const
+	typename BTree<KT, VT, KEY_COMPARE>::NodeData* BTree<KT, VT, KEY_COMPARE>::readNodeData(const BTreeNode& node) const
 	{
 		NodeData* data = (NodeData*)(void*)(sl_size)(node.position);
 		return data;
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::writeNodeData(const TreeNode& node, NodeData* data)
+	sl_bool BTree<KT, VT, KEY_COMPARE>::writeNodeData(const BTreeNode& node, NodeData* data)
 	{
 		if (node.isNull()) {
 			return sl_false;

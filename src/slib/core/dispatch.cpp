@@ -223,7 +223,7 @@ namespace slib
 			return -1;
 		}
 		sl_int32 timeout = -1;
-		TreePosition pos;
+		BTreePosition pos;
 		TimeTask timeTask;
 		LinkedQueue< Function<void()> > tasks;
 		sl_uint64 t;

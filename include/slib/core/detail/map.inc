@@ -163,7 +163,7 @@ namespace slib
 	{
 	protected:
 		const TreeMap<KT, VT, KEY_COMPARE>* m_map;
-		TreePosition m_pos;
+		BTreePosition m_pos;
 		sl_size m_index;
 		Ref<Referable> m_refer;
 
@@ -187,7 +187,7 @@ namespace slib
 	{
 	protected:
 		const TreeMap<KT, VT, KEY_COMPARE>* m_map;
-		TreePosition m_pos;
+		BTreePosition m_pos;
 		sl_size m_index;
 		Ref<Referable> m_refer;
 
@@ -211,7 +211,7 @@ namespace slib
 	{
 	protected:
 		const TreeMap<KT, VT, KEY_COMPARE>* m_map;
-		TreePosition m_pos;
+		BTreePosition m_pos;
 		sl_size m_index;
 		Ref<Referable> m_refer;
 
@@ -1153,7 +1153,7 @@ namespace slib
 	{
 		TreeMap<KT, VT, KEY_COMPARE>* ret = new TreeMap<KT, VT, KEY_COMPARE>;
 		if (ret) {
-			TreePosition pos;
+			BTreePosition pos;
 			KT key;
 			VT value;
 			while (tree.getNextPosition(pos, &key, &value)) {
@@ -1178,7 +1178,7 @@ namespace slib
 	{
 		CList<KT>* ret = new CList<KT>;
 		if (ret) {
-			TreePosition pos;
+			BTreePosition pos;
 			KT key;
 			while (tree.getNextPosition(pos, &key, sl_null)) {
 				if (!(ret->add_NoLock(key))) {
@@ -1202,7 +1202,7 @@ namespace slib
 	{
 		CList<VT>* ret = new CList<VT>;
 		if (ret) {
-			TreePosition pos;
+			BTreePosition pos;
 			VT value;
 			while (tree.getNextPosition(pos, sl_null, &value)) {
 				if (!(ret->add_NoLock(value))) {
@@ -1226,7 +1226,7 @@ namespace slib
 	{
 		CList< Pair<KT, VT> >* ret = new CList< Pair<KT, VT> >;
 		if (ret) {
-			TreePosition pos;
+			BTreePosition pos;
 			Pair<KT, VT> pair;
 			while (tree.getNextPosition(pos, &(pair.key), &(pair.value))) {
 				if (!(ret->add_NoLock(pair))) {
@@ -2255,7 +2255,7 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool TreeMapKeyIterator<KT, VT, KEY_COMPARE>::hasNext()
 	{
-		TreePosition pos = m_pos;
+		BTreePosition pos = m_pos;
 		return m_map->tree.getNextPosition(pos);
 	}
 
@@ -2285,7 +2285,7 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool TreeMapValueIterator<KT, VT, KEY_COMPARE>::hasNext()
 	{
-		TreePosition pos = m_pos;
+		BTreePosition pos = m_pos;
 		return m_map->tree.getNextPosition(pos);
 	}
 
@@ -2315,7 +2315,7 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool TreeMapIterator<KT, VT, KEY_COMPARE>::hasNext()
 	{
-		TreePosition pos = m_pos;
+		BTreePosition pos = m_pos;
 		return m_map->tree.getNextPosition(pos);
 	}
 

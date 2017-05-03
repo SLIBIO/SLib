@@ -24,15 +24,15 @@
 namespace slib
 {
 	
-	class SLIB_EXPORT TreeNode
+	class SLIB_EXPORT BTreeNode
 	{
 	public:
 		sl_uint64 position = 0;
 	
 	public:
-		sl_bool operator==(const TreeNode& other) const;
+		sl_bool operator==(const BTreeNode& other) const;
 	
-		sl_bool operator!=(const TreeNode& other) const;
+		sl_bool operator!=(const BTreeNode& other) const;
 	
 		sl_bool isNull() const;
 	
@@ -42,16 +42,16 @@ namespace slib
 
 	};
 	
-	class SLIB_EXPORT TreePosition
+	class SLIB_EXPORT BTreePosition
 	{
 	public:
-		TreeNode node;
+		BTreeNode node;
 		sl_uint32 item = 0;
 	
 	public:
-		sl_bool operator==(const TreePosition& other) const;
+		sl_bool operator==(const BTreePosition& other) const;
 
-		sl_bool operator!=(const TreePosition& other) const;
+		sl_bool operator!=(const BTreePosition& other) const;
 
 		sl_bool isNull() const;
 	
@@ -78,32 +78,32 @@ namespace slib
 	
 		sl_uint32 getMaxLength() const;
 
-		sl_bool search(const KT& key, TreePosition* pos = sl_null, VT* outValue = sl_null) const;
+		sl_bool search(const KT& key, BTreePosition* pos = sl_null, VT* outValue = sl_null) const;
 
-		sl_bool searchInNode(const KT& key, const TreeNode& node, TreePosition* pos = sl_null, VT* outValue = sl_null) const;
+		sl_bool searchInNode(const KT& key, const BTreeNode& node, BTreePosition* pos = sl_null, VT* outValue = sl_null) const;
 
-		sl_bool searchItemInNode(const KT& key, const TreeNode& node, sl_uint32& pos, TreeNode& link, VT* outValue = sl_null) const;
+		sl_bool searchItemInNode(const KT& key, const BTreeNode& node, sl_uint32& pos, BTreeNode& link, VT* outValue = sl_null) const;
 
 		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool searchKeyAndValue(const KT& key, const _VT& value, TreePosition* pos = sl_null, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		sl_bool searchKeyAndValue(const KT& key, const _VT& value, BTreePosition* pos = sl_null, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 
-		sl_bool getRange(const KT& key, TreePosition* pPosBegin, TreePosition* pPosEnd) const;
+		sl_bool getRange(const KT& key, BTreePosition* pPosBegin, BTreePosition* pPosEnd) const;
 	
-		sl_bool getAt(const TreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
+		sl_bool getAt(const BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
 
-		VT* getValuePointerAt(const TreePosition& pos) const;
+		VT* getValuePointerAt(const BTreePosition& pos) const;
 
 		sl_uint64 getCount() const;
 
-		sl_uint64 getCountInNode(const TreeNode& node) const;
+		sl_uint64 getCountInNode(const BTreeNode& node) const;
 
-		sl_bool getFirstPosition(TreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
+		sl_bool getFirstPosition(BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
 
-		sl_bool getNextPosition(TreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
+		sl_bool getNextPosition(BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
 	
-		sl_bool getLastPosition(TreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
+		sl_bool getLastPosition(BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
 
-		sl_bool getPrevPosition(TreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
+		sl_bool getPrevPosition(BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
 
 		sl_bool get(const KT& key, VT* value = sl_null) const;
 
@@ -132,9 +132,9 @@ namespace slib
 		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
 		sl_size removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
-		sl_bool removeAt(const TreePosition& pos);
+		sl_bool removeAt(const BTreePosition& pos);
 
-		sl_bool removeNode(const TreeNode& node);
+		sl_bool removeNode(const BTreeNode& node);
 
 		sl_size removeAll();
 
@@ -144,11 +144,11 @@ namespace slib
 			sl_uint64 countTotal;
 			sl_uint32 countItems;
 
-			TreeNode linkParent;
-			TreeNode linkFirst;
+			BTreeNode linkParent;
+			BTreeNode linkFirst;
 			KT* keys;
 			VT* values;
-			TreeNode* links;
+			BTreeNode* links;
 		};
 
 		class NodeDataScope
@@ -158,7 +158,7 @@ namespace slib
 			BTree* tree;
 
 		public:
-			NodeDataScope(const BTree* tree, const TreeNode& node);
+			NodeDataScope(const BTree* tree, const BTreeNode& node);
 
 			~NodeDataScope();
 
@@ -184,15 +184,15 @@ namespace slib
 
 		void _freeNodeData(NodeData* data);
 
-		sl_bool _insertItemInNode(const TreeNode& node, sl_uint32 at, const TreeNode& after, const KT& key, const VT& value, const TreeNode& link);
+		sl_bool _insertItemInNode(const BTreeNode& node, sl_uint32 at, const BTreeNode& after, const KT& key, const VT& value, const BTreeNode& link);
 
-		void _changeTotalCount(const TreeNode& node, sl_int64 n);
+		void _changeTotalCount(const BTreeNode& node, sl_int64 n);
 
 		void _changeParentTotalCount(NodeData* data, sl_int64 n);
 
 		sl_uint64 _getTotalCountInData(NodeData* data) const;
 
-		sl_bool _removeNode(const TreeNode& node, sl_bool flagUpdateParent);
+		sl_bool _removeNode(const BTreeNode& node, sl_bool flagUpdateParent);
 
 		// container-specific implementation
 	private:
@@ -203,18 +203,18 @@ namespace slib
 
 		virtual void free();
 
-		virtual TreeNode getRootNode() const;
+		virtual BTreeNode getRootNode() const;
 		
-		virtual sl_bool setRootNode(TreeNode node);
+		virtual sl_bool setRootNode(BTreeNode node);
 		
 		// here, "data" must be newly created node data. this function should manage the memory of "data" parameter
-		virtual TreeNode createNode(NodeData* data);
+		virtual BTreeNode createNode(NodeData* data);
 		
-		virtual sl_bool deleteNode(TreeNode node);
+		virtual sl_bool deleteNode(BTreeNode node);
 		
-		virtual NodeData* readNodeData(const TreeNode& node) const;
+		virtual NodeData* readNodeData(const BTreeNode& node) const;
 		
-		virtual sl_bool writeNodeData(const TreeNode& node, NodeData* data);
+		virtual sl_bool writeNodeData(const BTreeNode& node, NodeData* data);
 		
 		virtual void releaseNodeData(NodeData* data);
 		
