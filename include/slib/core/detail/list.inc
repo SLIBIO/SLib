@@ -25,7 +25,7 @@ namespace slib
 	CList<T>::CList(sl_size count)
 	{
 		if (count > 0) {
-			T* data = Base::createMemory(count * sizeof(T));
+			T* data = (T*)(Base::createMemory(count * sizeof(T)));
 			if (data) {
 				for (sl_size i = 0; i < count; i++) {
 					new (data + i) T();
@@ -48,7 +48,7 @@ namespace slib
 			capacity = count;
 		}
 		if (capacity > 0) {
-			T* data = Base::createMemory(capacity * sizeof(T));
+			T* data = (T*)(Base::createMemory(capacity * sizeof(T)));
 			if (data) {
 				for (sl_size i = 0; i < count; i++) {
 					new (data + i) T();
@@ -71,7 +71,7 @@ namespace slib
 			capacity = count;
 		}
 		if (capacity > 0) {
-			T* data = Base::createMemory(capacity * sizeof(T));
+			T* data = (T*)(Base::createMemory(capacity * sizeof(T)));
 			if (data) {
 				for (sl_size i = 0; i < count; i++) {
 					new (data + i) T(initialValue);
@@ -92,7 +92,7 @@ namespace slib
 	CList<T>::CList(const _T* values, sl_size count)
 	{
 		if (count > 0) {
-			T* data = Base::createMemory(count * sizeof(T));
+			T* data = (T*)(Base::createMemory(count * sizeof(T)));
 			if (data) {
 				for (sl_size i = 0; i < count; i++) {
 					new (data + i) T(values[i]);
@@ -401,9 +401,9 @@ namespace slib
 		}
 		T* data = m_data;
 		if (data) {
-			data = Base::reallocMemory(data, capacity * sizeof(T));
+			data = (T*)(Base::reallocMemory(data, capacity * sizeof(T)));
 		} else {
-			data = Base::createMemory(capacity * sizeof(T));
+			data = (T*)(Base::createMemory(capacity * sizeof(T)));
 		}
 		if (data) {
 			m_data = data;
@@ -580,7 +580,7 @@ namespace slib
 			return sl_true;
 		}
 		ObjectLocker lock(this);
-		return insertElements_NoLock(index, count, count);
+		return insertElements_NoLock(index, count, value);
 	}
 
 	template <class T>
@@ -1513,6 +1513,7 @@ namespace slib
 		if (obj) {
 			return obj->shrinkToFit_NoLock();
 		}
+		return sl_true;
 	}
 	
 	template <class T>
@@ -1522,6 +1523,7 @@ namespace slib
 		if (obj) {
 			return obj->shrinkToFit();
 		}
+		return sl_true;
 	}
 
 	template <class T>
@@ -1786,7 +1788,7 @@ namespace slib
 		if (obj) {
 			return obj->addElements(count, value);
 		} else {
-			obj = CList<T>::create(count, value);
+			obj = CList<T>::createFromElement(value, count);
 			if (obj) {
 				ref = obj;
 				return sl_true;
@@ -2444,6 +2446,7 @@ namespace slib
 		if (obj.isNotNull()) {
 			return obj->shrinkToFit();
 		}
+		return sl_true;
 	}
 	
 	template <class T>
