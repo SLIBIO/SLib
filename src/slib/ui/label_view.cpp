@@ -42,6 +42,10 @@ namespace slib
 	
 	void LabelView::setText(const String& text, UIUpdateMode mode)
 	{
+		if (m_text == text) {
+			return;
+		}
+		
 		m_text = text;
 		
 		if (isNativeWidget()) {
