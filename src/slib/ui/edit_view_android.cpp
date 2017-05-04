@@ -31,6 +31,22 @@ namespace slib
 		}
 	}
 
+	void JNICALL Android_EditView_nativeOnDone(JNIEnv* env, jobject _this, jlong instance)
+	{
+		Ref<View> _view = Android_ViewInstance::findView(instance);
+		if (EditView* view = CastInstance<EditView>(_view.get())) {
+			view->dispatchDoneEdit();
+		}
+	}
+
+	void JNICALL Android_EditView_nativeOnReturn(JNIEnv* env, jobject _this, jlong instance)
+	{
+		Ref<View> _view = Android_ViewInstance::findView(instance);
+		if (EditView* view = CastInstance<EditView>(_view.get())) {
+			view->dispatchReturnKey();
+		}
+	}
+
 	SLIB_JNI_BEGIN_CLASS(JAndroidEditView, "slib/platform/android/ui/view/UiEditView")
 
 		SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;I)Landroid/view/View;");
@@ -50,6 +66,8 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(setInputType, "_setInputType", "(Landroid/view/View;II)Z");
 
 		SLIB_JNI_NATIVE(nativeOnChange, "nativeOnChange", "(J)V", Android_EditView_nativeOnChange);
+		SLIB_JNI_NATIVE(nativeOnDone, "nativeOnDone", "(J)V", Android_EditView_nativeOnDone);
+		SLIB_JNI_NATIVE(nativeOnReturn, "nativeOnReturn", "(J)V", Android_EditView_nativeOnReturn);
 
 	SLIB_JNI_END_CLASS
 

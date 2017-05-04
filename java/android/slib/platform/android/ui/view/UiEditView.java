@@ -417,7 +417,23 @@ public class UiEditView extends EditText implements IView {
 			nativeOnChange(instance);
 		}
 	}
-	
+
+	private static native void nativeOnDone(long instance);
+	public static void onEventDone(IView view) {
+		long instance = view.getInstance();
+		if (instance != 0) {
+			nativeOnDone(instance);
+		}
+	}
+
+	private static native void nativeOnReturn(long instance);
+	public static void onEventReturn(IView view) {
+		long instance = view.getInstance();
+		if (instance != 0) {
+			nativeOnReturn(instance);
+		}
+	}
+
 	public UiEditView(Context context) {
 		super(context);
 		this.addTextChangedListener(new TextWatcher() {
@@ -429,6 +445,19 @@ public class UiEditView extends EditText implements IView {
 			}
 			
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+		});
+		this.setOnEditorActionListener(new OnEditorActionListener() {
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if (event == null) {
+					onEventDone(UiEditView.this);
+					return true;
+				} else {
+					if (!(event.isShiftPressed())) {
+						onEventReturn(UiEditView.this);
+					}
+				}
+				return false;
 			}
 		});
 		this.setImeOptions(EditorInfo.IME_FLAG_NO_FULLSCREEN);

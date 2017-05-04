@@ -13,6 +13,10 @@
 #include "slib/ui/mobile_app.h"
 #include "slib/ui/scroll_view.h"
 #include "slib/ui/resource.h"
+#include "slib/ui/core.h"
+#include "slib/ui/button.h"
+
+#include "slib/core/platform_android.h"
 
 namespace slib
 {
@@ -257,13 +261,21 @@ namespace slib
 		if (!m_flagReadOnly) {
 			m_windowEdit = new Window;
 			m_windowEdit->setBackgroundColor(Color::White);
-			m_editViewNative = new TextArea;
+			if (IsInstanceOf<PasswordView>(this)) {
+				m_editViewNative = new PasswordView;
+			} else {
+#if defined(SLIB_PLATFORM_IS_IOS)
+				m_editViewNative = new TextArea;
+#else
+				m_editViewNative = new EditView;
+#endif
+			}
 			m_editViewNative->setText(m_text, UIUpdateMode::Init);
 			m_editViewNative->setSizeFilling(sl_true, sl_true, UIUpdateMode::Init);
 			m_editViewNative->setMargin(UIResource::getScreenMinimum()/20);
 			m_editViewNative->setBorder(sl_false, UIUpdateMode::Init);
 			m_editViewNative->setGravity(Alignment::TopLeft, UIUpdateMode::Init);
-			m_editViewNative->setMultiLine(m_flagMultiLine, UIUpdateMode::Init);
+			m_editViewNative->setMultiLine(isMultiLine(), UIUpdateMode::Init);
 			m_editViewNative->setOnChange(SLIB_FUNCTION_WEAKREF(EditView, _onChangeEditViewNative, this));
 			m_editViewNative->setOnReturnKey(SLIB_FUNCTION_WEAKREF(EditView, _onReturnKeyEditViewNative, this));
 			m_editViewNative->setOnDoneEdit(SLIB_FUNCTION_WEAKREF(EditView, _onDoneEditViewNative, this));
@@ -279,6 +291,25 @@ namespace slib
 			m_windowEdit->create();
 			m_windowEdit->setOnClose(SLIB_FUNCTION_WEAKREF(EditView, _onCloseWindowEditViewNative, this));
 			m_editViewNative->setFocus();
+
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+			UI::dispatchToUiThread([] {
+				Android::showKeyboard();
+			}, 500);
+			sl_ui_pos sw = UIResource::getScreenMinimum();
+			m_editViewNative->setMarginRight(sw / 5 - sw / 20);
+			Ref<Button> btnDone = new Button;
+			btnDone = new Button;
+			btnDone->setText("Done");
+			btnDone->setWidth(sw / 5);
+			btnDone->setMargin(sw / 20);
+			btnDone->setMarginRight(sw / 40);
+			btnDone->setHeight(sw / 10);
+			btnDone->setFont(Font::create(getFontFamily(), sw/20));
+			btnDone->setAlignParentRight();
+			btnDone->setOnClick(SLIB_FUNCTION_WEAKREF(EditView, _onDoneEditViewNativeButton, this));
+			m_windowEdit->addView(btnDone);
+#endif
 		}
 #endif
 	}
@@ -311,8 +342,16 @@ namespace slib
 		m_editViewNative.setNull();
 		invalidate();
 		dispatchDoneEdit();
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+		Android::dismissKeyboard();
+#endif
 	}
-	
+
+	void EditView::_onDoneEditViewNativeButton(View* view)
+	{
+		_onDoneEditViewNative(sl_null);
+	}
+
 	void EditView::_onCloseWindowEditViewNative(Window* window, UIEvent* ev)
 	{
 		m_windowEdit.setNull();

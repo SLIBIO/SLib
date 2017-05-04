@@ -146,7 +146,9 @@ namespace slib
 		void _onReturnKeyEditViewNative(EditView* ev);
 		
 		void _onDoneEditViewNative(EditView* ev);
-		
+
+		void _onDoneEditViewNativeButton(View* view);
+
 		void _onCloseWindowEditViewNative(Window* window, UIEvent* ev);
 
 	protected:
