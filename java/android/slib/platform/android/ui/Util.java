@@ -88,13 +88,49 @@ public class Util {
 		return ret;
 	}
 
-	public static void dismissKeyboard(Activity activity) {
-		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-		if (imm != null) {
-			View view = activity.getCurrentFocus();
-			if (view != null) {
-				imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+	public static void showKeyboard(final Activity activity) {
+		if (!(UiThread.isUiThread())) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					showKeyboard(activity);
+				}
+			});
+			return;
+		}
+		try {
+			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+			if (imm != null) {
+				View view = activity.getCurrentFocus();
+				if (view != null) {
+					imm.showSoftInput(view, 0);
+				}
 			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	public static void dismissKeyboard(final Activity activity) {
+		if (!(UiThread.isUiThread())) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					dismissKeyboard(activity);
+				}
+			});
+			return;
+		}
+		try {
+			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+			if (imm != null) {
+				View view = activity.getCurrentFocus();
+				if (view != null) {
+					imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 

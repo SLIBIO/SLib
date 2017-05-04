@@ -26,6 +26,7 @@ namespace slib
 	SLIB_JNI_END_CLASS
 
 	SLIB_JNI_BEGIN_CLASS(_Util, "slib/platform/android/ui/Util")
+		SLIB_JNI_STATIC_METHOD(showKeyboard, "showKeyboard", "(Landroid/app/Activity;)V")
 		SLIB_JNI_STATIC_METHOD(dismissKeyboard, "dismissKeyboard", "(Landroid/app/Activity;)V")
 	SLIB_JNI_END_CLASS
 
@@ -97,6 +98,14 @@ namespace slib
 			}
 		}
 		return sl_null;
+	}
+
+	void Android::showKeyboard()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			_Util::showKeyboard.call(sl_null, jactivity);
+		}
 	}
 
 	void Android::dismissKeyboard()
