@@ -12,30 +12,30 @@ namespace slib
 {
 	
 	template <class T>
-	CArray<T>::CArray(const std::initializer_list<T>& l) : CArray(l.begin(), l.size())
+	CArray<T>::CArray(const std::initializer_list<T>& l) noexcept : CArray(l.begin(), l.size())
 	{
 	}
 
 	template <class T>
-	CArray<T>* CArray<T>::create(const std::initializer_list<T>& l)
+	CArray<T>* CArray<T>::create(const std::initializer_list<T>& l) noexcept
 	{
 		return create(l.begin(), l.size());
 	}
 	
 	
 	template <class T>
-	Array<T>::Array(const std::initializer_list<T>& l) : ref(CArray<T>::create(l.begin(), l.size()))
+	Array<T>::Array(const std::initializer_list<T>& l) noexcept : ref(CArray<T>::create(l.begin(), l.size()))
 	{
 	}
 	
 	template <class T>
-	Array<T> Array<T>::create(const std::initializer_list<T>& l)
+	Array<T> Array<T>::create(const std::initializer_list<T>& l) noexcept
 	{
 		return create(l.begin(), l.size());
 	}
 	
 	template <class T>
-	Array<T>& Array<T>::operator=(const std::initializer_list<T>& l)
+	Array<T>& Array<T>::operator=(const std::initializer_list<T>& l) noexcept
 	{
 		ref = CArray<T>::create(l.begin(), l.size());
 		return *this;
@@ -43,12 +43,12 @@ namespace slib
 	
 	
 	template <class T>
-	Atomic< Array<T> >::Atomic(const std::initializer_list<T>& l) : ref(CArray<T>::create(l.begin(), l.size()))
+	Atomic< Array<T> >::Atomic(const std::initializer_list<T>& l) noexcept : ref(CArray<T>::create(l.begin(), l.size()))
 	{
 	}
 	
 	template <class T>
-	Atomic< Array<T> >& Atomic< Array<T> >::operator=(const std::initializer_list<T>& l)
+	Atomic< Array<T> >& Atomic< Array<T> >::operator=(const std::initializer_list<T>& l) noexcept
 	{
 		ref = CArray<T>::create(l.begin(), l.size());
 		return *this;
