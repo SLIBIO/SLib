@@ -17,7 +17,7 @@
 #include "iterator.h"
 #include "list.h"
 #include "hashtable.h"
-#include "tree.h"
+#include "red_black_tree.h"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 #include <initializer_list>
@@ -94,11 +94,11 @@ namespace slib
 
 		sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 		
-		template <class _KT, class _VT>
-		void putAll_NoLock(IMap<_KT, _VT>* other, MapPutMode mode = MapPutMode::Default);
+		template <class KEY, class VALUE>
+		void putAll_NoLock(IMap<KEY, VALUE>* other, MapPutMode mode = MapPutMode::Default);
 
-		template <class _KT, class _VT>
-		void putAll(IMap<_KT, _VT>* other, MapPutMode mode = MapPutMode::Default);
+		template <class KEY, class VALUE>
+		void putAll(IMap<KEY, VALUE>* other, MapPutMode mode = MapPutMode::Default);
 
 		virtual sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null) = 0;
 
@@ -167,7 +167,7 @@ namespace slib
 			sl_bool operator()(const Pair<KT, VT>& a, const KT& b) const;
 		};
 
-		template <class _VT, class VALUE_EQUALS>
+		template <class VALUE, class VALUE_EQUALS>
 		class PairCompare
 		{
 		public:
@@ -177,7 +177,7 @@ namespace slib
 		public:
 			PairCompare(const KEY_EQUALS& key_equals, const VALUE_EQUALS& value_equals);
 
-			sl_bool operator()(const Pair<KT, VT>& a, const Pair<KT, _VT>& b) const;
+			sl_bool operator()(const Pair<KT, VT>& a, const Pair<KT, VALUE>& b) const;
 		};
 	
 		CList< Pair<KT, VT> > list;
@@ -210,11 +210,11 @@ namespace slib
 		// override
 		sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const VALUE& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool addIfNewKeyAndValue(const KT& key, const VALUE& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
 		// override
 		sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null);
@@ -222,17 +222,17 @@ namespace slib
 		// override
 		sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null);
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool removeKeyAndValue_NoLock(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool removeKeyAndValue_NoLock(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool removeKeyAndValue(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_size removeItemsByKeyAndValue_NoLock(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_size removeItemsByKeyAndValue_NoLock(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_size removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
 		// override
 		sl_size removeAll_NoLock();
@@ -240,11 +240,11 @@ namespace slib
 		// override
 		sl_bool contains_NoLock(const KT& key) const;
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool containsKeyAndValue_NoLock(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool containsKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool containsKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool containsKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 
 		// override
 		IMap<KT, VT>* duplicate_NoLock() const;
@@ -307,11 +307,11 @@ namespace slib
 		// override
 		sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const VALUE& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool addIfNewKeyAndValue(const KT& key, const VALUE& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
 		// override
 		sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null);
@@ -319,17 +319,17 @@ namespace slib
 		// override
 		sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null);
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool removeKeyAndValue_NoLock(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool removeKeyAndValue_NoLock(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool removeKeyAndValue(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_size removeItemsByKeyAndValue_NoLock(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_size removeItemsByKeyAndValue_NoLock(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_size removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
 		// override
 		sl_size removeAll_NoLock();
@@ -337,11 +337,11 @@ namespace slib
 		// override
 		sl_bool contains_NoLock(const KT& key) const;
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool containsKeyAndValue_NoLock(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool containsKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool containsKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool containsKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 
 		// override
 		IMap<KT, VT>* duplicate_NoLock() const;
@@ -376,7 +376,7 @@ namespace slib
 	class SLIB_EXPORT TreeMap : public IMap<KT, VT>
 	{
 	public:
-		BTree<KT, VT, KEY_COMPARE> tree;
+		RedBlackTree<KT, VT, KEY_COMPARE> tree;
 
 	public:
 		TreeMap(const KEY_COMPARE& key_compare = KEY_COMPARE());
@@ -406,11 +406,11 @@ namespace slib
 		// override
 		sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const VALUE& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool addIfNewKeyAndValue(const KT& key, const VALUE& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
 		// override
 		sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null);
@@ -418,17 +418,17 @@ namespace slib
 		// override
 		sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null);
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool removeKeyAndValue_NoLock(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool removeKeyAndValue_NoLock(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool removeKeyAndValue(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_size removeItemsByKeyAndValue_NoLock(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_size removeItemsByKeyAndValue_NoLock(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_size removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
 		// override
 		sl_size removeAll_NoLock();
@@ -436,11 +436,11 @@ namespace slib
 		// override
 		sl_bool contains_NoLock(const KT& key) const;
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool containsKeyAndValue_NoLock(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool containsKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool containsKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool containsKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 
 		// override
 		IMap<KT, VT>* duplicate_NoLock() const;
@@ -505,8 +505,8 @@ namespace slib
 		static Map<KT, VT> createTree(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare = KEY_COMPARE());
 #endif
 		
-		template <class _KT, class _VT>
-		static const Map<KT, VT>& from(const Map<_KT, _VT>& other);
+		template <class KEY, class VALUE>
+		static const Map<KT, VT>& from(const Map<KEY, VALUE>& other);
 		
 	public:
 		void init();
@@ -557,17 +557,17 @@ namespace slib
 
 		sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 		
-		template <class _KT, class _VT>
-		void putAll_NoLock(const Map<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
+		template <class KEY, class VALUE>
+		void putAll_NoLock(const Map<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default);
 		
-		template <class _KT, class _VT>
-		void putAll_NoLock(const AtomicMap<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
+		template <class KEY, class VALUE>
+		void putAll_NoLock(const AtomicMap<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default);
 
-		template <class _KT, class _VT>
-		void putAll(const Map<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
+		template <class KEY, class VALUE>
+		void putAll(const Map<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default);
 
-		template <class _KT, class _VT>
-		void putAll(const AtomicMap<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
+		template <class KEY, class VALUE>
+		void putAll(const AtomicMap<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default);
 
 		sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null) const;
 
@@ -629,8 +629,8 @@ namespace slib
 #endif
 		
 	public:
-		template <class _KT, class _VT>
-		static const Atomic< Map<KT, VT> >& from(const Atomic< Map<_KT, _VT> >& other);
+		template <class KEY, class VALUE>
+		static const Atomic< Map<KT, VT> >& from(const Atomic< Map<KEY, VALUE> >& other);
 		
 		void init();
 		
@@ -666,11 +666,11 @@ namespace slib
 
 		sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 
-		template <class _KT, class _VT>
-		void putAll(const Map<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
+		template <class KEY, class VALUE>
+		void putAll(const Map<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default);
 
-		template <class _KT, class _VT>
-		void putAll(const AtomicMap<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
+		template <class KEY, class VALUE>
+		void putAll(const AtomicMap<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default);
 
 		sl_bool remove(const KT& key, VT* outValue = sl_null) const;
 

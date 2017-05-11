@@ -334,8 +334,8 @@ namespace slib
 	}
 	
 	template <class KT, class VT>
-	template <class _KT, class _VT>
-	void IMap<KT, VT>::putAll_NoLock(IMap<_KT, _VT>* other, MapPutMode mode)
+	template <class KEY, class VALUE>
+	void IMap<KT, VT>::putAll_NoLock(IMap<KEY, VALUE>* other, MapPutMode mode)
 	{
 		if (!other) {
 			return;
@@ -343,16 +343,16 @@ namespace slib
 		if (this == other) {
 			return;
 		}
-		Iterator< Pair<_KT,_VT> > iterator(other->toIterator());
-		Pair<_KT, _VT> v;
+		Iterator< Pair<KEY,VALUE> > iterator(other->toIterator());
+		Pair<KEY, VALUE> v;
 		while (iterator.next(&v)) {
 			put_NoLock(v.key, v.value, mode);
 		}
 	}
 
 	template <class KT, class VT>
-	template <class _KT, class _VT>
-	void IMap<KT, VT>::putAll(IMap<_KT, _VT>* other, MapPutMode mode)
+	template <class KEY, class VALUE>
+	void IMap<KT, VT>::putAll(IMap<KEY, VALUE>* other, MapPutMode mode)
 	{
 		if (!other) {
 			return;
@@ -361,8 +361,8 @@ namespace slib
 			return;
 		}
 		ObjectLocker lock(this, other);
-		Iterator< Pair<_KT,_VT> > iterator(other->toIterator());
-		Pair<_KT, _VT> v;
+		Iterator< Pair<KEY,VALUE> > iterator(other->toIterator());
+		Pair<KEY, VALUE> v;
 		while (iterator.next(&v)) {
 			put_NoLock(v.key, v.value, mode);
 		}
@@ -467,14 +467,14 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	ListMap<KT, VT, KEY_EQUALS>::PairCompare<_VT, VALUE_EQUALS>::PairCompare(const KEY_EQUALS& _key_equals, const VALUE_EQUALS& _value_equals) : key_equals(_key_equals), value_equals(_value_equals)
+	template <class VALUE, class VALUE_EQUALS>
+	ListMap<KT, VT, KEY_EQUALS>::PairCompare<VALUE, VALUE_EQUALS>::PairCompare(const KEY_EQUALS& _key_equals, const VALUE_EQUALS& _value_equals) : key_equals(_key_equals), value_equals(_value_equals)
 	{
 	}
 	
 	template <class KT, class VT, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	SLIB_INLINE sl_bool ListMap<KT, VT, KEY_EQUALS>::PairCompare<_VT, VALUE_EQUALS>::operator()(const Pair<KT, VT>& a, const Pair<KT, _VT>& b) const
+	template <class VALUE, class VALUE_EQUALS>
+	SLIB_INLINE sl_bool ListMap<KT, VT, KEY_EQUALS>::PairCompare<VALUE, VALUE_EQUALS>::operator()(const Pair<KT, VT>& a, const Pair<KT, VALUE>& b) const
 	{
 		return key_equals(a.key, b.key) && value_equals(a.value, b.value);
 	}
@@ -571,13 +571,13 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_bool ListMap<KT, VT, KEY_EQUALS>::addIfNewKeyAndValue_NoLock(const KT& key, const _VT& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
+	template <class VALUE, class VALUE_EQUALS>
+	sl_bool ListMap<KT, VT, KEY_EQUALS>::addIfNewKeyAndValue_NoLock(const KT& key, const VALUE& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
 	{
 		if (pFlagExist) {
 			*pFlagExist = sl_false;
 		}
-		sl_reg index = list.indexOf_NoLock(Pair<KT, _VT>(key, value), 0, PairCompare<_VT, VALUE_EQUALS>(m_equals, value_equals));
+		sl_reg index = list.indexOf_NoLock(Pair<KT, VALUE>(key, value), 0, PairCompare<VALUE, VALUE_EQUALS>(m_equals, value_equals));
 		if (index >= 0) {
 			if (pFlagExist) {
 				*pFlagExist = sl_true;
@@ -591,8 +591,8 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_bool ListMap<KT, VT, KEY_EQUALS>::addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
+	template <class VALUE, class VALUE_EQUALS>
+	sl_bool ListMap<KT, VT, KEY_EQUALS>::addIfNewKeyAndValue(const KT& key, const VALUE& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
 	{
 		ObjectLocker lock(this);
 		return addIfNewKeyAndValue_NoLock(key, value, pFlagExist, value_equals);
@@ -632,36 +632,36 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_bool ListMap<KT, VT, KEY_EQUALS>::removeKeyAndValue_NoLock(const KT& key, const _VT& value, VT* outValue, const VALUE_EQUALS& value_equals)
+	template <class VALUE, class VALUE_EQUALS>
+	sl_bool ListMap<KT, VT, KEY_EQUALS>::removeKeyAndValue_NoLock(const KT& key, const VALUE& value, VT* outValue, const VALUE_EQUALS& value_equals)
 	{
 		if (outValue) {
 			Pair<KT, VT> pair;
-			if (list.removeValue_NoLock(Pair<KT, _VT>(key, value), &pair, PairCompare<_VT, VALUE_EQUALS>(m_equals, value_equals))) {
+			if (list.removeValue_NoLock(Pair<KT, VALUE>(key, value), &pair, PairCompare<VALUE, VALUE_EQUALS>(m_equals, value_equals))) {
 				*outValue = pair.value;
 				return sl_true;
 			}
 			return sl_false;
 		} else {
-			return list.removeValue_NoLock(Pair<KT, _VT>(key, value), sl_null, PairCompare<_VT, VALUE_EQUALS>(m_equals, value_equals));
+			return list.removeValue_NoLock(Pair<KT, VALUE>(key, value), sl_null, PairCompare<VALUE, VALUE_EQUALS>(m_equals, value_equals));
 		}
 	}
 	
 	template <class KT, class VT, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_bool ListMap<KT, VT, KEY_EQUALS>::removeKeyAndValue(const KT& key, const _VT& value, VT* outValue, const VALUE_EQUALS& value_equals)
+	template <class VALUE, class VALUE_EQUALS>
+	sl_bool ListMap<KT, VT, KEY_EQUALS>::removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue, const VALUE_EQUALS& value_equals)
 	{
 		ObjectLocker lock(this);
 		return removeKeyAndValue_NoLock(key, value, value_equals);
 	}
 	
 	template <class KT, class VT, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_size ListMap<KT, VT, KEY_EQUALS>::removeItemsByKeyAndValue_NoLock(const KT& key, const _VT& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
+	template <class VALUE, class VALUE_EQUALS>
+	sl_size ListMap<KT, VT, KEY_EQUALS>::removeItemsByKeyAndValue_NoLock(const KT& key, const VALUE& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
 	{
 		if (outValues) {
 			List< Pair<KT, VT> > pairs;
-			sl_size n = list.removeElementsByValue_NoLock(Pair<KT, _VT>(key, value), &pairs, PairCompare<_VT, VALUE_EQUALS>(m_equals, value_equals));
+			sl_size n = list.removeElementsByValue_NoLock(Pair<KT, VALUE>(key, value), &pairs, PairCompare<VALUE, VALUE_EQUALS>(m_equals, value_equals));
 			if (n) {
 				ListElements< Pair<KT, VT> > p(pairs);
 				for (sl_size i = 0; i < p.count; i++) {
@@ -670,13 +670,13 @@ namespace slib
 			}
 			return n;
 		} else {
-			return list.removeElementsByValue_NoLock(Pair<KT, _VT>(key, value), sl_null, PairCompare<_VT, VALUE_EQUALS>(m_equals, value_equals));
+			return list.removeElementsByValue_NoLock(Pair<KT, VALUE>(key, value), sl_null, PairCompare<VALUE, VALUE_EQUALS>(m_equals, value_equals));
 		}
 	}
 	
 	template <class KT, class VT, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_size ListMap<KT, VT, KEY_EQUALS>::removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
+	template <class VALUE, class VALUE_EQUALS>
+	sl_size ListMap<KT, VT, KEY_EQUALS>::removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
 	{
 		ObjectLocker lock(this);
 		return removeItemsByKeyAndValue_NoLock(key, value, outValues, value_equals);
@@ -695,15 +695,15 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_bool ListMap<KT, VT, KEY_EQUALS>::containsKeyAndValue_NoLock(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
+	template <class VALUE, class VALUE_EQUALS>
+	sl_bool ListMap<KT, VT, KEY_EQUALS>::containsKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const
 	{
-		return list.indexOf_NoLock(Pair<KT, _VT>(key, value), 0, PairCompare<_VT, VALUE_EQUALS>(m_equals, value_equals)) >= 0;
+		return list.indexOf_NoLock(Pair<KT, VALUE>(key, value), 0, PairCompare<VALUE, VALUE_EQUALS>(m_equals, value_equals)) >= 0;
 	}
 	
 	template <class KT, class VT, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_bool ListMap<KT, VT, KEY_EQUALS>::containsKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
+	template <class VALUE, class VALUE_EQUALS>
+	sl_bool ListMap<KT, VT, KEY_EQUALS>::containsKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const
 	{
 		ObjectLocker lock(this);
 		return contains_NoLock(key, value, value_equals);
@@ -840,15 +840,15 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue_NoLock(const KT& key, const _VT& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
+	template <class VALUE, class VALUE_EQUALS>
+	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue_NoLock(const KT& key, const VALUE& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
 	{
 		return table.addIfNewKeyAndValue(key, value, pFlagExist, value_equals);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
+	template <class VALUE, class VALUE_EQUALS>
+	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue(const KT& key, const VALUE& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
 	{
 		ObjectLocker lock(this);
 		return table.addIfNewKeyAndValue(key, value, pFlagExist, value_equals);
@@ -867,30 +867,30 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::removeKeyAndValue_NoLock(const KT& key, const _VT& value, VT* outValue, const VALUE_EQUALS& value_equals)
+	template <class VALUE, class VALUE_EQUALS>
+	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::removeKeyAndValue_NoLock(const KT& key, const VALUE& value, VT* outValue, const VALUE_EQUALS& value_equals)
 	{
 		return table.removeKeyAndValue(key, value, outValue, value_equals);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::removeKeyAndValue(const KT& key, const _VT& value, VT* outValue, const VALUE_EQUALS& value_equals)
+	template <class VALUE, class VALUE_EQUALS>
+	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue, const VALUE_EQUALS& value_equals)
 	{
 		ObjectLocker lock(this);
 		return table.removeKeyAndValue(key, value, outValue, value_equals);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_size HashMap<KT, VT, HASH, KEY_EQUALS>::removeItemsByKeyAndValue_NoLock(const KT& key, const _VT& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
+	template <class VALUE, class VALUE_EQUALS>
+	sl_size HashMap<KT, VT, HASH, KEY_EQUALS>::removeItemsByKeyAndValue_NoLock(const KT& key, const VALUE& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
 	{
 		return table.removeItemsByKeyAndValue(key, value, outValues, value_equals);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_size HashMap<KT, VT, HASH, KEY_EQUALS>::removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
+	template <class VALUE, class VALUE_EQUALS>
+	sl_size HashMap<KT, VT, HASH, KEY_EQUALS>::removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
 	{
 		ObjectLocker lock(this);
 		return table.removeItemsByKeyAndValue(key, value, outValues, value_equals);
@@ -909,15 +909,15 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::containsKeyAndValue_NoLock(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
+	template <class VALUE, class VALUE_EQUALS>
+	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::containsKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const
 	{
 		return table.searchKeyAndValue(key, value, value_equals) != sl_null;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	template <class _VT, class VALUE_EQUALS>
-	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::containsKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
+	template <class VALUE, class VALUE_EQUALS>
+	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::containsKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const
 	{
 		ObjectLocker lock(this);
 		return table.searchKeyAndValue(key, value, value_equals) != sl_null;
@@ -1065,15 +1065,15 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	template <class _VT, class VALUE_COMPARE>
-	sl_bool TreeMap<KT, VT, KEY_COMPARE>::addIfNewKeyAndValue_NoLock(const KT& key, const _VT& value, sl_bool* pFlagExist, const VALUE_COMPARE& value_compare)
+	template <class VALUE, class VALUE_COMPARE>
+	sl_bool TreeMap<KT, VT, KEY_COMPARE>::addIfNewKeyAndValue_NoLock(const KT& key, const VALUE& value, sl_bool* pFlagExist, const VALUE_COMPARE& value_compare)
 	{
 		return tree.addIfNewKeyAndValue(key, value, pFlagExist, value_compare);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	template <class _VT, class VALUE_COMPARE>
-	sl_bool TreeMap<KT, VT, KEY_COMPARE>::addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist, const VALUE_COMPARE& value_compare)
+	template <class VALUE, class VALUE_COMPARE>
+	sl_bool TreeMap<KT, VT, KEY_COMPARE>::addIfNewKeyAndValue(const KT& key, const VALUE& value, sl_bool* pFlagExist, const VALUE_COMPARE& value_compare)
 	{
 		ObjectLocker lock(this);
 		return tree.addIfNewKeyAndValue(key, value, pFlagExist, value_compare);
@@ -1092,30 +1092,30 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	template <class _VT, class VALUE_COMPARE>
-	sl_bool TreeMap<KT, VT, KEY_COMPARE>::removeKeyAndValue_NoLock(const KT& key, const _VT& value, VT* outValue, const VALUE_COMPARE& value_compare)
+	template <class VALUE, class VALUE_COMPARE>
+	sl_bool TreeMap<KT, VT, KEY_COMPARE>::removeKeyAndValue_NoLock(const KT& key, const VALUE& value, VT* outValue, const VALUE_COMPARE& value_compare)
 	{
 		return tree.removeKeyAndValue(key, value, outValue, value_compare);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	template <class _VT, class VALUE_COMPARE>
-	sl_bool TreeMap<KT, VT, KEY_COMPARE>::removeKeyAndValue(const KT& key, const _VT& value, VT* outValue, const VALUE_COMPARE& value_compare)
+	template <class VALUE, class VALUE_COMPARE>
+	sl_bool TreeMap<KT, VT, KEY_COMPARE>::removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue, const VALUE_COMPARE& value_compare)
 	{
 		ObjectLocker lock(this);
 		return tree.removeKeyAndValue(key, value, outValue, value_compare);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	template <class _VT, class VALUE_COMPARE>
-	sl_size TreeMap<KT, VT, KEY_COMPARE>::removeItemsByKeyAndValue_NoLock(const KT& key, const _VT& value, List<VT>* outValues, const VALUE_COMPARE& value_compare)
+	template <class VALUE, class VALUE_COMPARE>
+	sl_size TreeMap<KT, VT, KEY_COMPARE>::removeItemsByKeyAndValue_NoLock(const KT& key, const VALUE& value, List<VT>* outValues, const VALUE_COMPARE& value_compare)
 	{
 		return tree.removeItemsByKeyAndValue(key, value, outValues, value_compare);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	template <class _VT, class VALUE_COMPARE>
-	sl_size TreeMap<KT, VT, KEY_COMPARE>::removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues, const VALUE_COMPARE& value_compare)
+	template <class VALUE, class VALUE_COMPARE>
+	sl_size TreeMap<KT, VT, KEY_COMPARE>::removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues, const VALUE_COMPARE& value_compare)
 	{
 		ObjectLocker lock(this);
 		return tree.removeItemsByKeyAndValue(key, value, outValues, value_compare);
@@ -1134,15 +1134,15 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	template <class _VT, class VALUE_COMPARE>
-	sl_bool TreeMap<KT, VT, KEY_COMPARE>::containsKeyAndValue_NoLock(const KT& key, const _VT& value, const VALUE_COMPARE& value_compare) const
+	template <class VALUE, class VALUE_COMPARE>
+	sl_bool TreeMap<KT, VT, KEY_COMPARE>::containsKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_COMPARE& value_compare) const
 	{
 		return tree.searchKeyAndValue(key, value, sl_null, sl_null, value_compare);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	template <class _VT, class VALUE_COMPARE>
-	sl_bool TreeMap<KT, VT, KEY_COMPARE>::containsKeyAndValue(const KT& key, const _VT& value, const VALUE_COMPARE& value_compare) const
+	template <class VALUE, class VALUE_COMPARE>
+	sl_bool TreeMap<KT, VT, KEY_COMPARE>::containsKeyAndValue(const KT& key, const VALUE& value, const VALUE_COMPARE& value_compare) const
 	{
 		ObjectLocker lock(this);
 		return tree.searchKeyAndValue(key, value, sl_null, sl_null, value_compare);
@@ -1268,8 +1268,8 @@ namespace slib
 	}
 	
 	template <class KT, class VT>
-	template <class _KT, class _VT>
-	const Map<KT, VT>& Map<KT, VT>::from(const Map<_KT, _VT>& other)
+	template <class KEY, class VALUE>
+	const Map<KT, VT>& Map<KT, VT>::from(const Map<KEY, VALUE>& other)
 	{
 		return *(reinterpret_cast<Map<KT, VT> const*>(&other));
 	}
@@ -1492,8 +1492,8 @@ namespace slib
 	}
 	
 	template <class KT, class VT>
-	template <class _KT, class _VT>
-	void Map<KT, VT>::putAll_NoLock(const Map<_KT, _VT>& other, MapPutMode mode)
+	template <class KEY, class VALUE>
+	void Map<KT, VT>::putAll_NoLock(const Map<KEY, VALUE>& other, MapPutMode mode)
 	{
 		IMap<KT, VT>* obj = ref._ptr;
 		if (obj) {
@@ -1510,15 +1510,15 @@ namespace slib
 	}
 	
 	template <class KT, class VT>
-	template <class _KT, class _VT>
-	void Map<KT, VT>::putAll_NoLock(const AtomicMap<_KT, _VT>& other, MapPutMode mode)
+	template <class KEY, class VALUE>
+	void Map<KT, VT>::putAll_NoLock(const AtomicMap<KEY, VALUE>& other, MapPutMode mode)
 	{
-		putAll_NoLock(Map<_KT, _VT>(other), mode);
+		putAll_NoLock(Map<KEY, VALUE>(other), mode);
 	}
 
 	template <class KT, class VT>
-	template <class _KT, class _VT>
-	void Map<KT, VT>::putAll(const Map<_KT, _VT>& other, MapPutMode mode)
+	template <class KEY, class VALUE>
+	void Map<KT, VT>::putAll(const Map<KEY, VALUE>& other, MapPutMode mode)
 	{
 		IMap<KT, VT>* obj = ref._ptr;
 		if (obj) {
@@ -1535,10 +1535,10 @@ namespace slib
 	}
 
 	template <class KT, class VT>
-	template <class _KT, class _VT>
-	void Map<KT, VT>::putAll(const AtomicMap<_KT, _VT>& other, MapPutMode mode)
+	template <class KEY, class VALUE>
+	void Map<KT, VT>::putAll(const AtomicMap<KEY, VALUE>& other, MapPutMode mode)
 	{
-		putAll(Map<_KT, _VT>(other), mode);
+		putAll(Map<KEY, VALUE>(other), mode);
 	}
 
 	template <class KT, class VT>
@@ -1755,8 +1755,8 @@ namespace slib
 
 	
 	template <class KT, class VT>
-	template <class _KT, class _VT>
-	const Atomic< Map<KT, VT> >& Atomic< Map<KT, VT> >::from(const Atomic< Map<_KT, _VT> >& other)
+	template <class KEY, class VALUE>
+	const Atomic< Map<KT, VT> >& Atomic< Map<KT, VT> >::from(const Atomic< Map<KEY, VALUE> >& other)
 	{
 		return *(reinterpret_cast<Atomic< Map<KT, VT> > const*>(&other));
 	}
@@ -1896,8 +1896,8 @@ namespace slib
 	}
 
 	template <class KT, class VT>
-	template <class _KT, class _VT>
-	void Atomic< Map<KT, VT> >::putAll(const Map<_KT, _VT>& other, MapPutMode mode)
+	template <class KEY, class VALUE>
+	void Atomic< Map<KT, VT> >::putAll(const Map<KEY, VALUE>& other, MapPutMode mode)
 	{
 		Ref< IMap<KT, VT> > obj(ref);
 		if (obj.isNotNull()) {
@@ -1921,10 +1921,10 @@ namespace slib
 	}
 
 	template <class KT, class VT>
-	template <class _KT, class _VT>
-	void Atomic< Map<KT, VT> >::putAll(const AtomicMap<_KT, _VT>& other, MapPutMode mode)
+	template <class KEY, class VALUE>
+	void Atomic< Map<KT, VT> >::putAll(const AtomicMap<KEY, VALUE>& other, MapPutMode mode)
 	{
-		putAll(Map<_KT, _VT>(other), mode);
+		putAll(Map<KEY, VALUE>(other), mode);
 	}
 
 	template <class KT, class VT>
