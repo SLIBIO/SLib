@@ -8,8 +8,8 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CHECKHEADER_SLIB_CORE_TREE
-#define CHECKHEADER_SLIB_CORE_TREE
+#ifndef CHECKHEADER_SLIB_CORE_BTREE
+#define CHECKHEADER_SLIB_CORE_BTREE
 
 #include "definition.h"
 
@@ -84,14 +84,12 @@ namespace slib
 
 		sl_bool searchItemInNode(const KT& key, const BTreeNode& node, sl_uint32& pos, BTreeNode& link, VT* outValue = sl_null) const;
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool searchKeyAndValue(const KT& key, const _VT& value, BTreePosition* pos = sl_null, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool searchKeyAndValue(const KT& key, const VALUE& value, BTreePosition* pos = sl_null, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 
 		sl_bool getRange(const KT& key, BTreePosition* pPosBegin, BTreePosition* pPosEnd) const;
 	
 		sl_bool getAt(const BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
-
-		VT* getValuePointerAt(const BTreePosition& pos) const;
 
 		sl_uint64 getCount() const;
 
@@ -107,30 +105,25 @@ namespace slib
 
 		sl_bool get(const KT& key, VT* value = sl_null) const;
 
-		VT* getItemPointer(const KT& key) const;
-
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		VT* getItemPointerByKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
-
 		List<VT> getValues(const KT& key) const;
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		List<VT> getValuesByKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		List<VT> getValuesByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 
 		sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool addIfNewKeyAndValue(const KT& key, const VALUE& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
 		sl_bool remove(const KT& key, VT* outValue = sl_null);
 
 		sl_size removeItems(const KT& key, List<VT>* outValues = sl_null);
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool removeKeyAndValue(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_size removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
 		sl_bool removeAt(const BTreePosition& pos);
 
@@ -222,6 +215,6 @@ namespace slib
 
 }
 
-#include "detail/tree.inc"
+#include "detail/btree.inc"
 
 #endif

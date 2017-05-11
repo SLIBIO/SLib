@@ -52,7 +52,8 @@
 #include "core/sort.h"
 
 #include "core/hashtable.h"
-#include "core/tree.h"
+#include "core/red_black_tree.h"
+#include "core/btree.h"
 #include "core/array.h"
 #include "core/array2d.h"
 #include "core/iterator.h"
