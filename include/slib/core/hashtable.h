@@ -19,11 +19,6 @@
 #include "list.h"
 #include "math.h"
 
-#define _SLIB_HASHTABLE_MIN_CAPACITY 16
-#define _SLIB_HASHTABLE_MAX_CAPACITY 0x10000000
-#define _SLIB_HASHTABLE_LOAD_FACTOR_UP 0.75f
-#define _SLIB_HASHTABLE_LOAD_FACTOR_DOWN 0.25f
-
 namespace slib
 {
 	
@@ -31,22 +26,33 @@ namespace slib
 	class HashEntry
 	{
 	public:
-		KT key;
-		VT value;
-		
 		sl_uint32 hash;
 		HashEntry* chain;
-		
 		HashEntry* before;
 		HashEntry* next;
 		
+		KT key;
+		VT value;
+
 	public:
-		template <class _KT, class _VT>
-		SLIB_INLINE HashEntry(_KT&& _key, _VT&& _value)
-		 : key(Forward<_KT>(_key)), value(Forward<_VT>(_value))
-		{
-		}
+		template <class KEY, class VALUE>
+		HashEntry(KEY&& _key, VALUE&& _value) noexcept;
 		
+	};
+	
+	template <class KT, class VT>
+	struct HashTableStruct
+	{
+		HashEntry<KT, VT>** entries;
+		sl_uint32 capacity;
+		
+		sl_size count;
+		HashEntry<KT, VT>* firstEntry;
+		HashEntry<KT, VT>* lastEntry;
+		
+		sl_uint32 capacityMin;
+		sl_uint32 thresholdUp;
+		sl_uint32 thresholdDown;
 	};
 	
 
@@ -54,84 +60,71 @@ namespace slib
 	class SLIB_EXPORT HashTable
 	{
 	public:
-		HashTable(sl_uint32 capacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
+		HashTable() noexcept;
+		
+		HashTable(sl_uint32 capacity) noexcept;
+		
+		template <class HASH_ARG>
+		HashTable(sl_uint32 capacity, HASH_ARG&& hash) noexcept;
+
+		template <class HASH_ARG, class KEY_EQUALS_ARG>
+		HashTable(sl_uint32 capacity, HASH_ARG&& hash, KEY_EQUALS_ARG&& key_equals) noexcept;
 	
-		~HashTable();
+		~HashTable() noexcept;
 	
 	public:
-		sl_size getCount() const;
+		sl_size getCount() const noexcept;
 	
-		sl_size getCapacity() const;
+		sl_size getCapacity() const noexcept;
 	
-		HashEntry<KT, VT>* getFirstEntry() const;
+		HashEntry<KT, VT>* getFirstEntry() const noexcept;
 		
-		HashEntry<KT, VT>* getLastEntry() const;
+		HashEntry<KT, VT>* getLastEntry() const noexcept;
 		
-		HashEntry<KT, VT>* search(const KT& key) const;
+		HashEntry<KT, VT>* search(const KT& key) const noexcept;
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		HashEntry<KT, VT>* searchKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		HashEntry<KT, VT>* searchKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 		
-		sl_bool get(const KT& key, VT* outValue = sl_null) const;
+		sl_bool get(const KT& key, VT* outValue = sl_null) const noexcept;
 
-		VT* getItemPointer(const KT& key) const;
+		VT* getItemPointer(const KT& key) const noexcept;
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		VT* getItemPointerByKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		VT* getItemPointerByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 
-		List<VT> getValues(const KT& key) const;
+		List<VT> getValues(const KT& key) const noexcept;
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		List<VT> getValuesByKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		List<VT> getValuesByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 
-		template <class _KT, class _VT>
-		sl_bool put(_KT&& key, _VT&& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
+		template <class KEY, class VALUE>
+		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null) noexcept;
 
-		template < class _KT, class _VT, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<_VT>::Type> >
-		sl_bool addIfNewKeyAndValue(_KT&& key, _VT&& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class KEY, class VALUE, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<VALUE>::Type> >
+		sl_bool addIfNewKeyAndValue(KEY&& key, VALUE&& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 
-		sl_bool remove(const KT& key, VT* outValue = sl_null);
+		sl_bool remove(const KT& key, VT* outValue = sl_null) noexcept;
 
-		sl_size removeItems(const KT& key, List<VT>* outValues = sl_null);
+		sl_size removeItems(const KT& key, List<VT>* outValues = sl_null) noexcept;
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_bool removeKeyAndValue(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 
-		template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
-		sl_size removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 
-		sl_size removeAll();
+		sl_size removeAll() noexcept;
 
-		sl_bool copyFrom(const HashTable<KT, VT, HASH, KEY_EQUALS>* other);
+		sl_bool copyFrom(const HashTable<KT, VT, HASH, KEY_EQUALS>* other) noexcept;
 
 	private:
 		typedef HashEntry<KT, VT> Entry;
+		typedef HashTableStruct<KT, VT> Table;
 		
-		Entry** m_table;
-		sl_size m_nSize;
-		Entry* m_firstEntry;
-		Entry* m_lastEntry;
-
-		sl_uint32 m_nCapacity;
-		sl_uint32 m_nCapacityMin;
-		sl_uint32 m_nThresholdUp;
-		sl_uint32 m_nThresholdDown;
-
+		Table m_table;
 		HASH m_hash;
 		KEY_EQUALS m_equals;
-	
-	private:
-		void _init();
-
-		void _free();
-
-		sl_bool _createTable(sl_uint32 capacity);
-
-		void _addEntry(sl_uint32 hash, Entry* entry);
-
-		void _removeEntry(Entry* entry);
-		
-		void _compact();
 		
 	};
 
