@@ -70,6 +70,7 @@
     <ClCompile Include="..\..\src\slib\core\preference_win32.cpp" />
     <ClCompile Include="..\..\src\slib\core\ptr.cpp" />
     <ClCompile Include="..\..\src\slib\core\asset.cpp" />
+    <ClCompile Include="..\..\src\slib\core\red_black_tree.cpp" />
     <ClCompile Include="..\..\src\slib\core\ref.cpp" />
     <ClCompile Include="..\..\src\slib\core\resource.cpp" />
     <ClCompile Include="..\..\src\slib\core\service.cpp" />
