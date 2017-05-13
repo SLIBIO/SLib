@@ -15,7 +15,7 @@ namespace slib
 {
 	
 	// based on adler32
-	sl_uint32 HashBytes(const void* _buf, sl_size n)
+	sl_uint32 HashBytes(const void* _buf, sl_size n) noexcept
 	{
 		#define PRIV_SLIB_MOD_ADLER 65521
 		sl_uint8* buf = (sl_uint8*)_buf;
