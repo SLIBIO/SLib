@@ -330,7 +330,7 @@ namespace slib
 			}
 		}
 		
-		// rebalance red-black tree properties
+		// rebalance red-black tree.
 		// `node` is always BLACK, here
 		SLIB_ASSERT(!(node && node->flagRed));
 		
