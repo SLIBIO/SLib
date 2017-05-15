@@ -70,8 +70,17 @@ namespace slib
 		template <class HASH_ARG, class KEY_EQUALS_ARG>
 		HashTable(sl_uint32 capacity, HASH_ARG&& hash, KEY_EQUALS_ARG&& key_equals) noexcept;
 	
+		HashTable(const HashTable& other) = delete;
+		
+		HashTable(HashTable&& other) noexcept;
+		
 		~HashTable() noexcept;
-	
+		
+	public:
+		HashTable& operator=(const HashTable& other) = delete;
+		
+		HashTable& operator=(HashTable&& other) noexcept;
+		
 	public:
 		sl_size getCount() const noexcept;
 	

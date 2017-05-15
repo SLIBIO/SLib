@@ -19,29 +19,33 @@ namespace slib
 	class SLIB_EXPORT Mutex
 	{
 	public:
-		Mutex();
+		Mutex() noexcept;
 
-		Mutex(const Mutex& other);
+		Mutex(const Mutex& other) noexcept;
+		
+		Mutex(Mutex&& other) noexcept;
 
-		~Mutex();
+		~Mutex() noexcept;
 	
 	public:
-		sl_bool tryLock() const;
+		sl_bool tryLock() const noexcept;
 
-		void lock() const;
+		void lock() const noexcept;
 
-		void unlock() const;
+		void unlock() const noexcept;
 
 	public:
-		Mutex& operator=(const Mutex& other);
+		Mutex& operator=(const Mutex& other) noexcept;
 	
+		Mutex& operator=(Mutex&& other) noexcept;
+		
 	private:
 		mutable void* m_pObject;
 
 	private:
-		void _init();
+		void _init() noexcept;
 
-		void _free();
+		void _free() noexcept;
 
 	};
 	
@@ -50,33 +54,41 @@ namespace slib
 	class SLIB_EXPORT MutexLocker
 	{
 	public:
-		MutexLocker();
+		MutexLocker() noexcept;
 	
-		MutexLocker(const Mutex* mutex);
+		MutexLocker(const Mutex* mutex) noexcept;
 	
-		MutexLocker(const Mutex* mutex1, const Mutex* mutex2);
+		MutexLocker(const Mutex* mutex1, const Mutex* mutex2) noexcept;
 
-		MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3);
+		MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3) noexcept;
 	
-		MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4);
+		MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4) noexcept;
 	
-		MutexLocker(Mutex const* const* mutex_array, sl_size count);
+		MutexLocker(Mutex const* const* mutex_array, sl_size count) noexcept;
+		
+		MutexLocker(const MutexLocker& other) = delete;
+		
+		MutexLocker(MutexLocker&& other) = delete;
 
-		~MutexLocker();
+		~MutexLocker() noexcept;
 
 	public:
-		void lock(const Mutex* mutex);
+		void lock(const Mutex* mutex) noexcept;
 
-		void lock(const Mutex* mutex1, const Mutex* mutex2);
+		void lock(const Mutex* mutex1, const Mutex* mutex2) noexcept;
 
-		void lock(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3);
+		void lock(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3) noexcept;
 
-		void lock(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4);
+		void lock(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4) noexcept;
 
-		void lock(Mutex const* const* mutex_array, sl_size count);
+		void lock(Mutex const* const* mutex_array, sl_size count) noexcept;
 	
-
-		void unlock();
+		void unlock() noexcept;
+		
+	public:
+		MutexLocker& operator=(const MutexLocker& other) = delete;
+		
+		MutexLocker& operator=(MutexLocker&& other) = delete;
 
 	private:
 		sl_size m_count;

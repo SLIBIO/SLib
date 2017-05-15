@@ -29,7 +29,6 @@ namespace slib
 		HashBaseEntry* firstEntry;
 		HashBaseEntry* lastEntry;
 		
-		sl_uint32 minimumCapacity;
 		sl_uint32 thresholdUp;
 		sl_uint32 thresholdDown;
 	};
@@ -43,9 +42,9 @@ namespace slib
 	public:
 		static void init(Table* table) noexcept;
 		
-		static void init(Table* table, sl_uint32 minimumCapacity) noexcept;
+		static void init(Table* table, sl_uint32 capacity) noexcept;
 		
-		static void initEntries(Table* table) noexcept;
+		static sl_bool validateEntries(Table* table) noexcept;
 		
 		static sl_bool createEntries(Table* table, sl_uint32 capacity) noexcept;
 		
@@ -54,6 +53,8 @@ namespace slib
 		static void add(Table* table, Entry* entry, sl_uint32 hash) noexcept;
 		
 		static void remove(Table* table, Entry* entry) noexcept;
+		
+		static void expand(Table* table) noexcept;
 		
 		static void compact(Table* table) noexcept;
 		
@@ -104,6 +105,24 @@ namespace slib
 		_priv_HashTable_free(&m_table);
 	}
 	
+	template <class KT, class VT, class HASH, class KEY_EQUALS>
+	HashTable<KT, VT, HASH, KEY_EQUALS>::HashTable(HashTable<KT, VT, HASH, KEY_EQUALS>&& other) noexcept
+	 : m_hash(Move(other.m_hash)), m_equals(Move(other.m_equals))
+	{
+		Base::copyMemory(&m_table, &(other.m_table), sizeof(Table));
+		_priv_HashTable::init(reinterpret_cast<HashBaseTable*>(&(other.m_table)));
+	}
+
+	template <class KT, class VT, class HASH, class KEY_EQUALS>
+	HashTable<KT, VT, HASH, KEY_EQUALS>& HashTable<KT, VT, HASH, KEY_EQUALS>::operator=(HashTable<KT, VT, HASH, KEY_EQUALS>&& other) noexcept
+	{
+		Base::copyMemory(&m_table, &(other.m_table), sizeof(Table));
+		_priv_HashTable::init(reinterpret_cast<HashBaseTable*>(&(other.m_table)));
+		m_hash = Move(other.m_hash);
+		m_equals = Move(other.m_equals);
+		return *this;
+	}
+
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	SLIB_INLINE sl_size HashTable<KT, VT, HASH, KEY_EQUALS>::getCount() const noexcept
 	{
@@ -246,14 +265,15 @@ namespace slib
 	template <class KEY, class VALUE>
 	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::put(KEY&& key, VALUE&& value, MapPutMode mode, HashEntry<KT, VT>* ppEntry) noexcept
 	{
-
-		sl_uint32 capacity = m_table.capacity;
-		if (capacity == 0) {
+		
+		if (!(_priv_HashTable::validateEntries(reinterpret_cast<HashBaseTable*>(&m_table)))) {
 			if (ppEntry) {
 				*ppEntry = sl_null;
 			}
 			return sl_false;
 		}
+
+		sl_uint32 capacity = m_table.capacity;
 		
 		sl_uint32 hash = m_hash(key);
 
@@ -290,6 +310,7 @@ namespace slib
 		}
 		if (newEntry) {
 			_priv_HashTable::add(reinterpret_cast<HashBaseTable*>(&m_table), reinterpret_cast<HashBaseEntry*>(newEntry), hash);
+			_priv_HashTable::expand(reinterpret_cast<HashBaseTable*>(&m_table));
 			return sl_true;
 		}
 		return sl_false;
@@ -301,13 +322,14 @@ namespace slib
 	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue(KEY&& key, VALUE&& value, HashEntry<KT, VT>* ppEntry, const VALUE_EQUALS& value_equals) noexcept
 	{
 		
-		sl_uint32 capacity = m_table.capacity;
-		if (capacity == 0) {
+		if (!(_priv_HashTable::validateEntries(reinterpret_cast<HashBaseTable*>(&m_table)))) {
 			if (ppEntry) {
 				*ppEntry = sl_null;
 			}
 			return sl_false;
 		}
+		
+		sl_uint32 capacity = m_table.capacity;
 
 		sl_uint32 hash = m_hash(key);
 	
@@ -329,6 +351,7 @@ namespace slib
 		}
 		if (newEntry) {
 			_priv_HashTable::add(reinterpret_cast<HashBaseTable*>(&m_table), reinterpret_cast<HashBaseEntry*>(newEntry), hash);
+			_priv_HashTable::expand(reinterpret_cast<HashBaseTable*>(&m_table));
 			return sl_true;
 		}
 		return sl_false;
@@ -515,7 +538,7 @@ namespace slib
 		}
 		sl_size count = m_table.count;
 		_priv_HashTable_free(&m_table);
-		_priv_HashTable::initEntries(reinterpret_cast<HashBaseTable*>(&m_table));
+		_priv_HashTable::init(reinterpret_cast<HashBaseTable*>(&m_table));
 		return count;
 	}
 
@@ -523,16 +546,13 @@ namespace slib
 	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::copyFrom(const HashTable<KT, VT, HASH, KEY_EQUALS>* other) noexcept
 	{
 		_priv_HashTable_free(&m_table);
-		m_table.minimumCapacity = other->m_table.minimumCapacity;
-		_priv_HashTable::initEntries(reinterpret_cast<HashBaseTable*>(&m_table));
-		if (other->m_table.minimumCapacity == 0) {
+		m_hash = other->m_hash;
+		m_equals = other->m_equals;
+		_priv_HashTable::init(reinterpret_cast<HashBaseTable*>(&m_table), other->m_table.capacity);
+		if (m_table.capacity == 0) {
 			return sl_false;
 		}
-		if (m_table.minimumCapacity == 0) {
-			return sl_true;
-		}
-		
-		Entry* entry = other->m_firstEntry;
+		Entry* entry = other->m_table.firstEntry;
 		while (entry) {
 			Entry* newEntry = new Entry(entry->data.key, entry->data.value);
 			if (!newEntry) {
@@ -541,7 +561,6 @@ namespace slib
 			_priv_HashTable::add(reinterpret_cast<HashBaseTable*>(&m_table), reinterpret_cast<HashBaseEntry*>(entry), entry->hash);
 			entry = entry->next;
 		}
-		
 		return sl_true;
 	}
 	

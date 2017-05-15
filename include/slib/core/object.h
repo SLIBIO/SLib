@@ -28,24 +28,33 @@ namespace slib
 		SLIB_DECLARE_OBJECT
 
 	public:
-		Object();
+		Object() noexcept;
+		
+		Object(const Object& other) = delete;
+		
+		Object(Object&& other) = delete;
 
-		~Object();
+		~Object() noexcept;
 
 	public:
-		Mutex* getLocker() const;
+		Mutex* getLocker() const noexcept;
 
-		void lock() const;
+		void lock() const noexcept;
 	
-		void unlock() const;
+		void unlock() const noexcept;
 	
-		sl_bool tryLock() const;
+		sl_bool tryLock() const noexcept;
 		
-		Variant getProperty(const String& name);
+		Variant getProperty(const String& name) noexcept;
 		
-		void setProperty(const String& name, const Variant& value);
+		void setProperty(const String& name, const Variant& value) noexcept;
 		
-		void clearProperty(const String& name);
+		void clearProperty(const String& name) noexcept;
+		
+	public:
+		Object& operator=(const Object& other) = delete;
+		
+		Object& operator=(Object&& other) = delete;
 	
 	private:
 		Mutex m_locker;
@@ -56,18 +65,18 @@ namespace slib
 	class SLIB_EXPORT ObjectLocker : public MutexLocker
 	{
 	public:
-		ObjectLocker();
+		ObjectLocker() noexcept;
 
-		ObjectLocker(const Object* object);
+		ObjectLocker(const Object* object) noexcept;
 	
-		ObjectLocker(const Object* object1, const Object* object2);
+		ObjectLocker(const Object* object1, const Object* object2) noexcept;
 
-		~ObjectLocker();
+		~ObjectLocker() noexcept;
 
 	public:
-		void lock(const Object* object);
+		void lock(const Object* object) noexcept;
 
-		void lock(const Object* object1, const Object* object2);
+		void lock(const Object* object1, const Object* object2) noexcept;
 
 	};
 

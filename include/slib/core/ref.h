@@ -34,6 +34,8 @@ namespace slib
 		Referable() noexcept;
 
 		Referable(const Referable& other) noexcept;
+		
+		Referable(Referable&& other) noexcept;
 
 		virtual ~Referable() noexcept;
 
@@ -66,6 +68,11 @@ namespace slib
 		CWeakRef* _getWeakObject() noexcept;
 
 		void _free() noexcept;
+		
+	public:
+		Referable& operator=(const Referable& other) = delete;
+		
+		Referable& operator=(Referable&& other) = delete;
 
 	private:
 		sl_reg m_signature;
@@ -80,6 +87,7 @@ namespace slib
 		SpinLock m_lockWeak;
 
 		friend class CWeakRef;
+		
 	};
 
 	
@@ -653,6 +661,7 @@ namespace slib
 	class SLIB_EXPORT CWeakRef : public Referable
 	{
 		SLIB_DECLARE_OBJECT
+		
 	public:
 		CWeakRef() noexcept;
 

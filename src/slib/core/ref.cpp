@@ -44,6 +44,16 @@ namespace slib
 		m_flagWeakRef = sl_false;
 		m_weak = sl_null;
 	}
+	
+	Referable::Referable(Referable&& other) noexcept
+	{
+#ifdef SLIB_DEBUG_REFERENCE
+		m_signature = _SIGNATURE;
+#endif
+		m_nRefCount = 0;
+		m_flagWeakRef = sl_false;
+		m_weak = sl_null;
+	}
 
 	Referable::~Referable() noexcept
 	{
@@ -149,7 +159,7 @@ namespace slib
 	}
 #endif
 
-
+	
 	SLIB_DEFINE_ROOT_OBJECT(CWeakRef)
 
 	CWeakRef::CWeakRef() noexcept
