@@ -66,7 +66,7 @@ namespace slib
 	template <class KT, class VT>
 	template <class KEY, class VALUE>
 	SLIB_INLINE HashEntry<KT, VT>::HashEntry(KEY&& _key, VALUE&& _value) noexcept
-	 : key(Forward<KEY>(_key)), value(Forward<VALUE>(_value))
+	 : data(Forward<KEY>(_key), Forward<VALUE>(_value))
 	{
 	}
 	
@@ -139,7 +139,7 @@ namespace slib
 		sl_uint32 index = hash & (capacity - 1);
 		Entry* entry = m_table.entries[index];
 		while (entry) {
-			if (entry->hash == hash && m_equals(entry->key, key)) {
+			if (entry->hash == hash && m_equals(entry->data.key, key)) {
 				return entry;
 			}
 			entry = entry->chain;
@@ -159,7 +159,7 @@ namespace slib
 		sl_uint32 index = hash & (capacity - 1);
 		Entry* entry = m_table.entries[index];
 		while (entry) {
-			if (entry->hash == hash && m_equals(entry->key, key) && value_equals(entry->value, value)) {
+			if (entry->hash == hash && m_equals(entry->data.key, key) && value_equals(entry->data.value, value)) {
 				return entry;
 			}
 			entry = entry->chain;
@@ -173,7 +173,7 @@ namespace slib
 		Entry* entry = search(key);
 		if (entry) {
 			if (value) {
-				*value = entry->value;
+				*value = entry->data.value;
 			}
 			return sl_true;
 		}
@@ -185,7 +185,7 @@ namespace slib
 	{
 		Entry* entry = search(key);
 		if (entry) {
-			return &(entry->value);
+			return &(entry->data.value);
 		}
 		return sl_null;
 	}
@@ -196,7 +196,7 @@ namespace slib
 	{
 		Entry* entry = searchKeyAndValue(key, value, value_equals);
 		if (entry) {
-			return &(entry->value);
+			return &(entry->data.value);
 		}
 		return sl_null;
 	}
@@ -213,8 +213,8 @@ namespace slib
 		sl_uint32 index = hash & (capacity - 1);
 		Entry* entry = m_table.entries[index];
 		while (entry) {
-			if (entry->hash == hash && m_equals(entry->key, key)) {
-				ret.add_NoLock(entry->value);
+			if (entry->hash == hash && m_equals(entry->data.key, key)) {
+				ret.add_NoLock(entry->data.value);
 			}
 			entry = entry->chain;
 		}
@@ -234,8 +234,8 @@ namespace slib
 		sl_uint32 index = hash & (capacity - 1);
 		Entry* entry = m_table.entries[index];
 		while (entry) {
-			if (entry->hash == hash && m_equals(entry->key, key) && value_equals(entry->value, value)) {
-				ret.add_NoLock(entry->value);
+			if (entry->hash == hash && m_equals(entry->data.key, key) && value_equals(entry->data.value, value)) {
+				ret.add_NoLock(entry->data.value);
 			}
 			entry = entry->chain;
 		}
@@ -244,14 +244,14 @@ namespace slib
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	template <class KEY, class VALUE>
-	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::put(KEY&& key, VALUE&& value, MapPutMode mode, sl_bool* pFlagExist) noexcept
+	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::put(KEY&& key, VALUE&& value, MapPutMode mode, HashEntry<KT, VT>* ppEntry) noexcept
 	{
-		if (pFlagExist) {
-			*pFlagExist = sl_false;
-		}
-		
+
 		sl_uint32 capacity = m_table.capacity;
 		if (capacity == 0) {
+			if (ppEntry) {
+				*ppEntry = sl_null;
+			}
 			return sl_false;
 		}
 		
@@ -261,24 +261,33 @@ namespace slib
 			sl_uint32 index = hash & (capacity - 1);
 			Entry* entry = m_table.entries[index];
 			while (entry) {
-				if (entry->hash == hash && m_equals(entry->key, key)) {
-					if (pFlagExist) {
-						*pFlagExist = sl_true;
+				if (entry->hash == hash && m_equals(entry->data.key, key)) {
+					if (mode != MapPutMode::AddAlways) {
+						if (ppEntry) {
+							*ppEntry = entry;
+						}
+						if (mode == MapPutMode::AddNew) {
+							return sl_false;
+						}
+						entry->data.value = Forward<VALUE>(value);
+						return sl_true;
 					}
-					if (mode == MapPutMode::AddNew) {
-						return sl_false;
-					}
-					entry->value = Forward<VALUE>(value);
-					return sl_true;
+					break;
 				}
 				entry = entry->chain;
 			}
 			if (mode == MapPutMode::ReplaceExisting) {
+				if (ppEntry) {
+					*ppEntry = sl_null;
+				}
 				return sl_false;
 			}
 		}
 
 		Entry* newEntry = new Entry(Forward<KEY>(key), Forward<VALUE>(value));
+		if (ppEntry) {
+			*ppEntry = newEntry;
+		}
 		if (newEntry) {
 			_priv_HashTable::add(reinterpret_cast<HashBaseTable*>(&m_table), reinterpret_cast<HashBaseEntry*>(newEntry), hash);
 			return sl_true;
@@ -289,14 +298,14 @@ namespace slib
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	template <class KEY, class VALUE, class VALUE_EQUALS>
-	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue(KEY&& key, VALUE&& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals) noexcept
+	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue(KEY&& key, VALUE&& value, HashEntry<KT, VT>* ppEntry, const VALUE_EQUALS& value_equals) noexcept
 	{
-		if (pFlagExist) {
-			*pFlagExist = sl_false;
-		}
 		
 		sl_uint32 capacity = m_table.capacity;
 		if (capacity == 0) {
+			if (ppEntry) {
+				*ppEntry = sl_null;
+			}
 			return sl_false;
 		}
 
@@ -305,9 +314,9 @@ namespace slib
 		sl_uint32 index = hash & (capacity - 1);
 		Entry* entry = m_table.entries[index];
 		while (entry) {
-			if (entry->hash == hash && m_equals(entry->key, key) && value_equals(entry->value, value)) {
-				if (pFlagExist) {
-					*pFlagExist = sl_true;
+			if (entry->hash == hash && m_equals(entry->data.key, key) && value_equals(entry->data.value, value)) {
+				if (ppEntry) {
+					*ppEntry = entry;
 				}
 				return sl_false;
 			}
@@ -315,11 +324,42 @@ namespace slib
 		}
 
 		Entry* newEntry = new Entry(Forward<KEY>(key), Forward<VALUE>(value));
+		if (ppEntry) {
+			*ppEntry = newEntry;
+		}
 		if (newEntry) {
 			_priv_HashTable::add(reinterpret_cast<HashBaseTable*>(&m_table), reinterpret_cast<HashBaseEntry*>(newEntry), hash);
 			return sl_true;
 		}
 		return sl_false;
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_EQUALS>
+	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::removeEntry(const HashEntry<KT, VT>* entryRemove) noexcept
+	{
+		sl_uint32 capacity = m_table.capacity;
+		if (capacity == 0) {
+			return sl_false;
+		}
+		
+		sl_uint32 hash = entryRemove->hash;
+		sl_uint32 index = hash & (capacity - 1);
+		
+		Entry* entry;
+		Entry** link = m_table.entries + index;
+		while ((entry = *link)) {
+			if (entry == entryRemove) {
+				*link = entry->chain;
+				_priv_HashTable::remove(reinterpret_cast<HashBaseTable*>(&m_table), reinterpret_cast<HashBaseEntry*>(entry));
+				_priv_HashTable::compact(reinterpret_cast<HashBaseTable*>(&m_table));
+				delete entry;
+				return sl_true;
+			} else {
+				link = &(entry->chain);
+			}
+		}
+		return sl_false;
+
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
@@ -335,11 +375,11 @@ namespace slib
 		Entry* entry;
 		Entry** link = m_table.entries + index;
 		while ((entry = *link)) {
-			if (entry->hash == hash && m_equals(entry->key, key)) {
+			if (entry->hash == hash && m_equals(entry->data.key, key)) {
 				*link = entry->chain;
 				_priv_HashTable::remove(reinterpret_cast<HashBaseTable*>(&m_table), reinterpret_cast<HashBaseEntry*>(entry));
 				if (outValue) {
-					*outValue = Move(entry->value);
+					*outValue = Move(entry->data.value);
 				}
 				_priv_HashTable::compact(reinterpret_cast<HashBaseTable*>(&m_table));
 				delete entry;
@@ -366,11 +406,11 @@ namespace slib
 		Entry* entryDelete = sl_null;
 		Entry** linkDelete = &entryDelete;
 		while ((entry = *link)) {
-			if (entry->hash == hash && m_equals(entry->key, key)) {
+			if (entry->hash == hash && m_equals(entry->data.key, key)) {
 				*link = entry->chain;
 				_priv_HashTable::remove(reinterpret_cast<HashBaseTable*>(&m_table), reinterpret_cast<HashBaseEntry*>(entry));
 				if (outValues) {
-					outValues->add_NoLock(Move(entry->value));
+					outValues->add_NoLock(Move(entry->data.value));
 				}
 				*linkDelete = entry;
 				entry->chain = sl_null;
@@ -407,11 +447,11 @@ namespace slib
 		Entry* entry;
 		Entry** link = m_table.entries + index;
 		while ((entry = *link)) {
-			if (entry->hash == hash && m_equals(entry->key, key) && value_equals(entry->value, value)) {
+			if (entry->hash == hash && m_equals(entry->data.key, key) && value_equals(entry->data.value, value)) {
 				*link = entry->chain;
 				_priv_HashTable::remove(reinterpret_cast<HashBaseTable*>(&m_table), reinterpret_cast<HashBaseEntry*>(entry));
 				if (outValue) {
-					*outValue = Move(entry->value);
+					*outValue = Move(entry->data.value);
 				}
 				_priv_HashTable::compact(reinterpret_cast<HashBaseTable*>(&m_table));
 				delete entry;
@@ -439,11 +479,11 @@ namespace slib
 		Entry* entryDelete = sl_null;
 		Entry** linkDelete = &entryDelete;
 		while ((entry = *link)) {
-			if (entry->hash == hash && m_equals(entry->key, key) && value_equals(entry->value, value)) {
+			if (entry->hash == hash && m_equals(entry->data.key, key) && value_equals(entry->data.value, value)) {
 				*link = entry->chain;
 				_priv_HashTable::remove(reinterpret_cast<HashBaseTable*>(&m_table), reinterpret_cast<HashBaseEntry*>(entry));
 				if (outValues) {
-					outValues->add_NoLock(Move(entry->value));
+					outValues->add_NoLock(Move(entry->data.value));
 				}
 				*linkDelete = entry;
 				entry->chain = sl_null;
@@ -494,7 +534,7 @@ namespace slib
 		
 		Entry* entry = other->m_firstEntry;
 		while (entry) {
-			Entry* newEntry = new Entry(entry->key, entry->value);
+			Entry* newEntry = new Entry(entry->data.key, entry->data.value);
 			if (!newEntry) {
 				return sl_false;
 			}

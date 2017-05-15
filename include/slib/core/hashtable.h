@@ -14,6 +14,7 @@
 #include "definition.h"
 
 #include "constants.h"
+#include "pair.h"
 #include "hash.h"
 #include "compare.h"
 #include "list.h"
@@ -31,8 +32,7 @@ namespace slib
 		HashEntry* next;
 		sl_uint32 hash;
 		
-		KT key;
-		VT value;
+		Pair<KT, VT> data;
 
 	public:
 		template <class KEY, class VALUE>
@@ -99,10 +99,12 @@ namespace slib
 		List<VT> getValuesByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 
 		template <class KEY, class VALUE>
-		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null) noexcept;
+		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, HashEntry<KT, VT>* ppEntry = sl_null) noexcept;
 
 		template < class KEY, class VALUE, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<VALUE>::Type> >
-		sl_bool addIfNewKeyAndValue(KEY&& key, VALUE&& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		sl_bool addIfNewKeyAndValue(KEY&& key, VALUE&& value, HashEntry<KT, VT>* ppEntry = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+
+		sl_bool removeEntry(const HashEntry<KT, VT>* entry) noexcept;
 
 		sl_bool remove(const KT& key, VT* outValue = sl_null) noexcept;
 
