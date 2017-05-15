@@ -338,13 +338,13 @@ namespace slib
 		Node* node;
 		if (search(&node, key)) {
 			if (mode != MapPutMode::AddAlways) {
+				if (ppNode) {
+					*ppNode = node;
+				}
 				if (mode == MapPutMode::AddNew) {
 					return sl_false;
 				}
 				node->data.value = Forward<VALUE>(value);
-				if (ppNode) {
-					*ppNode = node;
-				}
 				return sl_true;
 			}
 		}
