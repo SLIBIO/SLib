@@ -14,6 +14,7 @@
 #include "definition.h"
 
 #include "constants.h"
+#include "pair.h"
 #include "compare.h"
 #include "list.h"
 
@@ -29,8 +30,7 @@ namespace slib
 		RedBlackTreeNode<KT, VT>* right;
 		sl_bool flagRed;
 		
-		KT key;
-		VT value;
+		Pair<KT, VT> data;
 		
 	public:
 		template <class KEY, class VALUE>
@@ -91,10 +91,14 @@ namespace slib
 		List<VT> getValuesByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 
 		template <class KEY, class VALUE>
-		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null) noexcept;
+		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, RedBlackTreeNode<KT, VT>** ppNode = sl_null) noexcept;
 
 		template < class KEY, class VALUE, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<VALUE>::Type> >
-		sl_bool addIfNewKeyAndValue(KEY&& key, VALUE&& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		sl_bool addIfNewKeyAndValue(KEY&& key, VALUE&& value, RedBlackTreeNode<KT, VT>** ppNode = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		
+		void insertNode(RedBlackTreeNode<KT, VT>* node) noexcept;
+
+		void removeNode(RedBlackTreeNode<KT, VT>* node) noexcept;
 
 		sl_bool remove(const KT& key, VT* outValue = sl_null) noexcept;
 
@@ -115,11 +119,6 @@ namespace slib
 		KEY_COMPARE m_compare;
 		
 		sl_size m_count;
-		
-	private:
-		void _insertNode(Node* node) noexcept;
-		
-		void _removeNode(Node* node) noexcept;
 		
 	};
 
