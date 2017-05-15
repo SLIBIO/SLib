@@ -26,10 +26,10 @@ namespace slib
 	class HashEntry
 	{
 	public:
-		sl_uint32 hash;
 		HashEntry* chain;
 		HashEntry* before;
 		HashEntry* next;
+		sl_uint32 hash;
 		
 		KT key;
 		VT value;

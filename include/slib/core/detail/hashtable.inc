@@ -14,11 +14,10 @@ namespace slib
 	class HashBaseEntry
 	{
 	public:
-		sl_uint32 hash;
 		HashBaseEntry* chain;
 		HashBaseEntry* before;
 		HashBaseEntry* next;
-		
+		sl_uint32 hash;
 	};
 	
 	struct HashBaseTable
