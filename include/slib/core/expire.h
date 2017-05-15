@@ -56,7 +56,7 @@ namespace slib
 
 		void removeAll();
 
-		sl_bool containsKey(const KT& key);
+		sl_bool contains(const KT& key);
 
 	protected:
 		void _update(Timer* timer);

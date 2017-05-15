@@ -142,13 +142,13 @@ namespace slib
 	}
 
 	template <class KT, class VT>
-	sl_bool ExpiringMap<KT, VT>::containsKey(const KT& key)
+	sl_bool ExpiringMap<KT, VT>::contains(const KT& key)
 	{
 		ObjectLocker lock(this);
-		if (m_mapCurrent.containsKey_NoLock(key)) {
+		if (m_mapCurrent.contains_NoLock(key)) {
 			return sl_true;
 		}
-		if (m_mapBackup.containsKey_NoLock(key)) {
+		if (m_mapBackup.contains_NoLock(key)) {
 			return sl_true;
 		}
 		return sl_false;
