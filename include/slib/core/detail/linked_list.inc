@@ -1589,6 +1589,12 @@ namespace slib
 	{
 		return link != p.link;
 	}
+	
+	template <class T>
+	SLIB_INLINE LinkPosition<T>::operator Link<T>*() const noexcept
+	{
+		return link;
+	}
 
 	template <class T>
 	SLIB_INLINE LinkPosition<T>& LinkPosition<T>::operator++()

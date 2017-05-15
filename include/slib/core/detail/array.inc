@@ -392,8 +392,12 @@ namespace slib
 	SLIB_INLINE ArrayPosition<T>::ArrayPosition(T* _pos, sl_size _count, Referable* _ref) noexcept
 	 : ref(_ref)
 	{
-		pos = _pos;
 		count = _count;
+		if (_count > 0) {
+			pos = _pos;
+		} else {
+			pos = sl_null;
+		}
 	}
 
 	template <class T>
@@ -412,6 +416,12 @@ namespace slib
 	SLIB_INLINE sl_bool ArrayPosition<T>::operator!=(const ArrayPosition<T>& other) const noexcept
 	{
 		return pos != other.pos;
+	}
+	
+	template <class T>
+	SLIB_INLINE ArrayPosition<T>::operator sl_bool() const noexcept
+	{
+		return count > 0;
 	}
 
 	template <class T>

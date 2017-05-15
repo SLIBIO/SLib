@@ -171,12 +171,13 @@ namespace slib
 		
 		ArrayPosition& operator=(ArrayPosition&& other) noexcept = default;
 		
-	public:
 		T& operator*() const noexcept;
 		
 		sl_bool operator==(const ArrayPosition& other) const noexcept;
 
 		sl_bool operator!=(const ArrayPosition& other) const noexcept;
+		
+		explicit operator sl_bool() const noexcept;
 
 		ArrayPosition& operator++() noexcept;
 

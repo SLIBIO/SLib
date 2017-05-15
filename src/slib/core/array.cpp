@@ -15,13 +15,13 @@ namespace slib
 {
 	
 	SLIB_DEFINE_ROOT_OBJECT(CArrayBase)
-
+	
 	CArrayBase::CArrayBase() noexcept
-	{		
+	{
 	}
-
+	
 	CArrayBase::~CArrayBase() noexcept
-	{		
+	{
 	}
 
 	
@@ -30,7 +30,7 @@ namespace slib
 	CArray2DBase::CArray2DBase() noexcept
 	{
 	}
-
+	
 	CArray2DBase::~CArray2DBase() noexcept
 	{
 	}

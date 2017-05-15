@@ -47,16 +47,17 @@ namespace slib
 		
 		LinkPosition& operator=(LinkPosition&& other) = default;
 
-	public:
 		T& operator*() const;
 		
 		sl_bool operator==(const LinkPosition<T>& p) const;
 
 		sl_bool operator!=(const LinkPosition<T>& p) const;
+		
+		operator Link<T>*() const noexcept;
 
 		LinkPosition<T>& operator++();
 
-	private:
+	public:
 		Link<T>* link;
 		Ref<Referable> ref;
 
