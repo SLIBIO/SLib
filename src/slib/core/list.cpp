@@ -15,11 +15,11 @@ namespace slib
 
 	SLIB_DEFINE_ROOT_OBJECT(IIteratorBase)
 
-	IIteratorBase::IIteratorBase()
+	IIteratorBase::IIteratorBase() noexcept
 	{
 	}
 
-	IIteratorBase::~IIteratorBase()
+	IIteratorBase::~IIteratorBase() noexcept
 	{
 	}
 

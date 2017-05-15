@@ -12,12 +12,12 @@ namespace slib
 {
 
 	template <class T>
-	SLIB_INLINE IteratorPosition<T>::IteratorPosition()
+	SLIB_INLINE IteratorPosition<T>::IteratorPosition() noexcept
 	{
 	}
 
 	template <class T>
-	SLIB_INLINE IteratorPosition<T>::IteratorPosition(const Ref< IIterator<T> >& iterator) : ref(iterator)
+	SLIB_INLINE IteratorPosition<T>::IteratorPosition(const Ref< IIterator<T> >& iterator) noexcept : ref(iterator)
 	{
 		if (iterator.isNotNull()) {
 			flagValid = iterator->next(&value);
@@ -27,25 +27,25 @@ namespace slib
 	}
 
 	template <class T>
-	IteratorPosition<T>::IteratorPosition(const IteratorPosition<T>& other) = default;
+	IteratorPosition<T>::IteratorPosition(const IteratorPosition<T>& other) noexcept = default;
 
 	template <class T>
-	IteratorPosition<T>::IteratorPosition(IteratorPosition<T>&& other) = default;
+	IteratorPosition<T>::IteratorPosition(IteratorPosition<T>&& other) noexcept = default;
 	
 	template <class T>
-	SLIB_INLINE T& IteratorPosition<T>::operator*()
+	SLIB_INLINE T& IteratorPosition<T>::operator*() noexcept
 	{
 		return value;
 	}
 	
 	template <class T>
-	SLIB_INLINE sl_bool IteratorPosition<T>::operator!=(const IteratorPosition<T>& p)
+	SLIB_INLINE sl_bool IteratorPosition<T>::operator!=(const IteratorPosition<T>& p) noexcept
 	{
 		return flagValid;
 	}
 	
 	template <class T>
-	SLIB_INLINE IteratorPosition<T>& IteratorPosition<T>::operator++()
+	SLIB_INLINE IteratorPosition<T>& IteratorPosition<T>::operator++() noexcept
 	{
 		flagValid = ref->next(&value);
 		return *this;
@@ -53,7 +53,7 @@ namespace slib
 
 	
 	template <class T>
-	SLIB_INLINE sl_bool Iterator<T>::hasNext() const
+	SLIB_INLINE sl_bool Iterator<T>::hasNext() const noexcept
 	{
 		IIterator<T>* obj = ref._ptr;
 		if (obj) {
@@ -63,7 +63,7 @@ namespace slib
 	}
 	
 	template <class T>
-	SLIB_INLINE sl_reg Iterator<T>::getIndex() const
+	SLIB_INLINE sl_reg Iterator<T>::getIndex() const noexcept
 	{
 		IIterator<T>* obj = ref._ptr;
 		if (obj) {
@@ -73,7 +73,7 @@ namespace slib
 	}
 	
 	template <class T>
-	SLIB_INLINE sl_bool Iterator<T>::next(T* _out) const
+	SLIB_INLINE sl_bool Iterator<T>::next(T* _out) const noexcept
 	{
 		IIterator<T>* obj = ref._ptr;
 		if (obj) {
@@ -83,20 +83,20 @@ namespace slib
 	};
 	
 	template <class T>
-	SLIB_INLINE IteratorPosition<T> Iterator<T>::begin() const
+	SLIB_INLINE IteratorPosition<T> Iterator<T>::begin() const noexcept
 	{
 		return IteratorPosition<T>(ref);
 	}
 
 	template <class T>
-	SLIB_INLINE IteratorPosition<T> Iterator<T>::end() const
+	SLIB_INLINE IteratorPosition<T> Iterator<T>::end() const noexcept
 	{
 		return IteratorPosition<T>();
 	}
 
 
 	template <class T>
-	sl_bool Atomic< Iterator<T> >::hasNext() const
+	sl_bool Atomic< Iterator<T> >::hasNext() const noexcept
 	{
 		Ref< IIterator<T> > obj(ref);
 		if (obj.isNotNull()) {
@@ -106,7 +106,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_reg Atomic< Iterator<T> >::getIndex() const
+	sl_reg Atomic< Iterator<T> >::getIndex() const noexcept
 	{
 		Ref< IIterator<T> > obj(ref);
 		if (obj.isNotNull()) {
@@ -116,7 +116,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool Atomic< Iterator<T> >::next(T* _out) const
+	sl_bool Atomic< Iterator<T> >::next(T* _out) const noexcept
 	{
 		Ref< IIterator<T> > obj(ref);
 		if (obj.isNotNull()) {
@@ -126,13 +126,13 @@ namespace slib
 	};
 
 	template <class T>
-	IteratorPosition<T> Atomic< Iterator<T> >::begin() const
+	IteratorPosition<T> Atomic< Iterator<T> >::begin() const noexcept
 	{
 		return IteratorPosition<T>(ref);
 	}
 
 	template <class T>
-	IteratorPosition<T> Atomic< Iterator<T> >::end() const
+	IteratorPosition<T> Atomic< Iterator<T> >::end() const noexcept
 	{
 		return IteratorPosition<T>();
 	}

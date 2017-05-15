@@ -23,9 +23,9 @@ namespace slib
 		SLIB_DECLARE_OBJECT
 
 	public:
-		IIteratorBase();
+		IIteratorBase() noexcept;
 
-		~IIteratorBase();
+		~IIteratorBase() noexcept;
 
 	};
 	
@@ -33,11 +33,11 @@ namespace slib
 	class SLIB_EXPORT IIterator : public IIteratorBase
 	{
 	public:
-		virtual sl_bool hasNext() = 0;
+		virtual sl_bool hasNext() noexcept = 0;
 
-		virtual sl_bool next(T* _out = sl_null) = 0;
+		virtual sl_bool next(T* _out = sl_null) noexcept = 0;
 
-		virtual sl_reg getIndex() = 0;
+		virtual sl_reg getIndex() noexcept = 0;
 
 	};
 	
@@ -45,20 +45,20 @@ namespace slib
 	class SLIB_EXPORT IteratorPosition
 	{
 	public:
-		IteratorPosition();
+		IteratorPosition() noexcept;
 
-		IteratorPosition(const Ref< IIterator<T> >& iterator);
+		IteratorPosition(const Ref< IIterator<T> >& iterator) noexcept;
 
-		IteratorPosition(const IteratorPosition<T>& other);
+		IteratorPosition(const IteratorPosition<T>& other) noexcept;
 
-		IteratorPosition(IteratorPosition<T>&& other);
+		IteratorPosition(IteratorPosition<T>&& other) noexcept;
 
 	public:
-		T& operator*();
+		T& operator*() noexcept;
 
-		sl_bool operator!=(const IteratorPosition<T>& p);
+		sl_bool operator!=(const IteratorPosition<T>& p) noexcept;
 
-		IteratorPosition<T>& operator++();
+		IteratorPosition<T>& operator++() noexcept;
 
 	private:
 		Ref< IIterator<T> > ref;
@@ -75,16 +75,16 @@ namespace slib
 		SLIB_REF_WRAPPER(Iterator, IIterator<T>)
 
 	public:
-		sl_bool hasNext() const;
+		sl_bool hasNext() const noexcept;
 
-		sl_reg getIndex() const;
+		sl_reg getIndex() const noexcept;
 
-		sl_bool next(T* _out) const;
+		sl_bool next(T* _out) const noexcept;
 
 		// range-based for loop
-		IteratorPosition<T> begin() const;
+		IteratorPosition<T> begin() const noexcept;
 
-		IteratorPosition<T> end() const;
+		IteratorPosition<T> end() const noexcept;
 
 	};
 	
@@ -96,16 +96,16 @@ namespace slib
 		SLIB_ATOMIC_REF_WRAPPER(IIterator<T>)
 	
 	public:
-		sl_bool hasNext() const;
+		sl_bool hasNext() const noexcept;
 
-		sl_reg getIndex() const;
+		sl_reg getIndex() const noexcept;
 
-		sl_bool next(T* _out) const;
+		sl_bool next(T* _out) const noexcept;
 
 		// range-based for loop
-		IteratorPosition<T> begin() const;
+		IteratorPosition<T> begin() const noexcept;
 
-		IteratorPosition<T> end() const;
+		IteratorPosition<T> end() const noexcept;
 
 	};
 	
