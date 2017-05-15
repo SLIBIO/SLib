@@ -56,7 +56,6 @@
 #include "core/btree.h"
 #include "core/array.h"
 #include "core/array2d.h"
-#include "core/iterator.h"
 #include "core/list.h"
 #include "core/map.h"
 #include "core/linked_list.h"
