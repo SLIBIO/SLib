@@ -254,7 +254,7 @@ namespace slib
 		}
 		
 	}
-		
+	
 	void _priv_RedBlackTree::rebalanceAfterRemove(RedBlackTreeBaseNode* node, RedBlackTreeBaseNode** pRoot) noexcept
 	{
 		sl_bool flagRed = node->flagRed;

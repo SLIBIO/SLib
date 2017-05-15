@@ -73,12 +73,12 @@ namespace slib
 	public:
 		sl_size getCount() const noexcept;
 		
-		sl_bool find(RedBlackTreeNode<KT, VT>** ppNode, const KT& key) const noexcept;
+		sl_bool find(const KT& key, RedBlackTreeNode<KT, VT>** ppNode) const noexcept;
 		
 		RedBlackTreeNode<KT, VT>* find(const KT& key) const noexcept;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool findKeyAndValue(RedBlackTreeNode<KT, VT>** ppNode, const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		sl_bool findKeyAndValue(const KT& key, const VALUE& value, RedBlackTreeNode<KT, VT>** ppNode, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		RedBlackTreeNode<KT, VT>* findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
