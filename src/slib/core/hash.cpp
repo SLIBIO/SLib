@@ -35,42 +35,34 @@ namespace slib
 	
 	void _priv_HashTable::init(HashBaseTable* table) noexcept
 	{
-		table->minimumCapacity = PRIV_SLIB_HASHTABLE_MIN_CAPACITY;
-		initEntries(table);
+		Base::zeroMemory(table, sizeof(HashBaseTable));
 	}
 	
-	void _priv_HashTable::init(HashBaseTable* table, sl_uint32 minimumCapacity) noexcept
+	void _priv_HashTable::init(HashBaseTable* table, sl_uint32 capacity) noexcept
 	{
-		if (minimumCapacity < PRIV_SLIB_HASHTABLE_MIN_CAPACITY) {
-			minimumCapacity = PRIV_SLIB_HASHTABLE_MIN_CAPACITY;
-		} else if (minimumCapacity > PRIV_SLIB_HASHTABLE_MAX_CAPACITY) {
-			minimumCapacity = PRIV_SLIB_HASHTABLE_MAX_CAPACITY;
-		} else {
-			minimumCapacity = Math::roundUpToPowerOfTwo32(minimumCapacity);
+		if (capacity) {
+			if (createEntries(table, capacity)) {
+				table->count = 0;
+				table->firstEntry = sl_null;
+				table->lastEntry = sl_null;
+				return;
+			}
 		}
-		table->minimumCapacity = minimumCapacity;
-		initEntries(table);
+		Base::zeroMemory(table, sizeof(HashBaseTable));
 	}
 	
-	void _priv_HashTable::initEntries(HashBaseTable* table) noexcept
+	sl_bool _priv_HashTable::validateEntries(HashBaseTable* table) noexcept
 	{
-		table->count = 0;
-		sl_uint32 capacity = table->minimumCapacity;
-		if (createEntries(table, capacity)) {
-			Base::zeroMemory(table->entries, capacity*sizeof(Entry*));
+		if (table->capacity == 0) {
+			return createEntries(table, PRIV_SLIB_HASHTABLE_MIN_CAPACITY);
 		} else {
-			table->entries = sl_null;
-			table->capacity = 0;
-			table->thresholdUp = 0;
-			table->thresholdDown = 0;
+			return sl_true;
 		}
-		table->firstEntry = sl_null;
-		table->lastEntry = sl_null;
 	}
 	
 	sl_bool _priv_HashTable::createEntries(HashBaseTable* table, sl_uint32 capacity) noexcept
 	{
-		if (capacity > PRIV_SLIB_HASHTABLE_MAX_CAPACITY || capacity < table->minimumCapacity) {
+		if (capacity > PRIV_SLIB_HASHTABLE_MAX_CAPACITY) {
 			return sl_false;
 		}
 		Entry** entries = (Entry**)(Base::createMemory(sizeof(Entry*)*capacity));
@@ -87,18 +79,11 @@ namespace slib
 	void _priv_HashTable::free(HashBaseTable* table) noexcept
 	{
 		Entry** entries = table->entries;
-		table->entries = sl_null;
-		table->capacity = 0;
-		table->count = 0;
-		table->firstEntry = sl_null;
-		table->lastEntry = sl_null;
-		table->thresholdUp = 0;
-		table->thresholdDown = 0;
 		if (entries) {
 			Base::freeMemory(entries);
 		}
 	}
-
+	
 	void _priv_HashTable::add(HashBaseTable* table, HashBaseEntry* entry, sl_uint32 hash) noexcept
 	{
 
@@ -126,12 +111,34 @@ namespace slib
 		
 		entries[index] = entry;
 		
+	}
+	
+	void _priv_HashTable::remove(HashBaseTable* table, HashBaseEntry* entry) noexcept
+	{
+		table->count--;
+		
+		Entry* before = entry->before;
+		Entry* next = entry->next;
+		if (before) {
+			before->next = next;
+		} else {
+			table->firstEntry = next;
+		}
+		if (next) {
+			next->before = before;
+		} else {
+			table->lastEntry = before;
+		}
+	}
+	
+	void _priv_HashTable::expand(HashBaseTable* table) noexcept
+	{
 		if (table->count >= table->thresholdUp) {
 			// double capacity
-			Entry** entriesOld = entries;
-			sl_uint32 n = capacity;
+			Entry** entriesOld = table->entries;
+			sl_uint32 n = table->capacity;
 			if (createEntries(table, n + n)) {
-				entries = table->entries;
+				Entry** entries = table->entries;
 				for (sl_uint32 i = 0; i < n; i++) {
 					Entry* entry = entriesOld[i];
 					entries[i] = sl_null;
@@ -163,29 +170,9 @@ namespace slib
 		}
 	}
 	
-	void _priv_HashTable::remove(HashBaseTable* table, HashBaseEntry* entry) noexcept
-	{
-		table->count--;
-		
-		Entry* before = entry->before;
-		Entry* next = entry->next;
-		if (before) {
-			before->next = next;
-		} else {
-			table->firstEntry = next;
-		}
-		if (next) {
-			next->before = before;
-		} else {
-			table->lastEntry = before;
-		}
-	}
-	
 	void _priv_HashTable::compact(HashBaseTable* table) noexcept
 	{
-		Entry* entry;
-		Entry** link;
-		if (table->count <= table->thresholdDown) {
+		if (table->capacity > PRIV_SLIB_HASHTABLE_MIN_CAPACITY && table->count <= table->thresholdDown) {
 			// half capacity
 			Entry** entriesOld = table->entries;
 			sl_uint32 n = table->capacity >> 1;
@@ -193,8 +180,8 @@ namespace slib
 				Entry** entries = table->entries;
 				for (sl_uint32 i = 0; i < n; i++) {
 					entries[i] = entriesOld[i];
-					link = entries + i;
-					while ((entry = *link)) {
+					Entry** link = entries + i;
+					while (Entry* entry = *link) {
 						link = &(entry->chain);
 					}
 					*link = entriesOld[i | n];
