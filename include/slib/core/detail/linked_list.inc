@@ -119,7 +119,7 @@ namespace slib
 	
 	template <class T>
 	template <class _T, class EQUALS>
-	Link<T>* CLinkedList<T>::search_NoLock(const _T& value, const EQUALS& equals) const
+	Link<T>* CLinkedList<T>::find_NoLock(const _T& value, const EQUALS& equals) const
 	{
 		Link<T>* now = m_front;
 		while (now) {
@@ -133,7 +133,7 @@ namespace slib
 	
 	template <class T>
 	template <class _T, class EQUALS>
-	Link<T>* CLinkedList<T>::search(const _T& value, const EQUALS& equals) const
+	Link<T>* CLinkedList<T>::find(const _T& value, const EQUALS& equals) const
 	{
 		ObjectLocker lock(this);
 		return findValue_NoLock(value);
@@ -874,22 +874,22 @@ namespace slib
 
 	template <class T>
 	template <class _T, class EQUALS>
-	Link<T>* LinkedList<T>::search_NoLock(const _T& value, const EQUALS& equals) const
+	Link<T>* LinkedList<T>::find_NoLock(const _T& value, const EQUALS& equals) const
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->search_NoLock(value, equals);
+			return obj->find_NoLock(value, equals);
 		}
 		return sl_null;
 	}
 
 	template <class T>
 	template <class _T, class EQUALS>
-	Link<T>* LinkedList<T>::search(const _T& value, const EQUALS& equals) const
+	Link<T>* LinkedList<T>::find(const _T& value, const EQUALS& equals) const
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->search(value, equals);
+			return obj->find(value, equals);
 		}
 		return sl_null;
 	}

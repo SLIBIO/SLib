@@ -90,10 +90,10 @@ namespace slib
 		
 		HashEntry<KT, VT>* getLastEntry() const noexcept;
 		
-		HashEntry<KT, VT>* search(const KT& key) const noexcept;
+		HashEntry<KT, VT>* find(const KT& key) const noexcept;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		HashEntry<KT, VT>* searchKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		HashEntry<KT, VT>* findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 		
 		sl_bool get(const KT& key, VT* outValue = sl_null) const noexcept;
 

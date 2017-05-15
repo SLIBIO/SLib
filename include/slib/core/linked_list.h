@@ -117,10 +117,10 @@ namespace slib
 		sl_bool getLastItem(T* _out) const;
 
 		template < class _T, class EQUALS = Equals<T, _T> >
-		Link<T>* search_NoLock(const _T& value, const EQUALS& equals = EQUALS()) const;
+		Link<T>* find_NoLock(const _T& value, const EQUALS& equals = EQUALS()) const;
 
 		template < class _T, class EQUALS = Equals<T, _T> >
-		Link<T>* search(const _T& value, const EQUALS& equals = EQUALS()) const;
+		Link<T>* find(const _T& value, const EQUALS& equals = EQUALS()) const;
 
 		template < class _T, class EQUALS = Equals<T, _T> >
 		sl_bool contains_NoLock(const _T& value, const EQUALS& equals = EQUALS()) const;
@@ -258,10 +258,10 @@ namespace slib
 		sl_bool getLastItem(T* _out) const;
 
 		template < class _T, class EQUALS = Equals<T, _T> >
-		Link<T>* search_NoLock(const _T& value, const EQUALS& equals = EQUALS()) const;
+		Link<T>* find_NoLock(const _T& value, const EQUALS& equals = EQUALS()) const;
 
 		template < class _T, class EQUALS = Equals<T, _T> >
-		Link<T>* search(const _T& value, const EQUALS& equals = EQUALS()) const;
+		Link<T>* find(const _T& value, const EQUALS& equals = EQUALS()) const;
 
 		template < class _T, class EQUALS = Equals<T, _T> >
 		sl_bool contains_NoLock(const _T& value, const EQUALS& equals = EQUALS()) const;

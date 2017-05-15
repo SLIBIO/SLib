@@ -130,7 +130,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool RedBlackTree<KT, VT, KEY_COMPARE>::search(RedBlackTreeNode<KT, VT>** ppNode, const KT& key) const noexcept
+	sl_bool RedBlackTree<KT, VT, KEY_COMPARE>::find(RedBlackTreeNode<KT, VT>** ppNode, const KT& key) const noexcept
 	{
 		Node* look = m_rootNode;
 		if (!look) {
@@ -172,10 +172,10 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	RedBlackTreeNode<KT, VT>* RedBlackTree<KT, VT, KEY_COMPARE>::search(const KT& key) const noexcept
+	RedBlackTreeNode<KT, VT>* RedBlackTree<KT, VT, KEY_COMPARE>::find(const KT& key) const noexcept
 	{
 		Node* node;
-		if (search(&node, key)) {
+		if (find(&node, key)) {
 			return node;
 		}
 		return sl_null;
@@ -183,10 +183,10 @@ namespace slib
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class VALUE, class VALUE_EQUALS>
-	sl_bool RedBlackTree<KT, VT, KEY_COMPARE>::searchKeyAndValue(RedBlackTreeNode<KT, VT>** ppNode, const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
+	sl_bool RedBlackTree<KT, VT, KEY_COMPARE>::findKeyAndValue(RedBlackTreeNode<KT, VT>** ppNode, const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
 	{
 		Node* node;
-		if (search(&node, key)) {
+		if (find(&node, key)) {
 			if (value_equals(node->data.value, value)) {
 				if (ppNode) {
 					*ppNode = node;
@@ -225,10 +225,10 @@ namespace slib
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class VALUE, class VALUE_EQUALS>
-	RedBlackTreeNode<KT, VT>* RedBlackTree<KT, VT, KEY_COMPARE>::searchKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
+	RedBlackTreeNode<KT, VT>* RedBlackTree<KT, VT, KEY_COMPARE>::findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
 	{
 		Node* node;
-		if (searchKeyAndValue(&node, key, value, value_equals)) {
+		if (findKeyAndValue(&node, key, value, value_equals)) {
 			return node;
 		}
 		return sl_null;
@@ -260,7 +260,7 @@ namespace slib
 	sl_bool RedBlackTree<KT, VT, KEY_COMPARE>::get(const KT& key, VT* value) const noexcept
 	{
 		Node* node;
-		if (search(&node, key)) {
+		if (find(&node, key)) {
 			if (value) {
 				*value = node->data.value;
 			}
@@ -273,7 +273,7 @@ namespace slib
 	VT* RedBlackTree<KT, VT, KEY_COMPARE>::getItemPointer(const KT& key) const noexcept
 	{
 		Node* node;
-		if (search(&node, key)) {
+		if (find(&node, key)) {
 			return &(node->data.value);
 		}
 		return sl_null;
@@ -284,7 +284,7 @@ namespace slib
 	VT* RedBlackTree<KT, VT, KEY_COMPARE>::getItemPointerByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
 	{
 		Node* node;
-		if (searchKeyAndValue(&node, key, value, value_equals)) {
+		if (findKeyAndValue(&node, key, value, value_equals)) {
 			return &(node->data.value);
 		}
 		return sl_null;
@@ -294,7 +294,7 @@ namespace slib
 	List<VT> RedBlackTree<KT, VT, KEY_COMPARE>::getValues(const KT& key) const noexcept
 	{
 		Node* node;
-		if (search(&node, key)) {
+		if (find(&node, key)) {
 			List<VT> ret(1, 1, node->data.value);
 			Node* nodeMid = node;
 			while ((node = node->getPrevious())) {
@@ -322,7 +322,7 @@ namespace slib
 	List<VT> RedBlackTree<KT, VT, KEY_COMPARE>::getValuesByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
 	{
 		Node* node;
-		if (search(&node, key)) {
+		if (find(&node, key)) {
 			List<VT> ret;
 			if (value_equals(node->data.value, value)) {
 				ret.add_NoLock(node->data.value);
@@ -357,7 +357,7 @@ namespace slib
 	sl_bool RedBlackTree<KT, VT, KEY_COMPARE>::put(KEY&& key, VALUE&& value, MapPutMode mode, RedBlackTreeNode<KT, VT>** ppNode) noexcept
 	{
 		Node* node;
-		if (search(&node, key)) {
+		if (find(&node, key)) {
 			if (mode != MapPutMode::AddAlways) {
 				if (ppNode) {
 					*ppNode = node;
@@ -391,7 +391,7 @@ namespace slib
 	sl_bool RedBlackTree<KT, VT, KEY_COMPARE>::addIfNewKeyAndValue(KEY&& key, VALUE&& value, RedBlackTreeNode<KT, VT>** ppNode, const VALUE_EQUALS& value_equals) noexcept
 	{
 		Node* node;
-		if (searchKeyAndValue(&node, key, value, value_equals)) {
+		if (findKeyAndValue(&node, key, value, value_equals)) {
 			if (ppNode) {
 				*ppNode = node;
 			}
@@ -464,7 +464,7 @@ namespace slib
 	sl_bool RedBlackTree<KT, VT, KEY_COMPARE>::remove(const KT& key, VT* outValue) noexcept
 	{
 		Node* node;
-		if (search(&node, key)) {
+		if (find(&node, key)) {
 			if (outValue) {
 				*outValue = Move(node->data.value);
 			}
@@ -478,13 +478,13 @@ namespace slib
 	sl_size RedBlackTree<KT, VT, KEY_COMPARE>::removeItems(const KT& key, List<VT>* outValues) noexcept
 	{
 		Node* node;
-		if (search(&node, key)) {
+		if (find(&node, key)) {
 			if (outValues) {
 				outValues->add_NoLock(Move(node->data.value));
 			}
 			removeNode(node);
 			sl_size n = 1;
-			while (search(&node, key)) {
+			while (find(&node, key)) {
 				if (outValues) {
 					outValues->add_NoLock(Move(node->data.value));
 				}
@@ -501,7 +501,7 @@ namespace slib
 	sl_bool RedBlackTree<KT, VT, KEY_COMPARE>::removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue, const VALUE_EQUALS& value_equals) noexcept
 	{
 		Node* node;
-		if (searchKeyAndValue(&node, key, value, value_equals)) {
+		if (findKeyAndValue(&node, key, value, value_equals)) {
 			if (outValue) {
 				*outValue = Move(node->data.value);
 			}
@@ -516,13 +516,13 @@ namespace slib
 	sl_size RedBlackTree<KT, VT, KEY_COMPARE>::removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues, const VALUE_EQUALS& value_equals) noexcept
 	{
 		Node* node;
-		if (searchKeyAndValue(&node, key, value, value_equals)) {
+		if (findKeyAndValue(&node, key, value, value_equals)) {
 			if (outValues) {
 				outValues->add_NoLock(Move(node->data.value));
 			}
 			removeNode(node);
 			sl_size n = 1;
-			while (searchKeyAndValue(&node, key, value, value_equals)) {
+			while (findKeyAndValue(&node, key, value, value_equals)) {
 				if (outValues) {
 					outValues->add_NoLock(Move(node->data.value));
 				}

@@ -111,17 +111,17 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::search(const KT& key, BTreePosition* pos, VT* outValue) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::find(const KT& key, BTreePosition* pos, VT* outValue) const
 	{
-		return searchInNode(key, getRootNode(), pos, outValue);
+		return findInNode(key, getRootNode(), pos, outValue);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::searchInNode(const KT& key, const BTreeNode& node, BTreePosition* pos, VT* outValue) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::findInNode(const KT& key, const BTreeNode& node, BTreePosition* pos, VT* outValue) const
 	{
 		BTreeNode link;
 		sl_uint32 item;
-		if (searchItemInNode(key, node, item, link, outValue)) {
+		if (findItemInNode(key, node, item, link, outValue)) {
 			if (pos) {
 				pos->node = node;
 				pos->item = item;
@@ -129,7 +129,7 @@ namespace slib
 			return sl_true;
 		} else {
 			if (link.isNotNull()) {
-				return searchInNode(key, link, pos, outValue);
+				return findInNode(key, link, pos, outValue);
 			} else {
 				if (pos) {
 					pos->node = node;
@@ -141,7 +141,7 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::searchItemInNode(const KT& key, const BTreeNode& node, sl_uint32& pos, BTreeNode& link, VT* outValue) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::findItemInNode(const KT& key, const BTreeNode& node, sl_uint32& pos, BTreeNode& link, VT* outValue) const
 	{
 		pos = 0;
 		NodeDataScope data(this, node);
@@ -175,11 +175,11 @@ namespace slib
 
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class VALUE, class VALUE_EQUALS>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::searchKeyAndValue(const KT& key, const VALUE& value, BTreePosition* pPos, VT* outValue, const VALUE_EQUALS& value_equals) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::findKeyAndValue(const KT& key, const VALUE& value, BTreePosition* pPos, VT* outValue, const VALUE_EQUALS& value_equals) const
 	{
 		List<VT> ret;
 		BTreePosition pos;
-		if (search(key, &pos)) {
+		if (find(key, &pos)) {
 			VT v;
 			if (!(getAt(pos, sl_null, &v))) {
 				if (pPos) {
@@ -244,7 +244,7 @@ namespace slib
 	sl_bool BTree<KT, VT, KEY_COMPARE>::getRange(const KT& key, BTreePosition* pPosBegin, BTreePosition* pPosEnd) const
 	{
 		BTreePosition pos;
-		if (search(key, &pos)) {
+		if (find(key, &pos)) {
 			BTreePosition posBegin = pos;
 			BTreePosition posEnd = pos;
 			KT keyItem;
@@ -589,7 +589,7 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool BTree<KT, VT, KEY_COMPARE>::get(const KT& key, VT* value) const
 	{
-		return search(key, sl_null, value);
+		return find(key, sl_null, value);
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
@@ -597,7 +597,7 @@ namespace slib
 	{
 		List<VT> ret;
 		BTreePosition pos;
-		if (search(key, &pos)) {
+		if (find(key, &pos)) {
 			VT value;
 			if (!(getAt(pos, sl_null, &value))) {
 				return ret;
@@ -631,7 +631,7 @@ namespace slib
 		List<VT> ret;
 		BTreePosition pos;
 		VT v;
-		if (search(key, &pos, &v)) {
+		if (find(key, &pos, &v)) {
 			if (value_equals(v, value)) {
 				ret.add_NoLock(v);
 			}
@@ -664,7 +664,7 @@ namespace slib
 	sl_bool BTree<KT, VT, KEY_COMPARE>::put(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 	{
 		BTreePosition pos;
-		if (search(key, &pos)) {
+		if (find(key, &pos)) {
 			if (pFlagExist) {
 				*pFlagExist = sl_true;
 			}
@@ -698,7 +698,7 @@ namespace slib
 	sl_bool BTree<KT, VT, KEY_COMPARE>::addIfNewKeyAndValue(const KT& key, const VALUE& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
 	{
 		BTreePosition pos;
-		if (searchKeyAndValue(key, value, &pos, sl_null, value_equals)) {
+		if (findKeyAndValue(key, value, &pos, sl_null, value_equals)) {
 			if (pFlagExist) {
 				*pFlagExist = sl_true;
 			}
@@ -716,7 +716,7 @@ namespace slib
 	sl_bool BTree<KT, VT, KEY_COMPARE>::remove(const KT& key, VT* outValue)
 	{
 		BTreePosition pos;
-		if (search(key, &pos, outValue)) {
+		if (find(key, &pos, outValue)) {
 			if (removeAt(pos)) {
 				return sl_true;
 			}
@@ -729,13 +729,13 @@ namespace slib
 	{
 		BTreePosition pos;
 		VT v;
-		if (search(key, &pos, &v)) {
+		if (find(key, &pos, &v)) {
 			if (removeAt(pos)) {
 				if (outValues) {
 					outValues->add_NoLock(v);			
 				}
 				sl_size n = 1;
-				while (search(key, &pos, &v)) {
+				while (find(key, &pos, &v)) {
 					if (removeAt(pos)) {
 						if (outValues) {
 							outValues->add_NoLock(v);
@@ -756,7 +756,7 @@ namespace slib
 	sl_bool BTree<KT, VT, KEY_COMPARE>::removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue, const VALUE_EQUALS& value_equals)
 	{
 		BTreePosition pos;
-		if (searchKeyAndValue(key, value, &pos, outValue, value_equals)) {
+		if (findKeyAndValue(key, value, &pos, outValue, value_equals)) {
 			if (removeAt(pos)) {
 				return sl_true;
 			}
@@ -770,7 +770,7 @@ namespace slib
 	{
 		BTreePosition pos;
 		VT v;
-		if (searchKeyAndValue(key, value, &pos, &v, value_equals)) {
+		if (findKeyAndValue(key, value, &pos, &v, value_equals)) {
 			if (removeAt(pos)) {
 				if (outValues) {
 					outValues->add_NoLock(v);

@@ -78,14 +78,14 @@ namespace slib
 	
 		sl_uint32 getMaxLength() const;
 
-		sl_bool search(const KT& key, BTreePosition* pos = sl_null, VT* outValue = sl_null) const;
+		sl_bool find(const KT& key, BTreePosition* pos = sl_null, VT* outValue = sl_null) const;
 
-		sl_bool searchInNode(const KT& key, const BTreeNode& node, BTreePosition* pos = sl_null, VT* outValue = sl_null) const;
+		sl_bool findInNode(const KT& key, const BTreeNode& node, BTreePosition* pos = sl_null, VT* outValue = sl_null) const;
 
-		sl_bool searchItemInNode(const KT& key, const BTreeNode& node, sl_uint32& pos, BTreeNode& link, VT* outValue = sl_null) const;
+		sl_bool findItemInNode(const KT& key, const BTreeNode& node, sl_uint32& pos, BTreeNode& link, VT* outValue = sl_null) const;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool searchKeyAndValue(const KT& key, const VALUE& value, BTreePosition* pos = sl_null, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		sl_bool findKeyAndValue(const KT& key, const VALUE& value, BTreePosition* pos = sl_null, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 
 		sl_bool getRange(const KT& key, BTreePosition* pPosBegin, BTreePosition* pPosEnd) const;
 	

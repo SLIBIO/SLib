@@ -148,7 +148,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	HashEntry<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::search(const KT& key) const noexcept
+	HashEntry<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::find(const KT& key) const noexcept
 	{
 		sl_uint32 capacity = m_table.capacity;
 		if (capacity == 0) {
@@ -168,7 +168,7 @@ namespace slib
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	template <class VALUE, class VALUE_EQUALS>
-	HashEntry<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::searchKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
+	HashEntry<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
 	{
 		sl_uint32 capacity = m_table.capacity;
 		if (capacity == 0) {
@@ -189,7 +189,7 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::get(const KT& key, VT* value) const noexcept
 	{
-		Entry* entry = search(key);
+		Entry* entry = find(key);
 		if (entry) {
 			if (value) {
 				*value = entry->data.value;
@@ -202,7 +202,7 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	VT* HashTable<KT, VT, HASH, KEY_EQUALS>::getItemPointer(const KT& key) const noexcept
 	{
-		Entry* entry = search(key);
+		Entry* entry = find(key);
 		if (entry) {
 			return &(entry->data.value);
 		}
@@ -213,7 +213,7 @@ namespace slib
 	template <class VALUE, class VALUE_EQUALS>
 	VT* HashTable<KT, VT, HASH, KEY_EQUALS>::getItemPointerByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
 	{
-		Entry* entry = searchKeyAndValue(key, value, value_equals);
+		Entry* entry = findKeyAndValue(key, value, value_equals);
 		if (entry) {
 			return &(entry->data.value);
 		}
