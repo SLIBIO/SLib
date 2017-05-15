@@ -37,13 +37,13 @@ namespace slib
 		RedBlackTreeNode(KEY&& key, VALUE&& value) noexcept;
 		
 	public:
-		RedBlackTreeNode<KT, VT>* getNext() const noexcept;
+		RedBlackTreeNode<KT, VT>* getNext() noexcept;
 		
-		RedBlackTreeNode<KT, VT>* getPrevious() const noexcept;
+		RedBlackTreeNode<KT, VT>* getPrevious() noexcept;
 		
-		RedBlackTreeNode<KT, VT>* getFirst() const noexcept;
+		RedBlackTreeNode<KT, VT>* getFirst() noexcept;
 		
-		RedBlackTreeNode<KT, VT>* getLast() const noexcept;
+		RedBlackTreeNode<KT, VT>* getLast() noexcept;
 		
 	private:
 		typedef RedBlackTreeNode<KT, VT> Node;
@@ -58,8 +58,17 @@ namespace slib
 
 		template <class KEY_COMPARE_ARG>
 		RedBlackTree(KEY_COMPARE_ARG&& key_compare) noexcept;
-
+		
+		RedBlackTree(const RedBlackTree& other) = delete;
+		
+		RedBlackTree(RedBlackTree&& other);
+		
 		virtual ~RedBlackTree() noexcept;
+		
+	public:
+		RedBlackTree& operator=(const RedBlackTree& other) = delete;
+		
+		RedBlackTree& operator=(RedBlackTree&& other);
 	
 	public:
 		sl_size getCount() const noexcept;
@@ -111,6 +120,8 @@ namespace slib
 		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 		
 		sl_size removeAll() noexcept;
+		
+		sl_bool copyFrom(const RedBlackTree<KT, VT, KEY_COMPARE>* other) noexcept;
 		
 	private:
 		typedef RedBlackTreeNode<KT, VT> Node;

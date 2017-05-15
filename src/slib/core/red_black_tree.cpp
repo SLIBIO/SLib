@@ -171,7 +171,7 @@ namespace slib
 	 5. Every path from a given node to any of its descendant NIL nodes contains the same number of black nodes.
 	 
 	 */
-	
+
 	void _priv_RedBlackTree::rebalanceAfterInsert(RedBlackTreeBaseNode* newNode, RedBlackTreeBaseNode** pRoot) noexcept
 	{
 		

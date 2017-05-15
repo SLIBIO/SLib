@@ -50,25 +50,25 @@ namespace slib
 	}
 	
 	template <class KT, class VT>
-	RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getNext() const noexcept
+	RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getNext() noexcept
 	{
 		return reinterpret_cast<Node*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeBaseNode*>(this)));
 	}
 	
 	template <class KT, class VT>
-	RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getPrevious() const noexcept
+	RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getPrevious() noexcept
 	{
 		return reinterpret_cast<Node*>(_priv_RedBlackTree::getPrevious(reinterpret_cast<RedBlackTreeBaseNode*>(this)));
 	}
 	
 	template <class KT, class VT>
-	RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getFirst() const noexcept
+	RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getFirst() noexcept
 	{
 		return reinterpret_cast<Node*>(_priv_RedBlackTree::getFirst(reinterpret_cast<RedBlackTreeBaseNode*>(this)));
 	}
 	
 	template <class KT, class VT>
-	RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getLast() const noexcept
+	RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getLast() noexcept
 	{
 		return reinterpret_cast<Node*>(_priv_RedBlackTree::getLast(reinterpret_cast<RedBlackTreeBaseNode*>(this)));
 	}
@@ -100,6 +100,27 @@ namespace slib
 		if (node) {
 			_priv_RedBlackTree_freeNode(node);
 		}
+	}
+	
+	template <class KT, class VT, class KEY_COMPARE>
+	RedBlackTree<KT, VT, KEY_COMPARE>::RedBlackTree(RedBlackTree<KT, VT, KEY_COMPARE>&& other) noexcept
+	: m_compare(Move(other.m_compare))
+	{
+		m_rootNode = other.m_rootNode;
+		other.m_rootNode = sl_null;
+		m_count = other.m_count;
+		other.m_count = 0;
+	}
+	
+	template <class KT, class VT, class KEY_COMPARE>
+	RedBlackTree<KT, VT, KEY_COMPARE>& RedBlackTree<KT, VT, KEY_COMPARE>::operator=(RedBlackTree<KT, VT, KEY_COMPARE>&& other) noexcept
+	{
+		m_rootNode = other.m_rootNode;
+		other.m_rootNode = sl_null;
+		m_count = other.m_count;
+		other.m_count = 0;
+		m_compare = Move(other.m_compare);
+		return *this;
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
@@ -278,7 +299,7 @@ namespace slib
 			Node* nodeMid = node;
 			while ((node = node->getPrevious())) {
 				if (m_compare(node->data.key, key) == 0) {
-					ret->add_NoLock(node->data.value);
+					ret.add_NoLock(node->data.value);
 				} else {
 					break;
 				}
@@ -286,7 +307,7 @@ namespace slib
 			node = nodeMid;
 			while ((node = node->getNext())) {
 				if (m_compare(node->data.key, key) == 0) {
-					ret->add_NoLock(node->data.value);
+					ret.add_NoLock(node->data.value);
 				} else {
 					break;
 				}
@@ -304,13 +325,13 @@ namespace slib
 		if (search(&node, key)) {
 			List<VT> ret;
 			if (value_equals(node->data.value, value)) {
-				ret->add_NoLock(node->data.value);
+				ret.add_NoLock(node->data.value);
 			}
 			Node* nodeMid = node;
 			while ((node = node->getPrevious())) {
 				if (m_compare(node->data.key, key) == 0) {
 					if (value_equals(node->data.value, value)) {
-						ret->add_NoLock(node->data.value);
+						ret.add_NoLock(node->data.value);
 					}
 				} else {
 					break;
@@ -320,7 +341,7 @@ namespace slib
 			while ((node = node->getNext())) {
 				if (m_compare(node->data.key, key) == 0) {
 					if (value_equals(node->data.value, value)) {
-						ret->add_NoLock(node->data.value);
+						ret.add_NoLock(node->data.value);
 					}
 				} else {
 					break;
@@ -436,6 +457,7 @@ namespace slib
 	{
 		m_count--;
 		_priv_RedBlackTree::rebalanceAfterRemove(reinterpret_cast<RedBlackTreeBaseNode*>(node), reinterpret_cast<RedBlackTreeBaseNode**>(&m_rootNode));
+		delete node;
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
@@ -443,11 +465,10 @@ namespace slib
 	{
 		Node* node;
 		if (search(&node, key)) {
-			removeNode(node);
 			if (outValue) {
 				*outValue = Move(node->data.value);
 			}
-			delete node;
+			removeNode(node);
 			return sl_true;
 		}
 		return sl_false;
@@ -458,18 +479,16 @@ namespace slib
 	{
 		Node* node;
 		if (search(&node, key)) {
-			removeNode(node);
 			if (outValues) {
 				outValues->add_NoLock(Move(node->data.value));
 			}
-			delete node;
+			removeNode(node);
 			sl_size n = 1;
 			while (search(&node, key)) {
-				removeNode(node);
 				if (outValues) {
 					outValues->add_NoLock(Move(node->data.value));
 				}
-				delete node;
+				removeNode(node);
 				n++;
 			}
 			return n;
@@ -483,11 +502,10 @@ namespace slib
 	{
 		Node* node;
 		if (searchKeyAndValue(&node, key, value, value_equals)) {
-			removeNode(node);
 			if (outValue) {
 				*outValue = Move(node->data.value);
 			}
-			delete node;
+			removeNode(node);
 			return sl_true;
 		}
 		return sl_false;
@@ -499,18 +517,16 @@ namespace slib
 	{
 		Node* node;
 		if (searchKeyAndValue(&node, key, value, value_equals)) {
-			removeNode(node);
 			if (outValues) {
 				outValues->add_NoLock(Move(node->data.value));
 			}
-			delete node;
+			removeNode(node);
 			sl_size n = 1;
 			while (searchKeyAndValue(&node, key, value, value_equals)) {
-				removeNode(node);
 				if (outValues) {
 					outValues->add_NoLock(Move(node->data.value));
 				}
-				delete node;
+				removeNode(node);
 				n++;
 			}
 			return n;
@@ -529,6 +545,106 @@ namespace slib
 		sl_size n = m_count;
 		m_count = 0;
 		return n;
+	}
+	
+	template <class KT, class VT, class KEY_COMPARE>
+	sl_bool RedBlackTree<KT, VT, KEY_COMPARE>::copyFrom(const RedBlackTree<KT, VT, KEY_COMPARE>* other) noexcept
+	{
+		Node* nodeTarget = m_rootNode;
+		if (nodeTarget) {
+			_priv_RedBlackTree_freeNode(nodeTarget);
+		}
+
+		m_compare = other->m_compare;
+		
+		Node* nodeSource = other->m_rootNode;
+		if (!nodeSource) {
+			m_rootNode = sl_null;
+			m_count = 0;
+			return sl_true;
+		}
+		
+		nodeTarget = new Node(nodeSource->data.key, nodeSource->data.value);
+		if (!nodeTarget) {
+			m_rootNode = sl_null;
+			m_count = 0;
+			return sl_false;
+		}
+
+		Node* nodeTargetRoot = nodeTarget;
+		Node* stackSource[PRIV_SLIB_RED_BLACK_TREE_MAX_DISTANCE];
+		Node* stackTarget[PRIV_SLIB_RED_BLACK_TREE_MAX_DISTANCE];
+		sl_size nStack = 0;
+		
+		for(;;) {
+			Node* leftSource = nodeSource->left;
+			Node* leftTarget;
+			if (leftSource) {
+				leftTarget = new Node(leftSource->data.key, leftSource->data.value);
+				if (!leftTarget) {
+					_priv_RedBlackTree_freeNode(nodeTargetRoot);
+					m_rootNode = sl_null;
+					m_count = 0;
+					return sl_false;
+				}
+				leftTarget->flagRed = leftSource->flagRed;
+				leftTarget->parent = nodeTarget;
+				nodeTarget->left = leftTarget;
+			} else {
+				leftTarget = sl_null;
+			}
+			
+
+			Node* rightSource = nodeSource->right;
+			Node* rightTarget;
+			if (rightSource) {
+				rightTarget = new Node(rightSource->data.key, rightSource->data.value);
+				if (!rightTarget) {
+					_priv_RedBlackTree_freeNode(nodeTargetRoot);
+					m_rootNode = sl_null;
+					m_count = 0;
+					return sl_false;
+				}
+				rightTarget->flagRed = rightSource->flagRed;
+				rightTarget->parent = nodeTarget;
+				nodeTarget->right = rightTarget;
+			} else {
+				rightTarget = sl_null;
+			}
+			
+			if (leftSource) {
+				if (rightSource) {
+					nodeSource = leftSource;
+					nodeTarget = leftTarget;
+					SLIB_ASSERT(nStack < PRIV_SLIB_RED_BLACK_TREE_MAX_DISTANCE);
+					stackSource[nStack] = rightSource;
+					stackTarget[nStack] = rightTarget;
+					nStack++;
+				} else {
+					nodeSource = leftSource;
+					nodeTarget = leftTarget;
+				}
+			} else {
+				if (rightSource) {
+					nodeSource = rightSource;
+					nodeTarget = rightTarget;
+				} else {
+					if (nStack > 0) {
+						nodeSource = stackSource[nStack-1];
+						nodeTarget = stackTarget[nStack-1];
+						nStack--;
+					} else {
+						break;
+					}
+				}
+			}
+		}
+		
+		m_rootNode = nodeTargetRoot;
+		m_count = other->m_count;
+		
+		return sl_true;
+		
 	}
 	
 	template <class KT, class VT>
@@ -564,6 +680,5 @@ namespace slib
 			}
 		}
 	}
-	
 
 }
