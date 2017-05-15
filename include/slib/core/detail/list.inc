@@ -1079,48 +1079,6 @@ namespace slib
 	
 	
 	template <class T>
-	SLIB_INLINE ListPosition<T>::ListPosition() noexcept {};
-	
-	template <class T>
-	SLIB_INLINE ListPosition<T>::ListPosition(const Ref< CList<T> >& list) noexcept : ref(list)
-	{
-		if (list.isNotNull()) {
-			data = list->getData();
-			count = list->getCount();
-		} else {
-			data = sl_null;
-			count = 0;
-		}
-	}
-	
-	template <class T>
-	ListPosition<T>::ListPosition(const ListPosition<T>& other) noexcept = default;
-	
-	template <class T>
-	ListPosition<T>::ListPosition(ListPosition<T>&& other) noexcept = default;
-	
-	template <class T>
-	SLIB_INLINE T& ListPosition<T>::operator*() noexcept
-	{
-		return *data;
-	}
-	
-	template <class T>
-	SLIB_INLINE sl_bool ListPosition<T>::operator!=(const ListPosition<T>& other) noexcept
-	{
-		return count > 0;
-	}
-	
-	template <class T>
-	SLIB_INLINE ListPosition<T>& ListPosition<T>::operator++() noexcept
-	{
-		data++;
-		count--;
-		return *this;
-	}
-	
-	
-	template <class T>
 	List<T>::List(sl_size count) noexcept
 	 : ref(CList<T>::create(count))
 	{
@@ -2732,15 +2690,19 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE ListPosition<T> Atomic< List<T> >::begin() const noexcept
+	SLIB_INLINE ArrayPosition<T> Atomic< List<T> >::begin() const noexcept
 	{
-		return ListPosition<T>(ref);
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return ArrayPosition<T>(obj->getData(), obj->getCount(), obj.get());
+		}
+		return ArrayPosition<T>();
 	}
 
 	template <class T>
-	SLIB_INLINE ListPosition<T> Atomic< List<T> >::end() const noexcept
+	SLIB_INLINE ArrayPosition<T> Atomic< List<T> >::end() const noexcept
 	{
-		return ListPosition<T>();
+		return ArrayPosition<T>();
 	}
 
 

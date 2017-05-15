@@ -385,45 +385,43 @@ namespace slib
 	template <class T>
 	SLIB_INLINE ArrayPosition<T>::ArrayPosition() noexcept
 	{
-		data = sl_null;
-		count = 0;
+		pos = sl_null;
 	}
 
 	template <class T>
-	SLIB_INLINE ArrayPosition<T>::ArrayPosition(const Ref< CArray<T> >& array) noexcept : ref(array)
+	SLIB_INLINE ArrayPosition<T>::ArrayPosition(T* _pos, sl_size _count, Referable* _ref) noexcept
+	 : ref(_ref)
 	{
-		if (array.isNotNull()) {
-			data = array->getData();
-			count = array->getCount();
-		} else {
-			data = sl_null;
-			count = 0;
-		}
+		pos = _pos;
+		count = _count;
 	}
 
 	template <class T>
-	ArrayPosition<T>::ArrayPosition(const ArrayPosition<T>& other) noexcept = default;
-
-	template <class T>
-	ArrayPosition<T>::ArrayPosition(ArrayPosition<T>&& other) noexcept = default;
-
-	template <class T>
-	SLIB_INLINE T& ArrayPosition<T>::operator*() noexcept
+	SLIB_INLINE T& ArrayPosition<T>::operator*() const noexcept
 	{
-		return *data;
+		return *pos;
+	}
+	
+	template <class T>
+	SLIB_INLINE sl_bool ArrayPosition<T>::operator==(const ArrayPosition<T>& other) const noexcept
+	{
+		return pos == other.pos;
 	}
 
 	template <class T>
-	SLIB_INLINE sl_bool ArrayPosition<T>::operator!=(const ArrayPosition<T>& other) noexcept
+	SLIB_INLINE sl_bool ArrayPosition<T>::operator!=(const ArrayPosition<T>& other) const noexcept
 	{
-		return count > 0;
+		return pos != other.pos;
 	}
 
 	template <class T>
 	SLIB_INLINE ArrayPosition<T>& ArrayPosition<T>::operator++() noexcept
 	{
-		data++;
+		pos++;
 		count--;
+		if (count == 0) {
+			pos = sl_null;
+		}
 		return *this;
 	}
 
@@ -893,7 +891,11 @@ namespace slib
 	template <class T>
 	ArrayPosition<T> Atomic< Array<T> >::begin() const noexcept
 	{
-		return ArrayPosition<T>(ref);
+		Ref< CArray<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return ArrayPosition<T>(obj->getData(), obj->getCount(), obj.get());
+		}
+		return ArrayPosition<T>();
 	}
 
 	template <class T>

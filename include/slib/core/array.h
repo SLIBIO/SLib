@@ -159,24 +159,31 @@ namespace slib
 	{
 	public:
 		ArrayPosition() noexcept;
+		
+		ArrayPosition(T* begin, sl_size count, Referable* ref) noexcept;
 
-		ArrayPosition(const Ref< CArray<T> >& array) noexcept;
+		ArrayPosition(const ArrayPosition& other) noexcept = default;
 
-		ArrayPosition(const ArrayPosition<T>& other) noexcept;
-
-		ArrayPosition(ArrayPosition<T>&& other) noexcept;
+		ArrayPosition(ArrayPosition&& other) noexcept = default;
 
 	public:
-		T& operator*() noexcept;
+		ArrayPosition& operator=(const ArrayPosition& other) noexcept = default;
+		
+		ArrayPosition& operator=(ArrayPosition&& other) noexcept = default;
+		
+	public:
+		T& operator*() const noexcept;
+		
+		sl_bool operator==(const ArrayPosition& other) const noexcept;
 
-		sl_bool operator!=(const ArrayPosition<T>& other) noexcept;
+		sl_bool operator!=(const ArrayPosition& other) const noexcept;
 
-		ArrayPosition<T>& operator++() noexcept;
+		ArrayPosition& operator++() noexcept;
 
 	private:
-		Ref< CArray<T> > ref;
-		T* data;
+		T* pos;
 		sl_size count;
+		Ref<Referable> ref;
 
 	};
 	
@@ -274,7 +281,7 @@ namespace slib
 		T* begin() const noexcept;
 
 		T* end() const noexcept;
-
+		
 	};
 	
 	

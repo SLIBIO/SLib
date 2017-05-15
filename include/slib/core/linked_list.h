@@ -35,18 +35,30 @@ namespace slib
 		LinkPosition();
 
 		LinkPosition(Link<T>* link);
+		
+		LinkPosition(Link<T>* link, Referable* ref);
 
-		LinkPosition(const LinkPosition<T>& other);
+		LinkPosition(const LinkPosition& other) = default;
+		
+		LinkPosition(LinkPosition&& other) = default;
+		
+	public:
+		LinkPosition& operator=(const LinkPosition& other) = default;
+		
+		LinkPosition& operator=(LinkPosition&& other) = default;
 
 	public:
-		T& operator*();
+		T& operator*() const;
+		
+		sl_bool operator==(const LinkPosition<T>& p) const;
 
-		sl_bool operator!=(const LinkPosition<T>& p);
+		sl_bool operator!=(const LinkPosition<T>& p) const;
 
 		LinkPosition<T>& operator++();
 
 	private:
 		Link<T>* link;
+		Ref<Referable> ref;
 
 	};
 	

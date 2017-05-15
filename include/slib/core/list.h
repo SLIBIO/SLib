@@ -283,31 +283,6 @@ namespace slib
 		
 	};
 	
-	template <class T>
-	class SLIB_EXPORT ListPosition
-	{
-	public:
-		ListPosition() noexcept;
-
-		ListPosition(const Ref< CList<T> >& list) noexcept;
-
-		ListPosition(const ListPosition<T>& other) noexcept;
-
-		ListPosition(ListPosition<T>&& other) noexcept;
-
-	public:
-		T& operator*() noexcept;
-
-		sl_bool operator!=(const ListPosition<T>& other) noexcept;
-
-		ListPosition<T>& operator++() noexcept;
-
-	private:
-		Ref< CList<T> > ref;
-		T* data;
-		sl_size count;
-
-	};
 	
 	template <class T>
 	class SLIB_EXPORT List
@@ -696,9 +671,9 @@ namespace slib
 		void sort(sl_bool flagAscending = sl_true, const COMPARE& compare = COMPARE()) const noexcept;
 	
 		// range-based for loop
-		ListPosition<T> begin() const noexcept;
+		ArrayPosition<T> begin() const noexcept;
 
-		ListPosition<T> end() const noexcept;
+		ArrayPosition<T> end() const noexcept;
 
 	};
 	

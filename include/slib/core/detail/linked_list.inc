@@ -1306,9 +1306,9 @@ namespace slib
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->begin();
+			return LinkPosition<T>(obj->getFront());
 		}
-		return sl_null;
+		return LinkPosition<T>();
 	}
 
 	template <class T>
@@ -1551,7 +1551,7 @@ namespace slib
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->begin();
+			return LinkPosition<T>(obj->getFront(), obj.get());
 		}
 		return sl_null;
 	}
@@ -1568,18 +1568,24 @@ namespace slib
 
 	template <class T>
 	SLIB_INLINE LinkPosition<T>::LinkPosition(Link<T>* _link) : link(_link) {}
+	
+	template <class T>
+	SLIB_INLINE LinkPosition<T>::LinkPosition(Link<T>* _link, Referable* _ref) : link(_link), ref(_ref) {}
 
 	template <class T>
-	SLIB_INLINE LinkPosition<T>::LinkPosition(const LinkPosition<T>& other) : link(other.link) {}
-
-	template <class T>
-	SLIB_INLINE T& LinkPosition<T>::operator*()
+	SLIB_INLINE T& LinkPosition<T>::operator*() const
 	{
 		return link->value;
 	}
+	
+	template <class T>
+	SLIB_INLINE sl_bool LinkPosition<T>::operator==(const LinkPosition<T>& p) const
+	{
+		return link == p.link;
+	}
 
 	template <class T>
-	SLIB_INLINE sl_bool LinkPosition<T>::operator!=(const LinkPosition<T>& p)
+	SLIB_INLINE sl_bool LinkPosition<T>::operator!=(const LinkPosition<T>& p) const
 	{
 		return link != p.link;
 	}
