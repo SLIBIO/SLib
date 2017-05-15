@@ -172,7 +172,7 @@ namespace slib
 	 
 	 */
 	
-	void _priv_RedBlackTree::insert(RedBlackTreeBaseNode* newNode, RedBlackTreeBaseNode** pRoot) noexcept
+	void _priv_RedBlackTree::rebalanceAfterInsert(RedBlackTreeBaseNode* newNode, RedBlackTreeBaseNode** pRoot) noexcept
 	{
 		
 		newNode->flagRed = sl_true;
@@ -255,7 +255,7 @@ namespace slib
 		
 	}
 		
-	void _priv_RedBlackTree::remove(RedBlackTreeBaseNode* node, RedBlackTreeBaseNode** pRoot) noexcept
+	void _priv_RedBlackTree::rebalanceAfterRemove(RedBlackTreeBaseNode* node, RedBlackTreeBaseNode** pRoot) noexcept
 	{
 		sl_bool flagRed = node->flagRed;
 		Node* parent = node->parent;

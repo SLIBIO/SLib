@@ -24,10 +24,10 @@ namespace slib
 	class SLIB_EXPORT RedBlackTreeNode
 	{
 	public:
-		sl_bool flagRed;
 		RedBlackTreeNode<KT, VT>* parent;
 		RedBlackTreeNode<KT, VT>* left;
 		RedBlackTreeNode<KT, VT>* right;
+		sl_bool flagRed;
 		
 		KT key;
 		VT value;
@@ -112,8 +112,9 @@ namespace slib
 		typedef RedBlackTreeNode<KT, VT> Node;
 		
 		Node* m_rootNode;
-		sl_size m_count;
 		KEY_COMPARE m_compare;
+		
+		sl_size m_count;
 		
 	private:
 		void _insertNode(Node* node) noexcept;

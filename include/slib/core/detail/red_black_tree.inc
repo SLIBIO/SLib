@@ -16,10 +16,10 @@ namespace slib
 	class SLIB_EXPORT RedBlackTreeBaseNode
 	{
 	public:
-		sl_bool flagRed;
 		RedBlackTreeBaseNode* parent;
 		RedBlackTreeBaseNode* left;
 		RedBlackTreeBaseNode* right;
+		sl_bool flagRed;
 	};
 	
 	class SLIB_EXPORT _priv_RedBlackTree
@@ -35,9 +35,9 @@ namespace slib
 		
 		static Node* getLast(Node* node) noexcept;
 		
-		static void insert(Node* node, Node** pRoot) noexcept;
+		static void rebalanceAfterInsert(Node* node, Node** pRoot) noexcept;
 		
-		static void remove(Node* node, Node** pRoot) noexcept;
+		static void rebalanceAfterRemove(Node* node, Node** pRoot) noexcept;
 		
 	};
 	
@@ -484,14 +484,13 @@ namespace slib
 	{
 		Node* root = m_rootNode;
 		
+		m_count++;
+		
 		// Init the root when the tree is empty
 		if (!root) {
 			m_rootNode = node;
-			m_count = 1;
 			return;
 		}
-		
-		m_count++;
 		
 		// Insert `node` to the binary tree
 		{
@@ -520,7 +519,7 @@ namespace slib
 			}
 		}
 		
-		_priv_RedBlackTree::insert(reinterpret_cast<RedBlackTreeBaseNode*>(node), reinterpret_cast<RedBlackTreeBaseNode**>(&m_rootNode));
+		_priv_RedBlackTree::rebalanceAfterInsert(reinterpret_cast<RedBlackTreeBaseNode*>(node), reinterpret_cast<RedBlackTreeBaseNode**>(&m_rootNode));
 		
 	}
 	
@@ -528,7 +527,7 @@ namespace slib
 	void RedBlackTree<KT, VT, KEY_COMPARE>::_removeNode(Node* node) noexcept
 	{
 		m_count--;
-		_priv_RedBlackTree::remove(reinterpret_cast<RedBlackTreeBaseNode*>(node), reinterpret_cast<RedBlackTreeBaseNode**>(&m_rootNode));
+		_priv_RedBlackTree::rebalanceAfterRemove(reinterpret_cast<RedBlackTreeBaseNode*>(node), reinterpret_cast<RedBlackTreeBaseNode**>(&m_rootNode));
 	}
 	
 	template <class KT, class VT>
