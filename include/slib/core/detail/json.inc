@@ -202,20 +202,16 @@ namespace slib
 		VariantMap _map = getVariantMap();
 		if (_map.isNotNull()) {
 			MutexLocker locker(_map.getLocker());
-			Iterator< Pair<String, Variant> > iterator = _map.toIterator();
-			if (iterator.isNotNull()) {
-				Map<KT, VT> map;
-				map.initHash();
-				Pair<String, Variant> pair;
-				while (iterator.next(&pair)) {
-					Json& v = *(static_cast<Json*>(&(pair.value)));
-					VT o;
-					v.get(o);
-					map.put_NoLock(Cast<String, KT>()(pair.key), Move(o));
-				}
-				_out = map;
-				return;
+			Map<KT, VT> map;
+			map.initHash();
+			for (auto& pair : _map) {
+				Json& v = *(static_cast<Json*>(&(pair.value)));
+				VT o;
+				v.get(o);
+				map.put_NoLock(Cast<String, KT>()(pair.key), Move(o), MapPutMode::AddAlways);
 			}
+			_out = Move(map);
+			return;
 		}
 		_out.setNull();
 	}
@@ -226,15 +222,11 @@ namespace slib
 		if (_in.isNotNull()) {
 			MutexLocker locker(_in.getLocker());
 			Map<String, Variant> map;
-			Iterator< Pair<KT, VT> > iterator = _in.toIterator();
-			if (iterator.isNotNull()) {
-				map.initHash();
-				Pair<KT, VT> pair;
-				while (iterator.next(&pair)) {
-					map.put_NoLock(Cast<KT, String>()(pair.key), Json(pair.value), MapPutMode::AddAlways);
-				}
+			map.initHash();
+			for (auto& pair : _in) {
+				map.put_NoLock(Cast<KT, String>()(pair.key), Json(pair.value), MapPutMode::AddAlways);
 			}
-			*this = map;
+			*this = Move(map);
 		} else {
 			setNull();
 		}

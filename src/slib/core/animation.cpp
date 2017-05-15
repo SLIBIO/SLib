@@ -942,19 +942,13 @@ namespace slib
 			ObjectLocker lock(this);
 			List< Ref<Animation> > animations;
 			{
-				Iterator< Ref<Animation> > iterator = m_mapAnimations.getValueIterator();
-				Ref<Animation> animation;
-				while (iterator.next(&animation)) {
-					if (animation.isNotNull()) {
-						animations.add_NoLock(animation);
-					}
+				for (auto& pair : m_mapAnimations) {
+					animations.add_NoLock(pair.value);
 				}
 			}
 			{
-				Iterator< WeakRef<Animation> > iterator = m_mapWeakAnimations.getValueIterator();
-				WeakRef<Animation> _animation;
-				while (iterator.next(&_animation)) {
-					Ref<Animation> animation(_animation);
+				for (auto& pair : m_mapWeakAnimations) {
+					Ref<Animation> animation(pair.value);
 					if (animation.isNotNull()) {
 						animations.add_NoLock(animation);
 					}

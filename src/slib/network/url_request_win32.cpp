@@ -334,18 +334,14 @@ namespace slib
 				case STEP_CONNECT:
 					{
 						{
-							Iterator< Pair<String, String> > iterator = m_requestHeaders.toIterator();
-							Pair<String, String> pair;
-							if (iterator.next(&pair)) {
+							for (auto& pair : m_requestHeaders) {
 								String line = String16::format("%s: %s\r\n", pair.key, pair.value);
 								::HttpAddRequestHeadersA(hRequest, line.getData(), (DWORD)(line.getLength()), HTTP_ADDREQ_FLAG_ADD | HTTP_ADDREQ_FLAG_REPLACE);
 							}
 						}
 						StringBuffer sb;
 						{
-							Iterator< Pair<String, String> > iterator = m_additionalRequestHeaders.toIterator();
-							Pair<String, String> pair;
-							while (iterator.next(&pair)) {
+							for (auto& pair : m_additionalRequestHeaders) {
 								String str = pair.key;
 								sb.addStatic(str.getData(), str.getLength());
 								sb.addStatic(": ", 2);

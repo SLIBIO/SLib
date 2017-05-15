@@ -75,9 +75,7 @@ namespace slib
 			JniLocal<jobjectArray> jheaders;
 			{
 				CList<String> list;
-				Iterator< Pair<String, String> > iterator = m_requestHeaders.toIterator();
-				Pair<String, String> pair;
-				while (iterator.next(&pair)) {
+				for (auto& pair : m_requestHeaders) {
 					list.add_NoLock(pair.key);
 					list.add_NoLock(pair.value);
 				}
@@ -98,9 +96,7 @@ namespace slib
 			JniLocal<jobjectArray> jadditionalHeaders;
 			{
 				CList<String> list;
-				Iterator< Pair<String, String> > iterator = m_additionalRequestHeaders.toIterator();
-				Pair<String, String> pair;
-				while (iterator.next(&pair)) {
+				for (auto& pair : m_additionalRequestHeaders) {
 					list.add_NoLock(pair.key);
 					list.add_NoLock(pair.value);
 				}

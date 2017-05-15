@@ -15,7 +15,6 @@
 
 #include "new_helper.h"
 #include "object.h"
-#include "iterator.h"
 #include "array.h"
 #include "compare.h"
 #include "sort.h"
@@ -201,12 +200,6 @@ namespace slib
 		template < class VALUE, class EQUALS = Equals<T, typename RemoveConstReference<VALUE>::Type> >
 		sl_bool addIfNotExist(VALUE&& value, const EQUALS& equals = EQUALS()) noexcept;
 
-		template <class VALUE>
-		sl_bool addAll_NoLock(const Iterator<VALUE>& iterator) noexcept;
-
-		template <class VALUE>
-		sl_bool addAll(const Iterator<VALUE>& iterator) noexcept;
-
 		sl_bool removeAt_NoLock(sl_size index, T* outValue = sl_null) noexcept;
 
 		sl_bool removeAt(sl_size index, T* outValue = sl_null) noexcept;
@@ -278,8 +271,6 @@ namespace slib
 
 		template < class COMPARE = Compare<T> >
 		void sort(sl_bool flagAscending = sl_true, const COMPARE& compare = COMPARE()) const noexcept;
-
-		Iterator<T> toIterator() const noexcept;
 
 		// range-based for loop
 		T* begin() noexcept;
@@ -494,12 +485,6 @@ namespace slib
 		template < class VALUE, class EQUALS = Equals<T, typename RemoveConstReference<VALUE>::Type> >
 		sl_bool addIfNotExist(VALUE&& value, const EQUALS& equals = EQUALS()) noexcept;
 
-		template <class VALUE>
-		sl_bool addAll_NoLock(const Iterator<VALUE>& iterator) noexcept;
-
-		template <class VALUE>
-		sl_bool addAll(const Iterator<VALUE>& iterator) noexcept;
-
 		sl_bool removeAt_NoLock(sl_size index, T* outValue = sl_null) const noexcept;
 
 		sl_bool removeAt(sl_size index, T* outValue = sl_null) const noexcept;
@@ -571,8 +556,6 @@ namespace slib
 
 		template < class COMPARE = Compare<T> >
 		void sort_NoLock(sl_bool flagAscending = sl_true, const COMPARE& compare = COMPARE()) const noexcept;
-
-		Iterator<T> toIterator() const noexcept;
 
 		const Mutex* getLocker() const noexcept;
 
@@ -676,9 +659,6 @@ namespace slib
 		template < class VALUE, class EQUALS = Equals<T, typename RemoveConstReference<VALUE>::Type> >
 		sl_bool addIfNotExist(VALUE&& value, const EQUALS& equals = EQUALS()) noexcept;
 
-		template <class VALUE>
-		sl_bool addAll(const Iterator<VALUE>& iterator) noexcept;
-
 		sl_bool removeAt(sl_size index, T* outValue = sl_null) const noexcept;
 
 		sl_size removeRange(sl_size index, sl_size count) const noexcept;
@@ -773,30 +753,6 @@ namespace slib
 		T* begin() noexcept;
 
 		T* end() noexcept;
-
-	};
-	
-	
-	template <class T>
-	class SLIB_EXPORT ListIterator : public IIterator<T>
-	{
-	protected:
-		const CList<T>* m_list;
-		Ref<Referable> m_refer;
-		sl_size m_index;
-
-	public:
-		ListIterator(const CList<T>* list, Referable* refer) noexcept;
-
-	public:
-		// override
-		sl_bool hasNext() noexcept;
-
-		// override
-		sl_bool next(T* _out) noexcept;
-
-		// override
-		sl_reg getIndex() noexcept;
 
 	};
 	

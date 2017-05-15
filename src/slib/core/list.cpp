@@ -13,19 +13,7 @@
 namespace slib
 {
 
-	SLIB_DEFINE_ROOT_OBJECT(IIteratorBase)
-
-	IIteratorBase::IIteratorBase() noexcept
-	{
-	}
-
-	IIteratorBase::~IIteratorBase() noexcept
-	{
-	}
-
-
-	const char _priv_List_ClassID[] = "list";
-	
+	const char _priv_List_ClassID[] = "list";	
 	
 	#define PRIV_SLIB_LIST_CAPACITY_MIN 5
 	

@@ -1629,13 +1629,12 @@ namespace slib
 
 	static sl_bool _priv_Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map)
 	{
-		Iterator< Pair<String, Variant> > iterator(map.toIterator());
+		MutexLocker lock(map.getLocker());
 		if (!(ret.addStatic("{", 1))) {
 			return sl_false;
 		}
 		sl_bool flagFirst = sl_true;
-		Pair<String, Variant> pair;
-		while (iterator.next(&pair)) {
+		for (auto& pair : map) {
 			Variant& v = pair.value;
 			if (!flagFirst) {
 				if (!(ret.addStatic(", ", 2))) {

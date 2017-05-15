@@ -51,18 +51,14 @@ namespace slib
 	void Json::get(std::map<KT, VT, COMPARE, ALLOC>& _out) const
 	{
 		_out.clear();
-		VariantMap _map = getVariantMap();
-		if (_map.isNotNull()) {
-			MutexLocker locker(_map.getLocker());
-			Iterator< Pair<String, Variant> > iterator = _map.toIterator();
-			if (iterator.isNotNull()) {
-				Pair<String, Variant> pair;
-				while (iterator.next(&pair)) {
-					Json& v = *(static_cast<Json*>(&(pair.value)));
-					VT o;
-					v.get(o);
-					_out[Cast<String, KT>()(Move(pair.key))] = Move(o);
-				}
+		VariantMap map = getVariantMap();
+		if (map.isNotNull()) {
+			MutexLocker locker(map.getLocker());
+			for (auto& pair : map) {
+				Json& v = *(static_cast<Json*>(&(pair.value)));
+				VT o;
+				v.get(o);
+				_out.emplace(pair.key, Move(o));
 			}
 		}
 	}
@@ -81,18 +77,14 @@ namespace slib
 	void Json::get(std::unordered_map<KT, VT, HASH, PRED, ALLOC>& _out) const
 	{
 		_out.clear();
-		VariantMap _map = getVariantMap();
-		if (_map.isNotNull()) {
-			MutexLocker locker(_map.getLocker());
-			Iterator< Pair<String, Variant> > iterator = _map.toIterator();
-			if (iterator.isNotNull()) {
-				Pair<String, Variant> pair;
-				while (iterator.next(&pair)) {
-					Json& v = *(static_cast<Json*>(&(pair.value)));
-					VT o;
-					v.get(o);
-					_out[Cast<String, KT>()(Move(pair.key))] = Move(o);
-				}
+		VariantMap map = getVariantMap();
+		if (map.isNotNull()) {
+			MutexLocker locker(map.getLocker());
+			for (auto& pair : map) {
+				Json& v = *(static_cast<Json*>(&(pair.value)));
+				VT o;
+				v.get(o);
+				_out.emplace(pair.key, Move(o));
 			}
 		}
 	}

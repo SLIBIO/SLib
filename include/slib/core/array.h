@@ -14,7 +14,6 @@
 #include "definition.h"
 
 #include "ref.h"
-#include "iterator.h"
 #include "new_helper.h"
 #include "compare.h"
 
@@ -269,8 +268,6 @@ namespace slib
 
 		Array<T> duplicate() const noexcept;
 
-		Iterator<T> toIterator() const noexcept;
-
 		sl_bool getData(ArrayData<T>& data) const noexcept;
 
 		// range-based for loop
@@ -360,29 +357,6 @@ namespace slib
 
 	};
 	
-	
-	template <class T>
-	class SLIB_EXPORT ArrayIterator : public IIterator<T>
-	{
-	protected:
-		ArrayData<T> m_arr;
-		sl_size m_index;
-
-	public:
-		ArrayIterator(const Array<T>& arr) noexcept;
-
-	public:
-		// override
-		sl_bool hasNext() noexcept;
-
-		// override
-		sl_bool next(T* _out) noexcept;
-
-		// override
-		sl_reg getIndex() noexcept;
-
-	};
-
 }
 
 #include "detail/array.inc"

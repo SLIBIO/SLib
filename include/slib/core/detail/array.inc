@@ -654,15 +654,6 @@ namespace slib
 		return sl_null;
 	}
 
-	template <class T>
-	Iterator<T> Array<T>::toIterator() const noexcept
-	{
-		CArray<T>* obj = ref._ptr;
-		if (obj) {
-			return new ArrayIterator<T>(obj);
-		}
-		return sl_null;
-	}
 
 	template <class T>
 	sl_bool Array<T>::getData(ArrayData<T>& data) const noexcept
@@ -909,40 +900,6 @@ namespace slib
 	ArrayPosition<T> Atomic< Array<T> >::end() const noexcept
 	{
 		return ArrayPosition<T>();
-	}
-
-
-	template <class T>
-	ArrayIterator<T>::ArrayIterator(const Array<T>& arr) noexcept
-	{
-		m_index = 0;
-		arr.getData(m_arr);
-	}
-
-	template <class T>
-	sl_bool ArrayIterator<T>::hasNext() noexcept
-	{
-		return (m_index < m_arr.count);
-	}
-
-	template <class T>
-	sl_bool ArrayIterator<T>::next(T* _out) noexcept
-	{
-		sl_size index = m_index;
-		if (index < m_arr.count) {
-			if (_out) {
-				*_out = m_arr.data[index];
-			}
-			m_index = index + 1;
-			return sl_true;
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	sl_reg ArrayIterator<T>::getIndex() noexcept
-	{
-		return (sl_reg)m_index - 1;
 	}
 
 }

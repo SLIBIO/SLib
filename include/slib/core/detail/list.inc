@@ -695,27 +695,6 @@ namespace slib
 	}
 	
 	template <class T>
-	template <class VALUE>
-	sl_bool CList<T>::addAll_NoLock(const Iterator<VALUE>& iterator) noexcept
-	{
-		VALUE value;
-		while (iterator.next(&value)) {
-			if (!(add_NoLock(value))) {
-				return sl_false;
-			}
-		}
-		return sl_true;
-	}
-	
-	template <class T>
-	template <class VALUE>
-	sl_bool CList<T>::addAll(const Iterator<VALUE>& iterator) noexcept
-	{
-		ObjectLocker lock(this);
-		return addAll_NoLock(iterator);
-	}
-	
-	template <class T>
 	sl_bool CList<T>::removeAt_NoLock(sl_size index, T* outValue) noexcept
 	{
 		sl_size count = m_count;
@@ -1072,12 +1051,6 @@ namespace slib
 	{
 		ObjectLocker lock(this);
 		QuickSort::sort(m_data, m_count, flagAscending, compare);
-	}
-	
-	template <class T>
-	Iterator<T> CList<T>::toIterator() const noexcept
-	{
-		return new ListIterator<T>(this, sl_null);
 	}
 	
 	template <class T>
@@ -1849,46 +1822,6 @@ namespace slib
 	}
 
 	template <class T>
-	template <class VALUE>
-	sl_bool List<T>::addAll_NoLock(const Iterator<VALUE>& iterator) noexcept
-	{
-		if (iterator.isNull()) {
-			return sl_true;
-		}
-		CList<T>* obj = ref._ptr;
-		if (obj) {
-			return obj->addAll_NoLock(iterator);
-		} else {
-			obj = CList<T>::create();
-			if (obj) {
-				ref = obj;
-				return obj->addAll_NoLock(iterator);
-			}
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	template <class VALUE>
-	sl_bool List<T>::addAll(const Iterator<VALUE>& iterator) noexcept
-	{
-		if (iterator.isNull()) {
-			return sl_true;
-		}
-		CList<T>* obj = ref._ptr;
-		if (obj) {
-			return obj->addAll(iterator);
-		} else {
-			obj = CList<T>::create();
-			if (obj) {
-				ref = obj;
-				return obj->addAll_NoLock(iterator);
-			}
-		}
-		return sl_false;
-	}
-
-	template <class T>
 	sl_bool List<T>::removeAt_NoLock(sl_size index, T* outValue) const noexcept
 	{
 		CList<T>* obj = ref._ptr;
@@ -2198,16 +2131,6 @@ namespace slib
 		}
 	}
 
-	template <class T>
-	Iterator<T> List<T>::toIterator() const noexcept
-	{
-		CList<T>* obj = ref._ptr;
-		if (obj) {
-			return new ListIterator<T>(obj, obj);
-		}
-		return sl_null;
-	}
-	
 	template <class T>
 	T* List<T>::begin() const noexcept
 	{
@@ -2654,33 +2577,6 @@ namespace slib
 	}
 
 	template <class T>
-	template <class VALUE>
-	sl_bool Atomic< List<T> >::addAll(const Iterator<VALUE>& iterator) noexcept
-	{
-		if (iterator.isNull()) {
-			return sl_true;
-		}
-		Ref< CList<T> > obj(ref);
-		if (obj.isNotNull()) {
-			return obj->addAll(iterator);
-		} else {
-			SpinLocker lock(SpinLockPoolForList::get(this));
-			obj = ref;
-			if (obj.isNotNull()) {
-				lock.unlock();
-				return obj->addAll(iterator);
-			}
-			obj = CList<T>::create();
-			if (obj.isNotNull()) {
-				ref = obj;
-				lock.unlock();
-				return obj->addAll(iterator);
-			}
-		}
-		return sl_false;
-	}
-
-	template <class T>
 	sl_bool Atomic< List<T> >::removeAt(sl_size index, T* outValue) const noexcept
 	{
 		Ref< CList<T> > obj(ref);
@@ -2920,37 +2816,6 @@ namespace slib
 	SLIB_INLINE T* ListElements<T>::end() noexcept
 	{
 		return data + count;
-	}
-
-
-	template <class T>
-	ListIterator<T>::ListIterator(const CList<T>* list, Referable* refer) noexcept
-	{
-		m_index = 0;
-		m_list = list;
-		m_refer = refer;
-	}
-
-	template <class T>
-	sl_bool ListIterator<T>::hasNext() noexcept
-	{
-		return (m_index < m_list->getCount());
-	}
-
-	template <class T>
-	sl_bool ListIterator<T>::next(T* _out) noexcept
-	{
-		if (m_list->getAt(m_index, _out)) {
-			m_index++;
-			return sl_true;
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	sl_reg ListIterator<T>::getIndex() noexcept
-	{
-		return (sl_reg)m_index - 1;
 	}
 
 }

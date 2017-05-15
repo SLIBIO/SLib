@@ -97,16 +97,12 @@ namespace slib
 						req.HTTPMethod = Apple::getNSStringFromString(HttpMethods::toString(param.method));
 						req.HTTPBody = [NSData dataWithBytes:param.requestBody.getData() length:param.requestBody.getSize()];
 						{
-							Pair<String, String> pair;
-							Iterator< Pair<String, String> > iterator = param.requestHeaders.toIterator();
-							while (iterator.next(&pair)) {
+							for (auto& pair : param.requestHeaders) {
 								[req setValue:(Apple::getNSStringFromString(pair.value)) forHTTPHeaderField:(Apple::getNSStringFromString(pair.key))];
 							}
 						}
 						{
-							Pair<String, String> pair;
-							Iterator< Pair<String, String> > iterator = param.additionalRequestHeaders.toIterator();
-							while (iterator.next(&pair)) {
+							for (auto& pair : param.additionalRequestHeaders) {
 								[req addValue:(Apple::getNSStringFromString(pair.value)) forHTTPHeaderField:(Apple::getNSStringFromString(pair.key))];
 							}
 						}

@@ -592,9 +592,7 @@ namespace slib
 		msg.addStatic(strVersion.getData(), strVersion.getLength());
 		msg.addStatic("\r\n", 2);
 
-		Iterator< Pair<String, String> > iterator = m_requestHeaders.toIterator();
-		Pair<String, String> pair;
-		while (iterator.next(&pair)) {
+		for (auto& pair : m_requestHeaders) {
 			String str = pair.key;
 			msg.addStatic(str.getData(), str.getLength());
 			msg.addStatic(": ", 2);
@@ -902,9 +900,7 @@ namespace slib
 		msg.addStatic(strMessage.getData(), strMessage.getLength());
 		msg.addStatic("\r\n", 2);
 
-		Iterator< Pair<String, String> > iterator = m_responseHeaders.toIterator();
-		Pair<String, String> pair;
-		while (iterator.next(&pair)) {
+		for (auto& pair : m_responseHeaders) {
 			String str = pair.key;
 			msg.addStatic(str.getData(), str.getLength());
 			msg.addStatic(": ", 2);
