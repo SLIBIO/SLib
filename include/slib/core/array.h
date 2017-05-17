@@ -14,15 +14,12 @@
 #include "definition.h"
 
 #include "ref.h"
-#include "iterator.h"
 #include "new_helper.h"
 #include "compare.h"
 
-namespace std
-{
-	template <class T>
-	class initializer_list;
-}
+#ifdef SLIB_SUPPORT_STD_TYPES
+#include <initializer_list>
+#endif
 
 namespace slib
 {
@@ -36,7 +33,7 @@ namespace slib
 		Ref<Referable> refer;
 
 	public:
-		T& operator[](sl_reg index) const;
+		T& operator[](sl_reg index) const noexcept;
 
 	};
 	
@@ -52,9 +49,9 @@ namespace slib
 		SLIB_DECLARE_OBJECT
 
 	public:
-		CArrayBase();
+		CArrayBase() noexcept;
 
-		~CArrayBase();
+		~CArrayBase() noexcept;
 
 	};
 	
@@ -68,88 +65,92 @@ namespace slib
 		Ref<Referable> m_refer;
 
 	protected:
-		CArray();
+		CArray() noexcept;
 
 	public:
-		CArray(sl_size count);
+		CArray(sl_size count) noexcept;
 
-		template <class _T>
-		CArray(const _T* data, sl_size count);
+		template <class VALUE>
+		CArray(const VALUE* data, sl_size count) noexcept;
 		
-		CArray(const std::initializer_list<T>& l);
+#ifdef SLIB_SUPPORT_STD_TYPES
+		CArray(const std::initializer_list<T>& l) noexcept;
+#endif
 
-		CArray(const T* data, sl_size count, Referable* refer);
+		CArray(const T* data, sl_size count, Referable* refer) noexcept;
 
-		~CArray();
+		~CArray() noexcept;
 
 	public:
-		static CArray<T>* create(sl_size count);
+		static CArray<T>* create(sl_size count) noexcept;
 
-		template <class _T>
-		static CArray<T>* create(const _T* data, sl_size count);
+		template <class VALUE>
+		static CArray<T>* create(const VALUE* data, sl_size count) noexcept;
 		
-		static CArray<T>* create(const std::initializer_list<T>& l);
+#ifdef SLIB_SUPPORT_STD_TYPES
+		static CArray<T>* create(const std::initializer_list<T>& l) noexcept;
+#endif
 
-		static CArray<T>* createStatic(const T* data, sl_size count, Referable* refer);
-
-	public:
-		T* getData() const;
-
-		sl_size getCount() const;
-
-		sl_bool isStatic() const;
-
-		const Ref<Referable>& getRefer() const;
+		static CArray<T>* createStatic(const T* data, sl_size count, Referable* refer) noexcept;
 
 	public:
-		T* getPointerAt(sl_size index) const;
+		T* getData() const noexcept;
 
-		sl_bool getAt(sl_size index, T* _out = sl_null) const;
+		sl_size getCount() const noexcept;
 
-		T getValueAt(sl_size index) const;
+		sl_bool isStatic() const noexcept;
 
-		T getValueAt(sl_size index, const T& def) const;
-
-		sl_bool setAt(sl_size index, const T& value) const;
-
-		T const& operator[](sl_size_t index) const;
-
-		T& operator[](sl_size_t index);
+		const Ref<Referable>& getRefer() const noexcept;
 
 	public:
-		CArray<T>* sub(sl_size start, sl_size count = SLIB_SIZE_MAX);
+		T* getPointerAt(sl_size index) const noexcept;
 
-		template < class _T, class EQUALS = Equals<T, _T> >
-		sl_reg indexOf(const _T& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const;
+		sl_bool getAt(sl_size index, T* _out = sl_null) const noexcept;
 
-		template < class _T, class EQUALS = Equals<T, _T> >
-		sl_reg lastIndexOf(const _T& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const;
+		T getValueAt(sl_size index) const noexcept;
 
-		template < class _T, class EQUALS = Equals<T, _T> >
-		sl_bool contains(const _T& value, const EQUALS& equals = EQUALS()) const;
+		T getValueAt(sl_size index, const T& def) const noexcept;
 
-		template <class _T>
-		sl_size read(sl_size startSource, sl_size len, _T* dataDst) const;
+		sl_bool setAt(sl_size index, const T& value) const noexcept;
 
-		template <class _T>
-		sl_size write(sl_size startTarget, sl_size len, const _T* dataSrc) const;
+		T const& operator[](sl_size_t index) const noexcept;
 
-		template <class _T>
-		sl_size copy(sl_size startTarget, const CArray<_T>* source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const;
+		T& operator[](sl_size_t index) noexcept;
 
-		template <class _T>
-		sl_size copy(const CArray<_T>* source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const;
+	public:
+		CArray<T>* sub(sl_size start, sl_size count = SLIB_SIZE_MAX) noexcept;
 
-		CArray<T>* duplicate() const;
+		template < class VALUE, class EQUALS = Equals<T, VALUE> >
+		sl_reg indexOf(const VALUE& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const noexcept;
+
+		template < class VALUE, class EQUALS = Equals<T, VALUE> >
+		sl_reg lastIndexOf(const VALUE& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const noexcept;
+
+		template < class VALUE, class EQUALS = Equals<T, VALUE> >
+		sl_bool contains(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
+
+		template <class VALUE>
+		sl_size read(sl_size startSource, sl_size len, VALUE* dataDst) const noexcept;
+
+		template <class VALUE>
+		sl_size write(sl_size startTarget, sl_size len, const VALUE* dataSrc) const noexcept;
+
+		template <class VALUE>
+		sl_size copy(sl_size startTarget, const CArray<VALUE>* source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
+
+		template <class VALUE>
+		sl_size copy(const CArray<VALUE>* source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
+
+		CArray<T>* duplicate() const noexcept;
 
 		// range-based for loop
-		T* begin();
+		T* begin() noexcept;
 
-		T const* begin() const;
+		T const* begin() const noexcept;
 
-		T* end();
+		T* end() noexcept;
 
-		T const* end() const;
+		T const* end() const noexcept;
 	
 	};
 	
@@ -157,25 +158,33 @@ namespace slib
 	class SLIB_EXPORT ArrayPosition
 	{
 	public:
-		ArrayPosition();
+		ArrayPosition() noexcept;
+		
+		ArrayPosition(T* begin, sl_size count, Referable* ref) noexcept;
 
-		ArrayPosition(const Ref< CArray<T> >& array);
+		ArrayPosition(const ArrayPosition& other) noexcept = default;
 
-		ArrayPosition(const ArrayPosition<T>& other);
-
-		ArrayPosition(ArrayPosition<T>&& other);
+		ArrayPosition(ArrayPosition&& other) noexcept = default;
 
 	public:
-		T& operator*();
+		ArrayPosition& operator=(const ArrayPosition& other) noexcept = default;
+		
+		ArrayPosition& operator=(ArrayPosition&& other) noexcept = default;
+		
+		T& operator*() const noexcept;
+		
+		sl_bool operator==(const ArrayPosition& other) const noexcept;
 
-		sl_bool operator!=(const ArrayPosition<T>& other);
+		sl_bool operator!=(const ArrayPosition& other) const noexcept;
+		
+		explicit operator sl_bool() const noexcept;
 
-		ArrayPosition<T>& operator++();
+		ArrayPosition& operator++() noexcept;
 
 	private:
-		Ref< CArray<T> > ref;
-		T* data;
+		T* pos;
 		sl_size count;
+		Ref<Referable> ref;
 
 	};
 	
@@ -187,89 +196,93 @@ namespace slib
 		SLIB_REF_WRAPPER(Array, CArray<T>)
 	
 	public:
-		Array(sl_size count);
+		Array(sl_size count) noexcept;
 		
-		template <class _T>
-		Array(const _T* data, sl_size count);
+		template <class VALUE>
+		Array(const VALUE* data, sl_size count) noexcept;
 		
-		Array(const std::initializer_list<T>& l);
+#ifdef SLIB_SUPPORT_STD_TYPES
+		Array(const std::initializer_list<T>& l) noexcept;
+#endif
 		
-		Array(const T* data, sl_size count, Referable* refer);
+		Array(const T* data, sl_size count, Referable* refer) noexcept;
 		
 	public:
-		static Array<T> create(sl_size count);
+		static Array<T> create(sl_size count) noexcept;
 
-		template <class _T>
-		static Array<T> create(const _T* data, sl_size count);
+		template <class VALUE>
+		static Array<T> create(const VALUE* data, sl_size count) noexcept;
 
-		static Array<T> create(const std::initializer_list<T>& l);
+#ifdef SLIB_SUPPORT_STD_TYPES
+		static Array<T> create(const std::initializer_list<T>& l) noexcept;
+#endif
 		
-		static Array<T> createStatic(const T* data, sl_size count);
+		static Array<T> createStatic(const T* data, sl_size count) noexcept;
 
-		static Array<T> createStatic(const T* data, sl_size count, Referable* refer);
+		static Array<T> createStatic(const T* data, sl_size count, Referable* refer) noexcept;
 		
-		template <class _T>
-		static const Array<T>& from(const Array<_T>& other);
+		template <class VALUE>
+		static const Array<T>& from(const Array<VALUE>& other) noexcept;
 
 	public:
-		T* getData() const;
+		T* getData() const noexcept;
 
-		sl_size getCount() const;
+		sl_size getCount() const noexcept;
 
-		sl_bool isEmpty() const;
+		sl_bool isEmpty() const noexcept;
 
-		sl_bool isNotEmpty() const;
+		sl_bool isNotEmpty() const noexcept;
 
 	public:
-		T* getPointerAt(sl_size index) const;
+		T* getPointerAt(sl_size index) const noexcept;
 
-		sl_bool getAt(sl_size index, T* _out = sl_null) const;
+		sl_bool getAt(sl_size index, T* _out = sl_null) const noexcept;
 
-		T getValueAt(sl_size index) const;
+		T getValueAt(sl_size index) const noexcept;
 
-		T getValueAt(sl_size index, const T& def) const;
+		T getValueAt(sl_size index, const T& def) const noexcept;
 
-		sl_bool setAt(sl_size index, const T& value) const;
+		sl_bool setAt(sl_size index, const T& value) const noexcept;
 
-		T& operator[](sl_size_t index) const;
+		T& operator[](sl_size_t index) const noexcept;
 		
-		Array<T>& operator=(const std::initializer_list<T>& l);
+#ifdef SLIB_SUPPORT_STD_TYPES
+		Array<T>& operator=(const std::initializer_list<T>& l) noexcept;
+#endif
 
 	public:
-		Array<T> sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const;
+		Array<T> sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const noexcept;
 
-		template < class _T, class EQUALS = Equals<T, _T> >
-		sl_reg indexOf(const _T& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const;
+		template < class VALUE, class EQUALS = Equals<T, VALUE> >
+		sl_reg indexOf(const VALUE& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const noexcept;
 
-		template < class _T, class EQUALS = Equals<T, _T> >
-		sl_reg lastIndexOf(const _T& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const;
+		template < class VALUE, class EQUALS = Equals<T, VALUE> >
+		sl_reg lastIndexOf(const VALUE& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const noexcept;
 
-		template < class _T, class EQUALS = Equals<T, _T> >
-		sl_bool contains(const _T& value, const EQUALS& equals = EQUALS()) const;
+		template < class VALUE, class EQUALS = Equals<T, VALUE> >
+		sl_bool contains(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
 
-		template <class _T>
-		sl_size read(sl_size startSource, sl_size len, _T* dataDst) const;
+		template <class VALUE>
+		sl_size read(sl_size startSource, sl_size len, VALUE* dataDst) const noexcept;
 
-		template <class _T>
-		sl_size write(sl_size startTarget, sl_size len, const _T* dataSrc) const;
+		template <class VALUE>
+		sl_size write(sl_size startTarget, sl_size len, const VALUE* dataSrc) const noexcept;
 
-		template <class _T>
-		sl_size copy(sl_size startTarget, const Array<_T>& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const;
+		template <class VALUE>
+		sl_size copy(sl_size startTarget, const Array<VALUE>& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
 
-		template <class _T>
-		sl_size copy(const Array<_T>& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const;
+		template <class VALUE>
+		sl_size copy(const Array<VALUE>& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
 
-		Array<T> duplicate() const;
+		Array<T> duplicate() const noexcept;
 
-		Iterator<T> toIterator() const;
-
-		sl_bool getData(ArrayData<T>& data) const;
+		sl_bool getData(ArrayData<T>& data) const noexcept;
 
 		// range-based for loop
-		T* begin() const;
+		T* begin() const noexcept;
 
-		T* end() const;
-
+		T* end() const noexcept;
+		
 	};
 	
 	
@@ -281,98 +294,83 @@ namespace slib
 		SLIB_ATOMIC_REF_WRAPPER(CArray<T>)
 		
 	public:
-		Atomic(sl_size count);
+		Atomic(sl_size count) noexcept;
 		
-		template <class _T>
-		Atomic(const _T* data, sl_size count);
+		template <class VALUE>
+		Atomic(const VALUE* data, sl_size count) noexcept;
 		
-		Atomic(const std::initializer_list<T>& l);
+#ifdef SLIB_SUPPORT_STD_TYPES
+		Atomic(const std::initializer_list<T>& l) noexcept;
+#endif
 		
-		Atomic(const T* data, sl_size count, Referable* refer);
+		Atomic(const T* data, sl_size count, Referable* refer) noexcept;
 		
 	public:
-		template <class _T>
-		static const Atomic< Array<T> >& from(const Atomic< Array<_T> >& other);
+		template <class VALUE>
+		static const Atomic< Array<T> >& from(const Atomic< Array<VALUE> >& other) noexcept;
 
-		sl_size getCount() const;
+		sl_size getCount() const noexcept;
 
-		sl_bool isEmpty() const;
+		sl_bool isEmpty() const noexcept;
 
-		sl_bool isNotEmpty() const;
+		sl_bool isNotEmpty() const noexcept;
 
 	public:
-		sl_bool getAt(sl_size index, T* _out = sl_null) const;
+		sl_bool getAt(sl_size index, T* _out = sl_null) const noexcept;
 
-		T getValueAt(sl_size index) const;
+		T getValueAt(sl_size index) const noexcept;
 
-		T getValueAt(sl_size index, const T& def) const;
+		T getValueAt(sl_size index, const T& def) const noexcept;
 
-		sl_bool setAt(sl_size index, const T& value) const;
+		sl_bool setAt(sl_size index, const T& value) const noexcept;
 
-		T operator[](sl_size_t index) const;
+		T operator[](sl_size_t index) const noexcept;
 		
-		Atomic& operator=(const std::initializer_list<T>& l);
+#ifdef SLIB_SUPPORT_STD_TYPES
+		Atomic& operator=(const std::initializer_list<T>& l) noexcept;
+#endif
 
 	public:
-		Array<T> sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const;
+		Array<T> sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const noexcept;
 
-		template < class _T, class EQUALS = Equals<T, _T> >
-		sl_reg indexOf(const _T& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const;
+		template < class VALUE, class EQUALS = Equals<T, VALUE> >
+		sl_reg indexOf(const VALUE& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const noexcept;
 
-		template < class _T, class EQUALS = Equals<T, _T> >
-		sl_reg lastIndexOf(const _T& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const;
+		template < class VALUE, class EQUALS = Equals<T, VALUE> >
+		sl_reg lastIndexOf(const VALUE& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const noexcept;
 
-		template < class _T, class EQUALS = Equals<T, _T> >
-		sl_bool contains(const _T& value, const EQUALS& equals = EQUALS()) const;
+		template < class VALUE, class EQUALS = Equals<T, VALUE> >
+		sl_bool contains(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
 	
-		template <class _T>
-		sl_size read(sl_size startSource, sl_size len, _T* dataDst) const;
+		template <class VALUE>
+		sl_size read(sl_size startSource, sl_size len, VALUE* dataDst) const noexcept;
 
-		template <class _T>
-		sl_size write(sl_size startTarget, sl_size len, const _T* dataSrc) const;
+		template <class VALUE>
+		sl_size write(sl_size startTarget, sl_size len, const VALUE* dataSrc) const noexcept;
 
-		template <class _T>
-		sl_size copy(sl_size startTarget, const Array<_T>& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const;
+		template <class VALUE>
+		sl_size copy(sl_size startTarget, const Array<VALUE>& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
 
-		template <class _T>
-		sl_size copy(const Array<_T>& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const;
+		template <class VALUE>
+		sl_size copy(const Array<VALUE>& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
 
-		Array<T> duplicate() const;
+		Array<T> duplicate() const noexcept;
 
-		sl_bool getData(ArrayData<T>& data) const;
+		sl_bool getData(ArrayData<T>& data) const noexcept;
 
 		// range-based for loop
-		ArrayPosition<T> begin() const;
+		ArrayPosition<T> begin() const noexcept;
 
-		ArrayPosition<T> end() const;
+		ArrayPosition<T> end() const noexcept;
 
 	};
 	
-	
-	template <class T>
-	class SLIB_EXPORT ArrayIterator : public IIterator<T>
-	{
-	protected:
-		ArrayData<T> m_arr;
-		sl_size m_index;
-
-	public:
-		ArrayIterator(const Array<T>& arr);
-
-	public:
-		// override
-		sl_bool hasNext();
-
-		// override
-		sl_bool next(T* _out);
-
-		// override
-		sl_reg getIndex();
-
-	};
-
 }
 
-#include "detail/array.h"
+#include "detail/array.inc"
+
+#ifdef SLIB_SUPPORT_STD_TYPES
+#include "detail/array_std.inc"
+#endif
 
 #endif

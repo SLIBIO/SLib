@@ -99,20 +99,17 @@ namespace slib
 	class _Win32_ListReportViewInstance : public Win32_ViewInstance
 	{
 	public:
-		// override
-		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
+		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
 		{
 			return sl_false;
 		}
 
-		// override
-		sl_bool processCommand(SHORT code, LRESULT& result)
+		sl_bool processCommand(SHORT code, LRESULT& result) override
 		{
 			return sl_false;
 		}
 
-		// override
-		sl_bool processNotify(NMHDR* nmhdr, LRESULT& result)
+		sl_bool processNotify(NMHDR* nmhdr, LRESULT& result) override
 		{
 			Ref<View> _view = getView();
 			if (ListReportView* view = CastInstance<ListReportView>(_view.get())) {

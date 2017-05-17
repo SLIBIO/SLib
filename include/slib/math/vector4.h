@@ -147,6 +147,6 @@ namespace slib
 
 }
 
-#include "detail/vector4.h"
+#include "detail/vector4.inc"
 
 #endif

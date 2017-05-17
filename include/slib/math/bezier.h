@@ -81,6 +81,6 @@ namespace slib
 
 }
 
-#include "detail/bezier.h"
+#include "detail/bezier.inc"
 
 #endif

@@ -65,14 +65,12 @@ namespace slib
 			::InvalidateRect(handle, NULL, TRUE);
 		}
 
-		// override
-		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
+		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
 		{
 			return sl_false;
 		}
 
-		// override
-		sl_bool processCommand(SHORT code, LRESULT& result)
+		sl_bool processCommand(SHORT code, LRESULT& result) override
 		{
 			switch (code) {
 			case STN_CLICKED:
@@ -84,8 +82,7 @@ namespace slib
 			return sl_false;
 		}
 
-		// override
-		sl_bool processControlColor(UINT msg, HDC hDC, HBRUSH& result)
+		sl_bool processControlColor(UINT msg, HDC hDC, HBRUSH& result) override
 		{
 			HBRUSH hbr = m_hBrushBackground;
 			if (hbr) {
@@ -98,8 +95,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void processPostControlColor(UINT msg, HDC hDC, HBRUSH& result)
+		void processPostControlColor(UINT msg, HDC hDC, HBRUSH& result) override
 		{
 			Color c = m_colorText;
 			::SetTextColor(hDC, GraphicsPlatform::getColorRef(c));

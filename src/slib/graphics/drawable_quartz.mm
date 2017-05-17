@@ -117,8 +117,7 @@ namespace slib
 			return sl_null;
 		}
 		
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& _rectSrc, const DrawParam& param)
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& _rectSrc, const DrawParam& param) override
 		{
 			CGRect rectSrc;
 			rectSrc.origin.x = _rectSrc.left;
@@ -132,20 +131,17 @@ namespace slib
 			}
 		}
 		
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
 		{
 			GraphicsPlatform::drawCGImage(canvas, rectDst, m_image, m_flagFlipped, param);
 		}
 
-		// override
-		sl_real getDrawableWidth()
+		sl_real getDrawableWidth() override
 		{
 			return (sl_real)m_width;
 		}
 		
-		// override
-		sl_real getDrawableHeight()
+		sl_real getDrawableHeight() override
 		{
 			return (sl_real)m_height;
 		}

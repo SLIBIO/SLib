@@ -13,6 +13,6 @@
 namespace slib
 {
 
-	const char _Map_ClassID[] = "map";
+	const char _priv_Map_ClassID[] = "map";
 
 }

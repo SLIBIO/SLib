@@ -115,14 +115,12 @@ namespace slib
 		{
 		}
 		
-		// override
-		String getGLSLVertexShader(RenderEngine* engine)
+		String getGLSLVertexShader(RenderEngine* engine) override
 		{
 			return m_vertexShader;
 		}
 		
-		// override
-		String getGLSLFragmentShader(RenderEngine* engine)
+		String getGLSLFragmentShader(RenderEngine* engine) override
 		{
 			return m_fragmentShader;
 		}

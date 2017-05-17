@@ -35,18 +35,31 @@ namespace slib
 		LinkPosition();
 
 		LinkPosition(Link<T>* link);
+		
+		LinkPosition(Link<T>* link, Referable* ref);
 
-		LinkPosition(const LinkPosition<T>& other);
-
+		LinkPosition(const LinkPosition& other) = default;
+		
+		LinkPosition(LinkPosition&& other) = default;
+		
 	public:
-		T& operator*();
+		LinkPosition& operator=(const LinkPosition& other) = default;
+		
+		LinkPosition& operator=(LinkPosition&& other) = default;
 
-		sl_bool operator!=(const LinkPosition<T>& p);
+		T& operator*() const;
+		
+		sl_bool operator==(const LinkPosition<T>& p) const;
+
+		sl_bool operator!=(const LinkPosition<T>& p) const;
+		
+		operator Link<T>*() const noexcept;
 
 		LinkPosition<T>& operator++();
 
-	private:
+	public:
 		Link<T>* link;
+		Ref<Referable> ref;
 
 	};
 	
@@ -105,10 +118,10 @@ namespace slib
 		sl_bool getLastItem(T* _out) const;
 
 		template < class _T, class EQUALS = Equals<T, _T> >
-		Link<T>* search_NoLock(const _T& value, const EQUALS& equals = EQUALS()) const;
+		Link<T>* find_NoLock(const _T& value, const EQUALS& equals = EQUALS()) const;
 
 		template < class _T, class EQUALS = Equals<T, _T> >
-		Link<T>* search(const _T& value, const EQUALS& equals = EQUALS()) const;
+		Link<T>* find(const _T& value, const EQUALS& equals = EQUALS()) const;
 
 		template < class _T, class EQUALS = Equals<T, _T> >
 		sl_bool contains_NoLock(const _T& value, const EQUALS& equals = EQUALS()) const;
@@ -246,10 +259,10 @@ namespace slib
 		sl_bool getLastItem(T* _out) const;
 
 		template < class _T, class EQUALS = Equals<T, _T> >
-		Link<T>* search_NoLock(const _T& value, const EQUALS& equals = EQUALS()) const;
+		Link<T>* find_NoLock(const _T& value, const EQUALS& equals = EQUALS()) const;
 
 		template < class _T, class EQUALS = Equals<T, _T> >
-		Link<T>* search(const _T& value, const EQUALS& equals = EQUALS()) const;
+		Link<T>* find(const _T& value, const EQUALS& equals = EQUALS()) const;
 
 		template < class _T, class EQUALS = Equals<T, _T> >
 		sl_bool contains_NoLock(const _T& value, const EQUALS& equals = EQUALS()) const;
@@ -398,6 +411,6 @@ namespace slib
 
 }
 
-#include "detail/linked_list.h"
+#include "detail/linked_list.inc"
 
 #endif

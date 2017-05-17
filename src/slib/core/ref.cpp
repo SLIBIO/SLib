@@ -15,15 +15,15 @@
 namespace slib
 {
 
-	struct _Ref_Const
+	struct _priv_Ref_Const
 	{
 		void* ptr;
 		sl_int32 lock;
 	};
 
-	const _Ref_Const _Ref_Null = {0, 0};
+	const _priv_Ref_Const _priv_Ref_Null = {0, 0};
 
-	Referable::Referable()
+	Referable::Referable() noexcept
 	{
 #ifdef SLIB_DEBUG_REFERENCE
 		m_signature = _SIGNATURE;
@@ -35,7 +35,17 @@ namespace slib
 		m_weak = sl_null;
 	}
 
-	Referable::Referable(const Referable& other)
+	Referable::Referable(const Referable& other) noexcept
+	{
+#ifdef SLIB_DEBUG_REFERENCE
+		m_signature = _SIGNATURE;
+#endif
+		m_nRefCount = 0;
+		m_flagWeakRef = sl_false;
+		m_weak = sl_null;
+	}
+	
+	Referable::Referable(Referable&& other) noexcept
 	{
 #ifdef SLIB_DEBUG_REFERENCE
 		m_signature = _SIGNATURE;
@@ -45,12 +55,12 @@ namespace slib
 		m_weak = sl_null;
 	}
 
-	Referable::~Referable()
+	Referable::~Referable() noexcept
 	{
 		_clearWeak();
 	}
 
-	sl_reg Referable::increaseReference()
+	sl_reg Referable::increaseReference() noexcept
 	{
 		if (m_nRefCount >= 0) {
 #ifdef SLIB_DEBUG_REFERENCE
@@ -61,7 +71,7 @@ namespace slib
 		return 1;
 	}
 
-	sl_reg Referable::decreaseReference()
+	sl_reg Referable::decreaseReference() noexcept
 	{
 		if (m_nRefCount > 0) {
 #ifdef SLIB_DEBUG_REFERENCE
@@ -76,12 +86,12 @@ namespace slib
 		return 1;
 	}
 	
-	sl_reg Referable::getReferenceCount()
+	sl_reg Referable::getReferenceCount() noexcept
 	{
 		return m_nRefCount;
 	}
 
-	sl_reg Referable::decreaseReferenceNoFree()
+	sl_reg Referable::decreaseReferenceNoFree() noexcept
 	{
 		if (m_nRefCount > 0) {
 #ifdef SLIB_DEBUG_REFERENCE
@@ -92,32 +102,32 @@ namespace slib
 		return 1;
 	}
 
-	void Referable::makeNeverFree()
+	void Referable::makeNeverFree() noexcept
 	{
 		m_nRefCount = -1;
 	}
 	
-	sl_object_type Referable::ObjectType()
+	sl_object_type Referable::ObjectType() noexcept
 	{
 		return 0;
 	}
 	
-	sl_bool Referable::checkObjectType(sl_object_type type)
+	sl_bool Referable::checkObjectType(sl_object_type type) noexcept
 	{
 		return sl_false;
 	}
 
-	sl_object_type Referable::getObjectType() const
+	sl_object_type Referable::getObjectType() const noexcept
 	{
 		return 0;
 	}
 
-	sl_bool Referable::isInstanceOf(sl_object_type type) const
+	sl_bool Referable::isInstanceOf(sl_object_type type) const noexcept
 	{
 		return sl_false;
 	}
 
-	CWeakRef* Referable::_getWeakObject()
+	CWeakRef* Referable::_getWeakObject() noexcept
 	{
 		SpinLocker lock(&m_lockWeak);
 		if (! m_weak) {
@@ -126,7 +136,7 @@ namespace slib
 		return m_weak;
 	}
 
-	void Referable::_clearWeak()
+	void Referable::_clearWeak() noexcept
 	{
 		if (m_weak) {
 			m_weak->release();
@@ -134,14 +144,14 @@ namespace slib
 		}
 	}
 
-	void Referable::_free()
+	void Referable::_free() noexcept
 	{
 		_clearWeak();
 		delete this;
 	}
 
 #ifdef SLIB_DEBUG_REFERENCE
-	void Referable::_checkValid()
+	void Referable::_checkValid() noexcept
 	{
 		if (m_signature != _SIGNATURE) {
 			SLIB_ABORT("Not-Referable object is referenced");
@@ -149,20 +159,20 @@ namespace slib
 	}
 #endif
 
-
+	
 	SLIB_DEFINE_ROOT_OBJECT(CWeakRef)
 
-	CWeakRef::CWeakRef()
+	CWeakRef::CWeakRef() noexcept
 	{
 		m_object = sl_null;
 		m_flagWeakRef = sl_true;
 	}
 
-	CWeakRef::~CWeakRef()
+	CWeakRef::~CWeakRef() noexcept
 	{
 	}
 
-	CWeakRef* CWeakRef::create(Referable* object)
+	CWeakRef* CWeakRef::create(Referable* object) noexcept
 	{
 		CWeakRef* ret = new CWeakRef;
 		if (ret) {
@@ -172,7 +182,7 @@ namespace slib
 		return ret;
 	}
 
-	Ref<Referable> CWeakRef::lock()
+	Ref<Referable> CWeakRef::lock() noexcept
 	{
 		Ref<Referable> ret;
 		SpinLocker lock(&m_lock);
@@ -187,7 +197,7 @@ namespace slib
 		return ret;
 	}
 
-	void CWeakRef::release()
+	void CWeakRef::release() noexcept
 	{
 		{
 			SpinLocker lock(&m_lock);
@@ -197,13 +207,13 @@ namespace slib
 	}
 
 
-	ReferableKeeper::ReferableKeeper(Referable* object)
+	ReferableKeeper::ReferableKeeper(Referable* object) noexcept
 	{
 		m_object = object;
 		object->increaseReference();
 	}
 
-	ReferableKeeper::~ReferableKeeper()
+	ReferableKeeper::~ReferableKeeper() noexcept
 	{
 		m_object->decreaseReferenceNoFree();
 	}

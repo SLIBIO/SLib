@@ -40,31 +40,23 @@ namespace slib
 		
 		void requestRender();
 		
-		// override
-		void invalidate();
+		void invalidate() override;
 		
-		// override
-		void invalidate(const UIRect& rect);
+		void invalidate(const UIRect& rect) override;
 		
 		void renderViewContent(RenderEngine* engine);
 		
-		// override
-		Size measureText(const String& text, const Ref<Font>& font, sl_bool flagMultiLine = sl_false);
+		Size measureText(const String& text, const Ref<Font>& font, sl_bool flagMultiLine = sl_false) override;
 		
-		// override
-		Ref<AnimationLoop> getAnimationLoop();
+		Ref<AnimationLoop> getAnimationLoop() override;
 		
-		// override
-		sl_bool isDrawingThread();
+		sl_bool isDrawingThread() override;
 		
-		// override
-		void dispatchToDrawingThread(const Function<void()>& callback, sl_uint32 delayMillis = 0);
+		void dispatchToDrawingThread(const Function<void()>& callback, sl_uint32 delayMillis = 0) override;
 		
-		// override
-		void runOnDrawingThread(const Function<void()>& callback);
+		void runOnDrawingThread(const Function<void()>& callback) override;
 		
-		// override
-		Ref<Dispatcher> getDispatcher();
+		Ref<Dispatcher> getDispatcher() override;
 
 		sl_bool isDebugTextVisible();
 		
@@ -82,35 +74,26 @@ namespace slib
 	protected:
 		virtual void onFrame(RenderEngine* engine);
 		
-		// override
-		void onAttach();
+		void onAttach() override;
 		
-		// override
-		void onDrawBackground(Canvas* canvas);
+		void onDrawBackground(Canvas* canvas) override;
 		
 	public:
-		// override
-		Ref<ViewInstance> createNativeWidget(ViewInstance* _parent);
+		Ref<ViewInstance> createNativeWidget(ViewInstance* _parent) override;
 		
 		virtual void dispatchFrame(RenderEngine* engine);
 		
-		// override
-		void dispatchMouseEvent(UIEvent* ev);
+		void dispatchMouseEvent(UIEvent* ev) override;
 		
-		// override
-		void dispatchTouchEvent(UIEvent* ev);
+		void dispatchTouchEvent(UIEvent* ev) override;
 		
-		// override
-		void dispatchMouseWheelEvent(UIEvent* ev);
+		void dispatchMouseWheelEvent(UIEvent* ev) override;
 		
-		// override
-		void dispatchKeyEvent(UIEvent* ev);
+		void dispatchKeyEvent(UIEvent* ev) override;
 		
-		// override
-		void dispatchSetCursor(UIEvent* ev);
+		void dispatchSetCursor(UIEvent* ev) override;
 		
-		// override
-		void dispatchSwipe(GestureEvent* ev);
+		void dispatchSwipe(GestureEvent* ev) override;
 
 	private:
 		void _dispatchMouseEvent(const Ref<UIEvent>& ev);

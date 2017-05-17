@@ -43,8 +43,7 @@ namespace slib
 
 		sl_bool isRunning();
 
-		// override
-		sl_bool dispatch(const Function<void()>& task, sl_uint64 delay_ms = 0);
+		sl_bool dispatch(const Function<void()>& task, sl_uint64 delay_ms = 0) override;
 
 		sl_bool addTimer(const Ref<Timer>& timer);
 		
@@ -66,7 +65,7 @@ namespace slib
 			sl_uint64 time;
 			Function<void()> task;
 		};
-		BTree<sl_uint64, TimeTask> m_timeTasks;
+		RedBlackTree<sl_uint64, TimeTask> m_timeTasks;
 		Mutex m_lockTimeTasks;
 
 		class TimerTask

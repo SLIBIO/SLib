@@ -58,8 +58,7 @@ namespace slib
 			return primary;
 		}
 		
-		// override
-		UIRect getRegion()
+		UIRect getRegion() override
 		{
 			CGRect rect = [m_screen bounds];
 			CGFloat f = UIPlatform::getGlobalScaleFactor();

@@ -13,11 +13,11 @@
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 
 #include "slib/media/media_player.h"
-
 #include "slib/render/opengl.h"
-#include "slib/core/safe_static.h"
 
+#include "slib/core/map.h"
 #include "slib/core/platform_android.h"
+#include "slib/core/safe_static.h"
 
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
@@ -117,8 +117,7 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		void release()
+		void release() override
 		{
 			ObjectLocker lock(this);
 			if (!m_flagInited) {
@@ -134,8 +133,7 @@ namespace slib
 			_removeFromMap();
 		}
 
-		// override
-		void resume()
+		void resume() override
 		{
 			ObjectLocker lock(this);
 			if (!m_flagInited) {
@@ -151,8 +149,7 @@ namespace slib
 			_addToMap();
 		}
 
-		// override
-		void pause()
+		void pause() override
 		{
 			ObjectLocker lock(this);
 			if (!m_flagInited) {
@@ -168,8 +165,7 @@ namespace slib
 			_removeFromMap();
 		}
 
-		// override
-		sl_bool isPlaying()
+		sl_bool isPlaying() override
 		{
 			ObjectLocker lock(this);
 			if (!m_flagInited) {
@@ -178,14 +174,12 @@ namespace slib
 			return m_flagPlaying;
 		}
 
-		//override
-		sl_real getVolume()
+		sl_real getVolume() override
 		{
 			return (sl_real) _JMediaPlayer::getVolume.callFloat(m_player.get());
 		}
 
-		// override
-		void setVolume(sl_real volume)
+		void setVolume(sl_real volume) override
 		{
 			ObjectLocker lock(this);
 			if (!m_flagInited) {
@@ -195,8 +189,7 @@ namespace slib
 			_JMediaPlayer::setVolume.call(m_player.get(), volume);
 		}
 
-		// override
-		void setAutoRepeat(sl_bool flagRepeat)
+		void setAutoRepeat(sl_bool flagRepeat) override
 		{
 			ObjectLocker lock(this);
 			if (!m_flagInited) {
@@ -205,8 +198,7 @@ namespace slib
 			_JMediaPlayer::setLooping.call(m_player.get(), flagRepeat);
 		}
 
-		// override
-		void renderVideo(MediaPlayerRenderVideoParam& param)
+		void renderVideo(MediaPlayerRenderVideoParam& param) override
 		{
 			ObjectLocker lock(this);
 			if (!m_flagInited) {

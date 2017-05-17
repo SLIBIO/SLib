@@ -22,39 +22,36 @@ namespace slib
 	class NewHelper
 	{
 	public:
-		static T* create();
+		static T* create() noexcept;
 
-		static T* create(sl_size count);
-
-		template <class _T>
-		static T* create(const _T* other);
+		static T* create(sl_size count) noexcept;
 
 		template <class _T>
-		static T* create(const _T* other, sl_size count);
+		static T* create(const _T* other, sl_size count) noexcept;
 
-		static void free(T* data);
+		static void free(T* data) noexcept;
 
-		static void free(T* data, sl_size count);
+		static void free(T* data, sl_size count) noexcept;
 
-		static void constructor(T* data);
+		static void constructor(T* data) noexcept;
 
-		static void constructor(T* data, sl_size count);
-
-		template <class _T>
-		static void constructor(T* data, const _T* other);
+		static void constructor(T* data, sl_size count) noexcept;
 
 		template <class _T>
-		static void constructor(T* data, const _T* other, sl_size count);
+		static void constructor(T* data, const _T* other) noexcept;
 
-		static void destructor(T* data);
+		template <class _T>
+		static void constructor(T* data, const _T* other, sl_size count) noexcept;
 
-		static void destructor(T* data, sl_size count);
+		static void destructor(T* data) noexcept;
+
+		static void destructor(T* data, sl_size count) noexcept;
 
 	};
 
 }
 
-#include "detail/new_helper.h"
+#include "detail/new_helper.inc"
 
 #endif
 

@@ -375,6 +375,8 @@
 		26EAB7E21EA288DA00ED96FA /* url.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2631B77D1DDB14E600729A87 /* url.cpp */; };
 		26EAB7E31EA288DA00ED96FA /* url_request.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2631B77F1DDB14ED00729A87 /* url_request.cpp */; };
 		26EAB7E41EA288DA00ED96FA /* url_request_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2631B7811DDB14F200729A87 /* url_request_apple.mm */; };
+		26FAA8861EC768C1007BC67F /* red_black_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FAA8851EC768C1007BC67F /* red_black_tree.cpp */; };
+		26FAA8871EC768C1007BC67F /* red_black_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FAA8851EC768C1007BC67F /* red_black_tree.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -674,6 +676,7 @@
 		26F5B3231E90125200F9FB7F /* geo_rectangle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = geo_rectangle.cpp; sourceTree = "<group>"; };
 		26F5B3241E90125200F9FB7F /* globe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = globe.cpp; sourceTree = "<group>"; };
 		26F5B3251E90125200F9FB7F /* latlon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = latlon.cpp; sourceTree = "<group>"; };
+		26FAA8851EC768C1007BC67F /* red_black_tree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = red_black_tree.cpp; sourceTree = "<group>"; };
 		26FBC2701DF9FB0200D76774 /* spin_lock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = spin_lock.cpp; sourceTree = "<group>"; };
 		26FD28F51CFCB67D003E95FB /* scroll_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scroll_bar.cpp; sourceTree = "<group>"; };
 		A234D6ED1B3F12F600ADDF4E /* content_type.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = content_type.cpp; sourceTree = "<group>"; };
@@ -994,6 +997,7 @@
 				E1D3A4281E14A2FC00007A98 /* preference.cpp */,
 				E1D3A42A1E14A38C00007A98 /* preference_apple.mm */,
 				2629F8751DFAF4B8005CF43D /* ptr.cpp */,
+				26FAA8851EC768C1007BC67F /* red_black_tree.cpp */,
 				2629F8731DFAF4AE005CF43D /* ref.cpp */,
 				A25F2EDF1B039EF600854DAF /* resource.cpp */,
 				A25F2EE01B039EF600854DAF /* service.cpp */,
@@ -1521,6 +1525,7 @@
 				26D15D7D1E93AD05003BD61A /* locale.cpp in Sources */,
 				26D15DA01E93AD16003BD61A /* compress_zlib.cpp in Sources */,
 				26D15DA41E93AD16003BD61A /* rsa.cpp in Sources */,
+				26FAA8871EC768C1007BC67F /* red_black_tree.cpp in Sources */,
 				26EAB7D41EA288DA00ED96FA /* ip_address.cpp in Sources */,
 				26D15DBB1E93AD24003BD61A /* vector4.cpp in Sources */,
 				26D15D721E93AD05003BD61A /* dispatch.cpp in Sources */,
@@ -1590,6 +1595,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				26D9D8791E96294F005F7BD3 /* pen.cpp in Sources */,
+				26FAA8861EC768C1007BC67F /* red_black_tree.cpp in Sources */,
 				26D9D7F31E9628E0005F7BD3 /* box.cpp in Sources */,
 				26D9D7F41E9628E0005F7BD3 /* map.cpp in Sources */,
 				26D9D8971E962962005F7BD3 /* http_service.cpp in Sources */,

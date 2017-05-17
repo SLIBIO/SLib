@@ -47,8 +47,7 @@ namespace slib
 			}
 		}
 
-		// override
-		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
+		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
 		{
 			if (msg == WM_PAINT) {
 				PAINTSTRUCT ps;
@@ -66,8 +65,7 @@ namespace slib
 			return Win32_ViewInstance::processWindowMessage(msg, wParam, lParam, result);
 		}
 
-		// override
-		void onFrame(RenderEngine* engine)
+		void onFrame(RenderEngine* engine) override
 		{
 			Ref<View> _view = getView();
 			if (RenderView* view = CastInstance<RenderView>(_view.get())) {

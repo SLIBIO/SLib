@@ -185,6 +185,6 @@ namespace slib
 
 }
 
-#include "detail/rectangle.h"
+#include "detail/rectangle.inc"
 
 #endif

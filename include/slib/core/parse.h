@@ -129,6 +129,6 @@ namespace slib
 
 }
 
-#include "detail/parse.h"
+#include "detail/parse.inc"
 
 #endif

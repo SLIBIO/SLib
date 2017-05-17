@@ -35,11 +35,9 @@ namespace slib
 		virtual void setChecked(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 	public:
-		// override
-		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
-		// override
-		void dispatchClick(UIEvent* ev);
+		void dispatchClick(UIEvent* ev) override;
 
 		void dispatchClick();
 		

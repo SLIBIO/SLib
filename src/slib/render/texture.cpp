@@ -121,8 +121,7 @@ namespace slib
 	public:
 		Ref<Texture> texture;
 		
-		// override
-		void update(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
+		void update(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) override
 		{
 			texture->update(x, y, width, height);
 		}

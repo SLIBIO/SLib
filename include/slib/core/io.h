@@ -322,26 +322,19 @@ namespace slib
 
 		char* getBuffer();
 	
-		// override
-		void close();
+		void close() override;
 	
-		// override
-		sl_reg read(void* buf, sl_size size);
+		sl_reg read(void* buf, sl_size size) override;
 	
-		// override
-		sl_reg write(const void* buf, sl_size size);
+		sl_reg write(const void* buf, sl_size size) override;
 
-		// override
-		sl_uint64 getPosition();
+		sl_uint64 getPosition() override;
 
-		// override
-		sl_uint64 getSize();
+		sl_uint64 getSize() override;
 
-		// override
-		sl_bool seek(sl_int64 offset, SeekPosition pos = SeekPosition::Current);
+		sl_bool seek(sl_int64 offset, SeekPosition pos = SeekPosition::Current) override;
 	
-		// override
-		sl_bool setSize(sl_uint64 size);
+		sl_bool setSize(sl_uint64 size) override;
 	
 		sl_bool isResizable();
 		
@@ -382,17 +375,13 @@ namespace slib
 
 		char* getBuffer();
 
-		// override
-		sl_reg read(void* buf, sl_size size);
+		sl_reg read(void* buf, sl_size size) override;
 
-		// override
-		sl_uint64 getPosition();
+		sl_uint64 getPosition() override;
 
-		// override
-		sl_uint64 getSize();
+		sl_uint64 getSize() override;
 
-		// override
-		sl_bool seek(sl_int64 offset, SeekPosition pos);
+		sl_bool seek(sl_int64 offset, SeekPosition pos) override;
 		
 	protected:
 		const void* m_buf;
@@ -421,13 +410,11 @@ namespace slib
 
 		void init(void* buf, sl_size size);
 
-		// override
-		sl_reg write(const void* buf, sl_size size);
+		sl_reg write(const void* buf, sl_size size) override;
 
 		sl_reg write(const Memory& mem);
 	
-		// override
-		sl_bool seek(sl_int64 offset, SeekPosition pos);
+		sl_bool seek(sl_int64 offset, SeekPosition pos) override;
 	
 		Memory getData();
 	
@@ -439,11 +426,9 @@ namespace slib
 	
 		char* getBuffer();
 	
-		// override
-		sl_uint64 getPosition();
+		sl_uint64 getPosition() override;
 
-		// override
-		sl_uint64 getSize();
+		sl_uint64 getSize() override;
 		
 	protected:
 		void* m_buf;

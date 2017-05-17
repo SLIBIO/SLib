@@ -141,8 +141,7 @@ namespace slib
 		~MobileMainWindow();
 
 	protected:
-		// override
-		void onResize(sl_ui_len width, sl_ui_len height);
+		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
 	};
 

@@ -60,8 +60,7 @@ namespace slib
 			return ret;
 		}
 
-		// override
-		sl_int64 execute(const String& sql)
+		sl_int64 execute(const String& sql) override
 		{
 			ObjectLocker lock(this);
 			char* zErrMsg = 0;
@@ -75,7 +74,7 @@ namespace slib
 
 		static Map<String, Variant> _getRow(sqlite3_stmt* stmt, String* columns, sl_uint32 nColumns)
 		{
-			Map<String, Variant> row = Map<String, Variant>::createList();
+			Map<String, Variant> row;
 			for (sl_uint32 cIndex = 0; cIndex < nColumns; cIndex++) {
 				String cValue = String::fromUtf8(::sqlite3_column_text(stmt, (int)cIndex));
 				row.put_NoLock(columns[cIndex], cValue);
@@ -120,14 +119,12 @@ namespace slib
 				m_db->unlock();
 			}
 
-			// override
-			sl_uint32 getColumnsCount()
+			sl_uint32 getColumnsCount() override
 			{
 				return m_nColumnNames;
 			}
 
-			// override
-			String getColumnName(sl_uint32 index)
+			String getColumnName(sl_uint32 index) override
 			{
 				if (index < m_nColumnNames) {
 					return m_columnNames[index];
@@ -135,14 +132,12 @@ namespace slib
 				return sl_null;
 			}
 
-			// override
-			sl_int32 getColumnIndex(const String& name)
+			sl_int32 getColumnIndex(const String& name) override
 			{
 				return m_mapColumnIndexes.getValue_NoLock(name, -1);
 			}
 
-			// override
-			Map<String, Variant> getRow()
+			Map<String, Variant> getRow() override
 			{
 				Map<String, Variant> ret;
 				if (m_nColumnNames > 0) {
@@ -199,8 +194,7 @@ namespace slib
 				return sl_null;
 			}
 
-			// override
-			Variant getValue(sl_uint32 index)
+			Variant getValue(sl_uint32 index) override
 			{
 				if (index < m_nColumnNames) {
 					return _getValue(index);
@@ -208,8 +202,7 @@ namespace slib
 				return sl_null;
 			}
 
-			// override
-			String getString(sl_uint32 index)
+			String getString(sl_uint32 index) override
 			{
 				if (index < m_nColumnNames) {
 					int type = ::sqlite3_column_type(m_statement, index);
@@ -225,8 +218,7 @@ namespace slib
 				return sl_null;
 			}
 
-			// override
-			sl_int64 getInt64(sl_uint32 index, sl_int64 defaultValue)
+			sl_int64 getInt64(sl_uint32 index, sl_int64 defaultValue) override
 			{
 				if (index < m_nColumnNames) {
 					int type = ::sqlite3_column_type(m_statement, index);
@@ -242,8 +234,7 @@ namespace slib
 				return defaultValue;
 			}
 
-			// override
-			sl_uint64 getUint64(sl_uint32 index, sl_uint64 defaultValue)
+			sl_uint64 getUint64(sl_uint32 index, sl_uint64 defaultValue) override
 			{
 				if (index < m_nColumnNames) {
 					int type = ::sqlite3_column_type(m_statement, index);
@@ -259,8 +250,7 @@ namespace slib
 				return defaultValue;
 			}
 
-			// override
-			sl_int32 getInt32(sl_uint32 index, sl_int32 defaultValue)
+			sl_int32 getInt32(sl_uint32 index, sl_int32 defaultValue) override
 			{
 				if (index < m_nColumnNames) {
 					int type = ::sqlite3_column_type(m_statement, index);
@@ -276,8 +266,7 @@ namespace slib
 				return defaultValue;
 			}
 
-			// override
-			sl_uint32 getUint32(sl_uint32 index, sl_uint32 defaultValue)
+			sl_uint32 getUint32(sl_uint32 index, sl_uint32 defaultValue) override
 			{
 				if (index < m_nColumnNames) {
 					int type = ::sqlite3_column_type(m_statement, index);
@@ -293,8 +282,7 @@ namespace slib
 				return defaultValue;
 			}
 
-			// override
-			float getFloat(sl_uint32 index, float defaultValue)
+			float getFloat(sl_uint32 index, float defaultValue) override
 			{
 				if (index < m_nColumnNames) {
 					int type = ::sqlite3_column_type(m_statement, index);
@@ -310,8 +298,7 @@ namespace slib
 				return defaultValue;
 			}
 
-			// override
-			double getDouble(sl_uint32 index, double defaultValue)
+			double getDouble(sl_uint32 index, double defaultValue) override
 			{
 				if (index < m_nColumnNames) {
 					int type = ::sqlite3_column_type(m_statement, index);
@@ -327,8 +314,7 @@ namespace slib
 				return defaultValue;
 			}
 
-			// override
-			Memory getBlob(sl_uint32 index)
+			Memory getBlob(sl_uint32 index) override
 			{
 				if (index < m_nColumnNames) {
 					int type = ::sqlite3_column_type(m_statement, index);
@@ -341,8 +327,7 @@ namespace slib
 				return sl_null;
 			}
 
-			// override
-			sl_bool moveNext()
+			sl_bool moveNext() override
 			{
 				sl_int32 nRet = ::sqlite3_step(m_statement);
 				if (nRet == SQLITE_ROW) {
@@ -435,8 +420,7 @@ namespace slib
 				return sl_false;
 			}
 
-			// override
-			sl_int64 executeBy(const Variant* params, sl_uint32 nParams)
+			sl_int64 executeBy(const Variant* params, sl_uint32 nParams) override
 			{
 				ObjectLocker lock(m_db.get());
 				if (_execute(params, nParams)) {
@@ -449,8 +433,7 @@ namespace slib
 				return -1;
 			}
 
-			// override
-			Ref<DatabaseCursor> queryBy(const Variant* params, sl_uint32 nParams)
+			Ref<DatabaseCursor> queryBy(const Variant* params, sl_uint32 nParams) override
 			{
 				ObjectLocker lock(m_db.get());
 				Ref<DatabaseCursor> ret;
@@ -466,8 +449,7 @@ namespace slib
 			}
 		};
 
-		// override
-		Ref<DatabaseStatement> prepareStatement(const String& sql)
+		Ref<DatabaseStatement> prepareStatement(const String& sql) override
 		{
 			ObjectLocker lock(this);
 			Ref<DatabaseStatement> ret;
@@ -482,8 +464,7 @@ namespace slib
 			return ret;
 		}
 
-		// override
-		String getErrorMessage()
+		String getErrorMessage() override
 		{
 			return ::sqlite3_errmsg(m_db);
 		}

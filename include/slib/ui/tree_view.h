@@ -257,14 +257,11 @@ namespace slib
 	public:
 		virtual void onSelectItem(TreeViewItem* item);
 		
-		// override
-		virtual void onDraw(Canvas* canvas);
+		void onDraw(Canvas* canvas) override;
 		
-		// override
-		virtual void onResize(sl_ui_len width, sl_ui_len height);
+		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
-		// override
-		virtual void onChangePadding();
+		void onChangePadding() override;
 		
 	protected:
 		virtual void dispatchSelectItem(TreeViewItem* item);

@@ -225,8 +225,8 @@ namespace slib
 					dst[k++] = (sl_char8)(v);
 				} else {
 					dst[k++] = '%';
-					dst[k++] = _StringConv_radixPatternUpper[(v >> 4) & 15];
-					dst[k++] = _StringConv_radixPatternUpper[v & 15];
+					dst[k++] = _priv_StringConv_radixPatternUpper[(v >> 4) & 15];
+					dst[k++] = _priv_StringConv_radixPatternUpper[v & 15];
 				}
 			}
 			return String(dst, k);

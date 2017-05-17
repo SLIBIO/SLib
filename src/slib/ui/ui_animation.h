@@ -24,8 +24,7 @@ namespace slib
 	public:
 		Ref<View> getView();
 		
-		// override
-		void update(float fraction, const Matrix3& value);
+		void update(float fraction, const Matrix3& value) override;
 		
 	private:
 		WeakRef<View> m_view;
@@ -42,8 +41,7 @@ namespace slib
 	public:
 		Ref<View> getView();
 		
-		// override
-		void update(float fraction, const Vector2& value);
+		void update(float fraction, const Vector2& value) override;
 		
 	private:
 		WeakRef<View> m_view;
@@ -60,8 +58,7 @@ namespace slib
 	public:
 		Ref<View> getView();
 		
-		// override
-		void update(float fraction, const Vector2& value);
+		void update(float fraction, const Vector2& value) override;
 		
 	private:
 		WeakRef<View> m_view;
@@ -78,8 +75,7 @@ namespace slib
 	public:
 		Ref<View> getView();
 		
-		// override
-		void update(float fraction, const sl_real& value);
+		void update(float fraction, const sl_real& value) override;
 		
 	private:
 		WeakRef<View> m_view;
@@ -96,8 +92,7 @@ namespace slib
 	public:
 		Ref<View> getView();
 		
-		// override
-		void update(float fraction, const Rectangle& value);
+		void update(float fraction, const Rectangle& value) override;
 		
 	private:
 		WeakRef<View> m_view;
@@ -114,8 +109,7 @@ namespace slib
 	public:
 		Ref<View> getView();
 		
-		// override
-		void update(float fraction, const sl_real& value);
+		void update(float fraction, const sl_real& value) override;
 		
 	private:
 		WeakRef<View> m_view;
@@ -132,8 +126,7 @@ namespace slib
 	public:
 		Ref<View> getView();
 		
-		// override
-		void update(float fraction, const Color4f& value);
+		void update(float fraction, const Color4f& value) override;
 		
 	private:
 		WeakRef<View> m_view;

@@ -451,6 +451,6 @@ namespace slib
 	
 }
 
-#include "detail/ip_address.h"
+#include "detail/ip_address.inc"
 
 #endif

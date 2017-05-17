@@ -165,6 +165,6 @@ namespace slib
 	
 }
 
-#include "detail/audio_util.h"
+#include "detail/audio_util.inc"
 
 #endif

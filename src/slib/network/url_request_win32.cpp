@@ -145,23 +145,18 @@ namespace slib
 		UrlRequest_DownloadStream(UrlRequest_Impl* request);
 
 	public:
-		// override
-		void close();
+		void close() override;
 
-		// override
-		sl_bool isOpened();
+		sl_bool isOpened() override;
 
-		// override
-		sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref);
+		sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref) override;
 
-		// override
-		sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref)
+		sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref) override
 		{
 			return sl_false;
 		}
 
-		// override
-		sl_bool addTask(const Function<void()>& callback)
+		sl_bool addTask(const Function<void()>& callback) override
 		{
 			return sl_false;
 		}
@@ -170,8 +165,7 @@ namespace slib
 
 		sl_bool readBuffer(UrlRequest_Impl* request, HINTERNET hRequest, AsyncStreamRequest* buffer);
 
-		// override
-		void onAsyncCopyExit(AsyncCopy* task);
+		void onAsyncCopyExit(AsyncCopy* task) override;
 
 	};
 
@@ -264,14 +258,12 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		void _cancel()
+		void _cancel() override
 		{
 			clean();
 		}
 
-		// override
-		void _sendAsync()
+		void _sendAsync() override
 		{
 			if (m_hRequest) {
 				processAsync(m_hRequest, ERROR_SUCCESS);
@@ -334,18 +326,14 @@ namespace slib
 				case STEP_CONNECT:
 					{
 						{
-							Iterator< Pair<String, String> > iterator = m_requestHeaders.toIterator();
-							Pair<String, String> pair;
-							if (iterator.next(&pair)) {
+							for (auto& pair : m_requestHeaders) {
 								String line = String16::format("%s: %s\r\n", pair.key, pair.value);
 								::HttpAddRequestHeadersA(hRequest, line.getData(), (DWORD)(line.getLength()), HTTP_ADDREQ_FLAG_ADD | HTTP_ADDREQ_FLAG_REPLACE);
 							}
 						}
 						StringBuffer sb;
 						{
-							Iterator< Pair<String, String> > iterator = m_additionalRequestHeaders.toIterator();
-							Pair<String, String> pair;
-							while (iterator.next(&pair)) {
+							for (auto& pair : m_additionalRequestHeaders) {
 								String str = pair.key;
 								sb.addStatic(str.getData(), str.getLength());
 								sb.addStatic(": ", 2);

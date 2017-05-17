@@ -100,7 +100,7 @@ namespace slib
 		NAME(sl_real sp = 1); \
 	protected: \
 		void initialize(); \
-		void layoutViews(sl_ui_len width, sl_ui_len height); \
+		void layoutViews(sl_ui_len width, sl_ui_len height) override; \
 	public:
 	
 #define SLIB_DECLARE_UILAYOUT_END \
@@ -177,8 +177,7 @@ namespace slib
 		UISize getContentSize();
 		
 	public:
-		// override
-		void dispatchResize(sl_ui_len width, sl_ui_len height);
+		void dispatchResize(sl_ui_len width, sl_ui_len height) override;
 		
 	protected:
 		void _layoutViews_safe();
@@ -206,8 +205,7 @@ namespace slib
 		UISize getContentSize();
 		
 	public:
-		// override
-		void dispatchResize(sl_ui_len width, sl_ui_len height);
+		void dispatchResize(sl_ui_len width, sl_ui_len height) override;
 		
 	};
 	
@@ -234,8 +232,7 @@ namespace slib
 		UISize getContentSize();
 		
 	public:
-		// override
-		void dispatchResize(sl_ui_len width, sl_ui_len height);
+		void dispatchResize(sl_ui_len width, sl_ui_len height) override;
 		
 	};
 	

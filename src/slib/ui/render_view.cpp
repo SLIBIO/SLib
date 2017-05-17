@@ -29,8 +29,7 @@ namespace slib
 		}
 		
 	public:
-		// override
-		void _wake()
+		void _wake() override
 		{
 			Ref<RenderView> view(m_view);
 			if (view.isNotNull()) {
@@ -179,8 +178,7 @@ namespace slib
 		WeakRef<RenderView> m_view;
 		
 	public:
-		// override
-		sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms)
+		sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms) override
 		{
 			Ref<RenderView> view(m_view);
 			if (view.isNotNull()) {

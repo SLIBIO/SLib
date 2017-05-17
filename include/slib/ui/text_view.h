@@ -35,14 +35,11 @@ namespace slib
 		void setEditable(sl_bool flagEditable);
 		
 	protected:
-		// override
-		void onDraw(Canvas* canvas);
+		void onDraw(Canvas* canvas) override;
 		
-		// override
-		void onMouseEvent(UIEvent* ev);
+		void onMouseEvent(UIEvent* ev) override;
 		
-		// override
-		void onKeyEvent(UIEvent* event);
+		void onKeyEvent(UIEvent* event) override;
 		
 	protected:
 		sl_bool m_flagEditable;

@@ -112,11 +112,9 @@ namespace slib
 		sl_bool isDecompressing();
 		
 	protected:
-		// override
-		sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref);
+		sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref) override;
 		
-		// override
-		void onReadStream(AsyncStreamResult* result);
+		void onReadStream(AsyncStreamResult* result) override;
 		
 	protected:
 		void setError();

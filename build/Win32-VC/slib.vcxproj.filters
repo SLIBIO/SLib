@@ -818,5 +818,8 @@
     <ClCompile Include="..\..\src\slib\network\http_io.cpp">
       <Filter>src\network</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\core\red_black_tree.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

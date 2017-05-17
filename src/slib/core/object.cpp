@@ -19,35 +19,35 @@ namespace slib
 
 	SLIB_DEFINE_ROOT_OBJECT(Object)
 
-	Object::Object()
+	Object::Object() noexcept
 	{
 	}
 
-	Object::~Object()
+	Object::~Object() noexcept
 	{
 	}
 
-	Mutex* Object::getLocker() const
+	Mutex* Object::getLocker() const noexcept
 	{
 		return (Mutex*)(&m_locker);
 	}
 
-	void Object::lock() const
+	void Object::lock() const noexcept
 	{
 		m_locker.lock();
 	}
 
-	void Object::unlock() const
+	void Object::unlock() const noexcept
 	{
 		m_locker.unlock();
 	}
 
-	sl_bool Object::tryLock() const
+	sl_bool Object::tryLock() const noexcept
 	{
 		return m_locker.tryLock();
 	}
 	
-	Variant Object::getProperty(const String& name)
+	Variant Object::getProperty(const String& name) noexcept
 	{
 		MutexLocker lock(&m_locker);
 		if (m_properties.isNotNull()) {
@@ -57,7 +57,7 @@ namespace slib
 		return Variant::null();
 	}
 	
-	void Object::setProperty(const String& name, const Variant& value)
+	void Object::setProperty(const String& name, const Variant& value) noexcept
 	{
 		MutexLocker lock(&m_locker);
 		HashMap<String, Variant>* map;
@@ -74,7 +74,7 @@ namespace slib
 		map->put_NoLock(name, value);
 	}
 	
-	void Object::clearProperty(const String& name)
+	void Object::clearProperty(const String& name) noexcept
 	{
 		MutexLocker lock(&m_locker);
 		if (m_properties.isNotNull()) {
@@ -83,30 +83,32 @@ namespace slib
 		}
 	}
 
-	ObjectLocker::ObjectLocker()
+	ObjectLocker::ObjectLocker() noexcept
 	{
 	}
 
-	ObjectLocker::ObjectLocker(const Object* object) : MutexLocker(object ? object->getLocker(): sl_null)
+	ObjectLocker::ObjectLocker(const Object* object) noexcept
+	 : MutexLocker(object ? object->getLocker(): sl_null)
 	{
 	}
 
-	ObjectLocker::ObjectLocker(const Object* object1, const Object* object2) : MutexLocker(object1 ? object1->getLocker() : sl_null, object2 ? object2->getLocker() : sl_null)
+	ObjectLocker::ObjectLocker(const Object* object1, const Object* object2) noexcept
+	 : MutexLocker(object1 ? object1->getLocker() : sl_null, object2 ? object2->getLocker() : sl_null)
 	{
 	}
 
-	ObjectLocker::~ObjectLocker()
+	ObjectLocker::~ObjectLocker() noexcept
 	{
 	}
 
-	void ObjectLocker::lock(const Object* object)
+	void ObjectLocker::lock(const Object* object) noexcept
 	{
 		if (object) {
 			MutexLocker::lock(object->getLocker());
 		}
 	}
 
-	void ObjectLocker::lock(const Object* object1, const Object* object2)
+	void ObjectLocker::lock(const Object* object1, const Object* object2) noexcept
 	{
 		if (object1) {
 			if (object2) {

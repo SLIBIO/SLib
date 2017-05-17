@@ -74,6 +74,6 @@ namespace slib
 
 }
 
-#include "detail/loop_queue.h"
+#include "detail/loop_queue.inc"
 
 #endif

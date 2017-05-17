@@ -398,6 +398,6 @@ namespace slib
 	SLIB_ALIGN(8) static sl_uint8 _static_color_buf_##name[] = {R, G, B, A}; \
 	Color& name = *(reinterpret_cast<Color*>(_static_color_buf_##name));
 
-#include "detail/color.h"
+#include "detail/color.inc"
 
 #endif

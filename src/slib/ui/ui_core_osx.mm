@@ -70,8 +70,7 @@ namespace slib
 		}
 		
 	public:
-		// override
-		UIRect getRegion()
+		UIRect getRegion() override
 		{
 			return m_region;
 		}

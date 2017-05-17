@@ -26,6 +26,6 @@ namespace slib
 
 }
 
-#include "detail/search.h"
+#include "detail/search.inc"
 
 #endif

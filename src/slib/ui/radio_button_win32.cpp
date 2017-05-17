@@ -22,14 +22,12 @@ namespace slib
 	class _Win32_RadioButtonViewInstance : public Win32_ViewInstance
 	{
 	public:
-		// override
-		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
+		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
 		{
 			return sl_false;
 		}
 
-		// override
-		sl_bool processCommand(SHORT code, LRESULT& result)
+		sl_bool processCommand(SHORT code, LRESULT& result) override
 		{
 			if (code == BN_CLICKED) {
 				::SendMessageW(getHandle(), BM_SETCHECK, BST_CHECKED, 0);

@@ -150,6 +150,6 @@ namespace slib
 
 }
 
-#include "detail/scoped.h"
+#include "detail/scoped.inc"
 
 #endif

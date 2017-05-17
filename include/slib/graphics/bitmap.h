@@ -79,11 +79,9 @@ namespace slib
 		virtual Ref<Canvas> getCanvas() = 0;
 
 	public:
-		// override
-		sl_real getDrawableWidth();
+		sl_real getDrawableWidth() override;
 
-		// override
-		sl_real getDrawableHeight();
+		sl_real getDrawableHeight() override;
 
 	public:
 		sl_uint32 getWidth();

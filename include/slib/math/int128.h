@@ -295,7 +295,7 @@ namespace slib
 
 }
 
-#include "detail/int128.h"
+#include "detail/int128.inc"
 
 #endif
 

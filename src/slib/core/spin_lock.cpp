@@ -35,7 +35,7 @@ namespace slib
 #endif
 	}
 
-	void SpinLock::lock() const
+	void SpinLock::lock() const noexcept
 	{
 		sl_uint32 count = 0;
 		while (!(_SpinLock_tryLock(&m_flagLock))) {
@@ -44,12 +44,12 @@ namespace slib
 		}
 	}
 
-	sl_bool SpinLock::tryLock() const
+	sl_bool SpinLock::tryLock() const noexcept
 	{
 		return _SpinLock_tryLock(&m_flagLock);
 	}
 
-	void SpinLock::unlock() const
+	void SpinLock::unlock() const noexcept
 	{
 #if defined(USE_CPP_ATOMIC)
 		std::atomic_flag* p = (std::atomic_flag*)(&m_flagLock);
@@ -60,17 +60,17 @@ namespace slib
 #endif
 	}
 
-	SpinLock& SpinLock::operator=(const SpinLock& other)
+	SpinLock& SpinLock::operator=(const SpinLock& other) noexcept
 	{
 		return *this;
 	}
 
 
-	SpinLocker::SpinLocker() : m_lock(sl_null)
+	SpinLocker::SpinLocker() noexcept: m_lock(sl_null)
 	{
 	}
 
-	SpinLocker::SpinLocker(const SpinLock* lock)
+	SpinLocker::SpinLocker(const SpinLock* lock) noexcept
 	{
 		m_lock = lock;
 		if (lock) {
@@ -78,12 +78,12 @@ namespace slib
 		}
 	}
 	
-	SpinLocker::~SpinLocker()
+	SpinLocker::~SpinLocker() noexcept
 	{
 		unlock();
 	}
 
-	void SpinLocker::lock(const SpinLock* lock)
+	void SpinLocker::lock(const SpinLock* lock) noexcept
 	{
 		if (! m_lock) {
 			m_lock = lock;
@@ -93,7 +93,7 @@ namespace slib
 		}
 	}
 
-	void SpinLocker::unlock()
+	void SpinLocker::unlock() noexcept
 	{
 		if (m_lock) {
 			m_lock->unlock();
@@ -101,7 +101,7 @@ namespace slib
 		}
 	}
 
-	DualSpinLocker::DualSpinLocker(const SpinLock* lock1, const SpinLock* lock2)
+	DualSpinLocker::DualSpinLocker(const SpinLock* lock1, const SpinLock* lock2) noexcept
 	{
 		if (lock1 < lock2) {
 			Swap(lock1, lock2);
@@ -116,12 +116,12 @@ namespace slib
 		}
 	}
 	
-	DualSpinLocker::~DualSpinLocker()
+	DualSpinLocker::~DualSpinLocker() noexcept
 	{
 		unlock();
 	}
 	
-	void DualSpinLocker::unlock()
+	void DualSpinLocker::unlock() noexcept
 	{
 		if (m_lock1) {
 			m_lock1->unlock();

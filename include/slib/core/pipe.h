@@ -40,9 +40,9 @@ namespace slib
 
 		sl_pipe getWriteHandle() const;
 
-		sl_int32 read32(void* buf, sl_uint32 size);
+		sl_int32 read32(void* buf, sl_uint32 size) override;
 
-		sl_int32 write32(const void* buf, sl_uint32 size);
+		sl_int32 write32(const void* buf, sl_uint32 size) override;
 
 		void close();
 
@@ -74,14 +74,11 @@ namespace slib
 		sl_pipe getWritePipeHandle();
 
 	protected:
-		// override
-		void _native_set();
+		void _native_set() override;
 
-		// override
-		void _native_reset();
+		void _native_reset() override;
 
-		// override
-		sl_bool _native_wait(sl_int32 timeout);
+		sl_bool _native_wait(sl_int32 timeout) override;
 
 	protected:
 		Ref<Pipe> m_pipe;

@@ -183,6 +183,6 @@ namespace slib
 
 }
 
-#include "detail/matrix2.h"
+#include "detail/matrix2.inc"
 
 #endif

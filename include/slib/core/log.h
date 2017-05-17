@@ -77,8 +77,7 @@ namespace slib
 		~FileLogger();
 	
 	public:
-		// override
-		void log(const String& tag, const String& content);
+		void log(const String& tag, const String& content) override;
 	
 	public:
 		SLIB_PROPERTY(AtomicString, FileName)
@@ -109,11 +108,9 @@ namespace slib
 		void removeErrorLogger(const Ref<Logger>& logger);
 
 	public:
-		// override
-		void log(const String& tag, const String& content);
+		void log(const String& tag, const String& content) override;
 
-		// override
-		void logError(const String& tag, const String& content);
+		void logError(const String& tag, const String& content) override;
 
 	protected:
 		CList< Ref<Logger> > m_listLoggers;
@@ -123,6 +120,6 @@ namespace slib
 	
 }
 
-#include "detail/log.h"
+#include "detail/log.inc"
 
 #endif

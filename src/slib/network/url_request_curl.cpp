@@ -43,14 +43,12 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		void _cancel()
+		void _cancel() override
 		{
 			m_flagClosed = sl_true;
 		}
 
-		// override
-		void _sendSync()
+		void _sendSync() override
 		{
 			connection_h connection;
 			if (::connection_create(&connection) != CONNECTION_ERROR_NONE) {
@@ -129,18 +127,14 @@ namespace slib
 			// HTTP headers and additional headers
 			if(m_requestHeaders.isNotEmpty())
 			{
-				Pair<String, String> pair;
-				Iterator< Pair<String, String> > iterator = m_requestHeaders.toIterator();
-				while (iterator.next(&pair)) {
+				for (auto& pair : m_requestHeaders) {
 					String s = pair.key + ": " + pair.value;
 					headerChunk = ::curl_slist_append(headerChunk, s.getData());
 				}
 			}
 			if(m_additionalRequestHeaders.isNotEmpty())
 			{
-				Pair<String, String> pair;
-				Iterator< Pair<String, String> > iterator = m_additionalRequestHeaders.toIterator();
-				while (iterator.next(&pair)) {
+				for (auto& pair : m_additionalRequestHeaders) {
 					String s = pair.key + ": " + pair.value;
 					headerChunk = ::curl_slist_append(headerChunk, s.getData());
 				}

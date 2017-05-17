@@ -41,11 +41,9 @@ namespace slib
 		void setVertical(UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 	protected:
-		// override
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
+		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical) override;
 		
-		// override
-		void onMakeLayout();
+		void onMakeLayout() override;
 		
 	private:
 		LayoutOrientation m_orientation;

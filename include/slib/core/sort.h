@@ -72,6 +72,6 @@ namespace slib
 
 }
 
-#include "detail/sort.h"
+#include "detail/sort.inc"
 
 #endif

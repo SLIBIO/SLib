@@ -25,38 +25,40 @@ namespace slib
 
 	template <class T> struct RemoveConstReference { typedef T Type; };
 	template <class T> struct RemoveConstReference<T const&> { typedef T Type; };
+	template <class T> struct RemoveConstReference<T&> { typedef T Type; };
+	template <class T> struct RemoveConstReference<T&&> { typedef T Type; };
 
 	template <class T, T v> struct ConstValue { constexpr static T value = v; };
 
 	template <class T> struct IsLValueHelper : ConstValue<bool, false> {};
 	template <class T> struct IsLValueHelper<T&> : ConstValue<bool, true> {};
-	template <class T> constexpr bool IsLValue() { return IsLValueHelper<T>::value; }
+	template <class T> constexpr bool IsLValue() noexcept { return IsLValueHelper<T>::value; }
 
 	template <class T1, class T2> struct IsSameTypeHelper : ConstValue<bool, false> {};
 	template <class T> struct IsSameTypeHelper<T, T> : ConstValue<bool, true> {};
-	template <class T1, class T2> constexpr bool IsSameType() { return IsSameTypeHelper<T1, T2>::value; }
+	template <class T1, class T2> constexpr bool IsSameType() noexcept { return IsSameTypeHelper<T1, T2>::value; }
 
 	template <class T>
-	constexpr typename RemoveReference<T>::Type&& Move(T&& v)
+	constexpr typename RemoveReference<T>::Type&& Move(T&& v) noexcept
 	{
 		return static_cast<typename RemoveReference<T>::Type&&>(v);
 	}
 
 	template <class T>
-	constexpr T&& Forward(typename RemoveReference<T>::Type& v)
+	constexpr T&& Forward(typename RemoveReference<T>::Type& v) noexcept
 	{
 		return static_cast<T&&>(v);
 	}
 
 	template <class T>
-	constexpr T&& Forward(typename RemoveReference<T>::Type&& v)
+	constexpr T&& Forward(typename RemoveReference<T>::Type&& v) noexcept
 	{
 		static_assert(!(IsLValue<T>()), "Can't forward an rvalue as an lvalue.");
 		return static_cast<T&&>(v);
 	}
 
 	template <class T>
-	SLIB_INLINE void Swap(T& a, T& b)
+	SLIB_INLINE void Swap(T& a, T& b) noexcept
 	{
 		T t(Move(a));
 		a = Move(b);
@@ -64,7 +66,7 @@ namespace slib
 	}
 
 	template<class T, sl_size_t N>
-	constexpr sl_size_t CountOfArray(const T (&)[N])
+	constexpr sl_size_t CountOfArray(const T (&)[N]) noexcept
 	{
 		return N;
 	}
@@ -92,7 +94,6 @@ namespace slib
 	
 	template <typename FROM, typename TO>
 	struct IsConvertible : public IsConvertibleHelper<FROM, TO>::type {};
-
 
 }
 

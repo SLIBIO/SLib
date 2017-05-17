@@ -14,6 +14,7 @@
 
 #include "slib/media/camera.h"
 
+#include "slib/core/map.h"
 #include "slib/core/platform_android.h"
 #include "slib/core/safe_static.h"
 

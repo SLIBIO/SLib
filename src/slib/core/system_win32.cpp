@@ -291,7 +291,7 @@ namespace slib
 
 #endif
 
-	void _abort(const char* msg, const char* file, sl_uint32 line)
+	void _abort(const char* msg, const char* file, sl_uint32 line) noexcept
 	{
 #if defined(SLIB_DEBUG)
 		slib::System::abort(msg, file, line);

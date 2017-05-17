@@ -62,27 +62,23 @@ namespace slib
 			return sl_null;
 		}
 		
-		// override
-		void save()
+		void save() override
 		{
 			CGContextSaveGState(m_graphics);
 		}
 		
-		// override
-		void restore()
+		void restore() override
 		{
 			CGContextRestoreGState(m_graphics);
 		}
 		
-		// override
-		Rectangle getClipBounds()
+		Rectangle getClipBounds() override
 		{
 			CGRect rc = CGContextGetClipBoundingBox(m_graphics);
 			return Rectangle((sl_real)(rc.origin.x), (sl_real)(rc.origin.y), (sl_real)(rc.origin.x + rc.size.width), (sl_real)(rc.origin.y + rc.size.height));
 		}
 
-		// override
-		void clipToRectangle(const Rectangle& rect)
+		void clipToRectangle(const Rectangle& rect) override
 		{
 			CGRect rc;
 			rc.origin.x = rect.left;
@@ -92,8 +88,7 @@ namespace slib
 			CGContextClipToRect(m_graphics, rc);
 		}
 		
-		// override
-		void clipToPath(const Ref<GraphicsPath>& path)
+		void clipToPath(const Ref<GraphicsPath>& path) override
 		{
 			if (path.isNotNull()) {
 				CGPathRef handle = GraphicsPlatform::getGraphicsPath(path.get());
@@ -122,16 +117,14 @@ namespace slib
 			return ret;
 		}
 		
-		// override
-		void concatMatrix(const Matrix3& other)
+		void concatMatrix(const Matrix3& other) override
 		{
 			CGAffineTransform t;
 			GraphicsPlatform::getCGAffineTransform(t, other);
 			CGContextConcatCTM(m_graphics, t);
 		}
 		
-		// override
-		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& in_font, const Color& _color)
+		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& in_font, const Color& _color) override
 		{		
 			if (text.isNotEmpty()) {
 				
@@ -209,8 +202,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen)
+		void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen) override
 		{
 			Ref<Pen> pen = _pen;
 			if (pen.isNull()) {
@@ -225,8 +217,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen)
+		void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen) override
 		{
 			if (countPoints < 2) {
 				return;
@@ -246,8 +237,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen)
+		void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen) override
 		{
 			Ref<GraphicsPath> path = GraphicsPath::create();
 			if (path.isNotNull()) {
@@ -256,8 +246,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void drawRectangle(const Rectangle& _rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		void drawRectangle(const Rectangle& _rect, const Ref<Pen>& _pen, const Ref<Brush>& brush) override
 		{
 			CGRect rect;
 			rect.origin.x = _rect.left;
@@ -279,8 +268,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Ref<Brush>& brush)
+		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Ref<Brush>& brush) override
 		{
 			Ref<GraphicsPath> path = GraphicsPath::create();
 			if (path.isNotNull()) {
@@ -289,8 +277,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void drawEllipse(const Rectangle& _rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		void drawEllipse(const Rectangle& _rect, const Ref<Pen>& _pen, const Ref<Brush>& brush) override
 		{
 			CGRect rect;
 			rect.origin.x = _rect.left;
@@ -311,8 +298,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode)
+		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode) override
 		{
 			if (countPoints <= 2) {
 				return;
@@ -329,8 +315,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush)
+		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush) override
 		{
 			Ref<GraphicsPath> path = GraphicsPath::create();
 			if (path.isNotNull()) {
@@ -339,8 +324,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Ref<Brush>& brush)
+		void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Ref<Brush>& brush) override
 		{
 			if (path.isNotNull()) {
 				CGPathRef handle = GraphicsPlatform::getGraphicsPath(path.get());
@@ -470,14 +454,12 @@ namespace slib
 			CGContextSetRGBFillColor(graphics, _color.getRedF(), _color.getGreenF(), _color.getBlueF(), _color.getAlphaF());
 		}
 		
-		// override
-		void _setAlpha(sl_real alpha)
+		void _setAlpha(sl_real alpha) override
 		{
 			CGContextSetAlpha(m_graphics, (CGFloat)alpha);
 		}
 		
-		// override
-		void _setAntiAlias(sl_bool flag)
+		void _setAntiAlias(sl_bool flag) override
 		{
 			if (flag) {
 				CGContextSetAllowsAntialiasing(m_graphics, YES);

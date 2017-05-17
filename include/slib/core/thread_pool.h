@@ -41,8 +41,7 @@ namespace slib
 	
 		sl_bool addTask(const Function<void()>& task);
 
-		// override
-		sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms = 0);
+		sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms = 0) override;
 	
 	public:
 		SLIB_PROPERTY(sl_uint32, MinimumThreadsCount)

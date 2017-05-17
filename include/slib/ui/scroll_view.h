@@ -32,49 +32,37 @@ namespace slib
 		
 		virtual void setContentView(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		// override
-		void setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 		
 		void setContentSize(const ScrollPoint& size, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		// override
-		ScrollPoint getScrollPosition();
+		ScrollPoint getScrollPosition() override;
 		
-		// override
-		ScrollPoint getScrollRange();
+		ScrollPoint getScrollRange() override;
 		
-		// override
-		void scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 		
 		void scrollTo(const ScrollPoint& position, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		// override
-		void smoothScrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void smoothScrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 		
 		void smoothScrollTo(const ScrollPoint& position, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		// override
-		void setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 		
 	public:
-		// override
-		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
-		// override
-		void dispatchScroll(sl_scroll_pos x, sl_scroll_pos y);
+		void dispatchScroll(sl_scroll_pos x, sl_scroll_pos y) override;
 		
 	protected:
-		// override
-		void onResize(sl_ui_len width, sl_ui_len height);
+		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
-		// override
-		void onResizeChild(View* child, sl_ui_len width, sl_ui_len height);
+		void onResizeChild(View* child, sl_ui_len width, sl_ui_len height) override;
 		
-		// override
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
+		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical) override;
 		
-		// override
-		void onUpdatePaging();
+		void onUpdatePaging() override;
 		
 	private:
 		void _refreshContentSize_NW();
@@ -87,11 +75,9 @@ namespace slib
 		
 		ScrollPoint _getScrollRange_NW();
 		
-		// override
-		void _setBorder_NW(sl_bool flag);
+		void _setBorder_NW(sl_bool flag) override;
 		
-		// override
-		void _setBackgroundColor_NW(const Color& color);
+		void _setBackgroundColor_NW(const Color& color) override;
 		
 		void _setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight);
 		

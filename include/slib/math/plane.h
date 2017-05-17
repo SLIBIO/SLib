@@ -98,6 +98,6 @@ namespace slib
 
 }
 
-#include "detail/plane.h"
+#include "detail/plane.inc"
 
 #endif

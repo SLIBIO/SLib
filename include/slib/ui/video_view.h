@@ -50,8 +50,7 @@ namespace slib
 		void updateCurrentFrame(const VideoFrame* frame);
 		
 	protected:
-		// override
-		void onDraw(Canvas* canvas);
+		void onDraw(Canvas* canvas) override;
 		
 	protected:
 		AtomicRef<MediaPlayer> m_mediaPlayer;

@@ -38,8 +38,7 @@ namespace slib
 		void registerHandler(HttpMethod method, const String& path, const WebHandler& handler);
 		
 	protected:
-		// override
-		sl_bool onHttpRequest(const Ref<HttpServiceContext>& context);
+		sl_bool onHttpRequest(const Ref<HttpServiceContext>& context) override;
 		
 	protected:
 		static String _getHandlerSignature(HttpMethod method, const String& path);

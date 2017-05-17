@@ -461,8 +461,7 @@ namespace slib
 
 		T& getFrame(sl_size index);
 
-		// override
-		void update(float fraction);
+		void update(float fraction) override;
 
 		virtual void update(float fraction, const T& value) = 0;
 		
@@ -473,7 +472,7 @@ namespace slib
 
 }
 
-#include "detail/animation.h"
+#include "detail/animation.inc"
 
 #endif
 

@@ -90,6 +90,6 @@ namespace slib
 
 }
 
-#include "detail/line.h"
+#include "detail/line.inc"
 
 #endif

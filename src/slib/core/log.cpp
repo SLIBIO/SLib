@@ -91,8 +91,7 @@ namespace slib
 		SLIB_INLINE ConsoleLogger() {}
 
 	public:
-		// override
-		void log(const String& tag, const String& content)
+		void log(const String& tag, const String& content) override
 		{
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 			ObjectLocker lock(this);
@@ -110,8 +109,7 @@ namespace slib
 #endif
 		}
 
-		// override
-		void logError(const String& tag, const String& content)
+		void logError(const String& tag, const String& content) override
 		{
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 			ObjectLocker lock(this);

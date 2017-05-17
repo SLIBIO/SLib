@@ -64,12 +64,10 @@ namespace slib
 		
 		virtual void onMessageFromJavaScript(const String& msg, const String& param);
 		
-		// override
-		void onResize(sl_ui_len width, sl_ui_len height);
+		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
 	public:
-		// override
-		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
 		virtual void dispatchStartLoad(const String& url);
 		

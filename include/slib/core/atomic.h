@@ -88,6 +88,6 @@ namespace slib
 	
 }
 
-#include "detail/atomic.h"
+#include "detail/atomic.inc"
 
 #endif

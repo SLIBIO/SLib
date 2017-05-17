@@ -31,15 +31,12 @@ namespace slib
 		static Ref<UIAnimationLoop> getInstance();
 		
 	public:
-		// override
-		sl_bool startNativeAnimation(Animation* animation);
+		sl_bool startNativeAnimation(Animation* animation) override;
 		
-		// override
-		void stopNativeAnimation(Animation* animation);
+		void stopNativeAnimation(Animation* animation) override;
 		
 	protected:
-		// override
-		void _wake();
+		void _wake() override;
 		
 		void _run();
 		

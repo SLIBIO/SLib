@@ -14,6 +14,7 @@
 
 #include "slib/device/sensor.h"
 
+#include "slib/core/map.h"
 #include "slib/core/platform_android.h"
 #include "slib/core/safe_static.h"
 
@@ -128,8 +129,7 @@ namespace slib
 			return sensor;
 		}
 
-		// override
-		sl_bool _start()
+		sl_bool _start() override
 		{
 			if (_JAndroidSensor::start.callBoolean(m_sensor)) {
 				return sl_true;
@@ -137,8 +137,7 @@ namespace slib
 			return sl_false;
 		}
 
-		// override
-		void _stop()
+		void _stop() override
 		{
 			_JAndroidSensor::stop.call(m_sensor);
 		}

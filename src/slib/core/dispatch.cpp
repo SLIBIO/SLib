@@ -223,17 +223,13 @@ namespace slib
 			return -1;
 		}
 		sl_int32 timeout = -1;
-		TreePosition pos;
-		TimeTask timeTask;
 		LinkedQueue< Function<void()> > tasks;
-		sl_uint64 t;
-		while (m_timeTasks.getFirstPosition(pos, &t, &timeTask)) {
-			if (rel >= t) {
-				tasks.push(timeTask.task);
-				m_timeTasks.removeAt(pos);
+		while (RedBlackTreeNode<sl_uint64, TimeTask>* node = m_timeTasks.getFirstNode()) {
+			if (rel >= node->data.key) {
+				tasks.push(node->data.value.task);
+				m_timeTasks.removeNode(node);
 			} else {
-				t = t - rel;
-				timeout = (sl_int32)t;
+				timeout = (sl_int32)(node->data.key - rel);
 				break;
 			}
 		}

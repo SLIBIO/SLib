@@ -31,49 +31,53 @@ namespace slib
 	class SLIB_EXPORT Referable
 	{
 	public:
-		Referable();
+		Referable() noexcept;
 
-		Referable(const Referable& other);
+		Referable(const Referable& other) noexcept;
+		
+		Referable(Referable&& other) noexcept;
 
-		virtual ~Referable();
+		virtual ~Referable() noexcept;
 
 	public:
-		sl_reg increaseReference();
+		sl_reg increaseReference() noexcept;
 
-		sl_reg decreaseReference();
+		sl_reg decreaseReference() noexcept;
 
-		sl_reg decreaseReferenceNoFree();
+		sl_reg decreaseReferenceNoFree() noexcept;
 		
-		sl_reg getReferenceCount();
+		sl_reg getReferenceCount() noexcept;
 
-		void makeNeverFree();
+		void makeNeverFree() noexcept;
 
 	public:
-		static sl_object_type ObjectType();
+		static sl_object_type ObjectType() noexcept;
 		
-		static sl_bool checkObjectType(sl_object_type type);
+		static sl_bool checkObjectType(sl_object_type type) noexcept;
 		
-		virtual sl_object_type getObjectType() const;
+		virtual sl_object_type getObjectType() const noexcept;
 
-		virtual sl_bool isInstanceOf(sl_object_type type) const;
+		virtual sl_bool isInstanceOf(sl_object_type type) const noexcept;
 
 	private:
-		void _clearWeak();
+		void _clearWeak() noexcept;
 
 	public:
-		SLIB_INLINE sl_bool _isWeakRef() const
-		{
-			return m_flagWeakRef;
-		}
+		sl_bool _isWeakRef() const noexcept;
 
-		CWeakRef* _getWeakObject();
+		CWeakRef* _getWeakObject() noexcept;
 
-		void _free();
+		void _free() noexcept;
+		
+	public:
+		Referable& operator=(const Referable& other) = delete;
+		
+		Referable& operator=(Referable&& other) = delete;
 
 	private:
 		sl_reg m_signature;
 #if defined(SLIB_DEBUG_REFERENCE)
-		void _checkValid();
+		void _checkValid() noexcept;
 #endif
 
 	private:
@@ -83,6 +87,7 @@ namespace slib
 		SpinLock m_lockWeak;
 
 		friend class CWeakRef;
+		
 	};
 
 	
@@ -103,141 +108,141 @@ namespace slib
 	class SLIB_EXPORT Ref
 	{
 	public:
-		constexpr Ref() : _ptr(sl_null) {}
+		constexpr Ref() noexcept : _ptr(sl_null) {}
 
-		constexpr Ref(sl_null_t) : _ptr(sl_null) {}
+		constexpr Ref(sl_null_t) noexcept : _ptr(sl_null) {}
 
-		Ref(T* _other);
+		Ref(T* _other) noexcept;
 
-		Ref(Ref<T>&& other);
+		Ref(Ref<T>&& other) noexcept;
 
-		Ref(const Ref<T>& other);
+		Ref(const Ref<T>& other) noexcept;
 
-		template <class _T>
-		Ref(Ref<_T>&& other);
+		template <class OTHER>
+		Ref(Ref<OTHER>&& other) noexcept;
 
-		template <class _T>
-		Ref(const Ref<_T>& other);
+		template <class OTHER>
+		Ref(const Ref<OTHER>& other) noexcept;
 
-		Ref(AtomicRef<T>&& other);
+		Ref(AtomicRef<T>&& other) noexcept;
 
-		Ref(const AtomicRef<T>& other);
+		Ref(const AtomicRef<T>& other) noexcept;
 
-		template <class _T>
-		Ref(AtomicRef<_T>&& other);
+		template <class OTHER>
+		Ref(AtomicRef<OTHER>&& other) noexcept;
 
-		template <class _T>
-		Ref(const AtomicRef<_T>& other);
+		template <class OTHER>
+		Ref(const AtomicRef<OTHER>& other) noexcept;
 
-		Ref(const WeakRef<T>& other);
+		Ref(const WeakRef<T>& other) noexcept;
 
-		template <class _T>
-		Ref(const WeakRef<_T>& other);
+		template <class OTHER>
+		Ref(const WeakRef<OTHER>& other) noexcept;
 
-		Ref(const AtomicWeakRef<T>& other);
+		Ref(const AtomicWeakRef<T>& other) noexcept;
 
-		template <class _T>
-		Ref(const AtomicWeakRef<_T>& other);
+		template <class OTHER>
+		Ref(const AtomicWeakRef<OTHER>& other) noexcept;
 
-		~Ref();
+		~Ref() noexcept;
 	
 	public:
-		static const Ref<T>& null();
+		static const Ref<T>& null() noexcept;
 
-		sl_bool isNull() const;
+		sl_bool isNull() const noexcept;
 	
-		sl_bool isNotNull() const;
+		sl_bool isNotNull() const noexcept;
 	
-		void setNull();
+		void setNull() noexcept;
 
-		T* get() const&;
+		T* get() const& noexcept;
 
-		const Ref<Referable>& getReference() const;
+		const Ref<Referable>& getReference() const noexcept;
 
-		template <class _T>
-		static const Ref<T>& from(const Ref<_T>& other);
+		template <class OTHER>
+		static const Ref<T>& from(const Ref<OTHER>& other) noexcept;
 
-		template <class _T>
-		static Ref<T>& from(Ref<_T>& other);
+		template <class OTHER>
+		static Ref<T>& from(Ref<OTHER>& other) noexcept;
 
-		template <class _T>
-		static Ref<T>&& from(Ref<_T>&& other);
+		template <class OTHER>
+		static Ref<T>&& from(Ref<OTHER>&& other) noexcept;
 
 	public:
-		Ref<T>& operator=(sl_null_t);
+		Ref<T>& operator=(sl_null_t) noexcept;
 
-		Ref<T>& operator=(T* other);
+		Ref<T>& operator=(T* other) noexcept;
 	
-		Ref<T>& operator=(Ref<T>&& other);
+		Ref<T>& operator=(Ref<T>&& other) noexcept;
 
-		Ref<T>& operator=(const Ref<T>& other);
+		Ref<T>& operator=(const Ref<T>& other) noexcept;
 
-		template <class _T>
-		Ref<T>& operator=(Ref<_T>&& other);
+		template <class OTHER>
+		Ref<T>& operator=(Ref<OTHER>&& other) noexcept;
 
-		template <class _T>
-		Ref<T>& operator=(const Ref<_T>& other);
+		template <class OTHER>
+		Ref<T>& operator=(const Ref<OTHER>& other) noexcept;
 
-		Ref<T>& operator=(AtomicRef<T>&& other);
+		Ref<T>& operator=(AtomicRef<T>&& other) noexcept;
 
-		Ref<T>& operator=(const AtomicRef<T>& other);
+		Ref<T>& operator=(const AtomicRef<T>& other) noexcept;
 
-		template <class _T>
-		Ref<T>& operator=(AtomicRef<_T>&& other);
+		template <class OTHER>
+		Ref<T>& operator=(AtomicRef<OTHER>&& other) noexcept;
 
-		template <class _T>
-		Ref<T>& operator=(const AtomicRef<_T>& other);
+		template <class OTHER>
+		Ref<T>& operator=(const AtomicRef<OTHER>& other) noexcept;
 
-		Ref<T>& operator=(const WeakRef<T>& other);
+		Ref<T>& operator=(const WeakRef<T>& other) noexcept;
 
-		template <class _T>
-		Ref<T>& operator=(const WeakRef<_T>& other);
+		template <class OTHER>
+		Ref<T>& operator=(const WeakRef<OTHER>& other) noexcept;
 
-		Ref<T>& operator=(const AtomicWeakRef<T>& other);
+		Ref<T>& operator=(const AtomicWeakRef<T>& other) noexcept;
 
-		template <class _T>
-		Ref<T>& operator=(const AtomicWeakRef<_T>& other);
-	
-	public:
-		sl_bool operator==(sl_null_t) const;
-
-		sl_bool operator==(T* other) const;
-
-		sl_bool operator==(const Ref<T>& other) const;
-	
-		template <class _T>
-		sl_bool operator==(const Ref<_T>& other) const;
-
-		sl_bool operator==(const AtomicRef<T>& other) const;
-
-		template <class _T>
-		sl_bool operator==(const AtomicRef<_T>& other) const;
-
-		sl_bool operator!=(sl_null_t) const;
-	
-		sl_bool operator!=(T* other) const;
-
-		sl_bool operator!=(const Ref<T>& other) const;
-	
-		template <class _T>
-		sl_bool operator!=(const Ref<_T>& other) const;
-
-		sl_bool operator!=(const AtomicRef<T>& other) const;
-
-		template <class _T>
-		sl_bool operator!=(const AtomicRef<_T>& other) const;
+		template <class OTHER>
+		Ref<T>& operator=(const AtomicWeakRef<OTHER>& other) noexcept;
 	
 	public:
-		T& operator*() const&;
+		sl_bool operator==(sl_null_t) const noexcept;
+
+		sl_bool operator==(T* other) const noexcept;
+
+		sl_bool operator==(const Ref<T>& other) const noexcept;
 	
-		T* operator->() const&;
+		template <class OTHER>
+		sl_bool operator==(const Ref<OTHER>& other) const noexcept;
+
+		sl_bool operator==(const AtomicRef<T>& other) const noexcept;
+
+		template <class OTHER>
+		sl_bool operator==(const AtomicRef<OTHER>& other) const noexcept;
+
+		sl_bool operator!=(sl_null_t) const noexcept;
+	
+		sl_bool operator!=(T* other) const noexcept;
+
+		sl_bool operator!=(const Ref<T>& other) const noexcept;
+	
+		template <class OTHER>
+		sl_bool operator!=(const Ref<OTHER>& other) const noexcept;
+
+		sl_bool operator!=(const AtomicRef<T>& other) const noexcept;
+
+		template <class OTHER>
+		sl_bool operator!=(const AtomicRef<OTHER>& other) const noexcept;
 	
 	public:
-		void _replaceObject(T* other);
-
-		void _move_init(void* other);
+		T& operator*() const& noexcept;
 	
-		void _move_assign(void* other);
+		T* operator->() const& noexcept;
+	
+	public:
+		void _replaceObject(T* other) noexcept;
+
+		void _move_init(void* other) noexcept;
+	
+		void _move_assign(void* other) noexcept;
 
 	public:
 		T* _ptr;
@@ -248,137 +253,137 @@ namespace slib
 	class Atomic< Ref<T> >
 	{
 	public:
-		constexpr Atomic() : _ptr(sl_null) {}
+		constexpr Atomic() noexcept : _ptr(sl_null) {}
 
-		constexpr Atomic(sl_null_t) : _ptr(sl_null) {}
+		constexpr Atomic(sl_null_t) noexcept : _ptr(sl_null) {}
 
-		Atomic(T* other);
+		Atomic(T* other) noexcept;
 
-		Atomic(AtomicRef<T>&& other);
+		Atomic(AtomicRef<T>&& other) noexcept;
 	
-		Atomic(const AtomicRef<T>& other);
+		Atomic(const AtomicRef<T>& other) noexcept;
 
-		template <class _T>
-		Atomic(AtomicRef<_T>&& other);
+		template <class OTHER>
+		Atomic(AtomicRef<OTHER>&& other) noexcept;
 	
-		template <class _T>
-		Atomic(const AtomicRef<_T>& other);
+		template <class OTHER>
+		Atomic(const AtomicRef<OTHER>& other) noexcept;
 
-		Atomic(Ref<T>&& other);
+		Atomic(Ref<T>&& other) noexcept;
 
-		Atomic(const Ref<T>& other);
+		Atomic(const Ref<T>& other) noexcept;
 
-		template <class _T>
-		Atomic(Ref<_T>&& other);
+		template <class OTHER>
+		Atomic(Ref<OTHER>&& other) noexcept;
 	
-		template <class _T>
-		Atomic(const Ref<_T>& other);
+		template <class OTHER>
+		Atomic(const Ref<OTHER>& other) noexcept;
 
-		Atomic(const WeakRef<T>& other);
+		Atomic(const WeakRef<T>& other) noexcept;
 
-		template <class _T>
-		Atomic(const WeakRef<_T>& other);
+		template <class OTHER>
+		Atomic(const WeakRef<OTHER>& other) noexcept;
 
-		Atomic(const AtomicWeakRef<T>& other);
+		Atomic(const AtomicWeakRef<T>& other) noexcept;
 
-		template <class _T>
-		Atomic(const AtomicWeakRef<_T>& other);
+		template <class OTHER>
+		Atomic(const AtomicWeakRef<OTHER>& other) noexcept;
 	
-		~Atomic();
-	
-	public:
-		static const AtomicRef<T>& null();
-	
-		sl_bool isNull() const;
-	
-		sl_bool isNotNull() const;
-	
-		void setNull();
-	
-		template <class _T>
-		static const AtomicRef<T>& from(const AtomicRef<_T>& other);
-
-		template <class _T>
-		static AtomicRef<T>& from(AtomicRef<_T>& other);
-
-		template <class _T>
-		static AtomicRef<T>&& from(AtomicRef<_T>&& other);
+		~Atomic() noexcept;
 	
 	public:
-		AtomicRef<T>& operator=(sl_null_t);
-
-		AtomicRef<T>& operator=(T* other);
-
-		AtomicRef<T>& operator=(AtomicRef<T>&& other);
-
-		AtomicRef<T>& operator=(const AtomicRef<T>& other);
-
-		template <class _T>
-		AtomicRef<T>& operator=(AtomicRef<_T>&& other);
+		static const AtomicRef<T>& null() noexcept;
 	
-		template <class _T>
-		AtomicRef<T>& operator=(const AtomicRef<_T>& other);
-
-		AtomicRef<T>& operator=(Ref<T>&& other);
+		sl_bool isNull() const noexcept;
 	
-		AtomicRef<T>& operator=(const Ref<T>& other);
-
-		template <class _T>
-		AtomicRef<T>& operator=(Ref<_T>&& other);
+		sl_bool isNotNull() const noexcept;
 	
-		template <class _T>
-		AtomicRef<T>& operator=(const Ref<_T>& other);
+		void setNull() noexcept;
+	
+		template <class OTHER>
+		static const AtomicRef<T>& from(const AtomicRef<OTHER>& other) noexcept;
 
-		AtomicRef<T>& operator=(const WeakRef<T>& other);
+		template <class OTHER>
+		static AtomicRef<T>& from(AtomicRef<OTHER>& other) noexcept;
 
-		template <class _T>
-		AtomicRef<T>& operator=(const WeakRef<_T>& other);
-
-		AtomicRef<T>& operator=(const AtomicWeakRef<T>& other);
-
-		template <class _T>
-		AtomicRef<T>& operator=(const AtomicWeakRef<_T>& other);
+		template <class OTHER>
+		static AtomicRef<T>&& from(AtomicRef<OTHER>&& other) noexcept;
 	
 	public:
-		sl_bool operator==(sl_null_t) const;
+		AtomicRef<T>& operator=(sl_null_t) noexcept;
 
-		sl_bool operator==(T* other) const;
+		AtomicRef<T>& operator=(T* other) noexcept;
 
-		sl_bool operator==(const AtomicRef<T>& other) const;
+		AtomicRef<T>& operator=(AtomicRef<T>&& other) noexcept;
 
-		template <class _T>
-		sl_bool operator==(const AtomicRef<_T>& other) const;
+		AtomicRef<T>& operator=(const AtomicRef<T>& other) noexcept;
 
-		sl_bool operator==(const Ref<T>& other) const;
+		template <class OTHER>
+		AtomicRef<T>& operator=(AtomicRef<OTHER>&& other) noexcept;
+	
+		template <class OTHER>
+		AtomicRef<T>& operator=(const AtomicRef<OTHER>& other) noexcept;
 
-		template <class _T>
-		sl_bool operator==(const Ref<_T>& other) const;
+		AtomicRef<T>& operator=(Ref<T>&& other) noexcept;
+	
+		AtomicRef<T>& operator=(const Ref<T>& other) noexcept;
 
-		sl_bool operator!=(sl_null_t) const;
+		template <class OTHER>
+		AtomicRef<T>& operator=(Ref<OTHER>&& other) noexcept;
+	
+		template <class OTHER>
+		AtomicRef<T>& operator=(const Ref<OTHER>& other) noexcept;
 
-		sl_bool operator!=(T* other) const;
+		AtomicRef<T>& operator=(const WeakRef<T>& other) noexcept;
 
-		sl_bool operator!=(const AtomicRef<T>& other) const;
+		template <class OTHER>
+		AtomicRef<T>& operator=(const WeakRef<OTHER>& other) noexcept;
 
-		template <class _T>
-		sl_bool operator!=(const AtomicRef<_T>& other) const;
+		AtomicRef<T>& operator=(const AtomicWeakRef<T>& other) noexcept;
 
-		sl_bool operator!=(const Ref<T>& other) const;
-
-		template <class _T>
-		sl_bool operator!=(const Ref<_T>& other) const;
-
-	public:
-		Ref<T> operator*() const;
+		template <class OTHER>
+		AtomicRef<T>& operator=(const AtomicWeakRef<OTHER>& other) noexcept;
 	
 	public:
-		T* _retainObject() const;
+		sl_bool operator==(sl_null_t) const noexcept;
 
-		void _replaceObject(T* other);
+		sl_bool operator==(T* other) const noexcept;
 
-		void _move_init(void* other);
+		sl_bool operator==(const AtomicRef<T>& other) const noexcept;
 
-		void _move_assign(void* other);
+		template <class OTHER>
+		sl_bool operator==(const AtomicRef<OTHER>& other) const noexcept;
+
+		sl_bool operator==(const Ref<T>& other) const noexcept;
+
+		template <class OTHER>
+		sl_bool operator==(const Ref<OTHER>& other) const noexcept;
+
+		sl_bool operator!=(sl_null_t) const noexcept;
+
+		sl_bool operator!=(T* other) const noexcept;
+
+		sl_bool operator!=(const AtomicRef<T>& other) const noexcept;
+
+		template <class OTHER>
+		sl_bool operator!=(const AtomicRef<OTHER>& other) const noexcept;
+
+		sl_bool operator!=(const Ref<T>& other) const noexcept;
+
+		template <class OTHER>
+		sl_bool operator!=(const Ref<OTHER>& other) const noexcept;
+
+	public:
+		Ref<T> operator*() const noexcept;
+	
+	public:
+		T* _retainObject() const noexcept;
+
+		void _replaceObject(T* other) noexcept;
+
+		void _move_init(void* other) noexcept;
+
+		void _move_assign(void* other) noexcept;
 
 	public:
 		T* _ptr;
@@ -392,124 +397,124 @@ namespace slib
 	class SLIB_EXPORT WeakRef
 	{
 	public:
-		SLIB_INLINE WeakRef() = default;
+		SLIB_INLINE WeakRef() noexcept = default;
 
-		SLIB_INLINE WeakRef(sl_null_t) {}
+		SLIB_INLINE WeakRef(sl_null_t) noexcept {}
 
-		WeakRef(T* other);
+		WeakRef(T* other) noexcept;
 	
-		WeakRef(WeakRef<T>&& other);
+		WeakRef(WeakRef<T>&& other) noexcept;
 
-		WeakRef(const WeakRef<T>& other);
+		WeakRef(const WeakRef<T>& other) noexcept;
 
-		template <class _T>
-		WeakRef(WeakRef<_T>&& other);
+		template <class OTHER>
+		WeakRef(WeakRef<OTHER>&& other) noexcept;
 	
-		template <class _T>
-		WeakRef(const WeakRef<_T>& other);
+		template <class OTHER>
+		WeakRef(const WeakRef<OTHER>& other) noexcept;
 
-		WeakRef(AtomicWeakRef<T>&& other);
+		WeakRef(AtomicWeakRef<T>&& other) noexcept;
 	
-		WeakRef(const AtomicWeakRef<T>& other);
+		WeakRef(const AtomicWeakRef<T>& other) noexcept;
 
-		template <class _T>
-		WeakRef(AtomicWeakRef<_T>&& other);
+		template <class OTHER>
+		WeakRef(AtomicWeakRef<OTHER>&& other) noexcept;
 
-		template <class _T>
-		WeakRef(const AtomicWeakRef<_T>& other);
+		template <class OTHER>
+		WeakRef(const AtomicWeakRef<OTHER>& other) noexcept;
 
-		WeakRef(const Ref<T>& other);
+		WeakRef(const Ref<T>& other) noexcept;
 	
-		template <class _T>
-		WeakRef(const Ref<_T>& other);
+		template <class OTHER>
+		WeakRef(const Ref<OTHER>& other) noexcept;
 	
-		WeakRef(const AtomicRef<T>& other);
+		WeakRef(const AtomicRef<T>& other) noexcept;
 
-		template <class _T>
-		WeakRef(const AtomicRef<_T>& other);
+		template <class OTHER>
+		WeakRef(const AtomicRef<OTHER>& other) noexcept;
 
-		~WeakRef();
+		~WeakRef() noexcept;
 
 	public:
-		static const WeakRef<T>& null();
+		static const WeakRef<T>& null() noexcept;
 
-		sl_bool isNull() const;
+		sl_bool isNull() const noexcept;
 
-		sl_bool isNotNull() const;
+		sl_bool isNotNull() const noexcept;
 
-		void setNull();
+		void setNull() noexcept;
 
-		template <class _T>
-		static const WeakRef<T>& from(const WeakRef<_T>& other);
+		template <class OTHER>
+		static const WeakRef<T>& from(const WeakRef<OTHER>& other) noexcept;
 
-		template <class _T>
-		static WeakRef<T>& from(WeakRef<_T>& other);
+		template <class OTHER>
+		static WeakRef<T>& from(WeakRef<OTHER>& other) noexcept;
 
-		template <class _T>
-		static WeakRef<T>&& from(WeakRef<_T>&& other);
+		template <class OTHER>
+		static WeakRef<T>&& from(WeakRef<OTHER>&& other) noexcept;
 
-		Ref<T> lock() const;
+		Ref<T> lock() const noexcept;
 
-		static WeakRef<T> fromReferable(Referable* referable);
-
-	public:
-		WeakRef<T>& operator=(sl_null_t);
-
-		WeakRef<T>& operator=(T* other);
-	
-		WeakRef<T>& operator=(WeakRef<T>&& other);
-
-		WeakRef<T>& operator=(const WeakRef<T>& other);
-
-		template <class _T>
-		WeakRef<T>& operator=(WeakRef<_T>&& other);
-	
-		template <class _T>
-		WeakRef<T>& operator=(const WeakRef<_T>& other);
-
-		WeakRef<T>& operator=(AtomicWeakRef<T>&& other);
-
-		WeakRef<T>& operator=(const AtomicWeakRef<T>& other);
-
-		template <class _T>
-		WeakRef<T>& operator=(AtomicWeakRef<_T>&& other);
-
-		template <class _T>
-		WeakRef<T>& operator=(const AtomicWeakRef<_T>& other);
-	
-		WeakRef<T>& operator=(const Ref<T>& other);
-	
-		template <class _T>
-		WeakRef<T>& operator=(const Ref<_T>& other);
-	
-		WeakRef<T>& operator=(const AtomicRef<T>& other);
-
-		template <class _T>
-		WeakRef<T>& operator=(const AtomicRef<_T>& other);
+		static WeakRef<T> fromReferable(Referable* referable) noexcept;
 
 	public:
-		sl_bool operator==(const WeakRef<T>& other) const;
+		WeakRef<T>& operator=(sl_null_t) noexcept;
 
-		template <class _T>
-		sl_bool operator==(const WeakRef<_T>& other) const;
-
-		sl_bool operator==(const AtomicWeakRef<T>& other) const;
+		WeakRef<T>& operator=(T* other) noexcept;
 	
-		template <class _T>
-		sl_bool operator==(const AtomicWeakRef<_T>& other) const;
+		WeakRef<T>& operator=(WeakRef<T>&& other) noexcept;
+
+		WeakRef<T>& operator=(const WeakRef<T>& other) noexcept;
+
+		template <class OTHER>
+		WeakRef<T>& operator=(WeakRef<OTHER>&& other) noexcept;
 	
-		sl_bool operator!=(const WeakRef<T>& other) const;
+		template <class OTHER>
+		WeakRef<T>& operator=(const WeakRef<OTHER>& other) noexcept;
 
-		template <class _T>
-		sl_bool operator!=(const WeakRef<_T>& other) const;
+		WeakRef<T>& operator=(AtomicWeakRef<T>&& other) noexcept;
 
-		sl_bool operator!=(const AtomicWeakRef<T>& other) const;
+		WeakRef<T>& operator=(const AtomicWeakRef<T>& other) noexcept;
 
-		template <class _T>
-		sl_bool operator!=(const AtomicWeakRef<_T>& other) const;
+		template <class OTHER>
+		WeakRef<T>& operator=(AtomicWeakRef<OTHER>&& other) noexcept;
+
+		template <class OTHER>
+		WeakRef<T>& operator=(const AtomicWeakRef<OTHER>& other) noexcept;
+	
+		WeakRef<T>& operator=(const Ref<T>& other) noexcept;
+	
+		template <class OTHER>
+		WeakRef<T>& operator=(const Ref<OTHER>& other) noexcept;
+	
+		WeakRef<T>& operator=(const AtomicRef<T>& other) noexcept;
+
+		template <class OTHER>
+		WeakRef<T>& operator=(const AtomicRef<OTHER>& other) noexcept;
+
+	public:
+		sl_bool operator==(const WeakRef<T>& other) const noexcept;
+
+		template <class OTHER>
+		sl_bool operator==(const WeakRef<OTHER>& other) const noexcept;
+
+		sl_bool operator==(const AtomicWeakRef<T>& other) const noexcept;
+	
+		template <class OTHER>
+		sl_bool operator==(const AtomicWeakRef<OTHER>& other) const noexcept;
+	
+		sl_bool operator!=(const WeakRef<T>& other) const noexcept;
+
+		template <class OTHER>
+		sl_bool operator!=(const WeakRef<OTHER>& other) const noexcept;
+
+		sl_bool operator!=(const AtomicWeakRef<T>& other) const noexcept;
+
+		template <class OTHER>
+		sl_bool operator!=(const AtomicWeakRef<OTHER>& other) const noexcept;
 	
 	private:
-		void _set(T* other);
+		void _set(T* other) noexcept;
 
 	public:
 		Ref<CWeakRef> _weak;
@@ -520,125 +525,125 @@ namespace slib
 	class SLIB_EXPORT Atomic< WeakRef<T> >
 	{
 	public:
-		SLIB_INLINE Atomic() = default;
+		SLIB_INLINE Atomic() noexcept = default;
 
-		SLIB_INLINE Atomic(sl_null_t) {}
+		SLIB_INLINE Atomic(sl_null_t) noexcept {}
 
-		Atomic(T* other);
+		Atomic(T* other) noexcept;
 
-		Atomic(AtomicWeakRef<T>&& other);
+		Atomic(AtomicWeakRef<T>&& other) noexcept;
 
-		Atomic(const AtomicWeakRef<T>& other);
+		Atomic(const AtomicWeakRef<T>& other) noexcept;
 
-		template <class _T>
-		Atomic(AtomicWeakRef<_T>&& other);
+		template <class OTHER>
+		Atomic(AtomicWeakRef<OTHER>&& other) noexcept;
 
-		template <class _T>
-		Atomic(const AtomicWeakRef<_T>& other);
+		template <class OTHER>
+		Atomic(const AtomicWeakRef<OTHER>& other) noexcept;
 
-		Atomic(WeakRef<T>&& other);
+		Atomic(WeakRef<T>&& other) noexcept;
 
-		Atomic(const WeakRef<T>& other);
+		Atomic(const WeakRef<T>& other) noexcept;
 
-		template <class _T>
-		Atomic(WeakRef<_T>&& other);
+		template <class OTHER>
+		Atomic(WeakRef<OTHER>&& other) noexcept;
 
-		template <class _T>
-		Atomic(const WeakRef<_T>& other);
+		template <class OTHER>
+		Atomic(const WeakRef<OTHER>& other) noexcept;
 
-		Atomic(const Ref<T>& other);
+		Atomic(const Ref<T>& other) noexcept;
 
-		template <class _T>
-		Atomic(const Ref<_T>& other);
+		template <class OTHER>
+		Atomic(const Ref<OTHER>& other) noexcept;
 
-		Atomic(const AtomicRef<T>& other);
+		Atomic(const AtomicRef<T>& other) noexcept;
 
-		template <class _T>
-		Atomic(const AtomicRef<_T>& other);
+		template <class OTHER>
+		Atomic(const AtomicRef<OTHER>& other) noexcept;
 
-		~Atomic();
+		~Atomic() noexcept;
 
 	public:
-		static const AtomicWeakRef<T>& null();
+		static const AtomicWeakRef<T>& null() noexcept;
 
-		sl_bool isNull() const;
+		sl_bool isNull() const noexcept;
 
-		sl_bool isNotNull() const;
+		sl_bool isNotNull() const noexcept;
 
-		void setNull();
+		void setNull() noexcept;
 
-		template <class _T>
-		static const AtomicWeakRef<T>& from(const AtomicWeakRef<_T>& other);
+		template <class OTHER>
+		static const AtomicWeakRef<T>& from(const AtomicWeakRef<OTHER>& other) noexcept;
 
-		template <class _T>
-		static AtomicWeakRef<T>& from(AtomicWeakRef<_T>& other);
+		template <class OTHER>
+		static AtomicWeakRef<T>& from(AtomicWeakRef<OTHER>& other) noexcept;
 
-		template <class _T>
-		static AtomicWeakRef<T>&& from(AtomicWeakRef<_T>&& other);
+		template <class OTHER>
+		static AtomicWeakRef<T>&& from(AtomicWeakRef<OTHER>&& other) noexcept;
 	
-		Ref<T> lock() const;
+		Ref<T> lock() const noexcept;
 	
 	public:
-		AtomicWeakRef<T>& operator=(sl_null_t);
+		AtomicWeakRef<T>& operator=(sl_null_t) noexcept;
 
-		AtomicWeakRef<T>& operator=(T* other);
+		AtomicWeakRef<T>& operator=(T* other) noexcept;
 	
-		AtomicWeakRef<T>& operator=(AtomicWeakRef<T>&& other);
+		AtomicWeakRef<T>& operator=(AtomicWeakRef<T>&& other) noexcept;
 
-		AtomicWeakRef<T>& operator=(const AtomicWeakRef<T>& other);
+		AtomicWeakRef<T>& operator=(const AtomicWeakRef<T>& other) noexcept;
 
-		template <class _T>
-		AtomicWeakRef<T>& operator=(AtomicWeakRef<_T>&& other);
+		template <class OTHER>
+		AtomicWeakRef<T>& operator=(AtomicWeakRef<OTHER>&& other) noexcept;
 
-		template <class _T>
-		AtomicWeakRef<T>& operator=(const AtomicWeakRef<_T>& other);
+		template <class OTHER>
+		AtomicWeakRef<T>& operator=(const AtomicWeakRef<OTHER>& other) noexcept;
 
-		AtomicWeakRef<T>& operator=(WeakRef<T>&& other);
+		AtomicWeakRef<T>& operator=(WeakRef<T>&& other) noexcept;
 
-		AtomicWeakRef<T>& operator=(const WeakRef<T>& other);
+		AtomicWeakRef<T>& operator=(const WeakRef<T>& other) noexcept;
 
-		template <class _T>
-		AtomicWeakRef<T>& operator=(WeakRef<_T>&& other);
+		template <class OTHER>
+		AtomicWeakRef<T>& operator=(WeakRef<OTHER>&& other) noexcept;
 
-		template <class _T>
-		AtomicWeakRef<T>& operator=(const WeakRef<_T>& other);
+		template <class OTHER>
+		AtomicWeakRef<T>& operator=(const WeakRef<OTHER>& other) noexcept;
 
-		AtomicWeakRef<T>& operator=(const Ref<T>& other);
+		AtomicWeakRef<T>& operator=(const Ref<T>& other) noexcept;
 
-		template <class _T>
-		AtomicWeakRef<T>& operator=(const Ref<_T>& other);
+		template <class OTHER>
+		AtomicWeakRef<T>& operator=(const Ref<OTHER>& other) noexcept;
 
-		AtomicWeakRef<T>& operator=(const AtomicRef<T>& other);
+		AtomicWeakRef<T>& operator=(const AtomicRef<T>& other) noexcept;
 
-		template <class _T>
-		AtomicWeakRef<T>& operator=(const AtomicRef<_T>& other);
-
-	public:
-		sl_bool operator==(const AtomicWeakRef<T>& other) const;
-
-		template <class _T>
-		sl_bool operator==(const AtomicWeakRef<_T>& other) const;
-
-		sl_bool operator==(const WeakRef<T>& other) const;
-
-		template <class _T>
-		sl_bool operator==(const WeakRef<_T>& other) const;
-
-		sl_bool operator!=(const AtomicWeakRef<T>& other) const;
-
-		template <class _T>
-		sl_bool operator!=(const AtomicWeakRef<_T>& other) const;
-
-		sl_bool operator!=(const WeakRef<T>& other) const;
-
-		template <class _T>
-		sl_bool operator!=(const WeakRef<_T>& other) const;
+		template <class OTHER>
+		AtomicWeakRef<T>& operator=(const AtomicRef<OTHER>& other) noexcept;
 
 	public:
-		WeakRef<T> operator*() const;
+		sl_bool operator==(const AtomicWeakRef<T>& other) const noexcept;
+
+		template <class OTHER>
+		sl_bool operator==(const AtomicWeakRef<OTHER>& other) const noexcept;
+
+		sl_bool operator==(const WeakRef<T>& other) const noexcept;
+
+		template <class OTHER>
+		sl_bool operator==(const WeakRef<OTHER>& other) const noexcept;
+
+		sl_bool operator!=(const AtomicWeakRef<T>& other) const noexcept;
+
+		template <class OTHER>
+		sl_bool operator!=(const AtomicWeakRef<OTHER>& other) const noexcept;
+
+		sl_bool operator!=(const WeakRef<T>& other) const noexcept;
+
+		template <class OTHER>
+		sl_bool operator!=(const WeakRef<OTHER>& other) const noexcept;
+
+	public:
+		WeakRef<T> operator*() const noexcept;
 	
 	private:
-		void _set(T* other);
+		void _set(T* other) noexcept;
 
 	public:
 		AtomicRef<CWeakRef> _weak;
@@ -656,30 +661,32 @@ namespace slib
 	class SLIB_EXPORT CWeakRef : public Referable
 	{
 		SLIB_DECLARE_OBJECT
+		
 	public:
-		CWeakRef();
+		CWeakRef() noexcept;
 
-		~CWeakRef();
+		~CWeakRef() noexcept;
 
 	public:
 		Referable* m_object;
 		SpinLock m_lock;
 
 	public:
-		static CWeakRef* create(Referable* object);
+		static CWeakRef* create(Referable* object) noexcept;
 
 	public:
-		Ref<Referable> lock();
+		Ref<Referable> lock() noexcept;
 
-		void release();
+		void release() noexcept;
+		
 	};
 	
 	class SLIB_EXPORT ReferableKeeper
 	{
 	public:
-		ReferableKeeper(Referable* object);
+		ReferableKeeper(Referable* object) noexcept;
 
-		~ReferableKeeper();
+		~ReferableKeeper() noexcept;
 
 	private:
 		Referable* m_object;
@@ -687,28 +694,28 @@ namespace slib
 	};
 	
 	template <class T, class... ARGS>
-	Ref<T> New(ARGS&&... args);
+	Ref<T> New(ARGS&&... args) noexcept;
 
 	template <class T, class... ARGS>
-	Ref<T> Init(ARGS&&... args);
+	Ref<T> Init(ARGS&&... args) noexcept;
 
-	template <class T, class _T>
-	sl_bool IsInstanceOf(_T* object);
+	template <class T, class OTHER>
+	sl_bool IsInstanceOf(OTHER* object) noexcept;
 
-	template <class T, class _T>
-	sl_bool IsInstanceOf(const Ref<_T>& object);
+	template <class T, class OTHER>
+	sl_bool IsInstanceOf(const Ref<OTHER>& object) noexcept;
 	
-	template <class T, class _T>
-	T* CastInstance(_T* object);
+	template <class T, class OTHER>
+	T* CastInstance(OTHER* object) noexcept;
 
-	template <class T, class _T>
-	const Ref<T>& CastRef(const Ref<_T>& object);
+	template <class T, class OTHER>
+	const Ref<T>& CastRef(const Ref<OTHER>& object) noexcept;
 
-	template <class T, class _T>
-	const Ref<T>& CastRef(const Ref<_T>& object, const Ref<T>& def);
+	template <class T, class OTHER>
+	const Ref<T>& CastRef(const Ref<OTHER>& object, const Ref<T>& def) noexcept;
 
 }
 
-#include "detail/ref.h"
+#include "detail/ref.inc"
 
 #endif

@@ -483,6 +483,6 @@ namespace slib
 
 }
 
-#include "detail/tcpip.h"
+#include "detail/tcpip.inc"
 
 #endif

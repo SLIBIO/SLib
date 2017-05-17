@@ -53,15 +53,12 @@ namespace slib
 		virtual void setMultiLineMode(MultiLineMode multiLineMode, UIUpdateMode updateMode = UIUpdateMode::Redraw);
 		
 	public:
-		// override
-		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
 	protected:
-		// override
-		void onDraw(Canvas* canvas);
+		void onDraw(Canvas* canvas) override;
 		
-		// override
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
+		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical) override;
 		
 	private:
 		void _setText_NW(const String& text);
@@ -70,14 +67,11 @@ namespace slib
 		
 		void _setTextAlignment_NW(Alignment align);
 		
-		// override
-		void _setFont_NW(const Ref<Font>& font);
+		void _setFont_NW(const Ref<Font>& font) override;
 		
-		// override
-		void _setBorder_NW(sl_bool flag);
+		void _setBorder_NW(sl_bool flag) override;
 		
-		// override
-		void _setBackgroundColor_NW(const Color& color);
+		void _setBackgroundColor_NW(const Color& color) override;
 		
 	protected:
 		AtomicString m_text;

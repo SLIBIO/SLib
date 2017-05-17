@@ -99,8 +99,7 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		sl_bool _start()
+		sl_bool _start() override
 		{
 			if ([m_sensor start]) {
 				return sl_true;
@@ -108,8 +107,7 @@ namespace slib
 			return sl_false;
 		}
 
-		// override
-		void _stop()
+		void _stop() override
 		{
 			[m_sensor stop];
 		}

@@ -96,8 +96,7 @@ namespace slib
 		static Ref<HttpServiceConnection> create(HttpService* service, AsyncStream* io);
 		
 	public:
-		// override
-		void close();
+		void close() override;
 		
 		void start(const void* data = sl_null, sl_uint32 size = 0);
 		
@@ -152,11 +151,9 @@ namespace slib
 	protected:
 		void onReadStream(AsyncStreamResult* result);
 		
-		// override
-		void onAsyncOutputComplete(AsyncOutput* output);
+		void onAsyncOutputComplete(AsyncOutput* output) override;
 		
-		// override
-		void onAsyncOutputError(AsyncOutput* output);
+		void onAsyncOutputError(AsyncOutput* output) override;
 		
 		friend class HttpServiceContext;
 		

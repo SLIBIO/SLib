@@ -125,8 +125,7 @@ namespace slib
 		static Ref<File> openForRandomRead(const String& filePath);
 	
 	public:
-		// override
-		void close();
+		void close() override;
 
 		sl_bool isOpened() const;
 	
@@ -134,25 +133,20 @@ namespace slib
 	
 		sl_file getHandle() const;
 
-		// override
-		sl_uint64 getPosition();
+		sl_uint64 getPosition() override;
 
-		// override
-		sl_uint64 getSize();
+		sl_uint64 getSize() override;
 
-		// override
-		sl_bool seek(sl_int64 offset, SeekPosition from);
+		sl_bool seek(sl_int64 offset, SeekPosition from) override;
 	
 
-		// override
-		sl_int32 read32(void* buf, sl_uint32 size);
+		sl_int32 read32(void* buf, sl_uint32 size) override;
 
-		// override
-		sl_int32 write32(const void* buf, sl_uint32 size);
+		sl_int32 write32(const void* buf, sl_uint32 size) override;
 	
 	
 		// works only if the file is already opened
-		sl_bool setSize(sl_uint64 size);
+		sl_bool setSize(sl_uint64 size) override;
 
 		sl_bool lock();
 

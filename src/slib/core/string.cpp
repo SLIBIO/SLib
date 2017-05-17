@@ -8,6 +8,8 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#define SLIB_SUPPORT_STD_TYPES
+
 #include "slib/core/string.h"
 #include "slib/core/string_buffer.h"
 
@@ -16,11 +18,12 @@
 #include "slib/core/endian.h"
 #include "slib/core/scoped.h"
 #include "slib/core/variant.h"
+#include "slib/core/cast.h"
 
 namespace slib
 {
 
-	class _TemplateFunc8
+	class _priv_TemplateFunc8
 	{
 	public:
 		SLIB_INLINE static const void* findMemory(const sl_char8* mem, sl_char8 pattern, sl_size count)
@@ -44,7 +47,7 @@ namespace slib
 		}
 	};
 
-	class _TemplateFunc16
+	class _priv_TemplateFunc16
 	{
 	public:
 		SLIB_INLINE static const void* findMemory(const sl_char16* mem, sl_char16 pattern, sl_size count)
@@ -67,19 +70,24 @@ namespace slib
 			return Base::resetMemory2((sl_uint16*)dst, value, count);
 		}
 	};
+	
+	enum STRING_CONTAINER_TYPES {
+		STRING_CONTAINER_TYPE_NORMAL = 0,
+		STRING_CONTAINER_TYPE_STD = 10,
+		STRING_CONTAINER_TYPE_REF = 11
+	};
 
-
-	const _String_Const _String_Null = {sl_null, 0};
+	const _priv_String_Const _priv_String_Null = {sl_null, 0};
 
 	const sl_char8 _g_string8_empty_buf[] = {0, 0};
-	const StringContainer _g_string8_empty_container = {const_cast<sl_char8*>(_g_string8_empty_buf), 0, 0, -1};
-	const _String_Const _String_Empty = {const_cast<StringContainer*>(&_g_string8_empty_container), 0};
+	const StringContainer _g_string8_empty_container = {const_cast<sl_char8*>(_g_string8_empty_buf), 0, 0, STRING_CONTAINER_TYPE_NORMAL, -1};
+	const _priv_String_Const _priv_String_Empty = {const_cast<StringContainer*>(&_g_string8_empty_container), 0};
 
-	const _String16_Const _String16_Null = {sl_null, 0};
+	const _priv_String16_Const _priv_String16_Null = {sl_null, 0};
 
 	const sl_char16 _g_string16_empty_buf[] = {0, 0};
-	const StringContainer16 _g_string16_empty_container = {const_cast<sl_char16*>(_g_string16_empty_buf), 0, 0, -1};
-	const _String16_Const _String16_Empty = {const_cast<StringContainer16*>(&_g_string16_empty_container), 0};
+	const StringContainer16 _g_string16_empty_container = {const_cast<sl_char16*>(_g_string16_empty_buf), 0, 0, STRING_CONTAINER_TYPE_NORMAL, -1};
+	const _priv_String16_Const _priv_String16_Empty = {const_cast<StringContainer16*>(&_g_string16_empty_container), 0};
 
 
 	SLIB_INLINE sl_reg StringContainer::increaseReference()
@@ -98,24 +106,85 @@ namespace slib
 		return 1;
 	}
 
+	class _priv_StringContainer_std : public StringContainer
+	{
+	public:
+		std::string str;
+		
+	public:
+		_priv_StringContainer_std(const std::string& _str): str(_str)
+		{
+		}
+		
+	};
+	
+	class _priv_StringContainer_ref : public StringContainer
+	{
+	public:
+		Ref<Referable> obj;
+		
+	public:
+		_priv_StringContainer_ref(const Ref<Referable>& _obj): obj(_obj)
+		{
+		}
+		
+	};
 
 	SLIB_INLINE sl_reg StringContainer::decreaseReference()
 	{
 		if (ref > 0) {
 			sl_reg nRef = Base::interlockedDecrement(&ref);
 			if (nRef == 0) {
+				if (type == STRING_CONTAINER_TYPE_STD) {
+					_priv_StringContainer_std* container = static_cast<_priv_StringContainer_std*>(this);
+					container->_priv_StringContainer_std::~_priv_StringContainer_std();
+				} else if (type == STRING_CONTAINER_TYPE_REF) {
+					_priv_StringContainer_ref* container = static_cast<_priv_StringContainer_ref*>(this);
+					container->_priv_StringContainer_ref::~_priv_StringContainer_ref();
+				}
 				Base::freeMemory(this);
 			}
 			return nRef;
 		}
 		return 1;
 	}
+	
+	class _priv_StringContainer16_std : public StringContainer16
+	{
+	public:
+		std::u16string str;
+		
+	public:
+		_priv_StringContainer16_std(const std::u16string& _str): str(_str)
+		{
+		}
+
+	};
+	
+	class _priv_StringContainer16_ref : public StringContainer16
+	{
+	public:
+		Ref<Referable> obj;
+		
+	public:
+		_priv_StringContainer16_ref(const Ref<Referable>& _obj): obj(_obj)
+		{
+		}
+		
+	};
 
 	SLIB_INLINE sl_reg StringContainer16::decreaseReference()
 	{
 		if (ref > 0) {
 			sl_reg nRef = Base::interlockedDecrement(&ref);
 			if (nRef == 0) {
+				if (type == STRING_CONTAINER_TYPE_STD) {
+					_priv_StringContainer16_std* container = static_cast<_priv_StringContainer16_std*>(this);
+					container->_priv_StringContainer16_std::~_priv_StringContainer16_std();
+				} else if (type == STRING_CONTAINER_TYPE_REF) {
+					_priv_StringContainer16_ref* container = static_cast<_priv_StringContainer16_ref*>(this);
+					container->_priv_StringContainer16_ref::~_priv_StringContainer16_ref();
+				}
 				Base::freeMemory(this);
 			}
 			return nRef;
@@ -123,11 +192,10 @@ namespace slib
 		return 1;
 	}
 
-
-	SLIB_INLINE StringContainer* String::_alloc(sl_size len)
+	SLIB_INLINE StringContainer* _priv_String_alloc(sl_size len)
 	{
 		if (len == 0) {
-			return _String_Empty.container;
+			return _priv_String_Empty.container;
 		}
 		sl_char8* buf = (sl_char8*)(Base::createMemory(sizeof(StringContainer) + len + 1));
 		if (buf) {
@@ -135,6 +203,7 @@ namespace slib
 			container->sz = buf + sizeof(StringContainer);
 			container->len = len;
 			container->hash = 0;
+			container->type = STRING_CONTAINER_TYPE_NORMAL;
 			container->ref = 1;
 			container->sz[len] = 0;
 			return container;
@@ -142,10 +211,10 @@ namespace slib
 		return sl_null;
 	}
 
-	SLIB_INLINE StringContainer16* String16::_alloc(sl_size len)
+	SLIB_INLINE StringContainer16* _priv_String16_alloc(sl_size len)
 	{
 		if (len == 0) {
-			return _String16_Empty.container;
+			return _priv_String16_Empty.container;
 		}
 		sl_char8* buf = (sl_char8*)(Base::createMemory(sizeof(StringContainer) + ((len + 1) << 1)));
 		if (buf) {
@@ -153,14 +222,680 @@ namespace slib
 			container->sz = (sl_char16*)((void*)(buf + sizeof(StringContainer16)));
 			container->len = len;
 			container->hash = 0;
+			container->type = STRING_CONTAINER_TYPE_NORMAL;
 			container->ref = 1;
 			container->sz[len] = 0;
 			return container;
 		}
 		return sl_null;
 	}
+	
+	SLIB_INLINE StringContainer* _priv_String_alloc_static(const sl_char8* sz, sl_size len)
+	{
+		if (len == 0) {
+			return _priv_String_Empty.container;
+		}
+		StringContainer* container = (StringContainer*)(Base::createMemory(sizeof(StringContainer)));
+		if (container) {
+			container->sz = (sl_char8*)sz;
+			container->len = len;
+			container->hash = 0;
+			container->type = STRING_CONTAINER_TYPE_NORMAL;
+			container->ref = 1;
+			return container;
+		}
+		return sl_null;
+	}
+	
+	SLIB_INLINE StringContainer16* _priv_String16_alloc_static(const sl_char16* sz, sl_size len)
+	{
+		if (len == 0) {
+			return _priv_String16_Empty.container;
+		}
+		StringContainer16* container = (StringContainer16*)(Base::createMemory(sizeof(StringContainer16)));
+		if (container) {
+			container->sz = (sl_char16*)sz;
+			container->len = len;
+			container->hash = 0;
+			container->type = STRING_CONTAINER_TYPE_NORMAL;
+			container->ref = 1;
+			return container;
+		}
+		return sl_null;
+	}
+	
+	SLIB_INLINE StringContainer* _priv_String_alloc_std(const std::string& str)
+	{
+		sl_size len = (sl_size)(str.length());
+		if (len == 0) {
+			return _priv_String_Empty.container;
+		}
+		if (len < 40) {
+			StringContainer* container = _priv_String_alloc(len);
+			if (container) {
+				Base::copyMemory(container->sz, str.c_str(), len);
+				return container;
+			}
+		} else {
+			_priv_StringContainer_std* container = (_priv_StringContainer_std*)(Base::createMemory(sizeof(_priv_StringContainer_std)));
+			if (container) {
+				new (container) _priv_StringContainer_std(str);
+				container->sz = (sl_char8*)(str.c_str());
+				container->len = len;
+				container->hash = 0;
+				container->type = STRING_CONTAINER_TYPE_STD;
+				container->ref = 1;
+				return container;
+			}
+		}
+		return sl_null;
+	}
+	
+	SLIB_INLINE StringContainer16* _priv_String16_alloc_std(const std::u16string& str)
+	{
+		sl_size len = (sl_size)(str.length());
+		if (len == 0) {
+			return _priv_String16_Empty.container;
+		}
+		if (len < 20) {
+			StringContainer16* container = _priv_String16_alloc(len);
+			if (container) {
+				Base::copyMemory(container->sz, str.c_str(), len * sizeof(sl_char16));
+				return container;
+			}
+		} else {
+			_priv_StringContainer16_std* container = (_priv_StringContainer16_std*)(Base::createMemory(sizeof(_priv_StringContainer16_std)));
+			if (container) {
+				new (container) _priv_StringContainer16_std(str);
+				container->sz = (sl_char16*)(str.c_str());
+				container->len = len;
+				container->hash = 0;
+				container->type = STRING_CONTAINER_TYPE_STD;
+				container->ref = 1;
+				return container;
+			}
+		}
+		return sl_null;
+	}
+	
+	SLIB_INLINE StringContainer* _priv_String_alloc_ref(const Ref<Referable>& obj, const sl_char8* sz, sl_size len)
+	{
+		if (len == 0) {
+			return _priv_String_Empty.container;
+		}
+		_priv_StringContainer_ref* container = (_priv_StringContainer_ref*)(Base::createMemory(sizeof(_priv_StringContainer_ref)));
+		if (container) {
+			new (container) _priv_StringContainer_ref(obj);
+			container->sz = (sl_char8*)(sz);
+			container->len = len;
+			container->hash = 0;
+			container->type = STRING_CONTAINER_TYPE_REF;
+			container->ref = 1;
+			return container;
+		}
+		return sl_null;
+	}
+	
+	SLIB_INLINE StringContainer16* _priv_String16_alloc_ref(const Ref<Referable>& obj, const sl_char16* sz, sl_size len)
+	{
+		if (len == 0) {
+			return _priv_String16_Empty.container;
+		}
+		_priv_StringContainer16_ref* container = (_priv_StringContainer16_ref*)(Base::createMemory(sizeof(_priv_StringContainer16_ref)));
+		if (container) {
+			new (container) _priv_StringContainer16_ref(obj);
+			container->sz = (sl_char16*)(sz);
+			container->len = len;
+			container->hash = 0;
+			container->type = STRING_CONTAINER_TYPE_REF;
+			container->ref = 1;
+			return container;
+		}
+		return sl_null;
+	}
+	
+	SLIB_INLINE StringContainer* _priv_String_create(sl_char8 ch, sl_size nRepeatCount)
+	{
+		StringContainer* container = _priv_String_alloc(nRepeatCount);
+		if (container) {
+			Base::resetMemory(container->sz, ch, nRepeatCount);
+		}
+		return container;
+	}
+	
+	SLIB_INLINE StringContainer16* _priv_String16_create(sl_char16 ch, sl_size nRepeatCount)
+	{
+		StringContainer16* container = _priv_String16_alloc(nRepeatCount);
+		if (container) {
+			Base::resetMemory2((sl_uint16*)(container->sz), ch, nRepeatCount);
+		}
+		return container;
+	}
+	
+	SLIB_INLINE StringContainer* _priv_String_create(const sl_char8* utf8, sl_reg lenUtf8)
+	{
+		if (utf8) {
+			if (lenUtf8 < 0) {
+				lenUtf8 = Base::getStringLength(utf8);
+			}
+			sl_size len = lenUtf8;
+			StringContainer* container = _priv_String_alloc(len);
+			if (container) {
+				Base::copyMemory(container->sz, utf8, len);
+			}
+			return container;
+		}
+		return sl_null;
+	}
+	
+	SLIB_INLINE StringContainer16* _priv_String16_create(const sl_char8* utf8, sl_reg lenUtf8)
+	{
+		if (utf8) {
+			if (lenUtf8 < 0) {
+				lenUtf8 = Base::getStringLength(utf8);
+			}
+			sl_size len = Charsets::utf8ToUtf16(utf8, lenUtf8, sl_null, -1);
+			StringContainer16* container = _priv_String16_alloc(len);
+			if (container && len > 0) {
+				Charsets::utf8ToUtf16(utf8, lenUtf8, container->sz, len);
+				container->sz[len] = 0;
+			}
+			return container;
+		}
+		return sl_null;
+	}
+	
+	SLIB_INLINE StringContainer* _priv_String_create(const sl_char16* utf16, sl_reg lenUtf16)
+	{
+		if (utf16) {
+			if (lenUtf16 < 0) {
+				lenUtf16 = Base::getStringLength2(utf16);
+			}
+			sl_size len = Charsets::utf16ToUtf8(utf16, lenUtf16, sl_null, -1);
+			StringContainer* container = _priv_String_alloc(len);
+			if (container && len > 0) {
+				Charsets::utf16ToUtf8(utf16, lenUtf16, container->sz, len);
+				container->sz[len] = 0;
+			}
+			return container;
+		}
+		return sl_null;
+	}
+	
+	SLIB_INLINE StringContainer16* _priv_String16_create(const sl_char16* utf16, sl_reg lenUtf16)
+	{
+		if (utf16) {
+			if (lenUtf16 < 0) {
+				lenUtf16 = Base::getStringLength2(utf16);
+			}
+			sl_size len = lenUtf16;
+			StringContainer16* container = _priv_String16_alloc(len);
+			if (container) {
+				Base::copyMemory(container->sz, utf16, len*sizeof(sl_char16));
+			}
+			return container;
+		}
+		return sl_null;
+	}
+	
+	SLIB_INLINE StringContainer* _priv_String_create(const sl_char32* utf32, sl_reg lenUtf32)
+	{
+		if (utf32) {
+			if (lenUtf32 < 0) {
+				lenUtf32 = Base::getStringLength4(utf32);
+			}
+			sl_size len = Charsets::utf32ToUtf8(utf32, lenUtf32, sl_null, -1);
+			StringContainer* container = _priv_String_alloc(len);
+			if (container && len > 0) {
+				Charsets::utf32ToUtf8(utf32, lenUtf32, container->sz, len);
+				container->sz[len] = 0;
+			}
+			return container;
+		}
+		return sl_null;
+	}
+	
+	SLIB_INLINE StringContainer16* _priv_String16_create(const sl_char32* utf32, sl_reg lenUtf32)
+	{
+		if (utf32) {
+			if (lenUtf32 < 0) {
+				lenUtf32 = Base::getStringLength4(utf32);
+			}
+			sl_size len = Charsets::utf32ToUtf16(utf32, lenUtf32, sl_null, -1);
+			StringContainer16* container = _priv_String16_alloc(len);
+			if (container && len > 0) {
+				Charsets::utf32ToUtf16(utf32, lenUtf32, container->sz, len);
+				container->sz[len] = 0;
+			}
+			return container;
+		}
+		return sl_null;
+	}
+	
+	
+	SLIB_INLINE StringContainer* _priv_String_merge8(const sl_char8* s1, sl_reg len1, const sl_char8* s2, sl_reg len2)
+	{
+		if (len1 < 0) {
+			len1 = Base::getStringLength(s1);
+		}
+		if (len2 < 0) {
+			len2 = Base::getStringLength(s2);
+		}
+		sl_size len = len1 + len2;
+		StringContainer* s = _priv_String_alloc(len);
+		if (s && len > 0) {
+			Base::copyMemory(s->sz, s1, len1);
+			Base::copyMemory(s->sz + len1, s2, len2);
+			s->sz[len] = 0;
+		}
+		return s;
+	}
+	
+	SLIB_INLINE StringContainer16* _priv_String16_merge16(const sl_char16* s1, sl_reg len1, const sl_char16* s2, sl_reg len2)
+	{
+		if (len1 < 0) {
+			len1 = Base::getStringLength2(s1);
+		}
+		if (len2 < 0) {
+			len2 = Base::getStringLength2(s2);
+		}
+		sl_size len = len1 + len2;
+		StringContainer16* s = _priv_String16_alloc(len);
+		if (s && len > 0) {
+			Base::copyMemory(s->sz, s1, len1*sizeof(sl_char16));
+			Base::copyMemory(s->sz + len1, s2, len2*sizeof(sl_char16));
+			s->sz[len] = 0;
+		}
+		return s;
+	}
+	
+	SLIB_INLINE StringContainer* _priv_String_merge16(const sl_char8* s1, sl_reg len1, const sl_char16* s2_u16, sl_reg len2_u16)
+	{
+		if (len1 < 0) {
+			len1 = Base::getStringLength(s1);
+		}
+		if (len2_u16 < 0) {
+			len2_u16 = Base::getStringLength2(s2_u16);
+		}
+		sl_size len2 = Charsets::utf16ToUtf8(s2_u16, len2_u16, sl_null, -1);
+		sl_size len = len1 + len2;
+		StringContainer* s = _priv_String_alloc(len);
+		if (s && len > 0) {
+			Base::copyMemory(s->sz, s1, len1);
+			Charsets::utf16ToUtf8(s2_u16, len2_u16, s->sz + len1, len2);
+			s->sz[len] = 0;
+		}
+		return s;
+	}
+	
+	SLIB_INLINE StringContainer* _priv_String_merge16(const sl_char16* s1_u16, sl_reg len1_u16, const sl_char8* s2, sl_reg len2)
+	{
+		if (len1_u16 < 0) {
+			len1_u16 = Base::getStringLength2(s1_u16);
+		}
+		if (len2 < 0) {
+			len2 = Base::getStringLength(s2);
+		}
+		sl_size len1 = Charsets::utf16ToUtf8(s1_u16, len1_u16, sl_null, -1);
+		sl_size len = len1 + len2;
+		StringContainer* s = _priv_String_alloc(len);
+		if (s && len > 0) {
+			Charsets::utf16ToUtf8(s1_u16, len1_u16, s->sz, len1);
+			Base::copyMemory(s->sz + len1, s2, len2);
+			s->sz[len] = 0;
+		}
+		return s;
+	}
+	
+	SLIB_INLINE StringContainer* _priv_String_merge32(const sl_char8* s1, sl_reg len1, const sl_char32* s2_u32, sl_reg len2_u32)
+	{
+		if (len1 < 0) {
+			len1 = Base::getStringLength(s1);
+		}
+		if (len2_u32 < 0) {
+			len2_u32 = Base::getStringLength4(s2_u32);
+		}
+		sl_size len2 = Charsets::utf32ToUtf8(s2_u32, len2_u32, sl_null, -1);
+		sl_size len = len1 + len2;
+		StringContainer* s = _priv_String_alloc(len);
+		if (s && len > 0) {
+			Base::copyMemory(s->sz, s1, len1*sizeof(sl_char8));
+			Charsets::utf32ToUtf8(s2_u32, len2_u32, s->sz + len1, len2);
+			s->sz[len] = 0;
+		}
+		return s;
+	}
+	
+	SLIB_INLINE StringContainer* _priv_String_merge32(const sl_char32* s1_u32, sl_reg len1_u32, const sl_char8* s2, sl_reg len2)
+	{
+		if (len1_u32 < 0) {
+			len1_u32 = Base::getStringLength4(s1_u32);
+		}
+		if (len2 < 0) {
+			len2 = Base::getStringLength(s2);
+		}
+		sl_size len1 = Charsets::utf32ToUtf8(s1_u32, len1_u32, sl_null, -1);
+		sl_size len = len1 + len2;
+		StringContainer* s = _priv_String_alloc(len);
+		if (s && len > 0) {
+			Charsets::utf32ToUtf8(s1_u32, len1_u32, s->sz, len1);
+			Base::copyMemory(s->sz + len1, s2, len2);
+			s->sz[len] = 0;
+		}
+		return s;
+	}
+	
+	SLIB_INLINE StringContainer16* _priv_String16_merge8(const sl_char16* s1, sl_reg len1, const sl_char8* s2_u8, sl_reg len2_u8)
+	{
+		if (len1 < 0) {
+			len1 = Base::getStringLength2(s1);
+		}
+		if (len2_u8 < 0) {
+			len2_u8 = Base::getStringLength(s2_u8);
+		}
+		sl_size len2 = Charsets::utf8ToUtf16(s2_u8, len2_u8, sl_null, -1);
+		sl_size len = len1 + len2;
+		StringContainer16* s = _priv_String16_alloc(len);
+		if (s && len > 0) {
+			Base::copyMemory(s->sz, s1, len1*sizeof(sl_char16));
+			Charsets::utf8ToUtf16(s2_u8, len2_u8, s->sz + len1, len2);
+			s->sz[len] = 0;
+		}
+		return s;
+	}
+	
+	SLIB_INLINE StringContainer16* _priv_String16_merge8(const sl_char8* s1_u8, sl_reg len1_u8, const sl_char16* s2, sl_reg len2)
+	{
+		if (len1_u8 < 0) {
+			len1_u8 = Base::getStringLength(s1_u8);
+		}
+		if (len2 < 0) {
+			len2 = Base::getStringLength2(s2);
+		}
+		sl_size len1 = Charsets::utf8ToUtf16(s1_u8, len1_u8, sl_null, -1);
+		sl_size len = len1 + len2;
+		StringContainer16* s = _priv_String16_alloc(len);
+		if (s && len > 0) {
+			Charsets::utf8ToUtf16(s1_u8, len1_u8, s->sz, len1);
+			Base::copyMemory(s->sz + len1, s2, len2*sizeof(sl_char16));
+			s->sz[len] = 0;
+		}
+		return s;
+	}
+	
+	SLIB_INLINE StringContainer16* _priv_String16_merge32(const sl_char16* s1, sl_reg len1, const sl_char32* s2_u32, sl_reg len2_u32)
+	{
+		if (len1 < 0) {
+			len1 = Base::getStringLength2(s1);
+		}
+		if (len2_u32 < 0) {
+			len2_u32 = Base::getStringLength4(s2_u32);
+		}
+		sl_size len2 = Charsets::utf32ToUtf16(s2_u32, len2_u32, sl_null, -1);
+		sl_size len = len1 + len2;
+		StringContainer16* s = _priv_String16_alloc(len);
+		if (s && len > 0) {
+			Base::copyMemory(s->sz, s1, len1*sizeof(sl_char16));
+			Charsets::utf32ToUtf16(s2_u32, len2_u32, s->sz + len1, len2);
+			s->sz[len] = 0;
+		}
+		return s;
+	}
+	
+	SLIB_INLINE StringContainer16* _priv_String16_merge32(const sl_char32* s1_u32, sl_reg len1_u32, const sl_char16* s2, sl_reg len2)
+	{
+		if (len1_u32 < 0) {
+			len1_u32 = Base::getStringLength4(s1_u32);
+		}
+		if (len2 < 0) {
+			len2 = Base::getStringLength2(s2);
+		}
+		sl_size len1 = Charsets::utf32ToUtf16(s1_u32, len1_u32, sl_null, -1);
+		sl_size len = len1 + len2;
+		StringContainer16* s = _priv_String16_alloc(len);
+		if (s && len > 0) {
+			Charsets::utf32ToUtf16(s1_u32, len1_u32, s->sz, len1);
+			Base::copyMemory(s->sz + len1, s2, len2*sizeof(sl_char16));
+			s->sz[len] = 0;
+		}
+		return s;
+	}
+	
+	SLIB_INLINE sl_int32 _priv_String_compare_objects(const sl_char8* str1, sl_size len1, const sl_char8* str2, sl_size len2)
+	{
+		if (len1 < len2) {
+			if (len1 == 0) {
+				return -1;
+			}
+			sl_int32 r = Base::compareMemory((sl_uint8*)str1, (sl_uint8*)str2, len1);
+			if (r == 0) {
+				return -1;
+			} else {
+				return r;
+			}
+		} else if (len1 > len2) {
+			if (len2 == 0) {
+				return 1;
+			}
+			sl_int32 r = Base::compareMemory((sl_uint8*)str1, (sl_uint8*)str2, len2);
+			if (r == 0) {
+				return 1;
+			} else {
+				return r;
+			}
+		} else {
+			if (len1 == 0) {
+				return 0;
+			}
+			return Base::compareMemory((sl_uint8*)str1, (sl_uint8*)str2, len1);
+		}
+	}
+	
+	SLIB_INLINE sl_int32 _priv_String16_compare_objects(const sl_char16* str1, sl_size len1, const sl_char16* str2, sl_size len2)
+	{
+		if (len1 < len2) {
+			if (len1 == 0) {
+				return -1;
+			}
+			sl_int32 r = Base::compareMemory2((sl_uint16*)str1, (sl_uint16*)str2, len1);
+			if (r == 0) {
+				return -1;
+			} else {
+				return r;
+			}
+		} else if (len1 > len2) {
+			if (len2 == 0) {
+				return 1;
+			}
+			sl_int32 r = Base::compareMemory2((sl_uint16*)str1, (sl_uint16*)str2, len2);
+			if (r == 0) {
+				return 1;
+			} else {
+				return r;
+			}
+		} else {
+			if (len1 == 0) {
+				return 0;
+			}
+			return Base::compareMemory2((sl_uint16*)str1, (sl_uint16*)str2, len1);
+		}
+	}
+	
+	SLIB_INLINE sl_int32 _priv_String_compare8(const sl_char8* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
+	{
+		if (len1 < 0) {
+			if (len2 < 0) {
+				return Base::compareString(str1, str2);
+			} else {
+				return Base::compareString(str1, str2, len2 + 1);
+			}
+		} else {
+			if (len2 < 0) {
+				return Base::compareString(str1, str2, len1 + 1);
+			} else {
+				return _priv_String_compare_objects(str1, len1, str2, len2);
+			}
+		}
+	}
+	
+	SLIB_INLINE sl_int32 _priv_String16_compare16(const sl_char16* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
+	{
+		if (len1 < 0) {
+			if (len2 < 0) {
+				return Base::compareString2(str1, str2);
+			} else {
+				return Base::compareString2(str1, str2, len2 + 1);
+			}
+		} else {
+			if (len2 < 0) {
+				return Base::compareString2(str1, str2, len1 + 1);
+			} else {
+				return _priv_String16_compare_objects(str1, len1, str2, len2);
+			}
+		}
+	}
+	
+	SLIB_INLINE sl_int32 _priv_String_compare16(const sl_char8* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
+	{
+		String other(str2, len2);
+		return _priv_String_compare8(str1, len1, other.getData(), other.getLength());
+	}
+	
+	SLIB_INLINE sl_int32 _priv_String16_compare8(const sl_char16* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
+	{
+		String16 other(str2, len2);
+		return _priv_String16_compare16(str1, len1, other.getData(), other.getLength());
+	}
+	
+	SLIB_INLINE sl_int32 _priv_String_compare32(const sl_char8* str1, sl_reg len1, const sl_char32* str2, sl_reg len2)
+	{
+		String other(str2, len2);
+		return _priv_String_compare8(str1, len1, other.getData(), other.getLength());
+	}
+	
+	SLIB_INLINE sl_int32 _priv_String16_compare32(const sl_char16* m1, sl_reg len1, const sl_char32* m2, sl_reg len2)
+	{
+		if (len1 < 0) {
+			len1 = SLIB_REG_MAX;
+		}
+		if (len2 < 0) {
+			len2 = SLIB_REG_MAX;
+		}
+		sl_size len = SLIB_MIN(len1, len2);
+		sl_uint16* s1 = (sl_uint16*)m1;
+		sl_uint32* s2 = (sl_uint32*)m2;
+		for (sl_size i = 0; i < len; i++) {
+			sl_uint32 c1 = s1[i];
+			sl_uint32 c2 = s2[i];
+			if (c1 < c2) {
+				return -1;
+			}
+			if (c1 > c2) {
+				return 1;
+			}
+			if (c1 == 0) {
+				return 0;
+			}
+		}
+		if (len1 < len2) {
+			if (s2[len1] == 0) {
+				return 0;
+			} else {
+				return -1;
+			}
+		}
+		if (len1 > len2) {
+			if (s1[len2] == 0) {
+				return 0;
+			} else {
+				return 1;
+			}
+		}
+		return 0;
+	}
 
+	
+	SLIB_INLINE sl_bool _priv_String_equals_objects(const sl_char8* str1, sl_size len1, const sl_char8* str2, sl_size len2)
+	{
+		if (len1 == len2) {
+			if (len1 == 0) {
+				return sl_true;
+			}
+			return Base::equalsMemory(str1, str2, len1);
+		} else {
+			return sl_false;
+		}
+	}
+	
+	SLIB_INLINE sl_bool _priv_String16_equals_objects(const sl_char16* str1, sl_size len1, const sl_char16* str2, sl_size len2)
+	{
+		if (len1 == len2) {
+			if (len1 == 0) {
+				return sl_true;
+			}
+			return Base::equalsMemory2((sl_uint16*)str1, (sl_uint16*)str2, len1);
+		} else {
+			return sl_false;
+		}
+	}
 
+	SLIB_INLINE sl_bool _priv_String_equals8(const sl_char8* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
+	{
+		if (len1 < 0) {
+			if (len2 < 0) {
+				return Base::equalsString(str1, str2);
+			} else {
+				return Base::equalsString(str1, str2, len2 + 1);
+			}
+		} else {
+			if (len2 < 0) {
+				return Base::equalsString(str1, str2, len1 + 1);
+			} else {
+				return _priv_String_equals_objects(str1, len1, str2, len2);
+			}
+		}
+	}
+	
+	SLIB_INLINE sl_bool _priv_String16_equals16(const sl_char16* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
+	{
+		if (len1 < 0) {
+			if (len2 < 0) {
+				return Base::equalsString2(str1, str2);
+			} else {
+				return Base::equalsString2(str1, str2, len2);
+			}
+		} else {
+			if (len2 < 0) {
+				return Base::equalsString2(str1, str2, len1);
+			} else {
+				return _priv_String16_equals_objects(str1, len1, str2, len2);
+			}
+		}
+	}
+	
+	SLIB_INLINE sl_bool _priv_String_equals16(const sl_char8* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
+	{
+		String other(str2, len2);
+		return _priv_String_equals8(str1, len1, other.getData(), other.getLength());
+	}
+	
+	SLIB_INLINE sl_bool _priv_String16_equals8(const sl_char16* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
+	{
+		String16 other(str2, len2);
+		return _priv_String16_equals16(str1, len1, other.getData(), other.getLength());
+	}
+	
+	SLIB_INLINE sl_bool _priv_String_equals32(const sl_char8* str1, sl_reg len1, const sl_char32* str2, sl_reg len2)
+	{
+		String other(str2, len2);
+		return _priv_String_equals8(str1, len1, other.getData(), other.getLength());
+	}
+	
+	SLIB_INLINE sl_bool _priv_String16_equals32(const sl_char16* str1, sl_reg len1, const sl_char32* str2, sl_reg len2)
+	{
+		return _priv_String16_compare32(str1, len1, str2, len2) == 0;
+	}
+	
 	SLIB_INLINE StringContainer* Atomic<String>::_retainContainer() const
 	{
 		if (m_container) {
@@ -230,556 +965,6 @@ namespace slib
 		}
 	}
 
-
-	SLIB_INLINE StringContainer* String::_create(sl_char8 ch, sl_size nRepeatCount)
-	{
-		StringContainer* container = _alloc(nRepeatCount);
-		if (container) {
-			Base::resetMemory(container->sz, ch, nRepeatCount);
-		}
-		return container;
-	}
-
-	SLIB_INLINE StringContainer16* String16::_create(sl_char16 ch, sl_size nRepeatCount)
-	{
-		StringContainer16* container = _alloc(nRepeatCount);
-		if (container) {
-			Base::resetMemory2((sl_uint16*)(container->sz), ch, nRepeatCount);
-		}
-		return container;
-	}
-
-	SLIB_INLINE StringContainer* String::_create(const sl_char8* utf8, sl_reg lenUtf8)
-	{
-		if (utf8) {
-			if (lenUtf8 < 0) {
-				lenUtf8 = Base::getStringLength(utf8);
-			}
-			sl_size len = lenUtf8;
-			StringContainer* container = _alloc(len);
-			if (container) {
-				Base::copyMemory(container->sz, utf8, len);
-			}
-			return container;
-		}
-		return sl_null;
-	}
-
-	SLIB_INLINE StringContainer16* String16::_create(const sl_char8* utf8, sl_reg lenUtf8)
-	{
-		if (utf8) {
-			if (lenUtf8 < 0) {
-				lenUtf8 = Base::getStringLength(utf8);
-			}
-			sl_size len = Charsets::utf8ToUtf16(utf8, lenUtf8, sl_null, -1);
-			StringContainer16* container = _alloc(len);
-			if (container && len > 0) {
-				Charsets::utf8ToUtf16(utf8, lenUtf8, container->sz, len);
-				container->sz[len] = 0;
-			}
-			return container;
-		}
-		return sl_null;
-	}
-
-	SLIB_INLINE StringContainer* String::_create(const sl_char16* utf16, sl_reg lenUtf16)
-	{
-		if (utf16) {
-			if (lenUtf16 < 0) {
-				lenUtf16 = Base::getStringLength2(utf16);
-			}
-			sl_size len = Charsets::utf16ToUtf8(utf16, lenUtf16, sl_null, -1);
-			StringContainer* container = _alloc(len);
-			if (container && len > 0) {
-				Charsets::utf16ToUtf8(utf16, lenUtf16, container->sz, len);
-				container->sz[len] = 0;
-			}
-			return container;
-		}
-		return sl_null;
-	}
-
-	SLIB_INLINE StringContainer16* String16::_create(const sl_char16* utf16, sl_reg lenUtf16)
-	{
-		if (utf16) {
-			if (lenUtf16 < 0) {
-				lenUtf16 = Base::getStringLength2(utf16);
-			}
-			sl_size len = lenUtf16;
-			StringContainer16* container = _alloc(len);
-			if (container) {
-				Base::copyMemory(container->sz, utf16, len*sizeof(sl_char16));
-			}
-			return container;
-		}
-		return sl_null;
-	}
-
-	SLIB_INLINE StringContainer* String::_create(const sl_char32* utf32, sl_reg lenUtf32)
-	{
-		if (utf32) {
-			if (lenUtf32 < 0) {
-				lenUtf32 = Base::getStringLength4(utf32);
-			}
-			sl_size len = Charsets::utf32ToUtf8(utf32, lenUtf32, sl_null, -1);
-			StringContainer* container = _alloc(len);
-			if (container && len > 0) {
-				Charsets::utf32ToUtf8(utf32, lenUtf32, container->sz, len);
-				container->sz[len] = 0;
-			}
-			return container;
-		}
-		return sl_null;
-	}
-
-	SLIB_INLINE StringContainer16* String16::_create(const sl_char32* utf32, sl_reg lenUtf32)
-	{
-		if (utf32) {
-			if (lenUtf32 < 0) {
-				lenUtf32 = Base::getStringLength4(utf32);
-			}
-			sl_size len = Charsets::utf32ToUtf16(utf32, lenUtf32, sl_null, -1);
-			StringContainer16* container = _alloc(len);
-			if (container && len > 0) {
-				Charsets::utf32ToUtf16(utf32, lenUtf32, container->sz, len);
-				container->sz[len] = 0;
-			}
-			return container;
-		}
-		return sl_null;
-	}
-
-
-	SLIB_INLINE StringContainer* String::_merge8(const sl_char8* s1, sl_reg len1, const sl_char8* s2, sl_reg len2)
-	{
-		if (len1 < 0) {
-			len1 = Base::getStringLength(s1);
-		}
-		if (len2 < 0) {
-			len2 = Base::getStringLength(s2);
-		}
-		sl_size len = len1 + len2;
-		StringContainer* s = _alloc(len);
-		if (s && len > 0) {
-			Base::copyMemory(s->sz, s1, len1);
-			Base::copyMemory(s->sz + len1, s2, len2);
-			s->sz[len] = 0;
-		}
-		return s;
-	}
-
-	SLIB_INLINE StringContainer16* String16::_merge16(const sl_char16* s1, sl_reg len1, const sl_char16* s2, sl_reg len2)
-	{
-		if (len1 < 0) {
-			len1 = Base::getStringLength2(s1);
-		}
-		if (len2 < 0) {
-			len2 = Base::getStringLength2(s2);
-		}
-		sl_size len = len1 + len2;
-		StringContainer16* s = _alloc(len);
-		if (s && len > 0) {
-			Base::copyMemory(s->sz, s1, len1*sizeof(sl_char16));
-			Base::copyMemory(s->sz + len1, s2, len2*sizeof(sl_char16));
-			s->sz[len] = 0;
-		}
-		return s;
-	}
-
-	SLIB_INLINE StringContainer* String::_merge16(const sl_char8* s1, sl_reg len1, const sl_char16* s2_u16, sl_reg len2_u16)
-	{
-		if (len1 < 0) {
-			len1 = Base::getStringLength(s1);
-		}
-		if (len2_u16 < 0) {
-			len2_u16 = Base::getStringLength2(s2_u16);
-		}
-		sl_size len2 = Charsets::utf16ToUtf8(s2_u16, len2_u16, sl_null, -1);
-		sl_size len = len1 + len2;
-		StringContainer* s = _alloc(len);
-		if (s && len > 0) {
-			Base::copyMemory(s->sz, s1, len1);
-			Charsets::utf16ToUtf8(s2_u16, len2_u16, s->sz + len1, len2);
-			s->sz[len] = 0;
-		}
-		return s;
-	}
-
-	SLIB_INLINE StringContainer* String::_merge16(const sl_char16* s1_u16, sl_reg len1_u16, const sl_char8* s2, sl_reg len2)
-	{
-		if (len1_u16 < 0) {
-			len1_u16 = Base::getStringLength2(s1_u16);
-		}
-		if (len2 < 0) {
-			len2 = Base::getStringLength(s2);
-		}
-		sl_size len1 = Charsets::utf16ToUtf8(s1_u16, len1_u16, sl_null, -1);
-		sl_size len = len1 + len2;
-		StringContainer* s = _alloc(len);
-		if (s && len > 0) {
-			Charsets::utf16ToUtf8(s1_u16, len1_u16, s->sz, len1);
-			Base::copyMemory(s->sz + len1, s2, len2);
-			s->sz[len] = 0;
-		}
-		return s;
-	}
-
-	SLIB_INLINE StringContainer* String::_merge32(const sl_char8* s1, sl_reg len1, const sl_char32* s2_u32, sl_reg len2_u32)
-	{
-		if (len1 < 0) {
-			len1 = Base::getStringLength(s1);
-		}
-		if (len2_u32 < 0) {
-			len2_u32 = Base::getStringLength4(s2_u32);
-		}
-		sl_size len2 = Charsets::utf32ToUtf8(s2_u32, len2_u32, sl_null, -1);
-		sl_size len = len1 + len2;
-		StringContainer* s = _alloc(len);
-		if (s && len > 0) {
-			Base::copyMemory(s->sz, s1, len1*sizeof(sl_char8));
-			Charsets::utf32ToUtf8(s2_u32, len2_u32, s->sz + len1, len2);
-			s->sz[len] = 0;
-		}
-		return s;
-	}
-
-	SLIB_INLINE StringContainer* String::_merge32(const sl_char32* s1_u32, sl_reg len1_u32, const sl_char8* s2, sl_reg len2)
-	{
-		if (len1_u32 < 0) {
-			len1_u32 = Base::getStringLength4(s1_u32);
-		}
-		if (len2 < 0) {
-			len2 = Base::getStringLength(s2);
-		}
-		sl_size len1 = Charsets::utf32ToUtf8(s1_u32, len1_u32, sl_null, -1);
-		sl_size len = len1 + len2;
-		StringContainer* s = _alloc(len);
-		if (s && len > 0) {
-			Charsets::utf32ToUtf8(s1_u32, len1_u32, s->sz, len1);
-			Base::copyMemory(s->sz + len1, s2, len2);
-			s->sz[len] = 0;
-		}
-		return s;
-	}
-
-	SLIB_INLINE StringContainer16* String16::_merge8(const sl_char16* s1, sl_reg len1, const sl_char8* s2_u8, sl_reg len2_u8)
-	{
-		if (len1 < 0) {
-			len1 = Base::getStringLength2(s1);
-		}
-		if (len2_u8 < 0) {
-			len2_u8 = Base::getStringLength(s2_u8);
-		}
-		sl_size len2 = Charsets::utf8ToUtf16(s2_u8, len2_u8, sl_null, -1);
-		sl_size len = len1 + len2;
-		StringContainer16* s = _alloc(len);
-		if (s && len > 0) {
-			Base::copyMemory(s->sz, s1, len1*sizeof(sl_char16));
-			Charsets::utf8ToUtf16(s2_u8, len2_u8, s->sz + len1, len2);
-			s->sz[len] = 0;
-		}
-		return s;
-	}
-
-	SLIB_INLINE StringContainer16* String16::_merge8(const sl_char8* s1_u8, sl_reg len1_u8, const sl_char16* s2, sl_reg len2)
-	{
-		if (len1_u8 < 0) {
-			len1_u8 = Base::getStringLength(s1_u8);
-		}
-		if (len2 < 0) {
-			len2 = Base::getStringLength2(s2);
-		}
-		sl_size len1 = Charsets::utf8ToUtf16(s1_u8, len1_u8, sl_null, -1);
-		sl_size len = len1 + len2;
-		StringContainer16* s = _alloc(len);
-		if (s && len > 0) {
-			Charsets::utf8ToUtf16(s1_u8, len1_u8, s->sz, len1);
-			Base::copyMemory(s->sz + len1, s2, len2*sizeof(sl_char16));
-			s->sz[len] = 0;
-		}
-		return s;
-	}
-
-	SLIB_INLINE StringContainer16* String16::_merge32(const sl_char16* s1, sl_reg len1, const sl_char32* s2_u32, sl_reg len2_u32)
-	{
-		if (len1 < 0) {
-			len1 = Base::getStringLength2(s1);
-		}
-		if (len2_u32 < 0) {
-			len2_u32 = Base::getStringLength4(s2_u32);
-		}
-		sl_size len2 = Charsets::utf32ToUtf16(s2_u32, len2_u32, sl_null, -1);
-		sl_size len = len1 + len2;
-		StringContainer16* s = _alloc(len);
-		if (s && len > 0) {
-			Base::copyMemory(s->sz, s1, len1*sizeof(sl_char16));
-			Charsets::utf32ToUtf16(s2_u32, len2_u32, s->sz + len1, len2);
-			s->sz[len] = 0;
-		}
-		return s;
-	}
-
-	SLIB_INLINE StringContainer16* String16::_merge32(const sl_char32* s1_u32, sl_reg len1_u32, const sl_char16* s2, sl_reg len2)
-	{
-		if (len1_u32 < 0) {
-			len1_u32 = Base::getStringLength4(s1_u32);
-		}
-		if (len2 < 0) {
-			len2 = Base::getStringLength2(s2);
-		}
-		sl_size len1 = Charsets::utf32ToUtf16(s1_u32, len1_u32, sl_null, -1);
-		sl_size len = len1 + len2;
-		StringContainer16* s = _alloc(len);
-		if (s && len > 0) {
-			Charsets::utf32ToUtf16(s1_u32, len1_u32, s->sz, len1);
-			Base::copyMemory(s->sz + len1, s2, len2*sizeof(sl_char16));
-			s->sz[len] = 0;
-		}
-		return s;
-	}
-
-	SLIB_INLINE sl_bool String::_equals8(const sl_char8* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
-	{
-		if (len1 < 0) {
-			len1 = SLIB_REG_MAX;
-		}
-		if (len2 < 0) {
-			len2 = SLIB_REG_MAX;
-		}
-		sl_size len = SLIB_MIN(len1, len2);
-		sl_uint8* s1 = (sl_uint8*)str1;
-		sl_uint8* s2 = (sl_uint8*)str2;
-		for (sl_size i = 0; i < len; i++) {
-			sl_uint8 c1 = s1[i];
-			sl_uint8 c2 = s2[i];
-			if (c1 != c2) {
-				return sl_false;
-			}
-			if (c1 == 0) {
-				return sl_true;
-			}
-		}
-		if (len1 < len2) {
-			if (s2[len1] == 0) {
-				return sl_true;
-			} else {
-				return sl_false;
-			}
-		}
-		if (len1 > len2) {
-			if (s1[len2] == 0) {
-				return sl_true;
-			} else {
-				return sl_false;
-			}
-		}
-		return sl_true;
-	}
-
-	SLIB_INLINE sl_bool String16::_equals16(const sl_char16* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
-	{
-		if (len1 < 0) {
-			len1 = SLIB_REG_MAX;
-		}
-		if (len2 < 0) {
-			len2 = SLIB_REG_MAX;
-		}
-		sl_size len = SLIB_MIN(len1, len2);
-		sl_uint16* s1 = (sl_uint16*)str1;
-		sl_uint16* s2 = (sl_uint16*)str2;
-		for (sl_size i = 0; i < len; i++) {
-			sl_uint16 c1 = s1[i];
-			sl_uint16 c2 = s2[i];
-			if (c1 != c2) {
-				return sl_false;
-			}
-			if (c1 == 0) {
-				return sl_true;
-			}
-		}
-		if (len1 < len2) {
-			if (s2[len1] == 0) {
-				return sl_true;
-			} else {
-				return sl_false;
-			}
-		}
-		if (len1 > len2) {
-			if (s1[len2] == 0) {
-				return sl_true;
-			} else {
-				return sl_false;
-			}
-		}
-		return sl_true;
-	}
-
-	SLIB_INLINE sl_bool String::_equals16(const sl_char8* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
-	{
-		String other(str2, len2);
-		return _equals8(str1, len1, other.getData(), other.getLength());
-	}
-
-	SLIB_INLINE sl_bool String16::_equals8(const sl_char16* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
-	{
-		String16 other(str2, len2);
-		return _equals16(str1, len1, other.getData(), other.getLength());
-	}
-
-	SLIB_INLINE sl_bool String::_equals32(const sl_char8* str1, sl_reg len1, const sl_char32* str2, sl_reg len2)
-	{
-		String other(str2, len2);
-		return _equals8(str1, len1, other.getData(), other.getLength());
-	}
-
-	SLIB_INLINE sl_bool String16::_equals32(const sl_char16* str1, sl_reg len1, const sl_char32* str2, sl_reg len2)
-	{
-		return _compare32(str1, len1, str2, len2) == 0;
-	}
-
-
-	SLIB_INLINE sl_int32 String::_compare8(const sl_char8* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
-	{
-		if (len1 < 0) {
-			len1 = SLIB_REG_MAX;
-		}
-		if (len2 < 0) {
-			len2 = SLIB_REG_MAX;
-		}
-		sl_size len = SLIB_MIN(len1, len2);
-		sl_uint8* s1 = (sl_uint8*)str1;
-		sl_uint8* s2 = (sl_uint8*)str2;
-		for (sl_size i = 0; i < len; i++) {
-			sl_uint8 c1 = s1[i];
-			sl_uint8 c2 = s2[i];
-			if (c1 < c2) {
-				return -1;
-			}
-			if (c1 > c2) {
-				return 1;
-			}
-			if (c1 == 0) {
-				return 0;
-			}
-		}
-		if (len1 < len2) {
-			if (s2[len1] == 0) {
-				return 0;
-			} else {
-				return -1;
-			}
-		}
-		if (len1 > len2) {
-			if (s1[len2] == 0) {
-				return 0;
-			} else {
-				return 1;
-			}
-		}
-		return 0;
-	}
-
-	SLIB_INLINE sl_int32 String16::_compare16(const sl_char16* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
-	{
-		if (len1 < 0) {
-			len1 = SLIB_REG_MAX;
-		}
-		if (len2 < 0) {
-			len2 = SLIB_REG_MAX;
-		}
-		sl_size len = SLIB_MIN(len1, len2);
-		sl_uint16* s1 = (sl_uint16*)str1;
-		sl_uint16* s2 = (sl_uint16*)str2;
-		for (sl_size i = 0; i < len; i++) {
-			sl_uint16 c1 = s1[i];
-			sl_uint16 c2 = s2[i];
-			if (c1 < c2) {
-				return -1;
-			}
-			if (c1 > c2) {
-				return 1;
-			}
-			if (c1 == 0) {
-				return 0;
-			}
-		}
-		if (len1 < len2) {
-			if (s2[len1] == 0) {
-				return 0;
-			} else {
-				return -1;
-			}
-		}
-		if (len1 > len2) {
-			if (s1[len2] == 0) {
-				return 0;
-			} else {
-				return 1;
-			}
-		}
-		return 0;
-	}
-
-	SLIB_INLINE sl_int32 String::_compare16(const sl_char8* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
-	{
-		String other(str2, len2);
-		return _compare8(str1, len1, other.getData(), other.getLength());
-	}
-
-	SLIB_INLINE sl_int32 String16::_compare8(const sl_char16* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
-	{
-		String16 other(str2, len2);
-		return _compare16(str1, len1, other.getData(), other.getLength());
-	}
-
-	SLIB_INLINE sl_int32 String::_compare32(const sl_char8* str1, sl_reg len1, const sl_char32* str2, sl_reg len2)
-	{
-		String other(str2, len2);
-		return _compare8(str1, len1, other.getData(), other.getLength());
-	}
-
-	SLIB_INLINE sl_int32 String16::_compare32(const sl_char16* m1, sl_reg len1, const sl_char32* m2, sl_reg len2)
-	{
-		if (len1 < 0) {
-			len1 = SLIB_REG_MAX;
-		}
-		if (len2 < 0) {
-			len2 = SLIB_REG_MAX;
-		}
-		sl_size len = SLIB_MIN(len1, len2);
-		sl_uint16* s1 = (sl_uint16*)m1;
-		sl_uint32* s2 = (sl_uint32*)m2;
-		for (sl_size i = 0; i < len; i++) {
-			sl_uint32 c1 = s1[i];
-			sl_uint32 c2 = s2[i];
-			if (c1 < c2) {
-				return -1;
-			}
-			if (c1 > c2) {
-				return 1;
-			}
-			if (c1 == 0) {
-				return 0;
-			}
-		}
-		if (len1 < len2) {
-			if (s2[len1] == 0) {
-				return 0;
-			} else {
-				return -1;
-			}
-		}
-		if (len1 > len2) {
-			if (s1[len2] == 0) {
-				return 0;
-			} else {
-				return 1;
-			}
-		}
-		return 0;
-	}
-
-
 	String::String(const String& src)
 	{
 		StringContainer* container = src.m_container;
@@ -845,9 +1030,9 @@ namespace slib
 		} else {
 			sl_size len = src.getLength();
 			if (len == 0) {
-				m_container = _String_Empty.container;
+				m_container = _priv_String_Empty.container;
 			} else {
-				m_container = _create(src.getData(), len);
+				m_container = _priv_String_create(src.getData(), len);
 			}
 		}
 	}
@@ -859,9 +1044,9 @@ namespace slib
 		} else {
 			sl_size len = src.getLength();
 			if (len == 0) {
-				m_container = _String16_Empty.container;
+				m_container = _priv_String16_Empty.container;
 			} else {
-				m_container = _create(src.getData(), len);
+				m_container = _priv_String16_create(src.getData(), len);
 			}
 		}
 	}
@@ -873,9 +1058,9 @@ namespace slib
 		} else {
 			sl_size len = src.getLength();
 			if (len == 0) {
-				m_container = _String_Empty.container;
+				m_container = _priv_String_Empty.container;
 			} else {
-				m_container = String::_create(src.getData(), len);
+				m_container = _priv_String_create(src.getData(), len);
 			}
 		}
 	}
@@ -887,9 +1072,9 @@ namespace slib
 		} else {
 			sl_size len = src.getLength();
 			if (len == 0) {
-				m_container = _String16_Empty.container;
+				m_container = _priv_String16_Empty.container;
 			} else {
-				m_container = String16::_create(src.getData(), len);
+				m_container = _priv_String16_create(src.getData(), len);
 			}
 		}
 	}
@@ -903,9 +1088,9 @@ namespace slib
 		} else {
 			sl_size len = src.getLength();
 			if (len == 0) {
-				m_container = _String_Empty.container;
+				m_container = _priv_String_Empty.container;
 			} else {
-				m_container = _create(src.getData(), len);
+				m_container = _priv_String_create(src.getData(), len);
 			}
 		}
 	}
@@ -918,9 +1103,9 @@ namespace slib
 		} else {
 			sl_size len = src.getLength();
 			if (len == 0) {
-				m_container = _String16_Empty.container;
+				m_container = _priv_String16_Empty.container;
 			} else {
-				m_container = _create(src.getData(), len);
+				m_container = _priv_String16_create(src.getData(), len);
 			}
 		}
 	}
@@ -933,9 +1118,9 @@ namespace slib
 		} else {
 			sl_size len = src.getLength();
 			if (len == 0) {
-				m_container = _String_Empty.container;
+				m_container = _priv_String_Empty.container;
 			} else {
-				m_container = String::_create(src.getData(), len);
+				m_container = _priv_String_create(src.getData(), len);
 			}
 		}
 	}
@@ -948,9 +1133,9 @@ namespace slib
 		} else {
 			sl_size len = src.getLength();
 			if (len == 0) {
-				m_container = _String16_Empty.container;
+				m_container = _priv_String16_Empty.container;
 			} else {
-				m_container = String16::_create(src.getData(), len);
+				m_container = _priv_String16_create(src.getData(), len);
 			}
 		}
 	}
@@ -991,249 +1176,260 @@ namespace slib
 
 	String::String(sl_char8 ch, sl_size nRepeatCount)
 	{
-		m_container = _create(ch, nRepeatCount);
+		m_container = _priv_String_create(ch, nRepeatCount);
 	}
 
 	Atomic<String>::Atomic(sl_char8 ch, sl_size nRepeatCount)
 	{
-		m_container = String::_create(ch, nRepeatCount);
+		m_container = _priv_String_create(ch, nRepeatCount);
 	}
 
 	String16::String16(sl_char16 ch, sl_size nRepeatCount)
 	{
-		m_container = _create(ch, nRepeatCount);
+		m_container = _priv_String16_create(ch, nRepeatCount);
 	}
 
 	Atomic<String16>::Atomic(sl_char16 ch, sl_size nRepeatCount)
 	{
-		m_container = String16::_create(ch, nRepeatCount);
+		m_container = _priv_String16_create(ch, nRepeatCount);
 	}
 
 
 	String::String(const char* strUtf8)
 	{
-		m_container = _create(strUtf8, -1);
+		m_container = _priv_String_create(strUtf8, -1);
 	}
 
 	String::String(const char* strUtf8, sl_reg length)
 	{
-		m_container = _create(strUtf8, length);
+		m_container = _priv_String_create(strUtf8, length);
 	}
 
 	Atomic<String>::Atomic(const char* strUtf8)
 	{
-		m_container = String::_create(strUtf8, -1);
+		m_container = _priv_String_create(strUtf8, -1);
 	}
 
 	Atomic<String>::Atomic(const char* strUtf8, sl_reg length)
 	{
-		m_container = String::_create(strUtf8, length);
+		m_container = _priv_String_create(strUtf8, length);
 	}
 
 	String16::String16(const char* strUtf8)
 	{
-		m_container = _create(strUtf8, -1);
+		m_container = _priv_String16_create(strUtf8, -1);
 	}
 
 	String16::String16(const char* strUtf8, sl_reg length)
 	{
-		m_container = _create(strUtf8, length);
+		m_container = _priv_String16_create(strUtf8, length);
 	}
 
 	Atomic<String16>::Atomic(const char* strUtf8)
 	{
-		m_container = String16::_create(strUtf8, -1);
+		m_container = _priv_String16_create(strUtf8, -1);
 	}
 
 	Atomic<String16>::Atomic(const char* strUtf8, sl_reg length)
 	{
-		m_container = String16::_create(strUtf8, length);
+		m_container = _priv_String16_create(strUtf8, length);
 	}
 
 	
 	String::String(const wchar_t* strUnicode)
 	{
 		if (sizeof(wchar_t) == 2) {
-			m_container = _create((sl_char16*)strUnicode, -1);
+			m_container = _priv_String_create((sl_char16*)strUnicode, -1);
 		} else {
-			m_container = _create((sl_char32*)strUnicode, -1);
+			m_container = _priv_String_create((sl_char32*)strUnicode, -1);
 		}
 	}
 	
 	String::String(const wchar_t* strUnicode, sl_reg length)
 	{
 		if (sizeof(wchar_t) == 2) {
-			m_container = _create((sl_char16*)strUnicode, length);
+			m_container = _priv_String_create((sl_char16*)strUnicode, length);
 		} else {
-			m_container = _create((sl_char32*)strUnicode, length);
+			m_container = _priv_String_create((sl_char32*)strUnicode, length);
 		}
 	}
 	
 	Atomic<String>::Atomic(const wchar_t* strUnicode)
 	{
 		if (sizeof(wchar_t) == 2) {
-			m_container = String::_create((sl_char16*)strUnicode, -1);
+			m_container = _priv_String_create((sl_char16*)strUnicode, -1);
 		} else {
-			m_container = String::_create((sl_char32*)strUnicode, -1);
+			m_container = _priv_String_create((sl_char32*)strUnicode, -1);
 		}
 	}
 	
 	Atomic<String>::Atomic(const wchar_t* strUnicode, sl_reg length)
 	{
 		if (sizeof(wchar_t) == 2) {
-			m_container = String::_create((sl_char16*)strUnicode, length);
+			m_container = _priv_String_create((sl_char16*)strUnicode, length);
 		} else {
-			m_container = String::_create((sl_char32*)strUnicode, length);
+			m_container = _priv_String_create((sl_char32*)strUnicode, length);
 		}
 	}
 	
 	String16::String16(const wchar_t* strUnicode)
 	{
 		if (sizeof(wchar_t) == 2) {
-			m_container = _create((sl_char16*)strUnicode, -1);
+			m_container = _priv_String16_create((sl_char16*)strUnicode, -1);
 		} else {
-			m_container = _create((sl_char32*)strUnicode, -1);
+			m_container = _priv_String16_create((sl_char32*)strUnicode, -1);
 		}
 	}
 	
 	String16::String16(const wchar_t* strUnicode, sl_reg length)
 	{
 		if (sizeof(wchar_t) == 2) {
-			m_container = _create((sl_char16*)strUnicode, length);
+			m_container = _priv_String16_create((sl_char16*)strUnicode, length);
 		} else {
-			m_container = _create((sl_char32*)strUnicode, length);
+			m_container = _priv_String16_create((sl_char32*)strUnicode, length);
 		}
 	}
 	
 	Atomic<String16>::Atomic(const wchar_t* strUnicode)
 	{
 		if (sizeof(wchar_t) == 2) {
-			m_container = String16::_create((sl_char16*)strUnicode, -1);
+			m_container = _priv_String16_create((sl_char16*)strUnicode, -1);
 		} else {
-			m_container = String16::_create((sl_char32*)strUnicode, -1);
+			m_container = _priv_String16_create((sl_char32*)strUnicode, -1);
 		}
 	}
 	
 	Atomic<String16>::Atomic(const wchar_t* strUnicode, sl_reg length)
 	{
 		if (sizeof(wchar_t) == 2) {
-			m_container = String16::_create((sl_char16*)strUnicode, length);
+			m_container = _priv_String16_create((sl_char16*)strUnicode, length);
 		} else {
-			m_container = String16::_create((sl_char32*)strUnicode, length);
+			m_container = _priv_String16_create((sl_char32*)strUnicode, length);
 		}
 	}
 
 	
 	String::String(const char16_t* strUtf16)
 	{
-		m_container = _create(strUtf16, -1);
+		m_container = _priv_String_create(strUtf16, -1);
 	}
 
 	String::String(const char16_t* strUtf16, sl_reg length)
 	{
-		m_container = _create(strUtf16, length);
+		m_container = _priv_String_create(strUtf16, length);
 	}
 
 	Atomic<String>::Atomic(const char16_t* strUtf16)
 	{
-		m_container = String::_create(strUtf16, -1);
+		m_container = _priv_String_create(strUtf16, -1);
 	}
 
 	Atomic<String>::Atomic(const char16_t* strUtf16, sl_reg length)
 	{
-		m_container = String::_create(strUtf16, length);
+		m_container = _priv_String_create(strUtf16, length);
 	}
 
 	String16::String16(const char16_t* strUtf16)
 	{
-		m_container = _create(strUtf16, -1);
+		m_container = _priv_String16_create(strUtf16, -1);
 	}
 
 	String16::String16(const char16_t* strUtf16, sl_reg length)
 	{
-		m_container = _create(strUtf16, length);
+		m_container = _priv_String16_create(strUtf16, length);
 	}
 
 	Atomic<String16>::Atomic(const char16_t* strUtf16)
 	{
-		m_container = String16::_create(strUtf16, -1);
+		m_container = _priv_String16_create(strUtf16, -1);
 	}
 
 	Atomic<String16>::Atomic(const char16_t* strUtf16, sl_reg length)
 	{
-		m_container = String16::_create(strUtf16, length);
+		m_container = _priv_String16_create(strUtf16, length);
 	}
 
 
 	String::String(const char32_t* strUtf32)
 	{
-		m_container = _create(strUtf32, -1);
+		m_container = _priv_String_create(strUtf32, -1);
 	}
 
 	String::String(const char32_t* strUtf32, sl_reg length)
 	{
-		m_container = _create(strUtf32, length);
+		m_container = _priv_String_create(strUtf32, length);
 	}
 
 	Atomic<String>::Atomic(const char32_t* strUtf32)
 	{
-		m_container = String::_create(strUtf32, -1);
+		m_container = _priv_String_create(strUtf32, -1);
 	}
 
 	Atomic<String>::Atomic(const char32_t* strUtf32, sl_reg length)
 	{
-		m_container = String::_create(strUtf32, length);
+		m_container = _priv_String_create(strUtf32, length);
 	}
 
 	String16::String16(const char32_t* strUtf32)
 	{
-		m_container = _create(strUtf32, -1);
+		m_container = _priv_String16_create(strUtf32, -1);
 	}
 
 	String16::String16(const char32_t* strUtf32, sl_reg length)
 	{
-		m_container = _create(strUtf32, length);
+		m_container = _priv_String16_create(strUtf32, length);
 	}
 
 	Atomic<String16>::Atomic(const char32_t* strUtf32)
 	{
-		m_container = String16::_create(strUtf32, -1);
+		m_container = _priv_String16_create(strUtf32, -1);
 	}
 
 	Atomic<String16>::Atomic(const char32_t* strUtf32, sl_reg length)
 	{
-		m_container = String16::_create(strUtf32, length);
+		m_container = _priv_String16_create(strUtf32, length);
+	}
+	
+	
+	String::String(const std::string& str)
+	{
+		m_container = _priv_String_alloc_std(str);
+	}
+	
+	String16::String16(const std::u16string& str)
+	{
+		m_container = _priv_String16_alloc_std(str);
+	}
+	
+	Atomic<String>::Atomic(const std::string& str)
+	{
+		m_container = _priv_String_alloc_std(str);
+	}
+	
+	Atomic<String16>::Atomic(const std::u16string& str)
+	{
+		m_container = _priv_String16_alloc_std(str);
 	}
 
 
 	String String::allocate(sl_size len)
 	{
-		return _alloc(len);
+		return _priv_String_alloc(len);
 	}
 
 	String16 String16::allocate(sl_size len)
 	{
-		return _alloc(len);
+		return _priv_String16_alloc(len);
 	}
 
 
 	String String::fromStatic(const sl_char8 *sz, sl_reg len)
 	{
 		if (sz) {
-			if (len == 0) {
-				return _String_Empty.container;
-			}
 			if (len < 0) {
 				len = Base::getStringLength(sz);
 			}
-			StringContainer* container = (StringContainer*)(Base::createMemory(sizeof(StringContainer)));
-			if (container) {
-				container->sz = (sl_char8*)sz;
-				container->len = len;
-				container->hash = 0;
-				container->ref = 1;
-				return container;
-			}
+			return _priv_String_alloc_static(sz, len);
 		}
 		return sl_null;
 	}
@@ -1241,25 +1437,68 @@ namespace slib
 	String16 String16::fromStatic(const sl_char16 *sz, sl_reg len)
 	{
 		if (sz) {
-			if (len == 0) {
-				return _String16_Empty.container;
-			}
 			if (len < 0) {
 				len = Base::getStringLength2(sz);
 			}
-			StringContainer16* container = (StringContainer16*)(Base::createMemory(sizeof(StringContainer16)));
-			if (container) {
-				container->sz = (sl_char16*)sz;
-				container->len = len;
-				container->hash = 0;
-				container->ref = 1;
-				return container;
+			return _priv_String16_alloc_static(sz, len);
+		}
+		return sl_null;
+	}
+	
+	String String::fromRef(const Ref<Referable>& ref, const sl_char8* str, sl_reg len)
+	{
+		if (str) {
+			if (len < 0) {
+				len = Base::getStringLength(str);
 			}
+			return _priv_String_alloc_ref(ref, str, len);
+		}
+		return sl_null;
+	}
+	
+	String16 String16::fromRef(const Ref<Referable>& ref, const sl_char16* str, sl_reg len)
+	{
+		if (str) {
+			if (len < 0) {
+				len = Base::getStringLength2(str);
+			}
+			return _priv_String16_alloc_ref(ref, str, len);
 		}
 		return sl_null;
 	}
 
-
+	String String::fromMemory(const Memory& mem)
+	{
+		if (mem.isNull()) {
+			return String::null();
+		}
+		sl_char8* s = (sl_char8*)(mem.getData());
+		sl_size n = mem.getSize();
+		if (n == 0) {
+			return String::getEmpty();
+		}
+		if (s[n-1] == 0) {
+			n--;
+		}
+		return fromRef(mem.ref, s, n);
+	}
+	
+	String16 String16::fromMemory(const Memory& mem)
+	{
+		if (mem.isNull()) {
+			return String16::null();
+		}
+		sl_char16* s = (sl_char16*)(mem.getData());
+		sl_size n = mem.getSize() >> 1;
+		if (n == 0) {
+			return String16::getEmpty();
+		}
+		if (s[n-1] == 0) {
+			n--;
+		}
+		return fromRef(mem.ref, s, n);
+	}
+	
 	String String::fromUtf8(const void* utf8, sl_reg len)
 	{
 		return String((const sl_char8*)utf8, len);
@@ -1538,29 +1777,29 @@ namespace slib
 
 	void String::setEmpty()
 	{
-		if (m_container != _String_Empty.container) {
-			_replaceContainer(_String_Empty.container);
+		if (m_container != _priv_String_Empty.container) {
+			_replaceContainer(_priv_String_Empty.container);
 		}
 	}
 
 	void String16::setEmpty()
 	{
-		if (m_container != _String16_Empty.container) {
-			_replaceContainer(_String16_Empty.container);
+		if (m_container != _priv_String16_Empty.container) {
+			_replaceContainer(_priv_String16_Empty.container);
 		}
 	}
 
 	void Atomic<String>::setEmpty()
 	{
-		if (m_container != _String_Empty.container) {
-			_replaceContainer(_String_Empty.container);
+		if (m_container != _priv_String_Empty.container) {
+			_replaceContainer(_priv_String_Empty.container);
 		}
 	}
 
 	void Atomic<String16>::setEmpty()
 	{
-		if (m_container != _String16_Empty.container) {
-			_replaceContainer(_String16_Empty.container);
+		if (m_container != _priv_String16_Empty.container) {
+			_replaceContainer(_priv_String16_Empty.container);
 		}
 	}
 
@@ -1594,7 +1833,7 @@ namespace slib
 
 
 	template <class CT>
-	SLIB_INLINE sl_uint32 _String_calcHash(const CT* buf, sl_size len)
+	SLIB_INLINE sl_uint32 _priv_String_calcHash(const CT* buf, sl_size len)
 	{
 		sl_uint32 hash = 0;
 		for (sl_size i = 0; i < len; i++) {
@@ -1612,7 +1851,7 @@ namespace slib
 			if (n > 0) {
 				sl_uint32 hash = m_container->hash;
 				if (hash == 0) {
-					hash = _String_calcHash(m_container->sz, n);
+					hash = _priv_String_calcHash(m_container->sz, n);
 					m_container->hash = hash;
 				}
 				return hash;
@@ -1628,7 +1867,7 @@ namespace slib
 			if (n > 0) {
 				sl_uint32 hash = m_container->hash;
 				if (hash == 0) {
-					hash = _String_calcHash(m_container->sz, n);
+					hash = _priv_String_calcHash(m_container->sz, n);
 					m_container->hash = hash;
 				}
 				return hash;
@@ -1666,7 +1905,7 @@ namespace slib
 
 
 	template <class CT>
-	SLIB_INLINE sl_uint32 _String_calcHashIgnoreCase(const CT* buf, sl_size len)
+	SLIB_INLINE sl_uint32 _priv_String_calcHashIgnoreCase(const CT* buf, sl_size len)
 	{
 		sl_uint32 hash = 0;
 		for (sl_size i = 0; i < len; i++) {
@@ -1683,7 +1922,7 @@ namespace slib
 		if (m_container) {
 			sl_size n = m_container->len;
 			if (n > 0) {
-				sl_uint32 hash = _String_calcHashIgnoreCase(m_container->sz, n);
+				sl_uint32 hash = _priv_String_calcHashIgnoreCase(m_container->sz, n);
 				return hash;
 			}
 		}
@@ -1695,7 +1934,7 @@ namespace slib
 		if (m_container) {
 			sl_size n = m_container->len;
 			if (n > 0) {
-				sl_uint32 hash = _String_calcHashIgnoreCase(m_container->sz, n);
+				sl_uint32 hash = _priv_String_calcHashIgnoreCase(m_container->sz, n);
 				return hash;
 			}
 		}
@@ -1756,6 +1995,43 @@ namespace slib
 			}
 		}
 		return sl_false;
+	}
+	
+	
+	std::string String::toStd() const
+	{
+		if (m_container) {
+			if (m_container->type == STRING_CONTAINER_TYPE_STD) {
+				return (static_cast<_priv_StringContainer_std*>(m_container))->str;
+			} else {
+				return std::string(m_container->sz, m_container->len);
+			}
+		}
+		return std::string();
+	}
+	
+	std::u16string String16::toStd() const
+	{
+		if (m_container) {
+			if (m_container->type == STRING_CONTAINER_TYPE_STD) {
+				return (static_cast<_priv_StringContainer16_std*>(m_container))->str;
+			} else {
+				return std::u16string(m_container->sz, m_container->len);
+			}
+		}
+		return std::u16string();
+	}
+
+	std::string Atomic<String>::toStd() const
+	{
+		String s(*this);
+		return s.toStd();
+	}
+	
+	std::u16string Atomic<String16>::toStd() const
+	{
+		String16 s(*this);
+		return s.toStd();
 	}
 
 
@@ -1953,7 +2229,7 @@ namespace slib
 			if (len == 0) {
 				setEmpty();
 			} else {
-				_replaceContainer(_create(other.getData(), len));
+				_replaceContainer(_priv_String_create(other.getData(), len));
 			}
 		}
 		return *this;
@@ -1968,7 +2244,7 @@ namespace slib
 			if (len == 0) {
 				setEmpty();
 			} else {
-				_replaceContainer(_create(other.getData(), len));
+				_replaceContainer(_priv_String16_create(other.getData(), len));
 			}
 		}
 		return *this;
@@ -1983,7 +2259,7 @@ namespace slib
 			if (len == 0) {
 				setEmpty();
 			} else {
-				_replaceContainer(String::_create(other.getData(), len));
+				_replaceContainer(_priv_String_create(other.getData(), len));
 			}
 		}
 		return *this;
@@ -1998,7 +2274,7 @@ namespace slib
 			if (len == 0) {
 				setEmpty();
 			} else {
-				_replaceContainer(String16::_create(other.getData(), len));
+				_replaceContainer(_priv_String16_create(other.getData(), len));
 			}
 		}
 		return *this;
@@ -2015,7 +2291,7 @@ namespace slib
 			if (len == 0) {
 				setEmpty();
 			} else {
-				_replaceContainer(_create(other.getData(), len));
+				_replaceContainer(_priv_String_create(other.getData(), len));
 			}
 		}
 		return *this;
@@ -2031,7 +2307,7 @@ namespace slib
 			if (len == 0) {
 				setEmpty();
 			} else {
-				_replaceContainer(_create(other.getData(), len));
+				_replaceContainer(_priv_String16_create(other.getData(), len));
 			}
 		}
 		return *this;
@@ -2047,7 +2323,7 @@ namespace slib
 			if (len == 0) {
 				setEmpty();
 			} else {
-				_replaceContainer(String::_create(other.getData(), len));
+				_replaceContainer(_priv_String_create(other.getData(), len));
 			}
 		}
 		return *this;
@@ -2063,7 +2339,7 @@ namespace slib
 			if (len == 0) {
 				setEmpty();
 			} else {
-				_replaceContainer(String16::_create(other.getData(), len));
+				_replaceContainer(_priv_String16_create(other.getData(), len));
 			}
 		}
 		return *this;
@@ -2073,7 +2349,7 @@ namespace slib
 	String& String::operator=(const char* utf8)
 	{
 		if (utf8) {
-			_replaceContainer(_create(utf8, -1));
+			_replaceContainer(_priv_String_create(utf8, -1));
 		} else {
 			setNull();
 		}
@@ -2083,7 +2359,7 @@ namespace slib
 	String16& String16::operator=(const char* utf8)
 	{
 		if (utf8) {
-			_replaceContainer(_create(utf8, -1));
+			_replaceContainer(_priv_String16_create(utf8, -1));
 		} else {
 			setNull();
 		}
@@ -2093,7 +2369,7 @@ namespace slib
 	AtomicString& Atomic<String>::operator=(const char* utf8)
 	{
 		if (utf8) {
-			_replaceContainer(String::_create(utf8, -1));
+			_replaceContainer(_priv_String_create(utf8, -1));
 		} else {
 			setNull();
 		}
@@ -2103,7 +2379,7 @@ namespace slib
 	AtomicString16& Atomic<String16>::operator=(const char* utf8)
 	{
 		if (utf8) {
-			_replaceContainer(String16::_create(utf8, -1));
+			_replaceContainer(_priv_String16_create(utf8, -1));
 		} else {
 			setNull();
 		}
@@ -2115,9 +2391,9 @@ namespace slib
 	{
 		if (sz) {
 			if (sizeof(wchar_t) == 2) {
-				_replaceContainer(_create((sl_char16*)sz, -1));
+				_replaceContainer(_priv_String_create((sl_char16*)sz, -1));
 			} else {
-				_replaceContainer(_create((sl_char32*)sz, -1));
+				_replaceContainer(_priv_String_create((sl_char32*)sz, -1));
 			}
 		} else {
 			setNull();
@@ -2129,9 +2405,9 @@ namespace slib
 	{
 		if (sz) {
 			if (sizeof(wchar_t) == 2) {
-				_replaceContainer(_create((sl_char16*)sz, -1));
+				_replaceContainer(_priv_String16_create((sl_char16*)sz, -1));
 			} else {
-				_replaceContainer(_create((sl_char32*)sz, -1));
+				_replaceContainer(_priv_String16_create((sl_char32*)sz, -1));
 			}
 		} else {
 			setNull();
@@ -2143,9 +2419,9 @@ namespace slib
 	{
 		if (sz) {
 			if (sizeof(wchar_t) == 2) {
-				_replaceContainer(String::_create((sl_char16*)sz, -1));
+				_replaceContainer(_priv_String_create((sl_char16*)sz, -1));
 			} else {
-				_replaceContainer(String::_create((sl_char32*)sz, -1));
+				_replaceContainer(_priv_String_create((sl_char32*)sz, -1));
 			}
 		} else {
 			setNull();
@@ -2157,9 +2433,9 @@ namespace slib
 	{
 		if (sz) {
 			if (sizeof(wchar_t) == 2) {
-				_replaceContainer(String16::_create((sl_char16*)sz, -1));
+				_replaceContainer(_priv_String16_create((sl_char16*)sz, -1));
 			} else {
-				_replaceContainer(String16::_create((sl_char32*)sz, -1));
+				_replaceContainer(_priv_String16_create((sl_char32*)sz, -1));
 			}
 		} else {
 			setNull();
@@ -2171,7 +2447,7 @@ namespace slib
 	String& String::operator=(const char16_t* utf16)
 	{
 		if (utf16) {
-			_replaceContainer(_create(utf16, -1));
+			_replaceContainer(_priv_String_create(utf16, -1));
 		} else {
 			setNull();
 		}
@@ -2181,7 +2457,7 @@ namespace slib
 	String16& String16::operator=(const char16_t* utf16)
 	{
 		if (utf16) {
-			_replaceContainer(_create(utf16, -1));
+			_replaceContainer(_priv_String16_create(utf16, -1));
 		} else {
 			setNull();
 		}
@@ -2191,7 +2467,7 @@ namespace slib
 	AtomicString& Atomic<String>::operator=(const char16_t* utf16)
 	{
 		if (utf16) {
-			_replaceContainer(String::_create(utf16, -1));
+			_replaceContainer(_priv_String_create(utf16, -1));
 		} else {
 			setNull();
 		}
@@ -2201,7 +2477,7 @@ namespace slib
 	AtomicString16& Atomic<String16>::operator=(const char16_t* utf16)
 	{
 		if (utf16) {
-			_replaceContainer(String16::_create(utf16, -1));
+			_replaceContainer(_priv_String16_create(utf16, -1));
 		} else {
 			setNull();
 		}
@@ -2212,7 +2488,7 @@ namespace slib
 	String& String::operator=(const char32_t* utf32)
 	{
 		if (utf32) {
-			_replaceContainer(_create(utf32, -1));
+			_replaceContainer(_priv_String_create(utf32, -1));
 		} else {
 			setNull();
 		}
@@ -2222,7 +2498,7 @@ namespace slib
 	String16& String16::operator=(const char32_t* utf32)
 	{
 		if (utf32) {
-			_replaceContainer(_create(utf32, -1));
+			_replaceContainer(_priv_String16_create(utf32, -1));
 		} else {
 			setNull();
 		}
@@ -2232,7 +2508,7 @@ namespace slib
 	AtomicString& Atomic<String>::operator=(const char32_t* utf32)
 	{
 		if (utf32) {
-			_replaceContainer(String::_create(utf32, -1));
+			_replaceContainer(_priv_String_create(utf32, -1));
 		} else {
 			setNull();
 		}
@@ -2242,14 +2518,39 @@ namespace slib
 	AtomicString16& Atomic<String16>::operator=(const char32_t* utf32)
 	{
 		if (utf32) {
-			_replaceContainer(String16::_create(utf32, -1));
+			_replaceContainer(_priv_String16_create(utf32, -1));
 		} else {
 			setNull();
 		}
 		return *this;
 	}
 
+	
+	String& String::operator=(const std::string& str)
+	{
+		_replaceContainer(_priv_String_alloc_std(str));
+		return *this;
+	}
+	
+	String16& String16::operator=(const std::u16string& str)
+	{
+		_replaceContainer(_priv_String16_alloc_std(str));
+		return *this;
+	}
+	
+	AtomicString& Atomic<String>::operator=(const std::string& str)
+	{
+		_replaceContainer(_priv_String_alloc_std(str));
+		return *this;
+	}
+	
+	AtomicString16& Atomic<String16>::operator=(const std::u16string& str)
+	{
+		_replaceContainer(_priv_String16_alloc_std(str));
+		return *this;
+	}
 
+	
 	String String::operator+(const String& other) const
 	{
 		sl_size n = getLength();
@@ -2257,7 +2558,7 @@ namespace slib
 			return other.getNotNull();
 		}
 		if (other.isNotEmpty()) {
-			return _merge8(getData(), n, other.getData(), other.getLength());
+			return _priv_String_merge8(getData(), n, other.getData(), other.getLength());
 		}
 		return getNotNull();
 	}
@@ -2269,7 +2570,7 @@ namespace slib
 			return (*this = other.getNotNull());
 		}
 		if (other.isNotEmpty()) {
-			_replaceContainer(_merge8(getData(), n, other.getData(), other.getLength()));
+			_replaceContainer(_priv_String_merge8(getData(), n, other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2281,7 +2582,7 @@ namespace slib
 			return other.getNotNull();
 		}
 		if (other.isNotEmpty()) {
-			return _merge16(getData(), n, other.getData(), other.getLength());
+			return _priv_String16_merge16(getData(), n, other.getData(), other.getLength());
 		}
 		return getNotNull();
 	}
@@ -2293,7 +2594,7 @@ namespace slib
 			return (*this = other.getNotNull());
 		}
 		if (other.isNotEmpty()) {
-			_replaceContainer(_merge16(getData(), n, other.getData(), other.getLength()));
+			_replaceContainer(_priv_String16_merge16(getData(), n, other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2306,7 +2607,7 @@ namespace slib
 			return other.getNotNull();
 		}
 		if (other.isNotEmpty()) {
-			return String::_merge8(s.getData(), n, other.getData(), other.getLength());
+			return _priv_String_merge8(s.getData(), n, other.getData(), other.getLength());
 		}
 		return s.getNotNull();
 	}
@@ -2319,7 +2620,7 @@ namespace slib
 			return (*this = other.getNotNull());
 		}
 		if (other.isNotEmpty()) {
-			_replaceContainer(String::_merge8(s.getData(), n, other.getData(), other.getLength()));
+			_replaceContainer(_priv_String_merge8(s.getData(), n, other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2332,7 +2633,7 @@ namespace slib
 			return other.getNotNull();
 		}
 		if (other.isNotEmpty()) {
-			return String16::_merge16(s.getData(), n, other.getData(), other.getLength());
+			return _priv_String16_merge16(s.getData(), n, other.getData(), other.getLength());
 		}
 		return s.getNotNull();
 	}
@@ -2345,7 +2646,7 @@ namespace slib
 			return (*this = other.getNotNull());
 		}
 		if (other.isNotEmpty()) {
-			_replaceContainer(String16::_merge16(s.getData(), n, other.getData(), other.getLength()));
+			_replaceContainer(_priv_String16_merge16(s.getData(), n, other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2354,7 +2655,7 @@ namespace slib
 	String String::operator+(const String16& other) const
 	{
 		if (other.isNotEmpty()) {
-			return _merge16(getData(), getLength(), other.getData(), other.getLength());
+			return _priv_String_merge16(getData(), getLength(), other.getData(), other.getLength());
 		}
 		return getNotNull();
 	}
@@ -2362,7 +2663,7 @@ namespace slib
 	String& String::operator+=(const String16& other)
 	{
 		if (other.isNotEmpty()) {
-			_replaceContainer(_merge16(getData(), getLength(), other.getData(), other.getLength()));
+			_replaceContainer(_priv_String_merge16(getData(), getLength(), other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2370,7 +2671,7 @@ namespace slib
 	String16 String16::operator+(const String& other) const
 	{
 		if (other.isNotEmpty()) {
-			return _merge8(getData(), getLength(), other.getData(), other.getLength());
+			return _priv_String16_merge8(getData(), getLength(), other.getData(), other.getLength());
 		}
 		return getNotNull();
 	}
@@ -2378,7 +2679,7 @@ namespace slib
 	String16& String16::operator+=(const String& other)
 	{
 		if (other.isNotEmpty()) {
-			_replaceContainer(_merge8(getData(), getLength(), other.getData(), other.getLength()));
+			_replaceContainer(_priv_String16_merge8(getData(), getLength(), other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2387,7 +2688,7 @@ namespace slib
 	{
 		String s(*this);
 		if (other.isNotEmpty()) {
-			return String::_merge16(s.getData(), s.getLength(), other.getData(), other.getLength());
+			return _priv_String_merge16(s.getData(), s.getLength(), other.getData(), other.getLength());
 		}
 		return s.getNotNull();
 	}
@@ -2396,7 +2697,7 @@ namespace slib
 	{
 		if (other.isNotEmpty()) {
 			String s(*this);
-			_replaceContainer(String::_merge16(s.getData(), s.getLength(), other.getData(), other.getLength()));
+			_replaceContainer(_priv_String_merge16(s.getData(), s.getLength(), other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2405,7 +2706,7 @@ namespace slib
 	{
 		String16 s(*this);
 		if (other.isNotEmpty()) {
-			return String16::_merge8(s.getData(), s.getLength(), other.getData(), other.getLength());
+			return _priv_String16_merge8(s.getData(), s.getLength(), other.getData(), other.getLength());
 		}
 		return s.getNotNull();
 	}
@@ -2414,7 +2715,7 @@ namespace slib
 	{
 		if (other.isNotEmpty()) {
 			String16 s(*this);
-			_replaceContainer(String16::_merge8(s.getData(), s.getLength(), other.getData(), other.getLength()));
+			_replaceContainer(_priv_String16_merge8(s.getData(), s.getLength(), other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2428,7 +2729,7 @@ namespace slib
 			return other.getNotNull();
 		}
 		if (other.isNotEmpty()) {
-			return _merge8(getData(), n, other.getData(), other.getLength());
+			return _priv_String_merge8(getData(), n, other.getData(), other.getLength());
 		}
 		return getNotNull();
 	}
@@ -2441,7 +2742,7 @@ namespace slib
 			return (*this = other.getNotNull());
 		}
 		if (other.isNotEmpty()) {
-			_replaceContainer(_merge8(getData(), n, other.getData(), other.getLength()));
+			_replaceContainer(_priv_String_merge8(getData(), n, other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2454,7 +2755,7 @@ namespace slib
 			return other.getNotNull();
 		}
 		if (other.isNotEmpty()) {
-			return _merge16(getData(), n, other.getData(), other.getLength());
+			return _priv_String16_merge16(getData(), n, other.getData(), other.getLength());
 		}
 		return getNotNull();
 	}
@@ -2467,7 +2768,7 @@ namespace slib
 			return (*this = other.getNotNull());
 		}
 		if (other.isNotEmpty()) {
-			_replaceContainer(_merge16(getData(), n, other.getData(), other.getLength()));
+			_replaceContainer(_priv_String16_merge16(getData(), n, other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2481,7 +2782,7 @@ namespace slib
 			return other.getNotNull();
 		}
 		if (other.isNotEmpty()) {
-			return String::_merge8(s.getData(), n, other.getData(), other.getLength());
+			return _priv_String_merge8(s.getData(), n, other.getData(), other.getLength());
 		}
 		return s.getNotNull();
 	}
@@ -2495,7 +2796,7 @@ namespace slib
 			return (*this = other.getNotNull());
 		}
 		if (other.isNotEmpty()) {
-			_replaceContainer(String::_merge8(s.getData(), n, other.getData(), other.getLength()));
+			_replaceContainer(_priv_String_merge8(s.getData(), n, other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2509,7 +2810,7 @@ namespace slib
 			return other.getNotNull();
 		}
 		if (other.isNotEmpty()) {
-			return String16::_merge16(s.getData(), n, other.getData(), other.getLength());
+			return _priv_String16_merge16(s.getData(), n, other.getData(), other.getLength());
 		}
 		return s.getNotNull();
 	}
@@ -2523,7 +2824,7 @@ namespace slib
 			return (*this = other.getNotNull());
 		}
 		if (other.isNotEmpty()) {
-			_replaceContainer(String16::_merge16(s.getData(), n, other.getData(), other.getLength()));
+			_replaceContainer(_priv_String16_merge16(s.getData(), n, other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2533,7 +2834,7 @@ namespace slib
 	{
 		String16 other(_other);
 		if (other.isNotEmpty()) {
-			return _merge16(getData(), getLength(), other.getData(), other.getLength());
+			return _priv_String_merge16(getData(), getLength(), other.getData(), other.getLength());
 		}
 		return getNotNull();
 	}
@@ -2542,7 +2843,7 @@ namespace slib
 	{
 		String16 other(_other);
 		if (other.isNotEmpty()) {
-			_replaceContainer(_merge16(getData(), getLength(), other.getData(), other.getLength()));
+			_replaceContainer(_priv_String_merge16(getData(), getLength(), other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2551,7 +2852,7 @@ namespace slib
 	{
 		String other(_other);
 		if (other.isNotEmpty()) {
-			return _merge8(getData(), getLength(), other.getData(), other.getLength());
+			return _priv_String16_merge8(getData(), getLength(), other.getData(), other.getLength());
 		}
 		return getNotNull();
 	}
@@ -2560,7 +2861,7 @@ namespace slib
 	{
 		String other(_other);
 		if (other.isNotEmpty()) {
-			_replaceContainer(_merge8(getData(), getLength(), other.getData(), other.getLength()));
+			_replaceContainer(_priv_String16_merge8(getData(), getLength(), other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2570,7 +2871,7 @@ namespace slib
 		String s(*this);
 		String16 other(_other);
 		if (other.isNotEmpty()) {
-			return String::_merge16(s.getData(), s.getLength(), other.getData(), other.getLength());
+			return _priv_String_merge16(s.getData(), s.getLength(), other.getData(), other.getLength());
 		}
 		return s.getNotNull();
 	}
@@ -2580,7 +2881,7 @@ namespace slib
 		String16 other(_other);
 		if (other.isNotEmpty()) {
 			String s(*this);
-			_replaceContainer(String::_merge16(s.getData(), s.getLength(), other.getData(), other.getLength()));
+			_replaceContainer(_priv_String_merge16(s.getData(), s.getLength(), other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2590,17 +2891,17 @@ namespace slib
 		String16 s(*this);
 		String other(_other);
 		if (other.isNotEmpty()) {
-			return String16::_merge8(s.getData(), s.getLength(), other.getData(), other.getLength());
+			return _priv_String16_merge8(s.getData(), s.getLength(), other.getData(), other.getLength());
 		}
 		return s.getNotNull();
 	}
 
 	AtomicString16& Atomic<String16>::operator+=(const AtomicString& _other)
 	{
-		String16 s(*this);
 		String other(_other);
 		if (other.isNotEmpty()) {
-			_replaceContainer(String16::_merge8(s.getData(), s.getLength(), other.getData(), other.getLength()));
+			String16 s(*this);
+			_replaceContainer(_priv_String16_merge8(s.getData(), s.getLength(), other.getData(), other.getLength()));
 		}
 		return *this;
 	}
@@ -2609,7 +2910,7 @@ namespace slib
 	String String::operator+(const sl_char8* utf8) const
 	{
 		if (utf8) {
-			return _merge8(getData(), getLength(), utf8, -1);
+			return _priv_String_merge8(getData(), getLength(), utf8, -1);
 		}
 		return getNotNull();
 	}
@@ -2617,7 +2918,7 @@ namespace slib
 	String& String::operator+=(const sl_char8* utf8)
 	{
 		if (utf8) {
-			_replaceContainer(_merge8(getData(), getLength(), utf8, -1));
+			_replaceContainer(_priv_String_merge8(getData(), getLength(), utf8, -1));
 		}
 		return *this;
 	}
@@ -2625,7 +2926,7 @@ namespace slib
 	String16 String16::operator+(const sl_char8* utf8) const
 	{
 		if (utf8) {
-			return _merge8(getData(), getLength(), utf8, -1);
+			return _priv_String16_merge8(getData(), getLength(), utf8, -1);
 		}
 		return getNotNull();
 	}
@@ -2633,7 +2934,7 @@ namespace slib
 	String16& String16::operator+=(const sl_char8* utf8)
 	{
 		if (utf8) {
-			_replaceContainer(_merge8(getData(), getLength(), utf8, -1));
+			_replaceContainer(_priv_String16_merge8(getData(), getLength(), utf8, -1));
 		}
 		return *this;
 	}
@@ -2642,16 +2943,16 @@ namespace slib
 	{
 		String s(*this);
 		if (utf8) {
-			return String::_merge8(s.getData(), s.getLength(), utf8, -1);
+			return _priv_String_merge8(s.getData(), s.getLength(), utf8, -1);
 		}
 		return s.getNotNull();
 	}
 
 	AtomicString& Atomic<String>::operator+=(const sl_char8* utf8)
 	{
-		String s(*this);
 		if (utf8) {
-			_replaceContainer(String::_merge8(s.getData(), s.getLength(), utf8, -1));
+			String s(*this);
+			_replaceContainer(_priv_String_merge8(s.getData(), s.getLength(), utf8, -1));
 		}
 		return *this;
 	}
@@ -2660,16 +2961,16 @@ namespace slib
 	{
 		String16 s(*this);
 		if (utf8) {
-			return String16::_merge8(s.getData(), s.getLength(), utf8, -1);
+			return _priv_String16_merge8(s.getData(), s.getLength(), utf8, -1);
 		}
 		return s.getNotNull();
 	}
 
 	AtomicString16& Atomic<String16>::operator+=(const sl_char8* utf8)
 	{
-		String16 s(*this);
 		if (utf8) {
-			_replaceContainer(String16::_merge8(s.getData(), s.getLength(), utf8, -1));
+			String16 s(*this);
+			_replaceContainer(_priv_String16_merge8(s.getData(), s.getLength(), utf8, -1));
 		}
 		return *this;
 	}
@@ -2678,7 +2979,7 @@ namespace slib
 	String String::operator+(const sl_char16* utf16) const
 	{
 		if (utf16) {
-			return _merge16(getData(), getLength(), utf16, -1);
+			return _priv_String_merge16(getData(), getLength(), utf16, -1);
 		}
 		return getNotNull();
 	}
@@ -2686,7 +2987,7 @@ namespace slib
 	String& String::operator+=(const sl_char16* utf16)
 	{
 		if (utf16) {
-			_replaceContainer(_merge16(getData(), getLength(), utf16, -1));
+			_replaceContainer(_priv_String_merge16(getData(), getLength(), utf16, -1));
 		}
 		return *this;
 	}
@@ -2694,7 +2995,7 @@ namespace slib
 	String16 String16::operator+(const sl_char16* utf16) const
 	{
 		if (utf16) {
-			return _merge16(getData(), getLength(), utf16, -1);
+			return _priv_String16_merge16(getData(), getLength(), utf16, -1);
 		}
 		return getNotNull();
 	}
@@ -2702,7 +3003,7 @@ namespace slib
 	String16& String16::operator+=(const sl_char16* utf16)
 	{
 		if (utf16) {
-			_replaceContainer(_merge16(getData(), getLength(), utf16, -1));
+			_replaceContainer(_priv_String16_merge16(getData(), getLength(), utf16, -1));
 		}
 		return *this;
 	}
@@ -2711,16 +3012,16 @@ namespace slib
 	{
 		String s(*this);
 		if (utf16) {
-			return String::_merge16(s.getData(), s.getLength(), utf16, -1);
+			return _priv_String_merge16(s.getData(), s.getLength(), utf16, -1);
 		}
 		return s.getNotNull();
 	}
 
 	AtomicString& Atomic<String>::operator+=(const sl_char16* utf16)
 	{
-		String s(*this);
 		if (utf16) {
-			_replaceContainer(String::_merge16(s.getData(), s.getLength(), utf16, -1));
+			String s(*this);
+			_replaceContainer(_priv_String_merge16(s.getData(), s.getLength(), utf16, -1));
 		}
 		return *this;
 	}
@@ -2729,16 +3030,16 @@ namespace slib
 	{
 		String16 s(*this);
 		if (utf16) {
-			return String16::_merge16(s.getData(), s.getLength(), utf16, -1);
+			return _priv_String16_merge16(s.getData(), s.getLength(), utf16, -1);
 		}
 		return s.getNotNull();
 	}
 
 	AtomicString16& Atomic<String16>::operator+=(const sl_char16* utf16)
 	{
-		String16 s(*this);
 		if (utf16) {
-			_replaceContainer(String16::_merge16(s.getData(), s.getLength(), utf16, -1));
+			String16 s(*this);
+			_replaceContainer(_priv_String16_merge16(s.getData(), s.getLength(), utf16, -1));
 		}
 		return *this;
 	}
@@ -2747,7 +3048,7 @@ namespace slib
 	String String::operator+(const sl_char32* utf32) const
 	{
 		if (utf32) {
-			return _merge32(getData(), getLength(), utf32, -1);
+			return _priv_String_merge32(getData(), getLength(), utf32, -1);
 		}
 		return getNotNull();
 	}
@@ -2755,7 +3056,7 @@ namespace slib
 	String& String::operator+=(const sl_char32* utf32)
 	{
 		if (utf32) {
-			_replaceContainer(_merge32(getData(), getLength(), utf32, -1));
+			_replaceContainer(_priv_String_merge32(getData(), getLength(), utf32, -1));
 		}
 		return *this;
 	}
@@ -2763,7 +3064,7 @@ namespace slib
 	String16 String16::operator+(const sl_char32* utf32) const
 	{
 		if (utf32) {
-			return _merge32(getData(), getLength(), utf32, -1);
+			return _priv_String16_merge32(getData(), getLength(), utf32, -1);
 		}
 		return getNotNull();
 	}
@@ -2771,7 +3072,7 @@ namespace slib
 	String16& String16::operator+=(const sl_char32* utf32)
 	{
 		if (utf32) {
-			_replaceContainer(_merge32(getData(), getLength(), utf32, -1));
+			_replaceContainer(_priv_String16_merge32(getData(), getLength(), utf32, -1));
 		}
 		return *this;
 	}
@@ -2780,16 +3081,16 @@ namespace slib
 	{
 		String s(*this);
 		if (utf32) {
-			return String::_merge32(s.getData(), s.getLength(), utf32, -1);
+			return _priv_String_merge32(s.getData(), s.getLength(), utf32, -1);
 		}
 		return s.getNotNull();
 	}
 
 	AtomicString& Atomic<String>::operator+=(const sl_char32* utf32)
 	{
-		String s(*this);
 		if (utf32) {
-			_replaceContainer(String::_merge32(s.getData(), s.getLength(), utf32, -1));
+			String s(*this);
+			_replaceContainer(_priv_String_merge32(s.getData(), s.getLength(), utf32, -1));
 		}
 		return *this;
 	}
@@ -2798,16 +3099,16 @@ namespace slib
 	{
 		String16 s(*this);
 		if (utf32) {
-			return String16::_merge32(s.getData(), s.getLength(), utf32, -1);
+			return _priv_String16_merge32(s.getData(), s.getLength(), utf32, -1);
 		}
 		return s.getNotNull();
 	}
 
 	AtomicString16& Atomic<String16>::operator+=(const sl_char32* utf32)
 	{
-		String16 s(*this);
 		if (utf32) {
-			_replaceContainer(String16::_merge32(s.getData(), s.getLength(), utf32, -1));
+			String16 s(*this);
+			_replaceContainer(_priv_String16_merge32(s.getData(), s.getLength(), utf32, -1));
 		}
 		return *this;
 	}
@@ -2816,7 +3117,7 @@ namespace slib
 	String operator+(const sl_char8* utf8, const String& s)
 	{
 		if (utf8) {
-			return String::_merge8(utf8, -1, s.getData(), s.getLength());
+			return _priv_String_merge8(utf8, -1, s.getData(), s.getLength());
 		}
 		return s.getNotNull();
 	}
@@ -2824,7 +3125,7 @@ namespace slib
 	String16 operator+(const sl_char8* utf8, const String16& s)
 	{
 		if (utf8) {
-			return String16::_merge8(utf8, -1, s.getData(), s.getLength());
+			return _priv_String16_merge8(utf8, -1, s.getData(), s.getLength());
 		}
 		return s.getNotNull();
 	}
@@ -2843,7 +3144,7 @@ namespace slib
 	String operator+(const sl_char16* utf16, const String& s)
 	{
 		if (utf16) {
-			return String::_merge16(utf16, -1, s.getData(), s.getLength());
+			return _priv_String_merge16(utf16, -1, s.getData(), s.getLength());
 		}
 		return s.getNotNull();
 	}
@@ -2851,7 +3152,7 @@ namespace slib
 	String16 operator+(const sl_char16* utf16, const String16& s)
 	{
 		if (utf16) {
-			return String16::_merge16(utf16, -1, s.getData(), s.getLength());
+			return _priv_String16_merge16(utf16, -1, s.getData(), s.getLength());
 		}
 		return s.getNotNull();
 	}
@@ -2870,7 +3171,7 @@ namespace slib
 	String operator+(const sl_char32* utf32, const String& s)
 	{
 		if (utf32) {
-			return String::_merge32(utf32, -1, s.getData(), s.getLength());
+			return _priv_String_merge32(utf32, -1, s.getData(), s.getLength());
 		}
 		return s.getNotNull();
 	}
@@ -2878,7 +3179,7 @@ namespace slib
 	String16 operator+(const sl_char32* utf32, const String16& s)
 	{
 		if (utf32) {
-			return String16::_merge32(utf32, -1, s.getData(), s.getLength());
+			return _priv_String16_merge32(utf32, -1, s.getData(), s.getLength());
 		}
 		return s.getNotNull();
 	}
@@ -2891,6 +3192,111 @@ namespace slib
 	String16 operator+(const sl_char32* utf32, const AtomicString16& s)
 	{
 		return utf32 + String16(s);
+	}
+
+	
+	String String::operator+(const std::string& str) const
+	{
+		sl_size n = str.length();
+		if (n > 0) {
+			return _priv_String_merge8(getData(), getLength(), str.c_str(), n);
+		}
+		return getNotNull();
+	}
+	
+	String& String::operator+=(const std::string& str)
+	{
+		sl_size n = str.length();
+		if (n > 0) {
+			_replaceContainer(_priv_String_merge8(getData(), getLength(), str.c_str(), n));
+		}
+		return *this;
+	}
+	
+	String16 String16::operator+(const std::u16string& str) const
+	{
+		sl_size n = str.length();
+		if (n > 0) {
+			return _priv_String16_merge16(getData(), getLength(), str.c_str(), n);
+		}
+		return getNotNull();
+	}
+	
+	String16& String16::operator+=(const std::u16string& str)
+	{
+		sl_size n = str.length();
+		if (n > 0) {
+			_replaceContainer(_priv_String16_merge16(getData(), getLength(), str.c_str(), n));
+		}
+		return *this;
+	}
+	
+	String Atomic<String>::operator+(const std::string& str) const
+	{
+		String s(*this);
+		sl_size n = str.length();
+		if (n > 0) {
+			return _priv_String_merge8(s.getData(), s.getLength(), str.c_str(), n);
+		}
+		return s.getNotNull();
+	}
+	
+	AtomicString& Atomic<String>::operator+=(const std::string& str)
+	{
+		sl_size n = str.length();
+		if (n > 0) {
+			String s(*this);
+			_replaceContainer(_priv_String_merge8(s.getData(), s.getLength(), str.c_str(), n));
+		}
+		return *this;
+	}
+	
+	String16 Atomic<String16>::operator+(const std::u16string& str) const
+	{
+		String16 s(*this);
+		sl_size n = str.length();
+		if (n > 0) {
+			return _priv_String16_merge16(s.getData(), s.getLength(), str.c_str(), n);
+		}
+		return s.getNotNull();
+	}
+	
+	AtomicString16& Atomic<String16>::operator+=(const std::u16string& str)
+	{
+		sl_size n = str.length();
+		if (n > 0) {
+			String16 s(*this);
+			_replaceContainer(_priv_String16_merge16(s.getData(), s.getLength(), str.c_str(), n));
+		}
+		return *this;
+	}
+	
+	String operator+(const std::string& str, const String& s)
+	{
+		sl_size n = str.length();
+		if (n > 0) {
+			return _priv_String_merge8(str.c_str(), n, s.getData(), s.getLength());
+		}
+		return s.getNotNull();
+	}
+	
+	String16 operator+(const std::u16string& str, const String16& s)
+	{
+		sl_size n = str.length();
+		if (n > 0) {
+			return _priv_String16_merge16(str.c_str(), n, s.getData(), s.getLength());
+		}
+		return s.getNotNull();
+	}
+	
+	String operator+(const std::string& str, const AtomicString& s)
+	{
+		return str + String(s);
+	}
+	
+	String16 operator+(const std::u16string& str, const AtomicString16& s)
+	{
+		return str + String16(s);
 	}
 
 
@@ -3332,17 +3738,19 @@ namespace slib
 		if (len != other.getLength()) {
 			return sl_false;
 		}
-		if (getHashCode() != other.getHashCode()) {
-			return sl_false;
+		if (len == 0) {
+			return sl_true;
 		}
-		for (sl_size i = 0; i < len; i++) {
-			sl_char8 c1 = s1[i];
-			sl_char8 c2 = s2[i];
-			if (c1 != c2) {
-				return sl_false;
+		sl_uint32 h1 = m_container->hash;
+		if (h1) {
+			sl_uint32 h2 = other.m_container->hash;
+			if (h2) {
+				if (h1 != h2) {
+					return sl_false;
+				}
 			}
 		}
-		return sl_true;
+		return Base::equalsMemory(s1, s2, len);
 	}
 
 	sl_bool String16::equals(const String16& other) const
@@ -3356,17 +3764,19 @@ namespace slib
 		if (len != other.getLength()) {
 			return sl_false;
 		}
-		if (getHashCode() != other.getHashCode()) {
-			return sl_false;
+		if (len == 0) {
+			return sl_true;
 		}
-		for (sl_size i = 0; i < len; i++) {
-			sl_char16 c1 = s1[i];
-			sl_char16 c2 = s2[i];
-			if (c1 != c2) {
-				return sl_false;
+		sl_uint32 h1 = m_container->hash;
+		if (h1) {
+			sl_uint32 h2 = other.m_container->hash;
+			if (h2) {
+				if (h1 != h2) {
+					return sl_false;
+				}
 			}
 		}
-		return sl_true;
+		return Base::equalsMemory2((sl_uint16*)s1, (sl_uint16*)s2, len);
 	}
 
 	sl_bool Atomic<String>::equals(const String& other) const
@@ -3382,30 +3792,14 @@ namespace slib
 	}
 
 
-	sl_bool String::equals(const String16& _other) const
+	sl_bool String::equals(const String16& other) const
 	{
-		String other(_other);
-		sl_size l1 = getLength();
-		sl_size l2 = other.getLength();
-		if (l1 != l2) {
-			return sl_false;
-		}
-		sl_char8* s1 = getData();
-		sl_char8* s2 = other.getData();
-		return _equals8(s1, l1, s2, l2);
+		return equals(String(other));
 	}
 
-	sl_bool String16::equals(const String& _other) const
+	sl_bool String16::equals(const String& other) const
 	{
-		String16 other(_other);
-		sl_size l1 = getLength();
-		sl_size l2 = other.getLength();
-		if (l1 != l2) {
-			return sl_false;
-		}
-		sl_char16* s1 = getData();
-		sl_char16* s2 = other.getData();
-		return _equals16(s1, l1, s2, l2);
+		return equals(String16(other));
 	}
 
 	sl_bool Atomic<String>::equals(const String16& other) const
@@ -3481,12 +3875,12 @@ namespace slib
 		if (sz == utf8) {
 			return sl_true;
 		}
-		return _equals8(sz, getLength(), utf8, -1);
+		return _priv_String_equals8(sz, getLength(), utf8, -1);
 	}
 
 	sl_bool String16::equals(const sl_char8* utf8) const
 	{
-		return _equals8(getData(), getLength(), utf8, -1);
+		return _priv_String16_equals8(getData(), getLength(), utf8, -1);
 	}
 
 	sl_bool Atomic<String>::equals(const sl_char8* utf8) const
@@ -3496,19 +3890,19 @@ namespace slib
 		if (sz == utf8) {
 			return sl_true;
 		}
-		return String::_equals8(sz, s.getLength(), utf8, -1);
+		return _priv_String_equals8(sz, s.getLength(), utf8, -1);
 	}
 
 	sl_bool Atomic<String16>::equals(const sl_char8* utf8) const
 	{
 		String16 s(*this);
-		return String16::_equals8(s.getData(), s.getLength(), utf8, -1);
+		return _priv_String16_equals8(s.getData(), s.getLength(), utf8, -1);
 	}
 
 
 	sl_bool String::equals(const sl_char16* utf16) const
 	{
-		return _equals16(getData(), getLength(), utf16, -1);
+		return _priv_String_equals16(getData(), getLength(), utf16, -1);
 	}
 
 	sl_bool String16::equals(const sl_char16* utf16) const
@@ -3517,13 +3911,13 @@ namespace slib
 		if (sz == utf16) {
 			return sl_true;
 		}
-		return _equals16(sz, getLength(), utf16, -1);
+		return _priv_String16_equals16(sz, getLength(), utf16, -1);
 	}
 
 	sl_bool Atomic<String>::equals(const sl_char16* utf16) const
 	{
 		String s(*this);
-		return String::_equals16(s.getData(), s.getLength(), utf16, -1);
+		return _priv_String_equals16(s.getData(), s.getLength(), utf16, -1);
 	}
 
 	sl_bool Atomic<String16>::equals(const sl_char16* utf16) const
@@ -3533,33 +3927,66 @@ namespace slib
 		if (sz == utf16) {
 			return sl_true;
 		}
-		return String16::_equals16(sz, s.getLength(), utf16, -1);
+		return _priv_String16_equals16(sz, s.getLength(), utf16, -1);
 	}
 
 
 	sl_bool String::equals(const sl_char32* utf32) const
 	{
-		return _equals32(getData(), getLength(), utf32, -1);
+		return _priv_String_equals32(getData(), getLength(), utf32, -1);
 	}
 
 	sl_bool String16::equals(const sl_char32* utf32) const
 	{
-		return _equals32(getData(), getLength(), utf32, -1);
+		return _priv_String16_equals32(getData(), getLength(), utf32, -1);
 	}
 
 	sl_bool Atomic<String>::equals(const sl_char32* utf32) const
 	{
 		String s(*this);
-		return String::_equals32(s.getData(), s.getLength(), utf32, -1);
+		return _priv_String_equals32(s.getData(), s.getLength(), utf32, -1);
 	}
 
 	sl_bool Atomic<String16>::equals(const sl_char32* utf32) const
 	{
 		String16 s(*this);
-		return String16::_equals32(s.getData(), s.getLength(), utf32, -1);
+		return _priv_String16_equals32(s.getData(), s.getLength(), utf32, -1);
 	}
 
+	
+	sl_bool String::equals(const std::string& str) const
+	{
+		const sl_char8* s1 = getData();
+		const sl_char8* s2 = str.c_str();
+		if (s1 == s2) {
+			return sl_true;
+		}
+		return _priv_String_equals_objects(s1, getLength(), s2, str.length());
+	}
+	
+	sl_bool String16::equals(const std::u16string& str) const
+	{
+		const sl_char16* s1 = getData();
+		const sl_char16* s2 = str.c_str();
+		if (s1 == s2) {
+			return sl_true;
+		}
+		return _priv_String16_equals_objects(s1, getLength(), s2, str.length());
+	}
+	
+	sl_bool Atomic<String>::equals(const std::string& str) const
+	{
+		String s(*this);
+		return s.equals(str);
+	}
+	
+	sl_bool Atomic<String16>::equals(const std::u16string& str) const
+	{
+		String16 s(*this);
+		return s.equals(str);
+	}
 
+	
 	sl_int32 String::compare(const String& other) const
 	{
 		sl_char8* s1 = getData();
@@ -3569,35 +3996,7 @@ namespace slib
 		}
 		sl_size len1 = getLength();
 		sl_size len2 = other.getLength();
-		sl_size len = SLIB_MIN(len1, len2);
-		for (sl_size i = 0; i < len; i++) {
-			sl_uint8 c1 = s1[i];
-			sl_uint8 c2 = s2[i];
-			if (c1 < c2) {
-				return -1;
-			}
-			if (c1 > c2) {
-				return 1;
-			}
-			if (c1 == 0) {
-				return 0;
-			}
-		}
-		if (len1 < len2) {
-			if (s2[len1] == 0) {
-				return 0;
-			} else {
-				return -1;
-			}
-		}
-		if (len1 > len2) {
-			if (s1[len2] == 0) {
-				return 0;
-			} else {
-				return 1;
-			}
-		}
-		return 0;
+		return _priv_String_compare_objects(s1, len1, s2, len2);
 	}
 
 	sl_int32 String16::compare(const String16& other) const
@@ -3609,35 +4008,7 @@ namespace slib
 		}
 		sl_size len1 = getLength();
 		sl_size len2 = other.getLength();
-		sl_size len = SLIB_MIN(len1, len2);
-		for (sl_size i = 0; i < len; i++) {
-			sl_uint16 c1 = s1[i];
-			sl_uint16 c2 = s2[i];
-			if (c1 < c2) {
-				return -1;
-			}
-			if (c1 > c2) {
-				return 1;
-			}
-			if (c1 == 0) {
-				return 0;
-			}
-		}
-		if (len1 < len2) {
-			if (s2[len1] == 0) {
-				return 0;
-			} else {
-				return -1;
-			}
-		}
-		if (len1 > len2) {
-			if (s1[len2] == 0) {
-				return 0;
-			} else {
-				return 1;
-			}
-		}
-		return 0;
+		return _priv_String16_compare_objects(s1, len1, s2, len2);
 	}
 
 	sl_int32 Atomic<String>::compare(const String& other) const
@@ -3656,13 +4027,13 @@ namespace slib
 	sl_int32 String::compare(const String16& _other) const
 	{
 		String other(_other);
-		return _compare8(getData(), getLength(), other.getData(), other.getLength());
+		return compare(other);
 	}
 
 	sl_int32 String16::compare(const String& _other) const
 	{
 		String16 other(_other);
-		return _compare16(getData(), getLength(), other.getData(), other.getLength());
+		return compare(other);
 	}
 
 	sl_int32 Atomic<String>::compare(const String16& other) const
@@ -3736,14 +4107,14 @@ namespace slib
 	{
 		sl_char8* sz = getData();
 		if (sz == utf8) {
-			return sl_true;
+			return 0;
 		}
-		return _compare8(sz, getLength(), utf8, -1);
+		return _priv_String_compare8(sz, getLength(), utf8, -1);
 	}
 
 	sl_int32 String16::compare(const sl_char8* utf8) const
 	{
-		return _compare8(getData(), getLength(), utf8, -1);
+		return _priv_String16_compare8(getData(), getLength(), utf8, -1);
 	}
 
 	sl_int32 Atomic<String>::compare(const sl_char8* utf8) const
@@ -3761,16 +4132,16 @@ namespace slib
 
 	sl_int32 String::compare(const sl_char16* utf16) const
 	{
-		return _compare16(getData(), getLength(), utf16, -1);
+		return _priv_String_compare16(getData(), getLength(), utf16, -1);
 	}
 
 	sl_int32 String16::compare(const sl_char16* utf16) const
 	{
 		sl_char16* sz = getData();
 		if (sz == utf16) {
-			return sl_true;
+			return 0;
 		}
-		return _compare16(sz, getLength(), utf16, -1);
+		return _priv_String16_compare16(sz, getLength(), utf16, -1);
 	}
 
 	sl_int32 Atomic<String>::compare(const sl_char16* utf16) const
@@ -3788,12 +4159,12 @@ namespace slib
 
 	sl_int32 String::compare(const sl_char32* utf32) const
 	{
-		return _compare32(getData(), getLength(), utf32, -1);
+		return _priv_String_compare32(getData(), getLength(), utf32, -1);
 	}
 
 	sl_int32 String16::compare(const sl_char32* utf32) const
 	{
-		return _compare32(getData(), getLength(), utf32, -1);
+		return _priv_String16_compare32(getData(), getLength(), utf32, -1);
 	}
 
 	sl_int32 Atomic<String>::compare(const sl_char32* utf32) const
@@ -3807,7 +4178,40 @@ namespace slib
 		String16 s(*this);
 		return s.compare(utf32);
 	}
-
+	
+	
+	sl_int32 String::compare(const std::string& str) const
+	{
+		const sl_char8* s1 = getData();
+		const sl_char8* s2 = str.c_str();
+		if (s1 == s2) {
+			return 0;
+		}
+		return _priv_String_compare_objects(s1, getLength(), s2, str.length());
+	}
+	
+	sl_int32 String16::compare(const std::u16string& str) const
+	{
+		const sl_char16* s1 = getData();
+		const sl_char16* s2 = str.c_str();
+		if (s1 == s2) {
+			return 0;
+		}
+		return _priv_String16_compare_objects(s1, getLength(), s2, str.length());
+	}
+	
+	sl_int32 Atomic<String>::compare(const std::string& str) const
+	{
+		String s(*this);
+		return s.compare(str);
+	}
+	
+	sl_int32 Atomic<String16>::compare(const std::u16string& str) const
+	{
+		String16 s(*this);
+		return s.compare(str);
+	}
+	
 
 	sl_int32 String::compare(const String& other, sl_size len) const
 	{
@@ -3824,7 +4228,7 @@ namespace slib
 		if (l2 > len) {
 			l2 = len;
 		}
-		return _compare8(s1, l1, s2, l2);
+		return _priv_String_compare_objects(s1, l1, s2, l2);
 	}
 
 	sl_int32 String16::compare(const String16& other, sl_size len) const
@@ -3842,7 +4246,7 @@ namespace slib
 		if (l2 > len) {
 			l2 = len;
 		}
-		return _compare16(s1, l1, s2, l2);
+		return _priv_String16_compare_objects(s1, l1, s2, l2);
 	}
 
 	sl_int32 Atomic<String>::compare(const String& other, sl_size len) const
@@ -4014,7 +4418,7 @@ namespace slib
 	}
 
 
-#define _DEFINE_STRING_COMPARE_FUNCS(CLASS, OP, BODY, BODY_FRIEND) \
+#define PRIV_DEFINE_STRING_COMPARE_FUNCS(CLASS, OP, BODY, BODY_FRIEND, STD) \
 	sl_bool CLASS::OP(const String& other) const \
 	{ \
 		return BODY; \
@@ -4043,6 +4447,10 @@ namespace slib
 	{ \
 		return BODY; \
 	} \
+	sl_bool CLASS::OP(const STD& other) const \
+	{ \
+		return BODY; \
+	} \
 	sl_bool OP(const sl_char8* other, const CLASS& s) \
 	{ \
 		return BODY_FRIEND; \
@@ -4054,36 +4462,40 @@ namespace slib
 	sl_bool OP(const sl_char32* other, const CLASS& s) \
 	{ \
 		return BODY_FRIEND; \
+	} \
+	sl_bool OP(const STD& other, const CLASS& s) \
+	{ \
+		return BODY_FRIEND; \
 	}
 
 
-	_DEFINE_STRING_COMPARE_FUNCS(String, operator==, equals(other), s.equals(other))
-	_DEFINE_STRING_COMPARE_FUNCS(String, operator!=, !(equals(other)), !(s.equals(other)))
-	_DEFINE_STRING_COMPARE_FUNCS(String, operator>=, compare(other)>=0, s.compare(other)<=0)
-	_DEFINE_STRING_COMPARE_FUNCS(String, operator<=, compare(other)<=0, s.compare(other)>=0)
-	_DEFINE_STRING_COMPARE_FUNCS(String, operator>, compare(other)>0, s.compare(other)<0)
-	_DEFINE_STRING_COMPARE_FUNCS(String, operator<, compare(other)<0, s.compare(other)>0)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(String, operator==, equals(other), s.equals(other), std::string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(String, operator!=, !(equals(other)), !(s.equals(other)), std::string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(String, operator>=, compare(other)>=0, s.compare(other)<=0, std::string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(String, operator<=, compare(other)<=0, s.compare(other)>=0, std::string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(String, operator>, compare(other)>0, s.compare(other)<0, std::string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(String, operator<, compare(other)<0, s.compare(other)>0, std::string)
 
-	_DEFINE_STRING_COMPARE_FUNCS(String16, operator==, equals(other), s.equals(other))
-	_DEFINE_STRING_COMPARE_FUNCS(String16, operator!=, !(equals(other)), !(s.equals(other)))
-	_DEFINE_STRING_COMPARE_FUNCS(String16, operator>=, compare(other)>=0, s.compare(other)<=0)
-	_DEFINE_STRING_COMPARE_FUNCS(String16, operator<=, compare(other)<=0, s.compare(other)>=0)
-	_DEFINE_STRING_COMPARE_FUNCS(String16, operator>, compare(other)>0, s.compare(other)<0)
-	_DEFINE_STRING_COMPARE_FUNCS(String16, operator<, compare(other)<0, s.compare(other)>0)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(String16, operator==, equals(other), s.equals(other), std::u16string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(String16, operator!=, !(equals(other)), !(s.equals(other)), std::u16string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(String16, operator>=, compare(other)>=0, s.compare(other)<=0, std::u16string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(String16, operator<=, compare(other)<=0, s.compare(other)>=0, std::u16string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(String16, operator>, compare(other)>0, s.compare(other)<0, std::u16string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(String16, operator<, compare(other)<0, s.compare(other)>0, std::u16string)
 
-	_DEFINE_STRING_COMPARE_FUNCS(AtomicString, operator==, equals(other), s.equals(other))
-	_DEFINE_STRING_COMPARE_FUNCS(AtomicString, operator!=, !(equals(other)), !(s.equals(other)))
-	_DEFINE_STRING_COMPARE_FUNCS(AtomicString, operator>=, compare(other)>=0, s.compare(other)<=0)
-	_DEFINE_STRING_COMPARE_FUNCS(AtomicString, operator<=, compare(other)<=0, s.compare(other)>=0)
-	_DEFINE_STRING_COMPARE_FUNCS(AtomicString, operator>, compare(other)>0, s.compare(other)<0)
-	_DEFINE_STRING_COMPARE_FUNCS(AtomicString, operator<, compare(other)<0, s.compare(other)>0)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(AtomicString, operator==, equals(other), s.equals(other), std::string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(AtomicString, operator!=, !(equals(other)), !(s.equals(other)), std::string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(AtomicString, operator>=, compare(other)>=0, s.compare(other)<=0, std::string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(AtomicString, operator<=, compare(other)<=0, s.compare(other)>=0, std::string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(AtomicString, operator>, compare(other)>0, s.compare(other)<0, std::string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(AtomicString, operator<, compare(other)<0, s.compare(other)>0, std::string)
 
-	_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator==, equals(other), s.equals(other))
-	_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator!=, !(equals(other)), !(s.equals(other)))
-	_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator>=, compare(other)>=0, s.compare(other)<=0)
-	_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator<=, compare(other)<=0, s.compare(other)>=0)
-	_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator>, compare(other)>0, s.compare(other)<0)
-	_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator<, compare(other)<0, s.compare(other)>0)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator==, equals(other), s.equals(other), std::u16string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator!=, !(equals(other)), !(s.equals(other)), std::u16string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator>=, compare(other)>=0, s.compare(other)<=0, std::u16string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator<=, compare(other)<=0, s.compare(other)>=0, std::u16string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator>, compare(other)>0, s.compare(other)<0, std::u16string)
+	PRIV_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator<, compare(other)<0, s.compare(other)>0, std::u16string)
 
 	String String::duplicate() const
 	{
@@ -4492,7 +4904,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class TT>
-	SLIB_INLINE sl_reg _String_indexOf(const ST& str, const CT* bufPat, sl_size countPat, sl_reg _start)
+	SLIB_INLINE sl_reg _priv_String_indexOf(const ST& str, const CT* bufPat, sl_size countPat, sl_reg _start)
 	{
 		if (countPat == 0) {
 			return 0;
@@ -4530,12 +4942,12 @@ namespace slib
 
 	sl_reg String::indexOf(const String& pattern, sl_reg start) const
 	{
-		return _String_indexOf<String, sl_char8, _TemplateFunc8>(*this, pattern.getData(), pattern.getLength(), start);
+		return _priv_String_indexOf<String, sl_char8, _priv_TemplateFunc8>(*this, pattern.getData(), pattern.getLength(), start);
 	}
 
 	sl_reg String16::indexOf(const String16& pattern, sl_reg start) const
 	{
-		return _String_indexOf<String16, sl_char16, _TemplateFunc16>(*this, pattern.getData(), pattern.getLength(), start);
+		return _priv_String_indexOf<String16, sl_char16, _priv_TemplateFunc16>(*this, pattern.getData(), pattern.getLength(), start);
 	}
 
 	sl_reg Atomic<String>::indexOf(const String& str, sl_reg start) const
@@ -4552,12 +4964,12 @@ namespace slib
 
 	sl_reg String::indexOf(const sl_char8* pattern, sl_reg start) const
 	{
-		return _String_indexOf<String, sl_char8, _TemplateFunc8>(*this, pattern, Base::getStringLength(pattern), start);
+		return _priv_String_indexOf<String, sl_char8, _priv_TemplateFunc8>(*this, pattern, Base::getStringLength(pattern), start);
 	}
 
 	sl_reg String16::indexOf(const sl_char16* pattern, sl_reg start) const
 	{
-		return _String_indexOf<String16, sl_char16, _TemplateFunc16>(*this, pattern, Base::getStringLength2(pattern), start);
+		return _priv_String_indexOf<String16, sl_char16, _priv_TemplateFunc16>(*this, pattern, Base::getStringLength2(pattern), start);
 	}
 
 	sl_reg Atomic<String>::indexOf(const sl_char8* pattern, sl_reg start) const
@@ -4633,7 +5045,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class TT>
-	SLIB_INLINE sl_reg _String_lastIndexOf(const ST& str, const CT* bufPat, sl_size countPat, sl_reg _start)
+	SLIB_INLINE sl_reg _priv_String_lastIndexOf(const ST& str, const CT* bufPat, sl_size countPat, sl_reg _start)
 	{
 		if (countPat == 0) {
 			return 0;
@@ -4672,12 +5084,12 @@ namespace slib
 
 	sl_reg String::lastIndexOf(const String& pattern, sl_reg start) const
 	{
-		return _String_lastIndexOf<String, sl_char8, _TemplateFunc8>(*this, pattern.getData(), pattern.getLength(), start);
+		return _priv_String_lastIndexOf<String, sl_char8, _priv_TemplateFunc8>(*this, pattern.getData(), pattern.getLength(), start);
 	}
 
 	sl_reg String16::lastIndexOf(const String16& pattern, sl_reg start) const
 	{
-		return _String_lastIndexOf<String16, sl_char16, _TemplateFunc16>(*this, pattern.getData(), pattern.getLength(), start);
+		return _priv_String_lastIndexOf<String16, sl_char16, _priv_TemplateFunc16>(*this, pattern.getData(), pattern.getLength(), start);
 	}
 
 	sl_reg Atomic<String>::lastIndexOf(const String& str, sl_reg start) const
@@ -4694,12 +5106,12 @@ namespace slib
 
 	sl_reg String::lastIndexOf(const sl_char8* pattern, sl_reg start) const
 	{
-		return _String_lastIndexOf<String, sl_char8, _TemplateFunc8>(*this, pattern, Base::getStringLength(pattern), start);
+		return _priv_String_lastIndexOf<String, sl_char8, _priv_TemplateFunc8>(*this, pattern, Base::getStringLength(pattern), start);
 	}
 
 	sl_reg String16::lastIndexOf(const sl_char16* pattern, sl_reg start) const
 	{
-		return _String_lastIndexOf<String16, sl_char16, _TemplateFunc16>(*this, pattern, Base::getStringLength2(pattern), start);
+		return _priv_String_lastIndexOf<String16, sl_char16, _priv_TemplateFunc16>(*this, pattern, Base::getStringLength2(pattern), start);
 	}
 
 	sl_reg Atomic<String>::lastIndexOf(const sl_char8* pattern, sl_reg start) const
@@ -5014,7 +5426,7 @@ namespace slib
 	}
 
 	template <class CT>
-	SLIB_INLINE void _String_copyMakingUpper(CT* dst, const CT* src, sl_size len)
+	SLIB_INLINE void _priv_String_copyMakingUpper(CT* dst, const CT* src, sl_size len)
 	{
 		for (sl_size i = 0; i < len; i++) {
 			dst[i] = SLIB_CHAR_LOWER_TO_UPPER(src[i]);
@@ -5022,7 +5434,7 @@ namespace slib
 	}
 
 	template <class CT>
-	SLIB_INLINE void _String_copyMakingLower(CT* dst, const CT* src, sl_size len)
+	SLIB_INLINE void _priv_String_copyMakingLower(CT* dst, const CT* src, sl_size len)
 	{
 		for (sl_size i = 0; i < len; i++) {
 			dst[i] = SLIB_CHAR_UPPER_TO_LOWER(src[i]);
@@ -5031,46 +5443,46 @@ namespace slib
 
 	void String::makeUpper()
 	{
-		_String_copyMakingUpper(getData(), getData(), getLength());
+		_priv_String_copyMakingUpper(getData(), getData(), getLength());
 	}
 
 	void String16::makeUpper()
 	{
-		_String_copyMakingUpper(getData(), getData(), getLength());
+		_priv_String_copyMakingUpper(getData(), getData(), getLength());
 	}
 
 	void Atomic<String>::makeUpper()
 	{
 		String s(*this);
-		_String_copyMakingUpper(s.getData(), s.getData(), s.getLength());
+		_priv_String_copyMakingUpper(s.getData(), s.getData(), s.getLength());
 	}
 
 	void Atomic<String16>::makeUpper()
 	{
 		String16 s(*this);
-		_String_copyMakingUpper(s.getData(), s.getData(), s.getLength());
+		_priv_String_copyMakingUpper(s.getData(), s.getData(), s.getLength());
 	}
 
 	void String::makeLower()
 	{
-		_String_copyMakingLower(getData(), getData(), getLength());
+		_priv_String_copyMakingLower(getData(), getData(), getLength());
 	}
 
 	void String16::makeLower()
 	{
-		_String_copyMakingLower(getData(), getData(), getLength());
+		_priv_String_copyMakingLower(getData(), getData(), getLength());
 	}
 
 	void Atomic<String>::makeLower()
 	{
 		String s(*this);
-		_String_copyMakingLower(s.getData(), s.getData(), s.getLength());
+		_priv_String_copyMakingLower(s.getData(), s.getData(), s.getLength());
 	}
 
 	void Atomic<String16>::makeLower()
 	{
 		String16 s(*this);
-		_String_copyMakingLower(s.getData(), s.getData(), s.getLength());
+		_priv_String_copyMakingLower(s.getData(), s.getData(), s.getLength());
 	}
 
 	String String::toUpper(const sl_char8* sz, sl_reg _len)
@@ -5088,7 +5500,7 @@ namespace slib
 		if (ret.isNull()) {
 			return ret;
 		}
-		_String_copyMakingUpper(ret.getData(), sz, len);
+		_priv_String_copyMakingUpper(ret.getData(), sz, len);
 		return ret;
 	}
 
@@ -5107,7 +5519,7 @@ namespace slib
 		if (ret.isNull()) {
 			return ret;
 		}
-		_String_copyMakingUpper(ret.getData(), sz, len);
+		_priv_String_copyMakingUpper(ret.getData(), sz, len);
 		return ret;
 	}
 
@@ -5126,7 +5538,7 @@ namespace slib
 		if (ret.isNull()) {
 			return ret;
 		}
-		_String_copyMakingLower(ret.getData(), sz, len);
+		_priv_String_copyMakingLower(ret.getData(), sz, len);
 		return ret;
 	}
 
@@ -5145,7 +5557,7 @@ namespace slib
 		if (ret.isNull()) {
 			return ret;
 		}
-		_String_copyMakingLower(ret.getData(), sz, len);
+		_priv_String_copyMakingLower(ret.getData(), sz, len);
 		return ret;
 	}
 
@@ -5225,7 +5637,7 @@ namespace slib
 	};
 
 	template <class ST, class CT>
-	SLIB_INLINE ST _String_replaceAll(const ST& str, const CT* pattern, sl_reg countPat, const CT* bufReplace, sl_reg countReplace)
+	SLIB_INLINE ST _priv_String_replaceAll(const ST& str, const CT* pattern, sl_reg countPat, const CT* bufReplace, sl_reg countReplace)
 	{
 		if (countPat == 0) {
 			return sl_null;
@@ -5270,12 +5682,12 @@ namespace slib
 
 	String String::replaceAll(const String& pattern, const String& replacement) const
 	{
-		return _String_replaceAll<String, sl_char8>(*this, pattern.getData(), pattern.getLength(), replacement.getData(), replacement.getLength());
+		return _priv_String_replaceAll<String, sl_char8>(*this, pattern.getData(), pattern.getLength(), replacement.getData(), replacement.getLength());
 	}
 
 	String16 String16::replaceAll(const String16& pattern, const String16& replacement) const
 	{
-		return _String_replaceAll<String16, sl_char16>(*this, pattern.getData(), pattern.getLength(), replacement.getData(), replacement.getLength());
+		return _priv_String_replaceAll<String16, sl_char16>(*this, pattern.getData(), pattern.getLength(), replacement.getData(), replacement.getLength());
 	}
 
 	String Atomic<String>::replaceAll(const String& pattern, const String& replacement) const
@@ -5292,12 +5704,12 @@ namespace slib
 
 	String String::replaceAll(const String& pattern, const sl_char8* replacement) const
 	{
-		return _String_replaceAll<String, sl_char8>(*this, pattern.getData(), pattern.getLength(), replacement, Base::getStringLength(replacement));
+		return _priv_String_replaceAll<String, sl_char8>(*this, pattern.getData(), pattern.getLength(), replacement, Base::getStringLength(replacement));
 	}
 
 	String16 String16::replaceAll(const String16& pattern, const sl_char16* replacement) const
 	{
-		return _String_replaceAll<String16, sl_char16>(*this, pattern.getData(), pattern.getLength(), replacement, Base::getStringLength2(replacement));
+		return _priv_String_replaceAll<String16, sl_char16>(*this, pattern.getData(), pattern.getLength(), replacement, Base::getStringLength2(replacement));
 	}
 
 	String Atomic<String>::replaceAll(const String& pattern, const sl_char8* replacement) const
@@ -5314,12 +5726,12 @@ namespace slib
 
 	String String::replaceAll(const sl_char8* pattern, const String& replacement) const
 	{
-		return _String_replaceAll<String, sl_char8>(*this, pattern, Base::getStringLength(pattern), replacement.getData(), replacement.getLength());
+		return _priv_String_replaceAll<String, sl_char8>(*this, pattern, Base::getStringLength(pattern), replacement.getData(), replacement.getLength());
 	}
 
 	String16 String16::replaceAll(const sl_char16* pattern, const String16& replacement) const
 	{
-		return _String_replaceAll<String16, sl_char16>(*this, pattern, Base::getStringLength2(pattern), replacement.getData(), replacement.getLength());
+		return _priv_String_replaceAll<String16, sl_char16>(*this, pattern, Base::getStringLength2(pattern), replacement.getData(), replacement.getLength());
 	}
 
 	String Atomic<String>::replaceAll(const sl_char8* pattern, const String& replacement) const
@@ -5336,12 +5748,12 @@ namespace slib
 
 	String String::replaceAll(const sl_char8* pattern, const sl_char8* replacement) const
 	{
-		return _String_replaceAll<String, sl_char8>(*this, pattern, Base::getStringLength(pattern), replacement, Base::getStringLength(replacement));
+		return _priv_String_replaceAll<String, sl_char8>(*this, pattern, Base::getStringLength(pattern), replacement, Base::getStringLength(replacement));
 	}
 
 	String16 String16::replaceAll(const sl_char16* pattern, const sl_char16* replacement) const
 	{
-		return _String_replaceAll<String16, sl_char16>(*this, pattern, Base::getStringLength2(pattern), replacement, Base::getStringLength2(replacement));
+		return _priv_String_replaceAll<String16, sl_char16>(*this, pattern, Base::getStringLength2(pattern), replacement, Base::getStringLength2(replacement));
 	}
 
 	String Atomic<String>::replaceAll(const sl_char8* pattern, const sl_char8* replacement) const
@@ -5357,7 +5769,7 @@ namespace slib
 	}
 
 	template <class ST, class CT>
-	SLIB_INLINE ST _String_trim(const ST& str)
+	SLIB_INLINE ST _priv_String_trim(const ST& str)
 	{
 		const CT* sz = str.getData();
 		sl_size n = str.getLength();
@@ -5383,12 +5795,12 @@ namespace slib
 
 	String String::trim() const
 	{
-		return _String_trim<String, sl_char8>(*this);
+		return _priv_String_trim<String, sl_char8>(*this);
 	}
 
 	String16 String16::trim() const
 	{
-		return _String_trim<String16, sl_char16>(*this);
+		return _priv_String_trim<String16, sl_char16>(*this);
 	}
 
 	String Atomic<String>::trim() const
@@ -5405,7 +5817,7 @@ namespace slib
 
 
 	template <class ST, class CT>
-	SLIB_INLINE ST _String_trimLeft(const ST& str)
+	SLIB_INLINE ST _priv_String_trimLeft(const ST& str)
 	{
 		const CT* sz = str.getData();
 		sl_size n = str.getLength();
@@ -5424,12 +5836,12 @@ namespace slib
 
 	String String::trimLeft() const
 	{
-		return _String_trimLeft<String, sl_char8>(*this);
+		return _priv_String_trimLeft<String, sl_char8>(*this);
 	}
 
 	String16 String16::trimLeft() const
 	{
-		return _String_trimLeft<String16, sl_char16>(*this);
+		return _priv_String_trimLeft<String16, sl_char16>(*this);
 	}
 
 	String Atomic<String>::trimLeft() const
@@ -5446,7 +5858,7 @@ namespace slib
 
 
 	template <class ST, class CT>
-	SLIB_INLINE ST _String_trimRight(const ST& str)
+	SLIB_INLINE ST _priv_String_trimRight(const ST& str)
 	{
 		const CT* sz = str.getData();
 		sl_size n = str.getLength();
@@ -5465,12 +5877,12 @@ namespace slib
 
 	String String::trimRight() const
 	{
-		return _String_trimRight<String, sl_char8>(*this);
+		return _priv_String_trimRight<String, sl_char8>(*this);
 	}
 
 	String16 String16::trimRight() const
 	{
-		return _String_trimRight<String16, sl_char16>(*this);
+		return _priv_String_trimRight<String16, sl_char16>(*this);
 	}
 
 	String Atomic<String>::trimRight() const
@@ -5487,7 +5899,7 @@ namespace slib
 
 
 	template <class ST, class CT, class TT>
-	List<ST> _String_split(const ST& str, const CT* pattern, sl_size countPattern)
+	List<ST> _priv_String_split(const ST& str, const CT* pattern, sl_size countPattern)
 	{
 		if (countPattern == 0) {
 			return sl_null;
@@ -5496,7 +5908,7 @@ namespace slib
 		if (ret) {
 			sl_reg start = 0;
 			while (1) {
-				sl_reg index = _String_indexOf<ST, CT, TT>(str, pattern, countPattern, start);
+				sl_reg index = _priv_String_indexOf<ST, CT, TT>(str, pattern, countPattern, start);
 				if (index < 0) {
 					ret->add_NoLock(str.substring(start));
 					break;
@@ -5510,12 +5922,12 @@ namespace slib
 
 	List<String> String::split(const String& pattern) const
 	{
-		return _String_split<String, sl_char8, _TemplateFunc8>(*this, pattern.getData(), pattern.getLength());
+		return _priv_String_split<String, sl_char8, _priv_TemplateFunc8>(*this, pattern.getData(), pattern.getLength());
 	}
 
 	List<String16> String16::split(const String16& pattern) const
 	{
-		return _String_split<String16, sl_char16, _TemplateFunc16>(*this, pattern.getData(), pattern.getLength());
+		return _priv_String_split<String16, sl_char16, _priv_TemplateFunc16>(*this, pattern.getData(), pattern.getLength());
 	}
 
 	List<String> Atomic<String>::split(const String& pattern) const
@@ -5532,12 +5944,12 @@ namespace slib
 
 	List<String> String::split(const sl_char8* pattern) const
 	{
-		return _String_split<String, sl_char8, _TemplateFunc8>(*this, pattern, Base::getStringLength(pattern));
+		return _priv_String_split<String, sl_char8, _priv_TemplateFunc8>(*this, pattern, Base::getStringLength(pattern));
 	}
 
 	List<String16> String16::split(const sl_char16* pattern) const
 	{
-		return _String_split<String16, sl_char16, _TemplateFunc16>(*this, pattern, Base::getStringLength2(pattern));
+		return _priv_String_split<String16, sl_char16, _priv_TemplateFunc16>(*this, pattern, Base::getStringLength2(pattern));
 	}
 
 	List<String> Atomic<String>::split(const sl_char8* pattern) const
@@ -5560,9 +5972,9 @@ namespace slib
 #define MAX_PRECISION 50
 
 	const char _string_conv_radix_pattern_lower[65] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@_";
-	const char* _StringConv_radixPatternLower = _string_conv_radix_pattern_lower;
+	const char* _priv_StringConv_radixPatternLower = _string_conv_radix_pattern_lower;
 	const char _string_conv_radix_pattern_upper[65] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@_";
-	const char* _StringConv_radixPatternUpper = _string_conv_radix_pattern_upper;
+	const char* _priv_StringConv_radixPatternUpper = _string_conv_radix_pattern_upper;
 
 	const sl_uint8 _string_conv_radix_inverse_pattern_big[128] = {
 		/*00*/ 255, 255, 255, 255, 255, 255, 255, 255,
@@ -5582,7 +5994,7 @@ namespace slib
 		/*70*/ 25,  26,  27,  28,  29,  30,  31,  32,
 		/*78*/ 33,  34,  35,  255, 255, 255, 255, 255
 	};
-	const sl_uint8* _StringConv_radixInversePatternBig = _string_conv_radix_inverse_pattern_big;
+	const sl_uint8* _priv_StringConv_radixInversePatternBig = _string_conv_radix_inverse_pattern_big;
 
 	const sl_uint8 _string_conv_radix_inverse_pattern_small[128] = {
 		/*00*/ 255, 255, 255, 255, 255, 255, 255, 255,
@@ -5602,10 +6014,10 @@ namespace slib
 		/*70*/ 25,  26,  27,  28,  29,  30,  31,  32,
 		/*78*/ 33,  34,  35,  255, 255, 255, 255, 255
 	};
-	const sl_uint8* _StringConv_radixInversePatternSmall = _string_conv_radix_inverse_pattern_small;
+	const sl_uint8* _priv_StringConv_radixInversePatternSmall = _string_conv_radix_inverse_pattern_small;
 
 	template <class IT, class CT>
-	SLIB_INLINE sl_reg _String_parseInt(sl_int32 radix, const CT* sz, sl_size i, sl_size n, IT* _out)
+	SLIB_INLINE sl_reg _priv_String_parseInt(sl_int32 radix, const CT* sz, sl_size i, sl_size n, IT* _out)
 	{
 		if (i >= n) {
 			return SLIB_PARSE_ERROR;
@@ -5649,7 +6061,7 @@ namespace slib
 	}
 
 	template <class IT, class CT>
-	SLIB_INLINE sl_reg _String_parseUint(sl_int32 radix, const CT* sz, sl_size i, sl_size n, IT* _out)
+	SLIB_INLINE sl_reg _priv_String_parseUint(sl_int32 radix, const CT* sz, sl_size i, sl_size n, IT* _out)
 	{
 		if (i >= n) {
 			return SLIB_PARSE_ERROR;
@@ -5679,12 +6091,12 @@ namespace slib
 
 	sl_reg String::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char8* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseInt(radix, sz, posBegin, posEnd, _out);
+		return _priv_String_parseInt(radix, sz, posBegin, posEnd, _out);
 	}
 
 	sl_reg String16::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseInt(radix, sz, posBegin, posEnd, _out);
+		return _priv_String_parseInt(radix, sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseInt32(sl_int32 radix, sl_int32* _out) const
@@ -5693,7 +6105,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseInt(radix, getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseInt(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool String16::parseInt32(sl_int32 radix, sl_int32* _out) const
@@ -5702,7 +6114,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseInt(radix, getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseInt(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool Atomic<String>::parseInt32(sl_int32 radix, sl_int32* _out) const
@@ -5746,12 +6158,12 @@ namespace slib
 
 	sl_reg String::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char8* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseUint(radix, sz, posBegin, posEnd, _out);
+		return _priv_String_parseUint(radix, sz, posBegin, posEnd, _out);
 	}
 
 	sl_reg String16::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseUint(radix, sz, posBegin, posEnd, _out);
+		return _priv_String_parseUint(radix, sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseUint32(sl_int32 radix, sl_uint32* _out) const
@@ -5760,7 +6172,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseUint(radix, getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseUint(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool String16::parseUint32(sl_int32 radix, sl_uint32* _out) const
@@ -5769,7 +6181,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseUint(radix, getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseUint(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool Atomic<String>::parseUint32(sl_int32 radix, sl_uint32* _out) const
@@ -5813,12 +6225,12 @@ namespace slib
 
 	sl_reg String::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char8* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseInt(radix, sz, posBegin, posEnd, _out);
+		return _priv_String_parseInt(radix, sz, posBegin, posEnd, _out);
 	}
 
 	sl_reg String16::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseInt(radix, sz, posBegin, posEnd, _out);
+		return _priv_String_parseInt(radix, sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseInt64(sl_int32 radix, sl_int64* _out) const
@@ -5827,7 +6239,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseInt(radix, getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseInt(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool String16::parseInt64(sl_int32 radix, sl_int64* _out) const
@@ -5836,7 +6248,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseInt(radix, getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseInt(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool Atomic<String>::parseInt64(sl_int32 radix, sl_int64* _out) const
@@ -5880,12 +6292,12 @@ namespace slib
 
 	sl_reg String::parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseUint(radix, sz, posBegin, posEnd, _out);
+		return _priv_String_parseUint(radix, sz, posBegin, posEnd, _out);
 	}
 
 	sl_reg String16::parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseUint(radix, sz, posBegin, posEnd, _out);
+		return _priv_String_parseUint(radix, sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseUint64(sl_int32 radix, sl_uint64* _out) const
@@ -5894,7 +6306,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseUint(radix, getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseUint(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool String16::parseUint64(sl_int32 radix, sl_uint64* _out) const
@@ -5903,7 +6315,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseUint(radix, getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseUint(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool Atomic<String>::parseUint64(sl_int32 radix, sl_uint64* _out) const
@@ -6060,7 +6472,7 @@ namespace slib
 
 
 	template <class FT, class CT>
-	SLIB_INLINE sl_reg _String_parseFloat(const CT* sz, sl_size i, sl_size n, FT* _out)
+	SLIB_INLINE sl_reg _priv_String_parseFloat(const CT* sz, sl_size i, sl_size n, FT* _out)
 	{
 		if (i >= n) {
 			return SLIB_PARSE_ERROR; // input string is empty
@@ -6169,12 +6581,12 @@ namespace slib
 
 	sl_reg String::parseFloat(float* _out, const char* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseFloat(sz, posBegin, posEnd, _out);
+		return _priv_String_parseFloat(sz, posBegin, posEnd, _out);
 	}
 
 	sl_reg String16::parseFloat(float* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseFloat(sz, posBegin, posEnd, _out);
+		return _priv_String_parseFloat(sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseFloat(float* _out) const
@@ -6183,7 +6595,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseFloat(getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseFloat(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool String16::parseFloat(float* _out) const
@@ -6192,7 +6604,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseFloat(getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseFloat(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool Atomic<String>::parseFloat(float* _out) const
@@ -6236,12 +6648,12 @@ namespace slib
 
 	sl_reg String::parseDouble(double* _out, const char* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseFloat(sz, posBegin, posEnd, _out);
+		return _priv_String_parseFloat(sz, posBegin, posEnd, _out);
 	}
 
 	sl_reg String16::parseDouble(double* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseFloat(sz, posBegin, posEnd, _out);
+		return _priv_String_parseFloat(sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseDouble(double* _out) const
@@ -6250,7 +6662,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseFloat(getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseFloat(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool String16::parseDouble(double* _out) const
@@ -6259,7 +6671,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseFloat(getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseFloat(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool Atomic<String>::parseDouble(double* _out) const
@@ -6301,7 +6713,7 @@ namespace slib
 	}
 
 	template <class CT>
-	SLIB_INLINE sl_reg _String_parseBoolean(const CT* sz, sl_size i, sl_size n, sl_bool* _out)
+	SLIB_INLINE sl_reg _priv_String_parseBoolean(const CT* sz, sl_size i, sl_size n, sl_bool* _out)
 	{
 		if (i >= n) {
 			return SLIB_PARSE_ERROR;
@@ -6388,12 +6800,12 @@ namespace slib
 
 	sl_reg String::parseBoolean(sl_bool* _out, const char* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseBoolean(sz, posBegin, posEnd, _out);
+		return _priv_String_parseBoolean(sz, posBegin, posEnd, _out);
 	}
 
 	sl_reg String16::parseBoolean(sl_bool* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseBoolean(sz, posBegin, posEnd, _out);
+		return _priv_String_parseBoolean(sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseBoolean(sl_bool* _out) const
@@ -6402,7 +6814,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseBoolean(getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseBoolean(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool String16::parseBoolean(sl_bool* _out) const
@@ -6411,7 +6823,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseBoolean(getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseBoolean(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool Atomic<String>::parseBoolean(sl_bool* _out) const
@@ -6454,7 +6866,7 @@ namespace slib
 
 
 	template <class CT>
-	SLIB_INLINE sl_reg _String_parseHexString(const CT* sz, sl_size i, sl_size n, void* _out)
+	SLIB_INLINE sl_reg _priv_String_parseHexString(const CT* sz, sl_size i, sl_size n, void* _out)
 	{
 		if (i >= n) {
 			return SLIB_PARSE_ERROR;
@@ -6494,12 +6906,12 @@ namespace slib
 
 	sl_reg String::parseHexString(void* _out, const char* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseHexString(sz, posBegin, posEnd, _out);
+		return _priv_String_parseHexString(sz, posBegin, posEnd, _out);
 	}
 
 	sl_reg String16::parseHexString(void* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _String_parseHexString(sz, posBegin, posEnd, _out);
+		return _priv_String_parseHexString(sz, posBegin, posEnd, _out);
 	}
 
 	sl_bool String::parseHexString(void* _out) const
@@ -6508,7 +6920,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseHexString(getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseHexString(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool String16::parseHexString(void* _out) const
@@ -6517,7 +6929,7 @@ namespace slib
 		if (n == 0) {
 			return sl_false;
 		}
-		return _String_parseHexString(getData(), 0, n, _out) == (sl_reg)n;
+		return _priv_String_parseHexString(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
 	sl_bool Atomic<String>::parseHexString(void* _out) const
@@ -6535,7 +6947,7 @@ namespace slib
 
 
 	template <class IT, class UT, class ST, class CT>
-	SLIB_INLINE ST _String_fromInt(IT _value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase, CT chGroup = sl_false, sl_bool flagSignPositive = sl_false, sl_bool flagLeadingSpacePositive = sl_false, sl_bool flagEncloseNagtive = sl_false)
+	SLIB_INLINE ST _priv_String_fromInt(IT _value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase, CT chGroup = sl_false, sl_bool flagSignPositive = sl_false, sl_bool flagLeadingSpacePositive = sl_false, sl_bool flagEncloseNagtive = sl_false)
 	{
 		if (radix < 2 || radix > 64) {
 			return sl_null;
@@ -6620,7 +7032,7 @@ namespace slib
 	}
 
 	template <class IT, class ST, class CT>
-	SLIB_INLINE ST _String_fromUint(IT value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase, CT chGroup = 0, sl_bool flagSignPositive = sl_false, sl_bool flagLeadingSpacePositive = sl_false)
+	SLIB_INLINE ST _priv_String_fromUint(IT value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase, CT chGroup = 0, sl_bool flagSignPositive = sl_false, sl_bool flagLeadingSpacePositive = sl_false)
 	{
 		if (radix < 2 || radix > 64) {
 			return sl_null;
@@ -6681,42 +7093,42 @@ namespace slib
 
 	String String::fromInt32(sl_int32 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
 	{
-		return _String_fromInt<sl_int32, sl_uint32, String, sl_char8>(value, radix, minWidth, flagUpperCase);
+		return _priv_String_fromInt<sl_int32, sl_uint32, String, sl_char8>(value, radix, minWidth, flagUpperCase);
 	}
 
 	String16 String16::fromInt32(sl_int32 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
 	{
-		return _String_fromInt<sl_int32, sl_uint32, String16, sl_char16>(value, radix, minWidth, flagUpperCase);
+		return _priv_String_fromInt<sl_int32, sl_uint32, String16, sl_char16>(value, radix, minWidth, flagUpperCase);
 	}
 
 	String String::fromUint32(sl_uint32 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
 	{
-		return _String_fromUint<sl_uint32, String, sl_char8>(value, radix, minWidth, flagUpperCase);
+		return _priv_String_fromUint<sl_uint32, String, sl_char8>(value, radix, minWidth, flagUpperCase);
 	}
 
 	String16 String16::fromUint32(sl_uint32 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
 	{
-		return _String_fromUint<sl_uint32, String16, sl_char16>(value, radix, minWidth, flagUpperCase);
+		return _priv_String_fromUint<sl_uint32, String16, sl_char16>(value, radix, minWidth, flagUpperCase);
 	}
 
 	String String::fromInt64(sl_int64 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
 	{
-		return _String_fromInt<sl_int64, sl_uint64, String, sl_char8>(value, radix, minWidth, flagUpperCase);
+		return _priv_String_fromInt<sl_int64, sl_uint64, String, sl_char8>(value, radix, minWidth, flagUpperCase);
 	}
 
 	String16 String16::fromInt64(sl_int64 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
 	{
-		return _String_fromInt<sl_int64, sl_uint64, String16, sl_char16>(value, radix, minWidth, flagUpperCase);
+		return _priv_String_fromInt<sl_int64, sl_uint64, String16, sl_char16>(value, radix, minWidth, flagUpperCase);
 	}
 
 	String String::fromUint64(sl_uint64 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
 	{
-		return _String_fromUint<sl_uint64, String, sl_char8>(value, radix, minWidth, flagUpperCase);
+		return _priv_String_fromUint<sl_uint64, String, sl_char8>(value, radix, minWidth, flagUpperCase);
 	}
 
 	String16 String16::fromUint64(sl_uint64 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
 	{
-		return _String_fromUint<sl_uint64, String16, sl_char16>(value, radix, minWidth, flagUpperCase);
+		return _priv_String_fromUint<sl_uint64, String16, sl_char16>(value, radix, minWidth, flagUpperCase);
 	}
 
 	String String::fromInt(sl_reg value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
@@ -6756,7 +7168,7 @@ namespace slib
 	}
 
 	template <class FT, class ST, class CT>
-	SLIB_INLINE ST _String_fromFloat(FT value, sl_int32 precision, sl_bool flagZeroPadding, sl_int32 minWidthIntegral, CT chConv = 'g', CT chGroup = 0, sl_bool flagSignPositive = sl_false, sl_bool flagLeadingSpacePositive = sl_false, sl_bool flagEncloseNagtive = sl_false)
+	SLIB_INLINE ST _priv_String_fromFloat(FT value, sl_int32 precision, sl_bool flagZeroPadding, sl_int32 minWidthIntegral, CT chConv = 'g', CT chGroup = 0, sl_bool flagSignPositive = sl_false, sl_bool flagLeadingSpacePositive = sl_false, sl_bool flagEncloseNagtive = sl_false)
 	{
 		
 		CT buf[MAX_NUMBER_STR_LEN];
@@ -6951,21 +7363,21 @@ namespace slib
 	}
 
 	String String::fromDouble(double value, sl_int32 precision, sl_bool flagZeroPadding, sl_uint32 minWidthIntegral) {
-		return _String_fromFloat<double, String, sl_char8>(value, precision, flagZeroPadding, minWidthIntegral);
+		return _priv_String_fromFloat<double, String, sl_char8>(value, precision, flagZeroPadding, minWidthIntegral);
 	}
 
 	String String::fromFloat(float value, sl_int32 precision, sl_bool flagZeroPadding, sl_uint32 minWidthIntegral)
 	{
-		return _String_fromFloat<float, String, sl_char8>(value, precision, flagZeroPadding, minWidthIntegral);
+		return _priv_String_fromFloat<float, String, sl_char8>(value, precision, flagZeroPadding, minWidthIntegral);
 	}
 
 	String16 String16::fromDouble(double value, sl_int32 precision, sl_bool flagZeroPadding, sl_uint32 minWidthIntegral) {
-		return _String_fromFloat<double, String16, sl_char16>(value, precision, flagZeroPadding, minWidthIntegral);
+		return _priv_String_fromFloat<double, String16, sl_char16>(value, precision, flagZeroPadding, minWidthIntegral);
 	}
 
 	String16 String16::fromFloat(float value, sl_int32 precision, sl_bool flagZeroPadding, sl_uint32 minWidthIntegral)
 	{
-		return _String_fromFloat<float, String16, sl_char16>(value, precision, flagZeroPadding, minWidthIntegral);
+		return _priv_String_fromFloat<float, String16, sl_char16>(value, precision, flagZeroPadding, minWidthIntegral);
 	}
 
 	String String::fromPointerValue(const void* pointer)
@@ -7009,7 +7421,7 @@ namespace slib
 	}
 
 	template <class ST, class CT>
-	SLIB_INLINE ST _String_makeHexString(const void* buf, sl_size size)
+	SLIB_INLINE ST _priv_String_makeHexString(const void* buf, sl_size size)
 	{
 		if (!buf || size <= 0) {
 			return sl_null;
@@ -7029,12 +7441,12 @@ namespace slib
 
 	String String::makeHexString(const void* buf, sl_size size)
 	{
-		return _String_makeHexString<String, sl_char8>(buf, size);
+		return _priv_String_makeHexString<String, sl_char8>(buf, size);
 	}
 
 	String16 String16::makeHexString(const void* buf, sl_size size)
 	{
-		return _String_makeHexString<String16, sl_char16>(buf, size);
+		return _priv_String_makeHexString<String16, sl_char16>(buf, size);
 	}
 
 	String String::makeHexString(const Memory& mem)
@@ -7058,7 +7470,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 */
 
 	template <class ST, class CT, class BT>
-	SLIB_INLINE ST _String_format(const CT* format, sl_size len, const Variant* params, sl_size _nParams)
+	SLIB_INLINE ST _priv_String_format(const CT* format, sl_size len, const Variant* params, sl_size _nParams)
 	{
 		if (len == 0) {
 			return ST::getEmpty();
@@ -7431,13 +7843,13 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 									}
 									ST content;
 									if (arg.isUint32()) {
-										content = _String_fromUint<sl_uint32, ST, CT>(arg.getUint32(), radix, _minWidth, flagUpperCase, chGroup, flagSignPositive, flagLeadingSpacePositive);
+										content = _priv_String_fromUint<sl_uint32, ST, CT>(arg.getUint32(), radix, _minWidth, flagUpperCase, chGroup, flagSignPositive, flagLeadingSpacePositive);
 									} else if (arg.isInt32()) {
-										content = _String_fromInt<sl_int32, sl_uint32, ST, CT>(arg.getInt32(), radix, _minWidth, flagUpperCase, chGroup, flagSignPositive, flagLeadingSpacePositive, flagEncloseNegative);
+										content = _priv_String_fromInt<sl_int32, sl_uint32, ST, CT>(arg.getInt32(), radix, _minWidth, flagUpperCase, chGroup, flagSignPositive, flagLeadingSpacePositive, flagEncloseNegative);
 									} else if (arg.isUint64()) {
-										content = _String_fromUint<sl_uint64, ST, CT>(arg.getUint64(), radix, _minWidth, flagUpperCase, chGroup, flagSignPositive, flagLeadingSpacePositive);
+										content = _priv_String_fromUint<sl_uint64, ST, CT>(arg.getUint64(), radix, _minWidth, flagUpperCase, chGroup, flagSignPositive, flagLeadingSpacePositive);
 									} else {
-										content = _String_fromInt<sl_int64, sl_uint64, ST, CT>(arg.getInt64(), radix, _minWidth, flagUpperCase, chGroup, flagSignPositive, flagLeadingSpacePositive, flagEncloseNegative);
+										content = _priv_String_fromInt<sl_int64, sl_uint64, ST, CT>(arg.getInt64(), radix, _minWidth, flagUpperCase, chGroup, flagSignPositive, flagLeadingSpacePositive, flagEncloseNegative);
 									}
 									lenContent = content.getLength();
 									if (lenContent < minWidth) {
@@ -7469,9 +7881,9 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 									}
 									ST content;
 									if (arg.isFloat()) {
-										content = _String_fromFloat<float, ST, CT>(arg.getFloat(), _precision, flagZeroPadded, 1, ch, chGroup, flagSignPositive, flagLeadingSpacePositive, flagEncloseNegative);
+										content = _priv_String_fromFloat<float, ST, CT>(arg.getFloat(), _precision, flagZeroPadded, 1, ch, chGroup, flagSignPositive, flagLeadingSpacePositive, flagEncloseNegative);
 									} else {
-										content = _String_fromFloat<double, ST, CT>(arg.getDouble(), _precision, flagZeroPadded, 1, ch, chGroup, flagSignPositive, flagLeadingSpacePositive, flagEncloseNegative);
+										content = _priv_String_fromFloat<double, ST, CT>(arg.getDouble(), _precision, flagZeroPadded, 1, ch, chGroup, flagSignPositive, flagLeadingSpacePositive, flagEncloseNegative);
 									}
 									lenContent = content.getLength();
 									if (lenContent < minWidth) {
@@ -7527,22 +7939,22 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 
 	String String::formatBy(const String& format, const Variant *params, sl_size nParams)
 	{
-		return _String_format<String, sl_char8, StringBuffer>(format.getData(), format.getLength(), params, nParams);
+		return _priv_String_format<String, sl_char8, StringBuffer>(format.getData(), format.getLength(), params, nParams);
 	}
 
 	String16 String16::formatBy(const String16& format, const Variant *params, sl_size nParams)
 	{
-		return _String_format<String16, sl_char16, StringBuffer16>(format.getData(), format.getLength(), params, nParams);
+		return _priv_String_format<String16, sl_char16, StringBuffer16>(format.getData(), format.getLength(), params, nParams);
 	}
 
 	String String::formatBy(const sl_char8* format, const Variant *params, sl_size nParams)
 	{
-		return _String_format<String, sl_char8, StringBuffer>(format, Base::getStringLength(format), params, nParams);
+		return _priv_String_format<String, sl_char8, StringBuffer>(format, Base::getStringLength(format), params, nParams);
 	}
 
 	String16 String16::formatBy(const sl_char16* format, const Variant *params, sl_size nParams)
 	{
-		return _String_format<String16, sl_char16, StringBuffer16>(format, Base::getStringLength2(format), params, nParams);
+		return _priv_String_format<String16, sl_char16, StringBuffer16>(format, Base::getStringLength2(format), params, nParams);
 	}
 
 	String String::format(const String& strFormat)
@@ -7679,6 +8091,258 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 	sl_uint32 HashIgnoreCaseString16::operator()(const String16& v) const
 	{
 		return v.getHashCodeIgnoreCase();
+	}
+
+	
+	signed char Cast<String, signed char>::operator()(const String& v) const
+	{
+		return (signed char)(v.parseInt32());
+	}
+
+	signed char Cast<String16, signed char>::operator()(const String16& v) const
+	{
+		return (signed char)(v.parseInt32());
+	}
+	
+	unsigned char Cast<String, unsigned char>::operator()(const String& v) const
+	{
+		return (unsigned char)(v.parseUint32());
+	}
+	
+	unsigned char Cast<String16, unsigned char>::operator()(const String16& v) const
+	{
+		return (unsigned char)(v.parseUint32());
+	}
+
+	short Cast<String, short>::operator()(const String& v) const
+	{
+		return (short)(v.parseInt32());
+	}
+	
+	short Cast<String16, short>::operator()(const String16& v) const
+	{
+		return (short)(v.parseInt32());
+	}
+	
+	unsigned short Cast<String, unsigned short>::operator()(const String& v) const
+	{
+		return (unsigned short)(v.parseUint32());
+	}
+	
+	unsigned short Cast<String16, unsigned short>::operator()(const String16& v) const
+	{
+		return (unsigned short)(v.parseUint32());
+	}
+	
+	int Cast<String, int>::operator()(const String& v) const
+	{
+		return (int)(v.parseInt32());
+	}
+	
+	int Cast<String16, int>::operator()(const String16& v) const
+	{
+		return (int)(v.parseInt32());
+	}
+	
+	unsigned int Cast<String, unsigned int>::operator()(const String& v) const
+	{
+		return (unsigned int)(v.parseUint32());
+	}
+	
+	unsigned int Cast<String16, unsigned int>::operator()(const String16& v) const
+	{
+		return (unsigned int)(v.parseUint32());
+	}
+
+	long Cast<String, long>::operator()(const String& v) const
+	{
+		return (long)(v.parseInt32());
+	}
+	
+	long Cast<String16, long>::operator()(const String16& v) const
+	{
+		return (long)(v.parseInt32());
+	}
+	
+	unsigned long Cast<String, unsigned long>::operator()(const String& v) const
+	{
+		return (unsigned long)(v.parseUint32());
+	}
+	
+	unsigned long Cast<String16, unsigned long>::operator()(const String16& v) const
+	{
+		return (unsigned long)(v.parseUint32());
+	}
+	
+	sl_int64 Cast<String, sl_int64>::operator()(const String& v) const
+	{
+		return v.parseInt64();
+	}
+	
+	sl_int64 Cast<String16, sl_int64>::operator()(const String16& v) const
+	{
+		return v.parseInt64();
+	}
+	
+	sl_uint64 Cast<String, sl_uint64>::operator()(const String& v) const
+	{
+		return v.parseUint64();
+	}
+	
+	sl_uint64 Cast<String16, sl_uint64>::operator()(const String16& v) const
+	{
+		return v.parseUint64();
+	}
+	
+	float Cast<String, float>::operator()(const String& v) const
+	{
+		return v.parseFloat();
+	}
+	
+	float Cast<String16, float>::operator()(const String16& v) const
+	{
+		return v.parseFloat();
+	}
+	
+	double Cast<String, double>::operator()(const String& v) const
+	{
+		return v.parseDouble();
+	}
+	
+	double Cast<String16, double>::operator()(const String16& v) const
+	{
+		return v.parseDouble();
+	}
+	
+	std::string Cast<String, std::string>::operator()(const String& v) const
+	{
+		return v.toStd();
+	}
+	
+	std::u16string Cast<String16, std::u16string>::operator()(const String16& v) const
+	{
+		return v.toStd();
+	}
+	
+	
+	String Cast<signed char, String>::operator()(signed char v) const
+	{
+		return String::fromInt32(v);
+	}
+	
+	String16 Cast<signed char, String16>::operator()(signed char v) const
+	{
+		return String16::fromInt32(v);
+	}
+	
+	String Cast<unsigned char, String>::operator()(unsigned char v) const
+	{
+		return String::fromUint32(v);
+	}
+	
+	String16 Cast<unsigned char, String16>::operator()(unsigned char v) const
+	{
+		return String16::fromUint32(v);
+	}
+	
+	String Cast<short, String>::operator()(short v) const
+	{
+		return String::fromInt32(v);
+	}
+	
+	String16 Cast<short, String16>::operator()(short v) const
+	{
+		return String16::fromInt32(v);
+	}
+	
+	String Cast<unsigned short, String>::operator()(unsigned short v) const
+	{
+		return String::fromUint32(v);
+	}
+	
+	String16 Cast<unsigned short, String16>::operator()(unsigned short v) const
+	{
+		return String16::fromUint32(v);
+	}
+	
+	String Cast<int, String>::operator()(int v) const
+	{
+		return String::fromInt32((sl_int32)v);
+	}
+	
+	String16 Cast<int, String16>::operator()(int v) const
+	{
+		return String16::fromInt32((sl_int32)v);
+	}
+	
+	String Cast<unsigned int, String>::operator()(unsigned int v) const
+	{
+		return String::fromUint32((sl_uint32)v);
+	}
+	
+	String16 Cast<unsigned int, String16>::operator()(unsigned int v) const
+	{
+		return String16::fromUint32((sl_uint32)v);
+	}
+	
+	String Cast<long, String>::operator()(long v) const
+	{
+		return String::fromInt32((sl_int32)v);
+	}
+	
+	String16 Cast<long, String16>::operator()(long v) const
+	{
+		return String16::fromInt32((sl_int32)v);
+	}
+	
+	String Cast<unsigned long, String>::operator()(unsigned long v) const
+	{
+		return String::fromUint32((sl_uint32)v);
+	}
+	
+	String16 Cast<unsigned long, String16>::operator()(unsigned long v) const
+	{
+		return String16::fromUint32((sl_uint32)v);
+	}
+	
+	String Cast<sl_int64, String>::operator()(sl_int64 v) const
+	{
+		return String::fromInt64(v);
+	}
+	
+	String16 Cast<sl_int64, String16>::operator()(sl_int64 v) const
+	{
+		return String16::fromInt64(v);
+	}
+	
+	String Cast<sl_uint64, String>::operator()(sl_uint64 v) const
+	{
+		return String::fromUint64(v);
+	}
+	
+	String16 Cast<sl_uint64, String16>::operator()(sl_uint64 v) const
+	{
+		return String16::fromUint64(v);
+	}
+	
+	String Cast<float, String>::operator()(float v) const
+	{
+		return String::fromFloat(v);
+	}
+	
+	String16 Cast<float, String16>::operator()(float v) const
+	{
+		return String16::fromFloat(v);
+	}
+	
+	String Cast<double, String>::operator()(double v) const
+	{
+		return String::fromDouble(v);
+	}
+	
+	String16 Cast<double, String16>::operator()(double v) const
+	{
+		return String16::fromDouble(v);
 	}
 
 
@@ -7918,16 +8582,6 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 			}
 		}
 		return ret;
-	}
-	
-	String operator "" _s(const char* sz, std::size_t len)
-	{
-		return String(sz, len);
-	}
-	
-	String operator "" _s(const sl_char16* sz, std::size_t len)
-	{
-		return String(sz, len);
 	}
 	
 }

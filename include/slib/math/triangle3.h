@@ -87,6 +87,6 @@ namespace slib
 
 }
 
-#include "detail/triangle3.h"
+#include "detail/triangle3.inc"
 
 #endif

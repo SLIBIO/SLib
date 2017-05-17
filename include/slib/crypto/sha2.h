@@ -36,8 +36,7 @@ namespace slib
 		~_SHA256Base();
 
 	public:
-		// override
-		void update(const void* input, sl_size n);
+		void update(const void* input, sl_size n) override;
 	
 	protected:
 		void _start();
@@ -61,11 +60,9 @@ namespace slib
 		~SHA224();
 
 	public:
-		// override
-		void start();
+		void start() override;
 
-		// override
-		void finish(void* output);
+		void finish(void* output) override;
 	
 	public: /* common functions for CryptoHash */
 		static void hash(const void* input, sl_size n, void* output);
@@ -82,7 +79,7 @@ namespace slib
 
 		static Memory hash(const Memory& data);
 
-		sl_uint32 getSize() const;
+		sl_uint32 getSize() const override;
 
 	};
 	
@@ -94,11 +91,9 @@ namespace slib
 		~SHA256();
 
 	public:
-		// override
-		void start();
+		void start() override;
 
-		// override
-		void finish(void* output);
+		void finish(void* output) override;
 
 	public:
 		static sl_uint32 make32bitChecksum(const void* input, sl_size n);
@@ -118,7 +113,7 @@ namespace slib
 
 		static Memory hash(const Memory& data);
 
-		sl_uint32 getSize() const;
+		sl_uint32 getSize() const override;
 
 	};
 	
@@ -130,8 +125,7 @@ namespace slib
 		~_SHA512Base();
 	
 	public:
-		// override
-		void update(const void* input, sl_size n);
+		void update(const void* input, sl_size n) override;
 	
 	protected:
 		void _start();
@@ -156,11 +150,9 @@ namespace slib
 		~SHA384();
 
 	public:
-		// override
-		void start();
+		void start() override;
 
-		// override
-		void finish(void* output);
+		void finish(void* output) override;
 
 	public: /* common functions for CryptoHash */
 		static void hash(const void* input, sl_size n, void* output);
@@ -177,7 +169,7 @@ namespace slib
 
 		static Memory hash(const Memory& data);
 
-		sl_uint32 getSize() const;
+		sl_uint32 getSize() const override;
 
 	};
 	
@@ -189,11 +181,9 @@ namespace slib
 		~SHA512();
 
 	public:
-		// override
-		void start();
+		void start() override;
 
-		// override
-		void finish(void* output);
+		void finish(void* output) override;
 
 	public: /* common functions for CryptoHash */
 		static void hash(const void* input, sl_size n, void* output);
@@ -210,7 +200,7 @@ namespace slib
 
 		static Memory hash(const Memory& data);
 
-		sl_uint32 getSize() const;
+		sl_uint32 getSize() const override;
 
 	};
 

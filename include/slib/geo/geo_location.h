@@ -74,6 +74,6 @@ namespace slib
 
 }
 
-#include "detail/geo_location.h"
+#include "detail/geo_location.inc"
 
 #endif

@@ -69,6 +69,6 @@ namespace slib
 
 }
 
-#include "detail/line3.h"
+#include "detail/line3.inc"
 
 #endif

@@ -402,6 +402,6 @@ namespace slib
 
 }
 
-#include "detail/math.h"
+#include "detail/math.inc"
 
 #endif

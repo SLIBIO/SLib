@@ -71,6 +71,6 @@ namespace slib
 
 }
 
-#include "detail/view_frustum.h"
+#include "detail/view_frustum.inc"
 
 #endif

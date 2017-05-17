@@ -141,14 +141,12 @@ namespace slib
 			return ret;
 		}
 
-		// override
-		sl_uint32 getBitmapWidth()
+		sl_uint32 getBitmapWidth() override
 		{
 			return m_width;
 		}
 
-		// override
-		sl_uint32 getBitmapHeight()
+		sl_uint32 getBitmapHeight() override
 		{
 			return m_height;
 		}
@@ -238,20 +236,17 @@ namespace slib
 			return ret;
 		}
 
-		// override
-		sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& bitmapData)
+		sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& bitmapData) override
 		{
 			return readWritePixels(sl_true, x, y, bitmapData);
 		}
 
-		// override
-		sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& bitmapData)
+		sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& bitmapData) override
 		{
 			return readWritePixels(sl_false, x, y, *((BitmapData*)&bitmapData));
 		}
 
-		// override
-		sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& color)
+		sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& color) override
 		{
 			jobject jbitmap = m_bitmap;
 			sl_uint32 w = m_width;
@@ -309,8 +304,7 @@ namespace slib
 			return ret;
 		}
 
-		// override
-		Ref<Canvas> getCanvas()
+		Ref<Canvas> getCanvas() override
 		{
 			JniLocal<jobject> jcanvas = _JAndroidBitmap::getCanvas.callObject(m_bitmap.get());
 			if (jcanvas.isNotNull()) {
@@ -319,8 +313,7 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override
 		{
 			jobject jcanvas = GraphicsPlatform::getCanvasHandle(canvas);
 			if (!jcanvas) {

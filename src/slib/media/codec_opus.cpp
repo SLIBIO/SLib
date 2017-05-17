@@ -149,7 +149,7 @@ namespace slib
 			return sl_null;
 		}
 		
-		Memory encode(const AudioData& input)
+		Memory encode(const AudioData& input) override
 		{
 			sl_uint32 lenMinFrame = m_nSamplesPerSecond / 400; // 2.5 ms
 			if (input.count % lenMinFrame == 0) {
@@ -227,8 +227,7 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		void setBitrate(sl_uint32 _bitrate)
+		void setBitrate(sl_uint32 _bitrate) override
 		{
 			sl_uint32 bitrate = _bitrate;
 			if (bitrate < 500) {
@@ -321,7 +320,7 @@ namespace slib
 			return ret;
 		}
 
-		sl_uint32 decode(const void* input, sl_uint32 sizeInput, const AudioData& output)
+		sl_uint32 decode(const void* input, sl_uint32 sizeInput, const AudioData& output) override
 		{
 			AudioData audio;
 			audio.count = output.count;

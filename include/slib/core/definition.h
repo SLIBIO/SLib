@@ -108,7 +108,7 @@ typedef char32_t			sl_char32;
 #define SLIB_UNICODE(quote)	u##quote
 
 #if defined(SLIB_COMPILER_IS_VC)
-#	define SLIB_WCHAR_SIZE(quote)		2
+#	define SLIB_WCHAR_SIZE				2
 #else
 #	if defined(__SIZEOF_WCHAR_T__)
 #		define SLIB_WCHAR_SIZE			__SIZEOF_WCHAR_T__
@@ -119,8 +119,8 @@ typedef char32_t			sl_char32;
 
 namespace slib
 {
-	SLIB_INLINE void _blank_proc(const void*) {}
-	void _abort(const char* msg, const char* file, sl_uint32 line);
+	SLIB_INLINE void _blank_proc(const void*) noexcept {}
+	void _abort(const char* msg, const char* file, sl_uint32 line) noexcept;
 }
 
 #define SLIB_UNUSED(x)					slib::_blank_proc(&x);

@@ -8,6 +8,8 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#define SLIB_SUPPORT_STD_TYPES
+
 #include "slib/core/variant.h"
 
 #include "slib/core/string_buffer.h"
@@ -24,17 +26,17 @@ namespace slib
 		return Compare<sl_uint64>()(a._value, b._value);
 	}
 
-	const char _VariantMap_ClassID[] = "VariantMap";
+	const char _priv_VariantMap_ClassID[] = "VariantMap";
 
-	const char _VariantList_ClassID[] = "VariantList";
+	const char _priv_VariantList_ClassID[] = "VariantList";
 
-	const char _VariantMapList_ClassID[] = "VariantMapList";
-
-
-	const _Variant_Const _Variant_Null = {0, VariantType::Null, 0};
+	const char _priv_VariantMapList_ClassID[] = "VariantMapList";
 
 
-	SLIB_INLINE void _Variant_copy(VariantType src_type, sl_uint64 src_value, sl_uint64& dst_value)
+	const _priv_Variant_Const _priv_Variant_Null = {0, VariantType::Null, 0};
+
+
+	SLIB_INLINE void _priv_Variant_copy(VariantType src_type, sl_uint64 src_value, sl_uint64& dst_value)
 	{
 		switch (src_type) {
 			case VariantType::String8:
@@ -53,7 +55,7 @@ namespace slib
 		}
 	}
 
-	SLIB_INLINE void _Variant_free(VariantType type, sl_uint64 value)
+	SLIB_INLINE void _priv_Variant_free(VariantType type, sl_uint64 value)
 	{
 		switch (type)
 		{
@@ -74,18 +76,18 @@ namespace slib
 
 	void Variant::_free(VariantType type, sl_uint64 value)
 	{
-		_Variant_free(type, value);
+		_priv_Variant_free(type, value);
 	}
 
 	SLIB_INLINE void Atomic<Variant>::_retain(VariantType& type, sl_uint64& value) const
 	{
-		if ((void*)(this) == (void*)(&_Variant_Null)) {
+		if ((void*)(this) == (void*)(&_priv_Variant_Null)) {
 			type = VariantType::Null;
 			value = 0;
 		} else {
 			SpinLocker lock(&m_lock);
 			type = _type;
-			_Variant_copy(_type, _value, value);
+			_priv_Variant_copy(_type, _value, value);
 		}
 	}
 
@@ -100,7 +102,7 @@ namespace slib
 			_type = type;
 			_value = value;
 		}
-		_Variant_free(typeOld, valueOld);
+		_priv_Variant_free(typeOld, valueOld);
 	}
 
 
@@ -114,7 +116,7 @@ namespace slib
 	Variant::Variant(const Variant& other)
 	{
 		_type = other._type;
-		_Variant_copy(_type, other._value, _value);
+		_priv_Variant_copy(_type, other._value, _value);
 	}
 
 	Variant::Variant(AtomicVariant&& _other)
@@ -132,14 +134,14 @@ namespace slib
 
 	Variant::~Variant()
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 	}
 
 	Variant::Variant(sl_null_t): _value(0), _type(VariantType::Null)
 	{
 	}
 	
-	Variant::Variant(char value)
+	Variant::Variant(signed char value)
 	{
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = value;
@@ -278,6 +280,18 @@ namespace slib
 			_type = VariantType::Null;
 		}
 	}
+	
+	Variant::Variant(const std::string& value)
+	{
+		_type = VariantType::String8;
+		new PTR_VAR(String, _value) String(value);
+	}
+	
+	Variant::Variant(const std::u16string& value)
+	{
+		_type = VariantType::String16;
+		new PTR_VAR(String16, _value) String16(value);
+	}
 
 	Variant::Variant(const Time& value)
 	{
@@ -385,12 +399,7 @@ namespace slib
 	{
 		return Map<String, Variant>::createHash();
 	}
-	
-	Variant Variant::createListMap()
-	{
-		return Map<String, Variant>::createList();
-	}
-	
+		
 	Variant Variant::createTreeMap()
 	{
 		return Map<String, Variant>::createTree();
@@ -495,7 +504,7 @@ namespace slib
 	Variant& Variant::operator=(Variant&& other)
 	{
 		if (this != &other) {
-			_Variant_free(_type, _value);
+			_priv_Variant_free(_type, _value);
 			_type = other._type;
 			_value = other._value;
 			other._type = VariantType::Null;
@@ -506,9 +515,9 @@ namespace slib
 	Variant& Variant::operator=(const Variant& other)
 	{
 		if (this != &other) {
-			_Variant_free(_type, _value);
+			_priv_Variant_free(_type, _value);
 			_type = other._type;
-			_Variant_copy(_type, other._value, _value);
+			_priv_Variant_copy(_type, other._value, _value);
 		}
 		return *this;
 	}
@@ -516,7 +525,7 @@ namespace slib
 	Variant& Variant::operator=(AtomicVariant&& other)
 	{
 		if ((void*)this != (void*)(&other)) {
-			_Variant_free(_type, _value);
+			_priv_Variant_free(_type, _value);
 			_type = other._type;
 			_value = other._value;
 			other._type = VariantType::Null;
@@ -526,7 +535,7 @@ namespace slib
 
 	Variant& Variant::operator=(const AtomicVariant& other)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		other._retain(_type, _value);
 		return *this;
 	}
@@ -550,7 +559,7 @@ namespace slib
 	void Variant::setNull()
 	{
 		if (_type != VariantType::Null) {
-			_Variant_free(_type, _value);
+			_priv_Variant_free(_type, _value);
 			_type = VariantType::Null;
 		}
 	}
@@ -611,7 +620,7 @@ namespace slib
 
 	void Variant::setInt32(sl_int32 value)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = value;
 	}
@@ -672,7 +681,7 @@ namespace slib
 
 	void Variant::setUint32(sl_uint32 value)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		_type = VariantType::Uint32;
 		REF_VAR(sl_uint32, _value) = value;
 	}
@@ -733,7 +742,7 @@ namespace slib
 
 	void Variant::setInt64(sl_int64 value)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		_type = VariantType::Int64;
 		REF_VAR(sl_int64, _value) = value;
 	}
@@ -794,7 +803,7 @@ namespace slib
 
 	void Variant::setUint64(sl_uint64 value)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		_type = VariantType::Uint64;
 		REF_VAR(sl_uint64, _value) = value;
 	}
@@ -866,7 +875,7 @@ namespace slib
 
 	void Variant::setFloat(float value)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		_type = VariantType::Float;
 		REF_VAR(float, _value) = value;
 	}
@@ -923,7 +932,7 @@ namespace slib
 
 	void Variant::setDouble(double value)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		_type = VariantType::Double;
 		REF_VAR(double, _value) = value;
 	}
@@ -1011,7 +1020,7 @@ namespace slib
 
 	void Variant::setBoolean(sl_bool value)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		_type = VariantType::Boolean;
 		REF_VAR(sl_bool, _value) = value;
 	}
@@ -1175,7 +1184,7 @@ namespace slib
 
 	void Variant::setString(const String& value)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		if (value.isNotNull()) {
 			_type = VariantType::String8;
 			new PTR_VAR(String, _value) String(value);
@@ -1186,7 +1195,7 @@ namespace slib
 
 	void Variant::setString(const String16& value)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		if (value.isNotNull()) {
 			_type = VariantType::String16;
 			new PTR_VAR(String16, _value) String16(value);
@@ -1197,7 +1206,7 @@ namespace slib
 
 	void Variant::setString(const AtomicString& s)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		String value(s);
 		if (value.isNotNull()) {
 			_type = VariantType::String8;
@@ -1209,7 +1218,7 @@ namespace slib
 
 	void Variant::setString(const AtomicString16& s)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		String value(s);
 		if (value.isNotNull()) {
 			_type = VariantType::String16;
@@ -1221,7 +1230,7 @@ namespace slib
 
 	void Variant::setString(const sl_char8* value)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		if (value) {
 			_type = VariantType::Sz8;
 			REF_VAR(const sl_char8*, _value) = value;
@@ -1232,13 +1241,47 @@ namespace slib
 
 	void Variant::setString(const sl_char16* value)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		if (value) {
 			_type = VariantType::Sz16;
 			REF_VAR(const sl_char16*, _value) = value;
 		} else {
 			_type = VariantType::Null;
 		}
+	}
+	
+	std::string Variant::getStdString(const std::string& def) const
+	{
+		return getString(def).toStd();
+	}
+	
+	std::string Variant::getStdString() const
+	{
+		return getString().toStd();
+	}
+	
+	std::u16string Variant::getStdString16(const std::u16string& def) const
+	{
+		return getString16(def).toStd();
+	}
+	
+	std::u16string Variant::getStdString16() const
+	{
+		return getString16().toStd();
+	}
+	
+	void Variant::setString(const std::string& value)
+	{
+		_priv_Variant_free(_type, _value);
+		_type = VariantType::String8;
+		new PTR_VAR(String, _value) String(value);
+	}
+	
+	void Variant::setString(const std::u16string& value)
+	{
+		_priv_Variant_free(_type, _value);
+		_type = VariantType::String16;
+		new PTR_VAR(String16, _value) String16(value);
 	}
 
 	sl_bool Variant::isTime() const
@@ -1272,7 +1315,7 @@ namespace slib
 
 	void Variant::setTime(const Time& value)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		_type = VariantType::Time;
 		REF_VAR(Time, _value) = value;
 	}
@@ -1292,7 +1335,7 @@ namespace slib
 
 	void Variant::setPointer(const void *ptr)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		if (ptr) {
 			_type = VariantType::Pointer;
 			REF_VAR(const void*, _value) = ptr;
@@ -1362,7 +1405,7 @@ namespace slib
 
 	void Variant::setMemory(const Memory& mem)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		if (mem.isNotNull()) {
 			_type = VariantType::Object;
 			new PTR_VAR(Memory, _value) Memory(mem);
@@ -1387,7 +1430,7 @@ namespace slib
 	
 	void Variant::setVariantList(const VariantList& list)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		if (list.isNotNull()) {
 			_type = VariantType::Object;
 			new PTR_VAR(VariantList, _value) VariantList(list);
@@ -1412,7 +1455,7 @@ namespace slib
 	
 	void Variant::setVariantMap(const VariantMap& map)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		if (map.isNotNull()) {
 			_type = VariantType::Object;
 			new PTR_VAR(VariantMap, _value) VariantMap(map);
@@ -1437,7 +1480,7 @@ namespace slib
 	
 	void Variant::setVariantMapList(const VariantMapList& list)
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 		if (list.isNotNull()) {
 			_type = VariantType::Object;
 			new PTR_VAR(VariantMapList, _value) VariantMapList(list);
@@ -1505,9 +1548,9 @@ namespace slib
 	}
 
 
-	static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map);
-	static sl_bool _Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list);
-	static sl_bool _Variant_getVariantListJsonString(StringBuffer& ret, const List<Variant>& list)
+	static sl_bool _priv_Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map);
+	static sl_bool _priv_Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list);
+	static sl_bool _priv_Variant_getVariantListJsonString(StringBuffer& ret, const List<Variant>& list)
 	{
 		ListLocker<Variant> l(list);
 		sl_size n = l.count;
@@ -1527,15 +1570,15 @@ namespace slib
 				Ref<Referable> obj(v.getObject());
 				if (obj.isNotNull()) {
 					if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
-						if (!_Variant_getVariantListJsonString(ret, p1)) {
+						if (!_priv_Variant_getVariantListJsonString(ret, p1)) {
 							return sl_false;
 						}
 					} else if (IMap<String, Variant>* p2 = CastInstance< IMap<String, Variant> >(obj._ptr)) {
-						if (!_Variant_getVariantMapJsonString(ret, p2)) {
+						if (!_priv_Variant_getVariantMapJsonString(ret, p2)) {
 							return sl_false;
 						}
 					} else if (CList< Map<String, Variant> >* p3 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
-						if (!_Variant_getVariantMapListJsonString(ret, p3)) {
+						if (!_priv_Variant_getVariantMapListJsonString(ret, p3)) {
 							return sl_false;
 						}
 					}
@@ -1553,7 +1596,7 @@ namespace slib
 		return sl_true;
 	}
 
-	static sl_bool _Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list)
+	static sl_bool _priv_Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list)
 	{
 		ListLocker< Map<String, Variant> > l(list);
 		sl_size n = l.count;
@@ -1569,7 +1612,7 @@ namespace slib
 					return sl_false;
 				}
 			}
-			if (!_Variant_getVariantMapJsonString(ret, v)) {
+			if (!_priv_Variant_getVariantMapJsonString(ret, v)) {
 				return sl_false;
 			}
 		}
@@ -1579,15 +1622,14 @@ namespace slib
 		return sl_true;
 	}
 
-	static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map)
+	static sl_bool _priv_Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map)
 	{
-		Iterator< Pair<String, Variant> > iterator(map.toIterator());
+		MutexLocker lock(map.getLocker());
 		if (!(ret.addStatic("{", 1))) {
 			return sl_false;
 		}
 		sl_bool flagFirst = sl_true;
-		Pair<String, Variant> pair;
-		while (iterator.next(&pair)) {
+		for (auto& pair : map) {
 			Variant& v = pair.value;
 			if (!flagFirst) {
 				if (!(ret.addStatic(", ", 2))) {
@@ -1604,15 +1646,15 @@ namespace slib
 				Ref<Referable> obj(v.getObject());
 				if (obj.isNotNull()) {
 					if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
-						if (!_Variant_getVariantListJsonString(ret, p1)) {
+						if (!_priv_Variant_getVariantListJsonString(ret, p1)) {
 							return sl_false;
 						}
 					} else if (IMap<String, Variant>* p2 = CastInstance< IMap<String, Variant> >(obj._ptr)) {
-						if (!_Variant_getVariantMapJsonString(ret, p2)) {
+						if (!_priv_Variant_getVariantMapJsonString(ret, p2)) {
 							return sl_false;
 						}
 					} else if (CList< Map<String, Variant> >* p3 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
-						if (!_Variant_getVariantMapListJsonString(ret, p3)) {
+						if (!_priv_Variant_getVariantMapListJsonString(ret, p3)) {
 							return sl_false;
 						}
 					}
@@ -1657,19 +1699,19 @@ namespace slib
 					if (obj.isNotNull()) {
 						if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_Variant_getVariantListJsonString(ret, p1)) {
+							if (!_priv_Variant_getVariantListJsonString(ret, p1)) {
 								return "<json-error>";
 							}
 							return ret.merge();
 						} else if (IMap<String, Variant>* p2 = CastInstance< IMap<String, Variant> >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_Variant_getVariantMapJsonString(ret, p2)) {
+							if (!_priv_Variant_getVariantMapJsonString(ret, p2)) {
 								return "<json-error>";
 							}
 							return ret.merge();
 						} else if (CList< Map<String, Variant> >* p3 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_Variant_getVariantMapListJsonString(ret, p3)) {
+							if (!_priv_Variant_getVariantMapListJsonString(ret, p3)) {
 								return "<json-error>";
 							}
 							return ret.merge();
@@ -1715,19 +1757,19 @@ namespace slib
 					if (obj.isNotNull()) {
 						if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_Variant_getVariantListJsonString(ret, p1)) {
+							if (!_priv_Variant_getVariantListJsonString(ret, p1)) {
 								return strNull;
 							}
 							return ret.merge();
 						} else if (IMap<String, Variant>* p2 = CastInstance< IMap<String, Variant> >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_Variant_getVariantMapJsonString(ret, p2)) {
+							if (!_priv_Variant_getVariantMapJsonString(ret, p2)) {
 								return strNull;
 							}
 							return ret.merge();
 						} else if (CList< Map<String, Variant> >* p3 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_Variant_getVariantMapListJsonString(ret, p3)) {
+							if (!_priv_Variant_getVariantMapListJsonString(ret, p3)) {
 								return strNull;
 							}
 							return ret.merge();
@@ -1764,17 +1806,17 @@ namespace slib
 		*this = _in;
 	}
 	
-	void Variant::get(char& _out) const
+	void Variant::get(signed char& _out) const
 	{
-		_out = (char)(getInt32());
+		_out = (signed char)(getInt32());
 	}
 	
-	void Variant::get(char& _out, char def) const
+	void Variant::get(signed char& _out, signed char def) const
 	{
-		_out = (char)(getInt32((sl_int32)def));
+		_out = (signed char)(getInt32((sl_int32)def));
 	}
 	
-	void Variant::set(char _in)
+	void Variant::set(signed char _in)
 	{
 		setInt32((sl_int32)_in);
 	}
@@ -2029,6 +2071,36 @@ namespace slib
 		setString(_in);
 	}
 	
+	void Variant::get(std::string& _out) const
+	{
+		_out = getString().toStd();
+	}
+	
+	void Variant::get(std::string& _out, const std::string& def) const
+	{
+		_out = getString(def).toStd();
+	}
+	
+	void Variant::set(const std::string& _in)
+	{
+		setString(_in);
+	}
+	
+	void Variant::get(std::u16string& _out) const
+	{
+		_out = getString16().toStd();
+	}
+	
+	void Variant::get(std::u16string& _out, const std::u16string& def) const
+	{
+		_out = getString16(def).toStd();
+	}
+	
+	void Variant::set(const std::u16string& _in)
+	{
+		setString(_in);
+	}
+
 	void Variant::get(Time& _out) const
 	{
 		_out = getTime();
@@ -2162,19 +2234,19 @@ namespace slib
 	Atomic<Variant>::Atomic(const Variant& other)
 	{
 		_type = other._type;
-		_Variant_copy(_type, other._value, _value);
+		_priv_Variant_copy(_type, other._value, _value);
 	}
 
 	Atomic<Variant>::~Atomic()
 	{
-		_Variant_free(_type, _value);
+		_priv_Variant_free(_type, _value);
 	}
 
 	Atomic<Variant>::Atomic(sl_null_t): _value(0), _type(VariantType::Null)
 	{
 	}
 	
-	Atomic<Variant>::Atomic(char value)
+	Atomic<Variant>::Atomic(signed char value)
 	{
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = value;
@@ -2313,6 +2385,18 @@ namespace slib
 			_type = VariantType::Null;
 		}
 	}
+	
+	Atomic<Variant>::Atomic(const std::string& value)
+	{
+		_type = VariantType::String8;
+		new PTR_VAR(String, _value) String(value);
+	}
+	
+	Atomic<Variant>::Atomic(const std::u16string& value)
+	{
+		_type = VariantType::String16;
+		new PTR_VAR(String16, _value) String16(value);
+	}
 
 	Atomic<Variant>::Atomic(const Time& value)
 	{
@@ -2444,7 +2528,7 @@ namespace slib
 	{
 		VariantType type = other._type;
 		sl_uint64 value;
-		_Variant_copy(type, other._value, value);
+		_priv_Variant_copy(type, other._value, value);
 		_replace(type, value);
 		return *this;
 	}
@@ -2742,6 +2826,44 @@ namespace slib
 			_replace(VariantType::Null, 0);
 		}
 	}
+	
+	std::string Atomic<Variant>::getStdString(const std::string& def) const
+	{
+		Variant var(*this);
+		return var.getString(def).toStd();
+	}
+	
+	std::string Atomic<Variant>::getStdString() const
+	{
+		Variant var(*this);
+		return var.getString().toStd();
+	}
+	
+	std::u16string Atomic<Variant>::getStdString16(const std::u16string& def) const
+	{
+		Variant var(*this);
+		return var.getString16(def).toStd();
+	}
+	
+	std::u16string Atomic<Variant>::getStdString16() const
+	{
+		Variant var(*this);
+		return var.getString16().toStd();
+	}
+	
+	void Atomic<Variant>::setString(const std::string& value)
+	{
+		sl_int64 v;
+		new PTR_VAR(String, v) String(value);
+		_replace(VariantType::String8, v);
+	}
+	
+	void Atomic<Variant>::setString(const std::u16string& value)
+	{
+		sl_int64 v;
+		new PTR_VAR(String16, v) String16(value);
+		_replace(VariantType::String16, v);
+	}
 
 	sl_bool Atomic<Variant>::isTime() const
 	{
@@ -2983,17 +3105,17 @@ namespace slib
 		*this = _in;
 	}
 	
-	void Atomic<Variant>::get(char& _out) const
+	void Atomic<Variant>::get(signed char& _out) const
 	{
-		_out = (char)(getInt32());
+		_out = (signed char)(getInt32());
 	}
 	
-	void Atomic<Variant>::get(char& _out, char def) const
+	void Atomic<Variant>::get(signed char& _out, signed char def) const
 	{
-		_out = (char)(getInt32((sl_int32)def));
+		_out = (signed char)(getInt32((sl_int32)def));
 	}
 	
-	void Atomic<Variant>::set(char _in)
+	void Atomic<Variant>::set(signed char _in)
 	{
 		setInt32((sl_int32)_in);
 	}
@@ -3248,6 +3370,36 @@ namespace slib
 		setString(_in);
 	}
 	
+	void Atomic<Variant>::get(std::string& _out) const
+	{
+		_out = getString().toStd();
+	}
+	
+	void Atomic<Variant>::get(std::string& _out, const std::string& def) const
+	{
+		_out = getString(def).toStd();
+	}
+	
+	void Atomic<Variant>::set(const std::string& _in)
+	{
+		setString(_in);
+	}
+	
+	void Atomic<Variant>::get(std::u16string& _out) const
+	{
+		_out = getString16().toStd();
+	}
+	
+	void Atomic<Variant>::get(std::u16string& _out, const std::u16string& def) const
+	{
+		_out = getString16(def).toStd();
+	}
+	
+	void Atomic<Variant>::set(const std::u16string& _in)
+	{
+		setString(_in);
+	}
+
 	void Atomic<Variant>::get(Time& _out) const
 	{
 		_out = getTime();

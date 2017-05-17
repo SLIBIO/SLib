@@ -189,20 +189,17 @@ namespace slib
 		}
 
 	public:
-		// override
-		void save()
+		void save() override
 		{
 			::cairo_save(m_graphics);
 		}
 
-		// override
-		void restore()
+		void restore() override
 		{
 			::cairo_restore(m_graphics);
 		}
 
-		// override
-		Rectangle getClipBounds()
+		Rectangle getClipBounds() override
 		{
 			double x1 = 0;
 			double y1 = 0;
@@ -212,15 +209,13 @@ namespace slib
 			return Rectangle((sl_real)x1, (sl_real)y1, (sl_real)x2, (sl_real)y2);
 		}
 
-		// override
-		void clipToRectangle(const Rectangle& rect)
+		void clipToRectangle(const Rectangle& rect) override
 		{
 			::cairo_rectangle(m_graphics, rect.left, rect.top, rect.getWidth(), rect.getHeight());
 			::cairo_clip(m_graphics);
 		}
 
-		// override
-		void clipToPath(const Ref<GraphicsPath>& path)
+		void clipToPath(const Ref<GraphicsPath>& path) override
 		{
 			if (path.isNotNull()) {
 				if (_applyPath(m_graphics, path.get())) {
@@ -229,8 +224,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void concatMatrix(const Matrix3& other)
+		void concatMatrix(const Matrix3& other) override
 		{
 			cairo_matrix_t t;
 			t.xx = other.m00;
@@ -242,8 +236,7 @@ namespace slib
 			::cairo_transform(m_graphics, &t);
 		}
 
-		// override
-		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& in_font, const Color& _color)
+		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& in_font, const Color& _color) override
 		{
 			if (text.isNotEmpty()) {
 				Ref<Font> _font = in_font;
@@ -292,8 +285,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen)
+		void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen) override
 		{
 			Ref<Pen> pen = _pen;
 			if (pen.isNull()) {
@@ -307,8 +299,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen)
+		void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen) override
 		{
 			if (countPoints < 2) {
 				return;
@@ -327,8 +318,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen)
+		void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen) override
 		{
 			Ref<GraphicsPath> path = GraphicsPath::create();
 			if (path.isNotNull()) {
@@ -337,15 +327,13 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush)
+		void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush) override
 		{
 			::cairo_rectangle(m_graphics, rect.left, rect.top, rect.getWidth(), rect.getHeight());
 			_drawPath(pen, brush);
 		}
 
-		// override
-		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Ref<Brush>& brush)
+		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Ref<Brush>& brush) override
 		{
 			Ref<GraphicsPath> path = GraphicsPath::create();
 			if (path.isNotNull()) {
@@ -354,8 +342,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush)
+		void drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush) override
 		{
 			Ref<GraphicsPath> path = GraphicsPath::create();
 			if (path.isNotNull()) {
@@ -364,8 +351,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode)
+		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode) override
 		{
 			if (countPoints <= 2) {
 				return;
@@ -382,8 +368,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush)
+		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush) override
 		{
 			Ref<GraphicsPath> path = GraphicsPath::create();
 			if (path.isNotNull()) {
@@ -392,8 +377,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Ref<Brush>& brush)
+		void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Ref<Brush>& brush) override
 		{
 			if (path.isNotNull()) {
 				if (_applyPath(m_graphics, path.get())) {
@@ -423,13 +407,11 @@ namespace slib
 			}
 		}
 
-		// override
-		void _setAlpha(sl_real alpha)
+		void _setAlpha(sl_real alpha) override
 		{
 		}
 
-		// override
-		void _setAntiAlias(sl_bool flag)
+		void _setAntiAlias(sl_bool flag) override
 		{
 			if (flag) {
 				::cairo_set_antialias(m_graphics, CAIRO_ANTIALIAS_GOOD);

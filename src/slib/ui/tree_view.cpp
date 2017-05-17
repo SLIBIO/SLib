@@ -25,8 +25,7 @@ namespace slib
 		}
 		
 	public:
-		// override
-		void onDraw(Canvas* canvas)
+		void onDraw(Canvas* canvas) override
 		{
 			Ref<TreeView> tree = m_tree;
 			if (tree.isNotNull()) {
@@ -34,8 +33,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void onMouseEvent(UIEvent* ev)
+		void onMouseEvent(UIEvent* ev) override
 		{
 			Ref<TreeView> tree = m_tree;
 			if (tree.isNotNull()) {
@@ -457,20 +455,17 @@ namespace slib
 		}
 		
 	public:
-		// override
-		sl_real getDrawableWidth()
+		sl_real getDrawableWidth() override
 		{
 			return 16;
 		}
 		
-		// override
-		sl_real getDrawableHeight()
+		sl_real getDrawableHeight() override
 		{
 			return 16;
 		}
 		
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
 		{
 			if (m_brush.isNotNull()) {
 				Point pts[3];

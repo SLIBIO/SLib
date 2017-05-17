@@ -22,8 +22,7 @@ namespace slib
 	class _Win32_ButtonViewInstance : public Win32_ViewInstance
 	{
 	public:
-		// override
-		sl_bool preprocessWindowMessage(MSG& msg)
+		sl_bool preprocessWindowMessage(MSG& msg) override
 		{
 			if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
 				LRESULT lr;
@@ -35,14 +34,12 @@ namespace slib
 			return sl_false;
 		}
 
-		// override
-		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
+		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
 		{
 			return sl_false;
 		}
 
-		// override
-		sl_bool processCommand(SHORT code, LRESULT& result)
+		sl_bool processCommand(SHORT code, LRESULT& result) override
 		{
 			if (code == BN_CLICKED) {
 				onClick();

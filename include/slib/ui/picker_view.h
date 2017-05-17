@@ -76,17 +76,14 @@ namespace slib
 		SLIB_PROPERTY(AtomicFunction<void(PickerView*, sl_uint32)>, OnSelectItem)
 		
 	protected:
-		// override
-		void onDraw(Canvas* canvas);
+		void onDraw(Canvas* canvas) override;
 		
-		// override
-		void onMouseEvent(UIEvent* ev);
+		void onMouseEvent(UIEvent* ev) override;
 		
 		virtual void onSelectItem(sl_uint32 index);
 		
 	public:
-		// override
-		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
 		virtual void dispatchSelectItem(sl_uint32 index);
 		
@@ -116,8 +113,7 @@ namespace slib
 		
 		void _setItemTitle_NW(sl_uint32 index, const String& title);
 		
-		// override
-		void _setFont_NW(const Ref<Font>& font);
+		void _setFont_NW(const Ref<Font>& font) override;
 		
 	protected:
 		AtomicList<String> m_values;
