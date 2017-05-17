@@ -17,8 +17,9 @@ namespace slib
 	
 	#define PRIV_SLIB_LIST_CAPACITY_MIN 5
 	
-	sl_bool _priv_CList::setCapacity(void** pData, sl_size elementSize, sl_size* pCapacity, sl_size *pCount, sl_size capacity) noexcept
+	sl_bool _priv_CList::setCapacity(void* _pData, sl_size elementSize, sl_size* pCapacity, sl_size *pCount, sl_size capacity) noexcept
 	{
+		void** pData = reinterpret_cast<void**>(_pData);
 		if (capacity < *pCount) {
 			capacity = *pCount;
 		}
@@ -39,8 +40,9 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool _priv_CList::adjustCapacity(void** pData, sl_size elementSize, sl_size* pCapacity, sl_size* pCount, sl_size count) noexcept
+	sl_bool _priv_CList::adjustCapacity(void* _pData, sl_size elementSize, sl_size* pCapacity, sl_size* pCount, sl_size count) noexcept
 	{
+		void** pData = reinterpret_cast<void**>(_pData);
 		if (count < *pCount) {
 			count = *pCount;
 		}
