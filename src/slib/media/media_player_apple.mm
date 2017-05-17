@@ -122,14 +122,12 @@ namespace slib
 		}
 		
 	public:
-		// override
-		void release()
+		void release() override
 		{
 			_release(sl_false, sl_false);
 		}
 		
-		// override
-		void resume()
+		void resume() override
 		{
 			ObjectLocker lock(this);
 			if (!m_flagInited) {
@@ -148,8 +146,7 @@ namespace slib
 			_addToMap();
 		}
 		
-		// override
-		void pause()
+		void pause() override
 		{
 			ObjectLocker lock(this);
 			if (!m_flagInited) {
@@ -167,21 +164,18 @@ namespace slib
 			m_flagPlaying = sl_false;
 			_removeFromMap();
 		}
-		
-		// override
-		sl_bool isPlaying()
+	
+		sl_bool isPlaying() override
 		{
 			return m_flagPlaying;
 		}
 		
-		// override
-		sl_real getVolume()
+		sl_real getVolume() override
 		{
 			return m_volume;
 		}
 		
-		// override
-		void setVolume(sl_real volume)
+		void setVolume(sl_real volume) override
 		{
 			ObjectLocker lock(this);
 			if (!m_flagInited) {
@@ -194,8 +188,7 @@ namespace slib
 			m_volume = volume;
 		}
 		
-		// override
-		void renderVideo(MediaPlayerRenderVideoParam& param)
+		void renderVideo(MediaPlayerRenderVideoParam& param) override
 		{
 			param.flagUpdated = sl_false;
 			if (param.onUpdateFrame.isNull()) {

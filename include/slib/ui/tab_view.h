@@ -150,25 +150,20 @@ namespace slib
 		SLIB_PROPERTY(AtomicFunction<void(TabView*, sl_uint32)>, OnSelectTab)
 		
 	public:
-		// override
-		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
 		virtual void dispatchSelectTab(sl_uint32 index);
 		
 	protected:
 		virtual void onSelectTab(sl_uint32 index);
 		
-		// override
-		void onClick(UIEvent* ev);
+		void onClick(UIEvent* ev) override;
 		
-		// override
-		void onMouseEvent(UIEvent* ev);
+		void onMouseEvent(UIEvent* ev) override;
 		
-		// override
-		void onDraw(Canvas* canvas);
+		void onDraw(Canvas* canvas) override;
 		
-		// override
-		void onResize(sl_ui_len width, sl_ui_len height);
+		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
 		virtual void onDrawTab(Canvas* canvas, const UIRect& rect, sl_uint32 index, const String& label);
 		
@@ -192,8 +187,7 @@ namespace slib
 		
 		void _selectTab_NW(sl_uint32 index);
 		
-		// override
-		void _setFont_NW(const Ref<Font>& font);
+		void _setFont_NW(const Ref<Font>& font) override;
 		
 	protected:
 		CList<TabViewItem> m_items;

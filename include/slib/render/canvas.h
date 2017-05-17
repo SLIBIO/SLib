@@ -83,76 +83,53 @@ namespace slib
 		
 		RenderCanvasState* getCurrentState();
 		
-		// override
-		void save();
+		void save() override;
 		
-		// override
-		void restore();
+		void restore() override;
 		
-		// override
-		Rectangle getClipBounds();
+		Rectangle getClipBounds() override;
 		
-		// override
-		void clipToRectangle(const Rectangle& rect);
+		void clipToRectangle(const Rectangle& rect) override;
 		
-		// override
-		void clipToPath(const Ref<GraphicsPath>& path);
+		void clipToPath(const Ref<GraphicsPath>& path) override;
 		
-		// override
-		void clipToRoundRect(const Rectangle& rect, const Size& radius);
+		void clipToRoundRect(const Rectangle& rect, const Size& radius) override;
 		
-		// override
-		void clipToEllipse(const Rectangle& rect);
+		void clipToEllipse(const Rectangle& rect) override;
 		
-		// override
-		void concatMatrix(const Matrix3& matrix);
+		void concatMatrix(const Matrix3& matrix) override;
 		
-		// override
-		void translate(sl_real dx, sl_real dy);
+		void translate(sl_real dx, sl_real dy) override;
 		
-		// override
-		Size measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine = sl_false);
+		Size measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine = sl_false) override;
 		
-		// override
-		Size measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false);
+		Size measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false) override;
 		
 		static Size measureRenderingText(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false);
 		
-		// override
-		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color);
+		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) override;
 		
-		// override
-		void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color);
+		void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) override;
 		
-		// override
-		void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen);
+		void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen) override;
 		
-		// override
-		void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen);
+		void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen) override;
 		
-		// override
-		void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen);
+		void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen) override;
 		
-		// override
-		void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush);
+		void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush) override;
 		
-		// override
-		void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor);
+		void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor) override;
 		
-		// override
-		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Ref<Brush>& brush);
+		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Ref<Brush>& brush) override;
 		
-		// override
-		void drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush);
+		void drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush) override;
 		
-		// override
-		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = FillMode::Alternate);
+		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = FillMode::Alternate) override;
 		
-		// override
-		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush);
+		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush) override;
 		
-		// override
-		void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Ref<Brush>& brush);
+		void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Ref<Brush>& brush) override;
 		
 		
 		void drawTexture(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, const DrawParam& param, const Color4f& color);
@@ -188,18 +165,14 @@ namespace slib
 		
 		
 	protected:
-		// override
-		void onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param);
+		void onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param) override;
 		
-		// override
-		void onDrawAll(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param);
+		void onDrawAll(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param) override;
 		
 	protected:
-		// override
-		void _setAlpha(sl_real alpha);
+		void _setAlpha(sl_real alpha) override;
 		
-		// override
-		void _setAntiAlias(sl_bool flag);
+		void _setAntiAlias(sl_bool flag) override;
 		
 		void _drawBitmap(const Rectangle& rectDst, Bitmap* src, const Rectangle& rectSrc, const DrawParam& param);
 		

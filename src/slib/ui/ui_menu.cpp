@@ -127,8 +127,7 @@ namespace slib
 	class _MenuItemSeparator : public MenuItem
 	{
 	public:
-		// override
-		sl_bool isSeparator() const
+		sl_bool isSeparator() const override
 		{
 			return sl_true;
 		}

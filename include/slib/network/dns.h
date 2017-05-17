@@ -481,8 +481,7 @@ namespace slib
 		void sendQuestion(const IPv4Address& serverIp, const String& hostName);
 		
 	protected:
-		// override
-		virtual void onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive);
+		void onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive) override;
 		
 	protected:
 		void _onDnsAnswer(const SocketAddress& serverAddress, const DnsPacket& packet);
@@ -604,8 +603,7 @@ namespace slib
 		Memory _buildHostAddressAnswerPacket(sl_uint16 id, const String& hostName, const IPv4Address& hostAddress, sl_bool flagEncrypt);
 		
 	protected:
-		// override
-		virtual void onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive);
+		void onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive) override;
 		
 	protected:
 		void _resolveDnsHost(DnsResolveHostParam& param);

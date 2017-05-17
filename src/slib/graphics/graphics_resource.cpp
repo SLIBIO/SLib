@@ -170,20 +170,17 @@ namespace slib
 		}
 		
 	public:
-		// override
-		sl_real getDrawableWidth()
+		sl_real getDrawableWidth() override
 		{
 			return (sl_real)m_width;
 		}
 		
-		// override
-		sl_real getDrawableHeight()
+		sl_real getDrawableHeight() override
 		{
 			return (sl_real)m_height;
 		}
 		
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override
 		{
 			Rectangle rectDstWhole = GraphicsUtil::transformRectangle(rectDst, rectSrc, Rectangle(0, 0, (float)m_width, (float)m_height));
 			sl_int32 width = (sl_int32)(rectDstWhole.getWidth());
@@ -203,8 +200,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
 		{
 			sl_int32 width = (sl_int32)(rectDst.getWidth());
 			sl_int32 height = (sl_int32)(rectDst.getHeight());
@@ -239,20 +235,17 @@ namespace slib
 		}
 		
 	public:
-		// override
-		sl_real getDrawableWidth()
+		sl_real getDrawableWidth() override
 		{
 			return (sl_real)m_width;
 		}
 		
-		// override
-		sl_real getDrawableHeight()
+		sl_real getDrawableHeight() override
 		{
 			return (sl_real)m_height;
 		}
 		
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override
 		{
 			Rectangle rectDstWhole = GraphicsUtil::transformRectangle(rectDst, rectSrc, Rectangle(0, 0, (float)m_width, (float)m_height));
 			sl_int32 width = (sl_int32)(rectDstWhole.getWidth());
@@ -272,8 +265,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
 		{
 			sl_int32 width = (sl_int32)(rectDst.getWidth());
 			sl_int32 height = (sl_int32)(rectDst.getHeight());

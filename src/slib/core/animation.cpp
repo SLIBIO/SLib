@@ -1036,8 +1036,7 @@ namespace slib
 		}
 
 	public:
-		// override
-		void _wake()
+		void _wake() override
 		{
 			if (m_thread.isNotNull()) {
 				m_thread->wake();

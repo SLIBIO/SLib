@@ -34,8 +34,7 @@ namespace slib
 		}
 		
 	public:
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
 		{
 			sl_bool flagAntiAlias = canvas->isAntiAlias();
 			canvas->setAntiAlias(sl_false);

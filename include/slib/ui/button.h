@@ -178,8 +178,7 @@ namespace slib
 		
 		Ref<Drawable> getBackground();
 		
-		// override
-		void setBackground(const Ref<Drawable>& background, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setBackground(const Ref<Drawable>& background, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 
 		
 		Ref<Pen> getBorder(ButtonState state, sl_uint32 category = 0);
@@ -188,8 +187,7 @@ namespace slib
 		
 		Ref<Pen> getBorder();
 		
-		// override
-		void setBorder(const Ref<Pen>& pen, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setBorder(const Ref<Pen>& pen, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 
 		void setBorder(sl_bool flagBorder, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
@@ -199,36 +197,26 @@ namespace slib
 		void setUsingDefaultColorFilter(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 	public:
-		// override
-		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
-		// override
-		void setEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 		
-		// override
-		void setPressedState(sl_bool flagState, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setPressedState(sl_bool flagState, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 		
-		// override
-		void setHoverState(sl_bool flagState, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setHoverState(sl_bool flagState, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 		
 	protected:
-		// override
-		void onDraw(Canvas* canvas);
+		void onDraw(Canvas* canvas) override;
 		
-		// override
-		void onDrawBackground(Canvas* canvas);
+		void onDrawBackground(Canvas* canvas) override;
 		
-		// override
-		void onDrawBorder(Canvas* canvas);
+		void onDrawBorder(Canvas* canvas) override;
 		
-		// override
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
+		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical) override;
 		
-		// override
-		void onKeyEvent(UIEvent* ev);
+		void onKeyEvent(UIEvent* ev) override;
 
-		// override
-		void onClick(UIEvent* ev);
+		void onClick(UIEvent* ev) override;
 		
 	protected:
 		virtual UISize measureContentSize();
@@ -245,8 +233,7 @@ namespace slib
 		
 		virtual void _setDefaultButton_NW(sl_bool flag);
 
-		// override
-		void _setFont_NW(const Ref<Font>& font);
+		void _setFont_NW(const Ref<Font>& font) override;
 
 	private:
 		AtomicString m_text;

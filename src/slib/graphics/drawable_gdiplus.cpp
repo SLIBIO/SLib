@@ -63,20 +63,17 @@ namespace slib
 			return sl_null;
 		}
 		
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override
 		{
 			GraphicsPlatform::drawImage(canvas, rectDst, m_image, rectSrc, param);
 		}
 		
-		// override
-		sl_real getDrawableWidth()
+		sl_real getDrawableWidth() override
 		{
 			return (sl_real)(m_image->GetWidth());
 		}
 		
-		// override
-		sl_real getDrawableHeight()
+		sl_real getDrawableHeight() override
 		{
 			return (sl_real)(m_image->GetHeight());
 		}

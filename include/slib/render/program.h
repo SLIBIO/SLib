@@ -236,14 +236,11 @@ namespace slib
 	class SLIB_EXPORT _RenderProgramTemplate : public RenderProgram
 	{
 	public:
-		// override
-		sl_bool onInit(RenderEngine* engine, RenderProgramState* state);
+		sl_bool onInit(RenderEngine* engine, RenderProgramState* state) override;
 		
-		// override
-		sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state);
+		sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state) override;
 		
-		// override
-		void onPostRender(RenderEngine* engine, RenderProgramState* state);
+		void onPostRender(RenderEngine* engine, RenderProgramState* state) override;
 
 	};
 
@@ -251,8 +248,7 @@ namespace slib
 	class SLIB_EXPORT RenderProgramT : public _RenderProgramTemplate
 	{
 	public:
-		// override
-		Ref<RenderProgramState> onCreate(RenderEngine* engine)
+		Ref<RenderProgramState> onCreate(RenderEngine* engine) override
 		{
 			return new StateType;
 		}
@@ -282,27 +278,23 @@ namespace slib
 	class SLIB_EXPORT RenderProgram2D_PositionTexture : public RenderProgramT<RenderProgramState2D_PositionTexture>
 	{
 	public:
-		// override
-		String getGLSLVertexShader(RenderEngine* engine);
+		String getGLSLVertexShader(RenderEngine* engine) override;
 		
-		// override
-		String getGLSLFragmentShader(RenderEngine* engine);
+		String getGLSLFragmentShader(RenderEngine* engine) override;
 		
 	};
 
 	class SLIB_EXPORT RenderProgram2D_PositionTextureYUV : public RenderProgram2D_PositionTexture
 	{
 	public:
-		// override
-		String getGLSLFragmentShader(RenderEngine* engine);
+		String getGLSLFragmentShader(RenderEngine* engine) override;
 		
 	};
 
 	class SLIB_EXPORT RenderProgram2D_PositionTextureOES : public RenderProgram2D_PositionTexture
 	{
 	public:
-		// override
-		String getGLSLFragmentShader(RenderEngine* engine);
+		String getGLSLFragmentShader(RenderEngine* engine) override;
 		
 	};
 
@@ -324,11 +316,9 @@ namespace slib
 	class SLIB_EXPORT RenderProgram2D_PositionColor : public RenderProgramT<RenderProgramState2D_PositionColor>
 	{
 	public:
-		// override
-		String getGLSLVertexShader(RenderEngine* engine);
+		String getGLSLVertexShader(RenderEngine* engine) override;
 		
-		// override
-		String getGLSLFragmentShader(RenderEngine* engine);
+		String getGLSLFragmentShader(RenderEngine* engine) override;
 		
 	};
 
@@ -348,11 +338,9 @@ namespace slib
 	class SLIB_EXPORT RenderProgram2D_Position : public RenderProgramT<RenderProgramState2D_Position>
 	{
 	public:
-		// override
-		String getGLSLVertexShader(RenderEngine* engine);
+		String getGLSLVertexShader(RenderEngine* engine) override;
 		
-		// override
-		String getGLSLFragmentShader(RenderEngine* engine);
+		String getGLSLFragmentShader(RenderEngine* engine) override;
 		
 	};
 
@@ -380,11 +368,9 @@ namespace slib
 	class SLIB_EXPORT RenderProgram3D_PositionNormalColor : public RenderProgramT<RenderProgramState3D_PositionNormalColor>
 	{
 	public:
-		// override
-		String getGLSLVertexShader(RenderEngine* engine);
+		String getGLSLVertexShader(RenderEngine* engine) override;
 		
-		// override
-		String getGLSLFragmentShader(RenderEngine* engine);
+		String getGLSLFragmentShader(RenderEngine* engine) override;
 		
 	};
 
@@ -406,11 +392,9 @@ namespace slib
 	class SLIB_EXPORT RenderProgram3D_PositionColor : public RenderProgramT<RenderProgramState3D_PositionColor>
 	{
 	public:
-		// override
-		String getGLSLVertexShader(RenderEngine* engine);
+		String getGLSLVertexShader(RenderEngine* engine) override;
 		
-		// override
-		String getGLSLFragmentShader(RenderEngine* engine);
+		String getGLSLFragmentShader(RenderEngine* engine) override;
 		
 	};
 
@@ -439,11 +423,9 @@ namespace slib
 	class SLIB_EXPORT RenderProgram3D_PositionNormalTexture : public RenderProgramT<RenderProgramState3D_PositionNormalTexture>
 	{
 	public:
-		// override
-		String getGLSLVertexShader(RenderEngine* engine);
+		String getGLSLVertexShader(RenderEngine* engine) override;
 		
-		// override
-		String getGLSLFragmentShader(RenderEngine* engine);
+		String getGLSLFragmentShader(RenderEngine* engine) override;
 		
 	};
 
@@ -466,11 +448,9 @@ namespace slib
 	class SLIB_EXPORT RenderProgram3D_PositionTexture : public RenderProgramT<RenderProgramState3D_PositionTexture>
 	{
 	public:
-		// override
-		String getGLSLVertexShader(RenderEngine* engine);
+		String getGLSLVertexShader(RenderEngine* engine) override;
 		
-		// override
-		String getGLSLFragmentShader(RenderEngine* engine);
+		String getGLSLFragmentShader(RenderEngine* engine) override;
 		
 	};
 
@@ -496,11 +476,9 @@ namespace slib
 	class SLIB_EXPORT RenderProgram3D_PositionNormal : public RenderProgramT<RenderProgramState3D_PositionNormal>
 	{
 	public:
-		// override
-		String getGLSLVertexShader(RenderEngine* engine);
+		String getGLSLVertexShader(RenderEngine* engine) override;
 		
-		// override
-		String getGLSLFragmentShader(RenderEngine* engine);
+		String getGLSLFragmentShader(RenderEngine* engine) override;
 		
 	};
 
@@ -520,11 +498,9 @@ namespace slib
 	class SLIB_EXPORT RenderProgram3D_Position : public RenderProgramT<RenderProgramState3D_Position>
 	{
 	public:
-		// override
-		String getGLSLVertexShader(RenderEngine* engine);
+		String getGLSLVertexShader(RenderEngine* engine) override;
 		
-		// override
-		String getGLSLFragmentShader(RenderEngine* engine);
+		String getGLSLFragmentShader(RenderEngine* engine) override;
 		
 	};
 

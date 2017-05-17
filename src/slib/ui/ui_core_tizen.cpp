@@ -57,8 +57,7 @@ namespace slib
 		}
 
 	public:
-		// override
-		UIRect getRegion()
+		UIRect getRegion() override
 		{
 			int rotation = 0;
 
@@ -217,7 +216,7 @@ namespace slib
 			return;
 		}
 
-		ListLocker<String> args = app->getArguments();
+		ListLocker<String> args(app->getArguments());
 		sl_uint32 n = (sl_uint32)(args.count);
 		SLIB_SCOPED_BUFFER(char*, 64, p, n)
 		for (sl_uint32 i = 0; i < n; i++) {

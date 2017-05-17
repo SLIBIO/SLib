@@ -63,20 +63,17 @@ namespace slib
 			return create(hEvent, sl_true);
 		}
 
-		// override
-		void _native_set()
+		void _native_set() override
 		{
 			::SetEvent(m_hEvent);
 		}
 
-		// override
-		void _native_reset()
+		void _native_reset() override
 		{
 			::ResetEvent(m_hEvent);
 		}
 
-		// override
-		sl_bool _native_wait(sl_int32 timeout)
+		sl_bool _native_wait(sl_int32 timeout) override
 		{
 			DWORD t = INFINITE;
 			if (timeout >= 0) {

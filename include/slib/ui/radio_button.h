@@ -32,11 +32,9 @@ namespace slib
 		~RadioButton();
 
 	public:
-		// override
-		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
-		// override
-		void dispatchClick(UIEvent* ev);
+		void dispatchClick(UIEvent* ev) override;
 
 		void dispatchClick();
 		

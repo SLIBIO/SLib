@@ -267,8 +267,7 @@ namespace slib
 		}
 
 	public:
-		// override
-		void invoke()
+		void invoke() override
 		{
 			if (UI::isUiThread()) {
 				m_callback();
@@ -290,8 +289,7 @@ namespace slib
 	class _UiDispatcher : public Dispatcher
 	{
 	public:
-		// override
-		sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms)
+		sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms) override
 		{
 			if (delay_ms > 0x7fffffff) {
 				delay_ms = 0x7fffffff;

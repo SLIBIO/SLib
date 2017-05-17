@@ -62,13 +62,12 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		void _cancel() {
+		void _cancel() override
+		{
 			clear();
 		}
 
-		// override
-		void _sendSync()
+		void _sendSync() override
 		{
 			JniLocal<jstring> url = Jni::getJniString(m_url);
 			JniLocal<jstring> method = Jni::getJniString(HttpMethods::toString(m_method));

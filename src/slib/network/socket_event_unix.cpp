@@ -57,21 +57,18 @@ namespace slib
 			return ret;
 		}
 		
-		// override
-		sl_bool _native_setup(sl_uint32 events)
+		sl_bool _native_setup(sl_uint32 events) override
 		{
 			m_events = events;
 			return sl_true;
 		}
 		
-		// override
-		void _native_set()
+		void _native_set() override
 		{
 			m_pipe->set();
 		}
 		
-		// override
-		void _native_reset()
+		void _native_reset() override
 		{
 			m_pipe->reset();
 		}

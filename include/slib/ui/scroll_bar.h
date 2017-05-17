@@ -119,14 +119,11 @@ namespace slib
 		sl_bool isValid();
 		
 	protected:
-		// override
-		void onDraw(Canvas* canvas);
+		void onDraw(Canvas* canvas) override;
 		
-		// override
-		void onMouseEvent(UIEvent* ev);
+		void onMouseEvent(UIEvent* ev) override;
 		
-		// override
-		void onMouseWheelEvent(UIEvent* ev);
+		void onMouseWheelEvent(UIEvent* ev) override;
 		
 		virtual void onChange(sl_scroll_pos value);
 		

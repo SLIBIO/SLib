@@ -42,8 +42,7 @@ namespace slib
 		virtual void onBindView(ListView* lv, sl_uint64 index, T* view) = 0;
 		
 	public:
-		// override
-		Ref<View> getView(ListView* lv, sl_uint64 index, View* original)
+		Ref<View> getView(ListView* lv, sl_uint64 index, View* original) override
 		{
 			Ref<T> view;
 			if (original) {
@@ -76,11 +75,9 @@ namespace slib
 		void refreshItems();
 		
 	protected:
-		// override
-		void onScroll(sl_scroll_pos x, sl_scroll_pos y);
+		void onScroll(sl_scroll_pos x, sl_scroll_pos y) override;
 		
-		// override
-		void onResize(sl_ui_len x, sl_ui_len y);
+		void onResize(sl_ui_len x, sl_ui_len y) override;
 		
 	protected:
 		void _checkUpdateContent(sl_bool fromDraw);

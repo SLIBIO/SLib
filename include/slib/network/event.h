@@ -64,7 +64,7 @@ namespace slib
 		const Ref<Socket>& getSocket();
 		
 	protected:
-		sl_bool _native_wait(sl_int32 timeout);
+		sl_bool _native_wait(sl_int32 timeout) override;
 		
 		virtual sl_bool _native_setup(sl_uint32 events) = 0;
 		

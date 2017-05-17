@@ -144,14 +144,11 @@ namespace slib
 		virtual void dispatchEndPageAnimation(View* page, UIPageAction action);
 		
 	public:
-		// override
-		void onResize(sl_ui_len width, sl_ui_len height);
+		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
-		// override
-		void onChangePadding();
+		void onChangePadding() override;
 		
-		// override
-		void onSwipe(GestureEvent* ev);
+		void onSwipe(GestureEvent* ev) override;
 		
 	public:
 		SLIB_PROPERTY(AtomicFunction<void(ViewPager*, View*, UIPageAction)>, OnPageAction)
@@ -347,11 +344,9 @@ namespace slib
 		
 		virtual void dispatchCloseWindow(UIEvent* ev);
 		
-		// override
-		virtual void dispatchOK(UIEvent* ev);
+		void dispatchOK(UIEvent* ev) override;
 
-		// override
-		virtual void dispatchCancel(UIEvent* ev);
+		void dispatchCancel(UIEvent* ev) override;
 		
 	protected:
 		void _openPopup(const Ref<View>& parent, Transition transition, sl_bool flagFillParentBackground);

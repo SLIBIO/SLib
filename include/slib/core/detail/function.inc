@@ -24,8 +24,7 @@ namespace slib
 		{}
 
 	public:
-		// override
-		RET_TYPE invoke(ARGS... params)
+		RET_TYPE invoke(ARGS... params) override
 		{
 			return func(params...);
 		}
@@ -45,8 +44,7 @@ namespace slib
 		{}
 
 	public:
-		// override
-		RET_TYPE invoke(ARGS... params)
+		RET_TYPE invoke(ARGS... params) override
 		{
 			return binds.invoke(func, params...);
 		}
@@ -65,8 +63,7 @@ namespace slib
 		{}
 
 	public:
-		// override
-		RET_TYPE invoke(ARGS... params)
+		RET_TYPE invoke(ARGS... params) override
 		{
 			return (object->*func)(params...);
 		}
@@ -87,8 +84,7 @@ namespace slib
 		{}
 	
 	public:
-		// override
-		RET_TYPE invoke(ARGS... params)
+		RET_TYPE invoke(ARGS... params) override
 		{
 			return binds.invokeMember(object, func, params...);
 		}
@@ -108,8 +104,7 @@ namespace slib
 		{}
 
 	public:
-		// override
-		RET_TYPE invoke(ARGS... params)
+		RET_TYPE invoke(ARGS... params) override
 		{
 			return ((object._ptr)->*func)(params...);
 		}
@@ -130,8 +125,7 @@ namespace slib
 		{}
 
 	public:
-		// override
-		RET_TYPE invoke(ARGS... params)
+		RET_TYPE invoke(ARGS... params) override
 		{
 			return binds.invokeMember(object._ptr, func, params...);
 		}
@@ -151,8 +145,7 @@ namespace slib
 		{}
 
 	public:
-		// override
-		RET_TYPE invoke(ARGS... params)
+		RET_TYPE invoke(ARGS... params) override
 		{
 			Ref<CLASS> o(object);
 			if (o.isNotNull()) {
@@ -178,8 +171,7 @@ namespace slib
 		{}
 
 	public:
-		// override
-		RET_TYPE invoke(ARGS... params)
+		RET_TYPE invoke(ARGS... params) override
 		{
 			Ref<CLASS> o(object);
 			if (o.isNotNull()) {

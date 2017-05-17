@@ -73,14 +73,11 @@ namespace slib
 		void setAutoDismissKeyboard(sl_bool flag);
 		
 	protected:
-		// override
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
+		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical) override;
 		
-		// override
-		void onDraw(Canvas* canvas);
+		void onDraw(Canvas* canvas) override;
 
-		// override
-		void onClick(UIEvent* ev);
+		void onClick(UIEvent* ev) override;
 		
 	public:
 		SLIB_PROPERTY(AtomicFunction<String(EditView*, String)>, OnChange)
@@ -97,11 +94,9 @@ namespace slib
 		virtual void onDoneEdit();
 		
 	public:
-		// override
-		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
-		// override
-		void dispatchKeyEvent(UIEvent* ev);
+		void dispatchKeyEvent(UIEvent* ev) override;
 		
 		virtual String dispatchChange(const String& newValue);
 		
@@ -132,14 +127,11 @@ namespace slib
 		
 		void _setAutoCapitalizationType_NW(UIAutoCapitalizationType type);
 		
-		// override
-		void _setFont_NW(const Ref<Font>& font);
+		void _setFont_NW(const Ref<Font>& font) override;
 		
-		// override
-		void _setBorder_NW(sl_bool flag);
+		void _setBorder_NW(sl_bool flag) override;
 		
-		// override
-		void _setBackgroundColor_NW(const Color& color);
+		void _setBackgroundColor_NW(const Color& color) override;
 		
 		String _onChangeEditViewNative(EditView* ev, const String& text);
 		
@@ -177,19 +169,15 @@ namespace slib
 		~PasswordView();
 
 	public:
-		// override
-		sl_bool isMultiLine();
+		sl_bool isMultiLine() override;
 		
-		// override
-		virtual void setMultiLine(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setMultiLine(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 		
 	public:
-		// override
-		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
 	protected:
-		// override
-		void onDraw(Canvas* canvas);
+		void onDraw(Canvas* canvas) override;
 		
 	};
 	
@@ -203,15 +191,12 @@ namespace slib
 		~TextArea();
 
 	public:
-		// override
-		sl_bool isMultiLine();
+		sl_bool isMultiLine() override;
 		
-		// override
-		void setMultiLine(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setMultiLine(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 		
 	public:
-		// override
-		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
 	};
 

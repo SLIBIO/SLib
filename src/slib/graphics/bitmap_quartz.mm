@@ -115,20 +115,17 @@ namespace slib
 			return ret;
 		}
 		
-		// override
-		sl_uint32 getBitmapWidth()
+		sl_uint32 getBitmapWidth() override
 		{
 			return m_width;
 		}
 		
-		// override
-		sl_uint32 getBitmapHeight()
+		sl_uint32 getBitmapHeight() override
 		{
 			return m_height;
 		}
 		
-		// override
-		sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& bitmapData)
+		sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& bitmapData) override
 		{
 			if (x > m_width) {
 				return sl_false;
@@ -148,8 +145,7 @@ namespace slib
 			return sl_true;
 		}
 		
-		// override
-		sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& bitmapData)
+		sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& bitmapData) override
 		{
 			if (x > m_width) {
 				return sl_false;
@@ -170,8 +166,7 @@ namespace slib
 			return sl_true;
 		}
 		
-		// override
-		sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& _color)
+		sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& _color) override
 		{
 			if (x > m_width) {
 				return sl_false;
@@ -203,14 +198,12 @@ namespace slib
 			return sl_true;
 		}
 		
-		// override
-		Ref<Canvas> getCanvas()
+		Ref<Canvas> getCanvas() override
 		{
 			return GraphicsPlatform::createCanvas(CanvasType::Bitmap, m_bitmap, m_width, m_height);
 		}
 		
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override
 		{
 			sl_int32 sx = (sl_int32)(rectSrc.left);
 			sl_int32 sy = (sl_int32)(rectSrc.top);
@@ -255,8 +248,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
 		{
 			CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 			if (colorSpace) {

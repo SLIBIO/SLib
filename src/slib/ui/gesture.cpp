@@ -85,8 +85,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void processEvent(UIEvent* ev, const Ref<View>& view, MotionTracker* tracker)
+		void processEvent(UIEvent* ev, const Ref<View>& view, MotionTracker* tracker) override
 		{
 			UIAction action = ev->getAction();
 			if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd || action == UIAction::TouchCancel) {

@@ -155,14 +155,11 @@ namespace slib
 		~SensorLogListener();
 
 	public:
-		// override
-		void onLocationChanged(Sensor* sensor, const GeoLocation& location);
+		void onLocationChanged(Sensor* sensor, const GeoLocation& location) override;
 	
-		// override
-		void onCompassChanged(Sensor* sensor, float declination);
+		void onCompassChanged(Sensor* sensor, float declination) override;
 
-		// override
-		void onAccelerometerChanged(Sensor* sensor, float xAccel, float yAccel, float zAccel);
+		void onAccelerometerChanged(Sensor* sensor, float xAccel, float yAccel, float zAccel) override;
 	};
 
 }

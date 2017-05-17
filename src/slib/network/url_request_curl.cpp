@@ -43,14 +43,12 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		void _cancel()
+		void _cancel() override
 		{
 			m_flagClosed = sl_true;
 		}
 
-		// override
-		void _sendSync()
+		void _sendSync() override
 		{
 			connection_h connection;
 			if (::connection_create(&connection) != CONNECTION_ERROR_NONE) {

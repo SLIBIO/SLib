@@ -39,29 +39,21 @@ namespace slib
 	public:
 		static Ref<_OSX_MenuItem> create(_OSX_Menu* parent, const MenuItemParam& param);
 		
-		// override
-		void setText(const String& text);
+		void setText(const String& text) override;
 
-		// override
-		void setShortcutKey(const KeycodeAndModifiers& km);
+		void setShortcutKey(const KeycodeAndModifiers& km) override;
 		
-		// override
-		void setSecondShortcutKey(const KeycodeAndModifiers& km);
+		void setSecondShortcutKey(const KeycodeAndModifiers& km) override;
 		
-		// override
-		void setEnabled(sl_bool flag);
+		void setEnabled(sl_bool flag) override;
 
-		// override
-		void setChecked(sl_bool flag);
+		void setChecked(sl_bool flag) override;
 
-		// override
-		void setIcon(const Ref<Bitmap>& icon);
+		void setIcon(const Ref<Bitmap>& icon) override;
 
-		// override
-		void setCheckedIcon(const Ref<Bitmap>& icon);
+		void setCheckedIcon(const Ref<Bitmap>& icon) override;
 
-		// override
-		void setSubmenu(const Ref<Menu>& menu);
+		void setSubmenu(const Ref<Menu>& menu) override;
 		
 		static NSImage* _createIcon(const Ref<Bitmap>& iconSrc);
 
@@ -91,14 +83,12 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		Ref<MenuItem> addMenuItem(const MenuItemParam& param)
+		Ref<MenuItem> addMenuItem(const MenuItemParam& param) override
 		{
 			return insertMenuItem(SLIB_UINT32_MAX, param);
 		}
 
-		// override
-		Ref<MenuItem> insertMenuItem(sl_uint32 index, const MenuItemParam& param)
+		Ref<MenuItem> insertMenuItem(sl_uint32 index, const MenuItemParam& param) override
 		{
 			ObjectLocker lock(this);
 			sl_uint32 n = (sl_uint32)(m_items.getCount());
@@ -114,12 +104,12 @@ namespace slib
 			return sl_null;
 		}
 
-		Ref<MenuItem> addSeparator()
+		Ref<MenuItem> addSeparator() override
 		{
 			return insertSeparator(SLIB_UINT32_MAX);
 		}
 		
-		Ref<MenuItem> insertSeparator(sl_uint32 index)
+		Ref<MenuItem> insertSeparator(sl_uint32 index) override
 		{
 			ObjectLocker lock(this);
 			sl_uint32 n = (sl_uint32)(m_items.getCount());
@@ -135,8 +125,7 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		void removeMenuItem(sl_uint32 index)
+		void removeMenuItem(sl_uint32 index) override
 		{
 			ObjectLocker lock(this);
 			if (index < m_items.getCount()) {
@@ -145,8 +134,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void removeMenuItem(const Ref<MenuItem>& item)
+		void removeMenuItem(const Ref<MenuItem>& item) override
 		{
 			ObjectLocker lock(this);
 			sl_reg index = m_items.indexOf(item);
@@ -156,8 +144,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void show(sl_ui_pos x, sl_ui_pos y)
+		void show(sl_ui_pos x, sl_ui_pos y) override
 		{
 			NSPoint pt;
 			pt.x = (CGFloat)x;

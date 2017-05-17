@@ -168,8 +168,7 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		Memory encode(const VideoFrame& input)
+		Memory encode(const VideoFrame& input) override
 		{
 			if (m_nWidth == input.image.width && m_nHeight == input.image.height) {
 				
@@ -216,8 +215,7 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		void setBitrate(sl_uint32 _bitrate)
+		void setBitrate(sl_uint32 _bitrate) override
 		{
 			sl_uint32 bitrate = _bitrate;
 			if (bitrate < 50) {

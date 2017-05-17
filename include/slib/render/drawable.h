@@ -36,8 +36,7 @@ namespace slib
 	public:
 		virtual void dispatchRender(RenderCanvas* canvas, const Rectangle& rectDst, const DrawParam& param);
 		
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 		
 	public:
 		SLIB_PROPERTY(AtomicFunction<void(RenderCanvas*, Rectangle const&, DrawParam const&)>, OnRender)
@@ -68,8 +67,7 @@ namespace slib
 		void setFragmentShader(const String& shader);
 		
 	protected:
-		// override
-		void onRender(RenderCanvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		void onRender(RenderCanvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 		
 	public:
 		AtomicString m_vertexShader;

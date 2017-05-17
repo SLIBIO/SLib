@@ -36,11 +36,9 @@ namespace slib
 		}
 		
 	public:
-		// override
-		void dispatchDraw(Canvas* canvas);
+		void dispatchDraw(Canvas* canvas) override;
 		
-		// override
-		void onResizeChild(View* child, sl_ui_len width, sl_ui_len height);
+		void onResizeChild(View* child, sl_ui_len width, sl_ui_len height) override;
 		
 	};
 	

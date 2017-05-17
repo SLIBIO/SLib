@@ -30,8 +30,7 @@ namespace slib
 		~Service();
 
 	public:
-		// override
-		AppType getAppType();
+		AppType getAppType() override;
 	
 	protected:
 		virtual String getServiceName() = 0;
@@ -40,14 +39,11 @@ namespace slib
 
 		virtual void onStopService() = 0;
 
-		// override
-		void doRun();
+		void doRun() override;
 	
-		// override
-		void onRunApp();
+		void onRunApp() override;
 
-		// override
-		String getUniqueInstanceId();
+		String getUniqueInstanceId() override;
 
 	protected:
 		virtual sl_bool dispatchStartService();

@@ -87,20 +87,15 @@ namespace slib
 		void getDesc(ImageDesc& desc) const;
 	
 
-		// override
-		sl_uint32 getBitmapWidth();
+		sl_uint32 getBitmapWidth() override;
 
-		// override
-		sl_uint32 getBitmapHeight();
+		sl_uint32 getBitmapHeight() override;
 	
-		// override
-		sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& desc);
+		sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& desc) override;
 
-		// override
-		sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& desc);
+		sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& desc) override;
 
-		// override
-		sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& color);
+		sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& color) override;
 
 		sl_bool readPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, Color* colors, sl_int32 stride = 0);
 
@@ -108,7 +103,7 @@ namespace slib
 
 		sl_bool resetPixels(const Color& color);
 
-		virtual Ref<Canvas> getCanvas();
+		Ref<Canvas> getCanvas() override;
 
 		void fillColor(const Color& color);
 	
@@ -128,8 +123,7 @@ namespace slib
 					   BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Default);
 
 
-		// override
-		Ref<Drawable> subDrawable(sl_real x, sl_real y, sl_real width, sl_real height);
+		Ref<Drawable> subDrawable(sl_real x, sl_real y, sl_real width, sl_real height) override;
 
 		Ref<Image> sub(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) const;
 
@@ -176,11 +170,9 @@ namespace slib
 	public:
 		Ref<Drawable> getDrawableCache();
 	
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override;
 
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
 	protected:
 		ImageDesc m_desc;

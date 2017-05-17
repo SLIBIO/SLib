@@ -50,8 +50,7 @@ namespace slib
 			return ret;
 		}
 
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& _rectDst, const Rectangle& _rectSrc, const DrawParam& param)
+		void onDraw(Canvas* canvas, const Rectangle& _rectDst, const Rectangle& _rectSrc, const DrawParam& param) override
 		{
 			jobject jcanvas = GraphicsPlatform::getCanvasHandle(canvas);
 			if (!jcanvas) {
@@ -180,14 +179,12 @@ namespace slib
 			}
 		}
 
-		// override
-		sl_real getDrawableWidth()
+		sl_real getDrawableWidth() override
 		{
 			return (sl_real)(m_image.width);
 		}
 
-		// override
-		sl_real getDrawableHeight()
+		sl_real getDrawableHeight() override
 		{
 			return (sl_real)(m_image.height);
 		}

@@ -96,8 +96,7 @@ namespace slib
 		void setSecondaryProgressColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 	protected:
-		// override
-		void onDraw(Canvas* canvas);
+		void onDraw(Canvas* canvas) override;
 		
 	protected:
 		float _refineValue(float value);

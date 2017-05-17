@@ -89,8 +89,7 @@ namespace slib
 		}
 
 	public:
-		// override
-		UIRect getRegion()
+		UIRect getRegion() override
 		{
 			UIRect ret;
 			ret.left = 0;

@@ -64,28 +64,22 @@ namespace slib
 		void setThumbHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 	protected:
-		// override
-		void onDraw(Canvas* canvas);
+		void onDraw(Canvas* canvas) override;
 		
-		// override
-		void onMouseEvent(UIEvent* ev);
+		void onMouseEvent(UIEvent* ev) override;
 		
-		// override
-		void onMouseWheelEvent(UIEvent* ev);
+		void onMouseWheelEvent(UIEvent* ev) override;
 		
-		// override
-		void onKeyEvent(UIEvent* event);
+		void onKeyEvent(UIEvent* event) override;
 		
 		virtual void onChange(float value);
 		
 		virtual void onChangeSecondary(float value);
 		
 	public:
-		// override
-		void dispatchChange(float value);
+		void dispatchChange(float value) override;
 		
-		// override
-		void dispatchChangeSecondary(float value);
+		void dispatchChangeSecondary(float value) override;
 		
 	protected:
 		void _drawTrack(Canvas* canvas, const Ref<Drawable>& track, const Rectangle& rectDst);

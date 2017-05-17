@@ -135,14 +135,12 @@ namespace slib
 			return sl_null;
 		}
 		
-		// override
-		void _sendAsync()
+		void _sendAsync() override
 		{
 			[m_task resume];
 		}
 	
-		// override
-		void _cancel()
+		void _cancel() override
 		{
 			clean();
 		}

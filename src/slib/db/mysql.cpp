@@ -159,8 +159,7 @@ namespace slib
 			return ret;
 		}
 
-		// override
-		sl_bool ping()
+		sl_bool ping() override
 		{
 			initThread();
 			ObjectLocker lock(this);
@@ -170,8 +169,7 @@ namespace slib
 			return sl_false;
 		}
 
-		// override
-		sl_int64 execute(const String& sql)
+		sl_int64 execute(const String& sql) override
 		{
 			initThread();
 			ObjectLocker lock(this);
@@ -222,14 +220,12 @@ namespace slib
 				m_db->unlock();
 			}
 
-			// override
-			sl_uint32 getColumnsCount()
+			sl_uint32 getColumnsCount() override
 			{
 				return m_nColumnNames;
 			}
 
-			// override
-			String getColumnName(sl_uint32 index)
+			String getColumnName(sl_uint32 index) override
 			{
 				if (index < m_nColumnNames) {
 					return m_columnNames[index];
@@ -237,14 +233,12 @@ namespace slib
 				return sl_null;
 			}
 
-			// override
-			sl_int32 getColumnIndex(const String& name)
+			sl_int32 getColumnIndex(const String& name) override
 			{
 				return m_mapColumnIndexes.getValue_NoLock(name, -1);
 			}
 
-			// override
-			Map<String, Variant> getRow()
+			Map<String, Variant> getRow() override
 			{
 				Map<String, Variant> ret;
 				if (m_row && m_nColumnNames > 0) {
@@ -265,8 +259,7 @@ namespace slib
 				}
 			}
 
-			// override
-			Variant getValue(sl_uint32 index)
+			Variant getValue(sl_uint32 index) override
 			{
 				if (m_row) {
 					if (index < m_nColumnNames) {
@@ -276,8 +269,7 @@ namespace slib
 				return sl_null;
 			}
 
-			// override
-			String getString(sl_uint32 index)
+			String getString(sl_uint32 index) override
 			{
 				if (m_row) {
 					if (index < m_nColumnNames) {
@@ -287,8 +279,7 @@ namespace slib
 				return sl_null;
 			}
 
-			// override
-			Memory getBlob(sl_uint32 index)
+			Memory getBlob(sl_uint32 index) override
 			{
 				if (m_row) {
 					if (index < m_nColumnNames) {
@@ -300,8 +291,7 @@ namespace slib
 				return sl_null;
 			}
 
-			// override
-			sl_bool moveNext()
+			sl_bool moveNext() override
 			{
 				m_row = ::mysql_fetch_row(m_result);
 				m_lengths = ::mysql_fetch_lengths(m_result);
@@ -312,8 +302,7 @@ namespace slib
 			}
 		};
 
-		// override
-		Ref<DatabaseCursor> query(const String& sql)
+		Ref<DatabaseCursor> query(const String& sql) override
 		{
 			initThread();
 			ObjectLocker lock(this);
@@ -426,14 +415,12 @@ namespace slib
 				m_db->unlock();
 			}
 
-			// override
-			sl_uint32 getColumnsCount()
+			sl_uint32 getColumnsCount() override
 			{
 				return m_nColumnNames;
 			}
 
-			// override
-			String getColumnName(sl_uint32 index)
+			String getColumnName(sl_uint32 index) override
 			{
 				if (index < m_nColumnNames) {
 					return m_columnNames[index];
@@ -441,14 +428,12 @@ namespace slib
 				return sl_null;
 			}
 
-			// override
-			sl_int32 getColumnIndex(const String& name)
+			sl_int32 getColumnIndex(const String& name) override
 			{
 				return m_mapColumnIndexes.getValue_NoLock(name, -1);
 			}
 
-			// override
-			Map<String, Variant> getRow()
+			Map<String, Variant> getRow() override
 			{
 				Map<String, Variant> ret;
 				if (m_nColumnNames > 0) {
@@ -532,8 +517,7 @@ namespace slib
 				return sl_null;
 			}
 
-			// override
-			Variant getValue(sl_uint32 index)
+			Variant getValue(sl_uint32 index) override
 			{
 				if (index < m_nColumnNames) {
 					return _getValue(index);
@@ -541,8 +525,7 @@ namespace slib
 				return sl_null;
 			}
 
-			// override
-			String getString(sl_uint32 index)
+			String getString(sl_uint32 index) override
 			{
 				if (index < m_nColumnNames) {
 					enum_field_types type = m_bind[index].buffer_type;
@@ -584,8 +567,7 @@ namespace slib
 				return sl_null;
 			}
 
-			// override
-			sl_int64 getInt64(sl_uint32 index, sl_int64 defaultValue)
+			sl_int64 getInt64(sl_uint32 index, sl_int64 defaultValue) override
 			{
 				enum_field_types type = m_bind[index].buffer_type;
 				if (!(m_fds[index].isNull)) {
@@ -625,8 +607,7 @@ namespace slib
 				return defaultValue;
 			}
 
-			// override
-			sl_uint64 getUint64(sl_uint32 index, sl_uint64 defaultValue)
+			sl_uint64 getUint64(sl_uint32 index, sl_uint64 defaultValue) override
 			{
 				if (index < m_nColumnNames) {
 					enum_field_types type = m_bind[index].buffer_type;
@@ -668,8 +649,7 @@ namespace slib
 				return defaultValue;
 			}
 
-			// override
-			sl_int32 getInt32(sl_uint32 index, sl_int32 defaultValue)
+			sl_int32 getInt32(sl_uint32 index, sl_int32 defaultValue) override
 			{
 				if (index < m_nColumnNames) {
 					enum_field_types type = m_bind[index].buffer_type;
@@ -709,8 +689,7 @@ namespace slib
 				return defaultValue;
 			}
 
-			// override
-			sl_uint32 getUint32(sl_uint32 index, sl_uint32 defaultValue)
+			sl_uint32 getUint32(sl_uint32 index, sl_uint32 defaultValue) override
 			{
 				if (index < m_nColumnNames) {
 					enum_field_types type = m_bind[index].buffer_type;
@@ -750,8 +729,7 @@ namespace slib
 				return defaultValue;
 			}
 
-			// override
-			float getFloat(sl_uint32 index, float defaultValue)
+			float getFloat(sl_uint32 index, float defaultValue) override
 			{
 				if (index < m_nColumnNames) {
 					enum_field_types type = m_bind[index].buffer_type;
@@ -791,8 +769,7 @@ namespace slib
 				return defaultValue;
 			}
 
-			// override
-			double getDouble(sl_uint32 index, double defaultValue)
+			double getDouble(sl_uint32 index, double defaultValue) override
 			{
 				if (index < m_nColumnNames) {
 					enum_field_types type = m_bind[index].buffer_type;
@@ -832,8 +809,7 @@ namespace slib
 				return defaultValue;
 			}
 
-			// override
-			Time getTime(sl_uint32 index, const Time& defaultValue)
+			Time getTime(sl_uint32 index, const Time& defaultValue) override
 			{
 				if (index < m_nColumnNames) {
 					enum_field_types type = m_bind[index].buffer_type;
@@ -857,8 +833,7 @@ namespace slib
 				return defaultValue;
 			}
 
-			// override
-			Memory getBlob(sl_uint32 index)
+			Memory getBlob(sl_uint32 index) override
 			{
 				if (index < m_nColumnNames) {
 					enum_field_types type = m_bind[index].buffer_type;
@@ -881,8 +856,7 @@ namespace slib
 				return sl_null;
 			}
 
-			// override
-			sl_bool moveNext()
+			sl_bool moveNext() override
 			{
 				int iRet = ::mysql_stmt_fetch(m_statement);
 				if (iRet == 0 || iRet == MYSQL_DATA_TRUNCATED) {
@@ -1066,8 +1040,7 @@ namespace slib
 				return sl_false;
 			}
 
-			// override
-			sl_int64 executeBy(const Variant* params, sl_uint32 nParams)
+			sl_int64 executeBy(const Variant* params, sl_uint32 nParams) override
 			{
 				initThread();
 				ObjectLocker lock(m_db.get());
@@ -1077,8 +1050,7 @@ namespace slib
 				return -1;
 			}
 
-			// override
-			Ref<DatabaseCursor> queryBy(const Variant* params, sl_uint32 nParams)
+			Ref<DatabaseCursor> queryBy(const Variant* params, sl_uint32 nParams) override
 			{
 				initThread();
 				ObjectLocker lock(m_db.get());
@@ -1178,8 +1150,7 @@ namespace slib
 
 		};
 
-		// override
-		Ref<DatabaseStatement> prepareStatement(const String& sql)
+		Ref<DatabaseStatement> prepareStatement(const String& sql) override
 		{
 			initThread();
 			ObjectLocker lock(this);
@@ -1192,8 +1163,7 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		String getErrorMessage()
+		String getErrorMessage() override
 		{
 			return ::mysql_error(m_mysql);
 		}

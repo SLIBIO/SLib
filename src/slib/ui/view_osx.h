@@ -39,59 +39,41 @@ namespace slib
 		NSView* getHandle();
 		
 	public:
-		// override
-		sl_bool isValid();
+		sl_bool isValid() override;
 		
-		// override
-		void setFocus();
+		void setFocus() override;
 		
-		// override
-		void invalidate();
+		void invalidate() override;
 		
-		// override
-		void invalidate(const UIRect& rect);
+		void invalidate(const UIRect& rect) override;
 		
-		// override
-		UIRect getFrame();
+		UIRect getFrame() override;
 		
-		// override
-		void setFrame(const UIRect& frame);
+		void setFrame(const UIRect& frame) override;
 		
-		// override
-		void setTransform(const Matrix3& transform);
+		void setTransform(const Matrix3& transform) override;
 
-		// override
-		void setVisible(sl_bool flag);
+		void setVisible(sl_bool flag) override;
 		
-		// override
-		void setEnabled(sl_bool flag);
+		void setEnabled(sl_bool flag) override;
 		
-		// override
-		void setOpaque(sl_bool flag);
+		void setOpaque(sl_bool flag) override;
 		
-		// override
-		void setAlpha(sl_real alpha);
+		void setAlpha(sl_real alpha) override;
 		
-		// override
-		void setClipping(sl_bool flag);
+		void setClipping(sl_bool flag) override;
 		
-		// override
-		void setDrawing(sl_bool flag);
+		void setDrawing(sl_bool flag) override;
 		
-		// override
-		UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
+		UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen) override;
 		
-		// override
-		UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView);
+		UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView) override;
 		
-		// override
-		void addChildInstance(const Ref<ViewInstance>& instance);
+		void addChildInstance(const Ref<ViewInstance>& instance) override;
 		
-		// override
-		void removeChildInstance(const Ref<ViewInstance>& instance);
+		void removeChildInstance(const Ref<ViewInstance>& instance) override;
 		
-		// override
-		void bringToFront();
+		void bringToFront() override;
 		
 	public:
 		void onDraw(NSRect rectDirty);

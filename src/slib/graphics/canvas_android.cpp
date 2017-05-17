@@ -72,20 +72,17 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		void save()
+		void save() override
 		{
 			_JAndroidGraphics::save.call(m_canvas);
 		}
 		
-		// override
-		void restore()
+		void restore() override
 		{
 			_JAndroidGraphics::restore.call(m_canvas);
 		}
 
-		// override
-		Rectangle getClipBounds()
+		Rectangle getClipBounds() override
 		{
 			JniLocal<jobject> rect(_JAndroidGraphics::getClipBounds.callObject(m_canvas));
 			if (rect.isNotNull()) {
@@ -100,14 +97,12 @@ namespace slib
 			return Rectangle(0, 0, size.x, size.y);
 		}
 
-		// override
-		void clipToRectangle(const Rectangle& _rect)
+		void clipToRectangle(const Rectangle& _rect) override
 		{
 			_JAndroidGraphics::clipToRectangle.call(m_canvas, (float)(_rect.left), (float)(_rect.top), (float)(_rect.right), (float)(_rect.bottom));
 		}
 
-		// override
-		void clipToPath(const Ref<GraphicsPath>& path)
+		void clipToPath(const Ref<GraphicsPath>& path) override
 		{
 			jobject handle = GraphicsPlatform::getGraphicsPath(path.get());
 			if (handle) {
@@ -115,8 +110,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void concatMatrix(const Matrix3& matrix)
+		void concatMatrix(const Matrix3& matrix) override
 		{
 			_JAndroidGraphics::concatMatrix.call(m_canvas,
 					(float)(matrix.m00), (float)(matrix.m10), (float)(matrix.m20),
@@ -124,8 +118,7 @@ namespace slib
 					(float)(matrix.m02), (float)(matrix.m12), (float)(matrix.m22));
 		}
 
-		// override
-		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& color)
+		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& color) override
 		{
 			if (text.isNotEmpty()) {
 				Ref<Font> font = _font;
@@ -140,8 +133,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen)
+		void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen) override
 		{
 			Ref<Pen> pen = _pen;
 			if (pen.isNull()) {
@@ -155,8 +147,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen)
+		void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen) override
 		{
 			if (countPoints < 2) {
 				return;
@@ -175,8 +166,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real endDegrees, const Ref<Pen>& _pen)
+		void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real endDegrees, const Ref<Pen>& _pen) override
 		{
 			Ref<Pen> pen = _pen;
 			if (pen.isNull()) {
@@ -191,8 +181,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawRectangle(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		void drawRectangle(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush) override
 		{
 			Ref<Pen> pen = _pen;
 			if (brush.isNull() && pen.isNull()) {
@@ -207,8 +196,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& _pen, const Ref<Brush>& brush) override
 		{
 			Ref<Pen> pen = _pen;
 			if (brush.isNull() && pen.isNull()) {
@@ -223,8 +211,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawEllipse(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		void drawEllipse(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush) override
 		{
 			Ref<Pen> pen = _pen;
 			if (brush.isNull() && pen.isNull()) {
@@ -239,8 +226,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode)
+		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode) override
 		{
 			if (countPoints <= 2) {
 				return;
@@ -260,8 +246,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real endDegrees, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real endDegrees, const Ref<Pen>& _pen, const Ref<Brush>& brush) override
 		{
 			Ref<Pen> pen = _pen;
 			if (brush.isNull() && pen.isNull()) {
@@ -276,9 +261,8 @@ namespace slib
 						, hPen, hBrush);
 			}
 		}
-
-		// override
-		void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		
+		void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& _pen, const Ref<Brush>& brush) override
 		{
 			jobject hPath = GraphicsPlatform::getGraphicsPath(path.get());
 			if (hPath) {
@@ -296,14 +280,12 @@ namespace slib
 			}
 		}
 
-		// override
-		void _setAlpha(sl_real alpha)
+		void _setAlpha(sl_real alpha) override
 		{
 			_JAndroidGraphics::setAlpha.call(m_canvas, (float)alpha);
 		}
 
-		// override
-		void _setAntiAlias(sl_bool flag)
+		void _setAntiAlias(sl_bool flag) override
 		{
 			_JAndroidGraphics::setAntiAlias.call(m_canvas, flag);
 		}

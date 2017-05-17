@@ -45,7 +45,7 @@ namespace slib
 	template <class KT, class VT>
 	template <class KEY, class VALUE>
 	RedBlackTreeNode<KT, VT>::RedBlackTreeNode(KEY&& _key, VALUE&& _value) noexcept
-	 : data(Forward<KEY>(_key), Forward<VALUE>(_value)), parent(sl_null), left(sl_null), right(sl_null), flagRed(sl_false)
+	 : parent(sl_null), left(sl_null), right(sl_null), flagRed(sl_false), data(Forward<KEY>(_key), Forward<VALUE>(_value))
 	{
 	}
 	

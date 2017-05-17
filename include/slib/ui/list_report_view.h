@@ -107,8 +107,7 @@ namespace slib
 		virtual void onDoubleClickRow(sl_uint32 row, const UIPoint& pt);
 		
 	public:
-		// override
-		Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
 		virtual void dispatchSelectRow(sl_uint32 row);
 		
@@ -133,8 +132,7 @@ namespace slib
 		
 		void _getSelectedRow_NW();
 		
-		// override
-		void _setFont_NW(const Ref<Font>& font);
+		void _setFont_NW(const Ref<Font>& font) override;
 		
 	protected:
 		CList<ListReportViewColumn> m_columns;

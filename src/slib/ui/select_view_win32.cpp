@@ -81,14 +81,12 @@ namespace slib
 	class _Win32_SelectViewInstance : public Win32_ViewInstance
 	{
 	public:
-		// override
-		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
+		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
 		{
 			return sl_false;
 		}
 
-		// override
-		sl_bool processCommand(SHORT code, LRESULT& result)
+		sl_bool processCommand(SHORT code, LRESULT& result) override
 		{
 			if (code == CBN_SELCHANGE) {
 				Ref<View> view = getView();

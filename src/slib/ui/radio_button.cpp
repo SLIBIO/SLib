@@ -35,8 +35,7 @@ namespace slib
 		}
 		
 	public:
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
 		{
 			canvas->drawEllipse(rectDst, m_penBorder, m_brushBack);
 			if (m_brushCheck.isNotNull()) {

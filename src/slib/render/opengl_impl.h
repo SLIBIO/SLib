@@ -1152,8 +1152,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		RenderEngineType getEngineType()
+		RenderEngineType getEngineType() override
 		{
 #if defined(_OPENGL_ES_IMPL)
 			return RenderEngineType::OpenGL_ES;
@@ -1246,8 +1245,7 @@ namespace slib
 			
 		};
 		
-		// override
-		Ref<RenderProgramInstance> _createProgramInstance(RenderProgram* program)
+		Ref<RenderProgramInstance> _createProgramInstance(RenderProgram* program) override
 		{
 			return _RenderProgramInstance::create(this, program);
 		}
@@ -1287,8 +1285,7 @@ namespace slib
 				return sl_null;
 			}
 			
-			// override
-			void onUpdate(RenderBaseObject* object)
+			void onUpdate(RenderBaseObject* object) override
 			{
 				VertexBuffer* buffer = (VertexBuffer*)object;
 				GL_BASE::updateVertexBuffer(handle, m_updatedOffset, buffer->getBuffer() + m_updatedOffset, m_updatedSize);
@@ -1296,8 +1293,7 @@ namespace slib
 			
 		};
 		
-		// override
-		Ref<VertexBufferInstance> _createVertexBufferInstance(VertexBuffer* buffer)
+		Ref<VertexBufferInstance> _createVertexBufferInstance(VertexBuffer* buffer) override
 		{
 			return _VertexBufferInstance::create(this, buffer);
 		}
@@ -1337,8 +1333,7 @@ namespace slib
 				return sl_null;
 			}
 			
-			// override
-			void onUpdate(RenderBaseObject* object)
+			void onUpdate(RenderBaseObject* object) override
 			{
 				IndexBuffer* buffer = (IndexBuffer*)object;
 				GL_BASE::updateIndexBuffer(handle, m_updatedOffset, buffer->getBuffer() + m_updatedOffset, m_updatedSize);
@@ -1346,8 +1341,7 @@ namespace slib
 			
 		};
 		
-		// override
-		Ref<IndexBufferInstance> _createIndexBufferInstance(IndexBuffer* buffer)
+		Ref<IndexBufferInstance> _createIndexBufferInstance(IndexBuffer* buffer) override
 		{
 			return _IndexBufferInstance::create(this, buffer);
 		}
@@ -1390,8 +1384,7 @@ namespace slib
 				return sl_null;
 			}
 			
-			// override
-			void onUpdate(RenderBaseObject* object)
+			void onUpdate(RenderBaseObject* object) override
 			{
 				Texture* texture = (Texture*)object;
 				GL_BASE::bindTexture2D(handle);
@@ -1433,68 +1426,57 @@ namespace slib
 			
 		};
 		
-		// override
-		Ref<TextureInstance> _createTextureInstance(Texture* texture)
+		Ref<TextureInstance> _createTextureInstance(Texture* texture) override
 		{
 			return _TextureInstance::create(this, texture);
 		}
 		
-		// override
-		sl_bool _beginScene()
+		sl_bool _beginScene() override
 		{
 			freeDirtyHandles();
 			return sl_true;
 		}
 		
-		// override
-		void _endScene()
+		void _endScene() override
 		{
 		}
 		
-		// override
-		void _setViewport(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
+		void _setViewport(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) override
 		{
 			GL_BASE::setViewport(x, y, width, height);
 		}
 		
-		// override
-		void _clear(const RenderClearParam& param)
+		void _clear(const RenderClearParam& param) override
 		{
 			GL_BASE::clear(param);
 		}
 		
-		// override
-		void _setDepthTest(sl_bool flag)
+		void _setDepthTest(sl_bool flag) override
 		{
 			GL_BASE::setDepthTest(flag);
 		}
 		
-		// override
-		void _setDepthWriteEnabled(sl_bool flagEnableDepthWrite)
+		void _setDepthWriteEnabled(sl_bool flagEnableDepthWrite) override
 		{
 			GL_BASE::setDepthWriteEnabled(flagEnableDepthWrite);
 		}
 		
-		// override
-		void _setDepthFunction(RenderFunctionOperation op)
+		void _setDepthFunction(RenderFunctionOperation op) override
 		{
 			GL_BASE::setDepthFunction(op);
 		}
 		
-		// override
-		void _setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW = sl_true)
+		void _setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW = sl_true) override
 		{
 			GL_BASE::setCullFace(flagEnableCull, flagCullCCW);
 		}
 		
-		// override
-		void _setBlending(sl_bool flagEnableBlending, const RenderBlendingParam& param)
+		void _setBlending(sl_bool flagEnableBlending, const RenderBlendingParam& param) override
 		{
 			GL_BASE::setBlending(flagEnableBlending, param);
 		}
 		
-		// override
-		sl_bool _beginProgram(RenderProgram* program, RenderProgramInstance* _instance, RenderProgramState** ppState)
+		sl_bool _beginProgram(RenderProgram* program, RenderProgramInstance* _instance, RenderProgramState** ppState) override
 		{
 			_RenderProgramInstance* instance = (_RenderProgramInstance*)_instance;
 			if (m_currentProgramInstance != instance) {
@@ -1508,12 +1490,11 @@ namespace slib
 			return sl_true;
 		}
 		
-		// override
-		void _endProgram()
+		void _endProgram() override
 		{
 		}
 		
-		void _resetCurrentBuffers()
+		void _resetCurrentBuffers() override
 		{
 			m_currentProgram.setNull();
 			m_currentProgramInstance.setNull();
@@ -1527,8 +1508,7 @@ namespace slib
 			m_activeSampler = -1;
 		}
 		
-		// override
-		void _drawPrimitive(EnginePrimitive* primitive)
+		void _drawPrimitive(EnginePrimitive* primitive) override
 		{
 			if (m_currentProgram.isNull()) {
 				return;
@@ -1598,8 +1578,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void _applyTexture(Texture* texture, TextureInstance* _instance, sl_reg _samplerNo)
+		void _applyTexture(Texture* texture, TextureInstance* _instance, sl_reg _samplerNo) override
 		{
 			_initSamplersCount();
 			sl_uint32 samplerNo = (sl_uint32)(_samplerNo);
@@ -1673,8 +1652,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		void _setLineWidth(sl_real width)
+		void _setLineWidth(sl_real width) override
 		{
 			GL_BASE::setLineWidth(width);
 		}
@@ -1683,248 +1661,208 @@ namespace slib
 			OpenGL entry points
 **************************************************/
 		
-		// override
-		Ref<Texture> createTextureFromName(sl_uint32 target, sl_uint32 name, sl_bool flagDeleteOnRelease)
+		Ref<Texture> createTextureFromName(sl_uint32 target, sl_uint32 name, sl_bool flagDeleteOnRelease) override
 		{
 			return new _NamedTexture(this, target, name, flagDeleteOnRelease);
 		}
 		
-		// override
-		sl_int32 getAttributeLocation(sl_uint32 program, const char* name)
+		sl_int32 getAttributeLocation(sl_uint32 program, const char* name) override
 		{
 			return GL_BASE::getAttributeLocation(program, name);
 		}
 		
-		// override
-		void setVertexFloatArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
+		void setVertexFloatArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) override
 		{
 			GL_BASE::setVertexFloatArrayAttributePtr(attributeLocation, data, countComponents, strideBytes, flagDoNormalize);
 		}
 		
-		// override
-		void setVertexFloatArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
+		void setVertexFloatArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) override
 		{
 			GL_BASE::setVertexFloatArrayAttribute(attributeLocation, offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize);
 		}
 		
-		// override
-		void setVertexInt8ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
+		void setVertexInt8ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) override
 		{
 			GL_BASE::setVertexInt8ArrayAttributePtr(attributeLocation, data, countComponents, strideBytes, flagDoNormalize);
 		}
 		
-		// override
-		void setVertexInt8ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
+		void setVertexInt8ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) override
 		{
 			GL_BASE::setVertexInt8ArrayAttribute(attributeLocation, offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize);
 		}
 		
-		// override
-		void setVertexUint8ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
+		void setVertexUint8ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) override
 		{
 			GL_BASE::setVertexUint8ArrayAttributePtr(attributeLocation, data, countComponents, strideBytes, flagDoNormalize);
 		}
 		
-		// override
-		void setVertexUint8ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
+		void setVertexUint8ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) override
 		{
 			GL_BASE::setVertexUint8ArrayAttribute(attributeLocation, offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize);
 		}
 		
-		// override
-		void setVertexInt16ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
+		void setVertexInt16ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) override
 		{
 			GL_BASE::setVertexInt16ArrayAttributePtr(attributeLocation, data, countComponents, strideBytes, flagDoNormalize);
 		}
 		
-		// override
-		void setVertexInt16ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
+		void setVertexInt16ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) override
 		{
 			GL_BASE::setVertexInt16ArrayAttribute(attributeLocation, offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize);
 		}
 		
-		// override
-		void setVertexUint16ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
+		void setVertexUint16ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) override
 		{
 			GL_BASE::setVertexUint16ArrayAttributePtr(attributeLocation, data, countComponents, strideBytes, flagDoNormalize);
 		}
 		
-		// override
-		void setVertexUint16ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
+		void setVertexUint16ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) override
 		{
 			GL_BASE::setVertexUint16ArrayAttribute(attributeLocation, offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize);
 		}
 		
-		// override
-		void disableVertexArrayAttribute(sl_int32 attributeLocation)
+		void disableVertexArrayAttribute(sl_int32 attributeLocation) override
 		{
 			GL_BASE::disableVertexArrayAttribute(attributeLocation);
 		}
 		
 		
-		// override
-		sl_int32 getUniformLocation(sl_uint32 program, const char* name)
+		sl_int32 getUniformLocation(sl_uint32 program, const char* name) override
 		{
 			return GL_BASE::getUniformLocation(program, name);
 		}
 		
-		// override
-		void setUniformFloatValue(sl_int32 uniformLocation, float value)
+		void setUniformFloatValue(sl_int32 uniformLocation, float value) override
 		{
 			GL_BASE::setUniformFloatValue(uniformLocation, value);
 		}
-		
-		// override
-		void setUniformFloatArray(sl_int32 uniformLocation, const void* values, sl_uint32 count)
+
+		void setUniformFloatArray(sl_int32 uniformLocation, const void* values, sl_uint32 count) override
 		{
 			GL_BASE::setUniformFloatArray(uniformLocation, values, count);
 		}
 		
-		// override
-		void setUniformIntValue(sl_int32 uniformLocation, sl_int32 value)
+		void setUniformIntValue(sl_int32 uniformLocation, sl_int32 value) override
 		{
 			GL_BASE::setUniformIntValue(uniformLocation, value);
 		}
 		
-		// override
-		void setUniformIntArray(sl_int32 uniformLocation, const void* values, sl_uint32 count)
+		void setUniformIntArray(sl_int32 uniformLocation, const void* values, sl_uint32 count) override
 		{
 			GL_BASE::setUniformIntArray(uniformLocation, values, count);
 		}
 		
-		// override
-		void setUniformFloat2Value(sl_int32 uniformLocation, float v1, float v2)
+		void setUniformFloat2Value(sl_int32 uniformLocation, float v1, float v2) override
 		{
 			GL_BASE::setUniformFloat2Value(uniformLocation, v1, v2);
 		}
 		
-		// override
-		void setUniformFloat2Value(sl_int32 uniformLocation, const Vector2& v)
+		void setUniformFloat2Value(sl_int32 uniformLocation, const Vector2& v) override
 		{
 			GL_BASE::setUniformFloat2Value(uniformLocation, v);
 		}
 		
-		// override
-		void setUniformFloat2Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
+		void setUniformFloat2Array(sl_int32 uniformLocation, const void* values, sl_uint32 count) override
 		{
 			GL_BASE::setUniformFloat2Array(uniformLocation, values, count);
 		}
 		
-		// override
-		void setUniformInt2Value(sl_int32 uniformLocation, sl_int32 v1, sl_int32 v2)
+		void setUniformInt2Value(sl_int32 uniformLocation, sl_int32 v1, sl_int32 v2) override
 		{
 			GL_BASE::setUniformInt2Value(uniformLocation, v1, v2);
 		}
 		
-		// override
-		void setUniformInt2Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
+		void setUniformInt2Array(sl_int32 uniformLocation, const void* values, sl_uint32 count) override
 		{
 			GL_BASE::setUniformInt2Array(uniformLocation, values, count);
 		}
 		
-		// override
-		void setUniformFloat3Value(sl_int32 uniformLocation, float v1, float v2, float v3)
+		void setUniformFloat3Value(sl_int32 uniformLocation, float v1, float v2, float v3) override
 		{
 			GL_BASE::setUniformFloat3Value(uniformLocation, v1, v2, v3);
 		}
 		
-		// override
-		void setUniformFloat3Value(sl_int32 uniformLocation, const Vector3& v)
+		void setUniformFloat3Value(sl_int32 uniformLocation, const Vector3& v) override
 		{
 			GL_BASE::setUniformFloat3Value(uniformLocation, v);
 		}
 		
-		// override
-		void setUniformFloat3Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
+		void setUniformFloat3Array(sl_int32 uniformLocation, const void* values, sl_uint32 count) override
 		{
 			GL_BASE::setUniformFloat3Array(uniformLocation, values, count);
 		}
 		
-		// override
-		void setUniformInt3Value(sl_int32 uniformLocation, sl_int32 v1, sl_int32 v2, sl_int32 v3)
+		void setUniformInt3Value(sl_int32 uniformLocation, sl_int32 v1, sl_int32 v2, sl_int32 v3) override
 		{
 			GL_BASE::setUniformInt3Value(uniformLocation, v1, v2, v3);
 		}
 		
-		// override
-		void setUniformInt3Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
+		void setUniformInt3Array(sl_int32 uniformLocation, const void* values, sl_uint32 count) override
 		{
 			GL_BASE::setUniformInt3Array(uniformLocation, values, count);
 		}
 		
-		// override
-		void setUniformFloat4Value(sl_int32 uniformLocation, float v1, float v2, float v3, float v4)
+		void setUniformFloat4Value(sl_int32 uniformLocation, float v1, float v2, float v3, float v4) override
 		{
 			GL_BASE::setUniformFloat4Value(uniformLocation, v1, v2, v3, v4);
 		}
 		
-		// override
-		void setUniformFloat4Value(sl_int32 uniformLocation, const Vector4& v)
+		void setUniformFloat4Value(sl_int32 uniformLocation, const Vector4& v) override
 		{
 			GL_BASE::setUniformFloat4Value(uniformLocation, v);
 		}
 		
-		// override
-		void setUniformFloat4Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
+		void setUniformFloat4Array(sl_int32 uniformLocation, const void* values, sl_uint32 count) override
 		{
 			GL_BASE::setUniformFloat4Array(uniformLocation, values, count);
 		}
 		
-		// override
-		void setUniformInt4Value(sl_int32 uniformLocation, sl_int32 v1, sl_int32 v2, sl_int32 v3, sl_int32 v4)
+		void setUniformInt4Value(sl_int32 uniformLocation, sl_int32 v1, sl_int32 v2, sl_int32 v3, sl_int32 v4) override
 		{
 			GL_BASE::setUniformInt4Value(uniformLocation, v1, v2, v3, v4);
 		}
 		
-		// override
-		void setUniformInt4Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
+		void setUniformInt4Array(sl_int32 uniformLocation, const void* values, sl_uint32 count) override
 		{
 			GL_BASE::setUniformInt4Array(uniformLocation, values, count);
 		}
 		
-		// override
-		void setUniformMatrix2Value(sl_int32 uniformLocation, const Matrix2& value)
+		void setUniformMatrix2Value(sl_int32 uniformLocation, const Matrix2& value) override
 		{
 			GL_BASE::setUniformMatrix2Value(uniformLocation, value);
 		}
 		
-		// override
-		void setUniformMatrix2Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
+		void setUniformMatrix2Array(sl_int32 uniformLocation, const void* values, sl_uint32 count) override
 		{
 			GL_BASE::setUniformMatrix2Array(uniformLocation, values, count);
 		}
 		
-		// override
-		void setUniformMatrix3Value(sl_int32 uniformLocation, const Matrix3& value)
+		void setUniformMatrix3Value(sl_int32 uniformLocation, const Matrix3& value) override
 		{
 			GL_BASE::setUniformMatrix3Value(uniformLocation, value);
 		}
 		
-		// override
-		void setUniformMatrix3Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
+		void setUniformMatrix3Array(sl_int32 uniformLocation, const void* values, sl_uint32 count) override
 		{
 			GL_BASE::setUniformMatrix3Array(uniformLocation, values, count);
 		}
 		
-		// override
-		void setUniformMatrix4Value(sl_int32 uniformLocation, const Matrix4& value)
+		void setUniformMatrix4Value(sl_int32 uniformLocation, const Matrix4& value) override
 		{
 			GL_BASE::setUniformMatrix4Value(uniformLocation, value);
 		}
 		
-		// override
-		void setUniformMatrix4Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
+		void setUniformMatrix4Array(sl_int32 uniformLocation, const void* values, sl_uint32 count) override
 		{
 			GL_BASE::setUniformMatrix4Array(uniformLocation, values, count);
 		}
 		
-		// override
-		void setUniformTextureSampler(sl_int32 uniformLocation, sl_uint32 samplerNo)
+		void setUniformTextureSampler(sl_int32 uniformLocation, sl_uint32 samplerNo) override
 		{
 			GL_BASE::setUniformTextureSampler(uniformLocation, samplerNo);
 		}
 		
-		void setUniformTextureSamplerArray(sl_int32 uniformLocation, const sl_reg* values, sl_uint32 count)
+		void setUniformTextureSamplerArray(sl_int32 uniformLocation, const sl_reg* values, sl_uint32 count) override
 		{
 			GL_BASE::setUniformTextureSamplerArray(uniformLocation, values, count);
 		}

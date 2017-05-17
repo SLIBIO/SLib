@@ -172,8 +172,7 @@ namespace slib
 		XmlNodeGroup(XmlNodeType type);
 
 	public:
-		// override
-		sl_bool buildText(StringBuffer& output) const;
+		sl_bool buildText(StringBuffer& output) const override;
 
 		sl_bool buildInnerXml(StringBuffer& output) const;
 
@@ -261,8 +260,7 @@ namespace slib
 
 		static Ref<XmlElement> create(const String& name, const String& uri, const String& localName);
 
-		// override
-		sl_bool buildXml(StringBuffer& output) const;
+		sl_bool buildXml(StringBuffer& output) const override;
 	
 		String getName() const;
 
@@ -324,8 +322,7 @@ namespace slib
 	public:
 		static Ref<XmlDocument> create();
 
-		// override
-		sl_bool buildXml(StringBuffer& output) const;
+		sl_bool buildXml(StringBuffer& output) const override;
 	
 		Ref<XmlElement> getElementById(const String& _id) const;
 
@@ -352,14 +349,11 @@ namespace slib
 	
 		static Ref<XmlText> createCDATA(const String& text);
 
-		// override
-		sl_bool buildText(StringBuffer& output) const;
+		sl_bool buildText(StringBuffer& output) const override;
 
-		// override
-		sl_bool buildXml(StringBuffer& output) const;
+		sl_bool buildXml(StringBuffer& output) const override;
 	
-		// override
-		String getText() const;
+		String getText() const override;
 
 		void setText(const String& text);
 
@@ -383,11 +377,9 @@ namespace slib
 	public:
 		static Ref<XmlProcessingInstruction> create(const String& target, const String& content);
 
-		// override
-		sl_bool buildText(StringBuffer& output) const;
+		sl_bool buildText(StringBuffer& output) const override;
 
-		// override
-		sl_bool buildXml(StringBuffer& output) const;
+		sl_bool buildXml(StringBuffer& output) const override;
 
 		String getTarget() const;
 
@@ -413,11 +405,9 @@ namespace slib
 	public:
 		static Ref<XmlComment> create(const String& comment);
 
-		// override
-		sl_bool buildText(StringBuffer& output) const;
+		sl_bool buildText(StringBuffer& output) const override;
 
-		// override
-		sl_bool buildXml(StringBuffer& output) const;
+		sl_bool buildXml(StringBuffer& output) const override;
 
 		String getComment() const;
 
@@ -438,11 +428,9 @@ namespace slib
 	public:
 		static Ref<XmlWhiteSpace> create(const String& content);
 
-		// override
-		sl_bool buildText(StringBuffer& output) const;
+		sl_bool buildText(StringBuffer& output) const override;
 
-		// override
-		sl_bool buildXml(StringBuffer& output) const;
+		sl_bool buildXml(StringBuffer& output) const override;
 
 		String getContent() const;
 

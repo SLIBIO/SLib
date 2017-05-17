@@ -46,11 +46,9 @@ namespace slib
 		virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 	public:
-		// override
-		void onDraw(Canvas* canvas);
+		void onDraw(Canvas* canvas) override;
 		
-		// override
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
+		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical) override;
 		
 	protected:
 		AtomicRef<Drawable> m_source;

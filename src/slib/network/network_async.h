@@ -61,8 +61,7 @@ namespace slib
 		~AsyncTcpServerInstance();
 		
 	public:
-		// override
-		void close();
+		void close() override;
 		
 		void start();
 		
@@ -90,8 +89,7 @@ namespace slib
 		~AsyncUdpSocketInstance();
 		
 	public:
-		// override
-		void close();
+		void close() override;
 		
 		void start();
 		

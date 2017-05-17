@@ -182,8 +182,7 @@ namespace slib
 			return ret;
 		}
 		
-		// override
-		void release()
+		void release() override
 		{
 			ObjectLocker lock(this);
 			if (!m_flagOpened) {
@@ -198,14 +197,12 @@ namespace slib
 			AudioConverterDispose(m_converter);
 		}
 		
-		// override
-		sl_bool isOpened()
+		sl_bool isOpened() override
 		{
 			return m_flagOpened;
 		}
 		
-		// override
-		void start()
+		void start() override
 		{
 			ObjectLocker lock(this);
 			if (!m_flagOpened) {
@@ -220,8 +217,7 @@ namespace slib
 			m_flagRunning = sl_true;
 		}
 		
-		// override
-		void stop()
+		void stop() override
 		{
 			ObjectLocker lock(this);
 			if (!m_flagOpened) {
@@ -236,8 +232,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		sl_bool isRunning()
+		sl_bool isRunning() override
 		{
 			return m_flagRunning;
 		}

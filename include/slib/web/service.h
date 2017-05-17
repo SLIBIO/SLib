@@ -45,11 +45,9 @@ namespace slib
 		const Ref<WebController>& getController();
 
 	protected:
-		// override
-		sl_bool dispatchStartService();
+		sl_bool dispatchStartService() override;
 
-		// override
-		void dispatchStopService();
+		void dispatchStopService() override;
 
 	protected:
 		Ref<HttpService> m_http;

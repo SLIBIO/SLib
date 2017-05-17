@@ -34,8 +34,7 @@ namespace slib
 		static Ref<UIApp> getApp();
 		
 	public:
-		// override
-		AppType getAppType();
+		AppType getAppType() override;
 		
 		static void quit();
 		
@@ -54,8 +53,7 @@ namespace slib
 		
 		virtual void onExit();
 		
-		// override
-		void onRunApp();
+		void onRunApp() override;
 		
 	public:
 		virtual void dispatchStart();

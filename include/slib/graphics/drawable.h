@@ -148,11 +148,9 @@ namespace slib
 		static sl_bool check(const Ref<Drawable>& drawable, Color* outColor = sl_null);
 
 	public:
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override;
 
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
 	protected:
 		Color m_color;
@@ -172,11 +170,9 @@ namespace slib
 		static Ref<Drawable> get();
 
 	public:
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override;
 
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 	
 	};
 	
@@ -194,23 +190,17 @@ namespace slib
 		static Ref<Drawable> create(const Ref<Drawable>& src, sl_real x, sl_real y, sl_real width, sl_real height);
 
 	public:
-		// override
-		sl_real getDrawableWidth();
+		sl_real getDrawableWidth() override;
 
-		// override
-		sl_real getDrawableHeight();
+		sl_real getDrawableHeight() override;
 
-		// override
-		Ref<Drawable> subDrawable(sl_real x, sl_real y, sl_real width, sl_real height);
+		Ref<Drawable> subDrawable(sl_real x, sl_real y, sl_real width, sl_real height) override;
 	
-		// override
-		Ref<Drawable> scaleDrawable(sl_real width, sl_real height);
+		Ref<Drawable> scaleDrawable(sl_real width, sl_real height) override;
 
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override;
 
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
 	protected:
 		Ref<Drawable> m_src;
@@ -234,23 +224,17 @@ namespace slib
 		static Ref<Drawable> create(const Ref<Drawable>& src, sl_real width, sl_real height);
 
 	public:
-		// override
-		sl_real getDrawableWidth();
+		sl_real getDrawableWidth() override;
 
-		// override
-		sl_real getDrawableHeight();
+		sl_real getDrawableHeight() override;
 
-		// override
-		Ref<Drawable> subDrawable(sl_real x, sl_real y, sl_real width, sl_real height);
+		Ref<Drawable> subDrawable(sl_real x, sl_real y, sl_real width, sl_real height) override;
 
-		// override
-		Ref<Drawable> scaleDrawable(sl_real width, sl_real height);
+		Ref<Drawable> scaleDrawable(sl_real width, sl_real height) override;
 
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override;
 
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
 	protected:
 		Ref<Drawable> m_src;
@@ -272,23 +256,17 @@ namespace slib
 		static Ref<Drawable> create(const Ref<Drawable>& src, const Rectangle& rectSrc, sl_real width, sl_real height);
 
 	public:
-		// override
-		sl_real getDrawableWidth();
+		sl_real getDrawableWidth() override;
 
-		// override
-		sl_real getDrawableHeight();
+		sl_real getDrawableHeight() override;
 
-		// override
-		Ref<Drawable> subDrawable(sl_real x, sl_real y, sl_real width, sl_real height);
+		Ref<Drawable> subDrawable(sl_real x, sl_real y, sl_real width, sl_real height) override;
 
-		// override
-		Ref<Drawable> scaleDrawable(sl_real width, sl_real height);
+		Ref<Drawable> scaleDrawable(sl_real width, sl_real height) override;
 
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override;
 
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
 	protected:
 		Ref<Drawable> m_src;
@@ -313,17 +291,13 @@ namespace slib
 		static Ref<Drawable> create(const Ref<Drawable>& src, sl_real alpha, sl_real blurRadius = 0);
 
 	public:
-		// override
-		sl_real getDrawableWidth();
+		sl_real getDrawableWidth() override;
 
-		// override
-		sl_real getDrawableHeight();
+		sl_real getDrawableHeight() override;
 
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override;
 
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
 	protected:
 		void _prepareParam(DrawParam& dst, const DrawParam& src);
@@ -358,8 +332,7 @@ namespace slib
 									const Ref<Drawable>& bottomLeft, const Ref<Drawable>& bottom, const Ref<Drawable>& bottomRight);
 
 	public:
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
 	protected:
 		sl_real m_widthLeft;
@@ -397,8 +370,7 @@ namespace slib
 									const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc, sl_real topHeightSrc, sl_real bottomHeightSrc);
 
 	public:
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
 	protected:
 		sl_real m_widthLeftDst;
@@ -432,8 +404,7 @@ namespace slib
 									const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc);
 
 	public:
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
 	protected:
 		sl_real m_widthLeftDst;
@@ -463,8 +434,7 @@ namespace slib
 									const Ref<Drawable>& src, sl_real topHeightSrc, sl_real bottomHeightSrc);
 
 	public:
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
 	protected:
 		sl_real m_heightTopDst;
@@ -485,13 +455,11 @@ namespace slib
 		~MipmapDrawable();
 
 	public:
-		// override
-		sl_real getDrawableWidth();
+		sl_real getDrawableWidth() override;
 
 		void setDrawableWidth(sl_real width);
 
-		// override
-		sl_real getDrawableHeight();
+		sl_real getDrawableHeight() override;
 
 		void setDrawableHeight(sl_real height);
 	
@@ -506,11 +474,9 @@ namespace slib
 		Ref<Drawable> getMatchingSource(sl_real requiredWidth, sl_real requiredHeight);
 
 	public:
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override;
 
-		// override
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
 	protected:
 		struct _Source

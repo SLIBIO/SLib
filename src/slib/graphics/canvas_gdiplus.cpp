@@ -157,15 +157,13 @@ namespace slib
 			return sl_null;
 		}
 
-		// override
-		void save()
+		void save() override
 		{
 			Gdiplus::GraphicsState state = m_graphics->Save();
 			m_stackState.push(state);
 		}
 		
-		// override
-		void restore()
+		void restore() override
 		{
 			Gdiplus::GraphicsState state;
 			if (m_stackState.pop(&state)) {
@@ -173,8 +171,7 @@ namespace slib
 			}
 		}
 
-		// override
-		Rectangle getClipBounds()
+		Rectangle getClipBounds() override
 		{
 			Gdiplus::RectF rc;
 			Gdiplus::Status status = m_graphics->GetClipBounds(&rc);
@@ -186,15 +183,13 @@ namespace slib
 			return Rectangle(0, 0, size.x, size.y);
 		}
 
-		// override
-		void clipToRectangle(const Rectangle& _rect)
+		void clipToRectangle(const Rectangle& _rect) override
 		{
 			Gdiplus::RectF rect(_rect.left, _rect.top, _rect.getWidth(), _rect.getHeight());
 			m_graphics->IntersectClip(rect);
 		}
 
-		// override
-		void clipToPath(const Ref<GraphicsPath>& path)
+		void clipToPath(const Ref<GraphicsPath>& path) override
 		{
 			if (path.isNotNull()) {
 				Gdiplus::GraphicsPath* handle = GraphicsPlatform::getGraphicsPath(path.get());
@@ -229,22 +224,19 @@ namespace slib
 			m_graphics->SetTransform(&m);
 		}
 
-		// override
-		void concatMatrix(const Matrix3& other)
+		void concatMatrix(const Matrix3& other) override
 		{
 			Matrix3 mat = other;
 			mat.multiply(getMatrix());
 			setMatrix(mat);
 		}
 
-		// override
-		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color)
+		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) override
 		{
 			_Gdiplus_Canvas::drawText16(text, x, y, font, color);
 		}
 		
-		// override
-		void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& color)
+		void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& color) override
 		{
 			if (text.isNotEmpty()) {
 				Gdiplus::Graphics* graphics = m_graphics;
@@ -278,8 +270,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen)
+		void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen) override
 		{
 			DRAW_PEN_BEGIN
 			if (hPen) {
@@ -288,8 +279,7 @@ namespace slib
 			DRAW_PEN_END
 		}
 
-		// override
-		void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen)
+		void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen) override
 		{
 			if (countPoints < 2) {
 				return;
@@ -302,8 +292,7 @@ namespace slib
 			DRAW_PEN_END
 		}
 
-		// override
-		void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen)
+		void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen) override
 		{
 			DRAW_PEN_BEGIN
 			if (hPen) {
@@ -313,8 +302,7 @@ namespace slib
 			DRAW_PEN_END
 		}
 
-		// override
-		void drawRectangle(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		void drawRectangle(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush) override
 		{
 			sl_real width = rect.getWidth();
 			sl_real height = rect.getHeight();
@@ -329,8 +317,7 @@ namespace slib
 			DRAW_PEN_BRUSH_END
 		}
 
-		// override
-		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& _pen, const Ref<Brush>& brush) override
 		{
 			sl_real width = rect.getWidth();
 			sl_real height = rect.getHeight();
@@ -341,8 +328,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void drawEllipse(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		void drawEllipse(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush) override
 		{
 			sl_real width = rect.getWidth();
 			sl_real height = rect.getHeight();
@@ -357,8 +343,7 @@ namespace slib
 			DRAW_PEN_BRUSH_END
 		}
 
-		// override
-		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode)
+		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode) override
 		{
 			if (countPoints <= 2) {
 				return;
@@ -387,8 +372,7 @@ namespace slib
 
 		}
 
-		// override
-		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen, const Ref<Brush>& brush) override
 		{
 			DRAW_PEN_BRUSH_BEGIN
 			if (hBrush) {
@@ -402,8 +386,7 @@ namespace slib
 			DRAW_PEN_BRUSH_END
 		}
 
-		// override
-		void drawPath(const Ref<GraphicsPath>& _path, const Ref<Pen>& _pen, const Ref<Brush>& brush)
+		void drawPath(const Ref<GraphicsPath>& _path, const Ref<Pen>& _pen, const Ref<Brush>& brush) override
 		{
 			Ref<GraphicsPath> path = _path;
 			if (path.isNotNull()) {
@@ -421,8 +404,7 @@ namespace slib
 			}
 		}
 
-		// override
-		void _setAntiAlias(sl_bool flag)
+		void _setAntiAlias(sl_bool flag) override
 		{
 			if (flag) {
 				m_graphics->SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);

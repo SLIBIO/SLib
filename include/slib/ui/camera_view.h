@@ -38,7 +38,7 @@ namespace slib
 		SLIB_PROPERTY(AtomicPtr<IVideoCaptureListener>, FrameListener)
 		
 	protected:
-		virtual void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame);
+		void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame) override;
 		
 	protected:
 		AtomicRef<Camera> m_camera;

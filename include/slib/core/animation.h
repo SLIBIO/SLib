@@ -461,8 +461,7 @@ namespace slib
 
 		T& getFrame(sl_size index);
 
-		// override
-		void update(float fraction);
+		void update(float fraction) override;
 
 		virtual void update(float fraction, const T& value) = 0;
 		

@@ -103,27 +103,20 @@ namespace slib
 		void relayout(UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 	protected:
-		// override
-		void onResize(sl_ui_len width, sl_ui_len height);
+		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
-		// override
-		void onDraw(Canvas* canvas);
+		void onDraw(Canvas* canvas) override;
 		
-		// override
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
+		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical) override;
 		
-		// override
-		void onMakeLayout();
+		void onMakeLayout() override;
 		
 	public:
-		// override
-		void dispatchMouseEvent(UIEvent* ev);
+		void dispatchMouseEvent(UIEvent* ev) override;
 		
-		// override
-		void dispatchSetCursor(UIEvent* ev);
+		void dispatchSetCursor(UIEvent* ev) override;
 		
-		// override
-		sl_bool hitTestForCapturingChildInstanceEvents(const UIPoint& pt);
+		sl_bool hitTestForCapturingChildInstanceEvents(const UIPoint& pt) override;
 		
 	protected:
 		sl_ui_len _getTotalSize();

@@ -35,14 +35,11 @@ namespace slib
 		
 		Ref<Socket> getSocket();
 		
-		// override
-		void close();
+		void close() override;
 		
-		// override
-		sl_int32 read32(void* buf, sl_uint32 size);
+		sl_int32 read32(void* buf, sl_uint32 size) override;
 		
-		// override
-		sl_int32 write32(const void* buf, sl_uint32 size);
+		sl_int32 write32(const void* buf, sl_uint32 size) override;
 		
 	protected:
 		AtomicRef<Socket> m_socket;

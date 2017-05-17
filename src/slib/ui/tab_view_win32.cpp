@@ -147,20 +147,17 @@ namespace slib
 	class _Win32_TabViewInstance : public Win32_ViewInstance
 	{
 	public:
-		// override
-		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
+		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
 		{
 			return sl_false;
 		}
 
-		// override
-		sl_bool processCommand(SHORT code, LRESULT& result)
+		sl_bool processCommand(SHORT code, LRESULT& result) override
 		{
 			return sl_false;
 		}
 
-		// override
-		sl_bool processNotify(NMHDR* nmhdr, LRESULT& result)
+		sl_bool processNotify(NMHDR* nmhdr, LRESULT& result) override
 		{
 			HWND handle = getHandle();
 			if (handle) {

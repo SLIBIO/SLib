@@ -77,20 +77,17 @@ namespace slib
 			return sl_null;
 		}
 		
-		// override
-		sl_uint32 getBitmapWidth()
+		sl_uint32 getBitmapWidth() override
 		{
 			return m_bitmap->GetWidth();
 		}
 		
-		// override
-		sl_uint32 getBitmapHeight()
+		sl_uint32 getBitmapHeight() override
 		{
 			return m_bitmap->GetHeight();
 		}
 		
-		// override
-		sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& _dst)
+		sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& _dst) override
 		{
 			sl_uint32 w = getBitmapWidth();
 			sl_uint32 h = getBitmapHeight();
@@ -168,8 +165,7 @@ namespace slib
 			}
 		}
 		
-		// override
-		sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& _src)
+		sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& _src) override
 		{
 			sl_uint32 w = getBitmapWidth();
 			sl_uint32 h = getBitmapHeight();
@@ -240,8 +236,7 @@ namespace slib
 			return sl_false;
 		}
 		
-		// override
-		sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& color)
+		sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& color) override
 		{
 			sl_uint32 w = getBitmapWidth();
 			sl_uint32 h = getBitmapHeight();
@@ -283,8 +278,7 @@ namespace slib
 			return sl_false;
 		}
 		
-		// override
-		Ref<Canvas> getCanvas()
+		Ref<Canvas> getCanvas() override
 		{
 			Gdiplus::Graphics* g = new Gdiplus::Graphics(m_bitmap);
 			if (g) {
@@ -295,8 +289,7 @@ namespace slib
 			return sl_null;
 		}
 		
-		// override
-		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override
 		{
 			GraphicsPlatform::drawImage(canvas, rectDst, m_bitmap, rectSrc, param);
 		}
