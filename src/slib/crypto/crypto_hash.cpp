@@ -129,7 +129,9 @@ namespace slib
 	void CLASS::hash(const void* input, sl_size n, void* output) \
 	{ \
 		CLASS h; \
-		h.execute(input, n, output); \
+		h.CLASS::start(); \
+		h.CLASS::update(input, n); \
+		h.CLASS::finish(output); \
 	} \
 	sl_uint32 CLASS::getHashSize() \
 	{ \
@@ -137,28 +139,28 @@ namespace slib
 	} \
 	void CLASS::hash(const String& s, void* output) \
 	{ \
-		hash(s.getData(), s.getLength(), output); \
+		CLASS::hash(s.getData(), s.getLength(), output); \
 	} \
 	void CLASS::hash(const Memory& data, void* output) \
 	{ \
-		hash(data.getData(), data.getSize(), output); \
+		CLASS::hash(data.getData(), data.getSize(), output); \
 	} \
 	Memory CLASS::hash(const void* input, sl_size n) \
 	{ \
 		char v[HASH_SIZE]; \
-		hash(input, n, v); \
+		CLASS::hash(input, n, v); \
 		return Memory::create(v, HASH_SIZE); \
 	} \
 	Memory CLASS::hash(const String& s) \
 	{ \
 		char v[HASH_SIZE]; \
-		hash(s.getData(), s.getLength(), v); \
+		CLASS::hash(s.getData(), s.getLength(), v); \
 		return Memory::create(v, HASH_SIZE); \
 	} \
 	Memory CLASS::hash(const Memory& data) \
 	{ \
 		char v[HASH_SIZE]; \
-		hash(data.getData(), data.getSize(), v); \
+		CLASS::hash(data.getData(), data.getSize(), v); \
 		return Memory::create(v, HASH_SIZE); \
 	} \
 	sl_uint32 CLASS::getSize() const \
