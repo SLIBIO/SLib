@@ -399,12 +399,7 @@ namespace slib
 	{
 		return Map<String, Variant>::createHash();
 	}
-	
-	Variant Variant::createListMap()
-	{
-		return Map<String, Variant>::createList();
-	}
-	
+		
 	Variant Variant::createTreeMap()
 	{
 		return Map<String, Variant>::createTree();

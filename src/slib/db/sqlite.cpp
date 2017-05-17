@@ -75,7 +75,7 @@ namespace slib
 
 		static Map<String, Variant> _getRow(sqlite3_stmt* stmt, String* columns, sl_uint32 nColumns)
 		{
-			Map<String, Variant> row = Map<String, Variant>::createList();
+			Map<String, Variant> row;
 			for (sl_uint32 cIndex = 0; cIndex < nColumns; cIndex++) {
 				String cValue = String::fromUtf8(::sqlite3_column_text(stmt, (int)cIndex));
 				row.put_NoLock(columns[cIndex], cValue);
