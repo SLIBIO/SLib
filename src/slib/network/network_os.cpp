@@ -13,6 +13,7 @@
 #include "slib/network/socket.h"
 #include "slib/core/endian.h"
 #include "slib/core/map.h"
+#include "slib/core/search.h"
 
 namespace slib
 {
