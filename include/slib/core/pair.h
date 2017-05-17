@@ -29,10 +29,10 @@ namespace slib
 		SLIB_INLINE Pair() noexcept
 		 {}
 
-		SLIB_INLINE Pair(const Pair<KT, VT>& other) noexcept
+		SLIB_INLINE Pair(const Pair<KT, VT>& other)
 		 = default;
 
-		SLIB_INLINE Pair(Pair<KT, VT>&& other) noexcept
+		SLIB_INLINE Pair(Pair<KT, VT>&& other)
 		 = default;
 
 		template <class KEY, class VALUE>
@@ -41,10 +41,10 @@ namespace slib
 		 {}
 
 	public:
-		SLIB_INLINE Pair<KT, VT>& operator=(const Pair<KT, VT>& other) noexcept
+		SLIB_INLINE Pair<KT, VT>& operator=(const Pair<KT, VT>& other)
 		 = default;
 
-		SLIB_INLINE Pair<KT, VT>& operator=(Pair<KT, VT>&& other) noexcept
+		SLIB_INLINE Pair<KT, VT>& operator=(Pair<KT, VT>&& other)
 		 = default;
 
 	};

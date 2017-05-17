@@ -255,7 +255,7 @@ namespace slib
 		
 	}
 	
-	void _priv_RedBlackTree::rebalanceAfterRemove(RedBlackTreeBaseNode* node, RedBlackTreeBaseNode** pRoot) noexcept
+	void _priv_RedBlackTree::removeNode(RedBlackTreeBaseNode* node, RedBlackTreeBaseNode** pRoot) noexcept
 	{
 		sl_bool flagRed = node->flagRed;
 		Node* parent = node->parent;
@@ -331,8 +331,8 @@ namespace slib
 		}
 		
 		// rebalance red-black tree.
-		// `node` is always BLACK, here
-		SLIB_ASSERT(!(node && node->flagRed));
+		// `node` is always NIL, here
+		node = sl_null;
 		
 		for (;;) {
 			

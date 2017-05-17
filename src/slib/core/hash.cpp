@@ -45,6 +45,7 @@ namespace slib
 				table->count = 0;
 				table->firstEntry = sl_null;
 				table->lastEntry = sl_null;
+				Base::zeroMemory(table->entries, sizeof(Entry*)*capacity);
 				return;
 			}
 		}
@@ -54,7 +55,12 @@ namespace slib
 	sl_bool _priv_HashTable::validateEntries(HashBaseTable* table) noexcept
 	{
 		if (table->capacity == 0) {
-			return createEntries(table, PRIV_SLIB_HASHTABLE_MIN_CAPACITY);
+			if (createEntries(table, PRIV_SLIB_HASHTABLE_MIN_CAPACITY)) {
+				Base::zeroMemory(table->entries, sizeof(Entry*)*PRIV_SLIB_HASHTABLE_MIN_CAPACITY);
+				return sl_true;
+			} else {
+				return sl_false;
+			}
 		} else {
 			return sl_true;
 		}

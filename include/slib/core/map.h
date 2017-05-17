@@ -13,8 +13,8 @@
 
 #include "definition.h"
 
+#include "pair.h"
 #include "object.h"
-#include "iterator.h"
 #include "list.h"
 #include "hashtable.h"
 #include "red_black_tree.h"
@@ -27,6 +27,9 @@ namespace slib
 {
 	
 	template <class KT, class VT>
+	class IMap;
+	
+	template <class KT, class VT>
 	class Map;
 	
 	template <class KT, class VT>
@@ -34,28 +37,42 @@ namespace slib
 
 	
 	template <class KT, class VT>
-	class SLIB_EXPORT Pair
+	class SLIB_EXPORT MapPosition
 	{
 	public:
-		KT key;
-		VT value;
-
+		MapPosition() noexcept;
+		
+		MapPosition(sl_null_t) noexcept;
+		
+		MapPosition(MapContainerType containerType, void* node, Referable* ref) noexcept;
+		
+		MapPosition(const MapPosition& other) noexcept = default;
+		
+		MapPosition(MapPosition&& other) noexcept = default;
+		
 	public:
-		SLIB_INLINE Pair() {}
-
-		SLIB_INLINE Pair(const Pair<KT, VT>& other) = default;
-
-		SLIB_INLINE Pair(Pair<KT, VT>&& other) = default;
-
-		template <class T1, class T2>
-		SLIB_INLINE Pair(T1&& _key, T2&& _value) : key(Forward<T1>(_key)), value(Forward<T2>(_value)) {}
-
-		SLIB_INLINE Pair<KT, VT>& operator=(const Pair<KT, VT>& other) = default;
-
-		SLIB_INLINE Pair<KT, VT>& operator=(Pair<KT, VT>&& other) = default;
-
+		MapPosition& operator=(const MapPosition& other) noexcept = default;
+		
+		MapPosition& operator=(MapPosition&& other) noexcept = default;
+		
+		Pair<KT, VT>& operator*() const noexcept;
+		
+		sl_bool operator==(const MapPosition& other) const noexcept;
+		
+		sl_bool operator!=(const MapPosition& other) const noexcept;
+		
+		explicit operator sl_bool() const noexcept;
+		
+		MapPosition<KT, VT>& operator++() noexcept;
+		
+	public:
+		void* node;
+		MapContainerType containerType;
+		Ref<Referable> ref;
+		
 	};
 
+	
 	extern const char _priv_Map_ClassID[];
 	
 	template <class KT, class VT>
@@ -64,405 +81,581 @@ namespace slib
 		SLIB_TEMPLATE_OBJECT(Object, _priv_Map_ClassID)
 	
 	public:
-		static IMap<KT, VT>* createDefault();
+		IMap() noexcept;
+		
+	public:
+		static IMap* createDefault() noexcept;
+		
+		sl_size getCount() const noexcept;
 
-		virtual sl_size getCount() const = 0;
-
-		sl_bool isEmpty() const;
+		sl_bool isEmpty() const noexcept;
 	
-		sl_bool isNotEmpty() const;
+		sl_bool isNotEmpty() const noexcept;
 	
-		virtual VT* getItemPointer(const KT& key) const = 0;
+		VT* getItemPointer(const KT& key) const noexcept;
 
-		sl_bool get_NoLock(const KT& key, VT* _out = sl_null) const;
+		sl_bool get_NoLock(const KT& key, VT* _out = sl_null) const noexcept;
 
-		sl_bool get(const KT& key, VT* _out = sl_null) const;
+		sl_bool get(const KT& key, VT* _out = sl_null) const noexcept;
 
-		VT getValue_NoLock(const KT& key) const;
+		VT getValue_NoLock(const KT& key) const noexcept;
 
-		VT getValue(const KT& key) const;
+		VT getValue(const KT& key) const noexcept;
 
-		VT getValue_NoLock(const KT& key, const VT& def) const;
+		VT getValue_NoLock(const KT& key, const VT& def) const noexcept;
 
-		VT getValue(const KT& key, const VT& def) const;
+		VT getValue(const KT& key, const VT& def) const noexcept;
 
-		virtual List<VT> getValues_NoLock(const KT& key) const = 0;
+		List<VT> getValues_NoLock(const KT& key) const noexcept;
 
-		List<VT> getValues(const KT& key) const;
+		List<VT> getValues(const KT& key) const noexcept;
 
-		virtual sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null) = 0;
+		template <class KEY, class VALUE>
+		sl_bool put_NoLock(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, MapPosition<KT, VT>* pPosition = sl_null) noexcept;
 
-		sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
+		template <class KEY, class VALUE>
+		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, MapPosition<KT, VT>* pPosition = sl_null) noexcept;
 		
 		template <class KEY, class VALUE>
-		void putAll_NoLock(IMap<KEY, VALUE>* other, MapPutMode mode = MapPutMode::Default);
+		void putAll_NoLock(IMap<KEY, VALUE>* other, MapPutMode mode = MapPutMode::Default) noexcept;
 
 		template <class KEY, class VALUE>
-		void putAll(IMap<KEY, VALUE>* other, MapPutMode mode = MapPutMode::Default);
+		void putAll(IMap<KEY, VALUE>* other, MapPutMode mode = MapPutMode::Default) noexcept;
 
-		virtual sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null) = 0;
+		sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null) noexcept;
 
-		sl_bool remove(const KT& key, VT* outValue = sl_null);
+		sl_bool remove(const KT& key, VT* outValue = sl_null) noexcept;
 
-		virtual sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null) = 0;
+		sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null) noexcept;
 
-		sl_size removeItems(const KT& key, List<VT>* outValues = sl_null);
+		sl_size removeItems(const KT& key, List<VT>* outValues = sl_null) noexcept;
 
-		virtual sl_size removeAll_NoLock() = 0;
+		sl_size removeAll_NoLock() noexcept;
 
-		sl_size removeAll();
+		sl_size removeAll() noexcept;
+		
+		void removeAt_NoLock(const MapPosition<KT, VT>& position) noexcept;
+		
+		void removeAt(const MapPosition<KT, VT>& position) noexcept;
+		
+		MapPosition<KT, VT> find_NoLock(const KT& key) noexcept;
+		
+		MapPosition<KT, VT> find(const KT& key) noexcept;
+		
+		sl_bool find_NoLock(const KT& key, MapPosition<KT, VT>* pPosition) noexcept;
+		
+		sl_bool find(const KT& key, MapPosition<KT, VT>* pPosition) noexcept;
 
-		virtual sl_bool contains_NoLock(const KT& key) const = 0;
+		sl_bool contains_NoLock(const KT& key) const noexcept;
 
-		sl_bool contains(const KT& key) const;
+		sl_bool contains(const KT& key) const noexcept;
 
-		virtual IMap<KT, VT>* duplicate_NoLock() const = 0;
+		IMap* duplicate_NoLock() const noexcept;
 
-		IMap<KT, VT>* duplicate() const;
+		IMap* duplicate() const noexcept;
 
-		virtual Iterator<KT> getKeyIteratorWithRefer(Referable* refer) const = 0;
+		List<KT> getAllKeys_NoLock() const noexcept;
 
-		Iterator<KT> getKeyIterator() const;
+		List<KT> getAllKeys() const noexcept;
 
-		virtual List<KT> getAllKeys_NoLock() const = 0;
+		List<VT> getAllValues_NoLock() const noexcept;
 
-		List<KT> getAllKeys() const;
+		List<VT> getAllValues() const noexcept;
 
-		virtual Iterator<VT> getValueIteratorWithRefer(Referable* refer) const = 0;
+		List< Pair<KT, VT> > toList_NoLock() const noexcept;
 
-		Iterator<VT> getValueIterator() const;
-
-		virtual List<VT> getAllValues_NoLock() const = 0;
-
-		List<VT> getAllValues() const;
-
-		virtual Iterator< Pair<KT, VT> > toIteratorWithRefer(Referable* refer) const = 0;
-
-		Iterator< Pair<KT, VT> > toIterator() const;
-
-		virtual List< Pair<KT, VT> > toList_NoLock() const = 0;
-
-		List< Pair<KT, VT> > toList() const;
+		List< Pair<KT, VT> > toList() const noexcept;
 
 		// range-based for loop
-		IteratorPosition< Pair<KT, VT> > begin() const;
+		MapPosition<KT, VT> begin() const noexcept;
 
-		IteratorPosition< Pair<KT, VT> > end() const;
-
+		MapPosition<KT, VT> end() const noexcept;
+		
+		MapPosition<KT, VT> getFirst(Referable* ref = sl_null) const noexcept;
+		
+	protected:
+		virtual sl_size _getCount() const noexcept = 0;
+		
+		virtual VT* _getItemPointer(const KT& key) const noexcept = 0;
+		
+		virtual List<VT> _getValues(const KT& key) const noexcept = 0;
+		
+		virtual sl_bool _put(const KT& key, const VT& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept = 0;
+		
+		virtual sl_bool _put(const KT& key, VT&& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept = 0;
+		
+		virtual sl_bool _put(KT&& key, const VT& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept = 0;
+		
+		virtual sl_bool _put(KT&& key, VT&& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept = 0;
+		
+		virtual sl_bool _remove(const KT& key, VT* outValue) noexcept = 0;
+		
+		virtual sl_size _removeItems(const KT& key, List<VT>* outValues) noexcept = 0;
+		
+		virtual sl_size _removeAll() noexcept = 0;
+		
+		virtual void _removeAt(const MapPosition<KT, VT>& position) noexcept = 0;
+		
+		virtual sl_bool _find(const KT& key, MapPosition<KT, VT>* pPosition) const noexcept = 0;
+		
+		virtual IMap* _duplicate() const noexcept = 0;
+		
+		virtual List<KT> _getAllKeys() const noexcept = 0;
+		
+		virtual List<VT> _getAllValues() const noexcept = 0;
+		
+		virtual List< Pair<KT, VT> > _toList() const noexcept = 0;
+		
+		virtual MapPosition<KT, VT> _getFirst(Referable* ref) const noexcept = 0;
+		
 	};
 	
 	
-	template < class KT, class VT, class KEY_EQUALS = Equals<KT> >
-	class SLIB_EXPORT ListMap : public IMap<KT, VT>
+	template <class KT, class VT>
+	class SLIB_EXPORT HashMapPosition
 	{
 	public:
-		class PairKeyCompare
-		{
-		public:
-			KEY_EQUALS key_equals;
-
-		public:
-			PairKeyCompare(const KEY_EQUALS& key_equals);
-
-			sl_bool operator()(const Pair<KT, VT>& a, const KT& b) const;
-		};
-
-		template <class VALUE, class VALUE_EQUALS>
-		class PairCompare
-		{
-		public:
-			KEY_EQUALS key_equals;
-			VALUE_EQUALS value_equals;
-
-		public:
-			PairCompare(const KEY_EQUALS& key_equals, const VALUE_EQUALS& value_equals);
-
-			sl_bool operator()(const Pair<KT, VT>& a, const Pair<KT, VALUE>& b) const;
-		};
-	
-		CList< Pair<KT, VT> > list;
+		HashMapPosition() noexcept;
+		
+		HashMapPosition(HashEntry<KT, VT>* entry) noexcept;
+		
+		HashMapPosition(const HashMapPosition& other) noexcept = default;
+		
+		HashMapPosition(HashMapPosition&& other) noexcept = default;
 
 	public:
-		ListMap(const KEY_EQUALS& equals = KEY_EQUALS());
+		HashMapPosition& operator=(const HashMapPosition& other) noexcept = default;
 		
-#ifdef SLIB_SUPPORT_STD_TYPES
-		ListMap(const std::initializer_list< Pair<KT, VT> >& l, const KEY_EQUALS& equals = KEY_EQUALS());
-#endif
+		HashMapPosition& operator=(HashMapPosition&& other) noexcept = default;
+		
+		HashMapPosition& operator=(HashEntry<KT, VT>* entry) noexcept;
+
+		Pair<KT, VT>& operator*() const noexcept;
+		
+		sl_bool operator==(const HashMapPosition& other) const noexcept;
+		
+		sl_bool operator!=(const HashMapPosition& other) const noexcept;
+		
+		operator HashEntry<KT, VT>*() const noexcept;
+		
+		HashMapPosition<KT, VT>& operator++() noexcept;
 		
 	public:
-		static ListMap<KT, VT, KEY_EQUALS>* create(const KEY_EQUALS& key_equals = KEY_EQUALS());
-
-#ifdef SLIB_SUPPORT_STD_TYPES
-		static ListMap<KT, VT, KEY_EQUALS>* create(const std::initializer_list< Pair<KT, VT> >& l, const KEY_EQUALS& key_equals = KEY_EQUALS());
-#endif
-		
-		VT operator[](const KT& key) const;
-
-		// override
-		sl_size getCount() const;
-
-		// override
-		VT* getItemPointer(const KT& key) const;
-
-		// override
-		List<VT> getValues_NoLock(const KT& key) const;
-
-		// override
-		sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
-
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const VALUE& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
-
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool addIfNewKeyAndValue(const KT& key, const VALUE& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
-
-		// override
-		sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null);
-
-		// override
-		sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null);
-
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool removeKeyAndValue_NoLock(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
-
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
-
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_size removeItemsByKeyAndValue_NoLock(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
-
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
-
-		// override
-		sl_size removeAll_NoLock();
-
-		// override
-		sl_bool contains_NoLock(const KT& key) const;
-
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool containsKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
-
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool containsKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
-
-		// override
-		IMap<KT, VT>* duplicate_NoLock() const;
-
-		// override
-		Iterator<KT> getKeyIteratorWithRefer(Referable* refer) const;
-
-		// override
-		List<KT> getAllKeys_NoLock() const;
-
-		// override
-		Iterator<VT> getValueIteratorWithRefer(Referable* refer) const;
-
-		// override
-		List<VT> getAllValues_NoLock() const;
-
-		// override
-		Iterator< Pair<KT, VT> > toIteratorWithRefer(Referable* refer) const;
-
-		// override
-		List< Pair<KT, VT> > toList_NoLock() const;
-
-	protected:
-		KEY_EQUALS m_equals;
+		HashEntry<KT, VT>* entry;
 		
 	};
-	
 
+	
 	template < class KT, class VT, class HASH = Hash<KT>, class KEY_EQUALS = Equals<KT> >
-	class SLIB_EXPORT HashMap : public IMap<KT, VT>
+	class SLIB_EXPORT HashMap final : public IMap<KT, VT>
 	{
 	public:
 		HashTable<KT, VT, HASH, KEY_EQUALS> table;
 
 	public:
-		HashMap(sl_uint32 capacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
+		HashMap() noexcept;
+		
+		HashMap(sl_uint32 capacity) noexcept;
+		
+		HashMap(sl_uint32 capacity, const HASH& hash) noexcept;
+		
+		HashMap(sl_uint32 capacity, const HASH& hash, const KEY_EQUALS& key_equals) noexcept;
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		HashMap(const std::initializer_list< Pair<KT, VT> >& l, sl_uint32 capacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
+		HashMap(const std::initializer_list< Pair<KT, VT> >& l, sl_uint32 capacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS()) noexcept;
 #endif
 		
 	public:
-		static HashMap<KT, VT, HASH, KEY_EQUALS>* create(sl_uint32 capacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
+		HashMap(const HashMap& other) = delete;
+		
+		HashMap(HashMap&& other) noexcept;
+		
+		HashMap& operator=(const HashMap& other) = delete;
+		
+		HashMap& operator=(HashMap&& other) noexcept;
+		
+	public:
+		static HashMap* create(sl_uint32 capacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS()) noexcept;
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		static HashMap<KT, VT, HASH, KEY_EQUALS>* create(const std::initializer_list< Pair<KT, VT> >& l, sl_uint32 capacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
+		static HashMap* create(const std::initializer_list< Pair<KT, VT> >& l, sl_uint32 capacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS()) noexcept;
 #endif
 		
-		VT operator[](const KT& key) const;
+		VT operator[](const KT& key) const noexcept;
 	
-		// override
-		sl_size getCount() const;
+		sl_size getCount() const noexcept;
+		
+		sl_bool isEmpty() const noexcept;
+		
+		sl_bool isNotEmpty() const noexcept;
+		
+		VT* getItemPointer(const KT& key) const noexcept;
 
-		// override
-		VT* getItemPointer(const KT& key) const;
+		sl_bool get_NoLock(const KT& key, VT* _out = sl_null) const noexcept;
+		
+		sl_bool get(const KT& key, VT* _out = sl_null) const noexcept;
+		
+		VT getValue_NoLock(const KT& key) const noexcept;
+		
+		VT getValue(const KT& key) const noexcept;
+		
+		VT getValue_NoLock(const KT& key, const VT& def) const noexcept;
+		
+		VT getValue(const KT& key, const VT& def) const noexcept;
+		
+		List<VT> getValues_NoLock(const KT& key) const noexcept;
+		
+		List<VT> getValues(const KT& key) const noexcept;
 
-		// override
-		List<VT> getValues_NoLock(const KT& key) const;
+		template <class KEY, class VALUE>
+		sl_bool put_NoLock(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, HashEntry<KT, VT>** ppEntry = sl_null) noexcept;
+		
+		template <class KEY, class VALUE>
+		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, HashEntry<KT, VT>** ppEntry = sl_null) noexcept;
 
-		// override
-		sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
+		template < class KEY, class VALUE, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<VALUE>::Type> >
+		sl_bool addIfNewKeyAndValue_NoLock(KEY&& key, VALUE&& value, HashEntry<KT, VT>** ppEntry = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+
+		template < class KEY, class VALUE, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<VALUE>::Type> >
+		sl_bool addIfNewKeyAndValue(KEY&& key, VALUE&& value, HashEntry<KT, VT>** ppEntry = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+
+		sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null) noexcept;
+		
+		sl_bool remove(const KT& key, VT* outValue = sl_null) noexcept;
+		
+		sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null) noexcept;
+		
+		sl_size removeItems(const KT& key, List<VT>* outValues = sl_null) noexcept;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const VALUE& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		sl_bool removeKeyAndValue_NoLock(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool addIfNewKeyAndValue(const KT& key, const VALUE& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
-
-		// override
-		sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null);
-
-		// override
-		sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null);
+		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool removeKeyAndValue_NoLock(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		sl_size removeItemsByKeyAndValue_NoLock(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+
+		sl_size removeAll_NoLock() noexcept;
+		
+		sl_size removeAll() noexcept;
+		
+		void removeAt_NoLock(const HashEntry<KT, VT>* entry) noexcept;
+		
+		void removeAt(const HashEntry<KT, VT>* entry) noexcept;
+		
+		HashEntry<KT, VT>* find_NoLock(const KT& key) const noexcept;
+		
+		HashEntry<KT, VT>* find(const KT& key) const noexcept;
+		
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		HashEntry<KT, VT>* findKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		HashEntry<KT, VT>* findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		
+		sl_bool contains_NoLock(const KT& key) const noexcept;
+		
+		sl_bool contains(const KT& key) const noexcept;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_size removeItemsByKeyAndValue_NoLock(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		sl_bool containsKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		sl_bool containsKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		
+		HashEntry<KT, VT>* getFirstEntry() const noexcept;
+		
+		HashEntry<KT, VT>* getLastEntry() const noexcept;
+		
+		HashMap* duplicate_NoLock() const noexcept;
+		
+		HashMap* duplicate() const noexcept;
 
-		// override
-		sl_size removeAll_NoLock();
+		List<KT> getAllKeys_NoLock() const noexcept;
+		
+		List<KT> getAllKeys() const noexcept;
 
-		// override
-		sl_bool contains_NoLock(const KT& key) const;
+		List<VT> getAllValues_NoLock() const noexcept;
+		
+		List<VT> getAllValues() const noexcept;
 
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool containsKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		List< Pair<KT, VT> > toList_NoLock() const noexcept;
+		
+		List< Pair<KT, VT> > toList() const noexcept;
+		
+		// range-based for loop
+		HashMapPosition<KT, VT> begin() const noexcept;
+		
+		HashMapPosition<KT, VT> end() const noexcept;
+		
+		sl_bool copyFrom(const HashMap* other) noexcept;
 
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool containsKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
-
-		// override
-		IMap<KT, VT>* duplicate_NoLock() const;
-
-		// override
-		Iterator<KT> getKeyIteratorWithRefer(Referable* refer) const;
-
-		// override
-		List<KT> getAllKeys_NoLock() const;
-
-		// override
-		Iterator<VT> getValueIteratorWithRefer(Referable* refer) const;
-
-		// override
-		List<VT> getAllValues_NoLock() const;
-
-		// override
-		Iterator< Pair<KT, VT> > toIteratorWithRefer(Referable* refer) const;
-
-		// override
-		List< Pair<KT, VT> > toList_NoLock() const;
-	
+	protected:
+		sl_size _getCount() const noexcept override;
+		
+		VT* _getItemPointer(const KT& key) const noexcept override;
+		
+		List<VT> _getValues(const KT& key) const noexcept override;
+		
+		sl_bool _put(const KT& key, const VT& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept override;
+		
+		sl_bool _put(const KT& key, VT&& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept override;
+		
+		sl_bool _put(KT&& key, const VT& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept override;
+		
+		sl_bool _put(KT&& key, VT&& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept override;
+		
+		sl_bool _remove(const KT& key, VT* outValue) noexcept override;
+		
+		sl_size _removeItems(const KT& key, List<VT>* outValues) noexcept override;
+		
+		sl_size _removeAll() noexcept override;
+		
+		void _removeAt(const MapPosition<KT, VT>& position) noexcept override;
+		
+		sl_bool _find(const KT& key, MapPosition<KT, VT>* pPosition) const noexcept override;
+		
+		IMap<KT, VT>* _duplicate() const noexcept override;
+		
+		List<KT> _getAllKeys() const noexcept override;
+		
+		List<VT> _getAllValues() const noexcept override;
+		
+		List< Pair<KT, VT> > _toList() const noexcept override;
+		
+		MapPosition<KT, VT> _getFirst(Referable* ref) const noexcept override;
+		
 	};
 	
 	
-/*
- TreeMap class Definition                                             
-	Now TreeMap is based on BTree, but should be changed to Red-Black
-	Tree implementation which is a little better for in-memory structure.
-*/
+	template <class KT, class VT>
+	class SLIB_EXPORT TreeMapPosition
+	{
+	public:
+		TreeMapPosition() noexcept;
+		
+		TreeMapPosition(RedBlackTreeNode<KT, VT>* node) noexcept;
+		
+		TreeMapPosition(const TreeMapPosition& other) noexcept = default;
+		
+		TreeMapPosition(TreeMapPosition&& other) noexcept = default;
+		
+	public:
+		TreeMapPosition& operator=(const TreeMapPosition& other) noexcept = default;
+		
+		TreeMapPosition& operator=(TreeMapPosition&& other) noexcept = default;
+		
+		TreeMapPosition& operator=(RedBlackTreeNode<KT, VT>* node) noexcept;
+		
+		Pair<KT, VT>& operator*() const noexcept;
+		
+		sl_bool operator==(const TreeMapPosition& other) const noexcept;
+		
+		sl_bool operator!=(const TreeMapPosition& other) const noexcept;
+		
+		operator RedBlackTreeNode<KT, VT>*() const noexcept;
+		
+		TreeMapPosition<KT, VT>& operator++() noexcept;
+		
+	public:
+		RedBlackTreeNode<KT, VT>* node;
+		
+	};
+	
+
 	template < class KT, class VT, class KEY_COMPARE = Compare<KT> >
-	class SLIB_EXPORT TreeMap : public IMap<KT, VT>
+	class SLIB_EXPORT TreeMap final : public IMap<KT, VT>
 	{
 	public:
 		RedBlackTree<KT, VT, KEY_COMPARE> tree;
 
 	public:
-		TreeMap(const KEY_COMPARE& key_compare = KEY_COMPARE());
-	
+		TreeMap() noexcept;
+		
+		TreeMap(const KEY_COMPARE& key_compare) noexcept;
+		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		TreeMap(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare = KEY_COMPARE());
+		TreeMap(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare = KEY_COMPARE()) noexcept;
 #endif
 		
 	public:
-		static TreeMap<KT, VT, KEY_COMPARE>* create(const KEY_COMPARE& key_compare = KEY_COMPARE());
+		TreeMap(const TreeMap& other) = delete;
+		
+		TreeMap(TreeMap&& other) noexcept;
+		
+		TreeMap& operator=(const TreeMap& other) = delete;
+		
+		TreeMap& operator=(TreeMap&& other) noexcept;
+
+	public:
+		static TreeMap* create(const KEY_COMPARE& key_compare = KEY_COMPARE()) noexcept;
 
 #ifdef SLIB_SUPPORT_STD_TYPES
-		static TreeMap<KT, VT, KEY_COMPARE>* create(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare = KEY_COMPARE());
+		static TreeMap* create(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare = KEY_COMPARE()) noexcept;
 #endif
 		
-		VT operator[](const KT& key) const;
-	
-		// override
-		sl_size getCount() const;
-
-		// override
-		VT* getItemPointer(const KT& key) const;
-
-		// override
-		List<VT> getValues_NoLock(const KT& key) const;
-
-		// override
-		sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
-
+		VT operator[](const KT& key) const noexcept;
+		
+		sl_size getCount() const noexcept;
+		
+		sl_bool isEmpty() const noexcept;
+		
+		sl_bool isNotEmpty() const noexcept;
+		
+		VT* getItemPointer(const KT& key) const noexcept;
+		
+		sl_bool get_NoLock(const KT& key, VT* _out = sl_null) const noexcept;
+		
+		sl_bool get(const KT& key, VT* _out = sl_null) const noexcept;
+		
+		VT getValue_NoLock(const KT& key) const noexcept;
+		
+		VT getValue(const KT& key) const noexcept;
+		
+		VT getValue_NoLock(const KT& key, const VT& def) const noexcept;
+		
+		VT getValue(const KT& key, const VT& def) const noexcept;
+		
+		List<VT> getValues_NoLock(const KT& key) const noexcept;
+		
+		List<VT> getValues(const KT& key) const noexcept;
+		
+		template <class KEY, class VALUE>
+		sl_bool put_NoLock(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, RedBlackTreeNode<KT, VT>** ppNode = sl_null) noexcept;
+		
+		template <class KEY, class VALUE>
+		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, RedBlackTreeNode<KT, VT>** ppNode = sl_null) noexcept;
+		
+		template < class KEY, class VALUE, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<VALUE>::Type> >
+		sl_bool addIfNewKeyAndValue_NoLock(KEY&& key, VALUE&& value, RedBlackTreeNode<KT, VT>** ppNode = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		
+		template < class KEY, class VALUE, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<VALUE>::Type> >
+		sl_bool addIfNewKeyAndValue(KEY&& key, VALUE&& value, RedBlackTreeNode<KT, VT>** ppNode = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		
+		sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null) noexcept;
+		
+		sl_bool remove(const KT& key, VT* outValue = sl_null) noexcept;
+		
+		sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null) noexcept;
+		
+		sl_size removeItems(const KT& key, List<VT>* outValues = sl_null) noexcept;
+		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const VALUE& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
-
+		sl_bool removeKeyAndValue_NoLock(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool addIfNewKeyAndValue(const KT& key, const VALUE& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
-
-		// override
-		sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null);
-
-		// override
-		sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null);
-
+		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool removeKeyAndValue_NoLock(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
-
+		sl_size removeItemsByKeyAndValue_NoLock(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		
+		sl_size removeAll_NoLock() noexcept;
+		
+		sl_size removeAll() noexcept;
+		
+		void removeAt_NoLock(const RedBlackTreeNode<KT, VT>* node) noexcept;
+		
+		void removeAt(const RedBlackTreeNode<KT, VT>* node) noexcept;
 
+		RedBlackTreeNode<KT, VT>* find_NoLock(const KT& key) const noexcept;
+		
+		RedBlackTreeNode<KT, VT>* find(const KT& key) const noexcept;
+		
+		sl_bool find_NoLock(const KT& key, RedBlackTreeNode<KT, VT>** ppNode) const noexcept;
+		
+		sl_bool find(const KT& key, RedBlackTreeNode<KT, VT>** ppNode) const noexcept;
+		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_size removeItemsByKeyAndValue_NoLock(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
-
+		RedBlackTreeNode<KT, VT>* findKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
-
-		// override
-		sl_size removeAll_NoLock();
-
-		// override
-		sl_bool contains_NoLock(const KT& key) const;
-
+		RedBlackTreeNode<KT, VT>* findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool containsKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
-
+		sl_bool searchKeyAndValue_NoLock(const KT& key, const VALUE& value, RedBlackTreeNode<KT, VT>** ppNode, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool containsKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		sl_bool searchKeyAndValue(const KT& key, const VALUE& value, RedBlackTreeNode<KT, VT>** ppNode, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 
-		// override
-		IMap<KT, VT>* duplicate_NoLock() const;
+		sl_bool contains_NoLock(const KT& key) const noexcept;
+		
+		sl_bool contains(const KT& key) const noexcept;
+		
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool containsKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool containsKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		
+		RedBlackTreeNode<KT, VT>* getFirstNode() const noexcept;
+		
+		RedBlackTreeNode<KT, VT>* getLastNode() const noexcept;
+		
+		TreeMap* duplicate_NoLock() const noexcept;
+		
+		TreeMap* duplicate() const noexcept;
+		
+		List<KT> getAllKeys_NoLock() const noexcept;
+		
+		List<KT> getAllKeys() const noexcept;
+		
+		List<VT> getAllValues_NoLock() const noexcept;
+		
+		List<VT> getAllValues() const noexcept;
+		
+		List< Pair<KT, VT> > toList_NoLock() const noexcept;
+		
+		List< Pair<KT, VT> > toList() const noexcept;
+		
+		// range-based for loop
+		TreeMapPosition<KT, VT> begin() const noexcept;
+		
+		TreeMapPosition<KT, VT> end() const noexcept;
+		
+		sl_bool copyFrom(const TreeMap* other) noexcept;
+		
+	protected:
+		sl_size _getCount() const noexcept override;
+		
+		VT* _getItemPointer(const KT& key) const noexcept override;
+		
+		List<VT> _getValues(const KT& key) const noexcept override;
+		
+		sl_bool _put(const KT& key, const VT& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept override;
+		
+		sl_bool _put(const KT& key, VT&& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept override;
+		
+		sl_bool _put(KT&& key, const VT& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept override;
+		
+		sl_bool _put(KT&& key, VT&& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept override;
+		
+		sl_bool _remove(const KT& key, VT* outValue) noexcept override;
+		
+		sl_size _removeItems(const KT& key, List<VT>* outValues) noexcept override;
+		
+		sl_size _removeAll() noexcept override;
+		
+		void _removeAt(const MapPosition<KT, VT>& position) noexcept override;
+		
+		sl_bool _find(const KT& key, MapPosition<KT, VT>* pPosition) const noexcept override;
 
-		// override
-		Iterator<KT> getKeyIteratorWithRefer(Referable* refer) const;
-
-		// override
-		List<KT> getAllKeys_NoLock() const;
-
-		// override
-		Iterator<VT> getValueIteratorWithRefer(Referable* refer) const;
-
-		// override
-		List<VT> getAllValues_NoLock() const;
-
-		// override
-		Iterator< Pair<KT, VT> > toIteratorWithRefer(Referable* refer) const;
-
-		// override
-		List< Pair<KT, VT> > toList_NoLock() const;
-
+		IMap<KT, VT>* _duplicate() const noexcept override;
+		
+		List<KT> _getAllKeys() const noexcept override;
+		
+		List<VT> _getAllValues() const noexcept override;
+		
+		List< Pair<KT, VT> > _toList() const noexcept override;
+		
+		MapPosition<KT, VT> _getFirst(Referable* ref) const noexcept override;
+		
 	};
 	
 	
@@ -475,144 +668,139 @@ namespace slib
 	
 	public:
 #ifdef SLIB_SUPPORT_STD_TYPES
-		Map(const std::initializer_list< Pair<KT, VT> >& l);
+		Map(const std::initializer_list< Pair<KT, VT> >& l) noexcept;
 #endif
 		
 	public:
-		static Map<KT, VT> create();
+		static Map create() noexcept;
 
-		template < class KEY_EQUALS = Equals<KT> >
-		static Map<KT, VT> createList(const KEY_EQUALS& key_equals = KEY_EQUALS());
-	
-#ifdef SLIB_SUPPORT_STD_TYPES
-		template < class KEY_EQUALS = Equals<KT> >
-		static Map<KT, VT> createList(const std::initializer_list< Pair<KT, VT> >& l, const KEY_EQUALS& key_equals = KEY_EQUALS());
-#endif
-		
 		template < class HASH = Hash<KT>, class KEY_EQUALS = Equals<KT> >
-		static Map<KT, VT> createHash(sl_uint32 initialCapacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
+		static Map createHash(sl_uint32 initialCapacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS()) noexcept;
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
 		template < class HASH = Hash<KT>, class KEY_EQUALS = Equals<KT> >
-		static Map<KT, VT> createHash(const std::initializer_list< Pair<KT, VT> >& l, sl_uint32 initialCapacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
+		static Map createHash(const std::initializer_list< Pair<KT, VT> >& l, sl_uint32 initialCapacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS()) noexcept;
 #endif
 	
 		template < class KEY_COMPARE = Compare<KT> >
-		static Map<KT, VT> createTree(const KEY_COMPARE& key_compare = KEY_COMPARE());
+		static Map createTree(const KEY_COMPARE& key_compare = KEY_COMPARE()) noexcept;
 	
 #ifdef SLIB_SUPPORT_STD_TYPES
 		template < class KEY_COMPARE = Compare<KT> >
-		static Map<KT, VT> createTree(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare = KEY_COMPARE());
+		static Map createTree(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare = KEY_COMPARE()) noexcept;
 #endif
 		
 		template <class KEY, class VALUE>
-		static const Map<KT, VT>& from(const Map<KEY, VALUE>& other);
+		static const Map& from(const Map<KEY, VALUE>& other) noexcept;
 		
 	public:
-		void init();
+		void init() noexcept;
 		
-		template < class KEY_EQUALS = Equals<KT> >
-		void initList(const KEY_EQUALS& key_equals = KEY_EQUALS());
-
 		template < class HASH = Hash<KT>, class KEY_EQUALS = Equals<KT> >
-		void initHash(sl_uint32 initialCapacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
-
+		void initHash(sl_uint32 initialCapacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS()) noexcept;
+		
 		template < class KEY_COMPARE = Compare<KT> >
-		void initTree(const KEY_COMPARE& key_compare = KEY_COMPARE());
+		void initTree(const KEY_COMPARE& key_compare = KEY_COMPARE()) noexcept;
 
 	public:
 #ifdef SLIB_SUPPORT_STD_TYPES
-		Map<KT, VT>& operator=(const std::initializer_list< Pair<KT, VT> >& l);
+		Map& operator=(const std::initializer_list< Pair<KT, VT> >& l) noexcept;
 #endif
 
-		VT operator[](const KT& key) const;
+		VT operator[](const KT& key) const noexcept;
 
-		sl_size getCount() const;
+		sl_size getCount() const noexcept;
 
-		sl_bool isEmpty() const;
+		sl_bool isEmpty() const noexcept;
 
-		sl_bool isNotEmpty() const;
+		sl_bool isNotEmpty() const noexcept;
 
-		VT* getItemPointer(const KT& key) const;
+		VT* getItemPointer(const KT& key) const noexcept;
 
-		VT* getNewItemPointer(const KT& key);
+		sl_bool get_NoLock(const KT& key, VT* _out = sl_null) const noexcept;
 
-		sl_bool get_NoLock(const KT& key, VT* _out = sl_null) const;
+		sl_bool get(const KT& key, VT* _out = sl_null) const noexcept;
 
-		sl_bool get(const KT& key, VT* _out = sl_null) const;
+		VT getValue_NoLock(const KT& key) const noexcept;
 
-		VT getValue_NoLock(const KT& key) const;
+		VT getValue(const KT& key) const noexcept;
 
-		VT getValue(const KT& key) const;
+		VT getValue_NoLock(const KT& key, const VT& def) const noexcept;
 
-		VT getValue_NoLock(const KT& key, const VT& def) const;
+		VT getValue(const KT& key, const VT& def) const noexcept;
 
-		VT getValue(const KT& key, const VT& def) const;
+		List<VT> getValues_NoLock(const KT& key) const noexcept;
 
-		List<VT> getValues_NoLock(const KT& key) const;
+		List<VT> getValues(const KT& key) const noexcept;
 
-		List<VT> getValues(const KT& key) const;
+		template <class KEY, class VALUE>
+		sl_bool put_NoLock(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, MapPosition<KT, VT>* pPosition = sl_null) noexcept;
 
-		sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
-
-		sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
+		template <class KEY, class VALUE>
+		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, MapPosition<KT, VT>* pPosition = sl_null) noexcept;
 		
 		template <class KEY, class VALUE>
-		void putAll_NoLock(const Map<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default);
+		void putAll_NoLock(const Map<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default) noexcept;
 		
 		template <class KEY, class VALUE>
-		void putAll_NoLock(const AtomicMap<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default);
+		void putAll_NoLock(const AtomicMap<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default) noexcept;
 
 		template <class KEY, class VALUE>
-		void putAll(const Map<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default);
+		void putAll(const Map<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default) noexcept;
 
 		template <class KEY, class VALUE>
-		void putAll(const AtomicMap<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default);
+		void putAll(const AtomicMap<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default) noexcept;
 
-		sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null) const;
+		sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null) const noexcept;
 
-		sl_bool remove(const KT& key, VT* outValue = sl_null) const;
+		sl_bool remove(const KT& key, VT* outValue = sl_null) const noexcept;
 
-		sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null) const;
+		sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null) const noexcept;
 
-		sl_size removeItems(const KT& key, List<VT>* outValues = sl_null) const;
+		sl_size removeItems(const KT& key, List<VT>* outValues = sl_null) const noexcept;
 
-		sl_size removeAll_NoLock() const;
+		sl_size removeAll_NoLock() const noexcept;
 
-		sl_size removeAll() const;
+		sl_size removeAll() const noexcept;
+		
+		void removeAt_NoLock(const MapPosition<KT, VT>& position) const noexcept;
+		
+		void removeAt(const MapPosition<KT, VT>& position) const noexcept;
+		
+		MapPosition<KT, VT> find_NoLock(const KT& key) noexcept;
+		
+		MapPosition<KT, VT> find(const KT& key) noexcept;
+		
+		sl_bool find_NoLock(const KT& key, MapPosition<KT, VT>* pPosition) noexcept;
+		
+		sl_bool find(const KT& key, MapPosition<KT, VT>* pPosition) noexcept;
 
-		sl_bool contains_NoLock(const KT& key) const;
+		sl_bool contains_NoLock(const KT& key) const noexcept;
 
-		sl_bool contains(const KT& key) const;
+		sl_bool contains(const KT& key) const noexcept;
 
-		Map<KT, VT> duplicate_NoLock() const;
+		Map duplicate_NoLock() const noexcept;
 
-		Map<KT, VT> duplicate() const;
+		Map duplicate() const noexcept;
 
-		Iterator<KT> getKeyIterator() const;
+		List<KT> getAllKeys_NoLock() const noexcept;
 
-		List<KT> getAllKeys_NoLock() const;
+		List<KT> getAllKeys() const noexcept;
 
-		List<KT> getAllKeys() const;
+		List<VT> getAllValues_NoLock() const noexcept;
 
-		Iterator<VT> getValueIterator() const;
+		List<VT> getAllValues() const noexcept;
 
-		List<VT> getAllValues_NoLock() const;
+		List< Pair<KT, VT> > toList_NoLock() const noexcept;
 
-		List<VT> getAllValues() const;
-
-		Iterator< Pair<KT, VT> > toIterator() const;
-
-		List< Pair<KT, VT> > toList_NoLock() const;
-
-		List< Pair<KT, VT> > toList() const;
+		List< Pair<KT, VT> > toList() const noexcept;
 
 		// range-based for loop
-		IteratorPosition< Pair<KT, VT> > begin() const;
+		MapPosition<KT, VT> begin() const noexcept;
 
-		IteratorPosition< Pair<KT, VT> > end() const;
+		MapPosition<KT, VT> end() const noexcept;
 	
-		const Mutex* getLocker() const;
+		const Mutex* getLocker() const noexcept;
 
 	};
 	
@@ -625,85 +813,85 @@ namespace slib
 
 	public:
 #ifdef SLIB_SUPPORT_STD_TYPES
-		Atomic(const std::initializer_list< Pair<KT, VT> >& l);
+		Atomic(const std::initializer_list< Pair<KT, VT> >& l) noexcept;
 #endif
 		
 	public:
 		template <class KEY, class VALUE>
-		static const Atomic< Map<KT, VT> >& from(const Atomic< Map<KEY, VALUE> >& other);
+		static const Atomic< Map<KT, VT> >& from(const Atomic< Map<KEY, VALUE> >& other) noexcept;
 		
-		void init();
-		
-		template < class KEY_EQUALS = Equals<KT> >
-		void initList(const KEY_EQUALS& key_equals = KEY_EQUALS());
+		void init() noexcept;
 
 		template < class HASH = Hash<KT>, class KEY_EQUALS = Equals<KT> >
-		void initHash(sl_uint32 initialCapacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
+		void initHash(sl_uint32 initialCapacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS()) noexcept;
 
 		template < class KEY_COMPARE = Compare<KT> >
-		void initTree(const KEY_COMPARE& key_compare = KEY_COMPARE());
+		void initTree(const KEY_COMPARE& key_compare = KEY_COMPARE()) noexcept;
 
 	public:
 #ifdef SLIB_SUPPORT_STD_TYPES
-		Atomic< Map<KT, VT> >& operator=(const std::initializer_list< Pair<KT, VT> >& l);
+		Atomic< Map<KT, VT> >& operator=(const std::initializer_list< Pair<KT, VT> >& l) noexcept;
 #endif
 
-		VT operator[](const KT& key) const;
+		VT operator[](const KT& key) const noexcept;
 
-		sl_size getCount() const;
+		sl_size getCount() const noexcept;
 
-		sl_bool isEmpty() const;
+		sl_bool isEmpty() const noexcept;
 
-		sl_bool isNotEmpty() const;
+		sl_bool isNotEmpty() const noexcept;
 
-		sl_bool get(const KT& key, VT* _out = sl_null) const;
+		sl_bool get(const KT& key, VT* _out = sl_null) const noexcept;
 
-		VT getValue(const KT& key) const;
+		VT getValue(const KT& key) const noexcept;
 
-		VT getValue(const KT& key, const VT& def) const;
+		VT getValue(const KT& key, const VT& def) const noexcept;
 
-		List<VT> getValues(const KT& key) const;
-
-		sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
+		List<VT> getValues(const KT& key) const noexcept;
 
 		template <class KEY, class VALUE>
-		void putAll(const Map<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default);
+		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, MapPosition<KT, VT>* pPosition = sl_null) noexcept;
 
 		template <class KEY, class VALUE>
-		void putAll(const AtomicMap<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default);
+		void putAll(const Map<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default) noexcept;
 
-		sl_bool remove(const KT& key, VT* outValue = sl_null) const;
+		template <class KEY, class VALUE>
+		void putAll(const AtomicMap<KEY, VALUE>& other, MapPutMode mode = MapPutMode::Default) noexcept;
 
-		sl_size removeItems(const KT& key, List<VT>* outValues = sl_null) const;
+		sl_bool remove(const KT& key, VT* outValue = sl_null) const noexcept;
 
-		sl_size removeAll() const;
+		sl_size removeItems(const KT& key, List<VT>* outValues = sl_null) const noexcept;
 
-		sl_bool contains(const KT& key) const;
+		sl_size removeAll() const noexcept;
+		
+		void removeAt(const MapPosition<KT, VT>& position) const noexcept;
+		
+		MapPosition<KT, VT> find(const KT& key) noexcept;
+
+		sl_bool find(const KT& key, MapPosition<KT, VT>* pPosition) noexcept;
+		
+		sl_bool contains(const KT& key) const noexcept;
 	
-		Map<KT, VT> duplicate() const;
+		Map<KT, VT> duplicate() const noexcept;
 
-		Iterator<KT> getKeyIterator() const;
+		List<KT> getAllKeys() const noexcept;
 
-		List<KT> getAllKeys() const;
+		List<VT> getAllValues() const noexcept;
 
-		Iterator<VT> getValueIterator() const;
-
-		List<VT> getAllValues() const;
-
-		Iterator< Pair<KT, VT> > toIterator() const;
-
-		List< Pair<KT, VT> > toList() const;
+		List< Pair<KT, VT> > toList() const noexcept;
 
 		// range-based for loop
-		IteratorPosition< Pair<KT, VT> > begin() const;
-
-		IteratorPosition< Pair<KT, VT> > end() const;
+		MapPosition<KT, VT> begin() const noexcept;
+		
+		MapPosition<KT, VT> end() const noexcept;
 	
 	};
 
 }
 
 #include "detail/map.inc"
+#include "detail/hash_map.inc"
+#include "detail/tree_map.inc"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 #include "detail/map_std.inc"

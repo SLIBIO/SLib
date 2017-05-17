@@ -37,7 +37,7 @@ namespace slib
 		
 		static void rebalanceAfterInsert(Node* node, Node** pRoot) noexcept;
 		
-		static void rebalanceAfterRemove(Node* node, Node** pRoot) noexcept;
+		static void removeNode(Node* node, Node** pRoot) noexcept;
 		
 	};
 	
@@ -104,7 +104,7 @@ namespace slib
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	RedBlackTree<KT, VT, KEY_COMPARE>::RedBlackTree(RedBlackTree<KT, VT, KEY_COMPARE>&& other) noexcept
-	: m_compare(Move(other.m_compare))
+	 : m_compare(Move(other.m_compare))
 	{
 		m_rootNode = other.m_rootNode;
 		other.m_rootNode = sl_null;
@@ -456,7 +456,7 @@ namespace slib
 	void RedBlackTree<KT, VT, KEY_COMPARE>::removeNode(Node* node) noexcept
 	{
 		m_count--;
-		_priv_RedBlackTree::rebalanceAfterRemove(reinterpret_cast<RedBlackTreeBaseNode*>(node), reinterpret_cast<RedBlackTreeBaseNode**>(&m_rootNode));
+		_priv_RedBlackTree::removeNode(reinterpret_cast<RedBlackTreeBaseNode*>(node), reinterpret_cast<RedBlackTreeBaseNode**>(&m_rootNode));
 		delete node;
 	}
 

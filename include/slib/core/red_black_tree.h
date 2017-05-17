@@ -61,14 +61,14 @@ namespace slib
 		
 		RedBlackTree(const RedBlackTree& other) = delete;
 		
-		RedBlackTree(RedBlackTree&& other);
+		RedBlackTree(RedBlackTree&& other) noexcept;
 		
-		virtual ~RedBlackTree() noexcept;
+		~RedBlackTree() noexcept;
 		
 	public:
 		RedBlackTree& operator=(const RedBlackTree& other) = delete;
 		
-		RedBlackTree& operator=(RedBlackTree&& other);
+		RedBlackTree& operator=(RedBlackTree&& other) noexcept;
 	
 	public:
 		sl_size getCount() const noexcept;

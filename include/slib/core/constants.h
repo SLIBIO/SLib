@@ -15,6 +15,12 @@
 
 namespace slib
 {
+	
+	enum class MapContainerType
+	{
+		Hash = 0,
+		Tree = 1
+	};
 
 	enum class MapPutMode
 	{

@@ -263,7 +263,7 @@ namespace slib
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	template <class KEY, class VALUE>
-	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::put(KEY&& key, VALUE&& value, MapPutMode mode, HashEntry<KT, VT>* ppEntry) noexcept
+	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::put(KEY&& key, VALUE&& value, MapPutMode mode, HashEntry<KT, VT>** ppEntry) noexcept
 	{
 		
 		if (!(_priv_HashTable::validateEntries(reinterpret_cast<HashBaseTable*>(&m_table)))) {
@@ -319,7 +319,7 @@ namespace slib
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	template <class KEY, class VALUE, class VALUE_EQUALS>
-	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue(KEY&& key, VALUE&& value, HashEntry<KT, VT>* ppEntry, const VALUE_EQUALS& value_equals) noexcept
+	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue(KEY&& key, VALUE&& value, HashEntry<KT, VT>** ppEntry, const VALUE_EQUALS& value_equals) noexcept
 	{
 		
 		if (!(_priv_HashTable::validateEntries(reinterpret_cast<HashBaseTable*>(&m_table)))) {
@@ -548,7 +548,12 @@ namespace slib
 		_priv_HashTable_free(&m_table);
 		m_hash = other->m_hash;
 		m_equals = other->m_equals;
-		_priv_HashTable::init(reinterpret_cast<HashBaseTable*>(&m_table), other->m_table.capacity);
+		sl_uint32 capacity = other->m_table.capacity;
+		if (capacity == 0) {
+			_priv_HashTable::init(reinterpret_cast<HashBaseTable*>(&m_table));
+			return sl_true;
+		}
+		_priv_HashTable::init(reinterpret_cast<HashBaseTable*>(&m_table), capacity);
 		if (m_table.capacity == 0) {
 			return sl_false;
 		}
