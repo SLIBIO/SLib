@@ -235,6 +235,12 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
+	SLIB_INLINE RedBlackTreeNode<KT, VT>* RedBlackTree<KT, VT, KEY_COMPARE>::getRootNode() const noexcept
+	{
+		return m_rootNode;
+	}
+	
+	template <class KT, class VT, class KEY_COMPARE>
 	RedBlackTreeNode<KT, VT>* RedBlackTree<KT, VT, KEY_COMPARE>::getFirstNode() const noexcept
 	{
 		Node* node = m_rootNode;

@@ -83,6 +83,8 @@ namespace slib
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		RedBlackTreeNode<KT, VT>* findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 
+		RedBlackTreeNode<KT, VT>* getRootNode() const noexcept;
+
 		RedBlackTreeNode<KT, VT>* getFirstNode() const noexcept;
 
 		RedBlackTreeNode<KT, VT>* getLastNode() const noexcept;
