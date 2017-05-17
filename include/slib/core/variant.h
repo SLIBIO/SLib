@@ -154,8 +154,6 @@ namespace slib
 		
 		static Variant createMap();
 		
-		static Variant createListMap();
-		
 		static Variant createTreeMap();
 		
 		static Variant createHashMap();
