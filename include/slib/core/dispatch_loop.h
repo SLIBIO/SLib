@@ -66,7 +66,7 @@ namespace slib
 			sl_uint64 time;
 			Function<void()> task;
 		};
-		BTree<sl_uint64, TimeTask> m_timeTasks;
+		RedBlackTree<sl_uint64, TimeTask> m_timeTasks;
 		Mutex m_lockTimeTasks;
 
 		class TimerTask
