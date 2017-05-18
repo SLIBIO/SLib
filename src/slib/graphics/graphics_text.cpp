@@ -15,10 +15,18 @@
 namespace slib
 {
 
+	TextStyle::TextStyle() : textColor(Color::Zero), backgroundColor(Color::Zero)
+	{
+	}
+	
+	TextStyle::~TextStyle()
+	{
+	}
+	
 	SLIB_DEFINE_OBJECT(TextItem, Object)
 
 	TextItem::TextItem(TextItemType type)
-	: m_type(type), m_layoutPosition(0, 0), m_layoutSize(0, 0)
+	 : m_type(type), m_layoutPosition(0, 0), m_layoutSize(0, 0)
 	{
 	}
 
@@ -30,15 +38,24 @@ namespace slib
 	{
 		return m_type;
 	}
-
+	
+	Ref<TextStyle> TextItem::getStyle()
+	{
+		return m_style;
+	}
+	
+	void TextItem::setStyle(const Ref<TextStyle>& style)
+	{
+		m_style = style;
+	}
+	
 	Ref<Font> TextItem::getFont()
 	{
-		return m_font;
-	}
-
-	void TextItem::setFont(const Ref<Font>& font)
-	{
-		m_font = font;
+		Ref<TextStyle> style = m_style;
+		if (style.isNotNull()) {
+			return style->font;
+		}
+		return sl_null;
 	}
 
 	Point TextItem::getLayoutPosition()
@@ -80,15 +97,13 @@ namespace slib
 	{
 	}
 
-	Ref<TextWordItem> TextWordItem::create(const String16& text, const Ref<Font>& font, const Color& textColor, const Color& backgroundColor)
+	Ref<TextWordItem> TextWordItem::create(const String16& text, const Ref<TextStyle>& style)
 	{
-		if (font.isNotNull()) {
+		if (style.isNotNull()) {
 			Ref<TextWordItem> ret = new TextWordItem;
 			if (ret.isNotNull()) {
 				ret->m_text = text;
-				ret->m_font = font;
-				ret->m_textColor = textColor;
-				ret->m_backColor = backgroundColor;
+				ret->m_style = style;
 				return ret;
 			}
 		}
@@ -105,31 +120,12 @@ namespace slib
 		m_text = text;
 	}
 
-	Color TextWordItem::getTextColor()
-	{
-		return m_textColor;
-	}
-
-	void TextWordItem::setTextColor(const Color& color)
-	{
-		m_textColor = color;
-	}
-
-	Color TextWordItem::getBackgroundColor()
-	{
-		return m_backColor;
-	}
-
-	void TextWordItem::setBackgroundColor(const Color& color)
-	{
-		m_backColor = color;
-	}
-
 	Size TextWordItem::getSize()
 	{
 		ObjectLocker lock(this);
+		
 		String16 text = m_text;
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		if (m_textCached == text && m_fontCached == font) {
 			return Size(m_widthCached, m_heightCached);
 		}
@@ -148,8 +144,8 @@ namespace slib
 		m_heightCached = 0;
 		return Size::zero();
 	}
-
-
+	
+	
 	SLIB_DEFINE_OBJECT(TextSpaceItem, TextItem)
 
 	TextSpaceItem::TextSpaceItem()
@@ -161,12 +157,12 @@ namespace slib
 	{
 	}
 
-	Ref<TextSpaceItem> TextSpaceItem::create(const Ref<Font>& font)
+	Ref<TextSpaceItem> TextSpaceItem::create(const Ref<TextStyle>& style)
 	{
-		if (font.isNotNull()) {
+		if (style.isNotNull()) {
 			Ref<TextSpaceItem> ret = new TextSpaceItem;
 			if (ret.isNotNull()) {
-				ret->m_font = font;
+				ret->m_style = style;
 				return ret;
 			}
 		}
@@ -175,7 +171,7 @@ namespace slib
 
 	Size TextSpaceItem::getSize()
 	{
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		if (font.isNotNull()) {
 			sl_real h = font->getFontHeight();
 			return Size(h * 0.3f, h);
@@ -196,12 +192,12 @@ namespace slib
 	{
 	}
 
-	Ref<TextTabItem> TextTabItem::create(const Ref<Font>& font)
+	Ref<TextTabItem> TextTabItem::create(const Ref<TextStyle>& style)
 	{
-		if (font.isNotNull()) {
+		if (style.isNotNull()) {
 			Ref<TextTabItem> ret = new TextTabItem;
 			if (ret.isNotNull()) {
-				ret->m_font = font;
+				ret->m_style = style;
 				return ret;
 			}
 		}
@@ -210,7 +206,7 @@ namespace slib
 
 	sl_real TextTabItem::getHeight()
 	{
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		if (font.isNotNull()) {
 			return font->getFontHeight();
 		} else {
@@ -230,12 +226,12 @@ namespace slib
 	{
 	}
 
-	Ref<TextLineBreakItem> TextLineBreakItem::create(const Ref<Font>& font)
+	Ref<TextLineBreakItem> TextLineBreakItem::create(const Ref<TextStyle>& style)
 	{
-		if (font.isNotNull()) {
+		if (style.isNotNull()) {
 			Ref<TextLineBreakItem> ret = new TextLineBreakItem;
 			if (ret.isNotNull()) {
-				ret->m_font = font;
+				ret->m_style = style;
 				return ret;
 			}
 		}
@@ -244,7 +240,7 @@ namespace slib
 
 	sl_real TextLineBreakItem::getHeight()
 	{
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		if (font.isNotNull()) {
 			return font->getFontHeight();
 		} else {
@@ -290,12 +286,12 @@ namespace slib
 	{
 	}
 
-	void TextParagraph::addText(const String16& text, const Ref<Font>& font, const Color& textColor, const Color& backgroundColor)
+	void TextParagraph::addText(const String16& text, const Ref<TextStyle>& style)
 	{
 		if (text.isEmpty()) {
 			return;
 		}
-		if (font.isNull()) {
+		if (style.isNull()) {
 			return;
 		}
 
@@ -309,23 +305,23 @@ namespace slib
 			sl_char16 ch = sz[pos];
 			if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
 				if (startWord < pos) {
-					Ref<TextWordItem> item = TextWordItem::create(String16(sz + startWord, pos - startWord), font, textColor, backgroundColor);
+					Ref<TextWordItem> item = TextWordItem::create(String16(sz + startWord, pos - startWord), style);
 					if (item.isNotNull()) {
 						m_items.add_NoLock(item);
 					}
 				}
 				if (ch == ' ') {
-					Ref<TextSpaceItem> item = TextSpaceItem::create(font);
+					Ref<TextSpaceItem> item = TextSpaceItem::create(style);
 					if (item.isNotNull()) {
 						m_items.add_NoLock(item);
 					}
 				} else if (ch == '\t') {
-					Ref<TextTabItem> item = TextTabItem::create(font);
+					Ref<TextTabItem> item = TextTabItem::create(style);
 					if (item.isNotNull()) {
 						m_items.add_NoLock(item);
 					}
 				} else if (ch == '\r' || ch == '\n') {
-					Ref<TextLineBreakItem> item = TextLineBreakItem::create(font);
+					Ref<TextLineBreakItem> item = TextLineBreakItem::create(style);
 					if (item.isNotNull()) {
 						m_items.add_NoLock(item);
 					}
@@ -340,61 +336,19 @@ namespace slib
 			pos++;
 		}
 		if (startWord == 0) {
-			Ref<TextWordItem> item = TextWordItem::create(text, font, textColor, backgroundColor);
+			Ref<TextWordItem> item = TextWordItem::create(text, style);
 			if (item.isNotNull()) {
 				m_items.add_NoLock(item);
 			}
 		} else if (startWord < len) {
-			Ref<TextWordItem> item = TextWordItem::create(String16(sz + startWord, len - startWord), font, textColor, backgroundColor);
+			Ref<TextWordItem> item = TextWordItem::create(String16(sz + startWord, len - startWord), style);
 			if (item.isNotNull()) {
 				m_items.add_NoLock(item);
 			}
 		}
 	}
 
-	void TextParagraph::setFont(const Ref<Font>& font)
-	{
-		ObjectLocker lock(this);
-		{
-			ListElements< Ref<TextItem> > items(m_items);
-			for (sl_size i = 0; i < items.count; i++) {
-				Ref<TextItem>& item = items[i];
-				item->setFont(font);
-			}
-		}
-		{
-			ListElements< Ref<TextItem> > items(m_layoutItems);
-			for (sl_size i = 0; i < items.count; i++) {
-				Ref<TextItem>& item = items[i];
-				item->setFont(font);
-			}
-		}
-	}
-
-	void TextParagraph::setTextColor(const Color& color)
-	{
-		ObjectLocker lock(this);
-		{
-			ListElements< Ref<TextItem> > items(m_items);
-			for (sl_size i = 0; i < items.count; i++) {
-				TextItem* item = items[i].get();
-				if (item->getType() == TextItemType::Word) {
-					(static_cast<TextWordItem*>(item))->setTextColor(color);
-				}
-			}
-		}
-		{
-			ListElements< Ref<TextItem> > items(m_layoutItems);
-			for (sl_size i = 0; i < items.count; i++) {
-				TextItem* item = items[i].get();
-				if (item->getType() == TextItemType::Word) {
-					(static_cast<TextWordItem*>(item))->setTextColor(color);
-				}
-			}
-		}
-	}
-
-	class _TextParagraph_Layouter
+	class _priv_TextParagraph_Layouter
 	{
 	public:
 		CList< Ref<TextItem> >* m_layoutItems;
@@ -415,7 +369,7 @@ namespace slib
 		sl_real m_maxWidth;
 		
 	public:
-		_TextParagraph_Layouter(CList< Ref<TextItem> >* layoutItems, const TextParagraphLayoutParam& param)
+		_priv_TextParagraph_Layouter(CList< Ref<TextItem> >* layoutItems, const TextParagraphLayoutParam& param)
 		{
 			m_layoutItems = layoutItems;
 			m_layoutWidth = param.width;
@@ -474,12 +428,17 @@ namespace slib
 		
 		void breakWord(TextWordItem* breakItem)
 		{
-			Ref<Font> font = breakItem->getFont();
-			String16 text = breakItem->getText();
+			Ref<TextStyle> style = breakItem->getStyle();
+			if (style.isNull()) {
+				return;
+			}
 			
+			Ref<Font> font = style->font;
 			if (font.isNull()) {
 				return;
 			}
+			
+			String16 text = breakItem->getText();
 			if (text.isEmpty()) {
 				return;
 			}
@@ -517,7 +476,7 @@ namespace slib
 			while (pos < len) {
 				size = atlas->getFontSize_NoLock(sz[pos]);
 				if (pos > startLine && x + size.x > widthRemaining) {
-					Ref<TextWordItem> newItem = TextWordItem::create(String(sz + startLine, pos - startLine), font, breakItem->getTextColor(), breakItem->getBackgroundColor());
+					Ref<TextWordItem> newItem = TextWordItem::create(String(sz + startLine, pos - startLine), style);
 					if (newItem.isNotNull()) {
 						newItem->setLayoutSize(Size(x, height));
 						m_lineItems.add(newItem);
@@ -540,7 +499,7 @@ namespace slib
 				pos++;
 			}
 			if (len > startLine) {
-				Ref<TextWordItem> newItem = TextWordItem::create(String(sz + startLine, len - startLine), font, breakItem->getTextColor(), breakItem->getBackgroundColor());
+				Ref<TextWordItem> newItem = TextWordItem::create(String(sz + startLine, len - startLine), style);
 				if (newItem.isNotNull()) {
 					newItem->setLayoutSize(Size(x, height));
 					m_lineItems.add(newItem);
@@ -728,7 +687,7 @@ namespace slib
 			}
 		}
 		
-		_TextParagraph_Layouter layouter(&m_layoutItems, param);
+		_priv_TextParagraph_Layouter layouter(&m_layoutItems, param);
 		
 		layouter.layout(&m_items);
 
@@ -751,11 +710,17 @@ namespace slib
 				TextWordItem* wordItem = static_cast<TextWordItem*>(item);
 				Rectangle frame = wordItem->getLayoutFrame();
 				if (rc.intersectRectangle(frame)) {
-					Color backColor = wordItem->getBackgroundColor();
-					if (backColor.a > 0) {
-						canvas->fillRectangle(Rectangle(x + frame.left, y + frame.top, x + frame.right, y + frame.bottom), wordItem->getBackgroundColor());
+					Ref<TextStyle> style = wordItem->getStyle();
+					if (style.isNotNull()) {
+						Ref<Font> font = style->font;
+						if (font.isNotNull()) {
+							Color backColor = style->backgroundColor;
+							if (backColor.a > 0) {
+								canvas->fillRectangle(Rectangle(x + frame.left, y + frame.top, x + frame.right, y + frame.bottom), backColor);
+							}
+							canvas->drawText16(wordItem->getText(), x + frame.left, y + frame.top, wordItem->getFont(), style->textColor);
+						}
 					}
-					canvas->drawText16(wordItem->getText(), x + frame.left, y + frame.top, wordItem->getFont(), wordItem->getTextColor());
 				}
 			}
 		}
@@ -779,10 +744,11 @@ namespace slib
 		m_width = 0;
 		m_multiLineMode = MultiLineMode::Single;
 		m_align = Alignment::Left;
-		m_textColor = Color::zero();
 		
 		m_contentWidth = 0;
 		m_contentHeight = 0;
+		
+		m_style = new TextStyle;
 	}
 
 	SimpleTextBox::~SimpleTextBox()
@@ -796,6 +762,8 @@ namespace slib
 		if (font.isNull()) {
 			return;
 		}
+
+		m_style->font = font;
 		
 		if (width < 0) {
 			width = 0;
@@ -821,7 +789,7 @@ namespace slib
 			if (text.isNotEmpty()) {
 				m_paragraph = new TextParagraph;
 				if (m_paragraph.isNotNull()) {
-					m_paragraph->addText(text, font, m_textColor);
+					m_paragraph->addText(text, m_style);
 				}
 			}
 			m_text = text;
@@ -832,7 +800,6 @@ namespace slib
 		}
 		if (m_paragraph.isNotNull()) {
 			if (m_font != font) {
-				m_paragraph->setFont(font);
 				flagReLayout = sl_true;
 			}
 			if (!(Math::isAlmostZero(m_width - width)) || m_multiLineMode != multiLineMode || m_align != align) {
@@ -854,7 +821,6 @@ namespace slib
 				
 				m_contentWidth = m_paragraph->getMaximumWidth();
 				m_contentHeight = m_paragraph->getTotalHeight();
-
 			}
 		}
 	}
@@ -869,15 +835,9 @@ namespace slib
 			return;
 		}
 		ObjectLocker lock(this);
-		Color colorOld = m_textColor;
 		Ref<TextParagraph> paragraphOld = m_paragraph;
-		m_textColor = color;
+		m_style->textColor = color;
 		update(text, font, width, flagWrappingWidth, multiLineMode, align);
-		if (colorOld != color && paragraphOld == m_paragraph) {
-			if (m_paragraph.isNotNull()) {
-				m_paragraph->setTextColor(color);
-			}
-		}
 		if (m_paragraph.isNotNull()) {
 			sl_real height = m_paragraph->getTotalHeight();
 			Alignment valign = align & Alignment::VerticalMask;

@@ -15,7 +15,7 @@
 
 #include "view.h"
 
-#include "../core/linked_object.h"
+#include "../graphics/text.h"
 
 namespace slib
 {

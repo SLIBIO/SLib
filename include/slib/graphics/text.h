@@ -32,6 +32,20 @@ namespace slib
 		Attach = 100
 	};
 	
+	class SLIB_EXPORT TextStyle : public Referable
+	{
+	public:
+		AtomicRef<Font> font;
+		Color textColor;
+		Color backgroundColor;
+		
+	public:
+		TextStyle();
+		
+		~TextStyle();
+
+	};
+	
 	class SLIB_EXPORT TextItem : public Object
 	{
 		SLIB_DECLARE_OBJECT
@@ -43,11 +57,13 @@ namespace slib
 	
 	public:
 		TextItemType getType();
-	
+		
+		Ref<TextStyle> getStyle();
+		
+		void setStyle(const Ref<TextStyle>& style);
+		
 		Ref<Font> getFont();
-
-		void setFont(const Ref<Font>& font);
-
+	
 		Point getLayoutPosition();
 
 		void setLayoutPosition(const Point& pt);
@@ -60,7 +76,7 @@ namespace slib
 
 	protected:
 		TextItemType m_type;
-		AtomicRef<Font> m_font;
+		AtomicRef<TextStyle> m_style;
 		Point m_layoutPosition;
 		Size m_layoutSize;
 
@@ -76,27 +92,17 @@ namespace slib
 		~TextWordItem();
 
 	public:
-		static Ref<TextWordItem> create(const String16& text, const Ref<Font>& font, const Color& textColor, const Color& backgroundColor = Color::zero());
+		static Ref<TextWordItem> create(const String16& text, const Ref<TextStyle>& style);
 
 	public:
 		String16 getText();
 
 		void setText(const String16& text);
 
-		Color getTextColor();
-
-		void setTextColor(const Color& color);
-
-		Color getBackgroundColor();
-
-		void setBackgroundColor(const Color& color);
-
 		Size getSize();
-
+		
 	private:
 		AtomicString16 m_text;
-		Color m_textColor;
-		Color m_backColor;
 
 		Ref<Font> m_fontCached;
 		String16 m_textCached;
@@ -115,7 +121,7 @@ namespace slib
 		~TextSpaceItem();
 
 	public:
-		static Ref<TextSpaceItem> create(const Ref<Font>& font);
+		static Ref<TextSpaceItem> create(const Ref<TextStyle>& style);
 
 	public:
 		Size getSize();
@@ -132,7 +138,7 @@ namespace slib
 		~TextTabItem();
 
 	public:
-		static Ref<TextTabItem> create(const Ref<Font>& font);
+		static Ref<TextTabItem> create(const Ref<TextStyle>& style);
 
 	public:
 		sl_real getHeight();
@@ -149,7 +155,7 @@ namespace slib
 		~TextLineBreakItem();
 
 	public:
-		static Ref<TextLineBreakItem> create(const Ref<Font>& font);
+		static Ref<TextLineBreakItem> create(const Ref<TextStyle>& style);
 
 	public:
 		sl_real getHeight();
@@ -199,11 +205,7 @@ namespace slib
 		~TextParagraph();
 
 	public:
-		void addText(const String16& text, const Ref<Font>& font, const Color& textColor, const Color& backgroundColor = Color::zero());
-
-		void setFont(const Ref<Font>& font);
-
-		void setTextColor(const Color& color);
+		void addText(const String16& text, const Ref<TextStyle>& style);
 
 		void layout(const TextParagraphLayoutParam& param);
 
@@ -243,11 +245,11 @@ namespace slib
 		Ref<TextParagraph> m_paragraph;
 
 		String m_text;
+		Ref<TextStyle> m_style;
 		Ref<Font> m_font;
 		sl_real m_width;
 		MultiLineMode m_multiLineMode;
 		Alignment m_align;
-		Color m_textColor;
 
 		sl_real m_contentWidth;
 		sl_real m_contentHeight;
