@@ -61,6 +61,15 @@ namespace slib
 #endif
 
 		~CList() noexcept;
+		
+	public:
+		CList(const CList& other) = delete;
+		
+		CList(CList&& other) noexcept;
+		
+		CList& operator=(const CList& other) = delete;
+		
+		CList& operator=(CList&& other) noexcept;
 
 	public:
 		static CList<T>* create() noexcept;

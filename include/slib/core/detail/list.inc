@@ -119,14 +119,46 @@ namespace slib
 	CList<T>::~CList() noexcept
 	{
 		T* data = m_data;
-		sl_size count = m_count;
 		if (data) {
+			sl_size count = m_count;
 			for (sl_size i = 0; i < count; i++) {
 				(data+i)->~T();
 			}
 			Base::freeMemory((void*)data);
 		}
 	}
+	
+	template <class T>
+	CList<T>::CList(CList<T>&& other) noexcept
+	{
+		m_data = other.m_data;
+		m_count = other.m_count;
+		m_capacity = other.m_capacity;
+		other.m_data = 0;
+		other.m_count = 0;
+		other.m_capacity = 0;
+	}
+	
+	template <class T>
+	CList<T>& CList<T>::operator=(CList<T>&& other) noexcept
+	{
+		T* data = m_data;
+		if (data) {
+			sl_size count = m_count;
+			for (sl_size i = 0; i < count; i++) {
+				(data+i)->~T();
+			}
+			Base::freeMemory((void*)data);
+		}
+		m_data = other.m_data;
+		m_count = other.m_count;
+		m_capacity = other.m_capacity;
+		other.m_data = 0;
+		other.m_count = 0;
+		other.m_capacity = 0;
+		return *this;
+	}
+
 	
 	template <class T>
 	CList<T>* CList<T>::create() noexcept
