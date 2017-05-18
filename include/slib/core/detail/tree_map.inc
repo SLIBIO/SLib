@@ -37,13 +37,13 @@ namespace slib
 	template <class KT, class VT>
 	sl_bool TreeMapPosition<KT, VT>::operator==(const TreeMapPosition& other) const noexcept
 	{
-		return node == other.entry;
+		return node == other.node;
 	}
 	
 	template <class KT, class VT>
 	sl_bool TreeMapPosition<KT, VT>::operator!=(const TreeMapPosition& other) const noexcept
 	{
-		return node != other.entry;
+		return node != other.node;
 	}
 	
 	template <class KT, class VT>

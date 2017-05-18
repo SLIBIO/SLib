@@ -115,6 +115,10 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	RedBlackTree<KT, VT, KEY_COMPARE>& RedBlackTree<KT, VT, KEY_COMPARE>::operator=(RedBlackTree<KT, VT, KEY_COMPARE>&& other) noexcept
 	{
+		Node* node = m_rootNode;
+		if (node) {
+			_priv_RedBlackTree_freeNode(node);
+		}
 		m_rootNode = other.m_rootNode;
 		other.m_rootNode = sl_null;
 		m_count = other.m_count;

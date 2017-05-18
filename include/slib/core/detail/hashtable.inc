@@ -116,6 +116,7 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	HashTable<KT, VT, HASH, KEY_EQUALS>& HashTable<KT, VT, HASH, KEY_EQUALS>::operator=(HashTable<KT, VT, HASH, KEY_EQUALS>&& other) noexcept
 	{
+		_priv_HashTable_free(&m_table);
 		Base::copyMemory(&m_table, &(other.m_table), sizeof(Table));
 		_priv_HashTable::init(reinterpret_cast<HashBaseTable*>(&(other.m_table)));
 		m_hash = Move(other.m_hash);
