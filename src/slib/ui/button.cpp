@@ -700,7 +700,7 @@ namespace slib
 		}
 	}
 
-	void Button::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
+	void Button::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
 	{
 		if (!flagVertical && !flagHorizontal) {
 			return;

@@ -104,14 +104,14 @@ namespace slib
 		m_textBox.draw(canvas, m_text, getFont(), getBoundsInnerPadding(), isWidthWrapping(), m_multiLineMode, m_textAlignment, m_textColor);
 	}
 	
-	void LabelView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
+	void LabelView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
 	{
 		if (!flagVertical && !flagHorizontal) {
 			return;
 		}
 		
 		sl_ui_pos paddingWidth = getPaddingLeft() + getPaddingRight();
-		m_textBox.update(m_text, getFont(), (sl_real)(getWidth() - paddingWidth), isWidthWrapping(), m_multiLineMode, m_textAlignment);
+		m_textBox.update(m_text, getFont(), (sl_real)(currentFrame.getWidth() - paddingWidth), isWidthWrapping(), m_multiLineMode, m_textAlignment);
 		if (flagHorizontal) {
 			setMeasuredWidth((sl_ui_pos)(m_textBox.getContentWidth()) + paddingWidth);
 		}

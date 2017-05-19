@@ -58,7 +58,7 @@ namespace slib
 	protected:
 		void onDraw(Canvas* canvas) override;
 		
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical) override;
+		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame) override;
 		
 	private:
 		void _setText_NW(const String& text);

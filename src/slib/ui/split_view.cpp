@@ -515,7 +515,7 @@ namespace slib
 		}
 	}
 	
-	void SplitView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
+	void SplitView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
 	{
 	}
 	

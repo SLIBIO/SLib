@@ -216,7 +216,7 @@ namespace slib
 		m_flagAutoDismissKeyboard = flag;
 	}
 
-	void EditView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
+	void EditView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
 	{
 		if (!flagHorizontal && !flagVertical) {
 			return;

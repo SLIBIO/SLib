@@ -296,6 +296,8 @@ namespace slib
 		void setCursor(const Ref<Cursor>& cursor);
 
 		
+		void measureLayout(const UIRect& currentFrame);
+
 		void measureLayout();
 		
 		sl_ui_len getMeasuredWidth();
@@ -1248,7 +1250,7 @@ namespace slib
 		
 		virtual void onRemoveChild(View* child);
 		
-		virtual void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
+		virtual void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame);
 		
 		virtual void onPrepareLayout(ViewPrepareLayoutParam& param);
 		

@@ -41,7 +41,7 @@ namespace slib
 		void setVertical(UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 	protected:
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical) override;
+		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame) override;
 		
 		void onMakeLayout() override;
 		

@@ -73,7 +73,7 @@ namespace slib
 		void setAutoDismissKeyboard(sl_bool flag);
 		
 	protected:
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical) override;
+		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame) override;
 		
 		void onDraw(Canvas* canvas) override;
 

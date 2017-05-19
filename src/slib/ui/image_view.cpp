@@ -90,7 +90,7 @@ namespace slib
 		canvas->draw(getBoundsInnerPadding(), m_source, m_scaleMode, m_gravity);
 	}
 	
-	void ImageView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
+	void ImageView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
 	{
 		if (!flagVertical && !flagHorizontal) {
 			return;

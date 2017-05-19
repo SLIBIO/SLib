@@ -212,7 +212,7 @@ namespace slib
 		
 		void onDrawBorder(Canvas* canvas) override;
 		
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical) override;
+		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame) override;
 		
 		void onKeyEvent(UIEvent* ev) override;
 

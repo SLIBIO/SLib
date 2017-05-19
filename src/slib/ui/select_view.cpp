@@ -388,7 +388,7 @@ namespace slib
 		}
 	}
 	
-	void SelectView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
+	void SelectView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
 	{
 		if (!flagVertical && !flagHorizontal) {
 			return;

@@ -1581,7 +1581,7 @@ namespace slib
 		m_cursor = cursor;
 	}
 
-	void View::measureLayout()
+	void View::measureLayout(const UIRect& currentFrame)
 	{
 		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (layoutAttrs.isNull()) {
@@ -1603,18 +1603,18 @@ namespace slib
 		if (widthMode == SizeMode::Wrapping) {
 			flagHorizontal = sl_true;
 		} else if (widthMode == SizeMode::Fixed) {
-			measuredWidth = getWidth();
+			measuredWidth = currentFrame.getWidth();
 		}
 		if (heightMode == SizeMode::Wrapping) {
 			flagVertical = sl_true;
 		} else if (heightMode == SizeMode::Fixed) {
-			measuredHeight = getHeight();
+			measuredHeight = currentFrame.getHeight();
 		}
 		layoutAttrs->measuredWidth = Math::clamp(measuredWidth, layoutAttrs->minWidth, layoutAttrs->maxWidth);
 		layoutAttrs->measuredHeight = Math::clamp(measuredHeight, layoutAttrs->minHeight, layoutAttrs->maxHeight);
 		
 		if (flagHorizontal || flagVertical) {
-			onMeasureLayout(flagHorizontal, flagVertical);
+			onMeasureLayout(flagHorizontal, flagVertical, currentFrame);
 		}
 		
 		layoutAttrs->measuredWidth = Math::clamp(layoutAttrs->measuredWidth, layoutAttrs->minWidth, layoutAttrs->maxWidth);
@@ -1622,6 +1622,11 @@ namespace slib
 
 		layoutAttrs->flagInvalidMeasure = sl_false;
 
+	}
+
+	void View::measureLayout()
+	{
+		measureLayout(getFrame());
 	}
 
 	sl_ui_len View::getMeasuredWidth()
@@ -1708,10 +1713,6 @@ namespace slib
 		SizeMode widthMode = layoutAttrs->widthMode;
 		SizeMode heightMode = layoutAttrs->heightMode;
 		
-		if (widthMode == SizeMode::Wrapping || heightMode == SizeMode::Wrapping) {
-			measureLayout();
-		}
-		
 		PositionMode leftMode = layoutAttrs->leftMode;
 		PositionMode topMode = layoutAttrs->topMode;
 		PositionMode rightMode = layoutAttrs->rightMode;
@@ -1755,35 +1756,6 @@ namespace slib
 		sl_ui_pos parentWidth = param.parentContentFrame.getWidth();
 		sl_ui_pos parentHeight = param.parentContentFrame.getHeight();
 		
-		sl_ui_pos width, height;
-		switch (widthMode) {
-			case SizeMode::Wrapping:
-				width = layoutAttrs->measuredWidth;
-				break;
-			case SizeMode::Filling:
-			case SizeMode::Weight:
-				width = (sl_ui_pos)((sl_real)parentWidth * Math::abs(layoutAttrs->widthWeight));
-				break;
-			default:
-				width = frame.getWidth();
-				break;
-		}
-		
-		switch (heightMode) {
-			case SizeMode::Wrapping:
-				height = layoutAttrs->measuredHeight;
-				break;
-			case SizeMode::Filling:
-			case SizeMode::Weight:
-				height = (sl_ui_pos)((sl_real)parentHeight * Math::abs(layoutAttrs->heightWeight));
-				break;
-			default:
-				height = frame.getHeight();
-				break;
-		}
-		
-		_restrictSize(width, height);
-		
 		if (layoutAttrs->flagRelativeMarginLeft) {
 			layoutAttrs->marginLeft = (sl_ui_pos)((sl_real)parentWidth * layoutAttrs->relativeMarginLeftWeight);
 		}
@@ -1796,178 +1768,238 @@ namespace slib
 		if (layoutAttrs->flagRelativeMarginBottom) {
 			layoutAttrs->marginBottom = (sl_ui_pos)((sl_real)parentHeight * layoutAttrs->relativeMarginBottomWeight);
 		}
-		Ref<View> referView;
-		switch (leftMode) {
-			case PositionMode::ParentEdge:
-				frame.left = param.parentContentFrame.left + layoutAttrs->marginLeft;
-				break;
-			case PositionMode::OtherStart:
-				referView = layoutAttrs->leftReferingView;
-				if (referView.isNotNull()) {
-					UIRect referFrame = referView->getLayoutFrame();
-					frame.left = referFrame.left + layoutAttrs->marginLeft;
-				} else {
+		
+		sl_bool flagWrapping = widthMode == SizeMode::Wrapping || heightMode == SizeMode::Wrapping;
+		
+		sl_ui_pos width = frame.getWidth();
+		sl_ui_pos height = frame.getHeight();
+
+		for (int step = 0; step < 2; step++) {
+			
+			if (flagWrapping) {
+				measureLayout(frame);
+			}
+			
+			sl_ui_pos oldWidth = width;
+			sl_ui_pos oldHeight = height;
+			
+			switch (widthMode) {
+				case SizeMode::Wrapping:
+					width = layoutAttrs->measuredWidth;
+					break;
+				case SizeMode::Filling:
+				case SizeMode::Weight:
+					width = (sl_ui_pos)((sl_real)parentWidth * Math::abs(layoutAttrs->widthWeight));
+					break;
+				default:
+					break;
+			}
+			
+			switch (heightMode) {
+				case SizeMode::Wrapping:
+					height = layoutAttrs->measuredHeight;
+					break;
+				case SizeMode::Filling:
+				case SizeMode::Weight:
+					height = (sl_ui_pos)((sl_real)parentHeight * Math::abs(layoutAttrs->heightWeight));
+					break;
+				default:
+					break;
+			}
+			
+			_restrictSize(width, height);
+			
+			Ref<View> referView;
+			switch (leftMode) {
+				case PositionMode::ParentEdge:
 					frame.left = param.parentContentFrame.left + layoutAttrs->marginLeft;
-				}
-				break;
-			case PositionMode::OtherEnd:
-				referView = layoutAttrs->leftReferingView;
-				if (referView.isNotNull()) {
-					UIRect referFrame = referView->getLayoutFrame();
-					frame.left = referFrame.right + referView->getMarginRight() + layoutAttrs->marginLeft;
-				} else {
-					frame.left = param.parentContentFrame.left + layoutAttrs->marginLeft;
-				}
-				break;
-			case PositionMode::CenterInParent:
-				frame.left = (param.parentContentFrame.left + layoutAttrs->marginLeft + param.parentContentFrame.right - layoutAttrs->marginRight - width) / 2;
-				break;
-			case PositionMode::CenterInOther:
-				referView = layoutAttrs->leftReferingView;
-				if (referView.isNotNull()) {
-					UIRect referFrame = referView->getLayoutFrame();
-					frame.left = (referFrame.left + layoutAttrs->marginLeft + referFrame.right - layoutAttrs->marginRight - width) / 2;
-				} else {
+					break;
+				case PositionMode::OtherStart:
+					referView = layoutAttrs->leftReferingView;
+					if (referView.isNotNull()) {
+						UIRect referFrame = referView->getLayoutFrame();
+						frame.left = referFrame.left + layoutAttrs->marginLeft;
+					} else {
+						frame.left = param.parentContentFrame.left + layoutAttrs->marginLeft;
+					}
+					break;
+				case PositionMode::OtherEnd:
+					referView = layoutAttrs->leftReferingView;
+					if (referView.isNotNull()) {
+						UIRect referFrame = referView->getLayoutFrame();
+						frame.left = referFrame.right + referView->getMarginRight() + layoutAttrs->marginLeft;
+					} else {
+						frame.left = param.parentContentFrame.left + layoutAttrs->marginLeft;
+					}
+					break;
+				case PositionMode::CenterInParent:
 					frame.left = (param.parentContentFrame.left + layoutAttrs->marginLeft + param.parentContentFrame.right - layoutAttrs->marginRight - width) / 2;
-				}
-			default:
-				break;
-		}
-		switch (rightMode) {
-			case PositionMode::ParentEdge:
-				frame.right = param.parentContentFrame.right - layoutAttrs->marginRight;
-				break;
-			case PositionMode::OtherStart:
-				referView = layoutAttrs->rightReferingView;
-				if (referView.isNotNull()) {
-					UIRect referFrame = referView->getLayoutFrame();
-					frame.right = referFrame.left - referView->getMarginLeft() - layoutAttrs->marginRight;
-				} else {
+					break;
+				case PositionMode::CenterInOther:
+					referView = layoutAttrs->leftReferingView;
+					if (referView.isNotNull()) {
+						UIRect referFrame = referView->getLayoutFrame();
+						frame.left = (referFrame.left + layoutAttrs->marginLeft + referFrame.right - layoutAttrs->marginRight - width) / 2;
+					} else {
+						frame.left = (param.parentContentFrame.left + layoutAttrs->marginLeft + param.parentContentFrame.right - layoutAttrs->marginRight - width) / 2;
+					}
+				default:
+					break;
+			}
+			switch (rightMode) {
+				case PositionMode::ParentEdge:
 					frame.right = param.parentContentFrame.right - layoutAttrs->marginRight;
-				}
-				break;
-			case PositionMode::OtherEnd:
-				referView = layoutAttrs->rightReferingView;
-				if (referView.isNotNull()) {
-					UIRect referFrame = referView->getLayoutFrame();
-					frame.right = referFrame.right - layoutAttrs->marginRight;
-				} else {
-					frame.right = param.parentContentFrame.right - layoutAttrs->marginRight;
-				}
-				break;
-			default:
-				frame.right = param.parentContentFrame.right;
-				break;
-		}
-		switch (topMode) {
-			case PositionMode::ParentEdge:
-				frame.top = param.parentContentFrame.top + layoutAttrs->marginTop;
-				break;
-			case PositionMode::OtherStart:
-				referView = layoutAttrs->topReferingView;
-				if (referView.isNotNull()) {
-					UIRect referFrame = referView->getLayoutFrame();
-					frame.top = referFrame.top + layoutAttrs->marginTop;
-				} else {
+					break;
+				case PositionMode::OtherStart:
+					referView = layoutAttrs->rightReferingView;
+					if (referView.isNotNull()) {
+						UIRect referFrame = referView->getLayoutFrame();
+						frame.right = referFrame.left - referView->getMarginLeft() - layoutAttrs->marginRight;
+					} else {
+						frame.right = param.parentContentFrame.right - layoutAttrs->marginRight;
+					}
+					break;
+				case PositionMode::OtherEnd:
+					referView = layoutAttrs->rightReferingView;
+					if (referView.isNotNull()) {
+						UIRect referFrame = referView->getLayoutFrame();
+						frame.right = referFrame.right - layoutAttrs->marginRight;
+					} else {
+						frame.right = param.parentContentFrame.right - layoutAttrs->marginRight;
+					}
+					break;
+				default:
+					frame.right = param.parentContentFrame.right;
+					break;
+			}
+			switch (topMode) {
+				case PositionMode::ParentEdge:
 					frame.top = param.parentContentFrame.top + layoutAttrs->marginTop;
-				}
-				break;
-			case PositionMode::OtherEnd:
-				referView = layoutAttrs->topReferingView;
-				if (referView.isNotNull()) {
-					UIRect referFrame = referView->getLayoutFrame();
-					frame.top = referFrame.bottom + referView->getMarginBottom() + layoutAttrs->marginTop;
-				} else {
-					frame.top = param.parentContentFrame.top + layoutAttrs->marginTop;
-				}
-				break;
-			case PositionMode::CenterInParent:
-				frame.top = (param.parentContentFrame.top + layoutAttrs->marginTop + param.parentContentFrame.bottom - layoutAttrs->marginBottom - height) / 2;
-				break;
-			case PositionMode::CenterInOther:
-				referView = layoutAttrs->topReferingView;
-				if (referView.isNotNull()) {
-					UIRect referFrame = referView->getLayoutFrame();
-					frame.top = (referFrame.top + layoutAttrs->marginTop + referFrame.bottom - layoutAttrs->marginBottom - height) / 2;
-				} else {
+					break;
+				case PositionMode::OtherStart:
+					referView = layoutAttrs->topReferingView;
+					if (referView.isNotNull()) {
+						UIRect referFrame = referView->getLayoutFrame();
+						frame.top = referFrame.top + layoutAttrs->marginTop;
+					} else {
+						frame.top = param.parentContentFrame.top + layoutAttrs->marginTop;
+					}
+					break;
+				case PositionMode::OtherEnd:
+					referView = layoutAttrs->topReferingView;
+					if (referView.isNotNull()) {
+						UIRect referFrame = referView->getLayoutFrame();
+						frame.top = referFrame.bottom + referView->getMarginBottom() + layoutAttrs->marginTop;
+					} else {
+						frame.top = param.parentContentFrame.top + layoutAttrs->marginTop;
+					}
+					break;
+				case PositionMode::CenterInParent:
 					frame.top = (param.parentContentFrame.top + layoutAttrs->marginTop + param.parentContentFrame.bottom - layoutAttrs->marginBottom - height) / 2;
-				}
-				break;
-			default:
-				break;
-		}
-		switch (bottomMode)
-		{
-			case PositionMode::ParentEdge:
-				frame.bottom = param.parentContentFrame.bottom - layoutAttrs->marginBottom;
-				break;
-			case PositionMode::OtherStart:
-				referView = layoutAttrs->bottomReferingView;
-				if (referView.isNotNull()) {
-					UIRect referFrame = referView->getLayoutFrame();
-					frame.bottom = referFrame.top - referView->getMarginTop() - layoutAttrs->marginBottom;
-				} else {
-					frame.bottom = param.parentContentFrame.bottom - layoutAttrs->marginBottom;
-				}
-				break;
-			case PositionMode::OtherEnd:
-				referView = layoutAttrs->bottomReferingView;
-				if (referView.isNotNull()) {
-					UIRect referFrame = referView->getLayoutFrame();
-					frame.bottom = referFrame.bottom - layoutAttrs->marginBottom;
-				} else {
-					frame.bottom = param.parentContentFrame.bottom - layoutAttrs->marginBottom;
-				}
-				break;
-			default:
-				frame.bottom = param.parentContentFrame.bottom;
-				break;
-		}
-		if (widthMode == SizeMode::Filling) {
-			if (frame.right < frame.left) {
-				frame.right = frame.left;
+					break;
+				case PositionMode::CenterInOther:
+					referView = layoutAttrs->topReferingView;
+					if (referView.isNotNull()) {
+						UIRect referFrame = referView->getLayoutFrame();
+						frame.top = (referFrame.top + layoutAttrs->marginTop + referFrame.bottom - layoutAttrs->marginBottom - height) / 2;
+					} else {
+						frame.top = (param.parentContentFrame.top + layoutAttrs->marginTop + param.parentContentFrame.bottom - layoutAttrs->marginBottom - height) / 2;
+					}
+					break;
+				default:
+					break;
 			}
-			if (width > 0 && width < frame.right - frame.left) {
-				if (layoutAttrs->widthWeight > 0) {
-					frame.right = frame.left + width;
-				} else {
-					frame.left = frame.right - width;
-				}
+			switch (bottomMode)
+			{
+				case PositionMode::ParentEdge:
+					frame.bottom = param.parentContentFrame.bottom - layoutAttrs->marginBottom;
+					break;
+				case PositionMode::OtherStart:
+					referView = layoutAttrs->bottomReferingView;
+					if (referView.isNotNull()) {
+						UIRect referFrame = referView->getLayoutFrame();
+						frame.bottom = referFrame.top - referView->getMarginTop() - layoutAttrs->marginBottom;
+					} else {
+						frame.bottom = param.parentContentFrame.bottom - layoutAttrs->marginBottom;
+					}
+					break;
+				case PositionMode::OtherEnd:
+					referView = layoutAttrs->bottomReferingView;
+					if (referView.isNotNull()) {
+						UIRect referFrame = referView->getLayoutFrame();
+						frame.bottom = referFrame.bottom - layoutAttrs->marginBottom;
+					} else {
+						frame.bottom = param.parentContentFrame.bottom - layoutAttrs->marginBottom;
+					}
+					break;
+				default:
+					frame.bottom = param.parentContentFrame.bottom;
+					break;
 			}
-		} else {
-			if (leftMode == PositionMode::Fixed) {
-				if (rightMode != PositionMode::Fixed) {
-					frame.left = frame.right - width;
-				} else {
-					frame.right = frame.left + width;
+			if (widthMode == SizeMode::Filling) {
+				if (frame.right < frame.left) {
+					frame.right = frame.left;
+				}
+				if (width > 0 && width < frame.right - frame.left) {
+					if (layoutAttrs->widthWeight > 0) {
+						frame.right = frame.left + width;
+					} else {
+						frame.left = frame.right - width;
+					}
 				}
 			} else {
-				frame.right = frame.left + width;
-			}
-		}
-		if (heightMode == SizeMode::Filling) {
-			if (frame.bottom < frame.top) {
-				frame.bottom = frame.top;
-			}
-			if (height > 0 && height < frame.bottom - frame.top) {
-				if (layoutAttrs->heightWeight > 0) {
-					frame.bottom = frame.top + height;
+				if (leftMode == PositionMode::Fixed) {
+					if (rightMode != PositionMode::Fixed) {
+						frame.left = frame.right - width;
+					} else {
+						frame.right = frame.left + width;
+					}
 				} else {
-					frame.top = frame.bottom - height;
+					frame.right = frame.left + width;
 				}
 			}
-		} else {
-			if (topMode == PositionMode::Fixed) {
-				if (bottomMode != PositionMode::Fixed) {
-					frame.top = frame.bottom - height;
-				} else {
-					frame.bottom = frame.top + height;
+			if (heightMode == SizeMode::Filling) {
+				if (frame.bottom < frame.top) {
+					frame.bottom = frame.top;
+				}
+				if (height > 0 && height < frame.bottom - frame.top) {
+					if (layoutAttrs->heightWeight > 0) {
+						frame.bottom = frame.top + height;
+					} else {
+						frame.top = frame.bottom - height;
+					}
 				}
 			} else {
-				frame.bottom = frame.top + height;
+				if (topMode == PositionMode::Fixed) {
+					if (bottomMode != PositionMode::Fixed) {
+						frame.top = frame.bottom - height;
+					} else {
+						frame.bottom = frame.top + height;
+					}
+				} else {
+					frame.bottom = frame.top + height;
+				}
 			}
+			frame.fixSizeError();
+			
+			if (flagWrapping && step == 0) {
+
+				width = frame.getWidth();
+				height = frame.getHeight();
+				
+				if ((widthMode == SizeMode::Wrapping || Math::isAlmostZero(oldWidth - width)) &&
+					 (heightMode == SizeMode::Wrapping || Math::isAlmostZero(oldHeight - height))) {
+					break;
+				}
+				
+				layoutAttrs->flagInvalidMeasure = sl_true;
+				
+			} else {
+				break;
+			}
+		
 		}
-		frame.fixSizeError();
+		
 		layoutAttrs->frame = frame;
 		layoutAttrs->flagUpdatedLayoutFrame = sl_true;
 	}
@@ -1983,8 +2015,8 @@ namespace slib
 				}
 			} else {
 				if (layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
-					measureLayout();
 					UIRect frame = layoutAttrs->frame;
+					measureLayout(frame);
 					sl_bool flagUpdate = sl_false;
 					if (layoutAttrs->widthMode == SizeMode::Wrapping && !(Math::isAlmostZero(layoutAttrs->measuredWidth - m_frame.getWidth()))) {
 						frame.setWidth(layoutAttrs->measuredWidth);
@@ -7673,7 +7705,7 @@ namespace slib
 	{
 	}
 
-	void View::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
+	void View::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
 	{
 		measureRelativeLayout(flagHorizontal, flagVertical);
 	}

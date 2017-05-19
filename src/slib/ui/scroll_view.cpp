@@ -190,7 +190,7 @@ namespace slib
 		}
 	}
 	
-	void ScrollView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
+	void ScrollView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
 	{
 	}
 	

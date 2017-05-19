@@ -103,7 +103,7 @@ namespace slib
 		
 		void onMouseEvent(UIEvent* ev) override;
 		
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical) override;
+		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame) override;
 		
 		virtual void onSelectItem(sl_uint32 index);
 		

@@ -64,7 +64,7 @@ namespace slib
 		setOrientation(LayoutOrientation::Vertical, mode);
 	}
 	
-	void LinearView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
+	void LinearView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
 	{
 		if (!flagVertical && !flagHorizontal) {
 			return;
