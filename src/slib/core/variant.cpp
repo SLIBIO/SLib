@@ -3542,6 +3542,22 @@ namespace slib
 				default:
 					break;
 			}
+		} else {
+			sl_bool flagInt1 = type == VariantType::Int32 || type == VariantType::Uint32 || type == VariantType::Int64 || type == VariantType::Uint64;
+			sl_bool flagInt2 = v2._type == VariantType::Int32 || v2._type == VariantType::Uint32 || v2._type == VariantType::Int64 || v2._type == VariantType::Uint64;
+			if (flagInt1 && flagInt2) {
+				return v1.getInt64() == v2.getInt64();
+			}
+			sl_bool flagFloat1 = type == VariantType::Float || type == VariantType::Double;
+			sl_bool flagFloat2 = v2._type == VariantType::Float || v2._type == VariantType::Double;
+			if ((flagInt1 || flagFloat1) && (flagInt2 || flagFloat2)) {
+				return v1.getDouble() == v2.getDouble();
+			}
+			sl_bool flagString1 = type == VariantType::String8 || type == VariantType::String16 || type == VariantType::Sz8 || type == VariantType::Sz16;
+			sl_bool flagString2 = v2._type == VariantType::String8 || v2._type == VariantType::String16 || v2._type == VariantType::Sz8 || v2._type == VariantType::Sz16;
+			if ((flagInt1 || flagFloat1 || flagString1) && (flagInt2 || flagFloat2 || flagString2)) {
+				return v1.getString() == v2.getString();
+			}
 		}
 		return sl_false;
 	}
