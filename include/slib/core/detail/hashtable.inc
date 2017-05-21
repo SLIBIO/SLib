@@ -564,7 +564,7 @@ namespace slib
 			if (!newEntry) {
 				return sl_false;
 			}
-			_priv_HashTable::add(reinterpret_cast<HashBaseTable*>(&m_table), reinterpret_cast<HashBaseEntry*>(entry), entry->hash);
+			_priv_HashTable::add(reinterpret_cast<HashBaseTable*>(&m_table), reinterpret_cast<HashBaseEntry*>(newEntry), newEntry->hash);
 			entry = entry->next;
 		}
 		return sl_true;
