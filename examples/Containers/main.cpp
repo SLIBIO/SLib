@@ -20,33 +20,33 @@ int main(int argc, const char * argv[])
 		int i;
 		List<String> list = {"a", "b", "c", "de", "a", "b"};
 		
-		Console::println("Original List");
+		Println("Original List");
 		i = 0;
 		for (auto& item : list) {
-			Console::println("[%d]=%s", i++, item);
+			Println("[%d]=%s", i++, item);
 		}
 		
-		Console::println("Member Access");
-		Console::println("[3]=%s", list[3]);
+		Println("Member Access");
+		Println("[3]=%s", list[3]);
 		
 		// Insert some values into the list
 		for (i = 0; i < 5; i++) {
 			list.add(String::format("t%d", i));
 		}
-		Console::println("List after insertion");
+		Println("List after insertion");
 		i = 0;
 		for (auto& item : list) {
-			Console::println("[%d]=%s", i++, item);
+			Println("[%d]=%s", i++, item);
 		}
 		
 		// Remove some values from the list
 		list.removeRange(7, 3);
 		list.removeAt(3);
 		list.removeElementsByValue("b");
-		Console::println("List after removal");
+		Println("List after removal");
 		i = 0;
 		for (auto& item : list) {
-			Console::println("[%d]=%s", i++, item);
+			Println("[%d]=%s", i++, item);
 		}
 		
 	}
@@ -56,40 +56,40 @@ int main(int argc, const char * argv[])
 		
 		Map<String, int> map = {{"a", 1}, {"b", 2}, {"c", 3}, {"ab", 12}, {"cd", 34}};
 		
-		Console::println("Original Map");
+		Println("Original Map");
 		for (auto& item : map) {
-			Console::println("[%s]=%d", item.key, item.value);
+			Println("[%s]=%d", item.key, item.value);
 		}
 
-		Console::println("Member Access");
-		Console::println("[3]=%s", map["ab"]);
+		Println("Member Access");
+		Println("[3]=%s", map["ab"]);
 
 		// Insert some values into the map
-		Console::println("Map after insertion");
+		Println("Map after insertion");
 		map.put("ab", 12);
 		map.put("aaa", 111);
 		map.put("abc", 123);
 		map.put("baa", 211);
 		map.put("bac", 213);
 		for (auto& item : map) {
-			Console::println("[%s]=%d", item.key, item.value);
+			Println("[%s]=%d", item.key, item.value);
 		}
 		
 		// Remove some values from the map
 		map.remove("ab");
 		map.remove("cd");
-		Console::println("Map after removal");
+		Println("Map after removal");
 		for (auto& item : map) {
-			Console::println("[%s]=%d", item.key, item.value);
+			Println("[%s]=%d", item.key, item.value);
 		}
 		
 		// Convert to TreeMap
 		Map<String, int> tree;
 		tree.initTree();
 		tree.putAll(map);
-		Console::println("TreeMap");
+		Println("TreeMap");
 		for (auto& item : tree) {
-			Console::println("[%s]=%d", item.key, item.value);
+			Println("[%s]=%d", item.key, item.value);
 		}
 		
 	}

@@ -26,6 +26,20 @@ namespace slib
 	}
 
 	template <class... ARGS>
+	void Printf(const String& format, ARGS&&... args)
+	{
+		String content = String::format(format, args...);
+		Console::print(content);
+	}
+
+	template <class... ARGS>
+	void Println(const String& format, ARGS&&... args)
+	{
+		String content = String::format(format, args...);
+		Console::println(content);
+	}
+
+	template <class... ARGS>
 	void Log(const String& tag, const String& format, ARGS&&... args)
 	{
 		String content = String::format(format, args...);

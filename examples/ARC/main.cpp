@@ -25,7 +25,7 @@ public:
 	{
 		SLIB_KEEP_REF;
 		
-		Console::println("Constructor called: %s", name);
+		Println("Constructor called: %s", name);
 		if (parent != nullptr) {
 			this->parent = parent;
 			parent->children.add(this);
@@ -34,19 +34,19 @@ public:
 
 	~ExampleNode()
 	{
-		Console::println("Destructor called: %s", name);
+		Println("Destructor called: %s", name);
 	}
 
 	void print()
 	{
 		Ref<ExampleNode> parent = this->parent;
 		if (parent == nullptr) {
-			Console::println("[Print] Root Node: %s", name);
+			Println("[Print] Root Node: %s", name);
 		} else {
 			if (children.getCount() > 0) {
-				Console::println("[Print] Node: %s, Parent: %s", name, parent->name);
+				Println("[Print] Node: %s, Parent: %s", name, parent->name);
 			} else {
-				Console::println("[Print] Leaf Node: %s, Parent: %s", name, parent->name);
+				Println("[Print] Leaf Node: %s, Parent: %s", name, parent->name);
 			}
 		}
 		for (auto& child : children) {

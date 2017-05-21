@@ -118,6 +118,19 @@ namespace slib
 	
 	};
 	
+	template <class... ARGS>
+	void Printf(const String& format, ARGS&&... args);
+	
+	template <class... ARGS>
+	void Println(const String& format, ARGS&&... args);
+	
+	template <class... ARGS>
+	void Log(const String& tag, const String& format, ARGS&&... args);
+	
+	template <class... ARGS>
+	void LogError(const String& tag, const String& format, ARGS&&... args);
+
+	
 }
 
 #include "detail/log.inc"
