@@ -10,7 +10,12 @@
 
 namespace slib
 {
-	
+
+	SLIB_INLINE MacAddress::MacAddress(const MacAddress& other) noexcept = default;
+
+	SLIB_INLINE MacAddress& MacAddress::operator=(const MacAddress& other) noexcept = default;
+
+
 	SLIB_INLINE const MacAddress& MacAddress::zero() noexcept
 	{
 		return *(reinterpret_cast<MacAddress const*>(&_zero));
@@ -51,8 +56,6 @@ namespace slib
 		return (m[0] & 1) == 0;
 	}
 
-	SLIB_INLINE MacAddress& MacAddress::operator=(const MacAddress& other) noexcept = default;
-	
 	SLIB_INLINE sl_bool MacAddress::operator==(const MacAddress& other) const noexcept
 	{
 		return m[0] == other.m[0] && m[1] == other.m[1] && m[2] == other.m[2] && m[3] == other.m[3] && m[4] == other.m[4] && m[5] == other.m[5];

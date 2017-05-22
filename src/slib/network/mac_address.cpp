@@ -16,8 +16,6 @@ namespace slib
 	SLIB_ALIGN(8) const sl_uint8 MacAddress::_zero[6] = { 0 };
 	SLIB_ALIGN(8) const sl_uint8 MacAddress::_broadcast[6] = { 255, 255, 255, 255, 255, 255 };
 
-	MacAddress::MacAddress(const MacAddress& other) noexcept = default;
-
 	MacAddress::MacAddress(const sl_uint8* _m) noexcept
 	{
 		m[0] = _m[0];
