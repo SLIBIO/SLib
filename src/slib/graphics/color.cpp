@@ -346,7 +346,7 @@ namespace slib
 	SLIB_SAFE_STATIC_GETTER(_priv_Color_Name_Map, _priv_Color_getNameMap)
 
 	template <class CT>
-	static sl_reg _priv_Color_parse(Color* _out, const CT* sz, sl_size pos, sl_size len) noexcept
+	SLIB_INLINE static sl_reg _priv_Color_parse(Color* _out, const CT* sz, sl_size pos, sl_size len) noexcept
 	{
 		if (pos >= len) {
 			return SLIB_PARSE_ERROR;
@@ -514,13 +514,13 @@ namespace slib
 	}
 
 	template <>
-	sl_reg Parser<Color, sl_char8>::parse(Color* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd)
+	sl_reg Parser<Color, sl_char8>::parse(Color* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_Color_parse(_out, sz, posBegin, posEnd);
 	}
 
 	template <>
-	sl_reg Parser<Color, sl_char16>::parse(Color* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd)
+	sl_reg Parser<Color, sl_char16>::parse(Color* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_Color_parse(_out, sz, posBegin, posEnd);
 	}

@@ -366,10 +366,10 @@ namespace slib
 	};
 	
 	template <>
-	sl_reg Parser<Color, sl_char8>::parse(Color* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd);
+	sl_reg Parser<Color, sl_char8>::parse(Color* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept;
 	
 	template <>
-	sl_reg Parser<Color, sl_char16>::parse(Color* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd);
+	sl_reg Parser<Color, sl_char16>::parse(Color* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept;
 	
 	class SLIB_EXPORT ColorMatrix
 	{
