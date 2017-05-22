@@ -40,71 +40,71 @@ namespace slib
 		};
 		
 	public:
-		constexpr IPv4Address(): a(0), b(0), c(0), d(0) {}
+		SLIB_INLINE constexpr IPv4Address() noexcept: a(0), b(0), c(0), d(0) {}
 		
-		constexpr IPv4Address(const IPv4Address& other): a(other.a), b(other.b), c(other.c), d(other.d) {}
+		SLIB_INLINE constexpr IPv4Address(const IPv4Address& other) noexcept: a(other.a), b(other.b), c(other.c), d(other.d) {}
 		
-		constexpr IPv4Address(sl_uint8 const addr[4]): a(addr[0]), b(addr[1]), c(addr[2]), d(addr[3]) {}
+		SLIB_INLINE constexpr IPv4Address(sl_uint8 const addr[4]) noexcept: a(addr[0]), b(addr[1]), c(addr[2]), d(addr[3]) {}
 		
-		constexpr IPv4Address(sl_uint8 _a, sl_uint8 _b, sl_uint8 _c, sl_uint8 _d): a(_a), b(_b), c(_c), d(_d) {}
+		SLIB_INLINE constexpr IPv4Address(sl_uint8 _a, sl_uint8 _b, sl_uint8 _c, sl_uint8 _d) noexcept: a(_a), b(_b), c(_c), d(_d) {}
 		
-		constexpr IPv4Address(sl_uint32 addr): a((sl_uint8)(addr >> 24)), b((sl_uint8)(addr >> 16)), c((sl_uint8)(addr >> 8)), d((sl_uint8)(addr)) {}
+		SLIB_INLINE constexpr IPv4Address(sl_uint32 addr) noexcept: a((sl_uint8)(addr >> 24)), b((sl_uint8)(addr >> 16)), c((sl_uint8)(addr >> 8)), d((sl_uint8)(addr)) {}
 		
-		IPv4Address(const String& address);
+		IPv4Address(const String& address) noexcept;
 		
 	public:
-		void setElements(sl_uint8 a, sl_uint8 b, sl_uint8 c, sl_uint8 d);
+		void setElements(sl_uint8 a, sl_uint8 b, sl_uint8 c, sl_uint8 d) noexcept;
 		
-		sl_uint32 getInt() const;
+		sl_uint32 getInt() const noexcept;
 		
-		void setInt(sl_uint32 addr);
+		void setInt(sl_uint32 addr) noexcept;
 		
-		void getBytes(sl_uint8* bytes) const;
+		void getBytes(sl_uint8* bytes) const noexcept;
 		
-		void setBytes(const sl_uint8* bytes);
+		void setBytes(const sl_uint8* bytes) noexcept;
 		
-		static const IPv4Address& zero();
+		static const IPv4Address& zero() noexcept;
 		
-		sl_bool isZero() const;
+		sl_bool isZero() const noexcept;
 		
-		sl_bool isNotZero() const;
+		sl_bool isNotZero() const noexcept;
 		
-		void setZero();
+		void setZero() noexcept;
 		
-		sl_bool isLoopback() const;
+		sl_bool isLoopback() const noexcept;
 		
-		sl_bool isMulticast() const;
+		sl_bool isMulticast() const noexcept;
 		
-		sl_bool isBroadcast() const;
+		sl_bool isBroadcast() const noexcept;
 		
-		sl_bool isHost() const;
+		sl_bool isHost() const noexcept;
 		
-		sl_bool isPrivate() const;
+		sl_bool isPrivate() const noexcept;
 		
-		int compare(const IPv4Address& other) const;
+		int compare(const IPv4Address& other) const noexcept;
 		
-		sl_uint32 hashCode() const;
+		sl_uint32 hashCode() const noexcept;
 		
 		// "a.b.c.d"
-		String toString() const;
+		String toString() const noexcept;
 		
-		sl_bool setString(const String& str);
+		sl_bool setString(const String& str) noexcept;
 		
-		void makeNetworkMask(sl_uint32 networkPrefixLength);
+		void makeNetworkMask(sl_uint32 networkPrefixLength) noexcept;
 		
-		sl_uint32 getNetworkPrefixLengthFromMask() const;
+		sl_uint32 getNetworkPrefixLengthFromMask() const noexcept;
 		
-		sl_bool setHostName(const String& hostName);
+		sl_bool setHostName(const String& hostName) noexcept;
 		
 		
 		template <class ST>
-		static sl_bool parse(const ST& str, IPv4Address* _out)
+		static sl_bool parse(const ST& str, IPv4Address* _out) noexcept
 		{
 			return Parse(str, _out);
 		}
 		
 		template <class ST>
-		sl_bool parse(const ST& str)
+		sl_bool parse(const ST& str) noexcept
 		{
 			return Parse(str, this);
 		}
@@ -112,25 +112,25 @@ namespace slib
 	public:
 		SLIB_INLINE IPv4Address& operator=(const IPv4Address& other) = default;
 		
-		IPv4Address& operator=(sl_uint32 addr);
+		IPv4Address& operator=(sl_uint32 addr) noexcept;
 		
-		IPv4Address& operator=(const String& address);
+		IPv4Address& operator=(const String& address) noexcept;
 		
-		sl_bool operator==(const IPv4Address& other) const;
+		sl_bool operator==(const IPv4Address& other) const noexcept;
 		
-		sl_bool operator==(sl_uint32 addr) const;
+		sl_bool operator==(sl_uint32 addr) const noexcept;
 		
-		sl_bool operator!=(const IPv4Address& other) const;
+		sl_bool operator!=(const IPv4Address& other) const noexcept;
 		
-		sl_bool operator!=(sl_uint32 addr) const;
+		sl_bool operator!=(sl_uint32 addr) const noexcept;
 		
-		sl_bool operator>=(const IPv4Address& other) const;
+		sl_bool operator>=(const IPv4Address& other) const noexcept;
 		
-		sl_bool operator>(const IPv4Address& other) const;
+		sl_bool operator>(const IPv4Address& other) const noexcept;
 		
-		sl_bool operator<=(const IPv4Address& other) const;
+		sl_bool operator<=(const IPv4Address& other) const noexcept;
 		
-		sl_bool operator<(const IPv4Address& other) const;
+		sl_bool operator<(const IPv4Address& other) const noexcept;
 		
 	private:
 		static const sl_uint8 _zero[4];
@@ -138,30 +138,30 @@ namespace slib
 	};
 	
 	template <>
-	sl_reg Parser<IPv4Address, sl_char8>::parse(IPv4Address* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd);
+	sl_reg Parser<IPv4Address, sl_char8>::parse(IPv4Address* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept;
 	
 	template <>
-	sl_reg Parser<IPv4Address, sl_char16>::parse(IPv4Address* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd);
+	sl_reg Parser<IPv4Address, sl_char16>::parse(IPv4Address* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept;
 	
 	template <>
 	class Compare<IPv4Address>
 	{
 	public:
-		int operator()(const IPv4Address& a, const IPv4Address& b) const;
+		int operator()(const IPv4Address& a, const IPv4Address& b) const noexcept;
 	};
 	
 	template <>
 	class Equals<IPv4Address>
 	{
 	public:
-		sl_bool operator()(const IPv4Address& a, const IPv4Address& b) const;
+		sl_bool operator()(const IPv4Address& a, const IPv4Address& b) const noexcept;
 	};
 	
 	template <>
 	class Hash<IPv4Address>
 	{
 	public:
-		sl_uint32 operator()(const IPv4Address& a) const;
+		sl_uint32 operator()(const IPv4Address& a) const noexcept;
 	};
 	
 	
@@ -172,9 +172,9 @@ namespace slib
 		sl_uint32 networkPrefixLength;
 		
 	public:
-		IPv4Address getNetworkMask() const;
+		IPv4Address getNetworkMask() const noexcept;
 		
-		void setNetworkMask(const IPv4Address& mask);
+		void setNetworkMask(const IPv4Address& mask) noexcept;
 		
 	};
 	
@@ -182,14 +182,14 @@ namespace slib
 	class Compare<IPv4AddressInfo>
 	{
 	public:
-		int operator()(const IPv4AddressInfo& a, const IPv4AddressInfo& b) const;
+		int operator()(const IPv4AddressInfo& a, const IPv4AddressInfo& b) const noexcept;
 	};
 	
 	template <>
 	class Equals<IPv4AddressInfo>
 	{
 	public:
-		sl_bool operator()(const IPv4AddressInfo& a, const IPv4AddressInfo& b) const;
+		sl_bool operator()(const IPv4AddressInfo& a, const IPv4AddressInfo& b) const noexcept;
 	};
 	
 	
@@ -199,101 +199,101 @@ namespace slib
 		sl_uint8 m[16];
 		
 	public:
-		SLIB_INLINE IPv6Address() = default;
+		SLIB_INLINE IPv6Address() noexcept {}
 		
-		IPv6Address(const IPv6Address& other);
+		IPv6Address(const IPv6Address& other) noexcept;
 		
 		// 8 elements
-		IPv6Address(const sl_uint16* s);
+		IPv6Address(const sl_uint16* s) noexcept;
 		
-		IPv6Address(sl_uint16 s0, sl_uint16 s1, sl_uint16 s2, sl_uint16 s3, sl_uint16 s4, sl_uint16 s5, sl_uint16 s6, sl_uint16 s7);
+		IPv6Address(sl_uint16 s0, sl_uint16 s1, sl_uint16 s2, sl_uint16 s3, sl_uint16 s4, sl_uint16 s5, sl_uint16 s6, sl_uint16 s7) noexcept;
 		
 		// 16 elements
-		IPv6Address(const sl_uint8* b);
+		IPv6Address(const sl_uint8* b) noexcept;
 		
-		IPv6Address(const IPv4Address& ipv4);
+		IPv6Address(const IPv4Address& ipv4) noexcept;
 		
-		IPv6Address(const String& address);
+		IPv6Address(const String& address) noexcept;
 		
 	public:
 		// not checking index bound (0~7)
-		sl_uint16 getElement(int index) const;
+		sl_uint16 getElement(int index) const noexcept;
 		
 		// not checking index bound (0~7)
-		void setElement(int index, sl_uint16 s);
+		void setElement(int index, sl_uint16 s) noexcept;
 		
 		// 8 elements
-		void getElements(sl_uint16* s) const;
+		void getElements(sl_uint16* s) const noexcept;
 		
 		// 8 elements
-		void setElements(const sl_uint16* s);
+		void setElements(const sl_uint16* s) noexcept;
 		
-		void setElements(sl_uint16 s0, sl_uint16 s1, sl_uint16 s2, sl_uint16 s3, sl_uint16 s4, sl_uint16 s5, sl_uint16 s6, sl_uint16 s7);
-		
-		// 16 elements
-		void getBytes(sl_uint8* bytes) const;
+		void setElements(sl_uint16 s0, sl_uint16 s1, sl_uint16 s2, sl_uint16 s3, sl_uint16 s4, sl_uint16 s5, sl_uint16 s6, sl_uint16 s7) noexcept;
 		
 		// 16 elements
-		void setBytes(const sl_uint8* bytes);
+		void getBytes(sl_uint8* bytes) const noexcept;
 		
-		static const IPv6Address& zero();
+		// 16 elements
+		void setBytes(const sl_uint8* bytes) noexcept;
 		
-		void setZero();
+		static const IPv6Address& zero() noexcept;
 		
-		sl_bool isZero() const;
+		void setZero() noexcept;
 		
-		sl_bool isNotZero() const;
+		sl_bool isZero() const noexcept;
 		
-		static const IPv6Address& getLoopback();
+		sl_bool isNotZero() const noexcept;
 		
-		sl_bool isLoopback() const;
+		static const IPv6Address& getLoopback() noexcept;
 		
-		IPv4Address getIPv4Transition() const;
+		sl_bool isLoopback() const noexcept;
 		
-		void setIPv4Transition(const IPv4Address& ipv4);
+		IPv4Address getIPv4Transition() const noexcept;
 		
-		sl_bool isIPv4Transition() const;
+		void setIPv4Transition(const IPv4Address& ipv4) noexcept;
 		
-		int compare(const IPv6Address& other) const;
+		sl_bool isIPv4Transition() const noexcept;
 		
-		sl_uint32 hashCode() const;
+		int compare(const IPv6Address& other) const noexcept;
+		
+		sl_uint32 hashCode() const noexcept;
 		
 		// "s0:s1:s2:s3:s4:s5:s6:s7"
-		String toString() const;
+		String toString() const noexcept;
 		
-		sl_bool setString(const String& str);
+		sl_bool setString(const String& str) noexcept;
 		
-		sl_bool setHostName(const String& hostName);
+		sl_bool setHostName(const String& hostName) noexcept;
 		
 		
 		template <class ST>
-		static sl_bool parse(const ST& str, IPv6Address* _out)
+		static sl_bool parse(const ST& str, IPv6Address* _out) noexcept
 		{
 			return Parse(str, _out);
 		}
 		
 		template <class ST>
-		sl_bool parse(const ST& str)
+		sl_bool parse(const ST& str) noexcept
 		{
 			return Parse(str, this);
 		}
 		
 	public:
-		IPv6Address& operator=(const IPv6Address& other);
+		IPv6Address& operator=(const IPv6Address& other) noexcept;
 		
-		IPv6Address& operator=(const String& address);
+		IPv6Address& operator=(const String& address) noexcept;
 		
-		sl_bool operator==(const IPv6Address& other) const;
+		sl_bool operator==(const IPv6Address& other) const noexcept;
 		
-		sl_bool operator!=(const IPv6Address& other) const;
+		sl_bool operator!=(const IPv6Address& other) const noexcept;
 		
-		sl_bool operator<=(const IPv6Address& other) const;
+		sl_bool operator<=(const IPv6Address& other) const noexcept;
 		
-		sl_bool operator<(const IPv6Address& other) const;
+		sl_bool operator<(const IPv6Address& other) const noexcept;
 		
-		sl_bool operator>=(const IPv6Address& other) const;
+		sl_bool operator>=(const IPv6Address& other) const noexcept;
 		
-		sl_bool operator>(const IPv6Address& other) const;
+		sl_bool operator>(const IPv6Address& other) const noexcept;
 		
 	private:
 		static const sl_uint8 _zero[16];
@@ -302,30 +302,30 @@ namespace slib
 	};
 	
 	template <>
-	sl_reg Parser<IPv6Address, sl_char8>::parse(IPv6Address* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd);
+	sl_reg Parser<IPv6Address, sl_char8>::parse(IPv6Address* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept;
 	
 	template <>
-	sl_reg Parser<IPv6Address, sl_char16>::parse(IPv6Address* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd);
+	sl_reg Parser<IPv6Address, sl_char16>::parse(IPv6Address* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept;
 	
 	template <>
 	class Compare<IPv6Address>
 	{
 	public:
-		int operator()(const IPv6Address& a, const IPv6Address& b) const;
+		int operator()(const IPv6Address& a, const IPv6Address& b) const noexcept;
 	};
 	
 	template <>
 	class Equals<IPv6Address>
 	{
 	public:
-		sl_bool operator()(const IPv6Address& a, const IPv6Address& b) const;
+		sl_bool operator()(const IPv6Address& a, const IPv6Address& b) const noexcept;
 	};
 	
 	template <>
 	class Hash<IPv6Address>
 	{
 	public:
-		sl_uint32 operator()(const IPv6Address& a) const;
+		sl_uint32 operator()(const IPv6Address& a) const noexcept;
 	};
 	
 	
@@ -345,108 +345,108 @@ namespace slib
 		sl_uint8 m[_SLIB_NET_IPADDRESS_SIZE];
 		
 	public:
-		SLIB_INLINE IPAddress(): type(IPAddressType::None) {}
+		SLIB_INLINE IPAddress() noexcept: type(IPAddressType::None) {}
 		
-		IPAddress(const IPAddress& other);
+		IPAddress(const IPAddress& other) noexcept;
 		
-		IPAddress(const IPv4Address& other);
+		IPAddress(const IPv4Address& other) noexcept;
 		
-		IPAddress(const IPv6Address& other);
+		IPAddress(const IPv6Address& other) noexcept;
 		
-		IPAddress(const String& address);
+		IPAddress(const String& address) noexcept;
 		
 	public:
-		static const IPAddress& none();
+		static const IPAddress& none() noexcept;
 		
-		void setNone();
+		void setNone() noexcept;
 		
-		sl_bool isNone() const;
+		sl_bool isNone() const noexcept;
 		
-		sl_bool isNotNone() const;
+		sl_bool isNotNone() const noexcept;
 		
-		sl_bool isIPv4() const;
+		sl_bool isIPv4() const noexcept;
 		
-		const IPv4Address& getIPv4() const;
+		const IPv4Address& getIPv4() const noexcept;
 		
-		void setIPv4(const IPv4Address& addr);
+		void setIPv4(const IPv4Address& addr) noexcept;
 		
-		sl_bool isIPv6() const;
+		sl_bool isIPv6() const noexcept;
 		
-		const IPv6Address& getIPv6() const;
+		const IPv6Address& getIPv6() const noexcept;
 		
-		void setIPv6(const IPv6Address& addr);
+		void setIPv6(const IPv6Address& addr) noexcept;
 		
-		int compare(const IPAddress& other) const;
+		int compare(const IPAddress& other) const noexcept;
 		
-		sl_uint32 hashCode() const;
+		sl_uint32 hashCode() const noexcept;
 		
-		String toString() const;
+		String toString() const noexcept;
 		
-		sl_bool setString(const String& str);
+		sl_bool setString(const String& str) noexcept;
 		
-		sl_bool setHostName(const String& hostName);
+		sl_bool setHostName(const String& hostName) noexcept;
 		
 		
 		template <class ST>
-		static sl_bool parse(const ST& str, IPAddress* _out)
+		static sl_bool parse(const ST& str, IPAddress* _out) noexcept
 		{
 			return Parse(str, _out);
 		}
 		
 		template <class ST>
-		sl_bool parse(const ST& str)
+		sl_bool parse(const ST& str) noexcept
 		{
 			return Parse(str, this);
 		}
 		
 	public:
-		IPAddress& operator=(const IPAddress& other);
+		IPAddress& operator=(const IPAddress& other) noexcept;
 		
-		IPAddress& operator=(const IPv4Address& other);
+		IPAddress& operator=(const IPv4Address& other) noexcept;
 		
-		IPAddress& operator=(const IPv6Address& other);
+		IPAddress& operator=(const IPv6Address& other) noexcept;
 		
-		IPAddress& operator=(const String& address);
+		IPAddress& operator=(const String& address) noexcept;
 		
-		sl_bool operator==(const IPAddress& other) const;
+		sl_bool operator==(const IPAddress& other) const noexcept;
 		
-		sl_bool operator!=(const IPAddress& other) const;
+		sl_bool operator!=(const IPAddress& other) const noexcept;
 		
 	private:
-		struct _IPAddress
+		struct _ipaddress
 		{
 			IPAddressType type;
 			sl_uint8 m[_SLIB_NET_IPADDRESS_SIZE];
 		};
-		static const _IPAddress _none;
+		static const _ipaddress _none;
 		
 	};
 	
 	template <>
-	sl_reg Parser<IPAddress, sl_char8>::parse(IPAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd);
+	sl_reg Parser<IPAddress, sl_char8>::parse(IPAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept;
 	
 	template <>
-	sl_reg Parser<IPAddress, sl_char16>::parse(IPAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd);
+	sl_reg Parser<IPAddress, sl_char16>::parse(IPAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept;
 	
 	template <>
 	class Compare<IPAddress>
 	{
 	public:
-		int operator()(const IPAddress& a, const IPAddress& b) const;
+		int operator()(const IPAddress& a, const IPAddress& b) const noexcept;
 	};
 	
 	template <>
 	class Equals<IPAddress>
 	{
 	public:
-		sl_bool operator()(const IPAddress& a, const IPAddress& b) const;
+		sl_bool operator()(const IPAddress& a, const IPAddress& b) const noexcept;
 	};
 	
 	template <>
 	class Hash<IPAddress>
 	{
 	public:
-		sl_uint32 operator()(const IPAddress& a) const;
+		sl_uint32 operator()(const IPAddress& a) const noexcept;
 	};
 	
 }
