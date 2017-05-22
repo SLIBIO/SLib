@@ -50,6 +50,8 @@ namespace slib
 	{
 		return (m[0] & 1) == 0;
 	}
+
+	SLIB_INLINE MacAddress& MacAddress::operator=(const MacAddress& other) noexcept = default;
 	
 	SLIB_INLINE sl_bool MacAddress::operator==(const MacAddress& other) const noexcept
 	{

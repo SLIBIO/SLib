@@ -201,8 +201,6 @@ namespace slib
 	}
 
 
-	MacAddress& MacAddress::operator=(const MacAddress& other) noexcept = default;
-
 	MacAddress& MacAddress::operator=(const String& address) noexcept
 	{
 		setString(address);
