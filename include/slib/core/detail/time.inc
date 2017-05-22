@@ -11,115 +11,115 @@
 namespace slib
 {
 
-	SLIB_INLINE void Time::setZero()
+	SLIB_INLINE void Time::setZero() noexcept
 	{
 		m_time = 0;
 	}
 	
-	SLIB_INLINE sl_int64 Time::toInt() const
+	SLIB_INLINE sl_int64 Time::toInt() const noexcept
 	{
 		return m_time;
 	}
 	
-	SLIB_INLINE Time& Time::operator=(const Time& other)
+	SLIB_INLINE Time& Time::operator=(const Time& other) noexcept
 	{
 		m_time = other.m_time;
 		return *this;
 	}
 	
-	SLIB_INLINE Time& Time::operator=(sl_int32 time)
+	SLIB_INLINE Time& Time::operator=(sl_int32 time) noexcept
 	{
 		m_time = time;
 		return *this;
 	}
 	
-	SLIB_INLINE Time& Time::operator=(sl_uint32 time)
+	SLIB_INLINE Time& Time::operator=(sl_uint32 time) noexcept
 	{
 		m_time = time;
 		return *this;
 	}
 	
-	SLIB_INLINE Time& Time::operator=(sl_int64 time)
+	SLIB_INLINE Time& Time::operator=(sl_int64 time) noexcept
 	{
 		m_time = time;
 		return *this;
 	}
 	
-	SLIB_INLINE Time& Time::operator=(sl_uint64 time)
+	SLIB_INLINE Time& Time::operator=(sl_uint64 time) noexcept
 	{
 		m_time = time;
 		return *this;
 	}
 	
-	SLIB_INLINE sl_bool Time::operator==(const Time& other) const
+	SLIB_INLINE sl_bool Time::operator==(const Time& other) const noexcept
 	{
 		return m_time == other.m_time;
 	}
 	
-	SLIB_INLINE sl_bool Time::operator<=(const Time& other) const
+	SLIB_INLINE sl_bool Time::operator<=(const Time& other) const noexcept
 	{
 		return m_time <= other.m_time;
 	}
 	
-	SLIB_INLINE sl_bool Time::operator>=(const Time& other) const
+	SLIB_INLINE sl_bool Time::operator>=(const Time& other) const noexcept
 	{
 		return m_time >= other.m_time;
 	}
 	
-	SLIB_INLINE sl_bool Time::operator!=(const Time& other) const
+	SLIB_INLINE sl_bool Time::operator!=(const Time& other) const noexcept
 	{
 		return m_time != other.m_time;
 	}
 	
-	SLIB_INLINE sl_bool Time::operator<(const Time& other) const
+	SLIB_INLINE sl_bool Time::operator<(const Time& other) const noexcept
 	{
 		return m_time < other.m_time;
 	}
 	
-	SLIB_INLINE sl_bool Time::operator>(const Time& other) const
+	SLIB_INLINE sl_bool Time::operator>(const Time& other) const noexcept
 	{
 		return m_time > other.m_time;
 	}
 	
-	SLIB_INLINE Time Time::operator+(sl_int64 time) const
+	SLIB_INLINE Time Time::operator+(sl_int64 time) const noexcept
 	{
 		return m_time + time;
 	}
 	
-	SLIB_INLINE Time Time::operator+(const Time& time) const
+	SLIB_INLINE Time Time::operator+(const Time& time) const noexcept
 	{
 		return m_time + time.m_time;
 	}
 	
-	SLIB_INLINE Time& Time::operator+=(sl_int64 time)
+	SLIB_INLINE Time& Time::operator+=(sl_int64 time) noexcept
 	{
 		m_time += time;
 		return *this;
 	}
 	
-	SLIB_INLINE Time& Time::operator+=(const Time& time)
+	SLIB_INLINE Time& Time::operator+=(const Time& time) noexcept
 	{
 		m_time += time.m_time;
 		return *this;
 	}
 	
-	SLIB_INLINE Time Time::operator-(sl_int64 time) const
+	SLIB_INLINE Time Time::operator-(sl_int64 time) const noexcept
 	{
 		return m_time - time;
 	}
 	
-	SLIB_INLINE Time Time::operator-(const Time& time) const
+	SLIB_INLINE Time Time::operator-(const Time& time) const noexcept
 	{
 		return m_time - time.m_time;
 	}
 	
-	SLIB_INLINE Time& Time::operator-=(sl_int64 time)
+	SLIB_INLINE Time& Time::operator-=(sl_int64 time) noexcept
 	{
 		m_time -= time;
 		return *this;
 	}
 	
-	SLIB_INLINE Time& Time::operator-=(const Time& time)
+	SLIB_INLINE Time& Time::operator-=(const Time& time) noexcept
 	{
 		m_time -= time.m_time;
 		return *this;

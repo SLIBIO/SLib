@@ -39,385 +39,385 @@ namespace slib
 		sl_int64 m_time; // microseconds
 
 	public:
-		constexpr Time() : m_time(0) {}
+		SLIB_INLINE constexpr Time() noexcept: m_time(0) {}
 
-		constexpr Time(const Time& other) : m_time(other.m_time) {}
+		SLIB_INLINE constexpr Time(const Time& other) noexcept: m_time(other.m_time) {}
 
-		constexpr Time(sl_int32 time) : m_time(time) {}
+		SLIB_INLINE constexpr Time(sl_int32 time) noexcept: m_time(time) {}
 
-		constexpr Time(sl_uint32 time) : m_time(time) {}
+		SLIB_INLINE constexpr Time(sl_uint32 time) noexcept: m_time(time) {}
 
-		constexpr Time(sl_int64 time) : m_time(time) {}
+		SLIB_INLINE constexpr Time(sl_int64 time) noexcept: m_time(time) {}
 
-		constexpr Time(sl_uint64 time) : m_time(time) {}
+		SLIB_INLINE constexpr Time(sl_uint64 time) noexcept: m_time(time) {}
 
-		Time(int year, int month, int date);
+		Time(int year, int month, int date) noexcept;
 
-		Time(int year, int month, int date, int hour, int minute, int second);
+		Time(int year, int month, int date, int hour, int minute, int second) noexcept;
 
-		Time(const String& str);
+		Time(const String& str) noexcept;
 
-		Time(const String16& str);
+		Time(const String16& str) noexcept;
 
-		Time(const AtomicString& str);
+		Time(const AtomicString& str) noexcept;
 
-		Time(const AtomicString16& str);
+		Time(const AtomicString16& str) noexcept;
 
-		Time(const sl_char8* str);
+		Time(const sl_char8* str) noexcept;
 
-		Time(const sl_char16* str);
+		Time(const sl_char16* str) noexcept;
 	
 	public:
-		static Time now();
+		static Time now() noexcept;
 
-		constexpr static Time zero()
+		SLIB_INLINE constexpr static Time zero()
 		{
 			return 0;
 		}
 
-		void setZero();
+		void setZero() noexcept;
 
-		constexpr sl_bool isZero() const
+		SLIB_INLINE constexpr sl_bool isZero() const
 		{
 			return m_time == 0;
 		}
 
-		constexpr sl_bool isNotZero() const
+		SLIB_INLINE constexpr sl_bool isNotZero() const
 		{
 			return m_time != 0;
 		}
 
-		sl_int64 toInt() const;
+		sl_int64 toInt() const noexcept;
 	
-		void setInt(sl_int64 time);
+		void setInt(sl_int64 time) noexcept;
 
-		void add(sl_int64 time);
+		void add(sl_int64 time) noexcept;
 
-		void add(const Time& other);
+		void add(const Time& other) noexcept;
 	
 	public:
-		Time& operator=(const Time& other);
+		Time& operator=(const Time& other) noexcept;
 
-		Time& operator=(sl_int32 time);
+		Time& operator=(sl_int32 time) noexcept;
 
-		Time& operator=(sl_uint32 time);
+		Time& operator=(sl_uint32 time) noexcept;
 
-		Time& operator=(sl_int64 time);
+		Time& operator=(sl_int64 time) noexcept;
 
-		Time& operator=(sl_uint64 time);
+		Time& operator=(sl_uint64 time) noexcept;
 
-		Time& operator=(const String& str);
+		Time& operator=(const String& str) noexcept;
 
-		Time& operator=(const String16& str);
+		Time& operator=(const String16& str) noexcept;
 
-		Time& operator=(const AtomicString& str);
+		Time& operator=(const AtomicString& str) noexcept;
 
-		Time& operator=(const AtomicString16& str);
+		Time& operator=(const AtomicString16& str) noexcept;
 
-		Time& operator=(const sl_char8* str);
+		Time& operator=(const sl_char8* str) noexcept;
 
-		Time& operator=(const sl_char16* str);
+		Time& operator=(const sl_char16* str) noexcept;
 	
 
-		sl_bool operator==(const Time& other) const;
+		sl_bool operator==(const Time& other) const noexcept;
 
-		sl_bool operator<=(const Time& other) const;
+		sl_bool operator<=(const Time& other) const noexcept;
 
-		sl_bool operator>=(const Time& other) const;
+		sl_bool operator>=(const Time& other) const noexcept;
 
-		sl_bool operator!=(const Time& other) const;
+		sl_bool operator!=(const Time& other) const noexcept;
 
-		sl_bool operator<(const Time& other) const;
+		sl_bool operator<(const Time& other) const noexcept;
 
-		sl_bool operator>(const Time& other) const;
+		sl_bool operator>(const Time& other) const noexcept;
 	
 
-		Time operator+(sl_int64 time) const;
+		Time operator+(sl_int64 time) const noexcept;
 
-		Time operator+(const Time& time) const;
+		Time operator+(const Time& time) const noexcept;
 
-		Time& operator+=(sl_int64 time);
+		Time& operator+=(sl_int64 time) noexcept;
 
-		Time& operator+=(const Time& time);
+		Time& operator+=(const Time& time) noexcept;
 	
 
-		Time operator-(sl_int64 time) const;
+		Time operator-(sl_int64 time) const noexcept;
 
-		Time operator-(const Time& time) const;
+		Time operator-(const Time& time) const noexcept;
 
-		Time& operator-=(sl_int64 time);
+		Time& operator-=(sl_int64 time) noexcept;
 
-		Time& operator-=(const Time& time);
+		Time& operator-=(const Time& time) noexcept;
 
 	public:
-		void setElements(int year, int month, int date, int hour, int minute, int second);
+		void setElements(int year, int month, int date, int hour, int minute, int second) noexcept;
 
-		void setNow();
+		void setNow() noexcept;
 
-		void setToSystem();
+		void setToSystem() noexcept;
 
-		void getDate(DATE* date) const;
+		void getDate(DATE* date) const noexcept;
 
-		void setDate(int year, int month, int day);
+		void setDate(int year, int month, int day) noexcept;
 
-		int getYear() const;
+		int getYear() const noexcept;
 
-		void setYear(int year);
+		void setYear(int year) noexcept;
 
-		void addYears(int years);
+		void addYears(int years) noexcept;
 
-		int getMonth() const;
+		int getMonth() const noexcept;
 
-		void setMonth(int month);
+		void setMonth(int month) noexcept;
 
-		void addMonths(int months);
+		void addMonths(int months) noexcept;
 
-		int getDay() const;
+		int getDay() const noexcept;
 
-		void setDay(int day);
+		void setDay(int day) noexcept;
 
-		void addDays(sl_int64 days);
+		void addDays(sl_int64 days) noexcept;
 
-		double getDayf() const;
+		double getDayf() const noexcept;
 
-		void setDayf(double day);
+		void setDayf(double day) noexcept;
 
-		void addDaysf(double days);
+		void addDaysf(double days) noexcept;
 
-		int getHour() const;
+		int getHour() const noexcept;
 
-		void setHour(int hour);
+		void setHour(int hour) noexcept;
 
-		void addHours(sl_int64 hours);
+		void addHours(sl_int64 hours) noexcept;
 
-		double getHourf() const;
+		double getHourf() const noexcept;
 
-		void setHourf(double hour);
+		void setHourf(double hour) noexcept;
 
-		void addHoursf(double hours);
+		void addHoursf(double hours) noexcept;
 
-		int getMinute() const;
+		int getMinute() const noexcept;
 
-		void setMinute(int minute);
+		void setMinute(int minute) noexcept;
 
-		void addMinutes(sl_int64 minutes);
+		void addMinutes(sl_int64 minutes) noexcept;
 
-		double getMinutef() const;
+		double getMinutef() const noexcept;
 	
-		void setMinutef(double minute);
+		void setMinutef(double minute) noexcept;
 
-		void addMinutesf(double minutes);
+		void addMinutesf(double minutes) noexcept;
 
-		int getSecond() const;
+		int getSecond() const noexcept;
 
-		void setSecond(int second);
+		void setSecond(int second) noexcept;
 
-		void addSeconds(sl_int64 seconds);
+		void addSeconds(sl_int64 seconds) noexcept;
 
-		double getSecondf() const;
+		double getSecondf() const noexcept;
 
-		void setSecondf(double second);
+		void setSecondf(double second) noexcept;
 
-		void addSecondsf(double seconds);
+		void addSecondsf(double seconds) noexcept;
 
-		int getMillisecond() const;
+		int getMillisecond() const noexcept;
 
-		void setMillisecond(int millis);
+		void setMillisecond(int millis) noexcept;
 
-		void addMilliseconds(sl_int64 millis);
+		void addMilliseconds(sl_int64 millis) noexcept;
 
-		double getMillisecondf() const;
+		double getMillisecondf() const noexcept;
 
-		void setMillisecondf(double millis);
+		void setMillisecondf(double millis) noexcept;
 
-		void addMillisecondsf(double millis);
+		void addMillisecondsf(double millis) noexcept;
 
-		int getMicrosecond() const;
+		int getMicrosecond() const noexcept;
 
-		void setMicrosecond(int micros);
+		void setMicrosecond(int micros) noexcept;
 
-		void addMicroseconds(sl_int64 micros);
+		void addMicroseconds(sl_int64 micros) noexcept;
 
-		double getMicrosecondf() const;
+		double getMicrosecondf() const noexcept;
 	
-		void setMicrosecondf(double micros);
+		void setMicrosecondf(double micros) noexcept;
 
-		void addMicrosecondsf(double micros);
+		void addMicrosecondsf(double micros) noexcept;
 
-		int getDayOfWeek() const;
+		int getDayOfWeek() const noexcept;
 
-		void setDayOfWeek(int day);
+		void setDayOfWeek(int day) noexcept;
 
-		int getDayOfYear() const;
+		int getDayOfYear() const noexcept;
 
-		void setDayOfYear(int day);
+		void setDayOfYear(int day) noexcept;
 
-		sl_int64 getDaysCount() const;
+		sl_int64 getDaysCount() const noexcept;
 
-		void setDaysCount(sl_int64 days);
+		void setDaysCount(sl_int64 days) noexcept;
 
-		double getDaysCountf() const;
+		double getDaysCountf() const noexcept;
 
-		void setDaysCountf(double days);
+		void setDaysCountf(double days) noexcept;
 
-		sl_int64 getHoursCount() const;
+		sl_int64 getHoursCount() const noexcept;
 
-		void setHoursCount(sl_int64 hours);
+		void setHoursCount(sl_int64 hours) noexcept;
 
-		double getHoursCountf() const;
+		double getHoursCountf() const noexcept;
 
-		void setHoursCountf(double hours);
+		void setHoursCountf(double hours) noexcept;
 
-		sl_int64 getMinutesCount() const;
+		sl_int64 getMinutesCount() const noexcept;
 
-		void setMinutesCount(sl_int64 minutes);
+		void setMinutesCount(sl_int64 minutes) noexcept;
 
-		double getMinutesCountf() const;
+		double getMinutesCountf() const noexcept;
 
-		void setMinutesCountf(double minutes);
+		void setMinutesCountf(double minutes) noexcept;
 
-		sl_int64 getSecondsCount() const;
+		sl_int64 getSecondsCount() const noexcept;
 
-		void setSecondsCount(sl_int64 seconds);
+		void setSecondsCount(sl_int64 seconds) noexcept;
 
-		double getSecondsCountf() const;
+		double getSecondsCountf() const noexcept;
 
-		void setSecondsCountf(double seconds);
+		void setSecondsCountf(double seconds) noexcept;
 
-		sl_int64 getMillisecondsCount() const;
+		sl_int64 getMillisecondsCount() const noexcept;
 
-		void setMillisecondsCount(sl_int64 milis);
+		void setMillisecondsCount(sl_int64 milis) noexcept;
 
-		double getMillisecondsCountf() const;
+		double getMillisecondsCountf() const noexcept;
 
-		void setMillisecondsCountf(double milis);
+		void setMillisecondsCountf(double milis) noexcept;
 
-		sl_int64 getMicrosecondsCount() const;
+		sl_int64 getMicrosecondsCount() const noexcept;
 
-		void setMicrosecondsCount(sl_int64 micros);
+		void setMicrosecondsCount(sl_int64 micros) noexcept;
 
-		double getMicrosecondsCountf() const;
+		double getMicrosecondsCountf() const noexcept;
 	
-		void setMicrosecondsCountf(double micros);
-	
-
-		int getDaysCountInMonth() const;
-
-		int getDaysCountInYear() const;
-
-		int getQuarter() const;
-	
-		String getWeekday(sl_bool flagShort = sl_true) const;
-	
-		Time getTimeOnly() const;
-
-
-		String toString() const;
-
-		String16 toString16() const;
-
-		String getDateString() const;
-
-		String16 getDateString16() const;
-
-		String getTimeString() const;
-
-		String16 getTimeString16() const;
-
-		sl_bool setString(const String& str);
-
-		sl_bool setString(const String16& str);
-
-		sl_bool setString(const AtomicString& str);
-
-		sl_bool setString(const AtomicString16& str);
-
-		sl_bool setString(const sl_char8* str);
-
-		sl_bool setString(const sl_char16* str);
-
-		String format(const String& fmt) const;
-
-		String format(const AtomicString& fmt) const;
-
-		String format(const String16& fmt) const;
-
-		String format(const AtomicString16& fmt) const;
-
-		String format(const sl_char8* fmt) const;
-
-		String format(const sl_char16* fmt) const;
+		void setMicrosecondsCountf(double micros) noexcept;
 	
 
-		static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char8* sz, sl_size posStart = 0, sl_size posEnd = SLIB_SIZE_MAX);
+		int getDaysCountInMonth() const noexcept;
 
-		static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char16* sz, sl_size posStart = 0, sl_size posEnd = SLIB_SIZE_MAX);
+		int getDaysCountInYear() const noexcept;
 
-		static sl_bool parseElements(const String& time, sl_int32* outArrayYMDHMS);
+		int getQuarter() const noexcept;
+	
+		String getWeekday(sl_bool flagShort = sl_true) const noexcept;
+	
+		Time getTimeOnly() const noexcept;
 
-		static sl_bool parseElements(const String16& time, sl_int32* outArrayYMDHMS);
 
-		static sl_bool parseElements(const AtomicString& time, sl_int32* outArrayYMDHMS);
+		String toString() const noexcept;
 
-		static sl_bool parseElements(const AtomicString16& time, sl_int32* outArrayYMDHMS);
+		String16 toString16() const noexcept;
 
-		static sl_bool parseElements(const sl_char8* time, sl_int32* outArrayYMDHMS);
+		String getDateString() const noexcept;
 
-		static sl_bool parseElements(const sl_char16* time, sl_int32* outArrayYMDHMS);
+		String16 getDateString16() const noexcept;
+
+		String getTimeString() const noexcept;
+
+		String16 getTimeString16() const noexcept;
+
+		sl_bool setString(const String& str) noexcept;
+
+		sl_bool setString(const String16& str) noexcept;
+
+		sl_bool setString(const AtomicString& str) noexcept;
+
+		sl_bool setString(const AtomicString16& str) noexcept;
+
+		sl_bool setString(const sl_char8* str) noexcept;
+
+		sl_bool setString(const sl_char16* str) noexcept;
+
+		String format(const String& fmt) const noexcept;
+
+		String format(const AtomicString& fmt) const noexcept;
+
+		String format(const String16& fmt) const noexcept;
+
+		String format(const AtomicString16& fmt) const noexcept;
+
+		String format(const sl_char8* fmt) const noexcept;
+
+		String format(const sl_char16* fmt) const noexcept;
+	
+
+		static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char8* sz, sl_size posStart = 0, sl_size posEnd = SLIB_SIZE_MAX) noexcept;
+
+		static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char16* sz, sl_size posStart = 0, sl_size posEnd = SLIB_SIZE_MAX) noexcept;
+
+		static sl_bool parseElements(const String& time, sl_int32* outArrayYMDHMS) noexcept;
+
+		static sl_bool parseElements(const String16& time, sl_int32* outArrayYMDHMS) noexcept;
+
+		static sl_bool parseElements(const AtomicString& time, sl_int32* outArrayYMDHMS) noexcept;
+
+		static sl_bool parseElements(const AtomicString16& time, sl_int32* outArrayYMDHMS) noexcept;
+
+		static sl_bool parseElements(const sl_char8* time, sl_int32* outArrayYMDHMS) noexcept;
+
+		static sl_bool parseElements(const sl_char16* time, sl_int32* outArrayYMDHMS) noexcept;
 
 		template <class ST>
-		static sl_bool parse(const ST& str, Time* _out)
+		static sl_bool parse(const ST& str, Time* _out) noexcept
 		{
 			return Parse(str, _out);
 		}
 
 		template <class ST>
-		sl_bool parse(const ST& str)
+		sl_bool parse(const ST& str) noexcept
 		{
 			return Parse(str, this);
 		}
 
 		/* platform functions */
 	protected:
-		sl_bool _getDate(DATE* date) const;
+		sl_bool _getDate(DATE* date) const noexcept;
 
-		void _setElements(int year, int month, int date, int hour, int minute, int second);
+		void _setElements(int year, int month, int date, int hour, int minute, int second) noexcept;
 
-		void _setNow();
+		void _setNow() noexcept;
 
-		void _setToSystem();
+		void _setToSystem() noexcept;
 
 	};
 	
 	template <>
-	sl_reg Parser<Time, sl_char8>::parse(Time* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd);
+	sl_reg Parser<Time, sl_char8>::parse(Time* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept;
 	
 	template <>
-	sl_reg Parser<Time, sl_char16>::parse(Time* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd);
+	sl_reg Parser<Time, sl_char16>::parse(Time* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept;
 	
 	class SLIB_EXPORT TimeCounter
 	{
 	public:
-		TimeCounter();
+		TimeCounter() noexcept;
 
-		~TimeCounter();
+		~TimeCounter() noexcept;
 	
 	public:
-		Time getTime() const;
+		Time getTime() const noexcept;
 
-		Time getTime(const Time& current) const;
+		Time getTime(const Time& current) const noexcept;
 	
-		sl_uint64 getElapsedMilliseconds() const;
+		sl_uint64 getElapsedMilliseconds() const noexcept;
 
-		sl_uint64 getElapsedMilliseconds(const Time& current) const;
+		sl_uint64 getElapsedMilliseconds(const Time& current) const noexcept;
 	
-		void reset();
+		void reset() noexcept;
 
-		void reset(const Time& current);
+		void reset(const Time& current) noexcept;
 
-		void update();
+		void update() noexcept;
 
-		void update(const Time& current);
+		void update(const Time& current) noexcept;
 
 	protected:
 		Time m_timeLast;
@@ -429,58 +429,58 @@ namespace slib
 	class SLIB_EXPORT TimeKeeper
 	{
 	public:
-		TimeKeeper();
+		TimeKeeper() noexcept;
 
-		~TimeKeeper();
+		~TimeKeeper() noexcept;
 
 	public:
-		void start();
+		void start() noexcept;
 
-		void start(const Time& current);
+		void start(const Time& current) noexcept;
 
-		void startAndSetTime(const Time& initialTimeValue);
+		void startAndSetTime(const Time& initialTimeValue) noexcept;
 
-		void startAndSetTime(const Time& initialTimeValue, const Time& current);
+		void startAndSetTime(const Time& initialTimeValue, const Time& current) noexcept;
 
-		void restart();
+		void restart() noexcept;
 
-		void restart(const Time& current);
+		void restart(const Time& current) noexcept;
 
-		void restartAndSetTime(const Time& initialTimeValue);
+		void restartAndSetTime(const Time& initialTimeValue) noexcept;
 
-		void restartAndSetTime(const Time& initialTimeValue, const Time& current);
+		void restartAndSetTime(const Time& initialTimeValue, const Time& current) noexcept;
 	
-		void stop();
+		void stop() noexcept;
 
-		void resume();
+		void resume() noexcept;
 
-		void resume(const Time& current);
+		void resume(const Time& current) noexcept;
 
-		void pause();
+		void pause() noexcept;
 
-		void pause(const Time& current);
+		void pause(const Time& current) noexcept;
 	
-		Time getTime() const;
+		Time getTime() const noexcept;
 
-		Time getTime(const Time& current) const;
+		Time getTime(const Time& current) const noexcept;
 
-		void setTime(const Time& time);
+		void setTime(const Time& time) noexcept;
 
-		void setTime(const Time& time, const Time& current);
+		void setTime(const Time& time, const Time& current) noexcept;
 
-		void update();
+		void update() noexcept;
 
-		void update(const Time& current);
+		void update(const Time& current) noexcept;
 
-		sl_bool isStarted() const;
+		sl_bool isStarted() const noexcept;
 
-		sl_bool isStopped() const;
+		sl_bool isStopped() const noexcept;
 
-		sl_bool isRunning() const;
+		sl_bool isRunning() const noexcept;
 
-		sl_bool isNotRunning() const;
+		sl_bool isNotRunning() const noexcept;
 	
-		sl_bool isPaused() const;
+		sl_bool isPaused() const noexcept;
 	
 	protected:
 		sl_bool m_flagStarted;
