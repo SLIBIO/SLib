@@ -19,31 +19,31 @@ namespace slib
 
 	SLIB_ALIGN(8) sl_uint8 Color::_zero[4] = {0, 0, 0, 0};
 
-	void Color::setBlueF(float v)
+	void Color::setBlueF(float v) noexcept
 	{
 		sl_int32 n = (sl_int32)(v * 255.0f);
 		b = (sl_uint8)(Math::clamp0_255(n));
 	}
 
-	void Color::setGreenF(float v)
+	void Color::setGreenF(float v) noexcept
 	{
 		sl_int32 n = (sl_int32)(v * 255.0f);
 		g = (sl_uint8)(Math::clamp0_255(n));
 	}
 
-	void Color::setRedF(float v)
+	void Color::setRedF(float v) noexcept
 	{
 		sl_int32 n = (sl_int32)(v * 255.0f);
 		r = (sl_uint8)(Math::clamp0_255(n));
 	}
 
-	void Color::setAlphaF(float v)
+	void Color::setAlphaF(float v) noexcept
 	{
 		sl_int32 n = (sl_int32)(v * 255.0f);
 		a = (sl_uint8)(Math::clamp0_255(n));
 	}
 
-	void Color::blend_PA_NPA(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a)
+	void Color::blend_PA_NPA(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a) noexcept
 	{
 		sl_uint32 _or = r;
 		sl_uint32 _og = g;
@@ -60,12 +60,12 @@ namespace slib
 		a = (sl_uint8)(_oa);
 	}
 
-	void Color::blend_PA_NPA(const Color& src)
+	void Color::blend_PA_NPA(const Color& src) noexcept
 	{
 		blend_PA_NPA(src.r, src.g, src.b, src.a);
 	}
 
-	void Color::blend_PA_PA(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a)
+	void Color::blend_PA_PA(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a) noexcept
 	{
 		sl_uint32 _or = r;
 		sl_uint32 _og = g;
@@ -82,12 +82,12 @@ namespace slib
 		a = (sl_uint8)(oa);
 	}
 
-	void Color::blend_PA_PA(const Color& src)
+	void Color::blend_PA_PA(const Color& src) noexcept
 	{
 		blend_PA_NPA(src.r, src.g, src.b, src.a);
 	}
 
-	void Color::blend_NPA_NPA(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a)
+	void Color::blend_NPA_NPA(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a) noexcept
 	{
 		sl_uint32 _or = r;
 		sl_uint32 _og = g;
@@ -105,12 +105,12 @@ namespace slib
 		a = (sl_uint8)(_oa);
 	}
 
-	void Color::blend_NPA_NPA(const Color& src)
+	void Color::blend_NPA_NPA(const Color& src) noexcept
 	{
 		blend_NPA_NPA(src.r, src.g, src.b, src.a);
 	}
 
-	void Color::blend_NPA_PA(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a)
+	void Color::blend_NPA_PA(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a) noexcept
 	{
 		sl_uint32 _or = r;
 		sl_uint32 _og = g;
@@ -128,12 +128,12 @@ namespace slib
 		a = (sl_uint8)(_oa);
 	}
 
-	void Color::blend_NPA_PA(const Color& src)
+	void Color::blend_NPA_PA(const Color& src) noexcept
 	{
 		blend_NPA_PA(src.r, src.g, src.b, src.a);
 	}
 
-	void Color::convertNPAtoPA()
+	void Color::convertNPAtoPA() noexcept
 	{
 		sl_uint32 _or = r;
 		sl_uint32 _og = g;
@@ -148,7 +148,7 @@ namespace slib
 		b = (sl_uint8)(_ob & 255);
 	}
 
-	void Color::convertPAtoNPA()
+	void Color::convertPAtoNPA() noexcept
 	{
 		sl_uint32 _or = r;
 		sl_uint32 _og = g;
@@ -164,7 +164,7 @@ namespace slib
 	}
 
 
-	String Color::toString() const
+	String Color::toString() const noexcept
 	{
 		return String::format("#%02x%02x%02x%02x", a, r, g, b);
 	}
@@ -177,176 +177,176 @@ namespace slib
  
 */
 		
-#define _MAP_COLOR(NAME) \
+#define PRIV_MAP_COLOR(NAME) \
 		{ \
 			SLIB_STATIC_STRING(_s, #NAME); \
 			mapName.put(_s.toLower(), (sl_uint32)(Color::NAME)); \
 		}
 
-	class _Color_Name_Map
+	class _priv_Color_Name_Map
 	{
 	public:
 		HashTable<String, Color> mapName;
 
 		
-		_Color_Name_Map()
+		_priv_Color_Name_Map() noexcept
 		{
-			_MAP_COLOR(AliceBlue)
-			_MAP_COLOR(AntiqueWhite)
-			_MAP_COLOR(Aqua)
-			_MAP_COLOR(Aquamarine)
-			_MAP_COLOR(Azure)
-			_MAP_COLOR(Beige)
-			_MAP_COLOR(Bisque)
-			_MAP_COLOR(Black)
-			_MAP_COLOR(BlanchedAlmond)
-			_MAP_COLOR(Blue)
-			_MAP_COLOR(BlueViolet)
-			_MAP_COLOR(Brown)
-			_MAP_COLOR(BurlyWood)
-			_MAP_COLOR(CadetBlue)
-			_MAP_COLOR(Chartreuse)
-			_MAP_COLOR(Chocolate)
-			_MAP_COLOR(Coral)
-			_MAP_COLOR(CornflowerBlue)
-			_MAP_COLOR(Cornsilk)
-			_MAP_COLOR(Crimson)
-			_MAP_COLOR(Cyan)
-			_MAP_COLOR(DarkBlue)
-			_MAP_COLOR(DarkCyan)
-			_MAP_COLOR(DarkGoldenrod)
-			_MAP_COLOR(DarkGray)
-			_MAP_COLOR(DarkGreen)
-			_MAP_COLOR(DarkKhaki)
-			_MAP_COLOR(DarkMagenta)
-			_MAP_COLOR(DarkOliveGreen)
-			_MAP_COLOR(DarkOrange)
-			_MAP_COLOR(DarkOrchid)
-			_MAP_COLOR(DarkRed)
-			_MAP_COLOR(DarkSalmon)
-			_MAP_COLOR(DarkSeaGreen)
-			_MAP_COLOR(DarkSlateBlue)
-			_MAP_COLOR(DarkSlateGray)
-			_MAP_COLOR(DarkTurquoise)
-			_MAP_COLOR(DarkViolet)
-			_MAP_COLOR(DeepPink)
-			_MAP_COLOR(DeepSkyBlue)
-			_MAP_COLOR(DimGray)
-			_MAP_COLOR(DodgerBlue)
-			_MAP_COLOR(Firebrick)
-			_MAP_COLOR(FloralWhite)
-			_MAP_COLOR(ForestGreen)
-			_MAP_COLOR(Fuchsia)
-			_MAP_COLOR(Gainsboro)
-			_MAP_COLOR(GhostWhite)
-			_MAP_COLOR(Gold)
-			_MAP_COLOR(Goldenrod)
-			_MAP_COLOR(Gray)
-			_MAP_COLOR(Green)
-			_MAP_COLOR(GreenYellow)
-			_MAP_COLOR(Honeydew)
-			_MAP_COLOR(HotPink)
-			_MAP_COLOR(IndianRed)
-			_MAP_COLOR(Indigo)
-			_MAP_COLOR(Ivory)
-			_MAP_COLOR(Khaki)
-			_MAP_COLOR(Lavender)
-			_MAP_COLOR(LavenderBlush)
-			_MAP_COLOR(LawnGreen)
-			_MAP_COLOR(LemonChiffon)
-			_MAP_COLOR(LightBlue)
-			_MAP_COLOR(LightCoral)
-			_MAP_COLOR(LightCyan)
-			_MAP_COLOR(LightGoldenrodYellow)
-			_MAP_COLOR(LightGray)
-			_MAP_COLOR(LightGreen)
-			_MAP_COLOR(LightPink)
-			_MAP_COLOR(LightSalmon)
-			_MAP_COLOR(LightSeaGreen)
-			_MAP_COLOR(LightSkyBlue)
-			_MAP_COLOR(LightSlateGray)
-			_MAP_COLOR(LightSteelBlue)
-			_MAP_COLOR(LightYellow)
-			_MAP_COLOR(Lime)
-			_MAP_COLOR(LimeGreen)
-			_MAP_COLOR(Linen)
-			_MAP_COLOR(Magenta)
-			_MAP_COLOR(Maroon)
-			_MAP_COLOR(MediumAquamarine)
-			_MAP_COLOR(MediumBlue)
-			_MAP_COLOR(MediumOrchid)
-			_MAP_COLOR(MediumPurple)
-			_MAP_COLOR(MediumSeaGreen)
-			_MAP_COLOR(MediumSlateBlue)
-			_MAP_COLOR(MediumSpringGreen)
-			_MAP_COLOR(MediumTurquoise)
-			_MAP_COLOR(MediumVioletRed)
-			_MAP_COLOR(MidnightBlue)
-			_MAP_COLOR(MintCream)
-			_MAP_COLOR(MistyRose)
-			_MAP_COLOR(Moccasin)
-			_MAP_COLOR(NavajoWhite)
-			_MAP_COLOR(Navy)
-			_MAP_COLOR(OldLace)
-			_MAP_COLOR(Olive)
-			_MAP_COLOR(OliveDrab)
-			_MAP_COLOR(Orange)
-			_MAP_COLOR(OrangeRed)
-			_MAP_COLOR(Orchid)
-			_MAP_COLOR(PaleGoldenrod)
-			_MAP_COLOR(PaleGreen)
-			_MAP_COLOR(PaleTurquoise)
-			_MAP_COLOR(PaleVioletRed)
-			_MAP_COLOR(PapayaWhip)
-			_MAP_COLOR(PeachPuff)
-			_MAP_COLOR(Peru)
-			_MAP_COLOR(Pink)
-			_MAP_COLOR(Plum)
-			_MAP_COLOR(PowderBlue)
-			_MAP_COLOR(Purple)
-			_MAP_COLOR(Red)
-			_MAP_COLOR(RosyBrown)
-			_MAP_COLOR(RoyalBlue)
-			_MAP_COLOR(SaddleBrown)
-			_MAP_COLOR(Salmon)
-			_MAP_COLOR(SandyBrown)
-			_MAP_COLOR(SeaGreen)
-			_MAP_COLOR(SeaShell)
-			_MAP_COLOR(Sienna)
-			_MAP_COLOR(Silver)
-			_MAP_COLOR(SkyBlue)
-			_MAP_COLOR(SlateBlue)
-			_MAP_COLOR(SlateGray)
-			_MAP_COLOR(Snow)
-			_MAP_COLOR(SpringGreen)
-			_MAP_COLOR(SteelBlue)
-			_MAP_COLOR(Tan)
-			_MAP_COLOR(Teal)
-			_MAP_COLOR(Thistle)
-			_MAP_COLOR(Tomato)
-			_MAP_COLOR(Transparent)
-			_MAP_COLOR(Turquoise)
-			_MAP_COLOR(Violet)
-			_MAP_COLOR(Wheat)
-			_MAP_COLOR(White)
-			_MAP_COLOR(WhiteSmoke)
-			_MAP_COLOR(Yellow)
-			_MAP_COLOR(YellowGreen)
-			_MAP_COLOR(Zero)
-			_MAP_COLOR(None)
+			PRIV_MAP_COLOR(AliceBlue)
+			PRIV_MAP_COLOR(AntiqueWhite)
+			PRIV_MAP_COLOR(Aqua)
+			PRIV_MAP_COLOR(Aquamarine)
+			PRIV_MAP_COLOR(Azure)
+			PRIV_MAP_COLOR(Beige)
+			PRIV_MAP_COLOR(Bisque)
+			PRIV_MAP_COLOR(Black)
+			PRIV_MAP_COLOR(BlanchedAlmond)
+			PRIV_MAP_COLOR(Blue)
+			PRIV_MAP_COLOR(BlueViolet)
+			PRIV_MAP_COLOR(Brown)
+			PRIV_MAP_COLOR(BurlyWood)
+			PRIV_MAP_COLOR(CadetBlue)
+			PRIV_MAP_COLOR(Chartreuse)
+			PRIV_MAP_COLOR(Chocolate)
+			PRIV_MAP_COLOR(Coral)
+			PRIV_MAP_COLOR(CornflowerBlue)
+			PRIV_MAP_COLOR(Cornsilk)
+			PRIV_MAP_COLOR(Crimson)
+			PRIV_MAP_COLOR(Cyan)
+			PRIV_MAP_COLOR(DarkBlue)
+			PRIV_MAP_COLOR(DarkCyan)
+			PRIV_MAP_COLOR(DarkGoldenrod)
+			PRIV_MAP_COLOR(DarkGray)
+			PRIV_MAP_COLOR(DarkGreen)
+			PRIV_MAP_COLOR(DarkKhaki)
+			PRIV_MAP_COLOR(DarkMagenta)
+			PRIV_MAP_COLOR(DarkOliveGreen)
+			PRIV_MAP_COLOR(DarkOrange)
+			PRIV_MAP_COLOR(DarkOrchid)
+			PRIV_MAP_COLOR(DarkRed)
+			PRIV_MAP_COLOR(DarkSalmon)
+			PRIV_MAP_COLOR(DarkSeaGreen)
+			PRIV_MAP_COLOR(DarkSlateBlue)
+			PRIV_MAP_COLOR(DarkSlateGray)
+			PRIV_MAP_COLOR(DarkTurquoise)
+			PRIV_MAP_COLOR(DarkViolet)
+			PRIV_MAP_COLOR(DeepPink)
+			PRIV_MAP_COLOR(DeepSkyBlue)
+			PRIV_MAP_COLOR(DimGray)
+			PRIV_MAP_COLOR(DodgerBlue)
+			PRIV_MAP_COLOR(Firebrick)
+			PRIV_MAP_COLOR(FloralWhite)
+			PRIV_MAP_COLOR(ForestGreen)
+			PRIV_MAP_COLOR(Fuchsia)
+			PRIV_MAP_COLOR(Gainsboro)
+			PRIV_MAP_COLOR(GhostWhite)
+			PRIV_MAP_COLOR(Gold)
+			PRIV_MAP_COLOR(Goldenrod)
+			PRIV_MAP_COLOR(Gray)
+			PRIV_MAP_COLOR(Green)
+			PRIV_MAP_COLOR(GreenYellow)
+			PRIV_MAP_COLOR(Honeydew)
+			PRIV_MAP_COLOR(HotPink)
+			PRIV_MAP_COLOR(IndianRed)
+			PRIV_MAP_COLOR(Indigo)
+			PRIV_MAP_COLOR(Ivory)
+			PRIV_MAP_COLOR(Khaki)
+			PRIV_MAP_COLOR(Lavender)
+			PRIV_MAP_COLOR(LavenderBlush)
+			PRIV_MAP_COLOR(LawnGreen)
+			PRIV_MAP_COLOR(LemonChiffon)
+			PRIV_MAP_COLOR(LightBlue)
+			PRIV_MAP_COLOR(LightCoral)
+			PRIV_MAP_COLOR(LightCyan)
+			PRIV_MAP_COLOR(LightGoldenrodYellow)
+			PRIV_MAP_COLOR(LightGray)
+			PRIV_MAP_COLOR(LightGreen)
+			PRIV_MAP_COLOR(LightPink)
+			PRIV_MAP_COLOR(LightSalmon)
+			PRIV_MAP_COLOR(LightSeaGreen)
+			PRIV_MAP_COLOR(LightSkyBlue)
+			PRIV_MAP_COLOR(LightSlateGray)
+			PRIV_MAP_COLOR(LightSteelBlue)
+			PRIV_MAP_COLOR(LightYellow)
+			PRIV_MAP_COLOR(Lime)
+			PRIV_MAP_COLOR(LimeGreen)
+			PRIV_MAP_COLOR(Linen)
+			PRIV_MAP_COLOR(Magenta)
+			PRIV_MAP_COLOR(Maroon)
+			PRIV_MAP_COLOR(MediumAquamarine)
+			PRIV_MAP_COLOR(MediumBlue)
+			PRIV_MAP_COLOR(MediumOrchid)
+			PRIV_MAP_COLOR(MediumPurple)
+			PRIV_MAP_COLOR(MediumSeaGreen)
+			PRIV_MAP_COLOR(MediumSlateBlue)
+			PRIV_MAP_COLOR(MediumSpringGreen)
+			PRIV_MAP_COLOR(MediumTurquoise)
+			PRIV_MAP_COLOR(MediumVioletRed)
+			PRIV_MAP_COLOR(MidnightBlue)
+			PRIV_MAP_COLOR(MintCream)
+			PRIV_MAP_COLOR(MistyRose)
+			PRIV_MAP_COLOR(Moccasin)
+			PRIV_MAP_COLOR(NavajoWhite)
+			PRIV_MAP_COLOR(Navy)
+			PRIV_MAP_COLOR(OldLace)
+			PRIV_MAP_COLOR(Olive)
+			PRIV_MAP_COLOR(OliveDrab)
+			PRIV_MAP_COLOR(Orange)
+			PRIV_MAP_COLOR(OrangeRed)
+			PRIV_MAP_COLOR(Orchid)
+			PRIV_MAP_COLOR(PaleGoldenrod)
+			PRIV_MAP_COLOR(PaleGreen)
+			PRIV_MAP_COLOR(PaleTurquoise)
+			PRIV_MAP_COLOR(PaleVioletRed)
+			PRIV_MAP_COLOR(PapayaWhip)
+			PRIV_MAP_COLOR(PeachPuff)
+			PRIV_MAP_COLOR(Peru)
+			PRIV_MAP_COLOR(Pink)
+			PRIV_MAP_COLOR(Plum)
+			PRIV_MAP_COLOR(PowderBlue)
+			PRIV_MAP_COLOR(Purple)
+			PRIV_MAP_COLOR(Red)
+			PRIV_MAP_COLOR(RosyBrown)
+			PRIV_MAP_COLOR(RoyalBlue)
+			PRIV_MAP_COLOR(SaddleBrown)
+			PRIV_MAP_COLOR(Salmon)
+			PRIV_MAP_COLOR(SandyBrown)
+			PRIV_MAP_COLOR(SeaGreen)
+			PRIV_MAP_COLOR(SeaShell)
+			PRIV_MAP_COLOR(Sienna)
+			PRIV_MAP_COLOR(Silver)
+			PRIV_MAP_COLOR(SkyBlue)
+			PRIV_MAP_COLOR(SlateBlue)
+			PRIV_MAP_COLOR(SlateGray)
+			PRIV_MAP_COLOR(Snow)
+			PRIV_MAP_COLOR(SpringGreen)
+			PRIV_MAP_COLOR(SteelBlue)
+			PRIV_MAP_COLOR(Tan)
+			PRIV_MAP_COLOR(Teal)
+			PRIV_MAP_COLOR(Thistle)
+			PRIV_MAP_COLOR(Tomato)
+			PRIV_MAP_COLOR(Transparent)
+			PRIV_MAP_COLOR(Turquoise)
+			PRIV_MAP_COLOR(Violet)
+			PRIV_MAP_COLOR(Wheat)
+			PRIV_MAP_COLOR(White)
+			PRIV_MAP_COLOR(WhiteSmoke)
+			PRIV_MAP_COLOR(Yellow)
+			PRIV_MAP_COLOR(YellowGreen)
+			PRIV_MAP_COLOR(Zero)
+			PRIV_MAP_COLOR(None)
 		}
 		
-		sl_bool getColorFromName(const String& nameLower, Color& color)
+		sl_bool getColorFromName(const String& nameLower, Color& color) noexcept
 		{
 			return mapName.get(nameLower, &color);
 		}
 		
 	};
 
-	SLIB_SAFE_STATIC_GETTER(_Color_Name_Map, _Color_getNameMap)
+	SLIB_SAFE_STATIC_GETTER(_priv_Color_Name_Map, _priv_Color_getNameMap)
 
 	template <class CT>
-	static sl_reg _Color_parse(Color* _out, const CT* sz, sl_size pos, sl_size len)
+	static sl_reg _priv_Color_parse(Color* _out, const CT* sz, sl_size pos, sl_size len) noexcept
 	{
 		if (pos >= len) {
 			return SLIB_PARSE_ERROR;
@@ -496,7 +496,7 @@ namespace slib
 						s[i] = SLIB_CHAR_UPPER_TO_LOWER(ch);
 					}
 					
-					_Color_Name_Map* nm = _Color_getNameMap();
+					_priv_Color_Name_Map* nm = _priv_Color_getNameMap();
 					if (nm) {
 						Color color;
 						if (nm->getColorFromName(String(s, n), color)) {
@@ -516,17 +516,17 @@ namespace slib
 	template <>
 	sl_reg Parser<Color, sl_char8>::parse(Color* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _Color_parse(_out, sz, posBegin, posEnd);
+		return _priv_Color_parse(_out, sz, posBegin, posEnd);
 	}
 
 	template <>
 	sl_reg Parser<Color, sl_char16>::parse(Color* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd)
 	{
-		return _Color_parse(_out, sz, posBegin, posEnd);
+		return _priv_Color_parse(_out, sz, posBegin, posEnd);
 	}
 
 
-	Color4f ColorMatrix::transformColor(const Color4f& src) const
+	Color4f ColorMatrix::transformColor(const Color4f& src) const noexcept
 	{
 		Color4f ret;
 		ret.x = src.dot(red);
@@ -537,12 +537,12 @@ namespace slib
 		return ret;
 	}
 
-	Color4f ColorMatrix::transformColor(const Color& src) const
+	Color4f ColorMatrix::transformColor(const Color& src) const noexcept
 	{
 		return transformColor((Color4f)src);
 	}
 
-	Color4f ColorMatrix::transformColor(const Color3f& src) const
+	Color4f ColorMatrix::transformColor(const Color3f& src) const noexcept
 	{
 		return transformColor(Color4f(src.x, src.y, src.z, 1));
 	}

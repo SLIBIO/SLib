@@ -183,31 +183,33 @@ namespace slib
 		};
 	
 	public:
-		constexpr Color(): r(0), g(0), b(0), a(0) {}
+		SLIB_INLINE constexpr Color() noexcept:
+		 r(0), g(0), b(0), a(0)
+		{}
 
-		constexpr Color(const Color& other):
+		SLIB_INLINE constexpr Color(const Color& other) noexcept:
 		 r(other.r), g(other.g), b(other.b), a(other.a)
 		{}
 
-		constexpr Color(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a = 255):
+		SLIB_INLINE constexpr Color(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a = 255) noexcept:
 		 r(_r), g(_g), b(_b), a(_a)
 		{}
 
-		constexpr Color(sl_uint32 argb):
+		SLIB_INLINE constexpr Color(sl_uint32 argb) noexcept:
 		 r((sl_uint8)((argb >> 16) & 0xFF)),
 		 g((sl_uint8)((argb >> 8) & 0xFF)),
 		 b((sl_uint8)(argb & 0xFF)),
 		 a((sl_uint8)((argb >> 24) & 0xFF))
 		{}
 
-		constexpr Color(const Color3f& v):
+		SLIB_INLINE constexpr Color(const Color3f& v) noexcept:
 		 r((sl_uint8)(Math::clamp0_255((sl_int32)(v.x * 255)))),
 		 g((sl_uint8)(Math::clamp0_255((sl_int32)(v.y * 255)))),
 		 b((sl_uint8)(Math::clamp0_255((sl_int32)(v.z * 255)))),
 		 a(255)
 		{}
 
-		constexpr Color(const Color4f& v):
+		SLIB_INLINE constexpr Color(const Color4f& v) noexcept:
 		 r((sl_uint8)(Math::clamp0_255((sl_int32)(v.x * 255)))),
 		 g((sl_uint8)(Math::clamp0_255((sl_int32)(v.y * 255)))),
 		 b((sl_uint8)(Math::clamp0_255((sl_int32)(v.z * 255)))),
@@ -215,145 +217,145 @@ namespace slib
 		{}
 	
 	public:
-		static const Color& zero();
+		static const Color& zero() noexcept;
 
-		constexpr sl_bool isZero() const
+		SLIB_INLINE constexpr sl_bool isZero() const noexcept
 		{
 			return r == 0 && g == 0 && b == 0 && a == 0;
 		}
 
-		constexpr sl_bool isNotZero() const
+		SLIB_INLINE constexpr sl_bool isNotZero() const noexcept
 		{
 			return r != 0 || g != 0 || b != 0 || a != 0;
 		}
 
-		void setZero();
+		void setZero() noexcept;
 	
-		constexpr float getBlueF() const
+		SLIB_INLINE constexpr float getBlueF() const noexcept
 		{
 			return (float)(b) / 255.0f;
 		}
 
-		void setBlueF(float v);
+		void setBlueF(float v) noexcept;
 
-		constexpr float getGreenF() const
+		SLIB_INLINE constexpr float getGreenF() const noexcept
 		{
 			return (float)(g) / 255.0f;
 		}
 
-		void setGreenF(float v);
+		void setGreenF(float v) noexcept;
 
-		constexpr float getRedF() const
+		SLIB_INLINE constexpr float getRedF() const noexcept
 		{
 			return (float)(r) / 255.0f;
 		}
 
-		void setRedF(float v);
+		void setRedF(float v) noexcept;
 
-		constexpr float getAlphaF() const
+		SLIB_INLINE constexpr float getAlphaF() const noexcept
 		{
 			return (float)(a) / 255.0f;
 		}
 
-		void setAlphaF(float v);
+		void setAlphaF(float v) noexcept;
 
-		void setRGBA(sl_uint8 r, sl_uint8 g, sl_uint8 b, sl_uint8 a);
+		void setRGBA(sl_uint8 r, sl_uint8 g, sl_uint8 b, sl_uint8 a) noexcept;
 	
-		constexpr sl_uint32 getARGB() const
+		SLIB_INLINE constexpr sl_uint32 getARGB() const noexcept
 		{
 			return ((sl_uint32)(a) << 24) | ((sl_uint32)(r) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(b));
 		}
 	
-		void setARGB(sl_uint32 v);
+		void setARGB(sl_uint32 v) noexcept;
 
-		constexpr sl_uint32 getABGR() const
+		SLIB_INLINE constexpr sl_uint32 getABGR() const noexcept
 		{
 			return ((sl_uint32)(a) << 24) | ((sl_uint32)(b) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(r));
 		}
 
-		void setABGR(sl_uint32 v);
+		void setABGR(sl_uint32 v) noexcept;
 
-		constexpr sl_uint32 getRGB() const
+		SLIB_INLINE constexpr sl_uint32 getRGB() const noexcept
 		{
 			return ((sl_uint32)(r) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(b));
 		}
 	
-		void setRGB(sl_uint8 r, sl_uint8 g, sl_uint8 b);
+		void setRGB(sl_uint8 r, sl_uint8 g, sl_uint8 b) noexcept;
 
-		void setRGB(sl_uint32 v);
+		void setRGB(sl_uint32 v) noexcept;
 	
-		constexpr sl_uint32 getBGR() const
+		SLIB_INLINE constexpr sl_uint32 getBGR() const noexcept
 		{
 			return ((sl_uint32)(b) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(r));
 		}
 	
-		void setBGR(sl_uint32 v);
+		void setBGR(sl_uint32 v) noexcept;
 
 
 		// assume that` dst is premultiplied alpha, and src is non-premultiplied alpha
-		void blend_PA_NPA(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a);
+		void blend_PA_NPA(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a) noexcept;
 	
 		// assume that dst is premultiplied alpha, and src is non-premultiplied alpha
-		void blend_PA_NPA(const Color& src);
+		void blend_PA_NPA(const Color& src) noexcept;
 	
 		// assume that dst is premultiplied alpha, and src is premultiplied alpha
-		void blend_PA_PA(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a);
+		void blend_PA_PA(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a) noexcept;
 	
 		// assume that dst is premultiplied alpha, and src is premultiplied alpha
-		void blend_PA_PA(const Color& src);
+		void blend_PA_PA(const Color& src) noexcept;
 	
 		// assume that dst is non-premultiplied alpha, and src is non-premultiplied alpha
-		void blend_NPA_NPA(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a);
+		void blend_NPA_NPA(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a) noexcept;
 
 		// assume that dst is non-premultiplied alpha, and src is non-premultiplied alpha
-		void blend_NPA_NPA(const Color& src);
+		void blend_NPA_NPA(const Color& src) noexcept;
 	
 		// assume that dst is non-premultiplied alpha, and src is premultiplied alpha
-		void blend_NPA_PA(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a);
+		void blend_NPA_PA(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a) noexcept;
 	
 		// assume that dst is non-premultiplied alpha, and src is premultiplied alpha
-		void blend_NPA_PA(const Color& src);
+		void blend_NPA_PA(const Color& src) noexcept;
 	
 	
-		void convertNPAtoPA();
+		void convertNPAtoPA() noexcept;
 	
-		void convertPAtoNPA();
+		void convertPAtoNPA() noexcept;
 
 
-		String toString() const;
+		String toString() const noexcept;
 
 
 		template <class ST>
-		static sl_bool parse(const ST& str, Color* _out)
+		static sl_bool parse(const ST& str, Color* _out) noexcept
 		{
 			return Parse(str, _out);
 		}
 
 		template <class ST>
-		sl_bool parse(const ST& str)
+		sl_bool parse(const ST& str) noexcept
 		{
 			return Parse(str, this);
 		}
 
 	public:
-		SLIB_INLINE Color& operator=(const Color& other) = default;
+		Color& operator=(const Color& other) noexcept;
 
-		constexpr sl_bool operator==(const Color& other) const
+		SLIB_INLINE constexpr sl_bool operator==(const Color& other) const noexcept
 		{
 			return r == other.r && g == other.g && b == other.b && a == other.a;
 		}
 
-		constexpr sl_bool operator!=(const Color& other) const
+		SLIB_INLINE constexpr sl_bool operator!=(const Color& other) const noexcept
 		{
 			return r != other.r || g != other.g || b != other.b || a != other.a;
 		}
 
-		constexpr operator Color3f() const
+		SLIB_INLINE constexpr operator Color3f() const noexcept
 		{
 			return Color3f((sl_real)(r) / 255, (sl_real)(g) / 255, (sl_real)(b) / 255);
 		}
 
-		constexpr operator Color4f() const
+		SLIB_INLINE constexpr operator Color4f() const noexcept
 		{
 			return Color4f((sl_real)(r) / 255, (sl_real)(g) / 255, (sl_real)(b) / 255, (sl_real)(a) / 255);
 		}
@@ -386,9 +388,9 @@ namespace slib
 		 d.a = dot(s, alpha)
 		 d = d + bias
 		 */
-		Color4f transformColor(const Color4f& s) const;
-		Color4f transformColor(const Color& s) const;
-		Color4f transformColor(const Color3f& s) const;
+		Color4f transformColor(const Color4f& s) const noexcept;
+		Color4f transformColor(const Color& s) const noexcept;
+		Color4f transformColor(const Color3f& s) const noexcept;
 
 	};
 
