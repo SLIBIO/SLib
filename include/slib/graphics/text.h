@@ -32,6 +32,40 @@ namespace slib
 		Attach = 100
 	};
 	
+	typedef sl_size sl_text_pos;
+	
+#define SLIB_TEXT_RANGE_NOT_FOUND SLIB_SIZE_MAX
+	
+	class SLIB_EXPORT TextRange
+	{
+	public:
+		sl_text_pos location;
+		sl_text_pos length;
+		
+	public:
+		SLIB_INLINE constexpr TextRange() noexcept : location(SLIB_TEXT_RANGE_NOT_FOUND), length(0) {}
+		
+		SLIB_INLINE constexpr TextRange(sl_null_t) noexcept : location(SLIB_TEXT_RANGE_NOT_FOUND), length(0) {}
+		
+		SLIB_INLINE constexpr TextRange(sl_text_pos _location, sl_text_pos _length) noexcept : location(_location), length(_length) {}
+		
+		SLIB_INLINE constexpr TextRange(const TextRange& other) noexcept : location(other.location), length(other.length) {};
+		
+	public:
+		SLIB_INLINE TextRange& operator=(const TextRange& other) noexcept
+		{
+			location = other.location;
+			length = other.length;
+			return *this;
+		}
+		
+		SLIB_INLINE constexpr sl_bool isNotFound() const noexcept
+		{
+			return location == SLIB_TEXT_RANGE_NOT_FOUND;
+		}
+		
+	};
+	
 	class SLIB_EXPORT TextStyle : public Referable
 	{
 	public:
@@ -40,9 +74,9 @@ namespace slib
 		Color backgroundColor;
 		
 	public:
-		TextStyle();
+		TextStyle() noexcept;
 		
-		~TextStyle();
+		~TextStyle() noexcept;
 
 	};
 	
@@ -51,28 +85,28 @@ namespace slib
 		SLIB_DECLARE_OBJECT
 
 	protected:
-		TextItem(TextItemType type);
+		TextItem(TextItemType type) noexcept;
 
-		~TextItem();
+		~TextItem() noexcept;
 	
 	public:
-		TextItemType getType();
+		TextItemType getType() noexcept;
 		
-		Ref<TextStyle> getStyle();
+		Ref<TextStyle> getStyle() noexcept;
 		
-		void setStyle(const Ref<TextStyle>& style);
+		void setStyle(const Ref<TextStyle>& style) noexcept;
 		
-		Ref<Font> getFont();
+		Ref<Font> getFont() noexcept;
 	
-		Point getLayoutPosition();
+		Point getLayoutPosition() noexcept;
 
-		void setLayoutPosition(const Point& pt);
+		void setLayoutPosition(const Point& pt) noexcept;
 
-		Size getLayoutSize();
+		Size getLayoutSize() noexcept;
 
-		void setLayoutSize(const Size& size);
+		void setLayoutSize(const Size& size) noexcept;
 
-		Rectangle getLayoutFrame();
+		Rectangle getLayoutFrame() noexcept;
 
 	protected:
 		TextItemType m_type;
@@ -87,19 +121,19 @@ namespace slib
 		SLIB_DECLARE_OBJECT
 
 	private:
-		TextWordItem();
+		TextWordItem() noexcept;
 
-		~TextWordItem();
-
-	public:
-		static Ref<TextWordItem> create(const String16& text, const Ref<TextStyle>& style);
+		~TextWordItem() noexcept;
 
 	public:
-		String16 getText();
+		static Ref<TextWordItem> create(const String16& text, const Ref<TextStyle>& style) noexcept;
 
-		void setText(const String16& text);
+	public:
+		String16 getText() noexcept;
 
-		Size getSize();
+		void setText(const String16& text) noexcept;
+
+		Size getSize() noexcept;
 		
 	private:
 		AtomicString16 m_text;
@@ -116,15 +150,15 @@ namespace slib
 		SLIB_DECLARE_OBJECT
 
 	private:
-		TextSpaceItem();
+		TextSpaceItem() noexcept;
 
-		~TextSpaceItem();
-
-	public:
-		static Ref<TextSpaceItem> create(const Ref<TextStyle>& style);
+		~TextSpaceItem() noexcept;
 
 	public:
-		Size getSize();
+		static Ref<TextSpaceItem> create(const Ref<TextStyle>& style) noexcept;
+
+	public:
+		Size getSize() noexcept;
 
 	};
 	
@@ -133,15 +167,15 @@ namespace slib
 		SLIB_DECLARE_OBJECT
 
 	private:
-		TextTabItem();
+		TextTabItem() noexcept;
 
-		~TextTabItem();
-
-	public:
-		static Ref<TextTabItem> create(const Ref<TextStyle>& style);
+		~TextTabItem() noexcept;
 
 	public:
-		sl_real getHeight();
+		static Ref<TextTabItem> create(const Ref<TextStyle>& style) noexcept;
+
+	public:
+		sl_real getHeight() noexcept;
 
 	};
 	
@@ -150,15 +184,15 @@ namespace slib
 		SLIB_DECLARE_OBJECT
 
 	private:
-		TextLineBreakItem();
+		TextLineBreakItem() noexcept;
 
-		~TextLineBreakItem();
-
-	public:
-		static Ref<TextLineBreakItem> create(const Ref<TextStyle>& style);
+		~TextLineBreakItem() noexcept;
 
 	public:
-		sl_real getHeight();
+		static Ref<TextLineBreakItem> create(const Ref<TextStyle>& style) noexcept;
+
+	public:
+		sl_real getHeight() noexcept;
 
 	};
 	
@@ -168,14 +202,14 @@ namespace slib
 		SLIB_DECLARE_OBJECT
 
 	public:
-		TextAttachItem();
+		TextAttachItem() noexcept;
 
-		~TextAttachItem();
+		~TextAttachItem() noexcept;
 
 	public:
-		virtual Size getSize() = 0;
+		virtual Size getSize() noexcept = 0;
 
-		virtual void setPosition(const Point& pos) = 0;
+		virtual void setPosition(const Point& pos) noexcept = 0;
 
 	};
 	
@@ -189,9 +223,9 @@ namespace slib
 		MultiLineMode multiLineMode;
 
 	public:
-		TextParagraphLayoutParam();
+		TextParagraphLayoutParam() noexcept;
 
-		~TextParagraphLayoutParam();
+		~TextParagraphLayoutParam() noexcept;
 
 	};
 	
@@ -200,26 +234,30 @@ namespace slib
 		SLIB_DECLARE_OBJECT
 
 	public:
-		TextParagraph();
+		TextParagraph() noexcept;
 
-		~TextParagraph();
+		~TextParagraph() noexcept;
 
 	public:
-		void addText(const String16& text, const Ref<TextStyle>& style);
+		void addText(const String16& text, const Ref<TextStyle>& style) noexcept;
 
-		void layout(const TextParagraphLayoutParam& param);
+		void layout(const TextParagraphLayoutParam& param) noexcept;
 
-		void draw(Canvas* canvas, sl_real x, sl_real y);
+		void draw(Canvas* canvas, sl_real x, sl_real y) noexcept;
 
-		sl_real getMaximumWidth();
+		sl_real getMaximumWidth() noexcept;
 
-		sl_real getTotalHeight();
+		sl_real getTotalHeight() noexcept;
+		
+		sl_real getPositionLength() noexcept;
 
 	protected:
 		CList< Ref<TextItem> > m_items;
 		CList< Ref<TextItem> > m_layoutItems;
 		sl_real m_maxWidth;
 		sl_real m_totalHeight;
+		
+		sl_real m_positionLength;
 
 	};
 	
@@ -228,18 +266,18 @@ namespace slib
 		SLIB_DECLARE_OBJECT
 
 	public:
-		SimpleTextBox();
+		SimpleTextBox() noexcept;
 
-		~SimpleTextBox();
+		~SimpleTextBox() noexcept;
 
 	public:
-		void update(const String& text, const Ref<Font>& font, sl_real width, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, const Alignment& align);
+		void update(const String& text, const Ref<Font>& font, sl_real width, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, const Alignment& align) noexcept;
 
-		void draw(Canvas* canvas, const String& text, const Ref<Font>& font, const Rectangle& frame, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, const Alignment& align, const Color& color);
+		void draw(Canvas* canvas, const String& text, const Ref<Font>& font, const Rectangle& frame, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, const Alignment& align, const Color& color) noexcept;
 
-		sl_real getContentWidth();
+		sl_real getContentWidth() noexcept;
 
-		sl_real getContentHeight();
+		sl_real getContentHeight() noexcept;
 
 	protected:
 		Ref<TextParagraph> m_paragraph;

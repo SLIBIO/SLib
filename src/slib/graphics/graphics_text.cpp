@@ -15,41 +15,41 @@
 namespace slib
 {
 
-	TextStyle::TextStyle() : textColor(Color::Zero), backgroundColor(Color::Zero)
+	TextStyle::TextStyle() noexcept : textColor(Color::Zero), backgroundColor(Color::Zero)
 	{
 	}
 	
-	TextStyle::~TextStyle()
+	TextStyle::~TextStyle() noexcept
 	{
 	}
 	
 	SLIB_DEFINE_OBJECT(TextItem, Object)
 
-	TextItem::TextItem(TextItemType type)
+	TextItem::TextItem(TextItemType type) noexcept
 	 : m_type(type), m_layoutPosition(0, 0), m_layoutSize(0, 0)
 	{
 	}
 
-	TextItem::~TextItem()
+	TextItem::~TextItem() noexcept
 	{
 	}
 
-	TextItemType TextItem::getType()
+	TextItemType TextItem::getType() noexcept
 	{
 		return m_type;
 	}
 	
-	Ref<TextStyle> TextItem::getStyle()
+	Ref<TextStyle> TextItem::getStyle() noexcept
 	{
 		return m_style;
 	}
 	
-	void TextItem::setStyle(const Ref<TextStyle>& style)
+	void TextItem::setStyle(const Ref<TextStyle>& style) noexcept
 	{
 		m_style = style;
 	}
 	
-	Ref<Font> TextItem::getFont()
+	Ref<Font> TextItem::getFont() noexcept
 	{
 		Ref<TextStyle> style = m_style;
 		if (style.isNotNull()) {
@@ -58,27 +58,27 @@ namespace slib
 		return sl_null;
 	}
 
-	Point TextItem::getLayoutPosition()
+	Point TextItem::getLayoutPosition() noexcept
 	{
 		return m_layoutPosition;
 	}
 
-	void TextItem::setLayoutPosition(const Point& pt)
+	void TextItem::setLayoutPosition(const Point& pt) noexcept
 	{
 		m_layoutPosition = pt;
 	}
 
-	Size TextItem::getLayoutSize()
+	Size TextItem::getLayoutSize() noexcept
 	{
 		return m_layoutSize;
 	}
 
-	void TextItem::setLayoutSize(const Size& size)
+	void TextItem::setLayoutSize(const Size& size) noexcept
 	{
 		m_layoutSize = size;
 	}
 
-	Rectangle TextItem::getLayoutFrame()
+	Rectangle TextItem::getLayoutFrame() noexcept
 	{
 		return Rectangle(m_layoutPosition.x, m_layoutPosition.y, m_layoutPosition.x + m_layoutSize.x, m_layoutPosition.y + m_layoutSize.y);
 	}
@@ -86,18 +86,18 @@ namespace slib
 
 	SLIB_DEFINE_OBJECT(TextWordItem, TextItem)
 
-	TextWordItem::TextWordItem()
-	: TextItem(TextItemType::Word)
+	TextWordItem::TextWordItem() noexcept
+	 : TextItem(TextItemType::Word)
 	{
 		m_widthCached = 0;
 		m_heightCached = 0;
 	}
 
-	TextWordItem::~TextWordItem()
+	TextWordItem::~TextWordItem() noexcept
 	{
 	}
 
-	Ref<TextWordItem> TextWordItem::create(const String16& text, const Ref<TextStyle>& style)
+	Ref<TextWordItem> TextWordItem::create(const String16& text, const Ref<TextStyle>& style) noexcept
 	{
 		if (style.isNotNull()) {
 			Ref<TextWordItem> ret = new TextWordItem;
@@ -110,17 +110,17 @@ namespace slib
 		return sl_null;
 	}
 
-	String16 TextWordItem::getText()
+	String16 TextWordItem::getText() noexcept
 	{
 		return m_text;
 	}
 
-	void TextWordItem::setText(const String16& text)
+	void TextWordItem::setText(const String16& text) noexcept
 	{
 		m_text = text;
 	}
 
-	Size TextWordItem::getSize()
+	Size TextWordItem::getSize() noexcept
 	{
 		ObjectLocker lock(this);
 		
@@ -148,16 +148,16 @@ namespace slib
 	
 	SLIB_DEFINE_OBJECT(TextSpaceItem, TextItem)
 
-	TextSpaceItem::TextSpaceItem()
-	: TextItem(TextItemType::Space)
+	TextSpaceItem::TextSpaceItem() noexcept
+	 : TextItem(TextItemType::Space)
 	{
 	}
 
-	TextSpaceItem::~TextSpaceItem()
+	TextSpaceItem::~TextSpaceItem() noexcept
 	{
 	}
 
-	Ref<TextSpaceItem> TextSpaceItem::create(const Ref<TextStyle>& style)
+	Ref<TextSpaceItem> TextSpaceItem::create(const Ref<TextStyle>& style) noexcept
 	{
 		if (style.isNotNull()) {
 			Ref<TextSpaceItem> ret = new TextSpaceItem;
@@ -169,7 +169,7 @@ namespace slib
 		return sl_null;
 	}
 
-	Size TextSpaceItem::getSize()
+	Size TextSpaceItem::getSize() noexcept
 	{
 		Ref<Font> font = getFont();
 		if (font.isNotNull()) {
@@ -183,16 +183,16 @@ namespace slib
 
 	SLIB_DEFINE_OBJECT(TextTabItem, TextItem)
 
-	TextTabItem::TextTabItem()
-	: TextItem(TextItemType::Tab)
+	TextTabItem::TextTabItem() noexcept
+	 : TextItem(TextItemType::Tab)
 	{
 	}
 
-	TextTabItem::~TextTabItem()
+	TextTabItem::~TextTabItem() noexcept
 	{
 	}
 
-	Ref<TextTabItem> TextTabItem::create(const Ref<TextStyle>& style)
+	Ref<TextTabItem> TextTabItem::create(const Ref<TextStyle>& style) noexcept
 	{
 		if (style.isNotNull()) {
 			Ref<TextTabItem> ret = new TextTabItem;
@@ -204,7 +204,7 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_real TextTabItem::getHeight()
+	sl_real TextTabItem::getHeight() noexcept
 	{
 		Ref<Font> font = getFont();
 		if (font.isNotNull()) {
@@ -217,16 +217,16 @@ namespace slib
 
 	SLIB_DEFINE_OBJECT(TextLineBreakItem, TextItem)
 
-	TextLineBreakItem::TextLineBreakItem()
-	: TextItem(TextItemType::LineBreak)
+	TextLineBreakItem::TextLineBreakItem() noexcept
+	 : TextItem(TextItemType::LineBreak)
 	{
 	}
 
-	TextLineBreakItem::~TextLineBreakItem()
+	TextLineBreakItem::~TextLineBreakItem() noexcept
 	{
 	}
 
-	Ref<TextLineBreakItem> TextLineBreakItem::create(const Ref<TextStyle>& style)
+	Ref<TextLineBreakItem> TextLineBreakItem::create(const Ref<TextStyle>& style) noexcept
 	{
 		if (style.isNotNull()) {
 			Ref<TextLineBreakItem> ret = new TextLineBreakItem;
@@ -238,7 +238,7 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_real TextLineBreakItem::getHeight()
+	sl_real TextLineBreakItem::getHeight() noexcept
 	{
 		Ref<Font> font = getFont();
 		if (font.isNotNull()) {
@@ -251,17 +251,17 @@ namespace slib
 
 	SLIB_DEFINE_OBJECT(TextAttachItem, TextItem)
 
-	TextAttachItem::TextAttachItem()
-	: TextItem(TextItemType::Attach)
+	TextAttachItem::TextAttachItem() noexcept
+	 : TextItem(TextItemType::Attach)
 	{
 	}
 
-	TextAttachItem::~TextAttachItem()
+	TextAttachItem::~TextAttachItem() noexcept
 	{
 	}
 
 
-	TextParagraphLayoutParam::TextParagraphLayoutParam()
+	TextParagraphLayoutParam::TextParagraphLayoutParam() noexcept
 	{
 		width = 1;
 		tabWidth = 1;
@@ -270,23 +270,25 @@ namespace slib
 		multiLineMode = MultiLineMode::Single;
 	}
 
-	TextParagraphLayoutParam::~TextParagraphLayoutParam()
+	TextParagraphLayoutParam::~TextParagraphLayoutParam() noexcept
 	{
 	}
 
 	SLIB_DEFINE_OBJECT(TextParagraph, Object)
 
-	TextParagraph::TextParagraph()
+	TextParagraph::TextParagraph() noexcept
 	{
 		m_maxWidth = 0;
 		m_totalHeight = 0;
+		
+		m_positionLength = 0;
 	}
 
-	TextParagraph::~TextParagraph()
+	TextParagraph::~TextParagraph() noexcept
 	{
 	}
 
-	void TextParagraph::addText(const String16& text, const Ref<TextStyle>& style)
+	void TextParagraph::addText(const String16& text, const Ref<TextStyle>& style) noexcept
 	{
 		if (text.isEmpty()) {
 			return;
@@ -308,22 +310,26 @@ namespace slib
 					Ref<TextWordItem> item = TextWordItem::create(String16(sz + startWord, pos - startWord), style);
 					if (item.isNotNull()) {
 						m_items.add_NoLock(item);
+						m_positionLength += pos - startWord;
 					}
 				}
 				if (ch == ' ') {
 					Ref<TextSpaceItem> item = TextSpaceItem::create(style);
 					if (item.isNotNull()) {
 						m_items.add_NoLock(item);
+						m_positionLength++;
 					}
 				} else if (ch == '\t') {
 					Ref<TextTabItem> item = TextTabItem::create(style);
 					if (item.isNotNull()) {
 						m_items.add_NoLock(item);
+						m_positionLength++;
 					}
 				} else if (ch == '\r' || ch == '\n') {
 					Ref<TextLineBreakItem> item = TextLineBreakItem::create(style);
 					if (item.isNotNull()) {
 						m_items.add_NoLock(item);
+						m_positionLength++;
 					}
 					if (ch == '\r' && pos + 1 < len) {
 						if (sz[pos + 1] == '\n') {
@@ -339,11 +345,13 @@ namespace slib
 			Ref<TextWordItem> item = TextWordItem::create(text, style);
 			if (item.isNotNull()) {
 				m_items.add_NoLock(item);
+				m_positionLength += len;
 			}
 		} else if (startWord < len) {
 			Ref<TextWordItem> item = TextWordItem::create(String16(sz + startWord, len - startWord), style);
 			if (item.isNotNull()) {
 				m_items.add_NoLock(item);
+				m_positionLength += len - startWord;
 			}
 		}
 	}
@@ -369,7 +377,7 @@ namespace slib
 		sl_real m_maxWidth;
 		
 	public:
-		_priv_TextParagraph_Layouter(CList< Ref<TextItem> >* layoutItems, const TextParagraphLayoutParam& param)
+		_priv_TextParagraph_Layouter(CList< Ref<TextItem> >* layoutItems, const TextParagraphLayoutParam& param) noexcept
 		{
 			m_layoutItems = layoutItems;
 			m_layoutWidth = param.width;
@@ -387,7 +395,7 @@ namespace slib
 			m_maxWidth = 0;
 		}
 		
-		void endLine()
+		void endLine() noexcept
 		{
 			sl_size n = m_lineItems.getCount();
 			if (n == 0) {
@@ -426,7 +434,7 @@ namespace slib
 			m_lineHeight = 0;
 		}
 		
-		void breakWord(TextWordItem* breakItem)
+		void breakWord(TextWordItem* breakItem) noexcept
 		{
 			Ref<TextStyle> style = breakItem->getStyle();
 			if (style.isNull()) {
@@ -512,7 +520,7 @@ namespace slib
 			}
 		}
 		
-		sl_size processWords(Ref<TextItem>* items, sl_size nItems)
+		sl_size processWords(Ref<TextItem>* items, sl_size nItems) noexcept
 		{
 			sl_real x = 0;
 			sl_real height = 0;
@@ -580,7 +588,7 @@ namespace slib
 			return nWords - 1;
 		}
 		
-		void processSpace(TextSpaceItem* item)
+		void processSpace(TextSpaceItem* item) noexcept
 		{
 			Size size = item->getSize();
 			if (size.y > m_lineHeight) {
@@ -591,7 +599,7 @@ namespace slib
 			m_x += size.x;
 		}
 		
-		void processTab(TextTabItem* item)
+		void processTab(TextTabItem* item) noexcept
 		{
 			sl_real h = item->getHeight();
 			if (h > m_lineHeight) {
@@ -604,7 +612,7 @@ namespace slib
 			m_x = tabX;
 		}
 		
-		void processLineBreak(TextLineBreakItem* item)
+		void processLineBreak(TextLineBreakItem* item) noexcept
 		{
 			sl_real h = item->getHeight();
 			if (h > m_lineHeight) {
@@ -618,7 +626,7 @@ namespace slib
 			}
 		}
 		
-		void processAttach(TextAttachItem* item)
+		void processAttach(TextAttachItem* item) noexcept
 		{
 			Size size = item->getSize();
 			if (size.y > m_lineHeight) {
@@ -630,7 +638,7 @@ namespace slib
 			m_lineWidth = m_x;
 		}
 
-		void layout(CList< Ref<TextItem> >* list)
+		void layout(CList< Ref<TextItem> >* list) noexcept
 		{
 			sl_size n = list->getCount();
 			Ref<TextItem>* items = list->getData();
@@ -675,7 +683,7 @@ namespace slib
 		
 	};
 
-	void TextParagraph::layout(const TextParagraphLayoutParam& param)
+	void TextParagraph::layout(const TextParagraphLayoutParam& param) noexcept
 	{
 		ObjectLocker lock(this);
 
@@ -696,7 +704,7 @@ namespace slib
 		
 	}
 
-	void TextParagraph::draw(Canvas* canvas, sl_real x, sl_real y)
+	void TextParagraph::draw(Canvas* canvas, sl_real x, sl_real y) noexcept
 	{
 		Rectangle rc = canvas->getInvalidatedRect();
 		
@@ -726,20 +734,25 @@ namespace slib
 		}
 	}
 
-	sl_real TextParagraph::getMaximumWidth()
+	sl_real TextParagraph::getMaximumWidth() noexcept
 	{
 		return m_maxWidth;
 	}
 
-	sl_real TextParagraph::getTotalHeight()
+	sl_real TextParagraph::getTotalHeight() noexcept
 	{
 		return m_totalHeight;
+	}
+	
+	sl_real TextParagraph::getPositionLength() noexcept
+	{
+		return m_positionLength;
 	}
 
 
 	SLIB_DEFINE_OBJECT(SimpleTextBox, Object)
 
-	SimpleTextBox::SimpleTextBox()
+	SimpleTextBox::SimpleTextBox() noexcept
 	{
 		m_width = 0;
 		m_multiLineMode = MultiLineMode::Single;
@@ -751,11 +764,11 @@ namespace slib
 		m_style = new TextStyle;
 	}
 
-	SimpleTextBox::~SimpleTextBox()
+	SimpleTextBox::~SimpleTextBox() noexcept
 	{
 	}
 
-	void SimpleTextBox::update(const String& text, const Ref<Font>& font, sl_real width, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, const Alignment& _align)
+	void SimpleTextBox::update(const String& text, const Ref<Font>& font, sl_real width, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, const Alignment& _align) noexcept
 	{
 		ObjectLocker lock(this);
 		
@@ -825,7 +838,7 @@ namespace slib
 		}
 	}
 
-	void SimpleTextBox::draw(Canvas* canvas, const String& text, const Ref<Font>& font, const Rectangle& frame, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, const Alignment& align, const Color& color)
+	void SimpleTextBox::draw(Canvas* canvas, const String& text, const Ref<Font>& font, const Rectangle& frame, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, const Alignment& align, const Color& color) noexcept
 	{
 		if (color.isZero()) {
 			return;
@@ -853,12 +866,12 @@ namespace slib
 		}
 	}
 
-	sl_real SimpleTextBox::getContentWidth()
+	sl_real SimpleTextBox::getContentWidth() noexcept
 	{
 		return m_contentWidth;
 	}
 
-	sl_real SimpleTextBox::getContentHeight()
+	sl_real SimpleTextBox::getContentHeight() noexcept
 	{
 		return m_contentHeight;
 	}
