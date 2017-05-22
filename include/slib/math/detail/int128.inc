@@ -11,24 +11,29 @@
 namespace slib
 {
 
-	SLIB_INLINE Uint128& Uint128::operator=(const Uint128& other) = default;
-	
-	SLIB_INLINE const Uint128& Uint128::zero()
+	SLIB_INLINE Uint128& Uint128::operator=(const Uint128& other) noexcept
 	{
-		return *((Uint128*)((void*)_zero));
+		low = other.low;
+		high = other.high;
+		return *this;
 	}
 	
-	SLIB_INLINE void Uint128::setZero()
-	{
-		high = 0;
-		low = 0;
-	}
-	
-	SLIB_INLINE Uint128& Uint128::operator=(sl_uint64 num)
+	SLIB_INLINE Uint128& Uint128::operator=(sl_uint64 num) noexcept
 	{
 		high = 0;
 		low = num;
 		return *this;
+	}
+
+	SLIB_INLINE const Uint128& Uint128::zero() noexcept
+	{
+		return *((Uint128*)((void*)_zero));
+	}
+	
+	SLIB_INLINE void Uint128::setZero() noexcept
+	{
+		high = 0;
+		low = 0;
 	}
 
 }

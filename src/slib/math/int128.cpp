@@ -22,7 +22,7 @@ namespace slib
 
 	SLIB_ALIGN(8) const sl_uint64 Uint128::_zero[2] = { 0, 0 };
 
-	int Uint128::compare(const Uint128& other) const
+	int Uint128::compare(const Uint128& other) const noexcept
 	{
 		if (high > other.high) {
 			return 1;
@@ -33,7 +33,7 @@ namespace slib
 		return (low < other.low) ? -1 : (low > other.low);
 	}
 
-	sl_bool Uint128::div(const Uint128& a, const Uint128& b, Uint128* quotient, Uint128* remainder)
+	sl_bool Uint128::div(const Uint128& a, const Uint128& b, Uint128* quotient, Uint128* remainder) noexcept
 	{
 		if (b.isZero()) {
 			return sl_false;
@@ -85,7 +85,7 @@ namespace slib
 		return sl_true;
 	}
 
-	Uint128 Uint128::div(const Uint128& other) const
+	Uint128 Uint128::div(const Uint128& other) const noexcept
 	{
 		Uint128 ret;
 		if (div(*this, other, &ret, sl_null)) {
@@ -95,7 +95,7 @@ namespace slib
 		}
 	}
 
-	Uint128 Uint128::div(sl_uint64 num) const
+	Uint128 Uint128::div(sl_uint64 num) const noexcept
 	{
 		Uint128 ret;
 		if (div(*this, num, &ret, sl_null)) {
@@ -105,7 +105,7 @@ namespace slib
 		}
 	}
 
-	Uint128 Uint128::mod(const Uint128& other) const
+	Uint128 Uint128::mod(const Uint128& other) const noexcept
 	{
 		Uint128 ret;
 		if (div(*this, other, sl_null, &ret)) {
@@ -115,7 +115,7 @@ namespace slib
 		}
 	}
 
-	sl_uint64 Uint128::mod(sl_uint64 num) const
+	sl_uint64 Uint128::mod(sl_uint64 num) const noexcept
 	{
 		Uint128 ret;
 		if (div(*this, num, sl_null, &ret)) {
@@ -125,19 +125,19 @@ namespace slib
 		}
 	}
 
-	void Uint128::shiftRight()
+	void Uint128::shiftRight() noexcept
 	{
 		low = (high << 63) | (low >> 1);
 		high >>= 1;
 	}
 
-	void Uint128::shiftLeft()
+	void Uint128::shiftLeft() noexcept
 	{
 		high = (low >> 63) | (high << 1);
 		low <<= 1;
 	}
 
-	void Uint128::makeNegative()
+	void Uint128::makeNegative() noexcept
 	{
 		low = -(sl_int64)(low);
 		high = -(sl_int64)(high);
@@ -146,43 +146,43 @@ namespace slib
 		}
 	}
 
-	void Uint128::makeBitwiseNot()
+	void Uint128::makeBitwiseNot() noexcept
 	{
 		low = ~low;
 		high = ~high;
 	}
 
-	sl_bool Uint128::operator==(const Uint128& other) const
+	sl_bool Uint128::operator==(const Uint128& other) const noexcept
 	{
 		return high == other.high && low == other.low;
 	}
 
-	sl_bool Uint128::operator==(sl_uint64 num) const
+	sl_bool Uint128::operator==(sl_uint64 num) const noexcept
 	{
 		return high == 0 && low == num;
 	}
 
-	sl_bool operator==(sl_uint64 num, const Uint128& v)
+	sl_bool operator==(sl_uint64 num, const Uint128& v) noexcept
 	{
 		return v.high == 0 && v.low == num;
 	}
 
-	sl_bool Uint128::operator!=(const Uint128& other) const
+	sl_bool Uint128::operator!=(const Uint128& other) const noexcept
 	{
 		return high != other.high || low != other.low;
 	}
 
-	sl_bool Uint128::operator!=(sl_uint64 num) const
+	sl_bool Uint128::operator!=(sl_uint64 num) const noexcept
 	{
 		return high != 0 || low != num;
 	}
 
-	sl_bool operator!=(sl_uint64 num, const Uint128& v)
+	sl_bool operator!=(sl_uint64 num, const Uint128& v) noexcept
 	{
 		return v.high != 0 || v.low != num;
 	}
 
-	sl_bool Uint128::operator>=(const Uint128& other) const
+	sl_bool Uint128::operator>=(const Uint128& other) const noexcept
 	{
 		if (high > other.high) {
 			return sl_true;
@@ -193,17 +193,17 @@ namespace slib
 		return low >= other.low;
 	}
 
-	sl_bool Uint128::operator>=(sl_uint64 num) const
+	sl_bool Uint128::operator>=(sl_uint64 num) const noexcept
 	{
 		return high > 0 || low >= num;
 	}
 
-	sl_bool operator>=(sl_uint64 num, const Uint128& v)
+	sl_bool operator>=(sl_uint64 num, const Uint128& v) noexcept
 	{
 		return v.high == 0 && v.low <= num;
 	}
 
-	sl_bool Uint128::operator<=(const Uint128& other) const
+	sl_bool Uint128::operator<=(const Uint128& other) const noexcept
 	{
 		if (high < other.high) {
 			return sl_true;
@@ -214,17 +214,17 @@ namespace slib
 		return low <= other.low;
 	}
 
-	sl_bool Uint128::operator<=(sl_uint64 num) const
+	sl_bool Uint128::operator<=(sl_uint64 num) const noexcept
 	{
 		return high == 0 && low <= num;
 	}
 
-	sl_bool operator<=(sl_uint64 num, const Uint128& v)
+	sl_bool operator<=(sl_uint64 num, const Uint128& v) noexcept
 	{
 		return v.high > 0 || v.low >= num;
 	}
 
-	sl_bool Uint128::operator>(const Uint128& other) const
+	sl_bool Uint128::operator>(const Uint128& other) const noexcept
 	{
 		if (high > other.high) {
 			return sl_true;
@@ -235,17 +235,17 @@ namespace slib
 		return low > other.low;
 	}
 
-	sl_bool Uint128::operator>(sl_uint64 num) const
+	sl_bool Uint128::operator>(sl_uint64 num) const noexcept
 	{
 		return high > 0 || low > num;
 	}
 
-	sl_bool operator>(sl_uint64 num, const Uint128& v)
+	sl_bool operator>(sl_uint64 num, const Uint128& v) noexcept
 	{
 		return v.high == 0 && v.low < num;
 	}
 
-	sl_bool Uint128::operator<(const Uint128& other) const
+	sl_bool Uint128::operator<(const Uint128& other) const noexcept
 	{
 		if (high < other.high) {
 			return sl_true;
@@ -256,17 +256,17 @@ namespace slib
 		return low < other.low;
 	}
 
-	sl_bool Uint128::operator<(sl_uint64 num) const
+	sl_bool Uint128::operator<(sl_uint64 num) const noexcept
 	{
 		return high == 0 && low < num;
 	}
 
-	sl_bool operator<(sl_uint64 num, const Uint128& v)
+	sl_bool operator<(sl_uint64 num, const Uint128& v) noexcept
 	{
 		return v.high > 0 || v.low > num;
 	}
 
-	Uint128 Uint128::operator+(const Uint128& other) const
+	Uint128 Uint128::operator+(const Uint128& other) const noexcept
 	{
 		Uint128 ret;
 		ret.high = high + other.high;
@@ -277,7 +277,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 Uint128::operator+(sl_uint64 num) const
+	Uint128 Uint128::operator+(sl_uint64 num) const noexcept
 	{
 		Uint128 ret;
 		ret.high = high;
@@ -288,7 +288,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 operator+(sl_uint64 num, const Uint128& v)
+	Uint128 operator+(sl_uint64 num, const Uint128& v) noexcept
 	{
 		Uint128 ret;
 		ret.high = v.high;
@@ -299,7 +299,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128& Uint128::operator+=(const Uint128& other)
+	Uint128& Uint128::operator+=(const Uint128& other) noexcept
 	{
 		high += other.high;
 		low += other.low;
@@ -309,7 +309,7 @@ namespace slib
 		return *this;
 	}
 
-	Uint128& Uint128::operator+=(sl_uint32 num)
+	Uint128& Uint128::operator+=(sl_uint32 num) noexcept
 	{
 		low += num;
 		if (low < num) {
@@ -319,7 +319,7 @@ namespace slib
 	}
 
 
-	Uint128& Uint128::operator++()
+	Uint128& Uint128::operator++() noexcept
 	{
 		low++;
 		if (low == 0) {
@@ -328,7 +328,7 @@ namespace slib
 		return *this;
 	}
 
-	Uint128 Uint128::operator++(int)
+	Uint128 Uint128::operator++(int) noexcept
 	{
 		Uint128 ret = *this;
 		low++;
@@ -338,7 +338,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 Uint128::operator-(const Uint128& other) const
+	Uint128 Uint128::operator-(const Uint128& other) const noexcept
 	{
 		Uint128 ret;
 		ret.high = high - other.high;
@@ -349,7 +349,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 Uint128::operator-(sl_uint64 num) const
+	Uint128 Uint128::operator-(sl_uint64 num) const noexcept
 	{
 		Uint128 ret;
 		ret.high = high;
@@ -360,7 +360,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 operator-(sl_uint64 num, const Uint128& v)
+	Uint128 operator-(sl_uint64 num, const Uint128& v) noexcept
 	{
 		Uint128 ret;
 		ret.high = - (sl_int64)(v.high);
@@ -371,7 +371,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128& Uint128::operator-=(const Uint128& other)
+	Uint128& Uint128::operator-=(const Uint128& other) noexcept
 	{
 		high -= other.high;
 		if (low < other.low) {
@@ -381,7 +381,7 @@ namespace slib
 		return *this;
 	}
 
-	Uint128& Uint128::operator-=(sl_uint64 num)
+	Uint128& Uint128::operator-=(sl_uint64 num) noexcept
 	{
 		if (low < num) {
 			high--;
@@ -390,7 +390,7 @@ namespace slib
 		return *this;
 	}
 
-	Uint128& Uint128::operator--()
+	Uint128& Uint128::operator--() noexcept
 	{
 		if (low == 0) {
 			high--;
@@ -399,7 +399,7 @@ namespace slib
 		return *this;
 	}
 
-	Uint128 Uint128::operator--(int)
+	Uint128 Uint128::operator--(int) noexcept
 	{
 		Uint128 ret = *this;
 		if (low == 0) {
@@ -409,7 +409,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 Uint128::operator*(const Uint128& other) const
+	Uint128 Uint128::operator*(const Uint128& other) const noexcept
 	{
 		Uint128 ret;
 		Math::mul64(low, other.low, ret.high, ret.low);
@@ -418,7 +418,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 Uint128::operator*(sl_uint64 num) const
+	Uint128 Uint128::operator*(sl_uint64 num) const noexcept
 	{
 		Uint128 ret;
 		Math::mul64(low, num, ret.high, ret.low);
@@ -426,7 +426,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 operator*(sl_uint64 num, const Uint128& v)
+	Uint128 operator*(sl_uint64 num, const Uint128& v) noexcept
 	{
 		Uint128 ret;
 		Math::mul64(v.low, num, ret.high, ret.low);
@@ -434,7 +434,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128& Uint128::operator*=(const Uint128& other)
+	Uint128& Uint128::operator*=(const Uint128& other) noexcept
 	{
 		sl_uint64 ml, mh;
 		Math::mul64(low, other.low, mh, ml);
@@ -445,7 +445,7 @@ namespace slib
 		return *this;
 	}
 
-	Uint128& Uint128::operator*=(sl_uint64 num)
+	Uint128& Uint128::operator*=(sl_uint64 num) noexcept
 	{
 		sl_uint64 ml, mh;
 		Math::mul64(low, num, mh, ml);
@@ -455,63 +455,63 @@ namespace slib
 		return *this;
 	}
 
-	Uint128 Uint128::operator/(const Uint128& other) const
+	Uint128 Uint128::operator/(const Uint128& other) const noexcept
 	{
 		return div(other);
 	}
 
-	Uint128 Uint128::operator/(sl_uint64 num) const
+	Uint128 Uint128::operator/(sl_uint64 num) const noexcept
 	{
 		return div(num);
 	}
 
-	Uint128 operator/(sl_uint64 num, const Uint128& v)
+	Uint128 operator/(sl_uint64 num, const Uint128& v) noexcept
 	{
 		Uint128 a(num);
 		return a.div(v);
 	}
 
-	Uint128& Uint128::operator/=(const Uint128& other)
+	Uint128& Uint128::operator/=(const Uint128& other) noexcept
 	{
 		*this = div(other);
 		return *this;
 	}
 
-	Uint128& Uint128::operator/=(sl_uint64 num)
+	Uint128& Uint128::operator/=(sl_uint64 num) noexcept
 	{
 		*this = div(num);
 		return *this;
 	}
 
-	Uint128 Uint128::operator%(const Uint128& other) const
+	Uint128 Uint128::operator%(const Uint128& other) const noexcept
 	{
 		return mod(other);
 	}
 
-	Uint128 Uint128::operator%(sl_uint64 num) const
+	Uint128 Uint128::operator%(sl_uint64 num) const noexcept
 	{
 		return mod(num);
 	}
 
-	Uint128 operator%(sl_uint64 num, const Uint128& v)
+	Uint128 operator%(sl_uint64 num, const Uint128& v) noexcept
 	{
 		Uint128 a(num);
 		return a.mod(v);
 	}
 
-	Uint128& Uint128::operator%=(const Uint128& other)
+	Uint128& Uint128::operator%=(const Uint128& other) noexcept
 	{
 		*this = mod(other);
 		return *this;
 	}
 
-	Uint128& Uint128::operator%=(sl_uint64 num)
+	Uint128& Uint128::operator%=(sl_uint64 num) noexcept
 	{
 		*this = mod(num);
 		return *this;
 	}
 
-	Uint128 Uint128::operator&(const Uint128& other) const
+	Uint128 Uint128::operator&(const Uint128& other) const noexcept
 	{
 		Uint128 ret;
 		ret.high = high & other.high;
@@ -519,7 +519,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 Uint128::operator&(sl_uint64 num) const
+	Uint128 Uint128::operator&(sl_uint64 num) const noexcept
 	{
 		Uint128 ret;
 		ret.high = high;
@@ -527,7 +527,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 operator&(sl_uint64 num, const Uint128& v)
+	Uint128 operator&(sl_uint64 num, const Uint128& v) noexcept
 	{
 		Uint128 ret;
 		ret.high = v.high;
@@ -535,20 +535,20 @@ namespace slib
 		return ret;
 	}
 
-	Uint128& Uint128::operator&=(const Uint128& other)
+	Uint128& Uint128::operator&=(const Uint128& other) noexcept
 	{
 		high &= other.high;
 		low &= other.low;
 		return *this;
 	}
 
-	Uint128& Uint128::operator&=(sl_uint32 num)
+	Uint128& Uint128::operator&=(sl_uint32 num) noexcept
 	{
 		low &= num;
 		return *this;
 	}
 
-	Uint128 Uint128::operator|(const Uint128& other) const
+	Uint128 Uint128::operator|(const Uint128& other) const noexcept
 	{
 		Uint128 ret;
 		ret.high = high | other.high;
@@ -556,7 +556,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 Uint128::operator|(sl_uint64 num) const
+	Uint128 Uint128::operator|(sl_uint64 num) const noexcept
 	{
 		Uint128 ret;
 		ret.high = high;
@@ -564,7 +564,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 operator|(sl_uint64 num, const Uint128& v)
+	Uint128 operator|(sl_uint64 num, const Uint128& v) noexcept
 	{
 		Uint128 ret;
 		ret.high = v.high;
@@ -572,20 +572,20 @@ namespace slib
 		return ret;
 	}
 
-	Uint128& Uint128::operator|=(const Uint128& other)
+	Uint128& Uint128::operator|=(const Uint128& other) noexcept
 	{
 		high |= other.high;
 		low |= other.low;
 		return *this;
 	}
 
-	Uint128& Uint128::operator|=(sl_uint32 num)
+	Uint128& Uint128::operator|=(sl_uint32 num) noexcept
 	{
 		low |= num;
 		return *this;
 	}
 
-	Uint128 Uint128::operator^(const Uint128& other) const
+	Uint128 Uint128::operator^(const Uint128& other) const noexcept
 	{
 		Uint128 ret;
 		ret.high = high ^ other.high;
@@ -593,7 +593,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 Uint128::operator^(sl_uint64 num) const
+	Uint128 Uint128::operator^(sl_uint64 num) const noexcept
 	{
 		Uint128 ret;
 		ret.high = high;
@@ -601,7 +601,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 operator^(sl_uint64 num, const Uint128& v)
+	Uint128 operator^(sl_uint64 num, const Uint128& v) noexcept
 	{
 		Uint128 ret;
 		ret.high = v.high;
@@ -609,20 +609,20 @@ namespace slib
 		return ret;
 	}
 
-	Uint128& Uint128::operator^=(const Uint128& other)
+	Uint128& Uint128::operator^=(const Uint128& other) noexcept
 	{
 		high ^= other.high;
 		low ^= other.low;
 		return *this;
 	}
 
-	Uint128& Uint128::operator^=(sl_uint32 num)
+	Uint128& Uint128::operator^=(sl_uint32 num) noexcept
 	{
 		low ^= num;
 		return *this;
 	}
 
-	Uint128 Uint128::operator>>(sl_uint32 n) const
+	Uint128 Uint128::operator>>(sl_uint32 n) const noexcept
 	{
 		Uint128 ret;
 		if (n) {
@@ -640,7 +640,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128& Uint128::operator>>=(sl_uint32 n)
+	Uint128& Uint128::operator>>=(sl_uint32 n) noexcept
 	{
 		if (n) {
 			if (n >= 64) {
@@ -654,7 +654,7 @@ namespace slib
 		return *this;
 	}
 
-	Uint128 Uint128::operator<<(sl_uint32 n) const
+	Uint128 Uint128::operator<<(sl_uint32 n) const noexcept
 	{
 		Uint128 ret;
 		if (n) {
@@ -672,7 +672,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128& Uint128::operator<<=(sl_uint32 n)
+	Uint128& Uint128::operator<<=(sl_uint32 n) noexcept
 	{
 		if (n) {
 			if (n >= 64) {
@@ -686,7 +686,7 @@ namespace slib
 		return *this;
 	}
 
-	Uint128 Uint128::operator-() const
+	Uint128 Uint128::operator-() const noexcept
 	{
 		Uint128 ret;
 		ret.low = -(sl_int64)(low);
@@ -697,7 +697,7 @@ namespace slib
 		return ret;
 	}
 
-	Uint128 Uint128::operator~() const
+	Uint128 Uint128::operator~() const noexcept
 	{
 		Uint128 ret;
 		ret.low = ~low;
@@ -705,7 +705,7 @@ namespace slib
 		return ret;
 	}
 
-	sl_uint32 Uint128::getMostSignificantBits() const
+	sl_uint32 Uint128::getMostSignificantBits() const noexcept
 	{
 		if (high != 0) {
 			return 64 + Math::getMostSignificantBits(high);
@@ -716,7 +716,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_uint32 Uint128::getLeastSignificantBits() const
+	sl_uint32 Uint128::getLeastSignificantBits() const noexcept
 	{
 		if (low != 0) {
 			return Math::getLeastSignificantBits(low);
@@ -727,35 +727,35 @@ namespace slib
 		return 0;
 	}
 
-	void Uint128::getBytesBE(void* _buf)
+	void Uint128::getBytesBE(void* _buf) noexcept
 	{
 		char* buf = (char*)_buf;
 		MIO::writeUint64BE(buf, high);
 		MIO::writeUint64BE(buf + 8, low);
 	}
 
-	void Uint128::setBytesBE(const void* _buf)
+	void Uint128::setBytesBE(const void* _buf) noexcept
 	{
 		const char* buf = (const char*)_buf;
 		high = MIO::readUint64BE(buf);
 		low = MIO::readUint64BE(buf + 8);
 	}
 
-	void Uint128::getBytesLE(void* _buf)
+	void Uint128::getBytesLE(void* _buf) noexcept
 	{
 		char* buf = (char*)_buf;
 		MIO::writeUint64LE(buf, low);
 		MIO::writeUint64LE(buf + 8, high);
 	}
 
-	void Uint128::setBytesLE(const void* _buf)
+	void Uint128::setBytesLE(const void* _buf) noexcept
 	{
 		const char* buf = (const char*)_buf;
 		low = MIO::readUint64LE(buf);
 		high = MIO::readUint64LE(buf + 8);
 	}
 
-	Uint128 Uint128::fromString(const String& str, sl_uint32 radix)
+	Uint128 Uint128::fromString(const String& str, sl_uint32 radix) noexcept
 	{
 		Uint128 ret(0);
 		if (ret.parse(str, radix)) {
@@ -765,7 +765,7 @@ namespace slib
 		return ret;
 	}
 
-	String Uint128::toString(sl_uint32 radix) const
+	String Uint128::toString(sl_uint32 radix) const noexcept
 	{
 		if (radix < 2 || radix > 64) {
 			return sl_null;
@@ -813,19 +813,19 @@ namespace slib
 		}
 	}
 
-	Uint128 Uint128::fromHexString(const String& str)
+	Uint128 Uint128::fromHexString(const String& str) noexcept
 	{
 		return fromString(str, 16);
 	}
 
-	String Uint128::toHexString() const
+	String Uint128::toHexString() const noexcept
 	{
 		return toString(16);
 	}
 
 
 	template <class CT>
-	static sl_reg _Uint128_parseString(Uint128* out, const CT* sz, sl_size posBegin, sl_size len, sl_uint32 radix)
+	SLIB_INLINE static sl_reg _priv_Uint128_parseString(Uint128* out, const CT* sz, sl_size posBegin, sl_size len, sl_uint32 radix) noexcept
 	{
 		if (radix < 2 || radix > 64) {
 			return SLIB_PARSE_ERROR;
@@ -866,29 +866,29 @@ namespace slib
 
 
 	template <>
-	sl_reg IntParser<Uint128, sl_char8>::parse(Uint128* _out, sl_uint32 radix, const sl_char8 *sz, sl_size posBegin, sl_size posEnd)
+	sl_reg IntParser<Uint128, sl_char8>::parse(Uint128* _out, sl_uint32 radix, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
-		return _Uint128_parseString(_out, sz, posBegin, posEnd, radix);
+		return _priv_Uint128_parseString(_out, sz, posBegin, posEnd, radix);
 	}
 
 	template <>
-	sl_reg IntParser<Uint128, sl_char16>::parse(Uint128* _out, sl_uint32 radix, const sl_char16 *sz, sl_size posBegin, sl_size posEnd)
+	sl_reg IntParser<Uint128, sl_char16>::parse(Uint128* _out, sl_uint32 radix, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
-		return _Uint128_parseString(_out, sz, posBegin, posEnd, radix);
+		return _priv_Uint128_parseString(_out, sz, posBegin, posEnd, radix);
 	}
 
 
-	int Compare<Uint128>::operator()(const Uint128& a, const Uint128& b) const
+	int Compare<Uint128>::operator()(const Uint128& a, const Uint128& b) const noexcept
 	{
 		return a.compare(b);
 	}
 
-	sl_bool Equals<Uint128>::operator()(const Uint128& a, const Uint128& b) const
+	sl_bool Equals<Uint128>::operator()(const Uint128& a, const Uint128& b) const noexcept
 	{
 		return a == b;
 	}
 
-	sl_uint32 Hash<Uint128>::operator()(const Uint128& v) const
+	sl_uint32 Hash<Uint128>::operator()(const Uint128& v) const noexcept
 	{
 		return Rehash((sl_uint32)(v.high ^ (v.high >> 32) ^ v.low ^ (v.low >> 32)));
 	}
