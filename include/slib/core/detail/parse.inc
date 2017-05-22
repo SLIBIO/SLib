@@ -12,7 +12,7 @@ namespace slib
 {
 	
 	template <class T>
-	sl_bool Parse(const String& str, T* _out)
+	sl_bool Parse(const String& str, T* _out) noexcept
 	{
 		sl_size n = str.getLength();
 		if (n == 0) {
@@ -22,7 +22,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool Parse(const String16& str, T* _out)
+	sl_bool Parse(const String16& str, T* _out) noexcept
 	{
 		sl_size n = str.getLength();
 		if (n == 0) {
@@ -32,7 +32,7 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool Parse(const AtomicString& _str, T* _out)
+	sl_bool Parse(const AtomicString& _str, T* _out) noexcept
 	{
 		String str(_str);
 		sl_size n = str.getLength();
@@ -43,7 +43,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool Parse(const AtomicString16& _str, T* _out)
+	sl_bool Parse(const AtomicString16& _str, T* _out) noexcept
 	{
 		String16 str(_str);
 		sl_size n = str.getLength();
@@ -54,7 +54,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool Parse(const sl_char8* sz, T* _out)
+	sl_bool Parse(const sl_char8* sz, T* _out) noexcept
 	{
 		sl_reg ret = Parser<T, sl_char8>::parse(_out, sz, 0, SLIB_SIZE_MAX);
 		if (ret != SLIB_PARSE_ERROR && sz[ret] == 0) {
@@ -64,7 +64,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool Parse(const sl_char16* sz, T* _out)
+	sl_bool Parse(const sl_char16* sz, T* _out) noexcept
 	{
 		sl_reg ret = Parser<T, sl_char16>::parse(_out, sz, 0, SLIB_SIZE_MAX);
 		if (ret != SLIB_PARSE_ERROR && sz[ret] == 0) {
@@ -75,7 +75,7 @@ namespace slib
 
 
 	template <class T>
-	sl_bool ParseInt(const String& str, T* _out, sl_uint32 radix)
+	sl_bool ParseInt(const String& str, T* _out, sl_uint32 radix) noexcept
 	{
 		sl_size n = str.getLength();
 		if (n == 0) {
@@ -85,7 +85,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool ParseInt(const String16& str, T* _out, sl_uint32 radix)
+	sl_bool ParseInt(const String16& str, T* _out, sl_uint32 radix) noexcept
 	{
 		sl_size n = str.getLength();
 		if (n == 0) {
@@ -95,7 +95,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool ParseInt(const AtomicString& _str, T* _out, sl_uint32 radix)
+	sl_bool ParseInt(const AtomicString& _str, T* _out, sl_uint32 radix) noexcept
 	{
 		String str(_str);
 		sl_size n = str.getLength();
@@ -106,7 +106,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool ParseInt(const AtomicString16& _str, T* _out, sl_uint32 radix)
+	sl_bool ParseInt(const AtomicString16& _str, T* _out, sl_uint32 radix) noexcept
 	{
 		String16 str(_str);
 		sl_size n = str.getLength();
@@ -117,7 +117,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool ParseInt(const sl_char8* sz, T* _out, sl_uint32 radix )
+	sl_bool ParseInt(const sl_char8* sz, T* _out, sl_uint32 radix ) noexcept
 	{
 		sl_reg ret = IntParser<T, sl_char8>::parse(_out, radix, sz, 0, SLIB_SIZE_MAX);
 		if (ret != SLIB_PARSE_ERROR && sz[ret] == 0) {
@@ -127,7 +127,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool ParseInt(const sl_char16* sz, T* _out, sl_uint32 radix)
+	sl_bool ParseInt(const sl_char16* sz, T* _out, sl_uint32 radix) noexcept
 	{
 		sl_reg ret = IntParser<T, sl_char16>::parse(_out, radix, sz, 0, SLIB_SIZE_MAX);
 		if (ret != SLIB_PARSE_ERROR && sz[ret] == 0) {
