@@ -13,21 +13,12 @@
 
 #include "definition.h"
 
+#include "constants.h"
 #include "motion_tracker.h"
 
 namespace slib
 {
 
-	enum class GestureType
-	{
-		SwipeLeft = 0,
-		SwipeRight = 1,
-		SwipeUp = 2,
-		SwipeDown = 3,
-		
-		Count = 4
-	};
-	
 	class GestureEvent : public Referable
 	{
 	public:

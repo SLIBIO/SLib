@@ -12,19 +12,20 @@
 
 #include "slib/render/canvas.h"
 #include "slib/core/thread.h"
+#include "slib/core/dispatch.h"
 
 namespace slib
 {
 
 	SLIB_DEFINE_OBJECT(RenderView, View)
 
-	class _RenderAnimationLoop : public AnimationLoop
+	class _priv_RenderView_AnimationLoop : public AnimationLoop
 	{
 	public:
 		WeakRef<RenderView> m_view;
 		
 	public:
-		_RenderAnimationLoop(RenderView* view) : m_view(view)
+		_priv_RenderView_AnimationLoop(RenderView* view) : m_view(view)
 		{
 		}
 		
@@ -59,7 +60,7 @@ namespace slib
 		m_redrawMode = RedrawMode::Continuously;
 		m_flagDispatchEventsToRenderingThread = sl_false;
 		
-		m_animationLoop = new _RenderAnimationLoop(this);
+		m_animationLoop = new _priv_RenderView_AnimationLoop(this);
 		m_lastRenderingThreadId = 0;
 		
 		m_flagDebugTextVisible = sl_true;
@@ -172,7 +173,7 @@ namespace slib
 		}
 	}
 
-	class _RenderViewDispatcher : public Dispatcher
+	class _priv_RenderView_Dispatcher : public Dispatcher
 	{
 	public:
 		WeakRef<RenderView> m_view;
@@ -194,7 +195,7 @@ namespace slib
 
 	Ref<Dispatcher> RenderView::getDispatcher()
 	{
-		Ref<_RenderViewDispatcher> ret = new _RenderViewDispatcher;
+		Ref<_priv_RenderView_Dispatcher> ret = new _priv_RenderView_Dispatcher;
 		if (ret.isNotNull()) {
 			ret->m_view = this;
 			return ret;
@@ -258,7 +259,7 @@ namespace slib
 		m_lastRenderingThreadId = Thread::getCurrentThreadUniqueId();
 		
 		if (m_animationLoop.isNotNull()) {
-			_RenderAnimationLoop* l = static_cast<_RenderAnimationLoop*>(m_animationLoop.get());
+			_priv_RenderView_AnimationLoop* l = static_cast<_priv_RenderView_AnimationLoop*>(m_animationLoop.get());
 			l->runStep();
 		}
 		

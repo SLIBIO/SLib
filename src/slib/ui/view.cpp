@@ -10,14 +10,15 @@
 
 #include "slib/ui/view.h"
 
-#include "slib/ui/window.h"
 #include "slib/ui/core.h"
+#include "slib/ui/window.h"
 #include "slib/ui/scroll_bar.h"
 #include "slib/ui/render_view.h"
 #include "slib/ui/animation.h"
 #include "slib/ui/resource.h"
 
 #include "slib/core/scoped.h"
+#include "slib/core/timer.h"
 #include "slib/math/transform2d.h"
 #include "slib/graphics/bitmap.h"
 #include "slib/graphics/util.h"

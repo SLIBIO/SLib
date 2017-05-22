@@ -20,21 +20,26 @@
 #include "../core/object.h"
 #include "../core/ptr.h"
 #include "../core/function.h"
-#include "../core/queue.h"
 #include "../core/animation.h"
-#include "../core/dispatch.h"
-#include "../core/timer.h"
+#include "../core/time.h"
+
 #include "../graphics/canvas.h"
-#include "../graphics/bitmap.h"
 
 namespace slib
 {
 
 	class Window;
 	class ViewInstance;
+	
+	class Timer;
+	class Dispatcher;
+	class Bitmap;
+	
 	class ViewPage;
 	class ScrollBar;
 	class MotionTracker;
+	class GestureDetector;
+	class GestureEvent;
 
 	struct ViewPrepareLayoutParam;
 

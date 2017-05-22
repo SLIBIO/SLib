@@ -16,8 +16,6 @@
 #include "view.h"
 #include "motion_tracker.h"
 
-#include "../core/time.h"
-
 namespace slib
 {
 

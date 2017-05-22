@@ -12,6 +12,7 @@
 
 #include "slib/core/safe_static.h"
 #include "slib/core/math.h"
+#include "slib/core/timer.h"
 #include "slib/ui/resource.h"
 
 #define ANIMATE_FRAME_MS 15

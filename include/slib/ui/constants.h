@@ -309,6 +309,16 @@ namespace slib
 		AttachInNativeWidget = 3
 	};
 	
+	enum class GestureType
+	{
+		SwipeLeft = 0,
+		SwipeRight = 1,
+		SwipeUp = 2,
+		SwipeDown = 3,
+		
+		Count = 4
+	};
+	
 	enum class UIPageAction
 	{
 		Push = 0,
