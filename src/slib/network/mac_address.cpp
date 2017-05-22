@@ -16,9 +16,9 @@ namespace slib
 	SLIB_ALIGN(8) const sl_uint8 MacAddress::_zero[6] = { 0 };
 	SLIB_ALIGN(8) const sl_uint8 MacAddress::_broadcast[6] = { 255, 255, 255, 255, 255, 255 };
 
-	MacAddress::MacAddress(const MacAddress& other) = default;
+	MacAddress::MacAddress(const MacAddress& other) noexcept = default;
 
-	MacAddress::MacAddress(const sl_uint8* _m)
+	MacAddress::MacAddress(const sl_uint8* _m) noexcept
 	{
 		m[0] = _m[0];
 		m[1] = _m[1];
@@ -28,7 +28,7 @@ namespace slib
 		m[5] = _m[5];
 	}
 
-	MacAddress::MacAddress(sl_uint8 m0, sl_uint8 m1, sl_uint8 m2, sl_uint8 m3, sl_uint8 m4, sl_uint8 m5)
+	MacAddress::MacAddress(sl_uint8 m0, sl_uint8 m1, sl_uint8 m2, sl_uint8 m3, sl_uint8 m4, sl_uint8 m5) noexcept
 	{
 		m[0] = m0;
 		m[1] = m1;
@@ -38,12 +38,12 @@ namespace slib
 		m[5] = m5;
 	}
 
-	MacAddress::MacAddress(const String& address)
+	MacAddress::MacAddress(const String& address) noexcept
 	{
 		setString(address);
 	}
 
-	void MacAddress::setZero()
+	void MacAddress::setZero() noexcept
 	{
 		m[0] = 0;
 		m[1] = 0;
@@ -53,7 +53,7 @@ namespace slib
 		m[5] = 0;
 	}
 
-	void MacAddress::setBroadcast()
+	void MacAddress::setBroadcast() noexcept
 	{
 		m[0] = 255;
 		m[1] = 255;
@@ -63,7 +63,7 @@ namespace slib
 		m[5] = 255;
 	}
 
-	void MacAddress::makeMulticast(const IPv4Address& addrMulticast)
+	void MacAddress::makeMulticast(const IPv4Address& addrMulticast) noexcept
 	{
 		m[0] = 1;
 		m[1] = 0;
@@ -73,7 +73,7 @@ namespace slib
 		m[5] = addrMulticast.d;
 	}
 
-	void MacAddress::makeMulticast(const IPv6Address& addrMulticast)
+	void MacAddress::makeMulticast(const IPv6Address& addrMulticast) noexcept
 	{
 		m[0] = 0x33;
 		m[1] = 0x33;
@@ -83,7 +83,7 @@ namespace slib
 		m[5] = addrMulticast.m[15];
 	}
 
-	void MacAddress::getBytes(sl_uint8* _m) const
+	void MacAddress::getBytes(sl_uint8* _m) const noexcept
 	{
 		_m[0] = m[0];
 		_m[1] = m[1];
@@ -93,7 +93,7 @@ namespace slib
 		_m[5] = m[5];
 	}
 
-	void MacAddress::setBytes(const sl_uint8* _m)
+	void MacAddress::setBytes(const sl_uint8* _m) noexcept
 	{
 		m[0] = _m[0];
 		m[1] = _m[1];
@@ -103,17 +103,17 @@ namespace slib
 		m[5] = _m[5];
 	}
 
-	int MacAddress::compare(const MacAddress& other) const
+	int MacAddress::compare(const MacAddress& other) const noexcept
 	{
 		return Base::compareMemory(m, other.m, 6);
 	}
 
-	sl_uint32 MacAddress::hashCode() const
+	sl_uint32 MacAddress::hashCode() const noexcept
 	{
 		return HashBytes(m, 6);
 	}
 
-	String MacAddress::toString(sl_char8 sep) const
+	String MacAddress::toString(sl_char8 sep) const noexcept
 	{
 		String ret;
 		for (int i = 0; i < 6; i++) {
@@ -125,7 +125,7 @@ namespace slib
 		return ret;
 	}
 
-	sl_bool MacAddress::setString(const String& str)
+	sl_bool MacAddress::setString(const String& str) noexcept
 	{
 		if (parse(str)) {
 			return sl_true;
@@ -136,7 +136,7 @@ namespace slib
 	}
 
 	template <class CT>
-	static sl_reg _MacAddress_parse(MacAddress* obj, const CT* sz, sl_size i, sl_size n)
+	SLIB_INLINE static sl_reg _priv_MacAddress_parse(MacAddress* obj, const CT* sz, sl_size i, sl_size n) noexcept
 	{
 		int v[6];
 		for (int k = 0; k < 6; k++) {
@@ -189,38 +189,38 @@ namespace slib
 	}
 
 	template <>
-	sl_reg Parser<MacAddress, sl_char8>::parse(MacAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd)
+	sl_reg Parser<MacAddress, sl_char8>::parse(MacAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
-		return _MacAddress_parse(_out, sz, posBegin, posEnd);
+		return _priv_MacAddress_parse(_out, sz, posBegin, posEnd);
 	}
 
 	template <>
-	sl_reg Parser<MacAddress, sl_char16>::parse(MacAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd)
+	sl_reg Parser<MacAddress, sl_char16>::parse(MacAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
-		return _MacAddress_parse(_out, sz, posBegin, posEnd);
+		return _priv_MacAddress_parse(_out, sz, posBegin, posEnd);
 	}
 
 
-	MacAddress& MacAddress::operator=(const MacAddress& other) = default;
+	MacAddress& MacAddress::operator=(const MacAddress& other) noexcept = default;
 
-	MacAddress& MacAddress::operator=(const String& address)
+	MacAddress& MacAddress::operator=(const String& address) noexcept
 	{
 		setString(address);
 		return *this;
 	}
 
 
-	int Compare<MacAddress>::operator()(const MacAddress& a, const MacAddress& b) const
+	int Compare<MacAddress>::operator()(const MacAddress& a, const MacAddress& b) const noexcept
 	{
 		return a.compare(b);
 	}
 
-	sl_bool Equals<MacAddress>::operator()(const MacAddress& a, const MacAddress& b) const
+	sl_bool Equals<MacAddress>::operator()(const MacAddress& a, const MacAddress& b) const noexcept
 	{
 		return a == b;
 	}
 
-	sl_uint32 Hash<MacAddress>::operator()(const MacAddress& a) const
+	sl_uint32 Hash<MacAddress>::operator()(const MacAddress& a) const noexcept
 	{
 		return a.hashCode();
 	}

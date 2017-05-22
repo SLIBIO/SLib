@@ -27,75 +27,75 @@ namespace slib
 		sl_uint8 m[6];
 		
 	public:
-		SLIB_INLINE MacAddress() = default;
+		SLIB_INLINE MacAddress() noexcept {}
 		
-		MacAddress(const MacAddress& other);
+		MacAddress(const MacAddress& other) noexcept;
 		
-		MacAddress(const sl_uint8* m);
+		MacAddress(const sl_uint8* m) noexcept;
 		
-		MacAddress(sl_uint8 m0, sl_uint8 m1, sl_uint8 m2, sl_uint8 m3, sl_uint8 m4, sl_uint8 m5);
+		MacAddress(sl_uint8 m0, sl_uint8 m1, sl_uint8 m2, sl_uint8 m3, sl_uint8 m4, sl_uint8 m5) noexcept;
 		
-		MacAddress(const String& address);
+		MacAddress(const String& address) noexcept;
 		
 	public:
-		static const MacAddress& zero();
+		static const MacAddress& zero() noexcept;
 		
-		sl_bool isZero() const;
+		sl_bool isZero() const noexcept;
 		
-		sl_bool isNotZero() const;
+		sl_bool isNotZero() const noexcept;
 		
-		void setZero();
+		void setZero() noexcept;
 		
-		static const MacAddress& getBroadcast();
+		static const MacAddress& getBroadcast() noexcept;
 		
-		sl_bool isBroadcast() const;
+		sl_bool isBroadcast() const noexcept;
 		
-		sl_bool isNotBroadcast() const;
+		sl_bool isNotBroadcast() const noexcept;
 		
-		void setBroadcast();
+		void setBroadcast() noexcept;
 		
-		sl_bool isMulticast() const;
+		sl_bool isMulticast() const noexcept;
 		
-		sl_bool isNotMulticast() const;
+		sl_bool isNotMulticast() const noexcept;
 		
-		void makeMulticast(const IPv4Address& addrMulticast);
+		void makeMulticast(const IPv4Address& addrMulticast) noexcept;
 		
-		void makeMulticast(const IPv6Address& addrMulticast);
+		void makeMulticast(const IPv6Address& addrMulticast) noexcept;
 		
-		void getBytes(sl_uint8* _m) const;
+		void getBytes(sl_uint8* _m) const noexcept;
 		
-		void setBytes(const sl_uint8* _m);
+		void setBytes(const sl_uint8* _m) noexcept;
 		
-		int compare(const MacAddress& other) const;
+		int compare(const MacAddress& other) const noexcept;
 		
-		sl_uint32 hashCode() const;
+		sl_uint32 hashCode() const noexcept;
 		
 		// m0-m1-m2-m3-m4-m5, m0:m1:m2:m3:m4:m5
-		String toString(sl_char8 sep = '-') const;
+		String toString(sl_char8 sep = '-') const noexcept;
 		
-		sl_bool setString(const String& address);
+		sl_bool setString(const String& address) noexcept;
 		
 		
 		template <class ST>
-		static sl_bool parse(const ST& str, MacAddress* _out)
+		static sl_bool parse(const ST& str, MacAddress* _out) noexcept
 		{
 			return Parse(str, _out);
 		}
 		
 		template <class ST>
-		sl_bool parse(const ST& str)
+		sl_bool parse(const ST& str) noexcept
 		{
 			return Parse(str, this);
 		}
 		
 	public:
-		MacAddress& operator=(const MacAddress& other);
+		MacAddress& operator=(const MacAddress& other) noexcept;
 		
-		MacAddress& operator=(const String& address);
+		MacAddress& operator=(const String& address) noexcept;
 		
-		sl_bool operator==(const MacAddress& other) const;
+		sl_bool operator==(const MacAddress& other) const noexcept;
 		
-		sl_bool operator!=(const MacAddress& other) const;
+		sl_bool operator!=(const MacAddress& other) const noexcept;
 		
 	private:
 		static const sl_uint8 _zero[6];
@@ -104,31 +104,31 @@ namespace slib
 	};
 	
 	template <>
-	sl_reg Parser<MacAddress, sl_char8>::parse(MacAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd);
+	sl_reg Parser<MacAddress, sl_char8>::parse(MacAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept;
 	
 	template <>
-	sl_reg Parser<MacAddress, sl_char16>::parse(MacAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd);
+	sl_reg Parser<MacAddress, sl_char16>::parse(MacAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept;
 	
 	
 	template <>
 	class Compare<MacAddress>
 	{
 	public:
-		int operator()(const MacAddress& a, const MacAddress& b) const;
+		int operator()(const MacAddress& a, const MacAddress& b) const noexcept;
 	};
 	
 	template <>
 	class Equals<MacAddress>
 	{
 	public:
-		sl_bool operator()(const MacAddress& a, const MacAddress& b) const;
+		sl_bool operator()(const MacAddress& a, const MacAddress& b) const noexcept;
 	};
 	
 	template <>
 	class Hash<MacAddress>
 	{
 	public:
-		sl_uint32 operator()(const MacAddress& a) const;
+		sl_uint32 operator()(const MacAddress& a) const noexcept;
 	};
 	
 }
