@@ -21,7 +21,7 @@
 namespace slib
 {
 
-	int Compare<Variant>::operator()(const Variant& a, const Variant& b) const
+	int Compare<Variant>::operator()(const Variant& a, const Variant& b) const noexcept
 	{
 		return Compare<sl_uint64>()(a._value, b._value);
 	}
@@ -36,7 +36,7 @@ namespace slib
 	const _priv_Variant_Const _priv_Variant_Null = {0, VariantType::Null, 0};
 
 
-	SLIB_INLINE void _priv_Variant_copy(VariantType src_type, sl_uint64 src_value, sl_uint64& dst_value)
+	SLIB_INLINE static void _priv_Variant_copy(VariantType src_type, sl_uint64 src_value, sl_uint64& dst_value) noexcept
 	{
 		switch (src_type) {
 			case VariantType::String8:
@@ -55,7 +55,7 @@ namespace slib
 		}
 	}
 
-	SLIB_INLINE void _priv_Variant_free(VariantType type, sl_uint64 value)
+	SLIB_INLINE static void _priv_Variant_free(VariantType type, sl_uint64 value) noexcept
 	{
 		switch (type)
 		{
@@ -74,12 +74,12 @@ namespace slib
 		}
 	}
 
-	void Variant::_free(VariantType type, sl_uint64 value)
+	void Variant::_free(VariantType type, sl_uint64 value) noexcept
 	{
 		_priv_Variant_free(type, value);
 	}
 
-	SLIB_INLINE void Atomic<Variant>::_retain(VariantType& type, sl_uint64& value) const
+	SLIB_INLINE void Atomic<Variant>::_retain(VariantType& type, sl_uint64& value) const noexcept
 	{
 		if ((void*)(this) == (void*)(&_priv_Variant_Null)) {
 			type = VariantType::Null;
@@ -91,7 +91,7 @@ namespace slib
 		}
 	}
 
-	SLIB_INLINE void Atomic<Variant>::_replace(VariantType type, sl_uint64 value)
+	SLIB_INLINE void Atomic<Variant>::_replace(VariantType type, sl_uint64 value) noexcept
 	{
 		VariantType typeOld;
 		sl_uint64 valueOld;
@@ -106,20 +106,20 @@ namespace slib
 	}
 
 
-	Variant::Variant(Variant&& other)
+	Variant::Variant(Variant&& other) noexcept
 	{
 		_type = other._type;
 		_value = other._value;
 		other._type = VariantType::Null;
 	}
 
-	Variant::Variant(const Variant& other)
+	Variant::Variant(const Variant& other) noexcept
 	{
 		_type = other._type;
 		_priv_Variant_copy(_type, other._value, _value);
 	}
 
-	Variant::Variant(AtomicVariant&& _other)
+	Variant::Variant(AtomicVariant&& _other) noexcept
 	{
 		Variant& other = REF_VAR(Variant, _other);
 		_type = other._type;
@@ -127,99 +127,95 @@ namespace slib
 		other._type = VariantType::Null;
 	}
 
-	Variant::Variant(const AtomicVariant& other)
+	Variant::Variant(const AtomicVariant& other) noexcept
 	{
 		other._retain(_type, _value);
 	}
 
-	Variant::~Variant()
+	Variant::~Variant() noexcept
 	{
 		_priv_Variant_free(_type, _value);
 	}
-
-	Variant::Variant(sl_null_t): _value(0), _type(VariantType::Null)
-	{
-	}
 	
-	Variant::Variant(signed char value)
+	Variant::Variant(signed char value) noexcept
 	{
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = value;
 	}
 	
-	Variant::Variant(unsigned char value)
+	Variant::Variant(unsigned char value) noexcept
 	{
 		_type = VariantType::Uint32;
 		REF_VAR(sl_uint32, _value) = value;
 	}
 
-	Variant::Variant(short value)
+	Variant::Variant(short value) noexcept
 	{
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = value;
 	}
 
-	Variant::Variant(unsigned short value)
+	Variant::Variant(unsigned short value) noexcept
 	{
 		_type = VariantType::Uint32;
 		REF_VAR(sl_uint32, _value) = value;
 	}
 	
-	Variant::Variant(int value)
+	Variant::Variant(int value) noexcept
 	{
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = (sl_int32)value;
 	}
 	
-	Variant::Variant(unsigned int value)
+	Variant::Variant(unsigned int value) noexcept
 	{
 		_type = VariantType::Uint32;
 		REF_VAR(sl_uint32, _value) = (sl_uint32)value;
 	}
 	
-	Variant::Variant(long value)
+	Variant::Variant(long value) noexcept
 	{
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = (sl_int32)value;
 	}
 	
-	Variant::Variant(unsigned long value)
+	Variant::Variant(unsigned long value) noexcept
 	{
 		_type = VariantType::Uint32;
 		REF_VAR(sl_uint32, _value) = (sl_uint32)value;
 	}
 
-	Variant::Variant(sl_int64 value)
+	Variant::Variant(sl_int64 value) noexcept
 	{
 		_type = VariantType::Int64;
 		REF_VAR(sl_int64, _value) = value;
 	}
 
-	Variant::Variant(sl_uint64 value)
+	Variant::Variant(sl_uint64 value) noexcept
 	{
 		_type = VariantType::Uint64;
 		REF_VAR(sl_uint64, _value) = value;
 	}
 
-	Variant::Variant(float value)
+	Variant::Variant(float value) noexcept
 	{
 		_type = VariantType::Float;
 		REF_VAR(float, _value) = value;
 	}
 
-	Variant::Variant(double value)
+	Variant::Variant(double value) noexcept
 	{
 		_type = VariantType::Double;
 		REF_VAR(double, _value) = value;
 	}
 
-	Variant::Variant(sl_bool value)
+	Variant::Variant(sl_bool value) noexcept
 	{
 		_type = VariantType::Boolean;
 		REF_VAR(sl_bool, _value) = value;
 	}
 
-	Variant::Variant(const String& value)
+	Variant::Variant(const String& value) noexcept
 	{
 		if (value.isNotNull()) {
 			_type = VariantType::String8;
@@ -229,7 +225,7 @@ namespace slib
 		}
 	}
 
-	Variant::Variant(const String16& value)
+	Variant::Variant(const String16& value) noexcept
 	{
 		if (value.isNotNull()) {
 			_type = VariantType::String16;
@@ -239,7 +235,7 @@ namespace slib
 		}
 	}
 
-	Variant::Variant(const AtomicString& s)
+	Variant::Variant(const AtomicString& s) noexcept
 	{
 		String value(s);
 		if (value.isNotNull()) {
@@ -250,7 +246,7 @@ namespace slib
 		}
 	}
 
-	Variant::Variant(const AtomicString16& s)
+	Variant::Variant(const AtomicString16& s) noexcept
 	{
 		String16 value(s);
 		if (value.isNotNull()) {
@@ -261,7 +257,7 @@ namespace slib
 		}
 	}
 
-	Variant::Variant(const sl_char8* sz8)
+	Variant::Variant(const sl_char8* sz8) noexcept
 	{
 		if (sz8) {
 			_type = VariantType::Sz8;
@@ -271,7 +267,7 @@ namespace slib
 		}
 	}
 
-	Variant::Variant(const sl_char16* sz16)
+	Variant::Variant(const sl_char16* sz16) noexcept
 	{
 		if (sz16) {
 			_type = VariantType::Sz16;
@@ -281,25 +277,25 @@ namespace slib
 		}
 	}
 	
-	Variant::Variant(const std::string& value)
+	Variant::Variant(const std::string& value) noexcept
 	{
 		_type = VariantType::String8;
 		new PTR_VAR(String, _value) String(value);
 	}
 	
-	Variant::Variant(const std::u16string& value)
+	Variant::Variant(const std::u16string& value) noexcept
 	{
 		_type = VariantType::String16;
 		new PTR_VAR(String16, _value) String16(value);
 	}
 
-	Variant::Variant(const Time& value)
+	Variant::Variant(const Time& value) noexcept
 	{
 		_type = VariantType::Time;
 		REF_VAR(Time, _value) = value;
 	}
 
-	Variant::Variant(const void* ptr)
+	Variant::Variant(const void* ptr) noexcept
 	{
 		if (ptr) {
 			_type = VariantType::Pointer;
@@ -309,7 +305,7 @@ namespace slib
 		}
 	}
 
-	Variant::Variant(const Memory& mem)
+	Variant::Variant(const Memory& mem) noexcept
 	{
 		if (mem.isNotNull()) {
 			_type = VariantType::Object;
@@ -319,7 +315,7 @@ namespace slib
 		}
 	}
 
-	Variant::Variant(const AtomicMemory& _mem)
+	Variant::Variant(const AtomicMemory& _mem) noexcept
 	{
 		Memory mem(_mem);
 		if (mem.isNotNull()) {
@@ -330,7 +326,7 @@ namespace slib
 		}
 	}
 	
-	Variant::Variant(const VariantList& list)
+	Variant::Variant(const VariantList& list) noexcept
 	{
 		if (list.isNotNull()) {
 			_type = VariantType::Object;
@@ -340,7 +336,7 @@ namespace slib
 		}
 	}
 	
-	Variant::Variant(const AtomicVariantList& list)
+	Variant::Variant(const AtomicVariantList& list) noexcept
 	{
 		if (list.isNotNull()) {
 			_type = VariantType::Object;
@@ -350,7 +346,7 @@ namespace slib
 		}
 	}
 	
-	Variant::Variant(const VariantMap& list)
+	Variant::Variant(const VariantMap& list) noexcept
 	{
 		if (list.isNotNull()) {
 			_type = VariantType::Object;
@@ -360,7 +356,7 @@ namespace slib
 		}
 	}
 	
-	Variant::Variant(const AtomicVariantMap& list)
+	Variant::Variant(const AtomicVariantMap& list) noexcept
 	{
 		if (list.isNotNull()) {
 			_type = VariantType::Object;
@@ -370,7 +366,7 @@ namespace slib
 		}
 	}
 	
-	Variant::Variant(const VariantMapList& list)
+	Variant::Variant(const VariantMapList& list) noexcept
 	{
 		if (list.isNotNull()) {
 			_type = VariantType::Object;
@@ -380,7 +376,7 @@ namespace slib
 		}
 	}
 	
-	Variant::Variant(const AtomicVariantMapList& list)
+	Variant::Variant(const AtomicVariantMapList& list) noexcept
 	{
 		if (list.isNotNull()) {
 			_type = VariantType::Object;
@@ -390,118 +386,118 @@ namespace slib
 		}
 	}
 		
-	Variant Variant::createList()
+	Variant Variant::createList() noexcept
 	{
 		return List<Variant>::create();
 	}
 	
-	Variant Variant::createMap()
+	Variant Variant::createMap() noexcept
 	{
 		return Map<String, Variant>::createHash();
 	}
 		
-	Variant Variant::createTreeMap()
+	Variant Variant::createTreeMap() noexcept
 	{
 		return Map<String, Variant>::createTree();
 	}
 	
-	Variant Variant::createHashMap()
+	Variant Variant::createHashMap() noexcept
 	{
 		return Map<String, Variant>::createHash();
 	}
 	
-	Variant Variant::createMapList()
+	Variant Variant::createMapList() noexcept
 	{
 		return List< Map<String, Variant> >::create();
 	}
 	
-	Variant Variant::fromInt32(sl_int32 value)
+	Variant Variant::fromInt32(sl_int32 value) noexcept
 	{
 		return value;
 	}
 
-	Variant Variant::fromUint32(sl_uint32 value)
+	Variant Variant::fromUint32(sl_uint32 value) noexcept
 	{
 		return value;
 	}
 
-	Variant Variant::fromInt64(sl_int64 value)
+	Variant Variant::fromInt64(sl_int64 value) noexcept
 	{
 		return value;
 	}
 
-	Variant Variant::fromUint64(sl_uint64 value)
+	Variant Variant::fromUint64(sl_uint64 value) noexcept
 	{
 		return value;
 	}
 
-	Variant Variant::fromFloat(float value)
+	Variant Variant::fromFloat(float value) noexcept
 	{
 		return value;
 	}
 
-	Variant Variant::fromDouble(double value)
+	Variant Variant::fromDouble(double value) noexcept
 	{
 		return value;
 	}
 
-	Variant Variant::fromBoolean(sl_bool value)
+	Variant Variant::fromBoolean(sl_bool value) noexcept
 	{
 		return value;
 	}
 
-	Variant Variant::fromString(const String& value)
+	Variant Variant::fromString(const String& value) noexcept
 	{
 		return value;
 	}
 
-	Variant Variant::fromString16(const String16& value)
+	Variant Variant::fromString16(const String16& value) noexcept
 	{
 		return value;
 	}
 
-	Variant Variant::fromSz8(const sl_char8* value)
+	Variant Variant::fromSz8(const sl_char8* value) noexcept
 	{
 		return value;
 	}
 
-	Variant Variant::fromSz16(const sl_char16* value)
+	Variant Variant::fromSz16(const sl_char16* value) noexcept
 	{
 		return value;
 	}
 
-	Variant Variant::fromTime(const Time& value)
+	Variant Variant::fromTime(const Time& value) noexcept
 	{
 		return value;
 	}
 
-	Variant Variant::fromPointer(const void* value)
+	Variant Variant::fromPointer(const void* value) noexcept
 	{
 		return value;
 	}
 
-	Variant Variant::fromMemory(const Memory& mem)
+	Variant Variant::fromMemory(const Memory& mem) noexcept
 	{
 		return mem;
 	}
 
-	Variant Variant::fromVariantList(const VariantList& value)
+	Variant Variant::fromVariantList(const VariantList& value) noexcept
 	{
 		return value;
 	}
 
-	Variant Variant::fromVariantMap(const VariantMap& value)
+	Variant Variant::fromVariantMap(const VariantMap& value) noexcept
 	{
 		return value;
 	}
 	
-	Variant Variant::fromVariantMapList(const VariantMapList& value)
+	Variant Variant::fromVariantMapList(const VariantMapList& value) noexcept
 	{
 		return value;
 	}
 
 
-	Variant& Variant::operator=(Variant&& other)
+	Variant& Variant::operator=(Variant&& other) noexcept
 	{
 		if (this != &other) {
 			_priv_Variant_free(_type, _value);
@@ -512,7 +508,7 @@ namespace slib
 		return *this;
 	}
 
-	Variant& Variant::operator=(const Variant& other)
+	Variant& Variant::operator=(const Variant& other) noexcept
 	{
 		if (this != &other) {
 			_priv_Variant_free(_type, _value);
@@ -522,7 +518,7 @@ namespace slib
 		return *this;
 	}
 
-	Variant& Variant::operator=(AtomicVariant&& other)
+	Variant& Variant::operator=(AtomicVariant&& other) noexcept
 	{
 		if ((void*)this != (void*)(&other)) {
 			_priv_Variant_free(_type, _value);
@@ -533,30 +529,30 @@ namespace slib
 		return *this;
 	}
 
-	Variant& Variant::operator=(const AtomicVariant& other)
+	Variant& Variant::operator=(const AtomicVariant& other) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		other._retain(_type, _value);
 		return *this;
 	}
 
-	Variant& Variant::operator=(sl_null_t)
+	Variant& Variant::operator=(sl_null_t) noexcept
 	{
 		setNull();
 		return *this;
 	}
 	
-	Variant Variant::operator[](sl_size indexForVariantList) const
+	Variant Variant::operator[](sl_size indexForVariantList) const noexcept
 	{
 		return getElement(indexForVariantList);
 	}
 
-	Variant Variant::operator[](const String& keyForVariantMap) const
+	Variant Variant::operator[](const String& keyForVariantMap) const noexcept
 	{
 		return getItem(keyForVariantMap);
 	}
 
-	void Variant::setNull()
+	void Variant::setNull() noexcept
 	{
 		if (_type != VariantType::Null) {
 			_priv_Variant_free(_type, _value);
@@ -564,12 +560,12 @@ namespace slib
 		}
 	}
 
-	sl_bool Variant::isInt32() const
+	sl_bool Variant::isInt32() const noexcept
 	{
 		return _type == VariantType::Int32;
 	}
 
-	sl_int32 Variant::getInt32(sl_int32 def) const
+	sl_int32 Variant::getInt32(sl_int32 def) const noexcept
 	{
 		switch (_type) {
 			case VariantType::Int32:
@@ -618,19 +614,19 @@ namespace slib
 		return def;
 	}
 
-	void Variant::setInt32(sl_int32 value)
+	void Variant::setInt32(sl_int32 value) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = value;
 	}
 
-	sl_bool Variant::isUint32() const
+	sl_bool Variant::isUint32() const noexcept
 	{
 		return _type == VariantType::Uint32;
 	}
 
-	sl_uint32 Variant::getUint32(sl_uint32 def) const
+	sl_uint32 Variant::getUint32(sl_uint32 def) const noexcept
 	{
 		switch (_type) {
 			case VariantType::Int32:
@@ -679,19 +675,19 @@ namespace slib
 		return def;
 	}
 
-	void Variant::setUint32(sl_uint32 value)
+	void Variant::setUint32(sl_uint32 value) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		_type = VariantType::Uint32;
 		REF_VAR(sl_uint32, _value) = value;
 	}
 
-	sl_bool Variant::isInt64() const
+	sl_bool Variant::isInt64() const noexcept
 	{
 		return _type == VariantType::Int64;
 	}
 
-	sl_int64 Variant::getInt64(sl_int64 def) const
+	sl_int64 Variant::getInt64(sl_int64 def) const noexcept
 	{
 		switch (_type) {
 			case VariantType::Int32:
@@ -740,19 +736,19 @@ namespace slib
 		return def;
 	}
 
-	void Variant::setInt64(sl_int64 value)
+	void Variant::setInt64(sl_int64 value) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		_type = VariantType::Int64;
 		REF_VAR(sl_int64, _value) = value;
 	}
 
-	sl_bool Variant::isUint64() const
+	sl_bool Variant::isUint64() const noexcept
 	{
 		return _type == VariantType::Uint64;
 	}
 
-	sl_uint64 Variant::getUint64(sl_uint64 def) const
+	sl_uint64 Variant::getUint64(sl_uint64 def) const noexcept
 	{
 		switch (_type) {
 			case VariantType::Int32:
@@ -801,34 +797,34 @@ namespace slib
 		return def;
 	}
 
-	void Variant::setUint64(sl_uint64 value)
+	void Variant::setUint64(sl_uint64 value) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		_type = VariantType::Uint64;
 		REF_VAR(sl_uint64, _value) = value;
 	}
 
-	sl_bool Variant::isInteger() const
+	sl_bool Variant::isInteger() const noexcept
 	{
 		return _type == VariantType::Int32 || _type == VariantType::Uint32 || _type == VariantType::Int64 || _type == VariantType::Uint64;
 	}
 
-	sl_bool Variant::isSignedInteger() const
+	sl_bool Variant::isSignedInteger() const noexcept
 	{
 		return _type == VariantType::Int32 || _type == VariantType::Int64;
 	}
 
-	sl_bool Variant::isUnsignedInteger() const
+	sl_bool Variant::isUnsignedInteger() const noexcept
 	{
 		return _type == VariantType::Uint32 || _type == VariantType::Uint64;
 	}
 
-	sl_bool Variant::isFloat() const
+	sl_bool Variant::isFloat() const noexcept
 	{
 		return _type == VariantType::Float;
 	}
 
-	float Variant::getFloat(float def) const
+	float Variant::getFloat(float def) const noexcept
 	{
 		switch (_type) {
 			case VariantType::Int32:
@@ -873,19 +869,19 @@ namespace slib
 		return def;
 	}
 
-	void Variant::setFloat(float value)
+	void Variant::setFloat(float value) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		_type = VariantType::Float;
 		REF_VAR(float, _value) = value;
 	}
 
-	sl_bool Variant::isDouble() const
+	sl_bool Variant::isDouble() const noexcept
 	{
 		return _type == VariantType::Double;
 	}
 
-	double Variant::getDouble(double def) const
+	double Variant::getDouble(double def) const noexcept
 	{
 		switch (_type) {
 			case VariantType::Int32:
@@ -930,24 +926,24 @@ namespace slib
 		return def;
 	}
 
-	void Variant::setDouble(double value)
+	void Variant::setDouble(double value) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		_type = VariantType::Double;
 		REF_VAR(double, _value) = value;
 	}
 
-	sl_bool Variant::isNumber() const
+	sl_bool Variant::isNumber() const noexcept
 	{
 		return isInteger() || _type == VariantType::Float || _type == VariantType::Double;
 	}
 
-	sl_bool Variant::isBoolean() const
+	sl_bool Variant::isBoolean() const noexcept
 	{
 		return _type == VariantType::Boolean;
 	}
 
-	sl_bool Variant::getBoolean(sl_bool def) const
+	sl_bool Variant::getBoolean(sl_bool def) const noexcept
 	{
 		switch (_type) {
 			case VariantType::Int32:
@@ -1018,39 +1014,39 @@ namespace slib
 		return def;
 	}
 
-	void Variant::setBoolean(sl_bool value)
+	void Variant::setBoolean(sl_bool value) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		_type = VariantType::Boolean;
 		REF_VAR(sl_bool, _value) = value;
 	}
 
-	sl_bool Variant::isString() const
+	sl_bool Variant::isString() const noexcept
 	{
 		return _type == VariantType::String8 || _type == VariantType::String16 || _type == VariantType::Sz8 || _type == VariantType::Sz16;
 	}
 
-	sl_bool Variant::isString8() const
+	sl_bool Variant::isString8() const noexcept
 	{
 		return _type == VariantType::String8;
 	}
 
-	sl_bool Variant::isString16() const
+	sl_bool Variant::isString16() const noexcept
 	{
 		return _type == VariantType::String16;
 	}
 
-	sl_bool Variant::isSz8() const
+	sl_bool Variant::isSz8() const noexcept
 	{
 		return _type == VariantType::Sz8;
 	}
 
-	sl_bool Variant::isSz16() const
+	sl_bool Variant::isSz16() const noexcept
 	{
 		return _type == VariantType::Sz16;
 	}
 
-	String Variant::getString(const String& def) const
+	String Variant::getString(const String& def) const noexcept
 	{
 		switch (_type) {
 			case VariantType::Int32:
@@ -1091,12 +1087,12 @@ namespace slib
 		return def;
 	}
 
-	String Variant::getString() const
+	String Variant::getString() const noexcept
 	{
 		return getString(String::null());
 	}
 
-	String16 Variant::getString16(const String16& def) const
+	String16 Variant::getString16(const String16& def) const noexcept
 	{
 		switch (_type) {
 			case VariantType::Int32:
@@ -1137,12 +1133,12 @@ namespace slib
 		return def;
 	}
 
-	String16 Variant::getString16() const
+	String16 Variant::getString16() const noexcept
 	{
 		return getString16(String16::null());
 	}
 
-	const sl_char8* Variant::getSz8(const sl_char8* def) const
+	const sl_char8* Variant::getSz8(const sl_char8* def) const noexcept
 	{
 		switch (_type) {
 			case VariantType::Boolean:
@@ -1161,7 +1157,7 @@ namespace slib
 		return def;
 	}
 
-	const sl_char16* Variant::getSz16(const sl_char16* def) const
+	const sl_char16* Variant::getSz16(const sl_char16* def) const noexcept
 	{
 		switch (_type) {
 			case VariantType::Boolean:
@@ -1182,7 +1178,7 @@ namespace slib
 		return def;
 	}
 
-	void Variant::setString(const String& value)
+	void Variant::setString(const String& value) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		if (value.isNotNull()) {
@@ -1193,7 +1189,7 @@ namespace slib
 		}
 	}
 
-	void Variant::setString(const String16& value)
+	void Variant::setString(const String16& value) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		if (value.isNotNull()) {
@@ -1204,7 +1200,7 @@ namespace slib
 		}
 	}
 
-	void Variant::setString(const AtomicString& s)
+	void Variant::setString(const AtomicString& s) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		String value(s);
@@ -1216,7 +1212,7 @@ namespace slib
 		}
 	}
 
-	void Variant::setString(const AtomicString16& s)
+	void Variant::setString(const AtomicString16& s) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		String value(s);
@@ -1228,7 +1224,7 @@ namespace slib
 		}
 	}
 
-	void Variant::setString(const sl_char8* value)
+	void Variant::setString(const sl_char8* value) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		if (value) {
@@ -1239,7 +1235,7 @@ namespace slib
 		}
 	}
 
-	void Variant::setString(const sl_char16* value)
+	void Variant::setString(const sl_char16* value) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		if (value) {
@@ -1250,46 +1246,46 @@ namespace slib
 		}
 	}
 	
-	std::string Variant::getStdString(const std::string& def) const
+	std::string Variant::getStdString(const std::string& def) const noexcept
 	{
 		return getString(def).toStd();
 	}
 	
-	std::string Variant::getStdString() const
+	std::string Variant::getStdString() const noexcept
 	{
 		return getString().toStd();
 	}
 	
-	std::u16string Variant::getStdString16(const std::u16string& def) const
+	std::u16string Variant::getStdString16(const std::u16string& def) const noexcept
 	{
 		return getString16(def).toStd();
 	}
 	
-	std::u16string Variant::getStdString16() const
+	std::u16string Variant::getStdString16() const noexcept
 	{
 		return getString16().toStd();
 	}
 	
-	void Variant::setString(const std::string& value)
+	void Variant::setString(const std::string& value) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		_type = VariantType::String8;
 		new PTR_VAR(String, _value) String(value);
 	}
 	
-	void Variant::setString(const std::u16string& value)
+	void Variant::setString(const std::u16string& value) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		_type = VariantType::String16;
 		new PTR_VAR(String16, _value) String16(value);
 	}
 
-	sl_bool Variant::isTime() const
+	sl_bool Variant::isTime() const noexcept
 	{
 		return _type == VariantType::Time;
 	}
 
-	Time Variant::getTime(const Time& def) const
+	Time Variant::getTime(const Time& def) const noexcept
 	{
 		switch (_type) {
 			case VariantType::Time:
@@ -1308,24 +1304,24 @@ namespace slib
 		return def;
 	}
 
-	Time Variant::getTime() const
+	Time Variant::getTime() const noexcept
 	{
 		return getTime(Time::zero());
 	}
 
-	void Variant::setTime(const Time& value)
+	void Variant::setTime(const Time& value) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		_type = VariantType::Time;
 		REF_VAR(Time, _value) = value;
 	}
 
-	sl_bool Variant::isPointer() const
+	sl_bool Variant::isPointer() const noexcept
 	{
 		return _type == VariantType::Pointer || _type == VariantType::Sz8 || _type == VariantType::Sz16;
 	}
 
-	void* Variant::getPointer(const void* def) const
+	void* Variant::getPointer(const void* def) const noexcept
 	{
 		if (_type == VariantType::Pointer || _type == VariantType::Sz8 || _type == VariantType::Sz16) {
 			return REF_VAR(void* const, _value);
@@ -1333,7 +1329,7 @@ namespace slib
 		return (void*)def;
 	}
 
-	void Variant::setPointer(const void *ptr)
+	void Variant::setPointer(const void *ptr) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		if (ptr) {
@@ -1344,17 +1340,17 @@ namespace slib
 		}
 	}
 
-	sl_bool Variant::isObject() const
+	sl_bool Variant::isObject() const noexcept
 	{
 		return _type == VariantType::Object || _type == VariantType::Weak;
 	}
 
-	sl_bool Variant::isWeak() const
+	sl_bool Variant::isWeak() const noexcept
 	{
 		return _type == VariantType::Weak;
 	}
 
-	Ref<Referable> Variant::getObject() const
+	Ref<Referable> Variant::getObject() const noexcept
 	{
 		if (_type == VariantType::Object) {
 			return REF_VAR(Ref<Referable> const, _value);
@@ -1364,7 +1360,7 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_object_type Variant::getObjectType() const
+	sl_object_type Variant::getObjectType() const noexcept
 	{
 		Ref<Referable> obj(getObject());
 		if (obj.isNotNull()) {
@@ -1373,7 +1369,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_bool Variant::isObjectNotNull() const
+	sl_bool Variant::isObjectNotNull() const noexcept
 	{
 		if (_type == VariantType::Object || _type == VariantType::Weak) {
 			return REF_VAR(Ref<Referable> const, _value).isNotNull();
@@ -1381,7 +1377,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool Variant::isObjectNull() const
+	sl_bool Variant::isObjectNull() const noexcept
 	{
 		if (_type == VariantType::Object || _type == VariantType::Weak) {
 			return REF_VAR(Ref<Referable> const, _value).isNull();
@@ -1389,12 +1385,12 @@ namespace slib
 		return sl_true;
 	}
 
-	sl_bool Variant::isMemory() const
+	sl_bool Variant::isMemory() const noexcept
 	{
 		return IsInstanceOf<CMemory>(getObject());
 	}
 
-	Memory Variant::getMemory() const
+	Memory Variant::getMemory() const noexcept
 	{
 		Ref<Referable> obj(getObject());
 		if (CMemory* p = CastInstance<CMemory>(obj._ptr)) {
@@ -1403,7 +1399,7 @@ namespace slib
 		return sl_null;
 	}
 
-	void Variant::setMemory(const Memory& mem)
+	void Variant::setMemory(const Memory& mem) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		if (mem.isNotNull()) {
@@ -1414,12 +1410,12 @@ namespace slib
 		}
 	}
 
-	sl_bool Variant::isVariantList() const
+	sl_bool Variant::isVariantList() const noexcept
 	{
 		return IsInstanceOf< CList<Variant> >(getObject());
 	}
 
-	VariantList Variant::getVariantList() const
+	VariantList Variant::getVariantList() const noexcept
 	{
 		Ref<Referable> obj(getObject());
 		if (CList<Variant>* p = CastInstance< CList<Variant> >(obj._ptr)) {
@@ -1428,7 +1424,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	void Variant::setVariantList(const VariantList& list)
+	void Variant::setVariantList(const VariantList& list) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		if (list.isNotNull()) {
@@ -1439,12 +1435,12 @@ namespace slib
 		}
 	}
 
-	sl_bool Variant::isVariantMap() const
+	sl_bool Variant::isVariantMap() const noexcept
 	{
 		return IsInstanceOf< IMap<String, Variant> >(getObject());
 	}
 
-	VariantMap Variant::getVariantMap() const
+	VariantMap Variant::getVariantMap() const noexcept
 	{
 		Ref<Referable> obj(getObject());
 		if (IMap<String, Variant>* p = CastInstance< IMap<String, Variant> >(obj._ptr)) {
@@ -1453,7 +1449,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	void Variant::setVariantMap(const VariantMap& map)
+	void Variant::setVariantMap(const VariantMap& map) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		if (map.isNotNull()) {
@@ -1464,12 +1460,12 @@ namespace slib
 		}
 	}
 
-	sl_bool Variant::isVariantMapList() const
+	sl_bool Variant::isVariantMapList() const noexcept
 	{
 		return IsInstanceOf< CList< Map<String, Variant> > >(getObject());
 	}
 
-	VariantMapList Variant::getVariantMapList() const
+	VariantMapList Variant::getVariantMapList() const noexcept
 	{
 		Ref<Referable> obj(getObject());
 		if (CList< Map<String, Variant> >* p = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
@@ -1478,7 +1474,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	void Variant::setVariantMapList(const VariantMapList& list)
+	void Variant::setVariantMapList(const VariantMapList& list) noexcept
 	{
 		_priv_Variant_free(_type, _value);
 		if (list.isNotNull()) {
@@ -1489,7 +1485,7 @@ namespace slib
 		}
 	}
 
-	sl_size Variant::getElementsCount() const
+	sl_size Variant::getElementsCount() const noexcept
 	{
 		Ref<Referable> obj(getObject());
 		if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
@@ -1500,7 +1496,7 @@ namespace slib
 		return 0;
 	}
 
-	Variant Variant::getElement(sl_size index) const
+	Variant Variant::getElement(sl_size index) const noexcept
 	{
 		Ref<Referable> obj(getObject());
 		if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
@@ -1511,7 +1507,7 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool Variant::setElement(sl_size index, const Variant& value)
+	sl_bool Variant::setElement(sl_size index, const Variant& value) noexcept
 	{
 		Ref<Referable> obj(getObject());
 		if (CList<Variant>* p = CastInstance< CList<Variant> >(obj._ptr)) {
@@ -1520,7 +1516,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool Variant::addElement(const Variant& value)
+	sl_bool Variant::addElement(const Variant& value) noexcept
 	{
 		Ref<Referable> obj(getObject());
 		if (CList<Variant>* p = CastInstance< CList<Variant> >(obj._ptr)) {
@@ -1529,7 +1525,7 @@ namespace slib
 		return sl_false;
 	}
 
-	Variant Variant::getItem(const String& key) const
+	Variant Variant::getItem(const String& key) const noexcept
 	{
 		Ref<Referable> obj(getObject());
 		if (IMap<String, Variant>* p = CastInstance< IMap<String, Variant> >(obj._ptr)) {
@@ -1538,7 +1534,7 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool Variant::putItem(const String& key, const Variant& value)
+	sl_bool Variant::putItem(const String& key, const Variant& value) noexcept
 	{
 		Ref<Referable> obj(getObject());
 		if (IMap<String, Variant>* p = CastInstance< IMap<String, Variant> >(obj._ptr)) {
@@ -1548,9 +1544,9 @@ namespace slib
 	}
 
 
-	static sl_bool _priv_Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map);
-	static sl_bool _priv_Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list);
-	static sl_bool _priv_Variant_getVariantListJsonString(StringBuffer& ret, const List<Variant>& list)
+	static sl_bool _priv_Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map) noexcept;
+	static sl_bool _priv_Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list) noexcept;
+	static sl_bool _priv_Variant_getVariantListJsonString(StringBuffer& ret, const List<Variant>& list) noexcept
 	{
 		ListLocker<Variant> l(list);
 		sl_size n = l.count;
@@ -1596,7 +1592,7 @@ namespace slib
 		return sl_true;
 	}
 
-	static sl_bool _priv_Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list)
+	static sl_bool _priv_Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list) noexcept
 	{
 		ListLocker< Map<String, Variant> > l(list);
 		sl_size n = l.count;
@@ -1622,7 +1618,7 @@ namespace slib
 		return sl_true;
 	}
 
-	static sl_bool _priv_Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map)
+	static sl_bool _priv_Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map) noexcept
 	{
 		MutexLocker lock(map.getLocker());
 		if (!(ret.addStatic("{", 1))) {
@@ -1673,7 +1669,7 @@ namespace slib
 		return sl_true;
 	}
 
-	String Variant::toString() const
+	String Variant::toString() const noexcept
 	{
 		switch (_type) {
 			case VariantType::Null:
@@ -1727,7 +1723,7 @@ namespace slib
 		}
 	}
 
-	String Variant::toJsonString() const
+	String Variant::toJsonString() const noexcept
 	{
 		SLIB_STATIC_STRING(strNull, "null")
 		switch (_type) {
@@ -1786,545 +1782,541 @@ namespace slib
 		}
 	}
 	
-	void Variant::get(Variant& _out) const
+	void Variant::get(Variant& _out) const noexcept
 	{
 		_out = *this;
 	}
 	
-	void Variant::set(const Variant& _in)
+	void Variant::set(const Variant& _in) noexcept
 	{
 		*this = _in;
 	}
 
-	void Variant::get(AtomicVariant& _out) const
+	void Variant::get(AtomicVariant& _out) const noexcept
 	{
 		_out = *this;
 	}
 
-	void Variant::set(const AtomicVariant& _in)
+	void Variant::set(const AtomicVariant& _in) noexcept
 	{
 		*this = _in;
 	}
 	
-	void Variant::get(signed char& _out) const
+	void Variant::get(signed char& _out) const noexcept
 	{
 		_out = (signed char)(getInt32());
 	}
 	
-	void Variant::get(signed char& _out, signed char def) const
+	void Variant::get(signed char& _out, signed char def) const noexcept
 	{
 		_out = (signed char)(getInt32((sl_int32)def));
 	}
 	
-	void Variant::set(signed char _in)
+	void Variant::set(signed char _in) noexcept
 	{
 		setInt32((sl_int32)_in);
 	}
 	
-	void Variant::get(unsigned char& _out) const
+	void Variant::get(unsigned char& _out) const noexcept
 	{
 		_out = (unsigned char)(getUint32());
 	}
 	
-	void Variant::get(unsigned char& _out, unsigned char def) const
+	void Variant::get(unsigned char& _out, unsigned char def) const noexcept
 	{
 		_out = (unsigned char)(getUint32((sl_uint32)def));
 	}
 	
-	void Variant::set(unsigned char _in)
+	void Variant::set(unsigned char _in) noexcept
 	{
 		setUint32((sl_uint32)_in);
 	}
 	
-	void Variant::get(short& _out) const
+	void Variant::get(short& _out) const noexcept
 	{
 		_out = (short)(getInt32());
 	}
 	
-	void Variant::get(short& _out, short def) const
+	void Variant::get(short& _out, short def) const noexcept
 	{
 		_out = (short)(getInt32((sl_int32)def));
 	}
 	
-	void Variant::set(short _in)
+	void Variant::set(short _in) noexcept
 	{
 		setInt32((sl_int32)_in);
 	}
 	
-	void Variant::get(unsigned short& _out) const
+	void Variant::get(unsigned short& _out) const noexcept
 	{
 		_out = (unsigned short)(getUint32());
 	}
 	
-	void Variant::get(unsigned short& _out, unsigned short def) const
+	void Variant::get(unsigned short& _out, unsigned short def) const noexcept
 	{
 		_out = (unsigned short)(getUint32((sl_uint32)def));
 	}
 	
-	void Variant::set(unsigned short _in)
+	void Variant::set(unsigned short _in) noexcept
 	{
 		setUint32((sl_uint32)_in);
 	}
 	
-	void Variant::get(int& _out) const
+	void Variant::get(int& _out) const noexcept
 	{
 		_out = (int)(getInt32());
 	}
 	
-	void Variant::get(int& _out, int def) const
+	void Variant::get(int& _out, int def) const noexcept
 	{
 		_out = (int)(getInt32((sl_int32)def));
 	}
 	
-	void Variant::set(int _in)
+	void Variant::set(int _in) noexcept
 	{
 		setInt32((sl_int32)_in);
 	}
 	
-	void Variant::get(unsigned int& _out) const
+	void Variant::get(unsigned int& _out) const noexcept
 	{
 		_out = (unsigned int)(getUint32());
 	}
 	
-	void Variant::get(unsigned int& _out, unsigned int def) const
+	void Variant::get(unsigned int& _out, unsigned int def) const noexcept
 	{
 		_out = (unsigned int)(getUint32((sl_uint32)def));
 	}
 	
-	void Variant::set(unsigned int _in)
+	void Variant::set(unsigned int _in) noexcept
 	{
 		setUint32((sl_uint32)_in);
 	}
 	
-	void Variant::get(long& _out) const
+	void Variant::get(long& _out) const noexcept
 	{
 		_out = (long)(getInt32());
 	}
 	
-	void Variant::get(long& _out, long def) const
+	void Variant::get(long& _out, long def) const noexcept
 	{
 		_out = (long)(getInt32((sl_int32)def));
 	}
 	
-	void Variant::set(long _in)
+	void Variant::set(long _in) noexcept
 	{
 		setInt32((sl_int32)_in);
 	}
 	
-	void Variant::get(unsigned long& _out) const
+	void Variant::get(unsigned long& _out) const noexcept
 	{
 		_out = (unsigned long)(getUint32());
 	}
 	
-	void Variant::get(unsigned long& _out, unsigned long def) const
+	void Variant::get(unsigned long& _out, unsigned long def) const noexcept
 	{
 		_out = (unsigned long)(getUint32((sl_uint32)def));
 	}
 	
-	void Variant::set(unsigned long _in)
+	void Variant::set(unsigned long _in) noexcept
 	{
 		setUint32((sl_uint32)_in);
 	}
 	
-	void Variant::get(sl_int64& _out) const
+	void Variant::get(sl_int64& _out) const noexcept
 	{
 		_out = getInt64();
 	}
 	
-	void Variant::get(sl_int64& _out, sl_int64 def) const
+	void Variant::get(sl_int64& _out, sl_int64 def) const noexcept
 	{
 		_out = getInt64(def);
 	}
 	
-	void Variant::set(sl_int64 _in)
+	void Variant::set(sl_int64 _in) noexcept
 	{
 		setInt64(_in);
 	}
 	
-	void Variant::get(sl_uint64& _out) const
+	void Variant::get(sl_uint64& _out) const noexcept
 	{
 		_out = getUint64();
 	}
 	
-	void Variant::get(sl_uint64& _out, sl_uint64 def) const
+	void Variant::get(sl_uint64& _out, sl_uint64 def) const noexcept
 	{
 		_out = getUint64(def);
 	}
 	
-	void Variant::set(sl_uint64 _in)
+	void Variant::set(sl_uint64 _in) noexcept
 	{
 		setUint64(_in);
 	}
 	
-	void Variant::get(float& _out) const
+	void Variant::get(float& _out) const noexcept
 	{
 		_out = getFloat();
 	}
 	
-	void Variant::get(float& _out, float def) const
+	void Variant::get(float& _out, float def) const noexcept
 	{
 		_out = getFloat(def);
 	}
 	
-	void Variant::set(float _in)
+	void Variant::set(float _in) noexcept
 	{
 		setFloat(_in);
 	}
 	
-	void Variant::get(double& _out) const
+	void Variant::get(double& _out) const noexcept
 	{
 		_out = getDouble();
 	}
 	
-	void Variant::get(double& _out, double def) const
+	void Variant::get(double& _out, double def) const noexcept
 	{
 		_out = getDouble(def);
 	}
 	
-	void Variant::set(double _in)
+	void Variant::set(double _in) noexcept
 	{
 		setDouble(_in);
 	}
 	
-	void Variant::get(bool& _out) const
+	void Variant::get(bool& _out) const noexcept
 	{
 		_out = getBoolean();
 	}
 	
-	void Variant::get(bool& _out, bool def) const
+	void Variant::get(bool& _out, bool def) const noexcept
 	{
 		_out = getBoolean(def);
 	}
 	
-	void Variant::set(bool _in)
+	void Variant::set(bool _in) noexcept
 	{
 		setBoolean(_in);
 	}
 	
-	void Variant::get(String& _out) const
+	void Variant::get(String& _out) const noexcept
 	{
 		_out = getString();
 	}
 	
-	void Variant::get(String& _out, const String& def) const
+	void Variant::get(String& _out, const String& def) const noexcept
 	{
 		_out = getString(def);
 	}
 	
-	void Variant::set(const String& _in)
+	void Variant::set(const String& _in) noexcept
 	{
 		setString(_in);
 	}
 	
-	void Variant::get(AtomicString& _out) const
+	void Variant::get(AtomicString& _out) const noexcept
 	{
 		_out = getString();
 	}
 	
-	void Variant::get(AtomicString& _out, const String& def) const
+	void Variant::get(AtomicString& _out, const String& def) const noexcept
 	{
 		_out = getString(def);
 	}
 	
-	void Variant::set(const AtomicString& _in)
+	void Variant::set(const AtomicString& _in) noexcept
 	{
 		setString(_in);
 	}
 
-	void Variant::get(String16& _out) const
+	void Variant::get(String16& _out) const noexcept
 	{
 		_out = getString16();
 	}
 	
-	void Variant::get(String16& _out, const String16& def) const
+	void Variant::get(String16& _out, const String16& def) const noexcept
 	{
 		_out = getString16(def);
 	}
 	
-	void Variant::set(const String16& _in)
+	void Variant::set(const String16& _in) noexcept
 	{
 		setString(_in);
 	}
 	
-	void Variant::get(AtomicString16& _out) const
+	void Variant::get(AtomicString16& _out) const noexcept
 	{
 		_out = getString16();
 	}
 	
-	void Variant::get(AtomicString16& _out, const String16& def) const
+	void Variant::get(AtomicString16& _out, const String16& def) const noexcept
 	{
 		_out = getString16(def);
 	}
 	
-	void Variant::set(const AtomicString16& _in)
+	void Variant::set(const AtomicString16& _in) noexcept
 	{
 		setString(_in);
 	}
 	
-	void Variant::set(const sl_char8* _in)
+	void Variant::set(const sl_char8* _in) noexcept
 	{
 		setString(_in);
 	}
 	
-	void Variant::set(const sl_char16* _in)
+	void Variant::set(const sl_char16* _in) noexcept
 	{
 		setString(_in);
 	}
 	
-	void Variant::get(std::string& _out) const
+	void Variant::get(std::string& _out) const noexcept
 	{
 		_out = getString().toStd();
 	}
 	
-	void Variant::get(std::string& _out, const std::string& def) const
+	void Variant::get(std::string& _out, const std::string& def) const noexcept
 	{
 		_out = getString(def).toStd();
 	}
 	
-	void Variant::set(const std::string& _in)
+	void Variant::set(const std::string& _in) noexcept
 	{
 		setString(_in);
 	}
 	
-	void Variant::get(std::u16string& _out) const
+	void Variant::get(std::u16string& _out) const noexcept
 	{
 		_out = getString16().toStd();
 	}
 	
-	void Variant::get(std::u16string& _out, const std::u16string& def) const
+	void Variant::get(std::u16string& _out, const std::u16string& def) const noexcept
 	{
 		_out = getString16(def).toStd();
 	}
 	
-	void Variant::set(const std::u16string& _in)
+	void Variant::set(const std::u16string& _in) noexcept
 	{
 		setString(_in);
 	}
 
-	void Variant::get(Time& _out) const
+	void Variant::get(Time& _out) const noexcept
 	{
 		_out = getTime();
 	}
 	
-	void Variant::get(Time& _out, const Time& def) const
+	void Variant::get(Time& _out, const Time& def) const noexcept
 	{
 		_out = getTime(def);
 	}
 	
-	void Variant::set(const Time& _in)
+	void Variant::set(const Time& _in) noexcept
 	{
 		setTime(_in);
 	}
 	
-	void Variant::get(void const* & _out) const
+	void Variant::get(void const* & _out) const noexcept
 	{
 		_out = getPointer();
 	}
 	
-	void Variant::get(void const* & _out, const void* def) const
+	void Variant::get(void const* & _out, const void* def) const noexcept
 	{
 		_out = getPointer(def);
 	}
 	
-	void Variant::set(const void* _in)
+	void Variant::set(const void* _in) noexcept
 	{
 		setPointer(_in);
 	}
 	
-	void Variant::get(Memory& _out) const
+	void Variant::get(Memory& _out) const noexcept
 	{
 		_out = getMemory();
 	}
 	
-	void Variant::set(const Memory& _in)
+	void Variant::set(const Memory& _in) noexcept
 	{
 		setMemory(_in);
 	}
 	
-	void Variant::get(AtomicMemory& _out) const
+	void Variant::get(AtomicMemory& _out) const noexcept
 	{
 		_out = getMemory();
 	}
 	
-	void Variant::set(const AtomicMemory& _in)
+	void Variant::set(const AtomicMemory& _in) noexcept
 	{
 		setMemory(_in);
 	}
 	
-	void Variant::get(VariantList& _out) const
+	void Variant::get(VariantList& _out) const noexcept
 	{
 		_out = getVariantList();
 	}
 	
-	void Variant::set(const VariantList& _in)
+	void Variant::set(const VariantList& _in) noexcept
 	{
 		setVariantList(_in);
 	}
 	
-	void Variant::get(AtomicVariantList& _out) const
+	void Variant::get(AtomicVariantList& _out) const noexcept
 	{
 		_out = getVariantList();
 	}
 	
-	void Variant::set(const AtomicVariantList& _in)
+	void Variant::set(const AtomicVariantList& _in) noexcept
 	{
 		setVariantList(_in);
 	}
 	
-	void Variant::get(VariantMap& _out) const
+	void Variant::get(VariantMap& _out) const noexcept
 	{
 		_out = getVariantMap();
 	}
 	
-	void Variant::set(const VariantMap& _in)
+	void Variant::set(const VariantMap& _in) noexcept
 	{
 		setVariantMap(_in);
 	}
 	
-	void Variant::get(AtomicVariantMap& _out) const
+	void Variant::get(AtomicVariantMap& _out) const noexcept
 	{
 		_out = getVariantMap();
 	}
 	
-	void Variant::set(const AtomicVariantMap& _in)
+	void Variant::set(const AtomicVariantMap& _in) noexcept
 	{
 		setVariantMap(_in);
 	}
 	
-	void Variant::get(VariantMapList& _out) const
+	void Variant::get(VariantMapList& _out) const noexcept
 	{
 		_out = getVariantMapList();
 	}
 	
-	void Variant::set(const VariantMapList& _in)
+	void Variant::set(const VariantMapList& _in) noexcept
 	{
 		setVariantMapList(_in);
 	}
 	
-	void Variant::get(AtomicVariantMapList& _out) const
+	void Variant::get(AtomicVariantMapList& _out) const noexcept
 	{
 		_out = getVariantMapList();
 	}
 	
-	void Variant::set(const AtomicVariantMapList& _in)
+	void Variant::set(const AtomicVariantMapList& _in) noexcept
 	{
 		setVariantMapList(_in);
 	}
 
 	
-	Atomic<Variant>::Atomic(AtomicVariant&& other)
+	Atomic<Variant>::Atomic(AtomicVariant&& other) noexcept
 	{
 		_type = other._type;
 		_value = other._value;
 		other._type = VariantType::Null;
 	}
 
-	Atomic<Variant>::Atomic(const AtomicVariant& other)
+	Atomic<Variant>::Atomic(const AtomicVariant& other) noexcept
 	{
 		other._retain(_type, _value);
 	}
 
-	Atomic<Variant>::Atomic(Variant&& other)
+	Atomic<Variant>::Atomic(Variant&& other) noexcept
 	{
 		_type = other._type;
 		_value = other._value;
 		other._type = VariantType::Null;
 	}
 
-	Atomic<Variant>::Atomic(const Variant& other)
+	Atomic<Variant>::Atomic(const Variant& other) noexcept
 	{
 		_type = other._type;
 		_priv_Variant_copy(_type, other._value, _value);
 	}
 
-	Atomic<Variant>::~Atomic()
+	Atomic<Variant>::~Atomic() noexcept
 	{
 		_priv_Variant_free(_type, _value);
 	}
-
-	Atomic<Variant>::Atomic(sl_null_t): _value(0), _type(VariantType::Null)
-	{
-	}
 	
-	Atomic<Variant>::Atomic(signed char value)
+	Atomic<Variant>::Atomic(signed char value) noexcept
 	{
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = value;
 	}
 	
-	Atomic<Variant>::Atomic(unsigned char value)
+	Atomic<Variant>::Atomic(unsigned char value) noexcept
 	{
 		_type = VariantType::Uint32;
 		REF_VAR(sl_uint32, _value) = value;
 	}
 
-	Atomic<Variant>::Atomic(short value)
+	Atomic<Variant>::Atomic(short value) noexcept
 	{
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = value;
 	}
 
-	Atomic<Variant>::Atomic(unsigned short value)
+	Atomic<Variant>::Atomic(unsigned short value) noexcept
 	{
 		_type = VariantType::Uint32;
 		REF_VAR(sl_uint32, _value) = value;
 	}
 	
-	Atomic<Variant>::Atomic(int value)
+	Atomic<Variant>::Atomic(int value) noexcept
 	{
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = (sl_int32)value;
 	}
 	
-	Atomic<Variant>::Atomic(unsigned int value)
+	Atomic<Variant>::Atomic(unsigned int value) noexcept
 	{
 		_type = VariantType::Uint32;
 		REF_VAR(sl_uint32, _value) = (sl_uint32)value;
 	}
 	
-	Atomic<Variant>::Atomic(long value)
+	Atomic<Variant>::Atomic(long value) noexcept
 	{
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = (sl_int32)value;
 	}
 	
-	Atomic<Variant>::Atomic(unsigned long value)
+	Atomic<Variant>::Atomic(unsigned long value) noexcept
 	{
 		_type = VariantType::Uint32;
 		REF_VAR(sl_uint32, _value) = (sl_uint32)value;
 	}
 
-	Atomic<Variant>::Atomic(sl_int64 value)
+	Atomic<Variant>::Atomic(sl_int64 value) noexcept
 	{
 		_type = VariantType::Int64;
 		REF_VAR(sl_int64, _value) = value;
 	}
 
-	Atomic<Variant>::Atomic(sl_uint64 value)
+	Atomic<Variant>::Atomic(sl_uint64 value) noexcept
 	{
 		_type = VariantType::Uint64;
 		REF_VAR(sl_uint64, _value) = value;
 	}
 
-	Atomic<Variant>::Atomic(float value)
+	Atomic<Variant>::Atomic(float value) noexcept
 	{
 		_type = VariantType::Float;
 		REF_VAR(float, _value) = value;
 	}
 
-	Atomic<Variant>::Atomic(double value)
+	Atomic<Variant>::Atomic(double value) noexcept
 	{
 		_type = VariantType::Double;
 		REF_VAR(double, _value) = value;
 	}
 
-	Atomic<Variant>::Atomic(sl_bool value)
+	Atomic<Variant>::Atomic(sl_bool value) noexcept
 	{
 		_type = VariantType::Boolean;
 		REF_VAR(sl_bool, _value) = value;
 	}
 
-	Atomic<Variant>::Atomic(const String& value)
+	Atomic<Variant>::Atomic(const String& value) noexcept
 	{
 		if (value.isNotNull()) {
 			_type = VariantType::String8;
@@ -2334,7 +2326,7 @@ namespace slib
 		}
 	}
 
-	Atomic<Variant>::Atomic(const String16& value)
+	Atomic<Variant>::Atomic(const String16& value) noexcept
 	{
 		if (value.isNotNull()) {
 			_type = VariantType::String16;
@@ -2344,7 +2336,7 @@ namespace slib
 		}
 	}
 
-	Atomic<Variant>::Atomic(const AtomicString& s)
+	Atomic<Variant>::Atomic(const AtomicString& s) noexcept
 	{
 		String value(s);
 		if (value.isNotNull()) {
@@ -2355,7 +2347,7 @@ namespace slib
 		}
 	}
 
-	Atomic<Variant>::Atomic(const AtomicString16& s)
+	Atomic<Variant>::Atomic(const AtomicString16& s) noexcept
 	{
 		String16 value(s);
 		if (value.isNotNull()) {
@@ -2366,7 +2358,7 @@ namespace slib
 		}
 	}
 
-	Atomic<Variant>::Atomic(const sl_char8* value)
+	Atomic<Variant>::Atomic(const sl_char8* value) noexcept
 	{
 		if (value) {
 			_type = VariantType::Sz8;
@@ -2376,7 +2368,7 @@ namespace slib
 		}
 	}
 
-	Atomic<Variant>::Atomic(const sl_char16* value)
+	Atomic<Variant>::Atomic(const sl_char16* value) noexcept
 	{
 		if (value) {
 			_type = VariantType::Sz16;
@@ -2386,25 +2378,25 @@ namespace slib
 		}
 	}
 	
-	Atomic<Variant>::Atomic(const std::string& value)
+	Atomic<Variant>::Atomic(const std::string& value) noexcept
 	{
 		_type = VariantType::String8;
 		new PTR_VAR(String, _value) String(value);
 	}
 	
-	Atomic<Variant>::Atomic(const std::u16string& value)
+	Atomic<Variant>::Atomic(const std::u16string& value) noexcept
 	{
 		_type = VariantType::String16;
 		new PTR_VAR(String16, _value) String16(value);
 	}
 
-	Atomic<Variant>::Atomic(const Time& value)
+	Atomic<Variant>::Atomic(const Time& value) noexcept
 	{
 		_type = VariantType::Time;
 		REF_VAR(Time, _value) = value;
 	}
 
-	Atomic<Variant>::Atomic(const void* ptr)
+	Atomic<Variant>::Atomic(const void* ptr) noexcept
 	{
 		if (ptr) {
 			_type = VariantType::Pointer;
@@ -2414,7 +2406,7 @@ namespace slib
 		}
 	}
 
-	Atomic<Variant>::Atomic(const Memory& mem)
+	Atomic<Variant>::Atomic(const Memory& mem) noexcept
 	{
 		if (mem.isNotNull()) {
 			_type = VariantType::Object;
@@ -2424,7 +2416,7 @@ namespace slib
 		}
 	}
 
-	Atomic<Variant>::Atomic(const AtomicMemory& _mem)
+	Atomic<Variant>::Atomic(const AtomicMemory& _mem) noexcept
 	{
 		Memory mem(_mem);
 		if (mem.isNotNull()) {
@@ -2435,7 +2427,7 @@ namespace slib
 		}
 	}
 	
-	Atomic<Variant>::Atomic(const VariantList& list)
+	Atomic<Variant>::Atomic(const VariantList& list) noexcept
 	{
 		if (list.isNotNull()) {
 			_type = VariantType::Object;
@@ -2445,7 +2437,7 @@ namespace slib
 		}
 	}
 	
-	Atomic<Variant>::Atomic(const AtomicVariantList& list)
+	Atomic<Variant>::Atomic(const AtomicVariantList& list) noexcept
 	{
 		if (list.isNotNull()) {
 			_type = VariantType::Object;
@@ -2455,7 +2447,7 @@ namespace slib
 		}
 	}
 	
-	Atomic<Variant>::Atomic(const VariantMap& list)
+	Atomic<Variant>::Atomic(const VariantMap& list) noexcept
 	{
 		if (list.isNotNull()) {
 			_type = VariantType::Object;
@@ -2465,7 +2457,7 @@ namespace slib
 		}
 	}
 	
-	Atomic<Variant>::Atomic(const AtomicVariantMap& list)
+	Atomic<Variant>::Atomic(const AtomicVariantMap& list) noexcept
 	{
 		if (list.isNotNull()) {
 			_type = VariantType::Object;
@@ -2475,7 +2467,7 @@ namespace slib
 		}
 	}
 	
-	Atomic<Variant>::Atomic(const VariantMapList& list)
+	Atomic<Variant>::Atomic(const VariantMapList& list) noexcept
 	{
 		if (list.isNotNull()) {
 			_type = VariantType::Object;
@@ -2485,7 +2477,7 @@ namespace slib
 		}
 	}
 	
-	Atomic<Variant>::Atomic(const AtomicVariantMapList& list)
+	Atomic<Variant>::Atomic(const AtomicVariantMapList& list) noexcept
 	{
 		if (list.isNotNull()) {
 			_type = VariantType::Object;
@@ -2495,7 +2487,7 @@ namespace slib
 		}
 	}
 	
-	AtomicVariant& Atomic<Variant>::operator=(AtomicVariant&& other)
+	AtomicVariant& Atomic<Variant>::operator=(AtomicVariant&& other) noexcept
 	{
 		if (this != &other) {
 			_replace(other._type, other._value);
@@ -2504,7 +2496,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicVariant& Atomic<Variant>::operator=(const AtomicVariant& other)
+	AtomicVariant& Atomic<Variant>::operator=(const AtomicVariant& other) noexcept
 	{
 		if (this != &other) {
 			VariantType type;
@@ -2515,7 +2507,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicVariant& Atomic<Variant>::operator=(Variant&& other)
+	AtomicVariant& Atomic<Variant>::operator=(Variant&& other) noexcept
 	{
 		if ((void*)this != (void*)(&other)) {
 			_replace(other._type, other._value);
@@ -2524,7 +2516,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicVariant& Atomic<Variant>::operator=(const Variant& other)
+	AtomicVariant& Atomic<Variant>::operator=(const Variant& other) noexcept
 	{
 		VariantType type = other._type;
 		sl_uint64 value;
@@ -2533,233 +2525,233 @@ namespace slib
 		return *this;
 	}
 
-	AtomicVariant& Atomic<Variant>::operator=(sl_null_t)
+	AtomicVariant& Atomic<Variant>::operator=(sl_null_t) noexcept
 	{
 		setNull();
 		return *this;
 	}
 	
-	Variant Atomic<Variant>::operator[](sl_size indexForVariantList) const
+	Variant Atomic<Variant>::operator[](sl_size indexForVariantList) const noexcept
 	{
 		return getElement(indexForVariantList);
 	}
 
-	Variant Atomic<Variant>::operator[](const String& keyForVariantMap) const
+	Variant Atomic<Variant>::operator[](const String& keyForVariantMap) const noexcept
 	{
 		return getItem(keyForVariantMap);
 	}
 
-	void Atomic<Variant>::setNull()
+	void Atomic<Variant>::setNull() noexcept
 	{
 		if (_type != VariantType::Null) {
 			_replace(VariantType::Null, 0);
 		}
 	}
 
-	sl_bool Atomic<Variant>::isInt32() const
+	sl_bool Atomic<Variant>::isInt32() const noexcept
 	{
 		return _type == VariantType::Int32;
 	}
 
-	sl_int32 Atomic<Variant>::getInt32(sl_int32 def) const
+	sl_int32 Atomic<Variant>::getInt32(sl_int32 def) const noexcept
 	{
 		Variant var(*this);
 		return var.getInt32(def);
 	}
 
-	void Atomic<Variant>::setInt32(sl_int32 value)
+	void Atomic<Variant>::setInt32(sl_int32 value) noexcept
 	{
 		sl_int64 v;
 		REF_VAR(sl_int32, v) = value;
 		_replace(VariantType::Int32, v);
 	}
 
-	sl_bool Atomic<Variant>::isUint32() const
+	sl_bool Atomic<Variant>::isUint32() const noexcept
 	{
 		return _type == VariantType::Uint32;
 	}
 
-	sl_uint32 Atomic<Variant>::getUint32(sl_uint32 def) const
+	sl_uint32 Atomic<Variant>::getUint32(sl_uint32 def) const noexcept
 	{
 		Variant var(*this);
 		return var.getUint32(def);
 	}
 
-	void Atomic<Variant>::setUint32(sl_uint32 value)
+	void Atomic<Variant>::setUint32(sl_uint32 value) noexcept
 	{
 		sl_int64 v;
 		REF_VAR(sl_uint32, v) = value;
 		_replace(VariantType::Uint32, v);
 	}
 
-	sl_bool Atomic<Variant>::isInt64() const
+	sl_bool Atomic<Variant>::isInt64() const noexcept
 	{
 		return _type == VariantType::Int64;
 	}
 
-	sl_int64 Atomic<Variant>::getInt64(sl_int64 def) const
+	sl_int64 Atomic<Variant>::getInt64(sl_int64 def) const noexcept
 	{
 		Variant var(*this);
 		return var.getInt64(def);
 	}
 
-	void Atomic<Variant>::setInt64(sl_int64 value)
+	void Atomic<Variant>::setInt64(sl_int64 value) noexcept
 	{
 		_replace(VariantType::Int64, value);
 	}
 
-	sl_bool Atomic<Variant>::isUint64() const
+	sl_bool Atomic<Variant>::isUint64() const noexcept
 	{
 		return _type == VariantType::Uint64;
 	}
 
-	sl_uint64 Atomic<Variant>::getUint64(sl_uint64 def) const
+	sl_uint64 Atomic<Variant>::getUint64(sl_uint64 def) const noexcept
 	{
 		Variant var(*this);
 		return var.getUint64(def);
 	}
 
-	void Atomic<Variant>::setUint64(sl_uint64 value)
+	void Atomic<Variant>::setUint64(sl_uint64 value) noexcept
 	{
 		_replace(VariantType::Uint64, value);
 	}
 
-	sl_bool Atomic<Variant>::isInteger() const
+	sl_bool Atomic<Variant>::isInteger() const noexcept
 	{
 		return _type == VariantType::Int32 || _type == VariantType::Uint32 || _type == VariantType::Int64 || _type == VariantType::Uint64;
 	}
 
-	sl_bool Atomic<Variant>::isSignedInteger() const
+	sl_bool Atomic<Variant>::isSignedInteger() const noexcept
 	{
 		return _type == VariantType::Int32 || _type == VariantType::Int64;
 	}
 
-	sl_bool Atomic<Variant>::isUnsignedInteger() const
+	sl_bool Atomic<Variant>::isUnsignedInteger() const noexcept
 	{
 		return _type == VariantType::Uint32 || _type == VariantType::Uint64;
 	}
 
-	sl_bool Atomic<Variant>::isFloat() const
+	sl_bool Atomic<Variant>::isFloat() const noexcept
 	{
 		return _type == VariantType::Float;
 	}
 
-	float Atomic<Variant>::getFloat(float def) const
+	float Atomic<Variant>::getFloat(float def) const noexcept
 	{
 		Variant var(*this);
 		return var.getFloat(def);
 	}
 
-	void Atomic<Variant>::setFloat(float value)
+	void Atomic<Variant>::setFloat(float value) noexcept
 	{
 		sl_int64 v;
 		REF_VAR(float, v) = value;
 		_replace(VariantType::Float, v);
 	}
 
-	sl_bool Atomic<Variant>::isDouble() const
+	sl_bool Atomic<Variant>::isDouble() const noexcept
 	{
 		return _type == VariantType::Double;
 	}
 
-	double Atomic<Variant>::getDouble(double def) const
+	double Atomic<Variant>::getDouble(double def) const noexcept
 	{
 		Variant var(*this);
 		return var.getDouble(def);
 	}
 
-	void Atomic<Variant>::setDouble(double value)
+	void Atomic<Variant>::setDouble(double value) noexcept
 	{
 		sl_int64 v;
 		REF_VAR(double, v) = value;
 		_replace(VariantType::Double, v);
 	}
 
-	sl_bool Atomic<Variant>::isNumber() const
+	sl_bool Atomic<Variant>::isNumber() const noexcept
 	{
 		return isInteger() || _type == VariantType::Float || _type == VariantType::Double;
 	}
 
-	sl_bool Atomic<Variant>::isBoolean() const
+	sl_bool Atomic<Variant>::isBoolean() const noexcept
 	{
 		return _type == VariantType::Boolean;
 	}
 
-	sl_bool Atomic<Variant>::getBoolean(sl_bool def) const
+	sl_bool Atomic<Variant>::getBoolean(sl_bool def) const noexcept
 	{
 		Variant var(*this);
 		return var.getBoolean(def);
 	}
 
-	void Atomic<Variant>::setBoolean(sl_bool value)
+	void Atomic<Variant>::setBoolean(sl_bool value) noexcept
 	{
 		sl_int64 v;
 		REF_VAR(sl_bool, v) = value;
 		_replace(VariantType::Boolean, v);
 	}
 
-	sl_bool Atomic<Variant>::isString() const
+	sl_bool Atomic<Variant>::isString() const noexcept
 	{
 		return _type == VariantType::String8 || _type == VariantType::String16 || _type == VariantType::Sz8 || _type == VariantType::Sz16;
 	}
 
-	sl_bool Atomic<Variant>::isString8() const
+	sl_bool Atomic<Variant>::isString8() const noexcept
 	{
 		return _type == VariantType::String8;
 	}
 
-	sl_bool Atomic<Variant>::isString16() const
+	sl_bool Atomic<Variant>::isString16() const noexcept
 	{
 		return _type == VariantType::String16;
 	}
 
-	sl_bool Atomic<Variant>::isSz8() const
+	sl_bool Atomic<Variant>::isSz8() const noexcept
 	{
 		return _type == VariantType::Sz8;
 	}
 
-	sl_bool Atomic<Variant>::isSz16() const
+	sl_bool Atomic<Variant>::isSz16() const noexcept
 	{
 		return _type == VariantType::Sz16;
 	}
 
-	String Atomic<Variant>::getString(const String& def) const
+	String Atomic<Variant>::getString(const String& def) const noexcept
 	{
 		Variant var(*this);
 		return var.getString(def);
 	}
 
-	String Atomic<Variant>::getString() const
+	String Atomic<Variant>::getString() const noexcept
 	{
 		Variant var(*this);
 		return var.getString();
 	}
 
-	String16 Atomic<Variant>::getString16(const String16& def) const
+	String16 Atomic<Variant>::getString16(const String16& def) const noexcept
 	{
 		Variant var(*this);
 		return var.getString16(def);
 	}
 
-	String16 Atomic<Variant>::getString16() const
+	String16 Atomic<Variant>::getString16() const noexcept
 	{
 		Variant var(*this);
 		return var.getString16();
 	}
 
-	const sl_char8* Atomic<Variant>::getSz8(const sl_char8* def) const
+	const sl_char8* Atomic<Variant>::getSz8(const sl_char8* def) const noexcept
 	{
 		Variant var(*this);
 		return var.getSz8(def);
 	}
 
-	const sl_char16* Atomic<Variant>::getSz16(const sl_char16* def) const
+	const sl_char16* Atomic<Variant>::getSz16(const sl_char16* def) const noexcept
 	{
 		Variant var(*this);
 		return var.getSz16(def);
 	}
 
-	void Atomic<Variant>::setString(const String& value)
+	void Atomic<Variant>::setString(const String& value) noexcept
 	{
 		if (value.isNotNull()) {
 			sl_int64 v;
@@ -2770,7 +2762,7 @@ namespace slib
 		}
 	}
 
-	void Atomic<Variant>::setString(const String16& value)
+	void Atomic<Variant>::setString(const String16& value) noexcept
 	{
 		if (value.isNotNull()) {
 			sl_int64 v;
@@ -2781,7 +2773,7 @@ namespace slib
 		}
 	}
 
-	void Atomic<Variant>::setString(const AtomicString& s)
+	void Atomic<Variant>::setString(const AtomicString& s) noexcept
 	{
 		String value(s);
 		if (value.isNotNull()) {
@@ -2793,7 +2785,7 @@ namespace slib
 		}
 	}
 
-	void Atomic<Variant>::setString(const AtomicString16& s)
+	void Atomic<Variant>::setString(const AtomicString16& s) noexcept
 	{
 		String16 value(s);
 		if (value.isNotNull()) {
@@ -2805,7 +2797,7 @@ namespace slib
 		}
 	}
 
-	void Atomic<Variant>::setString(const sl_char8* value)
+	void Atomic<Variant>::setString(const sl_char8* value) noexcept
 	{
 		if (value) {
 			sl_int64 v;
@@ -2816,7 +2808,7 @@ namespace slib
 		}
 	}
 
-	void Atomic<Variant>::setString(const sl_char16* value)
+	void Atomic<Variant>::setString(const sl_char16* value) noexcept
 	{
 		if (value) {
 			sl_int64 v;
@@ -2827,80 +2819,80 @@ namespace slib
 		}
 	}
 	
-	std::string Atomic<Variant>::getStdString(const std::string& def) const
+	std::string Atomic<Variant>::getStdString(const std::string& def) const noexcept
 	{
 		Variant var(*this);
 		return var.getString(def).toStd();
 	}
 	
-	std::string Atomic<Variant>::getStdString() const
+	std::string Atomic<Variant>::getStdString() const noexcept
 	{
 		Variant var(*this);
 		return var.getString().toStd();
 	}
 	
-	std::u16string Atomic<Variant>::getStdString16(const std::u16string& def) const
+	std::u16string Atomic<Variant>::getStdString16(const std::u16string& def) const noexcept
 	{
 		Variant var(*this);
 		return var.getString16(def).toStd();
 	}
 	
-	std::u16string Atomic<Variant>::getStdString16() const
+	std::u16string Atomic<Variant>::getStdString16() const noexcept
 	{
 		Variant var(*this);
 		return var.getString16().toStd();
 	}
 	
-	void Atomic<Variant>::setString(const std::string& value)
+	void Atomic<Variant>::setString(const std::string& value) noexcept
 	{
 		sl_int64 v;
 		new PTR_VAR(String, v) String(value);
 		_replace(VariantType::String8, v);
 	}
 	
-	void Atomic<Variant>::setString(const std::u16string& value)
+	void Atomic<Variant>::setString(const std::u16string& value) noexcept
 	{
 		sl_int64 v;
 		new PTR_VAR(String16, v) String16(value);
 		_replace(VariantType::String16, v);
 	}
 
-	sl_bool Atomic<Variant>::isTime() const
+	sl_bool Atomic<Variant>::isTime() const noexcept
 	{
 		return _type == VariantType::Time;
 	}
 
-	Time Atomic<Variant>::getTime(Time def) const
+	Time Atomic<Variant>::getTime(Time def) const noexcept
 	{
 		Variant var(*this);
 		return var.getTime(def);
 	}
 
-	Time Atomic<Variant>::getTime() const
+	Time Atomic<Variant>::getTime() const noexcept
 	{
 		Variant var(*this);
 		return var.getTime();
 	}
 
-	void Atomic<Variant>::setTime(const Time& value)
+	void Atomic<Variant>::setTime(const Time& value) noexcept
 	{
 		sl_int64 v;
 		REF_VAR(Time, v) = value;
 		_replace(VariantType::Time, v);
 	}
 
-	sl_bool Atomic<Variant>::isPointer() const
+	sl_bool Atomic<Variant>::isPointer() const noexcept
 	{
 		return _type == VariantType::Pointer || _type == VariantType::Sz8 || _type == VariantType::Sz16;
 	}
 
-	void* Atomic<Variant>::getPointer(const void* def) const
+	void* Atomic<Variant>::getPointer(const void* def) const noexcept
 	{
 		Variant var(*this);
 		return var.getPointer(def);
 	}
 
-	void Atomic<Variant>::setPointer(const void *ptr)
+	void Atomic<Variant>::setPointer(const void *ptr) noexcept
 	{
 		if (ptr) {
 			sl_int64 v;
@@ -2911,53 +2903,53 @@ namespace slib
 		}
 	}
 
-	sl_bool Atomic<Variant>::isObject() const
+	sl_bool Atomic<Variant>::isObject() const noexcept
 	{
 		return _type == VariantType::Object;
 	}
 
-	sl_bool Atomic<Variant>::isWeak() const
+	sl_bool Atomic<Variant>::isWeak() const noexcept
 	{
 		return _type == VariantType::Weak;
 	}
 
-	Ref<Referable> Atomic<Variant>::getObject() const
+	Ref<Referable> Atomic<Variant>::getObject() const noexcept
 	{
 		Variant var(*this);
 		return var.getObject();
 	}
 
-	sl_bool Atomic<Variant>::isObjectNotNull() const
+	sl_bool Atomic<Variant>::isObjectNotNull() const noexcept
 	{
 		Variant var(*this);
 		return var.isObjectNotNull();
 	}
 
-	sl_bool Atomic<Variant>::isObjectNull() const
+	sl_bool Atomic<Variant>::isObjectNull() const noexcept
 	{
 		Variant var(*this);
 		return var.isObjectNull();
 	}
 
-	sl_object_type Atomic<Variant>::getObjectType() const
+	sl_object_type Atomic<Variant>::getObjectType() const noexcept
 	{
 		Variant var(*this);
 		return var.getObjectType();
 	}
 
-	sl_bool Atomic<Variant>::isMemory() const
+	sl_bool Atomic<Variant>::isMemory() const noexcept
 	{
 		Variant var(*this);
 		return var.isMemory();
 	}
 
-	Memory Atomic<Variant>::getMemory() const
+	Memory Atomic<Variant>::getMemory() const noexcept
 	{
 		Variant var(*this);
 		return var.getMemory();
 	}
 
-	void Atomic<Variant>::setMemory(const Memory& mem)
+	void Atomic<Variant>::setMemory(const Memory& mem) noexcept
 	{
 		if (mem.isNotNull()) {
 			sl_int64 v;
@@ -2968,19 +2960,19 @@ namespace slib
 		}
 	}
 
-	sl_bool Atomic<Variant>::isVariantList() const
+	sl_bool Atomic<Variant>::isVariantList() const noexcept
 	{
 		Variant var(*this);
 		return var.isVariantList();
 	}
 
-	VariantList Atomic<Variant>::getVariantList() const
+	VariantList Atomic<Variant>::getVariantList() const noexcept
 	{
 		Variant var(*this);
 		return var.getVariantList();
 	}
 	
-	void Atomic<Variant>::setVariantList(const VariantList& list)
+	void Atomic<Variant>::setVariantList(const VariantList& list) noexcept
 	{
 		if (list.isNotNull()) {
 			sl_int64 v;
@@ -2991,19 +2983,19 @@ namespace slib
 		}
 	}
 	
-	sl_bool Atomic<Variant>::isVariantMap() const
+	sl_bool Atomic<Variant>::isVariantMap() const noexcept
 	{
 		Variant var(*this);
 		return var.isVariantMap();
 	}
 
-	VariantMap Atomic<Variant>::getVariantMap() const
+	VariantMap Atomic<Variant>::getVariantMap() const noexcept
 	{
 		Variant var(*this);
 		return var.getVariantMap();
 	}
 	
-	void Atomic<Variant>::setVariantMap(const VariantMap& map)
+	void Atomic<Variant>::setVariantMap(const VariantMap& map) noexcept
 	{
 		if (map.isNotNull()) {
 			sl_int64 v;
@@ -3014,19 +3006,19 @@ namespace slib
 		}
 	}
 
-	sl_bool Atomic<Variant>::isVariantMapList() const
+	sl_bool Atomic<Variant>::isVariantMapList() const noexcept
 	{
 		Variant var(*this);
 		return var.isVariantMap();
 	}
 
-	VariantMapList Atomic<Variant>::getVariantMapList() const
+	VariantMapList Atomic<Variant>::getVariantMapList() const noexcept
 	{
 		Variant var(*this);
 		return var.getVariantMapList();
 	}
 	
-	void Atomic<Variant>::setVariantMapList(const VariantMapList& list)
+	void Atomic<Variant>::setVariantMapList(const VariantMapList& list) noexcept
 	{
 		if (list.isNotNull()) {
 			sl_int64 v;
@@ -3037,486 +3029,486 @@ namespace slib
 		}
 	}
 
-	sl_size Atomic<Variant>::getElementsCount() const
+	sl_size Atomic<Variant>::getElementsCount() const noexcept
 	{
 		Variant var(*this);
 		return var.getElementsCount();
 	}
 
-	Variant Atomic<Variant>::getElement(sl_size index) const
+	Variant Atomic<Variant>::getElement(sl_size index) const noexcept
 	{
 		Variant var(*this);
 		return var.getElement(index);
 	}
 
-	sl_bool Atomic<Variant>::setElement(sl_size index, const Variant& value)
+	sl_bool Atomic<Variant>::setElement(sl_size index, const Variant& value) noexcept
 	{
 		Variant var(*this);
 		return var.setElement(index, value);
 	}
 
-	sl_bool Atomic<Variant>::addElement(const Variant& value)
+	sl_bool Atomic<Variant>::addElement(const Variant& value) noexcept
 	{
 		Variant var(*this);
 		return var.addElement(value);
 	}
 
-	Variant Atomic<Variant>::getItem(const String& key) const
+	Variant Atomic<Variant>::getItem(const String& key) const noexcept
 	{
 		Variant var(*this);
 		return var.getItem(key);
 	}
 
-	sl_bool Atomic<Variant>::putItem(const String& key, const Variant& value)
+	sl_bool Atomic<Variant>::putItem(const String& key, const Variant& value) noexcept
 	{
 		Variant var(*this);
 		return var.putItem(key, value);
 	}
 
-	String Atomic<Variant>::toString() const
+	String Atomic<Variant>::toString() const noexcept
 	{
 		Variant var(*this);
 		return var.toString();
 	}
 
-	String Atomic<Variant>::toJsonString() const
+	String Atomic<Variant>::toJsonString() const noexcept
 	{
 		Variant var(*this);
 		return var.toJsonString();
 	}
 	
-	void Atomic<Variant>::get(Variant& _out) const
+	void Atomic<Variant>::get(Variant& _out) const noexcept
 	{
 		_out = *this;
 	}
 	
-	void Atomic<Variant>::set(const Variant& _in)
+	void Atomic<Variant>::set(const Variant& _in) noexcept
 	{
 		*this = _in;
 	}
 	
-	void Atomic<Variant>::get(AtomicVariant& _out) const
+	void Atomic<Variant>::get(AtomicVariant& _out) const noexcept
 	{
 		_out = *this;
 	}
 	
-	void Atomic<Variant>::set(const AtomicVariant& _in)
+	void Atomic<Variant>::set(const AtomicVariant& _in) noexcept
 	{
 		*this = _in;
 	}
 	
-	void Atomic<Variant>::get(signed char& _out) const
+	void Atomic<Variant>::get(signed char& _out) const noexcept
 	{
 		_out = (signed char)(getInt32());
 	}
 	
-	void Atomic<Variant>::get(signed char& _out, signed char def) const
+	void Atomic<Variant>::get(signed char& _out, signed char def) const noexcept
 	{
 		_out = (signed char)(getInt32((sl_int32)def));
 	}
 	
-	void Atomic<Variant>::set(signed char _in)
+	void Atomic<Variant>::set(signed char _in) noexcept
 	{
 		setInt32((sl_int32)_in);
 	}
 	
-	void Atomic<Variant>::get(unsigned char& _out) const
+	void Atomic<Variant>::get(unsigned char& _out) const noexcept
 	{
 		_out = (unsigned char)(getUint32());
 	}
 	
-	void Atomic<Variant>::get(unsigned char& _out, unsigned char def) const
+	void Atomic<Variant>::get(unsigned char& _out, unsigned char def) const noexcept
 	{
 		_out = (unsigned char)(getUint32((sl_uint32)def));
 	}
 	
-	void Atomic<Variant>::set(unsigned char _in)
+	void Atomic<Variant>::set(unsigned char _in) noexcept
 	{
 		setUint32((sl_uint32)_in);
 	}
 	
-	void Atomic<Variant>::get(short& _out) const
+	void Atomic<Variant>::get(short& _out) const noexcept
 	{
 		_out = (short)(getInt32());
 	}
 	
-	void Atomic<Variant>::get(short& _out, short def) const
+	void Atomic<Variant>::get(short& _out, short def) const noexcept
 	{
 		_out = (short)(getInt32((sl_int32)def));
 	}
 	
-	void Atomic<Variant>::set(short _in)
+	void Atomic<Variant>::set(short _in) noexcept
 	{
 		setInt32((sl_int32)_in);
 	}
 	
-	void Atomic<Variant>::get(unsigned short& _out) const
+	void Atomic<Variant>::get(unsigned short& _out) const noexcept
 	{
 		_out = (unsigned short)(getUint32());
 	}
 	
-	void Atomic<Variant>::get(unsigned short& _out, unsigned short def) const
+	void Atomic<Variant>::get(unsigned short& _out, unsigned short def) const noexcept
 	{
 		_out = (unsigned short)(getUint32((sl_uint32)def));
 	}
 	
-	void Atomic<Variant>::set(unsigned short _in)
+	void Atomic<Variant>::set(unsigned short _in) noexcept
 	{
 		setUint32((sl_uint32)_in);
 	}
 	
-	void Atomic<Variant>::get(int& _out) const
+	void Atomic<Variant>::get(int& _out) const noexcept
 	{
 		_out = (int)(getInt32());
 	}
 	
-	void Atomic<Variant>::get(int& _out, int def) const
+	void Atomic<Variant>::get(int& _out, int def) const noexcept
 	{
 		_out = (int)(getInt32((sl_int32)def));
 	}
 	
-	void Atomic<Variant>::set(int _in)
+	void Atomic<Variant>::set(int _in) noexcept
 	{
 		setInt32((sl_int32)_in);
 	}
 	
-	void Atomic<Variant>::get(unsigned int& _out) const
+	void Atomic<Variant>::get(unsigned int& _out) const noexcept
 	{
 		_out = (unsigned int)(getUint32());
 	}
 	
-	void Atomic<Variant>::get(unsigned int& _out, unsigned int def) const
+	void Atomic<Variant>::get(unsigned int& _out, unsigned int def) const noexcept
 	{
 		_out = (unsigned int)(getUint32((sl_uint32)def));
 	}
 	
-	void Atomic<Variant>::set(unsigned int _in)
+	void Atomic<Variant>::set(unsigned int _in) noexcept
 	{
 		setUint32((sl_uint32)_in);
 	}
 	
-	void Atomic<Variant>::get(long& _out) const
+	void Atomic<Variant>::get(long& _out) const noexcept
 	{
 		_out = (long)(getInt32());
 	}
 	
-	void Atomic<Variant>::get(long& _out, long def) const
+	void Atomic<Variant>::get(long& _out, long def) const noexcept
 	{
 		_out = (long)(getInt32((sl_int32)def));
 	}
 	
-	void Atomic<Variant>::set(long _in)
+	void Atomic<Variant>::set(long _in) noexcept
 	{
 		setInt32((sl_int32)_in);
 	}
 	
-	void Atomic<Variant>::get(unsigned long& _out) const
+	void Atomic<Variant>::get(unsigned long& _out) const noexcept
 	{
 		_out = (unsigned long)(getUint32());
 	}
 	
-	void Atomic<Variant>::get(unsigned long& _out, unsigned long def) const
+	void Atomic<Variant>::get(unsigned long& _out, unsigned long def) const noexcept
 	{
 		_out = (unsigned long)(getUint32((sl_uint32)def));
 	}
 	
-	void Atomic<Variant>::set(unsigned long _in)
+	void Atomic<Variant>::set(unsigned long _in) noexcept
 	{
 		setUint32((sl_uint32)_in);
 	}
 	
-	void Atomic<Variant>::get(sl_int64& _out) const
+	void Atomic<Variant>::get(sl_int64& _out) const noexcept
 	{
 		_out = getInt64();
 	}
 	
-	void Atomic<Variant>::get(sl_int64& _out, sl_int64 def) const
+	void Atomic<Variant>::get(sl_int64& _out, sl_int64 def) const noexcept
 	{
 		_out = getInt64(def);
 	}
 	
-	void Atomic<Variant>::set(sl_int64 _in)
+	void Atomic<Variant>::set(sl_int64 _in) noexcept
 	{
 		setInt64(_in);
 	}
 	
-	void Atomic<Variant>::get(sl_uint64& _out) const
+	void Atomic<Variant>::get(sl_uint64& _out) const noexcept
 	{
 		_out = getUint64();
 	}
 	
-	void Atomic<Variant>::get(sl_uint64& _out, sl_uint64 def) const
+	void Atomic<Variant>::get(sl_uint64& _out, sl_uint64 def) const noexcept
 	{
 		_out = getUint64(def);
 	}
 	
-	void Atomic<Variant>::set(sl_uint64 _in)
+	void Atomic<Variant>::set(sl_uint64 _in) noexcept
 	{
 		setUint64(_in);
 	}
 	
-	void Atomic<Variant>::get(float& _out) const
+	void Atomic<Variant>::get(float& _out) const noexcept
 	{
 		_out = getFloat();
 	}
 	
-	void Atomic<Variant>::get(float& _out, float def) const
+	void Atomic<Variant>::get(float& _out, float def) const noexcept
 	{
 		_out = getFloat(def);
 	}
 	
-	void Atomic<Variant>::set(float _in)
+	void Atomic<Variant>::set(float _in) noexcept
 	{
 		setFloat(_in);
 	}
 	
-	void Atomic<Variant>::get(double& _out) const
+	void Atomic<Variant>::get(double& _out) const noexcept
 	{
 		_out = getDouble();
 	}
 	
-	void Atomic<Variant>::get(double& _out, double def) const
+	void Atomic<Variant>::get(double& _out, double def) const noexcept
 	{
 		_out = getDouble(def);
 	}
 	
-	void Atomic<Variant>::set(double _in)
+	void Atomic<Variant>::set(double _in) noexcept
 	{
 		setDouble(_in);
 	}
 	
-	void Atomic<Variant>::get(bool& _out) const
+	void Atomic<Variant>::get(bool& _out) const noexcept
 	{
 		_out = getBoolean();
 	}
 	
-	void Atomic<Variant>::get(bool& _out, bool def) const
+	void Atomic<Variant>::get(bool& _out, bool def) const noexcept
 	{
 		_out = getBoolean(def);
 	}
 	
-	void Atomic<Variant>::set(bool _in)
+	void Atomic<Variant>::set(bool _in) noexcept
 	{
 		setBoolean(_in);
 	}
 	
-	void Atomic<Variant>::get(String& _out) const
+	void Atomic<Variant>::get(String& _out) const noexcept
 	{
 		_out = getString();
 	}
 	
-	void Atomic<Variant>::get(String& _out, const String& def) const
+	void Atomic<Variant>::get(String& _out, const String& def) const noexcept
 	{
 		_out = getString(def);
 	}
 	
-	void Atomic<Variant>::set(const String& _in)
+	void Atomic<Variant>::set(const String& _in) noexcept
 	{
 		setString(_in);
 	}
 	
-	void Atomic<Variant>::get(AtomicString& _out) const
+	void Atomic<Variant>::get(AtomicString& _out) const noexcept
 	{
 		_out = getString();
 	}
 	
-	void Atomic<Variant>::get(AtomicString& _out, const String& def) const
+	void Atomic<Variant>::get(AtomicString& _out, const String& def) const noexcept
 	{
 		_out = getString(def);
 	}
 	
-	void Atomic<Variant>::set(const AtomicString& _in)
+	void Atomic<Variant>::set(const AtomicString& _in) noexcept
 	{
 		setString(_in);
 	}
 	
-	void Atomic<Variant>::get(String16& _out) const
+	void Atomic<Variant>::get(String16& _out) const noexcept
 	{
 		_out = getString16();
 	}
 	
-	void Atomic<Variant>::get(String16& _out, const String16& def) const
+	void Atomic<Variant>::get(String16& _out, const String16& def) const noexcept
 	{
 		_out = getString16(def);
 	}
 	
-	void Atomic<Variant>::set(const String16& _in)
+	void Atomic<Variant>::set(const String16& _in) noexcept
 	{
 		setString(_in);
 	}
 	
-	void Atomic<Variant>::get(AtomicString16& _out) const
+	void Atomic<Variant>::get(AtomicString16& _out) const noexcept
 	{
 		_out = getString16();
 	}
 	
-	void Atomic<Variant>::get(AtomicString16& _out, const String16& def) const
+	void Atomic<Variant>::get(AtomicString16& _out, const String16& def) const noexcept
 	{
 		_out = getString16(def);
 	}
 	
-	void Atomic<Variant>::set(const AtomicString16& _in)
+	void Atomic<Variant>::set(const AtomicString16& _in) noexcept
 	{
 		setString(_in);
 	}
 	
-	void Atomic<Variant>::set(const sl_char8* _in)
+	void Atomic<Variant>::set(const sl_char8* _in) noexcept
 	{
 		setString(_in);
 	}
 	
-	void Atomic<Variant>::set(const sl_char16* _in)
+	void Atomic<Variant>::set(const sl_char16* _in) noexcept
 	{
 		setString(_in);
 	}
 	
-	void Atomic<Variant>::get(std::string& _out) const
+	void Atomic<Variant>::get(std::string& _out) const noexcept
 	{
 		_out = getString().toStd();
 	}
 	
-	void Atomic<Variant>::get(std::string& _out, const std::string& def) const
+	void Atomic<Variant>::get(std::string& _out, const std::string& def) const noexcept
 	{
 		_out = getString(def).toStd();
 	}
 	
-	void Atomic<Variant>::set(const std::string& _in)
+	void Atomic<Variant>::set(const std::string& _in) noexcept
 	{
 		setString(_in);
 	}
 	
-	void Atomic<Variant>::get(std::u16string& _out) const
+	void Atomic<Variant>::get(std::u16string& _out) const noexcept
 	{
 		_out = getString16().toStd();
 	}
 	
-	void Atomic<Variant>::get(std::u16string& _out, const std::u16string& def) const
+	void Atomic<Variant>::get(std::u16string& _out, const std::u16string& def) const noexcept
 	{
 		_out = getString16(def).toStd();
 	}
 	
-	void Atomic<Variant>::set(const std::u16string& _in)
+	void Atomic<Variant>::set(const std::u16string& _in) noexcept
 	{
 		setString(_in);
 	}
 
-	void Atomic<Variant>::get(Time& _out) const
+	void Atomic<Variant>::get(Time& _out) const noexcept
 	{
 		_out = getTime();
 	}
 	
-	void Atomic<Variant>::get(Time& _out, const Time& def) const
+	void Atomic<Variant>::get(Time& _out, const Time& def) const noexcept
 	{
 		_out = getTime(def);
 	}
 	
-	void Atomic<Variant>::set(const Time& _in)
+	void Atomic<Variant>::set(const Time& _in) noexcept
 	{
 		setTime(_in);
 	}
 	
-	void Atomic<Variant>::get(void const* & _out) const
+	void Atomic<Variant>::get(void const* & _out) const noexcept
 	{
 		_out = getPointer();
 	}
 	
-	void Atomic<Variant>::get(void const* & _out, const void* def) const
+	void Atomic<Variant>::get(void const* & _out, const void* def) const noexcept
 	{
 		_out = getPointer(def);
 	}
 	
-	void Atomic<Variant>::set(const void* _in)
+	void Atomic<Variant>::set(const void* _in) noexcept
 	{
 		setPointer(_in);
 	}
 	
-	void Atomic<Variant>::get(Memory& _out) const
+	void Atomic<Variant>::get(Memory& _out) const noexcept
 	{
 		_out = getMemory();
 	}
 	
-	void Atomic<Variant>::set(const Memory& _in)
+	void Atomic<Variant>::set(const Memory& _in) noexcept
 	{
 		setMemory(_in);
 	}
 	
-	void Atomic<Variant>::get(AtomicMemory& _out) const
+	void Atomic<Variant>::get(AtomicMemory& _out) const noexcept
 	{
 		_out = getMemory();
 	}
 	
-	void Atomic<Variant>::set(const AtomicMemory& _in)
+	void Atomic<Variant>::set(const AtomicMemory& _in) noexcept
 	{
 		setMemory(_in);
 	}
 	
-	void Atomic<Variant>::get(VariantList& _out) const
+	void Atomic<Variant>::get(VariantList& _out) const noexcept
 	{
 		_out = getVariantList();
 	}
 	
-	void Atomic<Variant>::set(const VariantList& _in)
+	void Atomic<Variant>::set(const VariantList& _in) noexcept
 	{
 		setVariantList(_in);
 	}
 	
-	void Atomic<Variant>::get(AtomicVariantList& _out) const
+	void Atomic<Variant>::get(AtomicVariantList& _out) const noexcept
 	{
 		_out = getVariantList();
 	}
 	
-	void Atomic<Variant>::set(const AtomicVariantList& _in)
+	void Atomic<Variant>::set(const AtomicVariantList& _in) noexcept
 	{
 		setVariantList(_in);
 	}
 	
-	void Atomic<Variant>::get(VariantMap& _out) const
+	void Atomic<Variant>::get(VariantMap& _out) const noexcept
 	{
 		_out = getVariantMap();
 	}
 		
-	void Atomic<Variant>::set(const VariantMap& _in)
+	void Atomic<Variant>::set(const VariantMap& _in) noexcept
 	{
 		setVariantMap(_in);
 	}
 	
-	void Atomic<Variant>::get(AtomicVariantMap& _out) const
+	void Atomic<Variant>::get(AtomicVariantMap& _out) const noexcept
 	{
 		_out = getVariantMap();
 	}
 	
-	void Atomic<Variant>::set(const AtomicVariantMap& _in)
+	void Atomic<Variant>::set(const AtomicVariantMap& _in) noexcept
 	{
 		setVariantMap(_in);
 	}
 	
-	void Atomic<Variant>::get(VariantMapList& _out) const
+	void Atomic<Variant>::get(VariantMapList& _out) const noexcept
 	{
 		_out = getVariantMapList();
 	}
 	
-	void Atomic<Variant>::set(const VariantMapList& _in)
+	void Atomic<Variant>::set(const VariantMapList& _in) noexcept
 	{
 		setVariantMapList(_in);
 	}
 	
-	void Atomic<Variant>::get(AtomicVariantMapList& _out) const
+	void Atomic<Variant>::get(AtomicVariantMapList& _out) const noexcept
 	{
 		_out = getVariantMapList();
 	}
 	
-	void Atomic<Variant>::set(const AtomicVariantMapList& _in)
+	void Atomic<Variant>::set(const AtomicVariantMapList& _in) noexcept
 	{
 		setVariantMapList(_in);
 	}
 	
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const sl_int32* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const sl_int32* v2) noexcept
 	{
 		return *v1 == *v2;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const sl_uint32* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const sl_uint32* v2) noexcept
 	{
 		sl_int32 n = *v1;
 		if (n >= 0) {
@@ -3525,22 +3517,22 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v2, const sl_int32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v2, const sl_int32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const sl_int64* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const sl_int64* v2) noexcept
 	{
 		return (sl_int64)(*v1) == *v2;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v2, const sl_int32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v2, const sl_int32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const sl_uint64* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const sl_uint64* v2) noexcept
 	{
 		sl_int32 n = *v1;
 		if (n >= 0) {
@@ -3549,32 +3541,32 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v2, const sl_int32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v2, const sl_int32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const float* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const float* v2) noexcept
 	{
 		return Math::isAlmostZero((float)(*v1) - *v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v2, const sl_int32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v2, const sl_int32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const double* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const double* v2) noexcept
 	{
 		return Math::isAlmostZero((double)(*v1) - *v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const sl_int32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const sl_int32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const String* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const String* v2) noexcept
 	{
 		sl_int32 n;
 		if (v2->parseInt32(10, &n)) {
@@ -3583,12 +3575,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const sl_int32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const sl_int32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const String16* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const String16* v2) noexcept
 	{
 		sl_int32 n;
 		if (v2->parseInt32(10, &n)) {
@@ -3597,12 +3589,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const sl_int32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const sl_int32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, sl_char8 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, sl_char8 const* const* v2) noexcept
 	{
 		sl_int32 n;
 		if (String::parseInt32(10, &n, *v2)) {
@@ -3611,12 +3603,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const sl_int32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const sl_int32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, sl_char16 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, sl_char16 const* const* v2) noexcept
 	{
 		sl_int32 n;
 		if (String16::parseInt32(10, &n, *v2)) {
@@ -3625,58 +3617,58 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const sl_int32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const sl_int32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const sl_uint32* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const sl_uint32* v2) noexcept
 	{
 		return *v1 == *v2;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const sl_int64* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const sl_int64* v2) noexcept
 	{
 		return (sl_int64)(*v1) == *v2;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v2, const sl_uint32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v2, const sl_uint32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const sl_uint64* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const sl_uint64* v2) noexcept
 	{
 		return (sl_uint64)(*v1) == *v2;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v2, const sl_uint32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v2, const sl_uint32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const float* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const float* v2) noexcept
 	{
 		return Math::isAlmostZero((float)(*v1) - *v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v2, const sl_uint32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v2, const sl_uint32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const double* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const double* v2) noexcept
 	{
 		return Math::isAlmostZero((double)(*v1) - *v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const sl_uint32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const sl_uint32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const String* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const String* v2) noexcept
 	{
 		sl_uint32 n;
 		if (v2->parseUint32(10, &n)) {
@@ -3685,12 +3677,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const sl_uint32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const sl_uint32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const String16* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const String16* v2) noexcept
 	{
 		sl_uint32 n;
 		if (v2->parseUint32(10, &n)) {
@@ -3699,12 +3691,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const sl_uint32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const sl_uint32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, sl_char8 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, sl_char8 const* const* v2) noexcept
 	{
 		sl_uint32 n;
 		if (String::parseUint32(10, &n, *v2)) {
@@ -3713,12 +3705,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const sl_uint32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const sl_uint32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, sl_char16 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, sl_char16 const* const* v2) noexcept
 	{
 		sl_uint32 n;
 		if (String16::parseUint32(10, &n, *v2)) {
@@ -3727,18 +3719,18 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const sl_uint32* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const sl_uint32* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const sl_int64* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const sl_int64* v2) noexcept
 	{
 		return *v1 == *v2;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const sl_uint64* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const sl_uint64* v2) noexcept
 	{
 		sl_int64 n = *v1;
 		if (n >= 0) {
@@ -3747,32 +3739,32 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v2, const sl_int64* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v2, const sl_int64* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const float* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const float* v2) noexcept
 	{
 		return Math::isAlmostZero((float)(*v1) - *v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v2, const sl_int64* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v2, const sl_int64* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const double* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const double* v2) noexcept
 	{
 		return Math::isAlmostZero((double)(*v1) - *v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const sl_int64* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const sl_int64* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const String* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const String* v2) noexcept
 	{
 		sl_int64 n;
 		if (v2->parseInt64(10, &n)) {
@@ -3781,12 +3773,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const sl_int64* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const sl_int64* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const String16* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const String16* v2) noexcept
 	{
 		sl_int64 n;
 		if (v2->parseInt64(10, &n)) {
@@ -3795,12 +3787,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const sl_int64* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const sl_int64* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, sl_char8 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, sl_char8 const* const* v2) noexcept
 	{
 		sl_int64 n;
 		if (String::parseInt64(10, &n, *v2)) {
@@ -3809,12 +3801,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const sl_int64* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const sl_int64* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, sl_char16 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, sl_char16 const* const* v2) noexcept
 	{
 		sl_int64 n;
 		if (String16::parseInt64(10, &n, *v2)) {
@@ -3823,38 +3815,38 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const sl_int64* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const sl_int64* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const sl_uint64* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const sl_uint64* v2) noexcept
 	{
 		return *v1 == *v2;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const float* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const float* v2) noexcept
 	{
 		return Math::isAlmostZero((float)(*v1) - *v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v2, const sl_uint64* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v2, const sl_uint64* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const double* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const double* v2) noexcept
 	{
 		return Math::isAlmostZero((double)(*v1) - *v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const sl_uint64* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const sl_uint64* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const String* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const String* v2) noexcept
 	{
 		sl_uint64 n;
 		if (v2->parseUint64(10, &n)) {
@@ -3863,12 +3855,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const sl_uint64* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const sl_uint64* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const String16* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const String16* v2) noexcept
 	{
 		sl_uint64 n;
 		if (v2->parseUint64(10, &n)) {
@@ -3877,12 +3869,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const sl_uint64* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const sl_uint64* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, sl_char8 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, sl_char8 const* const* v2) noexcept
 	{
 		sl_uint64 n;
 		if (String::parseUint64(10, &n, *v2)) {
@@ -3891,12 +3883,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const sl_uint64* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const sl_uint64* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, sl_char16 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, sl_char16 const* const* v2) noexcept
 	{
 		sl_uint64 n;
 		if (String16::parseUint64(10, &n, *v2)) {
@@ -3905,28 +3897,28 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const sl_uint64* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const sl_uint64* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, const float* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, const float* v2) noexcept
 	{
 		return Math::isAlmostZero(*v1 - *v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, const double* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, const double* v2) noexcept
 	{
 		return Math::isAlmostZero((double)(*v1) - *v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const float* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const float* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, const String* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, const String* v2) noexcept
 	{
 		float n;
 		if (v2->parseFloat(&n)) {
@@ -3935,12 +3927,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const float* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const float* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, const String16* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, const String16* v2) noexcept
 	{
 		float n;
 		if (v2->parseFloat(&n)) {
@@ -3949,12 +3941,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const float* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const float* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, sl_char8 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, sl_char8 const* const* v2) noexcept
 	{
 		float n;
 		if (String::parseFloat(&n, *v2)) {
@@ -3963,12 +3955,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const float* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const float* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, sl_char16 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, sl_char16 const* const* v2) noexcept
 	{
 		float n;
 		if (String16::parseFloat(&n, *v2)) {
@@ -3977,18 +3969,18 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const float* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const float* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, const double* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, const double* v2) noexcept
 	{
 		return Math::isAlmostZero(*v1 - *v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, const String* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, const String* v2) noexcept
 	{
 		double n;
 		if (v2->parseDouble(&n)) {
@@ -3997,12 +3989,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const double* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const double* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, const String16* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, const String16* v2) noexcept
 	{
 		double n;
 		if (v2->parseDouble(&n)) {
@@ -4011,12 +4003,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const double* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const double* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, sl_char8 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, sl_char8 const* const* v2) noexcept
 	{
 		double n;
 		if (String::parseDouble(&n, *v2)) {
@@ -4025,12 +4017,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const double* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const double* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, sl_char16 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, sl_char16 const* const* v2) noexcept
 	{
 		double n;
 		if (String16::parseDouble(&n, *v2)) {
@@ -4039,98 +4031,98 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const double* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const double* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v1, const String* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v1, const String* v2) noexcept
 	{
 		return *v1 == *v2;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v1, const String16* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v1, const String16* v2) noexcept
 	{
 		return *v1 == *v2;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const String* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const String* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v1, sl_char8 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v1, sl_char8 const* const* v2) noexcept
 	{
 		return *v1 == *v2;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const String* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const String* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v1, sl_char16 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v1, sl_char16 const* const* v2) noexcept
 	{
 		return *v1 == *v2;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const String* v1)
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v1, const String16* v2)
-	{
-		return *v1 == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v1, sl_char8 const* const* v2)
-	{
-		return *v1 == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const String16* v1)
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v1, sl_char16 const* const* v2)
-	{
-		return *v1 == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const String16* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const String* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v1, sl_char8 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v1, const String16* v2) noexcept
+	{
+		return *v1 == *v2;
+	}
+	
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v1, sl_char8 const* const* v2) noexcept
+	{
+		return *v1 == *v2;
+	}
+	
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const String16* v1) noexcept
+	{
+		return _priv_Variant_equals_element(v1, v2);
+	}
+	
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v1, sl_char16 const* const* v2) noexcept
+	{
+		return *v1 == *v2;
+	}
+	
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const String16* v1) noexcept
+	{
+		return _priv_Variant_equals_element(v1, v2);
+	}
+
+	
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v1, sl_char8 const* const* v2) noexcept
 	{
 		return Base::compareString(*v1, *v2) == 0;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v1, sl_char16 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v1, sl_char16 const* const* v2) noexcept
 	{
 		return *v1 == String(*v2);
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, sl_char8 const* const* v1)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, sl_char8 const* const* v1) noexcept
 	{
 		return _priv_Variant_equals_element(v1, v2);
 	}
 
 
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v1, sl_char16 const* const* v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v1, sl_char16 const* const* v2) noexcept
 	{
 		return Base::compareString2(*v1, *v2) == 0;
 	}
 	
 	
 	template <class T>
-	SLIB_INLINE static sl_bool _priv_Variant_equals(const T* v1, const Variant& v2)
+	SLIB_INLINE static sl_bool _priv_Variant_equals(const T* v1, const Variant& v2) noexcept
 	{
 		VariantType type = v2._type;
 		switch (type) {
@@ -4160,7 +4152,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool operator==(const Variant& v1, const Variant& v2)
+	sl_bool operator==(const Variant& v1, const Variant& v2) noexcept
 	{
 		VariantType type = v1._type;
 		if (type == v2._type) {
@@ -4219,7 +4211,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool operator!=(const Variant& v1, const Variant& v2)
+	sl_bool operator!=(const Variant& v1, const Variant& v2) noexcept
 	{
 		return !(v1 == v2);
 	}

@@ -23,29 +23,29 @@ namespace slib
 	template <>
 	struct StringTypeFromCharType<sl_char16> { typedef String16 Type; };
 
-	SLIB_INLINE String16::String16(String16&& src)
+	SLIB_INLINE String16::String16(String16&& src) noexcept
 	{
 		m_container = src.m_container;
 		src.m_container = sl_null;
 	}
 
-	SLIB_INLINE String16::String16(AtomicString16&& src)
+	SLIB_INLINE String16::String16(AtomicString16&& src) noexcept
 	{
 		m_container = src.m_container;
 		src.m_container = sl_null;
 	}
 	
-	SLIB_INLINE const String16& String16::null()
+	SLIB_INLINE const String16& String16::null() noexcept
 	{
 		return *(reinterpret_cast<String16 const*>(&_priv_String16_Null));
 	}
 	
-	SLIB_INLINE const String16& String16::getEmpty()
+	SLIB_INLINE const String16& String16::getEmpty() noexcept
 	{
 		return *(reinterpret_cast<String16 const*>(&_priv_String16_Empty));
 	}
 
-	SLIB_INLINE const String16& String16::getNotNull() const
+	SLIB_INLINE const String16& String16::getNotNull() const noexcept
 	{
 		if (!m_container) {
 			return *(reinterpret_cast<String16 const*>(&_priv_String16_Empty));
@@ -53,17 +53,17 @@ namespace slib
 		return *this;
 	}
 	
-	SLIB_INLINE sl_bool String16::isNull() const
+	SLIB_INLINE sl_bool String16::isNull() const noexcept
 	{
 		return m_container == sl_null;
 	}
 	
-	SLIB_INLINE sl_bool String16::isNotNull() const
+	SLIB_INLINE sl_bool String16::isNotNull() const noexcept
 	{
 		return m_container != sl_null;
 	}
 	
-	SLIB_INLINE sl_bool String16::isEmpty() const
+	SLIB_INLINE sl_bool String16::isEmpty() const noexcept
 	{
 		if (m_container) {
 			return (m_container->len == 0);
@@ -72,7 +72,7 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE sl_bool String16::isNotEmpty() const
+	SLIB_INLINE sl_bool String16::isNotEmpty() const noexcept
 	{
 		if (m_container) {
 			return (m_container->len != 0);
@@ -81,7 +81,7 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE sl_char16* String16::getData() const
+	SLIB_INLINE sl_char16* String16::getData() const noexcept
 	{
 		if (m_container) {
 			return m_container->sz;
@@ -90,7 +90,7 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE sl_size String16::getLength() const
+	SLIB_INLINE sl_size String16::getLength() const noexcept
 	{
 		if (m_container) {
 			return m_container->len;
@@ -100,34 +100,34 @@ namespace slib
 	}
 
 
-	SLIB_INLINE AtomicString16::Atomic(AtomicString16&& src)
+	SLIB_INLINE AtomicString16::Atomic(AtomicString16&& src) noexcept
 	{
 		m_container = src.m_container;
 		src.m_container = sl_null;
 	}
 	
-	SLIB_INLINE AtomicString16::Atomic(String16&& src)
+	SLIB_INLINE AtomicString16::Atomic(String16&& src) noexcept
 	{
 		m_container = src.m_container;
 		src.m_container = sl_null;
 	}
 
-	SLIB_INLINE const AtomicString16& AtomicString16::null()
+	SLIB_INLINE const AtomicString16& AtomicString16::null() noexcept
 	{
 		return *(reinterpret_cast<AtomicString16 const*>(&_priv_String16_Null));
 	}
 	
-	SLIB_INLINE const AtomicString16& AtomicString16::getEmpty()
+	SLIB_INLINE const AtomicString16& AtomicString16::getEmpty() noexcept
 	{
 		return *(reinterpret_cast<AtomicString16 const*>(&_priv_String16_Empty));
 	}
 	
-	SLIB_INLINE sl_bool AtomicString16::isNull() const
+	SLIB_INLINE sl_bool AtomicString16::isNull() const noexcept
 	{
 		return m_container == sl_null;
 	}
 	
-	SLIB_INLINE sl_bool AtomicString16::isNotNull() const
+	SLIB_INLINE sl_bool AtomicString16::isNotNull() const noexcept
 	{
 		return m_container != sl_null;
 	}

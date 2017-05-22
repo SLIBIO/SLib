@@ -55,501 +55,502 @@ namespace slib
 		VariantType _type;
 	
 	public:
-		constexpr Variant() : _value(0), _type(VariantType::Null) {}
+		SLIB_INLINE constexpr Variant() noexcept : _value(0), _type(VariantType::Null) {}
 
-		Variant(Variant&& other);
+		SLIB_INLINE constexpr Variant(sl_null_t) noexcept : _value(0), _type(VariantType::Null) {}
 
-		Variant(const Variant& other);
+		Variant(Variant&& other) noexcept;
 
-		Variant(AtomicVariant&& _other);
+		Variant(const Variant& other) noexcept;
 
-		Variant(const AtomicVariant& other);
+		Variant(AtomicVariant&& _other) noexcept;
+
+		Variant(const AtomicVariant& other) noexcept;
 	
-		~Variant();
+		~Variant() noexcept;
 
 	public:
-		Variant(sl_null_t);
 		
-		Variant(signed char value);
+		Variant(signed char value) noexcept;
 		
-		Variant(unsigned char value);
+		Variant(unsigned char value) noexcept;
 
-		Variant(short value);
+		Variant(short value) noexcept;
 		
-		Variant(unsigned short value);
+		Variant(unsigned short value) noexcept;
 		
-		Variant(int value);
+		Variant(int value) noexcept;
 		
-		Variant(unsigned int value);
+		Variant(unsigned int value) noexcept;
 		
-		Variant(long value);
+		Variant(long value) noexcept;
 		
-		Variant(unsigned long value);
+		Variant(unsigned long value) noexcept;
 
-		Variant(sl_int64 value);
+		Variant(sl_int64 value) noexcept;
 
-		Variant(sl_uint64 value);
+		Variant(sl_uint64 value) noexcept;
 
-		Variant(float value);
+		Variant(float value) noexcept;
 	
-		Variant(double value);
+		Variant(double value) noexcept;
 
-		Variant(sl_bool value);
+		Variant(sl_bool value) noexcept;
 
-		Variant(const String& value);
+		Variant(const String& value) noexcept;
 
-		Variant(const String16& value);
+		Variant(const String16& value) noexcept;
 
-		Variant(const AtomicString& value);
+		Variant(const AtomicString& value) noexcept;
 
-		Variant(const AtomicString16& value);
+		Variant(const AtomicString16& value) noexcept;
 
 #ifdef SLIB_SUPPORT_STD_TYPES
-		Variant(const std::string& value);
+		Variant(const std::string& value) noexcept;
 		
-		Variant(const std::u16string& value);
+		Variant(const std::u16string& value) noexcept;
 #endif
 		
-		Variant(const sl_char8* sz8);
+		Variant(const sl_char8* sz8) noexcept;
 
-		Variant(const sl_char16* sz16);
+		Variant(const sl_char16* sz16) noexcept;
 		
-		Variant(const Time& value);
+		Variant(const Time& value) noexcept;
 
-		Variant(const void* ptr);
-
-		template <class T>
-		Variant(const Ref<T>& ref);
+		Variant(const void* ptr) noexcept;
 
 		template <class T>
-		Variant(const AtomicRef<T>& ref);
+		Variant(const Ref<T>& ref) noexcept;
 
 		template <class T>
-		Variant(const WeakRef<T>& weak);
+		Variant(const AtomicRef<T>& ref) noexcept;
 
 		template <class T>
-		Variant(const AtomicWeakRef<T>& weak);
+		Variant(const WeakRef<T>& weak) noexcept;
+
+		template <class T>
+		Variant(const AtomicWeakRef<T>& weak) noexcept;
 	
-		Variant(const Memory& mem);
+		Variant(const Memory& mem) noexcept;
 
-		Variant(const AtomicMemory& mem);
+		Variant(const AtomicMemory& mem) noexcept;
 
-		Variant(const List<Variant>& list);
+		Variant(const List<Variant>& list) noexcept;
 
-		Variant(const AtomicList<Variant>& list);
+		Variant(const AtomicList<Variant>& list) noexcept;
 
-		Variant(const Map<String, Variant>& map);
+		Variant(const Map<String, Variant>& map) noexcept;
 
-		Variant(const AtomicMap<String, Variant>& map);
+		Variant(const AtomicMap<String, Variant>& map) noexcept;
 		
-		Variant(const List< Map<String, Variant> >& list);
+		Variant(const List< Map<String, Variant> >& list) noexcept;
 		
-		Variant(const AtomicList< Map<String, Variant> >& list);
+		Variant(const AtomicList< Map<String, Variant> >& list) noexcept;
 	
 	public:
-		static const Variant& null();
+		static const Variant& null() noexcept;
 		
 		
-		static Variant createList();
+		static Variant createList() noexcept;
 		
-		static Variant createMap();
+		static Variant createMap() noexcept;
 		
-		static Variant createTreeMap();
+		static Variant createTreeMap() noexcept;
 		
-		static Variant createHashMap();
+		static Variant createHashMap() noexcept;
 		
-		static Variant createMapList();
+		static Variant createMapList() noexcept;
 
 	
-		static Variant fromInt32(sl_int32 value);
+		static Variant fromInt32(sl_int32 value) noexcept;
 
-		static Variant fromUint32(sl_uint32 value);
+		static Variant fromUint32(sl_uint32 value) noexcept;
 
-		static Variant fromInt64(sl_int64 value);
+		static Variant fromInt64(sl_int64 value) noexcept;
 
-		static Variant fromUint64(sl_uint64 value);
+		static Variant fromUint64(sl_uint64 value) noexcept;
 
-		static Variant fromFloat(float value);
+		static Variant fromFloat(float value) noexcept;
 
-		static Variant fromDouble(double value);
+		static Variant fromDouble(double value) noexcept;
 
-		static Variant fromBoolean(sl_bool value);
+		static Variant fromBoolean(sl_bool value) noexcept;
 
-		static Variant fromString(const String& value);
+		static Variant fromString(const String& value) noexcept;
 
-		static Variant fromString16(const String16& value);
+		static Variant fromString16(const String16& value) noexcept;
 
-		static Variant fromSz8(const sl_char8* value);
+		static Variant fromSz8(const sl_char8* value) noexcept;
 
-		static Variant fromSz16(const sl_char16* value);
+		static Variant fromSz16(const sl_char16* value) noexcept;
 
-		static Variant fromTime(const Time& value);
+		static Variant fromTime(const Time& value) noexcept;
 
-		static Variant fromPointer(const void* value);
-
-		template <class T>
-		static Variant fromRef(const Ref<T>& ref);
+		static Variant fromPointer(const void* value) noexcept;
 
 		template <class T>
-		static Variant fromWeakRef(const WeakRef<T>& weak);
-		
-		static Variant fromMemory(const Memory& mem);
-		
-		static Variant fromVariantList(const List<Variant>& value);
+		static Variant fromRef(const Ref<T>& ref) noexcept;
 
-		static Variant fromVariantMap(const Map<String, Variant>& value);
+		template <class T>
+		static Variant fromWeakRef(const WeakRef<T>& weak) noexcept;
 		
-		static Variant fromVariantMapList(const List< Map<String, Variant> >& value);
+		static Variant fromMemory(const Memory& mem) noexcept;
+		
+		static Variant fromVariantList(const List<Variant>& value) noexcept;
+
+		static Variant fromVariantMap(const Map<String, Variant>& value) noexcept;
+		
+		static Variant fromVariantMapList(const List< Map<String, Variant> >& value) noexcept;
 		
 	public:
-		Variant& operator=(Variant&& other);
+		Variant& operator=(Variant&& other) noexcept;
 
-		Variant& operator=(const Variant& other);
+		Variant& operator=(const Variant& other) noexcept;
 
-		Variant& operator=(AtomicVariant&& other);
+		Variant& operator=(AtomicVariant&& other) noexcept;
 
-		Variant& operator=(const AtomicVariant& other);
+		Variant& operator=(const AtomicVariant& other) noexcept;
 
-		Variant& operator=(sl_null_t);
+		Variant& operator=(sl_null_t) noexcept;
 		
 		template <class T>
-		Variant& operator=(const T& value);
+		Variant& operator=(const T& value) noexcept;
 		
-		Variant operator[](sl_size indexForVariantList) const;
+		Variant operator[](sl_size indexForVariantList) const noexcept;
 
-		Variant operator[](const String& keyForVariantMap) const;
+		Variant operator[](const String& keyForVariantMap) const noexcept;
 
 	public:
-		VariantType getType() const;
+		VariantType getType() const noexcept;
 
-		void setNull();
+		void setNull() noexcept;
 
-		sl_bool isNull() const;
+		sl_bool isNull() const noexcept;
 
-		sl_bool isNotNull() const;
+		sl_bool isNotNull() const noexcept;
 
 
-		sl_bool isInt32() const;
+		sl_bool isInt32() const noexcept;
 	
-		sl_int32 getInt32(sl_int32 def = 0) const;
+		sl_int32 getInt32(sl_int32 def = 0) const noexcept;
 
-		void setInt32(sl_int32 value);
+		void setInt32(sl_int32 value) noexcept;
 	
-		sl_bool isUint32() const;
+		sl_bool isUint32() const noexcept;
 	
-		sl_uint32 getUint32(sl_uint32 def = 0) const;
+		sl_uint32 getUint32(sl_uint32 def = 0) const noexcept;
 
-		void setUint32(sl_uint32 value);
+		void setUint32(sl_uint32 value) noexcept;
 	
-		sl_bool isInt64() const;
+		sl_bool isInt64() const noexcept;
 	
-		sl_int64 getInt64(sl_int64 def = 0) const;
+		sl_int64 getInt64(sl_int64 def = 0) const noexcept;
 
-		void setInt64(sl_int64 value);
+		void setInt64(sl_int64 value) noexcept;
 	
-		sl_bool isUint64() const;
+		sl_bool isUint64() const noexcept;
 	
-		sl_uint64 getUint64(sl_uint64 def = 0) const;
+		sl_uint64 getUint64(sl_uint64 def = 0) const noexcept;
 
-		void setUint64(sl_uint64 value);
+		void setUint64(sl_uint64 value) noexcept;
 	
-		sl_bool isInteger() const;
+		sl_bool isInteger() const noexcept;
 
-		sl_bool isSignedInteger() const;
+		sl_bool isSignedInteger() const noexcept;
 
-		sl_bool isUnsignedInteger() const;
+		sl_bool isUnsignedInteger() const noexcept;
 
-		sl_bool isFloat() const;
+		sl_bool isFloat() const noexcept;
 	
-		float getFloat(float def = 0) const;
+		float getFloat(float def = 0) const noexcept;
 
-		void setFloat(float value);
+		void setFloat(float value) noexcept;
 	
-		sl_bool isDouble() const;
+		sl_bool isDouble() const noexcept;
 	
-		double getDouble(double def = 0) const;
+		double getDouble(double def = 0) const noexcept;
 
-		void setDouble(double value);
+		void setDouble(double value) noexcept;
 	
-		sl_bool isNumber() const;
-	
-
-		sl_bool isBoolean() const;
-	
-		sl_bool getBoolean(sl_bool def = sl_false) const;
-
-		void setBoolean(sl_bool value);
+		sl_bool isNumber() const noexcept;
 	
 
-		sl_bool isString() const;
+		sl_bool isBoolean() const noexcept;
 	
-		sl_bool isString8() const;
+		sl_bool getBoolean(sl_bool def = sl_false) const noexcept;
+
+		void setBoolean(sl_bool value) noexcept;
 	
-		sl_bool isString16() const;
 
-		sl_bool isSz8() const;
-
-		sl_bool isSz16() const;
+		sl_bool isString() const noexcept;
 	
-		String getString(const String& def) const;
-
-		String getString() const;
-
-		String16 getString16(const String16& def) const;
+		sl_bool isString8() const noexcept;
 	
-		String16 getString16() const;
+		sl_bool isString16() const noexcept;
 
-		const sl_char8* getSz8(const sl_char8* def = sl_null) const;
+		sl_bool isSz8() const noexcept;
 
-		const sl_char16* getSz16(const sl_char16* def = sl_null) const;
+		sl_bool isSz16() const noexcept;
+	
+		String getString(const String& def) const noexcept;
 
-		void setString(const String& value);
+		String getString() const noexcept;
 
-		void setString(const String16& value);
+		String16 getString16(const String16& def) const noexcept;
+	
+		String16 getString16() const noexcept;
 
-		void setString(const AtomicString& value);
+		const sl_char8* getSz8(const sl_char8* def = sl_null) const noexcept;
 
-		void setString(const AtomicString16& value);
+		const sl_char16* getSz16(const sl_char16* def = sl_null) const noexcept;
 
-		void setString(const sl_char8* sz8);
+		void setString(const String& value) noexcept;
 
-		void setString(const sl_char16* sz16);
+		void setString(const String16& value) noexcept;
+
+		void setString(const AtomicString& value) noexcept;
+
+		void setString(const AtomicString16& value) noexcept;
+
+		void setString(const sl_char8* sz8) noexcept;
+
+		void setString(const sl_char16* sz16) noexcept;
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		std::string getStdString(const std::string& def) const;
+		std::string getStdString(const std::string& def) const noexcept;
 		
-		std::string getStdString() const;
+		std::string getStdString() const noexcept;
 		
-		std::u16string getStdString16(const std::u16string& def) const;
+		std::u16string getStdString16(const std::u16string& def) const noexcept;
 		
-		std::u16string getStdString16() const;
+		std::u16string getStdString16() const noexcept;
 
-		void setString(const std::string& value);
+		void setString(const std::string& value) noexcept;
 		
-		void setString(const std::u16string& value);
+		void setString(const std::u16string& value) noexcept;
 #endif
 
 
-		sl_bool isTime() const;
+		sl_bool isTime() const noexcept;
 
-		Time getTime(const Time& def) const;
+		Time getTime(const Time& def) const noexcept;
 
-		Time getTime() const;
+		Time getTime() const noexcept;
 
-		void setTime(const Time& value);
-
-
-		sl_bool isPointer() const;
-
-		void* getPointer(const void* def = sl_null) const;
-
-		void setPointer(const void* ptr);
+		void setTime(const Time& value) noexcept;
 
 
-		sl_bool isObject() const;
+		sl_bool isPointer() const noexcept;
 
-		sl_bool isWeak() const;
+		void* getPointer(const void* def = sl_null) const noexcept;
+
+		void setPointer(const void* ptr) noexcept;
+
+
+		sl_bool isObject() const noexcept;
+
+		sl_bool isWeak() const noexcept;
 	
-		Ref<Referable> getObject() const;
-	
-		template <class T>
-		Ref<T> getObject(const Ref<T>& def) const;
+		Ref<Referable> getObject() const noexcept;
 	
 		template <class T>
-		void setObject(const Ref<T>& ref);
+		Ref<T> getObject(const Ref<T>& def) const noexcept;
+	
+		template <class T>
+		void setObject(const Ref<T>& ref) noexcept;
 
 		template <class T>
-		void setWeak(const WeakRef<T>& weak);
+		void setWeak(const WeakRef<T>& weak) noexcept;
 
-		sl_bool isObjectNotNull() const;
+		sl_bool isObjectNotNull() const noexcept;
 
-		sl_bool isObjectNull() const;
+		sl_bool isObjectNull() const noexcept;
 
-		sl_object_type getObjectType() const;
+		sl_object_type getObjectType() const noexcept;
 
-		sl_bool isMemory() const;
+		sl_bool isMemory() const noexcept;
 
-		Memory getMemory() const;
+		Memory getMemory() const noexcept;
 
-		void setMemory(const Memory& mem);
+		void setMemory(const Memory& mem) noexcept;
 		
-		sl_bool isVariantList() const;
+		sl_bool isVariantList() const noexcept;
 
-		List<Variant> getVariantList() const;
+		List<Variant> getVariantList() const noexcept;
 		
-		void setVariantList(const List<Variant>& list);
+		void setVariantList(const List<Variant>& list) noexcept;
 	
-		sl_bool isVariantMap() const;
+		sl_bool isVariantMap() const noexcept;
 
-		Map<String, Variant> getVariantMap() const;
+		Map<String, Variant> getVariantMap() const noexcept;
 		
-		void setVariantMap(const Map<String, Variant>& map);
+		void setVariantMap(const Map<String, Variant>& map) noexcept;
 		
-		sl_bool isVariantMapList() const;
+		sl_bool isVariantMapList() const noexcept;
 
-		List< Map<String, Variant> > getVariantMapList() const;
+		List< Map<String, Variant> > getVariantMapList() const noexcept;
 		
-		void setVariantMapList(const List< Map<String, Variant> >& list);
+		void setVariantMapList(const List< Map<String, Variant> >& list) noexcept;
 
-		sl_size getElementsCount() const;
+		sl_size getElementsCount() const noexcept;
 
-		Variant getElement(sl_size index) const;
+		Variant getElement(sl_size index) const noexcept;
 	
-		sl_bool setElement(sl_size index, const Variant& value);
+		sl_bool setElement(sl_size index, const Variant& value) noexcept;
 	
-		sl_bool addElement(const Variant& value);
+		sl_bool addElement(const Variant& value) noexcept;
 	
-		Variant getItem(const String& key) const;
+		Variant getItem(const String& key) const noexcept;
 	
-		sl_bool putItem(const String& key, const Variant& value);
+		sl_bool putItem(const String& key, const Variant& value) noexcept;
 	
 
-		String toString() const;
+		String toString() const noexcept;
 	
-		String toJsonString() const;
+		String toJsonString() const noexcept;
 		
 	public:
-		void get(Variant& _out) const;
-		void set(const Variant& _in);
+		void get(Variant& _out) const noexcept;
+		void set(const Variant& _in) noexcept;
 		
-		void get(AtomicVariant& _out) const;
-		void set(const AtomicVariant& _in);
+		void get(AtomicVariant& _out) const noexcept;
+		void set(const AtomicVariant& _in) noexcept;
 		
-		void get(signed char& _out) const;
-		void get(signed char& _out, signed char def) const;
-		void set(signed char _in);
+		void get(signed char& _out) const noexcept;
+		void get(signed char& _out, signed char def) const noexcept;
+		void set(signed char _in) noexcept;
 		
-		void get(unsigned char& _out) const;
-		void get(unsigned char& _out, unsigned char def) const;
-		void set(unsigned char _in);
+		void get(unsigned char& _out) const noexcept;
+		void get(unsigned char& _out, unsigned char def) const noexcept;
+		void set(unsigned char _in) noexcept;
 		
-		void get(short& _out) const;
-		void get(short& _out, short def) const;
-		void set(short _in);
+		void get(short& _out) const noexcept;
+		void get(short& _out, short def) const noexcept;
+		void set(short _in) noexcept;
 		
-		void get(unsigned short& _out) const;
-		void get(unsigned short& _out, unsigned short def) const;
-		void set(unsigned short _in);
+		void get(unsigned short& _out) const noexcept;
+		void get(unsigned short& _out, unsigned short def) const noexcept;
+		void set(unsigned short _in) noexcept;
 		
-		void get(int& _out) const;
-		void get(int& _out, int def) const;
-		void set(int _in);
+		void get(int& _out) const noexcept;
+		void get(int& _out, int def) const noexcept;
+		void set(int _in) noexcept;
 		
-		void get(unsigned int& _out) const;
-		void get(unsigned int& _out, unsigned int def) const;
-		void set(unsigned int _in);
+		void get(unsigned int& _out) const noexcept;
+		void get(unsigned int& _out, unsigned int def) const noexcept;
+		void set(unsigned int _in) noexcept;
 		
-		void get(long& _out) const;
-		void get(long& _out, long def) const;
-		void set(long _in);
+		void get(long& _out) const noexcept;
+		void get(long& _out, long def) const noexcept;
+		void set(long _in) noexcept;
 		
-		void get(unsigned long& _out) const;
-		void get(unsigned long& _out, unsigned long def) const;
-		void set(unsigned long _in);
+		void get(unsigned long& _out) const noexcept;
+		void get(unsigned long& _out, unsigned long def) const noexcept;
+		void set(unsigned long _in) noexcept;
 		
-		void get(sl_int64& _out) const;
-		void get(sl_int64& _out, sl_int64 def) const;
-		void set(sl_int64 _in);
+		void get(sl_int64& _out) const noexcept;
+		void get(sl_int64& _out, sl_int64 def) const noexcept;
+		void set(sl_int64 _in) noexcept;
 		
-		void get(sl_uint64& _out) const;
-		void get(sl_uint64& _out, sl_uint64 def) const;
-		void set(sl_uint64 _in);
+		void get(sl_uint64& _out) const noexcept;
+		void get(sl_uint64& _out, sl_uint64 def) const noexcept;
+		void set(sl_uint64 _in) noexcept;
 		
-		void get(float& _out) const;
-		void get(float& _out, float def) const;
-		void set(float _in);
+		void get(float& _out) const noexcept;
+		void get(float& _out, float def) const noexcept;
+		void set(float _in) noexcept;
 		
-		void get(double& _out) const;
-		void get(double& _out, double def) const;
-		void set(double _in);
+		void get(double& _out) const noexcept;
+		void get(double& _out, double def) const noexcept;
+		void set(double _in) noexcept;
 		
-		void get(bool& _out) const;
-		void get(bool& _out, bool def) const;
-		void set(bool _in);
+		void get(bool& _out) const noexcept;
+		void get(bool& _out, bool def) const noexcept;
+		void set(bool _in) noexcept;
 		
-		void get(String& _out) const;
-		void get(String& _out, const String& def) const;
-		void set(const String& _in);
+		void get(String& _out) const noexcept;
+		void get(String& _out, const String& def) const noexcept;
+		void set(const String& _in) noexcept;
 		
-		void get(AtomicString& _out) const;
-		void get(AtomicString& _out, const String& def) const;
-		void set(const AtomicString& _in);
+		void get(AtomicString& _out) const noexcept;
+		void get(AtomicString& _out, const String& def) const noexcept;
+		void set(const AtomicString& _in) noexcept;
 		
-		void get(String16& _out) const;
-		void get(String16& _out, const String16& def) const;
-		void set(const String16& _in);
+		void get(String16& _out) const noexcept;
+		void get(String16& _out, const String16& def) const noexcept;
+		void set(const String16& _in) noexcept;
 		
-		void get(AtomicString16& _out) const;
-		void get(AtomicString16& _out, const String16& def) const;
-		void set(const AtomicString16& _in);
+		void get(AtomicString16& _out) const noexcept;
+		void get(AtomicString16& _out, const String16& def) const noexcept;
+		void set(const AtomicString16& _in) noexcept;
 
-		void set(const sl_char8* sz8);
-		void set(const sl_char16* sz16);
+		void set(const sl_char8* sz8) noexcept;
+		void set(const sl_char16* sz16) noexcept;
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		void get(std::string& _out) const;
-		void get(std::string& _out, const std::string& def) const;
-		void set(const std::string& _in);
+		void get(std::string& _out) const noexcept;
+		void get(std::string& _out, const std::string& def) const noexcept;
+		void set(const std::string& _in) noexcept;
 		
-		void get(std::u16string& _out) const;
-		void get(std::u16string& _out, const std::u16string& def) const;
-		void set(const std::u16string& _in);
+		void get(std::u16string& _out) const noexcept;
+		void get(std::u16string& _out, const std::u16string& def) const noexcept;
+		void set(const std::u16string& _in) noexcept;
 #endif
 		
-		void get(Time& _out) const;
-		void get(Time& _out, const Time& def) const;
-		void set(const Time& _in);
+		void get(Time& _out) const noexcept;
+		void get(Time& _out, const Time& def) const noexcept;
+		void set(const Time& _in) noexcept;
 		
-		void get(void const*& _out) const;
-		void get(void const*& _out, const void* def) const;
-		void set(const void* _in);
-		
-		template <class T>
-		void get(Ref<T>& _out) const;
-		template <class T>
-		void set(const Ref<T>& _in);
+		void get(void const*& _out) const noexcept;
+		void get(void const*& _out, const void* def) const noexcept;
+		void set(const void* _in) noexcept;
 		
 		template <class T>
-		void get(AtomicRef<T>& _out) const;
+		void get(Ref<T>& _out) const noexcept;
 		template <class T>
-		void set(const AtomicRef<T>& _in);
+		void set(const Ref<T>& _in) noexcept;
 		
 		template <class T>
-		void get(WeakRef<T>& _out) const;
+		void get(AtomicRef<T>& _out) const noexcept;
 		template <class T>
-		void set(const WeakRef<T>& _in);
+		void set(const AtomicRef<T>& _in) noexcept;
 		
 		template <class T>
-		void get(AtomicWeakRef<T>& _out) const;
+		void get(WeakRef<T>& _out) const noexcept;
 		template <class T>
-		void set(const AtomicWeakRef<T>& _in);
+		void set(const WeakRef<T>& _in) noexcept;
 		
-		void get(Memory& _out) const;
-		void set(const Memory& _in);
+		template <class T>
+		void get(AtomicWeakRef<T>& _out) const noexcept;
+		template <class T>
+		void set(const AtomicWeakRef<T>& _in) noexcept;
 		
-		void get(AtomicMemory& _out) const;
-		void set(const AtomicMemory& _in);
+		void get(Memory& _out) const noexcept;
+		void set(const Memory& _in) noexcept;
+		
+		void get(AtomicMemory& _out) const noexcept;
+		void set(const AtomicMemory& _in) noexcept;
 
-		void get(List<Variant>& _out) const;
-		void set(const List<Variant>& _in);
+		void get(List<Variant>& _out) const noexcept;
+		void set(const List<Variant>& _in) noexcept;
 		
-		void get(AtomicList<Variant>& _out) const;
-		void set(const AtomicList<Variant>& _in);
+		void get(AtomicList<Variant>& _out) const noexcept;
+		void set(const AtomicList<Variant>& _in) noexcept;
 		
-		void get(Map<String, Variant>& _out) const;
-		void set(const Map<String, Variant>& _in);
+		void get(Map<String, Variant>& _out) const noexcept;
+		void set(const Map<String, Variant>& _in) noexcept;
 		
-		void get(AtomicMap<String, Variant>& _out) const;
-		void set(const AtomicMap<String, Variant>& _in);
+		void get(AtomicMap<String, Variant>& _out) const noexcept;
+		void set(const AtomicMap<String, Variant>& _in) noexcept;
 		
-		void get(List< Map<String, Variant> >& _out) const;
-		void set(const List< Map<String, Variant> >& _in);
+		void get(List< Map<String, Variant> >& _out) const noexcept;
+		void set(const List< Map<String, Variant> >& _in) noexcept;
 		
-		void get(AtomicList< Map<String, Variant> >& _out) const;
-		void set(const AtomicList< Map<String, Variant> >& _in);
+		void get(AtomicList< Map<String, Variant> >& _out) const noexcept;
+		void set(const AtomicList< Map<String, Variant> >& _in) noexcept;
 		
 	private:
-		static void _free(VariantType type, sl_uint64 value);
+		static void _free(VariantType type, sl_uint64 value) noexcept;
 
 		friend class Atomic<Variant>;
 
@@ -565,468 +566,468 @@ namespace slib
 		SpinLock m_lock;
 
 	public:
-		constexpr Atomic() : _value(0), _type(VariantType::Null) {}
+		SLIB_INLINE constexpr Atomic() : _value(0), _type(VariantType::Null) {}
 
-		Atomic(AtomicVariant&& other);
+		SLIB_INLINE constexpr Atomic(sl_null_t) : _value(0), _type(VariantType::Null) {}
+		
+		Atomic(AtomicVariant&& other) noexcept;
 
-		Atomic(const AtomicVariant& other);
+		Atomic(const AtomicVariant& other) noexcept;
 
-		Atomic(Variant&& other);
+		Atomic(Variant&& other) noexcept;
 
-		Atomic(const Variant& other);
+		Atomic(const Variant& other) noexcept;
 
-		~Atomic();
+		~Atomic() noexcept;
 
 	public:
-		Atomic(sl_null_t);
+		Atomic(signed char value) noexcept;
 		
-		Atomic(signed char value);
+		Atomic(unsigned char value) noexcept;
 		
-		Atomic(unsigned char value);
+		Atomic(short value) noexcept;
 		
-		Atomic(short value);
+		Atomic(unsigned short value) noexcept;
 		
-		Atomic(unsigned short value);
+		Atomic(int value) noexcept;
 		
-		Atomic(int value);
+		Atomic(unsigned int value) noexcept;
 		
-		Atomic(unsigned int value);
+		Atomic(long value) noexcept;
 		
-		Atomic(long value);
+		Atomic(unsigned long value) noexcept;
 		
-		Atomic(unsigned long value);
+		Atomic(sl_int64 value) noexcept;
 		
-		Atomic(sl_int64 value);
-		
-		Atomic(sl_uint64 value);
+		Atomic(sl_uint64 value) noexcept;
 
-		Atomic(float value);
+		Atomic(float value) noexcept;
 
-		Atomic(double value);
+		Atomic(double value) noexcept;
 
-		Atomic(sl_bool value);
+		Atomic(sl_bool value) noexcept;
 
-		Atomic(const String& value);
+		Atomic(const String& value) noexcept;
 	
-		Atomic(const String16& value);
+		Atomic(const String16& value) noexcept;
 
-		Atomic(const AtomicString& value);
+		Atomic(const AtomicString& value) noexcept;
 
-		Atomic(const AtomicString16& value);
+		Atomic(const AtomicString16& value) noexcept;
 
-		Atomic(const sl_char8* sz8);
+		Atomic(const sl_char8* sz8) noexcept;
 
-		Atomic(const sl_char16* sz16);
+		Atomic(const sl_char16* sz16) noexcept;
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		Atomic(const std::string& value);
+		Atomic(const std::string& value) noexcept;
 		
-		Atomic(const std::u16string& value);
+		Atomic(const std::u16string& value) noexcept;
 #endif
 
-		Atomic(const Time& value);
+		Atomic(const Time& value) noexcept;
 
-		Atomic(const void* ptr);
+		Atomic(const void* ptr) noexcept;
 	
 		template <class T>
-		Atomic(const Ref<T>& ref);
+		Atomic(const Ref<T>& ref) noexcept;
 
 		template <class T>
-		Atomic(const AtomicRef<T>& ref);
+		Atomic(const AtomicRef<T>& ref) noexcept;
 
 		template <class T>
-		Atomic(const WeakRef<T>& weak);
+		Atomic(const WeakRef<T>& weak) noexcept;
 
 		template <class T>
-		Atomic(const AtomicWeakRef<T>& weak);
+		Atomic(const AtomicWeakRef<T>& weak) noexcept;
 	
-		Atomic(const Memory& mem);
+		Atomic(const Memory& mem) noexcept;
 
-		Atomic(const AtomicMemory& mem);
+		Atomic(const AtomicMemory& mem) noexcept;
 
-		Atomic(const List<Variant>& list);
+		Atomic(const List<Variant>& list) noexcept;
 		
-		Atomic(const AtomicList<Variant>& list);
+		Atomic(const AtomicList<Variant>& list) noexcept;
 		
-		Atomic(const Map<String, Variant>& map);
+		Atomic(const Map<String, Variant>& map) noexcept;
 		
-		Atomic(const AtomicMap<String, Variant>& map);
+		Atomic(const AtomicMap<String, Variant>& map) noexcept;
 		
-		Atomic(const List< Map<String, Variant> >& list);
+		Atomic(const List< Map<String, Variant> >& list) noexcept;
 		
-		Atomic(const AtomicList< Map<String, Variant> >& list);
+		Atomic(const AtomicList< Map<String, Variant> >& list) noexcept;
 
 	public:
-		static const AtomicVariant& null();
+		static const AtomicVariant& null() noexcept;
 
 	public:
-		AtomicVariant& operator=(AtomicVariant&& other);
+		AtomicVariant& operator=(AtomicVariant&& other) noexcept;
 
-		AtomicVariant& operator=(const AtomicVariant& other);
+		AtomicVariant& operator=(const AtomicVariant& other) noexcept;
 
-		AtomicVariant& operator=(Variant&& other);
+		AtomicVariant& operator=(Variant&& other) noexcept;
 
-		AtomicVariant& operator=(const Variant& other);
+		AtomicVariant& operator=(const Variant& other) noexcept;
 
-		AtomicVariant& operator=(sl_null_t);
+		AtomicVariant& operator=(sl_null_t) noexcept;
 		
 		template <class T>
-		AtomicVariant& operator=(const T& value);
+		AtomicVariant& operator=(const T& value) noexcept;
 		
-		Variant operator[](sl_size indexForVariantList) const;
+		Variant operator[](sl_size indexForVariantList) const noexcept;
 
-		Variant operator[](const String& keyForVariantMap) const;
+		Variant operator[](const String& keyForVariantMap) const noexcept;
 	
 	public:
-		VariantType getType() const;
+		VariantType getType() const noexcept;
 
-		void setNull();
+		void setNull() noexcept;
 
-		sl_bool isNull() const;
+		sl_bool isNull() const noexcept;
 
-		sl_bool isNotNull() const;
+		sl_bool isNotNull() const noexcept;
 
 	public:
-		sl_bool isInt32() const;
+		sl_bool isInt32() const noexcept;
 
-		sl_int32 getInt32(sl_int32 def = 0) const;
+		sl_int32 getInt32(sl_int32 def = 0) const noexcept;
 
-		void setInt32(sl_int32 value);
+		void setInt32(sl_int32 value) noexcept;
 
-		sl_bool isUint32() const;
+		sl_bool isUint32() const noexcept;
 
-		sl_uint32 getUint32(sl_uint32 def = 0) const;
+		sl_uint32 getUint32(sl_uint32 def = 0) const noexcept;
 
-		void setUint32(sl_uint32 value);
+		void setUint32(sl_uint32 value) noexcept;
 
-		sl_bool isInt64() const;
+		sl_bool isInt64() const noexcept;
 
-		sl_int64 getInt64(sl_int64 def = 0) const;
+		sl_int64 getInt64(sl_int64 def = 0) const noexcept;
 
-		void setInt64(sl_int64 value);
+		void setInt64(sl_int64 value) noexcept;
 
-		sl_bool isUint64() const;
+		sl_bool isUint64() const noexcept;
 
-		sl_uint64 getUint64(sl_uint64 def = 0) const;
+		sl_uint64 getUint64(sl_uint64 def = 0) const noexcept;
 
-		void setUint64(sl_uint64 value);
+		void setUint64(sl_uint64 value) noexcept;
 
-		sl_bool isInteger() const;
+		sl_bool isInteger() const noexcept;
 
-		sl_bool isSignedInteger() const;
+		sl_bool isSignedInteger() const noexcept;
 
-		sl_bool isUnsignedInteger() const;
+		sl_bool isUnsignedInteger() const noexcept;
 	
-		sl_bool isFloat() const;
+		sl_bool isFloat() const noexcept;
 
-		float getFloat(float def = 0) const;
+		float getFloat(float def = 0) const noexcept;
 
-		void setFloat(float value);
+		void setFloat(float value) noexcept;
 
-		sl_bool isDouble() const;
+		sl_bool isDouble() const noexcept;
 
-		double getDouble(double def = 0) const;
+		double getDouble(double def = 0) const noexcept;
 
-		void setDouble(double value);
+		void setDouble(double value) noexcept;
 
-		sl_bool isNumber() const;
-
-
-		sl_bool isTime() const;
-
-		Time getTime(Time def) const;
-
-		Time getTime() const;
-
-		void setTime(const Time& time);
+		sl_bool isNumber() const noexcept;
 
 
-		sl_bool isPointer() const;
+		sl_bool isTime() const noexcept;
 
-		void* getPointer(const void* def = sl_null) const;
+		Time getTime(Time def) const noexcept;
 
-		void setPointer(const void* ptr);
+		Time getTime() const noexcept;
 
-
-		sl_bool isBoolean() const;
-
-		sl_bool getBoolean(sl_bool def = sl_false) const;
-
-		void setBoolean(sl_bool value);
+		void setTime(const Time& time) noexcept;
 
 
-		sl_bool isString() const;
+		sl_bool isPointer() const noexcept;
 
-		sl_bool isString8() const;
+		void* getPointer(const void* def = sl_null) const noexcept;
 
-		sl_bool isString16() const;
+		void setPointer(const void* ptr) noexcept;
 
-		sl_bool isSz8() const;
 
-		sl_bool isSz16() const;
+		sl_bool isBoolean() const noexcept;
 
-		String getString(const String& def) const;
+		sl_bool getBoolean(sl_bool def = sl_false) const noexcept;
 
-		String getString() const;
+		void setBoolean(sl_bool value) noexcept;
 
-		String16 getString16(const String16& def) const;
 
-		String16 getString16() const;
+		sl_bool isString() const noexcept;
 
-		const sl_char8* getSz8(const sl_char8* def = sl_null) const;
+		sl_bool isString8() const noexcept;
 
-		const sl_char16* getSz16(const sl_char16* def = sl_null) const;
+		sl_bool isString16() const noexcept;
 
-		void setString(const String& value);
+		sl_bool isSz8() const noexcept;
 
-		void setString(const AtomicString& value);
+		sl_bool isSz16() const noexcept;
 
-		void setString(const String16& value);
+		String getString(const String& def) const noexcept;
 
-		void setString(const AtomicString16& value);
+		String getString() const noexcept;
 
-		void setString(const sl_char8* sz8);
+		String16 getString16(const String16& def) const noexcept;
 
-		void setString(const sl_char16* sz16);
+		String16 getString16() const noexcept;
+
+		const sl_char8* getSz8(const sl_char8* def = sl_null) const noexcept;
+
+		const sl_char16* getSz16(const sl_char16* def = sl_null) const noexcept;
+
+		void setString(const String& value) noexcept;
+
+		void setString(const AtomicString& value) noexcept;
+
+		void setString(const String16& value) noexcept;
+
+		void setString(const AtomicString16& value) noexcept;
+
+		void setString(const sl_char8* sz8) noexcept;
+
+		void setString(const sl_char16* sz16) noexcept;
 	
 #ifdef SLIB_SUPPORT_STD_TYPES
-		std::string getStdString(const std::string& def) const;
+		std::string getStdString(const std::string& def) const noexcept;
 		
-		std::string getStdString() const;
+		std::string getStdString() const noexcept;
 		
-		std::u16string getStdString16(const std::u16string& def) const;
+		std::u16string getStdString16(const std::u16string& def) const noexcept;
 		
-		std::u16string getStdString16() const;
+		std::u16string getStdString16() const noexcept;
 		
-		void setString(const std::string& value);
+		void setString(const std::string& value) noexcept;
 		
-		void setString(const std::u16string& value);
+		void setString(const std::u16string& value) noexcept;
 #endif
 
 		
-		sl_bool isObject() const;
+		sl_bool isObject() const noexcept;
 
-		sl_bool isWeak() const;
+		sl_bool isWeak() const noexcept;
 
-		Ref<Referable> getObject() const;
+		Ref<Referable> getObject() const noexcept;
 	
 		template <class T>
-		Ref<T> getObject(const Ref<T>& def) const;
+		Ref<T> getObject(const Ref<T>& def) const noexcept;
 
 		template <class T>
-		void setObject(const Ref<T>& object);
+		void setObject(const Ref<T>& object) noexcept;
 	
 		template <class T>
-		void setWeak(const WeakRef<T>& weak);
+		void setWeak(const WeakRef<T>& weak) noexcept;
 	
-		sl_bool isObjectNotNull() const;
+		sl_bool isObjectNotNull() const noexcept;
 
-		sl_bool isObjectNull() const;
+		sl_bool isObjectNull() const noexcept;
 
-		sl_object_type getObjectType() const;
+		sl_object_type getObjectType() const noexcept;
 
-		sl_bool isMemory() const;
+		sl_bool isMemory() const noexcept;
 
-		Memory getMemory() const;
+		Memory getMemory() const noexcept;
 
-		void setMemory(const Memory& mem);
+		void setMemory(const Memory& mem) noexcept;
 
 
-		sl_bool isVariantList() const;
+		sl_bool isVariantList() const noexcept;
 
-		List<Variant> getVariantList() const;
+		List<Variant> getVariantList() const noexcept;
 		
-		void setVariantList(const List<Variant>& list);
+		void setVariantList(const List<Variant>& list) noexcept;
 
-		sl_bool isVariantMap() const;
+		sl_bool isVariantMap() const noexcept;
 
-		Map<String, Variant> getVariantMap() const;
+		Map<String, Variant> getVariantMap() const noexcept;
 		
-		void setVariantMap(const Map<String, Variant>& map);
+		void setVariantMap(const Map<String, Variant>& map) noexcept;
 
-		sl_bool isVariantMapList() const;
+		sl_bool isVariantMapList() const noexcept;
 
-		List< Map<String, Variant> > getVariantMapList() const;
+		List< Map<String, Variant> > getVariantMapList() const noexcept;
 		
-		void setVariantMapList(const List< Map<String, Variant> >& list);
+		void setVariantMapList(const List< Map<String, Variant> >& list) noexcept;
 
-		sl_size getElementsCount() const;
+		sl_size getElementsCount() const noexcept;
 
-		Variant getElement(sl_size index) const;
+		Variant getElement(sl_size index) const noexcept;
 
-		sl_bool setElement(sl_size index, const Variant& value);
+		sl_bool setElement(sl_size index, const Variant& value) noexcept;
 
-		sl_bool addElement(const Variant& value);
+		sl_bool addElement(const Variant& value) noexcept;
 
-		Variant getItem(const String& key) const;
+		Variant getItem(const String& key) const noexcept;
 
-		sl_bool putItem(const String& key, const Variant& value);
+		sl_bool putItem(const String& key, const Variant& value) noexcept;
 
 
-		String toString() const;
+		String toString() const noexcept;
 
-		String toJsonString() const;
+		String toJsonString() const noexcept;
 		
 		
 	public:
-		void get(Variant& _out) const;
-		void set(const Variant& _in);
+		void get(Variant& _out) const noexcept;
+		void set(const Variant& _in) noexcept;
 		
-		void get(AtomicVariant& _out) const;
-		void set(const AtomicVariant& _in);
+		void get(AtomicVariant& _out) const noexcept;
+		void set(const AtomicVariant& _in) noexcept;
 		
-		void get(signed char& _out) const;
-		void get(signed char& _out, signed char def) const;
-		void set(signed char _in);
+		void get(signed char& _out) const noexcept;
+		void get(signed char& _out, signed char def) const noexcept;
+		void set(signed char _in) noexcept;
 		
-		void get(unsigned char& _out) const;
-		void get(unsigned char& _out, unsigned char def) const;
-		void set(unsigned char _in);
+		void get(unsigned char& _out) const noexcept;
+		void get(unsigned char& _out, unsigned char def) const noexcept;
+		void set(unsigned char _in) noexcept;
 		
-		void get(short& _out) const;
-		void get(short& _out, short def) const;
-		void set(short _in);
+		void get(short& _out) const noexcept;
+		void get(short& _out, short def) const noexcept;
+		void set(short _in) noexcept;
 		
-		void get(unsigned short& _out) const;
-		void get(unsigned short& _out, unsigned short def) const;
-		void set(unsigned short _in);
+		void get(unsigned short& _out) const noexcept;
+		void get(unsigned short& _out, unsigned short def) const noexcept;
+		void set(unsigned short _in) noexcept;
 		
-		void get(int& _out) const;
-		void get(int& _out, int def) const;
-		void set(int _in);
+		void get(int& _out) const noexcept;
+		void get(int& _out, int def) const noexcept;
+		void set(int _in) noexcept;
 		
-		void get(unsigned int& _out) const;
-		void get(unsigned int& _out, unsigned int def) const;
-		void set(unsigned int _in);
+		void get(unsigned int& _out) const noexcept;
+		void get(unsigned int& _out, unsigned int def) const noexcept;
+		void set(unsigned int _in) noexcept;
 		
-		void get(long& _out) const;
-		void get(long& _out, long def) const;
-		void set(long _in);
+		void get(long& _out) const noexcept;
+		void get(long& _out, long def) const noexcept;
+		void set(long _in) noexcept;
 		
-		void get(unsigned long& _out) const;
-		void get(unsigned long& _out, unsigned long def) const;
-		void set(unsigned long _in);
+		void get(unsigned long& _out) const noexcept;
+		void get(unsigned long& _out, unsigned long def) const noexcept;
+		void set(unsigned long _in) noexcept;
 		
-		void get(sl_int64& _out) const;
-		void get(sl_int64& _out, sl_int64 def) const;
-		void set(sl_int64 _in);
+		void get(sl_int64& _out) const noexcept;
+		void get(sl_int64& _out, sl_int64 def) const noexcept;
+		void set(sl_int64 _in) noexcept;
 		
-		void get(sl_uint64& _out) const;
-		void get(sl_uint64& _out, sl_uint64 def) const;
-		void set(sl_uint64 _in);
+		void get(sl_uint64& _out) const noexcept;
+		void get(sl_uint64& _out, sl_uint64 def) const noexcept;
+		void set(sl_uint64 _in) noexcept;
 		
-		void get(float& _out) const;
-		void get(float& _out, float def) const;
-		void set(float _in);
+		void get(float& _out) const noexcept;
+		void get(float& _out, float def) const noexcept;
+		void set(float _in) noexcept;
 		
-		void get(double& _out) const;
-		void get(double& _out, double def) const;
-		void set(double _in);
+		void get(double& _out) const noexcept;
+		void get(double& _out, double def) const noexcept;
+		void set(double _in) noexcept;
 		
-		void get(bool& _out) const;
-		void get(bool& _out, bool def) const;
-		void set(bool _in);
+		void get(bool& _out) const noexcept;
+		void get(bool& _out, bool def) const noexcept;
+		void set(bool _in) noexcept;
 		
-		void get(String& _out) const;
-		void get(String& _out, const String& def) const;
-		void set(const String& _in);
+		void get(String& _out) const noexcept;
+		void get(String& _out, const String& def) const noexcept;
+		void set(const String& _in) noexcept;
 		
-		void get(AtomicString& _out) const;
-		void get(AtomicString& _out, const String& def) const;
-		void set(const AtomicString& _in);
+		void get(AtomicString& _out) const noexcept;
+		void get(AtomicString& _out, const String& def) const noexcept;
+		void set(const AtomicString& _in) noexcept;
 		
-		void get(String16& _out) const;
-		void get(String16& _out, const String16& def) const;
-		void set(const String16& _in);
+		void get(String16& _out) const noexcept;
+		void get(String16& _out, const String16& def) const noexcept;
+		void set(const String16& _in) noexcept;
 		
-		void get(AtomicString16& _out) const;
-		void get(AtomicString16& _out, const String16& def) const;
-		void set(const AtomicString16& _in);
+		void get(AtomicString16& _out) const noexcept;
+		void get(AtomicString16& _out, const String16& def) const noexcept;
+		void set(const AtomicString16& _in) noexcept;
 		
-		void set(const sl_char8* sz8);
-		void set(const sl_char16* sz16);
+		void set(const sl_char8* sz8) noexcept;
+		void set(const sl_char16* sz16) noexcept;
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		void get(std::string& _out) const;
-		void get(std::string& _out, const std::string& def) const;
-		void set(const std::string& _in);
+		void get(std::string& _out) const noexcept;
+		void get(std::string& _out, const std::string& def) const noexcept;
+		void set(const std::string& _in) noexcept;
 		
-		void get(std::u16string& _out) const;
-		void get(std::u16string& _out, const std::u16string& def) const;
-		void set(const std::u16string& _in);
+		void get(std::u16string& _out) const noexcept;
+		void get(std::u16string& _out, const std::u16string& def) const noexcept;
+		void set(const std::u16string& _in) noexcept;
 #endif
 		
-		void get(Time& _out) const;
-		void get(Time& _out, const Time& def) const;
-		void set(const Time& _in);
+		void get(Time& _out) const noexcept;
+		void get(Time& _out, const Time& def) const noexcept;
+		void set(const Time& _in) noexcept;
 		
-		void get(void const*& _out) const;
-		void get(void const*& _out, const void* def) const;
-		void set(const void* ptr);
-		
-		template <class T>
-		void get(Ref<T>& _out) const;
-		template <class T>
-		void set(const Ref<T>& ref);
+		void get(void const*& _out) const noexcept;
+		void get(void const*& _out, const void* def) const noexcept;
+		void set(const void* ptr) noexcept;
 		
 		template <class T>
-		void get(AtomicRef<T>& _out) const;
+		void get(Ref<T>& _out) const noexcept;
 		template <class T>
-		void set(const AtomicRef<T>& ref);
-		
-		template <class T>
-		void get(WeakRef<T>& _out) const;
-		template <class T>
-		void set(const WeakRef<T>& ref);
+		void set(const Ref<T>& ref) noexcept;
 		
 		template <class T>
-		void get(AtomicWeakRef<T>& _out) const;
+		void get(AtomicRef<T>& _out) const noexcept;
 		template <class T>
-		void set(const AtomicWeakRef<T>& ref);
+		void set(const AtomicRef<T>& ref) noexcept;
 		
-		void get(Memory& _out) const;
-		void set(const Memory& ref);
+		template <class T>
+		void get(WeakRef<T>& _out) const noexcept;
+		template <class T>
+		void set(const WeakRef<T>& ref) noexcept;
 		
-		void get(AtomicMemory& _out) const;
-		void set(const AtomicMemory& ref);
+		template <class T>
+		void get(AtomicWeakRef<T>& _out) const noexcept;
+		template <class T>
+		void set(const AtomicWeakRef<T>& ref) noexcept;
 		
-		void get(List<Variant>& _out) const;
-		void set(const List<Variant>& _in);
+		void get(Memory& _out) const noexcept;
+		void set(const Memory& ref) noexcept;
 		
-		void get(AtomicList<Variant>& _out) const;
-		void set(const AtomicList<Variant>& _in);
+		void get(AtomicMemory& _out) const noexcept;
+		void set(const AtomicMemory& ref) noexcept;
 		
-		void get(Map<String, Variant>& _out) const;
-		void set(const Map<String, Variant>& _in);
+		void get(List<Variant>& _out) const noexcept;
+		void set(const List<Variant>& _in) noexcept;
 		
-		void get(AtomicMap<String, Variant>& _out) const;
-		void set(const AtomicMap<String, Variant>& _in);
+		void get(AtomicList<Variant>& _out) const noexcept;
+		void set(const AtomicList<Variant>& _in) noexcept;
 		
-		void get(List< Map<String, Variant> >& _out) const;
-		void set(const List< Map<String, Variant> >& _in);
+		void get(Map<String, Variant>& _out) const noexcept;
+		void set(const Map<String, Variant>& _in) noexcept;
 		
-		void get(AtomicList< Map<String, Variant> >& _out) const;
-		void set(const AtomicList< Map<String, Variant> >& _in);
+		void get(AtomicMap<String, Variant>& _out) const noexcept;
+		void set(const AtomicMap<String, Variant>& _in) noexcept;
+		
+		void get(List< Map<String, Variant> >& _out) const noexcept;
+		void set(const List< Map<String, Variant> >& _in) noexcept;
+		
+		void get(AtomicList< Map<String, Variant> >& _out) const noexcept;
+		void set(const AtomicList< Map<String, Variant> >& _in) noexcept;
 
 	private:
-		void _retain(VariantType& type, sl_uint64& value) const;
+		void _retain(VariantType& type, sl_uint64& value) const noexcept;
 
-		void _replace(VariantType type, sl_uint64 value);
+		void _replace(VariantType type, sl_uint64 value) noexcept;
 
 		friend class Variant;
 		
 	};
 	
-	sl_bool operator==(const Variant& v1, const Variant& v2);
+	sl_bool operator==(const Variant& v1, const Variant& v2) noexcept;
 	
-	sl_bool operator!=(const Variant& v1, const Variant& v2);
+	sl_bool operator!=(const Variant& v1, const Variant& v2) noexcept;
 
 	
 	template <>
 	class Compare<Variant>
 	{
 	public:
-		int operator()(const Variant &a, const Variant &b) const;
+		int operator()(const Variant &a, const Variant &b) const noexcept;
 	};
 
 	typedef List<Variant> VariantList;

@@ -21,56 +21,56 @@ namespace slib
 	extern const _priv_Variant_Const _priv_Variant_Null;
 	
 	template <class... ARGS>
-	String String::format(const sl_char8* szFormat, ARGS&&... args)
+	String String::format(const sl_char8* szFormat, ARGS&&... args) noexcept
 	{
 		Variant params[] = {Forward<ARGS>(args)...};
 		return formatBy(szFormat, params, sizeof...(args));
 	}
 	
 	template <class... ARGS>
-	String String::format(const String& strFormat, ARGS&&... args)
+	String String::format(const String& strFormat, ARGS&&... args) noexcept
 	{
 		Variant params[] = {Forward<ARGS>(args)...};
 		return formatBy(strFormat, params, sizeof...(args));
 	}
 	
 	template <class... ARGS>
-	String16 String16::format(const sl_char16* szFormat, ARGS&&... args)
+	String16 String16::format(const sl_char16* szFormat, ARGS&&... args) noexcept
 	{
 		Variant params[] = {Forward<ARGS>(args)...};
 		return formatBy(szFormat, params, sizeof...(args));
 	}
 	
 	template <class... ARGS>
-	String16 String16::format(const String16& strFormat, ARGS&&... args)
+	String16 String16::format(const String16& strFormat, ARGS&&... args) noexcept
 	{
 		Variant params[] = {Forward<ARGS>(args)...};
 		return formatBy(strFormat, params, sizeof...(args));
 	}
 	
 	template <class... ARGS>
-	String String::arg(ARGS&&... args) const
+	String String::arg(ARGS&&... args) const noexcept
 	{
 		Variant params[] = {Forward<ARGS>(args)...};
 		return argBy(params, sizeof...(args));
 	}
 	
 	template <class... ARGS>
-	String16 String16::arg(ARGS&&... args) const
+	String16 String16::arg(ARGS&&... args) const noexcept
 	{
 		Variant params[] = {Forward<ARGS>(args)...};
 		return argBy(params, sizeof...(args));
 	}
 	
 	template <class... ARGS>
-	String Atomic<String>::arg(ARGS&&... args) const
+	String Atomic<String>::arg(ARGS&&... args) const noexcept
 	{
 		Variant params[] = {Forward<ARGS>(args)...};
 		return argBy(params, sizeof...(args));
 	}
 	
 	template <class... ARGS>
-	String16 Atomic<String16>::arg(ARGS&&... args) const
+	String16 Atomic<String16>::arg(ARGS&&... args) const noexcept
 	{
 		Variant params[] = {Forward<ARGS>(args)...};
 		return argBy(params, sizeof...(args));
@@ -78,7 +78,7 @@ namespace slib
 
 
 	template <class T>
-	Variant::Variant(const Ref<T>& ref)
+	Variant::Variant(const Ref<T>& ref) noexcept
 	{
 		if (ref.isNotNull()) {
 			_type = VariantType::Object;
@@ -89,7 +89,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Variant::Variant(const AtomicRef<T>& _ref)
+	Variant::Variant(const AtomicRef<T>& _ref) noexcept
 	{
 		Ref<T> ref(_ref);
 		if (ref.isNotNull()) {
@@ -101,7 +101,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Variant::Variant(const WeakRef<T>& weak)
+	Variant::Variant(const WeakRef<T>& weak) noexcept
 	{
 		if (weak.isNotNull()) {
 			_type = VariantType::Weak;
@@ -112,7 +112,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Variant::Variant(const AtomicWeakRef<T>& _weak)
+	Variant::Variant(const AtomicWeakRef<T>& _weak) noexcept
 	{
 		Ref<T> weak(_weak);
 		if (weak.isNotNull()) {
@@ -123,55 +123,55 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE const Variant& Variant::null()
+	SLIB_INLINE const Variant& Variant::null() noexcept
 	{
 		return *(reinterpret_cast<Variant const*>(&_priv_Variant_Null));
 	}
 	
 	template <class T>
-	Variant Variant::fromRef(const Ref<T>& ref)
+	Variant Variant::fromRef(const Ref<T>& ref) noexcept
 	{
 		return ref;
 	}
 	
 	template <class T>
-	Variant Variant::fromWeakRef(const WeakRef<T>& weak)
+	Variant Variant::fromWeakRef(const WeakRef<T>& weak) noexcept
 	{
 		return weak;
 	}
 	
 	template <class T>
-	SLIB_INLINE Variant& Variant::operator=(const T& value)
+	SLIB_INLINE Variant& Variant::operator=(const T& value) noexcept
 	{
 		set(value);
 		return *this;
 	}
 	
 	
-	SLIB_INLINE VariantType Variant::getType() const
+	SLIB_INLINE VariantType Variant::getType() const noexcept
 	{
 		return _type;
 	}
 	
-	SLIB_INLINE sl_bool Variant::isNull() const
+	SLIB_INLINE sl_bool Variant::isNull() const noexcept
 	{
 		return _type == VariantType::Null;
 	}
 	
-	SLIB_INLINE sl_bool Variant::isNotNull() const
+	SLIB_INLINE sl_bool Variant::isNotNull() const noexcept
 	{
 		return _type != VariantType::Null;
 	}
 	
 	
 	template <class T>
-	Ref<T> Variant::getObject(const Ref<T>& def) const
+	Ref<T> Variant::getObject(const Ref<T>& def) const noexcept
 	{
 		return CastRef<T>(getObject(), def);
 	}
 	
 	template <class T>
-	void Variant::setObject(const Ref<T>& ref)
+	void Variant::setObject(const Ref<T>& ref) noexcept
 	{
 		_free(_type, _value);
 		if (ref.isNotNull()) {
@@ -183,7 +183,7 @@ namespace slib
 	}
 	
 	template <class T>
-	void Variant::setWeak(const WeakRef<T>& weak)
+	void Variant::setWeak(const WeakRef<T>& weak) noexcept
 	{
 		_free(_type, _value);
 		if (weak.isNotNull()) {
@@ -195,56 +195,56 @@ namespace slib
 	}
 	
 	template <class T>
-	void Variant::get(Ref<T>& _out) const
+	void Variant::get(Ref<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Variant::set(const Ref<T>& _in)
+	void Variant::set(const Ref<T>& _in) noexcept
 	{
 		setObject(_in);
 	}
 	
 	template <class T>
-	void Variant::get(AtomicRef<T>& _out) const
+	void Variant::get(AtomicRef<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Variant::set(const AtomicRef<T>& _in)
+	void Variant::set(const AtomicRef<T>& _in) noexcept
 	{
 		setObject(_in);
 	}
 	
 	template <class T>
-	void Variant::get(WeakRef<T>& _out) const
+	void Variant::get(WeakRef<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Variant::set(const WeakRef<T>& _in)
+	void Variant::set(const WeakRef<T>& _in) noexcept
 	{
 		setWeak(_in);
 	}
 	
 	template <class T>
-	void Variant::get(AtomicWeakRef<T>& _out) const
+	void Variant::get(AtomicWeakRef<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Variant::set(const AtomicWeakRef<T>& _in)
+	void Variant::set(const AtomicWeakRef<T>& _in) noexcept
 	{
 		setWeak(_in);
 	}
 
 	
 	template <class T>
-	Atomic<Variant>::Atomic(const Ref<T>& ref)
+	Atomic<Variant>::Atomic(const Ref<T>& ref) noexcept
 	{
 		if (ref.isNotNull()) {
 			_type = VariantType::Object;
@@ -255,7 +255,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Atomic<Variant>::Atomic(const AtomicRef<T>& _ref)
+	Atomic<Variant>::Atomic(const AtomicRef<T>& _ref) noexcept
 	{
 		Ref<T> ref(_ref);
 		if (ref.isNotNull()) {
@@ -267,7 +267,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Atomic<Variant>::Atomic(const WeakRef<T>& weak)
+	Atomic<Variant>::Atomic(const WeakRef<T>& weak) noexcept
 	{
 		if (weak.isNotNull()) {
 			_type = VariantType::Weak;
@@ -278,7 +278,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Atomic<Variant>::Atomic(const AtomicWeakRef<T>& _weak)
+	Atomic<Variant>::Atomic(const AtomicWeakRef<T>& _weak) noexcept
 	{
 		WeakRef<T> weak(_weak);
 		if (weak.isNotNull()) {
@@ -289,42 +289,42 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE const AtomicVariant& Atomic<Variant>::null()
+	SLIB_INLINE const AtomicVariant& Atomic<Variant>::null() noexcept
 	{
 		return *(reinterpret_cast<AtomicVariant const*>(&_priv_Variant_Null));
 	}
 	
 	template <class T>
-	SLIB_INLINE AtomicVariant& Atomic<Variant>::operator=(const T& value)
+	SLIB_INLINE AtomicVariant& Atomic<Variant>::operator=(const T& value) noexcept
 	{
 		set(value);
 		return *this;
 	}
 	
-	SLIB_INLINE VariantType Atomic<Variant>::getType() const
+	SLIB_INLINE VariantType Atomic<Variant>::getType() const noexcept
 	{
 		return _type;
 	}
 	
-	SLIB_INLINE sl_bool Atomic<Variant>::isNull() const
+	SLIB_INLINE sl_bool Atomic<Variant>::isNull() const noexcept
 	{
 		return _type == VariantType::Null;
 	}
 	
-	SLIB_INLINE sl_bool Atomic<Variant>::isNotNull() const
+	SLIB_INLINE sl_bool Atomic<Variant>::isNotNull() const noexcept
 	{
 		return _type != VariantType::Null;
 	}
 	
 	template <class T>
-	Ref<T> Atomic<Variant>::getObject(const Ref<T>& def) const
+	Ref<T> Atomic<Variant>::getObject(const Ref<T>& def) const noexcept
 	{
 		Variant var(*this);
 		return var.getObject(def);
 	}
 	
 	template <class T>
-	void Atomic<Variant>::setObject(const Ref<T>& object)
+	void Atomic<Variant>::setObject(const Ref<T>& object) noexcept
 	{
 		if (object.isNotNull()) {
 			sl_int64 v;
@@ -336,7 +336,7 @@ namespace slib
 	}
 	
 	template <class T>
-	void Atomic<Variant>::setWeak(const WeakRef<T>& weak)
+	void Atomic<Variant>::setWeak(const WeakRef<T>& weak) noexcept
 	{
 		if (weak.isNotNull()) {
 			sl_int64 v;
@@ -348,49 +348,49 @@ namespace slib
 	}
 	
 	template <class T>
-	void Atomic<Variant>::get(Ref<T>& _out) const
+	void Atomic<Variant>::get(Ref<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Atomic<Variant>::set(const Ref<T>& _in)
+	void Atomic<Variant>::set(const Ref<T>& _in) noexcept
 	{
 		setObject(_in);
 	}
 	
 	template <class T>
-	void Atomic<Variant>::get(AtomicRef<T>& _out) const
+	void Atomic<Variant>::get(AtomicRef<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Atomic<Variant>::set(const AtomicRef<T>& _in)
+	void Atomic<Variant>::set(const AtomicRef<T>& _in) noexcept
 	{
 		setObject(_in);
 	}
 	
 	template <class T>
-	void Atomic<Variant>::get(WeakRef<T>& _out) const
+	void Atomic<Variant>::get(WeakRef<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Atomic<Variant>::set(const WeakRef<T>& _in)
+	void Atomic<Variant>::set(const WeakRef<T>& _in) noexcept
 	{
 		setWeak(_in);
 	}
 	
 	template <class T>
-	void Atomic<Variant>::get(AtomicWeakRef<T>& _out) const
+	void Atomic<Variant>::get(AtomicWeakRef<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Atomic<Variant>::set(const AtomicWeakRef<T>& _in)
+	void Atomic<Variant>::set(const AtomicWeakRef<T>& _in) noexcept
 	{
 		setWeak(_in);
 	}

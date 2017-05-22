@@ -28,51 +28,51 @@ namespace slib
 	class SLIB_EXPORT StringBuffer
 	{
 	public:
-		StringBuffer();
+		StringBuffer() noexcept;
 		
-		~StringBuffer();
+		~StringBuffer() noexcept;
 
 	public:
 
 		/**
 		 * Returns total length of all string items.
 		 */
-		sl_size getLength() const;
+		sl_size getLength() const noexcept;
 
 		/**
 		 * Add string object to the queue.
 		 */
-		sl_bool add(const String& str);
+		sl_bool add(const String& str) noexcept;
 		
 		/**
 		 * Add string represented by StringData struct to the queue.
 		 */
-		sl_bool add(const StringData& str);
+		sl_bool add(const StringData& str) noexcept;
 		
 		/**
 		 * Add string pointed by buf to the queue.
 		 */
-		sl_bool addStatic(const sl_char8* buf, sl_size length);
+		sl_bool addStatic(const sl_char8* buf, sl_size length) noexcept;
 	
 		/**
 		 * Add all string items in buf to the current object and then clear buf.
 		 */
-		void link(StringBuffer& buf);
+		void link(StringBuffer& buf) noexcept;
 		
 		/**
 		 * Clears all items.
 		 */
-		void clear();
+		void clear() noexcept;
 		
 		/**
 		 * Merge all items and returns the merged string.
 		 */
-		String merge() const;
+		String merge() const noexcept;
 
 		/**
 		 * Merge all items and returns it as memory.
 		 */
-		Memory mergeToMemory() const;
+		Memory mergeToMemory() const noexcept;
 		
 	private:
 		LinkedQueue<StringData> m_queue;
@@ -97,50 +97,50 @@ namespace slib
 	class SLIB_EXPORT StringBuffer16
 	{
 	public:
-		StringBuffer16();
+		StringBuffer16() noexcept;
 		
-		~StringBuffer16();
+		~StringBuffer16() noexcept;
 
 	public:
 		/**
 		 * Returns total length of all string items.
 		 */
-		sl_size getLength() const;
+		sl_size getLength() const noexcept;
 		
 		/**
 		 * Add string object to the queue.
 		 */
-		sl_bool add(const String16& str);
+		sl_bool add(const String16& str) noexcept;
 		
 		/**
 		 * Add string represented by StringData struct to the queue.
 		 */
-		sl_bool add(const StringData& str);
+		sl_bool add(const StringData& str) noexcept;
 		
 		/**
 		 * Add string pointed by buf to the queue.
 		 */
-		sl_bool addStatic(const sl_char16* buf, sl_size length);
+		sl_bool addStatic(const sl_char16* buf, sl_size length) noexcept;
 
 		/**
 		 * Add all string items in buf to the current object and then clear buf.
 		 */
-		void link(StringBuffer16& buf);
+		void link(StringBuffer16& buf) noexcept;
 		
 		/**
 		 * Clears all items.
 		 */
-		void clear();
+		void clear() noexcept;
 
 		/**
 		 * Merge all items and returns the merged string.
 		 */
-		String16 merge() const;
+		String16 merge() const noexcept;
 
 		/**
 		 * Merge all items and returns it as memory.
 		 */
-		Memory mergeToMemory() const;
+		Memory mergeToMemory() const noexcept;
 		
 	private:
 		LinkedQueue<StringData> m_queue;

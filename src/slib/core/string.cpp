@@ -26,22 +26,22 @@ namespace slib
 	class _priv_TemplateFunc8
 	{
 	public:
-		SLIB_INLINE static const void* findMemory(const sl_char8* mem, sl_char8 pattern, sl_size count)
+		SLIB_INLINE static const void* findMemory(const sl_char8* mem, sl_char8 pattern, sl_size count) noexcept
 		{
 			return Base::findMemory(mem, pattern, count);
 		}
 		
-		SLIB_INLINE static const void* findMemoryReverse(const sl_char8* mem, sl_char8 pattern, sl_size count)
+		SLIB_INLINE static const void* findMemoryReverse(const sl_char8* mem, sl_char8 pattern, sl_size count) noexcept
 		{
 			return Base::findMemoryReverse(mem, pattern, count);
 		}
 		
-		SLIB_INLINE static sl_int32 compareMemory(const sl_char8* mem1, const sl_char8* mem2, sl_size count)
+		SLIB_INLINE static sl_int32 compareMemory(const sl_char8* mem1, const sl_char8* mem2, sl_size count) noexcept
 		{
 			return Base::compareMemory((sl_uint8*)mem1, (sl_uint8*)mem2, count);
 		}
 		
-		SLIB_INLINE static void resetMemory(sl_char8* dst, sl_char8 value, sl_size count)
+		SLIB_INLINE static void resetMemory(sl_char8* dst, sl_char8 value, sl_size count) noexcept
 		{
 			return Base::resetMemory(dst, value, count);
 		}
@@ -50,22 +50,22 @@ namespace slib
 	class _priv_TemplateFunc16
 	{
 	public:
-		SLIB_INLINE static const void* findMemory(const sl_char16* mem, sl_char16 pattern, sl_size count)
+		SLIB_INLINE static const void* findMemory(const sl_char16* mem, sl_char16 pattern, sl_size count) noexcept
 		{
 			return Base::findMemory2((sl_uint16*)mem, pattern, count);
 		}
 		
-		SLIB_INLINE static const void* findMemoryReverse(const sl_char16* mem, sl_char16 pattern, sl_size count)
+		SLIB_INLINE static const void* findMemoryReverse(const sl_char16* mem, sl_char16 pattern, sl_size count) noexcept
 		{
 			return Base::findMemoryReverse2((sl_uint16*)mem, pattern, count);
 		}
 		
-		SLIB_INLINE static sl_int16 compareMemory(const sl_char16* mem1, const sl_char16* mem2, sl_size count)
+		SLIB_INLINE static sl_int16 compareMemory(const sl_char16* mem1, const sl_char16* mem2, sl_size count) noexcept
 		{
 			return Base::compareMemory2((sl_uint16*)mem1, (sl_uint16*)mem2, count);
 		}
 		
-		SLIB_INLINE static void resetMemory(sl_char16* dst, sl_char16 value, sl_size count)
+		SLIB_INLINE static void resetMemory(sl_char16* dst, sl_char16 value, sl_size count) noexcept
 		{
 			return Base::resetMemory2((sl_uint16*)dst, value, count);
 		}
@@ -90,7 +90,7 @@ namespace slib
 	const _priv_String16_Const _priv_String16_Empty = {const_cast<StringContainer16*>(&_g_string16_empty_container), 0};
 
 
-	SLIB_INLINE sl_reg StringContainer::increaseReference()
+	SLIB_INLINE sl_reg StringContainer::increaseReference() noexcept
 	{
 		if (ref >= 0) {
 			return Base::interlockedIncrement(&ref);
@@ -98,7 +98,7 @@ namespace slib
 		return 1;
 	}
 
-	SLIB_INLINE sl_reg StringContainer16::increaseReference()
+	SLIB_INLINE sl_reg StringContainer16::increaseReference() noexcept
 	{
 		if (ref >= 0) {
 			return Base::interlockedIncrement(&ref);
@@ -130,7 +130,7 @@ namespace slib
 		
 	};
 
-	SLIB_INLINE sl_reg StringContainer::decreaseReference()
+	SLIB_INLINE sl_reg StringContainer::decreaseReference() noexcept
 	{
 		if (ref > 0) {
 			sl_reg nRef = Base::interlockedDecrement(&ref);
@@ -173,7 +173,7 @@ namespace slib
 		
 	};
 
-	SLIB_INLINE sl_reg StringContainer16::decreaseReference()
+	SLIB_INLINE sl_reg StringContainer16::decreaseReference() noexcept
 	{
 		if (ref > 0) {
 			sl_reg nRef = Base::interlockedDecrement(&ref);
@@ -192,7 +192,7 @@ namespace slib
 		return 1;
 	}
 
-	SLIB_INLINE StringContainer* _priv_String_alloc(sl_size len)
+	SLIB_INLINE static StringContainer* _priv_String_alloc(sl_size len) noexcept
 	{
 		if (len == 0) {
 			return _priv_String_Empty.container;
@@ -211,7 +211,7 @@ namespace slib
 		return sl_null;
 	}
 
-	SLIB_INLINE StringContainer16* _priv_String16_alloc(sl_size len)
+	SLIB_INLINE static StringContainer16* _priv_String16_alloc(sl_size len) noexcept
 	{
 		if (len == 0) {
 			return _priv_String16_Empty.container;
@@ -230,7 +230,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE StringContainer* _priv_String_alloc_static(const sl_char8* sz, sl_size len)
+	SLIB_INLINE static StringContainer* _priv_String_alloc_static(const sl_char8* sz, sl_size len) noexcept
 	{
 		if (len == 0) {
 			return _priv_String_Empty.container;
@@ -247,7 +247,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE StringContainer16* _priv_String16_alloc_static(const sl_char16* sz, sl_size len)
+	SLIB_INLINE static StringContainer16* _priv_String16_alloc_static(const sl_char16* sz, sl_size len) noexcept
 	{
 		if (len == 0) {
 			return _priv_String16_Empty.container;
@@ -264,7 +264,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE StringContainer* _priv_String_alloc_std(const std::string& str)
+	SLIB_INLINE static StringContainer* _priv_String_alloc_std(const std::string& str) noexcept
 	{
 		sl_size len = (sl_size)(str.length());
 		if (len == 0) {
@@ -291,7 +291,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE StringContainer16* _priv_String16_alloc_std(const std::u16string& str)
+	SLIB_INLINE static StringContainer16* _priv_String16_alloc_std(const std::u16string& str) noexcept
 	{
 		sl_size len = (sl_size)(str.length());
 		if (len == 0) {
@@ -318,7 +318,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE StringContainer* _priv_String_alloc_ref(const Ref<Referable>& obj, const sl_char8* sz, sl_size len)
+	SLIB_INLINE static StringContainer* _priv_String_alloc_ref(const Ref<Referable>& obj, const sl_char8* sz, sl_size len) noexcept
 	{
 		if (len == 0) {
 			return _priv_String_Empty.container;
@@ -336,7 +336,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE StringContainer16* _priv_String16_alloc_ref(const Ref<Referable>& obj, const sl_char16* sz, sl_size len)
+	SLIB_INLINE static StringContainer16* _priv_String16_alloc_ref(const Ref<Referable>& obj, const sl_char16* sz, sl_size len) noexcept
 	{
 		if (len == 0) {
 			return _priv_String16_Empty.container;
@@ -354,7 +354,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE StringContainer* _priv_String_create(sl_char8 ch, sl_size nRepeatCount)
+	SLIB_INLINE static StringContainer* _priv_String_create(sl_char8 ch, sl_size nRepeatCount) noexcept
 	{
 		StringContainer* container = _priv_String_alloc(nRepeatCount);
 		if (container) {
@@ -363,7 +363,7 @@ namespace slib
 		return container;
 	}
 	
-	SLIB_INLINE StringContainer16* _priv_String16_create(sl_char16 ch, sl_size nRepeatCount)
+	SLIB_INLINE static StringContainer16* _priv_String16_create(sl_char16 ch, sl_size nRepeatCount) noexcept
 	{
 		StringContainer16* container = _priv_String16_alloc(nRepeatCount);
 		if (container) {
@@ -372,7 +372,7 @@ namespace slib
 		return container;
 	}
 	
-	SLIB_INLINE StringContainer* _priv_String_create(const sl_char8* utf8, sl_reg lenUtf8)
+	SLIB_INLINE static StringContainer* _priv_String_create(const sl_char8* utf8, sl_reg lenUtf8) noexcept
 	{
 		if (utf8) {
 			if (lenUtf8 < 0) {
@@ -388,7 +388,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE StringContainer16* _priv_String16_create(const sl_char8* utf8, sl_reg lenUtf8)
+	SLIB_INLINE static StringContainer16* _priv_String16_create(const sl_char8* utf8, sl_reg lenUtf8) noexcept
 	{
 		if (utf8) {
 			if (lenUtf8 < 0) {
@@ -405,7 +405,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE StringContainer* _priv_String_create(const sl_char16* utf16, sl_reg lenUtf16)
+	SLIB_INLINE static StringContainer* _priv_String_create(const sl_char16* utf16, sl_reg lenUtf16) noexcept
 	{
 		if (utf16) {
 			if (lenUtf16 < 0) {
@@ -422,7 +422,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE StringContainer16* _priv_String16_create(const sl_char16* utf16, sl_reg lenUtf16)
+	SLIB_INLINE static StringContainer16* _priv_String16_create(const sl_char16* utf16, sl_reg lenUtf16) noexcept
 	{
 		if (utf16) {
 			if (lenUtf16 < 0) {
@@ -438,7 +438,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE StringContainer* _priv_String_create(const sl_char32* utf32, sl_reg lenUtf32)
+	SLIB_INLINE static StringContainer* _priv_String_create(const sl_char32* utf32, sl_reg lenUtf32) noexcept
 	{
 		if (utf32) {
 			if (lenUtf32 < 0) {
@@ -455,7 +455,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE StringContainer16* _priv_String16_create(const sl_char32* utf32, sl_reg lenUtf32)
+	SLIB_INLINE static StringContainer16* _priv_String16_create(const sl_char32* utf32, sl_reg lenUtf32) noexcept
 	{
 		if (utf32) {
 			if (lenUtf32 < 0) {
@@ -473,7 +473,7 @@ namespace slib
 	}
 	
 	
-	SLIB_INLINE StringContainer* _priv_String_merge8(const sl_char8* s1, sl_reg len1, const sl_char8* s2, sl_reg len2)
+	SLIB_INLINE static StringContainer* _priv_String_merge8(const sl_char8* s1, sl_reg len1, const sl_char8* s2, sl_reg len2) noexcept
 	{
 		if (len1 < 0) {
 			len1 = Base::getStringLength(s1);
@@ -491,7 +491,7 @@ namespace slib
 		return s;
 	}
 	
-	SLIB_INLINE StringContainer16* _priv_String16_merge16(const sl_char16* s1, sl_reg len1, const sl_char16* s2, sl_reg len2)
+	SLIB_INLINE static StringContainer16* _priv_String16_merge16(const sl_char16* s1, sl_reg len1, const sl_char16* s2, sl_reg len2) noexcept
 	{
 		if (len1 < 0) {
 			len1 = Base::getStringLength2(s1);
@@ -509,7 +509,7 @@ namespace slib
 		return s;
 	}
 	
-	SLIB_INLINE StringContainer* _priv_String_merge16(const sl_char8* s1, sl_reg len1, const sl_char16* s2_u16, sl_reg len2_u16)
+	SLIB_INLINE static StringContainer* _priv_String_merge16(const sl_char8* s1, sl_reg len1, const sl_char16* s2_u16, sl_reg len2_u16) noexcept
 	{
 		if (len1 < 0) {
 			len1 = Base::getStringLength(s1);
@@ -528,7 +528,7 @@ namespace slib
 		return s;
 	}
 	
-	SLIB_INLINE StringContainer* _priv_String_merge16(const sl_char16* s1_u16, sl_reg len1_u16, const sl_char8* s2, sl_reg len2)
+	SLIB_INLINE static StringContainer* _priv_String_merge16(const sl_char16* s1_u16, sl_reg len1_u16, const sl_char8* s2, sl_reg len2) noexcept
 	{
 		if (len1_u16 < 0) {
 			len1_u16 = Base::getStringLength2(s1_u16);
@@ -547,7 +547,7 @@ namespace slib
 		return s;
 	}
 	
-	SLIB_INLINE StringContainer* _priv_String_merge32(const sl_char8* s1, sl_reg len1, const sl_char32* s2_u32, sl_reg len2_u32)
+	SLIB_INLINE static StringContainer* _priv_String_merge32(const sl_char8* s1, sl_reg len1, const sl_char32* s2_u32, sl_reg len2_u32) noexcept
 	{
 		if (len1 < 0) {
 			len1 = Base::getStringLength(s1);
@@ -566,7 +566,7 @@ namespace slib
 		return s;
 	}
 	
-	SLIB_INLINE StringContainer* _priv_String_merge32(const sl_char32* s1_u32, sl_reg len1_u32, const sl_char8* s2, sl_reg len2)
+	SLIB_INLINE static StringContainer* _priv_String_merge32(const sl_char32* s1_u32, sl_reg len1_u32, const sl_char8* s2, sl_reg len2) noexcept
 	{
 		if (len1_u32 < 0) {
 			len1_u32 = Base::getStringLength4(s1_u32);
@@ -585,7 +585,7 @@ namespace slib
 		return s;
 	}
 	
-	SLIB_INLINE StringContainer16* _priv_String16_merge8(const sl_char16* s1, sl_reg len1, const sl_char8* s2_u8, sl_reg len2_u8)
+	SLIB_INLINE static StringContainer16* _priv_String16_merge8(const sl_char16* s1, sl_reg len1, const sl_char8* s2_u8, sl_reg len2_u8) noexcept
 	{
 		if (len1 < 0) {
 			len1 = Base::getStringLength2(s1);
@@ -604,7 +604,7 @@ namespace slib
 		return s;
 	}
 	
-	SLIB_INLINE StringContainer16* _priv_String16_merge8(const sl_char8* s1_u8, sl_reg len1_u8, const sl_char16* s2, sl_reg len2)
+	SLIB_INLINE static StringContainer16* _priv_String16_merge8(const sl_char8* s1_u8, sl_reg len1_u8, const sl_char16* s2, sl_reg len2) noexcept
 	{
 		if (len1_u8 < 0) {
 			len1_u8 = Base::getStringLength(s1_u8);
@@ -623,7 +623,7 @@ namespace slib
 		return s;
 	}
 	
-	SLIB_INLINE StringContainer16* _priv_String16_merge32(const sl_char16* s1, sl_reg len1, const sl_char32* s2_u32, sl_reg len2_u32)
+	SLIB_INLINE static StringContainer16* _priv_String16_merge32(const sl_char16* s1, sl_reg len1, const sl_char32* s2_u32, sl_reg len2_u32) noexcept
 	{
 		if (len1 < 0) {
 			len1 = Base::getStringLength2(s1);
@@ -642,7 +642,7 @@ namespace slib
 		return s;
 	}
 	
-	SLIB_INLINE StringContainer16* _priv_String16_merge32(const sl_char32* s1_u32, sl_reg len1_u32, const sl_char16* s2, sl_reg len2)
+	SLIB_INLINE static StringContainer16* _priv_String16_merge32(const sl_char32* s1_u32, sl_reg len1_u32, const sl_char16* s2, sl_reg len2) noexcept
 	{
 		if (len1_u32 < 0) {
 			len1_u32 = Base::getStringLength4(s1_u32);
@@ -661,7 +661,7 @@ namespace slib
 		return s;
 	}
 	
-	SLIB_INLINE sl_int32 _priv_String_compare_objects(const sl_char8* str1, sl_size len1, const sl_char8* str2, sl_size len2)
+	SLIB_INLINE static sl_int32 _priv_String_compare_objects(const sl_char8* str1, sl_size len1, const sl_char8* str2, sl_size len2) noexcept
 	{
 		if (len1 < len2) {
 			if (len1 == 0) {
@@ -691,7 +691,7 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE sl_int32 _priv_String16_compare_objects(const sl_char16* str1, sl_size len1, const sl_char16* str2, sl_size len2)
+	SLIB_INLINE static sl_int32 _priv_String16_compare_objects(const sl_char16* str1, sl_size len1, const sl_char16* str2, sl_size len2) noexcept
 	{
 		if (len1 < len2) {
 			if (len1 == 0) {
@@ -721,7 +721,7 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE sl_int32 _priv_String_compare8(const sl_char8* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
+	SLIB_INLINE static sl_int32 _priv_String_compare8(const sl_char8* str1, sl_reg len1, const sl_char8* str2, sl_reg len2) noexcept
 	{
 		if (len1 < 0) {
 			if (len2 < 0) {
@@ -738,7 +738,7 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE sl_int32 _priv_String16_compare16(const sl_char16* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
+	SLIB_INLINE static sl_int32 _priv_String16_compare16(const sl_char16* str1, sl_reg len1, const sl_char16* str2, sl_reg len2) noexcept
 	{
 		if (len1 < 0) {
 			if (len2 < 0) {
@@ -755,25 +755,25 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE sl_int32 _priv_String_compare16(const sl_char8* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
+	SLIB_INLINE static sl_int32 _priv_String_compare16(const sl_char8* str1, sl_reg len1, const sl_char16* str2, sl_reg len2) noexcept
 	{
 		String other(str2, len2);
 		return _priv_String_compare8(str1, len1, other.getData(), other.getLength());
 	}
 	
-	SLIB_INLINE sl_int32 _priv_String16_compare8(const sl_char16* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
+	SLIB_INLINE static sl_int32 _priv_String16_compare8(const sl_char16* str1, sl_reg len1, const sl_char8* str2, sl_reg len2) noexcept
 	{
 		String16 other(str2, len2);
 		return _priv_String16_compare16(str1, len1, other.getData(), other.getLength());
 	}
 	
-	SLIB_INLINE sl_int32 _priv_String_compare32(const sl_char8* str1, sl_reg len1, const sl_char32* str2, sl_reg len2)
+	SLIB_INLINE static sl_int32 _priv_String_compare32(const sl_char8* str1, sl_reg len1, const sl_char32* str2, sl_reg len2) noexcept
 	{
 		String other(str2, len2);
 		return _priv_String_compare8(str1, len1, other.getData(), other.getLength());
 	}
 	
-	SLIB_INLINE sl_int32 _priv_String16_compare32(const sl_char16* m1, sl_reg len1, const sl_char32* m2, sl_reg len2)
+	SLIB_INLINE static sl_int32 _priv_String16_compare32(const sl_char16* m1, sl_reg len1, const sl_char32* m2, sl_reg len2) noexcept
 	{
 		if (len1 < 0) {
 			len1 = SLIB_REG_MAX;
@@ -815,7 +815,7 @@ namespace slib
 	}
 
 	
-	SLIB_INLINE sl_bool _priv_String_equals_objects(const sl_char8* str1, sl_size len1, const sl_char8* str2, sl_size len2)
+	SLIB_INLINE static sl_bool _priv_String_equals_objects(const sl_char8* str1, sl_size len1, const sl_char8* str2, sl_size len2) noexcept
 	{
 		if (len1 == len2) {
 			if (len1 == 0) {
@@ -827,7 +827,7 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE sl_bool _priv_String16_equals_objects(const sl_char16* str1, sl_size len1, const sl_char16* str2, sl_size len2)
+	SLIB_INLINE static sl_bool _priv_String16_equals_objects(const sl_char16* str1, sl_size len1, const sl_char16* str2, sl_size len2) noexcept
 	{
 		if (len1 == len2) {
 			if (len1 == 0) {
@@ -839,7 +839,7 @@ namespace slib
 		}
 	}
 
-	SLIB_INLINE sl_bool _priv_String_equals8(const sl_char8* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
+	SLIB_INLINE static sl_bool _priv_String_equals8(const sl_char8* str1, sl_reg len1, const sl_char8* str2, sl_reg len2) noexcept
 	{
 		if (len1 < 0) {
 			if (len2 < 0) {
@@ -856,7 +856,7 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE sl_bool _priv_String16_equals16(const sl_char16* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
+	SLIB_INLINE static sl_bool _priv_String16_equals16(const sl_char16* str1, sl_reg len1, const sl_char16* str2, sl_reg len2) noexcept
 	{
 		if (len1 < 0) {
 			if (len2 < 0) {
@@ -873,30 +873,30 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE sl_bool _priv_String_equals16(const sl_char8* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
+	SLIB_INLINE static sl_bool _priv_String_equals16(const sl_char8* str1, sl_reg len1, const sl_char16* str2, sl_reg len2) noexcept
 	{
 		String other(str2, len2);
 		return _priv_String_equals8(str1, len1, other.getData(), other.getLength());
 	}
 	
-	SLIB_INLINE sl_bool _priv_String16_equals8(const sl_char16* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
+	SLIB_INLINE static sl_bool _priv_String16_equals8(const sl_char16* str1, sl_reg len1, const sl_char8* str2, sl_reg len2) noexcept
 	{
 		String16 other(str2, len2);
 		return _priv_String16_equals16(str1, len1, other.getData(), other.getLength());
 	}
 	
-	SLIB_INLINE sl_bool _priv_String_equals32(const sl_char8* str1, sl_reg len1, const sl_char32* str2, sl_reg len2)
+	SLIB_INLINE static sl_bool _priv_String_equals32(const sl_char8* str1, sl_reg len1, const sl_char32* str2, sl_reg len2) noexcept
 	{
 		String other(str2, len2);
 		return _priv_String_equals8(str1, len1, other.getData(), other.getLength());
 	}
 	
-	SLIB_INLINE sl_bool _priv_String16_equals32(const sl_char16* str1, sl_reg len1, const sl_char32* str2, sl_reg len2)
+	SLIB_INLINE static sl_bool _priv_String16_equals32(const sl_char16* str1, sl_reg len1, const sl_char32* str2, sl_reg len2) noexcept
 	{
 		return _priv_String16_compare32(str1, len1, str2, len2) == 0;
 	}
 	
-	SLIB_INLINE StringContainer* Atomic<String>::_retainContainer() const
+	SLIB_INLINE StringContainer* Atomic<String>::_retainContainer() const noexcept
 	{
 		if (m_container) {
 			SpinLocker lock(&m_lock);
@@ -909,7 +909,7 @@ namespace slib
 		return sl_null;
 	}
 
-	SLIB_INLINE StringContainer16* Atomic<String16>::_retainContainer() const
+	SLIB_INLINE StringContainer16* Atomic<String16>::_retainContainer() const noexcept
 	{
 		if (m_container) {
 			SpinLocker lock(&m_lock);
@@ -923,7 +923,7 @@ namespace slib
 	}
 
 
-	SLIB_INLINE void String::_replaceContainer(StringContainer* container)
+	SLIB_INLINE void String::_replaceContainer(StringContainer* container) noexcept
 	{
 		if (m_container) {
 			m_container->decreaseReference();
@@ -931,7 +931,7 @@ namespace slib
 		m_container = container;
 	}
 
-	SLIB_INLINE void String16::_replaceContainer(StringContainer16* container)
+	SLIB_INLINE void String16::_replaceContainer(StringContainer16* container) noexcept
 	{
 		if (m_container) {
 			m_container->decreaseReference();
@@ -939,7 +939,7 @@ namespace slib
 		m_container = container;
 	}
 
-	SLIB_INLINE void Atomic<String>::_replaceContainer(StringContainer* container)
+	SLIB_INLINE void Atomic<String>::_replaceContainer(StringContainer* container) noexcept
 	{
 		StringContainer* before;
 		{
@@ -952,7 +952,7 @@ namespace slib
 		}
 	}
 
-	SLIB_INLINE void Atomic<String16>::_replaceContainer(StringContainer16* container)
+	SLIB_INLINE void Atomic<String16>::_replaceContainer(StringContainer16* container) noexcept
 	{
 		StringContainer16* before;
 		{
@@ -965,7 +965,7 @@ namespace slib
 		}
 	}
 
-	String::String(const String& src)
+	String::String(const String& src) noexcept
 	{
 		StringContainer* container = src.m_container;
 		if (container) {
@@ -974,7 +974,7 @@ namespace slib
 		m_container= container;
 	}
 
-	String16::String16(const String16& src)
+	String16::String16(const String16& src) noexcept
 	{
 		StringContainer16* container = src.m_container;
 		if (container) {
@@ -983,7 +983,7 @@ namespace slib
 		m_container = container;
 	}
 
-	Atomic<String>::Atomic(const String& src)
+	Atomic<String>::Atomic(const String& src) noexcept
 	{
 		StringContainer* container = src.m_container;
 		if (container) {
@@ -992,7 +992,7 @@ namespace slib
 		m_container = container;
 	}
 
-	Atomic<String16>::Atomic(const String16& src)
+	Atomic<String16>::Atomic(const String16& src) noexcept
 	{
 		StringContainer16* container = src.m_container;
 		if (container) {
@@ -1002,28 +1002,28 @@ namespace slib
 	}
 
 
-	String::String(const AtomicString& src)
+	String::String(const AtomicString& src) noexcept
 	{
 		m_container = src._retainContainer();
 	}
 
-	String16::String16(const AtomicString16& src)
+	String16::String16(const AtomicString16& src) noexcept
 	{
 		m_container = src._retainContainer();
 	}
 
-	Atomic<String>::Atomic(const AtomicString& src)
+	Atomic<String>::Atomic(const AtomicString& src) noexcept
 	{
 		m_container = src._retainContainer();
 	}
 
-	Atomic<String16>::Atomic(const AtomicString16& src)
+	Atomic<String16>::Atomic(const AtomicString16& src) noexcept
 	{
 		m_container = src._retainContainer();
 	}
 
 
-	String::String(const String16& src)
+	String::String(const String16& src) noexcept
 	{
 		if (src.isNull()) {
 			m_container = sl_null;
@@ -1037,7 +1037,7 @@ namespace slib
 		}
 	}
 
-	String16::String16(const String& src)
+	String16::String16(const String& src) noexcept
 	{
 		if (src.isNull()) {
 			m_container = sl_null;
@@ -1051,7 +1051,7 @@ namespace slib
 		}
 	}
 
-	Atomic<String>::Atomic(const String16& src)
+	Atomic<String>::Atomic(const String16& src) noexcept
 	{
 		if (src.isNull()) {
 			m_container = sl_null;
@@ -1065,7 +1065,7 @@ namespace slib
 		}
 	}
 
-	Atomic<String16>::Atomic(const String& src)
+	Atomic<String16>::Atomic(const String& src) noexcept
 	{
 		if (src.isNull()) {
 			m_container = sl_null;
@@ -1080,7 +1080,7 @@ namespace slib
 	}
 
 
-	String::String(const AtomicString16& _src)
+	String::String(const AtomicString16& _src) noexcept
 	{
 		String16 src(_src);
 		if (src.isNull()) {
@@ -1095,7 +1095,7 @@ namespace slib
 		}
 	}
 
-	String16::String16(const AtomicString& _src)
+	String16::String16(const AtomicString& _src) noexcept
 	{
 		String src(_src);
 		if (src.isNull()) {
@@ -1110,7 +1110,7 @@ namespace slib
 		}
 	}
 
-	Atomic<String>::Atomic(const AtomicString16& _src)
+	Atomic<String>::Atomic(const AtomicString16& _src) noexcept
 	{
 		String16 src(_src);
 		if (src.isNull()) {
@@ -1125,7 +1125,7 @@ namespace slib
 		}
 	}
 
-	Atomic<String16>::Atomic(const AtomicString& _src)
+	Atomic<String16>::Atomic(const AtomicString& _src) noexcept
 	{
 		String src(_src);
 		if (src.isNull()) {
@@ -1141,7 +1141,7 @@ namespace slib
 	}
 
 
-	String::~String()
+	String::~String() noexcept
 	{
 		StringContainer* container = m_container;
 		if (container) {
@@ -1149,7 +1149,7 @@ namespace slib
 		}
 	}
 
-	String16::~String16()
+	String16::~String16() noexcept
 	{
 		StringContainer16* container = m_container;
 		if (container) {
@@ -1157,7 +1157,7 @@ namespace slib
 		}
 	}
 
-	Atomic<String>::~Atomic()
+	Atomic<String>::~Atomic() noexcept
 	{
 		StringContainer* container = m_container;
 		if (container) {
@@ -1165,7 +1165,7 @@ namespace slib
 		}
 	}
 
-	Atomic<String16>::~Atomic()
+	Atomic<String16>::~Atomic() noexcept
 	{
 		StringContainer16* container = m_container;
 		if (container) {
@@ -1174,69 +1174,69 @@ namespace slib
 	}
 
 
-	String::String(sl_char8 ch, sl_size nRepeatCount)
+	String::String(sl_char8 ch, sl_size nRepeatCount) noexcept
 	{
 		m_container = _priv_String_create(ch, nRepeatCount);
 	}
 
-	Atomic<String>::Atomic(sl_char8 ch, sl_size nRepeatCount)
+	Atomic<String>::Atomic(sl_char8 ch, sl_size nRepeatCount) noexcept
 	{
 		m_container = _priv_String_create(ch, nRepeatCount);
 	}
 
-	String16::String16(sl_char16 ch, sl_size nRepeatCount)
+	String16::String16(sl_char16 ch, sl_size nRepeatCount) noexcept
 	{
 		m_container = _priv_String16_create(ch, nRepeatCount);
 	}
 
-	Atomic<String16>::Atomic(sl_char16 ch, sl_size nRepeatCount)
+	Atomic<String16>::Atomic(sl_char16 ch, sl_size nRepeatCount) noexcept
 	{
 		m_container = _priv_String16_create(ch, nRepeatCount);
 	}
 
 
-	String::String(const char* strUtf8)
+	String::String(const char* strUtf8) noexcept
 	{
 		m_container = _priv_String_create(strUtf8, -1);
 	}
 
-	String::String(const char* strUtf8, sl_reg length)
+	String::String(const char* strUtf8, sl_reg length) noexcept
 	{
 		m_container = _priv_String_create(strUtf8, length);
 	}
 
-	Atomic<String>::Atomic(const char* strUtf8)
+	Atomic<String>::Atomic(const char* strUtf8) noexcept
 	{
 		m_container = _priv_String_create(strUtf8, -1);
 	}
 
-	Atomic<String>::Atomic(const char* strUtf8, sl_reg length)
+	Atomic<String>::Atomic(const char* strUtf8, sl_reg length) noexcept
 	{
 		m_container = _priv_String_create(strUtf8, length);
 	}
 
-	String16::String16(const char* strUtf8)
+	String16::String16(const char* strUtf8) noexcept
 	{
 		m_container = _priv_String16_create(strUtf8, -1);
 	}
 
-	String16::String16(const char* strUtf8, sl_reg length)
+	String16::String16(const char* strUtf8, sl_reg length) noexcept
 	{
 		m_container = _priv_String16_create(strUtf8, length);
 	}
 
-	Atomic<String16>::Atomic(const char* strUtf8)
+	Atomic<String16>::Atomic(const char* strUtf8) noexcept
 	{
 		m_container = _priv_String16_create(strUtf8, -1);
 	}
 
-	Atomic<String16>::Atomic(const char* strUtf8, sl_reg length)
+	Atomic<String16>::Atomic(const char* strUtf8, sl_reg length) noexcept
 	{
 		m_container = _priv_String16_create(strUtf8, length);
 	}
 
 	
-	String::String(const wchar_t* strUnicode)
+	String::String(const wchar_t* strUnicode) noexcept
 	{
 		if (sizeof(wchar_t) == 2) {
 			m_container = _priv_String_create((sl_char16*)strUnicode, -1);
@@ -1245,7 +1245,7 @@ namespace slib
 		}
 	}
 	
-	String::String(const wchar_t* strUnicode, sl_reg length)
+	String::String(const wchar_t* strUnicode, sl_reg length) noexcept
 	{
 		if (sizeof(wchar_t) == 2) {
 			m_container = _priv_String_create((sl_char16*)strUnicode, length);
@@ -1254,7 +1254,7 @@ namespace slib
 		}
 	}
 	
-	Atomic<String>::Atomic(const wchar_t* strUnicode)
+	Atomic<String>::Atomic(const wchar_t* strUnicode) noexcept
 	{
 		if (sizeof(wchar_t) == 2) {
 			m_container = _priv_String_create((sl_char16*)strUnicode, -1);
@@ -1263,7 +1263,7 @@ namespace slib
 		}
 	}
 	
-	Atomic<String>::Atomic(const wchar_t* strUnicode, sl_reg length)
+	Atomic<String>::Atomic(const wchar_t* strUnicode, sl_reg length) noexcept
 	{
 		if (sizeof(wchar_t) == 2) {
 			m_container = _priv_String_create((sl_char16*)strUnicode, length);
@@ -1272,7 +1272,7 @@ namespace slib
 		}
 	}
 	
-	String16::String16(const wchar_t* strUnicode)
+	String16::String16(const wchar_t* strUnicode) noexcept
 	{
 		if (sizeof(wchar_t) == 2) {
 			m_container = _priv_String16_create((sl_char16*)strUnicode, -1);
@@ -1281,7 +1281,7 @@ namespace slib
 		}
 	}
 	
-	String16::String16(const wchar_t* strUnicode, sl_reg length)
+	String16::String16(const wchar_t* strUnicode, sl_reg length) noexcept
 	{
 		if (sizeof(wchar_t) == 2) {
 			m_container = _priv_String16_create((sl_char16*)strUnicode, length);
@@ -1290,7 +1290,7 @@ namespace slib
 		}
 	}
 	
-	Atomic<String16>::Atomic(const wchar_t* strUnicode)
+	Atomic<String16>::Atomic(const wchar_t* strUnicode) noexcept
 	{
 		if (sizeof(wchar_t) == 2) {
 			m_container = _priv_String16_create((sl_char16*)strUnicode, -1);
@@ -1299,7 +1299,7 @@ namespace slib
 		}
 	}
 	
-	Atomic<String16>::Atomic(const wchar_t* strUnicode, sl_reg length)
+	Atomic<String16>::Atomic(const wchar_t* strUnicode, sl_reg length) noexcept
 	{
 		if (sizeof(wchar_t) == 2) {
 			m_container = _priv_String16_create((sl_char16*)strUnicode, length);
@@ -1309,121 +1309,121 @@ namespace slib
 	}
 
 	
-	String::String(const char16_t* strUtf16)
+	String::String(const char16_t* strUtf16) noexcept
 	{
 		m_container = _priv_String_create(strUtf16, -1);
 	}
 
-	String::String(const char16_t* strUtf16, sl_reg length)
+	String::String(const char16_t* strUtf16, sl_reg length) noexcept
 	{
 		m_container = _priv_String_create(strUtf16, length);
 	}
 
-	Atomic<String>::Atomic(const char16_t* strUtf16)
+	Atomic<String>::Atomic(const char16_t* strUtf16) noexcept
 	{
 		m_container = _priv_String_create(strUtf16, -1);
 	}
 
-	Atomic<String>::Atomic(const char16_t* strUtf16, sl_reg length)
+	Atomic<String>::Atomic(const char16_t* strUtf16, sl_reg length) noexcept
 	{
 		m_container = _priv_String_create(strUtf16, length);
 	}
 
-	String16::String16(const char16_t* strUtf16)
+	String16::String16(const char16_t* strUtf16) noexcept
 	{
 		m_container = _priv_String16_create(strUtf16, -1);
 	}
 
-	String16::String16(const char16_t* strUtf16, sl_reg length)
+	String16::String16(const char16_t* strUtf16, sl_reg length) noexcept
 	{
 		m_container = _priv_String16_create(strUtf16, length);
 	}
 
-	Atomic<String16>::Atomic(const char16_t* strUtf16)
+	Atomic<String16>::Atomic(const char16_t* strUtf16) noexcept
 	{
 		m_container = _priv_String16_create(strUtf16, -1);
 	}
 
-	Atomic<String16>::Atomic(const char16_t* strUtf16, sl_reg length)
+	Atomic<String16>::Atomic(const char16_t* strUtf16, sl_reg length) noexcept
 	{
 		m_container = _priv_String16_create(strUtf16, length);
 	}
 
 
-	String::String(const char32_t* strUtf32)
+	String::String(const char32_t* strUtf32) noexcept
 	{
 		m_container = _priv_String_create(strUtf32, -1);
 	}
 
-	String::String(const char32_t* strUtf32, sl_reg length)
+	String::String(const char32_t* strUtf32, sl_reg length) noexcept
 	{
 		m_container = _priv_String_create(strUtf32, length);
 	}
 
-	Atomic<String>::Atomic(const char32_t* strUtf32)
+	Atomic<String>::Atomic(const char32_t* strUtf32) noexcept
 	{
 		m_container = _priv_String_create(strUtf32, -1);
 	}
 
-	Atomic<String>::Atomic(const char32_t* strUtf32, sl_reg length)
+	Atomic<String>::Atomic(const char32_t* strUtf32, sl_reg length) noexcept
 	{
 		m_container = _priv_String_create(strUtf32, length);
 	}
 
-	String16::String16(const char32_t* strUtf32)
+	String16::String16(const char32_t* strUtf32) noexcept
 	{
 		m_container = _priv_String16_create(strUtf32, -1);
 	}
 
-	String16::String16(const char32_t* strUtf32, sl_reg length)
+	String16::String16(const char32_t* strUtf32, sl_reg length) noexcept
 	{
 		m_container = _priv_String16_create(strUtf32, length);
 	}
 
-	Atomic<String16>::Atomic(const char32_t* strUtf32)
+	Atomic<String16>::Atomic(const char32_t* strUtf32) noexcept
 	{
 		m_container = _priv_String16_create(strUtf32, -1);
 	}
 
-	Atomic<String16>::Atomic(const char32_t* strUtf32, sl_reg length)
+	Atomic<String16>::Atomic(const char32_t* strUtf32, sl_reg length) noexcept
 	{
 		m_container = _priv_String16_create(strUtf32, length);
 	}
 	
 	
-	String::String(const std::string& str)
+	String::String(const std::string& str) noexcept
 	{
 		m_container = _priv_String_alloc_std(str);
 	}
 	
-	String16::String16(const std::u16string& str)
+	String16::String16(const std::u16string& str) noexcept
 	{
 		m_container = _priv_String16_alloc_std(str);
 	}
 	
-	Atomic<String>::Atomic(const std::string& str)
+	Atomic<String>::Atomic(const std::string& str) noexcept
 	{
 		m_container = _priv_String_alloc_std(str);
 	}
 	
-	Atomic<String16>::Atomic(const std::u16string& str)
+	Atomic<String16>::Atomic(const std::u16string& str) noexcept
 	{
 		m_container = _priv_String16_alloc_std(str);
 	}
 
 
-	String String::allocate(sl_size len)
+	String String::allocate(sl_size len) noexcept
 	{
 		return _priv_String_alloc(len);
 	}
 
-	String16 String16::allocate(sl_size len)
+	String16 String16::allocate(sl_size len) noexcept
 	{
 		return _priv_String16_alloc(len);
 	}
 
 
-	String String::fromStatic(const sl_char8 *sz, sl_reg len)
+	String String::fromStatic(const sl_char8 *sz, sl_reg len) noexcept
 	{
 		if (sz) {
 			if (len < 0) {
@@ -1434,7 +1434,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String16 String16::fromStatic(const sl_char16 *sz, sl_reg len)
+	String16 String16::fromStatic(const sl_char16 *sz, sl_reg len) noexcept
 	{
 		if (sz) {
 			if (len < 0) {
@@ -1445,7 +1445,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	String String::fromRef(const Ref<Referable>& ref, const sl_char8* str, sl_reg len)
+	String String::fromRef(const Ref<Referable>& ref, const sl_char8* str, sl_reg len) noexcept
 	{
 		if (str) {
 			if (len < 0) {
@@ -1456,7 +1456,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	String16 String16::fromRef(const Ref<Referable>& ref, const sl_char16* str, sl_reg len)
+	String16 String16::fromRef(const Ref<Referable>& ref, const sl_char16* str, sl_reg len) noexcept
 	{
 		if (str) {
 			if (len < 0) {
@@ -1467,7 +1467,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String String::fromMemory(const Memory& mem)
+	String String::fromMemory(const Memory& mem) noexcept
 	{
 		if (mem.isNull()) {
 			return String::null();
@@ -1483,7 +1483,7 @@ namespace slib
 		return fromRef(mem.ref, s, n);
 	}
 	
-	String16 String16::fromMemory(const Memory& mem)
+	String16 String16::fromMemory(const Memory& mem) noexcept
 	{
 		if (mem.isNull()) {
 			return String16::null();
@@ -1499,52 +1499,52 @@ namespace slib
 		return fromRef(mem.ref, s, n);
 	}
 	
-	String String::fromUtf8(const void* utf8, sl_reg len)
+	String String::fromUtf8(const void* utf8, sl_reg len) noexcept
 	{
 		return String((const sl_char8*)utf8, len);
 	}
 
-	String String::fromUtf8(const Memory& mem)
+	String String::fromUtf8(const Memory& mem) noexcept
 	{
 		return fromUtf8(mem.getData(), mem.getSize());
 	}
 
-	String16 String16::fromUtf8(const void* utf8, sl_reg len)
+	String16 String16::fromUtf8(const void* utf8, sl_reg len) noexcept
 	{
 		return String16((const sl_char8*)utf8, len);
 	}
 
-	String16 String16::fromUtf8(const Memory& mem)
+	String16 String16::fromUtf8(const Memory& mem) noexcept
 	{
 		return fromUtf8(mem.getData(), mem.getSize());
 	}
 
 
-	String String::fromUtf16(const sl_char16* utf16, sl_reg len)
+	String String::fromUtf16(const sl_char16* utf16, sl_reg len) noexcept
 	{
 		return String(utf16, len);
 	}
 
-	String16 String16::fromUtf16(const sl_char16* utf16, sl_reg len)
+	String16 String16::fromUtf16(const sl_char16* utf16, sl_reg len) noexcept
 	{
 		String16 str(utf16, len);
 		return str;
 	}
 
 
-	String String::fromUtf32(const sl_char32* utf32, sl_reg len)
+	String String::fromUtf32(const sl_char32* utf32, sl_reg len) noexcept
 	{
 		return String(utf32, len);
 	}
 
-	String16 String16::fromUtf32(const sl_char32* utf32, sl_reg len)
+	String16 String16::fromUtf32(const sl_char32* utf32, sl_reg len) noexcept
 	{
 		String16 str(utf32, len);
 		return str;
 	}
 
 
-	String String::fromUtf16BE(const void* _utf16, sl_reg len)
+	String String::fromUtf16BE(const void* _utf16, sl_reg len) noexcept
 	{
 		if (!_utf16) {
 			return sl_null;
@@ -1568,12 +1568,12 @@ namespace slib
 		return sl_null;
 	}
 
-	String String::fromUtf16BE(const Memory& mem)
+	String String::fromUtf16BE(const Memory& mem) noexcept
 	{
 		return fromUtf16BE(mem.getData(), mem.getSize());
 	}
 
-	String16 String16::fromUtf16BE(const void* _utf16, sl_reg len)
+	String16 String16::fromUtf16BE(const void* _utf16, sl_reg len) noexcept
 	{
 		if (!_utf16) {
 			return sl_null;
@@ -1597,13 +1597,13 @@ namespace slib
 		return sl_null;
 	}
 
-	String16 String16::fromUtf16BE(const Memory& mem)
+	String16 String16::fromUtf16BE(const Memory& mem) noexcept
 	{
 		return fromUtf16BE(mem.getData(), mem.getSize());
 	}
 
 
-	String String::fromUtf16LE(const void* _utf16, sl_reg len)
+	String String::fromUtf16LE(const void* _utf16, sl_reg len) noexcept
 	{
 		if (!_utf16) {
 			return sl_null;
@@ -1627,12 +1627,12 @@ namespace slib
 		return sl_null;
 	}
 
-	String String::fromUtf16LE(const Memory& mem)
+	String String::fromUtf16LE(const Memory& mem) noexcept
 	{
 		return fromUtf16LE(mem.getData(), mem.getSize());
 	}
 
-	String16 String16::fromUtf16LE(const void* _utf16, sl_reg len)
+	String16 String16::fromUtf16LE(const void* _utf16, sl_reg len) noexcept
 	{
 		if (!_utf16) {
 			return sl_null;
@@ -1657,13 +1657,13 @@ namespace slib
 		return sl_null;
 	}
 
-	String16 String16::fromUtf16LE(const Memory& mem)
+	String16 String16::fromUtf16LE(const Memory& mem) noexcept
 	{
 		return fromUtf16LE(mem.getData(), mem.getSize());
 	}
 
 
-	String String::fromUtf(const void* _buf, sl_size len)
+	String String::fromUtf(const void* _buf, sl_size len) noexcept
 	{
 		sl_char8* buf = (sl_char8*)_buf;
 		if (!buf) {
@@ -1688,12 +1688,12 @@ namespace slib
 		return String(buf, len);
 	}
 
-	String String::fromUtf(const Memory& mem)
+	String String::fromUtf(const Memory& mem) noexcept
 	{
 		return fromUtf(mem.getData(), mem.getSize());
 	}
 
-	String16 String16::fromUtf(const void* _buf, sl_size len)
+	String16 String16::fromUtf(const void* _buf, sl_size len) noexcept
 	{
 		sl_char8* buf = (sl_char8*)_buf;
 		if (!buf) {
@@ -1718,56 +1718,56 @@ namespace slib
 		return String16(buf, len);
 	}
 
-	String16 String16::fromUtf(const Memory& mem)
+	String16 String16::fromUtf(const Memory& mem) noexcept
 	{
 		return fromUtf(mem.getData(), mem.getSize());
 	}
 
 
-	sl_bool Atomic<String>::isEmpty() const
+	sl_bool Atomic<String>::isEmpty() const noexcept
 	{
 		String s(*this);
 		return s.getLength() == 0;
 	}
 
-	sl_bool Atomic<String16>::isEmpty() const
+	sl_bool Atomic<String16>::isEmpty() const noexcept
 	{
 		String16 s(*this);
 		return s.getLength() == 0;
 	}
 
 
-	sl_bool Atomic<String>::isNotEmpty() const
+	sl_bool Atomic<String>::isNotEmpty() const noexcept
 	{
 		String s(*this);
 		return s.getLength() != 0;
 	}
 
-	sl_bool Atomic<String16>::isNotEmpty() const
+	sl_bool Atomic<String16>::isNotEmpty() const noexcept
 	{
 		String16 s(*this);
 		return s.getLength() != 0;
 	}
 
 
-	void String::setNull()
+	void String::setNull() noexcept
 	{
 		_replaceContainer(sl_null);
 	}
 
-	void String16::setNull()
+	void String16::setNull() noexcept
 	{
 		_replaceContainer(sl_null);
 	}
 
-	void Atomic<String>::setNull()
+	void Atomic<String>::setNull() noexcept
 	{
 		if (m_container) {
 			_replaceContainer(sl_null);
 		}
 	}
 
-	void Atomic<String16>::setNull()
+	void Atomic<String16>::setNull() noexcept
 	{
 		if (m_container) {
 			_replaceContainer(sl_null);
@@ -1775,28 +1775,28 @@ namespace slib
 	}
 
 
-	void String::setEmpty()
+	void String::setEmpty() noexcept
 	{
 		if (m_container != _priv_String_Empty.container) {
 			_replaceContainer(_priv_String_Empty.container);
 		}
 	}
 
-	void String16::setEmpty()
+	void String16::setEmpty() noexcept
 	{
 		if (m_container != _priv_String16_Empty.container) {
 			_replaceContainer(_priv_String16_Empty.container);
 		}
 	}
 
-	void Atomic<String>::setEmpty()
+	void Atomic<String>::setEmpty() noexcept
 	{
 		if (m_container != _priv_String_Empty.container) {
 			_replaceContainer(_priv_String_Empty.container);
 		}
 	}
 
-	void Atomic<String16>::setEmpty()
+	void Atomic<String16>::setEmpty() noexcept
 	{
 		if (m_container != _priv_String16_Empty.container) {
 			_replaceContainer(_priv_String16_Empty.container);
@@ -1804,27 +1804,27 @@ namespace slib
 	}
 
 
-	sl_size Atomic<String>::getLength() const
+	sl_size Atomic<String>::getLength() const noexcept
 	{
 		String s(*this);
 		return s.getLength();
 	}
 
-	sl_size Atomic<String16>::getLength() const
+	sl_size Atomic<String16>::getLength() const noexcept
 	{
 		String16 s(*this);
 		return s.getLength();
 	}
 
 
-	void String::setLength(sl_size len)
+	void String::setLength(sl_size len) noexcept
 	{
 		if (m_container && m_container != &_g_string8_empty_container) {
 			m_container->len = len;
 		}
 	}
 
-	void String16::setLength(sl_size len)
+	void String16::setLength(sl_size len) noexcept
 	{
 		if (m_container && m_container != &_g_string16_empty_container) {
 			m_container->len = len;
@@ -1833,7 +1833,7 @@ namespace slib
 
 
 	template <class CT>
-	SLIB_INLINE sl_uint32 _priv_String_calcHash(const CT* buf, sl_size len)
+	SLIB_INLINE static sl_uint32 _priv_String_calcHash(const CT* buf, sl_size len) noexcept
 	{
 		sl_uint32 hash = 0;
 		for (sl_size i = 0; i < len; i++) {
@@ -1844,7 +1844,7 @@ namespace slib
 		return hash;
 	}
 
-	sl_uint32 String::getHashCode() const
+	sl_uint32 String::getHashCode() const noexcept
 	{
 		if (m_container) {
 			sl_size n = m_container->len;
@@ -1860,7 +1860,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_uint32 String16::getHashCode() const
+	sl_uint32 String16::getHashCode() const noexcept
 	{
 		if (m_container) {
 			sl_size n = m_container->len;
@@ -1876,27 +1876,27 @@ namespace slib
 		return 0;
 	}
 
-	sl_uint32 Atomic<String>::getHashCode() const
+	sl_uint32 Atomic<String>::getHashCode() const noexcept
 	{
 		String s(*this);
 		return s.getHashCode();
 	}
 
-	sl_uint32 Atomic<String16>::getHashCode() const
+	sl_uint32 Atomic<String16>::getHashCode() const noexcept
 	{
 		String16 s(*this);
 		return s.getHashCode();
 	}
 
 
-	void String::setHashCode(sl_uint32 hash)
+	void String::setHashCode(sl_uint32 hash) noexcept
 	{
 		if (m_container && m_container != &_g_string8_empty_container) {
 			m_container->hash = hash;
 		}
 	}
 
-	void String16::setHashCode(sl_uint32 hash)
+	void String16::setHashCode(sl_uint32 hash) noexcept
 	{
 		if (m_container && m_container != &_g_string16_empty_container) {
 			m_container->hash = hash;
@@ -1905,7 +1905,7 @@ namespace slib
 
 
 	template <class CT>
-	SLIB_INLINE sl_uint32 _priv_String_calcHashIgnoreCase(const CT* buf, sl_size len)
+	SLIB_INLINE static sl_uint32 _priv_String_calcHashIgnoreCase(const CT* buf, sl_size len) noexcept
 	{
 		sl_uint32 hash = 0;
 		for (sl_size i = 0; i < len; i++) {
@@ -1917,7 +1917,7 @@ namespace slib
 		return hash;
 	}
 
-	sl_uint32 String::getHashCodeIgnoreCase() const
+	sl_uint32 String::getHashCodeIgnoreCase() const noexcept
 	{
 		if (m_container) {
 			sl_size n = m_container->len;
@@ -1929,7 +1929,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_uint32 String16::getHashCodeIgnoreCase() const
+	sl_uint32 String16::getHashCodeIgnoreCase() const noexcept
 	{
 		if (m_container) {
 			sl_size n = m_container->len;
@@ -1941,20 +1941,20 @@ namespace slib
 		return 0;
 	}
 
-	sl_uint32 Atomic<String>::getHashCodeIgnoreCase() const
+	sl_uint32 Atomic<String>::getHashCodeIgnoreCase() const noexcept
 	{
 		String s(*this);
 		return s.getHashCodeIgnoreCase();
 	}
 
-	sl_uint32 Atomic<String16>::getHashCodeIgnoreCase() const
+	sl_uint32 Atomic<String16>::getHashCodeIgnoreCase() const noexcept
 	{
 		String16 s(*this);
 		return s.getHashCodeIgnoreCase();
 	}
 
 
-	sl_char8 String::getAt(sl_reg index) const
+	sl_char8 String::getAt(sl_reg index) const noexcept
 	{
 		if (m_container) {
 			if (index >= 0 && index < (sl_reg)(m_container->len)) {
@@ -1964,7 +1964,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_char16 String16::getAt(sl_reg index) const
+	sl_char16 String16::getAt(sl_reg index) const noexcept
 	{
 		if (m_container) {
 			if (index >= 0 && index < (sl_reg)(m_container->len)) {
@@ -1975,7 +1975,7 @@ namespace slib
 	}
 
 
-	sl_bool String::setAt(sl_reg index, sl_char8 ch)
+	sl_bool String::setAt(sl_reg index, sl_char8 ch) noexcept
 	{
 		if (m_container) {
 			if (index >= 0 && index < (sl_reg)(m_container->len)) {
@@ -1986,7 +1986,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool String16::setAt(sl_reg index, sl_char16 ch)
+	sl_bool String16::setAt(sl_reg index, sl_char16 ch) noexcept
 	{
 		if (m_container) {
 			if (index >= 0 && index < (sl_reg)(m_container->len)) {
@@ -1998,7 +1998,7 @@ namespace slib
 	}
 	
 	
-	std::string String::toStd() const
+	std::string String::toStd() const noexcept
 	{
 		if (m_container) {
 			if (m_container->type == STRING_CONTAINER_TYPE_STD) {
@@ -2010,7 +2010,7 @@ namespace slib
 		return std::string();
 	}
 	
-	std::u16string String16::toStd() const
+	std::u16string String16::toStd() const noexcept
 	{
 		if (m_container) {
 			if (m_container->type == STRING_CONTAINER_TYPE_STD) {
@@ -2022,32 +2022,32 @@ namespace slib
 		return std::u16string();
 	}
 
-	std::string Atomic<String>::toStd() const
+	std::string Atomic<String>::toStd() const noexcept
 	{
 		String s(*this);
 		return s.toStd();
 	}
 	
-	std::u16string Atomic<String16>::toStd() const
+	std::u16string Atomic<String16>::toStd() const noexcept
 	{
 		String16 s(*this);
 		return s.toStd();
 	}
 
 
-	String& String::operator=(sl_null_t)
+	String& String::operator=(sl_null_t) noexcept
 	{
 		_replaceContainer(sl_null);
 		return *this;
 	}
 
-	String16& String16::operator=(sl_null_t)
+	String16& String16::operator=(sl_null_t) noexcept
 	{
 		_replaceContainer(sl_null);
 		return *this;
 	}
 
-	AtomicString& Atomic<String>::operator=(sl_null_t)
+	AtomicString& Atomic<String>::operator=(sl_null_t) noexcept
 	{
 		if (m_container) {
 			_replaceContainer(sl_null);
@@ -2055,7 +2055,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString16& Atomic<String16>::operator=(sl_null_t)
+	AtomicString16& Atomic<String16>::operator=(sl_null_t) noexcept
 	{
 		if (m_container) {
 			_replaceContainer(sl_null);
@@ -2064,7 +2064,7 @@ namespace slib
 	}
 
 
-	String& String::operator=(String&& other)
+	String& String::operator=(String&& other) noexcept
 	{
 		if (this != &other) {
 			_replaceContainer(other.m_container);
@@ -2073,7 +2073,7 @@ namespace slib
 		return *this;
 	}
 
-	String16& String16::operator=(String16&& other)
+	String16& String16::operator=(String16&& other) noexcept
 	{
 		if (this != &other) {
 			_replaceContainer(other.m_container);
@@ -2082,7 +2082,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString& Atomic<String>::operator=(AtomicString&& other)
+	AtomicString& Atomic<String>::operator=(AtomicString&& other) noexcept
 	{
 		if (this != &other) {
 			_replaceContainer(other.m_container);
@@ -2091,7 +2091,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString16& Atomic<String16>::operator=(AtomicString16&& other)
+	AtomicString16& Atomic<String16>::operator=(AtomicString16&& other) noexcept
 	{
 		if (this != &other) {
 			_replaceContainer(other.m_container);
@@ -2101,7 +2101,7 @@ namespace slib
 	}
 
 
-	String& String::operator=(AtomicString&& other)
+	String& String::operator=(AtomicString&& other) noexcept
 	{
 		if ((void*)this != (void*)(&other)) {
 			_replaceContainer(other.m_container);
@@ -2110,7 +2110,7 @@ namespace slib
 		return *this;
 	}
 
-	String16& String16::operator=(AtomicString16&& other)
+	String16& String16::operator=(AtomicString16&& other) noexcept
 	{
 		if ((void*)this != (void*)(&other)) {
 			_replaceContainer(other.m_container);
@@ -2119,7 +2119,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString& Atomic<String>::operator=(String&& other)
+	AtomicString& Atomic<String>::operator=(String&& other) noexcept
 	{
 		if ((void*)this != (void*)(&other)) {
 			_replaceContainer(other.m_container);
@@ -2128,7 +2128,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString16& Atomic<String16>::operator=(String16&& other)
+	AtomicString16& Atomic<String16>::operator=(String16&& other) noexcept
 	{
 		if ((void*)this != (void*)(&other)) {
 			_replaceContainer(other.m_container);
@@ -2138,7 +2138,7 @@ namespace slib
 	}
 
 
-	String& String::operator=(const String& other)
+	String& String::operator=(const String& other) noexcept
 	{
 		StringContainer* container = other.m_container;
 		if (m_container != container) {
@@ -2150,7 +2150,7 @@ namespace slib
 		return *this;
 	}
 
-	String16& String16::operator=(const String16& other)
+	String16& String16::operator=(const String16& other) noexcept
 	{
 		StringContainer16* container = other.m_container;
 		if (m_container != container) {
@@ -2162,7 +2162,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString& Atomic<String>::operator=(const String& other)
+	AtomicString& Atomic<String>::operator=(const String& other) noexcept
 	{
 		StringContainer* container = other.m_container;
 		if (m_container != container) {
@@ -2174,7 +2174,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString16& Atomic<String16>::operator=(const String16& other)
+	AtomicString16& Atomic<String16>::operator=(const String16& other) noexcept
 	{
 		StringContainer16* container = other.m_container;
 		if (m_container != container) {
@@ -2187,7 +2187,7 @@ namespace slib
 	}
 
 
-	String& String::operator=(const AtomicString& other)
+	String& String::operator=(const AtomicString& other) noexcept
 	{
 		if (m_container != other.m_container) {
 			_replaceContainer(other._retainContainer());
@@ -2195,7 +2195,7 @@ namespace slib
 		return *this;
 	}
 
-	String16& String16::operator=(const AtomicString16& other)
+	String16& String16::operator=(const AtomicString16& other) noexcept
 	{
 		if (m_container != other.m_container) {
 			_replaceContainer(other._retainContainer());
@@ -2203,7 +2203,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString& Atomic<String>::operator=(const AtomicString& other)
+	AtomicString& Atomic<String>::operator=(const AtomicString& other) noexcept
 	{
 		if (m_container != other.m_container) {
 			_replaceContainer(other._retainContainer());
@@ -2211,7 +2211,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString16& Atomic<String16>::operator=(const AtomicString16& other)
+	AtomicString16& Atomic<String16>::operator=(const AtomicString16& other) noexcept
 	{
 		if (m_container != other.m_container) {
 			_replaceContainer(other._retainContainer());
@@ -2220,7 +2220,7 @@ namespace slib
 	}
 
 
-	String& String::operator=(const String16& other)
+	String& String::operator=(const String16& other) noexcept
 	{
 		if (other.isNull()) {
 			setNull();
@@ -2235,7 +2235,7 @@ namespace slib
 		return *this;
 	}
 
-	String16& String16::operator=(const String& other)
+	String16& String16::operator=(const String& other) noexcept
 	{
 		if (other.isNull()) {
 			setNull();
@@ -2250,7 +2250,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString& Atomic<String>::operator=(const String16& other)
+	AtomicString& Atomic<String>::operator=(const String16& other) noexcept
 	{
 		if (other.isNull()) {
 			setNull();
@@ -2265,7 +2265,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString16& Atomic<String16>::operator=(const String& other)
+	AtomicString16& Atomic<String16>::operator=(const String& other) noexcept
 	{
 		if (other.isNull()) {
 			setNull();
@@ -2281,7 +2281,7 @@ namespace slib
 	}
 
 
-	String& String::operator=(const AtomicString16& _other)
+	String& String::operator=(const AtomicString16& _other) noexcept
 	{
 		String16 other(_other);
 		if (other.isNull()) {
@@ -2297,7 +2297,7 @@ namespace slib
 		return *this;
 	}
 
-	String16& String16::operator=(const AtomicString& _other)
+	String16& String16::operator=(const AtomicString& _other) noexcept
 	{
 		String other(_other);
 		if (other.isNull()) {
@@ -2313,7 +2313,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString& Atomic<String>::operator=(const AtomicString16& _other)
+	AtomicString& Atomic<String>::operator=(const AtomicString16& _other) noexcept
 	{
 		String16 other(_other);
 		if (other.isNull()) {
@@ -2329,7 +2329,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString16& Atomic<String16>::operator=(const AtomicString& _other)
+	AtomicString16& Atomic<String16>::operator=(const AtomicString& _other) noexcept
 	{
 		String other(_other);
 		if (other.isNull()) {
@@ -2346,7 +2346,7 @@ namespace slib
 	}
 
 
-	String& String::operator=(const char* utf8)
+	String& String::operator=(const char* utf8) noexcept
 	{
 		if (utf8) {
 			_replaceContainer(_priv_String_create(utf8, -1));
@@ -2356,7 +2356,7 @@ namespace slib
 		return *this;
 	}
 
-	String16& String16::operator=(const char* utf8)
+	String16& String16::operator=(const char* utf8) noexcept
 	{
 		if (utf8) {
 			_replaceContainer(_priv_String16_create(utf8, -1));
@@ -2366,7 +2366,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString& Atomic<String>::operator=(const char* utf8)
+	AtomicString& Atomic<String>::operator=(const char* utf8) noexcept
 	{
 		if (utf8) {
 			_replaceContainer(_priv_String_create(utf8, -1));
@@ -2376,7 +2376,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString16& Atomic<String16>::operator=(const char* utf8)
+	AtomicString16& Atomic<String16>::operator=(const char* utf8) noexcept
 	{
 		if (utf8) {
 			_replaceContainer(_priv_String16_create(utf8, -1));
@@ -2387,7 +2387,7 @@ namespace slib
 	}
 	
 	
-	String& String::operator=(const wchar_t* sz)
+	String& String::operator=(const wchar_t* sz) noexcept
 	{
 		if (sz) {
 			if (sizeof(wchar_t) == 2) {
@@ -2401,7 +2401,7 @@ namespace slib
 		return *this;
 	}
 	
-	String16& String16::operator=(const wchar_t* sz)
+	String16& String16::operator=(const wchar_t* sz) noexcept
 	{
 		if (sz) {
 			if (sizeof(wchar_t) == 2) {
@@ -2415,7 +2415,7 @@ namespace slib
 		return *this;
 	}
 	
-	AtomicString& Atomic<String>::operator=(const wchar_t* sz)
+	AtomicString& Atomic<String>::operator=(const wchar_t* sz) noexcept
 	{
 		if (sz) {
 			if (sizeof(wchar_t) == 2) {
@@ -2429,7 +2429,7 @@ namespace slib
 		return *this;
 	}
 	
-	AtomicString16& Atomic<String16>::operator=(const wchar_t* sz)
+	AtomicString16& Atomic<String16>::operator=(const wchar_t* sz) noexcept
 	{
 		if (sz) {
 			if (sizeof(wchar_t) == 2) {
@@ -2444,7 +2444,7 @@ namespace slib
 	}
 	
 
-	String& String::operator=(const char16_t* utf16)
+	String& String::operator=(const char16_t* utf16) noexcept
 	{
 		if (utf16) {
 			_replaceContainer(_priv_String_create(utf16, -1));
@@ -2454,7 +2454,7 @@ namespace slib
 		return *this;
 	}
 
-	String16& String16::operator=(const char16_t* utf16)
+	String16& String16::operator=(const char16_t* utf16) noexcept
 	{
 		if (utf16) {
 			_replaceContainer(_priv_String16_create(utf16, -1));
@@ -2464,7 +2464,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString& Atomic<String>::operator=(const char16_t* utf16)
+	AtomicString& Atomic<String>::operator=(const char16_t* utf16) noexcept
 	{
 		if (utf16) {
 			_replaceContainer(_priv_String_create(utf16, -1));
@@ -2474,7 +2474,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString16& Atomic<String16>::operator=(const char16_t* utf16)
+	AtomicString16& Atomic<String16>::operator=(const char16_t* utf16) noexcept
 	{
 		if (utf16) {
 			_replaceContainer(_priv_String16_create(utf16, -1));
@@ -2485,7 +2485,7 @@ namespace slib
 	}
 
 
-	String& String::operator=(const char32_t* utf32)
+	String& String::operator=(const char32_t* utf32) noexcept
 	{
 		if (utf32) {
 			_replaceContainer(_priv_String_create(utf32, -1));
@@ -2495,7 +2495,7 @@ namespace slib
 		return *this;
 	}
 
-	String16& String16::operator=(const char32_t* utf32)
+	String16& String16::operator=(const char32_t* utf32) noexcept
 	{
 		if (utf32) {
 			_replaceContainer(_priv_String16_create(utf32, -1));
@@ -2505,7 +2505,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString& Atomic<String>::operator=(const char32_t* utf32)
+	AtomicString& Atomic<String>::operator=(const char32_t* utf32) noexcept
 	{
 		if (utf32) {
 			_replaceContainer(_priv_String_create(utf32, -1));
@@ -2515,7 +2515,7 @@ namespace slib
 		return *this;
 	}
 
-	AtomicString16& Atomic<String16>::operator=(const char32_t* utf32)
+	AtomicString16& Atomic<String16>::operator=(const char32_t* utf32) noexcept
 	{
 		if (utf32) {
 			_replaceContainer(_priv_String16_create(utf32, -1));
@@ -2526,32 +2526,32 @@ namespace slib
 	}
 
 	
-	String& String::operator=(const std::string& str)
+	String& String::operator=(const std::string& str) noexcept
 	{
 		_replaceContainer(_priv_String_alloc_std(str));
 		return *this;
 	}
 	
-	String16& String16::operator=(const std::u16string& str)
+	String16& String16::operator=(const std::u16string& str) noexcept
 	{
 		_replaceContainer(_priv_String16_alloc_std(str));
 		return *this;
 	}
 	
-	AtomicString& Atomic<String>::operator=(const std::string& str)
+	AtomicString& Atomic<String>::operator=(const std::string& str) noexcept
 	{
 		_replaceContainer(_priv_String_alloc_std(str));
 		return *this;
 	}
 	
-	AtomicString16& Atomic<String16>::operator=(const std::u16string& str)
+	AtomicString16& Atomic<String16>::operator=(const std::u16string& str) noexcept
 	{
 		_replaceContainer(_priv_String16_alloc_std(str));
 		return *this;
 	}
 
 	
-	String String::operator+(const String& other) const
+	String String::operator+(const String& other) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -2563,7 +2563,7 @@ namespace slib
 		return getNotNull();
 	}
 
-	String& String::operator+=(const String& other)
+	String& String::operator+=(const String& other) noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -2575,7 +2575,7 @@ namespace slib
 		return *this;
 	}
 
-	String16 String16::operator+(const String16& other) const
+	String16 String16::operator+(const String16& other) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -2587,7 +2587,7 @@ namespace slib
 		return getNotNull();
 	}
 
-	String16& String16::operator+=(const String16& other)
+	String16& String16::operator+=(const String16& other) noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -2599,7 +2599,7 @@ namespace slib
 		return *this;
 	}
 
-	String Atomic<String>::operator+(const String& other) const
+	String Atomic<String>::operator+(const String& other) const noexcept
 	{
 		String s(*this);
 		sl_size n = s.getLength();
@@ -2612,7 +2612,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	AtomicString& Atomic<String>::operator+=(const String& other)
+	AtomicString& Atomic<String>::operator+=(const String& other) noexcept
 	{
 		String s(*this);
 		sl_size n = s.getLength();
@@ -2625,7 +2625,7 @@ namespace slib
 		return *this;
 	}
 
-	String16 Atomic<String16>::operator+(const String16& other) const
+	String16 Atomic<String16>::operator+(const String16& other) const noexcept
 	{
 		String16 s(*this);
 		sl_size n = s.getLength();
@@ -2638,7 +2638,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	AtomicString16& Atomic<String16>::operator+=(const String16& other)
+	AtomicString16& Atomic<String16>::operator+=(const String16& other) noexcept
 	{
 		String16 s(*this);
 		sl_size n = s.getLength();
@@ -2652,7 +2652,7 @@ namespace slib
 	}
 
 
-	String String::operator+(const String16& other) const
+	String String::operator+(const String16& other) const noexcept
 	{
 		if (other.isNotEmpty()) {
 			return _priv_String_merge16(getData(), getLength(), other.getData(), other.getLength());
@@ -2660,7 +2660,7 @@ namespace slib
 		return getNotNull();
 	}
 
-	String& String::operator+=(const String16& other)
+	String& String::operator+=(const String16& other) noexcept
 	{
 		if (other.isNotEmpty()) {
 			_replaceContainer(_priv_String_merge16(getData(), getLength(), other.getData(), other.getLength()));
@@ -2668,7 +2668,7 @@ namespace slib
 		return *this;
 	}
 
-	String16 String16::operator+(const String& other) const
+	String16 String16::operator+(const String& other) const noexcept
 	{
 		if (other.isNotEmpty()) {
 			return _priv_String16_merge8(getData(), getLength(), other.getData(), other.getLength());
@@ -2676,7 +2676,7 @@ namespace slib
 		return getNotNull();
 	}
 
-	String16& String16::operator+=(const String& other)
+	String16& String16::operator+=(const String& other) noexcept
 	{
 		if (other.isNotEmpty()) {
 			_replaceContainer(_priv_String16_merge8(getData(), getLength(), other.getData(), other.getLength()));
@@ -2684,7 +2684,7 @@ namespace slib
 		return *this;
 	}
 
-	String Atomic<String>::operator+(const String16& other) const
+	String Atomic<String>::operator+(const String16& other) const noexcept
 	{
 		String s(*this);
 		if (other.isNotEmpty()) {
@@ -2693,7 +2693,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	AtomicString& Atomic<String>::operator+=(const String16& other)
+	AtomicString& Atomic<String>::operator+=(const String16& other) noexcept
 	{
 		if (other.isNotEmpty()) {
 			String s(*this);
@@ -2702,7 +2702,7 @@ namespace slib
 		return *this;
 	}
 
-	String16 Atomic<String16>::operator+(const String& other) const
+	String16 Atomic<String16>::operator+(const String& other) const noexcept
 	{
 		String16 s(*this);
 		if (other.isNotEmpty()) {
@@ -2711,7 +2711,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	AtomicString16& Atomic<String16>::operator+=(const String& other)
+	AtomicString16& Atomic<String16>::operator+=(const String& other) noexcept
 	{
 		if (other.isNotEmpty()) {
 			String16 s(*this);
@@ -2721,7 +2721,7 @@ namespace slib
 	}
 
 
-	String String::operator+(const AtomicString& _other) const
+	String String::operator+(const AtomicString& _other) const noexcept
 	{
 		sl_size n = getLength();
 		String other(_other);
@@ -2734,7 +2734,7 @@ namespace slib
 		return getNotNull();
 	}
 
-	String& String::operator+=(const AtomicString& _other)
+	String& String::operator+=(const AtomicString& _other) noexcept
 	{
 		sl_size n = getLength();
 		String other(_other);
@@ -2747,7 +2747,7 @@ namespace slib
 		return *this;
 	}
 
-	String16 String16::operator+(const AtomicString16& _other) const
+	String16 String16::operator+(const AtomicString16& _other) const noexcept
 	{
 		sl_size n = getLength();
 		String16 other(_other);
@@ -2760,7 +2760,7 @@ namespace slib
 		return getNotNull();
 	}
 
-	String16& String16::operator+=(const AtomicString16& _other)
+	String16& String16::operator+=(const AtomicString16& _other) noexcept
 	{
 		sl_size n = getLength();
 		String16 other(_other);
@@ -2773,7 +2773,7 @@ namespace slib
 		return *this;
 	}
 
-	String Atomic<String>::operator+(const AtomicString& _other) const
+	String Atomic<String>::operator+(const AtomicString& _other) const noexcept
 	{
 		String s(*this);
 		sl_size n = s.getLength();
@@ -2787,7 +2787,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	AtomicString& Atomic<String>::operator+=(const AtomicString& _other)
+	AtomicString& Atomic<String>::operator+=(const AtomicString& _other) noexcept
 	{
 		String s(*this);
 		sl_size n = s.getLength();
@@ -2801,7 +2801,7 @@ namespace slib
 		return *this;
 	}
 
-	String16 Atomic<String16>::operator+(const AtomicString16& _other) const
+	String16 Atomic<String16>::operator+(const AtomicString16& _other) const noexcept
 	{
 		String16 s(*this);
 		sl_size n = s.getLength();
@@ -2815,7 +2815,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	AtomicString16& Atomic<String16>::operator+=(const AtomicString16& _other)
+	AtomicString16& Atomic<String16>::operator+=(const AtomicString16& _other) noexcept
 	{
 		String16 s(*this);
 		sl_size n = s.getLength();
@@ -2830,7 +2830,7 @@ namespace slib
 	}
 
 
-	String String::operator+(const AtomicString16& _other) const
+	String String::operator+(const AtomicString16& _other) const noexcept
 	{
 		String16 other(_other);
 		if (other.isNotEmpty()) {
@@ -2839,7 +2839,7 @@ namespace slib
 		return getNotNull();
 	}
 
-	String& String::operator+=(const AtomicString16& _other)
+	String& String::operator+=(const AtomicString16& _other) noexcept
 	{
 		String16 other(_other);
 		if (other.isNotEmpty()) {
@@ -2848,7 +2848,7 @@ namespace slib
 		return *this;
 	}
 
-	String16 String16::operator+(const AtomicString& _other) const
+	String16 String16::operator+(const AtomicString& _other) const noexcept
 	{
 		String other(_other);
 		if (other.isNotEmpty()) {
@@ -2857,7 +2857,7 @@ namespace slib
 		return getNotNull();
 	}
 
-	String16& String16::operator+=(const AtomicString& _other)
+	String16& String16::operator+=(const AtomicString& _other) noexcept
 	{
 		String other(_other);
 		if (other.isNotEmpty()) {
@@ -2866,7 +2866,7 @@ namespace slib
 		return *this;
 	}
 
-	String Atomic<String>::operator+(const AtomicString16& _other) const
+	String Atomic<String>::operator+(const AtomicString16& _other) const noexcept
 	{
 		String s(*this);
 		String16 other(_other);
@@ -2876,7 +2876,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	AtomicString& Atomic<String>::operator+=(const AtomicString16& _other)
+	AtomicString& Atomic<String>::operator+=(const AtomicString16& _other) noexcept
 	{
 		String16 other(_other);
 		if (other.isNotEmpty()) {
@@ -2886,7 +2886,7 @@ namespace slib
 		return *this;
 	}
 
-	String16 Atomic<String16>::operator+(const AtomicString& _other) const
+	String16 Atomic<String16>::operator+(const AtomicString& _other) const noexcept
 	{
 		String16 s(*this);
 		String other(_other);
@@ -2896,7 +2896,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	AtomicString16& Atomic<String16>::operator+=(const AtomicString& _other)
+	AtomicString16& Atomic<String16>::operator+=(const AtomicString& _other) noexcept
 	{
 		String other(_other);
 		if (other.isNotEmpty()) {
@@ -2907,7 +2907,7 @@ namespace slib
 	}
 
 
-	String String::operator+(const sl_char8* utf8) const
+	String String::operator+(const sl_char8* utf8) const noexcept
 	{
 		if (utf8) {
 			return _priv_String_merge8(getData(), getLength(), utf8, -1);
@@ -2915,7 +2915,7 @@ namespace slib
 		return getNotNull();
 	}
 
-	String& String::operator+=(const sl_char8* utf8)
+	String& String::operator+=(const sl_char8* utf8) noexcept
 	{
 		if (utf8) {
 			_replaceContainer(_priv_String_merge8(getData(), getLength(), utf8, -1));
@@ -2923,7 +2923,7 @@ namespace slib
 		return *this;
 	}
 
-	String16 String16::operator+(const sl_char8* utf8) const
+	String16 String16::operator+(const sl_char8* utf8) const noexcept
 	{
 		if (utf8) {
 			return _priv_String16_merge8(getData(), getLength(), utf8, -1);
@@ -2931,7 +2931,7 @@ namespace slib
 		return getNotNull();
 	}
 
-	String16& String16::operator+=(const sl_char8* utf8)
+	String16& String16::operator+=(const sl_char8* utf8) noexcept
 	{
 		if (utf8) {
 			_replaceContainer(_priv_String16_merge8(getData(), getLength(), utf8, -1));
@@ -2939,7 +2939,7 @@ namespace slib
 		return *this;
 	}
 
-	String Atomic<String>::operator+(const sl_char8* utf8) const
+	String Atomic<String>::operator+(const sl_char8* utf8) const noexcept
 	{
 		String s(*this);
 		if (utf8) {
@@ -2948,7 +2948,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	AtomicString& Atomic<String>::operator+=(const sl_char8* utf8)
+	AtomicString& Atomic<String>::operator+=(const sl_char8* utf8) noexcept
 	{
 		if (utf8) {
 			String s(*this);
@@ -2957,7 +2957,7 @@ namespace slib
 		return *this;
 	}
 
-	String16 Atomic<String16>::operator+(const sl_char8* utf8) const
+	String16 Atomic<String16>::operator+(const sl_char8* utf8) const noexcept
 	{
 		String16 s(*this);
 		if (utf8) {
@@ -2966,7 +2966,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	AtomicString16& Atomic<String16>::operator+=(const sl_char8* utf8)
+	AtomicString16& Atomic<String16>::operator+=(const sl_char8* utf8) noexcept
 	{
 		if (utf8) {
 			String16 s(*this);
@@ -2976,7 +2976,7 @@ namespace slib
 	}
 
 
-	String String::operator+(const sl_char16* utf16) const
+	String String::operator+(const sl_char16* utf16) const noexcept
 	{
 		if (utf16) {
 			return _priv_String_merge16(getData(), getLength(), utf16, -1);
@@ -2984,7 +2984,7 @@ namespace slib
 		return getNotNull();
 	}
 
-	String& String::operator+=(const sl_char16* utf16)
+	String& String::operator+=(const sl_char16* utf16) noexcept
 	{
 		if (utf16) {
 			_replaceContainer(_priv_String_merge16(getData(), getLength(), utf16, -1));
@@ -2992,7 +2992,7 @@ namespace slib
 		return *this;
 	}
 
-	String16 String16::operator+(const sl_char16* utf16) const
+	String16 String16::operator+(const sl_char16* utf16) const noexcept
 	{
 		if (utf16) {
 			return _priv_String16_merge16(getData(), getLength(), utf16, -1);
@@ -3000,7 +3000,7 @@ namespace slib
 		return getNotNull();
 	}
 
-	String16& String16::operator+=(const sl_char16* utf16)
+	String16& String16::operator+=(const sl_char16* utf16) noexcept
 	{
 		if (utf16) {
 			_replaceContainer(_priv_String16_merge16(getData(), getLength(), utf16, -1));
@@ -3008,7 +3008,7 @@ namespace slib
 		return *this;
 	}
 
-	String Atomic<String>::operator+(const sl_char16* utf16) const
+	String Atomic<String>::operator+(const sl_char16* utf16) const noexcept
 	{
 		String s(*this);
 		if (utf16) {
@@ -3017,7 +3017,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	AtomicString& Atomic<String>::operator+=(const sl_char16* utf16)
+	AtomicString& Atomic<String>::operator+=(const sl_char16* utf16) noexcept
 	{
 		if (utf16) {
 			String s(*this);
@@ -3026,7 +3026,7 @@ namespace slib
 		return *this;
 	}
 
-	String16 Atomic<String16>::operator+(const sl_char16* utf16) const
+	String16 Atomic<String16>::operator+(const sl_char16* utf16) const noexcept
 	{
 		String16 s(*this);
 		if (utf16) {
@@ -3035,7 +3035,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	AtomicString16& Atomic<String16>::operator+=(const sl_char16* utf16)
+	AtomicString16& Atomic<String16>::operator+=(const sl_char16* utf16) noexcept
 	{
 		if (utf16) {
 			String16 s(*this);
@@ -3045,7 +3045,7 @@ namespace slib
 	}
 
 
-	String String::operator+(const sl_char32* utf32) const
+	String String::operator+(const sl_char32* utf32) const noexcept
 	{
 		if (utf32) {
 			return _priv_String_merge32(getData(), getLength(), utf32, -1);
@@ -3053,7 +3053,7 @@ namespace slib
 		return getNotNull();
 	}
 
-	String& String::operator+=(const sl_char32* utf32)
+	String& String::operator+=(const sl_char32* utf32) noexcept
 	{
 		if (utf32) {
 			_replaceContainer(_priv_String_merge32(getData(), getLength(), utf32, -1));
@@ -3061,7 +3061,7 @@ namespace slib
 		return *this;
 	}
 
-	String16 String16::operator+(const sl_char32* utf32) const
+	String16 String16::operator+(const sl_char32* utf32) const noexcept
 	{
 		if (utf32) {
 			return _priv_String16_merge32(getData(), getLength(), utf32, -1);
@@ -3069,7 +3069,7 @@ namespace slib
 		return getNotNull();
 	}
 
-	String16& String16::operator+=(const sl_char32* utf32)
+	String16& String16::operator+=(const sl_char32* utf32) noexcept
 	{
 		if (utf32) {
 			_replaceContainer(_priv_String16_merge32(getData(), getLength(), utf32, -1));
@@ -3077,7 +3077,7 @@ namespace slib
 		return *this;
 	}
 
-	String Atomic<String>::operator+(const sl_char32* utf32) const
+	String Atomic<String>::operator+(const sl_char32* utf32) const noexcept
 	{
 		String s(*this);
 		if (utf32) {
@@ -3086,7 +3086,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	AtomicString& Atomic<String>::operator+=(const sl_char32* utf32)
+	AtomicString& Atomic<String>::operator+=(const sl_char32* utf32) noexcept
 	{
 		if (utf32) {
 			String s(*this);
@@ -3095,7 +3095,7 @@ namespace slib
 		return *this;
 	}
 
-	String16 Atomic<String16>::operator+(const sl_char32* utf32) const
+	String16 Atomic<String16>::operator+(const sl_char32* utf32) const noexcept
 	{
 		String16 s(*this);
 		if (utf32) {
@@ -3104,7 +3104,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	AtomicString16& Atomic<String16>::operator+=(const sl_char32* utf32)
+	AtomicString16& Atomic<String16>::operator+=(const sl_char32* utf32) noexcept
 	{
 		if (utf32) {
 			String16 s(*this);
@@ -3114,7 +3114,7 @@ namespace slib
 	}
 
 
-	String operator+(const sl_char8* utf8, const String& s)
+	String operator+(const sl_char8* utf8, const String& s) noexcept
 	{
 		if (utf8) {
 			return _priv_String_merge8(utf8, -1, s.getData(), s.getLength());
@@ -3122,7 +3122,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	String16 operator+(const sl_char8* utf8, const String16& s)
+	String16 operator+(const sl_char8* utf8, const String16& s) noexcept
 	{
 		if (utf8) {
 			return _priv_String16_merge8(utf8, -1, s.getData(), s.getLength());
@@ -3130,18 +3130,18 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	String operator+(const sl_char8* utf8, const AtomicString& s)
+	String operator+(const sl_char8* utf8, const AtomicString& s) noexcept
 	{
 		return utf8 + String(s);
 	}
 
-	String16 operator+(const sl_char8* utf8, const AtomicString16& s)
+	String16 operator+(const sl_char8* utf8, const AtomicString16& s) noexcept
 	{
 		return utf8 + String16(s);
 	}
 
 
-	String operator+(const sl_char16* utf16, const String& s)
+	String operator+(const sl_char16* utf16, const String& s) noexcept
 	{
 		if (utf16) {
 			return _priv_String_merge16(utf16, -1, s.getData(), s.getLength());
@@ -3149,7 +3149,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	String16 operator+(const sl_char16* utf16, const String16& s)
+	String16 operator+(const sl_char16* utf16, const String16& s) noexcept
 	{
 		if (utf16) {
 			return _priv_String16_merge16(utf16, -1, s.getData(), s.getLength());
@@ -3157,18 +3157,18 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	String operator+(const sl_char16* utf16, const AtomicString& s)
+	String operator+(const sl_char16* utf16, const AtomicString& s) noexcept
 	{
 		return utf16 + String(s);
 	}
 
-	String16 operator+(const sl_char16* utf16, const AtomicString16& s)
+	String16 operator+(const sl_char16* utf16, const AtomicString16& s) noexcept
 	{
 		return utf16 + String16(s);
 	}
 
 
-	String operator+(const sl_char32* utf32, const String& s)
+	String operator+(const sl_char32* utf32, const String& s) noexcept
 	{
 		if (utf32) {
 			return _priv_String_merge32(utf32, -1, s.getData(), s.getLength());
@@ -3176,7 +3176,7 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	String16 operator+(const sl_char32* utf32, const String16& s)
+	String16 operator+(const sl_char32* utf32, const String16& s) noexcept
 	{
 		if (utf32) {
 			return _priv_String16_merge32(utf32, -1, s.getData(), s.getLength());
@@ -3184,18 +3184,18 @@ namespace slib
 		return s.getNotNull();
 	}
 
-	String operator+(const sl_char32* utf32, const AtomicString& s)
+	String operator+(const sl_char32* utf32, const AtomicString& s) noexcept
 	{
 		return utf32 + String(s);
 	}
 
-	String16 operator+(const sl_char32* utf32, const AtomicString16& s)
+	String16 operator+(const sl_char32* utf32, const AtomicString16& s) noexcept
 	{
 		return utf32 + String16(s);
 	}
 
 	
-	String String::operator+(const std::string& str) const
+	String String::operator+(const std::string& str) const noexcept
 	{
 		sl_size n = str.length();
 		if (n > 0) {
@@ -3204,7 +3204,7 @@ namespace slib
 		return getNotNull();
 	}
 	
-	String& String::operator+=(const std::string& str)
+	String& String::operator+=(const std::string& str) noexcept
 	{
 		sl_size n = str.length();
 		if (n > 0) {
@@ -3213,7 +3213,7 @@ namespace slib
 		return *this;
 	}
 	
-	String16 String16::operator+(const std::u16string& str) const
+	String16 String16::operator+(const std::u16string& str) const noexcept
 	{
 		sl_size n = str.length();
 		if (n > 0) {
@@ -3222,7 +3222,7 @@ namespace slib
 		return getNotNull();
 	}
 	
-	String16& String16::operator+=(const std::u16string& str)
+	String16& String16::operator+=(const std::u16string& str) noexcept
 	{
 		sl_size n = str.length();
 		if (n > 0) {
@@ -3231,7 +3231,7 @@ namespace slib
 		return *this;
 	}
 	
-	String Atomic<String>::operator+(const std::string& str) const
+	String Atomic<String>::operator+(const std::string& str) const noexcept
 	{
 		String s(*this);
 		sl_size n = str.length();
@@ -3241,7 +3241,7 @@ namespace slib
 		return s.getNotNull();
 	}
 	
-	AtomicString& Atomic<String>::operator+=(const std::string& str)
+	AtomicString& Atomic<String>::operator+=(const std::string& str) noexcept
 	{
 		sl_size n = str.length();
 		if (n > 0) {
@@ -3251,7 +3251,7 @@ namespace slib
 		return *this;
 	}
 	
-	String16 Atomic<String16>::operator+(const std::u16string& str) const
+	String16 Atomic<String16>::operator+(const std::u16string& str) const noexcept
 	{
 		String16 s(*this);
 		sl_size n = str.length();
@@ -3261,7 +3261,7 @@ namespace slib
 		return s.getNotNull();
 	}
 	
-	AtomicString16& Atomic<String16>::operator+=(const std::u16string& str)
+	AtomicString16& Atomic<String16>::operator+=(const std::u16string& str) noexcept
 	{
 		sl_size n = str.length();
 		if (n > 0) {
@@ -3271,7 +3271,7 @@ namespace slib
 		return *this;
 	}
 	
-	String operator+(const std::string& str, const String& s)
+	String operator+(const std::string& str, const String& s) noexcept
 	{
 		sl_size n = str.length();
 		if (n > 0) {
@@ -3280,7 +3280,7 @@ namespace slib
 		return s.getNotNull();
 	}
 	
-	String16 operator+(const std::u16string& str, const String16& s)
+	String16 operator+(const std::u16string& str, const String16& s) noexcept
 	{
 		sl_size n = str.length();
 		if (n > 0) {
@@ -3289,445 +3289,445 @@ namespace slib
 		return s.getNotNull();
 	}
 	
-	String operator+(const std::string& str, const AtomicString& s)
+	String operator+(const std::string& str, const AtomicString& s) noexcept
 	{
 		return str + String(s);
 	}
 	
-	String16 operator+(const std::u16string& str, const AtomicString16& s)
+	String16 operator+(const std::u16string& str, const AtomicString16& s) noexcept
 	{
 		return str + String16(s);
 	}
 
 
-	String String::operator+(sl_int32 number) const
+	String String::operator+(sl_int32 number) const noexcept
 	{
 		return *this + String::fromInt32(number);
 	}
 
-	String& String::operator+=(sl_int32 number)
+	String& String::operator+=(sl_int32 number) noexcept
 	{
 		return (*this += String::fromInt32(number));
 	}
 
-	String operator+(sl_int32 number, const String& other)
+	String operator+(sl_int32 number, const String& other) noexcept
 	{
 		return String::fromInt32(number) + other;
 	}
 
-	String16 String16::operator+(sl_int32 number) const
+	String16 String16::operator+(sl_int32 number) const noexcept
 	{
 		return *this + String16::fromInt32(number);
 	}
 
-	String16& String16::operator+=(sl_int32 number)
+	String16& String16::operator+=(sl_int32 number) noexcept
 	{
 		return (*this += String16::fromInt32(number));
 	}
 
-	String16 operator+(sl_int32 number, const String16& other)
+	String16 operator+(sl_int32 number, const String16& other) noexcept
 	{
 		return String16::fromInt32(number) + other;
 	}
 
-	String Atomic<String>::operator+(sl_int32 number) const
+	String Atomic<String>::operator+(sl_int32 number) const noexcept
 	{
 		return *this + String::fromInt32(number);
 	}
 
-	AtomicString& Atomic<String>::operator+=(sl_int32 number)
+	AtomicString& Atomic<String>::operator+=(sl_int32 number) noexcept
 	{
 		return (*this += String::fromInt32(number));
 	}
 
-	String operator+(sl_int32 number, const AtomicString& other)
+	String operator+(sl_int32 number, const AtomicString& other) noexcept
 	{
 		return String::fromInt32(number) + other;
 	}
 
-	String16 Atomic<String16>::operator+(sl_int32 number) const
+	String16 Atomic<String16>::operator+(sl_int32 number) const noexcept
 	{
 		return *this + String16::fromInt32(number);
 	}
 
-	AtomicString16& Atomic<String16>::operator+=(sl_int32 number)
+	AtomicString16& Atomic<String16>::operator+=(sl_int32 number) noexcept
 	{
 		return (*this += String16::fromInt32(number));
 	}
 
-	String16 operator+(sl_int32 number, const AtomicString16& other)
+	String16 operator+(sl_int32 number, const AtomicString16& other) noexcept
 	{
 		return String16::fromInt32(number) + other;
 	}
 
 
-	String String::operator+(sl_uint32 number) const
+	String String::operator+(sl_uint32 number) const noexcept
 	{
 		return *this + String::fromUint32(number);
 	}
 
-	String& String::operator+=(sl_uint32 number)
+	String& String::operator+=(sl_uint32 number) noexcept
 	{
 		return (*this += String::fromUint32(number));
 	}
 
-	String operator+(sl_uint32 number, const String& other)
+	String operator+(sl_uint32 number, const String& other) noexcept
 	{
 		return String::fromUint32(number) + other;
 	}
 
-	String16 String16::operator+(sl_uint32 number) const
+	String16 String16::operator+(sl_uint32 number) const noexcept
 	{
 		return *this + String16::fromUint32(number);
 	}
 
-	String16& String16::operator+=(sl_uint32 number)
+	String16& String16::operator+=(sl_uint32 number) noexcept
 	{
 		return (*this += String16::fromUint32(number));
 	}
 
-	String16 operator+(sl_uint32 number, const String16& other)
+	String16 operator+(sl_uint32 number, const String16& other) noexcept
 	{
 		return String16::fromUint32(number) + other;
 	}
 
-	String Atomic<String>::operator+(sl_uint32 number) const
+	String Atomic<String>::operator+(sl_uint32 number) const noexcept
 	{
 		return *this + String::fromUint32(number);
 	}
 
-	AtomicString& Atomic<String>::operator+=(sl_uint32 number)
+	AtomicString& Atomic<String>::operator+=(sl_uint32 number) noexcept
 	{
 		return (*this += String::fromUint32(number));
 	}
 
-	String operator+(sl_uint32 number, const AtomicString& other)
+	String operator+(sl_uint32 number, const AtomicString& other) noexcept
 	{
 		return String::fromUint32(number) + other;
 	}
 
-	String16 Atomic<String16>::operator+(sl_uint32 number) const
+	String16 Atomic<String16>::operator+(sl_uint32 number) const noexcept
 	{
 		return *this + String16::fromUint32(number);
 	}
 
-	AtomicString16& Atomic<String16>::operator+=(sl_uint32 number)
+	AtomicString16& Atomic<String16>::operator+=(sl_uint32 number) noexcept
 	{
 		return (*this += String16::fromUint32(number));
 	}
 
-	String16 operator+(sl_uint32 number, const AtomicString16& other)
+	String16 operator+(sl_uint32 number, const AtomicString16& other) noexcept
 	{
 		return String16::fromUint32(number) + other;
 	}
 
 
-	String String::operator+(sl_int64 number) const
+	String String::operator+(sl_int64 number) const noexcept
 	{
 		return *this + String::fromInt64(number);
 	}
 
-	String& String::operator+=(sl_int64 number)
+	String& String::operator+=(sl_int64 number) noexcept
 	{
 		return (*this += String::fromInt64(number));
 	}
 
-	String operator+(sl_int64 number, const String& other)
+	String operator+(sl_int64 number, const String& other) noexcept
 	{
 		return String::fromInt64(number) + other;
 	}
 
-	String16 String16::operator+(sl_int64 number) const
+	String16 String16::operator+(sl_int64 number) const noexcept
 	{
 		return *this + String16::fromInt64(number);
 	}
 
-	String16& String16::operator+=(sl_int64 number)
+	String16& String16::operator+=(sl_int64 number) noexcept
 	{
 		return (*this += String16::fromInt64(number));
 	}
 
-	String16 operator+(sl_int64 number, const String16& other)
+	String16 operator+(sl_int64 number, const String16& other) noexcept
 	{
 		return String16::fromInt64(number) + other;
 	}
 
-	String Atomic<String>::operator+(sl_int64 number) const
+	String Atomic<String>::operator+(sl_int64 number) const noexcept
 	{
 		return *this + String::fromInt64(number);
 	}
 
-	AtomicString& Atomic<String>::operator+=(sl_int64 number)
+	AtomicString& Atomic<String>::operator+=(sl_int64 number) noexcept
 	{
 		return (*this += String::fromInt64(number));
 	}
 
-	String operator+(sl_int64 number, const AtomicString& other)
+	String operator+(sl_int64 number, const AtomicString& other) noexcept
 	{
 		return String::fromInt64(number) + other;
 	}
 
-	String16 Atomic<String16>::operator+(sl_int64 number) const
+	String16 Atomic<String16>::operator+(sl_int64 number) const noexcept
 	{
 		return *this + String16::fromInt64(number);
 	}
 
-	AtomicString16& Atomic<String16>::operator+=(sl_int64 number)
+	AtomicString16& Atomic<String16>::operator+=(sl_int64 number) noexcept
 	{
 		return (*this += String16::fromInt64(number));
 	}
 
-	String16 operator+(sl_int64 number, const AtomicString16& other)
+	String16 operator+(sl_int64 number, const AtomicString16& other) noexcept
 	{
 		return String16::fromInt64(number) + other;
 	}
 
 
-	String String::operator+(sl_uint64 number) const
+	String String::operator+(sl_uint64 number) const noexcept
 	{
 		return *this + String::fromUint64(number);
 	}
 
-	String& String::operator+=(sl_uint64 number)
+	String& String::operator+=(sl_uint64 number) noexcept
 	{
 		return (*this += String::fromUint64(number));
 	}
 
-	String operator+(sl_uint64 number, const String& other)
+	String operator+(sl_uint64 number, const String& other) noexcept
 	{
 		return String::fromUint64(number) + other;
 	}
 
-	String16 String16::operator+(sl_uint64 number) const
+	String16 String16::operator+(sl_uint64 number) const noexcept
 	{
 		return *this + String16::fromUint64(number);
 	}
 
-	String16& String16::operator+=(sl_uint64 number)
+	String16& String16::operator+=(sl_uint64 number) noexcept
 	{
 		return (*this += String16::fromUint64(number));
 	}
 
-	String16 operator+(sl_uint64 number, const String16& other)
+	String16 operator+(sl_uint64 number, const String16& other) noexcept
 	{
 		return String16::fromUint64(number) + other;
 	}
 
-	String Atomic<String>::operator+(sl_uint64 number) const
+	String Atomic<String>::operator+(sl_uint64 number) const noexcept
 	{
 		return *this + String::fromUint64(number);
 	}
 
-	AtomicString& Atomic<String>::operator+=(sl_uint64 number)
+	AtomicString& Atomic<String>::operator+=(sl_uint64 number) noexcept
 	{
 		return (*this += String::fromUint64(number));
 	}
 
-	String operator+(sl_uint64 number, const AtomicString& other)
+	String operator+(sl_uint64 number, const AtomicString& other) noexcept
 	{
 		return String::fromUint64(number) + other;
 	}
 
-	String16 Atomic<String16>::operator+(sl_uint64 number) const
+	String16 Atomic<String16>::operator+(sl_uint64 number) const noexcept
 	{
 		return *this + String16::fromUint64(number);
 	}
 
-	AtomicString16& Atomic<String16>::operator+=(sl_uint64 number)
+	AtomicString16& Atomic<String16>::operator+=(sl_uint64 number) noexcept
 	{
 		return (*this += String16::fromUint64(number));
 	}
 
-	String16 operator+(sl_uint64 number, const AtomicString16& other)
+	String16 operator+(sl_uint64 number, const AtomicString16& other) noexcept
 	{
 		return String16::fromUint64(number) + other;
 	}
 
 
-	String String::operator+(float number) const
+	String String::operator+(float number) const noexcept
 	{
 		return *this + String::fromFloat(number);
 	}
 
-	String& String::operator+=(float number)
+	String& String::operator+=(float number) noexcept
 	{
 		return (*this += String::fromFloat(number));
 	}
 
-	String operator+(float number, const String& other)
+	String operator+(float number, const String& other) noexcept
 	{
 		return String::fromFloat(number) + other;
 	}
 
-	String16 String16::operator+(float number) const
+	String16 String16::operator+(float number) const noexcept
 	{
 		return *this + String16::fromFloat(number);
 	}
 
-	String16& String16::operator+=(float number)
+	String16& String16::operator+=(float number) noexcept
 	{
 		return (*this += String16::fromFloat(number));
 	}
 
-	String16 operator+(float number, const String16& other)
+	String16 operator+(float number, const String16& other) noexcept
 	{
 		return String16::fromFloat(number) + other;
 	}
 
-	String Atomic<String>::operator+(float number) const
+	String Atomic<String>::operator+(float number) const noexcept
 	{
 		return *this + String::fromFloat(number);
 	}
 
-	AtomicString& Atomic<String>::operator+=(float number)
+	AtomicString& Atomic<String>::operator+=(float number) noexcept
 	{
 		return (*this += String::fromFloat(number));
 	}
 
-	String operator+(float number, const AtomicString& other)
+	String operator+(float number, const AtomicString& other) noexcept
 	{
 		return String::fromFloat(number) + other;
 	}
 
-	String16 Atomic<String16>::operator+(float number) const
+	String16 Atomic<String16>::operator+(float number) const noexcept
 	{
 		return *this + String16::fromFloat(number);
 	}
 
-	AtomicString16& Atomic<String16>::operator+=(float number)
+	AtomicString16& Atomic<String16>::operator+=(float number) noexcept
 	{
 		return (*this += String16::fromFloat(number));
 	}
 
-	String16 operator+(float number, const AtomicString16& other)
+	String16 operator+(float number, const AtomicString16& other) noexcept
 	{
 		return String16::fromFloat(number) + other;
 	}
 
 
-	String String::operator+(double number) const
+	String String::operator+(double number) const noexcept
 	{
 		return *this + String::fromDouble(number);
 	}
 
-	String& String::operator+=(double number)
+	String& String::operator+=(double number) noexcept
 	{
 		return (*this += String::fromDouble(number));
 	}
 
-	String operator+(double number, const String& other)
+	String operator+(double number, const String& other) noexcept
 	{
 		return String::fromDouble(number) + other;
 	}
 
-	String16 String16::operator+(double number) const
+	String16 String16::operator+(double number) const noexcept
 	{
 		return *this + String16::fromDouble(number);
 	}
 
-	String16& String16::operator+=(double number)
+	String16& String16::operator+=(double number) noexcept
 	{
 		return (*this += String16::fromDouble(number));
 	}
 
-	String16 operator+(double number, const String16& other)
+	String16 operator+(double number, const String16& other) noexcept
 	{
 		return String16::fromDouble(number) + other;
 	}
 
-	String Atomic<String>::operator+(double number) const
+	String Atomic<String>::operator+(double number) const noexcept
 	{
 		return *this + String::fromDouble(number);
 	}
 
-	AtomicString& Atomic<String>::operator+=(double number)
+	AtomicString& Atomic<String>::operator+=(double number) noexcept
 	{
 		return (*this += String::fromDouble(number));
 	}
 
-	String operator+(double number, const AtomicString& other)
+	String operator+(double number, const AtomicString& other) noexcept
 	{
 		return String::fromDouble(number) + other;
 	}
 
-	String16 Atomic<String16>::operator+(double number) const
+	String16 Atomic<String16>::operator+(double number) const noexcept
 	{
 		return *this + String16::fromDouble(number);
 	}
 
-	AtomicString16& Atomic<String16>::operator+=(double number)
+	AtomicString16& Atomic<String16>::operator+=(double number) noexcept
 	{
 		return (*this += String16::fromDouble(number));
 	}
 
-	String16 operator+(double number, const AtomicString16& other)
+	String16 operator+(double number, const AtomicString16& other) noexcept
 	{
 		return String16::fromDouble(number) + other;
 	}
 
 
-	String String::operator+(sl_bool value) const
+	String String::operator+(sl_bool value) const noexcept
 	{
 		return *this + String::fromBoolean(value);
 	}
 
-	String& String::operator+=(sl_bool value)
+	String& String::operator+=(sl_bool value) noexcept
 	{
 		return (*this += String::fromBoolean(value));
 	}
 
-	String operator+(sl_bool value, const String& other)
+	String operator+(sl_bool value, const String& other) noexcept
 	{
 		return String::fromBoolean(value) + other;
 	}
 
-	String16 String16::operator+(sl_bool value) const
+	String16 String16::operator+(sl_bool value) const noexcept
 	{
 		return *this + String16::fromBoolean(value);
 	}
 
-	String16& String16::operator+=(sl_bool value)
+	String16& String16::operator+=(sl_bool value) noexcept
 	{
 		return (*this += String16::fromBoolean(value));
 	}
 
-	String16 operator+(sl_bool value, const String16& other)
+	String16 operator+(sl_bool value, const String16& other) noexcept
 	{
 		return String::fromBoolean(value) + other;
 	}
 
-	String Atomic<String>::operator+(sl_bool value) const
+	String Atomic<String>::operator+(sl_bool value) const noexcept
 	{
 		return *this + String::fromBoolean(value);
 	}
 
-	AtomicString& Atomic<String>::operator+=(sl_bool value)
+	AtomicString& Atomic<String>::operator+=(sl_bool value) noexcept
 	{
 		return (*this += String::fromBoolean(value));
 	}
 
-	String operator+(sl_bool value, const AtomicString& other)
+	String operator+(sl_bool value, const AtomicString& other) noexcept
 	{
 		return String::fromBoolean(value) + other;
 	}
 
-	String16 Atomic<String16>::operator+(sl_bool value) const
+	String16 Atomic<String16>::operator+(sl_bool value) const noexcept
 	{
 		return *this + String16::fromBoolean(value);
 	}
 
-	AtomicString16& Atomic<String16>::operator+=(sl_bool value)
+	AtomicString16& Atomic<String16>::operator+=(sl_bool value) noexcept
 	{
 		return (*this += String16::fromBoolean(value));
 	}
 
-	String16 operator+(sl_bool value, const AtomicString16& other)
+	String16 operator+(sl_bool value, const AtomicString16& other) noexcept
 	{
 		return String::fromBoolean(value) + other;
 	}
 
 
-	sl_bool String::equals(const String& other) const
+	sl_bool String::equals(const String& other) const noexcept
 	{
 		sl_char8* s1 = getData();
 		sl_char8* s2 = other.getData();
@@ -3753,7 +3753,7 @@ namespace slib
 		return Base::equalsMemory(s1, s2, len);
 	}
 
-	sl_bool String16::equals(const String16& other) const
+	sl_bool String16::equals(const String16& other) const noexcept
 	{
 		sl_char16* s1 = getData();
 		sl_char16* s2 = other.getData();
@@ -3779,62 +3779,62 @@ namespace slib
 		return Base::equalsMemory2((sl_uint16*)s1, (sl_uint16*)s2, len);
 	}
 
-	sl_bool Atomic<String>::equals(const String& other) const
+	sl_bool Atomic<String>::equals(const String& other) const noexcept
 	{
 		String s(*this);
 		return s.equals(other);
 	}
 
-	sl_bool Atomic<String16>::equals(const String16& other) const
+	sl_bool Atomic<String16>::equals(const String16& other) const noexcept
 	{
 		String16 s(*this);
 		return s.equals(other);
 	}
 
 
-	sl_bool String::equals(const String16& other) const
+	sl_bool String::equals(const String16& other) const noexcept
 	{
 		return equals(String(other));
 	}
 
-	sl_bool String16::equals(const String& other) const
+	sl_bool String16::equals(const String& other) const noexcept
 	{
 		return equals(String16(other));
 	}
 
-	sl_bool Atomic<String>::equals(const String16& other) const
+	sl_bool Atomic<String>::equals(const String16& other) const noexcept
 	{
 		String s(*this);
 		return s.equals(other);
 	}
 
-	sl_bool Atomic<String16>::equals(const String& other) const
+	sl_bool Atomic<String16>::equals(const String& other) const noexcept
 	{
 		String16 s(*this);
 		return s.equals(other);
 	}
 
 
-	sl_bool String::equals(const AtomicString& _other) const
+	sl_bool String::equals(const AtomicString& _other) const noexcept
 	{
 		String other(_other);
 		return equals(other);
 	}
 
-	sl_bool String16::equals(const AtomicString16& _other) const
+	sl_bool String16::equals(const AtomicString16& _other) const noexcept
 	{
 		String16 other(_other);
 		return equals(other);
 	}
 
-	sl_bool Atomic<String>::equals(const AtomicString& _other) const
+	sl_bool Atomic<String>::equals(const AtomicString& _other) const noexcept
 	{
 		String s(*this);
 		String other(_other);
 		return s.equals(other);
 	}
 
-	sl_bool Atomic<String16>::equals(const AtomicString16& _other) const
+	sl_bool Atomic<String16>::equals(const AtomicString16& _other) const noexcept
 	{
 		String16 s(*this);
 		String16 other(_other);
@@ -3842,26 +3842,26 @@ namespace slib
 	}
 
 
-	sl_bool String::equals(const AtomicString16& _other) const
+	sl_bool String::equals(const AtomicString16& _other) const noexcept
 	{
 		String16 other(_other);
 		return equals(other);
 	}
 
-	sl_bool String16::equals(const AtomicString& _other) const
+	sl_bool String16::equals(const AtomicString& _other) const noexcept
 	{
 		String other(_other);
 		return equals(other);
 	}
 
-	sl_bool Atomic<String>::equals(const AtomicString16& _other) const
+	sl_bool Atomic<String>::equals(const AtomicString16& _other) const noexcept
 	{
 		String s(*this);
 		String16 other(_other);
 		return s.equals(other);
 	}
 
-	sl_bool Atomic<String16>::equals(const AtomicString& _other) const
+	sl_bool Atomic<String16>::equals(const AtomicString& _other) const noexcept
 	{
 		String16 s(*this);
 		String other(_other);
@@ -3869,7 +3869,7 @@ namespace slib
 	}
 
 
-	sl_bool String::equals(const sl_char8* utf8) const
+	sl_bool String::equals(const sl_char8* utf8) const noexcept
 	{
 		sl_char8* sz = getData();
 		if (sz == utf8) {
@@ -3878,12 +3878,12 @@ namespace slib
 		return _priv_String_equals8(sz, getLength(), utf8, -1);
 	}
 
-	sl_bool String16::equals(const sl_char8* utf8) const
+	sl_bool String16::equals(const sl_char8* utf8) const noexcept
 	{
 		return _priv_String16_equals8(getData(), getLength(), utf8, -1);
 	}
 
-	sl_bool Atomic<String>::equals(const sl_char8* utf8) const
+	sl_bool Atomic<String>::equals(const sl_char8* utf8) const noexcept
 	{
 		String s(*this);
 		sl_char8* sz = s.getData();
@@ -3893,19 +3893,19 @@ namespace slib
 		return _priv_String_equals8(sz, s.getLength(), utf8, -1);
 	}
 
-	sl_bool Atomic<String16>::equals(const sl_char8* utf8) const
+	sl_bool Atomic<String16>::equals(const sl_char8* utf8) const noexcept
 	{
 		String16 s(*this);
 		return _priv_String16_equals8(s.getData(), s.getLength(), utf8, -1);
 	}
 
 
-	sl_bool String::equals(const sl_char16* utf16) const
+	sl_bool String::equals(const sl_char16* utf16) const noexcept
 	{
 		return _priv_String_equals16(getData(), getLength(), utf16, -1);
 	}
 
-	sl_bool String16::equals(const sl_char16* utf16) const
+	sl_bool String16::equals(const sl_char16* utf16) const noexcept
 	{
 		sl_char16* sz = getData();
 		if (sz == utf16) {
@@ -3914,13 +3914,13 @@ namespace slib
 		return _priv_String16_equals16(sz, getLength(), utf16, -1);
 	}
 
-	sl_bool Atomic<String>::equals(const sl_char16* utf16) const
+	sl_bool Atomic<String>::equals(const sl_char16* utf16) const noexcept
 	{
 		String s(*this);
 		return _priv_String_equals16(s.getData(), s.getLength(), utf16, -1);
 	}
 
-	sl_bool Atomic<String16>::equals(const sl_char16* utf16) const
+	sl_bool Atomic<String16>::equals(const sl_char16* utf16) const noexcept
 	{
 		String16 s(*this);
 		sl_char16* sz = s.getData();
@@ -3931,30 +3931,30 @@ namespace slib
 	}
 
 
-	sl_bool String::equals(const sl_char32* utf32) const
+	sl_bool String::equals(const sl_char32* utf32) const noexcept
 	{
 		return _priv_String_equals32(getData(), getLength(), utf32, -1);
 	}
 
-	sl_bool String16::equals(const sl_char32* utf32) const
+	sl_bool String16::equals(const sl_char32* utf32) const noexcept
 	{
 		return _priv_String16_equals32(getData(), getLength(), utf32, -1);
 	}
 
-	sl_bool Atomic<String>::equals(const sl_char32* utf32) const
+	sl_bool Atomic<String>::equals(const sl_char32* utf32) const noexcept
 	{
 		String s(*this);
 		return _priv_String_equals32(s.getData(), s.getLength(), utf32, -1);
 	}
 
-	sl_bool Atomic<String16>::equals(const sl_char32* utf32) const
+	sl_bool Atomic<String16>::equals(const sl_char32* utf32) const noexcept
 	{
 		String16 s(*this);
 		return _priv_String16_equals32(s.getData(), s.getLength(), utf32, -1);
 	}
 
 	
-	sl_bool String::equals(const std::string& str) const
+	sl_bool String::equals(const std::string& str) const noexcept
 	{
 		const sl_char8* s1 = getData();
 		const sl_char8* s2 = str.c_str();
@@ -3964,7 +3964,7 @@ namespace slib
 		return _priv_String_equals_objects(s1, getLength(), s2, str.length());
 	}
 	
-	sl_bool String16::equals(const std::u16string& str) const
+	sl_bool String16::equals(const std::u16string& str) const noexcept
 	{
 		const sl_char16* s1 = getData();
 		const sl_char16* s2 = str.c_str();
@@ -3974,20 +3974,20 @@ namespace slib
 		return _priv_String16_equals_objects(s1, getLength(), s2, str.length());
 	}
 	
-	sl_bool Atomic<String>::equals(const std::string& str) const
+	sl_bool Atomic<String>::equals(const std::string& str) const noexcept
 	{
 		String s(*this);
 		return s.equals(str);
 	}
 	
-	sl_bool Atomic<String16>::equals(const std::u16string& str) const
+	sl_bool Atomic<String16>::equals(const std::u16string& str) const noexcept
 	{
 		String16 s(*this);
 		return s.equals(str);
 	}
 
 	
-	sl_int32 String::compare(const String& other) const
+	sl_int32 String::compare(const String& other) const noexcept
 	{
 		sl_char8* s1 = getData();
 		sl_char8* s2 = other.getData();
@@ -3999,7 +3999,7 @@ namespace slib
 		return _priv_String_compare_objects(s1, len1, s2, len2);
 	}
 
-	sl_int32 String16::compare(const String16& other) const
+	sl_int32 String16::compare(const String16& other) const noexcept
 	{
 		sl_char16* s1 = getData();
 		sl_char16* s2 = other.getData();
@@ -4011,64 +4011,64 @@ namespace slib
 		return _priv_String16_compare_objects(s1, len1, s2, len2);
 	}
 
-	sl_int32 Atomic<String>::compare(const String& other) const
+	sl_int32 Atomic<String>::compare(const String& other) const noexcept
 	{
 		String s(*this);
 		return s.compare(other);
 	}
 
-	sl_int32 Atomic<String16>::compare(const String16& other) const
+	sl_int32 Atomic<String16>::compare(const String16& other) const noexcept
 	{
 		String16 s(*this);
 		return s.compare(other);
 	}
 
 
-	sl_int32 String::compare(const String16& _other) const
+	sl_int32 String::compare(const String16& _other) const noexcept
 	{
 		String other(_other);
 		return compare(other);
 	}
 
-	sl_int32 String16::compare(const String& _other) const
+	sl_int32 String16::compare(const String& _other) const noexcept
 	{
 		String16 other(_other);
 		return compare(other);
 	}
 
-	sl_int32 Atomic<String>::compare(const String16& other) const
+	sl_int32 Atomic<String>::compare(const String16& other) const noexcept
 	{
 		String s(*this);
 		return s.compare(other);
 	}
 
-	sl_int32 Atomic<String16>::compare(const String& other) const
+	sl_int32 Atomic<String16>::compare(const String& other) const noexcept
 	{
 		String16 s(*this);
 		return s.compare(other);
 	}
 
 
-	sl_int32 String::compare(const AtomicString& _other) const
+	sl_int32 String::compare(const AtomicString& _other) const noexcept
 	{
 		String other(_other);
 		return compare(other);
 	}
 
-	sl_int32 String16::compare(const AtomicString16& _other) const
+	sl_int32 String16::compare(const AtomicString16& _other) const noexcept
 	{
 		String16 other(_other);
 		return compare(other);
 	}
 
-	sl_int32 Atomic<String>::compare(const AtomicString& _other) const
+	sl_int32 Atomic<String>::compare(const AtomicString& _other) const noexcept
 	{
 		String s(*this);
 		String other(_other);
 		return s.compare(other);
 	}
 
-	sl_int32 Atomic<String16>::compare(const AtomicString16& _other) const
+	sl_int32 Atomic<String16>::compare(const AtomicString16& _other) const noexcept
 	{
 		String16 s(*this);
 		String16 other(_other);
@@ -4076,26 +4076,26 @@ namespace slib
 	}
 
 
-	sl_int32 String::compare(const AtomicString16& _other) const
+	sl_int32 String::compare(const AtomicString16& _other) const noexcept
 	{
 		String16 other(_other);
 		return compare(other);
 	}
 
-	sl_int32 String16::compare(const AtomicString& _other) const
+	sl_int32 String16::compare(const AtomicString& _other) const noexcept
 	{
 		String other(_other);
 		return compare(other);
 	}
 
-	sl_int32 Atomic<String>::compare(const AtomicString16& _other) const
+	sl_int32 Atomic<String>::compare(const AtomicString16& _other) const noexcept
 	{
 		String s(*this);
 		String16 other(_other);
 		return s.compare(other);
 	}
 
-	sl_int32 Atomic<String16>::compare(const AtomicString& _other) const
+	sl_int32 Atomic<String16>::compare(const AtomicString& _other) const noexcept
 	{
 		String16 s(*this);
 		String other(_other);
@@ -4103,7 +4103,7 @@ namespace slib
 	}
 
 
-	sl_int32 String::compare(const sl_char8* utf8) const
+	sl_int32 String::compare(const sl_char8* utf8) const noexcept
 	{
 		sl_char8* sz = getData();
 		if (sz == utf8) {
@@ -4112,30 +4112,30 @@ namespace slib
 		return _priv_String_compare8(sz, getLength(), utf8, -1);
 	}
 
-	sl_int32 String16::compare(const sl_char8* utf8) const
+	sl_int32 String16::compare(const sl_char8* utf8) const noexcept
 	{
 		return _priv_String16_compare8(getData(), getLength(), utf8, -1);
 	}
 
-	sl_int32 Atomic<String>::compare(const sl_char8* utf8) const
+	sl_int32 Atomic<String>::compare(const sl_char8* utf8) const noexcept
 	{
 		String s(*this);
 		return s.compare(utf8);
 	}
 
-	sl_int32 Atomic<String16>::compare(const sl_char8* utf8) const
+	sl_int32 Atomic<String16>::compare(const sl_char8* utf8) const noexcept
 	{
 		String16 s(*this);
 		return s.compare(utf8);
 	}
 
 
-	sl_int32 String::compare(const sl_char16* utf16) const
+	sl_int32 String::compare(const sl_char16* utf16) const noexcept
 	{
 		return _priv_String_compare16(getData(), getLength(), utf16, -1);
 	}
 
-	sl_int32 String16::compare(const sl_char16* utf16) const
+	sl_int32 String16::compare(const sl_char16* utf16) const noexcept
 	{
 		sl_char16* sz = getData();
 		if (sz == utf16) {
@@ -4144,43 +4144,43 @@ namespace slib
 		return _priv_String16_compare16(sz, getLength(), utf16, -1);
 	}
 
-	sl_int32 Atomic<String>::compare(const sl_char16* utf16) const
+	sl_int32 Atomic<String>::compare(const sl_char16* utf16) const noexcept
 	{
 		String s(*this);
 		return s.compare(utf16);
 	}
 
-	sl_int32 Atomic<String16>::compare(const sl_char16* utf16) const
+	sl_int32 Atomic<String16>::compare(const sl_char16* utf16) const noexcept
 	{
 		String16 s(*this);
 		return s.compare(utf16);
 	}
 
 
-	sl_int32 String::compare(const sl_char32* utf32) const
+	sl_int32 String::compare(const sl_char32* utf32) const noexcept
 	{
 		return _priv_String_compare32(getData(), getLength(), utf32, -1);
 	}
 
-	sl_int32 String16::compare(const sl_char32* utf32) const
+	sl_int32 String16::compare(const sl_char32* utf32) const noexcept
 	{
 		return _priv_String16_compare32(getData(), getLength(), utf32, -1);
 	}
 
-	sl_int32 Atomic<String>::compare(const sl_char32* utf32) const
+	sl_int32 Atomic<String>::compare(const sl_char32* utf32) const noexcept
 	{
 		String s(*this);
 		return s.compare(utf32);
 	}
 
-	sl_int32 Atomic<String16>::compare(const sl_char32* utf32) const
+	sl_int32 Atomic<String16>::compare(const sl_char32* utf32) const noexcept
 	{
 		String16 s(*this);
 		return s.compare(utf32);
 	}
 	
 	
-	sl_int32 String::compare(const std::string& str) const
+	sl_int32 String::compare(const std::string& str) const noexcept
 	{
 		const sl_char8* s1 = getData();
 		const sl_char8* s2 = str.c_str();
@@ -4190,7 +4190,7 @@ namespace slib
 		return _priv_String_compare_objects(s1, getLength(), s2, str.length());
 	}
 	
-	sl_int32 String16::compare(const std::u16string& str) const
+	sl_int32 String16::compare(const std::u16string& str) const noexcept
 	{
 		const sl_char16* s1 = getData();
 		const sl_char16* s2 = str.c_str();
@@ -4200,20 +4200,20 @@ namespace slib
 		return _priv_String16_compare_objects(s1, getLength(), s2, str.length());
 	}
 	
-	sl_int32 Atomic<String>::compare(const std::string& str) const
+	sl_int32 Atomic<String>::compare(const std::string& str) const noexcept
 	{
 		String s(*this);
 		return s.compare(str);
 	}
 	
-	sl_int32 Atomic<String16>::compare(const std::u16string& str) const
+	sl_int32 Atomic<String16>::compare(const std::u16string& str) const noexcept
 	{
 		String16 s(*this);
 		return s.compare(str);
 	}
 	
 
-	sl_int32 String::compare(const String& other, sl_size len) const
+	sl_int32 String::compare(const String& other, sl_size len) const noexcept
 	{
 		sl_char8* s1 = getData();
 		sl_char8* s2 = other.getData();
@@ -4231,7 +4231,7 @@ namespace slib
 		return _priv_String_compare_objects(s1, l1, s2, l2);
 	}
 
-	sl_int32 String16::compare(const String16& other, sl_size len) const
+	sl_int32 String16::compare(const String16& other, sl_size len) const noexcept
 	{
 		sl_char16* s1 = getData();
 		sl_char16* s2 = other.getData();
@@ -4249,20 +4249,20 @@ namespace slib
 		return _priv_String16_compare_objects(s1, l1, s2, l2);
 	}
 
-	sl_int32 Atomic<String>::compare(const String& other, sl_size len) const
+	sl_int32 Atomic<String>::compare(const String& other, sl_size len) const noexcept
 	{
 		String s(*this);
 		return s.compare(other, len);
 	}
 
-	sl_int32 Atomic<String16>::compare(const String16& other, sl_size len) const
+	sl_int32 Atomic<String16>::compare(const String16& other, sl_size len) const noexcept
 	{
 		String16 s(*this);
 		return s.compare(other, len);
 	}
 
 
-	sl_bool String::equalsIgnoreCase(const String& other) const
+	sl_bool String::equalsIgnoreCase(const String& other) const noexcept
 	{
 		sl_char8* s1 = getData();
 		sl_char8* s2 = other.getData();
@@ -4285,7 +4285,7 @@ namespace slib
 		return sl_true;
 	}
 
-	sl_bool String16::equalsIgnoreCase(const String16& other) const
+	sl_bool String16::equalsIgnoreCase(const String16& other) const noexcept
 	{
 		sl_char16* s1 = getData();
 		sl_char16* s2 = other.getData();
@@ -4308,20 +4308,20 @@ namespace slib
 		return sl_true;
 	}
 
-	sl_bool Atomic<String>::equalsIgnoreCase(const String& other) const
+	sl_bool Atomic<String>::equalsIgnoreCase(const String& other) const noexcept
 	{
 		String s(*this);
 		return s.equalsIgnoreCase(other);
 	}
 
-	sl_bool Atomic<String16>::equalsIgnoreCase(const String16& other) const
+	sl_bool Atomic<String16>::equalsIgnoreCase(const String16& other) const noexcept
 	{
 		String16 s(*this);
 		return s.equalsIgnoreCase(other);
 	}
 
 
-	sl_int32 String::compareIgnoreCase(const String& other) const
+	sl_int32 String::compareIgnoreCase(const String& other) const noexcept
 	{
 		sl_char8* s1 = getData();
 		sl_char8* s2 = other.getData();
@@ -4363,7 +4363,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_int32 String16::compareIgnoreCase(const String16& other) const
+	sl_int32 String16::compareIgnoreCase(const String16& other) const noexcept
 	{
 		sl_char16* s1 = getData();
 		sl_char16* s2 = other.getData();
@@ -4405,13 +4405,13 @@ namespace slib
 		return 0;
 	}
 
-	sl_int32 Atomic<String>::compareIgnoreCase(const String& other) const
+	sl_int32 Atomic<String>::compareIgnoreCase(const String& other) const noexcept
 	{
 		String s(*this);
 		return s.compareIgnoreCase(other);
 	}
 
-	sl_int32 Atomic<String16>::compareIgnoreCase(const String16& other) const
+	sl_int32 Atomic<String16>::compareIgnoreCase(const String16& other) const noexcept
 	{
 		String16 s(*this);
 		return s.compareIgnoreCase(other);
@@ -4419,51 +4419,51 @@ namespace slib
 
 
 #define PRIV_DEFINE_STRING_COMPARE_FUNCS(CLASS, OP, BODY, BODY_FRIEND, STD) \
-	sl_bool CLASS::OP(const String& other) const \
+	sl_bool CLASS::OP(const String& other) const noexcept \
 	{ \
 		return BODY; \
 	} \
-	sl_bool CLASS::OP(const String16& other) const \
+	sl_bool CLASS::OP(const String16& other) const noexcept \
 	{ \
 		return BODY; \
 	} \
-	sl_bool CLASS::OP(const AtomicString& other) const \
+	sl_bool CLASS::OP(const AtomicString& other) const noexcept \
 	{ \
 		return BODY; \
 	} \
-	sl_bool CLASS::OP(const AtomicString16& other) const \
+	sl_bool CLASS::OP(const AtomicString16& other) const noexcept \
 	{ \
 		return BODY; \
 	} \
-	sl_bool CLASS::OP(const sl_char8* other) const \
+	sl_bool CLASS::OP(const sl_char8* other) const noexcept \
 	{ \
 		return BODY; \
 	} \
-	sl_bool CLASS::OP(const sl_char16* other) const \
+	sl_bool CLASS::OP(const sl_char16* other) const noexcept \
 	{ \
 		return BODY; \
 	} \
-	sl_bool CLASS::OP(const sl_char32* other) const \
+	sl_bool CLASS::OP(const sl_char32* other) const noexcept \
 	{ \
 		return BODY; \
 	} \
-	sl_bool CLASS::OP(const STD& other) const \
+	sl_bool CLASS::OP(const STD& other) const noexcept \
 	{ \
 		return BODY; \
 	} \
-	sl_bool OP(const sl_char8* other, const CLASS& s) \
+	sl_bool OP(const sl_char8* other, const CLASS& s) noexcept \
 	{ \
 		return BODY_FRIEND; \
 	} \
-	sl_bool OP(const sl_char16* other, const CLASS& s) \
+	sl_bool OP(const sl_char16* other, const CLASS& s) noexcept \
 	{ \
 		return BODY_FRIEND; \
 	} \
-	sl_bool OP(const sl_char32* other, const CLASS& s) \
+	sl_bool OP(const sl_char32* other, const CLASS& s) noexcept \
 	{ \
 		return BODY_FRIEND; \
 	} \
-	sl_bool OP(const STD& other, const CLASS& s) \
+	sl_bool OP(const STD& other, const CLASS& s) noexcept \
 	{ \
 		return BODY_FRIEND; \
 	}
@@ -4497,7 +4497,7 @@ namespace slib
 	PRIV_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator>, compare(other)>0, s.compare(other)<0, std::u16string)
 	PRIV_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator<, compare(other)<0, s.compare(other)>0, std::u16string)
 
-	String String::duplicate() const
+	String String::duplicate() const noexcept
 	{
 		if (isNotNull()) {
 			return String(getData(), getLength());
@@ -4505,7 +4505,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String16 String16::duplicate() const
+	String16 String16::duplicate() const noexcept
 	{
 		if (isNotNull()) {
 			return String16(getData(), getLength());
@@ -4513,61 +4513,61 @@ namespace slib
 		return sl_null;
 	}
 
-	String Atomic<String>::duplicate() const
+	String Atomic<String>::duplicate() const noexcept
 	{
 		String s(*this);
 		return s.duplicate();
 	}
 
-	String16 Atomic<String16>::duplicate() const
+	String16 Atomic<String16>::duplicate() const noexcept
 	{
 		String16 s(*this);
 		return s.duplicate();
 	}
 
-	Memory String::toMemory() const
+	Memory String::toMemory() const noexcept
 	{
 		return Memory::create(getData(), getLength()*sizeof(sl_char8));
 	}
 
-	Memory String::toStaticMemory() const
+	Memory String::toStaticMemory() const noexcept
 	{
 		return Memory::createStatic(getData(), getLength()*sizeof(sl_char8));
 	}
 
-	Memory String16::toMemory() const
+	Memory String16::toMemory() const noexcept
 	{
 		return Memory::create(getData(), getLength()*sizeof(sl_char16));
 	}
 
-	Memory String16::toStaticMemory() const
+	Memory String16::toStaticMemory() const noexcept
 	{
 		return Memory::createStatic(getData(), getLength()*sizeof(sl_char16));
 	}
 
-	Memory Atomic<String>::toMemory() const
+	Memory Atomic<String>::toMemory() const noexcept
 	{
 		String s(*this);
 		return s.toMemory();
 	}
 
-	Memory Atomic<String16>::toMemory() const
+	Memory Atomic<String16>::toMemory() const noexcept
 	{
 		String16 s(*this);
 		return s.toMemory();
 	}
 
-	sl_size String::getUtf16(sl_char16* utf16, sl_size len) const
+	sl_size String::getUtf16(sl_char16* utf16, sl_size len) const noexcept
 	{
 		return Charsets::utf8ToUtf16(getData(), getLength(), utf16, len);
 	}
 
-	sl_size String16::getUtf8(sl_char8* utf8, sl_size len) const
+	sl_size String16::getUtf8(sl_char8* utf8, sl_size len) const noexcept
 	{
 		return Charsets::utf16ToUtf8(getData(), getLength(), utf8, len);
 	}
 
-	sl_bool String::getUtf16(StringData& output) const
+	sl_bool String::getUtf16(StringData& output) const noexcept
 	{
 		if (isEmpty()) {
 			output.sz16 = (sl_char16*)("\0\0");
@@ -4588,7 +4588,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool String16::getUtf8(StringData& output) const
+	sl_bool String16::getUtf8(StringData& output) const noexcept
 	{
 		if (isEmpty()) {
 			output.sz8 = "";
@@ -4608,31 +4608,31 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_size Atomic<String>::getUtf16(sl_char16* utf16, sl_size len) const
+	sl_size Atomic<String>::getUtf16(sl_char16* utf16, sl_size len) const noexcept
 	{
 		String s(*this);
 		return s.getUtf16(utf16, len);
 	}
 
-	sl_bool Atomic<String>::getUtf16(StringData& output) const
+	sl_bool Atomic<String>::getUtf16(StringData& output) const noexcept
 	{
 		String s(*this);
 		return s.getUtf16(output);
 	}
 
-	sl_size Atomic<String16>::getUtf8(sl_char8* utf8, sl_size len) const
+	sl_size Atomic<String16>::getUtf8(sl_char8* utf8, sl_size len) const noexcept
 	{
 		String16 s(*this);
 		return s.getUtf8(utf8, len);
 	}
 
-	sl_bool Atomic<String16>::getUtf8(StringData& output) const
+	sl_bool Atomic<String16>::getUtf8(StringData& output) const noexcept
 	{
 		String16 s(*this);
 		return s.getUtf8(output);
 	}
 
-	Memory String::toUtf16() const
+	Memory String::toUtf16() const noexcept
 	{
 		sl_char8* sz8 = getData();
 		sl_size len8 = getLength();
@@ -4646,7 +4646,7 @@ namespace slib
 		return memory;
 	}
 
-	Memory String16::toUtf8() const
+	Memory String16::toUtf8() const noexcept
 	{
 		sl_char16* sz16 = getData();
 		sl_size len16 = getLength();
@@ -4660,24 +4660,24 @@ namespace slib
 		return memory;
 	}
 
-	Memory Atomic<String>::toUtf16() const
+	Memory Atomic<String>::toUtf16() const noexcept
 	{
 		String s(*this);
 		return s.toUtf16();
 	}
 
-	Memory Atomic<String16>::toUtf8() const
+	Memory Atomic<String16>::toUtf8() const noexcept
 	{
 		String16 s(*this);
 		return s.toUtf8();
 	}
 
-	sl_size String::getUtf32(sl_char32* utf32, sl_size len) const
+	sl_size String::getUtf32(sl_char32* utf32, sl_size len) const noexcept
 	{
 		return Charsets::utf8ToUtf32(getData(), getLength(), utf32, len);
 	}
 
-	sl_bool String::getUtf32(StringData& output) const
+	sl_bool String::getUtf32(StringData& output) const noexcept
 	{
 		if (isEmpty()) {
 			output.sz32 = (sl_char32*)("\0\0\0\0");
@@ -4697,19 +4697,19 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_size Atomic<String>::getUtf32(sl_char32* utf32, sl_size len) const
+	sl_size Atomic<String>::getUtf32(sl_char32* utf32, sl_size len) const noexcept
 	{
 		String s(*this);
 		return s.getUtf32(utf32, len);
 	}
 
-	sl_bool Atomic<String>::getUtf32(StringData& output) const
+	sl_bool Atomic<String>::getUtf32(StringData& output) const noexcept
 	{
 		String s(*this);
 		return s.getUtf32(output);
 	}
 
-	Memory String::toUtf32() const
+	Memory String::toUtf32() const noexcept
 	{
 		sl_char8* sz8 = getData();
 		sl_size len8 = getLength();
@@ -4723,13 +4723,13 @@ namespace slib
 		return memory;
 	}
 
-	Memory Atomic<String>::toUtf32() const
+	Memory Atomic<String>::toUtf32() const noexcept
 	{
 		String s(*this);
 		return s.toUtf32();
 	}
 
-	String String::substring(sl_reg start, sl_reg end) const
+	String String::substring(sl_reg start, sl_reg end) const noexcept
 	{
 		sl_reg count = getLength();
 		if (start < 0) {
@@ -4747,7 +4747,7 @@ namespace slib
 		return String(getData() + start, end - start);
 	}
 
-	String16 String16::substring(sl_reg start, sl_reg end) const
+	String16 String16::substring(sl_reg start, sl_reg end) const noexcept
 	{
 		sl_reg count = getLength();
 		if (start < 0) {
@@ -4765,85 +4765,85 @@ namespace slib
 		return String16(getData() + start, end - start);
 	}
 
-	String Atomic<String>::substring(sl_reg start, sl_reg end) const
+	String Atomic<String>::substring(sl_reg start, sl_reg end) const noexcept
 	{
 		String s(*this);
 		return s.substring(start, end);
 	}
 
-	String16 Atomic<String16>::substring(sl_reg start, sl_reg end) const
+	String16 Atomic<String16>::substring(sl_reg start, sl_reg end) const noexcept
 	{
 		String16 s(*this);
 		return s.substring(start, end);
 	}
 
-	String String::left(sl_reg len) const
+	String String::left(sl_reg len) const noexcept
 	{
 		return substring(0, len);
 	}
 
-	String16 String16::left(sl_reg len) const
+	String16 String16::left(sl_reg len) const noexcept
 	{
 		return substring( 0, len );
 	}
 
-	String Atomic<String>::left(sl_reg len) const
+	String Atomic<String>::left(sl_reg len) const noexcept
 	{
 		String s(*this);
 		return s.left(len);
 	}
 
-	String16 Atomic<String16>::left(sl_reg len) const
+	String16 Atomic<String16>::left(sl_reg len) const noexcept
 	{
 		String16 s(*this);
 		return s.left(len);
 	}
 
-	String String::right(sl_reg len) const
+	String String::right(sl_reg len) const noexcept
 	{
 		return substring(getLength() - len);
 	}
 
-	String16 String16::right(sl_reg len) const
+	String16 String16::right(sl_reg len) const noexcept
 	{
 		return substring(getLength() - len);
 	}
 
-	String Atomic<String>::right(sl_reg len) const
+	String Atomic<String>::right(sl_reg len) const noexcept
 	{
 		String s(*this);
 		return s.right(len);
 	}
 
-	String16 Atomic<String16>::right(sl_reg len) const
+	String16 Atomic<String16>::right(sl_reg len) const noexcept
 	{
 		String16 s(*this);
 		return s.right(len);
 	}
 
-	String String::mid(sl_reg start, sl_reg len) const
+	String String::mid(sl_reg start, sl_reg len) const noexcept
 	{
 		return substring(start, start + len);
 	}
 		
-	String16 String16::mid(sl_reg start, sl_reg len) const
+	String16 String16::mid(sl_reg start, sl_reg len) const noexcept
 	{
 		return substring(start, start+len);
 	}
 
-	String Atomic<String>::mid(sl_reg start, sl_reg len) const
+	String Atomic<String>::mid(sl_reg start, sl_reg len) const noexcept
 	{
 		String s(*this);
 		return s.mid(start, len);
 	}
 
-	String16 Atomic<String16>::mid(sl_reg start, sl_reg len) const
+	String16 Atomic<String16>::mid(sl_reg start, sl_reg len) const noexcept
 	{
 		String16 s(*this);
 		return s.mid(start, len);
 	}
 
-	sl_reg String::indexOf(sl_char8 ch, sl_reg _start) const
+	sl_reg String::indexOf(sl_char8 ch, sl_reg _start) const noexcept
 	{
 		sl_size count = getLength();
 		if (count == 0) {
@@ -4867,7 +4867,7 @@ namespace slib
 		}
 	}
 
-	sl_reg String16::indexOf(sl_char16 ch, sl_reg _start) const
+	sl_reg String16::indexOf(sl_char16 ch, sl_reg _start) const noexcept
 	{
 		sl_size count = getLength();
 		if (count == 0) {
@@ -4891,20 +4891,20 @@ namespace slib
 		}
 	}
 
-	sl_reg Atomic<String>::indexOf(sl_char8 ch, sl_reg start) const
+	sl_reg Atomic<String>::indexOf(sl_char8 ch, sl_reg start) const noexcept
 	{
 		String s(*this);
 		return s.indexOf(ch, start);
 	}
 
-	sl_reg Atomic<String16>::indexOf(sl_char16 ch, sl_reg start) const
+	sl_reg Atomic<String16>::indexOf(sl_char16 ch, sl_reg start) const noexcept
 	{
 		String16 s(*this);
 		return s.indexOf(ch, start);
 	}
 
 	template <class ST, class CT, class TT>
-	SLIB_INLINE sl_reg _priv_String_indexOf(const ST& str, const CT* bufPat, sl_size countPat, sl_reg _start)
+	SLIB_INLINE static sl_reg _priv_String_indexOf(const ST& str, const CT* bufPat, sl_size countPat, sl_reg _start) noexcept
 	{
 		if (countPat == 0) {
 			return 0;
@@ -4940,51 +4940,51 @@ namespace slib
 		return -1;
 	}
 
-	sl_reg String::indexOf(const String& pattern, sl_reg start) const
+	sl_reg String::indexOf(const String& pattern, sl_reg start) const noexcept
 	{
 		return _priv_String_indexOf<String, sl_char8, _priv_TemplateFunc8>(*this, pattern.getData(), pattern.getLength(), start);
 	}
 
-	sl_reg String16::indexOf(const String16& pattern, sl_reg start) const
+	sl_reg String16::indexOf(const String16& pattern, sl_reg start) const noexcept
 	{
 		return _priv_String_indexOf<String16, sl_char16, _priv_TemplateFunc16>(*this, pattern.getData(), pattern.getLength(), start);
 	}
 
-	sl_reg Atomic<String>::indexOf(const String& str, sl_reg start) const
+	sl_reg Atomic<String>::indexOf(const String& str, sl_reg start) const noexcept
 	{
 		String s(*this);
 		return s.indexOf(str, start);
 	}
 
-	sl_reg Atomic<String16>::indexOf(const String16& str, sl_reg start) const
+	sl_reg Atomic<String16>::indexOf(const String16& str, sl_reg start) const noexcept
 	{
 		String16 s(*this);
 		return s.indexOf(str, start);
 	}
 
-	sl_reg String::indexOf(const sl_char8* pattern, sl_reg start) const
+	sl_reg String::indexOf(const sl_char8* pattern, sl_reg start) const noexcept
 	{
 		return _priv_String_indexOf<String, sl_char8, _priv_TemplateFunc8>(*this, pattern, Base::getStringLength(pattern), start);
 	}
 
-	sl_reg String16::indexOf(const sl_char16* pattern, sl_reg start) const
+	sl_reg String16::indexOf(const sl_char16* pattern, sl_reg start) const noexcept
 	{
 		return _priv_String_indexOf<String16, sl_char16, _priv_TemplateFunc16>(*this, pattern, Base::getStringLength2(pattern), start);
 	}
 
-	sl_reg Atomic<String>::indexOf(const sl_char8* pattern, sl_reg start) const
+	sl_reg Atomic<String>::indexOf(const sl_char8* pattern, sl_reg start) const noexcept
 	{
 		String s(*this);
 		return s.indexOf(pattern, start);
 	}
 
-	sl_reg Atomic<String16>::indexOf(const sl_char16* pattern, sl_reg start) const
+	sl_reg Atomic<String16>::indexOf(const sl_char16* pattern, sl_reg start) const noexcept
 	{
 		String16 s(*this);
 		return s.indexOf(pattern, start);
 	}
 
-	sl_reg String::lastIndexOf(sl_char8 ch, sl_reg _start) const
+	sl_reg String::lastIndexOf(sl_char8 ch, sl_reg _start) const noexcept
 	{
 		sl_size count = getLength();
 		if (count == 0) {
@@ -5008,7 +5008,7 @@ namespace slib
 		}
 	}
 
-	sl_reg String16::lastIndexOf(sl_char16 ch, sl_reg _start) const
+	sl_reg String16::lastIndexOf(sl_char16 ch, sl_reg _start) const noexcept
 	{
 		sl_size count = getLength();
 		if (count == 0) {
@@ -5032,20 +5032,20 @@ namespace slib
 		}
 	}
 
-	sl_reg Atomic<String>::lastIndexOf(sl_char8 ch, sl_reg start) const
+	sl_reg Atomic<String>::lastIndexOf(sl_char8 ch, sl_reg start) const noexcept
 	{
 		String s(*this);
 		return s.lastIndexOf(ch, start);
 	}
 
-	sl_reg Atomic<String16>::lastIndexOf(sl_char16 ch, sl_reg start) const
+	sl_reg Atomic<String16>::lastIndexOf(sl_char16 ch, sl_reg start) const noexcept
 	{
 		String16 s(*this);
 		return s.lastIndexOf(ch, start);
 	}
 
 	template <class ST, class CT, class TT>
-	SLIB_INLINE sl_reg _priv_String_lastIndexOf(const ST& str, const CT* bufPat, sl_size countPat, sl_reg _start)
+	SLIB_INLINE static sl_reg _priv_String_lastIndexOf(const ST& str, const CT* bufPat, sl_size countPat, sl_reg _start) noexcept
 	{
 		if (countPat == 0) {
 			return 0;
@@ -5082,51 +5082,51 @@ namespace slib
 		return -1;
 	}
 
-	sl_reg String::lastIndexOf(const String& pattern, sl_reg start) const
+	sl_reg String::lastIndexOf(const String& pattern, sl_reg start) const noexcept
 	{
 		return _priv_String_lastIndexOf<String, sl_char8, _priv_TemplateFunc8>(*this, pattern.getData(), pattern.getLength(), start);
 	}
 
-	sl_reg String16::lastIndexOf(const String16& pattern, sl_reg start) const
+	sl_reg String16::lastIndexOf(const String16& pattern, sl_reg start) const noexcept
 	{
 		return _priv_String_lastIndexOf<String16, sl_char16, _priv_TemplateFunc16>(*this, pattern.getData(), pattern.getLength(), start);
 	}
 
-	sl_reg Atomic<String>::lastIndexOf(const String& str, sl_reg start) const
+	sl_reg Atomic<String>::lastIndexOf(const String& str, sl_reg start) const noexcept
 	{
 		String s(*this);
 		return s.indexOf(str, start);
 	}
 
-	sl_reg Atomic<String16>::lastIndexOf(const String16& str, sl_reg start) const
+	sl_reg Atomic<String16>::lastIndexOf(const String16& str, sl_reg start) const noexcept
 	{
 		String16 s(*this);
 		return s.indexOf(str, start);
 	}
 
-	sl_reg String::lastIndexOf(const sl_char8* pattern, sl_reg start) const
+	sl_reg String::lastIndexOf(const sl_char8* pattern, sl_reg start) const noexcept
 	{
 		return _priv_String_lastIndexOf<String, sl_char8, _priv_TemplateFunc8>(*this, pattern, Base::getStringLength(pattern), start);
 	}
 
-	sl_reg String16::lastIndexOf(const sl_char16* pattern, sl_reg start) const
+	sl_reg String16::lastIndexOf(const sl_char16* pattern, sl_reg start) const noexcept
 	{
 		return _priv_String_lastIndexOf<String16, sl_char16, _priv_TemplateFunc16>(*this, pattern, Base::getStringLength2(pattern), start);
 	}
 
-	sl_reg Atomic<String>::lastIndexOf(const sl_char8* pattern, sl_reg start) const
+	sl_reg Atomic<String>::lastIndexOf(const sl_char8* pattern, sl_reg start) const noexcept
 	{
 		String s(*this);
 		return s.indexOf(pattern, start);
 	}
 
-	sl_reg Atomic<String16>::lastIndexOf(const sl_char16* pattern, sl_reg start) const
+	sl_reg Atomic<String16>::lastIndexOf(const sl_char16* pattern, sl_reg start) const noexcept
 	{
 		String16 s(*this);
 		return s.indexOf(pattern, start);
 	}
 
-	sl_bool String::startsWith(sl_char8 ch) const
+	sl_bool String::startsWith(sl_char8 ch) const noexcept
 	{
 		if (isEmpty()) {
 			return sl_false;
@@ -5135,7 +5135,7 @@ namespace slib
 		}
 	}
 
-	sl_bool String16::startsWith(sl_char16 ch) const
+	sl_bool String16::startsWith(sl_char16 ch) const noexcept
 	{
 		if (isEmpty()) {
 			return sl_false;
@@ -5144,20 +5144,20 @@ namespace slib
 		}
 	}
 
-	sl_bool Atomic<String>::startsWith(sl_char8 ch) const
+	sl_bool Atomic<String>::startsWith(sl_char8 ch) const noexcept
 	{
 		String s(*this);
 		return s.startsWith(ch);
 	}
 
-	sl_bool Atomic<String16>::startsWith(sl_char16 ch) const
+	sl_bool Atomic<String16>::startsWith(sl_char16 ch) const noexcept
 	{
 		String16 s(*this);
 		return s.startsWith(ch);
 	}
 
 
-	sl_bool String::startsWith(const String& str) const
+	sl_bool String::startsWith(const String& str) const noexcept
 	{
 		sl_size count2 = str.getLength();
 		if (count2 == 0) {
@@ -5171,7 +5171,7 @@ namespace slib
 		}
 	}
 
-	sl_bool String16::startsWith(const String16& str) const
+	sl_bool String16::startsWith(const String16& str) const noexcept
 	{
 		sl_size count2 = str.getLength();
 		if (count2 == 0) {
@@ -5185,19 +5185,19 @@ namespace slib
 		}
 	}
 
-	sl_bool Atomic<String>::startsWith(const String& str) const
+	sl_bool Atomic<String>::startsWith(const String& str) const noexcept
 	{
 		String s(*this);
 		return s.startsWith(str);
 	}
 
-	sl_bool Atomic<String16>::startsWith(const String16& str) const
+	sl_bool Atomic<String16>::startsWith(const String16& str) const noexcept
 	{
 		String16 s(*this);
 		return s.startsWith(str);
 	}
 
-	sl_bool String::startsWith(const sl_char8* str) const
+	sl_bool String::startsWith(const sl_char8* str) const noexcept
 	{
 		const sl_char8* s = getData();
 		sl_size count = getLength();
@@ -5216,7 +5216,7 @@ namespace slib
 
 	}
 
-	sl_bool String16::startsWith(const sl_char16* str) const
+	sl_bool String16::startsWith(const sl_char16* str) const noexcept
 	{
 		const sl_char16* s = getData();
 		sl_size count = getLength();
@@ -5234,19 +5234,19 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool Atomic<String>::startsWith(const sl_char8* str) const
+	sl_bool Atomic<String>::startsWith(const sl_char8* str) const noexcept
 	{
 		String s(*this);
 		return s.startsWith(str);
 	}
 
-	sl_bool Atomic<String16>::startsWith(const sl_char16* str) const
+	sl_bool Atomic<String16>::startsWith(const sl_char16* str) const noexcept
 	{
 		String16 s(*this);
 		return s.startsWith(str);
 	}
 
-	sl_bool String::endsWith(sl_char8 ch) const
+	sl_bool String::endsWith(sl_char8 ch) const noexcept
 	{
 		sl_size count = getLength();
 		if (count < 1) {
@@ -5256,7 +5256,7 @@ namespace slib
 		}
 	}
 
-	sl_bool String16::endsWith(sl_char16 ch) const
+	sl_bool String16::endsWith(sl_char16 ch) const noexcept
 	{
 		sl_size count = getLength();
 		if (count < 1) {
@@ -5266,20 +5266,20 @@ namespace slib
 		}
 	}
 
-	sl_bool Atomic<String>::endsWith(sl_char8 ch) const
+	sl_bool Atomic<String>::endsWith(sl_char8 ch) const noexcept
 	{
 		String s(*this);
 		return s.endsWith(ch);
 	}
 
-	sl_bool Atomic<String16>::endsWith(sl_char16 ch) const
+	sl_bool Atomic<String16>::endsWith(sl_char16 ch) const noexcept
 	{
 		String16 s(*this);
 		return s.endsWith(ch);
 	}
 
 
-	sl_bool String::endsWith(const String& str) const
+	sl_bool String::endsWith(const String& str) const noexcept
 	{
 		sl_size count2 = str.getLength();
 		if (count2 == 0) {
@@ -5293,7 +5293,7 @@ namespace slib
 		}
 	}
 
-	sl_bool String16::endsWith(const String16& str) const
+	sl_bool String16::endsWith(const String16& str) const noexcept
 	{
 		sl_size count2 = str.getLength();
 		if (count2 == 0) {
@@ -5307,19 +5307,19 @@ namespace slib
 		}
 	}
 
-	sl_bool Atomic<String>::endsWith(const String& str) const
+	sl_bool Atomic<String>::endsWith(const String& str) const noexcept
 	{
 		String s(*this);
 		return s.endsWith(str);
 	}
 
-	sl_bool Atomic<String16>::endsWith(const String16& str) const
+	sl_bool Atomic<String16>::endsWith(const String16& str) const noexcept
 	{
 		String16 s(*this);
 		return s.endsWith(str);
 	}
 
-	sl_bool String::endsWith(const sl_char8* str) const
+	sl_bool String::endsWith(const sl_char8* str) const noexcept
 	{
 		sl_size count2 = Base::getStringLength(str);
 		if (count2 == 0) {
@@ -5333,7 +5333,7 @@ namespace slib
 		}
 	}
 
-	sl_bool String16::endsWith(const sl_char16* str) const
+	sl_bool String16::endsWith(const sl_char16* str) const noexcept
 	{
 		sl_size count2 = Base::getStringLength2(str);
 		if (count2 == 0) {
@@ -5347,86 +5347,86 @@ namespace slib
 		}
 	}
 
-	sl_bool Atomic<String>::endsWith(const sl_char8* str) const
+	sl_bool Atomic<String>::endsWith(const sl_char8* str) const noexcept
 	{
 		String s(*this);
 		return s.endsWith(str);
 	}
 
-	sl_bool Atomic<String16>::endsWith(const sl_char16* str) const
+	sl_bool Atomic<String16>::endsWith(const sl_char16* str) const noexcept
 	{
 		String16 s(*this);
 		return s.endsWith(str);
 	}
 
-	sl_bool String::contains(sl_char8 ch) const
+	sl_bool String::contains(sl_char8 ch) const noexcept
 	{
 		return indexOf(ch) >= 0;
 	}
 
-	sl_bool String16::contains(sl_char16 ch) const
+	sl_bool String16::contains(sl_char16 ch) const noexcept
 	{
 		return indexOf(ch) >= 0;
 	}
 
-	sl_bool Atomic<String>::constains(sl_char8 ch) const
+	sl_bool Atomic<String>::constains(sl_char8 ch) const noexcept
 	{
 		String s(*this);
 		return s.contains(ch);
 	}
 
-	sl_bool Atomic<String16>::contains(sl_char16 ch) const
+	sl_bool Atomic<String16>::contains(sl_char16 ch) const noexcept
 	{
 		String16 s(*this);
 		return s.contains(ch);
 	}
 
-	sl_bool String::contains(const String& str) const
+	sl_bool String::contains(const String& str) const noexcept
 	{
 		return indexOf(str) >= 0;
 	}
 
-	sl_bool String16::contains(const String16& str) const
+	sl_bool String16::contains(const String16& str) const noexcept
 	{
 		return indexOf(str) >= 0;
 	}
 
-	sl_bool Atomic<String>::contains(const String& str) const
+	sl_bool Atomic<String>::contains(const String& str) const noexcept
 	{
 		String s(*this);
 		return s.contains(str);
 	}
 
-	sl_bool Atomic<String16>::contains(const String16& str) const
+	sl_bool Atomic<String16>::contains(const String16& str) const noexcept
 	{
 		String16 s(*this);
 		return s.contains(str);
 	}
 
-	sl_bool String::contains(const sl_char8* str) const
+	sl_bool String::contains(const sl_char8* str) const noexcept
 	{
 		return indexOf(str) >= 0;
 	}
 
-	sl_bool String16::contains(const sl_char16* str) const
+	sl_bool String16::contains(const sl_char16* str) const noexcept
 	{
 		return indexOf(str) >= 0;
 	}
 
-	sl_bool Atomic<String>::contains(const sl_char8* str) const
+	sl_bool Atomic<String>::contains(const sl_char8* str) const noexcept
 	{
 		String s(*this);
 		return s.contains(str);
 	}
 
-	sl_bool Atomic<String16>::contains(const sl_char16* str) const
+	sl_bool Atomic<String16>::contains(const sl_char16* str) const noexcept
 	{
 		String16 s(*this);
 		return s.contains(str);
 	}
 
 	template <class CT>
-	SLIB_INLINE void _priv_String_copyMakingUpper(CT* dst, const CT* src, sl_size len)
+	SLIB_INLINE static void _priv_String_copyMakingUpper(CT* dst, const CT* src, sl_size len) noexcept
 	{
 		for (sl_size i = 0; i < len; i++) {
 			dst[i] = SLIB_CHAR_LOWER_TO_UPPER(src[i]);
@@ -5434,58 +5434,58 @@ namespace slib
 	}
 
 	template <class CT>
-	SLIB_INLINE void _priv_String_copyMakingLower(CT* dst, const CT* src, sl_size len)
+	SLIB_INLINE static void _priv_String_copyMakingLower(CT* dst, const CT* src, sl_size len) noexcept
 	{
 		for (sl_size i = 0; i < len; i++) {
 			dst[i] = SLIB_CHAR_UPPER_TO_LOWER(src[i]);
 		}
 	}
 
-	void String::makeUpper()
+	void String::makeUpper() noexcept
 	{
 		_priv_String_copyMakingUpper(getData(), getData(), getLength());
 	}
 
-	void String16::makeUpper()
+	void String16::makeUpper() noexcept
 	{
 		_priv_String_copyMakingUpper(getData(), getData(), getLength());
 	}
 
-	void Atomic<String>::makeUpper()
+	void Atomic<String>::makeUpper() noexcept
 	{
 		String s(*this);
 		_priv_String_copyMakingUpper(s.getData(), s.getData(), s.getLength());
 	}
 
-	void Atomic<String16>::makeUpper()
+	void Atomic<String16>::makeUpper() noexcept
 	{
 		String16 s(*this);
 		_priv_String_copyMakingUpper(s.getData(), s.getData(), s.getLength());
 	}
 
-	void String::makeLower()
+	void String::makeLower() noexcept
 	{
 		_priv_String_copyMakingLower(getData(), getData(), getLength());
 	}
 
-	void String16::makeLower()
+	void String16::makeLower() noexcept
 	{
 		_priv_String_copyMakingLower(getData(), getData(), getLength());
 	}
 
-	void Atomic<String>::makeLower()
+	void Atomic<String>::makeLower() noexcept
 	{
 		String s(*this);
 		_priv_String_copyMakingLower(s.getData(), s.getData(), s.getLength());
 	}
 
-	void Atomic<String16>::makeLower()
+	void Atomic<String16>::makeLower() noexcept
 	{
 		String16 s(*this);
 		_priv_String_copyMakingLower(s.getData(), s.getData(), s.getLength());
 	}
 
-	String String::toUpper(const sl_char8* sz, sl_reg _len)
+	String String::toUpper(const sl_char8* sz, sl_reg _len) noexcept
 	{
 		if (_len == 0) {
 			return String::getEmpty();
@@ -5504,7 +5504,7 @@ namespace slib
 		return ret;
 	}
 
-	String16 String16::toUpper(const sl_char16* sz, sl_reg _len)
+	String16 String16::toUpper(const sl_char16* sz, sl_reg _len) noexcept
 	{
 		if (_len == 0) {
 			return String16::getEmpty();
@@ -5523,7 +5523,7 @@ namespace slib
 		return ret;
 	}
 
-	String String::toLower(const sl_char8* sz, sl_reg _len)
+	String String::toLower(const sl_char8* sz, sl_reg _len) noexcept
 	{
 		if (_len == 0) {
 			return String::getEmpty();
@@ -5542,7 +5542,7 @@ namespace slib
 		return ret;
 	}
 
-	String16 String16::toLower(const sl_char16* sz, sl_reg _len)
+	String16 String16::toLower(const sl_char16* sz, sl_reg _len) noexcept
 	{
 		if (_len == 0) {
 			return String16::getEmpty();
@@ -5561,7 +5561,7 @@ namespace slib
 		return ret;
 	}
 
-	String String::toUpper() const
+	String String::toUpper() const noexcept
 	{
 		if (isNull()) {
 			return sl_null;
@@ -5569,7 +5569,7 @@ namespace slib
 		return toUpper(getData(), getLength());
 	}
 
-	String16 String16::toUpper() const
+	String16 String16::toUpper() const noexcept
 	{
 		if (isNull()) {
 			return sl_null;
@@ -5577,7 +5577,7 @@ namespace slib
 		return toUpper(getData(), getLength());
 	}
 
-	String Atomic<String>::toUpper() const
+	String Atomic<String>::toUpper() const noexcept
 	{
 		if (isNull()) {
 			return sl_null;
@@ -5586,7 +5586,7 @@ namespace slib
 		return String::toUpper(s.getData(), s.getLength());
 	}
 
-	String16 Atomic<String16>::toUpper() const
+	String16 Atomic<String16>::toUpper() const noexcept
 	{
 		if (isNull()) {
 			return sl_null;
@@ -5595,7 +5595,7 @@ namespace slib
 		return String16::toUpper(s.getData(), s.getLength());
 	}
 
-	String String::toLower() const
+	String String::toLower() const noexcept
 	{
 		if (isNull()) {
 			return sl_null;
@@ -5603,7 +5603,7 @@ namespace slib
 		return toLower(getData(), getLength());
 	}
 
-	String16 String16::toLower() const
+	String16 String16::toLower() const noexcept
 	{
 		if (isNull()) {
 			return sl_null;
@@ -5611,7 +5611,7 @@ namespace slib
 		return toLower(getData(), getLength());
 	}
 
-	String Atomic<String>::toLower() const
+	String Atomic<String>::toLower() const noexcept
 	{
 		if (isNull()) {
 			return sl_null;
@@ -5620,7 +5620,7 @@ namespace slib
 		return String::toLower(s.getData(), s.getLength());
 	}
 
-	String16 Atomic<String16>::toLower() const
+	String16 Atomic<String16>::toLower() const noexcept
 	{
 		if (isNull()) {
 			return sl_null;
@@ -5637,7 +5637,7 @@ namespace slib
 	};
 
 	template <class ST, class CT>
-	SLIB_INLINE ST _priv_String_replaceAll(const ST& str, const CT* pattern, sl_reg countPat, const CT* bufReplace, sl_reg countReplace)
+	SLIB_INLINE static ST _priv_String_replaceAll(const ST& str, const CT* pattern, sl_reg countPat, const CT* bufReplace, sl_reg countReplace) noexcept
 	{
 		if (countPat == 0) {
 			return sl_null;
@@ -5680,96 +5680,96 @@ namespace slib
 		return ret;
 	}
 
-	String String::replaceAll(const String& pattern, const String& replacement) const
+	String String::replaceAll(const String& pattern, const String& replacement) const noexcept
 	{
 		return _priv_String_replaceAll<String, sl_char8>(*this, pattern.getData(), pattern.getLength(), replacement.getData(), replacement.getLength());
 	}
 
-	String16 String16::replaceAll(const String16& pattern, const String16& replacement) const
+	String16 String16::replaceAll(const String16& pattern, const String16& replacement) const noexcept
 	{
 		return _priv_String_replaceAll<String16, sl_char16>(*this, pattern.getData(), pattern.getLength(), replacement.getData(), replacement.getLength());
 	}
 
-	String Atomic<String>::replaceAll(const String& pattern, const String& replacement) const
+	String Atomic<String>::replaceAll(const String& pattern, const String& replacement) const noexcept
 	{
 		String s(*this);
 		return s.replaceAll(pattern, replacement);
 	}
 
-	String16 Atomic<String16>::replaceAll(const String16& pattern, const String16& replacement) const
+	String16 Atomic<String16>::replaceAll(const String16& pattern, const String16& replacement) const noexcept
 	{
 		String16 s(*this);
 		return s.replaceAll(pattern, replacement);
 	}
 
-	String String::replaceAll(const String& pattern, const sl_char8* replacement) const
+	String String::replaceAll(const String& pattern, const sl_char8* replacement) const noexcept
 	{
 		return _priv_String_replaceAll<String, sl_char8>(*this, pattern.getData(), pattern.getLength(), replacement, Base::getStringLength(replacement));
 	}
 
-	String16 String16::replaceAll(const String16& pattern, const sl_char16* replacement) const
+	String16 String16::replaceAll(const String16& pattern, const sl_char16* replacement) const noexcept
 	{
 		return _priv_String_replaceAll<String16, sl_char16>(*this, pattern.getData(), pattern.getLength(), replacement, Base::getStringLength2(replacement));
 	}
 
-	String Atomic<String>::replaceAll(const String& pattern, const sl_char8* replacement) const
+	String Atomic<String>::replaceAll(const String& pattern, const sl_char8* replacement) const noexcept
 	{
 		String s(*this);
 		return s.replaceAll(pattern, replacement);
 	}
 
-	String16 Atomic<String16>::replaceAll(const String16& pattern, const sl_char16* replacement) const
+	String16 Atomic<String16>::replaceAll(const String16& pattern, const sl_char16* replacement) const noexcept
 	{
 		String16 s(*this);
 		return s.replaceAll(pattern, replacement);
 	}
 
-	String String::replaceAll(const sl_char8* pattern, const String& replacement) const
+	String String::replaceAll(const sl_char8* pattern, const String& replacement) const noexcept
 	{
 		return _priv_String_replaceAll<String, sl_char8>(*this, pattern, Base::getStringLength(pattern), replacement.getData(), replacement.getLength());
 	}
 
-	String16 String16::replaceAll(const sl_char16* pattern, const String16& replacement) const
+	String16 String16::replaceAll(const sl_char16* pattern, const String16& replacement) const noexcept
 	{
 		return _priv_String_replaceAll<String16, sl_char16>(*this, pattern, Base::getStringLength2(pattern), replacement.getData(), replacement.getLength());
 	}
 
-	String Atomic<String>::replaceAll(const sl_char8* pattern, const String& replacement) const
+	String Atomic<String>::replaceAll(const sl_char8* pattern, const String& replacement) const noexcept
 	{
 		String s(*this);
 		return s.replaceAll(pattern, replacement);
 	}
 
-	String16 Atomic<String16>::replaceAll(const sl_char16* pattern, const String16& replacement) const
+	String16 Atomic<String16>::replaceAll(const sl_char16* pattern, const String16& replacement) const noexcept
 	{
 		String16 s(*this);
 		return s.replaceAll(pattern, replacement);
 	}
 
-	String String::replaceAll(const sl_char8* pattern, const sl_char8* replacement) const
+	String String::replaceAll(const sl_char8* pattern, const sl_char8* replacement) const noexcept
 	{
 		return _priv_String_replaceAll<String, sl_char8>(*this, pattern, Base::getStringLength(pattern), replacement, Base::getStringLength(replacement));
 	}
 
-	String16 String16::replaceAll(const sl_char16* pattern, const sl_char16* replacement) const
+	String16 String16::replaceAll(const sl_char16* pattern, const sl_char16* replacement) const noexcept
 	{
 		return _priv_String_replaceAll<String16, sl_char16>(*this, pattern, Base::getStringLength2(pattern), replacement, Base::getStringLength2(replacement));
 	}
 
-	String Atomic<String>::replaceAll(const sl_char8* pattern, const sl_char8* replacement) const
+	String Atomic<String>::replaceAll(const sl_char8* pattern, const sl_char8* replacement) const noexcept
 	{
 		String s(*this);
 		return s.replaceAll(pattern, replacement);
 	}
 
-	String16 Atomic<String16>::replaceAll(const sl_char16* pattern, const sl_char16* replacement) const
+	String16 Atomic<String16>::replaceAll(const sl_char16* pattern, const sl_char16* replacement) const noexcept
 	{
 		String16 s(*this);
 		return s.replaceAll(pattern, replacement);
 	}
 
 	template <class ST, class CT>
-	SLIB_INLINE ST _priv_String_trim(const ST& str)
+	SLIB_INLINE static ST _priv_String_trim(const ST& str) noexcept
 	{
 		const CT* sz = str.getData();
 		sl_size n = str.getLength();
@@ -5793,23 +5793,23 @@ namespace slib
 		return str.substring(i, j + 1);
 	}
 
-	String String::trim() const
+	String String::trim() const noexcept
 	{
 		return _priv_String_trim<String, sl_char8>(*this);
 	}
 
-	String16 String16::trim() const
+	String16 String16::trim() const noexcept
 	{
 		return _priv_String_trim<String16, sl_char16>(*this);
 	}
 
-	String Atomic<String>::trim() const
+	String Atomic<String>::trim() const noexcept
 	{
 		String s(*this);
 		return s.trim();
 	}
 
-	String16 Atomic<String16>::trim() const
+	String16 Atomic<String16>::trim() const noexcept
 	{
 		String16 s(*this);
 		return s.trim();
@@ -5817,7 +5817,7 @@ namespace slib
 
 
 	template <class ST, class CT>
-	SLIB_INLINE ST _priv_String_trimLeft(const ST& str)
+	SLIB_INLINE static ST _priv_String_trimLeft(const ST& str) noexcept
 	{
 		const CT* sz = str.getData();
 		sl_size n = str.getLength();
@@ -5834,23 +5834,23 @@ namespace slib
 		return str.substring(i);
 	}
 
-	String String::trimLeft() const
+	String String::trimLeft() const noexcept
 	{
 		return _priv_String_trimLeft<String, sl_char8>(*this);
 	}
 
-	String16 String16::trimLeft() const
+	String16 String16::trimLeft() const noexcept
 	{
 		return _priv_String_trimLeft<String16, sl_char16>(*this);
 	}
 
-	String Atomic<String>::trimLeft() const
+	String Atomic<String>::trimLeft() const noexcept
 	{
 		String s(*this);
 		return s.trimLeft();
 	}
 
-	String16 Atomic<String16>::trimLeft() const
+	String16 Atomic<String16>::trimLeft() const noexcept
 	{
 		String16 s(*this);
 		return s.trimLeft();
@@ -5858,7 +5858,7 @@ namespace slib
 
 
 	template <class ST, class CT>
-	SLIB_INLINE ST _priv_String_trimRight(const ST& str)
+	SLIB_INLINE static ST _priv_String_trimRight(const ST& str) noexcept
 	{
 		const CT* sz = str.getData();
 		sl_size n = str.getLength();
@@ -5875,23 +5875,23 @@ namespace slib
 		return str.substring(0, j);
 	}
 
-	String String::trimRight() const
+	String String::trimRight() const noexcept
 	{
 		return _priv_String_trimRight<String, sl_char8>(*this);
 	}
 
-	String16 String16::trimRight() const
+	String16 String16::trimRight() const noexcept
 	{
 		return _priv_String_trimRight<String16, sl_char16>(*this);
 	}
 
-	String Atomic<String>::trimRight() const
+	String Atomic<String>::trimRight() const noexcept
 	{
 		String s(*this);
 		return s.trimRight();
 	}
 
-	String16 Atomic<String16>::trimRight() const
+	String16 Atomic<String16>::trimRight() const noexcept
 	{
 		String16 s(*this);
 		return s.trimRight();
@@ -5899,7 +5899,7 @@ namespace slib
 
 
 	template <class ST, class CT, class TT>
-	List<ST> _priv_String_split(const ST& str, const CT* pattern, sl_size countPattern)
+	List<ST> _priv_String_split(const ST& str, const CT* pattern, sl_size countPattern) noexcept
 	{
 		if (countPattern == 0) {
 			return sl_null;
@@ -5920,45 +5920,45 @@ namespace slib
 		return ret;
 	}
 
-	List<String> String::split(const String& pattern) const
+	List<String> String::split(const String& pattern) const noexcept
 	{
 		return _priv_String_split<String, sl_char8, _priv_TemplateFunc8>(*this, pattern.getData(), pattern.getLength());
 	}
 
-	List<String16> String16::split(const String16& pattern) const
+	List<String16> String16::split(const String16& pattern) const noexcept
 	{
 		return _priv_String_split<String16, sl_char16, _priv_TemplateFunc16>(*this, pattern.getData(), pattern.getLength());
 	}
 
-	List<String> Atomic<String>::split(const String& pattern) const
+	List<String> Atomic<String>::split(const String& pattern) const noexcept
 	{
 		String s(*this);
 		return s.split(pattern);
 	}
 
-	List<String16> Atomic<String16>::split(const String16& pattern) const
+	List<String16> Atomic<String16>::split(const String16& pattern) const noexcept
 	{
 		String16 s(*this);
 		return s.split(pattern);
 	}
 
-	List<String> String::split(const sl_char8* pattern) const
+	List<String> String::split(const sl_char8* pattern) const noexcept
 	{
 		return _priv_String_split<String, sl_char8, _priv_TemplateFunc8>(*this, pattern, Base::getStringLength(pattern));
 	}
 
-	List<String16> String16::split(const sl_char16* pattern) const
+	List<String16> String16::split(const sl_char16* pattern) const noexcept
 	{
 		return _priv_String_split<String16, sl_char16, _priv_TemplateFunc16>(*this, pattern, Base::getStringLength2(pattern));
 	}
 
-	List<String> Atomic<String>::split(const sl_char8* pattern) const
+	List<String> Atomic<String>::split(const sl_char8* pattern) const noexcept
 	{
 		String s(*this);
 		return s.split(pattern);
 	}
 
-	List<String16> Atomic<String16>::split(const sl_char16* pattern) const
+	List<String16> Atomic<String16>::split(const sl_char16* pattern) const noexcept
 	{
 		String16 s(*this);
 		return s.split(pattern);
@@ -6017,7 +6017,7 @@ namespace slib
 	const sl_uint8* _priv_StringConv_radixInversePatternSmall = _string_conv_radix_inverse_pattern_small;
 
 	template <class IT, class CT>
-	SLIB_INLINE sl_reg _priv_String_parseInt(sl_int32 radix, const CT* sz, sl_size i, sl_size n, IT* _out)
+	SLIB_INLINE static sl_reg _priv_String_parseInt(sl_int32 radix, const CT* sz, sl_size i, sl_size n, IT* _out) noexcept
 	{
 		if (i >= n) {
 			return SLIB_PARSE_ERROR;
@@ -6061,7 +6061,7 @@ namespace slib
 	}
 
 	template <class IT, class CT>
-	SLIB_INLINE sl_reg _priv_String_parseUint(sl_int32 radix, const CT* sz, sl_size i, sl_size n, IT* _out)
+	SLIB_INLINE static sl_reg _priv_String_parseUint(sl_int32 radix, const CT* sz, sl_size i, sl_size n, IT* _out) noexcept
 	{
 		if (i >= n) {
 			return SLIB_PARSE_ERROR;
@@ -6089,17 +6089,17 @@ namespace slib
 		return i;
 	}
 
-	sl_reg String::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char8* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char8* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseInt(radix, sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String16::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseInt(radix, sz, posBegin, posEnd, _out);
 	}
 
-	sl_bool String::parseInt32(sl_int32 radix, sl_int32* _out) const
+	sl_bool String::parseInt32(sl_int32 radix, sl_int32* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6108,7 +6108,7 @@ namespace slib
 		return _priv_String_parseInt(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool String16::parseInt32(sl_int32 radix, sl_int32* _out) const
+	sl_bool String16::parseInt32(sl_int32 radix, sl_int32* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6117,56 +6117,56 @@ namespace slib
 		return _priv_String_parseInt(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool Atomic<String>::parseInt32(sl_int32 radix, sl_int32* _out) const
+	sl_bool Atomic<String>::parseInt32(sl_int32 radix, sl_int32* _out) const noexcept
 	{
 		String s(*this);
 		return s.parseInt32(radix, _out);
 	}
 
-	sl_bool Atomic<String16>::parseInt32(sl_int32 radix, sl_int32* _out) const
+	sl_bool Atomic<String16>::parseInt32(sl_int32 radix, sl_int32* _out) const noexcept
 	{
 		String16 s(*this);
 		return s.parseInt32(radix, _out);
 	}
 
-	sl_int32 String::parseInt32(sl_int32 radix, sl_int32 def) const
+	sl_int32 String::parseInt32(sl_int32 radix, sl_int32 def) const noexcept
 	{
 		sl_int32 _out = def;
 		parseInt32(radix, &_out);
 		return _out;
 	}
 
-	sl_int32 String16::parseInt32(sl_int32 radix, sl_int32 def) const
+	sl_int32 String16::parseInt32(sl_int32 radix, sl_int32 def) const noexcept
 	{
 		sl_int32 _out = def;
 		parseInt32(radix, &_out);
 		return _out;
 	}
 
-	sl_int32 Atomic<String>::parseInt32(sl_int32 radix, sl_int32 def) const
+	sl_int32 Atomic<String>::parseInt32(sl_int32 radix, sl_int32 def) const noexcept
 	{
 		String s(*this);
 		return s.parseInt32(radix, def);
 	}
 
-	sl_int32 Atomic<String16>::parseInt32(sl_int32 radix, sl_int32 def) const
+	sl_int32 Atomic<String16>::parseInt32(sl_int32 radix, sl_int32 def) const noexcept
 	{
 		String16 s(*this);
 		return s.parseInt32(radix, def);
 	}
 
 
-	sl_reg String::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char8* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char8* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseUint(radix, sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String16::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseUint(radix, sz, posBegin, posEnd, _out);
 	}
 
-	sl_bool String::parseUint32(sl_int32 radix, sl_uint32* _out) const
+	sl_bool String::parseUint32(sl_int32 radix, sl_uint32* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6175,7 +6175,7 @@ namespace slib
 		return _priv_String_parseUint(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool String16::parseUint32(sl_int32 radix, sl_uint32* _out) const
+	sl_bool String16::parseUint32(sl_int32 radix, sl_uint32* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6184,56 +6184,56 @@ namespace slib
 		return _priv_String_parseUint(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool Atomic<String>::parseUint32(sl_int32 radix, sl_uint32* _out) const
+	sl_bool Atomic<String>::parseUint32(sl_int32 radix, sl_uint32* _out) const noexcept
 	{
 		String s(*this);
 		return s.parseUint32(radix, _out);
 	}
 
-	sl_bool Atomic<String16>::parseUint32(sl_int32 radix, sl_uint32* _out) const
+	sl_bool Atomic<String16>::parseUint32(sl_int32 radix, sl_uint32* _out) const noexcept
 	{
 		String16 s(*this);
 		return s.parseUint32(radix, _out);
 	}
 
-	sl_uint32 String::parseUint32(sl_int32 radix, sl_uint32 def) const
+	sl_uint32 String::parseUint32(sl_int32 radix, sl_uint32 def) const noexcept
 	{
 		sl_uint32 _out = def;
 		parseUint32(radix, &_out);
 		return _out;
 	}
 
-	sl_uint32 String16::parseUint32(sl_int32 radix, sl_uint32 def) const
+	sl_uint32 String16::parseUint32(sl_int32 radix, sl_uint32 def) const noexcept
 	{
 		sl_uint32 _out = def;
 		parseUint32(radix, &_out);
 		return _out;
 	}
 
-	sl_uint32 Atomic<String>::parseUint32(sl_int32 radix, sl_uint32 def) const
+	sl_uint32 Atomic<String>::parseUint32(sl_int32 radix, sl_uint32 def) const noexcept
 	{
 		String s(*this);
 		return s.parseUint32(radix, def);
 	}
 
-	sl_uint32 Atomic<String16>::parseUint32(sl_int32 radix, sl_uint32 def) const
+	sl_uint32 Atomic<String16>::parseUint32(sl_int32 radix, sl_uint32 def) const noexcept
 	{
 		String16 s(*this);
 		return s.parseUint32(radix, def);
 	}
 
 
-	sl_reg String::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char8* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char8* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseInt(radix, sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String16::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseInt(radix, sz, posBegin, posEnd, _out);
 	}
 
-	sl_bool String::parseInt64(sl_int32 radix, sl_int64* _out) const
+	sl_bool String::parseInt64(sl_int32 radix, sl_int64* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6242,7 +6242,7 @@ namespace slib
 		return _priv_String_parseInt(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool String16::parseInt64(sl_int32 radix, sl_int64* _out) const
+	sl_bool String16::parseInt64(sl_int32 radix, sl_int64* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6251,56 +6251,56 @@ namespace slib
 		return _priv_String_parseInt(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool Atomic<String>::parseInt64(sl_int32 radix, sl_int64* _out) const
+	sl_bool Atomic<String>::parseInt64(sl_int32 radix, sl_int64* _out) const noexcept
 	{
 		String s(*this);
 		return s.parseInt64(radix, _out);
 	}
 
-	sl_bool Atomic<String16>::parseInt64(sl_int32 radix, sl_int64* _out) const
+	sl_bool Atomic<String16>::parseInt64(sl_int32 radix, sl_int64* _out) const noexcept
 	{
 		String16 s(*this);
 		return s.parseInt64(radix, _out);
 	}
 
-	sl_int64 String::parseInt64(sl_int32 radix, sl_int64 def) const
+	sl_int64 String::parseInt64(sl_int32 radix, sl_int64 def) const noexcept
 	{
 		sl_int64 _out = def;
 		parseInt64(radix, &_out);
 		return _out;
 	}
 
-	sl_int64 String16::parseInt64(sl_int32 radix, sl_int64 def) const
+	sl_int64 String16::parseInt64(sl_int32 radix, sl_int64 def) const noexcept
 	{
 		sl_int64 _out = def;
 		parseInt64(radix, &_out);
 		return _out;
 	}
 
-	sl_int64 Atomic<String>::parseInt64(sl_int32 radix, sl_int64 def) const
+	sl_int64 Atomic<String>::parseInt64(sl_int32 radix, sl_int64 def) const noexcept
 	{
 		String s(*this);
 		return s.parseInt64(radix, def);
 	}
 
-	sl_int64 Atomic<String16>::parseInt64(sl_int32 radix, sl_int64 def) const
+	sl_int64 Atomic<String16>::parseInt64(sl_int32 radix, sl_int64 def) const noexcept
 	{
 		String16 s(*this);
 		return s.parseInt64(radix, def);
 	}
 
 
-	sl_reg String::parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String::parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseUint(radix, sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String16::parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseUint(radix, sz, posBegin, posEnd, _out);
 	}
 
-	sl_bool String::parseUint64(sl_int32 radix, sl_uint64* _out) const
+	sl_bool String::parseUint64(sl_int32 radix, sl_uint64* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6309,7 +6309,7 @@ namespace slib
 		return _priv_String_parseUint(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool String16::parseUint64(sl_int32 radix, sl_uint64* _out) const
+	sl_bool String16::parseUint64(sl_int32 radix, sl_uint64* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6318,46 +6318,46 @@ namespace slib
 		return _priv_String_parseUint(radix, getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool Atomic<String>::parseUint64(sl_int32 radix, sl_uint64* _out) const
+	sl_bool Atomic<String>::parseUint64(sl_int32 radix, sl_uint64* _out) const noexcept
 	{
 		String s(*this);
 		return s.parseUint64(radix, _out);
 	}
 
-	sl_bool Atomic<String16>::parseUint64(sl_int32 radix, sl_uint64* _out) const
+	sl_bool Atomic<String16>::parseUint64(sl_int32 radix, sl_uint64* _out) const noexcept
 	{
 		String16 s(*this);
 		return s.parseUint64(radix, _out);
 	}
 
-	sl_uint64 String::parseUint64(sl_int32 radix, sl_uint64 def) const
+	sl_uint64 String::parseUint64(sl_int32 radix, sl_uint64 def) const noexcept
 	{
 		sl_uint64 _out = def;
 		parseUint64(radix, &_out);
 		return _out;
 	}
 
-	sl_uint64 String16::parseUint64(sl_int32 radix, sl_uint64 def) const
+	sl_uint64 String16::parseUint64(sl_int32 radix, sl_uint64 def) const noexcept
 	{
 		sl_uint64 _out = def;
 		parseUint64(radix, &_out);
 		return _out;
 	}
 
-	sl_uint64 Atomic<String>::parseUint64(sl_int32 radix, sl_uint64 def) const
+	sl_uint64 Atomic<String>::parseUint64(sl_int32 radix, sl_uint64 def) const noexcept
 	{
 		String s(*this);
 		return s.parseUint64(radix, def);
 	}
 
-	sl_uint64 Atomic<String16>::parseUint64(sl_int32 radix, sl_uint64 def) const
+	sl_uint64 Atomic<String16>::parseUint64(sl_int32 radix, sl_uint64 def) const noexcept
 	{
 		String16 s(*this);
 		return s.parseUint64(radix, def);
 	}
 
 
-	sl_bool String::parseInt(sl_int32 radix, sl_reg* _out) const
+	sl_bool String::parseInt(sl_int32 radix, sl_reg* _out) const noexcept
 	{
 #ifdef SLIB_ARCH_IS_64BIT
 		return parseInt64(radix, _out);
@@ -6366,7 +6366,7 @@ namespace slib
 #endif
 	}
 
-	sl_bool String16::parseInt(sl_int32 radix, sl_reg* _out) const
+	sl_bool String16::parseInt(sl_int32 radix, sl_reg* _out) const noexcept
 	{
 #ifdef SLIB_ARCH_IS_64BIT
 		return parseInt64(radix, _out);
@@ -6375,46 +6375,46 @@ namespace slib
 #endif
 	}
 
-	sl_bool Atomic<String>::parseInt(sl_int32 radix, sl_reg* _out) const
+	sl_bool Atomic<String>::parseInt(sl_int32 radix, sl_reg* _out) const noexcept
 	{
 		String s(*this);
 		return s.parseInt(radix, _out);
 	}
 
-	sl_bool Atomic<String16>::parseInt(sl_int32 radix, sl_reg* _out) const
+	sl_bool Atomic<String16>::parseInt(sl_int32 radix, sl_reg* _out) const noexcept
 	{
 		String16 s(*this);
 		return s.parseInt(radix, _out);
 	}
 
-	sl_reg String::parseInt(sl_int32 radix, sl_reg def) const
+	sl_reg String::parseInt(sl_int32 radix, sl_reg def) const noexcept
 	{
 		sl_reg _out = def;
 		parseInt(radix, &_out);
 		return _out;
 	}
 
-	sl_reg String16::parseInt(sl_int32 radix, sl_reg def) const
+	sl_reg String16::parseInt(sl_int32 radix, sl_reg def) const noexcept
 	{
 		sl_reg _out = def;
 		parseInt(radix, &_out);
 		return _out;
 	}
 
-	sl_reg Atomic<String>::parseInt(sl_int32 radix, sl_reg def) const
+	sl_reg Atomic<String>::parseInt(sl_int32 radix, sl_reg def) const noexcept
 	{
 		String s(*this);
 		return s.parseInt(radix, def);
 	}
 
-	sl_reg Atomic<String16>::parseInt(sl_int32 radix, sl_reg def) const
+	sl_reg Atomic<String16>::parseInt(sl_int32 radix, sl_reg def) const noexcept
 	{
 		String16 s(*this);
 		return s.parseInt(radix, def);
 	}
 
 
-	sl_bool String::parseSize(sl_int32 radix, sl_size* _out) const
+	sl_bool String::parseSize(sl_int32 radix, sl_size* _out) const noexcept
 	{
 #ifdef SLIB_ARCH_IS_64BIT
 		return parseUint64(radix, _out);
@@ -6423,7 +6423,7 @@ namespace slib
 #endif
 	}
 
-	sl_bool String16::parseSize(sl_int32 radix, sl_size* _out) const
+	sl_bool String16::parseSize(sl_int32 radix, sl_size* _out) const noexcept
 	{
 #ifdef SLIB_ARCH_IS_64BIT
 		return parseUint64(radix, _out);
@@ -6432,39 +6432,39 @@ namespace slib
 #endif
 	}
 
-	sl_bool Atomic<String>::parseSize(sl_int32 radix, sl_size* _out) const
+	sl_bool Atomic<String>::parseSize(sl_int32 radix, sl_size* _out) const noexcept
 	{
 		String s(*this);
 		return s.parseSize(radix, _out);
 	}
 
-	sl_bool Atomic<String16>::parseSize(sl_int32 radix, sl_size* _out) const
+	sl_bool Atomic<String16>::parseSize(sl_int32 radix, sl_size* _out) const noexcept
 	{
 		String16 s(*this);
 		return s.parseSize(radix, _out);
 	}
 
-	sl_size String::parseSize(sl_int32 radix, sl_size def) const
+	sl_size String::parseSize(sl_int32 radix, sl_size def) const noexcept
 	{
 		sl_size _out = def;
 		parseSize(radix, &_out);
 		return _out;
 	}
 
-	sl_size String16::parseSize(sl_int32 radix, sl_size def) const
+	sl_size String16::parseSize(sl_int32 radix, sl_size def) const noexcept
 	{
 		sl_size _out = def;
 		parseSize(radix, &_out);
 		return _out;
 	}
 
-	sl_size Atomic<String>::parseSize(sl_int32 radix, sl_size def) const
+	sl_size Atomic<String>::parseSize(sl_int32 radix, sl_size def) const noexcept
 	{
 		String s(*this);
 		return s.parseSize(radix, def);
 	}
 
-	sl_size Atomic<String16>::parseSize(sl_int32 radix, sl_size def) const
+	sl_size Atomic<String16>::parseSize(sl_int32 radix, sl_size def) const noexcept
 	{
 		String16 s(*this);
 		return s.parseSize(radix, def);
@@ -6472,7 +6472,7 @@ namespace slib
 
 
 	template <class FT, class CT>
-	SLIB_INLINE sl_reg _priv_String_parseFloat(const CT* sz, sl_size i, sl_size n, FT* _out)
+	SLIB_INLINE static sl_reg _priv_String_parseFloat(const CT* sz, sl_size i, sl_size n, FT* _out) noexcept
 	{
 		if (i >= n) {
 			return SLIB_PARSE_ERROR; // input string is empty
@@ -6579,17 +6579,17 @@ namespace slib
 		return i;
 	}
 
-	sl_reg String::parseFloat(float* _out, const char* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String::parseFloat(float* _out, const char* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseFloat(sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseFloat(float* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String16::parseFloat(float* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseFloat(sz, posBegin, posEnd, _out);
 	}
 
-	sl_bool String::parseFloat(float* _out) const
+	sl_bool String::parseFloat(float* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6598,7 +6598,7 @@ namespace slib
 		return _priv_String_parseFloat(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool String16::parseFloat(float* _out) const
+	sl_bool String16::parseFloat(float* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6607,56 +6607,56 @@ namespace slib
 		return _priv_String_parseFloat(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool Atomic<String>::parseFloat(float* _out) const
+	sl_bool Atomic<String>::parseFloat(float* _out) const noexcept
 	{
 		String s(*this);
 		return s.parseFloat(_out);
 	}
 
-	sl_bool Atomic<String16>::parseFloat(float* _out) const
+	sl_bool Atomic<String16>::parseFloat(float* _out) const noexcept
 	{
 		String16 s(*this);
 		return s.parseFloat(_out);
 	}
 
-	float String::parseFloat(float def) const
+	float String::parseFloat(float def) const noexcept
 	{
 		float _out = def;
 		parseFloat(&_out);
 		return _out;
 	}
 
-	float String16::parseFloat(float def) const
+	float String16::parseFloat(float def) const noexcept
 	{
 		float _out = def;
 		parseFloat(&_out);
 		return _out;
 	}
 
-	float Atomic<String>::parseFloat(float def) const
+	float Atomic<String>::parseFloat(float def) const noexcept
 	{
 		String s(*this);
 		return s.parseFloat(def);
 	}
 
-	float Atomic<String16>::parseFloat(float def) const
+	float Atomic<String16>::parseFloat(float def) const noexcept
 	{
 		String16 s(*this);
 		return s.parseFloat(def);
 	}
 
 
-	sl_reg String::parseDouble(double* _out, const char* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String::parseDouble(double* _out, const char* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseFloat(sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseDouble(double* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String16::parseDouble(double* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseFloat(sz, posBegin, posEnd, _out);
 	}
 
-	sl_bool String::parseDouble(double* _out) const
+	sl_bool String::parseDouble(double* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6665,7 +6665,7 @@ namespace slib
 		return _priv_String_parseFloat(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool String16::parseDouble(double* _out) const
+	sl_bool String16::parseDouble(double* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6674,46 +6674,46 @@ namespace slib
 		return _priv_String_parseFloat(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool Atomic<String>::parseDouble(double* _out) const
+	sl_bool Atomic<String>::parseDouble(double* _out) const noexcept
 	{
 		String s(*this);
 		return s.parseDouble(_out);
 	}
 
-	sl_bool Atomic<String16>::parseDouble(double* _out) const
+	sl_bool Atomic<String16>::parseDouble(double* _out) const noexcept
 	{
 		String16 s(*this);
 		return s.parseDouble(_out);
 	}
 
-	double String::parseDouble(double def) const
+	double String::parseDouble(double def) const noexcept
 	{
 		double _out = def;
 		parseDouble(&_out);
 		return _out;
 	}
 
-	double String16::parseDouble(double def) const
+	double String16::parseDouble(double def) const noexcept
 	{
 		double _out = def;
 		parseDouble(&_out);
 		return _out;
 	}
 
-	double Atomic<String>::parseDouble(double def) const
+	double Atomic<String>::parseDouble(double def) const noexcept
 	{
 		String s(*this);
 		return s.parseDouble(def);
 	}
 
-	double Atomic<String16>::parseDouble(double def) const
+	double Atomic<String16>::parseDouble(double def) const noexcept
 	{
 		String16 s(*this);
 		return s.parseDouble(def);
 	}
 
 	template <class CT>
-	SLIB_INLINE sl_reg _priv_String_parseBoolean(const CT* sz, sl_size i, sl_size n, sl_bool* _out)
+	SLIB_INLINE static sl_reg _priv_String_parseBoolean(const CT* sz, sl_size i, sl_size n, sl_bool* _out) noexcept
 	{
 		if (i >= n) {
 			return SLIB_PARSE_ERROR;
@@ -6798,17 +6798,17 @@ namespace slib
 		return i;
 	}
 
-	sl_reg String::parseBoolean(sl_bool* _out, const char* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String::parseBoolean(sl_bool* _out, const char* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseBoolean(sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseBoolean(sl_bool* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String16::parseBoolean(sl_bool* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseBoolean(sz, posBegin, posEnd, _out);
 	}
 
-	sl_bool String::parseBoolean(sl_bool* _out) const
+	sl_bool String::parseBoolean(sl_bool* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6817,7 +6817,7 @@ namespace slib
 		return _priv_String_parseBoolean(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool String16::parseBoolean(sl_bool* _out) const
+	sl_bool String16::parseBoolean(sl_bool* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6826,39 +6826,39 @@ namespace slib
 		return _priv_String_parseBoolean(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool Atomic<String>::parseBoolean(sl_bool* _out) const
+	sl_bool Atomic<String>::parseBoolean(sl_bool* _out) const noexcept
 	{
 		String s(*this);
 		return s.parseBoolean(_out);
 	}
 
-	sl_bool Atomic<String16>::parseBoolean(sl_bool* _out) const
+	sl_bool Atomic<String16>::parseBoolean(sl_bool* _out) const noexcept
 	{
 		String16 s(*this);
 		return s.parseBoolean(_out);
 	}
 
-	sl_bool String::parseBoolean(sl_bool def) const
+	sl_bool String::parseBoolean(sl_bool def) const noexcept
 	{
 		sl_bool _out = def;
 		parseBoolean(&_out);
 		return _out;
 	}
 
-	sl_bool String16::parseBoolean(sl_bool def) const
+	sl_bool String16::parseBoolean(sl_bool def) const noexcept
 	{
 		sl_bool _out = def;
 		parseBoolean(&_out);
 		return _out;
 	}
 
-	sl_bool Atomic<String>::parseBoolean(sl_bool def) const
+	sl_bool Atomic<String>::parseBoolean(sl_bool def) const noexcept
 	{
 		String s(*this);
 		return s.parseBoolean(def);
 	}
 
-	sl_bool Atomic<String16>::parseBoolean(sl_bool def) const
+	sl_bool Atomic<String16>::parseBoolean(sl_bool def) const noexcept
 	{
 		String16 s(*this);
 		return s.parseBoolean(def);
@@ -6866,7 +6866,7 @@ namespace slib
 
 
 	template <class CT>
-	SLIB_INLINE sl_reg _priv_String_parseHexString(const CT* sz, sl_size i, sl_size n, void* _out)
+	SLIB_INLINE static sl_reg _priv_String_parseHexString(const CT* sz, sl_size i, sl_size n, void* _out) noexcept
 	{
 		if (i >= n) {
 			return SLIB_PARSE_ERROR;
@@ -6904,17 +6904,17 @@ namespace slib
 		return i;
 	}
 
-	sl_reg String::parseHexString(void* _out, const char* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String::parseHexString(void* _out, const char* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseHexString(sz, posBegin, posEnd, _out);
 	}
 
-	sl_reg String16::parseHexString(void* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd)
+	sl_reg String16::parseHexString(void* _out, const sl_char16* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		return _priv_String_parseHexString(sz, posBegin, posEnd, _out);
 	}
 
-	sl_bool String::parseHexString(void* _out) const
+	sl_bool String::parseHexString(void* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6923,7 +6923,7 @@ namespace slib
 		return _priv_String_parseHexString(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool String16::parseHexString(void* _out) const
+	sl_bool String16::parseHexString(void* _out) const noexcept
 	{
 		sl_size n = getLength();
 		if (n == 0) {
@@ -6932,13 +6932,13 @@ namespace slib
 		return _priv_String_parseHexString(getData(), 0, n, _out) == (sl_reg)n;
 	}
 
-	sl_bool Atomic<String>::parseHexString(void* _out) const
+	sl_bool Atomic<String>::parseHexString(void* _out) const noexcept
 	{
 		String s(*this);
 		return s.parseHexString(_out);
 	}
 
-	sl_bool Atomic<String16>::parseHexString(void* _out) const
+	sl_bool Atomic<String16>::parseHexString(void* _out) const noexcept
 	{
 		String16 s(*this);
 		return s.parseHexString(_out);
@@ -6947,7 +6947,7 @@ namespace slib
 
 
 	template <class IT, class UT, class ST, class CT>
-	SLIB_INLINE ST _priv_String_fromInt(IT _value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase, CT chGroup = sl_false, sl_bool flagSignPositive = sl_false, sl_bool flagLeadingSpacePositive = sl_false, sl_bool flagEncloseNagtive = sl_false)
+	SLIB_INLINE static ST _priv_String_fromInt(IT _value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase, CT chGroup = sl_false, sl_bool flagSignPositive = sl_false, sl_bool flagLeadingSpacePositive = sl_false, sl_bool flagEncloseNagtive = sl_false) noexcept
 	{
 		if (radix < 2 || radix > 64) {
 			return sl_null;
@@ -7032,7 +7032,7 @@ namespace slib
 	}
 
 	template <class IT, class ST, class CT>
-	SLIB_INLINE ST _priv_String_fromUint(IT value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase, CT chGroup = 0, sl_bool flagSignPositive = sl_false, sl_bool flagLeadingSpacePositive = sl_false)
+	SLIB_INLINE static ST _priv_String_fromUint(IT value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase, CT chGroup = 0, sl_bool flagSignPositive = sl_false, sl_bool flagLeadingSpacePositive = sl_false) noexcept
 	{
 		if (radix < 2 || radix > 64) {
 			return sl_null;
@@ -7091,47 +7091,47 @@ namespace slib
 		return ST(buf + pos, MAX_NUMBER_STR_LEN - pos);
 	}
 
-	String String::fromInt32(sl_int32 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
+	String String::fromInt32(sl_int32 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase) noexcept
 	{
 		return _priv_String_fromInt<sl_int32, sl_uint32, String, sl_char8>(value, radix, minWidth, flagUpperCase);
 	}
 
-	String16 String16::fromInt32(sl_int32 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
+	String16 String16::fromInt32(sl_int32 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase) noexcept
 	{
 		return _priv_String_fromInt<sl_int32, sl_uint32, String16, sl_char16>(value, radix, minWidth, flagUpperCase);
 	}
 
-	String String::fromUint32(sl_uint32 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
+	String String::fromUint32(sl_uint32 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase) noexcept
 	{
 		return _priv_String_fromUint<sl_uint32, String, sl_char8>(value, radix, minWidth, flagUpperCase);
 	}
 
-	String16 String16::fromUint32(sl_uint32 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
+	String16 String16::fromUint32(sl_uint32 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase) noexcept
 	{
 		return _priv_String_fromUint<sl_uint32, String16, sl_char16>(value, radix, minWidth, flagUpperCase);
 	}
 
-	String String::fromInt64(sl_int64 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
+	String String::fromInt64(sl_int64 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase) noexcept
 	{
 		return _priv_String_fromInt<sl_int64, sl_uint64, String, sl_char8>(value, radix, minWidth, flagUpperCase);
 	}
 
-	String16 String16::fromInt64(sl_int64 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
+	String16 String16::fromInt64(sl_int64 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase) noexcept
 	{
 		return _priv_String_fromInt<sl_int64, sl_uint64, String16, sl_char16>(value, radix, minWidth, flagUpperCase);
 	}
 
-	String String::fromUint64(sl_uint64 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
+	String String::fromUint64(sl_uint64 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase) noexcept
 	{
 		return _priv_String_fromUint<sl_uint64, String, sl_char8>(value, radix, minWidth, flagUpperCase);
 	}
 
-	String16 String16::fromUint64(sl_uint64 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
+	String16 String16::fromUint64(sl_uint64 value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase) noexcept
 	{
 		return _priv_String_fromUint<sl_uint64, String16, sl_char16>(value, radix, minWidth, flagUpperCase);
 	}
 
-	String String::fromInt(sl_reg value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
+	String String::fromInt(sl_reg value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase) noexcept
 	{
 #ifdef SLIB_ARCH_IS_64BIT
 		return fromInt64(value, radix, minWidth, flagUpperCase);
@@ -7140,7 +7140,7 @@ namespace slib
 #endif
 	}
 
-	String16 String16::fromInt(sl_reg value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
+	String16 String16::fromInt(sl_reg value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase) noexcept
 	{
 #ifdef SLIB_ARCH_IS_64BIT
 		return fromInt64(value, radix, minWidth, flagUpperCase);
@@ -7149,7 +7149,7 @@ namespace slib
 #endif
 	}
 
-	String String::fromSize(sl_size value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
+	String String::fromSize(sl_size value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase) noexcept
 	{
 #ifdef SLIB_ARCH_IS_64BIT
 		return fromUint64(value, radix, minWidth, flagUpperCase);
@@ -7158,7 +7158,7 @@ namespace slib
 #endif
 	}
 
-	String16 String16::fromSize(sl_size value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase)
+	String16 String16::fromSize(sl_size value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase) noexcept
 	{
 #ifdef SLIB_ARCH_IS_64BIT
 		return fromUint64(value, radix, minWidth, flagUpperCase);
@@ -7168,7 +7168,7 @@ namespace slib
 	}
 
 	template <class FT, class ST, class CT>
-	SLIB_INLINE ST _priv_String_fromFloat(FT value, sl_int32 precision, sl_bool flagZeroPadding, sl_int32 minWidthIntegral, CT chConv = 'g', CT chGroup = 0, sl_bool flagSignPositive = sl_false, sl_bool flagLeadingSpacePositive = sl_false, sl_bool flagEncloseNagtive = sl_false)
+	SLIB_INLINE static ST _priv_String_fromFloat(FT value, sl_int32 precision, sl_bool flagZeroPadding, sl_int32 minWidthIntegral, CT chConv = 'g', CT chGroup = 0, sl_bool flagSignPositive = sl_false, sl_bool flagLeadingSpacePositive = sl_false, sl_bool flagEncloseNagtive = sl_false) noexcept
 	{
 		
 		CT buf[MAX_NUMBER_STR_LEN];
@@ -7362,25 +7362,27 @@ namespace slib
 		return ST(buf, str - buf);
 	}
 
-	String String::fromDouble(double value, sl_int32 precision, sl_bool flagZeroPadding, sl_uint32 minWidthIntegral) {
+	String String::fromDouble(double value, sl_int32 precision, sl_bool flagZeroPadding, sl_uint32 minWidthIntegral) noexcept
+	{
 		return _priv_String_fromFloat<double, String, sl_char8>(value, precision, flagZeroPadding, minWidthIntegral);
 	}
 
-	String String::fromFloat(float value, sl_int32 precision, sl_bool flagZeroPadding, sl_uint32 minWidthIntegral)
+	String String::fromFloat(float value, sl_int32 precision, sl_bool flagZeroPadding, sl_uint32 minWidthIntegral) noexcept
 	{
 		return _priv_String_fromFloat<float, String, sl_char8>(value, precision, flagZeroPadding, minWidthIntegral);
 	}
 
-	String16 String16::fromDouble(double value, sl_int32 precision, sl_bool flagZeroPadding, sl_uint32 minWidthIntegral) {
+	String16 String16::fromDouble(double value, sl_int32 precision, sl_bool flagZeroPadding, sl_uint32 minWidthIntegral) noexcept
+	{
 		return _priv_String_fromFloat<double, String16, sl_char16>(value, precision, flagZeroPadding, minWidthIntegral);
 	}
 
-	String16 String16::fromFloat(float value, sl_int32 precision, sl_bool flagZeroPadding, sl_uint32 minWidthIntegral)
+	String16 String16::fromFloat(float value, sl_int32 precision, sl_bool flagZeroPadding, sl_uint32 minWidthIntegral) noexcept
 	{
 		return _priv_String_fromFloat<float, String16, sl_char16>(value, precision, flagZeroPadding, minWidthIntegral);
 	}
 
-	String String::fromPointerValue(const void* pointer)
+	String String::fromPointerValue(const void* pointer) noexcept
 	{
 #ifdef SLIB_ARCH_IS_64BIT
 		return fromUint64((sl_uint64)(pointer), 16, 16, sl_true);
@@ -7389,7 +7391,7 @@ namespace slib
 #endif
 	}
 
-	String16 String16::fromPointerValue(const void* pointer)
+	String16 String16::fromPointerValue(const void* pointer) noexcept
 	{
 #ifdef SLIB_ARCH_IS_64BIT
 		return fromUint64((sl_uint64)(pointer), 16, 16, sl_true);
@@ -7398,7 +7400,7 @@ namespace slib
 #endif
 	}
 
-	String String::fromBoolean(sl_bool value)
+	String String::fromBoolean(sl_bool value) noexcept
 	{
 		if (value) {
 			SLIB_STATIC_STRING(s, "true");
@@ -7409,7 +7411,7 @@ namespace slib
 		}
 	}
 
-	String16 String16::fromBoolean(sl_bool value)
+	String16 String16::fromBoolean(sl_bool value) noexcept
 	{
 		if (value) {
 			SLIB_STATIC_STRING16_BY_ARRAY(s, 't', 'r', 'u', 'e');
@@ -7421,7 +7423,7 @@ namespace slib
 	}
 
 	template <class ST, class CT>
-	SLIB_INLINE ST _priv_String_makeHexString(const void* buf, sl_size size)
+	SLIB_INLINE static ST _priv_String_makeHexString(const void* buf, sl_size size) noexcept
 	{
 		if (!buf || size <= 0) {
 			return sl_null;
@@ -7439,22 +7441,22 @@ namespace slib
 		return str;
 	}
 
-	String String::makeHexString(const void* buf, sl_size size)
+	String String::makeHexString(const void* buf, sl_size size) noexcept
 	{
 		return _priv_String_makeHexString<String, sl_char8>(buf, size);
 	}
 
-	String16 String16::makeHexString(const void* buf, sl_size size)
+	String16 String16::makeHexString(const void* buf, sl_size size) noexcept
 	{
 		return _priv_String_makeHexString<String16, sl_char16>(buf, size);
 	}
 
-	String String::makeHexString(const Memory& mem)
+	String String::makeHexString(const Memory& mem) noexcept
 	{
 		return makeHexString(mem.getData(), mem.getSize());
 	}
 
-	String16 String16::makeHexString(const Memory& mem)
+	String16 String16::makeHexString(const Memory& mem) noexcept
 	{
 		return makeHexString(mem.getData(), mem.getSize());
 	}
@@ -7470,7 +7472,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 */
 
 	template <class ST, class CT, class BT>
-	SLIB_INLINE ST _priv_String_format(const CT* format, sl_size len, const Variant* params, sl_size _nParams)
+	SLIB_INLINE static ST _priv_String_format(const CT* format, sl_size len, const Variant* params, sl_size _nParams) noexcept
 	{
 		if (len == 0) {
 			return ST::getEmpty();
@@ -7937,410 +7939,410 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return sb.merge();
 	}
 
-	String String::formatBy(const String& format, const Variant *params, sl_size nParams)
+	String String::formatBy(const String& format, const Variant *params, sl_size nParams) noexcept
 	{
 		return _priv_String_format<String, sl_char8, StringBuffer>(format.getData(), format.getLength(), params, nParams);
 	}
 
-	String16 String16::formatBy(const String16& format, const Variant *params, sl_size nParams)
+	String16 String16::formatBy(const String16& format, const Variant *params, sl_size nParams) noexcept
 	{
 		return _priv_String_format<String16, sl_char16, StringBuffer16>(format.getData(), format.getLength(), params, nParams);
 	}
 
-	String String::formatBy(const sl_char8* format, const Variant *params, sl_size nParams)
+	String String::formatBy(const sl_char8* format, const Variant *params, sl_size nParams) noexcept
 	{
 		return _priv_String_format<String, sl_char8, StringBuffer>(format, Base::getStringLength(format), params, nParams);
 	}
 
-	String16 String16::formatBy(const sl_char16* format, const Variant *params, sl_size nParams)
+	String16 String16::formatBy(const sl_char16* format, const Variant *params, sl_size nParams) noexcept
 	{
 		return _priv_String_format<String16, sl_char16, StringBuffer16>(format, Base::getStringLength2(format), params, nParams);
 	}
 
-	String String::format(const String& strFormat)
+	String String::format(const String& strFormat) noexcept
 	{
 		return strFormat;
 	}
 
-	String16 String16::format(const String16& strFormat)
+	String16 String16::format(const String16& strFormat) noexcept
 	{
 		return strFormat;
 	}
 
-	String String::format(const sl_char8* szFormat)
+	String String::format(const sl_char8* szFormat) noexcept
 	{
 		return szFormat;
 	}
 
-	String16 String16::format(const sl_char16* szFormat)
+	String16 String16::format(const sl_char16* szFormat) noexcept
 	{
 		return szFormat;
 	}
 
-	String String::argBy(const Variant* params, sl_size nParams) const
+	String String::argBy(const Variant* params, sl_size nParams) const noexcept
 	{
 		return formatBy(*this, params, nParams);
 	}
 
-	String16 String16::argBy(const Variant* params, sl_size nParams) const
+	String16 String16::argBy(const Variant* params, sl_size nParams) const noexcept
 	{
 		return formatBy(*this, params, nParams);
 	}
 
-	String Atomic<String>::argBy(const Variant* params, sl_size nParams) const
+	String Atomic<String>::argBy(const Variant* params, sl_size nParams) const noexcept
 	{
 		return String::formatBy(*this, params, nParams);
 	}
 
-	String16 Atomic<String16>::argBy(const Variant* params, sl_size nParams) const
+	String16 Atomic<String16>::argBy(const Variant* params, sl_size nParams) const noexcept
 	{
 		return String16::formatBy(*this, params, nParams);
 	}
 
 
-	int Compare<String>::operator()(const String& a, const String& b) const
+	int Compare<String>::operator()(const String& a, const String& b) const noexcept
 	{
 		return a.compare(b);
 	}
 
-	int Compare<String16>::operator()(const String16& a, const String16& b) const
+	int Compare<String16>::operator()(const String16& a, const String16& b) const noexcept
 	{
 		return a.compare(b);
 	}
 
-	int Compare<AtomicString>::operator()(const AtomicString& a, const AtomicString& b) const
+	int Compare<AtomicString>::operator()(const AtomicString& a, const AtomicString& b) const noexcept
 	{
 		return a.compare(b);
 	}
 
-	int Compare<AtomicString16>::operator()(const AtomicString16& a, const AtomicString16& b) const
+	int Compare<AtomicString16>::operator()(const AtomicString16& a, const AtomicString16& b) const noexcept
 	{
 		return a.compare(b);
 	}
 
 
-	sl_bool Equals<String>::operator()(const String& a, const String& b) const
+	sl_bool Equals<String>::operator()(const String& a, const String& b) const noexcept
 	{
 		return a.equals(b);
 	}
 
-	sl_bool Equals<String16>::operator()(const String16& a, const String16& b) const
+	sl_bool Equals<String16>::operator()(const String16& a, const String16& b) const noexcept
 	{
 		return a.equals(b);
 	}
 
-	sl_bool Equals<AtomicString>::operator()(const AtomicString& a, const AtomicString& b) const
+	sl_bool Equals<AtomicString>::operator()(const AtomicString& a, const AtomicString& b) const noexcept
 	{
 		return a.equals(b);
 	}
 
-	sl_bool Equals<AtomicString16>::operator()(const AtomicString16& a, const AtomicString16& b) const
+	sl_bool Equals<AtomicString16>::operator()(const AtomicString16& a, const AtomicString16& b) const noexcept
 	{
 		return a.equals(b);
 	}
 
 
-	sl_uint32 Hash<String>::operator()(const String& v) const
+	sl_uint32 Hash<String>::operator()(const String& v) const noexcept
 	{
 		return v.getHashCode();
 	}
 
-	sl_uint32 Hash<String16>::operator()(const String16& v) const
+	sl_uint32 Hash<String16>::operator()(const String16& v) const noexcept
 	{
 		return v.getHashCode();
 	}
 
-	sl_uint32 Hash<AtomicString>::operator()(const AtomicString& v) const
+	sl_uint32 Hash<AtomicString>::operator()(const AtomicString& v) const noexcept
 	{
 		return v.getHashCode();
 	}
 
-	sl_uint32 Hash<AtomicString16>::operator()(const AtomicString16& v) const
+	sl_uint32 Hash<AtomicString16>::operator()(const AtomicString16& v) const noexcept
 	{
 		return v.getHashCode();
 	}
 
 
-	int CompareIgnoreCaseString::operator()(const String& a, const String& b) const
+	int CompareIgnoreCaseString::operator()(const String& a, const String& b) const noexcept
 	{
 		return a.compareIgnoreCase(b);
 	}
 
-	int CompareIgnoreCaseString16::operator()(const String16& a, const String16& b) const
+	int CompareIgnoreCaseString16::operator()(const String16& a, const String16& b) const noexcept
 	{
 		return a.compareIgnoreCase(b);
 	}
 
 
-	sl_bool EqualsIgnoreCaseString::operator()(const String& a, const String& b) const
+	sl_bool EqualsIgnoreCaseString::operator()(const String& a, const String& b) const noexcept
 	{
 		return a.equalsIgnoreCase(b);
 	}
 
-	sl_bool EqualsIgnoreCaseString16::operator()(const String16& a, const String16& b) const
+	sl_bool EqualsIgnoreCaseString16::operator()(const String16& a, const String16& b) const noexcept
 	{
 		return a.equalsIgnoreCase(b);
 	}
 
 
-	sl_uint32 HashIgnoreCaseString::operator()(const String& v) const
+	sl_uint32 HashIgnoreCaseString::operator()(const String& v) const noexcept
 	{
 		return v.getHashCodeIgnoreCase();
 	}
 
-	sl_uint32 HashIgnoreCaseString16::operator()(const String16& v) const
+	sl_uint32 HashIgnoreCaseString16::operator()(const String16& v) const noexcept
 	{
 		return v.getHashCodeIgnoreCase();
 	}
 
 	
-	signed char Cast<String, signed char>::operator()(const String& v) const
+	signed char Cast<String, signed char>::operator()(const String& v) const noexcept
 	{
 		return (signed char)(v.parseInt32());
 	}
 
-	signed char Cast<String16, signed char>::operator()(const String16& v) const
+	signed char Cast<String16, signed char>::operator()(const String16& v) const noexcept
 	{
 		return (signed char)(v.parseInt32());
 	}
 	
-	unsigned char Cast<String, unsigned char>::operator()(const String& v) const
+	unsigned char Cast<String, unsigned char>::operator()(const String& v) const noexcept
 	{
 		return (unsigned char)(v.parseUint32());
 	}
 	
-	unsigned char Cast<String16, unsigned char>::operator()(const String16& v) const
+	unsigned char Cast<String16, unsigned char>::operator()(const String16& v) const noexcept
 	{
 		return (unsigned char)(v.parseUint32());
 	}
 
-	short Cast<String, short>::operator()(const String& v) const
+	short Cast<String, short>::operator()(const String& v) const noexcept
 	{
 		return (short)(v.parseInt32());
 	}
 	
-	short Cast<String16, short>::operator()(const String16& v) const
+	short Cast<String16, short>::operator()(const String16& v) const noexcept
 	{
 		return (short)(v.parseInt32());
 	}
 	
-	unsigned short Cast<String, unsigned short>::operator()(const String& v) const
+	unsigned short Cast<String, unsigned short>::operator()(const String& v) const noexcept
 	{
 		return (unsigned short)(v.parseUint32());
 	}
 	
-	unsigned short Cast<String16, unsigned short>::operator()(const String16& v) const
+	unsigned short Cast<String16, unsigned short>::operator()(const String16& v) const noexcept
 	{
 		return (unsigned short)(v.parseUint32());
 	}
 	
-	int Cast<String, int>::operator()(const String& v) const
+	int Cast<String, int>::operator()(const String& v) const noexcept
 	{
 		return (int)(v.parseInt32());
 	}
 	
-	int Cast<String16, int>::operator()(const String16& v) const
+	int Cast<String16, int>::operator()(const String16& v) const noexcept
 	{
 		return (int)(v.parseInt32());
 	}
 	
-	unsigned int Cast<String, unsigned int>::operator()(const String& v) const
+	unsigned int Cast<String, unsigned int>::operator()(const String& v) const noexcept
 	{
 		return (unsigned int)(v.parseUint32());
 	}
 	
-	unsigned int Cast<String16, unsigned int>::operator()(const String16& v) const
+	unsigned int Cast<String16, unsigned int>::operator()(const String16& v) const noexcept
 	{
 		return (unsigned int)(v.parseUint32());
 	}
 
-	long Cast<String, long>::operator()(const String& v) const
+	long Cast<String, long>::operator()(const String& v) const noexcept
 	{
 		return (long)(v.parseInt32());
 	}
 	
-	long Cast<String16, long>::operator()(const String16& v) const
+	long Cast<String16, long>::operator()(const String16& v) const noexcept
 	{
 		return (long)(v.parseInt32());
 	}
 	
-	unsigned long Cast<String, unsigned long>::operator()(const String& v) const
+	unsigned long Cast<String, unsigned long>::operator()(const String& v) const noexcept
 	{
 		return (unsigned long)(v.parseUint32());
 	}
 	
-	unsigned long Cast<String16, unsigned long>::operator()(const String16& v) const
+	unsigned long Cast<String16, unsigned long>::operator()(const String16& v) const noexcept
 	{
 		return (unsigned long)(v.parseUint32());
 	}
 	
-	sl_int64 Cast<String, sl_int64>::operator()(const String& v) const
+	sl_int64 Cast<String, sl_int64>::operator()(const String& v) const noexcept
 	{
 		return v.parseInt64();
 	}
 	
-	sl_int64 Cast<String16, sl_int64>::operator()(const String16& v) const
+	sl_int64 Cast<String16, sl_int64>::operator()(const String16& v) const noexcept
 	{
 		return v.parseInt64();
 	}
 	
-	sl_uint64 Cast<String, sl_uint64>::operator()(const String& v) const
+	sl_uint64 Cast<String, sl_uint64>::operator()(const String& v) const noexcept
 	{
 		return v.parseUint64();
 	}
 	
-	sl_uint64 Cast<String16, sl_uint64>::operator()(const String16& v) const
+	sl_uint64 Cast<String16, sl_uint64>::operator()(const String16& v) const noexcept
 	{
 		return v.parseUint64();
 	}
 	
-	float Cast<String, float>::operator()(const String& v) const
+	float Cast<String, float>::operator()(const String& v) const noexcept
 	{
 		return v.parseFloat();
 	}
 	
-	float Cast<String16, float>::operator()(const String16& v) const
+	float Cast<String16, float>::operator()(const String16& v) const noexcept
 	{
 		return v.parseFloat();
 	}
 	
-	double Cast<String, double>::operator()(const String& v) const
+	double Cast<String, double>::operator()(const String& v) const noexcept
 	{
 		return v.parseDouble();
 	}
 	
-	double Cast<String16, double>::operator()(const String16& v) const
+	double Cast<String16, double>::operator()(const String16& v) const noexcept
 	{
 		return v.parseDouble();
 	}
 	
-	std::string Cast<String, std::string>::operator()(const String& v) const
+	std::string Cast<String, std::string>::operator()(const String& v) const noexcept
 	{
 		return v.toStd();
 	}
 	
-	std::u16string Cast<String16, std::u16string>::operator()(const String16& v) const
+	std::u16string Cast<String16, std::u16string>::operator()(const String16& v) const noexcept
 	{
 		return v.toStd();
 	}
 	
 	
-	String Cast<signed char, String>::operator()(signed char v) const
+	String Cast<signed char, String>::operator()(signed char v) const noexcept
 	{
 		return String::fromInt32(v);
 	}
 	
-	String16 Cast<signed char, String16>::operator()(signed char v) const
+	String16 Cast<signed char, String16>::operator()(signed char v) const noexcept
 	{
 		return String16::fromInt32(v);
 	}
 	
-	String Cast<unsigned char, String>::operator()(unsigned char v) const
+	String Cast<unsigned char, String>::operator()(unsigned char v) const noexcept
 	{
 		return String::fromUint32(v);
 	}
 	
-	String16 Cast<unsigned char, String16>::operator()(unsigned char v) const
+	String16 Cast<unsigned char, String16>::operator()(unsigned char v) const noexcept
 	{
 		return String16::fromUint32(v);
 	}
 	
-	String Cast<short, String>::operator()(short v) const
+	String Cast<short, String>::operator()(short v) const noexcept
 	{
 		return String::fromInt32(v);
 	}
 	
-	String16 Cast<short, String16>::operator()(short v) const
+	String16 Cast<short, String16>::operator()(short v) const noexcept
 	{
 		return String16::fromInt32(v);
 	}
 	
-	String Cast<unsigned short, String>::operator()(unsigned short v) const
+	String Cast<unsigned short, String>::operator()(unsigned short v) const noexcept
 	{
 		return String::fromUint32(v);
 	}
 	
-	String16 Cast<unsigned short, String16>::operator()(unsigned short v) const
+	String16 Cast<unsigned short, String16>::operator()(unsigned short v) const noexcept
 	{
 		return String16::fromUint32(v);
 	}
 	
-	String Cast<int, String>::operator()(int v) const
+	String Cast<int, String>::operator()(int v) const noexcept
 	{
 		return String::fromInt32((sl_int32)v);
 	}
 	
-	String16 Cast<int, String16>::operator()(int v) const
+	String16 Cast<int, String16>::operator()(int v) const noexcept
 	{
 		return String16::fromInt32((sl_int32)v);
 	}
 	
-	String Cast<unsigned int, String>::operator()(unsigned int v) const
+	String Cast<unsigned int, String>::operator()(unsigned int v) const noexcept
 	{
 		return String::fromUint32((sl_uint32)v);
 	}
 	
-	String16 Cast<unsigned int, String16>::operator()(unsigned int v) const
+	String16 Cast<unsigned int, String16>::operator()(unsigned int v) const noexcept
 	{
 		return String16::fromUint32((sl_uint32)v);
 	}
 	
-	String Cast<long, String>::operator()(long v) const
+	String Cast<long, String>::operator()(long v) const noexcept
 	{
 		return String::fromInt32((sl_int32)v);
 	}
 	
-	String16 Cast<long, String16>::operator()(long v) const
+	String16 Cast<long, String16>::operator()(long v) const noexcept
 	{
 		return String16::fromInt32((sl_int32)v);
 	}
 	
-	String Cast<unsigned long, String>::operator()(unsigned long v) const
+	String Cast<unsigned long, String>::operator()(unsigned long v) const noexcept
 	{
 		return String::fromUint32((sl_uint32)v);
 	}
 	
-	String16 Cast<unsigned long, String16>::operator()(unsigned long v) const
+	String16 Cast<unsigned long, String16>::operator()(unsigned long v) const noexcept
 	{
 		return String16::fromUint32((sl_uint32)v);
 	}
 	
-	String Cast<sl_int64, String>::operator()(sl_int64 v) const
+	String Cast<sl_int64, String>::operator()(sl_int64 v) const noexcept
 	{
 		return String::fromInt64(v);
 	}
 	
-	String16 Cast<sl_int64, String16>::operator()(sl_int64 v) const
+	String16 Cast<sl_int64, String16>::operator()(sl_int64 v) const noexcept
 	{
 		return String16::fromInt64(v);
 	}
 	
-	String Cast<sl_uint64, String>::operator()(sl_uint64 v) const
+	String Cast<sl_uint64, String>::operator()(sl_uint64 v) const noexcept
 	{
 		return String::fromUint64(v);
 	}
 	
-	String16 Cast<sl_uint64, String16>::operator()(sl_uint64 v) const
+	String16 Cast<sl_uint64, String16>::operator()(sl_uint64 v) const noexcept
 	{
 		return String16::fromUint64(v);
 	}
 	
-	String Cast<float, String>::operator()(float v) const
+	String Cast<float, String>::operator()(float v) const noexcept
 	{
 		return String::fromFloat(v);
 	}
 	
-	String16 Cast<float, String16>::operator()(float v) const
+	String16 Cast<float, String16>::operator()(float v) const noexcept
 	{
 		return String16::fromFloat(v);
 	}
 	
-	String Cast<double, String>::operator()(double v) const
+	String Cast<double, String>::operator()(double v) const noexcept
 	{
 		return String::fromDouble(v);
 	}
 	
-	String16 Cast<double, String16>::operator()(double v) const
+	String16 Cast<double, String16>::operator()(double v) const noexcept
 	{
 		return String16::fromDouble(v);
 	}
@@ -8350,35 +8352,35 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 				String Buffer
 **********************************************************/
 
-	StringBuffer::StringBuffer()
+	StringBuffer::StringBuffer() noexcept
 	{
 		m_len = 0;
 	}
 	
-	StringBuffer::~StringBuffer()
+	StringBuffer::~StringBuffer() noexcept
 	{
 	}
 
-	StringBuffer16::StringBuffer16()
+	StringBuffer16::StringBuffer16() noexcept
 	{
 		m_len = 0;
 	}
 	
-	StringBuffer16::~StringBuffer16()
+	StringBuffer16::~StringBuffer16() noexcept
 	{
 	}
 
-	sl_size StringBuffer::getLength() const
+	sl_size StringBuffer::getLength() const noexcept
 	{
 		return m_len;
 	}
 
-	sl_size StringBuffer16::getLength() const
+	sl_size StringBuffer16::getLength() const noexcept
 	{
 		return m_len;
 	}
 	
-	sl_bool StringBuffer::add(const String& str)
+	sl_bool StringBuffer::add(const String& str) noexcept
 	{
 		sl_size len = str.getLength();
 		if (len == 0) {
@@ -8395,7 +8397,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return sl_false;
 	}
 	
-	sl_bool StringBuffer16::add(const String16& str)
+	sl_bool StringBuffer16::add(const String16& str) noexcept
 	{
 		sl_size len = str.getLength();
 		if (len == 0) {
@@ -8412,7 +8414,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return sl_false;
 	}
 	
-	sl_bool StringBuffer::add(const StringData& data)
+	sl_bool StringBuffer::add(const StringData& data) noexcept
 	{
 		sl_size len = data.len;
 		if (len == 0) {
@@ -8427,7 +8429,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return sl_false;
 	}
 	
-	sl_bool StringBuffer16::add(const StringData& data)
+	sl_bool StringBuffer16::add(const StringData& data) noexcept
 	{
 		sl_size len = data.len;
 		if (len == 0) {
@@ -8442,7 +8444,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return sl_false;
 	}
 	
-	sl_bool StringBuffer::addStatic(const sl_char8* buf, sl_size length)
+	sl_bool StringBuffer::addStatic(const sl_char8* buf, sl_size length) noexcept
 	{
 		StringData data;
 		data.sz8 = buf;
@@ -8450,7 +8452,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return add(data);
 	}
 
-	sl_bool StringBuffer16::addStatic(const sl_char16* buf, sl_size length)
+	sl_bool StringBuffer16::addStatic(const sl_char16* buf, sl_size length) noexcept
 	{
 		StringData data;
 		data.sz16 = buf;
@@ -8458,33 +8460,33 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return add(data);
 	}
 
-	void StringBuffer::link(StringBuffer& buf)
+	void StringBuffer::link(StringBuffer& buf) noexcept
 	{
 		m_len += buf.m_len;
 		buf.m_len = 0;
 		m_queue.merge_NoLock(&(buf.m_queue));
 	}
 	
-	void StringBuffer16::link(StringBuffer16& buf)
+	void StringBuffer16::link(StringBuffer16& buf) noexcept
 	{
 		m_len += buf.m_len;
 		buf.m_len = 0;
 		m_queue.merge_NoLock(&(buf.m_queue));
 	}
 	
-	void StringBuffer::clear()
+	void StringBuffer::clear() noexcept
 	{
 		m_queue.removeAll_NoLock();
 		m_len = 0;
 	}
 
-	void StringBuffer16::clear()
+	void StringBuffer16::clear() noexcept
 	{
 		m_queue.removeAll_NoLock();
 		m_len = 0;
 	}
 
-	String StringBuffer::merge() const
+	String StringBuffer::merge() const noexcept
 	{
 		if (m_queue.getCount() == 0) {
 			return String::getEmpty();
@@ -8511,7 +8513,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return ret;
 	}
 	
-	String16 StringBuffer16::merge() const
+	String16 StringBuffer16::merge() const noexcept
 	{
 		if (m_queue.getCount() == 0) {
 			return String16::getEmpty();
@@ -8538,7 +8540,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return ret;
 	}
 	
-	Memory StringBuffer::mergeToMemory() const
+	Memory StringBuffer::mergeToMemory() const noexcept
 	{
 		if (m_queue.getCount() == 0) {
 			return sl_null;
@@ -8561,7 +8563,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return ret;
 	}
 	
-	Memory StringBuffer16::mergeToMemory() const
+	Memory StringBuffer16::mergeToMemory() const noexcept
 	{
 		if (m_queue.getCount() == 0) {
 			return sl_null;
