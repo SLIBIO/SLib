@@ -13,14 +13,13 @@ namespace slib
 	
 	template <class T>
 	template <class O>
-	Triangle3T<T>::Triangle3T(const Triangle3T<O>& other)
+	Triangle3T<T>::Triangle3T(const Triangle3T<O>& other) noexcept
 	 : point1(other.point1), point2(other.point2), point3(other.point3)
-	{
-	}
+	 {}
 	
 	template <class T>
 	template <class O>
-	Triangle3T<T>& Triangle3T<T>::operator=(const Triangle3T<O>& other)
+	Triangle3T<T>& Triangle3T<T>::operator=(const Triangle3T<O>& other) noexcept
 	{
 		point1 = other.point1;
 		point2 = other.point2;

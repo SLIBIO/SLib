@@ -30,92 +30,92 @@ namespace slib
 		T w;
 
 	public:
-		SLIB_INLINE Vector4T() = default;
+		SLIB_INLINE Vector4T() noexcept = default;
 
-		constexpr Vector4T(const Vector4T<T, FT>& other) : x(other.x), y(other.y), z(other.z), w(other.w) {}
+		SLIB_INLINE constexpr Vector4T(const Vector4T<T, FT>& other) noexcept : x(other.x), y(other.y), z(other.z), w(other.w) {}
 	
 		template <class O, class FO>
-		constexpr Vector4T(const Vector4T<O, FO>& other) : x((T)(other.x)), y((T)(other.y)), z((T)(other.z)), w((T)(other.w)) {}
+		SLIB_INLINE constexpr Vector4T(const Vector4T<O, FO>& other) noexcept : x((T)(other.x)), y((T)(other.y)), z((T)(other.z)), w((T)(other.w)) {}
 	
-		constexpr Vector4T(T _x, T _y, T _z, T _w) : x(_x), y(_y), z(_z), w(_w) {}
+		SLIB_INLINE constexpr Vector4T(T _x, T _y, T _z, T _w) noexcept : x(_x), y(_y), z(_z), w(_w) {}
 	
-		constexpr Vector4T(const Vector3T<T, FT>& xyz, T _w) : x(xyz.x), y(xyz.y), z(xyz.z), w(_w) {}
-	
-	public:
-		static const Vector4T<T, FT>& zero();
-
-		static const Vector4T<T, FT>& fromArray(const T arr[4]);
-	
-		static Vector4T<T, FT>& fromArray(T arr[4]);
+		SLIB_INLINE constexpr Vector4T(const Vector3T<T, FT>& xyz, T _w) noexcept : x(xyz.x), y(xyz.y), z(xyz.z), w(_w) {}
 	
 	public:
-		const Vector3T<T, FT>& xyz() const;
+		static const Vector4T<T, FT>& zero() noexcept;
 
-		Vector3T<T, FT>& xyz();
-
-		static Vector4T<T, FT> fromLocation(const Vector3T<T, FT>& v);
-
-		static Vector4T<T, FT> fromDirection(const Vector3T<T, FT>& v);
-
-		T dot(const Vector4T<T, FT>& other) const;
-
-		T getLength2p() const;
-
-		FT getLength() const;
-
-		T getLength2p(const Vector4T<T, FT>& other) const;
-
-		FT getLength(const Vector4T<T, FT>& other) const;
-
-		void normalize();
-
-		Vector4T<T, FT> getNormalized();
-
-		FT getCosBetween(const Vector4T<T, FT>& other) const;
-
-		FT getAngleBetween(const Vector4T<T, FT>& other) const;
-
-		sl_bool equals(const Vector4T<T, FT>& other) const;
+		static const Vector4T<T, FT>& fromArray(const T arr[4]) noexcept;
 	
-		sl_bool isAlmostEqual(const Vector4T<T, FT>& other) const;
-
-		Vector4T<T, FT> lerp(const Vector4T<T, FT>& target, float factor) const;
+		static Vector4T<T, FT>& fromArray(T arr[4]) noexcept;
 	
 	public:
-		Vector4T<T, FT>& operator=(const Vector4T<T, FT>& other) = default;
+		const Vector3T<T, FT>& xyz() const noexcept;
+
+		Vector3T<T, FT>& xyz() noexcept;
+
+		static Vector4T<T, FT> fromLocation(const Vector3T<T, FT>& v) noexcept;
+
+		static Vector4T<T, FT> fromDirection(const Vector3T<T, FT>& v) noexcept;
+
+		T dot(const Vector4T<T, FT>& other) const noexcept;
+
+		T getLength2p() const noexcept;
+
+		FT getLength() const noexcept;
+
+		T getLength2p(const Vector4T<T, FT>& other) const noexcept;
+
+		FT getLength(const Vector4T<T, FT>& other) const noexcept;
+
+		void normalize() noexcept;
+
+		Vector4T<T, FT> getNormalized() noexcept;
+
+		FT getCosBetween(const Vector4T<T, FT>& other) const noexcept;
+
+		FT getAngleBetween(const Vector4T<T, FT>& other) const noexcept;
+
+		sl_bool equals(const Vector4T<T, FT>& other) const noexcept;
+	
+		sl_bool isAlmostEqual(const Vector4T<T, FT>& other) const noexcept;
+
+		Vector4T<T, FT> lerp(const Vector4T<T, FT>& target, float factor) const noexcept;
+	
+	public:
+		Vector4T<T, FT>& operator=(const Vector4T<T, FT>& other) noexcept = default;
 
 		template <class O, class FO>
-		Vector4T<T, FT>& operator=(const Vector4T<O, FO>& other);
+		Vector4T<T, FT>& operator=(const Vector4T<O, FO>& other) noexcept;
 
-		Vector4T<T, FT> operator+(const Vector4T<T, FT>& other) const;
+		Vector4T<T, FT> operator+(const Vector4T<T, FT>& other) const noexcept;
 
-		Vector4T<T, FT>& operator+=(const Vector4T<T, FT>& other);
+		Vector4T<T, FT>& operator+=(const Vector4T<T, FT>& other) noexcept;
 
-		Vector4T<T, FT> operator-(const Vector4T<T, FT>& other) const;
+		Vector4T<T, FT> operator-(const Vector4T<T, FT>& other) const noexcept;
 
-		Vector4T<T, FT>& operator-=(const Vector4T<T, FT>& other);
+		Vector4T<T, FT>& operator-=(const Vector4T<T, FT>& other) noexcept;
 
-		Vector4T<T, FT> operator*(T f) const;
+		Vector4T<T, FT> operator*(T f) const noexcept;
 
-		Vector4T<T, FT>& operator*=(T f);
+		Vector4T<T, FT>& operator*=(T f) noexcept;
 
-		Vector4T<T, FT> operator*(const Vector4T<T, FT>& other) const;
+		Vector4T<T, FT> operator*(const Vector4T<T, FT>& other) const noexcept;
 
-		Vector4T<T, FT>& operator*=(const Vector4T<T, FT>& other);
+		Vector4T<T, FT>& operator*=(const Vector4T<T, FT>& other) noexcept;
 
-		Vector4T<T, FT> operator/(T f) const;
+		Vector4T<T, FT> operator/(T f) const noexcept;
 
-		Vector4T<T, FT>& operator/=(T f);
+		Vector4T<T, FT>& operator/=(T f) noexcept;
 
-		Vector4T<T, FT> operator/(const Vector4T<T, FT>& other) const;
+		Vector4T<T, FT> operator/(const Vector4T<T, FT>& other) const noexcept;
 
-		Vector4T<T, FT>& operator/(const Vector4T<T, FT>& other);
+		Vector4T<T, FT>& operator/(const Vector4T<T, FT>& other) noexcept;
 
-		Vector4T<T, FT> operator-() const;
+		Vector4T<T, FT> operator-() const noexcept;
 
-		sl_bool operator==(const Vector4T<T, FT>& other) const;
+		sl_bool operator==(const Vector4T<T, FT>& other) const noexcept;
 
-		sl_bool operator!=(const Vector4T<T, FT>& other) const;
+		sl_bool operator!=(const Vector4T<T, FT>& other) const noexcept;
 
 	private:
 		static T _zero[4];
@@ -133,16 +133,16 @@ namespace slib
 	typedef Vector4T<sl_int64, double> Vector4li;
 
 	template <class T, class FT>
-	Vector4T<T, FT> operator*(T f, const Vector4T<T, FT>& v);
+	Vector4T<T, FT> operator*(T f, const Vector4T<T, FT>& v) noexcept;
 
 	template <class T, class FT>
-	Vector4T<T, FT> operator/(T f, const Vector4T<T, FT>& v);
+	Vector4T<T, FT> operator/(T f, const Vector4T<T, FT>& v) noexcept;
 
 	template <class T, class FT>
 	class Interpolation< Vector4T<T, FT> >
 	{
 	public:
-		static Vector4T<T, FT> interpolate(const Vector4T<T, FT>& a, const Vector4T<T, FT>& b, float factor);
+		static Vector4T<T, FT> interpolate(const Vector4T<T, FT>& a, const Vector4T<T, FT>& b, float factor) noexcept;
 	};
 
 }

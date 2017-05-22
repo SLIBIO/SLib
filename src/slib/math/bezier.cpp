@@ -16,25 +16,23 @@ namespace slib
 {
 
 	template <class T>
-	CubicBezierCurveT<T>::CubicBezierCurveT(T _x0, T _y0, T _x1, T _y1, T _x2, T _y2, T _x3, T _y3)
-	: x0(_x0), y0(_y0),
+	CubicBezierCurveT<T>::CubicBezierCurveT(T _x0, T _y0, T _x1, T _y1, T _x2, T _y2, T _x3, T _y3) noexcept
+	 :x0(_x0), y0(_y0),
 	  x1(_x1), y1(_y1),
 	  x2(_x2), y2(_y2),
 	  x3(_x3), y3(_y3)
-	{
-	}
+	 {}
 
 	template <class T>
-	CubicBezierCurveT<T>::CubicBezierCurveT(const PointT<T>& P0, const PointT<T>& P1, const PointT<T>& P2, const PointT<T>& P3)
-	: x0(P0.x), y0(P0.y),
+	CubicBezierCurveT<T>::CubicBezierCurveT(const PointT<T>& P0, const PointT<T>& P1, const PointT<T>& P2, const PointT<T>& P3) noexcept
+	 :x0(P0.x), y0(P0.y),
 	  x1(P1.x), y1(P1.y),
 	  x2(P2.x), y2(P2.y),
 	  x3(P3.x), y3(P3.y)
-	{
-	}
+	 {}
 
 	template <class T>
-	void CubicBezierCurveT<T>::getPoint(T t, T& x, T& y)
+	void CubicBezierCurveT<T>::getPoint(T t, T& x, T& y) const noexcept
 	{
 		T it = 1 - t;
 		T it2 = it * it;
@@ -48,13 +46,13 @@ namespace slib
 	}
 
 	template <class T>
-	void CubicBezierCurveT<T>::getPoint(T t, PointT<T>& pt)
+	void CubicBezierCurveT<T>::getPoint(T t, PointT<T>& pt) const noexcept
 	{
 		getPoint(t, pt.x, pt.y);
 	}
 
 	template <class T>
-	PointT<T> CubicBezierCurveT<T>::getPoint(T t)
+	PointT<T> CubicBezierCurveT<T>::getPoint(T t) const noexcept
 	{
 		PointT<T> ret;
 		getPoint(t, ret.x, ret.y);
@@ -62,7 +60,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_uint32 CubicBezierCurveT<T>::convertArcToBezier(PointT<T> pts[13], const RectangleT<T>& rc, T startDegrees, T sweepDegrees)
+	sl_uint32 CubicBezierCurveT<T>::convertArcToBezier(PointT<T> pts[13], const RectangleT<T>& rc, T startDegrees, T sweepDegrees) noexcept
 	{
 		T PI2 = Math::HalfPI<T>();
 		T _2PI = Math::DualPI<T>();
@@ -138,7 +136,7 @@ namespace slib
 	}
 
 	template <class T>
-	void CubicBezierCurveT<T>::describeArc(T cx, T cy, T rx, T ry, T startRadian, T endRadian)
+	void CubicBezierCurveT<T>::describeArc(T cx, T cy, T rx, T ry, T startRadian, T endRadian) noexcept
 	{
 		T cos1 = Math::cos(startRadian);
 		T sin1 = Math::sin(startRadian);

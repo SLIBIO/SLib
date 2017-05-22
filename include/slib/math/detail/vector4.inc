@@ -12,26 +12,26 @@ namespace slib
 {
 	
 	template <class T, class FT>
-	SLIB_INLINE const Vector4T<T, FT>& Vector4T<T, FT>::zero()
+	SLIB_INLINE const Vector4T<T, FT>& Vector4T<T, FT>::zero() noexcept
 	{
 		return *(reinterpret_cast<Vector4T<T, FT> const*>(&_zero));
 	}
 	
 	template <class T, class FT>
-	SLIB_INLINE const Vector4T<T, FT>& Vector4T<T, FT>::fromArray(const T arr[4])
+	SLIB_INLINE const Vector4T<T, FT>& Vector4T<T, FT>::fromArray(const T arr[4]) noexcept
 	{
 		return *(reinterpret_cast<Vector4T<T, FT> const*>(arr));
 	}
 	
 	template <class T, class FT>
-	SLIB_INLINE Vector4T<T, FT>& Vector4T<T, FT>::fromArray(T arr[4])
+	SLIB_INLINE Vector4T<T, FT>& Vector4T<T, FT>::fromArray(T arr[4]) noexcept
 	{
 		return *(reinterpret_cast<Vector4T<T, FT>*>(arr));
 	}
 	
 	template <class T, class FT>
 	template <class O, class FO>
-	SLIB_INLINE Vector4T<T, FT>& Vector4T<T, FT>::operator=(const Vector4T<O, FO>& other)
+	SLIB_INLINE Vector4T<T, FT>& Vector4T<T, FT>::operator=(const Vector4T<O, FO>& other) noexcept
 	{
 		x = (T)(other.x);
 		y = (T)(other.y);
@@ -41,32 +41,32 @@ namespace slib
 	}
 	
 	template <class T, class FT>
-	SLIB_INLINE const Vector3T<T, FT>& Vector4T<T, FT>::xyz() const
+	SLIB_INLINE const Vector3T<T, FT>& Vector4T<T, FT>::xyz() const noexcept
 	{
 		return *(reinterpret_cast<Vector3T<T, FT> const*>(this));
 	}
 	
 	template <class T, class FT>
-	SLIB_INLINE Vector3T<T, FT>& Vector4T<T, FT>::xyz()
+	SLIB_INLINE Vector3T<T, FT>& Vector4T<T, FT>::xyz() noexcept
 	{
 		return *(reinterpret_cast<Vector3T<T, FT>*>(this));
 	}
 	
 	template <class T, class FT>
-	Vector4T<T, FT> operator*(T f, const Vector4T<T, FT>& v)
+	Vector4T<T, FT> operator*(T f, const Vector4T<T, FT>& v) noexcept
 	{
 		return {f * v.x, f * v.y, f * v.z, f * v.w};
 	}
 	
 	template <class T, class FT>
-	Vector4T<T, FT> operator/(T f, const Vector4T<T, FT>& v)
+	Vector4T<T, FT> operator/(T f, const Vector4T<T, FT>& v) noexcept
 	{
 		return {f / v.x, f / v.y, f / v.z, f / v.w};
 	}
 	
 	
 	template <class T, class FT>
-	SLIB_INLINE Vector4T<T, FT> Interpolation< Vector4T<T, FT> >::interpolate(const Vector4T<T, FT>& a, const Vector4T<T, FT>& b, float factor)
+	SLIB_INLINE Vector4T<T, FT> Interpolation< Vector4T<T, FT> >::interpolate(const Vector4T<T, FT>& a, const Vector4T<T, FT>& b, float factor) noexcept
 	{
 		return a.lerp(b, factor);
 	}

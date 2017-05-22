@@ -35,13 +35,13 @@ namespace slib
 		, 0, 0, 0, 1 };
 
 	template <class T>
-	Vector4T<T> Matrix4T<T>::getRow0() const
+	Vector4T<T> Matrix4T<T>::getRow0() const noexcept
 	{
 		return {m00, m01, m02, m03};
 	}
 
 	template <class T>
-	void Matrix4T<T>::setRow0(const Vector4T<T>& v)
+	void Matrix4T<T>::setRow0(const Vector4T<T>& v) noexcept
 	{
 		m00 = v.x;
 		m01 = v.y;
@@ -50,13 +50,13 @@ namespace slib
 	}
 
 	template <class T>
-	Vector4T<T> Matrix4T<T>::getRow1() const
+	Vector4T<T> Matrix4T<T>::getRow1() const noexcept
 	{
 		return {m10, m11, m12, m13};
 	}
 
 	template <class T>
-	void Matrix4T<T>::setRow1(const Vector4T<T>& v)
+	void Matrix4T<T>::setRow1(const Vector4T<T>& v) noexcept
 	{
 		m10 = v.x;
 		m11 = v.y;
@@ -65,13 +65,13 @@ namespace slib
 	}
 
 	template <class T>
-	Vector4T<T> Matrix4T<T>::getRow2() const
+	Vector4T<T> Matrix4T<T>::getRow2() const noexcept
 	{
 		return {m20, m21, m22, m23};
 	}
 
 	template <class T>
-	void Matrix4T<T>::setRow2(const Vector4T<T>& v)
+	void Matrix4T<T>::setRow2(const Vector4T<T>& v) noexcept
 	{
 		m20 = v.x;
 		m21 = v.y;
@@ -80,13 +80,13 @@ namespace slib
 	}
 
 	template <class T>
-	Vector4T<T> Matrix4T<T>::getRow3() const
+	Vector4T<T> Matrix4T<T>::getRow3() const noexcept
 	{
 		return {m30, m31, m32, m33};
 	}
 
 	template <class T>
-	void Matrix4T<T>::setRow3(const Vector4T<T>& v)
+	void Matrix4T<T>::setRow3(const Vector4T<T>& v) noexcept
 	{
 		m30 = v.x;
 		m31 = v.y;
@@ -95,14 +95,14 @@ namespace slib
 	}
 
 	template <class T>
-	Vector4T<T> Matrix4T<T>::getRow(sl_uint32 index) const
+	Vector4T<T> Matrix4T<T>::getRow(sl_uint32 index) const noexcept
 	{
 		const T* t = &m00 + (index << 2);
 		return {t[0], t[1], t[2], t[3]};
 	}
 
 	template <class T>
-	void Matrix4T<T>::setRow(sl_uint32 index, const Vector4T<T>& v)
+	void Matrix4T<T>::setRow(sl_uint32 index, const Vector4T<T>& v) noexcept
 	{
 		T* t = &m00 + (index << 2);
 		t[0] = v.x;
@@ -112,13 +112,13 @@ namespace slib
 	}
 
 	template <class T>
-	Vector4T<T> Matrix4T<T>::getColumn0() const
+	Vector4T<T> Matrix4T<T>::getColumn0() const noexcept
 	{
 		return {m00, m10, m20, m30};
 	}
 
 	template <class T>
-	void Matrix4T<T>::setColumn0(const Vector4T<T>& v)
+	void Matrix4T<T>::setColumn0(const Vector4T<T>& v) noexcept
 	{
 		m00 = v.x;
 		m10 = v.y;
@@ -127,13 +127,13 @@ namespace slib
 	}
 
 	template <class T>
-	Vector4T<T> Matrix4T<T>::getColumn1() const
+	Vector4T<T> Matrix4T<T>::getColumn1() const noexcept
 	{
 		return {m01, m11, m21, m31};
 	}
 
 	template <class T>
-	void Matrix4T<T>::setColumn1(const Vector4T<T>& v)
+	void Matrix4T<T>::setColumn1(const Vector4T<T>& v) noexcept
 	{
 		m01 = v.x;
 		m11 = v.y;
@@ -142,13 +142,13 @@ namespace slib
 	}
 
 	template <class T>
-	Vector4T<T> Matrix4T<T>::getColumn2() const
+	Vector4T<T> Matrix4T<T>::getColumn2() const noexcept
 	{
 		return {m02, m12, m22, m32};
 	}
 
 	template <class T>
-	void Matrix4T<T>::setColumn2(const Vector4T<T>& v)
+	void Matrix4T<T>::setColumn2(const Vector4T<T>& v) noexcept
 	{
 		m02 = v.x;
 		m12 = v.y;
@@ -157,13 +157,13 @@ namespace slib
 	}
 
 	template <class T>
-	Vector4T<T> Matrix4T<T>::getColumn3() const
+	Vector4T<T> Matrix4T<T>::getColumn3() const noexcept
 	{
 		return {m03, m13, m23, m33};
 	}
 
 	template <class T>
-	void Matrix4T<T>::setColumn3(const Vector4T<T>& v)
+	void Matrix4T<T>::setColumn3(const Vector4T<T>& v) noexcept
 	{
 		m03 = v.x;
 		m13 = v.y;
@@ -172,14 +172,14 @@ namespace slib
 	}
 
 	template <class T>
-	Vector4T<T> Matrix4T<T>::getColumn(sl_uint32 index) const
+	Vector4T<T> Matrix4T<T>::getColumn(sl_uint32 index) const noexcept
 	{
 		const T* t = &m00 + index;
 		return {t[0], t[4], t[8], t[12]};
 	}
 
 	template <class T>
-	void Matrix4T<T>::setColumn(sl_uint32 index, const Vector4T<T>& v)
+	void Matrix4T<T>::setColumn(sl_uint32 index, const Vector4T<T>& v) noexcept
 	{
 		T* t = &m00 + index;
 		t[0] = v.x;
@@ -189,19 +189,19 @@ namespace slib
 	}
 
 	template <class T>
-	T Matrix4T<T>::getElement(sl_uint32 row, sl_uint32 column) const
+	T Matrix4T<T>::getElement(sl_uint32 row, sl_uint32 column) const noexcept
 	{
 		return (&m00)[(row << 2) + column];
 	}
 
 	template <class T>
-	void Matrix4T<T>::setElement(sl_uint32 row, sl_uint32 column, const T& v)
+	void Matrix4T<T>::setElement(sl_uint32 row, sl_uint32 column, const T& v) noexcept
 	{
 		(&m00)[(row << 2) + column] = v;
 	}
 
 	template <class T>
-	void Matrix4T<T>::add(const Matrix4T<T>& other)
+	void Matrix4T<T>::add(const Matrix4T<T>& other) noexcept
 	{
 		m00 += other.m00; m01 += other.m01; m02 += other.m02; m03 += other.m03;
 		m10 += other.m10; m11 += other.m11; m12 += other.m12; m13 += other.m13;
@@ -210,7 +210,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Matrix4T<T>::subtract(const Matrix4T<T>& other)
+	void Matrix4T<T>::subtract(const Matrix4T<T>& other) noexcept
 	{
 		m00 -= other.m00; m01 -= other.m01; m02 -= other.m02; m03 -= other.m03;
 		m10 -= other.m10; m11 -= other.m11; m12 -= other.m12; m13 -= other.m13;
@@ -219,7 +219,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Matrix4T<T>::multiply(T value)
+	void Matrix4T<T>::multiply(T value) noexcept
 	{
 		m00 *= value; m01 *= value; m02 *= value; m03 *= value;
 		m10 *= value; m11 *= value; m12 *= value; m13 *= value;
@@ -228,7 +228,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Matrix4T<T>::divide(T value)
+	void Matrix4T<T>::divide(T value) noexcept
 	{
 		m00 /= value; m01 /= value; m02 /= value; m03 /= value;
 		m10 /= value; m11 /= value; m12 /= value; m13 /= value;
@@ -237,7 +237,7 @@ namespace slib
 	}
 
 	template <class T>
-	Vector4T<T> Matrix4T<T>::multiplyLeft(const Vector4T<T>& v) const
+	Vector4T<T> Matrix4T<T>::multiplyLeft(const Vector4T<T>& v) const noexcept
 	{
 		T _x = v.x * m00 + v.y * m10 + v.z * m20 + v.w * m30;
 		T _y = v.x * m01 + v.y * m11 + v.z * m21 + v.w * m31;
@@ -247,7 +247,7 @@ namespace slib
 	}
 
 	template <class T>
-	Vector4T<T> Matrix4T<T>::multiplyRight(const Vector4T<T>& v) const
+	Vector4T<T> Matrix4T<T>::multiplyRight(const Vector4T<T>& v) const noexcept
 	{
 		T _x = m00 * v.x + m01 * v.y + m02 * v.z + m03 * v.w;
 		T _y = m10 * v.x + m11 * v.y + m12 * v.z + m13 * v.w;
@@ -257,7 +257,7 @@ namespace slib
 	}
 
 	template <class T>
-	Vector3T<T> Matrix4T<T>::transformPosition(T x, T y, T z) const
+	Vector3T<T> Matrix4T<T>::transformPosition(T x, T y, T z) const noexcept
 	{
 		T _x = x * m00 + y * m10 + z * m20 + m30;
 		T _y = x * m01 + y * m11 + z * m21 + m31;
@@ -266,7 +266,7 @@ namespace slib
 	}
 
 	template <class T>
-	Vector3T<T> Matrix4T<T>::transformPosition(const Vector3T<T>& v) const
+	Vector3T<T> Matrix4T<T>::transformPosition(const Vector3T<T>& v) const noexcept
 	{
 		T _x = v.x * m00 + v.y * m10 + v.z * m20 + m30;
 		T _y = v.x * m01 + v.y * m11 + v.z * m21 + m31;
@@ -275,7 +275,7 @@ namespace slib
 	}
 
 	template <class T>
-	Vector3T<T> Matrix4T<T>::transformDirection(T x, T y, T z) const
+	Vector3T<T> Matrix4T<T>::transformDirection(T x, T y, T z) const noexcept
 	{
 		T _x = x * m00 + y * m10 + z * m20;
 		T _y = x * m01 + y * m11 + z * m21;
@@ -284,7 +284,7 @@ namespace slib
 	}
 
 	template <class T>
-	Vector3T<T> Matrix4T<T>::transformDirection(const Vector3T<T>& v) const
+	Vector3T<T> Matrix4T<T>::transformDirection(const Vector3T<T>& v) const noexcept
 	{
 		T _x = v.x * m00 + v.y * m10 + v.z * m20;
 		T _y = v.x * m01 + v.y * m11 + v.z * m21;
@@ -293,7 +293,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Matrix4T<T>::multiply(const Matrix4T<T>& m)
+	void Matrix4T<T>::multiply(const Matrix4T<T>& m) noexcept
 	{
 		T v0, v1, v2, v3;
 		v0 = m00 * m.m00 + m01 * m.m10 + m02 * m.m20 + m03 * m.m30;
@@ -319,7 +319,7 @@ namespace slib
 	}
 
 	template <class T>
-	T Matrix4T<T>::getDeterminant() const
+	T Matrix4T<T>::getDeterminant() const noexcept
 	{
 		return SLIB_MATH_MATRIX_DETERMINANT4(m00, m01, m02, m03,
 											m10, m11, m12, m13,
@@ -328,7 +328,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Matrix4T<T>::makeInverse()
+	void Matrix4T<T>::makeInverse() noexcept
 	{
 		T A00 = SLIB_MATH_MATRIX_DETERMINANT3(m11, m12, m13, m21, m22, m23, m31, m32, m33);
 		T A01 = -SLIB_MATH_MATRIX_DETERMINANT3(m10, m12, m13, m20, m22, m23, m30, m32, m33);
@@ -355,7 +355,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Matrix4T<T>::inverse() const
+	Matrix4T<T> Matrix4T<T>::inverse() const noexcept
 	{
 		Matrix4T<T> ret(*this);
 		ret.makeInverse();
@@ -363,7 +363,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Matrix4T<T>::makeTranspose()
+	void Matrix4T<T>::makeTranspose() noexcept
 	{
 		T	f;
 		f = m01; m01 = m10; m10 = f;
@@ -375,7 +375,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Matrix4T<T>::transpose() const
+	Matrix4T<T> Matrix4T<T>::transpose() const noexcept
 	{
 		Matrix4T<T> ret(*this);
 		ret.makeTranspose();
@@ -383,14 +383,14 @@ namespace slib
 	}
 
 	template <class T>
-	void Matrix4T<T>::makeInverseTranspose()
+	void Matrix4T<T>::makeInverseTranspose() noexcept
 	{
 		makeInverse();
 		makeTranspose();
 	}
 
 	template <class T>
-	Matrix4T<T> Matrix4T<T>::inverseTranspose() const
+	Matrix4T<T> Matrix4T<T>::inverseTranspose() const noexcept
 	{
 		Matrix4T<T> ret(*this);
 		ret.makeInverse();
@@ -399,7 +399,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Matrix4T<T>::lerp(const Matrix4T<T>& target, float factor) const
+	Matrix4T<T> Matrix4T<T>::lerp(const Matrix4T<T>& target, float factor) const noexcept
 	{
 		return {
 			SLIB_LERP(m00, target.m00, factor), SLIB_LERP(m01, target.m01, factor), SLIB_LERP(m02, target.m02, factor), SLIB_LERP(m03, target.m03, factor),
@@ -409,7 +409,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Matrix4T<T>::operator+(const Matrix4T<T>& other) const
+	Matrix4T<T> Matrix4T<T>::operator+(const Matrix4T<T>& other) const noexcept
 	{
 		Matrix4T<T> ret(*this);
 		ret.add(other);
@@ -417,14 +417,14 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T>& Matrix4T<T>::operator+=(const Matrix4T<T>& other)
+	Matrix4T<T>& Matrix4T<T>::operator+=(const Matrix4T<T>& other) noexcept
 	{
 		add(other);
 		return *this;
 	}
 
 	template <class T>
-	Matrix4T<T> Matrix4T<T>::operator-(const Matrix4T<T>& other) const
+	Matrix4T<T> Matrix4T<T>::operator-(const Matrix4T<T>& other) const noexcept
 	{
 		Matrix4T<T> ret(*this);
 		ret.subtract(other);
@@ -432,14 +432,14 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T>& Matrix4T<T>::operator-=(const Matrix4T<T>& other)
+	Matrix4T<T>& Matrix4T<T>::operator-=(const Matrix4T<T>& other) noexcept
 	{
 		subtract(other);
 		return *this;
 	}
 
 	template <class T>
-	Matrix4T<T> Matrix4T<T>::operator-() const
+	Matrix4T<T> Matrix4T<T>::operator-() const noexcept
 	{
 		Matrix4T<T> ret(Matrix4T<T>::zero());
 		ret.subtract(*this);
@@ -447,7 +447,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Matrix4T<T>::operator*(T value) const
+	Matrix4T<T> Matrix4T<T>::operator*(T value) const noexcept
 	{
 		Matrix4T<T> ret(*this);
 		ret.multiply(value);
@@ -455,14 +455,14 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T>& Matrix4T<T>::operator*=(T value)
+	Matrix4T<T>& Matrix4T<T>::operator*=(T value) noexcept
 	{
 		multiply(value);
 		return *this;
 	}
 
 	template <class T>
-	Matrix4T<T> Matrix4T<T>::operator/(T value) const
+	Matrix4T<T> Matrix4T<T>::operator/(T value) const noexcept
 	{
 		Matrix4T<T> ret(*this);
 		ret.divide(value);
@@ -470,20 +470,20 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T>& Matrix4T<T>::operator/=(T value)
+	Matrix4T<T>& Matrix4T<T>::operator/=(T value) noexcept
 	{
 		divide(value);
 		return *this;
 	}
 
 	template <class T>
-	Vector4T<T> Matrix4T<T>::operator*(const Vector4T<T>& v) const
+	Vector4T<T> Matrix4T<T>::operator*(const Vector4T<T>& v) const noexcept
 	{
 		return multiplyRight(v);
 	}
 
 	template <class T>
-	Matrix4T<T> Matrix4T<T>::operator*(const Matrix4T<T>& other) const
+	Matrix4T<T> Matrix4T<T>::operator*(const Matrix4T<T>& other) const noexcept
 	{
 		Matrix4T<T> ret(*this);
 		ret.multiply(other);
@@ -491,14 +491,14 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T>& Matrix4T<T>::operator*=(const Matrix4T<T>& other)
+	Matrix4T<T>& Matrix4T<T>::operator*=(const Matrix4T<T>& other) noexcept
 	{
 		multiply(other);
 		return *this;
 	}
 
 	template <class T>
-	sl_bool Matrix4T<T>::operator==(const Matrix4T<T>& other) const
+	sl_bool Matrix4T<T>::operator==(const Matrix4T<T>& other) const noexcept
 	{
 		return m00 == other.m00 && m01 == other.m01 && m02 == other.m02 && m03 == other.m03 &&
 			m10 == other.m10 && m11 == other.m11 && m12 == other.m12 && m13 == other.m13 &&
@@ -507,7 +507,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool Matrix4T<T>::operator!=(const Matrix4T<T>& other) const
+	sl_bool Matrix4T<T>::operator!=(const Matrix4T<T>& other) const noexcept
 	{
 		return m00 != other.m00 || m01 != other.m01 || m02 != other.m02 || m03 != other.m03 ||
 			m10 != other.m10 || m11 != other.m11 || m12 != other.m12 || m13 != other.m13 ||

@@ -16,31 +16,31 @@ namespace slib
 {
 
 	template <class T>
-	LineT<T>::LineT(const PointT<T>& point, const Vector2T<T>& dir)
+	LineT<T>::LineT(const PointT<T>& point, const Vector2T<T>& dir) noexcept
 	{
 		setFromPointAndDirection(point, dir);
 	}
 
 	template <class T>
-	Vector2T<T> LineT<T>::getDirection() const
+	Vector2T<T> LineT<T>::getDirection() const noexcept
 	{
 		return {b, -a};
 	}
 
 	template <class T>
-	Vector2T<T> LineT<T>::getNormal() const
+	Vector2T<T> LineT<T>::getNormal() const noexcept
 	{
 		return {a, b};
 	}
 
 	template <class T>
-	Vector2T<T> LineT<T>::projectOriginOnNormalized() const
+	Vector2T<T> LineT<T>::projectOriginOnNormalized() const noexcept
 	{
 		return {-a*c, -b*c};
 	}
 
 	template <class T>
-	Vector2T<T> LineT<T>::projectOrigin() const
+	Vector2T<T> LineT<T>::projectOrigin() const noexcept
 	{
 		T L = a * a + b * b;
 		if (L > 0) {
@@ -51,13 +51,13 @@ namespace slib
 	}
 
 	template <class T>
-	T LineT<T>::getDistanceFromPointOnNormalized(const PointT<T>& pos) const
+	T LineT<T>::getDistanceFromPointOnNormalized(const PointT<T>& pos) const noexcept
 	{
 		return a * pos.x + b * pos.y + c;
 	}
 
 	template <class T>
-	T LineT<T>::getDistanceFromPoint(const PointT<T>& pos) const
+	T LineT<T>::getDistanceFromPoint(const PointT<T>& pos) const noexcept
 	{
 		T L = a * a + b * b;
 		if (L > 0) {
@@ -69,14 +69,14 @@ namespace slib
 	}
 
 	template <class T>
-	Vector2T<T> LineT<T>::projectPointOnNormalized(const Vector2T<T>& pos) const
+	Vector2T<T> LineT<T>::projectPointOnNormalized(const Vector2T<T>& pos) const noexcept
 	{
 		T D = a * pos.x + b * pos.y + c;
 		return {pos.x - D * a, pos.y - D * b};
 	}
 
 	template <class T>
-	Vector2T<T> LineT<T>::projectPoint(const Vector2T<T>& pos) const
+	Vector2T<T> LineT<T>::projectPoint(const Vector2T<T>& pos) const noexcept
 	{
 		T L = a * a + b * b;
 		if (L > 0) {
@@ -88,7 +88,7 @@ namespace slib
 	}
 
 	template <class T>
-	void LineT<T>::setFromPointAndDirection(const PointT<T>& point, const Vector2T<T>& dir)
+	void LineT<T>::setFromPointAndDirection(const PointT<T>& point, const Vector2T<T>& dir) noexcept
 	{
 		a = dir.y;
 		b = -dir.x;
@@ -96,7 +96,7 @@ namespace slib
 	}
 
 	template <class T>
-	void LineT<T>::setFromPointAndNormal(const PointT<T>& point, const Vector2T<T>& normal)
+	void LineT<T>::setFromPointAndNormal(const PointT<T>& point, const Vector2T<T>& normal) noexcept
 	{
 		a = normal.x;
 		b = normal.y;
@@ -104,7 +104,7 @@ namespace slib
 	}
 
 	template <class T>
-	void LineT<T>::normalize()
+	void LineT<T>::normalize() noexcept
 	{
 		T l = Math::sqrt(a * a + b * b);
 		a /= l;
@@ -113,7 +113,7 @@ namespace slib
 	}
 
 	template <class T>
-	void LineT<T>::transform(const Matrix3T<T>& mat)
+	void LineT<T>::transform(const Matrix3T<T>& mat) noexcept
 	{
 		T _a = a * mat.m00 + b * mat.m10;
 		T _b = a * mat.m01 + b * mat.m11;

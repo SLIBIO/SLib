@@ -16,37 +16,36 @@ namespace slib
 {
 
 	template <class T>
-	Triangle3T<T>::Triangle3T(const Vector3T<T>& _point1, const Vector3T<T>& _point2, const Vector3T<T>& _point3)
-	: point1(_point1), point2(_point2), point3(_point3)
-	{
-	}
+	Triangle3T<T>::Triangle3T(const Vector3T<T>& _point1, const Vector3T<T>& _point2, const Vector3T<T>& _point3) noexcept
+	 : point1(_point1), point2(_point2), point3(_point3)
+	 {}
 
 	template <class T>
-	Vector3T<T> Triangle3T<T>::getNormal(const Vector3T<T>& point1, const Vector3T<T>& point2, const Vector3T<T>& point3)
+	Vector3T<T> Triangle3T<T>::getNormal(const Vector3T<T>& point1, const Vector3T<T>& point2, const Vector3T<T>& point3) noexcept
 	{
 		return (point1 - point2).cross(point2 - point3);
 	}
 
 	template <class T>
-	Vector3T<T> Triangle3T<T>::getNormal() const
+	Vector3T<T> Triangle3T<T>::getNormal() const noexcept
 	{
 		return getNormal(point1, point2, point3);
 	}
 
 	template <class T>
-	T Triangle3T<T>::getSize() const
+	T Triangle3T<T>::getSize() const noexcept
 	{
 		return (point1 - point2).cross(point2 - point3).getLength() / 2;
 	}
 
 	template <class T>
-	PlaneT<T> Triangle3T<T>::getPlane() const
+	PlaneT<T> Triangle3T<T>::getPlane() const noexcept
 	{
 		return {point1, getNormal()};
 	}
 
 	template <class T>
-	void Triangle3T<T>::transform(const Matrix4T<T>& mat)
+	void Triangle3T<T>::transform(const Matrix4T<T>& mat) noexcept
 	{
 		point1 = mat.transformPosition(point1);
 		point2 = mat.transformPosition(point2);
@@ -54,7 +53,7 @@ namespace slib
 	}
 
 	template <class T>
-	Vector3T<T> Triangle3T<T>::projectPoint(const Vector3T<T>& point, T* pDist, T* pU, T* pV) const
+	Vector3T<T> Triangle3T<T>::projectPoint(const Vector3T<T>& point, T* pDist, T* pU, T* pV) const noexcept
 	{
 		const Triangle3T<T>& triangle = *this;
 		Vector3T<T> P = triangle.point2 - triangle.point1;
@@ -99,7 +98,7 @@ namespace slib
 						sl_bool* pFlagParallel,
 						sl_bool* pFlagExtendPoint1,
 						sl_bool* pFlagExtendPoint2,
-						sl_bool* pFlagExtendTriangle) const
+						sl_bool* pFlagExtendTriangle) const noexcept
 	{
 		const Triangle3T<T>& triangle = *this;
 		T L = line.getLength();
@@ -247,7 +246,7 @@ namespace slib
 						const PlaneT<T>& plane,
 						Line3T<T>* outLine,
 						sl_uint32* outLineNo1,
-						sl_uint32* outLineNo2) const
+						sl_uint32* outLineNo2) const noexcept
 	{
 		const Triangle3T<T>& triangle = *this;
 		Line3T<T> line1(triangle.point1, triangle.point2);
@@ -299,7 +298,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool Triangle3T<T>::intersectTriangle(const Triangle3T<T>& triangle, Line3T<T>* outLine) const
+	sl_bool Triangle3T<T>::intersectTriangle(const Triangle3T<T>& triangle, Line3T<T>* outLine) const noexcept
 	{
 		const Triangle3T<T>& triangle1 = *this;
 		const Triangle3T<T>& triangle2 = triangle;

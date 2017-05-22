@@ -32,53 +32,53 @@ namespace slib
 		T c;
 
 	public:
-		LineT() = default;
+		SLIB_INLINE LineT() noexcept = default;
 
-		constexpr LineT(const LineT<T>& other)
+		SLIB_INLINE constexpr LineT(const LineT<T>& other) noexcept
 		 : a((T)(other.a)), b((T)(other.b)), c((T)(other.c))
 		{}
 
 		template <class O>
-		constexpr LineT(const LineT<O>& other)
+		SLIB_INLINE constexpr LineT(const LineT<O>& other) noexcept
 		 : a((T)(other.a)), b((T)(other.b)), c((T)(other.c))
 		{}
 
-		constexpr LineT(T _a, T _b, T _c)
+		SLIB_INLINE constexpr LineT(T _a, T _b, T _c) noexcept
 		 : a(_a), b(_b), c(_c)
 		{}
 
-		LineT(const PointT<T>& point, const Vector2T<T>& dir);
+		LineT(const PointT<T>& point, const Vector2T<T>& dir) noexcept;
 
 	public:
-		Vector2T<T> getDirection() const;
+		Vector2T<T> getDirection() const noexcept;
 
-		Vector2T<T> getNormal() const;
+		Vector2T<T> getNormal() const noexcept;
 
-		Vector2T<T> projectOriginOnNormalized() const;
+		Vector2T<T> projectOriginOnNormalized() const noexcept;
 
-		Vector2T<T> projectOrigin() const;
+		Vector2T<T> projectOrigin() const noexcept;
 
-		T getDistanceFromPointOnNormalized(const PointT<T>& pos) const;
+		T getDistanceFromPointOnNormalized(const PointT<T>& pos) const noexcept;
 
-		T getDistanceFromPoint(const PointT<T>& pos) const;
+		T getDistanceFromPoint(const PointT<T>& pos) const noexcept;
 
-		Vector2T<T> projectPointOnNormalized(const PointT<T>& pos) const;
+		Vector2T<T> projectPointOnNormalized(const PointT<T>& pos) const noexcept;
 
-		Vector2T<T> projectPoint(const PointT<T>& pos) const;
+		Vector2T<T> projectPoint(const PointT<T>& pos) const noexcept;
 
-		void setFromPointAndDirection(const PointT<T>& point, const Vector2T<T>& dir);
+		void setFromPointAndDirection(const PointT<T>& point, const Vector2T<T>& dir) noexcept;
 
-		void setFromPointAndNormal(const PointT<T>& point, const Vector2T<T>& normal);
+		void setFromPointAndNormal(const PointT<T>& point, const Vector2T<T>& normal) noexcept;
 
-		void normalize();
+		void normalize() noexcept;
 
-		void transform(const Matrix3T<T>& mat);
+		void transform(const Matrix3T<T>& mat) noexcept;
 
 	public:
-		LineT<T>& operator=(const LineT<T>& other) = default;
+		LineT<T>& operator=(const LineT<T>& other) noexcept = default;
 
 		template <class O>
-		LineT<T>& operator=(const LineT<O>& other);
+		LineT<T>& operator=(const LineT<O>& other) noexcept;
 
 	};
 	

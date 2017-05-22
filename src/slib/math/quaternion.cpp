@@ -19,19 +19,19 @@ namespace slib
 	SLIB_ALIGN(8) T QuaternionT<T>::_identity[4] = { 0, 0, 0, 1 };
 
 	template <class T>
-	T QuaternionT<T>::getLength2p() const
+	T QuaternionT<T>::getLength2p() const noexcept
 	{
 		return x * x + y * y + z * z + w * w;
 	}
 
 	template <class T>
-	T QuaternionT<T>::getLength() const
+	T QuaternionT<T>::getLength() const noexcept
 	{
 		return Math::sqrt(x * x + y * y + z * z + w * w);
 	}
 
 	template <class T>
-	void QuaternionT<T>::multiply(const QuaternionT<T>& other)
+	void QuaternionT<T>::multiply(const QuaternionT<T>& other) noexcept
 	{
 		T ox = other.x, oy = other.y, oz = other.z, ow = other.w;
 		T qx = w * ox + x * ow + y * oz - z * oy;
@@ -42,7 +42,7 @@ namespace slib
 	}
 
 	template <class T>
-	void QuaternionT<T>::divide(const QuaternionT<T>& other)
+	void QuaternionT<T>::divide(const QuaternionT<T>& other) noexcept
 	{
 		T ox = -other.x, oy = -other.y, oz = -other.z, ow = other.w;
 		T qx = w * ox + x * ow + y * oz - z * oy;
@@ -53,7 +53,7 @@ namespace slib
 	}
 
 	template <class T>
-	void QuaternionT<T>::setRotation(const Vector3T<T>& vAxis, T fAngle)
+	void QuaternionT<T>::setRotation(const Vector3T<T>& vAxis, T fAngle) noexcept
 	{
 		T f = Math::sin(fAngle / 2) / vAxis.getLength();
 		x = vAxis.x * f;
@@ -63,7 +63,7 @@ namespace slib
 	}
 
 	template <class T>
-	QuaternionT<T> QuaternionT<T>::getRotation(const Vector3T<T>& vAxis, T fAngle)
+	QuaternionT<T> QuaternionT<T>::getRotation(const Vector3T<T>& vAxis, T fAngle) noexcept
 	{
 		QuaternionT<T> ret;
 		ret.setRotation(vAxis, fAngle);
@@ -71,19 +71,19 @@ namespace slib
 	}
 
 	template <class T>
-	T QuaternionT<T>::getAngle() const
+	T QuaternionT<T>::getAngle() const noexcept
 	{
 		return 2 * Math::arccos(w);
 	}
 
 	template <class T>
-	Vector4T<T> QuaternionT<T>::getAxis() const
+	Vector4T<T> QuaternionT<T>::getAxis() const noexcept
 	{
 		return {x, y, z, 0};
 	}
 
 	template <class T>
-	void QuaternionT<T>::makeInverse()
+	void QuaternionT<T>::makeInverse() noexcept
 	{
 		x = -x;
 		y = -y;
@@ -91,7 +91,7 @@ namespace slib
 	}
 
 	template <class T>
-	QuaternionT<T> QuaternionT<T>::inverse() const
+	QuaternionT<T> QuaternionT<T>::inverse() const noexcept
 	{
 		QuaternionT<T> ret = *this;
 		ret.makeInverse();
@@ -99,14 +99,14 @@ namespace slib
 	}
 
 	template <class T>
-	QuaternionT<T>& QuaternionT<T>::operator*=(const QuaternionT<T>& other)
+	QuaternionT<T>& QuaternionT<T>::operator*=(const QuaternionT<T>& other) noexcept
 	{
 		multiply(other);
 		return *this;
 	}
 
 	template <class T>
-	QuaternionT<T> QuaternionT<T>::operator*(const QuaternionT<T>& other) const
+	QuaternionT<T> QuaternionT<T>::operator*(const QuaternionT<T>& other) const noexcept
 	{
 		QuaternionT<T> ret = *this;
 		ret.multiply(other);
@@ -114,14 +114,14 @@ namespace slib
 	}
 
 	template <class T>
-	QuaternionT<T>& QuaternionT<T>::operator/=(const QuaternionT<T>& other)
+	QuaternionT<T>& QuaternionT<T>::operator/=(const QuaternionT<T>& other) noexcept
 	{
 		divide(other);
 		return *this;
 	}
 
 	template <class T>
-	QuaternionT<T> QuaternionT<T>::operator/(QuaternionT<T>& other) const
+	QuaternionT<T> QuaternionT<T>::operator/(QuaternionT<T>& other) const noexcept
 	{
 		QuaternionT<T> ret = *this;
 		ret.divide(other);
@@ -129,13 +129,13 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool QuaternionT<T>::operator==(const QuaternionT<T>& other) const
+	sl_bool QuaternionT<T>::operator==(const QuaternionT<T>& other) const noexcept
 	{
 		return (x == other.x) && (y == other.y) && (z == other.z) && (w == other.w);
 	}
 
 	template <class T>
-	sl_bool QuaternionT<T>::operator!=(const QuaternionT<T>& other) const
+	sl_bool QuaternionT<T>::operator!=(const QuaternionT<T>& other) const noexcept
 	{
 		return (x != other.x) || (y != other.y) || (z != other.z) || (w != other.w);
 	}

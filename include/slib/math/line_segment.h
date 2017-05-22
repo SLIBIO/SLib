@@ -27,37 +27,37 @@ namespace slib
 		PointT<T> point2;
 
 	public:
-		LineSegmentT() = default;
+		LineSegmentT() noexcept = default;
 
-		LineSegmentT(const LineSegmentT<T>& other) = default;
-
-		template <class O>
-		LineSegmentT(const LineSegmentT<O>& other);
-
-		LineSegmentT(const PointT<T>& point1, const PointT<T>& point2);
-
-		LineSegmentT(T x1, T y1, T x2, T y2);
-
-	public:
-		Vector2T<T> getDirection() const;
-
-		T getLength2p() const;
-
-		T getLength() const;
-
-		void transform(const Matrix3T<T>& mat);
-
-		PointT<T> projectPoint(const PointT<T>& point) const;
-
-		T getDistanceFromPoint(const PointT<T>& point) const;
-
-		T getDistanceFromPointOnInfiniteLine(const PointT<T>& point) const;
-
-	public:
-		LineSegmentT<T>& operator=(const LineSegmentT<T>& other) = default;
+		LineSegmentT(const LineSegmentT<T>& other) noexcept = default;
 
 		template <class O>
-		LineSegmentT<T>& operator=(const LineSegmentT<O>& other);
+		LineSegmentT(const LineSegmentT<O>& other) noexcept;
+
+		LineSegmentT(const PointT<T>& point1, const PointT<T>& point2) noexcept;
+
+		LineSegmentT(T x1, T y1, T x2, T y2) noexcept;
+
+	public:
+		Vector2T<T> getDirection() const noexcept;
+
+		T getLength2p() const noexcept;
+
+		T getLength() const noexcept;
+
+		void transform(const Matrix3T<T>& mat) noexcept;
+
+		PointT<T> projectPoint(const PointT<T>& point) const noexcept;
+
+		T getDistanceFromPoint(const PointT<T>& point) const noexcept;
+
+		T getDistanceFromPointOnInfiniteLine(const PointT<T>& point) const noexcept;
+
+	public:
+		LineSegmentT<T>& operator=(const LineSegmentT<T>& other) noexcept = default;
+
+		template <class O>
+		LineSegmentT<T>& operator=(const LineSegmentT<O>& other) noexcept;
 
 	};
 	

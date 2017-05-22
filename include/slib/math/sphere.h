@@ -27,28 +27,28 @@ namespace slib
 		T radius;
 
 	public:
-		SphereT() = default;
+		SphereT() noexcept = default;
 
-		SphereT(const SphereT<T>& other) = default;
+		SphereT(const SphereT<T>& other) noexcept = default;
 
 		template <class O>
-		SphereT(const SphereT<O>& other);
+		SphereT(const SphereT<O>& other) noexcept;
 
-		SphereT(const Vector3T<T>& center, T radius);
+		SphereT(const Vector3T<T>& center, T radius) noexcept;
 
-		SphereT(T xc, T yc, T zc, T radius);
+		SphereT(T xc, T yc, T zc, T radius) noexcept;
 
 	public:
-		sl_bool containsPoint(const Vector3T<T>& point) const;
+		sl_bool containsPoint(const Vector3T<T>& point) const noexcept;
 
 		// returns the count of intersected points
-		sl_uint32 intersectLine(const Line3T<T>& line, Vector3T<T>* pOut1, Vector3T<T>* pOut2) const;
+		sl_uint32 intersectLine(const Line3T<T>& line, Vector3T<T>* pOut1, Vector3T<T>* pOut2) const noexcept;
 
 	public:
-		SphereT<T>& operator=(const SphereT<T>& other) = default;
+		SphereT<T>& operator=(const SphereT<T>& other) noexcept = default;
 
 		template <class O>
-		SphereT<T>& operator=(const SphereT<O>& other);
+		SphereT<T>& operator=(const SphereT<O>& other) noexcept;
 	
 	};
 	

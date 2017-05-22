@@ -13,13 +13,13 @@ namespace slib
 	
 	template <class T>
 	template <class O>
-	SLIB_INLINE SphereT<T>::SphereT(const SphereT<O>& other) : center(other.center), radius((T)(other.radius))
-	{
-	}
+	SLIB_INLINE SphereT<T>::SphereT(const SphereT<O>& other) noexcept
+	 : center(other.center), radius((T)(other.radius))
+	 {}
 	
 	template <class T>
 	template <class O>
-	SLIB_INLINE SphereT<T>& SphereT<T>::operator=(const SphereT<O>& other)
+	SLIB_INLINE SphereT<T>& SphereT<T>::operator=(const SphereT<O>& other) noexcept
 	{
 		center = other.center;
 		radius = (T)(other.radius);

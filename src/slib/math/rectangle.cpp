@@ -18,39 +18,39 @@ namespace slib
 	SLIB_ALIGN(8) T RectangleT<T, FT>::_zero[4] = {0, 0, 0, 0};
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setWidth(T width)
+	void RectangleT<T, FT>::setWidth(T width) noexcept
 	{
 		right = left + width;
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setHeight(T height)
+	void RectangleT<T, FT>::setHeight(T height) noexcept
 	{
 		bottom = top + height;
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setSize(T width, T height)
+	void RectangleT<T, FT>::setSize(T width, T height) noexcept
 	{
 		right = left + width;
 		bottom = top + height;
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setSize(const SizeT<T, FT>& size)
+	void RectangleT<T, FT>::setSize(const SizeT<T, FT>& size) noexcept
 	{
 		right = left + size.x;
 		bottom = top + size.y;
 	}
 
 	template <class T, class FT>
-	PointT<T, FT> RectangleT<T, FT>::getLocation() const
+	PointT<T, FT> RectangleT<T, FT>::getLocation() const noexcept
 	{
 		return {left, top};
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setLocation(T _x, T _y)
+	void RectangleT<T, FT>::setLocation(T _x, T _y) noexcept
 	{
 		T w = right - left;
 		T h = bottom - top;
@@ -61,7 +61,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setLocation(const PointT<T, FT>& location)
+	void RectangleT<T, FT>::setLocation(const PointT<T, FT>& location) noexcept
 	{
 		T w = right - left;
 		T h = bottom - top;
@@ -72,7 +72,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::translate(T tx, T ty)
+	void RectangleT<T, FT>::translate(T tx, T ty) noexcept
 	{
 		left += tx;
 		top += ty;
@@ -81,7 +81,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::translate(const PointT<T, FT>& t)
+	void RectangleT<T, FT>::translate(const PointT<T, FT>& t) noexcept
 	{
 		left += t.x;
 		top += t.y;
@@ -90,93 +90,93 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	PointT<T, FT> RectangleT<T, FT>::getLeftTop() const
+	PointT<T, FT> RectangleT<T, FT>::getLeftTop() const noexcept
 	{
 		return {left, top};
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setLeftTop(T _x, T _y)
+	void RectangleT<T, FT>::setLeftTop(T _x, T _y) noexcept
 	{
 		left = _x;
 		top = _y;
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setLeftTop(const PointT<T, FT>& pt)
+	void RectangleT<T, FT>::setLeftTop(const PointT<T, FT>& pt) noexcept
 	{
 		left = pt.x;
 		top = pt.y;
 	}
 
 	template <class T, class FT>
-	PointT<T, FT> RectangleT<T, FT>::getLeftBottom() const
+	PointT<T, FT> RectangleT<T, FT>::getLeftBottom() const noexcept
 	{
 		return {left, bottom};
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setLeftBottom(T _x, T _y)
+	void RectangleT<T, FT>::setLeftBottom(T _x, T _y) noexcept
 	{
 		left = _x;
 		bottom = _y;
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setLeftBottom(const PointT<T, FT>& pt)
+	void RectangleT<T, FT>::setLeftBottom(const PointT<T, FT>& pt) noexcept
 	{
 		left = pt.x;
 		bottom = pt.y;
 	}
 
 	template <class T, class FT>
-	PointT<T, FT> RectangleT<T, FT>::getRightTop() const
+	PointT<T, FT> RectangleT<T, FT>::getRightTop() const noexcept
 	{
 		return {right, top};
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setRightTop(T _x, T _y)
+	void RectangleT<T, FT>::setRightTop(T _x, T _y) noexcept
 	{
 		right = _x;
 		top = _y;
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setRightTop(const PointT<T, FT>& pt)
+	void RectangleT<T, FT>::setRightTop(const PointT<T, FT>& pt) noexcept
 	{
 		right = pt.x;
 		top = pt.y;
 	}
 
 	template <class T, class FT>
-	PointT<T, FT> RectangleT<T, FT>::getRightBottom() const
+	PointT<T, FT> RectangleT<T, FT>::getRightBottom() const noexcept
 	{
 		return {right, bottom};
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setRightBottom(T _x, T _y)
+	void RectangleT<T, FT>::setRightBottom(T _x, T _y) noexcept
 	{
 		right = _x;
 		bottom = _y;
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setRightBottom(const PointT<T, FT>& pt)
+	void RectangleT<T, FT>::setRightBottom(const PointT<T, FT>& pt) noexcept
 	{
 		right = pt.x;
 		bottom = pt.y;
 	}
 
 	template <class T, class FT>
-	PointT<T, FT> RectangleT<T, FT>::getCenter() const
+	PointT<T, FT> RectangleT<T, FT>::getCenter() const noexcept
 	{
 		return {(left + right) / 2, (top + bottom) / 2};
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setCenter(T _x, T _y)
+	void RectangleT<T, FT>::setCenter(T _x, T _y) noexcept
 	{
 		T w = (right - left) / 2;
 		T h = (bottom - top) / 2;
@@ -187,7 +187,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setCenter(const PointT<T, FT>& pt)
+	void RectangleT<T, FT>::setCenter(const PointT<T, FT>& pt) noexcept
 	{
 		T w = (right - left) / 2;
 		T h = (bottom - top) / 2;
@@ -198,7 +198,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setZero()
+	void RectangleT<T, FT>::setZero() noexcept
 	{
 		left = 0;
 		top = 0;
@@ -207,25 +207,25 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	sl_bool RectangleT<T, FT>::containsPoint(T x, T y) const
+	sl_bool RectangleT<T, FT>::containsPoint(T x, T y) const noexcept
 	{
 		return x >= left && x <= right && y >= top && y <= bottom;
 	}
 
 	template <class T, class FT>
-	sl_bool RectangleT<T, FT>::containsPoint(const PointT<T, FT>& pt) const
+	sl_bool RectangleT<T, FT>::containsPoint(const PointT<T, FT>& pt) const noexcept
 	{
 		return pt.x >= left && pt.x <= right && pt.y >= top && pt.y <= bottom;
 	}
 
 	template <class T, class FT>
-	sl_bool RectangleT<T, FT>::containsRectangle(const RectangleT<T, FT>& other) const
+	sl_bool RectangleT<T, FT>::containsRectangle(const RectangleT<T, FT>& other) const noexcept
 	{
 		return left <= other.left && right >= other.right && top <= other.top && bottom >= other.bottom;
 	}
 
 	template <class T, class FT>
-	sl_bool RectangleT<T, FT>::intersectRectangle(const RectangleT<T, FT>& other, RectangleT<T, FT>* outIntersect) const
+	sl_bool RectangleT<T, FT>::intersectRectangle(const RectangleT<T, FT>& other, RectangleT<T, FT>* outIntersect) const noexcept
 	{
 		if (outIntersect) {
 			T _left = SLIB_MAX(left, other.left);
@@ -243,21 +243,21 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setFromPoint(T x, T y)
+	void RectangleT<T, FT>::setFromPoint(T x, T y) noexcept
 	{
 		left = right = x;
 		top = bottom = y;
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setFromPoint(const PointT<T, FT>& pt)
+	void RectangleT<T, FT>::setFromPoint(const PointT<T, FT>& pt) noexcept
 	{
 		left = right = pt.x;
 		top = bottom = pt.y;
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::mergePoint(T x, T y)
+	void RectangleT<T, FT>::mergePoint(T x, T y) noexcept
 	{
 		if (left > x) {
 			left = x;
@@ -274,7 +274,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::mergePoint(const PointT<T, FT>& pt)
+	void RectangleT<T, FT>::mergePoint(const PointT<T, FT>& pt) noexcept
 	{
 		if (left > pt.x) {
 			left = pt.x;
@@ -291,7 +291,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::mergePoints(const PointT<T, FT>* points, sl_size count)
+	void RectangleT<T, FT>::mergePoints(const PointT<T, FT>* points, sl_size count) noexcept
 	{
 		for (sl_size i = 0; i < count; i++) {
 			const PointT<T, FT>& v = points[i];
@@ -311,14 +311,14 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::mergePoints(const List< PointT<T, FT> >& points)
+	void RectangleT<T, FT>::mergePoints(const List< PointT<T, FT> >& points) noexcept
 	{
 		ListLocker< PointT<T, FT> > list(points);
 		mergePoints(list.data, list.count);
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setFromPoints(const PointT<T, FT>* points, sl_size count)
+	void RectangleT<T, FT>::setFromPoints(const PointT<T, FT>* points, sl_size count) noexcept
 	{
 		if (count > 0) {
 			setFromPoint(points[0]);
@@ -329,21 +329,21 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setFromPoints(const List< PointT<T, FT> >& points)
+	void RectangleT<T, FT>::setFromPoints(const List< PointT<T, FT> >& points) noexcept
 	{
 		ListLocker< PointT<T, FT> > list(points);
 		setFromPoints(list.data, list.count);
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::setFromPoints(const PointT<T, FT>& pt1, const PointT<T, FT>& pt2)
+	void RectangleT<T, FT>::setFromPoints(const PointT<T, FT>& pt1, const PointT<T, FT>& pt2) noexcept
 	{
 		setFromPoint(pt1);
 		mergePoint(pt2);
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::mergeRectangle(const RectangleT<T, FT>& rect)
+	void RectangleT<T, FT>::mergeRectangle(const RectangleT<T, FT>& rect) noexcept
 	{
 		if (left > rect.left) {
 			left = rect.left;
@@ -360,7 +360,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::getCornerPoints(PointT<T, FT>* _out) const
+	void RectangleT<T, FT>::getCornerPoints(PointT<T, FT>* _out) const noexcept
 	{
 		_out[0].x = left; _out[0].y = top;
 		_out[1].x = right; _out[1].y = top;
@@ -369,7 +369,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void RectangleT<T, FT>::transform(const Matrix3T<FT>& mat)
+	void RectangleT<T, FT>::transform(const Matrix3T<FT>& mat) noexcept
 	{
 		Vector2T<T, FT> pts[4];
 		getCornerPoints(pts);
@@ -380,13 +380,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	sl_bool RectangleT<T, FT>::equals(const RectangleT<T, FT>& other) const
+	sl_bool RectangleT<T, FT>::equals(const RectangleT<T, FT>& other) const noexcept
 	{
 		return left == other.left && top == other.top && right == other.right && bottom == other.bottom;
 	}
 
 	template <class T, class FT>
-	sl_bool RectangleT<T, FT>::isAlmostEqual(const RectangleT<T, FT>& other) const
+	sl_bool RectangleT<T, FT>::isAlmostEqual(const RectangleT<T, FT>& other) const noexcept
 	{
 		return Math::isAlmostZero(left - other.left) &&
 			Math::isAlmostZero(top - other.top) &&
@@ -395,13 +395,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	sl_bool RectangleT<T, FT>::isValidSize()
+	sl_bool RectangleT<T, FT>::isValidSize() noexcept
 	{
 		return right > left && bottom > top;
 	}
 
 	template <class T, class FT>
-	sl_bool RectangleT<T, FT>::fixSizeError()
+	sl_bool RectangleT<T, FT>::fixSizeError() noexcept
 	{
 		sl_bool flagFixed = sl_false;
 		if (right < left) {
@@ -416,7 +416,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	RectangleT<T, FT> RectangleT<T, FT>::lerp(const RectangleT<T, FT>& target, float factor) const
+	RectangleT<T, FT> RectangleT<T, FT>::lerp(const RectangleT<T, FT>& target, float factor) const noexcept
 	{
 		return {(T)SLIB_LERP(left, target.left, factor), (T)SLIB_LERP(top, target.top, factor), (T)SLIB_LERP(right, target.right, factor), (T)SLIB_LERP(bottom, target.bottom, factor)};
 	}

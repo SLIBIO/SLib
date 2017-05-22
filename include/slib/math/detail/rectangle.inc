@@ -12,32 +12,32 @@ namespace slib
 {
 
 	template <class T, class FT>
-	SLIB_INLINE const RectangleT<T, FT>& RectangleT<T, FT>::zero()
+	SLIB_INLINE const RectangleT<T, FT>& RectangleT<T, FT>::zero() noexcept
 	{
 		return *(reinterpret_cast<RectangleT<T, FT> const*>(&_zero));
 	}
 
 	template <class T, class FT>
-	SLIB_INLINE T RectangleT<T, FT>::getWidth() const
+	SLIB_INLINE T RectangleT<T, FT>::getWidth() const noexcept
 	{
 		return right - left;
 	}
 	
 	template <class T, class FT>
-	SLIB_INLINE T RectangleT<T, FT>::getHeight() const
+	SLIB_INLINE T RectangleT<T, FT>::getHeight() const noexcept
 	{
 		return bottom - top;
 	}
 	
 	template <class T, class FT>
-	SLIB_INLINE SizeT<T, FT> RectangleT<T, FT>::getSize() const
+	SLIB_INLINE SizeT<T, FT> RectangleT<T, FT>::getSize() const noexcept
 	{
 		return {right - left, bottom - top};
 	}
 	
 	template <class T, class FT>
 	template <class O, class FO>
-	SLIB_INLINE RectangleT<T, FT>& RectangleT<T, FT>::operator=(const RectangleT<O, FO>& other)
+	SLIB_INLINE RectangleT<T, FT>& RectangleT<T, FT>::operator=(const RectangleT<O, FO>& other) noexcept
 	{
 		left = (T)(other.left);
 		top = (T)(other.top);
@@ -48,7 +48,7 @@ namespace slib
 	
 	
 	template <class T, class FT>
-	SLIB_INLINE RectangleT<T, FT> Interpolation< RectangleT<T, FT> >::interpolate(const RectangleT<T, FT>& a, const RectangleT<T, FT>& b, float factor)
+	SLIB_INLINE RectangleT<T, FT> Interpolation< RectangleT<T, FT> >::interpolate(const RectangleT<T, FT>& a, const RectangleT<T, FT>& b, float factor) noexcept
 	{
 		return a.lerp(b, factor);
 	}

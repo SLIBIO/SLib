@@ -30,27 +30,27 @@ namespace slib
 		Vector3T<T> point3;
 
 	public:
-		Triangle3T() = default;
+		Triangle3T() noexcept = default;
 
-		Triangle3T(const Triangle3T<T>& other) = default;
+		Triangle3T(const Triangle3T<T>& other) noexcept = default;
 
 		template <class O>
-		Triangle3T(const Triangle3T<O>& other);
+		Triangle3T(const Triangle3T<O>& other) noexcept;
 
-		Triangle3T(const Vector3T<T>& point1, const Vector3T<T>& point2, const Vector3T<T>& point3);
+		Triangle3T(const Vector3T<T>& point1, const Vector3T<T>& point2, const Vector3T<T>& point3) noexcept;
 
 	public:
-		static Vector3T<T> getNormal(const Vector3T<T>& point1, const Vector3T<T>& point2, const Vector3T<T>& point3);
+		static Vector3T<T> getNormal(const Vector3T<T>& point1, const Vector3T<T>& point2, const Vector3T<T>& point3) noexcept;
 
-		Vector3T<T> getNormal() const;
+		Vector3T<T> getNormal() const noexcept;
 
-		T getSize() const;
+		T getSize() const noexcept;
 
-		PlaneT<T> getPlane() const;
+		PlaneT<T> getPlane() const noexcept;
 
-		void transform(const Matrix4T<T>& mat);
+		void transform(const Matrix4T<T>& mat) noexcept;
 
-		Vector3T<T> projectPoint(const Vector3T<T>& point, T* pDist = sl_null, T* pU = sl_null, T* pV = sl_null) const;
+		Vector3T<T> projectPoint(const Vector3T<T>& point, T* pDist = sl_null, T* pU = sl_null, T* pV = sl_null) const noexcept;
 
 		sl_bool intersectLine(
 			Line3T<T>& line,
@@ -61,21 +61,21 @@ namespace slib
 			sl_bool* pFlagParallel = sl_null,
 			sl_bool* pFlagExtendPoint1 = sl_null,
 			sl_bool* pFlagExtendPoint2 = sl_null,
-			sl_bool* pFlagExtendTriangle = sl_null) const;
+			sl_bool* pFlagExtendTriangle = sl_null) const noexcept;
 
 		sl_bool intersectPlane(
 			const PlaneT<T>& plane,
 			Line3T<T>* outLine = sl_null,
 			sl_uint32* outLineNo1 = sl_null,
-			sl_uint32* outLineNo2 = sl_null) const;
+			sl_uint32* outLineNo2 = sl_null) const noexcept;
 
-		sl_bool intersectTriangle(const Triangle3T<T>& triangle, Line3T<T>* outLine) const;
+		sl_bool intersectTriangle(const Triangle3T<T>& triangle, Line3T<T>* outLine) const noexcept;
 
 	public:
-		Triangle3T<T>& operator=(const Triangle3T<T>& other) = default;
+		Triangle3T<T>& operator=(const Triangle3T<T>& other) noexcept = default;
 
 		template <class O>
-		Triangle3T<T>& operator=(const Triangle3T<O>& other);
+		Triangle3T<T>& operator=(const Triangle3T<O>& other) noexcept;
 	
 	};
 	

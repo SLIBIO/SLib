@@ -33,33 +33,33 @@ namespace slib
 		Matrix4T<T> MVP;
 
 	public:
-		ViewFrustumT() = default;
+		ViewFrustumT() noexcept = default;
 
-		ViewFrustumT(const ViewFrustumT<T>& other) = default;
-
-		template <class O>
-		ViewFrustumT(const ViewFrustumT<O>& other);
-
-	public:
-		static const ViewFrustumT<T>& fromMVP(const Matrix4T<T>& MVP);
-
-		void getPlanes(PlaneT<T>& near, PlaneT<T>& far, PlaneT<T>& left, PlaneT<T>& right, PlaneT<T>& top, PlaneT<T>& bottom) const;
-
-		void getPlanes(PlaneT<T>* _out) const;
-
-		sl_bool containsPoint(const Vector3T<T>& pt, sl_bool flagSkipNearFar = sl_true) const;
-
-		sl_bool containsFacets(const Vector3T<T>* pts, sl_uint32 n, sl_bool* pFlagIntersect = sl_null, sl_bool flagSkipNearFar = sl_true) const;
-
-		sl_bool containsSphere(const SphereT<T>& sphere, sl_bool* pFlagIntersect = sl_null, sl_bool flagSkipNearFar = sl_true) const;
-
-		sl_bool containsBox(const BoxT<T>& box, sl_bool* pFlagIntersect = sl_null, sl_bool flagSkipNearFar = sl_true) const;
-
-	public:
-		ViewFrustumT<T>& operator=(const ViewFrustumT<T>& other) = default;
+		ViewFrustumT(const ViewFrustumT<T>& other) noexcept = default;
 
 		template <class O>
-		ViewFrustumT<T>& operator=(const ViewFrustumT<O>& other);
+		ViewFrustumT(const ViewFrustumT<O>& other) noexcept;
+
+	public:
+		static const ViewFrustumT<T>& fromMVP(const Matrix4T<T>& MVP) noexcept;
+
+		void getPlanes(PlaneT<T>& near, PlaneT<T>& far, PlaneT<T>& left, PlaneT<T>& right, PlaneT<T>& top, PlaneT<T>& bottom) const noexcept;
+
+		void getPlanes(PlaneT<T>* _out) const noexcept;
+
+		sl_bool containsPoint(const Vector3T<T>& pt, sl_bool flagSkipNearFar = sl_true) const noexcept;
+
+		sl_bool containsFacets(const Vector3T<T>* pts, sl_uint32 n, sl_bool* pFlagIntersect = sl_null, sl_bool flagSkipNearFar = sl_true) const noexcept;
+
+		sl_bool containsSphere(const SphereT<T>& sphere, sl_bool* pFlagIntersect = sl_null, sl_bool flagSkipNearFar = sl_true) const noexcept;
+
+		sl_bool containsBox(const BoxT<T>& box, sl_bool* pFlagIntersect = sl_null, sl_bool flagSkipNearFar = sl_true) const noexcept;
+
+	public:
+		ViewFrustumT<T>& operator=(const ViewFrustumT<T>& other) noexcept = default;
+
+		template <class O>
+		ViewFrustumT<T>& operator=(const ViewFrustumT<O>& other) noexcept;
 
 	};
 

@@ -34,43 +34,43 @@ namespace slib
 		T d;
 
 	public:
-		SLIB_INLINE PlaneT() = default;
+		SLIB_INLINE PlaneT() noexcept = default;
 
-		constexpr PlaneT(const PlaneT<T>& other):
-		 a(other.a), b(other.b), c(other.c), d(other.d)
-		{}
+		SLIB_INLINE constexpr PlaneT(const PlaneT<T>& other)
+		 : a(other.a), b(other.b), c(other.c), d(other.d)
+		 {}
 
 		template <class O>
-		constexpr PlaneT(const PlaneT<O>& other):
-		 a((T)(other.a)), b((T)(other.b)), c((T)(other.c)), d((T)(other.d))
-		{}
+		SLIB_INLINE constexpr PlaneT(const PlaneT<O>& other)
+		 : a((T)(other.a)), b((T)(other.b)), c((T)(other.c)), d((T)(other.d))
+		 {}
 
-		constexpr PlaneT(T _a, T _b, T _c, T _d):
-		 a(_a), b(_b), c(_c), d(_d)
-		{}
+		SLIB_INLINE constexpr PlaneT(T _a, T _b, T _c, T _d)
+		 : a(_a), b(_b), c(_c), d(_d)
+		 {}
 
-		PlaneT(const Vector3T<T>& point, const Vector3T<T>& normal);
+		PlaneT(const Vector3T<T>& point, const Vector3T<T>& normal) noexcept;
 
 	public:
-		Vector3T<T> getNormal() const;
+		Vector3T<T> getNormal() const noexcept;
 
-		Vector3T<T> projectOriginOnNormalized() const;
+		Vector3T<T> projectOriginOnNormalized() const noexcept;
 
-		Vector3T<T> projectOrigin() const;
+		Vector3T<T> projectOrigin() const noexcept;
 
-		T getDistanceFromPointOnNormalized(const Vector3T<T>& pos) const;
+		T getDistanceFromPointOnNormalized(const Vector3T<T>& pos) const noexcept;
 
-		T getDistanceFromPoint(const Vector3T<T>& pos) const;
+		T getDistanceFromPoint(const Vector3T<T>& pos) const noexcept;
 
-		Vector3T<T> projectPointOnNormalized(const Vector3T<T>& pos) const;
+		Vector3T<T> projectPointOnNormalized(const Vector3T<T>& pos) const noexcept;
 
-		Vector3T<T> projectPoint(const Vector3T<T>& pos) const;
+		Vector3T<T> projectPoint(const Vector3T<T>& pos) const noexcept;
 
-		void setFromPointAndNormal(const Vector3T<T>& point, const Vector3T<T>& normal);
+		void setFromPointAndNormal(const Vector3T<T>& point, const Vector3T<T>& normal) noexcept;
 
-		void normalize();
+		void normalize() noexcept;
 
-		void transform(const Matrix4T<T>& mat);
+		void transform(const Matrix4T<T>& mat) noexcept;
 
 		// return sl_true when the plane intersects to the line segment
 		sl_bool intersectLine(
@@ -78,15 +78,15 @@ namespace slib
 			Vector3T<T>* outIntersectPoint = sl_null,
 			sl_bool* pFlagParallel = sl_null,
 			sl_bool* pFlagExtendPoint1 = sl_null,
-			sl_bool* pFlagExtendPoint2 = sl_null) const;
+			sl_bool* pFlagExtendPoint2 = sl_null) const noexcept;
 
-		sl_bool intersectPlane(const PlaneT<T>& plane, Line3T<T>* outIntersectLine = sl_null, sl_bool* pFlagParallel = sl_null) const;
+		sl_bool intersectPlane(const PlaneT<T>& plane, Line3T<T>* outIntersectLine = sl_null, sl_bool* pFlagParallel = sl_null) const noexcept;
 
 	public:
-		PlaneT<T>& operator=(const PlaneT<T>& other) = default;
+		PlaneT<T>& operator=(const PlaneT<T>& other) noexcept = default;
 
 		template <class O>
-		PlaneT<T>& operator=(const PlaneT<O>& other);
+		PlaneT<T>& operator=(const PlaneT<O>& other) noexcept;
 	
 	};
 	

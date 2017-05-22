@@ -16,25 +16,25 @@ namespace slib
 {
 
 	template <class T>
-	PlaneT<T>::PlaneT(const Vector3T<T>& point, const Vector3T<T>& normal)
+	PlaneT<T>::PlaneT(const Vector3T<T>& point, const Vector3T<T>& normal) noexcept
 	{
 		setFromPointAndNormal(point, normal);
 	}
 
 	template <class T>
-	Vector3T<T> PlaneT<T>::getNormal() const
+	Vector3T<T> PlaneT<T>::getNormal() const noexcept
 	{
 		return {a, b, c};
 	}
 
 	template <class T>
-	Vector3T<T> PlaneT<T>::projectOriginOnNormalized() const
+	Vector3T<T> PlaneT<T>::projectOriginOnNormalized() const noexcept
 	{
 		return {-a*d, -b*d, -c*d};
 	}
 
 	template <class T>
-	Vector3T<T> PlaneT<T>::projectOrigin() const
+	Vector3T<T> PlaneT<T>::projectOrigin() const noexcept
 	{
 		T L = a * a + b * b + c * c;
 		if (L > 0) {
@@ -45,13 +45,13 @@ namespace slib
 	}
 
 	template <class T>
-	T PlaneT<T>::getDistanceFromPointOnNormalized(const Vector3T<T>& pos) const
+	T PlaneT<T>::getDistanceFromPointOnNormalized(const Vector3T<T>& pos) const noexcept
 	{
 		return a * pos.x + b * pos.y + c * pos.z + d;
 	}
 
 	template <class T>
-	T PlaneT<T>::getDistanceFromPoint(const Vector3T<T>& pos) const
+	T PlaneT<T>::getDistanceFromPoint(const Vector3T<T>& pos) const noexcept
 	{
 		T L = a * a + b * b + c * c;
 		if (L > 0) {
@@ -63,14 +63,14 @@ namespace slib
 	}
 
 	template <class T>
-	Vector3T<T> PlaneT<T>::projectPointOnNormalized(const Vector3T<T>& pos) const
+	Vector3T<T> PlaneT<T>::projectPointOnNormalized(const Vector3T<T>& pos) const noexcept
 	{
 		T D = a * pos.x + b * pos.y + c * pos.z + d;
 		return {pos.x - D * a, pos.y - D * b, pos.z - D * c};
 	}
 
 	template <class T>
-	Vector3T<T> PlaneT<T>::projectPoint(const Vector3T<T>& pos) const
+	Vector3T<T> PlaneT<T>::projectPoint(const Vector3T<T>& pos) const noexcept
 	{
 		T L = a * a + b * b + c * c;
 		if (L > 0) {
@@ -82,7 +82,7 @@ namespace slib
 	}
 
 	template <class T>
-	void PlaneT<T>::setFromPointAndNormal(const Vector3T<T>& point, const Vector3T<T>& normal)
+	void PlaneT<T>::setFromPointAndNormal(const Vector3T<T>& point, const Vector3T<T>& normal) noexcept
 	{
 		a = normal.x;
 		b = normal.y;
@@ -91,7 +91,7 @@ namespace slib
 	}
 
 	template <class T>
-	void PlaneT<T>::normalize()
+	void PlaneT<T>::normalize() noexcept
 	{
 		T l = Math::sqrt(a * a + b * b + c * c);
 		if (l > 0) {
@@ -103,7 +103,7 @@ namespace slib
 	}
 
 	template <class T>
-	void PlaneT<T>::transform(const Matrix4T<T>& mat)
+	void PlaneT<T>::transform(const Matrix4T<T>& mat) noexcept
 	{
 		T _a = a * mat.m00 + b * mat.m10 + c * mat.m20;
 		T _b = a * mat.m01 + b * mat.m11 + c * mat.m21;
@@ -126,7 +126,7 @@ namespace slib
 						Vector3T<T>* outIntersectPoint,
 						sl_bool* pFlagParallel ,
 						sl_bool* pFlagExtendPoint1,
-						sl_bool* pFlagExtendPoint2) const
+						sl_bool* pFlagExtendPoint2) const noexcept
 	{
 		// distances from line end points
 		T len = line.getLength();
@@ -202,7 +202,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool PlaneT<T>::intersectPlane(const PlaneT<T>& plane, Line3T<T>* outIntersectLine, sl_bool* pFlagParallel) const
+	sl_bool PlaneT<T>::intersectPlane(const PlaneT<T>& plane, Line3T<T>* outIntersectLine, sl_bool* pFlagParallel) const noexcept
 	{
 		PlaneT<T> plane1 = *this;
 		PlaneT<T> plane2 = plane;

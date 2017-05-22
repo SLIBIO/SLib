@@ -13,7 +13,7 @@ namespace slib
 
 	template <class T>
 	template <class O>
-	BoxT<T>::BoxT(const BoxT<O>& other)
+	BoxT<T>::BoxT(const BoxT<O>& other) noexcept
 	: x1((T)(other.x1)), x2((T)(other.x2))
 	, y1((T)(other.y1)), y2((T)(other.y2))
 	, z1((T)(other.z1)), z2((T)(other.z2))
@@ -21,14 +21,14 @@ namespace slib
 	}
 	
 	template <class T>
-	SLIB_INLINE const BoxT<T>& BoxT<T>::zero()
+	SLIB_INLINE const BoxT<T>& BoxT<T>::zero() noexcept
 	{
 		return *((BoxT*)((void*)_zero));
 	}
 	
 	template <class T>
 	template <class O>
-	BoxT<T>& BoxT<T>::operator=(const BoxT<O>& other)
+	BoxT<T>& BoxT<T>::operator=(const BoxT<O>& other) noexcept
 	{
 		x1 = (T)(other.x1); x2 = (T)(other.x2);
 		y1 = (T)(other.y1); y2 = (T)(other.y2);

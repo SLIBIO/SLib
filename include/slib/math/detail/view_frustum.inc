@@ -13,19 +13,19 @@ namespace slib
 
 	template <class T>
 	template <class O>
-	ViewFrustumT<T>::ViewFrustumT(const ViewFrustumT<O>& other) : MVP(other.MVP)
-	{
-	}
+	ViewFrustumT<T>::ViewFrustumT(const ViewFrustumT<O>& other) noexcept
+	 : MVP(other.MVP)
+	 {}
 	
 	template <class T>
-	SLIB_INLINE const ViewFrustumT<T>& ViewFrustumT<T>::fromMVP(const Matrix4T<T>& MVP)
+	SLIB_INLINE const ViewFrustumT<T>& ViewFrustumT<T>::fromMVP(const Matrix4T<T>& MVP) noexcept
 	{
 		return *((ViewFrustumT<T>*)(void*)&MVP);
 	}
 	
 	template <class T>
 	template <class O>
-	ViewFrustumT<T>& ViewFrustumT<T>::operator=(const ViewFrustumT<O>& other)
+	ViewFrustumT<T>& ViewFrustumT<T>::operator=(const ViewFrustumT<O>& other) noexcept
 	{
 		MVP = other.MVP;
 		return *this;

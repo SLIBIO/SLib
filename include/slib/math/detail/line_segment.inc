@@ -13,14 +13,14 @@ namespace slib
 	
 	template <class T>
 	template <class O>
-	SLIB_INLINE LineSegmentT<T>::LineSegmentT(const LineSegmentT<O>& other)
+	SLIB_INLINE LineSegmentT<T>::LineSegmentT(const LineSegmentT<O>& other) noexcept
 	: point1(other.point1), point2(other.point2)
 	{
 	}
 	
 	template <class T>
 	template <class O>
-	SLIB_INLINE LineSegmentT<T>& LineSegmentT<T>::operator=(const LineSegmentT<O>& other)
+	SLIB_INLINE LineSegmentT<T>& LineSegmentT<T>::operator=(const LineSegmentT<O>& other) noexcept
 	{
 		point1 = other.point1;
 		point2 = other.point2;

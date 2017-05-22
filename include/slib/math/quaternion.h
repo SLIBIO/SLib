@@ -28,75 +28,75 @@ namespace slib
 		T w;
 
 	public:
-		QuaternionT() = default;
+		SLIB_INLINE QuaternionT() noexcept = default;
 
-		constexpr QuaternionT(const QuaternionT<T>& other):
-		 x(other.x), y(other.y), z(other.z), w(other.w)
-		{}
-
-		template <class O>
-		constexpr QuaternionT(const QuaternionT<O>& other):
-		 x((T)(other.x)), y((T)(other.y)), z((T)(other.z)), w((T)(other.w))
-		{}
-	
-		QuaternionT(T _x, T _y, T _z, T _w):
-		 x(_x), y(_y), z(_z), w(_w)
-		{}
-
-		QuaternionT(const Vector4T<T>& other):
-		 x(other.x), y(other.y), z(other.z), w(other.w)
-		{}
-	
-	public:
-		static const QuaternionT<T>& identity();
-
-		static const QuaternionT<T>& fromArray(const T arr[2]);
-
-		static QuaternionT<T>& fromArray(T arr[2]);
-	
-		const Vector4T<T>& toVector4() const;
-
-		Vector4T<T>& toVector4();
-
-		T getLength2p() const;
-
-		T getLength() const;
-
-		void multiply(const QuaternionT<T>& other);
-
-		void divide(const QuaternionT<T>& other);
-
-		void setRotation(const Vector3T<T>& vAxis, T fAngle);
-
-		static QuaternionT<T> getRotation(const Vector3T<T>& vAxis, T fAngle);
-
-		T getAngle() const;
-
-		Vector4T<T> getAxis() const;
-
-		void makeInverse();
-
-		QuaternionT<T> inverse() const;
-
-	public:
-		QuaternionT<T>& operator=(const QuaternionT<T>& other) = default;
+		SLIB_INLINE constexpr QuaternionT(const QuaternionT<T>& other)
+		 : x(other.x), y(other.y), z(other.z), w(other.w)
+		 {}
 
 		template <class O>
-		QuaternionT<T>& operator=(const QuaternionT<O>& other);
+		SLIB_INLINE constexpr QuaternionT(const QuaternionT<O>& other)
+		 : x((T)(other.x)), y((T)(other.y)), z((T)(other.z)), w((T)(other.w))
+		 {}
+	
+		SLIB_INLINE QuaternionT(T _x, T _y, T _z, T _w)
+		 : x(_x), y(_y), z(_z), w(_w)
+		 {}
 
-		QuaternionT<T>& operator=(const Vector4T<T>& other);
+		SLIB_INLINE QuaternionT(const Vector4T<T>& other)
+		 : x(other.x), y(other.y), z(other.z), w(other.w)
+		 {}
+	
+	public:
+		static const QuaternionT<T>& identity() noexcept;
 
-		QuaternionT<T>& operator*=(const QuaternionT<T>& other);
+		static const QuaternionT<T>& fromArray(const T arr[2]) noexcept;
 
-		QuaternionT<T> operator*(const QuaternionT<T>& other) const;
+		static QuaternionT<T>& fromArray(T arr[2]) noexcept;
+	
+		const Vector4T<T>& toVector4() const noexcept;
 
-		QuaternionT<T>& operator/=(const QuaternionT<T>& other);
+		Vector4T<T>& toVector4() noexcept;
 
-		QuaternionT<T> operator/(QuaternionT<T>& other) const;
+		T getLength2p() const noexcept;
 
-		sl_bool operator==(const QuaternionT<T>& other) const;
+		T getLength() const noexcept;
 
-		sl_bool operator!=(const QuaternionT<T>& other) const;
+		void multiply(const QuaternionT<T>& other) noexcept;
+
+		void divide(const QuaternionT<T>& other) noexcept;
+
+		void setRotation(const Vector3T<T>& vAxis, T fAngle) noexcept;
+
+		static QuaternionT<T> getRotation(const Vector3T<T>& vAxis, T fAngle) noexcept;
+
+		T getAngle() const noexcept;
+
+		Vector4T<T> getAxis() const noexcept;
+
+		void makeInverse() noexcept;
+
+		QuaternionT<T> inverse() const noexcept;
+
+	public:
+		QuaternionT<T>& operator=(const QuaternionT<T>& other) noexcept = default;
+
+		template <class O>
+		QuaternionT<T>& operator=(const QuaternionT<O>& other) noexcept;
+
+		QuaternionT<T>& operator=(const Vector4T<T>& other) noexcept;
+
+		QuaternionT<T>& operator*=(const QuaternionT<T>& other) noexcept;
+
+		QuaternionT<T> operator*(const QuaternionT<T>& other) const noexcept;
+
+		QuaternionT<T>& operator/=(const QuaternionT<T>& other) noexcept;
+
+		QuaternionT<T> operator/(QuaternionT<T>& other) const noexcept;
+
+		sl_bool operator==(const QuaternionT<T>& other) const noexcept;
+
+		sl_bool operator!=(const QuaternionT<T>& other) const noexcept;
 
 	private:
 		static T _identity[4];

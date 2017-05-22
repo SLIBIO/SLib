@@ -16,7 +16,7 @@ namespace slib
 {
 
 	template <class T>
-	void Transform2T<T>::setTranslation(Matrix3T<T>& _out, T x, T y)
+	void Transform2T<T>::setTranslation(Matrix3T<T>& _out, T x, T y) noexcept
 	{
 		_out.m00 = 1; _out.m01 = 0; _out.m02 = 0;
 		_out.m10 = 0; _out.m11 = 1; _out.m12 = 0;
@@ -24,7 +24,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform2T<T>::setTranslation(Matrix3T<T>& _out, const Vector2T<T>& v)
+	void Transform2T<T>::setTranslation(Matrix3T<T>& _out, const Vector2T<T>& v) noexcept
 	{
 		_out.m00 = 1; _out.m01 = 0; _out.m02 = 0;
 		_out.m10 = 0; _out.m11 = 1; _out.m12 = 0;
@@ -32,7 +32,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix3T<T> Transform2T<T>::getTranslationMatrix(T x, T y)
+	Matrix3T<T> Transform2T<T>::getTranslationMatrix(T x, T y) noexcept
 	{
 		return {1, 0, 0,
 				0, 1, 0,
@@ -40,7 +40,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix3T<T> Transform2T<T>::getTranslationMatrix(const Vector2T<T>& v)
+	Matrix3T<T> Transform2T<T>::getTranslationMatrix(const Vector2T<T>& v) noexcept
 	{
 		return {1, 0, 0,
 				0, 1, 0,
@@ -48,41 +48,41 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform2T<T>::translate(Matrix3T<T>& mat, T x, T y)
+	void Transform2T<T>::translate(Matrix3T<T>& mat, T x, T y) noexcept
 	{
 		mat.m20 += x;
 		mat.m21 += y;
 	}
 
 	template <class T>
-	void Transform2T<T>::translate(Matrix3T<T>& mat, const Vector2T<T>& v)
+	void Transform2T<T>::translate(Matrix3T<T>& mat, const Vector2T<T>& v) noexcept
 	{
 		mat.m20 += v.x;
 		mat.m21 += v.y;
 	}
 	
 	template <class T>
-	void Transform2T<T>::preTranslate(Matrix3T<T>& mat, T x, T y)
+	void Transform2T<T>::preTranslate(Matrix3T<T>& mat, T x, T y) noexcept
 	{
 		mat.m20 += (x * mat.m00 + y * mat.m10);
 		mat.m21 += (x * mat.m01 + y * mat.m11);
 	}
 	
 	template <class T>
-	void Transform2T<T>::preTranslate(Matrix3T<T>& mat, const Vector2T<T>& v)
+	void Transform2T<T>::preTranslate(Matrix3T<T>& mat, const Vector2T<T>& v) noexcept
 	{
 		mat.m20 += (v.x * mat.m00 + v.y * mat.m10);
 		mat.m21 += (v.x * mat.m01 + v.y * mat.m11);
 	}
 	
 	template <class T>
-	sl_bool Transform2T<T>::isTranslation(const Matrix3T<T>& mat)
+	sl_bool Transform2T<T>::isTranslation(const Matrix3T<T>& mat) noexcept
 	{
 		return Math::isAlmostZero(mat.m00 - 1) && Math::isAlmostZero(mat.m11 - 1) && Math::isAlmostZero(mat.m01) && Math::isAlmostZero(mat.m10);
 	}
 	
 	template <class T>
-	void Transform2T<T>::setScaling(Matrix3T<T>& _out, T sx, T sy)
+	void Transform2T<T>::setScaling(Matrix3T<T>& _out, T sx, T sy) noexcept
 	{
 		_out.m00 = sx; _out.m01 = 0; _out.m02 = 0;
 		_out.m10 = 0; _out.m11 = sy; _out.m12 = 0;
@@ -90,7 +90,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform2T<T>::setScaling(Matrix3T<T>& _out, const Vector2T<T>& v)
+	void Transform2T<T>::setScaling(Matrix3T<T>& _out, const Vector2T<T>& v) noexcept
 	{
 		_out.m00 = v.x; _out.m01 = 0; _out.m02 = 0;
 		_out.m10 = 0; _out.m11 = v.y; _out.m12 = 0;
@@ -98,7 +98,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix3T<T> Transform2T<T>::getScalingMatrix(T x, T y)
+	Matrix3T<T> Transform2T<T>::getScalingMatrix(T x, T y) noexcept
 	{
 		return {x, 0, 0,
 				0, y, 0,
@@ -106,7 +106,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix3T<T> Transform2T<T>::getScalingMatrix(const Vector2T<T>& v)
+	Matrix3T<T> Transform2T<T>::getScalingMatrix(const Vector2T<T>& v) noexcept
 	{
 		return {v.x, 0, 0,
 				0, v.y, 0,
@@ -114,7 +114,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform2T<T>::scale(Matrix3T<T>& mat, T sx, T sy)
+	void Transform2T<T>::scale(Matrix3T<T>& mat, T sx, T sy) noexcept
 	{
 		mat.m00 *= sx;
 		mat.m10 *= sx;
@@ -125,13 +125,13 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform2T<T>::scale(Matrix3T<T>& mat, const Vector2T<T>& v)
+	void Transform2T<T>::scale(Matrix3T<T>& mat, const Vector2T<T>& v) noexcept
 	{
 		scale(mat, v.x, v.y);
 	}
 
 	template <class T>
-	void Transform2T<T>::setRotation(Matrix3T<T>& _out, T radians)
+	void Transform2T<T>::setRotation(Matrix3T<T>& _out, T radians) noexcept
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
@@ -141,7 +141,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform2T<T>::setRotation(Matrix3T<T>& _out, T cx, T cy, T radians)
+	void Transform2T<T>::setRotation(Matrix3T<T>& _out, T cx, T cy, T radians) noexcept
 	{
 		setTranslation(_out, -cx, -cy);
 		rotate(_out, radians);
@@ -149,13 +149,13 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform2T<T>::setRotation(Matrix3T<T>& _out, const Vector2T<T>& pt, T radians)
+	void Transform2T<T>::setRotation(Matrix3T<T>& _out, const Vector2T<T>& pt, T radians) noexcept
 	{
 		setRotation(_out, pt.x, pt.y, radians);
 	}
 
 	template <class T>
-	Matrix3T<T> Transform2T<T>::getRotationMatrix(T radians)
+	Matrix3T<T> Transform2T<T>::getRotationMatrix(T radians) noexcept
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
@@ -165,7 +165,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix3T<T> Transform2T<T>::getRotationMatrix(T cx, T cy, T radians)
+	Matrix3T<T> Transform2T<T>::getRotationMatrix(T cx, T cy, T radians) noexcept
 	{
 		Matrix3T<T> ret;
 		setRotation(ret, cx, cy, radians);
@@ -173,7 +173,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix3T<T> Transform2T<T>::getRotationMatrix(const Vector2T<T>& pt, T radians)
+	Matrix3T<T> Transform2T<T>::getRotationMatrix(const Vector2T<T>& pt, T radians) noexcept
 	{
 		Matrix3T<T> ret;
 		setRotation(ret, pt, radians);
@@ -181,7 +181,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform2T<T>::rotate(Matrix3T<T>& mat, T radians)
+	void Transform2T<T>::rotate(Matrix3T<T>& mat, T radians) noexcept
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
@@ -200,7 +200,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform2T<T>::rotate(Matrix3T<T>& mat, T cx, T cy, T radians)
+	void Transform2T<T>::rotate(Matrix3T<T>& mat, T cx, T cy, T radians) noexcept
 	{
 		translate(mat, -cx, -cy);
 		rotate(mat, radians);
@@ -208,25 +208,25 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform2T<T>::rotate(Matrix3T<T>& mat, const Vector2T<T>& pt, T radians)
+	void Transform2T<T>::rotate(Matrix3T<T>& mat, const Vector2T<T>& pt, T radians) noexcept
 	{
 		rotate(mat, pt.x, pt.y, radians);
 	}
 
 	template <class T>
-	T Transform2T<T>::getRotationAngleFromDirToDir(const Vector2T<T>& from, const Vector2T<T>& to)
+	T Transform2T<T>::getRotationAngleFromDirToDir(const Vector2T<T>& from, const Vector2T<T>& to) noexcept
 	{
 		return to.getAngleBetween(from);
 	}
 
 	template <class T>
-	void Transform2T<T>::setTransformFromDirToDir(Matrix3T<T>& _out, const Vector2T<T>& from, const Vector2T<T>& to)
+	void Transform2T<T>::setTransformFromDirToDir(Matrix3T<T>& _out, const Vector2T<T>& from, const Vector2T<T>& to) noexcept
 	{
 		setRotation(_out, getRotationAngleFromDirToDir(from, to));
 	}
 
 	template <class T>
-	Matrix3T<T> Transform2T<T>::getTransformMatrixFromDirToDir(const Vector2T<T>& from, const Vector2T<T>& to)
+	Matrix3T<T> Transform2T<T>::getTransformMatrixFromDirToDir(const Vector2T<T>& from, const Vector2T<T>& to) noexcept
 	{
 		Matrix3T<T> ret;
 		setTransformFromDirToDir(ret, from, to);

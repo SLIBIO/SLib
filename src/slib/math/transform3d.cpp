@@ -16,7 +16,7 @@ namespace slib
 {
 
 	template <class T>
-	void Transform3T<T>::setTranslation(Matrix4T<T>& _out, T x, T y, T z)
+	void Transform3T<T>::setTranslation(Matrix4T<T>& _out, T x, T y, T z) noexcept
 	{
 		_out.m00 = 1; _out.m01 = 0; _out.m02 = 0; _out.m03 = 0;
 		_out.m10 = 0; _out.m11 = 1; _out.m12 = 0; _out.m13 = 0;
@@ -25,7 +25,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::setTranslation(Matrix4T<T>& _out, const Vector3T<T>& v)
+	void Transform3T<T>::setTranslation(Matrix4T<T>& _out, const Vector3T<T>& v) noexcept
 	{
 		_out.m00 = 1; _out.m01 = 0; _out.m02 = 0; _out.m03 = 0;
 		_out.m10 = 0; _out.m11 = 1; _out.m12 = 0; _out.m13 = 0;
@@ -34,7 +34,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getTranslationMatrix(T x, T y, T z)
+	Matrix4T<T> Transform3T<T>::getTranslationMatrix(T x, T y, T z) noexcept
 	{
 		return {1, 0, 0, 0,
 				0, 1, 0, 0,
@@ -43,7 +43,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getTranslationMatrix(const Vector3T<T>& v)
+	Matrix4T<T> Transform3T<T>::getTranslationMatrix(const Vector3T<T>& v) noexcept
 	{
 		return {1, 0, 0, 0,
 				0, 1, 0, 0,
@@ -52,7 +52,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::translate(Matrix4T<T>& mat, T x, T y, T z)
+	void Transform3T<T>::translate(Matrix4T<T>& mat, T x, T y, T z) noexcept
 	{
 		mat.m30 += x;
 		mat.m31 += y;
@@ -60,7 +60,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::translate(Matrix4T<T>& mat, const Vector3T<T>& v)
+	void Transform3T<T>::translate(Matrix4T<T>& mat, const Vector3T<T>& v) noexcept
 	{
 		mat.m30 += v.x;
 		mat.m31 += v.y;
@@ -68,7 +68,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::setScaling(Matrix4T<T>& _out, T sx, T sy, T sz)
+	void Transform3T<T>::setScaling(Matrix4T<T>& _out, T sx, T sy, T sz) noexcept
 	{
 		_out.m00 = sx; _out.m01 = 0; _out.m02 = 0; _out.m03 = 0;
 		_out.m10 = 0; _out.m11 = sy; _out.m12 = 0; _out.m13 = 0;
@@ -77,7 +77,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::setScaling(Matrix4T<T>& _out, const Vector3T<T>& v)
+	void Transform3T<T>::setScaling(Matrix4T<T>& _out, const Vector3T<T>& v) noexcept
 	{
 		_out.m00 = v.x; _out.m01 = 0; _out.m02 = 0; _out.m03 = 0;
 		_out.m10 = 0; _out.m11 = v.y; _out.m12 = 0; _out.m13 = 0;
@@ -86,7 +86,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getScalingMatrix(T x, T y, T z)
+	Matrix4T<T> Transform3T<T>::getScalingMatrix(T x, T y, T z) noexcept
 	{
 		return {x, 0, 0, 0,
 				0, y, 0, 0,
@@ -95,7 +95,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getScalingMatrix(const Vector3T<T>& v)
+	Matrix4T<T> Transform3T<T>::getScalingMatrix(const Vector3T<T>& v) noexcept
 	{
 		return {v.x, 0, 0, 0,
 				0, v.y, 0, 0,
@@ -104,7 +104,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::scale(Matrix4T<T>& mat, T sx, T sy, T sz)
+	void Transform3T<T>::scale(Matrix4T<T>& mat, T sx, T sy, T sz) noexcept
 	{
 		mat.m00 *= sx;
 		mat.m10 *= sx;
@@ -121,13 +121,13 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::scale(Matrix4T<T>& mat, const Vector3T<T>& v)
+	void Transform3T<T>::scale(Matrix4T<T>& mat, const Vector3T<T>& v) noexcept
 	{
 		scale(mat, v.x, v.y, v.z);
 	}
 
 	template <class T>
-	void Transform3T<T>::setRotationX(Matrix4T<T>& _out, T radians)
+	void Transform3T<T>::setRotationX(Matrix4T<T>& _out, T radians) noexcept
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
@@ -138,7 +138,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getRotationXMatrix(T radians)
+	Matrix4T<T> Transform3T<T>::getRotationXMatrix(T radians) noexcept
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
@@ -149,7 +149,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::rotateX(Matrix4T<T>& mat, T radians)
+	void Transform3T<T>::rotateX(Matrix4T<T>& mat, T radians) noexcept
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
@@ -169,7 +169,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::setRotationY(Matrix4T<T>& _out, T radians)
+	void Transform3T<T>::setRotationY(Matrix4T<T>& _out, T radians) noexcept
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
@@ -180,7 +180,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getRotationYMatrix(T radians)
+	Matrix4T<T> Transform3T<T>::getRotationYMatrix(T radians) noexcept
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
@@ -191,7 +191,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::rotateY(Matrix4T<T>& mat, T radians)
+	void Transform3T<T>::rotateY(Matrix4T<T>& mat, T radians) noexcept
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
@@ -211,7 +211,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::setRotationZ(Matrix4T<T>& _out, T radians)
+	void Transform3T<T>::setRotationZ(Matrix4T<T>& _out, T radians) noexcept
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
@@ -222,7 +222,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getRotationZMatrix(T radians)
+	Matrix4T<T> Transform3T<T>::getRotationZMatrix(T radians) noexcept
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
@@ -233,7 +233,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::rotateZ(Matrix4T<T>& mat, T radians)
+	void Transform3T<T>::rotateZ(Matrix4T<T>& mat, T radians) noexcept
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
@@ -253,7 +253,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::setRotation(Matrix4T<T>& _out, const QuaternionT<T>& q)
+	void Transform3T<T>::setRotation(Matrix4T<T>& _out, const QuaternionT<T>& q) noexcept
 	{
 		T d = q.getLength2p();
 		T s = 2 / d;
@@ -281,7 +281,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getRotationMatrix(const QuaternionT<T>& q)
+	Matrix4T<T> Transform3T<T>::getRotationMatrix(const QuaternionT<T>& q) noexcept
 	{
 		T d = q.getLength2p();
 		T s = 2 / d;
@@ -297,7 +297,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::rotate(Matrix4T<T>& mat, const QuaternionT<T>& q)
+	void Transform3T<T>::rotate(Matrix4T<T>& mat, const QuaternionT<T>& q) noexcept
 	{
 		T d = q.getLength2p();
 		T s = 2 / d;
@@ -336,7 +336,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::setRotation(Matrix4T<T>& _out, const Vector3T<T>& vAxis, T fAngle)
+	void Transform3T<T>::setRotation(Matrix4T<T>& _out, const Vector3T<T>& vAxis, T fAngle) noexcept
 	{
 		QuaternionT<T> q;
 		q.setRotation(vAxis, fAngle);
@@ -344,7 +344,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getRotationMatrix(const Vector3T<T>& vAxis, T fAngle)
+	Matrix4T<T> Transform3T<T>::getRotationMatrix(const Vector3T<T>& vAxis, T fAngle) noexcept
 	{
 		Matrix4T<T> ret;
 		setRotation(ret, vAxis, fAngle);
@@ -352,7 +352,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::rotate(Matrix4T<T>& mat, const Vector3T<T>& vAxis, T fAngle)
+	void Transform3T<T>::rotate(Matrix4T<T>& mat, const Vector3T<T>& vAxis, T fAngle) noexcept
 	{
 		QuaternionT<T> q;
 		q.setRotation(vAxis, fAngle);
@@ -360,7 +360,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::setPerspectiveProjection(Matrix4T<T>& _out, T sx, T sy, T zNear, T zFar)
+	void Transform3T<T>::setPerspectiveProjection(Matrix4T<T>& _out, T sx, T sy, T zNear, T zFar) noexcept
 	{
 		_out.m00 = sx; _out.m01 = 0; _out.m02 = 0; _out.m03 = 0;
 		_out.m10 = 0; _out.m11 = sy; _out.m12 = 0; _out.m13 = 0;
@@ -369,7 +369,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getPerspectiveProjectionMatrix(T sx, T sy, T zNear, T zFar)
+	Matrix4T<T> Transform3T<T>::getPerspectiveProjectionMatrix(T sx, T sy, T zNear, T zFar) noexcept
 	{
 		return {sx, 0, 0, 0,
 				0, sy, 0, 0,
@@ -378,7 +378,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::setPerspectiveProjectionFovY(Matrix4T<T>& _out, T fovY, T fAspectWH, T zNear, T zFar)
+	void Transform3T<T>::setPerspectiveProjectionFovY(Matrix4T<T>& _out, T fovY, T fAspectWH, T zNear, T zFar) noexcept
 	{
 		T sy = Math::cot(fovY / 2);
 		T sx = sy / fAspectWH;
@@ -386,7 +386,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getPerspectiveProjectionFovYMatrix(T fovY, T fAspectWH, T zNear, T zFar)
+	Matrix4T<T> Transform3T<T>::getPerspectiveProjectionFovYMatrix(T fovY, T fAspectWH, T zNear, T zFar) noexcept
 	{
 		Matrix4T<T> ret;
 		setPerspectiveProjectionFovY(ret, fovY, fAspectWH, zNear, zFar);
@@ -394,7 +394,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::setOrthogonalProjection(Matrix4T<T>& _out, T sx, T sy, T zNear, T zFar)
+	void Transform3T<T>::setOrthogonalProjection(Matrix4T<T>& _out, T sx, T sy, T zNear, T zFar) noexcept
 	{
 		_out.m00 = sx; _out.m01 = 0; _out.m02 = 0; _out.m03 = 0;
 		_out.m10 = 0; _out.m11 = sy; _out.m12 = 0; _out.m13 = 0;
@@ -403,7 +403,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getOrthogonalProjectionMatrix(T sx, T sy, T zNear, T zFar)
+	Matrix4T<T> Transform3T<T>::getOrthogonalProjectionMatrix(T sx, T sy, T zNear, T zFar) noexcept
 	{
 		return {sx, 0, 0, 0,
 				0, sy, 0, 0,
@@ -412,7 +412,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::lookAt(Matrix4T<T>& _out, const Vector3T<T>& eye, const Vector3T<T>& at, const Vector3T<T>& up)
+	void Transform3T<T>::lookAt(Matrix4T<T>& _out, const Vector3T<T>& eye, const Vector3T<T>& at, const Vector3T<T>& up) noexcept
 	{
 		Vector3T<T> xAxis, yAxis, zAxis;
 		zAxis = (at - eye);
@@ -436,7 +436,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getLookAtMatrix(const Vector3T<T>& eye, const Vector3T<T>& at, const Vector3T<T>& up)
+	Matrix4T<T> Transform3T<T>::getLookAtMatrix(const Vector3T<T>& eye, const Vector3T<T>& at, const Vector3T<T>& up) noexcept
 	{
 		Matrix4T<T> ret;
 		lookAt(ret, eye, at, up);
@@ -444,7 +444,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::makeTransform(Matrix4T<T>& _out, const Vector3T<T>& position, const Vector3T<T>& scaling, const QuaternionT<T>& rotation)
+	void Transform3T<T>::makeTransform(Matrix4T<T>& _out, const Vector3T<T>& position, const Vector3T<T>& scaling, const QuaternionT<T>& rotation) noexcept
 	{
 		setRotation(_out, rotation);
 		_out.m00 *= scaling.x; _out.m01 *= scaling.x; _out.m02 *= scaling.x;
@@ -454,7 +454,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getTransformMatrix(const Vector3T<T>& position, const Vector3T<T>& scaling, const QuaternionT<T>& rotation)
+	Matrix4T<T> Transform3T<T>::getTransformMatrix(const Vector3T<T>& position, const Vector3T<T>& scaling, const QuaternionT<T>& rotation) noexcept
 	{
 		Matrix4T<T> ret;
 		makeTransform(ret, position, scaling, rotation);
@@ -462,7 +462,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::getRotationFromDirToDir(Vector3T<T>& outAxis, T& outAngle, const Vector3T<T>& from, const Vector3T<T>& to)
+	void Transform3T<T>::getRotationFromDirToDir(Vector3T<T>& outAxis, T& outAngle, const Vector3T<T>& from, const Vector3T<T>& to) noexcept
 	{
 		Vector3T<T> dirBefore = from;
 		dirBefore.normalize();
@@ -473,7 +473,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::setQuaternionFromDirToDir(QuaternionT<T>& _out, const Vector3T<T>& from, const Vector3T<T>& to)
+	void Transform3T<T>::setQuaternionFromDirToDir(QuaternionT<T>& _out, const Vector3T<T>& from, const Vector3T<T>& to) noexcept
 	{
 		Vector3T<T> dirAxisRotation;
 		T angleRotation;
@@ -482,7 +482,7 @@ namespace slib
 	}
 
 	template <class T>
-	QuaternionT<T> Transform3T<T>::getQuaternionRotationFromDirToDir(const Vector3T<T>& from, const Vector3T<T>& to)
+	QuaternionT<T> Transform3T<T>::getQuaternionRotationFromDirToDir(const Vector3T<T>& from, const Vector3T<T>& to) noexcept
 	{
 		QuaternionT<T> ret;
 		setQuaternionFromDirToDir(ret, from, to);
@@ -490,7 +490,7 @@ namespace slib
 	}
 
 	template <class T>
-	void Transform3T<T>::setTransformFromDirToDir(Matrix4T<T>& _out, const Vector3T<T>& from, const Vector3T<T>& to)
+	void Transform3T<T>::setTransformFromDirToDir(Matrix4T<T>& _out, const Vector3T<T>& from, const Vector3T<T>& to) noexcept
 	{
 		QuaternionT<T> q;
 		setQuaternionFromDirToDir(q, from, to);
@@ -498,7 +498,7 @@ namespace slib
 	}
 
 	template <class T>
-	Matrix4T<T> Transform3T<T>::getTransformMatrixFromDirToDir(const Vector3T<T>& from, const Vector3T<T>& to)
+	Matrix4T<T> Transform3T<T>::getTransformMatrixFromDirToDir(const Vector3T<T>& from, const Vector3T<T>& to) noexcept
 	{
 		Matrix4T<T> ret;
 		setTransformFromDirToDir(ret, from, to);
@@ -506,31 +506,31 @@ namespace slib
 	}
 
 	template <class T>
-	Vector3T<T> Transform3T<T>::getTransformedOrigin(const Matrix4T<T>& transform)
+	Vector3T<T> Transform3T<T>::getTransformedOrigin(const Matrix4T<T>& transform) noexcept
 	{
 		return {transform.m30, transform.m31, transform.m32};
 	}
 
 	template <class T>
-	Vector3T<T> Transform3T<T>::getTransformedAxisX(const Matrix4T<T>& transform)
+	Vector3T<T> Transform3T<T>::getTransformedAxisX(const Matrix4T<T>& transform) noexcept
 	{
 		return {transform.m00, transform.m01, transform.m02};
 	}
 
 	template <class T>
-	Vector3T<T> Transform3T<T>::getTransformedAxisY(const Matrix4T<T>& transform)
+	Vector3T<T> Transform3T<T>::getTransformedAxisY(const Matrix4T<T>& transform) noexcept
 	{
 		return {transform.m10, transform.m11, transform.m12};
 	}
 
 	template <class T>
-	Vector3T<T> Transform3T<T>::getTransformedAxisZ(const Matrix4T<T>& transform)
+	Vector3T<T> Transform3T<T>::getTransformedAxisZ(const Matrix4T<T>& transform) noexcept
 	{
 		return {transform.m20, transform.m21, transform.m22};
 	}
 
 	template <class T>
-	Vector3T<T> Transform3T<T>::projectToViewport(const Matrix4T<T>& matViewProjection, const Vector3T<T>& point)
+	Vector3T<T> Transform3T<T>::projectToViewport(const Matrix4T<T>& matViewProjection, const Vector3T<T>& point) noexcept
 	{
 		Vector4T<T> v = Vector4T<T>(point, 1) * matViewProjection;
 		if (v.w >= 0 && Math::isLessThanEpsilon(v.w)) {
@@ -543,7 +543,7 @@ namespace slib
 	}
 
 	template <class T>
-	Line3T<T> Transform3T<T>::unprojectViewportPoint(const Matrix4T<T>& matProjection, const Vector2T<T>& pt)
+	Line3T<T> Transform3T<T>::unprojectViewportPoint(const Matrix4T<T>& matProjection, const Vector2T<T>& pt) noexcept
 	{
 		Vector4T<T> vTest1(1, 1, 1, 1);
 		Vector4T<T> vTest2(1, 1, 2, 1);
@@ -558,19 +558,19 @@ namespace slib
 	}
 
 	template <class T>
-	Line3T<T> Transform3T<T>::unprojectScreenPoint(const Matrix4T<T>& matProjection, const Vector2T<T>& pt, T viewportWidth, T viewportHeight)
+	Line3T<T> Transform3T<T>::unprojectScreenPoint(const Matrix4T<T>& matProjection, const Vector2T<T>& pt, T viewportWidth, T viewportHeight) noexcept
 	{
 		return unprojectViewportPoint(matProjection, Vector2T<T>((pt.x / viewportWidth * 2) - 1, 1 - (pt.y / viewportHeight * 2)));
 	}
 
 	template <class T>
-	Line3T<T> Transform3T<T>::unprojectScreenPoint(const Matrix4T<T>& matProjection, const Vector2T<T>& pt, const RectangleT<T>& viewport)
+	Line3T<T> Transform3T<T>::unprojectScreenPoint(const Matrix4T<T>& matProjection, const Vector2T<T>& pt, const RectangleT<T>& viewport) noexcept
 	{
 		return unprojectScreenPoint(matProjection, Vector2T<T>(pt.x - viewport.left, pt.y - viewport.top), viewport.getWidth(), viewport.getHeight());
 	}
 
 	template <class T>
-	Vector2T<T> Transform3T<T>::convertViewportToScreen(const Vector2T<T>& ptViewport, const RectangleT<T>& viewport)
+	Vector2T<T> Transform3T<T>::convertViewportToScreen(const Vector2T<T>& ptViewport, const RectangleT<T>& viewport) noexcept
 	{
 		return {
 			((viewport.left + viewport.right) + ptViewport.x * (viewport.right - viewport.left)) / 2,
@@ -578,7 +578,7 @@ namespace slib
 	}
 
 	template <class T>
-	Vector2T<T> Transform3T<T>::convertViewportToScreen(const Vector2T<T>& ptViewport, T viewportWidth, T viewportHeight)
+	Vector2T<T> Transform3T<T>::convertViewportToScreen(const Vector2T<T>& ptViewport, T viewportWidth, T viewportHeight) noexcept
 	{
 		return {
 			(1 + ptViewport.x) * viewportWidth / 2,
@@ -586,7 +586,7 @@ namespace slib
 	}
 
 	template <class T>
-	Vector2T<T> Transform3T<T>::convertScreenToViewport(const Vector2T<T>& ptScreen, const RectangleT<T>& viewport)
+	Vector2T<T> Transform3T<T>::convertScreenToViewport(const Vector2T<T>& ptScreen, const RectangleT<T>& viewport) noexcept
 	{
 		return {
 			(ptScreen.x - viewport.left) * 2 / (viewport.right - viewport.left) - 1,
@@ -594,7 +594,7 @@ namespace slib
 	}
 
 	template <class T>
-	Vector2T<T> Transform3T<T>::convertScreenToViewport(const Vector2T<T>& ptScreen, T viewportWidth, T viewportHeight)
+	Vector2T<T> Transform3T<T>::convertScreenToViewport(const Vector2T<T>& ptScreen, T viewportWidth, T viewportHeight) noexcept
 	{
 		return {
 			ptScreen.x * 2 / viewportWidth - 1,
@@ -602,7 +602,7 @@ namespace slib
 	}
 
 	template <class T>
-	RectangleT<T> Transform3T<T>::convertViewportToScreen(const RectangleT<T>& rcInViewport, const RectangleT<T>& viewport)
+	RectangleT<T> Transform3T<T>::convertViewportToScreen(const RectangleT<T>& rcInViewport, const RectangleT<T>& viewport) noexcept
 	{
 		return {
 			((viewport.left + viewport.right) + rcInViewport.left * (viewport.right - viewport.left)) / 2,
@@ -612,7 +612,7 @@ namespace slib
 	}
 
 	template <class T>
-	RectangleT<T> Transform3T<T>::convertViewportToScreen(const RectangleT<T>& rcInViewport, T viewportWidth, T viewportHeight)
+	RectangleT<T> Transform3T<T>::convertViewportToScreen(const RectangleT<T>& rcInViewport, T viewportWidth, T viewportHeight) noexcept
 	{
 		return {
 			(1 + rcInViewport.left) * viewportWidth / 2,
@@ -622,7 +622,7 @@ namespace slib
 	}
 
 	template <class T>
-	RectangleT<T> Transform3T<T>::convertScreenToViewport(const RectangleT<T>& rcInScreen, const RectangleT<T>& viewport)
+	RectangleT<T> Transform3T<T>::convertScreenToViewport(const RectangleT<T>& rcInScreen, const RectangleT<T>& viewport) noexcept
 	{
 		return {
 			(rcInScreen.left - viewport.left) * 2 / (viewport.right - viewport.left) - 1,
@@ -632,7 +632,7 @@ namespace slib
 	}
 
 	template <class T>
-	RectangleT<T> Transform3T<T>::convertScreenToViewport(const RectangleT<T>& rcInScreen, T viewportWidth, T viewportHeight)
+	RectangleT<T> Transform3T<T>::convertScreenToViewport(const RectangleT<T>& rcInScreen, T viewportWidth, T viewportHeight) noexcept
 	{
 		return {
 			rcInScreen.left * 2 / viewportWidth - 1,

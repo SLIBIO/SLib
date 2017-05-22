@@ -12,38 +12,38 @@ namespace slib
 {
 	
 	template <class T>
-	SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::zero()
+	SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::zero() noexcept
 	{
 		return *(reinterpret_cast<Matrix3T<T> const*>(&_zero));
 	}
 	
 	template <class T>
-	SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::one()
+	SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::one() noexcept
 	{
 		return *(reinterpret_cast<Matrix3T<T> const*>(&_one));
 	}
 	
 	template <class T>
-	SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::identity()
+	SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::identity() noexcept
 	{
 		return *(reinterpret_cast<Matrix3T<T> const*>(&_identity));
 	}
 	
 	template <class T>
-	SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::fromArray(const T arr[9])
+	SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::fromArray(const T arr[9]) noexcept
 	{
 		return *(reinterpret_cast<Matrix3T<T> const*>(arr));
 	}
 	
 	template <class T>
-	SLIB_INLINE Matrix3T<T>& Matrix3T<T>::fromArray(T arr[9])
+	SLIB_INLINE Matrix3T<T>& Matrix3T<T>::fromArray(T arr[9]) noexcept
 	{
 		return *(reinterpret_cast<Matrix3T<T>*>(arr));
 	}
 	
 	template <class T>
 	template <class O>
-	Matrix3T<T>& Matrix3T<T>::operator=(const Matrix3T<O>& other)
+	Matrix3T<T>& Matrix3T<T>::operator=(const Matrix3T<O>& other) noexcept
 	{
 		m00 = (T)(other.m00); m01 = (T)(other.m01); m02 = (T)(other.m02);
 		m10 = (T)(other.m10); m11 = (T)(other.m11); m12 = (T)(other.m12);
@@ -53,7 +53,7 @@ namespace slib
 	
 	
 	template <class T>
-	Matrix3T<T> operator*(T value, const Matrix3T<T>& m)
+	Matrix3T<T> operator*(T value, const Matrix3T<T>& m) noexcept
 	{
 		Matrix3T<T> ret(m);
 		ret.multiply(value);
@@ -61,14 +61,14 @@ namespace slib
 	}
 	
 	template <class T>
-	Vector3T<T> operator*(const Vector3T<T>& v, const Matrix3T<T>& m)
+	Vector3T<T> operator*(const Vector3T<T>& v, const Matrix3T<T>& m) noexcept
 	{
 		return m.multiplyLeft(v);
 	}
 	
 	
 	template <class T>
-	SLIB_INLINE Matrix3T<T> Interpolation< Matrix3T<T> >::interpolate(const Matrix3T<T>& a, const Matrix3T<T>& b, float factor)
+	SLIB_INLINE Matrix3T<T> Interpolation< Matrix3T<T> >::interpolate(const Matrix3T<T>& a, const Matrix3T<T>& b, float factor) noexcept
 	{
 		return a.lerp(b, factor);
 	}

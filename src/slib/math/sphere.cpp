@@ -16,17 +16,17 @@ namespace slib
 {
 
 	template <class T>
-	SphereT<T>::SphereT(const Vector3T<T>& _center, T _radius) : center(_center), radius(_radius)
-	{
-	}
+	SphereT<T>::SphereT(const Vector3T<T>& _center, T _radius) noexcept
+	 : center(_center), radius(_radius)
+	 {}
 
 	template <class T>
-	SphereT<T>::SphereT(T xc, T yc, T zc, T _radius) : center(xc, yc, zc), radius(_radius)
-	{
-	}
+	SphereT<T>::SphereT(T xc, T yc, T zc, T _radius) noexcept
+	 : center(xc, yc, zc), radius(_radius)
+	 {}
 
 	template <class T>
-	sl_bool SphereT<T>::containsPoint(const Vector3T<T>& point) const
+	sl_bool SphereT<T>::containsPoint(const Vector3T<T>& point) const noexcept
 	{
 		T dx = point.x - center.x;
 		T dy = point.y - center.y;
@@ -35,7 +35,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_uint32 SphereT<T>::intersectLine(const Line3T<T>& line, Vector3T<T>* pOut1, Vector3T<T>* pOut2) const
+	sl_uint32 SphereT<T>::intersectLine(const Line3T<T>& line, Vector3T<T>* pOut1, Vector3T<T>* pOut2) const noexcept
 	{
 		const SphereT<T>& sphere = *this;
 		Vector3T<T> l = line.getDirection();

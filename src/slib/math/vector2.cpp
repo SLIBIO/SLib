@@ -19,31 +19,31 @@ namespace slib
 	SLIB_ALIGN(8) T Vector2T<T, FT>::_zero[2] = {0, 0};
 
 	template <class T, class FT>
-	T Vector2T<T, FT>::dot(const Vector2T<T, FT>& other) const
+	T Vector2T<T, FT>::dot(const Vector2T<T, FT>& other) const noexcept
 	{
 		return x * other.x + y * other.y;
 	}
 
 	template <class T, class FT>
-	T Vector2T<T, FT>::cross(const Vector2T<T, FT>& other) const
+	T Vector2T<T, FT>::cross(const Vector2T<T, FT>& other) const noexcept
 	{
 		return x*other.y - y*other.x;
 	}
 
 	template <class T, class FT>
-	T Vector2T<T, FT>::getLength2p() const
+	T Vector2T<T, FT>::getLength2p() const noexcept
 	{
 		return x * x + y * y;
 	}
 
 	template <class T, class FT>
-	FT Vector2T<T, FT>::getLength() const
+	FT Vector2T<T, FT>::getLength() const noexcept
 	{
 		return Math::sqrt((FT)(x * x + y * y));
 	}
 
 	template <class T, class FT>
-	T Vector2T<T, FT>::getLength2p(const Vector2T<T, FT>& other) const
+	T Vector2T<T, FT>::getLength2p(const Vector2T<T, FT>& other) const noexcept
 	{
 		T dx = x - other.x;
 		T dy = y - other.y;
@@ -51,7 +51,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	FT Vector2T<T, FT>::getLength(const Vector2T<T, FT>& other) const
+	FT Vector2T<T, FT>::getLength(const Vector2T<T, FT>& other) const noexcept
 	{
 		T dx = x - other.x;
 		T dy = y - other.y;
@@ -59,7 +59,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void Vector2T<T, FT>::normalize()
+	void Vector2T<T, FT>::normalize() noexcept
 	{
 		T l = x * x + y * y;
 		if (l > 0) {
@@ -70,7 +70,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT> Vector2T<T, FT>::getNormalized()
+	Vector2T<T, FT> Vector2T<T, FT>::getNormalized() noexcept
 	{
 		T l = x * x + y * y;
 		if (l > 0) {
@@ -81,7 +81,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	FT Vector2T<T, FT>::getCosBetween(const Vector2T<T, FT>& other) const
+	FT Vector2T<T, FT>::getCosBetween(const Vector2T<T, FT>& other) const noexcept
 	{
 		FT ret = (FT)(dot(other)) / Math::sqrt((FT)(getLength2p() * other.getLength2p()));
 		if (ret > 1) {
@@ -91,13 +91,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	FT Vector2T<T, FT>::getAbsAngleBetween(const Vector2T<T, FT>& other) const
+	FT Vector2T<T, FT>::getAbsAngleBetween(const Vector2T<T, FT>& other) const noexcept
 	{
 		return Math::arccos(getCosBetween(other));
 	}
 
 	template <class T, class FT>
-	FT Vector2T<T, FT>::getAngleBetween(const Vector2T<T, FT>& other) const
+	FT Vector2T<T, FT>::getAngleBetween(const Vector2T<T, FT>& other) const noexcept
 	{
 		FT a = getAbsAngleBetween(other);
 		if (cross(other) > 0) {
@@ -107,31 +107,31 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	sl_bool Vector2T<T, FT>::equals(const Vector2T<T, FT>& other) const
+	sl_bool Vector2T<T, FT>::equals(const Vector2T<T, FT>& other) const noexcept
 	{
 		return x == other.x && y == other.y;
 	}
 
 	template <class T, class FT>
-	sl_bool Vector2T<T, FT>::isAlmostEqual(const Vector2T<T, FT>& other) const
+	sl_bool Vector2T<T, FT>::isAlmostEqual(const Vector2T<T, FT>& other) const noexcept
 	{
 		return Math::isAlmostZero((FT)(x - other.x)) && Math::isAlmostZero((FT)(y - other.y));
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT> Vector2T<T, FT>::lerp(const Vector2T<T, FT>& target, float factor) const
+	Vector2T<T, FT> Vector2T<T, FT>::lerp(const Vector2T<T, FT>& target, float factor) const noexcept
 	{
 		return {(T)SLIB_LERP(x, target.x, factor), (T)SLIB_LERP(y, target.y, factor)};
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT> Vector2T<T, FT>::operator+(const Vector2T<T, FT>& other) const
+	Vector2T<T, FT> Vector2T<T, FT>::operator+(const Vector2T<T, FT>& other) const noexcept
 	{
 		return {x + other.x, y + other.y};
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT>& Vector2T<T, FT>::operator+=(const Vector2T<T, FT>& other)
+	Vector2T<T, FT>& Vector2T<T, FT>::operator+=(const Vector2T<T, FT>& other) noexcept
 	{
 		x += other.x;
 		y += other.y;
@@ -139,13 +139,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT> Vector2T<T, FT>::operator-(const Vector2T<T, FT>& other) const
+	Vector2T<T, FT> Vector2T<T, FT>::operator-(const Vector2T<T, FT>& other) const noexcept
 	{
 		return {x - other.x, y - other.y};
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT>& Vector2T<T, FT>::operator-=(const Vector2T<T, FT>& other)
+	Vector2T<T, FT>& Vector2T<T, FT>::operator-=(const Vector2T<T, FT>& other) noexcept
 	{
 		x -= other.x;
 		y -= other.y;
@@ -153,13 +153,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT> Vector2T<T, FT>::operator*(T f) const
+	Vector2T<T, FT> Vector2T<T, FT>::operator*(T f) const noexcept
 	{
 		return {x * f, y * f};
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT>& Vector2T<T, FT>::operator*=(T f)
+	Vector2T<T, FT>& Vector2T<T, FT>::operator*=(T f) noexcept
 	{
 		x *= f;
 		y *= f;
@@ -167,13 +167,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT> Vector2T<T, FT>::operator*(const Vector2T<T, FT>& other) const
+	Vector2T<T, FT> Vector2T<T, FT>::operator*(const Vector2T<T, FT>& other) const noexcept
 	{
 		return {x * other.x, y * other.y};
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT>& Vector2T<T, FT>::operator*=(const Vector2T<T, FT>& other)
+	Vector2T<T, FT>& Vector2T<T, FT>::operator*=(const Vector2T<T, FT>& other) noexcept
 	{
 		x *= other.x;
 		y *= other.y;
@@ -181,13 +181,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT> Vector2T<T, FT>::operator/(T f) const
+	Vector2T<T, FT> Vector2T<T, FT>::operator/(T f) const noexcept
 	{
 		return {x / f, y / f};
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT>& Vector2T<T, FT>::operator/=(T f)
+	Vector2T<T, FT>& Vector2T<T, FT>::operator/=(T f) noexcept
 	{
 		x /= f;
 		y /= f;
@@ -195,13 +195,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT> Vector2T<T, FT>::operator/(const Vector2T<T, FT>& other) const
+	Vector2T<T, FT> Vector2T<T, FT>::operator/(const Vector2T<T, FT>& other) const noexcept
 	{
 		return {x / other.x, y / other.y};
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT>& Vector2T<T, FT>::operator/(const Vector2T<T, FT>& other)
+	Vector2T<T, FT>& Vector2T<T, FT>::operator/(const Vector2T<T, FT>& other) noexcept
 	{
 		x /= other.x;
 		y /= other.y;
@@ -209,19 +209,19 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector2T<T, FT> Vector2T<T, FT>::operator-() const
+	Vector2T<T, FT> Vector2T<T, FT>::operator-() const noexcept
 	{
 		return {-x, -y};
 	}
 
 	template <class T, class FT>
-	sl_bool Vector2T<T, FT>::operator==(const Vector2T<T, FT>& other) const
+	sl_bool Vector2T<T, FT>::operator==(const Vector2T<T, FT>& other) const noexcept
 	{
 		return x == other.x && y == other.y;
 	}
 
 	template <class T, class FT>
-	sl_bool Vector2T<T, FT>::operator!=(const Vector2T<T, FT>& other) const
+	sl_bool Vector2T<T, FT>::operator!=(const Vector2T<T, FT>& other) const noexcept
 	{
 		return x != other.x || y != other.y;
 	}

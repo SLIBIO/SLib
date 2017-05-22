@@ -19,37 +19,37 @@ namespace slib
 	SLIB_ALIGN(8) T Vector4T<T, FT>::_zero[4] = {0, 0, 0, 0};
 
 	template <class T, class FT>
-	Vector4T<T, FT> Vector4T<T, FT>::fromLocation(const Vector3T<T, FT>& v)
+	Vector4T<T, FT> Vector4T<T, FT>::fromLocation(const Vector3T<T, FT>& v) noexcept
 	{
 		return {v.x, v.y, v.z, 1};
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT> Vector4T<T, FT>::fromDirection(const Vector3T<T, FT>& v)
+	Vector4T<T, FT> Vector4T<T, FT>::fromDirection(const Vector3T<T, FT>& v) noexcept
 	{
 		return {v.x, v.y, v.z, 0};
 	}
 
 	template <class T, class FT>
-	T Vector4T<T, FT>::dot(const Vector4T<T, FT>& other) const
+	T Vector4T<T, FT>::dot(const Vector4T<T, FT>& other) const noexcept
 	{
 		return x * other.x + y * other.y + z * other.z + w * other.w;
 	}
 
 	template <class T, class FT>
-	T Vector4T<T, FT>::getLength2p() const
+	T Vector4T<T, FT>::getLength2p() const noexcept
 	{
 		return x * x + y * y + z * z + w * w;
 	}
 
 	template <class T, class FT>
-	FT Vector4T<T, FT>::getLength() const
+	FT Vector4T<T, FT>::getLength() const noexcept
 	{
 		return Math::sqrt((FT)(x * x + y * y + z * z + w * w));
 	}
 
 	template <class T, class FT>
-	T Vector4T<T, FT>::getLength2p(const Vector4T<T, FT>& other) const
+	T Vector4T<T, FT>::getLength2p(const Vector4T<T, FT>& other) const noexcept
 	{
 		T dx = x - other.x;
 		T dy = y - other.y;
@@ -59,7 +59,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	FT Vector4T<T, FT>::getLength(const Vector4T<T, FT>& other) const
+	FT Vector4T<T, FT>::getLength(const Vector4T<T, FT>& other) const noexcept
 	{
 		T dx = x - other.x;
 		T dy = y - other.y;
@@ -69,7 +69,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void Vector4T<T, FT>::normalize()
+	void Vector4T<T, FT>::normalize() noexcept
 	{
 		T l = x * x + y * y + z * z + w * w;
 		if (l > 0) {
@@ -82,7 +82,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT> Vector4T<T, FT>::getNormalized()
+	Vector4T<T, FT> Vector4T<T, FT>::getNormalized() noexcept
 	{
 		T l = x * x + y * y + z * z + w * w;
 		if (l > 0) {
@@ -97,43 +97,43 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	FT Vector4T<T, FT>::getCosBetween(const Vector4T<T, FT>& other) const
+	FT Vector4T<T, FT>::getCosBetween(const Vector4T<T, FT>& other) const noexcept
 	{
 		return (FT)(dot(other)) / Math::sqrt((FT)(getLength2p() * other.getLength2p()));
 	}
 
 	template <class T, class FT>
-	FT Vector4T<T, FT>::getAngleBetween(const Vector4T<T, FT>& other) const
+	FT Vector4T<T, FT>::getAngleBetween(const Vector4T<T, FT>& other) const noexcept
 	{
 		return Math::arccos(getCosBetween(other));
 	}
 
 	template <class T, class FT>
-	sl_bool Vector4T<T, FT>::equals(const Vector4T<T, FT>& other) const
+	sl_bool Vector4T<T, FT>::equals(const Vector4T<T, FT>& other) const noexcept
 	{
 		return x == other.x && y == other.y && z == other.z && w == other.w;
 	}
 
 	template <class T, class FT>
-	sl_bool Vector4T<T, FT>::isAlmostEqual(const Vector4T<T, FT>& other) const
+	sl_bool Vector4T<T, FT>::isAlmostEqual(const Vector4T<T, FT>& other) const noexcept
 	{
 		return Math::isAlmostZero((FT)(x - other.x)) && Math::isAlmostZero((FT)(y - other.y)) && Math::isAlmostZero((FT)(z - other.z)) && Math::isAlmostZero((FT)(w - other.w));
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT> Vector4T<T, FT>::lerp(const Vector4T<T, FT>& target, float factor) const
+	Vector4T<T, FT> Vector4T<T, FT>::lerp(const Vector4T<T, FT>& target, float factor) const noexcept
 	{
 		return {(T)SLIB_LERP(x, target.x, factor), (T)SLIB_LERP(y, target.y, factor), (T)SLIB_LERP(z, target.z, factor), (T)SLIB_LERP(w, target.w, factor)};
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT> Vector4T<T, FT>::operator+(const Vector4T<T, FT>& other) const
+	Vector4T<T, FT> Vector4T<T, FT>::operator+(const Vector4T<T, FT>& other) const noexcept
 	{
 		return {x + other.x, y + other.y, z + other.z, w + other.w};
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT>& Vector4T<T, FT>::operator+=(const Vector4T<T, FT>& other)
+	Vector4T<T, FT>& Vector4T<T, FT>::operator+=(const Vector4T<T, FT>& other) noexcept
 	{
 		x += other.x;
 		y += other.y;
@@ -143,13 +143,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT> Vector4T<T, FT>::operator-(const Vector4T<T, FT>& other) const
+	Vector4T<T, FT> Vector4T<T, FT>::operator-(const Vector4T<T, FT>& other) const noexcept
 	{
 		return {x - other.x, y - other.y, z - other.z, w - other.w};
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT>& Vector4T<T, FT>::operator-=(const Vector4T<T, FT>& other)
+	Vector4T<T, FT>& Vector4T<T, FT>::operator-=(const Vector4T<T, FT>& other) noexcept
 	{
 		x -= other.x;
 		y -= other.y;
@@ -159,13 +159,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT> Vector4T<T, FT>::operator*(T f) const
+	Vector4T<T, FT> Vector4T<T, FT>::operator*(T f) const noexcept
 	{
 		return {x * f, y * f, z * f, w * f};
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT>& Vector4T<T, FT>::operator*=(T f)
+	Vector4T<T, FT>& Vector4T<T, FT>::operator*=(T f) noexcept
 	{
 		x *= f;
 		y *= f;
@@ -175,13 +175,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT> Vector4T<T, FT>::operator*(const Vector4T<T, FT>& other) const
+	Vector4T<T, FT> Vector4T<T, FT>::operator*(const Vector4T<T, FT>& other) const noexcept
 	{
 		return {x * other.x, y * other.y, z * other.z, w * other.w};
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT>& Vector4T<T, FT>::operator*=(const Vector4T<T, FT>& other)
+	Vector4T<T, FT>& Vector4T<T, FT>::operator*=(const Vector4T<T, FT>& other) noexcept
 	{
 		x *= other.x;
 		y *= other.y;
@@ -191,13 +191,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT> Vector4T<T, FT>::operator/(T f) const
+	Vector4T<T, FT> Vector4T<T, FT>::operator/(T f) const noexcept
 	{
 		return {x / f, y / f, z / f, w / f};
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT>& Vector4T<T, FT>::operator/=(T f)
+	Vector4T<T, FT>& Vector4T<T, FT>::operator/=(T f) noexcept
 	{
 		x /= f;
 		y /= f;
@@ -207,13 +207,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT> Vector4T<T, FT>::operator/(const Vector4T<T, FT>& other) const
+	Vector4T<T, FT> Vector4T<T, FT>::operator/(const Vector4T<T, FT>& other) const noexcept
 	{
 		return {x / other.x, y / other.y, z / other.z, w / other.w};
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT>& Vector4T<T, FT>::operator/(const Vector4T<T, FT>& other)
+	Vector4T<T, FT>& Vector4T<T, FT>::operator/(const Vector4T<T, FT>& other) noexcept
 	{
 		x /= other.x;
 		y /= other.y;
@@ -223,19 +223,19 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector4T<T, FT> Vector4T<T, FT>::operator-() const
+	Vector4T<T, FT> Vector4T<T, FT>::operator-() const noexcept
 	{
 		return {-x, -y, -z, -w};
 	}
 
 	template <class T, class FT>
-	sl_bool Vector4T<T, FT>::operator==(const Vector4T<T, FT>& other) const
+	sl_bool Vector4T<T, FT>::operator==(const Vector4T<T, FT>& other) const noexcept
 	{
 		return x == other.x && y == other.y && z == other.z && w == other.w;
 	}
 
 	template <class T, class FT>
-	sl_bool Vector4T<T, FT>::operator!=(const Vector4T<T, FT>& other) const
+	sl_bool Vector4T<T, FT>::operator!=(const Vector4T<T, FT>& other) const noexcept
 	{
 		return x != other.x || y != other.y || z != other.z || w != other.w;
 	}

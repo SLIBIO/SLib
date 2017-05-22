@@ -33,167 +33,169 @@ namespace slib
 		T m30; T m31; T m32; T m33;
 	
 	public:
-		SLIB_INLINE Matrix4T() = default;
+		SLIB_INLINE Matrix4T() noexcept = default;
 
-		constexpr Matrix4T(const Matrix4T<T>& other):
-		 m00(other.m00), m01(other.m01), m02(other.m02), m03(other.m03),
+		SLIB_INLINE constexpr Matrix4T(const Matrix4T<T>& other) noexcept
+		:m00(other.m00), m01(other.m01), m02(other.m02), m03(other.m03),
 		 m10(other.m10), m11(other.m11), m12(other.m12), m13(other.m13),
 		 m20(other.m20), m21(other.m21), m22(other.m22), m23(other.m23),
 		 m30(other.m30), m31(other.m31), m32(other.m32), m33(other.m33)
 		{}
 	
 		template <class O>
-		constexpr Matrix4T(const Matrix4T<O>& other):
-		 m00((T)(other.m00)), m01((T)(other.m01)), m02((T)(other.m02)), m03((T)(other.m03)),
+		SLIB_INLINE constexpr Matrix4T(const Matrix4T<O>& other) noexcept
+		:m00((T)(other.m00)), m01((T)(other.m01)), m02((T)(other.m02)), m03((T)(other.m03)),
 		 m10((T)(other.m10)), m11((T)(other.m11)), m12((T)(other.m12)), m13((T)(other.m13)),
 		 m20((T)(other.m20)), m21((T)(other.m21)), m22((T)(other.m22)), m23((T)(other.m23)),
 		 m30((T)(other.m30)), m31((T)(other.m31)), m32((T)(other.m32)), m33((T)(other.m33))
 		{}
 	
-		Matrix4T(T _m00, T _m01, T _m02, T _m03,
-				 T _m10, T _m11, T _m12, T _m13,
-				 T _m20, T _m21, T _m22, T _m23,
-				 T _m30, T _m31, T _m32, T _m33):
-		 m00(_m00), m01(_m01), m02(_m02), m03(_m03),
+		SLIB_INLINE Matrix4T(
+			T _m00, T _m01, T _m02, T _m03,
+			T _m10, T _m11, T _m12, T _m13,
+			T _m20, T _m21, T _m22, T _m23,
+			T _m30, T _m31, T _m32, T _m33
+		) noexcept
+		:m00(_m00), m01(_m01), m02(_m02), m03(_m03),
 		 m10(_m10), m11(_m11), m12(_m12), m13(_m13),
 		 m20(_m20), m21(_m21), m22(_m22), m23(_m23),
 		 m30(_m30), m31(_m31), m32(_m32), m33(_m33)
 		{}
 	
-		Matrix4T(const Vector4T<T>& row0, const Vector4T<T>& row1, const Vector4T<T>& row2, const Vector4T<T>& row3):
-		 m00(row0.x), m01(row0.y), m02(row0.z), m03(row0.w),
+		SLIB_INLINE Matrix4T(const Vector4T<T>& row0, const Vector4T<T>& row1, const Vector4T<T>& row2, const Vector4T<T>& row3) noexcept
+		:m00(row0.x), m01(row0.y), m02(row0.z), m03(row0.w),
 		 m10(row1.x), m11(row1.y), m12(row1.z), m13(row1.w),
 		 m20(row2.x), m21(row2.y), m22(row2.z), m23(row2.w),
 		 m30(row3.x), m31(row3.y), m32(row3.z), m33(row3.w)
 		{}
 
 	public:
-		static const Matrix4T<T>& zero();
+		static const Matrix4T<T>& zero() noexcept;
 
-		static const Matrix4T<T>& one();
+		static const Matrix4T<T>& one() noexcept;
 
-		static const Matrix4T<T>& identity();
+		static const Matrix4T<T>& identity() noexcept;
 
-		static const Matrix4T<T>& fromArray(const T arr[16]);
+		static const Matrix4T<T>& fromArray(const T arr[16]) noexcept;
 
-		static Matrix4T<T>& fromArray(T arr[16]);
+		static Matrix4T<T>& fromArray(T arr[16]) noexcept;
 
-		Vector4T<T> getRow0() const;
+		Vector4T<T> getRow0() const noexcept;
 
-		void setRow0(const Vector4T<T>& v);
+		void setRow0(const Vector4T<T>& v) noexcept;
 
-		Vector4T<T> getRow1() const;
+		Vector4T<T> getRow1() const noexcept;
 
-		void setRow1(const Vector4T<T>& v);
+		void setRow1(const Vector4T<T>& v) noexcept;
 
-		Vector4T<T> getRow2() const;
+		Vector4T<T> getRow2() const noexcept;
 
-		void setRow2(const Vector4T<T>& v);
+		void setRow2(const Vector4T<T>& v) noexcept;
 
-		Vector4T<T> getRow3() const;
+		Vector4T<T> getRow3() const noexcept;
 
-		void setRow3(const Vector4T<T>& v);
+		void setRow3(const Vector4T<T>& v) noexcept;
 	
-		Vector4T<T> getRow(sl_uint32 index) const;
+		Vector4T<T> getRow(sl_uint32 index) const noexcept;
 
-		void setRow(sl_uint32 index, const Vector4T<T>& v);
+		void setRow(sl_uint32 index, const Vector4T<T>& v) noexcept;
 	
-		Vector4T<T> getColumn0() const;
+		Vector4T<T> getColumn0() const noexcept;
 
-		void setColumn0(const Vector4T<T>& v);
+		void setColumn0(const Vector4T<T>& v) noexcept;
 
-		Vector4T<T> getColumn1() const;
+		Vector4T<T> getColumn1() const noexcept;
 
-		void setColumn1(const Vector4T<T>& v);
+		void setColumn1(const Vector4T<T>& v) noexcept;
 
-		Vector4T<T> getColumn2() const;
+		Vector4T<T> getColumn2() const noexcept;
 
-		void setColumn2(const Vector4T<T>& v);
+		void setColumn2(const Vector4T<T>& v) noexcept;
 
-		Vector4T<T> getColumn3() const;
+		Vector4T<T> getColumn3() const noexcept;
 
-		void setColumn3(const Vector4T<T>& v);
+		void setColumn3(const Vector4T<T>& v) noexcept;
 	
-		Vector4T<T> getColumn(sl_uint32 index) const;
+		Vector4T<T> getColumn(sl_uint32 index) const noexcept;
 
-		void setColumn(sl_uint32 index, const Vector4T<T>& v);
+		void setColumn(sl_uint32 index, const Vector4T<T>& v) noexcept;
 	
-		T getElement(sl_uint32 row, sl_uint32 column) const;
+		T getElement(sl_uint32 row, sl_uint32 column) const noexcept;
 
-		void setElement(sl_uint32 row, sl_uint32 column, const T& v);
+		void setElement(sl_uint32 row, sl_uint32 column, const T& v) noexcept;
 	
 
-		void add(const Matrix4T<T>& other);
+		void add(const Matrix4T<T>& other) noexcept;
 
-		void subtract(const Matrix4T<T>& other);
+		void subtract(const Matrix4T<T>& other) noexcept;
 
-		void multiply(T value);
+		void multiply(T value) noexcept;
 
-		void divide(T value);
+		void divide(T value) noexcept;
 
-		Vector4T<T> multiplyLeft(const Vector4T<T>& v) const;
+		Vector4T<T> multiplyLeft(const Vector4T<T>& v) const noexcept;
 
-		Vector4T<T> multiplyRight(const Vector4T<T>& v) const;
+		Vector4T<T> multiplyRight(const Vector4T<T>& v) const noexcept;
 
-		Vector3T<T> transformPosition(T x, T y, T z) const;
+		Vector3T<T> transformPosition(T x, T y, T z) const noexcept;
 
-		Vector3T<T> transformPosition(const Vector3T<T>& v) const;
+		Vector3T<T> transformPosition(const Vector3T<T>& v) const noexcept;
 
-		Vector3T<T> transformDirection(T x, T y, T z) const;
+		Vector3T<T> transformDirection(T x, T y, T z) const noexcept;
 
-		Vector3T<T> transformDirection(const Vector3T<T>& v) const;
+		Vector3T<T> transformDirection(const Vector3T<T>& v) const noexcept;
 
-		void multiply(const Matrix4T<T>& m);
+		void multiply(const Matrix4T<T>& m) noexcept;
 
-		T getDeterminant() const;
+		T getDeterminant() const noexcept;
 
-		void makeInverse();
+		void makeInverse() noexcept;
 
-		Matrix4T<T> inverse() const;
+		Matrix4T<T> inverse() const noexcept;
 
-		void makeTranspose();
+		void makeTranspose() noexcept;
 
-		Matrix4T<T> transpose() const;
+		Matrix4T<T> transpose() const noexcept;
 
-		void makeInverseTranspose();
+		void makeInverseTranspose() noexcept;
 
-		Matrix4T<T> inverseTranspose() const;
+		Matrix4T<T> inverseTranspose() const noexcept;
 
-		Matrix4T<T> lerp(const Matrix4T<T>& target, float factor) const;
+		Matrix4T<T> lerp(const Matrix4T<T>& target, float factor) const noexcept;
 	
 	public:
-		Matrix4T<T>& operator=(const Matrix4T<T>& other) = default;
+		Matrix4T<T>& operator=(const Matrix4T<T>& other) noexcept = default;
 
 		template <class O>
-		Matrix4T<T>& operator=(const Matrix4T<O>& other);
+		Matrix4T<T>& operator=(const Matrix4T<O>& other) noexcept;
 	
-		Matrix4T<T> operator+(const Matrix4T<T>& other) const;
+		Matrix4T<T> operator+(const Matrix4T<T>& other) const noexcept;
 	
-		Matrix4T<T>& operator+=(const Matrix4T<T>& other);
+		Matrix4T<T>& operator+=(const Matrix4T<T>& other) noexcept;
 	
-		Matrix4T<T> operator-(const Matrix4T<T>& other) const;
+		Matrix4T<T> operator-(const Matrix4T<T>& other) const noexcept;
 	
-		Matrix4T<T>& operator-=(const Matrix4T<T>& other);
+		Matrix4T<T>& operator-=(const Matrix4T<T>& other) noexcept;
 
-		Matrix4T<T> operator-() const;
+		Matrix4T<T> operator-() const noexcept;
 	
-		Matrix4T<T> operator*(T value) const;
+		Matrix4T<T> operator*(T value) const noexcept;
 	
-		Matrix4T<T>& operator*=(T value);
+		Matrix4T<T>& operator*=(T value) noexcept;
 
-		Matrix4T<T> operator/(T value) const;
+		Matrix4T<T> operator/(T value) const noexcept;
 	
-		Matrix4T<T>& operator/=(T value);
+		Matrix4T<T>& operator/=(T value) noexcept;
 	
-		Vector4T<T> operator*(const Vector4T<T>& v) const;
+		Vector4T<T> operator*(const Vector4T<T>& v) const noexcept;
 	
-		Matrix4T<T> operator*(const Matrix4T<T>& other) const;
+		Matrix4T<T> operator*(const Matrix4T<T>& other) const noexcept;
 	
-		Matrix4T<T>& operator*=(const Matrix4T<T>& other);
+		Matrix4T<T>& operator*=(const Matrix4T<T>& other) noexcept;
 
-		sl_bool operator==(const Matrix4T<T>& other) const;
+		sl_bool operator==(const Matrix4T<T>& other) const noexcept;
 
-		sl_bool operator!=(const Matrix4T<T>& other) const;
+		sl_bool operator!=(const Matrix4T<T>& other) const noexcept;
 
 	private:
 		static T _zero[16];
@@ -203,16 +205,16 @@ namespace slib
 	};
 	
 	template <class T>
-	Matrix4T<T> operator*(T value, const Matrix4T<T>& m);
+	Matrix4T<T> operator*(T value, const Matrix4T<T>& m) noexcept;
 	
 	template <class T>
-	Vector4T<T> operator*(const Vector4T<T>& v, const Matrix4T<T>& m);
+	Vector4T<T> operator*(const Vector4T<T>& v, const Matrix4T<T>& m) noexcept;
 	
 	template <class T>
 	class Interpolation< Matrix4T<T> >
 	{
 	public:
-		static Matrix4T<T> interpolate(const Matrix4T<T>& a, const Matrix4T<T>& b, float factor);
+		static Matrix4T<T> interpolate(const Matrix4T<T>& a, const Matrix4T<T>& b, float factor) noexcept;
 	};
 	
 	extern template class Matrix4T<float>;

@@ -14,7 +14,7 @@ namespace slib
 {
 
 	template <class T>
-	void ViewFrustumT<T>::getPlanes(PlaneT<T>& near, PlaneT<T>& far, PlaneT<T>& left, PlaneT<T>& right, PlaneT<T>& top, PlaneT<T>& bottom) const
+	void ViewFrustumT<T>::getPlanes(PlaneT<T>& near, PlaneT<T>& far, PlaneT<T>& left, PlaneT<T>& right, PlaneT<T>& top, PlaneT<T>& bottom) const noexcept
 	{
 		const Matrix4T<T>& m = MVP;
 		left.a = m.m03 + m.m00;
@@ -44,13 +44,13 @@ namespace slib
 	}
 
 	template <class T>
-	void ViewFrustumT<T>::getPlanes(PlaneT<T>* _out) const
+	void ViewFrustumT<T>::getPlanes(PlaneT<T>* _out) const noexcept
 	{
 		getPlanes(_out[0], _out[1], _out[2], _out[3], _out[4], _out[5]);
 	}
 
 	template <class T>
-	sl_bool ViewFrustumT<T>::containsPoint(const Vector3T<T>& pt, sl_bool flagSkipNearFar) const
+	sl_bool ViewFrustumT<T>::containsPoint(const Vector3T<T>& pt, sl_bool flagSkipNearFar) const noexcept
 	{
 		PlaneT<T> planes[6];
 		getPlanes(planes);
@@ -63,7 +63,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool ViewFrustumT<T>::containsFacets(const Vector3T<T>* pts, sl_uint32 n, sl_bool* pFlagIntersect, sl_bool flagSkipNearFar) const
+	sl_bool ViewFrustumT<T>::containsFacets(const Vector3T<T>* pts, sl_uint32 n, sl_bool* pFlagIntersect, sl_bool flagSkipNearFar) const noexcept
 	{
 		PlaneT<T> planes[6];
 		getPlanes(planes);
@@ -89,7 +89,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool ViewFrustumT<T>::containsSphere(const SphereT<T>& sphere, sl_bool* pFlagIntersect, sl_bool flagSkipNearFar) const
+	sl_bool ViewFrustumT<T>::containsSphere(const SphereT<T>& sphere, sl_bool* pFlagIntersect, sl_bool flagSkipNearFar) const noexcept
 	{
 		PlaneT<T> planes[6];
 		getPlanes(planes);
@@ -110,7 +110,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool ViewFrustumT<T>::containsBox(const BoxT<T>& box, sl_bool* pFlagIntersect, sl_bool flagSkipNearFar) const
+	sl_bool ViewFrustumT<T>::containsBox(const BoxT<T>& box, sl_bool* pFlagIntersect, sl_bool flagSkipNearFar) const noexcept
 	{
 		Vector3T<T> corners[8];
 		box.getCornerPoints(corners);

@@ -13,7 +13,7 @@ namespace slib
 
 	template <class T>
 	template <class O>
-	SLIB_INLINE PlaneT<T>& PlaneT<T>::operator=(const PlaneT<O>& other)
+	SLIB_INLINE PlaneT<T>& PlaneT<T>::operator=(const PlaneT<O>& other) noexcept
 	{
 		a = (T)(other.a);
 		b = (T)(other.b);

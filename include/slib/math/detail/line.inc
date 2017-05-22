@@ -13,7 +13,7 @@ namespace slib
 	
 	template <class T>
 	template <class O>
-	SLIB_INLINE LineT<T>& LineT<T>::operator=(const LineT<O>& other)
+	SLIB_INLINE LineT<T>& LineT<T>::operator=(const LineT<O>& other) noexcept
 	{
 		a = (T)(other.a);
 		b = (T)(other.b);

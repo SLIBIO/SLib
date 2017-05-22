@@ -28,29 +28,29 @@ namespace slib
 		PointT<T> point3;
 
 	public:
-		TriangleT() = default;
+		TriangleT() noexcept = default;
 
-		TriangleT(const TriangleT<T>& other) = default;
-
-		template <class O>
-		TriangleT(const TriangleT<O>& other);
-
-		TriangleT(const PointT<T>& point1, const PointT<T>& point2, const PointT<T>& point3);
-
-	public:
-		static T getCross(const PointT<T>& point1, const PointT<T>& point2, const PointT<T>& point3);
-
-		T getCross() const;
-
-		T getSize() const;
-
-		void transform(Matrix3T<T>& mat);
-
-	public:
-		TriangleT<T>& operator=(const TriangleT<T>& other) = default;
+		TriangleT(const TriangleT<T>& other) noexcept = default;
 
 		template <class O>
-		TriangleT<T>& operator=(const TriangleT<O>& other);
+		TriangleT(const TriangleT<O>& other) noexcept;
+
+		TriangleT(const PointT<T>& point1, const PointT<T>& point2, const PointT<T>& point3) noexcept;
+
+	public:
+		static T getCross(const PointT<T>& point1, const PointT<T>& point2, const PointT<T>& point3) noexcept;
+
+		T getCross() const noexcept;
+
+		T getSize() const noexcept;
+
+		void transform(Matrix3T<T>& mat) noexcept;
+
+	public:
+		TriangleT<T>& operator=(const TriangleT<T>& other) noexcept = default;
+
+		template <class O>
+		TriangleT<T>& operator=(const TriangleT<O>& other) noexcept;
 	
 	};
 	

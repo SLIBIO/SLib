@@ -47,29 +47,29 @@ namespace slib
 		CubicBezierCurveT(const CubicBezierCurveT<T>& other) = default;
 
 		template <class O>
-		CubicBezierCurveT(const CubicBezierCurveT<O>& other);
+		CubicBezierCurveT(const CubicBezierCurveT<O>& other) noexcept;
 
-		CubicBezierCurveT(T x0, T y0, T x1, T y1, T x2, T y2, T x3, T y3);
+		CubicBezierCurveT(T x0, T y0, T x1, T y1, T x2, T y2, T x3, T y3) noexcept;
 
-		CubicBezierCurveT(const PointT<T>& P0, const PointT<T>& P1, const PointT<T>& P2, const PointT<T>& P3);
+		CubicBezierCurveT(const PointT<T>& P0, const PointT<T>& P1, const PointT<T>& P2, const PointT<T>& P3) noexcept;
 
 	public:
-		void getPoint(T t, T& x, T& y);
+		void getPoint(T t, T& x, T& y) const noexcept;
 	
-		void getPoint(T t, PointT<T>& pt);
+		void getPoint(T t, PointT<T>& pt) const noexcept;
 	
-		PointT<T> getPoint(T t);
+		PointT<T> getPoint(T t) const noexcept;
 
 		// returns 1 + 3 * NumberOfArcSections points
-		static sl_uint32 convertArcToBezier(PointT<T> pts[13], const RectangleT<T>& rc, T startDegrees, T sweepDegrees);
+		static sl_uint32 convertArcToBezier(PointT<T> pts[13], const RectangleT<T>& rc, T startDegrees, T sweepDegrees) noexcept;
 	
-		void describeArc(T cx, T cy, T rx, T ry, T startRadian, T endRadian);
+		void describeArc(T cx, T cy, T rx, T ry, T startRadian, T endRadian) noexcept;
 
 	public:
 		CubicBezierCurveT<T>& operator=(const CubicBezierCurveT<T>& other) = default;
 
 		template <class O>
-		CubicBezierCurveT<T>& operator=(const CubicBezierCurveT<O>& other);
+		CubicBezierCurveT<T>& operator=(const CubicBezierCurveT<O>& other) noexcept;
 
 	};
 	

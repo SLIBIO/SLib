@@ -19,25 +19,25 @@ namespace slib
 	SLIB_ALIGN(8) T Vector3T<T, FT>::_zero[3] = {0, 0, 0};
 
 	template <class T, class FT>
-	Vector3T<T, FT> Vector3T<T, FT>::fromLocation(const Vector2T<T>& v)
+	Vector3T<T, FT> Vector3T<T, FT>::fromLocation(const Vector2T<T>& v) noexcept
 	{
 		return {v.x, v.y, 1};
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT> Vector3T<T, FT>::fromDirection(const Vector2T<T>& v)
+	Vector3T<T, FT> Vector3T<T, FT>::fromDirection(const Vector2T<T>& v) noexcept
 	{
 		return {v.x, v.y, 0};
 	}
 
 	template <class T, class FT>
-	T Vector3T<T, FT>::dot(const Vector3T<T, FT>& other) const
+	T Vector3T<T, FT>::dot(const Vector3T<T, FT>& other) const noexcept
 	{
 		return x * other.x + y * other.y + z * other.z;
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT> Vector3T<T, FT>::cross(const Vector3T<T, FT>& other) const
+	Vector3T<T, FT> Vector3T<T, FT>::cross(const Vector3T<T, FT>& other) const noexcept
 	{
 		T _x = y*other.z - z*other.y;
 		T _y = z*other.x - x*other.z;
@@ -46,19 +46,19 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	T Vector3T<T, FT>::getLength2p() const
+	T Vector3T<T, FT>::getLength2p() const noexcept
 	{
 		return x * x + y * y + z * z;
 	}
 
 	template <class T, class FT>
-	FT Vector3T<T, FT>::getLength() const
+	FT Vector3T<T, FT>::getLength() const noexcept
 	{
 		return Math::sqrt((FT)(x * x + y * y + z * z));
 	}
 
 	template <class T, class FT>
-	T Vector3T<T, FT>::getLength2p(const Vector3T<T, FT>& other) const
+	T Vector3T<T, FT>::getLength2p(const Vector3T<T, FT>& other) const noexcept
 	{
 		T dx = x - other.x;
 		T dy = y - other.y;
@@ -67,7 +67,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	FT Vector3T<T, FT>::getLength(const Vector3T<T, FT>& other) const
+	FT Vector3T<T, FT>::getLength(const Vector3T<T, FT>& other) const noexcept
 	{
 		T dx = x - other.x;
 		T dy = y - other.y;
@@ -76,7 +76,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	void Vector3T<T, FT>::normalize()
+	void Vector3T<T, FT>::normalize() noexcept
 	{
 		T l = x * x + y * y + z * z;
 		if (l > 0) {
@@ -88,7 +88,7 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT> Vector3T<T, FT>::getNormalized()
+	Vector3T<T, FT> Vector3T<T, FT>::getNormalized() noexcept
 	{
 		T l = x * x + y * y + z * z;
 		if (l > 0) {
@@ -102,43 +102,43 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	FT Vector3T<T, FT>::getCosBetween(const Vector3T<T, FT>& other) const
+	FT Vector3T<T, FT>::getCosBetween(const Vector3T<T, FT>& other) const noexcept
 	{
 		return dot(other) / Math::sqrt((FT)(getLength2p() * other.getLength2p()));
 	}
 
 	template <class T, class FT>
-	FT Vector3T<T, FT>::getAngleBetween(const Vector3T<T, FT>& other) const
+	FT Vector3T<T, FT>::getAngleBetween(const Vector3T<T, FT>& other) const noexcept
 	{
 		return Math::arccos(getCosBetween(other));
 	}
 
 	template <class T, class FT>
-	sl_bool Vector3T<T, FT>::equals(const Vector3T<T, FT>& other) const
+	sl_bool Vector3T<T, FT>::equals(const Vector3T<T, FT>& other) const noexcept
 	{
 		return x == other.x && y == other.y && z == other.z;
 	}
 
 	template <class T, class FT>
-	sl_bool Vector3T<T, FT>::isAlmostEqual(const Vector3T<T, FT>& other) const
+	sl_bool Vector3T<T, FT>::isAlmostEqual(const Vector3T<T, FT>& other) const noexcept
 	{
 		return Math::isAlmostZero((FT)(x - other.x)) && Math::isAlmostZero((FT)(y - other.y)) && Math::isAlmostZero((FT)(z - other.z));
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT> Vector3T<T, FT>::lerp(const Vector3T<T, FT>& target, float factor) const
+	Vector3T<T, FT> Vector3T<T, FT>::lerp(const Vector3T<T, FT>& target, float factor) const noexcept
 	{
 		return {(T)SLIB_LERP(x, target.x, factor), (T)SLIB_LERP(y, target.y, factor), (T)SLIB_LERP(z, target.z, factor)};
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT> Vector3T<T, FT>::operator+(const Vector3T<T, FT>& other) const
+	Vector3T<T, FT> Vector3T<T, FT>::operator+(const Vector3T<T, FT>& other) const noexcept
 	{
 		return {x + other.x, y + other.y, z + other.z};
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT>& Vector3T<T, FT>::operator+=(const Vector3T<T, FT>& other)
+	Vector3T<T, FT>& Vector3T<T, FT>::operator+=(const Vector3T<T, FT>& other) noexcept
 	{
 		x += other.x;
 		y += other.y;
@@ -147,13 +147,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT> Vector3T<T, FT>::operator-(const Vector3T<T, FT>& other) const
+	Vector3T<T, FT> Vector3T<T, FT>::operator-(const Vector3T<T, FT>& other) const noexcept
 	{
 		return {x - other.x, y - other.y, z - other.z};
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT>& Vector3T<T, FT>::operator-=(const Vector3T<T, FT>& other)
+	Vector3T<T, FT>& Vector3T<T, FT>::operator-=(const Vector3T<T, FT>& other) noexcept
 	{
 		x -= other.x;
 		y -= other.y;
@@ -162,13 +162,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT> Vector3T<T, FT>::operator*(T f) const
+	Vector3T<T, FT> Vector3T<T, FT>::operator*(T f) const noexcept
 	{
 		return {x * f, y * f, z * f};
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT>& Vector3T<T, FT>::operator*=(T f)
+	Vector3T<T, FT>& Vector3T<T, FT>::operator*=(T f) noexcept
 	{
 		x *= f;
 		y *= f;
@@ -177,13 +177,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT> Vector3T<T, FT>::operator*(const Vector3T<T, FT>& other) const
+	Vector3T<T, FT> Vector3T<T, FT>::operator*(const Vector3T<T, FT>& other) const noexcept
 	{
 		return {x * other.x, y * other.y, z * other.z};
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT>& Vector3T<T, FT>::operator*=(const Vector3T<T, FT>& other)
+	Vector3T<T, FT>& Vector3T<T, FT>::operator*=(const Vector3T<T, FT>& other) noexcept
 	{
 		x *= other.x;
 		y *= other.y;
@@ -192,13 +192,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT> Vector3T<T, FT>::operator/(T f) const
+	Vector3T<T, FT> Vector3T<T, FT>::operator/(T f) const noexcept
 	{
 		return {x / f, y / f, z / f};
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT>& Vector3T<T, FT>::operator/=(T f)
+	Vector3T<T, FT>& Vector3T<T, FT>::operator/=(T f) noexcept
 	{
 		x /= f;
 		y /= f;
@@ -207,13 +207,13 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT> Vector3T<T, FT>::operator/(const Vector3T<T, FT>& other) const
+	Vector3T<T, FT> Vector3T<T, FT>::operator/(const Vector3T<T, FT>& other) const noexcept
 	{
 		return {x / other.x, y / other.y, z / other.z};
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT>& Vector3T<T, FT>::operator/(const Vector3T<T, FT>& other)
+	Vector3T<T, FT>& Vector3T<T, FT>::operator/(const Vector3T<T, FT>& other) noexcept
 	{
 		x /= other.x;
 		y /= other.y;
@@ -222,19 +222,19 @@ namespace slib
 	}
 
 	template <class T, class FT>
-	Vector3T<T, FT> Vector3T<T, FT>::operator-() const
+	Vector3T<T, FT> Vector3T<T, FT>::operator-() const noexcept
 	{
 		return {-x, -y, -z};
 	}
 
 	template <class T, class FT>
-	sl_bool Vector3T<T, FT>::operator==(const Vector3T<T, FT>& other) const
+	sl_bool Vector3T<T, FT>::operator==(const Vector3T<T, FT>& other) const noexcept
 	{
 		return x == other.x && y == other.y && z == other.z;
 	}
 
 	template <class T, class FT>
-	sl_bool Vector3T<T, FT>::operator!=(const Vector3T<T, FT>& other) const
+	sl_bool Vector3T<T, FT>::operator!=(const Vector3T<T, FT>& other) const noexcept
 	{
 		return x != other.x || y != other.y || z != other.z;
 	}

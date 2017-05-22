@@ -18,20 +18,19 @@ namespace slib
 
 	template <class T>
 	BoxT<T>::BoxT(T _x1, T _y1, T _z1,
-				  T _x2, T _y2, T _z2)
-	: x1(_x1), y1(_y1), z1(_z1),
-	  x2(_x2), y2(_y2), z2(_z2)
-	{
-	}
+				  T _x2, T _y2, T _z2) noexcept
+	 : x1(_x1), y1(_y1), z1(_z1),
+	   x2(_x2), y2(_y2), z2(_z2)
+	 {}
 
 	template <class T>
-	Vector3T<T> BoxT<T>::getStart() const
+	Vector3T<T> BoxT<T>::getStart() const noexcept
 	{
 		return {x1, y1, z1};
 	}
 
 	template <class T>
-	void BoxT<T>::setStart(T x, T y, T z)
+	void BoxT<T>::setStart(T x, T y, T z) noexcept
 	{
 		x1 = x;
 		y1 = y;
@@ -39,7 +38,7 @@ namespace slib
 	}
 
 	template <class T>
-	void BoxT<T>::setStart(const Vector3T<T>& v)
+	void BoxT<T>::setStart(const Vector3T<T>& v) noexcept
 	{
 		x1 = v.x;
 		y1 = v.y;
@@ -47,13 +46,13 @@ namespace slib
 	}
 
 	template <class T>
-	Vector3T<T> BoxT<T>::getEnd() const
+	Vector3T<T> BoxT<T>::getEnd() const noexcept
 	{
 		return {x2, y2, z2};
 	}
 
 	template <class T>
-	void BoxT<T>::setEnd(T x, T y, T z)
+	void BoxT<T>::setEnd(T x, T y, T z) noexcept
 	{
 		x2 = x;
 		y2 = y;
@@ -61,7 +60,7 @@ namespace slib
 	}
 
 	template <class T>
-	void BoxT<T>::setEnd(const Vector3T<T>& v)
+	void BoxT<T>::setEnd(const Vector3T<T>& v) noexcept
 	{
 		x2 = v.x;
 		y2 = v.y;
@@ -69,26 +68,26 @@ namespace slib
 	}
 
 	template <class T>
-	Vector3T<T> BoxT<T>::getSize() const
+	Vector3T<T> BoxT<T>::getSize() const noexcept
 	{
 		return {x2 - x1, y2 - y1, z2 - z1};
 	}
 
 	template <class T>
-	Vector3T<T> BoxT<T>::getCenter() const
+	Vector3T<T> BoxT<T>::getCenter() const noexcept
 	{
 		return {(x2 + x1) / 2, (y2 + y1) / 2, (z2 + z1) / 2};
 	}
 
 	template <class T>
-	void BoxT<T>::setZero()
+	void BoxT<T>::setZero() noexcept
 	{
 		x1 = 0; y1 = 0; z1 = 0;
 		x2 = 0; y2 = 0; z2 = 0;
 	}
 
 	template <class T>
-	sl_bool BoxT<T>::containsPoint(T x, T y, T z) const
+	sl_bool BoxT<T>::containsPoint(T x, T y, T z) const noexcept
 	{
 		return
 			x >= x1 && x <= x2 &&
@@ -97,7 +96,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool BoxT<T>::containsPoint(const Vector3T<T>& pt) const
+	sl_bool BoxT<T>::containsPoint(const Vector3T<T>& pt) const noexcept
 	{
 		return
 			pt.x >= x1 && pt.x <= x2 &&
@@ -106,7 +105,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool BoxT<T>::containsBox(const BoxT<T>& other) const
+	sl_bool BoxT<T>::containsBox(const BoxT<T>& other) const noexcept
 	{
 		return
 			x1 <= other.x2 && x2 >= other.x1 &&
@@ -115,7 +114,7 @@ namespace slib
 	}
 
 	template <class T>
-	void BoxT<T>::setFromPoint(T x, T y, T z)
+	void BoxT<T>::setFromPoint(T x, T y, T z) noexcept
 	{
 		x1 = x2 = x;
 		y1 = y2 = y;
@@ -123,13 +122,13 @@ namespace slib
 	}
 
 	template <class T>
-	void BoxT<T>::setFromPoint(const Vector3T<T>& pt)
+	void BoxT<T>::setFromPoint(const Vector3T<T>& pt) noexcept
 	{
 		setFromPoint(pt.x, pt.y, pt.z);
 	}
 
 	template <class T>
-	void BoxT<T>::mergePoint(T x, T y, T z)
+	void BoxT<T>::mergePoint(T x, T y, T z) noexcept
 	{
 		if (x1 > x) {
 			x1 = x;
@@ -152,13 +151,13 @@ namespace slib
 	}
 
 	template <class T>
-	void BoxT<T>::mergePoint(const Vector3T<T>& pt)
+	void BoxT<T>::mergePoint(const Vector3T<T>& pt) noexcept
 	{
 		mergePoint(pt.x, pt.y, pt.z);
 	}
 
 	template <class T>
-	void BoxT<T>::mergePoints(const Vector3T<T>* points, sl_size count)
+	void BoxT<T>::mergePoints(const Vector3T<T>* points, sl_size count) noexcept
 	{
 		for (sl_size i = 0; i < count; i++) {
 			const Vector3T<T>& v = points[i];
@@ -184,14 +183,14 @@ namespace slib
 	}
 
 	template <class T>
-	void BoxT<T>::mergePoints(const List< Vector3T<T> >& points)
+	void BoxT<T>::mergePoints(const List< Vector3T<T> >& points) noexcept
 	{
 		ListLocker< Vector3T<T> > list(points);
 		mergePoints(list.data, list.count);
 	}
 
 	template <class T>
-	void BoxT<T>::setFromPoints(const Vector3T<T>* points, sl_size count)
+	void BoxT<T>::setFromPoints(const Vector3T<T>* points, sl_size count) noexcept
 	{
 		if (count > 0) {
 			setFromPoint(points[0]);
@@ -202,21 +201,21 @@ namespace slib
 	}
 
 	template <class T>
-	void BoxT<T>::setFromPoints(const List< Vector3T<T> >& points)
+	void BoxT<T>::setFromPoints(const List< Vector3T<T> >& points) noexcept
 	{
 		ListLocker< Vector3T<T> > list(points);
 		setFromPoints(list.data, list.count);
 	}
 
 	template <class T>
-	void BoxT<T>::setFromPoints(const Vector3T<T>& pt1, const Vector3T<T>& pt2)
+	void BoxT<T>::setFromPoints(const Vector3T<T>& pt1, const Vector3T<T>& pt2) noexcept
 	{
 		setFromPoint(pt1);
 		mergePoint(pt2);
 	}
 
 	template <class T>
-	void BoxT<T>::mergeBox(const BoxT<T>& other)
+	void BoxT<T>::mergeBox(const BoxT<T>& other) noexcept
 	{
 		if (x1 > other.x1) {
 			x1 = other.x1;
@@ -239,7 +238,7 @@ namespace slib
 	}
 
 	template <class T>
-	void BoxT<T>::getCornerPoints(Vector3T<T>* _out) const
+	void BoxT<T>::getCornerPoints(Vector3T<T>* _out) const noexcept
 	{
 		_out[0].x = x1; _out[0].y = y1; _out[0].z = z1;
 		_out[1].x = x2; _out[1].y = y1; _out[1].z = z1;
