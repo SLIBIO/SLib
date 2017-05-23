@@ -256,18 +256,18 @@ namespace slib
 		}
 	}
 
-	class _UiCallback : public Callable<void()>
+	class _priv_Ui_Callback : public Callable<void()>
 	{
 	public:
 		Function<void()> m_callback;
 
 	public:
-		SLIB_INLINE _UiCallback(const Function<void()>& callback) : m_callback(callback)
-		{
-		}
+		SLIB_INLINE _priv_Ui_Callback(const Function<void()>& callback) noexcept
+		 : m_callback(callback)
+		 {}
 
 	public:
-		void invoke() override
+		void invoke() noexcept override
 		{
 			if (UI::isUiThread()) {
 				m_callback();
@@ -281,12 +281,12 @@ namespace slib
 	Function<void()> UI::getCallbackOnUiThread(const Function<void()>& callback)
 	{
 		if (callback.isNotNull()) {
-			return (Callable<void()>*)(new _UiCallback(callback));
+			return static_cast<Callable<void()>*>(new _priv_Ui_Callback(callback));
 		}
 		return sl_null;
 	}
 
-	class _UiDispatcher : public Dispatcher
+	class _priv_Ui_Dispatcher : public Dispatcher
 	{
 	public:
 		sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms) override
@@ -301,7 +301,7 @@ namespace slib
 
 	Ref<Dispatcher> UI::getDispatcher()
 	{
-		return new _UiDispatcher();
+		return new _priv_Ui_Dispatcher();
 	}
 
 	static sl_int32 _g_ui_run_loop_level = 0;

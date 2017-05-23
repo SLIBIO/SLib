@@ -38,7 +38,7 @@ namespace slib
 	class SLIB_EXPORT Callable<RET_TYPE(ARGS...)> : public CallableBase
 	{
 	public:
-		virtual RET_TYPE invoke(ARGS... params) = 0;
+		virtual RET_TYPE invoke(ARGS... params) noexcept = 0;
 
 	};
 	
@@ -51,38 +51,38 @@ namespace slib
 
 	public:
 		template <class FUNC>
-		Function(const FUNC& func);
+		Function(const FUNC& func) noexcept;
 
 	public:
 		template <class FUNC>
-		Function& operator=(const FUNC& func);
+		Function& operator=(const FUNC& func) noexcept;
 
-		RET_TYPE operator()(ARGS... args) const;
+		RET_TYPE operator()(ARGS... args) const noexcept;
 	
 	public:
 		template <class FUNC>
-		static Function<RET_TYPE(ARGS...)> create(const FUNC& func);
+		static Function<RET_TYPE(ARGS...)> create(const FUNC& func) noexcept;
 
 		template <class CLASS, class FUNC>
-		static Function<RET_TYPE(ARGS...)> fromClass(CLASS* object, FUNC func);
+		static Function<RET_TYPE(ARGS...)> fromClass(CLASS* object, FUNC func) noexcept;
 
 		template <class CLASS, class FUNC>
-		static Function<RET_TYPE(ARGS...)> fromRef(const Ref<CLASS>& object, FUNC func);
+		static Function<RET_TYPE(ARGS...)> fromRef(const Ref<CLASS>& object, FUNC func) noexcept;
 
 		template <class CLASS, class FUNC>
-		static Function<RET_TYPE(ARGS...)> fromWeakRef(const WeakRef<CLASS>& object, FUNC func);
+		static Function<RET_TYPE(ARGS...)> fromWeakRef(const WeakRef<CLASS>& object, FUNC func) noexcept;
 	
 		template <class FUNC, class... BINDS>
-		static Function<RET_TYPE(ARGS...)> bind(const FUNC& func, const BINDS&... binds);
+		static Function<RET_TYPE(ARGS...)> bind(const FUNC& func, const BINDS&... binds) noexcept;
 
 		template <class CLASS, class FUNC, class... BINDS>
-		static Function<RET_TYPE(ARGS...)> bindClass(CLASS* object, FUNC func, const BINDS&... binds);
+		static Function<RET_TYPE(ARGS...)> bindClass(CLASS* object, FUNC func, const BINDS&... binds) noexcept;
 
 		template <class CLASS, class FUNC, class... BINDS>
-		static Function<RET_TYPE(ARGS...)> bindRef(const Ref<CLASS>& object, FUNC func, const BINDS&... binds);
+		static Function<RET_TYPE(ARGS...)> bindRef(const Ref<CLASS>& object, FUNC func, const BINDS&... binds) noexcept;
 
 		template <class CLASS, class FUNC, class... BINDS>
-		static Function<RET_TYPE(ARGS...)> bindWeakRef(const WeakRef<CLASS>& object, FUNC func, const BINDS&... binds);
+		static Function<RET_TYPE(ARGS...)> bindWeakRef(const WeakRef<CLASS>& object, FUNC func, const BINDS&... binds) noexcept;
 
 	};
 	
@@ -95,13 +95,13 @@ namespace slib
 
 	public:
 		template <class FUNC>
-		Atomic(const FUNC& func);
+		Atomic(const FUNC& func) noexcept;
 
 	public:
 		template <class FUNC>
-		Atomic& operator=(const FUNC& func);
+		Atomic& operator=(const FUNC& func) noexcept;
 
-		RET_TYPE operator()(ARGS... args) const;
+		RET_TYPE operator()(ARGS... args) const noexcept;
 
 	};
 
