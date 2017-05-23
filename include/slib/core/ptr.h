@@ -23,16 +23,7 @@ namespace slib
 	
 	template <class T>
 	using AtomicPtr = Atomic< Ptr<T> >;
-	
-	struct _Ptr_Const
-	{
-		void* _ptr;
-		void* ref;
-		sl_int32 lock;
-	};
-	
-	extern const _Ptr_Const _Ptr_Null;
-	
+		
 	template <class T>
 	class SLIB_EXPORT Ptr
 	{
@@ -41,266 +32,266 @@ namespace slib
 		Ref<Referable> ref;
 	
 	public:
-		Ptr();
+		Ptr() noexcept;
 
-		Ptr(Ptr<T>&& other);
+		Ptr(Ptr<T>&& other) noexcept;
 	
-		Ptr(const Ptr<T>& other);
+		Ptr(const Ptr<T>& other) noexcept;
 
 		template <class O>
-		Ptr(Ptr<O>&& other);
-	
-		template <class O>
-		Ptr(const Ptr<O>& other);
-
-		Ptr(AtomicPtr<T>&& other);
-
-		Ptr(const AtomicPtr<T>& other);
-
-		template <class O>
-		Ptr(AtomicPtr<O>&& other);
-
-		template <class O>
-		Ptr(const AtomicPtr<O>& other);
-
-		Ptr(sl_null_t);
-
-		Ptr(T* pointer);
-
-		template <class O>
-		Ptr(const Ref<O>& reference);
-
-		template <class O>
-		Ptr(T* pointer, const Ref<O>& reference);
+		Ptr(Ptr<O>&& other) noexcept;
 	
 		template <class O>
-		Ptr(const AtomicRef<O>& reference);
+		Ptr(const Ptr<O>& other) noexcept;
+
+		Ptr(AtomicPtr<T>&& other) noexcept;
+
+		Ptr(const AtomicPtr<T>& other) noexcept;
 
 		template <class O>
-		Ptr(T* pointer, const AtomicRef<O>& reference);
+		Ptr(AtomicPtr<O>&& other) noexcept;
 
 		template <class O>
-		Ptr(const WeakRef<O>& weak);
+		Ptr(const AtomicPtr<O>& other) noexcept;
+
+		Ptr(sl_null_t) noexcept;
+
+		Ptr(T* pointer) noexcept;
 
 		template <class O>
-		Ptr(T* pointer, const WeakRef<O>& weak);
+		Ptr(const Ref<O>& reference) noexcept;
 
 		template <class O>
-		Ptr(const AtomicWeakRef<O>& weak);
+		Ptr(T* pointer, const Ref<O>& reference) noexcept;
+	
+		template <class O>
+		Ptr(const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		Ptr(T* pointer, const AtomicWeakRef<O>& weak);
+		Ptr(T* pointer, const AtomicRef<O>& reference) noexcept;
+
+		template <class O>
+		Ptr(const WeakRef<O>& weak) noexcept;
+
+		template <class O>
+		Ptr(T* pointer, const WeakRef<O>& weak) noexcept;
+
+		template <class O>
+		Ptr(const AtomicWeakRef<O>& weak) noexcept;
+
+		template <class O>
+		Ptr(T* pointer, const AtomicWeakRef<O>& weak) noexcept;
 
 	public:
-		static Ptr<T> fromPointer(T* pointer);
+		static Ptr<T> fromPointer(T* pointer) noexcept;
 
 		template <class O>
-		static Ptr<T> fromRef(O* reference);
+		static Ptr<T> fromRef(O* reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromRef(T* pointer, O* reference);
+		static Ptr<T> fromRef(T* pointer, O* reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromRef(const Ref<O>& reference);
+		static Ptr<T> fromRef(const Ref<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromRef(T* pointer, const Ref<O>& reference);
+		static Ptr<T> fromRef(T* pointer, const Ref<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromRef(const AtomicRef<O>& reference);
+		static Ptr<T> fromRef(const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromRef(T* pointer, const AtomicRef<O>& reference);
+		static Ptr<T> fromRef(T* pointer, const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromRef(const WeakRef<O>& reference);
+		static Ptr<T> fromRef(const WeakRef<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromRef(T* pointer, const WeakRef<O>& reference);
+		static Ptr<T> fromRef(T* pointer, const WeakRef<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromRef(const AtomicWeakRef<O>& reference);
+		static Ptr<T> fromRef(const AtomicWeakRef<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromRef(T* pointer, const AtomicWeakRef<O>& reference);
+		static Ptr<T> fromRef(T* pointer, const AtomicWeakRef<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromWeak(O* reference);
+		static Ptr<T> fromWeak(O* reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromWeak(T* pointer, O* reference);
+		static Ptr<T> fromWeak(T* pointer, O* reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromWeak(const Ref<O>& reference);
+		static Ptr<T> fromWeak(const Ref<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromWeak(T* pointer, const Ref<O>& reference);
+		static Ptr<T> fromWeak(T* pointer, const Ref<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromWeak(const AtomicRef<O>& reference);
+		static Ptr<T> fromWeak(const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromWeak(T* pointer, const AtomicRef<O>& reference);
+		static Ptr<T> fromWeak(T* pointer, const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromWeak(const WeakRef<O>& reference);
+		static Ptr<T> fromWeak(const WeakRef<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromWeak(T* pointer, const WeakRef<O>& reference);
+		static Ptr<T> fromWeak(T* pointer, const WeakRef<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromWeak(const AtomicWeakRef<O>& reference);
+		static Ptr<T> fromWeak(const AtomicWeakRef<O>& reference) noexcept;
 
 		template <class O>
-		static Ptr<T> fromWeak(T* pointer, const AtomicWeakRef<O>& reference);
+		static Ptr<T> fromWeak(T* pointer, const AtomicWeakRef<O>& reference) noexcept;
 
 	public:
-		static const Ptr<T>& null();
+		static const Ptr<T>& null() noexcept;
 	
-		sl_bool isNull() const;
+		sl_bool isNull() const noexcept;
 
-		sl_bool isNotNull() const;
+		sl_bool isNotNull() const noexcept;
 
-		void setNull();
+		void setNull() noexcept;
 
 		template <class O>
-		static const Ptr<T>& from(const Ptr<O>& other);
+		static const Ptr<T>& from(const Ptr<O>& other) noexcept;
 	
-		sl_bool isWeak() const;
+		sl_bool isWeak() const noexcept;
 
-		Ptr<T> lock() const;
+		Ptr<T> lock() const noexcept;
 
 	public:
-		void setPointer(T* pointer);
+		void setPointer(T* pointer) noexcept;
 
 		template <class O>
-		void setRef(O* reference);
+		void setRef(O* reference) noexcept;
 
 		template <class O>
-		void setRef(T* pointer, O* reference);
+		void setRef(T* pointer, O* reference) noexcept;
 
 		template <class O>
-		void setRef(const Ref<O>& reference);
+		void setRef(const Ref<O>& reference) noexcept;
 
 		template <class O>
-		void setRef(T* pointer, const Ref<O>& reference);
+		void setRef(T* pointer, const Ref<O>& reference) noexcept;
 
 		template <class O>
-		void setRef(const AtomicRef<O>& reference);
+		void setRef(const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		void setRef(T* pointer, const AtomicRef<O>& reference);
+		void setRef(T* pointer, const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		void setRef(const WeakRef<O>& reference);
+		void setRef(const WeakRef<O>& reference) noexcept;
 
 		template <class O>
-		void setRef(T* pointer, const WeakRef<O>& reference);
+		void setRef(T* pointer, const WeakRef<O>& reference) noexcept;
 
 		template <class O>
-		void setRef(const AtomicWeakRef<O>& reference);
+		void setRef(const AtomicWeakRef<O>& reference) noexcept;
 
 		template <class O>
-		void setRef(T* pointer, const AtomicWeakRef<O>& reference);
+		void setRef(T* pointer, const AtomicWeakRef<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(O* reference);
+		void setWeak(O* reference) noexcept;
 
 		template <class O>
-		void setWeak(T* pointer, O* reference);
+		void setWeak(T* pointer, O* reference) noexcept;
 
 		template <class O>
-		void setWeak(const Ref<O>& reference);
+		void setWeak(const Ref<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(T* pointer, const Ref<O>& reference);
+		void setWeak(T* pointer, const Ref<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(const AtomicRef<O>& reference);
+		void setWeak(const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(T* pointer, const AtomicRef<O>& reference);
+		void setWeak(T* pointer, const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(const WeakRef<O>& reference);
+		void setWeak(const WeakRef<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(T* pointer, const WeakRef<O>& reference);
+		void setWeak(T* pointer, const WeakRef<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(const AtomicWeakRef<O>& reference);
+		void setWeak(const AtomicWeakRef<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(T* pointer, const AtomicWeakRef<O>& reference);
+		void setWeak(T* pointer, const AtomicWeakRef<O>& reference) noexcept;
 
 	public:
-		Ptr<T>& operator=(Ptr<T>&& other);
+		Ptr<T>& operator=(Ptr<T>&& other) noexcept;
 
-		Ptr<T>& operator=(const Ptr<T>& other);
+		Ptr<T>& operator=(const Ptr<T>& other) noexcept;
 
 		template <class O>
-		Ptr<T>& operator=(Ptr<O>&& other);
+		Ptr<T>& operator=(Ptr<O>&& other) noexcept;
 	
 		template <class O>
-		Ptr<T>& operator=(const Ptr<O>& other);
+		Ptr<T>& operator=(const Ptr<O>& other) noexcept;
 
-		Ptr<T>& operator=(AtomicPtr<T>&& other);
+		Ptr<T>& operator=(AtomicPtr<T>&& other) noexcept;
 
-		Ptr<T>& operator=(const AtomicPtr<T>& other);
-
-		template <class O>
-		Ptr<T>& operator=(AtomicPtr<O>&& other);
+		Ptr<T>& operator=(const AtomicPtr<T>& other) noexcept;
 
 		template <class O>
-		Ptr<T>& operator=(const AtomicPtr<O>& other);
-
-		Ptr<T>& operator=(sl_null_t);
-
-		Ptr<T>& operator=(T* pointer);
+		Ptr<T>& operator=(AtomicPtr<O>&& other) noexcept;
 
 		template <class O>
-		Ptr<T>& operator=(const Ref<O>& reference);
+		Ptr<T>& operator=(const AtomicPtr<O>& other) noexcept;
+
+		Ptr<T>& operator=(sl_null_t) noexcept;
+
+		Ptr<T>& operator=(T* pointer) noexcept;
 
 		template <class O>
-		Ptr<T>& operator=(const AtomicRef<O>& reference);
+		Ptr<T>& operator=(const Ref<O>& reference) noexcept;
 
 		template <class O>
-		Ptr<T>& operator=(const WeakRef<O>& weak);
+		Ptr<T>& operator=(const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		Ptr<T>& operator=(const AtomicWeakRef<O>& weak);
-
-
-		sl_bool operator==(const Ptr<T>& other) const;
+		Ptr<T>& operator=(const WeakRef<O>& weak) noexcept;
 
 		template <class O>
-		sl_bool operator==(const Ptr<O>& other) const;
+		Ptr<T>& operator=(const AtomicWeakRef<O>& weak) noexcept;
+
+
+		sl_bool operator==(const Ptr<T>& other) const noexcept;
+
+		template <class O>
+		sl_bool operator==(const Ptr<O>& other) const noexcept;
 	
-		sl_bool operator==(const AtomicPtr<T>& other) const;
+		sl_bool operator==(const AtomicPtr<T>& other) const noexcept;
 
 		template <class O>
-		sl_bool operator==(const AtomicPtr<O>& other) const;
+		sl_bool operator==(const AtomicPtr<O>& other) const noexcept;
 
-		sl_bool operator!=(const Ptr<T>& other) const;
-
-		template <class O>
-		sl_bool operator!=(const Ptr<O>& other) const;
-
-		sl_bool operator!=(const AtomicPtr<T>& other) const;
+		sl_bool operator!=(const Ptr<T>& other) const noexcept;
 
 		template <class O>
-		sl_bool operator!=(const AtomicPtr<O>& other) const;
+		sl_bool operator!=(const Ptr<O>& other) const noexcept;
+
+		sl_bool operator!=(const AtomicPtr<T>& other) const noexcept;
+
+		template <class O>
+		sl_bool operator!=(const AtomicPtr<O>& other) const noexcept;
 
 
-		T& operator*() const;
+		T& operator*() const noexcept;
 
-		T* operator->() const;
+		T* operator->() const noexcept;
 	
 
 	public:
-		void _move_init(void* _other);
+		void _move_init(void* _other) noexcept;
 
-		void _move_assign(void* _other);
+		void _move_assign(void* _other) noexcept;
 
 	};
 	
@@ -313,199 +304,199 @@ namespace slib
 		Ref<Referable> _ref;
 	
 	public:
-		Atomic();
+		Atomic() noexcept;
 
-		Atomic(AtomicPtr<T>&& other);
+		Atomic(AtomicPtr<T>&& other) noexcept;
 
-		Atomic(const AtomicPtr<T>& other);
-
-		template <class O>
-		Atomic(AtomicPtr<O>&& other);
+		Atomic(const AtomicPtr<T>& other) noexcept;
 
 		template <class O>
-		Atomic(const AtomicPtr<O>& other);
-
-		Atomic(Ptr<T>&& other);
-
-		Atomic(const Ptr<T>& other);
+		Atomic(AtomicPtr<O>&& other) noexcept;
 
 		template <class O>
-		Atomic(Ptr<O>&& other);
+		Atomic(const AtomicPtr<O>& other) noexcept;
+
+		Atomic(Ptr<T>&& other) noexcept;
+
+		Atomic(const Ptr<T>& other) noexcept;
+
+		template <class O>
+		Atomic(Ptr<O>&& other) noexcept;
 	
 		template <class O>
-		Atomic(const Ptr<O>& other);
+		Atomic(const Ptr<O>& other) noexcept;
 
-		Atomic(sl_null_t);
+		Atomic(sl_null_t) noexcept;
 
-		Atomic(T* pointer);
-
-		template <class O>
-		Atomic(const Ref<O>& reference);
+		Atomic(T* pointer) noexcept;
 
 		template <class O>
-		Atomic(T* pointer, const Ref<O>& reference);
+		Atomic(const Ref<O>& reference) noexcept;
 
 		template <class O>
-		Atomic(const AtomicRef<O>& reference);
+		Atomic(T* pointer, const Ref<O>& reference) noexcept;
 
 		template <class O>
-		Atomic(T* pointer, const AtomicRef<O>& reference);
+		Atomic(const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		Atomic(const WeakRef<O>& weak);
+		Atomic(T* pointer, const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		Atomic(T* pointer, const WeakRef<O>& weak);
+		Atomic(const WeakRef<O>& weak) noexcept;
 
 		template <class O>
-		Atomic(const AtomicWeakRef<O>& weak);
+		Atomic(T* pointer, const WeakRef<O>& weak) noexcept;
 
 		template <class O>
-		Atomic(T* pointer, const AtomicWeakRef<O>& weak);
+		Atomic(const AtomicWeakRef<O>& weak) noexcept;
+
+		template <class O>
+		Atomic(T* pointer, const AtomicWeakRef<O>& weak) noexcept;
 
 	public:
-		static const AtomicPtr<T>& null();
+		static const AtomicPtr<T>& null() noexcept;
 
-		sl_bool isNull() const;
+		sl_bool isNull() const noexcept;
 
-		sl_bool isNotNull() const;
+		sl_bool isNotNull() const noexcept;
 
-		void setNull();
+		void setNull() noexcept;
 
 		template <class O>
-		static const AtomicPtr<T>& from(const AtomicPtr<O>& other);
+		static const AtomicPtr<T>& from(const AtomicPtr<O>& other) noexcept;
 
-		Ptr<T> lock() const;
+		Ptr<T> lock() const noexcept;
 
 	public:
-		void setPointer(T* pointer);
+		void setPointer(T* pointer) noexcept;
 
 		template <class O>
-		void setRef(O* reference);
+		void setRef(O* reference) noexcept;
 
 		template <class O>
-		void setRef(T* pointer, O* reference);
+		void setRef(T* pointer, O* reference) noexcept;
 
 		template <class O>
-		void setRef(const Ref<O>& reference);
+		void setRef(const Ref<O>& reference) noexcept;
 
 		template <class O>
-		void setRef(T* pointer, const Ref<O>& reference);
+		void setRef(T* pointer, const Ref<O>& reference) noexcept;
 
 		template <class O>
-		void setRef(const AtomicRef<O>& reference);
+		void setRef(const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		void setRef(T* pointer, const AtomicRef<O>& reference);
+		void setRef(T* pointer, const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		void setRef(const WeakRef<O>& reference);
+		void setRef(const WeakRef<O>& reference) noexcept;
 
 		template <class O>
-		void setRef(T* pointer, const WeakRef<O>& reference);
+		void setRef(T* pointer, const WeakRef<O>& reference) noexcept;
 
 		template <class O>
-		void setRef(const AtomicWeakRef<O>& reference);
+		void setRef(const AtomicWeakRef<O>& reference) noexcept;
 
 		template <class O>
-		void setRef(T* pointer, const AtomicWeakRef<O>& reference);
+		void setRef(T* pointer, const AtomicWeakRef<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(O* reference);
+		void setWeak(O* reference) noexcept;
 
 		template <class O>
-		void setWeak(T* pointer, O* reference);
+		void setWeak(T* pointer, O* reference) noexcept;
 
 		template <class O>
-		void setWeak(const Ref<O>& reference);
+		void setWeak(const Ref<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(T* pointer, const Ref<O>& reference);
+		void setWeak(T* pointer, const Ref<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(const AtomicRef<O>& reference);
+		void setWeak(const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(T* pointer, const AtomicRef<O>& reference);
+		void setWeak(T* pointer, const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(const WeakRef<O>& reference);
+		void setWeak(const WeakRef<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(T* pointer, const WeakRef<O>& reference);
+		void setWeak(T* pointer, const WeakRef<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(const AtomicWeakRef<O>& reference);
+		void setWeak(const AtomicWeakRef<O>& reference) noexcept;
 
 		template <class O>
-		void setWeak(T* pointer, const AtomicWeakRef<O>& reference);
+		void setWeak(T* pointer, const AtomicWeakRef<O>& reference) noexcept;
 
 	public:
-		AtomicPtr<T>& operator=(AtomicPtr<T>&& other);
+		AtomicPtr<T>& operator=(AtomicPtr<T>&& other) noexcept;
 
-		AtomicPtr<T>& operator=(const AtomicPtr<T>& other);
+		AtomicPtr<T>& operator=(const AtomicPtr<T>& other) noexcept;
 
 		template <class O>
-		AtomicPtr<T>& operator=(AtomicPtr<O>&& other);
+		AtomicPtr<T>& operator=(AtomicPtr<O>&& other) noexcept;
 	
 		template <class O>
-		AtomicPtr<T>& operator=(const AtomicPtr<O>& other);
+		AtomicPtr<T>& operator=(const AtomicPtr<O>& other) noexcept;
 
-		AtomicPtr<T>& operator=(Ptr<T>&& other);
+		AtomicPtr<T>& operator=(Ptr<T>&& other) noexcept;
 	
-		AtomicPtr<T>& operator=(const Ptr<T>& other);
+		AtomicPtr<T>& operator=(const Ptr<T>& other) noexcept;
 
 		template <class O>
-		AtomicPtr<T>& operator=(Ptr<O>&& other);
+		AtomicPtr<T>& operator=(Ptr<O>&& other) noexcept;
 	
 		template <class O>
-		AtomicPtr<T>& operator=(const Ptr<O>& other);
+		AtomicPtr<T>& operator=(const Ptr<O>& other) noexcept;
 
-		AtomicPtr<T>& operator=(sl_null_t);
+		AtomicPtr<T>& operator=(sl_null_t) noexcept;
 
-		AtomicPtr<T>& operator=(T* pointer);
-
-		template <class O>
-		AtomicPtr<T>& operator=(const Ref<O>& reference);
+		AtomicPtr<T>& operator=(T* pointer) noexcept;
 
 		template <class O>
-		AtomicPtr<T>& operator=(const AtomicRef<O>& reference);
+		AtomicPtr<T>& operator=(const Ref<O>& reference) noexcept;
 
 		template <class O>
-		AtomicPtr<T>& operator=(const WeakRef<O>& weak);
+		AtomicPtr<T>& operator=(const AtomicRef<O>& reference) noexcept;
 
 		template <class O>
-		AtomicPtr<T>& operator=(const AtomicWeakRef<O>& weak);
-
-
-		sl_bool operator==(const AtomicPtr<T>& other) const;
+		AtomicPtr<T>& operator=(const WeakRef<O>& weak) noexcept;
 
 		template <class O>
-		sl_bool operator==(const AtomicPtr<O>& other) const;
+		AtomicPtr<T>& operator=(const AtomicWeakRef<O>& weak) noexcept;
 
-		sl_bool operator==(const Ptr<T>& other) const;
 
-		template <class O>
-		sl_bool operator==(const Ptr<O>& other) const;
-
-		sl_bool operator!=(const AtomicPtr<T>& other) const;
+		sl_bool operator==(const AtomicPtr<T>& other) const noexcept;
 
 		template <class O>
-		sl_bool operator!=(const AtomicPtr<O>& other) const;
+		sl_bool operator==(const AtomicPtr<O>& other) const noexcept;
 
-		sl_bool operator!=(const Ptr<T>& other) const;
+		sl_bool operator==(const Ptr<T>& other) const noexcept;
 
 		template <class O>
-		sl_bool operator!=(const Ptr<O>& other) const;
+		sl_bool operator==(const Ptr<O>& other) const noexcept;
+
+		sl_bool operator!=(const AtomicPtr<T>& other) const noexcept;
+
+		template <class O>
+		sl_bool operator!=(const AtomicPtr<O>& other) const noexcept;
+
+		sl_bool operator!=(const Ptr<T>& other) const noexcept;
+
+		template <class O>
+		sl_bool operator!=(const Ptr<O>& other) const noexcept;
 
 	public:
-		T* _retain(Ref<Referable>& reference) const;
+		T* _retain(Ref<Referable>& reference) const noexcept;
 
-		void _replace(T* pointer, const Ref<Referable>& reference);
+		void _replace(T* pointer, const Ref<Referable>& reference) noexcept;
 
-		void _move_init(void* _other);
+		void _move_init(void* _other) noexcept;
 
-		void _move_assign(void* _other);
+		void _move_assign(void* _other) noexcept;
 	
 	private:
 		SpinLock m_lock;
@@ -520,22 +511,22 @@ namespace slib
 		Ptr<T> m_ptr;
 
 	public:
-		PtrLocker(const Ptr<T>& ptr);
+		PtrLocker(const Ptr<T>& ptr) noexcept;
 
-		PtrLocker(const AtomicPtr<T>& ptr);
+		PtrLocker(const AtomicPtr<T>& ptr) noexcept;
 
 	public:
-		void unlock();
+		void unlock() noexcept;
 	
-		T* get();
+		T* get() noexcept;
 
-		sl_bool isNull();
+		sl_bool isNull() noexcept;
 	
-		sl_bool isNotNull();
+		sl_bool isNotNull() noexcept;
 	
-		T& operator*() const;
+		T& operator*() const noexcept;
 	
-		T* operator->() const;
+		T* operator->() const noexcept;
 
 	};
 

@@ -12,7 +12,14 @@
 
 namespace slib
 {
+	
+	struct _priv_Ptr_Const
+	{
+		void* _ptr;
+		void* ref;
+		sl_int32 lock;
+	};
 
-	const _Ptr_Const _Ptr_Null = {0, 0, 0};
+	const _priv_Ptr_Const _priv_Ptr_Null = {0, 0, 0};
 
 }
