@@ -21,12 +21,9 @@ namespace slib
 	};
 
 	template <class T>
-	CList<T>::CList() noexcept
-	{
-		m_data = 0;
-		m_count = 0;
-		m_capacity = 0;
-	}
+	SLIB_INLINE CList<T>::CList() noexcept
+	 : m_data(sl_null), m_count(0), m_capacity(0)
+	 {}
 	
 	template <class T>
 	CList<T>::CList(sl_size count) noexcept
@@ -43,7 +40,7 @@ namespace slib
 				return;
 			}
 		}
-		m_data = 0;
+		m_data = sl_null;
 		m_count = 0;
 		m_capacity = 0;
 	}
@@ -66,7 +63,7 @@ namespace slib
 				return;
 			}
 		}
-		m_data = 0;
+		m_data = sl_null;
 		m_count = 0;
 		m_capacity = 0;
 	}
@@ -89,7 +86,7 @@ namespace slib
 				return;
 			}
 		}
-		m_data = 0;
+		m_data = sl_null;
 		m_count = 0;
 		m_capacity = 0;
 	}
@@ -110,7 +107,7 @@ namespace slib
 				return;
 			}
 		}
-		m_data = 0;
+		m_data = sl_null;
 		m_count = 0;
 		m_capacity = 0;
 	}
@@ -134,7 +131,7 @@ namespace slib
 		m_data = other.m_data;
 		m_count = other.m_count;
 		m_capacity = other.m_capacity;
-		other.m_data = 0;
+		other.m_data = sl_null;
 		other.m_count = 0;
 		other.m_capacity = 0;
 	}
@@ -153,7 +150,7 @@ namespace slib
 		m_data = other.m_data;
 		m_count = other.m_count;
 		m_capacity = other.m_capacity;
-		other.m_data = 0;
+		other.m_data = sl_null;
 		other.m_count = 0;
 		other.m_capacity = 0;
 		return *this;
