@@ -15,6 +15,7 @@
 
 #include "object.h"
 #include "tuple.h"
+#include "null_value.h"
 
 namespace slib
 {
@@ -38,7 +39,7 @@ namespace slib
 	class SLIB_EXPORT Callable<RET_TYPE(ARGS...)> : public CallableBase
 	{
 	public:
-		virtual RET_TYPE invoke(ARGS... params) noexcept = 0;
+		virtual RET_TYPE invoke(ARGS... params) = 0;
 
 	};
 	
@@ -57,7 +58,7 @@ namespace slib
 		template <class FUNC>
 		Function& operator=(const FUNC& func) noexcept;
 
-		RET_TYPE operator()(ARGS... args) const noexcept;
+		RET_TYPE operator()(ARGS... args) const;
 	
 	public:
 		template <class FUNC>
@@ -101,7 +102,7 @@ namespace slib
 		template <class FUNC>
 		Atomic& operator=(const FUNC& func) noexcept;
 
-		RET_TYPE operator()(ARGS... args) const noexcept;
+		RET_TYPE operator()(ARGS... args) const;
 
 	};
 
