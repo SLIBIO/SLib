@@ -14,7 +14,6 @@
 #include "definition.h"
 
 #include "ref.h"
-#include "new_helper.h"
 #include "compare.h"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
@@ -64,10 +63,9 @@ namespace slib
 		sl_bool m_flagStatic;
 		Ref<Referable> m_refer;
 
-	protected:
+	public:
 		CArray() noexcept;
 
-	public:
 		CArray(sl_size count) noexcept;
 
 		template <class VALUE>
@@ -80,6 +78,15 @@ namespace slib
 		CArray(const T* data, sl_size count, Referable* refer) noexcept;
 
 		~CArray() noexcept;
+		
+	public:
+		CArray(const CArray& other) = delete;
+		
+		CArray(CArray&& other) noexcept;
+		
+		CArray& operator=(const CArray& other) = delete;
+		
+		CArray& operator=(CArray&& other) noexcept;
 
 	public:
 		static CArray<T>* create(sl_size count) noexcept;

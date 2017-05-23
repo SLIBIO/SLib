@@ -8,6 +8,8 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include <new>
+
 namespace slib
 {
 	
@@ -18,19 +20,19 @@ namespace slib
 	}
 
 	template <class T>
-	CArray<T>::CArray() noexcept
-	{
-		m_flagStatic = sl_true;
-		m_data = sl_null;
-		m_count = 0;
-	}
+	SLIB_INLINE CArray<T>::CArray() noexcept
+	 : m_flagStatic(sl_true), m_data(sl_null), m_count(0)
+	 {}
 
 	template <class T>
 	CArray<T>::CArray(sl_size count) noexcept
 	{
 		if (count > 0) {
-			T* dataNew = NewHelper<T>::create(count);
+			T* dataNew = (T*)(Base::createMemory(count * sizeof(T)));
 			if (dataNew) {
+				for (sl_size i = 0; i < count; i++) {
+					new (dataNew + i) T();
+				}
 				m_flagStatic = sl_false;
 				m_data = dataNew;
 				m_count = count;
@@ -47,8 +49,11 @@ namespace slib
 	CArray<T>::CArray(const VALUE* data, sl_size count) noexcept
 	{
 		if (count > 0) {
-			T* dataNew = NewHelper<T>::create(data, count);
+			T* dataNew = (T*)(Base::createMemory(count * sizeof(T)));
 			if (dataNew) {
+				for (sl_size i = 0; i < count; i++) {
+					new (dataNew + i) T(data[i]);
+				}
 				m_flagStatic = sl_false;
 				m_data = dataNew;
 				m_count = count;
@@ -79,8 +84,51 @@ namespace slib
 	CArray<T>::~CArray() noexcept
 	{
 		if (! m_flagStatic) {
-			NewHelper<T>::free(m_data, m_count);
+			T* data = m_data;
+			if (data) {
+				sl_size count = m_count;
+				for (sl_size i = 0; i < count; i++) {
+					(data+i)->~T();
+				}
+			}
+			Base::freeMemory((void*)data);
 		}
+	}
+
+
+	template <class T>
+	CArray<T>::CArray(CArray<T>&& other) noexcept
+	 : m_refer(Move(other.m_refer))
+	{
+		m_flagStatic = other.m_flagStatic;
+		m_data = other.m_data;
+		m_count = other.m_count;
+		other.m_flagStatic = sl_true;
+		other.m_data = sl_null;
+		other.m_count = 0;
+	}
+
+	template <class T>
+	CArray<T>& CArray<T>::operator=(CArray<T>&& other) noexcept
+	{
+		if (!m_flagStatic) {
+			T* data = m_data;
+			if (data) {
+				sl_size count = m_count;
+				for (sl_size i = 0; i < count; i++) {
+					(data+i)->~T();
+				}
+			}
+			Base::freeMemory((void*)data);
+		}
+		m_flagStatic = other.m_flagStatic;
+		m_data = other.m_data;
+		m_count = other.m_count;
+		other.m_flagStatic = sl_true;
+		other.m_data = sl_null;
+		other.m_count = 0;
+		m_refer = Move(other.m_refer);
+		return *this;
 	}
 
 	template <class T>
