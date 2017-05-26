@@ -37,13 +37,13 @@ namespace slib
 		RedBlackTreeNode(KEY&& key, VALUE&& value) noexcept;
 		
 	public:
-		RedBlackTreeNode<KT, VT>* getNext() noexcept;
+		RedBlackTreeNode<KT, VT>* getNext() const noexcept;
 		
-		RedBlackTreeNode<KT, VT>* getPrevious() noexcept;
+		RedBlackTreeNode<KT, VT>* getPrevious() const noexcept;
 		
-		RedBlackTreeNode<KT, VT>* getFirst() noexcept;
+		RedBlackTreeNode<KT, VT>* getFirst() const noexcept;
 		
-		RedBlackTreeNode<KT, VT>* getLast() noexcept;
+		RedBlackTreeNode<KT, VT>* getLast() const noexcept;
 		
 	private:
 		typedef RedBlackTreeNode<KT, VT> Node;

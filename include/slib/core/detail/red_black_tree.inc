@@ -44,33 +44,33 @@ namespace slib
 	
 	template <class KT, class VT>
 	template <class KEY, class VALUE>
-	RedBlackTreeNode<KT, VT>::RedBlackTreeNode(KEY&& _key, VALUE&& _value) noexcept
+	SLIB_INLINE RedBlackTreeNode<KT, VT>::RedBlackTreeNode(KEY&& _key, VALUE&& _value) noexcept
 	 : parent(sl_null), left(sl_null), right(sl_null), flagRed(sl_false), data(Forward<KEY>(_key), Forward<VALUE>(_value))
 	{
 	}
 	
 	template <class KT, class VT>
-	RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getNext() noexcept
+	SLIB_INLINE RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getNext() const noexcept
 	{
-		return reinterpret_cast<Node*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeBaseNode*>(this)));
+		return reinterpret_cast<Node*>(_priv_RedBlackTree::getNext(const_cast<RedBlackTreeBaseNode*>(reinterpret_cast<RedBlackTreeBaseNode const*>(this))));
 	}
 	
 	template <class KT, class VT>
-	RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getPrevious() noexcept
+	SLIB_INLINE RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getPrevious() const noexcept
 	{
-		return reinterpret_cast<Node*>(_priv_RedBlackTree::getPrevious(reinterpret_cast<RedBlackTreeBaseNode*>(this)));
+		return reinterpret_cast<Node*>(_priv_RedBlackTree::getPrevious(const_cast<RedBlackTreeBaseNode*>(reinterpret_cast<RedBlackTreeBaseNode const*>(this))));
 	}
 	
 	template <class KT, class VT>
-	RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getFirst() noexcept
+	SLIB_INLINE RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getFirst() const noexcept
 	{
-		return reinterpret_cast<Node*>(_priv_RedBlackTree::getFirst(reinterpret_cast<RedBlackTreeBaseNode*>(this)));
+		return reinterpret_cast<Node*>(_priv_RedBlackTree::getFirst(const_cast<RedBlackTreeBaseNode*>(reinterpret_cast<RedBlackTreeBaseNode const*>(this))));
 	}
 	
 	template <class KT, class VT>
-	RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getLast() noexcept
+	SLIB_INLINE RedBlackTreeNode<KT, VT>* RedBlackTreeNode<KT, VT>::getLast() const noexcept
 	{
-		return reinterpret_cast<Node*>(_priv_RedBlackTree::getLast(reinterpret_cast<RedBlackTreeBaseNode*>(this)));
+		return reinterpret_cast<Node*>(_priv_RedBlackTree::getLast(const_cast<RedBlackTreeBaseNode*>(reinterpret_cast<RedBlackTreeBaseNode const*>(this))));
 	}
 
 	

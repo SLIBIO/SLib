@@ -16,7 +16,7 @@
 #include "pair.h"
 #include "object.h"
 #include "list.h"
-#include "hashtable.h"
+#include "hash_table.h"
 #include "red_black_tree.h"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
@@ -210,6 +210,9 @@ namespace slib
 		
 	};
 	
+
+	template <class KT, class VT>
+	using HashMapNode = HashTableNode<KT, VT>;
 	
 	template <class KT, class VT>
 	class SLIB_EXPORT HashMapPosition
@@ -217,7 +220,7 @@ namespace slib
 	public:
 		HashMapPosition() noexcept;
 		
-		HashMapPosition(HashEntry<KT, VT>* entry) noexcept;
+		HashMapPosition(HashMapNode<KT, VT>* node) noexcept;
 		
 		HashMapPosition(const HashMapPosition& other) noexcept = default;
 		
@@ -228,7 +231,7 @@ namespace slib
 		
 		HashMapPosition& operator=(HashMapPosition&& other) noexcept = default;
 		
-		HashMapPosition& operator=(HashEntry<KT, VT>* entry) noexcept;
+		HashMapPosition& operator=(HashMapNode<KT, VT>* node) noexcept;
 
 		Pair<KT, VT>& operator*() const noexcept;
 		
@@ -236,12 +239,12 @@ namespace slib
 		
 		sl_bool operator!=(const HashMapPosition& other) const noexcept;
 		
-		operator HashEntry<KT, VT>*() const noexcept;
+		operator HashMapNode<KT, VT>*() const noexcept;
 		
 		HashMapPosition<KT, VT>& operator++() noexcept;
 		
 	public:
-		HashEntry<KT, VT>* entry;
+		HashMapNode<KT, VT>* node;
 		
 	};
 
@@ -308,16 +311,16 @@ namespace slib
 		List<VT> getValues(const KT& key) const noexcept;
 
 		template <class KEY, class VALUE>
-		sl_bool put_NoLock(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, HashEntry<KT, VT>** ppEntry = sl_null) noexcept;
+		sl_bool put_NoLock(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, HashMapNode<KT, VT>** ppNode = sl_null) noexcept;
 		
 		template <class KEY, class VALUE>
-		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, HashEntry<KT, VT>** ppEntry = sl_null) noexcept;
+		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, HashMapNode<KT, VT>** ppNode = sl_null) noexcept;
 
 		template < class KEY, class VALUE, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<VALUE>::Type> >
-		sl_bool addIfNewKeyAndValue_NoLock(KEY&& key, VALUE&& value, HashEntry<KT, VT>** ppEntry = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		sl_bool addIfNewKeyAndValue_NoLock(KEY&& key, VALUE&& value, HashMapNode<KT, VT>** ppNode = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 
 		template < class KEY, class VALUE, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<VALUE>::Type> >
-		sl_bool addIfNewKeyAndValue(KEY&& key, VALUE&& value, HashEntry<KT, VT>** ppEntry = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		sl_bool addIfNewKeyAndValue(KEY&& key, VALUE&& value, HashMapNode<KT, VT>** ppNode = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 
 		sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null) noexcept;
 		
@@ -343,19 +346,19 @@ namespace slib
 		
 		sl_size removeAll() noexcept;
 		
-		void removeAt_NoLock(const HashEntry<KT, VT>* entry) noexcept;
+		void removeAt_NoLock(const HashMapNode<KT, VT>* node) noexcept;
 		
-		void removeAt(const HashEntry<KT, VT>* entry) noexcept;
+		void removeAt(const HashMapNode<KT, VT>* node) noexcept;
 		
-		HashEntry<KT, VT>* find_NoLock(const KT& key) const noexcept;
+		HashMapNode<KT, VT>* find_NoLock(const KT& key) const noexcept;
 		
-		HashEntry<KT, VT>* find(const KT& key) const noexcept;
-		
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		HashEntry<KT, VT>* findKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		HashMapNode<KT, VT>* find(const KT& key) const noexcept;
 		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		HashEntry<KT, VT>* findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		HashMapNode<KT, VT>* findKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		HashMapNode<KT, VT>* findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 		
 		sl_bool contains_NoLock(const KT& key) const noexcept;
 		
@@ -367,9 +370,9 @@ namespace slib
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		sl_bool containsKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 		
-		HashEntry<KT, VT>* getFirstEntry() const noexcept;
+		HashMapNode<KT, VT>* getFirstNode() const noexcept;
 		
-		HashEntry<KT, VT>* getLastEntry() const noexcept;
+		HashMapNode<KT, VT>* getLastNode() const noexcept;
 		
 		HashMap* duplicate_NoLock() const noexcept;
 		
@@ -431,6 +434,9 @@ namespace slib
 		
 	};
 	
+
+	template <class KT, class VT>
+	using TreeMapNode = RedBlackTreeNode<KT, VT>;
 	
 	template <class KT, class VT>
 	class SLIB_EXPORT TreeMapPosition
@@ -438,7 +444,7 @@ namespace slib
 	public:
 		TreeMapPosition() noexcept;
 		
-		TreeMapPosition(RedBlackTreeNode<KT, VT>* node) noexcept;
+		TreeMapPosition(TreeMapNode<KT, VT>* node) noexcept;
 		
 		TreeMapPosition(const TreeMapPosition& other) noexcept = default;
 		
@@ -449,7 +455,7 @@ namespace slib
 		
 		TreeMapPosition& operator=(TreeMapPosition&& other) noexcept = default;
 		
-		TreeMapPosition& operator=(RedBlackTreeNode<KT, VT>* node) noexcept;
+		TreeMapPosition& operator=(TreeMapNode<KT, VT>* node) noexcept;
 		
 		Pair<KT, VT>& operator*() const noexcept;
 		
@@ -457,12 +463,12 @@ namespace slib
 		
 		sl_bool operator!=(const TreeMapPosition& other) const noexcept;
 		
-		operator RedBlackTreeNode<KT, VT>*() const noexcept;
+		operator TreeMapNode<KT, VT>*() const noexcept;
 		
 		TreeMapPosition<KT, VT>& operator++() noexcept;
 		
 	public:
-		RedBlackTreeNode<KT, VT>* node;
+		TreeMapNode<KT, VT>* node;
 		
 	};
 	
@@ -525,16 +531,16 @@ namespace slib
 		List<VT> getValues(const KT& key) const noexcept;
 		
 		template <class KEY, class VALUE>
-		sl_bool put_NoLock(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, RedBlackTreeNode<KT, VT>** ppNode = sl_null) noexcept;
+		sl_bool put_NoLock(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, TreeMapNode<KT, VT>** ppNode = sl_null) noexcept;
 		
 		template <class KEY, class VALUE>
-		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, RedBlackTreeNode<KT, VT>** ppNode = sl_null) noexcept;
+		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, TreeMapNode<KT, VT>** ppNode = sl_null) noexcept;
 		
 		template < class KEY, class VALUE, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<VALUE>::Type> >
-		sl_bool addIfNewKeyAndValue_NoLock(KEY&& key, VALUE&& value, RedBlackTreeNode<KT, VT>** ppNode = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		sl_bool addIfNewKeyAndValue_NoLock(KEY&& key, VALUE&& value, TreeMapNode<KT, VT>** ppNode = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 		
 		template < class KEY, class VALUE, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<VALUE>::Type> >
-		sl_bool addIfNewKeyAndValue(KEY&& key, VALUE&& value, RedBlackTreeNode<KT, VT>** ppNode = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		sl_bool addIfNewKeyAndValue(KEY&& key, VALUE&& value, TreeMapNode<KT, VT>** ppNode = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 		
 		sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null) noexcept;
 		
@@ -560,29 +566,29 @@ namespace slib
 		
 		sl_size removeAll() noexcept;
 		
-		void removeAt_NoLock(const RedBlackTreeNode<KT, VT>* node) noexcept;
+		void removeAt_NoLock(const TreeMapNode<KT, VT>* node) noexcept;
 		
-		void removeAt(const RedBlackTreeNode<KT, VT>* node) noexcept;
+		void removeAt(const TreeMapNode<KT, VT>* node) noexcept;
 
-		RedBlackTreeNode<KT, VT>* find_NoLock(const KT& key) const noexcept;
+		TreeMapNode<KT, VT>* find_NoLock(const KT& key) const noexcept;
 		
-		RedBlackTreeNode<KT, VT>* find(const KT& key) const noexcept;
+		TreeMapNode<KT, VT>* find(const KT& key) const noexcept;
 		
-		sl_bool find_NoLock(const KT& key, RedBlackTreeNode<KT, VT>** ppNode) const noexcept;
+		sl_bool find_NoLock(const KT& key, TreeMapNode<KT, VT>** ppNode) const noexcept;
 		
-		sl_bool find(const KT& key, RedBlackTreeNode<KT, VT>** ppNode) const noexcept;
-		
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		RedBlackTreeNode<KT, VT>* findKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		sl_bool find(const KT& key, TreeMapNode<KT, VT>** ppNode) const noexcept;
 		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		RedBlackTreeNode<KT, VT>* findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		TreeMapNode<KT, VT>* findKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool searchKeyAndValue_NoLock(const KT& key, const VALUE& value, RedBlackTreeNode<KT, VT>** ppNode, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		TreeMapNode<KT, VT>* findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool searchKeyAndValue(const KT& key, const VALUE& value, RedBlackTreeNode<KT, VT>** ppNode, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		sl_bool searchKeyAndValue_NoLock(const KT& key, const VALUE& value, TreeMapNode<KT, VT>** ppNode, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		
+		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
+		sl_bool searchKeyAndValue(const KT& key, const VALUE& value, TreeMapNode<KT, VT>** ppNode, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 
 		sl_bool contains_NoLock(const KT& key) const noexcept;
 		
@@ -594,9 +600,9 @@ namespace slib
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		sl_bool containsKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 		
-		RedBlackTreeNode<KT, VT>* getFirstNode() const noexcept;
+		TreeMapNode<KT, VT>* getFirstNode() const noexcept;
 		
-		RedBlackTreeNode<KT, VT>* getLastNode() const noexcept;
+		TreeMapNode<KT, VT>* getLastNode() const noexcept;
 		
 		TreeMap* duplicate_NoLock() const noexcept;
 		

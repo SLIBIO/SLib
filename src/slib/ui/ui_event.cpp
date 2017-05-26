@@ -11,7 +11,7 @@
 #include "slib/ui/event.h"
 
 #include "slib/ui/core.h"
-#include "slib/core/hashtable.h"
+#include "slib/core/hash_table.h"
 #include "slib/core/string_buffer.h"
 #include "slib/core/log.h"
 #include "slib/core/safe_static.h"

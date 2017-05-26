@@ -8,8 +8,8 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CHECKHEADER_SLIB_CORE_HASHTABLE
-#define CHECKHEADER_SLIB_CORE_HASHTABLE
+#ifndef CHECKHEADER_SLIB_CORE_HASH_TABLE
+#define CHECKHEADER_SLIB_CORE_HASH_TABLE
 
 #include "definition.h"
 
@@ -24,31 +24,42 @@ namespace slib
 {
 	
 	template <class KT, class VT>
-	class HashEntry
+	class HashTableNode
 	{
 	public:
-		HashEntry* chain;
-		HashEntry* before;
-		HashEntry* next;
+		HashTableNode* chain;
+		HashTableNode* before;
+		HashTableNode* next;
 		sl_uint32 hash;
 		
 		Pair<KT, VT> data;
 
 	public:
 		template <class KEY, class VALUE>
-		HashEntry(KEY&& _key, VALUE&& _value) noexcept;
+		HashTableNode(KEY&& _key, VALUE&& _value) noexcept;
+
+	public:
+		SLIB_INLINE constexpr HashTableNode<KT, VT>* getNext() const noexcept
+		{
+			return next;
+		}
+		
+		SLIB_INLINE constexpr HashTableNode<KT, VT>* getPrevious() const noexcept
+		{
+			return before;
+		}
 		
 	};
 	
 	template <class KT, class VT>
 	struct HashTableStruct
 	{
-		HashEntry<KT, VT>** entries;
+		HashTableNode<KT, VT>** nodes;
 		sl_uint32 capacity;
 		
 		sl_size count;
-		HashEntry<KT, VT>* firstEntry;
-		HashEntry<KT, VT>* lastEntry;
+		HashTableNode<KT, VT>* firstNode;
+		HashTableNode<KT, VT>* lastNode;
 		
 		sl_uint32 capacityMin;
 		sl_uint32 thresholdUp;
@@ -86,14 +97,14 @@ namespace slib
 	
 		sl_size getCapacity() const noexcept;
 	
-		HashEntry<KT, VT>* getFirstEntry() const noexcept;
+		HashTableNode<KT, VT>* getFirstNode() const noexcept;
 		
-		HashEntry<KT, VT>* getLastEntry() const noexcept;
+		HashTableNode<KT, VT>* getLastNode() const noexcept;
 		
-		HashEntry<KT, VT>* find(const KT& key) const noexcept;
+		HashTableNode<KT, VT>* find(const KT& key) const noexcept;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		HashEntry<KT, VT>* findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		HashTableNode<KT, VT>* findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 		
 		sl_bool get(const KT& key, VT* outValue = sl_null) const noexcept;
 
@@ -108,12 +119,12 @@ namespace slib
 		List<VT> getValuesByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 
 		template <class KEY, class VALUE>
-		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, HashEntry<KT, VT>** ppEntry = sl_null) noexcept;
+		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, HashTableNode<KT, VT>** ppNode = sl_null) noexcept;
 
 		template < class KEY, class VALUE, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<VALUE>::Type> >
-		sl_bool addIfNewKeyAndValue(KEY&& key, VALUE&& value, HashEntry<KT, VT>** ppEntry = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		sl_bool addIfNewKeyAndValue(KEY&& key, VALUE&& value, HashTableNode<KT, VT>** ppNode = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 
-		sl_bool removeEntry(const HashEntry<KT, VT>* entry) noexcept;
+		sl_bool removeNode(const HashTableNode<KT, VT>* node) noexcept;
 
 		sl_bool remove(const KT& key, VT* outValue = sl_null) noexcept;
 
@@ -130,7 +141,7 @@ namespace slib
 		sl_bool copyFrom(const HashTable<KT, VT, HASH, KEY_EQUALS>* other) noexcept;
 
 	private:
-		typedef HashEntry<KT, VT> Entry;
+		typedef HashTableNode<KT, VT> Node;
 		typedef HashTableStruct<KT, VT> Table;
 		
 		Table m_table;
@@ -141,6 +152,6 @@ namespace slib
 
 }
 
-#include "detail/hashtable.inc"
+#include "detail/hash_table.inc"
 
 #endif

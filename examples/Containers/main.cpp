@@ -54,7 +54,7 @@ int main(int argc, const char * argv[])
 	// Map Example
 	{
 		
-		Map<String, int> map = {{"a", 1}, {"b", 2}, {"c", 3}, {"ab", 12}, {"cd", 34}};
+		Map<String, int> map = {{"a", 1}, {"b", 2}, {"c", 3}, {"ab", 11}, {"cd", 34}};
 		
 		Println("Original Map");
 		for (auto& item : map) {

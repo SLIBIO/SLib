@@ -16,7 +16,7 @@
 
 #include "slib/ui/core.h"
 #include "slib/ui/platform.h"
-#include "slib/core/hashtable.h"
+#include "slib/core/hash_table.h"
 #include "slib/core/safe_static.h"
 
 #import <Carbon/Carbon.h>

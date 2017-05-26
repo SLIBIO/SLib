@@ -30,9 +30,9 @@ namespace slib
 	SLIB_INLINE Pair<KT, VT>& MapPosition<KT, VT>::operator*() const noexcept
 	{
 		if (containerType == MapContainerType::Hash) {
-			return (reinterpret_cast<HashEntry<KT, VT>*>(node))->data;
+			return (reinterpret_cast<HashMapNode<KT, VT>*>(node))->data;
 		} else {
-			return (reinterpret_cast<RedBlackTreeNode<KT, VT>*>(node))->data;
+			return (reinterpret_cast<TreeMapNode<KT, VT>*>(node))->data;
 		}
 	}
 	
@@ -58,9 +58,9 @@ namespace slib
 	SLIB_INLINE MapPosition<KT, VT>& MapPosition<KT, VT>::operator++() noexcept
 	{
 		if (containerType == MapContainerType::Hash) {
-			node = (reinterpret_cast<HashEntry<KT, VT>*>(node))->next;
+			node = (reinterpret_cast<HashMapNode<KT, VT>*>(node))->next;
 		} else {
-			node = (reinterpret_cast<RedBlackTreeNode<KT, VT>*>(node))->getNext();
+			node = (reinterpret_cast<TreeMapNode<KT, VT>*>(node))->getNext();
 		}
 		return *this;
 	}

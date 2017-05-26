@@ -17,12 +17,12 @@ namespace slib
 	 {}
 	
 	template <class KT, class VT>
-	TreeMapPosition<KT, VT>::TreeMapPosition(RedBlackTreeNode<KT, VT>* _node) noexcept
+	TreeMapPosition<KT, VT>::TreeMapPosition(TreeMapNode<KT, VT>* _node) noexcept
 	 : node(_node)
 	 {}
 	
 	template <class KT, class VT>
-	TreeMapPosition<KT, VT>& TreeMapPosition<KT, VT>::operator=(RedBlackTreeNode<KT, VT>* _node) noexcept
+	TreeMapPosition<KT, VT>& TreeMapPosition<KT, VT>::operator=(TreeMapNode<KT, VT>* _node) noexcept
 	{
 		node = _node;
 		return *this;
@@ -47,7 +47,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT>
-	TreeMapPosition<KT, VT>::operator RedBlackTreeNode<KT, VT>*() const noexcept
+	TreeMapPosition<KT, VT>::operator TreeMapNode<KT, VT>*() const noexcept
 	{
 		return node;
 	}
@@ -91,7 +91,7 @@ namespace slib
 	VT TreeMap<KT, VT, KEY_COMPARE>::operator[](const KT& key) const noexcept
 	{
 		ObjectLocker lock(this);
-		RedBlackTreeNode<KT, VT>* node;
+		TreeMapNode<KT, VT>* node;
 		if (tree.find(key, &node)) {
 			return node->data.value;
 		} else {
@@ -126,7 +126,7 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	VT* TreeMap<KT, VT, KEY_COMPARE>::_getItemPointer(const KT& key) const noexcept
 	{
-		RedBlackTreeNode<KT, VT>* node;
+		TreeMapNode<KT, VT>* node;
 		if (tree.find(key, &node)) {
 			return &(node->data.value);
 		}
@@ -136,7 +136,7 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	VT* TreeMap<KT, VT, KEY_COMPARE>::getItemPointer(const KT& key) const noexcept
 	{
-		RedBlackTreeNode<KT, VT>* node;
+		TreeMapNode<KT, VT>* node;
 		if (tree.find(key, &node)) {
 			return &(node->data.value);
 		}
@@ -146,7 +146,7 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool TreeMap<KT, VT, KEY_COMPARE>::get_NoLock(const KT& key, VT* _out) const noexcept
 	{
-		RedBlackTreeNode<KT, VT>* node;
+		TreeMapNode<KT, VT>* node;
 		if (tree.find(key, &node)) {
 			if (_out) {
 				*_out = node->data.value;
@@ -160,7 +160,7 @@ namespace slib
 	sl_bool TreeMap<KT, VT, KEY_COMPARE>::get(const KT& key, VT* _out) const noexcept
 	{
 		ObjectLocker lock(this);
-		RedBlackTreeNode<KT, VT>* node;
+		TreeMapNode<KT, VT>* node;
 		if (tree.find(key, &node)) {
 			if (_out) {
 				*_out = node->data.value;
@@ -173,7 +173,7 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	VT TreeMap<KT, VT, KEY_COMPARE>::getValue_NoLock(const KT& key) const noexcept
 	{
-		RedBlackTreeNode<KT, VT>* node;
+		TreeMapNode<KT, VT>* node;
 		if (tree.find(key, &node)) {
 			return node->data.value;
 		} else {
@@ -185,7 +185,7 @@ namespace slib
 	VT TreeMap<KT, VT, KEY_COMPARE>::getValue(const KT& key) const noexcept
 	{
 		ObjectLocker lock(this);
-		RedBlackTreeNode<KT, VT>* node;
+		TreeMapNode<KT, VT>* node;
 		if (tree.find(key, &node)) {
 			return node->data.value;
 		} else {
@@ -196,7 +196,7 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	VT TreeMap<KT, VT, KEY_COMPARE>::getValue_NoLock(const KT& key, const VT& def) const noexcept
 	{
-		RedBlackTreeNode<KT, VT>* node;
+		TreeMapNode<KT, VT>* node;
 		if (tree.find(key, &node)) {
 			return node->data.value;
 		} else {
@@ -208,7 +208,7 @@ namespace slib
 	VT TreeMap<KT, VT, KEY_COMPARE>::getValue(const KT& key, const VT& def) const noexcept
 	{
 		ObjectLocker lock(this);
-		RedBlackTreeNode<KT, VT>* node;
+		TreeMapNode<KT, VT>* node;
 		if (tree.find(key, &node)) {
 			return node->data.value;
 		} else {
@@ -239,7 +239,7 @@ namespace slib
 	sl_bool TreeMap<KT, VT, KEY_COMPARE>::_put(const KT& key, const VT& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept
 	{
 		if (pPosition) {
-			RedBlackTreeNode<KT, VT>* node;
+			TreeMapNode<KT, VT>* node;
 			if (tree.put(key, value, mode, &node)) {
 				*pPosition = MapPosition<KT, VT>(MapContainerType::Tree, node, sl_null);
 				return sl_true;
@@ -254,7 +254,7 @@ namespace slib
 	sl_bool TreeMap<KT, VT, KEY_COMPARE>::_put(const KT& key, VT&& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept
 	{
 		if (pPosition) {
-			RedBlackTreeNode<KT, VT>* node;
+			TreeMapNode<KT, VT>* node;
 			if (tree.put(key, Move(value), mode, &node)) {
 				*pPosition = MapPosition<KT, VT>(MapContainerType::Tree, node, sl_null);
 				return sl_true;
@@ -269,7 +269,7 @@ namespace slib
 	sl_bool TreeMap<KT, VT, KEY_COMPARE>::_put(KT&& key, const VT& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept
 	{
 		if (pPosition) {
-			RedBlackTreeNode<KT, VT>* node;
+			TreeMapNode<KT, VT>* node;
 			if (tree.put(Move(key), value, mode, &node)) {
 				*pPosition = MapPosition<KT, VT>(MapContainerType::Tree, node, sl_null);
 				return sl_true;
@@ -284,7 +284,7 @@ namespace slib
 	sl_bool TreeMap<KT, VT, KEY_COMPARE>::_put(KT&& key, VT&& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept
 	{
 		if (pPosition) {
-			RedBlackTreeNode<KT, VT>* node;
+			TreeMapNode<KT, VT>* node;
 			if (tree.put(Move(key), Move(value), mode, &node)) {
 				*pPosition = MapPosition<KT, VT>(MapContainerType::Tree, node, sl_null);
 				return sl_true;
@@ -297,14 +297,14 @@ namespace slib
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class KEY, class VALUE>
-	sl_bool TreeMap<KT, VT, KEY_COMPARE>::put_NoLock(KEY&& key, VALUE&& value, MapPutMode mode, RedBlackTreeNode<KT, VT>** ppNode) noexcept
+	sl_bool TreeMap<KT, VT, KEY_COMPARE>::put_NoLock(KEY&& key, VALUE&& value, MapPutMode mode, TreeMapNode<KT, VT>** ppNode) noexcept
 	{
 		return tree.put(Forward<KEY>(key), Forward<VALUE>(value), mode, ppNode);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class KEY, class VALUE>
-	sl_bool TreeMap<KT, VT, KEY_COMPARE>::put(KEY&& key, VALUE&& value, MapPutMode mode, RedBlackTreeNode<KT, VT>** ppNode) noexcept
+	sl_bool TreeMap<KT, VT, KEY_COMPARE>::put(KEY&& key, VALUE&& value, MapPutMode mode, TreeMapNode<KT, VT>** ppNode) noexcept
 	{
 		ObjectLocker lock(this);
 		return tree.put(Forward<KEY>(key), Forward<VALUE>(value), mode, ppNode);
@@ -312,14 +312,14 @@ namespace slib
 
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class KEY, class VALUE, class VALUE_COMPARE>
-	sl_bool TreeMap<KT, VT, KEY_COMPARE>::addIfNewKeyAndValue_NoLock(KEY&& key, VALUE&& value, RedBlackTreeNode<KT, VT>** ppNode, const VALUE_COMPARE& value_compare) noexcept
+	sl_bool TreeMap<KT, VT, KEY_COMPARE>::addIfNewKeyAndValue_NoLock(KEY&& key, VALUE&& value, TreeMapNode<KT, VT>** ppNode, const VALUE_COMPARE& value_compare) noexcept
 	{
 		return tree.addIfNewKeyAndValue(key, value, ppNode, value_compare);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class KEY, class VALUE, class VALUE_COMPARE>
-	sl_bool TreeMap<KT, VT, KEY_COMPARE>::addIfNewKeyAndValue(KEY&& key, VALUE&& value, RedBlackTreeNode<KT, VT>** ppNode, const VALUE_COMPARE& value_compare) noexcept
+	sl_bool TreeMap<KT, VT, KEY_COMPARE>::addIfNewKeyAndValue(KEY&& key, VALUE&& value, TreeMapNode<KT, VT>** ppNode, const VALUE_COMPARE& value_compare) noexcept
 	{
 		ObjectLocker lock(this);
 		return tree.addIfNewKeyAndValue(key, value, ppNode, value_compare);
@@ -415,27 +415,27 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	void TreeMap<KT, VT, KEY_COMPARE>::_removeAt(const MapPosition<KT, VT>& position) noexcept
 	{
-		tree.removeNode(reinterpret_cast<RedBlackTreeNode<KT, VT>*>(position.node));
+		tree.removeNode(reinterpret_cast<TreeMapNode<KT, VT>*>(position.node));
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	void TreeMap<KT, VT, KEY_COMPARE>::removeAt_NoLock(const RedBlackTreeNode<KT, VT>* node) noexcept
+	void TreeMap<KT, VT, KEY_COMPARE>::removeAt_NoLock(const TreeMapNode<KT, VT>* node) noexcept
 	{
-		tree.removeNode(const_cast<RedBlackTreeNode<KT, VT>*>(node));
+		tree.removeNode(const_cast<TreeMapNode<KT, VT>*>(node));
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	void TreeMap<KT, VT, KEY_COMPARE>::removeAt(const RedBlackTreeNode<KT, VT>* node) noexcept
+	void TreeMap<KT, VT, KEY_COMPARE>::removeAt(const TreeMapNode<KT, VT>* node) noexcept
 	{
 		ObjectLocker lock(this);
-		tree.removeNode(const_cast<RedBlackTreeNode<KT, VT>*>(node));
+		tree.removeNode(const_cast<TreeMapNode<KT, VT>*>(node));
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool TreeMap<KT, VT, KEY_COMPARE>::_find(const KT& key, MapPosition<KT, VT>* pPosition) const noexcept
 	{
 		if (pPosition) {
-			RedBlackTreeNode<KT, VT>* node;
+			TreeMapNode<KT, VT>* node;
 			if (tree.find(key, &node)) {
 				*pPosition = MapPosition<KT, VT>(MapContainerType::Tree, node, sl_null);
 				return sl_true;
@@ -448,26 +448,26 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	RedBlackTreeNode<KT, VT>* TreeMap<KT, VT, KEY_COMPARE>::find_NoLock(const KT& key) const noexcept
+	TreeMapNode<KT, VT>* TreeMap<KT, VT, KEY_COMPARE>::find_NoLock(const KT& key) const noexcept
 	{
 		return tree.find(key);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	RedBlackTreeNode<KT, VT>* TreeMap<KT, VT, KEY_COMPARE>::find(const KT& key) const noexcept
+	TreeMapNode<KT, VT>* TreeMap<KT, VT, KEY_COMPARE>::find(const KT& key) const noexcept
 	{
 		ObjectLocker lock(this);
 		return tree.find(key);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool TreeMap<KT, VT, KEY_COMPARE>::find_NoLock(const KT& key, RedBlackTreeNode<KT, VT>** ppNode) const noexcept
+	sl_bool TreeMap<KT, VT, KEY_COMPARE>::find_NoLock(const KT& key, TreeMapNode<KT, VT>** ppNode) const noexcept
 	{
 		return tree.find(key, ppNode);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool TreeMap<KT, VT, KEY_COMPARE>::find(const KT& key, RedBlackTreeNode<KT, VT>** ppNode) const noexcept
+	sl_bool TreeMap<KT, VT, KEY_COMPARE>::find(const KT& key, TreeMapNode<KT, VT>** ppNode) const noexcept
 	{
 		ObjectLocker lock(this);
 		return tree.find(key, ppNode);
@@ -475,14 +475,14 @@ namespace slib
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class VALUE, class VALUE_EQUALS>
-	RedBlackTreeNode<KT, VT>* TreeMap<KT, VT, KEY_COMPARE>::findKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
+	TreeMapNode<KT, VT>* TreeMap<KT, VT, KEY_COMPARE>::findKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
 	{
 		return tree.findKeyAndValue(key, value, value_equals);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class VALUE, class VALUE_EQUALS>
-	RedBlackTreeNode<KT, VT>* TreeMap<KT, VT, KEY_COMPARE>::findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
+	TreeMapNode<KT, VT>* TreeMap<KT, VT, KEY_COMPARE>::findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
 	{
 		ObjectLocker lock(this);
 		return tree.findKeyAndValue(key, value, value_equals);
@@ -490,14 +490,14 @@ namespace slib
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class VALUE, class VALUE_EQUALS>
-	sl_bool TreeMap<KT, VT, KEY_COMPARE>::searchKeyAndValue_NoLock(const KT& key, const VALUE& value, RedBlackTreeNode<KT, VT>** ppNode, const VALUE_EQUALS& value_equals) const noexcept
+	sl_bool TreeMap<KT, VT, KEY_COMPARE>::searchKeyAndValue_NoLock(const KT& key, const VALUE& value, TreeMapNode<KT, VT>** ppNode, const VALUE_EQUALS& value_equals) const noexcept
 	{
 		return tree.findKeyAndValue(key, value, ppNode, value_equals);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class VALUE, class VALUE_EQUALS>
-	sl_bool TreeMap<KT, VT, KEY_COMPARE>::searchKeyAndValue(const KT& key, const VALUE& value, RedBlackTreeNode<KT, VT>** ppNode, const VALUE_EQUALS& value_equals) const noexcept
+	sl_bool TreeMap<KT, VT, KEY_COMPARE>::searchKeyAndValue(const KT& key, const VALUE& value, TreeMapNode<KT, VT>** ppNode, const VALUE_EQUALS& value_equals) const noexcept
 	{
 		ObjectLocker lock(this);
 		return tree.findKeyAndValue(key, value, ppNode, value_equals);
@@ -532,13 +532,13 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	RedBlackTreeNode<KT, VT>* TreeMap<KT, VT, KEY_COMPARE>::getFirstNode() const noexcept
+	TreeMapNode<KT, VT>* TreeMap<KT, VT, KEY_COMPARE>::getFirstNode() const noexcept
 	{
 		return tree.getFirstNode();
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	RedBlackTreeNode<KT, VT>* TreeMap<KT, VT, KEY_COMPARE>::getLastNode() const noexcept
+	TreeMapNode<KT, VT>* TreeMap<KT, VT, KEY_COMPARE>::getLastNode() const noexcept
 	{
 		return tree.getLastNode();
 	}
@@ -583,7 +583,7 @@ namespace slib
 		}
 		CList<KT>* ret = new CList<KT>;
 		if (ret) {
-			RedBlackTreeNode<KT, VT>* node = tree.getFirstNode();
+			TreeMapNode<KT, VT>* node = tree.getFirstNode();
 			while (node) {
 				if (!(ret->add_NoLock(node->data.key))) {
 					delete ret;
@@ -617,7 +617,7 @@ namespace slib
 		}
 		CList<VT>* ret = new CList<VT>;
 		if (ret) {
-			RedBlackTreeNode<KT, VT>* node = tree.getFirstNode();
+			TreeMapNode<KT, VT>* node = tree.getFirstNode();
 			while (node) {
 				if (!(ret->add_NoLock(node->data.value))) {
 					delete ret;
@@ -651,7 +651,7 @@ namespace slib
 		}
 		CList< Pair<KT, VT> >* ret = new CList< Pair<KT, VT> >;
 		if (ret) {
-			RedBlackTreeNode<KT, VT>* node = tree.getFirstNode();
+			TreeMapNode<KT, VT>* node = tree.getFirstNode();
 			while (node) {
 				if (!(ret->add_NoLock(node->data))) {
 					delete ret;

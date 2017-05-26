@@ -13,49 +13,49 @@ namespace slib
 	
 	template <class KT, class VT>
 	HashMapPosition<KT, VT>::HashMapPosition() noexcept
-	 : entry(sl_null)
+	 : node(sl_null)
 	 {}
 	
 	template <class KT, class VT>
-	HashMapPosition<KT, VT>::HashMapPosition(HashEntry<KT, VT>* _entry) noexcept
-	 : entry(_entry)
+	HashMapPosition<KT, VT>::HashMapPosition(HashMapNode<KT, VT>* _node) noexcept
+	 : node(_node)
 	 {}
 
 	template <class KT, class VT>
-	HashMapPosition<KT, VT>& HashMapPosition<KT, VT>::operator=(HashEntry<KT, VT>* _entry) noexcept
+	HashMapPosition<KT, VT>& HashMapPosition<KT, VT>::operator=(HashMapNode<KT, VT>* _node) noexcept
 	{
-		entry = _entry;
+		node = _node;
 		return *this;
 	}
 	
 	template <class KT, class VT>
 	Pair<KT, VT>& HashMapPosition<KT, VT>::operator*() const noexcept
 	{
-		return entry->data;
+		return node->data;
 	}
 	
 	template <class KT, class VT>
 	sl_bool HashMapPosition<KT, VT>::operator==(const HashMapPosition& other) const noexcept
 	{
-		return entry == other.entry;
+		return node == other.node;
 	}
 	
 	template <class KT, class VT>
 	sl_bool HashMapPosition<KT, VT>::operator!=(const HashMapPosition& other) const noexcept
 	{
-		return entry != other.entry;
+		return node != other.node;
 	}
 	
 	template <class KT, class VT>
-	HashMapPosition<KT, VT>::operator HashEntry<KT, VT>*() const noexcept
+	HashMapPosition<KT, VT>::operator HashMapNode<KT, VT>*() const noexcept
 	{
-		return entry;
+		return node;
 	}
 	
 	template <class KT, class VT>
 	HashMapPosition<KT, VT>& HashMapPosition<KT, VT>::operator++() noexcept
 	{
-		entry = entry->next;
+		node = node->next;
 		return *this;
 	}
 	
@@ -111,9 +111,9 @@ namespace slib
 	VT HashMap<KT, VT, HASH, KEY_EQUALS>::operator[](const KT& key) const noexcept
 	{
 		ObjectLocker lock(this);
-		HashEntry<KT, VT>* entry = table.find(key);
-		if (entry) {
-			return entry->data.value;
+		HashMapNode<KT, VT>* node = table.find(key);
+		if (node) {
+			return node->data.value;
 		} else {
 			return VT();
 		}
@@ -146,9 +146,9 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	VT* HashMap<KT, VT, HASH, KEY_EQUALS>::_getItemPointer(const KT& key) const noexcept
 	{
-		HashEntry<KT, VT>* entry = table.find(key);
-		if (entry) {
-			return &(entry->data.value);
+		HashMapNode<KT, VT>* node = table.find(key);
+		if (node) {
+			return &(node->data.value);
 		}
 		return sl_null;
 	}
@@ -156,9 +156,9 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	VT* HashMap<KT, VT, HASH, KEY_EQUALS>::getItemPointer(const KT& key) const noexcept
 	{
-		HashEntry<KT, VT>* entry = table.find(key);
-		if (entry) {
-			return &(entry->data.value);
+		HashMapNode<KT, VT>* node = table.find(key);
+		if (node) {
+			return &(node->data.value);
 		}
 		return sl_null;
 	}
@@ -166,10 +166,10 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::get_NoLock(const KT& key, VT* _out) const noexcept
 	{
-		HashEntry<KT, VT>* entry = table.find(key);
-		if (entry) {
+		HashMapNode<KT, VT>* node = table.find(key);
+		if (node) {
 			if (_out) {
-				*_out = entry->data.value;
+				*_out = node->data.value;
 			}
 			return sl_true;
 		}
@@ -180,10 +180,10 @@ namespace slib
 	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::get(const KT& key, VT* _out) const noexcept
 	{
 		ObjectLocker lock(this);
-		HashEntry<KT, VT>* entry = table.find(key);
-		if (entry) {
+		HashMapNode<KT, VT>* node = table.find(key);
+		if (node) {
 			if (_out) {
-				*_out = entry->data.value;
+				*_out = node->data.value;
 			}
 			return sl_true;
 		}
@@ -193,9 +193,9 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	VT HashMap<KT, VT, HASH, KEY_EQUALS>::getValue_NoLock(const KT& key) const noexcept
 	{
-		HashEntry<KT, VT>* entry = table.find(key);
-		if (entry) {
-			return entry->data.value;
+		HashMapNode<KT, VT>* node = table.find(key);
+		if (node) {
+			return node->data.value;
 		} else {
 			return VT();
 		}
@@ -205,9 +205,9 @@ namespace slib
 	VT HashMap<KT, VT, HASH, KEY_EQUALS>::getValue(const KT& key) const noexcept
 	{
 		ObjectLocker lock(this);
-		HashEntry<KT, VT>* entry = table.find(key);
-		if (entry) {
-			return entry->data.value;
+		HashMapNode<KT, VT>* node = table.find(key);
+		if (node) {
+			return node->data.value;
 		} else {
 			return VT();
 		}
@@ -216,9 +216,9 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	VT HashMap<KT, VT, HASH, KEY_EQUALS>::getValue_NoLock(const KT& key, const VT& def) const noexcept
 	{
-		HashEntry<KT, VT>* entry = table.find(key);
-		if (entry) {
-			return entry->data.value;
+		HashMapNode<KT, VT>* node = table.find(key);
+		if (node) {
+			return node->data.value;
 		} else {
 			return def;
 		}
@@ -227,9 +227,9 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	VT HashMap<KT, VT, HASH, KEY_EQUALS>::getValue(const KT& key, const VT& def) const noexcept
 	{
-		HashEntry<KT, VT>* entry = table.find(key);
-		if (entry) {
-			return entry->data.value;
+		HashMapNode<KT, VT>* node = table.find(key);
+		if (node) {
+			return node->data.value;
 		} else {
 			return def;
 		}
@@ -258,9 +258,9 @@ namespace slib
 	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::_put(const KT& key, const VT& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept
 	{
 		if (pPosition) {
-			HashEntry<KT, VT>* entry;
-			if (table.put(key, value, mode, &entry)) {
-				*pPosition = MapPosition<KT, VT>(MapContainerType::Hash, entry, sl_null);
+			HashMapNode<KT, VT>* node;
+			if (table.put(key, value, mode, &node)) {
+				*pPosition = MapPosition<KT, VT>(MapContainerType::Hash, node, sl_null);
 				return sl_true;
 			}
 			return sl_false;
@@ -273,9 +273,9 @@ namespace slib
 	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::_put(const KT& key, VT&& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept
 	{
 		if (pPosition) {
-			HashEntry<KT, VT>* entry;
-			if (table.put(key, Move(value), mode, &entry)) {
-				*pPosition = MapPosition<KT, VT>(MapContainerType::Hash, entry, sl_null);
+			HashMapNode<KT, VT>* node;
+			if (table.put(key, Move(value), mode, &node)) {
+				*pPosition = MapPosition<KT, VT>(MapContainerType::Hash, node, sl_null);
 				return sl_true;
 			}
 			return sl_false;
@@ -288,9 +288,9 @@ namespace slib
 	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::_put(KT&& key, const VT& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept
 	{
 		if (pPosition) {
-			HashEntry<KT, VT>* entry;
-			if (table.put(Move(key), value, mode, &entry)) {
-				*pPosition = MapPosition<KT, VT>(MapContainerType::Hash, entry, sl_null);
+			HashMapNode<KT, VT>* node;
+			if (table.put(Move(key), value, mode, &node)) {
+				*pPosition = MapPosition<KT, VT>(MapContainerType::Hash, node, sl_null);
 				return sl_true;
 			}
 			return sl_false;
@@ -303,9 +303,9 @@ namespace slib
 	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::_put(KT&& key, VT&& value, MapPutMode mode, MapPosition<KT, VT>* pPosition) noexcept
 	{
 		if (pPosition) {
-			HashEntry<KT, VT>* entry;
-			if (table.put(Move(key), Move(value), mode, &entry)) {
-				*pPosition = MapPosition<KT, VT>(MapContainerType::Hash, entry, sl_null);
+			HashMapNode<KT, VT>* node;
+			if (table.put(Move(key), Move(value), mode, &node)) {
+				*pPosition = MapPosition<KT, VT>(MapContainerType::Hash, node, sl_null);
 				return sl_true;
 			}
 			return sl_false;
@@ -316,32 +316,32 @@ namespace slib
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	template <class KEY, class VALUE>
-	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::put_NoLock(KEY&& key, VALUE&& value, MapPutMode mode, HashEntry<KT, VT>** ppEntry) noexcept
+	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::put_NoLock(KEY&& key, VALUE&& value, MapPutMode mode, HashMapNode<KT, VT>** ppNode) noexcept
 	{
-		return table.put(Forward<KEY>(key), Forward<VALUE>(value), mode, ppEntry);
+		return table.put(Forward<KEY>(key), Forward<VALUE>(value), mode, ppNode);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	template <class KEY, class VALUE>
-	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::put(KEY&& key, VALUE&& value, MapPutMode mode, HashEntry<KT, VT>** ppEntry) noexcept
+	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::put(KEY&& key, VALUE&& value, MapPutMode mode, HashMapNode<KT, VT>** ppNode) noexcept
 	{
 		ObjectLocker lock(this);
-		return table.put(Forward<KEY>(key), Forward<VALUE>(value), mode, ppEntry);
+		return table.put(Forward<KEY>(key), Forward<VALUE>(value), mode, ppNode);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	template <class KEY, class VALUE, class VALUE_EQUALS>
-	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue_NoLock(KEY&& key, VALUE&& value, HashEntry<KT, VT>** ppEntry, const VALUE_EQUALS& value_equals) noexcept
+	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue_NoLock(KEY&& key, VALUE&& value, HashMapNode<KT, VT>** ppNode, const VALUE_EQUALS& value_equals) noexcept
 	{
-		return table.addIfNewKeyAndValue(Forward<KEY>(key), Forward<VALUE>(value), ppEntry, value_equals);
+		return table.addIfNewKeyAndValue(Forward<KEY>(key), Forward<VALUE>(value), ppNode, value_equals);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	template <class KEY, class VALUE, class VALUE_EQUALS>
-	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue(KEY&& key, VALUE&& value, HashEntry<KT, VT>** ppEntry, const VALUE_EQUALS& value_equals) noexcept
+	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue(KEY&& key, VALUE&& value, HashMapNode<KT, VT>** ppNode, const VALUE_EQUALS& value_equals) noexcept
 	{
 		ObjectLocker lock(this);
-		return table.addIfNewKeyAndValue(Forward<KEY>(key), Forward<VALUE>(value), ppEntry, value_equals);
+		return table.addIfNewKeyAndValue(Forward<KEY>(key), Forward<VALUE>(value), ppNode, value_equals);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
@@ -434,29 +434,29 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	void HashMap<KT, VT, HASH, KEY_EQUALS>::_removeAt(const MapPosition<KT, VT>& position) noexcept
 	{
-		table.removeEntry(reinterpret_cast<HashEntry<KT, VT>*>(position.node));
+		table.removeNode(reinterpret_cast<HashMapNode<KT, VT>*>(position.node));
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	void HashMap<KT, VT, HASH, KEY_EQUALS>::removeAt_NoLock(const HashEntry<KT, VT>* entry) noexcept
+	void HashMap<KT, VT, HASH, KEY_EQUALS>::removeAt_NoLock(const HashMapNode<KT, VT>* node) noexcept
 	{
-		table.removeEntry(const_cast<HashEntry<KT, VT>*>(entry));
+		table.removeNode(const_cast<HashMapNode<KT, VT>*>(node));
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	void HashMap<KT, VT, HASH, KEY_EQUALS>::removeAt(const HashEntry<KT, VT>* entry) noexcept
+	void HashMap<KT, VT, HASH, KEY_EQUALS>::removeAt(const HashMapNode<KT, VT>* node) noexcept
 	{
 		ObjectLocker lock(this);
-		table.removeEntry(const_cast<HashEntry<KT, VT>*>(entry));
+		table.removeNode(const_cast<HashMapNode<KT, VT>*>(node));
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::_find(const KT& key, MapPosition<KT, VT>* pPosition) const noexcept
 	{
 		if (pPosition) {
-			HashEntry<KT, VT>* entry = table.find(key);
-			if (entry) {
-				*pPosition = MapPosition<KT, VT>(MapContainerType::Hash, entry, sl_null);
+			HashMapNode<KT, VT>* node = table.find(key);
+			if (node) {
+				*pPosition = MapPosition<KT, VT>(MapContainerType::Hash, node, sl_null);
 				return sl_true;
 			} else {
 				return sl_false;
@@ -467,13 +467,13 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	HashEntry<KT, VT>* HashMap<KT, VT, HASH, KEY_EQUALS>::find_NoLock(const KT& key) const noexcept
+	HashMapNode<KT, VT>* HashMap<KT, VT, HASH, KEY_EQUALS>::find_NoLock(const KT& key) const noexcept
 	{
 		return table.find(key);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	HashEntry<KT, VT>* HashMap<KT, VT, HASH, KEY_EQUALS>::find(const KT& key) const noexcept
+	HashMapNode<KT, VT>* HashMap<KT, VT, HASH, KEY_EQUALS>::find(const KT& key) const noexcept
 	{
 		ObjectLocker lock(this);
 		return table.find(key);
@@ -481,14 +481,14 @@ namespace slib
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	template <class VALUE, class VALUE_EQUALS>
-	HashEntry<KT, VT>* HashMap<KT, VT, HASH, KEY_EQUALS>::findKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
+	HashMapNode<KT, VT>* HashMap<KT, VT, HASH, KEY_EQUALS>::findKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
 	{
 		return table.findKeyAndValue(key, value, value_equals);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	template <class VALUE, class VALUE_EQUALS>
-	HashEntry<KT, VT>* HashMap<KT, VT, HASH, KEY_EQUALS>::findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
+	HashMapNode<KT, VT>* HashMap<KT, VT, HASH, KEY_EQUALS>::findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
 	{
 		ObjectLocker lock(this);
 		return table.findKeyAndValue(key, value, value_equals);
@@ -523,15 +523,15 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	HashEntry<KT, VT>* HashMap<KT, VT, HASH, KEY_EQUALS>::getFirstEntry() const noexcept
+	HashMapNode<KT, VT>* HashMap<KT, VT, HASH, KEY_EQUALS>::getFirstNode() const noexcept
 	{
-		return table.getFirstEntry();
+		return table.getFirstNode();
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	HashEntry<KT, VT>* HashMap<KT, VT, HASH, KEY_EQUALS>::getLastEntry() const noexcept
+	HashMapNode<KT, VT>* HashMap<KT, VT, HASH, KEY_EQUALS>::getLastNode() const noexcept
 	{
-		return table.getLastEntry();
+		return table.getLastNode();
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
@@ -574,13 +574,13 @@ namespace slib
 		}
 		CList<KT>* ret = new CList<KT>;
 		if (ret) {
-			HashEntry<KT, VT>* entry = table.getFirstEntry();
-			while (entry) {
-				if (!(ret->add_NoLock(entry->data.key))) {
+			HashMapNode<KT, VT>* node = table.getFirstNode();
+			while (node) {
+				if (!(ret->add_NoLock(node->data.key))) {
 					delete ret;
 					return sl_null;
 				}
-				entry = entry->next;
+				node = node->next;
 			}
 			return ret;
 		}
@@ -608,13 +608,13 @@ namespace slib
 		}
 		CList<VT>* ret = new CList<VT>;
 		if (ret) {
-			HashEntry<KT, VT>* entry = table.getFirstEntry();
-			while (entry) {
-				if (!(ret->add_NoLock(entry->data.value))) {
+			HashMapNode<KT, VT>* node = table.getFirstNode();
+			while (node) {
+				if (!(ret->add_NoLock(node->data.value))) {
 					delete ret;
 					return sl_null;
 				}
-				entry = entry->next;
+				node = node->next;
 			}
 			return ret;
 		}
@@ -642,13 +642,13 @@ namespace slib
 		}
 		CList< Pair<KT, VT> >* ret = new CList< Pair<KT, VT> >;
 		if (ret) {
-			HashEntry<KT, VT>* entry = table.getFirstEntry();
-			while (entry) {
-				if (!(ret->add_NoLock(entry->data))) {
+			HashMapNode<KT, VT>* node = table.getFirstNode();
+			while (node) {
+				if (!(ret->add_NoLock(node->data))) {
 					delete ret;
 					return sl_null;
 				}
-				entry = entry->next;
+				node = node->next;
 			}
 			return ret;
 		}
@@ -665,13 +665,13 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	MapPosition<KT, VT> HashMap<KT, VT, HASH, KEY_EQUALS>::_getFirst(Referable* ref) const noexcept
 	{
-		return MapPosition<KT, VT>(MapContainerType::Hash, table.getFirstEntry(), ref);
+		return MapPosition<KT, VT>(MapContainerType::Hash, table.getFirstNode(), ref);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	SLIB_INLINE HashMapPosition<KT, VT> HashMap<KT, VT, HASH, KEY_EQUALS>::begin() const noexcept
 	{
-		return table.getFirstEntry();
+		return table.getFirstNode();
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
