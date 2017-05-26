@@ -220,10 +220,7 @@ namespace slib
 
 	void ViewPager::_goTo(sl_size index, const Transition& _transition)
 	{
-#if defined(SLIB_PLATFORM_IS_ANDROID)
-		Android::dismissKeyboard();
-#endif
-		
+
 		Transition transition = _transition;
 
 		ObjectLocker lock(this);
@@ -253,7 +250,11 @@ namespace slib
 		if (viewOut == viewIn) {
 			return;
 		}
-		
+
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+		Android::dismissKeyboard();
+#endif
+
 		setEnabled(sl_false);
 		viewOut->setEnabled(sl_false, UIUpdateMode::NoRedraw);
 		viewIn->setEnabled(sl_false, UIUpdateMode::NoRedraw);
@@ -361,9 +362,6 @@ namespace slib
 
 	void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl_bool flagRemoveAllBackPages)
 	{
-#if defined(SLIB_PLATFORM_IS_ANDROID)
-		Android::dismissKeyboard();
-#endif
 
 		if (viewIn.isNull()) {
 			return;
@@ -377,12 +375,17 @@ namespace slib
 			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPager, _push, this, viewIn, _transition, flagRemoveAllBackPages), 100);
 			return;
 		}
-		
+
 		Transition transition(_transition);
 		
 		sl_size n = m_pages.getCount();
 		
 		if (n == 0) {
+
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+			Android::dismissKeyboard();
+#endif
+
 			ScopedCounter counter(&m_countActiveTransitionAnimations);
 			m_indexCurrent = 0;
 			m_pages.add_NoLock(viewIn);
@@ -402,7 +405,11 @@ namespace slib
 		if (viewBack == viewIn) {
 			return;
 		}
-		
+
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+		Android::dismissKeyboard();
+#endif
+
 		m_indexCurrent = n;
 
 		viewIn->setFrame(getBoundsInnerPadding(), UIUpdateMode::NoRedraw);
@@ -481,10 +488,7 @@ namespace slib
 
 	void ViewPager::_pop(const Ref<View>& _viewOut, const Transition& _transition)
 	{
-#if defined(SLIB_PLATFORM_IS_ANDROID)
-		Android::dismissKeyboard();
-#endif
-		
+
 		ObjectLocker lock(this);
 		
 		if (m_countActiveTransitionAnimations) {
@@ -505,7 +509,11 @@ namespace slib
 		if (_viewOut.isNotNull() && _viewOut != viewOut) {
 			return;
 		}
-		
+
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+		Android::dismissKeyboard();
+#endif
+
 		if (n == 1) {
 			ScopedCounter counter(&m_countActiveTransitionAnimations);
 			dispatchPageAction(viewOut.get(), UIPageAction::Pause);
@@ -1196,9 +1204,6 @@ namespace slib
 
 	void ViewPage::_closePopup(Transition transition)
 	{
-#if defined(SLIB_PLATFORM_IS_ANDROID)
-		Android::dismissKeyboard();
-#endif
 
 		ObjectLocker lock(this);
 		
@@ -1206,7 +1211,11 @@ namespace slib
 			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPage, _closePopup, this, transition), 100);
 			return;
 		}
-		
+
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+		Android::dismissKeyboard();
+#endif
+
 		_applyDefaultClosingPopupTransition(transition);
 		
 		setEnabled(sl_false, UIUpdateMode::NoRedraw);
