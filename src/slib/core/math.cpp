@@ -24,191 +24,191 @@
 namespace slib
 {
 
-	float Math::pow(float x, float y)
+	float Math::pow(float x, float y) noexcept
 	{
 		return ::powf(x, y);
 	}
 
-	double Math::pow(double x, double y)
+	double Math::pow(double x, double y) noexcept
 	{
 		return ::pow(x, y);
 	}
 
-	float Math::sqrt(float f)
+	float Math::sqrt(float f) noexcept
 	{
 		return ::sqrtf(f);
 	}
 
-	double Math::sqrt(double f)
+	double Math::sqrt(double f) noexcept
 	{
 		return ::sqrt(f);
 	}
 
-	float Math::cbrt(float f)
+	float Math::cbrt(float f) noexcept
 	{
 		return ::cbrtf(f);
 	}
 
-	double Math::cbrt(double f)
+	double Math::cbrt(double f) noexcept
 	{
 		return ::cbrt(f);
 	}
 
-	float Math::sin(float f)
+	float Math::sin(float f) noexcept
 	{
 		return ::sinf(f);
 	}
 
-	double Math::sin(double f)
+	double Math::sin(double f) noexcept
 	{
 		return ::sin(f);
 	}
 
-	float Math::cos(float f)
+	float Math::cos(float f) noexcept
 	{
 		return ::cosf(f);
 	}
 
-	double Math::cos(double f)
+	double Math::cos(double f) noexcept
 	{
 		return ::cos(f);
 	}
 
-	float Math::tan(float f)
+	float Math::tan(float f) noexcept
 	{
 		return ::tanf(f);
 	}
 
-	double Math::tan(double f)
+	double Math::tan(double f) noexcept
 	{
 		return ::tan(f);
 	}
 
-	float Math::cot(float f)
+	float Math::cot(float f) noexcept
 	{
 		return 1.0f / tan(f);
 	}
 
-	double Math::cot(double f)
+	double Math::cot(double f) noexcept
 	{
 		return 1.0 / tan(f);
 	}
 
-	float Math::arccos(float f)
+	float Math::arccos(float f) noexcept
 	{
 		return ::acosf(f);
 	}
 
-	double Math::arccos(double f)
+	double Math::arccos(double f) noexcept
 	{
 		return ::acos(f);
 	}
 
-	float Math::arcsin(float f)
+	float Math::arcsin(float f) noexcept
 	{
 		return ::asinf(f);
 	}
 
-	double Math::arcsin(double f)
+	double Math::arcsin(double f) noexcept
 	{
 		return ::asin(f);
 	}
 
-	float Math::arctan(float f)
+	float Math::arctan(float f) noexcept
 	{
 		return ::atanf(f);
 	}
 
-	double Math::arctan(double f)
+	double Math::arctan(double f) noexcept
 	{
 		return ::atan(f);
 	}
 
-	float Math::arctan2(float y, float x)
+	float Math::arctan2(float y, float x) noexcept
 	{
 		return ::atan2f(y, x);
 	}
 
-	double Math::arctan2(double y, double x)
+	double Math::arctan2(double y, double x) noexcept
 	{
 		return ::atan2(y, x);
 	}
 
-	float Math::log(float f)
+	float Math::log(float f) noexcept
 	{
 		return ::logf(f);
 	}
 
-	double Math::log(double f)
+	double Math::log(double f) noexcept
 	{
 		return ::log(f);
 	}
 
-	float Math::log10(float f)
+	float Math::log10(float f) noexcept
 	{
 		return ::log10f(f);
 	}
 
-	double Math::log10(double f)
+	double Math::log10(double f) noexcept
 	{
 		return ::log10(f);
 	}
 
-	float Math::log2(float f)
+	float Math::log2(float f) noexcept
 	{
 		float log2f = 0.69314718055994530941723212145818f;
 		return ::logf(f) / log2f;
 	}
 
-	double Math::log2(double f)
+	double Math::log2(double f) noexcept
 	{
 		double log2 = 0.69314718055994530941723212145818;
 		return ::log(f) / log2;
 	}
 
-	float Math::exp(float f)
+	float Math::exp(float f) noexcept
 	{
 		return ::expf(f);
 	}
 
-	double Math::exp(double f)
+	double Math::exp(double f) noexcept
 	{
 		return ::exp(f);
 	}
 
-	float Math::round(float f)
+	float Math::round(float f) noexcept
 	{
 		return ::floorf(f + 0.5f);
 	}
 
-	double Math::round(double f)
+	double Math::round(double f) noexcept
 	{
 		return ::floor(f + 0.5);
 	}
 
-	float Math::floor(float f)
+	float Math::floor(float f) noexcept
 	{
 		return ::floorf(f);
 	}
 
-	double Math::floor(double f)
+	double Math::floor(double f) noexcept
 	{
 		return ::floor(f);
 	}
 
-	float Math::ceil(float f)
+	float Math::ceil(float f) noexcept
 	{
 		return ::ceilf(f);
 	}
 
-	double Math::ceil(double f)
+	double Math::ceil(double f) noexcept
 	{
 		return ::ceil(f);
 	}
 
 #if defined(SLIB_PLATFORM_IS_WP8)
 
-	sl_bool Math::isNaN(float f)
+	sl_bool Math::isNaN(float f) noexcept
 	{
 		sl_int32 ret = _isnan(f);
 		if (ret == 0) {
@@ -217,7 +217,7 @@ namespace slib
 		return sl_true;
 	}
 
-	sl_bool Math::isNaN(double f)
+	sl_bool Math::isNaN(double f) noexcept
 	{
 		sl_int32 ret = _isnan(f);
 		if (ret == 0) {
@@ -226,7 +226,7 @@ namespace slib
 		return sl_true;
 	}
 
-	sl_bool Math::isInfinite(float f)
+	sl_bool Math::isInfinite(float f) noexcept
 	{
 		sl_int32 ret = _finite(f);
 		if (ret == 0) {
@@ -235,7 +235,7 @@ namespace slib
 		return sl_true;
 	}
 
-	sl_bool Math::isInfinite(double f)
+	sl_bool Math::isInfinite(double f) noexcept
 	{
 		sl_int32 ret = _finite(f);
 		if (ret == 0) {
@@ -246,22 +246,22 @@ namespace slib
 
 #else
 
-	sl_bool Math::isNaN(float f)
+	sl_bool Math::isNaN(float f) noexcept
 	{
 		return isnan(f) != 0;
 	}
 
-	sl_bool Math::isNaN(double f)
+	sl_bool Math::isNaN(double f) noexcept
 	{
 		return isnan(f) != 0;
 	}
 
-	sl_bool Math::isInfinite(float f)
+	sl_bool Math::isInfinite(float f) noexcept
 	{
 		return isinf(f) != 0;
 	}
 
-	sl_bool Math::isInfinite(double f)
+	sl_bool Math::isInfinite(double f) noexcept
 	{
 		return isinf(f) != 0;
 	}
@@ -269,7 +269,7 @@ namespace slib
 #endif
 
 	template <class T>
-	SLIB_INLINE static T _Math_normalizeDegree(T v)
+	SLIB_INLINE static T _priv_Math_normalizeDegree(T v) noexcept
 	{
 		if (Math::isNaN(v)) {
 			return 0;
@@ -288,28 +288,28 @@ namespace slib
 		return v;
 	}
 
-	float Math::normalizeDegree(float v)
+	float Math::normalizeDegree(float v) noexcept
 	{
-		return _Math_normalizeDegree(v);
+		return _priv_Math_normalizeDegree(v);
 	}
 
-	double Math::normalizeDegree(double v)
+	double Math::normalizeDegree(double v) noexcept
 	{
-		return _Math_normalizeDegree(v);
+		return _priv_Math_normalizeDegree(v);
 	}
 
-	float Math::normalizeDegreeDistance(float v)
+	float Math::normalizeDegreeDistance(float v) noexcept
 	{
 		return normalizeDegree(v + 180) - 180;
 	}
 
-	double Math::normalizeDegreeDistance(double v)
+	double Math::normalizeDegreeDistance(double v) noexcept
 	{
 		return normalizeDegree(v + 180) - 180;
 	}
 
 	template <class T>
-	SLIB_INLINE static T _Math_convertAngleFromEllipseToCircle(T angle, T radiusX, T radiusY)
+	SLIB_INLINE static T _priv_Math_convertAngleFromEllipseToCircle(T angle, T radiusX, T radiusY) noexcept
 	{
 		T _cos = Math::cos(angle);
 		if (Math::isAlmostZero(_cos) || Math::isAlmostZero(sin(angle))) {
@@ -322,44 +322,44 @@ namespace slib
 		return stretched;
 	}
 
-	float Math::convertAngleFromEllipseToCircle(float angle, float radiusX, float radiusY)
+	float Math::convertAngleFromEllipseToCircle(float angle, float radiusX, float radiusY) noexcept
 	{
-		return _Math_convertAngleFromEllipseToCircle(angle, radiusX, radiusY);
+		return _priv_Math_convertAngleFromEllipseToCircle(angle, radiusX, radiusY);
 	}
 
-	double Math::convertAngleFromEllipseToCircle(double angle, double radiusX, double radiusY)
+	double Math::convertAngleFromEllipseToCircle(double angle, double radiusX, double radiusY) noexcept
 	{
-		return _Math_convertAngleFromEllipseToCircle(angle, radiusX, radiusY);
+		return _priv_Math_convertAngleFromEllipseToCircle(angle, radiusX, radiusY);
 	}
 
-	double Math::random()
+	double Math::random() noexcept
 	{
 		return (randomInt() % 10000) / 10000.0;
 	}
 	
-	sl_uint32 Math::randomInt()
+	sl_uint32 Math::randomInt() noexcept
 	{
 		return ::rand();
 	}
 	
-	double Math::randomByTime()
+	double Math::randomByTime() noexcept
 	{
 		return (randomIntByTime() % 10000) / 10000.0;
 	}
 	
-	sl_uint32 Math::randomIntByTime()
+	sl_uint32 Math::randomIntByTime() noexcept
 	{
 		sl_uint32 dw = System::getTickCount();
 		::srand(dw);
 		return ::rand();
 	}
 	
-	void Math::srand(sl_uint32 seed)
+	void Math::srand(sl_uint32 seed) noexcept
 	{
 		::srand(seed);
 	}
 	
-	void Math::randomMemory(void* _mem, sl_size size)
+	void Math::randomMemory(void* _mem, sl_size size) noexcept
 	{
 #define RANDOM_BLOCK 64
 		sl_size nSections = size / RANDOM_BLOCK;
@@ -435,7 +435,18 @@ namespace slib
 		}
 	}
 
-	sl_uint32 Math::roundUpToPowerOfTwo32(sl_uint32 num)
+	sl_uint32 Math::roundUpToPowerOfTwo(sl_uint32 num) noexcept
+	{
+		num--;
+		num |= (num >> 1);
+		num |= (num >> 2);
+		num |= (num >> 4);
+		num |= (num >> 8);
+		num |= (num >> 16);
+		return num + 1;
+	}
+	
+	sl_uint32 Math::roundUpToPowerOfTwo32(sl_uint32 num) noexcept
 	{
 		num--;
 		num |= (num >> 1);
@@ -446,7 +457,19 @@ namespace slib
 		return num + 1;
 	}
 
-	sl_uint64 Math::roundUpToPowerOfTwo64(sl_uint64 num)
+	sl_uint64 Math::roundUpToPowerOfTwo(sl_uint64 num) noexcept
+	{
+		num--;
+		num |= (num >> 1);
+		num |= (num >> 2);
+		num |= (num >> 4);
+		num |= (num >> 8);
+		num |= (num >> 16);
+		num |= (num >> 32);
+		return num + 1;
+	}
+	
+	sl_uint64 Math::roundUpToPowerOfTwo64(sl_uint64 num) noexcept
 	{
 		num--;
 		num |= (num >> 1);
@@ -458,7 +481,17 @@ namespace slib
 		return num + 1;
 	}
 
-	sl_uint32 Math::getMostSignificantBits(sl_uint32 n)
+	sl_uint32 Math::getMostSignificantBits(sl_uint32 n) noexcept
+	{
+		sl_uint32 ret = 0;
+		while (n) {
+			ret++;
+			n >>= 1;
+		}
+		return ret;
+	}
+	
+	sl_uint32 Math::getMostSignificantBits32(sl_uint32 n) noexcept
 	{
 		sl_uint32 ret = 0;
 		while (n) {
@@ -468,7 +501,17 @@ namespace slib
 		return ret;
 	}
 
-	sl_uint32 Math::getMostSignificantBits(sl_uint64 n)
+	sl_uint32 Math::getMostSignificantBits(sl_uint64 n) noexcept
+	{
+		sl_uint32 ret = 0;
+		while (n) {
+			ret++;
+			n >>= 1;
+		}
+		return ret;
+	}
+	
+	sl_uint32 Math::getMostSignificantBits64(sl_uint64 n) noexcept
 	{
 		sl_uint32 ret = 0;
 		while (n) {
@@ -478,7 +521,20 @@ namespace slib
 		return ret;
 	}
 
-	sl_uint32 Math::getLeastSignificantBits(sl_uint32 n)
+	sl_uint32 Math::getLeastSignificantBits(sl_uint32 n) noexcept
+	{
+		if (n == 0) {
+			return 0;
+		}
+		sl_uint32 ret = 0;
+		while ((n & 1) == 0) {
+			ret++;
+			n >>= 1;
+		}
+		return ret;
+	}
+	
+	sl_uint32 Math::getLeastSignificantBits32(sl_uint32 n) noexcept
 	{
 		if (n == 0) {
 			return 0;
@@ -491,7 +547,7 @@ namespace slib
 		return ret;
 	}
 
-	sl_uint32 Math::getLeastSignificantBits(sl_uint64 n)
+	sl_uint32 Math::getLeastSignificantBits(sl_uint64 n) noexcept
 	{
 		if (n == 0) {
 			return 0;
@@ -503,6 +559,19 @@ namespace slib
 		}
 		return ret;
 	}
-
+	
+	sl_uint32 Math::getLeastSignificantBits64(sl_uint64 n) noexcept
+	{
+		if (n == 0) {
+			return 0;
+		}
+		sl_uint32 ret = 0;
+		while ((n & 1) == 0) {
+			ret++;
+			n >>= 1;
+		}
+		return ret;
+	}
+	
 }
 

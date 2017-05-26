@@ -18,7 +18,7 @@
 
 namespace slib
 {
-	SLIB_INLINE void Math::mul32(sl_uint32 a, sl_uint32 b, sl_uint32& o_high, sl_uint32& o_low)
+	SLIB_INLINE void Math::mul32(sl_uint32 a, sl_uint32 b, sl_uint32& o_high, sl_uint32& o_low) noexcept
 	{
 #if defined(SLIB_COMPILER_IS_VC)
 		sl_uint64 m = __emulu(a, b);
@@ -32,7 +32,7 @@ namespace slib
 #endif
 	}
 
-	SLIB_INLINE void Math::mul64(sl_uint64 a, sl_uint64 b, sl_uint64& o_high, sl_uint64& o_low)
+	SLIB_INLINE void Math::mul64(sl_uint64 a, sl_uint64 b, sl_uint64& o_high, sl_uint64& o_low) noexcept
 	{
 #if defined(SLIB_COMPILER_IS_VC) && defined(SLIB_ARCH_IS_64BIT)
 		o_low = _umul128(a, b, &o_high);
