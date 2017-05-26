@@ -21,7 +21,7 @@ namespace slib
 
 	template <class T>
 	SLIB_INLINE CArray<T>::CArray() noexcept
-	 : m_flagStatic(sl_true), m_data(sl_null), m_count(0)
+	 : m_data(sl_null), m_count(0), m_flagStatic(sl_true)
 	 {}
 
 	template <class T>
