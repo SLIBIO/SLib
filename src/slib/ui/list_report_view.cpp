@@ -85,7 +85,7 @@ namespace slib
 		if (row.isNotNull()) {
 			MutexLocker lock(row.getLocker());
 			if (iCol < row.getCount()) {
-				ListReportViewCell* cell = row.getPointerAt(iCol);
+				ListReportViewCell* cell = row.getPointerAt_NoLock(iCol);
 				return cell->text;
 			}
 		}
@@ -113,7 +113,7 @@ namespace slib
 						return;
 					}
 				}
-				ListReportViewCell* cell = row.getPointerAt(iCol);
+				ListReportViewCell* cell = row.getPointerAt_NoLock(iCol);
 				cell->text = text;
 			}
 			if (mode == UIUpdateMode::Redraw) {
@@ -130,7 +130,7 @@ namespace slib
 	{
 		MutexLocker lock(m_columns.getLocker());
 		if (iCol < m_columns.getCount()) {
-			ListReportViewColumn* col = m_columns.getPointerAt(iCol);
+			ListReportViewColumn* col = m_columns.getPointerAt_NoLock(iCol);
 			return col->title;
 		}
 		return sl_null;
@@ -140,7 +140,7 @@ namespace slib
 	{
 		MutexLocker lock(m_columns.getLocker());
 		if (iCol < m_columns.getCount()) {
-			ListReportViewColumn* col = m_columns.getPointerAt(iCol);
+			ListReportViewColumn* col = m_columns.getPointerAt_NoLock(iCol);
 			col->title = text;
 			if (isNativeWidget()) {
 				_setHeaderText_NW(iCol, text);
@@ -156,7 +156,7 @@ namespace slib
 	{
 		MutexLocker lock(m_columns.getLocker());
 		if (iCol < m_columns.getCount()) {
-			ListReportViewColumn* col = m_columns.getPointerAt(iCol);
+			ListReportViewColumn* col = m_columns.getPointerAt_NoLock(iCol);
 			return col->width;
 		}
 		return 0;
@@ -166,7 +166,7 @@ namespace slib
 	{
 		MutexLocker lock(m_columns.getLocker());
 		if (iCol < m_columns.getCount()) {
-			ListReportViewColumn* col = m_columns.getPointerAt(iCol);
+			ListReportViewColumn* col = m_columns.getPointerAt_NoLock(iCol);
 			col->width = width;
 			if (isNativeWidget()) {
 				_setColumnWidth_NW(iCol, width);
@@ -182,7 +182,7 @@ namespace slib
 	{
 		MutexLocker lock(m_columns.getLocker());
 		if (iCol < m_columns.getCount()) {
-			ListReportViewColumn* col = m_columns.getPointerAt(iCol);
+			ListReportViewColumn* col = m_columns.getPointerAt_NoLock(iCol);
 			return col->headerAlign;
 		}
 		return Alignment::Center;
@@ -192,7 +192,7 @@ namespace slib
 	{
 		MutexLocker lock(m_columns.getLocker());
 		if (iCol < m_columns.getCount()) {
-			ListReportViewColumn* col = m_columns.getPointerAt(iCol);
+			ListReportViewColumn* col = m_columns.getPointerAt_NoLock(iCol);
 			col->headerAlign = align;
 			if (isNativeWidget()) {
 				_setHeaderAlignment_NW(iCol, align);
@@ -208,7 +208,7 @@ namespace slib
 	{
 		MutexLocker lock(m_columns.getLocker());
 		if (iCol < m_columns.getCount()) {
-			ListReportViewColumn* col = m_columns.getPointerAt(iCol);
+			ListReportViewColumn* col = m_columns.getPointerAt_NoLock(iCol);
 			return col->align;
 		}
 		return Alignment::Center;
@@ -218,7 +218,7 @@ namespace slib
 	{
 		MutexLocker lock(m_columns.getLocker());
 		if (iCol < m_columns.getCount()) {
-			ListReportViewColumn* col = m_columns.getPointerAt(iCol);
+			ListReportViewColumn* col = m_columns.getPointerAt_NoLock(iCol);
 			col->align = align;
 			if (isNativeWidget()) {
 				_setColumnAlignment_NW(iCol, align);

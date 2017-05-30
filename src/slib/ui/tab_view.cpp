@@ -107,7 +107,7 @@ namespace slib
 	{
 		MutexLocker lock(m_items.getLocker());
 		if (index < m_items.getCount()) {
-			TabViewItem* item = m_items.getPointerAt(index);
+			TabViewItem* item = m_items.getPointerAt_NoLock(index);
 			return item->label;
 		}
 		return sl_null;
@@ -117,7 +117,7 @@ namespace slib
 	{
 		ObjectLocker lock(this);
 		if (index < m_items.getCount()) {
-			TabViewItem* item = m_items.getPointerAt(index);
+			TabViewItem* item = m_items.getPointerAt_NoLock(index);
 			item->label = text;
 			if (isNativeWidget()) {
 				_setTabLabel_NW(index, text);
@@ -133,7 +133,7 @@ namespace slib
 	{
 		MutexLocker lock(m_items.getLocker());
 		if (index < m_items.getCount()) {
-			TabViewItem* item = m_items.getPointerAt(index);
+			TabViewItem* item = m_items.getPointerAt_NoLock(index);
 			return item->contentView;
 		}
 		return sl_null;
@@ -143,7 +143,7 @@ namespace slib
 	{
 		MutexLocker lock(m_items.getLocker());
 		if (index < m_items.getCount()) {
-			TabViewItem* item = m_items.getPointerAt(index);
+			TabViewItem* item = m_items.getPointerAt_NoLock(index);
 			if (item->contentView != view) {
 				removeChild(item->contentView, UIUpdateMode::NoRedraw);
 				if (view.isNotNull()) {

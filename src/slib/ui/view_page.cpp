@@ -505,7 +505,7 @@ namespace slib
 		}
 		
 		sl_size indexPop = m_indexCurrent;
-		Ref<View> viewOut = *(m_pages.getPointerAt(indexPop));
+		Ref<View> viewOut = *(m_pages.getPointerAt_NoLock(indexPop));
 		if (_viewOut.isNotNull() && _viewOut != viewOut) {
 			return;
 		}
@@ -529,10 +529,10 @@ namespace slib
 		Ref<View> viewBack;
 		if (indexPop > 0) {
 			m_indexCurrent = indexPop - 1;
-			viewBack = *(m_pages.getPointerAt(indexPop - 1));
+			viewBack = *(m_pages.getPointerAt_NoLock(indexPop - 1));
 		} else {
 			m_indexCurrent = 0;
-			viewBack = *(m_pages.getPointerAt(1));
+			viewBack = *(m_pages.getPointerAt_NoLock(1));
 		}
 		
 		setEnabled(sl_false);

@@ -29,7 +29,7 @@ namespace slib
 		m_dividerColor = Color::Gray;
 		
 		m_items.setCount(2);
-		m_items.getPointerAt(0)->weight = 1;
+		m_items.getPointerAt_NoLock(0)->weight = 1;
 		
 #if defined(SLIB_PLATFORM_IS_DESKTOP)
 		m_cursorMargin = 4;
@@ -118,7 +118,7 @@ namespace slib
 	Ref<View> SplitView::getItemView(sl_size index)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			return item->view;
 		}
@@ -128,7 +128,7 @@ namespace slib
 	void SplitView::setItemView(sl_size index, const Ref<View>& view, UIUpdateMode mode)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			if (item->view.isNotNull()) {
 				removeChild(item->view);
@@ -142,7 +142,7 @@ namespace slib
 	sl_ui_len SplitView::getItemSize(sl_size index)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			return (sl_ui_len)(item->weight * _getTotalSize());
 		}
@@ -162,7 +162,7 @@ namespace slib
 	sl_real SplitView::getItemWeight(sl_size index)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			return item->weight;
 		}
@@ -172,20 +172,20 @@ namespace slib
 	void SplitView::setItemWeight(sl_size index, sl_real weight, UIUpdateMode mode)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			sl_size nItems = m_items.getCount();
 			Item* itemNext;
 			if (index == nItems - 1) {
 				index --;
 				itemNext = item;
-				item = m_items.getPointerAt(index);
+				item = m_items.getPointerAt_NoLock(index);
 				if (!item) {
 					return;
 				}
 				weight = item->weight + itemNext->weight - weight;
 			} else {
-				itemNext = m_items.getPointerAt(index + 1);
+				itemNext = m_items.getPointerAt_NoLock(index + 1);
 				if (!itemNext) {
 					return;
 				}
@@ -240,7 +240,7 @@ namespace slib
 	sl_real SplitView::getItemMinimumWeight(sl_size index)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			return item->minWeight;
 		}
@@ -250,7 +250,7 @@ namespace slib
 	void SplitView::setItemMinimumWeight(sl_size index, sl_real weight, UIUpdateMode mode)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			if (weight < 0) {
 				weight = 0;
@@ -269,7 +269,7 @@ namespace slib
 	sl_real SplitView::getItemMaximumWeight(sl_size index)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			return item->maxWeight;
 		}
@@ -279,7 +279,7 @@ namespace slib
 	void SplitView::setItemMaximumWeight(sl_size index, sl_real weight, UIUpdateMode mode)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			if (weight < 0) {
 				weight = 0;
@@ -298,7 +298,7 @@ namespace slib
 	sl_ui_len SplitView::getItemMinimumSize(sl_size index)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			return item->minSize;
 		}
@@ -308,7 +308,7 @@ namespace slib
 	void SplitView::setItemMinimumSize(sl_size index, sl_ui_len size, UIUpdateMode mode)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			item->minSize = size;
 			if (index > 0) {
@@ -321,7 +321,7 @@ namespace slib
 	sl_ui_len SplitView::getItemMaximumSize(sl_size index)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			return item->maxSize;
 		}
@@ -331,7 +331,7 @@ namespace slib
 	void SplitView::setItemMaximumSize(sl_size index, sl_ui_len size, UIUpdateMode mode)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			item->maxSize = size;
 			if (index > 0) {
@@ -344,7 +344,7 @@ namespace slib
 	sl_ui_len SplitView::getItemDividerWidth(sl_size index)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			return item->dividerWidth;
 		}
@@ -354,7 +354,7 @@ namespace slib
 	void SplitView::setItemDividerWidth(sl_size index, sl_ui_len width, UIUpdateMode mode)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			item->dividerWidth = width;
 			_resetWeights(mode);
@@ -364,7 +364,7 @@ namespace slib
 	Ref<Drawable> SplitView::getItemDividerBackground(sl_size index)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			return item->dividerBackground;
 		}
@@ -374,7 +374,7 @@ namespace slib
 	void SplitView::setItemDividerBackground(sl_size index, const Ref<Drawable>& background, UIUpdateMode mode)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			item->dividerBackground = background;
 			if (mode == UIUpdateMode::Redraw) {
@@ -386,7 +386,7 @@ namespace slib
 	Color SplitView::getItemDividerColor(sl_size index)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			return item->dividerColor;
 		}
@@ -396,7 +396,7 @@ namespace slib
 	void SplitView::setItemDividerColor(sl_size index, const Color& color, UIUpdateMode mode)
 	{
 		ObjectLocker lock(this);
-		Item* item = m_items.getPointerAt(index);
+		Item* item = m_items.getPointerAt_NoLock(index);
 		if (item) {
 			item->dividerColor = color;
 			if (mode == UIUpdateMode::Redraw) {

@@ -283,7 +283,7 @@ namespace slib
 	}
 	
 	template <class T>
-	T* CList<T>::getPointerAt(sl_size index) const noexcept
+	T* CList<T>::getPointerAt_NoLock(sl_size index) const noexcept
 	{
 		if (index < m_count) {
 			return m_data + index;
@@ -1249,11 +1249,11 @@ namespace slib
 	}
 	
 	template <class T>
-	T* List<T>::getPointerAt(sl_size index) const noexcept
+	T* List<T>::getPointerAt_NoLock(sl_size index) const noexcept
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->getPointerAt(index);
+			return obj->getPointerAt_NoLock(index);
 		}
 		return sl_null;
 	}

@@ -106,7 +106,7 @@ namespace slib
 		T* getData() const noexcept;
 
 	public:
-		T* getPointerAt(sl_size index) const noexcept;
+		T* getPointerAt_NoLock(sl_size index) const noexcept;
 
 		sl_bool getAt_NoLock(sl_size index, T* _out = sl_null) const noexcept;
 
@@ -356,7 +356,7 @@ namespace slib
 		sl_bool isNotEmpty() const noexcept;
 		
 	public:
-		T* getPointerAt(sl_size index) const noexcept;
+		T* getPointerAt_NoLock(sl_size index) const noexcept;
 
 		sl_bool getAt_NoLock(sl_size index, T* _out = sl_null) const noexcept;
 
