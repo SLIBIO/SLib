@@ -19,6 +19,7 @@
 #include "slib/core/scoped.h"
 #include "slib/core/variant.h"
 #include "slib/core/cast.h"
+#include "slib/core/math.h"
 
 namespace slib
 {
