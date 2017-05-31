@@ -236,6 +236,8 @@ namespace slib
 		T& operator*() const& noexcept;
 	
 		T* operator->() const& noexcept;
+		
+		explicit operator sl_bool() const noexcept;
 	
 	public:
 		void _replaceObject(T* other) noexcept;
@@ -375,6 +377,8 @@ namespace slib
 
 	public:
 		Ref<T> operator*() const noexcept;
+		
+		explicit operator sl_bool() const noexcept;
 	
 	public:
 		T* _retainObject() const noexcept;
@@ -512,6 +516,9 @@ namespace slib
 
 		template <class OTHER>
 		sl_bool operator!=(const AtomicWeakRef<OTHER>& other) const noexcept;
+		
+	public:
+		explicit operator sl_bool() const noexcept;
 	
 	private:
 		void _set(T* other) noexcept;
@@ -641,6 +648,8 @@ namespace slib
 
 	public:
 		WeakRef<T> operator*() const noexcept;
+		
+		explicit operator sl_bool() const noexcept;
 	
 	private:
 		void _set(T* other) noexcept;
