@@ -13,12 +13,10 @@
 
 #include "definition.h"
 
-#include "constants.h"
-#include "pair.h"
+#include "map_common.h"
 #include "hash.h"
 #include "compare.h"
 #include "list.h"
-#include "math.h"
 
 namespace slib
 {
@@ -27,27 +25,14 @@ namespace slib
 	class HashTableNode
 	{
 	public:
-		HashTableNode* chain;
-		HashTableNode* before;
 		HashTableNode* next;
 		sl_uint32 hash;
+		KT key;
+		VT value;
 		
-		Pair<KT, VT> data;
-
 	public:
-		template <class KEY, class VALUE>
-		HashTableNode(KEY&& _key, VALUE&& _value) noexcept;
-
-	public:
-		SLIB_INLINE constexpr HashTableNode<KT, VT>* getNext() const noexcept
-		{
-			return next;
-		}
-		
-		SLIB_INLINE constexpr HashTableNode<KT, VT>* getPrevious() const noexcept
-		{
-			return before;
-		}
+		template <class KEY, class... VALUE_ARGS>
+		HashTableNode(KEY&& _key, VALUE_ARGS&&... value_args) noexcept;
 		
 	};
 	
@@ -55,21 +40,53 @@ namespace slib
 	struct HashTableStruct
 	{
 		HashTableNode<KT, VT>** nodes;
-		sl_uint32 capacity;
-		
 		sl_size count;
-		HashTableNode<KT, VT>* firstNode;
-		HashTableNode<KT, VT>* lastNode;
-		
+		sl_uint32 capacity;
 		sl_uint32 capacityMin;
 		sl_uint32 thresholdUp;
 		sl_uint32 thresholdDown;
 	};
 	
+	template <class KT, class VT>
+	class SLIB_EXPORT HashTablePosition
+	{
+	public:
+		typedef HashTableNode<KT, VT> Node;
+		
+	public:
+		HashTablePosition(Node** entry, Node** last_entry, Node* node) noexcept;
+		
+		HashTablePosition(const HashTablePosition& other) noexcept = default;
+		
+		HashTablePosition(HashTablePosition&& other) noexcept = default;
+		
+	public:
+		HashTablePosition& operator=(const HashTablePosition& other) noexcept = default;
+		
+		HashTablePosition& operator=(HashTablePosition&& other) noexcept = default;
+		
+		Node& operator*() const noexcept;
+		
+		sl_bool operator==(const HashTablePosition& other) const noexcept;
+		
+		sl_bool operator!=(const HashTablePosition& other) const noexcept;
+		
+		HashTablePosition& operator++() noexcept;
+		
+	public:
+		Node** entry;
+		Node** last_entry;
+		Node* node;
+		
+	};
+
 
 	template < class KT, class VT, class HASH = Hash<KT>, class KEY_EQUALS = Equals<KT> >
 	class SLIB_EXPORT HashTable
 	{
+	public:
+		typedef HashTableNode<KT, VT> Node;
+		
 	public:
 		HashTable() noexcept;
 		
@@ -96,35 +113,41 @@ namespace slib
 		sl_size getCount() const noexcept;
 	
 		sl_size getCapacity() const noexcept;
-	
-		HashTableNode<KT, VT>* getFirstNode() const noexcept;
 		
-		HashTableNode<KT, VT>* getLastNode() const noexcept;
-		
-		HashTableNode<KT, VT>* find(const KT& key) const noexcept;
+		Node* find(const KT& key) const noexcept;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		HashTableNode<KT, VT>* findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		Node* findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 		
-		sl_bool get(const KT& key, VT* outValue = sl_null) const noexcept;
-
 		VT* getItemPointer(const KT& key) const noexcept;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		VT* getItemPointerByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 
+		sl_bool get(const KT& key, VT* outValue = sl_null) const noexcept;
+		
+		VT getValue(const KT& key) const noexcept;
+		
+		VT getValue(const KT& key, const VT& def) const noexcept;
+		
 		List<VT> getValues(const KT& key) const noexcept;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		List<VT> getValuesByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 
 		template <class KEY, class VALUE>
-		sl_bool put(KEY&& key, VALUE&& value, MapPutMode mode = MapPutMode::Default, HashTableNode<KT, VT>** ppNode = sl_null) noexcept;
+		Node* put(KEY&& key, VALUE&& value, sl_bool* isInsertion = sl_null) noexcept;
+		
+		template <class KEY, class VALUE>
+		Node* replace(const KEY& key, VALUE&& value) noexcept;
+		
+		template <class KEY, class... VALUE_ARGS>
+		Node* add(KEY&& key, VALUE_ARGS&&... value_args) noexcept;
 
-		template < class KEY, class VALUE, class VALUE_EQUALS = Equals<VT, typename RemoveConstReference<VALUE>::Type> >
-		sl_bool addIfNewKeyAndValue(KEY&& key, VALUE&& value, HashTableNode<KT, VT>** ppNode = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
-
-		sl_bool removeNode(const HashTableNode<KT, VT>* node) noexcept;
+		template <class KEY, class... VALUE_ARGS>
+		MapEmplaceReturn<Node> emplace(KEY&& key, VALUE_ARGS&&... value_args) noexcept;
+		
+		Node* removeNode(const Node* node) noexcept;
 
 		sl_bool remove(const KT& key, VT* outValue = sl_null) noexcept;
 
@@ -139,9 +162,12 @@ namespace slib
 		sl_size removeAll() noexcept;
 
 		sl_bool copyFrom(const HashTable<KT, VT, HASH, KEY_EQUALS>* other) noexcept;
+		
+		HashTablePosition<KT, VT> begin() const noexcept;
+		
+		HashTablePosition<KT, VT> end() const noexcept;
 
 	private:
-		typedef HashTableNode<KT, VT> Node;
 		typedef HashTableStruct<KT, VT> Table;
 		
 		Table m_table;

@@ -11,6 +11,8 @@
 #include "slib/core/hash.h"
 #include "slib/core/hash_table.h"
 
+#include "slib/core/math.h"
+
 namespace slib
 {
 	
@@ -45,8 +47,6 @@ namespace slib
 			capacity = Math::roundUpToPowerOfTwo(capacity);
 			if (createNodes(table, capacity)) {
 				table->count = 0;
-				table->firstNode = sl_null;
-				table->lastNode = sl_null;
 				Base::zeroMemory(table->nodes, sizeof(Node*)*capacity);
 				table->capacityMin = capacity;
 				return;
@@ -85,61 +85,6 @@ namespace slib
 		return sl_false;
 	}
 
-	void _priv_HashTable::free(HashTableBaseTable* table) noexcept
-	{
-		Node** nodes = table->nodes;
-		if (nodes) {
-			Base::freeMemory(nodes);
-		}
-	}
-	
-	void _priv_HashTable::add(HashTableBaseTable* table, HashTableBaseNode* node, sl_uint32 hash) noexcept
-	{
-
-		table->count++;
-		
-		sl_uint32 capacity = table->capacity;
-		Node** nodes = table->nodes;
-		
-		sl_uint32 index = hash & (capacity - 1);
-		
-		node->hash = hash;
-		
-		node->chain = nodes[index];
-		
-		Node* last = table->lastNode;
-		if (last) {
-			last->next = node;
-		}
-		table->lastNode = node;
-		node->before = last;
-		if (!(table->firstNode)) {
-			table->firstNode = node;
-		}
-		node->next = sl_null;
-		
-		nodes[index] = node;
-		
-	}
-	
-	void _priv_HashTable::remove(HashTableBaseTable* table, HashTableBaseNode* node) noexcept
-	{
-		table->count--;
-		
-		Node* before = node->before;
-		Node* next = node->next;
-		if (before) {
-			before->next = next;
-		} else {
-			table->firstNode = next;
-		}
-		if (next) {
-			next->before = before;
-		} else {
-			table->lastNode = before;
-		}
-	}
-	
 	void _priv_HashTable::expand(HashTableBaseTable* table) noexcept
 	{
 		if (table->count >= table->thresholdUp) {
@@ -156,11 +101,11 @@ namespace slib
 						sl_uint32 highBitBefore = node->hash & n;
 						Node* broken = sl_null;
 						nodes[i | highBitBefore] = node;
-						while (Node* chain = node->chain) {
+						while (Node* chain = node->next) {
 							sl_uint32 highBitChain = chain->hash & n;
 							if (highBitBefore != highBitChain) {
 								if (broken) {
-									broken->chain = chain;
+									broken->next = chain;
 								} else {
 									nodes[i | highBitChain] = chain;
 								}
@@ -170,7 +115,7 @@ namespace slib
 							node = chain;
 						}
 						if (broken) {
-							broken->chain = sl_null;
+							broken->next = sl_null;
 						}
 					}
 				}
@@ -191,7 +136,7 @@ namespace slib
 					nodes[i] = nodesOld[i];
 					Node** link = nodes + i;
 					while (Node* node = *link) {
-						link = &(node->chain);
+						link = &(node->next);
 					}
 					*link = nodesOld[i | n];
 				}
