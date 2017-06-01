@@ -20,7 +20,7 @@ namespace slib
 	{
 	public:
 		template < class T1, class T2, class COMPARE=Compare<T1, T2> >
-		static sl_bool search(const T1* list, sl_size size, const T2& what, sl_size* pIndexPrev = sl_null, const COMPARE& compare = COMPARE());
+		static sl_bool search(const T1* list, sl_size size, const T2& what, sl_size* pIndexLessEqual = sl_null, const COMPARE& compare = COMPARE());
 
 	};
 

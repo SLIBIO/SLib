@@ -12,11 +12,11 @@ namespace slib
 {
 
 	template <class T1, class T2, class COMPARE>
-	sl_bool BinarySearch::search(const T1* list, sl_size size, const T2& what, sl_size* pIndexPrev, const COMPARE& compare)
+	sl_bool BinarySearch::search(const T1* list, sl_size size, const T2& what, sl_size* pIndexLessEqual, const COMPARE& compare)
 	{
 		if (size == 0) {
-			if (pIndexPrev) {
-				*pIndexPrev = 0;
+			if (pIndexLessEqual) {
+				*pIndexLessEqual = 0;
 			}
 			return sl_false;
 		}
@@ -27,8 +27,8 @@ namespace slib
 			if (start == end) {
 				int c = compare(list[start], what);
 				if (c == 0) {
-					if (pIndexPrev) {
-						*pIndexPrev = start;
+					if (pIndexLessEqual) {
+						*pIndexLessEqual = start;
 					}
 					return sl_true;
 				} else if (c < 0) {
@@ -41,8 +41,8 @@ namespace slib
 				sl_size mid = (start + end) / 2;
 				int c = compare(list[mid], what);
 				if (c == 0) {
-					if (pIndexPrev) {
-						*pIndexPrev = mid;
+					if (pIndexLessEqual) {
+						*pIndexLessEqual = mid;
 					}
 					return sl_true;
 				} else if (c < 0) {
@@ -56,8 +56,8 @@ namespace slib
 				}
 			}
 		}
-		if (pIndexPrev) {
-			*pIndexPrev = index;
+		if (pIndexLessEqual) {
+			*pIndexLessEqual = index;
 		}
 		return sl_false;
 	}
