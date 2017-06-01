@@ -12,33 +12,14 @@ namespace slib
 {
 
 	template <class T1, class T2, class COMPARE>
-	sl_bool BinarySearch::search(const T1* list, sl_size size, const T2& what, sl_size* pIndexGreaterEqual, const COMPARE& compare)
+	sl_bool BinarySearch::search(const T1* list, sl_size size, const T2& what, sl_size* pIndexGreaterEqual, const COMPARE& compare) noexcept
 	{
-		if (size == 0) {
-			if (pIndexGreaterEqual) {
-				*pIndexGreaterEqual = 0;
-			}
-			return sl_false;
-		}
-		sl_size index = 0;
-		sl_size start = 0;
-		sl_size end = size - 1;
-		while (1) {
-			if (start == end) {
-				int c = compare(list[start], what);
-				if (c == 0) {
-					if (pIndexGreaterEqual) {
-						*pIndexGreaterEqual = start;
-					}
-					return sl_true;
-				} else if (c < 0) {
-					index = start + 1;
-				} else {
-					index = start;
-				}
-				break;
-			} else {
-				sl_size mid = (start + end) / 2;
+		sl_size mid;
+		if (size > 0) {
+			sl_size start = 0;
+			sl_size end = size - 1;
+			do {
+				mid = (start + end) >> 1;
 				int c = compare(list[mid], what);
 				if (c == 0) {
 					if (pIndexGreaterEqual) {
@@ -46,18 +27,23 @@ namespace slib
 					}
 					return sl_true;
 				} else if (c < 0) {
+					if (end == mid) {
+						mid++;
+						break;
+					}
 					start = mid + 1;
 				} else {
-					if (start >= mid) {
-						index = mid;
+					if (start == mid) {
 						break;
 					}
 					end = mid - 1;
 				}
-			}
+			} while(1);
+		} else {
+			mid = 0;
 		}
 		if (pIndexGreaterEqual) {
-			*pIndexGreaterEqual = index;
+			*pIndexGreaterEqual = mid;
 		}
 		return sl_false;
 	}
