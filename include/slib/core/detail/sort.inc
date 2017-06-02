@@ -12,7 +12,7 @@ namespace slib
 {
 	
 	template <class TYPE, class COMPARE>
-	void SelectionSort::sortAsc(TYPE* list, sl_size size, const COMPARE& compare)
+	void SelectionSort::sortAsc(TYPE* list, sl_size size, const COMPARE& compare) noexcept
 	{
 		if (size < 2) {
 			return;
@@ -32,7 +32,7 @@ namespace slib
 	}
 	
 	template <class TYPE, class COMPARE>
-	void SelectionSort::sortDesc(TYPE* list, sl_size size, const COMPARE& compare)
+	void SelectionSort::sortDesc(TYPE* list, sl_size size, const COMPARE& compare) noexcept
 	{
 		if (size < 2) {
 			return;
@@ -52,7 +52,7 @@ namespace slib
 	}
 	
 	template <class TYPE, class COMPARE>
-	void SelectionSort::sort(TYPE* list, sl_size size, sl_bool flagAsc, const COMPARE& compare)
+	void SelectionSort::sort(TYPE* list, sl_size size, sl_bool flagAsc, const COMPARE& compare) noexcept
 	{
 		if (flagAsc) {
 			sortAsc(list, size, compare);
@@ -63,7 +63,7 @@ namespace slib
 	
 	
 	template <class TYPE, class COMPARE>
-	void InsertionSort::sortAsc(TYPE* list, sl_size size, const COMPARE& compare)
+	void InsertionSort::sortAsc(TYPE* list, sl_size size, const COMPARE& compare) noexcept
 	{
 		if (size < 2) {
 			return;
@@ -85,7 +85,7 @@ namespace slib
 	}
 	
 	template <class TYPE, class COMPARE>
-	void InsertionSort::sortDesc(TYPE* list, sl_size size, const COMPARE& compare)
+	void InsertionSort::sortDesc(TYPE* list, sl_size size, const COMPARE& compare) noexcept
 	{
 		if (size < 2) {
 			return;
@@ -107,7 +107,7 @@ namespace slib
 	}
 
 	template <class TYPE, class COMPARE>
-	void InsertionSort::sort(TYPE* list, sl_size size, sl_bool flagAsc, const COMPARE& compare)
+	void InsertionSort::sort(TYPE* list, sl_size size, sl_bool flagAsc, const COMPARE& compare) noexcept
 	{
 		if (flagAsc) {
 			sortAsc(list, size, compare);
@@ -117,7 +117,7 @@ namespace slib
 	}
 
 	template <class TYPE, class COMPARE>
-	void InsertionSort::sortAsc(const TYPE* src, TYPE* dst, sl_size size, const COMPARE& compare)
+	void InsertionSort::sortAsc(const TYPE* src, TYPE* dst, sl_size size, const COMPARE& compare) noexcept
 	{
 		if (src == dst) {
 			sort(dst, size);
@@ -141,7 +141,7 @@ namespace slib
 	}
 
 	template <class TYPE, class COMPARE>
-	void InsertionSort::sortDesc(const TYPE* src, TYPE* dst, sl_size size, const COMPARE& compare)
+	void InsertionSort::sortDesc(const TYPE* src, TYPE* dst, sl_size size, const COMPARE& compare) noexcept
 	{
 		if (src == dst) {
 			sort(dst, size);
@@ -165,7 +165,7 @@ namespace slib
 	}
 
 	template <class TYPE, class COMPARE>
-	void InsertionSort::sort(const TYPE* src, TYPE* dst, sl_size size, sl_bool flagAsc, const COMPARE& compare)
+	void InsertionSort::sort(const TYPE* src, TYPE* dst, sl_size size, sl_bool flagAsc, const COMPARE& compare) noexcept
 	{
 		if (flagAsc) {
 			sortAsc(src, dst, size, compare);
@@ -176,7 +176,7 @@ namespace slib
 
 
 	template <class TYPE, class COMPARE>
-	void QuickSort::sortAsc(TYPE* list, sl_size size, const COMPARE& compare)
+	void QuickSort::sortAsc(TYPE* list, sl_size size, const COMPARE& compare) noexcept
 	{
 		if (size < 2) {
 			return;
@@ -255,7 +255,7 @@ namespace slib
 	}
 
 	template <class TYPE, class COMPARE>
-	void QuickSort::sortDesc(TYPE* list, sl_size size, const COMPARE& compare)
+	void QuickSort::sortDesc(TYPE* list, sl_size size, const COMPARE& compare) noexcept
 	{
 		if (size < 2) {
 			return;
@@ -334,7 +334,7 @@ namespace slib
 	}
 
 	template <class TYPE, class COMPARE>
-	void QuickSort::sort(TYPE* list, sl_size size, sl_bool flagAsc, const COMPARE& compare)
+	void QuickSort::sort(TYPE* list, sl_size size, sl_bool flagAsc, const COMPARE& compare) noexcept
 	{
 		if (flagAsc) {
 			sortAsc(list, size, compare);
