@@ -111,6 +111,10 @@ namespace slib
 		
 	public:
 		sl_size getCount() const noexcept;
+		
+		sl_bool isEmpty() const noexcept;
+		
+		sl_bool isNotEmpty() const noexcept;
 	
 		sl_size getCapacity() const noexcept;
 		

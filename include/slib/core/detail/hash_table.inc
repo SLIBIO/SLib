@@ -158,6 +158,18 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
+	SLIB_INLINE sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::isEmpty() const noexcept
+	{
+		return m_table.count == 0;
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_EQUALS>
+	SLIB_INLINE sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::isNotEmpty() const noexcept
+	{
+		return m_table.count > 0;
+	}
+
+	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	SLIB_INLINE sl_size HashTable<KT, VT, HASH, KEY_EQUALS>::getCapacity() const noexcept
 	{
 		return m_table.capacity;
