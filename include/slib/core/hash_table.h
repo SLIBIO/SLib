@@ -58,12 +58,8 @@ namespace slib
 		
 		HashTablePosition(const HashTablePosition& other) noexcept = default;
 		
-		HashTablePosition(HashTablePosition&& other) noexcept = default;
-		
 	public:
 		HashTablePosition& operator=(const HashTablePosition& other) noexcept = default;
-		
-		HashTablePosition& operator=(HashTablePosition&& other) noexcept = default;
 		
 		Node& operator*() const noexcept;
 		
