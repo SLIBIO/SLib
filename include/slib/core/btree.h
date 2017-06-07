@@ -13,7 +13,6 @@
 
 #include "definition.h"
 
-#include "constants.h"
 #include "compare.h"
 #include "search.h"
 #include "list.h"
@@ -27,18 +26,33 @@ namespace slib
 	class SLIB_EXPORT BTreeNode
 	{
 	public:
-		sl_uint64 position = 0;
+		sl_uint64 position;
+		
+	public:
+		BTreeNode() noexcept;
+		
+		BTreeNode(sl_null_t) noexcept;
+		
+		BTreeNode(sl_uint64 position) noexcept;
+		
+		BTreeNode(const BTreeNode& other) noexcept;
 	
 	public:
-		sl_bool operator==(const BTreeNode& other) const;
+		BTreeNode& operator=(const BTreeNode& other) noexcept;
+		
+		BTreeNode& operator=(sl_null_t) noexcept;
+		
+		sl_bool operator==(const BTreeNode& other) const noexcept;
 	
-		sl_bool operator!=(const BTreeNode& other) const;
+		sl_bool operator!=(const BTreeNode& other) const noexcept;
 	
-		sl_bool isNull() const;
+		sl_bool isNull() const noexcept;
 	
-		sl_bool isNotNull() const;
+		sl_bool isNotNull() const noexcept;
 	
-		void setNull();
+		void setNull() noexcept;
+		
+		explicit operator sl_bool() const noexcept;
 
 	};
 	
@@ -46,18 +60,33 @@ namespace slib
 	{
 	public:
 		BTreeNode node;
-		sl_uint32 item = 0;
+		sl_uint32 item;
+		
+	public:
+		BTreePosition() noexcept;
+		
+		BTreePosition(sl_null_t) noexcept;
+		
+		BTreePosition(const BTreeNode& node, sl_uint32 item) noexcept;
+		
+		BTreePosition(const BTreePosition& other) noexcept;
 	
 	public:
-		sl_bool operator==(const BTreePosition& other) const;
+		BTreePosition& operator=(const BTreePosition& other) noexcept;
+		
+		BTreePosition& operator=(sl_null_t) noexcept;
+		
+		sl_bool operator==(const BTreePosition& other) const noexcept;
 
-		sl_bool operator!=(const BTreePosition& other) const;
+		sl_bool operator!=(const BTreePosition& other) const noexcept;
 
-		sl_bool isNull() const;
+		sl_bool isNull() const noexcept;
 	
-		sl_bool isNotNull() const;
+		sl_bool isNotNull() const noexcept;
 	
-		void setNull();
+		void setNull() noexcept;
+		
+		explicit operator sl_bool() const noexcept;
 
 	};
 	
@@ -72,37 +101,45 @@ namespace slib
 		virtual ~BTree();
 	
 	public:
-		sl_bool isValid() const;
+		sl_bool isValid() const noexcept;
 	
-		sl_uint32 getOrder() const;
+		sl_uint32 getOrder() const noexcept;
 	
-		sl_uint32 getMaxLength() const;
+		sl_uint32 getMaxLength() const noexcept;
+		
+		sl_uint64 getCountInNode(const BTreeNode& node) const;
+		
+		sl_uint64 getCount() const;
+		
+		sl_bool getAt(const BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
+				
+		sl_bool moveToFirstInNode(const BTreeNode& node, BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
+		
+		sl_bool moveToFirst(BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
+		
+		sl_bool moveToLastInNode(const BTreeNode& node, BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
+		
+		sl_bool moveToLast(BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
+
+		sl_bool moveToPrevious(BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
+
+		sl_bool moveToNext(BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
+		
+		sl_bool findItemInNode(const BTreeNode& node, const KT& key, sl_uint32& pos, BTreeNode& link, VT* outValue = sl_null, sl_uint32* pCountItemsInNode = sl_null) const;
+
+		sl_bool findInNode(const BTreeNode& node, const KT& key, BTreePosition* pos = sl_null, VT* outValue = sl_null) const;
 
 		sl_bool find(const KT& key, BTreePosition* pos = sl_null, VT* outValue = sl_null) const;
 
-		sl_bool findInNode(const KT& key, const BTreeNode& node, BTreePosition* pos = sl_null, VT* outValue = sl_null) const;
+		sl_bool findBoundsInNode(const BTreeNode& node, const KT& key, BTreePosition* pLessEqual = sl_null, BTreePosition* pGreaterEqual = sl_null) const;
 
-		sl_bool findItemInNode(const KT& key, const BTreeNode& node, sl_uint32& pos, BTreeNode& link, VT* outValue = sl_null) const;
+		sl_bool findBounds(const KT& key, BTreePosition* pLessEqual = sl_null, BTreePosition* pGreaterEqual = sl_null) const;
+
+		sl_bool findEqualRange(const KT& key, BTreePosition* pBegin = sl_null, BTreePosition* pEnd = sl_null) const;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		sl_bool findKeyAndValue(const KT& key, const VALUE& value, BTreePosition* pos = sl_null, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
-
-		sl_bool getRange(const KT& key, BTreePosition* pPosBegin, BTreePosition* pPosEnd) const;
 	
-		sl_bool getAt(const BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
-
-		sl_uint64 getCount() const;
-
-		sl_uint64 getCountInNode(const BTreeNode& node) const;
-
-		sl_bool getFirstPosition(BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
-
-		sl_bool getNextPosition(BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
-	
-		sl_bool getLastPosition(BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
-
-		sl_bool getPrevPosition(BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
-
 		sl_bool get(const KT& key, VT* value = sl_null) const;
 
 		List<VT> getValues(const KT& key) const;
@@ -110,10 +147,17 @@ namespace slib
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		List<VT> getValuesByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 
-		sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
+		sl_bool put(const KT& key, const VT& value, BTreePosition* pos = sl_null, sl_bool* isInsertion = sl_null) noexcept;
+		
+		sl_bool replace(const KT& key, const VT& value, BTreePosition* pos = sl_null) noexcept;
+		
+		sl_bool add(const KT& key, const VT& value, BTreePosition* pos = sl_null) noexcept;
+		
+		sl_bool emplace(const KT& key, const VT& value, BTreePosition* pos = sl_null) noexcept;
 
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool addIfNewKeyAndValue(const KT& key, const VALUE& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		sl_bool removeNode(const BTreeNode& node);
+
+		sl_bool removeAt(const BTreePosition& pos);
 
 		sl_bool remove(const KT& key, VT* outValue = sl_null);
 
@@ -124,10 +168,6 @@ namespace slib
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
-
-		sl_bool removeAt(const BTreePosition& pos);
-
-		sl_bool removeNode(const BTreeNode& node);
 
 		sl_size removeAll();
 
@@ -177,7 +217,7 @@ namespace slib
 
 		void _freeNodeData(NodeData* data);
 
-		sl_bool _insertItemInNode(const BTreeNode& node, sl_uint32 at, const BTreeNode& after, const KT& key, const VT& value, const BTreeNode& link);
+		sl_bool _insertItemInNode(const BTreeNode& node, sl_uint32 at, const BTreeNode& after, const KT& key, const VT& value, const BTreeNode& link, BTreePosition* pPosition);
 
 		void _changeTotalCount(const BTreeNode& node, sl_int64 n);
 
@@ -195,7 +235,7 @@ namespace slib
 		virtual void init();
 
 		virtual void free();
-
+		
 		virtual BTreeNode getRootNode() const;
 		
 		virtual sl_bool setRootNode(BTreeNode node);
