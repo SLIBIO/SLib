@@ -131,11 +131,11 @@ namespace slib
 
 		sl_bool find(const KT& key, BTreePosition* pos = sl_null, VT* outValue = sl_null) const;
 
-		sl_bool findBoundsInNode(const BTreeNode& node, const KT& key, BTreePosition* pLessEqual = sl_null, BTreePosition* pGreaterEqual = sl_null) const;
+		sl_bool getBoundsInNode(const BTreeNode& node, const KT& key, BTreePosition* pLessEqual = sl_null, BTreePosition* pGreaterEqual = sl_null) const;
 
-		sl_bool findBounds(const KT& key, BTreePosition* pLessEqual = sl_null, BTreePosition* pGreaterEqual = sl_null) const;
+		sl_bool getBounds(const KT& key, BTreePosition* pLessEqual = sl_null, BTreePosition* pGreaterEqual = sl_null) const;
 
-		sl_bool findEqualRange(const KT& key, BTreePosition* pBegin = sl_null, BTreePosition* pEnd = sl_null) const;
+		sl_bool getEqualRange(const KT& key, BTreePosition* pBegin = sl_null, BTreePosition* pEnd = sl_null) const;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		sl_bool findKeyAndValue(const KT& key, const VALUE& value, BTreePosition* pos = sl_null, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;

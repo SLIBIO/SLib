@@ -529,7 +529,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::findBoundsInNode(const BTreeNode& node, const KT& key, BTreePosition* pLessEqual, BTreePosition* pGreaterEqual) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::getBoundsInNode(const BTreeNode& node, const KT& key, BTreePosition* pLessEqual, BTreePosition* pGreaterEqual) const
 	{
 		BTreeNode link;
 		sl_uint32 item;
@@ -546,7 +546,7 @@ namespace slib
 			return sl_true;
 		} else {
 			if (link.isNotNull()) {
-				return findBoundsInNode(link, key, pLessEqual, pGreaterEqual);
+				return getBoundsInNode(link, key, pLessEqual, pGreaterEqual);
 			} else {
 				if (n == 0) {
 					if (pLessEqual) {
@@ -581,7 +581,7 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::findBounds(const KT& key, BTreePosition* pLessEqual, BTreePosition* pGreaterEqual) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::getBounds(const KT& key, BTreePosition* pLessEqual, BTreePosition* pGreaterEqual) const
 	{
 		BTreeNode root = getRootNode();
 		if (root.isNull()) {
@@ -593,11 +593,11 @@ namespace slib
 			}
 			return sl_false;
 		}
-		return findBoundsInNode(root, key, pLessEqual, pGreaterEqual);
+		return getBoundsInNode(root, key, pLessEqual, pGreaterEqual);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::findEqualRange(const KT& key, BTreePosition* pBegin, BTreePosition* pEnd) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::getEqualRange(const KT& key, BTreePosition* pBegin, BTreePosition* pEnd) const
 	{
 		BTreePosition pos;
 		if (find(key, &pos)) {
