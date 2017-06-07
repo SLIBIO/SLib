@@ -111,6 +111,10 @@ namespace slib
 		
 		sl_uint64 getCount() const;
 		
+		sl_bool isEmpty() const;
+		
+		sl_bool isNotEmpty() const;
+		
 		sl_bool getAt(const BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
 				
 		sl_bool moveToFirstInNode(const BTreeNode& node, BTreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;

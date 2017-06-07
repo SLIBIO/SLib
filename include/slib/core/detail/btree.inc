@@ -199,6 +199,18 @@ namespace slib
 	{
 		return getCountInNode(getRootNode());
 	}
+	
+	template <class KT, class VT, class KEY_COMPARE>
+	sl_bool BTree<KT, VT, KEY_COMPARE>::isEmpty() const
+	{
+		return getCountInNode(getRootNode()) == 0;
+	}
+	
+	template <class KT, class VT, class KEY_COMPARE>
+	sl_bool BTree<KT, VT, KEY_COMPARE>::isNotEmpty() const
+	{
+		return getCountInNode(getRootNode()) > 0;
+	}
 
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool BTree<KT, VT, KEY_COMPARE>::getAt(const BTreePosition& pos, KT* key, VT* value) const
