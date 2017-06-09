@@ -47,10 +47,10 @@ namespace slib
 		
 		static void compact(Table* table) noexcept;
 		
+		template <class KT, class VT>
+		static void free(HashTableStruct<KT, VT>* table) noexcept;
+		
 	};
-	
-	template <class KT, class VT>
-	void _priv_HashTable_free(HashTableStruct<KT, VT>* table) noexcept;
 	
 	
 	template <class KT, class VT>
@@ -129,7 +129,7 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	HashTable<KT, VT, HASH, KEY_EQUALS>::~HashTable() noexcept
 	{
-		_priv_HashTable_free(&m_table);
+		_priv_HashTable::free(&m_table);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
@@ -143,7 +143,7 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	HashTable<KT, VT, HASH, KEY_EQUALS>& HashTable<KT, VT, HASH, KEY_EQUALS>::operator=(HashTable<KT, VT, HASH, KEY_EQUALS>&& other) noexcept
 	{
-		_priv_HashTable_free(&m_table);
+		_priv_HashTable::free(&m_table);
 		Base::copyMemory(&m_table, &(other.m_table), sizeof(Table));
 		_priv_HashTable::init(reinterpret_cast<HashTableBaseTable*>(&(other.m_table)));
 		m_hash = Move(other.m_hash);
@@ -610,7 +610,7 @@ namespace slib
 			return 0;
 		}
 		sl_size count = m_table.count;
-		_priv_HashTable_free(&m_table);
+		_priv_HashTable::free(&m_table);
 		_priv_HashTable::init(reinterpret_cast<HashTableBaseTable*>(&m_table));
 		return count;
 	}
@@ -618,7 +618,7 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::copyFrom(const HashTable<KT, VT, HASH, KEY_EQUALS>* other) noexcept
 	{
-		_priv_HashTable_free(&m_table);
+		_priv_HashTable::free(&m_table);
 		m_hash = other->m_hash;
 		m_equals = other->m_equals;
 		sl_uint32 capacity = other->m_table.capacity;
@@ -640,7 +640,7 @@ namespace slib
 					Node* nodeTarget = new Node(nodeSource->key, nodeSource->value);
 					*link = nodeTarget;
 					if (!nodeTarget) {
-						_priv_HashTable_free(&m_table);
+						_priv_HashTable::free(&m_table);
 						_priv_HashTable::init(reinterpret_cast<HashTableBaseTable*>(&m_table));
 						return sl_false;
 					}
@@ -675,7 +675,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT>
-	void _priv_HashTable_free(HashTableStruct<KT, VT>* table) noexcept
+	void _priv_HashTable::free(HashTableStruct<KT, VT>* table) noexcept
 	{
 		typedef HashTableNode<KT, VT> Node;
 		Node** nodes = table->nodes;
