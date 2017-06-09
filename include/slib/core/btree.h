@@ -134,6 +134,8 @@ namespace slib
 		sl_bool findInNode(const BTreeNode& node, const KT& key, BTreePosition* pos = sl_null, VT* outValue = sl_null) const;
 
 		sl_bool find(const KT& key, BTreePosition* pos = sl_null, VT* outValue = sl_null) const;
+		
+		BTreePosition findInsertPositionInNode(const BTreeNode& node, const KT& key) const;
 
 		sl_bool getBoundsInNode(const BTreeNode& node, const KT& key, BTreePosition* pLessEqual = sl_null, BTreePosition* pGreaterEqual = sl_null) const;
 

@@ -493,7 +493,7 @@ namespace slib
 			if (outValue) {
 				*outValue = data->values[pos];
 			}
-			link.setNull();
+			link = data->links[pos];
 			return sl_true;
 		} else {
 			pos = (sl_uint32)_pos;
@@ -538,6 +538,19 @@ namespace slib
 			return sl_false;
 		}
 		return findInNode(root, key, pos, outValue);
+	}
+	
+	template <class KT, class VT, class KEY_COMPARE>
+	BTreePosition BTree<KT, VT, KEY_COMPARE>::findInsertPositionInNode(const BTreeNode& node, const KT& key) const
+	{
+		BTreeNode link;
+		sl_uint32 item;
+		findItemInNode(node, key, item, link, sl_null);
+		if (link.isNotNull()) {
+			return findInsertPositionInNode(link, key);
+		} else {
+			return BTreePosition(node, item);
+		}
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
@@ -839,8 +852,7 @@ namespace slib
 		if (root.isNull()) {
 			return sl_false;
 		}
-		BTreePosition pos;
-		findInNode(root, key, &pos);
+		BTreePosition pos = findInsertPositionInNode(root, key);
 		BTreeNode link;
 		if (_insertItemInNode(pos.node, pos.item, link, key, value, link, pPos)) {
 			return sl_true;
