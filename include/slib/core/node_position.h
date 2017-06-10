@@ -37,7 +37,11 @@ namespace slib
 		 {}
 		
 	public:
-		NodePosition& operator=(const NodePosition& other) noexcept = default;
+		SLIB_INLINE NodePosition& operator=(const NodePosition& other) noexcept
+		{
+			node = other.node;
+			return *this;
+		}
 		
 		SLIB_INLINE NodePosition& operator=(NODE* other) noexcept
 		{
