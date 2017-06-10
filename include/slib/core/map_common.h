@@ -13,8 +13,6 @@
 
 #include "definition.h"
 
-#include "cpp.h"
-
 namespace slib
 {
 	
