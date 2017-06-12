@@ -137,11 +137,13 @@ namespace slib
 		
 		BTreePosition findInsertPositionInNode(const BTreeNode& node, const KT& key) const;
 
-		sl_bool getBoundsInNode(const BTreeNode& node, const KT& key, BTreePosition* pLessEqual = sl_null, BTreePosition* pGreaterEqual = sl_null) const;
+		sl_bool getNearestInNode(const BTreeNode& node, const KT& key, BTreePosition* pLessEqual = sl_null, BTreePosition* pGreaterEqual = sl_null) const;
 
-		sl_bool getBounds(const KT& key, BTreePosition* pLessEqual = sl_null, BTreePosition* pGreaterEqual = sl_null) const;
+		sl_bool getNearest(const KT& key, BTreePosition* pLessEqual = sl_null, BTreePosition* pGreaterEqual = sl_null) const;
+		
+		sl_bool getEqualRangeInNode(const BTreeNode& node, const KT& key, BTreePosition* pLowerBound = sl_null, BTreePosition* pUpperBound = sl_null) const;
 
-		sl_bool getEqualRange(const KT& key, BTreePosition* pBegin = sl_null, BTreePosition* pEnd = sl_null) const;
+		sl_bool getEqualRange(const KT& key, BTreePosition* pLowerBound = sl_null, BTreePosition* pUpperBound = sl_null) const;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		sl_bool findKeyAndValue(const KT& key, const VALUE& value, BTreePosition* pos = sl_null, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;

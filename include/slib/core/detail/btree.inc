@@ -554,7 +554,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::getBoundsInNode(const BTreeNode& node, const KT& key, BTreePosition* pLessEqual, BTreePosition* pGreaterEqual) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::getNearestInNode(const BTreeNode& node, const KT& key, BTreePosition* pLessEqual, BTreePosition* pGreaterEqual) const
 	{
 		BTreeNode link;
 		sl_uint32 item;
@@ -571,7 +571,7 @@ namespace slib
 			return sl_true;
 		} else {
 			if (link.isNotNull()) {
-				return getBoundsInNode(link, key, pLessEqual, pGreaterEqual);
+				return getNearestInNode(link, key, pLessEqual, pGreaterEqual);
 			} else {
 				if (n == 0) {
 					if (pLessEqual) {
@@ -606,7 +606,7 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::getBounds(const KT& key, BTreePosition* pLessEqual, BTreePosition* pGreaterEqual) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::getNearest(const KT& key, BTreePosition* pLessEqual, BTreePosition* pGreaterEqual) const
 	{
 		BTreeNode root = getRootNode();
 		if (root.isNull()) {
@@ -618,63 +618,117 @@ namespace slib
 			}
 			return sl_false;
 		}
-		return getBoundsInNode(root, key, pLessEqual, pGreaterEqual);
+		return getNearestInNode(root, key, pLessEqual, pGreaterEqual);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::getEqualRange(const KT& key, BTreePosition* pBegin, BTreePosition* pEnd) const
+	sl_bool BTree<KT, VT, KEY_COMPARE>::getEqualRangeInNode(const BTreeNode& node, const KT& key, BTreePosition* pLowerBound, BTreePosition* pUpperBound) const
 	{
-		BTreePosition pos;
-		if (find(key, &pos)) {
-			BTreePosition posMid = pos;
-			KT keyItem;
-			if (pBegin) {
-				*pBegin = posMid;
-				BTreePosition pos = posMid;
-				while (moveToPrevious(pos, &keyItem)) {
-					if (m_compare(keyItem, key) == 0) {
-						*pBegin = pos;
-					} else {
-						break;
-					}
-				}
+		NodeDataScope data(this, node);
+		sl_uint32 n;
+		if (data.isNull() || !((n = data->countItems))) {
+			if (pLowerBound) {
+				pLowerBound->setNull();
 			}
-			if (pEnd) {
-				*pEnd = posMid;
-				BTreePosition pos = posMid;
-				while (moveToNext(pos, &keyItem)) {
-					if (m_compare(keyItem, key) == 0) {
-						*pEnd = pos;
-					} else {
-						break;
-					}
-				}
+			if (pUpperBound) {
+				pUpperBound->setNull();
 			}
-			return sl_true;
+			return sl_false;
 		}
-		return sl_false;
+		sl_size _item = 0;
+		if (!(BinarySearch::search(data->keys, n, key, &_item, m_compare))) {
+			sl_uint32 item = (sl_uint32)_item;
+			BTreeNode link;
+			if (item) {
+				link = data->links[item - 1];
+			} else {
+				link = data->linkFirst;
+			}
+			if (link.isNotNull()) {
+				return getEqualRangeInNode(link, key, pLowerBound, pUpperBound);
+			} else {
+				BTreePosition pos;
+				if (item < n) {
+					pos.node = node;
+					pos.item = item;
+				}
+				if (pLowerBound) {
+					*pLowerBound = pos;
+				}
+				if (pUpperBound) {
+					*pUpperBound = pos;
+				}
+				return sl_false;
+			}
+		}
+		sl_uint32 itemMiddle = (sl_uint32)_item;
+		if (pLowerBound) {
+			sl_uint32 item = itemMiddle;
+			for (sl_int32 i = itemMiddle - 1; i >= 0; i--) {
+				if (m_compare(data->keys[i], key) == 0) {
+					item = i;
+				} else {
+					break;
+				}
+			}
+			BTreeNode link;
+			if (item) {
+				link = data->links[item - 1];
+			} else {
+				link = data->linkFirst;
+			}
+			if (link.isNull() || !(getEqualRangeInNode(link, key, pLowerBound, sl_null))) {
+				pLowerBound->node = node;
+				pLowerBound->item = item;
+			}
+		}
+		if (pUpperBound) {
+			sl_uint32 item = itemMiddle;
+			for (sl_uint32 i = itemMiddle + 1; i < n; i++) {
+				if (m_compare(data->keys[i], key) == 0) {
+					item = i;
+				} else {
+					break;
+				}
+			}
+			BTreeNode link = data->links[item];
+			if (link.isNull() || !(getEqualRangeInNode(link, key, sl_null, pUpperBound))) {
+				if (item < n) {
+					pUpperBound->node = node;
+					pUpperBound->item = item + 1;
+				} else {
+					pUpperBound->setNull();
+				}
+			}
+		}
+		return sl_true;
+	}
+	
+	template <class KT, class VT, class KEY_COMPARE>
+	sl_bool BTree<KT, VT, KEY_COMPARE>::getEqualRange(const KT& key, BTreePosition* pLowerBound, BTreePosition* pUpperBound) const
+	{
+		BTreeNode root = getRootNode();
+		if (root.isNull()) {
+			if (pLowerBound) {
+				pLowerBound->setNull();
+			}
+			if (pUpperBound) {
+				pUpperBound->setNull();
+			}
+			return sl_false;
+		}
+		return getEqualRangeInNode(root, key, pLowerBound, pUpperBound);
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class VALUE, class VALUE_EQUALS>
 	sl_bool BTree<KT, VT, KEY_COMPARE>::findKeyAndValue(const KT& key, const VALUE& value, BTreePosition* pPos, VT* outValue, const VALUE_EQUALS& value_equals) const
 	{
-		VT v;
-		BTreePosition pos;
-		if (find(key, &pos, &v)) {
-			if (value_equals(value, v)) {
-				if (pPos) {
-					*pPos = pos;
-				}
-				if (outValue) {
-					*outValue = v;
-				}
-				return sl_true;
-			}
-			BTreePosition posMid = pos;
-			KT keyItem;
-			while (moveToPrevious(pos, &keyItem, &v)) {
-				if (m_compare(keyItem, key) == 0) {
+		BTreePosition pos, end;
+		if (getEqualRange(key, &pos, &end)) {
+			VT v;
+			if (getAt(pos, sl_null, &v)) {
+				while (pos != end) {
 					if (value_equals(value, v)) {
 						if (pPos) {
 							*pPos = pos;
@@ -684,24 +738,9 @@ namespace slib
 						}
 						return sl_true;
 					}
-				} else {
-					break;
-				}
-			}
-			pos = posMid;
-			while (moveToNext(pos, &keyItem, &v)) {
-				if (m_compare(keyItem, key) == 0) {
-					if (value_equals(value, v)) {
-						if (pPos) {
-							*pPos = pos;
-						}
-						if (outValue) {
-							*outValue = v;
-						}
-						return sl_true;
+					if (!(moveToNext(pos, sl_null, &v))) {
+						break;
 					}
-				} else {
-					break;
 				}
 			}
 		}
@@ -718,28 +757,15 @@ namespace slib
 	List<VT> BTree<KT, VT, KEY_COMPARE>::getValues(const KT& key) const
 	{
 		List<VT> ret;
-		BTreePosition pos;
-		if (find(key, &pos)) {
-			VT value;
-			if (!(getAt(pos, sl_null, &value))) {
-				return ret;
-			}
-			ret.add_NoLock(value);
-			BTreePosition posMid = pos;
-			KT keyItem;
-			while (moveToPrevious(pos, &keyItem, &value)) {
-				if (m_compare(keyItem, key) == 0) {
-					ret.add_NoLock(value);
-				} else {
-					break;
-				}
-			}
-			pos = posMid;
-			while (moveToNext(pos, &keyItem, &value)) {
-				if (m_compare(keyItem, key) == 0) {
-					ret.add_NoLock(value);
-				} else {
-					break;
+		BTreePosition node, end;
+		if (getEqualRange(key, &node, &end)) {
+			VT v;
+			if (getAt(node, sl_null, &v)) {
+				while (node != end) {
+					ret.add_NoLock(v);
+					if (!(moveToNext(node, sl_null, &v))) {
+						break;
+					}
 				}
 			}
 		}
@@ -751,31 +777,17 @@ namespace slib
 	List<VT> BTree<KT, VT, KEY_COMPARE>::getValuesByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const
 	{
 		List<VT> ret;
-		BTreePosition pos;
-		VT v;
-		if (find(key, &pos, &v)) {
-			if (value_equals(v, value)) {
-				ret.add_NoLock(v);
-			}
-			BTreePosition posMid = pos;
-			KT keyItem;
-			while (getPrevPosition(pos, &keyItem, &v)) {
-				if (m_compare(keyItem, key) == 0) {
+		BTreePosition node, end;
+		if (getEqualRange(key, &node, &end)) {
+			VT v;
+			if (getAt(node, sl_null, &v)) {
+				while (node != end) {
 					if (value_equals(v, value)) {
 						ret.add_NoLock(v);
 					}
-				} else {
-					break;
-				}
-			}
-			pos = posMid;
-			while (getNextPosition(pos, &keyItem, &v)) {
-				if (m_compare(keyItem, key) == 0) {
-					if (value_equals(v, value)) {
-						ret.add_NoLock(v);
+					if (!(moveToNext(node, sl_null, &v))) {
+						break;
 					}
-				} else {
-					break;
 				}
 			}
 		}
