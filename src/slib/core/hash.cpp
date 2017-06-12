@@ -84,20 +84,35 @@ namespace slib
 		}
 		return sl_false;
 	}
+	
+	sl_bool _priv_HashTable::reallocNodes(HashTableBaseTable* table, sl_uint32 capacity) noexcept
+	{
+		if (capacity > PRIV_SLIB_HASHTABLE_MAX_CAPACITY) {
+			return sl_false;
+		}
+		Node** nodes = (Node**)(Base::reallocMemory(table->nodes, sizeof(Node*)*capacity));
+		if (nodes) {
+			table->nodes = nodes;
+			table->capacity = capacity;
+			table->thresholdUp = (sl_uint32)(PRIV_SLIB_HASHTABLE_LOAD_FACTOR_UP * capacity);
+			table->thresholdDown = (sl_uint32)(PRIV_SLIB_HASHTABLE_LOAD_FACTOR_DOWN * capacity);
+			return sl_true;
+		}
+		return sl_false;
+	}
 
 	void _priv_HashTable::expand(HashTableBaseTable* table) noexcept
 	{
 		if (table->count >= table->thresholdUp) {
 			// double capacity
-			Node** nodesOld = table->nodes;
 			sl_uint32 n = table->capacity;
-			if (createNodes(table, n + n)) {
+			if (reallocNodes(table, n + n)) {
 				Node** nodes = table->nodes;
 				for (sl_uint32 i = 0; i < n; i++) {
-					Node* node = nodesOld[i];
-					nodes[i] = sl_null;
+					Node* node = nodes[i];
 					nodes[i | n] = sl_null;
 					if (node) {
+						nodes[i] = sl_null;
 						sl_uint32 highBitBefore = node->hash & n;
 						Node* broken = sl_null;
 						nodes[i | highBitBefore] = node;
@@ -119,29 +134,24 @@ namespace slib
 						}
 					}
 				}
-				Base::freeMemory(nodesOld);
 			}
 		}
 	}
 	
-	void _priv_HashTable::compact(HashTableBaseTable* table) noexcept
+	void _priv_HashTable::shrink(HashTableBaseTable* table) noexcept
 	{
-		if (table->capacity > table->capacityMin && table->count <= table->thresholdDown) {
+		while (table->capacity > table->capacityMin && table->count <= table->thresholdDown) {
 			// half capacity
-			Node** nodesOld = table->nodes;
+			Node** nodes = table->nodes;
 			sl_uint32 n = table->capacity >> 1;
-			if (createNodes(table, n)) {
-				Node** nodes = table->nodes;
-				for (sl_uint32 i = 0; i < n; i++) {
-					nodes[i] = nodesOld[i];
-					Node** link = nodes + i;
-					while (Node* node = *link) {
-						link = &(node->next);
-					}
-					*link = nodesOld[i | n];
+			for (sl_uint32 i = 0; i < n; i++) {
+				Node** link = nodes + i;
+				while (Node* node = *link) {
+					link = &(node->next);
 				}
-				Base::freeMemory(nodesOld);
+				*link = nodes[i | n];
 			}
+			reallocNodes(table, n);
 		}
 	}
 	

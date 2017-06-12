@@ -43,9 +43,11 @@ namespace slib
 		
 		static sl_bool createNodes(Table* table, sl_uint32 capacity) noexcept;
 		
+		static sl_bool reallocNodes(Table* table, sl_uint32 capacity) noexcept;
+		
 		static void expand(Table* table) noexcept;
 		
-		static void compact(Table* table) noexcept;
+		static void shrink(Table* table) noexcept;
 		
 		template <class KT, class VT>
 		static void free(HashTableStruct<KT, VT>* table) noexcept;
@@ -444,7 +446,6 @@ namespace slib
 			if (node == nodeRemove) {
 				*link = next;
 				(m_table.count)--;
-				_priv_HashTable::compact(reinterpret_cast<HashTableBaseTable*>(&m_table));
 				delete node;
 				return next;
 			} else {
@@ -476,7 +477,6 @@ namespace slib
 				if (outValue) {
 					*outValue = Move(node->value);
 				}
-				_priv_HashTable::compact(reinterpret_cast<HashTableBaseTable*>(&m_table));
 				delete node;
 				return sl_true;
 			} else {
@@ -520,7 +520,6 @@ namespace slib
 		if (!nodeDelete) {
 			return 0;
 		}
-		_priv_HashTable::compact(reinterpret_cast<HashTableBaseTable*>(&m_table));
 		sl_size nDelete = 0;
 		while (nodeDelete) {
 			node = nodeDelete;
@@ -554,7 +553,6 @@ namespace slib
 				if (outValue) {
 					*outValue = Move(node->value);
 				}
-				_priv_HashTable::compact(reinterpret_cast<HashTableBaseTable*>(&m_table));
 				delete node;
 				return sl_true;
 			} else {
@@ -599,7 +597,6 @@ namespace slib
 		if (!nodeDelete) {
 			return 0;
 		}
-		_priv_HashTable::compact(reinterpret_cast<HashTableBaseTable*>(&m_table));
 		sl_size nDelete = 0;
 		while (nodeDelete) {
 			node = nodeDelete;
@@ -622,6 +619,12 @@ namespace slib
 		_priv_HashTable::free(&m_table);
 		_priv_HashTable::init(reinterpret_cast<HashTableBaseTable*>(&m_table));
 		return count;
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_EQUALS>
+	void HashTable<KT, VT, HASH, KEY_EQUALS>::shrink() noexcept
+	{
+		_priv_HashTable::shrink(reinterpret_cast<HashTableBaseTable*>(&m_table));
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>

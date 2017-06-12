@@ -161,6 +161,8 @@ namespace slib
 		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 
 		sl_size removeAll() noexcept;
+		
+		void shrink() noexcept;
 
 		sl_bool copyFrom(const HashTable<KT, VT, HASH, KEY_EQUALS>* other) noexcept;
 		
