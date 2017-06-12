@@ -62,8 +62,12 @@ namespace slib
 	
 	template <class KT, class VT>
 	SLIB_INLINE HashTablePosition<KT, VT>::HashTablePosition(HashTableNode<KT, VT>** _entry, HashTableNode<KT, VT>** _last_entry, HashTableNode<KT, VT>* _node) noexcept
-	 : entry(_entry), last_entry(_last_entry), node(_node)
-	 {}
+	{
+		entry = _entry;
+		last_entry = _last_entry;
+		next = _node;
+		++(*this);
+	}
 	
 	template <class KT, class VT>
 	SLIB_INLINE HashTableNode<KT, VT>& HashTablePosition<KT, VT>::operator*() const noexcept
@@ -86,13 +90,18 @@ namespace slib
 	template <class KT, class VT>
 	SLIB_INLINE HashTablePosition<KT, VT>& HashTablePosition<KT, VT>::operator++() noexcept
 	{
-		node = node->next;
-		while (!node) {
-			entry++;
-			if (entry == last_entry) {
-				break;
+		node = next;
+		if (node) {
+			next = node->next;
+			while (!next) {
+				entry++;
+				if (entry == last_entry) {
+					break;
+				}
+				next = *entry;
 			}
-			node = *entry;
+		} else {
+			next = sl_null;
 		}
 		return *this;
 	}

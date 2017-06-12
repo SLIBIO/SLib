@@ -73,6 +73,7 @@ namespace slib
 		Node** entry;
 		Node** last_entry;
 		Node* node;
+		Node* next;
 		
 	};
 
@@ -163,6 +164,7 @@ namespace slib
 
 		sl_bool copyFrom(const HashTable<KT, VT, HASH, KEY_EQUALS>* other) noexcept;
 		
+		// range-based for loop
 		HashTablePosition<KT, VT> begin() const noexcept;
 		
 		HashTablePosition<KT, VT> end() const noexcept;
