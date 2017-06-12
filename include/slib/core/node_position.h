@@ -81,9 +81,7 @@ namespace slib
 		
 		SLIB_INLINE NODE& operator++() noexcept
 		{
-			if (node) {
-				node = node->getNext();
-			}
+			node = node->getNext();
 			return node;
 		}
 		
