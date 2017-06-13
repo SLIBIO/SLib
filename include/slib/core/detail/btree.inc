@@ -722,7 +722,7 @@ namespace slib
 
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class VALUE, class VALUE_EQUALS>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::findKeyAndValue(const KT& key, const VALUE& value, BTreePosition* pPos, VT* outValue, const VALUE_EQUALS& value_equals) const
+	BTreePosition BTree<KT, VT, KEY_COMPARE>::findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const
 	{
 		BTreePosition pos, end;
 		if (getEqualRange(key, &pos, &end)) {
@@ -730,13 +730,7 @@ namespace slib
 			if (getAt(pos, sl_null, &v)) {
 				do {
 					if (value_equals(value, v)) {
-						if (pPos) {
-							*pPos = pos;
-						}
-						if (outValue) {
-							*outValue = v;
-						}
-						return sl_true;
+						return pos;
 					}
 					if (!(moveToNext(pos, sl_null, &v))) {
 						break;
@@ -744,7 +738,7 @@ namespace slib
 				} while (pos != end);
 			}
 		}
-		return sl_false;
+		return sl_null;
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
@@ -988,21 +982,37 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_size BTree<KT, VT, KEY_COMPARE>::removeItems(const KT& key, List<VT>* outValues)
+	sl_size BTree<KT, VT, KEY_COMPARE>::removeItems(const KT& key)
+	{
+		BTreePosition pos;
+		if (find(key, &pos, sl_null)) {
+			if (removeAt(pos)) {
+				sl_size n = 1;
+				while (find(key, &pos, sl_null)) {
+					if (removeAt(pos)) {
+						n++;
+					} else {
+						break;
+					}
+				}
+				return n;
+			}
+		}
+		return 0;
+	}
+	
+	template <class KT, class VT, class KEY_COMPARE>
+	sl_size BTree<KT, VT, KEY_COMPARE>::removeItems(const KT& key, List<VT>& outValues)
 	{
 		BTreePosition pos;
 		VT v;
 		if (find(key, &pos, &v)) {
 			if (removeAt(pos)) {
-				if (outValues) {
-					outValues->add_NoLock(v);			
-				}
+				outValues.add_NoLock(v);
 				sl_size n = 1;
 				while (find(key, &pos, &v)) {
 					if (removeAt(pos)) {
-						if (outValues) {
-							outValues->add_NoLock(v);
-						}
+						outValues.add_NoLock(v);
 						n++;
 					} else {
 						break;
@@ -1016,10 +1026,10 @@ namespace slib
 
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class VALUE, class VALUE_EQUALS>
-	sl_bool BTree<KT, VT, KEY_COMPARE>::removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue, const VALUE_EQUALS& value_equals)
+	sl_bool BTree<KT, VT, KEY_COMPARE>::removeKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals)
 	{
-		BTreePosition pos;
-		if (findKeyAndValue(key, value, &pos, outValue, value_equals)) {
+		BTreePosition pos = findKeyAndValue(key, value, value_equals);
+		if (pos.isNotNull()) {
 			if (removeAt(pos)) {
 				return sl_true;
 			}
@@ -1029,22 +1039,20 @@ namespace slib
 
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class VALUE, class VALUE_EQUALS>
-	sl_size BTree<KT, VT, KEY_COMPARE>::removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
+	sl_size BTree<KT, VT, KEY_COMPARE>::removeItemsByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals)
 	{
-		BTreePosition pos;
-		VT v;
-		if (findKeyAndValue(key, value, &pos, &v, value_equals)) {
+		BTreePosition pos = findKeyAndValue(key, value, value_equals);
+		if (pos.isNotNull()) {
 			if (removeAt(pos)) {
-				if (outValues) {
-					outValues->add_NoLock(v);
-				}
 				sl_size n = 1;
-				while (searchKeyAndValue(key, value, &pos, &v, value_equals)) {
-					if (removeAt(pos)) {
-						if (outValues) {
-							outValues->add_NoLock(v);
+				for (;;) {
+					pos = findKeyAndValue(key, value, value_equals);
+					if (pos.isNotNull()) {
+						if (removeAt(pos)) {
+							n++;
+						} else {
+							break;
 						}
-						n++;
 					} else {
 						break;
 					}

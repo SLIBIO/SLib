@@ -146,7 +146,7 @@ namespace slib
 		sl_bool getEqualRange(const KT& key, BTreePosition* pLowerBound = sl_null, BTreePosition* pUpperBound = sl_null) const;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool findKeyAndValue(const KT& key, const VALUE& value, BTreePosition* pos = sl_null, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+		BTreePosition findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 	
 		sl_bool get(const KT& key, VT* value = sl_null) const;
 
@@ -168,14 +168,16 @@ namespace slib
 		sl_bool removeAt(const BTreePosition& pos);
 
 		sl_bool remove(const KT& key, VT* outValue = sl_null);
+		
+		sl_size removeItems(const KT& key);
 
-		sl_size removeItems(const KT& key, List<VT>* outValues = sl_null);
+		sl_size removeItems(const KT& key, List<VT>& removed_values);
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 
 		sl_size removeAll();
 
