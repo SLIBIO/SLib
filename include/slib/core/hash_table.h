@@ -148,7 +148,7 @@ namespace slib
 		template <class KEY, class... VALUE_ARGS>
 		MapEmplaceReturn<Node> emplace(KEY&& key, VALUE_ARGS&&... value_args) noexcept;
 		
-		Node* removeNode(const Node* node) noexcept;
+		void removeAt(const Node* node) noexcept;
 
 		sl_bool remove(const KT& key, VT* outValue = sl_null) noexcept;
 

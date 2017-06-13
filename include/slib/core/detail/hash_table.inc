@@ -429,7 +429,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	HashTableNode<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::removeNode(const HashTableNode<KT, VT>* nodeRemove) noexcept
+	HashTableNode<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::removeAt(const HashTableNode<KT, VT>* nodeRemove) noexcept
 	{
 		sl_uint32 capacity = m_table.capacity;
 		if (capacity == 0) {
