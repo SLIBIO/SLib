@@ -728,7 +728,7 @@ namespace slib
 		if (getEqualRange(key, &pos, &end)) {
 			VT v;
 			if (getAt(pos, sl_null, &v)) {
-				while (pos != end) {
+				do {
 					if (value_equals(value, v)) {
 						if (pPos) {
 							*pPos = pos;
@@ -741,7 +741,7 @@ namespace slib
 					if (!(moveToNext(pos, sl_null, &v))) {
 						break;
 					}
-				}
+				} while (pos != end);
 			}
 		}
 		return sl_false;
@@ -756,20 +756,21 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	List<VT> BTree<KT, VT, KEY_COMPARE>::getValues(const KT& key) const
 	{
-		List<VT> ret;
-		BTreePosition node, end;
-		if (getEqualRange(key, &node, &end)) {
+		BTreePosition pos, end;
+		if (getEqualRange(key, &pos, &end)) {
 			VT v;
-			if (getAt(node, sl_null, &v)) {
-				while (node != end) {
+			if (getAt(pos, sl_null, &v)) {
+				List<VT> ret;
+				do {
 					ret.add_NoLock(v);
-					if (!(moveToNext(node, sl_null, &v))) {
+					if (!(moveToNext(pos, sl_null, &v))) {
 						break;
 					}
-				}
+				} while (pos != end);
+				return ret;
 			}
 		}
-		return ret;
+		return sl_null;
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
@@ -777,18 +778,18 @@ namespace slib
 	List<VT> BTree<KT, VT, KEY_COMPARE>::getValuesByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const
 	{
 		List<VT> ret;
-		BTreePosition node, end;
-		if (getEqualRange(key, &node, &end)) {
+		BTreePosition pos, end;
+		if (getEqualRange(key, &pos, &end)) {
 			VT v;
-			if (getAt(node, sl_null, &v)) {
-				while (node != end) {
+			if (getAt(pos, sl_null, &v)) {
+				do {
 					if (value_equals(v, value)) {
 						ret.add_NoLock(v);
 					}
-					if (!(moveToNext(node, sl_null, &v))) {
+					if (!(moveToNext(pos, sl_null, &v))) {
 						break;
 					}
-				}
+				} while (pos != end);
 			}
 		}
 		return ret;
