@@ -15,6 +15,7 @@
 
 #include "ref.h"
 #include "compare.h"
+#include "null_value.h"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 #include <initializer_list>

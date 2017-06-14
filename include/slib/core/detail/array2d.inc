@@ -231,7 +231,7 @@ namespace slib
 		if (x >= 0 && x < (sl_reg)m_width && y >= 0 && y < (sl_reg)m_height) {
 			return m_data[y * m_stride + x];
 		} else {
-			return T();
+			return NullValue<T>::get();
 		}
 	}
 	
@@ -482,7 +482,7 @@ namespace slib
 		if (obj) {
 			return obj->getValueAt(x, y);
 		} else {
-			return T();
+			return NullValue<T>::get();
 		}
 	}
 	
@@ -649,7 +649,7 @@ namespace slib
 		if (obj.isNotNull()) {
 			return obj->getValueAt(x, y);
 		} else {
-			return T();
+			return NullValue<T>::get();
 		}
 	}
 

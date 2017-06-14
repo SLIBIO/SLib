@@ -220,7 +220,7 @@ namespace slib
 		if (index < m_count) {
 			return m_data[index];
 		} else {
-			return T();
+			return NullValue<T>::get();
 		}
 	}
 	
@@ -591,7 +591,7 @@ namespace slib
 		if (obj) {
 			return obj->getValueAt(index);
 		} else {
-			return T();
+			return NullValue<T>::get();
 		}
 	}
 
@@ -815,7 +815,7 @@ namespace slib
 		if (obj.isNotNull()) {
 			return obj->getValueAt(index);
 		} else {
-			return T();
+			return NullValue<T>::get();
 		}
 	}
 
@@ -846,7 +846,7 @@ namespace slib
 		if (obj.isNotNull()) {
 			return obj->getValueAt(index);
 		} else {
-			return T();
+			return NullValue<T>::get();
 		}
 	}
 
