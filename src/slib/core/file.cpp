@@ -394,7 +394,7 @@ namespace slib
 		}
 		List<String> ret;
 		List<String> listCurrent = getFiles(dirPath);
-		listCurrent.sort_NoLock(sl_true);
+		listCurrent.sort_NoLock();
 		String* p = listCurrent.getData();
 		sl_size n = listCurrent.getCount();
 		for (sl_size i = 0; i < n; i++) {
