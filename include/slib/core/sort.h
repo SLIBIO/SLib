@@ -28,9 +28,6 @@ namespace slib
 		template < class TYPE, class COMPARE = Compare<TYPE> >
 		static void sortDesc(TYPE* list, sl_size size, const COMPARE& compare = COMPARE()) noexcept;
 
-		template < class TYPE, class COMPARE = Compare<TYPE> >
-		static void sort(TYPE* list, sl_size size, sl_bool flagAscending, const COMPARE& compare = COMPARE()) noexcept;
-
 	};
 	
 	class SLIB_EXPORT InsertionSort
@@ -43,16 +40,10 @@ namespace slib
 		static void sortDesc(TYPE* list, sl_size size, const COMPARE& compare = COMPARE()) noexcept;
 
 		template < class TYPE, class COMPARE = Compare<TYPE> >
-		static void sort(TYPE* list, sl_size size, sl_bool flagAsc, const COMPARE& compare = COMPARE()) noexcept;
-
-		template < class TYPE, class COMPARE = Compare<TYPE> >
 		static void sortAsc(const TYPE* src, TYPE* dst, sl_size size, const COMPARE& compare = COMPARE()) noexcept;
 
 		template < class TYPE, class COMPARE = Compare<TYPE> >
 		static void sortDesc(const TYPE* src, TYPE* dst, sl_size size, const COMPARE& compare = COMPARE()) noexcept;
-
-		template < class TYPE, class COMPARE = Compare<TYPE> >
-		static void sort(const TYPE* src, TYPE* dst, sl_size size, sl_bool flagAscending, const COMPARE& compare = COMPARE()) noexcept;
 
 	};
 	
@@ -64,9 +55,6 @@ namespace slib
 
 		template < class TYPE, class COMPARE = Compare<TYPE> >
 		static void sortDesc(TYPE* list, sl_size size, const COMPARE& compare = COMPARE()) noexcept;
-
-		template < class TYPE, class COMPARE = Compare<TYPE> >
-		static void sort(TYPE* list, sl_size size, sl_bool flagAscending, const COMPARE& compare = COMPARE()) noexcept;
 
 	};
 

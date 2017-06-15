@@ -26,7 +26,7 @@ namespace slib
 				}
 			}
 			if (sel != i) {
-				swap(list[sel], list[i]);
+				Swap(list[sel], list[i]);
 			}
 		}
 	}
@@ -46,18 +46,8 @@ namespace slib
 				}
 			}
 			if (sel != i) {
-				swap(list[sel], list[i]);
+				Swap(list[sel], list[i]);
 			}
-		}
-	}
-	
-	template <class TYPE, class COMPARE>
-	void SelectionSort::sort(TYPE* list, sl_size size, sl_bool flagAsc, const COMPARE& compare) noexcept
-	{
-		if (flagAsc) {
-			sortAsc(list, size, compare);
-		} else {
-			sortDesc(list, size, compare);
 		}
 	}
 	
@@ -105,22 +95,12 @@ namespace slib
 			}
 		}
 	}
-
-	template <class TYPE, class COMPARE>
-	void InsertionSort::sort(TYPE* list, sl_size size, sl_bool flagAsc, const COMPARE& compare) noexcept
-	{
-		if (flagAsc) {
-			sortAsc(list, size, compare);
-		} else {
-			sortDesc(list, size, compare);
-		}
-	}
-
+	
 	template <class TYPE, class COMPARE>
 	void InsertionSort::sortAsc(const TYPE* src, TYPE* dst, sl_size size, const COMPARE& compare) noexcept
 	{
 		if (src == dst) {
-			sort(dst, size);
+			sortAsc(dst, size, compare);
 		}
 		if (size < 2) {
 			return;
@@ -144,7 +124,7 @@ namespace slib
 	void InsertionSort::sortDesc(const TYPE* src, TYPE* dst, sl_size size, const COMPARE& compare) noexcept
 	{
 		if (src == dst) {
-			sort(dst, size);
+			sortDesc(dst, size, compare);
 		}
 		if (size < 2) {
 			return;
@@ -164,16 +144,6 @@ namespace slib
 		}
 	}
 
-	template <class TYPE, class COMPARE>
-	void InsertionSort::sort(const TYPE* src, TYPE* dst, sl_size size, sl_bool flagAsc, const COMPARE& compare) noexcept
-	{
-		if (flagAsc) {
-			sortAsc(src, dst, size, compare);
-		} else {
-			sortDesc(src, dst, size, compare);
-		}
-	}
-
 
 	template <class TYPE, class COMPARE>
 	void QuickSort::sortAsc(TYPE* list, sl_size size, const COMPARE& compare) noexcept
@@ -188,7 +158,7 @@ namespace slib
 		for(;;) {
 			sl_size n = end - start + 1;
 			if (n < 8) {
-				InsertionSort::sortAsc(list + start, n);
+				InsertionSort::sortAsc(list + start, n, compare);
 			} else {
 				sl_size mid = start + (n / 2);
 				Swap(list[mid], list[start]);
@@ -267,7 +237,7 @@ namespace slib
 		for(;;) {
 			sl_size n = end - start + 1;
 			if (n < 8) {
-				InsertionSort::sortDesc(list + start, n);
+				InsertionSort::sortDesc(list + start, n, compare);
 			} else {
 				sl_size mid = start + (n / 2);
 				Swap(list[mid], list[start]);
@@ -330,16 +300,6 @@ namespace slib
 			nStack--;
 			start = stack_start[nStack];
 			end = stack_end[nStack];
-		}
-	}
-
-	template <class TYPE, class COMPARE>
-	void QuickSort::sort(TYPE* list, sl_size size, sl_bool flagAsc, const COMPARE& compare) noexcept
-	{
-		if (flagAsc) {
-			sortAsc(list, size, compare);
-		} else {
-			sortDesc(list, size, compare);
 		}
 	}
 
