@@ -349,6 +349,20 @@ namespace slib
 	}
 	
 	template <class T>
+	template <class O>
+	SLIB_INLINE Ptr<T>& Ptr<T>::from(Ptr<O>& other) noexcept
+	{
+		return *(reinterpret_cast<Ptr<T>*>(&other));
+	}
+	
+	template <class T>
+	template <class O>
+	SLIB_INLINE Ptr<T>&& Ptr<T>::from(Ptr<O>&& other) noexcept
+	{
+		return static_cast<Ptr<T>&&>(*(reinterpret_cast<Ptr<T>*>(&other)));
+	}
+
+	template <class T>
 	sl_bool Ptr<T>::isWeak() const noexcept
 	{
 		Referable* obj = ref._ptr;
@@ -998,6 +1012,20 @@ namespace slib
 	SLIB_INLINE const AtomicPtr<T>& Atomic< Ptr<T> >::from(const AtomicPtr<O>& other) noexcept
 	{
 		return *(reinterpret_cast<AtomicPtr<T> const*>(&other));
+	}
+	
+	template <class T>
+	template <class O>
+	SLIB_INLINE AtomicPtr<T>& Atomic< Ptr<T> >::from(AtomicPtr<O>& other) noexcept
+	{
+		return *(reinterpret_cast<AtomicPtr<T>*>(&other));
+	}
+	
+	template <class T>
+	template <class O>
+	SLIB_INLINE AtomicPtr<T>&& Atomic< Ptr<T> >::from(AtomicPtr<O>&& other) noexcept
+	{
+		return static_cast<AtomicPtr<T>&&>(*(reinterpret_cast<AtomicPtr<T>*>(&other)));
 	}
 	
 	template <class T>

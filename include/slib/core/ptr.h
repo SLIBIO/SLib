@@ -156,6 +156,12 @@ namespace slib
 
 		template <class O>
 		static const Ptr<T>& from(const Ptr<O>& other) noexcept;
+
+		template <class O>
+		static Ptr<T>& from(const Ptr<O>& other) noexcept;
+
+		template <class O>
+		static Ptr<T>&& from(Ptr<O>&& other) noexcept;
 	
 		sl_bool isWeak() const noexcept;
 
@@ -365,6 +371,12 @@ namespace slib
 
 		template <class O>
 		static const AtomicPtr<T>& from(const AtomicPtr<O>& other) noexcept;
+
+		template <class O>
+		static AtomicPtr<T>& from(AtomicPtr<O>& other) noexcept;
+
+		template <class O>
+		static AtomicPtr<T>&& from(AtomicPtr<O>&& other) noexcept;
 
 		Ptr<T> lock() const noexcept;
 
