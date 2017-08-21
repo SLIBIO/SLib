@@ -13,9 +13,11 @@
 
 #include "definition.h"
 
+#include "array_traits.h"
 #include "ref.h"
 #include "compare.h"
 #include "null_value.h"
+#include "sort.h"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 #include <initializer_list>
@@ -127,12 +129,18 @@ namespace slib
 
 	public:
 		CArray<T>* sub(sl_size start, sl_size count = SLIB_SIZE_MAX) noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg indexOf(const VALUE& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg lastIndexOf(const VALUE& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg indexOf(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg indexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg lastIndexOf(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg lastIndexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
 		sl_bool contains(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
@@ -150,6 +158,14 @@ namespace slib
 		sl_size copy(const CArray<VALUE>* source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
 
 		CArray<T>* duplicate() const noexcept;
+		
+		template < class COMPARE = Compare<T> >
+		void sort(const COMPARE& compare = COMPARE()) const noexcept;
+		
+		template < class COMPARE = Compare<T> >
+		void sortDesc(const COMPARE& compare = COMPARE()) const noexcept;
+		
+		void reverse() const noexcept;
 
 		// range-based for loop
 		T* begin() noexcept;
@@ -260,12 +276,18 @@ namespace slib
 
 	public:
 		Array<T> sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg indexOf(const VALUE& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg lastIndexOf(const VALUE& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg indexOf(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg indexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg lastIndexOf(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg lastIndexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
 		sl_bool contains(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
@@ -285,6 +307,14 @@ namespace slib
 		Array<T> duplicate() const noexcept;
 
 		sl_bool getData(ArrayData<T>& data) const noexcept;
+		
+		template < class COMPARE = Compare<T> >
+		void sort(const COMPARE& compare = COMPARE()) const noexcept;
+		
+		template < class COMPARE = Compare<T> >
+		void sortDesc(const COMPARE& compare = COMPARE()) const noexcept;
+		
+		void reverse() const noexcept;
 
 		// range-based for loop
 		T* begin() const noexcept;
@@ -340,12 +370,18 @@ namespace slib
 
 	public:
 		Array<T> sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg indexOf(const VALUE& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg lastIndexOf(const VALUE& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg indexOf(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg indexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg lastIndexOf(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg lastIndexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
 		sl_bool contains(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
@@ -365,6 +401,14 @@ namespace slib
 		Array<T> duplicate() const noexcept;
 
 		sl_bool getData(ArrayData<T>& data) const noexcept;
+		
+		template < class COMPARE = Compare<T> >
+		void sort(const COMPARE& compare = COMPARE()) const noexcept;
+		
+		template < class COMPARE = Compare<T> >
+		void sortDesc(const COMPARE& compare = COMPARE()) const noexcept;
+		
+		void reverse() const noexcept;
 
 		// range-based for loop
 		ArrayPosition<T> begin() const noexcept;

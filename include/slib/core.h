@@ -18,7 +18,6 @@
 #endif
 
 #include "core/definition.h"
-#include "core/constants.h"
 #include "core/base.h"
 #include "core/endian.h"
 #include "core/mio.h"
@@ -55,7 +54,6 @@
 #include "core/hash_table.h"
 #include "core/btree.h"
 #include "core/array.h"
-#include "core/array2d.h"
 #include "core/list.h"
 #include "core/map.h"
 #include "core/linked_list.h"

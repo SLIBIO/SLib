@@ -30,9 +30,7 @@ namespace slib
 		if (count > 0) {
 			T* dataNew = (T*)(Base::createMemory(count * sizeof(T)));
 			if (dataNew) {
-				for (sl_size i = 0; i < count; i++) {
-					new (dataNew + i) T();
-				}
+				ArrayTraits<T>::construct(dataNew, count);
 				m_flagStatic = sl_false;
 				m_data = dataNew;
 				m_count = count;
@@ -51,9 +49,7 @@ namespace slib
 		if (count > 0) {
 			T* dataNew = (T*)(Base::createMemory(count * sizeof(T)));
 			if (dataNew) {
-				for (sl_size i = 0; i < count; i++) {
-					new (dataNew + i) T(data[i]);
-				}
+				ArrayTraits<T>::construct(dataNew, data, count);
 				m_flagStatic = sl_false;
 				m_data = dataNew;
 				m_count = count;
@@ -86,12 +82,9 @@ namespace slib
 		if (! m_flagStatic) {
 			T* data = m_data;
 			if (data) {
-				sl_size count = m_count;
-				for (sl_size i = 0; i < count; i++) {
-					(data+i)->~T();
-				}
+				ArrayTraits<T>::free(data, m_count);
+				Base::freeMemory((void*)data);
 			}
-			Base::freeMemory((void*)data);
 		}
 	}
 
@@ -114,12 +107,9 @@ namespace slib
 		if (!m_flagStatic) {
 			T* data = m_data;
 			if (data) {
-				sl_size count = m_count;
-				for (sl_size i = 0; i < count; i++) {
-					(data+i)->~T();
-				}
+				ArrayTraits<T>::free(data, m_count);
+				Base::freeMemory((void*)data);
 			}
-			Base::freeMemory((void*)data);
 		}
 		m_flagStatic = other.m_flagStatic;
 		m_data = other.m_data;
@@ -278,56 +268,45 @@ namespace slib
 	}
 	
 	template <class T>
-	template <class VALUE, class EQUALS>
-	sl_reg CArray<T>::indexOf(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	template <class VALUE, class ARG>
+	sl_reg CArray<T>::indexOf(const VALUE& value, const ARG& arg) const noexcept
 	{
-		sl_reg ret = -1;
-		sl_reg n = m_count;
-		T* p = m_data;
-		if (start < 0) {
-			start = 0;
-		}
-		for (sl_reg i = start; i < n; i++) {
-			if (equals(p[i], value)) {
-				ret = i;
-				break;
-			}
-		}
-		return ret;
+		return ArrayTraits<T>::indexOf(m_data, m_count, value, arg);
 	}
-
+	
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_reg CArray<T>::lastIndexOf(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	sl_reg CArray<T>::indexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
 	{
-		sl_reg ret = -1;
-		sl_reg n = m_count;
-		T* p = m_data;
-		if (start < 0 || start >= n) {
-			start = n - 1;
-		}
-		for (sl_reg i = start; i >= 0; i--) {
-			if (equals(p[i], value)) {
-				ret = i;
-				break;
-			}
-		}
-		return ret;
+		return ArrayTraits<T>::indexOf(m_data, m_count, value, equals, startIndex);
 	}
-
+	
+	template <class T>
+	template <class VALUE, class ARG>
+	sl_reg CArray<T>::lastIndexOf(const VALUE& value, const ARG& arg) const noexcept
+	{
+		return ArrayTraits<T>::lastIndexOf(m_data, m_count, value, arg);
+	}
+	
+	template <class T>
+	template <class VALUE, class EQUALS>
+	sl_reg CArray<T>::lastIndexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
+	{
+		return ArrayTraits<T>::lastIndexOf(m_data, m_count, value, equals, startIndex);
+	}
+	
 	template <class T>
 	template <class VALUE, class EQUALS>
 	sl_bool CArray<T>::contains(const VALUE& value, const EQUALS& equals) const noexcept
 	{
-		return indexOf(value, 0, equals) >= 0;
+		return ArrayTraits<T>::indexOf(m_data, m_count, value, equals) >= 0;
 	}
 
 	template <class T>
 	template <class VALUE>
-	sl_size CArray<T>::read(sl_size startSource, sl_size len, VALUE* dataDst) const noexcept
+	sl_size CArray<T>::read(sl_size startSource, sl_size len, VALUE* pDst) const noexcept
 	{
 		T* pSrc = m_data;
-		VALUE* pDst = dataDst;
 		if (pDst && pSrc) {
 			sl_size countSrc = m_count;
 			if (startSource < countSrc) {
@@ -335,12 +314,7 @@ namespace slib
 				if (len > lenSrc) {
 					len = lenSrc;
 				}
-				pSrc += startSource;
-				for (sl_size i = 0; i < len; i++) {
-					*(pDst) = *(pSrc);
-					pDst++;
-					pSrc++;
-				}
+				ArrayTraits<T>::copy(pDst, pSrc + startSource, len);
 				return len;
 			}
 		}
@@ -349,10 +323,9 @@ namespace slib
 
 	template <class T>
 	template <class VALUE>
-	sl_size CArray<T>::write(sl_size startTarget, sl_size len, const VALUE* dataSrc) const noexcept
+	sl_size CArray<T>::write(sl_size startTarget, sl_size len, const VALUE* pSrc) const noexcept
 	{
 		T* pDst = m_data;
-		const VALUE* pSrc = dataSrc;
 		if (pSrc && pDst) {
 			sl_size countDst = m_count;
 			if (startTarget < countDst) {
@@ -360,12 +333,7 @@ namespace slib
 				if (len > lenDst) {
 					len = lenDst;
 				}
-				pDst += startTarget;
-				for (sl_size i = 0; i < len; i++) {
-					*(pDst) = *(pSrc);
-					pDst++;
-					pSrc++;
-				}
+				ArrayTraits<T>::copy(pDst + startTarget, pSrc, len);
 				return len;
 			}
 		}
@@ -404,7 +372,27 @@ namespace slib
 	{
 		return create(m_data, m_count);
 	}
-
+	
+	template <class T>
+	template <class COMPARE>
+	void CArray<T>::sort(const COMPARE& compare) const noexcept
+	{
+		QuickSort::sortAsc(m_data, m_count, compare);
+	}
+	
+	template <class T>
+	template <class COMPARE>
+	void CArray<T>::sortDesc(const COMPARE& compare) const noexcept
+	{
+		QuickSort::sortDesc(m_data, m_count, compare);
+	}
+	
+	template <class T>
+	void CArray<T>::reverse() const noexcept
+	{
+		ArrayTraits<T>::reverse(m_data, m_count);
+	}
+	
 	template <class T>
 	SLIB_INLINE T* CArray<T>::begin() noexcept
 	{
@@ -631,24 +619,47 @@ namespace slib
 		return sl_null;
 	}
 
+	
 	template <class T>
-	template <class VALUE, class EQUALS>
-	sl_reg Array<T>::indexOf(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	template <class VALUE, class ARG>
+	sl_reg Array<T>::indexOf(const VALUE& value, const ARG& arg) const noexcept
 	{
 		CArray<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->indexOf(value, start, equals);
+			return obj->indexOf(value, arg);
 		}
 		return -1;
 	}
 
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_reg Array<T>::lastIndexOf(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	sl_reg Array<T>::indexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
 	{
 		CArray<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->lastIndexOf(value, start, equals);
+			return obj->indexOf(value, equals, startIndex);
+		}
+		return -1;
+	}
+	
+	template <class T>
+	template <class VALUE, class ARG>
+	sl_reg Array<T>::lastIndexOf(const VALUE& value, const ARG& arg) const noexcept
+	{
+		CArray<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->lastIndexOf(value, arg);
+		}
+		return -1;
+	}
+
+	template <class T>
+	template <class VALUE, class EQUALS>
+	sl_reg Array<T>::lastIndexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
+	{
+		CArray<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->lastIndexOf(value, equals, startIndex);
 		}
 		return -1;
 	}
@@ -710,7 +721,6 @@ namespace slib
 		return sl_null;
 	}
 
-
 	template <class T>
 	sl_bool Array<T>::getData(ArrayData<T>& data) const noexcept
 	{
@@ -731,7 +741,36 @@ namespace slib
 			return sl_false;
 		}
 	}
-
+	
+	template <class T>
+	template <class COMPARE>
+	void Array<T>::sort(const COMPARE& compare) const noexcept
+	{
+		CArray<T>* obj = ref._ptr;
+		if (obj) {
+			obj->sort(compare);
+		}
+	}
+	
+	template <class T>
+	template <class COMPARE>
+	void Array<T>::sortDesc(const COMPARE& compare) const noexcept
+	{
+		CArray<T>* obj = ref._ptr;
+		if (obj) {
+			obj->sortDesc(compare);
+		}
+	}
+	
+	template <class T>
+	void Array<T>::reverse() const noexcept
+	{
+		CArray<T>* obj = ref._ptr;
+		if (obj) {
+			obj->reverse();
+		}
+	}
+	
 	template <class T>
 	T* Array<T>::begin() const noexcept
 	{
@@ -797,7 +836,7 @@ namespace slib
 	{
 		return ref.isNotNull();
 	}
-
+	
 	template <class T>
 	sl_bool Atomic< Array<T> >::getAt(sl_size index, T* _out) const noexcept
 	{
@@ -807,7 +846,7 @@ namespace slib
 		}
 		return sl_false;
 	}
-
+	
 	template <class T>
 	T Atomic< Array<T> >::getValueAt(sl_size index) const noexcept
 	{
@@ -818,7 +857,7 @@ namespace slib
 			return NullValue<T>::get();
 		}
 	}
-
+	
 	template <class T>
 	T Atomic< Array<T> >::getValueAt(sl_size index, const T& def) const noexcept
 	{
@@ -859,29 +898,51 @@ namespace slib
 		}
 		return sl_null;
 	}
-
+	
 	template <class T>
-	template <class VALUE, class EQUALS>
-	sl_reg Atomic< Array<T> >::indexOf(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	template <class VALUE, class ARG>
+	sl_reg Atomic< Array<T> >::indexOf(const VALUE& value, const ARG& arg) const noexcept
 	{
 		Ref< CArray<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->indexOf(value, start, equals);
+			return obj->indexOf(value, arg);
 		}
 		return -1;
 	}
 
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_reg Atomic< Array<T> >::lastIndexOf(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	sl_reg Atomic< Array<T> >::indexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
 	{
 		Ref< CArray<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->lastIndexOf(value, start, equals);
+			return obj->indexOf(value, equals, startIndex);
 		}
 		return -1;
 	}
-
+	
+	template <class T>
+	template <class VALUE, class ARG>
+	sl_reg Atomic< Array<T> >::lastIndexOf(const VALUE& value, const ARG& arg) const noexcept
+	{
+		Ref< CArray<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->lastIndexOf(value, arg);
+		}
+		return -1;
+	}
+	
+	template <class T>
+	template <class VALUE, class EQUALS>
+	sl_reg Atomic< Array<T> >::lastIndexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
+	{
+		Ref< CArray<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->lastIndexOf(value, equals, startIndex);
+		}
+		return -1;
+	}
+	
 	template <class T>
 	template <class VALUE, class EQUALS>
 	sl_bool Atomic< Array<T> >::contains(const VALUE& value, const EQUALS& equals) const noexcept
