@@ -14,6 +14,9 @@
 #include "definition.h"
 
 #include "base.h"
+#include "array_traits.h"
+
+#include <new>
 
 namespace slib
 {
@@ -22,36 +25,53 @@ namespace slib
 	class NewHelper
 	{
 	public:
-		static T* create() noexcept;
+		SLIB_INLINE static T* create() noexcept
+		{
+			T* data = (T*)(Base::createMemory(sizeof(T)));
+			if (data) {
+				new (data) T();
+			}
+			return data;
+		}
 
-		static T* create(sl_size count) noexcept;
+		SLIB_INLINE static T* create(sl_size count) noexcept
+		{
+			T* data = (T*)(Base::createMemory(sizeof(T)*count));
+			if (data) {
+				ArrayTraits<T>::construct(data, count);
+			}
+			return data;
+		}
 
-		template <class _T>
-		static T* create(const _T* other, sl_size count) noexcept;
+		template <class TYPE>
+		SLIB_INLINE static T* create(const TYPE* other, sl_size count) noexcept
+		{
+			T* data = (T*)(Base::createMemory(sizeof(T)*count));
+			if (data) {
+				ArrayTraits<T>::copy_construct(data, other, count);
+			}
+			return data;
+		}
 
-		static void free(T* data) noexcept;
+		SLIB_INLINE static void free(T* data) noexcept
+		{
+			if (data) {
+				data->~T();
+				Base::freeMemory((void*)data);
+			}
+		}
 
-		static void free(T* data, sl_size count) noexcept;
-
-		static void constructor(T* data) noexcept;
-
-		static void constructor(T* data, sl_size count) noexcept;
-
-		template <class _T>
-		static void constructor(T* data, const _T* other) noexcept;
-
-		template <class _T>
-		static void constructor(T* data, const _T* other, sl_size count) noexcept;
-
-		static void destructor(T* data) noexcept;
-
-		static void destructor(T* data, sl_size count) noexcept;
+		SLIB_INLINE static void free(T* data, sl_size count) noexcept
+		{
+			if (data) {
+				ArrayTraits<T>::free(data, count);
+				Base::freeMemory((void*)data);
+			}
+		}
 
 	};
 
 }
-
-#include "detail/new_helper.inc"
 
 #endif
 

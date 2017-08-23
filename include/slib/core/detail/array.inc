@@ -49,7 +49,7 @@ namespace slib
 		if (count > 0) {
 			T* dataNew = (T*)(Base::createMemory(count * sizeof(T)));
 			if (dataNew) {
-				ArrayTraits<T>::construct(dataNew, data, count);
+				ArrayTraits<T>::copy_construct(dataNew, data, count);
 				m_flagStatic = sl_false;
 				m_data = dataNew;
 				m_count = count;

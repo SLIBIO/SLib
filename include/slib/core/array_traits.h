@@ -35,7 +35,7 @@ namespace slib
 		}
 		
 		template <class T, class TYPE>
-		SLIB_INLINE static void construct(T* dst, const TYPE* src, sl_reg count) noexcept
+		SLIB_INLINE static void copy_construct(T* dst, const TYPE* src, sl_reg count) noexcept
 		{
 			while (count-- > 0) {
 				new (dst++) T(*(src++));
@@ -314,13 +314,13 @@ namespace slib
 		}
 		
 		template <class T>
-		SLIB_INLINE static void construct(T* dst, const T* src, sl_reg count) noexcept
+		SLIB_INLINE static void copy_construct(T* dst, const T* src, sl_reg count) noexcept
 		{
 			Base::copyMemory(dst, src, ((sl_size)count)*sizeof(T));
 		}
 
 		template <class T, class TYPE>
-		SLIB_INLINE static void construct(T* dst, const TYPE* src, sl_reg count) noexcept
+		SLIB_INLINE static void copy_construct(T* dst, const TYPE* src, sl_reg count) noexcept
 		{
 			while (count-- > 0) {
 				*(dst++) = *(src++);
@@ -386,14 +386,6 @@ namespace slib
 		SLIB_INLINE static void construct(T* dst, sl_reg count) noexcept
 		{
 			Base::zeroMemory(dst, ((sl_size)count) * sizeof(T));
-		}
-				
-		template <class T, class TYPE>
-		SLIB_INLINE static void construct(T* dst, const TYPE* src, sl_reg count) noexcept
-		{
-			while (count-- > 0) {
-				new (dst++) T(*(src++));
-			}
 		}
 
 	};
