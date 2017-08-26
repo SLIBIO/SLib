@@ -246,7 +246,7 @@ namespace slib
 		static Array<T> createStatic(const T* data, sl_size count, Referable* refer) noexcept;
 		
 		template <class VALUE>
-		static const Array<T>& from(const Array<VALUE>& other) noexcept;
+		static Array<T>& from(const Array<VALUE>& other) noexcept;
 
 	public:
 		T* getData() const noexcept;
@@ -345,7 +345,7 @@ namespace slib
 		
 	public:
 		template <class VALUE>
-		static const Atomic< Array<T> >& from(const Atomic< Array<VALUE> >& other) noexcept;
+		static Atomic< Array<T> >& from(const Atomic< Array<VALUE> >& other) noexcept;
 
 		sl_size getCount() const noexcept;
 

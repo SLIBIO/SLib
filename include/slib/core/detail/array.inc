@@ -515,9 +515,9 @@ namespace slib
 	
 	template <class T>
 	template <class VALUE>
-	const Array<T>& Array<T>::from(const Array<VALUE>& other) noexcept
+	Array<T>& Array<T>::from(const Array<VALUE>& other) noexcept
 	{
-		return *(reinterpret_cast<Array<T> const*>(&other));
+		return *(const_cast<Array<T>*>(reinterpret_cast<Array<T> const*>(&other)));
 	}
 	
 	template <class T>
@@ -810,9 +810,9 @@ namespace slib
 	
 	template <class T>
 	template <class VALUE>
-	const Atomic< Array<T> >& Atomic< Array<T> >::from(const Atomic< Array<VALUE> >& other) noexcept
+	Atomic< Array<T> >& Atomic< Array<T> >::from(const Atomic< Array<VALUE> >& other) noexcept
 	{
-		return *(reinterpret_cast<Atomic< Array<T> > const*>(&other));
+		return *(const_cast<Atomic< Array<T> >*>(reinterpret_cast<Atomic< Array<T> > const*>(&other)));
 	}
 
 	template <class T>

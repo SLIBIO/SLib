@@ -9,7 +9,6 @@
  */
 
 #include "slib/core/array.h"
-#include "slib/core/array2d.h"
 
 namespace slib
 {
@@ -21,17 +20,6 @@ namespace slib
 	}
 	
 	CArrayBase::~CArrayBase() noexcept
-	{
-	}
-
-	
-	SLIB_DEFINE_ROOT_OBJECT(CArray2DBase)
-	
-	CArray2DBase::CArray2DBase() noexcept
-	{
-	}
-	
-	CArray2DBase::~CArray2DBase() noexcept
 	{
 	}
 
