@@ -171,7 +171,7 @@ namespace slib
 		
 		sl_size removeItems(const KT& key);
 
-		sl_size removeItems(const KT& key, List<VT>& removed_values);
+		List<VT> removeItemsAndReturnValues(const KT& key);
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS());

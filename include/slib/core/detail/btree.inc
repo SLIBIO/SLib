@@ -1002,26 +1002,24 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	sl_size BTree<KT, VT, KEY_COMPARE>::removeItems(const KT& key, List<VT>& outValues)
+	List<VT> BTree<KT, VT, KEY_COMPARE>::removeItemsAndReturnValues(const KT& key)
 	{
+		List<VT> ret;
 		BTreePosition pos;
 		VT v;
 		if (find(key, &pos, &v)) {
 			if (removeAt(pos)) {
-				outValues.add_NoLock(v);
-				sl_size n = 1;
+				ret.add_NoLock(v);
 				while (find(key, &pos, &v)) {
 					if (removeAt(pos)) {
-						outValues.add_NoLock(v);
-						n++;
+						ret.add_NoLock(v);
 					} else {
 						break;
 					}
 				}
-				return n;
 			}
 		}
-		return 0;
+		return ret;
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
