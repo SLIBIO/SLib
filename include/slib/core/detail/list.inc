@@ -31,9 +31,7 @@ namespace slib
 		if (count > 0) {
 			T* data = (T*)(Base::createMemory(count * sizeof(T)));
 			if (data) {
-				for (sl_size i = 0; i < count; i++) {
-					new (data + i) T();
-				}
+				ArrayTraits<T>::construct(data, count);
 				m_data = data;
 				m_count = count;
 				m_capacity = count;
@@ -54,9 +52,7 @@ namespace slib
 		if (capacity > 0) {
 			T* data = (T*)(Base::createMemory(capacity * sizeof(T)));
 			if (data) {
-				for (sl_size i = 0; i < count; i++) {
-					new (data + i) T();
-				}
+				ArrayTraits<T>::construct(data, count);
 				m_data = data;
 				m_count = count;
 				m_capacity = capacity;
@@ -98,9 +94,7 @@ namespace slib
 		if (count > 0) {
 			T* data = (T*)(Base::createMemory(count * sizeof(T)));
 			if (data) {
-				for (sl_size i = 0; i < count; i++) {
-					new (data + i) T(values[i]);
-				}
+				ArrayTraits<T>::copy_construct(data, values, count);
 				m_data = data;
 				m_count = count;
 				m_capacity = count;
@@ -117,10 +111,7 @@ namespace slib
 	{
 		T* data = m_data;
 		if (data) {
-			sl_size count = m_count;
-			for (sl_size i = 0; i < count; i++) {
-				(data+i)->~T();
-			}
+			ArrayTraits<T>::free(data, m_count);
 			Base::freeMemory((void*)data);
 		}
 	}
@@ -141,10 +132,7 @@ namespace slib
 	{
 		T* data = m_data;
 		if (data) {
-			sl_size count = m_count;
-			for (sl_size i = 0; i < count; i++) {
-				(data+i)->~T();
-			}
+			ArrayTraits<T>::free(data, m_count);
 			Base::freeMemory((void*)data);
 		}
 		m_data = other.m_data;
@@ -322,7 +310,7 @@ namespace slib
 		if (index < m_count) {
 			return m_data[index];
 		} else {
-			return T();
+			return NullValue<T>::get();
 		}
 	}
 	
@@ -333,7 +321,7 @@ namespace slib
 		if (index < m_count) {
 			return m_data[index];
 		} else {
-			return T();
+			return NullValue<T>::get();
 		}
 	}
 	
@@ -399,19 +387,13 @@ namespace slib
 			return sl_true;
 		}
 		if (count < oldCount) {
-			T* data = m_data;
-			for (sl_reg i = count; i < (sl_reg)oldCount; i++) {
-				(data+i)->~T();
-			}
+			ArrayTraits<T>::free(m_data + count, oldCount - count);
 			m_count = count;
 			adjustCapacity_NoLock(count);
 			return sl_true;
 		} else {
 			if (adjustCapacity_NoLock(count)) {
-				T* data = m_data;
-				for (sl_reg i = oldCount; i < (sl_reg)count; i++) {
-					new (data + i) T();
-				}
+				ArrayTraits<T>::construct(m_data + oldCount, count - oldCount);
 				m_count = count;
 				return sl_true;
 			}
@@ -511,9 +493,7 @@ namespace slib
 			if (index < oldCount) {
 				Base::moveMemory(data + nValues, data, (oldCount - index) * sizeof(T));
 			}
-			for (sl_size i = 0; i < nValues; i++) {
-				new (data + i) T(values[i]);
-			}
+			ArrayTraits<T>::copy_construct(data, values, nValues);
 			m_count = newCount;
 			return sl_true;
 		}
@@ -625,10 +605,7 @@ namespace slib
 		sl_size oldCount = m_count;
 		sl_size newCount = oldCount + nValues;
 		if (adjustCapacity_NoLock(newCount)) {
-			T* data = m_data + oldCount;
-			for (sl_size i = 0; i < nValues; i++) {
-				new (data + i) T(values[i]);
-			}
+			ArrayTraits<T>::copy_construct(m_data + oldCount, values, nValues);
 			m_count = newCount;
 			return sl_true;
 		}
@@ -706,7 +683,7 @@ namespace slib
 	template <class VALUE, class EQUALS>
 	sl_bool CList<T>::addIfNotExist_NoLock(VALUE&& value, const EQUALS& equals) noexcept
 	{
-		if (indexOf_NoLock(value, 0, equals) < 0) {
+		if (indexOf_NoLock(value, equals) < 0) {
 			return add_NoLock(value);
 		}
 		return sl_false;
@@ -717,7 +694,7 @@ namespace slib
 	sl_bool CList<T>::addIfNotExist(VALUE&& value, const EQUALS& equals) noexcept
 	{
 		ObjectLocker lock(this);
-		if (indexOf_NoLock(value, 0, equals) < 0) {
+		if (indexOf_NoLock(value, equals) < 0) {
 			return add_NoLock(value);
 		}
 		return sl_false;
@@ -760,9 +737,7 @@ namespace slib
 				nValues = count - index;
 			}
 			T* dst = m_data + index;
-			for (sl_size i = 0; i < nValues; i++) {
-				(dst + i)->~T();
-			}
+			ArrayTraits<T>::free(dst, nValues);
 			if (index + nValues < count) {
 				Base::moveMemory(dst, dst + nValues, (count - index - nValues) * sizeof(T));
 			}
@@ -783,16 +758,13 @@ namespace slib
 	
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_bool CList<T>::removeValue_NoLock(const VALUE& value, T* outValue, const EQUALS& equals) noexcept
+	sl_bool CList<T>::remove_NoLock(const VALUE& value, const EQUALS& equals) noexcept
 	{
 		if (m_data) {
 			T* data = m_data;
 			sl_size count = m_count;
 			for (sl_size i = 0; i < count; i++) {
 				if (equals(data[i], value)) {
-					if (outValue) {
-						*outValue = Move(data[i]);
-					}
 					(data + i)->~T();
 					if (i + 1 < count) {
 						Base::moveMemory(data + i, data + i + 1, (count - i - 1) * sizeof(T));
@@ -809,37 +781,31 @@ namespace slib
 	
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_bool CList<T>::removeValue(const VALUE& value, T* outValue, const EQUALS& equals) noexcept
+	sl_bool CList<T>::remove(const VALUE& value, const EQUALS& equals) noexcept
 	{
 		ObjectLocker lock(this);
-		return removeValue_NoLock(value, outValue, equals);
+		return removeValue_NoLock(value, equals);
 	}
 	
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_size CList<T>::removeElementsByValue_NoLock(const VALUE& value, List<T>* outValues, const EQUALS& equals) noexcept
+	sl_size CList<T>::removeValues_NoLock(const VALUE& value, const EQUALS& equals) noexcept
 	{
 		if (m_data) {
 			T* data = m_data;
 			sl_size count = m_count;
-			for (sl_size i = 0; i < count;) {
-				if (equals(data[i], value)) {
-					if (outValues) {
-						outValues->add_NoLock(Move(data[i]));
+			sl_size t = 0;
+			for (sl_size i = 0; i < count; i++) {
+				if (!(equals(data[i], value))) {
+					if (t != i) {
+						data[t] = Move(data[i]);
 					}
-					(data + i)->~T();
-					if (i + 1 < count) {
-						Base::moveMemory(data + i, data + i + 1, (count - i - 1) * sizeof(T));
-					}
-					count--;
-				} else {
-					i++;
+					t++;
 				}
 			}
-			if (count < m_count) {
-				m_count = count;
-				adjustCapacity_NoLock(count);
-				return m_count - count;
+			if (t < count) {
+				setCount_NoLock(t);
+				return count - t;
 			}
 		}
 		return 0;
@@ -847,12 +813,75 @@ namespace slib
 	
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_size CList<T>::removeElementsByValue(const VALUE& value, List<T>* outValues, const EQUALS& equals) noexcept
+	sl_size CList<T>::removeValues(const VALUE& value, const EQUALS& equals) noexcept
 	{
 		ObjectLocker lock(this);
-		return removeElementsByValue_NoLock(value, outValues, equals);
+		return removeElementsByValue_NoLock(value, equals);
 	}
 	
+	template <class T>
+	template <class PREDICATE>
+	sl_bool CList<T>::removeIf_NoLock(const PREDICATE& p) noexcept
+	{
+		if (m_data) {
+			T* data = m_data;
+			sl_size count = m_count;
+			for (sl_size i = 0; i < count; i++) {
+				if (p(data[i])) {
+					(data + i)->~T();
+					if (i + 1 < count) {
+						Base::moveMemory(data + i, data + i + 1, (count - i - 1) * sizeof(T));
+					}
+					count--;
+					m_count = count;
+					adjustCapacity_NoLock(count);
+					return sl_true;
+				}
+			}
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	template <class PREDICATE>
+	sl_bool CList<T>::removeIf(const PREDICATE& p) noexcept
+	{
+		ObjectLocker lock(this);
+		return removeIf_NoLock(p);
+	}
+	
+	template <class T>
+	template <class PREDICATE>
+	sl_size CList<T>::removeElementsIf_NoLock(const PREDICATE& p) noexcept
+	{
+		if (m_data) {
+			T* data = m_data;
+			sl_size count = m_count;
+			sl_size t = 0;
+			for (sl_size i = 0; i < count; i++) {
+				if (!(p(data[i]))) {
+					if (t != i) {
+						data[t] = Move(data[i]);
+					}
+					t++;
+				}
+			}
+			if (t < count) {
+				setCount_NoLock(t);
+				return count - t;
+			}
+		}
+		return 0;
+	}
+	
+	template <class T>
+	template <class PREDICATE>
+	sl_size CList<T>::removeElementsIf(const PREDICATE& p) noexcept
+	{
+		ObjectLocker lock(this);
+		return removeElementsIf_NoLock(p);
+	}
+
 	template <class T>
 	sl_size CList<T>::removeAll_NoLock() noexcept
 	{
@@ -879,7 +908,7 @@ namespace slib
 			}
 			data->~T();
 			count--;
-			Base::moveMemory(data, data + 1, count);
+			Base::moveMemory(data, data + 1, count * sizeof(T));
 			m_count = count;
 			adjustCapacity_NoLock(count);
 			return sl_true;
@@ -903,11 +932,9 @@ namespace slib
 				nElements = count;
 			}
 			T* data = m_data;
-			for (sl_size i = 0; i < nElements; i++) {
-				(data + i)->~T();
-			}
+			ArrayTraits<T>::free(data, nElements);
 			count -= nElements;
-			Base::moveMemory(data, data + nElements, count);
+			Base::moveMemory(data, data + nElements, count * sizeof(T));
 			m_count = count;
 			adjustCapacity_NoLock(count);
 			return nElements;
@@ -955,10 +982,7 @@ namespace slib
 			if (nElements > count) {
 				nElements = count;
 			}
-			T* data = m_data + count - nElements;
-			for (sl_size i = 0; i < nElements; i++) {
-				(data + i)->~T();
-			}
+			ArrayTraits<T>::free(m_data + count - nElements, nElements);
 			count -= nElements;
 			m_count = count;
 			adjustCapacity_NoLock(count);
@@ -975,67 +999,78 @@ namespace slib
 	}
 	
 	template <class T>
-	template <class VALUE, class EQUALS>
-	sl_reg CList<T>::indexOf_NoLock(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	template <class VALUE, class ARG>
+	sl_reg CList<T>::indexOf_NoLock(const VALUE& value, const ARG& arg) const noexcept
 	{
-		sl_reg ret = -1;
-		if (start < 0) {
-			start = 0;
-		}
-		for (sl_size i = start; i < m_count; i++) {
-			if (equals(m_data[i], value)) {
-				ret = i;
-				break;
-			}
-		}
-		return ret;
+		return ArrayTraits<T>::indexOf(m_data, m_count, value, arg);
 	}
 	
 	template <class T>
-	template <class VALUE, class EQUALS>
-	sl_reg CList<T>::indexOf(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	template <class VALUE, class ARG>
+	sl_reg CList<T>::indexOf(const VALUE& value, const ARG& arg) const noexcept
 	{
 		ObjectLocker lock(this);
-		return indexOf_NoLock(value, start, equals);
+		return ArrayTraits<T>::indexOf(m_data, m_count, value, arg);
 	}
 	
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_reg CList<T>::lastIndexOf_NoLock(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	sl_reg CList<T>::indexOf_NoLock(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
 	{
-		sl_reg ret = -1;
-		if (start < 0 || start >= (sl_reg)m_count) {
-			start = m_count - 1;
-		}
-		for (sl_reg i = start; i >= 0; i--) {
-			if (equals(m_data[i], value)) {
-				ret = i;
-				break;
-			}
-		}
-		return ret;
+		return ArrayTraits<T>::indexOf(m_data, m_count, value, equals, startIndex);
 	}
 	
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_reg CList<T>::lastIndexOf(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	sl_reg CList<T>::indexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
 	{
 		ObjectLocker lock(this);
-		return lastIndexOf_NoLock(value, start, equals);
+		return ArrayTraits<T>::indexOf(m_data, m_count, value, equals, startIndex);
 	}
 	
+	template <class T>
+	template <class VALUE, class ARG>
+	sl_reg CList<T>::lastIndexOf_NoLock(const VALUE& value, const ARG& arg) const noexcept
+	{
+		return ArrayTraits<T>::lastIndexOf(m_data, m_count, value, arg);
+	}
+	
+	template <class T>
+	template <class VALUE, class ARG>
+	sl_reg CList<T>::lastIndexOf(const VALUE& value, const ARG& arg) const noexcept
+	{
+		ObjectLocker lock(this);
+		return ArrayTraits<T>::lastIndexOf(m_data, m_count, value, arg);
+	}
+	
+	template <class T>
+	template <class VALUE, class EQUALS>
+	sl_reg CList<T>::lastIndexOf_NoLock(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
+	{
+		return ArrayTraits<T>::lastIndexOf(m_data, m_count, value, equals, startIndex);
+	}
+	
+	template <class T>
+	template <class VALUE, class EQUALS>
+	sl_reg CList<T>::lastIndexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
+	{
+		ObjectLocker lock(this);
+		return ArrayTraits<T>::lastIndexOf(m_data, m_count, value, equals, startIndex);
+	}
+
 	template <class T>
 	template <class VALUE, class EQUALS>
 	sl_bool CList<T>::contains_NoLock(const VALUE& value, const EQUALS& equals) const noexcept
 	{
-		return indexOf_NoLock(value, 0, equals) >= 0;
+		return ArrayTraits<T>::indexOf(m_data, m_count, value, equals) >= 0;
 	}
 	
 	template <class T>
 	template <class VALUE, class EQUALS>
 	sl_bool CList<T>::contains(const VALUE& value, const EQUALS& equals) const noexcept
 	{
-		return indexOf(value, 0, equals) >= 0;
+		ObjectLocker lock(this);
+		return ArrayTraits<T>::indexOf(m_data, m_count, value, equals) >= 0;
 	}
 	
 	template <class T>
@@ -1069,17 +1104,65 @@ namespace slib
 	
 	template <class T>
 	template <class COMPARE>
-	void CList<T>::sort_NoLock(sl_bool flagAscending, const COMPARE& compare) const noexcept
+	void CList<T>::sort_NoLock(const COMPARE& compare) const noexcept
 	{
-		QuickSort::sort(m_data, m_count, flagAscending, compare);
+		QuickSort::sortAsc(m_data, m_count, compare);
 	}
 	
 	template <class T>
 	template <class COMPARE>
-	void CList<T>::sort(sl_bool flagAscending, const COMPARE& compare) const noexcept
+	void CList<T>::sort(const COMPARE& compare) const noexcept
 	{
 		ObjectLocker lock(this);
-		QuickSort::sort(m_data, m_count, flagAscending, compare);
+		QuickSort::sortAsc(m_data, m_count, compare);
+	}
+	
+	template <class T>
+	template <class COMPARE>
+	void CList<T>::sortDesc_NoLock(const COMPARE& compare) const noexcept
+	{
+		QuickSort::sortDesc(m_data, m_count, compare);
+	}
+	
+	template <class T>
+	template <class COMPARE>
+	void CList<T>::sortDesc(const COMPARE& compare) const noexcept
+	{
+		ObjectLocker lock(this);
+		QuickSort::sortDesc(m_data, m_count, compare);
+	}
+	
+	template <class T>
+	void CList<T>::reverse_NoLock() const noexcept
+	{
+		ArrayTraits<T>::reverse(m_data, m_count);
+	}
+	
+	template <class T>
+	void CList<T>::reverse() const noexcept
+	{
+		ObjectLocker lock(this);
+		ArrayTraits<T>::reverse(m_data, m_count);
+	}
+	
+	template <class T>
+	CList<T>* CList<T>::slice_NoLock(sl_size index, sl_size count) const noexcept
+	{
+		if (count > 0 && index < m_count) {
+			sl_size n = m_count - index;
+			if (count > n) {
+				count = n;
+			}
+			return create(m_data + index, count);
+		}
+		return sl_null;
+	}
+	
+	template <class T>
+	CList<T>* CList<T>::slice(sl_size index, sl_size count) const noexcept
+	{
+		ObjectLocker lock(this);
+		return slice_NoLock(index, count);
 	}
 	
 	template <class T>
@@ -1167,7 +1250,7 @@ namespace slib
 	template <class VALUE>
 	List<T> List<T>::create(const Array<VALUE>& array) noexcept
 	{
-		return create(array.getData(), array.getCount());
+		return CList<T>::create(array.getData(), array.getCount());
 	}
 	
 	template <class T>
@@ -1178,10 +1261,10 @@ namespace slib
 	
 	template <class T>
 	template <class... ARGS>
-	List<T> List<T>::createFromElements(ARGS&&... _values) noexcept
+	List<T> List<T>::createFromElements(ARGS&&... args) noexcept
 	{
-		T values[] = {Forward<ARGS>(_values)...};
-		return create(values, sizeof...(_values));
+		T values[] = {Forward<ARGS>(args)...};
+		return CList<T>::create(values, sizeof...(args));
 	}
 	
 	template <class T>
@@ -1193,9 +1276,9 @@ namespace slib
 	
 	template <class T>
 	template <class VALUE>
-	SLIB_INLINE const List<T>& List<T>::from(const List<VALUE>& other) noexcept
+	SLIB_INLINE List<T>& List<T>::from(const List<VALUE>& other) noexcept
 	{
-		return *(reinterpret_cast<List<T> const*>(&other));
+		return *(const_cast<List<T>*>(reinterpret_cast<List<T> const*>(&other)));
 	}
 	
 	template <class T>
@@ -1285,7 +1368,7 @@ namespace slib
 		if (obj) {
 			return obj->getValueAt_NoLock(index);
 		} else {
-			return T();
+			return NullValue<T>::get();
 		}
 	}
 
@@ -1296,7 +1379,7 @@ namespace slib
 		if (obj) {
 			return obj->getValueAt(index);
 		} else {
-			return T();
+			return NullValue<T>::get();
 		}
 	}
 
@@ -1825,7 +1908,7 @@ namespace slib
 		if (obj) {
 			return obj->removeAt(index, outValue);
 		}
-		return 0;
+		return sl_false;
 	}
 
 	template <class T>
@@ -1837,7 +1920,7 @@ namespace slib
 		}
 		return 0;
 	}
-
+	
 	template <class T>
 	sl_size List<T>::removeRange(sl_size index, sl_size count) const noexcept
 	{
@@ -1847,47 +1930,91 @@ namespace slib
 		}
 		return 0;
 	}
-
+	
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_bool List<T>::removeValue_NoLock(const VALUE& value, T* outValue, const EQUALS& equals) const noexcept
+	sl_bool List<T>::remove_NoLock(const VALUE& value, const EQUALS& equals) const noexcept
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->removeValue_NoLock(value, outValue, equals);
+			return obj->remove_NoLock(value, equals);
 		}
 		return sl_false;
 	}
 
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_bool List<T>::removeValue(const VALUE& value, T* outValue, const EQUALS& equals) const noexcept
+	sl_bool List<T>::remove(const VALUE& value, const EQUALS& equals) const noexcept
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->removeValue(value, outValue, equals);
+			return obj->remove(value, equals);
 		}
 		return sl_false;
 	}
 
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_size List<T>::removeElementsByValue_NoLock(const VALUE& value, List<T>* outValues, const EQUALS& equals) const noexcept
+	sl_size List<T>::removeValues_NoLock(const VALUE& value, const EQUALS& equals) const noexcept
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->removeElementsByValue_NoLock(value, outValues, equals);
+			return obj->removeValues_NoLock(value, equals);
 		}
 		return 0;
 	}
 
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_size List<T>::removeElementsByValue(const VALUE& value, List<T>* outValues, const EQUALS& equals) const noexcept
+	sl_size List<T>::removeValues(const VALUE& value, const EQUALS& equals) const noexcept
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->removeElementsByValue(value, outValues, equals);
+			return obj->removeValues(value, equals);
+		}
+		return 0;
+	}
+	
+	template <class T>
+	template <class PREDICATE>
+	sl_bool List<T>::removeIf_NoLock(const PREDICATE& p) noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->removeIf_NoLock(p);
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	template <class PREDICATE>
+	sl_bool List<T>::removeIf(const PREDICATE& p) noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->removeIf(p);
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	template <class PREDICATE>
+	sl_size List<T>::removeElementsIf_NoLock(const PREDICATE& p) noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->removeElementsIf_NoLock(p);
+		}
+		return 0;
+	}
+	
+	template <class T>
+	template <class PREDICATE>
+	sl_size List<T>::removeElementsIf(const PREDICATE& p) noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->removeElementsIf(p);
 		}
 		return 0;
 	}
@@ -1991,47 +2118,91 @@ namespace slib
 		}
 		return 0;
 	}
-
+	
 	template <class T>
-	template <class VALUE, class EQUALS>
-	sl_reg List<T>::indexOf_NoLock(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	template <class VALUE, class ARG>
+	sl_reg List<T>::indexOf_NoLock(const VALUE& value, const ARG& arg) const noexcept
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->indexOf_NoLock(value, start, equals);
+			return obj->indexOf_NoLock(value, arg);
+		}
+		return -1;
+	}
+	
+	template <class T>
+	template <class VALUE, class ARG>
+	sl_reg List<T>::indexOf(const VALUE& value, const ARG& arg) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->indexOf(value, arg);
 		}
 		return -1;
 	}
 	
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_reg List<T>::indexOf(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	sl_reg List<T>::indexOf_NoLock(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->indexOf(value, start, equals);
+			return obj->indexOf_NoLock(value, equals, startIndex);
 		}
 		return -1;
 	}
-
+	
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_reg List<T>::lastIndexOf_NoLock(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	sl_reg List<T>::indexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->lastIndexOf_NoLock(value, start, equals);
+			return obj->indexOf(value, equals, startIndex);
 		}
 		return -1;
 	}
-
+	
 	template <class T>
-	template <class VALUE, class EQUALS>
-	sl_reg List<T>::lastIndexOf(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	template <class VALUE, class ARG>
+	sl_reg List<T>::lastIndexOf_NoLock(const VALUE& value, const ARG& arg) const noexcept
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->lastIndexOf(value, start, equals);
+			return obj->lastIndexOf_NoLock(value, arg);
+		}
+		return -1;
+	}
+	
+	template <class T>
+	template <class VALUE, class ARG>
+	sl_reg List<T>::lastIndexOf(const VALUE& value, const ARG& arg) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->lastIndexOf(value, arg);
+		}
+		return -1;
+	}
+	
+	template <class T>
+	template <class VALUE, class EQUALS>
+	sl_reg List<T>::lastIndexOf_NoLock(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->lastIndexOf_NoLock(value, equals, startIndex);
+		}
+		return -1;
+	}
+	
+	template <class T>
+	template <class VALUE, class EQUALS>
+	sl_reg List<T>::lastIndexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->lastIndexOf(value, equals, startIndex);
 		}
 		return -1;
 	}
@@ -2067,7 +2238,7 @@ namespace slib
 		}
 		return sl_null;
 	}
-
+	
 	template <class T>
 	List<T> List<T>::duplicate() const noexcept
 	{
@@ -2077,7 +2248,7 @@ namespace slib
 		}
 		return sl_null;
 	}
-
+	
 	template <class T>
 	Array<T> List<T>::toArray_NoLock() const noexcept
 	{
@@ -2100,21 +2271,90 @@ namespace slib
 
 	template <class T>
 	template <class COMPARE>
-	void List<T>::sort_NoLock(sl_bool flagAscending, const COMPARE& compare) const noexcept
+	void List<T>::sort_NoLock(const COMPARE& compare) const noexcept
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			obj->sort_NoLock(flagAscending, compare);
+			obj->sort_NoLock(compare);
 		}
 	}
 
 	template <class T>
 	template <class COMPARE>
-	void List<T>::sort(sl_bool flagAscending, const COMPARE& compare) const noexcept
+	void List<T>::sort(const COMPARE& compare) const noexcept
 	{
 		CList<T>* obj = ref._ptr;
 		if (obj) {
-			obj->sort(flagAscending, compare);
+			obj->sort(compare);
+		}
+	}
+	
+	template <class T>
+	template <class COMPARE>
+	void List<T>::sortDesc_NoLock(const COMPARE& compare) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			obj->sortDesc_NoLock(compare);
+		}
+	}
+	
+	template <class T>
+	template <class COMPARE>
+	void List<T>::sortDesc(const COMPARE& compare) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			obj->sortDesc(compare);
+		}
+	}
+	
+	template <class T>
+	List<T> List<T>::slice_NoLock(sl_size index, sl_size count) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->slice_NoLock(index, count);
+		}
+		return sl_null;
+	}
+	
+	template <class T>
+	List<T> List<T>::slice(sl_size index, sl_size count) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->slice(index, count);
+		}
+		return sl_null;
+	}
+	
+	template <class T>
+	void List<T>::reverse_NoLock() const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			obj->reverse_NoLock();
+		}
+	}
+	
+	template <class T>
+	void List<T>::reverse() const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			obj->reverse();
+		}
+	}
+	
+	template <class T>
+	const Mutex* List<T>::getLocker() const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->getLocker();
+		} else {
+			return sl_null;
 		}
 	}
 
@@ -2136,17 +2376,6 @@ namespace slib
 			return obj->end();
 		}
 		return sl_null;
-	}
-
-	template <class T>
-	const Mutex* List<T>::getLocker() const noexcept
-	{
-		CList<T>* obj = ref._ptr;
-		if (obj) {
-			return obj->getLocker();
-		} else {
-			return sl_null;
-		}
 	}
 
 
@@ -2177,9 +2406,9 @@ namespace slib
 	
 	template <class T>
 	template <class VALUE>
-	const Atomic< List<T> >& Atomic< List<T> >::from(const Atomic< List<VALUE> >& other) noexcept
+	Atomic< List<T> >& Atomic< List<T> >::from(const Atomic< List<VALUE> >& other) noexcept
 	{
-		return *(reinterpret_cast<Atomic< List<T> > const*>(&other));
+		return *(const_cast<Atomic< List<T> >*>(reinterpret_cast<Atomic< List<T> > const*>(&other)));
 	}
 
 	template <class T>
@@ -2229,7 +2458,7 @@ namespace slib
 		if (obj.isNotNull()) {
 			return obj->getValueAt(index);
 		} else {
-			return T();
+			return NullValue<T>::get();
 		}
 	}
 
@@ -2261,7 +2490,7 @@ namespace slib
 		if (obj.isNotNull()) {
 			return obj->getValueAt(index);
 		} else {
-			return T();
+			return NullValue<T>::get();
 		}
 	}
 
@@ -2503,7 +2732,7 @@ namespace slib
 		}
 		return sl_false;
 	}
-
+	
 	template <class T>
 	template <class VALUE>
 	sl_bool Atomic< List<T> >::addAll(const List<VALUE>& _other) noexcept
@@ -2538,7 +2767,7 @@ namespace slib
 	{
 		return addAll(List<VALUE>(other));
 	}
-
+	
 	template <class T>
 	template <class VALUE, class EQUALS>
 	sl_bool Atomic< List<T> >::addIfNotExist(VALUE&& value, const EQUALS& equals) noexcept
@@ -2572,7 +2801,7 @@ namespace slib
 		}
 		return sl_false;
 	}
-
+	
 	template <class T>
 	sl_size Atomic< List<T> >::removeRange(sl_size index, sl_size count) const noexcept
 	{
@@ -2585,24 +2814,46 @@ namespace slib
 
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_bool Atomic< List<T> >::removeValue(const VALUE& value, T* outValue, const EQUALS& equals) const noexcept
+	sl_bool Atomic< List<T> >::remove(const VALUE& value, const EQUALS& equals) const noexcept
 	{
 		Ref< CList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->removeValue(value, outValue, equals);
+			return obj->remove(value, equals);
 		}
 		return sl_false;
 	}
 
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_size Atomic< List<T> >::removeElementsByValue(const VALUE& value, List<T>* outValues, const EQUALS& equals) const noexcept
+	sl_size Atomic< List<T> >::removeValues(const VALUE& value, const EQUALS& equals) const noexcept
 	{
 		Ref< CList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->removeElementsByValue(value, outValues, equals);
+			return obj->removeValues(value, equals);
 		}
 		return 0;
+	}
+	
+	template <class T>
+	template <class PREDICATE>
+	sl_bool Atomic< List<T> >::removeIf(const PREDICATE& p) noexcept
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->removeIf(p);
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	template <class PREDICATE>
+	sl_size Atomic< List<T> >::removeElementsIf(const PREDICATE& p) noexcept
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->removeElementsIf(p);
+		}
+		return sl_false;
 	}
 
 	template <class T>
@@ -2656,23 +2907,45 @@ namespace slib
 	}
 
 	template <class T>
-	template <class VALUE, class EQUALS>
-	sl_reg Atomic< List<T> >::indexOf(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	template <class VALUE, class ARG>
+	sl_reg Atomic< List<T> >::indexOf(const VALUE& value, const ARG& arg) const noexcept
 	{
 		Ref< CList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->indexOf(value, start);
+			return obj->indexOf(value, arg);
 		}
 		return -1;
 	}
-
+	
 	template <class T>
 	template <class VALUE, class EQUALS>
-	sl_reg Atomic< List<T> >::lastIndexOf(const VALUE& value, sl_reg start, const EQUALS& equals) const noexcept
+	sl_reg Atomic< List<T> >::indexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
 	{
 		Ref< CList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->lastIndexOf(value, start);
+			return obj->indexOf(value, equals, startIndex);
+		}
+		return -1;
+	}
+	
+	template <class T>
+	template <class VALUE, class ARG>
+	sl_reg Atomic< List<T> >::lastIndexOf(const VALUE& value, const ARG& arg) const noexcept
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->lastIndexOf(value, arg);
+		}
+		return -1;
+	}
+	
+	template <class T>
+	template <class VALUE, class EQUALS>
+	sl_reg Atomic< List<T> >::lastIndexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->lastIndexOf(value, equals, startIndex);
 		}
 		return -1;
 	}
@@ -2710,12 +2983,41 @@ namespace slib
 
 	template <class T>
 	template <class COMPARE>
-	void Atomic< List<T> >::sort(sl_bool flagAscending, const COMPARE& compare) const noexcept
+	void Atomic< List<T> >::sort(const COMPARE& compare) const noexcept
 	{
 		Ref< CList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			obj->sortBy(flagAscending, compare);
+			obj->sort(compare);
 		}
+	}
+	
+	template <class T>
+	template <class COMPARE>
+	void Atomic< List<T> >::sortDesc(const COMPARE& compare) const noexcept
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			obj->sortDesc(compare);
+		}
+	}
+	
+	template <class T>
+	void Atomic< List<T> >::reverse() const noexcept
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			obj->reverse();
+		}
+	}
+	
+	template <class T>
+	List<T> Atomic< List<T> >::slice(sl_size index, sl_size count) const noexcept
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->slice(index, count);
+		}
+		return sl_null;
 	}
 
 	template <class T>

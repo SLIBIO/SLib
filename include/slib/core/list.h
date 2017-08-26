@@ -16,8 +16,6 @@
 #include "new_helper.h"
 #include "object.h"
 #include "array.h"
-#include "compare.h"
-#include "sort.h"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 #include <initializer_list>
@@ -218,16 +216,28 @@ namespace slib
 		sl_size removeRange(sl_size index, sl_size count) noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_bool removeValue_NoLock(const VALUE& value, T* outValue = sl_null, const EQUALS& equals = EQUALS()) noexcept;
+		sl_bool remove_NoLock(const VALUE& value, const EQUALS& equals = EQUALS()) noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_bool removeValue(const VALUE& value, T* outValue = sl_null, const EQUALS& equals = EQUALS()) noexcept;
+		sl_bool remove(const VALUE& value, const EQUALS& equals = EQUALS()) noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_size removeElementsByValue_NoLock(const VALUE& value, List<T>* outValues = sl_null, const EQUALS& equals = EQUALS()) noexcept;
+		sl_size removeValues_NoLock(const VALUE& value, const EQUALS& equals = EQUALS()) noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_size removeElementsByValue(const VALUE& value, List<T>* outValues = sl_null, const EQUALS& equals = EQUALS()) noexcept;
+		sl_size removeValues(const VALUE& value, const EQUALS& equals = EQUALS()) noexcept;
+		
+		template <class PREDICATE>
+		sl_bool removeIf_NoLock(const PREDICATE& p) noexcept;
+		
+		template <class PREDICATE>
+		sl_bool removeIf(const PREDICATE& p) noexcept;
+		
+		template <class PREDICATE>
+		sl_size removeElementsIf_NoLock(const PREDICATE& p) noexcept;
+		
+		template <class PREDICATE>
+		sl_size removeElementsIf(const PREDICATE& p) noexcept;
 
 		sl_size removeAll_NoLock() noexcept;
 
@@ -248,18 +258,30 @@ namespace slib
 		sl_size popBackElements_NoLock(sl_size count) noexcept;
 
 		sl_size popBackElements(sl_size count) noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg indexOf_NoLock(const VALUE& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg indexOf(const VALUE& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg lastIndexOf_NoLock(const VALUE& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg lastIndexOf(const VALUE& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg indexOf_NoLock(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg indexOf(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg indexOf_NoLock(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg indexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg lastIndexOf_NoLock(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg lastIndexOf(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg lastIndexOf_NoLock(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg lastIndexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
 		sl_bool contains_NoLock(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
@@ -276,10 +298,24 @@ namespace slib
 		Array<T> toArray() const noexcept;
 
 		template < class COMPARE = Compare<T> >
-		void sort_NoLock(sl_bool flagAscending = sl_true, const COMPARE& compare = COMPARE()) const noexcept;
+		void sort_NoLock(const COMPARE& compare = COMPARE()) const noexcept;
 
 		template < class COMPARE = Compare<T> >
-		void sort(sl_bool flagAscending = sl_true, const COMPARE& compare = COMPARE()) const noexcept;
+		void sort(const COMPARE& compare = COMPARE()) const noexcept;
+		
+		template < class COMPARE = Compare<T> >
+		void sortDesc_NoLock(const COMPARE& compare = COMPARE()) const noexcept;
+		
+		template < class COMPARE = Compare<T> >
+		void sortDesc(const COMPARE& compare = COMPARE()) const noexcept;
+		
+		void reverse_NoLock() const noexcept;
+		
+		void reverse() const noexcept;
+
+		CList<T>* slice_NoLock(sl_size index, sl_size count = SLIB_SIZE_MAX) const noexcept;
+		
+		CList<T>* slice(sl_size index, sl_size count = SLIB_SIZE_MAX) const noexcept;
 
 		// range-based for loop
 		T* begin() noexcept;
@@ -342,8 +378,8 @@ namespace slib
 		static List<T> createCopy(const List<VALUE>& other) noexcept;
 		
 		template <class VALUE>
-		static const List<T>& from(const List<VALUE>& other) noexcept;
-
+		static List<T>& from(const List<VALUE>& other) noexcept;
+		
 	public:
 		sl_size getCount() const noexcept;
 
@@ -478,16 +514,28 @@ namespace slib
 		sl_size removeRange(sl_size index, sl_size count) const noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_bool removeValue_NoLock(const VALUE& value, T* outValue = sl_null, const EQUALS& equals = EQUALS()) const noexcept;
+		sl_bool remove_NoLock(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_bool removeValue(const VALUE& value, T* outValue = sl_null, const EQUALS& equals = EQUALS()) const noexcept;
+		sl_bool remove(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_size removeElementsByValue_NoLock(const VALUE& value, List<T>* outValues = sl_null, const EQUALS& equals = EQUALS()) const noexcept;
+		sl_size removeValues_NoLock(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_size removeElementsByValue(const VALUE& value, List<T>* outValues = sl_null, const EQUALS& equals = EQUALS()) const noexcept;
+		sl_size removeValues(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
+
+		template <class PREDICATE>
+		sl_bool removeIf_NoLock(const PREDICATE& p) noexcept;
+		
+		template <class PREDICATE>
+		sl_bool removeIf(const PREDICATE& p) noexcept;
+		
+		template <class PREDICATE>
+		sl_size removeElementsIf_NoLock(const PREDICATE& p) noexcept;
+		
+		template <class PREDICATE>
+		sl_size removeElementsIf(const PREDICATE& p) noexcept;
 
 		sl_size removeAll_NoLock() const noexcept;
 
@@ -508,18 +556,30 @@ namespace slib
 		sl_size popBackElements_NoLock(sl_size count) const noexcept;
 
 		sl_size popBackElements(sl_size count) const noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg indexOf_NoLock(const VALUE& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg indexOf(const VALUE& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg lastIndexOf_NoLock(const VALUE& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg lastIndexOf(const VALUE& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg indexOf_NoLock(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg indexOf(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg indexOf_NoLock(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg indexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg lastIndexOf_NoLock(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg lastIndexOf(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg lastIndexOf_NoLock(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg lastIndexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
 		sl_bool contains_NoLock(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
@@ -534,12 +594,26 @@ namespace slib
 		Array<T> toArray_NoLock() const noexcept;
 
 		Array<T> toArray() const noexcept;
-
+		
 		template < class COMPARE = Compare<T> >
-		void sort(sl_bool flagAscending = sl_true, const COMPARE& compare = COMPARE()) const noexcept;
-
+		void sort_NoLock(const COMPARE& compare = COMPARE()) const noexcept;
+		
 		template < class COMPARE = Compare<T> >
-		void sort_NoLock(sl_bool flagAscending = sl_true, const COMPARE& compare = COMPARE()) const noexcept;
+		void sort(const COMPARE& compare = COMPARE()) const noexcept;
+		
+		template < class COMPARE = Compare<T> >
+		void sortDesc_NoLock(const COMPARE& compare = COMPARE()) const noexcept;
+		
+		template < class COMPARE = Compare<T> >
+		void sortDesc(const COMPARE& compare = COMPARE()) const noexcept;
+		
+		void reverse_NoLock() const noexcept;
+		
+		void reverse() const noexcept;
+		
+		List<T> slice_NoLock(sl_size index, sl_size count = SLIB_SIZE_MAX) const noexcept;
+		
+		List<T> slice(sl_size index, sl_size count = SLIB_SIZE_MAX) const noexcept;
 
 		const Mutex* getLocker() const noexcept;
 
@@ -573,7 +647,7 @@ namespace slib
 
 	public:
 		template <class VALUE>
-		static const Atomic< List<T> >& from(const Atomic< List<VALUE> >& other) noexcept;
+		static Atomic< List<T> >& from(const Atomic< List<VALUE> >& other) noexcept;
 
 		sl_size getCount() const noexcept;
 
@@ -648,11 +722,17 @@ namespace slib
 		sl_size removeRange(sl_size index, sl_size count) const noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_bool removeValue(const VALUE& value, T* outValue = sl_null, const EQUALS& equals = EQUALS()) const noexcept;
+		sl_bool remove(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_size removeElementsByValue(const VALUE& value, List<T>* outValues = sl_null, const EQUALS& equals = EQUALS()) const noexcept;
+		sl_size removeValues(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
 
+		template <class PREDICATE>
+		sl_bool removeIf(const PREDICATE& p) noexcept;
+		
+		template <class PREDICATE>
+		sl_size removeElementsIf(const PREDICATE& p) noexcept;
+		
 		sl_size removeAll() const noexcept;
 
 		sl_bool popFront(T* _out = sl_null) const noexcept;
@@ -662,12 +742,19 @@ namespace slib
 		sl_bool popBack(T* _out = sl_null) const noexcept;
 
 		sl_size popBackElements(sl_size count) const noexcept;
-	
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg indexOf(const VALUE& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const noexcept;
-
-		template < class VALUE, class EQUALS = Equals<T, VALUE> >
-		sl_reg lastIndexOf(const VALUE& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const noexcept;
+		
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg indexOf(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg indexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
+		
+		template < class VALUE, class ARG = Equals<T, VALUE> >
+		sl_reg lastIndexOf(const VALUE& value, const ARG& arg = ARG()) const noexcept;
+		
+		template <class VALUE, class EQUALS>
+		sl_reg lastIndexOf(const VALUE& value, const EQUALS& equals, sl_reg startIndex) const noexcept;
 
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
 		sl_bool contains(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
@@ -675,10 +762,17 @@ namespace slib
 		List<T> duplicate() const noexcept;
 
 		Array<T> toArray() const noexcept;
-
+		
 		template < class COMPARE = Compare<T> >
-		void sort(sl_bool flagAscending = sl_true, const COMPARE& compare = COMPARE()) const noexcept;
-	
+		void sort(const COMPARE& compare = COMPARE()) const noexcept;
+		
+		template < class COMPARE = Compare<T> >
+		void sortDesc(const COMPARE& compare = COMPARE()) const noexcept;
+		
+		void reverse() const noexcept;
+		
+		List<T> slice(sl_size index, sl_size count = SLIB_SIZE_MAX) const noexcept;
+
 		// range-based for loop
 		ArrayPosition<T> begin() const noexcept;
 
