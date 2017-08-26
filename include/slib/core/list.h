@@ -13,7 +13,6 @@
 
 #include "definition.h"
 
-#include "new_helper.h"
 #include "object.h"
 #include "array.h"
 
