@@ -15,7 +15,7 @@
 
 namespace slib
 {
-	
+
 	// based on adler32
 	sl_uint32 HashBytes(const void* _buf, sl_size n) noexcept
 	{

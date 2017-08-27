@@ -15,7 +15,6 @@
 
 #include "map_common.h"
 #include "hash.h"
-#include "compare.h"
 #include "list.h"
 
 namespace slib
@@ -148,17 +147,19 @@ namespace slib
 		template <class KEY, class... VALUE_ARGS>
 		MapEmplaceReturn<Node> emplace(KEY&& key, VALUE_ARGS&&... value_args) noexcept;
 		
-		void removeAt(const Node* node) noexcept;
+		sl_bool removeAt(const Node* node) noexcept;
 
 		sl_bool remove(const KT& key, VT* outValue = sl_null) noexcept;
+		
+		sl_size removeItems(const KT& key) noexcept;
 
-		sl_size removeItems(const KT& key, List<VT>* outValues = sl_null) noexcept;
+		List<VT> removeItemsAndReturnValues(const KT& key) noexcept;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
 
 		sl_size removeAll() noexcept;
 		
