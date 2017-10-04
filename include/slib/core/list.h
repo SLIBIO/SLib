@@ -103,7 +103,8 @@ namespace slib
 		T* getData() const noexcept;
 
 	public:
-		T* getPointerAt_NoLock(sl_size index) const noexcept;
+		/* unsynchronized function */
+		T* getPointerAt(sl_size index) const noexcept;
 
 		sl_bool getAt_NoLock(sl_size index, T* _out = sl_null) const noexcept;
 
@@ -123,8 +124,10 @@ namespace slib
 		template <class VALUE>
 		sl_bool setAt(sl_size index, VALUE&& value) const noexcept;
 
+		/* unsynchronized function */
 		T const& operator[](sl_size_t index) const noexcept;
 
+		/* unsynchronized function */
 		T& operator[](sl_size_t index) noexcept;
 
 	public:
@@ -391,7 +394,8 @@ namespace slib
 		sl_bool isNotEmpty() const noexcept;
 		
 	public:
-		T* getPointerAt_NoLock(sl_size index) const noexcept;
+		/* unsynchronized function */
+		T* getPointerAt(sl_size index) const noexcept;
 
 		sl_bool getAt_NoLock(sl_size index, T* _out = sl_null) const noexcept;
 
@@ -411,6 +415,7 @@ namespace slib
 		template <class VALUE>
 		sl_bool setAt(sl_size index, VALUE&& value) const noexcept;
 
+		/* unsynchronized function */
 		T& operator[](sl_size_t index) const noexcept;
 
 #ifdef SLIB_SUPPORT_STD_TYPES
