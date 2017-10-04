@@ -13,718 +13,57 @@ namespace slib
 	
 	#define PRIV_SLIB_RED_BLACK_TREE_MAX_DISTANCE 128
 	
-	class SLIB_EXPORT RedBlackTreeBaseNode
-	{
-	public:
-		RedBlackTreeBaseNode* parent;
-		RedBlackTreeBaseNode* left;
-		RedBlackTreeBaseNode* right;
-		sl_bool flagRed;
-	};
-	
 	class SLIB_EXPORT _priv_RedBlackTree
 	{
 	public:
-		typedef RedBlackTreeBaseNode Node;
+		static RedBlackTreeNode* getPrevious(RedBlackTreeNode* node) noexcept;
 		
-		static Node* getPrevious(Node* node) noexcept;
+		static RedBlackTreeNode* getNext(RedBlackTreeNode* node) noexcept;
 		
-		static Node* getNext(Node* node) noexcept;
+		static RedBlackTreeNode* getFirst(RedBlackTreeNode* node) noexcept;
 		
-		static Node* getFirst(Node* node) noexcept;
+		static RedBlackTreeNode* getLast(RedBlackTreeNode* node) noexcept;
 		
-		static Node* getLast(Node* node) noexcept;
+		static void rebalanceAfterInsert(RedBlackTreeNode* node, RedBlackTreeNode** pRoot) noexcept;
 		
-		template <class NODE, class KEY, class KEY_COMPARE>
-		static NODE* tryFind(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, int* pCompareResult) noexcept;
-		
-		static void rebalanceAfterInsert(Node* node, Node** pRoot) noexcept;
-		
-		template <class NODE>
-		static void insertNode(NODE** pRoot, NODE* node, NODE* where, int compare_result) noexcept;
-		
-		template <class NODE, class KEY_COMPARE>
-		static void addNode(NODE** pRoot, NODE* node, const KEY_COMPARE& key_compare) noexcept;
-		
-		static void removeNode(Node* node, Node** pRoot) noexcept;
-		
-		template <class NODE>
-		static void freeNodes(NODE* node) noexcept;
-		
-		template <class NODE>
-		static NODE* duplicateNode(NODE* other) noexcept;
+		static void removeNode(RedBlackTreeNode* node, RedBlackTreeNode** pRoot) noexcept;
 		
 	};
 	
 	template <class NODE>
-	SLIB_INLINE RedBlackTreeNodeBase<NODE>::RedBlackTreeNodeBase()
-	 : parent(sl_null), left(sl_null), right(sl_null), flagRed(sl_false)
-	 {}
-	
-	template <class NODE>
-	SLIB_INLINE NODE* RedBlackTreeNodeBase<NODE>::getNext() const noexcept
+	SLIB_INLINE NODE* RedBlackTree::getNextNode(NODE* node) noexcept
 	{
-		return reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(const_cast<RedBlackTreeBaseNode*>(reinterpret_cast<RedBlackTreeBaseNode const*>(this))));
+		return reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 	}
 	
 	template <class NODE>
-	SLIB_INLINE NODE* RedBlackTreeNodeBase<NODE>::getPrevious() const noexcept
+	SLIB_INLINE NODE* RedBlackTree::getPreviousNode(NODE* node) noexcept
 	{
-		return reinterpret_cast<NODE*>(_priv_RedBlackTree::getPrevious(const_cast<RedBlackTreeBaseNode*>(reinterpret_cast<RedBlackTreeBaseNode const*>(this))));
+		return reinterpret_cast<NODE*>(_priv_RedBlackTree::getPrevious(reinterpret_cast<RedBlackTreeNode*>(node)));
 	}
 	
 	template <class NODE>
-	SLIB_INLINE NODE* RedBlackTreeNodeBase<NODE>::getFirst() const noexcept
+	SLIB_INLINE NODE* RedBlackTree::getFirstNode(NODE* root) noexcept
 	{
-		return reinterpret_cast<NODE*>(_priv_RedBlackTree::getFirst(const_cast<RedBlackTreeBaseNode*>(reinterpret_cast<RedBlackTreeBaseNode const*>(this))));
-	}
-	
-	template <class NODE>
-	SLIB_INLINE NODE* RedBlackTreeNodeBase<NODE>::getLast() const noexcept
-	{
-		return reinterpret_cast<NODE*>(_priv_RedBlackTree::getLast(const_cast<RedBlackTreeBaseNode*>(reinterpret_cast<RedBlackTreeBaseNode const*>(this))));
-	}
-	
-	template <class KT, class VT>
-	template <class KEY, class VALUE>
-	SLIB_INLINE RedBlackTreeNode<KT, VT>::RedBlackTreeNode(KEY&& _key, VALUE&& _value) noexcept
-	 : key(Forward<KEY>(_key)), value(Forward<VALUE>(_value))
-	 {}
-	
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	RedBlackTree<KT, VT, KEY_COMPARE, NODE>::RedBlackTree() noexcept
-	{
-		m_rootNode = sl_null;
-		m_count = 0;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	template <class KEY_COMPARE_ARG>
-	RedBlackTree<KT, VT, KEY_COMPARE, NODE>::RedBlackTree(KEY_COMPARE_ARG&& key_compare) noexcept
-	 : m_compare(Forward<KEY_COMPARE_ARG>(key_compare))
-	{
-		m_rootNode = sl_null;
-		m_count = 0;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	RedBlackTree<KT, VT, KEY_COMPARE, NODE>::~RedBlackTree() noexcept
-	{
-		if (m_rootNode) {
-			_priv_RedBlackTree::freeNodes(m_rootNode);
-		}
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	RedBlackTree<KT, VT, KEY_COMPARE, NODE>::RedBlackTree(RedBlackTree<KT, VT, KEY_COMPARE, NODE>&& other) noexcept
-	: m_compare(Move(other.m_compare))
-	{
-		m_rootNode = other.m_rootNode;
-		other.m_rootNode = sl_null;
-		m_count = other.m_count;
-		other.m_count = 0;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	RedBlackTree<KT, VT, KEY_COMPARE, NODE>& RedBlackTree<KT, VT, KEY_COMPARE, NODE>::operator=(RedBlackTree<KT, VT, KEY_COMPARE, NODE>&& other) noexcept
-	{
-		if (m_rootNode) {
-			_priv_RedBlackTree::freeNodes(m_rootNode);
-		}
-		m_rootNode = other.m_rootNode;
-		other.m_rootNode = sl_null;
-		m_count = other.m_count;
-		other.m_count = 0;
-		m_compare = Move(other.m_compare);
-		return *this;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE sl_size RedBlackTree<KT, VT, KEY_COMPARE, NODE>::getCount() const noexcept
-	{
-		return m_count;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE sl_bool RedBlackTree<KT, VT, KEY_COMPARE, NODE>::isEmpty() const noexcept
-	{
-		return m_count == 0;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE sl_bool RedBlackTree<KT, VT, KEY_COMPARE, NODE>::isNotEmpty() const noexcept
-	{
-		return m_count > 0;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE NODE* RedBlackTree<KT, VT, KEY_COMPARE, NODE>::getRootNode() const noexcept
-	{
-		return m_rootNode;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE NODE* RedBlackTree<KT, VT, KEY_COMPARE, NODE>::getFirstNode() const noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			return reinterpret_cast<NODE*>(_priv_RedBlackTree::getFirst(reinterpret_cast<RedBlackTreeBaseNode*>(node)));
+		if (root) {
+			return reinterpret_cast<NODE*>(_priv_RedBlackTree::getFirst(reinterpret_cast<RedBlackTreeNode*>(root)));
 		} else {
 			return sl_null;
 		}
 	}
 	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE NODE* RedBlackTree<KT, VT, KEY_COMPARE, NODE>::getLastNode() const noexcept
+	template <class NODE>
+	SLIB_INLINE NODE* RedBlackTree::getLastNode(NODE* root) noexcept
 	{
-		NODE* node = m_rootNode;
-		if (node) {
-			return reinterpret_cast<NODE*>(_priv_RedBlackTree::getLast(reinterpret_cast<RedBlackTreeBaseNode*>(node)));
-		} else {
-			return sl_null;
-		}
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE NODE* RedBlackTree<KT, VT, KEY_COMPARE, NODE>::tryFind(const KT& key, int* pCompareResult) const noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			return _priv_RedBlackTree::tryFind(node, key, m_compare, pCompareResult);
+		if (root) {
+			return reinterpret_cast<NODE*>(_priv_RedBlackTree::getLast(reinterpret_cast<RedBlackTreeNode*>(root)));
 		} else {
 			return sl_null;
 		}
 	}
 
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE NODE* RedBlackTree<KT, VT, KEY_COMPARE, NODE>::find(const KT& key) const noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			int compare_result;
-			node = _priv_RedBlackTree::tryFind(node, key, m_compare, &compare_result);
-			if (compare_result == 0) {
-				return node;
-			}
-		}
-		return sl_null;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	void RedBlackTree<KT, VT, KEY_COMPARE, NODE>::getBounds(const KT& key, NODE** pLessEqual, NODE** pGreaterEqual) const noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			int compare_result;
-			node = _priv_RedBlackTree::tryFind(node, key, m_compare, &compare_result);
-			if (compare_result == 0) {
-				if (pLessEqual) {
-					*pLessEqual = node;
-				}
-				if (pGreaterEqual) {
-					*pGreaterEqual = node;
-				}
-			} else if (compare_result > 0) {
-				if (pLessEqual) {
-					*pLessEqual = reinterpret_cast<NODE*>(_priv_RedBlackTree::getPrevious(reinterpret_cast<RedBlackTreeBaseNode*>(node)));
-				}
-				if (pGreaterEqual) {
-					*pGreaterEqual = node;
-				}
-			} else {
-				if (pLessEqual) {
-					*pLessEqual = node;
-				}
-				if (pGreaterEqual) {
-					*pGreaterEqual = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeBaseNode*>(node)));
-				}
-			}
-		} else {
-			if (pLessEqual) {
-				*pLessEqual = sl_null;
-			}
-			if (pGreaterEqual) {
-				*pGreaterEqual = sl_null;
-			}
-		}
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	sl_bool RedBlackTree<KT, VT, KEY_COMPARE, NODE>::getEqualRange(const KT& key, NODE** pStart, NODE** pEnd) const noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			int compare_result;
-			NODE* mid = _priv_RedBlackTree::tryFind(node, key, m_compare, &compare_result);
-			if (compare_result == 0) {
-				if (pStart) {
-					NODE* start = mid;
-					node = mid;
-					while ((node = node->getPrevious())) {
-						if (m_compare(node->key, key) == 0) {
-							start = node;
-						} else {
-							break;
-						}
-					}
-					*pStart = start;
-				}
-				if (pEnd) {
-					NODE* end = mid;
-					node = mid;
-					while ((node = node->getNext())) {
-						if (m_compare(node->key, key) == 0) {
-							end = node;
-						} else {
-							break;
-						}
-					}
-					*pEnd = end;
-				}
-				return sl_true;
-			}
-		}
-		return sl_false;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	template <class VALUE, class VALUE_EQUALS>
-	NODE* RedBlackTree<KT, VT, KEY_COMPARE, NODE>::findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			int compare_result;
-			NODE* mid = _priv_RedBlackTree::tryFind(node, key, m_compare, &compare_result);
-			if (compare_result == 0) {
-				while ((node = node->getPrevious())) {
-					if (m_compare(node->key, key) == 0) {
-						if (value_equals(node->value, value)) {
-							return node;
-						}
-					} else {
-						break;
-					}
-				}
-				node = mid;
-				while ((node = node->getNext())) {
-					if (m_compare(node->key, key) == 0) {
-						if (value_equals(node->value, value)) {
-							return node;
-						}
-					} else {
-						break;
-					}
-				}
-			}
-		}
-		return sl_null;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE VT* RedBlackTree<KT, VT, KEY_COMPARE, NODE>::getItemPointer(const KT& key) const noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			int compare_result;
-			node = _priv_RedBlackTree::tryFind(node, key, m_compare, &compare_result);
-			if (compare_result == 0) {
-				return &(node->value);
-			}
-		}
-		return sl_null;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	template <class VALUE, class VALUE_EQUALS>
-	SLIB_INLINE VT* RedBlackTree<KT, VT, KEY_COMPARE, NODE>::getItemPointerByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
-	{
-		NODE* node = findKeyAndValue(key, value, value_equals);
-		if (node) {
-			return &(node->value);
-		}
-		return sl_null;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE sl_bool RedBlackTree<KT, VT, KEY_COMPARE, NODE>::get(const KT& key, VT* value) const noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			int compare_result;
-			node = _priv_RedBlackTree::tryFind(node, key, m_compare, &compare_result);
-			if (compare_result == 0) {
-				if (value) {
-					*value = node->value;
-				}
-				return sl_true;
-			}
-		}
-		return sl_false;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE VT RedBlackTree<KT, VT, KEY_COMPARE, NODE>::getValue(const KT& key) const noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			int compare_result;
-			node = _priv_RedBlackTree::tryFind(node, key, m_compare, &compare_result);
-			if (compare_result == 0) {
-				return node->value;
-			}
-		}
-		return VT();
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE VT RedBlackTree<KT, VT, KEY_COMPARE, NODE>::getValue(const KT& key, const VT& def) const noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			int compare_result;
-			node = _priv_RedBlackTree::tryFind(node, key, m_compare, &compare_result);
-			if (compare_result == 0) {
-				return node->value;
-			}
-		}
-		return def;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	List<VT> RedBlackTree<KT, VT, KEY_COMPARE, NODE>::getValues(const KT& key) const noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			int compare_result;
-			node = _priv_RedBlackTree::tryFind(node, key, m_compare, &compare_result);
-			if (compare_result == 0) {
-				List<VT> ret(1, 1, node->value);
-				NODE* mid = node;
-				while ((node = node->getPrevious())) {
-					if (m_compare(node->key, key) == 0) {
-						ret.add_NoLock(node->value);
-					} else {
-						break;
-					}
-				}
-				node = mid;
-				while ((node = node->getNext())) {
-					if (m_compare(node->key, key) == 0) {
-						ret.add_NoLock(node->value);
-					} else {
-						break;
-					}
-				}
-				return ret;
-			}
-		}
-		return sl_null;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	template <class VALUE, class VALUE_EQUALS>
-	List<VT> RedBlackTree<KT, VT, KEY_COMPARE, NODE>::getValuesByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			int compare_result;
-			node = _priv_RedBlackTree::tryFind(node, key, m_compare, &compare_result);
-			if (compare_result == 0) {
-				List<VALUE> ret;
-				if (value_equals(node->value, value)) {
-					ret.add_NoLock(node->value);
-				}
-				NODE* mid = node;
-				while ((node = node->getPrevious())) {
-					if (m_compare(node->key, key) == 0) {
-						if (value_equals(node->value, value)) {
-							ret.add_NoLock(node->value);
-						}
-					} else {
-						break;
-					}
-				}
-				node = mid;
-				while ((node = node->getNext())) {
-					if (m_compare(node->key, key) == 0) {
-						if (value_equals(node->value, value)) {
-							ret.add_NoLock(node->value);
-						}
-					} else {
-						break;
-					}
-				}
-				return ret;
-			}
-		}
-		return sl_null;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE void RedBlackTree<KT, VT, KEY_COMPARE, NODE>::insertNode(NODE* node, NODE* where, int compare_result) noexcept
-	{
-		m_count++;
-		if (where) {
-			_priv_RedBlackTree::insertNode(&m_rootNode, node, where, compare_result);
-		} else {
-			m_rootNode = node;
-		}
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE void RedBlackTree<KT, VT, KEY_COMPARE, NODE>::insertNode(NODE* node) noexcept
-	{
-		m_count++;
-		_priv_RedBlackTree::addNode(&m_rootNode, node, m_compare);
-	}
-
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	template <class KEY, class VALUE>
-	NODE* RedBlackTree<KT, VT, KEY_COMPARE, NODE>::put(KEY&& key, VALUE&& value, sl_bool* isInsertion) noexcept
-	{
-		NODE* root = m_rootNode;
-		if (root) {
-			int compare_result;
-			NODE* where = _priv_RedBlackTree::tryFind(m_rootNode, key, m_compare, &compare_result);
-			if (compare_result == 0) {
-				where->value = Forward<VALUE>(value);
-				if (isInsertion) {
-					*isInsertion = sl_false;
-				}
-				return where;
-			}
-			NODE* node = new NODE(Forward<KEY>(key), Forward<VALUE>(value));
-			if (node) {
-				_priv_RedBlackTree::insertNode(&m_rootNode, node, where, compare_result);
-				m_count++;
-				if (isInsertion) {
-					*isInsertion = sl_true;
-				}
-				return node;
-			}
-		} else {
-			NODE* node = new NODE(Forward<KEY>(key), Forward<VALUE>(value));
-			if (node) {
-				m_rootNode = node;
-				m_count++;
-				if (isInsertion) {
-					*isInsertion = sl_true;
-				}
-				return node;
-			}
-		}
-		if (isInsertion) {
-			*isInsertion = sl_false;
-		}
-		return sl_null;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	template <class KEY, class VALUE>
-	NODE* RedBlackTree<KT, VT, KEY_COMPARE, NODE>::replace(const KEY& key, VALUE&& value) noexcept
-	{
-		NODE* root = m_rootNode;
-		if (root) {
-			int compare_result;
-			NODE* where = _priv_RedBlackTree::tryFind(m_rootNode, key, m_compare, &compare_result);
-			if (compare_result == 0) {
-				where->value = Forward<VALUE>(value);
-				return where;
-			}
-		}
-		return sl_null;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	template <class KEY, class... VALUE_ARGS>
-	NODE* RedBlackTree<KT, VT, KEY_COMPARE, NODE>::add(KEY&& key, VALUE_ARGS&&... value_args) noexcept
-	{
-		NODE* node = new NODE(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
-		if (node) {
-			m_count++;
-			NODE* root = m_rootNode;
-			if (root) {
-				_priv_RedBlackTree::addNode(&m_rootNode, node, m_compare);
-			} else {
-				m_rootNode = node;
-			}
-			return node;
-		}
-		return sl_null;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	template <class KEY, class... VALUE_ARGS>
-	MapEmplaceReturn<NODE> RedBlackTree<KT, VT, KEY_COMPARE, NODE>::emplace(KEY&& key, VALUE_ARGS&&... value_args) noexcept
-	{
-		NODE* root = m_rootNode;
-		if (root) {
-			int compare_result;
-			NODE* where = _priv_RedBlackTree::tryFind(m_rootNode, key, m_compare, &compare_result);
-			if (compare_result == 0) {
-				return MapEmplaceReturn<NODE>(sl_false, where);
-			}
-			NODE* node = new NODE(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
-			if (node) {
-				_priv_RedBlackTree::insertNode(&m_rootNode, node, where, compare_result);
-				m_count++;
-				return MapEmplaceReturn<NODE>(sl_true, node);
-			}
-		} else {
-			NODE* node = new NODE(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
-			if (node) {
-				m_rootNode = node;
-				m_count++;
-				return MapEmplaceReturn<NODE>(sl_true, node);
-			}
-		}
-		return sl_null;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE void RedBlackTree<KT, VT, KEY_COMPARE, NODE>::removeNode(NODE* node) noexcept
-	{
-		m_count--;
-		_priv_RedBlackTree::removeNode(reinterpret_cast<RedBlackTreeBaseNode*>(node), reinterpret_cast<RedBlackTreeBaseNode**>(&m_rootNode));
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	sl_bool RedBlackTree<KT, VT, KEY_COMPARE, NODE>::remove(const KT& key, VT* outValue) noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			int compare_result;
-			node = _priv_RedBlackTree::tryFind(node, key, m_compare, &compare_result);
-			if (compare_result == 0) {
-				if (outValue) {
-					*outValue = Move(node->value);
-				}
-				removeNode(node);
-				return sl_true;
-			}
-		}
-		return sl_false;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	sl_size RedBlackTree<KT, VT, KEY_COMPARE, NODE>::removeItems(const KT& key, List<VT>* outValues) noexcept
-	{
-		NODE* node = find(key);
-		if (node) {
-			if (outValues) {
-				outValues->add_NoLock(Move(node->value));
-			}
-			removeNode(node);
-			sl_size n = 1;
-			while ((node = find(key))) {
-				if (outValues) {
-					outValues->add_NoLock(Move(node->value));
-				}
-				removeNode(node);
-				n++;
-			}
-			return n;
-		}
-		return 0;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	template <class VALUE, class VALUE_EQUALS>
-	sl_bool RedBlackTree<KT, VT, KEY_COMPARE, NODE>::removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue, const VALUE_EQUALS& value_equals) noexcept
-	{
-		NODE* node = findKeyAndValue(key, value, value_equals);
-		if (node) {
-			if (outValue) {
-				*outValue = Move(node->value);
-			}
-			removeNode(node);
-			return sl_true;
-		}
-		return sl_false;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	template <class VALUE, class VALUE_EQUALS>
-	sl_size RedBlackTree<KT, VT, KEY_COMPARE, NODE>::removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues, const VALUE_EQUALS& value_equals) noexcept
-	{
-		NODE* node = findKeyAndValue(key, value, value_equals);
-		if (node) {
-			if (outValues) {
-				outValues->add_NoLock(Move(node->value));
-			}
-			removeNode(node);
-			sl_size n = 1;
-			while ((node = findKeyAndValue(key, value, value_equals))) {
-				if (outValues) {
-					outValues->add_NoLock(Move(node->value));
-				}
-				removeNode(node);
-				n++;
-			}
-			return n;
-		}
-		return 0;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	sl_size RedBlackTree<KT, VT, KEY_COMPARE, NODE>::removeAll() noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			_priv_RedBlackTree::freeNodes(node);
-			m_rootNode = sl_null;
-		}
-		sl_size n = m_count;
-		m_count = 0;
-		return n;
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	sl_bool RedBlackTree<KT, VT, KEY_COMPARE, NODE>::copyFrom(const RedBlackTree<KT, VT, KEY_COMPARE, NODE>* other) noexcept
-	{
-		if (m_rootNode) {
-			_priv_RedBlackTree::freeNodes(m_rootNode);
-		}
-		m_compare = other->m_compare;
-		NODE* otherRoot = other->m_rootNode;
-		if (!otherRoot) {
-			m_rootNode = sl_null;
-			m_count = 0;
-			return sl_true;
-		}
-		NODE* newNode = _priv_RedBlackTree::duplicateNode(otherRoot);
-		if (newNode) {
-			m_rootNode = newNode;
-			m_count = other->m_count;
-			return sl_true;
-		} else {
-			m_rootNode = sl_null;
-			m_count = 0;
-			return sl_false;
-		}
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE NodePosition<NODE> RedBlackTree<KT, VT, KEY_COMPARE, NODE>::begin() const noexcept
-	{
-		NODE* node = m_rootNode;
-		if (node) {
-			return reinterpret_cast<NODE*>(_priv_RedBlackTree::getFirst(reinterpret_cast<RedBlackTreeBaseNode*>(node)));
-		} else {
-			return sl_null;
-		}
-	}
-	
-	template <class KT, class VT, class KEY_COMPARE, class NODE>
-	SLIB_INLINE NodePosition<NODE> RedBlackTree<KT, VT, KEY_COMPARE, NODE>::end() const noexcept
-	{
-		return sl_null;
-	}
-	
-	
 	template <class NODE, class KEY, class KEY_COMPARE>
-	NODE* _priv_RedBlackTree::tryFind(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, int* pCompareResult) noexcept
+	NODE* RedBlackTree::tryFind(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, int& compare_result) noexcept
 	{
 		int comp;
 		for (;;) {
@@ -747,12 +86,235 @@ namespace slib
 				}
 			}
 		}
-		*pCompareResult = comp;
+		compare_result = comp;
 		return look;
 	}
 	
+	template <class NODE, class KEY, class KEY_COMPARE>
+	sl_bool RedBlackTree::getEqualRange(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, NODE** pStart, NODE** pEnd) noexcept
+	{
+		if (!look) {
+			return sl_false;
+		}
+		int compare_result;
+		look = tryFind(look, key, key_compare, &compare_result);
+		if (compare_result != 0) {
+			return sl_false;
+		}
+		if (pStart) {
+			NODE* last_equal = look;
+			NODE* left = look->left;
+			if (left) {
+				NODE* node = left;
+				for (;;) {
+					if (key_compare(node->key, key) == 0) {
+						last_equal = node;
+						left = node->left;
+						if (left) {
+							node = left;
+						} else {
+							break;
+						}
+					} else {
+						NODE* right = node->right;
+						if (right) {
+							node = right;
+						} else {
+							break;
+						}
+					}
+				}
+			}
+			*pStart = last_equal;
+		}
+		if (pEnd) {
+			NODE* last_equal = look;
+			NODE* right = look->right;
+			if (right) {
+				NODE* node = right;
+				for (;;) {
+					if (key_compare(node->key, key) != 0) {
+						last_equal = node;
+						NODE* left = node->left;
+						if (left) {
+							node = left;
+						} else {
+							break;
+						}
+					} else {
+						right = node->right;
+						if (right) {
+							node = right;
+						} else {
+							break;
+						}
+					}
+				}
+			}
+			*pEnd = last_equal;
+		}
+		return sl_true;
+	}
+	
+	template <class NODE, class KEY, class KEY_COMPARE>
+	void RedBlackTree::getNearest(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, NODE** pLessEqual, NODE** pGreaterEqual) noexcept
+	{
+		if (!look) {
+			if (pLessEqual) {
+				*pLessEqual = sl_null;
+			}
+			if (pGreaterEqual) {
+				*pGreaterEqual = sl_null;
+			}
+		}
+		int compare_result;
+		NODE* node = tryFind(look, key, key_compare, compare_result);
+		if (compare_result == 0) {
+			if (pLessEqual) {
+				*pLessEqual = node;
+			}
+			if (pGreaterEqual) {
+				*pGreaterEqual = node;
+			}
+		} else if (compare_result > 0) {
+			if (pLessEqual) {
+				*pLessEqual = reinterpret_cast<NODE*>(_priv_RedBlackTree::getPrevious(reinterpret_cast<RedBlackTreeNode*>(node)));
+			}
+			if (pGreaterEqual) {
+				*pGreaterEqual = node;
+			}
+		} else {
+			if (pLessEqual) {
+				*pLessEqual = node;
+			}
+			if (pGreaterEqual) {
+				*pGreaterEqual = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+			}
+		}
+	}
+
+	template <class NODE, class KEY, class KEY_COMPARE>
+	NODE* RedBlackTree::getLowerBound(NODE* look, const KEY& key, const KEY_COMPARE& key_compare) noexcept
+	{
+		if (!look) {
+			return sl_null;
+		}
+		NODE* last_greater_equal = sl_null;
+		for (;;) {
+			if (key_compare(look->key, key) >= 0) {
+				last_greater_equal = look;
+				NODE* left = look->left;
+				if (left) {
+					look = left;
+				} else {
+					break;
+				}
+			} else {
+				NODE* right = look->right;
+				if (right) {
+					look = right;
+				} else {
+					break;
+				}
+			}
+		}
+		return last_greater_equal;
+	}
+	
+	template <class NODE, class KEY, class KEY_COMPARE>
+	NODE* RedBlackTree::getUpperBound(NODE* look, const KEY& key, const KEY_COMPARE& key_compare) noexcept
+	{
+		if (!look) {
+			return sl_null;
+		}
+		NODE* last_greater = sl_null;
+		for (;;) {
+			if (key_compare(look->key, key) > 0) {
+				last_greater = look;
+				NODE* left = look->left;
+				if (left) {
+					look = left;
+				} else {
+					break;
+				}
+			} else {
+				NODE* right = look->right;
+				if (right) {
+					look = right;
+				} else {
+					break;
+				}
+			}
+		}
+		return last_greater;
+	}
+	
+	template <class NODE, class KEY, class KEY_COMPARE>
+	SLIB_INLINE NODE* RedBlackTree::find(NODE* look, const KEY& key, const KEY_COMPARE& key_compare) noexcept
+	{
+		if (!look) {
+			return sl_null;
+		}
+		int compare_result;
+		NODE* node = tryFind(look, key, key_compare, &compare_result);
+		if (compare_result == 0) {
+			return node;
+		}
+		return sl_null;
+	}
+
+	template <class NODE, class KEY, class KEY_COMPARE, class VALUE, class VALUE_EQUALS>
+	NODE* RedBlackTree::findKeyAndValue(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, const VALUE& value, const VALUE_EQUALS& value_equals) noexcept
+	{
+		NODE *node, *end;
+		if (getEqualRange(look, key, key_compare, &node, &end)) {
+			while (1) {
+				if (value_equals(node->value, value)) {
+					return node;
+				}
+				if (node == end) {
+					break;
+				}
+				node = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+			}
+		}
+		return sl_null;
+	}
+	
+	template <class VT, class NODE, class KEY, class KEY_COMPARE>
+	void RedBlackTree::getValues(List<VT>& list, NODE* look, const KEY& key, const KEY_COMPARE& key_compare) noexcept
+	{
+		NODE *node, *end;
+		if (getEqualRange(look, key, key_compare, &node, &end)) {
+			while (1) {
+				list.add_NoLock(node->value);
+				if (node == end) {
+					break;
+				}
+				node = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+			}
+		}
+	}
+	
+	template <class VT, class NODE, class KEY, class KEY_COMPARE, class VALUE, class VALUE_EQUALS>
+	void RedBlackTree::getValuesByKeyAndValue(List<VT>& list, NODE* look, const KEY& key, const KEY_COMPARE& key_compare, const VALUE& value, const VALUE_EQUALS& value_equals) noexcept
+	{
+		NODE *node, *end;
+		if (getEqualRange(look, key, key_compare, &node, &end)) {
+			while (1) {
+				if (value_equals(node->value, value)) {
+					list.add_NoLock(node->value);
+				}
+				if (node == end) {
+					break;
+				}
+				node = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+			}
+		}
+	}
+	
 	template <class NODE>
-	SLIB_INLINE void _priv_RedBlackTree::insertNode(NODE** pRoot, NODE* node, NODE* where, int compare_result) noexcept
+	void RedBlackTree::insertNode(NODE** pRoot, NODE* node, NODE* where, int compare_result) noexcept
 	{
 		if (compare_result > 0) {
 			where->left = node;
@@ -760,11 +322,11 @@ namespace slib
 			where->right = node;
 		}
 		node->parent = where;
-		_priv_RedBlackTree::rebalanceAfterInsert(reinterpret_cast<RedBlackTreeBaseNode*>(node), reinterpret_cast<RedBlackTreeBaseNode**>(pRoot));
+		_priv_RedBlackTree::rebalanceAfterInsert(reinterpret_cast<RedBlackTreeNode*>(node), reinterpret_cast<RedBlackTreeNode**>(pRoot));
 	}
 	
 	template <class NODE, class KEY_COMPARE>
-	void _priv_RedBlackTree::addNode(NODE** pRoot, NODE* node, const KEY_COMPARE& key_compare) noexcept
+	void RedBlackTree::addNode(NODE** pRoot, NODE* node, const KEY_COMPARE& key_compare) noexcept
 	{
 		NODE* look = *pRoot;
 		if (look) {
@@ -788,14 +350,282 @@ namespace slib
 				}
 			}
 			node->parent = look;
-			_priv_RedBlackTree::rebalanceAfterInsert(reinterpret_cast<RedBlackTreeBaseNode*>(node), reinterpret_cast<RedBlackTreeBaseNode**>(pRoot));
+			_priv_RedBlackTree::rebalanceAfterInsert(reinterpret_cast<RedBlackTreeNode*>(node), reinterpret_cast<RedBlackTreeNode**>(pRoot));
 		} else {
 			*pRoot = node;
 		}
+		
+	}
+
+	template <class NODE, class KEY, class KEY_COMPARE, class VALUE>
+	NODE* RedBlackTree::put(NODE** pRoot, sl_size& count, KEY&& key, const KEY_COMPARE& key_compare, VALUE&& value, sl_bool* isInsertion) noexcept
+	{
+		NODE* root = *pRoot;
+		if (root) {
+			int compare_result;
+			NODE* where = tryFind(root, key, key_compare, compare_result);
+			if (compare_result == 0) {
+				where->value = Forward<VALUE>(value);
+				if (isInsertion) {
+					*isInsertion = sl_false;
+				}
+				return where;
+			}
+			NODE* node = new NODE(Forward<KEY>(key), Forward<VALUE>(value));
+			if (node) {
+				insertNode(pRoot, node, where, compare_result);
+				count++;
+				if (isInsertion) {
+					*isInsertion = sl_true;
+				}
+				return node;
+			}
+		} else {
+			NODE* node = new NODE(Forward<KEY>(key), Forward<VALUE>(value));
+			if (node) {
+				*pRoot = node;
+				count++;
+				if (isInsertion) {
+					*isInsertion = sl_true;
+				}
+				return node;
+			}
+		}
+		if (isInsertion) {
+			*isInsertion = sl_false;
+		}
+		return sl_null;
+	}
+	
+	template <class NODE, class KEY, class KEY_COMPARE, class VALUE>
+	NODE* RedBlackTree::replace(NODE* root, const KEY& key, const KEY_COMPARE& key_compare, VALUE&& value) noexcept
+	{
+		if (!root) {
+			return sl_null;
+		}
+		int compare_result;
+		NODE* node = tryFind(root, key, key_compare, compare_result);
+		if (compare_result == 0) {
+			node->value = Forward<VALUE>(value);
+			return node;
+		} else {
+			return sl_null;
+		}
+	}
+	
+	template <class NODE, class KEY, class KEY_COMPARE, class... VALUE_ARGS>
+	NODE* RedBlackTree::add(NODE** pRoot, sl_size& count, KEY&& key, const KEY_COMPARE& key_compare, VALUE_ARGS&&... value_args) noexcept
+	{
+		NODE* node = new NODE(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
+		if (node) {
+			addNode(pRoot, node, key_compare);
+			count++;
+			return node;
+		}
+		return sl_null;
+	}
+	
+	template <class NODE, class KEY, class KEY_COMPARE, class... VALUE_ARGS>
+	MapEmplaceReturn<NODE> RedBlackTree::emplace(NODE** pRoot, sl_size& count, KEY&& key, const KEY_COMPARE& key_compare, VALUE_ARGS&&... value_args) noexcept
+	{
+		NODE* root = *pRoot;
+		if (root) {
+			int compare_result;
+			NODE* where = tryFind(pRoot, key, key_compare, compare_result);
+			if (compare_result == 0) {
+				return MapEmplaceReturn<NODE>(sl_false, where);
+			}
+			NODE* node = new NODE(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
+			if (node) {
+				insertNode(pRoot, node, where, compare_result);
+				count++;
+				return MapEmplaceReturn<NODE>(sl_true, node);
+			}
+		} else {
+			NODE* node = new NODE(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
+			if (node) {
+				*pRoot = node;
+				count++;
+				return MapEmplaceReturn<NODE>(sl_true, node);
+			}
+		}
+		return sl_null;
 	}
 	
 	template <class NODE>
-	void _priv_RedBlackTree::freeNodes(NODE* node) noexcept
+	SLIB_INLINE void RedBlackTree::removeNode(NODE** pRoot, sl_size& count, NODE* node) noexcept
+	{
+		count--;
+		_priv_RedBlackTree::removeNode(reinterpret_cast<RedBlackTreeNode*>(node), reinterpret_cast<RedBlackTreeNode**>(pRoot));
+		delete node;
+	}
+	
+	template <class NODE>
+	sl_size RedBlackTree::removeNodes(NODE** pRoot, sl_size& count, NODE* node, sl_size countRemove) noexcept
+	{
+		if (!countRemove) {
+			return 0;
+		}
+		sl_size n = countRemove - 1;
+		for (sl_size i = 0; i < n; i++) {
+			NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+			removeNode(pRoot, count, node);
+			if (next) {
+				node = next;
+			} else {
+				return i + 1;
+			}
+		}
+		removeNode(pRoot, count, node);
+		return countRemove;
+	}
+	
+	template <class NODE>
+	sl_size RedBlackTree::removeRange(NODE** pRoot, sl_size& count, NODE* node, NODE* last) noexcept
+	{
+		if (!node) {
+			node = *pRoot;
+			if (node) {
+				node = reinterpret_cast<NODE*>(_priv_RedBlackTree::getFirst(reinterpret_cast<RedBlackTreeNode*>(node)));
+			} else {
+				return 0;
+			}
+		}
+		sl_size n = 0;
+		while (1) {
+			n++;
+			if (node == last) {
+				removeNode(pRoot, count, node);
+				break;
+			} else {
+				NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+				removeNode(pRoot, count, node);
+				node = next;
+			}
+		}
+		return n;
+	}
+	
+	template <class NODE, class KEY, class KEY_COMPARE, class VALUE>
+	sl_bool RedBlackTree::remove(NODE** pRoot, sl_size& count, const KEY& key, const KEY_COMPARE& key_compare, VALUE* outValue) noexcept
+	{
+		NODE* root = *pRoot;
+		if (root) {
+			int compare_result;
+			NODE* node = tryFind(root, key, key_compare, &compare_result);
+			if (compare_result == 0) {
+				if (outValue) {
+					outValue = Move(node->value);
+				}
+				removeNode(pRoot, count, node);
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+
+	template <class NODE, class KEY, class KEY_COMPARE>
+	sl_size RedBlackTree::removeItems(NODE** pRoot, sl_size& count, const KEY& key, const KEY_COMPARE& key_compare) noexcept
+	{
+		NODE* node;
+		NODE* end;
+		if (getEqualRange(*pRoot, key, key_compare, &node, &end)) {
+			sl_size n = 0;
+			while (1) {
+				n++;
+				if (node == end) {
+					removeNode(pRoot, count, node);
+					break;
+				} else {
+					NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+					removeNode(pRoot, count, node);
+					node = next;
+				}
+			}
+			return n;
+		} else {
+			return 0;
+		}
+	}
+	
+	template <class VT, class NODE, class KEY, class KEY_COMPARE>
+	sl_size RedBlackTree::removeItemsAndReturnValues(List<VT>& list, NODE** pRoot, sl_size& count, const KEY& key, const KEY_COMPARE& key_compare) noexcept
+	{
+		NODE* node;
+		NODE* end;
+		if (getEqualRange(*pRoot, key, key_compare, &node, &end)) {
+			sl_size n = 0;
+			while (1) {
+				n++;
+				list.add_NoLock(node->value);
+				if (node == end) {
+					removeNode(pRoot, count, node);
+					break;
+				} else {
+					NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+					removeNode(pRoot, count, node);
+					node = next;
+				}
+			}
+			return n;
+		} else {
+			return 0;
+		}
+	}
+	
+	template <class NODE, class KEY, class KEY_COMPARE, class VALUE, class VALUE_EQUALS>
+	sl_bool RedBlackTree::removeKeyAndValue(NODE** pRoot, sl_size& count, const KEY& key, const KEY_COMPARE& key_compare, const VALUE& value, const VALUE_EQUALS& value_equals) noexcept
+	{
+		NODE* node;
+		NODE* end;
+		if (getEqualRange(*pRoot, key, key_compare, &node, &end)) {
+			while (1) {
+				if (value_equals(node->value, value)) {
+					removeNode(pRoot, count, node);
+					return sl_true;
+				}
+				if (node == end) {
+					break;
+				}
+				node = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+			}
+		}
+		return sl_false;
+	}
+	
+	template <class NODE, class KEY, class KEY_COMPARE, class VALUE, class VALUE_EQUALS>
+	sl_size RedBlackTree::removeItemsByKeyAndValue(NODE** pRoot, sl_size& count, const KEY& key, const KEY_COMPARE& key_compare, const VALUE& value, const VALUE_EQUALS& value_equals) noexcept
+	{
+		sl_size n = 0;
+		NODE* node;
+		NODE* end;
+		if (getEqualRange(*pRoot, key, key_compare, &node, &end)) {
+			while (1) {
+				if (value_equals(node->value, value)) {
+					n++;
+					if (node == end) {
+						removeNode(pRoot, count, node);
+						break;
+					} else {
+						NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+						removeNode(pRoot, count, node);
+						node = next;
+					}
+				} else {
+					if (node == end) {
+						break;
+					}
+					node = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+				}
+			}
+			return n;
+		} else {
+			return 0;
+		}
+	}
+
+	template <class NODE>
+	void RedBlackTree::freeNodes(NODE* node) noexcept
 	{
 		NODE* stack[PRIV_SLIB_RED_BLACK_TREE_MAX_DISTANCE];
 		sl_size nStack = 0;
@@ -828,8 +658,12 @@ namespace slib
 	}
 	
 	template <class NODE>
-	NODE* _priv_RedBlackTree::duplicateNode(NODE* nodeSource) noexcept
+	NODE* RedBlackTree::duplicateNode(NODE* nodeSource) noexcept
 	{
+		if (!nodeSource) {
+			return sl_null;
+		}
+		
 		NODE* nodeTarget = new NODE(nodeSource->key, nodeSource->value);
 		if (!nodeTarget) {
 			return sl_null;
@@ -846,7 +680,7 @@ namespace slib
 			if (leftSource) {
 				leftTarget = new NODE(leftSource->key, leftSource->value);
 				if (!leftTarget) {
-					_priv_RedBlackTree::freeNodes(nodeTargetRoot);
+					freeNodes(nodeTargetRoot);
 					return sl_null;
 				}
 				leftTarget->flagRed = leftSource->flagRed;
@@ -861,7 +695,7 @@ namespace slib
 			if (rightSource) {
 				rightTarget = new NODE(rightSource->key, rightSource->value);
 				if (!rightTarget) {
-					_priv_RedBlackTree::freeNodes(nodeTargetRoot);
+					freeNodes(nodeTargetRoot);
 					return sl_null;
 				}
 				rightTarget->flagRed = rightSource->flagRed;

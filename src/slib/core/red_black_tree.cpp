@@ -13,9 +13,9 @@
 namespace slib
 {
 	
-	SLIB_INLINE RedBlackTreeBaseNode* _priv_RedBlackTree_getFirst(RedBlackTreeBaseNode* node) noexcept
+	SLIB_INLINE RedBlackTreeNode* _priv_RedBlackTree_getFirst(RedBlackTreeNode* node) noexcept
 	{
-		typedef RedBlackTreeBaseNode Node;
+		typedef RedBlackTreeNode Node;
 		for (;;) {
 			Node* left = node->left;
 			if (!left) {
@@ -26,9 +26,9 @@ namespace slib
 		return node;
 	}
 	
-	SLIB_INLINE RedBlackTreeBaseNode* _priv_RedBlackTree_getLast(RedBlackTreeBaseNode* node) noexcept
+	SLIB_INLINE RedBlackTreeNode* _priv_RedBlackTree_getLast(RedBlackTreeNode* node) noexcept
 	{
-		typedef RedBlackTreeBaseNode Node;
+		typedef RedBlackTreeNode Node;
 		for (;;) {
 			Node* right = node->right;
 			if (!right) {
@@ -39,9 +39,9 @@ namespace slib
 		return node;
 	}
 	
-	SLIB_INLINE RedBlackTreeBaseNode* _priv_RedBlackTree_getPrevious(RedBlackTreeBaseNode* node) noexcept
+	SLIB_INLINE RedBlackTreeNode* _priv_RedBlackTree_getPrevious(RedBlackTreeNode* node) noexcept
 	{
-		typedef RedBlackTreeBaseNode Node;
+		typedef RedBlackTreeNode Node;
 		Node* left = node->left;
 		if (left) {
 			return _priv_RedBlackTree_getLast(left);
@@ -59,9 +59,9 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE RedBlackTreeBaseNode* _priv_RedBlackTree_getNext(RedBlackTreeBaseNode* node) noexcept
+	SLIB_INLINE RedBlackTreeNode* _priv_RedBlackTree_getNext(RedBlackTreeNode* node) noexcept
 	{
-		typedef RedBlackTreeBaseNode Node;
+		typedef RedBlackTreeNode Node;
 		Node* right = node->right;
 		if (right) {
 			return _priv_RedBlackTree_getFirst(right);
@@ -79,7 +79,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE void _priv_RedBlackTree_setLeft(RedBlackTreeBaseNode* node, RedBlackTreeBaseNode* left) noexcept
+	SLIB_INLINE void _priv_RedBlackTree_setLeft(RedBlackTreeNode* node, RedBlackTreeNode* left) noexcept
 	{
 		node->left = left;
 		if (left) {
@@ -87,7 +87,7 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE void _priv_RedBlackTree_setRight(RedBlackTreeBaseNode* node, RedBlackTreeBaseNode* right) noexcept
+	SLIB_INLINE void _priv_RedBlackTree_setRight(RedBlackTreeNode* node, RedBlackTreeNode* right) noexcept
 	{
 		node->right = right;
 		if (right) {
@@ -95,7 +95,7 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE void _priv_RedBlackTree_replaceChild(RedBlackTreeBaseNode* parent, RedBlackTreeBaseNode* oldChild, RedBlackTreeBaseNode* newChild, RedBlackTreeBaseNode** pRoot) noexcept
+	SLIB_INLINE void _priv_RedBlackTree_replaceChild(RedBlackTreeNode* parent, RedBlackTreeNode* oldChild, RedBlackTreeNode* newChild, RedBlackTreeNode** pRoot) noexcept
 	{
 		newChild->parent = parent;
 		if (parent) {
@@ -109,7 +109,7 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE void _priv_RedBlackTree_removeChild(RedBlackTreeBaseNode* parent, RedBlackTreeBaseNode* child, RedBlackTreeBaseNode** pRoot) noexcept
+	SLIB_INLINE void _priv_RedBlackTree_removeChild(RedBlackTreeNode* parent, RedBlackTreeNode* child, RedBlackTreeNode** pRoot) noexcept
 	{
 		if (parent) {
 			if (parent->left == child) {
@@ -122,7 +122,7 @@ namespace slib
 		}
 	}
 
-	SLIB_INLINE void _priv_RedBlackTree_rotateLeft(RedBlackTreeBaseNode* node, RedBlackTreeBaseNode* right, RedBlackTreeBaseNode* parent, RedBlackTreeBaseNode** pRoot) noexcept
+	SLIB_INLINE void _priv_RedBlackTree_rotateLeft(RedBlackTreeNode* node, RedBlackTreeNode* right, RedBlackTreeNode* parent, RedBlackTreeNode** pRoot) noexcept
 	{
 		_priv_RedBlackTree_setRight(node, right->left);
 		right->left = node;
@@ -130,7 +130,7 @@ namespace slib
 		_priv_RedBlackTree_replaceChild(parent, node, right, pRoot);
 	}
 	
-	SLIB_INLINE void _priv_RedBlackTree_rotateRight(RedBlackTreeBaseNode* node, RedBlackTreeBaseNode* left, RedBlackTreeBaseNode* parent, RedBlackTreeBaseNode** pRoot) noexcept
+	SLIB_INLINE void _priv_RedBlackTree_rotateRight(RedBlackTreeNode* node, RedBlackTreeNode* left, RedBlackTreeNode* parent, RedBlackTreeNode** pRoot) noexcept
 	{
 		_priv_RedBlackTree_setLeft(node, left->right);
 		left->right = node;
@@ -138,22 +138,22 @@ namespace slib
 		_priv_RedBlackTree_replaceChild(parent, node, left, pRoot);
 	}
 	
-	RedBlackTreeBaseNode* _priv_RedBlackTree::getPrevious(RedBlackTreeBaseNode* node) noexcept
+	RedBlackTreeNode* _priv_RedBlackTree::getPrevious(RedBlackTreeNode* node) noexcept
 	{
 		return _priv_RedBlackTree_getPrevious(node);
 	}
 	
-	RedBlackTreeBaseNode* _priv_RedBlackTree::getNext(RedBlackTreeBaseNode* node) noexcept
+	RedBlackTreeNode* _priv_RedBlackTree::getNext(RedBlackTreeNode* node) noexcept
 	{
 		return _priv_RedBlackTree_getNext(node);
 	}
 	
-	RedBlackTreeBaseNode* _priv_RedBlackTree::getFirst(RedBlackTreeBaseNode* node) noexcept
+	RedBlackTreeNode* _priv_RedBlackTree::getFirst(RedBlackTreeNode* node) noexcept
 	{
 		return _priv_RedBlackTree_getFirst(node);
 	}
 	
-	RedBlackTreeBaseNode* _priv_RedBlackTree::getLast(RedBlackTreeBaseNode* node) noexcept
+	RedBlackTreeNode* _priv_RedBlackTree::getLast(RedBlackTreeNode* node) noexcept
 	{
 		return _priv_RedBlackTree_getLast(node);
 	}
@@ -172,8 +172,9 @@ namespace slib
 	 
 	 */
 
-	void _priv_RedBlackTree::rebalanceAfterInsert(RedBlackTreeBaseNode* newNode, RedBlackTreeBaseNode** pRoot) noexcept
+	void _priv_RedBlackTree::rebalanceAfterInsert(RedBlackTreeNode* newNode, RedBlackTreeNode** pRoot) noexcept
 	{
+		typedef RedBlackTreeNode Node;
 		
 		newNode->flagRed = sl_true;
 		
@@ -255,8 +256,10 @@ namespace slib
 		
 	}
 	
-	void _priv_RedBlackTree::removeNode(RedBlackTreeBaseNode* node, RedBlackTreeBaseNode** pRoot) noexcept
+	void _priv_RedBlackTree::removeNode(RedBlackTreeNode* node, RedBlackTreeNode** pRoot) noexcept
 	{
+		typedef RedBlackTreeNode Node;
+		
 		sl_bool flagRed = node->flagRed;
 		Node* parent = node->parent;
 		Node* left = node->left;

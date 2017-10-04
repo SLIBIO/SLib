@@ -13,159 +13,109 @@
 
 #include "definition.h"
 
-#include "map_common.h"
-#include "node_position.h"
-#include "compare.h"
 #include "list.h"
+#include "map_common.h"
 
 namespace slib
 {
 	
-	template <class NODE>
-	class SLIB_EXPORT RedBlackTreeNodeBase
+	struct SLIB_EXPORT RedBlackTreeNode
 	{
-	public:
-		NODE* parent;
-		NODE* left;
-		NODE* right;
+		RedBlackTreeNode* parent;
+		RedBlackTreeNode* left;
+		RedBlackTreeNode* right;
 		sl_bool flagRed;
-		
-	public:
-		RedBlackTreeNodeBase();
+	};
 
-	public:
-		NODE* getNext() const noexcept;
-		
-		NODE* getPrevious() const noexcept;
-		
-		NODE* getFirst() const noexcept;
-		
-		NODE* getLast() const noexcept;
-		
-	private:
-		typedef RedBlackTreeNodeBase Node;
-		
-	};
-	
-	template <class KT, class VT>
-	class SLIB_EXPORT RedBlackTreeNode : public RedBlackTreeNodeBase< RedBlackTreeNode<KT, VT> >
-	{
-	public:
-		KT key;
-		VT value;
-		
-	public:
-		template <class KEY, class VALUE>
-		RedBlackTreeNode(KEY&& key, VALUE&& value) noexcept;
-		
-	};
-	
-	
-	template < class KT, class VT, class KEY_COMPARE = Compare<KT>, class NODE = RedBlackTreeNode<KT, VT> >
 	class SLIB_EXPORT RedBlackTree
 	{
 	public:
-		typedef NODE Node;
+		template <class NODE>
+		static NODE* getPreviousNode(NODE* node) noexcept;
 		
-	public:
-		RedBlackTree() noexcept;
+		template <class NODE>
+		static NODE* getNextNode(NODE* node) noexcept;
+		
+		template <class NODE>
+		static NODE* getFirstNode(NODE* root) noexcept;
+		
+		template <class NODE>
+		static NODE* getLastNode(NODE* root) noexcept;
+		
+		template <class NODE, class KEY, class KEY_COMPARE>
+		static NODE* tryFind(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, int& compare_result) noexcept;
+		
+		template <class NODE, class KEY, class KEY_COMPARE>
+		static sl_bool getEqualRange(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, NODE** pStart = sl_null, NODE** pEnd = sl_null) noexcept;
+		
+		template <class NODE, class KEY, class KEY_COMPARE>
+		static void getNearest(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, NODE** pLessEqual = sl_null, NODE** pGreaterEqual = sl_null) noexcept;
+		
+		template <class NODE, class KEY, class KEY_COMPARE>
+		static NODE* getLowerBound(NODE* look, const KEY& key, const KEY_COMPARE& key_compare) noexcept;
+		
+		template <class NODE, class KEY, class KEY_COMPARE>
+		static NODE* getUpperBound(NODE* look, const KEY& key, const KEY_COMPARE& key_compare) noexcept;
+		
+		template <class NODE, class KEY, class KEY_COMPARE>
+		static NODE* find(NODE* look, const KEY& key, const KEY_COMPARE& key_compare) noexcept;
 
-		template <class KEY_COMPARE_ARG>
-		RedBlackTree(KEY_COMPARE_ARG&& key_compare) noexcept;
-		
-		RedBlackTree(const RedBlackTree& other) = delete;
-		
-		RedBlackTree(RedBlackTree&& other) noexcept;
-		
-		~RedBlackTree() noexcept;
-		
-	public:
-		RedBlackTree& operator=(const RedBlackTree& other) = delete;
-		
-		RedBlackTree& operator=(RedBlackTree&& other) noexcept;
-	
-	public:
-		sl_size getCount() const noexcept;
-		
-		sl_bool isEmpty() const noexcept;
-		
-		sl_bool isNotEmpty() const noexcept;
-		
-		NODE* getRootNode() const noexcept;
-		
-		NODE* getFirstNode() const noexcept;
-		
-		NODE* getLastNode() const noexcept;
-		
-		NODE* tryFind(const KT& key, int* pCompareResult) const noexcept;
+		template <class NODE, class KEY, class KEY_COMPARE, class VALUE, class VALUE_EQUALS>
+		static NODE* findKeyAndValue(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, const VALUE& value, const VALUE_EQUALS& value_equals) noexcept;
 
-		NODE* find(const KT& key) const noexcept;
-		
-		void getBounds(const KT& key, NODE** pLessEqual = sl_null, NODE** pGreaterEqual = sl_null) const noexcept;
-		
-		sl_bool getEqualRange(const KT& key, NODE** pStart = sl_null, NODE** pEnd = sl_null) const noexcept;
-		
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		NODE* findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
-		
-		VT* getItemPointer(const KT& key) const noexcept;
-		
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		VT* getItemPointerByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
+		template <class VT, class NODE, class KEY, class KEY_COMPARE>
+		static void getValues(List<VT>& list, NODE* look, const KEY& key, const KEY_COMPARE& key_compare) noexcept;
 
-		sl_bool get(const KT& key, VT* value = sl_null) const noexcept;
+		template <class VT, class NODE, class KEY, class KEY_COMPARE, class VALUE, class VALUE_EQUALS>
+		static void getValuesByKeyAndValue(List<VT>& list, NODE* look, const KEY& key, const KEY_COMPARE& key_compare, const VALUE& value, const VALUE_EQUALS& value_equals) noexcept;
 		
-		VT getValue(const KT& key) const noexcept;
+		template <class NODE>
+		static void insertNode(NODE** pRoot, NODE* node, NODE* where, int compare_result) noexcept;
 		
-		VT getValue(const KT& key, const VT& def) const noexcept;
+		template <class NODE, class KEY_COMPARE>
+		static void addNode(NODE** pRoot, NODE* node, const KEY_COMPARE& key_compare) noexcept;
+		
+		template <class NODE, class KEY, class KEY_COMPARE, class VALUE>
+		static NODE* put(NODE** pRoot, sl_size& count, KEY&& key, const KEY_COMPARE& key_compare, VALUE&& value, sl_bool* isInsertion) noexcept;
+		
+		template <class NODE, class KEY, class KEY_COMPARE, class VALUE>
+		static NODE* replace(NODE* root, const KEY& key, const KEY_COMPARE& key_compare, VALUE&& value) noexcept;
+		
+		template <class NODE, class KEY, class KEY_COMPARE, class... VALUE_ARGS>
+		static NODE* add(NODE** pRoot, sl_size& count, KEY&& key, const KEY_COMPARE& key_compare, VALUE_ARGS&&... value_args) noexcept;
 
-		List<VT> getValues(const KT& key) const noexcept;
+		template <class NODE, class KEY, class KEY_COMPARE, class... VALUE_ARGS>
+		static MapEmplaceReturn<NODE> emplace(NODE** pRoot, sl_size& count, KEY&& key, const KEY_COMPARE& key_compare, VALUE_ARGS&&... value_args) noexcept;
+		
+		template <class NODE>
+		static void removeNode(NODE** pRoot, sl_size& count, NODE* node) noexcept;
 
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		List<VT> getValuesByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
-		
-		void insertNode(NODE* node, NODE* where, int compare_result) noexcept;
-		
-		void insertNode(NODE* node) noexcept;
-		
-		template <class KEY, class VALUE>
-		NODE* put(KEY&& key, VALUE&& value, sl_bool* isInsertion = sl_null) noexcept;
-		
-		template <class KEY, class VALUE>
-		NODE* replace(const KEY& key, VALUE&& value) noexcept;
-		
-		template <class KEY, class... VALUE_ARGS>
-		NODE* add(KEY&& key, VALUE_ARGS&&... value_args) noexcept;
-		
-		template <class KEY, class... VALUE_ARGS>
-		MapEmplaceReturn<NODE> emplace(KEY&& key, VALUE_ARGS&&... value_args) noexcept;
-		
-		void removeNode(NODE* node) noexcept;
+		template <class NODE>
+		static sl_size removeNodes(NODE** pRoot, sl_size& count, NODE* node, sl_size countRemove) noexcept;
 
-		sl_bool remove(const KT& key, VT* outValue = sl_null) noexcept;
+		template <class NODE>
+		static sl_size removeRange(NODE** pRoot, sl_size& count, NODE* node, NODE* last) noexcept;
 
-		sl_size removeItems(const KT& key, List<VT>* outValues = sl_null) noexcept;
+		template <class NODE, class KEY, class KEY_COMPARE, class VALUE>
+		sl_bool remove(NODE** pRoot, sl_size& count, const KEY& key, const KEY_COMPARE& key_compare, VALUE* outValue) noexcept;
 
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_bool removeKeyAndValue(const KT& key, const VALUE& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		template <class NODE, class KEY, class KEY_COMPARE>
+		static sl_size removeItems(NODE** pRoot, sl_size& count, const KEY& key, const KEY_COMPARE& key_compare) noexcept;
+		
+		template <class VT, class NODE, class KEY, class KEY_COMPARE>
+		static sl_size removeItemsAndReturnValues(List<VT>& list, NODE** pRoot, sl_size& count, const KEY& key, const KEY_COMPARE& key_compare) noexcept;
 
-		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
-		sl_size removeItemsByKeyAndValue(const KT& key, const VALUE& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) noexcept;
+		template <class NODE, class KEY, class KEY_COMPARE, class VALUE, class VALUE_EQUALS>
+		static sl_bool removeKeyAndValue(NODE** pRoot, sl_size& count, const KEY& key, const KEY_COMPARE& key_compare, const VALUE& value, const VALUE_EQUALS& value_equals) noexcept;
 		
-		sl_size removeAll() noexcept;
+		template <class NODE, class KEY, class KEY_COMPARE, class VALUE, class VALUE_EQUALS>
+		static sl_size removeItemsByKeyAndValue(NODE** pRoot, sl_size& count, const KEY& key, const KEY_COMPARE& key_compare, const VALUE& value, const VALUE_EQUALS& value_equals) noexcept;
 		
-		sl_bool copyFrom(const RedBlackTree<KT, VT, KEY_COMPARE, NODE>* other) noexcept;
+		template <class NODE>
+		static void freeNodes(NODE* node) noexcept;
 		
-		// range-based for loop
-		NodePosition<NODE> begin() const noexcept;
-		
-		NodePosition<NODE> end() const noexcept;
-		
-	private:
-		NODE* m_rootNode;
-		KEY_COMPARE m_compare;
-		
-		sl_size m_count;
+		template <class NODE>
+		static NODE* duplicateNode(NODE* other) noexcept;
 		
 	};
 	
