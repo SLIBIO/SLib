@@ -408,8 +408,11 @@ namespace slib
 	template <class T> class List;
 	template <class T> struct ArrayTraits< List<T> > : public ArrayTraits_ZeroInit {};
 	
-	template <class KT, class VT> class Map;
-	template <class KT, class VT> struct ArrayTraits< Map<KT, VT> > : public ArrayTraits_ZeroInit {};
+	template <class KT, class VT, class KEY_COMPARE> class Map;
+	template <class KT, class VT, class KEY_COMPARE> struct ArrayTraits< Map<KT, VT, KEY_COMPARE> > : public ArrayTraits_ZeroInit {};
+	
+	template <class KT, class VT, class HASH, class KEY_COMPARE> class HashMap;
+	template <class KT, class VT, class HASH, class KEY_COMPARE> struct ArrayTraits< HashMap<KT, VT, HASH, KEY_COMPARE> > : public ArrayTraits_ZeroInit {};
 
 	class Variant;
 	template <> struct ArrayTraits<Variant> : public ArrayTraits_ZeroInit {};
