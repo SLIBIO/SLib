@@ -97,7 +97,7 @@ namespace slib
 			return sl_false;
 		}
 		int compare_result;
-		look = tryFind(look, key, key_compare, &compare_result);
+		look = tryFind(look, key, key_compare, compare_result);
 		if (compare_result != 0) {
 			return sl_false;
 		}
@@ -256,7 +256,7 @@ namespace slib
 			return sl_null;
 		}
 		int compare_result;
-		NODE* node = tryFind(look, key, key_compare, &compare_result);
+		NODE* node = tryFind(look, key, key_compare, compare_result);
 		if (compare_result == 0) {
 			return node;
 		}
@@ -501,6 +501,9 @@ namespace slib
 				NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 				removeNode(pRoot, count, node);
 				node = next;
+				if (!node) {
+					break;
+				}
 			}
 		}
 		return n;
@@ -512,10 +515,10 @@ namespace slib
 		NODE* root = *pRoot;
 		if (root) {
 			int compare_result;
-			NODE* node = tryFind(root, key, key_compare, &compare_result);
+			NODE* node = tryFind(root, key, key_compare, compare_result);
 			if (compare_result == 0) {
 				if (outValue) {
-					outValue = Move(node->value);
+					*outValue = Move(node->value);
 				}
 				removeNode(pRoot, count, node);
 				return sl_true;

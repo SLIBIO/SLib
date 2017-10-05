@@ -18,33 +18,33 @@
 namespace slib
 {
 	
-	template <class KT, class VT>
+	template <class FIRST_T, class SECOND_T>
 	class SLIB_EXPORT Pair
 	{
 	public:
-		KT key;
-		VT value;
+		FIRST_T first;
+		SECOND_T second;
 
 	public:
 		SLIB_INLINE Pair() noexcept
 		 {}
 
-		SLIB_INLINE Pair(const Pair<KT, VT>& other)
+		SLIB_INLINE Pair(const Pair& other)
 		 = default;
 
-		SLIB_INLINE Pair(Pair<KT, VT>&& other)
+		SLIB_INLINE Pair(Pair&& other)
 		 = default;
 
-		template <class KEY, class VALUE>
-		SLIB_INLINE Pair(KEY&& _key, VALUE&& _value) noexcept
-		 : key(Forward<KEY>(_key)), value(Forward<VALUE>(_value))
+		template <class FIRST, class SECOND>
+		SLIB_INLINE Pair(FIRST&& _first, SECOND&& _second) noexcept
+		 : first(Forward<FIRST>(_first)), second(Forward<SECOND>(_second))
 		 {}
 
 	public:
-		SLIB_INLINE Pair<KT, VT>& operator=(const Pair<KT, VT>& other)
+		SLIB_INLINE Pair& operator=(const Pair& other)
 		 = default;
 
-		SLIB_INLINE Pair<KT, VT>& operator=(Pair<KT, VT>&& other)
+		SLIB_INLINE Pair& operator=(Pair&& other)
 		 = default;
 
 	};

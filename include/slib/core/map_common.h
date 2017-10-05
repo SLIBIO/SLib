@@ -16,12 +16,6 @@
 namespace slib
 {
 	
-	enum class MapContainerType
-	{
-		Hash = 0,
-		Tree = 1
-	};
-		
 	template <class NODE>
 	class SLIB_EXPORT MapEmplaceReturn
 	{

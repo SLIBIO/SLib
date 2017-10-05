@@ -97,7 +97,7 @@ namespace slib
 		static sl_size removeRange(NODE** pRoot, sl_size& count, NODE* node, NODE* last) noexcept;
 
 		template <class NODE, class KEY, class KEY_COMPARE, class VALUE>
-		sl_bool remove(NODE** pRoot, sl_size& count, const KEY& key, const KEY_COMPARE& key_compare, VALUE* outValue) noexcept;
+		static sl_bool remove(NODE** pRoot, sl_size& count, const KEY& key, const KEY_COMPARE& key_compare, VALUE* outValue) noexcept;
 
 		template <class NODE, class KEY, class KEY_COMPARE>
 		static sl_size removeItems(NODE** pRoot, sl_size& count, const KEY& key, const KEY_COMPARE& key_compare) noexcept;
