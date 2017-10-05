@@ -10,85 +10,47 @@
 
 namespace slib
 {
-
-	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	HashMap<KT, VT, HASH, KEY_EQUALS>::HashMap(const std::initializer_list< Pair<KT, VT> >& l, sl_uint32 capacity, const HASH& hash, const KEY_EQUALS& key_equals) noexcept
-	 : table(capacity)
-	{
-		const Pair<KT, VT>* data = l.begin();
-		for (sl_size i = 0; i < l.size(); i++) {
-			table.put(data[i].key, data[i].value, MapPutMode::AddAlways, sl_null);
-		}
-	}
-	
-	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	HashMap<KT, VT, HASH, KEY_EQUALS>* HashMap<KT, VT, HASH, KEY_EQUALS>::create(const std::initializer_list< Pair<KT, VT> >& l, sl_uint32 capacity, const HASH& hash, const KEY_EQUALS& key_equals) noexcept
-	{
-		HashMap<KT, VT, HASH, KEY_EQUALS>* ret = new HashMap<KT, VT, HASH, KEY_EQUALS>(l, capacity, hash, key_equals);
-		if (ret) {
-			if (ret->table.getCapacity() > 0) {
-				return ret;
-			}
-			delete ret;
-		}
-		return sl_null;
-	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	TreeMap<KT, VT, KEY_COMPARE>::TreeMap(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare) noexcept
-	 : tree(key_compare)
+	CMap<KT, VT, KEY_COMPARE>::CMap(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& compare) noexcept
+	 : m_compare(compare)
 	{
+		m_root = sl_null;
+		m_count = 0;
 		const Pair<KT, VT>* data = l.begin();
 		for (sl_size i = 0; i < l.size(); i++) {
-			tree.put(data[i].key, data[i].value, MapPutMode::AddAlways, sl_null);
+			RedBlackTree::add(&m_root, m_count, data[i].key, compare, data[i].value);
 		}
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	TreeMap<KT, VT, KEY_COMPARE>* TreeMap<KT, VT, KEY_COMPARE>::create(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare) noexcept
+	SLIB_INLINE Map<KT, VT, KEY_COMPARE>::Map(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& compare) noexcept
+	 : ref(new CMAP(l, compare))
+	{}
+
+	template <class KT, class VT, class KEY_COMPARE>
+	SLIB_INLINE Map<KT, VT, KEY_COMPARE> Map<KT, VT, KEY_COMPARE>::create(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& compare) noexcept
 	{
-		return new TreeMap<KT, VT, KEY_COMPARE>(l, key_compare);
+		return new CMAP(l, compare);
 	}
 
-	
-	template <class KT, class VT>
-	SLIB_INLINE Map<KT, VT>::Map(const std::initializer_list< Pair<KT, VT> >& l) noexcept
-	 : ref(HashMap<KT, VT>::create(l))
+	template <class KT, class VT, class KEY_COMPARE>
+	SLIB_INLINE Map<KT, VT, KEY_COMPARE>& Map<KT, VT, KEY_COMPARE>::operator=(const std::initializer_list< Pair<KT, VT> >& l) noexcept
 	{
-	}
-
-	template <class KT, class VT>
-	template <class HASH, class KEY_EQUALS>
-	Map<KT, VT> Map<KT, VT>::createHash(const std::initializer_list< Pair<KT, VT> >& l, sl_uint32 initialCapacity, const HASH& hash, const KEY_EQUALS& key_equals) noexcept
-	{
-		return HashMap<KT, VT, HASH, KEY_EQUALS>::create(l, initialCapacity, hash, key_equals);
-	}
-	
-	template <class KT, class VT>
-	template <class KEY_COMPARE>
-	Map<KT, VT> Map<KT, VT>::createTree(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare) noexcept
-	{
-		return TreeMap<KT, VT, KEY_COMPARE>::create(l, key_compare);
-	}
-
-	template <class KT, class VT>
-	SLIB_INLINE Map<KT, VT>& Map<KT, VT>::operator=(const std::initializer_list< Pair<KT, VT> >& l) noexcept
-	{
-		ref = HashMap<KT, VT>::create(l);
+		ref = new CMAP(l);
 		return *this;
 	}
 	
 	
-	template <class KT, class VT>
-	Atomic< Map<KT, VT> >::Atomic(const std::initializer_list< Pair<KT, VT> >& l) noexcept
-	 : ref(HashMap<KT, VT>::create(l))
-	{
-	}
+	template <class KT, class VT, class KEY_COMPARE>
+	Atomic< Map<KT, VT, KEY_COMPARE> >::Atomic(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& compare) noexcept
+	 : ref(new CMAP(l, compare))
+	{}
 	
-	template <class KT, class VT>
-	Atomic< Map<KT, VT> >& Atomic< Map<KT, VT> >::operator=(const std::initializer_list< Pair<KT, VT> >& l) noexcept
+	template <class KT, class VT, class KEY_COMPARE>
+	Atomic< Map<KT, VT, KEY_COMPARE> >& Atomic< Map<KT, VT, KEY_COMPARE> >::operator=(const std::initializer_list< Pair<KT, VT> >& l) noexcept
 	{
-		ref = HashMap<KT, VT>::create(l);
+		ref = new CMAP(l);
 		return *this;
 	}
 	
