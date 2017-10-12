@@ -1831,12 +1831,12 @@ namespace slib
 			m_container->len = len;
 		}
 	}
-
-
+	
+	
 	template <class CT>
-	SLIB_INLINE static sl_uint32 _priv_String_calcHash(const CT* buf, sl_size len) noexcept
+	SLIB_INLINE static sl_size _priv_String_calcHash(const CT* buf, sl_size len) noexcept
 	{
-		sl_uint32 hash = 0;
+		sl_size hash = 0;
 		for (sl_size i = 0; i < len; i++) {
 			sl_uint32 ch = buf[i];
 			hash = hash * 31 + ch;
@@ -1844,13 +1844,13 @@ namespace slib
 		hash = Rehash(hash);
 		return hash;
 	}
-
-	sl_uint32 String::getHashCode() const noexcept
+	
+	sl_size String::getHashCode() const noexcept
 	{
 		if (m_container) {
 			sl_size n = m_container->len;
 			if (n > 0) {
-				sl_uint32 hash = m_container->hash;
+				sl_size hash = m_container->hash;
 				if (hash == 0) {
 					hash = _priv_String_calcHash(m_container->sz, n);
 					m_container->hash = hash;
@@ -1860,13 +1860,13 @@ namespace slib
 		}
 		return 0;
 	}
-
-	sl_uint32 String16::getHashCode() const noexcept
+	
+	sl_size String16::getHashCode() const noexcept
 	{
 		if (m_container) {
 			sl_size n = m_container->len;
 			if (n > 0) {
-				sl_uint32 hash = m_container->hash;
+				sl_size hash = m_container->hash;
 				if (hash == 0) {
 					hash = _priv_String_calcHash(m_container->sz, n);
 					m_container->hash = hash;
@@ -1876,28 +1876,28 @@ namespace slib
 		}
 		return 0;
 	}
-
-	sl_uint32 Atomic<String>::getHashCode() const noexcept
+	
+	sl_size Atomic<String>::getHashCode() const noexcept
 	{
 		String s(*this);
 		return s.getHashCode();
 	}
-
-	sl_uint32 Atomic<String16>::getHashCode() const noexcept
+	
+	sl_size Atomic<String16>::getHashCode() const noexcept
 	{
 		String16 s(*this);
 		return s.getHashCode();
 	}
 
-
-	void String::setHashCode(sl_uint32 hash) noexcept
+	
+	void String::setHashCode(sl_size hash) noexcept
 	{
 		if (m_container && m_container != &_g_string8_empty_container) {
 			m_container->hash = hash;
 		}
 	}
 
-	void String16::setHashCode(sl_uint32 hash) noexcept
+	void String16::setHashCode(sl_size hash) noexcept
 	{
 		if (m_container && m_container != &_g_string16_empty_container) {
 			m_container->hash = hash;
@@ -1906,9 +1906,9 @@ namespace slib
 
 
 	template <class CT>
-	SLIB_INLINE static sl_uint32 _priv_String_calcHashIgnoreCase(const CT* buf, sl_size len) noexcept
+	SLIB_INLINE static sl_size _priv_String_calcHashIgnoreCase(const CT* buf, sl_size len) noexcept
 	{
-		sl_uint32 hash = 0;
+		sl_size hash = 0;
 		for (sl_size i = 0; i < len; i++) {
 			sl_uint32 ch = buf[i];
 			ch = SLIB_CHAR_LOWER_TO_UPPER(ch);
@@ -1917,38 +1917,38 @@ namespace slib
 		hash = Rehash(hash);
 		return hash;
 	}
-
-	sl_uint32 String::getHashCodeIgnoreCase() const noexcept
+	
+	sl_size String::getHashCodeIgnoreCase() const noexcept
 	{
 		if (m_container) {
 			sl_size n = m_container->len;
 			if (n > 0) {
-				sl_uint32 hash = _priv_String_calcHashIgnoreCase(m_container->sz, n);
+				sl_size hash = _priv_String_calcHashIgnoreCase(m_container->sz, n);
+				return hash;
+			}
+		}
+		return 0;
+	}
+	
+	sl_size String16::getHashCodeIgnoreCase() const noexcept
+	{
+		if (m_container) {
+			sl_size n = m_container->len;
+			if (n > 0) {
+				sl_size hash = _priv_String_calcHashIgnoreCase(m_container->sz, n);
 				return hash;
 			}
 		}
 		return 0;
 	}
 
-	sl_uint32 String16::getHashCodeIgnoreCase() const noexcept
-	{
-		if (m_container) {
-			sl_size n = m_container->len;
-			if (n > 0) {
-				sl_uint32 hash = _priv_String_calcHashIgnoreCase(m_container->sz, n);
-				return hash;
-			}
-		}
-		return 0;
-	}
-
-	sl_uint32 Atomic<String>::getHashCodeIgnoreCase() const noexcept
+	sl_size Atomic<String>::getHashCodeIgnoreCase() const noexcept
 	{
 		String s(*this);
 		return s.getHashCodeIgnoreCase();
 	}
 
-	sl_uint32 Atomic<String16>::getHashCodeIgnoreCase() const noexcept
+	sl_size Atomic<String16>::getHashCodeIgnoreCase() const noexcept
 	{
 		String16 s(*this);
 		return s.getHashCodeIgnoreCase();
@@ -3742,9 +3742,9 @@ namespace slib
 		if (len == 0) {
 			return sl_true;
 		}
-		sl_uint32 h1 = m_container->hash;
+		sl_size h1 = m_container->hash;
 		if (h1) {
-			sl_uint32 h2 = other.m_container->hash;
+			sl_size h2 = other.m_container->hash;
 			if (h2) {
 				if (h1 != h2) {
 					return sl_false;
@@ -3768,9 +3768,9 @@ namespace slib
 		if (len == 0) {
 			return sl_true;
 		}
-		sl_uint32 h1 = m_container->hash;
+		sl_size h1 = m_container->hash;
 		if (h1) {
-			sl_uint32 h2 = other.m_container->hash;
+			sl_size h2 = other.m_container->hash;
 			if (h2) {
 				if (h1 != h2) {
 					return sl_false;
@@ -8043,22 +8043,22 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 	}
 
 
-	sl_uint32 Hash<String>::operator()(const String& v) const noexcept
+	sl_size Hash<String>::operator()(const String& v) const noexcept
 	{
 		return v.getHashCode();
 	}
 
-	sl_uint32 Hash<String16>::operator()(const String16& v) const noexcept
+	sl_size Hash<String16>::operator()(const String16& v) const noexcept
 	{
 		return v.getHashCode();
 	}
 
-	sl_uint32 Hash<AtomicString>::operator()(const AtomicString& v) const noexcept
+	sl_size Hash<AtomicString>::operator()(const AtomicString& v) const noexcept
 	{
 		return v.getHashCode();
 	}
 
-	sl_uint32 Hash<AtomicString16>::operator()(const AtomicString16& v) const noexcept
+	sl_size Hash<AtomicString16>::operator()(const AtomicString16& v) const noexcept
 	{
 		return v.getHashCode();
 	}
@@ -8086,12 +8086,12 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 	}
 
 
-	sl_uint32 HashIgnoreCaseString::operator()(const String& v) const noexcept
+	sl_size HashIgnoreCaseString::operator()(const String& v) const noexcept
 	{
 		return v.getHashCodeIgnoreCase();
 	}
 
-	sl_uint32 HashIgnoreCaseString16::operator()(const String16& v) const noexcept
+	sl_size HashIgnoreCaseString16::operator()(const String16& v) const noexcept
 	{
 		return v.getHashCodeIgnoreCase();
 	}

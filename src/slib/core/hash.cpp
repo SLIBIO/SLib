@@ -16,17 +16,45 @@
 namespace slib
 {
 
-	// based on adler32
-	sl_uint32 HashBytes(const void* _buf, sl_size n) noexcept
+	/****************************************************
+	 
+		Fowler–Noll–Vo hash function / FNV-1a hash
+	 
+	 https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+	 http://www.isthe.com/chongo/tech/comp/fnv/index.html
+	 
+	****************************************************/
+	sl_uint32 HashBytes32(const void* _buf, sl_size n) noexcept
 	{
-		#define PRIV_SLIB_MOD_ADLER 65521
 		sl_uint8* buf = (sl_uint8*)_buf;
-		sl_uint32 a = 1, b = 0;
+		sl_uint32 hash = 0x811c9dc5;
+		sl_uint32 prime = 16777619;
 		for (sl_size i = 0; i < n; i++) {
-			a = (a + buf[i]) % PRIV_SLIB_MOD_ADLER;
-			b = (b + a) % PRIV_SLIB_MOD_ADLER;
+			hash ^= buf[i];
+			hash *= prime;
 		}
-		return Rehash((b << 16) | a);
+		return hash;
+	}
+	
+	sl_uint64 HashBytes64(const void* _buf, sl_size n) noexcept
+	{
+		sl_uint8* buf = (sl_uint8*)_buf;
+		sl_uint64 hash = SLIB_UINT64(0xcbf29ce484222325);
+		sl_uint64 prime = SLIB_UINT64(1099511628211);
+		for (sl_size i = 0; i < n; i++) {
+			hash ^= buf[i];
+			hash *= prime;
+		}
+		return hash;
+	}
+	
+	sl_size HashBytes(const void* buf, sl_size n) noexcept
+	{
+#ifdef SLIB_ARCH_IS_64BIT
+		return HashBytes64(buf, n);
+#else
+		return HashBytes32(buf, n);
+#endif
 	}
 
 	

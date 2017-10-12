@@ -236,7 +236,7 @@ namespace slib
 	public:
 		int compare(const IcmpEchoAddress& other) const;
 		
-		sl_uint32 hashCode() const;
+		sl_size hashCode() const;
 		
 	public:
 		sl_bool operator==(const IcmpEchoAddress& other) const;
@@ -265,7 +265,7 @@ namespace slib
 	class Hash<IcmpEchoAddress>
 	{
 	public:
-		sl_uint32 operator()(const IcmpEchoAddress& a) const;
+		sl_size operator()(const IcmpEchoAddress& a) const;
 		
 	};
 

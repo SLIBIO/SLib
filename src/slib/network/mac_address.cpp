@@ -106,9 +106,9 @@ namespace slib
 		return Base::compareMemory(m, other.m, 6);
 	}
 
-	sl_uint32 MacAddress::hashCode() const noexcept
+	sl_size MacAddress::hashCode() const noexcept
 	{
-		return HashBytes(m, 6);
+		return Rehash64ToSize(SLIB_MAKE_QWORD4(SLIB_MAKE_WORD(0, 0), SLIB_MAKE_DWORD(m[2], m[3], m[4], m[5])));
 	}
 
 	String MacAddress::toString(sl_char8 sep) const noexcept
@@ -216,7 +216,7 @@ namespace slib
 		return a == b;
 	}
 
-	sl_uint32 Hash<MacAddress>::operator()(const MacAddress& a) const noexcept
+	sl_size Hash<MacAddress>::operator()(const MacAddress& a) const noexcept
 	{
 		return a.hashCode();
 	}

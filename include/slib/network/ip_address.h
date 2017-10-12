@@ -83,7 +83,7 @@ namespace slib
 		
 		int compare(const IPv4Address& other) const noexcept;
 		
-		sl_uint32 hashCode() const noexcept;
+		sl_size hashCode() const noexcept;
 		
 		// "a.b.c.d"
 		String toString() const noexcept;
@@ -161,7 +161,7 @@ namespace slib
 	class Hash<IPv4Address>
 	{
 	public:
-		sl_uint32 operator()(const IPv4Address& a) const noexcept;
+		sl_size operator()(const IPv4Address& a) const noexcept;
 	};
 	
 	
@@ -256,7 +256,7 @@ namespace slib
 		
 		int compare(const IPv6Address& other) const noexcept;
 		
-		sl_uint32 hashCode() const noexcept;
+		sl_size hashCode() const noexcept;
 		
 		// "s0:s1:s2:s3:s4:s5:s6:s7"
 		String toString() const noexcept;
@@ -325,7 +325,7 @@ namespace slib
 	class Hash<IPv6Address>
 	{
 	public:
-		sl_uint32 operator()(const IPv6Address& a) const noexcept;
+		sl_size operator()(const IPv6Address& a) const noexcept;
 	};
 	
 	
@@ -378,7 +378,7 @@ namespace slib
 		
 		int compare(const IPAddress& other) const noexcept;
 		
-		sl_uint32 hashCode() const noexcept;
+		sl_size hashCode() const noexcept;
 		
 		String toString() const noexcept;
 		
@@ -446,7 +446,7 @@ namespace slib
 	class Hash<IPAddress>
 	{
 	public:
-		sl_uint32 operator()(const IPAddress& a) const noexcept;
+		sl_size operator()(const IPAddress& a) const noexcept;
 	};
 	
 }

@@ -68,7 +68,7 @@ namespace slib
 		
 		int compare(const MacAddress& other) const noexcept;
 		
-		sl_uint32 hashCode() const noexcept;
+		sl_size hashCode() const noexcept;
 		
 		// m0-m1-m2-m3-m4-m5, m0:m1:m2:m3:m4:m5
 		String toString(sl_char8 sep = '-') const noexcept;
@@ -128,7 +128,7 @@ namespace slib
 	class Hash<MacAddress>
 	{
 	public:
-		sl_uint32 operator()(const MacAddress& a) const noexcept;
+		sl_size operator()(const MacAddress& a) const noexcept;
 	};
 	
 }

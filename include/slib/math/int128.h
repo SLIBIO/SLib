@@ -290,7 +290,7 @@ namespace slib
 	class Hash<Uint128>
 	{
 	public:
-		sl_uint32 operator()(const Uint128& a) const noexcept;
+		sl_size operator()(const Uint128& a) const noexcept;
 	};
 
 }

@@ -413,7 +413,7 @@ namespace slib
 		sl_bool operator==(const IPv4PacketIdentifier& other) const;
 
 	public:
-		sl_uint32 hashCode() const;
+		sl_size hashCode() const;
 		
 	};
 
@@ -421,7 +421,7 @@ namespace slib
 	class Hash<IPv4PacketIdentifier>
 	{
 	public:
-		sl_uint32 operator()(const IPv4PacketIdentifier& v) const;
+		sl_size operator()(const IPv4PacketIdentifier& v) const;
 		
 	};
 

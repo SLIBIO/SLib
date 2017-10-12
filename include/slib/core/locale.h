@@ -660,9 +660,9 @@ namespace slib
 	class Hash<Locale>
 	{
 	public:
-		constexpr sl_uint32 operator()(const Locale& locale) const
+		constexpr sl_size operator()(const Locale& locale) const
 		{
-			return Rehash(locale.value);
+			return Rehash32(locale.value);
 		}
 
 	};

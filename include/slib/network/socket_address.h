@@ -49,7 +49,7 @@ namespace slib
 		
 		int compare(const SocketAddress& other) const noexcept;
 		
-		sl_uint32 hashCode() const noexcept;
+		sl_size hashCode() const noexcept;
 		
 		/*
 		 Address Format
@@ -131,7 +131,7 @@ namespace slib
 	class Hash<SocketAddress>
 	{
 	public:
-		sl_uint32 operator()(const SocketAddress& a) const noexcept;
+		sl_size operator()(const SocketAddress& a) const noexcept;
 	};
 
 }

@@ -479,17 +479,17 @@ namespace slib
 		return source == other.source && destination == other.destination && identification == other.identification && protocol == other.protocol;
 	}
 	
-	sl_uint32 IPv4PacketIdentifier::hashCode() const
+	sl_size IPv4PacketIdentifier::hashCode() const
 	{
 		sl_uint64 t = source.hashCode();
 		t *= 961;
 		t += destination.hashCode();
 		t *= 31;
 		t += SLIB_MAKE_DWORD2(identification, protocol);
-		return Hash64(t);
+		return Rehash64ToSize(t);
 	}
 	
-	sl_uint32 Hash<IPv4PacketIdentifier>::operator()(const IPv4PacketIdentifier& v) const
+	sl_size Hash<IPv4PacketIdentifier>::operator()(const IPv4PacketIdentifier& v) const
 	{
 		return v.hashCode();
 	}

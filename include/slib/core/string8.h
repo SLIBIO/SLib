@@ -42,7 +42,7 @@ namespace slib
 	public:
 		sl_char8* sz;
 		sl_size len;
-		sl_uint32 hash;
+		sl_size hash;
 		sl_uint32 type;
 		sl_reg ref;
 		
@@ -282,19 +282,19 @@ namespace slib
 		/**
 		 * @return the hash code.
 		 */
-		sl_uint32 getHashCode() const noexcept;
+		sl_size getHashCode() const noexcept;
 		
 		/**
 		 * Sets the hash code.
 		 *
 		 * Don't use for null or empty string
 		 */
-		void setHashCode(sl_uint32 hash) noexcept;
+		void setHashCode(sl_size hash) noexcept;
 		
 		/**
 		 * @return the hash code ignoring the case.
 		 */
-		sl_uint32 getHashCodeIgnoreCase() const noexcept;
+		sl_size getHashCodeIgnoreCase() const noexcept;
 		
 		/**
 		 * @return the character at `index` in string.
@@ -1331,12 +1331,12 @@ namespace slib
 		/**
 		 * @return the hash code.
 		 */
-		sl_uint32 getHashCode() const noexcept;
+		sl_size getHashCode() const noexcept;
 		
 		/**
 		 * @return the hash code ignoring the case.
 		 */
-		sl_uint32 getHashCodeIgnoreCase() const noexcept;
+		sl_size getHashCodeIgnoreCase() const noexcept;
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
 		/**
@@ -2034,14 +2034,14 @@ namespace slib
 	class Hash<String>
 	{
 	public:
-		sl_uint32 operator()(const String& a) const noexcept;
+		sl_size operator()(const String& a) const noexcept;
 	};
 	
 	template <>
 	class Hash<AtomicString>
 	{
 	public:
-		sl_uint32 operator()(const AtomicString& a) const noexcept;
+		sl_size operator()(const AtomicString& a) const noexcept;
 	};
 	
 	class CompareIgnoreCaseString
@@ -2059,7 +2059,7 @@ namespace slib
 	class HashIgnoreCaseString
 	{
 	public:
-		sl_uint32 operator()(const String& v) const noexcept;
+		sl_size operator()(const String& v) const noexcept;
 		
 	};
 

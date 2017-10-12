@@ -150,11 +150,9 @@ namespace slib
 		return c;
 	}
 
-	sl_uint32 IcmpEchoAddress::hashCode() const
+	sl_size IcmpEchoAddress::hashCode() const
 	{
-		sl_uint64 t = ip.hashCode();
-		t = t * 31 + SLIB_MAKE_DWORD2(identifier, sequenceNumber);
-		return Hash64(t);
+		return Rehash64ToSize(SLIB_MAKE_QWORD4(SLIB_MAKE_DWORD2(identifier, sequenceNumber), ip.getInt()));
 	}
 
 	sl_bool IcmpEchoAddress::operator == (const IcmpEchoAddress& other) const
@@ -177,7 +175,7 @@ namespace slib
 		return a == b;
 	}
 
-	sl_uint32 Hash<IcmpEchoAddress>::operator()(const IcmpEchoAddress& a) const
+	sl_size Hash<IcmpEchoAddress>::operator()(const IcmpEchoAddress& a) const
 	{
 		return a.hashCode();
 	}

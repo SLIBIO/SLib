@@ -61,9 +61,9 @@ namespace slib
 	class Hash<Keycode>
 	{
 	public:
-		constexpr sl_uint32 operator()(const Keycode& code) const
+		constexpr sl_size operator()(const Keycode& code) const
 		{
-			return Rehash((sl_uint32)code);
+			return Rehash32((sl_uint32)code);
 		}
 		
 	};

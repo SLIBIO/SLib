@@ -62,11 +62,9 @@ namespace slib
 		return c;
 	}
 	
-	sl_uint32 SocketAddress::hashCode() const noexcept
+	sl_size SocketAddress::hashCode() const noexcept
 	{
-		sl_uint64 t = ip.hashCode();
-		t = t * 31 + port;
-		return Hash64(t);
+		return Rehash64ToSize((((sl_uint64)port) << 32) ^ ip.hashCode());
 	}
 	
 	String SocketAddress::toString() const noexcept
@@ -276,7 +274,7 @@ namespace slib
 		return a == b;
 	}
 	
-	sl_uint32 Hash<SocketAddress>::operator()(const SocketAddress& a) const noexcept
+	sl_size Hash<SocketAddress>::operator()(const SocketAddress& a) const noexcept
 	{
 		return a.hashCode();
 	}

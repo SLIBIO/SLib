@@ -101,9 +101,9 @@ namespace slib
 		return (p1 < p2) ? -1 : (p1 > p2);
 	}
 
-	sl_uint32 IPv4Address::hashCode() const noexcept
+	sl_size IPv4Address::hashCode() const noexcept
 	{
-		return Rehash(getInt());
+		return Rehash32(getInt());
 	}
 
 	String IPv4Address::toString() const noexcept
@@ -256,7 +256,7 @@ namespace slib
 		return a == b;
 	}
 
-	sl_uint32 Hash<IPv4Address>::operator()(const IPv4Address& a) const noexcept
+	sl_size Hash<IPv4Address>::operator()(const IPv4Address& a) const noexcept
 	{
 		return a.hashCode();
 	}
@@ -418,9 +418,9 @@ namespace slib
 		return Base::compareMemory(m, other.m, 16);
 	}
 
-	sl_uint32 IPv6Address::hashCode() const noexcept
+	sl_size IPv6Address::hashCode() const noexcept
 	{
-		return HashBytes(m, 16);
+		return Rehash64ToSize(SLIB_MAKE_QWORD(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7]) ^ SLIB_MAKE_QWORD(m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]));
 	}
 
 	String IPv6Address::toString() const noexcept
@@ -606,7 +606,7 @@ namespace slib
 		return a == b;
 	}
 
-	sl_uint32 Hash<IPv6Address>::operator()(const IPv6Address& a) const noexcept
+	sl_size Hash<IPv6Address>::operator()(const IPv6Address& a) const noexcept
 	{
 		return a.hashCode();
 	}
@@ -682,7 +682,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_uint32 IPAddress::hashCode() const noexcept
+	sl_size IPAddress::hashCode() const noexcept
 	{
 		switch (type) {
 			case IPAddressType::None:
@@ -815,7 +815,7 @@ namespace slib
 		return a == b;
 	}
 
-	sl_uint32 Hash<IPAddress>::operator()(const IPAddress& a) const noexcept
+	sl_size Hash<IPAddress>::operator()(const IPAddress& a) const noexcept
 	{
 		return a.hashCode();
 	}

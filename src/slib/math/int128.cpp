@@ -888,9 +888,9 @@ namespace slib
 		return a == b;
 	}
 
-	sl_uint32 Hash<Uint128>::operator()(const Uint128& v) const noexcept
+	sl_size Hash<Uint128>::operator()(const Uint128& v) const noexcept
 	{
-		return Rehash((sl_uint32)(v.high ^ (v.high >> 32) ^ v.low ^ (v.low >> 32)));
+		return Rehash64ToSize(v.high ^ v.low);
 	}
 
 }
