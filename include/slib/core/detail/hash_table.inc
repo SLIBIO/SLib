@@ -11,43 +11,52 @@
 namespace slib
 {
 	
-	class HashTableBaseNode
+	class HashTableNodeBase
 	{
 	public:
-		HashTableBaseNode* next;
-		sl_uint32 hash;
+		HashTableNodeBase* next;
+		sl_size hash;
 	};
 	
-	struct HashTableBaseTable
+	struct HashTableStructBase
 	{
-		HashTableBaseNode** nodes;
+		HashTableNodeBase** nodes;
 		sl_size count;
-		sl_uint32 capacity;
-		sl_uint32 capacityMin;
-		sl_uint32 thresholdUp;
-		sl_uint32 thresholdDown;
+		sl_size capacity;
+		sl_size capacityMinimum;
+		sl_size capacityMaximum;
+		sl_size thresholdDown;
+		sl_size thresholdUp;
 	};
 	
 	class _priv_HashTable
 	{
 	public:
-		typedef HashTableBaseNode Node;
-		typedef HashTableBaseTable Table;
+		typedef HashTableNodeBase NODE;
+		typedef HashTableStructBase TABLE;
 		
 	public:
-		static void init(Table* table) noexcept;
+		static void fixCapacityRange(TABLE* table) noexcept;
 		
-		static void init(Table* table, sl_uint32 capacity) noexcept;
+		static void updateThresholds(TABLE* table) noexcept;
 		
-		static sl_bool validateNodes(Table* table) noexcept;
+		static void init(TABLE* table, sl_size capacityMinimum, sl_size capacityMaximum) noexcept;
 		
-		static sl_bool createNodes(Table* table, sl_uint32 capacity) noexcept;
+		static void move(TABLE* dst, TABLE* src) noexcept;
+
+		static void clear(TABLE* table) noexcept;
 		
-		static sl_bool reallocNodes(Table* table, sl_uint32 capacity) noexcept;
+		static void setMinimumCapacity(TABLE* table, sl_size capacity);
 		
-		static void expand(Table* table) noexcept;
+		static void setMaximumCapacity(TABLE* table, sl_size capacity);
+
+		static sl_bool validateNodes(TABLE* table) noexcept;
 		
-		static void shrink(Table* table) noexcept;
+		static sl_bool reallocNodes(TABLE* table, sl_size capacity) noexcept;
+		
+		static void expand(TABLE* table) noexcept;
+		
+		static void shrink(TABLE* table) noexcept;
 		
 		template <class KT, class VT>
 		static void free(HashTableStruct<KT, VT>* table) noexcept;
@@ -107,42 +116,19 @@ namespace slib
 		}
 		return *this;
 	}
-
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	HashTable<KT, VT, HASH, KEY_EQUALS>::HashTable() noexcept
+	HashTable<KT, VT, HASH, KEY_EQUALS>::HashTable(sl_size capacityMinimum, sl_size capacityMaximum, const HASH& hash, const KEY_EQUALS& equals) noexcept
+	 : m_hash(hash), m_equals(equals)
 	{
-		_priv_HashTable::init(reinterpret_cast<HashTableBaseTable*>(&m_table));
-	}
-	
-	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	HashTable<KT, VT, HASH, KEY_EQUALS>::HashTable(sl_uint32 capacity) noexcept
-	{
-		_priv_HashTable::init(reinterpret_cast<HashTableBaseTable*>(&m_table), capacity);
-	}
-	
-	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	template <class HASH_ARG>
-	HashTable<KT, VT, HASH, KEY_EQUALS>::HashTable(sl_uint32 capacity, HASH_ARG&& hash) noexcept
-	 : m_hash(Forward<HASH_ARG>(hash))
-	{
-		_priv_HashTable::init(reinterpret_cast<HashTableBaseTable*>(&m_table), capacity);
-	}
-	
-	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	template <class HASH_ARG, class KEY_EQUALS_ARG>
-	HashTable<KT, VT, HASH, KEY_EQUALS>::HashTable(sl_uint32 capacity, HASH_ARG&& hash, KEY_EQUALS_ARG&& equals) noexcept
-	 : m_hash(Forward<HASH_ARG>(hash)), m_equals(Forward<KEY_EQUALS_ARG>(equals))
-	{
-		_priv_HashTable::init(reinterpret_cast<HashTableBaseTable*>(&m_table), capacity);
+		_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), capacityMinimum, capacityMaximum);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	HashTable<KT, VT, HASH, KEY_EQUALS>::HashTable(HashTable<KT, VT, HASH, KEY_EQUALS>&& other) noexcept
 	: m_hash(Move(other.m_hash)), m_equals(Move(other.m_equals))
 	{
-		Base::copyMemory(&m_table, &(other.m_table), sizeof(Table));
-		_priv_HashTable::init(reinterpret_cast<HashTableBaseTable*>(&(other.m_table)));
+		_priv_HashTable::move(reinterpret_cast<HashTableStructBase*>(&m_table), reinterpret_cast<HashTableStructBase*>(&(other.m_table)));
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
@@ -155,8 +141,7 @@ namespace slib
 	HashTable<KT, VT, HASH, KEY_EQUALS>& HashTable<KT, VT, HASH, KEY_EQUALS>::operator=(HashTable<KT, VT, HASH, KEY_EQUALS>&& other) noexcept
 	{
 		_priv_HashTable::free(&m_table);
-		Base::copyMemory(&m_table, &(other.m_table), sizeof(Table));
-		_priv_HashTable::init(reinterpret_cast<HashTableBaseTable*>(&(other.m_table)));
+		_priv_HashTable::move(reinterpret_cast<HashTableStructBase*>(&m_table), reinterpret_cast<HashTableStructBase*>(&(other.m_table)));
 		m_hash = Move(other.m_hash);
 		m_equals = Move(other.m_equals);
 		return *this;
@@ -185,17 +170,41 @@ namespace slib
 	{
 		return m_table.capacity;
 	}
+	
+	template <class KT, class VT, class HASH, class KEY_EQUALS>
+	SLIB_INLINE sl_size HashTable<KT, VT, HASH, KEY_EQUALS>::getMinimumCapacity() const noexcept
+	{
+		return m_table.capacityMinimum;
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_EQUALS>
+	SLIB_INLINE void HashTable<KT, VT, HASH, KEY_EQUALS>::setMinimumCapacity(sl_size capacity) noexcept
+	{
+		_priv_HashTable::setMinimumCapacity(reinterpret_cast<HashTableStructBase*>(&m_table), capacity);
+	}
+
+	template <class KT, class VT, class HASH, class KEY_EQUALS>
+	SLIB_INLINE sl_size HashTable<KT, VT, HASH, KEY_EQUALS>::getMaximumCapacity() const noexcept
+	{
+		return m_table.capacityMaximum;
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_EQUALS>
+	SLIB_INLINE void HashTable<KT, VT, HASH, KEY_EQUALS>::setMaximumCapacity(sl_size capacity) noexcept
+	{
+		_priv_HashTable::setMaximumCapacity(reinterpret_cast<HashTableStructBase*>(&m_table), capacity);
+	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	HashTableNode<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::find(const KT& key) const noexcept
 	{
-		sl_uint32 capacity = m_table.capacity;
+		sl_size capacity = m_table.capacity;
 		if (capacity == 0) {
 			return sl_null;
 		}
-		sl_uint32 hash = m_hash(key);
-		sl_uint32 index = hash & (capacity - 1);
-		Node* node = m_table.nodes[index];
+		sl_size hash = m_hash(key);
+		sl_size index = hash & (capacity - 1);
+		NODE* node = m_table.nodes[index];
 		while (node) {
 			if (node->hash == hash && m_equals(node->key, key)) {
 				return node;
@@ -209,13 +218,13 @@ namespace slib
 	template <class VALUE, class VALUE_EQUALS>
 	HashTableNode<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
 	{
-		sl_uint32 capacity = m_table.capacity;
+		sl_size capacity = m_table.capacity;
 		if (capacity == 0) {
 			return sl_null;
 		}
-		sl_uint32 hash = m_hash(key);
-		sl_uint32 index = hash & (capacity - 1);
-		Node* node = m_table.nodes[index];
+		sl_size hash = m_hash(key);
+		sl_size index = hash & (capacity - 1);
+		NODE* node = m_table.nodes[index];
 		while (node) {
 			if (node->hash == hash && m_equals(node->key, key) && value_equals(node->value, value)) {
 				return node;
@@ -228,7 +237,7 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	VT* HashTable<KT, VT, HASH, KEY_EQUALS>::getItemPointer(const KT& key) const noexcept
 	{
-		Node* node = find(key);
+		NODE* node = find(key);
 		if (node) {
 			return &(node->value);
 		}
@@ -239,7 +248,7 @@ namespace slib
 	template <class VALUE, class VALUE_EQUALS>
 	VT* HashTable<KT, VT, HASH, KEY_EQUALS>::getItemPointerByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
 	{
-		Node* node = findKeyAndValue(key, value, value_equals);
+		NODE* node = findKeyAndValue(key, value, value_equals);
 		if (node) {
 			return &(node->value);
 		}
@@ -249,7 +258,7 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::get(const KT& key, VT* value) const noexcept
 	{
-		Node* node = find(key);
+		NODE* node = find(key);
 		if (node) {
 			if (value) {
 				*value = node->value;
@@ -262,7 +271,7 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	VT HashTable<KT, VT, HASH, KEY_EQUALS>::getValue(const KT& key) const noexcept
 	{
-		Node* node = find(key);
+		NODE* node = find(key);
 		if (node) {
 			return node->value;
 		} else {
@@ -273,7 +282,7 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	VT HashTable<KT, VT, HASH, KEY_EQUALS>::getValue(const KT& key, const VT& def) const noexcept
 	{
-		Node* node = find(key);
+		NODE* node = find(key);
 		if (node) {
 			return node->value;
 		}
@@ -283,14 +292,14 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	List<VT> HashTable<KT, VT, HASH, KEY_EQUALS>::getValues(const KT& key) const noexcept
 	{
-		sl_uint32 capacity = m_table.capacity;
+		sl_size capacity = m_table.capacity;
 		if (capacity == 0) {
 			return sl_null;
 		}
 		List<VT> ret;
-		sl_uint32 hash = m_hash(key);
-		sl_uint32 index = hash & (capacity - 1);
-		Node* node = m_table.nodes[index];
+		sl_size hash = m_hash(key);
+		sl_size index = hash & (capacity - 1);
+		NODE* node = m_table.nodes[index];
 		while (node) {
 			if (node->hash == hash && m_equals(node->key, key)) {
 				ret.add_NoLock(node->value);
@@ -304,14 +313,14 @@ namespace slib
 	template <class VALUE, class VALUE_EQUALS>
 	List<VT> HashTable<KT, VT, HASH, KEY_EQUALS>::getValuesByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
 	{
-		sl_uint32 capacity = m_table.capacity;
+		sl_size capacity = m_table.capacity;
 		if (capacity == 0) {
 			return sl_null;
 		}
 		List<VT> ret;
-		sl_uint32 hash = m_hash(key);
-		sl_uint32 index = hash & (capacity - 1);
-		Node* node = m_table.nodes[index];
+		sl_size hash = m_hash(key);
+		sl_size index = hash & (capacity - 1);
+		NODE* node = m_table.nodes[index];
 		while (node) {
 			if (node->hash == hash && m_equals(node->key, key) && value_equals(node->value, value)) {
 				ret.add_NoLock(node->value);
@@ -325,12 +334,12 @@ namespace slib
 	template <class KEY, class VALUE>
 	HashTableNode<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::put(KEY&& key, VALUE&& value, sl_bool* isInsertion) noexcept
 	{
-		sl_uint32 capacity = m_table.capacity;
-		sl_uint32 hash = m_hash(key);
-		sl_uint32 index = hash & (capacity - 1);
+		sl_size capacity = m_table.capacity;
+		sl_size hash = m_hash(key);
+		sl_size index = hash & (capacity - 1);
 		
-		Node** nodes = m_table.nodes;
-		Node* node = nodes[index];
+		NODE** nodes = m_table.nodes;
+		NODE* node = nodes[index];
 		while (node) {
 			if (node->hash == hash && m_equals(node->key, key)) {
 				node->value = Forward<VALUE>(value);
@@ -341,16 +350,16 @@ namespace slib
 			}
 			node = node->next;
 		}
-		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableBaseTable*>(&m_table)))) {
+		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
 			return sl_null;
 		}
-		node = new Node(Forward<KEY>(key), Forward<VALUE>(value));
+		node = new NODE(Forward<KEY>(key), Forward<VALUE>(value));
 		if (node) {
 			(m_table.count)++;
 			node->hash = hash;
 			node->next = nodes[index];
 			nodes[index] = node;
-			_priv_HashTable::expand(reinterpret_cast<HashTableBaseTable*>(&m_table));
+			_priv_HashTable::expand(reinterpret_cast<HashTableStructBase*>(&m_table));
 			if (isInsertion) {
 				*isInsertion = sl_true;
 			}
@@ -366,7 +375,7 @@ namespace slib
 	template <class KEY, class VALUE>
 	HashTableNode<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::replace(const KEY& key, VALUE&& value) noexcept
 	{
-		Node* node = find(key);
+		NODE* node = find(key);
 		if (node) {
 			node->value = Forward<VALUE>(value);
 			return node;
@@ -378,20 +387,20 @@ namespace slib
 	template <class KEY, class... VALUE_ARGS>
 	HashTableNode<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::add(KEY&& key, VALUE_ARGS&&... value_args) noexcept
 	{
-		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableBaseTable*>(&m_table)))) {
+		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
 			return sl_null;
 		}
-		Node* node = new Node(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
+		NODE* node = new NODE(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 		if (node) {
-			sl_uint32 capacity = m_table.capacity;
-			sl_uint32 hash = m_hash(key);
-			sl_uint32 index = hash & (capacity - 1);
-			Node** nodes = m_table.nodes;
+			sl_size capacity = m_table.capacity;
+			sl_size hash = m_hash(key);
+			sl_size index = hash & (capacity - 1);
+			NODE** nodes = m_table.nodes;
 			(m_table.count)++;
 			node->hash = hash;
 			node->next = nodes[index];
 			nodes[index] = node;
-			_priv_HashTable::expand(reinterpret_cast<HashTableBaseTable*>(&m_table));
+			_priv_HashTable::expand(reinterpret_cast<HashTableStructBase*>(&m_table));
 			return node;
 		}
 		return sl_null;
@@ -401,28 +410,28 @@ namespace slib
 	template <class KEY, class... VALUE_ARGS>
 	MapEmplaceReturn< HashTableNode<KT, VT> > HashTable<KT, VT, HASH, KEY_EQUALS>::emplace(KEY&& key, VALUE_ARGS&&... value_args) noexcept
 	{
-		sl_uint32 capacity = m_table.capacity;
-		sl_uint32 hash = m_hash(key);
-		sl_uint32 index = hash & (capacity - 1);
+		sl_size capacity = m_table.capacity;
+		sl_size hash = m_hash(key);
+		sl_size index = hash & (capacity - 1);
 		
-		Node** nodes = m_table.nodes;
-		Node* node = nodes[index];
+		NODE** nodes = m_table.nodes;
+		NODE* node = nodes[index];
 		while (node) {
 			if (node->hash == hash && m_equals(node->key, key)) {
 				return MapEmplaceReturn< HashTableNode<KT, VT> >(sl_false, node);
 			}
 			node = node->next;
 		}
-		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableBaseTable*>(&m_table)))) {
+		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
 			return sl_null;
 		}
-		node = new Node(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
+		node = new NODE(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 		if (node) {
 			(m_table.count)++;
 			node->hash = hash;
 			node->next = nodes[index];
 			nodes[index] = node;
-			_priv_HashTable::expand(reinterpret_cast<HashTableBaseTable*>(&m_table));
+			_priv_HashTable::expand(reinterpret_cast<HashTableStructBase*>(&m_table));
 			return MapEmplaceReturn< HashTableNode<KT, VT> >(sl_true, node);
 		}
 		return sl_null;
@@ -431,18 +440,18 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::removeAt(const HashTableNode<KT, VT>* nodeRemove) noexcept
 	{
-		sl_uint32 capacity = m_table.capacity;
+		sl_size capacity = m_table.capacity;
 		if (capacity == 0) {
 			return sl_null;
 		}
 		
-		sl_uint32 hash = nodeRemove->hash;
-		sl_uint32 index = hash & (capacity - 1);
+		sl_size hash = nodeRemove->hash;
+		sl_size index = hash & (capacity - 1);
 		
-		Node** link = m_table.nodes + index;
-		Node* node = *link;
+		NODE** link = m_table.nodes + index;
+		NODE* node = *link;
 		while (node) {
-			Node* next = node->next;
+			NODE* next = node->next;
 			if (node == nodeRemove) {
 				*link = next;
 				(m_table.count)--;
@@ -459,18 +468,18 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::remove(const KT& key, VT* outValue) noexcept
 	{
-		sl_uint32 capacity = m_table.capacity;
+		sl_size capacity = m_table.capacity;
 		if (capacity == 0) {
 			return sl_false;
 		}
 
-		sl_uint32 hash = m_hash(key);
-		sl_uint32 index = hash & (capacity - 1);
+		sl_size hash = m_hash(key);
+		sl_size index = hash & (capacity - 1);
 		
-		Node** link = m_table.nodes + index;
-		Node* node = *link;
+		NODE** link = m_table.nodes + index;
+		NODE* node = *link;
 		while (node) {
-			Node* next = node->next;
+			NODE* next = node->next;
 			if (node->hash == hash && m_equals(node->key, key)) {
 				*link = next;
 				(m_table.count)--;
@@ -490,20 +499,20 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_size HashTable<KT, VT, HASH, KEY_EQUALS>::removeItems(const KT& key) noexcept
 	{
-		sl_uint32 capacity = m_table.capacity;
+		sl_size capacity = m_table.capacity;
 		if (capacity == 0) {
 			return 0;
 		}
 		
-		sl_uint32 hash = m_hash(key);
-		sl_uint32 index = hash & (capacity - 1);
+		sl_size hash = m_hash(key);
+		sl_size index = hash & (capacity - 1);
 		
-		Node** link = m_table.nodes + index;
-		Node* node = *link;
-		Node* nodeDelete = sl_null;
-		Node** linkDelete = &nodeDelete;
+		NODE** link = m_table.nodes + index;
+		NODE* node = *link;
+		NODE* nodeDelete = sl_null;
+		NODE** linkDelete = &nodeDelete;
 		while ((node = *link)) {
-			Node* next = node->next;
+			NODE* next = node->next;
 			if (node->hash == hash && m_equals(node->key, key)) {
 				*link = next;
 				*linkDelete = node;
@@ -531,21 +540,21 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	List<VT> HashTable<KT, VT, HASH, KEY_EQUALS>::removeItemsAndReturnValues(const KT& key) noexcept
 	{
-		sl_uint32 capacity = m_table.capacity;
+		sl_size capacity = m_table.capacity;
 		if (capacity == 0) {
 			return sl_null;
 		}
 		
-		sl_uint32 hash = m_hash(key);
-		sl_uint32 index = hash & (capacity - 1);
+		sl_size hash = m_hash(key);
+		sl_size index = hash & (capacity - 1);
 		
 		List<VT> ret;
-		Node** link = m_table.nodes + index;
-		Node* node = *link;
-		Node* nodeDelete = sl_null;
-		Node** linkDelete = &nodeDelete;
+		NODE** link = m_table.nodes + index;
+		NODE* node = *link;
+		NODE* nodeDelete = sl_null;
+		NODE** linkDelete = &nodeDelete;
 		while ((node = *link)) {
-			Node* next = node->next;
+			NODE* next = node->next;
 			if (node->hash == hash && m_equals(node->key, key)) {
 				*link = next;
 				ret.add_NoLock(Move(node->value));
@@ -575,18 +584,18 @@ namespace slib
 	template <class VALUE, class VALUE_EQUALS>
 	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::removeKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) noexcept
 	{
-		sl_uint32 capacity = m_table.capacity;
+		sl_size capacity = m_table.capacity;
 		if (capacity == 0) {
 			return sl_false;
 		}
 		
-		sl_uint32 hash = m_hash(key);
-		sl_uint32 index = hash & (capacity - 1);
+		sl_size hash = m_hash(key);
+		sl_size index = hash & (capacity - 1);
 		
-		Node** link = m_table.nodes + index;
-		Node* node = *link;
+		NODE** link = m_table.nodes + index;
+		NODE* node = *link;
 		while (node) {
-			Node* next = node->next;
+			NODE* next = node->next;
 			if (node->hash == hash && m_equals(node->key, key) && value_equals(node->value, value)) {
 				*link = next;
 				(m_table.count)--;
@@ -604,20 +613,20 @@ namespace slib
 	template <class VALUE, class VALUE_EQUALS>
 	sl_size HashTable<KT, VT, HASH, KEY_EQUALS>::removeItemsByKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) noexcept
 	{
-		sl_uint32 capacity = m_table.capacity;
+		sl_size capacity = m_table.capacity;
 		if (capacity == 0) {
 			return 0;
 		}
 		
-		sl_uint32 hash = m_hash(key);
-		sl_uint32 index = hash & (capacity - 1);
+		sl_size hash = m_hash(key);
+		sl_size index = hash & (capacity - 1);
 
-		Node** link = m_table.nodes + index;
-		Node* node = *link;
-		Node* nodeDelete = sl_null;
-		Node** linkDelete = &nodeDelete;
+		NODE** link = m_table.nodes + index;
+		NODE* node = *link;
+		NODE* nodeDelete = sl_null;
+		NODE** linkDelete = &nodeDelete;
 		while (node) {
-			Node* next = node->next;
+			NODE* next = node->next;
 			if (node->hash == hash && m_equals(node->key, key) && value_equals(node->value, value)) {
 				*link = next;
 				*linkDelete = node;
@@ -645,20 +654,20 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_size HashTable<KT, VT, HASH, KEY_EQUALS>::removeAll() noexcept
 	{
-		sl_uint32 capacity = m_table.capacity;
+		sl_size capacity = m_table.capacity;
 		if (capacity == 0) {
 			return 0;
 		}
 		sl_size count = m_table.count;
 		_priv_HashTable::free(&m_table);
-		_priv_HashTable::init(reinterpret_cast<HashTableBaseTable*>(&m_table));
+		_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
 		return count;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	void HashTable<KT, VT, HASH, KEY_EQUALS>::shrink() noexcept
 	{
-		_priv_HashTable::shrink(reinterpret_cast<HashTableBaseTable*>(&m_table));
+		_priv_HashTable::shrink(reinterpret_cast<HashTableStructBase*>(&m_table));
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
@@ -667,27 +676,26 @@ namespace slib
 		_priv_HashTable::free(&m_table);
 		m_hash = other->m_hash;
 		m_equals = other->m_equals;
-		sl_uint32 capacity = other->m_table.capacity;
+		sl_size capacity = other->m_table.capacity;
+		_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), other->m_table.capacityMinimum, other->m_table.capacityMaximum);
 		if (capacity == 0) {
-			_priv_HashTable::init(reinterpret_cast<HashTableBaseTable*>(&m_table));
 			return sl_true;
 		}
-		_priv_HashTable::init(reinterpret_cast<HashTableBaseTable*>(&m_table), capacity);
-		if (m_table.capacity == 0) {
+		if (!(_priv_HashTable::reallocNodes(reinterpret_cast<HashTableStructBase*>(&m_table), capacity))) {
 			return sl_false;
 		}
-		Node** nodesTarget = m_table.nodes;
-		Node** nodesSource = other->m_table.nodes;
-		for (sl_uint32 i = 0; i < capacity; i++) {
-			Node* nodeSource = nodesSource[i];
+		NODE** nodesTarget = m_table.nodes;
+		NODE** nodesSource = other->m_table.nodes;
+		for (sl_size i = 0; i < capacity; i++) {
+			NODE* nodeSource = nodesSource[i];
 			if (nodeSource) {
-				Node** link = &(nodesTarget[i]);
+				NODE** link = &(nodesTarget[i]);
 				do {
-					Node* nodeTarget = new Node(nodeSource->key, nodeSource->value);
+					NODE* nodeTarget = new NODE(nodeSource->key, nodeSource->value);
 					*link = nodeTarget;
 					if (!nodeTarget) {
 						_priv_HashTable::free(&m_table);
-						_priv_HashTable::init(reinterpret_cast<HashTableBaseTable*>(&m_table));
+						_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), other->m_table.capacityMinimum, other->m_table.capacityMaximum);
 						return sl_false;
 					}
 					nodeTarget->hash = nodeSource->hash;
@@ -703,10 +711,10 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	SLIB_INLINE HashTablePosition<KT, VT> HashTable<KT, VT, HASH, KEY_EQUALS>::begin() const noexcept
 	{
-		Node** nodes = m_table.nodes;
-		sl_uint32 capacity = m_table.capacity;
-		for (sl_uint32 i = 0; i < capacity; i++) {
-			Node* node = nodes[i];
+		NODE** nodes = m_table.nodes;
+		sl_size capacity = m_table.capacity;
+		for (sl_size i = 0; i < capacity; i++) {
+			NODE* node = nodes[i];
 			if (node) {
 				return HashTablePosition<KT, VT>(nodes + i, nodes + capacity, node);
 			}
@@ -723,11 +731,10 @@ namespace slib
 	template <class KT, class VT>
 	void _priv_HashTable::free(HashTableStruct<KT, VT>* table) noexcept
 	{
-		typedef HashTableNode<KT, VT> Node;
-		Node** nodes = table->nodes;
+		HashTableNode<KT, VT>** nodes = table->nodes;
 		if (nodes) {
-			sl_uint32 capacity = table->capacity;
-			for (sl_uint32 i = 0; i < capacity; i++) {
+			sl_size capacity = table->capacity;
+			for (sl_size i = 0; i < capacity; i++) {
 				HashTableNode<KT, VT>* node = nodes[i];
 				while (node) {
 					HashTableNode<KT, VT>* next = node->next;

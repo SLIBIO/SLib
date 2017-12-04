@@ -59,93 +59,134 @@ namespace slib
 
 	
 	#define PRIV_SLIB_HASHTABLE_MIN_CAPACITY 16
-	#define PRIV_SLIB_HASHTABLE_MAX_CAPACITY 0x10000000
 	#define PRIV_SLIB_HASHTABLE_LOAD_FACTOR_UP 0.75f
 	#define PRIV_SLIB_HASHTABLE_LOAD_FACTOR_DOWN 0.25f
 	
-	void _priv_HashTable::init(HashTableBaseTable* table) noexcept
+	void _priv_HashTable::fixCapacityRange(HashTableStructBase* table) noexcept
 	{
-		Base::zeroMemory(table, sizeof(HashTableBaseTable));
-		table->capacityMin = PRIV_SLIB_HASHTABLE_MIN_CAPACITY;
-	}
-	
-	void _priv_HashTable::init(HashTableBaseTable* table, sl_uint32 capacity) noexcept
-	{
-		if (capacity) {
-			capacity = Math::roundUpToPowerOfTwo(capacity);
-			if (createNodes(table, capacity)) {
-				table->count = 0;
-				Base::zeroMemory(table->nodes, sizeof(Node*)*capacity);
-				table->capacityMin = capacity;
-				return;
+		sl_size _capacityMinimum = table->capacityMinimum;
+		table->capacityMinimum = Math::roundUpToPowerOfTwo(_capacityMinimum);
+		if (table->capacityMinimum < _capacityMinimum) {
+			table->capacityMinimum = table->capacityMinimum << 1;
+		}
+		if (table->capacityMinimum < PRIV_SLIB_HASHTABLE_MIN_CAPACITY || (sl_reg)(table->capacityMinimum) < 0) {
+			table->capacityMinimum = PRIV_SLIB_HASHTABLE_MIN_CAPACITY;
+		}
+		if (table->capacityMaximum == 0) {
+			table->capacityMaximum = SLIB_SIZE_MAX;
+		} else {
+			if (table->capacityMaximum < table->capacityMinimum) {
+				table->capacityMaximum = table->capacityMinimum;
 			}
 		}
-		init(table);
 	}
 	
-	sl_bool _priv_HashTable::validateNodes(HashTableBaseTable* table) noexcept
+	void _priv_HashTable::updateThresholds(HashTableStructBase* table) noexcept
 	{
 		if (table->capacity == 0) {
-			if (createNodes(table, PRIV_SLIB_HASHTABLE_MIN_CAPACITY)) {
-				Base::zeroMemory(table->nodes, sizeof(Node*)*PRIV_SLIB_HASHTABLE_MIN_CAPACITY);
+			return;
+		}
+		table->thresholdDown = (sl_size)(PRIV_SLIB_HASHTABLE_LOAD_FACTOR_DOWN * table->capacity);
+		if (table->thresholdDown < table->capacityMinimum) {
+			table->thresholdDown = table->capacityMinimum;
+		}
+		table->thresholdUp = (sl_size)(PRIV_SLIB_HASHTABLE_LOAD_FACTOR_UP * table->capacity);
+		if (table->thresholdUp > table->capacityMaximum) {
+			table->thresholdUp = table->capacityMaximum;
+		}
+	}
+
+	void _priv_HashTable::init(HashTableStructBase* table, sl_size capacityMinimum, sl_size capacityMaximum) noexcept
+	{
+		table->nodes = sl_null;
+		table->count = 0;
+		table->capacity = 0;
+		table->capacityMinimum = capacityMinimum;
+		table->capacityMaximum = capacityMaximum;
+		table->thresholdUp = 0;
+		table->thresholdDown = 0;
+		fixCapacityRange(table);
+	}
+	
+	void _priv_HashTable::move(HashTableStructBase* dst, HashTableStructBase* src) noexcept
+	{
+		Base::copyMemory(dst, src, sizeof(HashTableStructBase));
+		clear(src);
+	}
+	
+	void _priv_HashTable::clear(HashTableStructBase* table) noexcept
+	{
+		table->nodes = sl_null;
+		table->count = 0;
+		table->capacity = 0;
+		table->thresholdUp = 0;
+		table->thresholdDown = 0;
+	}
+	
+	void _priv_HashTable::setMinimumCapacity(HashTableStructBase* table, sl_size capacity) noexcept
+	{
+		table->capacityMinimum = capacity;
+		fixCapacityRange(table);
+		updateThresholds(table);
+	}
+	
+	void _priv_HashTable::setMaximumCapacity(HashTableStructBase* table, sl_size capacity) noexcept
+	{
+		table->capacityMaximum = capacity;
+		fixCapacityRange(table);
+		updateThresholds(table);
+	}
+
+	sl_bool _priv_HashTable::validateNodes(HashTableStructBase* table) noexcept
+	{
+		if (table->capacity == 0) {
+			sl_size capacity = table->capacityMinimum;
+			NODE** nodes = (NODE**)(Base::createMemory(sizeof(NODE*)*capacity));
+			if (nodes) {
+				Base::zeroMemory(table->nodes, sizeof(NODE*)*capacity);
+				table->nodes = nodes;
+				table->capacity = capacity;
+				updateThresholds(table);
 				return sl_true;
-			} else {
-				return sl_false;
 			}
+			return sl_false;
 		} else {
 			return sl_true;
 		}
 	}
 	
-	sl_bool _priv_HashTable::createNodes(HashTableBaseTable* table, sl_uint32 capacity) noexcept
+	sl_bool _priv_HashTable::reallocNodes(HashTableStructBase* table, sl_size capacity) noexcept
 	{
-		if (capacity > PRIV_SLIB_HASHTABLE_MAX_CAPACITY) {
+		if (capacity > table->capacityMaximum) {
 			return sl_false;
 		}
-		Node** nodes = (Node**)(Base::createMemory(sizeof(Node*)*capacity));
+		NODE** nodes = (NODE**)(Base::reallocMemory(table->nodes, sizeof(NODE*)*capacity));
 		if (nodes) {
 			table->nodes = nodes;
 			table->capacity = capacity;
-			table->thresholdUp = (sl_uint32)(PRIV_SLIB_HASHTABLE_LOAD_FACTOR_UP * capacity);
-			table->thresholdDown = (sl_uint32)(PRIV_SLIB_HASHTABLE_LOAD_FACTOR_DOWN * capacity);
-			return sl_true;
-		}
-		return sl_false;
-	}
-	
-	sl_bool _priv_HashTable::reallocNodes(HashTableBaseTable* table, sl_uint32 capacity) noexcept
-	{
-		if (capacity > PRIV_SLIB_HASHTABLE_MAX_CAPACITY) {
-			return sl_false;
-		}
-		Node** nodes = (Node**)(Base::reallocMemory(table->nodes, sizeof(Node*)*capacity));
-		if (nodes) {
-			table->nodes = nodes;
-			table->capacity = capacity;
-			table->thresholdUp = (sl_uint32)(PRIV_SLIB_HASHTABLE_LOAD_FACTOR_UP * capacity);
-			table->thresholdDown = (sl_uint32)(PRIV_SLIB_HASHTABLE_LOAD_FACTOR_DOWN * capacity);
+			updateThresholds(table);
 			return sl_true;
 		}
 		return sl_false;
 	}
 
-	void _priv_HashTable::expand(HashTableBaseTable* table) noexcept
+	void _priv_HashTable::expand(HashTableStructBase* table) noexcept
 	{
-		if (table->count >= table->thresholdUp) {
+		if (table->capacity < table->capacityMaximum && table->count >= table->thresholdUp) {
 			// double capacity
-			sl_uint32 n = table->capacity;
+			sl_size n = table->capacity;
 			if (reallocNodes(table, n + n)) {
-				Node** nodes = table->nodes;
-				for (sl_uint32 i = 0; i < n; i++) {
-					Node* node = nodes[i];
+				NODE** nodes = table->nodes;
+				for (sl_size i = 0; i < n; i++) {
+					NODE* node = nodes[i];
 					nodes[i | n] = sl_null;
 					if (node) {
 						nodes[i] = sl_null;
-						sl_uint32 highBitBefore = node->hash & n;
-						Node* broken = sl_null;
+						sl_size highBitBefore = node->hash & n;
+						NODE* broken = sl_null;
 						nodes[i | highBitBefore] = node;
-						while (Node* chain = node->next) {
-							sl_uint32 highBitChain = chain->hash & n;
+						while (NODE* chain = node->next) {
+							sl_size highBitChain = chain->hash & n;
 							if (highBitBefore != highBitChain) {
 								if (broken) {
 									broken->next = chain;
@@ -166,15 +207,15 @@ namespace slib
 		}
 	}
 	
-	void _priv_HashTable::shrink(HashTableBaseTable* table) noexcept
+	void _priv_HashTable::shrink(HashTableStructBase* table) noexcept
 	{
-		while (table->capacity > table->capacityMin && table->count <= table->thresholdDown) {
+		while (table->capacity > table->capacityMinimum && table->count <= table->thresholdDown) {
 			// half capacity
-			Node** nodes = table->nodes;
-			sl_uint32 n = table->capacity >> 1;
-			for (sl_uint32 i = 0; i < n; i++) {
-				Node** link = nodes + i;
-				while (Node* node = *link) {
+			NODE** nodes = table->nodes;
+			sl_size n = table->capacity >> 1;
+			for (sl_size i = 0; i < n; i++) {
+				NODE** link = nodes + i;
+				while (NODE* node = *link) {
 					link = &(node->next);
 				}
 				*link = nodes[i | n];
@@ -182,5 +223,5 @@ namespace slib
 			reallocNodes(table, n);
 		}
 	}
-	
+
 }
