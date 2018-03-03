@@ -14,7 +14,8 @@ namespace slib
 	template <class KT, class VT>
 	template <class KEY, class... VALUE_ARGS>
 	SLIB_INLINE MapNode<KT, VT>::MapNode(KEY&& _key, VALUE_ARGS&&... value_args) noexcept
-	 : key(Forward<KEY>(_key)), value(Forward<VALUE_ARGS>(value_args)...)
+	 : key(Forward<KEY>(_key)), value(Forward<VALUE_ARGS>(value_args)...),
+       parent(sl_null), left(sl_null), right(sl_null), flagRed(sl_false)
 	{}
 
 	template <class KT, class VT>
@@ -62,6 +63,10 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	SLIB_INLINE CMap<KT, VT, KEY_COMPARE>& CMap<KT, VT, KEY_COMPARE>::operator=(CMap<KT, VT, KEY_COMPARE>&& other) noexcept
 	{
+		NODE* root = m_root;
+		if (root) {
+			RedBlackTree::freeNodes(root);
+		}
 		m_root = other.m_root;
 		m_count = other.m_count;
 		m_compare = Move(other.m_compare);
@@ -493,7 +498,7 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	SLIB_INLINE void CMap<KT, VT, KEY_COMPARE>::removeAt(MapNode<KT, VT>* node) noexcept
 	{
-		return RedBlackTree::removeNode(&m_root, m_count, node);
+		RedBlackTree::removeNode(&m_root, m_count, node);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
@@ -602,10 +607,10 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	void CMap<KT, VT, KEY_COMPARE>::copyFrom_NoLock(const CMap<KT, VT, KEY_COMPARE>& other) noexcept
+	sl_bool CMap<KT, VT, KEY_COMPARE>::copyFrom_NoLock(const CMap<KT, VT, KEY_COMPARE>& other) noexcept
 	{
 		if (this == &other) {
-			return;
+			return sl_true;
 		}
 		NODE* root = m_root;
 		if (root) {
@@ -617,24 +622,27 @@ namespace slib
 			if (root) {
 				m_root = root;
 				m_count = other.m_count;
+                return sl_true;
 			} else {
 				m_root = sl_null;
 				m_count = 0;
+                return sl_false;
 			}
 		} else {
 			m_root = sl_null;
 			m_count = 0;
+            return sl_true;
 		}
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	void CMap<KT, VT, KEY_COMPARE>::copyFrom(const CMap<KT, VT, KEY_COMPARE>& other) noexcept
+	sl_bool CMap<KT, VT, KEY_COMPARE>::copyFrom(const CMap<KT, VT, KEY_COMPARE>& other) noexcept
 	{
 		if (this == &other) {
-			return;
+			return sl_true;
 		}
 		ObjectLocker lock(this, &other);
-		copyFrom_NoLock(other);
+		return copyFrom_NoLock(other);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
@@ -670,7 +678,7 @@ namespace slib
 		List<KT> ret;
 		NODE* node = RedBlackTree::getFirstNode(m_root);
 		while (node) {
-			ret.add_NoLock(node->value);
+			ret.add_NoLock(node->key);
 			node = node->getNext();
 		}
 		return ret;
@@ -734,14 +742,14 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	SLIB_INLINE CMap<KT, VT, KEY_COMPARE>::EnumLockHelper::EnumLockHelper(const CMap<KT, VT, KEY_COMPARE>& map)
+	SLIB_INLINE CMap<KT, VT, KEY_COMPARE>::EnumLockHelper::EnumLockHelper(const CMap<KT, VT, KEY_COMPARE>& map) noexcept
 	{
 		node = map.getFirstNode();
 		mutex = map.getLocker();
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	SLIB_INLINE CMap<KT, VT, KEY_COMPARE>::EnumHelper::EnumHelper(const CMap<KT, VT, KEY_COMPARE>& map)
+	SLIB_INLINE CMap<KT, VT, KEY_COMPARE>::EnumHelper::EnumHelper(const CMap<KT, VT, KEY_COMPARE>& map) noexcept
 	{
 		node = map.getFirstNode();
 	}
@@ -1082,13 +1090,17 @@ namespace slib
 		if (obj) {
 			return obj->put(Forward<KEY>(key), Forward<VALUE>(value), isInsertion);
 		} else {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->put(Forward<KEY>(key), Forward<VALUE>(value), isInsertion);
+			}
 			obj = new CMAP;
 			if (obj) {
 				ref = obj;
-				if (isInsertion) {
-					*isInsertion = sl_true;
-				}
-				return obj->add_NoLock(Forward<KEY>(key), Forward<VALUE>(value)) != sl_null;
+				lock.unlock();
+				return obj->put(Forward<KEY>(key), Forward<VALUE>(value), isInsertion);
 			}
 		}
 		return sl_false;
@@ -1096,7 +1108,7 @@ namespace slib
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class KEY, class VALUE>
-	SLIB_INLINE MapNode<KT, VT>* Map<KT, VT, KEY_COMPARE>::replace_NoLock(const KEY& key, VALUE&& value) noexcept
+	SLIB_INLINE MapNode<KT, VT>* Map<KT, VT, KEY_COMPARE>::replace_NoLock(const KEY& key, VALUE&& value) const noexcept
 	{
 		CMAP* obj = ref._ptr;
 		if (obj) {
@@ -1107,7 +1119,7 @@ namespace slib
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class KEY, class VALUE>
-	SLIB_INLINE sl_bool Map<KT, VT, KEY_COMPARE>::replace(const KEY& key, VALUE&& value) noexcept
+	SLIB_INLINE sl_bool Map<KT, VT, KEY_COMPARE>::replace(const KEY& key, VALUE&& value) const noexcept
 	{
 		CMAP* obj = ref._ptr;
 		if (obj) {
@@ -1141,10 +1153,17 @@ namespace slib
 		if (obj) {
 			return obj->add(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 		} else {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->add(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
+			}
 			obj = new CMAP;
 			if (obj) {
 				ref = obj;
-				return obj->add_NoLock(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...) != sl_null;
+				lock.unlock();
+				return obj->add(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 			}
 		}
 		return sl_false;
@@ -1180,10 +1199,17 @@ namespace slib
 		if (obj) {
 			return obj->emplace(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 		} else {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->emplace(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
+			}
 			obj = new CMAP;
 			if (obj) {
 				ref = obj;
-				return obj->add_NoLock(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...) != sl_null;
+				lock.unlock();
+				return obj->emplace(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 			}
 		}
 		return sl_false;
@@ -1213,9 +1239,17 @@ namespace slib
 		if (obj) {
 			obj->putAll(other);
 		} else {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				obj->putAll(other);
+				return;
+			}
 			obj = new CMAP;
 			if (obj) {
 				ref = obj;
+				lock.unlock();
 				obj->putAll(other);
 			}
 		}
@@ -1223,7 +1257,7 @@ namespace slib
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class MAP>
-	SLIB_INLINE void Map<KT, VT, KEY_COMPARE>::replaceAll_NoLock(const MAP& other) noexcept
+	SLIB_INLINE void Map<KT, VT, KEY_COMPARE>::replaceAll_NoLock(const MAP& other) const noexcept
 	{
 		CMAP* obj = ref._ptr;
 		if (obj) {
@@ -1233,7 +1267,7 @@ namespace slib
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class MAP>
-	SLIB_INLINE void Map<KT, VT, KEY_COMPARE>::replaceAll(const MAP& other) noexcept
+	SLIB_INLINE void Map<KT, VT, KEY_COMPARE>::replaceAll(const MAP& other) const noexcept
 	{
 		CMAP* obj = ref._ptr;
 		if (obj) {
@@ -1566,7 +1600,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	SLIB_INLINE Map<KT, VT, KEY_COMPARE>::EnumLockHelper::EnumLockHelper(const Map<KT, VT, KEY_COMPARE>& map)
+	SLIB_INLINE Map<KT, VT, KEY_COMPARE>::EnumLockHelper::EnumLockHelper(const Map<KT, VT, KEY_COMPARE>& map) noexcept
 	{
 		CMAP* obj = map.ref._ptr;
 		if (obj) {
@@ -1579,7 +1613,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	SLIB_INLINE Map<KT, VT, KEY_COMPARE>::EnumHelper::EnumHelper(const Map<KT, VT, KEY_COMPARE>& map)
+	SLIB_INLINE Map<KT, VT, KEY_COMPARE>::EnumHelper::EnumHelper(const Map<KT, VT, KEY_COMPARE>& map) noexcept
 	{
 		node = map.getFirstNode();
 	}
@@ -1645,6 +1679,27 @@ namespace slib
 		return sl_false;
 	}
 
+	template <class KT, class VT, class KEY_COMPARE>
+	sl_bool Atomic< Map<KT, VT, KEY_COMPARE> >::find(const KT& key) const noexcept
+	{
+		Ref<CMAP> obj(ref);
+		if (obj.isNotNull()) {
+			return obj->find(key);
+		}
+		return sl_false;
+	}
+	
+	template <class KT, class VT, class KEY_COMPARE>
+	template <class VALUE, class VALUE_EQUALS>
+	sl_bool Atomic< Map<KT, VT, KEY_COMPARE> >::findKeyAndValue(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals) const noexcept
+	{
+		Ref<CMAP> obj(ref);
+		if (obj.isNotNull()) {
+			return obj->findKeyAndValue(key, value, value_equals);
+		}
+		return sl_false;
+	}
+	
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool Atomic< Map<KT, VT, KEY_COMPARE> >::get(const KT& key, VT* _out) const noexcept
 	{
@@ -1723,11 +1778,11 @@ namespace slib
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class KEY, class VALUE>
-	SLIB_INLINE sl_bool Atomic< Map<KT, VT, KEY_COMPARE> >::replace(const KEY& key, VALUE&& value) noexcept
+	SLIB_INLINE sl_bool Atomic< Map<KT, VT, KEY_COMPARE> >::replace(const KEY& key, VALUE&& value) const noexcept
 	{
 		Ref<CMAP> obj(ref);
 		if (obj.isNotNull()) {
-			return obj->replace(Forward<KEY>(key), Forward<VALUE>(value));
+			return obj->replace(key, Forward<VALUE>(value));
 		}
 		return sl_false;
 	}
@@ -1787,12 +1842,26 @@ namespace slib
 		Ref<CMAP> obj(ref);
 		if (obj.isNotNull()) {
 			obj->putAll(other);
+		} else {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				obj->putAll(other);
+				return;
+			}
+			obj = new CMAP;
+			if (obj.isNotNull()) {
+				ref = obj;
+				lock.unlock();
+				obj->putAll(other);
+			}
 		}
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	template <class MAP>
-	void Atomic< Map<KT, VT, KEY_COMPARE> >::replaceAll(const MAP& other) noexcept
+	void Atomic< Map<KT, VT, KEY_COMPARE> >::replaceAll(const MAP& other) const noexcept
 	{
 		Ref<CMAP> obj(ref);
 		if (obj.isNotNull()) {
@@ -1807,6 +1876,20 @@ namespace slib
 		Ref<CMAP> obj(ref);
 		if (obj.isNotNull()) {
 			obj->addAll(other);
+		} else {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				obj->addAll(other);
+				return;
+			}
+			obj = new CMAP;
+			if (obj.isNotNull()) {
+				ref = obj;
+				lock.unlock();
+				obj->addAll(other);
+			}
 		}
 	}
 	
@@ -1817,6 +1900,20 @@ namespace slib
 		Ref<CMAP> obj(ref);
 		if (obj.isNotNull()) {
 			obj->emplaceAll(other);
+		} else {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				obj->emplaceAll(other);
+				return;
+			}
+			obj = new CMAP;
+			if (obj.isNotNull()) {
+				ref = obj;
+				lock.unlock();
+				obj->emplaceAll(other);
+			}
 		}
 	}
 	
@@ -1940,7 +2037,7 @@ namespace slib
 	
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	Atomic< Map<KT, VT, KEY_COMPARE> >::EnumLockHelper::EnumLockHelper(const Map<KT, VT, KEY_COMPARE>& map)
+	Atomic< Map<KT, VT, KEY_COMPARE> >::EnumLockHelper::EnumLockHelper(const Map<KT, VT, KEY_COMPARE>& map) noexcept
 	{
 		CMAP* obj = map.ref._ptr;
 		if (obj) {
@@ -1954,10 +2051,9 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	Atomic< Map<KT, VT, KEY_COMPARE> >::EnumHelper::EnumHelper(const Map<KT, VT, KEY_COMPARE>& map)
+	Atomic< Map<KT, VT, KEY_COMPARE> >::EnumHelper::EnumHelper(const Map<KT, VT, KEY_COMPARE>& map) noexcept
 	 : node(map.getFirstNode()), ref(map.ref)
-	{
-	}
+	{}
 
 }
 

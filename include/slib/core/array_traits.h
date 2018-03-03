@@ -22,7 +22,6 @@
 namespace slib
 {
 	
-	
 	struct SLIB_EXPORT ArrayTraits_Memory
 	{
 		

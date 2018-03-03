@@ -334,6 +334,10 @@ namespace slib
 	template <class KEY, class VALUE>
 	HashTableNode<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::put(KEY&& key, VALUE&& value, sl_bool* isInsertion) noexcept
 	{
+		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
+			return sl_null;
+		}
+		
 		sl_size capacity = m_table.capacity;
 		sl_size hash = m_hash(key);
 		sl_size index = hash & (capacity - 1);
@@ -350,9 +354,7 @@ namespace slib
 			}
 			node = node->next;
 		}
-		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
-			return sl_null;
-		}
+		
 		node = new NODE(Forward<KEY>(key), Forward<VALUE>(value));
 		if (node) {
 			(m_table.count)++;
@@ -410,6 +412,10 @@ namespace slib
 	template <class KEY, class... VALUE_ARGS>
 	MapEmplaceReturn< HashTableNode<KT, VT> > HashTable<KT, VT, HASH, KEY_EQUALS>::emplace(KEY&& key, VALUE_ARGS&&... value_args) noexcept
 	{
+		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
+			return sl_null;
+		}
+		
 		sl_size capacity = m_table.capacity;
 		sl_size hash = m_hash(key);
 		sl_size index = hash & (capacity - 1);
@@ -422,9 +428,7 @@ namespace slib
 			}
 			node = node->next;
 		}
-		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
-			return sl_null;
-		}
+		
 		node = new NODE(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 		if (node) {
 			(m_table.count)++;
@@ -671,13 +675,13 @@ namespace slib
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
-	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::copyFrom(const HashTable<KT, VT, HASH, KEY_EQUALS>* other) noexcept
+	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::copyFrom(const HashTable<KT, VT, HASH, KEY_EQUALS>& other) noexcept
 	{
 		_priv_HashTable::free(&m_table);
-		m_hash = other->m_hash;
-		m_equals = other->m_equals;
-		sl_size capacity = other->m_table.capacity;
-		_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), other->m_table.capacityMinimum, other->m_table.capacityMaximum);
+		m_hash = other.m_hash;
+		m_equals = other.m_equals;
+		sl_size capacity = other.m_table.capacity;
+		_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), other.m_table.capacityMinimum, other.m_table.capacityMaximum);
 		if (capacity == 0) {
 			return sl_true;
 		}
@@ -685,7 +689,8 @@ namespace slib
 			return sl_false;
 		}
 		NODE** nodesTarget = m_table.nodes;
-		NODE** nodesSource = other->m_table.nodes;
+		Base::zeroMemory(nodesTarget, capacity*sizeof(NODE*));
+		NODE** nodesSource = other.m_table.nodes;
 		for (sl_size i = 0; i < capacity; i++) {
 			NODE* nodeSource = nodesSource[i];
 			if (nodeSource) {
@@ -695,7 +700,7 @@ namespace slib
 					*link = nodeTarget;
 					if (!nodeTarget) {
 						_priv_HashTable::free(&m_table);
-						_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), other->m_table.capacityMinimum, other->m_table.capacityMaximum);
+						_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), other.m_table.capacityMinimum, other.m_table.capacityMaximum);
 						return sl_false;
 					}
 					nodeTarget->hash = nodeSource->hash;
@@ -704,7 +709,7 @@ namespace slib
 				} while (nodeSource);
 			}
 		}
-		m_table.count = other->m_table.count;
+		m_table.count = other.m_table.count;
 		return sl_true;
 	}
 	

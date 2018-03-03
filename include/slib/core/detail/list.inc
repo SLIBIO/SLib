@@ -1548,10 +1548,17 @@ namespace slib
 		if (obj) {
 			return obj->insert(index, Forward<ARGS>(args)...);
 		} else {
-			obj = CList<T>::createFromElement(T(Forward<ARGS>(args)...));
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->insert(index, Forward<ARGS>(args)...);
+			}
+			obj = CList<T>::create();
 			if (obj) {
 				ref = obj;
-				return sl_true;
+				lock.unlock();
+				return obj->insert(index, Forward<ARGS>(args)...);
 			}
 		}
 		return sl_false;
@@ -1582,10 +1589,17 @@ namespace slib
 		if (obj) {
 			return obj->insertElements(index, values, count);
 		} else {
-			obj = CList<T>::create(values, count);
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->insertElements(index, values, count);
+			}
+			obj = CList<T>::create();
 			if (obj) {
 				ref = obj;
-				return sl_true;
+				lock.unlock();
+				return obj->insertElements(index, values, count);
 			}
 		}
 		return sl_false;
@@ -1614,10 +1628,17 @@ namespace slib
 		if (obj) {
 			return obj->insertElements(index, count, value);
 		} else {
-			obj = CList<T>::createFromElement(value, count);
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->insertElements(index, count, value);
+			}
+			obj = CList<T>::create();
 			if (obj) {
 				ref = obj;
-				return sl_true;
+				lock.unlock();
+				return obj->insertElements(index, count, value);
 			}
 		}
 		return sl_false;
@@ -1663,13 +1684,17 @@ namespace slib
 		if (obj) {
 			return obj->insertAll(index, other);
 		} else {
-			{
-				ObjectLocker lock(other);
-				obj = CList<T>::create(other->getData(), other->getCount());
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->insertAll(index, other);
 			}
+			obj = CList<T>::create();
 			if (obj) {
 				ref = obj;
-				return sl_true;
+				lock.unlock();
+				return obj->insertAll(index, other);
 			}
 		}
 		return sl_false;
@@ -1707,10 +1732,17 @@ namespace slib
 		if (obj) {
 			return obj->add(Forward<ARGS>(args)...);
 		} else {
-			obj = CList<T>::createFromElement(T(Forward<ARGS>(args)...));
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->add(Forward<ARGS>(args)...);
+			}
+			obj = CList<T>::create();
 			if (obj) {
 				ref = obj;
-				return sl_true;
+				lock.unlock();
+				return obj->add(Forward<ARGS>(args)...);
 			}
 		}
 		return sl_false;
@@ -1747,10 +1779,17 @@ namespace slib
 		if (obj) {
 			return obj->addElements(values, count);
 		} else {
-			obj = CList<T>::create(values, count);
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->addElements(values, count);
+			}
+			obj = CList<T>::create();
 			if (obj) {
 				ref = obj;
-				return sl_true;
+				lock.unlock();
+				return obj->addElements(values, count);
 			}
 		}
 		return sl_false;
@@ -1785,10 +1824,17 @@ namespace slib
 		if (obj) {
 			return obj->addElements(count, value);
 		} else {
-			obj = CList<T>::createFromElement(value, count);
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->addElements(count, value);
+			}
+			obj = CList<T>::create();
 			if (obj) {
 				ref = obj;
-				return sl_true;
+				lock.unlock();
+				return obj->addElements(count, value);
 			}
 		}
 		return sl_false;
@@ -1834,13 +1880,17 @@ namespace slib
 		if (obj) {
 			return obj->addAll(other);
 		} else {
-			{
-				ObjectLocker lock(other);
-				obj = CList<T>::create(other->getData(), other->getCount());
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->addAll(other);
 			}
+			obj = CList<T>::create();
 			if (obj) {
 				ref = obj;
-				return sl_true;
+				lock.unlock();
+				return obj->addAll(other);
 			}
 		}
 		return sl_false;
@@ -1878,10 +1928,17 @@ namespace slib
 		if (obj) {
 			return obj->addIfNotExist(Forward<VALUE>(value), equals);
 		} else {
-			obj = CList<T>::createFromElement(value);
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->addIfNotExist(Forward<VALUE>(value), equals);
+			}
+			obj = CList<T>::create();
 			if (obj) {
 				ref = obj;
-				return sl_true;
+				lock.unlock();
+				return obj->addIfNotExist(Forward<VALUE>(value), equals);
 			}
 		}
 		return sl_false;

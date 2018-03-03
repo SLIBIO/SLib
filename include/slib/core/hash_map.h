@@ -8,8 +8,8 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef CHECKHEADER_SLIB_CORE_MAP
-#define CHECKHEADER_SLIB_CORE_MAP
+#ifndef CHECKHEADER_SLIB_CORE_HASH_MAP
+#define CHECKHEADER_SLIB_CORE_HASH_MAP
 
 #include "definition.h"
 
@@ -18,6 +18,9 @@
 #include "node_position.h"
 #include "pair.h"
 #include "red_black_tree.h"
+#include "hash.h"
+#include "hash_table.h"
+#include "math.h"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 #include <initializer_list>
@@ -26,73 +29,88 @@
 namespace slib
 {
 	
-	template <class KT, class VT, class KEY_COMPARE>
-	class CMap;
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	class CHashMap;
 	
-	template <class KT, class VT, class KEY_COMPARE>
-	class Map;
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	class HashMap;
 	
-	template < class KT, class VT, class KEY_COMPARE = Compare<KT> >
-	using AtomicMap = Atomic< Map<KT, VT, KEY_COMPARE> >;
+	template < class KT, class VT, class HASH = Hash<KT>, class KEY_COMPARE = Compare<KT> >
+	using AtomicHashMap = Atomic< HashMap<KT, VT, HASH, KEY_COMPARE> >;
 	
 	
 	template <class KT, class VT>
-	class SLIB_EXPORT MapNode
+	class SLIB_EXPORT HashMapNode
 	{
 	public:
-		MapNode* parent;
-		MapNode* left;
-		MapNode* right;
+		HashMapNode* parent;
+		HashMapNode* left;
+		HashMapNode* right;
 		sl_bool flagRed;
 		
 		KT key;
 		VT value;
 		
+		sl_size hash;
+		HashMapNode* previous;
+		HashMapNode* next;
+		
 	public:
 		template <class KEY, class... VALUE_ARGS>
-		MapNode(KEY&& _key, VALUE_ARGS&&... value_args) noexcept;
+		HashMapNode(KEY&& _key, VALUE_ARGS&&... value_args) noexcept;
 		
 	public:
-		MapNode* getNext() const noexcept;
+		HashMapNode* getNext() const noexcept;
 		
-		MapNode* getPrevious() const noexcept;
+		HashMapNode* getPrevious() const noexcept;
 		
 	};
 	
-	extern const char _priv_Map_ClassID[];
+	extern const char _priv_HashMap_ClassID[];
 	
-	template < class KT, class VT, class KEY_COMPARE = Compare<KT> >
-	class SLIB_EXPORT CMap : public Object
+	template < class KT, class VT, class HASH = Hash<KT>, class KEY_COMPARE = Compare<KT> >
+	class SLIB_EXPORT CHashMap : public Object
 	{
-		SLIB_TEMPLATE_OBJECT(Object, _priv_Map_ClassID)
+		SLIB_TEMPLATE_OBJECT(Object, _priv_HashMap_ClassID)
 		
 	public:
-		typedef MapNode<KT, VT> NODE;
+		typedef HashMapNode<KT, VT> NODE;
 		typedef NodePosition<NODE> POSITION;
 		
+		struct TABLE
+		{
+			NODE** nodes;
+			sl_size count;
+			sl_size capacity;
+			sl_size capacityMinimum;
+			sl_size capacityMaximum;
+			sl_size thresholdDown;
+			sl_size thresholdUp;
+		};
+		
 	protected:
-		NODE* m_root;
-		sl_size m_count;
+		TABLE m_table;
+		NODE* m_nodeFirst;
+		NODE* m_nodeLast;
+		HASH m_hash;
 		KEY_COMPARE m_compare;
 		
 	public:
-		CMap() noexcept;
-
-		CMap(const KEY_COMPARE& compare) noexcept;
+		CHashMap(sl_size capacityMinimum = 0, sl_size capacityMaximum = 0, const HASH& hash = HASH(), const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
 		
-		~CMap() noexcept;
+		~CHashMap() noexcept;
 		
 	public:
-		CMap(const CMap& other) = delete;
+		CHashMap(const CHashMap& other) = delete;
 		
-		CMap& operator=(const CMap& other) = delete;
+		CHashMap& operator=(const CHashMap& other) = delete;
 		
-		CMap(CMap&& other) noexcept;
+		CHashMap(CHashMap&& other) noexcept;
 		
-		CMap& operator=(CMap&& other) noexcept;
+		CHashMap& operator=(CHashMap&& other) noexcept;
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		CMap(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
+		CHashMap(const std::initializer_list< Pair<KT, VT> >& l, sl_size capacityMinimum = 0, sl_size capacityMaximum = 0, const HASH& hash = HASH(), const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
 #endif
 		
 	public:
@@ -101,6 +119,20 @@ namespace slib
 		sl_bool isEmpty() const noexcept;
 		
 		sl_bool isNotEmpty() const noexcept;
+		
+		sl_size getCapacity() const noexcept;
+		
+		sl_size getMinimumCapacity() const noexcept;
+		
+		void setMinimumCapacity_NoLock(sl_size capacity) noexcept;
+		
+		void setMinimumCapacity(sl_size capacity) noexcept;
+		
+		sl_size getMaximumCapacity() const noexcept;
+		
+		void setMaximumCapacity_NoLock(sl_size capacity) noexcept;
+		
+		void setMaximumCapacity(sl_size capacity) noexcept;
 		
 		NODE* getFirstNode() const noexcept;
 		
@@ -112,15 +144,6 @@ namespace slib
 		
 		/* unsynchronized function */
 		sl_bool getEqualRange(const KT& key, NODE** pStart = sl_null, NODE** pEnd = sl_null) const noexcept;
-		
-		/* unsynchronized function */
-		void getNearest(const KT& key, NODE** pLessEqual = sl_null, NODE** pGreaterEqual = sl_null) const noexcept;
-		
-		/* unsynchronized function */
-		NODE* getLowerBound(const KT& key) const noexcept;
-		
-		/* unsynchronized function */
-		NODE* getUpperBound(const KT& key) const noexcept;
 		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		NODE* findKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
@@ -242,13 +265,17 @@ namespace slib
 		
 		sl_size removeAll() noexcept;
 		
-		sl_bool copyFrom_NoLock(const CMap& other) noexcept;
-
-		sl_bool copyFrom(const CMap& other) noexcept;
+		void shrink_NoLock() noexcept;
 		
-		CMap* duplicate_NoLock() const noexcept;
+		void shrink() noexcept;
 		
-		CMap* duplicate() const noexcept;
+		sl_bool copyFrom_NoLock(const CHashMap& other) noexcept;
+		
+		sl_bool copyFrom(const CHashMap& other) noexcept;
+		
+		CHashMap* duplicate_NoLock() const noexcept;
+		
+		CHashMap* duplicate() const noexcept;
 		
 		List<KT> getAllKeys_NoLock() const noexcept;
 		
@@ -267,11 +294,28 @@ namespace slib
 		
 		POSITION end() const noexcept;
 		
+	protected:
+		void _free() noexcept;
+		
+		NODE* _getEntry(const KT& key) const noexcept;
+		
+		NODE** _getEntryPtr(const KT& key) noexcept;
+		
+        void _initNode(NODE* node, sl_size hash) noexcept;
+		
+		void _removeNode(NODE* node) noexcept;
+        
+		void _expand() noexcept;
+		
+        void _rebuildTree(sl_size capacity) noexcept;
+		
+		sl_bool _copyFrom(const CHashMap* other) noexcept;
+		
 	public:
 		class EnumLockHelper
 		{
 		public:
-			EnumLockHelper(const CMap& map) noexcept;
+			EnumLockHelper(const CHashMap& map) noexcept;
 		public:
 			NODE* node;
 			Mutex* mutex;
@@ -280,7 +324,7 @@ namespace slib
 		class EnumHelper
 		{
 		public:
-			EnumHelper(const CMap& map) noexcept;
+			EnumHelper(const CHashMap& map) noexcept;
 		public:
 			NODE* node;
 		};
@@ -288,42 +332,40 @@ namespace slib
 	};
 	
 	
-	template < class KT, class VT, class KEY_COMPARE = Compare<KT> >
-	class SLIB_EXPORT Map
+	template < class KT, class VT, class HASH = Hash<KT>, class KEY_COMPARE = Compare<KT> >
+	class SLIB_EXPORT HashMap
 	{
 	public:
-		Ref< CMap<KT, VT, KEY_COMPARE> > ref;
-		SLIB_REF_WRAPPER(Map, CMap<KT, VT, KEY_COMPARE>)
+		Ref< CHashMap<KT, VT, HASH, KEY_COMPARE> > ref;
+		SLIB_REF_WRAPPER(HashMap, CHashMap<KT, VT, HASH, KEY_COMPARE>)
 		
 	public:
-		typedef MapNode<KT, VT> NODE;
+		typedef HashMapNode<KT, VT> NODE;
 		typedef NodePosition<NODE> POSITION;
-		typedef CMap<KT, VT, KEY_COMPARE> CMAP;
+		typedef CHashMap<KT, VT, HASH, KEY_COMPARE> CMAP;
 		
 	public:
+		HashMap(sl_size capacityMinimum, sl_size capacityMaximum = 0, const HASH& hash = HASH(), const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
+		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		Map(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
+		HashMap(const std::initializer_list< Pair<KT, VT> >& l, sl_size capacityMinimum = 0, sl_size capacityMaximum = 0, const HASH& hash = HASH(), const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
 #endif
 		
 	public:
-		static Map create() noexcept;
-		
-		static Map create(const KEY_COMPARE& compare) noexcept;
+		static HashMap create(sl_size capacityMinimum = 0, sl_size capacityMaximum = 0, const HASH& hash = HASH(), const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		static Map create(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& key_compare = KEY_COMPARE()) noexcept;
+		static HashMap create(const std::initializer_list< Pair<KT, VT> >& l, sl_size capacityMinimum = 0, sl_size capacityMaximum = 0, const HASH& hash = HASH(), const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
 #endif
 		
-		template <class KEY, class VALUE, class OTHER_COMPARE>
-		static const Map& from(const Map<KEY, VALUE, OTHER_COMPARE>& other) noexcept;
+		template <class KEY, class VALUE, class OTHER_HASH, class OTHER_COMPARE>
+		static const HashMap& from(const HashMap<KEY, VALUE, OTHER_HASH, OTHER_COMPARE>& other) noexcept;
 		
-		void init() noexcept;
-		
-		void init(const KEY_COMPARE& compare) noexcept;
+		void init(sl_size capacityMinimum = 0, sl_size capacityMaximum = 0, const HASH& hash = HASH(), const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
 
 	public:
 #ifdef SLIB_SUPPORT_STD_TYPES
-		Map& operator=(const std::initializer_list< Pair<KT, VT> >& l) noexcept;
+		HashMap& operator=(const std::initializer_list< Pair<KT, VT> >& l) noexcept;
 #endif
 		
 		VT operator[](const KT& key) const noexcept;
@@ -333,6 +375,20 @@ namespace slib
 		sl_bool isEmpty() const noexcept;
 		
 		sl_bool isNotEmpty() const noexcept;
+		
+		sl_size getCapacity() const noexcept;
+		
+		sl_size getMinimumCapacity() const noexcept;
+		
+		void setMinimumCapacity_NoLock(sl_size capacity) noexcept;
+		
+		void setMinimumCapacity(sl_size capacity) noexcept;
+		
+		sl_size getMaximumCapacity() const noexcept;
+		
+		void setMaximumCapacity_NoLock(sl_size capacity) noexcept;
+		
+		void setMaximumCapacity(sl_size capacity) noexcept;
 		
 		NODE* getFirstNode() const noexcept;
 		
@@ -345,15 +401,6 @@ namespace slib
 		/* unsynchronized function */
 		sl_bool getEqualRange(const KT& key, NODE** pStart = sl_null, NODE** pEnd = sl_null) const noexcept;
 		
-		/* unsynchronized function */
-		void getNearest(const KT& key, NODE** pLessEqual = sl_null, NODE** pGreaterEqual = sl_null) const noexcept;
-		
-		/* unsynchronized function */
-		NODE* getLowerBound(const KT& key) const noexcept;
-		
-		/* unsynchronized function */
-		NODE* getUpperBound(const KT& key) const noexcept;
-
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		NODE* findKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
 		
@@ -474,9 +521,13 @@ namespace slib
 		
 		sl_size removeAll() const noexcept;
 		
-		Map duplicate_NoLock() const noexcept;
+		void shrink_NoLock() noexcept;
 		
-		Map duplicate() const noexcept;
+		void shrink() noexcept;
+		
+		HashMap duplicate_NoLock() const noexcept;
+		
+		HashMap duplicate() const noexcept;
 		
 		List<KT> getAllKeys_NoLock() const noexcept;
 		
@@ -501,7 +552,7 @@ namespace slib
 		class EnumLockHelper
 		{
 		public:
-			EnumLockHelper(const Map& map) noexcept;
+			EnumLockHelper(const HashMap& map) noexcept;
 		public:
 			NODE* node;
 			Mutex* mutex;
@@ -510,41 +561,41 @@ namespace slib
 		class EnumHelper
 		{
 		public:
-			EnumHelper(const Map& map) noexcept;
+			EnumHelper(const HashMap& map) noexcept;
 		public:
 			NODE* node;
 		};
 		
 	};
 	
-	template <class KT, class VT, class KEY_COMPARE>
-	class SLIB_EXPORT Atomic< Map<KT, VT, KEY_COMPARE> >
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	class SLIB_EXPORT Atomic< HashMap<KT, VT, HASH, KEY_COMPARE> >
 	{
 	public:
-		AtomicRef< CMap<KT, VT, KEY_COMPARE> > ref;
-		SLIB_ATOMIC_REF_WRAPPER(CMap<KT, VT, KEY_COMPARE>)
+		AtomicRef< CHashMap<KT, VT, HASH, KEY_COMPARE> > ref;
+		SLIB_ATOMIC_REF_WRAPPER(CHashMap<KT, VT, HASH, KEY_COMPARE>)
 		
 	public:
-		typedef MapNode<KT, VT> NODE;
+		typedef HashMapNode<KT, VT> NODE;
 		typedef NodePositionWithRef<NODE> POSITION;
-		typedef CMap<KT, VT, KEY_COMPARE> CMAP;
+		typedef CHashMap<KT, VT, HASH, KEY_COMPARE> CMAP;
 		
 	public:
+		Atomic(sl_size capacityMinimum, sl_size capacityMaximum = 0, const HASH& hash = HASH(), const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
+		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		Atomic(const std::initializer_list< Pair<KT, VT> >& l, const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
+		Atomic(const std::initializer_list< Pair<KT, VT> >& l, sl_size capacityMinimum = 0, sl_size capacityMaximum = 0, const HASH& hash = HASH(), const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
 #endif
 		
 	public:
-		template <class KEY, class VALUE, class OTHER_COMPARE>
-		static const Atomic& from(const Atomic< Map<KEY, VALUE, OTHER_COMPARE> >& other) noexcept;
+		template <class KEY, class VALUE, class OTHER_HASH, class OTHER_COMPARE>
+		static const Atomic& from(const Atomic< HashMap<KEY, VALUE, OTHER_HASH, OTHER_COMPARE> >& other) noexcept;
 		
-		void init() noexcept;
+		void init(sl_size capacityMinimum = 0, sl_size capacityMaximum = 0, const HASH& hash = HASH(), const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
 		
-		void init(const KEY_COMPARE& compare) noexcept;
-
 	public:
 #ifdef SLIB_SUPPORT_STD_TYPES
-		Atomic< Map<KT, VT, KEY_COMPARE> >& operator=(const std::initializer_list< Pair<KT, VT> >& l) noexcept;
+		Atomic< HashMap<KT, VT, HASH, KEY_COMPARE> >& operator=(const std::initializer_list< Pair<KT, VT> >& l) noexcept;
 #endif
 		
 		VT operator[](const KT& key) const noexcept;
@@ -554,6 +605,16 @@ namespace slib
 		sl_bool isEmpty() const noexcept;
 		
 		sl_bool isNotEmpty() const noexcept;
+		
+		sl_size getCapacity() const noexcept;
+		
+		sl_size getMinimumCapacity() const noexcept;
+		
+		void setMinimumCapacity(sl_size capacity) noexcept;
+		
+		sl_size getMaximumCapacity() const noexcept;
+		
+		void setMaximumCapacity(sl_size capacity) noexcept;
 		
 		sl_bool find(const KT& key) const noexcept;
 		
@@ -609,7 +670,9 @@ namespace slib
 		
 		sl_size removeAll() const noexcept;
 		
-		Map<KT, VT, KEY_COMPARE> duplicate() const noexcept;
+		void shrink() noexcept;
+		
+		HashMap<KT, VT, HASH, KEY_COMPARE> duplicate() const noexcept;
 		
 		List<KT> getAllKeys() const noexcept;
 		
@@ -626,7 +689,7 @@ namespace slib
 		class EnumLockHelper
 		{
 		public:
-			EnumLockHelper(const Map<KT, VT, KEY_COMPARE>& map) noexcept;
+			EnumLockHelper(const HashMap<KT, VT, HASH, KEY_COMPARE>& map) noexcept;
 		public:
 			NODE* node;
 			Mutex* mutex;
@@ -636,7 +699,7 @@ namespace slib
 		class EnumHelper
 		{
 		public:
-			EnumHelper(const Map<KT, VT, KEY_COMPARE>& map) noexcept;
+			EnumHelper(const HashMap<KT, VT, HASH, KEY_COMPARE>& map) noexcept;
 		public:
 			NODE* node;
 			Ref<Referable> ref;
@@ -646,10 +709,11 @@ namespace slib
 	
 }
 
-#include "detail/map.inc"
+#include "detail/hash_map.inc"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
-#include "detail/map_std.inc"
+#include "detail/hash_map_std.inc"
 #endif
 
 #endif
+

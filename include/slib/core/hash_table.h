@@ -166,7 +166,7 @@ namespace slib
 		
 		void shrink() noexcept;
 
-		sl_bool copyFrom(const HashTable<KT, VT, HASH, KEY_EQUALS>* other) noexcept;
+		sl_bool copyFrom(const HashTable<KT, VT, HASH, KEY_EQUALS>& other) noexcept;
 		
 		// range-based for loop
 		HashTablePosition<KT, VT> begin() const noexcept;

@@ -9,10 +9,13 @@
  */
 
 #include "slib/core/map.h"
+#include "slib/core/hash_map.h"
 
 namespace slib
 {
 
 	const char _priv_Map_ClassID[] = "map";
+	
+	const char _priv_HashMap_ClassID[] = "hash_map";
 
 }
