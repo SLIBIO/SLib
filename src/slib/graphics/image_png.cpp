@@ -117,7 +117,7 @@ namespace slib
 		return saveToPNG(this);
 	}
 
-	sl_bool Image::saveToPNG(String filePath, const Ref<Image>& image)
+	sl_bool Image::saveToPNG(const String& filePath, const Ref<Image>& image)
 	{
 		if (image.isNull()) {
 			return sl_false;
@@ -137,7 +137,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool Image::saveToPNG(String filePath)
+	sl_bool Image::saveToPNG(const String& filePath)
 	{
 		return saveToPNG(filePath, this);
 	}

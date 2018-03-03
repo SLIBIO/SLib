@@ -151,9 +151,9 @@ namespace slib
 
 		Memory saveToPNG();
 
-		static sl_bool saveToPNG(String filePath, const Ref<Image>& image);
+		static sl_bool saveToPNG(const String& filePath, const Ref<Image>& image);
 
-		sl_bool saveToPNG(String filePath);
+		sl_bool saveToPNG(const String& filePath);
 		
 
 		static Ref<Image> loadFromJPEG(const void* content, sl_size size);
@@ -162,9 +162,9 @@ namespace slib
 
 		Memory saveToJPEG(float quality = 0.5f);
 
-		static sl_bool saveToJPEG(String filePath, const Ref<Image>& image, float quality = 0.5f);
+		static sl_bool saveToJPEG(const String& filePath, const Ref<Image>& image, float quality = 0.5f);
 
-		sl_bool saveToJPEG(String filePath, float quality = 0.5f);
+		sl_bool saveToJPEG(const String& filePath, float quality = 0.5f);
 
 		
 	public:

@@ -59,6 +59,16 @@ namespace slib
 			return *this;
 		}
 		
+		SLIB_INLINE constexpr sl_bool operator==(const TextRange& other) const noexcept
+		{
+			return location == other.location && length == other.length;
+		}
+		
+		SLIB_INLINE constexpr sl_bool operator!=(const TextRange& other) const noexcept
+		{
+			return location != other.location || length != other.length;
+		}
+		
 		SLIB_INLINE constexpr sl_bool isNotFound() const noexcept
 		{
 			return location == SLIB_TEXT_RANGE_NOT_FOUND;
@@ -256,7 +266,6 @@ namespace slib
 		CList< Ref<TextItem> > m_layoutItems;
 		sl_real m_maxWidth;
 		sl_real m_totalHeight;
-		
 		sl_real m_positionLength;
 
 	};

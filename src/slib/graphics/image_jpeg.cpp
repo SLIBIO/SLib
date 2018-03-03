@@ -182,7 +182,7 @@ namespace slib
 		return saveToJPEG(this, quality);
 	}
 
-	sl_bool Image::saveToJPEG(String filePath, const Ref<Image>& image, float quality)
+	sl_bool Image::saveToJPEG(const String& filePath, const Ref<Image>& image, float quality)
 	{
 		if (image.isNull()) {
 			return sl_false;
@@ -202,7 +202,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool Image::saveToJPEG(String filePath, float quality)
+	sl_bool Image::saveToJPEG(const String& filePath, float quality)
 	{
 		return saveToJPEG(filePath, this, quality);
 	}
