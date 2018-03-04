@@ -78,49 +78,27 @@ namespace slib
 
 
 	template <class T>
-	Variant::Variant(const Ref<T>& ref) noexcept
+	SLIB_INLINE Variant::Variant(const Ref<T>& ref) noexcept
 	{
-		if (ref.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Ref<T>*>(&_value)) Ref<T>(ref);
-		} else {
-			_type = VariantType::Null;
-		}
+		_constructorRef(&ref);
 	}
 	
 	template <class T>
-	Variant::Variant(const AtomicRef<T>& _ref) noexcept
+	SLIB_INLINE Variant::Variant(const AtomicRef<T>& ref) noexcept
 	{
-		Ref<T> ref(_ref);
-		if (ref.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Ref<T>*>(&_value)) Ref<T>(ref);
-		} else {
-			_type = VariantType::Null;
-		}
+		_constructorAtomicRef(&ref);
 	}
 	
 	template <class T>
-	Variant::Variant(const WeakRef<T>& weak) noexcept
+	SLIB_INLINE Variant::Variant(const WeakRef<T>& weak) noexcept
 	{
-		if (weak.isNotNull()) {
-			_type = VariantType::Weak;
-			new (reinterpret_cast<WeakRef<T>*>(&_value)) WeakRef<T>(weak);
-		} else {
-			_type = VariantType::Null;
-		}
+		_constructorWeakRef(&weak);
 	}
 	
 	template <class T>
-	Variant::Variant(const AtomicWeakRef<T>& _weak) noexcept
+	SLIB_INLINE Variant::Variant(const AtomicWeakRef<T>& weak) noexcept
 	{
-		Ref<T> weak(_weak);
-		if (weak.isNotNull()) {
-			_type = VariantType::Weak;
-			new (reinterpret_cast<WeakRef<T>*>(&_value)) WeakRef<T>(weak);
-		} else {
-			_type = VariantType::Null;
-		}
+		_constructorAtomicWeakRef(&weak);
 	}
 	
 	SLIB_INLINE const Variant& Variant::null() noexcept
@@ -129,13 +107,13 @@ namespace slib
 	}
 	
 	template <class T>
-	Variant Variant::fromRef(const Ref<T>& ref) noexcept
+	SLIB_INLINE Variant Variant::fromRef(const Ref<T>& ref) noexcept
 	{
 		return ref;
 	}
 	
 	template <class T>
-	Variant Variant::fromWeakRef(const WeakRef<T>& weak) noexcept
+	SLIB_INLINE Variant Variant::fromWeakRef(const WeakRef<T>& weak) noexcept
 	{
 		return weak;
 	}
@@ -165,128 +143,94 @@ namespace slib
 	
 	
 	template <class T>
-	Ref<T> Variant::getObject(const Ref<T>& def) const noexcept
+	SLIB_INLINE Ref<T> Variant::getObject(const Ref<T>& def) const noexcept
 	{
 		return CastRef<T>(getObject(), def);
 	}
 	
 	template <class T>
-	void Variant::setObject(const Ref<T>& ref) noexcept
+	SLIB_INLINE void Variant::setObject(const Ref<T>& ref) noexcept
 	{
-		_free(_type, _value);
-		if (ref.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Ref<T>*>(&_value)) Ref<T>(ref);
-		} else {
-			_type = VariantType::Null;
-		}
+		_assignRef(&ref);
 	}
 	
 	template <class T>
-	void Variant::setWeak(const WeakRef<T>& weak) noexcept
+	SLIB_INLINE void Variant::setWeak(const WeakRef<T>& weak) noexcept
 	{
-		_free(_type, _value);
-		if (weak.isNotNull()) {
-			_type = VariantType::Weak;
-			new (reinterpret_cast<WeakRef<T>*>(&_value)) WeakRef<T>(weak);
-		} else {
-			_type = VariantType::Null;
-		}
+		_assignWeakRef(&weak);
 	}
 	
 	template <class T>
-	void Variant::get(Ref<T>& _out) const noexcept
+	SLIB_INLINE void Variant::get(Ref<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Variant::set(const Ref<T>& _in) noexcept
+	SLIB_INLINE void Variant::set(const Ref<T>& _in) noexcept
 	{
-		setObject(_in);
+		_assignRef(&_in);
 	}
 	
 	template <class T>
-	void Variant::get(AtomicRef<T>& _out) const noexcept
+	SLIB_INLINE void Variant::get(AtomicRef<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Variant::set(const AtomicRef<T>& _in) noexcept
+	SLIB_INLINE void Variant::set(const AtomicRef<T>& _in) noexcept
 	{
-		setObject(_in);
+		_assignAtomicRef(&_in);
 	}
 	
 	template <class T>
-	void Variant::get(WeakRef<T>& _out) const noexcept
+	SLIB_INLINE void Variant::get(WeakRef<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Variant::set(const WeakRef<T>& _in) noexcept
+	SLIB_INLINE void Variant::set(const WeakRef<T>& _in) noexcept
 	{
-		setWeak(_in);
+		_assignWeakRef(&_in);
 	}
 	
 	template <class T>
-	void Variant::get(AtomicWeakRef<T>& _out) const noexcept
+	SLIB_INLINE void Variant::get(AtomicWeakRef<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Variant::set(const AtomicWeakRef<T>& _in) noexcept
+	SLIB_INLINE void Variant::set(const AtomicWeakRef<T>& _in) noexcept
 	{
-		setWeak(_in);
+		_assignAtomicWeakRef(&_in);
 	}
 
 	
 	template <class T>
-	Atomic<Variant>::Atomic(const Ref<T>& ref) noexcept
+	SLIB_INLINE Atomic<Variant>::Atomic(const Ref<T>& ref) noexcept
 	{
-		if (ref.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Ref<T>*>(&_value)) Ref<T>(ref);
-		} else {
-			_type = VariantType::Null;
-		}
+		_constructorRef(&ref);
 	}
 	
 	template <class T>
-	Atomic<Variant>::Atomic(const AtomicRef<T>& _ref) noexcept
+	SLIB_INLINE Atomic<Variant>::Atomic(const AtomicRef<T>& ref) noexcept
 	{
-		Ref<T> ref(_ref);
-		if (ref.isNotNull()) {
-			_type = VariantType::Object;
-			new (reinterpret_cast<Ref<T>*>(&_value)) Ref<T>(ref);
-		} else {
-			_type = VariantType::Null;
-		}
+		_constructorAtomicRef(&ref);
 	}
 	
 	template <class T>
-	Atomic<Variant>::Atomic(const WeakRef<T>& weak) noexcept
+	SLIB_INLINE Atomic<Variant>::Atomic(const WeakRef<T>& weak) noexcept
 	{
-		if (weak.isNotNull()) {
-			_type = VariantType::Weak;
-			new (reinterpret_cast<WeakRef<T>*>(&_value)) WeakRef<T>(weak);
-		} else {
-			_type = VariantType::Null;
-		}
+		_constructorWeakRef(&weak);
 	}
 	
 	template <class T>
-	Atomic<Variant>::Atomic(const AtomicWeakRef<T>& _weak) noexcept
+	SLIB_INLINE Atomic<Variant>::Atomic(const AtomicWeakRef<T>& weak) noexcept
 	{
-		WeakRef<T> weak(_weak);
-		if (weak.isNotNull()) {
-			_type = VariantType::Weak;
-			new (reinterpret_cast<WeakRef<T>*>(&_value)) WeakRef<T>(weak);
-		} else {
-			_type = VariantType::Null;
-		}
+		_constructorAtomicWeakRef(&weak);
 	}
 	
 	SLIB_INLINE const AtomicVariant& Atomic<Variant>::null() noexcept
@@ -317,181 +261,96 @@ namespace slib
 	}
 	
 	template <class T>
-	Ref<T> Atomic<Variant>::getObject(const Ref<T>& def) const noexcept
+	SLIB_INLINE Ref<T> Atomic<Variant>::getObject(const Ref<T>& def) const noexcept
 	{
 		Variant var(*this);
 		return var.getObject(def);
 	}
 	
 	template <class T>
-	void Atomic<Variant>::setObject(const Ref<T>& object) noexcept
+	SLIB_INLINE void Atomic<Variant>::setObject(const Ref<T>& object) noexcept
 	{
-		if (object.isNotNull()) {
-			sl_int64 v;
-			new (reinterpret_cast<Ref<T>*>(&v)) Ref<T>(object);
-			_replace(VariantType::Object, v);
-		} else {
-			_replace(VariantType::Null, 0);
-		}
+		_assignRef(&object);
 	}
 	
 	template <class T>
-	void Atomic<Variant>::setWeak(const WeakRef<T>& weak) noexcept
+	SLIB_INLINE void Atomic<Variant>::setWeak(const WeakRef<T>& weak) noexcept
 	{
-		if (weak.isNotNull()) {
-			sl_int64 v;
-			new (reinterpret_cast<WeakRef<T>*>(&v)) WeakRef<T>(weak);
-			_replace(VariantType::Weak, v);
-		} else {
-			_replace(VariantType::Null, 0);
-		}
+		_assignWeakRef(&weak);
 	}
 	
 	template <class T>
-	void Atomic<Variant>::get(Ref<T>& _out) const noexcept
+	SLIB_INLINE void Atomic<Variant>::get(Ref<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Atomic<Variant>::set(const Ref<T>& _in) noexcept
+	SLIB_INLINE void Atomic<Variant>::set(const Ref<T>& _in) noexcept
 	{
-		setObject(_in);
+		_assignRef(&_in);
 	}
 	
 	template <class T>
-	void Atomic<Variant>::get(AtomicRef<T>& _out) const noexcept
+	SLIB_INLINE void Atomic<Variant>::get(AtomicRef<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Atomic<Variant>::set(const AtomicRef<T>& _in) noexcept
+	SLIB_INLINE void Atomic<Variant>::set(const AtomicRef<T>& _in) noexcept
 	{
-		setObject(_in);
+		_assignAtomicRef(&_in);
 	}
 	
 	template <class T>
-	void Atomic<Variant>::get(WeakRef<T>& _out) const noexcept
+	SLIB_INLINE void Atomic<Variant>::get(WeakRef<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Atomic<Variant>::set(const WeakRef<T>& _in) noexcept
+	SLIB_INLINE void Atomic<Variant>::set(const WeakRef<T>& _in) noexcept
 	{
-		setWeak(_in);
+		_assignWeakRef(&_in);
 	}
 	
 	template <class T>
-	void Atomic<Variant>::get(AtomicWeakRef<T>& _out) const noexcept
+	SLIB_INLINE void Atomic<Variant>::get(AtomicWeakRef<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
 	}
 	
 	template <class T>
-	void Atomic<Variant>::set(const AtomicWeakRef<T>& _in) noexcept
+	SLIB_INLINE void Atomic<Variant>::set(const AtomicWeakRef<T>& _in) noexcept
 	{
-		setWeak(_in);
+		_assignAtomicWeakRef(&_in);
 	}
 	
 	
-	extern const char _priv_VariantMap_ClassID[];
+	template <> sl_object_type CMap<String, Variant>::ObjectType() noexcept;
+	template <> sl_bool CMap<String, Variant>::isDerivedFrom(sl_object_type type) noexcept;
+	template <> sl_object_type CMap<String, Variant>::getObjectType() const noexcept;
+	template <> sl_bool CMap<String, Variant>::isInstanceOf(sl_object_type type) const noexcept;
 	
-	template <>
-	SLIB_INLINE sl_object_type IMap<String, Variant>::ObjectType() noexcept
-	{
-		return _priv_VariantMap_ClassID;
-	}
+	template <> sl_object_type CHashMap<String, Variant>::ObjectType() noexcept;
+	template <> sl_bool CHashMap<String, Variant>::isDerivedFrom(sl_object_type type) noexcept;
+	template <> sl_object_type CHashMap<String, Variant>::getObjectType() const noexcept;
+	template <>	sl_bool CHashMap<String, Variant>::isInstanceOf(sl_object_type type) const noexcept;
 	
-	template <>
-	SLIB_INLINE sl_bool IMap<String, Variant>::checkObjectType(sl_object_type type) noexcept
-	{
-		if (type == _priv_VariantMap_ClassID || type == _priv_Map_ClassID) {
-			return sl_true;
-		}
-		return Object::checkObjectType(type);
-	}
+	template <> sl_object_type CList<Variant>::ObjectType() noexcept;
+	template <> sl_bool CList<Variant>::isDerivedFrom(sl_object_type type) noexcept;
+	template <> sl_object_type CList<Variant>::getObjectType() const noexcept;
+	template <> sl_bool CList<Variant>::isInstanceOf(sl_object_type type) const noexcept;
 	
-	template <>
-	SLIB_INLINE sl_object_type IMap<String, Variant>::getObjectType() const noexcept
-	{
-		return _priv_VariantMap_ClassID;
-	}
-	
-	template <>
-	SLIB_INLINE sl_bool IMap<String, Variant>::isInstanceOf(sl_object_type type) const noexcept
-	{
-		if (type == _priv_VariantMap_ClassID || type == _priv_Map_ClassID) {
-			return sl_true;
-		}
-		return Object::checkObjectType(type);
-	}
-	
-	
-	extern const char _priv_VariantList_ClassID[];
-	
-	template <>
-	SLIB_INLINE sl_object_type CList<Variant>::ObjectType() noexcept
-	{
-		return _priv_VariantList_ClassID;
-	}
-	
-	template <>
-	SLIB_INLINE sl_bool CList<Variant>::checkObjectType(sl_object_type type) noexcept
-	{
-		if (type == _priv_VariantList_ClassID || type == _priv_List_ClassID) {
-			return sl_true;
-		}
-		return Object::checkObjectType(type);
-	}
-	
-	template <>
-	SLIB_INLINE sl_object_type CList<Variant>::getObjectType() const noexcept
-	{
-		return _priv_VariantList_ClassID;
-	}
-	
-	template <>
-	SLIB_INLINE sl_bool CList<Variant>::isInstanceOf(sl_object_type type) const noexcept
-	{
-		if (type == _priv_VariantList_ClassID || type == _priv_List_ClassID) {
-			return sl_true;
-		}
-		return Object::checkObjectType(type);
-	}
-	
-	
-	extern const char _priv_VariantMapList_ClassID[];
-	
-	template <>
-	SLIB_INLINE sl_object_type CList< Map<String, Variant> >::ObjectType() noexcept
-	{
-		return _priv_VariantMapList_ClassID;
-	}
-	
-	template <>
-	SLIB_INLINE sl_bool CList< Map<String, Variant> >::checkObjectType(sl_object_type type) noexcept
-	{
-		if (type == _priv_VariantMapList_ClassID || type == _priv_Map_ClassID) {
-			return sl_true;
-		}
-		return Object::checkObjectType(type);
-	}
-	
-	template <>
-	SLIB_INLINE sl_object_type CList< Map<String, Variant> >::getObjectType() const noexcept
-	{
-		return _priv_VariantMapList_ClassID;
-	}
-	
-	template <>
-	SLIB_INLINE sl_bool CList< Map<String, Variant> >::isInstanceOf(sl_object_type type) const noexcept
-	{
-		if (type == _priv_VariantMapList_ClassID || type == _priv_Map_ClassID) {
-			return sl_true;
-		}
-		return Object::checkObjectType(type);
-	}
+	template <> sl_object_type CList< Map<String, Variant> >::ObjectType() noexcept;
+	template <> sl_bool CList< Map<String, Variant> >::isDerivedFrom(sl_object_type type) noexcept;
+	template <>	sl_object_type CList< Map<String, Variant> >::getObjectType() const noexcept;
+	template <> sl_bool CList< Map<String, Variant> >::isInstanceOf(sl_object_type type) const noexcept;
+
+	template <> sl_object_type CList< HashMap<String, Variant> >::ObjectType() noexcept;
+	template <> sl_bool CList< HashMap<String, Variant> >::isDerivedFrom(sl_object_type type) noexcept;
+	template <> sl_object_type CList< HashMap<String, Variant> >::getObjectType() const noexcept;
+	template <> sl_bool CList< HashMap<String, Variant> >::isInstanceOf(sl_object_type type) const noexcept;
 	
 }

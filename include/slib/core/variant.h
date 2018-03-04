@@ -17,6 +17,7 @@
 #include "string.h"
 #include "list.h"
 #include "map.h"
+#include "hash_map.h"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 #include <string>
@@ -143,10 +144,18 @@ namespace slib
 
 		Variant(const AtomicMap<String, Variant>& map) noexcept;
 		
+		Variant(const HashMap<String, Variant>& map) noexcept;
+		
+		Variant(const AtomicHashMap<String, Variant>& map) noexcept;
+
 		Variant(const List< Map<String, Variant> >& list) noexcept;
 		
 		Variant(const AtomicList< Map<String, Variant> >& list) noexcept;
-	
+		
+		Variant(const List< HashMap<String, Variant> >& list) noexcept;
+		
+		Variant(const AtomicList< HashMap<String, Variant> >& list) noexcept;
+		
 	public:
 		static const Variant& null() noexcept;
 		
@@ -155,11 +164,11 @@ namespace slib
 		
 		static Variant createMap() noexcept;
 		
-		static Variant createTreeMap() noexcept;
-		
 		static Variant createHashMap() noexcept;
 		
 		static Variant createMapList() noexcept;
+
+		static Variant createHashMapList() noexcept;
 
 	
 		static Variant fromInt32(sl_int32 value) noexcept;
@@ -200,7 +209,11 @@ namespace slib
 
 		static Variant fromVariantMap(const Map<String, Variant>& value) noexcept;
 		
+		static Variant fromVariantHashMap(const HashMap<String, Variant>& value) noexcept;
+
 		static Variant fromVariantMapList(const List< Map<String, Variant> >& value) noexcept;
+		
+		static Variant fromVariantHashMapList(const List< HashMap<String, Variant> >& value) noexcept;
 		
 	public:
 		Variant& operator=(Variant&& other) noexcept;
@@ -380,17 +393,33 @@ namespace slib
 		
 		void setVariantList(const List<Variant>& list) noexcept;
 	
+		sl_bool isVariantMapOrVariantHashMap() const noexcept;
+		
 		sl_bool isVariantMap() const noexcept;
 
 		Map<String, Variant> getVariantMap() const noexcept;
 		
 		void setVariantMap(const Map<String, Variant>& map) noexcept;
 		
+		sl_bool isVariantHashMap() const noexcept;
+		
+		HashMap<String, Variant> getVariantHashMap() const noexcept;
+		
+		void setVariantHashMap(const HashMap<String, Variant>& map) noexcept;
+		
+		sl_bool isVariantMapListOrVariantHashMapList() const noexcept;
+		
 		sl_bool isVariantMapList() const noexcept;
 
 		List< Map<String, Variant> > getVariantMapList() const noexcept;
 		
 		void setVariantMapList(const List< Map<String, Variant> >& list) noexcept;
+
+		sl_bool isVariantHashMapList() const noexcept;
+		
+		List< HashMap<String, Variant> > getVariantHashMapList() const noexcept;
+		
+		void setVariantHashMapList(const List< HashMap<String, Variant> >& list) noexcept;
 
 		sl_size getElementsCount() const noexcept;
 
@@ -543,13 +572,41 @@ namespace slib
 		void get(AtomicMap<String, Variant>& _out) const noexcept;
 		void set(const AtomicMap<String, Variant>& _in) noexcept;
 		
+		void get(HashMap<String, Variant>& _out) const noexcept;
+		void set(const HashMap<String, Variant>& _in) noexcept;
+		
+		void get(AtomicHashMap<String, Variant>& _out) const noexcept;
+		void set(const AtomicHashMap<String, Variant>& _in) noexcept;
+		
 		void get(List< Map<String, Variant> >& _out) const noexcept;
 		void set(const List< Map<String, Variant> >& _in) noexcept;
 		
 		void get(AtomicList< Map<String, Variant> >& _out) const noexcept;
 		void set(const AtomicList< Map<String, Variant> >& _in) noexcept;
 		
+		void get(List< HashMap<String, Variant> >& _out) const noexcept;
+		void set(const List< HashMap<String, Variant> >& _in) noexcept;
+		
+		void get(AtomicList< HashMap<String, Variant> >& _out) const noexcept;
+		void set(const AtomicList< HashMap<String, Variant> >& _in) noexcept;
+
 	private:
+		void _constructorRef(const void* ptr);
+		
+		void _constructorAtomicRef(const void* ptr);
+		
+		void _constructorWeakRef(const void* ptr);
+		
+		void _constructorAtomicWeakRef(const void* ptr);
+
+		void _assignRef(const void* ptr);
+		
+		void _assignAtomicRef(const void* ptr);
+		
+		void _assignWeakRef(const void* ptr);
+		
+		void _assignAtomicWeakRef(const void* ptr);
+		
 		static void _free(VariantType type, sl_uint64 value) noexcept;
 
 		friend class Atomic<Variant>;
@@ -653,9 +710,17 @@ namespace slib
 		
 		Atomic(const AtomicMap<String, Variant>& map) noexcept;
 		
+		Atomic(const HashMap<String, Variant>& map) noexcept;
+		
+		Atomic(const AtomicHashMap<String, Variant>& map) noexcept;
+		
 		Atomic(const List< Map<String, Variant> >& list) noexcept;
 		
 		Atomic(const AtomicList< Map<String, Variant> >& list) noexcept;
+		
+		Atomic(const List< HashMap<String, Variant> >& list) noexcept;
+		
+		Atomic(const AtomicList< HashMap<String, Variant> >& list) noexcept;
 
 	public:
 		static const AtomicVariant& null() noexcept;
@@ -839,11 +904,21 @@ namespace slib
 		
 		void setVariantList(const List<Variant>& list) noexcept;
 
+		sl_bool isVariantMapOrVariantHashMap() const noexcept;
+
 		sl_bool isVariantMap() const noexcept;
 
 		Map<String, Variant> getVariantMap() const noexcept;
 		
 		void setVariantMap(const Map<String, Variant>& map) noexcept;
+
+		sl_bool isVariantHashMap() const noexcept;
+		
+		HashMap<String, Variant> getVariantHashMap() const noexcept;
+		
+		void setVariantHashMap(const HashMap<String, Variant>& map) noexcept;
+
+		sl_bool isVariantMapListOrVariantHashMapList() const noexcept;
 
 		sl_bool isVariantMapList() const noexcept;
 
@@ -851,6 +926,12 @@ namespace slib
 		
 		void setVariantMapList(const List< Map<String, Variant> >& list) noexcept;
 
+		sl_bool isVariantHashMapList() const noexcept;
+		
+		List< HashMap<String, Variant> > getVariantHashMapList() const noexcept;
+		
+		void setVariantHashMapList(const List< HashMap<String, Variant> >& list) noexcept;
+		
 		sl_size getElementsCount() const noexcept;
 
 		Variant getElement(sl_size index) const noexcept;
@@ -1003,13 +1084,41 @@ namespace slib
 		void get(AtomicMap<String, Variant>& _out) const noexcept;
 		void set(const AtomicMap<String, Variant>& _in) noexcept;
 		
+		void get(HashMap<String, Variant>& _out) const noexcept;
+		void set(const HashMap<String, Variant>& _in) noexcept;
+		
+		void get(AtomicHashMap<String, Variant>& _out) const noexcept;
+		void set(const AtomicHashMap<String, Variant>& _in) noexcept;
+		
 		void get(List< Map<String, Variant> >& _out) const noexcept;
 		void set(const List< Map<String, Variant> >& _in) noexcept;
 		
 		void get(AtomicList< Map<String, Variant> >& _out) const noexcept;
 		void set(const AtomicList< Map<String, Variant> >& _in) noexcept;
 
+		void get(List< HashMap<String, Variant> >& _out) const noexcept;
+		void set(const List< HashMap<String, Variant> >& _in) noexcept;
+		
+		void get(AtomicList< HashMap<String, Variant> >& _out) const noexcept;
+		void set(const AtomicList< HashMap<String, Variant> >& _in) noexcept;
+		
 	private:
+		void _constructorRef(const void* ptr);
+		
+		void _constructorAtomicRef(const void* ptr);
+		
+		void _constructorWeakRef(const void* ptr);
+		
+		void _constructorAtomicWeakRef(const void* ptr);
+		
+		void _assignRef(const void* ptr);
+		
+		void _assignAtomicRef(const void* ptr);
+		
+		void _assignWeakRef(const void* ptr);
+		
+		void _assignAtomicWeakRef(const void* ptr);
+		
 		void _retain(VariantType& type, sl_uint64& value) const noexcept;
 
 		void _replace(VariantType type, sl_uint64 value) noexcept;
@@ -1034,8 +1143,12 @@ namespace slib
 	typedef AtomicList<Variant> AtomicVariantList;
 	typedef Map<String, Variant> VariantMap;
 	typedef AtomicMap<String, Variant> AtomicVariantMap;
+	typedef HashMap<String, Variant> VariantHashMap;
+	typedef AtomicHashMap<String, Variant> AtomicVariantHashMap;
 	typedef List< Map<String, Variant> > VariantMapList;
 	typedef AtomicList< Map<String, Variant> > AtomicVariantMapList;
+	typedef List< HashMap<String, Variant> > VariantHashMapList;
+	typedef AtomicList< HashMap<String, Variant> > AtomicVariantHashMapList;
 
 }
 
