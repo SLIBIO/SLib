@@ -19,7 +19,7 @@ namespace slib
 		m_count = 0;
 		const Pair<KT, VT>* data = l.begin();
 		for (sl_size i = 0; i < l.size(); i++) {
-			RedBlackTree::add(&m_root, m_count, data[i].key, compare, data[i].value);
+			RedBlackTree::add(&m_root, m_count, data[i].first, compare, data[i].second);
 		}
 	}
 	

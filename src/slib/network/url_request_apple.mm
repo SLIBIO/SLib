@@ -186,7 +186,7 @@ namespace slib
 					if (map.isNotNull()) {
 						IMap<String, String>* pmap = map.ref.get();
 						[dict enumerateKeysAndObjectsUsingBlock:^(id key, id value, BOOL *stop) {
-							pmap->put_NoLock(Apple::getStringFromNSString((NSString*)key), Apple::getStringFromNSString((NSString*)value), MapPutMode::AddAlways);
+							pmap->add_NoLock(Apple::getStringFromNSString((NSString*)key), Apple::getStringFromNSString((NSString*)value));
 						}];
 						m_responseHeaders = map;
 					}

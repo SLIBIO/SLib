@@ -20,7 +20,7 @@ namespace slib
 		m_nodeLast = sl_null;
 		const Pair<KT, VT>* data = l.begin();
 		for (sl_size i = 0; i < l.size(); i++) {
-			add_NoLock(data[i].key, data[i].value);
+			add_NoLock(data[i].first, data[i].second);
 		}
 	}
 	

@@ -20,7 +20,168 @@
 
 namespace slib
 {
+	
+	extern const char _priv_VariantMap_ClassID[];
+	extern const char _priv_VariantHashMap_ClassID[];
+	extern const char _priv_VariantList_ClassID[];
+	extern const char _priv_VariantMapList_ClassID[];
+	extern const char _priv_VariantHashMapList_ClassID[];
 
+	template <>
+	sl_object_type CMap<String, Json>::ObjectType() noexcept
+	{
+		return _priv_VariantMap_ClassID;
+	}
+	
+	template <>
+	sl_bool CMap<String, Json>::isDerivedFrom(sl_object_type type) noexcept
+	{
+		if (type == _priv_VariantMap_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	template <>
+	sl_object_type CMap<String, Json>::getObjectType() const noexcept
+	{
+		return _priv_VariantMap_ClassID;
+	}
+	
+	template <>
+	sl_bool CMap<String, Json>::isInstanceOf(sl_object_type type) const noexcept
+	{
+		if (type == _priv_VariantMap_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	
+	template <>
+	SLIB_INLINE sl_object_type CHashMap<String, Json>::ObjectType() noexcept
+	{
+		return _priv_VariantHashMap_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CHashMap<String, Json>::isDerivedFrom(sl_object_type type) noexcept
+	{
+		if (type == _priv_VariantHashMap_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	template <>
+	sl_object_type CHashMap<String, Json>::getObjectType() const noexcept
+	{
+		return _priv_VariantHashMap_ClassID;
+	}
+	
+	template <>
+	sl_bool CHashMap<String, Json>::isInstanceOf(sl_object_type type) const noexcept
+	{
+		if (type == _priv_VariantHashMap_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	
+	template <>
+	SLIB_INLINE sl_object_type CList<Json>::ObjectType() noexcept
+	{
+		return _priv_VariantList_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CList<Json>::isDerivedFrom(sl_object_type type) noexcept
+	{
+		if (type == _priv_VariantList_ClassID || type == _priv_List_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	template <>
+	sl_object_type CList<Json>::getObjectType() const noexcept
+	{
+		return _priv_VariantList_ClassID;
+	}
+	
+	template <>
+	sl_bool CList<Json>::isInstanceOf(sl_object_type type) const noexcept
+	{
+		if (type == _priv_VariantList_ClassID || type == _priv_List_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	
+	template <>
+	SLIB_INLINE sl_object_type CList< Map<String, Json> >::ObjectType() noexcept
+	{
+		return _priv_VariantMapList_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CList< Map<String, Json> >::isDerivedFrom(sl_object_type type) noexcept
+	{
+		if (type == _priv_VariantMapList_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	template <>
+	sl_object_type CList< Map<String, Json> >::getObjectType() const noexcept
+	{
+		return _priv_VariantMapList_ClassID;
+	}
+	
+	template <>
+	sl_bool CList< Map<String, Json> >::isInstanceOf(sl_object_type type) const noexcept
+	{
+		if (type == _priv_VariantMapList_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	
+	template <>
+	SLIB_INLINE sl_object_type CList< HashMap<String, Json> >::ObjectType() noexcept
+	{
+		return _priv_VariantHashMapList_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CList< HashMap<String, Json> >::isDerivedFrom(sl_object_type type) noexcept
+	{
+		if (type == _priv_VariantHashMapList_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	template <>
+	sl_object_type CList< HashMap<String, Json> >::getObjectType() const noexcept
+	{
+		return _priv_VariantHashMapList_ClassID;
+	}
+	
+	template <>
+	sl_bool CList< HashMap<String, Json> >::isInstanceOf(sl_object_type type) const noexcept
+	{
+		if (type == _priv_VariantHashMapList_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	
 	JsonParseParam::JsonParseParam()
 	{
 		flagLogError = sl_true;
@@ -65,7 +226,7 @@ namespace slib
 	{
 	}
 	
-	Json::Json(const std::initializer_list< Pair<String, Json> >& pairs): Variant(VariantMap(*(reinterpret_cast<const std::initializer_list< Pair<String, Variant> >*>(&pairs))))
+	Json::Json(const std::initializer_list<JsonPair>& pairs): Variant(VariantHashMap(*(reinterpret_cast<const std::initializer_list< Pair<String, Variant> >*>(&pairs))))
 	{
 	}
 	
@@ -185,6 +346,14 @@ namespace slib
 	{
 	}
 	
+	Json::Json(const HashMap<String, Variant>& map): Variant(map)
+	{
+	}
+	
+	Json::Json(const AtomicHashMap<String, Variant>& map): Variant(map)
+	{
+	}
+	
 	Json::Json(const List< Map<String, Variant> >& list): Variant(list)
 	{
 	}
@@ -193,27 +362,35 @@ namespace slib
 	{
 	}
 	
-	Json::Json(const List<Json>& list): Variant(*(reinterpret_cast<VariantList const*>(&list)))
+	Json::Json(const List< HashMap<String, Variant> >& list): Variant(list)
 	{
 	}
 	
-	Json::Json(const AtomicList<Json>& list): Variant(*(reinterpret_cast<AtomicVariantList const*>(&list)))
+	Json::Json(const AtomicList< HashMap<String, Variant> >& list): Variant(list)
 	{
 	}
 	
-	Json::Json(const Map<String, Json>& map): Variant(*(reinterpret_cast<VariantMap const*>(&map)))
+	Json::Json(const JsonList& list): Variant(*(reinterpret_cast<VariantList const*>(&list)))
 	{
 	}
 	
-	Json::Json(const AtomicMap<String, Json>& map): Variant(*(reinterpret_cast<AtomicVariantMap const*>(&map)))
+	Json::Json(const AtomicJsonList& list): Variant(*(reinterpret_cast<AtomicVariantList const*>(&list)))
 	{
 	}
 	
-	Json::Json(const List< Map<String, Json> >& list): Variant(*(reinterpret_cast<VariantMapList const*>(&list)))
+	Json::Json(const JsonMap& map): Variant(*(reinterpret_cast<VariantHashMap const*>(&map)))
 	{
 	}
 	
-	Json::Json(const AtomicList< Map<String, Json> >& list): Variant(*(reinterpret_cast<AtomicVariantMapList const*>(&list)))
+	Json::Json(const AtomicJsonMap& map): Variant(*(reinterpret_cast<AtomicVariantHashMap const*>(&map)))
+	{
+	}
+	
+	Json::Json(const JsonMapList& list): Variant(*(reinterpret_cast<VariantHashMapList const*>(&list)))
+	{
+	}
+	
+	Json::Json(const AtomicJsonMapList& list): Variant(*(reinterpret_cast<AtomicVariantHashMapList const*>(&list)))
 	{
 	}
 
@@ -224,7 +401,7 @@ namespace slib
 	
 	Json Json::createMap()
 	{
-		return Variant::createMap();
+		return Variant::createHashMap();
 	}
 
 	Json& Json::operator=(const Json& json)
@@ -257,7 +434,7 @@ namespace slib
 		return *this;
 	}
 	
-	Json& Json::operator=(const std::initializer_list< Pair<String, Json> >& pairs)
+	Json& Json::operator=(const std::initializer_list<JsonPair>& pairs)
 	{
 		return *this = Json(pairs);
 	}
@@ -405,15 +582,15 @@ namespace slib
 			}
 			if (buf[pos] == ']') {
 				pos++;
-				return Variant::createList();
+				return Json::createList();
 			}
-			VariantList list = VariantList::create();
+			JsonList list = JsonList::create();
 			while (pos < len) {
 				CT ch = buf[pos];
 				if (ch == ']' || ch == ',') {
-					list.add_NoLock(Variant::null());
+					list.add_NoLock(Json::null());
 				} else {
-					Variant item = parseJson();
+					Json item = parseJson();
 					if (flagError) {
 						return sl_null;
 					}
@@ -456,7 +633,7 @@ namespace slib
 				errorMessage = "Object: Missing character } ";
 				return sl_null;
 			}
-			VariantMap map = VariantMap::createHash();
+			JsonMap map = JsonMap::create();
 			sl_bool flagFirst = sl_true;
 			while (pos < len) {
 				escapeSpaceAndComments();
@@ -537,9 +714,9 @@ namespace slib
 					return sl_null;
 				}
 				if (buf[pos] == '}' || buf[pos] == ',') {
-					map.put_NoLock(key, Variant::null());
+					map.put_NoLock(key, Json::null());
 				} else {
-					Variant item = parseJson();
+					Json item = parseJson();
 					if (flagError) {
 						return sl_null;
 					}
@@ -571,10 +748,10 @@ namespace slib
 				return sl_null;
 			}
 			if (str == strTrue) {
-				return Variant::fromBoolean(sl_true);
+				return Json::fromBoolean(sl_true);
 			}
 			if (str == strFalse) {
-				return Variant::fromBoolean(sl_false);
+				return Json::fromBoolean(sl_false);
 			}
 			sl_int64 vi64;
 			if (str.parseInt64(10, &vi64)) {
@@ -722,7 +899,7 @@ namespace slib
 		return isVariantList();
 	}
 	
-	List<Json> Json::getJsonList() const
+	JsonList Json::getJsonList() const
 	{
 		Ref<Referable> obj(getObject());
 		if (CList<Json>* p = CastInstance< CList<Json> >(obj._ptr)) {
@@ -731,47 +908,47 @@ namespace slib
 		return sl_null;
 	}
 	
-	void Json::setJsonList(const List<Json>& list)
+	void Json::setJsonList(const JsonList& list)
 	{
 		setVariantList(*(reinterpret_cast<VariantList const*>(&list)));
 	}
 	
 	sl_bool Json::isJsonMap() const
 	{
-		return isVariantMap();
+		return isVariantHashMap();
 	}
 	
-	Map<String, Json> Json::getJsonMap() const
+	JsonMap Json::getJsonMap() const
 	{
 		Ref<Referable> obj(getObject());
-		if (IMap<String, Json>* p = CastInstance< IMap<String, Json> >(obj._ptr)) {
+		if (CHashMap<String, Json>* p = CastInstance< CHashMap<String, Json> >(obj._ptr)) {
 			return p;
 		}
 		return sl_null;
 	}
 	
-	void Json::setJsonMap(const Map<String, Json>& map)
+	void Json::setJsonMap(const JsonMap& map)
 	{
-		setVariantMap(*(reinterpret_cast<VariantMap const*>(&map)));
+		setVariantHashMap(*(reinterpret_cast<VariantHashMap const*>(&map)));
 	}
 	
 	sl_bool Json::isJsonMapList() const
 	{
-		return isVariantMapList();
+		return isVariantHashMapList();
 	}
 	
-	List< Map<String, Json> > Json::getJsonMapList() const
+	JsonMapList Json::getJsonMapList() const
 	{
 		Ref<Referable> obj(getObject());
-		if (CList< Map<String, Json> >* p = CastInstance< CList< Map<String, Json> > >(obj._ptr)) {
+		if (CList< HashMap<String, Json> >* p = CastInstance< CList< HashMap<String, Json> > >(obj._ptr)) {
 			return p;
 		}
 		return sl_null;
 	}
 	
-	void Json::setJsonMapList(const List< Map<String, Json> >& list)
+	void Json::setJsonMapList(const JsonMapList& list)
 	{
-		setVariantMapList(*(reinterpret_cast<VariantMapList const*>(&list)));
+		setVariantHashMapList(*(reinterpret_cast<VariantHashMapList const*>(&list)));
 	}
 
 	
@@ -1150,6 +1327,26 @@ namespace slib
 		setVariantMap(_in);
 	}
 	
+	void Json::get(VariantHashMap& _out) const
+	{
+		_out = getVariantHashMap();
+	}
+	
+	void Json::set(const VariantHashMap& _in)
+	{
+		setVariantHashMap(_in);
+	}
+	
+	void Json::get(AtomicVariantHashMap& _out) const
+	{
+		_out = getVariantHashMap();
+	}
+	
+	void Json::set(const AtomicVariantHashMap& _in)
+	{
+		setVariantHashMap(_in);
+	}
+	
 	void Json::get(VariantMapList& _out) const
 	{
 		_out = getVariantMapList();
@@ -1170,6 +1367,26 @@ namespace slib
 		setVariantMapList(_in);
 	}
 
+	void Json::get(VariantHashMapList& _out) const
+	{
+		_out = getVariantHashMapList();
+	}
+	
+	void Json::set(const VariantHashMapList& _in)
+	{
+		setVariantHashMapList(_in);
+	}
+	
+	void Json::get(AtomicVariantHashMapList& _out) const
+	{
+		_out = getVariantHashMapList();
+	}
+	
+	void Json::set(const AtomicVariantHashMapList& _in)
+	{
+		setVariantHashMapList(_in);
+	}
+	
 	void Json::get(JsonList& _out) const
 	{
 		_out = getJsonList();

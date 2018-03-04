@@ -157,7 +157,7 @@ namespace slib
 						for (sl_uint32 i = 0; i < n - 1; i += 2) {
 							String key = Jni::getStringArrayElement(headers, i);
 							String value = Jni::getStringArrayElement(headers, i + 1);
-							map.ref->put_NoLock(key, value, MapPutMode::AddAlways);
+							map.ref->add_NoLock(key, value);
 						}
 					}
 					m_responseHeaders = map;

@@ -56,6 +56,16 @@ namespace slib
 
 	};
 	
+	class Json;
+	
+	typedef List<Json> JsonList;
+	typedef AtomicList<Json> AtomicJsonList;
+	typedef HashMap<String, Json> JsonMap;
+	typedef AtomicHashMap<String, Json> AtomicJsonMap;
+	typedef List< HashMap<String, Json> > JsonMapList;
+	typedef AtomicList< HashMap<String, Json> > AtomicJsonMapList;
+	typedef Pair<String, Json> JsonPair;
+	
 	class SLIB_EXPORT Json : public Variant
 	{
 	public:
@@ -140,36 +150,50 @@ namespace slib
 		
 		Json(const AtomicMap<String, Variant>& map);
 		
+		Json(const HashMap<String, Variant>& map);
+		
+		Json(const AtomicHashMap<String, Variant>& map);
+		
 		Json(const List< Map<String, Variant> >& list);
 		
 		Json(const AtomicList< Map<String, Variant> >& list);
 		
-		Json(const List<Json>& list);
+		Json(const List< HashMap<String, Variant> >& list);
 		
-		Json(const AtomicList<Json>& list);
+		Json(const AtomicList< HashMap<String, Variant> >& list);
 		
-		Json(const Map<String, Json>& map);
+		Json(const JsonList& list);
 		
-		Json(const AtomicMap<String, Json>& map);
+		Json(const AtomicJsonList& list);
 		
-		Json(const List< Map<String, Json> >& list);
+		Json(const JsonMap& map);
 		
-		Json(const AtomicList< Map<String, Json> >& list);
-
+		Json(const AtomicJsonMap& map);
+		
+		Json(const JsonMapList& list);
+		
+		Json(const AtomicJsonMapList& list);
+		
 		template <class T>
 		Json(const List<T>& list);
 		
 		template <class T>
 		Json(const AtomicList<T>& list);
 		
-		template <class KT, class VT>
-		Json(const Map<KT, VT>& map);
+		template <class KT, class VT, class KEY_COMPARE>
+		Json(const Map<KT, VT, KEY_COMPARE>& map);
 		
-		template <class KT, class VT>
-		Json(const AtomicMap<KT, VT>& map);
+		template <class KT, class VT, class KEY_COMPARE>
+		Json(const AtomicMap<KT, VT, KEY_COMPARE>& map);
+		
+		template <class KT, class VT, class HASH, class KEY_COMPARE>
+		Json(const HashMap<KT, VT, HASH, KEY_COMPARE>& map);
+		
+		template <class KT, class VT, class HASH, class KEY_COMPARE>
+		Json(const AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& map);
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		Json(const std::initializer_list< Pair<String, Json> >& pairs);
+		Json(const std::initializer_list<JsonPair>& pairs);
 		
 		Json(const std::initializer_list<Json>& elements);
 #endif
@@ -196,7 +220,7 @@ namespace slib
 		Json& operator=(sl_null_t);
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		Json& operator=(const std::initializer_list< Pair<String, Json> >& pairs);
+		Json& operator=(const std::initializer_list<JsonPair>& pairs);
 		
 		Json& operator=(const std::initializer_list<Json>& elements);
 #endif
@@ -240,21 +264,21 @@ namespace slib
 	public:
 		sl_bool isJsonList() const;
 		
-		List<Json> getJsonList() const;
+		JsonList getJsonList() const;
 		
-		void setJsonList(const List<Json>& list);
+		void setJsonList(const JsonList& list);
 		
 		sl_bool isJsonMap() const;
 		
-		Map<String, Json> getJsonMap() const;
+		JsonMap getJsonMap() const;
 		
-		void setJsonMap(const Map<String, Json>& map);
+		void setJsonMap(const JsonMap& map);
 		
 		sl_bool isJsonMapList() const;
 		
-		List< Map<String, Json> > getJsonMapList() const;
+		JsonMapList getJsonMapList() const;
 		
-		void setJsonMapList(const List< Map<String, Json> >& list);
+		void setJsonMapList(const JsonMapList& list);
 
 		Json getElement(sl_size index) const;
 
@@ -394,29 +418,41 @@ namespace slib
 		void get(AtomicMap<String, Variant>& _out) const;
 		void set(const AtomicMap<String, Variant>& _in);
 		
+		void get(HashMap<String, Variant>& _out) const;
+		void set(const HashMap<String, Variant>& _in);
+		
+		void get(AtomicHashMap<String, Variant>& _out) const;
+		void set(const AtomicHashMap<String, Variant>& _in);
+		
 		void get(List< Map<String, Variant> >& _out) const;
 		void set(const List< Map<String, Variant> >& _in);
 		
 		void get(AtomicList< Map<String, Variant> >& _out) const;
 		void set(const AtomicList< Map<String, Variant> >& _in);
 		
-		void get(List<Json>& _out) const;
-		void set(const List<Json>& _in);
+		void get(List< HashMap<String, Variant> >& _out) const;
+		void set(const List< HashMap<String, Variant> >& _in);
 		
-		void get(AtomicList<Json>& _out) const;
-		void set(const AtomicList<Json>& _in);
+		void get(AtomicList< HashMap<String, Variant> >& _out) const;
+		void set(const AtomicList< HashMap<String, Variant> >& _in);
 		
-		void get(Map<String, Json>& _out) const;
-		void set(const Map<String, Json>& _in);
+		void get(JsonList& _out) const;
+		void set(const JsonList& _in);
 		
-		void get(AtomicMap<String, Json>& _out) const;
-		void set(const AtomicMap<String, Json>& _in);
+		void get(AtomicJsonList& _out) const;
+		void set(const AtomicJsonList& _in);
 		
-		void get(List< Map<String, Json> >& _out) const;
-		void set(const List< Map<String, Json> >& _in);
+		void get(JsonMap& _out) const;
+		void set(const JsonMap& _in);
 		
-		void get(AtomicList< Map<String, Json> >& _out) const;
-		void set(const AtomicList< Map<String, Json> >& _in);
+		void get(AtomicJsonMap& _out) const;
+		void set(const AtomicJsonMap& _in);
+		
+		void get(JsonMapList& _out) const;
+		void set(const JsonMapList& _in);
+		
+		void get(AtomicJsonMapList& _out) const;
+		void set(const AtomicJsonMapList& _in);
 		
 		template <class T>
 		void get(List<T>& _out) const;
@@ -428,15 +464,25 @@ namespace slib
 		template <class T>
 		void set(const AtomicList<T>& _in);
 		
-		template <class KT, class VT>
-		void get(Map<KT, VT>& _out) const;
-		template <class KT, class VT>
-		void set(const Map<KT, VT>& _in);
+		template <class KT, class VT, class KEY_COMPARE>
+		void get(Map<KT, VT, KEY_COMPARE>& _out) const;
+		template <class KT, class VT, class KEY_COMPARE>
+		void set(const Map<KT, VT, KEY_COMPARE>& _in);
 		
-		template <class KT, class VT>
-		void get(AtomicMap<KT, VT>& _out) const;
-		template <class KT, class VT>
-		void set(const AtomicMap<KT, VT>& _in);
+		template <class KT, class VT, class KEY_COMPARE>
+		void get(AtomicMap<KT, VT, KEY_COMPARE>& _out) const;
+		template <class KT, class VT, class KEY_COMPARE>
+		void set(const AtomicMap<KT, VT, KEY_COMPARE>& _in);
+		
+		template <class KT, class VT, class HASH, class KEY_COMPARE>
+		void get(HashMap<KT, VT, HASH, KEY_COMPARE>& _out) const;
+		template <class KT, class VT, class HASH, class KEY_COMPARE>
+		void set(const HashMap<KT, VT, HASH, KEY_COMPARE>& _in);
+		
+		template <class KT, class VT, class HASH, class KEY_COMPARE>
+		void get(AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& _out) const;
+		template <class KT, class VT, class HASH, class KEY_COMPARE>
+		void set(const AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& _in);
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
 		template <class T>
@@ -465,24 +511,15 @@ namespace slib
 		
 	};
 	
-	SLIB_INLINE Pair<String, Json> operator<<=(const String& str, const Json& v)
+	SLIB_INLINE JsonPair operator<<=(const String& str, const Json& v)
 	{
 		return Pair<String, Json>(str, v);
 	}
 	
-	SLIB_INLINE Pair<String, Json> operator>>=(const String& str, const Json& v)
+	SLIB_INLINE JsonPair operator>>=(const String& str, const Json& v)
 	{
-		return Pair<String, Json>(str, v);
+		return JsonPair(str, v);
 	}
-	
-	typedef List<Json> JsonList;
-	typedef AtomicList<Json> AtomicJsonList;
-	typedef Map<String, Json> JsonMap;
-	typedef AtomicMap<String, Json> AtomicJsonMap;
-	typedef List< Map<String, Json> > JsonMapList;
-	typedef AtomicList< Map<String, Json> > AtomicJsonMapList;
-	
-	typedef Pair<String, Json> JsonPair;
 
 }
 

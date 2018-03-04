@@ -212,7 +212,7 @@ namespace slib
 			} else {
 				name = String::fromUtf8(data + posStart, posCurrent - posStart);
 			}
-			map.put_NoLock(name, value, MapPutMode::AddAlways);
+			map.add_NoLock(name, value);
 			posCurrent += 2;
 		}
 		return posCurrent;
@@ -320,7 +320,7 @@ namespace slib
 
 	void HttpRequest::addRequestHeader(String name, String value)
 	{
-		m_requestHeaders.put_NoLock(name, value, MapPutMode::AddAlways);
+		m_requestHeaders.add_NoLock(name, value);
 	}
 
 	sl_bool HttpRequest::containsRequestHeader(String name) const
@@ -753,7 +753,7 @@ namespace slib
 
 	void HttpResponse::addResponseHeader(String name, String value)
 	{
-		m_responseHeaders.put_NoLock(name, value, MapPutMode::AddAlways);
+		m_responseHeaders.add_NoLock(name, value);
 	}
 
 	sl_bool HttpResponse::containsResponseHeader(String name) const

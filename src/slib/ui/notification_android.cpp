@@ -67,7 +67,7 @@ namespace slib
 					} else {
 						value = strValue;
 					}
-					_data.put_NoLock(key, value, MapPutMode::AddAlways);
+					_data.add_NoLock(key, value);
 				}
 			}
 		}

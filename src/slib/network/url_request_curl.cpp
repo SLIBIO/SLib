@@ -301,7 +301,7 @@ namespace slib
 						headers.initHash(0, HashIgnoreCaseString(), EqualsIgnoreCaseString());
 						m_responseHeaders = headers;
 					}
-					headers.put(name, value, MapPutMode::AddAlways);
+					headers.add(name, value);
 				}
 			}
 			return sl_true;

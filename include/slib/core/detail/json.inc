@@ -46,15 +46,27 @@ namespace slib
 	{
 		set(list);
 	}
-		
-	template <class KT, class VT>
-	SLIB_INLINE Json::Json(const Map<KT, VT>& map)
+	
+	template <class KT, class VT, class KEY_COMPARE>
+	SLIB_INLINE Json::Json(const Map<KT, VT, KEY_COMPARE>& map)
 	{
 		set(map);
 	}
 
-	template <class KT, class VT>
-	SLIB_INLINE Json::Json(const AtomicMap<KT, VT>& map)
+	template <class KT, class VT, class KEY_COMPARE>
+	SLIB_INLINE Json::Json(const AtomicMap<KT, VT, KEY_COMPARE>& map)
+	{
+		set(map);
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	SLIB_INLINE Json::Json(const HashMap<KT, VT, HASH, KEY_COMPARE>& map)
+	{
+		set(map);
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	SLIB_INLINE Json::Json(const AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& map)
 	{
 		set(map);
 	}
@@ -145,16 +157,24 @@ namespace slib
 		List<T> dst;
 		Ref<Referable> obj(getObject());
 		if (obj.isNotNull()) {
-			if (CList<Variant>* _src = CastInstance< CList<Variant> >(obj.get())) {
-				ListLocker<Variant> src(*_src);
+			if (CList<Variant>* s1 = CastInstance< CList<Variant> >(obj.get())) {
+				ListLocker<Variant> src(*s1);
 				for (sl_size i = 0; i < src.count; i++) {
 					Json& v = *(static_cast<Json*>(&(src[i])));
 					T o;
 					v.get(o);
 					dst.add_NoLock(Move(o));
 				}
-			} else if (CList< Map<String, Variant> >* _src = CastInstance< CList< Map<String, Variant> > >(obj.get())) {
-				ListLocker< Map<String, Variant> > src(*_src);
+			} else if (CList< Map<String, Variant> >* s2 = CastInstance< CList< Map<String, Variant> > >(obj.get())) {
+				ListLocker< Map<String, Variant> > src(*s2);
+				for (sl_size i = 0; i < src.count; i++) {
+					Json v(src[i]);
+					T o;
+					v.get(o);
+					dst.add_NoLock(Move(o));
+				}
+			} else if (CList< HashMap<String, Variant> >* s3 = CastInstance< CList< HashMap<String, Variant> > >(obj.get())) {
+				ListLocker< HashMap<String, Variant> > src(*s3);
 				for (sl_size i = 0; i < src.count; i++) {
 					Json v(src[i]);
 					T o;
@@ -163,20 +183,20 @@ namespace slib
 				}
 			}
 		}
-		_out = dst;
+		_out = Move(dst);
 	}
 	
 	template <class T>
 	void Json::set(const List<T>& _in)
 	{
 		if (_in.isNotNull()) {
-			List<Variant> list;
+			JsonList list;
 			ListLocker<T> src(_in);
 			for (sl_size i = 0; i < src.count; i++) {
 				T& o = src[i];
 				list.add_NoLock(Json(o));
 			}
-			*this = list;
+			*this = Move(list);
 		} else {
 			setNull();
 		}
@@ -196,35 +216,43 @@ namespace slib
 		set(List<T>(_in));
 	}
 	
-	template <class KT, class VT>
-	void Json::get(Map<KT, VT>& _out) const
+	template <class KT, class VT, class KEY_COMPARE>
+	void Json::get(Map<KT, VT, KEY_COMPARE>& _out) const
 	{
-		VariantMap _map = getVariantMap();
-		if (_map.isNotNull()) {
-			MutexLocker locker(_map.getLocker());
-			Map<KT, VT> map;
-			map.initHash();
-			for (auto& pair : _map) {
-				Json& v = *(static_cast<Json*>(&(pair.value)));
-				VT o;
-				v.get(o);
-				map.put_NoLock(Cast<String, KT>()(pair.key), Move(o), MapPutMode::AddAlways);
+		Map<KT, VT, KEY_COMPARE> dst;
+		Ref<Referable> obj(getObject());
+		if (obj.isNotNull()) {
+			if (CMap<String, Variant>* s1 = CastInstance< CMap<String, Variant> >(obj.get())) {
+				CMap<String, Variant>& map = *s1;
+				MutexLocker locker(map.getLocker());
+				for (auto& pair : map) {
+					Json& v = *(static_cast<Json*>(&(pair.value)));
+					VT o;
+					v.get(o);
+					dst.add_NoLock(Cast<String, KT>()(pair.key), Move(o));
+				}
+			} else if (CHashMap<String, Variant>* s2 = CastInstance< CHashMap<String, Variant> >(obj.get())) {
+				CHashMap<String, Variant>& map = *s2;
+				MutexLocker locker(map.getLocker());
+				for (auto& pair : map) {
+					Json& v = *(static_cast<Json*>(&(pair.value)));
+					VT o;
+					v.get(o);
+					dst.add_NoLock(Cast<String, KT>()(pair.key), Move(o));
+				}
 			}
-			_out = Move(map);
-			return;
 		}
-		_out.setNull();
+		_out = Move(dst);
 	}
 	
-	template <class KT, class VT>
-	void Json::set(const Map<KT, VT>& _in)
+	template <class KT, class VT, class KEY_COMPARE>
+	void Json::set(const Map<KT, VT, KEY_COMPARE>& _in)
 	{
 		if (_in.isNotNull()) {
 			MutexLocker locker(_in.getLocker());
-			Map<String, Variant> map;
-			map.initHash();
+			JsonMap map;
 			for (auto& pair : _in) {
-				map.put_NoLock(Cast<KT, String>()(pair.key), Json(pair.value), MapPutMode::AddAlways);
+				map.put_NoLock(Cast<KT, String>()(pair.key), Json(pair.value));
 			}
 			*this = Move(map);
 		} else {
@@ -232,18 +260,76 @@ namespace slib
 		}
 	}
 	
-	template <class KT, class VT>
-	SLIB_INLINE void Json::get(AtomicMap<KT, VT>& _out) const
+	template <class KT, class VT, class KEY_COMPARE>
+	SLIB_INLINE void Json::get(AtomicMap<KT, VT, KEY_COMPARE>& _out) const
 	{
-		Map<KT, VT> t;
+		Map<KT, VT, KEY_COMPARE> t;
 		get(t);
 		_out = Move(t);
 	}
 	
-	template <class KT, class VT>
-	SLIB_INLINE void Json::set(const AtomicMap<KT, VT>& _in)
+	template <class KT, class VT, class KEY_COMPARE>
+	SLIB_INLINE void Json::set(const AtomicMap<KT, VT, KEY_COMPARE>& _in)
 	{
-		set(Map<KT, VT>(_in));
+		set(Map<KT, VT, KEY_COMPARE>(_in));
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	void Json::get(HashMap<KT, VT, HASH, KEY_COMPARE>& _out) const
+	{
+		HashMap<KT, VT, HASH, KEY_COMPARE> dst;
+		Ref<Referable> obj(getObject());
+		if (obj.isNotNull()) {
+			if (CMap<String, Variant>* s1 = CastInstance< CMap<String, Variant> >(obj.get())) {
+				CMap<String, Variant>& map = *s1;
+				MutexLocker locker(map.getLocker());
+				for (auto& pair : map) {
+					Json& v = *(static_cast<Json*>(&(pair.value)));
+					VT o;
+					v.get(o);
+					dst.add_NoLock(Cast<String, KT>()(pair.key), Move(o));
+				}
+			} else if (CHashMap<String, Variant>* s2 = CastInstance< CHashMap<String, Variant> >(obj.get())) {
+				CHashMap<String, Variant>& map = *s2;
+				MutexLocker locker(map.getLocker());
+				for (auto& pair : map) {
+					Json& v = *(static_cast<Json*>(&(pair.value)));
+					VT o;
+					v.get(o);
+					dst.add_NoLock(Cast<String, KT>()(pair.key), Move(o));
+				}
+			}
+		}
+		_out = Move(dst);
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	void Json::set(const HashMap<KT, VT, HASH, KEY_COMPARE>& _in)
+	{
+		if (_in.isNotNull()) {
+			MutexLocker locker(_in.getLocker());
+			JsonMap map;
+			for (auto& pair : _in) {
+				map.put_NoLock(Cast<KT, String>()(pair.key), Json(pair.value));
+			}
+			*this = Move(map);
+		} else {
+			setNull();
+		}
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	SLIB_INLINE void Json::get(AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& _out) const
+	{
+		HashMap<KT, VT, HASH, KEY_COMPARE> t;
+		get(t);
+		_out = Move(t);
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	SLIB_INLINE void Json::set(const AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& _in)
+	{
+		set(HashMap<KT, VT, HASH, KEY_COMPARE>(_in));
 	}
 	
 	template <class T>
@@ -259,94 +345,29 @@ namespace slib
 	}
 	
 	
-	template <>
-	SLIB_INLINE sl_object_type IMap<String, Json>::ObjectType() noexcept
-	{
-		return _priv_VariantMap_ClassID;
-	}
+	template <> sl_object_type CMap<String, Json>::ObjectType() noexcept;
+	template <> sl_bool CMap<String, Json>::isDerivedFrom(sl_object_type type) noexcept;
+	template <> sl_object_type CMap<String, Json>::getObjectType() const noexcept;
+	template <> sl_bool CMap<String, Json>::isInstanceOf(sl_object_type type) const noexcept;
 	
-	template <>
-	SLIB_INLINE sl_bool IMap<String, Json>::checkObjectType(sl_object_type type) noexcept
-	{
-		if (type == _priv_VariantMap_ClassID || type == _priv_Map_ClassID) {
-			return sl_true;
-		}
-		return Object::checkObjectType(type);
-	}
+	template <> sl_object_type CHashMap<String, Json>::ObjectType() noexcept;
+	template <> sl_bool CHashMap<String, Json>::isDerivedFrom(sl_object_type type) noexcept;
+	template <> sl_object_type CHashMap<String, Json>::getObjectType() const noexcept;
+	template <>	sl_bool CHashMap<String, Json>::isInstanceOf(sl_object_type type) const noexcept;
 	
-	template <>
-	SLIB_INLINE sl_object_type IMap<String, Json>::getObjectType() const noexcept
-	{
-		return _priv_VariantMap_ClassID;
-	}
+	template <> sl_object_type CList<Json>::ObjectType() noexcept;
+	template <> sl_bool CList<Json>::isDerivedFrom(sl_object_type type) noexcept;
+	template <> sl_object_type CList<Json>::getObjectType() const noexcept;
+	template <> sl_bool CList<Json>::isInstanceOf(sl_object_type type) const noexcept;
 	
-	template <>
-	SLIB_INLINE sl_bool IMap<String, Json>::isInstanceOf(sl_object_type type) const noexcept
-	{
-		if (type == _priv_VariantMap_ClassID || type == _priv_Map_ClassID) {
-			return sl_true;
-		}
-		return Object::checkObjectType(type);
-	}
+	template <> sl_object_type CList< Map<String, Json> >::ObjectType() noexcept;
+	template <> sl_bool CList< Map<String, Json> >::isDerivedFrom(sl_object_type type) noexcept;
+	template <>	sl_object_type CList< Map<String, Json> >::getObjectType() const noexcept;
+	template <> sl_bool CList< Map<String, Json> >::isInstanceOf(sl_object_type type) const noexcept;
 	
-		template <>
-	SLIB_INLINE sl_object_type CList<Json>::ObjectType() noexcept
-	{
-		return _priv_VariantList_ClassID;
-	}
-	
-	template <>
-	SLIB_INLINE sl_bool CList<Json>::checkObjectType(sl_object_type type) noexcept
-	{
-		if (type == _priv_VariantList_ClassID || type == _priv_List_ClassID) {
-			return sl_true;
-		}
-		return Object::checkObjectType(type);
-	}
-	
-	template <>
-	SLIB_INLINE sl_object_type CList<Json>::getObjectType() const noexcept
-	{
-		return _priv_VariantList_ClassID;
-	}
-	
-	template <>
-	SLIB_INLINE sl_bool CList<Json>::isInstanceOf(sl_object_type type) const noexcept
-	{
-		if (type == _priv_VariantList_ClassID || type == _priv_List_ClassID) {
-			return sl_true;
-		}
-		return Object::checkObjectType(type);
-	}
-	
-	template <>
-	SLIB_INLINE sl_object_type CList< Map<String, Json> >::ObjectType() noexcept
-	{
-		return _priv_VariantMapList_ClassID;
-	}
-	
-	template <>
-	SLIB_INLINE sl_bool CList< Map<String, Json> >::checkObjectType(sl_object_type type) noexcept
-	{
-		if (type == _priv_VariantMapList_ClassID || type == _priv_Map_ClassID) {
-			return sl_true;
-		}
-		return Object::checkObjectType(type);
-	}
-	
-	template <>
-	SLIB_INLINE sl_object_type CList< Map<String, Json> >::getObjectType() const noexcept
-	{
-		return _priv_VariantMapList_ClassID;
-	}
-	
-	template <>
-	SLIB_INLINE sl_bool CList< Map<String, Json> >::isInstanceOf(sl_object_type type) const noexcept
-	{
-		if (type == _priv_VariantMapList_ClassID || type == _priv_Map_ClassID) {
-			return sl_true;
-		}
-		return Object::checkObjectType(type);
-	}
+	template <> sl_object_type CList< HashMap<String, Json> >::ObjectType() noexcept;
+	template <> sl_bool CList< HashMap<String, Json> >::isDerivedFrom(sl_object_type type) noexcept;
+	template <> sl_object_type CList< HashMap<String, Json> >::getObjectType() const noexcept;
+	template <> sl_bool CList< HashMap<String, Json> >::isInstanceOf(sl_object_type type) const noexcept;
 	
 }

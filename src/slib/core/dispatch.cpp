@@ -207,7 +207,7 @@ namespace slib
 			TimeTask tt;
 			tt.time = getElapsedMilliseconds() + delay_ms;
 			tt.task = task;
-			if (m_timeTasks.put(tt.time, tt, MapPutMode::AddAlways)) {
+			if (m_timeTasks.add(tt.time, tt)) {
 				_wake();
 				return sl_true;
 			}

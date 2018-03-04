@@ -73,8 +73,6 @@ namespace slib
 	const char _priv_VariantMapList_ClassID[] = "VariantMapList";
 
 	const char _priv_VariantHashMapList_ClassID[] = "VariantHashMapList";
-
-	extern const char _priv_VariantMap_ClassID[];
 	
 	template <>
 	sl_object_type CMap<String, Variant>::ObjectType() noexcept
@@ -107,8 +105,6 @@ namespace slib
 	}
 	
 	
-	extern const char _priv_VariantHashMap_ClassID[];
-	
 	template <>
 	SLIB_INLINE sl_object_type CHashMap<String, Variant>::ObjectType() noexcept
 	{
@@ -139,8 +135,6 @@ namespace slib
 		return Object::isDerivedFrom(type);
 	}
 	
-	
-	extern const char _priv_VariantList_ClassID[];
 	
 	template <>
 	SLIB_INLINE sl_object_type CList<Variant>::ObjectType() noexcept
@@ -173,8 +167,6 @@ namespace slib
 	}
 	
 	
-	extern const char _priv_VariantMapList_ClassID[];
-	
 	template <>
 	SLIB_INLINE sl_object_type CList< Map<String, Variant> >::ObjectType() noexcept
 	{
@@ -205,8 +197,6 @@ namespace slib
 		return Object::isDerivedFrom(type);
 	}
 	
-	
-	extern const char _priv_VariantHashMapList_ClassID[];
 	
 	template <>
 	SLIB_INLINE sl_object_type CList< HashMap<String, Variant> >::ObjectType() noexcept
