@@ -112,7 +112,7 @@ namespace slib
 		return 0;
 	}
 	
-	sl_bool Referable::checkObjectType(sl_object_type type) noexcept
+	sl_bool Referable::isDerivedFrom(sl_object_type type) noexcept
 	{
 		return sl_false;
 	}

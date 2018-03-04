@@ -141,7 +141,7 @@ public: \
 #define SLIB_DECLARE_OBJECT \
 public: \
 	static sl_object_type ObjectType() noexcept; \
-	static sl_bool checkObjectType(sl_object_type type) noexcept; \
+	static sl_bool isDerivedFrom(sl_object_type type) noexcept; \
 	sl_object_type getObjectType() const noexcept override; \
 	sl_bool isInstanceOf(sl_object_type type) const noexcept override;
 
@@ -151,22 +151,22 @@ public: \
 
 #define SLIB_DEFINE_ROOT_OBJECT(CLASS) \
 	SLIB_DEFINE_OBJECT_TYPE(CLASS) \
-	sl_bool CLASS::checkObjectType(sl_object_type type) noexcept { return type == _g_objectId_##CLASS; } \
+	sl_bool CLASS::isDerivedFrom(sl_object_type type) noexcept { return type == _g_objectId_##CLASS; } \
 	sl_object_type CLASS::getObjectType() const noexcept { return _g_objectId_##CLASS; } \
 	sl_bool CLASS::isInstanceOf(sl_object_type type) const noexcept { return type == _g_objectId_##CLASS; }
 
 #define SLIB_DEFINE_OBJECT(CLASS, BASE) \
 	SLIB_DEFINE_OBJECT_TYPE(CLASS) \
-	sl_bool CLASS::checkObjectType(sl_object_type type) noexcept { if (type == _g_objectId_##CLASS) return sl_true; return BASE::checkObjectType(type); } \
+	sl_bool CLASS::isDerivedFrom(sl_object_type type) noexcept { if (type == _g_objectId_##CLASS) return sl_true; return BASE::isDerivedFrom(type); } \
 	sl_object_type CLASS::getObjectType() const noexcept { return _g_objectId_##CLASS; } \
-	sl_bool CLASS::isInstanceOf(sl_object_type type) const noexcept { if (type == _g_objectId_##CLASS) return sl_true; return BASE::checkObjectType(type); }
+	sl_bool CLASS::isInstanceOf(sl_object_type type) const noexcept { if (type == _g_objectId_##CLASS) return sl_true; return BASE::isDerivedFrom(type); }
 
 #define SLIB_TEMPLATE_OBJECT(BASE, ID) \
 public: \
 	static sl_object_type ObjectType() noexcept { return ID; } \
-	static sl_bool checkObjectType(sl_object_type type) noexcept { if (type == ID) return sl_true; return BASE::checkObjectType(type); } \
+	static sl_bool isDerivedFrom(sl_object_type type) noexcept { if (type == ID) return sl_true; return BASE::isDerivedFrom(type); } \
 	sl_object_type getObjectType() const noexcept override { return ID; } \
-	sl_bool isInstanceOf(sl_object_type type) const noexcept override { if (type == ID) return sl_true; return BASE::checkObjectType(type); }
+	sl_bool isInstanceOf(sl_object_type type) const noexcept override { if (type == ID) return sl_true; return BASE::isDerivedFrom(type); }
 
 #define SLIB_REF_WRAPPER_NO_OP(WRAPPER, ...) \
 public: \

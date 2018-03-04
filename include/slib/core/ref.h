@@ -53,7 +53,7 @@ namespace slib
 	public:
 		static sl_object_type ObjectType() noexcept;
 		
-		static sl_bool checkObjectType(sl_object_type type) noexcept;
+		static sl_bool isDerivedFrom(sl_object_type type) noexcept;
 		
 		virtual sl_object_type getObjectType() const noexcept;
 
