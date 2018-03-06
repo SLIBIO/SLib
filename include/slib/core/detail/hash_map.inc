@@ -830,19 +830,42 @@ namespace slib
 		if (m_table.capacity == 0) {
 			return 0;
 		}
-		sl_size n = m_table.count;
+		sl_size count = m_table.count;
 		_free();
 		_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
 		m_nodeFirst = sl_null;
 		m_nodeLast = sl_null;
-		return n;
+		return count;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	sl_size CHashMap<KT, VT, HASH, KEY_COMPARE>::removeAll() noexcept
 	{
-		ObjectLocker lock(this);
-		return removeAll_NoLock();
+		NODE* first;
+		NODE** nodes;
+		sl_size count;
+		{
+			ObjectLocker lock(this);
+			if (m_table.capacity == 0) {
+				return 0;
+			}
+			first = m_nodeFirst;
+			nodes = m_table.nodes;
+			count = m_table.count;
+			_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
+			m_nodeFirst = sl_null;
+			m_nodeLast = sl_null;
+		}
+		NODE* node = first;
+		while (node) {
+			NODE* next = node->next;
+			delete node;
+			node = next;
+		}
+		if (nodes) {
+			Base::freeMemory(nodes);
+		}
+		return count;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
@@ -1561,7 +1584,7 @@ namespace slib
 				ref = obj;
 				NODE* node = obj->add_NoLock(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 				if (node) {
-					return MapEmplaceReturn< MapNode<KT, VT> >(sl_true, node);
+					return MapEmplaceReturn<NODE>(sl_true, node);
 				} else {
 					return sl_null;
 				}
@@ -2261,7 +2284,7 @@ namespace slib
 				return obj->emplace(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 			}
 		}
-		return sl_null;
+		return sl_false;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>

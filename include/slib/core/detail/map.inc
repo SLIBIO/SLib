@@ -590,20 +590,31 @@ namespace slib
 	sl_size CMap<KT, VT, KEY_COMPARE>::removeAll_NoLock() noexcept
 	{
 		NODE* root = m_root;
+		sl_size count = m_count;
 		if (root) {
 			RedBlackTree::freeNodes(root);
 			m_root = sl_null;
 		}
-		sl_size n = m_count;
 		m_count = 0;
-		return n;
+		return count;
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_size CMap<KT, VT, KEY_COMPARE>::removeAll() noexcept
 	{
-		ObjectLocker lock(this);
-		return removeAll_NoLock();
+		NODE* root;
+		sl_size count;
+		{
+			ObjectLocker lock(this);
+			root = m_root;
+			count = m_count;
+			m_root = sl_null;
+			m_count = 0;
+		}
+		if (root) {
+			RedBlackTree::freeNodes(root);
+		}
+		return count;
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
@@ -1182,7 +1193,7 @@ namespace slib
 				ref = obj;
 				NODE* node = obj->add_NoLock(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 				if (node) {
-					return MapEmplaceReturn< MapNode<KT, VT> >(sl_true, node);
+					return MapEmplaceReturn<NODE>(sl_true, node);
 				} else {
 					return sl_null;
 				}
@@ -1832,7 +1843,7 @@ namespace slib
 				return obj->emplace(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 			}
 		}
-		return sl_null;
+		return sl_false;
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>

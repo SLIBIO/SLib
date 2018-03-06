@@ -784,7 +784,7 @@ namespace slib
 	sl_bool CList<T>::remove(const VALUE& value, const EQUALS& equals) noexcept
 	{
 		ObjectLocker lock(this);
-		return removeValue_NoLock(value, equals);
+		return remove_NoLock(value, equals);
 	}
 	
 	template <class T>
@@ -816,7 +816,7 @@ namespace slib
 	sl_size CList<T>::removeValues(const VALUE& value, const EQUALS& equals) noexcept
 	{
 		ObjectLocker lock(this);
-		return removeElementsByValue_NoLock(value, equals);
+		return removeValues_NoLock(value, equals);
 	}
 	
 	template <class T>
@@ -885,16 +885,36 @@ namespace slib
 	template <class T>
 	sl_size CList<T>::removeAll_NoLock() noexcept
 	{
+		T* data = m_data;
 		sl_size count = m_count;
-		setCount_NoLock(0);
+		if (data) {
+			ArrayTraits<T>::free(data, count);
+			Base::freeMemory((void*)data);
+			m_data = sl_null;
+		}
+		m_count = 0;
+		m_capacity = 0;
 		return count;
 	}
 	
 	template <class T>
 	sl_size CList<T>::removeAll() noexcept
 	{
-		ObjectLocker lock(this);
-		return removeAll_NoLock();
+		T* data;
+		sl_size count;
+		{
+			ObjectLocker lock(this);
+			data = m_data;
+			count = m_count;
+			m_data = sl_null;
+			m_count = 0;
+			m_capacity = 0;
+		}
+		if (data) {
+			ArrayTraits<T>::free(data, count);
+			Base::freeMemory((void*)data);
+		}
+		return count;
 	}
 	
 	template <class T>

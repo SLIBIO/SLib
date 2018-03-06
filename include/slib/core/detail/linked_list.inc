@@ -12,7 +12,7 @@ namespace slib
 {
 	
 	template <class T>
-	SLIB_INLINE CLinkedList<T>::CLinkedList()
+	SLIB_INLINE CLinkedList<T>::CLinkedList() noexcept
 	{
 		m_front = sl_null;
 		m_back = sl_null;
@@ -20,13 +20,13 @@ namespace slib
 	}
 	
 	template <class T>
-	CLinkedList<T>::~CLinkedList()
+	CLinkedList<T>::~CLinkedList() noexcept
 	{
 		removeAll_NoLock();
 	}
 	
 	template <class T>
-	SLIB_INLINE void CLinkedList<T>::init()
+	SLIB_INLINE void CLinkedList<T>::init() noexcept
 	{
 		m_front = sl_null;
 		m_back = sl_null;
@@ -34,7 +34,7 @@ namespace slib
 	}
 	
 	template <class T>
-	SLIB_INLINE void CLinkedList<T>::init(Link<T>* front, Link<T>* back, sl_size count)
+	SLIB_INLINE void CLinkedList<T>::init(Link<T>* front, Link<T>* back, sl_size count) noexcept
 	{
 		m_front = front;
 		m_back = back;
@@ -42,7 +42,7 @@ namespace slib
 	}
 	
 	template <class T>
-	SLIB_INLINE void CLinkedList<T>::init(const CLinkedList<T>* other)
+	SLIB_INLINE void CLinkedList<T>::init(const CLinkedList<T>* other) noexcept
 	{
 		m_front = other->m_front;
 		m_back = other->m_back;
@@ -50,37 +50,37 @@ namespace slib
 	}
 	
 	template <class T>
-	SLIB_INLINE Link<T>* CLinkedList<T>::getFront() const
+	SLIB_INLINE Link<T>* CLinkedList<T>::getFront() const noexcept
 	{
 		return m_front;
 	}
 	
 	template <class T>
-	SLIB_INLINE Link<T>* CLinkedList<T>::getBack() const
+	SLIB_INLINE Link<T>* CLinkedList<T>::getBack() const noexcept
 	{
 		return m_back;
 	}
 	
 	template <class T>
-	SLIB_INLINE sl_size CLinkedList<T>::getCount() const
+	SLIB_INLINE sl_size CLinkedList<T>::getCount() const noexcept
 	{
 		return m_count;
 	}
 	
 	template <class T>
-	SLIB_INLINE sl_bool CLinkedList<T>::isEmpty() const
+	SLIB_INLINE sl_bool CLinkedList<T>::isEmpty() const noexcept
 	{
 		return m_front == sl_null;
 	}
 	
 	template <class T>
-	SLIB_INLINE sl_bool CLinkedList<T>::isNotEmpty() const
+	SLIB_INLINE sl_bool CLinkedList<T>::isNotEmpty() const noexcept
 	{
 		return m_front != sl_null;
 	}
 	
 	template <class T>
-	sl_bool CLinkedList<T>::getFirstItem_NoLock(T* _out) const
+	sl_bool CLinkedList<T>::getFrontValue_NoLock(T* _out) const noexcept
 	{
 		if (m_front) {
 			if (_out) {
@@ -92,14 +92,14 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool CLinkedList<T>::getFirstItem(T* _out) const
+	sl_bool CLinkedList<T>::getFrontValue(T* _out) const noexcept
 	{
 		ObjectLocker lock(this);
-		return getFirstItem_NoLock(_out);
+		return getFrontValue_NoLock(_out);
 	}
 	
 	template <class T>
-	sl_bool CLinkedList<T>::getLastItem_NoLock(T* _out) const
+	sl_bool CLinkedList<T>::getBackValue_NoLock(T* _out) const noexcept
 	{
 		if (m_back) {
 			if (_out) {
@@ -111,15 +111,15 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool CLinkedList<T>::getLastItem(T* _out) const
+	sl_bool CLinkedList<T>::getBackValue(T* _out) const noexcept
 	{
 		ObjectLocker lock(this);
-		return getLastItem_NoLock(_out);
+		return getBackValue_NoLock(_out);
 	}
 	
 	template <class T>
-	template <class _T, class EQUALS>
-	Link<T>* CLinkedList<T>::find_NoLock(const _T& value, const EQUALS& equals) const
+	template <class VALUE, class EQUALS>
+	Link<T>* CLinkedList<T>::find_NoLock(const VALUE& value, const EQUALS& equals) const noexcept
 	{
 		Link<T>* now = m_front;
 		while (now) {
@@ -132,37 +132,15 @@ namespace slib
 	}
 	
 	template <class T>
-	template <class _T, class EQUALS>
-	Link<T>* CLinkedList<T>::find(const _T& value, const EQUALS& equals) const
+	template <class VALUE, class EQUALS>
+	sl_bool CLinkedList<T>::find(const VALUE& value, const EQUALS& equals) const noexcept
 	{
 		ObjectLocker lock(this);
-		return findValue_NoLock(value);
+		return find_NoLock(value) != sl_null;
 	}
 	
 	template <class T>
-	template <class _T, class EQUALS>
-	sl_bool CLinkedList<T>::contains_NoLock(const _T& value, const EQUALS& equals) const
-	{
-		Link<T>* now = m_front;
-		while (now) {
-			if (equals(now->value, value)) {
-				return sl_true;
-			}
-			now = now->next;
-		}
-		return sl_false;
-	}
-	
-	template <class T>
-	template <class _T, class EQUALS>
-	sl_bool CLinkedList<T>::contains(const _T& value, const EQUALS& equals) const
-	{
-		ObjectLocker lock(this);
-		return contains_NoLock(value);
-	}
-	
-	template <class T>
-	Link<T>* CLinkedList<T>::pushBack_NoLock(const T& value, sl_size countLimit)
+	Link<T>* CLinkedList<T>::pushBack_NoLock(const T& value, sl_size countLimit) noexcept
 	{
 		Link<T>* item = _createItem(value);
 		if (!item) {
@@ -176,11 +154,11 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::pushBack(const T& value, sl_size countLimit)
+	sl_bool CLinkedList<T>::pushBack(const T& value, sl_size countLimit) noexcept
 	{
 		Link<T>* item = _createItem(value);
 		if (!item) {
-			return sl_null;
+			return sl_false;
 		}
 		Link<T>* old;
 		{
@@ -190,32 +168,33 @@ namespace slib
 		if (old) {
 			_freeItem(old);
 		}
-		return item;
+		return sl_true;
 	}
 	
 	template <class T>
-	template <class _T>
-	void CLinkedList<T>::pushBackAll_NoLock(const CLinkedList<_T>* other)
+	template <class VALUE>
+	sl_bool CLinkedList<T>::pushBackAll_NoLock(const CLinkedList<VALUE>* other) noexcept
 	{
-		Link<_T>* link = other->getFront();
+		Link<VALUE>* link = other->getFront();
 		while (link) {
 			if (!(pushBack_NoLock(link->value))) {
-				return;
+				return sl_false;
 			}
 			link = link->next;
 		}
+		return sl_true;
 	}
 
 	template <class T>
-	template <class _T>
-	void CLinkedList<T>::pushBackAll(const CLinkedList<_T>* other)
+	template <class VALUE>
+	sl_bool CLinkedList<T>::pushBackAll(const CLinkedList<VALUE>* other) noexcept
 	{
 		ObjectLocker lock(this, other);
-		pushBackAll_NoLock(other);
+		return pushBackAll_NoLock(other);
 	}
 	
 	template <class T>
-	sl_bool CLinkedList<T>::popBack_NoLock(T* _out)
+	sl_bool CLinkedList<T>::popBack_NoLock(T* _out) noexcept
 	{
 		Link<T>* old = _popBackItem();
 		if (old) {
@@ -230,7 +209,7 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool CLinkedList<T>::popBack(T* _out)
+	sl_bool CLinkedList<T>::popBack(T* _out) noexcept
 	{
 		Link<T>* old;
 		{
@@ -249,7 +228,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::pushFront_NoLock(const T& value, sl_size countLimit)
+	Link<T>* CLinkedList<T>::pushFront_NoLock(const T& value, sl_size countLimit) noexcept
 	{
 		Link<T>* item = _createItem(value);
 		if (!item) {
@@ -263,11 +242,11 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::pushFront(const T& value, sl_size countLimit)
+	sl_bool CLinkedList<T>::pushFront(const T& value, sl_size countLimit) noexcept
 	{
 		Link<T>* item = _createItem(value);
 		if (!item) {
-			return sl_null;
+			return sl_false;
 		}
 		Link<T>* old;
 		{
@@ -277,32 +256,33 @@ namespace slib
 		if (old) {
 			_freeItem(old);
 		}
-		return item;
+		return sl_true;
 	}
 	
 	template <class T>
-	template <class _T>
-	void CLinkedList<T>::pushFrontAll_NoLock(const CLinkedList<_T>* other)
+	template <class VALUE>
+	sl_bool CLinkedList<T>::pushFrontAll_NoLock(const CLinkedList<VALUE>* other) noexcept
 	{
-		Link<_T>* link = other->getBack();
+		Link<VALUE>* link = other->getBack();
 		while (link) {
 			if (!(pushFront_NoLock(link->value))) {
-				return;
+				return sl_false;
 			}
 			link = link->before;
 		}
+		return sl_false;
 	}
 
 	template <class T>
-	template <class _T>
-	void CLinkedList<T>::pushFrontAll(const CLinkedList<_T>* other)
+	template <class VALUE>
+	sl_bool CLinkedList<T>::pushFrontAll(const CLinkedList<VALUE>* other) noexcept
 	{
 		ObjectLocker lock(this, other);
-		pushFrontAll_NoLock(other);
+		return pushFrontAll_NoLock(other);
 	}
 	
 	template <class T>
-	sl_bool CLinkedList<T>::popFront_NoLock(T* _out)
+	sl_bool CLinkedList<T>::popFront_NoLock(T* _out) noexcept
 	{
 		Link<T>* old = _popFrontItem();
 		if (old) {
@@ -317,7 +297,7 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool CLinkedList<T>::popFront(T* _out)
+	sl_bool CLinkedList<T>::popFront(T* _out) noexcept
 	{
 		Link<T>* old;
 		{
@@ -336,7 +316,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::insertBefore_NoLock(Link<T>* itemWhere, const T& value)
+	Link<T>* CLinkedList<T>::insertBefore(Link<T>* itemWhere, const T& value) noexcept
 	{
 		if (itemWhere) {
 			Link<T>* itemNew = _createItem(value);
@@ -350,22 +330,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::insertBefore(Link<T>* itemWhere, const T& value)
-	{
-		if (itemWhere) {
-			Link<T>* itemNew = _createItem(value);
-			if (itemNew) {
-				ObjectLocker lock(this);
-				_insertBefore(itemWhere, itemNew);
-			}
-			return itemNew;
-		} else {
-			return pushFront(value);
-		}
-	}
-	
-	template <class T>
-	Link<T>* CLinkedList<T>::insertAfter_NoLock(Link<T>* itemWhere, const T& value)
+	Link<T>* CLinkedList<T>::insertAfter(Link<T>* itemWhere, const T& value) noexcept
 	{
 		if (itemWhere) {
 			Link<T>* itemNew = _createItem(value);
@@ -379,22 +344,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::insertAfter(Link<T>* itemWhere, const T& value)
-	{
-		if (itemWhere) {
-			Link<T>* itemNew = _createItem(value);
-			if (itemNew) {
-				ObjectLocker lock(this);
-				_insertAfter(itemWhere, itemNew);
-			}
-			return itemNew;
-		} else {
-			return pushBack_NoLock(value);
-		}
-	}
-	
-	template <class T>
-	void CLinkedList<T>::removeItem_NoLock(Link<T>* item)
+	void CLinkedList<T>::removeAt(Link<T>* item) noexcept
 	{
 		if (item) {
 			_removeItem(item);
@@ -403,49 +353,39 @@ namespace slib
 	}
 	
 	template <class T>
-	void CLinkedList<T>::removeItem(Link<T>* item)
+	sl_size CLinkedList<T>::removeAll_NoLock() noexcept
 	{
-		if (item) {
-			{
-				ObjectLocker lock(this);
-				_removeItem(item);
-			}
-			_freeItem(item);
-		}
-	}
-	
-	template <class T>
-	void CLinkedList<T>::removeAll_NoLock()
-	{
-		Link<T>* now = m_front;
+		Link<T>* front = m_front;
+		sl_size count = m_count;
 		init();
-		freeLink(now);
+		freeLink(front);
+		return count;
 	}
 	
 	template <class T>
-	void CLinkedList<T>::removeAll()
+	sl_size CLinkedList<T>::removeAll() noexcept
 	{
-		Link<T>* now;
+		Link<T>* front;
+		sl_size count;
 		{
 			ObjectLocker lock(this);
-			now = m_front;
+			front = m_front;
+			count = m_count;
 			init();
 		}
-		freeLink(now);
+		freeLink(front);
+		return count;
 	}
 	
 	template <class T>
-	template <class _T, class EQUALS>
-	sl_bool CLinkedList<T>::removeValue_NoLock(const _T& value, T* outValue, const EQUALS& equals)
+	template <class VALUE, class EQUALS>
+	sl_bool CLinkedList<T>::remove_NoLock(const VALUE& value, const EQUALS& equals) noexcept
 	{
 		Link<T>* now = m_front;
 		while (now) {
 			Link<T>* next = now->next;
 			if (equals(now->value, value)) {
-				if (outValue) {
-					*outValue = now->value;
-				}
-				removeItem_NoLock(now);
+				removeAt(now);
 				return sl_true;
 			}
 			now = next;
@@ -454,16 +394,16 @@ namespace slib
 	}
 	
 	template <class T>
-	template <class _T, class EQUALS>
-	sl_bool CLinkedList<T>::removeValue(const _T& value, T* outValue, const EQUALS& equals)
+	template <class VALUE, class EQUALS>
+	sl_bool CLinkedList<T>::remove(const VALUE& value, const EQUALS& equals) noexcept
 	{
 		ObjectLocker lock(this);
-		return removeValue_NoLock(value, outValue, equals);
+		return remove_NoLock(value, equals);
 	}
 	
 	template <class T>
-	template <class _T, class EQUALS>
-	sl_size CLinkedList<T>::removeItemsByValue_NoLock(const _T& value, List<T>* outValues, const EQUALS& equals)
+	template <class VALUE, class EQUALS>
+	sl_size CLinkedList<T>::removeValues_NoLock(const VALUE& value, const EQUALS& equals) noexcept
 	{
 		sl_size n = 0;
 		Link<T>* now = m_front;
@@ -471,10 +411,7 @@ namespace slib
 			Link<T>* next = now->next;
 			if (equals(now->value, value)) {
 				n++;
-				if (outValues) {
-					outValues->add_NoLock(now->value);
-				}
-				removeItem_NoLock(now);
+				removeAt(now);
 			}
 			now = next;
 		}
@@ -482,15 +419,15 @@ namespace slib
 	}
 	
 	template <class T>
-	template <class _T, class EQUALS>
-	sl_size CLinkedList<T>::removeItemsByValue(const _T& value, List<T>* outValues, const EQUALS& equals)
+	template <class VALUE, class EQUALS>
+	sl_size CLinkedList<T>::removeValues(const VALUE& value, const EQUALS& equals) noexcept
 	{
 		ObjectLocker lock(this);
-		return removeItemsByValue_NoLock(value, outValues, equals);
+		return removeValues_NoLock(value, equals);
 	}
 	
 	template <class T>
-	void CLinkedList<T>::merge_NoLock(CLinkedList<T>* other)
+	void CLinkedList<T>::merge_NoLock(CLinkedList<T>* other) noexcept
 	{
 		if (!other) {
 			return;
@@ -515,7 +452,7 @@ namespace slib
 	}
 
 	template <class T>
-	void CLinkedList<T>::merge(CLinkedList<T>* other)
+	void CLinkedList<T>::merge(CLinkedList<T>* other) noexcept
 	{
 		if (!other) {
 			return;
@@ -528,7 +465,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Array<T> CLinkedList<T>::toArray_NoLock() const
+	Array<T> CLinkedList<T>::toArray_NoLock() const noexcept
 	{
 		Array<T> ret;
 		if (m_count) {
@@ -548,14 +485,14 @@ namespace slib
 	}
 	
 	template <class T>
-	Array<T> CLinkedList<T>::toArray() const
+	Array<T> CLinkedList<T>::toArray() const noexcept
 	{
 		ObjectLocker lock(this);
 		return toArray_NoLock();
 	}
 	
 	template <class T>
-	List<T> CLinkedList<T>::toList_NoLock() const
+	List<T> CLinkedList<T>::toList_NoLock() const noexcept
 	{
 		List<T> ret;
 		if (m_count) {
@@ -575,14 +512,14 @@ namespace slib
 	}
 	
 	template <class T>
-	List<T> CLinkedList<T>::toList() const
+	List<T> CLinkedList<T>::toList() const noexcept
 	{
 		ObjectLocker lock(this);
 		return toList_NoLock();
 	}
 	
 	template <class T>
-	CLinkedList<T>* CLinkedList<T>::duplicate_NoLock() const
+	CLinkedList<T>* CLinkedList<T>::duplicate_NoLock() const noexcept
 	{
 		CLinkedList<T>* ret = new CLinkedList<T>;
 		if (ret) {
@@ -600,26 +537,26 @@ namespace slib
 	}
 	
 	template <class T>
-	CLinkedList<T>* CLinkedList<T>::duplicate() const
+	CLinkedList<T>* CLinkedList<T>::duplicate() const noexcept
 	{
 		ObjectLocker lock(this);
 		return duplicate_NoLock();
 	}
 	
 	template <class T>
-	SLIB_INLINE LinkPosition<T> CLinkedList<T>::begin() const
+	SLIB_INLINE LinkPosition<T> CLinkedList<T>::begin() const noexcept
 	{
 		return LinkPosition<T>(m_front);
 	}
 	
 	template <class T>
-	SLIB_INLINE LinkPosition<T> CLinkedList<T>::end() const
+	SLIB_INLINE LinkPosition<T> CLinkedList<T>::end() const noexcept
 	{
 		return LinkPosition<T>();
 	}
 	
 	template <class T>
-	void CLinkedList<T>::freeLink(Link<T>* link)
+	void CLinkedList<T>::freeLink(Link<T>* link) noexcept
 	{
 		while (link) {
 			Link<T>* next = link->next;
@@ -629,7 +566,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::_createItem(const T& value)
+	Link<T>* CLinkedList<T>::_createItem(const T& value) noexcept
 	{
 		Link<T>* item = (Link<T>*)(Base::createMemory(sizeof(Link<T>)));
 		if (!item) {
@@ -642,7 +579,7 @@ namespace slib
 	}
 	
 	template <class T>
-	void CLinkedList<T>::_freeItem(Link<T>* item)
+	void CLinkedList<T>::_freeItem(Link<T>* item) noexcept
 	{
 		item->value.T::~T();
 		Base::freeMemory(item);
@@ -650,7 +587,7 @@ namespace slib
 	
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::_pushBackItem(Link<T>* item, sl_size countLimit)
+	Link<T>* CLinkedList<T>::_pushBackItem(Link<T>* item, sl_size countLimit) noexcept
 	{
 		Link<T>* old;
 		if (countLimit > 0 && m_count >= countLimit) {
@@ -671,7 +608,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::_popBackItem()
+	Link<T>* CLinkedList<T>::_popBackItem() noexcept
 	{
 		Link<T>* back = m_back;
 		if (back) {
@@ -689,7 +626,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::_pushFrontItem(Link<T>* item, sl_size countLimit)
+	Link<T>* CLinkedList<T>::_pushFrontItem(Link<T>* item, sl_size countLimit) noexcept
 	{
 		Link<T>* old;
 		if (countLimit > 0 && m_count >= countLimit) {
@@ -710,7 +647,7 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::_popFrontItem()
+	Link<T>* CLinkedList<T>::_popFrontItem() noexcept
 	{
 		Link<T>* front = m_front;
 		if (front) {
@@ -728,7 +665,7 @@ namespace slib
 	}
 	
 	template <class T>
-	void CLinkedList<T>::_removeItem(Link<T>* item)
+	void CLinkedList<T>::_removeItem(Link<T>* item) noexcept
 	{
 		m_count--;
 		Link<T>* before = item->before;
@@ -746,7 +683,7 @@ namespace slib
 	}
 	
 	template <class T>
-	void CLinkedList<T>::_insertBefore(Link<T>* itemWhere, Link<T>* itemNew)
+	void CLinkedList<T>::_insertBefore(Link<T>* itemWhere, Link<T>* itemNew) noexcept
 	{
 		itemNew->next = itemWhere;
 		Link<T>* before = itemWhere->before;
@@ -761,7 +698,7 @@ namespace slib
 	}
 
 	template <class T>
-	void CLinkedList<T>::_insertAfter(Link<T>* itemWhere, Link<T>* itemNew)
+	void CLinkedList<T>::_insertAfter(Link<T>* itemWhere, Link<T>* itemNew) noexcept
 	{
 		itemNew->before = itemWhere;
 		Link<T>* next = itemWhere->next;
@@ -777,13 +714,13 @@ namespace slib
 
 
 	template <class T>
-	LinkedList<T> LinkedList<T>::create()
+	LinkedList<T> LinkedList<T>::create() noexcept
 	{
 		return new CLinkedList<T>;
 	}
 
 	template <class T>
-	SLIB_INLINE Link<T>* LinkedList<T>::getFront() const
+	SLIB_INLINE Link<T>* LinkedList<T>::getFront() const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -793,7 +730,7 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE Link<T>* LinkedList<T>::getBack() const
+	SLIB_INLINE Link<T>* LinkedList<T>::getBack() const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -803,7 +740,7 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE sl_size LinkedList<T>::getCount() const
+	SLIB_INLINE sl_size LinkedList<T>::getCount() const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -813,7 +750,7 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE sl_bool LinkedList<T>::isEmpty() const
+	SLIB_INLINE sl_bool LinkedList<T>::isEmpty() const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -823,7 +760,7 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE sl_bool LinkedList<T>::isNotEmpty() const
+	SLIB_INLINE sl_bool LinkedList<T>::isNotEmpty() const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -833,48 +770,48 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool LinkedList<T>::getFirstItem_NoLock(T* _out) const
+	sl_bool LinkedList<T>::getFrontValue_NoLock(T* _out) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->getFirstItem_NoLock(_out);
+			return obj->getFrontValue_NoLock(_out);
 		}
 		return sl_false;
 	}
 
 	template <class T>
-	sl_bool LinkedList<T>::getFirstItem(T* _out) const
+	sl_bool LinkedList<T>::getFrontValue(T* _out) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->getFirstItem(_out);
+			return obj->getFrontValue(_out);
 		}
 		return sl_false;
 	}
 
 	template <class T>
-	sl_bool LinkedList<T>::getLastItem_NoLock(T* _out) const
+	sl_bool LinkedList<T>::getBackValue_NoLock(T* _out) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->getLastItem_NoLock(_out);
+			return obj->getBackValue_NoLock(_out);
 		}
 		return sl_false;
 	}
 
 	template <class T>
-	sl_bool LinkedList<T>::getLastItem(T* _out) const
+	sl_bool LinkedList<T>::getBackValue(T* _out) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->getLastItem(_out);
+			return obj->getBackValue(_out);
 		}
 		return sl_false;
 	}
 
 	template <class T>
-	template <class _T, class EQUALS>
-	Link<T>* LinkedList<T>::find_NoLock(const _T& value, const EQUALS& equals) const
+	template <class VALUE, class EQUALS>
+	Link<T>* LinkedList<T>::find_NoLock(const VALUE& value, const EQUALS& equals) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -884,40 +821,18 @@ namespace slib
 	}
 
 	template <class T>
-	template <class _T, class EQUALS>
-	Link<T>* LinkedList<T>::find(const _T& value, const EQUALS& equals) const
+	template <class VALUE, class EQUALS>
+	sl_bool LinkedList<T>::find(const VALUE& value, const EQUALS& equals) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
 			return obj->find(value, equals);
 		}
-		return sl_null;
-	}
-
-	template <class T>
-	template <class _T, class EQUALS>
-	sl_bool LinkedList<T>::contains_NoLock(const _T& value, const EQUALS& equals) const
-	{
-		CLinkedList<T>* obj = ref._ptr;
-		if (obj) {
-			return obj->contains_NoLock(value, equals);
-		}
 		return sl_false;
 	}
 
 	template <class T>
-	template <class _T, class EQUALS>
-	sl_bool LinkedList<T>::contains(const _T& value, const EQUALS& equals) const
-	{
-		CLinkedList<T>* obj = ref._ptr;
-		if (obj) {
-			return obj->contains(value, equals);
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	Link<T>* LinkedList<T>::pushBack_NoLock(const T& value, sl_size countLimit)
+	Link<T>* LinkedList<T>::pushBack_NoLock(const T& value, sl_size countLimit) noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -933,53 +848,75 @@ namespace slib
 	}
 
 	template <class T>
-	Link<T>* LinkedList<T>::pushBack(const T& value, sl_size countLimit)
+	sl_bool LinkedList<T>::pushBack(const T& value, sl_size countLimit) noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
 			return obj->pushBack(value, countLimit);
 		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->pushBack(value, countLimit);
+			}
 			obj = new CLinkedList<T>;
 			if (obj) {
 				ref = obj;
-				return obj->pushBack_NoLock(value, countLimit);
+				lock.unlock();
+				return obj->pushBack(value, countLimit);
 			}
 		}
-		return sl_null;
+		return sl_false;
 	}
 	
 	template <class T>
-	template <class _T>
-	void LinkedList<T>::pushBackAll_NoLock(const LinkedList<_T>& _other)
+	template <class VALUE>
+	sl_bool LinkedList<T>::pushBackAll_NoLock(const LinkedList<VALUE>& _other) noexcept
 	{
 		CLinkedList<T>* other = _other.ref._ptr;
-		if (other) {
-			CLinkedList<T>* obj = ref._ptr;
-			if (obj) {
-				obj->pushBackAll_NoLock(other);
-			} else {
-				ref = other->duplicate_NoLock();
-			}
+		if (!other) {
+			return sl_true;
+		}
+		CLinkedList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->pushBackAll_NoLock(other);
+		} else {
+			ref = other->duplicate_NoLock();
+			return ref.isNotNull();
 		}
 	}
 
 	template <class T>
-	template <class _T>
-	void LinkedList<T>::pushBackAll(const LinkedList<_T>& _other)
+	template <class VALUE>
+	sl_bool LinkedList<T>::pushBackAll(const LinkedList<VALUE>& _other) noexcept
 	{
 		CLinkedList<T>* other = _other.ref._ptr;
-		if (other) {
-			CLinkedList<T>* obj = ref._ptr;
+		if (!other) {
+			return sl_true;
+		}
+		CLinkedList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->pushBackAll(other);
+		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref._ptr;
 			if (obj) {
-				obj->pushBackAll(other);
-			} else {
-				ref = other->duplicate();
+				lock.unlock();
+				return obj->pushBackAll(other);
+			}
+			obj = new CLinkedList<T>;
+			if (obj) {
+				ref = obj;
+				lock.unlock();
+				return obj->pushBackAll(other);
 			}
 		}
+		return sl_false;
 	}
 
 	template <class T>
-	sl_bool LinkedList<T>::popBack_NoLock(T* _out) const
+	sl_bool LinkedList<T>::popBack_NoLock(T* _out) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -989,7 +926,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool LinkedList<T>::popBack(T* _out) const
+	sl_bool LinkedList<T>::popBack(T* _out) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -999,7 +936,7 @@ namespace slib
 	}
 
 	template <class T>
-	Link<T>* LinkedList<T>::pushFront_NoLock(const T& value, sl_size countLimit)
+	Link<T>* LinkedList<T>::pushFront_NoLock(const T& value, sl_size countLimit) noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -1015,53 +952,75 @@ namespace slib
 	}
 
 	template <class T>
-	Link<T>* LinkedList<T>::pushFront(const T& value, sl_size countLimit)
+	sl_bool LinkedList<T>::pushFront(const T& value, sl_size countLimit) noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
 			return obj->pushFront(value, countLimit);
 		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->pushFront(value, countLimit);
+			}
 			obj = new CLinkedList<T>;
 			if (obj) {
 				ref = obj;
-				return obj->pushFront_NoLock(value, countLimit);
+				lock.unlock();
+				return obj->pushFront(value, countLimit);
 			}
 		}
-		return sl_null;
+		return sl_false;
 	}
 	
 	template <class T>
-	template <class _T>
-	void LinkedList<T>::pushFrontAll_NoLock(const LinkedList<_T>& _other)
+	template <class VALUE>
+	sl_bool LinkedList<T>::pushFrontAll_NoLock(const LinkedList<VALUE>& _other) noexcept
 	{
 		LinkedList<T>* other = _other.ref._ptr;
-		if (other) {
-			CLinkedList<T>* obj = ref._ptr;
-			if (obj) {
-				obj->pushFrontAll_NoLock(other);
-			} else {
-				ref = other->duplicate_NoLock();
-			}
+		if (!other) {
+			return sl_true;
+		}
+		CLinkedList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->pushFrontAll_NoLock(other);
+		} else {
+			ref = other->duplicate_NoLock();
+			return ref.isNotNull();
 		}
 	}
 
 	template <class T>
-	template <class _T>
-	void LinkedList<T>::pushFrontAll(const LinkedList<_T>& _other)
+	template <class VALUE>
+	sl_bool LinkedList<T>::pushFrontAll(const LinkedList<VALUE>& _other) noexcept
 	{
 		LinkedList<T>* other = _other.ref._ptr;
-		if (other) {
-			CLinkedList<T>* obj = ref._ptr;
+		if (!other) {
+			return sl_true;
+		}
+		CLinkedList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->pushFrontAll(other);
+		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref._ptr;
 			if (obj) {
-				obj->pushFrontAll(other);
-			} else {
-				ref = other->duplicate();
+				lock.unlock();
+				return obj->pushFrontAll(other);
+			}
+			obj = new CLinkedList<T>;
+			if (obj) {
+				ref = obj;
+				lock.unlock();
+				return obj->pushFrontAll(other);
 			}
 		}
+		return sl_false;
 	}
 
 	template <class T>
-	sl_bool LinkedList<T>::popFront_NoLock(T* _out) const
+	sl_bool LinkedList<T>::popFront_NoLock(T* _out) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -1071,7 +1030,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool LinkedList<T>::popFront(T* _out) const
+	sl_bool LinkedList<T>::popFront(T* _out) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -1081,17 +1040,7 @@ namespace slib
 	}
 
 	template <class T>
-	Link<T>* LinkedList<T>::insertBefore_NoLock(Link<T>* itemWhere, const T& value) const
-	{
-		CLinkedList<T>* obj = ref._ptr;
-		if (obj) {
-			obj->insertBefore_NoLock(itemWhere, value);
-		}
-		return sl_null;
-	}
-
-	template <class T>
-	Link<T>* LinkedList<T>::insertBefore(Link<T>* itemWhere, const T& value) const
+	Link<T>* LinkedList<T>::insertBefore(Link<T>* itemWhere, const T& value) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -1101,107 +1050,90 @@ namespace slib
 	}
 
 	template <class T>
-	Link<T>* LinkedList<T>::insertAfter_NoLock(Link<T>* itemWhere, const T& value) const
+	Link<T>* LinkedList<T>::insertAfter(Link<T>* itemWhere, const T& value) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			obj->insertAfter_NoLock(itemWhere, value);
+			obj->insertAfter(itemWhere, value);
 		}
 		return sl_null;
 	}
 
 	template <class T>
-	Link<T>* LinkedList<T>::insertAfter(Link<T>* itemWhere, const T& value) const
+	void LinkedList<T>::removeAt(Link<T>* item) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			obj->insertAfter_NoLock(itemWhere, value);
-		}
-		return sl_null;
-	}
-
-	template <class T>
-	void LinkedList<T>::removeItem_NoLock(Link<T>* item) const
-	{
-		CLinkedList<T>* obj = ref._ptr;
-		if (obj) {
-			obj->removeItem_NoLock(item);
+			obj->removeAt(item);
 		}
 	}
 
 	template <class T>
-	void LinkedList<T>::removeItem(Link<T>* item) const
+	sl_size LinkedList<T>::removeAll_NoLock() const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			obj->removeItem(item);
-		}
-	}
-
-	template <class T>
-	void LinkedList<T>::removeAll_NoLock() const
-	{
-		CLinkedList<T>* obj = ref._ptr;
-		if (obj) {
-			obj->removeAll_NoLock();
-		}
-	}
-
-	template <class T>
-	void LinkedList<T>::removeAll() const
-	{
-		CLinkedList<T>* obj = ref._ptr;
-		if (obj) {
-			obj->removeAll();
-		}
-	}
-
-	template <class T>
-	template <class _T, class EQUALS>
-	sl_bool LinkedList<T>::removeValue_NoLock(const _T& value, T* outValue, const EQUALS& equals) const
-	{
-		CLinkedList<T>* obj = ref._ptr;
-		if (obj) {
-			return obj->removeValue_NoLock(value, outValue, equals);
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	template <class _T, class EQUALS>
-	sl_bool LinkedList<T>::removeValue(const _T& value, T* outValue, const EQUALS& equals) const
-	{
-		CLinkedList<T>* obj = ref._ptr;
-		if (obj) {
-			return obj->removeValue(value, outValue, equals);
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	template <class _T, class EQUALS>
-	sl_size LinkedList<T>::removeItemsByValue_NoLock(const _T& value, List<T>* outValues, const EQUALS& equals) const
-	{
-		CLinkedList<T>* obj = ref._ptr;
-		if (obj) {
-			return obj->removeItemsByValue_NoLock(value, outValues, equals);
+			return obj->removeAll_NoLock();
 		}
 		return 0;
 	}
 
 	template <class T>
-	template <class _T, class EQUALS>
-	sl_size LinkedList<T>::removeItemsByValue(const _T& value, List<T>* outValues, const EQUALS& equals) const
+	sl_size LinkedList<T>::removeAll() const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->removeItemsByValue(value, outValues, equals);
+			return obj->removeAll();
+		}
+		return 0;
+	}
+
+	template <class T>
+	template <class VALUE, class EQUALS>
+	sl_bool LinkedList<T>::remove_NoLock(const VALUE& value, const EQUALS& equals) const noexcept
+	{
+		CLinkedList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->remove_NoLock(value, equals);
+		}
+		return sl_false;
+	}
+
+	template <class T>
+	template <class VALUE, class EQUALS>
+	sl_bool LinkedList<T>::remove(const VALUE& value, const EQUALS& equals) const noexcept
+	{
+		CLinkedList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->remove(value, equals);
+		}
+		return sl_false;
+	}
+
+	template <class T>
+	template <class VALUE, class EQUALS>
+	sl_size LinkedList<T>::removeValues_NoLock(const VALUE& value, const EQUALS& equals) const noexcept
+	{
+		CLinkedList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->removeValues_NoLock(value, equals);
+		}
+		return 0;
+	}
+
+	template <class T>
+	template <class VALUE, class EQUALS>
+	sl_size LinkedList<T>::removeValues(const VALUE& value, const EQUALS& equals) const noexcept
+	{
+		CLinkedList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->removeValues(value, equals);
 		}
 		return 0;
 	}
 	
 	template <class T>
-	void LinkedList<T>::merge_NoLock(LinkedList<T>& _other)
+	void LinkedList<T>::merge_NoLock(LinkedList<T>& _other) noexcept
 	{
 		CLinkedList<T>* other = _other.ref._ptr;
 		if (!other) {
@@ -1221,7 +1153,7 @@ namespace slib
 	}
 
 	template <class T>
-	void LinkedList<T>::merge(LinkedList<T>& _other)
+	void LinkedList<T>::merge(LinkedList<T>& _other) noexcept
 	{
 		CLinkedList<T>* other = _other.ref._ptr;
 		if (!other) {
@@ -1231,18 +1163,25 @@ namespace slib
 		if (obj) {
 			obj->merge(other);
 		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				obj->merge(other);
+				return;
+			}
 			obj = new CLinkedList<T>;
 			if (obj) {
-				ObjectLocker lock(other);
-				obj->init(other);
-				other->init();
 				ref = obj;
+				lock.unlock();
+				obj->merge(other);
+				return;
 			}
 		}
 	}
 
 	template <class T>
-	Array<T> LinkedList<T>::toArray_NoLock() const
+	Array<T> LinkedList<T>::toArray_NoLock() const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -1252,7 +1191,7 @@ namespace slib
 	}
 
 	template <class T>
-	Array<T> LinkedList<T>::toArray() const
+	Array<T> LinkedList<T>::toArray() const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -1262,7 +1201,7 @@ namespace slib
 	}
 
 	template <class T>
-	List<T> LinkedList<T>::toList_NoLock() const
+	List<T> LinkedList<T>::toList_NoLock() const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -1272,7 +1211,7 @@ namespace slib
 	}
 
 	template <class T>
-	List<T> LinkedList<T>::toList() const
+	List<T> LinkedList<T>::toList() const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -1282,7 +1221,7 @@ namespace slib
 	}
 
 	template <class T>
-	LinkedList<T> LinkedList<T>::duplicate_NoLock() const
+	LinkedList<T> LinkedList<T>::duplicate_NoLock() const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -1292,7 +1231,7 @@ namespace slib
 	}
 
 	template <class T>
-	LinkedList<T> LinkedList<T>::duplicate() const
+	LinkedList<T> LinkedList<T>::duplicate() const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -1302,7 +1241,7 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE LinkPosition<T> LinkedList<T>::begin() const
+	SLIB_INLINE LinkPosition<T> LinkedList<T>::begin() const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
@@ -1312,14 +1251,14 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE LinkPosition<T> LinkedList<T>::end() const
+	SLIB_INLINE LinkPosition<T> LinkedList<T>::end() const noexcept
 	{
 		return LinkPosition<T>();
 	}
 
 
 	template <class T>
-	SLIB_INLINE sl_size Atomic< LinkedList<T> >::getCount() const
+	SLIB_INLINE sl_size Atomic< LinkedList<T> >::getCount() const noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
@@ -1329,7 +1268,7 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE sl_bool Atomic< LinkedList<T> >::isEmpty() const
+	SLIB_INLINE sl_bool Atomic< LinkedList<T> >::isEmpty() const noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
@@ -1339,7 +1278,7 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE sl_bool Atomic< LinkedList<T> >::isNotEmpty() const
+	SLIB_INLINE sl_bool Atomic< LinkedList<T> >::isNotEmpty() const noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
@@ -1349,71 +1288,89 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool Atomic< LinkedList<T> >::getFirstItem(T* _out) const
+	sl_bool Atomic< LinkedList<T> >::getFrontValue(T* _out) const noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->getFirstItem(_out);
+			return obj->getFrontValue(_out);
 		}
 		return sl_false;
 	}
 
 	template <class T>
-	sl_bool Atomic< LinkedList<T> >::getLastItem(T* _out) const
+	sl_bool Atomic< LinkedList<T> >::getBackValue(T* _out) const noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->getLastItem(_out);
+			return obj->getBackValue(_out);
 		}
 		return sl_false;
 	}
 
 	template <class T>
-	template <class _T, class EQUALS>
-	sl_bool Atomic< LinkedList<T> >::contains(const _T& value, const EQUALS& equals) const
+	template <class VALUE, class EQUALS>
+	sl_bool Atomic< LinkedList<T> >::find(const VALUE& value, const EQUALS& equals) const noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->contains(value, equals);
+			return obj->find(value, equals);
 		}
 		return sl_false;
 	}
 
 	template <class T>
-	sl_bool Atomic< LinkedList<T> >::pushBack(const T& value, sl_size countLimit)
+	sl_bool Atomic< LinkedList<T> >::pushBack(const T& value, sl_size countLimit) noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->pushBack(value, countLimit) != sl_null;
+			return obj->pushBack(value, countLimit);
 		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				return obj->pushBack(value, countLimit);
+			}
 			obj = new CLinkedList<T>;
 			if (obj.isNotNull()) {
-				if (obj->pushBack_NoLock(value, countLimit)) {
-					ref = obj;
-					return sl_true;
-				}
+				ref = obj;
+				lock.unlock();
+				return obj->pushBack(value, countLimit);
 			}
 		}
 		return sl_false;
 	}
 
 	template <class T>
-	template <class _T>
-	void Atomic< LinkedList<T> >::pushBackAll(const LinkedList<_T>& _other)
+	template <class VALUE>
+	sl_bool Atomic< LinkedList<T> >::pushBackAll(const LinkedList<VALUE>& _other) noexcept
 	{
 		CLinkedList<T>* other = _other.ref._ptr;
-		if (other) {
-			Ref< CLinkedList<T> > obj(ref);
+		if (!other) {
+			return sl_true;
+		}
+		Ref< CLinkedList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->pushBackAll(other);
+		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref;
 			if (obj.isNotNull()) {
-				obj->pushBackAll(other);
-			} else {
-				ref = other->duplicate();
+				lock.unlock();
+				return obj->pushBackAll(other);
+			}
+			obj = new CLinkedList<T>;
+			if (obj.isNotNull()) {
+				ref = obj;
+				lock.unlock();
+				return obj->pushBackAll(other);
 			}
 		}
+		return sl_false;
 	}
 
 	template <class T>
-	sl_bool Atomic< LinkedList<T> >::popBack(T* _out) const
+	sl_bool Atomic< LinkedList<T> >::popBack(T* _out) const noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
@@ -1423,40 +1380,58 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool Atomic< LinkedList<T> >::pushFront(const T& value, sl_size countLimit)
+	sl_bool Atomic< LinkedList<T> >::pushFront(const T& value, sl_size countLimit) noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->pushFront(value, countLimit) != sl_null;
+			return obj->pushFront(value, countLimit);
 		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				return obj->pushFront(value, countLimit);
+			}
 			obj = new CLinkedList<T>;
 			if (obj.isNotNull()) {
-				if (obj->pushFront_NoLock(value, countLimit)) {
-					ref = obj;
-					return sl_true;
-				}
+				ref = obj;
+				lock.unlock();
+				return obj->pushFront(value, countLimit);
 			}
 		}
-		return sl_null;
+		return sl_false;
 	}
 
 	template <class T>
-	template <class _T>
-	void Atomic< LinkedList<T> >::pushFrontAll(const LinkedList<_T>& _other)
+	template <class VALUE>
+	sl_bool Atomic< LinkedList<T> >::pushFrontAll(const LinkedList<VALUE>& _other) noexcept
 	{
 		CLinkedList<T>* other = _other.ref._ptr;
-		if (other) {
-			Ref< CLinkedList<T> > obj(ref);
+		if (!other) {
+			return sl_true;
+		}
+		Ref< CLinkedList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->pushFrontAll(other);
+		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref;
 			if (obj.isNotNull()) {
-				obj->pushFrontAll(other);
-			} else {
-				ref = other->duplicate();
+				lock.unlock();
+				return obj->pushFrontAll(other);
+			}
+			obj = new CLinkedList<T>;
+			if (obj.isNotNull()) {
+				ref = obj;
+				lock.unlock();
+				return obj->pushFrontAll(other);
 			}
 		}
+		return sl_false;
 	}
 
 	template <class T>
-	sl_bool Atomic< LinkedList<T> >::popFront(T* _out) const
+	sl_bool Atomic< LinkedList<T> >::popFront(T* _out) const noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
@@ -1466,38 +1441,39 @@ namespace slib
 	}
 
 	template <class T>
-	void Atomic< LinkedList<T> >::removeAll() const
+	sl_size Atomic< LinkedList<T> >::removeAll() const noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			obj->removeAll();
-		}
-	}
-
-	template <class T>
-	template <class _T, class EQUALS>
-	sl_bool Atomic< LinkedList<T> >::removeValue(const _T& value, T* outValue, const EQUALS& equals) const
-	{
-		Ref< CLinkedList<T> > obj(ref);
-		if (obj.isNotNull()) {
-			return obj->removeValue(value, outValue, equals);
-		}
-		return sl_false;
-	}
-
-	template <class T>
-	template <class _T, class EQUALS>
-	sl_size Atomic< LinkedList<T> >::removeItemsByValue(const _T& value, List<T>* outValues, const EQUALS& equals) const
-	{
-		Ref< CLinkedList<T> > obj(ref);
-		if (obj.isNotNull()) {
-			return obj->removeItemsByValue(value, outValues, equals);
+			return obj->removeAll();
 		}
 		return 0;
 	}
 
 	template <class T>
-	void Atomic< LinkedList<T> >::merge(LinkedList<T>& _other)
+	template <class VALUE, class EQUALS>
+	sl_bool Atomic< LinkedList<T> >::remove(const VALUE& value, const EQUALS& equals) const noexcept
+	{
+		Ref< CLinkedList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->removeValue(value, equals);
+		}
+		return sl_false;
+	}
+
+	template <class T>
+	template <class VALUE, class EQUALS>
+	sl_size Atomic< LinkedList<T> >::removeValues(const VALUE& value, const EQUALS& equals) const noexcept
+	{
+		Ref< CLinkedList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->removeValues(value, equals);
+		}
+		return 0;
+	}
+
+	template <class T>
+	void Atomic< LinkedList<T> >::merge(LinkedList<T>& _other) noexcept
 	{
 		CLinkedList<T>* other = _other.ref._ptr;
 		if (!other) {
@@ -1507,17 +1483,25 @@ namespace slib
 		if (obj.isNotNull()) {
 			obj->merge(other);
 		} else {
+			SpinLocker lock(SpinLockPoolForList::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				obj->merge(other);
+				return;
+			}
 			obj = new CLinkedList<T>;
 			if (obj.isNotNull()) {
-				obj->init(other);
-				other->init();
 				ref = obj;
+				lock.unlock();
+				obj->merge(other);
+				return;
 			}
 		}
 	}
 
 	template <class T>
-	Array<T> Atomic< LinkedList<T> >::toArray() const
+	Array<T> Atomic< LinkedList<T> >::toArray() const noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
@@ -1527,7 +1511,7 @@ namespace slib
 	}
 
 	template <class T>
-	List<T> Atomic< LinkedList<T> >::toList() const
+	List<T> Atomic< LinkedList<T> >::toList() const noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
@@ -1537,7 +1521,7 @@ namespace slib
 	}
 
 	template <class T>
-	LinkedList<T> Atomic< LinkedList<T> >::duplicate() const
+	LinkedList<T> Atomic< LinkedList<T> >::duplicate() const noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
@@ -1547,7 +1531,7 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE LinkPosition<T> Atomic< LinkedList<T> >::begin() const
+	SLIB_INLINE LinkPosition<T> Atomic< LinkedList<T> >::begin() const noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
@@ -1557,35 +1541,35 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE LinkPosition<T> Atomic< LinkedList<T> >::end() const
+	SLIB_INLINE LinkPosition<T> Atomic< LinkedList<T> >::end() const noexcept
 	{
 		return LinkPosition<T>();
 	}
 
 
 	template <class T>
-	SLIB_INLINE LinkPosition<T>::LinkPosition() : link(sl_null) {}
+	SLIB_INLINE LinkPosition<T>::LinkPosition() noexcept : link(sl_null) {}
 
 	template <class T>
-	SLIB_INLINE LinkPosition<T>::LinkPosition(Link<T>* _link) : link(_link) {}
+	SLIB_INLINE LinkPosition<T>::LinkPosition(Link<T>* _link) noexcept : link(_link) {}
 	
 	template <class T>
-	SLIB_INLINE LinkPosition<T>::LinkPosition(Link<T>* _link, Referable* _ref) : link(_link), ref(_ref) {}
+	SLIB_INLINE LinkPosition<T>::LinkPosition(Link<T>* _link, Referable* _ref) noexcept : link(_link), ref(_ref) {}
 
 	template <class T>
-	SLIB_INLINE T& LinkPosition<T>::operator*() const
+	SLIB_INLINE T& LinkPosition<T>::operator*() const noexcept
 	{
 		return link->value;
 	}
 	
 	template <class T>
-	SLIB_INLINE sl_bool LinkPosition<T>::operator==(const LinkPosition<T>& p) const
+	SLIB_INLINE sl_bool LinkPosition<T>::operator==(const LinkPosition<T>& p) const noexcept
 	{
 		return link == p.link;
 	}
 
 	template <class T>
-	SLIB_INLINE sl_bool LinkPosition<T>::operator!=(const LinkPosition<T>& p) const
+	SLIB_INLINE sl_bool LinkPosition<T>::operator!=(const LinkPosition<T>& p) const noexcept
 	{
 		return link != p.link;
 	}
@@ -1597,7 +1581,7 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE LinkPosition<T>& LinkPosition<T>::operator++()
+	SLIB_INLINE LinkPosition<T>& LinkPosition<T>::operator++() noexcept
 	{
 		link = link->next;
 		return *this;
