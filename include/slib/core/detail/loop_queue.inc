@@ -12,7 +12,7 @@ namespace slib
 {
 	
 	template <class T>
-	LoopQueue<T>::LoopQueue(sl_size size, sl_size latency)
+	LoopQueue<T>::LoopQueue(sl_size size, sl_size latency) noexcept
 	{
 		m_first = 0;
 		m_count = 0;
@@ -26,7 +26,7 @@ namespace slib
 	}
 
 	template <class T>
-	LoopQueue<T>::~LoopQueue()
+	LoopQueue<T>::~LoopQueue() noexcept
 	{
 		if (m_data) {
 			NewHelper<T>::free(m_data, m_size);
@@ -34,13 +34,13 @@ namespace slib
 	}
 
 	template <class T>
-	sl_size LoopQueue<T>::getQueueSize()
+	sl_size LoopQueue<T>::getQueueSize() const noexcept
 	{
 		return m_size;
 	}
 
 	template <class T>
-	sl_bool LoopQueue<T>::setQueueSize(sl_size size)
+	sl_bool LoopQueue<T>::setQueueSize(sl_size size) noexcept
 	{
 		ObjectLocker lock(this);
 		if (m_data) {
@@ -58,45 +58,47 @@ namespace slib
 	}
 
 	template <class T>
-	void LoopQueue<T>::removeAll()
+	sl_size LoopQueue<T>::removeAll() noexcept
 	{
 		ObjectLocker lock(this);
+		sl_size count = m_count;
 		m_first = 0;
 		m_count = 0;
+		return count;
 	}
 
 	template <class T>
-	T* LoopQueue<T>::getBuffer()
+	T* LoopQueue<T>::getBuffer() const noexcept
 	{
 		return m_data;
 	}
 
 	template <class T>
-	sl_size LoopQueue<T>::getCount()
+	sl_size LoopQueue<T>::getCount() const noexcept
 	{
 		return m_count;
 	}
 
 	template <class T>
-	void LoopQueue<T>::setLatency(sl_size latency)
+	void LoopQueue<T>::setLatency(sl_size latency) noexcept
 	{
 		m_latency = latency;
 	}
 
 	template <class T>
-	sl_size LoopQueue<T>::getLatency()
+	sl_size LoopQueue<T>::getLatency() const noexcept
 	{
 		return m_latency;
 	}
 
 	template <class T>
-	sl_bool LoopQueue<T>::add(const T& data, sl_bool flagPush)
+	sl_bool LoopQueue<T>::push(const T& data, sl_bool flagShift) noexcept
 	{
 		ObjectLocker lock(this);
 		if (m_size == 0) {
 			return sl_false;
 		}
-		if (m_count == m_size && ! flagPush) {
+		if (m_count == m_size && !flagShift) {
 			return sl_false;
 		}
 		sl_size last = m_first + m_count;
@@ -110,13 +112,13 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool LoopQueue<T>::add(const T* buffer, sl_size count, sl_bool flagPush)
+	sl_bool LoopQueue<T>::push(const T* buffer, sl_size count, sl_bool flagShift) noexcept
 	{
 		ObjectLocker lock(this);
 		if (m_size == 0) {
 			return sl_false;
 		}
-		if (m_count + count > m_size && !flagPush) {
+		if (m_count + count > m_size && !flagShift) {
 			return sl_false;
 		}
 		sl_size last = m_first + m_count;
@@ -148,7 +150,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool LoopQueue<T>::get(T& output)
+	sl_bool LoopQueue<T>::pop(T& output) noexcept
 	{
 		ObjectLocker lock(this);
 		sl_bool ret = sl_false;
@@ -162,7 +164,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool LoopQueue<T>::get(T* buffer, sl_size count)
+	sl_bool LoopQueue<T>::pop(T* buffer, sl_size count) noexcept
 	{
 		ObjectLocker lock(this);
 		sl_bool ret = sl_false;
@@ -188,7 +190,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_size LoopQueue<T>::copy(T* buffer, sl_size count)
+	sl_size LoopQueue<T>::copy(T* buffer, sl_size count) const noexcept
 	{
 		ObjectLocker lock(this);
 		if (count > m_count) {

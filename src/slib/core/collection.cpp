@@ -48,5 +48,5 @@ namespace slib
 	LinkedObjectListBase::~LinkedObjectListBase()
 	{
 	}
-
+	
 }

@@ -24,9 +24,9 @@ namespace slib
 		SLIB_DECLARE_OBJECT
 
 	public:
-		LoopQueueBase();
+		LoopQueueBase() noexcept;
 
-		~LoopQueueBase();
+		~LoopQueueBase() noexcept;
 
 	};
 	
@@ -41,34 +41,34 @@ namespace slib
 		sl_size m_latency;
 	
 	public:
-		LoopQueue(sl_size size = 10, sl_size latency = 0);
+		LoopQueue(sl_size size = 10, sl_size latency = 0) noexcept;
 
-		~LoopQueue();
+		~LoopQueue() noexcept;
 	
 	public:
-		sl_size getQueueSize();
+		sl_size getQueueSize() const noexcept;
 
-		sl_bool setQueueSize(sl_size size);
+		sl_bool setQueueSize(sl_size size) noexcept;
 
-		void removeAll();
+		sl_size removeAll() noexcept;
 
-		T* getBuffer();
+		T* getBuffer() const noexcept;
 
-		sl_size getCount();
+		sl_size getCount() const noexcept;
 
-		void setLatency(sl_size latency);
+		void setLatency(sl_size latency) noexcept;
 
-		sl_size getLatency();
+		sl_size getLatency() const noexcept;
 
-		sl_bool add(const T& data, sl_bool flagPush = sl_true);
+		sl_bool push(const T& data, sl_bool flagShift = sl_true) noexcept;
 
-		sl_bool add(const T* buffer, sl_size count, sl_bool flagPush = sl_true);
+		sl_bool push(const T* buffer, sl_size count, sl_bool flagShift = sl_true) noexcept;
 
-		sl_bool get(T& output);
+		sl_bool pop(T& output) noexcept;
 
-		sl_bool get(T* buffer, sl_size count);
+		sl_bool pop(T* buffer, sl_size count) noexcept;
 
-		sl_size copy(T* buffer, sl_size count);
+		sl_size copy(T* buffer, sl_size count) const noexcept;
 
 	};
 

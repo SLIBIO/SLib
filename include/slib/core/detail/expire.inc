@@ -14,8 +14,8 @@ namespace slib
 	template <class KT, class VT>
 	ExpiringMap<KT, VT>::ExpiringMap()
 	{
-		m_mapCurrent.initHash();
-		m_mapBackup.initHash();
+		m_mapCurrent.init();
+		m_mapBackup.init();
 
 		m_duration = 0;
 	}
@@ -145,10 +145,10 @@ namespace slib
 	sl_bool ExpiringMap<KT, VT>::contains(const KT& key)
 	{
 		ObjectLocker lock(this);
-		if (m_mapCurrent.contains_NoLock(key)) {
+		if (m_mapCurrent.find_NoLock(key)) {
 			return sl_true;
 		}
-		if (m_mapBackup.contains_NoLock(key)) {
+		if (m_mapBackup.find_NoLock(key)) {
 			return sl_true;
 		}
 		return sl_false;
@@ -159,7 +159,7 @@ namespace slib
 	{
 		ObjectLocker lock(this);
 		m_mapBackup = m_mapCurrent;
-		m_mapCurrent.initHash();
+		m_mapCurrent.init();
 	}
 
 	template <class KT, class VT>

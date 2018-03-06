@@ -14,7 +14,7 @@
 #include "definition.h"
 
 #include "object.h"
-#include "map.h"
+#include "hash_map.h"
 #include "dispatch_loop.h"
 
 namespace slib
@@ -24,8 +24,8 @@ namespace slib
 	class SLIB_EXPORT ExpiringMap : public Object
 	{
 	protected:
-		Map<KT, VT> m_mapCurrent;
-		Map<KT, VT> m_mapBackup;
+		HashMap<KT, VT> m_mapCurrent;
+		HashMap<KT, VT> m_mapBackup;
 
 		sl_uint32 m_duration;
 

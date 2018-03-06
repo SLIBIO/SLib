@@ -22,19 +22,19 @@ namespace slib
 	class SLIB_EXPORT Queue : public CONTAINER
 	{
 	public:
-		sl_bool push_NoLock(const T& value, sl_size countLimit = 0);
+		sl_bool push_NoLock(const T& value, sl_size countLimit = 0) noexcept;
 
-		sl_bool push(const T& value, sl_size countLimit = 0);
+		sl_bool push(const T& value, sl_size countLimit = 0) noexcept;
 
-		void pushAll(const Queue<T, CONTAINER>* other);
+		sl_bool pushAll(const Queue<T, CONTAINER>* other) noexcept;
 
-		sl_bool pop_NoLock(T* _out = sl_null);
+		sl_bool pop_NoLock(T* _out = sl_null) noexcept;
 
-		sl_bool pop(T* _out = sl_null);
+		sl_bool pop(T* _out = sl_null) noexcept;
 
-		Queue<T, CONTAINER>* duplicate_NoLock() const;
+		Queue<T, CONTAINER>* duplicate_NoLock() const noexcept;
 
-		Queue<T, CONTAINER>* duplicate() const;
+		Queue<T, CONTAINER>* duplicate() const noexcept;
 
 	};
 	
@@ -42,19 +42,19 @@ namespace slib
 	class SLIB_EXPORT Stack : public CONTAINER
 	{
 	public:
-		sl_bool push_NoLock(const T& value, sl_size countLimit = 0);
+		sl_bool push_NoLock(const T& value, sl_size countLimit = 0) noexcept;
 
-		sl_bool push(const T& value, sl_size countLimit = 0);
+		sl_bool push(const T& value, sl_size countLimit = 0) noexcept;
 
-		void pushAll(const Stack<T, CONTAINER>* other);
+		sl_bool pushAll(const Stack<T, CONTAINER>* other) noexcept;
 
-		sl_bool pop_NoLock(T* _out = sl_null);
+		sl_bool pop_NoLock(T* _out = sl_null) noexcept;
 
-		sl_bool pop(T* _out = sl_null);
+		sl_bool pop(T* _out = sl_null) noexcept;
 
-		Stack<T, CONTAINER>* duplicate_NoLock() const;
+		Stack<T, CONTAINER>* duplicate_NoLock() const noexcept;
 
-		Stack<T, CONTAINER>* duplicate() const;
+		Stack<T, CONTAINER>* duplicate() const noexcept;
 
 	};
 	

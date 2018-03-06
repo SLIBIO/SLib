@@ -11,20 +11,20 @@
 namespace slib
 {
 
-	template <class ITEM>
-	QueueChannelArray<ITEM>::QueueChannelArray()
+	template <class T>
+	QueueChannelArray<T>::QueueChannelArray() noexcept
 	{
 		m_channelCurrent = 0;
 	}
 	
-	template <class ITEM>
-	sl_size QueueChannelArray<ITEM>::getChannelsCount()
+	template <class T>
+	sl_size QueueChannelArray<T>::getChannelsCount() noexcept
 	{
 		return m_arr.getCount();
 	}
 	
-	template <class ITEM>
-	sl_bool QueueChannelArray<ITEM>::setChannelsCount(sl_size n)
+	template <class T>
+	sl_bool QueueChannelArray<T>::setChannelsCount(sl_size n) noexcept
 	{
 		Array<Channel> arr = Array<Channel>::create(n);
 		if (arr.isNotNull()) {
@@ -35,8 +35,8 @@ namespace slib
 		return sl_false;
 	}
 	
-	template <class ITEM>
-	sl_size QueueChannelArray<ITEM>::getAllItemsCount() const
+	template <class T>
+	sl_size QueueChannelArray<T>::getAllItemsCount() const noexcept
 	{
 		sl_size count = 0;
 		ArrayData<Channel> info;
@@ -47,58 +47,60 @@ namespace slib
 		return count;
 	}
 	
-	template <class ITEM>
-	void QueueChannelArray<ITEM>::removeAll()
+	template <class T>
+	sl_size QueueChannelArray<T>::removeAll() noexcept
 	{
+		sl_size count = 0;
 		ArrayData<Channel> info;
 		m_arr.getData(info);
 		for (sl_size i = 0; i < info.count; i++) {
-			info[i].queue.removeAll();
+			count += info[i].queue.removeAll();
 		}
+		return count;
 	}
 	
-	template <class ITEM>
-	Link<ITEM>* QueueChannelArray<ITEM>::pushBack(sl_size channelNo, const ITEM& value, sl_size countLimit)
+	template <class T>
+	sl_bool QueueChannelArray<T>::pushBack(sl_size channelNo, const T& value, sl_size countLimit) noexcept
 	{
-		LinkedList<ITEM> queue(_activateChannelQueue(channelNo));
+		LinkedList<T> queue(_activateChannelQueue(channelNo));
 		if (queue.isNotNull()) {
 			return queue.pushBack(value, countLimit);
 		}
 		return sl_null;
 	}
 	
-	template <class ITEM>
-	sl_bool QueueChannelArray<ITEM>::popBack(sl_size channelNo, ITEM* _out)
+	template <class T>
+	sl_bool QueueChannelArray<T>::popBack(sl_size channelNo, T* _out) noexcept
 	{
-		LinkedList<ITEM> queue(_getChannelQueue(channelNo));
+		LinkedList<T> queue(_getChannelQueue(channelNo));
 		if (queue.isNotNull()) {
 			return queue.popBack(_out);
 		}
 		return sl_false;
 	}
 	
-	template <class ITEM>
-	Link<ITEM>* QueueChannelArray<ITEM>::pushFront(sl_size channelNo, const ITEM& value, sl_size countLimit)
+	template <class T>
+	sl_bool QueueChannelArray<T>::pushFront(sl_size channelNo, const T& value, sl_size countLimit) noexcept
 	{
-		LinkedList<ITEM> queue(_activateChannelQueue(channelNo));
+		LinkedList<T> queue(_activateChannelQueue(channelNo));
 		if (queue.isNotNull()) {
 			return queue.pushFront(value, countLimit);
 		}
 		return sl_null;
 	}
 	
-	template <class ITEM>
-	sl_bool QueueChannelArray<ITEM>::popFront(sl_size channelNo, ITEM* _out)
+	template <class T>
+	sl_bool QueueChannelArray<T>::popFront(sl_size channelNo, T* _out) noexcept
 	{
-		LinkedList<ITEM> queue(_getChannelQueue(channelNo));
+		LinkedList<T> queue(_getChannelQueue(channelNo));
 		if (queue.isNotNull()) {
 			return queue.popFront(_out);
 		}
 		return sl_false;
 	}
 
-	template <class ITEM>
-	sl_bool QueueChannelArray<ITEM>::popBack(ITEM* _out)
+	template <class T>
+	sl_bool QueueChannelArray<T>::popBack(T* _out) noexcept
 	{
 		ArrayData<Channel> info;
 		m_arr.getData(info);
@@ -111,7 +113,7 @@ namespace slib
 			if (no >= info.count) {
 				no = 0;
 			}
-			LinkedList<ITEM> queue(info[no].queue);
+			LinkedList<T> queue(info[no].queue);
 			if (queue.isNotNull()) {
 				if (queue.popBack(_out)) {
 					m_channelCurrent = no;
@@ -123,8 +125,8 @@ namespace slib
 		return sl_false;
 	}
 
-	template <class ITEM>
-	sl_bool QueueChannelArray<ITEM>::popFront(ITEM* _out)
+	template <class T>
+	sl_bool QueueChannelArray<T>::popFront(T* _out) noexcept
 	{
 		ArrayData<Channel> info;
 		m_arr.getData(info);
@@ -137,7 +139,7 @@ namespace slib
 			if (no >= info.count) {
 				no = 0;
 			}
-			LinkedList<ITEM> queue(info[no].queue);
+			LinkedList<T> queue(info[no].queue);
 			if (queue.isNotNull()) {
 				if (queue.popFront(_out)) {
 					m_channelCurrent = no;
@@ -149,8 +151,8 @@ namespace slib
 		return sl_false;
 	}
 
-	template <class ITEM>
-	LinkedList<ITEM> QueueChannelArray<ITEM>::_getChannelQueue(sl_size no)
+	template <class T>
+	LinkedList<T> QueueChannelArray<T>::_getChannelQueue(sl_size no) noexcept
 	{
 		ArrayData<Channel> info;
 		m_arr.getData(info);
@@ -160,8 +162,8 @@ namespace slib
 		return sl_null;
 	}
 
-	template <class ITEM>
-	LinkedList<ITEM> QueueChannelArray<ITEM>::_activateChannelQueue(sl_size no)
+	template <class T>
+	LinkedList<T> QueueChannelArray<T>::_activateChannelQueue(sl_size no) noexcept
 	{
 		ArrayData<Channel> info;
 		m_arr.getData(info);
@@ -169,7 +171,7 @@ namespace slib
 			Channel& channel = info[no];
 			MutexLocker lock(&(channel.locker));
 			if (channel.queue.isNull()) {
-				channel.queue = LinkedList<ITEM>::create();
+				channel.queue = LinkedList<T>::create();
 			}
 			return channel.queue;
 		}

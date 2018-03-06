@@ -12,7 +12,7 @@ namespace slib
 {
 	
 	template <class T>
-	SLIB_INLINE LinkedObjectList<T>::LinkedObjectList()
+	SLIB_INLINE LinkedObjectList<T>::LinkedObjectList() noexcept
 	{
 		m_front.setNull();
 		m_back.setNull();
@@ -20,60 +20,43 @@ namespace slib
 	}
 	
 	template <class T>
-	SLIB_INLINE LinkedObjectList<T>::~LinkedObjectList()
+	SLIB_INLINE LinkedObjectList<T>::~LinkedObjectList() noexcept
 	{
 		removeAll_NoLock();
 	}
 	
 	template <class T>
-	SLIB_INLINE const Ref<T>& LinkedObjectList<T>::getFront() const
+	SLIB_INLINE const Ref<T>& LinkedObjectList<T>::getFront() const noexcept
 	{
 		return m_front;
 	}
 	
 	template <class T>
-	SLIB_INLINE const Ref<T>& LinkedObjectList<T>::getBack() const
+	SLIB_INLINE const Ref<T>& LinkedObjectList<T>::getBack() const noexcept
 	{
 		return m_back;
 	}
 	
 	template <class T>
-	SLIB_INLINE sl_size LinkedObjectList<T>::getCount() const
+	SLIB_INLINE sl_size LinkedObjectList<T>::getCount() const noexcept
 	{
 		return m_count;
 	}
 	
 	template <class T>
-	SLIB_INLINE sl_bool LinkedObjectList<T>::isEmpty() const
+	SLIB_INLINE sl_bool LinkedObjectList<T>::isEmpty() const noexcept
 	{
 		return m_front.isNull();
 	}
 	
 	template <class T>
-	SLIB_INLINE sl_bool LinkedObjectList<T>::isNotEmpty() const
+	SLIB_INLINE sl_bool LinkedObjectList<T>::isNotEmpty() const noexcept
 	{
 		return m_front.isNotNull();
 	}
 	
 	template <class T>
-	SLIB_INLINE void LinkedObjectList<T>::removeAll_NoLock()
-	{
-		_init();
-	}
-	
-	template <class T>
-	void LinkedObjectList<T>::removeAll()
-	{
-		Ref<T> front;
-		{
-			ObjectLocker lock(this);
-			front = m_front;
-			_init();
-		}
-	}
-	
-	template <class T>
-	sl_bool LinkedObjectList<T>::pushBack_NoLock(const Ref<T>& object, sl_size countLimit)
+	sl_bool LinkedObjectList<T>::pushBack_NoLock(const Ref<T>& object, sl_size countLimit) noexcept
 	{
 		if (object.isNull()) {
 			return sl_false;
@@ -83,7 +66,7 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool LinkedObjectList<T>::pushBack(const Ref<T>& object, sl_size countLimit)
+	sl_bool LinkedObjectList<T>::pushBack(const Ref<T>& object, sl_size countLimit) noexcept
 	{
 		if (object.isNull()) {
 			return sl_false;
@@ -97,7 +80,7 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool LinkedObjectList<T>::popBack_NoLock(Ref<T>* _out)
+	sl_bool LinkedObjectList<T>::popBack_NoLock(Ref<T>* _out) noexcept
 	{
 		Ref<T> old = _popBack();
 		if (old.isNotNull()) {
@@ -111,7 +94,7 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool LinkedObjectList<T>::popBack(Ref<T>* _out)
+	sl_bool LinkedObjectList<T>::popBack(Ref<T>* _out) noexcept
 	{
 		Ref<T> old;
 		{
@@ -129,7 +112,7 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool LinkedObjectList<T>::pushFront_NoLock(const Ref<T>& object, sl_size countLimit)
+	sl_bool LinkedObjectList<T>::pushFront_NoLock(const Ref<T>& object, sl_size countLimit) noexcept
 	{
 		if (object.isNull()) {
 			return sl_false;
@@ -139,7 +122,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool LinkedObjectList<T>::pushFront(const Ref<T>& object, sl_size countLimit)
+	sl_bool LinkedObjectList<T>::pushFront(const Ref<T>& object, sl_size countLimit) noexcept
 	{
 		if (object.isNull()) {
 			return sl_null;
@@ -153,7 +136,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool LinkedObjectList<T>::popFront_NoLock(Ref<T>* _out)
+	sl_bool LinkedObjectList<T>::popFront_NoLock(Ref<T>* _out) noexcept
 	{
 		Ref<T> old = _popFront();
 		if (old) {
@@ -167,7 +150,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool LinkedObjectList<T>::popFront(Ref<T>* _out)
+	sl_bool LinkedObjectList<T>::popFront(Ref<T>* _out) noexcept
 	{
 		Ref<T> old;
 		{
@@ -185,26 +168,46 @@ namespace slib
 	}
 
 	template <class T>
-	void LinkedObjectList<T>::remove_NoLock(const Ref<T>& object)
+	sl_bool LinkedObjectList<T>::remove_NoLock(const Ref<T>& object) noexcept
 	{
 		if (object.isNull()) {
-			return;
+			return sl_false;
 		}
 		_remove(object);
+		return sl_true;
 	}
 
 	template <class T>
-	void LinkedObjectList<T>::remove(const Ref<T>& object)
+	sl_bool LinkedObjectList<T>::remove(const Ref<T>& object) noexcept
 	{
-		if (object.isNull()) {
-			return;
-		}
 		ObjectLocker lock(this);
-		_remove(object);
+		return remove_NoLock(object);
 	}
 
 	template <class T>
-	sl_bool LinkedObjectList<T>::insertBefore_NoLock(const Ref<T>& objectWhere, const Ref<T>& objectNew)
+	sl_size LinkedObjectList<T>::removeAll_NoLock() noexcept
+	{
+		sl_size count = m_count;
+		_init();
+		return count;
+	}
+	
+	template <class T>
+	sl_size LinkedObjectList<T>::removeAll() noexcept
+	{
+		Ref<T> front;
+		sl_size count;
+		{
+			ObjectLocker lock(this);
+			front = m_front;
+			count = m_count;
+			_init();
+		}
+		return count;
+	}
+	
+	template <class T>
+	sl_bool LinkedObjectList<T>::insertBefore(const Ref<T>& objectWhere, const Ref<T>& objectNew) noexcept
 	{
 		if (objectWhere.isNotNull()) {
 			_insertBefore(objectWhere, objectNew);
@@ -213,21 +216,9 @@ namespace slib
 			return pushFront_NoLock(objectNew);
 		}
 	}
-
+	
 	template <class T>
-	sl_bool LinkedObjectList<T>::insertBefore(const Ref<T>& objectWhere, const Ref<T>& objectNew)
-	{
-		if (objectWhere.isNotNull()) {
-			ObjectLocker lock(this);
-			_insertBefore(objectWhere, objectNew);
-			return sl_true;
-		} else {
-			return pushFront(objectNew);
-		}
-	}
-
-	template <class T>
-	sl_bool LinkedObjectList<T>::insertAfter_NoLock(const Ref<T>& objectWhere, const Ref<T>& objectNew)
+	sl_bool LinkedObjectList<T>::insertAfter(const Ref<T>& objectWhere, const Ref<T>& objectNew) noexcept
 	{
 		if (objectWhere.isNotNull()) {
 			_insertAfter(objectWhere, objectNew);
@@ -238,19 +229,7 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool LinkedObjectList<T>::insertAfter(const Ref<T>& objectWhere, const Ref<T>& objectNew)
-	{
-		if (objectWhere.isNotNull()) {
-			ObjectLocker lock(this);
-			_insertAfter(objectWhere, objectNew);
-			return sl_true;
-		} else {
-			return pushBack_NoLock(objectNew);
-		}
-	}
-
-	template <class T>
-	void LinkedObjectList<T>::merge(LinkedObjectList<T>* other)
+	void LinkedObjectList<T>::merge(LinkedObjectList<T>* other) noexcept
 	{
 		if ((void*)this == (void*)other) {
 			return;
@@ -273,7 +252,7 @@ namespace slib
 	}
 
 	template <class T>
-	Array< Ref<T> > LinkedObjectList<T>::toArray_NoLock() const
+	Array< Ref<T> > LinkedObjectList<T>::toArray_NoLock() const noexcept
 	{
 		Array< Ref<T> > ret;
 		if (m_count) {
@@ -293,14 +272,14 @@ namespace slib
 	}
 
 	template <class T>
-	Array< Ref<T> > LinkedObjectList<T>::toArray() const
+	Array< Ref<T> > LinkedObjectList<T>::toArray() const noexcept
 	{
 		ObjectLocker lock(this);
 		return toArray_NoLock();
 	}
 
 	template <class T>
-	List< Ref<T> > LinkedObjectList<T>::toList_NoLock() const
+	List< Ref<T> > LinkedObjectList<T>::toList_NoLock() const noexcept
 	{
 		List< Ref<T> > ret;
 		if (m_count) {
@@ -320,14 +299,14 @@ namespace slib
 	}
 
 	template <class T>
-	List< Ref<T> > LinkedObjectList<T>::toList() const
+	List< Ref<T> > LinkedObjectList<T>::toList() const noexcept
 	{
 		ObjectLocker lock(this);
 		return toList_NoLock();
 	}
 
 	template <class T>
-	Ref<T> LinkedObjectList<T>::_pushBack(const Ref<T>& object, sl_size countLimit)
+	Ref<T> LinkedObjectList<T>::_pushBack(const Ref<T>& object, sl_size countLimit) noexcept
 	{
 		Ref<T> old;
 		if (countLimit > 0 && m_count >= countLimit) {
@@ -347,7 +326,7 @@ namespace slib
 	}
 
 	template <class T>
-	Ref<T> LinkedObjectList<T>::_popBack()
+	Ref<T> LinkedObjectList<T>::_popBack() noexcept
 	{
 		Ref<T> back = m_back;
 		if (back.isNotNull()) {
@@ -360,12 +339,14 @@ namespace slib
 				m_front.setNull();
 				m_back.setNull();
 			}
+			back->before.setNull();
+			back->next.setNull();
 		}
 		return back;
 	}
 
 	template <class T>
-	Ref<T> LinkedObjectList<T>::_pushFront(const Ref<T>& object, sl_size countLimit)
+	Ref<T> LinkedObjectList<T>::_pushFront(const Ref<T>& object, sl_size countLimit) noexcept
 	{
 		Ref<T> old;
 		if (countLimit > 0 && m_count >= countLimit) {
@@ -385,7 +366,7 @@ namespace slib
 	}
 
 	template <class T>
-	Ref<T> LinkedObjectList<T>::_popFront()
+	Ref<T> LinkedObjectList<T>::_popFront() noexcept
 	{
 		Ref<T> front = m_front;
 		if (front.isNotNull()) {
@@ -398,62 +379,72 @@ namespace slib
 				m_front.setNull();
 				m_back.setNull();
 			}
+			front->before.setNull();
+			front->next.setNull();
 		}
 		return front;
 	}
 
 	template <class T>
-	void LinkedObjectList<T>::_remove(const Ref<T>& object)
+	void LinkedObjectList<T>::_remove(const Ref<T>& object) noexcept
 	{
-		m_count--;
 		Ref<T> before = object->before;
 		Ref<T> next = object->next;
-		if (before.isNotNull()) {
+		if (m_front == object) {
+			m_front = next;
+		} else if (before.isNotNull()) {
 			before->next = next;
 		} else {
-			m_front = next;
+			return;
 		}
-		if (next.isNotNull()) {
+		if (m_back == object) {
+			m_back = before;
+		} else if (next.isNotNull()) {
 			next->before = before;
 		} else {
-			m_back = before;
+			return;
 		}
+		m_count--;
 		object->before.setNull();
 		object->next.setNull();
 	}
 
 	template <class T>
-	void LinkedObjectList<T>::_insertBefore(const Ref<T>& objectWhere, const Ref<T>& objectNew)
+	void LinkedObjectList<T>::_insertBefore(const Ref<T>& objectWhere, const Ref<T>& objectNew) noexcept
 	{
 		objectNew->next = objectWhere;
 		Ref<T> before = objectWhere->before;
 		objectNew->before = before;
 		objectWhere->before = objectNew;
-		if (before) {
+		if (m_front == objectWhere) {
+			m_front = objectNew;
+		} else if (before.isNotNull()) {
 			before->next = objectNew;
 		} else {
-			m_front = objectNew;
+			return;
 		}
 		m_count++;
 	}
 
 	template <class T>
-	void LinkedObjectList<T>::_insertAfter(const Ref<T>& objectWhere, const Ref<T>& objectNew)
+	void LinkedObjectList<T>::_insertAfter(const Ref<T>& objectWhere, const Ref<T>& objectNew) noexcept
 	{
 		objectNew->before = objectWhere;
 		Ref<T> next = objectWhere->next;
 		objectNew->next = next;
 		objectWhere->next = objectNew;
-		if (next) {
+		if (m_back == objectWhere) {
+			m_back = objectNew;
+		} else if (next.isNotNull()) {
 			next->before = objectNew;
 		} else {
-			m_back = objectNew;
+			return;
 		}
 		m_count++;
 	}
 
 	template <class T>
-	SLIB_INLINE void LinkedObjectList<T>::_init()
+	SLIB_INLINE void LinkedObjectList<T>::_init() noexcept
 	{
 		m_front.setNull();
 		m_back.setNull();

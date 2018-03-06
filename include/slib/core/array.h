@@ -302,7 +302,13 @@ namespace slib
 		sl_size copy(sl_size startTarget, const Array<VALUE>& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
 
 		template <class VALUE>
+		sl_size copy(sl_size startTarget, const AtomicArray<VALUE>& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
+
+		template <class VALUE>
 		sl_size copy(const Array<VALUE>& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
+
+		template <class VALUE>
+		sl_size copy(const AtomicArray<VALUE>& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
 
 		Array<T> duplicate() const noexcept;
 
@@ -396,7 +402,13 @@ namespace slib
 		sl_size copy(sl_size startTarget, const Array<VALUE>& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
 
 		template <class VALUE>
+		sl_size copy(sl_size startTarget, const AtomicArray<VALUE>& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
+
+		template <class VALUE>
 		sl_size copy(const Array<VALUE>& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
+
+		template <class VALUE>
+		sl_size copy(const AtomicArray<VALUE>& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const noexcept;
 
 		Array<T> duplicate() const noexcept;
 

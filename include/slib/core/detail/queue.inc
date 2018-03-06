@@ -12,44 +12,44 @@ namespace slib
 {
 	
 	template <class T, class CONTAINER>
-	sl_bool Queue<T, CONTAINER>::push_NoLock(const T& value, sl_size countLimit)
+	sl_bool Queue<T, CONTAINER>::push_NoLock(const T& value, sl_size countLimit) noexcept
 	{
 		return this->pushBack_NoLock(value, countLimit) != sl_null;
 	}
 
 	template <class T, class CONTAINER>
-	sl_bool Queue<T, CONTAINER>::push(const T& value, sl_size countLimit)
+	sl_bool Queue<T, CONTAINER>::push(const T& value, sl_size countLimit) noexcept
 	{
-		return this->pushBack(value, countLimit) != sl_null;
+		return this->pushBack(value, countLimit);
 	}
 	
 	template <class T, class CONTAINER>
-	void Queue<T, CONTAINER>::pushAll(const Queue<T, CONTAINER>* other)
+	sl_bool Queue<T, CONTAINER>::pushAll(const Queue<T, CONTAINER>* other) noexcept
 	{
-		this->pushBackAll(other);
+		return this->pushBackAll(other);
 	}
 	
 	template <class T, class CONTAINER>
-	sl_bool Queue<T, CONTAINER>::pop_NoLock(T* _out)
+	sl_bool Queue<T, CONTAINER>::pop_NoLock(T* _out) noexcept
 	{
 		return this->popFront_NoLock(_out);
 	}
 	
 	template <class T, class CONTAINER>
-	sl_bool Queue<T, CONTAINER>::pop(T* _out)
+	sl_bool Queue<T, CONTAINER>::pop(T* _out) noexcept
 	{
 		return this->popFront(_out);
 	}
 	
 	template <class T, class CONTAINER>
-	Queue<T, CONTAINER>* Queue<T, CONTAINER>::duplicate_NoLock() const
+	Queue<T, CONTAINER>* Queue<T, CONTAINER>::duplicate_NoLock() const noexcept
 	{
 		CONTAINER* container = CONTAINER::duplicate_NoLock();
 		return static_cast<Queue<T, CONTAINER>*>(container);
 	}
 	
 	template <class T, class CONTAINER>
-	Queue<T, CONTAINER>* Queue<T, CONTAINER>::duplicate() const
+	Queue<T, CONTAINER>* Queue<T, CONTAINER>::duplicate() const noexcept
 	{
 		CONTAINER* container = CONTAINER::duplicate();
 		return static_cast<Queue<T, CONTAINER>*>(container);
@@ -57,44 +57,44 @@ namespace slib
 	
 	
 	template <class T, class CONTAINER>
-	sl_bool Stack<T, CONTAINER>::push_NoLock(const T& value, sl_size countLimit)
+	sl_bool Stack<T, CONTAINER>::push_NoLock(const T& value, sl_size countLimit) noexcept
 	{
 		return this->pushBack_NoLock(value, countLimit) != sl_null;
 	}
 	
 	template <class T, class CONTAINER>
-	sl_bool Stack<T, CONTAINER>::push(const T& value, sl_size countLimit)
+	sl_bool Stack<T, CONTAINER>::push(const T& value, sl_size countLimit) noexcept
 	{
-		return this->pushBack(value, countLimit) != sl_null;
+		return this->pushBack(value, countLimit);
 	}
 	
 	template <class T, class CONTAINER>
-	void Stack<T, CONTAINER>::pushAll(const Stack<T, CONTAINER>* other)
+	sl_bool Stack<T, CONTAINER>::pushAll(const Stack<T, CONTAINER>* other) noexcept
 	{
-		this->pushBackAll(other);
+		return this->pushBackAll(other);
 	}
 	
 	template <class T, class CONTAINER>
-	sl_bool Stack<T, CONTAINER>::pop_NoLock(T* _out)
+	sl_bool Stack<T, CONTAINER>::pop_NoLock(T* _out) noexcept
 	{
 		return this->popBack_NoLock(_out);
 	}
 	
 	template <class T, class CONTAINER>
-	sl_bool Stack<T, CONTAINER>::pop(T* _out)
+	sl_bool Stack<T, CONTAINER>::pop(T* _out) noexcept
 	{
 		return this->popBack(_out);
 	}
 	
 	template <class T, class CONTAINER>
-	Stack<T, CONTAINER>* Stack<T, CONTAINER>::duplicate_NoLock() const
+	Stack<T, CONTAINER>* Stack<T, CONTAINER>::duplicate_NoLock() const noexcept
 	{
 		CONTAINER* container = CONTAINER::duplicate_NoLock();
 		return static_cast<Stack<T, CONTAINER>*>(container);
 	}
 	
 	template <class T, class CONTAINER>
-	Stack<T, CONTAINER>* Stack<T, CONTAINER>::duplicate() const
+	Stack<T, CONTAINER>* Stack<T, CONTAINER>::duplicate() const noexcept
 	{
 		CONTAINER* container = CONTAINER::duplicate();
 		return static_cast<Stack<T, CONTAINER>*>(container);

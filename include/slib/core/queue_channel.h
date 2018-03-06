@@ -19,13 +19,13 @@
 namespace slib
 {
 
-	template <class ITEM>
+	template <class T>
 	class SLIB_EXPORT QueueChannelArray : public Object
 	{
 	public:
 		struct Channel
 		{
-			AtomicLinkedList<ITEM> queue;
+			AtomicLinkedList<T> queue;
 			Mutex locker;
 		};
 
@@ -34,32 +34,32 @@ namespace slib
 		sl_size m_channelCurrent;
 
 	public:
-		QueueChannelArray();
+		QueueChannelArray() noexcept;
 	
-		sl_size getChannelsCount();
+		sl_size getChannelsCount() noexcept;
 	
-		sl_bool setChannelsCount(sl_size n);
+		sl_bool setChannelsCount(sl_size n) noexcept;
 
-		sl_size getAllItemsCount() const;
+		sl_size getAllItemsCount() const noexcept;
 
-		void removeAll();
+		sl_size removeAll() noexcept;
 
-		Link<ITEM>* pushBack(sl_size channelNo, const ITEM& value, sl_size countLimit = 0);
+		sl_bool pushBack(sl_size channelNo, const T& value, sl_size countLimit = 0) noexcept;
 
-		sl_bool popBack(sl_size channelNo, ITEM* _out = sl_null);
+		sl_bool popBack(sl_size channelNo, T* _out = sl_null) noexcept;
 	
-		Link<ITEM>* pushFront(sl_size channelNo, const ITEM& value, sl_size countLimit = 0);
+		sl_bool pushFront(sl_size channelNo, const T& value, sl_size countLimit = 0) noexcept;
 
-		sl_bool popFront(sl_size channelNo, ITEM* _out = sl_null);
+		sl_bool popFront(sl_size channelNo, T* _out = sl_null) noexcept;
 
-		sl_bool popBack(ITEM* _out = sl_null);
+		sl_bool popBack(T* _out = sl_null) noexcept;
 
-		sl_bool popFront(ITEM* _out = sl_null);
+		sl_bool popFront(T* _out = sl_null) noexcept;
 
 	protected:
-		LinkedList<ITEM> _getChannelQueue(sl_size no);
+		LinkedList<T> _getChannelQueue(sl_size no) noexcept;
 
-		LinkedList<ITEM> _activateChannelQueue(sl_size no);
+		LinkedList<T> _activateChannelQueue(sl_size no) noexcept;
 
 	};
 

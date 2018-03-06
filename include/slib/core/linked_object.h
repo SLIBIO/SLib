@@ -27,8 +27,8 @@ namespace slib
 	class SLIB_EXPORT LinkedObject : public Object
 	{
 	public:
-		AtomicRef<T> next;
-		AtomicWeakRef<T> before;
+		Ref<T> next;
+		WeakRef<T> before;
 
 	};
 	
@@ -37,9 +37,9 @@ namespace slib
 		SLIB_DECLARE_OBJECT
 
 	public:
-		LinkedObjectListBase();
+		LinkedObjectListBase() noexcept;
 
-		~LinkedObjectListBase();
+		~LinkedObjectListBase() noexcept;
 
 	};
 	
@@ -52,80 +52,77 @@ namespace slib
 		sl_size m_count;
 
 	public:
-		LinkedObjectList();
+		LinkedObjectList() noexcept;
 
-		~LinkedObjectList();
-
-	public:
-		const Ref<T>& getFront() const;
-	
-		const Ref<T>& getBack() const;
-	
-		sl_size getCount() const;
-
-		sl_bool isEmpty() const;
-	
-		sl_bool isNotEmpty() const;
+		~LinkedObjectList() noexcept;
 
 	public:
-		void removeAll_NoLock();
+		const Ref<T>& getFront() const noexcept;
+	
+		const Ref<T>& getBack() const noexcept;
+	
+		sl_size getCount() const noexcept;
 
-		void removeAll();
+		sl_bool isEmpty() const noexcept;
+	
+		sl_bool isNotEmpty() const noexcept;
 
-		sl_bool pushBack_NoLock(const Ref<T>& object, sl_size countLimit = 0);
+		sl_bool pushBack_NoLock(const Ref<T>& object, sl_size countLimit = 0) noexcept;
 
-		sl_bool pushBack(const Ref<T>& object, sl_size countLimit = 0);
+		sl_bool pushBack(const Ref<T>& object, sl_size countLimit = 0) noexcept;
 
-		sl_bool popBack_NoLock(Ref<T>* _out = sl_null);
+		sl_bool popBack_NoLock(Ref<T>* _out = sl_null) noexcept;
 
-		sl_bool popBack(Ref<T>* _out = sl_null);
+		sl_bool popBack(Ref<T>* _out = sl_null) noexcept;
 
-		sl_bool pushFront_NoLock(const Ref<T>& object, sl_size countLimit = 0);
+		sl_bool pushFront_NoLock(const Ref<T>& object, sl_size countLimit = 0) noexcept;
 
-		sl_bool pushFront(const Ref<T>& object, sl_size countLimit = 0);
+		sl_bool pushFront(const Ref<T>& object, sl_size countLimit = 0) noexcept;
 
-		sl_bool popFront_NoLock(Ref<T>* _out = sl_null);
+		sl_bool popFront_NoLock(Ref<T>* _out = sl_null) noexcept;
 
-		sl_bool popFront(Ref<T>* _out = sl_null);
+		sl_bool popFront(Ref<T>* _out = sl_null) noexcept;
 
-		void remove_NoLock(const Ref<T>& object);
+		/* unsynchronized function */
+		sl_bool insertBefore(const Ref<T>& objectWhere, const Ref<T>& objectNew) noexcept;
+		
+		/* unsynchronized function */
+		sl_bool insertAfter(const Ref<T>& objectWhere, const Ref<T>& objectNew) noexcept;
 
-		void remove(const Ref<T>& object);
+		sl_bool remove_NoLock(const Ref<T>& object) noexcept;
 
-		sl_bool insertBefore_NoLock(const Ref<T>& objectWhere, const Ref<T>& objectNew);
+		sl_bool remove(const Ref<T>& object) noexcept;
 
-		sl_bool insertBefore(const Ref<T>& objectWhere, const Ref<T>& objectNew);
+		sl_size removeAll_NoLock() noexcept;
+		
+		sl_size removeAll() noexcept;
 
-		sl_bool insertAfter_NoLock(const Ref<T>& objectWhere, const Ref<T>& objectNew);
+		void merge(LinkedObjectList<T>* other) noexcept;
 
-		sl_bool insertAfter(const Ref<T>& objectWhere, const Ref<T>& objectNew);
+		Array< Ref<T> > toArray_NoLock() const noexcept;
 
-		void merge(LinkedObjectList<T>* other);
+		Array< Ref<T> > toArray() const noexcept;
 
-		Array< Ref<T> > toArray_NoLock() const;
+		List< Ref<T> > toList_NoLock() const noexcept;
 
-		Array< Ref<T> > toArray() const;
-
-		List< Ref<T> > toList_NoLock() const;
-
-		List< Ref<T> > toList() const;
+		List< Ref<T> > toList() const noexcept;
 
 	protected:
-		void _init();
+		void _init() noexcept;
 
-		Ref<T> _pushBack(const Ref<T>& object, sl_size countLimit);
+		Ref<T> _pushBack(const Ref<T>& object, sl_size countLimit) noexcept;
 
-		Ref<T> _popBack();
+		Ref<T> _popBack() noexcept;
 
-		Ref<T> _pushFront(const Ref<T>& object, sl_size countLimit);
+		Ref<T> _pushFront(const Ref<T>& object, sl_size countLimit) noexcept;
 
-		Ref<T> _popFront();
+		Ref<T> _popFront() noexcept;
 
-		void _remove(const Ref<T>& object);
+		void _remove(const Ref<T>& object) noexcept;
 
-		void _insertBefore(const Ref<T>& objectWhere, const Ref<T>& objectNew);
+		void _insertBefore(const Ref<T>& objectWhere, const Ref<T>& objectNew) noexcept;
 
-		void _insertAfter(const Ref<T>& objectWhere, const Ref<T>& objectNew);
+		void _insertAfter(const Ref<T>& objectWhere, const Ref<T>& objectNew) noexcept;
 	
 	};
 

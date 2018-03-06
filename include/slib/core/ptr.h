@@ -158,7 +158,7 @@ namespace slib
 		static const Ptr<T>& from(const Ptr<O>& other) noexcept;
 
 		template <class O>
-		static Ptr<T>& from(const Ptr<O>& other) noexcept;
+		static Ptr<T>& from(Ptr<O>& other) noexcept;
 
 		template <class O>
 		static Ptr<T>&& from(Ptr<O>&& other) noexcept;

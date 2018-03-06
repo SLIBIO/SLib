@@ -706,9 +706,23 @@ namespace slib
 
 	template <class T>
 	template <class VALUE>
+	sl_size Array<T>::copy(sl_size startTarget, const AtomicArray<VALUE>& source, sl_size startSource, sl_size len) const noexcept
+	{
+		return copy(startTarget, Array<VALUE>(source), startSource, len);
+	}
+
+	template <class T>
+	template <class VALUE>
 	sl_size Array<T>::copy(const Array<VALUE>& source, sl_size start, sl_size len) const noexcept
 	{
 		return copy(0, source, start, len);
+	}
+
+	template <class T>
+	template <class VALUE>
+	sl_size Array<T>::copy(const AtomicArray<VALUE>& source, sl_size start, sl_size len) const noexcept
+	{
+		return copy(0, Array<VALUE>(source), start, len);
 	}
 
 	template <class T>
@@ -985,11 +999,25 @@ namespace slib
 
 	template <class T>
 	template <class VALUE>
+	sl_size Atomic< Array<T> >::copy(sl_size startTarget, const AtomicArray<VALUE>& source, sl_size startSource, sl_size len) const noexcept
+	{
+		return copy(startTarget, Array<VALUE>(source), startSource, len);
+	}
+	
+	template <class T>
+	template <class VALUE>
 	sl_size Atomic< Array<T> >::copy(const Array<VALUE>& source, sl_size start, sl_size len) const noexcept
 	{
 		return copy(0, source, start, len);
 	}
 
+	template <class T>
+	template <class VALUE>
+	sl_size Atomic< Array<T> >::copy(const AtomicArray<VALUE>& source, sl_size start, sl_size len) const noexcept
+	{
+		return copy(0, Array<VALUE>(source), start, len);
+	}
+	
 	template <class T>
 	Array<T> Atomic< Array<T> >::duplicate() const noexcept
 	{
