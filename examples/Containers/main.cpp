@@ -42,7 +42,7 @@ int main(int argc, const char * argv[])
 		// Remove some values from the list
 		list.removeRange(7, 3);
 		list.removeAt(3);
-		list.removeElementsByValue("b");
+		list.removeValues("b");
 		Println("List after removal");
 		i = 0;
 		for (auto& item : list) {
@@ -54,18 +54,18 @@ int main(int argc, const char * argv[])
 	// Map Example
 	{
 		
-		Map<String, int> map = {{"a", 1}, {"b", 2}, {"c", 3}, {"ab", 11}, {"cd", 34}};
+		HashMap<String, int> map = {{"a", 1}, {"b", 2}, {"c", 3}, {"ab", 11}, {"cd", 34}};
 		
-		Println("Original Map");
+		Println("HashMap");
 		for (auto& item : map) {
 			Println("[%s]=%d", item.key, item.value);
 		}
 
 		Println("Member Access");
-		Println("[3]=%s", map["ab"]);
+		Println("[ab]=%s", map["ab"]);
 
 		// Insert some values into the map
-		Println("Map after insertion");
+		Println("HashMap after insertion");
 		map.put("ab", 12);
 		map.put("aaa", 111);
 		map.put("abc", 123);
@@ -78,16 +78,15 @@ int main(int argc, const char * argv[])
 		// Remove some values from the map
 		map.remove("ab");
 		map.remove("cd");
-		Println("Map after removal");
+		Println("HashMap after removal");
 		for (auto& item : map) {
 			Println("[%s]=%d", item.key, item.value);
 		}
 		
 		// Convert to TreeMap
 		Map<String, int> tree;
-		tree.initTree();
 		tree.putAll(map);
-		Println("TreeMap");
+		Println("Map");
 		for (auto& item : tree) {
 			Println("[%s]=%d", item.key, item.value);
 		}
