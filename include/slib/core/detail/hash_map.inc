@@ -337,13 +337,16 @@ namespace slib
 		sl_size hash = m_hash(key);
 		sl_size index = hash & (capacity - 1);
 		NODE** nodes = m_table.nodes;
-		NODE* node = RedBlackTree::put(&(nodes[index]), m_table.count, Forward<KEY>(key), m_compare, Forward<VALUE>(value), isInsertion);
-		if (node) {
-			_initNode(node, hash);
-			_expand();
-			return node;
+		sl_bool flagInsert;
+		NODE* node = RedBlackTree::put(&(nodes[index]), m_table.count, Forward<KEY>(key), m_compare, Forward<VALUE>(value), &flagInsert);
+		if (isInsertion) {
+			*isInsertion = flagInsert;
 		}
-		return sl_null;
+		if (flagInsert) {
+			_linkNode(node, hash);
+			_expand();
+		}
+		return node;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
@@ -394,7 +397,7 @@ namespace slib
 		NODE** nodes = m_table.nodes;
 		NODE* node = RedBlackTree::add(&(nodes[index]), m_table.count, Forward<KEY>(key), m_compare, Forward<VALUE_ARGS>(value_args)...);
 		if (node) {
-			_initNode(node, hash);
+			_linkNode(node, hash);
 			_expand();
 			return node;
 		}
@@ -421,8 +424,8 @@ namespace slib
 		sl_size index = hash & (capacity - 1);
 		NODE** nodes = m_table.nodes;
 		MapEmplaceReturn<NODE> ret = RedBlackTree::emplace(&(nodes[index]), m_table.count, Forward<KEY>(key), m_compare, Forward<VALUE_ARGS>(value_args)...);
-		if (ret.node) {
-			_initNode(ret.node, hash);
+		if (ret.isSuccess) {
+			_linkNode(ret.node, hash);
 			_expand();
 		}
 		return ret;
@@ -611,7 +614,7 @@ namespace slib
 		if (capacity == 0) {
 			return;
 		}
-		_removeNode(node);
+		_unlinkNode(node);
 		RedBlackTree::removeNode(m_table.nodes + (node->hash & (capacity - 1)), m_table.count, node);
 	}
 	
@@ -626,7 +629,7 @@ namespace slib
 		sl_size n = 0;
 		while (n < count && node) {
 			NODE* next = node->next;
-			_removeNode(node);
+			_unlinkNode(node);
 			RedBlackTree::removeNode(nodes + (node->hash & (capacity - 1)), m_table.count, node);
 			node = next;
 			n++;
@@ -653,7 +656,7 @@ namespace slib
 		while (1) {
 			n++;
 			NODE* next = node->next;
-			_removeNode(node);
+			_unlinkNode(node);
 			RedBlackTree::removeNode(nodes + (node->hash & (capacity - 1)), m_table.count, node);
 			if (node == last || !next) {
 				break;
@@ -672,7 +675,7 @@ namespace slib
 		}
 		NODE* node = RedBlackTree::find(*pEntry, key, m_compare);
 		if (node) {
-			_removeNode(node);
+			_unlinkNode(node);
 			RedBlackTree::removeNode(pEntry, m_table.count, node);
 			return sl_true;
 		}
@@ -700,12 +703,12 @@ namespace slib
 			while (1) {
 				n++;
 				if (node == end) {
-					_removeNode(node);
+					_unlinkNode(node);
 					RedBlackTree::removeNode(pEntry, m_table.count, node);
 					break;
 				} else {
 					NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
-					_removeNode(node);
+					_unlinkNode(node);
 					RedBlackTree::removeNode(pEntry, m_table.count, node);
 					node = next;
 				}
@@ -737,12 +740,12 @@ namespace slib
 			while (1) {
 				ret.add_NoLock(node->value);
 				if (node == end) {
-					_removeNode(node);
+					_unlinkNode(node);
 					RedBlackTree::removeNode(pEntry, m_table.count, node);
 					break;
 				} else {
 					NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
-					_removeNode(node);
+					_unlinkNode(node);
 					RedBlackTree::removeNode(pEntry, m_table.count, node);
 					node = next;
 				}
@@ -771,7 +774,7 @@ namespace slib
 		if (RedBlackTree::getEqualRange(*pEntry, key, m_compare, &node, &end)) {
 			while (1) {
 				if (value_equals(node->value, value)) {
-					_removeNode(node);
+					_unlinkNode(node);
 					RedBlackTree::removeNode(pEntry, m_table.count, node);
 					return sl_true;
 				}
@@ -808,12 +811,12 @@ namespace slib
 				if (value_equals(node->value, value)) {
 					n++;
 					if (node == end) {
-						_removeNode(node);
+						_unlinkNode(node);
 						RedBlackTree::removeNode(pEntry, m_table.count, node);
 						break;
 					} else {
 						NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
-						_removeNode(node);
+						_unlinkNode(node);
 						RedBlackTree::removeNode(pEntry, m_table.count, node);
 						node = next;
 					}
@@ -1068,7 +1071,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
-	void CHashMap<KT, VT, HASH, KEY_COMPARE>::_initNode(HashMapNode<KT, VT>* node, sl_size hash) noexcept
+	void CHashMap<KT, VT, HASH, KEY_COMPARE>::_linkNode(HashMapNode<KT, VT>* node, sl_size hash) noexcept
 	{
 		NODE* last = m_nodeLast;
 		node->hash = hash;
@@ -1083,7 +1086,7 @@ namespace slib
 	}
 
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
-	void CHashMap<KT, VT, HASH, KEY_COMPARE>::_removeNode(HashMapNode<KT, VT>* node) noexcept
+	void CHashMap<KT, VT, HASH, KEY_COMPARE>::_unlinkNode(HashMapNode<KT, VT>* node) noexcept
 	{
 		NODE* previous = node->previous;
 		NODE* next = node->next;
@@ -1148,7 +1151,7 @@ namespace slib
             sl_size index = nodeSrc->hash & (capacity - 1);
             NODE* node = RedBlackTree::add(&(nodes[index]), m_table.count, nodeSrc->key, m_compare, nodeSrc->value);
             if (node) {
-                _initNode(node, nodeSrc->hash);
+                _linkNode(node, nodeSrc->hash);
             } else {
                 removeAll_NoLock();
                 return sl_false;

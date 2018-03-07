@@ -301,9 +301,9 @@ namespace slib
 		
 		NODE** _getEntryPtr(const KT& key) noexcept;
 		
-        void _initNode(NODE* node, sl_size hash) noexcept;
+        void _linkNode(NODE* node, sl_size hash) noexcept;
 		
-		void _removeNode(NODE* node) noexcept;
+		void _unlinkNode(NODE* node) noexcept;
         
 		void _expand() noexcept;
 		
