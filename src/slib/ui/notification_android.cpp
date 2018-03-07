@@ -49,14 +49,14 @@ namespace slib
 
 	void _Notification_onMessageReceived(JNIEnv* env, jobject _this, jstring title, jstring body, jobjectArray data)
 	{
-		HashMap<String, Variant> _data;
+		JsonMap _data;
 		if (data) {
 			sl_uint32 n = Jni::getArrayLength(data);
 			if (n > 0) {
 				for (sl_uint32 i = 0; i + 1 < n; i += 2) {
 					String key = Jni::getStringArrayElement(data, i);
 					String strValue = Jni::getStringArrayElement(data, i + 1);
-					Variant value;
+					Json value;
 					if (strValue.isNotEmpty()) {
 						JsonParseParam p;
 						p.flagLogError = sl_false;
