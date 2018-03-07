@@ -182,10 +182,10 @@ namespace slib
 		sl_bool emplace(KEY&& key, VALUE_ARGS&&... value_args) noexcept;
 		
 		template <class MAP>
-		void putAll_NoLock(const MAP& other) noexcept;
+		sl_bool putAll_NoLock(const MAP& other) noexcept;
 		
 		template <class MAP>
-		void putAll(const MAP& other) noexcept;
+		sl_bool putAll(const MAP& other) noexcept;
 		
 		template <class MAP>
 		void replaceAll_NoLock(const MAP& other) noexcept;
@@ -194,16 +194,16 @@ namespace slib
 		void replaceAll(const MAP& other) noexcept;
 		
 		template <class MAP>
-		void addAll_NoLock(const MAP& other) noexcept;
+		sl_bool addAll_NoLock(const MAP& other) noexcept;
 		
 		template <class MAP>
-		void addAll(const MAP& other) noexcept;
+		sl_bool addAll(const MAP& other) noexcept;
 		
 		template <class MAP>
-		void emplaceAll_NoLock(const MAP& other) noexcept;
+		sl_bool emplaceAll_NoLock(const MAP& other) noexcept;
 		
 		template <class MAP>
-		void emplaceAll(const MAP& other) noexcept;
+		sl_bool emplaceAll(const MAP& other) noexcept;
 		
 		/* unsynchronized function */
 		void removeAt(NODE* node) noexcept;
@@ -414,10 +414,10 @@ namespace slib
 		sl_bool emplace(KEY&& key, VALUE_ARGS&&... value_args) noexcept;
 		
 		template <class MAP>
-		void putAll_NoLock(const MAP& other) noexcept;
+		sl_bool putAll_NoLock(const MAP& other) noexcept;
 		
 		template <class MAP>
-		void putAll(const MAP& other) noexcept;
+		sl_bool putAll(const MAP& other) noexcept;
 		
 		template <class MAP>
 		void replaceAll_NoLock(const MAP& other) const noexcept;
@@ -426,16 +426,16 @@ namespace slib
 		void replaceAll(const MAP& other) const noexcept;
 		
 		template <class MAP>
-		void addAll_NoLock(const MAP& other) noexcept;
+		sl_bool addAll_NoLock(const MAP& other) noexcept;
 		
 		template <class MAP>
-		void addAll(const MAP& other) noexcept;
+		sl_bool addAll(const MAP& other) noexcept;
 		
 		template <class MAP>
-		void emplaceAll_NoLock(const MAP& other) noexcept;
+		sl_bool emplaceAll_NoLock(const MAP& other) noexcept;
 		
 		template <class MAP>
-		void emplaceAll(const MAP& other) noexcept;
+		sl_bool emplaceAll(const MAP& other) noexcept;
 		
 		/* unsynchronized function */
 		void removeAt(NODE* node) const noexcept;
@@ -584,16 +584,16 @@ namespace slib
 		sl_bool emplace(KEY&& key, VALUE_ARGS&&... value_args) noexcept;
 		
 		template <class MAP>
-		void putAll(const MAP& other) noexcept;
+		sl_bool putAll(const MAP& other) noexcept;
 		
 		template <class MAP>
 		void replaceAll(const MAP& other) const noexcept;
 		
 		template <class MAP>
-		void addAll(const MAP& other) noexcept;
+		sl_bool addAll(const MAP& other) noexcept;
 		
 		template <class MAP>
-		void emplaceAll(const MAP& other) noexcept;
+		sl_bool emplaceAll(const MAP& other) noexcept;
 		
 		sl_bool remove(const KT& key, VT* outValue = sl_null) const noexcept;
 		

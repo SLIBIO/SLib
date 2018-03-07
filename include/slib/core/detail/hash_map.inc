@@ -333,12 +333,10 @@ namespace slib
 		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
 			return sl_null;
 		}
-		
 		sl_size capacity = m_table.capacity;
 		sl_size hash = m_hash(key);
 		sl_size index = hash & (capacity - 1);
 		NODE** nodes = m_table.nodes;
-		
 		NODE* node = RedBlackTree::put(&(nodes[index]), m_table.count, Forward<KEY>(key), m_compare, Forward<VALUE>(value), isInsertion);
 		if (node) {
 			_initNode(node, hash);
@@ -390,12 +388,10 @@ namespace slib
 		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
 			return sl_null;
 		}
-		
 		sl_size capacity = m_table.capacity;
 		sl_size hash = m_hash(key);
 		sl_size index = hash & (capacity - 1);
 		NODE** nodes = m_table.nodes;
-		
 		NODE* node = RedBlackTree::add(&(nodes[index]), m_table.count, Forward<KEY>(key), m_compare, Forward<VALUE_ARGS>(value_args)...);
 		if (node) {
 			_initNode(node, hash);
@@ -420,12 +416,10 @@ namespace slib
 		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
 			return sl_null;
 		}
-		
 		sl_size capacity = m_table.capacity;
 		sl_size hash = m_hash(key);
 		sl_size index = hash & (capacity - 1);
 		NODE** nodes = m_table.nodes;
-		
 		MapEmplaceReturn<NODE> ret = RedBlackTree::emplace(&(nodes[index]), m_table.count, Forward<KEY>(key), m_compare, Forward<VALUE_ARGS>(value_args)...);
 		if (ret.node) {
 			_initNode(ret.node, hash);
@@ -444,39 +438,45 @@ namespace slib
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void CHashMap<KT, VT, HASH, KEY_COMPARE>::putAll_NoLock(const MAP& other) noexcept
+	sl_bool CHashMap<KT, VT, HASH, KEY_COMPARE>::putAll_NoLock(const MAP& other) noexcept
 	{
 		typename MAP::EnumHelper helper(other);
 		auto node = helper.node;
 		if (!node) {
-			return;
+			return sl_true;
 		}
 		if (reinterpret_cast<void*>(m_nodeFirst) == reinterpret_cast<void*>(node)) {
-			return;
+			return sl_true;
 		}
 		while (node) {
-			put_NoLock(node->key, node->value);
+			if (!(put_NoLock(node->key, node->value))) {
+				return sl_false;
+			}
 			node = node->getNext();
 		}
+		return sl_true;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void CHashMap<KT, VT, HASH, KEY_COMPARE>::putAll(const MAP& other) noexcept
+	sl_bool CHashMap<KT, VT, HASH, KEY_COMPARE>::putAll(const MAP& other) noexcept
 	{
 		typename MAP::EnumLockHelper helper(other);
 		auto node = helper.node;
 		if (!node) {
-			return;
+			return sl_true;
 		}
 		if (reinterpret_cast<void*>(m_nodeFirst) == reinterpret_cast<void*>(node)) {
-			return;
+			return sl_true;
 		}
 		MutexLocker lock(getLocker(), helper.mutex);
 		while (node) {
-			put_NoLock(node->key, node->value);
+			if (!(put_NoLock(node->key, node->value))) {
+				return sl_false;
+			}
 			node = node->getNext();
 		}
+		return sl_true;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
@@ -518,76 +518,90 @@ namespace slib
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void CHashMap<KT, VT, HASH, KEY_COMPARE>::addAll_NoLock(const MAP& other) noexcept
+	sl_bool CHashMap<KT, VT, HASH, KEY_COMPARE>::addAll_NoLock(const MAP& other) noexcept
 	{
 		typename MAP::EnumHelper helper(other);
 		auto node = helper.node;
 		if (!node) {
-			return;
+			return sl_true;
 		}
 		if (reinterpret_cast<void*>(m_nodeFirst) == reinterpret_cast<void*>(node)) {
-			return;
+			return sl_false;
 		}
 		while (node) {
-			add_NoLock(node->key, node->value);
+			if (!(add_NoLock(node->key, node->value))) {
+				return sl_false;
+			}
 			node = node->getNext();
 		}
+		return sl_true;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void CHashMap<KT, VT, HASH, KEY_COMPARE>::addAll(const MAP& other) noexcept
+	sl_bool CHashMap<KT, VT, HASH, KEY_COMPARE>::addAll(const MAP& other) noexcept
 	{
 		typename MAP::EnumLockHelper helper(other);
 		auto node = helper.node;
 		if (!node) {
-			return;
+			return sl_true;
 		}
 		if (reinterpret_cast<void*>(m_nodeFirst) == reinterpret_cast<void*>(node)) {
-			return;
+			return sl_false;
 		}
 		MutexLocker lock(getLocker(), helper.mutex);
 		while (node) {
-			add_NoLock(node->key, node->value);
+			if (!(add_NoLock(node->key, node->value))) {
+				return sl_false;
+			}
 			node = node->getNext();
 		}
+		return sl_true;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void CHashMap<KT, VT, HASH, KEY_COMPARE>::emplaceAll_NoLock(const MAP& other) noexcept
+	sl_bool CHashMap<KT, VT, HASH, KEY_COMPARE>::emplaceAll_NoLock(const MAP& other) noexcept
 	{
 		typename MAP::EnumHelper helper(other);
 		auto node = helper.node;
 		if (!node) {
-			return;
+			return sl_true;
 		}
 		if (reinterpret_cast<void*>(m_nodeFirst) == reinterpret_cast<void*>(node)) {
-			return;
+			return sl_true;
 		}
 		while (node) {
-			emplace_NoLock(node->key, node->value);
+			MapEmplaceReturn<NODE> ret = emplace_NoLock(node->key, node->value);
+			if (!(ret.node)) {
+				return sl_false;
+			}
 			node = node->getNext();
 		}
+		return sl_true;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void CHashMap<KT, VT, HASH, KEY_COMPARE>::emplaceAll(const MAP& other) noexcept
+	sl_bool CHashMap<KT, VT, HASH, KEY_COMPARE>::emplaceAll(const MAP& other) noexcept
 	{
 		typename MAP::EnumLockHelper helper(other);
 		auto node = helper.node;
 		if (!node) {
-			return;
+			return sl_true;
 		}
 		if (reinterpret_cast<void*>(m_nodeFirst) == reinterpret_cast<void*>(node)) {
-			return;
+			return sl_true;
 		}
 		MutexLocker lock(getLocker(), helper.mutex);
 		while (node) {
-			emplace_NoLock(node->key, node->value);
+			MapEmplaceReturn<NODE> ret = emplace_NoLock(node->key, node->value);
+			if (!(ret.node)) {
+				return sl_false;
+			}
 			node = node->getNext();
 		}
+		return sl_true;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
@@ -1118,7 +1132,7 @@ namespace slib
 	}
     
     template <class KT, class VT, class HASH, class KEY_COMPARE>
-    sl_bool CHashMap<KT, VT, HASH, KEY_COMPARE>::_copyFrom(const CHashMap<KT, VT, HASH, KEY_COMPARE>* other)
+    sl_bool CHashMap<KT, VT, HASH, KEY_COMPARE>::_copyFrom(const CHashMap<KT, VT, HASH, KEY_COMPARE>* other) noexcept
     {
         sl_size capacity = other->m_table.capacity;
         if (capacity == 0) {
@@ -1503,13 +1517,17 @@ namespace slib
 		if (obj) {
 			return obj->put(Forward<KEY>(key), Forward<VALUE>(value), isInsertion);
 		} else {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->put(Forward<KEY>(key), Forward<VALUE>(value), isInsertion);
+			}
 			obj = new CMAP;
 			if (obj) {
 				ref = obj;
-				if (isInsertion) {
-					*isInsertion = sl_true;
-				}
-				return obj->add_NoLock(Forward<KEY>(key), Forward<VALUE>(value)) != sl_null;
+				lock.unlock();
+				return obj->put(Forward<KEY>(key), Forward<VALUE>(value), isInsertion);
 			}
 		}
 		return sl_false;
@@ -1562,10 +1580,17 @@ namespace slib
 		if (obj) {
 			return obj->add(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 		} else {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->add(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
+			}
 			obj = new CMAP;
 			if (obj) {
 				ref = obj;
-				return obj->add_NoLock(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...) != sl_null;
+				lock.unlock();
+				return obj->add(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 			}
 		}
 		return sl_false;
@@ -1601,10 +1626,17 @@ namespace slib
 		if (obj) {
 			return obj->emplace(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 		} else {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->emplace(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
+			}
 			obj = new CMAP;
 			if (obj) {
 				ref = obj;
-				return obj->add_NoLock(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...) != sl_null;
+				lock.unlock();
+				return obj->emplace(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
 			}
 		}
 		return sl_false;
@@ -1612,34 +1644,43 @@ namespace slib
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void HashMap<KT, VT, HASH, KEY_COMPARE>::putAll_NoLock(const MAP& other) noexcept
+	sl_bool HashMap<KT, VT, HASH, KEY_COMPARE>::putAll_NoLock(const MAP& other) noexcept
 	{
 		CMAP* obj = ref._ptr;
 		if (obj) {
-			obj->putAll_NoLock(other);
+			return obj->putAll_NoLock(other);
 		} else {
 			obj = new CMAP;
 			if (obj) {
 				ref = obj;
-				obj->putAll_NoLock(other);
+				return obj->putAll_NoLock(other);
 			}
 		}
+		return sl_false;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void HashMap<KT, VT, HASH, KEY_COMPARE>::putAll(const MAP& other) noexcept
+	sl_bool HashMap<KT, VT, HASH, KEY_COMPARE>::putAll(const MAP& other) noexcept
 	{
 		CMAP* obj = ref._ptr;
 		if (obj) {
-			obj->putAll(other);
+			return obj->putAll(other);
 		} else {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->putAll(other);
+			}
 			obj = new CMAP;
 			if (obj) {
 				ref = obj;
-				obj->putAll(other);
+				lock.unlock();
+				return obj->putAll(other);
 			}
 		}
+		return sl_false;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
@@ -1664,66 +1705,84 @@ namespace slib
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void HashMap<KT, VT, HASH, KEY_COMPARE>::addAll_NoLock(const MAP& other) noexcept
+	sl_bool HashMap<KT, VT, HASH, KEY_COMPARE>::addAll_NoLock(const MAP& other) noexcept
 	{
 		CMAP* obj = ref._ptr;
 		if (obj) {
-			obj->addAll_NoLock(other);
+			return obj->addAll_NoLock(other);
 		} else {
 			obj = new CMAP;
 			if (obj) {
 				ref = obj;
-				obj->addAll_NoLock(other);
+				return obj->addAll_NoLock(other);
 			}
 		}
+		return sl_false;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void HashMap<KT, VT, HASH, KEY_COMPARE>::addAll(const MAP& other) noexcept
+	sl_bool HashMap<KT, VT, HASH, KEY_COMPARE>::addAll(const MAP& other) noexcept
 	{
 		CMAP* obj = ref._ptr;
 		if (obj) {
-			obj->addAll(other);
+			return obj->addAll(other);
 		} else {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->addAll(other);
+			}
 			obj = new CMAP;
 			if (obj) {
 				ref = obj;
-				obj->addAll(other);
+				lock.unlock();
+				return obj->addAll(other);
 			}
 		}
+		return sl_false;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void HashMap<KT, VT, HASH, KEY_COMPARE>::emplaceAll_NoLock(const MAP& other) noexcept
+	sl_bool HashMap<KT, VT, HASH, KEY_COMPARE>::emplaceAll_NoLock(const MAP& other) noexcept
 	{
 		CMAP* obj = ref._ptr;
 		if (obj) {
-			obj->emplaceAll_NoLock(other);
+			return obj->emplaceAll_NoLock(other);
 		} else {
 			obj = new CMAP;
 			if (obj) {
 				ref = obj;
-				obj->emplaceAll_NoLock(other);
+				return obj->emplaceAll_NoLock(other);
 			}
 		}
+		return sl_false;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void HashMap<KT, VT, HASH, KEY_COMPARE>::emplaceAll(const MAP& other) noexcept
+	sl_bool HashMap<KT, VT, HASH, KEY_COMPARE>::emplaceAll(const MAP& other) noexcept
 	{
 		CMAP* obj = ref._ptr;
 		if (obj) {
-			obj->emplaceAll(other);
+			return obj->emplaceAll(other);
 		} else {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref._ptr;
+			if (obj) {
+				lock.unlock();
+				return obj->emplaceAll(other);
+			}
 			obj = new CMAP;
 			if (obj) {
 				ref = obj;
-				obj->emplaceAll(other);
+				lock.unlock();
+				return obj->emplaceAll(other);
 			}
 		}
+		return sl_false;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
@@ -2289,26 +2348,26 @@ namespace slib
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void Atomic< HashMap<KT, VT, HASH, KEY_COMPARE> >::putAll(const MAP& other) noexcept
+	sl_bool Atomic< HashMap<KT, VT, HASH, KEY_COMPARE> >::putAll(const MAP& other) noexcept
 	{
 		Ref<CMAP> obj(ref);
 		if (obj.isNotNull()) {
-			obj->putAll(other);
+			return obj->putAll(other);
 		} else {
 			SpinLocker lock(SpinLockPoolForMap::get(this));
 			obj = ref;
 			if (obj.isNotNull()) {
 				lock.unlock();
-				obj->putAll(other);
-				return;
+				return obj->putAll(other);
 			}
 			obj = new CMAP;
 			if (obj.isNotNull()) {
 				ref = obj;
 				lock.unlock();
-				obj->putAll(other);
+				return obj->putAll(other);
 			}
 		}
+		return sl_false;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
@@ -2323,50 +2382,50 @@ namespace slib
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void Atomic< HashMap<KT, VT, HASH, KEY_COMPARE> >::addAll(const MAP& other) noexcept
+	sl_bool Atomic< HashMap<KT, VT, HASH, KEY_COMPARE> >::addAll(const MAP& other) noexcept
 	{
 		Ref<CMAP> obj(ref);
 		if (obj.isNotNull()) {
-			obj->addAll(other);
+			return obj->addAll(other);
 		} else {
 			SpinLocker lock(SpinLockPoolForMap::get(this));
 			obj = ref;
 			if (obj.isNotNull()) {
 				lock.unlock();
-				obj->addAll(other);
-				return;
+				return obj->addAll(other);
 			}
 			obj = new CMAP;
 			if (obj.isNotNull()) {
 				ref = obj;
 				lock.unlock();
-				obj->addAll(other);
+				return obj->addAll(other);
 			}
 		}
+		return sl_false;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	template <class MAP>
-	void Atomic< HashMap<KT, VT, HASH, KEY_COMPARE> >::emplaceAll(const MAP& other) noexcept
+	sl_bool Atomic< HashMap<KT, VT, HASH, KEY_COMPARE> >::emplaceAll(const MAP& other) noexcept
 	{
 		Ref<CMAP> obj(ref);
 		if (obj.isNotNull()) {
-			obj->emplaceAll(other);
+			return obj->emplaceAll(other);
 		} else {
 			SpinLocker lock(SpinLockPoolForMap::get(this));
 			obj = ref;
 			if (obj.isNotNull()) {
 				lock.unlock();
-				obj->emplaceAll(other);
-				return;
+				return obj->emplaceAll(other);
 			}
 			obj = new CMAP;
 			if (obj.isNotNull()) {
 				ref = obj;
 				lock.unlock();
-				obj->emplaceAll(other);
+				return obj->emplaceAll(other);
 			}
 		}
+		return sl_false;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
