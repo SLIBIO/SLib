@@ -282,9 +282,9 @@ namespace slib
             alert = aps[@"alert"];
         }
         
-		slib::Variant _userInfo = slib::Json::parseJson(slib::Apple::getStringFromNSString(jsonString));
+		slib::Json _userInfo = slib::Json::parseJson(slib::Apple::getStringFromNSString(jsonString));
         slib::PushNotificationMessage message;
-        message.data = _userInfo.getVariantMap();
+        message.data = _userInfo.getJsonMap();
         
         if (alert) {
             if ([alert isKindOfClass:[NSString class]]) {

@@ -158,10 +158,10 @@ namespace slib
 			return node;
 		}
 		
-		SLIB_INLINE NODE& operator++() noexcept
+		SLIB_INLINE NodePositionWithRef& operator++() noexcept
 		{
 			node = node->getNext();
-			return node;
+			return *this;
 		}
 		
 	public:

@@ -151,14 +151,14 @@ namespace slib
 	class Hash<sl_int64>
 	{
 	public:
-		constexpr sl_size operator()(sl_int64 v) const noexcept { return Rehash64(v); }
+		constexpr sl_size operator()(sl_int64 v) const noexcept { return Rehash64ToSize(v); }
 	};
 
 	template <>
 	class Hash<sl_uint64>
 	{
 	public:
-		constexpr sl_size operator()(sl_uint64 v) const noexcept { return Rehash64(v); }
+		constexpr sl_size operator()(sl_uint64 v) const noexcept { return Rehash64ToSize(v); }
 	};
 
 	template <>
@@ -172,7 +172,7 @@ namespace slib
 	class Hash<double>
 	{
 	public:
-		SLIB_INLINE sl_size operator()(double v) const noexcept { return Rehash64(*(reinterpret_cast<sl_uint64*>(&v))); }
+		SLIB_INLINE sl_size operator()(double v) const noexcept { return Rehash64ToSize(*(reinterpret_cast<sl_uint64*>(&v))); }
 	};
 
 	template <class T>

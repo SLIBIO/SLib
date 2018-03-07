@@ -14,7 +14,7 @@
 #include "definition.h"
 
 #include "../core/string.h"
-#include "../core/variant.h"
+#include "../core/json.h"
 #include "../core/function.h"
 
 namespace slib
@@ -25,7 +25,7 @@ namespace slib
 	public:
 		String title;
 		String body;
-		HashMap<String, Variant> data;
+		JsonMap data;
 
 	public:
 		PushNotificationMessage();
