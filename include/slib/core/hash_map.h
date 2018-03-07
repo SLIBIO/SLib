@@ -56,6 +56,10 @@ namespace slib
 		HashMapNode* next;
 		
 	public:
+		HashMapNode(const HashMapNode& other) = delete;
+
+		HashMapNode(HashMapNode& other) = delete;
+
 		template <class KEY, class... VALUE_ARGS>
 		HashMapNode(KEY&& _key, VALUE_ARGS&&... value_args) noexcept;
 		

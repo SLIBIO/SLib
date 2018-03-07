@@ -49,6 +49,10 @@ namespace slib
 		VT value;
 		
 	public:
+		MapNode(const MapNode& other) = delete;
+		
+		MapNode(MapNode& other) = delete;
+		
 		template <class KEY, class... VALUE_ARGS>
 		MapNode(KEY&& _key, VALUE_ARGS&&... value_args) noexcept;
 		
