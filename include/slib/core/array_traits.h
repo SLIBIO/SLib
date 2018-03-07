@@ -161,7 +161,7 @@ namespace slib
 		static sl_reg indexOf(T* data, sl_reg count, const TYPE& value, const EQUALS& equals) noexcept
 		{
 			sl_reg ret = -1;
-			for (sl_size i = 0; i < count; i++) {
+			for (sl_reg i = 0; i < count; i++) {
 				if (equals(data[i], value)) {
 					ret = i;
 					break;

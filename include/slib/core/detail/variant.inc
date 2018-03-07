@@ -328,29 +328,164 @@ namespace slib
 	}
 	
 	
-	template <> sl_object_type CMap<String, Variant>::ObjectType() noexcept;
-	template <> sl_bool CMap<String, Variant>::isDerivedFrom(sl_object_type type) noexcept;
-	template <> sl_object_type CMap<String, Variant>::getObjectType() const noexcept;
-	template <> sl_bool CMap<String, Variant>::isInstanceOf(sl_object_type type) const noexcept;
+	extern const char _priv_VariantMap_ClassID[];
+	extern const char _priv_VariantHashMap_ClassID[];
+	extern const char _priv_VariantList_ClassID[];
+	extern const char _priv_VariantMapList_ClassID[];
+	extern const char _priv_VariantHashMapList_ClassID[];
 	
-	template <> sl_object_type CHashMap<String, Variant>::ObjectType() noexcept;
-	template <> sl_bool CHashMap<String, Variant>::isDerivedFrom(sl_object_type type) noexcept;
-	template <> sl_object_type CHashMap<String, Variant>::getObjectType() const noexcept;
-	template <>	sl_bool CHashMap<String, Variant>::isInstanceOf(sl_object_type type) const noexcept;
+	template <>
+	SLIB_INLINE sl_object_type CMap<String, Variant>::ObjectType() noexcept
+	{
+		return _priv_VariantMap_ClassID;
+	}
 	
-	template <> sl_object_type CList<Variant>::ObjectType() noexcept;
-	template <> sl_bool CList<Variant>::isDerivedFrom(sl_object_type type) noexcept;
-	template <> sl_object_type CList<Variant>::getObjectType() const noexcept;
-	template <> sl_bool CList<Variant>::isInstanceOf(sl_object_type type) const noexcept;
+	template <>
+	SLIB_INLINE sl_bool CMap<String, Variant>::isDerivedFrom(sl_object_type type) noexcept
+	{
+		if (type == _priv_VariantMap_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
 	
-	template <> sl_object_type CList< Map<String, Variant> >::ObjectType() noexcept;
-	template <> sl_bool CList< Map<String, Variant> >::isDerivedFrom(sl_object_type type) noexcept;
-	template <>	sl_object_type CList< Map<String, Variant> >::getObjectType() const noexcept;
-	template <> sl_bool CList< Map<String, Variant> >::isInstanceOf(sl_object_type type) const noexcept;
-
-	template <> sl_object_type CList< HashMap<String, Variant> >::ObjectType() noexcept;
-	template <> sl_bool CList< HashMap<String, Variant> >::isDerivedFrom(sl_object_type type) noexcept;
-	template <> sl_object_type CList< HashMap<String, Variant> >::getObjectType() const noexcept;
-	template <> sl_bool CList< HashMap<String, Variant> >::isInstanceOf(sl_object_type type) const noexcept;
+	template <>
+	SLIB_INLINE sl_object_type CMap<String, Variant>::getObjectType() const noexcept
+	{
+		return _priv_VariantMap_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CMap<String, Variant>::isInstanceOf(sl_object_type type) const noexcept
+	{
+		if (type == _priv_VariantMap_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	
+	template <>
+	SLIB_INLINE sl_object_type CHashMap<String, Variant>::ObjectType() noexcept
+	{
+		return _priv_VariantHashMap_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CHashMap<String, Variant>::isDerivedFrom(sl_object_type type) noexcept
+	{
+		if (type == _priv_VariantHashMap_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	template <>
+	SLIB_INLINE sl_object_type CHashMap<String, Variant>::getObjectType() const noexcept
+	{
+		return _priv_VariantHashMap_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CHashMap<String, Variant>::isInstanceOf(sl_object_type type) const noexcept
+	{
+		if (type == _priv_VariantHashMap_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	
+	template <>
+	SLIB_INLINE sl_object_type CList<Variant>::ObjectType() noexcept
+	{
+		return _priv_VariantList_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CList<Variant>::isDerivedFrom(sl_object_type type) noexcept
+	{
+		if (type == _priv_VariantList_ClassID || type == _priv_List_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	template <>
+	SLIB_INLINE sl_object_type CList<Variant>::getObjectType() const noexcept
+	{
+		return _priv_VariantList_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CList<Variant>::isInstanceOf(sl_object_type type) const noexcept
+	{
+		if (type == _priv_VariantList_ClassID || type == _priv_List_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	
+	template <>
+	SLIB_INLINE sl_object_type CList< Map<String, Variant> >::ObjectType() noexcept
+	{
+		return _priv_VariantMapList_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CList< Map<String, Variant> >::isDerivedFrom(sl_object_type type) noexcept
+	{
+		if (type == _priv_VariantMapList_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	template <>
+	SLIB_INLINE sl_object_type CList< Map<String, Variant> >::getObjectType() const noexcept
+	{
+		return _priv_VariantMapList_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CList< Map<String, Variant> >::isInstanceOf(sl_object_type type) const noexcept
+	{
+		if (type == _priv_VariantMapList_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	
+	template <>
+	SLIB_INLINE sl_object_type CList< HashMap<String, Variant> >::ObjectType() noexcept
+	{
+		return _priv_VariantHashMapList_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CList< HashMap<String, Variant> >::isDerivedFrom(sl_object_type type) noexcept
+	{
+		if (type == _priv_VariantHashMapList_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
+	
+	template <>
+	SLIB_INLINE sl_object_type CList< HashMap<String, Variant> >::getObjectType() const noexcept
+	{
+		return _priv_VariantHashMapList_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CList< HashMap<String, Variant> >::isInstanceOf(sl_object_type type) const noexcept
+	{
+		if (type == _priv_VariantHashMapList_ClassID || type == _priv_Map_ClassID) {
+			return sl_true;
+		}
+		return Object::isDerivedFrom(type);
+	}
 	
 }

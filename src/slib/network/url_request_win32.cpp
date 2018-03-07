@@ -102,7 +102,7 @@ namespace slib
 							if (r->address.getHashCode() == url.getHashCode() && r->address == url) {
 								Ref<UrlRequest_Connection> connection = link->value;
 								Link< Ref<UrlRequest_Connection> >* before = link->before;
-								connectionPool.removeItem_NoLock(link);
+								connectionPool.removeAt(link);
 								return connection;
 							}
 							link = link->before;

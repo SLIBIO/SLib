@@ -46,9 +46,9 @@ namespace slib
 
 		static void clear(TABLE* table) noexcept;
 		
-		static void setMinimumCapacity(TABLE* table, sl_size capacity);
+		static void setMinimumCapacity(TABLE* table, sl_size capacity) noexcept;
 		
-		static void setMaximumCapacity(TABLE* table, sl_size capacity);
+		static void setMaximumCapacity(TABLE* table, sl_size capacity) noexcept;
 
 		static sl_bool validateNodes(TABLE* table) noexcept;
 		

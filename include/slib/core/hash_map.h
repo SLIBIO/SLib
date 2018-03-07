@@ -58,7 +58,9 @@ namespace slib
 	public:
 		HashMapNode(const HashMapNode& other) = delete;
 
+#ifdef SLIB_COMPILER_IS_GCC
 		HashMapNode(HashMapNode& other) = delete;
+#endif
 
 		template <class KEY, class... VALUE_ARGS>
 		HashMapNode(KEY&& _key, VALUE_ARGS&&... value_args) noexcept;

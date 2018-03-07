@@ -19,33 +19,33 @@ namespace slib
 
 	SLIB_DEFINE_OBJECT(CLinkedListBase, Object)
 
-	CLinkedListBase::CLinkedListBase()
+	CLinkedListBase::CLinkedListBase() noexcept
 	{
 	}
 
-	CLinkedListBase::~CLinkedListBase()
+	CLinkedListBase::~CLinkedListBase() noexcept
 	{
 	}
 
 
 	SLIB_DEFINE_OBJECT(LoopQueueBase, Object)
 
-	LoopQueueBase::LoopQueueBase()
+	LoopQueueBase::LoopQueueBase() noexcept
 	{
 	}
 
-	LoopQueueBase::~LoopQueueBase()
+	LoopQueueBase::~LoopQueueBase() noexcept
 	{
 	}
 
 
 	SLIB_DEFINE_OBJECT(LinkedObjectListBase, Object)
 
-	LinkedObjectListBase::LinkedObjectListBase()
+	LinkedObjectListBase::LinkedObjectListBase() noexcept
 	{
 	}
 
-	LinkedObjectListBase::~LinkedObjectListBase()
+	LinkedObjectListBase::~LinkedObjectListBase() noexcept
 	{
 	}
 	

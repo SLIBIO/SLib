@@ -51,7 +51,9 @@ namespace slib
 	public:
 		MapNode(const MapNode& other) = delete;
 		
+#ifdef SLIB_COMPILER_IS_GCC
 		MapNode(MapNode& other) = delete;
+#endif
 		
 		template <class KEY, class... VALUE_ARGS>
 		MapNode(KEY&& _key, VALUE_ARGS&&... value_args) noexcept;
