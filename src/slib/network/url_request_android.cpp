@@ -151,8 +151,8 @@ namespace slib
 			if (headers) {
 				sl_uint32 n = Jni::getArrayLength(headers);
 				if (n > 0) {
-					Map<String, String> map;
-					map.initHash(0, HashIgnoreCaseString(), EqualsIgnoreCaseString());
+					HttpHeaderMap map;
+					map.init();
 					if (map.isNotNull()) {
 						for (sl_uint32 i = 0; i < n - 1; i += 2) {
 							String key = Jni::getStringArrayElement(headers, i);

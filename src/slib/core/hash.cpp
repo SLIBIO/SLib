@@ -143,7 +143,7 @@ namespace slib
 			sl_size capacity = table->capacityMinimum;
 			NODE** nodes = (NODE**)(Base::createMemory(sizeof(NODE*)*capacity));
 			if (nodes) {
-				Base::zeroMemory(table->nodes, sizeof(NODE*)*capacity);
+				Base::zeroMemory(nodes, sizeof(NODE*)*capacity);
 				table->nodes = nodes;
 				table->capacity = capacity;
 				updateThresholds(table);

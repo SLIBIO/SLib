@@ -161,7 +161,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::send(const String& url, const Map<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete)
+	Ref<UrlRequest> UrlRequest::send(const String& url, const HashMap<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -171,7 +171,7 @@ namespace slib
 		return send(rp);
 	}
 
-	Ref<UrlRequest> UrlRequest::send(const String& url, const Map<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+	Ref<UrlRequest> UrlRequest::send(const String& url, const HashMap<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -201,7 +201,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::send(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
+	Ref<UrlRequest> UrlRequest::send(HttpMethod method, const String& url, const HashMap<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -212,7 +212,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::send(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+	Ref<UrlRequest> UrlRequest::send(HttpMethod method, const String& url, const HashMap<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -224,7 +224,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete)
+	Ref<UrlRequest> UrlRequest::sendJson(HttpMethod method, const String& url, const HashMap<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -235,7 +235,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+	Ref<UrlRequest> UrlRequest::sendJson(HttpMethod method, const String& url, const HashMap<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -268,7 +268,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::post(const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
+	Ref<UrlRequest> UrlRequest::post(const String& url, const HashMap<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -279,7 +279,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::post(const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+	Ref<UrlRequest> UrlRequest::post(const String& url, const HashMap<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -312,7 +312,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::postJson(const String& url, const Map<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete)
+	Ref<UrlRequest> UrlRequest::postJson(const String& url, const HashMap<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -323,7 +323,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::postJson(const String& url, const Map<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+	Ref<UrlRequest> UrlRequest::postJson(const String& url, const HashMap<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -344,7 +344,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::sendSynchronous(const String& url, const Map<String, Variant>& params)
+	Ref<UrlRequest> UrlRequest::sendSynchronous(const String& url, const HashMap<String, Variant>& params)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -363,7 +363,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::sendSynchronous(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& body)
+	Ref<UrlRequest> UrlRequest::sendSynchronous(HttpMethod method, const String& url, const HashMap<String, Variant>& params, const Variant& body)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -374,7 +374,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::sendJsonSynchronous(HttpMethod method, const String& url, const Map<String, Variant>& params, const Json& json)
+	Ref<UrlRequest> UrlRequest::sendJsonSynchronous(HttpMethod method, const String& url, const HashMap<String, Variant>& params, const Json& json)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -395,7 +395,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::postSynchronous(const String& url, const Map<String, Variant>& params, const Variant& body)
+	Ref<UrlRequest> UrlRequest::postSynchronous(const String& url, const HashMap<String, Variant>& params, const Variant& body)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -416,7 +416,7 @@ namespace slib
 		return send(rp);
 	}
 	
-	Ref<UrlRequest> UrlRequest::postJsonSynchronous(const String& url, const Map<String, Variant>& params, const Json& json)
+	Ref<UrlRequest> UrlRequest::postJsonSynchronous(const String& url, const HashMap<String, Variant>& params, const Json& json)
 	{
 		UrlRequestParam rp;
 		rp.url = url;
@@ -452,17 +452,17 @@ namespace slib
 		return m_requestBody.getSize();
 	}
 	
-	Map<String, Variant> UrlRequest::getParameters()
+	HashMap<String, Variant> UrlRequest::getParameters()
 	{
 		return m_parameters;
 	}
 	
-	Map<String, String> UrlRequest::getRequestHeaders()
+	HttpHeaderMap UrlRequest::getRequestHeaders()
 	{
 		return m_requestHeaders;
 	}
 	
-	Map<String, String> UrlRequest::getAdditionalRequestHeaders()
+	HttpHeaderMap UrlRequest::getAdditionalRequestHeaders()
 	{
 		return m_additionalRequestHeaders;
 	}
@@ -501,7 +501,7 @@ namespace slib
 		return m_responseMessage;
 	}
 	
-	Map<String, String> UrlRequest::getResponseHeaders()
+	HttpHeaderMap UrlRequest::getResponseHeaders()
 	{
 		return m_responseHeaders;
 	}
@@ -765,12 +765,28 @@ namespace slib
 	{
 		callback(this);
 	}
-		
+	
 	String UrlRequest::_buildParameters(const Map<String, Variant>& params)
 	{
 		StringBuffer sb;
 		sl_bool flagFirst = sl_true;
-		for (auto pair : params) {
+		for (auto& pair : params) {
+			if (!flagFirst) {
+				sb.addStatic("&", 1);
+			}
+			flagFirst = sl_false;
+			sb.add(pair.key);
+			sb.addStatic("=", 1);
+			sb.add(Url::encodeUriComponentByUTF8(pair.value.getString()));
+		}
+		return sb.merge();
+	}
+	
+	String UrlRequest::_buildParameters(const HashMap<String, Variant>& params)
+	{
+		StringBuffer sb;
+		sl_bool flagFirst = sl_true;
+		for (auto& pair : params) {
 			if (!flagFirst) {
 				sb.addStatic("&", 1);
 			}
@@ -789,8 +805,10 @@ namespace slib
 			if (varBody.isObject()) {
 				Ref<Referable> obj = varBody.getObject();
 				if (obj.isNotNull()) {
-					if (IMap<String, Variant>* map = CastInstance< IMap<String, Variant> >(obj.get())) {
+					if (CMap<String, Variant>* map = CastInstance< CMap<String, Variant> >(obj.get())) {
 						body = _buildParameters(map).toMemory();
+					} else if (CHashMap<String, Variant>* hashMap = CastInstance< CHashMap<String, Variant> >(obj.get())) {
+						body = _buildParameters(hashMap).toMemory();
 					} else if (XmlDocument* xml = CastInstance<XmlDocument>(obj.get())) {
 						body = xml->toString().toMemory();
 					} else if (CMemory* mem = CastInstance<CMemory>(obj.get())) {

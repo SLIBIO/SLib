@@ -14,7 +14,7 @@
 
 #include "slib/media/camera.h"
 
-#include "slib/core/map.h"
+#include "slib/core/hash_map.h"
 #include "slib/core/platform_android.h"
 #include "slib/core/safe_static.h"
 
@@ -40,7 +40,7 @@ namespace slib
 	SLIB_JNI_END_CLASS
 
 	class _Android_Camera;
-	typedef HashMap<jlong, WeakRef<_Android_Camera> > _AndroidCameraMap;
+	typedef CHashMap<jlong, WeakRef<_Android_Camera> > _AndroidCameraMap;
 	SLIB_SAFE_STATIC_GETTER(_AndroidCameraMap, _AndroidCameras_get)
 
 	class _Android_Camera : public Camera

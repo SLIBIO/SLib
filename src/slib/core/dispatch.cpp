@@ -224,12 +224,12 @@ namespace slib
 		}
 		sl_int32 timeout = -1;
 		LinkedQueue< Function<void()> > tasks;
-		while (RedBlackTreeNode<sl_uint64, TimeTask>* node = m_timeTasks.getFirstNode()) {
-			if (rel >= node->data.key) {
-				tasks.push(node->data.value.task);
-				m_timeTasks.removeNode(node);
+		while (MapNode<sl_uint64, TimeTask>* node = m_timeTasks.getFirstNode()) {
+			if (rel >= node->key) {
+				tasks.push(node->value.task);
+				m_timeTasks.removeAt(node);
 			} else {
-				timeout = (sl_int32)(node->data.key - rel);
+				timeout = (sl_int32)(node->key - rel);
 				break;
 			}
 		}
@@ -271,7 +271,7 @@ namespace slib
 			} else {
 				Link<TimerTask>* linkRemove = link;
 				link = link->next;
-				m_queueTimers.removeItem(linkRemove);
+				m_queueTimers.removeAt(linkRemove);
 			}
 		}
 
@@ -312,7 +312,7 @@ namespace slib
 		MutexLocker lock(&m_lockTimer);
 		TimerTask t;
 		t.timer = timer;
-		m_queueTimers.removeValue(t);
+		m_queueTimers.remove(t);
 	}
 
 	sl_uint64 DispatchLoop::getElapsedMilliseconds()

@@ -72,9 +72,9 @@ namespace slib
 			return -1;
 		}
 
-		static Map<String, Variant> _getRow(sqlite3_stmt* stmt, String* columns, sl_uint32 nColumns)
+		static HashMap<String, Variant> _getRow(sqlite3_stmt* stmt, String* columns, sl_uint32 nColumns)
 		{
-			Map<String, Variant> row;
+			HashMap<String, Variant> row;
 			for (sl_uint32 cIndex = 0; cIndex < nColumns; cIndex++) {
 				String cValue = String::fromUtf8(::sqlite3_column_text(stmt, (int)cIndex));
 				row.put_NoLock(columns[cIndex], cValue);
@@ -91,7 +91,7 @@ namespace slib
 			CList<String> m_listColumnNames;
 			sl_uint32 m_nColumnNames;
 			String* m_columnNames;
-			HashMap<String, sl_int32> m_mapColumnIndexes;
+			CHashMap<String, sl_int32> m_mapColumnIndexes;
 
 			_DatabaseCursor(Database* db, DatabaseStatement* statementObj, sqlite3_stmt* statement)
 			{
@@ -137,11 +137,10 @@ namespace slib
 				return m_mapColumnIndexes.getValue_NoLock(name, -1);
 			}
 
-			Map<String, Variant> getRow() override
+			HashMap<String, Variant> getRow() override
 			{
-				Map<String, Variant> ret;
+				HashMap<String, Variant> ret;
 				if (m_nColumnNames > 0) {
-					ret.initHash();
 					for (sl_uint32 index = 0; index < m_nColumnNames; index++) {
 						ret.put_NoLock(m_columnNames[index], _getValue(index));
 					}				

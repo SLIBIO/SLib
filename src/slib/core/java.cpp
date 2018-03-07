@@ -13,6 +13,7 @@
 #ifdef SLIB_PLATFORM_USE_JNI
 
 #include "slib/core/java.h"
+#include "slib/core/hash_map.h"
 #include "slib/core/log.h"
 #include "slib/core/safe_static.h"
 
@@ -33,7 +34,7 @@ namespace slib
 	class _Jni_Shared
 	{
 	public:
-		HashMap<String, JniClass> classes;
+		CHashMap<String, JniClass> classes;
 		
 		CList<_JniSingletonClass*> singleton_classes;
 		CList<_JniSingletonMethod*> singleton_methods;

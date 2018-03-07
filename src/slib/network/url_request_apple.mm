@@ -38,7 +38,7 @@ namespace slib
 		_Slib_UrlRequestListener* listener;
 		NSOperationQueue* operationQueue;
 		NSFileManager* fileManager;
-		HashMap< NSUInteger, WeakRef<UrlRequest_Impl> > requests;
+		CHashMap< NSUInteger, WeakRef<UrlRequest_Impl> > requests;
 		
 	public:
 		UrlRequest_Shared()
@@ -181,12 +181,12 @@ namespace slib
 				
 				NSDictionary* dict = http.allHeaderFields;
 				if (dict != nil && [dict count] > 0) {
-					Map<String, String> map;
-					map.initHash(0, HashIgnoreCaseString(), EqualsIgnoreCaseString());
-					if (map.isNotNull()) {
-						IMap<String, String>* pmap = map.ref.get();
+					HttpHeaderMap map;
+					map.init();
+					auto cmap = map.ref.get();
+					if (cmap) {
 						[dict enumerateKeysAndObjectsUsingBlock:^(id key, id value, BOOL *stop) {
-							pmap->add_NoLock(Apple::getStringFromNSString((NSString*)key), Apple::getStringFromNSString((NSString*)value));
+							cmap->add_NoLock(Apple::getStringFromNSString((NSString*)key), Apple::getStringFromNSString((NSString*)value));
 						}];
 						m_responseHeaders = map;
 					}

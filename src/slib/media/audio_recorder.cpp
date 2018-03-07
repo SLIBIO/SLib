@@ -68,7 +68,7 @@ namespace slib
 			format = AudioFormat::Int16_Stereo;
 		}
 		if (audioOut.format == format && (((sl_size)(audioOut.data)) & 1) == 0) {
-			return m_queue.get((sl_int16*)(audioOut.data), nChannels * audioOut.count);
+			return m_queue.pop((sl_int16*)(audioOut.data), nChannels * audioOut.count);
 		} else {
 			sl_int16 samples[2048];
 			AudioData temp;
@@ -84,7 +84,7 @@ namespace slib
 						m = 1024;
 					}
 					n -= m;
-					m_queue.get(samples, nChannels*m);
+					m_queue.pop(samples, nChannels*m);
 					audioOut.copySamplesFrom(temp, m);
 				}
 				return sl_true;
@@ -132,7 +132,7 @@ namespace slib
 			listener->onRecordAudio(this, audio);
 			m_onRecordAudio(this, audio);
 		}
-		m_queue.add(s, count);
+		m_queue.push(s, count);
 		if (m_event.isNotNull()) {
 			m_event->set();
 		}

@@ -12,6 +12,7 @@
 
 #include "slib/graphics/util.h"
 #include "slib/core/safe_static.h"
+#include "slib/core/new_helper.h"
 
 namespace slib
 {

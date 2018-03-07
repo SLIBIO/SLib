@@ -38,10 +38,12 @@
 
 #include "../core/string.h"
 #include "../core/content_type.h"
-#include "../core/map.h"
+#include "../core/hash_map.h"
 
 namespace slib
 {
+	
+	typedef HashMap<String, String, HashIgnoreCaseString, CompareIgnoreCaseString> HttpHeaderMap;
 
 	enum class HttpStatus
 	{
@@ -159,7 +161,7 @@ namespace slib
 		 =0: incomplete packet
 		 >0: size of the headers (ending with [CR][LF][CR][LF])
 		 */
-		static sl_reg parseHeaders(Map<String, String>& outMap, const void* headers, sl_size size);
+		static sl_reg parseHeaders(HttpHeaderMap& outMap, const void* headers, sl_size size);
 		
 	};
 	
@@ -195,7 +197,7 @@ namespace slib
 		void setRequestVersion(const String& version);
 		
 		
-		const Map<String, String>& getRequestHeaders() const;
+		const HttpHeaderMap& getRequestHeaders() const;
 		
 		String getRequestHeader(String name) const;
 		
@@ -253,7 +255,7 @@ namespace slib
 		void setRequestOrigin(const String& origin);
 		
 		
-		const Map<String, String>& getParameters() const;
+		const HashMap<String, String>& getParameters() const;
 		
 		String getParameter(const String& name) const;
 		
@@ -261,7 +263,7 @@ namespace slib
 		
 		sl_bool containsParameter(const String& name) const;
 		
-		const Map<String, String>& getQueryParameters() const;
+		const HashMap<String, String>& getQueryParameters() const;
 		
 		String getQueryParameter(String name) const;
 		
@@ -269,7 +271,7 @@ namespace slib
 		
 		sl_bool containsQueryParameter(String name) const;
 		
-		const Map<String, String>& getPostParameters() const;
+		const HashMap<String, String>& getPostParameters() const;
 		
 		String getPostParameter(String name) const;
 		
@@ -283,9 +285,9 @@ namespace slib
 		
 		void applyQueryToParameters();
 		
-		static Map<String, String> parseParameters(const void* data, sl_size size);
+		static HashMap<String, String> parseParameters(const void* data, sl_size size);
 		
-		static Map<String, String> parseParameters(const String& str);
+		static HashMap<String, String> parseParameters(const String& str);
 		
 		Memory makeRequestPacket() const;
 		
@@ -305,10 +307,10 @@ namespace slib
 		String m_query;
 		String m_requestVersion;
 		
-		Map<String, String> m_requestHeaders;
-		Map<String, String> m_parameters;
-		Map<String, String> m_queryParameters;
-		Map<String, String> m_postParameters;
+		HttpHeaderMap m_requestHeaders;
+		HashMap<String, String> m_parameters;
+		HashMap<String, String> m_queryParameters;
+		HashMap<String, String> m_postParameters;
 		
 	};
 	
@@ -333,7 +335,7 @@ namespace slib
 		void setResponseVersion(const String& version);
 		
 		
-		const Map<String, String>& getResponseHeaders() const;
+		const HttpHeaderMap& getResponseHeaders() const;
 		
 		String getResponseHeader(String name) const;
 		
@@ -406,7 +408,7 @@ namespace slib
 		String m_responseMessage;
 		String m_responseVersion;
 		
-		Map<String, String> m_responseHeaders;
+		HttpHeaderMap m_responseHeaders;
 		
 	};
 	

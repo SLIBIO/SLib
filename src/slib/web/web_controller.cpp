@@ -47,12 +47,12 @@ namespace slib
 				if (ret.isObject()) {
 					Ref<Referable> obj = ret.getObject();
 					if (obj.isNotNull()) {
-						if (IsInstanceOf< Map<String, Variant> >(obj)) {
-							context->write(ret.toJsonString());
-						} else if (XmlDocument* xml = CastInstance<XmlDocument>(obj.get())) {
+						if (XmlDocument* xml = CastInstance<XmlDocument>(obj.get())) {
 							context->write(xml->toString());
 						} else if (CMemory* mem = CastInstance<CMemory>(obj.get())) {
 							context->write(mem);
+						} else {
+							context->write(ret.toJsonString());
 						}
 					}
 				} else {

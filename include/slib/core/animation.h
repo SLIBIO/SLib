@@ -16,7 +16,7 @@
 #include "object.h"
 #include "function.h"
 #include "ptr.h"
-#include "map.h"
+#include "hash_map.h"
 #include "math.h"
 #include "interpolation.h"
 
@@ -342,8 +342,8 @@ namespace slib
 		sl_int32 _runStep();
 
 	protected:
-		HashMap< sl_reg, Ref<Animation> > m_mapAnimations;
-		HashMap< sl_reg, WeakRef<Animation> > m_mapWeakAnimations;
+		CHashMap< sl_reg, Ref<Animation> > m_mapAnimations;
+		CHashMap< sl_reg, WeakRef<Animation> > m_mapWeakAnimations;
 		List< Ref<Animation> > m_animationsRunning;
 		sl_bool m_flagPaused;
 

@@ -19,7 +19,7 @@
 namespace slib
 {
 
-	typedef HashMap<const void*, WeakRef<ViewInstance> > _UiViewInstanceMap;
+	typedef CHashMap<const void*, WeakRef<ViewInstance> > _UiViewInstanceMap;
 	SLIB_SAFE_STATIC_GETTER(_UiViewInstanceMap, _UI_getViewInstances)
 	
 	void UIPlatform::_registerViewInstance(const void* handle, ViewInstance* instance)
@@ -47,7 +47,7 @@ namespace slib
 		}
 	}
 	
-	typedef HashMap<const void*, WeakRef<WindowInstance> > _UiWindowInstanceMap;
+	typedef CHashMap<const void*, WeakRef<WindowInstance> > _UiWindowInstanceMap;
 	SLIB_SAFE_STATIC_GETTER(_UiWindowInstanceMap, _UI_getWindowInstances)
 	
 	void UIPlatform::_registerWindowInstance(const void* handle, WindowInstance* instance)

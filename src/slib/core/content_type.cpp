@@ -10,7 +10,7 @@
 
 #include "slib/core/content_type.h"
 
-#include "slib/core/map.h"
+#include "slib/core/hash_map.h"
 #include "slib/core/safe_static.h"
 
 #define DEFINE_CONTENT_TYPE(name, text) \
@@ -155,7 +155,7 @@ namespace slib
 	class _ContentType_Mapping
 	{
 	public:
-		HashMap<String, ContentType> maps;
+		CHashMap<String, ContentType> maps;
 
 		_ContentType_Mapping()
 		{

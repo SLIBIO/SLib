@@ -127,7 +127,7 @@ namespace slib
 		return sl_null;
 	}
 
-	typedef HashMap< String, WeakRef<FontAtlas> > _FontAtlasMap;
+	typedef CHashMap< String, WeakRef<FontAtlas> > _FontAtlasMap;
 	SLIB_SAFE_STATIC_GETTER(_FontAtlasMap, _FontAtlas_getShared)
 
 	Ref<FontAtlas> FontAtlas::getShared(const Ref<Font>& font)

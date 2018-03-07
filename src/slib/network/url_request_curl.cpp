@@ -296,9 +296,9 @@ namespace slib
 				if (value.isEmpty() && name.startsWith("HTTP")) {
 					m_responseHeaders.setNull();
 				} else {
-					Map<String, String> headers = m_responseHeaders;
+					HttpHeaderMap headers = m_responseHeaders;
 					if (headers.isNull()) {
-						headers.initHash(0, HashIgnoreCaseString(), EqualsIgnoreCaseString());
+						headers.init();
 						m_responseHeaders = headers;
 					}
 					headers.add(name, value);

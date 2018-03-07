@@ -332,7 +332,7 @@ namespace slib
 	class _RenderCanvas_Shared
 	{
 	public:
-		HashMap< String, Ref<RenderCanvasProgram> > programs;
+		CHashMap< String, Ref<RenderCanvasProgram> > programs;
 		Ref<VertexBuffer> vbRectangle;
 		
 	public:

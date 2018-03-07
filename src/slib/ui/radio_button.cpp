@@ -151,7 +151,7 @@ namespace slib
 			if (view->getRadioGroup() == this) {
 				view->setRadioGroup(Ref<RadioGroup>::null());
 			}
-			m_views.removeValue(view);
+			m_views.remove(view);
 		}
 	}
 

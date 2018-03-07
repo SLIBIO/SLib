@@ -25,7 +25,7 @@ namespace slib
 	public:
 		String title;
 		String body;
-		Map<String, Variant> data;
+		HashMap<String, Variant> data;
 
 	public:
 		PushNotificationMessage();

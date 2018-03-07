@@ -14,7 +14,7 @@
 #include "definition.h"
 
 #include "locale.h"
-#include "map.h"
+#include "hash_map.h"
 #include "string.h"
 #include "memory.h"
 #include "safe_static.h"
@@ -92,7 +92,7 @@ namespace slib
 #define SLIB_DEFINE_RESOURCE_MAP_BEGIN(TYPE) \
 	class _ResourceMap { \
 	public: \
-		slib::HashMap< slib::String, TYPE > map; \
+		slib::CHashMap< slib::String, TYPE > map; \
 	public: \
 		_ResourceMap() { \
 

@@ -302,7 +302,7 @@ namespace slib
 		AtomicString m_name;
 		AtomicString m_uri;
 		AtomicString m_localName;
-		CList<XmlAttribute> m_attributes;
+		List<XmlAttribute> m_attributes;
 		HashMap<String, String> m_mapAttributes;
 		Mutex m_lockAttributes;
 

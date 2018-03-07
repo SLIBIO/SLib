@@ -418,13 +418,21 @@ namespace slib
 	};
 
 	template <>
+	class Compare<IPv4PacketIdentifier>
+	{
+	public:
+		int operator()(const IPv4PacketIdentifier& a, const IPv4PacketIdentifier& b) const;
+		
+	};
+
+	template <>
 	class Hash<IPv4PacketIdentifier>
 	{
 	public:
 		sl_size operator()(const IPv4PacketIdentifier& v) const;
 		
 	};
-
+	
 	class SLIB_EXPORT IPv4Fragment
 	{
 	public:
@@ -476,7 +484,7 @@ namespace slib
 		static List<Memory> makeFragments(const IPv4Packet* header, sl_uint16 identifier, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu = 1500);
 		
 	protected:
-		ExpiringMap<IPv4PacketIdentifier, Ref<IPv4FragmentedPacket> > m_packets;
+		ExpiringMap< IPv4PacketIdentifier, Ref<IPv4FragmentedPacket> > m_packets;
 		sl_int32 m_currentIdentifier;
 		
 	};

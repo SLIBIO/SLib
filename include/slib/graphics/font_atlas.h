@@ -17,7 +17,7 @@
 #include "bitmap.h"
 
 #include "../math/rectangle.h"
-#include "../core/map.h"
+#include "../core/hash_map.h"
 
 namespace slib
 {
@@ -92,7 +92,7 @@ namespace slib
 		sl_uint32 m_maxPlanes;
 		sl_real m_fontSourceHeight;
 
-		HashMap<sl_char16, FontAtlasChar> m_map;
+		CHashMap<sl_char16, FontAtlasChar> m_map;
 		sl_uint32 m_countPlanes;
 		Ref<Bitmap> m_currentPlane;
 		Ref<Canvas> m_currentCanvas;

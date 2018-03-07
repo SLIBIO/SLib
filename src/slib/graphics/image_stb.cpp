@@ -16,7 +16,15 @@
 #endif
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "thirdparty/stb/stbi_ext/stb_image.h"
+
+#ifdef SLIB_PLATFORM_IS_APPLE
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored "-Wcomma"
+#	include "thirdparty/stb/stbi_ext/stb_image.h"
+#	pragma clang diagnostic pop
+#else
+#	include "thirdparty/stb/stbi_ext/stb_image.h"
+#endif
 
 #include "thirdparty/stb/stbi_ext/etc1_utils.c"
 

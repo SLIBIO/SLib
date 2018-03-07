@@ -1001,7 +1001,7 @@ namespace slib
 
 	void HttpService::removeProcessor(const Ptr<IHttpServiceProcessor>& processor)
 	{
-		m_processors.removeValue(processor);
+		m_processors.remove(processor);
 		m_processorsCached = m_processors.duplicate();
 	}
 
@@ -1017,7 +1017,7 @@ namespace slib
 
 	void HttpService::removeConnectionProvider(const Ref<HttpServiceConnectionProvider>& provider)
 	{
-		m_connectionProviders.removeValue(provider);
+		m_connectionProviders.remove(provider);
 	}
 
 	sl_bool HttpService::addHttpService(const SocketAddress& addr)

@@ -10,7 +10,7 @@
 
 #include "slib/media/media_player.h"
 
-#include "slib/core/map.h"
+#include "slib/core/hash_map.h"
 #include "slib/core/safe_static.h"
 
 namespace slib
@@ -63,7 +63,7 @@ namespace slib
 	}
 
 
-	typedef HashMap< MediaPlayer*, Ref<MediaPlayer> > _MediaPlayersMap;
+	typedef CHashMap< MediaPlayer*, Ref<MediaPlayer> > _MediaPlayersMap;
 	SLIB_SAFE_STATIC_GETTER(_MediaPlayersMap, _getMediaPlayersMap)
 
 	SLIB_DEFINE_OBJECT(MediaPlayer, Object)

@@ -16,7 +16,7 @@
 #include "constants.h"
 #include "mac_address.h"
 
-#include "../core/map.h"
+#include "../core/hash_map.h"
 
 /*
 	Ethernet II Frame (Layer 2)
@@ -84,7 +84,7 @@ namespace slib
 		void parseEthernetFrame(const void* frame, sl_uint32 sizeFrame, sl_bool flagUseSource, sl_bool flagUseDestination);
 		
 	protected:
-		HashMap<IPv4Address, MacAddress> m_table;
+		CHashMap<IPv4Address, MacAddress> m_table;
 		
 	};
 	

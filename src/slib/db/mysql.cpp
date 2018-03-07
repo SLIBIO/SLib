@@ -192,7 +192,7 @@ namespace slib
 			CList<String> m_listColumnNames;
 			sl_uint32 m_nColumnNames;
 			String* m_columnNames;
-			HashMap<String, sl_int32> m_mapColumnIndexes;
+			CHashMap<String, sl_int32> m_mapColumnIndexes;
 
 			_DatabaseCursor(MySQL_Database* db, MYSQL_RES* result)
 			{
@@ -238,11 +238,10 @@ namespace slib
 				return m_mapColumnIndexes.getValue_NoLock(name, -1);
 			}
 
-			Map<String, Variant> getRow() override
+			HashMap<String, Variant> getRow() override
 			{
-				Map<String, Variant> ret;
+				HashMap<String, Variant> ret;
 				if (m_row && m_nColumnNames > 0) {
-					ret.initHash();
 					for (sl_uint32 index = 0; index < m_nColumnNames; index++) {
 						ret.put_NoLock(m_columnNames[index], _getValue(index));
 					}
@@ -382,7 +381,7 @@ namespace slib
 			CList<String> m_listColumnNames;
 			sl_uint32 m_nColumnNames;
 			String* m_columnNames;
-			HashMap<String, sl_int32> m_mapColumnIndexes;
+			CHashMap<String, sl_int32> m_mapColumnIndexes;
 
 			_DatabaseStatementCursor(Database* db, DatabaseStatement* statementObj, MYSQL_STMT* statement, MYSQL_RES* resultMetadata, MYSQL_BIND* bind, _FieldDesc* fds)
 			{
@@ -433,11 +432,10 @@ namespace slib
 				return m_mapColumnIndexes.getValue_NoLock(name, -1);
 			}
 
-			Map<String, Variant> getRow() override
+			HashMap<String, Variant> getRow() override
 			{
-				Map<String, Variant> ret;
+				HashMap<String, Variant> ret;
 				if (m_nColumnNames > 0) {
-					ret.initHash();
 					for (sl_uint32 index = 0; index < m_nColumnNames; index++) {
 						ret.put_NoLock(m_columnNames[index], _getValue(index));
 					}

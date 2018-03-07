@@ -28,9 +28,9 @@ namespace slib
 		return m_db;
 	}
 
-	List< Map<String, Variant> > DatabaseStatement::getListForQueryResultBy(const Variant* params, sl_uint32 nParams)
+	List< HashMap<String, Variant> > DatabaseStatement::getListForQueryResultBy(const Variant* params, sl_uint32 nParams)
 	{
-		List< Map<String, Variant> > ret;
+		List< HashMap<String, Variant> > ret;
 		Ref<DatabaseCursor> cursor = queryBy(params, nParams);
 		if (cursor.isNotNull()) {
 			while (cursor->moveNext()) {
@@ -40,9 +40,9 @@ namespace slib
 		return ret;
 	}
 
-	Map<String, Variant> DatabaseStatement::getRecordForQueryResultBy(const Variant* params, sl_uint32 nParams)
+	HashMap<String, Variant> DatabaseStatement::getRecordForQueryResultBy(const Variant* params, sl_uint32 nParams)
 	{
-		Map<String, Variant> ret;
+		HashMap<String, Variant> ret;
 		Ref<DatabaseCursor> cursor = queryBy(params, nParams);
 		if (cursor.isNotNull()) {
 			if (cursor->moveNext()) {

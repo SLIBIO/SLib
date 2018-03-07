@@ -114,7 +114,7 @@ namespace slib
 	class _HttpMethod_Mapping
 	{
 	public:
-		HashMap<String, HttpMethod> maps;
+		CHashMap<String, HttpMethod> maps;
 		
 		_HttpMethod_Mapping()
 		{
@@ -157,7 +157,7 @@ namespace slib
 	DEFINE_HTTP_HEADER(Origin, "Origin")
 	DEFINE_HTTP_HEADER(AccessControlAllowOrigin, "Access-Control-Allow-Origin")
 
-	sl_reg HttpHeaders::parseHeaders(Map<String, String>& map, const void* _data, sl_size size)
+	sl_reg HttpHeaders::parseHeaders(HttpHeaderMap& map, const void* _data, sl_size size)
 	{
 		const sl_char8* data = (const sl_char8*)_data;
 		sl_size posCurrent = 0;
@@ -231,8 +231,6 @@ namespace slib
 		SLIB_STATIC_STRING(s2, "GET");
 		m_methodText = s2;
 		m_methodTextUpper = s2;
-		
-		m_requestHeaders.initHash(0, HashIgnoreCaseString(), EqualsIgnoreCaseString());
 	}
 
 	HttpRequest::~HttpRequest()
@@ -298,7 +296,7 @@ namespace slib
 		m_requestVersion = version;
 	}
 
-	const Map<String, String>& HttpRequest::getRequestHeaders() const
+	const HttpHeaderMap& HttpRequest::getRequestHeaders() const
 	{
 		return m_requestHeaders;
 	}
@@ -325,7 +323,7 @@ namespace slib
 
 	sl_bool HttpRequest::containsRequestHeader(String name) const
 	{
-		return m_requestHeaders.contains_NoLock(name);
+		return m_requestHeaders.find_NoLock(name) != sl_null;
 	}
 
 	void HttpRequest::removeRequestHeader(String name)
@@ -451,7 +449,7 @@ namespace slib
 		setRequestHeader(HttpHeaders::Origin, origin);
 	}
 
-	const Map<String, String>& HttpRequest::getParameters() const
+	const HashMap<String, String>& HttpRequest::getParameters() const
 	{
 		return m_parameters;
 	}
@@ -468,10 +466,10 @@ namespace slib
 
 	sl_bool HttpRequest::containsParameter(const String& name) const
 	{
-		return m_parameters.contains_NoLock(name);
+		return m_parameters.find_NoLock(name) != sl_null;
 	}
 
-	const Map<String, String>& HttpRequest::getQueryParameters() const
+	const HashMap<String, String>& HttpRequest::getQueryParameters() const
 	{
 		return m_queryParameters;
 	}
@@ -488,10 +486,10 @@ namespace slib
 
 	sl_bool HttpRequest::containsQueryParameter(String name) const
 	{
-		return m_queryParameters.contains_NoLock(name);
+		return m_queryParameters.find_NoLock(name) != sl_null;
 	}
 
-	const Map<String, String>& HttpRequest::getPostParameters() const
+	const HashMap<String, String>& HttpRequest::getPostParameters() const
 	{
 		return m_postParameters;
 	}
@@ -508,12 +506,12 @@ namespace slib
 
 	sl_bool HttpRequest::containsPostParameter(String name) const
 	{
-		return m_postParameters.contains_NoLock(name);
+		return m_postParameters.find_NoLock(name) != sl_null;
 	}
 
 	void HttpRequest::applyPostParameters(const void* data, sl_size size)
 	{
-		Map<String, String> params = parseParameters(data, size);
+		HashMap<String, String> params = parseParameters(data, size);
 		m_postParameters.putAll_NoLock(params);
 		m_parameters.putAll_NoLock(params);
 	}
@@ -525,19 +523,19 @@ namespace slib
 
 	void HttpRequest::applyQueryToParameters()
 	{
-		Map<String, String> params = parseParameters(m_query);
+		HashMap<String, String> params = parseParameters(m_query);
 		m_queryParameters.putAll_NoLock(params);
 		m_parameters.putAll_NoLock(params);
 	}
 
-	Map<String, String> HttpRequest::parseParameters(const String& str)
+	HashMap<String, String> HttpRequest::parseParameters(const String& str)
 	{
 		return parseParameters(str.getData(), str.getLength());
 	}
 
-	Map<String, String> HttpRequest::parseParameters(const void* data, sl_size len)
+	HashMap<String, String> HttpRequest::parseParameters(const void* data, sl_size len)
 	{
-		Map<String, String> ret;
+		HashMap<String, String> ret;
 		sl_char8* buf = (sl_char8*)data;
 		sl_size start = 0;
 		sl_size indexSplit = 0;
@@ -692,8 +690,6 @@ namespace slib
 		m_responseCode = HttpStatus::OK;
 		SLIB_STATIC_STRING(s2, "OK");
 		m_responseMessage = s2;
-
-		m_responseHeaders.initHash(0, HashIgnoreCaseString(), EqualsIgnoreCaseString());
 	}
 
 	HttpResponse::~HttpResponse()
@@ -731,7 +727,7 @@ namespace slib
 		m_responseVersion = version;
 	}
 
-	const Map<String, String>& HttpResponse::getResponseHeaders() const
+	const HttpHeaderMap& HttpResponse::getResponseHeaders() const
 	{
 		return m_responseHeaders;
 	}
@@ -758,7 +754,7 @@ namespace slib
 
 	sl_bool HttpResponse::containsResponseHeader(String name) const
 	{
-		return m_responseHeaders.contains_NoLock(name);
+		return m_responseHeaders.find_NoLock(name) != sl_null;
 	}
 
 	void HttpResponse::removeResponseHeader(String name)

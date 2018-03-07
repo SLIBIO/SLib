@@ -65,7 +65,7 @@ namespace slib
 		Function<void()> onNo;
 	};
 
-	typedef HashMap<jlong, Ref<_UiAlertResult> > _UiAlertMap;
+	typedef CHashMap<jlong, Ref<_UiAlertResult> > _UiAlertMap;
 	SLIB_SAFE_STATIC_GETTER(_UiAlertMap, _AndroidUi_alerts)
 
 	sl_bool AlertDialog::_show()

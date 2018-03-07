@@ -14,8 +14,6 @@
 #include "definition.h"
 
 #include "../core/object.h"
-#include "../core/list.h"
-#include "../core/map.h"
 #include "../core/variant.h"
 
 namespace slib
@@ -43,7 +41,7 @@ namespace slib
 		virtual sl_int32 getColumnIndex(const String& name) = 0;
 	
 
-		virtual Map<String, Variant> getRow() = 0;
+		virtual HashMap<String, Variant> getRow() = 0;
 	
 
 		virtual Variant getValue(sl_uint32 index);
@@ -147,29 +145,29 @@ namespace slib
 			return queryBy(params, sizeof...(args));
 		}
 	
-		virtual List< Map<String, Variant> > getListForQueryResultBy(const Variant* params = sl_null, sl_uint32 nParams = 0);
+		virtual List< HashMap<String, Variant> > getListForQueryResultBy(const Variant* params = sl_null, sl_uint32 nParams = 0);
 
-		SLIB_INLINE List< Map<String, Variant> > getListForQueryResult()
+		SLIB_INLINE List< HashMap<String, Variant> > getListForQueryResult()
 		{
 			return getListForQueryResultBy();
 		}
 
 		template <class... ARGS>
-		SLIB_INLINE List< Map<String, Variant> > getListForQueryResult(ARGS&&... args)
+		SLIB_INLINE List< HashMap<String, Variant> > getListForQueryResult(ARGS&&... args)
 		{
 			Variant params[] = {Forward<ARGS>(args)...};
 			return getListForQueryResultBy(params, sizeof...(args));
 		}
 
-		virtual Map<String, Variant> getRecordForQueryResultBy(const Variant* params = sl_null, sl_uint32 nParams = 0);
+		virtual HashMap<String, Variant> getRecordForQueryResultBy(const Variant* params = sl_null, sl_uint32 nParams = 0);
 
-		SLIB_INLINE Map<String, Variant> getRecordForQueryResult()
+		SLIB_INLINE HashMap<String, Variant> getRecordForQueryResult()
 		{
 			return getRecordForQueryResultBy();
 		}
 
 		template <class... ARGS>
-		SLIB_INLINE Map<String, Variant> getRecordForQueryResult(ARGS&&... args)
+		SLIB_INLINE HashMap<String, Variant> getRecordForQueryResult(ARGS&&... args)
 		{
 			Variant params[] = {Forward<ARGS>(args)...};
 			return getRecordForQueryResultBy(params, sizeof...(args));
@@ -211,9 +209,9 @@ namespace slib
 		virtual Ref<DatabaseCursor> query(const String& sql);
 	
 
-		virtual List< Map<String, Variant> > getListForQueryResult(const String& sql);
+		virtual List< HashMap<String, Variant> > getListForQueryResult(const String& sql);
 
-		virtual Map<String, Variant> getRecordForQueryResult(const String& sql);
+		virtual HashMap<String, Variant> getRecordForQueryResult(const String& sql);
 
 		virtual Variant getValueForQueryResult(const String& sql);
 
@@ -236,19 +234,19 @@ namespace slib
 			return queryBy(sql, params, sizeof...(args));
 		}
 	
-		virtual List< Map<String, Variant> > getListForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
+		virtual List< HashMap<String, Variant> > getListForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
 
 		template <class... ARGS>
-		SLIB_INLINE List< Map<String, Variant> > getListForQueryResult(const String& sql, ARGS&&... args)
+		SLIB_INLINE List< HashMap<String, Variant> > getListForQueryResult(const String& sql, ARGS&&... args)
 		{
 			Variant params[] = {Forward<ARGS>(args)...};
 			return getListForQueryResultBy(sql, params, sizeof...(args));
 		}
 	
-		virtual Map<String, Variant> getRecordForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
+		virtual HashMap<String, Variant> getRecordForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
 
 		template <class... ARGS>
-		SLIB_INLINE Map<String, Variant> getRecordForQueryResult(const String& sql, ARGS&&... args)
+		SLIB_INLINE HashMap<String, Variant> getRecordForQueryResult(const String& sql, ARGS&&... args)
 		{
 			Variant params[] = {Forward<ARGS>(args)...};
 			return getRecordForQueryResultBy(sql, params, sizeof...(args));

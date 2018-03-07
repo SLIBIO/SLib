@@ -41,7 +41,7 @@ namespace slib
 		return sl_null;
 	}
 
-	List< Map<String, Variant> > Database::getListForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	List< HashMap<String, Variant> > Database::getListForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams)
 	{
 		Ref<DatabaseStatement> statement = prepareStatement(sql);
 		if (statement.isNotNull()) {
@@ -50,7 +50,7 @@ namespace slib
 		return sl_null;
 	}
 
-	Map<String, Variant> Database::getRecordForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	HashMap<String, Variant> Database::getRecordForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams)
 	{
 		Ref<DatabaseStatement> statement = prepareStatement(sql);
 		if (statement.isNotNull()) {
@@ -78,9 +78,9 @@ namespace slib
 		return queryBy(sql, sl_null, 0);
 	}
 
-	List< Map<String, Variant> > Database::getListForQueryResult(const String& sql)
+	List< HashMap<String, Variant> > Database::getListForQueryResult(const String& sql)
 	{
-		List< Map<String, Variant> > ret;
+		List< HashMap<String, Variant> > ret;
 		Ref<DatabaseCursor> cursor = query(sql);
 		if (cursor.isNotNull()) {
 			while (cursor->moveNext()) {
@@ -90,7 +90,7 @@ namespace slib
 		return ret;
 	}
 
-	Map<String, Variant> Database::getRecordForQueryResult(const String& sql)
+	HashMap<String, Variant> Database::getRecordForQueryResult(const String& sql)
 	{
 		Ref<DatabaseCursor> cursor = query(sql);
 		if (cursor.isNotNull()) {

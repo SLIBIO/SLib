@@ -650,7 +650,7 @@ namespace slib
 			return;
 		}
 		_removeChild(view);
-		m_children.removeValue(view);
+		m_children.remove(view);
 		m_childrenCache.setNull();
 		if (view == m_childMouseDown) {
 			m_childMouseDown.setNull();
@@ -8221,7 +8221,7 @@ namespace slib
 			{
 				ListElements< Ref<View> > list(selectedChildren);
 				for (sl_size i = 0; i < list.count; i++) {
-					old.removeValue_NoLock(list[i]);
+					old.remove_NoLock(list[i]);
 				}
 			}
 			

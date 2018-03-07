@@ -17,6 +17,7 @@
 #include "async.h"
 
 #include "../core/string.h"
+#include "../core/hash_map.h"
 #include "../crypto/aes.h"
 
 /********************************************************************
@@ -633,7 +634,7 @@ namespace slib
 			String requestedHostName;
 			sl_bool flagEncrypted;
 		};
-		HashMap<sl_uint16, ForwardElement> m_mapForward;
+		CHashMap<sl_uint16, ForwardElement> m_mapForward;
 		
 		Ptr<IDnsServerListener> m_listener;
 		

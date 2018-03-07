@@ -49,7 +49,7 @@ namespace slib
 
 	void _Notification_onMessageReceived(JNIEnv* env, jobject _this, jstring title, jstring body, jobjectArray data)
 	{
-		Map<String, Variant> _data;
+		HashMap<String, Variant> _data;
 		if (data) {
 			sl_uint32 n = Jni::getArrayLength(data);
 			if (n > 0) {

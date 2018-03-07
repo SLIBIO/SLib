@@ -15,7 +15,7 @@
 #include "slib/media/media_player.h"
 #include "slib/render/opengl.h"
 
-#include "slib/core/map.h"
+#include "slib/core/hash_map.h"
 #include "slib/core/platform_android.h"
 #include "slib/core/safe_static.h"
 
@@ -27,7 +27,7 @@ namespace slib
 
 	class _Android_MediaPlayer;
 
-	typedef HashMap<jlong, WeakRef<_Android_MediaPlayer> > _AndroidMediaPlayerMap;
+	typedef CHashMap<jlong, WeakRef<_Android_MediaPlayer> > _AndroidMediaPlayerMap;
 	SLIB_SAFE_STATIC_GETTER(_AndroidMediaPlayerMap, _AndroidMediaPlayerMap_get)
 
 	void _MediaPlayer_onCompleted(JNIEnv* env, jobject _this, jlong instance);

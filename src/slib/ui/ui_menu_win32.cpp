@@ -24,7 +24,7 @@ namespace slib
 {
 
 	class _Win32_Menu;
-	typedef HashMap<HMENU, WeakRef<_Win32_Menu> > _UiMenuMap;
+	typedef CHashMap<HMENU, WeakRef<_Win32_Menu> > _UiMenuMap;
 	SLIB_SAFE_STATIC_GETTER(_UiMenuMap, _UI_getMenu)
 
 	class _Win32_MenuItem : public MenuItem

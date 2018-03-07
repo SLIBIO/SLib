@@ -154,7 +154,7 @@ namespace slib
 
 	void LoggerSet::removeDefaultLogger(const Ref<Logger>& logger)
 	{
-		m_listLoggers.removeValue(logger);
+		m_listLoggers.remove(logger);
 	}
 
 
@@ -170,7 +170,7 @@ namespace slib
 
 	void LoggerSet::removeErrorLogger(const Ref<Logger>& logger)
 	{
-		m_listErrorLoggers.removeValue(logger);
+		m_listErrorLoggers.remove(logger);
 	}
 
 

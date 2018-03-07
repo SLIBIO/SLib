@@ -13,7 +13,7 @@
 
 #include "definition.h"
 
-#include "map.h"
+#include "hash_map.h"
 #include "variant.h"
 
 namespace slib
@@ -38,7 +38,7 @@ namespace slib
 		Variant getValue(const String& name);
 
 	private:
-		HashMap<String, String> m_mapValues;
+		CHashMap<String, String> m_mapValues;
 
 	};
 	

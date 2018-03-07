@@ -10,7 +10,7 @@
 
 #include "slib/core/app.h"
 
-#include "slib/core/map.h"
+#include "slib/core/hash_map.h"
 #include "slib/core/system.h"
 #include "slib/core/file.h"
 #include "slib/core/safe_static.h"
@@ -171,12 +171,12 @@ namespace slib
 		m_flagCrashRecoverySupport = flagSupport;
 	}
 
-	typedef Map<String, String> _Application_EnvList;
-	SLIB_SAFE_STATIC_GETTER(_Application_EnvList, _Application_getEnvList, _Application_EnvList::createHash())
+	typedef HashMap<String, String> _Application_EnvList;
+	SLIB_SAFE_STATIC_GETTER(_Application_EnvList, _Application_getEnvList, _Application_EnvList::create())
 
 	void Application::setEnvironmentPath(const String& key, const String& path)
 	{
-		Map<String, String>* envMap = _Application_getEnvList();
+		HashMap<String, String>* envMap = _Application_getEnvList();
 		if (envMap) {
 			envMap->put(key, path);
 		}
@@ -184,7 +184,7 @@ namespace slib
 
 	String Application::getEnvironmentPath(const String& key)
 	{
-		Map<String, String>* envMap = _Application_getEnvList();
+		HashMap<String, String>* envMap = _Application_getEnvList();
 		if (envMap) {
 			return envMap->getValue(key, String::null());
 		}

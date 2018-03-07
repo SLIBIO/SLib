@@ -19,7 +19,7 @@
 #include "socket_address.h"
 
 #include "../core/object.h"
-#include "../core/map.h"
+#include "../core/hash_map.h"
 
 /*
 	If you are usiing kernel-mode NAT on linux (for example on port range 40000~60000), following configuration will avoid to conflict with kernel-networking.
@@ -60,7 +60,7 @@ namespace slib
 		sl_bool mapToInternalAddress(sl_uint16 port, SocketAddress& address);
 		
 	protected:
-		HashMap< SocketAddress, sl_uint16 > m_mapPorts;
+		CHashMap< SocketAddress, sl_uint16 > m_mapPorts;
 		
 		_NatTablePort* m_ports;
 		sl_uint16 m_nPorts;
@@ -125,8 +125,8 @@ namespace slib
 			sl_uint16 sequenceNumberTarget;
 		};
 		
-		HashMap<IcmpEchoAddress, IcmpEchoElement> m_mapIcmpEchoOutgoing;
-		HashMap<sl_uint32, IcmpEchoElement> m_mapIcmpEchoIncoming;
+		CHashMap<IcmpEchoAddress, IcmpEchoElement> m_mapIcmpEchoOutgoing;
+		CHashMap<sl_uint32, IcmpEchoElement> m_mapIcmpEchoIncoming;
 		
 	};
 

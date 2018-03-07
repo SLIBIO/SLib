@@ -14,7 +14,7 @@
 
 #include "slib/device/sensor.h"
 
-#include "slib/core/map.h"
+#include "slib/core/hash_map.h"
 #include "slib/core/platform_android.h"
 #include "slib/core/safe_static.h"
 
@@ -22,7 +22,7 @@ namespace slib
 {
 
 	class _Android_Sensor;
-	typedef HashMap<jlong, WeakRef<_Android_Sensor> > _AndroidSensorMap;
+	typedef CHashMap<jlong, WeakRef<_Android_Sensor> > _AndroidSensorMap;
 	SLIB_SAFE_STATIC_GETTER(_AndroidSensorMap, _AndroidSensors_get)
 
 	SLIB_JNI_BEGIN_CLASS(_JAndroidSensor, "slib/platform/android/device/Sensor")

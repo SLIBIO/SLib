@@ -295,7 +295,7 @@ namespace slib
 		AtomicRef<ThreadPool> m_threadPool;
 		sl_bool m_flagRunning;
 		
-		HashMap< HttpServiceConnection*, Ref<HttpServiceConnection> > m_connections;
+		CHashMap< HttpServiceConnection*, Ref<HttpServiceConnection> > m_connections;
 		
 		CList< Ptr<IHttpServiceProcessor> > m_processors;
 		AtomicList< Ptr<IHttpServiceProcessor> > m_processorsCached;

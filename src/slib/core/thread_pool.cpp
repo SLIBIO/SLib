@@ -117,7 +117,7 @@ namespace slib
 				ObjectLocker lock(this);
 				sl_size nThreads = m_threadWorkers.getCount();
 				if (nThreads > getMinimumThreadsCount()) {
-					m_threadWorkers.removeValue_NoLock(Thread::getCurrent());
+					m_threadWorkers.remove_NoLock(Thread::getCurrent());
 					return;
 				} else {
 					lock.unlock();

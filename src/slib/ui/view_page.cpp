@@ -913,7 +913,7 @@ namespace slib
 			m_popupState = PopupState::ClosingPopup;
 			Ref<MobileApp> mobile = MobileApp::getApp();
 			if (mobile.isNotNull()) {
-				mobile->m_popupPages.removeValue(this);
+				mobile->m_popupPages.remove(this);
 			}
 			if (isDrawingThread()) {
 				_closePopup(transition);

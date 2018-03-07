@@ -1012,8 +1012,8 @@ namespace slib
 			IPv4Address resolvedAddress;
 			resolvedAddress.setZero();
 
-			HashMap<String, IPv4Address> aliasAddresses4;
-			HashMap<String, IPv6Address> aliasAddresses6;
+			CHashMap<String, IPv4Address> aliasAddresses4;
+			CHashMap<String, IPv6Address> aliasAddresses6;
 			// address
 			{
 				ListElements<DnsPacket::Address> addresses(packet.addresses);

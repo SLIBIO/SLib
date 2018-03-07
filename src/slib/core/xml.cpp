@@ -794,7 +794,7 @@ namespace slib
 	sl_bool XmlElement::containsAttribute(const String& name) const
 	{
 		MutexLocker lock(&m_lockAttributes);
-		return m_mapAttributes.contains_NoLock(name);
+		return m_mapAttributes.find_NoLock(name) != sl_null;
 	}
 
 	sl_bool XmlElement::setAttribute(sl_size index, const String& value)
@@ -829,7 +829,7 @@ namespace slib
 			return sl_false;
 		}
 		MutexLocker lock(&m_lockAttributes);
-		if (m_mapAttributes.contains_NoLock(name)) {
+		if (m_mapAttributes.find_NoLock(name)) {
 			m_mapAttributes.put_NoLock(name, value);
 			ListElements<XmlAttribute> attrs(m_attributes);
 			for (sl_size i = 0; i < attrs.count; i++) {
@@ -854,7 +854,7 @@ namespace slib
 			return sl_false;
 		}
 		MutexLocker lock(&m_lockAttributes);
-		if (m_mapAttributes.contains_NoLock(attr.name)) {
+		if (m_mapAttributes.find_NoLock(attr.name)) {
 			m_mapAttributes.put_NoLock(attr.name, attr.value);
 			ListElements<XmlAttribute> attrs(m_attributes);
 			for (sl_size i = 0; i < attrs.count; i++) {
@@ -897,7 +897,7 @@ namespace slib
 	sl_bool XmlElement::removeAttribute(const String& name)
 	{
 		MutexLocker lock(&m_lockAttributes);
-		if (m_mapAttributes.contains_NoLock(name)) {
+		if (m_mapAttributes.find_NoLock(name)) {
 			m_mapAttributes.remove_NoLock(name);
 			ListElements<XmlAttribute> attrs(m_attributes);
 			for (sl_size i = 0; i < attrs.count; i++) {
@@ -1394,15 +1394,15 @@ namespace slib
 		
 		void parsePI(XmlNodeGroup* parent);
 		
-		void processPrefix(const String& name, const String& defNamespace, const Map<String, String>& namespaces, String& prefix, String& uri, String& localName);
+		void processPrefix(const String& name, const String& defNamespace, const HashMap<String, String>& namespaces, String& prefix, String& uri, String& localName);
 		
 		void parseAttribute(String& name, String& value);
 		
-		void parseElement(XmlNodeGroup* parent, const String& defNamespace, const Map<String, String>& namespaces);
+		void parseElement(XmlNodeGroup* parent, const String& defNamespace, const HashMap<String, String>& namespaces);
 		
 		void parseText(XmlNodeGroup* parent);
 		
-		void parseNodes(XmlNodeGroup* parent, const String& defNamespace, const Map<String, String>& namespaces);
+		void parseNodes(XmlNodeGroup* parent, const String& defNamespace, const HashMap<String, String>& namespaces);
 		
 		void parseXml();
 		
@@ -1838,7 +1838,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	SLIB_INLINE void _priv_Xml_Parser<ST, CT, BT>::processPrefix(const String& name, const String& defNamespace, const Map<String, String>& namespaces, String& prefix, String& uri, String& localName)
+	SLIB_INLINE void _priv_Xml_Parser<ST, CT, BT>::processPrefix(const String& name, const String& defNamespace, const HashMap<String, String>& namespaces, String& prefix, String& uri, String& localName)
 	{
 		sl_reg index = name.indexOf(':');
 		if (index >= 0) {
@@ -1930,10 +1930,10 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _defNamespace, const Map<String, String>& _namespaces)
+	void _priv_Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _defNamespace, const HashMap<String, String>& _namespaces)
 	{
 		String defNamespace = _defNamespace;
-		Map<String, String> namespaces = _namespaces;
+		HashMap<String, String> namespaces = _namespaces;
 		
 		calcLineNumber();
 		sl_size startLine = lineNumber;
@@ -2196,7 +2196,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parseNodes(XmlNodeGroup* parent, const String& defNamespace, const Map<String, String>& namespaces)
+	void _priv_Xml_Parser<ST, CT, BT>::parseNodes(XmlNodeGroup* parent, const String& defNamespace, const HashMap<String, String>& namespaces)
 	{
 		while (pos < len) {
 			if (buf[pos] == '<') { // Element, Comment, PI, CDATA
@@ -2247,7 +2247,7 @@ namespace slib
 	void _priv_Xml_Parser<ST, CT, BT>::parseXml()
 	{
 		CALL_LISTENER(onStartDocument, document.get(), document.get())
-		parseNodes(document.get(), String::null(), Map<String, String>::null());
+		parseNodes(document.get(), String::null(), HashMap<String, String>::null());
 		if (flagError) {
 			return;
 		}

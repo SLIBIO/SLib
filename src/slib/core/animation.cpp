@@ -159,7 +159,7 @@ namespace slib
 	void Animation::removeTarget(const Ref<AnimationTarget>& target)
 	{
 		if (target.isNotNull()) {
-			m_targets.removeValue(target);
+			m_targets.remove(target);
 			if (m_targets.getCount() == 0) {
 				stop();
 			}
@@ -181,7 +181,7 @@ namespace slib
 	void Animation::unlinkAnimation(const Ref<Animation>& animation)
 	{
 		if (animation.isNotNull()) {
-			m_linkedAnimations.removeValue(animation);
+			m_linkedAnimations.remove(animation);
 		}
 	}
 

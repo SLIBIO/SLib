@@ -267,7 +267,7 @@ namespace slib
 			File::deleteFile(m_file->getPath());
 			_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
 			if (list) {
-				list->removeValue(m_name);
+				list->remove(m_name);
 			}
 		}
 		

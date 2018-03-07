@@ -194,7 +194,7 @@ namespace slib
 			return;
 		}
 		_removeChild(item.get());
-		m_children.removeValue(item);
+		m_children.remove(item);
 		if (isVisible()) {
 			_relayoutTree(mode);
 		}

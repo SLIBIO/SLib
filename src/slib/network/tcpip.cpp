@@ -489,6 +489,13 @@ namespace slib
 		return Rehash64ToSize(t);
 	}
 	
+	int Compare<IPv4PacketIdentifier>::operator()(const IPv4PacketIdentifier& a, const IPv4PacketIdentifier& b) const
+	{
+		sl_size _a = a.hashCode();
+		sl_size _b = b.hashCode();
+		return (_a < _b) ? -1 : (_a > _b);
+	}
+
 	sl_size Hash<IPv4PacketIdentifier>::operator()(const IPv4PacketIdentifier& v) const
 	{
 		return v.hashCode();

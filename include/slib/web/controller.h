@@ -44,7 +44,7 @@ namespace slib
 		static String _getHandlerSignature(HttpMethod method, const String& path);
 		
 	protected:
-		TreeMap<String, WebHandler> m_handlers;
+		CMap<String, WebHandler> m_handlers;
 		
 		friend class WebModule;
 		

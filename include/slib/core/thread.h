@@ -18,7 +18,7 @@
 #include "object.h"
 #include "function.h"
 #include "string.h"
-#include "map.h"
+#include "hash_map.h"
 
 #define SLIB_THREAD_DEFAULT_STACK_SIZE 1048576 // 1MB
 

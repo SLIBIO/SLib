@@ -12,7 +12,7 @@
 
 #include "slib/network/socket.h"
 #include "slib/core/endian.h"
-#include "slib/core/map.h"
+#include "slib/core/hash_map.h"
 #include "slib/core/search.h"
 
 namespace slib
@@ -289,7 +289,7 @@ namespace slib
 {
 	List<NetworkInterfaceInfo> Network::findAllInterfaces()
 	{
-		Map<String, NetworkInterfaceInfo> ret;
+		HashMap<String, NetworkInterfaceInfo> ret;
 
 		struct ifaddrs * adapters = 0;
 		getifaddrs(&adapters);

@@ -29,7 +29,7 @@ namespace slib
 		SLIB_JNI_NATIVE(nativeOnStop, "nativeOnStop", "(J)V", _AndroidAnimation_onStop);
 	SLIB_JNI_END_CLASS
 
-	typedef HashMap< sl_reg, Function<void()> > _AndroidAnimationStopMap;
+	typedef CHashMap< sl_reg, Function<void()> > _AndroidAnimationStopMap;
 	SLIB_SAFE_STATIC_GETTER(_AndroidAnimationStopMap, _AndroidAnimationStopMap_get);
 
 	sl_bool UIAnimationLoop::_applyNativeAnimation(Animation* animation)

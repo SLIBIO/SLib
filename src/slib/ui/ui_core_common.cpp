@@ -40,7 +40,7 @@ namespace slib
 		}
 	}
 	
-	typedef HashMap< sl_reg, Function<void()> > _Ui_DispatchDelayedMap;
+	typedef CHashMap< sl_reg, Function<void()> > _Ui_DispatchDelayedMap;
 	
 	SLIB_SAFE_STATIC_GETTER(_Ui_DispatchDelayedMap, _Ui_getDispatchDelayedMap);
 	sl_reg _g_ui_dispatch_delayed_last_ptr = 0;

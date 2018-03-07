@@ -16,6 +16,7 @@
 #include "dispatch.h"
 #include "thread.h"
 #include "time.h"
+#include "map.h"
 
 namespace slib
 {
@@ -65,7 +66,7 @@ namespace slib
 			sl_uint64 time;
 			Function<void()> task;
 		};
-		RedBlackTree<sl_uint64, TimeTask> m_timeTasks;
+		CMap<sl_uint64, TimeTask> m_timeTasks;
 		Mutex m_lockTimeTasks;
 
 		class TimerTask

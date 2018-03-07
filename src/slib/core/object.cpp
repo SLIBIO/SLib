@@ -11,7 +11,7 @@
 #include "slib/core/object.h"
 
 #include "slib/core/string.h"
-#include "slib/core/map.h"
+#include "slib/core/hash_map.h"
 #include "slib/core/variant.h"
 
 namespace slib
@@ -51,7 +51,7 @@ namespace slib
 	{
 		MutexLocker lock(&m_locker);
 		if (m_properties.isNotNull()) {
-			HashMap<String, Variant>* map = static_cast<HashMap<String, Variant>*>(m_properties.get());
+			CHashMap<String, Variant>* map = static_cast<CHashMap<String, Variant>*>(m_properties.get());
 			return map->getValue_NoLock(name);
 		}
 		return Variant::null();
@@ -60,11 +60,11 @@ namespace slib
 	void Object::setProperty(const String& name, const Variant& value) noexcept
 	{
 		MutexLocker lock(&m_locker);
-		HashMap<String, Variant>* map;
+		CHashMap<String, Variant>* map;
 		if (m_properties.isNotNull()) {
-			map = static_cast<HashMap<String, Variant>*>(m_properties.get());
+			map = static_cast<CHashMap<String, Variant>*>(m_properties.get());
 		} else {
-			map = new HashMap<String, Variant>;
+			map = new CHashMap<String, Variant>;
 			if (map) {
 				m_properties = map;
 			} else {
@@ -78,7 +78,7 @@ namespace slib
 	{
 		MutexLocker lock(&m_locker);
 		if (m_properties.isNotNull()) {
-			HashMap<String, Variant>* map = static_cast<HashMap<String, Variant>*>(m_properties.get());
+			CHashMap<String, Variant>* map = static_cast<CHashMap<String, Variant>*>(m_properties.get());
 			map->remove_NoLock(name);
 		}
 	}
