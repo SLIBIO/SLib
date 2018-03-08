@@ -84,6 +84,7 @@ namespace slib
 	
 	BOOL m_flagRunning;
 	BOOL m_flagViewVisible;
+	int m_frameNumber;
 }
 @end
 
@@ -96,6 +97,11 @@ namespace slib
 	}
 	SLib_iOS_GLView* view = m_view;
 	if (view != nil) {
+		if (m_frameNumber % 10 == 0) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self queryViewState];
+			});
+		}
 		if (m_flagViewVisible && !(slib::MobileApp::isPaused())) {
 			if (view->m_flagRenderingContinuously || view->m_flagRequestRender) {
 				view->m_flagRequestRender = sl_false;
@@ -103,6 +109,7 @@ namespace slib
 			}
 		}
 	}
+	m_frameNumber++;
 }
 
 - (void)queryViewState
@@ -138,25 +145,16 @@ namespace slib
 {
 	m_flagRunning = YES;
 	m_flagViewVisible = NO;
+	m_frameNumber = 0;
 #if defined(SLIB_PLATFORM_IS_IOS_SIMULATOR)
 	slib::TimeCounter timer;
-	int frameNumber = 0;
 	while (m_flagRunning) {
-		if (frameNumber % 10 == 0) {
-			SLib_iOS_GLView* view = m_view;
-			if (view != nil) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[self queryViewState];
-				});
-			}
-		}
 		[self onGLRenderFrame];
 		sl_uint64 t = timer.getElapsedMilliseconds();
 		if (t < 15) {
 			[NSThread sleepForTimeInterval:(15 - (sl_uint32)(t)) / 1000.0];
 		}
 		timer.reset();
-		frameNumber++;
 	}
 #else
 	NSRunLoop* loop = [NSRunLoop currentRunLoop];

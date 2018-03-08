@@ -18,7 +18,7 @@ namespace slib
 {
 
 	SLIB_DEFINE_OBJECT(MobileApp, UIApp)
-	
+
 	MobileApp::MobileApp()
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
@@ -31,6 +31,7 @@ namespace slib
 		m_pager = new ViewPager;
 		m_pager->setSizeFilling(1, 1, UIUpdateMode::Init);
 		m_pager->setOpaque(sl_true, UIUpdateMode::Init);
+		m_pager->setBackgroundColor(Color::White);
 		m_pager->setMinimumPagesCount(1);
 		m_contentView->addChild(m_pager, UIUpdateMode::Init);
 		
