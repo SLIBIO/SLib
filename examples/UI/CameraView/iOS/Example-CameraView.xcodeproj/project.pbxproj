@@ -21,7 +21,7 @@
 /* Begin PBXFileReference section */
 		264A3BE3205250AA0070817E /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = ../../src/app.h; sourceTree = "<group>"; };
 		264A3BE4205250AA0070817E /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = ../../src/app.cpp; sourceTree = "<group>"; };
-		26F5DE1F2051ACD500BC4998 /* ExampleCameraView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleCameraView.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		26F5DE1F2051ACD500BC4998 /* Example-CameraView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Example-CameraView.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		26F5DE252051ACD500BC4998 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		26F5DE262051ACD500BC4998 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		26F5DE292051ACD500BC4998 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -64,7 +64,7 @@
 		26F5DE202051ACD500BC4998 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				26F5DE1F2051ACD500BC4998 /* ExampleCameraView.app */,
+				26F5DE1F2051ACD500BC4998 /* Example-CameraView.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -108,9 +108,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		26F5DE1E2051ACD500BC4998 /* ExampleCameraView */ = {
+		26F5DE1E2051ACD500BC4998 /* Example-CameraView */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 26F5DE352051ACD500BC4998 /* Build configuration list for PBXNativeTarget "ExampleCameraView" */;
+			buildConfigurationList = 26F5DE352051ACD500BC4998 /* Build configuration list for PBXNativeTarget "Example-CameraView" */;
 			buildPhases = (
 				26F5DE1B2051ACD500BC4998 /* Sources */,
 				26F5DE1C2051ACD500BC4998 /* Frameworks */,
@@ -120,9 +120,9 @@
 			);
 			dependencies = (
 			);
-			name = ExampleCameraView;
+			name = "Example-CameraView";
 			productName = ExampleCameraView;
-			productReference = 26F5DE1F2051ACD500BC4998 /* ExampleCameraView.app */;
+			productReference = 26F5DE1F2051ACD500BC4998 /* Example-CameraView.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -140,7 +140,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 26F5DE1A2051ACD500BC4998 /* Build configuration list for PBXProject "ExampleCameraView" */;
+			buildConfigurationList = 26F5DE1A2051ACD500BC4998 /* Build configuration list for PBXProject "Example-CameraView" */;
 			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -153,7 +153,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				26F5DE1E2051ACD500BC4998 /* ExampleCameraView */,
+				26F5DE1E2051ACD500BC4998 /* Example-CameraView */,
 			);
 		};
 /* End PBXProject section */
@@ -351,7 +351,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		26F5DE1A2051ACD500BC4998 /* Build configuration list for PBXProject "ExampleCameraView" */ = {
+		26F5DE1A2051ACD500BC4998 /* Build configuration list for PBXProject "Example-CameraView" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				26F5DE332051ACD500BC4998 /* Debug */,
@@ -360,7 +360,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		26F5DE352051ACD500BC4998 /* Build configuration list for PBXNativeTarget "ExampleCameraView" */ = {
+		26F5DE352051ACD500BC4998 /* Build configuration list for PBXNativeTarget "Example-CameraView" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				26F5DE362051ACD500BC4998 /* Debug */,
