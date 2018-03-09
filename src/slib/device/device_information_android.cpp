@@ -20,12 +20,12 @@
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidPoint, "android/graphics/Point")
+	SLIB_JNI_BEGIN_CLASS(JAndroidPoint, "android/graphics/Point")
 		SLIB_JNI_INT_FIELD(x);
 		SLIB_JNI_INT_FIELD(y);
 	SLIB_JNI_END_CLASS
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidDeviceInformation, "slib/platform/android/device/DeviceInformation")
+	SLIB_JNI_BEGIN_CLASS(JAndroidDeviceInformation, "slib/platform/android/device/DeviceInformation")
 		SLIB_JNI_STATIC_METHOD(getDeviceId, "getDeviceId", "(Landroid/app/Activity;)Ljava/lang/String;");
 		SLIB_JNI_STATIC_METHOD(getDeviceOSVersion, "getDeviceOSVersion", "()Ljava/lang/String;");
 		SLIB_JNI_STATIC_METHOD(getDeviceName, "getDeviceName", "()Ljava/lang/String;");
@@ -37,7 +37,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return _JAndroidDeviceInformation::getDeviceId.callString(sl_null, jactivity);
+			return JAndroidDeviceInformation::getDeviceId.callString(sl_null, jactivity);
 		}
 		return sl_null;
 	}
@@ -46,7 +46,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return _JAndroidDeviceInformation::getDeviceName.callString(sl_null);
+			return JAndroidDeviceInformation::getDeviceName.callString(sl_null);
 		}
 		return sl_null;
 	}
@@ -55,7 +55,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return _JAndroidDeviceInformation::getDeviceOSVersion.callString(sl_null);
+			return JAndroidDeviceInformation::getDeviceOSVersion.callString(sl_null);
 		}
 		return sl_null;
 	}
@@ -71,10 +71,10 @@ namespace slib
 		Size ret;
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			JniLocal<jobject> jpt = _JAndroidDeviceInformation::getScreenSize.callObject(sl_null, jactivity);
+			JniLocal<jobject> jpt = JAndroidDeviceInformation::getScreenSize.callObject(sl_null, jactivity);
 			if (jpt.isNotNull()) {
-				ret.x = _JAndroidPoint::x.get(jpt);
-				ret.y = _JAndroidPoint::y.get(jpt);
+				ret.x = JAndroidPoint::x.get(jpt);
+				ret.y = JAndroidPoint::y.get(jpt);
 			}
 		}
 		return ret;
@@ -84,7 +84,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return (sl_uint32)(_JAndroidDeviceInformation::getDevicePPI.callInt(sl_null, jactivity));
+			return (sl_uint32)(JAndroidDeviceInformation::getDevicePPI.callInt(sl_null, jactivity));
 		}
 		return -1;
 	}

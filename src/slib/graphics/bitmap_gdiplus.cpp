@@ -24,30 +24,30 @@
 namespace slib
 {
 
-	class _Gdiplus_Bitmap : public Bitmap
+	class _priv_Gdiplus_Bitmap : public Bitmap
 	{
 		SLIB_DECLARE_OBJECT
 	public:
 		Gdiplus::Bitmap* m_bitmap;
 
 	public:
-		_Gdiplus_Bitmap()
+		_priv_Gdiplus_Bitmap()
 		{
 		}
 			
-		~_Gdiplus_Bitmap()
+		~_priv_Gdiplus_Bitmap()
 		{
 			delete m_bitmap;
 		}
 		
 	public:
-		static Ref<_Gdiplus_Bitmap> create(sl_uint32 width, sl_uint32 height)
+		static Ref<_priv_Gdiplus_Bitmap> create(sl_uint32 width, sl_uint32 height)
 		{
 			if (width > 0 && height > 0) {
 				Gdiplus::Bitmap* bitmap = new Gdiplus::Bitmap(width, height, PixelFormat32bppARGB);
 				if (bitmap) {
 					if (bitmap->GetWidth() == width && bitmap->GetHeight() == height) {
-						Ref<_Gdiplus_Bitmap> ret = new _Gdiplus_Bitmap();
+						Ref<_priv_Gdiplus_Bitmap> ret = new _priv_Gdiplus_Bitmap();
 						if (ret.isNotNull()) {
 							ret->m_bitmap = bitmap;
 							return ret;
@@ -59,14 +59,14 @@ namespace slib
 			return sl_null;
 		}
 		
-		static Ref<_Gdiplus_Bitmap> loadFromMemory(const void* mem, sl_size size)
+		static Ref<_priv_Gdiplus_Bitmap> loadFromMemory(const void* mem, sl_size size)
 		{
 			IStream* stream = ::SHCreateMemStream((BYTE*)mem, (sl_uint32)size);
 			if (stream) {
 				Gdiplus::Bitmap* bitmap = new Gdiplus::Bitmap(stream);
 				stream->Release();
 				if (bitmap && bitmap->GetWidth() > 0 && bitmap->GetHeight() > 0) {
-					Ref<_Gdiplus_Bitmap> ret = new _Gdiplus_Bitmap();
+					Ref<_priv_Gdiplus_Bitmap> ret = new _priv_Gdiplus_Bitmap();
 					if (ret.isNotNull()) {
 						ret->m_bitmap = bitmap;
 						return ret;
@@ -295,21 +295,21 @@ namespace slib
 		}
 	};
 
-	SLIB_DEFINE_OBJECT(_Gdiplus_Bitmap, Bitmap)
+	SLIB_DEFINE_OBJECT(_priv_Gdiplus_Bitmap, Bitmap)
 
 	Ref<Bitmap> Bitmap::create(sl_uint32 width, sl_uint32 height)
 	{
-		return _Gdiplus_Bitmap::create(width, height);
+		return _priv_Gdiplus_Bitmap::create(width, height);
 	}
 
 	Ref<Bitmap> Bitmap::loadFromMemory(const void* mem, sl_size size)
 	{
-		return _Gdiplus_Bitmap::loadFromMemory(mem, size);
+		return _priv_Gdiplus_Bitmap::loadFromMemory(mem, size);
 	}
 
 	Gdiplus::Bitmap* GraphicsPlatform::getBitmapHandle(Bitmap* _bitmap)
 	{
-		if (_Gdiplus_Bitmap* bitmap = CastInstance<_Gdiplus_Bitmap>(_bitmap)) {
+		if (_priv_Gdiplus_Bitmap* bitmap = CastInstance<_priv_Gdiplus_Bitmap>(_bitmap)) {
 			return bitmap->m_bitmap;
 		}
 		return NULL;

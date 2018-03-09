@@ -17,10 +17,10 @@
 #include "slib/render/program.h"
 #include "slib/core/queue.h"
 
-#define _OPENGL_ES_IMPL
+#define PRIV_OPENGL_ES_IMPL
 #define GL_BASE GLES
-#define GL_ENGINE _GLES_Engine
-#define GL_ENTRY(x) _GLES_ENTRY(x)
+#define GL_ENGINE _priv_GLES_Engine
+#define GL_ENTRY(x) PRIV_GLES_ENTRY(x)
 #include "opengl_impl.h"
 
 #	if defined (SLIB_PLATFORM_IS_WIN32)
@@ -29,12 +29,12 @@
 
 namespace slib
 {
-	_GLES_ENTRY_POINTS _GLES_ENTRIES;
+	_priv_GLES_EntryPoints _priv_GLES_entries;
 	
-#undef _SLIB_RENDER_GLES_ENTRY
-#define _SLIB_RENDER_GLES_ENTRY(TYPE, name, ...) \
+#undef PRIV_SLIB_RENDER_GLES_ENTRY
+#define PRIV_SLIB_RENDER_GLES_ENTRY(TYPE, name, ...) \
 	proc = ::GetProcAddress(hDll, #name); \
-	*((FARPROC*)(&(_GLES_ENTRIES.name))) = proc;
+	*((FARPROC*)(&(_priv_GLES_entries.name))) = proc;
 	
 	static sl_bool _g_render_GLES_flagLoadedEntryPoints = sl_false;
 	
@@ -55,7 +55,7 @@ namespace slib
 			return;
 		}
 		FARPROC proc;
-		_SLIB_RENDER_GLES_ENTRIES
+		PRIV_SLIB_RENDER_GLES_ENTRIES
 		_g_render_GLES_flagLoadedEntryPoints = sl_true;
 	}
 	

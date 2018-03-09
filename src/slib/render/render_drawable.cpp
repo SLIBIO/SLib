@@ -103,15 +103,15 @@ namespace slib
 		m_program.setNull();
 	}
 	
-	class _ShaderDrawable_Program : public RenderProgram2D_Position
+	class _priv_ShaderDrawable_Program : public RenderProgram2D_Position
 	{
 	public:
 		String m_vertexShader;
 		String m_fragmentShader;
 		
 	public:
-		_ShaderDrawable_Program(const String& vs, const String fs):
-	 m_vertexShader(vs), m_fragmentShader(fs)
+		_priv_ShaderDrawable_Program(const String& vs, const String& fs)
+		 : m_vertexShader(vs), m_fragmentShader(fs)
 		{
 		}
 		
@@ -136,7 +136,7 @@ namespace slib
 			if (vs.isEmpty() || fs.isEmpty()) {
 				return;
 			}
-			program = new _ShaderDrawable_Program(vs, fs);
+			program = new _priv_ShaderDrawable_Program(vs, fs);
 			if (program.isNull()) {
 				return;
 			}

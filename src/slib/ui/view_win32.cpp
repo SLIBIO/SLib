@@ -413,7 +413,7 @@ namespace slib
 		return sl_false;
 	}
 
-	class _Win32_Draw_BackBuffer
+	class _priv_Win32_Draw_BackBuffer
 	{
 	public:
 		Mutex mutex;
@@ -423,7 +423,7 @@ namespace slib
 		Gdiplus::Graphics* graphics;
 
 	public:
-		_Win32_Draw_BackBuffer()
+		_priv_Win32_Draw_BackBuffer()
 		{
 			bitmap = sl_null;
 			graphics = sl_null;
@@ -456,7 +456,7 @@ namespace slib
 
 	};
 
-	static sl_size _Win32_getSelfInvalidatableRects(View* view, UIRect bounds, UIRect* outRects, sl_size countRectsBuf)
+	static sl_size _priv_Win32_getSelfInvalidatableRects(View* view, UIRect bounds, UIRect* outRects, sl_size countRectsBuf)
 	{
 		if (!countRectsBuf) {
 			return 0;
@@ -484,7 +484,7 @@ namespace slib
 					} else {
 						sl_ui_pos x = child->getLeft();
 						sl_ui_pos y = child->getTop();
-						sl_size n = _Win32_getSelfInvalidatableRects(child.get(), child->getBounds(), outRects, countRectsBuf);
+						sl_size n = _priv_Win32_getSelfInvalidatableRects(child.get(), child->getBounds(), outRects, countRectsBuf);
 						sl_size m = 0;
 						for (sl_size k = 0; k < n; k++) {
 							outRects[k].left += x;
@@ -505,7 +505,7 @@ namespace slib
 		return count;
 	}
 
-	static void _Win32_DrawView(Canvas* canvas, View* view)
+	static void _priv_Win32_DrawView(Canvas* canvas, View* view)
 	{
 		Color colorClear = Color::zero();
 		do {
@@ -536,7 +536,7 @@ namespace slib
 		view->dispatchDraw(canvas);
 	}
 
-	static void _Win32_DrawViewRegion(Gdiplus::Graphics* graphics, View* view, RECT& rcPaint)
+	static void _priv_Win32_DrawViewRegion(Gdiplus::Graphics* graphics, View* view, RECT& rcPaint)
 	{
 		sl_uint32 widthRedraw = (sl_uint32)(rcPaint.right - rcPaint.left);
 		sl_uint32 heightRedraw = (sl_uint32)(rcPaint.bottom - rcPaint.top);
@@ -545,7 +545,7 @@ namespace slib
 			CanvasStateScope scope(canvas);
 			canvas->translate(-(sl_real)(rcPaint.left), -(sl_real)(rcPaint.top));
 			canvas->setInvalidatedRect(Rectangle((sl_real)(rcPaint.left), (sl_real)(rcPaint.top), (sl_real)(rcPaint.right), (sl_real)(rcPaint.bottom)));
-			_Win32_DrawView(canvas.get(), view);
+			_priv_Win32_DrawView(canvas.get(), view);
 		}
 	}
 
@@ -571,16 +571,16 @@ namespace slib
 #if defined(USE_SCREEN_BACK_BUFFER)
 								sl_uint32 widthRedraw = (sl_uint32)(ps.rcPaint.right - ps.rcPaint.left);
 								sl_uint32 heightRedraw = (sl_uint32)(ps.rcPaint.bottom - ps.rcPaint.top);
-								SLIB_SAFE_STATIC(_Win32_Draw_BackBuffer, bb)
+								SLIB_SAFE_STATIC(_priv_Win32_Draw_BackBuffer, bb)
 								if (!(SLIB_SAFE_STATIC_CHECK_FREED(bb))) {
 									MutexLocker lock(&(bb.mutex));
 									bb.allocateBackBuffer(widthRedraw, heightRedraw);
 									if (bb.bitmap && bb.graphics) {
-										_Win32_DrawViewRegion(bb.graphics, view.get(), ps.rcPaint);
+										_priv_Win32_DrawViewRegion(bb.graphics, view.get(), ps.rcPaint);
 										Gdiplus::Rect rcPaint(ps.rcPaint.left, ps.rcPaint.top, widthRedraw, heightRedraw);
 										Gdiplus::Region region(rcPaint);
 										static UIRect rectsExclude[128];
-										sl_size n = _Win32_getSelfInvalidatableRects(view.get(), UIRect(ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom), rectsExclude, 128);
+										sl_size n = _priv_Win32_getSelfInvalidatableRects(view.get(), UIRect(ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom), rectsExclude, 128);
 										if (n > 0) {
 											for (sl_size i = 0; i < n; i++) {
 												region.Exclude(Gdiplus::Rect(rectsExclude[i].left, rectsExclude[i].top, rectsExclude[i].getWidth(), rectsExclude[i].getHeight()));
@@ -596,7 +596,7 @@ namespace slib
 								Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, &graphics, rect.right, rect.bottom, sl_false);
 								if (canvas.isNotNull()) {
 									canvas->setInvalidatedRect(Rectangle((sl_real)(ps.rcPaint.left), (sl_real)(ps.rcPaint.top), (sl_real)(ps.rcPaint.right), (sl_real)(ps.rcPaint.bottom)));
-									_Win32_DrawView(canvas.get(), view.get());
+									_priv_Win32_DrawView(canvas.get(), view.get());
 								}
 #endif
 							}
@@ -748,7 +748,7 @@ namespace slib
 	{
 	}
 
-	LRESULT CALLBACK _Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	LRESULT CALLBACK _priv_Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(hWnd));
 		if (instance.isNotNull()) {
@@ -821,12 +821,12 @@ namespace slib
 		return 0;
 	}
 
-	sl_bool _Win32_captureChildInstanceEvents(View* view, UINT uMsg)
+	sl_bool _priv_Win32_captureChildInstanceEvents(View* view, UINT uMsg)
 	{
 		Ref<View> parent = view->getParent();
 		while (parent.isNotNull()) {
 			if (parent->isCapturingChildInstanceEvents()) {
-				if (_Win32_captureChildInstanceEvents(parent.get(), uMsg)) {
+				if (_priv_Win32_captureChildInstanceEvents(parent.get(), uMsg)) {
 					return sl_true;
 				}
 				Ref<ViewInstance> _instance = parent->getViewInstance();
@@ -853,7 +853,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool _Win32_captureChildInstanceEvents(View* view, MSG& msg)
+	sl_bool _priv_Win32_captureChildInstanceEvents(View* view, MSG& msg)
 	{
 		UINT uMsg = msg.message;
 		switch (uMsg) {
@@ -880,7 +880,7 @@ namespace slib
 		default:
 			return sl_false;
 		}
-		return _Win32_captureChildInstanceEvents(view, uMsg);
+		return _priv_Win32_captureChildInstanceEvents(view, uMsg);
 	}
 
 /******************************************

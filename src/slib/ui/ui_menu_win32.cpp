@@ -23,11 +23,11 @@
 namespace slib
 {
 
-	class _Win32_Menu;
-	typedef CHashMap<HMENU, WeakRef<_Win32_Menu> > _UiMenuMap;
-	SLIB_SAFE_STATIC_GETTER(_UiMenuMap, _UI_getMenu)
+	class _priv_Win32_Menu;
+	typedef CHashMap<HMENU, WeakRef<_priv_Win32_Menu> > _priv_UiMenuMap;
+	SLIB_SAFE_STATIC_GETTER(_priv_UiMenuMap, _priv_UI_getMenu)
 
-	class _Win32_MenuItem : public MenuItem
+	class _priv_Win32_MenuItem : public MenuItem
 	{
 		SLIB_DECLARE_OBJECT
 
@@ -36,13 +36,13 @@ namespace slib
 		HBITMAP m_hbmUnchecked;
 
 	public:
-		_Win32_MenuItem()
+		_priv_Win32_MenuItem()
 		{
 			m_hbmChecked = NULL;
 			m_hbmUnchecked = NULL;
 		}
 
-		~_Win32_MenuItem()
+		~_priv_Win32_MenuItem()
 		{
 			if (m_hbmChecked) {
 				::DeleteObject(m_hbmChecked);
@@ -52,7 +52,7 @@ namespace slib
 			}
 		}
 
-		static Ref<_Win32_MenuItem> create(_Win32_Menu* parent, sl_uint32 index, const MenuItemParam& param);
+		static Ref<_priv_Win32_MenuItem> create(_priv_Win32_Menu* parent, sl_uint32 index, const MenuItemParam& param);
 
 		static String makeText(const String& title, const KeycodeAndModifiers& shortcutKey, const KeycodeAndModifiers& secondShortcutKey);
 
@@ -98,9 +98,9 @@ namespace slib
 
 	};
 
-	SLIB_DEFINE_OBJECT(_Win32_MenuItem, MenuItem)
+	SLIB_DEFINE_OBJECT(_priv_Win32_MenuItem, MenuItem)
 
-	class _Win32_Menu : public Menu
+	class _priv_Win32_Menu : public Menu
 	{
 		SLIB_DECLARE_OBJECT
 
@@ -108,23 +108,23 @@ namespace slib
 		HMENU m_hMenu;
 
 	public:
-		_Win32_Menu()
+		_priv_Win32_Menu()
 		{
 			m_hMenu = NULL;
 		}
 
-		~_Win32_Menu()
+		~_priv_Win32_Menu()
 		{
 			if (m_hMenu) {
 				::DestroyMenu(m_hMenu);
-				_UiMenuMap* map = _UI_getMenu();
+				_priv_UiMenuMap* map = _priv_UI_getMenu();
 				if (map) {
 					map->remove(m_hMenu);
 				}
 			}
 		}
 
-		static Ref<_Win32_Menu> create()
+		static Ref<_priv_Win32_Menu> create()
 		{
 			HMENU hMenu = ::CreateMenu();
 			if (hMenu) {
@@ -133,10 +133,10 @@ namespace slib
 				mi.fMask = MIM_STYLE;
 				mi.dwStyle = MNS_NOTIFYBYPOS;
 				if (::SetMenuInfo(hMenu, &mi)) {
-					Ref<_Win32_Menu> ret = new _Win32_Menu();
+					Ref<_priv_Win32_Menu> ret = new _priv_Win32_Menu();
 					if (ret.isNotNull()) {
 						ret->m_hMenu = hMenu;
-						_UiMenuMap* map = _UI_getMenu();
+						_priv_UiMenuMap* map = _priv_UI_getMenu();
 						if (map) {
 							map->put(hMenu, ret);
 						}
@@ -160,7 +160,7 @@ namespace slib
 			if (index > n) {
 				index = n;
 			}
-			Ref<MenuItem> item = _Win32_MenuItem::create(this, index, param);
+			Ref<MenuItem> item = _priv_Win32_MenuItem::create(this, index, param);
 			if (item.isNotNull()) {
 				m_items.insert(index, item);
 				return item;
@@ -221,17 +221,17 @@ namespace slib
 			}
 		}
 
-		friend class _Win32_MenuItem;
+		friend class _priv_Win32_MenuItem;
 	};
 
-	SLIB_DEFINE_OBJECT(_Win32_Menu, Menu)
+	SLIB_DEFINE_OBJECT(_priv_Win32_Menu, Menu)
 
 	Ref<Menu> Menu::create()
 	{
-		return _Win32_Menu::create();
+		return _priv_Win32_Menu::create();
 	}
 
-	Ref<_Win32_MenuItem> _Win32_MenuItem::create(_Win32_Menu* parent, sl_uint32 index, const MenuItemParam& param)
+	Ref<_priv_Win32_MenuItem> _priv_Win32_MenuItem::create(_priv_Win32_Menu* parent, sl_uint32 index, const MenuItemParam& param)
 	{
 		MENUITEMINFOW mii;
 		Base::zeroMemory(&mii, sizeof(mii));
@@ -259,7 +259,7 @@ namespace slib
 		String16 text = makeText(param.text, param.shortcutKey, param.secondShortcutKey);
 		mii.dwTypeData = (LPWSTR)(text.getData());
 		if (::InsertMenuItemW(parent->m_hMenu, index, TRUE, &mii)) {
-			Ref<_Win32_MenuItem> ret = new _Win32_MenuItem;
+			Ref<_priv_Win32_MenuItem> ret = new _priv_Win32_MenuItem;
 			if (ret.isNotNull()) {
 				ret->m_parent = parent;
 				ret->m_text = param.text;
@@ -285,7 +285,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String _Win32_MenuItem::makeText(const String& title, const KeycodeAndModifiers& shortcutKey, const KeycodeAndModifiers& secondShortcutKey)
+	String _priv_Win32_MenuItem::makeText(const String& title, const KeycodeAndModifiers& shortcutKey, const KeycodeAndModifiers& secondShortcutKey)
 	{
 		String text = title;
 		if (shortcutKey.getKeycode() != Keycode::Unknown) {
@@ -305,7 +305,7 @@ namespace slib
 	}
 
 #define MENU_ITEM_SET_PROLOG \
-	Ref<_Win32_Menu> parent(WeakRef<_Win32_Menu>::from(m_parent)); \
+	Ref<_priv_Win32_Menu> parent(WeakRef<_priv_Win32_Menu>::from(m_parent)); \
 	if (parent.isNull()) { \
 		return; \
 	} \
@@ -320,7 +320,7 @@ namespace slib
 	Base::zeroMemory(&mii, sizeof(mii)); \
 	mii.cbSize = sizeof(mii);
 
-	void _Win32_MenuItem::_updateText()
+	void _priv_Win32_MenuItem::_updateText()
 	{
 		MENU_ITEM_SET_PROLOG;
 		mii.fMask = MIIM_STRING;
@@ -329,7 +329,7 @@ namespace slib
 		::SetMenuItemInfoW(hMenu, index, TRUE, &mii);
 	}
 
-	void _Win32_MenuItem::_updateState()
+	void _priv_Win32_MenuItem::_updateState()
 	{
 		MENU_ITEM_SET_PROLOG;
 		mii.fMask = MIIM_STATE;
@@ -343,7 +343,7 @@ namespace slib
 		::SetMenuItemInfoW(hMenu, index, TRUE, &mii);
 	}
 
-	void _Win32_MenuItem::setIcon(const Ref<Bitmap>& icon)
+	void _priv_Win32_MenuItem::setIcon(const Ref<Bitmap>& icon)
 	{
 		MenuItem::setIcon(icon);
 		MENU_ITEM_SET_PROLOG;
@@ -357,7 +357,7 @@ namespace slib
 		::SetMenuItemInfoW(hMenu, index, TRUE, &mii);
 	}
 
-	void _Win32_MenuItem::setCheckedIcon(const Ref<Bitmap>& icon)
+	void _priv_Win32_MenuItem::setCheckedIcon(const Ref<Bitmap>& icon)
 	{
 		MenuItem::setIcon(icon);
 		MENU_ITEM_SET_PROLOG;
@@ -371,7 +371,7 @@ namespace slib
 		::SetMenuItemInfoW(hMenu, index, TRUE, &mii);
 	}
 
-	void _Win32_MenuItem::setSubmenu(const Ref<Menu>& menu)
+	void _priv_Win32_MenuItem::setSubmenu(const Ref<Menu>& menu)
 	{
 		MenuItem::setSubmenu(menu);
 		MENU_ITEM_SET_PROLOG;
@@ -383,7 +383,7 @@ namespace slib
 
 	HMENU UIPlatform::getMenuHandle(const Ref<Menu>& menu)
 	{
-		if (_Win32_Menu* _menu = CastInstance<_Win32_Menu>(menu.get())) {
+		if (_priv_Win32_Menu* _menu = CastInstance<_priv_Win32_Menu>(menu.get())) {
 			return _menu->m_hMenu;
 		}
 		return NULL;
@@ -391,20 +391,20 @@ namespace slib
 
 	Ref<Menu> UIPlatform::getMenu(HMENU hMenu)
 	{
-		_UiMenuMap* map = _UI_getMenu();
+		_priv_UiMenuMap* map = _priv_UI_getMenu();
 		if (map) {
-			return map->getValue(hMenu, WeakRef<_Win32_Menu>::null());
+			return map->getValue(hMenu, WeakRef<_priv_Win32_Menu>::null());
 		}
 		return sl_null;
 	}
 
-	void _Win32_processMenuCommand(WPARAM wParam, LPARAM lParam)
+	void _priv_Win32_processMenuCommand(WPARAM wParam, LPARAM lParam)
 	{
 		HMENU hMenu = (HMENU)(lParam);
 		sl_uint32 index = (sl_uint32)(wParam);
-		_UiMenuMap* map = _UI_getMenu();
+		_priv_UiMenuMap* map = _priv_UI_getMenu();
 		if (map) {
-			Ref<_Win32_Menu> menu(map->getValue(hMenu, WeakRef<_Win32_Menu>::null()));
+			Ref<_priv_Win32_Menu> menu(map->getValue(hMenu, WeakRef<_priv_Win32_Menu>::null()));
 			if (menu.isNotNull()) {
 				Ref<MenuItem> item = menu->getMenuItem(index);
 				if (item.isNotNull()) {
@@ -414,7 +414,7 @@ namespace slib
 		}
 	}
 
-	sl_bool _Win32_processMenuShortcutKey(MSG& msg)
+	sl_bool _priv_Win32_processMenuShortcutKey(MSG& msg)
 	{
 		if (msg.message != WM_KEYDOWN) {
 			return sl_false;

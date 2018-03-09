@@ -329,7 +329,7 @@ namespace slib
 	};
 	
 	
-#define _SLIB_NET_IPADDRESS_SIZE 16
+#define PRIV_SLIB_NET_IPADDRESS_SIZE 16
 	
 	enum class IPAddressType
 	{
@@ -342,7 +342,7 @@ namespace slib
 	{
 	public:
 		IPAddressType type;
-		sl_uint8 m[_SLIB_NET_IPADDRESS_SIZE];
+		sl_uint8 m[PRIV_SLIB_NET_IPADDRESS_SIZE];
 		
 	public:
 		SLIB_INLINE IPAddress() noexcept: type(IPAddressType::None) {}
@@ -416,7 +416,7 @@ namespace slib
 		struct _ipaddress
 		{
 			IPAddressType type;
-			sl_uint8 m[_SLIB_NET_IPADDRESS_SIZE];
+			sl_uint8 m[PRIV_SLIB_NET_IPADDRESS_SIZE];
 		};
 		static const _ipaddress _none;
 		

@@ -22,7 +22,7 @@
 namespace slib
 {
 
-	class _TabView : public TabView
+	class _priv_TabView : public TabView
 	{
 	public:
 		void _applyTabsCount(HWND hWnd)
@@ -144,7 +144,7 @@ namespace slib
 		}
 	};
 
-	class _Win32_TabViewInstance : public Win32_ViewInstance
+	class _priv_Win32_TabViewInstance : public Win32_ViewInstance
 	{
 	public:
 		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
@@ -162,7 +162,7 @@ namespace slib
 			HWND handle = getHandle();
 			if (handle) {
 				Ref<View> _view = getView();
-				if (_TabView* view = CastInstance<_TabView>(_view.get())) {
+				if (_priv_TabView* view = CastInstance<_priv_TabView>(_view.get())) {
 					UINT code = nmhdr->code;
 					if (code == TCN_SELCHANGE) {
 						view->_onSelectTab(handle, this);
@@ -184,7 +184,7 @@ namespace slib
 		DWORD style = WS_CLIPCHILDREN;
 		DWORD styleEx = WS_EX_CONTROLPARENT;
 
-		Ref<_Win32_TabViewInstance> ret = Win32_ViewInstance::create<_Win32_TabViewInstance>(this, parent, L"SysTabControl32", L"", style, styleEx);
+		Ref<_priv_Win32_TabViewInstance> ret = Win32_ViewInstance::create<_priv_Win32_TabViewInstance>(this, parent, L"SysTabControl32", L"", style, styleEx);
 		
 		if (ret.isNotNull()) {
 
@@ -196,7 +196,7 @@ namespace slib
 				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 			}
 
-			((_TabView*)this)->_copyTabs(handle, ret.get());
+			((_priv_TabView*)this)->_copyTabs(handle, ret.get());
 		}
 		return ret;
 	}
@@ -205,7 +205,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_TabView*)this)->_applyTabsCount(handle);
+			((_priv_TabView*)this)->_applyTabsCount(handle);
 		}
 	}
 
@@ -213,7 +213,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_TabView*)this)->_applyClientBounds(handle);
+			((_priv_TabView*)this)->_applyClientBounds(handle);
 		}
 	}
 
@@ -221,7 +221,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_TabView*)this)->_setTabLabel(handle, index, text);
+			((_priv_TabView*)this)->_setTabLabel(handle, index, text);
 		}
 	}
 
@@ -230,7 +230,7 @@ namespace slib
 		Ref<ViewInstance> viewInstance = getViewInstance();
 		if (viewInstance.isNotNull()) {
 			HWND handle = UIPlatform::getViewHandle(viewInstance.get());
-			((_TabView*)this)->_applyTabContents(handle, viewInstance.get());
+			((_priv_TabView*)this)->_applyTabContents(handle, viewInstance.get());
 		}
 	}
 
@@ -238,7 +238,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			m_indexSelected = (sl_uint32)(((_TabView*)this)->_getSelectedIndex(handle));
+			m_indexSelected = (sl_uint32)(((_priv_TabView*)this)->_getSelectedIndex(handle));
 		}
 	}
 
@@ -247,7 +247,7 @@ namespace slib
 		Ref<ViewInstance> viewInstance = getViewInstance();
 		if (viewInstance.isNotNull()) {
 			HWND handle = UIPlatform::getViewHandle(viewInstance.get());
-			((_TabView*)this)->_selectTab(handle, viewInstance.get(), index);
+			((_priv_TabView*)this)->_selectTab(handle, viewInstance.get(), index);
 		}
 	}
 
@@ -255,7 +255,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			return ((_TabView*)this)->_getClientBounds(handle).getSize();
+			return ((_priv_TabView*)this)->_getClientBounds(handle).getSize();
 		}
 		return UISize::zero();
 	}

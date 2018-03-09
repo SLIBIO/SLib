@@ -25,7 +25,7 @@ namespace slib
 	class iOS_Window;
 }
 
-@interface slib_iOS_Window_RootViewController : UIViewController
+@interface _priv_Slib_iOS_Window_RootViewController : UIViewController
 {
 	@public slib::WeakRef<slib::iOS_Window> m_window;
 }
@@ -67,8 +67,8 @@ namespace slib
 						if (content.isNotNull()) {
 							content->setWindowContent(sl_true);
 							ret->m_viewContent = content;
-							if ([view isKindOfClass:[Slib_iOS_ViewHandle class]]) {
-								((Slib_iOS_ViewHandle*)view)->m_viewInstance = Ref<iOS_ViewInstance>::from(content);
+							if ([view isKindOfClass:[_priv_Slib_iOS_ViewHandle class]]) {
+								((_priv_Slib_iOS_ViewHandle*)view)->m_viewInstance = Ref<iOS_ViewInstance>::from(content);
 							}
 						}
 					}
@@ -118,9 +118,9 @@ namespace slib
 					}
 					window.windowLevel = UIWindowLevelNormal + 1;
 				}
-				slib_iOS_Window_RootViewController* controller = [[slib_iOS_Window_RootViewController alloc] init];
+				_priv_Slib_iOS_Window_RootViewController* controller = [[_priv_Slib_iOS_Window_RootViewController alloc] init];
 				if (controller != nil) {
-					Slib_iOS_ViewHandle* view = [[Slib_iOS_ViewHandle alloc] init];
+					_priv_Slib_iOS_ViewHandle* view = [[_priv_Slib_iOS_ViewHandle alloc] init];
 					if (view != nil) {
 						view.opaque = NO;
 						controller.view = view;
@@ -598,7 +598,7 @@ UIView* iOS_Window_findFirstResponder(UIView* root)
 	return nil;
 }
 
-@implementation slib_iOS_Window_RootViewController
+@implementation _priv_Slib_iOS_Window_RootViewController
 
 - (BOOL)prefersStatusBarHidden
 {

@@ -14,12 +14,12 @@
 
 namespace slib
 {
-	SLIB_SAFE_STATIC_GETTER(LinkedQueue< Function<void()> >, _Ui_getDispatchQueue);
+	SLIB_SAFE_STATIC_GETTER(LinkedQueue< Function<void()> >, _priv_Ui_getDispatchQueue);
 	
-	sl_bool _UIDispatcher::addCallback(const Function<void()>& callback)
+	sl_bool _priv_UIDispatcher::addCallback(const Function<void()>& callback)
 	{
 		if (callback.isNotNull()) {
-			LinkedQueue< Function<void()> >* queue = _Ui_getDispatchQueue();
+			LinkedQueue< Function<void()> >* queue = _priv_Ui_getDispatchQueue();
 			if (queue) {
 				return queue->push(callback);
 			}
@@ -27,9 +27,9 @@ namespace slib
 		return sl_false;
 	}
 	
-	void _UIDispatcher::processCallbacks()
+	void _priv_UIDispatcher::processCallbacks()
 	{
-		LinkedQueue< Function<void()> >* queue = _Ui_getDispatchQueue();
+		LinkedQueue< Function<void()> >* queue = _priv_Ui_getDispatchQueue();
 		if (queue) {
 			sl_size n = queue->getCount();
 			Function<void()> callback;
@@ -40,15 +40,15 @@ namespace slib
 		}
 	}
 	
-	typedef CHashMap< sl_reg, Function<void()> > _Ui_DispatchDelayedMap;
+	typedef CHashMap< sl_reg, Function<void()> > _priv_Ui_DispatchDelayedMap;
 	
-	SLIB_SAFE_STATIC_GETTER(_Ui_DispatchDelayedMap, _Ui_getDispatchDelayedMap);
+	SLIB_SAFE_STATIC_GETTER(_priv_Ui_DispatchDelayedMap, _priv_Ui_getDispatchDelayedMap);
 	sl_reg _g_ui_dispatch_delayed_last_ptr = 0;
 	
-	sl_bool _UIDispatcher::addDelayedCallback(const Function<void()>& callback, sl_reg& ptr)
+	sl_bool _priv_UIDispatcher::addDelayedCallback(const Function<void()>& callback, sl_reg& ptr)
 	{
 		if (callback.isNotNull()) {
-			_Ui_DispatchDelayedMap* map = _Ui_getDispatchDelayedMap();
+			_priv_Ui_DispatchDelayedMap* map = _priv_Ui_getDispatchDelayedMap();
 			if (map) {
 				sl_reg p = Base::interlockedIncrement(&_g_ui_dispatch_delayed_last_ptr);
 				if (map->put(p, callback)) {
@@ -60,9 +60,9 @@ namespace slib
 		return sl_false;
 	}
 	
-	void _UIDispatcher::processDelayedCallback(sl_reg ptr)
+	void _priv_UIDispatcher::processDelayedCallback(sl_reg ptr)
 	{
-		_Ui_DispatchDelayedMap* map = _Ui_getDispatchDelayedMap();
+		_priv_Ui_DispatchDelayedMap* map = _priv_Ui_getDispatchDelayedMap();
 		if (map) {
 			Function<void()> callback;
 			if (map->get(ptr, &callback)) {
@@ -72,13 +72,13 @@ namespace slib
 		}
 	}
 	
-	void _UIDispatcher::removeAllCallbacks()
+	void _priv_UIDispatcher::removeAllCallbacks()
 	{
-		LinkedQueue< Function<void()> >* queue = _Ui_getDispatchQueue();
+		LinkedQueue< Function<void()> >* queue = _priv_Ui_getDispatchQueue();
 		if (queue) {
 			queue->removeAll();
 		}
-		_Ui_DispatchDelayedMap* map = _Ui_getDispatchDelayedMap();
+		_priv_Ui_DispatchDelayedMap* map = _priv_Ui_getDispatchDelayedMap();
 		if (map) {
 			map->removeAll();
 		}

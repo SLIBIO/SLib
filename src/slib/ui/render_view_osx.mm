@@ -18,11 +18,15 @@
 
 #include "view_osx.h"
 
-@interface SLib_macOS_GLView : Slib_OSX_ViewHandle {
+@interface _priv_Slib_macOS_GLView : _priv_Slib_macOS_ViewHandle {
 	
 	@public sl_bool m_flagRenderingContinuously;
 	@public sl_bool m_flagRequestRender;
 	@public sl_bool m_flagUpdate;
+	@public sl_bool m_flagViewVisible;
+	@public CGFloat m_viewportWidth;
+	@public CGFloat m_viewportHeight;
+
 	@public slib::Mutex m_lockRender;
 	
 	slib::AtomicRef<slib::Thread> m_thread;
@@ -30,6 +34,7 @@
 
 -(void)_setRenderContinuously:(BOOL)flag;
 -(void)_requestRender;
+-(void)_queryViewStatus;
 
 @end
 
@@ -39,12 +44,12 @@ namespace slib
 
 	Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* _parent)
 	{
-		OSX_VIEW_CREATE_INSTANCE_BEGIN
-		SLib_macOS_GLView* handle = [[SLib_macOS_GLView alloc] initWithFrame:frame];
+		MACOS_VIEW_CREATE_INSTANCE_BEGIN
+		_priv_Slib_macOS_GLView* handle = [[_priv_Slib_macOS_GLView alloc] initWithFrame:frame];
 		if (handle != nil) {
 			[handle _setRenderContinuously:(m_redrawMode == RedrawMode::Continuously)];
 		}
-		OSX_VIEW_CREATE_INSTANCE_END
+		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
 
@@ -52,8 +57,8 @@ namespace slib
 	{
 		ObjectLocker lock(this);
 		NSView* view = UIPlatform::getViewHandle(this);
-		if (view != nil && [view isKindOfClass:[SLib_macOS_GLView class]]) {
-			SLib_macOS_GLView* v = (SLib_macOS_GLView*)view;
+		if (view != nil && [view isKindOfClass:[_priv_Slib_macOS_GLView class]]) {
+			_priv_Slib_macOS_GLView* v = (_priv_Slib_macOS_GLView*)view;
 			[v _setRenderContinuously:(mode == RedrawMode::Continuously)];
 		}
 	}
@@ -61,13 +66,13 @@ namespace slib
 	void RenderView::_requestRender_NW()
 	{
 		NSView* view = UIPlatform::getViewHandle(this);
-		if (view != nil && [view isKindOfClass:[SLib_macOS_GLView class]]) {
-			SLib_macOS_GLView* v = (SLib_macOS_GLView*)view;
+		if (view != nil && [view isKindOfClass:[_priv_Slib_macOS_GLView class]]) {
+			_priv_Slib_macOS_GLView* v = (_priv_Slib_macOS_GLView*)view;
 			[v _requestRender];
 		}
 	}
 
-	void _macOS_GLView_thread(__weak SLib_macOS_GLView* _handle)
+	void _priv_macOS_GLView_thread(__weak _priv_Slib_macOS_GLView* _handle)
 	{
 		Ref<RenderEngine> engine = GL::createEngine();
 		if (engine.isNull()) {
@@ -90,24 +95,32 @@ namespace slib
 			return;
 		}
 		
+		int frameNumber = 0;
+		
 		while (1) {
 			
 			sl_bool flagWorking = sl_false;
 			
 			if (Thread::isNotStoppingCurrent()) {
 				
-				SLib_macOS_GLView* handle = _handle;
+				_priv_Slib_macOS_GLView* handle = _handle;
 				if (handle == nil) {
 					return;
 				}
-				Ref<OSX_ViewInstance> instance = handle->m_viewInstance;
+				Ref<macOS_ViewInstance> instance = handle->m_viewInstance;
 				if (instance.isNull()) {
 					return;
 				}
 				
+				if (frameNumber % 10 == 0) {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[handle _queryViewStatus];
+					});
+				}
+				
 				do {
 					MutexLocker lock(&(handle->m_lockRender));
-					if ([handle isHidden] || handle.visibleRect.size.width < 1 || handle.visibleRect.size.height < 1 || handle.window == nil) {
+					if (!(handle->m_flagViewVisible)) {
 						if (context != nil) {
 							[context clearDrawable];
 							context = nil;
@@ -139,13 +152,14 @@ namespace slib
 					
 					flagWorking = sl_true;
 					if (flagUpdate) {
-						NSRect rect = [handle bounds];
-						if (rect.size.width != 0 && rect.size.height != 0) {
+						sl_uint32 viewportWidth = (sl_uint32)(handle->m_viewportWidth);
+						sl_uint32 viewportHeight = (sl_uint32)(handle->m_viewportHeight);
+						if (viewportWidth != 0 && viewportHeight != 0) {
 						
 							[context makeCurrentContext];
-							engine->setViewport(0, 0, (sl_uint32)(rect.size.width), (sl_uint32)(rect.size.height));
+							engine->setViewport(0, 0, viewportWidth, viewportHeight);
 							
-							Ref<OSX_ViewInstance> instance = handle->m_viewInstance;
+							Ref<macOS_ViewInstance> instance = handle->m_viewInstance;
 							if (instance.isNotNull()) {
 								Ref<View> _view = instance->getView();
 								if (RenderView* view = CastInstance<RenderView>(_view.get())) {
@@ -161,6 +175,8 @@ namespace slib
 						}
 					}
 				} while(0);
+				
+				frameNumber++;
 				
 			} else {
 				break;
@@ -179,12 +195,13 @@ namespace slib
 			} else {
 				break;
 			}
+			
 		}
 	}
 
 }
 
-@implementation SLib_macOS_GLView
+@implementation _priv_Slib_macOS_GLView
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -192,8 +209,11 @@ namespace slib
 		m_flagRenderingContinuously = sl_false;
 		m_flagRequestRender = sl_true;
 		m_flagUpdate = sl_true;
+		m_flagViewVisible = sl_false;
+		m_viewportWidth = 1;
+		m_viewportHeight = 1;
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_surfaceNeedsUpdate:) name:NSViewGlobalFrameDidChangeNotification object:self];
-		m_thread = slib::Thread::start(slib::Function<void()>::bind(&(slib::_macOS_GLView_thread), self));
+		m_thread = slib::Thread::start(slib::Function<void()>::bind(&(slib::_priv_macOS_GLView_thread), self));
 	}
 	return self;
 }
@@ -255,6 +275,22 @@ namespace slib
 -(void)_requestRender
 {
 	m_flagRequestRender = sl_true;
+}
+
+-(void)_queryViewStatus
+{
+	sl_bool flagVisible = sl_true;
+	if ([self isHidden]) {
+		flagVisible = sl_false;
+	} else if (self.visibleRect.size.width < 1 || self.visibleRect.size.height < 1) {
+		flagVisible = sl_false;
+	} else if (self.window == nil) {
+		flagVisible = sl_false;
+	}
+	m_flagViewVisible = flagVisible;
+	NSRect rect = [self bounds];
+	m_viewportWidth = rect.size.width;
+	m_viewportHeight = rect.size.height;
 }
 
 @end

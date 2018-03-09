@@ -21,17 +21,17 @@
 namespace slib
 {
 
-	class OSX_ViewInstance : public ViewInstance
+	class macOS_ViewInstance : public ViewInstance
 	{
 	public:
-		OSX_ViewInstance();
+		macOS_ViewInstance();
 		
-		~OSX_ViewInstance();
+		~macOS_ViewInstance();
 		
 	public:
-		static Ref<OSX_ViewInstance> create(NSView* handle, sl_bool flagFreeOnRelease);
+		static Ref<macOS_ViewInstance> create(NSView* handle, sl_bool flagFreeOnRelease);
 		
-		static Ref<OSX_ViewInstance> create(NSView* handle, NSView* parent, View* view);
+		static Ref<macOS_ViewInstance> create(NSView* handle, NSView* parent, View* view);
 		
 	public:
 		static void freeHandle(NSView* handle);
@@ -99,28 +99,28 @@ namespace slib
 		
 	};
 
-	void OSX_transformViewFrame(NSPoint& origin, NSSize& size, const UIRect& frame, sl_real translationX, sl_real translationY, sl_real scaleX, sl_real scaleY, sl_real rotationRadian, sl_real anchorOffsetX, sl_real anchorOffsetY);
+	void _priv_macOS_transformViewFrame(NSPoint& origin, NSSize& size, const UIRect& frame, sl_real translationX, sl_real translationY, sl_real scaleX, sl_real scaleY, sl_real rotationRadian, sl_real anchorOffsetX, sl_real anchorOffsetY);
 
 }
 
-@interface Slib_OSX_ViewBase : NSView {
+@interface _priv_Slib_macOS_ViewBase : NSView {
 	@public sl_bool m_flagOpaque;
 	@public sl_bool m_flagClipping;
 	@public sl_bool m_flagDrawing;
 }
 @end
 
-@interface Slib_OSX_ViewHandle : Slib_OSX_ViewBase {
+@interface _priv_Slib_macOS_ViewHandle : _priv_Slib_macOS_ViewBase {
 
-	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 
 	NSTrackingArea* m_trackingArea;
 }
 @end
 
 
-#define OSX_VIEW_CREATE_INSTANCE_BEGIN \
-	Ref<OSX_ViewInstance> ret; \
+#define MACOS_VIEW_CREATE_INSTANCE_BEGIN \
+	Ref<macOS_ViewInstance> ret; \
 	NSView* parent = UIPlatform::getViewHandle(_parent); \
 	UIRect _frame = getFrame(); \
 	NSRect frame; \
@@ -129,7 +129,7 @@ namespace slib
 	frame.size.width = (CGFloat)(_frame.getWidth()); \
 	frame.size.height = (CGFloat)(_frame.getHeight());
 
-#define OSX_VIEW_CREATE_INSTANCE_END \
+#define MACOS_VIEW_CREATE_INSTANCE_END \
 	if (handle != nil) { \
 		Vector2 t; \
 		sl_real r; \
@@ -138,12 +138,12 @@ namespace slib
 		if (getFinalTranslationRotationScale(&t, &r, &s, &anchor)) { \
 			NSPoint pt; \
 			NSSize size; \
-			OSX_transformViewFrame(pt, size, _frame, t.x, t.y, s.x, s.y, r, anchor.x, anchor.y); \
+			_priv_macOS_transformViewFrame(pt, size, _frame, t.x, t.y, s.x, s.y, r, anchor.x, anchor.y); \
 			[handle setFrameOrigin:pt]; \
 			[handle setFrameSize:size]; \
 			handle.frameRotation = Math::getDegreesFromRadian(r); \
 		} \
-		ret = OSX_ViewInstance::create(handle, parent, this); \
+		ret = macOS_ViewInstance::create(handle, parent, this); \
 		if (ret.isNotNull()) { \
 			handle->m_viewInstance = ret; \
 		} \

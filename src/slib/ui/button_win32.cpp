@@ -19,7 +19,7 @@
 namespace slib
 {
 
-	class _Win32_ButtonViewInstance : public Win32_ViewInstance
+	class _priv_Win32_ButtonViewInstance : public Win32_ViewInstance
 	{
 	public:
 		sl_bool preprocessWindowMessage(MSG& msg) override
@@ -60,7 +60,7 @@ namespace slib
 		if (m_flagDefaultButton) {
 			style |= BS_DEFPUSHBUTTON;
 		}
-		Ref<_Win32_ButtonViewInstance> ret = Win32_ViewInstance::create<_Win32_ButtonViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
+		Ref<_priv_Win32_ButtonViewInstance> ret = Win32_ViewInstance::create<_priv_Win32_ButtonViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
 		if (ret.isNotNull()) {
 			Ref<Font> font = getFont();
 			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());

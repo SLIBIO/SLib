@@ -18,18 +18,18 @@
 namespace slib
 {
 
-	class _Win32_Cursor : public Cursor
+	class _priv_Win32_Cursor : public Cursor
 	{
 	public:
 		HCURSOR m_hCursor;
 		sl_bool m_flagDestroyOnRelease;
 
 	public:
-		_Win32_Cursor()
+		_priv_Win32_Cursor()
 		{
 		}
 
-		~_Win32_Cursor()
+		~_priv_Win32_Cursor()
 		{
 			if (m_flagDestroyOnRelease) {
 				::DestroyCursor(m_hCursor);
@@ -37,11 +37,11 @@ namespace slib
 		}
 
 	public:
-		static Ref<_Win32_Cursor> create(HCURSOR hCursor, sl_bool flagFreeOnDestroy)
+		static Ref<_priv_Win32_Cursor> create(HCURSOR hCursor, sl_bool flagFreeOnDestroy)
 		{
-			Ref<_Win32_Cursor> ret;
+			Ref<_priv_Win32_Cursor> ret;
 			if (hCursor) {
-				ret = new _Win32_Cursor;
+				ret = new _priv_Win32_Cursor;
 				if (ret.isNotNull()) {
 					ret->m_hCursor = hCursor;
 					ret->m_flagDestroyOnRelease = flagFreeOnDestroy;
@@ -57,7 +57,7 @@ namespace slib
 
 	Ref<Cursor> UIPlatform::createCursor(HCURSOR hCursor, sl_bool flagDestroyOnRelease)
 	{
-		return _Win32_Cursor::create(hCursor, flagDestroyOnRelease);
+		return _priv_Win32_Cursor::create(hCursor, flagDestroyOnRelease);
 	}
 
 	HCURSOR UIPlatform::getCursorHandle(const Ref<Cursor>& cursor)
@@ -65,7 +65,7 @@ namespace slib
 		if (cursor.isNull()) {
 			return NULL;
 		}
-		_Win32_Cursor* c = (_Win32_Cursor*)(cursor.get());
+		_priv_Win32_Cursor* c = (_priv_Win32_Cursor*)(cursor.get());
 		return c->m_hCursor;
 	}
 
@@ -110,7 +110,7 @@ namespace slib
 		if (cursor.isNull()) {
 			return;
 		}
-		_Win32_Cursor* c = (_Win32_Cursor*)(cursor.get());
+		_priv_Win32_Cursor* c = (_priv_Win32_Cursor*)(cursor.get());
 		::SetCursor(c->m_hCursor);
 	}
 

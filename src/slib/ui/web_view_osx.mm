@@ -21,20 +21,20 @@
 
 #ifdef USE_WK_WEB_VIEW
 typedef WKWebView OSWebView;
-@interface _Slib_OSX_WebView : OSWebView<WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
+@interface _priv_Slib_macOS_WebView : OSWebView<WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
 #else
 typedef WebView OSWebView;
-@interface _Slib_OSX_WebView : OSWebView<WebFrameLoadDelegate, WebUIDelegate>
+@interface _priv_Slib_macOS_WebView : OSWebView<WebFrameLoadDelegate, WebUIDelegate>
 #endif
 {
-	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 }
 @end
 
 namespace slib
 {
 
-	class _WebView : public WebView
+	class _priv_WebView : public WebView
 	{
 	public:
 		void _load(OSWebView* handle)
@@ -145,12 +145,12 @@ namespace slib
 
 	Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* _parent)
 	{
-		OSX_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_OSX_WebView* handle = [[_Slib_OSX_WebView alloc] initWithFrame:frame];
+		MACOS_VIEW_CREATE_INSTANCE_BEGIN
+		_priv_Slib_macOS_WebView* handle = [[_priv_Slib_macOS_WebView alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((_WebView*)this)->_applyProperties(handle);
+			((_priv_WebView*)this)->_applyProperties(handle);
 		}
-		OSX_VIEW_CREATE_INSTANCE_END
+		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
 
@@ -163,7 +163,7 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 			OSWebView* wv = (OSWebView*)handle;
-			((_WebView*)this)->_load(wv);
+			((_priv_WebView*)this)->_load(wv);
 		}
 	}
 
@@ -245,7 +245,7 @@ namespace slib
 
 }
 
-@implementation _Slib_OSX_WebView
+@implementation _priv_Slib_macOS_WebView
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -339,10 +339,10 @@ namespace slib
 		return;
 	}
 #endif
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
-		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
+		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
 			view->_onStartLoad(self);
 		}
 	}
@@ -358,10 +358,10 @@ namespace slib
 		return;
 	}
 #endif
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
-		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
+		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
 			view->_onFinishLoad(self);
 		}
 	}
@@ -377,10 +377,10 @@ namespace slib
 		return;
 	}
 #endif
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
-		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
+		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
 			view->_onLoadError(self, error);
 		}
 	}
@@ -397,10 +397,10 @@ namespace slib
 		return;
 	}
 #endif
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
-		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
+		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
 			view->_onLoadError(self, error);
 		}
 	}
@@ -410,10 +410,10 @@ namespace slib
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message
 {
 	id body = message.body;
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
-		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
+		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
 			view->_onInvokeMethod(self, body);
 		}
 	}
@@ -426,10 +426,10 @@ namespace slib
 
 - (id)invokeDefaultMethodWithArguments:(NSArray *)args
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance.lock();
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
-		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>ckInstance(_view.get())) {
+		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>ckInstance(_view.get())) {
 			view->_onInvokeMethod(self, args);
 		}
 	}

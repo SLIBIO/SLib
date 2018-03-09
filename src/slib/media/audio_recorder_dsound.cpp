@@ -26,7 +26,7 @@
 namespace slib
 {
 
-	class _DirectSound_AudioRecorder : public AudioRecorder
+	class _priv_DirectSound_AudioRecorder : public AudioRecorder
 	{
 	public:
 		IDirectSoundCapture8* m_device;
@@ -38,14 +38,14 @@ namespace slib
 		sl_bool m_flagOpened;
 
 	public:
-		_DirectSound_AudioRecorder()
+		_priv_DirectSound_AudioRecorder()
 		{
 			m_flagOpened = sl_true;
 			m_flagRunning = sl_false;
 			m_events[2] = ::CreateEventW(NULL, FALSE, FALSE, NULL);
 		}
 
-		~_DirectSound_AudioRecorder()
+		~_priv_DirectSound_AudioRecorder()
 		{
 			release();
 		}
@@ -56,7 +56,7 @@ namespace slib
 			LogError("AudioRecorder", text);
 		}
 		
-		static Ref<_DirectSound_AudioRecorder> create(const AudioRecorderParam& param)
+		static Ref<_priv_DirectSound_AudioRecorder> create(const AudioRecorderParam& param)
 		{
 			if (param.channelsCount != 1 && param.channelsCount != 2) {
 				return sl_null;
@@ -155,7 +155,7 @@ namespace slib
 						if (SUCCEEDED(hr)) {
 							hr = buffer->Start(DSCBSTART_LOOPING);
 							if (SUCCEEDED(hr)) {
-								Ref<_DirectSound_AudioRecorder> ret = new _DirectSound_AudioRecorder();
+								Ref<_priv_DirectSound_AudioRecorder> ret = new _priv_DirectSound_AudioRecorder();
 								if (ret.isNotNull()) {
 									ret->m_device = device;
 									ret->m_buffer = buffer;
@@ -226,7 +226,7 @@ namespace slib
 			if (m_flagRunning) {
 				return;
 			}
-			m_thread = Thread::start(SLIB_FUNCTION_CLASS(_DirectSound_AudioRecorder, run, this));
+			m_thread = Thread::start(SLIB_FUNCTION_CLASS(_priv_DirectSound_AudioRecorder, run, this));
 			if (m_thread.isNotNull()) {
 				m_flagRunning = sl_true;
 			}
@@ -319,15 +319,15 @@ namespace slib
 
 	Ref<AudioRecorder> DirectSound::createRecorder(const AudioRecorderParam& param)
 	{
-		return _DirectSound_AudioRecorder::create(param);
+		return _priv_DirectSound_AudioRecorder::create(param);
 	}
 
 	List<AudioRecorderInfo> DirectSound::getRecordersList()
 	{
 		List<AudioRecorderInfo> ret;
-		ListElements<_DirectSound_AudioRecorder::DeviceProperty> props(_DirectSound_AudioRecorder::queryDeviceInfos());
+		ListElements<_priv_DirectSound_AudioRecorder::DeviceProperty> props(_priv_DirectSound_AudioRecorder::queryDeviceInfos());
 		for (sl_size i = 0; i < props.count; i++) {
-			_DirectSound_AudioRecorder::DeviceProperty& prop = props[i];
+			_priv_DirectSound_AudioRecorder::DeviceProperty& prop = props[i];
 			AudioRecorderInfo info;
 			info.id = prop.szGuid;
 			info.name = prop.name;

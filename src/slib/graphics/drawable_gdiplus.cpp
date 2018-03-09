@@ -25,7 +25,7 @@
 namespace slib
 {
 
-	class _Gdiplus_ImageDrawable : public Drawable
+	class _priv_Gdiplus_ImageDrawable : public Drawable
 	{
 		SLIB_DECLARE_OBJECT
 	public:
@@ -34,11 +34,11 @@ namespace slib
 		Ref<Referable> m_ref;
 		
 	public:
-		_Gdiplus_ImageDrawable()
+		_priv_Gdiplus_ImageDrawable()
 		{
 		}
 		
-		~_Gdiplus_ImageDrawable()
+		~_priv_Gdiplus_ImageDrawable()
 		{
 			if (m_flagFreeOnRelease) {
 				delete m_image;
@@ -46,10 +46,10 @@ namespace slib
 		}
 		
 	public:
-		static Ref<_Gdiplus_ImageDrawable> create(Gdiplus::Image* image, sl_bool flagFreeOnRelease, Referable* ref)
+		static Ref<_priv_Gdiplus_ImageDrawable> create(Gdiplus::Image* image, sl_bool flagFreeOnRelease, Referable* ref)
 		{
 			if (image) {
-				Ref<_Gdiplus_ImageDrawable> ret = new _Gdiplus_ImageDrawable();
+				Ref<_priv_Gdiplus_ImageDrawable> ret = new _priv_Gdiplus_ImageDrawable();
 				if (ret.isNotNull()) {
 					ret->m_image = image;
 					ret->m_flagFreeOnRelease = flagFreeOnRelease;
@@ -80,7 +80,7 @@ namespace slib
 		
 	};
 
-	SLIB_DEFINE_OBJECT(_Gdiplus_ImageDrawable, Drawable)
+	SLIB_DEFINE_OBJECT(_priv_Gdiplus_ImageDrawable, Drawable)
 
 	Ref<Drawable> PlatformDrawable::create(const ImageDesc& desc)
 	{
@@ -102,12 +102,12 @@ namespace slib
 
 	Ref<Drawable> GraphicsPlatform::createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease, Referable* ref)
 	{
-		return _Gdiplus_ImageDrawable::create(image, flagFreeOnRelease, ref);
+		return _priv_Gdiplus_ImageDrawable::create(image, flagFreeOnRelease, ref);
 	}
 
 	Gdiplus::Image* GraphicsPlatform::getImageHandle(Drawable* _drawable)
 	{
-		if (_Gdiplus_ImageDrawable* drawable = CastInstance<_Gdiplus_ImageDrawable>(_drawable)) {
+		if (_priv_Gdiplus_ImageDrawable* drawable = CastInstance<_priv_Gdiplus_ImageDrawable>(_drawable)) {
 			return drawable->m_image;
 		}
 		if (Bitmap* bitmap = CastInstance<Bitmap>(_drawable)) {

@@ -23,7 +23,7 @@
 namespace slib
 {
 
-	struct _AsyncIoLoopHandle
+	struct _priv_AsyncIoLoopHandle
 	{
 		int kq;
 		Ref<PipeEvent> eventWake;
@@ -38,7 +38,7 @@ namespace slib
 		int kq;
 		kq = ::kqueue();
 		if (kq != -1) {
-			_AsyncIoLoopHandle* handle = new _AsyncIoLoopHandle;
+			_priv_AsyncIoLoopHandle* handle = new _priv_AsyncIoLoopHandle;
 			if (handle) {
 				handle->kq = kq;
 				handle->eventWake = pipe;
@@ -57,14 +57,14 @@ namespace slib
 
 	void AsyncIoLoop::_native_closeHandle(void* _handle)
 	{
-		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)_handle;
+		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)_handle;
 		::close(handle->kq);
 		delete handle;
 	}
 
 	void AsyncIoLoop::_native_runLoop()
 	{
-		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
+		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
 
 		struct kevent waitEvents[ASYNC_MAX_WAIT_EVENT];
 
@@ -113,13 +113,13 @@ namespace slib
 
 	void AsyncIoLoop::_native_wake()
 	{
-		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
+		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
 		handle->eventWake->set();
 	}
 
 	sl_bool AsyncIoLoop::_native_attachInstance(AsyncIoInstance* instance, AsyncIoMode mode)
 	{
-		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
+		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
 		int hObject = (int)(instance->getHandle());
 		
 		struct kevent ke[2];
@@ -151,7 +151,7 @@ namespace slib
 
 	void AsyncIoLoop::_native_detachInstance(AsyncIoInstance* instance)
 	{
-		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
+		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
 		int hObject = (int)(instance->getHandle());
 		
 		AsyncIoMode mode = instance->getMode();

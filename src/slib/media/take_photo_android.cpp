@@ -27,7 +27,7 @@ namespace slib
 	void Android_TakePhoto_onFailure(JNIEnv* env, jobject _this);
 	void Android_TakePhoto_onCanceled(JNIEnv* env, jobject _this);
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidTakePhoto, "slib/platform/android/camera/TakePhoto")
+	SLIB_JNI_BEGIN_CLASS(JAndroidTakePhoto, "slib/platform/android/camera/TakePhoto")
 		SLIB_JNI_STATIC_METHOD(takePhoto, "takePhoto", "(Landroid/app/Activity;Ljava/lang/String;)V");
 		SLIB_JNI_NATIVE(onSuccess, "onSuccess", "(Ljava/lang/String;)V", Android_TakePhoto_onSuccess);
 		SLIB_JNI_NATIVE(onFailure, "onFailure", "()V", Android_TakePhoto_onFailure);
@@ -76,7 +76,7 @@ namespace slib
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JniLocal<jstring> jpath = Jni::getJniString(param.outputFilePath);
-			_JAndroidTakePhoto::takePhoto.call(sl_null, jactivity, jpath.get());
+			JAndroidTakePhoto::takePhoto.call(sl_null, jactivity, jpath.get());
 		}
 	}
 

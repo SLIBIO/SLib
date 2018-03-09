@@ -152,12 +152,12 @@ namespace slib
 		return sl_null;
 	}
 
-	class _ContentType_Mapping
+	class _priv_ContentType_Mapping
 	{
 	public:
 		CHashMap<String, ContentType> maps;
 
-		_ContentType_Mapping()
+		_priv_ContentType_Mapping()
 		{
 			maps.put("txt", ContentType::TextPlain);
 			maps.put("htm", ContentType::TextHtml);
@@ -210,7 +210,7 @@ namespace slib
 
 	ContentType ContentTypes::getFromFileExtension(const String& fileExt)
 	{
-		SLIB_SAFE_STATIC(_ContentType_Mapping, t)
+		SLIB_SAFE_STATIC(_priv_ContentType_Mapping, t)
 		if (SLIB_SAFE_STATIC_CHECK_FREED(t)) {
 			return ContentType::Unknown;
 		}

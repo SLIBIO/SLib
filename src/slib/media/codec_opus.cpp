@@ -55,7 +55,7 @@ namespace slib
 		}
 	}
 
-	class _OpusEncoderImpl : public OpusEncoder
+	class _priv_OpusEncoderImpl : public OpusEncoder
 	{
 	public:
 		sl_size m_sizeEncoder;
@@ -69,14 +69,14 @@ namespace slib
 		sl_bool m_flagResetBitrate;
 		
 	public:
-		_OpusEncoderImpl()
+		_priv_OpusEncoderImpl()
 		{
 			m_encoder = sl_null;
 			m_sizeEncoder = 0;
 			m_flagResetBitrate = sl_false;
 		}
 
-		~_OpusEncoderImpl()
+		~_priv_OpusEncoderImpl()
 		{
 			Base::freeMemory(m_encoder);
 #ifdef OPUS_RESET_INTERVAL
@@ -90,7 +90,7 @@ namespace slib
 			LogError("AudioOpusEncoder", str);
 		}
 
-		static Ref<_OpusEncoderImpl> create(const OpusEncoderParam& param)
+		static Ref<_priv_OpusEncoderImpl> create(const OpusEncoderParam& param)
 		{
 			if (!isValidSamplingRate(param.samplesPerSecond)) {
 				logError("Encoding sampling rate must be one of 8000, 12000, 16000, 24000, 48000");
@@ -121,7 +121,7 @@ namespace slib
 							::opus_encoder_ctl(encoder, OPUS_SET_SIGNAL(OPUS_SIGNAL_VOICE));
 						}
 						
-						Ref<_OpusEncoderImpl> ret = new _OpusEncoderImpl();
+						Ref<_priv_OpusEncoderImpl> ret = new _priv_OpusEncoderImpl();
 
 						if (ret.isNotNull()) {
 							
@@ -244,7 +244,7 @@ namespace slib
 
 	Ref<OpusEncoder> OpusEncoder::create(const OpusEncoderParam& param)
 	{
-		return _OpusEncoderImpl::create(param);
+		return _priv_OpusEncoderImpl::create(param);
 	}
 
 
@@ -272,18 +272,18 @@ namespace slib
 		return OpusEncoder::isValidSamplingRate(nSamplesPerSecond);
 	}
 
-	class _OpusDecoderImpl : public OpusDecoder
+	class _priv_OpusDecoderImpl : public OpusDecoder
 	{
 	public:
 		::OpusDecoder* m_decoder;
 
 	public:
-		_OpusDecoderImpl()
+		_priv_OpusDecoderImpl()
 		{
 			m_decoder = sl_null;
 		}
 		
-		~_OpusDecoderImpl()
+		~_priv_OpusDecoderImpl()
 		{
 			::opus_decoder_destroy(m_decoder);
 		}
@@ -294,7 +294,7 @@ namespace slib
 			LogError("AudioOpusDecoder", str);
 		}
 
-		static Ref<_OpusDecoderImpl> create(const OpusDecoderParam& param)
+		static Ref<_priv_OpusDecoderImpl> create(const OpusDecoderParam& param)
 		{
 			if (!isValidSamplingRate(param.samplesPerSecond)) {
 				logError("Decoding sampling rate must be one of 8000, 12000, 16000, 24000, 48000");
@@ -309,7 +309,7 @@ namespace slib
 			if (! decoder) {
 				return sl_null;
 			}
-			Ref<_OpusDecoderImpl> ret = new _OpusDecoderImpl();
+			Ref<_priv_OpusDecoderImpl> ret = new _priv_OpusDecoderImpl();
 			if (ret.isNotNull()) {
 				ret->m_decoder = decoder;
 				ret->m_nSamplesPerSecond = param.samplesPerSecond;
@@ -378,7 +378,7 @@ namespace slib
 
 	Ref<OpusDecoder> OpusDecoder::create(const OpusDecoderParam& param)
 	{
-		return _OpusDecoderImpl::create(param);
+		return _priv_OpusDecoderImpl::create(param);
 	}
 
 }

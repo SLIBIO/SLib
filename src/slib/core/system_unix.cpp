@@ -34,7 +34,7 @@
 #include <sys/time.h>
 #include <sys/syscall.h>
 
-#define _PATH_MAX 1024
+#define PRIV_PATH_MAX 1024
 
 namespace slib
 {
@@ -42,12 +42,12 @@ namespace slib
 #if !defined(SLIB_PLATFORM_IS_APPLE)
 	String System::getApplicationPath()
 	{
-		char path[_PATH_MAX] = {0};
+		char path[PRIV_PATH_MAX] = {0};
 #	if defined(SLIB_PLATFORM_IS_ANDROID)
 		char a[50];
 		::sprintf(a, "/proc/%d/cmdline", getpid());
 		FILE* fp = fopen(a, "rb");
-		int n = fread(path, 1, _PATH_MAX - 1, fp);
+		int n = fread(path, 1, PRIV_PATH_MAX - 1, fp);
 		fclose(fp);
 
 		String ret;
@@ -56,7 +56,7 @@ namespace slib
 		}
 		return "/data/data/" + ret;
 #	else
-		int n = readlink("/proc/self/exe", path, _PATH_MAX-1);
+		int n = readlink("/proc/self/exe", path, PRIV_PATH_MAX-1);
 		/*
 		-- another solution --
 
@@ -86,8 +86,8 @@ namespace slib
 
 	String System::getCurrentDirectory()
 	{
-		char path[_PATH_MAX] = {0};
-		char* r = ::getcwd(path, _PATH_MAX-1);
+		char path[PRIV_PATH_MAX] = {0};
+		char* r = ::getcwd(path, PRIV_PATH_MAX-1);
 		if (r) {
 			return path;
 		}
@@ -245,27 +245,27 @@ namespace slib
 
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
 
-	typedef CList<String> _GlobalUniqueInstanceList;
+	typedef CList<String> _priv_GlobalUniqueInstanceList;
 
-	SLIB_SAFE_STATIC_GETTER(_GlobalUniqueInstanceList, _getGlobalUniqueInstanceList)
+	SLIB_SAFE_STATIC_GETTER(_priv_GlobalUniqueInstanceList, _getGlobalUniqueInstanceList)
 
-	class _GlobalUniqueInstance : public GlobalUniqueInstance
+	class _priv_GlobalUniqueInstance : public GlobalUniqueInstance
 	{
 	public:
 		String m_name;
 		Ref<File> m_file;
 		
 	public:
-		_GlobalUniqueInstance()
+		_priv_GlobalUniqueInstance()
 		{
 		}
 		
-		~_GlobalUniqueInstance()
+		~_priv_GlobalUniqueInstance()
 		{
 			m_file->unlock();
 			m_file->close();
 			File::deleteFile(m_file->getPath());
-			_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+			_priv_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
 			if (list) {
 				list->remove(m_name);
 			}
@@ -280,7 +280,7 @@ namespace slib
 		}
 		
 		String name = File::makeSafeFileName(_name);
-		_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+		_priv_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
 		if (!list) {
 			return sl_null;
 		}
@@ -288,7 +288,7 @@ namespace slib
 			return sl_null;
 		}
 		
-		Ref<_GlobalUniqueInstance> instance = new _GlobalUniqueInstance;
+		Ref<_priv_GlobalUniqueInstance> instance = new _priv_GlobalUniqueInstance;
 		if (instance.isNotNull()) {
 			String fileName = "/tmp/.slib_global_lock_" + name;
 			Ref<File> file = File::openForWrite(fileName);
@@ -312,7 +312,7 @@ namespace slib
 			return sl_false;
 		}
 		String name = File::makeSafeFileName(_name);
-		_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+		_priv_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
 		if (!list) {
 			return sl_false;
 		}

@@ -36,7 +36,7 @@ namespace slib
 		return _runOnUiThread();
 	}
 
-	void _Win32_processCustomMsgBox(WPARAM wParam, LPARAM lParam)
+	void _priv_Win32_processCustomMsgBox(WPARAM wParam, LPARAM lParam)
 	{
 		HWND hWndMsg = ::FindWindowW(NULL, L"CustomizedMsgBox");
 		if (hWndMsg == NULL) {
@@ -154,13 +154,13 @@ namespace slib
 		return _runOnUiThread();
 	}
 
-	struct _FileDialog_FilterW
+	struct _priv_FileDialog_FilterW
 	{
 		String16 title;
 		String16 patterns;
 	};
 
-	static int CALLBACK _FileDialog_BrowseDirCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM pData)
+	static int CALLBACK _priv_FileDialog_BrowseDirCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM pData)
 	{
 		switch (uMsg) {
 			case BFFM_INITIALIZED:
@@ -188,7 +188,7 @@ namespace slib
 					bi.lpszTitle = (LPWSTR)(_title.getData());
 				}
 				bi.ulFlags = BIF_NEWDIALOGSTYLE;
-				bi.lpfn = _FileDialog_BrowseDirCallback;
+				bi.lpfn = _priv_FileDialog_BrowseDirCallback;
 				String16 initialDir;
 				if (File::isDirectory(selectedPath)) {
 					initialDir = selectedPath;
@@ -216,9 +216,9 @@ namespace slib
 			ofn.hwndOwner = UIPlatform::getWindowHandle(parent.get());
 
 			sl_size lenSzFilters = 0;
-			CList<_FileDialog_FilterW> wfilters;
+			CList<_priv_FileDialog_FilterW> wfilters;
 			{
-				_FileDialog_FilterW wfilter;
+				_priv_FileDialog_FilterW wfilter;
 				ListLocker<Filter> list(filters);
 				for (sl_size i = 0; i < list.count; i++) {
 					wfilter.title = list[i].title;
@@ -235,7 +235,7 @@ namespace slib
 			{
 				sl_size pos = 0;
 				sl_size len;
-				ListElements<_FileDialog_FilterW> list(wfilters);
+				ListElements<_priv_FileDialog_FilterW> list(wfilters);
 				for (sl_size i = 0; i < list.count; i++) {
 					len = list[i].title.getLength();
 					Base::copyMemory(szFilters + pos, list[i].title.getData(), len * 2);

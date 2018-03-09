@@ -131,7 +131,7 @@ namespace slib
 	sl_uint32 _g_system_version_minor = 0;
 	sl_bool _g_system_flagInitVersion = sl_true;
 
-	void _Apple_initSystemVersion()
+	void _priv_Apple_initSystemVersion()
 	{
 		if (_g_system_flagInitVersion) {
 #if defined(SLIB_PLATFORM_IS_OSX)
@@ -177,19 +177,19 @@ namespace slib
 
 	String Apple::getSystemVersion()
 	{
-		_Apple_initSystemVersion();
+		_priv_Apple_initSystemVersion();
 		return _g_system_version;
 	}
 
 	sl_uint32 Apple::getSystemMajorVersion()
 	{
-		_Apple_initSystemVersion();
+		_priv_Apple_initSystemVersion();
 		return _g_system_version_major;
 	}
 
 	sl_uint32 Apple::getSystemMinorVersion()
 	{
-		_Apple_initSystemVersion();
+		_priv_Apple_initSystemVersion();
 		return _g_system_version_minor;
 	}
 

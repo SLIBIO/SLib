@@ -94,7 +94,7 @@ namespace slib
 				
 				[handle setOpaque:(view->isOpaque() ? YES : NO)];
 				
-				if (!([handle isKindOfClass:[Slib_iOS_ViewHandle class]])) {
+				if (!([handle isKindOfClass:[_priv_Slib_iOS_ViewHandle class]])) {
 					sl_real alpha = view->getAlpha();
 					if (alpha < 0.995f) {
 						[handle setAlpha: alpha];
@@ -507,14 +507,14 @@ namespace slib
 	Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		Slib_iOS_ViewHandle* handle = [[Slib_iOS_ViewHandle alloc] initWithFrame:frame];
+		_priv_Slib_iOS_ViewHandle* handle = [[_priv_Slib_iOS_ViewHandle alloc] initWithFrame:frame];
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
 	
 }
 
-@implementation Slib_iOS_ViewHandle
+@implementation _priv_Slib_iOS_ViewHandle
 
 - (void)drawRect:(CGRect)dirtyRect
 {

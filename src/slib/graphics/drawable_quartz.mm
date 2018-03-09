@@ -20,7 +20,7 @@
 namespace slib
 {
 
-	void _Drawable_DataProviderRelease(void *info, const void *data, size_t size)
+	void _priv_Drawable_DataProviderRelease(void *info, const void *data, size_t size)
 	{
 		Referable* ref = (Referable*)info;
 		ref->decreaseReference();
@@ -40,7 +40,7 @@ namespace slib
 		Ref<Drawable> ret;
 		Ref<Referable> refData = desc.ref;
 		refData->increaseReference();
-		CGDataProviderRef provider = CGDataProviderCreateWithData(refData.get(), desc.colors, (stride * height) << 2, _Drawable_DataProviderRelease);
+		CGDataProviderRef provider = CGDataProviderCreateWithData(refData.get(), desc.colors, (stride * height) << 2, _priv_Drawable_DataProviderRelease);
 		if (provider) {
 			CGColorSpaceRef colorSpaceRef = CGColorSpaceCreateDeviceRGB();
 			if (colorSpaceRef) {
@@ -73,7 +73,7 @@ namespace slib
 	}
 
 
-	class _Quartz_ImageDrawable : public Drawable
+	class _priv_Quartz_ImageDrawable : public Drawable
 	{
 		SLIB_DECLARE_OBJECT
 		
@@ -84,17 +84,17 @@ namespace slib
 		sl_bool m_flagFlipped;
 		
 	public:
-		_Quartz_ImageDrawable()
+		_priv_Quartz_ImageDrawable()
 		{
 		}
 		
-		~_Quartz_ImageDrawable()
+		~_priv_Quartz_ImageDrawable()
 		{
 			CGImageRelease(m_image);
 		}
 		
 	public:
-		static Ref<_Quartz_ImageDrawable> create(CGImageRef image, sl_bool flagFlipped)
+		static Ref<_priv_Quartz_ImageDrawable> create(CGImageRef image, sl_bool flagFlipped)
 		{
 			if (image) {
 				CGImageRetain(image);
@@ -102,7 +102,7 @@ namespace slib
 				if (width > 0) {
 					sl_int32 height = (sl_int32)(CGImageGetHeight(image));
 					if (height > 0) {
-						Ref<_Quartz_ImageDrawable> ret = new _Quartz_ImageDrawable();
+						Ref<_priv_Quartz_ImageDrawable> ret = new _priv_Quartz_ImageDrawable();
 						if (ret.isNotNull()) {
 							ret->m_image = image;
 							ret->m_width = width;
@@ -148,16 +148,16 @@ namespace slib
 		
 	};
 
-	SLIB_DEFINE_OBJECT(_Quartz_ImageDrawable, Drawable)
+	SLIB_DEFINE_OBJECT(_priv_Quartz_ImageDrawable, Drawable)
 
 	Ref<Drawable> GraphicsPlatform::createImageDrawable(CGImageRef image, sl_bool flagFlipped)
 	{
-		return _Quartz_ImageDrawable::create(image, flagFlipped);
+		return _priv_Quartz_ImageDrawable::create(image, flagFlipped);
 	}
 
 	CGImageRef GraphicsPlatform::getImageDrawableHandle(Drawable* _drawable)
 	{
-		if (_Quartz_ImageDrawable* drawable = CastInstance<_Quartz_ImageDrawable>(_drawable)) {
+		if (_priv_Quartz_ImageDrawable* drawable = CastInstance<_priv_Quartz_ImageDrawable>(_drawable)) {
 			return drawable->m_image;
 		}
 		return NULL;

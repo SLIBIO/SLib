@@ -1135,12 +1135,12 @@ namespace slib
 		}
 	}
 
-	class _ViewPagePopupBackground : public ViewGroup
+	class _priv_ViewPagePopupBackground : public ViewGroup
 	{
 		SLIB_DECLARE_OBJECT
 	};
 
-	SLIB_DEFINE_OBJECT(_ViewPagePopupBackground, ViewGroup)
+	SLIB_DEFINE_OBJECT(_priv_ViewPagePopupBackground, ViewGroup)
 
 	void ViewPage::_openPopup(const Ref<View>& parent, Transition transition, sl_bool flagFillParentBackground)
 	{
@@ -1153,7 +1153,7 @@ namespace slib
 		
 		Ref<View> viewAdd;
 		if (flagFillParentBackground) {
-			Ref<_ViewPagePopupBackground> back = new _ViewPagePopupBackground;
+			Ref<_priv_ViewPagePopupBackground> back = new _priv_ViewPagePopupBackground;
 			Color color = m_popupBackgroundColor;
 			if (color.isZero()) {
 				color = getGlobalPopupBackgroundColor();
@@ -1222,7 +1222,7 @@ namespace slib
 		
 		Ref<View> parent = getParent();
 		if (parent.isNotNull()) {
-			if (IsInstanceOf<_ViewPagePopupBackground>(parent)) {
+			if (IsInstanceOf<_priv_ViewPagePopupBackground>(parent)) {
 				parent->setBackgroundColor(Color::zero());
 			}
 		}
@@ -1255,7 +1255,7 @@ namespace slib
 			
 			Ref<View> parent = getParent();
 			if (parent.isNotNull()) {
-				if (IsInstanceOf<_ViewPagePopupBackground>(parent)) {
+				if (IsInstanceOf<_priv_ViewPagePopupBackground>(parent)) {
 					Ref<View> parent2 = parent->getParent();
 					if (parent2.isNotNull()) {
 						parent2->removeChild(parent);

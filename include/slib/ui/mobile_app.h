@@ -95,6 +95,8 @@ namespace slib
 		virtual void onResize(sl_ui_len width, sl_ui_len height);
 		
 	public:
+		void dispatchStart() override;
+		
 		virtual void dispatchPause();
 		
 		static void dispatchPauseToApp();
@@ -142,6 +144,8 @@ namespace slib
 
 	protected:
 		void onResize(sl_ui_len width, sl_ui_len height) override;
+		
+		void onClose(UIEvent* ev) override;
 		
 	};
 

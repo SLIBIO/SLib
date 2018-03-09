@@ -171,12 +171,12 @@ namespace slib
 		m_flagCrashRecoverySupport = flagSupport;
 	}
 
-	typedef HashMap<String, String> _Application_EnvList;
-	SLIB_SAFE_STATIC_GETTER(_Application_EnvList, _Application_getEnvList, _Application_EnvList::create())
+	typedef HashMap<String, String> _priv_Application_EnvList;
+	SLIB_SAFE_STATIC_GETTER(_priv_Application_EnvList, _priv_Application_getEnvList, _priv_Application_EnvList::create())
 
 	void Application::setEnvironmentPath(const String& key, const String& path)
 	{
-		HashMap<String, String>* envMap = _Application_getEnvList();
+		HashMap<String, String>* envMap = _priv_Application_getEnvList();
 		if (envMap) {
 			envMap->put(key, path);
 		}
@@ -184,7 +184,7 @@ namespace slib
 
 	String Application::getEnvironmentPath(const String& key)
 	{
-		HashMap<String, String>* envMap = _Application_getEnvList();
+		HashMap<String, String>* envMap = _priv_Application_getEnvList();
 		if (envMap) {
 			return envMap->getValue(key, String::null());
 		}
@@ -210,22 +210,22 @@ namespace slib
 		return path;
 	}
 
-	SLIB_SAFE_STATIC_GETTER(String, _Application_getAppPath, System::getApplicationPath())
+	SLIB_SAFE_STATIC_GETTER(String, _priv_Application_getAppPath, System::getApplicationPath())
 
 	String Application::getApplicationPath()
 	{
-		String* s = _Application_getAppPath();
+		String* s = _priv_Application_getAppPath();
 		if (!s) {
 			return sl_null;
 		}
 		return *s;
 	}
 
-	SLIB_SAFE_STATIC_GETTER(String, _Application_getAppDir, System::getApplicationDirectory())
+	SLIB_SAFE_STATIC_GETTER(String, _priv_Application_getAppDir, System::getApplicationDirectory())
 
 	String Application::getApplicationDirectory()
 	{
-		String* s = _Application_getAppDir();
+		String* s = _priv_Application_getAppDir();
 		if (!s) {
 			return sl_null;
 		}
@@ -234,7 +234,7 @@ namespace slib
 
 	void Application::setApplicationDirectory(const String& path)
 	{
-		String* s = _Application_getAppDir();
+		String* s = _priv_Application_getAppDir();
 		if (s) {
 			*s = path;
 		}

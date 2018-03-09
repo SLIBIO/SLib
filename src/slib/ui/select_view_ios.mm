@@ -16,7 +16,7 @@
 
 #include "view_ios.h"
 
-@interface _Slib_iOS_SelectView : UITextField<UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate>
+@interface _priv_Slib_iOS_SelectView : UITextField<UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate>
 {
 	@public UIPickerView* m_picker;
 	
@@ -28,7 +28,7 @@
 
 namespace slib
 {
-	class _SelectView : public SelectView
+	class _priv_SelectView : public SelectView
 	{
 	public:
 		sl_uint32 _getItemsCount()
@@ -42,14 +42,14 @@ namespace slib
 			return Apple::getNSStringFromString(s);
 		}
 		
-		void _onSelectItem(_Slib_iOS_SelectView* v, sl_uint32 row)
+		void _onSelectItem(_priv_Slib_iOS_SelectView* v, sl_uint32 row)
 		{
 			m_indexSelected = row;
 			v.text = _getItemTitle(row);
 			dispatchSelectItem(row);
 		}
 		
-		void _onStartSelection(_Slib_iOS_SelectView* v)
+		void _onStartSelection(_priv_Slib_iOS_SelectView* v)
 		{
 			sl_uint32 n = m_indexSelected;
 			v->m_selectionBefore = n;
@@ -58,12 +58,12 @@ namespace slib
 			});
 		}
 		
-		void _onCancelSelection(_Slib_iOS_SelectView* v)
+		void _onCancelSelection(_priv_Slib_iOS_SelectView* v)
 		{
 			_onSelectItem(v, v->m_selectionBefore);
 		}
 		
-		void _selectItem(_Slib_iOS_SelectView* v, sl_uint32 row)
+		void _selectItem(_priv_Slib_iOS_SelectView* v, sl_uint32 row)
 		{
 			v.text = _getItemTitle(row);
 			[v->m_picker selectRow:row inComponent:0 animated:NO];
@@ -73,9 +73,9 @@ namespace slib
 	Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_iOS_SelectView* handle = [[_Slib_iOS_SelectView alloc] initWithFrame:frame];
+		_priv_Slib_iOS_SelectView* handle = [[_priv_Slib_iOS_SelectView alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((_SelectView*)this)->_selectItem(handle, m_indexSelected);
+			((_priv_SelectView*)this)->_selectItem(handle, m_indexSelected);
 			
 			Ref<Font> font = getFont();
 			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
@@ -101,9 +101,9 @@ namespace slib
 		}
 		
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
-			_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
-			((_SelectView*)this)->_selectItem(v, index);
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
+			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
+			((_priv_SelectView*)this)->_selectItem(v, index);
 		}
 	}
 	
@@ -117,8 +117,8 @@ namespace slib
 		}
 		
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
-			_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
+			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
 			[v->m_picker reloadAllComponents];
 		}
 	}
@@ -133,8 +133,8 @@ namespace slib
 		}
 		
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
-			_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
+			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
 			[v->m_picker reloadAllComponents];
 		}
 	}
@@ -150,8 +150,8 @@ namespace slib
 		}
 		
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
-			_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
+			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
 			[v->m_picker reloadAllComponents];
 		}
 	}
@@ -167,8 +167,8 @@ namespace slib
 		}
 		
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
-			_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
+			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
 			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
 			if (hFont != nil) {
 				[v setFont:hFont];
@@ -180,13 +180,13 @@ namespace slib
 #define DROP_ICON_WIDTH 20
 #define DROP_ICON_HEIGHT 12
 
-@interface _Slib_iOS_SelectView_DropIcon : UIView
+@interface _priv_Slib_iOS_SelectView_DropIcon : UIView
 {
-	@public __weak _Slib_iOS_SelectView* parent;
+	@public __weak _priv_Slib_iOS_SelectView* parent;
 }
 @end
 
-@implementation _Slib_iOS_SelectView_DropIcon
+@implementation _priv_Slib_iOS_SelectView_DropIcon
 - (id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -223,7 +223,7 @@ namespace slib
 }
 @end
 
-@implementation _Slib_iOS_SelectView
+@implementation _priv_Slib_iOS_SelectView
 -(id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -240,7 +240,7 @@ namespace slib
 		[[self valueForKey:@"textInputTraits"] setValue:[UIColor clearColor] forKey:@"insertionPointColor"];
 		
 		// add icon
-		_Slib_iOS_SelectView_DropIcon* icon = [[_Slib_iOS_SelectView_DropIcon alloc] initWithFrame:(CGRectMake(0, 0, DROP_ICON_WIDTH, DROP_ICON_HEIGHT))];
+		_priv_Slib_iOS_SelectView_DropIcon* icon = [[_priv_Slib_iOS_SelectView_DropIcon alloc] initWithFrame:(CGRectMake(0, 0, DROP_ICON_WIDTH, DROP_ICON_HEIGHT))];
 		icon->parent = self;
 		self.rightView =  icon;
 		self.rightViewMode = UITextFieldViewModeAlways;
@@ -277,7 +277,7 @@ namespace slib
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
+		if (slib::_priv_SelectView* _view = slib::CastInstance<slib::_priv_SelectView>(view.get())) {
 			_view->_onSelectItem(self, (sl_uint32)row);
 		}
 	}
@@ -288,7 +288,7 @@ namespace slib
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
+		if (slib::_priv_SelectView* _view = slib::CastInstance<slib::_priv_SelectView>(view.get())) {
 			return (NSInteger)(_view->_getItemsCount());
 		}
 	}
@@ -300,7 +300,7 @@ namespace slib
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
+		if (slib::_priv_SelectView* _view = slib::CastInstance<slib::_priv_SelectView>(view.get())) {
 			return _view->_getItemTitle((sl_uint32)row);
 		}
 	}
@@ -312,7 +312,7 @@ namespace slib
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
+		if (slib::_priv_SelectView* _view = slib::CastInstance<slib::_priv_SelectView>(view.get())) {
 			if ((NSInteger)(_view->_getItemsCount()) > 0) {
 				return YES;
 			}
@@ -327,7 +327,7 @@ namespace slib
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
+		if (slib::_priv_SelectView* _view = slib::CastInstance<slib::_priv_SelectView>(view.get())) {
 			_view->_onStartSelection(self);
 		}
 	}
@@ -355,7 +355,7 @@ namespace slib
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
+		if (slib::_priv_SelectView* _view = slib::CastInstance<slib::_priv_SelectView>(view.get())) {
 			_view->_onCancelSelection(self);
 		}
 	}

@@ -12,19 +12,19 @@ namespace slib
 {
 	
 	template <class T>
-	class _SafeStaticDestructor
+	class _priv_SafeStaticDestructor
 	{
 	public:
 		T* object;
 		volatile sl_bool flagFreed;
 
 	public:
-		SLIB_INLINE _SafeStaticDestructor(T* p)
-		: object(p), flagFreed(sl_false)
+		SLIB_INLINE  _priv_SafeStaticDestructor(T* p)
+		 : object(p), flagFreed(sl_false)
 		{
 		}
 
-		~_SafeStaticDestructor()
+		~ _priv_SafeStaticDestructor()
 		{
 			flagFreed = sl_true;
 			object->~T();

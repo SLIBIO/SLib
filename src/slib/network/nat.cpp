@@ -208,17 +208,17 @@ namespace slib
 		return sn;
 	}
 
-	_NatTablePort::_NatTablePort()
+	_priv_NatTablePort::_priv_NatTablePort()
 	{
 		flagActive = sl_false;
 		timeLastAccess.setZero();
 	}
 
-	_NatTablePort::~_NatTablePort()
+	_priv_NatTablePort::~_priv_NatTablePort()
 	{
 	}
 
-	_NatTableMapping::_NatTableMapping()
+	_priv_NatTableMapping::_priv_NatTableMapping()
 	{
 		m_ports = sl_null;
 		m_nPorts = 0;
@@ -228,19 +228,19 @@ namespace slib
 		m_portEnd = 0;
 	}
 
-	_NatTableMapping::~_NatTableMapping()
+	_priv_NatTableMapping::~_priv_NatTableMapping()
 	{
-		NewHelper<_NatTablePort>::free(m_ports, m_nPorts);
+		NewHelper<_priv_NatTablePort>::free(m_ports, m_nPorts);
 	}
 
-	void _NatTableMapping::setup(sl_uint16 portBegin, sl_uint16 portEnd)
+	void _priv_NatTableMapping::setup(sl_uint16 portBegin, sl_uint16 portEnd)
 	{
 		ObjectLocker lock(this);
 
 		m_mapPorts.removeAll_NoLock();
 
 		if (m_ports) {
-			NewHelper<_NatTablePort>::free(m_ports, m_nPorts);
+			NewHelper<_priv_NatTablePort>::free(m_ports, m_nPorts);
 			m_ports = sl_null;
 		}
 		m_pos = 0;
@@ -250,11 +250,11 @@ namespace slib
 		m_portEnd = portEnd;
 		if (portEnd >= portBegin) {
 			m_nPorts = portEnd - portBegin + 1;
-			m_ports = NewHelper<_NatTablePort>::create(m_nPorts);
+			m_ports = NewHelper<_priv_NatTablePort>::create(m_nPorts);
 		}
 	}
 
-	sl_bool _NatTableMapping::mapToExternalPort(const SocketAddress& address, sl_uint16& _port)
+	sl_bool _priv_NatTableMapping::mapToExternalPort(const SocketAddress& address, sl_uint16& _port)
 	{
 		ObjectLocker lock(this);
 
@@ -316,7 +316,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool _NatTableMapping::mapToInternalAddress(sl_uint16 port, SocketAddress& address)
+	sl_bool _priv_NatTableMapping::mapToInternalAddress(sl_uint16 port, SocketAddress& address)
 	{
 		ObjectLocker lock(this);
 		if (!m_ports) {

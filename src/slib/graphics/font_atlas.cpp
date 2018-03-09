@@ -127,13 +127,13 @@ namespace slib
 		return sl_null;
 	}
 
-	typedef CHashMap< String, WeakRef<FontAtlas> > _FontAtlasMap;
-	SLIB_SAFE_STATIC_GETTER(_FontAtlasMap, _FontAtlas_getShared)
+	typedef CHashMap< String, WeakRef<FontAtlas> > _priv_FontAtlasMap;
+	SLIB_SAFE_STATIC_GETTER(_priv_FontAtlasMap, _priv_FontAtlas_getShared)
 
 	Ref<FontAtlas> FontAtlas::getShared(const Ref<Font>& font)
 	{
 		if (font.isNotNull()) {
-			_FontAtlasMap* map = _FontAtlas_getShared();
+			_priv_FontAtlasMap* map = _priv_FontAtlas_getShared();
 			if (map) {
 				String fontFamily = font->getFamilyName();
 				sl_real fontSize = SLIB_FONT_SIZE_PRECISION_APPLY(font->getSize());
@@ -166,7 +166,7 @@ namespace slib
 
 	void FontAtlas::removeAllShared()
 	{
-		_FontAtlasMap* map = _FontAtlas_getShared();
+		_priv_FontAtlasMap* map = _priv_FontAtlas_getShared();
 		if (map) {
 			map->removeAll();
 		}

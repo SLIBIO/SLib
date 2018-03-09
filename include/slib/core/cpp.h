@@ -81,10 +81,10 @@ namespace slib
 	private:
 		template<class T> static void _test_implicit(T);
 
-		template<class _FROM, class _TO, class _T = decltype(_test_implicit<_TO>(DeclaredValue<_FROM>()))>
+		template<class OTHER_FROM, class OTHER_TO, class OTHER_T = decltype(_test_implicit<OTHER_TO>(DeclaredValue<OTHER_FROM>()))>
 		static ConstValue<bool, true> _test(int);
 
-		template <class _FROM, class _TO>
+		template <class OTHER_FROM, class OTHER_TO>
 		static ConstValue<bool, false> _test(...);
 
 	public:

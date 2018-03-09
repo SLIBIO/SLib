@@ -16,7 +16,7 @@
 
 #include "view_ios.h"
 
-@interface _Slib_iOS_PickerView : UIPickerView<UIPickerViewDelegate, UIPickerViewDataSource>
+@interface _priv_Slib_iOS_PickerView : UIPickerView<UIPickerViewDelegate, UIPickerViewDataSource>
 {
 	@public sl_uint32 m_selectionBefore;
 	
@@ -30,7 +30,7 @@
 
 namespace slib
 {
-	class _PickerView : public PickerView
+	class _priv_PickerView : public PickerView
 	{
 	public:
 		sl_uint32 _getItemsCount()
@@ -44,13 +44,13 @@ namespace slib
 			return Apple::getNSStringFromString(s);
 		}
 		
-		void _onSelectItem(_Slib_iOS_PickerView* v, sl_uint32 row)
+		void _onSelectItem(_priv_Slib_iOS_PickerView* v, sl_uint32 row)
 		{
 			m_indexSelected = row;
 			dispatchSelectItem(row);
 		}
 		
-		void _selectItem(_Slib_iOS_PickerView* v, sl_uint32 row)
+		void _selectItem(_priv_Slib_iOS_PickerView* v, sl_uint32 row)
 		{
 			[v selectRow:row inComponent:0 animated:NO];
 		}
@@ -59,7 +59,7 @@ namespace slib
 	Ref<ViewInstance> PickerView::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_iOS_PickerView* handle = [[_Slib_iOS_PickerView alloc] initWithFrame:frame];
+		_priv_Slib_iOS_PickerView* handle = [[_priv_Slib_iOS_PickerView alloc] initWithFrame:frame];
 		if (handle != nil) {
 			Ref<Font> font = getFont();
 			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
@@ -70,7 +70,7 @@ namespace slib
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		if (handle != nil) {
-			((_PickerView*)this)->_selectItem(handle, m_indexSelected);
+			((_priv_PickerView*)this)->_selectItem(handle, m_indexSelected);
 		}
 		return ret;
 	}
@@ -89,9 +89,9 @@ namespace slib
 		}
 		
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
-			_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
-			((_PickerView*)this)->_selectItem(v, index);
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_PickerView class]]) {
+			_priv_Slib_iOS_PickerView* v = (_priv_Slib_iOS_PickerView*)handle;
+			((_priv_PickerView*)this)->_selectItem(v, index);
 		}
 	}
 	
@@ -105,10 +105,10 @@ namespace slib
 		}
 		
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
-			_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_PickerView class]]) {
+			_priv_Slib_iOS_PickerView* v = (_priv_Slib_iOS_PickerView*)handle;
 			[v reloadAllComponents];
-			((_PickerView*)this)->_selectItem(v, m_indexSelected);
+			((_priv_PickerView*)this)->_selectItem(v, m_indexSelected);
 		}
 	}
 	
@@ -122,10 +122,10 @@ namespace slib
 		}
 		
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
-			_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_PickerView class]]) {
+			_priv_Slib_iOS_PickerView* v = (_priv_Slib_iOS_PickerView*)handle;
 			[v reloadAllComponents];
-			((_PickerView*)this)->_selectItem(v, m_indexSelected);
+			((_priv_PickerView*)this)->_selectItem(v, m_indexSelected);
 		}
 	}
 	
@@ -140,8 +140,8 @@ namespace slib
 		}
 		
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
-			_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_PickerView class]]) {
+			_priv_Slib_iOS_PickerView* v = (_priv_Slib_iOS_PickerView*)handle;
 			[v reloadAllComponents];
 		}
 	}
@@ -157,8 +157,8 @@ namespace slib
 		}
 		
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
-			_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_PickerView class]]) {
+			_priv_Slib_iOS_PickerView* v = (_priv_Slib_iOS_PickerView*)handle;
 			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
 			if (hFont != nil) {
 				v->m_font = hFont;
@@ -168,7 +168,7 @@ namespace slib
 	}	
 }
 
-@implementation _Slib_iOS_PickerView
+@implementation _priv_Slib_iOS_PickerView
 -(id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -194,7 +194,7 @@ namespace slib
 {
 	slib::Ref<slib::PickerView> view = m_view;
 	if (view.isNotNull()) {
-		((slib::_PickerView*)(view.get()))->_onSelectItem(self, (sl_uint32)row);
+		((slib::_priv_PickerView*)(view.get()))->_onSelectItem(self, (sl_uint32)row);
 	}
 }
 
@@ -202,7 +202,7 @@ namespace slib
 {
 	slib::Ref<slib::PickerView> view = m_view;
 	if (view.isNotNull()) {
-		return (NSInteger)(((slib::_PickerView*)(view.get()))->_getItemsCount());
+		return (NSInteger)(((slib::_priv_PickerView*)(view.get()))->_getItemsCount());
 	}
 	return 0;
 }
@@ -216,7 +216,7 @@ namespace slib
 	}
 	slib::Ref<slib::PickerView> picker = m_view;
 	if (picker.isNotNull()) {
-		label.text = ((slib::_PickerView*)(picker.get()))->_getItemTitle((sl_uint32)row);
+		label.text = ((slib::_priv_PickerView*)(picker.get()))->_getItemTitle((sl_uint32)row);
 	}
 	return label;
 }

@@ -612,7 +612,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 		return ret;
 	}
 
-	class _UIKeyNameMapper
+	class _priv_UIKeyNameMapper
 	{
 	private:
 		HashTable<sl_uint32, String> mapLong;
@@ -622,14 +622,14 @@ sl_bool UIEvent::is##NAME##Key() const \
 		
 	public:
 
-#define _MAP_KEY(NAME) \
+#define PRIV_MAP_KEY(NAME) \
 		{ \
 			SLIB_STATIC_STRING(_s, #NAME); \
 			mapLong.put((sl_uint32)(Keycode::NAME), _s); \
 			mapShort.put((sl_uint32)(Keycode::NAME), _s); \
 			mapName.put(_s.toLower(), (sl_uint32)(Keycode::NAME)); \
 		}
-#define _MAP_KEY2(NAME, SHORT_NAME) \
+#define PRIV_MAP_KEY2(NAME, SHORT_NAME) \
 		{ \
 			SLIB_STATIC_STRING(_s1, #NAME); \
 			mapLong.put((sl_uint32)(Keycode::NAME), _s1); \
@@ -639,154 +639,154 @@ sl_bool UIEvent::is##NAME##Key() const \
 			mapName.put(_s2.toLower(), (sl_uint32)(Keycode::NAME)); \
 		}
 
-		_UIKeyNameMapper()
+		_priv_UIKeyNameMapper()
 		{
 			SLIB_STATIC_STRING(_invalid, "Invalid")
 			nameInvalid = _invalid;
-			_MAP_KEY(Unknown);
+			PRIV_MAP_KEY(Unknown);
 			
-			_MAP_KEY2(Backspace, "Back")
-			_MAP_KEY(Tab)
-			_MAP_KEY(Enter)
-			_MAP_KEY2(Escape, "Esc")
+			PRIV_MAP_KEY2(Backspace, "Back")
+			PRIV_MAP_KEY(Tab)
+			PRIV_MAP_KEY(Enter)
+			PRIV_MAP_KEY2(Escape, "Esc")
 			
-			_MAP_KEY(Space)
-			_MAP_KEY2(Grave, "`")
-			_MAP_KEY2(Equal, "=")
-			_MAP_KEY2(Semicolon, ";")
-			_MAP_KEY2(Backslash, "\\")
-			_MAP_KEY2(LeftBaracket, "[")
-			_MAP_KEY2(RightBaracket, "]")
-			_MAP_KEY2(Quote, "'")
-			_MAP_KEY2(Comma, ",")
-			_MAP_KEY2(Minus, "-")
-			_MAP_KEY2(Period, ".")
-			_MAP_KEY2(Divide, "/")
+			PRIV_MAP_KEY(Space)
+			PRIV_MAP_KEY2(Grave, "`")
+			PRIV_MAP_KEY2(Equal, "=")
+			PRIV_MAP_KEY2(Semicolon, ";")
+			PRIV_MAP_KEY2(Backslash, "\\")
+			PRIV_MAP_KEY2(LeftBaracket, "[")
+			PRIV_MAP_KEY2(RightBaracket, "]")
+			PRIV_MAP_KEY2(Quote, "'")
+			PRIV_MAP_KEY2(Comma, ",")
+			PRIV_MAP_KEY2(Minus, "-")
+			PRIV_MAP_KEY2(Period, ".")
+			PRIV_MAP_KEY2(Divide, "/")
 			
-			_MAP_KEY2(Num0, "0")
-			_MAP_KEY2(Num1, "1")
-			_MAP_KEY2(Num2, "2")
-			_MAP_KEY2(Num3, "3")
-			_MAP_KEY2(Num4, "4")
-			_MAP_KEY2(Num5, "5")
-			_MAP_KEY2(Num6, "6")
-			_MAP_KEY2(Num7, "7")
-			_MAP_KEY2(Num8, "8")
-			_MAP_KEY2(Num9, "9")
+			PRIV_MAP_KEY2(Num0, "0")
+			PRIV_MAP_KEY2(Num1, "1")
+			PRIV_MAP_KEY2(Num2, "2")
+			PRIV_MAP_KEY2(Num3, "3")
+			PRIV_MAP_KEY2(Num4, "4")
+			PRIV_MAP_KEY2(Num5, "5")
+			PRIV_MAP_KEY2(Num6, "6")
+			PRIV_MAP_KEY2(Num7, "7")
+			PRIV_MAP_KEY2(Num8, "8")
+			PRIV_MAP_KEY2(Num9, "9")
 			
-			_MAP_KEY(A)
-			_MAP_KEY(B)
-			_MAP_KEY(C)
-			_MAP_KEY(D)
-			_MAP_KEY(E)
-			_MAP_KEY(F)
-			_MAP_KEY(G)
-			_MAP_KEY(H)
-			_MAP_KEY(I)
-			_MAP_KEY(J)
-			_MAP_KEY(K)
-			_MAP_KEY(L)
-			_MAP_KEY(M)
-			_MAP_KEY(N)
-			_MAP_KEY(O)
-			_MAP_KEY(P)
-			_MAP_KEY(Q)
-			_MAP_KEY(R)
-			_MAP_KEY(S)
-			_MAP_KEY(T)
-			_MAP_KEY(U)
-			_MAP_KEY(V)
-			_MAP_KEY(W)
-			_MAP_KEY(X)
-			_MAP_KEY(Y)
-			_MAP_KEY(Z)
+			PRIV_MAP_KEY(A)
+			PRIV_MAP_KEY(B)
+			PRIV_MAP_KEY(C)
+			PRIV_MAP_KEY(D)
+			PRIV_MAP_KEY(E)
+			PRIV_MAP_KEY(F)
+			PRIV_MAP_KEY(G)
+			PRIV_MAP_KEY(H)
+			PRIV_MAP_KEY(I)
+			PRIV_MAP_KEY(J)
+			PRIV_MAP_KEY(K)
+			PRIV_MAP_KEY(L)
+			PRIV_MAP_KEY(M)
+			PRIV_MAP_KEY(N)
+			PRIV_MAP_KEY(O)
+			PRIV_MAP_KEY(P)
+			PRIV_MAP_KEY(Q)
+			PRIV_MAP_KEY(R)
+			PRIV_MAP_KEY(S)
+			PRIV_MAP_KEY(T)
+			PRIV_MAP_KEY(U)
+			PRIV_MAP_KEY(V)
+			PRIV_MAP_KEY(W)
+			PRIV_MAP_KEY(X)
+			PRIV_MAP_KEY(Y)
+			PRIV_MAP_KEY(Z)
 			
-			_MAP_KEY(Numpad0)
-			_MAP_KEY(Numpad1)
-			_MAP_KEY(Numpad2)
-			_MAP_KEY(Numpad3)
-			_MAP_KEY(Numpad4)
-			_MAP_KEY(Numpad5)
-			_MAP_KEY(Numpad6)
-			_MAP_KEY(Numpad7)
-			_MAP_KEY(Numpad8)
-			_MAP_KEY(Numpad9)
+			PRIV_MAP_KEY(Numpad0)
+			PRIV_MAP_KEY(Numpad1)
+			PRIV_MAP_KEY(Numpad2)
+			PRIV_MAP_KEY(Numpad3)
+			PRIV_MAP_KEY(Numpad4)
+			PRIV_MAP_KEY(Numpad5)
+			PRIV_MAP_KEY(Numpad6)
+			PRIV_MAP_KEY(Numpad7)
+			PRIV_MAP_KEY(Numpad8)
+			PRIV_MAP_KEY(Numpad9)
 			
-			_MAP_KEY2(NumpadDivide, "Numpad/")
-			_MAP_KEY2(NumpadMultiply, "Numpad*")
-			_MAP_KEY2(NumpadMinus, "Numpad-")
-			_MAP_KEY2(NumpadPlus, "Numpad+")
-			_MAP_KEY2(NumpadEnter, "NumpadEnter")
-			_MAP_KEY2(NumpadDecimal, "Numpad.")
+			PRIV_MAP_KEY2(NumpadDivide, "Numpad/")
+			PRIV_MAP_KEY2(NumpadMultiply, "Numpad*")
+			PRIV_MAP_KEY2(NumpadMinus, "Numpad-")
+			PRIV_MAP_KEY2(NumpadPlus, "Numpad+")
+			PRIV_MAP_KEY2(NumpadEnter, "NumpadEnter")
+			PRIV_MAP_KEY2(NumpadDecimal, "Numpad.")
 			
-			_MAP_KEY(F1)
-			_MAP_KEY(F2)
-			_MAP_KEY(F3)
-			_MAP_KEY(F4)
-			_MAP_KEY(F5)
-			_MAP_KEY(F6)
-			_MAP_KEY(F7)
-			_MAP_KEY(F8)
-			_MAP_KEY(F9)
-			_MAP_KEY(F10)
-			_MAP_KEY(F11)
-			_MAP_KEY(F12)
+			PRIV_MAP_KEY(F1)
+			PRIV_MAP_KEY(F2)
+			PRIV_MAP_KEY(F3)
+			PRIV_MAP_KEY(F4)
+			PRIV_MAP_KEY(F5)
+			PRIV_MAP_KEY(F6)
+			PRIV_MAP_KEY(F7)
+			PRIV_MAP_KEY(F8)
+			PRIV_MAP_KEY(F9)
+			PRIV_MAP_KEY(F10)
+			PRIV_MAP_KEY(F11)
+			PRIV_MAP_KEY(F12)
 			
-			_MAP_KEY2(PageUp, "PgUp")
-			_MAP_KEY2(PageDown, "PgDn")
-			_MAP_KEY(Home)
-			_MAP_KEY(End)
-			_MAP_KEY(Left)
-			_MAP_KEY(Up)
-			_MAP_KEY(Right)
-			_MAP_KEY(Down)
-			_MAP_KEY2(PrintScreen, "PrtSc")
-			_MAP_KEY2(Insert, "Ins")
-			_MAP_KEY2(Delete, "Del")
-			_MAP_KEY(Sleep)
-			_MAP_KEY(Pause)
+			PRIV_MAP_KEY2(PageUp, "PgUp")
+			PRIV_MAP_KEY2(PageDown, "PgDn")
+			PRIV_MAP_KEY(Home)
+			PRIV_MAP_KEY(End)
+			PRIV_MAP_KEY(Left)
+			PRIV_MAP_KEY(Up)
+			PRIV_MAP_KEY(Right)
+			PRIV_MAP_KEY(Down)
+			PRIV_MAP_KEY2(PrintScreen, "PrtSc")
+			PRIV_MAP_KEY2(Insert, "Ins")
+			PRIV_MAP_KEY2(Delete, "Del")
+			PRIV_MAP_KEY(Sleep)
+			PRIV_MAP_KEY(Pause)
 			
-			_MAP_KEY(GoHome)
-			_MAP_KEY(GoMenu)
-			_MAP_KEY(GoBack)
-			_MAP_KEY(Camera)
-			_MAP_KEY(VolumeMute)
-			_MAP_KEY(VolumeDown)
-			_MAP_KEY(VolumeUp)
-			_MAP_KEY(MediaPrev)
-			_MAP_KEY(MediaNext)
-			_MAP_KEY(MediaPause)
-			_MAP_KEY(MediaStop)
-			_MAP_KEY2(PhoneStar, "Dial*")
-			_MAP_KEY2(PhonePound, "Dial#")
+			PRIV_MAP_KEY(GoHome)
+			PRIV_MAP_KEY(GoMenu)
+			PRIV_MAP_KEY(GoBack)
+			PRIV_MAP_KEY(Camera)
+			PRIV_MAP_KEY(VolumeMute)
+			PRIV_MAP_KEY(VolumeDown)
+			PRIV_MAP_KEY(VolumeUp)
+			PRIV_MAP_KEY(MediaPrev)
+			PRIV_MAP_KEY(MediaNext)
+			PRIV_MAP_KEY(MediaPause)
+			PRIV_MAP_KEY(MediaStop)
+			PRIV_MAP_KEY2(PhoneStar, "Dial*")
+			PRIV_MAP_KEY2(PhonePound, "Dial#")
 
-			_MAP_KEY2(LeftShift, "LShift")
-			_MAP_KEY2(RightShift, "RShift")
-			_MAP_KEY2(LeftControl, "LCtrl")
-			_MAP_KEY2(RightControl, "RCtrl")
+			PRIV_MAP_KEY2(LeftShift, "LShift")
+			PRIV_MAP_KEY2(RightShift, "RShift")
+			PRIV_MAP_KEY2(LeftControl, "LCtrl")
+			PRIV_MAP_KEY2(RightControl, "RCtrl")
 #if defined(SLIB_PLATFORM_IS_APPLE)
-			_MAP_KEY2(LeftAlt, "LAlt")
-			_MAP_KEY2(RightAlt, "RAlt")
-			_MAP_KEY2(LeftWin, "LWin")
-			_MAP_KEY2(RightWin, "RWin")
-			_MAP_KEY2(LeftOption, "LAlt")
-			_MAP_KEY2(RightOption, "RAlt")
-			_MAP_KEY2(LeftCommand, "LCmd")
-			_MAP_KEY2(RightCommand, "RCmd")
+			PRIV_MAP_KEY2(LeftAlt, "LAlt")
+			PRIV_MAP_KEY2(RightAlt, "RAlt")
+			PRIV_MAP_KEY2(LeftWin, "LWin")
+			PRIV_MAP_KEY2(RightWin, "RWin")
+			PRIV_MAP_KEY2(LeftOption, "LAlt")
+			PRIV_MAP_KEY2(RightOption, "RAlt")
+			PRIV_MAP_KEY2(LeftCommand, "LCmd")
+			PRIV_MAP_KEY2(RightCommand, "RCmd")
 #else
-			_MAP_KEY2(LeftOption, "LAlt")
-			_MAP_KEY2(RightOption, "RAlt")
-			_MAP_KEY2(LeftCommand, "LCmd")
-			_MAP_KEY2(RightCommand, "RCmd")
-			_MAP_KEY2(LeftAlt, "LAlt")
-			_MAP_KEY2(RightAlt, "RAlt")
-			_MAP_KEY2(LeftWin, "LWin")
-			_MAP_KEY2(RightWin, "RWin")
+			PRIV_MAP_KEY2(LeftOption, "LAlt")
+			PRIV_MAP_KEY2(RightOption, "RAlt")
+			PRIV_MAP_KEY2(LeftCommand, "LCmd")
+			PRIV_MAP_KEY2(RightCommand, "RCmd")
+			PRIV_MAP_KEY2(LeftAlt, "LAlt")
+			PRIV_MAP_KEY2(RightAlt, "RAlt")
+			PRIV_MAP_KEY2(LeftWin, "LWin")
+			PRIV_MAP_KEY2(RightWin, "RWin")
 #endif
-			_MAP_KEY(CapsLock)
-			_MAP_KEY(ScrollLock)
-			_MAP_KEY(NumLock)
-			_MAP_KEY(ContextMenu)
+			PRIV_MAP_KEY(CapsLock)
+			PRIV_MAP_KEY(ScrollLock)
+			PRIV_MAP_KEY(NumLock)
+			PRIV_MAP_KEY(ContextMenu)
 
 		}
 		
@@ -816,11 +816,11 @@ sl_bool UIEvent::is##NAME##Key() const \
 		
 	};
 
-	SLIB_SAFE_STATIC_GETTER(_UIKeyNameMapper, _UI_getKeyNameMapper)
+	SLIB_SAFE_STATIC_GETTER(_priv_UIKeyNameMapper, _priv_UI_getKeyNameMapper)
 
 	String UI::getKeyName(Keycode code, sl_bool flagShort)
 	{
-		_UIKeyNameMapper* mapper = _UI_getKeyNameMapper();
+		_priv_UIKeyNameMapper* mapper = _priv_UI_getKeyNameMapper();
 		if (mapper) {
 			return mapper->get(code, flagShort);
 		}
@@ -829,7 +829,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	Keycode UI::getKeycodeFromName(const String& keyName)
 	{
-		_UIKeyNameMapper* mapper = _UI_getKeyNameMapper();
+		_priv_UIKeyNameMapper* mapper = _priv_UI_getKeyNameMapper();
 		if (mapper) {
 			return mapper->getCode(keyName);
 		}

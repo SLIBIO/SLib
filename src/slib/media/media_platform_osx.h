@@ -22,7 +22,7 @@
 namespace slib
 {
 
-	class OSX_AudioDeviceInfo
+	class _priv_macOS_AudioDeviceInfo
 	{
 	public:
 		AudioDeviceID id;
@@ -38,7 +38,7 @@ namespace slib
 		sl_bool selectDevice(sl_bool flagInput, String uid);
 
 	public:
-		static List<OSX_AudioDeviceInfo> getAllDevices(sl_bool flagInput);
+		static List<_priv_macOS_AudioDeviceInfo> getAllDevices(sl_bool flagInput);
 		
 	private:
 		static void logError(String text);

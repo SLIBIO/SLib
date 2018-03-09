@@ -23,14 +23,14 @@
 namespace slib
 {
 
-	class _UI_Android_KeyMapper
+	class _priv_UI_Android_KeyMapper
 	{
 	private:
 		HashTable<sl_uint32, sl_uint32> mapKeyToVK;
 		HashTable<sl_uint32, sl_uint32> mapVKToKey;
 		
 	public:
-		_UI_Android_KeyMapper()
+		_priv_UI_Android_KeyMapper()
 		{
 			map(Keycode::Tab, 61);
 			map(Keycode::Enter, 66);
@@ -193,11 +193,11 @@ namespace slib
 		
 	};
 
-	SLIB_SAFE_STATIC_GETTER(_UI_Android_KeyMapper, _UI_Android_getKeyMapper)
+	SLIB_SAFE_STATIC_GETTER(_priv_UI_Android_KeyMapper, _priv_UI_Android_getKeyMapper)
 
 	sl_uint32 UIEvent::getSystemKeycode(Keycode key)
 	{
-		_UI_Android_KeyMapper* mapper = _UI_Android_getKeyMapper();
+		_priv_UI_Android_KeyMapper* mapper = _priv_UI_Android_getKeyMapper();
 		if (mapper) {
 			return mapper->keyToVk(key);
 		}
@@ -206,7 +206,7 @@ namespace slib
 
 	Keycode UIEvent::getKeycodeFromSystemKeycode(sl_uint32 vkey)
 	{
-		_UI_Android_KeyMapper* mapper = _UI_Android_getKeyMapper();
+		_priv_UI_Android_KeyMapper* mapper = _priv_UI_Android_getKeyMapper();
 		if (mapper) {
 			return mapper->vkToKey(vkey);
 		}

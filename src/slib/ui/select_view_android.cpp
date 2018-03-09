@@ -19,7 +19,7 @@
 namespace slib
 {
 
-	void JNICALL _JAndroidSelectView_nativeOnSelect(JNIEnv* env, jobject _this, jlong instance, jint n)
+	void JNICALL _priv_JAndroidSelectView_nativeOnSelect(JNIEnv* env, jobject _this, jlong instance, jint n)
 	{
 		Ref<View> _view = Android_ViewInstance::findView(instance);
 		if (SelectView* view = CastInstance<SelectView>(_view.get())) {
@@ -27,7 +27,7 @@ namespace slib
 		}
 	}
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidSelectView, "slib/platform/android/ui/view/UiSelectView")
+	SLIB_JNI_BEGIN_CLASS(JAndroidSelectView, "slib/platform/android/ui/view/UiSelectView")
 
 		SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;)Lslib/platform/android/ui/view/UiSelectView;");
 
@@ -36,11 +36,11 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(select, "_select", "(Landroid/view/View;I)V");
 		SLIB_JNI_STATIC_METHOD(setFont, "_setFont", "(Landroid/view/View;Lslib/platform/android/ui/UiFont;)Z");
 
-		SLIB_JNI_NATIVE(nativeOnSelect, "nativeOnSelect", "(JI)V", _JAndroidSelectView_nativeOnSelect);
+		SLIB_JNI_NATIVE(nativeOnSelect, "nativeOnSelect", "(JI)V", _priv_JAndroidSelectView_nativeOnSelect);
 
 	SLIB_JNI_END_CLASS
 
-	class _SelectView : public SelectView
+	class _priv_SelectView : public SelectView
 	{
 	public:
 		void _copyItems(jobject jview)
@@ -53,14 +53,14 @@ namespace slib
 					Jni::setStringArrayElement(arr, i, titles[i]);
 				}
 				titles.unlock();
-				_JAndroidSelectView::applyList.call(sl_null, jview, arr.get());
+				JAndroidSelectView::applyList.call(sl_null, jview, arr.get());
 				_select(jview, m_indexSelected);
 			}
 		}
 
 		sl_uint32 _getSelectedIndex(jobject jview)
 		{
-			jint n = _JAndroidSelectView::getSelectedIndex.callInt(sl_null, jview);
+			jint n = JAndroidSelectView::getSelectedIndex.callInt(sl_null, jview);
 			if (n < 0) {
 				n = 0;
 			}
@@ -69,7 +69,7 @@ namespace slib
 		
 		void _select(jobject jview, sl_uint32 n)
 		{
-			_JAndroidSelectView::select.call(sl_null, jview, n);
+			JAndroidSelectView::select.call(sl_null, jview, n);
 		}
 
 	};
@@ -79,17 +79,17 @@ namespace slib
 		Ref<Android_ViewInstance> ret;
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
-			JniLocal<jobject> handle = _JAndroidSelectView::create.callObject(sl_null, parent->getContext());
+			JniLocal<jobject> handle = JAndroidSelectView::create.callObject(sl_null, parent->getContext());
 			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
 
-				((_SelectView*)this)->_copyItems(handle);
+				((_priv_SelectView*)this)->_copyItems(handle);
 
 				Ref<Font> font = getFont();
 				jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 				if (jfont) {
-					_JAndroidSelectView::setFont.callBoolean(sl_null, handle, jfont);
+					JAndroidSelectView::setFont.callBoolean(sl_null, handle, jfont);
 				}
 			}
 		}
@@ -100,7 +100,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			m_indexSelected = ((_SelectView*)this)->_getSelectedIndex(handle);
+			m_indexSelected = ((_priv_SelectView*)this)->_getSelectedIndex(handle);
 		}
 	}
 
@@ -108,7 +108,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_SelectView*)this)->_select(handle, index);
+			((_priv_SelectView*)this)->_select(handle, index);
 		}
 	}
 
@@ -116,7 +116,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_SelectView*)this)->_copyItems(handle);
+			((_priv_SelectView*)this)->_copyItems(handle);
 		}
 	}
 
@@ -124,7 +124,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_SelectView*)this)->_copyItems(handle);
+			((_priv_SelectView*)this)->_copyItems(handle);
 		}
 	}
 
@@ -132,7 +132,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_SelectView*)this)->_copyItems(handle);
+			((_priv_SelectView*)this)->_copyItems(handle);
 		}
 	}
 
@@ -142,7 +142,7 @@ namespace slib
 		if (handle) {
 			jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 			if (jfont) {
-				_JAndroidSelectView::setFont.callBoolean(sl_null, handle, jfont);
+				JAndroidSelectView::setFont.callBoolean(sl_null, handle, jfont);
 			}
 		}
 	}

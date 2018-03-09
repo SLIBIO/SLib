@@ -19,7 +19,7 @@
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidButton, "slib/platform/android/ui/view/UiButton")
+	SLIB_JNI_BEGIN_CLASS(JAndroidButton, "slib/platform/android/ui/view/UiButton")
 
 		SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;)Lslib/platform/android/ui/view/UiButton;");
 
@@ -34,16 +34,16 @@ namespace slib
 		Ref<Android_ViewInstance> ret;
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
-			JniLocal<jobject> handle = _JAndroidButton::create.callObject(sl_null, parent->getContext());
+			JniLocal<jobject> handle = JAndroidButton::create.callObject(sl_null, parent->getContext());
 			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
 				JniLocal<jstring> jtext = Jni::getJniString(m_text);
-				_JAndroidButton::setText.callBoolean(sl_null, handle, jtext.get());
+				JAndroidButton::setText.callBoolean(sl_null, handle, jtext.get());
 				Ref<Font> font = getFont();
 				jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 				if (jfont) {
-					_JAndroidButton::setFont.callBoolean(sl_null, handle, jfont);
+					JAndroidButton::setFont.callBoolean(sl_null, handle, jfont);
 				}
 			}
 		}
@@ -55,7 +55,7 @@ namespace slib
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			JniLocal<jstring> jstr = Jni::getJniString(text);
-			_JAndroidButton::setText.callBoolean(sl_null, handle, jstr.get());
+			JAndroidButton::setText.callBoolean(sl_null, handle, jstr.get());
 		}
 	}
 
@@ -69,7 +69,7 @@ namespace slib
 		if (handle) {
 			jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 			if (jfont) {
-				_JAndroidButton::setFont.callBoolean(sl_null, handle, jfont);
+				JAndroidButton::setFont.callBoolean(sl_null, handle, jfont);
 			}
 		}
 	}

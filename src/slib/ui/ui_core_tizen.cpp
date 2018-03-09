@@ -36,16 +36,16 @@ namespace slib
 
 	pthread_t _g_main_thread = 0;
 
-	class _Tizen_Screen : public Screen
+	class _priv_Tizen_Screen : public Screen
 	{
 	public:
 		int m_width;
 		int m_height;
 
 	public:
-		static Ref<_Tizen_Screen> create()
+		static Ref<_priv_Tizen_Screen> create()
 		{
-			Ref<_Tizen_Screen> ret = new _Tizen_Screen();
+			Ref<_priv_Tizen_Screen> ret = new _priv_Tizen_Screen();
 			if (ret.isNotNull()) {
 				ret->m_width = 0;
 				::system_info_get_platform_int("http://tizen.org/feature/screen.width", &(ret->m_width));
@@ -94,7 +94,7 @@ namespace slib
 			return sl_null;
 		}
 		if (ret.isNull()) {
-			ret = _Tizen_Screen::create();
+			ret = _priv_Tizen_Screen::create();
 		}
 		return ret;
 	}
@@ -132,7 +132,7 @@ namespace slib
 	
 	static void _ui_dispatch_callback(void* data)
 	{
-		_UIDispatcher::processCallbacks();
+		_priv_UIDispatcher::processCallbacks();
 	}
 
 	static Eina_Bool _ui_dispatch_timer_callback(void* data)
@@ -149,7 +149,7 @@ namespace slib
 			return;
 		}
 		if (delayMillis == 0) {
-			if (_UIDispatcher::addCallback(callback)) {
+			if (_priv_UIDispatcher::addCallback(callback)) {
 				::ecore_main_loop_thread_safe_call_async(_ui_dispatch_callback, sl_null);
 			}
 		} else {

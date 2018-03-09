@@ -1929,10 +1929,10 @@ namespace slib
 			return sl_false;
 		}
 		const CBigInt* TE;
-		CBigInt _TE;
+		CBigInt t_TE;
 		if (this == &E) {
-			TE = &_TE;
-			if (!_TE.copyFrom(E)) {
+			TE = &t_TE;
+			if (!t_TE.copyFrom(E)) {
 				return sl_false;
 			}
 		} else {
@@ -2046,10 +2046,10 @@ namespace slib
 		return _cbigint_mont_mul(A, o, M, MI);
 	}
 
-	sl_bool CBigInt::pow_montgomery(const CBigInt& A, const CBigInt& _E, const CBigInt& _M) noexcept
+	sl_bool CBigInt::pow_montgomery(const CBigInt& A, const CBigInt& inE, const CBigInt& inM) noexcept
 	{
 		CBigInt M;
-		M.copyFrom(_M);
+		M.copyFrom(inM);
 		if (!M.compact()) {
 			return sl_false;
 		}
@@ -2062,13 +2062,13 @@ namespace slib
 		}
 		const CBigInt* pE;
 		CBigInt _t_E;
-		if (&_E == this) {
+		if (&inE == this) {
 			pE = &_t_E;
-			if (!_t_E.copyFrom(_E)) {
+			if (!_t_E.copyFrom(inE)) {
 				return sl_false;
 			}
 		} else {
-			pE = &_E;
+			pE = &inE;
 		}
 		const CBigInt& E = *pE;
 		sl_size nE = E.getMostSignificantElements();
@@ -2301,24 +2301,24 @@ namespace slib
 		return inverseMod(*this, M);
 	}
 
-	sl_bool CBigInt::gcd(const CBigInt& _A, const CBigInt& _B) noexcept
+	sl_bool CBigInt::gcd(const CBigInt& inA, const CBigInt& inB) noexcept
 	{
-		if (&_A == &_B) {
+		if (&inA == &inB) {
 			sign = 1;
-			return copyAbsFrom(_A);
+			return copyAbsFrom(inA);
 		}
-		sl_size lbA = _A.getLeastSignificantBits();
-		sl_size lbB = _B.getLeastSignificantBits();
+		sl_size lbA = inA.getLeastSignificantBits();
+		sl_size lbB = inB.getLeastSignificantBits();
 		if (lbA == 0 || lbB == 0) {
 			setZero();
 			return sl_true;
 		}
 		sl_size min_p2 = Math::min(lbA - 1, lbB - 1);
 		CBigInt A, B;
-		if (!A.shiftRight(_A, min_p2)) {
+		if (!A.shiftRight(inA, min_p2)) {
 			return sl_false;
 		}
-		if (!B.shiftRight(_B, min_p2)) {
+		if (!B.shiftRight(inB, min_p2)) {
 			return sl_false;
 		}
 		for (;;) {

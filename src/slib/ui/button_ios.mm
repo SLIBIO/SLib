@@ -16,7 +16,7 @@
 
 #include "view_ios.h"
 
-@interface _Slib_iOS_Button : UIButton {
+@interface _priv_Slib_iOS_Button : UIButton {
 	
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 
@@ -29,7 +29,7 @@ namespace slib
 	Ref<ViewInstance> Button::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_iOS_Button* handle = [[_Slib_iOS_Button alloc] initWithFrame:frame];
+		_priv_Slib_iOS_Button* handle = [[_priv_Slib_iOS_Button alloc] initWithFrame:frame];
 		if (handle != nil) {
 			[handle setTitle:(Apple::getNSStringFromString(m_text)) forState:UIControlStateNormal];
 			Ref<Font> font = getFont();
@@ -71,7 +71,7 @@ namespace slib
 	}
 }
 
-@implementation _Slib_iOS_Button
+@implementation _priv_Slib_iOS_Button
 -(id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];

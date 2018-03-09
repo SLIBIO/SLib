@@ -479,13 +479,13 @@ namespace slib
 		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
 	protected:
-		struct _Source
+		struct Source
 		{
 			sl_real width;
 			sl_real height;
 			Ref<Drawable> drawable;
 		};
-		CList<_Source> m_sources;
+		CList<Source> m_sources;
 
 		sl_real m_width;
 		sl_real m_height;

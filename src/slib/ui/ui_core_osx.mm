@@ -18,24 +18,24 @@
 #include "slib/ui/platform.h"
 #include "slib/ui/app.h"
 
-@interface _slib_OSX_AppDelegate : NSObject <NSApplicationDelegate>
+@interface _priv_Slib_macOS_AppDelegate : NSObject <NSApplicationDelegate>
 @end
 
 namespace slib
 {
 
-	class _OSX_Screen : public Screen
+	class _priv_macOS_Screen : public Screen
 	{
 	public:
 		NSScreen* m_screen;
 		UIRect m_region;
 		
 	public:
-		static Ref<_OSX_Screen> create(NSScreen* screen, NSScreen* primary)
+		static Ref<_priv_macOS_Screen> create(NSScreen* screen, NSScreen* primary)
 		{
-			Ref<_OSX_Screen> ret;
+			Ref<_priv_macOS_Screen> ret;
 			if (screen != nil) {
-				ret = new _OSX_Screen();
+				ret = new _priv_macOS_Screen();
 				if (ret.isNotNull()) {
 					ret->m_screen = screen;
 					UIRect region;
@@ -79,12 +79,12 @@ namespace slib
 
 	Ref<Screen> UIPlatform::createScreen(NSScreen* screen)
 	{
-		return _OSX_Screen::create(screen, nil);
+		return _priv_macOS_Screen::create(screen, nil);
 	}
 
 	NSScreen* UIPlatform::getScreenHandle(Screen* _screen)
 	{
-		_OSX_Screen* screen = (_OSX_Screen*)_screen;
+		_priv_macOS_Screen* screen = (_priv_macOS_Screen*)_screen;
 		if (screen) {
 			return screen->m_screen;
 		}
@@ -110,14 +110,14 @@ namespace slib
 		NSScreen* primary = [arr objectAtIndex:0];
 		for (sl_size i = 0; i < n; i++) {
 			NSScreen* _screen = [arr objectAtIndex:i];
-			ret.add_NoLock(_OSX_Screen::create(_screen, primary));
+			ret.add_NoLock(_priv_macOS_Screen::create(_screen, primary));
 		}
 		return ret;
 	}
 
 	Ref<Screen> UI::getPrimaryScreen()
 	{
-		NSScreen* screen = _OSX_Screen::getPrimaryScreen();
+		NSScreen* screen = _priv_macOS_Screen::getPrimaryScreen();
 		return UIPlatform::createScreen(screen);
 	}
 
@@ -163,7 +163,7 @@ namespace slib
 	{
 		[NSApplication sharedApplication];
 		[[NSBundle mainBundle] loadNibNamed:@"MainMenu" owner:NSApp topLevelObjects:nil];
-		_slib_OSX_AppDelegate * delegate = [[_slib_OSX_AppDelegate alloc] init];
+		_priv_Slib_macOS_AppDelegate * delegate = [[_priv_Slib_macOS_AppDelegate alloc] init];
 		[NSApp setDelegate:delegate];
 		
 		@autoreleasepool {
@@ -184,7 +184,7 @@ namespace slib
 
 }
 
-@implementation _slib_OSX_AppDelegate
+@implementation _priv_Slib_macOS_AppDelegate
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	slib::UIApp::dispatchStartToApp();
 }

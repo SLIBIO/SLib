@@ -28,12 +28,12 @@
 namespace slib
 {
 
-	class _Win32_WebView_OleClient;
+	class _priv_Win32_WebView_OleClient;
 
-	class _Win32_WebViewInstance : public Win32_ViewInstance
+	class _priv_Win32_WebViewInstance : public Win32_ViewInstance
 	{
 	public:
-		_Win32_WebView_OleClient* m_oleClient;
+		_priv_Win32_WebView_OleClient* m_oleClient;
 
 		IOleObject* m_control;
 		IWebBrowser2* m_browser;
@@ -41,8 +41,8 @@ namespace slib
 		DWORD m_eventCookie;
 
 	public:
-		_Win32_WebViewInstance();
-		~_Win32_WebViewInstance();
+		_priv_Win32_WebViewInstance();
+		~_priv_Win32_WebViewInstance();
 
 	public:
 		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
@@ -121,12 +121,12 @@ namespace slib
 
 	};
 
-	class _Win32_WebView_OleClient : public IOleClientSite, public IOleInPlaceSite, public IOleInPlaceFrame, public IDocHostUIHandler, public IDispatch
+	class _priv_Win32_WebView_OleClient : public IOleClientSite, public IOleInPlaceSite, public IOleInPlaceFrame, public IDocHostUIHandler, public IDispatch
 	{
 	public:
-		_Win32_WebViewInstance* m_viewInstance;
+		_priv_Win32_WebViewInstance* m_viewInstance;
 
-		_Win32_WebView_OleClient()
+		_priv_Win32_WebView_OleClient()
 		{
 		}
 
@@ -507,16 +507,16 @@ namespace slib
 	};
 
 
-	_Win32_WebViewInstance::_Win32_WebViewInstance()
+	_priv_Win32_WebViewInstance::_priv_Win32_WebViewInstance()
 	{
 		m_control = NULL;
 		m_browser = NULL;
 
-		m_oleClient = new _Win32_WebView_OleClient;
+		m_oleClient = new _priv_Win32_WebView_OleClient;
 		m_oleClient->m_viewInstance = this;
 	}
 
-	_Win32_WebViewInstance::~_Win32_WebViewInstance()
+	_priv_Win32_WebViewInstance::~_priv_Win32_WebViewInstance()
 	{
 		if (m_browser) {
 			m_browser->Quit();
@@ -530,7 +530,7 @@ namespace slib
 		delete m_oleClient;
 	}
 
-	sl_bool _Win32_WebViewInstance::_initialize()
+	sl_bool _priv_Win32_WebViewInstance::_initialize()
 	{
 		HRESULT hr;
 		IOleObject* control;
@@ -581,7 +581,7 @@ namespace slib
 		return sl_true;
 	}
 
-	void _Win32_WebViewInstance::_installExternal()
+	void _priv_Win32_WebViewInstance::_installExternal()
 	{
 		HRESULT hr;
 		IHTMLDocument2* doc = getDoc();
@@ -615,7 +615,7 @@ namespace slib
 		}
 	}
 
-	class _WebView_DocumentMoniker : public IMoniker
+	class _priv_WebView_DocumentMoniker : public IMoniker
 	{
 	public:
 		IStream* m_stream;
@@ -623,13 +623,13 @@ namespace slib
 
 		sl_int32 m_nRef;
 
-		_WebView_DocumentMoniker()
+		_priv_WebView_DocumentMoniker()
 		{
 			m_stream = NULL;
 			m_nRef = 1;
 		}
 
-		~_WebView_DocumentMoniker()
+		~_priv_WebView_DocumentMoniker()
 		{
 			SLIB_WIN32_COM_SAFE_RELEASE(m_stream);
 		}
@@ -786,7 +786,7 @@ namespace slib
 		}
 	};
 
-	void _WebView_writeHTML(IHTMLDocument2* doc, String16 content, String16 baseURL)
+	void _priv_WebView_writeHTML(IHTMLDocument2* doc, String16 content, String16 baseURL)
 	{
 		if (baseURL.isNotEmpty()) {
 			HRESULT hr;
@@ -798,7 +798,7 @@ namespace slib
 					IBindCtx* ctx = NULL;
 					hr = ::CreateBindCtx(0, &ctx);
 					if (hr == S_OK) {
-						_WebView_DocumentMoniker* moniker = new _WebView_DocumentMoniker;
+						_priv_WebView_DocumentMoniker* moniker = new _priv_WebView_DocumentMoniker;
 						if (moniker) {
 							moniker->m_stream = stream;
 							if (stream) {
@@ -835,7 +835,7 @@ namespace slib
 		}
 	}
 
-	String _WebView_getSource(IHTMLDocument2* doc)
+	String _priv_WebView_getSource(IHTMLDocument2* doc)
 	{
 		String ret;
 		HRESULT hr;
@@ -860,10 +860,10 @@ namespace slib
 	}
 
 
-	class _WebView : public WebView
+	class _priv_WebView : public WebView
 	{
 	public:
-		void _init(_Win32_WebViewInstance* instance)
+		void _init(_priv_Win32_WebViewInstance* instance)
 		{
 			IWebBrowser2* browser = instance->m_browser;
 			if (browser) {
@@ -875,14 +875,14 @@ namespace slib
 			}
 		}
 
-		void _load(_Win32_WebViewInstance* instance)
+		void _load(_priv_Win32_WebViewInstance* instance)
 		{
 			IWebBrowser2* browser = instance->m_browser;
 			if (browser) {
 				if (m_flagOfflineContent) {
 					IHTMLDocument2* doc2 = instance->getDoc();
 					if (doc2) {
-						_WebView_writeHTML(doc2, m_offlineContentHTML, m_urlOrigin);
+						_priv_WebView_writeHTML(doc2, m_offlineContentHTML, m_urlOrigin);
 						doc2->Release();
 					}
 				} else {
@@ -909,11 +909,11 @@ namespace slib
 
 		DWORD style = 0;
 		DWORD styleEx = 0;
-		Ref<_Win32_WebViewInstance> ret = Win32_ViewInstance::create<_Win32_WebViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
+		Ref<_priv_Win32_WebViewInstance> ret = Win32_ViewInstance::create<_priv_Win32_WebViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
 		if (ret.isNotNull()) {
 			ret->_initialize();
-			((_WebView*)this)->_init(ret.get());
-			((_WebView*)this)->_load(ret.get());
+			((_priv_WebView*)this)->_init(ret.get());
+			((_priv_WebView*)this)->_load(ret.get());
 		}
 		return ret;
 	}
@@ -921,7 +921,7 @@ namespace slib
 	void WebView::_refreshSize_NW()
 	{
 		Ref<ViewInstance> _instance = getViewInstance();
-		if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
+		if (_priv_Win32_WebViewInstance* instance = CastInstance<_priv_Win32_WebViewInstance>(_instance.get())) {
 			instance->_resize();
 		}
 	}
@@ -929,15 +929,15 @@ namespace slib
 	void WebView::_load_NW()
 	{
 		Ref<ViewInstance> _instance = getViewInstance();
-		if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
-			((_WebView*)this)->_load(instance);
+		if (_priv_Win32_WebViewInstance* instance = CastInstance<_priv_Win32_WebViewInstance>(_instance.get())) {
+			((_priv_WebView*)this)->_load(instance);
 		}
 	}
 
 	String WebView::_getURL_NW()
 	{
 		Ref<ViewInstance> _instance = getViewInstance();
-		if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
+		if (_priv_Win32_WebViewInstance* instance = CastInstance<_priv_Win32_WebViewInstance>(_instance.get())) {
 			IHTMLDocument2* doc2 = instance->getDoc();
 			if (doc2) {
 				String ret;
@@ -959,7 +959,7 @@ namespace slib
 	String WebView::_getPageTitle_NW()
 	{
 		Ref<ViewInstance> _instance = getViewInstance();
-		if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
+		if (_priv_Win32_WebViewInstance* instance = CastInstance<_priv_Win32_WebViewInstance>(_instance.get())) {
 			IHTMLDocument2* doc2 = instance->getDoc();
 			if (doc2) {
 				String ret;
@@ -981,7 +981,7 @@ namespace slib
 	void WebView::_goBack_NW()
 	{
 		Ref<ViewInstance> _instance = getViewInstance();
-		if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
+		if (_priv_Win32_WebViewInstance* instance = CastInstance<_priv_Win32_WebViewInstance>(_instance.get())) {
 			IWebBrowser2* browser = instance->m_browser;
 			if (browser) {
 				browser->GoBack();
@@ -992,7 +992,7 @@ namespace slib
 	void WebView::_goForward_NW()
 	{
 		Ref<ViewInstance> _instance = getViewInstance();
-		if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
+		if (_priv_Win32_WebViewInstance* instance = CastInstance<_priv_Win32_WebViewInstance>(_instance.get())) {
 			IWebBrowser2* browser = instance->m_browser;
 			if (browser) {
 				browser->GoForward();
@@ -1003,7 +1003,7 @@ namespace slib
 	void WebView::_reload_NW()
 	{
 		Ref<ViewInstance> _instance = getViewInstance();
-		if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
+		if (_priv_Win32_WebViewInstance* instance = CastInstance<_priv_Win32_WebViewInstance>(_instance.get())) {
 			IWebBrowser2* browser = instance->m_browser;
 			if (browser) {
 				browser->Refresh();
@@ -1011,7 +1011,7 @@ namespace slib
 		}
 	}
 
-	String _WebView_evalJavascript(IHTMLWindow2* win, const String& _script)
+	String _priv_WebView_evalJavascript(IHTMLWindow2* win, const String& _script)
 	{
 		String ret;
 		IDispatchEx* disp = NULL;
@@ -1057,14 +1057,14 @@ namespace slib
 		String16 script = _script;
 		if (script.isNotEmpty()) {
 			Ref<ViewInstance> _instance = getViewInstance();
-			if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
+			if (_priv_Win32_WebViewInstance* instance = CastInstance<_priv_Win32_WebViewInstance>(_instance.get())) {
 				IHTMLDocument2* doc2 = instance->getDoc();
 				if (doc2) {
 					HRESULT hr;
 					IHTMLWindow2* win = NULL;
 					hr = doc2->get_parentWindow(&win);
 					if (hr == S_OK) {
-						//_WebView_evalJavascript(win, _script);
+						//_priv_WebView_evalJavascript(win, _script);
 						BSTR s = (BSTR)(::SysAllocString((OLECHAR*)(script.getData())));
 						if (s) {
 							VARIANT var;

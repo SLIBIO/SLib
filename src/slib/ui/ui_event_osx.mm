@@ -24,7 +24,7 @@
 namespace slib
 {
 
-	class _UI_OSX_KeyMapper
+	class _priv_UI_macOS_KeyMapper
 	{
 	private:
 		HashTable<Keycode, sl_uint32> mapKeyToVK;
@@ -32,7 +32,7 @@ namespace slib
 		HashTable<Keycode, NSString*> mapKeyToEquivalent;
 		
 	public:
-		_UI_OSX_KeyMapper()
+		_priv_UI_macOS_KeyMapper()
 		{
 			map(Keycode::Tab, 0x30, '\t');
 			map(Keycode::Enter, 0x24, '\r');
@@ -205,11 +205,11 @@ namespace slib
 		
 	};
 
-	SLIB_SAFE_STATIC_GETTER(_UI_OSX_KeyMapper, _UI_OSX_getKeyMapper)
+	SLIB_SAFE_STATIC_GETTER(_priv_UI_macOS_KeyMapper, _priv_UI_macOS_getKeyMapper)
 
 	sl_uint32 UIEvent::getSystemKeycode(Keycode key)
 	{
-		_UI_OSX_KeyMapper* mapper = _UI_OSX_getKeyMapper();
+		_priv_UI_macOS_KeyMapper* mapper = _priv_UI_macOS_getKeyMapper();
 		if (mapper) {
 			return mapper->keyToVk(key);
 		}
@@ -218,7 +218,7 @@ namespace slib
 
 	Keycode UIEvent::getKeycodeFromSystemKeycode(sl_uint32 vkey)
 	{
-		_UI_OSX_KeyMapper* mapper = _UI_OSX_getKeyMapper();
+		_priv_UI_macOS_KeyMapper* mapper = _priv_UI_macOS_getKeyMapper();
 		if (mapper) {
 			return mapper->vkToKey(vkey);
 		}
@@ -281,7 +281,7 @@ namespace slib
 
 	NSString* UIPlatform::getKeyEquivalent(const KeycodeAndModifiers& km, NSUInteger& mask)
 	{
-		_UI_OSX_KeyMapper* mapper = _UI_OSX_getKeyMapper();
+		_priv_UI_macOS_KeyMapper* mapper = _priv_UI_macOS_getKeyMapper();
 		if (!mapper) {
 			return @"";
 		}

@@ -353,12 +353,12 @@ namespace slib
 		m_count = m;
 	}
 
-	static const void* _Tizen_Event_TouchBegin = "tb";
-	static const void* _Tizen_Event_TouchEnd = "te";
-	static const void* _Tizen_Event_TouchMove = "tm";
-	static const void* _Tizen_Event_MultiTouchBegin = "mtb";
-	static const void* _Tizen_Event_MultiTouchEnd = "mte";
-	static const void* _Tizen_Event_MultiTouchMove = "mtm";
+	static const void* _priv_Tizen_Event_TouchBegin = "tb";
+	static const void* _priv_Tizen_Event_TouchEnd = "te";
+	static const void* _priv_Tizen_Event_TouchMove = "tm";
+	static const void* _priv_Tizen_Event_MultiTouchBegin = "mtb";
+	static const void* _priv_Tizen_Event_MultiTouchEnd = "mte";
+	static const void* _priv_Tizen_Event_MultiTouchMove = "mtm";
 
 	void Tizen_ViewInstance::onTouch(const void *eventType, void *event_info)
 	{
@@ -385,32 +385,32 @@ namespace slib
 		UIAction action;
 		unsigned int timestamp;
 
-		if (eventType == _Tizen_Event_TouchBegin) {
+		if (eventType == _priv_Tizen_Event_TouchBegin) {
 			Evas_Event_Mouse_Down* ev = (Evas_Event_Mouse_Down*)event_info;
 			m_touchEventInfo->setPoint(0, TouchPhase::Begin, ev->canvas.x - x, ev->canvas.y - y);
 			timestamp = ev->timestamp;
 			action = UIAction::TouchBegin;
-		} else if (eventType == _Tizen_Event_MultiTouchBegin) {
+		} else if (eventType == _priv_Tizen_Event_MultiTouchBegin) {
 			Evas_Event_Multi_Down* ev = (Evas_Event_Multi_Down*)event_info;
 			m_touchEventInfo->setPoint(ev->device, TouchPhase::Begin, ev->canvas.x - x, ev->canvas.y - y);
 			timestamp = ev->timestamp;
 			action = UIAction::TouchMove;
-		} else if (eventType == _Tizen_Event_TouchMove) {
+		} else if (eventType == _priv_Tizen_Event_TouchMove) {
 			Evas_Event_Mouse_Move* ev = (Evas_Event_Mouse_Move*)event_info;
 			m_touchEventInfo->setPoint(0, TouchPhase::Move, ev->cur.canvas.x - x, ev->cur.canvas.y - y);
 			timestamp = ev->timestamp;
 			action = UIAction::TouchMove;
-		} else if (eventType == _Tizen_Event_MultiTouchMove) {
+		} else if (eventType == _priv_Tizen_Event_MultiTouchMove) {
 			Evas_Event_Multi_Move* ev = (Evas_Event_Multi_Move*)event_info;
 			m_touchEventInfo->setPoint(ev->device, TouchPhase::Move, ev->cur.canvas.x - x, ev->cur.canvas.y - y);
 			timestamp = ev->timestamp;
 			action = UIAction::TouchMove;
-		} else if (eventType == _Tizen_Event_TouchEnd) {
+		} else if (eventType == _priv_Tizen_Event_TouchEnd) {
 			Evas_Event_Mouse_Up* ev = (Evas_Event_Mouse_Up*)event_info;
 			m_touchEventInfo->setPoint(0, TouchPhase::End, ev->canvas.x - x, ev->canvas.y - y);
 			timestamp = ev->timestamp;
 			action = UIAction::TouchEnd;
-		} else if (eventType == _Tizen_Event_MultiTouchEnd) {
+		} else if (eventType == _priv_Tizen_Event_MultiTouchEnd) {
 			Evas_Event_Multi_Up* ev = (Evas_Event_Multi_Up*)event_info;
 			m_touchEventInfo->setPoint(ev->device, TouchPhase::End, ev->canvas.x - x, ev->canvas.y - y);
 			timestamp = ev->timestamp;
@@ -445,12 +445,12 @@ namespace slib
 	{
 		Evas_Object* handle = m_handle;
 		if (handle) {
-			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MOUSE_DOWN, &(Tizen_ViewInstance::_onTouch), _Tizen_Event_TouchBegin);
-			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MOUSE_UP, &(Tizen_ViewInstance::_onTouch), _Tizen_Event_TouchEnd);
-			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MOUSE_MOVE, &(Tizen_ViewInstance::_onTouch), _Tizen_Event_TouchMove);
-			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MULTI_DOWN, &(Tizen_ViewInstance::_onTouch), _Tizen_Event_MultiTouchBegin);
-			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MULTI_UP, &(Tizen_ViewInstance::_onTouch), _Tizen_Event_MultiTouchEnd);
-			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MULTI_MOVE, &(Tizen_ViewInstance::_onTouch), _Tizen_Event_MultiTouchMove);
+			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MOUSE_DOWN, &(Tizen_ViewInstance::_onTouch), _priv_Tizen_Event_TouchBegin);
+			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MOUSE_UP, &(Tizen_ViewInstance::_onTouch), _priv_Tizen_Event_TouchEnd);
+			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MOUSE_MOVE, &(Tizen_ViewInstance::_onTouch), _priv_Tizen_Event_TouchMove);
+			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MULTI_DOWN, &(Tizen_ViewInstance::_onTouch), _priv_Tizen_Event_MultiTouchBegin);
+			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MULTI_UP, &(Tizen_ViewInstance::_onTouch), _priv_Tizen_Event_MultiTouchEnd);
+			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MULTI_MOVE, &(Tizen_ViewInstance::_onTouch), _priv_Tizen_Event_MultiTouchMove);
 		}
 	}
 

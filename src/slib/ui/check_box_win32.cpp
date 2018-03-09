@@ -19,7 +19,7 @@
 namespace slib
 {
 
-	class _Win32_CheckBoxViewInstance : public Win32_ViewInstance
+	class _priv_Win32_CheckBoxViewInstance : public Win32_ViewInstance
 	{
 	public:
 		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
@@ -45,7 +45,7 @@ namespace slib
 		}
 		String16 text = getText();
 		UINT style = BS_AUTOCHECKBOX | WS_TABSTOP;
-		Ref<_Win32_CheckBoxViewInstance> ret = Win32_ViewInstance::create<_Win32_CheckBoxViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
+		Ref<_priv_Win32_CheckBoxViewInstance> ret = Win32_ViewInstance::create<_priv_Win32_CheckBoxViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
 		if (ret.isNotNull()) {
 			HWND handle = ret->getHandle();
 			if (m_flagChecked) {

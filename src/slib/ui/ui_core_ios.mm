@@ -23,7 +23,7 @@
 #include "slib/core/variant.h"
 #include "slib/core/platform_apple.h"
 
-@interface _slib_iOS_AppDelegate : UIResponder <UIApplicationDelegate>
+@interface _priv_Slib_iOS_AppDelegate : UIResponder <UIApplicationDelegate>
 @property (strong, nonatomic) UIWindow *window;
 @end
 
@@ -144,7 +144,7 @@ namespace slib
 	void UIPlatform::runApp()
 	{
 		@autoreleasepool {
-			UIApplicationMain(0, nil, nil, NSStringFromClass([_slib_iOS_AppDelegate class]));
+			UIApplicationMain(0, nil, nil, NSStringFromClass([_priv_Slib_iOS_AppDelegate class]));
 		}
 	}
 	
@@ -154,7 +154,7 @@ namespace slib
 	
 	UIWindow* UIPlatform::getMainWindow()
 	{
-		_slib_iOS_AppDelegate* app = (_slib_iOS_AppDelegate*)([[UIApplication sharedApplication] delegate]);
+		_priv_Slib_iOS_AppDelegate* app = (_priv_Slib_iOS_AppDelegate*)([[UIApplication sharedApplication] delegate]);
 		if (app != nil) {
 			return app.window;
 		}
@@ -193,7 +193,7 @@ namespace slib
 	}	
 }
 
-@implementation _slib_iOS_AppDelegate
+@implementation _priv_Slib_iOS_AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	

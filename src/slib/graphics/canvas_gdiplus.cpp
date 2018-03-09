@@ -32,7 +32,7 @@
 namespace slib
 {
 
-	static void _Gdiplus_applyAlphaToColor(Gdiplus::Color& color, sl_real alpha)
+	static void _priv_Gdiplus_applyAlphaToColor(Gdiplus::Color& color, sl_real alpha)
 	{
 		BYTE a = color.GetA();
 		BYTE r = color.GetR();
@@ -64,7 +64,7 @@ namespace slib
 			hPenClone = hPen->Clone(); \
 			Gdiplus::Color color; \
 			hPenClone->GetColor(&color); \
-			_Gdiplus_applyAlphaToColor(color, alpha); \
+			_priv_Gdiplus_applyAlphaToColor(color, alpha); \
 			hPenClone->SetColor(color); \
 			hPen = hPenClone; \
 		} \
@@ -91,7 +91,7 @@ namespace slib
 			hBrushClone = hBrush->Clone(); \
 			Gdiplus::Color color; \
 			((Gdiplus::SolidBrush*)hBrushClone)->GetColor(&color); \
-			_Gdiplus_applyAlphaToColor(color, alpha); \
+			_priv_Gdiplus_applyAlphaToColor(color, alpha); \
 			((Gdiplus::SolidBrush*)hBrushClone)->SetColor(color); \
 			hBrush = hBrushClone; \
 		} \
@@ -99,7 +99,7 @@ namespace slib
 			hPenClone = hPen->Clone(); \
 			Gdiplus::Color color; \
 			hPenClone->GetColor(&color); \
-			_Gdiplus_applyAlphaToColor(color, alpha); \
+			_priv_Gdiplus_applyAlphaToColor(color, alpha); \
 			hPenClone->SetColor(color); \
 			hPen = hPenClone; \
 		} \
@@ -113,7 +113,7 @@ namespace slib
 		delete hPenClone; \
 	}
 
-	class _Gdiplus_Canvas : public Canvas
+	class _priv_Gdiplus_Canvas : public Canvas
 	{
 		SLIB_DECLARE_OBJECT
 	public:
@@ -123,11 +123,11 @@ namespace slib
 		Ref<Referable> m_ref;
 
 	public:
-		_Gdiplus_Canvas()
+		_priv_Gdiplus_Canvas()
 		{
 		}
 
-		~_Gdiplus_Canvas()
+		~_priv_Gdiplus_Canvas()
 		{
 			if (m_flagFreeOnRelease) {
 				delete m_graphics;			
@@ -135,10 +135,10 @@ namespace slib
 		}
 
 	public:
-		static Ref<_Gdiplus_Canvas> create(CanvasType type, Gdiplus::Graphics* graphics, sl_real width, sl_real height, sl_bool flagFreeOnRelease, Referable* ref)
+		static Ref<_priv_Gdiplus_Canvas> create(CanvasType type, Gdiplus::Graphics* graphics, sl_real width, sl_real height, sl_bool flagFreeOnRelease, Referable* ref)
 		{		
 			if (graphics) {
-				Ref<_Gdiplus_Canvas> ret = new _Gdiplus_Canvas();
+				Ref<_priv_Gdiplus_Canvas> ret = new _priv_Gdiplus_Canvas();
 				if (ret.isNotNull()) {
 					ret->m_graphics = graphics;
 					ret->m_flagFreeOnRelease = flagFreeOnRelease;
@@ -233,7 +233,7 @@ namespace slib
 
 		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) override
 		{
-			_Gdiplus_Canvas::drawText16(text, x, y, font, color);
+			_priv_Gdiplus_Canvas::drawText16(text, x, y, font, color);
 		}
 		
 		void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& color) override
@@ -417,19 +417,19 @@ namespace slib
 
 	};
 
-	SLIB_DEFINE_OBJECT(_Gdiplus_Canvas, Canvas)
+	SLIB_DEFINE_OBJECT(_priv_Gdiplus_Canvas, Canvas)
 
 	Ref<Canvas> GraphicsPlatform::createCanvas(CanvasType type, Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, sl_bool flagFreeOnRelease, Referable* ref)
 	{
 		if (!graphics) {
 			return sl_null;
 		}
-		return _Gdiplus_Canvas::create(type, graphics, (sl_real)width, (sl_real)height, flagFreeOnRelease, ref);
+		return _priv_Gdiplus_Canvas::create(type, graphics, (sl_real)width, (sl_real)height, flagFreeOnRelease, ref);
 	}
 
 	Gdiplus::Graphics* GraphicsPlatform::getCanvasHandle(Canvas* _canvas)
 	{
-		if (_Gdiplus_Canvas* canvas = CastInstance<_Gdiplus_Canvas>(_canvas)) {
+		if (_priv_Gdiplus_Canvas* canvas = CastInstance<_priv_Gdiplus_Canvas>(_canvas)) {
 			return canvas->m_graphics;
 		}
 		return NULL;

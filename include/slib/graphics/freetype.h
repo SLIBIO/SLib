@@ -28,7 +28,7 @@ namespace slib
 	
 	class Image;
 
-	class _FreeTypeLibrary;
+	class _priv_FreeTypeLibrary;
 
 	class SLIB_EXPORT FreeType : public Object
 	{
@@ -79,7 +79,7 @@ namespace slib
 		void _strokeString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, sl_bool flagBorder, sl_bool flagOutside, sl_uint32 radius, const Color& color);
 
 	protected:
-		Ref<_FreeTypeLibrary> m_libraryRef;
+		Ref<_priv_FreeTypeLibrary> m_libraryRef;
 		FT_LibraryRec_* m_library;
 		FT_FaceRec_* m_face;
 		Memory m_mem;

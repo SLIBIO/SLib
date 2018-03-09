@@ -47,8 +47,8 @@ namespace slib
 		if (expiring_duration_ms > 0) {
 			m_duration = expiring_duration_ms;
 			m_dispatchLoop = loop;
-			typedef ExpiringMap<KT, VT> _ExpiringMap;
-			m_timer = Timer::startWithLoop(loop, SLIB_FUNCTION_CLASS(_ExpiringMap, _update, this), expiring_duration_ms);
+			typedef ExpiringMap<KT, VT> EXPIRING_MAP;
+			m_timer = Timer::startWithLoop(loop, SLIB_FUNCTION_CLASS(EXPIRING_MAP, _update, this), expiring_duration_ms);
 		}
 	}
 	

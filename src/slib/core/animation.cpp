@@ -762,7 +762,7 @@ namespace slib
 		return time;
 	}
 
-	constexpr static float _Animation_bounce(float f)
+	constexpr static float _priv_Animation_bounce(float f)
 	{
 		return f * f * 8.0f;
 	}
@@ -803,13 +803,13 @@ namespace slib
 				{
 					f *= 1.1226f;
 					if (f < 0.3535f) {
-						return _Animation_bounce(f);
+						return _priv_Animation_bounce(f);
 					} else if (f < 0.7408f) {
-						return _Animation_bounce(f - 0.54719f) + 0.7f;
+						return _priv_Animation_bounce(f - 0.54719f) + 0.7f;
 					} else if (f < 0.9644f) {
-						return _Animation_bounce(f - 0.8526f) + 0.9f;
+						return _priv_Animation_bounce(f - 0.8526f) + 0.9f;
 					} else {
-						return _Animation_bounce(f - 1.0435f) + 0.95f;
+						return _priv_Animation_bounce(f - 1.0435f) + 0.95f;
 					}
 				}
 			case AnimationCurve::Anticipate:
@@ -1010,25 +1010,25 @@ namespace slib
 	}
 	
 	
-	class _DefaultAnimationLoop : public AnimationLoop
+	class _priv_DefaultAnimationLoop : public AnimationLoop
 	{
 	public:
 		Ref<Thread> m_thread;
 
 	public:
-		_DefaultAnimationLoop()
+		_priv_DefaultAnimationLoop()
 		{
 			SLIB_REFERABLE_CONSTRUCTOR
 
 			if (m_thread.isNull()) {
-				m_thread = Thread::start(SLIB_FUNCTION_CLASS(_DefaultAnimationLoop, run, this));
+				m_thread = Thread::start(SLIB_FUNCTION_CLASS(_priv_DefaultAnimationLoop, run, this));
 			} else {
 				m_thread->wake();
 			}
 	
 		}
 
-		~_DefaultAnimationLoop()
+		~_priv_DefaultAnimationLoop()
 		{
 			if (m_thread.isNotNull()) {
 				m_thread->finishAndWait();
@@ -1059,11 +1059,11 @@ namespace slib
 
 	};
 	
-	SLIB_SAFE_STATIC_GETTER(Ref<AnimationLoop>, _AnimationLoop_getDefault, new _DefaultAnimationLoop)
+	SLIB_SAFE_STATIC_GETTER(Ref<AnimationLoop>, _priv_AnimationLoop_getDefault, new _priv_DefaultAnimationLoop)
 	
 	Ref<AnimationLoop> AnimationLoop::getDefault()
 	{
-		Ref<AnimationLoop>* pLoop = _AnimationLoop_getDefault();
+		Ref<AnimationLoop>* pLoop = _priv_AnimationLoop_getDefault();
 		if (pLoop) {
 			return *pLoop;
 		}

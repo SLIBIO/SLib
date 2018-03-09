@@ -22,7 +22,7 @@
 namespace slib
 {
 
-	class _WGLRendererImpl : public Renderer
+	class _priv_WGLRendererImpl : public Renderer
 	{
 	public:
 		sl_bool m_flagRequestRender;
@@ -35,19 +35,19 @@ namespace slib
 		AtomicRef<Thread> m_threadRender;
 
 	public:
-		_WGLRendererImpl()
+		_priv_WGLRendererImpl()
 		{
 			m_context = sl_null;
 			m_flagRequestRender = sl_true;
 		}
 
-		~_WGLRendererImpl()
+		~_priv_WGLRendererImpl()
 		{
 			release();
 		}
 
 	public:
-		static Ref<_WGLRendererImpl> create(void* _windowHandle, const RendererParam& _param)
+		static Ref<_priv_WGLRendererImpl> create(void* _windowHandle, const RendererParam& _param)
 		{
 			HWND hWnd = (HWND)_windowHandle;
 			if (hWnd == 0) {
@@ -80,14 +80,14 @@ namespace slib
 						HGLRC context = wglCreateContext(hDC);
 						if (context) {
 
-							Ref<_WGLRendererImpl> ret = new _WGLRendererImpl();
+							Ref<_priv_WGLRendererImpl> ret = new _priv_WGLRendererImpl();
 
 							if (ret.isNotNull()) {
 								ret->m_hWindow = hWnd;
 								ret->m_hDC = hDC;
 								ret->m_context = context;
 
-								ret->m_threadRender = Thread::start(SLIB_FUNCTION_CLASS(_WGLRendererImpl, run, ret.get()));
+								ret->m_threadRender = Thread::start(SLIB_FUNCTION_CLASS(_priv_WGLRendererImpl, run, ret.get()));
 
 								ret->m_callback = param.callback;
 
@@ -184,7 +184,7 @@ namespace slib
 
 	Ref<Renderer> WGL::createRenderer(void* windowHandle, const RendererParam& param)
 	{
-		return _WGLRendererImpl::create(windowHandle, param);
+		return _priv_WGLRendererImpl::create(windowHandle, param);
 	}
 
 }

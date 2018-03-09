@@ -44,20 +44,20 @@ namespace slib
 #include "slib/render/program.h"
 #include "slib/core/queue.h"
 
-#define _OPENGL_IMPL
+#define PRIV_OPENGL_IMPL
 #define GL_BASE GL
-#define GL_ENGINE _GL_Engine
-#define GL_ENTRY(x) _GL_ENTRY(x)
+#define GL_ENGINE _priv_GL_Engine
+#define GL_ENTRY(x) PRIV_GL_ENTRY(x)
 #include "opengl_impl.h"
 
 #	if defined (SLIB_PLATFORM_IS_WIN32)
 
 namespace slib
 {
-	_GL_ENTRY_POINTS _GL_ENTRIES;
+	_priv_GL_EntryPoints _priv_GL_entries;
 	
-#undef _SLIB_RENDER_GL_ENTRY
-#define _SLIB_RENDER_GL_ENTRY(TYPE, name, ...) \
+#undef PRIV_SLIB_RENDER_GL_ENTRY
+#define PRIV_SLIB_RENDER_GL_ENTRY(TYPE, name, ...) \
 	if (hDll) { \
 		proc = ::GetProcAddress(hDll, #name); \
 	} else { \
@@ -69,11 +69,11 @@ namespace slib
 	if (proc == 0) { \
 		flagSupport = sl_false; \
 	} \
-	*((FARPROC*)(&(_GL_ENTRIES.name))) = proc;
+	*((FARPROC*)(&(_priv_GL_entries.name))) = proc;
 	
-#undef _SLIB_RENDER_GL_SUPPORT
-#define _SLIB_RENDER_GL_SUPPORT(name) \
-	_GL_ENTRIES.flagSupports##name = flagSupport; \
+#undef PRIV_SLIB_RENDER_GL_SUPPORT
+#define PRIV_SLIB_RENDER_GL_SUPPORT(name) \
+	_priv_GL_entries.flagSupports##name = flagSupport; \
 	flagSupport = sl_true;
 	
 	static sl_bool _g_render_GL_flagLoadedEntryPoints = sl_false;
@@ -102,7 +102,7 @@ namespace slib
 		}
 		FARPROC proc;
 		sl_bool flagSupport = sl_true;
-		_SLIB_RENDER_GL_ENTRIES
+		PRIV_SLIB_RENDER_GL_ENTRIES
 		_g_render_GL_flagLoadedEntryPoints = sl_true;
 	}
 	

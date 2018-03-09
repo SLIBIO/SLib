@@ -24,35 +24,35 @@
 
 namespace slib
 {
-	class _AVFoundation_Camera;
+	class _priv_AVFoundation_Camera;
 }
 
-@interface _AVFoundation_Camera_Callback : NSObject<AVCaptureVideoDataOutputSampleBufferDelegate>
+@interface _priv_AVFoundation_Camera_Callback : NSObject<AVCaptureVideoDataOutputSampleBufferDelegate>
 {
-	@public slib::WeakRef<slib::_AVFoundation_Camera> m_camera;
+	@public slib::WeakRef<slib::_priv_AVFoundation_Camera> m_camera;
 }
 @end
 
 namespace slib
 {
 
-	class _AVFoundation_Camera_Static
+	class _priv_AVFoundation_Camera_Static
 	{
 	public:
 		dispatch_queue_t dispatch_queue;
 		
 	public:
-		_AVFoundation_Camera_Static()
+		_priv_AVFoundation_Camera_Static()
 		{
 			dispatch_queue = dispatch_queue_create("SLIB_CAMERA", DISPATCH_QUEUE_SERIAL);
 		}
 	};
-	SLIB_SAFE_STATIC_GETTER(_AVFoundation_Camera_Static, _AVFoundation_Camera_getStatic)
+	SLIB_SAFE_STATIC_GETTER(_priv_AVFoundation_Camera_Static, _priv_AVFoundation_Camera_getStatic)
 
-	class _AVFoundation_Camera : public Camera
+	class _priv_AVFoundation_Camera : public Camera
 	{
 	public:
-		_AVFoundation_Camera_Callback* m_callback;
+		_priv_AVFoundation_Camera_Callback* m_callback;
 		AVCaptureSession *m_session;
 		AVCaptureDevice* m_device;
 		AVCaptureDeviceInput* m_input;
@@ -61,7 +61,7 @@ namespace slib
 		sl_bool m_flagRunning;
 		
 	public:
-		_AVFoundation_Camera()
+		_priv_AVFoundation_Camera()
 		{
 			m_callback = nil;
 			m_session = nil;
@@ -72,7 +72,7 @@ namespace slib
 			m_flagRunning = sl_false;
 		}
 
-		~_AVFoundation_Camera()
+		~_priv_AVFoundation_Camera()
 		{
 			release();
 		}
@@ -86,11 +86,11 @@ namespace slib
 			Log("Camera", "%s: [%s]", error, [err localizedDescription]);
 		}
 
-		static Ref<_AVFoundation_Camera> _create(const CameraParam& param)
+		static Ref<_priv_AVFoundation_Camera> _create(const CameraParam& param)
 		{
-			Ref<_AVFoundation_Camera> ret;
+			Ref<_priv_AVFoundation_Camera> ret;
 			
-			_AVFoundation_Camera_Callback* callback = [[_AVFoundation_Camera_Callback alloc] init];
+			_priv_AVFoundation_Camera_Callback* callback = [[_priv_AVFoundation_Camera_Callback alloc] init];
 			AVCaptureSession *session = [[AVCaptureSession alloc] init];
 			
 			sl_int32 req_width = param.preferedFrameWidth;
@@ -117,7 +117,7 @@ namespace slib
 			
 			AVCaptureVideoDataOutput* output = [[AVCaptureVideoDataOutput alloc] init];
 			[output setAlwaysDiscardsLateVideoFrames:YES];
-			dispatch_queue_t queue = _AVFoundation_Camera_getStatic()->dispatch_queue;
+			dispatch_queue_t queue = _priv_AVFoundation_Camera_getStatic()->dispatch_queue;
 			[output setSampleBufferDelegate:callback queue:queue];
 			
 			NSMutableDictionary *settings = [[NSMutableDictionary alloc] init];
@@ -140,7 +140,7 @@ namespace slib
 				[videoConnection setVideoOrientation:AVCaptureVideoOrientationPortrait];
 			}
 			
-			ret = new _AVFoundation_Camera();
+			ret = new _priv_AVFoundation_Camera();
 			if (ret.isNotNull()) {
 				callback->m_camera = ret;
 				ret->m_callback = callback;
@@ -156,7 +156,7 @@ namespace slib
 			return ret;
 		}
 		
-		struct _PresetInfo
+		struct _priv_PresetInfo
 		{
 			NSString* preset;
 			sl_int32 width;
@@ -164,7 +164,7 @@ namespace slib
 		};
 		static void selectPresetForSession(AVCaptureSession* session, sl_int32& req_width, sl_int32& req_height)
 		{
-			_PresetInfo presets[3] = {
+			_priv_PresetInfo presets[3] = {
 				{AVCaptureSessionPreset352x288, 352, 288},
 				{AVCaptureSessionPreset640x480, 640, 480},
 				{AVCaptureSessionPreset1280x720, 1280, 720}
@@ -332,7 +332,7 @@ namespace slib
 
 	Ref<Camera> Camera::create(const CameraParam& param)
 	{
-		return _AVFoundation_Camera::_create(param);
+		return _priv_AVFoundation_Camera::_create(param);
 	}
 
 	List<CameraInfo> Camera::getCamerasList()
@@ -352,11 +352,11 @@ namespace slib
 
 }
 
-@implementation _AVFoundation_Camera_Callback
+@implementation _priv_AVFoundation_Camera_Callback
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
-	slib::Ref<slib::_AVFoundation_Camera> camera(m_camera);
+	slib::Ref<slib::_priv_AVFoundation_Camera> camera(m_camera);
 	if (camera.isNotNull()) {
 		camera->_onFrame(sampleBuffer);
 	}

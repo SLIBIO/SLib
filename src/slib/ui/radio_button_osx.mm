@@ -16,8 +16,8 @@
 
 #include "view_osx.h"
 
-@interface _Slib_OSX_RadioButton : NSButton {
-	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+@interface _priv_Slib_macOS_RadioButton : NSButton {
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 }
 
 @end
@@ -27,8 +27,8 @@ namespace slib
 
 	Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* _parent)
 	{
-		OSX_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_OSX_RadioButton* handle = [[_Slib_OSX_RadioButton alloc] initWithFrame:frame];
+		MACOS_VIEW_CREATE_INSTANCE_BEGIN
+		_priv_Slib_macOS_RadioButton* handle = [[_priv_Slib_macOS_RadioButton alloc] initWithFrame:frame];
 		if (handle != nil) {
 			handle.title = Apple::getNSStringFromString(getText());
 			[handle setButtonType:NSRadioButton];
@@ -40,13 +40,13 @@ namespace slib
 				[handle setFont:hFont];
 			}
 		}
-		OSX_VIEW_CREATE_INSTANCE_END
+		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
 
 }
 
-@implementation _Slib_OSX_RadioButton
+@implementation _priv_Slib_macOS_RadioButton
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -59,7 +59,7 @@ namespace slib
 
 -(void)onClick
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		instance->onClick();
 	}

@@ -18,7 +18,7 @@ namespace slib
 	
 	SLIB_DEFINE_OBJECT(Slider, ProgressBar)
 	
-	class _Slider_Static
+	class _priv_Slider_Static
 	{
 	public:
 		Ref<Drawable> defaultTrack;
@@ -28,7 +28,7 @@ namespace slib
 		Ref<Drawable> defaultPressedThumb;
 		Ref<Drawable> defaultHoverThumb;
 		
-		_Slider_Static()
+		_priv_Slider_Static()
 		{
 			defaultTrack = ColorDrawable::create(Color(0, 0, 0));
 			defaultProgress = ColorDrawable::create(Color(0, 50, 250));
@@ -39,14 +39,14 @@ namespace slib
 		}
 	};
 	
-	SLIB_SAFE_STATIC_GETTER(_Slider_Static, _Slider_getStatic)
+	SLIB_SAFE_STATIC_GETTER(_priv_Slider_Static, _priv_Slider_getStatic)
 	
 	Slider::Slider(LayoutOrientation orientation) : ProgressBar(orientation)
 	{
 		
 		SLIB_REFERABLE_CONSTRUCTOR
 		
-		_Slider_Static* s = _Slider_getStatic();
+		_priv_Slider_Static* s = _priv_Slider_getStatic();
 		if (s) {
 			m_track = s->defaultTrack;
 			m_progress = s->defaultProgress;

@@ -17,7 +17,7 @@
 #include "view_android.h"
 
 
-SLIB_JNI_BEGIN_CLASS(_JAndroidEditView, "slib/platform/android/ui/view/UiEditView")
+SLIB_JNI_BEGIN_CLASS(JAndroidEditView, "slib/platform/android/ui/view/UiEditView")
 
 	SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;I)Landroid/view/View;");
 
@@ -34,21 +34,21 @@ SLIB_JNI_END_CLASS
 namespace slib
 {
 
-	class _LabelView : public LabelView
+	class _priv_LabelView : public LabelView
 	{
 	public:
 		void applyParameters(jobject handle)
 		{
 			JniLocal<jstring> jtext = Jni::getJniString(m_text);
-			_JAndroidEditView::setText.callBoolean(sl_null, handle, jtext.get());
-			_JAndroidEditView::setBorder.callBoolean(sl_null, handle, isBorder());
-			_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, m_textAlignment.value);
-			_JAndroidEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
-			_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
+			JAndroidEditView::setText.callBoolean(sl_null, handle, jtext.get());
+			JAndroidEditView::setBorder.callBoolean(sl_null, handle, isBorder());
+			JAndroidEditView::setAlignment.callBoolean(sl_null, handle, m_textAlignment.value);
+			JAndroidEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
+			JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
 			Ref<Font> font = getFont();
 			jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 			if (jfont) {
-				_JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
+				JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
 			}
 		}
 	};
@@ -58,11 +58,11 @@ namespace slib
 		Ref<Android_ViewInstance> ret;
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
-			JniLocal<jobject> handle = _JAndroidEditView::create.callObject(sl_null, parent->getContext(), 3);
+			JniLocal<jobject> handle = JAndroidEditView::create.callObject(sl_null, parent->getContext(), 3);
 			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
-				((_LabelView*)this)->applyParameters(handle);
+				((_priv_LabelView*)this)->applyParameters(handle);
 			}
 		}
 		return ret;
@@ -73,7 +73,7 @@ namespace slib
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			JniLocal<jstring> jstr = Jni::getJniString(text);
-			_JAndroidEditView::setText.callBoolean(sl_null, handle, jstr.get());
+			JAndroidEditView::setText.callBoolean(sl_null, handle, jstr.get());
 		}
 	}
 
@@ -81,7 +81,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, align.value);
+			JAndroidEditView::setAlignment.callBoolean(sl_null, handle, align.value);
 		}
 	}
 
@@ -89,7 +89,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidEditView::setTextColor.callBoolean(sl_null, handle, color.getARGB());
+			JAndroidEditView::setTextColor.callBoolean(sl_null, handle, color.getARGB());
 		}
 	}
 
@@ -99,7 +99,7 @@ namespace slib
 		if (handle) {
 			jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 			if (jfont) {
-				_JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
+				JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
 			}
 		}
 	}
@@ -108,7 +108,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidEditView::setBorder.callBoolean(sl_null, handle, flag);
+			JAndroidEditView::setBorder.callBoolean(sl_null, handle, flag);
 		}
 	}
 
@@ -116,7 +116,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, color.getARGB());
+			JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, color.getARGB());
 		}
 	}
 

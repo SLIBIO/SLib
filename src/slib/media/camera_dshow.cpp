@@ -71,7 +71,7 @@ EXTERN_C const CLSID CLSID_NullRenderer;
 namespace slib
 {
 
-	class _DShow_Camera : public Camera, public ISampleGrabberCB
+	class _priv_DShow_Camera : public Camera, public ISampleGrabberCB
 	{
 	public:
 		ICaptureGraphBuilder2* m_capture;
@@ -82,7 +82,7 @@ namespace slib
 		sl_bool m_flagRunning;
 
 	public:
-		_DShow_Camera()
+		_priv_DShow_Camera()
 		{
 			m_capture = sl_null;
 			m_graph = sl_null;
@@ -92,7 +92,7 @@ namespace slib
 			m_flagRunning = sl_false;
 		}
 
-		~_DShow_Camera()
+		~_priv_DShow_Camera()
 		{
 			release();
 		}
@@ -106,9 +106,9 @@ namespace slib
 			Log("Camera", "%s (Result=%d)", error, (sl_int32)hr);
 		}
 
-		static Ref<_DShow_Camera> _create(const CameraParam& param)
+		static Ref<_priv_DShow_Camera> _create(const CameraParam& param)
 		{
-			Ref<_DShow_Camera> ret;
+			Ref<_priv_DShow_Camera> ret;
 			HRESULT hr;
 
 			IBaseFilter* filterSource = NULL;
@@ -151,7 +151,7 @@ namespace slib
 														if (SUCCEEDED(hr)) {
 															hr = capture->RenderStream(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Video, filterSource, filterGrabber, filterNullRenderer);
 															if (SUCCEEDED(hr)) {
-																ret = new _DShow_Camera();
+																ret = new _priv_DShow_Camera();
 																if (ret.isNotNull()) {
 																	hr = grabber->SetCallback(ret.get(), 0);
 																	if (SUCCEEDED(hr)) {
@@ -423,12 +423,12 @@ namespace slib
 
 	Ref<Camera> DirectShow::createCamera(const CameraParam& param)
 	{
-		return _DShow_Camera::_create(param);
+		return _priv_DShow_Camera::_create(param);
 	}
 
 	List<CameraInfo> DirectShow::getCamerasList()
 	{
-		return _DShow_Camera::_queryDevices(String::null(), NULL);
+		return _priv_DShow_Camera::_queryDevices(String::null(), NULL);
 	}
 
 }

@@ -18,9 +18,9 @@ namespace slib
 		FUNC func;
 
 	public:
-		template <class _FUNC>
-		SLIB_INLINE _priv_CallableFromFunction(_FUNC&& _func) noexcept
-		 : func(Forward<_FUNC>(_func))
+		template <class OTHER_FUNC>
+		SLIB_INLINE _priv_CallableFromFunction(OTHER_FUNC&& _func) noexcept
+		 : func(Forward<OTHER_FUNC>(_func))
 		 {}
 
 	public:
@@ -38,9 +38,9 @@ namespace slib
 		BIND_TUPLE binds;
 
 	public:
-		template <class _FUNC, class _BIND_TUPLE>
-		SLIB_INLINE _priv_BindFromFunction(_FUNC&& _func, _BIND_TUPLE&& _binds) noexcept
-		 : func(Forward<_FUNC>(_func)), binds(Forward<_BIND_TUPLE>(_binds))
+		template <class OTHER_FUNC, class OTHER_BIND_TUPLE>
+		SLIB_INLINE _priv_BindFromFunction(OTHER_FUNC&& _func, OTHER_BIND_TUPLE&& _binds) noexcept
+		 : func(Forward<OTHER_FUNC>(_func)), binds(Forward<OTHER_BIND_TUPLE>(_binds))
 		 {}
 
 	public:
@@ -78,9 +78,9 @@ namespace slib
 		BIND_TUPLE binds;
 
 	public:
-		template <class _BIND_TUPLE>
-		SLIB_INLINE _priv_BindFromClass(CLASS* _object, FUNC _func, _BIND_TUPLE&& _binds) noexcept
-		 : object(_object), func(_func), binds(Forward<_BIND_TUPLE>(_binds))
+		template <class OTHER_BIND_TUPLE>
+		SLIB_INLINE _priv_BindFromClass(CLASS* _object, FUNC _func, OTHER_BIND_TUPLE&& _binds) noexcept
+		 : object(_object), func(_func), binds(Forward<OTHER_BIND_TUPLE>(_binds))
 		 {}
 	
 	public:
@@ -119,9 +119,9 @@ namespace slib
 		BIND_TUPLE binds;
 
 	public:
-		template <class T, class _BIND_TUPLE>
-		SLIB_INLINE _priv_BindFromRef(T&& _object, FUNC _func, _BIND_TUPLE&& _binds) noexcept
-		 : object(Forward<T>(_object)), func(_func), binds(Forward<_BIND_TUPLE>(_binds))
+		template <class T, class OTHER_BIND_TUPLE>
+		SLIB_INLINE _priv_BindFromRef(T&& _object, FUNC _func, OTHER_BIND_TUPLE&& _binds) noexcept
+		 : object(Forward<T>(_object)), func(_func), binds(Forward<OTHER_BIND_TUPLE>(_binds))
 		 {}
 
 	public:
@@ -165,9 +165,9 @@ namespace slib
 		BIND_TUPLE binds;
 
 	public:
-		template <class T, class _BIND_TUPLE>
-		SLIB_INLINE _priv_BindFromWeakRef(T&& _object, FUNC _func, _BIND_TUPLE&& _binds) noexcept
-		 : object(Forward<T>(_object)), func(_func), binds(Forward<_BIND_TUPLE>(_binds))
+		template <class T, class OTHER_BIND_TUPLE>
+		SLIB_INLINE _priv_BindFromWeakRef(T&& _object, FUNC _func, OTHER_BIND_TUPLE&& _binds) noexcept
+		 : object(Forward<T>(_object)), func(_func), binds(Forward<OTHER_BIND_TUPLE>(_binds))
 		 {}
 
 	public:

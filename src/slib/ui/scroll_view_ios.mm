@@ -16,7 +16,7 @@
 
 #include "view_ios.h"
 
-@interface _Slib_iOS_ScrollView : UIScrollView<UIScrollViewDelegate> {
+@interface _priv_Slib_iOS_ScrollView : UIScrollView<UIScrollViewDelegate> {
 	
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 	
@@ -36,10 +36,10 @@
 
 namespace slib
 {
-	class _ScrollView : public ScrollView
+	class _priv_ScrollView : public ScrollView
 	{
 	public:
-		void _applyContentSize(_Slib_iOS_ScrollView* sv)
+		void _applyContentSize(_priv_Slib_iOS_ScrollView* sv)
 		{
 			if (![NSThread isMainThread]) {
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -59,7 +59,7 @@ namespace slib
 			[sv setContentSize:CGSizeMake((CGFloat)(size.x) / f, (CGFloat)(size.y) / f)];
 		}
 		
-		void _applyContent(_Slib_iOS_ScrollView* sv)
+		void _applyContent(_priv_Slib_iOS_ScrollView* sv)
 		{
 			if (![NSThread isMainThread]) {
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -87,7 +87,7 @@ namespace slib
 			_applyContentSize(sv);
 		}
 		
-		void _applyProperties(_Slib_iOS_ScrollView* handle)
+		void _applyProperties(_priv_Slib_iOS_ScrollView* handle)
 		{
 			if (![NSThread isMainThread]) {
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -112,7 +112,7 @@ namespace slib
 		{
 			CGPoint pt= sv.contentOffset;
 			Ref<View> _view = instance->getView();
-			if (_ScrollView* view = CastInstance<_ScrollView>(_view.get())) {
+			if (_priv_ScrollView* view = CastInstance<_priv_ScrollView>(_view.get())) {
 				CGFloat f = UIPlatform::getGlobalScaleFactor();
 				view->_onScroll_NW((sl_scroll_pos)(pt.x * f), (sl_scroll_pos)(pt.y * f));
 			}
@@ -123,9 +123,9 @@ namespace slib
 	Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_iOS_ScrollView* handle = [[_Slib_iOS_ScrollView alloc] initWithFrame:frame];
+		_priv_Slib_iOS_ScrollView* handle = [[_priv_Slib_iOS_ScrollView alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((_ScrollView*)this)->_applyProperties(handle);
+			((_priv_ScrollView*)this)->_applyProperties(handle);
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -141,9 +141,9 @@ namespace slib
 		}
 		
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
-			_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
-			((_ScrollView*)this)->_applyContentSize(sv);
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_ScrollView class]]) {
+			_priv_Slib_iOS_ScrollView* sv = (_priv_Slib_iOS_ScrollView*)handle;
+			((_priv_ScrollView*)this)->_applyContentSize(sv);
 		}
 	}
 	
@@ -158,9 +158,9 @@ namespace slib
 		}
 		
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
-			_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
-			((_ScrollView*)this)->_applyContent(sv);
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_ScrollView class]]) {
+			_priv_Slib_iOS_ScrollView* sv = (_priv_Slib_iOS_ScrollView*)handle;
+			((_priv_ScrollView*)this)->_applyContent(sv);
 		}
 	}
 	
@@ -176,8 +176,8 @@ namespace slib
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			CGFloat f = UIPlatform::getGlobalScaleFactor();
-			if ([handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
-				_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
+			if ([handle isKindOfClass:[_priv_Slib_iOS_ScrollView class]]) {
+				_priv_Slib_iOS_ScrollView* sv = (_priv_Slib_iOS_ScrollView*)handle;
 				[sv setContentOffsetFromAPI:CGPointMake((CGFloat)(x) / f, (CGFloat)(y) / f) animated:flagAnimate];
 			} else if ([handle isKindOfClass:[UIScrollView class]]) {
 				UIScrollView* sv = (UIScrollView*)handle;
@@ -247,8 +247,8 @@ namespace slib
 	void ScrollView::_setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight)
 	{
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
-			_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_ScrollView class]]) {
+			_priv_Slib_iOS_ScrollView* sv = (_priv_Slib_iOS_ScrollView*)handle;
 			[sv setPaging:flagPaging :pageWidth :pageHeight];
 		}
 	}
@@ -264,7 +264,7 @@ namespace slib
 	}	
 }
 
-@implementation _Slib_iOS_ScrollView
+@implementation _priv_Slib_iOS_ScrollView
 
 -(id)initWithFrame:(CGRect)frame
 {
@@ -280,7 +280,7 @@ namespace slib
 	[super setContentOffset:contentOffset];
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_ScrollView::_onScroll(instance.get(), self);
+		slib::_priv_ScrollView::_onScroll(instance.get(), self);
 	}
 }
 

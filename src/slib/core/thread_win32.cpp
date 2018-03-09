@@ -41,7 +41,7 @@ namespace slib
 		_gt_threadUniqueId = n;
 	}
 
-	static DWORD CALLBACK _ThreadProc(LPVOID lpParam)
+	static DWORD CALLBACK _priv_ThreadProc(LPVOID lpParam)
 	{
 		Thread* pThread = (Thread*)lpParam;
 		pThread->_run();
@@ -53,7 +53,7 @@ namespace slib
 	{
 		DWORD threadID = 0;
 		this->increaseReference();
-		m_handle = (void*)(CreateThread(NULL, stackSize, _ThreadProc, (LPVOID)this, 0, &threadID));
+		m_handle = (void*)(CreateThread(NULL, stackSize, _priv_ThreadProc, (LPVOID)this, 0, &threadID));
 		if (!m_handle) {
 			this->decreaseReference();
 		}

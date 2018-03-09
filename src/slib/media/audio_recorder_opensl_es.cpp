@@ -24,7 +24,7 @@
 namespace slib
 {
 
-	class _OpenSLES_AudioRecorderImpl : public AudioRecorder
+	class _priv_OpenSLES_AudioRecorderImpl : public AudioRecorder
 	{
 	public:
 		SLObjectItf m_engineObject;
@@ -42,14 +42,14 @@ namespace slib
 		sl_uint32 m_nSamplesFrame;
 		
 	public:
-		_OpenSLES_AudioRecorderImpl()
+		_priv_OpenSLES_AudioRecorderImpl()
 		{
 			m_flagOpened = sl_true;
 			m_flagRunning = sl_false;
 			m_indexBuffer = 0;
 		}
 
-		~_OpenSLES_AudioRecorderImpl()
+		~_priv_OpenSLES_AudioRecorderImpl()
 		{
 			release();
 		}
@@ -60,9 +60,9 @@ namespace slib
 			LogError("OpenSL_ES", text);
 		}
 
-		static Ref<_OpenSLES_AudioRecorderImpl> create(const AudioRecorderParam& param)
+		static Ref<_priv_OpenSLES_AudioRecorderImpl> create(const AudioRecorderParam& param)
 		{
-			Ref<_OpenSLES_AudioRecorderImpl> ret;
+			Ref<_priv_OpenSLES_AudioRecorderImpl> ret;
 			
 			if (param.channelsCount != 1 && param.channelsCount != 2) {
 				return ret;
@@ -123,7 +123,7 @@ namespace slib
 					if ((*recorderObject)->Realize(recorderObject, SL_BOOLEAN_FALSE) == SL_RESULT_SUCCESS) {
 						if ((*recorderObject)->GetInterface(recorderObject, SL_IID_RECORD, &recordInterface) == SL_RESULT_SUCCESS) {
 							if ((*recorderObject)->GetInterface( recorderObject, SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &bufferQueue) == SL_RESULT_SUCCESS) {
-								ret = new _OpenSLES_AudioRecorderImpl();
+								ret = new _priv_OpenSLES_AudioRecorderImpl();
 								if (ret.isNotNull()) {
 									ret->m_engineInterface = engineInterface;
 									ret->m_engineObject = engineObject;
@@ -137,7 +137,7 @@ namespace slib
 									
 									if (ret->m_bufFrame) {
 										Base::zeroMemory(ret->m_bufFrame, sizeof(sl_int16) * ret->m_nSamplesFrame * 2);
-										if ((*bufferQueue)->RegisterCallback(bufferQueue, _OpenSLES_AudioRecorderImpl::callback, ret.get()) == SL_RESULT_SUCCESS) {
+										if ((*bufferQueue)->RegisterCallback(bufferQueue, _priv_OpenSLES_AudioRecorderImpl::callback, ret.get()) == SL_RESULT_SUCCESS) {
 											if (param.flagAutoStart) {
 												ret->start();
 											}
@@ -243,14 +243,14 @@ namespace slib
 
 		static void	callback(SLAndroidSimpleBufferQueueItf bufferQueue, void* p_context)
 		{
-			_OpenSLES_AudioRecorderImpl* object = (_OpenSLES_AudioRecorderImpl*)p_context;
+			_priv_OpenSLES_AudioRecorderImpl* object = (_priv_OpenSLES_AudioRecorderImpl*)p_context;
 			object->onFrame();
 		}
 	};
 
 	Ref<AudioRecorder> OpenSL_ES::createRecorder(const AudioRecorderParam& param)
 	{
-		return _OpenSLES_AudioRecorderImpl::create(param);
+		return _priv_OpenSLES_AudioRecorderImpl::create(param);
 	}
 
 }

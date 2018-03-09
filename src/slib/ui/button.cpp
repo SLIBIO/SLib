@@ -51,13 +51,13 @@ namespace slib
 		textColor = Color::zero();
 	}
 
-	class _Button_Categories
+	class _priv_Button_Categories
 	{
 	public:
 		ButtonCategory categories[2];
 		
 	public:
-		_Button_Categories()
+		_priv_Button_Categories()
 		{
 			categories[1].properties[(int)(ButtonState::Normal)].border = Pen::create(PenStyle::Solid, 3, Color(0, 100, 250));
 		}
@@ -65,7 +65,7 @@ namespace slib
 	public:
 		static ButtonCategory* getCategories()
 		{
-			SLIB_SAFE_STATIC(_Button_Categories, ret)
+			SLIB_SAFE_STATIC(_priv_Button_Categories, ret)
 			if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
 				return sl_null;
 			}
@@ -119,7 +119,7 @@ namespace slib
 		m_nCategories = nCategories;
 		m_categories = NewHelper<ButtonCategory>::create(nCategories);
 		if (!categories) {
-			categories = _Button_Categories::getCategories();
+			categories = _priv_Button_Categories::getCategories();
 			if (nCategories > 2) {
 				nCategories = 2;
 			}

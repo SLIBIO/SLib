@@ -17,25 +17,25 @@
 
 #include "view_osx.h"
 
-@interface SLib_macOS_TextField : NSTextField<NSTextFieldDelegate> {
+@interface _priv_Slib_macOS_TextField : NSTextField<NSTextFieldDelegate> {
 	
-	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 	
 	@public sl_bool m_flagMultiLine;
 	
 }
 @end
 
-@interface SLib_macOS_SecureTextField : NSSecureTextField<NSTextFieldDelegate> {
+@interface _priv_Slib_macOS_SecureTextField : NSSecureTextField<NSTextFieldDelegate> {
 	
-	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 
 }
 @end
 
-@interface SLib_macOS_TextArea_TextView : NSTextView {
+@interface _priv_Slib_macOS_TextArea_TextView : NSTextView {
 	
-	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 
 	
 	@public NSAttributedString* placeholderString;
@@ -43,11 +43,11 @@
 }
 @end
 
-@interface SLib_macOS_TextArea : NSScrollView<NSTextViewDelegate> {
+@interface _priv_Slib_macOS_TextArea : NSScrollView<NSTextViewDelegate> {
 	
-	@public SLib_macOS_TextArea_TextView* textView;
+	@public _priv_Slib_macOS_TextArea_TextView* textView;
 	
-	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 
 }
 
@@ -75,8 +75,8 @@ namespace slib
 				if ([handle isKindOfClass:[NSTextField class]]) {
 					NSTextField* tv = (NSTextField*)handle;
 					hFont = tv.font;
-				} else if ([handle isKindOfClass:[SLib_macOS_TextArea class]]) {
-					SLib_macOS_TextArea* tv = (SLib_macOS_TextArea*)handle;
+				} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+					_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
 					hFont = tv->textView.font;
 				}
 
@@ -92,8 +92,8 @@ namespace slib
 				if (attr != [[tv cell] placeholderAttributedString]) {
 					[[tv cell] setPlaceholderAttributedString:attr];
 				}
-			} else if ([handle isKindOfClass:[SLib_macOS_TextArea class]]) {
-				SLib_macOS_TextArea* tv = (SLib_macOS_TextArea*)handle;
+			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
 				tv->textView->placeholderString = attr;
 				if (m_text.isEmpty() && attr != nil) {
 					[tv setNeedsDisplay:YES];
@@ -120,7 +120,7 @@ namespace slib
 			}
 		}
 		
-		void _applyProperties(SLib_macOS_TextArea* handle)
+		void _applyProperties(_priv_Slib_macOS_TextArea* handle)
 		{
 			NSTextView* tv = handle->textView;
 			[tv setString:(Apple::getNSStringFromString(m_text))];
@@ -160,7 +160,7 @@ namespace slib
 			return Alignment::Left;
 		}
 		
-		static void onChangeTextField(OSX_ViewInstance* instance, NSTextField* control)
+		static void onChangeTextField(macOS_ViewInstance* instance, NSTextField* control)
 		{
 			Ref<View> _view = instance->getView();
 			if (EditView_Impl* view = CastInstance<EditView_Impl>(_view.get())) {
@@ -173,7 +173,7 @@ namespace slib
 			}
 		}
 		
-		static void onChangeTextArea(OSX_ViewInstance* instance, SLib_macOS_TextArea* control)
+		static void onChangeTextArea(macOS_ViewInstance* instance, _priv_Slib_macOS_TextArea* control)
 		{
 			Ref<View> _view = instance->getView();
 			if (EditView_Impl* view = CastInstance<EditView_Impl>(_view.get())) {
@@ -190,37 +190,37 @@ namespace slib
 
 	Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* _parent)
 	{
-		OSX_VIEW_CREATE_INSTANCE_BEGIN
-		SLib_macOS_TextField* handle = [[SLib_macOS_TextField alloc] initWithFrame:frame];
+		MACOS_VIEW_CREATE_INSTANCE_BEGIN
+		_priv_Slib_macOS_TextField* handle = [[_priv_Slib_macOS_TextField alloc] initWithFrame:frame];
 		if (handle != nil) {
 			handle->m_flagMultiLine = m_flagMultiLine;
 			((EditView_Impl*)this)->_applyProperties(handle);
 			[handle setDelegate:handle];
 		}
-		OSX_VIEW_CREATE_INSTANCE_END
+		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
 
 	Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* _parent)
 	{
-		OSX_VIEW_CREATE_INSTANCE_BEGIN
-		SLib_macOS_SecureTextField* handle = [[SLib_macOS_SecureTextField alloc] initWithFrame:frame];
+		MACOS_VIEW_CREATE_INSTANCE_BEGIN
+		_priv_Slib_macOS_SecureTextField* handle = [[_priv_Slib_macOS_SecureTextField alloc] initWithFrame:frame];
 		if (handle != nil) {
 			((EditView_Impl*)this)->_applyProperties(handle);
 			[handle setDelegate:handle];
 		}
-		OSX_VIEW_CREATE_INSTANCE_END
+		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
 
 	Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* _parent)
 	{
-		OSX_VIEW_CREATE_INSTANCE_BEGIN
-		SLib_macOS_TextArea* handle = [[SLib_macOS_TextArea alloc] initWithFrame:frame];
+		MACOS_VIEW_CREATE_INSTANCE_BEGIN
+		_priv_Slib_macOS_TextArea* handle = [[_priv_Slib_macOS_TextArea alloc] initWithFrame:frame];
 		if (handle != nil) {
 			((EditView_Impl*)this)->_applyProperties(handle);
 		}
-		OSX_VIEW_CREATE_INSTANCE_END
+		MACOS_VIEW_CREATE_INSTANCE_END
 		if (handle != nil) {
 			handle->textView->m_viewInstance = ret;
 		}
@@ -235,8 +235,8 @@ namespace slib
 				NSTextField* tv = (NSTextField*)handle;
 				NSString* s = [tv stringValue];
 				m_text = Apple::getStringFromNSString(s);
-			} else if ([handle isKindOfClass:[SLib_macOS_TextArea class]]) {
-				SLib_macOS_TextArea* tv = (SLib_macOS_TextArea*)handle;
+			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
 				NSString* s = [tv->textView string];
 				m_text = Apple::getStringFromNSString(s);
 			}
@@ -257,8 +257,8 @@ namespace slib
 						[tv setStringValue:value];
 					});
 				}
-			} else if ([handle isKindOfClass:[SLib_macOS_TextArea class]]) {
-				SLib_macOS_TextArea* tv = (SLib_macOS_TextArea*)handle;
+			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
 				if (UI::isUiThread()) {
 					[tv->textView setString:value];
 				} else {
@@ -283,8 +283,8 @@ namespace slib
 						[tv setBordered:(flag?TRUE:FALSE)];
 					});
 				}
-			} else if ([handle isKindOfClass:[SLib_macOS_TextArea class]]) {
-				SLib_macOS_TextArea* tv = (SLib_macOS_TextArea*)handle;
+			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
 				if (UI::isUiThread()) {
 					[tv setBorderType:(flag?NSBezelBorder:NSNoBorder)];
 				} else {
@@ -311,8 +311,8 @@ namespace slib
 						((EditView_Impl*)this)->_applyPlaceholder(handle);
 					});
 				}
-			} else if ([handle isKindOfClass:[SLib_macOS_TextArea class]]) {
-				SLib_macOS_TextArea* tv = (SLib_macOS_TextArea*)handle;
+			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
 				if (UI::isUiThread()) {
 					[tv->textView setAlignment:EditView_Impl::translateAlignment(align)];
 					((EditView_Impl*)this)->_applyPlaceholder(handle);
@@ -367,8 +367,8 @@ namespace slib
 						[tv setEditable:(flag ? FALSE : TRUE)];
 					});
 				}
-			} else if ([handle isKindOfClass:[SLib_macOS_TextArea class]]) {
-				SLib_macOS_TextArea* tv = (SLib_macOS_TextArea*)handle;
+			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
 				if (UI::isUiThread()) {
 					[tv->textView setEditable:(flag ? FALSE : TRUE)];
 				} else {
@@ -383,8 +383,8 @@ namespace slib
 	void EditView::_setMultiLine_NW(sl_bool flag)
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[SLib_macOS_TextField class]]) {
-			SLib_macOS_TextField* tv = (SLib_macOS_TextField*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_TextField class]]) {
+			_priv_Slib_macOS_TextField* tv = (_priv_Slib_macOS_TextField*)handle;
 			tv->m_flagMultiLine = flag;
 		}
 	}
@@ -402,8 +402,8 @@ namespace slib
 						[tv setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
 					});
 				}
-			} else if ([handle isKindOfClass:[SLib_macOS_TextArea class]]) {
-				SLib_macOS_TextArea* tv = (SLib_macOS_TextArea*)handle;
+			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
 				if (UI::isUiThread()) {
 					[tv->textView setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
 				} else {
@@ -428,8 +428,8 @@ namespace slib
 						[tv setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(color))];
 					});
 				}
-			} else if ([handle isKindOfClass:[SLib_macOS_TextArea class]]) {
-				SLib_macOS_TextArea* tv = (SLib_macOS_TextArea*)handle;
+			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
 				if (UI::isUiThread()) {
 					[tv->textView setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(color))];
 				} else {
@@ -459,8 +459,8 @@ namespace slib
 						});
 					}
 				}
-			} else if ([handle isKindOfClass:[SLib_macOS_TextArea class]]) {
-				SLib_macOS_TextArea* tv = (SLib_macOS_TextArea*)handle;
+			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
 				NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 				if (hFont != nil) {
 					if (UI::isUiThread()) {
@@ -479,10 +479,10 @@ namespace slib
 
 }
 
-@implementation SLib_macOS_TextField
+@implementation _priv_Slib_macOS_TextField
 -(void)controlTextDidChange:(NSNotification *)obj
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::EditView_Impl::onChangeTextField(instance.get(), self);
 	}
@@ -506,7 +506,7 @@ namespace slib
 
 - (void)keyUp:(NSEvent*)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
 		if (flagNoDefault) {
@@ -517,11 +517,11 @@ namespace slib
 }
 @end
 
-@implementation SLib_macOS_SecureTextField
+@implementation _priv_Slib_macOS_SecureTextField
 
 -(void)controlTextDidChange:(NSNotification *)obj
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::EditView_Impl::onChangeTextField(instance.get(), self);
 	}
@@ -529,7 +529,7 @@ namespace slib
 
 - (void)keyUp:(NSEvent*)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
 		if (flagNoDefault) {
@@ -541,13 +541,13 @@ namespace slib
 
 @end
 
-@implementation SLib_macOS_TextArea
+@implementation _priv_Slib_macOS_TextArea
 
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
 	if (self != nil) {
-		textView = [[SLib_macOS_TextArea_TextView alloc] init];
+		textView = [[_priv_Slib_macOS_TextArea_TextView alloc] init];
 		if (textView == nil) {
 			return nil;
 		}
@@ -570,7 +570,7 @@ namespace slib
 
 -(void)controlTextDidChange:(NSNotification *)obj
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::EditView_Impl::onChangeTextArea(instance.get(), self);
 	}
@@ -578,11 +578,11 @@ namespace slib
 
 @end
 
-@implementation SLib_macOS_TextArea_TextView
+@implementation _priv_Slib_macOS_TextArea_TextView
 
 - (void)keyDown:(NSEvent*)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagNoDefault = instance->onEventKey(sl_true, theEvent);
 		if (flagNoDefault) {
@@ -594,7 +594,7 @@ namespace slib
 
 - (void)keyUp:(NSEvent*)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
 		if (flagNoDefault) {

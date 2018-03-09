@@ -16,9 +16,9 @@
 
 #include "view_osx.h"
 
-@interface _Slib_OSX_CheckBox : NSButton {
+@interface _priv_Slib_macOS_CheckBox : NSButton {
 	
-	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 
 }
 
@@ -29,8 +29,8 @@ namespace slib
 
 	Ref<ViewInstance> CheckBox::createNativeWidget(ViewInstance* _parent)
 	{
-		OSX_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_OSX_CheckBox* handle = [[_Slib_OSX_CheckBox alloc] initWithFrame:frame];
+		MACOS_VIEW_CREATE_INSTANCE_BEGIN
+		_priv_Slib_macOS_CheckBox* handle = [[_priv_Slib_macOS_CheckBox alloc] initWithFrame:frame];
 		if (handle != nil) {
 			handle.title = Apple::getNSStringFromString(getText());
 			[handle setButtonType:NSSwitchButton];
@@ -42,7 +42,7 @@ namespace slib
 				[handle setFont:hFont];
 			}
 		}
-		OSX_VIEW_CREATE_INSTANCE_END
+		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
 
@@ -66,7 +66,7 @@ namespace slib
 
 }
 
-@implementation _Slib_OSX_CheckBox
+@implementation _priv_Slib_macOS_CheckBox
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -79,7 +79,7 @@ namespace slib
 
 -(void)onClick
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		instance->onClick();
 	}

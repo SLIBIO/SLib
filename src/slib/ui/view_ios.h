@@ -99,7 +99,7 @@ namespace slib
 	
 }
 
-@interface Slib_iOS_ViewHandle : UIView {
+@interface _priv_Slib_iOS_ViewHandle : UIView {
 
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 

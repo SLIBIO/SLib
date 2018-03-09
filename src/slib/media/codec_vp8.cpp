@@ -59,7 +59,7 @@ namespace slib
 	{
 	}
 
-	class _VP8EncoderImpl : public VP8Encoder
+	class _priv_VP8EncoderImpl : public VP8Encoder
 	{
 	public:
 		sl_uint32 m_nProcessFrameCount;
@@ -69,7 +69,7 @@ namespace slib
 		vpx_codec_interface m_codec_interface;
 
 	public:
-		_VP8EncoderImpl()
+		_priv_VP8EncoderImpl()
 		{
 			m_codec = sl_null;
 			m_codec_image = sl_null;
@@ -77,7 +77,7 @@ namespace slib
 			m_nProcessFrameCount = 0;
 		}
 
-		~_VP8EncoderImpl()
+		~_priv_VP8EncoderImpl()
 		{
 			if (m_codec_image != sl_null) {
 				vpx_img_free(m_codec_image);
@@ -112,7 +112,7 @@ namespace slib
 			return VPX_CBR;
 		}
 
-		static Ref<_VP8EncoderImpl> create(const VP8EncoderParam& param)
+		static Ref<_priv_VP8EncoderImpl> create(const VP8EncoderParam& param)
 		{
 			vpx_codec_enc_cfg_t codec_config;
 			vpx_codec_interface codec_interface = &vpx_codec_vp8_cx;
@@ -134,7 +134,7 @@ namespace slib
 								codec_config.g_timebase.num = 1;
 								
 								if (!vpx_codec_enc_init(codec, codec_interface(), &codec_config, 0)) {
-									Ref<_VP8EncoderImpl> ret = new _VP8EncoderImpl();
+									Ref<_priv_VP8EncoderImpl> ret = new _priv_VP8EncoderImpl();
 									if (ret.isNotNull()) {
 										ret->m_codec = codec;
 										ret->m_codec_config = codec_config;
@@ -238,18 +238,18 @@ namespace slib
 	{
 	}
 
-	class _VP8DecoderImpl : public VP8Decoder
+	class _priv_VP8DecoderImpl : public VP8Decoder
 	{
 	public:
 		vpx_codec_ctx_t* m_codec;
 
 	public:
-		_VP8DecoderImpl()
+		_priv_VP8DecoderImpl()
 		{
 			m_codec = sl_null;
 		}
 		
-		~_VP8DecoderImpl()
+		~_priv_VP8DecoderImpl()
 		{
 			if (m_codec != sl_null) {
 				vpx_codec_destroy(m_codec);
@@ -264,7 +264,7 @@ namespace slib
 			LogError("VideoVpxDecoder", str);
 		}
 
-		static Ref<_VP8DecoderImpl> create(const VP8DecoderParam& param)
+		static Ref<_priv_VP8DecoderImpl> create(const VP8DecoderParam& param)
 		{
 			vpx_codec_interface codec_interface = &vpx_codec_vp8_dx;
 
@@ -272,7 +272,7 @@ namespace slib
 				vpx_codec_ctx_t* codec = new vpx_codec_ctx_t;
 				if (codec) {
 					if (!vpx_codec_dec_init(codec, codec_interface(), NULL, 0)) {
-						Ref<_VP8DecoderImpl> ret = new _VP8DecoderImpl;
+						Ref<_priv_VP8DecoderImpl> ret = new _priv_VP8DecoderImpl;
 						if (ret.isNotNull()) {
 							ret->m_nWidth = param.width;
 							ret->m_nHeight = param.height;
@@ -343,12 +343,12 @@ namespace slib
 
 	Ref<VP8Encoder> VP8Encoder::create(const VP8EncoderParam& param)
 	{
-		return _VP8EncoderImpl::create(param);
+		return _priv_VP8EncoderImpl::create(param);
 	}
 
 	Ref<VP8Decoder> VP8Decoder::create(const VP8DecoderParam& param)
 	{
-		return _VP8DecoderImpl::create(param);
+		return _priv_VP8DecoderImpl::create(param);
 	}
 
 }

@@ -329,14 +329,14 @@ namespace slib
 		
 	};
 	
-	class _RenderCanvas_Shared
+	class _priv_RenderCanvas_Shared
 	{
 	public:
 		CHashMap< String, Ref<RenderCanvasProgram> > programs;
 		Ref<VertexBuffer> vbRectangle;
 		
 	public:
-		_RenderCanvas_Shared()
+		_priv_RenderCanvas_Shared()
 		{
 			static RenderVertex2D_Position v[] = {
 				{ { 0, 0 } }
@@ -367,7 +367,7 @@ namespace slib
 		
 	};
 	
-	SLIB_SAFE_STATIC_GETTER(_RenderCanvas_Shared, _RenderCanvas_getShared)
+	SLIB_SAFE_STATIC_GETTER(_priv_RenderCanvas_Shared, _priv_RenderCanvas_getShared)
 	
 	
 	SLIB_DEFINE_OBJECT(RenderCanvas, Canvas)
@@ -632,7 +632,7 @@ namespace slib
 			return;
 		}
 		
-		_RenderCanvas_Shared* shared = _RenderCanvas_getShared();
+		_priv_RenderCanvas_Shared* shared = _priv_RenderCanvas_getShared();
 		if (!shared) {
 			return;
 		}
@@ -842,7 +842,7 @@ namespace slib
 	
 	void RenderCanvas::_fillRectangle(const Rectangle& _rect, const Color& _color)
 	{
-		_RenderCanvas_Shared* shared = _RenderCanvas_getShared();
+		_priv_RenderCanvas_Shared* shared = _priv_RenderCanvas_getShared();
 		if (!shared) {
 			return;
 		}
@@ -884,7 +884,7 @@ namespace slib
 	
 	void RenderCanvas::drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush)
 	{
-		_RenderCanvas_Shared* shared = _RenderCanvas_getShared();
+		_priv_RenderCanvas_Shared* shared = _priv_RenderCanvas_getShared();
 		if (!shared) {
 			return;
 		}
@@ -938,7 +938,7 @@ namespace slib
 	void RenderCanvas::drawTexture(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& _rectSrc, const DrawParam& param, const Color4f& color)
 	{
 		
-		_RenderCanvas_Shared* shared = _RenderCanvas_getShared();
+		_priv_RenderCanvas_Shared* shared = _priv_RenderCanvas_getShared();
 		if (!shared) {
 			return;
 		}
@@ -1013,7 +1013,7 @@ namespace slib
 	void RenderCanvas::drawTexture(const Rectangle& _rectDst, const Ref<Texture>& texture, const Rectangle& _rectSrc, const DrawParam& param, const Color4f& color)
 	{
 		
-		_RenderCanvas_Shared* shared = _RenderCanvas_getShared();
+		_priv_RenderCanvas_Shared* shared = _priv_RenderCanvas_getShared();
 		if (!shared) {
 			return;
 		}
@@ -1117,7 +1117,7 @@ namespace slib
 	
 	void RenderCanvas::drawRectangle(const Rectangle& rect, RenderProgramState2D_Position* programState, const DrawParam& param)
 	{
-		_RenderCanvas_Shared* shared = _RenderCanvas_getShared();
+		_priv_RenderCanvas_Shared* shared = _priv_RenderCanvas_getShared();
 		if (!shared) {
 			return;
 		}

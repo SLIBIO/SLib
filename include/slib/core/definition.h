@@ -126,10 +126,10 @@ namespace slib
 #define SLIB_UNUSED(x)					slib::_blank_proc(&x);
 
 #if defined(SLIB_DEBUG)
-#	define SLIB_ASSERT(_Expression)		( (!!(_Expression)) || (slib::_abort(#_Expression, __FILE__, __LINE__), 0) )
+#	define SLIB_ASSERT(EXPRESSION)		( (!!(EXPRESSION)) || (slib::_abort(#EXPRESSION, __FILE__, __LINE__), 0) )
 #	define SLIB_ABORT(MESSAGE)			(slib::_abort(MESSAGE, __FILE__, __LINE__))
 #else
-#	define SLIB_ASSERT(_Expression)
+#	define SLIB_ASSERT(EXPRESSION)
 #	define SLIB_ABORT(MESSAGE)
 #endif
 

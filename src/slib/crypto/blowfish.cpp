@@ -40,7 +40,7 @@ namespace slib
 	
 #define BLOWFISH_ROUNDS 16
 
-	SLIB_INLINE static sl_uint32 _Blowfish_F(const sl_uint32 S[4][256], sl_uint32 x)
+	SLIB_INLINE static sl_uint32 _priv_Blowfish_F(const sl_uint32 S[4][256], sl_uint32 x)
 	{
 		sl_uint8 d = x & 0xff;
 		x >>= 8;
@@ -52,14 +52,14 @@ namespace slib
 		return ((S[0][a] + S[1][b]) ^ S[2][c]) + S[3][d];
 	}
 	
-	SLIB_INLINE static void _Blowfish_encipher(const sl_uint32* P, const sl_uint32 S[4][256], sl_uint32& xl, sl_uint32& xr)
+	SLIB_INLINE static void _priv_Blowfish_encipher(const sl_uint32* P, const sl_uint32 S[4][256], sl_uint32& xl, sl_uint32& xr)
 	{
 		sl_uint32 Xl = xl;
 		sl_uint32 Xr = xr;
 		sl_uint32 temp;
 		for (int i = 0; i < BLOWFISH_ROUNDS; i++) {
 			Xl = Xl ^ P[i];
-			Xr = _Blowfish_F(S, Xl) ^ Xr;
+			Xr = _priv_Blowfish_F(S, Xl) ^ Xr;
 			temp = Xl; Xl = Xr; Xr = temp;
 		}
 		temp = Xl; Xl = Xr; Xr = temp;
@@ -69,14 +69,14 @@ namespace slib
 		xr = Xr;
 	}
 	
-	SLIB_INLINE static void _Blowfish_decipher (const sl_uint32* P, const sl_uint32 S[4][256], sl_uint32& xl, sl_uint32& xr)
+	SLIB_INLINE static void _priv_Blowfish_decipher (const sl_uint32* P, const sl_uint32 S[4][256], sl_uint32& xl, sl_uint32& xr)
 	{
 		sl_uint32 Xl = xl;
 		sl_uint32 Xr = xr;
 		sl_uint32 temp;
 		for (int i = BLOWFISH_ROUNDS + 1 ; i > 1 ; i--) {
 			Xl = Xl ^ P[i];
-			Xr = _Blowfish_F(S, Xl) ^ Xr;
+			Xr = _priv_Blowfish_F(S, Xl) ^ Xr;
 			temp = Xl;  Xl = Xr;  Xr = temp;
 		}
 		temp = Xl;  Xl = Xr;  Xr = temp;
@@ -90,7 +90,7 @@ namespace slib
 	/* The magical constants of the Blowfish cipher (used in initializing
 	 * the P array and the S-boxes): these are the hexadecimal digits of
 	 * pi = 3.243F6A8885A308D313198A2E03707344... */
-	static const sl_uint32 _Blowfish_Init_P[BLOWFISH_ROUNDS+2] = {
+	static const sl_uint32 _priv_Blowfish_Init_P[BLOWFISH_ROUNDS+2] = {
 		0x243f6a88UL, 0x85a308d3UL, 0x13198a2eUL, 0x03707344UL,
 		0xa4093822UL, 0x299f31d0UL, 0x082efa98UL, 0xec4e6c89UL,
 		0x452821e6UL, 0x38d01377UL, 0xbe5466cfUL, 0x34e90c6cUL,
@@ -98,7 +98,7 @@ namespace slib
 		0x9216d5d9UL, 0x8979fb1bUL,
 	};
 
-	static const sl_uint32 _Blowfish_Init_S[4][256] = {
+	static const sl_uint32 _priv_Blowfish_Init_S[4][256] = {
 		{
 			0xd1310ba6UL, 0x98dfb5acUL, 0x2ffd72dbUL, 0xd01adfb7UL,
 			0xb8e1afedUL, 0x6a267e96UL, 0xba7c9045UL, 0xf12c7f99UL,
@@ -374,13 +374,13 @@ namespace slib
 		int i;
 		
 		for (i = 0; i < BLOWFISH_ROUNDS + 2; i++) {
-			P[i] = _Blowfish_Init_P[i];
+			P[i] = _priv_Blowfish_Init_P[i];
 		}
 		for (i = 0; i < 256; i++) {
-			S[0][i] = _Blowfish_Init_S[0][i];
-			S[1][i] = _Blowfish_Init_S[1][i];
-			S[2][i] = _Blowfish_Init_S[2][i];
-			S[3][i] = _Blowfish_Init_S[3][i];
+			S[0][i] = _priv_Blowfish_Init_S[0][i];
+			S[1][i] = _priv_Blowfish_Init_S[1][i];
+			S[2][i] = _priv_Blowfish_Init_S[2][i];
+			S[3][i] = _priv_Blowfish_Init_S[3][i];
 		}
 		
 		sl_uint32 j = 0;
@@ -399,13 +399,13 @@ namespace slib
 		sl_uint32 datar = 0;
 		
 		for (i = 0; i < BLOWFISH_ROUNDS + 2; i += 2) {
-			_Blowfish_encipher(P, S, datal, datar);
+			_priv_Blowfish_encipher(P, S, datal, datar);
 			P[i] = datal;
 			P[i+1] = datar;
 		}
 		for (i = 0; i < 4; i++) {
 			for (j = 0; j < 256; j += 2) {
-				_Blowfish_encipher(P, S, datal, datar);
+				_priv_Blowfish_encipher(P, S, datal, datar);
 				S[i][j] = datal;
 				S[i][j+1] = datar;
 			}
@@ -415,7 +415,7 @@ namespace slib
 	
 	void Blowfish::encrypt(sl_uint32& d0, sl_uint32& d1) const
 	{
-		_Blowfish_encipher(m_P, m_S, d0, d1);
+		_priv_Blowfish_encipher(m_P, m_S, d0, d1);
 	}
 	
 	void Blowfish::encryptBlock(const void* _src, void *_dst) const
@@ -426,7 +426,7 @@ namespace slib
 		sl_uint32 d0 = MIO::readUint32BE(IN);
 		sl_uint32 d1 = MIO::readUint32BE(IN + 4);
 		
-		_Blowfish_encipher(m_P, m_S, d0, d1);
+		_priv_Blowfish_encipher(m_P, m_S, d0, d1);
 		
 		MIO::writeUint32BE(OUT, d0);
 		MIO::writeUint32BE(OUT + 4, d1);
@@ -434,7 +434,7 @@ namespace slib
 	
 	void Blowfish::decrypt(sl_uint32& d0, sl_uint32& d1) const
 	{
-		_Blowfish_decipher(m_P, m_S, d0, d1);
+		_priv_Blowfish_decipher(m_P, m_S, d0, d1);
 	}
 	
 	void Blowfish::decryptBlock(const void* _src, void *_dst) const
@@ -445,7 +445,7 @@ namespace slib
 		sl_uint32 d0 = MIO::readUint32BE(IN);
 		sl_uint32 d1 = MIO::readUint32BE(IN + 4);
 		
-		_Blowfish_decipher(m_P, m_S, d0, d1);
+		_priv_Blowfish_decipher(m_P, m_S, d0, d1);
 		
 		MIO::writeUint32BE(OUT, d0);
 		MIO::writeUint32BE(OUT + 4, d1);

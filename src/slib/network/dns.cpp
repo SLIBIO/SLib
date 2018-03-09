@@ -15,7 +15,7 @@
 #include "slib/core/mio.h"
 #include "slib/core/log.h"
 
-#define _MAX_NAME SLIB_NETWORK_DNS_NAME_MAX_LENGTH
+#define PRIV_MAX_NAME SLIB_NETWORK_DNS_NAME_MAX_LENGTH
 
 namespace slib
 {
@@ -205,7 +205,7 @@ namespace slib
 	{
 		const sl_uint8* buf = (const sl_uint8*)(_buf);
 
-		char name[_MAX_NAME];
+		char name[PRIV_MAX_NAME];
 		sl_uint32 lenName = 0;
 
 		sl_uint32 ret = 0;
@@ -222,7 +222,7 @@ namespace slib
 					}
 					return ret;
 				} else {
-					if (lenName >= _MAX_NAME) {
+					if (lenName >= PRIV_MAX_NAME) {
 						return 0;
 					}
 					now++;
@@ -233,7 +233,7 @@ namespace slib
 						name[lenName] = '.';
 						lenName++;
 					}
-					if (lenLabel > _MAX_NAME - lenName) {
+					if (lenLabel > PRIV_MAX_NAME - lenName) {
 						return 0;
 					}
 					Base::copyMemory(name + lenName, buf + now, lenLabel);
@@ -358,7 +358,7 @@ namespace slib
 		_dataOffset = 0;
 		_dataLength = 0;
 
-		_TTL = 0;
+		m_TTL = 0;
 	}
 
 	DnsResponseRecord::~DnsResponseRecord()
@@ -367,12 +367,12 @@ namespace slib
 
 	sl_uint32 DnsResponseRecord::getTTL() const
 	{
-		return _TTL;
+		return m_TTL;
 	}
 
 	void DnsResponseRecord::setTTL(sl_uint32 TTL)
 	{
-		_TTL = TTL;
+		m_TTL = TTL;
 	}
 
 	sl_uint16 DnsResponseRecord::getDataLength() const
@@ -398,7 +398,7 @@ namespace slib
 		if (pos + 6 > size) {
 			return 0;
 		}
-		_TTL = MIO::readUint32BE(buf + pos);
+		m_TTL = MIO::readUint32BE(buf + pos);
 		_dataLength = MIO::readUint16BE(buf + pos + 4);
 		pos += 6;
 		_dataOffset = pos;
@@ -419,7 +419,7 @@ namespace slib
 		if (pos + 6 + sizeData > size) {
 			return 0;
 		}
-		MIO::writeUint32BE(buf + pos, _TTL);
+		MIO::writeUint32BE(buf + pos, m_TTL);
 		MIO::writeUint16BE(buf + pos + 4, sizeData);
 		Base::copyMemory(buf + pos + 6, data, sizeData);
 		return pos + 6 + sizeData;

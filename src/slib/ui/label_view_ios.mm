@@ -16,7 +16,7 @@
 
 #include "view_ios.h"
 
-@interface _Slib_iOS_LabelTextField : UILabel {
+@interface _priv_Slib_iOS_LabelTextField : UILabel {
 	
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 	
@@ -25,7 +25,7 @@
 
 namespace slib
 {
-	class _LabelView : public LabelView
+	class _priv_LabelView : public LabelView
 	{
 	public:
 		void applyProperties(UILabel* handle)
@@ -79,9 +79,9 @@ namespace slib
 	Ref<ViewInstance> LabelView::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_iOS_LabelTextField* handle = [[_Slib_iOS_LabelTextField alloc] initWithFrame:frame];
+		_priv_Slib_iOS_LabelTextField* handle = [[_priv_Slib_iOS_LabelTextField alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((_LabelView*)this)->applyProperties(handle);
+			((_priv_LabelView*)this)->applyProperties(handle);
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -116,7 +116,7 @@ namespace slib
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 			UILabel* tv = (UILabel*)handle;
-			[tv setTextAlignment:_LabelView::translateAlignment(align)];
+			[tv setTextAlignment:_priv_LabelView::translateAlignment(align)];
 		}
 	}
 	
@@ -196,7 +196,7 @@ namespace slib
 	}	
 }
 
-@implementation _Slib_iOS_LabelTextField
+@implementation _priv_Slib_iOS_LabelTextField
 -(id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];

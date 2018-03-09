@@ -26,7 +26,7 @@ namespace slib
                  / "*" / "+" / "," / ";" / "="
 */
 
-	const sl_bool _URL_unreserved_pattern[128] = {
+	const sl_bool _priv_URL_unreserved_pattern[128] = {
 		/*		NUL		SOH		STX		ETX		EOT		ENQ		ACK		BEL		*/
 		/*00*/	0,		0,		0,		0,		0,		0,		0,		0,
 		/*		BS		HT		LF		VT		FF		CR		SO		SI		*/
@@ -61,7 +61,7 @@ namespace slib
 		/*78*/	1,		1,		1,		0,		0,		0,		1,		0
 	};
 
-	const sl_bool _URL_unreserved_pattern_uri_components[128] = {
+	const sl_bool _priv_URL_unreserved_pattern_uri_components[128] = {
 		/*		NUL		SOH		STX		ETX		EOT		ENQ		ACK		BEL		*/
 		/*00*/	0,		0,		0,		0,		0,		0,		0,		0,
 		/*		BS		HT		LF		VT		FF		CR		SO		SI		*/
@@ -96,7 +96,7 @@ namespace slib
 		/*78*/	1,		1,		1,		0,		0,		0,		1,		0
 	};
 
-	const sl_bool _URL_unreserved_pattern_uri[128] = {
+	const sl_bool _priv_URL_unreserved_pattern_uri[128] = {
 		/*		NUL		SOH		STX		ETX		EOT		ENQ		ACK		BEL		*/
 		/*00*/	0,		0,		0,		0,		0,		0,		0,		0,
 		/*		BS		HT		LF		VT		FF		CR		SO		SI		*/
@@ -209,7 +209,7 @@ namespace slib
 		}
 	}
 	
-	String _URL_encodePercentByUTF8(const String& value, const sl_bool patternUnreserved[128])
+	String _priv_URL_encodePercentByUTF8(const String& value, const sl_bool patternUnreserved[128])
 	{
 		sl_size n = value.getLength();
 		if (n > 0) {
@@ -237,7 +237,7 @@ namespace slib
 	
 	String Url::encodePercentByUTF8(const String& value)
 	{
-		return _URL_encodePercentByUTF8(value, _URL_unreserved_pattern);
+		return _priv_URL_encodePercentByUTF8(value, _priv_URL_unreserved_pattern);
 	}
 	
 	String Url::decodePercentByUTF8(const String& value)
@@ -278,7 +278,7 @@ namespace slib
 	
 	String Url::encodeUriComponentByUTF8(const String& value)
 	{
-		return _URL_encodePercentByUTF8(value, _URL_unreserved_pattern_uri_components);
+		return _priv_URL_encodePercentByUTF8(value, _priv_URL_unreserved_pattern_uri_components);
 	}
 	
 	String Url::decodeUriComponentByUTF8(const String& value)
@@ -288,7 +288,7 @@ namespace slib
 	
 	String Url::encodeUriByUTF8(const String& value)
 	{
-		return _URL_encodePercentByUTF8(value, _URL_unreserved_pattern_uri);
+		return _priv_URL_encodePercentByUTF8(value, _priv_URL_unreserved_pattern_uri);
 	}
 	
 	String Url::decodeUriByUTF8(const String& value)

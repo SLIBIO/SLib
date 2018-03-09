@@ -18,14 +18,14 @@ namespace slib
 
 	SLIB_DEFINE_OBJECT(ProgressBar, View)
 	
-	class _ProgressBar_Static
+	class _priv_ProgressBar_Static
 	{
 	public:
 		Ref<Drawable> defaultTrack;
 		Ref<Drawable> defaultProgress;
 		Ref<Drawable> defaultProgress2;
 		
-		_ProgressBar_Static()
+		_priv_ProgressBar_Static()
 		{
 			defaultTrack = ColorDrawable::create(Color(220, 220, 220));
 			defaultProgress = ColorDrawable::create(Color(150, 150, 150));
@@ -33,7 +33,7 @@ namespace slib
 		}
 	};
 	
-	SLIB_SAFE_STATIC_GETTER(_ProgressBar_Static, _ProgressBar_getStatic)
+	SLIB_SAFE_STATIC_GETTER(_priv_ProgressBar_Static, _priv_ProgressBar_getStatic)
 	
 	ProgressBar::ProgressBar(LayoutOrientation orientation)
 	{
@@ -52,7 +52,7 @@ namespace slib
 		m_step = 0;
 		m_flagReversed = sl_false;
 		
-		_ProgressBar_Static* s = _ProgressBar_getStatic();
+		_priv_ProgressBar_Static* s = _priv_ProgressBar_getStatic();
 		if (s) {
 			m_track = s->defaultTrack;
 			m_progress = s->defaultProgress;

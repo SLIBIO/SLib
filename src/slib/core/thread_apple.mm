@@ -16,11 +16,11 @@
 
 #include "slib/core/thread.h"
 
-@interface _slib_apple_ThreadObject : NSObject
+@interface _priv_Slib_ThreadObject : NSObject
 @end
 
-@implementation _slib_apple_ThreadObject
--(void)_slib_thread_callback: (NSMutableDictionary*)parameter
+@implementation _priv_Slib_ThreadObject
+-(void)run_callback: (NSMutableDictionary*)parameter
 {
 	long long _thread = [[parameter objectForKey:@"thread_object"] longLongValue];
 	slib::Thread* pThread = (slib::Thread*)_thread;
@@ -76,11 +76,11 @@ namespace slib
 	{
 		this->increaseReference();
 
-		_slib_apple_ThreadObject *obj = [[_slib_apple_ThreadObject alloc] init];
+		_priv_Slib_ThreadObject *obj = [[_priv_Slib_ThreadObject alloc] init];
 		NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
 		params[@"thread_object"] = [NSNumber numberWithLong:(long)this];
 		NSThread* thread=[[NSThread alloc]initWithTarget:obj
-												selector:@selector(_slib_thread_callback:) object:params];
+												selector:@selector(run_callback:) object:params];
 		if (thread != NULL) {
 			m_handle = (__bridge void*)thread;
 			stackSize = ((stackSize - 1) | 4095) + 1;

@@ -26,7 +26,7 @@
 namespace slib
 {
 
-	struct _AsyncIoLoopHandle
+	struct _priv_AsyncIoLoopHandle
 	{
 		int fdEpoll;
 		Ref<PipeEvent> eventWake;
@@ -45,7 +45,7 @@ namespace slib
 		fdEpoll = ::epoll_create1(0);
 #endif
 		if (fdEpoll >= 0) {
-			_AsyncIoLoopHandle* handle = new _AsyncIoLoopHandle;
+			_priv_AsyncIoLoopHandle* handle = new _priv_AsyncIoLoopHandle;
 			if (handle) {
 				handle->fdEpoll = fdEpoll;
 				handle->eventWake = pipe;
@@ -65,14 +65,14 @@ namespace slib
 
 	void AsyncIoLoop::_native_closeHandle(void* _handle)
 	{
-		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)_handle;
+		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)_handle;
 		::close(handle->fdEpoll);
 		delete handle;
 	}
 
 	void AsyncIoLoop::_native_runLoop()
 	{
-		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
+		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
 
 		epoll_event waitEvents[ASYNC_MAX_WAIT_EVENT];
 
@@ -130,13 +130,13 @@ namespace slib
 
 	void AsyncIoLoop::_native_wake()
 	{
-		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
+		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
 		handle->eventWake->set();
 	}
 
 	sl_bool AsyncIoLoop::_native_attachInstance(AsyncIoInstance* instance, AsyncIoMode mode)
 	{
-		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
+		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
 		int hObject = (int)(instance->getHandle());
 		epoll_event ev;
 		ev.data.ptr = (void*)instance;
@@ -170,7 +170,7 @@ namespace slib
 
 	void AsyncIoLoop::_native_detachInstance(AsyncIoInstance* instance)
 	{
-		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
+		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
 		int hObject = (int)(instance->getHandle());
 		epoll_event ev;
 		int ret = ::epoll_ctl(handle->fdEpoll, EPOLL_CTL_DEL, hObject, &ev);

@@ -27,29 +27,29 @@ namespace slib
 	{
 	}
 
-	class _Sqlite3Database : public SQLiteDatabase
+	class _priv_Sqlite3Database : public SQLiteDatabase
 	{
 	public:
 		sqlite3* m_db;
 
-		_Sqlite3Database()
+		_priv_Sqlite3Database()
 		{
 			m_db = sl_null;
 		}
 
-		~_Sqlite3Database()
+		~_priv_Sqlite3Database()
 		{
 			::sqlite3_close(m_db);
 		}
 
-		static Ref<_Sqlite3Database> connect(const String& filePath)
+		static Ref<_priv_Sqlite3Database> connect(const String& filePath)
 		{
-			Ref<_Sqlite3Database> ret;
+			Ref<_priv_Sqlite3Database> ret;
 			sqlite3* db = sl_null;
 			if (File::exists(filePath)) {
 				sl_int32 iResult = ::sqlite3_open(filePath.getData(), &db);
 				if (SQLITE_OK == iResult) {
-					ret = new _Sqlite3Database();
+					ret = new _priv_Sqlite3Database();
 					if (ret.isNotNull()) {
 						ret->m_db = db;
 						return ret;
@@ -82,7 +82,7 @@ namespace slib
 			return row;
 		}
 
-		class _DatabaseCursor : public DatabaseCursor
+		class _priv_DatabaseCursor : public DatabaseCursor
 		{
 		public:
 			Ref<DatabaseStatement> m_statementObj;
@@ -93,7 +93,7 @@ namespace slib
 			String* m_columnNames;
 			CHashMap<String, sl_int32> m_mapColumnIndexes;
 
-			_DatabaseCursor(Database* db, DatabaseStatement* statementObj, sqlite3_stmt* statement)
+			_priv_DatabaseCursor(Database* db, DatabaseStatement* statementObj, sqlite3_stmt* statement)
 			{
 				m_db = db;
 				m_statementObj = statementObj;
@@ -112,7 +112,7 @@ namespace slib
 				db->lock();
 			}
 
-			~_DatabaseCursor()
+			~_priv_DatabaseCursor()
 			{
 				::sqlite3_reset(m_statement);
 				::sqlite3_clear_bindings(m_statement);
@@ -337,21 +337,21 @@ namespace slib
 
 		};
 
-		class _DatabaseStatement : public DatabaseStatement
+		class _priv_DatabaseStatement : public DatabaseStatement
 		{
 		public:
 			sqlite3* m_sqlite;
 			sqlite3_stmt* m_statement;
 			Array<Variant> m_boundParams;
 
-			_DatabaseStatement(_Sqlite3Database* db, sqlite3_stmt* statement)
+			_priv_DatabaseStatement(_priv_Sqlite3Database* db, sqlite3_stmt* statement)
 			{
 				m_db = db;
 				m_sqlite = db->m_db;
 				m_statement = statement;
 			}
 
-			~_DatabaseStatement()
+			~_priv_DatabaseStatement()
 			{
 				::sqlite3_finalize(m_statement);
 			}
@@ -437,7 +437,7 @@ namespace slib
 				ObjectLocker lock(m_db.get());
 				Ref<DatabaseCursor> ret;
 				if (_execute(params, nParams)) {
-					ret = new _DatabaseCursor(m_db.get(), this, m_statement);
+					ret = new _priv_DatabaseCursor(m_db.get(), this, m_statement);
 					if (ret.isNotNull()) {
 						return ret;
 					}
@@ -454,7 +454,7 @@ namespace slib
 			Ref<DatabaseStatement> ret;
 			sqlite3_stmt* statement = sl_null;
 			if (SQLITE_OK == ::sqlite3_prepare_v2(m_db, sql.getData(), -1, &statement, sl_null)) {
-				ret = new _DatabaseStatement(this, statement);
+				ret = new _priv_DatabaseStatement(this, statement);
 				if (ret.isNotNull()) {
 					return ret;
 				}
@@ -471,7 +471,7 @@ namespace slib
 
 	Ref<SQLiteDatabase> SQLiteDatabase::connect(const String& path)
 	{
-		return _Sqlite3Database::connect(path);
+		return _priv_Sqlite3Database::connect(path);
 	}
 
 }

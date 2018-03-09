@@ -124,7 +124,7 @@ namespace slib
 		return sl_false;
 	}
 	
-	class _MenuItemSeparator : public MenuItem
+	class _priv_MenuItemSeparator : public MenuItem
 	{
 	public:
 		sl_bool isSeparator() const override
@@ -136,7 +136,7 @@ namespace slib
 	
 	Ref<MenuItem> MenuItem::createSeparator()
 	{
-		return new _MenuItemSeparator;
+		return new _priv_MenuItemSeparator;
 	}
 	
 	sl_bool MenuItem::processShortcutKey(const KeycodeAndModifiers& km)

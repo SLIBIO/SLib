@@ -20,7 +20,7 @@ namespace slib
 
 	class GLRenderEngine;
 	
-	class SLIB_EXPORT _SLIB_RENDER_ENTRIES_CLASS
+	class SLIB_EXPORT PRIV_SLIB_RENDER_ENTRIES_CLASS
 	{
 	public:
 		static Ref<GLRenderEngine> createEngine();

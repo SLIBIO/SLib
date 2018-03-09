@@ -217,6 +217,17 @@ namespace slib
 	{
 	}
 	
+	void MobileApp::dispatchStart()
+	{
+		UIApp::dispatchStart();
+#ifdef SLIB_PLATFORM_IS_DESKTOP
+		Ref<MobileMainWindow> window = getMainWindow();
+		if (window.isNotNull()) {
+			window->forceCreate();
+		}
+#endif
+	}
+	
 	void MobileApp::dispatchPause()
 	{
 		onPause();
@@ -344,7 +355,6 @@ namespace slib
 		if (window.isNotNull()) {
 			window->forceCreate();
 		}
-		
 		onCreateActivity();
 	}
 	
@@ -404,6 +414,13 @@ namespace slib
 	void MobileMainWindow::onResize(sl_ui_len width, sl_ui_len height)
 	{
 		MobileApp::dispatchResizeToApp(width, height);
+	}
+	
+	void MobileMainWindow::onClose(UIEvent* ev)
+	{
+#ifdef SLIB_PLATFORM_IS_DESKTOP
+		MobileApp::quit();
+#endif
 	}
 
 }

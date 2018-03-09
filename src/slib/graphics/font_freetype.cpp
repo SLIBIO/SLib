@@ -22,13 +22,13 @@
 namespace slib
 {
 
-	class _FreeTypeLibrary : public Referable
+	class _priv_FreeTypeLibrary : public Referable
 	{
 	public:
 		FT_Library m_library;
 
 	public:
-		_FreeTypeLibrary()
+		_priv_FreeTypeLibrary()
 		{
 			FT_Error err = FT_Init_FreeType(&m_library);
 			if (err || !m_library) {
@@ -36,7 +36,7 @@ namespace slib
 			}
 		}
 
-		~_FreeTypeLibrary()
+		~_priv_FreeTypeLibrary()
 		{
 			freeLibrary();
 		}
@@ -69,7 +69,7 @@ namespace slib
 	Ref<FreeType> FreeType::loadFromMemory(const Memory& mem, sl_uint32 index)
 	{
 		if (mem.isNotEmpty()) {
-			Ref<_FreeTypeLibrary> libraryRef = new _FreeTypeLibrary;
+			Ref<_priv_FreeTypeLibrary> libraryRef = new _priv_FreeTypeLibrary;
 			if (libraryRef.isNotNull()) {
 				FT_Library library = libraryRef->m_library;
 				if (library) {

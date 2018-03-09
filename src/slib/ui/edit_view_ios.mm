@@ -16,7 +16,7 @@
 
 #include "view_ios.h"
 
-@interface SLib_iOS_TextField : UITextField<UITextFieldDelegate> {
+@interface _priv_Slib_iOS_TextField : UITextField<UITextFieldDelegate> {
 	
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 	
@@ -26,7 +26,7 @@
 
 @end
 
-@interface SLib_iOS_TextArea : UITextView<UITextViewDelegate> {
+@interface _priv_Slib_iOS_TextArea : UITextView<UITextViewDelegate> {
 	
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 	
@@ -183,7 +183,7 @@ namespace slib
 			[handle setAutocapitalizationType:convertAutoCapitalizationType(m_autoCapitalizationType)];
 		}
 		
-		void applyProperties(SLib_iOS_TextArea* handle)
+		void applyProperties(_priv_Slib_iOS_TextArea* handle)
 		{
 			if (![NSThread isMainThread]) {
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -292,7 +292,7 @@ namespace slib
 	Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		SLib_iOS_TextField* handle = [[SLib_iOS_TextField alloc] initWithFrame:frame];
+		_priv_Slib_iOS_TextField* handle = [[_priv_Slib_iOS_TextField alloc] initWithFrame:frame];
 		
 		if (handle != nil) {
 			((EditView_Impl*)this)->applyProperties(handle);
@@ -304,7 +304,7 @@ namespace slib
 	Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		SLib_iOS_TextField* handle = [[SLib_iOS_TextField alloc] initWithFrame:frame];
+		_priv_Slib_iOS_TextField* handle = [[_priv_Slib_iOS_TextField alloc] initWithFrame:frame];
 		
 		if (handle != nil) {
 			handle.secureTextEntry = TRUE;
@@ -317,7 +317,7 @@ namespace slib
 	Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		SLib_iOS_TextArea* handle = [[SLib_iOS_TextArea alloc] initWithFrame:frame];
+		_priv_Slib_iOS_TextArea* handle = [[_priv_Slib_iOS_TextArea alloc] initWithFrame:frame];
 		if (handle != nil) {
 			((EditView_Impl*)this)->applyProperties(handle);
 		}
@@ -427,8 +427,8 @@ namespace slib
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
 				((EditView_Impl*)this)->applyPlaceholder(tv);
-			} else if ([handle isKindOfClass:[SLib_iOS_TextArea class]]) {
-				SLib_iOS_TextArea* tv = (SLib_iOS_TextArea*)handle;
+			} else if ([handle isKindOfClass:[_priv_Slib_iOS_TextArea class]]) {
+				_priv_Slib_iOS_TextArea* tv = (_priv_Slib_iOS_TextArea*)handle;
 				NSString* s = Apple::getNSStringFromString(value);
 				[tv setPlaceholder:s];
 				[tv refreshPlaceholder];
@@ -451,8 +451,8 @@ namespace slib
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
 				((EditView_Impl*)this)->applyPlaceholder(tv);
-			} else if ([handle isKindOfClass:[SLib_iOS_TextArea class]]) {
-				SLib_iOS_TextArea* tv = (SLib_iOS_TextArea*)handle;
+			} else if ([handle isKindOfClass:[_priv_Slib_iOS_TextArea class]]) {
+				_priv_Slib_iOS_TextArea* tv = (_priv_Slib_iOS_TextArea*)handle;
 				[tv setPlaceholderColor:(GraphicsPlatform::getUIColorFromColor(value))];
 				[tv refreshPlaceholder];
 			}
@@ -621,7 +621,7 @@ namespace slib
 	}
 }
 
-@implementation SLib_iOS_TextField
+@implementation _priv_Slib_iOS_TextField
 -(id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -663,7 +663,7 @@ namespace slib
 
 @end
 
-@implementation SLib_iOS_TextArea
+@implementation _priv_Slib_iOS_TextArea
 
 -(id)initWithFrame:(CGRect)frame
 {

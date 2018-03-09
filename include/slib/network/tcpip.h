@@ -232,7 +232,7 @@ namespace slib
 
 	private:
 		sl_uint8 _versionAndHeaderLength;
-		sl_uint8 _TOS_DSCP_ECN;
+		sl_uint8 m_TOS_DSCP_ECN;
 		sl_uint8 _totalLength[2];
 		sl_uint8 _identification[2];
 		sl_uint8 _flagsAndFlagmentOffset[2];

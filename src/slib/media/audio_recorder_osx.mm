@@ -21,7 +21,7 @@
 namespace slib
 {
 
-	class _OSX_AudioRecorder : public AudioRecorder
+	class _priv_macOS_AudioRecorder : public AudioRecorder
 	{
 	public:
 		sl_bool m_flagOpened;
@@ -35,7 +35,7 @@ namespace slib
 		AudioStreamBasicDescription m_formatDst;
 		
 	public:
-		_OSX_AudioRecorder()
+		_priv_macOS_AudioRecorder()
 		{
 			m_flagOpened = sl_true;
 			m_flagRunning = sl_false;
@@ -43,7 +43,7 @@ namespace slib
 			m_callback = sl_null;
 		}
 
-		~_OSX_AudioRecorder()
+		~_priv_macOS_AudioRecorder()
 		{
 			release();
 		}
@@ -54,15 +54,15 @@ namespace slib
 			LogError("AudioRecorder", text);
 		}
 		
-		static Ref<_OSX_AudioRecorder> create(const AudioRecorderParam& param)
+		static Ref<_priv_macOS_AudioRecorder> create(const AudioRecorderParam& param)
 		{
-			Ref<_OSX_AudioRecorder> ret;
+			Ref<_priv_macOS_AudioRecorder> ret;
 			
 			if (param.channelsCount != 1 && param.channelsCount != 2) {
 				return ret;
 			}
 			
-			OSX_AudioDeviceInfo deviceInfo;
+			_priv_macOS_AudioDeviceInfo deviceInfo;
 			if (!(deviceInfo.selectDevice(sl_true, param.deviceId))) {
 				logError("Failed to find audio input device - " + param.deviceId);
 				return ret;
@@ -122,7 +122,7 @@ namespace slib
 				
 				if (AudioObjectSetPropertyData(deviceID, &prop, 0, NULL, sizeValue, &sizeFrame) == kAudioHardwareNoError) {
 						
-					ret = new _OSX_AudioRecorder();
+					ret = new _priv_macOS_AudioRecorder();
 					
 					if (ret.isNotNull()) {
 						
@@ -295,7 +295,7 @@ namespace slib
 									const AudioTimeStamp*   inOutputTime,
 									void*                   inClientData)
 		{
-			_OSX_AudioRecorder* object = (_OSX_AudioRecorder*)(inClientData);
+			_priv_macOS_AudioRecorder* object = (_priv_macOS_AudioRecorder*)(inClientData);
 			object->onFrame(inInputData);
 			return 0;
 		}
@@ -304,12 +304,12 @@ namespace slib
 
 	Ref<AudioRecorder> AudioRecorder::create(const AudioRecorderParam& param)
 	{
-		return _OSX_AudioRecorder::create(param);
+		return _priv_macOS_AudioRecorder::create(param);
 	}
 
 	List<AudioRecorderInfo> AudioRecorder::getRecordersList()
 	{
-		ListElements<OSX_AudioDeviceInfo> list(OSX_AudioDeviceInfo::getAllDevices(sl_true));
+		ListElements<_priv_macOS_AudioDeviceInfo> list(_priv_macOS_AudioDeviceInfo::getAllDevices(sl_true));
 		List<AudioRecorderInfo> ret;
 		for (sl_size i = 0; i < list.count; i++) {
 			AudioRecorderInfo info;

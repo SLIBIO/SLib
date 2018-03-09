@@ -183,9 +183,9 @@ namespace slib
 			*pFlagParallel = sl_false;
 		}
 		
-		Vector3T<T> _T = S - triangle.point1;
-		u = _T.dot(DQ) / det;
-		Vector3T<T> TP = _T.cross(P);
+		Vector3T<T> vT = S - triangle.point1;
+		u = vT.dot(DQ) / det;
+		Vector3T<T> TP = vT.cross(P);
 		v = D.dot(TP) / det;
 		dist = Q.dot(TP) / det;
 		

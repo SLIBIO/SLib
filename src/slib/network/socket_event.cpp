@@ -93,10 +93,10 @@ namespace slib
 		return sl_false;
 	}
 	
-#define _MAX_WAIT_EVENTS 64
+#define PRIV_MAX_WAIT_EVENTS 64
 	sl_bool SocketEvent::waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* status, sl_uint32 count, sl_int32 timeout)
 	{
-		if (count == 0 || count > _MAX_WAIT_EVENTS) { // WSA_MAXIMUM_WAIT_EVENTS
+		if (count == 0 || count > PRIV_MAX_WAIT_EVENTS) { // WSA_MAXIMUM_WAIT_EVENTS
 			return sl_false;
 		}
 		Ref<Thread> thread = Thread::getCurrent();

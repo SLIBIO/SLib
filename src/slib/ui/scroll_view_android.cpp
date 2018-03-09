@@ -19,9 +19,9 @@
 namespace slib
 {
 
-	void JNICALL _AndroidScrollView_nativeOnScroll(JNIEnv* env, jobject _this, jlong instance, int x, int y);
+	void JNICALL _priv_AndroidScrollView_nativeOnScroll(JNIEnv* env, jobject _this, jlong instance, int x, int y);
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidScrollView, "slib/platform/android/ui/view/UiScrollView")
+	SLIB_JNI_BEGIN_CLASS(JAndroidScrollView, "slib/platform/android/ui/view/UiScrollView")
 
 		SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;Z)Landroid/view/View;");
 
@@ -32,11 +32,11 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(setPaging, "_setPaging", "(Landroid/view/View;ZII)V");
 		SLIB_JNI_STATIC_METHOD(setScrollBarsVisible, "_setScrollBarsVisible", "(Landroid/view/View;ZZ)V");
 
-		SLIB_JNI_NATIVE(nativeOnScroll, "nativeOnScroll", "(JII)V", _AndroidScrollView_nativeOnScroll);
+		SLIB_JNI_NATIVE(nativeOnScroll, "nativeOnScroll", "(JII)V", _priv_AndroidScrollView_nativeOnScroll);
 
 	SLIB_JNI_END_CLASS
 
-	class _ScrollView : public ScrollView
+	class _priv_ScrollView : public ScrollView
 	{
 	public:
 		void _applyContent(jobject sv, ViewInstance* scrollViewInstance)
@@ -50,11 +50,11 @@ namespace slib
 		
 		void _applyProperties(jobject handle, ViewInstance* scrollViewInstance)
 		{
-			_JAndroidScrollView::setBackgroundColor.call(sl_null, handle, getBackgroundColor().getARGB());
+			JAndroidScrollView::setBackgroundColor.call(sl_null, handle, getBackgroundColor().getARGB());
 			if (isPaging()) {
-				_JAndroidScrollView::setPaging.call(sl_null, handle, 1, getPageWidth(), getPageHeight());
+				JAndroidScrollView::setPaging.call(sl_null, handle, 1, getPageWidth(), getPageHeight());
 			}
-			_JAndroidScrollView::setScrollBarsVisible.call(sl_null, handle, isHorizontalScrollBarVisible(), isVerticalScrollBarVisible());
+			JAndroidScrollView::setScrollBarsVisible.call(sl_null, handle, isHorizontalScrollBarVisible(), isVerticalScrollBarVisible());
 			_applyContent(handle, scrollViewInstance);
 		}
 
@@ -64,10 +64,10 @@ namespace slib
 		}
 	};
 
-	void JNICALL _AndroidScrollView_nativeOnScroll(JNIEnv* env, jobject _this, jlong instance, int x, int y)
+	void JNICALL _priv_AndroidScrollView_nativeOnScroll(JNIEnv* env, jobject _this, jlong instance, int x, int y)
 	{
 		Ref<View> _view = Android_ViewInstance::findView(instance);
-		if (_ScrollView* view = CastInstance<_ScrollView>(_view.get())) {
+		if (_priv_ScrollView* view = CastInstance<_priv_ScrollView>(_view.get())) {
 			view->_onScroll(x, y);
 		}
 	}
@@ -77,11 +77,11 @@ namespace slib
 		Ref<Android_ViewInstance> ret;
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
-			JniLocal<jobject> handle = _JAndroidScrollView::create.callObject(sl_null, parent->getContext(), isVerticalScrolling());
+			JniLocal<jobject> handle = JAndroidScrollView::create.callObject(sl_null, parent->getContext(), isVerticalScrolling());
 			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
-				((_ScrollView*)this)->_applyProperties(handle, ret.get());
+				((_priv_ScrollView*)this)->_applyProperties(handle, ret.get());
 			}
 		}
 		return ret;
@@ -97,7 +97,7 @@ namespace slib
 		if (instance.isNotNull()) {
 			jobject handle = UIPlatform::getViewHandle(instance.get());
 			if (handle) {
-				((_ScrollView*)this)->_applyContent(handle, instance.get());
+				((_priv_ScrollView*)this)->_applyContent(handle, instance.get());
 			}
 		}
 	}
@@ -106,7 +106,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidScrollView::scrollTo.call(sl_null, handle, (int)x, (int)y);
+			JAndroidScrollView::scrollTo.call(sl_null, handle, (int)x, (int)y);
 		}
 	}
 
@@ -115,8 +115,8 @@ namespace slib
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			ScrollPoint ret;
-			ret.x = (sl_scroll_pos)(_JAndroidScrollView::getScrollX.callInt(sl_null, handle));
-			ret.y = (sl_scroll_pos)(_JAndroidScrollView::getScrollY.callInt(sl_null, handle));
+			ret.x = (sl_scroll_pos)(JAndroidScrollView::getScrollX.callInt(sl_null, handle));
+			ret.y = (sl_scroll_pos)(JAndroidScrollView::getScrollY.callInt(sl_null, handle));
 			return ret;
 		}
 		return ScrollPoint::zero();
@@ -148,7 +148,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidScrollView::setBackgroundColor.call(sl_null, handle, color.getARGB());
+			JAndroidScrollView::setBackgroundColor.call(sl_null, handle, color.getARGB());
 		}
 	}
 
@@ -156,7 +156,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidScrollView::setPaging.call(sl_null, handle, flagPaging, pageWidth, pageHeight);
+			JAndroidScrollView::setPaging.call(sl_null, handle, flagPaging, pageWidth, pageHeight);
 		}
 	}
 
@@ -164,7 +164,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_JAndroidScrollView::setScrollBarsVisible.call(sl_null, handle, flagHorizontal, flagVertical);
+			JAndroidScrollView::setScrollBarsVisible.call(sl_null, handle, flagHorizontal, flagVertical);
 		}
 	}
 

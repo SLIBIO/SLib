@@ -19,18 +19,18 @@
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidPointF, "android/graphics/PointF")
+	SLIB_JNI_BEGIN_CLASS(JAndroidPointF, "android/graphics/PointF")
 		SLIB_JNI_FLOAT_FIELD(x);
 		SLIB_JNI_FLOAT_FIELD(y);
 	SLIB_JNI_END_CLASS
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidFontMetrics, "android/graphics/Paint$FontMetrics")
+	SLIB_JNI_BEGIN_CLASS(JAndroidFontMetrics, "android/graphics/Paint$FontMetrics")
 		SLIB_JNI_FLOAT_FIELD(ascent);
 		SLIB_JNI_FLOAT_FIELD(descent);
 		SLIB_JNI_FLOAT_FIELD(leading);
 	SLIB_JNI_END_CLASS
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidFont, "slib/platform/android/ui/UiFont")
+	SLIB_JNI_BEGIN_CLASS(JAndroidFont, "slib/platform/android/ui/UiFont")
 		SLIB_JNI_STATIC_METHOD(create, "create", "(Ljava/lang/String;FI)Lslib/platform/android/ui/UiFont;");
 		SLIB_JNI_METHOD(getFontMetrics, "getFontMetrics", "()Landroid/graphics/Paint$FontMetrics;");
 		SLIB_JNI_METHOD(measureText, "measureText", "(Ljava/lang/String;)Landroid/graphics/PointF;");
@@ -41,11 +41,11 @@ namespace slib
 	{
 		jobject font = GraphicsPlatform::getNativeFont(this);
 		if (font) {
-			JniLocal<jobject> fm = _JAndroidFont::getFontMetrics.callObject(font);
+			JniLocal<jobject> fm = JAndroidFont::getFontMetrics.callObject(font);
 			if (fm.isNotNull()) {
-				_out.ascent = -(_JAndroidFontMetrics::ascent.get(fm.get()));
-				_out.descent = _JAndroidFontMetrics::descent.get(fm.get());
-				_out.leading = _JAndroidFontMetrics::leading.get(fm.get());
+				_out.ascent = -(JAndroidFontMetrics::ascent.get(fm.get()));
+				_out.descent = JAndroidFontMetrics::descent.get(fm.get());
+				_out.leading = JAndroidFontMetrics::leading.get(fm.get());
 				return sl_true;
 			}
 		}
@@ -57,10 +57,10 @@ namespace slib
 		jobject font = GraphicsPlatform::getNativeFont(this);
 		if (font) {	
 			JniLocal<jstring> jtext = Jni::getJniString(text);
-			JniLocal<jobject> size = _JAndroidFont::measureText.callObject(font, jtext.get());
+			JniLocal<jobject> size = JAndroidFont::measureText.callObject(font, jtext.get());
 			Size ret;
-			ret.x = _JAndroidPointF::x.get(size.get());
-			ret.y = _JAndroidPointF::y.get(size.get());
+			ret.x = JAndroidPointF::x.get(size.get());
+			ret.y = JAndroidPointF::y.get(size.get());
 			return ret;
 		}
 		return Size::zero();
@@ -89,7 +89,7 @@ namespace slib
 			}
 			float size = (float)(desc.size);
 			JniLocal<jstring> fontName = Jni::getJniString(desc.familyName);
-			JniLocal<jobject> jfont = _JAndroidFont::create.callObject(sl_null, fontName.value, size, style);
+			JniLocal<jobject> jfont = JAndroidFont::create.callObject(sl_null, fontName.value, size, style);
 			if (jfont.isNotNull()) {
 				JniGlobal<jobject> gfont = jfont;
 				if (gfont.isNotNull()) {

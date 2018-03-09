@@ -32,7 +32,7 @@ typedef UIView* NativeView;
 #include "slib/ui/core.h"
 #include "slib/math/transform2d.h"
 
-@interface SLib_NativeAnimationDelegate : NSObject<CAAnimationDelegate>
+@interface _priv_Slib_NativeAnimationDelegate : NSObject<CAAnimationDelegate>
 {
 	@public slib::Function<void()> onStop;
 }
@@ -135,7 +135,7 @@ namespace slib
 		
 		_native_UIAnimation_setAnimation(group, animation, sl_true);
 		
-		SLib_NativeAnimationDelegate* delegate = [[SLib_NativeAnimationDelegate alloc] init];
+		_priv_Slib_NativeAnimationDelegate* delegate = [[_priv_Slib_NativeAnimationDelegate alloc] init];
 		delegate->onStop = onStop;
 		group.delegate = delegate;
 		
@@ -266,7 +266,7 @@ namespace slib
 	}	
 }
 
-@implementation SLib_NativeAnimationDelegate
+@implementation _priv_Slib_NativeAnimationDelegate
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
 {

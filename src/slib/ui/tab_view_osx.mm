@@ -16,21 +16,21 @@
 
 #include "view_osx.h"
 
-@interface _Slib_OSX_TabView : NSTabView<NSTabViewDelegate> {
+@interface _priv_Slib_macOS_TabView : NSTabView<NSTabViewDelegate> {
 	
-	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 	
 }
 @end
 
-@interface _Slib_OSX_TabView_EmptyView : NSView {
+@interface _priv_Slib_macOS_TabView_EmptyView : NSView {
 }
 @end
 
 namespace slib
 {
 
-	class _TabView : public TabView
+	class _priv_TabView : public TabView
 	{
 	public:
 		void _applyTabsCount(NSTabView* tv)
@@ -91,7 +91,7 @@ namespace slib
 				view->setParent(this);
 			}
 			if (handle == nil) {
-				handle = [[_Slib_OSX_TabView_EmptyView alloc] init];
+				handle = [[_priv_Slib_macOS_TabView_EmptyView alloc] init];
 			}
 			[handle setHidden:NO];
 			[item setView:handle];
@@ -102,7 +102,7 @@ namespace slib
 			dispatchSelectTab((sl_uint32)([tv indexOfTabViewItem:[tv selectedTabViewItem]]));
 		}
 		
-		void _updateContentViewSize(_Slib_OSX_TabView* tv)
+		void _updateContentViewSize(_priv_Slib_macOS_TabView* tv)
 		{
 			NSRect rc = [tv contentRect];
 			UIRect frame;
@@ -125,26 +125,26 @@ namespace slib
 	Ref<ViewInstance> TabView::createNativeWidget(ViewInstance* _parent)
 	{
 		ObjectLocker lock(this);
-		OSX_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_OSX_TabView* handle = [[_Slib_OSX_TabView alloc] initWithFrame: frame];
+		MACOS_VIEW_CREATE_INSTANCE_BEGIN
+		_priv_Slib_macOS_TabView* handle = [[_priv_Slib_macOS_TabView alloc] initWithFrame: frame];
 		if (handle != nil) {
 			[handle setDelegate:handle];
-			((_TabView*)this)->_copyTabs(handle);
+			((_priv_TabView*)this)->_copyTabs(handle);
 			
 			Ref<Font> font = getFont();
 			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 			[handle setFont:hFont];
 		}
-		OSX_VIEW_CREATE_INSTANCE_END
+		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
 
 	void TabView::_refreshTabsCount_NW()
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_OSX_TabView class]]) {
-			_Slib_OSX_TabView* tv = (_Slib_OSX_TabView*)handle;
-			((_TabView*)this)->_applyTabsCount(tv);
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_TabView class]]) {
+			_priv_Slib_macOS_TabView* tv = (_priv_Slib_macOS_TabView*)handle;
+			((_priv_TabView*)this)->_applyTabsCount(tv);
 		}
 	}
 
@@ -167,9 +167,9 @@ namespace slib
 	void TabView::_setTabContentView_NW(sl_uint32 index, const Ref<View>& view)
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_OSX_TabView class]]) {
-			_Slib_OSX_TabView* tv = (_Slib_OSX_TabView*)handle;
-			((_TabView*)this)->_setTabContentView(tv, index, view);
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_TabView class]]) {
+			_priv_Slib_macOS_TabView* tv = (_priv_Slib_macOS_TabView*)handle;
+			((_priv_TabView*)this)->_setTabContentView(tv, index, view);
 		}
 	}
 
@@ -217,7 +217,7 @@ namespace slib
 
 }
 
-@implementation _Slib_OSX_TabView
+@implementation _priv_Slib_macOS_TabView
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -229,10 +229,10 @@ namespace slib
 -(void)setFrame:(NSRect)frame
 {
 	[super setFrame:frame];
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_TabView* _view = slib::CastInstance<slib::_TabView>(view.get())) {
+		if (slib::_priv_TabView* _view = slib::CastInstance<slib::_priv_TabView>(view.get())) {
 			_view->_updateContentViewSize(self);
 		}
 	}
@@ -240,17 +240,17 @@ namespace slib
 
 - (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_TabView* _view = slib::CastInstance<slib::_TabView>(view.get())) {
+		if (slib::_priv_TabView* _view = slib::CastInstance<slib::_priv_TabView>(view.get())) {
 			_view->_onSelectTab(self);
 		}
 	}
 }
 @end
 
-@implementation _Slib_OSX_TabView_EmptyView
+@implementation _priv_Slib_macOS_TabView_EmptyView
 
 @end
 

@@ -21,7 +21,7 @@
 namespace slib
 {
 
-	class _ListReportView : public ListReportView
+	class _priv_ListReportView : public ListReportView
 	{
 	public:
 		static sl_uint32 getColumnsCountFromListView(HWND hWnd)
@@ -96,7 +96,7 @@ namespace slib
 
 	};
 
-	class _Win32_ListReportViewInstance : public Win32_ViewInstance
+	class _priv_Win32_ListReportViewInstance : public Win32_ViewInstance
 	{
 	public:
 		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
@@ -170,7 +170,7 @@ namespace slib
 
 		DWORD style = LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDATA | WS_TABSTOP | WS_BORDER;
 		DWORD styleEx = 0;
-		Ref<_Win32_ListReportViewInstance> ret = Win32_ViewInstance::create<_Win32_ListReportViewInstance>(this, parent, L"SysListView32", L"", style, styleEx);
+		Ref<_priv_Win32_ListReportViewInstance> ret = Win32_ViewInstance::create<_priv_Win32_ListReportViewInstance>(this, parent, L"SysListView32", L"", style, styleEx);
 		
 		if (ret.isNotNull()) {
 
@@ -186,8 +186,8 @@ namespace slib
 			UINT exStyle = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_ONECLICKACTIVATE | LVS_EX_DOUBLEBUFFER;
 			::SendMessageW(handle, LVM_SETEXTENDEDLISTVIEWSTYLE, exStyle, exStyle);
 
-			((_ListReportView*)this)->_copyColumns(handle);
-			((_ListReportView*)this)->_applyRowsCount(handle);
+			((_priv_ListReportView*)this)->_copyColumns(handle);
+			((_priv_ListReportView*)this)->_applyRowsCount(handle);
 		}
 		return ret;
 	}
@@ -196,7 +196,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_ListReportView*)this)->_applyColumnsCount(handle);
+			((_priv_ListReportView*)this)->_applyColumnsCount(handle);
 		}
 	}
 
@@ -204,7 +204,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_ListReportView*)this)->_applyRowsCount(handle);
+			((_priv_ListReportView*)this)->_applyRowsCount(handle);
 			::InvalidateRect(handle, NULL, TRUE);
 		}
 	}
@@ -244,7 +244,7 @@ namespace slib
 			LVCOLUMNW lvc;
 			Base::zeroMemory(&lvc, sizeof(lvc));
 			lvc.mask = LVCF_FMT;
-			lvc.fmt = _ListReportView::translateAlignment(align);
+			lvc.fmt = _priv_ListReportView::translateAlignment(align);
 			::SendMessageW(handle, LVM_SETCOLUMNW, (WPARAM)iCol, (LPARAM)(&lvc));
 		}
 	}

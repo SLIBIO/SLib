@@ -25,14 +25,14 @@ namespace slib
 		ICON_DOWN = 3
 	};
 	
-	class _SelectView_DefaultIcon : public Drawable
+	class _priv_SelectView_DefaultIcon : public Drawable
 	{
 	public:
 		Ref<Brush> m_brush;
 		Point m_pts[3];
 		
 	public:
-		_SelectView_DefaultIcon(int type)
+		_priv_SelectView_DefaultIcon(int type)
 		{
 			m_brush = Brush::createSolidBrush(Color::Black);
 			if (type == ICON_LEFT) {
@@ -75,7 +75,7 @@ namespace slib
 		
 	};
 	
-	class _SelectView_DefaultResources
+	class _priv_SelectView_DefaultResources
 	{
 	public:
 		Ref<Drawable> leftIcon;
@@ -83,16 +83,16 @@ namespace slib
 		Ref<Drawable> downIcon;
 		
 	public:
-		_SelectView_DefaultResources()
+		_priv_SelectView_DefaultResources()
 		{
-			leftIcon = new _SelectView_DefaultIcon(ICON_LEFT);
-			rightIcon = new _SelectView_DefaultIcon(ICON_RIGHT);
-			downIcon = new _SelectView_DefaultIcon(ICON_DOWN);
+			leftIcon = new _priv_SelectView_DefaultIcon(ICON_LEFT);
+			rightIcon = new _priv_SelectView_DefaultIcon(ICON_RIGHT);
+			downIcon = new _priv_SelectView_DefaultIcon(ICON_DOWN);
 		}
 		
 	};
 	
-	SLIB_SAFE_STATIC_GETTER(_SelectView_DefaultResources, _SelectView_getDefaultResources)
+	SLIB_SAFE_STATIC_GETTER(_priv_SelectView_DefaultResources, _priv_SelectView_getDefaultResources)
 	
 	SelectView::SelectView()
 	{
@@ -108,7 +108,7 @@ namespace slib
 		
 		m_textColor = Color::Black;
 		
-		_SelectView_DefaultResources* def = _SelectView_getDefaultResources();
+		_priv_SelectView_DefaultResources* def = _priv_SelectView_getDefaultResources();
 		if (def) {
 			m_leftIcon = def->leftIcon;
 			m_rightIcon = def->rightIcon;

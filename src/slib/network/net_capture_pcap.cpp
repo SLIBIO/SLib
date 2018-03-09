@@ -31,7 +31,7 @@
 namespace slib
 {
 
-	class _NetPcapCapture : public NetCapture
+	class _priv_NetPcapCapture : public NetCapture
 	{
 	public:
 		pcap_t* m_handle;
@@ -42,19 +42,19 @@ namespace slib
 		sl_bool m_flagRunning;
 		
 	public:
-		_NetPcapCapture()
+		_priv_NetPcapCapture()
 		{
 			m_flagInit = sl_false;
 			m_flagRunning = sl_false;
 		}
 		
-		~_NetPcapCapture()
+		~_priv_NetPcapCapture()
 		{
 			release();
 		}
 		
 	public:
-		static Ref<_NetPcapCapture> create(const NetCaptureParam& param)
+		static Ref<_priv_NetPcapCapture> create(const NetCaptureParam& param)
 		{
 			String name = param.deviceName;		
 			String name8;
@@ -77,11 +77,11 @@ namespace slib
 			pcap_t* handle = pcap_open_live(szName, MAX_PACKET_SIZE, param.flagPromiscuous, param.timeoutRead, errBuf);
 			if (handle) {
 				if (pcap_setbuff(handle, param.sizeBuffer) == 0) {
-					Ref<_NetPcapCapture> ret = new _NetPcapCapture;
+					Ref<_priv_NetPcapCapture> ret = new _priv_NetPcapCapture;
 					if (ret.isNotNull()) {
 						ret->_initWithParam(param);
 						ret->m_handle = handle;
-						ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_NetPcapCapture, _run, ret.get()));
+						ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_priv_NetPcapCapture, _run, ret.get()));
 						if (ret->m_thread.isNotNull()) {
 							ret->m_flagInit = sl_true;
 							if (param.flagAutoStart) {
@@ -108,11 +108,11 @@ namespace slib
 							if (pcap_set_timeout(handle, param.timeoutRead) == 0) {
 								int iRet = pcap_activate(handle);
 								if (iRet == 0 || iRet == PCAP_WARNING || iRet == PCAP_WARNING_PROMISC_NOTSUP || iRet == PCAP_WARNING_TSTAMP_TYPE_NOTSUP) {
-									Ref<_NetPcapCapture> ret = new _NetPcapCapture;
+									Ref<_priv_NetPcapCapture> ret = new _priv_NetPcapCapture;
 									if (ret.isNotNull()) {
 										ret->_initWithParam(param);
 										ret->m_handle = handle;
-										ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_NetPcapCapture, _run, ret.get()));
+										ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_priv_NetPcapCapture, _run, ret.get()));
 										if (ret->m_thread.isNotNull()) {
 											ret->m_flagInit = sl_true;
 											if (param.flagAutoStart) {
@@ -249,10 +249,10 @@ namespace slib
 
 	Ref<NetCapture> NetCapture::createPcap(const NetCaptureParam& param)
 	{
-		return _NetPcapCapture::create(param);
+		return _priv_NetPcapCapture::create(param);
 	}
 
-	static void _NetCapture_parseDeviceInfo(pcap_if_t* dev, NetCaptureDeviceInfo& _out)
+	static void _priv_NetCapture_parseDeviceInfo(pcap_if_t* dev, NetCaptureDeviceInfo& _out)
 	{
 		_out.name = String::fromUtf8(dev->name);
 		_out.description = String::fromUtf8(dev->description);
@@ -293,7 +293,7 @@ namespace slib
 			pcap_if_t* dev = devs;
 			while (dev) {
 				NetCaptureDeviceInfo item;
-				_NetCapture_parseDeviceInfo(dev, item);
+				_priv_NetCapture_parseDeviceInfo(dev, item);
 				list.add_NoLock(item);
 				dev = dev->next;
 			}
@@ -314,7 +314,7 @@ namespace slib
 			pcap_if_t* dev = devs;
 			while (dev) {
 				if (name == dev->name || name == dev->description) {
-					_NetCapture_parseDeviceInfo(dev, _out);
+					_priv_NetCapture_parseDeviceInfo(dev, _out);
 					return sl_true;
 				}
 				dev = dev->next;

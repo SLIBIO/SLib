@@ -18,7 +18,7 @@
 namespace slib
 {
 
-	struct _AsyncIoLoopHandle
+	struct _priv_AsyncIoLoopHandle
 	{
 		HANDLE hCompletionPort;
 		OVERLAPPED overlappedWake;
@@ -28,7 +28,7 @@ namespace slib
 	{
 		HANDLE hCompletionPort = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 1);
 		if (hCompletionPort) {
-			_AsyncIoLoopHandle* handle = new _AsyncIoLoopHandle;
+			_priv_AsyncIoLoopHandle* handle = new _priv_AsyncIoLoopHandle;
 			if (handle) {
 				handle->hCompletionPort = hCompletionPort;
 				return handle;
@@ -40,13 +40,13 @@ namespace slib
 
 	void AsyncIoLoop::_native_closeHandle(void* _handle)
 	{
-		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)_handle;
+		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)_handle;
 		::CloseHandle(handle->hCompletionPort);
 		delete handle;
 	}
 
 
-	BOOL WINAPI _GetQueuedCompletionStatusEx_Impl(
+	BOOL WINAPI _priv_GetQueuedCompletionStatusEx_Impl(
 		HANDLE CompletionPort,
 		LPOVERLAPPED_ENTRY lpCompletionPortEntries,
 		ULONG ulCount,
@@ -70,11 +70,11 @@ namespace slib
 
 	void AsyncIoLoop::_native_runLoop()
 	{
-		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
+		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
 
 		WINAPI_GetQueuedCompletionStatusEx fGetQueuedCompletionStatusEx = Windows::getAPI_GetQueuedCompletionStatusEx();
 		if (!fGetQueuedCompletionStatusEx) {
-			fGetQueuedCompletionStatusEx = _GetQueuedCompletionStatusEx_Impl;
+			fGetQueuedCompletionStatusEx = _priv_GetQueuedCompletionStatusEx_Impl;
 		}
 
 		OVERLAPPED_ENTRY entries[ASYNC_MAX_WAIT_EVENT];
@@ -111,14 +111,14 @@ namespace slib
 
 	void AsyncIoLoop::_native_wake()
 	{
-		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
+		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
 		Base::resetMemory(&(handle->overlappedWake), 0, sizeof(OVERLAPPED));
 		::PostQueuedCompletionStatus(handle->hCompletionPort, 0, 0, &(handle->overlappedWake));
 	}
 
 	sl_bool AsyncIoLoop::_native_attachInstance(AsyncIoInstance* instance, AsyncIoMode mode)
 	{
-		_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
+		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
 		HANDLE hObject = (HANDLE)(instance->getHandle());
 		HANDLE hPort = ::CreateIoCompletionPort(hObject, handle->hCompletionPort, (ULONG_PTR)instance, 0);
 		if (hPort) {

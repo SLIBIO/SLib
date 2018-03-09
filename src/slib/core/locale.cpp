@@ -574,7 +574,7 @@ namespace slib
 	}
 
 	template <class CT>
-	SLIB_INLINE sl_uint32 _Locale_getValueFromName(const CT* name)
+	SLIB_INLINE sl_uint32 _priv_Locale_getValueFromName(const CT* name)
 	{
 		sl_uint32 value = Locale::Unknown;
 		if (name[0] != 0 && name[1] != 0) {
@@ -591,17 +591,17 @@ namespace slib
 
 	Locale::Locale(const sl_char8* name)
 	{
-		value = _Locale_getValueFromName(name);
+		value = _priv_Locale_getValueFromName(name);
 	}
 
 	Locale::Locale(const sl_char16* name)
 	{
-		value = _Locale_getValueFromName(name);
+		value = _priv_Locale_getValueFromName(name);
 	}
 
 	Locale::Locale(const String& name)
 	{
-		value = _Locale_getValueFromName(name.getData());
+		value = _priv_Locale_getValueFromName(name.getData());
 	}
 
 	Language Locale::getLanguage() const

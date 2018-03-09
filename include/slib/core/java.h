@@ -471,7 +471,7 @@ namespace slib
 #define SLIB_JNI_BEGIN_CLASS(CLASS, NAME) \
 namespace CLASS \
 { \
-	static slib::_JniSingletonClass _gcls(NAME); \
+	static slib::_priv_JniSingletonClass _gcls(NAME); \
 	SLIB_INLINE slib::JniClass get() { \
 		return _gcls.cls; \
 	}
@@ -486,42 +486,42 @@ namespace CLASS \
 #define SLIB_JNI_END_CLASS_SECTION \
 }
 
-#define SLIB_JNI_NEW(VAR, SIG) static slib::_JniSingletonMethod VAR(&_gcls, "<init>", SIG);
+#define SLIB_JNI_NEW(VAR, SIG) static slib::_priv_JniSingletonMethod VAR(&_gcls, "<init>", SIG);
 
-#define SLIB_JNI_METHOD(VAR, NAME, SIG) static slib::_JniSingletonMethod VAR(&_gcls, NAME, SIG);
-#define SLIB_JNI_STATIC_METHOD(VAR, NAME, SIG) static slib::_JniSingletonStaticMethod VAR(&_gcls, NAME, SIG);
+#define SLIB_JNI_METHOD(VAR, NAME, SIG) static slib::_priv_JniSingletonMethod VAR(&_gcls, NAME, SIG);
+#define SLIB_JNI_STATIC_METHOD(VAR, NAME, SIG) static slib::_priv_JniSingletonStaticMethod VAR(&_gcls, NAME, SIG);
 
-#define SLIB_JNI_FIELD(VAR, NAME, SIG) static slib::_JniSingletonField VAR(&_gcls, NAME, SIG);
-#define SLIB_JNI_OBJECT_FIELD(VAR, SIG) static slib::_JniSingletonObjectField VAR(&_gcls, (#VAR), SIG);
-#define SLIB_JNI_BOOLEAN_FIELD(VAR) static slib::_JniSingletonBooleanField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_BYTE_FIELD(VAR) static slib::_JniSingletonByteField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_CHAR_FIELD(VAR) static slib::_JniSingletonCharField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_SHORT_FIELD(VAR) static slib::_JniSingletonShortField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_INT_FIELD(VAR) static slib::_JniSingletonIntField VAR(&_gcls, (#VAR));;
-#define SLIB_JNI_LONG_FIELD(VAR) static slib::_JniSingletonLongField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_FLOAT_FIELD(VAR) static slib::_JniSingletonFloatField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_DOUBLE_FIELD(VAR) static slib::_JniSingletonDoubleField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_STRING_FIELD(VAR) static slib::_JniSingletonStringField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_STRING16_FIELD(VAR) static slib::_JniSingletonString16Field VAR(&_gcls, (#VAR));
+#define SLIB_JNI_FIELD(VAR, NAME, SIG) static slib::_priv_JniSingletonField VAR(&_gcls, NAME, SIG);
+#define SLIB_JNI_OBJECT_FIELD(VAR, SIG) static slib::_priv_JniSingletonObjectField VAR(&_gcls, (#VAR), SIG);
+#define SLIB_JNI_BOOLEAN_FIELD(VAR) static slib::_priv_JniSingletonBooleanField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_BYTE_FIELD(VAR) static slib::_priv_JniSingletonByteField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_CHAR_FIELD(VAR) static slib::_priv_JniSingletonCharField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_SHORT_FIELD(VAR) static slib::_priv_JniSingletonShortField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_INT_FIELD(VAR) static slib::_priv_JniSingletonIntField VAR(&_gcls, (#VAR));;
+#define SLIB_JNI_LONG_FIELD(VAR) static slib::_priv_JniSingletonLongField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_FLOAT_FIELD(VAR) static slib::_priv_JniSingletonFloatField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_DOUBLE_FIELD(VAR) static slib::_priv_JniSingletonDoubleField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_STRING_FIELD(VAR) static slib::_priv_JniSingletonStringField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_STRING16_FIELD(VAR) static slib::_priv_JniSingletonString16Field VAR(&_gcls, (#VAR));
 
-#define SLIB_JNI_STATIC_FIELD(VAR, NAME, SIG) static slib::_JniSingletonStaticField VAR(&_gcls, NAME, SIG);
-#define SLIB_JNI_STATIC_OBJECT_FIELD(VAR, SIG) static slib::_JniSingletonStaticObjectField VAR(&_gcls, (#VAR), SIG);
-#define SLIB_JNI_STATIC_BOOLEAN_FIELD(VAR) static slib::_JniSingletonStaticBooleanField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_STATIC_BYTE_FIELD(VAR) static slib::_JniSingletonStaticByteField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_STATIC_CHAR_FIELD(VAR) static slib::_JniSingletonStaticCharField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_STATIC_SHORT_FIELD(VAR) static slib::_JniSingletonStaticShortField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_STATIC_INT_FIELD(VAR) static slib::_JniSingletonStaticIntField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_STATIC_LONG_FIELD(VAR) static slib::_JniSingletonStaticLongField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_STATIC_FLOAT_FIELD(VAR) static slib::_JniSingletonStaticFloatField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_STATIC_DOUBLE_FIELD(VAR) static slib::_JniSingletonStaticDoubleField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_STATIC_STRING_FIELD(VAR) static slib::_JniSingletonStaticStringField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_STATIC_STRING16_FIELD(VAR) static slib::_JniSingletonStaticString16Field VAR(&_gcls, (#VAR));
+#define SLIB_JNI_STATIC_FIELD(VAR, NAME, SIG) static slib::_priv_JniSingletonStaticField VAR(&_gcls, NAME, SIG);
+#define SLIB_JNI_STATIC_OBJECT_FIELD(VAR, SIG) static slib::_priv_JniSingletonStaticObjectField VAR(&_gcls, (#VAR), SIG);
+#define SLIB_JNI_STATIC_BOOLEAN_FIELD(VAR) static slib::_priv_JniSingletonStaticBooleanField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_STATIC_BYTE_FIELD(VAR) static slib::_priv_JniSingletonStaticByteField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_STATIC_CHAR_FIELD(VAR) static slib::_priv_JniSingletonStaticCharField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_STATIC_SHORT_FIELD(VAR) static slib::_priv_JniSingletonStaticShortField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_STATIC_INT_FIELD(VAR) static slib::_priv_JniSingletonStaticIntField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_STATIC_LONG_FIELD(VAR) static slib::_priv_JniSingletonStaticLongField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_STATIC_FLOAT_FIELD(VAR) static slib::_priv_JniSingletonStaticFloatField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_STATIC_DOUBLE_FIELD(VAR) static slib::_priv_JniSingletonStaticDoubleField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_STATIC_STRING_FIELD(VAR) static slib::_priv_JniSingletonStaticStringField VAR(&_gcls, (#VAR));
+#define SLIB_JNI_STATIC_STRING16_FIELD(VAR) static slib::_priv_JniSingletonStaticString16Field VAR(&_gcls, (#VAR));
 
-#define SLIB_JNI_NATIVE(VAR, NAME, SIG, fn) static slib::_JniNativeMethod VAR(&_gcls, NAME, SIG, (const void*)(fn));
+#define SLIB_JNI_NATIVE(VAR, NAME, SIG, fn) static slib::_priv_JniNativeMethod VAR(&_gcls, NAME, SIG, (const void*)(fn));
 #define SLIB_JNI_NATIVE_IMPL(VAR, NAME, SIG, RET, ...) \
-	RET JNICALL SLib_JniNativeImpl_##VAR(JNIEnv* env, jobject _this, ##__VA_ARGS__); \
-	static slib::_JniNativeMethod VAR(&_gcls, NAME, SIG, (const void*)(SLib_JniNativeImpl_##VAR)); \
-	RET JNICALL SLib_JniNativeImpl_##VAR(JNIEnv* env, jobject _this, ##__VA_ARGS__)
+	RET JNICALL _priv_slib_JniNativeImpl_##VAR(JNIEnv* env, jobject _this, ##__VA_ARGS__); \
+	static slib::_priv_JniNativeMethod VAR(&_gcls, NAME, SIG, (const void*)(_priv_slib_JniNativeImpl_##VAR)); \
+	RET JNICALL _priv_slib_JniNativeImpl_##VAR(JNIEnv* env, jobject _this, ##__VA_ARGS__)
 
 #include "detail/java.inc"
 

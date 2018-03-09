@@ -1156,7 +1156,7 @@ namespace slib
 	void MipmapDrawable::addSource(const Ref<Drawable>& source, sl_real width, sl_real height)
 	{
 		if (source.isNotNull()) {
-			_Source src;
+			Source src;
 			src.drawable = source;
 			src.width = width;
 			src.height = height;
@@ -1167,7 +1167,7 @@ namespace slib
 	void MipmapDrawable::addSource(const Ref<Drawable>& source)
 	{
 		if (source.isNotNull()) {
-			_Source src;
+			Source src;
 			src.drawable = source;
 			src.width = source->getDrawableWidth();
 			src.height = source->getDrawableHeight();
@@ -1177,7 +1177,7 @@ namespace slib
 
 	Ref<Drawable> MipmapDrawable::getSource(sl_size index)
 	{
-		_Source source;
+		Source source;
 		if (m_sources.getAt(index, &source)) {
 			return source.drawable;
 		}
@@ -1195,7 +1195,7 @@ namespace slib
 			return getSource(0);
 		}
 		
-		ListLocker<_Source> sources(m_sources);
+		ListLocker<Source> sources(m_sources);
 		if (sources.count == 0) {
 			return sl_null;
 		}
@@ -1207,7 +1207,7 @@ namespace slib
 		sl_real minSize = 0;
 		Ref<Drawable> minSrc;
 		for (i = 0; i < sources.count; i++) {
-			_Source& s = sources[i];
+			Source& s = sources[i];
 			sl_real width = s.width;
 			sl_real height = s.height;
 			if (width >= requiredWidth && height >= requiredHeight) {
@@ -1225,7 +1225,7 @@ namespace slib
 		sl_real maxSize = 0;
 		Ref<Drawable> maxSrc;
 		for (i = 0; i < sources.count; i++) {
-			_Source& s = sources[i];
+			Source& s = sources[i];
 			sl_real width = s.width;
 			sl_real height = s.height;
 			if (width < requiredWidth || height < requiredHeight) {

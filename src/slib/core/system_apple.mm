@@ -18,16 +18,16 @@
 
 #include <mach-o/dyld.h>
 
-#define _PATH_MAX 1024
+#define PRIV_PATH_MAX 1024
 
 namespace slib
 {
 
 	String System::getApplicationPath()
 	{
-		char path[_PATH_MAX] = {0};
-		char pathResolved[_PATH_MAX] = {0};
-		uint32_t size = _PATH_MAX - 1;
+		char path[PRIV_PATH_MAX] = {0};
+		char pathResolved[PRIV_PATH_MAX] = {0};
+		uint32_t size = PRIV_PATH_MAX - 1;
 		if (_NSGetExecutablePath(path, &size) == 0) {
 			realpath(path, pathResolved);
 		}
@@ -58,7 +58,7 @@ namespace slib
 		return Apple::getStringFromNSString(path);
 	}
 
-	void _System_setBundleLoginItemEnabled(const String& path, sl_bool flagEnabled)
+	void _priv_System_setBundleLoginItemEnabled(const String& path, sl_bool flagEnabled)
 	{
 #if defined(SLIB_PLATFORM_IS_MACOS)
 		if (path.isEmpty()) {
@@ -103,22 +103,22 @@ namespace slib
 
 	void System::registerApplicationRunAtStartup(const String& path)
 	{
-		_System_setBundleLoginItemEnabled(path, sl_true);
+		_priv_System_setBundleLoginItemEnabled(path, sl_true);
 	}
 
 	void System::registerApplicationRunAtStartup()
 	{
-		_System_setBundleLoginItemEnabled(Apple::getMainBundlePath(), sl_true);
+		_priv_System_setBundleLoginItemEnabled(Apple::getMainBundlePath(), sl_true);
 	}
 
 	void System::unregisterApplicationRunAtStartup(const String& path)
 	{
-		_System_setBundleLoginItemEnabled(path, sl_false);
+		_priv_System_setBundleLoginItemEnabled(path, sl_false);
 	}
 
 	void System::unregisterApplicationRunAtStartup()
 	{
-		_System_setBundleLoginItemEnabled(Apple::getMainBundlePath(), sl_false);
+		_priv_System_setBundleLoginItemEnabled(Apple::getMainBundlePath(), sl_false);
 	}
 
 }

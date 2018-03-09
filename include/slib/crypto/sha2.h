@@ -28,12 +28,12 @@
 namespace slib
 {
 	
-	class SLIB_EXPORT _SHA256Base : public CryptoHash
+	class SLIB_EXPORT _priv_SHA256Base : public CryptoHash
 	{
 	public:
-		_SHA256Base();
+		_priv_SHA256Base();
 
-		~_SHA256Base();
+		~_priv_SHA256Base();
 
 	public:
 		void update(const void* input, sl_size n) override;
@@ -52,7 +52,7 @@ namespace slib
 		sl_uint32 h[8];
 	};
 	
-	class SLIB_EXPORT SHA224 : public _SHA256Base
+	class SLIB_EXPORT SHA224 : public _priv_SHA256Base
 	{
 	public:
 		SHA224();
@@ -83,7 +83,7 @@ namespace slib
 
 	};
 	
-	class SLIB_EXPORT SHA256 : public _SHA256Base
+	class SLIB_EXPORT SHA256 : public _priv_SHA256Base
 	{
 	public:
 		SHA256();
@@ -117,12 +117,12 @@ namespace slib
 
 	};
 	
-	class SLIB_EXPORT _SHA512Base : public CryptoHash
+	class SLIB_EXPORT _priv_SHA512Base : public CryptoHash
 	{
 	public:
-		_SHA512Base();
+		_priv_SHA512Base();
 
-		~_SHA512Base();
+		~_priv_SHA512Base();
 	
 	public:
 		void update(const void* input, sl_size n) override;
@@ -142,7 +142,7 @@ namespace slib
 
 	};
 	
-	class SLIB_EXPORT SHA384 : public _SHA512Base
+	class SLIB_EXPORT SHA384 : public _priv_SHA512Base
 	{
 	public:
 		SHA384();
@@ -173,7 +173,7 @@ namespace slib
 
 	};
 	
-	class SLIB_EXPORT SHA512 : public _SHA512Base
+	class SLIB_EXPORT SHA512 : public _priv_SHA512Base
 	{
 	public:
 		SHA512();

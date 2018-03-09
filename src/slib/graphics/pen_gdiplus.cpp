@@ -21,13 +21,13 @@
 namespace slib
 {
 
-	class _Gdiplus_PenObject : public Referable
+	class _priv_Gdiplus_PenObject : public Referable
 	{
 	public:
 		Gdiplus::Pen* m_pen;
 
 	public:
-		_Gdiplus_PenObject(const PenDesc& desc)
+		_priv_Gdiplus_PenObject(const PenDesc& desc)
 		{
 			m_pen = NULL;
 			const Color& _color = desc.color;
@@ -93,30 +93,30 @@ namespace slib
 			}
 		}
 
-		~_Gdiplus_PenObject()
+		~_priv_Gdiplus_PenObject()
 		{
 			delete m_pen;
 		}
 
 	};
 
-	class _Pen : public Pen
+	class _priv_Pen : public Pen
 	{
 	public:
-		_Gdiplus_PenObject* getPlatformObject()
+		_priv_Gdiplus_PenObject* getPlatformObject()
 		{
 			if (m_platformObject.isNull()) {
 				SpinLocker lock(&m_lock);
 				if (m_platformObject.isNull()) {
-					m_platformObject = new _Gdiplus_PenObject(m_desc);
+					m_platformObject = new _priv_Gdiplus_PenObject(m_desc);
 				}
 			}
-			return (_Gdiplus_PenObject*)(m_platformObject.get());;
+			return (_priv_Gdiplus_PenObject*)(m_platformObject.get());;
 		}
 
 		Gdiplus::Pen* getPlatformHandle()
 		{
-			_Gdiplus_PenObject* po = getPlatformObject();
+			_priv_Gdiplus_PenObject* po = getPlatformObject();
 			if (po) {
 				return po->m_pen;
 			}
@@ -127,7 +127,7 @@ namespace slib
 	Gdiplus::Pen* GraphicsPlatform::getPenHandle(Pen* pen)
 	{
 		if (pen) {
-			return ((_Pen*)pen)->getPlatformHandle();
+			return ((_priv_Pen*)pen)->getPlatformHandle();
 		}
 		return NULL;
 	}

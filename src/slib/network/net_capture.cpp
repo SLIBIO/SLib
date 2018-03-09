@@ -101,7 +101,7 @@ namespace slib
 	}
 	
 	
-	class _NetRawPacketCapture : public NetCapture
+	class _priv_NetRawPacketCapture : public NetCapture
 	{
 	public:
 		AtomicRef<Socket> m_socket;
@@ -115,7 +115,7 @@ namespace slib
 		sl_bool m_flagRunning;
 		
 	public:
-		_NetRawPacketCapture()
+		_priv_NetRawPacketCapture()
 		{
 			m_deviceType = NetworkLinkDeviceType::Ethernet;
 			m_ifaceIndex = 0;
@@ -124,13 +124,13 @@ namespace slib
 			m_flagRunning = sl_false;
 		}
 		
-		~_NetRawPacketCapture()
+		~_priv_NetRawPacketCapture()
 		{
 			release();
 		}
 		
 	public:
-		static Ref<_NetRawPacketCapture> create(const NetCaptureParam& param)
+		static Ref<_priv_NetRawPacketCapture> create(const NetCaptureParam& param)
 		{
 			
 			sl_uint32 iface = 0;
@@ -163,14 +163,14 @@ namespace slib
 				}
 				Memory mem = Memory::create(MAX_PACKET_SIZE);
 				if (mem.isNotEmpty()) {
-					Ref<_NetRawPacketCapture> ret = new _NetRawPacketCapture;
+					Ref<_priv_NetRawPacketCapture> ret = new _priv_NetRawPacketCapture;
 					if (ret.isNotNull()) {
 						ret->_initWithParam(param);
 						ret->m_bufPacket = mem;
 						ret->m_socket = socket;
 						ret->m_deviceType = deviceType;
 						ret->m_ifaceIndex = iface;
-						ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_NetRawPacketCapture, _run, ret.get()));
+						ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_priv_NetRawPacketCapture, _run, ret.get()));
 						if (ret->m_thread.isNotNull()) {
 							ret->m_flagInit = sl_true;
 							if (param.flagAutoStart) {
@@ -300,10 +300,10 @@ namespace slib
 	
 	Ref<NetCapture> NetCapture::createRawPacket(const NetCaptureParam& param)
 	{
-		return _NetRawPacketCapture::create(param);
+		return _priv_NetRawPacketCapture::create(param);
 	}
 	
-	class _NetRawIPv4Capture : public NetCapture
+	class _priv_NetRawIPv4Capture : public NetCapture
 	{
 	public:
 		AtomicRef<Socket> m_socketTCP;
@@ -317,19 +317,19 @@ namespace slib
 		sl_bool m_flagRunning;
 		
 	public:
-		_NetRawIPv4Capture()
+		_priv_NetRawIPv4Capture()
 		{
 			m_flagInit = sl_false;
 			m_flagRunning = sl_false;
 		}
 		
-		~_NetRawIPv4Capture()
+		~_priv_NetRawIPv4Capture()
 		{
 			release();
 		}
 		
 	public:
-		static Ref<_NetRawIPv4Capture> create(const NetCaptureParam& param)
+		static Ref<_priv_NetRawIPv4Capture> create(const NetCaptureParam& param)
 		{
 			Ref<Socket> socketTCP = Socket::openRaw(NetworkInternetProtocol::TCP);
 			Ref<Socket> socketUDP = Socket::openRaw(NetworkInternetProtocol::UDP);
@@ -340,14 +340,14 @@ namespace slib
 				socketICMP->setOption_IncludeIpHeader(sl_true);
 				Memory mem = Memory::create(MAX_PACKET_SIZE);
 				if (mem.isNotEmpty()) {
-					Ref<_NetRawIPv4Capture> ret = new _NetRawIPv4Capture;
+					Ref<_priv_NetRawIPv4Capture> ret = new _priv_NetRawIPv4Capture;
 					if (ret.isNotNull()) {
 						ret->_initWithParam(param);
 						ret->m_bufPacket = mem;
 						ret->m_socketTCP = socketTCP;
 						ret->m_socketUDP = socketUDP;
 						ret->m_socketICMP = socketICMP;
-						ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_NetRawIPv4Capture, _run, ret.get()));
+						ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_priv_NetRawIPv4Capture, _run, ret.get()));
 						if (ret->m_thread.isNotNull()) {
 							ret->m_flagInit = sl_true;
 							if (param.flagAutoStart) {
@@ -522,7 +522,7 @@ namespace slib
 	
 	Ref<NetCapture> NetCapture::createRawIPv4(const NetCaptureParam& param)
 	{
-		return _NetRawIPv4Capture::create(param);
+		return _priv_NetRawIPv4Capture::create(param);
 	}
 	
 	

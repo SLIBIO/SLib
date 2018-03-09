@@ -24,7 +24,7 @@
 namespace slib
 {
 
-	class _OpenSLES_AudioPlayerImpl : public AudioPlayer
+	class _priv_OpenSLES_AudioPlayerImpl : public AudioPlayer
 	{
 	public:
 		SLObjectItf m_engineObject;
@@ -32,11 +32,11 @@ namespace slib
 		SLObjectItf m_mixerObject;
 
 	public:
-		_OpenSLES_AudioPlayerImpl()
+		_priv_OpenSLES_AudioPlayerImpl()
 		{
 		}
 
-		~_OpenSLES_AudioPlayerImpl()
+		~_priv_OpenSLES_AudioPlayerImpl()
 		{
 			(*m_mixerObject)->Destroy(m_mixerObject);
 			(*m_engineObject)->Destroy(m_engineObject);
@@ -48,9 +48,9 @@ namespace slib
 			LogError("OpenSL_ES", text);
 		}
 
-		static Ref<_OpenSLES_AudioPlayerImpl> create(const AudioPlayerParam& param)
+		static Ref<_priv_OpenSLES_AudioPlayerImpl> create(const AudioPlayerParam& param)
 		{
-			Ref<_OpenSLES_AudioPlayerImpl> ret;
+			Ref<_priv_OpenSLES_AudioPlayerImpl> ret;
 
 			SLObjectItf engineObject;
 			SLEngineItf engineInterface;
@@ -64,7 +64,7 @@ namespace slib
 					if ((*engineObject)->GetInterface(engineObject, SL_IID_ENGINE,  &engineInterface) == SL_RESULT_SUCCESS) {
 						if ((*engineInterface)->CreateOutputMix(engineInterface, &mixerObject, 0, sl_null, sl_null) == SL_RESULT_SUCCESS) {
 							if ((*mixerObject)->Realize(mixerObject, SL_BOOLEAN_FALSE) == SL_RESULT_SUCCESS) {
-								ret = new _OpenSLES_AudioPlayerImpl();
+								ret = new _priv_OpenSLES_AudioPlayerImpl();
 								if (ret.isNotNull()) {
 									ret->m_engineObject = engineObject;
 									ret->m_engineInterface = engineInterface;
@@ -95,10 +95,10 @@ namespace slib
 
 	};
 
-	class _OpenSLES_AudioPlayerBufferImpl : public AudioPlayerBuffer
+	class _priv_OpenSLES_AudioPlayerBufferImpl : public AudioPlayerBuffer
 	{
 	public:
-		Ref<_OpenSLES_AudioPlayerImpl> m_engine;
+		Ref<_priv_OpenSLES_AudioPlayerImpl> m_engine;
 		SLObjectItf m_playerObject;
 		SLPlayItf m_playerInterface;
 		SLAndroidSimpleBufferQueueItf m_bufferQueue;
@@ -111,14 +111,14 @@ namespace slib
 		sl_uint32 m_nSamplesFrame;
 
 	public:
-		_OpenSLES_AudioPlayerBufferImpl()
+		_priv_OpenSLES_AudioPlayerBufferImpl()
 		{
 			m_flagOpened = sl_true;
 			m_flagRunning = sl_false;
 			m_indexBuffer = 0;
 		}
 		
-		~_OpenSLES_AudioPlayerBufferImpl()
+		~_priv_OpenSLES_AudioPlayerBufferImpl()
 		{
 			release();
 		}
@@ -129,9 +129,9 @@ namespace slib
 			LogError("OpenSL_ES_Buffer", text);
 		}
 
-		static Ref<_OpenSLES_AudioPlayerBufferImpl> create(Ref<_OpenSLES_AudioPlayerImpl> engine, const AudioPlayerBufferParam& param)
+		static Ref<_priv_OpenSLES_AudioPlayerBufferImpl> create(Ref<_priv_OpenSLES_AudioPlayerImpl> engine, const AudioPlayerBufferParam& param)
 		{
-			Ref<_OpenSLES_AudioPlayerBufferImpl> ret;
+			Ref<_priv_OpenSLES_AudioPlayerBufferImpl> ret;
 			
 			if (param.channelsCount != 1 && param.channelsCount != 2) {
 				return ret;
@@ -173,7 +173,7 @@ namespace slib
 				if ((*playerObject)->Realize(playerObject, SL_BOOLEAN_FALSE) == SL_RESULT_SUCCESS) {
 					if ((*playerObject)->GetInterface(playerObject, SL_IID_PLAY, &playerInterface) == SL_RESULT_SUCCESS) {
 						if ((*playerObject)->GetInterface(playerObject, SL_IID_BUFFERQUEUE, &bufferQueue) == SL_RESULT_SUCCESS) {
-							ret = new _OpenSLES_AudioPlayerBufferImpl();
+							ret = new _priv_OpenSLES_AudioPlayerBufferImpl();
 							if (ret.isNotNull()) {
 								ret->m_engine = engine;
 								ret->m_playerObject = playerObject;
@@ -185,7 +185,7 @@ namespace slib
 								ret->_init(param);
 								
 								if (ret->m_bufFrame) {
-									if ((*bufferQueue)->RegisterCallback(bufferQueue, _OpenSLES_AudioPlayerBufferImpl::callback, ret.get()) == SL_RESULT_SUCCESS) {
+									if ((*bufferQueue)->RegisterCallback(bufferQueue, _priv_OpenSLES_AudioPlayerBufferImpl::callback, ret.get()) == SL_RESULT_SUCCESS) {
 										if (param.flagAutoStart) {
 											ret->start();
 										}
@@ -296,19 +296,19 @@ namespace slib
 
 		static void	callback(SLAndroidSimpleBufferQueueItf bufferQueue, void* p_context)
 		{
-			_OpenSLES_AudioPlayerBufferImpl* object = (_OpenSLES_AudioPlayerBufferImpl*)p_context;
+			_priv_OpenSLES_AudioPlayerBufferImpl* object = (_priv_OpenSLES_AudioPlayerBufferImpl*)p_context;
 			object->onFrame();
 		}
 	};
 
-	Ref<AudioPlayerBuffer> _OpenSLES_AudioPlayerImpl::createBuffer(const AudioPlayerBufferParam& param)
+	Ref<AudioPlayerBuffer> _priv_OpenSLES_AudioPlayerImpl::createBuffer(const AudioPlayerBufferParam& param)
 	{
-		return _OpenSLES_AudioPlayerBufferImpl::create(this, param);
+		return _priv_OpenSLES_AudioPlayerBufferImpl::create(this, param);
 	}
 
 	Ref<AudioPlayer> OpenSL_ES::createPlayer(const AudioPlayerParam& param)
 	{
-		return _OpenSLES_AudioPlayerImpl::create(param);
+		return _priv_OpenSLES_AudioPlayerImpl::create(param);
 	}
 
 }

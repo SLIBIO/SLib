@@ -237,7 +237,7 @@ namespace slib
 		}
 	}
 
-	static Time _File_getModifiedTime(HANDLE handle)
+	static Time _priv_File_getModifiedTime(HANDLE handle)
 	{
 		FILETIME ft;
 		BOOL bRet = ::GetFileTime(handle, NULL, NULL, &ft);
@@ -251,7 +251,7 @@ namespace slib
 		}
 	}
 
-	static Time _File_getAccessedTime(HANDLE handle)
+	static Time _priv_File_getAccessedTime(HANDLE handle)
 	{
 		FILETIME ft;
 		BOOL bRet = ::GetFileTime(handle, NULL, &ft, NULL);
@@ -265,7 +265,7 @@ namespace slib
 		}
 	}
 
-	static Time _File_getCreatedTime(HANDLE handle)
+	static Time _priv_File_getCreatedTime(HANDLE handle)
 	{
 		FILETIME ft;
 		BOOL bRet = ::GetFileTime(handle, &ft, NULL, NULL);
@@ -282,7 +282,7 @@ namespace slib
 	Time File::getModifiedTime()
 	{
 		if (isOpened()) {
-			return _File_getModifiedTime((HANDLE)m_file);
+			return _priv_File_getModifiedTime((HANDLE)m_file);
 		} else {
 			return Time::zero();
 		}
@@ -296,7 +296,7 @@ namespace slib
 		}
 		HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 		if (handle != INVALID_HANDLE_VALUE) {
-			Time ret = _File_getModifiedTime(handle);
+			Time ret = _priv_File_getModifiedTime(handle);
 			::CloseHandle(handle);
 			return ret;
 		} else {
@@ -307,7 +307,7 @@ namespace slib
 	Time File::getAccessedTime()
 	{
 		if (isOpened()) {
-			return _File_getAccessedTime((HANDLE)m_file);
+			return _priv_File_getAccessedTime((HANDLE)m_file);
 		} else {
 			return Time::zero();
 		}
@@ -321,7 +321,7 @@ namespace slib
 		}
 		HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 		if (handle != INVALID_HANDLE_VALUE) {
-			Time ret = _File_getAccessedTime(handle);
+			Time ret = _priv_File_getAccessedTime(handle);
 			::CloseHandle(handle);
 			return ret;
 		} else {
@@ -332,7 +332,7 @@ namespace slib
 	Time File::getCreatedTime()
 	{
 		if (isOpened()) {
-			return _File_getCreatedTime((HANDLE)m_file);
+			return _priv_File_getCreatedTime((HANDLE)m_file);
 		} else {
 			return Time::zero();
 		}
@@ -346,7 +346,7 @@ namespace slib
 		}
 		HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 		if (handle != INVALID_HANDLE_VALUE) {
-			Time ret = _File_getCreatedTime(handle);
+			Time ret = _priv_File_getCreatedTime(handle);
 			::CloseHandle(handle);
 			return ret;
 		} else {

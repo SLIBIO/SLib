@@ -17,7 +17,7 @@
 namespace slib
 {
 
-	class _Unix_AsyncTcpSocketInstance : public AsyncTcpSocketInstance
+	class _priv_Unix_AsyncTcpSocketInstance : public AsyncTcpSocketInstance
 	{
 	public:
 		AtomicRef<AsyncStreamRequest> m_requestReading;
@@ -27,26 +27,26 @@ namespace slib
 		sl_bool m_flagConnecting;
 		
 	public:
-		_Unix_AsyncTcpSocketInstance()
+		_priv_Unix_AsyncTcpSocketInstance()
 		{
 			m_sizeWritten = 0;
 			m_flagConnecting = sl_false;
 		}
 		
-		~_Unix_AsyncTcpSocketInstance()
+		~_priv_Unix_AsyncTcpSocketInstance()
 		{
 			close();
 		}
 		
 	public:
-		static Ref<_Unix_AsyncTcpSocketInstance> create(const Ref<Socket>& socket)
+		static Ref<_priv_Unix_AsyncTcpSocketInstance> create(const Ref<Socket>& socket)
 		{
-			Ref<_Unix_AsyncTcpSocketInstance> ret;
+			Ref<_priv_Unix_AsyncTcpSocketInstance> ret;
 			if (socket.isNotNull()) {
 				if (socket->setNonBlockingMode(sl_true)) {
 					sl_file handle = (sl_file)(socket->getHandle());
 					if (handle != SLIB_FILE_INVALID_HANDLE) {
-						ret = new _Unix_AsyncTcpSocketInstance();
+						ret = new _priv_Unix_AsyncTcpSocketInstance();
 						if (ret.isNotNull()) {
 							ret->m_socket = socket;
 							ret->setHandle(handle);
@@ -209,34 +209,34 @@ namespace slib
 
 	Ref<AsyncTcpSocketInstance> AsyncTcpSocket::_createInstance(const Ref<Socket>& socket)
 	{
-		return _Unix_AsyncTcpSocketInstance::create(socket);
+		return _priv_Unix_AsyncTcpSocketInstance::create(socket);
 	}
 
-	class _Unix_AsyncTcpServerInstance : public AsyncTcpServerInstance
+	class _priv_Unix_AsyncTcpServerInstance : public AsyncTcpServerInstance
 	{
 	public:
 		sl_bool m_flagListening;
 		
 	public:
-		_Unix_AsyncTcpServerInstance()
+		_priv_Unix_AsyncTcpServerInstance()
 		{
 			m_flagListening = sl_false;
 		}
 		
-		~_Unix_AsyncTcpServerInstance()
+		~_priv_Unix_AsyncTcpServerInstance()
 		{
 			close();
 		}
 		
 	public:
-		static Ref<_Unix_AsyncTcpServerInstance> create(const Ref<Socket>& socket)
+		static Ref<_priv_Unix_AsyncTcpServerInstance> create(const Ref<Socket>& socket)
 		{
-			Ref<_Unix_AsyncTcpServerInstance> ret;
+			Ref<_priv_Unix_AsyncTcpServerInstance> ret;
 			if (socket.isNotNull()) {
 				if (socket->setNonBlockingMode(sl_true)) {
 					sl_file handle = (sl_file)(socket->getHandle());
 					if (handle != SLIB_FILE_INVALID_HANDLE) {
-						ret = new _Unix_AsyncTcpServerInstance();
+						ret = new _priv_Unix_AsyncTcpServerInstance();
 						if (ret.isNotNull()) {
 							ret->m_socket = socket;
 							ret->setHandle(handle);
@@ -289,30 +289,30 @@ namespace slib
 
 	Ref<AsyncTcpServerInstance> AsyncTcpServer::_createInstance(const Ref<Socket>& socket)
 	{
-		return _Unix_AsyncTcpServerInstance::create(socket);
+		return _priv_Unix_AsyncTcpServerInstance::create(socket);
 	}
 
-	class _Unix_AsyncUdpSocketInstance : public AsyncUdpSocketInstance
+	class _priv_Unix_AsyncUdpSocketInstance : public AsyncUdpSocketInstance
 	{
 	public:
-		_Unix_AsyncUdpSocketInstance()
+		_priv_Unix_AsyncUdpSocketInstance()
 		{
 		}
 		
-		~_Unix_AsyncUdpSocketInstance()
+		~_priv_Unix_AsyncUdpSocketInstance()
 		{
 			close();
 		}
 		
 	public:
-		static Ref<_Unix_AsyncUdpSocketInstance> create(const Ref<Socket>& socket, const Memory& buffer)
+		static Ref<_priv_Unix_AsyncUdpSocketInstance> create(const Ref<Socket>& socket, const Memory& buffer)
 		{
-			Ref<_Unix_AsyncUdpSocketInstance> ret;
+			Ref<_priv_Unix_AsyncUdpSocketInstance> ret;
 			if (socket.isNotNull()) {
 				if (socket->setNonBlockingMode(sl_true)) {
 					sl_file handle = (sl_file)(socket->getHandle());
 					if (handle != SLIB_FILE_INVALID_HANDLE) {
-						ret = new _Unix_AsyncUdpSocketInstance();
+						ret = new _priv_Unix_AsyncUdpSocketInstance();
 						if (ret.isNotNull()) {
 							ret->m_socket = socket;
 							ret->setHandle(handle);
@@ -392,7 +392,7 @@ namespace slib
 	{
 		Memory buffer = Memory::create(packetSize);
 		if (buffer.isNotEmpty()) {
-			return _Unix_AsyncUdpSocketInstance::create(socket, buffer);
+			return _priv_Unix_AsyncUdpSocketInstance::create(socket, buffer);
 		}
 		return sl_null;
 	}

@@ -19,14 +19,14 @@
 namespace slib
 {
 
-	void OSX_AudioDeviceInfo::logError(String text)
+	void _priv_macOS_AudioDeviceInfo::logError(String text)
 	{
 		LogError("AudioDevice", text);
 	}
 		
-	List<OSX_AudioDeviceInfo> OSX_AudioDeviceInfo::getAllDevices(sl_bool flagInput)
+	List<_priv_macOS_AudioDeviceInfo> _priv_macOS_AudioDeviceInfo::getAllDevices(sl_bool flagInput)
 	{
-		List<OSX_AudioDeviceInfo> ret;
+		List<_priv_macOS_AudioDeviceInfo> ret;
 		
 		AudioObjectPropertyAddress propDeviceListing;
 		propDeviceListing.mSelector = kAudioHardwarePropertyDevices;
@@ -57,7 +57,7 @@ namespace slib
 		}
 		
 		for (sl_uint32 i = 0; i < nCountDevices; i++) {
-			OSX_AudioDeviceInfo info;
+			_priv_macOS_AudioDeviceInfo info;
 			if (info.getDeviceInfo(deviceIds[i], flagInput)) {
 				ret.add_NoLock(info);
 			}
@@ -65,9 +65,9 @@ namespace slib
 		return ret;
 	}
 
-	sl_bool OSX_AudioDeviceInfo::getDeviceInfo(AudioDeviceID deviceID, sl_bool flagInput)
+	sl_bool _priv_macOS_AudioDeviceInfo::getDeviceInfo(AudioDeviceID deviceID, sl_bool flagInput)
 	{
-		OSX_AudioDeviceInfo& info = *this;
+		_priv_macOS_AudioDeviceInfo& info = *this;
 		
 		AudioObjectPropertyAddress propDeviceConfig;
 		propDeviceConfig.mScope = flagInput ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput;
@@ -131,7 +131,7 @@ namespace slib
 		return sl_true;
 	}
 
-	sl_bool OSX_AudioDeviceInfo::getDefaultDevice(sl_bool flagInput)
+	sl_bool _priv_macOS_AudioDeviceInfo::getDefaultDevice(sl_bool flagInput)
 	{
 		AudioObjectPropertyAddress propDeviceConfig;
 		propDeviceConfig.mSelector = flagInput ? kAudioHardwarePropertyDefaultInputDevice : kAudioHardwarePropertyDefaultOutputDevice;
@@ -151,14 +151,14 @@ namespace slib
 		return getDeviceInfo(dev, flagInput);
 	}
 		
-	sl_bool OSX_AudioDeviceInfo::selectDevice(sl_bool flagInput, String uid)
+	sl_bool _priv_macOS_AudioDeviceInfo::selectDevice(sl_bool flagInput, String uid)
 	{
 		if (uid.isEmpty()) {
 			return getDefaultDevice(flagInput);
 		} else {
-			ListElements<OSX_AudioDeviceInfo> list(getAllDevices(flagInput));
+			ListElements<_priv_macOS_AudioDeviceInfo> list(getAllDevices(flagInput));
 			for (sl_size i = 0; i < list.count; i++) {
-				OSX_AudioDeviceInfo& element = list[i];
+				_priv_macOS_AudioDeviceInfo& element = list[i];
 				if (element.uid == uid) {
 					*this = element;
 					return sl_true;

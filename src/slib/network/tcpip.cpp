@@ -58,32 +58,32 @@ namespace slib
 	
 	sl_uint8 IPv4Packet::getTypeOfService() const
 	{
-		return _TOS_DSCP_ECN;
+		return m_TOS_DSCP_ECN;
 	}
 	
 	void IPv4Packet::setTypeOfService(sl_uint8 TOS)
 	{
-		_TOS_DSCP_ECN = TOS;
+		m_TOS_DSCP_ECN = TOS;
 	}
 	
 	sl_uint32 IPv4Packet::getDSCP() const
 	{
-		return ((_TOS_DSCP_ECN >> 2) & 0x3F);
+		return ((m_TOS_DSCP_ECN >> 2) & 0x3F);
 	}
 	
 	void IPv4Packet::setDSCP(sl_uint32 DSCP)
 	{
-		_TOS_DSCP_ECN = (sl_uint8)((_TOS_DSCP_ECN & 3) | ((DSCP & 0x3F) << 2));
+		m_TOS_DSCP_ECN = (sl_uint8)((m_TOS_DSCP_ECN & 3) | ((DSCP & 0x3F) << 2));
 	}
 	
 	sl_uint32 IPv4Packet::getECN() const
 	{
-		return (_TOS_DSCP_ECN & 3);
+		return (m_TOS_DSCP_ECN & 3);
 	}
 	
 	void IPv4Packet::setECN(sl_uint32 ECN)
 	{
-		_TOS_DSCP_ECN = (sl_uint8)((_TOS_DSCP_ECN & 0xFC) | (ECN & 3));
+		m_TOS_DSCP_ECN = (sl_uint8)((m_TOS_DSCP_ECN & 0xFC) | (ECN & 3));
 	}
 	
 	sl_uint16 IPv4Packet::getIdentification() const

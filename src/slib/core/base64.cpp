@@ -55,7 +55,7 @@ namespace slib
 		return encode(mem.getData(), mem.getSize());
 	}
 
-	SLIB_INLINE sl_uint32 _Base64_index(sl_char8 c)
+	SLIB_INLINE sl_uint32 _priv_Base64_index(sl_char8 c)
 	{
 		if (c >= 'A' && c <= 'Z') {
 			return c - 'A';
@@ -109,7 +109,7 @@ namespace slib
 				indexInput++;
 				continue;
 			}
-			sl_uint32 sig = _Base64_index(ch);
+			sl_uint32 sig = _priv_Base64_index(ch);
 			if (ch == '=' && indexInput >= len - countPadding) {
 				sig = 0;
 			}

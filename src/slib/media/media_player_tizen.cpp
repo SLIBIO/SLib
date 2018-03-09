@@ -19,7 +19,7 @@
 
 namespace slib
 {
-	class _MediaPlayer : public MediaPlayer
+	class _priv_MediaPlayer : public MediaPlayer
 	{
 	public:
 		player_h m_player;
@@ -31,7 +31,7 @@ namespace slib
 		sl_real m_volume;
 
 	public:
-		_MediaPlayer()
+		_priv_MediaPlayer()
 		{
 			m_player = sl_null;
 			m_flagInited = sl_false;
@@ -40,14 +40,14 @@ namespace slib
 			m_volume = 1;
 		}
 
-		~_MediaPlayer()
+		~_priv_MediaPlayer()
 		{
 			SLIB_REFERABLE_DESTRUCTOR
 			_release(sl_true);
 		}
 
 	public:
-		static Ref<_MediaPlayer> create(const MediaPlayerParam& param)
+		static Ref<_priv_MediaPlayer> create(const MediaPlayerParam& param)
 		{
 			player_h player;
 			int errorCode = ::player_create(&player);
@@ -66,7 +66,7 @@ namespace slib
 
 			if (PLAYER_ERROR_NONE == errorCode) {
 
-				Ref<_MediaPlayer> ret = new _MediaPlayer;
+				Ref<_priv_MediaPlayer> ret = new _priv_MediaPlayer;
 
 				if (ret.isNotNull()) {
 
@@ -74,11 +74,11 @@ namespace slib
 					ret->m_flagInited = sl_true;
 					ret->_init(param);
 
-					errorCode = ::player_prepare_async(player, _MediaPlayer::_onPrepared, ret.get());
+					errorCode = ::player_prepare_async(player, _priv_MediaPlayer::_onPrepared, ret.get());
 
 					if (PLAYER_ERROR_NONE == errorCode) {
 
-						::player_set_completed_cb(player, _MediaPlayer::_onReachEnd, ret.get());
+						::player_set_completed_cb(player, _priv_MediaPlayer::_onReachEnd, ret.get());
 
 						if (param.flagAutoStart) {
 							ret->resume();
@@ -100,14 +100,14 @@ namespace slib
 	public:
 		static void _onPrepared(void* userData)
 		{
-			Ref<_MediaPlayer> player = (_MediaPlayer*)userData;
+			Ref<_priv_MediaPlayer> player = (_priv_MediaPlayer*)userData;
 			player->_onPrepared();
 
 		}
 
 		static void _onReachEnd(void* userData)
 		{
-			Ref<_MediaPlayer> player = (_MediaPlayer*)userData;
+			Ref<_priv_MediaPlayer> player = (_priv_MediaPlayer*)userData;
 			player->_onReachEnd();
 		}
 
@@ -252,7 +252,7 @@ namespace slib
 
 	Ref<MediaPlayer> MediaPlayer::_createNative(const MediaPlayerParam& param)
 	{
-		return _MediaPlayer::create(param);
+		return _priv_MediaPlayer::create(param);
 	}
 }
 

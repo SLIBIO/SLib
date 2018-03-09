@@ -63,8 +63,8 @@ namespace slib
 	}
 
 
-	typedef CHashMap< MediaPlayer*, Ref<MediaPlayer> > _MediaPlayersMap;
-	SLIB_SAFE_STATIC_GETTER(_MediaPlayersMap, _getMediaPlayersMap)
+	typedef CHashMap< MediaPlayer*, Ref<MediaPlayer> > _priv_MediaPlayersMap;
+	SLIB_SAFE_STATIC_GETTER(_priv_MediaPlayersMap, _getMediaPlayersMap)
 
 	SLIB_DEFINE_OBJECT(MediaPlayer, Object)
 
@@ -166,7 +166,7 @@ namespace slib
 	void MediaPlayer::_addToMap()
 	{
 		if (m_flagSelfAlive) {
-			_MediaPlayersMap* map = _getMediaPlayersMap();
+			_priv_MediaPlayersMap* map = _getMediaPlayersMap();
 			if (map) {
 				map->put(this, this);
 			}
@@ -176,7 +176,7 @@ namespace slib
 	void MediaPlayer::_removeFromMap()
 	{
 		if (m_flagSelfAlive) {
-			_MediaPlayersMap* map = _getMediaPlayersMap();
+			_priv_MediaPlayersMap* map = _getMediaPlayersMap();
 			if (map) {
 				map->remove(this);
 			}

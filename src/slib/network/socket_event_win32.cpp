@@ -21,30 +21,30 @@
 namespace slib
 {
 
-	class _Win_SocketEvent : public SocketEvent
+	class _priv_Win32_SocketEvent : public SocketEvent
 	{
 	public:
 		WSAEVENT m_hEvent;
 
 	public:
-		_Win_SocketEvent()
+		_priv_Win32_SocketEvent()
 		{
 		}
 
-		~_Win_SocketEvent()
+		~_priv_Win32_SocketEvent()
 		{
 			::WSACloseEvent(m_hEvent);
 		}
 
 	public:
-		static Ref<_Win_SocketEvent> create(const Ref<Socket>& socket)
+		static Ref<_priv_Win32_SocketEvent> create(const Ref<Socket>& socket)
 		{
-			Ref<_Win_SocketEvent> ret;
+			Ref<_priv_Win32_SocketEvent> ret;
 			if (socket.isNotNull()) {
 				Socket::initializeSocket();
 				WSAEVENT hEvent = ::WSACreateEvent();
 				if (hEvent != WSA_INVALID_EVENT) {
-					ret = new _Win_SocketEvent;
+					ret = new _priv_Win32_SocketEvent;
 					if (ret.isNotNull()) {
 						ret->m_hEvent = hEvent;
 						ret->m_socket = socket;
@@ -88,7 +88,7 @@ namespace slib
 
 	Ref<SocketEvent> SocketEvent::create(const Ref<Socket>& socket)
 	{
-		return _Win_SocketEvent::create(socket);
+		return _priv_Win32_SocketEvent::create(socket);
 	}
 
 	sl_bool SocketEvent::_native_waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* status, sl_uint32 count, sl_int32 timeout)
@@ -98,7 +98,7 @@ namespace slib
 		SLIB_SCOPED_BUFFER(sl_uint32, 64, indexMap, count);
 		sl_uint32 cEvents = 0;
 		for (sl_uint32 i = 0; i < count; i++) {
-			Ref<_Win_SocketEvent> ev = Ref<_Win_SocketEvent>::from(events[i]);
+			Ref<_priv_Win32_SocketEvent> ev = Ref<_priv_Win32_SocketEvent>::from(events[i]);
 			if (ev.isNotNull()) {
 				Ref<Socket> sock = ev->getSocket();
 				if (sock.isNotNull() && sock->isOpened()) {
@@ -121,7 +121,7 @@ namespace slib
 			sl_uint32 index = indexMap[indexHandle];
 			WSANETWORKEVENTS ne;
 			ZeroMemory(&ne, sizeof(ne));
-			Ref<_Win_SocketEvent> ev = Ref<_Win_SocketEvent>::from(events[index]);
+			Ref<_priv_Win32_SocketEvent> ev = Ref<_priv_Win32_SocketEvent>::from(events[index]);
 			if (ev.isNotNull()) {
 				Ref<Socket> sock = ev->getSocket();
 				if (sock.isNotNull() && 0 == ::WSAEnumNetworkEvents((SOCKET)(sock->getHandle()), hEvents[indexHandle], &ne)) {

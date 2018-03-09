@@ -22,7 +22,7 @@
 namespace slib
 {
 
-	class _Win32_Window : public WindowInstance
+	class _priv_Win32_Window : public WindowInstance
 	{
 	public:
 		HWND m_handle;
@@ -36,7 +36,7 @@ namespace slib
 		Color m_backgroundColor;
 
 	public:
-		_Win32_Window()
+		_priv_Win32_Window()
 		{
 			m_flagMinimized = sl_false;
 			m_flagMaximized = sl_false;
@@ -44,17 +44,17 @@ namespace slib
 			m_backgroundColor = Color::zero();
 		}
 
-		~_Win32_Window()
+		~_priv_Win32_Window()
 		{
 			close();
 		}
 
 	public:
-		static Ref<_Win32_Window> create(HWND hWnd, sl_bool flagDestroyOnRelease)
+		static Ref<_priv_Win32_Window> create(HWND hWnd, sl_bool flagDestroyOnRelease)
 		{
-			Ref<_Win32_Window> ret;
+			Ref<_priv_Win32_Window> ret;
 			if (hWnd) {
-				ret = new _Win32_Window();
+				ret = new _priv_Win32_Window();
 				if (ret.isNotNull()) {
 					ret->m_handle = hWnd;
 					ret->m_flagDestroyOnRelease = flagDestroyOnRelease;
@@ -83,7 +83,7 @@ namespace slib
 
 			HWND hParent = NULL;
 			if (param.parent.isNotNull()) {
-				_Win32_Window* w = static_cast<_Win32_Window*>(param.parent.get());
+				_priv_Win32_Window* w = static_cast<_priv_Win32_Window*>(param.parent.get());
 				hParent = w->m_handle;
 			}
 
@@ -177,7 +177,7 @@ namespace slib
 			HWND hWnd = m_handle;
 			if (hWnd) {
 				if (window.isNotNull()) {
-					_Win32_Window* w = static_cast<_Win32_Window*>(window.get());
+					_priv_Win32_Window* w = static_cast<_priv_Win32_Window*>(window.get());
 					HWND hWndParent = w->m_handle;
 					if (hWndParent) {
 						::SetWindowLongPtr(hWnd, GWLP_HWNDPARENT, (LONG_PTR)hWndParent);
@@ -794,12 +794,12 @@ namespace slib
 
 	};
 
-	LRESULT CALLBACK _Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK _priv_Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	LRESULT CALLBACK _priv_Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		Ref<WindowInstance> _window = UIPlatform::getWindowInstance(hWnd);
-		_Win32_Window* window = (_Win32_Window*)(_window.get());
+		_priv_Win32_Window* window = (_priv_Win32_Window*)(_window.get());
 		if (window && window->m_handle) {
 			switch (uMsg) {
 			case WM_CLOSE:
@@ -932,12 +932,12 @@ namespace slib
 				}
 			}
 		}
-		return _Win32_ViewProc(hWnd, uMsg, wParam, lParam);
+		return _priv_Win32_ViewProc(hWnd, uMsg, wParam, lParam);
 	}
 
 	Ref<WindowInstance> Window::createWindowInstance(const WindowInstanceParam& param)
 	{
-		HWND hWnd = _Win32_Window::createHandle(param);
+		HWND hWnd = _priv_Win32_Window::createHandle(param);
 		if (hWnd) {
 			return UIPlatform::createWindowInstance(hWnd);
 		}
@@ -950,7 +950,7 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		ret = _Win32_Window::create(hWnd, flagDestroyOnRelease);
+		ret = _priv_Win32_Window::create(hWnd, flagDestroyOnRelease);
 		if (ret.isNotNull()) {
 			UIPlatform::_registerWindowInstance((void*)hWnd, ret.get());
 		}
@@ -969,7 +969,7 @@ namespace slib
 
 	HWND UIPlatform::getWindowHandle(WindowInstance* instance)
 	{
-		_Win32_Window* window = (_Win32_Window*)instance;
+		_priv_Win32_Window* window = (_priv_Win32_Window*)instance;
 		if (window) {
 			return window->m_handle;
 		} else {
@@ -981,7 +981,7 @@ namespace slib
 	{
 		if (window) {
 			Ref<WindowInstance> _instance = window->getWindowInstance();
-			_Win32_Window* instance = (_Win32_Window*)(_instance.get());
+			_priv_Win32_Window* instance = (_priv_Win32_Window*)(_instance.get());
 			if (instance) {
 				return instance->m_handle;
 			}

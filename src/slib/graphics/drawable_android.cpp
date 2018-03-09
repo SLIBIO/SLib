@@ -21,27 +21,27 @@
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidBitmap, "slib/platform/android/ui/UiBitmap")
+	SLIB_JNI_BEGIN_CLASS(JAndroidBitmap, "slib/platform/android/ui/UiBitmap")
 		SLIB_JNI_STATIC_METHOD(drawPixels, "drawPixels", "(Lslib/platform/android/ui/Graphics;FFFF[IIIIFFI)V");
 		SLIB_JNI_STATIC_METHOD(drawPixelsWithColorMatrix, "drawPixels", "(Lslib/platform/android/ui/Graphics;FFFF[IIIIFFIFFFFFFFFFFFFFFFFFFFF)V");
 		SLIB_JNI_STATIC_METHOD(getArrayBuffer, "getArrayBuffer", "()[I");
 		SLIB_JNI_STATIC_METHOD(returnArrayBuffer, "returnArrayBuffer", "([I)V");
 	SLIB_JNI_END_CLASS
 
-	class _Android_ImageDrawable : public Drawable
+	class _priv_Android_ImageDrawable : public Drawable
 	{
 		SLIB_DECLARE_OBJECT
 	public:
 		ImageDesc m_image;
 
 	public:
-		static Ref<_Android_ImageDrawable> create(const ImageDesc& image)
+		static Ref<_priv_Android_ImageDrawable> create(const ImageDesc& image)
 		{
-			Ref<_Android_ImageDrawable> ret;
+			Ref<_priv_Android_ImageDrawable> ret;
 			sl_uint32 width = image.width;
 			sl_uint32 height = image.height;
 			if (width > 0 && height > 0) {
-				ret = new _Android_ImageDrawable();
+				ret = new _priv_Android_ImageDrawable();
 				if (ret.isNotNull()) {
 					ret->m_image = image;
 					return ret;
@@ -123,7 +123,7 @@ namespace slib
 			sl_uint32 width = (sl_uint32)(rectSrc.getWidth());
 			sl_uint32 height = (sl_uint32)(rectSrc.getHeight());
 
-			JniLocal<jintArray> abuf = (jintArray)(_JAndroidBitmap::getArrayBuffer.callObject(sl_null));
+			JniLocal<jintArray> abuf = (jintArray)(JAndroidBitmap::getArrayBuffer.callObject(sl_null));
 			if (abuf.isNotNull()) {
 				sl_uint32 nAbuf = Jni::getArrayLength(abuf);
 				if (nAbuf >= width) {
@@ -152,7 +152,7 @@ namespace slib
 								pixelsCurrent += image.stride;
 							}
 							if (param.useColorMatrix) {
-								_JAndroidBitmap::drawPixelsWithColorMatrix.call(sl_null, jcanvas,
+								JAndroidBitmap::drawPixelsWithColorMatrix.call(sl_null, jcanvas,
 									rectDst.left, yCurrent, rectDst.right, yCurrent + heightSegmentDst,
 									abuf.value, width, width, heightSegment,
 									alpha, blur, tileMode,
@@ -163,7 +163,7 @@ namespace slib
 									cc.x, cc.y, cc.z, cc.w
 									);
 							} else {
-								_JAndroidBitmap::drawPixels.call(sl_null, jcanvas,
+								JAndroidBitmap::drawPixels.call(sl_null, jcanvas,
 									rectDst.left, yCurrent, rectDst.right, yCurrent + heightSegmentDst,
 									abuf.value, width, width, heightSegment,
 									alpha, blur, tileMode);
@@ -175,7 +175,7 @@ namespace slib
 						delete[] jpixels;
 					}
 				}
-				_JAndroidBitmap::returnArrayBuffer.call(sl_null, abuf.value);
+				JAndroidBitmap::returnArrayBuffer.call(sl_null, abuf.value);
 			}
 		}
 
@@ -190,11 +190,11 @@ namespace slib
 		}
 	};
 
-	SLIB_DEFINE_OBJECT(_Android_ImageDrawable, Drawable);
+	SLIB_DEFINE_OBJECT(_priv_Android_ImageDrawable, Drawable);
 
 	Ref<Drawable> PlatformDrawable::create(const ImageDesc& desc)
 	{
-		return _Android_ImageDrawable::create(desc);
+		return _priv_Android_ImageDrawable::create(desc);
 	}
 
 	Ref<Drawable> PlatformDrawable::loadFromMemory(const void* buf, sl_size size)

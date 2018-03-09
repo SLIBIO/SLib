@@ -251,7 +251,7 @@ namespace slib
 		}
 	}
 
-	sl_int64 _File_getModifiedTime(struct stat& st)
+	sl_int64 _priv_File_getModifiedTime(struct stat& st)
 	{
 #if defined(SLIB_PLATFORM_IS_APPLE)
 		sl_int64 t = st.st_mtimespec.tv_sec;
@@ -269,7 +269,7 @@ namespace slib
 		return t;
 	}
 
-	sl_int64 _File_getAccessedTime(struct stat& st)
+	sl_int64 _priv_File_getAccessedTime(struct stat& st)
 	{
 #if defined(SLIB_PLATFORM_IS_APPLE)
 		sl_int64 t = st.st_atimespec.tv_sec;
@@ -287,7 +287,7 @@ namespace slib
 		return t;
 	}
 
-	sl_int64 _File_getCreatedTime(struct stat& st)
+	sl_int64 _priv_File_getCreatedTime(struct stat& st)
 	{
 #if defined(SLIB_PLATFORM_IS_APPLE)
 		sl_int64 t = st.st_ctimespec.tv_sec;
@@ -311,7 +311,7 @@ namespace slib
 			int fd = (int)m_file;
 			struct stat st;
 			if (0 == ::fstat(fd, &st)) {
-				return _File_getModifiedTime(st);
+				return _priv_File_getModifiedTime(st);
 			}
 		}
 		return Time::zero();
@@ -324,7 +324,7 @@ namespace slib
 		}
 		struct stat st;
 		if (0 == ::stat(filePath.getData(), &st)) {
-			return _File_getModifiedTime(st);
+			return _priv_File_getModifiedTime(st);
 		} else {
 			return Time::zero();
 		}
@@ -336,7 +336,7 @@ namespace slib
 			int fd = (int)m_file;
 			struct stat st;
 			if (0 == ::fstat(fd, &st)) {
-				return _File_getAccessedTime(st);
+				return _priv_File_getAccessedTime(st);
 			}
 		}
 		return Time::zero();
@@ -349,7 +349,7 @@ namespace slib
 		}
 		struct stat st;
 		if (0 == ::stat(filePath.getData(), &st)) {
-			return _File_getAccessedTime(st);
+			return _priv_File_getAccessedTime(st);
 		} else {
 			return Time::zero();
 		}
@@ -361,7 +361,7 @@ namespace slib
 			int fd = (int)m_file;
 			struct stat st;
 			if (0 == ::fstat(fd, &st)) {
-				return _File_getCreatedTime(st);
+				return _priv_File_getCreatedTime(st);
 			}
 		}
 		return Time::zero();
@@ -374,13 +374,13 @@ namespace slib
 		}
 		struct stat st;
 		if (0 == ::stat(filePath.getData(), &st)) {
-			return _File_getCreatedTime(st);
+			return _priv_File_getCreatedTime(st);
 		} else {
 			return Time::zero();
 		}
 	}
 
-	static sl_bool _File_setAccessedAndModifiedTime(const String& filePath, Time timeAccess, Time timeModify)
+	static sl_bool _priv_File_setAccessedAndModifiedTime(const String& filePath, Time timeAccess, Time timeModify)
 	{
 		if (filePath.isEmpty()) {
 			return sl_false;
@@ -396,13 +396,13 @@ namespace slib
 	sl_bool File::setModifiedTime(const String& filePath, Time time)
 	{
 		Time timeAccess = getAccessedTime(filePath);
-		return _File_setAccessedAndModifiedTime(filePath, timeAccess, time);
+		return _priv_File_setAccessedAndModifiedTime(filePath, timeAccess, time);
 	}
 
 	sl_bool File::setAccessedTime(const String& filePath, Time time)
 	{
 		Time timeModify = getModifiedTime(filePath);
-		return _File_setAccessedAndModifiedTime(filePath, time, timeModify);
+		return _priv_File_setAccessedAndModifiedTime(filePath, time, timeModify);
 	}
 
 	sl_bool File::setCreatedTime(const String& filePath, Time time)

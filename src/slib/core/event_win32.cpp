@@ -18,28 +18,28 @@
 namespace slib
 {
 
-	class _Win32Event : public Event
+	class _priv_Win32Event : public Event
 	{
 	public:
 		HANDLE m_hEvent;
 		sl_bool m_flagCloseOnRelease;
 
-		_Win32Event()
+		_priv_Win32Event()
 		{
 		}
 
-		~_Win32Event()
+		~_priv_Win32Event()
 		{
 			if (m_flagCloseOnRelease) {
 				::CloseHandle(m_hEvent);
 			}
 		}
 
-		static Ref<_Win32Event> create(HANDLE hEvent, sl_bool flagCloseOnRelease)
+		static Ref<_priv_Win32Event> create(HANDLE hEvent, sl_bool flagCloseOnRelease)
 		{
-			Ref<_Win32Event> ret;
+			Ref<_priv_Win32Event> ret;
 			if (hEvent) {
-				ret = new _Win32Event;
+				ret = new _priv_Win32Event;
 				if (ret.isNotNull()) {
 					ret->m_hEvent = hEvent;
 					ret->m_flagCloseOnRelease = flagCloseOnRelease;
@@ -52,7 +52,7 @@ namespace slib
 			return ret;
 		}
 
-		static Ref<_Win32Event> create(sl_bool flagAutoReset)
+		static Ref<_priv_Win32Event> create(sl_bool flagAutoReset)
 		{
 			HANDLE hEvent;
 #if defined(SLIB_PLATFORM_IS_WIN32)
@@ -90,12 +90,12 @@ namespace slib
 
 	Ref<Event> Windows::createEvent(HANDLE hEvent, sl_bool flagCloseOnRelease)
 	{
-		return _Win32Event::create(hEvent, flagCloseOnRelease);
+		return _priv_Win32Event::create(hEvent, flagCloseOnRelease);
 	}
 
 	Ref<Event> Event::create(sl_bool flagAutoReset)
 	{
-		return _Win32Event::create(flagAutoReset);
+		return _priv_Win32Event::create(flagAutoReset);
 	}
 
 }

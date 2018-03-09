@@ -16,17 +16,17 @@
 
 #include "view_osx.h"
 
-@interface _Slib_OSX_ListReportView_TableView : NSTableView {
+@interface _priv_Slib_macOS_ListReportView_TableView : NSTableView {
 	
-	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 }
 @end
 
-@interface _Slib_OSX_ListReportView : NSScrollView<NSTableViewDataSource, NSTableViewDelegate> {
+@interface _priv_Slib_macOS_ListReportView : NSScrollView<NSTableViewDataSource, NSTableViewDelegate> {
 
-	@public _Slib_OSX_ListReportView_TableView* table;
+	@public _priv_Slib_macOS_ListReportView_TableView* table;
 
-	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 		
 	@public slib::CList<NSTableColumn*> m_columns;
 	
@@ -37,10 +37,10 @@
 namespace slib
 {
 
-	class _ListReportView : public ListReportView
+	class _priv_ListReportView : public ListReportView
 	{
 	public:
-		void _applyColumnsCount(_Slib_OSX_ListReportView* tv)
+		void _applyColumnsCount(_priv_Slib_macOS_ListReportView* tv)
 		{
 			ObjectLocker lock(this);
 			CList<NSTableColumn*>& _columns = tv->m_columns;
@@ -66,7 +66,7 @@ namespace slib
 			}
 		}
 		
-		void _copyColumns(_Slib_OSX_ListReportView* tv)
+		void _copyColumns(_priv_Slib_macOS_ListReportView* tv)
 		{
 			ObjectLocker lock(this);
 			ListLocker<ListReportViewColumn> columns(m_columns);
@@ -85,7 +85,7 @@ namespace slib
 			}
 		}
 		
-		void _applyFont(_Slib_OSX_ListReportView* tv)
+		void _applyFont(_priv_Slib_macOS_ListReportView* tv)
 		{
 			NSFont* font = tv->m_font;
 			if (font != nil) {
@@ -116,13 +116,13 @@ namespace slib
 
 	Ref<ViewInstance> ListReportView::createNativeWidget(ViewInstance* _parent)
 	{
-		_Slib_OSX_ListReportView_TableView* table = nil;
+		_priv_Slib_macOS_ListReportView_TableView* table = nil;
 		ObjectLocker lock(this);
-		OSX_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_OSX_ListReportView* handle = nil;
-		table = [[_Slib_OSX_ListReportView_TableView alloc] init];
+		MACOS_VIEW_CREATE_INSTANCE_BEGIN
+		_priv_Slib_macOS_ListReportView* handle = nil;
+		table = [[_priv_Slib_macOS_ListReportView_TableView alloc] init];
 		if (table != nil) {
-			handle = [[_Slib_OSX_ListReportView alloc] initWithFrame:frame];
+			handle = [[_priv_Slib_macOS_ListReportView alloc] initWithFrame:frame];
 			if (handle != nil) {
 				handle->table = table;
 				[table setDelegate:handle];
@@ -131,9 +131,9 @@ namespace slib
 				Ref<Font> font = getFont();
 				NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 				handle->m_font = hFont;
-				((_ListReportView*)this)->_copyColumns(handle);
+				((_priv_ListReportView*)this)->_copyColumns(handle);
 				[table setRowSizeStyle:NSTableViewRowSizeStyleCustom];
-				((_ListReportView*)this)->_applyFont(handle);
+				((_priv_ListReportView*)this)->_applyFont(handle);
 				
 				[handle setDocumentView:table];
 				[handle setHasVerticalScroller:TRUE];
@@ -142,7 +142,7 @@ namespace slib
 				[table setGridStyleMask:NSTableViewSolidVerticalGridLineMask | NSTableViewSolidHorizontalGridLineMask];
 			}
 		}
-		OSX_VIEW_CREATE_INSTANCE_END
+		MACOS_VIEW_CREATE_INSTANCE_END
 		if (ret.isNotNull()) {
 			ret->setView(this);
 			if (table != nil) {
@@ -156,9 +156,9 @@ namespace slib
 	void ListReportView::_refreshColumnsCount_NW()
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListReportView class]]) {
-			_Slib_OSX_ListReportView* tv = (_Slib_OSX_ListReportView*)handle;
-			((_ListReportView*)this)->_applyColumnsCount(tv);
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_ListReportView class]]) {
+			_priv_Slib_macOS_ListReportView* tv = (_priv_Slib_macOS_ListReportView*)handle;
+			((_priv_ListReportView*)this)->_applyColumnsCount(tv);
 			[tv->table reloadData];
 		}
 	}
@@ -166,8 +166,8 @@ namespace slib
 	void ListReportView::_refreshRowsCount_NW()
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListReportView class]]) {
-			_Slib_OSX_ListReportView* tv = (_Slib_OSX_ListReportView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_ListReportView class]]) {
+			_priv_Slib_macOS_ListReportView* tv = (_priv_Slib_macOS_ListReportView*)handle;
 			[tv->table reloadData];
 		}
 	}
@@ -175,8 +175,8 @@ namespace slib
 	void ListReportView::_setHeaderText_NW(sl_uint32 iCol, const String& text)
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListReportView class]]) {
-			_Slib_OSX_ListReportView* tv = (_Slib_OSX_ListReportView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_ListReportView class]]) {
+			_priv_Slib_macOS_ListReportView* tv = (_priv_Slib_macOS_ListReportView*)handle;
 			NSTableColumn* tc = tv->m_columns.getValueAt(iCol, nil);
 			if (tc != nil) {
 				[tc setTitle:Apple::getNSStringFromString(text)];
@@ -187,8 +187,8 @@ namespace slib
 	void ListReportView::_setColumnWidth_NW(sl_uint32 iCol, sl_ui_len width)
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListReportView class]]) {
-			_Slib_OSX_ListReportView* tv = (_Slib_OSX_ListReportView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_ListReportView class]]) {
+			_priv_Slib_macOS_ListReportView* tv = (_priv_Slib_macOS_ListReportView*)handle;
 			NSTableColumn* tc = tv->m_columns.getValueAt(iCol, nil);
 			if (tc != nil) {
 				[tc setWidth:(CGFloat)width];
@@ -199,11 +199,11 @@ namespace slib
 	void ListReportView::_setHeaderAlignment_NW(sl_uint32 iCol, Alignment align)
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListReportView class]]) {
-			_Slib_OSX_ListReportView* tv = (_Slib_OSX_ListReportView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_ListReportView class]]) {
+			_priv_Slib_macOS_ListReportView* tv = (_priv_Slib_macOS_ListReportView*)handle;
 			NSTableColumn* tc = tv->m_columns.getValueAt(iCol, nil);
 			if (tc != nil) {
-				[[tc headerCell] setAlignment:_ListReportView::translateAlignment(align)];
+				[[tc headerCell] setAlignment:_priv_ListReportView::translateAlignment(align)];
 			}
 		}
 	}
@@ -211,11 +211,11 @@ namespace slib
 	void ListReportView::_setColumnAlignment_NW(sl_uint32 iCol, Alignment align)
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListReportView class]]) {
-			_Slib_OSX_ListReportView* tv = (_Slib_OSX_ListReportView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_ListReportView class]]) {
+			_priv_Slib_macOS_ListReportView* tv = (_priv_Slib_macOS_ListReportView*)handle;
 			NSTableColumn* tc = tv->m_columns.getValueAt(iCol, nil);
 			if (tc != nil) {
-				[[tc dataCell] setAlignment:_ListReportView::translateAlignment(align)];
+				[[tc dataCell] setAlignment:_priv_ListReportView::translateAlignment(align)];
 			}
 		}
 	}
@@ -223,8 +223,8 @@ namespace slib
 	void ListReportView::_getSelectedRow_NW()
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListReportView class]]) {
-			_Slib_OSX_ListReportView* tv = (_Slib_OSX_ListReportView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_ListReportView class]]) {
+			_priv_Slib_macOS_ListReportView* tv = (_priv_Slib_macOS_ListReportView*)handle;
 			m_selectedRow = (sl_int32)([tv->table selectedRow]);
 		}
 	}
@@ -232,18 +232,18 @@ namespace slib
 	void ListReportView::_setFont_NW(const Ref<Font>& font)
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListReportView class]]) {
-			_Slib_OSX_ListReportView* tv = (_Slib_OSX_ListReportView*)handle;
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_ListReportView class]]) {
+			_priv_Slib_macOS_ListReportView* tv = (_priv_Slib_macOS_ListReportView*)handle;
 			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 			tv->m_font = hFont;
-			((_ListReportView*)this)->_applyFont(tv);
+			((_priv_ListReportView*)this)->_applyFont(tv);
 			[tv->table reloadData];
 		}
 	}
 
 }
 
-@implementation _Slib_OSX_ListReportView
+@implementation _priv_Slib_macOS_ListReportView
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -254,7 +254,7 @@ namespace slib
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView{
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::ListReportView* _view = slib::CastInstance<slib::ListReportView>(view.get())) {
@@ -265,7 +265,7 @@ namespace slib
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row{
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::ListReportView* _view = slib::CastInstance<slib::ListReportView>(view.get())) {
@@ -282,10 +282,10 @@ namespace slib
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_ListReportView* _view = slib::CastInstance<slib::_ListReportView>(view.get())) {
+		if (slib::_priv_ListReportView* _view = slib::CastInstance<slib::_priv_ListReportView>(view.get())) {
 			sl_int32 n = (sl_int32)([table selectedRow]);
 			if (n >= 0) {
 				_view->dispatchSelectRow(n);
@@ -295,7 +295,7 @@ namespace slib
 }
 @end
 
-@implementation _Slib_OSX_ListReportView_TableView
+@implementation _priv_Slib_macOS_ListReportView_TableView
 - (void)mouseDown:(NSEvent *)theEvent
 {
 	NSInteger indexRowBefore = [self selectedRow];
@@ -304,10 +304,10 @@ namespace slib
 	NSPoint ptView = [self convertPoint:ptWindow fromView:nil];
 	NSInteger indexRow = [self rowAtPoint:ptView];
 	if (indexRow >= 0) {
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+		slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 		if (instance.isNotNull()) {
 			slib::Ref<slib::View> view = instance->getView();
-			if (slib::_ListReportView* _view = slib::CastInstance<slib::_ListReportView>(view.get())) {
+			if (slib::_priv_ListReportView* _view = slib::CastInstance<slib::_priv_ListReportView>(view.get())) {
 				if (indexRow == indexRowBefore) {
 					// don't call event callback when it is new selection because it is already called by default
 					_view->dispatchSelectRow((sl_uint32)(indexRow));
@@ -332,10 +332,10 @@ namespace slib
 	NSPoint ptView = [self convertPoint:ptWindow fromView:nil];
 	NSInteger indexRow = [self rowAtPoint:ptView];
 	if (indexRow >= 0) {
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+		slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 		if (instance.isNotNull()) {
 			slib::Ref<slib::View> view = instance->getView();
-			if (slib::_ListReportView* _view = slib::CastInstance<slib::_ListReportView>(view.get())) {
+			if (slib::_priv_ListReportView* _view = slib::CastInstance<slib::_priv_ListReportView>(view.get())) {
 				sl_ui_posf x = (sl_ui_posf)(ptView.x);
 				sl_ui_posf y = (sl_ui_posf)(ptView.y);
 				_view->dispatchRightButtonClickRow((sl_uint32)(indexRow), slib::UIPointf(x, y));

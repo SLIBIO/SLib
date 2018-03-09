@@ -98,7 +98,7 @@ namespace slib
 		{
 			struct {
 				IPAddressType type;
-				sl_uint8 data[_SLIB_NET_IPADDRESS_SIZE];
+				sl_uint8 data[PRIV_SLIB_NET_IPADDRESS_SIZE];
 			} ip;
 			sl_uint32 port;
 		};

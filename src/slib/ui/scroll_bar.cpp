@@ -72,7 +72,7 @@ namespace slib
 
 	SLIB_DEFINE_OBJECT(ScrollBar, View)
 	
-	class _ScrollBar_Static
+	class _priv_ScrollBar_Static
 	{
 	public:
 		Ref<Drawable> defaultThumb;
@@ -82,7 +82,7 @@ namespace slib
 		Ref<Drawable> defaultHoverTrack;
 		Ref<Drawable> defaultPressedTrack;
 		
-		_ScrollBar_Static()
+		_priv_ScrollBar_Static()
 		{
 			defaultThumb = ColorDrawable::create(Color(0, 0, 0, 150));
 			defaultPressedThumb = ColorDrawable::create(Color(0, 0, 0, 200));
@@ -93,7 +93,7 @@ namespace slib
 		}
 	};
 	
-	SLIB_SAFE_STATIC_GETTER(_ScrollBar_Static, _ScrollBar_getStatic)
+	SLIB_SAFE_STATIC_GETTER(_priv_ScrollBar_Static, _priv_ScrollBar_getStatic)
 	
 	ScrollBar::ScrollBar(LayoutOrientation orientation)
 	{
@@ -112,7 +112,7 @@ namespace slib
 		m_valueDown = 0;
 		m_posDown = 0;
 		
-		_ScrollBar_Static* s = _ScrollBar_getStatic();
+		_priv_ScrollBar_Static* s = _priv_ScrollBar_getStatic();
 		if (s) {
 			m_thumb = s->defaultThumb;
 			m_pressedThumb = s->defaultPressedThumb;

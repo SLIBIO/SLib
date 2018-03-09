@@ -19,22 +19,22 @@
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidPoint, "android/graphics/Point")
+	SLIB_JNI_BEGIN_CLASS(JAndroidPoint, "android/graphics/Point")
 		SLIB_JNI_INT_FIELD(x);
 		SLIB_JNI_INT_FIELD(y);
 	SLIB_JNI_END_CLASS
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidRect, "android/graphics/Rect")
+	SLIB_JNI_BEGIN_CLASS(JAndroidRect, "android/graphics/Rect")
 		SLIB_JNI_INT_FIELD(left);
 		SLIB_JNI_INT_FIELD(top);
 		SLIB_JNI_INT_FIELD(right);
 		SLIB_JNI_INT_FIELD(bottom);
 	SLIB_JNI_END_CLASS
 
-	void JNICALL _AndroidWindow_nativeOnResize(JNIEnv* env, jobject _this, jlong instance, int w, int h);
-	jboolean JNICALL _AndroidWindow_nativeOnClose(JNIEnv* env, jobject _this, jlong instance);
+	void JNICALL _priv_AndroidWindow_nativeOnResize(JNIEnv* env, jobject _this, jlong instance, int w, int h);
+	jboolean JNICALL _priv_AndroidWindow_nativeOnClose(JNIEnv* env, jobject _this, jlong instance);
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidWindow, "slib/platform/android/ui/window/UiWindow")
+	SLIB_JNI_BEGIN_CLASS(JAndroidWindow, "slib/platform/android/ui/window/UiWindow")
 
 		SLIB_JNI_STATIC_METHOD(create, "create", "(Landroid/app/Activity;ZZIIII)Lslib/platform/android/ui/window/UiWindow;");
 
@@ -58,35 +58,35 @@ namespace slib
 		SLIB_JNI_METHOD(convertCoordinateFromScreenToWindow, "convertCoordinateFromScreenToWindow", "(II)Landroid/graphics/Point;");
 		SLIB_JNI_METHOD(convertCoordinateFromWindowToScreen, "convertCoordinateFromWindowToScreen", "(II)Landroid/graphics/Point;");
 
-		SLIB_JNI_NATIVE(onResize, "nativeOnResize", "(JII)V", _AndroidWindow_nativeOnResize);
-		SLIB_JNI_NATIVE(onClose, "nativeOnClose", "(J)Z", _AndroidWindow_nativeOnClose);
+		SLIB_JNI_NATIVE(onResize, "nativeOnResize", "(JII)V", _priv_AndroidWindow_nativeOnResize);
+		SLIB_JNI_NATIVE(onClose, "nativeOnClose", "(J)Z", _priv_AndroidWindow_nativeOnClose);
 
 	SLIB_JNI_END_CLASS
 		
-	class _Android_Window : public WindowInstance
+	class _priv_Android_Window : public WindowInstance
 	{
 	public:
 		AtomicJniGlobal<jobject> m_window;
 		AtomicRef<ViewInstance> m_viewContent;
 
 	public:
-		_Android_Window()
+		_priv_Android_Window()
 		{
 		}
 
-		~_Android_Window()
+		~_priv_Android_Window()
 		{
 			close();
 		}
 
 	public:
-		static Ref<_Android_Window> create(jobject jwindow)
+		static Ref<_priv_Android_Window> create(jobject jwindow)
 		{
 			if (!jwindow) {
 				return sl_null;
 			}
-			JniLocal<jobject> jcontent = _JAndroidWindow::getContentView.callObject(jwindow);
-			Ref<_Android_Window> ret = new _Android_Window();
+			JniLocal<jobject> jcontent = JAndroidWindow::getContentView.callObject(jwindow);
+			Ref<_priv_Android_Window> ret = new _priv_Android_Window();
 			if (ret.isNotNull()) {
 				JniGlobal<jobject> window = jwindow;
 				Ref<ViewInstance> content = UIPlatform::createViewInstance(jcontent);
@@ -95,7 +95,7 @@ namespace slib
 					ret->m_window = window;
 					ret->m_viewContent = content;
 					jlong instance = (jlong)(window.get());
-					_JAndroidWindow::instance.set(jwindow, instance);
+					JAndroidWindow::instance.set(jwindow, instance);
 					return ret;
 				}
 			}
@@ -111,7 +111,7 @@ namespace slib
 					return 0;
 				}
 			}
-			jobject jwindow = _JAndroidWindow::create.callObject(sl_null, jactivity
+			jobject jwindow = JAndroidWindow::create.callObject(sl_null, jactivity
 				, param.flagFullScreen, param.flagCenterScreen
 				, (int)(param.location.x), (int)(param.location.y), (int)(param.size.x), (int)(param.size.y));
 			return jwindow;
@@ -130,7 +130,7 @@ namespace slib
 			jobject jwindow = _jwindow;
 			if (jwindow) {
 				UIPlatform::removeWindowInstance(jwindow);
-				_JAndroidWindow::close.call(jwindow);
+				JAndroidWindow::close.call(jwindow);
 				m_window.setNull();
 			}
 		}
@@ -155,7 +155,7 @@ namespace slib
 			JniGlobal<jobject> _jwindow(m_window);
 			jobject jwindow = _jwindow;
 			if (jwindow) {
-				_JAndroidWindow::focus.call(jwindow);
+				JAndroidWindow::focus.call(jwindow);
 				return sl_true;
 			}
 			return sl_false;
@@ -166,13 +166,13 @@ namespace slib
 			JniGlobal<jobject> _jwindow(m_window);
 			jobject jwindow = _jwindow;
 			if (jwindow) {
-				JniLocal<jobject> rect = _JAndroidWindow::getFrame.callObject(jwindow);
+				JniLocal<jobject> rect = JAndroidWindow::getFrame.callObject(jwindow);
 				if (rect.isNotNull()) {
 					UIRect ret;
-					ret.left = (sl_ui_pos)(_JAndroidRect::left.get(rect));
-					ret.top = (sl_ui_pos)(_JAndroidRect::top.get(rect));
-					ret.right = (sl_ui_pos)(_JAndroidRect::right.get(rect));
-					ret.bottom = (sl_ui_pos)(_JAndroidRect::bottom.get(rect));
+					ret.left = (sl_ui_pos)(JAndroidRect::left.get(rect));
+					ret.top = (sl_ui_pos)(JAndroidRect::top.get(rect));
+					ret.right = (sl_ui_pos)(JAndroidRect::right.get(rect));
+					ret.bottom = (sl_ui_pos)(JAndroidRect::bottom.get(rect));
 					ret.fixSizeError();
 					return ret;
 				}
@@ -185,7 +185,7 @@ namespace slib
 			JniGlobal<jobject> _jwindow(m_window);
 			jobject jwindow = _jwindow;
 			if (jwindow) {
-				_JAndroidWindow::setFrame.call(jwindow, (int)(frame.left), (int)(frame.top), (int)(frame.right), (int)(frame.bottom));
+				JAndroidWindow::setFrame.call(jwindow, (int)(frame.left), (int)(frame.top), (int)(frame.right), (int)(frame.bottom));
 				return sl_true;
 			}
 			return sl_false;
@@ -201,11 +201,11 @@ namespace slib
 			JniGlobal<jobject> _jwindow(m_window);
 			jobject jwindow = _jwindow;
 			if (jwindow) {
-				JniLocal<jobject> size = _JAndroidWindow::getSize.callObject(jwindow);
+				JniLocal<jobject> size = JAndroidWindow::getSize.callObject(jwindow);
 				if (size.isNotNull()) {
 					UISize ret;
-					ret.x = (sl_ui_pos)(_JAndroidPoint::x.get(size));
-					ret.y = (sl_ui_pos)(_JAndroidPoint::y.get(size));
+					ret.x = (sl_ui_pos)(JAndroidPoint::x.get(size));
+					ret.y = (sl_ui_pos)(JAndroidPoint::y.get(size));
 					return ret;
 				}
 			}
@@ -217,7 +217,7 @@ namespace slib
 			JniGlobal<jobject> _jwindow(m_window);
 			jobject jwindow = _jwindow;
 			if (jwindow) {
-				_JAndroidWindow::setSize.call(jwindow, (int)(size.x), (int)(size.y));
+				JAndroidWindow::setSize.call(jwindow, (int)(size.x), (int)(size.y));
 				return sl_true;
 			}
 			return sl_false;
@@ -238,7 +238,7 @@ namespace slib
 			JniGlobal<jobject> _jwindow(m_window);
 			jobject jwindow = _jwindow;
 			if (jwindow) {
-				int color = _JAndroidWindow::getBackgroundColor.callInt(jwindow);
+				int color = JAndroidWindow::getBackgroundColor.callInt(jwindow);
 				Color ret;
 				ret.setARGB(color);
 				return ret;
@@ -253,7 +253,7 @@ namespace slib
 			if (jwindow) {
 				Color color = _color;
 				if (color.isNotZero()) {
-					_JAndroidWindow::setBackgroundColor.call(jwindow, color.getARGB());
+					JAndroidWindow::setBackgroundColor.call(jwindow, color.getARGB());
 					return sl_true;
 				}
 			}
@@ -285,7 +285,7 @@ namespace slib
 			JniGlobal<jobject> _jwindow(m_window);
 			jobject jwindow = _jwindow;
 			if (jwindow) {
-				return _JAndroidWindow::isVisible.callBoolean(jwindow) != 0;
+				return JAndroidWindow::isVisible.callBoolean(jwindow) != 0;
 			}
 			return sl_false;
 		}
@@ -295,7 +295,7 @@ namespace slib
 			JniGlobal<jobject> _jwindow(m_window);
 			jobject jwindow = _jwindow;
 			if (jwindow) {
-				_JAndroidWindow::setVisible.call(jwindow, flag);
+				JAndroidWindow::setVisible.call(jwindow, flag);
 				return sl_true;
 			}
 			return sl_false;
@@ -306,7 +306,7 @@ namespace slib
 			JniGlobal<jobject> _jwindow(m_window);
 			jobject jwindow = _jwindow;
 			if (jwindow) {
-				return _JAndroidWindow::isAlwaysOnTop.callBoolean(jwindow) != 0;
+				return JAndroidWindow::isAlwaysOnTop.callBoolean(jwindow) != 0;
 			}
 			return sl_false;
 		}
@@ -316,7 +316,7 @@ namespace slib
 			JniGlobal<jobject> _jwindow(m_window);
 			jobject jwindow = _jwindow;
 			if (jwindow) {
-				_JAndroidWindow::setAlwaysOnTop.call(jwindow, flag);
+				JAndroidWindow::setAlwaysOnTop.call(jwindow, flag);
 				return sl_true;
 			}
 			return sl_false;
@@ -367,7 +367,7 @@ namespace slib
 			JniGlobal<jobject> _jwindow(m_window);
 			jobject jwindow = _jwindow;
 			if (jwindow) {
-				return (sl_real)(_JAndroidWindow::getAlpha.callFloat(jwindow));
+				return (sl_real)(JAndroidWindow::getAlpha.callFloat(jwindow));
 			}
 			return sl_false;
 		}
@@ -377,7 +377,7 @@ namespace slib
 			JniGlobal<jobject> _jwindow(m_window);
 			jobject jwindow = _jwindow;
 			if (jwindow) {
-				_JAndroidWindow::setAlpha.call(jwindow, (jfloat)alpha);
+				JAndroidWindow::setAlpha.call(jwindow, (jfloat)alpha);
 				return sl_true;
 			}
 			return sl_false;
@@ -398,11 +398,11 @@ namespace slib
 			JniGlobal<jobject> _jwindow(m_window);
 			jobject jwindow = _jwindow;
 			if (jwindow) {
-				JniLocal<jobject> jpt = _JAndroidWindow::convertCoordinateFromScreenToWindow.callObject(jwindow, 0, 0);
+				JniLocal<jobject> jpt = JAndroidWindow::convertCoordinateFromScreenToWindow.callObject(jwindow, 0, 0);
 				if (jpt.isNotNull()) {
 					UIPointf ret;
-					ret.x = ptScreen.x + (sl_ui_posf)(_JAndroidPoint::x.get(jpt));
-					ret.y = ptScreen.y + (sl_ui_posf)(_JAndroidPoint::y.get(jpt));
+					ret.x = ptScreen.x + (sl_ui_posf)(JAndroidPoint::x.get(jpt));
+					ret.y = ptScreen.y + (sl_ui_posf)(JAndroidPoint::y.get(jpt));
 					return ret;
 				}
 			}
@@ -414,11 +414,11 @@ namespace slib
 			JniGlobal<jobject> _jwindow(m_window);
 			jobject jwindow = _jwindow;
 			if (jwindow) {
-				JniLocal<jobject> jpt = _JAndroidWindow::convertCoordinateFromWindowToScreen.callObject(jwindow, 0, 0);
+				JniLocal<jobject> jpt = JAndroidWindow::convertCoordinateFromWindowToScreen.callObject(jwindow, 0, 0);
 				if (jpt.isNotNull()) {
 					UIPointf ret;
-					ret.x = ptWindow.x + (sl_ui_posf)(_JAndroidPoint::x.get(jpt));
-					ret.y = ptWindow.y + (sl_ui_posf)(_JAndroidPoint::y.get(jpt));
+					ret.x = ptWindow.x + (sl_ui_posf)(JAndroidPoint::x.get(jpt));
+					ret.y = ptWindow.y + (sl_ui_posf)(JAndroidPoint::y.get(jpt));
 					return ret;
 				}
 			}
@@ -457,22 +457,22 @@ namespace slib
 
 	};
 
-	Ref<_Android_Window> _AndroidUi_getWindow(jlong instance)
+	Ref<_priv_Android_Window> _priv_AndroidUi_getWindow(jlong instance)
 	{
-		return Ref<_Android_Window>::from(UIPlatform::getWindowInstance((jobject)instance));
+		return Ref<_priv_Android_Window>::from(UIPlatform::getWindowInstance((jobject)instance));
 	}
 
-	void JNICALL _AndroidWindow_nativeOnResize(JNIEnv* env, jobject _this, jlong instance, int w, int h)
+	void JNICALL _priv_AndroidWindow_nativeOnResize(JNIEnv* env, jobject _this, jlong instance, int w, int h)
 	{
-		Ref<_Android_Window> window = _AndroidUi_getWindow(instance);
+		Ref<_priv_Android_Window> window = _priv_AndroidUi_getWindow(instance);
 		if (window.isNotNull()) {
 			window->onResize((sl_ui_pos)w, (sl_ui_pos)h);
 		}
 	}
 
-	jboolean JNICALL _AndroidWindow_nativeOnClose(JNIEnv* env, jobject _this, jlong instance)
+	jboolean JNICALL _priv_AndroidWindow_nativeOnClose(JNIEnv* env, jobject _this, jlong instance)
 	{
-		Ref<_Android_Window> window = _AndroidUi_getWindow(instance);
+		Ref<_priv_Android_Window> window = _priv_AndroidUi_getWindow(instance);
 		if (window.isNotNull()) {
 			return window->onClose();
 		}
@@ -481,7 +481,7 @@ namespace slib
 
 	Ref<WindowInstance> Window::createWindowInstance(const WindowInstanceParam& param)
 	{
-		JniLocal<jobject> jwindow = _Android_Window::createHandle(param);
+		JniLocal<jobject> jwindow = _priv_Android_Window::createHandle(param);
 		if (jwindow.isNotNull()) {
 			return UIPlatform::createWindowInstance(jwindow);
 		}
@@ -495,7 +495,7 @@ namespace slib
 		if (window.isNotNull()) {
 			return window;
 		}
-		Ref<_Android_Window> ret = _Android_Window::create(jwindow);
+		Ref<_priv_Android_Window> ret = _priv_Android_Window::create(jwindow);
 		if (ret.isNotNull()) {
 			UIPlatform::_registerWindowInstance((void*)(ret->m_window.get()), ret.get());
 		}
@@ -514,7 +514,7 @@ namespace slib
 
 	jobject UIPlatform::getWindowHandle(WindowInstance* instance)
 	{
-		_Android_Window* window = (_Android_Window*)instance;
+		_priv_Android_Window* window = (_priv_Android_Window*)instance;
 		if (window) {
 			return window->m_window.get();
 		} else {

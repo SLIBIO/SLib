@@ -433,12 +433,12 @@ namespace slib
 		close();
 	}
 
-	class _HttpServiceConnection_SendResponseAndCloseListener : public Referable
+	class _priv_HttpServiceConnection_SendResponseAndCloseListener : public Referable
 	{
 	public:
 		WeakRef<HttpServiceConnection> m_connection;
 
-		_HttpServiceConnection_SendResponseAndCloseListener(HttpServiceConnection* connection)
+		_priv_HttpServiceConnection_SendResponseAndCloseListener(HttpServiceConnection* connection)
 		{
 			m_connection = connection;
 		}
@@ -455,8 +455,8 @@ namespace slib
 	void HttpServiceConnection::sendResponseAndClose(const Memory& mem)
 	{
 		if (mem.isNotEmpty()) {
-			Ref<_HttpServiceConnection_SendResponseAndCloseListener> listener(new _HttpServiceConnection_SendResponseAndCloseListener(this));
-			if (m_io->writeFromMemory(mem, SLIB_FUNCTION_REF(_HttpServiceConnection_SendResponseAndCloseListener, onWriteStream, listener))) {
+			Ref<_priv_HttpServiceConnection_SendResponseAndCloseListener> listener(new _priv_HttpServiceConnection_SendResponseAndCloseListener(this));
+			if (m_io->writeFromMemory(mem, SLIB_FUNCTION_REF(_priv_HttpServiceConnection_SendResponseAndCloseListener, onWriteStream, listener))) {
 				return;
 			}
 		}
@@ -515,18 +515,18 @@ namespace slib
 		m_service = service;
 	}
 
-	class _DefaultHttpServiceConnectionProvider : public HttpServiceConnectionProvider, public IAsyncTcpServerListener
+	class _priv_DefaultHttpServiceConnectionProvider : public HttpServiceConnectionProvider, public IAsyncTcpServerListener
 	{
 	public:
 		Ref<AsyncTcpServer> m_server;
 		Ref<AsyncIoLoop> m_loop;
 
 	public:
-		_DefaultHttpServiceConnectionProvider()
+		_priv_DefaultHttpServiceConnectionProvider()
 		{
 		}
 
-		~_DefaultHttpServiceConnectionProvider()
+		~_priv_DefaultHttpServiceConnectionProvider()
 		{
 			release();
 		}
@@ -536,7 +536,7 @@ namespace slib
 		{
 			Ref<AsyncIoLoop> loop = service->getAsyncIoLoop();
 			if (loop.isNotNull()) {
-				Ref<_DefaultHttpServiceConnectionProvider> ret = new _DefaultHttpServiceConnectionProvider;
+				Ref<_priv_DefaultHttpServiceConnectionProvider> ret = new _priv_DefaultHttpServiceConnectionProvider;
 				if (ret.isNotNull()) {
 					ret->m_loop = loop;
 					ret->setService(service);
@@ -1022,7 +1022,7 @@ namespace slib
 
 	sl_bool HttpService::addHttpService(const SocketAddress& addr)
 	{
-		Ref<HttpServiceConnectionProvider> provider = _DefaultHttpServiceConnectionProvider::create(this, addr);
+		Ref<HttpServiceConnectionProvider> provider = _priv_DefaultHttpServiceConnectionProvider::create(this, addr);
 		if (provider.isNotNull()) {
 			addConnectionProvider(provider);
 			return sl_true;

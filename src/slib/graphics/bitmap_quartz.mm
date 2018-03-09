@@ -19,7 +19,7 @@
 namespace slib
 {
 
-	class _Quartz_Bitmap : public Bitmap
+	class _priv_Quartz_Bitmap : public Bitmap
 	{
 		SLIB_DECLARE_OBJECT
 		
@@ -31,19 +31,19 @@ namespace slib
 		sl_uint32 m_height;
 		
 	public:
-		_Quartz_Bitmap()
+		_priv_Quartz_Bitmap()
 		{
 		}
 		
-		~_Quartz_Bitmap()
+		~_priv_Quartz_Bitmap()
 		{
 			CGContextRelease(m_bitmap);
 		}
 		
 	public:
-		static Ref<_Quartz_Bitmap> create(sl_uint32 width, sl_uint32 height)
+		static Ref<_priv_Quartz_Bitmap> create(sl_uint32 width, sl_uint32 height)
 		{
-			Ref<_Quartz_Bitmap> ret;
+			Ref<_priv_Quartz_Bitmap> ret;
 			
 			if (width > 0 && height > 0) {
 				
@@ -65,7 +65,7 @@ namespace slib
 
 						if (bitmap) {
 							
-							ret = new _Quartz_Bitmap();
+							ret = new _priv_Quartz_Bitmap();
 							
 							if (ret.isNotNull()) {
 							
@@ -88,9 +88,9 @@ namespace slib
 			return ret;
 		}
 		
-		static Ref<_Quartz_Bitmap> loadFromMemory(const void* mem, sl_size size)
+		static Ref<_priv_Quartz_Bitmap> loadFromMemory(const void* mem, sl_size size)
 		{
-			Ref<_Quartz_Bitmap> ret;
+			Ref<_priv_Quartz_Bitmap> ret;
 			CGImageRef image = GraphicsPlatform::loadCGImageFromMemory(mem, size);
 			if (image) {
 				CGImageRetain(image);
@@ -267,16 +267,16 @@ namespace slib
 		
 	};
 
-	SLIB_DEFINE_OBJECT(_Quartz_Bitmap, Bitmap)
+	SLIB_DEFINE_OBJECT(_priv_Quartz_Bitmap, Bitmap)
 
 	Ref<Bitmap> Bitmap::create(sl_uint32 width, sl_uint32 height)
 	{
-		return _Quartz_Bitmap::create(width, height);
+		return _priv_Quartz_Bitmap::create(width, height);
 	}
 
 	Ref<Bitmap> Bitmap::loadFromMemory(const void* mem, sl_size size)
 	{
-		return _Quartz_Bitmap::loadFromMemory(mem, size);
+		return _priv_Quartz_Bitmap::loadFromMemory(mem, size);
 	}
 
 

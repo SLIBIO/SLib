@@ -33,33 +33,33 @@ namespace slib
 
 	static sl_int32 _ui_active_windows_count = 0;
 
-	class _Tizen_Window;
-	SLIB_STATIC_ZERO_INITIALIZED(Ref<_Tizen_Window>, _ui_main_window)
+	class _priv_Tizen_Window;
+	SLIB_STATIC_ZERO_INITIALIZED(Ref<_priv_Tizen_Window>, _ui_main_window)
 
-	class _Tizen_Window : public WindowInstance
+	class _priv_Tizen_Window : public WindowInstance
 	{
 	public:
 		Evas_Object* m_window;
 		AtomicRef<ViewInstance> m_viewContent;
 		
 	public:
-		_Tizen_Window()
+		_priv_Tizen_Window()
 		{
 			m_window = sl_null;
 		}
 		
-		~_Tizen_Window()
+		~_priv_Tizen_Window()
 		{
 			_release();
 		}
 		
 	public:
-		static Ref<_Tizen_Window> create(Evas_Object* window)
+		static Ref<_priv_Tizen_Window> create(Evas_Object* window)
 		{
 
 			if (window) {
 
-				Ref<_Tizen_Window> ret = new _Tizen_Window();
+				Ref<_priv_Tizen_Window> ret = new _priv_Tizen_Window();
 
 				if (ret.isNotNull()) {
 
@@ -96,7 +96,7 @@ namespace slib
 		{
 			Ref<WindowInstance> instance = UIPlatform::getWindowInstance(win);
 			if (instance.isNotNull()) {
-				(static_cast<_Tizen_Window*>(instance.get()))->m_window = sl_null;
+				(static_cast<_priv_Tizen_Window*>(instance.get()))->m_window = sl_null;
 			}
 			UIPlatform::removeWindowInstance(win);
 			sl_int32 n = Base::interlockedDecrement32(&_ui_active_windows_count);
@@ -155,7 +155,7 @@ namespace slib
 					::evas_object_resize(win, (Evas_Coord)(rect.getWidth()), (Evas_Coord)(rect.getHeight()));
 				}
 
-				Ref<_Tizen_Window> ret = Ref<_Tizen_Window>::from(UIPlatform::createWindowInstance(win));
+				Ref<_priv_Tizen_Window> ret = Ref<_priv_Tizen_Window>::from(UIPlatform::createWindowInstance(win));
 				if (ret.isNotNull()) {
 					::elm_win_autodel_set(win, EINA_TRUE);
 					return ret;
@@ -198,7 +198,7 @@ namespace slib
 			Evas_Object* window = m_window;
 			if (window) {
 				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThread(SLIB_FUNCTION_WEAKREF(_Tizen_Window, close, this));
+					UI::dispatchToUiThread(SLIB_FUNCTION_WEAKREF(_priv_Tizen_Window, close, this));
 					return;
 				}
 				UIPlatform::removeWindowInstance(window);
@@ -224,7 +224,7 @@ namespace slib
 			Evas_Object* window = m_window;
 			if (window) {
 				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), _Tizen_Window, setFocus, this));
+					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), _priv_Tizen_Window, setFocus, this));
 					return sl_true;
 				}
 				::elm_win_raise(window);
@@ -292,7 +292,7 @@ namespace slib
 			Evas_Object* window = m_window;
 			if (window) {
 				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), _Tizen_Window, setVisible, this, flag));
+					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), _priv_Tizen_Window, setVisible, this, flag));
 					return sl_true;
 				}
 				if (flag) {
@@ -386,7 +386,7 @@ namespace slib
 	
 	Ref<WindowInstance> Window::createWindowInstance(const WindowInstanceParam& param)
 	{
-		return _Tizen_Window::create(param);
+		return _priv_Tizen_Window::create(param);
 	}
 
 
@@ -396,7 +396,7 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		ret = _Tizen_Window::create(window);
+		ret = _priv_Tizen_Window::create(window);
 		if (ret.isNotNull()) {
 			UIPlatform::_registerWindowInstance(window, ret.get());
 		}
@@ -415,7 +415,7 @@ namespace slib
 	
 	Evas_Object* UIPlatform::getWindowHandle(WindowInstance* instance)
 	{
-		_Tizen_Window* window = static_cast<_Tizen_Window*>(instance);
+		_priv_Tizen_Window* window = static_cast<_priv_Tizen_Window*>(instance);
 		if (window) {
 			return window->m_window;
 		} else {
@@ -428,7 +428,7 @@ namespace slib
 		if (window) {
 			Ref<WindowInstance> _instance = window->getWindowInstance();
 			if (_instance.isNotNull()) {
-				_Tizen_Window* instance = static_cast<_Tizen_Window*>(_instance.get());
+				_priv_Tizen_Window* instance = static_cast<_priv_Tizen_Window*>(_instance.get());
 				return instance->m_window;
 			}
 		}

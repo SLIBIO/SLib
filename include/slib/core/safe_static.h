@@ -25,7 +25,7 @@
 ****************************************************************/
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
-#	define SLIB_SAFE_STATIC_DESTRUCTOR(TYPE, NAME) static slib::_SafeStaticDestructor<TYPE> _static_destructor_instance_##NAME(&NAME);
+#	define SLIB_SAFE_STATIC_DESTRUCTOR(TYPE, NAME) static slib:: _priv_SafeStaticDestructor<TYPE> _static_destructor_instance_##NAME(&NAME);
 #	define SLIB_SAFE_STATIC_CHECK_FREED(NAME) _static_destructor_instance_##NAME.flagFreed
 #else
 #	define SLIB_SAFE_STATIC_DESTRUCTOR(TYPE, NAME)

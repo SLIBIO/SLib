@@ -85,8 +85,8 @@ namespace slib
 	
 	SLIB_DEFINE_OBJECT(UrlRequest, Object)
 	
-	typedef HashMap< UrlRequest*, Ref<UrlRequest> > _UrlRequestMap;
-	SLIB_SAFE_STATIC_GETTER(_UrlRequestMap, _getUrlRequestMap)
+	typedef HashMap< UrlRequest*, Ref<UrlRequest> > _priv_UrlRequestMap;
+	SLIB_SAFE_STATIC_GETTER(_priv_UrlRequestMap, _getUrlRequestMap)
 	
 	UrlRequest::UrlRequest()
 	{
@@ -651,7 +651,7 @@ namespace slib
 		m_flagStoreResponseContent = param.flagStoreResponseContent;
 		
 		if (m_flagSelfAlive) {
-			_UrlRequestMap* map = _getUrlRequestMap();
+			_priv_UrlRequestMap* map = _getUrlRequestMap();
 			if (map) {
 				map->put(this, this);
 			}
@@ -662,7 +662,7 @@ namespace slib
 	void UrlRequest::_removeFromMap()
 	{
 		if (m_flagSelfAlive) {
-			_UrlRequestMap* map = _getUrlRequestMap();
+			_priv_UrlRequestMap* map = _getUrlRequestMap();
 			if (map) {
 				map->remove(this);
 			}

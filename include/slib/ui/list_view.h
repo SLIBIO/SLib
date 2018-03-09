@@ -58,7 +58,7 @@ namespace slib
 	
 	
 	
-	class _ListContentView;
+	class _priv_ListContentView;
 	
 	class SLIB_EXPORT ListView : public VerticalScrollView
 	{
@@ -95,7 +95,7 @@ namespace slib
 	protected:
 		AtomicPtr<IListViewAdapter> m_adapter;
 		
-		Ref<_ListContentView> m_contentView;
+		Ref<_priv_ListContentView> m_contentView;
 		sl_bool m_flagResetAdapter;
 		sl_bool m_flagRefreshItems;
 		
@@ -119,7 +119,7 @@ namespace slib
 		
 		sl_int32 m_lockCountLayouting;
 		
-		friend class _ListContentView;
+		friend class _priv_ListContentView;
 		
 	};
 

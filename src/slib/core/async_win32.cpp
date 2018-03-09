@@ -19,7 +19,7 @@
 namespace slib
 {
 
-	class _Win32AsyncFileStreamInstance : public AsyncStreamInstance
+	class _priv_Win32AsyncFileStreamInstance : public AsyncStreamInstance
 	{
 	public:
 		Ref<AsyncStreamRequest> m_requestOperating;
@@ -27,22 +27,22 @@ namespace slib
 		OVERLAPPED m_overlappedRead;
 		OVERLAPPED m_overlappedWrite;
 
-		_Win32AsyncFileStreamInstance()
+		_priv_Win32AsyncFileStreamInstance()
 		{
 			m_offset = 0;
 		}
 
-		~_Win32AsyncFileStreamInstance()
+		~_priv_Win32AsyncFileStreamInstance()
 		{
 			close();
 		}
 
-		static Ref<_Win32AsyncFileStreamInstance> open(const String& path, FileMode mode)
+		static Ref<_priv_Win32AsyncFileStreamInstance> open(const String& path, FileMode mode)
 		{
-			Ref<_Win32AsyncFileStreamInstance> ret;
+			Ref<_priv_Win32AsyncFileStreamInstance> ret;
 			sl_file handle = _openHandle(path, mode);
 			if (handle != SLIB_FILE_INVALID_HANDLE) {
-				ret = new _Win32AsyncFileStreamInstance();
+				ret = new _priv_Win32AsyncFileStreamInstance();
 				if (ret.isNotNull()) {
 					ret->setHandle(handle);
 					if (mode == FileMode::Append) {
@@ -228,7 +228,7 @@ namespace slib
 
 	Ref<AsyncStream> AsyncFile::openIOCP(const String& path, FileMode mode, const Ref<AsyncIoLoop>& loop)
 	{
-		Ref<_Win32AsyncFileStreamInstance> ret = _Win32AsyncFileStreamInstance::open(path, mode);
+		Ref<_priv_Win32AsyncFileStreamInstance> ret = _priv_Win32AsyncFileStreamInstance::open(path, mode);
 		return AsyncStream::create(ret.get(), AsyncIoMode::InOut, loop);
 	}
 

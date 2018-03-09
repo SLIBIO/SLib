@@ -19,14 +19,14 @@
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidRect, "android/graphics/Rect")
+	SLIB_JNI_BEGIN_CLASS(JAndroidRect, "android/graphics/Rect")
 		SLIB_JNI_INT_FIELD(left);
 		SLIB_JNI_INT_FIELD(top);
 		SLIB_JNI_INT_FIELD(right);
 		SLIB_JNI_INT_FIELD(bottom);
 	SLIB_JNI_END_CLASS
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidGraphics, "slib/platform/android/ui/Graphics")
+	SLIB_JNI_BEGIN_CLASS(JAndroidGraphics, "slib/platform/android/ui/Graphics")
 		SLIB_JNI_METHOD(getWidth, "getWidth", "()I");
 		SLIB_JNI_METHOD(getHeight, "getHeight", "()I");
 		SLIB_JNI_METHOD(save, "save", "()V");
@@ -49,19 +49,19 @@ namespace slib
 		SLIB_JNI_METHOD(setAntiAlias, "setAntiAlias", "(Z)V");
 	SLIB_JNI_END_CLASS
 
-	class _Android_Canvas : public Canvas
+	class _priv_Android_Canvas : public Canvas
 	{
 		SLIB_DECLARE_OBJECT
 	public:
 		JniGlobal<jobject> m_canvas;
 
 	public:
-		static Ref<_Android_Canvas> create(CanvasType type, jobject jcanvas) {
+		static Ref<_priv_Android_Canvas> create(CanvasType type, jobject jcanvas) {
 			JniGlobal<jobject> canvas = jcanvas;
 			if (canvas.isNotNull()) {
-				int width = _JAndroidGraphics::getWidth.callInt(jcanvas);
-				int height = _JAndroidGraphics::getHeight.callInt(jcanvas);
-				Ref<_Android_Canvas> ret = new _Android_Canvas();
+				int width = JAndroidGraphics::getWidth.callInt(jcanvas);
+				int height = JAndroidGraphics::getHeight.callInt(jcanvas);
+				Ref<_priv_Android_Canvas> ret = new _priv_Android_Canvas();
 				if (ret.isNotNull()) {
 					ret->m_canvas = canvas;
 					ret->setType(type);
@@ -74,23 +74,23 @@ namespace slib
 
 		void save() override
 		{
-			_JAndroidGraphics::save.call(m_canvas);
+			JAndroidGraphics::save.call(m_canvas);
 		}
 		
 		void restore() override
 		{
-			_JAndroidGraphics::restore.call(m_canvas);
+			JAndroidGraphics::restore.call(m_canvas);
 		}
 
 		Rectangle getClipBounds() override
 		{
-			JniLocal<jobject> rect(_JAndroidGraphics::getClipBounds.callObject(m_canvas));
+			JniLocal<jobject> rect(JAndroidGraphics::getClipBounds.callObject(m_canvas));
 			if (rect.isNotNull()) {
 				Rectangle ret;
-				ret.left = _JAndroidRect::left.get(rect);
-				ret.top = _JAndroidRect::top.get(rect);
-				ret.right = _JAndroidRect::right.get(rect);
-				ret.bottom = _JAndroidRect::bottom.get(rect);
+				ret.left = JAndroidRect::left.get(rect);
+				ret.top = JAndroidRect::top.get(rect);
+				ret.right = JAndroidRect::right.get(rect);
+				ret.bottom = JAndroidRect::bottom.get(rect);
 				return ret;
 			}
 			Size size = getSize();
@@ -99,20 +99,20 @@ namespace slib
 
 		void clipToRectangle(const Rectangle& _rect) override
 		{
-			_JAndroidGraphics::clipToRectangle.call(m_canvas, (float)(_rect.left), (float)(_rect.top), (float)(_rect.right), (float)(_rect.bottom));
+			JAndroidGraphics::clipToRectangle.call(m_canvas, (float)(_rect.left), (float)(_rect.top), (float)(_rect.right), (float)(_rect.bottom));
 		}
 
 		void clipToPath(const Ref<GraphicsPath>& path) override
 		{
 			jobject handle = GraphicsPlatform::getGraphicsPath(path.get());
 			if (handle) {
-				_JAndroidGraphics::clipToPath.call(m_canvas, handle);
+				JAndroidGraphics::clipToPath.call(m_canvas, handle);
 			}
 		}
 
 		void concatMatrix(const Matrix3& matrix) override
 		{
-			_JAndroidGraphics::concatMatrix.call(m_canvas,
+			JAndroidGraphics::concatMatrix.call(m_canvas,
 					(float)(matrix.m00), (float)(matrix.m10), (float)(matrix.m20),
 					(float)(matrix.m01), (float)(matrix.m11), (float)(matrix.m21),
 					(float)(matrix.m02), (float)(matrix.m12), (float)(matrix.m22));
@@ -128,7 +128,7 @@ namespace slib
 				jobject hFont = GraphicsPlatform::getNativeFont(font.get());
 				if (hFont) {
 					JniLocal<jstring> jtext = Jni::getJniString(text);
-					_JAndroidGraphics::drawText.call(m_canvas, jtext.value, (float)x, (float)y, hFont, color.getARGB());
+					JAndroidGraphics::drawText.call(m_canvas, jtext.value, (float)x, (float)y, hFont, color.getARGB());
 				}
 			}
 		}
@@ -141,7 +141,7 @@ namespace slib
 			}
 			jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
 			if (hPen) {
-				_JAndroidGraphics::drawLine.call(m_canvas
+				JAndroidGraphics::drawLine.call(m_canvas
 						, (float)(pt1.x), (float)(pt1.y), (float)(pt2.x), (float)(pt2.y)
 						, hPen);
 			}
@@ -161,7 +161,7 @@ namespace slib
 				JniLocal<jfloatArray> jarr = Jni::newFloatArray(countPoints*2);
 				if (jarr.isNotNull()) {
 					Jni::setFloatArrayRegion(jarr, 0, countPoints*2, (jfloat*)(points));
-					_JAndroidGraphics::drawLines.call(m_canvas, jarr.value, hPen);
+					JAndroidGraphics::drawLines.call(m_canvas, jarr.value, hPen);
 				}
 			}
 		}
@@ -174,7 +174,7 @@ namespace slib
 			}
 			jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
 			if (hPen) {
-				_JAndroidGraphics::drawArc.call(m_canvas
+				JAndroidGraphics::drawArc.call(m_canvas
 						, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
 						, (float)(startDegrees), (float)(endDegrees)
 						, hPen);
@@ -190,7 +190,7 @@ namespace slib
 			jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
 			jobject hBrush = GraphicsPlatform::getBrushHandle(brush.get());
 			if (hPen || hBrush) {
-				_JAndroidGraphics::drawRectangle.call(m_canvas
+				JAndroidGraphics::drawRectangle.call(m_canvas
 						, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
 						, hPen, hBrush);
 			}
@@ -205,7 +205,7 @@ namespace slib
 			jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
 			jobject hBrush = GraphicsPlatform::getBrushHandle(brush.get());
 			if (hPen || hBrush) {
-				_JAndroidGraphics::drawRoundRectangle.call(m_canvas
+				JAndroidGraphics::drawRoundRectangle.call(m_canvas
 						, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
 						, (float)(radius.x), (float)(radius.y), hPen, hBrush);
 			}
@@ -220,7 +220,7 @@ namespace slib
 			jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
 			jobject hBrush = GraphicsPlatform::getBrushHandle(brush.get());
 			if (hPen || hBrush) {
-				_JAndroidGraphics::drawEllipse.call(m_canvas
+				JAndroidGraphics::drawEllipse.call(m_canvas
 						, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
 						, hPen, hBrush);
 			}
@@ -241,7 +241,7 @@ namespace slib
 				JniLocal<jfloatArray> jarr = Jni::newFloatArray(countPoints*2);
 				if (jarr.isNotNull()) {
 					Jni::setFloatArrayRegion(jarr, 0, countPoints*2, (jfloat*)(points));
-					_JAndroidGraphics::drawPolygon.call(m_canvas, jarr.value, hPen, hBrush, fillMode);
+					JAndroidGraphics::drawPolygon.call(m_canvas, jarr.value, hPen, hBrush, fillMode);
 				}
 			}
 		}
@@ -255,7 +255,7 @@ namespace slib
 			jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
 			jobject hBrush = GraphicsPlatform::getBrushHandle(brush.get());
 			if (hPen || hBrush) {
-				_JAndroidGraphics::drawPie.call(m_canvas
+				JAndroidGraphics::drawPie.call(m_canvas
 						, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
 						, (float)(startDegrees), (float)(endDegrees)
 						, hPen, hBrush);
@@ -273,7 +273,7 @@ namespace slib
 				jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
 				jobject hBrush = GraphicsPlatform::getBrushHandle(brush.get());
 				if (hPen || hBrush) {
-					_JAndroidGraphics::drawPath.call(m_canvas
+					JAndroidGraphics::drawPath.call(m_canvas
 							, hPath
 							, hPen, hBrush);
 				}
@@ -282,29 +282,29 @@ namespace slib
 
 		void _setAlpha(sl_real alpha) override
 		{
-			_JAndroidGraphics::setAlpha.call(m_canvas, (float)alpha);
+			JAndroidGraphics::setAlpha.call(m_canvas, (float)alpha);
 		}
 
 		void _setAntiAlias(sl_bool flag) override
 		{
-			_JAndroidGraphics::setAntiAlias.call(m_canvas, flag);
+			JAndroidGraphics::setAntiAlias.call(m_canvas, flag);
 		}
 
 	};
 
-	SLIB_DEFINE_OBJECT(_Android_Canvas, Canvas)
+	SLIB_DEFINE_OBJECT(_priv_Android_Canvas, Canvas)
 
 	Ref<Canvas> GraphicsPlatform::createCanvas(CanvasType type, jobject jcanvas)
 	{
 		if (!jcanvas) {
 			return sl_null;
 		}
-		return _Android_Canvas::create(type, jcanvas);
+		return _priv_Android_Canvas::create(type, jcanvas);
 	}
 
 	jobject GraphicsPlatform::getCanvasHandle(Canvas* _canvas)
 	{
-		if (_Android_Canvas* canvas = CastInstance<_Android_Canvas>(_canvas)) {
+		if (_priv_Android_Canvas* canvas = CastInstance<_priv_Android_Canvas>(_canvas)) {
 			return canvas->m_canvas;
 		} else {
 			return 0;

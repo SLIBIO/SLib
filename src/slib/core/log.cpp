@@ -54,7 +54,7 @@ namespace slib
 		log(tag, content);
 	}
 
-	static String _Log_getLineString(const String& tag, const String& content)
+	static String _priv_Log_getLineString(const String& tag, const String& content)
 	{
 		return String::format("%s [%s] %s", Time::now(), tag, content);
 	}
@@ -78,7 +78,7 @@ namespace slib
 		if (fileName.isEmpty()) {
 			return;
 		}
-		String s = _Log_getLineString(tag, content) + "\r\n";
+		String s = _priv_Log_getLineString(tag, content) + "\r\n";
 		if (s.getLength() > 0) {
 			ObjectLocker lock(this);
 			File::appendAllTextUTF8(fileName, s);
@@ -104,7 +104,7 @@ namespace slib
 				::dlog_print(DLOG_INFO, tag.getData(), " ");
 			}
 #else
-			String s = _Log_getLineString(tag, content);
+			String s = _priv_Log_getLineString(tag, content);
 			Console::println(s);
 #endif
 		}

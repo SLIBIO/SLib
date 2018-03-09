@@ -46,7 +46,7 @@ namespace slib
 			mask |= GL_COLOR_BUFFER_BIT;
 		}
 		if (param.flagDepth) {
-#if defined(_OPENGL_IMPL)
+#if defined(PRIV_OPENGL_IMPL)
 			GL_ENTRY(glClearDepth)(param.depth);
 #else
 			GL_ENTRY(glClearDepthf)(param.depth);
@@ -104,7 +104,7 @@ namespace slib
 		GL_ENTRY(glDepthMask)(flagEnableDepthWrite ? GL_TRUE : GL_FALSE);
 	}
 	
-	static GLenum _GL_getFunctionOp(RenderFunctionOperation op)
+	static GLenum _priv_GL_getFunctionOp(RenderFunctionOperation op)
 	{
 		switch (op) {
 			case RenderFunctionOperation::Never:
@@ -129,7 +129,7 @@ namespace slib
 	
 	void GL_BASE::setDepthFunction(RenderFunctionOperation op)
 	{
-		GL_ENTRY(glDepthFunc)(_GL_getFunctionOp(op));
+		GL_ENTRY(glDepthFunc)(_priv_GL_getFunctionOp(op));
 	}
 	
 	void GL_BASE::setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW)
@@ -147,7 +147,7 @@ namespace slib
 		}
 	}
 	
-	static GLenum _GL_getBlendingOp(RenderBlendingOperation op)
+	static GLenum _priv_GL_getBlendingOp(RenderBlendingOperation op)
 	{
 		switch (op) {
 			case RenderBlendingOperation::Add:
@@ -160,7 +160,7 @@ namespace slib
 		return GL_FUNC_ADD;
 	}
 	
-	static GLenum _GL_getBlendingFactor(RenderBlendingFactor factor)
+	static GLenum _priv_GL_getBlendingFactor(RenderBlendingFactor factor)
 	{
 		switch (factor) {
 			case RenderBlendingFactor::One:
@@ -201,17 +201,17 @@ namespace slib
 	{
 		if (flagEnableBlending) {
 			GL_ENTRY(glEnable)(GL_BLEND);
-			GLenum op = _GL_getBlendingOp(param.operation);
-			GLenum opAlpha = _GL_getBlendingOp(param.operationAlpha);
+			GLenum op = _priv_GL_getBlendingOp(param.operation);
+			GLenum opAlpha = _priv_GL_getBlendingOp(param.operationAlpha);
 			if (op != opAlpha) {
 				GL_ENTRY(glBlendEquationSeparate)(op, opAlpha);
 			} else {
 				GL_ENTRY(glBlendEquation)(op);
 			}
-			GLenum fSrc = _GL_getBlendingFactor(param.blendSrc);
-			GLenum fDst = _GL_getBlendingFactor(param.blendDst);
-			GLenum fSrcAlpha = _GL_getBlendingFactor(param.blendSrcAlpha);
-			GLenum fDstAlpha = _GL_getBlendingFactor(param.blendDstAlpha);
+			GLenum fSrc = _priv_GL_getBlendingFactor(param.blendSrc);
+			GLenum fDst = _priv_GL_getBlendingFactor(param.blendDst);
+			GLenum fSrcAlpha = _priv_GL_getBlendingFactor(param.blendSrcAlpha);
+			GLenum fDstAlpha = _priv_GL_getBlendingFactor(param.blendDstAlpha);
 			if (fSrc == fSrcAlpha && fDst == fDstAlpha) {
 				GL_ENTRY(glBlendFunc)(fSrc, fDst);
 			} else {
@@ -229,7 +229,7 @@ namespace slib
 		setBlending(flagEnableBlending, param);
 	}
 	
-	static sl_uint32 _GL_createShader(GLenum type, const String& source)
+	static sl_uint32 _priv_GL_createShader(GLenum type, const String& source)
 	{
 		GLuint shader = GL_ENTRY(glCreateShader)(type);
 		if (shader) {
@@ -261,12 +261,12 @@ namespace slib
 	
 	sl_uint32 GL_BASE::createVertexShader(const String& source)
 	{
-		return _GL_createShader(GL_VERTEX_SHADER, source);
+		return _priv_GL_createShader(GL_VERTEX_SHADER, source);
 	}
 	
 	sl_uint32 GL_BASE::createFragmentShader(const String& source)
 	{
-		return _GL_createShader(GL_FRAGMENT_SHADER, source);
+		return _priv_GL_createShader(GL_FRAGMENT_SHADER, source);
 	}
 	
 	void GL_BASE::deleteShader(sl_uint32 shader)
@@ -335,7 +335,7 @@ namespace slib
 		}
 	}
 	
-	static sl_uint32 _GL_createBuffer(GLenum target, const void* data, sl_size size, sl_bool flagStatic)
+	static sl_uint32 _priv_GL_createBuffer(GLenum target, const void* data, sl_size size, sl_bool flagStatic)
 	{
 		GLuint buffer = 0;
 		GL_ENTRY(glGenBuffers)(1, &buffer);
@@ -347,7 +347,7 @@ namespace slib
 		return 0;
 	}
 	
-	static void _GL_updateBuffer(GLenum target, sl_uint32 buffer, sl_size offset, const void* data, sl_size size)
+	static void _priv_GL_updateBuffer(GLenum target, sl_uint32 buffer, sl_size offset, const void* data, sl_size size)
 	{
 		if (buffer) {
 			GL_ENTRY(glBindBuffer)(target, buffer);
@@ -357,17 +357,17 @@ namespace slib
 	
 	sl_uint32 GL_BASE::createVertexBuffer(const void* data, sl_size size, sl_bool flagStatic)
 	{
-		return _GL_createBuffer(GL_ARRAY_BUFFER, data, size, flagStatic);
+		return _priv_GL_createBuffer(GL_ARRAY_BUFFER, data, size, flagStatic);
 	}
 	
 	sl_uint32 GL_BASE::createVertexBuffer(sl_size size, sl_bool flagStatic)
 	{
-		return _GL_createBuffer(GL_ARRAY_BUFFER, sl_null, size, flagStatic);
+		return _priv_GL_createBuffer(GL_ARRAY_BUFFER, sl_null, size, flagStatic);
 	}
 	
 	void GL_BASE::updateVertexBuffer(sl_uint32 buffer, sl_size offset, const void* data, sl_size size)
 	{
-		_GL_updateBuffer(GL_ARRAY_BUFFER, buffer, offset, data, size);
+		_priv_GL_updateBuffer(GL_ARRAY_BUFFER, buffer, offset, data, size);
 	}
 	
 	void GL_BASE::bindVertexBuffer(sl_uint32 buffer)
@@ -382,17 +382,17 @@ namespace slib
 	
 	sl_uint32 GL_BASE::createIndexBuffer(const void* data, sl_size size, sl_bool flagStatic)
 	{
-		return _GL_createBuffer(GL_ELEMENT_ARRAY_BUFFER, data, size, flagStatic);
+		return _priv_GL_createBuffer(GL_ELEMENT_ARRAY_BUFFER, data, size, flagStatic);
 	}
 	
 	sl_uint32 GL_BASE::createIndexBuffer(sl_size size, sl_bool flagStatic)
 	{
-		return _GL_createBuffer(GL_ELEMENT_ARRAY_BUFFER, sl_null, size, flagStatic);
+		return _priv_GL_createBuffer(GL_ELEMENT_ARRAY_BUFFER, sl_null, size, flagStatic);
 	}
 	
 	void GL_BASE::updateIndexBuffer(sl_uint32 buffer, sl_size offset, const void* data, sl_size size)
 	{
-		_GL_updateBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer, offset, data, size);
+		_priv_GL_updateBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer, offset, data, size);
 	}
 	
 	void GL_BASE::bindIndexBuffer(sl_uint32 buffer)
@@ -422,7 +422,7 @@ namespace slib
 		return -1;
 	}
 	
-	static void _GL_setVertexArrayAttribute(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
+	static void _priv_GL_setVertexArrayAttribute(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
 	{
 		if (attributeLocation != -1) {
 			GL_ENTRY(glEnableVertexAttribArray)(attributeLocation);
@@ -430,21 +430,21 @@ namespace slib
 		}
 	}
 	
-#define _SL_SETVERTEXARRAY(t) \
+#define PRIV_DEFINE_SETVERTEXARRAY(t) \
 	void GL_BASE::setVertex##t##ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) \
 	{ \
-		_GL_setVertexArrayAttribute(attributeLocation, data, countComponents, strideBytes, flagDoNormalize); \
+		_priv_GL_setVertexArrayAttribute(attributeLocation, data, countComponents, strideBytes, flagDoNormalize); \
 	} \
 	void GL_BASE::setVertex##t##ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) \
 	{ \
-		_GL_setVertexArrayAttribute(attributeLocation, (void*)offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize); \
+		_priv_GL_setVertexArrayAttribute(attributeLocation, (void*)offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize); \
 	}
 	
-	_SL_SETVERTEXARRAY(Float)
-	_SL_SETVERTEXARRAY(Int8)
-	_SL_SETVERTEXARRAY(Uint8)
-	_SL_SETVERTEXARRAY(Int16)
-	_SL_SETVERTEXARRAY(Uint16)
+	PRIV_DEFINE_SETVERTEXARRAY(Float)
+	PRIV_DEFINE_SETVERTEXARRAY(Int8)
+	PRIV_DEFINE_SETVERTEXARRAY(Uint8)
+	PRIV_DEFINE_SETVERTEXARRAY(Int16)
+	PRIV_DEFINE_SETVERTEXARRAY(Uint16)
 	
 	void GL_BASE::disableVertexArrayAttribute(sl_int32 attributeLocation)
 	{
@@ -731,7 +731,7 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE static GLenum _GL_getPrimitiveType(PrimitiveType type)
+	SLIB_INLINE static GLenum _priv_GL_getPrimitiveType(PrimitiveType type)
 	{
 		switch (type) {
 			case PrimitiveType::Triangle:
@@ -754,12 +754,12 @@ namespace slib
 	
 	void GL_BASE::drawPrimitives(PrimitiveType type, sl_uint32 countVertices, sl_uint32 startIndex)
 	{
-		GL_ENTRY(glDrawArrays)(_GL_getPrimitiveType(type), startIndex, countVertices);
+		GL_ENTRY(glDrawArrays)(_priv_GL_getPrimitiveType(type), startIndex, countVertices);
 	}
 	
 	void GL_BASE::drawElements(PrimitiveType type, sl_uint32 countIndices, sl_size offsetBytes)
 	{
-		GL_ENTRY(glDrawElements)(_GL_getPrimitiveType(type), countIndices, GL_UNSIGNED_SHORT, (void*)offsetBytes);
+		GL_ENTRY(glDrawElements)(_priv_GL_getPrimitiveType(type), countIndices, GL_UNSIGNED_SHORT, (void*)offsetBytes);
 	}
 	
 	void GL_BASE::setLineWidth(float width)
@@ -991,7 +991,7 @@ namespace slib
 		GL_ENTRY(glBindTexture)(GL_TEXTURE_2D, 0);
 	}
 	
-	static GLenum _GL_getFilter(TextureFilterMode filter)
+	static GLenum _priv_GL_getFilter(TextureFilterMode filter)
 	{
 		switch (filter) {
 			case TextureFilterMode::Linear:
@@ -1005,11 +1005,11 @@ namespace slib
 	void GL_BASE::setTextureFilterMode(sl_uint32 target, TextureFilterMode minFilter, TextureFilterMode magFilter)
 	{
 		GLenum f;
-		f = _GL_getFilter(minFilter);
+		f = _priv_GL_getFilter(minFilter);
 		if (f != GL_NONE) {
 			GL_ENTRY(glTexParameteri)(target, GL_TEXTURE_MIN_FILTER, f);
 		}
-		f = _GL_getFilter(magFilter);
+		f = _priv_GL_getFilter(magFilter);
 		if (f != GL_NONE) {
 			GL_ENTRY(glTexParameteri)(target, GL_TEXTURE_MAG_FILTER, f);
 		}
@@ -1020,7 +1020,7 @@ namespace slib
 		setTextureFilterMode(GL_TEXTURE_2D, minFilter, magFilter);
 	}
 	
-	static GLenum _GL_getWrap(TextureWrapMode wrap)
+	static GLenum _priv_GL_getWrap(TextureWrapMode wrap)
 	{
 		switch (wrap) {
 			case TextureWrapMode::Repeat:
@@ -1036,11 +1036,11 @@ namespace slib
 	void GL_BASE::setTextureWrapMode(sl_uint32 target, TextureWrapMode wrapX, TextureWrapMode wrapY)
 	{
 		GLenum f;
-		f = _GL_getWrap(wrapX);
+		f = _priv_GL_getWrap(wrapX);
 		if (f != GL_NONE) {
 			GL_ENTRY(glTexParameteri)(target, GL_TEXTURE_WRAP_S, f);
 		}
-		f = _GL_getWrap(wrapY);
+		f = _priv_GL_getWrap(wrapY);
 		if (f != GL_NONE) {
 			GL_ENTRY(glTexParameteri)(target, GL_TEXTURE_WRAP_T, f);
 		}
@@ -1068,33 +1068,33 @@ namespace slib
 	public:
 		CList<sl_uint32> m_listDirtyBufferHandles;
 		CList<sl_uint32> m_listDirtyTextureHandles;
-		struct _ProgramHandle {
+		struct GLProgramHandle {
 			sl_uint32 program;
 			sl_uint32 vertexShader;
 			sl_uint32 fragmentShader;
 		};
-		CList<_ProgramHandle> m_listDirtyProgramHandles;
+		CList<GLProgramHandle> m_listDirtyProgramHandles;
 		CList< Ref<Referable> > m_listDirtyObjects;
 		
-		class _RenderProgramInstance;
+		class GLRenderProgramInstance;
 		Ref<RenderProgram> m_currentProgram;
-		Ref<_RenderProgramInstance> m_currentProgramInstance;
+		Ref<GLRenderProgramInstance> m_currentProgramInstance;
 		
-		class _VertexBufferInstance;
-		Ref<_VertexBufferInstance> m_currentVertexBufferInstance;
+		class GLVertexBufferInstance;
+		Ref<GLVertexBufferInstance> m_currentVertexBufferInstance;
 		
-		class _IndexBufferInstance;
-		Ref<_IndexBufferInstance> m_currentIndexBufferInstance;
+		class GLIndexBufferInstance;
+		Ref<GLIndexBufferInstance> m_currentIndexBufferInstance;
 		
 		Ref<RenderProgram> m_currentProgramRendering;
-		Ref<_RenderProgramInstance> m_currentProgramInstanceRendering;
+		Ref<GLRenderProgramInstance> m_currentProgramInstanceRendering;
 		
-		class _TextureInstance;
+		class GLTextureInstance;
 		
-		class _SamplerState {
+		class GLSamplerState {
 		public:
 			Ref<Texture> texture;
-			Ref<_TextureInstance> instance;
+			Ref<GLTextureInstance> instance;
 			TextureFilterMode minFilter;
 			TextureFilterMode magFilter;
 			TextureWrapMode wrapX;
@@ -1106,7 +1106,7 @@ namespace slib
 				instance.setNull();
 			}
 		};
-		_SamplerState m_samplers[MAX_SAMPLER_COUNT];
+		GLSamplerState m_samplers[MAX_SAMPLER_COUNT];
 		sl_uint32 m_nSamplers;
 		sl_uint32 m_activeSampler;
 		
@@ -1139,7 +1139,7 @@ namespace slib
 				m_listDirtyTextureHandles.removeAll_NoLock();
 			}
 			{
-				ListLocker<_ProgramHandle> list(m_listDirtyProgramHandles);
+				ListLocker<GLProgramHandle> list(m_listDirtyProgramHandles);
 				for (sl_size i = 0; i < list.count; i++) {
 					GL_BASE::deleteProgram(list[i].program);
 					GL_BASE::deleteShader(list[i].vertexShader);
@@ -1154,14 +1154,14 @@ namespace slib
 		
 		RenderEngineType getEngineType() override
 		{
-#if defined(_OPENGL_ES_IMPL)
+#if defined(PRIV_OPENGL_ES_IMPL)
 			return RenderEngineType::OpenGL_ES;
 #else
 			return RenderEngineType::OpenGL;
 #endif
 		}
 		
-		class _RenderProgramInstance : public RenderProgramInstance
+		class GLRenderProgramInstance : public RenderProgramInstance
 		{
 		public:
 			sl_uint32 vertexShader;
@@ -1170,18 +1170,18 @@ namespace slib
 			Ref<RenderProgramState> state;
 			
 		public:
-			_RenderProgramInstance()
+			GLRenderProgramInstance()
 			{
 				vertexShader = -1;
 				fragmentShader = -1;
 				program = -1;
 			}
 			
-			~_RenderProgramInstance()
+			~GLRenderProgramInstance()
 			{
 				Ref<RenderEngine> engine = getEngine();
 				if (engine.isNotNull()) {
-					_ProgramHandle handle;
+					GLProgramHandle handle;
 					handle.program = program;
 					handle.vertexShader = vertexShader;
 					handle.fragmentShader = fragmentShader;
@@ -1190,7 +1190,7 @@ namespace slib
 			}
 			
 		public:
-			static Ref<_RenderProgramInstance> create(GL_ENGINE* engine, RenderProgram* program)
+			static Ref<GLRenderProgramInstance> create(GL_ENGINE* engine, RenderProgram* program)
 			{
 				String vsSource = convertShader(program->getGLSLVertexShader(engine));
 				String fsSource = convertShader(program->getGLSLFragmentShader(engine));
@@ -1206,7 +1206,7 @@ namespace slib
 									state->gl_program = ph;
 									state->gl_engine = engine;
 									if (program->onInit(engine, state.get())) {
-										Ref<_RenderProgramInstance> ret = new _RenderProgramInstance();
+										Ref<GLRenderProgramInstance> ret = new GLRenderProgramInstance();
 										if (ret.isNotNull()) {
 											ret->program = ph;
 											ret->vertexShader = vs;
@@ -1229,7 +1229,7 @@ namespace slib
 			
 			static String convertShader(String glsl)
 			{
-#if defined(_OPENGL_IMPL)
+#if defined(PRIV_OPENGL_IMPL)
 #else
 				if (! (glsl.contains("precision highp float;") || glsl.contains("precision mediump float;") || glsl.contains("precision lowp float;"))) {
 					glsl = "precision mediump float;" + glsl;
@@ -1247,21 +1247,21 @@ namespace slib
 		
 		Ref<RenderProgramInstance> _createProgramInstance(RenderProgram* program) override
 		{
-			return _RenderProgramInstance::create(this, program);
+			return GLRenderProgramInstance::create(this, program);
 		}
 		
-		class _VertexBufferInstance : public VertexBufferInstance
+		class GLVertexBufferInstance : public VertexBufferInstance
 		{
 		public:
 			sl_uint32 handle;
 			
 		public:
-			_VertexBufferInstance()
+			GLVertexBufferInstance()
 			{
 				handle = -1;
 			}
 			
-			~_VertexBufferInstance()
+			~GLVertexBufferInstance()
 			{
 				Ref<RenderEngine> engine = getEngine();
 				if (engine.isNotNull()) {
@@ -1270,11 +1270,11 @@ namespace slib
 			}
 			
 		public:
-			static Ref<_VertexBufferInstance> create(GL_ENGINE* engine, VertexBuffer* buffer)
+			static Ref<GLVertexBufferInstance> create(GL_ENGINE* engine, VertexBuffer* buffer)
 			{
 				sl_uint32 handle = GL_BASE::createVertexBuffer(buffer->getBuffer(), buffer->getSize(), buffer->isStatic());
 				if (handle) {
-					Ref<_VertexBufferInstance> ret = new _VertexBufferInstance();
+					Ref<GLVertexBufferInstance> ret = new GLVertexBufferInstance();
 					if (ret.isNotNull()) {
 						ret->handle = handle;
 						ret->link(engine, buffer);
@@ -1295,21 +1295,21 @@ namespace slib
 		
 		Ref<VertexBufferInstance> _createVertexBufferInstance(VertexBuffer* buffer) override
 		{
-			return _VertexBufferInstance::create(this, buffer);
+			return GLVertexBufferInstance::create(this, buffer);
 		}
 		
-		class _IndexBufferInstance : public IndexBufferInstance
+		class GLIndexBufferInstance : public IndexBufferInstance
 		{
 		public:
 			sl_uint32 handle;
 			
 		public:
-			_IndexBufferInstance()
+			GLIndexBufferInstance()
 			{
 				handle = -1;
 			}
 			
-			~_IndexBufferInstance()
+			~GLIndexBufferInstance()
 			{
 				Ref<RenderEngine> engine = getEngine();
 				if (engine.isNotNull()) {
@@ -1318,11 +1318,11 @@ namespace slib
 			}
 			
 		public:
-			static Ref<_IndexBufferInstance> create(GL_ENGINE* engine, IndexBuffer* buffer)
+			static Ref<GLIndexBufferInstance> create(GL_ENGINE* engine, IndexBuffer* buffer)
 			{
 				sl_uint32 handle = GL_BASE::createIndexBuffer(buffer->getBuffer(), buffer->getSize(), buffer->isStatic());
 				if (handle) {
-					Ref<_IndexBufferInstance> ret = new _IndexBufferInstance();
+					Ref<GLIndexBufferInstance> ret = new GLIndexBufferInstance();
 					if (ret.isNotNull()) {
 						ret->handle = handle;
 						ret->link(engine, buffer);
@@ -1343,21 +1343,21 @@ namespace slib
 		
 		Ref<IndexBufferInstance> _createIndexBufferInstance(IndexBuffer* buffer) override
 		{
-			return _IndexBufferInstance::create(this, buffer);
+			return GLIndexBufferInstance::create(this, buffer);
 		}
 		
-		class _TextureInstance : public TextureInstance
+		class GLTextureInstance : public TextureInstance
 		{
 		public:
 			sl_uint32 handle;
 			
 		public:
-			_TextureInstance()
+			GLTextureInstance()
 			{
 				handle = -1;
 			}
 			
-			~_TextureInstance()
+			~GLTextureInstance()
 			{
 				Ref<RenderEngine> engine = getEngine();
 				if (engine.isNotNull()) {
@@ -1366,14 +1366,14 @@ namespace slib
 			}
 			
 		public:
-			static Ref<_TextureInstance> create(GL_ENGINE* engine, Texture* texture)
+			static Ref<GLTextureInstance> create(GL_ENGINE* engine, Texture* texture)
 			{
 				sl_uint32 handle = GL_BASE::createTexture2D(texture->getSource());;
 				if (texture->isFreeSourceOnUpdate()) {
 					texture->freeSource();
 				}
 				if (handle) {
-					Ref<_TextureInstance> ret = new _TextureInstance();
+					Ref<GLTextureInstance> ret = new GLTextureInstance();
 					if (ret.isNotNull()) {
 						ret->handle = handle;
 						ret->link(engine, texture);
@@ -1396,7 +1396,7 @@ namespace slib
 			
 		};
 		
-		class _NamedTexture : public EngineTexture
+		class GLNamedTexture : public EngineTexture
 		{
 		public:
 			WeakRef<GL_ENGINE> m_engine;
@@ -1405,12 +1405,12 @@ namespace slib
 			sl_bool m_flagDeleteOnRelease;
 			
 		public:
-			_NamedTexture(GL_ENGINE* engine, sl_uint32 target, sl_uint32 name, sl_bool flagDeleteOnRelease):
+			GLNamedTexture(GL_ENGINE* engine, sl_uint32 target, sl_uint32 name, sl_bool flagDeleteOnRelease):
 		 m_engine(engine), m_target(target), m_name(name), m_flagDeleteOnRelease(flagDeleteOnRelease)
 			{
 			}
 			
-			~_NamedTexture()
+			~GLNamedTexture()
 			{
 				Ref<GL_ENGINE> engine = m_engine;
 				if (engine.isNotNull()) {
@@ -1428,7 +1428,7 @@ namespace slib
 		
 		Ref<TextureInstance> _createTextureInstance(Texture* texture) override
 		{
-			return _TextureInstance::create(this, texture);
+			return GLTextureInstance::create(this, texture);
 		}
 		
 		sl_bool _beginScene() override
@@ -1478,7 +1478,7 @@ namespace slib
 		
 		sl_bool _beginProgram(RenderProgram* program, RenderProgramInstance* _instance, RenderProgramState** ppState) override
 		{
-			_RenderProgramInstance* instance = (_RenderProgramInstance*)_instance;
+			GLRenderProgramInstance* instance = (GLRenderProgramInstance*)_instance;
 			if (m_currentProgramInstance != instance) {
 				GL_BASE::useProgram(instance->program);
 				m_currentProgramInstance = instance;
@@ -1517,11 +1517,11 @@ namespace slib
 				return;
 			}
 			
-			_VertexBufferInstance* vb = static_cast<_VertexBufferInstance*>(primitive->vertexBufferInstance.get());
+			GLVertexBufferInstance* vb = static_cast<GLVertexBufferInstance*>(primitive->vertexBufferInstance.get());
 			vb->_update(primitive->vertexBuffer.get());
-			_IndexBufferInstance* ib = sl_null;
+			GLIndexBufferInstance* ib = sl_null;
 			if (primitive->indexBufferInstance.isNotNull()) {
-				ib = (_IndexBufferInstance*)(primitive->indexBufferInstance.get());
+				ib = (GLIndexBufferInstance*)(primitive->indexBufferInstance.get());
 				ib->_update(primitive->indexBuffer.get());
 			}
 			
@@ -1592,7 +1592,7 @@ namespace slib
 				return;
 			}
 			if (_instance) {
-				_TextureInstance* instance = (_TextureInstance*)_instance;
+				GLTextureInstance* instance = (GLTextureInstance*)_instance;
 				if (instance->_isUpdated()) {
 					_setActiveSampler(samplerNo);
 					instance->_update(texture);
@@ -1625,7 +1625,7 @@ namespace slib
 			} else {
 				if (m_samplers[samplerNo].texture != texture) {
 					_setActiveSampler(samplerNo);
-					_NamedTexture* named = static_cast<_NamedTexture*>(texture);
+					GLNamedTexture* named = static_cast<GLNamedTexture*>(texture);
 					GL_BASE::bindTexture(named->m_target, named->m_name);
 					GL_BASE::setTextureFilterMode(named->m_target, texture->getMinFilter(), texture->getMagFilter());
 					GL_BASE::setTextureWrapMode(named->m_target, texture->getWrapX(), texture->getWrapY());
@@ -1663,7 +1663,7 @@ namespace slib
 		
 		Ref<Texture> createTextureFromName(sl_uint32 target, sl_uint32 name, sl_bool flagDeleteOnRelease) override
 		{
-			return new _NamedTexture(this, target, name, flagDeleteOnRelease);
+			return new GLNamedTexture(this, target, name, flagDeleteOnRelease);
 		}
 		
 		sl_int32 getAttributeLocation(sl_uint32 program, const char* name) override

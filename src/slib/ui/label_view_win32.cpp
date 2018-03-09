@@ -19,7 +19,7 @@
 namespace slib
 {
 
-	class _Win32_LabelViewInstance : public Win32_ViewInstance
+	class _priv_Win32_LabelViewInstance : public Win32_ViewInstance
 	{
 		SLIB_DECLARE_OBJECT
 
@@ -29,14 +29,14 @@ namespace slib
 		HBRUSH m_hBrushBackground;
 
 	public:
-		_Win32_LabelViewInstance()
+		_priv_Win32_LabelViewInstance()
 		{
 			m_hBrushBackground = NULL;
 			m_colorText = Color::zero();
 			m_colorBackground = Color::zero();
 		}
 
-		~_Win32_LabelViewInstance()
+		~_priv_Win32_LabelViewInstance()
 		{
 			if (m_hBrushBackground) {
 				::DeleteObject(m_hBrushBackground);
@@ -102,7 +102,7 @@ namespace slib
 		}
 	};
 
-	SLIB_DEFINE_OBJECT(_Win32_LabelViewInstance, Win32_ViewInstance)
+	SLIB_DEFINE_OBJECT(_priv_Win32_LabelViewInstance, Win32_ViewInstance)
 
 	Ref<ViewInstance> LabelView::createNativeWidget(ViewInstance* parent)
 	{
@@ -122,7 +122,7 @@ namespace slib
 			style |= SS_RIGHT;
 		}
 		String16 text = m_text;
-		Ref<_Win32_LabelViewInstance> ret = Win32_ViewInstance::create<_Win32_LabelViewInstance>(this, parent, L"STATIC", (LPCWSTR)(text.getData()), style, 0);
+		Ref<_priv_Win32_LabelViewInstance> ret = Win32_ViewInstance::create<_priv_Win32_LabelViewInstance>(this, parent, L"STATIC", (LPCWSTR)(text.getData()), style, 0);
 		if (ret.isNotNull()) {
 
 			HWND handle = ret->getHandle();
@@ -167,7 +167,7 @@ namespace slib
 	void LabelView::_setTextColor_NW(const Color& color)
 	{
 		Ref<ViewInstance> _instance = getViewInstance();
-		if (_Win32_LabelViewInstance* instance = CastInstance<_Win32_LabelViewInstance>(_instance.get())) {
+		if (_priv_Win32_LabelViewInstance* instance = CastInstance<_priv_Win32_LabelViewInstance>(_instance.get())) {
 			instance->setTextColor(color); 
 		}
 	}
@@ -201,7 +201,7 @@ namespace slib
 	void LabelView::_setBackgroundColor_NW(const Color& color)
 	{
 		Ref<ViewInstance> _instance = getViewInstance();
-		if (_Win32_LabelViewInstance* instance = CastInstance<_Win32_LabelViewInstance>(_instance.get())) {
+		if (_priv_Win32_LabelViewInstance* instance = CastInstance<_priv_Win32_LabelViewInstance>(_instance.get())) {
 			instance->setBackgroundColor(color);
 		}
 	}

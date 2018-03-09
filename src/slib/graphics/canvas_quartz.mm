@@ -22,7 +22,7 @@
 namespace slib
 {
 
-	class _Quartz_Canvas : public Canvas
+	class _priv_Quartz_Canvas : public Canvas
 	{
 		SLIB_DECLARE_OBJECT
 		
@@ -30,21 +30,21 @@ namespace slib
 		CGContextRef m_graphics;
 		
 	public:
-		_Quartz_Canvas()
+		_priv_Quartz_Canvas()
 		{
 		}
 		
-		~_Quartz_Canvas()
+		~_priv_Quartz_Canvas()
 		{
 			CGContextRelease(m_graphics);
 		}
 		
 	public:
-		static Ref<_Quartz_Canvas> _create(CanvasType type, CGContextRef graphics, sl_real width, sl_real height)
+		static Ref<_priv_Quartz_Canvas> _create(CanvasType type, CGContextRef graphics, sl_real width, sl_real height)
 		{
 			if (graphics) {
 				
-				Ref<_Quartz_Canvas> ret = new _Quartz_Canvas();
+				Ref<_priv_Quartz_Canvas> ret = new _priv_Quartz_Canvas();
 				
 				if (ret.isNotNull()) {
 					
@@ -474,19 +474,19 @@ namespace slib
 		
 	};
 
-	SLIB_DEFINE_OBJECT(_Quartz_Canvas, Canvas)
+	SLIB_DEFINE_OBJECT(_priv_Quartz_Canvas, Canvas)
 
 	Ref<Canvas> GraphicsPlatform::createCanvas(CanvasType type, CGContextRef graphics, sl_uint32 width, sl_uint32 height)
 	{
 		if (!graphics) {
 			return sl_null;
 		}
-		return _Quartz_Canvas::_create(type, graphics, (sl_real)width, (sl_real)height);
+		return _priv_Quartz_Canvas::_create(type, graphics, (sl_real)width, (sl_real)height);
 	}
 
 	CGContextRef GraphicsPlatform::getCanvasHandle(Canvas* _canvas)
 	{
-		if (_Quartz_Canvas* canvas = CastInstance<_Quartz_Canvas>(_canvas)) {
+		if (_priv_Quartz_Canvas* canvas = CastInstance<_priv_Quartz_Canvas>(_canvas)) {
 			return canvas->m_graphics;
 		}
 		return NULL;

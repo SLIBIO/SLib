@@ -16,9 +16,9 @@
 
 #include "view_osx.h"
 
-@interface _Slib_OSX_LabelTextField : NSTextField {
+@interface _priv_Slib_macOS_LabelTextField : NSTextField {
 	
-	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 	
 }
 @end
@@ -26,7 +26,7 @@
 namespace slib
 {
 
-	class _LabelView : public LabelView
+	class _priv_LabelView : public LabelView
 	{
 	public:
 		void _applyProperties(NSTextField* handle)
@@ -69,14 +69,14 @@ namespace slib
 
 	Ref<ViewInstance> LabelView::createNativeWidget(ViewInstance* _parent)
 	{
-		OSX_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_OSX_LabelTextField* handle = [[_Slib_OSX_LabelTextField alloc] initWithFrame:frame];
+		MACOS_VIEW_CREATE_INSTANCE_BEGIN
+		_priv_Slib_macOS_LabelTextField* handle = [[_priv_Slib_macOS_LabelTextField alloc] initWithFrame:frame];
 		if (handle != nil) {
 			[handle setEditable:NO];
 			[handle setSelectable:NO];
-			((_LabelView*)this)->_applyProperties(handle);
+			((_priv_LabelView*)this)->_applyProperties(handle);
 		}
-		OSX_VIEW_CREATE_INSTANCE_END
+		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
 
@@ -94,7 +94,7 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
 			NSTextField* tv = (NSTextField*)handle;
-			[tv setAlignment:_LabelView::translateAlignment(align)];
+			[tv setAlignment:_priv_LabelView::translateAlignment(align)];
 		}
 	}
 
@@ -139,7 +139,7 @@ namespace slib
 
 }
 
-@implementation _Slib_OSX_LabelTextField
+@implementation _priv_Slib_macOS_LabelTextField
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -150,7 +150,7 @@ namespace slib
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		instance->onClick();
 	}

@@ -15,7 +15,7 @@
 namespace slib
 {
 
-	class _RadioButton_Icon : public Drawable
+	class _priv_RadioButton_Icon : public Drawable
 	{
 	public:
 		Ref<Pen> m_penBorder;
@@ -23,7 +23,7 @@ namespace slib
 		Ref<Brush> m_brushCheck;
 		
 	public:
-		_RadioButton_Icon(const Ref<Pen>& penBorder, const Color& backColor, const Color& checkColor)
+		_priv_RadioButton_Icon(const Ref<Pen>& penBorder, const Color& backColor, const Color& checkColor)
 		{
 			m_penBorder = penBorder;
 			if (backColor.a > 0) {
@@ -53,12 +53,12 @@ namespace slib
 		
 	};
 
-	class _RadioButton_Categories
+	class _priv_RadioButton_Categories
 	{
 	public:
 		ButtonCategory categories[2];
 		
-		_RadioButton_Categories()
+		_priv_RadioButton_Categories()
 		{
 			Color colorBackNormal = Color::White;
 			Color colorBackHover = Color::White;
@@ -72,21 +72,21 @@ namespace slib
 			Color colorCheckDisabled = Color(90, 90, 90);
 			Color colorCheckHover = Color(0, 80, 200);
 			Color colorCheckDown = colorCheckHover;
-			categories[0].properties[(int)ButtonState::Normal].icon = new _RadioButton_Icon(penNormal, colorBackNormal, Color::zero());
-			categories[0].properties[(int)ButtonState::Disabled].icon = new _RadioButton_Icon(penDisabled, colorBackDisabled, Color::zero());
-			categories[0].properties[(int)ButtonState::Hover].icon = new _RadioButton_Icon(penHover, colorBackHover, Color::zero());
-			categories[0].properties[(int)ButtonState::Pressed].icon = new _RadioButton_Icon(penDown, colorBackDown, Color::zero());
+			categories[0].properties[(int)ButtonState::Normal].icon = new _priv_RadioButton_Icon(penNormal, colorBackNormal, Color::zero());
+			categories[0].properties[(int)ButtonState::Disabled].icon = new _priv_RadioButton_Icon(penDisabled, colorBackDisabled, Color::zero());
+			categories[0].properties[(int)ButtonState::Hover].icon = new _priv_RadioButton_Icon(penHover, colorBackHover, Color::zero());
+			categories[0].properties[(int)ButtonState::Pressed].icon = new _priv_RadioButton_Icon(penDown, colorBackDown, Color::zero());
 			
 			categories[1] = categories[0];
-			categories[1].properties[(int)ButtonState::Normal].icon = new _RadioButton_Icon(penNormal, colorBackNormal, colorCheckNormal);
-			categories[1].properties[(int)ButtonState::Disabled].icon = new _RadioButton_Icon(penDisabled, colorBackDisabled, colorCheckDisabled);
-			categories[1].properties[(int)ButtonState::Hover].icon = new _RadioButton_Icon(penHover, colorBackHover, colorCheckHover);
-			categories[1].properties[(int)ButtonState::Pressed].icon = new _RadioButton_Icon(penDown, colorBackDown, colorCheckDown);
+			categories[1].properties[(int)ButtonState::Normal].icon = new _priv_RadioButton_Icon(penNormal, colorBackNormal, colorCheckNormal);
+			categories[1].properties[(int)ButtonState::Disabled].icon = new _priv_RadioButton_Icon(penDisabled, colorBackDisabled, colorCheckDisabled);
+			categories[1].properties[(int)ButtonState::Hover].icon = new _priv_RadioButton_Icon(penHover, colorBackHover, colorCheckHover);
+			categories[1].properties[(int)ButtonState::Pressed].icon = new _priv_RadioButton_Icon(penDown, colorBackDown, colorCheckDown);
 		}
 		
 		static ButtonCategory* getCategories()
 		{
-			SLIB_SAFE_STATIC(_RadioButton_Categories, ret)
+			SLIB_SAFE_STATIC(_priv_RadioButton_Categories, ret)
 			if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
 				return sl_null;
 			}
@@ -98,7 +98,7 @@ namespace slib
 
 	SLIB_DEFINE_OBJECT(RadioButton, CheckBox)
 
-	RadioButton::RadioButton() : CheckBox(2, _RadioButton_Categories::getCategories())
+	RadioButton::RadioButton() : CheckBox(2, _priv_RadioButton_Categories::getCategories())
 	{
 		setCreatingNativeWidget(sl_true);
 	}

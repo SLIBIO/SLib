@@ -21,16 +21,16 @@
 namespace slib
 {
 
-	void _AndroidAnimation_onStop(JNIEnv* env, jobject _this, jlong ptr);
+	void _priv_AndroidAnimation_onStop(JNIEnv* env, jobject _this, jlong ptr);
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidAnimation, "slib/platform/android/ui/UiAnimation")
+	SLIB_JNI_BEGIN_CLASS(JAndroidAnimation, "slib/platform/android/ui/UiAnimation")
 		SLIB_JNI_STATIC_METHOD(start, "start", "(Landroid/view/View;JFFIIZFFZFFFFZFFFFZFFZFF)Lslib/platform/android/ui/UiAnimation;");
 		SLIB_JNI_METHOD(stop, "stop", "()V");
-		SLIB_JNI_NATIVE(nativeOnStop, "nativeOnStop", "(J)V", _AndroidAnimation_onStop);
+		SLIB_JNI_NATIVE(nativeOnStop, "nativeOnStop", "(J)V", _priv_AndroidAnimation_onStop);
 	SLIB_JNI_END_CLASS
 
-	typedef CHashMap< sl_reg, Function<void()> > _AndroidAnimationStopMap;
-	SLIB_SAFE_STATIC_GETTER(_AndroidAnimationStopMap, _AndroidAnimationStopMap_get);
+	typedef CHashMap< sl_reg, Function<void()> > _priv_AndroidAnimationStopMap;
+	SLIB_SAFE_STATIC_GETTER(_priv_AndroidAnimationStopMap, _priv_AndroidAnimationStopMap_get);
 
 	sl_bool UIAnimationLoop::_applyNativeAnimation(Animation* animation)
 	{
@@ -105,7 +105,7 @@ namespace slib
 
 			sl_reg id = animation->getId();
 
-			_AndroidAnimationStopMap* map = _AndroidAnimationStopMap_get();
+			_priv_AndroidAnimationStopMap* map = _priv_AndroidAnimationStopMap_get();
 			if (map) {
 				Ref<Animation> _animation = animation;
 				Function<void()> onStop = [=](){
@@ -140,7 +140,7 @@ namespace slib
 						anchor = viewAnimate->getAnchorOffset();
 					}
 				}
-				JniLocal<jobject> ret = _JAndroidAnimation::start.callObject(sl_null, handle, (jlong)id, animation->getDuration(), animation->getStartDelay(),
+				JniLocal<jobject> ret = JAndroidAnimation::start.callObject(sl_null, handle, (jlong)id, animation->getDuration(), animation->getStartDelay(),
 											(int)(animation->getAnimationCurve()), animation->getRepeatCount(), animation->isAutoReverse(),
 											anchor.x, anchor.y,
 											flagTranslate, translateStart.x, translateStart.y, translateEnd.x, translateEnd.y,
@@ -162,13 +162,13 @@ namespace slib
 		Ref<Referable> _animator = _getNativeInstance(animation);
 		JniGlobal<jobject> animator = CastInstance< CJniGlobal<jobject> >(_animator.get());
 		if (animator.isNotNull()) {
-			_JAndroidAnimation::stop.call(animator.get());
+			JAndroidAnimation::stop.call(animator.get());
 		}
 	}
 
-	void _AndroidAnimation_onStop(JNIEnv* env, jobject _this, jlong id)
+	void _priv_AndroidAnimation_onStop(JNIEnv* env, jobject _this, jlong id)
 	{
-		_AndroidAnimationStopMap* map = _AndroidAnimationStopMap_get();
+		_priv_AndroidAnimationStopMap* map = _priv_AndroidAnimationStopMap_get();
 		if (map) {
 			Function<void()> onStop;
 			map->remove((sl_reg)id, &onStop);

@@ -294,7 +294,7 @@ namespace slib
 	}
 	
 	template <class ST, class CT>
-	class _Json_Parser
+	class _priv_Json_Parser
 	{
 	public:
 		const CT* buf = sl_null;
@@ -311,7 +311,7 @@ namespace slib
 		ST strFalse;
 		
 	public:
-		_Json_Parser();
+		_priv_Json_Parser();
 		
 	public:
 		void escapeSpaceAndComments();
@@ -323,7 +323,7 @@ namespace slib
 	};
 
 	template <>
-	_Json_Parser<String, sl_char8>::_Json_Parser()
+	_priv_Json_Parser<String, sl_char8>::_priv_Json_Parser()
 	{
 		SLIB_STATIC_STRING(_null, "null");
 		strNull = _null;
@@ -334,7 +334,7 @@ namespace slib
 	}
 
 	template <>
-	_Json_Parser<String16, sl_char16>::_Json_Parser()
+	_priv_Json_Parser<String16, sl_char16>::_priv_Json_Parser()
 	{
 		SLIB_STATIC_STRING16_BY_ARRAY(_null, 'n', 'u', 'l', 'l');
 		strNull = _null;
@@ -345,7 +345,7 @@ namespace slib
 	}
 
 	template <class ST, class CT>
-	void _Json_Parser<ST, CT>::escapeSpaceAndComments()
+	void _priv_Json_Parser<ST, CT>::escapeSpaceAndComments()
 	{
 		sl_bool flagLineComment = sl_false;
 		sl_bool flagBlockComment = sl_false;
@@ -387,7 +387,7 @@ namespace slib
 	}
 
 	template <class ST, class CT>
-	Json _Json_Parser<ST, CT>::parseJson()
+	Json _priv_Json_Parser<ST, CT>::parseJson()
 	{
 		escapeSpaceAndComments();
 		if (pos == len) {
@@ -611,11 +611,11 @@ namespace slib
 	}
 
 	template <class ST, class CT>
-	Json _Json_Parser<ST, CT>::parseJson(const CT* buf, sl_size len, JsonParseParam& param)
+	Json _priv_Json_Parser<ST, CT>::parseJson(const CT* buf, sl_size len, JsonParseParam& param)
 	{
 		param.flagError = sl_false;
 		
-		_Json_Parser<ST, CT> parser;
+		_priv_Json_Parser<ST, CT> parser;
 		parser.buf = buf;
 		parser.len = len;
 		parser.flagSupportComments = param.flagSupportComments;
@@ -651,7 +651,7 @@ namespace slib
 
 	Json Json::parseJson(const sl_char8* sz, sl_size len, JsonParseParam& param)
 	{
-		return _Json_Parser<String, sl_char8>::parseJson(sz, len, param);
+		return _priv_Json_Parser<String, sl_char8>::parseJson(sz, len, param);
 	}
 
 	Json Json::parseJson(const sl_char8* sz, sl_size len)
@@ -662,7 +662,7 @@ namespace slib
 
 	Json Json::parseJson(const String& json, JsonParseParam& param)
 	{
-		return _Json_Parser<String, sl_char8>::parseJson(json.getData(), json.getLength(), param);
+		return _priv_Json_Parser<String, sl_char8>::parseJson(json.getData(), json.getLength(), param);
 	}
 
 	Json Json::parseJson(const String& json)
@@ -674,7 +674,7 @@ namespace slib
 
 	Json Json::parseJson16(const sl_char16* sz, sl_size len, JsonParseParam& param)
 	{
-		return _Json_Parser<String16, sl_char16>::parseJson(sz, len, param);
+		return _priv_Json_Parser<String16, sl_char16>::parseJson(sz, len, param);
 	}
 
 	Json Json::parseJson16(const sl_char16* sz, sl_size len)
@@ -685,7 +685,7 @@ namespace slib
 
 	Json Json::parseJson16(const String16& json, JsonParseParam& param)
 	{
-		return _Json_Parser<String16, sl_char16>::parseJson(json.getData(), json.getLength(), param);
+		return _priv_Json_Parser<String16, sl_char16>::parseJson(json.getData(), json.getLength(), param);
 	}
 
 	Json Json::parseJson16(const String16& json)

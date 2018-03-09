@@ -15,22 +15,22 @@
 namespace slib
 {
 
-	_SHA256Base::_SHA256Base()
+	_priv_SHA256Base::_priv_SHA256Base()
 	{
 		rdata_len = 0;
 	}
 
-	_SHA256Base::~_SHA256Base()
+	_priv_SHA256Base::~_priv_SHA256Base()
 	{
 	}
 
-	void _SHA256Base::_start()
+	void _priv_SHA256Base::_start()
 	{
 		rdata_len = 0;
 		sizeTotalInput = 0;
 	}
 
-	void _SHA256Base::update(const void* _input, sl_size sizeInput)
+	void _priv_SHA256Base::update(const void* _input, sl_size sizeInput)
 	{
 		if (rdata_len >= 64) {
 			return;
@@ -68,7 +68,7 @@ namespace slib
 		}
 	}
 
-	void _SHA256Base::_finish()
+	void _priv_SHA256Base::_finish()
 	{
 		if (rdata_len >= 64) {
 			return;
@@ -88,7 +88,7 @@ namespace slib
 		rdata_len = 0;
 	}
 
-	void _SHA256Base::_updateSection(const sl_uint8* input)
+	void _priv_SHA256Base::_updateSection(const sl_uint8* input)
 	{
 		static sl_uint32 K[64] = {
 			0x428a2f98ul, 0x71374491ul, 0xb5c0fbcful, 0xe9b5dba5ul,
@@ -209,22 +209,22 @@ namespace slib
 	}
 
 
-	_SHA512Base::_SHA512Base()
+	_priv_SHA512Base::_priv_SHA512Base()
 	{
 		rdata_len = 0;
 	}
 
-	_SHA512Base::~_SHA512Base()
+	_priv_SHA512Base::~_priv_SHA512Base()
 	{
 	}
 
-	void _SHA512Base::_start()
+	void _priv_SHA512Base::_start()
 	{
 		rdata_len = 0;
 		sizeTotalInput = 0;
 	}
 
-	void _SHA512Base::update(const void* _input, sl_size sizeInput)
+	void _priv_SHA512Base::update(const void* _input, sl_size sizeInput)
 	{
 		if (rdata_len >= 128) {
 			return;
@@ -262,7 +262,7 @@ namespace slib
 		}
 	}
 
-	void _SHA512Base::_finish()
+	void _priv_SHA512Base::_finish()
 	{
 		if (rdata_len >= 128) {
 			return;
@@ -282,7 +282,7 @@ namespace slib
 		rdata_len = 0;
 	}
 
-	void _SHA512Base::_updateSection(const sl_uint8* input)
+	void _priv_SHA512Base::_updateSection(const sl_uint8* input)
 	{
 		static sl_uint64 K[80] = {
 			SLIB_UINT64(0x428a2f98d728ae22), SLIB_UINT64(0x7137449123ef65cd), SLIB_UINT64(0xb5c0fbcfec4d3b2f), SLIB_UINT64(0xe9b5dba58189dbbc), SLIB_UINT64(0x3956c25bf348b538),

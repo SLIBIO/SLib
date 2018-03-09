@@ -15,12 +15,12 @@
 namespace slib
 {
 
-	void GCM_Table::generateTable(const void* _H)
+	void GCM_Table::generateTable(const void* inH)
 	{
 		sl_uint32 i, j;
 		Uint128 H;
 
-		H.setBytesBE(_H);
+		H.setBytesBE(inH);
 
 /*
 	  In 4-bit table
@@ -52,7 +52,7 @@ namespace slib
 		}
 	}
 
-	static const sl_uint64 _GCM_R[16] =
+	static const sl_uint64 PRIV_GCM_R[16] =
 	{
 		SLIB_UINT64(0x0000000000000000)
 		, SLIB_UINT64(0x1c20000000000000)
@@ -72,12 +72,12 @@ namespace slib
 		, SLIB_UINT64(0xb5e0000000000000)
 	};
 
-	void GCM_Table::multiplyH(const void* _X, void* _O) const
+	void GCM_Table::multiplyH(const void* inX, void* inO) const
 	{
-		const sl_uint8* X = (const sl_uint8*)_X;
-		sl_uint8* O = (sl_uint8*)_O;
+		const sl_uint8* X = (const sl_uint8*)inX;
+		sl_uint8* O = (sl_uint8*)inO;
 		Uint128 Z;
-		const sl_uint64* R = _GCM_R;
+		const sl_uint64* R = PRIV_GCM_R;
 		Z.setZero();
 		for (sl_uint32 i = 15; i >= 1; i--) {
 			// process low 4-bit
@@ -113,10 +113,10 @@ namespace slib
 		Z.getBytesBE(O);
 	}
 
-	void GCM_Table::multiplyData(void* _X, const void* _D, sl_size lenD) const
+	void GCM_Table::multiplyData(void* inX, const void* inD, sl_size lenD) const
 	{
-		sl_uint8* X = (sl_uint8*)_X;
-		const sl_uint8* D = (const sl_uint8*)_D;
+		sl_uint8* X = (sl_uint8*)inX;
+		const sl_uint8* D = (const sl_uint8*)inD;
 		sl_size i, k, n;
 
 		n = lenD >> 4;
@@ -137,9 +137,9 @@ namespace slib
 		}
 	}
 
-	void GCM_Table::multiplyLength(void* _X, sl_size len1, sl_size len2) const
+	void GCM_Table::multiplyLength(void* inX, sl_size len1, sl_size len2) const
 	{
-		sl_uint8* X = (sl_uint8*)_X;
+		sl_uint8* X = (sl_uint8*)inX;
 		sl_uint64 v;
 		v = len1 << 3;
 		X[0] ^= (sl_uint8)(v >> 56);
@@ -162,9 +162,9 @@ namespace slib
 		multiplyH(X, X);
 	}
 
-	void GCM_Table::calculateGHash(const void* A, sl_size lenA, const void* C, sl_size lenC, void* _O) const
+	void GCM_Table::calculateGHash(const void* A, sl_size lenA, const void* C, sl_size lenC, void* inO) const
 	{
-		sl_uint8* O = (sl_uint8*)_O;
+		sl_uint8* O = (sl_uint8*)inO;
 
 		Base::zeroMemory(O, 16);
 		
@@ -175,10 +175,10 @@ namespace slib
 		multiplyLength(O, lenA, lenC);
 	}
 
-	void GCM_Table::calculateCIV(const void* _IV, sl_size lenIV, void* _CIV) const
+	void GCM_Table::calculateCIV(const void* inIV, sl_size lenIV, void* inCIV) const
 	{
-		const sl_uint8* IV = (const sl_uint8*)_IV;
-		sl_uint8* CIV = (sl_uint8*)_CIV;
+		const sl_uint8* IV = (const sl_uint8*)inIV;
+		sl_uint8* CIV = (sl_uint8*)inCIV;
 		sl_size i;
 		if (lenIV == 12) {
 			for (i = 0; i < 12; i++) {

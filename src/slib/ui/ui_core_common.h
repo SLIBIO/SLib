@@ -15,7 +15,7 @@
 
 namespace slib
 {
-	class _UIDispatcher
+	class _priv_UIDispatcher
 	{
 	public:
 		static sl_bool addCallback(const Function<void()>& callback);

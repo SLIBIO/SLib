@@ -24,7 +24,7 @@
 namespace slib
 {
 
-	class _Win32AsyncTcpSocketInstance : public AsyncTcpSocketInstance
+	class _priv_Win32AsyncTcpSocketInstance : public AsyncTcpSocketInstance
 	{
 	public:
 		WSAOVERLAPPED m_overlappedRead;
@@ -40,23 +40,23 @@ namespace slib
 		LPFN_CONNECTEX m_funcConnectEx;
 
 	public:
-		_Win32AsyncTcpSocketInstance()
+		_priv_Win32AsyncTcpSocketInstance()
 		{
 		}
 
-		~_Win32AsyncTcpSocketInstance()
+		~_priv_Win32AsyncTcpSocketInstance()
 		{
 			close();
 		}
 
 	public:
-		static Ref<_Win32AsyncTcpSocketInstance> create(const Ref<Socket>& socket)
+		static Ref<_priv_Win32AsyncTcpSocketInstance> create(const Ref<Socket>& socket)
 		{
-			Ref<_Win32AsyncTcpSocketInstance> ret;
+			Ref<_priv_Win32AsyncTcpSocketInstance> ret;
 			if (socket.isNotNull()) {
 				sl_file handle = (sl_file)(socket->getHandle());
 				if (handle != SLIB_FILE_INVALID_HANDLE) {
-					ret = new _Win32AsyncTcpSocketInstance();
+					ret = new _priv_Win32AsyncTcpSocketInstance();
 					if (ret.isNotNull()) {
 						ret->m_socket = socket;
 						ret->setHandle(handle);
@@ -245,11 +245,11 @@ namespace slib
 
 	Ref<AsyncTcpSocketInstance> AsyncTcpSocket::_createInstance(const Ref<Socket>& socket)
 	{
-		return _Win32AsyncTcpSocketInstance::create(socket);
+		return _priv_Win32AsyncTcpSocketInstance::create(socket);
 	}
 
 
-	class _Win32AsyncTcpServerInstance : public AsyncTcpServerInstance
+	class _priv_Win32AsyncTcpServerInstance : public AsyncTcpServerInstance
 	{
 	public:
 		sl_bool m_flagAccepting;
@@ -262,23 +262,23 @@ namespace slib
 		LPFN_GETACCEPTEXSOCKADDRS m_funcGetAcceptExSockaddrs;
 
 	public:
-		_Win32AsyncTcpServerInstance()
+		_priv_Win32AsyncTcpServerInstance()
 		{
 			m_flagAccepting = sl_false;
 		}
 
-		~_Win32AsyncTcpServerInstance()
+		~_priv_Win32AsyncTcpServerInstance()
 		{
 			close();
 		}
 
 	public:
-		static Ref<_Win32AsyncTcpServerInstance> create(const Ref<Socket>& socket)
+		static Ref<_priv_Win32AsyncTcpServerInstance> create(const Ref<Socket>& socket)
 		{
 			if (socket.isNotNull()) {
 				sl_file handle = (sl_file)(socket->getHandle());
 				if (handle != SLIB_FILE_INVALID_HANDLE) {
-					Ref<_Win32AsyncTcpServerInstance> ret = new _Win32AsyncTcpServerInstance();
+					Ref<_priv_Win32AsyncTcpServerInstance> ret = new _priv_Win32AsyncTcpServerInstance();
 					if (ret.isNotNull()) {
 						ret->m_socket = socket;
 						ret->setHandle(handle);
@@ -437,11 +437,11 @@ namespace slib
 
 	Ref<AsyncTcpServerInstance> AsyncTcpServer::_createInstance(const Ref<Socket>& socket)
 	{
-		return _Win32AsyncTcpServerInstance::create(socket);
+		return _priv_Win32AsyncTcpServerInstance::create(socket);
 	}
 
 
-	class _Win32AsyncUdpSocketInstance : public AsyncUdpSocketInstance
+	class _priv_Win32AsyncUdpSocketInstance : public AsyncUdpSocketInstance
 	{
 	public:
 		sl_bool m_flagReceiving;
@@ -453,25 +453,25 @@ namespace slib
 		int m_lenAddrReceive;
 
 	public:
-		_Win32AsyncUdpSocketInstance()
+		_priv_Win32AsyncUdpSocketInstance()
 		{
 			m_flagReceiving = sl_false;
 		}
 
-		~_Win32AsyncUdpSocketInstance()
+		~_priv_Win32AsyncUdpSocketInstance()
 		{
 			close();
 		}
 
 	public:
-		static Ref<_Win32AsyncUdpSocketInstance> create(const Ref<Socket>& socket, const Memory& buffer)
+		static Ref<_priv_Win32AsyncUdpSocketInstance> create(const Ref<Socket>& socket, const Memory& buffer)
 		{
-			Ref<_Win32AsyncUdpSocketInstance> ret;
+			Ref<_priv_Win32AsyncUdpSocketInstance> ret;
 			if (socket.isNotNull()) {
 				if (socket->setNonBlockingMode(sl_true)) {
 					sl_file handle = (sl_file)(socket->getHandle());
 					if (handle != SLIB_FILE_INVALID_HANDLE) {
-						ret = new _Win32AsyncUdpSocketInstance();
+						ret = new _priv_Win32AsyncUdpSocketInstance();
 						if (ret.isNotNull()) {
 							ret->m_socket = socket;
 							ret->setHandle(handle);
@@ -597,7 +597,7 @@ namespace slib
 	{
 		Memory buffer = Memory::create(packetSize);
 		if (buffer.isNotEmpty()) {
-			return _Win32AsyncUdpSocketInstance::create(socket, buffer);
+			return _priv_Win32AsyncUdpSocketInstance::create(socket, buffer);
 		}
 		return sl_null;
 	}

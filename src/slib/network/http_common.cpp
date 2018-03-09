@@ -111,12 +111,12 @@ namespace slib
 		return sl_null;
 	}
 
-	class _HttpMethod_Mapping
+	class _priv_HttpMethod_Mapping
 	{
 	public:
 		CHashMap<String, HttpMethod> maps;
 		
-		_HttpMethod_Mapping()
+		_priv_HttpMethod_Mapping()
 		{
 			maps.put(_g_sz_http_method_GET, HttpMethod::GET);
 			maps.put(_g_sz_http_method_HEAD, HttpMethod::HEAD);
@@ -131,7 +131,7 @@ namespace slib
 
 	HttpMethod HttpMethods::fromString(const String& method)
 	{
-		SLIB_SAFE_STATIC(_HttpMethod_Mapping, t)
+		SLIB_SAFE_STATIC(_priv_HttpMethod_Mapping, t)
 		if (SLIB_SAFE_STATIC_CHECK_FREED(t)) {
 			return HttpMethod::Unknown;
 		}

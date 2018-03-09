@@ -111,12 +111,12 @@ namespace slib
 		return create(Image::loadFromAsset(path));
 	}
 	
-	class _TextureBitmap : public Bitmap
+	class _priv_TextureBitmap : public Bitmap
 	{
 		friend class Texture;
 	};
 	
-	class _TextureBitmapCache : public BitmapCache
+	class _priv_TextureBitmapCache : public BitmapCache
 	{
 	public:
 		Ref<Texture> texture;
@@ -135,17 +135,17 @@ namespace slib
 			if (width > 0) {
 				sl_uint32 height = source->getHeight();
 				if (height > 0) {
-					_TextureBitmap* tb = (_TextureBitmap*)(source.get());
+					_priv_TextureBitmap* tb = (_priv_TextureBitmap*)(source.get());
 					Ref<BitmapCache> cache = tb->m_renderingTextureCached;
 					if (cache.isNotNull()) {
-						return ((_TextureBitmapCache*)(cache.get()))->texture;
+						return ((_priv_TextureBitmapCache*)(cache.get()))->texture;
 					}
 					Ref<Texture> ret = new Texture;
 					if (ret.isNotNull()) {
 						ret->m_sourceWeak = tb;
 						ret->m_width = width;
 						ret->m_height = height;
-						Ref<_TextureBitmapCache> tc = new _TextureBitmapCache;
+						Ref<_priv_TextureBitmapCache> tc = new _priv_TextureBitmapCache;
 						if (tc.isNotNull()) {
 							tc->texture = ret;
 							tb->m_renderingTextureCached = tc;

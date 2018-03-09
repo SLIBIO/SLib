@@ -10,7 +10,7 @@
 
 #include "slib/core/ref.h"
 
-#define _SIGNATURE 0x15181289
+#define PRIV_SIGNATURE 0x15181289
 
 namespace slib
 {
@@ -26,7 +26,7 @@ namespace slib
 	Referable::Referable() noexcept
 	{
 #ifdef SLIB_DEBUG_REFERENCE
-		m_signature = _SIGNATURE;
+		m_signature = PRIV_SIGNATURE;
 #else
 		SLIB_UNUSED(m_signature);
 #endif
@@ -38,7 +38,7 @@ namespace slib
 	Referable::Referable(const Referable& other) noexcept
 	{
 #ifdef SLIB_DEBUG_REFERENCE
-		m_signature = _SIGNATURE;
+		m_signature = PRIV_SIGNATURE;
 #endif
 		m_nRefCount = 0;
 		m_flagWeakRef = sl_false;
@@ -48,7 +48,7 @@ namespace slib
 	Referable::Referable(Referable&& other) noexcept
 	{
 #ifdef SLIB_DEBUG_REFERENCE
-		m_signature = _SIGNATURE;
+		m_signature = PRIV_SIGNATURE;
 #endif
 		m_nRefCount = 0;
 		m_flagWeakRef = sl_false;
@@ -153,7 +153,7 @@ namespace slib
 #ifdef SLIB_DEBUG_REFERENCE
 	void Referable::_checkValid() noexcept
 	{
-		if (m_signature != _SIGNATURE) {
+		if (m_signature != PRIV_SIGNATURE) {
 			SLIB_ABORT("Not-Referable object is referenced");
 		}
 	}

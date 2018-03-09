@@ -16,9 +16,9 @@
 
 #include "view_osx.h"
 
-@interface _Slib_OSX_ScrollView : NSScrollView {
+@interface _priv_Slib_macOS_ScrollView : NSScrollView {
 	
-	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 	
 }
 @end
@@ -26,7 +26,7 @@
 namespace slib
 {
 
-	class _ScrollView : public ScrollView
+	class _priv_ScrollView : public ScrollView
 	{
 	public:
 		void _applyContent(NSScrollView* sv)
@@ -55,13 +55,13 @@ namespace slib
 			_applyContent(handle);
 		}
 		
-		static void _onScroll(OSX_ViewInstance* instance, NSScrollView* sv)
+		static void _onScroll(macOS_ViewInstance* instance, NSScrollView* sv)
 		{
 			NSClipView* clip = [sv contentView];
 			if (clip != nil) {
 				NSPoint pt=[clip bounds].origin;
 				Ref<View> _view = instance->getView();
-				if (_ScrollView* view = CastInstance<_ScrollView>(_view.get())) {
+				if (_priv_ScrollView* view = CastInstance<_priv_ScrollView>(_view.get())) {
 					view->_onScroll_NW((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y));
 				}
 			}
@@ -70,14 +70,14 @@ namespace slib
 
 	Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
 	{
-		OSX_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_OSX_ScrollView* handle = [[_Slib_OSX_ScrollView alloc] initWithFrame:frame];
+		MACOS_VIEW_CREATE_INSTANCE_BEGIN
+		_priv_Slib_macOS_ScrollView* handle = [[_priv_Slib_macOS_ScrollView alloc] initWithFrame:frame];
 		if (handle != nil) {
 			[handle setHasVerticalScroller:(isVerticalScrolling()?YES:NO)];
 			[handle setHasHorizontalScroller:(isHorizontalScrolling()?YES:NO)];
-			((_ScrollView*)this)->_applyProperties(handle);
+			((_priv_ScrollView*)this)->_applyProperties(handle);
 		}
-		OSX_VIEW_CREATE_INSTANCE_END
+		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
 
@@ -90,7 +90,7 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
 			NSScrollView* sv = (NSScrollView*)handle;
-			((_ScrollView*)this)->_applyContent(sv);
+			((_priv_ScrollView*)this)->_applyContent(sv);
 		}
 	}
 
@@ -177,7 +177,7 @@ namespace slib
 
 }
 
-@implementation _Slib_OSX_ScrollView
+@implementation _priv_Slib_macOS_ScrollView
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -195,9 +195,9 @@ namespace slib
 }
 
 - (void)boundDidChange:(NSNotification *)notification {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_ScrollView::_onScroll(instance.get(), self);
+		slib::_priv_ScrollView::_onScroll(instance.get(), self);
 	}
 }
 @end

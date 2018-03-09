@@ -19,7 +19,7 @@
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidBrush, "slib/platform/android/ui/UiBrush")
+	SLIB_JNI_BEGIN_CLASS(JAndroidBrush, "slib/platform/android/ui/UiBrush")
 		SLIB_JNI_NEW(init, "()V");
 		SLIB_JNI_INT_FIELD(style);
 		SLIB_JNI_INT_FIELD(color);
@@ -33,12 +33,12 @@ namespace slib
 	public:
 		Android_BrushObject(const BrushDesc& desc)
 		{
-			JniLocal<jobject> jbrush = _JAndroidBrush::init.newObject(sl_null);
+			JniLocal<jobject> jbrush = JAndroidBrush::init.newObject(sl_null);
 			if (jbrush.isNotNull()) {
 				JniGlobal<jobject> gbrush = jbrush;
 				if (gbrush.isNotNull()) {
-					_JAndroidBrush::color.set(jbrush, desc.color.getARGB());
-					_JAndroidBrush::style.set(jbrush, (int)(desc.style));
+					JAndroidBrush::color.set(jbrush, desc.color.getARGB());
+					JAndroidBrush::style.set(jbrush, (int)(desc.style));
 					m_brush = gbrush;
 				}
 			}

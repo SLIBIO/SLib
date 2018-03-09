@@ -16,9 +16,9 @@
 
 #include "view_osx.h"
 
-@interface _Slib_OSX_Button : NSButton {
+@interface _priv_Slib_macOS_Button : NSButton {
 	
-	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 
 }
 
@@ -29,8 +29,8 @@ namespace slib
 
 	Ref<ViewInstance> Button::createNativeWidget(ViewInstance* _parent)
 	{
-		OSX_VIEW_CREATE_INSTANCE_BEGIN
-		_Slib_OSX_Button* handle = [[_Slib_OSX_Button alloc] initWithFrame:frame];
+		MACOS_VIEW_CREATE_INSTANCE_BEGIN
+		_priv_Slib_macOS_Button* handle = [[_priv_Slib_macOS_Button alloc] initWithFrame:frame];
 		if (handle != nil) {
 			handle.title = Apple::getNSStringFromString(m_text);
 			
@@ -44,7 +44,7 @@ namespace slib
 			}
 			handle.bezelStyle = NSRoundedBezelStyle;
 		}
-		OSX_VIEW_CREATE_INSTANCE_END
+		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
 
@@ -84,7 +84,7 @@ namespace slib
 
 }
 
-@implementation _Slib_OSX_Button
+@implementation _priv_Slib_macOS_Button
 
 -(id)initWithFrame:(NSRect)frame
 {
@@ -98,7 +98,7 @@ namespace slib
 
 -(void)onClick
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		instance->onClick();
 	}
@@ -116,7 +116,7 @@ namespace slib
 
 - (void)keyDown:(NSEvent*)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagNoDefault = instance->onEventKey(sl_true, theEvent);
 		if (flagNoDefault) {
@@ -128,7 +128,7 @@ namespace slib
 
 - (void)keyUp:(NSEvent*)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
 		if (flagNoDefault) {

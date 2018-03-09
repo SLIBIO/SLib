@@ -433,14 +433,14 @@ namespace slib
 		return sl_null;
 	}
 	
-	class _TreeView_DefaultIdentIcon : public Drawable
+	class _priv_TreeView_DefaultIdentIcon : public Drawable
 	{
 	public:
 		Ref<Brush> m_brush;
 		Point m_pts[3];
 		
 	public:
-		_TreeView_DefaultIdentIcon(sl_bool flagCollapse)
+		_priv_TreeView_DefaultIdentIcon(sl_bool flagCollapse)
 		{
 			m_brush = Brush::createSolidBrush(Color(50, 50, 50));
 			if (flagCollapse) {
@@ -506,8 +506,8 @@ namespace slib
 		m_itemIndent = 16;
 		m_textIndent = 4;
 		
-		m_iconCollapsed = new _TreeView_DefaultIdentIcon(sl_true);
-		m_iconExpanded = new _TreeView_DefaultIdentIcon(sl_false);
+		m_iconCollapsed = new _priv_TreeView_DefaultIdentIcon(sl_true);
+		m_iconExpanded = new _priv_TreeView_DefaultIdentIcon(sl_false);
 	}
 	
 	TreeView::~TreeView()

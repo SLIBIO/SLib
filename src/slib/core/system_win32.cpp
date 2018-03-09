@@ -32,7 +32,7 @@ using namespace Platform;
 #include "slib/core/string_buffer.h"
 #include "slib/core/log.h"
 
-#define _PATH_MAX 1024
+#define PRIV_PATH_MAX 1024
 
 namespace slib
 {
@@ -40,8 +40,8 @@ namespace slib
 	String System::getApplicationPath()
 	{
 #if defined(SLIB_PLATFORM_IS_WIN32)
-		sl_char16 bufAppPath[_PATH_MAX] = {0};
-		::GetModuleFileNameW(GetModuleHandle(NULL), (WCHAR*)bufAppPath, _PATH_MAX - 1);
+		sl_char16 bufAppPath[PRIV_PATH_MAX] = {0};
+		::GetModuleFileNameW(GetModuleHandle(NULL), (WCHAR*)bufAppPath, PRIV_PATH_MAX - 1);
 		return String(bufAppPath);
 #endif
 #if defined(SLIB_PLATFORM_IS_WP8)
@@ -52,8 +52,8 @@ namespace slib
 	String System::getTempDirectory()
 	{
 #if defined(SLIB_PLATFORM_IS_WIN32)
-		sl_char16 sz[_PATH_MAX] = {0};
-		sl_int32 n = ::GetTempPathW(_PATH_MAX - 1, (LPWSTR)sz);
+		sl_char16 sz[PRIV_PATH_MAX] = {0};
+		sl_int32 n = ::GetTempPathW(PRIV_PATH_MAX - 1, (LPWSTR)sz);
 		return String(sz, n);
 #else
 		SLIB_STATIC_STRING(temp, "/temp");
@@ -65,8 +65,8 @@ namespace slib
 
 	String System::getCurrentDirectory()
 	{
-		WCHAR path[_PATH_MAX] = { 0 };
-		::GetCurrentDirectoryW(_PATH_MAX - 1, path);
+		WCHAR path[PRIV_PATH_MAX] = { 0 };
+		::GetCurrentDirectoryW(PRIV_PATH_MAX - 1, path);
 		return String(path);
 	}
 
@@ -236,17 +236,17 @@ namespace slib
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
-	class _GlobalUniqueInstance : public GlobalUniqueInstance
+	class _priv_GlobalUniqueInstance : public GlobalUniqueInstance
 	{
 	public:
 		HANDLE m_hMutex;
 
 	public:
-		_GlobalUniqueInstance()
+		_priv_GlobalUniqueInstance()
 		{
 		}
 
-		~_GlobalUniqueInstance()
+		~_priv_GlobalUniqueInstance()
 		{
 			::CloseHandle(m_hMutex);
 		}
@@ -264,7 +264,7 @@ namespace slib
 			::CloseHandle(hMutex);
 			return sl_null;
 		}
-		Ref<_GlobalUniqueInstance> instance = new _GlobalUniqueInstance;
+		Ref<_priv_GlobalUniqueInstance> instance = new _priv_GlobalUniqueInstance;
 		if (instance.isNotNull()) {
 			hMutex = ::CreateMutexW(NULL, FALSE, (LPCWSTR)(name.getData()));
 			if (hMutex) {

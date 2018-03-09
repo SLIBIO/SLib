@@ -23,7 +23,7 @@ namespace slib
 	class UrlRequest_Impl;
 }
 
-@interface _Slib_UrlRequestListener : NSObject<NSURLSessionTaskDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate> {
+@interface _priv_Slib_UrlRequestListener : NSObject<NSURLSessionTaskDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate> {
 }
 @end
 
@@ -35,7 +35,7 @@ namespace slib
 	public:
 		NSURLSession* defaultSession;
 		NSURLSession* backgroundSession;
-		_Slib_UrlRequestListener* listener;
+		_priv_Slib_UrlRequestListener* listener;
 		NSOperationQueue* operationQueue;
 		NSFileManager* fileManager;
 		CHashMap< NSUInteger, WeakRef<UrlRequest_Impl> > requests;
@@ -44,7 +44,7 @@ namespace slib
 		UrlRequest_Shared()
 		{
 			operationQueue = [[NSOperationQueue alloc] init];
-			listener = [[_Slib_UrlRequestListener alloc] init];
+			listener = [[_priv_Slib_UrlRequestListener alloc] init];
 			NSURLSessionConfiguration* configDefault = [NSURLSessionConfiguration defaultSessionConfiguration];
 			defaultSession = [NSURLSession sessionWithConfiguration:configDefault delegate:listener delegateQueue:operationQueue];
 			NSURLSessionConfiguration* configDownload = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:@"slib_main_background_url_session"];
@@ -259,7 +259,7 @@ namespace slib
 	
 }
 
-@implementation _Slib_UrlRequestListener
+@implementation _priv_Slib_UrlRequestListener
 
 -(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didSendBodyData:(int64_t)bytesSent totalBytesSent:(int64_t)totalBytesSent totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend
 {

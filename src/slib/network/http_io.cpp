@@ -171,14 +171,14 @@ namespace slib
 	{
 	}
 
-	class _HttpContentReader_Persistent : public HttpContentReader
+	class _priv_HttpContentReader_Persistent : public HttpContentReader
 	{
 	public:
 		sl_uint64 m_sizeTotal;
 		sl_uint64 m_sizeRead;
 
 	public:
-		_HttpContentReader_Persistent()
+		_priv_HttpContentReader_Persistent()
 		{
 			m_sizeRead = 0;
 			m_sizeTotal = 0;
@@ -206,7 +206,7 @@ namespace slib
 															   sl_uint32 bufferSize,
 															   sl_bool flagDecompress)
 	{
-		Ref<_HttpContentReader_Persistent> ret = new _HttpContentReader_Persistent;
+		Ref<_priv_HttpContentReader_Persistent> ret = new _priv_HttpContentReader_Persistent;
 		if (io.isNull()) {
 			return ret;
 		}
@@ -245,7 +245,7 @@ namespace slib
 
 */
 
-	class _HttpContentReader_Chunked : public HttpContentReader
+	class _priv_HttpContentReader_Chunked : public HttpContentReader
 	{
 	public:
 		sl_uint32 m_state;
@@ -254,7 +254,7 @@ namespace slib
 		sl_uint32 m_sizeTrailerField;
 
 	public:
-		_HttpContentReader_Chunked()
+		_priv_HttpContentReader_Chunked()
 		{
 			m_state = 0;
 			m_sizeCurrentChunk = 0;
@@ -374,7 +374,7 @@ namespace slib
 															sl_uint32 bufferSize,
 															sl_bool flagDecompress)
 	{
-		Ref<_HttpContentReader_Chunked> ret = new _HttpContentReader_Chunked;
+		Ref<_priv_HttpContentReader_Chunked> ret = new _priv_HttpContentReader_Chunked;
 		if (io.isNull()) {
 			return ret;
 		}
@@ -394,7 +394,7 @@ namespace slib
 		return ret;
 	}
 
-	class _HttpContentReader_TearDown : public HttpContentReader
+	class _priv_HttpContentReader_TearDown : public HttpContentReader
 	{
 	public:
 		Memory filterRead(void* data, sl_uint32 size, Referable* refData)
@@ -408,7 +408,7 @@ namespace slib
 															 sl_uint32 bufferSize,
 															 sl_bool flagDecompress)
 	{
-		Ref<_HttpContentReader_TearDown> ret = new _HttpContentReader_TearDown;
+		Ref<_priv_HttpContentReader_TearDown> ret = new _priv_HttpContentReader_TearDown;
 		if (io.isNull()) {
 			return ret;
 		}

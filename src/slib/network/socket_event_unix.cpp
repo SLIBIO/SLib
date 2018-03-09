@@ -22,31 +22,31 @@
 
 namespace slib
 {
-	class _Unix_SocketEvent : public SocketEvent
+	class _priv_Unix_SocketEvent : public SocketEvent
 	{
 	public:
 		Ref<PipeEvent> m_pipe;
 		sl_uint32 m_events;
 		
 	public:
-		_Unix_SocketEvent()
+		_priv_Unix_SocketEvent()
 		{
 			m_events = 0;
 		}
 		
-		~_Unix_SocketEvent()
+		~_priv_Unix_SocketEvent()
 		{
 		}
 		
 	public:
-		static Ref<_Unix_SocketEvent> create(const Ref<Socket>& socket)
+		static Ref<_priv_Unix_SocketEvent> create(const Ref<Socket>& socket)
 		{
-			Ref<_Unix_SocketEvent> ret;
+			Ref<_priv_Unix_SocketEvent> ret;
 			if (socket.isNotNull()) {
 				Socket::initializeSocket();
 				Ref<PipeEvent> ev = PipeEvent::create();
 				if (ev.isNotNull()) {
-					ret = new _Unix_SocketEvent;
+					ret = new _priv_Unix_SocketEvent;
 					if (ret.isNotNull()) {
 						ret->m_pipe = ev;
 						ret->m_socket = socket;
@@ -76,7 +76,7 @@ namespace slib
 	
 	Ref<SocketEvent> SocketEvent::create(const Ref<Socket>& socket)
 	{
-		return Ref<SocketEvent>::from(_Unix_SocketEvent::create(socket));
+		return Ref<SocketEvent>::from(_priv_Unix_SocketEvent::create(socket));
 	}
 
 	sl_bool SocketEvent::_native_waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* status, sl_uint32 count, sl_int32 timeout)
@@ -86,7 +86,7 @@ namespace slib
 		Base::zeroMemory(fd, sizeof(pollfd)*2*count);
 		sl_uint32 cEvents = 0;
 		for (sl_uint32 i = 0; i < count; i++) {
-			Ref<_Unix_SocketEvent> ev = Ref<_Unix_SocketEvent>::from(events[i]);
+			Ref<_priv_Unix_SocketEvent> ev = Ref<_priv_Unix_SocketEvent>::from(events[i]);
 			if (ev.isNotNull()) {
 				Ref<Socket> sock = ev->getSocket();
 				if (sock.isNotNull()) {
@@ -144,7 +144,7 @@ namespace slib
 					status[indexMap[k]] = ret;
 				}
 				if (fd[k*2+1].revents) {
-					Ref<_Unix_SocketEvent> ev = Ref<_Unix_SocketEvent>::from(events[indexMap[k]]);
+					Ref<_priv_Unix_SocketEvent> ev = Ref<_priv_Unix_SocketEvent>::from(events[indexMap[k]]);
 					ev->reset();
 				}
 			}

@@ -169,20 +169,20 @@ namespace slib
 	}
 	
 /*******************************
-	_RenderProgramTemplate
+	_priv_RenderProgramTemplate
 *******************************/
 	
-	sl_bool _RenderProgramTemplate::onInit(RenderEngine* _engine, RenderProgramState* _state)
+	sl_bool _priv_RenderProgramTemplate::onInit(RenderEngine* _engine, RenderProgramState* _state)
 	{
 		RenderEngineType type = _engine->getEngineType();
 		
 		if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 			
 			GLRenderEngine* engine = (GLRenderEngine*)_engine;
-			_RenderProgramStateTemplate* state = (_RenderProgramStateTemplate*)_state;
+			_priv_RenderProgramStateTemplate* state = (_priv_RenderProgramStateTemplate*)_state;
 			
 			sl_uint32 program = state->gl_program;
-			_RenderProgramStateItem* item = state->items;
+			_priv_RenderProgramStateItem* item = state->items;
 			sl_int32 i = 0;
 			while (item->gl_name) {
 				if (item->type == 1) {
@@ -203,20 +203,20 @@ namespace slib
 		return sl_false;
 	}
 	
-	sl_bool _RenderProgramTemplate::onPreRender(RenderEngine* _engine, RenderProgramState* _state)
+	sl_bool _priv_RenderProgramTemplate::onPreRender(RenderEngine* _engine, RenderProgramState* _state)
 	{
 		RenderEngineType type = _engine->getEngineType();
 		
 		if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 			
 			GLRenderEngine* engine = (GLRenderEngine*)_engine;
-			_RenderProgramStateTemplate* state = (_RenderProgramStateTemplate*)_state;
+			_priv_RenderProgramStateTemplate* state = (_priv_RenderProgramStateTemplate*)_state;
 			
 			sl_int32 i = state->_indexFirstAttribute;
 			
 			if (i >= 0) {
 				sl_int32 n = state->_indexLastAttribute;
-				_RenderProgramStateItem* items = state->items;
+				_priv_RenderProgramStateItem* items = state->items;
 				for (; i <= n; i++) {
 					if (items[i].type == 2 && items[i].gl_location >= 0) {
 						switch (items[i].attrType) {
@@ -245,20 +245,20 @@ namespace slib
 		return sl_false;
 	}
 	
-	void _RenderProgramTemplate::onPostRender(RenderEngine* _engine, RenderProgramState* _state)
+	void _priv_RenderProgramTemplate::onPostRender(RenderEngine* _engine, RenderProgramState* _state)
 	{
 		RenderEngineType type = _engine->getEngineType();
 		
 		if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 			
 			GLRenderEngine* engine = (GLRenderEngine*)_engine;
-			_RenderProgramStateTemplate* state = (_RenderProgramStateTemplate*)_state;
+			_priv_RenderProgramStateTemplate* state = (_priv_RenderProgramStateTemplate*)_state;
 			
 			sl_int32 i = state->_indexFirstAttribute;
 			
 			if (i >= 0) {
 				sl_int32 n = state->_indexLastAttribute;
-				_RenderProgramStateItem* items = state->items;
+				_priv_RenderProgramStateItem* items = state->items;
 				for (; i <= n; i++) {
 					if (items[i].type == 2 && items[i].gl_location >= 0) {
 						engine->disableVertexArrayAttribute(items[i].gl_location);

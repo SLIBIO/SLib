@@ -21,7 +21,7 @@
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidBitmap, "slib/platform/android/ui/UiBitmap")
+	SLIB_JNI_BEGIN_CLASS(JAndroidBitmap, "slib/platform/android/ui/UiBitmap")
 		SLIB_JNI_STATIC_METHOD(create, "create", "(II)Lslib/platform/android/ui/UiBitmap;");
 		SLIB_JNI_STATIC_METHOD(load, "load", "([B)Lslib/platform/android/ui/UiBitmap;");
 		SLIB_JNI_METHOD(getWidth, "getWidth", "()I");
@@ -36,7 +36,7 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(returnArrayBuffer, "returnArrayBuffer", "([I)V");
 	SLIB_JNI_END_CLASS
 
-	class _Android_Bitmap : public Bitmap
+	class _priv_Android_Bitmap : public Bitmap
 	{
 		SLIB_DECLARE_OBJECT
 	public:
@@ -49,29 +49,29 @@ namespace slib
 		Ref<Referable> m_ref;
 
 	public:
-		_Android_Bitmap()
+		_priv_Android_Bitmap()
 		{
 			m_flagFreeOnRelease = sl_true;
 		}
 
-		~_Android_Bitmap()
+		~_priv_Android_Bitmap()
 		{
 			if (m_flagFreeOnRelease) {
-				_JAndroidBitmap::recycle.call(m_bitmap);
+				JAndroidBitmap::recycle.call(m_bitmap);
 			}
 		}
 
 	public:
-		static Ref<_Android_Bitmap> create(jobject jbitmap, sl_bool flagFreeOnRelease, Referable* ref)
+		static Ref<_priv_Android_Bitmap> create(jobject jbitmap, sl_bool flagFreeOnRelease, Referable* ref)
 		{
-			Ref<_Android_Bitmap> ret;
+			Ref<_priv_Android_Bitmap> ret;
 			if (jbitmap) {
-				jint width = _JAndroidBitmap::getWidth.callInt(jbitmap);
-				jint height = _JAndroidBitmap::getHeight.callInt(jbitmap);
+				jint width = JAndroidBitmap::getWidth.callInt(jbitmap);
+				jint height = JAndroidBitmap::getHeight.callInt(jbitmap);
 				if (width > 0 && height > 0) {
 					JniGlobal<jobject> bitmap = jbitmap;
 					if (bitmap.isNotNull()) {
-						ret = new _Android_Bitmap();
+						ret = new _priv_Android_Bitmap();
 						if (ret.isNotNull()) {
 							ret->m_bitmap = bitmap;
 							ret->m_width = (sl_real)width;
@@ -83,21 +83,21 @@ namespace slib
 					}
 				}
 				if (flagFreeOnRelease) {
-					_JAndroidBitmap::recycle.call(jbitmap);
+					JAndroidBitmap::recycle.call(jbitmap);
 				}
 			}
 			return ret;
 		}
 
-		static Ref<_Android_Bitmap> create(sl_uint32 width, sl_uint32 height)
+		static Ref<_priv_Android_Bitmap> create(sl_uint32 width, sl_uint32 height)
 		{
-			Ref<_Android_Bitmap> ret;
+			Ref<_priv_Android_Bitmap> ret;
 			if (width > 0 && height > 0) {
-				JniLocal<jobject> jbitmap = _JAndroidBitmap::create.callObject(sl_null, width, height);
+				JniLocal<jobject> jbitmap = JAndroidBitmap::create.callObject(sl_null, width, height);
 				if (jbitmap.isNotNull()) {
 					JniGlobal<jobject> bitmap = jbitmap;
 					if (bitmap.isNotNull()) {
-						ret = new _Android_Bitmap();
+						ret = new _priv_Android_Bitmap();
 						if (ret.isNotNull()) {
 							ret->m_width = width;
 							ret->m_height = height;
@@ -105,7 +105,7 @@ namespace slib
 							return ret;
 						}
 					}
-					_JAndroidBitmap::recycle.call(jbitmap);
+					JAndroidBitmap::recycle.call(jbitmap);
 				}
 			}
 			return ret;
@@ -116,27 +116,27 @@ namespace slib
 			JniLocal<jbyteArray> imageData = Jni::newByteArray(size);
 			if (imageData.isNotNull()) {
 				Jni::setByteArrayRegion(imageData, 0, size, (jbyte*)buf);
-				return _JAndroidBitmap::load.callObject(sl_null, imageData.value);
+				return JAndroidBitmap::load.callObject(sl_null, imageData.value);
 			}
 			return 0;
 		}
 
-		static Ref<_Android_Bitmap> load(const void* buf, sl_size size)
+		static Ref<_priv_Android_Bitmap> load(const void* buf, sl_size size)
 		{
-			Ref<_Android_Bitmap> ret;
+			Ref<_priv_Android_Bitmap> ret;
 			JniLocal<jobject> jbitmap = loadJBitmap(buf, size);
 			if (jbitmap.isNotNull()) {
 				JniGlobal<jobject> bitmap = jbitmap;
 				if (bitmap.isNotNull()) {
-					ret = new _Android_Bitmap();
+					ret = new _priv_Android_Bitmap();
 					if (ret.isNotNull()) {
-						ret->m_width = _JAndroidBitmap::getWidth.callInt(jbitmap);
-						ret->m_height = _JAndroidBitmap::getHeight.callInt(jbitmap);
+						ret->m_width = JAndroidBitmap::getWidth.callInt(jbitmap);
+						ret->m_height = JAndroidBitmap::getHeight.callInt(jbitmap);
 						ret->m_bitmap = bitmap;
 						return ret;
 					}
 				}
-				_JAndroidBitmap::recycle.call(jbitmap);
+				JAndroidBitmap::recycle.call(jbitmap);
 			}
 			return ret;
 		}
@@ -195,7 +195,7 @@ namespace slib
 			}
 
 			sl_bool ret = sl_false;
-			JniLocal<jintArray> abuf = (jintArray)(_JAndroidBitmap::getArrayBuffer.callObject(sl_null));
+			JniLocal<jintArray> abuf = (jintArray)(JAndroidBitmap::getArrayBuffer.callObject(sl_null));
 			if (abuf.isNotNull()) {
 				sl_uint32 nAbuf = Jni::getArrayLength(abuf);
 				if (nAbuf >= width) {
@@ -211,7 +211,7 @@ namespace slib
 							heightSegment = nRowsMax;
 						}
 						if (flagRead) {
-							_JAndroidBitmap::read.call(jbitmap, x, yCurrent, width, heightSegment, abuf.value, width);
+							JAndroidBitmap::read.call(jbitmap, x, yCurrent, width, heightSegment, abuf.value, width);
 							for (sl_uint32 r = 0; r < heightSegment; r++) {
 								Jni::getIntArrayRegion(abuf.value, r*width, width, (jint*)(pixelsCurrent));
 								pixelsCurrent += data.pitch;
@@ -221,14 +221,14 @@ namespace slib
 								Jni::setIntArrayRegion(abuf.value, r*width, width, (jint*)(pixelsCurrent));
 								pixelsCurrent += data.pitch;
 							}
-							_JAndroidBitmap::write.call(jbitmap, x, yCurrent, width, heightSegment, abuf.value, width);
+							JAndroidBitmap::write.call(jbitmap, x, yCurrent, width, heightSegment, abuf.value, width);
 						}
 						yCurrent += heightSegment;
 						heightRemain -= heightSegment;
 					}
 					ret = sl_true;
 				}
-				_JAndroidBitmap::returnArrayBuffer.call(sl_null, abuf.value);
+				JAndroidBitmap::returnArrayBuffer.call(sl_null, abuf.value);
 			}
 			if (ret && flagRead) {
 				bitmapData.copyPixelsFrom(data);
@@ -267,7 +267,7 @@ namespace slib
 
 			sl_bool ret = sl_false;
 
-			JniLocal<jintArray> abuf = (jintArray)(_JAndroidBitmap::getArrayBuffer.callObject(sl_null));
+			JniLocal<jintArray> abuf = (jintArray)(JAndroidBitmap::getArrayBuffer.callObject(sl_null));
 
 			if (abuf.isNotNull()) {
 
@@ -292,21 +292,21 @@ namespace slib
 							for (sl_uint32 r = 0; r < heightSegment; r++) {
 								Jni::setIntArrayRegion(abuf.value, r*width, width, (jint*)(bufRow));
 							}
-							_JAndroidBitmap::write.call(jbitmap, x, yCurrent, width, heightSegment, abuf.value, width);
+							JAndroidBitmap::write.call(jbitmap, x, yCurrent, width, heightSegment, abuf.value, width);
 							yCurrent += heightSegment;
 							heightRemain -= heightSegment;
 						}
 						ret = sl_true;
 					}
 				}
-				_JAndroidBitmap::returnArrayBuffer.call(sl_null, abuf.value);
+				JAndroidBitmap::returnArrayBuffer.call(sl_null, abuf.value);
 			}
 			return ret;
 		}
 
 		Ref<Canvas> getCanvas() override
 		{
-			JniLocal<jobject> jcanvas = _JAndroidBitmap::getCanvas.callObject(m_bitmap.get());
+			JniLocal<jobject> jcanvas = JAndroidBitmap::getCanvas.callObject(m_bitmap.get());
 			if (jcanvas.isNotNull()) {
 				return GraphicsPlatform::createCanvas(CanvasType::Bitmap, jcanvas);
 			}
@@ -337,7 +337,7 @@ namespace slib
 				const Color4f& cb = param.colorMatrix.blue;
 				const Color4f& ca = param.colorMatrix.alpha;
 				const Color4f& cc = param.colorMatrix.bias;
-				_JAndroidBitmap::drawWithColorMatrix.call(m_bitmap, jcanvas,
+				JAndroidBitmap::drawWithColorMatrix.call(m_bitmap, jcanvas,
 					rectDst.left, rectDst.top, rectDst.right, rectDst.bottom,
 					(sl_int32)(rectSrc.left), (sl_int32)(rectSrc.top), (sl_int32)(rectSrc.right), (sl_int32)(rectSrc.bottom),
 					alpha, blur, tileMode,
@@ -348,7 +348,7 @@ namespace slib
 					cc.x, cc.y, cc.z, cc.w
 					);
 			} else {
-				_JAndroidBitmap::draw.call(m_bitmap, jcanvas,
+				JAndroidBitmap::draw.call(m_bitmap, jcanvas,
 					rectDst.left, rectDst.top, rectDst.right, rectDst.bottom,
 					(sl_int32)(rectSrc.left), (sl_int32)(rectSrc.top), (sl_int32)(rectSrc.right), (sl_int32)(rectSrc.bottom),
 					alpha, blur, tileMode);
@@ -356,26 +356,26 @@ namespace slib
 		}
 	};
 
-	SLIB_DEFINE_OBJECT(_Android_Bitmap, Bitmap)
+	SLIB_DEFINE_OBJECT(_priv_Android_Bitmap, Bitmap)
 
 	Ref<Bitmap> Bitmap::create(sl_uint32 width, sl_uint32 height)
 	{
-		return _Android_Bitmap::create(width, height);
+		return _priv_Android_Bitmap::create(width, height);
 	}
 
 	Ref<Bitmap> Bitmap::loadFromMemory(const void* mem, sl_size size)
 	{
-		return _Android_Bitmap::load(mem, size);
+		return _priv_Android_Bitmap::load(mem, size);
 	}
 
 	Ref<Drawable> GraphicsPlatform::createImageDrawable(jobject bitmap, sl_bool flagFreeOnRelease, Referable* ref)
 	{
-		return _Android_Bitmap::create(bitmap, flagFreeOnRelease, ref);
+		return _priv_Android_Bitmap::create(bitmap, flagFreeOnRelease, ref);
 	}
 
 	jobject GraphicsPlatform::getImageDrawableHandle(Drawable* _drawable)
 	{
-		if (_Android_Bitmap* drawable = CastInstance<_Android_Bitmap>(_drawable)) {
+		if (_priv_Android_Bitmap* drawable = CastInstance<_priv_Android_Bitmap>(_drawable)) {
 			return drawable->m_bitmap;
 		}
 		return 0;

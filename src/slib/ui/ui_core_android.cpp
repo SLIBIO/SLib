@@ -26,46 +26,46 @@
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidPoint, "android/graphics/Point")
+	SLIB_JNI_BEGIN_CLASS(JAndroidPoint, "android/graphics/Point")
 		SLIB_JNI_INT_FIELD(x);
 		SLIB_JNI_INT_FIELD(y);
 	SLIB_JNI_END_CLASS
 
-	SLIB_JNI_BEGIN_CLASS(_AndroidUtil, "slib/platform/android/ui/Util")
+	SLIB_JNI_BEGIN_CLASS(JAndroidUtil, "slib/platform/android/ui/Util")
 		SLIB_JNI_STATIC_METHOD(getDefaultDisplay, "getDefaultDisplay", "(Landroid/app/Activity;)Landroid/view/Display;");
 		SLIB_JNI_STATIC_METHOD(getDisplaySize, "getDisplaySize", "(Landroid/view/Display;)Landroid/graphics/Point;");
 		SLIB_JNI_STATIC_METHOD(openURL, "openURL", "(Landroid/app/Activity;Ljava/lang/String;)V");
 	SLIB_JNI_END_CLASS
 
-	void _AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this);
-	void _AndroidUiThread_runDispatchDelayedCallback(JNIEnv* env, jobject _this, jlong ptr);
+	void _priv_AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this);
+	void _priv_AndroidUiThread_runDispatchDelayedCallback(JNIEnv* env, jobject _this, jlong ptr);
 
-	SLIB_JNI_BEGIN_CLASS(_AndroidUiThread, "slib/platform/android/ui/UiThread")
+	SLIB_JNI_BEGIN_CLASS(JAndroidUiThread, "slib/platform/android/ui/UiThread")
 		SLIB_JNI_STATIC_METHOD(isUiThread, "isUiThread", "()Z");
 		SLIB_JNI_STATIC_METHOD(dispatch, "dispatch", "()V");
 		SLIB_JNI_STATIC_METHOD(dispatchDelayed, "dispatchDelayed", "(JI)V");
 		SLIB_JNI_STATIC_METHOD(runLoop, "runLoop", "()V");
 		SLIB_JNI_STATIC_METHOD(quitLoop, "quitLoop", "()V");
 
-		SLIB_JNI_NATIVE(nativeDispatchCallback, "nativeDispatchCallback", "()V", _AndroidUiThread_runDispatchCallback);
-		SLIB_JNI_NATIVE(nativeDispatchDelayedCallback, "nativeDispatchDelayedCallback", "(J)V", _AndroidUiThread_runDispatchDelayedCallback);
+		SLIB_JNI_NATIVE(nativeDispatchCallback, "nativeDispatchCallback", "()V", _priv_AndroidUiThread_runDispatchCallback);
+		SLIB_JNI_NATIVE(nativeDispatchDelayedCallback, "nativeDispatchDelayedCallback", "(J)V", _priv_AndroidUiThread_runDispatchDelayedCallback);
 	SLIB_JNI_END_CLASS
 
-	void _Android_onCreateActivity(JNIEnv* env, jobject _this, jobject activity);
-	void _Android_onDestroyActivity(JNIEnv* env, jobject _this, jobject activity);
-	void _Android_onResumeActivity(JNIEnv* env, jobject _this, jobject activity);
-	void _Android_onPauseActivity(JNIEnv* env, jobject _this, jobject activity);
-	jboolean _Android_onBack(JNIEnv* env, jobject _this, jobject activity);
+	void _priv_Android_onCreateActivity(JNIEnv* env, jobject _this, jobject activity);
+	void _priv_Android_onDestroyActivity(JNIEnv* env, jobject _this, jobject activity);
+	void _priv_Android_onResumeActivity(JNIEnv* env, jobject _this, jobject activity);
+	void _priv_Android_onPauseActivity(JNIEnv* env, jobject _this, jobject activity);
+	jboolean _priv_Android_onBack(JNIEnv* env, jobject _this, jobject activity);
 
-	SLIB_JNI_BEGIN_CLASS(_Android, "slib/platform/android/Android")
-		SLIB_JNI_NATIVE(onCreateActivity, "nativeOnCreateActivity", "(Landroid/app/Activity;)V", _Android_onCreateActivity);
-		SLIB_JNI_NATIVE(onDestroyActivity, "nativeOnDestroyActivity", "(Landroid/app/Activity;)V", _Android_onDestroyActivity);
-		SLIB_JNI_NATIVE(onResumeActivity, "nativeOnResumeActivity", "(Landroid/app/Activity;)V", _Android_onResumeActivity);
-		SLIB_JNI_NATIVE(onPauseActivity, "nativeOnPauseActivity", "(Landroid/app/Activity;)V", _Android_onPauseActivity);
-		SLIB_JNI_NATIVE(onBack, "nativeOnBack", "(Landroid/app/Activity;)Z", _Android_onBack);
+	SLIB_JNI_BEGIN_CLASS(JAndroid, "slib/platform/android/Android")
+		SLIB_JNI_NATIVE(onCreateActivity, "nativeOnCreateActivity", "(Landroid/app/Activity;)V", _priv_Android_onCreateActivity);
+		SLIB_JNI_NATIVE(onDestroyActivity, "nativeOnDestroyActivity", "(Landroid/app/Activity;)V", _priv_Android_onDestroyActivity);
+		SLIB_JNI_NATIVE(onResumeActivity, "nativeOnResumeActivity", "(Landroid/app/Activity;)V", _priv_Android_onResumeActivity);
+		SLIB_JNI_NATIVE(onPauseActivity, "nativeOnPauseActivity", "(Landroid/app/Activity;)V", _priv_Android_onPauseActivity);
+		SLIB_JNI_NATIVE(onBack, "nativeOnBack", "(Landroid/app/Activity;)Z", _priv_Android_onBack);
 	SLIB_JNI_END_CLASS
 
-	class _Android_Screen : public Screen
+	class _priv_Android_Screen : public Screen
 	{
 	public:
 		JniGlobal<jobject> m_display;
@@ -73,15 +73,15 @@ namespace slib
 		int m_height;
 
 	public:
-		static Ref<_Android_Screen> create(jobject display)
+		static Ref<_priv_Android_Screen> create(jobject display)
 		{
-			JniLocal<jobject> size = _AndroidUtil::getDisplaySize.callObject(sl_null, display);
+			JniLocal<jobject> size = JAndroidUtil::getDisplaySize.callObject(sl_null, display);
 			if (size.isNotNull()) {
-				Ref<_Android_Screen> ret = new _Android_Screen();
+				Ref<_priv_Android_Screen> ret = new _priv_Android_Screen();
 				if (ret.isNotNull()) {
 					ret->m_display = display;
-					ret->m_width = _JAndroidPoint::x.get(size);
-					ret->m_height = _JAndroidPoint::y.get(size);
+					ret->m_width = JAndroidPoint::x.get(size);
+					ret->m_height = JAndroidPoint::y.get(size);
 					return ret;
 				}
 			}
@@ -107,7 +107,7 @@ namespace slib
 			return sl_null;
 		}
 		if (ret.isNull()) {
-			ret = _Android_Screen::create(sl_null);
+			ret = _priv_Android_Screen::create(sl_null);
 		}
 		return ret;
 	}
@@ -131,50 +131,50 @@ namespace slib
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JniLocal<jstring> jurl = Jni::getJniString(_url);
-			_AndroidUtil::openURL.call(sl_null, jactivity, jurl.get());
+			JAndroidUtil::openURL.call(sl_null, jactivity, jurl.get());
 		}
 	}
 	
 	sl_bool UI::isUiThread()
 	{
-		return _AndroidUiThread::isUiThread.callBoolean(sl_null) != 0;
+		return JAndroidUiThread::isUiThread.callBoolean(sl_null) != 0;
 	}
 
 	void UI::dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMillis)
 	{
 		if (delayMillis == 0) {
-			if (_UIDispatcher::addCallback(callback)) {
-				_AndroidUiThread::dispatch.call(sl_null);
+			if (_priv_UIDispatcher::addCallback(callback)) {
+				JAndroidUiThread::dispatch.call(sl_null);
 			}
 		} else {
 			if (delayMillis > 0x7fffffff) {
 				delayMillis = 0x7fffffff;
 			}
 			sl_reg ptr;
-			if (_UIDispatcher::addDelayedCallback(callback, ptr)) {
-				_AndroidUiThread::dispatchDelayed.call(sl_null, (jlong)ptr, delayMillis);
+			if (_priv_UIDispatcher::addDelayedCallback(callback, ptr)) {
+				JAndroidUiThread::dispatchDelayed.call(sl_null, (jlong)ptr, delayMillis);
 			}
 		}
 	}
 
-	void _AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this)
+	void _priv_AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this)
 	{
-		_UIDispatcher::processCallbacks();
+		_priv_UIDispatcher::processCallbacks();
 	}
 
-	void _AndroidUiThread_runDispatchDelayedCallback(JNIEnv* env, jobject _this, jlong ptr)
+	void _priv_AndroidUiThread_runDispatchDelayedCallback(JNIEnv* env, jobject _this, jlong ptr)
 	{
-		_UIDispatcher::processDelayedCallback((sl_reg)ptr);
+		_priv_UIDispatcher::processDelayedCallback((sl_reg)ptr);
 	}
 
 	void UIPlatform::runLoop(sl_uint32 level)
 	{
-		_AndroidUiThread::runLoop.call(sl_null);
+		JAndroidUiThread::runLoop.call(sl_null);
 	}
 
 	void UIPlatform::quitLoop()
 	{
-		_AndroidUiThread::quitLoop.call(sl_null);
+		JAndroidUiThread::quitLoop.call(sl_null);
 	}
 
 	static Ref<UIApp> _g_mobile_app;
@@ -187,7 +187,7 @@ namespace slib
 	{
 	}
 
-	void _Android_onCreateActivity(JNIEnv* env, jobject _this, jobject activity)
+	void _priv_Android_onCreateActivity(JNIEnv* env, jobject _this, jobject activity)
 	{
 		Log("Activity", "Created");
 		Android::setCurrentActivity(activity);
@@ -202,26 +202,26 @@ namespace slib
 		}
 	}
 
-	void _Android_onDestroyActivity(JNIEnv* env, jobject _this, jobject activity)
+	void _priv_Android_onDestroyActivity(JNIEnv* env, jobject _this, jobject activity)
 	{
 		Log("Activity", "Destroyed");
 		MobileApp::dispatchDestroyActivityToApp();
 	}
 
-	void _Android_onResumeActivity(JNIEnv* env, jobject _this, jobject activity)
+	void _priv_Android_onResumeActivity(JNIEnv* env, jobject _this, jobject activity)
 	{
 		Log("Activity", "Resumed");
 		Android::setCurrentActivity(activity);
 		MobileApp::dispatchResumeToApp();
 	}
 
-	void _Android_onPauseActivity(JNIEnv* env, jobject _this, jobject activity)
+	void _priv_Android_onPauseActivity(JNIEnv* env, jobject _this, jobject activity)
 	{
 		Log("Activity", "Paused");
 		MobileApp::dispatchPauseToApp();
 	}
 
-	jboolean _Android_onBack(JNIEnv* env, jobject _this, jobject activity)
+	jboolean _priv_Android_onBack(JNIEnv* env, jobject _this, jobject activity)
 	{
 		Log("Activity", "BackPressed");
 		return (jboolean)(MobileApp::dispatchBackToApp());

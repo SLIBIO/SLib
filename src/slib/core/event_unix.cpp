@@ -23,7 +23,7 @@
 namespace slib
 {
 
-	class _UnixEvent : public Event
+	class _priv_UnixEvent : public Event
 	{
 	public:
 		pthread_cond_t m_cond;
@@ -31,19 +31,19 @@ namespace slib
 		sl_bool m_signal;
 		sl_bool m_flagAutoReset;
 		
-		_UnixEvent()
+		_priv_UnixEvent()
 		{
 		}
 
-		~_UnixEvent()
+		~_priv_UnixEvent()
 		{
 			pthread_cond_destroy(&m_cond);
 			pthread_mutex_destroy(&m_mutex);
 		}
 
-		static Ref<_UnixEvent> create(sl_bool flagAutoReset)
+		static Ref<_priv_UnixEvent> create(sl_bool flagAutoReset)
 		{
-			Ref<_UnixEvent> ret = new _UnixEvent;
+			Ref<_priv_UnixEvent> ret = new _priv_UnixEvent;
 			if (ret.isNotNull()) {
 				pthread_cond_init(&(ret->m_cond), NULL);
 				pthread_mutex_init(&(ret->m_mutex), NULL);
@@ -129,7 +129,7 @@ namespace slib
 
 	Ref<Event> Event::create(sl_bool flagAutoReset)
 	{
-		return _UnixEvent::create(flagAutoReset);
+		return _priv_UnixEvent::create(flagAutoReset);
 	}
 
 }

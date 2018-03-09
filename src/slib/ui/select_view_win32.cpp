@@ -19,7 +19,7 @@
 namespace slib
 {
 
-	class _SelectView : public SelectView
+	class _priv_SelectView : public SelectView
 	{
 	public:
 		void _applyItemsCount(HWND hWnd)
@@ -78,7 +78,7 @@ namespace slib
 
 	};
 
-	class _Win32_SelectViewInstance : public Win32_ViewInstance
+	class _priv_Win32_SelectViewInstance : public Win32_ViewInstance
 	{
 	public:
 		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
@@ -90,7 +90,7 @@ namespace slib
 		{
 			if (code == CBN_SELCHANGE) {
 				Ref<View> view = getView();
-				if (_SelectView* _view = CastInstance<_SelectView>(view.get())) {
+				if (_priv_SelectView* _view = CastInstance<_priv_SelectView>(view.get())) {
 					_view->_onSelectItem(m_handle);
 				}
 				return sl_true;
@@ -107,7 +107,7 @@ namespace slib
 		}
 
 		UINT style = CBS_DROPDOWNLIST | WS_TABSTOP;
-		Ref<_Win32_SelectViewInstance> ret = Win32_ViewInstance::create<_Win32_SelectViewInstance>(this, parent, L"COMBOBOX", L"", style, 0);
+		Ref<_priv_Win32_SelectViewInstance> ret = Win32_ViewInstance::create<_priv_Win32_SelectViewInstance>(this, parent, L"COMBOBOX", L"", style, 0);
 		
 		if (ret.isNotNull()) {
 
@@ -119,7 +119,7 @@ namespace slib
 				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 			}
 
-			((_SelectView*)this)->_copyItems(handle);
+			((_priv_SelectView*)this)->_copyItems(handle);
 		}
 		return ret;
 	}
@@ -128,7 +128,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			m_indexSelected = ((_SelectView*)this)->_getSelectedIndex(handle);
+			m_indexSelected = ((_priv_SelectView*)this)->_getSelectedIndex(handle);
 		}
 	}
 
@@ -144,7 +144,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_SelectView*)this)->_applyItemsCount(handle);
+			((_priv_SelectView*)this)->_applyItemsCount(handle);
 		}
 	}
 
@@ -152,7 +152,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_SelectView*)this)->_copyItems(handle);
+			((_priv_SelectView*)this)->_copyItems(handle);
 		}
 	}
 
@@ -160,7 +160,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_SelectView*)this)->_setItemTitle(handle, index, title);
+			((_priv_SelectView*)this)->_setItemTitle(handle, index, title);
 		}
 	}
 

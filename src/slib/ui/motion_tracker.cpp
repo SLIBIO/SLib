@@ -146,7 +146,7 @@ namespace slib
 		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_real _MotionTracker_getVectorDotProduct(const sl_real* v1, const sl_real* v2, sl_uint32 N)
+	SLIB_INLINE static sl_real _priv_MotionTracker_getVectorDotProduct(const sl_real* v1, const sl_real* v2, sl_uint32 N)
 	{
 		sl_real dot = 0;
 		for (sl_uint32 i = 0; i < N; i++) {
@@ -155,7 +155,7 @@ namespace slib
 		return dot;
 	}
 	
-	SLIB_INLINE static sl_real _MotionTracker_getVectorLength(const sl_real* v, sl_uint32 N)
+	SLIB_INLINE static sl_real _priv_MotionTracker_getVectorLength(const sl_real* v, sl_uint32 N)
 	{
 		sl_real len = 0;
 		for (sl_uint32 i = 0; i < N; i++) {
@@ -164,7 +164,7 @@ namespace slib
 		return Math::sqrt(len);
 	}
 	
-	static sl_bool _MotionTracker_solveLeastSquares(const sl_real* x, const sl_real* y, const sl_real* w, sl_uint32 m, sl_uint32 n, sl_real* outB, sl_real* outDet) {
+	static sl_bool _priv_MotionTracker_solveLeastSquares(const sl_real* x, const sl_real* y, const sl_real* w, sl_uint32 m, sl_uint32 n, sl_real* outB, sl_real* outDet) {
 		// Expand the X vector to a matrix A, pre-multiplied by the weights.
 		sl_real a[MAX_DEGREE + 1][HISTORY_SIZE]; // column-major order
 		for (sl_uint32 h = 0; h < m; h++) {
@@ -181,13 +181,13 @@ namespace slib
 				q[j][h] = a[j][h];
 			}
 			for (sl_uint32 i = 0; i < j; i++) {
-				sl_real dot = _MotionTracker_getVectorDotProduct(&q[j][0], &q[i][0], m);
+				sl_real dot = _priv_MotionTracker_getVectorDotProduct(&q[j][0], &q[i][0], m);
 				for (sl_uint32 h = 0; h < m; h++) {
 					q[j][h] -= dot * q[i][h];
 				}
 			}
 			//sl_real f = q[j][0];
-			sl_real norm = _MotionTracker_getVectorLength(&q[j][0], m);
+			sl_real norm = _priv_MotionTracker_getVectorLength(&q[j][0], m);
 			if (norm < 0.000001f) {
 				// vectors are linearly dependent or zero so no solution
 				return sl_false;
@@ -197,7 +197,7 @@ namespace slib
 				q[j][h] *= invNorm;
 			}
 			for (sl_uint32 i = 0; i < n; i++) {
-				r[j][i] = i < j ? 0 : _MotionTracker_getVectorDotProduct(&q[j][0], &a[i][0], m);
+				r[j][i] = i < j ? 0 : _priv_MotionTracker_getVectorDotProduct(&q[j][0], &a[i][0], m);
 			}
 		}
 		
@@ -209,7 +209,7 @@ namespace slib
 		}
 		for (sl_uint32 i = n; i != 0; ) {
 			i--;
-			outB[i] = _MotionTracker_getVectorDotProduct(&q[i][0], wy, m);
+			outB[i] = _priv_MotionTracker_getVectorDotProduct(&q[i][0], wy, m);
 			for (sl_uint32 j = n - 1; j > i; j--) {
 				outB[i] -= r[i][j] * outB[j];
 			}
@@ -286,7 +286,7 @@ namespace slib
 			}
 			if (degree >= 1) {
 				sl_real xdet, ydet;
-				if (_MotionTracker_solveLeastSquares(time, x, w, nHistory, degree + 1, xCoeff, &xdet) && _MotionTracker_solveLeastSquares(time, y, w, nHistory, degree + 1, yCoeff, &ydet)) {
+				if (_priv_MotionTracker_solveLeastSquares(time, x, w, nHistory, degree + 1, xCoeff, &xdet) && _priv_MotionTracker_solveLeastSquares(time, y, w, nHistory, degree + 1, yCoeff, &ydet)) {
 					m_currentConfidence = xdet * ydet;
 					m_currentVelocity.x = xCoeff[1];
 					m_currentVelocity.y = yCoeff[1];

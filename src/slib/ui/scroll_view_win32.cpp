@@ -17,19 +17,19 @@
 
 #include "view_win32.h"
 
-#define _SCROLL_LINE_SIZE 20
-#define _SCROLL_WHEEL_SIZE 40
+#define PRIV_SCROLL_LINE_SIZE 20
+#define PRIV_SCROLL_WHEEL_SIZE 40
 
 namespace slib
 {
 
-	class _ScrollView : public ScrollView
+	class _priv_ScrollView : public ScrollView
 	{
 	public:
-		friend class _Win32_ScrollViewInstance;
+		friend class _priv_Win32_ScrollViewInstance;
 	};
 		
-	class _Win32_ScrollViewInstance : public Win32_ViewInstance
+	class _priv_Win32_ScrollViewInstance : public Win32_ViewInstance
 	{
 	public:
 		Color m_backgroundColor;
@@ -40,7 +40,7 @@ namespace slib
 			HWND handle = getHandle();
 			if (msg == WM_ERASEBKGND) {
 				Ref<View> view = getView();
-				if (_ScrollView* sv = CastInstance<_ScrollView>(view.get())) {
+				if (_priv_ScrollView* sv = CastInstance<_priv_ScrollView>(view.get())) {
 					Ref<View> cv = sv->getContentView();
 					if (cv.isNotNull()) {
 						if (cv->getWidth() >= sv->getWidth() && cv->getHeight() >= sv->getHeight()) {
@@ -67,15 +67,15 @@ namespace slib
 				}
 			} else {
 				Ref<View> view = getView();
-				if (_ScrollView* sv = CastInstance<_ScrollView>(view.get())) {
+				if (_priv_ScrollView* sv = CastInstance<_priv_ScrollView>(view.get())) {
 					if (sv->isHorizontalScrolling()) {
-						if (Windows::processWindowHorizontalScrollEvents(handle, msg, wParam, lParam, _SCROLL_LINE_SIZE, _SCROLL_WHEEL_SIZE)) {
+						if (Windows::processWindowHorizontalScrollEvents(handle, msg, wParam, lParam, PRIV_SCROLL_LINE_SIZE, PRIV_SCROLL_WHEEL_SIZE)) {
 							_refreshContentPosition(sv, sl_true);
 							return sl_true;
 						}
 					}
 					if (sv->isVerticalScrolling()) {
-						if (Windows::processWindowVerticalScrollEvents(handle, msg, wParam, lParam, _SCROLL_LINE_SIZE, _SCROLL_WHEEL_SIZE)) {
+						if (Windows::processWindowVerticalScrollEvents(handle, msg, wParam, lParam, PRIV_SCROLL_LINE_SIZE, PRIV_SCROLL_WHEEL_SIZE)) {
 							_refreshContentPosition(sv, sl_true);
 							return sl_true;
 						}
@@ -95,7 +95,7 @@ namespace slib
 			return sl_false;
 		}
 
-		void _setContentView(const Ref<View>& viewChild, _ScrollView* viewParent)
+		void _setContentView(const Ref<View>& viewChild, _priv_ScrollView* viewParent)
 		{
 			if (viewChild.isNotNull()) {
 				viewChild->attachToNewInstance(this);
@@ -104,7 +104,7 @@ namespace slib
 			_refreshContentPosition(viewParent, sl_false);
 		}
 
-		void _refreshContentSize(_ScrollView* view)
+		void _refreshContentSize(_priv_ScrollView* view)
 		{
 			HWND handle = getHandle();
 			if (handle) {
@@ -120,7 +120,7 @@ namespace slib
 			}
 		}
 
-		void _refreshContentPosition(_ScrollView* view, sl_bool flagFromEvent)
+		void _refreshContentPosition(_priv_ScrollView* view, sl_bool flagFromEvent)
 		{
 			HWND handle = getHandle();
 			if (handle) {
@@ -162,9 +162,9 @@ namespace slib
 		if (isBorder()) {
 			style |= WS_BORDER;
 		}
-		Ref<_Win32_ScrollViewInstance> ret = Win32_ViewInstance::create<_Win32_ScrollViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
+		Ref<_priv_Win32_ScrollViewInstance> ret = Win32_ViewInstance::create<_priv_Win32_ScrollViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
 		if (ret.isNotNull()) {
-			ret->_setContentView(m_viewContent, (_ScrollView*)this);
+			ret->_setContentView(m_viewContent, (_priv_ScrollView*)this);
 			ret->m_backgroundColor = getBackgroundColor();
 		}
 		return ret;
@@ -173,16 +173,16 @@ namespace slib
 	void ScrollView::_refreshContentSize_NW()
 	{
 		Ref<ViewInstance> instance = getViewInstance();
-		if (_Win32_ScrollViewInstance* _instance = CastInstance<_Win32_ScrollViewInstance>(instance.get())) {
-			_instance->_refreshContentSize((_ScrollView*)this);
+		if (_priv_Win32_ScrollViewInstance* _instance = CastInstance<_priv_Win32_ScrollViewInstance>(instance.get())) {
+			_instance->_refreshContentSize((_priv_ScrollView*)this);
 		}
 	}
 
 	void ScrollView::_setContentView_NW(const Ref<View>& view)
 	{
 		Ref<ViewInstance> instance = getViewInstance();
-		if (_Win32_ScrollViewInstance* _instance = CastInstance<_Win32_ScrollViewInstance>(instance.get())) {
-			_instance->_setContentView(view, (_ScrollView*)this);
+		if (_priv_Win32_ScrollViewInstance* _instance = CastInstance<_priv_Win32_ScrollViewInstance>(instance.get())) {
+			_instance->_setContentView(view, (_priv_ScrollView*)this);
 		}
 	}
 
@@ -203,8 +203,8 @@ namespace slib
 				::SetScrollInfo(handle, SB_VERT, &si, TRUE);
 			}
 			Ref<ViewInstance> instance = getViewInstance();
-			if (_Win32_ScrollViewInstance* _instance = CastInstance<_Win32_ScrollViewInstance>(instance.get())) {
-				_instance->_refreshContentPosition((_ScrollView*)this, sl_false);
+			if (_priv_Win32_ScrollViewInstance* _instance = CastInstance<_priv_Win32_ScrollViewInstance>(instance.get())) {
+				_instance->_refreshContentPosition((_priv_ScrollView*)this, sl_false);
 			}
 		}
 	}
@@ -267,7 +267,7 @@ namespace slib
 	void ScrollView::_setBackgroundColor_NW(const Color& color)
 	{
 		Ref<ViewInstance> instance = getViewInstance();
-		if (_Win32_ScrollViewInstance* _instance = CastInstance<_Win32_ScrollViewInstance>(instance.get())) {
+		if (_priv_Win32_ScrollViewInstance* _instance = CastInstance<_priv_Win32_ScrollViewInstance>(instance.get())) {
 			_instance->m_backgroundColor = color;
 		}
 	}

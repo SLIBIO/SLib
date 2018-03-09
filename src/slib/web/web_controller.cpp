@@ -81,7 +81,7 @@ namespace slib
 		if (app.isNotNull()) {
 			Ref<WebController> controller = app->getController();
 			if (controller.isNotNull()) {
-				ListLocker<_Handler> list(m_handlers);
+				ListLocker<Handler> list(m_handlers);
 				for (sl_size i = 0; i < list.count; i++) {
 					controller->registerHandler(list[i].method, m_path + list[i].path, list[i].handler);
 				}
@@ -92,7 +92,7 @@ namespace slib
 	void WebModule::addHandler(HttpMethod method, const String& path, const WebHandler& handler)
 	{
 		if (handler.isNotNull()) {
-			_Handler h;
+			Handler h;
 			h.method = method;
 			h.path = path;
 			h.handler = handler;

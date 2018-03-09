@@ -1993,13 +1993,13 @@ namespace slib
 		_processRead(&result);
 	}
 
-	class _AsyncStreamFilter_WriteRequest : public AsyncStreamRequest
+	class _priv_AsyncStreamFilter_WriteRequest : public AsyncStreamRequest
 	{
 	public:
 		Memory memConverted;
 		
 	public:
-		_AsyncStreamFilter_WriteRequest(const Memory& _memConv, void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult*)>& callback)
+		_priv_AsyncStreamFilter_WriteRequest(const Memory& _memConv, void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult*)>& callback)
 		 : AsyncStreamRequest(data, size, userObject, callback, sl_false), memConverted(_memConv)
 		{
 		}
@@ -2022,7 +2022,7 @@ namespace slib
 		if (size > 0) {
 			Memory memConv = filterWrite(data, size, userObject);
 			if (memConv.isNotEmpty()) {
-				Ref<_AsyncStreamFilter_WriteRequest> req = new _AsyncStreamFilter_WriteRequest(memConv, data, size, userObject, callback);
+				Ref<_priv_AsyncStreamFilter_WriteRequest> req = new _priv_AsyncStreamFilter_WriteRequest(memConv, data, size, userObject, callback);
 				if (req.isNotNull()) {
 					return stream->write(memConv.getData(), (sl_uint32)(memConv.getSize()), SLIB_FUNCTION_WEAKREF(AsyncStreamFilter, onWriteStream, this), req.get());
 				}
@@ -2043,7 +2043,7 @@ namespace slib
 		if (result->flagError) {
 			m_flagWritingError = sl_true;
 		}
-		_AsyncStreamFilter_WriteRequest* req = (_AsyncStreamFilter_WriteRequest*)(result->userObject);
+		_priv_AsyncStreamFilter_WriteRequest* req = (_priv_AsyncStreamFilter_WriteRequest*)(result->userObject);
 		if (req) {
 			req->runCallback(this, req->size, m_flagWritingError);
 		}

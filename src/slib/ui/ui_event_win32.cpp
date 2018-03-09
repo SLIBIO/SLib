@@ -22,14 +22,14 @@
 namespace slib
 {
 
-	class _UI_Windows_KeyMapper
+	class _priv_UI_Windows_KeyMapper
 	{
 	private:
 		HashTable<sl_uint32, sl_uint32> mapKeyToVK;
 		HashTable<sl_uint32, sl_uint32> mapVKToKey;
 		
 	public:
-		_UI_Windows_KeyMapper()
+		_priv_UI_Windows_KeyMapper()
 		{
 			map(Keycode::Tab, VK_TAB);
 			map(Keycode::Enter, VK_RETURN);
@@ -192,11 +192,11 @@ namespace slib
 		
 	};
 
-	SLIB_SAFE_STATIC_GETTER(_UI_Windows_KeyMapper, _UI_Windows_getKeyMapper)
+	SLIB_SAFE_STATIC_GETTER(_priv_UI_Windows_KeyMapper, _priv_UI_Windows_getKeyMapper)
 
 	sl_uint32 UIEvent::getSystemKeycode(Keycode key)
 	{
-		_UI_Windows_KeyMapper* mapper = _UI_Windows_getKeyMapper();
+		_priv_UI_Windows_KeyMapper* mapper = _priv_UI_Windows_getKeyMapper();
 		if (mapper) {
 			return mapper->keyToVk(key);
 		}
@@ -205,7 +205,7 @@ namespace slib
 
 	Keycode UIEvent::getKeycodeFromSystemKeycode(sl_uint32 vkey)
 	{
-		_UI_Windows_KeyMapper* mapper = _UI_Windows_getKeyMapper();
+		_priv_UI_Windows_KeyMapper* mapper = _priv_UI_Windows_getKeyMapper();
 		if (mapper) {
 			return mapper->vkToKey(vkey);
 		}

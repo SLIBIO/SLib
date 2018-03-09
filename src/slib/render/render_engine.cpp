@@ -385,7 +385,7 @@ namespace slib
 		drawPrimitive(4, vb, PrimitiveType::TriangleStrip);
 	}
 	
-	static void _RenderEngine_makeTransform2D(Matrix3& mat, const Rectangle& rectDst)
+	static void _priv_RenderEngine_makeTransform2D(Matrix3& mat, const Rectangle& rectDst)
 	{
 		sl_real x = rectDst.left;
 		sl_real y = rectDst.bottom;
@@ -396,7 +396,7 @@ namespace slib
 		mat.m20 = x; mat.m21 = y; mat.m22 = 1;
 	}
 	
-	static void _RenderEngine_makeTextureTransform2D(Matrix3& mat, const Rectangle& rt)
+	static void _priv_RenderEngine_makeTextureTransform2D(Matrix3& mat, const Rectangle& rt)
 	{
 		sl_real x = rt.left;
 		sl_real y = rt.top;
@@ -425,14 +425,14 @@ namespace slib
 	void RenderEngine::drawRectangle2D(const Ref<RenderProgram2D_Position>& program, const Rectangle& rectDst, const Color4f& color)
 	{
 		Matrix3 transform;
-		_RenderEngine_makeTransform2D(transform, rectDst);
+		_priv_RenderEngine_makeTransform2D(transform, rectDst);
 		drawRectangle2D(program, transform, color);
 	}
 	
 	void RenderEngine::drawRectangle2D(const Rectangle& rectDst, const Color4f& color)
 	{
 		Matrix3 transform;
-		_RenderEngine_makeTransform2D(transform, rectDst);
+		_priv_RenderEngine_makeTransform2D(transform, rectDst);
 		drawRectangle2D(getDefaultRenderProgramForDrawRectangle2D(), transform, color);
 	}
 	
@@ -450,7 +450,7 @@ namespace slib
 				scope->setTransform(transform);
 				scope->setTexture(texture);
 				Matrix3 textureTransform;
-				_RenderEngine_makeTextureTransform2D(textureTransform, rectSrc);
+				_priv_RenderEngine_makeTextureTransform2D(textureTransform, rectSrc);
 				scope->setTextureTransform(textureTransform);
 				scope->setColor(color);
 				drawTexture2D();
@@ -497,7 +497,7 @@ namespace slib
 	{
 		if (texture.isNotNull()) {
 			Matrix3 transform;
-			_RenderEngine_makeTransform2D(transform, rectDst);
+			_priv_RenderEngine_makeTransform2D(transform, rectDst);
 			drawTexture2D(program, transform, texture, rectSrc, color);
 		}
 	}
@@ -506,7 +506,7 @@ namespace slib
 	{
 		if (texture.isNotNull()) {
 			Matrix3 transform;
-			_RenderEngine_makeTransform2D(transform, rectDst);
+			_priv_RenderEngine_makeTransform2D(transform, rectDst);
 			drawTexture2D(getDefaultRenderProgramForDrawTexture2D(), transform, texture, rectSrc, color);
 		}
 	}
@@ -515,7 +515,7 @@ namespace slib
 	{
 		if (texture.isNotNull()) {
 			Matrix3 transform;
-			_RenderEngine_makeTransform2D(transform, rectDst);
+			_priv_RenderEngine_makeTransform2D(transform, rectDst);
 			drawTexture2D(program, transform, texture, rectSrc, Vector4(1, 1, 1, alpha));
 		}
 	}
@@ -524,7 +524,7 @@ namespace slib
 	{
 		if (texture.isNotNull()) {
 			Matrix3 transform;
-			_RenderEngine_makeTransform2D(transform, rectDst);
+			_priv_RenderEngine_makeTransform2D(transform, rectDst);
 			drawTexture2D(getDefaultRenderProgramForDrawTexture2D(), transform, texture, rectSrc, Vector4(1, 1, 1, alpha));
 		}
 	}

@@ -21,7 +21,7 @@
 namespace slib
 {
 
-	class _OSX_AudioPlayerBuffer : public AudioPlayerBuffer
+	class _priv_macOS_AudioPlayerBuffer : public AudioPlayerBuffer
 	{
 	public:
 		sl_bool m_flagOpened;
@@ -35,14 +35,14 @@ namespace slib
 		AudioStreamBasicDescription m_formatDst;
 		
 	public:
-		_OSX_AudioPlayerBuffer()
+		_priv_macOS_AudioPlayerBuffer()
 		{
 			m_flagOpened = sl_true;
 			m_flagRunning = sl_false;
 			m_callback = sl_null;
 		}
 
-		~_OSX_AudioPlayerBuffer()
+		~_priv_macOS_AudioPlayerBuffer()
 		{
 			release();
 		}
@@ -53,9 +53,9 @@ namespace slib
 			LogError("AudioPlayer", text);
 		}
 		
-		static Ref<_OSX_AudioPlayerBuffer> create(const AudioPlayerBufferParam& param, const AudioDeviceID deviceID)
+		static Ref<_priv_macOS_AudioPlayerBuffer> create(const AudioPlayerBufferParam& param, const AudioDeviceID deviceID)
 		{
-			Ref<_OSX_AudioPlayerBuffer> ret;
+			Ref<_priv_macOS_AudioPlayerBuffer> ret;
 			
 			if (param.channelsCount != 1 && param.channelsCount != 2) {
 				return ret;
@@ -112,7 +112,7 @@ namespace slib
 				
 				if (AudioObjectSetPropertyData(deviceID, &prop, 0, NULL, sizeValue, &sizeFrame) == kAudioHardwareNoError) {
 					
-					ret = new _OSX_AudioPlayerBuffer();
+					ret = new _priv_macOS_AudioPlayerBuffer();
 					
 					if (ret.isNotNull()) {
 						
@@ -225,7 +225,7 @@ namespace slib
 									AudioStreamPacketDescription**  outDataPacketDescription,
 									void*                           inUserData)
 		{
-			_OSX_AudioPlayerBuffer* object = (_OSX_AudioPlayerBuffer*)inUserData;
+			_priv_macOS_AudioPlayerBuffer* object = (_priv_macOS_AudioPlayerBuffer*)inUserData;
 			object->onConvert(*ioNumberDataPackets, ioData);
 			return noErr;
 		}
@@ -243,24 +243,24 @@ namespace slib
 											const AudioTimeStamp* outputTime,
 											void *clientData)
 		{
-			_OSX_AudioPlayerBuffer* object = (_OSX_AudioPlayerBuffer*)(clientData);
+			_priv_macOS_AudioPlayerBuffer* object = (_priv_macOS_AudioPlayerBuffer*)(clientData);
 			
 			return object->onFrame(outputData);
 		}
 	};
 
-	class _OSX_AudioPlayer : public AudioPlayer
+	class _priv_macOS_AudioPlayer : public AudioPlayer
 	{
 	public:
 		AudioDeviceID m_deviceID;
 		
 	public:
-		_OSX_AudioPlayer()
+		_priv_macOS_AudioPlayer()
 		{
 			m_deviceID = 0;
 		}
 
-		~_OSX_AudioPlayer()
+		~_priv_macOS_AudioPlayer()
 		{
 		}
 		
@@ -270,15 +270,15 @@ namespace slib
 			LogError("AudioPlayer", text);
 		}
 		
-		static Ref<_OSX_AudioPlayer> create(const AudioPlayerParam& param)
+		static Ref<_priv_macOS_AudioPlayer> create(const AudioPlayerParam& param)
 		{
-			OSX_AudioDeviceInfo deviceInfo;
+			_priv_macOS_AudioDeviceInfo deviceInfo;
 			if (!(deviceInfo.selectDevice(sl_false, param.deviceId))) {
 				logError("Failed to find audio ouptut device - " + param.deviceId);
 				return sl_null;
 			}
 
-			Ref<_OSX_AudioPlayer> ret = new _OSX_AudioPlayer();
+			Ref<_priv_macOS_AudioPlayer> ret = new _priv_macOS_AudioPlayer();
 			if (ret.isNotNull()) {
 				ret->m_deviceID = deviceInfo.id;
 			}		
@@ -288,7 +288,7 @@ namespace slib
 		Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param) override
 		{
 			if (m_deviceID != 0) {
-				return _OSX_AudioPlayerBuffer::create(param, m_deviceID);
+				return _priv_macOS_AudioPlayerBuffer::create(param, m_deviceID);
 			}
 			return sl_null;
 		}
@@ -297,12 +297,12 @@ namespace slib
 
 	Ref<AudioPlayer> AudioPlayer::create(const AudioPlayerParam& param)
 	{
-		return _OSX_AudioPlayer::create(param);
+		return _priv_macOS_AudioPlayer::create(param);
 	}
 
 	List<AudioPlayerInfo> AudioPlayer::getPlayersList()
 	{
-		ListElements<OSX_AudioDeviceInfo> list(OSX_AudioDeviceInfo::getAllDevices(sl_false));
+		ListElements<_priv_macOS_AudioDeviceInfo> list(_priv_macOS_AudioDeviceInfo::getAllDevices(sl_false));
 		List<AudioPlayerInfo> ret;
 		for (sl_size i = 0; i < list.count; i++) {
 			AudioPlayerInfo info;

@@ -40,21 +40,21 @@ namespace slib
 
 	DWORD _g_thread_ui = 0;
 
-	class _Win32_UI
+	class _priv_Win32_UI
 	{
 	public:
 		Ref<Screen> m_screenPrimary;
 
-		_Win32_UI();
+		_priv_Win32_UI();
 
 	};
 
-	SLIB_SAFE_STATIC_GETTER(_Win32_UI, _Win32_getUI)
+	SLIB_SAFE_STATIC_GETTER(_priv_Win32_UI, _priv_Win32_getUI)
 
-	class _Win32_Screen : public Screen
+	class _priv_Win32_Screen : public Screen
 	{
 	public:
-		_Win32_Screen()
+		_priv_Win32_Screen()
 		{
 		}
 
@@ -71,7 +71,7 @@ namespace slib
 
 	List< Ref<Screen> > UI::getScreens()
 	{
-		_Win32_UI* ui = _Win32_getUI();
+		_priv_Win32_UI* ui = _priv_Win32_getUI();
 		if (!ui) {
 			return sl_null;
 		}
@@ -82,7 +82,7 @@ namespace slib
 
 	Ref<Screen> UI::getPrimaryScreen()
 	{
-		_Win32_UI* ui = _Win32_getUI();
+		_priv_Win32_UI* ui = _priv_Win32_getUI();
 		if (!ui) {
 			return sl_null;
 		}
@@ -91,7 +91,7 @@ namespace slib
 
 	Ref<Screen> UI::getFocusedScreen()
 	{
-		_Win32_UI* ui = _Win32_getUI();
+		_priv_Win32_UI* ui = _priv_Win32_getUI();
 		if (!ui) {
 			return sl_null;
 		}
@@ -103,7 +103,7 @@ namespace slib
 		return (_g_thread_ui == ::GetCurrentThreadId());
 	}
 
-	void _Win32_PostMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+	void _priv_Win32_PostMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		Win32_UI_Shared* shared = Win32_UI_Shared::get();
 		if (!shared) {
@@ -122,33 +122,33 @@ namespace slib
 			if (!shared) {
 				return;
 			}
-			if (_UIDispatcher::addCallback(callback)) {
+			if (_priv_UIDispatcher::addCallback(callback)) {
 				::PostMessageW(shared->hWndMessage, SLIB_UI_MESSAGE_DISPATCH, 0, 0);
 			}
 		} else {
 			sl_reg ptr;
-			if (_UIDispatcher::addDelayedCallback(callback, ptr)) {
-				Dispatch::setTimeout(Function<void()>::bind(&_Win32_PostMessage, SLIB_UI_MESSAGE_DISPATCH_DELAYED, 0, (LPARAM)ptr), delayMillis);
+			if (_priv_UIDispatcher::addDelayedCallback(callback, ptr)) {
+				Dispatch::setTimeout(Function<void()>::bind(&_priv_Win32_PostMessage, SLIB_UI_MESSAGE_DISPATCH_DELAYED, 0, (LPARAM)ptr), delayMillis);
 			}
 		}
 	}
 
-	void _Win32_processMenuCommand(WPARAM wParam, LPARAM lParam);
-	sl_bool _Win32_processMenuShortcutKey(MSG& msg);
-	void _Win32_processCustomMsgBox(WPARAM wParam, LPARAM lParam);
-	sl_bool _Win32_captureChildInstanceEvents(View* view, MSG& msg);
+	void _priv_Win32_processMenuCommand(WPARAM wParam, LPARAM lParam);
+	sl_bool _priv_Win32_processMenuShortcutKey(MSG& msg);
+	void _priv_Win32_processCustomMsgBox(WPARAM wParam, LPARAM lParam);
+	sl_bool _priv_Win32_captureChildInstanceEvents(View* view, MSG& msg);
 
-	LRESULT CALLBACK _Win32_MessageProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	LRESULT CALLBACK _priv_Win32_MessageProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (uMsg == SLIB_UI_MESSAGE_DISPATCH) {
-			_UIDispatcher::processCallbacks();
+			_priv_UIDispatcher::processCallbacks();
 		} else if (uMsg == SLIB_UI_MESSAGE_DISPATCH_DELAYED) {
-			_UIDispatcher::processDelayedCallback((sl_reg)lParam);
+			_priv_UIDispatcher::processDelayedCallback((sl_reg)lParam);
 		} else if (uMsg == SLIB_UI_MESSAGE_CUSTOM_MSGBOX) {
-			_Win32_processCustomMsgBox(wParam, lParam);
+			_priv_Win32_processCustomMsgBox(wParam, lParam);
 			return 0;
 		} else if (uMsg == WM_MENUCOMMAND) {
-			_Win32_processMenuCommand(wParam, lParam);
+			_priv_Win32_processMenuCommand(wParam, lParam);
 			return 0;
 		}
 		return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -163,13 +163,13 @@ namespace slib
 				break;
 			}
 			if (msg.message == SLIB_UI_MESSAGE_DISPATCH) {
-				_UIDispatcher::processCallbacks();
+				_priv_UIDispatcher::processCallbacks();
 			} else if (msg.message == SLIB_UI_MESSAGE_DISPATCH_DELAYED) {
-				_UIDispatcher::processDelayedCallback((sl_reg)(msg.lParam));
+				_priv_UIDispatcher::processDelayedCallback((sl_reg)(msg.lParam));
 			} else if (msg.message == SLIB_UI_MESSAGE_CLOSE) {
 				::DestroyWindow(msg.hwnd);
 			} else if (msg.message == WM_MENUCOMMAND) {
-				_Win32_processMenuCommand(msg.wParam, msg.lParam);
+				_priv_Win32_processMenuCommand(msg.wParam, msg.lParam);
 			} else {
 				do {
 					HWND hWnd = ::GetActiveWindow();
@@ -180,14 +180,14 @@ namespace slib
 							}
 						}
 					}
-					if (_Win32_processMenuShortcutKey(msg)) {
+					if (_priv_Win32_processMenuShortcutKey(msg)) {
 						break;
 					}
 					Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(msg.hwnd));
 					if (instance.isNotNull()) {
 						Ref<View> view = instance->getView();
 						if (view.isNotNull()) {
-							if (_Win32_captureChildInstanceEvents(view.get(), msg)) {
+							if (_priv_Win32_captureChildInstanceEvents(view.get(), msg)) {
 								break;
 							}
 							if (instance->preprocessWindowMessage(msg)) {
@@ -201,7 +201,7 @@ namespace slib
 			}
 		}
 
-		_UIDispatcher::removeAllCallbacks();
+		_priv_UIDispatcher::removeAllCallbacks();
 
 	}
 
@@ -240,13 +240,13 @@ namespace slib
 		::PostQuitMessage(0);
 	}
 
-	_Win32_UI::_Win32_UI()
+	_priv_Win32_UI::_priv_Win32_UI()
 	{
-		m_screenPrimary = new _Win32_Screen();
+		m_screenPrimary = new _priv_Win32_Screen();
 	}
 
-	LRESULT CALLBACK _Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK _priv_Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK _priv_Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	Win32_UI_Shared::Win32_UI_Shared()
 	{
@@ -258,7 +258,7 @@ namespace slib
 			::ZeroMemory(&wc, sizeof(wc));
 			wc.cbSize = sizeof(wc);
 			wc.style = CS_DBLCLKS | CS_PARENTDC;
-			wc.lpfnWndProc = _Win32_ViewProc;
+			wc.lpfnWndProc = _priv_Win32_ViewProc;
 			wc.cbClsExtra = 0;
 			wc.cbWndExtra = 0;
 			wc.hInstance = hInstance;
@@ -277,7 +277,7 @@ namespace slib
 			::ZeroMemory(&wc, sizeof(wc));
 			wc.cbSize = sizeof(wc);
 			wc.style = CS_DBLCLKS;
-			wc.lpfnWndProc = _Win32_WindowProc;
+			wc.lpfnWndProc = _priv_Win32_WindowProc;
 			wc.cbClsExtra = 0;
 			wc.cbWndExtra = 0;
 			wc.hInstance = hInstance;
@@ -295,7 +295,7 @@ namespace slib
 			WNDCLASSW wc;
 			::ZeroMemory(&wc, sizeof(wc));
 			wc.hInstance = hInstance;
-			wc.lpfnWndProc = _Win32_MessageProc;
+			wc.lpfnWndProc = _priv_Win32_MessageProc;
 			wc.lpszClassName = L"SLIBMESSAGEHANDLER";
 			m_wndClassForMessage = ::RegisterClassW(&wc);
 			hWndMessage = ::CreateWindowExW(0, (LPCWSTR)((LONG_PTR)m_wndClassForMessage), L"", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, hInstance, 0);

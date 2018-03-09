@@ -19,25 +19,25 @@
 namespace slib
 {
 
-	void _Notification_onTokenRefresh(JNIEnv* env, jobject _this, jstring token);
-	void _Notification_onMessageReceived(JNIEnv* env, jobject _this, jstring title, jstring body, jobjectArray data);
+	void _priv_Notification_onTokenRefresh(JNIEnv* env, jobject _this, jstring token);
+	void _priv_Notification_onMessageReceived(JNIEnv* env, jobject _this, jstring title, jstring body, jobjectArray data);
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidFirebaseInstanceIDService, "slib/platform/android/ui/FirebaseInstanceIDService")
-	SLIB_JNI_NATIVE(onCompleted, "nativeOnTokenRefresh", "(Ljava/lang/String;)V", _Notification_onTokenRefresh);
-	SLIB_JNI_STATIC_METHOD(getToken, "getToken", "()V");
+	SLIB_JNI_BEGIN_CLASS(JAndroidFirebaseInstanceIDService, "slib/platform/android/ui/FirebaseInstanceIDService")
+		SLIB_JNI_NATIVE(onCompleted, "nativeOnTokenRefresh", "(Ljava/lang/String;)V", _priv_Notification_onTokenRefresh);
+		SLIB_JNI_STATIC_METHOD(getToken, "getToken", "()V");
 	SLIB_JNI_END_CLASS
 
-	SLIB_JNI_BEGIN_CLASS(_JAndroidFirebaseMessagingService, "slib/platform/android/ui/FirebaseMessagingService")
-	SLIB_JNI_NATIVE(onPrepared, "nativeOnMessageReceived", "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)V", _Notification_onMessageReceived);
+	SLIB_JNI_BEGIN_CLASS(JAndroidFirebaseMessagingService, "slib/platform/android/ui/FirebaseMessagingService")
+		SLIB_JNI_NATIVE(onPrepared, "nativeOnMessageReceived", "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)V", _priv_Notification_onMessageReceived);
 	SLIB_JNI_END_CLASS
 
 
 	void PushNotification::_initToken()
 	{
-		_JAndroidFirebaseInstanceIDService::getToken.call(sl_null);
+		JAndroidFirebaseInstanceIDService::getToken.call(sl_null);
 	}
 
-	void _Notification_onTokenRefresh(JNIEnv* env, jobject _this, jstring token)
+	void _priv_Notification_onTokenRefresh(JNIEnv* env, jobject _this, jstring token)
 	{
 		String tokenString = Jni::getString(token);
 		Function<void (String)> callback = PushNotification::getTokenRefreshCallback();
@@ -47,7 +47,7 @@ namespace slib
 	}
 
 
-	void _Notification_onMessageReceived(JNIEnv* env, jobject _this, jstring title, jstring body, jobjectArray data)
+	void _priv_Notification_onMessageReceived(JNIEnv* env, jobject _this, jstring title, jstring body, jobjectArray data)
 	{
 		JsonMap _data;
 		if (data) {

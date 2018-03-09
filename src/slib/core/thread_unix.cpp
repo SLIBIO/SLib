@@ -42,7 +42,7 @@ namespace slib
 		_gt_threadUniqueId = n;
 	}
 
-	static void* _ThreadProc(void* lpParam)
+	static void* _priv_ThreadProc(void* lpParam)
 	{
 		Thread* pThread = (Thread*)lpParam;
 		pThread->_run();
@@ -65,7 +65,7 @@ namespace slib
 			return;
 		}
 		this->increaseReference();
-		result = pthread_create(&threadId, &attr, &_ThreadProc, this);
+		result = pthread_create(&threadId, &attr, &_priv_ThreadProc, this);
 		if (result == 0) {
 			m_handle = (void*)(threadId);
 		} else {
@@ -78,11 +78,11 @@ namespace slib
 	{
 	}
 
-#define _UNIX_SCHED_POLICY SCHED_FIFO
+#define PRIV_UNIX_SCHED_POLICY SCHED_FIFO
 	static int _thread_getUnixPriority(ThreadPriority priority)
 	{
-		int min = sched_get_priority_min(_UNIX_SCHED_POLICY);
-		int max = sched_get_priority_max(_UNIX_SCHED_POLICY);
+		int min = sched_get_priority_min(PRIV_UNIX_SCHED_POLICY);
+		int max = sched_get_priority_max(PRIV_UNIX_SCHED_POLICY);
 		if (min < 0 || max < 0) {
 			return -1;
 		}
@@ -109,7 +109,7 @@ namespace slib
 			if (p >= 0) {
 				sched_param param;
 				param.sched_priority = p;
-				pthread_setschedparam(thread, _UNIX_SCHED_POLICY, &param);
+				pthread_setschedparam(thread, PRIV_UNIX_SCHED_POLICY, &param);
 			}
 		}
 	}

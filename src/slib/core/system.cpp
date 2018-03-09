@@ -89,23 +89,23 @@ namespace slib
 
 #if defined(SLIB_PLATFORM_IS_MOBILE)
 
-	typedef CList<String> _GlobalUniqueInstanceList;
+	typedef CList<String> _priv_GlobalUniqueInstanceList;
 
-	SLIB_SAFE_STATIC_GETTER(_GlobalUniqueInstanceList, _getGlobalUniqueInstanceList)
+	SLIB_SAFE_STATIC_GETTER(_priv_GlobalUniqueInstanceList, _getGlobalUniqueInstanceList)
 
-	class _GlobalUniqueInstance : public GlobalUniqueInstance
+	class _priv_GlobalUniqueInstance : public GlobalUniqueInstance
 	{
 	public:
 		String m_name;
 		
 	public:
-		_GlobalUniqueInstance()
+		_priv_GlobalUniqueInstance()
 		{
 		}
 		
-		~_GlobalUniqueInstance()
+		~_priv_GlobalUniqueInstance()
 		{
-			_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+			_priv_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
 			if (list) {
 				list->remove(m_name);
 			}
@@ -120,14 +120,14 @@ namespace slib
 			return sl_null;
 		}
 		name = File::makeSafeFileName(name);
-		_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+		_priv_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
 		if (!list) {
 			return sl_null;
 		}
 		if (list->indexOf(name) >= 0) {
 			return sl_null;
 		}
-		Ref<_GlobalUniqueInstance> instance = new _GlobalUniqueInstance();
+		Ref<_priv_GlobalUniqueInstance> instance = new _priv_GlobalUniqueInstance();
 		if (instance.isNotNull()) {
 			instance->m_name = name;
 			list->add(name);
@@ -143,7 +143,7 @@ namespace slib
 			return sl_false;
 		}
 		name = File::makeSafeFileName(name);
-		_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+		_priv_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
 		if (!list) {
 			return sl_false;
 		}

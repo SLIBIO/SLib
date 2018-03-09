@@ -22,11 +22,11 @@
 
 namespace slib
 {
-	class _OSX_Window;
+	class _priv_macOS_Window;
 }
 
-@interface _slib_OSX_Window : NSWindow<NSWindowDelegate> {
-@public slib::WeakRef<slib::_OSX_Window> m_window;
+@interface _priv_Slib_macOS_Window : NSWindow<NSWindowDelegate> {
+@public slib::WeakRef<slib::_priv_macOS_Window> m_window;
 	
 @public sl_bool m_flagClosing;
 @public sl_bool m_flagModal;
@@ -37,7 +37,7 @@ namespace slib
 namespace slib
 {
 
-	class _OSX_Window : public WindowInstance
+	class _priv_macOS_Window : public WindowInstance
 	{
 	public:
 		NSWindow* m_window;
@@ -48,17 +48,17 @@ namespace slib
 		AtomicRef<ViewInstance> m_viewContent;
 		
 	public:
-		_OSX_Window()
+		_priv_macOS_Window()
 		{
 		}
 		
-		~_OSX_Window()
+		~_priv_macOS_Window()
 		{
 			release();
 		}
 
 	public:
-		static Ref<_OSX_Window> create(NSWindow* window)
+		static Ref<_priv_macOS_Window> create(NSWindow* window)
 		{
 			if (window != nil) {
 				sl_ui_pos heightScreen;
@@ -72,7 +72,7 @@ namespace slib
 				} else {
 					heightScreen = 0;
 				}
-				Ref<_OSX_Window> ret = new _OSX_Window();
+				Ref<_priv_macOS_Window> ret = new _priv_macOS_Window();
 				if (ret.isNotNull()) {
 					ret->m_window = window;
 					ret->m_heightScreen = heightScreen;
@@ -82,8 +82,8 @@ namespace slib
 						if (content.isNotNull()) {
 							content->setWindowContent(sl_true);
 							ret->m_viewContent = content;
-							if ([view isKindOfClass:[Slib_OSX_ViewHandle class]]) {
-								((Slib_OSX_ViewHandle*)view)->m_viewInstance = Ref<OSX_ViewInstance>::from(content);
+							if ([view isKindOfClass:[_priv_Slib_macOS_ViewHandle class]]) {
+								((_priv_Slib_macOS_ViewHandle*)view)->m_viewInstance = Ref<macOS_ViewInstance>::from(content);
 							}
 						}
 					}
@@ -98,7 +98,7 @@ namespace slib
 			
 			NSWindow* parent = nil;
 			if (param.parent.isNotNull()) {
-				_OSX_Window* w = static_cast<_OSX_Window*>(param.parent.get());
+				_priv_macOS_Window* w = static_cast<_priv_macOS_Window*>(param.parent.get());
 				parent = w->m_window;
 			}
 			
@@ -149,16 +149,16 @@ namespace slib
 				rect = [NSWindow contentRectForFrameRect:rect styleMask:styleMask];
 			}
 
-			_slib_OSX_Window* window = [[_slib_OSX_Window alloc] initWithContentRect:rect styleMask:styleMask backing:NSBackingStoreBuffered defer:YES screen:screen];
+			_priv_Slib_macOS_Window* window = [[_priv_Slib_macOS_Window alloc] initWithContentRect:rect styleMask:styleMask backing:NSBackingStoreBuffered defer:YES screen:screen];
 			
 			if (window != nil) {
 			
 				window->m_flagClosing = sl_false;
 				window->m_flagModal = flagModal;
 				[window setReleasedWhenClosed:NO];
-				[window setContentView:[[Slib_OSX_ViewHandle alloc] init]];
+				[window setContentView:[[_priv_Slib_macOS_ViewHandle alloc] init]];
 
-				Ref<_OSX_Window> ret = Ref<_OSX_Window>::from(UIPlatform::createWindowInstance(window));
+				Ref<_priv_macOS_Window> ret = Ref<_priv_macOS_Window>::from(UIPlatform::createWindowInstance(window));
 				
 				if (ret.isNotNull()) {
 					
@@ -209,8 +209,8 @@ namespace slib
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
-				if ([window isKindOfClass:[_slib_OSX_Window class]]) {
-					_slib_OSX_Window* w = (_slib_OSX_Window*)window;
+				if ([window isKindOfClass:[_priv_Slib_macOS_Window class]]) {
+					_priv_Slib_macOS_Window* w = (_priv_Slib_macOS_Window*)window;
 					if (w->m_flagModal) {
 						w->m_flagModal = sl_false;
 						NSWindow* parent = m_parent;
@@ -248,7 +248,7 @@ namespace slib
 			NSWindow* window = m_window;
 			if (window != nil) {
 				if (windowInst.isNotNull()) {
-					_OSX_Window* w = static_cast<_OSX_Window*>(windowInst.get());
+					_priv_macOS_Window* w = static_cast<_priv_macOS_Window*>(windowInst.get());
 					NSWindow* p = w->m_window;
 					m_parent = p;
 					if (p != nil) {
@@ -1026,12 +1026,12 @@ namespace slib
 
 	Ref<WindowInstance> Window::createWindowInstance(const WindowInstanceParam& param)
 	{
-		return _OSX_Window::create(param);
+		return _priv_macOS_Window::create(param);
 	}
 
 }
 
-@implementation _slib_OSX_Window
+@implementation _priv_Slib_macOS_Window
 
 - (BOOL)canBecomeKeyWindow
 {
@@ -1042,7 +1042,7 @@ namespace slib
 {
 	BOOL ret = YES;
 	m_flagClosing = sl_true;
-	slib::Ref<slib::_OSX_Window> window = m_window;
+	slib::Ref<slib::_priv_macOS_Window> window = m_window;
 	if (window.isNotNull()) {
 		if (window->onClose()) {
 			window->close();
@@ -1057,15 +1057,15 @@ namespace slib
 
 - (void)windowWillClose:(NSNotification *)notification
 {
-	slib::Ref<slib::_OSX_Window> window = m_window;
+	slib::Ref<slib::_priv_macOS_Window> window = m_window;
 	if (window.isNotNull()) {
-		slib::UI::dispatchToUiThread(SLIB_FUNCTION_REF(slib::_OSX_Window, release, window));
+		slib::UI::dispatchToUiThread(SLIB_FUNCTION_REF(slib::_priv_macOS_Window, release, window));
 	}
 }
 
 - (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)frameSize
 {
-	slib::Ref<slib::_OSX_Window> window = m_window;
+	slib::Ref<slib::_priv_macOS_Window> window = m_window;
 	if (window.isNotNull()) {
 		slib::UISize size((sl_ui_pos)(frameSize.width), (sl_ui_pos)(frameSize.height));
 		if (size.x < 0) {
@@ -1083,7 +1083,7 @@ namespace slib
 
 - (void)windowDidResize:(NSNotification *)notification
 {
-	slib::Ref<slib::_OSX_Window> window = m_window;
+	slib::Ref<slib::_priv_macOS_Window> window = m_window;
 	if (window.isNotNull()) {
 		NSSize size = self.frame.size;
 		window->onResize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
@@ -1092,7 +1092,7 @@ namespace slib
 
 - (void)windowDidMove:(NSNotification *)notification
 {
-	slib::Ref<slib::_OSX_Window> window = m_window;
+	slib::Ref<slib::_priv_macOS_Window> window = m_window;
 	if (window.isNotNull()) {
 		window->onMove();
 	}
@@ -1100,7 +1100,7 @@ namespace slib
 
 - (void)windowWillMiniaturize:(NSNotification *)notification
 {
-	slib::Ref<slib::_OSX_Window> window = m_window;
+	slib::Ref<slib::_priv_macOS_Window> window = m_window;
 	if (window.isNotNull()) {
 		window->onMinimize();
 	}
@@ -1108,7 +1108,7 @@ namespace slib
 
 - (void)windowDidDeminiaturize:(NSNotification *)notification
 {
-	slib::Ref<slib::_OSX_Window> window = m_window;
+	slib::Ref<slib::_priv_macOS_Window> window = m_window;
 	if (window.isNotNull()) {
 		window->onDeminimize();
 	}
@@ -1116,7 +1116,7 @@ namespace slib
 
 - (void)windowDidEnterFullScreen:(NSNotification *)notification
 {
-	slib::Ref<slib::_OSX_Window> window = m_window;
+	slib::Ref<slib::_priv_macOS_Window> window = m_window;
 	if (window.isNotNull()) {
 		window->onMaximize();
 	}
@@ -1124,7 +1124,7 @@ namespace slib
 
 - (void)windowDidExitFullScreen:(NSNotification *)notification
 {
-	slib::Ref<slib::_OSX_Window> window = m_window;
+	slib::Ref<slib::_priv_macOS_Window> window = m_window;
 	if (window.isNotNull()) {
 		window->onDemaximize();
 	}
@@ -1171,7 +1171,7 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		ret = _OSX_Window::create(window);
+		ret = _priv_macOS_Window::create(window);
 		if (ret.isNotNull()) {
 			UIPlatform::_registerWindowInstance((__bridge void*)window, ret.get());
 		}
@@ -1190,7 +1190,7 @@ namespace slib
 
 	NSWindow* UIPlatform::getWindowHandle(WindowInstance* instance)
 	{
-		_OSX_Window* window = (_OSX_Window*)instance;
+		_priv_macOS_Window* window = (_priv_macOS_Window*)instance;
 		if (window) {
 			return window->m_window;
 		} else {
@@ -1203,7 +1203,7 @@ namespace slib
 		if (window) {
 			Ref<WindowInstance> instance = window->getWindowInstance();
 			if (instance.isNotNull()) {
-				_OSX_Window* _instance = (_OSX_Window*)(instance.get());
+				_priv_macOS_Window* _instance = (_priv_macOS_Window*)(instance.get());
 				if (_instance) {
 					return _instance->m_window;
 				}

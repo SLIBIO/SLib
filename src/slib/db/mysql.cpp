@@ -47,23 +47,23 @@ namespace slib
 	{
 	}
 
-	class _MySQL_Database_Lib
+	class _priv_MySQL_Database_Lib
 	{
 	public:
-		SLIB_INLINE _MySQL_Database_Lib()
+		SLIB_INLINE _priv_MySQL_Database_Lib()
 		{
 			::mysql_library_init(0, sl_null, sl_null);
 		}
 	};
 
-	class _MySQL_Database_ThreadHandler : public Referable
+	class _priv_MySQL_Database_ThreadHandler : public Referable
 	{
 	public:
-		SLIB_INLINE _MySQL_Database_ThreadHandler()
+		SLIB_INLINE _priv_MySQL_Database_ThreadHandler()
 		{
 		}
 
-		~_MySQL_Database_ThreadHandler()
+		~_priv_MySQL_Database_ThreadHandler()
 		{
 			::mysql_thread_end();
 		}
@@ -71,7 +71,7 @@ namespace slib
 
 	void MySQL_Database::initThread()
 	{
-		SLIB_SAFE_STATIC(_MySQL_Database_Lib, lib)
+		SLIB_SAFE_STATIC(_priv_MySQL_Database_Lib, lib)
 		if (SLIB_SAFE_STATIC_CHECK_FREED(lib)) {
 			return;
 		}
@@ -87,7 +87,7 @@ namespace slib
 			Ref<Referable> ref = thread->getAttachedObject("MYSQL");
 			if (ref.isNull()) {
 				::mysql_thread_init();
-				ref = new _MySQL_Database_ThreadHandler;
+				ref = new _priv_MySQL_Database_ThreadHandler;
 				if (ref.isNotNull()) {
 					thread->attachObject("MYSQL", ref.get());
 				}
@@ -97,26 +97,26 @@ namespace slib
 		}
 	}
 
-	class _MySQL_Database : public MySQL_Database
+	class _priv_MySQL_Database : public MySQL_Database
 	{
 	public:
 		MYSQL* m_mysql;
 
 	public:
-		_MySQL_Database()
+		_priv_MySQL_Database()
 		{
 			m_mysql = sl_null;
 		}
 
-		~_MySQL_Database()
+		~_priv_MySQL_Database()
 		{
 			::mysql_close(m_mysql);
 		}
 
 	public:
-		static Ref<_MySQL_Database> connect(const MySQL_Param& param, String& outErrorMessage)
+		static Ref<_priv_MySQL_Database> connect(const MySQL_Param& param, String& outErrorMessage)
 		{
-			Ref<_MySQL_Database> ret;
+			Ref<_priv_MySQL_Database> ret;
 
 			initThread();
 
@@ -144,7 +144,7 @@ namespace slib
 					my_bool flagReportTruncation = 1;
 					::mysql_options(mysql, MYSQL_REPORT_DATA_TRUNCATION, &flagReportTruncation);
 
-					ret = new _MySQL_Database;
+					ret = new _priv_MySQL_Database;
 					if (ret.isNotNull()) {
 						ret->m_mysql = mysql;
 						return ret;
@@ -180,7 +180,7 @@ namespace slib
 			return -1;
 		}
 
-		class _DatabaseCursor : public DatabaseCursor
+		class _priv_DatabaseCursor : public DatabaseCursor
 		{
 		public:
 			MYSQL_RES* m_result;
@@ -194,7 +194,7 @@ namespace slib
 			String* m_columnNames;
 			CHashMap<String, sl_int32> m_mapColumnIndexes;
 
-			_DatabaseCursor(MySQL_Database* db, MYSQL_RES* result)
+			_priv_DatabaseCursor(MySQL_Database* db, MYSQL_RES* result)
 			{
 				m_db = db;
 				m_result = result;
@@ -214,7 +214,7 @@ namespace slib
 				db->lock();
 			}
 
-			~_DatabaseCursor()
+			~_priv_DatabaseCursor()
 			{
 				::mysql_free_result(m_result);
 				m_db->unlock();
@@ -309,7 +309,7 @@ namespace slib
 			if (0 == mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
 				MYSQL_RES* res = ::mysql_use_result(m_mysql);
 				if (res) {
-					ret = new _DatabaseCursor(this, res);
+					ret = new _priv_DatabaseCursor(this, res);
 					if (ret.isNotNull()) {
 						return ret;
 					}
@@ -321,8 +321,8 @@ namespace slib
 			return ret;
 		}
 
-#define _FIELD_DESC_BUFFER_SIZE 64
-		struct _FieldDesc
+#define PRIV_FIELD_DESC_BUFFER_SIZE 64
+		struct _priv_FieldDesc
 		{
 			my_bool isNull;
 			my_bool isError;
@@ -335,7 +335,7 @@ namespace slib
 				float flt;
 				double dbl;
 				MYSQL_TIME time;
-				char buf[_FIELD_DESC_BUFFER_SIZE];
+				char buf[PRIV_FIELD_DESC_BUFFER_SIZE];
 			};
 		};
 
@@ -367,7 +367,7 @@ namespace slib
 			return Time(y, mt.month, mt.day, mt.hour, mt.minute, mt.second);
 		}
 
-		class _DatabaseStatementCursor : public DatabaseCursor
+		class _priv_DatabaseStatementCursor : public DatabaseCursor
 		{
 		public:
 			Ref<DatabaseStatement> m_statementObj;
@@ -376,14 +376,14 @@ namespace slib
 			MYSQL_RES* m_resultMetadata;
 			MYSQL_FIELD* m_fields;
 			MYSQL_BIND* m_bind;
-			_FieldDesc* m_fds;
+			_priv_FieldDesc* m_fds;
 
 			CList<String> m_listColumnNames;
 			sl_uint32 m_nColumnNames;
 			String* m_columnNames;
 			CHashMap<String, sl_int32> m_mapColumnIndexes;
 
-			_DatabaseStatementCursor(Database* db, DatabaseStatement* statementObj, MYSQL_STMT* statement, MYSQL_RES* resultMetadata, MYSQL_BIND* bind, _FieldDesc* fds)
+			_priv_DatabaseStatementCursor(Database* db, DatabaseStatement* statementObj, MYSQL_STMT* statement, MYSQL_RES* resultMetadata, MYSQL_BIND* bind, _priv_FieldDesc* fds)
 			{
 				m_db = db;
 				m_statementObj = statementObj;
@@ -405,7 +405,7 @@ namespace slib
 				db->lock();
 			}
 
-			~_DatabaseStatementCursor()
+			~_priv_DatabaseStatementCursor()
 			{
 				::mysql_free_result(m_resultMetadata);
 				::mysql_stmt_free_result(m_statement);
@@ -865,7 +865,7 @@ namespace slib
 			
 		};
 
-		class _DatabaseStatement : public DatabaseStatement
+		class _priv_DatabaseStatement : public DatabaseStatement
 		{
 		public:
 			String m_sql;
@@ -873,7 +873,7 @@ namespace slib
 			MYSQL_STMT* m_statement;
 
 		public:
-			_DatabaseStatement(_MySQL_Database* db, const String& sql)
+			_priv_DatabaseStatement(_priv_MySQL_Database* db, const String& sql)
 			{
 				m_db = db;
 				m_sql = sql;
@@ -881,7 +881,7 @@ namespace slib
 				m_statement = sl_null;
 			}
 
-			~_DatabaseStatement()
+			~_priv_DatabaseStatement()
 			{
 				close();
 			}
@@ -917,7 +917,7 @@ namespace slib
 				if (n == nParams) {
 					if (n > 0) {
 						SLIB_SCOPED_BUFFER(MYSQL_BIND, 32, bind, n);
-						SLIB_SCOPED_BUFFER(_FieldDesc, 32, fds, n);
+						SLIB_SCOPED_BUFFER(_priv_FieldDesc, 32, fds, n);
 						SLIB_SCOPED_BUFFER(String, 32, strings, n);
 						SLIB_SCOPED_BUFFER(Memory, 32, blobs, n);
 						if (bind && fds && strings && blobs) {
@@ -1060,10 +1060,10 @@ namespace slib
 						MYSQL_FIELD* fields = ::mysql_fetch_fields(resultMetadata);
 						MYSQL_BIND* bind = (MYSQL_BIND*)(Base::createMemory(sizeof(MYSQL_BIND)*nFields));
 						if (bind) {
-							_FieldDesc* fds = (_FieldDesc*)(Base::createMemory(sizeof(_FieldDesc)*nFields));
+							_priv_FieldDesc* fds = (_priv_FieldDesc*)(Base::createMemory(sizeof(_priv_FieldDesc)*nFields));
 							if (fds) {
 								Base::zeroMemory(bind, sizeof(MYSQL_BIND)*nFields);
-								Base::zeroMemory(fds, sizeof(_FieldDesc)*nFields);
+								Base::zeroMemory(fds, sizeof(_priv_FieldDesc)*nFields);
 								for (sl_uint32 i = 0; i < nFields; i++) {
 									bind[i].length = &(fds[i].length);
 									bind[i].is_null = &(fds[i].isNull);
@@ -1114,24 +1114,24 @@ namespace slib
 									case MYSQL_TYPE_BLOB:
 										bind[i].buffer_type = MYSQL_TYPE_BLOB;
 										bind[i].buffer = &(fds[i].buf);
-										bind[i].buffer_length = _FIELD_DESC_BUFFER_SIZE;
+										bind[i].buffer_length = PRIV_FIELD_DESC_BUFFER_SIZE;
 										break;
 									case MYSQL_TYPE_VARCHAR:
 									case MYSQL_TYPE_VAR_STRING:
 									case MYSQL_TYPE_STRING:
 										bind[i].buffer_type = MYSQL_TYPE_STRING;
 										bind[i].buffer = &(fds[i].buf);
-										bind[i].buffer_length = _FIELD_DESC_BUFFER_SIZE;
+										bind[i].buffer_length = PRIV_FIELD_DESC_BUFFER_SIZE;
 										break;
 									default:
 										bind[i].buffer_type = MYSQL_TYPE_STRING;
 										bind[i].buffer = &(fds[i].buf);
-										bind[i].buffer_length = _FIELD_DESC_BUFFER_SIZE;
+										bind[i].buffer_length = PRIV_FIELD_DESC_BUFFER_SIZE;
 										break;
 									}
 								}
 								if (0 == ::mysql_stmt_bind_result(m_statement, bind)) {
-									ret = new _DatabaseStatementCursor(m_db.get(), this, m_statement, resultMetadata, bind, fds);
+									ret = new _priv_DatabaseStatementCursor(m_db.get(), this, m_statement, resultMetadata, bind, fds);
 									if (ret.isNotNull()) {
 										return ret;
 									}
@@ -1152,7 +1152,7 @@ namespace slib
 		{
 			initThread();
 			ObjectLocker lock(this);
-			Ref<_DatabaseStatement> ret = new _DatabaseStatement(this, sql);
+			Ref<_priv_DatabaseStatement> ret = new _priv_DatabaseStatement(this, sql);
 			if (ret.isNotNull()) {
 				if (ret->prepare()) {
 					return ret;
@@ -1169,7 +1169,7 @@ namespace slib
 
 	Ref<MySQL_Database> MySQL_Database::connect(const MySQL_Param& param, String& outErrorMessage)
 	{
-		return _MySQL_Database::connect(param, outErrorMessage);
+		return _priv_MySQL_Database::connect(param, outErrorMessage);
 	}
 
 	Ref<MySQL_Database> MySQL_Database::connect(const MySQL_Param& param)

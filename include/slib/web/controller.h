@@ -62,13 +62,13 @@ namespace slib
 		
 	protected:
 		String m_path;
-		struct _Handler
+		struct Handler
 		{
 			HttpMethod method;
 			String path;
 			WebHandler handler;
 		};
-		CList<_Handler> m_handlers;
+		CList<Handler> m_handlers;
 		
 	};
 }
@@ -86,7 +86,7 @@ namespace SWEB_MODULE_##NAME { \
 
 #define SWEB_HANDLER(METHOD, PATH, NAME) \
 	slib::Variant NAME(SWEB_HANDLER_PARAMS_LIST); \
-	class _SLIB_WEB_HANDLER_REGISTERER##NAME { public: _SLIB_WEB_HANDLER_REGISTERER##NAME() { getModule()->addHandler(slib::HttpMethod::METHOD, PATH, &NAME); } } _SLIB_WEB_HANDLER_REGISTERER_INSTANCE_##NAME; \
+	class _priv_slib_WebHandlerRegisterer_##NAME { public: _priv_slib_WebHandlerRegisterer_##NAME() { getModule()->addHandler(slib::HttpMethod::METHOD, PATH, &NAME); } } _priv_slib_WebHandlerRegisterer_instance_##NAME; \
 	slib::Variant NAME(SWEB_HANDLER_PARAMS_LIST)
 
 #define SWEB_STRING_PARAM(NAME) slib::String NAME = context->getParameter(#NAME);

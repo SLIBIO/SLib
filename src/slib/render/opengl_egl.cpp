@@ -23,7 +23,7 @@
 namespace slib
 {
 
-	class _EGLRendererImpl : public Renderer
+	class _priv_EGLRendererImpl : public Renderer
 	{
 	public:
 		sl_bool m_flagRequestRender;
@@ -41,13 +41,13 @@ namespace slib
 		EGLNativeDisplayType m_hDisplay;
 
 	public:
-		_EGLRendererImpl()
+		_priv_EGLRendererImpl()
 		{
 			m_context = sl_null;
 			m_flagRequestRender = sl_true;
 		}
 
-		~_EGLRendererImpl()
+		~_priv_EGLRendererImpl()
 		{
 			release();
 		}
@@ -82,7 +82,7 @@ namespace slib
 		}
 #	endif
 
-		static Ref<_EGLRendererImpl> create(void* _windowHandle, const RendererParam& _param)
+		static Ref<_priv_EGLRendererImpl> create(void* _windowHandle, const RendererParam& _param)
 		{
 			EGLNativeWindowType windowHandle = (EGLNativeWindowType)_windowHandle;
 			if (windowHandle == 0) {
@@ -91,7 +91,7 @@ namespace slib
 
 			RendererParam param = _param;
 
-			PFNEGLGETPLATFORMDISPLAYEXTPROC eglGetPlatformDisplayEXT = (PFNEGLGETPLATFORMDISPLAYEXTPROC)(_EGL_ENTRY(eglGetProcAddress)("eglGetPlatformDisplayEXT"));
+			PFNEGLGETPLATFORMDISPLAYEXTPROC eglGetPlatformDisplayEXT = (PFNEGLGETPLATFORMDISPLAYEXTPROC)(PRIV_EGL_ENTRY(eglGetProcAddress)("eglGetPlatformDisplayEXT"));
 			if (!eglGetPlatformDisplayEXT) {
 				return sl_null;
 			}
@@ -125,9 +125,9 @@ namespace slib
 				EGLDisplay display = eglGetPlatformDisplayEXT(_platform, displayHandle, displayAttributes);
 				if (display != EGL_NO_DISPLAY) {
 					EGLint majorVersion, minorVersion;
-					if (_EGL_ENTRY(eglInitialize)(display, &majorVersion, &minorVersion)) {
-						_EGL_ENTRY(eglBindAPI)(EGL_OPENGL_ES_API);
-						if (_EGL_ENTRY(eglGetError)() == EGL_SUCCESS) {
+					if (PRIV_EGL_ENTRY(eglInitialize)(display, &majorVersion, &minorVersion)) {
+						PRIV_EGL_ENTRY(eglBindAPI)(EGL_OPENGL_ES_API);
+						if (PRIV_EGL_ENTRY(eglGetError)() == EGL_SUCCESS) {
 							const EGLint configAttributes[] =
 							{
 								EGL_RED_SIZE, (param.nRedBits >= 0) ? param.nRedBits : EGL_DONT_CARE,
@@ -141,25 +141,25 @@ namespace slib
 							};
 							EGLint configCount;
 							EGLConfig config;
-							if (_EGL_ENTRY(eglChooseConfig)(display, configAttributes, &config, 1, &configCount)) {
+							if (PRIV_EGL_ENTRY(eglChooseConfig)(display, configAttributes, &config, 1, &configCount)) {
 								if (configCount == 1) {
 									EGLint nRedBits;
-									_EGL_ENTRY(eglGetConfigAttrib)(display, config, EGL_RED_SIZE, &nRedBits);
+									PRIV_EGL_ENTRY(eglGetConfigAttrib)(display, config, EGL_RED_SIZE, &nRedBits);
 									param.nRedBits = nRedBits;
 									EGLint nGreenBits;
-									_EGL_ENTRY(eglGetConfigAttrib)(display, config, EGL_GREEN_SIZE, &nGreenBits);
+									PRIV_EGL_ENTRY(eglGetConfigAttrib)(display, config, EGL_GREEN_SIZE, &nGreenBits);
 									param.nGreenBits = nGreenBits;
 									EGLint nBlueBits;
-									_EGL_ENTRY(eglGetConfigAttrib)(display, config, EGL_BLUE_SIZE, &nBlueBits);
+									PRIV_EGL_ENTRY(eglGetConfigAttrib)(display, config, EGL_BLUE_SIZE, &nBlueBits);
 									param.nBlueBits = nBlueBits;
 									EGLint nAlphaBits;
-									_EGL_ENTRY(eglGetConfigAttrib)(display, config, EGL_ALPHA_SIZE, &nAlphaBits);
+									PRIV_EGL_ENTRY(eglGetConfigAttrib)(display, config, EGL_ALPHA_SIZE, &nAlphaBits);
 									param.nAlphaBits = nAlphaBits;
 									EGLint nDepthBits;
-									_EGL_ENTRY(eglGetConfigAttrib)(display, config, EGL_DEPTH_SIZE, &nDepthBits);
+									PRIV_EGL_ENTRY(eglGetConfigAttrib)(display, config, EGL_DEPTH_SIZE, &nDepthBits);
 									param.nDepthBits = nDepthBits;
 									EGLint nStencilBits;
-									_EGL_ENTRY(eglGetConfigAttrib)(display, config, EGL_STENCIL_SIZE, &nStencilBits);
+									PRIV_EGL_ENTRY(eglGetConfigAttrib)(display, config, EGL_STENCIL_SIZE, &nStencilBits);
 									param.nStencilBits = nStencilBits;
 
 									const EGLint surfaceAttributes[] =
@@ -168,10 +168,10 @@ namespace slib
 										EGL_NONE, EGL_NONE,
 									};
 
-									EGLSurface surface = _EGL_ENTRY(eglCreateWindowSurface)(display, config, windowHandle, surfaceAttributes);
+									EGLSurface surface = PRIV_EGL_ENTRY(eglCreateWindowSurface)(display, config, windowHandle, surfaceAttributes);
 									if (surface != EGL_NO_SURFACE) {
 
-										if (_EGL_ENTRY(eglGetError()) == EGL_SUCCESS) {
+										if (PRIV_EGL_ENTRY(eglGetError()) == EGL_SUCCESS) {
 
 											EGLint contextAttibutes[] =
 											{
@@ -179,10 +179,10 @@ namespace slib
 												EGL_NONE
 											};
 
-											EGLContext context = _EGL_ENTRY(eglCreateContext)(display, config, NULL, contextAttibutes);
-											if (_EGL_ENTRY(eglGetError()) == EGL_SUCCESS) {
+											EGLContext context = PRIV_EGL_ENTRY(eglCreateContext)(display, config, NULL, contextAttibutes);
+											if (PRIV_EGL_ENTRY(eglGetError()) == EGL_SUCCESS) {
 
-												Ref<_EGLRendererImpl> ret = new _EGLRendererImpl();
+												Ref<_priv_EGLRendererImpl> ret = new _priv_EGLRendererImpl();
 
 												if (ret.isNotNull()) {
 
@@ -197,22 +197,22 @@ namespace slib
 													ret->m_config = config;
 													ret->m_callback = param.callback;
 
-													ret->m_threadRender = Thread::start(SLIB_FUNCTION_CLASS(_EGLRendererImpl, run, ret.get()));
+													ret->m_threadRender = Thread::start(SLIB_FUNCTION_CLASS(_priv_EGLRendererImpl, run, ret.get()));
 
 													return ret;
 												}
 
-												_EGL_ENTRY(eglDestroyContext)(display, context);
+												PRIV_EGL_ENTRY(eglDestroyContext)(display, context);
 											}
 										}
 
-										_EGL_ENTRY(eglDestroySurface)(display, surface);
+										PRIV_EGL_ENTRY(eglDestroySurface)(display, surface);
 									}
 								}
 							}
 						}
 					}
-					_EGL_ENTRY(eglTerminate)(display);
+					PRIV_EGL_ENTRY(eglTerminate)(display);
 				}
 				releaseDisplay(windowHandle, displayHandle);
 			}
@@ -230,9 +230,9 @@ namespace slib
 			}
 
 			if (m_context) {
-				_EGL_ENTRY(eglDestroyContext)(m_display, m_context);
-				_EGL_ENTRY(eglDestroySurface)(m_display, m_surface);
-				_EGL_ENTRY(eglTerminate)(m_display);
+				PRIV_EGL_ENTRY(eglDestroyContext)(m_display, m_context);
+				PRIV_EGL_ENTRY(eglDestroySurface)(m_display, m_surface);
+				PRIV_EGL_ENTRY(eglTerminate)(m_display);
 
 				releaseDisplay(m_hWindow, m_hDisplay);
 
@@ -242,7 +242,7 @@ namespace slib
 
 		void run()
 		{
-			_EGL_ENTRY(eglMakeCurrent)(m_display, m_surface, m_surface, m_context);
+			PRIV_EGL_ENTRY(eglMakeCurrent)(m_display, m_surface, m_surface, m_context);
 
 			Ref<RenderEngine> engine = GLES::createEngine();
 			if (engine.isNull()) {
@@ -262,7 +262,7 @@ namespace slib
 					break;
 				}
 			}
-			_EGL_ENTRY(eglMakeCurrent)(NULL, NULL, NULL, NULL);
+			PRIV_EGL_ENTRY(eglMakeCurrent)(NULL, NULL, NULL, NULL);
 		}
 
 		void runStep(RenderEngine* engine)
@@ -286,8 +286,8 @@ namespace slib
 					if (size.x != 0 && size.y != 0) {
 						engine->setViewport(0, 0, size.x, size.y);
 						callback->onFrame(engine);
-						_EGL_ENTRY(eglSwapInterval)(m_display, 0);
-						_EGL_ENTRY(eglSwapBuffers)(m_display, m_surface);
+						PRIV_EGL_ENTRY(eglSwapInterval)(m_display, 0);
+						PRIV_EGL_ENTRY(eglSwapBuffers)(m_display, m_surface);
 					}
 				}
 			}
@@ -302,7 +302,7 @@ namespace slib
 
 	Ref<Renderer> EGL::createRenderer(void* windowHandle, const RendererParam& param)
 	{
-		return _EGLRendererImpl::create(windowHandle, param);
+		return _priv_EGLRendererImpl::create(windowHandle, param);
 	}
 
 }
@@ -311,16 +311,16 @@ namespace slib
 
 namespace slib
 {
-	_EGL_EntryPoints _EGL_ENTRIES;
+	_priv_EGL_EntryPoints _priv_EGL_entries;
 
-#undef _SLIB_RENDER_EGL_ENTRY
-#define _SLIB_RENDER_EGL_ENTRY(TYPE, name, ...) \
+#undef PRIV_SLIB_RENDER_EGL_ENTRY
+#define PRIV_SLIB_RENDER_EGL_ENTRY(TYPE, name, ...) \
 	proc = ::GetProcAddress(hDll, #name); \
 	if (proc == 0) { \
 		LogError("EGL", "Failed to get function entry point - " #name); \
 		return; \
 	} \
-	*((FARPROC*)(&(_EGL_ENTRIES.name))) = proc;
+	*((FARPROC*)(&(_priv_EGL_entries.name))) = proc;
 
 	static sl_bool _g_render_egl_flagLoadedEntryPoints = sl_false;
 
@@ -342,8 +342,8 @@ namespace slib
 			return;
 		}
 		FARPROC proc;
-#define ENTRIES _EGL_ENTRIES
-		_SLIB_RENDER_EGL_ENTRIES
+#define ENTRIES _priv_EGL_entries
+		PRIV_SLIB_RENDER_EGL_ENTRIES
 		
 		_g_render_egl_flagLoadedEntryPoints = sl_true;
 	}

@@ -90,11 +90,11 @@ namespace slib
 	TYPE get(const slib::String& name);
 
 #define SLIB_DEFINE_RESOURCE_MAP_BEGIN(TYPE) \
-	class _ResourceMap { \
+	class  _priv_ResourceMap { \
 	public: \
 		slib::CHashMap< slib::String, TYPE > map; \
 	public: \
-		_ResourceMap() { \
+		 _priv_ResourceMap() { \
 
 #define SLIB_DEFINE_RESOURCE_MAP_ITEM(NAME) \
 			SLIB_STATIC_STRING(_key_##NAME, #NAME); \
@@ -103,9 +103,9 @@ namespace slib
 #define SLIB_DEFINE_RESOURCE_MAP_END(TYPE, DEFAULT_VALUE) \
 		} \
 	}; \
-	SLIB_SAFE_STATIC_GETTER(_ResourceMap, _get_resource_map); \
+	SLIB_SAFE_STATIC_GETTER( _priv_ResourceMap, _get_resource_map); \
 	TYPE get(const slib::String& name) { \
-		_ResourceMap* map = _get_resource_map(); \
+		 _priv_ResourceMap* map = _get_resource_map(); \
 		if (map) { \
 			return map->map.getValue_NoLock(name, DEFAULT_VALUE); \
 		} \

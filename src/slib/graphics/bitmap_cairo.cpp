@@ -20,7 +20,7 @@
 namespace slib
 {
 
-	class _Cairo_Bitmap : public Bitmap
+	class _priv_Cairo_Bitmap : public Bitmap
 	{
 		SLIB_DECLARE_OBJECT
 
@@ -28,12 +28,12 @@ namespace slib
 		cairo_surface_t* m_bitmap;
 
 	public:
-		_Cairo_Bitmap()
+		_priv_Cairo_Bitmap()
 		{
 			m_bitmap = sl_null;
 		}
 
-		~_Cairo_Bitmap()
+		~_priv_Cairo_Bitmap()
 		{
 			if (m_bitmap) {
 				::cairo_surface_destroy(m_bitmap);
@@ -41,12 +41,12 @@ namespace slib
 		}
 
 	public:
-		static Ref<_Cairo_Bitmap> create(sl_uint32 width, sl_uint32 height)
+		static Ref<_priv_Cairo_Bitmap> create(sl_uint32 width, sl_uint32 height)
 		{
 			if (width > 0 && height > 0) {
 				cairo_surface_t* bitmap = ::cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
 				if (bitmap) {
-					Ref<_Cairo_Bitmap> ret = new _Cairo_Bitmap();
+					Ref<_priv_Cairo_Bitmap> ret = new _priv_Cairo_Bitmap();
 					if (ret.isNotNull()) {
 						ret->m_bitmap = bitmap;
 						return ret;
@@ -209,11 +209,11 @@ namespace slib
 
 	};
 
-	SLIB_DEFINE_OBJECT(_Cairo_Bitmap, Bitmap)
+	SLIB_DEFINE_OBJECT(_priv_Cairo_Bitmap, Bitmap)
 
 	Ref<Bitmap> Bitmap::create(sl_uint32 width, sl_uint32 height)
 	{
-		return _Cairo_Bitmap::create(width, height);
+		return _priv_Cairo_Bitmap::create(width, height);
 	}
 
 	Ref<Bitmap> Bitmap::loadFromMemory(const void* mem, sl_size size)

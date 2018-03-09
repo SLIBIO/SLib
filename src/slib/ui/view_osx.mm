@@ -21,20 +21,20 @@ namespace slib
 {
 
 /******************************************
-			OSX_ViewInstance
+			macOS_ViewInstance
 ******************************************/
 
-	OSX_ViewInstance::OSX_ViewInstance()
+	macOS_ViewInstance::macOS_ViewInstance()
 	{
 		m_handle = nil;
 	}
 
-	OSX_ViewInstance::~OSX_ViewInstance()
+	macOS_ViewInstance::~macOS_ViewInstance()
 	{
 		_release();
 	}
 
-	void OSX_ViewInstance::_release()
+	void macOS_ViewInstance::_release()
 	{
 		UIPlatform::removeViewInstance(m_handle);
 		if (m_flagFreeOnRelease) {
@@ -43,17 +43,17 @@ namespace slib
 		m_handle = nil;
 	}
 
-	void OSX_ViewInstance::freeHandle(NSView* handle)
+	void macOS_ViewInstance::freeHandle(NSView* handle)
 	{
 		if (handle != nil) {
 			[handle removeFromSuperview];
 		}
 	}
 
-	Ref<OSX_ViewInstance> OSX_ViewInstance::create(NSView* handle, sl_bool flagFreeOnRelease)
+	Ref<macOS_ViewInstance> macOS_ViewInstance::create(NSView* handle, sl_bool flagFreeOnRelease)
 	{
 		if (handle != nil) {
-			Ref<OSX_ViewInstance> ret = new OSX_ViewInstance();
+			Ref<macOS_ViewInstance> ret = new macOS_ViewInstance();
 			if (ret.isNotNull()) {
 				ret->m_handle = handle;
 				ret->m_flagFreeOnRelease = flagFreeOnRelease;
@@ -68,11 +68,11 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<OSX_ViewInstance> OSX_ViewInstance::create(NSView* handle, NSView* parent, View* view)
+	Ref<macOS_ViewInstance> macOS_ViewInstance::create(NSView* handle, NSView* parent, View* view)
 	{
 		if (handle != nil) {
 			
-			Ref<OSX_ViewInstance> instance = create(handle, sl_true);
+			Ref<macOS_ViewInstance> instance = create(handle, sl_true);
 			
 			if (instance.isNotNull()) {
 				
@@ -84,10 +84,10 @@ namespace slib
 						[control setEnabled:FALSE];
 					}
 				}
-				if ([handle isKindOfClass:[Slib_OSX_ViewBase class]]) {
-					((Slib_OSX_ViewBase*)handle)->m_flagOpaque = view->isOpaque();
-					((Slib_OSX_ViewBase*)handle)->m_flagClipping = view->isClipping();
-					((Slib_OSX_ViewBase*)handle)->m_flagDrawing = view->isDrawing();
+				if ([handle isKindOfClass:[_priv_Slib_macOS_ViewBase class]]) {
+					((_priv_Slib_macOS_ViewBase*)handle)->m_flagOpaque = view->isOpaque();
+					((_priv_Slib_macOS_ViewBase*)handle)->m_flagClipping = view->isClipping();
+					((_priv_Slib_macOS_ViewBase*)handle)->m_flagDrawing = view->isDrawing();
 				}
 				
 				/*****************
@@ -113,17 +113,17 @@ namespace slib
 		
 	}
 
-	NSView* OSX_ViewInstance::getHandle()
+	NSView* macOS_ViewInstance::getHandle()
 	{
 		return m_handle;
 	}
 
-	sl_bool OSX_ViewInstance::isValid()
+	sl_bool macOS_ViewInstance::isValid()
 	{
 		return sl_true;
 	}
 
-	void OSX_ViewInstance::setFocus()
+	void macOS_ViewInstance::setFocus()
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -140,7 +140,7 @@ namespace slib
 		}
 	}
 
-	void OSX_ViewInstance::invalidate()
+	void macOS_ViewInstance::invalidate()
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -154,7 +154,7 @@ namespace slib
 		}
 	}
 
-	void OSX_ViewInstance::invalidate(const UIRect& rect)
+	void macOS_ViewInstance::invalidate(const UIRect& rect)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -173,7 +173,7 @@ namespace slib
 		}
 	}
 
-	UIRect OSX_ViewInstance::getFrame()
+	UIRect macOS_ViewInstance::getFrame()
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -189,7 +189,7 @@ namespace slib
 		return UIRect::zero();
 	}
 
-	void OSX_ViewInstance::setFrame(const UIRect& frame)
+	void macOS_ViewInstance::setFrame(const UIRect& frame)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -210,11 +210,11 @@ namespace slib
 		}
 	}
 
-	void OSX_ViewInstance::setTransform(const Matrix3 &transform)
+	void macOS_ViewInstance::setTransform(const Matrix3 &transform)
 	{
 	}
 
-	void OSX_ViewInstance::setVisible(sl_bool flag)
+	void macOS_ViewInstance::setVisible(sl_bool flag)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -228,7 +228,7 @@ namespace slib
 		}
 	}
 
-	void OSX_ViewInstance::setEnabled(sl_bool flag)
+	void macOS_ViewInstance::setEnabled(sl_bool flag)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -245,18 +245,18 @@ namespace slib
 		}
 	}
 
-	void OSX_ViewInstance::setOpaque(sl_bool flag)
+	void macOS_ViewInstance::setOpaque(sl_bool flag)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
-			if ([handle isKindOfClass:[Slib_OSX_ViewBase class]]) {
-				Slib_OSX_ViewBase* control = (Slib_OSX_ViewBase*)handle;
+			if ([handle isKindOfClass:[_priv_Slib_macOS_ViewBase class]]) {
+				_priv_Slib_macOS_ViewBase* control = (_priv_Slib_macOS_ViewBase*)handle;
 				control->m_flagOpaque = flag;
 			}
 		}
 	}
 
-	void OSX_ViewInstance::setAlpha(sl_real alpha)
+	void macOS_ViewInstance::setAlpha(sl_real alpha)
 	{
 		/*********
 			Don't use alphaValue because this causes displaying error when used with frameRotation or bounds
@@ -283,29 +283,29 @@ namespace slib
 		
 	}
 	
-	void OSX_ViewInstance::setClipping(sl_bool flag)
+	void macOS_ViewInstance::setClipping(sl_bool flag)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
-			if ([handle isKindOfClass:[Slib_OSX_ViewBase class]]) {
-				Slib_OSX_ViewBase* control = (Slib_OSX_ViewBase*)handle;
+			if ([handle isKindOfClass:[_priv_Slib_macOS_ViewBase class]]) {
+				_priv_Slib_macOS_ViewBase* control = (_priv_Slib_macOS_ViewBase*)handle;
 				control->m_flagClipping = flag;
 			}
 		}
 	}
 	
-	void OSX_ViewInstance::setDrawing(sl_bool flag)
+	void macOS_ViewInstance::setDrawing(sl_bool flag)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
-			if ([handle isKindOfClass:[Slib_OSX_ViewBase class]]) {
-				Slib_OSX_ViewBase* control = (Slib_OSX_ViewBase*)handle;
+			if ([handle isKindOfClass:[_priv_Slib_macOS_ViewBase class]]) {
+				_priv_Slib_macOS_ViewBase* control = (_priv_Slib_macOS_ViewBase*)handle;
 				control->m_flagDrawing = flag;
 			}
 		}
 	}
 	
-	UIPointf OSX_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
+	UIPointf macOS_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -331,7 +331,7 @@ namespace slib
 		return ptScreen;
 	}
 
-	UIPointf OSX_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf& ptView)
+	UIPointf macOS_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf& ptView)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -357,11 +357,11 @@ namespace slib
 		return ptView;
 	}
 
-	void OSX_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
+	void macOS_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
-			OSX_ViewInstance* child = (OSX_ViewInstance*)(_child.get());
+			macOS_ViewInstance* child = (macOS_ViewInstance*)(_child.get());
 			if (child) {
 				NSView* child_handle = child->m_handle;
 				if (child_handle != nil) {
@@ -371,9 +371,9 @@ namespace slib
 		}
 	}
 
-	void OSX_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
+	void macOS_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 	{
-		OSX_ViewInstance* child = (OSX_ViewInstance*)(_child.get());
+		macOS_ViewInstance* child = (macOS_ViewInstance*)(_child.get());
 		if (child) {
 			NSView* child_handle = child->m_handle;
 			if (child_handle != nil) {
@@ -382,7 +382,7 @@ namespace slib
 		}
 	}
 
-	void OSX_ViewInstance::bringToFront()
+	void macOS_ViewInstance::bringToFront()
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -401,7 +401,7 @@ namespace slib
 		}
 	}
 
-	void OSX_ViewInstance::onDraw(NSRect rcDirty)
+	void macOS_ViewInstance::onDraw(NSRect rcDirty)
 	{
 		NSView* handle = m_handle;
 		
@@ -460,7 +460,7 @@ namespace slib
 		}
 	}
 
-	sl_bool OSX_ViewInstance::onEventKey(sl_bool flagDown, NSEvent* event)
+	sl_bool macOS_ViewInstance::onEventKey(sl_bool flagDown, NSEvent* event)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -479,7 +479,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool OSX_ViewInstance::onEventMouse(UIAction action, NSEvent* event)
+	sl_bool macOS_ViewInstance::onEventMouse(UIAction action, NSEvent* event)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -502,7 +502,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool OSX_ViewInstance::onEventMouse(UIAction action, const NSPoint& pt)
+	sl_bool macOS_ViewInstance::onEventMouse(UIAction action, const NSPoint& pt)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -522,7 +522,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool OSX_ViewInstance::onEventMouseWheel(NSEvent* event)
+	sl_bool macOS_ViewInstance::onEventMouseWheel(NSEvent* event)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -547,7 +547,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool OSX_ViewInstance::onEventUpdateCursor(NSEvent* event)
+	sl_bool macOS_ViewInstance::onEventUpdateCursor(NSEvent* event)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -566,7 +566,7 @@ namespace slib
 		return sl_false;
 	}
 
-	void OSX_ViewInstance::applyModifiers(UIEvent* ev, NSEvent* event)
+	void macOS_ViewInstance::applyModifiers(UIEvent* ev, NSEvent* event)
 	{
 		NSUInteger flags = [event modifierFlags];
 		if (flags & NSShiftKeyMask) {
@@ -590,9 +590,9 @@ namespace slib
 
 	Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
 	{
-		OSX_VIEW_CREATE_INSTANCE_BEGIN
-		Slib_OSX_ViewHandle* handle = [[Slib_OSX_ViewHandle alloc] initWithFrame:frame];
-		OSX_VIEW_CREATE_INSTANCE_END
+		MACOS_VIEW_CREATE_INSTANCE_BEGIN
+		_priv_Slib_macOS_ViewHandle* handle = [[_priv_Slib_macOS_ViewHandle alloc] initWithFrame:frame];
+		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
 
@@ -608,7 +608,7 @@ namespace slib
 			if (getFinalTranslationRotationScale(&t, &r, &s, &anchor)) {
 				NSPoint pt;
 				NSSize size;
-				OSX_transformViewFrame(pt, size, _frame, t.x, t.y, s.x, s.y, r, anchor.x, anchor.y);
+				_priv_macOS_transformViewFrame(pt, size, _frame, t.x, t.y, s.x, s.y, r, anchor.x, anchor.y);
 				NSRect bounds;
 				bounds.origin.x = 0;
 				bounds.origin.y = 0;
@@ -656,7 +656,7 @@ namespace slib
 			if (getFinalTranslationRotationScale(&t, &r, &s, &anchor)) {
 				NSPoint pt;
 				NSSize size;
-				OSX_transformViewFrame(pt, size, _frame, t.x, t.y, s.x, s.y, r, anchor.x, anchor.y);
+				_priv_macOS_transformViewFrame(pt, size, _frame, t.x, t.y, s.x, s.y, r, anchor.x, anchor.y);
 				NSRect bounds;
 				bounds.origin.x = 0;
 				bounds.origin.y = 0;
@@ -695,7 +695,7 @@ namespace slib
 	}
 
 
-	void OSX_transformViewFrame(NSPoint& origin, NSSize& size, const UIRect& frame, sl_real tx, sl_real ty, sl_real sx, sl_real sy, sl_real r, sl_real anchorOffsetX, sl_real anchorOffsetY)
+	void _priv_macOS_transformViewFrame(NSPoint& origin, NSSize& size, const UIRect& frame, sl_real tx, sl_real ty, sl_real sx, sl_real sy, sl_real r, sl_real anchorOffsetX, sl_real anchorOffsetY)
 	{
 		sl_ui_pos x = frame.left;
 		sl_ui_pos y = frame.top;
@@ -730,7 +730,7 @@ namespace slib
 
 }
 
-@implementation Slib_OSX_ViewBase
+@implementation _priv_Slib_macOS_ViewBase
 
 - (BOOL)isFlipped
 {
@@ -744,7 +744,7 @@ namespace slib
 
 @end
 
-@implementation Slib_OSX_ViewHandle
+@implementation _priv_Slib_macOS_ViewHandle
 - (id)init
 {
 	self = [super init];
@@ -778,7 +778,7 @@ namespace slib
 	m_trackingArea = [[NSTrackingArea alloc] initWithRect:rc options: (NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect) owner:self userInfo:nil];
 	if (m_trackingArea != nil) {
 		[self addTrackingArea:m_trackingArea];
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+		slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 		if (instance.isNotNull()) {
 			NSPoint mouseLocation = [[self window] mouseLocationOutsideOfEventStream];
 			mouseLocation = [self convertPoint: mouseLocation fromView: nil];
@@ -800,7 +800,7 @@ namespace slib
 - (void)drawRect:(NSRect)dirtyRect
 {
 	if (m_flagDrawing) {
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+		slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 		if (instance.isNotNull()) {
 			instance->onDraw(dirtyRect);
 		}
@@ -809,7 +809,7 @@ namespace slib
 
 - (void)keyDown:(NSEvent*)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagStopPropagation = instance->onEventKey(sl_true, theEvent);
 		if (flagStopPropagation) {
@@ -821,7 +821,7 @@ namespace slib
 
 - (void)keyUp:(NSEvent*)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagStopPropagation = instance->onEventKey(sl_false, theEvent);
 		if (flagStopPropagation) {
@@ -833,7 +833,7 @@ namespace slib
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::LeftButtonDown, theEvent);
 		if (flagStopPropagation) {
@@ -845,7 +845,7 @@ namespace slib
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		instance->onEventMouse(slib::UIAction::LeftButtonUp, theEvent);
 		NSInteger clicks = [theEvent clickCount];
@@ -861,7 +861,7 @@ namespace slib
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::LeftButtonDrag, theEvent);
 		if (flagStopPropagation) {
@@ -873,7 +873,7 @@ namespace slib
 
 - (void)rightMouseDown:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::RightButtonDown, theEvent);
 		if (flagStopPropagation) {
@@ -885,7 +885,7 @@ namespace slib
 
 - (void)rightMouseUp:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		instance->onEventMouse(slib::UIAction::RightButtonUp, theEvent);
 		NSInteger clicks = [theEvent clickCount];
@@ -901,7 +901,7 @@ namespace slib
 
 - (void)rightMouseDragged:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::RightButtonDrag, theEvent);
 		if (flagStopPropagation) {
@@ -913,7 +913,7 @@ namespace slib
 
 - (void)otherMouseDown:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MiddleButtonDown, theEvent);
 		if (flagStopPropagation) {
@@ -925,7 +925,7 @@ namespace slib
 
 - (void)otherMouseUp:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		instance->onEventMouse(slib::UIAction::MiddleButtonUp, theEvent);
 		NSInteger clicks = [theEvent clickCount];
@@ -941,7 +941,7 @@ namespace slib
 
 - (void)otherMouseDragged:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MiddleButtonDrag, theEvent);
 		if (flagStopPropagation) {
@@ -954,7 +954,7 @@ namespace slib
 - (void)mouseMoved:(NSEvent *)theEvent
 {
 	[[self window] invalidateCursorRectsForView:self];
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MouseMove, theEvent);
 		if (flagStopPropagation) {
@@ -966,7 +966,7 @@ namespace slib
 
 - (void)mouseEntered:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MouseEnter, theEvent);
 		if (flagStopPropagation) {
@@ -978,7 +978,7 @@ namespace slib
 
 - (void)mouseExited:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MouseLeave, theEvent);
 		if (flagStopPropagation) {
@@ -990,7 +990,7 @@ namespace slib
 
 - (void)scrollWheel:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagStopPropagation = instance->onEventMouseWheel(theEvent);
 		if (flagStopPropagation) {
@@ -1002,7 +1002,7 @@ namespace slib
 
 - (void)cursorUpdate:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagNoDefault = instance->onEventUpdateCursor(theEvent);
 		if (flagNoDefault) {
@@ -1014,7 +1014,7 @@ namespace slib
 
 - (NSView *)hitTest:(NSPoint)aPoint
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (view.isNotNull()) {
@@ -1047,7 +1047,7 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		return OSX_ViewInstance::create(handle, flagFreeOnRelease);
+		return macOS_ViewInstance::create(handle, flagFreeOnRelease);
 	}
 
 	void UIPlatform::registerViewInstance(NSView* handle, ViewInstance* instance)
@@ -1067,9 +1067,9 @@ namespace slib
 
 	NSView* UIPlatform::getViewHandle(ViewInstance* _instance)
 	{
-		OSX_ViewInstance* osx_instance = (OSX_ViewInstance*)_instance;
-		if (osx_instance) {
-			return osx_instance->getHandle();
+		macOS_ViewInstance* instance = (macOS_ViewInstance*)_instance;
+		if (instance) {
+			return instance->getHandle();
 		} else {
 			return nil;
 		}
@@ -1080,8 +1080,8 @@ namespace slib
 		if (view) {
 			Ref<ViewInstance> instance = view->getViewInstance();
 			if (instance.isNotNull()) {
-				OSX_ViewInstance* osx_instance = (OSX_ViewInstance*)(instance.get());
-				return osx_instance->getHandle();
+				macOS_ViewInstance* _instance = (macOS_ViewInstance*)(instance.get());
+				return _instance->getHandle();
 			}
 		}
 		return nil;

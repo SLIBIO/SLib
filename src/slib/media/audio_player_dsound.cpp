@@ -28,7 +28,7 @@
 namespace slib
 {
 
-	class _DirectSound_AudioPlayerBuffer : public AudioPlayerBuffer
+	class _priv_DirectSound_AudioPlayerBuffer : public AudioPlayerBuffer
 	{
 	public:
 		LPDIRECTSOUND		m_ds;
@@ -46,7 +46,7 @@ namespace slib
 		sl_bool m_flagOpened;
 
 	public:
-		_DirectSound_AudioPlayerBuffer()
+		_priv_DirectSound_AudioPlayerBuffer()
 		{
 			m_nOffsetNextWrite = m_nNotifySize = 0;
 			m_ds = NULL;
@@ -57,7 +57,7 @@ namespace slib
 			m_thread.setNull();
 		}
 
-		~_DirectSound_AudioPlayerBuffer()
+		~_priv_DirectSound_AudioPlayerBuffer()
 		{
 			release();
 		}
@@ -68,7 +68,7 @@ namespace slib
 			LogError("AudioPlayer", text);
 		}
 
-		static Ref<_DirectSound_AudioPlayerBuffer> create(const AudioPlayerBufferParam& param, const GUID& deviceID)
+		static Ref<_priv_DirectSound_AudioPlayerBuffer> create(const AudioPlayerBufferParam& param, const GUID& deviceID)
 		{
 			if (param.channelsCount != 1 && param.channelsCount != 2) {
 				return sl_null;
@@ -125,7 +125,7 @@ namespace slib
 							if (SUCCEEDED(hr)) {
 								hr = dsBuffer->Play(0, 0, DSBPLAY_LOOPING);
 								if (SUCCEEDED(hr)) {
-									Ref<_DirectSound_AudioPlayerBuffer> ret = new _DirectSound_AudioPlayerBuffer();
+									Ref<_priv_DirectSound_AudioPlayerBuffer> ret = new _priv_DirectSound_AudioPlayerBuffer();
 									if (ret.isNotNull()) {
 										ret->m_ds = ds;
 										ret->m_dsBuffer = dsBuffer;
@@ -208,7 +208,7 @@ namespace slib
 			if (m_flagRunning) {
 				return;
 			}
-			m_thread = Thread::start(SLIB_FUNCTION_CLASS(_DirectSound_AudioPlayerBuffer, run, this));
+			m_thread = Thread::start(SLIB_FUNCTION_CLASS(_priv_DirectSound_AudioPlayerBuffer, run, this));
 			if (m_thread.isNotNull()) {
 				m_flagRunning = sl_true;
 			}
@@ -268,17 +268,17 @@ namespace slib
 
 	};
 
-	class _DirectSound_AudioPlayer : public AudioPlayer
+	class _priv_DirectSound_AudioPlayer : public AudioPlayer
 	{
 	public:
 		GUID m_deviceID;
 
 	public:
-		_DirectSound_AudioPlayer()
+		_priv_DirectSound_AudioPlayer()
 		{
 		}
 
-		~_DirectSound_AudioPlayer()
+		~_priv_DirectSound_AudioPlayer()
 		{
 		}
 
@@ -288,9 +288,9 @@ namespace slib
 			LogError("AudioPlayer", text);
 		}
 
-		static Ref<_DirectSound_AudioPlayer> create(const AudioPlayerParam& param)
+		static Ref<_priv_DirectSound_AudioPlayer> create(const AudioPlayerParam& param)
 		{
-			Ref<_DirectSound_AudioPlayer> ret = new _DirectSound_AudioPlayer();
+			Ref<_priv_DirectSound_AudioPlayer> ret = new _priv_DirectSound_AudioPlayer();
 			GUID gid;
 			String deviceID = param.deviceId;
 			if (deviceID.isEmpty()) {
@@ -314,7 +314,7 @@ namespace slib
 
 		Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param) override
 		{
-			return _DirectSound_AudioPlayerBuffer::create(param, m_deviceID);
+			return _priv_DirectSound_AudioPlayerBuffer::create(param, m_deviceID);
 		}
 
 		struct DeviceProperty {
@@ -351,15 +351,15 @@ namespace slib
 
 	Ref<AudioPlayer> DirectSound::createPlayer(const AudioPlayerParam& param)
 	{
-		return _DirectSound_AudioPlayer::create(param);
+		return _priv_DirectSound_AudioPlayer::create(param);
 	}
 
 	List<AudioPlayerInfo> DirectSound::getPlayersList()
 	{
 		List<AudioPlayerInfo> ret;
-		ListElements<_DirectSound_AudioPlayer::DeviceProperty> props(_DirectSound_AudioPlayer::queryDeviceInfos());
+		ListElements<_priv_DirectSound_AudioPlayer::DeviceProperty> props(_priv_DirectSound_AudioPlayer::queryDeviceInfos());
 		for (sl_size i = 0; i < props.count; i++) {
-			_DirectSound_AudioPlayer::DeviceProperty& prop = props[i];
+			_priv_DirectSound_AudioPlayer::DeviceProperty& prop = props[i];
 			AudioPlayerInfo info;
 			info.id = prop.szGuid;
 			info.name = prop.name;

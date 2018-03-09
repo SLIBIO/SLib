@@ -7735,7 +7735,7 @@ namespace slib
 	{
 	}
 
-	static UIAction _View_getActionUp(UIAction actionDown)
+	static UIAction _priv_View_getActionUp(UIAction actionDown)
 	{
 		if (actionDown == UIAction::LeftButtonDown) {
 			return UIAction::LeftButtonUp;
@@ -7903,7 +7903,7 @@ namespace slib
 				oldChild = m_childMouseDown;
 				if (oldChild.isNotNull()) {
 					dispatchMouseEventToChild(ev, oldChild.get());
-					if (action == _View_getActionUp(m_actionMouseDown)) {
+					if (action == _priv_View_getActionUp(m_actionMouseDown)) {
 						m_childMouseDown.setNull();
 						m_actionMouseDown = UIAction::Unknown;
 					}
@@ -8767,7 +8767,7 @@ namespace slib
 		}
 	}
 
-	static void _View_scrollPagingElement(sl_scroll_pos& value, sl_scroll_pos speed, sl_scroll_pos pageSize)
+	static void _priv_View_scrollPagingElement(sl_scroll_pos& value, sl_scroll_pos speed, sl_scroll_pos pageSize)
 	{
 		if (pageSize < 1) {
 			return;
@@ -8884,11 +8884,11 @@ namespace slib
 						}
 						if (flagHorz) {
 							sl_scroll_pos pageWidth = (sl_scroll_pos)(scrollAttrs->pageWidth == 0 ? getWidth() : scrollAttrs->pageWidth);
-							_View_scrollPagingElement(x, speed.x, pageWidth);
+							_priv_View_scrollPagingElement(x, speed.x, pageWidth);
 						}
 						if (flagVert) {
 							sl_scroll_pos pageHeight = (sl_scroll_pos)(scrollAttrs->pageHeight == 0 ? getHeight() : scrollAttrs->pageHeight);
-							_View_scrollPagingElement(y, speed.y, pageHeight);
+							_priv_View_scrollPagingElement(y, speed.y, pageHeight);
 						}
 						smoothScrollTo(x, y);
 					} else {
@@ -9021,7 +9021,7 @@ namespace slib
 		scrollAttrs->timerFlow.setNull();
 	}
 
-	static void _View_smoothScrollElement(sl_scroll_pos& value, sl_scroll_pos& target, sl_scroll_pos dt, sl_scroll_pos T, sl_bool& flagAnimating)
+	static void _priv_View_smoothScrollElement(sl_scroll_pos& value, sl_scroll_pos& target, sl_scroll_pos dt, sl_scroll_pos T, sl_bool& flagAnimating)
 	{
 		flagAnimating = sl_false;
 		sl_scroll_pos offset = target - value;
@@ -9068,8 +9068,8 @@ namespace slib
 			
 			sl_scroll_pos x = scrollAttrs->x;
 			sl_scroll_pos y = scrollAttrs->y;
-			_View_smoothScrollElement(x, scrollAttrs->xSmoothTarget, dt, T, flagX);
-			_View_smoothScrollElement(y, scrollAttrs->ySmoothTarget, dt, T, flagY);
+			_priv_View_smoothScrollElement(x, scrollAttrs->xSmoothTarget, dt, T, flagX);
+			_priv_View_smoothScrollElement(y, scrollAttrs->ySmoothTarget, dt, T, flagY);
 			
 			_scrollTo(x, y, sl_false, sl_true);
 			

@@ -331,7 +331,7 @@ namespace slib
 		}
 	}
 
-	class _ImageStretch_FillColor
+	class _priv_ImageStretch_FillColor
 	{
 	public:
 		template <class BLEND_OP>
@@ -348,7 +348,7 @@ namespace slib
 		}
 	};
 
-	class _ImageStretch_Copy
+	class _priv_ImageStretch_Copy
 	{
 	public:
 		template <class BLEND_OP>
@@ -366,7 +366,7 @@ namespace slib
 		}
 	};
 
-	class _ImageStretch_Nearest
+	class _priv_ImageStretch_Nearest
 	{
 	public:
 		template <class BLEND_OP>
@@ -440,16 +440,16 @@ namespace slib
 		
 	};
 
-	struct _ImageStretch_FilterParam
+	struct _priv_ImageStretch_FilterParam
 	{
 		sl_bool flagBox;
 		float filterSize;
 	};
 
-	class _ImageStretch_Smooth_LinearFilter
+	class _priv_ImageStretch_Smooth_LinearFilter
 	{
 	public:
-		SLIB_INLINE static void getColorAt(Color& _out, const Color* colors, float fx, float fy, sl_uint32 stride, const _ImageStretch_FilterParam& px, const _ImageStretch_FilterParam& py)
+		SLIB_INLINE static void getColorAt(Color& _out, const Color* colors, float fx, float fy, sl_uint32 stride, const _priv_ImageStretch_FilterParam& px, const _priv_ImageStretch_FilterParam& py)
 		{
 			const Color& c00 = *colors;
 			const Color& c01 = colors[1];
@@ -473,7 +473,7 @@ namespace slib
 			_out.a = (sl_uint8)(a);
 		}
 		
-		SLIB_INLINE static void getColorAtX(Color& _out, const Color* colors, float fx, const _ImageStretch_FilterParam& px)
+		SLIB_INLINE static void getColorAtX(Color& _out, const Color* colors, float fx, const _priv_ImageStretch_FilterParam& px)
 		{
 			const Color& c0 = *colors;
 			const Color& c1 = colors[1];
@@ -489,7 +489,7 @@ namespace slib
 			_out.a = (sl_uint8)(a);
 		}
 		
-		SLIB_INLINE static void getColorAtY(Color& _out, const Color* colors, float fy, sl_uint32 stride, const _ImageStretch_FilterParam& py)
+		SLIB_INLINE static void getColorAtY(Color& _out, const Color* colors, float fy, sl_uint32 stride, const _priv_ImageStretch_FilterParam& py)
 		{
 			const Color& c0 = *colors;
 			const Color& c1 = colors[stride];
@@ -507,10 +507,10 @@ namespace slib
 
 	};
 
-	class _ImageStretch_Smooth_BoxFilter
+	class _priv_ImageStretch_Smooth_BoxFilter
 	{
 	public:
-		SLIB_INLINE static void prepareFilter(float f, const _ImageStretch_FilterParam& p, float& s, float& e, int& n, float& area)
+		SLIB_INLINE static void prepareFilter(float f, const _priv_ImageStretch_FilterParam& p, float& s, float& e, int& n, float& area)
 		{
 			if (p.flagBox) {
 				s = 1 - f;
@@ -527,7 +527,7 @@ namespace slib
 			}
 		}
 		
-		SLIB_INLINE static void getColorAt(Color& _out, const Color* colors, float fx, float fy, sl_uint32 stride, const _ImageStretch_FilterParam& px, const _ImageStretch_FilterParam& py)
+		SLIB_INLINE static void getColorAt(Color& _out, const Color* colors, float fx, float fy, sl_uint32 stride, const _priv_ImageStretch_FilterParam& px, const _priv_ImageStretch_FilterParam& py)
 		{
 			float sx, ex, ax; int nx;
 			prepareFilter(fx, px, sx, ex, nx, ax);
@@ -579,7 +579,7 @@ namespace slib
 			_out.a = (sl_uint8)(a / area);
 		}
 		
-		SLIB_INLINE static void getColorAtX(Color& _out, const Color* colors, float fx, const _ImageStretch_FilterParam& px)
+		SLIB_INLINE static void getColorAtX(Color& _out, const Color* colors, float fx, const _priv_ImageStretch_FilterParam& px)
 		{
 			float sx, ex, ax; int nx;
 			prepareFilter(fx, px, sx, ex, nx, ax);
@@ -600,7 +600,7 @@ namespace slib
 			_out.a = (sl_uint8)(a / ax);
 		}
 		
-		SLIB_INLINE static void getColorAtY(Color& _out, const Color* colors, float fy, sl_uint32 stride, const _ImageStretch_FilterParam& py)
+		SLIB_INLINE static void getColorAtY(Color& _out, const Color* colors, float fy, sl_uint32 stride, const _priv_ImageStretch_FilterParam& py)
 		{
 			float sy, ey, ay; int ny;
 			prepareFilter(fy, py, sy, ey, ny, ay);
@@ -629,7 +629,7 @@ namespace slib
 		
 	};
 
-	SLIB_INLINE static void _ImageStretch_Smooth_Prepare(sl_int32 sw, sl_int32 dw, float& step, float& sx_start, sl_int32& dx_start, sl_int32& dx_end, _ImageStretch_FilterParam& param)
+	SLIB_INLINE static void _priv_ImageStretch_Smooth_Prepare(sl_int32 sw, sl_int32 dw, float& step, float& sx_start, sl_int32& dx_start, sl_int32& dx_end, _priv_ImageStretch_FilterParam& param)
 	{
 		if (sw >= dw) {
 			step = (float)(sw) / (float)(dw);
@@ -649,7 +649,7 @@ namespace slib
 	}
 
 	template <class FILTER>
-	class _ImageStretch_Smooth
+	class _priv_ImageStretch_Smooth
 	{
 	public:
 		template <class BLEND_OP>
@@ -659,8 +659,8 @@ namespace slib
 			sl_int32 dw = dst.width;
 			float sx_step, sx_start;
 			sl_int32 isx, dx_start, dx_end;
-			_ImageStretch_FilterParam px;
-			_ImageStretch_Smooth_Prepare(sw, dw, sx_step, sx_start, dx_start, dx_end, px);
+			_priv_ImageStretch_FilterParam px;
+			_priv_ImageStretch_Smooth_Prepare(sw, dw, sx_step, sx_start, dx_start, dx_end, px);
 			
 			sl_int32 dx, dy;
 			sl_int32 dh = dst.height;
@@ -710,8 +710,8 @@ namespace slib
 			sl_int32 dh = dst.height;
 			float sy_step, sy_start;
 			sl_int32 isy, dy_start, dy_end;
-			_ImageStretch_FilterParam py;
-			_ImageStretch_Smooth_Prepare(sh, dh, sy_step, sy_start, dy_start, dy_end, py);
+			_priv_ImageStretch_FilterParam py;
+			_priv_ImageStretch_Smooth_Prepare(sh, dh, sy_step, sy_start, dy_start, dy_end, py);
 			
 			sl_int32 dx, dy;
 			sl_int32 dw = dst.width;
@@ -758,8 +758,8 @@ namespace slib
 			sl_int32 dw = dst.width;
 			float sx_step, sx_start;
 			sl_int32 isx, dx_start, dx_end;
-			_ImageStretch_FilterParam px;
-			_ImageStretch_Smooth_Prepare(sw, dw, sx_step, sx_start, dx_start, dx_end, px);
+			_priv_ImageStretch_FilterParam px;
+			_priv_ImageStretch_Smooth_Prepare(sw, dw, sx_step, sx_start, dx_start, dx_end, px);
 			
 			sl_int32 dx, dy;
 			sl_int32 dh = dst.height;
@@ -804,8 +804,8 @@ namespace slib
 			sl_int32 dh = dst.height;
 			float sy_step, sy_start;
 			sl_int32 isy, dy_start, dy_end;
-			_ImageStretch_FilterParam py;
-			_ImageStretch_Smooth_Prepare(sh, dh, sy_step, sy_start, dy_start, dy_end, py);
+			_priv_ImageStretch_FilterParam py;
+			_priv_ImageStretch_Smooth_Prepare(sh, dh, sy_step, sy_start, dy_start, dy_end, py);
 			
 			sl_int32 dx, dy;
 			sl_int32 dw = dst.width;
@@ -866,15 +866,15 @@ namespace slib
 			sl_int32 dw = dst.width;
 			float sx_step, sx_start;
 			sl_int32 isx, dx_start, dx_end;
-			_ImageStretch_FilterParam px;
-			_ImageStretch_Smooth_Prepare(sw, dw, sx_step, sx_start, dx_start, dx_end, px);
+			_priv_ImageStretch_FilterParam px;
+			_priv_ImageStretch_Smooth_Prepare(sw, dw, sx_step, sx_start, dx_start, dx_end, px);
 			
 			sl_int32 sh = src.height;
 			sl_int32 dh = dst.height;
 			float sy_step, sy_start;
 			sl_int32 isy, dy_start, dy_end;
-			_ImageStretch_FilterParam py;
-			_ImageStretch_Smooth_Prepare(sh, dh, sy_step, sy_start, dy_start, dy_end, py);
+			_priv_ImageStretch_FilterParam py;
+			_priv_ImageStretch_Smooth_Prepare(sh, dh, sy_step, sy_start, dy_start, dy_end, py);
 			
 			sl_int32 dx, dy;
 			float sx, sy;
@@ -954,7 +954,7 @@ namespace slib
 		}
 	};
 
-	class _ImageStretch_Smooth_IntBox
+	class _priv_ImageStretch_Smooth_IntBox
 	{
 	public:
 		template <class BLEND_OP>
@@ -1043,7 +1043,7 @@ namespace slib
 		
 	};
 
-	class _ImageBlend_Copy
+	class _priv_ImageBlend_Copy
 	{
 	public:
 		SLIB_INLINE static void blend(Color& dst, const Color& src)
@@ -1052,7 +1052,7 @@ namespace slib
 		}
 	};
 
-	class _ImageBlend_SrcAlpha
+	class _priv_ImageBlend_SrcAlpha
 	{
 	public:
 		SLIB_INLINE static void blend(Color& dst, const Color& src)
@@ -1061,7 +1061,7 @@ namespace slib
 		}
 	};
 
-	class _ImageStretch
+	class _priv_ImageStretch
 	{
 	public:
 		template <class STRETCH_OP>
@@ -1069,10 +1069,10 @@ namespace slib
 		{
 			switch (blend) {
 				case BlendMode::Copy:
-					STRETCH_OP::template stretch<_ImageBlend_Copy>(dst, src);
+					STRETCH_OP::template stretch<_priv_ImageBlend_Copy>(dst, src);
 					break;
 				case BlendMode::SrcAlpha:
-					STRETCH_OP::template stretch<_ImageBlend_SrcAlpha>(dst, src);
+					STRETCH_OP::template stretch<_priv_ImageBlend_SrcAlpha>(dst, src);
 					break;
 			}
 		}
@@ -1087,27 +1087,27 @@ namespace slib
 			return;
 		}
 		if (src.width == dst.width && src.height == dst.height) {
-			_ImageStretch::template stretch<_ImageStretch_Copy>(dst, src, blend);
+			_priv_ImageStretch::template stretch<_priv_ImageStretch_Copy>(dst, src, blend);
 			return;
 		}
 		if (src.width == 1 && src.height == 1) {
-			_ImageStretch::template stretch<_ImageStretch_FillColor>(dst, src, blend);
+			_priv_ImageStretch::template stretch<_priv_ImageStretch_FillColor>(dst, src, blend);
 			return;
 		}
 		if (stretch == StretchMode::Nearest) {
-			_ImageStretch::template stretch<_ImageStretch_Nearest>(dst, src, blend);
+			_priv_ImageStretch::template stretch<_priv_ImageStretch_Nearest>(dst, src, blend);
 		} else if (stretch == StretchMode::Linear) {
-			_ImageStretch::template stretch< _ImageStretch_Smooth<_ImageStretch_Smooth_LinearFilter> >(dst, src, blend);
+			_priv_ImageStretch::template stretch< _priv_ImageStretch_Smooth<_priv_ImageStretch_Smooth_LinearFilter> >(dst, src, blend);
 		} else {
 			if (src.width <= dst.width && src.height <= dst.height) {
-				_ImageStretch::template stretch< _ImageStretch_Smooth<_ImageStretch_Smooth_LinearFilter> >(dst, src, blend);
+				_priv_ImageStretch::template stretch< _priv_ImageStretch_Smooth<_priv_ImageStretch_Smooth_LinearFilter> >(dst, src, blend);
 				return;
 			}
 			if (src.width % dst.width == 0 && src.height % dst.height == 0) {
-				_ImageStretch::template stretch<_ImageStretch_Smooth_IntBox>(dst, src, blend);
+				_priv_ImageStretch::template stretch<_priv_ImageStretch_Smooth_IntBox>(dst, src, blend);
 				return;
 			}
-			_ImageStretch::template stretch< _ImageStretch_Smooth<_ImageStretch_Smooth_BoxFilter> >(dst, src, blend);
+			_priv_ImageStretch::template stretch< _priv_ImageStretch_Smooth<_priv_ImageStretch_Smooth_BoxFilter> >(dst, src, blend);
 		}
 	}
 

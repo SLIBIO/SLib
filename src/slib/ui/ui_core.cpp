@@ -30,7 +30,7 @@ namespace slib
 	}
 
 
-	class _UI_Core_Default
+	class _priv_UI_Core_Default
 	{
 	public:
 		sl_real fontSize;
@@ -39,7 +39,7 @@ namespace slib
 		sl_ui_len scrollBarWidth;
 
 	public:
-		_UI_Core_Default()
+		_priv_UI_Core_Default()
 		{
 	#if defined(SLIB_PLATFORM_IS_DESKTOP)
 			scrollBarWidth = 12;
@@ -53,11 +53,11 @@ namespace slib
 		}
 	};
 
-	SLIB_SAFE_STATIC_GETTER(_UI_Core_Default, _UI_Core_getDefault)
+	SLIB_SAFE_STATIC_GETTER(_priv_UI_Core_Default, _priv_UI_Core_getDefault)
 
 	sl_real UI::getDefaultFontSize()
 	{
-		_UI_Core_Default* def = _UI_Core_getDefault();
+		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
 		if (!def) {
 			return 0;
 		}
@@ -66,7 +66,7 @@ namespace slib
 
 	void UI::setDefaultFontSize(sl_real fontSize)
 	{
-		_UI_Core_Default* def = _UI_Core_getDefault();
+		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
 		if (!def) {
 			return;
 		}
@@ -83,7 +83,7 @@ namespace slib
 
 	String UI::getDefaultFontFamily()
 	{
-		_UI_Core_Default* def = _UI_Core_getDefault();
+		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
 		if (!def) {
 			return sl_null;
 		}
@@ -92,7 +92,7 @@ namespace slib
 
 	void UI::setDefaultFontFamily(const String& fontFamily)
 	{
-		_UI_Core_Default* def = _UI_Core_getDefault();
+		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
 		if (!def) {
 			return;
 		}
@@ -109,7 +109,7 @@ namespace slib
 
 	Ref<Font> UI::getDefaultFont()
 	{
-		_UI_Core_Default* def = _UI_Core_getDefault();
+		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
 		if (!def) {
 			return sl_null;
 		}
@@ -118,7 +118,7 @@ namespace slib
 
 	void UI::setDefaultFont(const Ref<Font>& font)
 	{
-		_UI_Core_Default* def = _UI_Core_getDefault();
+		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
 		if (!def) {
 			return;
 		}
@@ -131,7 +131,7 @@ namespace slib
 
 	sl_ui_len UI::getDefaultScrollBarWidth()
 	{
-		_UI_Core_Default* def = _UI_Core_getDefault();
+		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
 		if (!def) {
 			return 0;
 		}
@@ -140,7 +140,7 @@ namespace slib
 
 	void UI::setDefaultScrollBarWidth(sl_ui_len len)
 	{
-		_UI_Core_Default* def = _UI_Core_getDefault();
+		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
 		if (!def) {
 			return;
 		}

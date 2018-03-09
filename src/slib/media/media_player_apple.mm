@@ -22,12 +22,12 @@
 
 namespace slib
 {
-	class _AVPlayer;
+	class _priv_AVPlayer;
 }
 
-@interface _AVPlayer_Observer : NSObject
+@interface _priv_AVPlayer_Observer : NSObject
 {
-	@public slib::WeakRef<slib::_AVPlayer> m_player;
+	@public slib::WeakRef<slib::_priv_AVPlayer> m_player;
 }
 - (void)playerItemDidReachEnd:(NSNotification *)notification;
 @end
@@ -35,13 +35,13 @@ namespace slib
 namespace slib
 {
 
-	class _AVPlayer : public MediaPlayer
+	class _priv_AVPlayer : public MediaPlayer
 	{
 	public:
 		AVPlayer* m_player;
 		AVPlayerItem* m_playerItem;
 		AVPlayerItemVideoOutput* m_videoOutput;
-		_AVPlayer_Observer* m_observer;
+		_priv_AVPlayer_Observer* m_observer;
 		
 		AVPlayerStatus m_status;
 		sl_bool m_flagInited;
@@ -49,7 +49,7 @@ namespace slib
 		sl_real m_volume;
 		
 	public:
-		_AVPlayer()
+		_priv_AVPlayer()
 		{
 			m_status = AVPlayerStatusUnknown;
 			m_flagInited = sl_false;
@@ -57,14 +57,14 @@ namespace slib
 			m_volume = 1;
 		}
 		
-		~_AVPlayer()
+		~_priv_AVPlayer()
 		{
 			SLIB_REFERABLE_DESTRUCTOR
 			_release(sl_true, sl_false);
 		}
 		
 	public:
-		static Ref<_AVPlayer> create(const MediaPlayerParam& param)
+		static Ref<_priv_AVPlayer> create(const MediaPlayerParam& param)
 		{
 			AVPlayerItem* playerItem = nil;
 			if (param.url.isNotEmpty()) {
@@ -94,9 +94,9 @@ namespace slib
 					videoOutput = [[AVPlayerItemVideoOutput alloc] initWithPixelBufferAttributes:pixBuffAttributes];
 				}
 				
-				Ref<_AVPlayer> ret = new _AVPlayer;
+				Ref<_priv_AVPlayer> ret = new _priv_AVPlayer;
 				if (ret.isNotNull()) {
-					_AVPlayer_Observer* observer = [[_AVPlayer_Observer alloc] init];
+					_priv_AVPlayer_Observer* observer = [[_priv_AVPlayer_Observer alloc] init];
 					if (observer != nil) {
 						observer->m_player = ret;
 						ret->m_flagInited = sl_true;
@@ -307,15 +307,15 @@ namespace slib
 
 	Ref<MediaPlayer> MediaPlayer::_createNative(const MediaPlayerParam& param)
 	{
-		return _AVPlayer::create(param);
+		return _priv_AVPlayer::create(param);
 	}
 
 }
 
-@implementation _AVPlayer_Observer
+@implementation _priv_AVPlayer_Observer
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
-	slib::Ref<slib::_AVPlayer> player(m_player);
+	slib::Ref<slib::_priv_AVPlayer> player(m_player);
 	if (player.isNotNull()) {
 		player->_onReachEnd();
 	}
@@ -324,7 +324,7 @@ namespace slib
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)contex
 {
 	if ([keyPath isEqualToString:@"status"]) {
-		slib::Ref<slib::_AVPlayer> player(m_player);
+		slib::Ref<slib::_priv_AVPlayer> player(m_player);
 		if (player.isNotNull()) {
 			player->_onStatus();
 		}

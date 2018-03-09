@@ -372,7 +372,7 @@ namespace slib
 		String toString() const;
 		
 	private:
-		sl_uint32 _TTL;
+		sl_uint32 m_TTL;
 		sl_uint16 _dataLength;
 		sl_uint16 _dataOffset;
 		const sl_uint8* _message;

@@ -17,7 +17,7 @@
 #include "slib/ui/app.h"
 #include "slib/ui/platform.h"
 
-@interface _OSX_MenuItemHandle : NSMenuItem
+@interface _priv_macOS_MenuItemHandle : NSMenuItem
 {
 	@public slib::WeakRef<slib::MenuItem> m_item;
 	@public NSImage* m_defaultCheckedImage;
@@ -27,17 +27,17 @@
 namespace slib
 {
 
-	class _OSX_Menu;
+	class _priv_macOS_Menu;
 
-	class _OSX_MenuItem : public MenuItem
+	class _priv_macOS_MenuItem : public MenuItem
 	{
 		SLIB_DECLARE_OBJECT
 		
 	public:
-		_OSX_MenuItemHandle* m_handle;
+		_priv_macOS_MenuItemHandle* m_handle;
 
 	public:
-		static Ref<_OSX_MenuItem> create(_OSX_Menu* parent, const MenuItemParam& param);
+		static Ref<_priv_macOS_MenuItem> create(_priv_macOS_Menu* parent, const MenuItemParam& param);
 		
 		void setText(const String& text) override;
 
@@ -59,9 +59,9 @@ namespace slib
 
 	};
 
-	SLIB_DEFINE_OBJECT(_OSX_MenuItem, MenuItem)
+	SLIB_DEFINE_OBJECT(_priv_macOS_MenuItem, MenuItem)
 
-	class _OSX_Menu : public Menu
+	class _priv_macOS_Menu : public Menu
 	{
 		SLIB_DECLARE_OBJECT
 
@@ -69,12 +69,12 @@ namespace slib
 		NSMenu* m_handle;
 
 	public:
-		static Ref<_OSX_Menu> create()
+		static Ref<_priv_macOS_Menu> create()
 		{
 			NSMenu* handle = [[NSMenu alloc] initWithTitle:@""];
 			if (handle != nil) {
 				handle.autoenablesItems = NO;
-				Ref<_OSX_Menu> ret = new _OSX_Menu();
+				Ref<_priv_macOS_Menu> ret = new _priv_macOS_Menu();
 				if (ret.isNotNull()) {
 					ret->m_handle = handle;
 					return ret;
@@ -95,7 +95,7 @@ namespace slib
 			if (index > n) {
 				index = n;
 			}
-			Ref<_OSX_MenuItem> item = _OSX_MenuItem::create(this, param);
+			Ref<_priv_macOS_MenuItem> item = _priv_macOS_MenuItem::create(this, param);
 			if (item.isNotNull()) {
 				[m_handle insertItem:item->m_handle atIndex:index];
 				m_items.insert(index, item);
@@ -152,19 +152,19 @@ namespace slib
 			[m_handle popUpMenuPositioningItem:nil atLocation:pt inView:nil];
 		}
 
-		friend class _OSX_MenuItem;
+		friend class _priv_macOS_MenuItem;
 	};
 
-	SLIB_DEFINE_OBJECT(_OSX_Menu, Menu)
+	SLIB_DEFINE_OBJECT(_priv_macOS_Menu, Menu)
 
 	Ref<Menu> Menu::create()
 	{
-		return _OSX_Menu::create();
+		return _priv_macOS_Menu::create();
 	}
 
-	Ref<_OSX_MenuItem> _OSX_MenuItem::create(_OSX_Menu* parent, const MenuItemParam& param)
+	Ref<_priv_macOS_MenuItem> _priv_macOS_MenuItem::create(_priv_macOS_Menu* parent, const MenuItemParam& param)
 	{
-		_OSX_MenuItemHandle* handle = [[_OSX_MenuItemHandle alloc] init];
+		_priv_macOS_MenuItemHandle* handle = [[_priv_macOS_MenuItemHandle alloc] init];
 		if (handle != nil) {
 			handle.title = Apple::getNSStringFromString(param.text.replaceAll("&", String::null()));
 			NSUInteger keMask;
@@ -186,7 +186,7 @@ namespace slib
 			if (handle.onStateImage == nil) {
 				handle.onStateImage = handle->m_defaultCheckedImage;
 			}
-			Ref<_OSX_MenuItem> ret = new _OSX_MenuItem;
+			Ref<_priv_macOS_MenuItem> ret = new _priv_macOS_MenuItem;
 			if (ret.isNotNull()) {
 				ret->m_handle = handle;
 				handle->m_item = ret.get();
@@ -207,7 +207,7 @@ namespace slib
 		return sl_null;
 	}
 
-	void _OSX_MenuItem::setText(const String& text)
+	void _priv_macOS_MenuItem::setText(const String& text)
 	{
 		MenuItem::setText(text);
 		m_handle.title = Apple::getNSStringFromString(text.replaceAll("&", String::null()));
@@ -216,7 +216,7 @@ namespace slib
 		}
 	}
 
-	void _OSX_MenuItem::setShortcutKey(const slib::KeycodeAndModifiers &km)
+	void _priv_macOS_MenuItem::setShortcutKey(const slib::KeycodeAndModifiers &km)
 	{
 		MenuItem::setShortcutKey(km);
 		NSUInteger keMask;
@@ -229,7 +229,7 @@ namespace slib
 		}
 	}
 
-	void _OSX_MenuItem::setSecondShortcutKey(const slib::KeycodeAndModifiers &km)
+	void _priv_macOS_MenuItem::setSecondShortcutKey(const slib::KeycodeAndModifiers &km)
 	{
 		MenuItem::setSecondShortcutKey(km);
 		NSUInteger keMask;
@@ -239,25 +239,25 @@ namespace slib
 		}
 	}
 
-	void _OSX_MenuItem::setEnabled(sl_bool flag)
+	void _priv_macOS_MenuItem::setEnabled(sl_bool flag)
 	{
 		MenuItem::setEnabled(flag);
 		m_handle.enabled = flag ? YES : NO;
 	}
 
-	void _OSX_MenuItem::setChecked(sl_bool flag)
+	void _priv_macOS_MenuItem::setChecked(sl_bool flag)
 	{
 		MenuItem::setChecked(flag);
 		m_handle.state = flag ? NSOnState : NSOffState;
 	}
 
-	void _OSX_MenuItem::setIcon(const Ref<Bitmap>& icon)
+	void _priv_macOS_MenuItem::setIcon(const Ref<Bitmap>& icon)
 	{
 		MenuItem::setIcon(icon);
 		m_handle.offStateImage = GraphicsPlatform::createNSImageFromBitmap(icon);
 	}
 
-	void _OSX_MenuItem::setCheckedIcon(const Ref<Bitmap>& icon)
+	void _priv_macOS_MenuItem::setCheckedIcon(const Ref<Bitmap>& icon)
 	{
 		MenuItem::setCheckedIcon(icon);
 		m_handle.onStateImage = GraphicsPlatform::createNSImageFromBitmap(icon);
@@ -266,7 +266,7 @@ namespace slib
 		}
 	}
 
-	void _OSX_MenuItem::setSubmenu(const Ref<Menu>& menu)
+	void _priv_macOS_MenuItem::setSubmenu(const Ref<Menu>& menu)
 	{
 		MenuItem::setSubmenu(menu);
 		m_handle.submenu = UIPlatform::getMenuHandle(menu);
@@ -275,7 +275,7 @@ namespace slib
 		}
 	}
 
-	NSImage* _OSX_MenuItem::_createIcon(const Ref<Bitmap>& iconSrc)
+	NSImage* _priv_macOS_MenuItem::_createIcon(const Ref<Bitmap>& iconSrc)
 	{
 		if (iconSrc.isNotNull()) {
 			NSImage* icon = GraphicsPlatform::createNSImageFromBitmap(iconSrc);
@@ -296,7 +296,7 @@ namespace slib
 
 	NSMenu* UIPlatform::getMenuHandle(const Ref<Menu>& menu)
 	{
-		if (_OSX_Menu* _menu = CastInstance<_OSX_Menu>(menu.get())) {
+		if (_priv_macOS_Menu* _menu = CastInstance<_priv_macOS_Menu>(menu.get())) {
 			return _menu->m_handle;
 		}
 		return nil;
@@ -304,7 +304,7 @@ namespace slib
 
 	NSMenuItem* UIPlatform::getMenuItemHandle(const Ref<MenuItem>& item)
 	{
-		if (_OSX_MenuItem* _item = CastInstance<_OSX_MenuItem>(item.get())) {
+		if (_priv_macOS_MenuItem* _item = CastInstance<_priv_macOS_MenuItem>(item.get())) {
 			return _item->m_handle;
 		}
 		return nil;
@@ -335,7 +335,7 @@ namespace slib
 
 }
 
-@implementation _OSX_MenuItemHandle
+@implementation _priv_macOS_MenuItemHandle
 
 -(id)init
 {
