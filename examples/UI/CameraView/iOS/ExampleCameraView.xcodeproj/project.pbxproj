@@ -7,18 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		264A3BE5205250AA0070817E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264A3BE4205250AA0070817E /* app.cpp */; };
 		26F5DE272051ACD500BC4998 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 26F5DE262051ACD500BC4998 /* ViewController.m */; };
 		26F5DE2A2051ACD500BC4998 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 26F5DE282051ACD500BC4998 /* Main.storyboard */; };
 		26F5DE2C2051ACD500BC4998 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26F5DE2B2051ACD500BC4998 /* Assets.xcassets */; };
 		26F5DE2F2051ACD500BC4998 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 26F5DE2D2051ACD500BC4998 /* LaunchScreen.storyboard */; };
 		26F5DE322051ACD500BC4998 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26F5DE312051ACD500BC4998 /* main.mm */; };
-		26F5DE3B2051B22500BC4998 /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5DE3A2051B22500BC4998 /* app.cpp */; };
 		26F5DE452051C9AF00BC4998 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F5DE432051B62F00BC4998 /* GLKit.framework */; };
 		26F5DE462051C9B700BC4998 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F5DE3F2051B61100BC4998 /* AVFoundation.framework */; };
 		26F5DE4A2051C9CD00BC4998 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F5DE492051C9CC00BC4998 /* CoreMedia.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		264A3BE3205250AA0070817E /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = ../../src/app.h; sourceTree = "<group>"; };
+		264A3BE4205250AA0070817E /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = ../../src/app.cpp; sourceTree = "<group>"; };
 		26F5DE1F2051ACD500BC4998 /* ExampleCameraView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleCameraView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26F5DE252051ACD500BC4998 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		26F5DE262051ACD500BC4998 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
@@ -27,8 +29,6 @@
 		26F5DE2E2051ACD500BC4998 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		26F5DE302051ACD500BC4998 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		26F5DE312051ACD500BC4998 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
-		26F5DE392051B22500BC4998 /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = ../../app.h; sourceTree = "<group>"; };
-		26F5DE3A2051B22500BC4998 /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = ../../app.cpp; sourceTree = "<group>"; };
 		26F5DE3D2051B60600BC4998 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		26F5DE3F2051B61100BC4998 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		26F5DE412051B61D00BC4998 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -86,8 +86,8 @@
 		26F5DE382051B02400BC4998 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				26F5DE3A2051B22500BC4998 /* app.cpp */,
-				26F5DE392051B22500BC4998 /* app.h */,
+				264A3BE4205250AA0070817E /* app.cpp */,
+				264A3BE3205250AA0070817E /* app.h */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -176,7 +176,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26F5DE3B2051B22500BC4998 /* app.cpp in Sources */,
+				264A3BE5205250AA0070817E /* app.cpp in Sources */,
 				26F5DE272051ACD500BC4998 /* ViewController.m in Sources */,
 				26F5DE322051ACD500BC4998 /* main.mm in Sources */,
 			);
