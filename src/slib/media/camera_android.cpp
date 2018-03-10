@@ -146,7 +146,7 @@ namespace slib
 		}
 
 		Memory m_memFrame;
-		void _onFrame(jbyteArray jdata, jint width, jint height) {
+		void _onFrame(jbyteArray jdata, jint width, jint height, jint orientation) {
 			if (width & 1) {
 				return;
 			}
@@ -170,18 +170,32 @@ namespace slib
 			frame.image.data = mem.getData();
 			frame.image.pitch = 0;
 			frame.image.ref = mem.ref;
-			frame.rotation = RotationMode::Rotate90;
+			switch (orientation) {
+				case 90:
+					frame.rotation = RotationMode::Rotate90;
+					break;
+				case 180:
+					frame.rotation = RotationMode::Rotate180;
+					break;
+				case 270:
+					frame.rotation = RotationMode::Rotate270;
+					break;
+				default:
+					frame.rotation = RotationMode::Rotate0;
+					break;
+			}
 			_onCaptureVideoFrame(&frame);
 		}
 
 	};
 
+
 	SLIB_JNI_BEGIN_CLASS_SECTION(JAndroidCamera)
-		SLIB_JNI_NATIVE_IMPL(nativeOnFrame, "nativeOnFrame", "(J[BII)V", void, jlong instance, jbyteArray jdata, jint jwidth, jint jheight)
+		SLIB_JNI_NATIVE_IMPL(nativeOnFrame, "nativeOnFrame", "(J[BIII)V", void, jlong instance, jbyteArray data, jint width, jint height, jint orientation)
 		{
 			Ref<_priv_Android_Camera> camera = _priv_Android_Camera::get(instance);
 			if (camera.isNotNull()) {
-				camera->_onFrame(jdata, jwidth, jheight);
+				camera->_onFrame(data, width, height, orientation);
 			}
 		}
 	SLIB_JNI_END_CLASS_SECTION

@@ -30,19 +30,21 @@ public class SlibActivity extends Activity {
 	boolean flagVisible;
 
 	public static final int REQUEST_IMAGE_CAPTURE = 0x0000ff;
-	
+
+	public static final int PERMISSION_REQUEST_CAMERA = 0xA00001;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		
+
 		super.onCreate(savedInstanceState);
-		
+
 		Android.onCreateActivity(this);
-		
+
 		Window window = getWindow();
 		window.setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED, WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 		window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -51,7 +53,7 @@ public class SlibActivity extends Activity {
 		UiGLView.onPauseViews();
 		flagVisible = false;
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -67,15 +69,15 @@ public class SlibActivity extends Activity {
 		Android.onDestroyActivity(this);
 		windows.removeAllElements();
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		if (!Android.onBack(this)) {
 			return;
 		}
-		
+
 		if (windows.isEmpty()) {
-			super.onBackPressed();			
+			super.onBackPressed();
 			return;
 		}
 		try {
@@ -85,21 +87,22 @@ public class SlibActivity extends Activity {
 			Logger.exception(e);
 		}
 	}
-	
+
 	@Override
 	public void finish() {
 		super.finish();
 	}
-	
+
 	public boolean isVisible() {
 		return flagVisible;
 	}
-	
+
 	Vector<UiWindow> windows = new Vector<UiWindow>();
+
 	public void onCreateWindow(UiWindow window) {
 		windows.add(window);
 	}
-	
+
 	public boolean onCloseWindow(UiWindow window) {
 		if (windows.contains(window)) {
 			windows.remove(window);
@@ -128,7 +131,7 @@ public class SlibActivity extends Activity {
 		});
 		return true;
 	}
-	
+
 	void dispatchTouchEventToSuper(final MotionEvent ev) {
 		try {
 			super.dispatchTouchEvent(ev);
@@ -143,4 +146,11 @@ public class SlibActivity extends Activity {
 			TakePhoto.onResult(this, resultCode, data);
 		}
 	}
+
+	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+		if (requestCode == PERMISSION_REQUEST_CAMERA) {
+			SCamera.onRequestPermissionsResult();
+		}
+	}
+
 }

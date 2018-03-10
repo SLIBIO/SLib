@@ -120,7 +120,7 @@ namespace slib
 		None = 0,
 		Horizontal = 1,
 		Vertical = 2,
-		Both = 3
+		Both = 3 // Same effect with `RotationMode::Rotate180`
 	};
 
 	enum class ScaleMode

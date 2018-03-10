@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode 12
+        versionName "1.1"
         externalNativeBuild {
             cmake {
                 targets 'slib', 'slib-core', 'zlib', 'png', 'jpeg', 'freetype', 'sqlite3', 'opus', 'vpx'

@@ -47,14 +47,27 @@ namespace slib
 		
 		void setRepeat(sl_bool flagRepeat);
 		
+		RotationMode getRotation();
+		
+		void setRotation(const RotationMode& rotation);
+		
+		FlipMode getFlip();
+		
+		void setFlip(const FlipMode& flip);
+
 		void updateCurrentFrame(const VideoFrame* frame);
 		
 	protected:
 		void onDraw(Canvas* canvas) override;
 		
 	protected:
+		Ref<VertexBuffer> _applyFrameRotationAndFlip(FlipMode frameFlip, RotationMode frameRotation, FlipMode userFlip, RotationMode userRotation);
+		
+	protected:
 		AtomicRef<MediaPlayer> m_mediaPlayer;
 		sl_bool m_flagRepeat;
+		RotationMode m_rotation;
+		FlipMode m_flip;
 		
 		AtomicRef<Texture> m_textureFrame;
 		sl_bool m_flagYUV;
@@ -63,6 +76,12 @@ namespace slib
 		Ref<RenderProgram2D_PositionTextureYUV> m_programYUV;
 		Ref<RenderProgram2D_PositionTextureOES> m_programOES;
 		
+		AtomicRef<VertexBuffer> m_vbFrame;
+		FlipMode m_frameFlipApplied;
+		RotationMode m_frameRotationApplied;
+		FlipMode m_userFlipApplied;
+		RotationMode m_userRotationApplied;
+
 		MediaPlayerRenderVideoParam m_renderVideoParam;
 		
 	};

@@ -30,6 +30,8 @@ namespace slib
 		setDebugTextVisible(sl_false);
 		
 		m_flagRepeat = sl_true;
+		m_rotation = RotationMode::Rotate0;
+		m_flip = FlipMode::None;
 		
 		m_flagYUV = sl_false;
 		
@@ -124,6 +126,26 @@ namespace slib
 		}
 	}
 	
+	RotationMode VideoView::getRotation()
+	{
+		return m_rotation;
+	}
+	
+	void VideoView::setRotation(const RotationMode& rotation)
+	{
+		m_rotation = rotation;
+	}
+	
+	FlipMode VideoView::getFlip()
+	{
+		return m_flip;
+	}
+	
+	void VideoView::setFlip(const FlipMode& flip)
+	{
+		m_flip = flip;
+	}
+	
 	void VideoView::updateCurrentFrame(const VideoFrame* frame)
 	{
 		ColorSpace colorSpace = BitmapFormats::getColorSpace(frame->image.format);
@@ -151,6 +173,7 @@ namespace slib
 			bitmapData.copyPixelsFrom(frame->image);
 			texture->update();
 			m_textureFrame = texture;
+			_applyFrameRotationAndFlip(frame->flip, frame->rotation, m_flip, m_rotation);
 		}
 		requestRender();
 	}
@@ -182,7 +205,8 @@ namespace slib
 						program = m_programRGB;
 					}
 				}
-				if (texture.isNotNull() && program.isNotNull()) {
+				Ref<VertexBuffer> vb = m_vbFrame;
+				if (vb.isNotNull() && texture.isNotNull() && program.isNotNull()) {
 					Matrix3 mat = canvas->getTransformMatrixForRectangle(getBounds());
 					RenderProgramScope<RenderProgramState2D_PositionTexture> scope;
 					if (scope.begin(engine.get(), program)) {
@@ -190,12 +214,104 @@ namespace slib
 						scope->setTexture(texture);
 						scope->setTextureTransform(textureMatrix);
 						scope->setColor(Color4f(1, 1, 1, canvas->getAlpha()));
-						Ref<VertexBuffer> vb = engine->getDefaultVertexBufferForDrawTexture2D();
 						engine->drawPrimitive(4, vb, PrimitiveType::TriangleStrip);
 					}
 				}
 			}
 		}
+	}
+	
+	Ref<VertexBuffer> VideoView::_applyFrameRotationAndFlip(FlipMode frameFlip, RotationMode frameRotation, FlipMode userFlip, RotationMode userRotation)
+	{
+		if (m_vbFrame.isNotNull() && m_frameFlipApplied == frameFlip && m_frameRotationApplied == frameRotation && m_userFlipApplied == userFlip && m_userRotationApplied == userRotation) {
+			return m_vbFrame;
+		}
+		RenderVertex2D_PositionTexture v[] = {
+			{ { 0, 0 }, { 0, 0 } }
+			, { { 1, 0 }, { 1, 0 } }
+			, { { 0, 1 }, { 0, 1 } }
+			, { { 1, 1 }, { 1, 1 } }
+		};
+		Vector2 t;
+		switch (frameFlip) {
+			case FlipMode::Horizontal:
+				Swap(v[0].texCoord, v[1].texCoord);
+				Swap(v[2].texCoord, v[3].texCoord);
+				break;
+			case FlipMode::Vertical:
+				Swap(v[0].texCoord, v[2].texCoord);
+				Swap(v[1].texCoord, v[3].texCoord);
+				break;
+			case FlipMode::Both:
+				Swap(v[0].texCoord, v[3].texCoord);
+				Swap(v[1].texCoord, v[2].texCoord);
+				break;
+			default:
+				break;
+		}
+		switch (frameRotation) {
+			case RotationMode::Rotate90:
+				t = v[0].texCoord;
+				v[0].texCoord = v[2].texCoord;
+				v[2].texCoord = v[3].texCoord;
+				v[3].texCoord = v[1].texCoord;
+				v[1].texCoord = t;
+				break;
+			case RotationMode::Rotate180:
+				Swap(v[0].texCoord, v[3].texCoord);
+				Swap(v[1].texCoord, v[2].texCoord);
+				break;
+			case RotationMode::Rotate270:
+				t = v[0].texCoord;
+				v[0].texCoord = v[1].texCoord;
+				v[1].texCoord = v[3].texCoord;
+				v[3].texCoord = v[2].texCoord;
+				v[2].texCoord = t;
+				break;
+			default:
+				break;
+		}
+		switch (userFlip) {
+			case FlipMode::Horizontal:
+				Swap(v[0].texCoord, v[1].texCoord);
+				Swap(v[2].texCoord, v[3].texCoord);
+				break;
+			case FlipMode::Vertical:
+				Swap(v[0].texCoord, v[2].texCoord);
+				Swap(v[1].texCoord, v[3].texCoord);
+				break;
+			case FlipMode::Both:
+				Swap(v[0].texCoord, v[3].texCoord);
+				Swap(v[1].texCoord, v[2].texCoord);
+				break;
+			default:
+				break;
+		}
+		switch (userRotation) {
+			case RotationMode::Rotate90:
+				t = v[0].texCoord;
+				v[0].texCoord = v[2].texCoord;
+				v[2].texCoord = v[3].texCoord;
+				v[3].texCoord = v[1].texCoord;
+				v[1].texCoord = t;
+				break;
+			case RotationMode::Rotate180:
+				Swap(v[0].texCoord, v[3].texCoord);
+				Swap(v[1].texCoord, v[2].texCoord);
+				break;
+			case RotationMode::Rotate270:
+				t = v[0].texCoord;
+				v[0].texCoord = v[1].texCoord;
+				v[1].texCoord = v[3].texCoord;
+				v[3].texCoord = v[2].texCoord;
+				v[2].texCoord = t;
+				break;
+			default:
+				break;
+		}
+		Ref<VertexBuffer> vb = VertexBuffer::create(v, sizeof(v));
+		m_vbFrame = vb;
+		return vb;
 	}
 
 }

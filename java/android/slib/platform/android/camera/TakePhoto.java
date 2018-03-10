@@ -51,10 +51,6 @@ public class TakePhoto {
 						".jpg",
 						new File(path)
 				);
-				if (file == null) {
-					onFailure();
-					return;
-				}
 				file.deleteOnExit();
 				currentPhotoPath = Uri.fromFile(file);
 			} else {

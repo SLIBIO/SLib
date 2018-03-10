@@ -40,6 +40,7 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 	private int backgroundColor;
 	private boolean flagFullScreen;
 	private int mLeft, mTop, mRight, mBottom;
+	private int mWidth, mHeight;
 
 	private UiWindow(Context context) {
 		super(context);
@@ -161,8 +162,8 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 
 	public Point getSize() {
 		Point ret = new Point();
-		ret.x = getWidth();
-		ret.y = getHeight();
+		ret.x = mWidth;
+		ret.y = mHeight;
 		return ret;
 	}
 
@@ -170,6 +171,8 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 		if (flagFullScreen) {
 			return;
 		}
+		mWidth = width;
+		mHeight = height;
 		mRight = mLeft + width;
 		mBottom = mTop + height;
 		try {
@@ -263,6 +266,8 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 
 	public void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
+		mWidth = w;
+		mHeight = h;
 		if (instance != 0) {
 			nativeOnResize(instance, w, h);
 		}

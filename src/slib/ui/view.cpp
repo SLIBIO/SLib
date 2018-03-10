@@ -2461,6 +2461,7 @@ namespace slib
 
 	void View::invalidateLayoutFromResize(UIUpdateMode mode)
 	{
+		m_flagInvalidLayout = sl_true;
 		if (mode == UIUpdateMode::Init) {
 			return;
 		}
@@ -2472,7 +2473,6 @@ namespace slib
 			instanceView->dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, invalidateLayoutFromResize, this, mode));
 			return;
 		}
-		m_flagInvalidLayout = sl_true;
 		Ref<View> parent = m_parent;
 		if (parent.isNotNull()) {
 			parent->invalidateLayoutFromResizeContent(UIUpdateMode::NoRedraw);
