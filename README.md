@@ -64,7 +64,7 @@ SLib enables software developers to build multi-platform(Android/iOS/MacOS/Tizen
  * Android Studio 2.3 or higher for compiling Android packages
  * Visual Studio 2017 or higher for compiling Win32 packages
  * Tizen Studio 1.1.1 or higher for compiling Tizen packages
- * KDevelop 4.7 or higher for compiling Linux packages
+ * CMake (>=2.6), GCC/C++ (>=4.8) for compiling Linux packages
 
 ### Clone the repository from Github.
 
@@ -85,7 +85,8 @@ You can see the following projects in `build` directory.
 | macOS-Xcode | Xcode project for macOS |
 | Win32-VC | Visual Studio solution for Win32 |
 | TizenStudio | Tizen Studio project for Tizen |
-| Linux-KDevelop | KDevelop project for Linux |
+| Linux-CMake | CMake project for Linux |
+| Linux-KDevelop | KDevelop (>=4.7) project for Linux |
  
  After compiling the projects, you can find the static libraries in the `lib` directory.
 
@@ -107,7 +108,7 @@ On Windows, you'll need to run the `setup-path.bat` batch file on Command Prompt
 
 `setup-path` will register the current source directory as `SLIB-PATH` environment variable depending on the Operating Systems and IDEs(XCode and KDevelop).
 
-After setting up the environment variables, please close all the running IDEs(Xcode, Android Studio, Tizen Studio,...) and reopen them. (on macOS, press Command+Q to completely close the IDEs)
+After setting up the environment variables, please close all the running IDEs(Xcode, Android Studio, Tizen Studio,...) and terminal (or konsole) windows, and then reopen them. (on macOS, press Command+Q to completely close the IDEs).
 
 ## Integrating SLib with existing C++ projects
 
@@ -120,7 +121,7 @@ It is very easy to integrate `SLib` into your existing C++ project. You just nee
 | Tizen | Tizen Studio | ${SLIB_PATH}/include | ${SLIB_PATH}/lib/Tizen/${ConfigName}-${SDK_ARCH} |
 | macOS | Xcode | $(SLIB_PATH)/include | $(SLIB_PATH)/lib/macOS/$(CONFIGURATION) |
 | Win32 | Visual Studio | $(SLIB_PATH)/include | $(SLIB_PATH)/lib/Win32/$(Configuration)-$(Platform) |
-| Linux | KDevelop, CMake | ${SLIB_PATH}/include | ${SLIB_PATH}/lib/Linux/${CMAKE_BUILD_TYPE}-${CMAKE_HOST_SYSTEM_PROCESSOR} |
+| Linux | CMake, KDevelop | ${SLIB_PATH}/include | ${SLIB_PATH}/lib/Linux/${CMAKE_BUILD_TYPE}-${CMAKE_HOST_SYSTEM_PROCESSOR} |
 
 You can also integrate SLib into any types of C++ projects using similar `include` and `lib` directory rules.
 
@@ -336,9 +337,9 @@ Secondly, open your VC project created by yourself which will use SLib.
         `slib.lib`
 
 
-### KDevelop or CMake
+### CMake or KDevelop
 
-Firstly, open and build `SLib.kdev4` project in the `build/Linux-KDevelop` directory in SLib source. After completion of build, you can see the precompiled static libraries in the `lib/Linux` directory.
+Firstly, run `build-release.sh` (or `build-debug.sh`) in the `build/Linux-CMake` directory in SLib source. (You can also use KDevelop project - `SLib.kdev4` in the `build/Linux-KDevelop` directory to compile SLib). After completion of build, you can see the precompiled static libraries in the `lib/Linux` directory.
 
 Secondly, setup your project which will use SLib.
 
