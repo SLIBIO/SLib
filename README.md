@@ -64,7 +64,7 @@ SLib enables software developers to build multi-platform(Android/iOS/MacOS/Tizen
  * Android Studio 2.3 or higher for compiling Android packages
  * Visual Studio 2017 or higher for compiling Win32 packages
  * Tizen Studio 1.1.1 or higher for compiling Tizen packages
- * CMake (>=2.6), GCC/C++ (>=4.8) for compiling Linux packages
+ * CMake (>=2.6), GCC/C++ (>=4.8.1) for compiling Linux packages
 
 ### Clone the repository from Github.
 
