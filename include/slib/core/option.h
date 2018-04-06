@@ -314,44 +314,102 @@
 /*************************************
 	Architecture Definition
 **************************************/
-#if defined(SLIB_COMPILER_IS_GCC)
-#	if defined(__arm__) || defined(__aarch64__) || defined(__arm64__) // arm
-#		define SLIB_ARCH_IS_ARM
-#		if defined(__aarch64__) || defined(__arm64__)
-#			define SLIB_ARCH_IS_ARM64
-#		endif
-#	elif defined(__ia64__) // itanium (IA64)
-#		define SLIB_ARCH_IS_IA64
-#	elif defined(__amd64__) || defined(__x86_64__) // AMD64(x86_64)
-#		define SLIB_ARCH_IS_X64
-#	elif defined(__i386__) || defined(_X86_) // x86
-#		define SLIB_ARCH_IS_X86
-#	elif defined(__mips__)
-#		define SLIB_ARCH_IS_MIPS
+
+#if defined(__amd64__) || defined(__x86_64__) || defined(_M_X64) || defined(_M_AMD64)
+#	define SLIB_ARCH_IS_X64
+#	define SLIB_ARCH_IS_64BIT
+#	define SLIB_ARCH_IS_LITTLE_ENDIAN
+#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(_X86_) || defined(_M_IX86) || defined(EMSCRIPTEN)
+#	define SLIB_ARCH_IS_X86
+#	define SLIB_ARCH_IS_LITTLE_ENDIAN
+#elif defined(__arm64__) || defined(__arm64) || defined(__aarch64__)
+#	define SLIB_ARCH_IS_ARM64
+#	define SLIB_ARCH_IS_64BIT
+#	if defined(__AARCH64EL__)
+#		define SLIB_ARCH_IS_LITTLE_ENDIAN
+#	elif defined(__AARCH64EB__) || defined(__ARMEB__)
+#		define SLIB_ARCH_IS_BIG_ENDIAN
 #	endif
-#	if defined(__LP64) || defined(__LP64__)
-#		define SLIB_ARCH_IS_64BIT
+#elif defined(__arm__) || defined(__arm) || defined(ARM) || defined(_ARM_) || defined(__ARM__) || defined(_M_ARM)
+#	define SLIB_ARCH_IS_ARM
+#	if defined(__ARMEB__)
+#		define SLIB_ARCH_IS_BIG_ENDIAN
+#	endif
+#elif defined(__mips__) || defined(__mips) || defined(__MIPS__) || defined(_M_MRX000)
+#	define SLIB_ARCH_IS_MIPS
+#	if defined(__MIPSEB__) || defined(_MIPSEB) || defined(__MIPSEB)
+#		define SLIB_ARCH_IS_BIG_ENDIAN
+#	elif defined(__MIPSEL__) || defined(_MIPSEL) || defined(__MIPSEL)
+#		define SLIB_ARCH_IS_LITTLE_ENDIAN
+#	endif
+#elif defined(_IA64) || defined(__IA64__) || defined(__ia64__) || defined(__ia64) || defined(_M_IA64)
+#	define SLIB_ARCH_IS_IA64
+#	define SLIB_ARCH_IS_64BIT
+#	if defined(hpux) || defined(_hpux)
+#		define SLIB_ARCH_IS_BIG_ENDIAN
 #	else
-#		define SLIB_ARCH_IS_32BIT
+#		define SLIB_ARCH_IS_LITTLE_ENDIAN
 #	endif
-#elif defined(SLIB_COMPILER_IS_VC)
-#	if (defined(_M_ARM)) // arm
-#		define SLIB_ARCH_IS_ARM
-#	elif (defined(_M_IA64)) // itanium (IA64)
-#		define SLIB_ARCH_IS_IA64
-#	elif (defined(_M_IX86))  // x86
-#		define SLIB_ARCH_IS_X86
-#	elif (defined(_M_X64) || defined(_M_AMD64))  // AMD64(x86_64)
-#		define SLIB_ARCH_IS_X64
-#	endif
-#	ifdef SLIB_PLATFORM_IS_WIN64
-#		define SLIB_ARCH_IS_64BIT
+#elif defined(__ALPHA) || defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
+#	define SLIB_ARCH_IS_ALPHA
+#	define SLIB_ARCH_IS_LITTLE_ENDIAN
+#elif defined(__hppa) || defined(__hppa__)
+#	define SLIB_ARCH_IS_HPPA
+#	define SLIB_ARCH_IS_BIG_ENDIAN
+#elif defined(__PPC) || defined(__POWERPC__) || defined(__powerpc) || defined(__PPC__) || defined(__powerpc__) || defined(__ppc__) || defined(__ppc) || defined(_ARCH_PPC) || defined(_M_PPC)
+#	define SLIB_ARCH_IS_POWERPC
+#elif defined(_POWER) || defined(_ARCH_PWR) || defined(_ARCH_PWR2) || defined(_ARCH_PWR3) || defined(_ARCH_PWR4) || defined(__THW_RS6000)
+#	define SLIB_ARCH_IS_POWER
+#	define SLIB_ARCH_IS_BIG_ENDIAN
+#elif defined(__sparc__) || defined(__sparc) || defined(sparc)
+#	define SLIB_ARCH_IS_SPARC
+#	define SLIB_ARCH_IS_BIG_ENDIAN
+#elif defined(__m68k__)
+#	define SLIB_ARCH_IS_M68K
+#	define SLIB_ARCH_IS_BIG_ENDIAN
+#elif defined(__s390__)
+#	define SLIB_ARCH_IS_S390
+#	define SLIB_ARCH_IS_BIG_ENDIAN
+#elif defined(__sh__) || defined(__sh) || defined(SHx) || defined(_SHX_)
+#	define SLIB_ARCH_IS_SH
+#	if defined(__LITTLE_ENDIAN__)
+#		define SLIB_ARCH_IS_LITTLE_ENDIAN
 #	else
-#		ifdef SLIB_PLATFORM_IS_WIN32
-#			define SLIB_ARCH_IS_32BIT
+#		define SLIB_ARCH_IS_BIG_ENDIAN
+#	endif
+#elif defined (nios2) || defined(__nios2) || defined(__nios2__)
+#	define SLIB_ARCH_IS_NIOS2
+#	if defined(__nios2_little_endian) || defined(nios2_little_endian) || defined(__nios2_little_endian__)
+#		define SLIB_ARCH_IS_LITTLE_ENDIAN
+#	else
+#		define SLIB_ARCH_IS_BIG_ENDIAN
+#	endif
+#endif
+
+#ifndef SLIB_ARCH_IS_64BIT
+#	if defined(__LP64) || defined(__LP64__) || defined(_WIN64)
+#		define SLIB_ARCH_IS_64BIT
+#	endif
+#endif
+#ifndef SLIB_ARCH_IS_64BIT
+#	define SLIB_ARCH_IS_32BIT
+#endif
+
+#if !defined(SLIB_ARCH_IS_BIG_ENDIAN) && !defined(SLIB_ARCH_IS_LITTLE_ENDIAN)
+#	if defined(__BYTE_ORDER__)
+#		if defined(__ORDER_BIG_ENDIAN__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#			define SLIB_ARCH_IS_BIG_ENDIAN
+#		elif defined(__ORDER_LITTLE_ENDIAN__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#			define SLIB_ARCH_IS_LITTLE_ENDIAN
 #		endif
 #	endif
 #endif
+#if defined(SLIB_ARCH_IS_ARM) || defined(SLIB_ARCH_IS_ARM64)
+#	ifndef SLIB_ARCH_IS_BIG_ENDIAN
+#		define SLIB_ARCH_IS_LITTLE_ENDIAN
+#	endif
+#endif
+
 
 #if defined(SLIB_ARCH_IS_32BIT)
 #	define SLIB_IF_ARCH_IS_32BIT(Y, N) Y
@@ -369,6 +427,12 @@
 #	define SLIB_IF_ARCH_IS_ARM(Y, N) Y
 #else
 #	define SLIB_IF_ARCH_IS_ARM(Y, N) N
+#endif
+
+#if defined(SLIB_ARCH_IS_ARM64)
+#	define SLIB_IF_ARCH_IS_ARM64(Y, N) Y
+#else
+#	define SLIB_IF_ARCH_IS_ARM64(Y, N) N
 #endif
 
 #if defined(SLIB_ARCH_IS_X86)
