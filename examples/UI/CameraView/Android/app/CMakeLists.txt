@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-include (${SLIB_PATH}/build/CMake/include.cmake)
+include (${SLIB_PATH}/include/slib-app.cmake)
 
 file (GLOB SOURCE_FILES
  ${CMAKE_CURRENT_LIST_DIR}/../../src/*.cpp

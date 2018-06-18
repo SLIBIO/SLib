@@ -1,4 +1,4 @@
-set (SLIB_BASE_PATH "${CMAKE_CURRENT_LIST_DIR}/../..")
+set (SLIB_BASE_PATH "${CMAKE_CURRENT_LIST_DIR}/..")
 
 include_directories ("${SLIB_BASE_PATH}/include")
 
