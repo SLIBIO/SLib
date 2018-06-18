@@ -1,0 +1,244 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{09f86a62-c379-4633-a641-c666cc880dce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\gen">
+      <UniqueIdentifier>{8730df89-82aa-4d37-b3e4-a5821d5e6292}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\modules">
+      <UniqueIdentifier>{9c84eec0-6a6d-4817-90ca-1b00eec5d0ae}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\assocdat.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\bc-align.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\bc-data.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\bc-incbin.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\bc-org.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\bc-reserve.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\bitvect.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\bytecode.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\errwarn.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\expr.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\file.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\floatnum.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\genmodule.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\hamt.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\insn.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\intnum.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\inttree.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\linemap.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\md5.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\mergesort.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\phash.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\section.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\strcasecmp.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\strsep.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\symrec.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\valparam.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\value.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\xmalloc.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\xstrdup.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\gas-token.c">
+      <Filter>src\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\lc3bid.c">
+      <Filter>src\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\module.c">
+      <Filter>src\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\nasm-token.c">
+      <Filter>src\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\x86cpu.c">
+      <Filter>src\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\x86regtmod.c">
+      <Filter>src\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\arch\lc3b\lc3barch.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\arch\lc3b\lc3bbc.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\arch\x86\x86arch.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\arch\x86\x86bc.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\arch\x86\x86expr.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\arch\x86\x86id.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\codeview\cv-dbgfmt.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\codeview\cv-symline.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\codeview\cv-type.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\dwarf2\dwarf2-aranges.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\dwarf2\dwarf2-dbgfmt.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\dwarf2\dwarf2-info.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\dwarf2\dwarf2-line.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\null\null-dbgfmt.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\stabs\stabs-dbgfmt.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\listfmts\nasm\nasm-listfmt.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\bin\bin-objfmt.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\coff\coff-objfmt.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\coff\win64-except.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\dbg\dbg-objfmt.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\elf\elf.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\elf\elf-objfmt.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\elf\elf-x86-amd64.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\elf\elf-x86-x32.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\elf\elf-x86-x86.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\macho\macho-objfmt.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\rdf\rdf-objfmt.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\xdf\xdf-objfmt.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\parsers\gas\gas-parse.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\parsers\gas\gas-parse-intel.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\parsers\gas\gas-parser.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\parsers\nasm\nasm-parse.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\parsers\nasm\nasm-parser.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\cpp\cpp-preproc.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\gas\gas-eval.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\gas\gas-preproc.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\nasm\nasm-eval.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\nasm\nasmlib.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\nasm\nasm-pp.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\nasm\nasm-preproc.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\raw\raw-preproc.c">
+      <Filter>src\modules</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

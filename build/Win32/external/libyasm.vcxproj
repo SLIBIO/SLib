@@ -1,0 +1,285 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\external\src\yasm\gas-token.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\lc3bid.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\assocdat.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\bc-align.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\bc-data.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\bc-incbin.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\bc-org.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\bc-reserve.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\bitvect.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\bytecode.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\errwarn.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\expr.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\file.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\floatnum.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\genmodule.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\hamt.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\insn.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\intnum.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\inttree.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\linemap.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\md5.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\mergesort.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\phash.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\section.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\strcasecmp.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\strsep.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\symrec.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\valparam.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\value.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\xmalloc.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\libyasm\xstrdup.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\module.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\arch\lc3b\lc3barch.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\arch\lc3b\lc3bbc.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\arch\x86\x86arch.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\arch\x86\x86bc.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\arch\x86\x86expr.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\arch\x86\x86id.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\codeview\cv-dbgfmt.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\codeview\cv-symline.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\codeview\cv-type.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\dwarf2\dwarf2-aranges.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\dwarf2\dwarf2-dbgfmt.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\dwarf2\dwarf2-info.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\dwarf2\dwarf2-line.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\null\null-dbgfmt.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\dbgfmts\stabs\stabs-dbgfmt.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\listfmts\nasm\nasm-listfmt.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\bin\bin-objfmt.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\coff\coff-objfmt.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\coff\win64-except.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\dbg\dbg-objfmt.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\elf\elf-objfmt.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\elf\elf-x86-amd64.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\elf\elf-x86-x32.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\elf\elf-x86-x86.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\elf\elf.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\macho\macho-objfmt.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\rdf\rdf-objfmt.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\objfmts\xdf\xdf-objfmt.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\parsers\gas\gas-parse-intel.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\parsers\gas\gas-parse.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\parsers\gas\gas-parser.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\parsers\nasm\nasm-parse.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\parsers\nasm\nasm-parser.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\cpp\cpp-preproc.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\gas\gas-eval.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\gas\gas-preproc.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\nasm\nasm-eval.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\nasm\nasm-pp.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\nasm\nasm-preproc.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\nasm\nasmlib.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\modules\preprocs\raw\raw-preproc.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\nasm-token.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\x86cpu.c" />
+    <ClCompile Include="..\..\..\external\src\yasm\x86regtmod.c" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B5162745-E455-43C3-B4EE-22240E457FC5}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>slib</RootNamespace>
+    <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>libyasm</TargetName>
+    <IncludePath>$(ProjectDir)..\..\..\external\src\yasm;$(ProjectDir)..\..\..\external\src\yasm\gen_inc;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>libyasm</TargetName>
+    <IncludePath>$(ProjectDir)..\..\..\external\src\yasm;$(ProjectDir)..\..\..\external\src\yasm\gen_inc;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>libyasm</TargetName>
+    <IncludePath>$(ProjectDir)..\..\..\external\src\yasm;$(ProjectDir)..\..\..\external\src\yasm\gen_inc;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <TargetName>libyasm</TargetName>
+    <IncludePath>$(ProjectDir)..\..\..\external\src\yasm;$(ProjectDir)..\..\..\external\src\yasm\gen_inc;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <AdditionalOptions>/DHAVE_CONFIG_H /wd4996 /wd4267 /wd4312 /wd4244 /wd4703 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <AdditionalOptions>/DHAVE_CONFIG_H /wd4996 /wd4267 /wd4312 /wd4244 /wd4703 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MinimalRebuild>true</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>/DHAVE_CONFIG_H /wd4996 /wd4267 /wd4312 /wd4244 /wd4703 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MinimalRebuild>true</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>/DHAVE_CONFIG_H /wd4996 /wd4267 /wd4312 /wd4244 /wd4703 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

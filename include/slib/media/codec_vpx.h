@@ -17,7 +17,7 @@
 
 namespace slib
 {
-	enum class VPXBitrateMode
+	enum class VpxBitrateMode
 	{
 		Variable,
 		Constant,
@@ -25,9 +25,16 @@ namespace slib
 		ConstantQuality
 	};
 	
-	class SLIB_EXPORT VP8EncoderParam
+	enum class VpxCodecName
+	{
+		VP8,
+		VP9
+	};
+	
+	class SLIB_EXPORT VpxEncoderParam
 	{
 	public:
+		VpxCodecName codec;
 		sl_uint32 width;
 		sl_uint32 height;
 		sl_uint32 framesPerSecond;
@@ -35,49 +42,50 @@ namespace slib
 		sl_uint32 bitrate;
 		sl_uint32 threadsCount;
 		sl_uint32 cpuUsage;
-		VPXBitrateMode bitrateMode;
+		VpxBitrateMode bitrateMode;
 		
 	public:
-		VP8EncoderParam();
+		VpxEncoderParam();
 		
-		~VP8EncoderParam();
+		~VpxEncoderParam();
 		
 	};
 	
-	class SLIB_EXPORT VP8DecoderParam
+	class SLIB_EXPORT VpxDecoderParam
 	{
 	public:
+		VpxCodecName codec;
 		sl_uint32 width;
 		sl_uint32 height;
 		
 	public:
-		VP8DecoderParam();
+		VpxDecoderParam();
 		
-		~VP8DecoderParam();
-		
-	};
-	
-	class SLIB_EXPORT VP8Encoder : public VideoEncoder
-	{
-	public:
-		VP8Encoder();
-		
-		~VP8Encoder();
-		
-	public:
-		static Ref<VP8Encoder> create(const VP8EncoderParam& param);
+		~VpxDecoderParam();
 		
 	};
 	
-	class SLIB_EXPORT VP8Decoder : public VideoDecoder
+	class SLIB_EXPORT VpxEncoder : public VideoEncoder
 	{
 	public:
-		VP8Decoder();
+		VpxEncoder();
 		
-		~VP8Decoder();
+		~VpxEncoder();
 		
 	public:
-		static Ref<VP8Decoder> create(const VP8DecoderParam& param);
+		static Ref<VpxEncoder> create(const VpxEncoderParam& param);
+		
+	};
+	
+	class SLIB_EXPORT VpxDecoder : public VideoDecoder
+	{
+	public:
+		VpxDecoder();
+		
+		~VpxDecoder();
+		
+	public:
+		static Ref<VpxDecoder> create(const VpxDecoderParam& param);
 		
 	};	
 }

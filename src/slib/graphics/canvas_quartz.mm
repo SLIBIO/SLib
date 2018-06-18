@@ -22,7 +22,7 @@
 namespace slib
 {
 
-	class _priv_Quartz_Canvas : public Canvas
+	class _priv_Quartz_Canvas : public CanvasExt
 	{
 		SLIB_DECLARE_OBJECT
 		

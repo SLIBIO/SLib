@@ -9,12 +9,12 @@
  */
 
 #include <slib/core.h>
+#include <slib.h>
 
 using namespace slib;
 
 int main(int argc, const char * argv[])
 {
-	
 	// List Example
 	{
 		int i;
@@ -92,6 +92,5 @@ int main(int argc, const char * argv[])
 		}
 
 	}
-	
 	return 0;
 }

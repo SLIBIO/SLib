@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		264A3BE5205250AA0070817E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264A3BE4205250AA0070817E /* app.cpp */; };
+		260D833820C7DAF90013B34E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260D833720C7DAF90013B34E /* app.cpp */; };
 		26F5DE272051ACD500BC4998 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 26F5DE262051ACD500BC4998 /* ViewController.m */; };
 		26F5DE2A2051ACD500BC4998 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 26F5DE282051ACD500BC4998 /* Main.storyboard */; };
 		26F5DE2C2051ACD500BC4998 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26F5DE2B2051ACD500BC4998 /* Assets.xcassets */; };
@@ -19,8 +19,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		264A3BE3205250AA0070817E /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = ../../src/app.h; sourceTree = "<group>"; };
-		264A3BE4205250AA0070817E /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = ../../src/app.cpp; sourceTree = "<group>"; };
+		260D833620C7DAF90013B34E /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = ../src/app.h; sourceTree = "<group>"; };
+		260D833720C7DAF90013B34E /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = ../src/app.cpp; sourceTree = "<group>"; };
 		26F5DE1F2051ACD500BC4998 /* Example-CameraView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Example-CameraView.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		26F5DE252051ACD500BC4998 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		26F5DE262051ACD500BC4998 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
@@ -51,10 +51,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		260D833520C7DAE60013B34E /* src */ = {
+			isa = PBXGroup;
+			children = (
+				260D833720C7DAF90013B34E /* app.cpp */,
+				260D833620C7DAF90013B34E /* app.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
 		26F5DE162051ACD500BC4998 = {
 			isa = PBXGroup;
 			children = (
-				26F5DE382051B02400BC4998 /* Source */,
+				260D833520C7DAE60013B34E /* src */,
 				26F5DE212051ACD500BC4998 /* ExampleCameraView */,
 				26F5DE202051ACD500BC4998 /* Products */,
 				26F5DE3C2051B60500BC4998 /* Frameworks */,
@@ -81,15 +90,6 @@
 				26F5DE312051ACD500BC4998 /* main.mm */,
 			);
 			path = ExampleCameraView;
-			sourceTree = "<group>";
-		};
-		26F5DE382051B02400BC4998 /* Source */ = {
-			isa = PBXGroup;
-			children = (
-				264A3BE4205250AA0070817E /* app.cpp */,
-				264A3BE3205250AA0070817E /* app.h */,
-			);
-			path = Source;
 			sourceTree = "<group>";
 		};
 		26F5DE3C2051B60500BC4998 /* Frameworks */ = {
@@ -131,7 +131,7 @@
 		26F5DE172051ACD500BC4998 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = SLIBIO;
 				TargetAttributes = {
 					26F5DE1E2051ACD500BC4998 = {
@@ -176,7 +176,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				264A3BE5205250AA0070817E /* app.cpp in Sources */,
+				260D833820C7DAF90013B34E /* app.cpp in Sources */,
 				26F5DE272051ACD500BC4998 /* ViewController.m in Sources */,
 				26F5DE322051ACD500BC4998 /* main.mm in Sources */,
 			);
@@ -218,6 +218,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -225,6 +226,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -273,6 +275,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -280,6 +283,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

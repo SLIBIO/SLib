@@ -15,7 +15,7 @@
 
 #if defined(SLIB_RENDER_SUPPORT_OPENGL_GLES)
 
-#include "thirdparty/gl/GLES3/gl3.h"
+#include "gl/GLES3/gl3.h"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 

@@ -15,9 +15,9 @@
 #include "slib/core/log.h"
 #include "slib/core/file.h"
 
-#include "thirdparty/freetype/freetype-2.5.5/include/ft2build.h"
-#include "thirdparty/freetype/freetype-2.5.5/include/freetype.h"
-#include "thirdparty/freetype/freetype-2.5.5/include/ftstroke.h"
+#include "freetype/ft2build.h"
+#include "freetype/freetype.h"
+#include "freetype/ftstroke.h"
 
 namespace slib
 {

@@ -23,18 +23,18 @@ namespace slib
 	: width(0), height(0), stride(0), colors(sl_null)
 	{
 	}
-
+	
 	ImageDesc::~ImageDesc()
 	{
 	}
-
-
+	
+	
 	SLIB_DEFINE_OBJECT(Image, Bitmap)
-
+	
 	Image::Image()
 	{
 	}
-
+	
 	Image::~Image()
 	{
 	}
@@ -1318,23 +1318,26 @@ namespace slib
 		}
 		return ret;
 	}
-
-	Ref<Drawable> Image::getDrawableCache()
+	
+	Ref<Drawable> Image::getDrawableCache(Canvas* canvas)
 	{
 		Ref<Drawable> drawableCached = m_drawableCached;
 		if (drawableCached.isNotNull()) {
-			return drawableCached;
+			if (canvas->isSupportedDrawable(drawableCached)) {
+				return drawableCached;
+			}
+			m_drawableCached.setNull();
 		}
-		drawableCached = PlatformDrawable::create(this);
+		drawableCached = canvas->createDrawableCacheForImage(this);
 		if (drawableCached.isNotNull()) {
 			m_drawableCached = drawableCached;
 		}
 		return drawableCached;
 	}
-
+	
 	void Image::onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)
 	{
-		Ref<Drawable> drawableCached = getDrawableCache();
+		Ref<Drawable> drawableCached = getDrawableCache(canvas);
 		if (drawableCached.isNotNull()) {
 			drawableCached->onDraw(canvas, rectDst, rectSrc, param);
 		}
@@ -1342,7 +1345,7 @@ namespace slib
 
 	void Image::onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
 	{
-		Ref<Drawable> drawableCached = getDrawableCache();
+		Ref<Drawable> drawableCached = getDrawableCache(canvas);
 		if (drawableCached.isNotNull()) {
 			drawableCached->onDrawAll(canvas, rectDst, param);
 		}

@@ -60,11 +60,11 @@ SLib enables software developers to build multi-platform(Android/iOS/MacOS/Tizen
 
 ### Prerequisites
 
- * Xcode 8.0 or higher for compiling macOS/iOS packages
- * Android Studio 2.3 or higher for compiling Android packages
+ * Xcode 9.4 or higher for compiling macOS/iOS packages
+ * Android Studio 3.0 or higher for compiling Android packages
  * Visual Studio 2017 or higher for compiling Win32 packages
  * Tizen Studio 1.1.1 or higher for compiling Tizen packages
- * CMake (>=2.6), GCC/C++ (>=4.8.1) for compiling Linux packages
+ * CMake (>=3.0), GCC/C++ (>=4.8.1) for compiling Linux packages. Optional: KDevelop(>=4.7)
 
 ### Clone the repository from Github.
 
@@ -73,20 +73,17 @@ SLib enables software developers to build multi-platform(Android/iOS/MacOS/Tizen
  ```
 
 ### Build the static libraries
- 
-Build Configurations Debug/Release and Platforms arm/arm64/i386/x86/x86_64 for the each project in `build` directory using the appropriate IDE.
- 
+
 You can see the following projects in `build` directory.
 
 | Project| Description |
 | ----|----|
-| AndroidStudio | Android Studio project for Android |
-| iOS-Xcode | Xcode project for iOS |
-| macOS-Xcode | Xcode project for macOS |
-| Win32-VC | Visual Studio solution for Win32 |
-| TizenStudio | Tizen Studio project for Tizen |
-| Linux-CMake | CMake project for Linux |
-| Linux-KDevelop | KDevelop (>=4.7) project for Linux |
+| Android | Android Studio project for Android |
+| iOS | Xcode project for iOS |
+| macOS | Xcode project for macOS |
+| Win32 | Visual Studio solution for Win32 |
+| Tizen | Tizen Studio project for Tizen |
+| Linux | CMake/KDevelop project for Linux |
  
  After compiling the projects, you can find the static libraries in the `lib` directory.
 
@@ -135,7 +132,7 @@ To make your project more portable, you can copy the include directory and the p
 
 ### Android Studio (using CMake)
 
-Firstly, open and build the project in the `build/AndroidStudio` directory in the SLib source. After completion of build, you can see the precompiled static libraries and `slib.aar` in the `lib/Android` directory.
+Firstly, open and build the project in the `build/Android` directory in the SLib source. After completion of build, you can see the precompiled static libraries and `slib.aar` in the `lib/Android` directory.
 
 Secondly, open your Android project created by yourself which will use SLib.
 
@@ -214,7 +211,7 @@ If you already defined `JNI_OnLoad` in somewhere, please insert `slib::Android::
 
 ### Xcode (iOS, macOS)
 
-Firstly, open and build the project in the `build/iOS-Xcode` (or `build/macOS-Xcode` for macOS) directory in the SLib source. After completion of build, you can see the precompiled static libraries in the `lib/iOS` (or `lib/macOS` for macOS) directory.
+Firstly, open and build the project in the `build/iOS` (or `build/macOS` for macOS) directory in the SLib source. After completion of build, you can see the precompiled static libraries in the `lib/iOS` (or `lib/macOS` for macOS) directory.
 
 Secondly, open your Xcode project created by yourself which will use SLib.
 
@@ -247,7 +244,7 @@ Secondly, open your Xcode project created by yourself which will use SLib.
 
 ### Tizen Studio
 
-Firstly, open and build the project in the `build/TizenStudio` directory in the SLib source. After completion of build, you can see the precompiled static libraries in the `lib/Tizen` directory.
+Firstly, open and build the project in the `build/Tizen` directory in the SLib source. After completion of build, you can see the precompiled static libraries in the `lib/Tizen` directory.
 
 Secondly, open your Tizen project created by yourself which will use SLib.
 
@@ -306,7 +303,7 @@ Secondly, open your Tizen project created by yourself which will use SLib.
 
 ### Visual Studio
 
-Firstly, open and build `SLib.sln` solution in the `build/Win32-VC` directory in SLib source. After completion of build, you can see the precompiled static libraries in the `lib/Win32` directory.
+Firstly, open and build `SLib.sln` solution in the `build/Win32` directory in SLib source. After completion of build, you can see the precompiled static libraries in the `lib/Win32` directory.
 
 Secondly, open your VC project created by yourself which will use SLib.
 
@@ -339,7 +336,7 @@ Secondly, open your VC project created by yourself which will use SLib.
 
 ### CMake or KDevelop
 
-Firstly, run `build-release.sh` (or `build-debug.sh`) in the `build/Linux-CMake` directory in SLib source. (You can also use KDevelop project - `SLib.kdev4` in the `build/Linux-KDevelop` directory to compile SLib). After completion of build, you can see the precompiled static libraries in the `lib/Linux` directory.
+Firstly, run `build-release.sh` (or `build-debug.sh`) in the `build/Linux` directory in SLib source. (You can also use KDevelop project - `SLib.kdev4` to compile SLib). After completion of build, you can see the precompiled static libraries in the `lib/Linux` directory.
 
 Secondly, setup your project which will use SLib.
 

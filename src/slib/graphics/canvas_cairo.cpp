@@ -17,7 +17,7 @@
 namespace slib
 {
 
-	class Cairo_Canvas : public Canvas
+	class Cairo_Canvas : public CanvasExt
 	{
 		SLIB_DECLARE_OBJECT
 

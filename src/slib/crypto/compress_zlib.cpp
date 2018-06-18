@@ -10,7 +10,7 @@
 
 #include "slib/crypto/zlib.h"
 
-#include "thirdparty/zlib/zlib.h"
+#include "zlib/zlib.h"
 
 #define STREAM ((z_stream*)(this->m_stream))
 #define GZIP_HEADER ((gz_header*)(this->m_gzipHeader))

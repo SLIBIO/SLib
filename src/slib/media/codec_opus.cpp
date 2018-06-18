@@ -14,7 +14,7 @@
 #include "slib/core/time.h"
 #include "slib/core/scoped.h"
 
-#include "thirdparty/opus/opus.h"
+#include "opus/opus.h"
 
 //#define OPUS_RESET_INTERVAL 10000
 

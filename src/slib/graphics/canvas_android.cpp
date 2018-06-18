@@ -49,7 +49,7 @@ namespace slib
 		SLIB_JNI_METHOD(setAntiAlias, "setAntiAlias", "(Z)V");
 	SLIB_JNI_END_CLASS
 
-	class _priv_Android_Canvas : public Canvas
+	class _priv_Android_Canvas : public CanvasExt
 	{
 		SLIB_DECLARE_OBJECT
 	public:

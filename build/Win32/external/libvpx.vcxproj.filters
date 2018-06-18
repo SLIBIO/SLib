@@ -1,0 +1,737 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{09f86a62-c379-4633-a641-c666cc880dce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vpx_util">
+      <UniqueIdentifier>{c3b43595-709c-49e0-a15c-200deb13ff1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vpx_scale">
+      <UniqueIdentifier>{2b99b121-7adf-4d21-be0e-0c70a250e857}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vpx_mem">
+      <UniqueIdentifier>{965cf63d-e2d9-4684-a813-11a15dd1d3cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vpx_dsp">
+      <UniqueIdentifier>{5b1eaad5-2273-41b9-aac6-7331ba417c73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vpx">
+      <UniqueIdentifier>{eab7c650-44b6-40bb-9029-d11eb0aa23bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vp9">
+      <UniqueIdentifier>{e8eca2d3-67ef-457d-8d0f-1b4dd9fae2e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vp8">
+      <UniqueIdentifier>{f828b907-7ed5-4c3b-b944-a93e32e0f486}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\asm">
+      <UniqueIdentifier>{21ea3775-0447-47b7-90bc-585e66028b77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vpx_dsp\x86">
+      <UniqueIdentifier>{360a7595-72d6-47ef-a5d4-6bc9910e84ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vp9\common">
+      <UniqueIdentifier>{86771ed8-2ff5-4e0b-a589-88619450d685}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vp9\encoder">
+      <UniqueIdentifier>{9b81799a-b0c5-45ba-a1d0-9d0ead58a7ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vp9\decoder">
+      <UniqueIdentifier>{d5ed724f-b1a2-4122-9e52-e2f951af5ce5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vp9\encoder\x86">
+      <UniqueIdentifier>{420def6d-8320-47a7-a0c2-3e85be567bfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vp9\common\x86">
+      <UniqueIdentifier>{d0a1f75f-c3ef-4834-8427-aafd209780f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vp8\common">
+      <UniqueIdentifier>{56a2d681-9888-4cfd-8604-d534ccaa4bd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vp8\decoder">
+      <UniqueIdentifier>{df25ca43-d9dd-4deb-9e5c-37eaa843c5a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vp8\encoder">
+      <UniqueIdentifier>{384fb2ad-11f7-473c-9d5e-f240256039ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vp8\encoder\x86">
+      <UniqueIdentifier>{7d73a413-3411-4bb0-9e32-d917c0955e58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vp8\common\x86">
+      <UniqueIdentifier>{dbf7aa8a-a4ae-432e-bc0e-c51d704aa48c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\vp8\generic">
+      <UniqueIdentifier>{31e7cbca-4d35-43f4-896e-b37ae17aa995}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_config.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_util\vpx_thread.c">
+      <Filter>src\vpx_util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_util\vpx_write_yuv_frame.c">
+      <Filter>src\vpx_util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_scale\vpx_scale_rtcd.c">
+      <Filter>src\vpx_scale</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_scale\generic\gen_scalers.c">
+      <Filter>src\vpx_scale</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_scale\generic\vpx_scale.c">
+      <Filter>src\vpx_scale</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_scale\generic\yv12config.c">
+      <Filter>src\vpx_scale</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_scale\generic\yv12extend.c">
+      <Filter>src\vpx_scale</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_mem\vpx_mem.c">
+      <Filter>src\vpx_mem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\add_noise.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\avg.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\bitreader.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\bitreader_buffer.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\bitwriter.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\bitwriter_buffer.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\deblock.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\fastssim.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\fwd_txfm.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\intrapred.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\inv_txfm.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\loopfilter.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\prob.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\psnr.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\psnrhvs.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\quantize.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\sad.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\skin_detection.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\subtract.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\sum_squares.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\variance.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\vpx_convolve.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\vpx_dsp_rtcd.c">
+      <Filter>src\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\avg_intrin_avx2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\avg_intrin_sse2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\avg_pred_sse2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\fwd_txfm_avx2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\fwd_txfm_sse2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\inv_txfm_sse2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\inv_txfm_ssse3.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\loopfilter_avx2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\loopfilter_sse2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\quantize_avx.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\quantize_sse2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\quantize_ssse3.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\sad_avx2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\sad4d_avx2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\sum_squares_sse2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\variance_avx2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\variance_sse2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\vpx_asm_stubs.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\vpx_subpixel_8t_intrin_avx2.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx_dsp\x86\vpx_subpixel_8t_intrin_ssse3.c">
+      <Filter>src\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx\src\svc_encodeframe.c">
+      <Filter>src\vpx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx\src\vpx_codec.c">
+      <Filter>src\vpx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx\src\vpx_decoder.c">
+      <Filter>src\vpx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx\src\vpx_encoder.c">
+      <Filter>src\vpx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vpx\src\vpx_image.c">
+      <Filter>src\vpx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\vp9_cx_iface.c">
+      <Filter>src\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\vp9_dx_iface.c">
+      <Filter>src\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\decoder\vp9_decodeframe.c">
+      <Filter>src\vp9\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\decoder\vp9_decodemv.c">
+      <Filter>src\vp9\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\decoder\vp9_decoder.c">
+      <Filter>src\vp9\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\decoder\vp9_detokenize.c">
+      <Filter>src\vp9\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\decoder\vp9_dsubexp.c">
+      <Filter>src\vp9\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_alt_ref_aq.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_aq_360.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_aq_complexity.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_aq_cyclicrefresh.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_aq_variance.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_bitstream.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_blockiness.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_context_tree.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_cost.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_dct.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_encodeframe.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_encodemb.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_encodemv.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_encoder.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_ethread.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_extend.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_firstpass.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_frame_scale.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_lookahead.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_mbgraph.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_mcomp.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_multi_thread.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_noise_estimate.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_picklpf.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_pickmode.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_quantize.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_ratectrl.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_rd.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_rdopt.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_resize.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_segmentation.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_skin_detection.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_speed_features.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_subexp.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_svc_layercontext.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_temporal_filter.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_tokenize.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\vp9_treewriter.c">
+      <Filter>src\vp9\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\x86\temporal_filter_sse4.c">
+      <Filter>src\vp9\encoder\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\x86\vp9_dct_intrin_sse2.c">
+      <Filter>src\vp9\encoder\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\x86\vp9_dct_ssse3.c">
+      <Filter>src\vp9\encoder\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\x86\vp9_diamond_search_sad_avx.c">
+      <Filter>src\vp9\encoder\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\x86\vp9_error_avx2.c">
+      <Filter>src\vp9\encoder\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\x86\vp9_frame_scale_ssse3.c">
+      <Filter>src\vp9\encoder\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\encoder\x86\vp9_quantize_sse2.c">
+      <Filter>src\vp9\encoder\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_alloccommon.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_blockd.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_common_data.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_debugmodes.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_entropy.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_entropymode.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_entropymv.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_filter.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_frame_buffers.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_idct.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_loopfilter.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_mfqe.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_mvref_common.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_postproc.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_pred_common.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_quant_common.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_reconinter.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_reconintra.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_rtcd.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_scale.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_scan.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_seg_common.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_thread_common.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\vp9_tile_common.c">
+      <Filter>src\vp9\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp9\common\x86\vp9_idct_intrin_sse2.c">
+      <Filter>src\vp9\common\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\vp8_cx_iface.c">
+      <Filter>src\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\vp8_dx_iface.c">
+      <Filter>src\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\bitstream.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\boolhuff.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\dct.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\denoising.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\encodeframe.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\encodeintra.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\encodemb.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\encodemv.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\ethreading.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\firstpass.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\lookahead.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\mcomp.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\modecosts.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\onyx_if.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\pickinter.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\picklpf.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\ratectrl.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\rdopt.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\segmentation.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\temporal_filter.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\tokenize.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\treewriter.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\vp8_quantize.c">
+      <Filter>src\vp8\encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\x86\denoising_sse2.c">
+      <Filter>src\vp8\encoder\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\x86\quantize_sse4.c">
+      <Filter>src\vp8\encoder\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\x86\vp8_enc_stubs_sse2.c">
+      <Filter>src\vp8\encoder\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\x86\vp8_quantize_sse2.c">
+      <Filter>src\vp8\encoder\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\encoder\x86\vp8_quantize_ssse3.c">
+      <Filter>src\vp8\encoder\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\decoder\dboolhuff.c">
+      <Filter>src\vp8\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\decoder\decodeframe.c">
+      <Filter>src\vp8\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\decoder\decodemv.c">
+      <Filter>src\vp8\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\decoder\detokenize.c">
+      <Filter>src\vp8\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\decoder\onyxd_if.c">
+      <Filter>src\vp8\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\decoder\threading.c">
+      <Filter>src\vp8\decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\alloccommon.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\blockd.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\context.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\copy_c.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\debugmodes.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\dequantize.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\entropy.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\entropymode.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\entropymv.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\extend.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\filter.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\findnearmv.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\idct_blk.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\idctllm.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\loopfilter_filters.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\mbpitch.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\mfqe.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\modecont.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\postproc.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\quant_common.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\reconinter.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\reconintra.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\reconintra4x4.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\rtcd.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\setupintrarecon.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\swapyv12buffer.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\treecoder.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\vp8_loopfilter.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\vp8_skin_detection.c">
+      <Filter>src\vp8\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\x86\filter_x86.c">
+      <Filter>src\vp8\common\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\x86\idct_blk_mmx.c">
+      <Filter>src\vp8\common\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\x86\idct_blk_sse2.c">
+      <Filter>src\vp8\common\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\x86\loopfilter_x86.c">
+      <Filter>src\vp8\common\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\x86\vp8_asm_stubs.c">
+      <Filter>src\vp8\common\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libvpx\vp8\common\generic\systemdependent.c">
+      <Filter>src\vp8\generic</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\avg_ssse3_x86_64.asm">
+      <Filter>src\asm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\common\x86\copy_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\common\x86\copy_sse3.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\common\x86\dequantize_mmx.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\common\x86\idctllm_mmx.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\common\x86\idctllm_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\common\x86\iwalsh_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\common\x86\loopfilter_block_sse2_x86_64.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\common\x86\loopfilter_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\common\x86\mfqe_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\common\x86\recon_mmx.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\common\x86\recon_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\common\x86\subpixel_mmx.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\common\x86\subpixel_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\common\x86\subpixel_ssse3.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\encoder\x86\dct_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\encoder\x86\encodeopt.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\encoder\x86\fwalsh_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp8\encoder\x86\temporal_filter_apply_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp9\common\x86\vp9_mfqe_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp9\encoder\x86\vp9_dct_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp9\encoder\x86\vp9_error_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vp9\encoder\x86\vp9_quantize_ssse3_x86_64.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\add_noise_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\bitdepth_conversion_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\deblock_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\fwd_txfm_ssse3_x86_64.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\intrapred_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\intrapred_ssse3.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\inv_wht_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\sad4d_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\sad_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\sad_sse3.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\sad_sse4.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\sad_ssse3.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\ssim_opt_x86_64.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\subpel_variance_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\subtract_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\vpx_convolve_copy_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\vpx_high_subpixel_8t_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\vpx_high_subpixel_bilinear_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\vpx_subpixel_8t_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\vpx_subpixel_8t_ssse3.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\vpx_subpixel_bilinear_sse2.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_dsp\x86\vpx_subpixel_bilinear_ssse3.asm" />
+    <CustomBuild Include="..\..\..\external\src\libvpx\vpx_ports\emms.asm">
+      <Filter>src\asm</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

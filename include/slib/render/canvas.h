@@ -66,7 +66,7 @@ namespace slib
 		
 	};
 	
-	class SLIB_EXPORT RenderCanvas : public Canvas
+	class SLIB_EXPORT RenderCanvas : public CanvasExt
 	{
 		SLIB_DECLARE_OBJECT
 		

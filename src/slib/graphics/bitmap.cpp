@@ -10,10 +10,6 @@
 
 #include "slib/graphics/bitmap.h"
 
-#include "slib/graphics/image.h"
-#include "slib/core/file.h"
-#include "slib/core/asset.h"
-
 namespace slib
 {
 
@@ -35,52 +31,6 @@ namespace slib
 
 	Bitmap::~Bitmap()
 	{
-	}
-
-	Ref<Bitmap> Bitmap::create(const ImageDesc& desc)
-	{
-		Ref<Bitmap> ret = Bitmap::create(desc.width, desc.height);
-		if (ret.isNotNull()) {
-			ret->writePixels(0, 0, desc.width, desc.height, desc.colors, desc.stride);
-			return ret;
-		}
-		return sl_null;
-	}
-
-	Ref<Bitmap> Bitmap::create(const Ref<Image>& image)
-	{
-		if (image.isNotNull()) {
-			ImageDesc desc;
-			image->getDesc(desc);
-			return Bitmap::create(desc);
-		}
-		return sl_null;
-	}
-
-	Ref<Bitmap> Bitmap::loadFromMemory(const Memory& mem)
-	{
-		if (mem.isNotEmpty()) {
-			return Bitmap::loadFromMemory(mem.getData(), mem.getSize());
-		}
-		return sl_null;
-	}
-
-	Ref<Bitmap> Bitmap::loadFromFile(const String& filePath)
-	{
-		Memory mem = File::readAllBytes(filePath);
-		if (mem.isNotEmpty()) {
-			return Bitmap::loadFromMemory(mem);
-		}
-		return sl_null;
-	}
-
-	Ref<Bitmap> Bitmap::loadFromAsset(const String& path)
-	{
-		Memory mem = Assets::readAllBytes(path);
-		if (mem.isNotEmpty()) {
-			return Bitmap::loadFromMemory(mem);
-		}
-		return sl_null;
 	}
 
 	sl_real Bitmap::getDrawableWidth()

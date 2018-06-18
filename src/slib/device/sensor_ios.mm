@@ -191,6 +191,22 @@ namespace slib
 	return self;
 }
 
+-(void) onChangeCompass: (CMMagnetometerData * _Nullable) magnetometerData error: (NSError * _Nullable) error
+{
+	slib::Ref<slib::_priv_Sensor> sensor(m_sensor);
+	if (sensor.isNotNull() && magnetometerData != nil) {
+		sensor->onChangeCompass(magnetometerData.magneticField.x);
+	}
+}
+
+-(void) onChangeAccelerometer: (CMDeviceMotion * _Nullable) motion error: (NSError * _Nullable) error
+{
+	slib::Ref<slib::_priv_Sensor> sensor(m_sensor);
+	if (sensor.isNotNull() && motion != nil) {
+		sensor->onChangeAccelerometer((float)(motion.userAcceleration.x + motion.gravity.x) * G, (float)(motion.userAcceleration.y + motion.gravity.y) * G, (float)(motion.userAcceleration.z + motion.gravity.z) * G);
+	}
+}
+
 -(sl_bool) start
 {
 	slib::Ref<slib::_priv_Sensor> sensor(m_sensor);
@@ -200,19 +216,8 @@ namespace slib
 	
 	if (flagUseLocation) {
 		dispatch_async(dispatch_get_main_queue(), ^{
-			if (m_locationManager == nil) {
-				m_locationManager = [[CLLocationManager alloc] init];
-				m_locationManager.delegate = self;
-				
-				if (__IPHONE_OS_VERSION_MAX_ALLOWED >= 80000) {
-					[m_locationManager requestAlwaysAuthorization];
-				} else {
-					[m_locationManager requestWhenInUseAuthorization];
-				}
-			}
-			[m_locationManager startUpdatingLocation];
+			[self startLocationManager];
 		});
-		
 		sensor->setRunningLocation(sl_true);
 	}
 	
@@ -220,10 +225,7 @@ namespace slib
 		if (m_motionManager.magnetometerAvailable) {
 			sensor->setRunningCompass(sl_true);
 			[m_motionManager startMagnetometerUpdatesToQueue:operationQueue withHandler:^(CMMagnetometerData * _Nullable magnetometerData, NSError * _Nullable error) {
-				slib::Ref<slib::_priv_Sensor> sensor(m_sensor);
-				if (sensor.isNotNull() && magnetometerData != nil) {
-					sensor->onChangeCompass(magnetometerData.magneticField.x);
-				}
+				[self onChangeCompass:magnetometerData error:error];
 			}];
 		} else {
 			NSLog(@"magnetometer is not available!");
@@ -233,12 +235,8 @@ namespace slib
 	if (flagUseAccelerometor) {
 		if (m_motionManager.accelerometerAvailable) {
 			sensor->setRunningAccelerometer(sl_true);
-			sensor->setRunningAccelerometer(sl_true);
 			[m_motionManager startDeviceMotionUpdatesToQueue:operationQueue withHandler:^(CMDeviceMotion * _Nullable motion, NSError * _Nullable error) {
-				slib::Ref<slib::_priv_Sensor> sensor(m_sensor);
-				if (sensor.isNotNull() && motion != nil) {
-					sensor->onChangeAccelerometer((float)(motion.userAcceleration.x + motion.gravity.x) * G, (float)(motion.userAcceleration.y + motion.gravity.y) * G, (float)(motion.userAcceleration.z + motion.gravity.z) * G);
-				}
+				[self onChangeAccelerometer:motion error:error];
 			}];
 		} else {
 			NSLog(@"accelerometer is not available!");
@@ -264,6 +262,21 @@ namespace slib
 	return sl_false;
 }
 
+-(void) startLocationManager
+{
+	if (m_locationManager == nil) {
+		m_locationManager = [[CLLocationManager alloc] init];
+		m_locationManager.delegate = self;
+		
+		if (__IPHONE_OS_VERSION_MAX_ALLOWED >= 80000) {
+			[m_locationManager requestAlwaysAuthorization];
+		} else {
+			[m_locationManager requestWhenInUseAuthorization];
+		}
+	}
+	[m_locationManager startUpdatingLocation];
+}
+
 -(void) stop
 {
 	slib::Ref<slib::_priv_Sensor> sensor(m_sensor);
@@ -280,9 +293,12 @@ namespace slib
 	}
 	
 	if (sensor->isRunningLocation()) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[m_locationManager stopUpdatingLocation];
-		});
+		CLLocationManager* manager = m_locationManager;
+		if (manager != nil) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[manager stopUpdatingLocation];
+			});
+		}
 	}
 }
 

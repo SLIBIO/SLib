@@ -12,8 +12,8 @@
 
 #include "slib/core/file.h"
 
-#include "thirdparty/libpng/png.h"
-#include "thirdparty/libpng/pngstruct.h"
+#include "libpng/png.h"
+#include "libpng/pngstruct.h"
 
 namespace slib
 {

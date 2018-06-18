@@ -1,0 +1,351 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\external\src\opus\celt\bands.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\celt.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\celt_decoder.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\celt_encoder.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\celt_lpc.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\cwrs.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\entcode.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\entdec.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\entenc.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\kiss_fft.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\laplace.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\mathops.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\mdct.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\modes.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\pitch.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\quant_bands.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\rate.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\vq.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\x86\celt_lpc_sse.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\x86\pitch_sse.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\x86\pitch_sse2.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\x86\pitch_sse4_1.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\x86\vq_sse2.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\x86\x86cpu.c" />
+    <ClCompile Include="..\..\..\external\src\opus\celt\x86\x86_celt_map.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\A2NLSF.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\ana_filt_bank_1.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\biquad_alt.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\bwexpander.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\bwexpander_32.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\check_control_input.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\CNG.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\code_signs.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\control_audio_bandwidth.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\control_codec.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\control_SNR.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\debug.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\decoder_set_fs.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\decode_core.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\decode_frame.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\decode_indices.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\decode_parameters.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\decode_pitch.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\decode_pulses.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\dec_API.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\encode_indices.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\encode_pulses.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\enc_API.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\apply_sine_window_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\autocorr_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\burg_modified_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\corrMatrix_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\encode_frame_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\find_LPC_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\find_LTP_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\find_pitch_lags_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\find_pred_coefs_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\k2a_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\k2a_Q16_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\LTP_analysis_filter_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\LTP_scale_ctrl_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\noise_shape_analysis_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\pitch_analysis_core_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\process_gains_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\regularize_correlations_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\residual_energy16_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\residual_energy_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\schur64_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\schur_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\vector_ops_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\warped_autocorrelation_FIX.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\x86\burg_modified_FIX_sse.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\fixed\x86\vector_ops_FIX_sse.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\gain_quant.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\HP_variable_cutoff.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\init_decoder.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\init_encoder.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\inner_prod_aligned.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\interpolate.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\lin2log.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\log2lin.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\LPC_analysis_filter.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\LPC_fit.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\LPC_inv_pred_gain.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\LP_variable_cutoff.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\NLSF2A.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\NLSF_decode.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\NLSF_del_dec_quant.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\NLSF_encode.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\NLSF_stabilize.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\NLSF_unpack.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\NLSF_VQ.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\NLSF_VQ_weights_laroia.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\NSQ.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\NSQ_del_dec.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\pitch_est_tables.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\PLC.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\process_NLSFs.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\quant_LTP_gains.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\resampler.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\resampler_down2.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\resampler_down2_3.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\resampler_private_AR2.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\resampler_private_down_FIR.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\resampler_private_IIR_FIR.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\resampler_private_up2_HQ.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\resampler_rom.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\shell_coder.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\sigm_Q15.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\sort.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\stereo_decode_pred.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\stereo_encode_pred.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\stereo_find_predictor.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\stereo_LR_to_MS.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\stereo_MS_to_LR.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\stereo_quant_pred.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\sum_sqr_shift.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\tables_gain.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\tables_LTP.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\tables_NLSF_CB_NB_MB.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\tables_NLSF_CB_WB.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\tables_other.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\tables_pitch_lag.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\tables_pulses_per_block.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\table_LSF_cos.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\VAD.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\VQ_WMat_EC.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\x86\NSQ_del_dec_sse.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\x86\NSQ_sse.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\x86\VAD_sse.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\x86\VQ_WMat_EC_sse.c" />
+    <ClCompile Include="..\..\..\external\src\opus\silk\x86\x86_silk_map.c" />
+    <ClCompile Include="..\..\..\external\src\opus\src\analysis.c" />
+    <ClCompile Include="..\..\..\external\src\opus\src\mlp.c" />
+    <ClCompile Include="..\..\..\external\src\opus\src\mlp_data.c" />
+    <ClCompile Include="..\..\..\external\src\opus\src\opus.c" />
+    <ClCompile Include="..\..\..\external\src\opus\src\opus_decoder.c" />
+    <ClCompile Include="..\..\..\external\src\opus\src\opus_encoder.c" />
+    <ClCompile Include="..\..\..\external\src\opus\src\opus_multistream.c" />
+    <ClCompile Include="..\..\..\external\src\opus\src\opus_multistream_decoder.c" />
+    <ClCompile Include="..\..\..\external\src\opus\src\opus_multistream_encoder.c" />
+    <ClCompile Include="..\..\..\external\src\opus\src\repacketizer.c" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6DB9D22E-A39D-4D71-B1FF-D800719F2FC2}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>slib</RootNamespace>
+    <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>opus</TargetName>
+    <IncludePath>$(ProjectDir)..\..\..\external\src\opus;$(ProjectDir)..\..\..\external\src\opus\include;$(ProjectDir)..\..\..\external\src\opus\celt;$(ProjectDir)..\..\..\external\src\opus\silk;$(ProjectDir)..\..\..\external\src\opus\silk\fixed;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>opus</TargetName>
+    <IncludePath>$(ProjectDir)..\..\..\external\src\opus;$(ProjectDir)..\..\..\external\src\opus\include;$(ProjectDir)..\..\..\external\src\opus\celt;$(ProjectDir)..\..\..\external\src\opus\silk;$(ProjectDir)..\..\..\external\src\opus\silk\fixed;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>opus</TargetName>
+    <IncludePath>$(ProjectDir)..\..\..\external\src\opus;$(ProjectDir)..\..\..\external\src\opus\include;$(ProjectDir)..\..\..\external\src\opus\celt;$(ProjectDir)..\..\..\external\src\opus\silk;$(ProjectDir)..\..\..\external\src\opus\silk\fixed;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <TargetName>opus</TargetName>
+    <IncludePath>$(ProjectDir)..\..\..\external\src\opus;$(ProjectDir)..\..\..\external\src\opus\include;$(ProjectDir)..\..\..\external\src\opus\celt;$(ProjectDir)..\..\..\external\src\opus\silk;$(ProjectDir)..\..\..\external\src\opus\silk\fixed;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <AdditionalOptions>/DHAVE_CONFIG_H %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <AdditionalOptions>/DHAVE_CONFIG_H %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MinimalRebuild>true</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>/DHAVE_CONFIG_H %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MinimalRebuild>true</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>/DHAVE_CONFIG_H %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

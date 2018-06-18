@@ -15,8 +15,6 @@
 #include "slib/graphics/image.h"
 #include "slib/graphics/util.h"
 
-#include "slib/core/file.h"
-#include "slib/core/asset.h"
 #include "slib/core/safe_static.h"
 
 namespace slib
@@ -236,44 +234,6 @@ namespace slib
 	{
 		if (src.isNotNull()) {
 			return src->filter(alpha, blurRadius);
-		}
-		return sl_null;
-	}
-
-
-	Ref<Drawable> PlatformDrawable::create(const Ref<Image>& image)
-	{
-		if (image.isNotNull()) {
-			ImageDesc desc;
-			image->getDesc(desc);
-			return PlatformDrawable::create(desc);
-		}
-		return sl_null;
-	}
-
-	Ref<Drawable> PlatformDrawable::loadFromMemory(const Memory& mem)
-	{
-		if (mem.isNotEmpty()) {
-			return PlatformDrawable::loadFromMemory(mem.getData(), mem.getSize());
-		}
-		return sl_null;
-	}
-
-
-	Ref<Drawable> PlatformDrawable::loadFromFile(const String& filePath)
-	{
-		Memory mem = File::readAllBytes(filePath);
-		if (mem.isNotEmpty()) {
-			return PlatformDrawable::loadFromMemory(mem);
-		}
-		return sl_null;
-	}
-
-	Ref<Drawable> PlatformDrawable::loadFromAsset(const String& path)
-	{
-		Memory mem = Assets::readAllBytes(path);
-		if (mem.isNotEmpty()) {
-			return PlatformDrawable::loadFromMemory(mem);
 		}
 		return sl_null;
 	}

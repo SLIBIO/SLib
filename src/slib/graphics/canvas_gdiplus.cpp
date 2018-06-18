@@ -113,7 +113,7 @@ namespace slib
 		delete hPenClone; \
 	}
 
-	class _priv_Gdiplus_Canvas : public Canvas
+	class _priv_Gdiplus_Canvas : public CanvasExt
 	{
 		SLIB_DECLARE_OBJECT
 	public:

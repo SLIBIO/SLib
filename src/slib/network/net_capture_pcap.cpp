@@ -20,9 +20,9 @@
 #define TAG "NetCapture"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
-#include "thirdparty/winpcap/pcap/pcap.h"
+#include "winpcap/pcap/pcap.h"
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-#include "thirdparty/pcap/pcap.h"
+#include "pcap/pcap.h"
 #include <sys/socket.h>
 #endif
 

@@ -7,16 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2605064D20CF87E000032B2C /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2605064C20CF87E000032B2C /* app.cpp */; };
 		264A3BF4205306D90070817E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 264A3BF3205306D90070817E /* AppDelegate.m */; };
 		264A3BF6205306D90070817E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 264A3BF5205306D90070817E /* Assets.xcassets */; };
 		264A3BF9205306D90070817E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 264A3BF7205306D90070817E /* MainMenu.xib */; };
 		264A3BFC205306D90070817E /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 264A3BFB205306D90070817E /* main.mm */; };
-		264A3C062053088F0070817E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264A3C052053088F0070817E /* app.cpp */; };
 		264A3C09205308A70070817E /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264A3C08205308A70070817E /* AVFoundation.framework */; };
 		264A3C0B205308AF0070817E /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264A3C0A205308AF0070817E /* CoreMedia.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2605064B20CF87E000032B2C /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = ../src/app.h; sourceTree = "<group>"; };
+		2605064C20CF87E000032B2C /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = ../src/app.cpp; sourceTree = "<group>"; };
 		264A3BEF205306D90070817E /* Example-CameraView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Example-CameraView.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		264A3BF2205306D90070817E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		264A3BF3205306D90070817E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -24,8 +26,6 @@
 		264A3BF8205306D90070817E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		264A3BFA205306D90070817E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		264A3BFB205306D90070817E /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
-		264A3C042053088F0070817E /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = ../../src/app.h; sourceTree = "<group>"; };
-		264A3C052053088F0070817E /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = ../../src/app.cpp; sourceTree = "<group>"; };
 		264A3C08205308A70070817E /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		264A3C0A205308AF0070817E /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -43,10 +43,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2605064A20CF87D500032B2C /* src */ = {
+			isa = PBXGroup;
+			children = (
+				2605064C20CF87E000032B2C /* app.cpp */,
+				2605064B20CF87E000032B2C /* app.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
 		264A3BE6205306D90070817E = {
 			isa = PBXGroup;
 			children = (
-				264A3C03205308820070817E /* Source */,
+				2605064A20CF87D500032B2C /* src */,
 				264A3BF1205306D90070817E /* ExampleCameraView */,
 				264A3BF0205306D90070817E /* Products */,
 				264A3C07205308A70070817E /* Frameworks */,
@@ -72,15 +81,6 @@
 				264A3BFB205306D90070817E /* main.mm */,
 			);
 			path = ExampleCameraView;
-			sourceTree = "<group>";
-		};
-		264A3C03205308820070817E /* Source */ = {
-			isa = PBXGroup;
-			children = (
-				264A3C052053088F0070817E /* app.cpp */,
-				264A3C042053088F0070817E /* app.h */,
-			);
-			path = Source;
 			sourceTree = "<group>";
 		};
 		264A3C07205308A70070817E /* Frameworks */ = {
@@ -118,7 +118,7 @@
 		264A3BE7205306D90070817E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = SLIBIO;
 				TargetAttributes = {
 					264A3BEE205306D90070817E = {
@@ -167,7 +167,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				264A3C062053088F0070817E /* app.cpp in Sources */,
+				2605064D20CF87E000032B2C /* app.cpp in Sources */,
 				264A3BFC205306D90070817E /* main.mm in Sources */,
 				264A3BF4205306D90070817E /* AppDelegate.m in Sources */,
 			);
@@ -201,6 +201,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -208,6 +209,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -256,6 +258,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -263,6 +266,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

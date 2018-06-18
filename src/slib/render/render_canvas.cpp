@@ -1153,7 +1153,7 @@ namespace slib
 		if (src->isBitmap()) {
 			_drawBitmap(rectDst, (Bitmap*)(src.get()), rectSrc, param);
 		} else {
-			Canvas::onDraw(rectDst, src, rectSrc, param);
+			CanvasExt::onDraw(rectDst, src, rectSrc, param);
 		}
 	}
 	
@@ -1162,7 +1162,7 @@ namespace slib
 		if (src->isBitmap()) {
 			_drawBitmap(rectDst, (Bitmap*)(src.get()), Rectangle(0, 0, src->getDrawableWidth(), src->getDrawableHeight()), param);
 		} else {
-			Canvas::onDrawAll(rectDst, src, param);
+			CanvasExt::onDrawAll(rectDst, src, param);
 		}
 	}
 	

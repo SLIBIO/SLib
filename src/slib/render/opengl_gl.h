@@ -20,7 +20,7 @@
 #include <Windows.h>
 #include <gl/gl.h>
 
-#include "thirdparty/gl/GL/glext.h"
+#include "gl/GL/glext.h"
 
 #define PRIV_SLIB_RENDER_GL_ENTRY(TYPE, name, ...) \
 	TYPE(__stdcall* name)(__VA_ARGS__);

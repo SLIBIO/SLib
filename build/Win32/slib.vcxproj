@@ -1,0 +1,469 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\slib\core\async_config.h" />
+    <ClInclude Include="..\..\src\slib\graphics\image_stb.h" />
+    <ClInclude Include="..\..\src\slib\network\network_async.h" />
+    <ClInclude Include="..\..\src\slib\render\opengl_egl_entries.h" />
+    <ClInclude Include="..\..\src\slib\render\opengl_gl.h" />
+    <ClInclude Include="..\..\src\slib\render\opengl_gles.h" />
+    <ClInclude Include="..\..\src\slib\render\opengl_impl.h" />
+    <ClInclude Include="..\..\src\slib\ui\ui_animation.h" />
+    <ClInclude Include="..\..\src\slib\ui\ui_core_common.h" />
+    <ClInclude Include="..\..\src\slib\ui\ui_core_win32.h" />
+    <ClInclude Include="..\..\src\slib\ui\view_win32.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\slib\core\animation.cpp" />
+    <ClCompile Include="..\..\src\slib\core\app.cpp" />
+    <ClCompile Include="..\..\src\slib\core\array.cpp" />
+    <ClCompile Include="..\..\src\slib\core\async.cpp" />
+    <ClCompile Include="..\..\src\slib\core\async_iocp.cpp" />
+    <ClCompile Include="..\..\src\slib\core\async_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\core\atomic.cpp" />
+    <ClCompile Include="..\..\src\slib\core\base.cpp" />
+    <ClCompile Include="..\..\src\slib\core\base64.cpp" />
+    <ClCompile Include="..\..\src\slib\core\charset.cpp" />
+    <ClCompile Include="..\..\src\slib\core\collection.cpp" />
+    <ClCompile Include="..\..\src\slib\core\content_type.cpp" />
+    <ClCompile Include="..\..\src\slib\core\dispatch.cpp" />
+    <ClCompile Include="..\..\src\slib\core\event.cpp" />
+    <ClCompile Include="..\..\src\slib\core\event_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\core\file.cpp" />
+    <ClCompile Include="..\..\src\slib\core\file_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\core\function.cpp" />
+    <ClCompile Include="..\..\src\slib\core\hash.cpp" />
+    <ClCompile Include="..\..\src\slib\core\io.cpp" />
+    <ClCompile Include="..\..\src\slib\core\json.cpp" />
+    <ClCompile Include="..\..\src\slib\core\list.cpp" />
+    <ClCompile Include="..\..\src\slib\core\locale.cpp" />
+    <ClCompile Include="..\..\src\slib\core\log.cpp" />
+    <ClCompile Include="..\..\src\slib\core\map.cpp" />
+    <ClCompile Include="..\..\src\slib\core\math.cpp" />
+    <ClCompile Include="..\..\src\slib\core\memory.cpp" />
+    <ClCompile Include="..\..\src\slib\core\mutex.cpp" />
+    <ClCompile Include="..\..\src\slib\core\object.cpp" />
+    <ClCompile Include="..\..\src\slib\core\parse.cpp" />
+    <ClCompile Include="..\..\src\slib\core\pipe.cpp" />
+    <ClCompile Include="..\..\src\slib\core\pipe_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\core\java.cpp" />
+    <ClCompile Include="..\..\src\slib\core\platform_windows.cpp" />
+    <ClCompile Include="..\..\src\slib\core\preference.cpp" />
+    <ClCompile Include="..\..\src\slib\core\preference_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\core\ptr.cpp" />
+    <ClCompile Include="..\..\src\slib\core\asset.cpp" />
+    <ClCompile Include="..\..\src\slib\core\red_black_tree.cpp" />
+    <ClCompile Include="..\..\src\slib\core\ref.cpp" />
+    <ClCompile Include="..\..\src\slib\core\resource.cpp" />
+    <ClCompile Include="..\..\src\slib\core\service.cpp" />
+    <ClCompile Include="..\..\src\slib\core\setting.cpp" />
+    <ClCompile Include="..\..\src\slib\core\spin_lock.cpp" />
+    <ClCompile Include="..\..\src\slib\core\string.cpp" />
+    <ClCompile Include="..\..\src\slib\core\system.cpp" />
+    <ClCompile Include="..\..\src\slib\core\system_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\core\thread.cpp" />
+    <ClCompile Include="..\..\src\slib\core\thread_pool.cpp" />
+    <ClCompile Include="..\..\src\slib\core\thread_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\core\time.cpp" />
+    <ClCompile Include="..\..\src\slib\core\timer.cpp" />
+    <ClCompile Include="..\..\src\slib\core\variant.cpp" />
+    <ClCompile Include="..\..\src\slib\core\win32_com.cpp" />
+    <ClCompile Include="..\..\src\slib\core\xml.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\aes.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\block_cipher.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\blowfish.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\compress_zlib.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\crypto_hash.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\gcm.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\md5.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\rsa.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\sha1.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\sha2.cpp" />
+    <ClCompile Include="..\..\src\slib\db\database.cpp" />
+    <ClCompile Include="..\..\src\slib\db\database_cursor.cpp" />
+    <ClCompile Include="..\..\src\slib\db\database_statement.cpp" />
+    <ClCompile Include="..\..\src\slib\db\mysql.cpp" />
+    <ClCompile Include="..\..\src\slib\db\sqlite.cpp" />
+    <ClCompile Include="..\..\src\slib\device\sensor.cpp" />
+    <ClCompile Include="..\..\src\slib\device\vibrator.cpp" />
+    <ClCompile Include="..\..\src\slib\geo\earth.cpp" />
+    <ClCompile Include="..\..\src\slib\geo\geo_line.cpp" />
+    <ClCompile Include="..\..\src\slib\geo\geo_location.cpp" />
+    <ClCompile Include="..\..\src\slib\geo\geo_rectangle.cpp" />
+    <ClCompile Include="..\..\src\slib\geo\globe.cpp" />
+    <ClCompile Include="..\..\src\slib\geo\latlon.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\bitmap.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\bitmap_data.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\bitmap_ext.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\bitmap_format.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\bitmap_gdiplus.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\brush.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\brush_gdiplus.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\canvas.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\canvas_ext.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\canvas_gdiplus.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\color.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\drawable.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\drawable_ext.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\drawable_gdiplus.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\font.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\font_atlas.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\font_freetype.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\font_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\graphics_path.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\graphics_path_gdiplus.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\graphics_platform_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\graphics_resource.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\graphics_text.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\graphics_util.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\image.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\image_jpeg.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\image_png.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\image_stb.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\pen.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\pen_gdiplus.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\yuv.cpp" />
+    <ClCompile Include="..\..\src\slib\math\bezier.cpp" />
+    <ClCompile Include="..\..\src\slib\math\bigint.cpp" />
+    <ClCompile Include="..\..\src\slib\math\box.cpp" />
+    <ClCompile Include="..\..\src\slib\math\int128.cpp" />
+    <ClCompile Include="..\..\src\slib\math\line.cpp" />
+    <ClCompile Include="..\..\src\slib\math\line3.cpp" />
+    <ClCompile Include="..\..\src\slib\math\line_segment.cpp" />
+    <ClCompile Include="..\..\src\slib\math\matrix2.cpp" />
+    <ClCompile Include="..\..\src\slib\math\matrix3.cpp" />
+    <ClCompile Include="..\..\src\slib\math\matrix4.cpp" />
+    <ClCompile Include="..\..\src\slib\math\plane.cpp" />
+    <ClCompile Include="..\..\src\slib\math\quaternion.cpp" />
+    <ClCompile Include="..\..\src\slib\math\rectangle.cpp" />
+    <ClCompile Include="..\..\src\slib\math\sphere.cpp" />
+    <ClCompile Include="..\..\src\slib\math\transform2d.cpp" />
+    <ClCompile Include="..\..\src\slib\math\transform3d.cpp" />
+    <ClCompile Include="..\..\src\slib\math\triangle.cpp" />
+    <ClCompile Include="..\..\src\slib\math\triangle3.cpp" />
+    <ClCompile Include="..\..\src\slib\math\vector2.cpp" />
+    <ClCompile Include="..\..\src\slib\math\vector3.cpp" />
+    <ClCompile Include="..\..\src\slib\math\vector4.cpp" />
+    <ClCompile Include="..\..\src\slib\math\view_frustum.cpp" />
+    <ClCompile Include="..\..\src\slib\media\audio_codec.cpp" />
+    <ClCompile Include="..\..\src\slib\media\audio_data.cpp" />
+    <ClCompile Include="..\..\src\slib\media\audio_format.cpp" />
+    <ClCompile Include="..\..\src\slib\media\audio_player.cpp" />
+    <ClCompile Include="..\..\src\slib\media\audio_player_dsound.cpp" />
+    <ClCompile Include="..\..\src\slib\media\audio_player_opensl_es.cpp" />
+    <ClCompile Include="..\..\src\slib\media\audio_player_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\media\audio_recorder.cpp" />
+    <ClCompile Include="..\..\src\slib\media\audio_recorder_dsound.cpp" />
+    <ClCompile Include="..\..\src\slib\media\audio_recorder_opensl_es.cpp" />
+    <ClCompile Include="..\..\src\slib\media\audio_recorder_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\media\audio_util.cpp" />
+    <ClCompile Include="..\..\src\slib\media\camera.cpp" />
+    <ClCompile Include="..\..\src\slib\media\camera_dshow.cpp" />
+    <ClCompile Include="..\..\src\slib\media\camera_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\media\codec_opus.cpp" />
+    <ClCompile Include="..\..\src\slib\media\codec_vpx.cpp" />
+    <ClCompile Include="..\..\src\slib\media\media_player.cpp" />
+    <ClCompile Include="..\..\src\slib\media\media_player_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\media\video_capture.cpp" />
+    <ClCompile Include="..\..\src\slib\media\video_codec.cpp" />
+    <ClCompile Include="..\..\src\slib\media\video_frame.cpp" />
+    <ClCompile Include="..\..\src\slib\network\arp.cpp" />
+    <ClCompile Include="..\..\src\slib\network\dns.cpp" />
+    <ClCompile Include="..\..\src\slib\network\ethernet.cpp" />
+    <ClCompile Include="..\..\src\slib\network\http_common.cpp" />
+    <ClCompile Include="..\..\src\slib\network\http_io.cpp" />
+    <ClCompile Include="..\..\src\slib\network\http_service.cpp" />
+    <ClCompile Include="..\..\src\slib\network\icmp.cpp" />
+    <ClCompile Include="..\..\src\slib\network\ip_address.cpp" />
+    <ClCompile Include="..\..\src\slib\network\mac_address.cpp" />
+    <ClCompile Include="..\..\src\slib\network\nat.cpp" />
+    <ClCompile Include="..\..\src\slib\network\network_async.cpp" />
+    <ClCompile Include="..\..\src\slib\network\network_async_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\network\network_io.cpp" />
+    <ClCompile Include="..\..\src\slib\network\network_os.cpp" />
+    <ClCompile Include="..\..\src\slib\network\net_capture.cpp" />
+    <ClCompile Include="..\..\src\slib\network\net_capture_pcap.cpp" />
+    <ClCompile Include="..\..\src\slib\network\socket.cpp" />
+    <ClCompile Include="..\..\src\slib\network\socket_address.cpp" />
+    <ClCompile Include="..\..\src\slib\network\socket_event.cpp" />
+    <ClCompile Include="..\..\src\slib\network\socket_event_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\network\tcpip.cpp" />
+    <ClCompile Include="..\..\src\slib\network\url.cpp" />
+    <ClCompile Include="..\..\src\slib\network\url_request.cpp" />
+    <ClCompile Include="..\..\src\slib\network\url_request_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\render\index_buffer.cpp" />
+    <ClCompile Include="..\..\src\slib\render\opengl_egl.cpp" />
+    <ClCompile Include="..\..\src\slib\render\opengl_gl.cpp" />
+    <ClCompile Include="..\..\src\slib\render\opengl_gles.cpp" />
+    <ClCompile Include="..\..\src\slib\render\opengl_wgl.cpp" />
+    <ClCompile Include="..\..\src\slib\render\render_base.cpp" />
+    <ClCompile Include="..\..\src\slib\render\render_canvas.cpp" />
+    <ClCompile Include="..\..\src\slib\render\render_drawable.cpp" />
+    <ClCompile Include="..\..\src\slib\render\render_engine.cpp" />
+    <ClCompile Include="..\..\src\slib\render\render_program.cpp" />
+    <ClCompile Include="..\..\src\slib\render\render_resource.cpp" />
+    <ClCompile Include="..\..\src\slib\render\texture.cpp" />
+    <ClCompile Include="..\..\src\slib\render\vertex_buffer.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\button.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\button_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\camera_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\check_box.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\check_box_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\common_dialogs.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\common_dialogs_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\cursor.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\cursor_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\edit_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\edit_view_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\gesture.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\image_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\label_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\label_view_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\linear_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\list_report_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\list_report_view_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\list_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\mobile_app.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\mobile_game.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\motion_tracker.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\picker_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\progress_bar.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\radio_button.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\radio_button_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\render_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\render_view_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\scroll_bar.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\scroll_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\scroll_view_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\select_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\select_view_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\slider.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\split_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\tab_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\tab_view_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\text_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\transition.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\tree_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_animation.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_app.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_core.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_core_common.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_core_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_event.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_event_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_menu.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_menu_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_platform.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_resource.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\video_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\view_page.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\view_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\web_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\web_view_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\window.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\window_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\web\web_controller.cpp" />
+    <ClCompile Include="..\..\src\slib\web\web_service.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{FF088AB2-B7A3-4548-8608-4DFACDE182A2}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>slib</RootNamespace>
+    <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(ProjectDir)..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\external\include;$(IncludePath)</IncludePath>
+    <TargetName>slib</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\external\include;$(IncludePath)</IncludePath>
+    <TargetName>slib</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(ProjectDir)..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\external\include;$(IncludePath)</IncludePath>
+    <TargetName>slib</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IntDir>$(ProjectDir)Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\external\include;$(IncludePath)</IncludePath>
+    <TargetName>slib</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <MinimalRebuild>false</MinimalRebuild>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <MinimalRebuild>false</MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

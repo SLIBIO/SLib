@@ -13,8 +13,8 @@
 
 #include "slib/render/definition.h"
 
-#include "thirdparty/gl/EGL/egl.h"
-#include "thirdparty/gl/EGL/eglext.h"
+#include "gl/EGL/egl.h"
+#include "gl/EGL/eglext.h"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 

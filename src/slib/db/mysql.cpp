@@ -12,8 +12,8 @@
 
 #if defined(SLIB_DATABASE_SUPPORT_MYSQL)
 
-#include "thirdparty/mariadb-connector/mysql.h"
-#include "thirdparty/mariadb-connector/errmsg.h"
+#include "libmariadb/mysql.h"
+#include "libmariadb/errmsg.h"
 
 #include "slib/core/thread.h"
 #include "slib/core/scoped.h"

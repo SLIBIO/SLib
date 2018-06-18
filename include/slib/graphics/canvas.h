@@ -35,6 +35,8 @@ namespace slib
 		Render = 3
 	};
 	
+	class Image;
+	
 	class SLIB_EXPORT Canvas : public Object
 	{
 		SLIB_DECLARE_OBJECT
@@ -84,11 +86,11 @@ namespace slib
 
 		virtual void clipToPath(const Ref<GraphicsPath>& path) = 0;
 
-		virtual void clipToRoundRect(const Rectangle& rect, const Size& radius);
+		virtual void clipToRoundRect(const Rectangle& rect, const Size& radius) = 0;
 
 		void clipToRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry);
 
-		virtual void clipToEllipse(const Rectangle& rect);
+		virtual void clipToEllipse(const Rectangle& rect) = 0;
 
 		void clipToEllipse(sl_real x, sl_real y, sl_real width, sl_real height);
 
@@ -105,17 +107,17 @@ namespace slib
 		virtual void scale(sl_real sx, sl_real sy);
 
 	
-		virtual Size measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine = sl_false);
+		virtual Size measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine = sl_false) = 0;
 
-		virtual Size measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false);
+		virtual Size measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false) = 0;
 
 		virtual void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) = 0;
 
 		virtual void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color);
 
-		void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment, sl_bool flagMultiLine = sl_false);
+		virtual void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment, sl_bool flagMultiLine = sl_false) = 0;
 
-		void drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment, sl_bool flagMultiLine = sl_false);
+		virtual void drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment, sl_bool flagMultiLine = sl_false) = 0;
 
 
 		virtual void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen) = 0;
@@ -135,7 +137,7 @@ namespace slib
 
 		virtual void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
 
-		virtual void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor);
+		virtual void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor) = 0;
 
 		void drawRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen, const Ref<Brush>& brush);
 
@@ -156,7 +158,11 @@ namespace slib
 
 		virtual void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
 
+		virtual void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Color& fillColor) = 0;
+
 		void drawRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry, const Ref<Pen>& pen, const Ref<Brush>& brush);
+
+		void drawRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry, const Ref<Pen>& pen, const Color& fillColor);
 
 		void drawRoundRect(const Rectangle& rc, const Size& radius, const Ref<Pen>& pen);
 
@@ -173,7 +179,11 @@ namespace slib
 
 		virtual void drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
 
+		virtual void drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor) = 0;
+
 		void drawEllipse(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen, const Ref<Brush>& brush);
+
+		void drawEllipse(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen, const Color& fillColor);
 
 		void drawEllipse(const Rectangle& rc, const Ref<Pen>& pen);
 
@@ -190,7 +200,11 @@ namespace slib
 
 		virtual void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = FillMode::Alternate) = 0;
 
+		virtual void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Color& fillColor, FillMode fillMode = FillMode::Alternate) = 0;
+
 		void drawPolygon(const List<Point>& points, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = FillMode::Alternate);
+
+		void drawPolygon(const List<Point>& points, const Ref<Pen>& pen, const Color& fillColor, FillMode fillMode = FillMode::Alternate);
 
 		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen);
 
@@ -207,7 +221,11 @@ namespace slib
 
 		virtual void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
 
+		virtual void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Color& fillColor) = 0;
+		
 		void drawPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush);
+
+		void drawPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Color& fillColor);
 
 		void drawPie(const Rectangle& rc, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen);
 
@@ -224,6 +242,8 @@ namespace slib
 
 		virtual void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
 	
+		virtual void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Color& fillColor) = 0;
+		
 		void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen);
 
 		void fillPath(const Ref<GraphicsPath>& path, const Ref<Brush>& brush);
@@ -231,36 +251,39 @@ namespace slib
 		void fillPath(const Ref<GraphicsPath>& path, const Color& color);
 
 
-		void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param);
+		virtual void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param) = 0;
 
 		void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc);
 
-		void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param);
+		virtual void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param) = 0;
 
 		void draw(const Rectangle& rectDst, const Ref<Drawable>& src);
 
-		void draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst
-				, const Ref<Drawable>& src, sl_real xSrc, sl_real ySrc, sl_real widthSrc, sl_real heightSrc, const DrawParam& param);
+		void draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& src, sl_real xSrc, sl_real ySrc, sl_real widthSrc, sl_real heightSrc, const DrawParam& param);
 
-		void draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst
-				  , const Ref<Drawable>& src, sl_real xSrc, sl_real ySrc, sl_real widthSrc, sl_real heightSrc);
+		void draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& src, sl_real xSrc, sl_real ySrc, sl_real widthSrc, sl_real heightSrc);
 	
 		void draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& drawable, const DrawParam& param);
 
 		void draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& drawable);
 	
-		void draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& drawable, const DrawParam& param);
+		virtual void draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& drawable, const DrawParam& param) = 0;
 
 		void draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& drawable);
 
-		void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, Alignment alignment, const DrawParam& param);
+		virtual void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, Alignment alignment, const DrawParam& param) = 0;
 
 		void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, Alignment alignment);
-
+		
+		
+		virtual sl_bool isSupportedDrawable(const Ref<Drawable>& drawable) = 0;
+		
+		virtual Ref<Drawable> createDrawableCacheForImage(const Ref<Image>& image) = 0;
+		
 	protected:
-		virtual void onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param);
+		virtual void onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param) = 0;
 
-		virtual void onDrawAll(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param);
+		virtual void onDrawAll(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param) = 0;
 
 	protected:
 		virtual void _setAlpha(sl_real alpha);
@@ -274,6 +297,60 @@ namespace slib
 		Rectangle m_invalidatedRect;
 		sl_real m_alpha;
 		sl_bool m_flagAntiAlias;
+
+	};
+	
+	
+	class SLIB_EXPORT CanvasExt : public Canvas
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		CanvasExt();
+		
+		~CanvasExt();
+		
+	public:
+		void clipToRoundRect(const Rectangle& rect, const Size& radius) override;
+		
+		void clipToEllipse(const Rectangle& rect) override;
+		
+		Size measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine = sl_false) override;
+		
+		Size measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false) override;
+		
+		void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment, sl_bool flagMultiLine = sl_false) override;
+		
+		void drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment, sl_bool flagMultiLine = sl_false) override;
+
+		void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor) override;
+	
+		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Color& fillColor) override;
+		
+		void drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor) override;
+		
+		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Color& fillColor, FillMode fillMode = FillMode::Alternate) override;
+		
+		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Color& fillColor) override;
+		
+		void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Color& fillColor) override;
+		
+		void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param) override;
+		
+		void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param) override;
+
+		void draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& drawable, const DrawParam& param) override;
+		
+		void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, Alignment alignment, const DrawParam& param) override;
+		
+		sl_bool isSupportedDrawable(const Ref<Drawable>& drawable) override;
+		
+		Ref<Drawable> createDrawableCacheForImage(const Ref<Image>& image) override;
+		
+	protected:
+		void onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param) override;
+		
+		void onDrawAll(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param) override;
 
 	};
 	

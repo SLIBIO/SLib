@@ -167,8 +167,8 @@ namespace slib
 		sl_bool saveToJPEG(const String& filePath, float quality = 0.5f);
 
 		
-	public:
-		Ref<Drawable> getDrawableCache();
+	protected:
+		Ref<Drawable> getDrawableCache(Canvas* canvas);
 	
 		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override;
 

@@ -21,7 +21,7 @@
 #include <malloc.h>
 #endif
 
-#include "thirdparty/libjpeg/jpeglib.h"
+#include "libjpeg/jpeglib.h"
 
 namespace slib
 {

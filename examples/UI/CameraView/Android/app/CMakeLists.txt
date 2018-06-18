@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-include_directories (${SLIB_PATH}/include)
-link_directories (${SLIB_PATH}/lib/Android/${CMAKE_BUILD_TYPE}-${ANDROID_ABI})
+include (${SLIB_PATH}/build/CMake/include.cmake)
 
 file (GLOB SOURCE_FILES
  ${CMAKE_CURRENT_LIST_DIR}/../../src/*.cpp

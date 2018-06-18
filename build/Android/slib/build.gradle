@@ -1,0 +1,58 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion '27.0.3'
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 25
+        versionCode 12
+        versionName "1.1"
+        externalNativeBuild {
+            cmake {
+                targets 'slib', 'slib-core', 'cpufeatures', 'zlib', 'png', 'jpeg', 'freetype', 'sqlite3', 'opus', 'vpx'
+                arguments '-DANDROID_ARM_MODE=arm', '-DANDROID_ARM_NEON=TRUE'
+            }
+        }
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86'
+        }
+    }
+    buildTypes {
+        debug {
+            jniDebuggable true
+        }
+        release {
+            minifyEnabled false
+        }
+    }
+    sourceSets {
+        main.java.srcDirs += '../../../java/android'
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.google.firebase:firebase-core:10.0.1'
+    implementation 'com.google.firebase:firebase-messaging:10.0.1'
+}
+
+tasks.all { task ->
+    if (task.name == "assembleDebug" || task.name == "assembleRelease") {
+        task.doLast {
+            System.out.println("Moving slib.aar into lib!")
+            def sourceFile = projectDir.getPath() + "/build/outputs/aar/" + (task.name == "assembleDebug" ? "slib-debug.aar" : "slib-release.aar");
+            def targetDir = projectDir.getPath() + "/../../../lib/Android";
+            def targetFileName = "slib.aar";
+            def targetFile = targetDir + "/" + targetFileName;
+            new File(targetDir).mkdirs()
+            new File(targetFile).delete();
+            new File(sourceFile).renameTo(targetFile);
+        }
+    }
+}
