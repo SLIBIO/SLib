@@ -19,7 +19,7 @@
 namespace slib
 {
 
-#if defined(SLIB_PLATFORM_IS_OSX)
+#if defined(SLIB_PLATFORM_IS_MACOS)
 
 	CGImageRef GraphicsPlatform::loadCGImageFromMemory(const void* buf, sl_size size)
 	{
@@ -54,6 +54,33 @@ namespace slib
 		return Color4f((sl_real)red, (sl_real)green, (sl_real)blue, (sl_real)alpha);
 	}
 
+	NSImage* GraphicsPlatform::createNSImageFromBitmap(const Ref<Bitmap>& bitmap)
+	{
+		if (bitmap.isNotNull() && bitmap->isNotEmpty()) {
+			sl_uint32 width = bitmap->getWidth();
+			sl_uint32 height = bitmap->getHeight();
+			NSBitmapImageRep* rep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:width pixelsHigh:height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:FALSE colorSpaceName:NSDeviceRGBColorSpace bitmapFormat:0 bytesPerRow:(width*4) bitsPerPixel:32];
+			if (rep != nil) {
+				BitmapData bd;
+				bd.data = rep.bitmapData;
+				bd.format = BitmapFormat::RGBA;
+				bd.width = width;
+				bd.height = height;
+				if (bitmap->readPixels(0, 0, bd)) {
+					NSSize size;
+					size.width = width;
+					size.height = height;
+					NSImage* image = [[NSImage alloc] initWithSize:size];
+					if (image != nil) {
+						[image addRepresentation:rep];
+						return image;
+					}
+				}
+			}
+		}
+		return nil;
+	}
+	
 #endif
 
 #if defined(SLIB_PLATFORM_IS_IOS)

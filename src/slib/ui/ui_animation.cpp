@@ -72,8 +72,7 @@ namespace slib
 		return ret;
 	}
 	
-#if !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_MACOS)
-	
+#if !defined(SLIB_UI_IS_ANDROID) && !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_MACOS)
 	sl_bool UIAnimationLoop::_applyNativeAnimation(Animation* animation)
 	{
 		return sl_false;
@@ -82,7 +81,6 @@ namespace slib
 	void UIAnimationLoop::_stopNativeAnimation(Animation* animation)
 	{
 	}
-	
 #endif
 	
 	

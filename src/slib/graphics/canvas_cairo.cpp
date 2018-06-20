@@ -12,7 +12,7 @@
 
 #include "slib/graphics/platform.h"
 
-#if defined(SLIB_PLATFORM_IS_TIZEN)
+#if defined(SLIB_GRAPHICS_IS_CAIRO)
 
 namespace slib
 {

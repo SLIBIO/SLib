@@ -264,7 +264,7 @@ namespace slib
 			if (IsInstanceOf<PasswordView>(this)) {
 				m_editViewNative = new PasswordView;
 			} else {
-#if defined(SLIB_PLATFORM_IS_IOS)
+#if defined(SLIB_UI_IS_IOS)
 				m_editViewNative = new TextArea;
 #else
 				m_editViewNative = new EditView;
@@ -292,7 +292,7 @@ namespace slib
 			m_windowEdit->setOnClose(SLIB_FUNCTION_WEAKREF(EditView, _onCloseWindowEditViewNative, this));
 			m_editViewNative->setFocus();
 
-#if defined(SLIB_PLATFORM_IS_ANDROID)
+#if defined(SLIB_UI_IS_ANDROID)
 			UI::dispatchToUiThread([] {
 				Android::showKeyboard();
 			}, 500);
@@ -465,8 +465,7 @@ namespace slib
 	}
 
 
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID)) && !(defined(SLIB_PLATFORM_IS_TIZEN))
-
+#if !defined(SLIB_UI)
 	Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;
@@ -525,12 +524,9 @@ namespace slib
 	{
 		return sl_null;
 	}
-
 #endif
 
-
-#if !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_ANDROID)) && !(defined(SLIB_PLATFORM_IS_TIZEN))
-
+#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID) && !defined(SLIB_UI_IS_EFL)
 	void EditView::_setReturnKeyType_NW(UIReturnKeyType type)
 	{
 	}
@@ -542,7 +538,6 @@ namespace slib
 	void EditView::_setAutoCapitalizationType_NW(UIAutoCapitalizationType type)
 	{
 	}
-
 #endif
 
 }

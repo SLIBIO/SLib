@@ -1,41 +1,47 @@
-#include "slib/core/definition.h"
-
-#if defined(SLIB_PLATFORM_IS_TIZEN)
-
-#include "slib/network/url_request.h"
+#include "slib/network/curl.h"
 
 #include "slib/core/file.h"
 #include "slib/core/log.h"
 
-#include <curl/curl.h>
-#include <net_connection.h>
+#include "curl/curl.h"
+
 #include <stdlib.h>
+
+#if defined(SLIB_PLATFORM_IS_TIZEN)
+#	include <net_connection.h>
+#endif
+
+#if defined(DELETE)
+#	undef DELETE
+#endif
 
 namespace slib
 {
 
-	class UrlRequest_Impl : public UrlRequest
+	class CurlRequest_Impl : public UrlRequest
 	{
+		friend class CurlRequest;
+		
 	public:
 		CURL* m_curl;
 		sl_bool m_flagClosed;
 		sl_bool m_flagProcessResponse;
 
 	public:
-		UrlRequest_Impl()
+		CurlRequest_Impl()
 		{
 			m_curl = sl_null;
 			m_flagClosed = sl_false;
 			m_flagProcessResponse = sl_false;
 		}
 
-		~UrlRequest_Impl()
+		~CurlRequest_Impl()
 		{
 		}
 
 	public:
-		static Ref<UrlRequest_Impl> create(const UrlRequestParam& param, const String& url) {
-			Ref<UrlRequest_Impl> ret = new UrlRequest_Impl;
+		static Ref<CurlRequest_Impl> create(const UrlRequestParam& param, const String& url) {
+			Ref<CurlRequest_Impl> ret = new CurlRequest_Impl;
 			if (ret.isNotNull()) {
 				ret->_init(param, url);
 				return ret;
@@ -50,21 +56,26 @@ namespace slib
 
 		void _sendSync() override
 		{
+#if defined(SLIB_PLATFORM_IS_TIZEN)
 			connection_h connection;
 			if (::connection_create(&connection) != CONNECTION_ERROR_NONE) {
 				onError();
 				return;
 			}
+#endif
 
 			CURL* curl = ::curl_easy_init();
 			if (!curl) {
+#if defined(SLIB_PLATFORM_IS_TIZEN)
 				::connection_destroy(connection);
+#endif
 				onError();
 				return;
 			}
 
 			m_curl = curl;
 
+#if defined(SLIB_PLATFORM_IS_TIZEN)
 			char* proxy_address;
 			sl_bool flagSetProxy = sl_false;
 			int conn_err = ::connection_get_proxy(connection, CONNECTION_ADDRESS_FAMILY_IPV4, &proxy_address);
@@ -85,6 +96,7 @@ namespace slib
 				}
 			}
 			::connection_set_proxy_address_changed_cb(connection, UrlRequest_Impl::callbackProxyChanged, (void*)this);
+#endif
 
 			String url = m_url;
 			::curl_easy_setopt(curl, CURLOPT_URL, url.getData());
@@ -150,17 +162,17 @@ namespace slib
 				::curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, requestBody.getSize());
 			} else {
 				if (requestBody.isNotEmpty()) {
-					::curl_easy_setopt(curl, CURLOPT_READFUNCTION, UrlRequest_Impl::callbackRead);
+					::curl_easy_setopt(curl, CURLOPT_READFUNCTION, CurlRequest_Impl::callbackRead);
 					::curl_easy_setopt(curl, CURLOPT_READDATA, (void*)this);
 				}
 			}
 
 			// received header
-			::curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, UrlRequest_Impl::callbackHeader);
+			::curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, CurlRequest_Impl::callbackHeader);
 			::curl_easy_setopt(curl, CURLOPT_HEADERDATA, (void*)this);
 
 			// received data
-			::curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, UrlRequest_Impl::callbackWrite);
+			::curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlRequest_Impl::callbackWrite);
 			::curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)this);
 
 			/* getting data */
@@ -172,7 +184,7 @@ namespace slib
 				onComplete();
 			} else {
 				String strError = ::curl_easy_strerror(err);
-				LogError("UrlRequest", "Error: %s", strError);
+				LogError("CurlRequest", "Error: %s", strError);
 				m_lastErrorMessage = strError;
 				onError();
 			}
@@ -182,7 +194,9 @@ namespace slib
 			}
 
 			::curl_easy_cleanup(curl);
+#if defined(SLIB_PLATFORM_IS_TIZEN)
 			::connection_destroy(connection);
+#endif
 
 		}
 
@@ -216,10 +230,14 @@ namespace slib
 			Memory body = m_requestBody;
 			sl_size total = body.getSize();
 			if (m_sizeBodySent + size > total) {
-				size = total - m_sizeBodySent;
+				if (total > m_sizeBodySent) {
+					size = total - (sl_size)m_sizeBodySent;
+				} else {
+					size = 0;
+				}
 			}
 			if (size > 0) {
-				body.read(m_sizeBodySent, size, data);
+				body.read((sl_size)m_sizeBodySent, size, data);
 				m_sizeBodySent += size;
 				onUploadBody(size);
 			}
@@ -228,7 +246,7 @@ namespace slib
 
 		static size_t callbackRead(void *contents, size_t size, size_t nmemb, void *user_data)
 		{
-			UrlRequest_Impl* req = (UrlRequest_Impl*)user_data;
+			CurlRequest_Impl* req = (CurlRequest_Impl*)user_data;
 			size_t n = size * nmemb;
 			if (n) {
 				return (size_t)(req->onRead(contents, (sl_size)n));
@@ -261,7 +279,7 @@ namespace slib
 
 		static size_t callbackWrite(void *contents, size_t size, size_t nmemb, void *user_data)
 		{
-			UrlRequest_Impl* req = (UrlRequest_Impl*)user_data;
+			CurlRequest_Impl* req = (CurlRequest_Impl*)user_data;
 			size_t n = size * nmemb;
 			if (n) {
 				return (size_t)(req->onWrite(contents, (sl_size)n));
@@ -309,7 +327,7 @@ namespace slib
 
 		static size_t callbackHeader(char *buffer, size_t size, size_t nitems, void *user_data)
 		{
-			UrlRequest_Impl* req = (UrlRequest_Impl*)user_data;
+			CurlRequest_Impl* req = (CurlRequest_Impl*)user_data;
 			size_t n = size * nitems;
 			if (n) {
 				if (req->onHeader(buffer, (sl_size)n)) {
@@ -333,18 +351,25 @@ namespace slib
 
 		static void callbackProxyChanged(const char *ipv4_address, const char *ipv6_address, void *user_data)
 		{
-			UrlRequest_Impl* req = (UrlRequest_Impl*)user_data;
+			CurlRequest_Impl* req = (CurlRequest_Impl*)user_data;
 			req->onProxyChanged(ipv4_address, ipv6_address);
 		}
 
 	};
 
-
-	Ref<UrlRequest> UrlRequest::_create(const UrlRequestParam& param, const String& url)
+#define URL_REQUEST CurlRequest
+#include "url_request_common.inc"
+	
+	Ref<UrlRequest> CurlRequest::_create(const UrlRequestParam& param, const String& url)
 	{
-		return Ref<UrlRequest>::from(UrlRequest_Impl::create(param, url));
+		return Ref<UrlRequest>::from(CurlRequest_Impl::create(param, url));
 	}
 
-}
-
+#if defined(SLIB_PLATFORM_IS_LINUX) && !defined(SLIB_PLATFORM_IS_ANDROID)
+	Ref<UrlRequest> UrlRequest::_create(const UrlRequestParam& param, const String& url)
+	{
+		return Ref<UrlRequest>::from(CurlRequest_Impl::create(param, url));
+	}
 #endif
+	
+}

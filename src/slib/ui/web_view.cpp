@@ -8,6 +8,10 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include "slib/core/definition.h"
+
+#ifndef SLIB_UI_IS_GTK
+
 #include "slib/ui/web_view.h"
 
 namespace slib
@@ -142,7 +146,7 @@ namespace slib
 	}
 	
 	
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID)) && !(defined(SLIB_PLATFORM_IS_TIZEN))
+#if !defined(SLIB_UI)
 	
 	Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* parent)
 	{
@@ -186,3 +190,5 @@ namespace slib
 #endif
 
 }
+
+#endif

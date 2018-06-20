@@ -623,6 +623,7 @@
 		2605A2401EA26AE3005CC1D3 /* url.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C13E421DDA30FD00612945 /* url.cpp */; };
 		2605A2411EA26AE3005CC1D3 /* url_request.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C13E441DDA32F000612945 /* url_request.cpp */; };
 		2605A2421EA26AE3005CC1D3 /* url_request_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26C13E461DDA516D00612945 /* url_request_apple.mm */; };
+		26072FFE20D97B66004EB272 /* url_request_curl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26072FFD20D97B66004EB272 /* url_request_curl.cpp */; };
 		26C1B62C20D4305100E36539 /* bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C1B62B20D4305000E36539 /* bitmap.cpp */; };
 		26C1B63520D4FF5200E36539 /* canvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4801C1193C400D47AB0 /* canvas.cpp */; };
 		26C1B63720D513D200E36539 /* canvas_ext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C1B63620D513D200E36539 /* canvas_ext.cpp */; };
@@ -632,7 +633,7 @@
 		26C1B63D20D51D1D00E36539 /* canvas_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26FBDE4E1DA2B3EC00FF1B55 /* canvas_quartz.mm */; };
 		26C1B63E20D51D1D00E36539 /* drawable_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26FBDE541DA2B3F700FF1B55 /* drawable_quartz.mm */; };
 		26C1B63F20D51D1D00E36539 /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4841C1193C400D47AB0 /* font.cpp */; };
-		26C1B64020D51D1D00E36539 /* font_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26FBDE591DA2B40700FF1B55 /* font_apple.mm */; };
+		26C1B64020D51D1D00E36539 /* font_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26FBDE591DA2B40700FF1B55 /* font_quartz.mm */; };
 		26C1B64120D51D1D00E36539 /* font_atlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B89A6B1DC3467B00ABE895 /* font_atlas.cpp */; };
 		26C1B64220D51D1D00E36539 /* graphics_path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4861C1193C400D47AB0 /* graphics_path.cpp */; };
 		26C1B64320D51D1D00E36539 /* graphics_path_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26FBDE621DA2B41700FF1B55 /* graphics_path_quartz.mm */; };
@@ -844,18 +845,18 @@
 		26D9D97E1E964675005F7BD3 /* audio_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4A71C11940A00D47AB0 /* audio_player.cpp */; };
 		26D9D97F1E964675005F7BD3 /* audio_player_dsound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C72AC51E2150E200F7D6D0 /* audio_player_dsound.cpp */; };
 		26D9D9801E964675005F7BD3 /* audio_player_opensl_es.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C72AC61E2150E200F7D6D0 /* audio_player_opensl_es.cpp */; };
-		26D9D9811E964675005F7BD3 /* audio_player_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4AC1C11940A00D47AB0 /* audio_player_osx.mm */; };
+		26D9D9811E964675005F7BD3 /* audio_player_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4AC1C11940A00D47AB0 /* audio_player_macos.mm */; };
 		26D9D9821E964675005F7BD3 /* audio_recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4AE1C11940A00D47AB0 /* audio_recorder.cpp */; };
 		26D9D9831E964675005F7BD3 /* audio_recorder_dsound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C72AC91E2150EE00F7D6D0 /* audio_recorder_dsound.cpp */; };
 		26D9D9841E964675005F7BD3 /* audio_recorder_opensl_es.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C72ACA1E2150EE00F7D6D0 /* audio_recorder_opensl_es.cpp */; };
-		26D9D9851E964675005F7BD3 /* audio_recorder_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4B31C11940A00D47AB0 /* audio_recorder_osx.mm */; };
+		26D9D9851E964675005F7BD3 /* audio_recorder_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4B31C11940A00D47AB0 /* audio_recorder_macos.mm */; };
 		26D9D9861E964675005F7BD3 /* audio_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26694BF61C9AB4330047E67C /* audio_util.cpp */; };
 		26D9D9871E964675005F7BD3 /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4B51C11940A00D47AB0 /* camera.cpp */; };
 		26D9D9881E964675005F7BD3 /* camera_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26D8AC891E393CE50092EB81 /* camera_apple.mm */; };
 		26D9D9891E964675005F7BD3 /* camera_dshow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C72ACD1E2150F900F7D6D0 /* camera_dshow.cpp */; };
 		26D9D98A1E964675005F7BD3 /* codec_opus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4B71C11940A00D47AB0 /* codec_opus.cpp */; };
 		26D9D98B1E964675005F7BD3 /* codec_vpx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4B81C11940A00D47AB0 /* codec_vpx.cpp */; };
-		26D9D98C1E964675005F7BD3 /* media_platform_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4BA1C11940A00D47AB0 /* media_platform_osx.mm */; };
+		26D9D98C1E964675005F7BD3 /* media_platform_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4BA1C11940A00D47AB0 /* media_platform_macos.mm */; };
 		26D9D98D1E964675005F7BD3 /* media_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D8AC8D1E393F010092EB81 /* media_player.cpp */; };
 		26D9D98E1E964675005F7BD3 /* media_player_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26D8AC8C1E393F010092EB81 /* media_player_apple.mm */; };
 		26D9D98F1E964675005F7BD3 /* video_capture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4BB1C11940A00D47AB0 /* video_capture.cpp */; };
@@ -896,23 +897,23 @@
 		26D9D9B21E964683005F7BD3 /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4E71C11940A00D47AB0 /* texture.cpp */; };
 		26D9D9B31E964683005F7BD3 /* vertex_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4E81C11940A00D47AB0 /* vertex_buffer.cpp */; };
 		26D9D9B41E96468D005F7BD3 /* button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4EA1C11940A00D47AB0 /* button.cpp */; };
-		26D9D9B51E96468D005F7BD3 /* button_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4ED1C11940A00D47AB0 /* button_osx.mm */; };
+		26D9D9B51E96468D005F7BD3 /* button_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4ED1C11940A00D47AB0 /* button_macos.mm */; };
 		26D9D9B61E96468D005F7BD3 /* camera_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2688DD861C16FBDF00973672 /* camera_view.cpp */; };
 		26D9D9B71E96468D005F7BD3 /* check_box.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4F21C11940A00D47AB0 /* check_box.cpp */; };
-		26D9D9B81E96468D005F7BD3 /* check_box_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4F31C11940A00D47AB0 /* check_box_osx.mm */; };
+		26D9D9B81E96468D005F7BD3 /* check_box_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4F31C11940A00D47AB0 /* check_box_macos.mm */; };
 		26D9D9B91E96468D005F7BD3 /* common_dialogs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2649C2341CBBCB54003E7561 /* common_dialogs.cpp */; };
-		26D9D9BA1E96468D005F7BD3 /* common_dialogs_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2649C2361CBBCB7E003E7561 /* common_dialogs_osx.mm */; };
+		26D9D9BA1E96468D005F7BD3 /* common_dialogs_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2649C2361CBBCB7E003E7561 /* common_dialogs_macos.mm */; };
 		26D9D9BB1E96468D005F7BD3 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4F51C11940A00D47AB0 /* cursor.cpp */; };
-		26D9D9BC1E96468D005F7BD3 /* cursor_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4F61C11940A00D47AB0 /* cursor_osx.mm */; };
+		26D9D9BC1E96468D005F7BD3 /* cursor_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4F61C11940A00D47AB0 /* cursor_macos.mm */; };
 		26D9D9BD1E96468D005F7BD3 /* edit_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5001C11940A00D47AB0 /* edit_view.cpp */; };
-		26D9D9BE1E96468D005F7BD3 /* edit_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5031C11940A00D47AB0 /* edit_view_osx.mm */; };
+		26D9D9BE1E96468D005F7BD3 /* edit_view_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5031C11940A00D47AB0 /* edit_view_macos.mm */; };
 		26D9D9BF1E96468D005F7BD3 /* gesture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E17DADF01E0C9A1E006161F6 /* gesture.cpp */; };
 		26D9D9C01E96468D005F7BD3 /* image_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD51E1C11940A00D47AB0 /* image_view.cpp */; };
 		26D9D9C11E96468D005F7BD3 /* label_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD50C1C11940A00D47AB0 /* label_view.cpp */; };
-		26D9D9C21E96468D005F7BD3 /* label_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD50F1C11940A00D47AB0 /* label_view_osx.mm */; };
+		26D9D9C21E96468D005F7BD3 /* label_view_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD50F1C11940A00D47AB0 /* label_view_macos.mm */; };
 		26D9D9C31E96468D005F7BD3 /* linear_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C7E37D1D00097000C0A769 /* linear_view.cpp */; };
 		26D9D9C41E96468D005F7BD3 /* list_report_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5111C11940A00D47AB0 /* list_report_view.cpp */; };
-		26D9D9C51E96468D005F7BD3 /* list_report_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5121C11940A00D47AB0 /* list_report_view_osx.mm */; };
+		26D9D9C51E96468D005F7BD3 /* list_report_view_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5121C11940A00D47AB0 /* list_report_view_macos.mm */; };
 		26D9D9C61E96468D005F7BD3 /* list_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2699DC8F1D43682D0085EE67 /* list_view.cpp */; };
 		26D9D9C71E96468D005F7BD3 /* mobile_app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D5431D096A7000819E09 /* mobile_app.cpp */; };
 		26D9D9C81E96468D005F7BD3 /* mobile_game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D5411D0965C400819E09 /* mobile_game.cpp */; };
@@ -920,18 +921,18 @@
 		26D9D9CA1E96468D005F7BD3 /* picker_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1B34E9E1E0A90C0006217F4 /* picker_view.cpp */; };
 		26D9D9CB1E96468D005F7BD3 /* progress_bar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB61391D872FB10049A5C3 /* progress_bar.cpp */; };
 		26D9D9CC1E96468D005F7BD3 /* radio_button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5141C11940A00D47AB0 /* radio_button.cpp */; };
-		26D9D9CD1E96468D005F7BD3 /* radio_button_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5151C11940A00D47AB0 /* radio_button_osx.mm */; };
+		26D9D9CD1E96468D005F7BD3 /* radio_button_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5151C11940A00D47AB0 /* radio_button_macos.mm */; };
 		26D9D9CE1E96468D005F7BD3 /* render_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5171C11940A00D47AB0 /* render_view.cpp */; };
-		26D9D9CF1E96468D005F7BD3 /* render_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD51A1C11940A00D47AB0 /* render_view_osx.mm */; };
+		26D9D9CF1E96468D005F7BD3 /* render_view_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD51A1C11940A00D47AB0 /* render_view_macos.mm */; };
 		26D9D9D01E96468D005F7BD3 /* scroll_bar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267C16B81CE779D8000318C2 /* scroll_bar.cpp */; };
 		26D9D9D11E96468D005F7BD3 /* scroll_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5231C11940A00D47AB0 /* scroll_view.cpp */; };
-		26D9D9D21E96468D005F7BD3 /* scroll_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5261C11940A00D47AB0 /* scroll_view_osx.mm */; };
+		26D9D9D21E96468D005F7BD3 /* scroll_view_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5261C11940A00D47AB0 /* scroll_view_macos.mm */; };
 		26D9D9D31E96468D005F7BD3 /* select_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4FB1C11940A00D47AB0 /* select_view.cpp */; };
-		26D9D9D41E96468D005F7BD3 /* select_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4FE1C11940A00D47AB0 /* select_view_osx.mm */; };
+		26D9D9D41E96468D005F7BD3 /* select_view_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4FE1C11940A00D47AB0 /* select_view_macos.mm */; };
 		26D9D9D51E96468D005F7BD3 /* slider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1CC6F921D8FC21000C491E5 /* slider.cpp */; };
 		26D9D9D61E96468D005F7BD3 /* split_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AE7CCB1D8450F80095AACA /* split_view.cpp */; };
 		26D9D9D71E96468D005F7BD3 /* tab_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5281C11940A00D47AB0 /* tab_view.cpp */; };
-		26D9D9D81E96468D005F7BD3 /* tab_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5291C11940A00D47AB0 /* tab_view_osx.mm */; };
+		26D9D9D81E96468D005F7BD3 /* tab_view_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5291C11940A00D47AB0 /* tab_view_macos.mm */; };
 		26D9D9D91E96468D005F7BD3 /* text_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B1C9A01DC7ABB60092C84F /* text_view.cpp */; };
 		26D9D9DA1E96468D005F7BD3 /* transition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C4E26A1DB47A7200A9211F /* transition.cpp */; };
 		26D9D9DB1E96468D005F7BD3 /* tree_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */; };
@@ -941,21 +942,21 @@
 		26D9D9DF1E96468D005F7BD3 /* ui_core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD52B1C11940A00D47AB0 /* ui_core.cpp */; };
 		26D9D9E01E96468D005F7BD3 /* ui_core_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2682C3F21E2D5D0800E9CB98 /* ui_core_apple.mm */; };
 		26D9D9E11E96468D005F7BD3 /* ui_core_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2682C3F71E2D639B00E9CB98 /* ui_core_common.cpp */; };
-		26D9D9E21E96468D005F7BD3 /* ui_core_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD52E1C11940A00D47AB0 /* ui_core_osx.mm */; };
+		26D9D9E21E96468D005F7BD3 /* ui_core_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD52E1C11940A00D47AB0 /* ui_core_macos.mm */; };
 		26D9D9E31E96468D005F7BD3 /* ui_event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5301C11940A00D47AB0 /* ui_event.cpp */; };
-		26D9D9E41E96468D005F7BD3 /* ui_event_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5331C11940A00D47AB0 /* ui_event_osx.mm */; };
+		26D9D9E41E96468D005F7BD3 /* ui_event_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5331C11940A00D47AB0 /* ui_event_macos.mm */; };
 		26D9D9E51E96468D005F7BD3 /* ui_menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264A5D7B1CB6C9BF00FB0B08 /* ui_menu.cpp */; };
-		26D9D9E61E96468D005F7BD3 /* ui_menu_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 264A5D7D1CB6C9C800FB0B08 /* ui_menu_osx.mm */; };
+		26D9D9E61E96468D005F7BD3 /* ui_menu_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 264A5D7D1CB6C9C800FB0B08 /* ui_menu_macos.mm */; };
 		26D9D9E71E96468D005F7BD3 /* ui_platform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D57F1D0999F700819E09 /* ui_platform.cpp */; };
 		26D9D9E81E96468D005F7BD3 /* ui_resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260A402F1D2AAAE3009CFCE8 /* ui_resource.cpp */; };
 		26D9D9E91E96468D005F7BD3 /* video_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2688DD841C16F6E200973672 /* video_view.cpp */; };
 		26D9D9EA1E96468D005F7BD3 /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5361C11940A00D47AB0 /* view.cpp */; };
-		26D9D9EB1E96468D005F7BD3 /* view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD53D1C11940A00D47AB0 /* view_osx.mm */; };
+		26D9D9EB1E96468D005F7BD3 /* view_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD53D1C11940A00D47AB0 /* view_macos.mm */; };
 		26D9D9EC1E96468D005F7BD3 /* view_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BBBEC71D8FDF1F00735947 /* view_page.cpp */; };
 		26D9D9ED1E96468D005F7BD3 /* web_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5401C11940A00D47AB0 /* web_view.cpp */; };
-		26D9D9EE1E96468D005F7BD3 /* web_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5431C11940A00D47AB0 /* web_view_osx.mm */; };
+		26D9D9EE1E96468D005F7BD3 /* web_view_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5431C11940A00D47AB0 /* web_view_macos.mm */; };
 		26D9D9EF1E96468D005F7BD3 /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5451C11940A00D47AB0 /* window.cpp */; };
-		26D9D9F01E96468D005F7BD3 /* window_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5481C11940A00D47AB0 /* window_osx.mm */; };
+		26D9D9F01E96468D005F7BD3 /* window_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5481C11940A00D47AB0 /* window_macos.mm */; };
 		26D9D9F11E964693005F7BD3 /* web_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CBDF001DED5EC700B1B13B /* web_controller.cpp */; };
 		26D9D9F21E964693005F7BD3 /* web_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26912BC21DEA81D5008C5FFD /* web_service.cpp */; };
 		26D9D9F41E968240005F7BD3 /* http_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D9D9F31E968240005F7BD3 /* http_io.cpp */; };
@@ -1582,6 +1583,8 @@
 		26050B1020CFBA8100032B2C /* subpixel_mmx.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; name = subpixel_mmx.asm; path = ../../external/src/libvpx/vp8/common/x86/subpixel_mmx.asm; sourceTree = "<group>"; };
 		26050B2220CFBD6B00032B2C /* jmemmgr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jmemmgr.c; path = ../../external/src/libjpeg/jmemmgr.c; sourceTree = "<group>"; };
 		26050B2520CFBDD300032B2C /* systemdependent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = systemdependent.c; path = ../../external/src/libvpx/vp8/common/generic/systemdependent.c; sourceTree = "<group>"; };
+		26072FFD20D97B66004EB272 /* url_request_curl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url_request_curl.cpp; sourceTree = "<group>"; };
+		2607300220D985BF004EB272 /* url_request_common.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = url_request_common.inc; sourceTree = "<group>"; };
 		2609E5591E37E03A00CFBDBB /* timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = timer.cpp; sourceTree = "<group>"; };
 		260A402D1D2AAAD8009CFCE8 /* render_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_resource.cpp; sourceTree = "<group>"; };
 		260A402F1D2AAAE3009CFCE8 /* ui_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_resource.cpp; sourceTree = "<group>"; };
@@ -1599,9 +1602,9 @@
 		2648D5451D096A8B00819E09 /* ui_app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_app.cpp; sourceTree = "<group>"; };
 		2648D57F1D0999F700819E09 /* ui_platform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_platform.cpp; sourceTree = "<group>"; };
 		2649C2341CBBCB54003E7561 /* common_dialogs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = common_dialogs.cpp; sourceTree = "<group>"; };
-		2649C2361CBBCB7E003E7561 /* common_dialogs_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = common_dialogs_osx.mm; sourceTree = "<group>"; };
+		2649C2361CBBCB7E003E7561 /* common_dialogs_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = common_dialogs_macos.mm; sourceTree = "<group>"; };
 		264A5D7B1CB6C9BF00FB0B08 /* ui_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_menu.cpp; sourceTree = "<group>"; };
-		264A5D7D1CB6C9C800FB0B08 /* ui_menu_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_menu_osx.mm; sourceTree = "<group>"; };
+		264A5D7D1CB6C9C800FB0B08 /* ui_menu_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_menu_macos.mm; sourceTree = "<group>"; };
 		2653358E1E2E8A5A00199C76 /* ui_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_animation.cpp; sourceTree = "<group>"; };
 		26599DB91BEA5DD2008659BB /* thread_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_pool.cpp; sourceTree = "<group>"; };
 		265EBF1F1C23041600AD81D9 /* database_cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_cursor.cpp; sourceTree = "<group>"; };
@@ -1642,14 +1645,14 @@
 		266DD4A51C11940A00D47AB0 /* audio_codec.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_codec.cpp; sourceTree = "<group>"; };
 		266DD4A61C11940A00D47AB0 /* audio_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_format.cpp; sourceTree = "<group>"; };
 		266DD4A71C11940A00D47AB0 /* audio_player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_player.cpp; sourceTree = "<group>"; };
-		266DD4AC1C11940A00D47AB0 /* audio_player_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = audio_player_osx.mm; sourceTree = "<group>"; };
+		266DD4AC1C11940A00D47AB0 /* audio_player_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = audio_player_macos.mm; sourceTree = "<group>"; };
 		266DD4AE1C11940A00D47AB0 /* audio_recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_recorder.cpp; sourceTree = "<group>"; };
-		266DD4B31C11940A00D47AB0 /* audio_recorder_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = audio_recorder_osx.mm; sourceTree = "<group>"; };
+		266DD4B31C11940A00D47AB0 /* audio_recorder_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = audio_recorder_macos.mm; sourceTree = "<group>"; };
 		266DD4B51C11940A00D47AB0 /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
 		266DD4B71C11940A00D47AB0 /* codec_opus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = codec_opus.cpp; sourceTree = "<group>"; };
 		266DD4B81C11940A00D47AB0 /* codec_vpx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = codec_vpx.cpp; sourceTree = "<group>"; };
-		266DD4B91C11940A00D47AB0 /* media_platform_osx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = media_platform_osx.h; sourceTree = "<group>"; };
-		266DD4BA1C11940A00D47AB0 /* media_platform_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = media_platform_osx.mm; sourceTree = "<group>"; };
+		266DD4B91C11940A00D47AB0 /* media_platform_macos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = media_platform_macos.h; sourceTree = "<group>"; };
+		266DD4BA1C11940A00D47AB0 /* media_platform_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = media_platform_macos.mm; sourceTree = "<group>"; };
 		266DD4BB1C11940A00D47AB0 /* video_capture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_capture.cpp; sourceTree = "<group>"; };
 		266DD4BC1C11940A00D47AB0 /* video_codec.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_codec.cpp; sourceTree = "<group>"; };
 		266DD4BE1C11940A00D47AB0 /* dns.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dns.cpp; sourceTree = "<group>"; };
@@ -1684,39 +1687,39 @@
 		266DD4E71C11940A00D47AB0 /* texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = texture.cpp; sourceTree = "<group>"; };
 		266DD4E81C11940A00D47AB0 /* vertex_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vertex_buffer.cpp; sourceTree = "<group>"; };
 		266DD4EA1C11940A00D47AB0 /* button.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = button.cpp; sourceTree = "<group>"; };
-		266DD4ED1C11940A00D47AB0 /* button_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = button_osx.mm; sourceTree = "<group>"; };
+		266DD4ED1C11940A00D47AB0 /* button_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = button_macos.mm; sourceTree = "<group>"; };
 		266DD4F21C11940A00D47AB0 /* check_box.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = check_box.cpp; sourceTree = "<group>"; };
-		266DD4F31C11940A00D47AB0 /* check_box_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = check_box_osx.mm; sourceTree = "<group>"; };
+		266DD4F31C11940A00D47AB0 /* check_box_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = check_box_macos.mm; sourceTree = "<group>"; };
 		266DD4F51C11940A00D47AB0 /* cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cursor.cpp; sourceTree = "<group>"; };
-		266DD4F61C11940A00D47AB0 /* cursor_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cursor_osx.mm; sourceTree = "<group>"; };
+		266DD4F61C11940A00D47AB0 /* cursor_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cursor_macos.mm; sourceTree = "<group>"; };
 		266DD4FB1C11940A00D47AB0 /* select_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = select_view.cpp; sourceTree = "<group>"; };
-		266DD4FE1C11940A00D47AB0 /* select_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = select_view_osx.mm; sourceTree = "<group>"; };
+		266DD4FE1C11940A00D47AB0 /* select_view_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = select_view_macos.mm; sourceTree = "<group>"; };
 		266DD5001C11940A00D47AB0 /* edit_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = edit_view.cpp; sourceTree = "<group>"; };
-		266DD5031C11940A00D47AB0 /* edit_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = edit_view_osx.mm; sourceTree = "<group>"; };
+		266DD5031C11940A00D47AB0 /* edit_view_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = edit_view_macos.mm; sourceTree = "<group>"; };
 		266DD50C1C11940A00D47AB0 /* label_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = label_view.cpp; sourceTree = "<group>"; };
-		266DD50F1C11940A00D47AB0 /* label_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = label_view_osx.mm; sourceTree = "<group>"; };
+		266DD50F1C11940A00D47AB0 /* label_view_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = label_view_macos.mm; sourceTree = "<group>"; };
 		266DD5111C11940A00D47AB0 /* list_report_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_report_view.cpp; sourceTree = "<group>"; };
-		266DD5121C11940A00D47AB0 /* list_report_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = list_report_view_osx.mm; sourceTree = "<group>"; };
+		266DD5121C11940A00D47AB0 /* list_report_view_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = list_report_view_macos.mm; sourceTree = "<group>"; };
 		266DD5141C11940A00D47AB0 /* radio_button.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = radio_button.cpp; sourceTree = "<group>"; };
-		266DD5151C11940A00D47AB0 /* radio_button_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = radio_button_osx.mm; sourceTree = "<group>"; };
+		266DD5151C11940A00D47AB0 /* radio_button_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = radio_button_macos.mm; sourceTree = "<group>"; };
 		266DD5171C11940A00D47AB0 /* render_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_view.cpp; sourceTree = "<group>"; };
-		266DD51A1C11940A00D47AB0 /* render_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = render_view_osx.mm; sourceTree = "<group>"; };
+		266DD51A1C11940A00D47AB0 /* render_view_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = render_view_macos.mm; sourceTree = "<group>"; };
 		266DD51E1C11940A00D47AB0 /* image_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image_view.cpp; sourceTree = "<group>"; };
 		266DD5231C11940A00D47AB0 /* scroll_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scroll_view.cpp; sourceTree = "<group>"; };
-		266DD5261C11940A00D47AB0 /* scroll_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = scroll_view_osx.mm; sourceTree = "<group>"; };
+		266DD5261C11940A00D47AB0 /* scroll_view_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = scroll_view_macos.mm; sourceTree = "<group>"; };
 		266DD5281C11940A00D47AB0 /* tab_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tab_view.cpp; sourceTree = "<group>"; };
-		266DD5291C11940A00D47AB0 /* tab_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = tab_view_osx.mm; sourceTree = "<group>"; };
+		266DD5291C11940A00D47AB0 /* tab_view_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = tab_view_macos.mm; sourceTree = "<group>"; };
 		266DD52B1C11940A00D47AB0 /* ui_core.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_core.cpp; sourceTree = "<group>"; };
-		266DD52E1C11940A00D47AB0 /* ui_core_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_core_osx.mm; sourceTree = "<group>"; };
+		266DD52E1C11940A00D47AB0 /* ui_core_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_core_macos.mm; sourceTree = "<group>"; };
 		266DD5301C11940A00D47AB0 /* ui_event.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_event.cpp; sourceTree = "<group>"; };
-		266DD5331C11940A00D47AB0 /* ui_event_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_event_osx.mm; sourceTree = "<group>"; };
+		266DD5331C11940A00D47AB0 /* ui_event_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_event_macos.mm; sourceTree = "<group>"; };
 		266DD5361C11940A00D47AB0 /* view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view.cpp; sourceTree = "<group>"; };
-		266DD53C1C11940A00D47AB0 /* view_osx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = view_osx.h; sourceTree = "<group>"; };
-		266DD53D1C11940A00D47AB0 /* view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = view_osx.mm; sourceTree = "<group>"; };
+		266DD53C1C11940A00D47AB0 /* view_macos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = view_macos.h; sourceTree = "<group>"; };
+		266DD53D1C11940A00D47AB0 /* view_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = view_macos.mm; sourceTree = "<group>"; };
 		266DD5401C11940A00D47AB0 /* web_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = web_view.cpp; sourceTree = "<group>"; };
-		266DD5431C11940A00D47AB0 /* web_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = web_view_osx.mm; sourceTree = "<group>"; };
+		266DD5431C11940A00D47AB0 /* web_view_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = web_view_macos.mm; sourceTree = "<group>"; };
 		266DD5451C11940A00D47AB0 /* window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = "<group>"; };
-		266DD5481C11940A00D47AB0 /* window_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = window_osx.mm; sourceTree = "<group>"; };
+		266DD5481C11940A00D47AB0 /* window_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = window_macos.mm; sourceTree = "<group>"; };
 		266F12B21C97A13F00DE26FF /* block_cipher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = block_cipher.cpp; sourceTree = "<group>"; };
 		267C16B81CE779D8000318C2 /* scroll_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scroll_bar.cpp; sourceTree = "<group>"; };
 		267D008B1E32AA5A002CC949 /* render_drawable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_drawable.cpp; sourceTree = "<group>"; };
@@ -1811,7 +1814,7 @@
 		26FBC26C1DF9E83F00D76774 /* function.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = function.cpp; sourceTree = "<group>"; };
 		26FBDE4E1DA2B3EC00FF1B55 /* canvas_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = canvas_quartz.mm; sourceTree = "<group>"; };
 		26FBDE541DA2B3F700FF1B55 /* drawable_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = drawable_quartz.mm; sourceTree = "<group>"; };
-		26FBDE591DA2B40700FF1B55 /* font_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = font_apple.mm; sourceTree = "<group>"; };
+		26FBDE591DA2B40700FF1B55 /* font_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = font_quartz.mm; sourceTree = "<group>"; };
 		26FBDE621DA2B41700FF1B55 /* graphics_path_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = graphics_path_quartz.mm; sourceTree = "<group>"; };
 		26FBDE661DA2B48800FF1B55 /* bitmap_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = bitmap_quartz.mm; sourceTree = "<group>"; };
 		26FBDE681DA2BDE900FF1B55 /* graphics_platform_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = graphics_platform_apple.mm; sourceTree = "<group>"; };
@@ -3096,19 +3099,19 @@
 				266DD4A71C11940A00D47AB0 /* audio_player.cpp */,
 				26C72AC51E2150E200F7D6D0 /* audio_player_dsound.cpp */,
 				26C72AC61E2150E200F7D6D0 /* audio_player_opensl_es.cpp */,
-				266DD4AC1C11940A00D47AB0 /* audio_player_osx.mm */,
+				266DD4AC1C11940A00D47AB0 /* audio_player_macos.mm */,
 				266DD4AE1C11940A00D47AB0 /* audio_recorder.cpp */,
 				26C72AC91E2150EE00F7D6D0 /* audio_recorder_dsound.cpp */,
 				26C72ACA1E2150EE00F7D6D0 /* audio_recorder_opensl_es.cpp */,
-				266DD4B31C11940A00D47AB0 /* audio_recorder_osx.mm */,
+				266DD4B31C11940A00D47AB0 /* audio_recorder_macos.mm */,
 				26694BF61C9AB4330047E67C /* audio_util.cpp */,
 				266DD4B51C11940A00D47AB0 /* camera.cpp */,
 				26D8AC891E393CE50092EB81 /* camera_apple.mm */,
 				26C72ACD1E2150F900F7D6D0 /* camera_dshow.cpp */,
 				266DD4B71C11940A00D47AB0 /* codec_opus.cpp */,
 				266DD4B81C11940A00D47AB0 /* codec_vpx.cpp */,
-				266DD4B91C11940A00D47AB0 /* media_platform_osx.h */,
-				266DD4BA1C11940A00D47AB0 /* media_platform_osx.mm */,
+				266DD4B91C11940A00D47AB0 /* media_platform_macos.h */,
+				266DD4BA1C11940A00D47AB0 /* media_platform_macos.mm */,
 				26D8AC8D1E393F010092EB81 /* media_player.cpp */,
 				26D8AC8C1E393F010092EB81 /* media_player_apple.mm */,
 				266DD4BB1C11940A00D47AB0 /* video_capture.cpp */,
@@ -3145,7 +3148,9 @@
 				266DD4D71C11940A00D47AB0 /* tcpip.cpp */,
 				26C13E421DDA30FD00612945 /* url.cpp */,
 				26C13E441DDA32F000612945 /* url_request.cpp */,
+				2607300220D985BF004EB272 /* url_request_common.inc */,
 				26C13E461DDA516D00612945 /* url_request_apple.mm */,
+				26072FFD20D97B66004EB272 /* url_request_curl.cpp */,
 			);
 			path = network;
 			sourceTree = "<group>";
@@ -3175,23 +3180,23 @@
 			isa = PBXGroup;
 			children = (
 				266DD4EA1C11940A00D47AB0 /* button.cpp */,
-				266DD4ED1C11940A00D47AB0 /* button_osx.mm */,
+				266DD4ED1C11940A00D47AB0 /* button_macos.mm */,
 				2688DD861C16FBDF00973672 /* camera_view.cpp */,
 				266DD4F21C11940A00D47AB0 /* check_box.cpp */,
-				266DD4F31C11940A00D47AB0 /* check_box_osx.mm */,
+				266DD4F31C11940A00D47AB0 /* check_box_macos.mm */,
 				2649C2341CBBCB54003E7561 /* common_dialogs.cpp */,
-				2649C2361CBBCB7E003E7561 /* common_dialogs_osx.mm */,
+				2649C2361CBBCB7E003E7561 /* common_dialogs_macos.mm */,
 				266DD4F51C11940A00D47AB0 /* cursor.cpp */,
-				266DD4F61C11940A00D47AB0 /* cursor_osx.mm */,
+				266DD4F61C11940A00D47AB0 /* cursor_macos.mm */,
 				266DD5001C11940A00D47AB0 /* edit_view.cpp */,
-				266DD5031C11940A00D47AB0 /* edit_view_osx.mm */,
+				266DD5031C11940A00D47AB0 /* edit_view_macos.mm */,
 				E17DADF01E0C9A1E006161F6 /* gesture.cpp */,
 				266DD51E1C11940A00D47AB0 /* image_view.cpp */,
 				266DD50C1C11940A00D47AB0 /* label_view.cpp */,
-				266DD50F1C11940A00D47AB0 /* label_view_osx.mm */,
+				266DD50F1C11940A00D47AB0 /* label_view_macos.mm */,
 				26C7E37D1D00097000C0A769 /* linear_view.cpp */,
 				266DD5111C11940A00D47AB0 /* list_report_view.cpp */,
-				266DD5121C11940A00D47AB0 /* list_report_view_osx.mm */,
+				266DD5121C11940A00D47AB0 /* list_report_view_macos.mm */,
 				2699DC8F1D43682D0085EE67 /* list_view.cpp */,
 				2648D5431D096A7000819E09 /* mobile_app.cpp */,
 				2648D5411D0965C400819E09 /* mobile_game.cpp */,
@@ -3199,18 +3204,18 @@
 				E1B34E9E1E0A90C0006217F4 /* picker_view.cpp */,
 				26BB61391D872FB10049A5C3 /* progress_bar.cpp */,
 				266DD5141C11940A00D47AB0 /* radio_button.cpp */,
-				266DD5151C11940A00D47AB0 /* radio_button_osx.mm */,
+				266DD5151C11940A00D47AB0 /* radio_button_macos.mm */,
 				266DD5171C11940A00D47AB0 /* render_view.cpp */,
-				266DD51A1C11940A00D47AB0 /* render_view_osx.mm */,
+				266DD51A1C11940A00D47AB0 /* render_view_macos.mm */,
 				267C16B81CE779D8000318C2 /* scroll_bar.cpp */,
 				266DD5231C11940A00D47AB0 /* scroll_view.cpp */,
-				266DD5261C11940A00D47AB0 /* scroll_view_osx.mm */,
+				266DD5261C11940A00D47AB0 /* scroll_view_macos.mm */,
 				266DD4FB1C11940A00D47AB0 /* select_view.cpp */,
-				266DD4FE1C11940A00D47AB0 /* select_view_osx.mm */,
+				266DD4FE1C11940A00D47AB0 /* select_view_macos.mm */,
 				E1CC6F921D8FC21000C491E5 /* slider.cpp */,
 				26AE7CCB1D8450F80095AACA /* split_view.cpp */,
 				266DD5281C11940A00D47AB0 /* tab_view.cpp */,
-				266DD5291C11940A00D47AB0 /* tab_view_osx.mm */,
+				266DD5291C11940A00D47AB0 /* tab_view_macos.mm */,
 				26B1C9A01DC7ABB60092C84F /* text_view.cpp */,
 				26C4E26A1DB47A7200A9211F /* transition.cpp */,
 				26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */,
@@ -3222,23 +3227,23 @@
 				2682C3F21E2D5D0800E9CB98 /* ui_core_apple.mm */,
 				2682C3F71E2D639B00E9CB98 /* ui_core_common.cpp */,
 				2682C3F81E2D639B00E9CB98 /* ui_core_common.h */,
-				266DD52E1C11940A00D47AB0 /* ui_core_osx.mm */,
+				266DD52E1C11940A00D47AB0 /* ui_core_macos.mm */,
 				266DD5301C11940A00D47AB0 /* ui_event.cpp */,
-				266DD5331C11940A00D47AB0 /* ui_event_osx.mm */,
+				266DD5331C11940A00D47AB0 /* ui_event_macos.mm */,
 				264A5D7B1CB6C9BF00FB0B08 /* ui_menu.cpp */,
-				264A5D7D1CB6C9C800FB0B08 /* ui_menu_osx.mm */,
+				264A5D7D1CB6C9C800FB0B08 /* ui_menu_macos.mm */,
 				2648D57F1D0999F700819E09 /* ui_platform.cpp */,
 				260A402F1D2AAAE3009CFCE8 /* ui_resource.cpp */,
 				26FBB34A1ED5581F0086C27A /* ui_text.cpp */,
 				2688DD841C16F6E200973672 /* video_view.cpp */,
 				266DD5361C11940A00D47AB0 /* view.cpp */,
-				266DD53C1C11940A00D47AB0 /* view_osx.h */,
-				266DD53D1C11940A00D47AB0 /* view_osx.mm */,
+				266DD53C1C11940A00D47AB0 /* view_macos.h */,
+				266DD53D1C11940A00D47AB0 /* view_macos.mm */,
 				26BBBEC71D8FDF1F00735947 /* view_page.cpp */,
 				266DD5401C11940A00D47AB0 /* web_view.cpp */,
-				266DD5431C11940A00D47AB0 /* web_view_osx.mm */,
+				266DD5431C11940A00D47AB0 /* web_view_macos.mm */,
 				266DD5451C11940A00D47AB0 /* window.cpp */,
-				266DD5481C11940A00D47AB0 /* window_osx.mm */,
+				266DD5481C11940A00D47AB0 /* window_macos.mm */,
 			);
 			path = ui;
 			sourceTree = "<group>";
@@ -3269,7 +3274,7 @@
 				26C1B63A20D5162100E36539 /* drawable_ext.cpp */,
 				26FBDE541DA2B3F700FF1B55 /* drawable_quartz.mm */,
 				266DD4841C1193C400D47AB0 /* font.cpp */,
-				26FBDE591DA2B40700FF1B55 /* font_apple.mm */,
+				26FBDE591DA2B40700FF1B55 /* font_quartz.mm */,
 				26B89A6B1DC3467B00ABE895 /* font_atlas.cpp */,
 				266DD4831C1193C400D47AB0 /* font_freetype.cpp */,
 				266DD4861C1193C400D47AB0 /* graphics_path.cpp */,
@@ -4582,14 +4587,14 @@
 				26D9D9A01E96467B005F7BD3 /* network_os.cpp in Sources */,
 				26D9D9E81E96468D005F7BD3 /* ui_resource.cpp in Sources */,
 				26D9D8FA1E9645CE005F7BD3 /* compress_zlib.cpp in Sources */,
-				26D9D9C51E96468D005F7BD3 /* list_report_view_osx.mm in Sources */,
-				26D9D9851E964675005F7BD3 /* audio_recorder_osx.mm in Sources */,
+				26D9D9C51E96468D005F7BD3 /* list_report_view_macos.mm in Sources */,
+				26D9D9851E964675005F7BD3 /* audio_recorder_macos.mm in Sources */,
 				26D9D8FB1E9645CE005F7BD3 /* atomic.cpp in Sources */,
 				26D9D9AF1E964683005F7BD3 /* render_engine.cpp in Sources */,
 				26D9D8FC1E9645CE005F7BD3 /* preference.cpp in Sources */,
 				26D9D8FD1E9645CE005F7BD3 /* animation.cpp in Sources */,
 				26D9D95E1E964662005F7BD3 /* geo_rectangle.cpp in Sources */,
-				26D9D9B81E96468D005F7BD3 /* check_box_osx.mm in Sources */,
+				26D9D9B81E96468D005F7BD3 /* check_box_macos.mm in Sources */,
 				26D9D9731E96466A005F7BD3 /* graphics_text.cpp in Sources */,
 				26D9D9941E96467B005F7BD3 /* ethernet.cpp in Sources */,
 				26C1B63E20D51D1D00E36539 /* drawable_quartz.mm in Sources */,
@@ -4614,7 +4619,7 @@
 				26D9D98B1E964675005F7BD3 /* codec_vpx.cpp in Sources */,
 				26D9D97B1E964675005F7BD3 /* audio_codec.cpp in Sources */,
 				26C1B62C20D4305100E36539 /* bitmap.cpp in Sources */,
-				26D9D9CF1E96468D005F7BD3 /* render_view_osx.mm in Sources */,
+				26D9D9CF1E96468D005F7BD3 /* render_view_macos.mm in Sources */,
 				26D9D9061E9645CE005F7BD3 /* crypto_hash.cpp in Sources */,
 				26D9D9CA1E96468D005F7BD3 /* picker_view.cpp in Sources */,
 				26D9D9071E9645CE005F7BD3 /* thread_apple.mm in Sources */,
@@ -4638,24 +4643,24 @@
 				26D9D9861E964675005F7BD3 /* audio_util.cpp in Sources */,
 				26D9D9A21E96467B005F7BD3 /* socket_address.cpp in Sources */,
 				26D9D9C11E96468D005F7BD3 /* label_view.cpp in Sources */,
-				26D9D98C1E964675005F7BD3 /* media_platform_osx.mm in Sources */,
+				26D9D98C1E964675005F7BD3 /* media_platform_macos.mm in Sources */,
 				26D9D90C1E9645CE005F7BD3 /* spin_lock.cpp in Sources */,
 				26D9D95B1E964662005F7BD3 /* earth.cpp in Sources */,
 				26D9D9D01E96468D005F7BD3 /* scroll_bar.cpp in Sources */,
 				26D9D90D1E9645CE005F7BD3 /* charset.cpp in Sources */,
 				26D9D9CC1E96468D005F7BD3 /* radio_button.cpp in Sources */,
-				26D9D9EE1E96468D005F7BD3 /* web_view_osx.mm in Sources */,
-				26D9D9CD1E96468D005F7BD3 /* radio_button_osx.mm in Sources */,
+				26D9D9EE1E96468D005F7BD3 /* web_view_macos.mm in Sources */,
+				26D9D9CD1E96468D005F7BD3 /* radio_button_macos.mm in Sources */,
 				26D9D90E1E9645CE005F7BD3 /* string.cpp in Sources */,
 				26D9D9741E96466A005F7BD3 /* graphics_util.cpp in Sources */,
 				26D9D90F1E9645CE005F7BD3 /* mutex.cpp in Sources */,
-				26D9D9E41E96468D005F7BD3 /* ui_event_osx.mm in Sources */,
+				26D9D9E41E96468D005F7BD3 /* ui_event_macos.mm in Sources */,
 				26D9D98D1E964675005F7BD3 /* media_player.cpp in Sources */,
 				26D9D9D51E96468D005F7BD3 /* slider.cpp in Sources */,
 				26D9D9651E964669005F7BD3 /* brush.cpp in Sources */,
 				26D9D9101E9645CE005F7BD3 /* math.cpp in Sources */,
 				26D9D9561E964659005F7BD3 /* database.cpp in Sources */,
-				26D9D9D81E96468D005F7BD3 /* tab_view_osx.mm in Sources */,
+				26D9D9D81E96468D005F7BD3 /* tab_view_macos.mm in Sources */,
 				26D9D9621E964669005F7BD3 /* bitmap_data.cpp in Sources */,
 				26D9D9111E9645CE005F7BD3 /* xml.cpp in Sources */,
 				26D9D9D31E96468D005F7BD3 /* select_view.cpp in Sources */,
@@ -4679,7 +4684,7 @@
 				26D9D99A1E96467B005F7BD3 /* nat.cpp in Sources */,
 				26D9D9181E9645CE005F7BD3 /* json.cpp in Sources */,
 				26D9D9191E9645CE005F7BD3 /* java.cpp in Sources */,
-				26D9D9E21E96468D005F7BD3 /* ui_core_osx.mm in Sources */,
+				26D9D9E21E96468D005F7BD3 /* ui_core_macos.mm in Sources */,
 				26D9D97C1E964675005F7BD3 /* audio_data.cpp in Sources */,
 				26D9D9F41E968240005F7BD3 /* http_io.cpp in Sources */,
 				26D9D91A1E9645CE005F7BD3 /* setting.cpp in Sources */,
@@ -4688,10 +4693,10 @@
 				26D9D9B21E964683005F7BD3 /* texture.cpp in Sources */,
 				26D9D91C1E9645CE005F7BD3 /* pipe_unix.cpp in Sources */,
 				26D9D9751E96466A005F7BD3 /* image_jpeg.cpp in Sources */,
-				26D9D9D41E96468D005F7BD3 /* select_view_osx.mm in Sources */,
+				26D9D9D41E96468D005F7BD3 /* select_view_macos.mm in Sources */,
 				26D9D9B01E964683005F7BD3 /* render_program.cpp in Sources */,
 				26D9D91D1E9645CE005F7BD3 /* transform2d.cpp in Sources */,
-				26D9D9E61E96468D005F7BD3 /* ui_menu_osx.mm in Sources */,
+				26D9D9E61E96468D005F7BD3 /* ui_menu_macos.mm in Sources */,
 				26D9D91E1E9645CE005F7BD3 /* resource.cpp in Sources */,
 				26D9D9DD1E96468D005F7BD3 /* ui_animation_apple.mm in Sources */,
 				26D9D91F1E9645CE005F7BD3 /* ref.cpp in Sources */,
@@ -4706,12 +4711,12 @@
 				26D9D9951E96467B005F7BD3 /* http_common.cpp in Sources */,
 				26D9D9BF1E96468D005F7BD3 /* gesture.cpp in Sources */,
 				26D9D9231E9645CE005F7BD3 /* bezier.cpp in Sources */,
-				26D9D9C21E96468D005F7BD3 /* label_view_osx.mm in Sources */,
+				26D9D9C21E96468D005F7BD3 /* label_view_macos.mm in Sources */,
 				26D9D99E1E96467B005F7BD3 /* network_async_unix.cpp in Sources */,
 				26D9D9241E9645CE005F7BD3 /* sha1.cpp in Sources */,
 				26D9D9901E964675005F7BD3 /* video_codec.cpp in Sources */,
 				26D9D9251E9645CE005F7BD3 /* sha2.cpp in Sources */,
-				26D9D9BC1E96468D005F7BD3 /* cursor_osx.mm in Sources */,
+				26D9D9BC1E96468D005F7BD3 /* cursor_macos.mm in Sources */,
 				26D9D9DB1E96468D005F7BD3 /* tree_view.cpp in Sources */,
 				26D9D9261E9645CE005F7BD3 /* file.cpp in Sources */,
 				26D9D9DA1E96468D005F7BD3 /* transition.cpp in Sources */,
@@ -4726,7 +4731,7 @@
 				26D9D9801E964675005F7BD3 /* audio_player_opensl_es.cpp in Sources */,
 				26D9D9291E9645CE005F7BD3 /* line.cpp in Sources */,
 				26D9D9AD1E964683005F7BD3 /* render_canvas.cpp in Sources */,
-				26D9D9D21E96468D005F7BD3 /* scroll_view_osx.mm in Sources */,
+				26D9D9D21E96468D005F7BD3 /* scroll_view_macos.mm in Sources */,
 				26D9D9691E96466A005F7BD3 /* drawable.cpp in Sources */,
 				26D9D92A1E9645CE005F7BD3 /* platform_apple.mm in Sources */,
 				26D9D9D71E96468D005F7BD3 /* tab_view.cpp in Sources */,
@@ -4736,7 +4741,7 @@
 				26D9D95F1E964662005F7BD3 /* globe.cpp in Sources */,
 				26D9D9C81E96468D005F7BD3 /* mobile_game.cpp in Sources */,
 				26D9D92D1E9645CE005F7BD3 /* system_apple.mm in Sources */,
-				26D9D9F01E96468D005F7BD3 /* window_osx.mm in Sources */,
+				26D9D9F01E96468D005F7BD3 /* window_macos.mm in Sources */,
 				26D9D9B11E964683005F7BD3 /* render_resource.cpp in Sources */,
 				26D9D9BD1E96468D005F7BD3 /* edit_view.cpp in Sources */,
 				26D9D99D1E96467B005F7BD3 /* network_async.cpp in Sources */,
@@ -4750,7 +4755,7 @@
 				26D9D9601E964662005F7BD3 /* latlon.cpp in Sources */,
 				26D9D9E71E96468D005F7BD3 /* ui_platform.cpp in Sources */,
 				26D9D9C91E96468D005F7BD3 /* motion_tracker.cpp in Sources */,
-				26D9D9B51E96468D005F7BD3 /* button_osx.mm in Sources */,
+				26D9D9B51E96468D005F7BD3 /* button_macos.mm in Sources */,
 				26D9D92E1E9645CE005F7BD3 /* box.cpp in Sources */,
 				26C1B63C20D51D1D00E36539 /* bitmap_quartz.mm in Sources */,
 				26D9D9DE1E96468D005F7BD3 /* ui_app.cpp in Sources */,
@@ -4760,7 +4765,7 @@
 				26D9D9311E9645CE005F7BD3 /* asset.cpp in Sources */,
 				26D9D9321E9645CE005F7BD3 /* vector2.cpp in Sources */,
 				26D9D9A51E96467B005F7BD3 /* tcpip.cpp in Sources */,
-				26D9D9EB1E96468D005F7BD3 /* view_osx.mm in Sources */,
+				26D9D9EB1E96468D005F7BD3 /* view_macos.mm in Sources */,
 				26D9D9331E9645CE005F7BD3 /* pipe.cpp in Sources */,
 				26D9D9341E9645CE005F7BD3 /* md5.cpp in Sources */,
 				26D9D98A1E964675005F7BD3 /* codec_opus.cpp in Sources */,
@@ -4771,7 +4776,7 @@
 				26D9D97F1E964675005F7BD3 /* audio_player_dsound.cpp in Sources */,
 				26D9D9371E9645CE005F7BD3 /* thread_pool.cpp in Sources */,
 				26D9D9881E964675005F7BD3 /* camera_apple.mm in Sources */,
-				26C1B64020D51D1D00E36539 /* font_apple.mm in Sources */,
+				26C1B64020D51D1D00E36539 /* font_quartz.mm in Sources */,
 				26D9D9381E9645CE005F7BD3 /* base64.cpp in Sources */,
 				26D9D9391E9645CE005F7BD3 /* aes.cpp in Sources */,
 				26F2F8D91EC2E0EB0074C29E /* red_black_tree.cpp in Sources */,
@@ -4786,7 +4791,7 @@
 				26D9D93E1E9645CE005F7BD3 /* memory.cpp in Sources */,
 				26D9D93F1E9645CE005F7BD3 /* transform3d.cpp in Sources */,
 				26D9D9401E9645CE005F7BD3 /* vector3.cpp in Sources */,
-				26D9D9BA1E96468D005F7BD3 /* common_dialogs_osx.mm in Sources */,
+				26D9D9BA1E96468D005F7BD3 /* common_dialogs_macos.mm in Sources */,
 				26D9D99B1E96467B005F7BD3 /* net_capture.cpp in Sources */,
 				26D9D9A71E96467B005F7BD3 /* url_request.cpp in Sources */,
 				26C1B64320D51D1D00E36539 /* graphics_path_quartz.mm in Sources */,
@@ -4795,7 +4800,7 @@
 				26D9D9DF1E96468D005F7BD3 /* ui_core.cpp in Sources */,
 				26D9D9E91E96468D005F7BD3 /* video_view.cpp in Sources */,
 				26D9D9721E96466A005F7BD3 /* graphics_resource.cpp in Sources */,
-				26D9D9BE1E96468D005F7BD3 /* edit_view_osx.mm in Sources */,
+				26D9D9BE1E96468D005F7BD3 /* edit_view_macos.mm in Sources */,
 				26D9D95C1E964662005F7BD3 /* geo_line.cpp in Sources */,
 				26D9D9C61E96468D005F7BD3 /* list_view.cpp in Sources */,
 				26D9D9F11E964693005F7BD3 /* web_controller.cpp in Sources */,
@@ -4805,7 +4810,7 @@
 				26D9D9421E9645CE005F7BD3 /* rectangle.cpp in Sources */,
 				26D9D98E1E964675005F7BD3 /* media_player_apple.mm in Sources */,
 				26D9D9931E96467B005F7BD3 /* dns.cpp in Sources */,
-				26D9D9811E964675005F7BD3 /* audio_player_osx.mm in Sources */,
+				26D9D9811E964675005F7BD3 /* audio_player_macos.mm in Sources */,
 				26D9D9431E9645CE005F7BD3 /* file_unix.cpp in Sources */,
 				26D9D9441E9645CE005F7BD3 /* line3.cpp in Sources */,
 				26D9D9451E9645CE005F7BD3 /* object.cpp in Sources */,
@@ -4817,6 +4822,7 @@
 				26D9D9491E9645CE005F7BD3 /* triangle.cpp in Sources */,
 				26D9D94A1E9645CE005F7BD3 /* system.cpp in Sources */,
 				26D9D9CB1E96468D005F7BD3 /* progress_bar.cpp in Sources */,
+				26072FFE20D97B66004EB272 /* url_request_curl.cpp in Sources */,
 				26D9D97D1E964675005F7BD3 /* audio_format.cpp in Sources */,
 				26D9D94B1E9645CE005F7BD3 /* io.cpp in Sources */,
 				26D9D94C1E9645CE005F7BD3 /* locale.cpp in Sources */,

@@ -10,7 +10,7 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_PLATFORM_IS_APPLE)
+#if defined(SLIB_GRAPHICS_IS_QUARTZ)
 
 #include "slib/graphics/path.h"
 

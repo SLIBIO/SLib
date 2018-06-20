@@ -10,7 +10,7 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_PLATFORM_IS_WINDOWS)
+#if defined(SLIB_PLATFORM_IS_WIN32)
 
 #include <winsock2.h>
 #pragma comment(lib, "ws2_32.lib")

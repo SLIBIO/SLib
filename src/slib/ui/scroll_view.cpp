@@ -209,8 +209,7 @@ namespace slib
 	}
 	
 	
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
-	
+#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_WIN32) && !defined(SLIB_UI_IS_ANDROID)	
 	Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;
@@ -245,12 +244,9 @@ namespace slib
 	void ScrollView::_setBackgroundColor_NW(const Color& color)
 	{
 	}
-	
 #endif
 	
-	
-#if !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
-	
+#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
 	void ScrollView::_setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight)
 	{
 	}
@@ -258,9 +254,7 @@ namespace slib
 	void ScrollView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
 	{
 	}
-	
 #endif
-	
 	
 	HorizontalScrollView::HorizontalScrollView()
 	{

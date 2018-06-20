@@ -318,8 +318,7 @@ namespace slib
 	}
 	
 	
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_WIN32))
-	
+#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_WIN32)
 	Ref<ViewInstance> ListReportView::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;
@@ -356,6 +355,6 @@ namespace slib
 	void ListReportView::_setFont_NW(const Ref<Font>& font)
 	{
 	}
-	
 #endif
+
 }

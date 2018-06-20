@@ -89,7 +89,12 @@ namespace slib
 		m_flagDialog = sl_false;
 		m_flagBorderless = sl_false;
 		m_flagShowTitleBar = sl_true;
-		m_flagFullScreenOnCreate = SLIB_IF_PLATFORM_IS_MOBILE(sl_true, sl_false);
+		m_flagFullScreenOnCreate = 
+#ifdef SLIB_PLATFORM_IS_MOBILE
+			sl_true;
+#else
+			sl_false;
+#endif
 		m_flagCenterScreenOnCreate = sl_false;
 		
 		m_flagUseClientSizeRequested = sl_false;
@@ -851,7 +856,7 @@ namespace slib
 
 			attach(window, sl_false);
 			
-#if defined(SLIB_PLATFORM_IS_OSX) || defined(SLIB_PLATFORM_IS_IOS) || defined(SLIB_PLATFORM_IS_TIZEN)
+#if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_IOS) || defined(SLIB_UI_IS_EFL)
 			UISize sizeClient = getClientSize();
 			dispatchResize(sizeClient.x, sizeClient.y);
 #endif

@@ -15,65 +15,50 @@
 #	error "Slib needs at least a C++11 compliant compiler. Please enable C++11 in Project Settings"
 #endif
 
-/* Platforms */
-// Windows Platforms
-#define SLIB_PLATFORM_WIN32			0x01010000
-#define SLIB_PLATFORM_WIN64			0x01020000
-#define SLIB_PLATFORM_CYGWIN_WIN32	0x01A10000
-#define SLIB_PLATFORM_CYGWIN_WIN64	0x01A20000
-#define SLIB_PLATFORM_WP8			0x01880000
+/* Platform */
+// Windows Platform
+#define SLIB_PLATFORM_WIN32				0x01010000
+#define SLIB_PLATFORM_WIN64				0x01010001
+#define SLIB_PLATFORM_UWP				0x01020000	// Universal Windows Platform
+// Unix Platform
+#define SLIB_PLATFORM_LINUX				0x02010000	// RedHat, Fedora, CentOS, Debian, Ubuntu ...
+#define SLIB_PLATFORM_ANDROID			0x02010A00
+#define SLIB_PLATFORM_TIZEN				0x02010B00
+#define SLIB_PLATFORM_MACOS				0x02020100
+#define SLIB_PLATFORM_IOS				0x02020200
+#define SLIB_PLATFORM_IOS_SIMULATOR		0x02020201
+#define SLIB_PLATFORM_FREEBSD			0x02030000
+#define SLIB_PLATFORM_SOLARIS			0x02040000
 
-// Unix Platforms
-#define SLIB_PLATFORM_LINUX			0x02000000	/* RedHat, Fedora, CentOS, Debian, Ubuntu ... */
-#define SLIB_PLATFORM_FREEBSD		0x03000000
-#define SLIB_PLATFORM_SOLARIS		0x04000000
-// macOS&iOS Platforms
-#define SLIB_PLATFORM_OSX			0x08100000
-#define SLIB_PLATFORM_MACOS			SLIB_PLATFORM_OSX
-#define SLIB_PLATFORM_IOS			0x08210000
-#define SLIB_PLATFORM_IOS_SIMULATOR	0x08220000
-// Android Platforms
-#define SLIB_PLATFORM_ANDROID		0x0A010000
-// Tizen Platform
-#define SLIB_PLATFORM_TIZEN		    0x0B010000
+/* Graphics */
+#define SLIB_GRAPHICS_GDI		0x0100
+#define SLIB_GRAPHICS_QUARTZ	0x0200
+#define SLIB_GRAPHICS_CAIRO		0x0300
+#define SLIB_GRAPHICS_ANDROID	0x0400
 
-#define SLIB_PLATFORM_TYPE			(SLIB_PLATFORM & 0xFFFF0000)
-#define SLIB_PLATFORM_VERSION		(SLIB_PLATFORM & 0x0000FFFF)
+/* UI Framework */
+#define SLIB_UI_WIN32			0x0100
+#define SLIB_UI_MACOS			0x0200 // Cocoa
+#define SLIB_UI_IOS				0x0201 // Cocoa Touch
+#define SLIB_UI_ANDROID			0x0300
+#define SLIB_UI_GTK				0x0400
+#define SLIB_UI_EFL				0x0500
 
-/* Compilers */
-#define SLIB_COMPILER_VC		0x00010000
-#define SLIB_COMPILER_GCC		0x00020000
-#define SLIB_COMPILER_OBJC		0x00030000
-
-#define SLIB_COMPILER_TYPE		(SLIB_COMPILER & 0xFFFF0000)
-#define SLIB_COMPILER_VERSION	(SLIB_COMPILER & 0x0000FFFF)
-
-#define SLIB_COMPILER_VC6		0x00010060
-#define SLIB_COMPILER_VC7		0x00010070
-#define SLIB_COMPILER_VC8		0x00010080
-#define SLIB_COMPILER_VC9		0x00010090
-#define SLIB_COMPILER_VC10		0x000100A0
-#define SLIB_COMPILER_VC11		0x000100B0
-#define SLIB_COMPILER_VC12		0x000100C0
+/* Compiler */
+#define SLIB_COMPILER_VC		0x0100
+#define SLIB_COMPILER_GCC		0x0200
+#define SLIB_COMPILER_OBJC		0x0300
 
 /*************************************
-	Platform Definition
+ 		Platform Definition
 **************************************/
 #ifndef SLIB_PLATFORM
-#	if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
-#		define SLIB_PLATFORM			SLIB_PLATFORM_WP8
+#	if defined(WINAPI_FAMILY)
+#		define SLIB_PLATFORM			SLIB_PLATFORM_UWP
 #	elif defined(_WIN64)
-#		if defined(__CYGWIN__)
-#			define SLIB_PLATFORM		SLIB_PLATFORM_CYGWIN_WIN64
-#		else
-#			define SLIB_PLATFORM		SLIB_PLATFORM_WIN64
-#		endif
+#		define SLIB_PLATFORM			SLIB_PLATFORM_WIN64
 #	elif defined(_WIN32)
-#		if defined(__CYGWIN__)
-#			define SLIB_PLATFORM		SLIB_PLATFORM_CYGWIN_WIN32
-#		else
-#			define SLIB_PLATFORM		SLIB_PLATFORM_WIN32
-#		endif
+#		define SLIB_PLATFORM			SLIB_PLATFORM_WIN32
 #	elif defined(__APPLE__) && defined(__MACH__)
 #		include <TargetConditionals.h>
 #		if TARGET_OS_IOS
@@ -89,166 +74,154 @@
 #		define SLIB_PLATFORM			SLIB_PLATFORM_ANDROID
 #	elif defined(TIZEN_DEPRECATION)
 #		define SLIB_PLATFORM			SLIB_PLATFORM_TIZEN
+#	elif defined(__linux__)
+#		define SLIB_PLATFORM			SLIB_PLATFORM_LINUX
 #	elif defined(__unix__) && defined(BSD)
 #		define SLIB_PLATFORM			SLIB_PLATFORM_FREEBSD
 #	elif defined(__unix__) && defined(__sun) && defined(__SVR4)
 #		define SLIB_PLATFORM			SLIB_PLATFORM_SOLARIS
-#	elif defined(__linux__)
-#		define SLIB_PLATFORM			SLIB_PLATFORM_LINUX
 #	endif
 #endif
-#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_WIN32)
+
+#if (SLIB_PLATFORM == SLIB_PLATFORM_WIN32)
 #	define SLIB_PLATFORM_IS_WIN32
 #	define SLIB_PLATFORM_IS_WINDOWS
 #	define SLIB_PLATFORM_IS_DESKTOP
 #endif
-#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_CYGWIN_WIN32)
-#	define SLIB_PLATFORM_IS_WIN32
-#	define SLIB_PLATFORM_IS_WINDOWS
-#	define SLIB_PLATFORM_IS_CYGWIN
-#	define SLIB_PLATFORM_IS_UNIX
-#	define SLIB_PLATFORM_IS_DESKTOP
-#endif
-#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_WIN64)
+#if (SLIB_PLATFORM == SLIB_PLATFORM_WIN64)
 #	define SLIB_PLATFORM_IS_WIN32
 #	define SLIB_PLATFORM_IS_WIN64
 #	define SLIB_PLATFORM_IS_WINDOWS
 #	define SLIB_PLATFORM_IS_DESKTOP
 #endif
-#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_CYGWIN_WIN64)
-#	define SLIB_PLATFORM_IS_WIN32
-#	define SLIB_PLATFORM_IS_WIN64
-#	define SLIB_PLATFORM_IS_WINDOWS
-#	define SLIB_PLATFORM_IS_CYGWIN
-#	define SLIB_PLATFORM_IS_UNIX
-#	define SLIB_PLATFORM_IS_DESKTOP
-#endif
-#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_WP8)
-#	define SLIB_PLATFORM_IS_WP8
-#	define SLIB_PLATFORM_IS_WINDOWS
-#	define SLIB_PLATFORM_IS_MOBILE
-#endif
-#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_LINUX)
-#	define SLIB_PLATFORM_IS_LINUX
-#	define SLIB_PLATFORM_IS_UNIX
-#	define SLIB_PLATFORM_IS_DESKTOP
-#endif
-#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_FREEBSD)
-#	define SLIB_PLATFORM_IS_FREEBSD
-#	define SLIB_PLATFORM_IS_UNIX
-#	define SLIB_PLATFORM_IS_DESKTOP
-#endif
-#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_SOLARIS)
-#	define SLIB_PLATFORM_IS_SOLARIS
-#	define SLIB_PLATFORM_IS_UNIX
-#	define SLIB_PLATFORM_IS_DESKTOP
-#endif
-#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_MACOS)
-#	define SLIB_PLATFORM_IS_OSX
+#if (SLIB_PLATFORM == SLIB_PLATFORM_MACOS)
 #	define SLIB_PLATFORM_IS_MACOS
 #	define SLIB_PLATFORM_IS_APPLE
 #	define SLIB_PLATFORM_IS_UNIX
 #	define SLIB_PLATFORM_IS_DESKTOP
 #endif
-#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_IOS)
+#if (SLIB_PLATFORM == SLIB_PLATFORM_IOS)
 #	define SLIB_PLATFORM_IS_IOS
 #	define SLIB_PLATFORM_IS_IOS_DEVICE
 #	define SLIB_PLATFORM_IS_APPLE
 #	define SLIB_PLATFORM_IS_UNIX
 #	define SLIB_PLATFORM_IS_MOBILE
 #endif
-#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_IOS_SIMULATOR)
+#if (SLIB_PLATFORM == SLIB_PLATFORM_IOS_SIMULATOR)
 #	define SLIB_PLATFORM_IS_IOS
 #	define SLIB_PLATFORM_IS_IOS_SIMULATOR
 #	define SLIB_PLATFORM_IS_APPLE
 #	define SLIB_PLATFORM_IS_UNIX
 #	define SLIB_PLATFORM_IS_MOBILE
 #endif
-#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_ANDROID)
+#if (SLIB_PLATFORM == SLIB_PLATFORM_ANDROID)
 #	define SLIB_PLATFORM_IS_ANDROID
 #	define SLIB_PLATFORM_IS_LINUX
 #	define SLIB_PLATFORM_IS_UNIX
 #	define SLIB_PLATFORM_IS_MOBILE
 #	define SLIB_PLATFORM_USE_JNI
 #endif
-#if (SLIB_PLATFORM_TYPE == SLIB_PLATFORM_TIZEN)
+#if (SLIB_PLATFORM == SLIB_PLATFORM_TIZEN)
 #	define SLIB_PLATFORM_IS_TIZEN
 #	define SLIB_PLATFORM_IS_LINUX
 #	define SLIB_PLATFORM_IS_UNIX
 #	define SLIB_PLATFORM_IS_MOBILE
 #endif
-
-
-#if defined(SLIB_PLATFORM_IS_DESKTOP)
-#	define SLIB_IF_PLATFORM_IS_DESKTOP(Y, N) Y
-#else
-#	define SLIB_IF_PLATFORM_IS_DESKTOP(Y, N) N
+#if (SLIB_PLATFORM == SLIB_PLATFORM_UWP)
+#	define SLIB_PLATFORM_IS_UWP
+#	define SLIB_PLATFORM_IS_WINDOWS
+#	define SLIB_PLATFORM_IS_MOBILE
+#endif
+#if (SLIB_PLATFORM == SLIB_PLATFORM_LINUX)
+#	define SLIB_PLATFORM_IS_LINUX
+#	define SLIB_PLATFORM_IS_UNIX
+#	define SLIB_PLATFORM_IS_DESKTOP
+#endif
+#if (SLIB_PLATFORM == SLIB_PLATFORM_FREEBSD)
+#	define SLIB_PLATFORM_IS_FREEBSD
+#	define SLIB_PLATFORM_IS_UNIX
+#	define SLIB_PLATFORM_IS_DESKTOP
+#endif
+#if (SLIB_PLATFORM == SLIB_PLATFORM_SOLARIS)
+#	define SLIB_PLATFORM_IS_SOLARIS
+#	define SLIB_PLATFORM_IS_UNIX
+#	define SLIB_PLATFORM_IS_DESKTOP
 #endif
 
-#if defined(SLIB_PLATFORM_IS_MOBILE)
-#	define SLIB_IF_PLATFORM_IS_MOBILE(Y, N) Y
+#ifdef SLIB_PLATFORM_IS_MACOS
+#	define SLIB_IF_PLATFORM_IS_MACOS(Y,N) (Y)
 #else
-#	define SLIB_IF_PLATFORM_IS_MOBILE(Y, N) N
-#endif
-
-#if defined(SLIB_PLATFORM_IS_WINDOWS)
-#	define SLIB_IF_PLATFORM_IS_WINDOWS(Y, N) Y
-#else
-#	define SLIB_IF_PLATFORM_IS_WINDOWS(Y, N) N
-#endif
-
-#if defined(SLIB_PLATFORM_IS_WIN32)
-#	define SLIB_IF_PLATFORM_IS_WIN32(Y, N) Y
-#else
-#	define SLIB_IF_PLATFORM_IS_WIN32(Y, N) N
-#endif
-
-#if defined(SLIB_PLATFORM_IS_UNIX)
-#	define SLIB_IF_PLATFORM_IS_UNIX(Y, N) Y
-#else
-#	define SLIB_IF_PLATFORM_IS_UNIX(Y, N) N
-#endif
-
-#if defined(SLIB_PLATFORM_IS_LINUX)
-#	define SLIB_IF_PLATFORM_IS_LINUX(Y, N) Y
-#else
-#	define SLIB_IF_PLATFORM_IS_LINUX(Y, N) N
-#endif
-
-#if defined(SLIB_PLATFORM_IS_ANDROID)
-#	define SLIB_IF_PLATFORM_IS_ANDROID(Y, N) Y
-#else
-#	define SLIB_IF_PLATFORM_IS_ANDROID(Y, N) N
-#endif
-
-#if defined(SLIB_PLATFORM_IS_APPLE)
-#	define SLIB_IF_PLATFORM_IS_APPLE(Y, N) Y
-#else
-#	define SLIB_IF_PLATFORM_IS_APPLE(Y, N) N
-#endif
-
-#if defined(SLIB_PLATFORM_IS_MACOS)
-#	define SLIB_IF_PLATFORM_IS_MACOS(Y, N) Y
-#	define SLIB_IF_PLATFORM_IS_OSX(Y, N) Y
-#else
-#	define SLIB_IF_PLATFORM_IS_MACOS(Y, N) N
-#	define SLIB_IF_PLATFORM_IS_OSX(Y, N) N
-#endif
-
-#if defined(SLIB_PLATFORM_IS_IOS)
-#	define SLIB_IF_PLATFORM_IS_IOS(Y, N) Y
-#else
-#	define SLIB_IF_PLATFORM_IS_IOS(Y, N) N
-#endif
-
-#if defined(SLIB_PLATFORM_IS_TIZEN)
-#	define SLIB_IF_PLATFORM_IS_TIZEN(Y, N) Y
-#else
-#	define SLIB_IF_PLATFORM_IS_TIZEN(Y, N) N
+#	define SLIB_IF_PLATFORM_IS_MACOS(Y,N) (N)
 #endif
 
 /*************************************
-	Compiler Definition
+ 		Graphics Definition
+**************************************/
+#ifndef SLIB_GRAPHICS
+#	if defined(SLIB_PLATFORM_IS_WIN32)
+#		define SLIB_GRAPHICS		SLIB_GRAPHICS_GDI
+#	elif defined(SLIB_PLATFORM_IS_APPLE)
+#		define SLIB_GRAPHICS		SLIB_GRAPHICS_QUARTZ
+#	elif defined(SLIB_PLATFORM_IS_ANDROID)
+#		define SLIB_GRAPHICS		SLIB_GRAPHICS_ANDROID
+#	elif defined(SLIB_PLATFORM_IS_LINUX)
+#		define SLIB_GRAPHICS		SLIB_GRAPHICS_CAIRO
+#	endif
+#endif
+
+#if (SLIB_GRAPHICS == SLIB_GRAPHICS_GDI)
+#	define SLIB_GRAPHICS_IS_GDI
+#endif
+#if (SLIB_GRAPHICS == SLIB_GRAPHICS_QUARTZ)
+#	define SLIB_GRAPHICS_IS_QUARTZ
+#endif
+#if (SLIB_GRAPHICS == SLIB_GRAPHICS_ANDROID)
+#	define SLIB_GRAPHICS_IS_ANDROID
+#endif
+#if (SLIB_GRAPHICS == SLIB_GRAPHICS_CAIRO)
+#	define SLIB_GRAPHICS_IS_CAIRO
+#endif
+
+/*************************************
+ 			UI Definition
+**************************************/
+#ifndef SLIB_UI
+#	if defined(SLIB_PLATFORM_IS_WIN32)
+#		define SLIB_UI			SLIB_UI_WIN32
+#	elif defined(SLIB_PLATFORM_IS_MACOS)
+#		define SLIB_UI			SLIB_UI_MACOS
+#	elif defined(SLIB_PLATFORM_IS_IOS)
+#		define SLIB_UI			SLIB_UI_IOS
+#	elif defined(SLIB_PLATFORM_IS_ANDROID)
+#		define SLIB_UI			SLIB_UI_ANDROID
+#	elif defined(SLIB_PLATFORM_IS_TIZEN)
+#		define SLIB_UI			SLIB_UI_EFL
+#	elif defined(SLIB_PLATFORM_IS_LINUX)
+#		define SLIB_UI			SLIB_UI_GTK
+#	endif
+#endif
+
+#if (SLIB_UI == SLIB_UI_WIN32)
+#	define SLIB_UI_IS_WIN32
+#endif
+#if (SLIB_UI == SLIB_UI_MACOS)
+#	define SLIB_UI_IS_MACOS
+#endif
+#if (SLIB_UI == SLIB_UI_IOS)
+#	define SLIB_UI_IS_IOS
+#endif
+#if (SLIB_UI == SLIB_UI_ANDROID)
+#	define SLIB_UI_IS_ANDROID
+#endif
+#if (SLIB_UI == SLIB_UI_GTK)
+#	define SLIB_UI_IS_GTK
+#endif
+#if (SLIB_UI == SLIB_UI_EFL)
+#	define SLIB_UI_IS_EFL
+#endif
+
+/*************************************
+ 		Compiler Definition
 **************************************/
 #ifndef SLIB_COMPILER
 #	if defined(_MSC_VER)
@@ -261,60 +234,21 @@
 #		endif
 #	endif
 #endif
-// Microsoft Visual Studio Sub-versions
+
 #if (SLIB_COMPILER == SLIB_COMPILER_VC)
-#undef SLIB_COMPILER
-#	ifdef _MSC_VER
-#		if _MSC_VER >= 1800
-#			define SLIB_COMPILER				SLIB_COMPILER_VC12
-#		elif _MSC_VER >= 1700
-#			define SLIB_COMPILER				SLIB_COMPILER_VC11
-#		elif _MSC_VER >= 1600
-#			define SLIB_COMPILER				SLIB_COMPILER_VC10
-#		elif _MSC_VER >= 1500
-#			define SLIB_COMPILER				SLIB_COMPILER_VC9
-#		elif _MSC_VER >= 1400
-#			define SLIB_COMPILER				SLIB_COMPILER_VC8
-#		elif _MSC_VER >= 1300
-#			define SLIB_COMPILER				SLIB_COMPILER_VC7
-#		elif _MSC_VER >= 1200
-#			define SLIB_COMPILER				SLIB_COMPILER_VC6
-#		endif
-#	endif
-#endif
-#if (SLIB_COMPILER_TYPE == SLIB_COMPILER_VC)
 #	define SLIB_COMPILER_IS_VC
 #endif
-#if (SLIB_COMPILER_TYPE == SLIB_COMPILER_GCC)
+#if (SLIB_COMPILER == SLIB_COMPILER_GCC)
 #	define SLIB_COMPILER_IS_GCC
 #endif
-#if (SLIB_COMPILER_TYPE == SLIB_COMPILER_OBJC)
+#if (SLIB_COMPILER == SLIB_COMPILER_OBJC)
 #	define SLIB_COMPILER_IS_GCC
 #	define SLIB_COMPILER_IS_OBJC
-#endif
-
-#if defined(SLIB_COMPILER_IS_VC)
-#	define SLIB_IF_COMPILER_IS_VC(Y, N) Y
-#else
-#	define SLIB_IF_COMPILER_IS_VC(Y, N) N
-#endif
-
-#if defined(SLIB_COMPILER_IS_GCC)
-#	define SLIB_IF_COMPILER_IS_GCC(Y, N) Y
-#else
-#	define SLIB_IF_COMPILER_IS_GCC(Y, N) N
-#endif
-
-#if defined(SLIB_COMPILER_IS_OBJC)
-#	define SLIB_IF_COMPILER_IS_OBJC(Y, N) Y
-#else
-#	define SLIB_IF_COMPILER_IS_OBJC(Y, N) N
 #endif
 
 /*************************************
 	Architecture Definition
 **************************************/
-
 #if defined(__amd64__) || defined(__x86_64__) || defined(_M_X64) || defined(_M_AMD64)
 #	define SLIB_ARCH_IS_X64
 #	define SLIB_ARCH_IS_64BIT
@@ -408,43 +342,6 @@
 #	ifndef SLIB_ARCH_IS_BIG_ENDIAN
 #		define SLIB_ARCH_IS_LITTLE_ENDIAN
 #	endif
-#endif
-
-
-#if defined(SLIB_ARCH_IS_32BIT)
-#	define SLIB_IF_ARCH_IS_32BIT(Y, N) Y
-#else
-#	define SLIB_IF_ARCH_IS_32BIT(Y, N) N
-#endif
-
-#if defined(SLIB_ARCH_IS_64BIT)
-#	define SLIB_IF_ARCH_IS_64BIT(Y, N) Y
-#else
-#	define SLIB_IF_ARCH_IS_64BIT(Y, N) N
-#endif
-
-#if defined(SLIB_ARCH_IS_ARM)
-#	define SLIB_IF_ARCH_IS_ARM(Y, N) Y
-#else
-#	define SLIB_IF_ARCH_IS_ARM(Y, N) N
-#endif
-
-#if defined(SLIB_ARCH_IS_ARM64)
-#	define SLIB_IF_ARCH_IS_ARM64(Y, N) Y
-#else
-#	define SLIB_IF_ARCH_IS_ARM64(Y, N) N
-#endif
-
-#if defined(SLIB_ARCH_IS_X86)
-#	define SLIB_IF_ARCH_IS_X86(Y, N) Y
-#else
-#	define SLIB_IF_ARCH_IS_X86(Y, N) N
-#endif
-
-#if defined(SLIB_ARCH_IS_X64)
-#	define SLIB_IF_ARCH_IS_X64(Y, N) Y
-#else
-#	define SLIB_IF_ARCH_IS_X64(Y, N) N
 #endif
 
 #endif

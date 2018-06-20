@@ -10,7 +10,7 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_PLATFORM_IS_APPLE)
+#if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_IOS)
 
 #include "slib/ui/core.h"
 #include "slib/core/platform_apple.h"

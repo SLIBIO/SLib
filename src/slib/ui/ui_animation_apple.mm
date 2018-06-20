@@ -10,13 +10,13 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_PLATFORM_IS_IOS) || defined(SLIB_PLATFORM_IS_MACOS)
+#if defined(SLIB_UI_IS_IOS) || defined(SLIB_UI_IS_MACOS)
 
 #include "ui_animation.h"
 
-#if defined(SLIB_PLATFORM_IS_MACOS)
+#if defined(SLIB_UI_IS_MACOS)
 
-#include "view_osx.h"
+#include "view_macos.h"
 #include <Quartz/Quartz.h>
 
 typedef NSView* NativeView;
@@ -92,7 +92,7 @@ namespace slib
 		
 		if (flagTranslate) {
 			CABasicAnimation* ca = [CABasicAnimation animationWithKeyPath:@"transform.translation"];
-#ifdef SLIB_PLATFORM_IS_OSX
+#ifdef SLIB_UI_IS_MACOS
 			ca.fromValue = [NSValue valueWithSize:CGSizeMake(translateStart.x, translateStart.y)];
 			ca.toValue = [NSValue valueWithSize:CGSizeMake(translateEnd.x, translateEnd.y)];
 #else

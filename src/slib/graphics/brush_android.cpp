@@ -10,7 +10,7 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_PLATFORM_IS_ANDROID)
+#if defined(SLIB_GRAPHICS_IS_ANDROID)
 
 #include "slib/graphics/brush.h"
 

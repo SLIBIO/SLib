@@ -13,7 +13,7 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_PLATFORM_IS_IOS)
+#if defined(SLIB_UI_IS_IOS)
 
 #include "slib/ui/view.h"
 #include "slib/ui/platform.h"

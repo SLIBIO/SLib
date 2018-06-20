@@ -222,13 +222,11 @@ namespace slib
 		}
 	}
 	
-#if !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
-	
+#if !(defined(SLIB_UI_IS_IOS)) && !(defined(SLIB_UI_IS_ANDROID))
 	sl_bool GestureDetector::_enableNative(const Ref<View>& view, GestureType type)
 	{
 		return sl_false;
 	}
-	
 #endif
 
 }

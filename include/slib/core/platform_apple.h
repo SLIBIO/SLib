@@ -19,7 +19,7 @@
 
 #ifdef __OBJC__
 #import <Foundation/Foundation.h>
-#ifdef SLIB_PLATFORM_IS_OSX
+#ifdef SLIB_PLATFORM_IS_MACOS
 #import <Cocoa/Cocoa.h>
 #endif
 #if defined(SLIB_PLATFORM_IS_IOS)
@@ -30,7 +30,7 @@
 namespace slib
 {
 
-	// specific functions for OSX & iOS
+	// specific functions for macOS & iOS
 	class SLIB_EXPORT Apple
 	{
 	public:

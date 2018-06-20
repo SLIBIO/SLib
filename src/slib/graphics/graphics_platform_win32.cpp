@@ -30,6 +30,42 @@ namespace slib
 		return ret;
 	}
 
+	HBITMAP GraphicsPlatform::createDIBFromBitmap(const Ref<Bitmap>& bitmap)
+	{
+		if (bitmap.isNotNull() && bitmap->isNotEmpty()) {
+
+			BITMAPINFOHEADER bi;
+			bi.biSize = sizeof(bi);
+			bi.biWidth = bitmap->getWidth();
+			bi.biHeight = bitmap->getHeight();
+			bi.biPlanes = 1;
+			bi.biBitCount = 32;
+			bi.biCompression = BI_RGB;
+			bi.biSizeImage = 0;
+			bi.biXPelsPerMeter = 1000;
+			bi.biYPelsPerMeter = 1000;
+			bi.biClrImportant = 0;
+			bi.biClrUsed = 0;
+
+			void* buf;
+			HBITMAP hbm = ::CreateDIBSection(NULL, (BITMAPINFO*)&bi, DIB_RGB_COLORS, &buf, NULL, 0);
+
+			if (hbm) {
+				BitmapData bd;
+				bd.format = BitmapFormat::BGRA_PA;
+				bd.width = bitmap->getWidth();
+				bd.height = bitmap->getHeight();
+				bd.data = (char*)buf + bd.width * 4 * (bd.height - 1);
+				bd.pitch = -((int)bd.width * 4);
+				if (bitmap->readPixels(0, 0, bd)) {
+					return hbm;
+				}
+				::DeleteObject(hbm);
+			}
+		}
+		return NULL;
+	}
+
 }
 
 #endif

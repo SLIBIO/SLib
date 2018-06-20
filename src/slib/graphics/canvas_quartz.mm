@@ -10,7 +10,7 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_PLATFORM_IS_APPLE)
+#if defined(SLIB_GRAPHICS_IS_QUARTZ)
 
 #include "slib/graphics/canvas.h"
 
@@ -549,7 +549,7 @@ namespace slib
 		}
 		
 		if (ciImage != nil) {
-#if defined(SLIB_PLATFORM_IS_OSX)
+#if defined(SLIB_PLATFORM_IS_MACOS)
 			NSGraphicsContext* oldContext = [NSGraphicsContext currentContext];
 			NSGraphicsContext* context = [NSGraphicsContext graphicsContextWithGraphicsPort:graphics flipped:NO];
 			[NSGraphicsContext setCurrentContext:context];
@@ -557,7 +557,7 @@ namespace slib
 			UIGraphicsPushContext(graphics);
 #endif
 			
-#if defined(SLIB_PLATFORM_IS_OSX)
+#if defined(SLIB_PLATFORM_IS_MACOS)
 			NSRect rectDst;
 #else
 			CGRect rectDst;
@@ -568,7 +568,7 @@ namespace slib
 			rectDst.size.width = _rectDst.getWidth();
 			rectDst.size.height = _rectDst.getHeight();
 					
-#if defined(SLIB_PLATFORM_IS_OSX)
+#if defined(SLIB_PLATFORM_IS_MACOS)
 			if (!flagFlipY) {
 				CGContextSaveGState(graphics);
 				CGContextTranslateCTM(graphics, 0, rectDst.origin.y + rectDst.size.height);
@@ -605,7 +605,7 @@ namespace slib
 #endif
 			
 
-#if defined(SLIB_PLATFORM_IS_OSX)
+#if defined(SLIB_PLATFORM_IS_MACOS)
 			[NSGraphicsContext setCurrentContext:oldContext];
 #else
 			UIGraphicsPopContext();

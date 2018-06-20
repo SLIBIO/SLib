@@ -37,7 +37,7 @@
     <ClCompile Include="..\..\src\slib\core\content_type.cpp" />
     <ClCompile Include="..\..\src\slib\core\dispatch.cpp" />
     <ClCompile Include="..\..\src\slib\core\event.cpp" />
-    <ClCompile Include="..\..\src\slib\core\event_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\core\event_windows.cpp" />
     <ClCompile Include="..\..\src\slib\core\file.cpp" />
     <ClCompile Include="..\..\src\slib\core\file_win32.cpp" />
     <ClCompile Include="..\..\src\slib\core\function.cpp" />

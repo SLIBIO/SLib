@@ -58,13 +58,11 @@ namespace slib
 		return m_mainMenu;
 	}
 	
-#if !defined(SLIB_PLATFORM_IS_OSX)
-	
+#if !defined(SLIB_UI_IS_MACOS)
 	void UIApp::setMenu(const Ref<Menu>& menu)
 	{
 		m_mainMenu = menu;
 	}
-	
 #endif
 	
 	void UIApp::onStart()

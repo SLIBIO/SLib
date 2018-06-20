@@ -10,7 +10,7 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_PLATFORM_IS_TIZEN)
+#if defined(SLIB_GRAPHICS_IS_CAIRO)
 
 #include "slib/graphics/bitmap.h"
 #include "slib/graphics/image.h"

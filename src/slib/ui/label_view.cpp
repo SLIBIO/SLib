@@ -121,8 +121,7 @@ namespace slib
 		
 	}
 	
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
-	
+#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_WIN32) && !defined(SLIB_UI_IS_ANDROID)
 	Ref<ViewInstance> LabelView::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;
@@ -151,6 +150,6 @@ namespace slib
 	void LabelView::_setBackgroundColor_NW(const Color& color)
 	{
 	}
-	
 #endif
+
 }

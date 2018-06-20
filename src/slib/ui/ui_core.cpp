@@ -359,22 +359,4 @@ namespace slib
 		}
 	}
 
-
-#if defined(SLIB_PLATFORM_IS_TIZEN)
-
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicList<int>, _g_tizen_available_screen_orientations);
-
-	List<int> UI::getAvailableScreenOrientations()
-	{
-		return _g_tizen_available_screen_orientations;
-	}
-
-	void UI::setAvailableScreenOrientations(const List<int>& orientations)
-	{
-		_g_tizen_available_screen_orientations = orientations;
-	}
-
-#endif
-
 }
-

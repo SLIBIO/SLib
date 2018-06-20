@@ -16,7 +16,7 @@
 
 #include "slib/core/scoped.h"
 
-#if defined(SLIB_PLATFORM_IS_ANDROID)
+#if defined(SLIB_UI_IS_ANDROID)
 #	include "slib/core/platform_android.h"
 #endif
 
@@ -251,7 +251,7 @@ namespace slib
 			return;
 		}
 
-#if defined(SLIB_PLATFORM_IS_ANDROID)
+#if defined(SLIB_UI_IS_ANDROID)
 		Android::dismissKeyboard();
 #endif
 
@@ -382,7 +382,7 @@ namespace slib
 		
 		if (n == 0) {
 
-#if defined(SLIB_PLATFORM_IS_ANDROID)
+#if defined(SLIB_UI_IS_ANDROID)
 			Android::dismissKeyboard();
 #endif
 
@@ -406,7 +406,7 @@ namespace slib
 			return;
 		}
 
-#if defined(SLIB_PLATFORM_IS_ANDROID)
+#if defined(SLIB_UI_IS_ANDROID)
 		Android::dismissKeyboard();
 #endif
 
@@ -510,7 +510,7 @@ namespace slib
 			return;
 		}
 
-#if defined(SLIB_PLATFORM_IS_ANDROID)
+#if defined(SLIB_UI_IS_ANDROID)
 		Android::dismissKeyboard();
 #endif
 
@@ -1212,7 +1212,7 @@ namespace slib
 			return;
 		}
 
-#if defined(SLIB_PLATFORM_IS_ANDROID)
+#if defined(SLIB_UI_IS_ANDROID)
 		Android::dismissKeyboard();
 #endif
 

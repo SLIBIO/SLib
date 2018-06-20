@@ -12,6 +12,8 @@ stb_image 2.19
 
 # Headers
 gl
+cairo 1.14.2
+curl 7.59.0
 libmariadb-client 3.0.4
 pcap 1.8.1
 WinPcap 4.1.3

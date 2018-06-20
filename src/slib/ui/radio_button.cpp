@@ -176,7 +176,7 @@ namespace slib
 	}
 
 
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_WIN32))
+#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_WIN32)
 	Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;

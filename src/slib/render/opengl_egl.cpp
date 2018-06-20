@@ -103,7 +103,7 @@ namespace slib
 			EGLint _renderer = 0;
 			EGLint _clientVersion = 0;
 			
-#	if defined(SLIB_PLATFORM_IS_WINDOWS)
+#	if defined(SLIB_PLATFORM_IS_WIN32)
 			_platform = EGL_PLATFORM_ANGLE_ANGLE;
 			_renderer = EGL_PLATFORM_ANGLE_TYPE_D3D9_ANGLE;
 			_clientVersion = 2;

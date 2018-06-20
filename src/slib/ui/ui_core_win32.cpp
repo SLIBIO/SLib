@@ -10,7 +10,7 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_UI_IS_WIN32)
 
 #include "ui_core_win32.h"
 #include "ui_core_common.h"

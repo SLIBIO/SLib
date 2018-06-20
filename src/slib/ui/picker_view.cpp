@@ -421,7 +421,12 @@ namespace slib
 		sl_real ellapsed = (sl_real)((time - m_timeFlowFrameBefore).getSecondsCountf());
 		m_timeFlowFrameBefore = time;
 		
-		float T = UIResource::getScreenMinimum() / SLIB_IF_PLATFORM_IS_MOBILE(2.0f, 4.0f);
+		float T = UIResource::getScreenMinimum() /
+#ifdef SLIB_PLATFORM_IS_MOBILE
+			2.0f;
+#else
+			4.0f;
+#endif
 		if (Math::abs(m_speedFlow) <= T) {
 			if (Math::abs(m_yOffset) >= 1) {
 				if (m_yOffset > 0) {
@@ -455,7 +460,7 @@ namespace slib
 		
 	}
 	
-#if !(defined(SLIB_PLATFORM_IS_IOS))
+#if !defined(SLIB_UI_IS_IOS)
 	
 	Ref<ViewInstance> PickerView::createNativeWidget(ViewInstance* parent)
 	{

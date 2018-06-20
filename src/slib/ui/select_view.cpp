@@ -477,8 +477,7 @@ namespace slib
 		return ret;
 	}
 	
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
-	
+#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_WIN32) && !defined(SLIB_UI_IS_ANDROID)
 	Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;
@@ -507,7 +506,6 @@ namespace slib
 	void SelectView::_setFont_NW(const Ref<Font>& font)
 	{
 	}
-	
 #endif
 
 }

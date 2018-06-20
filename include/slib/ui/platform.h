@@ -16,35 +16,28 @@
 #include "../core/ref.h"
 #include "../graphics/platform.h"
 
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#include "event.h"
 
-#include "../core/platform_windows.h"
-#include <GdiPlus.h>
-
-#elif defined(SLIB_PLATFORM_IS_ANDROID)
-
-#include "../core/platform_android.h"
-
-#elif defined(SLIB_PLATFORM_IS_APPLE)
-
-#include "../core/platform_apple.h"
-#include <CoreText/CoreText.h>
-
-#elif defined(SLIB_PLATFORM_IS_TIZEN)
-
-enum class TizenViewType
+#if defined(SLIB_UI_IS_WIN32)
+#	include "../core/platform_windows.h"
+#endif
+#if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_IOS)
+#	include "../core/platform_apple.h"
+#	include <CoreText/CoreText.h>
+#endif
+#if defined(SLIB_UI_IS_ANDROID)
+#	include "../core/platform_android.h"
+#endif
+#if defined(SLIB_UI_IS_EFL)
+enum class EFL_ViewType
 {
 	Generic = 0,
 	Grid = 1,
 	OpenGL = 2,
 	Window = 3
 };
-
-#include <Evas.h>
-
+#	include <Evas.h>
 #endif
-
-#include "event.h"
 
 namespace slib
 {
@@ -66,8 +59,7 @@ namespace slib
 		static void runApp();
 		static void quitApp();
 		
-#if defined(SLIB_PLATFORM_IS_WIN32)
-		
+#if defined(SLIB_UI_IS_WIN32)
 		static Ref<ViewInstance> createViewInstance(HWND hWnd, sl_bool flagDestroyOnRelease = sl_true);
 		static void registerViewInstance(HWND hWnd, ViewInstance* instance);
 		static Ref<ViewInstance> getViewInstance(HWND hWnd);
@@ -86,26 +78,9 @@ namespace slib
 		
 		static HMENU getMenuHandle(const Ref<Menu>& menu);
 		static Ref<Menu> getMenu(HMENU hMenu);
-		
-#elif defined(SLIB_PLATFORM_IS_ANDROID)
-		
-		static Ref<ViewInstance> createViewInstance(jobject jhandle);
-		static void registerViewInstance(jobject jhandle, ViewInstance* instance);
-		static Ref<ViewInstance> getViewInstance(jobject jhandle);
-		static void removeViewInstance(jobject jhandle);
-		static jobject getViewHandle(ViewInstance* instance);
-		static jobject getViewHandle(View* view);
-		
-		static Ref<WindowInstance> createWindowInstance(jobject window);
-		static Ref<WindowInstance> getWindowInstance(jobject window);
-		static void removeWindowInstance(jobject window);
-		static jobject getWindowHandle(WindowInstance* instance);
-		
-#elif defined(SLIB_PLATFORM_IS_APPLE)
-		
+
+#elif defined(SLIB_UI_IS_MACOS)		
 #	if defined(__OBJC__)
-#		if defined(SLIB_PLATFORM_IS_OSX)
-		
 		static Ref<ViewInstance> createViewInstance(NSView* handle, sl_bool flagFreeOnRelease = sl_true);
 		static void registerViewInstance(NSView* handle, ViewInstance* instance);
 		static Ref<ViewInstance> getViewInstance(NSView* handle);
@@ -130,9 +105,10 @@ namespace slib
 		static NSMenuItem* getMenuItemHandle(const Ref<MenuItem>& menu);
 		
 		static NSString* getKeyEquivalent(const KeycodeAndModifiers& km, NSUInteger& outMask);
-		
-#		elif defined(SLIB_PLATFORM_IS_IOS)
-		
+
+#	endif		
+#elif defined(SLIB_UI_IS_IOS)
+#	if defined(__OBJC__)
 		static Ref<ViewInstance> createViewInstance(UIView* handle, sl_bool flagFreeOnRelease = sl_true);
 		static void registerViewInstance(UIView* handle, ViewInstance* instance);
 		static Ref<ViewInstance> getViewInstance(UIView* handle);
@@ -154,12 +130,22 @@ namespace slib
 		static CGFloat getGlobalScaleFactor();
 		static void setGlobalScaleFactor(CGFloat factor);
 		
-#		endif
 #	endif
-
-#elif defined(SLIB_PLATFORM_IS_TIZEN)
-
-		static Ref<ViewInstance> createViewInstance(TizenViewType type, Evas_Object* handle, sl_bool flagFreeOnRelease = sl_true);
+#elif defined(SLIB_UI_IS_ANDROID)
+		static Ref<ViewInstance> createViewInstance(jobject jhandle);
+		static void registerViewInstance(jobject jhandle, ViewInstance* instance);
+		static Ref<ViewInstance> getViewInstance(jobject jhandle);
+		static void removeViewInstance(jobject jhandle);
+		static jobject getViewHandle(ViewInstance* instance);
+		static jobject getViewHandle(View* view);
+		
+		static Ref<WindowInstance> createWindowInstance(jobject window);
+		static Ref<WindowInstance> getWindowInstance(jobject window);
+		static void removeWindowInstance(jobject window);
+		static jobject getWindowHandle(WindowInstance* instance);
+		
+#elif defined(SLIB_UI_IS_EFL)
+		static Ref<ViewInstance> createViewInstance(EFL_ViewType type, Evas_Object* handle, sl_bool flagFreeOnRelease = sl_true);
 		static void registerViewInstance(Evas_Object* handle, ViewInstance* instance);
 		static Ref<ViewInstance> getViewInstance(Evas_Object* handle);
 		static Ref<View> getView(Evas_Object* handle);
@@ -174,7 +160,6 @@ namespace slib
 		static Evas_Object* getWindowHandle(Window* window);
 
 		static Evas_Object* getMainWindow();
-
 #endif
 		
 	private:
@@ -188,7 +173,7 @@ namespace slib
 
 }
 
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_UI_IS_WIN32)
 
 #define SLIB_UI_MESSAGE_BEGIN 0x7100
 #define SLIB_UI_MESSAGE_CLOSE SLIB_UI_MESSAGE_BEGIN

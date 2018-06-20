@@ -17,7 +17,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#if defined(SLIB_PLATFORM_IS_WP8)
+#if defined(SLIB_PLATFORM_IS_UWP)
 #include "float.h"
 #endif
 
@@ -206,7 +206,7 @@ namespace slib
 		return ::ceil(f);
 	}
 
-#if defined(SLIB_PLATFORM_IS_WP8)
+#if defined(SLIB_PLATFORM_IS_UWP)
 
 	sl_bool Math::isNaN(float f) noexcept
 	{

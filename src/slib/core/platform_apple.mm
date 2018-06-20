@@ -134,7 +134,7 @@ namespace slib
 	void _priv_Apple_initSystemVersion()
 	{
 		if (_g_system_flagInitVersion) {
-#if defined(SLIB_PLATFORM_IS_OSX)
+#if defined(SLIB_PLATFORM_IS_MACOS)
 			double v = NSAppKitVersionNumber;
 			if (v >= NSAppKitVersionNumber10_10) {
 				_g_system_version = "10.10";

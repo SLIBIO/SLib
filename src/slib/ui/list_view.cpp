@@ -15,8 +15,7 @@
 #define MAX_ITEMS_VISIBLE 500
 #define MAX_MID_HEIGHT 1000000
 
-#if defined(SLIB_PLATFORM_IS_WIN32) || defined(SLIB_PLATFORM_IS_IOS)
-#else
+#if !defined(SLIB_UI_IS_WIN32) && !defined(SLIB_UI_IS_IOS)
 #	define USE_CONTENT_VIEW
 #endif
 
@@ -737,7 +736,7 @@ namespace slib
 				}
 				
 #if !defined(USE_CONTENT_VIEW)
-#if defined(SLIB_PLATFORM_IS_IOS)
+#if defined(SLIB_UI_IS_IOS)
 				if (isNativeWidget()) {
 					UIRect rcContent = getBounds();
 					rcContent.top += scrollY;

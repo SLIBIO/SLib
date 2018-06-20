@@ -19,7 +19,7 @@
 #include <signal.h>
 #include <float.h>
 
-#if defined(SLIB_PLATFORM_IS_WP8)
+#if defined(SLIB_PLATFORM_IS_UWP)
 using namespace Windows::Storage;
 using namespace Platform;
 #endif
@@ -44,7 +44,7 @@ namespace slib
 		::GetModuleFileNameW(GetModuleHandle(NULL), (WCHAR*)bufAppPath, PRIV_PATH_MAX - 1);
 		return String(bufAppPath);
 #endif
-#if defined(SLIB_PLATFORM_IS_WP8)
+#if defined(SLIB_PLATFORM_IS_UWP)
 		return String::fromUtf16(ApplicationData::Current->LocalFolder->Path->Data());
 #endif
 	}

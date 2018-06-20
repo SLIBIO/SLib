@@ -86,7 +86,7 @@ namespace slib
 }
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-#	if defined(SLIB_PLATFORM_IS_DESKTOP)
+#	if defined(SLIB_PLATFORM_IS_WIN32)
 
 #include <winsock2.h>
 #include <ws2ipdef.h>

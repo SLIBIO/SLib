@@ -161,8 +161,7 @@ namespace slib
 		View::dispatchClick();
 	}
 
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_WIN32))
-
+#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_WIN32)
 	Ref<ViewInstance> CheckBox::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;
@@ -175,9 +174,7 @@ namespace slib
 	void CheckBox::_setChecked_NW(sl_bool flag)
 	{
 	}
-
 #endif
-
 
 }
 

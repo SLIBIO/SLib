@@ -10,7 +10,7 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_UI_IS_WIN32)
 
 #include "slib/ui/scroll_view.h"
 #include "slib/ui/core.h"

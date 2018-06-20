@@ -234,7 +234,7 @@ namespace slib
 		virtual void _setDefaultButton_NW(sl_bool flag);
 
 		void _setFont_NW(const Ref<Font>& font) override;
-
+		
 	private:
 		AtomicString m_text;
 		sl_bool m_flagMultiLine;

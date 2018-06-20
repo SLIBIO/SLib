@@ -529,7 +529,7 @@ namespace slib
 			if (m_flagCreatingChildInstances) {
 				ListElements< Ref<View> > children(getChildren());
 				for (sl_size i = 0; i < children.count; i++) {
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_UI_IS_WIN32)
 					Ref<View>& child = children[children.count - 1 - i];
 #else
 					Ref<View>& child = children[i];
@@ -961,7 +961,7 @@ namespace slib
 				}
 			}
 			invalidateLayer();
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_UI_IS_WIN32)
 			if (checkSelfInvalidatable()) {
 				Ref<ViewInstance> instance = m_instance;
 				if (instance.isNotNull()) {
@@ -1003,7 +1003,7 @@ namespace slib
 				}
 			}
 			invalidateLayer(rectIntersect);
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_UI_IS_WIN32)
 			if (checkSelfInvalidatable()) {
 				Ref<ViewInstance> instance = m_instance;
 				if (instance.isNotNull()) {
@@ -1077,7 +1077,7 @@ namespace slib
 
 	sl_bool View::checkSelfInvalidatable()
 	{
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_UI_IS_WIN32)
 		Ref<ViewInstance> instance = m_instance;
 		if (instance.isNotNull()) {
 			if (instance->isNativeWidget()) {
@@ -4324,7 +4324,7 @@ namespace slib
 		sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
 		sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
 		
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_UI_IS_WIN32)
 		if (isInstance()) {
 			Vector2 t;
 			if (getFinalTranslationRotationScale(&t, sl_null, sl_null, sl_null)) {
@@ -4361,7 +4361,7 @@ namespace slib
 		sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
 		sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
 		
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_UI_IS_WIN32)
 		if (isInstance()) {
 			Vector2 t;
 			if (getFinalTranslationRotationScale(&t, sl_null, sl_null, sl_null)) {
@@ -4401,7 +4401,7 @@ namespace slib
 		sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
 		sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
 
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_UI_IS_WIN32)
 		if (isInstance()) {
 			Vector2 t;
 			if (getFinalTranslationRotationScale(&t, sl_null, sl_null, sl_null)) {
@@ -4438,7 +4438,7 @@ namespace slib
 		sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
 		sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
 
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_UI_IS_WIN32)
 		if (isInstance()) {
 			Vector2 t;
 			if (getFinalTranslationRotationScale(&t, sl_null, sl_null, sl_null)) {
@@ -5118,7 +5118,7 @@ namespace slib
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->alpha = alpha;
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_UI_IS_WIN32)
 			if (mode == UIUpdateMode::Redraw) {
 				invalidateBoundsInParent();
 			}
@@ -6914,7 +6914,7 @@ namespace slib
 					if (child->isVisible()) {
 						
 						if (child->isInstance()) {
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_UI_IS_WIN32)
 							if (!(child->checkSelfInvalidatable())) {
 								sl_ui_pos offx = child->m_frame.left;
 								sl_ui_pos offy = child->m_frame.top;
@@ -9099,14 +9099,14 @@ namespace slib
 		
 	}
 
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID)) && !(defined(SLIB_PLATFORM_IS_TIZEN))
+#if !defined(SLIB_UI)
 	Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)
 	{
 		return sl_null;
 	}
 #endif
 
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_WIN32))
+#if !(defined(SLIB_UI_IS_MACOS)) && !(defined(SLIB_UI_IS_WIN32))
 	void View::_setFrame_NI(const UIRect& frame)
 	{
 		Ref<ViewInstance> instance = m_instance;
@@ -9116,7 +9116,7 @@ namespace slib
 	}
 #endif
 
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
+#if !(defined(SLIB_UI_IS_MACOS)) && !(defined(SLIB_UI_IS_WIN32)) && !(defined(SLIB_UI_IS_ANDROID))
 	void View::_setTransform_NI(const Matrix3& matrix)
 	{
 		Ref<ViewInstance> instance = m_instance;
@@ -9188,7 +9188,7 @@ namespace slib
 	{
 		Ref<View> view = getView();
 		if (view.isNotNull()) {
-#if defined(SLIB_PLATFORM_IS_OSX)
+#if defined(SLIB_UI_IS_MACOS)
 			sl_real alpha = view->getAlpha();
 			Ref<View> parent = view->getParent();
 			while (parent.isNotNull()) {

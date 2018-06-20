@@ -22,8 +22,7 @@ namespace slib
 	{
 	}
 	
-#if !defined(SLIB_PLATFORM_IS_WIN32) && !defined(SLIB_PLATFORM_IS_OSX)
-	
+#if !defined(SLIB_UI_IS_WIN32) && !defined(SLIB_UI_IS_MACOS)
 	Ref<Cursor> Cursor::getArrow()
 	{
 		return sl_null;
@@ -70,6 +69,6 @@ namespace slib
 	void Cursor::hide()
 	{
 	}
-	
 #endif
+
 }

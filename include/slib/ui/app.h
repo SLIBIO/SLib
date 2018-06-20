@@ -42,10 +42,10 @@ namespace slib
 		
 		void setMainWindow(const Ref<Window>& window);
 		
-		// Menu Bar (Mainly used in OSX)
+		// Menu Bar (Mainly used in macOS)
 		Ref<Menu> getMenu();
 		
-		// Menu Bar (Mainly used in OSX)
+		// Menu Bar (Mainly used in macOS)
 		void setMenu(const Ref<Menu>& menu);
 		
 	protected:

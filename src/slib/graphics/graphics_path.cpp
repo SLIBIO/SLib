@@ -243,7 +243,7 @@ namespace slib
 	}
 
 
-#if !(defined(SLIB_PLATFORM_IS_APPLE)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
+#if !(defined(SLIB_GRAPHICS_IS_GDI)) && !(defined(SLIB_GRAPHICS_IS_QUARTZ)) && !(defined(SLIB_GRAPHICS_IS_ANDROID))
 
 	void GraphicsPath::_initialize_PO()
 	{

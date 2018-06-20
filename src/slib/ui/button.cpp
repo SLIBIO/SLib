@@ -708,6 +708,12 @@ namespace slib
 		}
 		
 		UISize size = measureContentSize();
+		sl_ui_pos paddingNativeWidth = 0;
+		sl_ui_pos paddingNativeHeight = 0;
+		if (isCreatingNativeWidget()) {
+			paddingNativeWidth = 30;
+			paddingNativeHeight = 8;
+		}
 		
 		if (flagHorizontal) {
 			if (size.x < 0) {
@@ -717,6 +723,7 @@ namespace slib
 			if (width < 0) {
 				width = 0;
 			}
+			width += paddingNativeWidth;
 			setMeasuredWidth(width);
 		}
 		if (flagVertical) {
@@ -727,6 +734,7 @@ namespace slib
 			if (height < 0) {
 				height = 0;
 			}
+			height += paddingNativeHeight;
 			setMeasuredHeight(height);
 		}
 	}
@@ -953,8 +961,7 @@ namespace slib
 		}
 	}
 
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
-
+#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_WIN32) && !defined(SLIB_UI_IS_ANDROID)
 	Ref<ViewInstance> Button::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;
@@ -971,7 +978,6 @@ namespace slib
 	void Button::_setDefaultButton_NW(sl_bool flag)
 	{
 	}
-
 #endif
 
 }

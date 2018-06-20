@@ -1124,7 +1124,7 @@ namespace slib
 
 #define PRIV_GL_ENTRY(name) _priv_GL_entries.name
 
-#elif defined(SLIB_PLATFORM_IS_OSX)
+#elif defined(SLIB_PLATFORM_IS_MACOS)
 
 #include <OpenGL/gl3.h>
 

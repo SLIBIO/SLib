@@ -1094,7 +1094,7 @@ namespace slib
 		m_time = n / 10 - SLIB_INT64(11644473600000000); // Convert 1601 Based (FILETIME mode) to 1970 Based (time_t mode)
 	}
 
-#	if defined(SLIB_PLATFORM_IS_DESKTOP)
+#	if defined(SLIB_PLATFORM_IS_WIN32)
 
 	void Time::_setToSystem() noexcept
 	{
@@ -1104,7 +1104,7 @@ namespace slib
 		SetLocalTime(&st);
 	}
 
-#	elif defined(SLIB_PLATFORM_IS_MOBILE)
+#	else
 
 	void Time::_setToSystem() noexcept
 	{

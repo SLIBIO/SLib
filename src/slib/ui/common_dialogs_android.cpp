@@ -10,7 +10,7 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_PLATFORM_IS_ANDROID)
+#if defined(SLIB_UI_IS_ANDROID)
 
 #include "slib/ui/common_dialogs.h"
 

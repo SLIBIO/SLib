@@ -47,9 +47,9 @@ namespace slib
 	{
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 		m_pObject = Base::createMemory(sizeof(CRITICAL_SECTION));
-#	if defined(SLIB_PLATFORM_IS_DESKTOP)
+#	if defined(SLIB_PLATFORM_IS_WIN32)
 		InitializeCriticalSection((PCRITICAL_SECTION)m_pObject);
-#	elif defined(SLIB_PLATFORM_IS_MOBILE)
+#	else
 		InitializeCriticalSectionEx((PCRITICAL_SECTION)m_pObject, NULL, NULL);
 #	endif
 #elif defined(SLIB_PLATFORM_IS_UNIX)

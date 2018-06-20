@@ -13,6 +13,8 @@
 
 #include "definition.h"
 
+#ifndef SLIB_UI_IS_GTK
+
 #include "view.h"
 
 namespace slib
@@ -101,5 +103,7 @@ namespace slib
 	};
 
 }
+
+#endif
 
 #endif

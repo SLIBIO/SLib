@@ -151,7 +151,7 @@ namespace slib
 		static Ref<UrlRequest> postJsonSynchronous(const String& url, const Json& json);
 		
 		static Ref<UrlRequest> postJsonSynchronous(const String& url, const HashMap<String, Variant>& params, const Json& json);
-		
+				
 	public:
 		const String& getUrl();
 		
@@ -218,6 +218,7 @@ namespace slib
 		String getLastErrorMessage();
 
 		sl_bool isClosed();
+		
 		
 	protected:
 		static Ref<UrlRequest> _create(const UrlRequestParam& param, const String& url);
@@ -287,6 +288,7 @@ namespace slib
 		
 		Ref<Event> m_eventSync;
 		
+		friend class CurlRequest;
 	};
 
 }
