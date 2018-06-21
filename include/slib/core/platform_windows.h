@@ -85,6 +85,27 @@ namespace slib
 	
 		static sl_bool setRegistryValue(HKEY hKey, const String16& subPath, const String16& name, const Variant& value);
 	
+
+		static sl_bool isCurrentProcessInAdminGroup();
+
+		static sl_bool isCurrentProcessRunAsAdmin();
+
+
+		class ShellExecuteParam
+		{
+		public:
+			String16 path;
+			String16 params;
+			sl_bool runAsAdmin; // `shellExecute` returns sl_false if the user refused the elevation
+			String16 currentDirectory;
+			HWND hWndParent;
+			int nShow;
+		public:
+			ShellExecuteParam();
+		};
+
+		static sl_bool shellExecute(const ShellExecuteParam& param);
+
 	};
 
 }

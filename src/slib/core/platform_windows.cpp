@@ -491,6 +491,89 @@ namespace slib
 		return flagSuccess;
 	}
 
+	sl_bool Windows::isCurrentProcessInAdminGroup()
+	{
+		BOOL flagResult = FALSE;
+		HANDLE hToken;
+		if (::OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_DUPLICATE, &hToken)) {
+			OSVERSIONINFOW osver = { sizeof(osver) };
+			if (::GetVersionExW(&osver)) {
+				sl_bool flagError = sl_false;
+				HANDLE hTokenToCheck = NULL;
+				if (osver.dwMajorVersion >= 6) { // Windows Vista or later
+					TOKEN_ELEVATION_TYPE elevType;
+					DWORD cbSize = 0;
+					if (::GetTokenInformation(hToken, TokenElevationType, &elevType, sizeof(elevType), &cbSize)) {
+						if (elevType == TokenElevationTypeLimited) {
+							if (!::GetTokenInformation(hToken, TokenLinkedToken, &hTokenToCheck, sizeof(hTokenToCheck), &cbSize)) {
+								flagError = sl_true;
+							}
+						}
+					} else {
+						flagError = sl_true;
+					}
+				}
+				if (!flagError) {
+					if (!hTokenToCheck) {
+						::DuplicateToken(hToken, SecurityIdentification, &hTokenToCheck);
+					}
+					if (hTokenToCheck) {
+						BYTE adminSID[SECURITY_MAX_SID_SIZE];
+						DWORD cbSize = sizeof(adminSID);
+						if (::CreateWellKnownSid(WinBuiltinAdministratorsSid, NULL, &adminSID, &cbSize)) {
+							::CheckTokenMembership(hTokenToCheck, &adminSID, &flagResult);
+						}
+						::CloseHandle(hTokenToCheck);
+					}
+				}
+			}
+			::CloseHandle(hToken);
+		}
+		return flagResult != FALSE;
+	}
+
+	sl_bool Windows::isCurrentProcessRunAsAdmin()
+	{
+		BOOL flagResult = FALSE;
+		SID_IDENTIFIER_AUTHORITY siAuthority = SECURITY_NT_AUTHORITY;
+		PSID pSidAdmin = NULL;
+		if (::AllocateAndInitializeSid(&siAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0, &pSidAdmin)) {
+			::CheckTokenMembership(NULL, pSidAdmin, &flagResult);
+			::FreeSid(pSidAdmin);
+		}
+		return flagResult != FALSE;
+	}
+
+	Windows::ShellExecuteParam::ShellExecuteParam()
+	{
+		runAsAdmin = sl_false;
+		hWndParent = NULL;
+		nShow = SW_NORMAL;
+	}
+
+	sl_bool Windows::shellExecute(const ShellExecuteParam& param)
+	{
+		SHELLEXECUTEINFOW sei;
+		Base::zeroMemory(&sei, sizeof(sei));
+		sei.cbSize = sizeof(sei);
+		if (param.runAsAdmin) {
+			sei.lpVerb = L"runas";
+		}
+		sei.lpFile = (LPCWSTR)(param.path.getData());
+		if (param.params.isNotEmpty()) {
+			sei.lpParameters = (LPCWSTR)(param.params.getData());
+		}
+		if (param.currentDirectory.isNotEmpty()) {
+			sei.lpDirectory = (LPCWSTR)(param.currentDirectory.getData());
+		}
+		sei.hwnd = param.hWndParent;
+		sei.nShow = param.nShow;
+		if (ShellExecuteExW(&sei)) {
+			return sl_true;
+		}
+		return sl_false;
+	}
+
 }
 
 #endif
