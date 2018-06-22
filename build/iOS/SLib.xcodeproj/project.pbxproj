@@ -56,6 +56,8 @@
 		2607300020D98466004EB272 /* url_request_curl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26072FFF20D98466004EB272 /* url_request_curl.cpp */; };
 		2607300120D9846B004EB272 /* url_request_curl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26072FFF20D98466004EB272 /* url_request_curl.cpp */; };
 		2607300520DA853B004EB272 /* sad4d_avx512.c in Sources */ = {isa = PBXBuildFile; fileRef = 2607300420DA853B004EB272 /* sad4d_avx512.c */; settings = {COMPILER_FLAGS = "-mavx512f -mavx512bw"; }; };
+		2607301120DD22C9004EB272 /* rw_lock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2607301020DD22C8004EB272 /* rw_lock.cpp */; };
+		2607301220DD22C9004EB272 /* rw_lock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2607301020DD22C8004EB272 /* rw_lock.cpp */; };
 		260D834820C7DB5A0013B34E /* gzclose.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D833920C7DB590013B34E /* gzclose.c */; };
 		260D834920C7DB5A0013B34E /* infback.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D833A20C7DB590013B34E /* infback.c */; };
 		260D834A20C7DB5A0013B34E /* crc32.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D833B20C7DB590013B34E /* crc32.c */; };
@@ -1135,6 +1137,7 @@
 		26072FFF20D98466004EB272 /* url_request_curl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url_request_curl.cpp; sourceTree = "<group>"; };
 		2607300320D985D3004EB272 /* url_request_common.inc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = url_request_common.inc; sourceTree = "<group>"; };
 		2607300420DA853B004EB272 /* sad4d_avx512.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sad4d_avx512.c; path = ../../external/src/libvpx/vpx_dsp/x86/sad4d_avx512.c; sourceTree = "<group>"; };
+		2607301020DD22C8004EB272 /* rw_lock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rw_lock.cpp; sourceTree = "<group>"; };
 		260747CB1D9388F60061A3B5 /* slider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = slider.cpp; sourceTree = "<group>"; };
 		260D833920C7DB590013B34E /* gzclose.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gzclose.c; path = ../../external/src/zlib/gzclose.c; sourceTree = "<group>"; };
 		260D833A20C7DB590013B34E /* infback.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = infback.c; path = ../../external/src/zlib/infback.c; sourceTree = "<group>"; };
@@ -3200,6 +3203,7 @@
 				26FAA8851EC768C1007BC67F /* red_black_tree.cpp */,
 				2629F8731DFAF4AE005CF43D /* ref.cpp */,
 				A25F2EDF1B039EF600854DAF /* resource.cpp */,
+				2607301020DD22C8004EB272 /* rw_lock.cpp */,
 				A25F2EE01B039EF600854DAF /* service.cpp */,
 				A25F2EE11B039EF600854DAF /* setting.cpp */,
 				26FBC2701DF9FB0200D76774 /* spin_lock.cpp */,
@@ -3994,6 +3998,7 @@
 				26D15D961E93AD05003BD61A /* thread.cpp in Sources */,
 				26EAB7D71EA288DA00ED96FA /* net_capture_pcap.cpp in Sources */,
 				26D15DA31E93AD16003BD61A /* md5.cpp in Sources */,
+				2607301220DD22C9004EB272 /* rw_lock.cpp in Sources */,
 				26D15DAE1E93AD24003BD61A /* matrix2.cpp in Sources */,
 				26D15D731E93AD05003BD61A /* event.cpp in Sources */,
 				26D15D691E93AD05003BD61A /* async.cpp in Sources */,
@@ -4631,6 +4636,7 @@
 				26D9D8411E9628E0005F7BD3 /* block_cipher.cpp in Sources */,
 				26D9D8421E9628E0005F7BD3 /* line.cpp in Sources */,
 				26D9D8631E96294F005F7BD3 /* bitmap_format.cpp in Sources */,
+				2607301120DD22C9004EB272 /* rw_lock.cpp in Sources */,
 				26D9D8561E962932005F7BD3 /* device_information_ios.mm in Sources */,
 				26D9D8431E9628E0005F7BD3 /* service.cpp in Sources */,
 				26D9D8CE1E962976005F7BD3 /* render_view.cpp in Sources */,

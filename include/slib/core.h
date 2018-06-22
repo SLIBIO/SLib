@@ -71,6 +71,7 @@
 #include "core/event.h"
 #include "core/thread.h"
 #include "core/thread_pool.h"
+#include "core/rw_lock.h"
 #include "core/log.h"
 #include "core/asset.h"
 

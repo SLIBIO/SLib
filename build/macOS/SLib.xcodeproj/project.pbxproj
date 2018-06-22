@@ -624,6 +624,8 @@
 		2605A2411EA26AE3005CC1D3 /* url_request.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C13E441DDA32F000612945 /* url_request.cpp */; };
 		2605A2421EA26AE3005CC1D3 /* url_request_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26C13E461DDA516D00612945 /* url_request_apple.mm */; };
 		26072FFE20D97B66004EB272 /* url_request_curl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26072FFD20D97B66004EB272 /* url_request_curl.cpp */; };
+		2607300E20DCE368004EB272 /* rw_lock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2607300D20DCE367004EB272 /* rw_lock.cpp */; };
+		2607300F20DCE368004EB272 /* rw_lock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2607300D20DCE367004EB272 /* rw_lock.cpp */; };
 		26C1B62C20D4305100E36539 /* bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C1B62B20D4305000E36539 /* bitmap.cpp */; };
 		26C1B63520D4FF5200E36539 /* canvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4801C1193C400D47AB0 /* canvas.cpp */; };
 		26C1B63720D513D200E36539 /* canvas_ext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C1B63620D513D200E36539 /* canvas_ext.cpp */; };
@@ -1585,6 +1587,7 @@
 		26050B2520CFBDD300032B2C /* systemdependent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = systemdependent.c; path = ../../external/src/libvpx/vp8/common/generic/systemdependent.c; sourceTree = "<group>"; };
 		26072FFD20D97B66004EB272 /* url_request_curl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url_request_curl.cpp; sourceTree = "<group>"; };
 		2607300220D985BF004EB272 /* url_request_common.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = url_request_common.inc; sourceTree = "<group>"; };
+		2607300D20DCE367004EB272 /* rw_lock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rw_lock.cpp; sourceTree = "<group>"; };
 		2609E5591E37E03A00CFBDBB /* timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = timer.cpp; sourceTree = "<group>"; };
 		260A402D1D2AAAD8009CFCE8 /* render_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_resource.cpp; sourceTree = "<group>"; };
 		260A402F1D2AAAE3009CFCE8 /* ui_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_resource.cpp; sourceTree = "<group>"; };
@@ -3418,6 +3421,7 @@
 				26F2F8D81EC2E0EB0074C29E /* red_black_tree.cpp */,
 				A25F2FB31B03A33700854DAF /* ref.cpp */,
 				26D3A1A31C85894A00FB8DBD /* resource.cpp */,
+				2607300D20DCE367004EB272 /* rw_lock.cpp */,
 				A25F2FB51B03A33700854DAF /* service.cpp */,
 				A25F2FB61B03A33700854DAF /* setting.cpp */,
 				A25F2FB71B03A33700854DAF /* spin_lock.cpp */,
@@ -4007,6 +4011,7 @@
 				26D158CE1E93A28C003BD61A /* system.cpp in Sources */,
 				26D158B61E93A28C003BD61A /* io.cpp in Sources */,
 				2605A2301EA26AE2005CC1D3 /* http_service.cpp in Sources */,
+				2607300F20DCE368004EB272 /* rw_lock.cpp in Sources */,
 				26D158BA1E93A28C003BD61A /* locale.cpp in Sources */,
 				26D158AF1E93A28C003BD61A /* dispatch.cpp in Sources */,
 			);
@@ -4671,6 +4676,7 @@
 				26D9D9131E9645CE005F7BD3 /* log.cpp in Sources */,
 				26D9D9141E9645CE005F7BD3 /* thread.cpp in Sources */,
 				26C1B63920D5153500E36539 /* bitmap_ext.cpp in Sources */,
+				2607300E20DCE368004EB272 /* rw_lock.cpp in Sources */,
 				26D9D9CE1E96468D005F7BD3 /* render_view.cpp in Sources */,
 				26D9D9841E964675005F7BD3 /* audio_recorder_opensl_es.cpp in Sources */,
 				26D9D9541E964659005F7BD3 /* database_cursor.cpp in Sources */,

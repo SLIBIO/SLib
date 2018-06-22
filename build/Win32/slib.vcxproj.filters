@@ -833,5 +833,8 @@
     <ClCompile Include="..\..\src\slib\network\url_request_curl.cpp">
       <Filter>src\network</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\core\rw_lock.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

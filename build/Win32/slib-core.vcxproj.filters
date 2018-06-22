@@ -359,5 +359,8 @@
     <ClCompile Include="..\..\src\slib\core\event_windows.cpp">
       <Filter>src\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\core\rw_lock.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
