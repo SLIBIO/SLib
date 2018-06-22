@@ -89,32 +89,6 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool File::lock()
-	{
-		HANDLE handle = (HANDLE)m_file;
-		if (handle != (HANDLE)SLIB_FILE_INVALID_HANDLE) {
-			OVERLAPPED o;
-			ZeroMemory(&o, sizeof(o));
-			if (::LockFileEx(handle, LOCKFILE_EXCLUSIVE_LOCK | LOCKFILE_FAIL_IMMEDIATELY, 0, 1, 0, &o)) {
-				return sl_true;
-			}
-		}
-		return sl_false;
-	}
-
-	sl_bool File::unlock()
-	{
-		HANDLE handle = (HANDLE)m_file;
-		if (handle != (HANDLE)SLIB_FILE_INVALID_HANDLE) {
-			OVERLAPPED o;
-			ZeroMemory(&o, sizeof(o));
-			if (::UnlockFileEx(handle, 0, 0, 0, &o)) {
-				return sl_true;
-			}
-		}
-		return sl_false;
-	}
-
 	sl_uint64 File::getPosition()
 	{
 		if (isOpened()) {
@@ -162,21 +136,6 @@ namespace slib
 		return sl_false;
 	}
 
-
-	sl_bool File::setSize(sl_uint64 size)
-	{
-		if (isOpened()) {
-			sl_int64 pos_orig = getPosition();
-			if (seek(size, SeekPosition::Begin)) {
-				HANDLE handle = (HANDLE)m_file;
-				BOOL bRet = ::SetEndOfFile(handle);
-				seek(pos_orig, SeekPosition::Begin);
-				return bRet != 0;
-			}
-		}
-		return sl_false;
-	}
-
 	sl_int32 File::read32(void* buf, sl_uint32 size)
 	{
 		if (isOpened()) {
@@ -211,16 +170,32 @@ namespace slib
 		return -1;
 	}
 
+	sl_bool File::setSize(sl_uint64 size)
+	{
+		if (isOpened()) {
+			sl_int64 pos_orig = getPosition();
+			if (seek(size, SeekPosition::Begin)) {
+				HANDLE handle = (HANDLE)m_file;
+				BOOL bRet = ::SetEndOfFile(handle);
+				seek(pos_orig, SeekPosition::Begin);
+				return bRet != 0;
+			}
+		}
+		return sl_false;
+	}
+
 	sl_uint64 File::getSize(sl_file fd)
 	{
 		HANDLE handle = (HANDLE)fd;
 		if (handle != INVALID_HANDLE_VALUE) {
 			sl_uint64 ret = 0;
-			*((DWORD*)&ret) = ::GetFileSize(handle, ((DWORD*)&ret) + 1);
-			return ret;
-		} else {
-			return 0;
+			if (::GetFileSizeEx(handle, (PLARGE_INTEGER)(&ret))) {
+				return ret;
+			} else {
+				int n = ::GetFileType(handle);
+			}
 		}
+		return 0;
 	}
 
 	sl_uint64 File::getSize(const String& _filePath)
@@ -235,6 +210,44 @@ namespace slib
 		} else {
 			return 0;
 		}
+	}
+
+	sl_uint64 File::getDiskSize(sl_file fd)
+	{
+		HANDLE handle = (HANDLE)fd;
+		if (handle != INVALID_HANDLE_VALUE) {
+			sl_uint64 size = 0;
+			DWORD nOutput;
+			::DeviceIoControl(handle, IOCTL_DISK_GET_LENGTH_INFO, NULL, 0, &size, sizeof(size), &nOutput, NULL);
+			return size;
+		}
+		return 0;
+	}
+
+	sl_bool File::lock()
+	{
+		HANDLE handle = (HANDLE)m_file;
+		if (handle != (HANDLE)SLIB_FILE_INVALID_HANDLE) {
+			OVERLAPPED o;
+			ZeroMemory(&o, sizeof(o));
+			if (::LockFileEx(handle, LOCKFILE_EXCLUSIVE_LOCK | LOCKFILE_FAIL_IMMEDIATELY, 0, 1, 0, &o)) {
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+
+	sl_bool File::unlock()
+	{
+		HANDLE handle = (HANDLE)m_file;
+		if (handle != (HANDLE)SLIB_FILE_INVALID_HANDLE) {
+			OVERLAPPED o;
+			ZeroMemory(&o, sizeof(o));
+			if (::UnlockFileEx(handle, 0, 0, 0, &o)) {
+				return sl_true;
+			}
+		}
+		return sl_false;
 	}
 
 	static Time _priv_File_getModifiedTime(HANDLE handle)

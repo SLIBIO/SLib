@@ -19,6 +19,14 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#if defined(SLIB_PLATFORM_IS_DESKTOP)
+#	include <sys/ioctl.h>
+#	if defined(SLIB_PLATFORM_IS_MACOS)
+#		include <sys/disk.h>
+#	elif defined(SLIB_PLATFORM_IS_LINUX)
+#		include <linux/fs.h>
+#	endif
+#endif
 #include <dirent.h>
 #include <stdio.h>
 #include <errno.h>
@@ -94,40 +102,6 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool File::lock()
-	{
-		if (isOpened()) {
-			int fd = (int)m_file;
-			struct flock fl;
-			Base::resetMemory(&fl, 0, sizeof(fl));
-			fl.l_start = 0;
-			fl.l_len = 0;
-			fl.l_type = F_WRLCK;
-			fl.l_whence = SEEK_SET;
-			if (::fcntl(fd, F_SETLK, &fl) >= 0) {
-				return sl_true;
-			}
-		}
-		return sl_false;
-	}
-
-	sl_bool File::unlock()
-	{
-		if (isOpened()) {
-			int fd = (int)m_file;
-			struct flock fl;
-			Base::resetMemory(&fl, 0, sizeof(fl));
-			fl.l_start = 0;
-			fl.l_len = 0;
-			fl.l_type = F_UNLCK;
-			fl.l_whence = SEEK_SET;
-			if (::fcntl(fd, F_SETLK, &fl) >= 0) {
-				return sl_true;
-			}
-		}
-		return sl_false;
-	}
-
 	sl_uint64 File::getPosition()
 	{
 		if (isOpened()) {
@@ -166,15 +140,6 @@ namespace slib
 			if (ret != -1) {
 				return sl_true;
 			}
-		}
-		return sl_false;
-	}
-
-	sl_bool File::setSize(sl_uint64 newSize)
-	{
-		if (isOpened()) {
-			int fd = (int)m_file;
-			return 0 == ::ftruncate(fd, newSize);
 		}
 		return sl_false;
 	}
@@ -223,6 +188,15 @@ namespace slib
 		return -1;
 	}
 
+	sl_bool File::setSize(sl_uint64 newSize)
+	{
+		if (isOpened()) {
+			int fd = (int)m_file;
+			return 0 == ::ftruncate(fd, newSize);
+		}
+		return sl_false;
+	}
+
 	sl_uint64 File::getSize(sl_file _fd)
 	{
 		int fd = (int)_fd;
@@ -237,7 +211,7 @@ namespace slib
 			return 0;
 		}
 	}
-
+	
 	sl_uint64 File::getSize(const String& filePath)
 	{
 		if (filePath.isEmpty()) {
@@ -250,7 +224,65 @@ namespace slib
 			return 0;
 		}
 	}
-
+	
+	sl_uint64 File::getDiskSize(sl_file _fd)
+	{
+#if defined(SLIB_PLATFORM_IS_DESKTOP)
+#	if defined(SLIB_PLATFORM_IS_MACOS)
+		int fd = (int)_fd;
+		if (fd != -1) {
+			sl_uint64 nSectors = 0;
+			::ioctl(fd, DKIOCGETBLOCKCOUNT, &nSectors);
+			sl_uint32 nSectorSize = 0;
+			::ioctl(fd, DKIOCGETBLOCKSIZE, &nSectorSize);
+			return nSectorSize * nSectors;
+		}
+#	elif defined(SLIB_PLATFORM_IS_LINUX)
+		int fd = (int)_fd;
+		if (fd != -1) {
+			sl_uint64 size = 0;
+			::ioctl(fd, BLKGETSIZE64, &size);
+			return size;
+		}
+#	endif
+#endif
+		return 0;
+	}
+	
+	sl_bool File::lock()
+	{
+		if (isOpened()) {
+			int fd = (int)m_file;
+			struct flock fl;
+			Base::resetMemory(&fl, 0, sizeof(fl));
+			fl.l_start = 0;
+			fl.l_len = 0;
+			fl.l_type = F_WRLCK;
+			fl.l_whence = SEEK_SET;
+			if (::fcntl(fd, F_SETLK, &fl) >= 0) {
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	sl_bool File::unlock()
+	{
+		if (isOpened()) {
+			int fd = (int)m_file;
+			struct flock fl;
+			Base::resetMemory(&fl, 0, sizeof(fl));
+			fl.l_start = 0;
+			fl.l_len = 0;
+			fl.l_type = F_UNLCK;
+			fl.l_whence = SEEK_SET;
+			if (::fcntl(fd, F_SETLK, &fl) >= 0) {
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
 	sl_int64 _priv_File_getModifiedTime(struct stat& st)
 	{
 #if defined(SLIB_PLATFORM_IS_APPLE)

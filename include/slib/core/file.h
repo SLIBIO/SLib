@@ -88,8 +88,10 @@ namespace slib
 	
 			ShareRead = 0x1000,
 			ShareWrite = 0x2000,
-			ShareDelete = 0x4000
-	
+			ShareReadWrite = ShareRead | ShareWrite,
+			ShareDelete = 0x4000,
+			ShareAll = ShareRead | ShareWrite | ShareDelete
+
 		};
 	
 	};
@@ -112,7 +114,7 @@ namespace slib
 
 		static Ref<File> open(const String& filePath, const FileMode& mode);
 	
-		static Ref<File> openForRead(const String& filePath);
+		static Ref<File> openForRead(const String& filePath, sl_bool flagShareRead = sl_true);
 
 		static Ref<File> openForWrite(const String& filePath);
 
@@ -122,8 +124,20 @@ namespace slib
 
 		static Ref<File> openForRandomAccess(const String& filePath);
 	
-		static Ref<File> openForRandomRead(const String& filePath);
-	
+		static Ref<File> openForRandomRead(const String& filePath, sl_bool flagShareRead = sl_true);
+
+		/*
+			Physical Disks and Volumes
+		 
+				"\\\\.\\PhysicalDrive0"  (Win32)
+				"\\\\.\\CdRom0"
+				"\\\\.\\A:"
+		 
+		 		"/dev/disk0"  (macOS)
+		 		"/dev/sda1"   (Linux)
+		*/
+		static Ref<File> openDevice(const String16& path, sl_bool flagRead, sl_bool flagWrite);
+
 	public:
 		void close() override;
 
@@ -136,7 +150,7 @@ namespace slib
 		sl_uint64 getPosition() override;
 
 		sl_uint64 getSize() override;
-
+		
 		sl_bool seek(sl_int64 offset, SeekPosition from) override;
 	
 
@@ -148,16 +162,23 @@ namespace slib
 		// works only if the file is already opened
 		sl_bool setSize(sl_uint64 size) override;
 
+		
+		static sl_uint64 getSize(sl_file fd);
+		
+		static sl_uint64 getSize(const String& path);
+		
+		static sl_uint64 getDiskSize(sl_file fd);
+		
+		static sl_uint64 getDiskSize(const String& path);
+		
+		
 		sl_bool lock();
 
 		sl_bool unlock();
 	
-	
-		static sl_uint64 getSize(sl_file fd);
+		sl_uint64 getDiskSize();
 
-		static sl_uint64 getSize(const String& path);
-	
-
+		
 		Time getModifiedTime();
 
 		Time getAccessedTime();

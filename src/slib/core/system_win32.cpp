@@ -172,6 +172,25 @@ namespace slib
 #endif
 	}
 
+	sl_uint32 System::getLastError()
+	{
+		return (sl_uint32)(::GetLastError());
+	}
+
+	String System::formatErrorCode(sl_uint32 errorCode)
+	{
+		String ret;
+		if (errorCode > 0) {
+			LPWSTR buf = sl_null;
+			DWORD size = ::FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buf, 0, NULL);
+			if (buf) {
+				ret = String((sl_char16*)buf, size);
+				::LocalFree(buf);
+			}
+		}
+		return ret;
+	}
+
 	void System::abort(const String& _msg, const String& _file, sl_uint32 line)
 	{
 #if defined(SLIB_DEBUG)

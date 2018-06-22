@@ -23,6 +23,7 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
+#include <errno.h>
 
 #include <unistd.h>
 #include <sched.h>
@@ -209,6 +210,16 @@ namespace slib
 	void System::yield()
 	{
 		sched_yield();
+	}
+	
+	sl_uint32 System::getLastError()
+	{
+		return errno;
+	}
+	
+	String System::formatErrorCode(sl_uint32 errorCode)
+	{
+		return ::strerror(errorCode);
 	}
 
 	void System::abort(const String& msg, const String& file, sl_uint32 line)

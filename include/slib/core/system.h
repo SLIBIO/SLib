@@ -60,7 +60,12 @@ namespace slib
 
 		static void yield(sl_uint32 elapsed);
 	
-
+		
+		// Error Handling
+		static sl_uint32 getLastError();
+		
+		static String formatErrorCode(sl_uint32 errorCode);
+		
 		static void abort(const String& msg, const String& file, sl_uint32 line);
 
 		static void setCrashHandler(SIGNAL_HANDLER handler);

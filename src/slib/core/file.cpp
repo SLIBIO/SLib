@@ -51,9 +51,9 @@ namespace slib
 		return open(filePath, mode, FilePermissions::All);
 	}
 
-	Ref<File> File::openForRead(const String& filePath)
+	Ref<File> File::openForRead(const String& filePath, sl_bool flagShareRead)
 	{
-		return open(filePath, FileMode::Read);
+		return open(filePath, FileMode::Read, flagShareRead ? (FilePermissions::All | FilePermissions::ShareRead) : FilePermissions::All);
 	}
 
 	Ref<File> File::openForWrite(const String& filePath)
@@ -76,9 +76,24 @@ namespace slib
 		return open(filePath, FileMode::RandomAccess);
 	}
 
-	Ref<File> File::openForRandomRead(const String& filePath)
+	Ref<File> File::openForRandomRead(const String& filePath, sl_bool flagShareRead)
 	{
-		return open(filePath, FileMode::RandomRead);
+		return open(filePath, FileMode::RandomRead, flagShareRead ? (FilePermissions::All | FilePermissions::ShareRead) : FilePermissions::All);
+	}
+
+	Ref<File> File::openDevice(const String16& path, sl_bool flagRead, sl_bool flagWrite)
+	{
+		FileMode mode = FileMode::NotCreate | FileMode::NotTruncate | FileMode::HintRandomAccess;
+		FilePermissions perms = FilePermissions::None;
+		if (flagRead) {
+			mode |= FileMode::Read;
+			perms |= FilePermissions::ShareRead;
+		}
+		if (flagWrite) {
+			mode |= FileMode::Write;
+			perms |= FilePermissions::ShareWrite;
+		}
+		return open(path, mode, perms);
 	}
 
 	void File::close()
@@ -110,6 +125,20 @@ namespace slib
 		return getSize(m_file);
 	}
 
+	sl_uint64 File::getDiskSize()
+	{
+		return getDiskSize(m_file);
+	}
+
+	sl_uint64 File::getDiskSize(const String& path)
+	{
+		Ref<File> file = openDevice(path, sl_false, sl_false);
+		if (file.isNotNull()) {
+			return getDiskSize(file->m_file);
+		}
+		return 0;
+	}
+	
 	sl_bool File::exists(const String& filePath)
 	{
 		return (getAttributes(filePath) & FileAttributes::NotExist) == 0;
