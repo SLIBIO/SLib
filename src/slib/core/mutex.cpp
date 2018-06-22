@@ -16,8 +16,6 @@
 #include <windows.h>
 #elif defined(SLIB_PLATFORM_IS_UNIX)
 #include <pthread.h>
-#include <time.h>
-#include <sys/time.h>
 #endif
 
 namespace slib
@@ -48,30 +46,30 @@ namespace slib
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 		m_pObject = Base::createMemory(sizeof(CRITICAL_SECTION));
 #	if defined(SLIB_PLATFORM_IS_WIN32)
-		InitializeCriticalSection((PCRITICAL_SECTION)m_pObject);
+		::InitializeCriticalSection((PCRITICAL_SECTION)m_pObject);
 #	else
-		InitializeCriticalSectionEx((PCRITICAL_SECTION)m_pObject, NULL, NULL);
+		::InitializeCriticalSectionEx((PCRITICAL_SECTION)m_pObject, NULL, NULL);
 #	endif
 #elif defined(SLIB_PLATFORM_IS_UNIX)
 		m_pObject = Base::createMemory(sizeof(pthread_mutex_t));
 		pthread_mutexattr_t attr;
-		pthread_mutexattr_init(&attr);
-		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-		pthread_mutex_init((pthread_mutex_t*)(m_pObject), &attr);
-		pthread_mutexattr_destroy(&attr);
+		::pthread_mutexattr_init(&attr);
+		::pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+		::pthread_mutex_init((pthread_mutex_t*)(m_pObject), &attr);
+		::pthread_mutexattr_destroy(&attr);
 #endif
 	}
 
 	void Mutex::_free() noexcept
 	{
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-		DeleteCriticalSection((PCRITICAL_SECTION)m_pObject);
+		::DeleteCriticalSection((PCRITICAL_SECTION)m_pObject);
 		Base::freeMemory(m_pObject);
-		m_pObject = sl_null;
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-		pthread_mutex_destroy((pthread_mutex_t*)(m_pObject));
+		::pthread_mutex_destroy((pthread_mutex_t*)(m_pObject));
 		Base::freeMemory(m_pObject);
 #endif
+		m_pObject = sl_null;
 	}
 
 	void Mutex::lock() const noexcept
@@ -80,9 +78,9 @@ namespace slib
 			return;
 		}
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-		EnterCriticalSection((PCRITICAL_SECTION)m_pObject);
+		::EnterCriticalSection((PCRITICAL_SECTION)m_pObject);
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-		pthread_mutex_lock((pthread_mutex_t*)(m_pObject));
+		::pthread_mutex_lock((pthread_mutex_t*)(m_pObject));
 #endif
 	}
 
@@ -92,9 +90,9 @@ namespace slib
 			return sl_false;
 		}
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-		return TryEnterCriticalSection((PCRITICAL_SECTION)m_pObject) != 0;
+		return ::TryEnterCriticalSection((PCRITICAL_SECTION)m_pObject) != 0;
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-		return pthread_mutex_trylock((pthread_mutex_t*)(m_pObject)) == 0;
+		return ::pthread_mutex_trylock((pthread_mutex_t*)(m_pObject)) == 0;
 #endif
 	}
 
@@ -104,9 +102,9 @@ namespace slib
 			return;
 		}
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-		LeaveCriticalSection((PCRITICAL_SECTION)m_pObject);
+		::LeaveCriticalSection((PCRITICAL_SECTION)m_pObject);
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-		pthread_mutex_unlock((pthread_mutex_t*)(m_pObject));
+		::pthread_mutex_unlock((pthread_mutex_t*)(m_pObject));
 #endif
 	}
 
@@ -120,48 +118,87 @@ namespace slib
 		return *this;
 	}
 
-
+	
 	MutexLocker::MutexLocker() noexcept
+	{
+		m_mutex = sl_null;
+	}
+	
+	MutexLocker::MutexLocker(const Mutex* mutex) noexcept
+	{
+		m_mutex = mutex;
+		if (mutex) {
+			mutex->lock();
+		}
+	}
+	
+	MutexLocker::~MutexLocker() noexcept
+	{
+		unlock();
+	}
+	
+	void MutexLocker::lock(const Mutex* mutex) noexcept
+	{
+		if (m_mutex) {
+			return;
+		}
+		if (mutex) {
+			m_mutex = mutex;
+			mutex->lock();
+		}
+	}
+	
+	void MutexLocker::unlock() noexcept
+	{
+		const Mutex* mutex = m_mutex;
+		if (mutex) {
+			mutex->unlock();
+			m_mutex = sl_null;
+		}
+	}
+
+
+	MultipleMutexLocker::MultipleMutexLocker() noexcept
 	{
 		m_count = 0;
 	}
 
-	MutexLocker::MutexLocker(const Mutex* mutex) noexcept
+	MultipleMutexLocker::MultipleMutexLocker(const Mutex* mutex) noexcept
 	{
 		m_count = 0;
 		lock(mutex);
 	}
 
-	MutexLocker::MutexLocker(const Mutex* mutex1, const Mutex* mutex2) noexcept
+	MultipleMutexLocker::MultipleMutexLocker(const Mutex* mutex1, const Mutex* mutex2) noexcept
 	{
 		m_count = 0;
 		lock(mutex1, mutex2);
 	}
 
-	MutexLocker::MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3) noexcept
+	MultipleMutexLocker::MultipleMutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3) noexcept
 	{
 		m_count = 0;
 		lock(mutex1, mutex2, mutex3);
 	}
 
-	MutexLocker::MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4) noexcept
+	MultipleMutexLocker::MultipleMutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4) noexcept
 	{
 		m_count = 0;
 		lock(mutex1, mutex2, mutex3, mutex4);
 	}
 
-	MutexLocker::MutexLocker(Mutex const* const* mutex_array, sl_size count) noexcept
+	MultipleMutexLocker::MultipleMutexLocker(Mutex const* const* mutex_array, sl_size count) noexcept
 	{
 		m_count = 0;
 		lock(mutex_array, count);
 	}
 
-	MutexLocker::~MutexLocker() noexcept
+	MultipleMutexLocker::~MultipleMutexLocker() noexcept
 	{
 		unlock();
 	}
 
-	void MutexLocker::lock(const Mutex* mutex) noexcept
+	void MultipleMutexLocker::lock(const Mutex* mutex) noexcept
 	{
 		if (m_count > 0) {
 			return;
@@ -173,7 +210,7 @@ namespace slib
 		}
 	}
 
-	void MutexLocker::lock(const Mutex* mutex1, const Mutex* mutex2) noexcept
+	void MultipleMutexLocker::lock(const Mutex* mutex1, const Mutex* mutex2) noexcept
 	{
 		if (m_count > 0) {
 			return;
@@ -211,7 +248,7 @@ namespace slib
 		}
 	}
 
-	void MutexLocker::lock(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3) noexcept
+	void MultipleMutexLocker::lock(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3) noexcept
 	{
 		Mutex const* arr[3];
 		arr[0] = mutex1;
@@ -220,7 +257,7 @@ namespace slib
 		lock(arr, 3);
 	}
 
-	void MutexLocker::lock(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4) noexcept
+	void MultipleMutexLocker::lock(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4) noexcept
 	{
 		Mutex const* arr[4];
 		arr[0] = mutex1;
@@ -230,7 +267,7 @@ namespace slib
 		lock(arr, 4);
 	}
 
-	void MutexLocker::lock(Mutex const* const* mutex_array, sl_size count) noexcept
+	void MultipleMutexLocker::lock(Mutex const* const* mutex_array, sl_size count) noexcept
 	{
 		if (count > SLIB_MAX_LOCK_MUTEX) {
 			return;
@@ -266,7 +303,7 @@ namespace slib
 		}
 	}
 
-	void MutexLocker::unlock() noexcept
+	void MultipleMutexLocker::unlock() noexcept
 	{
 		if (m_count > 0) {
 			for (sl_size i = m_count; i > 0;) {

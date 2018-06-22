@@ -68,16 +68,30 @@ namespace slib
 		ObjectLocker() noexcept;
 
 		ObjectLocker(const Object* object) noexcept;
-	
-		ObjectLocker(const Object* object1, const Object* object2) noexcept;
-
+		
 		~ObjectLocker() noexcept;
 
 	public:
 		void lock(const Object* object) noexcept;
 
-		void lock(const Object* object1, const Object* object2) noexcept;
+	};
 
+	class SLIB_EXPORT MultipleObjectsLocker : public MultipleMutexLocker
+	{
+	public:
+		MultipleObjectsLocker() noexcept;
+		
+		MultipleObjectsLocker(const Object* object) noexcept;
+		
+		MultipleObjectsLocker(const Object* object1, const Object* object2) noexcept;
+		
+		~MultipleObjectsLocker() noexcept;
+		
+	public:
+		void lock(const Object* object) noexcept;
+		
+		void lock(const Object* object1, const Object* object2) noexcept;
+		
 	};
 
 }

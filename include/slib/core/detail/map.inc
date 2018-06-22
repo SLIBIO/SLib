@@ -380,7 +380,7 @@ namespace slib
 		if (reinterpret_cast<void*>(RedBlackTree::getFirstNode(m_root)) == reinterpret_cast<void*>(node)) {
 			return sl_true;
 		}
-		MutexLocker lock(getLocker(), helper.mutex);
+		MultipleMutexLocker lock(getLocker(), helper.mutex);
 		while (node) {
 			if (!(RedBlackTree::put(&m_root, m_count, node->key, m_compare, node->value, sl_null))) {
 				return sl_false;
@@ -420,7 +420,7 @@ namespace slib
 		if (reinterpret_cast<void*>(RedBlackTree::getFirstNode(m_root)) == reinterpret_cast<void*>(node)) {
 			return;
 		}
-		MutexLocker lock(getLocker(), helper.mutex);
+		MultipleMutexLocker lock(getLocker(), helper.mutex);
 		while (node) {
 			RedBlackTree::replace(m_root, node->key, m_compare, node->value);
 			node = node->getNext();
@@ -460,7 +460,7 @@ namespace slib
 		if (reinterpret_cast<void*>(RedBlackTree::getFirstNode(m_root)) == reinterpret_cast<void*>(node)) {
 			return sl_false;
 		}
-		MutexLocker lock(getLocker(), helper.mutex);
+		MultipleMutexLocker lock(getLocker(), helper.mutex);
 		while (node) {
 			if (!(RedBlackTree::add(&m_root, m_count, node->key, m_compare, node->value))) {
 				return sl_false;
@@ -504,7 +504,7 @@ namespace slib
 		if (reinterpret_cast<void*>(RedBlackTree::getFirstNode(m_root)) == reinterpret_cast<void*>(node)) {
 			return sl_true;
 		}
-		MutexLocker lock(getLocker(), helper.mutex);
+		MultipleMutexLocker lock(getLocker(), helper.mutex);
 		while (node) {
 			MapEmplaceReturn<NODE> ret = RedBlackTree::emplace(&m_root, m_count, node->key, m_compare, node->value);
 			if (!(ret.node)) {
@@ -672,7 +672,7 @@ namespace slib
 		if (this == &other) {
 			return sl_true;
 		}
-		ObjectLocker lock(this, &other);
+		MultipleObjectsLocker lock(this, &other);
 		return copyFrom_NoLock(other);
 	}
 	

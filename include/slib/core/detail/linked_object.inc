@@ -234,7 +234,7 @@ namespace slib
 		if ((void*)this == (void*)other) {
 			return;
 		}
-		ObjectLocker lock(this, other);
+		MultipleObjectsLocker lock(this, other);
 		Ref<T> _front = other->getFront();
 		Ref<T> _back = other->getBack();
 		if (_front) {

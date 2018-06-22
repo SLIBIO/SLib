@@ -472,7 +472,7 @@ namespace slib
 		if (reinterpret_cast<void*>(m_nodeFirst) == reinterpret_cast<void*>(node)) {
 			return sl_true;
 		}
-		MutexLocker lock(getLocker(), helper.mutex);
+		MultipleMutexLocker lock(getLocker(), helper.mutex);
 		while (node) {
 			if (!(put_NoLock(node->key, node->value))) {
 				return sl_false;
@@ -512,7 +512,7 @@ namespace slib
 		if (reinterpret_cast<void*>(m_nodeFirst) == reinterpret_cast<void*>(node)) {
 			return;
 		}
-		MutexLocker lock(getLocker(), helper.mutex);
+		MultipleMutexLocker lock(getLocker(), helper.mutex);
 		while (node) {
 			replace_NoLock(node->key, node->value);
 			node = node->getNext();
@@ -552,7 +552,7 @@ namespace slib
 		if (reinterpret_cast<void*>(m_nodeFirst) == reinterpret_cast<void*>(node)) {
 			return sl_false;
 		}
-		MutexLocker lock(getLocker(), helper.mutex);
+		MultipleMutexLocker lock(getLocker(), helper.mutex);
 		while (node) {
 			if (!(add_NoLock(node->key, node->value))) {
 				return sl_false;
@@ -596,7 +596,7 @@ namespace slib
 		if (reinterpret_cast<void*>(m_nodeFirst) == reinterpret_cast<void*>(node)) {
 			return sl_true;
 		}
-		MutexLocker lock(getLocker(), helper.mutex);
+		MultipleMutexLocker lock(getLocker(), helper.mutex);
 		while (node) {
 			MapEmplaceReturn<NODE> ret = emplace_NoLock(node->key, node->value);
 			if (!(ret.node)) {

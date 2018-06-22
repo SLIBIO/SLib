@@ -1835,7 +1835,7 @@ namespace slib
 
 	void AsyncStreamFilter::close()
 	{
-		MutexLocker lock(&m_lockReading, &m_lockWriting);
+		MultipleMutexLocker lock(&m_lockReading, &m_lockWriting);
 		if (m_flagOpened) {
 			m_flagOpened = sl_false;
 		}

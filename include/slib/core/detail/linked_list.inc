@@ -189,7 +189,7 @@ namespace slib
 	template <class VALUE>
 	sl_bool CLinkedList<T>::pushBackAll(const CLinkedList<VALUE>* other) noexcept
 	{
-		ObjectLocker lock(this, other);
+		MultipleObjectsLocker lock(this, other);
 		return pushBackAll_NoLock(other);
 	}
 	
@@ -277,7 +277,7 @@ namespace slib
 	template <class VALUE>
 	sl_bool CLinkedList<T>::pushFrontAll(const CLinkedList<VALUE>* other) noexcept
 	{
-		ObjectLocker lock(this, other);
+		MultipleObjectsLocker lock(this, other);
 		return pushFrontAll_NoLock(other);
 	}
 	
@@ -460,7 +460,7 @@ namespace slib
 		if (this == other) {
 			return;
 		}
-		ObjectLocker lock(this, other);
+		MultipleObjectsLocker lock(this, other);
 		merge_NoLock(other);
 	}
 	

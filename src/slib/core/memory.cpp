@@ -545,7 +545,7 @@ namespace slib
 	
 	void MemoryQueue::link(MemoryQueue& buf)
 	{
-		ObjectLocker lock(this, &buf);
+		MultipleObjectsLocker lock(this, &buf);
 		m_size += buf.m_size;
 		buf.m_size = 0;
 		m_queue.merge_NoLock(&(buf.m_queue));

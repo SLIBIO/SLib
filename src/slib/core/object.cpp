@@ -83,17 +83,13 @@ namespace slib
 		}
 	}
 
+	
 	ObjectLocker::ObjectLocker() noexcept
 	{
 	}
 
 	ObjectLocker::ObjectLocker(const Object* object) noexcept
 	 : MutexLocker(object ? object->getLocker(): sl_null)
-	{
-	}
-
-	ObjectLocker::ObjectLocker(const Object* object1, const Object* object2) noexcept
-	 : MutexLocker(object1 ? object1->getLocker() : sl_null, object2 ? object2->getLocker() : sl_null)
 	{
 	}
 
@@ -108,17 +104,43 @@ namespace slib
 		}
 	}
 
-	void ObjectLocker::lock(const Object* object1, const Object* object2) noexcept
+	
+	MultipleObjectsLocker::MultipleObjectsLocker() noexcept
+	{
+	}
+	
+	MultipleObjectsLocker::MultipleObjectsLocker(const Object* object) noexcept
+	 : MultipleMutexLocker(object ? object->getLocker(): sl_null)
+	{
+	}
+	
+	MultipleObjectsLocker::MultipleObjectsLocker(const Object* object1, const Object* object2) noexcept
+	 : MultipleMutexLocker(object1 ? object1->getLocker() : sl_null, object2 ? object2->getLocker() : sl_null)
+	{
+	}
+	
+	MultipleObjectsLocker::~MultipleObjectsLocker() noexcept
+	{
+	}
+	
+	void MultipleObjectsLocker::lock(const Object* object) noexcept
+	{
+		if (object) {
+			MultipleMutexLocker::lock(object->getLocker());
+		}
+	}
+	
+	void MultipleObjectsLocker::lock(const Object* object1, const Object* object2) noexcept
 	{
 		if (object1) {
 			if (object2) {
-				MutexLocker::lock(object1->getLocker(), object2->getLocker());
+				MultipleMutexLocker::lock(object1->getLocker(), object2->getLocker());
 			} else {
-				MutexLocker::lock(object1->getLocker());
+				MultipleMutexLocker::lock(object1->getLocker());
 			}
 		} else {
 			if (object2) {
-				MutexLocker::lock(object2->getLocker());
+				MultipleMutexLocker::lock(object2->getLocker());
 			}
 		}
 	}

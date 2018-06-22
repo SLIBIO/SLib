@@ -569,7 +569,7 @@ namespace slib
 		if (this == other) {
 			return sl_false;
 		}
-		ObjectLocker lock(this, other);
+		MultipleObjectsLocker lock(this, other);
 		return insertElements_NoLock(index, other->getData(), other->getCount());
 	}
 	
@@ -675,7 +675,7 @@ namespace slib
 		if (this == other) {
 			return sl_false;
 		}
-		ObjectLocker lock(this, other);
+		MultipleObjectsLocker lock(this, other);
 		return addElements_NoLock(other->getData(), other->getCount());
 	}
 	

@@ -49,28 +49,58 @@ namespace slib
 
 	};
 	
-#define SLIB_MAX_LOCK_MUTEX 16
 	
 	class SLIB_EXPORT MutexLocker
 	{
 	public:
 		MutexLocker() noexcept;
-	
+		
 		MutexLocker(const Mutex* mutex) noexcept;
-	
-		MutexLocker(const Mutex* mutex1, const Mutex* mutex2) noexcept;
-
-		MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3) noexcept;
-	
-		MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4) noexcept;
-	
-		MutexLocker(Mutex const* const* mutex_array, sl_size count) noexcept;
 		
 		MutexLocker(const MutexLocker& other) = delete;
 		
 		MutexLocker(MutexLocker&& other) = delete;
-
+		
 		~MutexLocker() noexcept;
+		
+	public:
+		void lock(const Mutex* mutex) noexcept;
+		
+		void unlock() noexcept;
+		
+	public:
+		MutexLocker& operator=(const MutexLocker& other) = delete;
+		
+		MutexLocker& operator=(MutexLocker&& other) = delete;
+		
+	private:
+		const Mutex* m_mutex;
+		
+	};
+	
+	
+#define SLIB_MAX_LOCK_MUTEX 16
+	
+	class SLIB_EXPORT MultipleMutexLocker
+	{
+	public:
+		MultipleMutexLocker() noexcept;
+	
+		MultipleMutexLocker(const Mutex* mutex) noexcept;
+	
+		MultipleMutexLocker(const Mutex* mutex1, const Mutex* mutex2) noexcept;
+
+		MultipleMutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3) noexcept;
+	
+		MultipleMutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4) noexcept;
+	
+		MultipleMutexLocker(Mutex const* const* mutex_array, sl_size count) noexcept;
+		
+		MultipleMutexLocker(const MultipleMutexLocker& other) = delete;
+		
+		MultipleMutexLocker(MultipleMutexLocker&& other) = delete;
+
+		~MultipleMutexLocker() noexcept;
 
 	public:
 		void lock(const Mutex* mutex) noexcept;
@@ -86,9 +116,9 @@ namespace slib
 		void unlock() noexcept;
 		
 	public:
-		MutexLocker& operator=(const MutexLocker& other) = delete;
+		MultipleMutexLocker& operator=(const MultipleMutexLocker& other) = delete;
 		
-		MutexLocker& operator=(MutexLocker&& other) = delete;
+		MultipleMutexLocker& operator=(MultipleMutexLocker&& other) = delete;
 
 	private:
 		sl_size m_count;
