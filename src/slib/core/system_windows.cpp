@@ -18,6 +18,7 @@
 #include <process.h>
 #include <signal.h>
 #include <float.h>
+#include <conio.h>
 
 #if defined(SLIB_PLATFORM_IS_UWP)
 using namespace Windows::Storage;
@@ -196,7 +197,7 @@ namespace slib
 #if defined(SLIB_DEBUG)
 		String16 msg = _msg;
 		String16 file = _file;
-		_wassert((wchar_t*)(msg.getData()), (wchar_t*)(file.getData()), line);
+		::_wassert((wchar_t*)(msg.getData()), (wchar_t*)(file.getData()), line);
 #endif
 	}
 
@@ -243,7 +244,7 @@ namespace slib
 	void System::setCrashHandler(SIGNAL_HANDLER handler)
 	{
 		_g_signal_crash_handler = handler;
-		SetUnhandledExceptionFilter(_seh_crash_handler);
+		::SetUnhandledExceptionFilter(_seh_crash_handler);
 		handler = _signal_crash_handler;
 		signal(SIGFPE, handler);
 		signal(SIGSEGV, handler);
@@ -320,17 +321,26 @@ namespace slib
 	void Console::print(const String& _s)
 	{
 		String16 s = _s;
-		wprintf(L"%s", (LPCWSTR)(s.getData()));
-		OutputDebugStringW((LPCWSTR)s.getData());
+		::wprintf(L"%s", (LPCWSTR)(s.getData()));
+		::OutputDebugStringW((LPCWSTR)s.getData());
 	}
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 	String Console::readLine()
 	{
 		char line[512];
-		char* l = gets_s(line);
+		char* l = ::gets_s(line);
 		line[511] = 0;
 		return l;
+	}
+
+	sl_char16 Console::readChar(sl_bool flagPrintEcho)
+	{
+		if (flagPrintEcho) {
+			return (sl_char16)(::_getche());
+		} else {
+			return (sl_char16)(::_getch());
+		}
 	}
 #endif
 

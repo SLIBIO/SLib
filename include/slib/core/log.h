@@ -38,6 +38,8 @@ namespace slib
 	
 		static String readLine();
 
+		static sl_char16 readChar(sl_bool flagPrintEcho = sl_false);
+
 	};
 	
 	class SLIB_EXPORT Logger : public Object

@@ -77,9 +77,6 @@
     <ClCompile Include="..\..\src\slib\core\file.cpp">
       <Filter>src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\slib\core\file_win32.cpp">
-      <Filter>src\core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\slib\core\async.cpp">
       <Filter>src\core</Filter>
     </ClCompile>
@@ -114,9 +111,6 @@
       <Filter>src\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\slib\core\win32_com.cpp">
-      <Filter>src\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\slib\core\system_win32.cpp">
       <Filter>src\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\slib\crypto\aes.cpp">
@@ -360,6 +354,12 @@
       <Filter>src\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\slib\core\rw_lock.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\core\file_win32.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\core\system_windows.cpp">
       <Filter>src\core</Filter>
     </ClCompile>
   </ItemGroup>

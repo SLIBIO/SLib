@@ -155,4 +155,16 @@ namespace slib
 
 #endif
 
+#if defined(SLIB_PLATFORM_IS_MOBILE)
+	String Console::readLine()
+	{
+		return sl_null;
+	}
+	
+	sl_char16 Console::readChar()
+	{
+		return 0;
+	}
+#endif
+	
 }

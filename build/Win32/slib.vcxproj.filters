@@ -167,9 +167,6 @@
     <ClCompile Include="..\..\src\slib\core\win32_com.cpp">
       <Filter>src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\slib\core\system_win32.cpp">
-      <Filter>src\core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\slib\crypto\aes.cpp">
       <Filter>src\crypto</Filter>
     </ClCompile>
@@ -834,6 +831,9 @@
       <Filter>src\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\slib\core\rw_lock.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\core\system_windows.cpp">
       <Filter>src\core</Filter>
     </ClCompile>
   </ItemGroup>

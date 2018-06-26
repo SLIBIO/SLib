@@ -79,7 +79,7 @@
     <ClCompile Include="..\..\src\slib\core\spin_lock.cpp" />
     <ClCompile Include="..\..\src\slib\core\string.cpp" />
     <ClCompile Include="..\..\src\slib\core\system.cpp" />
-    <ClCompile Include="..\..\src\slib\core\system_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\core\system_windows.cpp" />
     <ClCompile Include="..\..\src\slib\core\thread.cpp" />
     <ClCompile Include="..\..\src\slib\core\thread_pool.cpp" />
     <ClCompile Include="..\..\src\slib\core\thread_win32.cpp" />

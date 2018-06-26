@@ -54,9 +54,9 @@ namespace slib
 				}
 			} else {
 				if (mode & FileMode::NotTruncate) {
-					dwCreateDisposition = CREATE_ALWAYS;
-				} else {
 					dwCreateDisposition = OPEN_ALWAYS;
+				} else {
+					dwCreateDisposition = CREATE_ALWAYS;
 				}
 			}
 		} else {

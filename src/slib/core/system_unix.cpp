@@ -29,6 +29,7 @@
 #include <sched.h>
 #include <signal.h>
 #include <fcntl.h>
+#include <termios.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -384,6 +385,23 @@ namespace slib
 			::free(line);
 		}
 		return ret;
+	}
+	
+	sl_char16 Console::readChar(sl_bool flagPrintEcho)
+	{
+		termios tOld, tNew;
+		::tcgetattr(0, &tOld);
+		tNew = tOld;
+		tNew.c_lflag &= ~ICANON;
+		if (flagPrintEcho) {
+			tNew.c_lflag |= ECHO;
+		} else {
+			tNew.c_lflag &= ~ECHO;
+		}
+		::tcsetattr(0, TCSANOW, &tNew);
+		sl_char16 ch = (sl_char16)(::getchar());
+		::tcsetattr(0, TCSANOW, &tOld);
+		return ch;
 	}
 #endif
 
