@@ -9,7 +9,6 @@
  */
 
 #include <slib/core.h>
-#include <slib.h>
 
 using namespace slib;
 
