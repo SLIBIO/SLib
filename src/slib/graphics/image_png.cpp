@@ -18,7 +18,7 @@
 namespace slib
 {
 
-	Ref<Image> Image::loadFromPNG(const void* content, sl_size size)
+	Ref<Image> Image::loadPNG(const void* content, sl_size size)
 	{
 		png_image image;
 		Base::resetMemory(&image, 0, sizeof(image));
@@ -59,7 +59,7 @@ namespace slib
 	{
 	}
 
-	Memory Image::saveToPNG(const Ref<Image>& image)
+	Memory Image::savePNG(const Ref<Image>& image)
 	{
 		if (image.isNull()) {
 			return sl_null;
@@ -112,19 +112,19 @@ namespace slib
 		return ret;
 	}
 
-	Memory Image::saveToPNG()
+	Memory Image::savePNG()
 	{
-		return saveToPNG(this);
+		return savePNG(this);
 	}
 
-	sl_bool Image::saveToPNG(const String& filePath, const Ref<Image>& image)
+	sl_bool Image::savePNG(const String& filePath, const Ref<Image>& image)
 	{
 		if (image.isNull()) {
 			return sl_false;
 		}
 		Ref<File> file = File::openForWrite(filePath);
 		if (file.isNotNull()) {
-			Memory mem = saveToPNG(image);
+			Memory mem = savePNG(image);
 			if (mem.isNotEmpty()) {
 				sl_reg size = mem.getSize();
 				if (file->write(mem.getData(), size) == size) {
@@ -137,9 +137,9 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool Image::saveToPNG(const String& filePath)
+	sl_bool Image::savePNG(const String& filePath)
 	{
-		return saveToPNG(filePath, this);
+		return savePNG(filePath, this);
 	}
 
 }

@@ -39,7 +39,7 @@ namespace slib
 		longjmp(err->setjmp_buffer, 1);
 	}
 
-	Ref<Image> Image::loadFromJPEG(const void* content, sl_size size)
+	Ref<Image> Image::loadJPEG(const void* content, sl_size size)
 	{
 		jpeg_decompress_struct cinfo;
 		_slib_image_ext_jpeg_error_mgr jerr;
@@ -93,7 +93,7 @@ namespace slib
 		return ret;
 	}
 
-	Memory Image::saveToJPEG(const Ref<Image>& image, float quality)
+	Memory Image::saveJPEG(const Ref<Image>& image, float quality)
 	{
 		if (image.isNull()) {
 			return sl_null;
@@ -177,19 +177,19 @@ namespace slib
 		return ret;
 	}
 
-	Memory Image::saveToJPEG(float quality)
+	Memory Image::saveJPEG(float quality)
 	{
-		return saveToJPEG(this, quality);
+		return saveJPEG(this, quality);
 	}
 
-	sl_bool Image::saveToJPEG(const String& filePath, const Ref<Image>& image, float quality)
+	sl_bool Image::saveJPEG(const String& filePath, const Ref<Image>& image, float quality)
 	{
 		if (image.isNull()) {
 			return sl_false;
 		}
 		Ref<File> file = File::openForWrite(filePath);
 		if (file.isNotNull()) {
-			Memory mem = saveToJPEG(image, quality);
+			Memory mem = saveJPEG(image, quality);
 			if (mem.isNotEmpty()) {
 				sl_reg size = mem.getSize();
 				if (file->write(mem.getData(), size) == size) {
@@ -202,9 +202,9 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool Image::saveToJPEG(const String& filePath, float quality)
+	sl_bool Image::saveJPEG(const String& filePath, float quality)
 	{
-		return saveToJPEG(filePath, this, quality);
+		return saveJPEG(filePath, this, quality);
 	}
 
 }

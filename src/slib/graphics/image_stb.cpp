@@ -8,7 +8,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "image_stb.h"
+#include "slib/graphics/image.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4312)
@@ -29,7 +29,7 @@
 namespace slib
 {
 
-	Ref<Image> Image_STB::loadImage(const void* content, sl_size size)
+	Ref<Image> Image::loadSTB(const void* content, sl_size size)
 	{
 		Ref<Image> ret;
 		int width;

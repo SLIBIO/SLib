@@ -161,7 +161,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	sl_char16 Console::readChar()
+	sl_char16 Console::readChar(sl_bool flagEcho)
 	{
 		return 0;
 	}

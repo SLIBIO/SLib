@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\slib\core\async_config.h" />
-    <ClInclude Include="..\..\src\slib\graphics\image_stb.h" />
     <ClInclude Include="..\..\src\slib\network\network_async.h" />
     <ClInclude Include="..\..\src\slib\render\opengl_egl_entries.h" />
     <ClInclude Include="..\..\src\slib\render\opengl_gl.h" />

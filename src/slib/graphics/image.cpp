@@ -14,8 +14,6 @@
 #include "slib/core/asset.h"
 #include "slib/core/scoped.h"
 
-#include "image_stb.h"
-
 namespace slib
 {
 
@@ -1281,7 +1279,7 @@ namespace slib
 
 	Ref<Image> Image::loadFromMemory(const void* mem, sl_size size, sl_uint32 width, sl_uint32 height)
 	{
-		Ref<Image> ret = Image_STB::loadImage(mem, size);
+		Ref<Image> ret = loadSTB(mem, size);
 		if (ret.isNotNull()) {
 			if (width == 0 || height == 0) {
 				return ret;

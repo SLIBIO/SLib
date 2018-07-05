@@ -45,9 +45,6 @@
     <ClInclude Include="..\..\src\slib\core\async_config.h">
       <Filter>src\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\slib\graphics\image_stb.h">
-      <Filter>src\graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\slib\network\network_async.h">
       <Filter>src\network</Filter>
     </ClInclude>
