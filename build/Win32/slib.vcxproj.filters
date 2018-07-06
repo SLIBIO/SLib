@@ -833,5 +833,8 @@
     <ClCompile Include="..\..\src\slib\core\system_windows.cpp">
       <Filter>src\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\math\calculator.cpp">
+      <Filter>src\math</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -210,7 +210,7 @@ namespace slib
 
 	sl_bool Math::isNaN(float f) noexcept
 	{
-		sl_int32 ret = _isnan(f);
+		sl_int32 ret = ::_isnan(f);
 		if (ret == 0) {
 			return sl_false;
 		}
@@ -219,7 +219,7 @@ namespace slib
 
 	sl_bool Math::isNaN(double f) noexcept
 	{
-		sl_int32 ret = _isnan(f);
+		sl_int32 ret = ::_isnan(f);
 		if (ret == 0) {
 			return sl_false;
 		}
@@ -228,7 +228,7 @@ namespace slib
 
 	sl_bool Math::isInfinite(float f) noexcept
 	{
-		sl_int32 ret = _finite(f);
+		sl_int32 ret = ::_finite(f);
 		if (ret == 0) {
 			return sl_false;
 		}
@@ -237,7 +237,7 @@ namespace slib
 
 	sl_bool Math::isInfinite(double f) noexcept
 	{
-		sl_int32 ret = _finite(f);
+		sl_int32 ret = ::_finite(f);
 		if (ret == 0) {
 			return sl_false;
 		}
@@ -248,22 +248,22 @@ namespace slib
 
 	sl_bool Math::isNaN(float f) noexcept
 	{
-		return isnan(f) != 0;
+		return ::isnan(f) != 0;
 	}
 
 	sl_bool Math::isNaN(double f) noexcept
 	{
-		return isnan(f) != 0;
+		return ::isnan(f) != 0;
 	}
 
 	sl_bool Math::isInfinite(float f) noexcept
 	{
-		return isinf(f) != 0;
+		return ::isinf(f) != 0;
 	}
 
 	sl_bool Math::isInfinite(double f) noexcept
 	{
-		return isinf(f) != 0;
+		return ::isinf(f) != 0;
 	}
 
 #endif

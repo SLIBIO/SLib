@@ -43,4 +43,6 @@
 
 #include "math/bezier.h"
 
+#include "math/calculator.h"
+
 #endif

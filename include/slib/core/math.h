@@ -213,15 +213,14 @@ namespace slib
 			return (((0xFFFF - (((-v) >> 31) & v)) >> 31) | (((-v) >> 31) & v)) & 0xFFFF; // clamp to < 65536
 		}
 	
-
 		SLIB_INLINE constexpr static sl_bool isAlmostZero(float f) noexcept
 		{
-			return f > -SLIB_EPSILON && f < SLIB_EPSILON;
+			return (f > -SLIB_EPSILON && f < SLIB_EPSILON);
 		}
 
 		SLIB_INLINE constexpr static sl_bool isAlmostZero(double f) noexcept
 		{
-			return f > -SLIB_EPSILON_LONG && f < SLIB_EPSILON_LONG;
+			return (f > -SLIB_EPSILON_LONG && f < SLIB_EPSILON_LONG);
 		}
 
 		SLIB_INLINE constexpr static sl_bool isAlmostZero(sl_int32 v) noexcept
@@ -246,55 +245,54 @@ namespace slib
 	
 		SLIB_INLINE constexpr static sl_bool isLessThanEpsilon(float f) noexcept
 		{
-			return f < SLIB_EPSILON;
+			return (f < SLIB_EPSILON);
 		}
 
 		SLIB_INLINE constexpr static sl_bool isLessThanEpsilon(double f) noexcept
 		{
-			return f < SLIB_EPSILON_LONG;
+			return (f < SLIB_EPSILON_LONG);
 		}
 
 		SLIB_INLINE constexpr static sl_bool isLessThanEpsilon(sl_int32 v) noexcept
 		{
-			return v <= 0;
+			return (v <= 0);
 		}
 
 		SLIB_INLINE constexpr static sl_bool isLessThanEpsilon(sl_uint32 v) noexcept
 		{
-			return v <= 0;
+			return (v <= 0);
 		}
 
 		SLIB_INLINE constexpr static sl_bool isLessThanEpsilon(sl_int64 v) noexcept
 		{
-			return v <= 0;
+			return (v <= 0);
 		}
 
 		SLIB_INLINE constexpr static sl_bool isLessThanEpsilon(sl_uint64 v) noexcept
 		{
-			return v <= 0;
+			return (v <= 0);
 		}
 	
 
 		SLIB_INLINE constexpr static float getRadianFromDegrees(float f) noexcept
 		{
-			return f * SLIB_PI / 180.0f;
+			return (f * SLIB_PI / 180.0f);
 		}
 
 		SLIB_INLINE constexpr static double getRadianFromDegrees(double f) noexcept
 		{
-			return f * SLIB_PI_LONG / 180.0;
+			return (f * SLIB_PI_LONG / 180.0);
 		}
 
 		SLIB_INLINE constexpr static float getDegreesFromRadian(float f) noexcept
 		{
-			return f * 180.0f / SLIB_PI;
+			return (f * 180.0f / SLIB_PI);
 		}
 
 		SLIB_INLINE constexpr static double getDegreesFromRadian(double f) noexcept
 		{
-			return f * 180.0 / SLIB_PI_LONG;
+			return (f * 180.0 / SLIB_PI_LONG);
 		}
-
 
 		template <class T>
 		SLIB_INLINE constexpr static T PI() noexcept
@@ -429,7 +427,7 @@ namespace slib
 		static void mul32(sl_uint32 a, sl_uint32 b, sl_uint32& o_high, sl_uint32& o_low) noexcept;
 
 		static void mul64(sl_uint64 a, sl_uint64 b, sl_uint64& o_high, sl_uint64& o_low) noexcept;
-
+				
 	};
 
 }

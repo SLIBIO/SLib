@@ -19,10 +19,7 @@ namespace slib
 	
 	extern const _priv_String16_Const _priv_String16_Null;
 	extern const _priv_String16_Const _priv_String16_Empty;
-
-	template <>
-	struct StringTypeFromCharType<sl_char16> { typedef String16 Type; };
-
+	
 	SLIB_INLINE String16::String16(String16&& src) noexcept
 	{
 		m_container = src.m_container;

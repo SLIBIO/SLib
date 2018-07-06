@@ -144,6 +144,7 @@
     <ClCompile Include="..\..\src\slib\math\bezier.cpp" />
     <ClCompile Include="..\..\src\slib\math\bigint.cpp" />
     <ClCompile Include="..\..\src\slib\math\box.cpp" />
+    <ClCompile Include="..\..\src\slib\math\calculator.cpp" />
     <ClCompile Include="..\..\src\slib\math\int128.cpp" />
     <ClCompile Include="..\..\src\slib\math\line.cpp" />
     <ClCompile Include="..\..\src\slib\math\line3.cpp" />

@@ -51,7 +51,29 @@ namespace slib
 	
 	template <class CharType>
 	struct StringTypeFromCharType;
+	
+	template <>
+	struct StringTypeFromCharType<sl_char16> { typedef String16 Type; };
+	
+	template <>
+	struct StringTypeFromCharType<sl_char8> { typedef String Type; };
+	
+	
+	template <class StringType>
+	struct CharTypeFromStringType;
 
+	template <>
+	struct CharTypeFromStringType<String> { typedef sl_char8 Type; };
+
+	template <>
+	struct CharTypeFromStringType<AtomicString> { typedef sl_char8 Type; };
+
+	template <>
+	struct CharTypeFromStringType<String16> { typedef sl_char16 Type; };
+	
+	template <>
+	struct CharTypeFromStringType<AtomicString16> { typedef sl_char16 Type; };
+	
 }
 
 #include "detail/string8.inc"

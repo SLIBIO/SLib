@@ -19,10 +19,6 @@ namespace slib
 	
 	extern const _priv_String_Const _priv_String_Null;
 	extern const _priv_String_Const _priv_String_Empty;
-
-	template <>
-	struct StringTypeFromCharType<sl_char8> { typedef String Type; };
-
 	
 	SLIB_INLINE String::String(String&& src) noexcept
 	{
