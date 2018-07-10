@@ -58,8 +58,14 @@ namespace slib
 		sl_bool finishAndWait(sl_int32 timeout = -1);
 
 		sl_bool wait(sl_int32 timeout = -1);
+		
+		void wakeSelfEvent();
 
+		const Ref<Event>& getSelfEvent();
+		
 		void wake();
+		
+		Ref<Event> getWaitingEvent();
 	
 		void setWaitingEvent(Event* ev);
 

@@ -53,8 +53,9 @@ namespace slib
 	
 	protected:
 		CList< Ref<Thread> > m_threadWorkers;
+		LinkedQueue< Ref<Thread> > m_threadSleeping;
 		LinkedQueue< Function<void()> > m_tasks;
-	
+
 		sl_bool m_flagRunning;
 
 	};

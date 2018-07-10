@@ -136,9 +136,18 @@ namespace slib
 		if (m_flagRequestStop) {
 			return sl_false;
 		} else {
-			sl_bool ret = m_eventWake->wait(timeout);
-			return ret;
+			return m_eventWake->wait(timeout);
 		}
+	}
+
+	void Thread::wakeSelfEvent()
+	{
+		m_eventWake->set();
+	}
+	
+	const Ref<Event>& Thread::getSelfEvent()
+	{
+		return m_eventWake;
 	}
 
 	void Thread::wake()
@@ -147,6 +156,11 @@ namespace slib
 		if (ev.isNotNull()) {
 			ev->set();
 		}
+	}
+	
+	Ref<Event> Thread::getWaitingEvent()
+	{
+		return m_eventWaiting;
 	}
 
 	void Thread::setWaitingEvent(Event* ev)

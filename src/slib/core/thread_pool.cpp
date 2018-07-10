@@ -80,12 +80,10 @@ namespace slib
 
 		// wake a sleeping worker
 		{
-			ListElements< Ref<Thread> > threads(m_threadWorkers);
-			for (sl_size i = 0; i < threads.count; i++) {
-				if (threads[i]->isWaiting()) {
-					threads[i]->wake();
-					return sl_true;
-				}
+			Ref<Thread> thread;
+			if (m_threadSleeping.pop_NoLock(&thread)) {
+				thread->wakeSelfEvent();
+				return sl_true;
 			}
 		}
 
@@ -109,6 +107,10 @@ namespace slib
 
 	void ThreadPool::onRunWorker()
 	{
+		Ref<Thread> thread = Thread::getCurrent();
+		if (thread.isNull()) {
+			return;
+		}
 		while (m_flagRunning && Thread::isNotStoppingCurrent()) {
 			Function<void()> task;
 			if (m_tasks.pop(&task)) {
@@ -117,11 +119,12 @@ namespace slib
 				ObjectLocker lock(this);
 				sl_size nThreads = m_threadWorkers.getCount();
 				if (nThreads > getMinimumThreadsCount()) {
-					m_threadWorkers.remove_NoLock(Thread::getCurrent());
+					m_threadWorkers.remove_NoLock(thread);
 					return;
 				} else {
+					m_threadSleeping.push_NoLock(thread);
 					lock.unlock();
-					Thread::sleep(5000);
+					thread->wait();
 				}
 			}
 		}
