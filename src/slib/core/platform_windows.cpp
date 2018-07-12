@@ -341,6 +341,9 @@ namespace slib
 	LOAD_LIBRARY(kernel32, "kernel32.dll")
 	GET_API(kernel32, GetQueuedCompletionStatusEx)
 
+	LOAD_LIBRARY(wininet, "wininet.dll")
+
+
 	sl_bool Windows::getRegistryValue(HKEY hKeyParent, const String16& path, const String16& name, Variant* out)
 	{
 		if (!hKeyParent) {
@@ -568,7 +571,7 @@ namespace slib
 		}
 		sei.hwnd = param.hWndParent;
 		sei.nShow = param.nShow;
-		if (ShellExecuteExW(&sei)) {
+		if (::ShellExecuteExW(&sei)) {
 			return sl_true;
 		}
 		return sl_false;

@@ -32,6 +32,8 @@ using namespace Platform;
 #include "slib/core/list.h"
 #include "slib/core/string_buffer.h"
 #include "slib/core/log.h"
+#include "slib/core/platform_windows.h"
+
 
 #define PRIV_PATH_MAX 1024
 
@@ -183,11 +185,20 @@ namespace slib
 		String ret;
 		if (errorCode > 0) {
 			LPWSTR buf = sl_null;
-			DWORD size = ::FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buf, 0, NULL);
+			DWORD size = ::FormatMessageW(
+				FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_HMODULE,
+				Windows::loadLibrary_wininet(),
+				errorCode,
+				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+				(LPWSTR)&buf, 0,
+				NULL);
 			if (buf) {
 				ret = String((sl_char16*)buf, size);
 				::LocalFree(buf);
 			}
+		}
+		if (ret.isEmpty()) {
+			return String::format("Unknown error: %d", errorCode);
 		}
 		return ret;
 	}

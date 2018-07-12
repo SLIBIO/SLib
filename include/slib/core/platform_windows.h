@@ -77,6 +77,8 @@ namespace slib
 
 		static WINAPI_GetQueuedCompletionStatusEx getAPI_GetQueuedCompletionStatusEx();
 
+		static HMODULE loadLibrary_wininet();
+
 	
 		static Ref<Event> createEvent(HANDLE hEvent, sl_bool flagCloseOnRelease = sl_true);
 	

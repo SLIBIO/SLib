@@ -220,7 +220,11 @@ namespace slib
 	
 	String System::formatErrorCode(sl_uint32 errorCode)
 	{
-		return ::strerror(errorCode);
+		String ret = ::strerror(errorCode);
+		if (ret.isEmpty()) {
+			return String::format("Unknown error: %d", errorCode);
+		}
+		return ret;
 	}
 
 	void System::abort(const String& msg, const String& file, sl_uint32 line)
