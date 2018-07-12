@@ -15,7 +15,6 @@
 #include "slib/network/url_request.h"
 
 #include "slib/core/safe_static.h"
-#include "slib/core/log.h"
 #include "slib/core/platform_apple.h"
 
 namespace slib
@@ -231,7 +230,6 @@ namespace slib
 					} else {
 						strError = String::format("Moving downloaded file failed: %s=>%s", Apple::getStringFromNSString(pathTempFile.absoluteString), m_downloadFilePath);
 					}
-					LogError("UrlRequest", "Error: %s", strError);
 					m_lastErrorMessage = strError;
 					onError();
 				}
@@ -242,7 +240,6 @@ namespace slib
 		{
 			if (error != nil) {
 				String strError = Apple::getStringFromNSString(error.localizedDescription);
-				LogError("UrlRequest", "Error: %s", strError);
 				m_lastErrorMessage = strError;
 				onError();
 			} else {

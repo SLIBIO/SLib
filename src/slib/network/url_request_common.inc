@@ -33,8 +33,8 @@
 		}
 		Ref<UrlRequest> request = new UrlRequest;
 		if (request.isNotNull()) {
-			LogError("UrlRequest", "Failed to create request on %s", url);
 			request->_init(param, url);
+			request->m_lastErrorMessage = "Failed to create request";
 			request->onError();
 			return request;
 		}

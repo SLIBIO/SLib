@@ -16,7 +16,7 @@
 #include "slib/core/thread_pool.h"
 #include "slib/core/safe_static.h"
 #include "slib/core/event.h"
-#include "slib/core/log.h"
+#include "slib/core/system.h"
 
 namespace slib
 {
@@ -266,6 +266,11 @@ namespace slib
 			return sl_true;
 		}
 		return m_flagError;
+	}
+
+	String UrlRequest::getLastErrorMessage()
+	{
+		return m_lastErrorMessage;
 	}
 	
 	sl_bool UrlRequest::isClosed()

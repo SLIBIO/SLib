@@ -19,15 +19,19 @@
 #include "slib/network/url.h"
 #include "slib/core/string_buffer.h"
 #include "slib/core/scoped.h"
-#include "slib/core/log.h"
 #include "slib/core/safe_static.h"
 #include "slib/core/async.h"
+#include "slib/core/system.h"
 
-#include <wininet.h>
-#pragma comment(lib, "wininet.lib")
+#include <winhttp.h>
+#pragma comment(lib, "winhttp.lib")
 
 #define MAX_CONNECTION_POOL_SIZE 32
 #define READ_BUFFER_SIZE 65536
+#define DOWNLOAD_ACCUME_SIZE 2000000
+
+#undef min
+#undef max
 
 namespace slib
 {
@@ -62,44 +66,52 @@ namespace slib
 		HashMap< sl_int32, WeakRef<UrlRequest_Impl> > requests;
 
 	public:
-		UrlRequest_Session(INTERNET_STATUS_CALLBACK callback)
+		UrlRequest_Session(WINHTTP_STATUS_CALLBACK callback)
 		{
 			lastConnectionId = 0;
 			lastTaskId = 0;
-			hInternet = ::InternetOpenW(L"Windows Client", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, INTERNET_FLAG_ASYNC);
-			::InternetSetStatusCallbackA(hInternet, callback);
+			
+			hInternet = ::WinHttpOpen(L"Windows Client", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, NULL, NULL, WINHTTP_FLAG_ASYNC);
+			::WinHttpSetStatusCallback(hInternet, callback,
+				WINHTTP_CALLBACK_FLAG_REQUEST_ERROR |
+				WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE |
+				WINHTTP_CALLBACK_FLAG_HEADERS_AVAILABLE |
+				WINHTTP_CALLBACK_STATUS_DATA_AVAILABLE |
+				WINHTTP_CALLBACK_STATUS_READ_COMPLETE,
+				NULL);
 		}
 
 		~UrlRequest_Session()
 		{
-			::InternetSetStatusCallbackA(hInternet, NULL);
-			::InternetCloseHandle(hInternet);
+			::WinHttpSetStatusCallback(hInternet, NULL, 0, NULL);
+			::WinHttpCloseHandle(hInternet);
 		}
 
-		Ref<UrlRequest_Connection> getConnection(const String16& url, LPCWSTR& path)
+		Ref<UrlRequest_Connection> getConnection(const String& url, String16& outPath)
 		{
-			DWORD lenURL = (DWORD)(url.getLength());
+			String16 urlBuffer = url;
+			DWORD lenURL = (DWORD)(urlBuffer.getLength());
 			URL_COMPONENTSW comps = { 0 };
 			comps.dwStructSize = sizeof(comps);
 			comps.dwHostNameLength = lenURL;
 			comps.dwUserNameLength = lenURL;
 			comps.dwPasswordLength = lenURL;
 			comps.dwUrlPathLength = lenURL;
-			if (::InternetCrackUrlW((LPCWSTR)(url.getData()), lenURL, 0, &comps)) {
+			if (::WinHttpCrackUrl((LPCWSTR)(urlBuffer.getData()), lenURL, 0, &comps)) {
 				if (comps.lpszHostName && (comps.nScheme == INTERNET_SCHEME_HTTP || comps.nScheme == INTERNET_SCHEME_HTTPS)) {
-					if (comps.lpszUrlPath && comps.lpszUrlPath[0]) {
-						path = comps.lpszUrlPath;
-						*(comps.lpszUrlPath - 1) = 0;
+					if (comps.lpszUrlPath && *(comps.lpszUrlPath)) {
+						outPath = comps.lpszUrlPath;
+						*(comps.lpszUrlPath) = 0;
 					} else {
-						path = L"/";
+						outPath = L"/";
 					}
-					String16 address = url.getData();
+					String16 address = urlBuffer.getData();
 					{
 						ObjectLocker lock(&connectionPool);
 						Link< Ref<UrlRequest_Connection> >* link = connectionPool.getBack();
 						while (link) {
 							Ref<UrlRequest_Connection>& r = link->value;
-							if (r->address.getHashCode() == url.getHashCode() && r->address == url) {
+							if (r->address.getHashCode() == address.getHashCode() && r->address == address) {
 								Ref<UrlRequest_Connection> connection = link->value;
 								Link< Ref<UrlRequest_Connection> >* before = link->before;
 								connectionPool.removeAt(link);
@@ -116,14 +128,17 @@ namespace slib
 						comps.lpszPassword[comps.dwPasswordLength] = 0;
 					}
 					sl_int32 connectionId = Base::interlockedIncrement32(&(lastConnectionId)) & 0x7FFFFFFF;
-					HINTERNET hConnect = ::InternetConnectW(hInternet, comps.lpszHostName, comps.nPort, comps.lpszUserName, comps.lpszPassword, INTERNET_SERVICE_HTTP, 0, (DWORD_PTR)(connectionId | 0x80000000));
+					HINTERNET hConnect = ::WinHttpConnect(hInternet, comps.lpszHostName, comps.nPort, 0);					
 					if (hConnect) {
 						Ref<UrlRequest_Connection> ret = new UrlRequest_Connection(hConnect, connectionId, address, comps.nScheme == INTERNET_SCHEME_HTTPS);
 						if (ret.isNotNull()) {
+							if (comps.lpszUserName || comps.lpszPassword) {
+								::WinHttpSetCredentials(hConnect, WINHTTP_AUTH_TARGET_SERVER, WINHTTP_AUTH_SCHEME_BASIC, comps.lpszUserName, comps.lpszPassword, NULL);
+							}
 							connections.put(connectionId, ret);
 							return ret;
 						}
-						::InternetCloseHandle(hConnect);
+						::WinHttpCloseHandle(hConnect);
 					}
 				}
 			}
@@ -132,42 +147,6 @@ namespace slib
 
 	};
 
-	class UrlRequest_DownloadStream : public AsyncStream, public IAsyncCopyListener
-	{
-	public:
-		WeakRef<UrlRequest_Impl> m_request;
-		LinkedQueue< Ref<AsyncStreamRequest> > m_queueBuffers;
-		Ref<AsyncStreamRequest> m_currentBuffer;
-		DWORD m_currentReadSize;
-		sl_bool m_flagCompleteRead;
-
-	public:
-		UrlRequest_DownloadStream(UrlRequest_Impl* request);
-
-	public:
-		void close() override;
-
-		sl_bool isOpened() override;
-
-		sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref) override;
-
-		sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref) override
-		{
-			return sl_false;
-		}
-
-		sl_bool addTask(const Function<void()>& callback) override
-		{
-			return sl_false;
-		}
-
-		void onReadBuffer(UrlRequest_Impl* request, HINTERNET hRequest);
-
-		sl_bool readBuffer(UrlRequest_Impl* request, HINTERNET hRequest, AsyncStreamRequest* buffer);
-
-		void onAsyncCopyExit(AsyncCopy* task) override;
-
-	};
 
 	class UrlRequest_Impl : public UrlRequest
 	{
@@ -177,23 +156,27 @@ namespace slib
 		sl_int32 m_taskId;
 		sl_int32 m_step;
 
-		Memory m_bufPacket;
-		DWORD m_sizeReadPacket;
+		Memory m_memReceiving;
+		sl_size m_offsetReceiving;
 
-		AtomicRef<AsyncFile> m_downloadFile;
-		AtomicRef<UrlRequest_DownloadStream> m_downloadStream;
-		AtomicRef<AsyncCopy> m_downloadCopy;
+		AtomicRef<AsyncStream> m_fileDownload;
+		sl_bool m_flagDownloadReading;
+		sl_reg m_sizeDownloadWriting;
 
 		enum {
-			STEP_CONNECT, STEP_SEND_REQUEST, STEP_RECEIVE_DATA, STEP_COMPLETE, STEP_ERROR
+			STEP_INIT, STEP_SENDING_REQUEST, STEP_RECEIVING_RESPONSE, STEP_RECEIVING_DATA, STEP_FINISHED_RECEIVING, STEP_COMPLETE, STEP_ERROR
 		};
 
 	public:
 		UrlRequest_Impl()
 		{
 			m_hRequest = NULL;
-			m_step = STEP_CONNECT;
-			m_sizeReadPacket = 0;
+			m_step = STEP_INIT;
+
+			m_offsetReceiving = 0;
+
+			m_flagDownloadReading = sl_false;
+			m_sizeDownloadWriting = 0;
 		}
 
 		~UrlRequest_Impl()
@@ -214,39 +197,30 @@ namespace slib
 		{
 			UrlRequest_Session* session = getSession();
 			if (session) {
-				Memory bufPacket = Memory::create(READ_BUFFER_SIZE);
-				if (bufPacket.isNull()) {
-					return sl_null;
-				}
-				LPCWSTR path;
+				String16 path;
 				Ref<UrlRequest_Connection> connection = session->getConnection(url, path);
 				if (connection.isNotNull()) {
 					Ref<UrlRequest_Impl> ret = new UrlRequest_Impl;
 					if (ret.isNotNull()) {
-						Ref<AsyncFile> fileDownload;
+						Ref<AsyncStream> fileDownload;
 						if (param.downloadFilePath.isNotEmpty()) {
-							Ref<File> file = File::openForWrite(param.downloadFilePath);
-							if (file.isNull()) {
-								return sl_null;
-							}
-							fileDownload = AsyncFile::create(file);
+							fileDownload = AsyncFile::openIOCP(param.downloadFilePath, FileMode::Write);
 							if (fileDownload.isNull()) {
 								return sl_null;
 							}
 						}
 						sl_int32 taskId = Base::interlockedIncrement32(&(session->lastTaskId)) & 0x7FFFFFFF;
 						String16 verb = HttpMethods::toString(param.method);
-						DWORD flags = INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE;
+						DWORD flags = WINHTTP_FLAG_REFRESH;
 						if (connection->flagHttps) {
-							flags |= INTERNET_FLAG_SECURE;
+							flags |= WINHTTP_FLAG_SECURE;
 						}
 						ret->_init(param, url);
 						ret->m_connection = connection;
-						ret->m_downloadFile = fileDownload;
-						ret->m_bufPacket = bufPacket;
 						ret->m_taskId = taskId;
+						ret->m_fileDownload = fileDownload;
 						session->requests.put(taskId, ret);
-						HINTERNET hRequest = ::HttpOpenRequestW(connection->hConnect, (LPCWSTR)(verb.getData()), path, NULL, NULL, NULL, flags, (DWORD_PTR)taskId);
+						HINTERNET hRequest = ::WinHttpOpenRequest(connection->hConnect, (LPCWSTR)(verb.getData()), (LPCWSTR)(path.getData()), NULL, NULL, NULL, flags);
 						if (hRequest) {
 							ret->m_hRequest = hRequest;
 							return ret;
@@ -266,14 +240,14 @@ namespace slib
 		void _sendAsync() override
 		{
 			if (m_hRequest) {
-				processAsync(m_hRequest, ERROR_SUCCESS);
+				startAsync();
 			}
 		}
 
 		void clean()
 		{
 			if (m_hRequest) {
-				::InternetCloseHandle(m_hRequest);
+				::WinHttpCloseHandle(m_hRequest);
 				m_hRequest = NULL;
 				UrlRequest_Session* session = getSession();
 				if (session) {
@@ -281,9 +255,237 @@ namespace slib
 				}
 				m_connection.setNull();
 			}
-			m_downloadCopy.setNull();
-			m_downloadStream.setNull();
-			m_downloadFile.setNull();
+			m_fileDownload.setNull();
+		}
+
+		void startAsync()
+		{
+			if (m_step != STEP_INIT) {
+				return;
+			}
+			{
+				for (auto& pair : m_requestHeaders) {
+					String16 line = String16::format("%s: %s\r\n", pair.key, pair.value);
+					::WinHttpAddRequestHeaders(m_hRequest, (LPCWSTR)(line.getData()), (DWORD)(line.getLength()), WINHTTP_ADDREQ_FLAG_ADD | WINHTTP_ADDREQ_FLAG_REPLACE);
+				}
+			}
+			StringBuffer16 sb;
+			{
+				for (auto& pair : m_additionalRequestHeaders) {
+					String16 str = pair.key;
+					sb.addStatic(str.getData(), str.getLength());
+					sb.addStatic(SLIB_UNICODE(": "), 2);
+					str = pair.value;
+					sb.addStatic(str.getData(), str.getLength());
+					sb.addStatic(SLIB_UNICODE("\r\n"), 2);
+				}
+			}
+			String16 s = sb.merge();
+			Memory body = m_requestBody;
+
+			m_step = STEP_SENDING_REQUEST;
+			if (!(::WinHttpSendRequest(m_hRequest, (LPCWSTR)(s.getData()), (DWORD)(s.getLength()), body.getData(), (DWORD)(body.getSize()), (DWORD)(body.getSize()), (DWORD_PTR)m_taskId))) {
+				processLastError();
+			}
+		}
+
+		void _onSendRequestComplete()
+		{
+			m_sizeBodySent = m_requestBody.getSize();
+			onUploadBody(m_sizeBodySent);
+
+			m_step = STEP_RECEIVING_RESPONSE;
+			if (!(::WinHttpReceiveResponse(m_hRequest, NULL))) {
+				processLastError();
+			}
+		}
+
+		void _onHeadersAvailable()
+		{
+			DWORD status = 0;
+			DWORD len = 4;
+			if (!(::WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER, NULL, &status, &len, NULL))) {
+				processLastError();
+				return;
+			}
+			m_responseStatus = (HttpStatus)status;
+
+			m_sizeContentTotal = SLIB_UINT64_MAX;
+
+			len = 0;
+			::WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_RAW_HEADERS_CRLF, NULL, NULL, &len, NULL);
+			SLIB_SCOPED_BUFFER(char, 1024, bufHeaders, len);
+			if (!(::WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_RAW_HEADERS_CRLF, NULL, bufHeaders, &len, NULL))) {
+				processLastError();
+				return;
+			}
+			if (len) {
+				HttpResponse response;
+				String strPacket((sl_char16*)bufHeaders, len / 2);
+				sl_reg iRet = response.parseResponsePacket(strPacket.getData(), strPacket.getLength());
+				if (iRet > 0) {
+					m_responseMessage = response.getResponseMessage();
+					m_responseHeaders = response.getResponseHeaders();
+					String strLength = response.getResponseHeader("Content-Length");
+					if (strLength.isNotEmpty()) {
+						m_sizeContentTotal = strLength.parseUint64();
+					}
+				}
+			}
+
+			onResponse();
+
+			if (m_sizeContentTotal == 0) {
+				processComplete();
+				return;
+			}
+
+			m_step = STEP_RECEIVING_DATA;
+
+			if (m_fileDownload.isNotNull()) {
+				downloadData();
+			} else {
+				receiveData();
+			}
+		}
+
+		void receiveData()
+		{
+			if (m_step != STEP_RECEIVING_DATA) {
+				return;
+			}
+			if (!(::WinHttpQueryDataAvailable(m_hRequest, NULL))) {
+				processLastError();
+			}
+		}
+
+		void downloadData()
+		{
+			if (m_step != STEP_RECEIVING_DATA) {
+				return;
+			}
+			ObjectLocker lock(this);
+			if (m_flagDownloadReading) {
+				return;
+			}
+			if (m_sizeDownloadWriting > DOWNLOAD_ACCUME_SIZE) {
+				return;
+			}
+			m_flagDownloadReading = sl_true;
+			lock.unlock();
+			if (!(::WinHttpQueryDataAvailable(m_hRequest, NULL))) {
+				processLastError();
+			}
+		}
+
+		void _onDataAvailable(sl_size size)
+		{
+			if (m_step != STEP_RECEIVING_DATA) {
+				return;
+			}
+			if (size == 0) {
+				finishReceiving();
+				return;
+			}
+			sl_size sizeBuf = m_memReceiving.getSize();
+			if (sizeBuf < size) {
+				if (sizeBuf == 0) {
+					sizeBuf = Math::max((sl_size)READ_BUFFER_SIZE, size);
+					if ((sl_uint64)sizeBuf > m_sizeContentTotal) {
+						sizeBuf = (sl_size)m_sizeContentTotal;
+					}
+				} else {
+					processReadData();
+					sizeBuf = size;
+				}
+				m_memReceiving = Memory::create(sizeBuf);
+				if (m_memReceiving.isNull()) {
+					processError("Memory Error");
+					return;
+				}
+				m_offsetReceiving = 0;
+			}
+			if (m_offsetReceiving + size > sizeBuf) {
+				processReadData();
+			}
+			if (!(::WinHttpReadData(m_hRequest, (char*)(m_memReceiving.getData()) + m_offsetReceiving, (DWORD)size, NULL))) {
+				processLastError();
+			}
+		}
+
+		void finishReceiving()
+		{
+			processReadData();
+			if (m_fileDownload.isNotNull()) {
+				Ref<AsyncStream> file = m_fileDownload;
+				if (file.isNotNull()) {
+					m_step = STEP_FINISHED_RECEIVING;
+					if (!(file->write(sl_null, 0, SLIB_FUNCTION_WEAKREF(UrlRequest_Impl, _onWriteDownloadFile, this)))) {
+						processError("Error on writing download file");
+					}
+				}
+			} else {
+				processComplete();
+			}
+		}
+
+		void processReadData()
+		{
+			if (m_offsetReceiving == 0) {
+				return;
+			}
+			if (m_fileDownload.isNotNull()) {
+				Ref<AsyncStream> file = m_fileDownload;
+				if (file.isNotNull()) {
+					Memory mem = Memory::create(m_memReceiving.getData(), (sl_uint32)m_offsetReceiving);
+					if (mem.isEmpty()) {
+						processError("Error on writing download file");
+					} else {
+						Base::interlockedAdd(&m_sizeDownloadWriting, m_offsetReceiving);
+						if (!(file->writeFromMemory(mem, SLIB_FUNCTION_WEAKREF(UrlRequest_Impl, _onWriteDownloadFile, this)))) {
+							processError("Error on writing download file");
+						}
+					}
+				}
+			} else {
+				onReceiveContent(m_memReceiving.getData(), m_offsetReceiving, Memory::null());
+			}
+			m_offsetReceiving = 0;
+		}
+
+		void _onReadComplete(const void* data, DWORD size)
+		{
+			if (m_step != STEP_RECEIVING_DATA) {
+				return;
+			}
+			m_offsetReceiving += size;
+			if (m_sizeContentReceived + size >= m_sizeContentTotal) {				
+				finishReceiving();
+				return;
+			}
+			if (m_downloadFilePath.isNotEmpty()) {
+				m_flagDownloadReading = sl_false;
+				downloadData();
+			} else {
+				receiveData();
+			}
+		}
+
+		void _onWriteDownloadFile(AsyncStreamResult* result)
+		{
+			if (result->size > 0) {
+				onDownloadContent(result->size);
+				Base::interlockedAdd(&m_sizeDownloadWriting, -((sl_reg)(result->size)));
+			}
+			if (result->flagError) {
+				processError("Error on writing download file");
+				return;
+			}
+			if (m_sizeContentReceived >= m_sizeContentTotal || (m_step == STEP_FINISHED_RECEIVING && result->size == 0)) {
+				processComplete();
+			} else {
+				downloadData();
+			}
 		}
 
 		static void CALLBACK callbackStatus(HINTERNET hInternet, DWORD_PTR dwContext, DWORD dwInternetStatus, LPVOID lpvStatusInformation, DWORD dwStatusInformationLength)
@@ -295,167 +497,27 @@ namespace slib
 			if (!session) {
 				return;
 			}
-			sl_int32 id = (sl_int32)(dwContext);
+			Ref<UrlRequest_Impl> request = session->requests.getValue((sl_int32)(dwContext), WeakRef<UrlRequest_Impl>::null());
+			if (request.isNull()) {
+				return;
+			}
 			switch (dwInternetStatus) {
-			case INTERNET_STATUS_REQUEST_COMPLETE:
-				if (!(id & 0x80000000)) {
-					Ref<UrlRequest_Impl> request = session->requests.getValue(id, WeakRef<UrlRequest_Impl>::null());
-					if (request.isNotNull()) {
-						INTERNET_ASYNC_RESULT* result = (LPINTERNET_ASYNC_RESULT)lpvStatusInformation;
-						request->processAsync(hInternet, result->dwError);
-					}
-				}
+			case WINHTTP_CALLBACK_STATUS_REQUEST_ERROR:
+				request->processErrorCode(((WINHTTP_ASYNC_RESULT*)lpvStatusInformation)->dwError);
 				break;
-			case INTERNET_STATUS_REQUEST_SENT:
-				if (!(id & 0x80000000)) {
-					Ref<UrlRequest_Impl> request = session->requests.getValue(id, WeakRef<UrlRequest_Impl>::null());
-					if (request.isNotNull()) {
-						DWORD dwSize = *((DWORD*)lpvStatusInformation);
-						request->m_sizeBodySent += dwSize;
-						request->onUploadBody(dwSize);
-					}
-				}
+			case WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE:
+				request->_onSendRequestComplete();
+				break;
+			case WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE:
+				request->_onHeadersAvailable();
+				break;
+			case WINHTTP_CALLBACK_STATUS_DATA_AVAILABLE:
+				request->_onDataAvailable(*((DWORD*)lpvStatusInformation));
+				break;
+			case WINHTTP_CALLBACK_STATUS_READ_COMPLETE:
+				request->_onReadComplete(lpvStatusInformation, dwStatusInformationLength);
 				break;
 			}
-		}
-		
-		void processAsync(HINTERNET hRequest, DWORD dwError)
-		{
-			while (dwError == ERROR_SUCCESS && m_step != STEP_COMPLETE) {
-				switch (m_step) {
-				case STEP_CONNECT:
-					{
-						{
-							for (auto& pair : m_requestHeaders) {
-								String line = String16::format("%s: %s\r\n", pair.key, pair.value);
-								::HttpAddRequestHeadersA(hRequest, line.getData(), (DWORD)(line.getLength()), HTTP_ADDREQ_FLAG_ADD | HTTP_ADDREQ_FLAG_REPLACE);
-							}
-						}
-						StringBuffer sb;
-						{
-							for (auto& pair : m_additionalRequestHeaders) {
-								String str = pair.key;
-								sb.addStatic(str.getData(), str.getLength());
-								sb.addStatic(": ", 2);
-								str = pair.value;
-								sb.addStatic(str.getData(), str.getLength());
-								sb.addStatic("\r\n", 2);
-							}
-						}
-						String s = sb.merge();
-						Memory body = m_requestBody;
-
-						m_step = STEP_SEND_REQUEST;
-						if (!(::HttpSendRequestA(hRequest, s.getData(), (DWORD)(s.getLength()), body.getData(), (DWORD)(body.getSize())))) {
-							dwError = ::GetLastError();
-						}
-					}
-					break;
-				case STEP_SEND_REQUEST:
-					{
-						DWORD status;
-						DWORD len = 4;
-						::HttpQueryInfoA(hRequest, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &status, &len, NULL);
-						m_responseStatus = (HttpStatus)status;
-
-						m_sizeContentTotal = (sl_uint64)-1;
-
-						len = 0;
-						::HttpQueryInfoA(hRequest, HTTP_QUERY_RAW_HEADERS_CRLF, NULL, &len, NULL);
-
-						SLIB_SCOPED_BUFFER(char, 1024, bufHeaders, len);
-						::HttpQueryInfoA(hRequest, HTTP_QUERY_RAW_HEADERS_CRLF, bufHeaders, &len, NULL);
-						if (len) {
-							HttpResponse response;
-							sl_reg iRet = response.parseResponsePacket(bufHeaders, len);
-							if (iRet > 0) {
-								m_responseMessage = response.getResponseMessage();
-								m_responseHeaders = response.getResponseHeaders();
-								String strLength = response.getResponseHeader("Content-Length");
-								if (strLength.isNotEmpty()) {
-									m_sizeContentTotal = strLength.parseUint64();
-								}
-							}
-						}
-
-						onResponse();
-
-						if (m_sizeContentTotal == 0) {
-							processComplete();
-						} else {
-							m_step = STEP_RECEIVE_DATA;
-							if (m_downloadFilePath.isNotEmpty()) {
-								Ref<UrlRequest_DownloadStream> stream = new UrlRequest_DownloadStream(this);
-								if (stream.isNotNull()) {
-									m_downloadStream = stream;
-									AsyncCopyParam cp;
-									cp.source = stream;
-									cp.target = m_downloadFile;
-									cp.listener.setRef(stream);
-									cp.bufferSize = READ_BUFFER_SIZE;
-									m_downloadCopy = AsyncCopy::create(cp);
-									if (m_downloadCopy.isNotNull()) {
-										return;
-									}
-								}
-								processError();
-								return;
-							} else {
-								dwError = receiveData(hRequest);
-							}
-						}
-					}
-					break;
-				case STEP_RECEIVE_DATA:
-					{
-						if (m_downloadFilePath.isNotNull()) {
-							Ref<UrlRequest_DownloadStream> stream = m_downloadStream;
-							if (stream.isNotNull()) {
-								stream->onReadBuffer(this, hRequest);
-							}
-							return;
-						} else {
-							if (m_sizeReadPacket) {
-								onReceiveContent(m_bufPacket.getData(), m_sizeReadPacket, Memory::null());
-							}
-							dwError = receiveData(hRequest);
-						}
-					}
-					break;
-				}
-			}
-			if (dwError != ERROR_SUCCESS && dwError != ERROR_IO_PENDING) {
-				if (dwError == ERROR_INTERNET_EXTENDED_ERROR) {
-					DWORD err = dwError;
-					WCHAR buf[512];
-					DWORD len = 512;
-					if (::InternetGetLastResponseInfoW(&err, buf, &len)) {
-						LogError("UrlRequest", String(buf, len));
-					}
-				}
-				processError();
-			}
-		}
-
-		DWORD receiveData(HINTERNET hRequest)
-		{
-			void* buf = m_bufPacket.getData();
-			DWORD sizeBuf = (DWORD)(m_bufPacket.getSize());
-			while (1) {
-				m_sizeReadPacket = 0;
-				if (::InternetReadFile(hRequest, buf, sizeBuf, &m_sizeReadPacket)) {
-					if (m_sizeReadPacket) {
-						onReceiveContent(buf, m_sizeReadPacket, Memory::null());
-					} else {
-						processComplete();
-						return ERROR_SUCCESS;
-					}
-				} else {
-					DWORD dwError = ::GetLastError();
-					return dwError;
-				}
-			}
-			return ERROR_SUCCESS;
 		}
 
 		void processComplete()
@@ -473,13 +535,24 @@ namespace slib
 			clean();
 		}
 
-		void processError()
+		void processLastError()
+		{
+			processErrorCode(::GetLastError());
+		}
+
+		void processErrorCode(DWORD dwError)
+		{
+			processError(System::formatErrorCode(dwError));
+		}
+
+		void processError(const String& errorMessage)
 		{
 			ObjectLocker lock(this);
 			if (m_step == STEP_COMPLETE || m_step == STEP_ERROR) {
 				return;
 			}
 			m_step = STEP_ERROR;
+			m_lastErrorMessage = errorMessage;
 			onError();
 			clean();
 		}
@@ -487,106 +560,9 @@ namespace slib
 		friend class UrlRequest_DownloadStream;
 	};
 
-	UrlRequest_DownloadStream::UrlRequest_DownloadStream(UrlRequest_Impl* request) : m_request(request)
-	{
-		m_flagCompleteRead = sl_false;
-	}
-
-	void UrlRequest_DownloadStream::close()
-	{
-		ObjectLocker lock(this);
-		m_request.setNull();
-	}
-
-	sl_bool UrlRequest_DownloadStream::isOpened()
-	{
-		return m_request.isNotNull();
-	}
-
-	sl_bool UrlRequest_DownloadStream::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref)
-	{
-		Ref<UrlRequest_Impl> request(m_request);
-		if (request.isNotNull()) {
-			Ref<AsyncStreamRequest> buf = AsyncStreamRequest::createRead(data, size, ref, callback);
-			if (buf.isNotNull()) {
-				ObjectLocker lock(this);
-				if (m_currentBuffer.isNotNull()) {
-					if (m_queueBuffers.push(buf)) {
-						return sl_true;
-					}
-				} else {
-					return readBuffer(request.get(), request->m_hRequest, buf.get());
-				}
-			}
-		}
-		return sl_false;
-	}
-
-	void UrlRequest_DownloadStream::onReadBuffer(UrlRequest_Impl* request, HINTERNET hRequest)
-	{
-		if (m_currentReadSize) {
-			request->onDownloadContent(m_currentReadSize);
-		}
-		ObjectLocker lock(this);
-		if (m_currentBuffer.isNotNull()) {
-			m_currentBuffer->runCallback(this, m_currentReadSize, sl_false);
-			m_currentBuffer.setNull();
-		}
-		while (m_currentBuffer.isNull()) {
-			Ref<AsyncStreamRequest> buf;
-			if (m_queueBuffers.pop(&buf)) {
-				if (!(readBuffer(request, hRequest, buf.get()))) {
-					m_currentBuffer->runCallback(this, 0, sl_true);
-					close();
-					return;
-				}
-			} else {
-				break;
-			}
-		}
-	}
-
-	sl_bool UrlRequest_DownloadStream::readBuffer(UrlRequest_Impl* request, HINTERNET hRequest, AsyncStreamRequest* buffer)
-	{
-		m_currentReadSize = 0;
-		if (::InternetReadFile(hRequest, buffer->data, buffer->size, &m_currentReadSize)) {
-			if (m_currentReadSize) {
-				request->onDownloadContent(m_currentReadSize);
-				buffer->runCallback(this, m_currentReadSize, sl_false);
-				return sl_true;
-			} else {
-				m_flagCompleteRead = sl_true;
-				return sl_false;
-			}
-		} else {
-			DWORD dwError = ::GetLastError();
-			if (dwError == ERROR_IO_PENDING) {
-				m_currentBuffer = buffer;
-				return sl_true;
-			}
-			return sl_false;
-		}
-	}
-
-	void UrlRequest_DownloadStream::onAsyncCopyExit(AsyncCopy* task)
-	{
-		Ref<UrlRequest_Impl> request(m_request);
-		if (request.isNotNull()) {
-			if (task->isWritingErrorOccured()) {
-				request->processError();
-				return;
-			}
-			if (m_flagCompleteRead) {
-				request->processComplete();
-				return;
-			}
-			request->processError();
-		}
-	}
-
 	UrlRequest_Connection::~UrlRequest_Connection()
 	{
-		::InternetCloseHandle(hConnect);
+		::WinHttpCloseHandle(hConnect);
 		UrlRequest_Session* session = UrlRequest_Impl::getSession();
 		if (session) {
 			session->connections.remove(id);

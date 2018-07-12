@@ -1,7 +1,7 @@
 #include "slib/network/curl.h"
 
 #include "slib/core/file.h"
-#include "slib/core/log.h"
+#include "slib/core/system.h"
 
 #include "curl/curl.h"
 
@@ -184,7 +184,6 @@ namespace slib
 				onComplete();
 			} else {
 				String strError = ::curl_easy_strerror(err);
-				LogError("CurlRequest", "Error: %s", strError);
 				m_lastErrorMessage = strError;
 				onError();
 			}
