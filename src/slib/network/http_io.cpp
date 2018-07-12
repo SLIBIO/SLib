@@ -464,7 +464,7 @@ namespace slib
 		setReadingError();
 	}
 
-	sl_bool HttpContentReader::write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref)
+	sl_bool HttpContentReader::write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref)
 	{
 		return sl_false;
 	}

@@ -170,17 +170,17 @@ namespace slib
 		if (!m_flagRunning) {
 			return;
 		}
-		m_thread->wake();
+		m_thread->wakeSelfEvent();
 	}
 
 	sl_int32 DispatchLoop::_getTimeout()
 	{
 		m_timeCounter.update();
+		sl_int32 t1 = _getTimeout_TimeTasks();
+		sl_int32 t2 = _getTimeout_Timer();
 		if (m_queueTasks.isNotEmpty()) {
 			return 0;
 		}
-		sl_int32 t1 = _getTimeout_TimeTasks();
-		sl_int32 t2 = _getTimeout_Timer();
 		if (t1 < 0) {
 			return t2;
 		} else {
@@ -334,15 +334,13 @@ namespace slib
 				}
 			}
 			
-			sl_int32 _t = _getTimeout();
-			if (_t < 0) {
-				_t = 10000;
+			sl_int32 t = _getTimeout();
+			if (t != 0) {
+				if (t < 0 || t > 10000) {
+					t = 10000;
+				}
+				Thread::sleep(t);
 			}
-			if (_t > 10000) {
-				_t = 10000;
-			}
-			Thread::sleep(_t);
-
 		}
 	}
 

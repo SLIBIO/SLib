@@ -85,19 +85,23 @@ namespace slib
 						return;
 					}
 				}
-				sl_int32 n = socket->receive((char*)(request->data), request->size);
-				if (n > 0) {
-					_onReceive(request.get(), n, flagError);
-				} else if (n < 0) {
-					_onReceive(request.get(), 0, sl_true);
-					return;
-				} else {
-					if (flagError) {
+				if (request->data && request->size) {
+					sl_int32 n = socket->receive((char*)(request->data), request->size);
+					if (n > 0) {
+						_onReceive(request.get(), n, flagError);
+					} else if (n < 0) {
 						_onReceive(request.get(), 0, sl_true);
+						return;
 					} else {
-						m_requestReading = request;
+						if (flagError) {
+							_onReceive(request.get(), 0, sl_true);
+						} else {
+							m_requestReading = request;
+						}
+						return;
 					}
-					return;
+				} else {
+					_onReceive(request.get(), request->size, sl_false);
 				}
 				request.setNull();
 			}
@@ -126,25 +130,29 @@ namespace slib
 						return;
 					}
 				}
-				sl_uint32 size = request->size - m_sizeWritten;
-				sl_int32 n = socket->send((char*)(request->data) + m_sizeWritten, size);
-				if (n > 0) {
-					m_sizeWritten += n;
-					if (m_sizeWritten >= request->size) {
-						_onSend(request.get(), request->size, flagError);
-					} else {
-						m_requestWriting = request;
-					}
-				} else if (n < 0) {
-					_onSend(request.get(), m_sizeWritten, sl_true);
-					return;
-				} else {
-					if (flagError) {
+				if (request->data && request->size) {
+					sl_uint32 size = request->size - m_sizeWritten;
+					sl_int32 n = socket->send((char*)(request->data) + m_sizeWritten, size);
+					if (n > 0) {
+						m_sizeWritten += n;
+						if (m_sizeWritten >= request->size) {
+							_onSend(request.get(), request->size, flagError);
+						} else {
+							m_requestWriting = request;
+						}
+					} else if (n < 0) {
 						_onSend(request.get(), m_sizeWritten, sl_true);
+						return;
 					} else {
-						m_requestWriting = request;
+						if (flagError) {
+							_onSend(request.get(), m_sizeWritten, sl_true);
+						} else {
+							m_requestWriting = request;
+						}
+						return;
 					}
-					return;
+				} else {
+					_onSend(request.get(), request->size, sl_false);
 				}
 				request.setNull();
 			}

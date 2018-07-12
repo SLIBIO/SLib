@@ -231,12 +231,12 @@ namespace slib
 		sl_bool flagRead;
 
 	protected:
-		AsyncStreamRequest(void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult*)>& callback, sl_bool flagRead);
+		AsyncStreamRequest(const void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult*)>& callback, sl_bool flagRead);
 	
 	public:
 		static Ref<AsyncStreamRequest> createRead(void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult*)>& callback);
 
-		static Ref<AsyncStreamRequest> createWrite(void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult*)>& callback);
+		static Ref<AsyncStreamRequest> createWrite(const void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult*)>& callback);
 
 	public:
 		void runCallback(AsyncStream* stream, sl_uint32 resultSize, sl_bool flagError);
@@ -256,7 +256,7 @@ namespace slib
 	public:
 		virtual sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject);
 
-		virtual sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject);
+		virtual sl_bool write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject);
 
 		virtual sl_bool isSeekable();
 
@@ -307,7 +307,7 @@ namespace slib
 
 		virtual sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) = 0;
 
-		virtual sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) = 0;
+		virtual sl_bool write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) = 0;
 
 		virtual sl_bool isSeekable();
 
@@ -337,7 +337,7 @@ namespace slib
 	
 		sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) override;
 
-		sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) override;
+		sl_bool write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) override;
 
 		sl_bool isSeekable() override;
 
@@ -370,7 +370,7 @@ namespace slib
 	public:
 		sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) override;
 
-		sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) override;
+		sl_bool write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) override;
 
 		sl_bool addTask(const Function<void()>& callback) override;
 
@@ -413,7 +413,7 @@ namespace slib
 
 		sl_bool isOpened() override;
 
-		sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) override;
+		sl_bool write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) override;
 	
 	public:
 		Ptr<IReader> getReader();
@@ -809,7 +809,7 @@ namespace slib
 
 		sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) override;
 	
-		sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) override;
+		sl_bool write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) override;
 	
 		sl_bool addTask(const Function<void()>& callback) override;
 
@@ -835,7 +835,7 @@ namespace slib
 	protected:
 		virtual Memory filterRead(void* data, sl_uint32 size, Referable* userObject);
 
-		virtual Memory filterWrite(void* data, sl_uint32 size, Referable* userObject);
+		virtual Memory filterWrite(const void* data, sl_uint32 size, Referable* userObject);
 	
 	protected:
 		void setReadingError();
@@ -864,13 +864,7 @@ namespace slib
 		sl_bool m_flagWritingEnded;
 	
 	protected:
-		void _read();
-
-		void _processRead(AsyncStreamResult* result);
-
-		void _processReadEmpty();
-	
-		void _processZeroWrite(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& listener, const Ref<Referable>& userObject);
+		sl_bool _read();
 
 		void _closeAllReadRequests();
 	

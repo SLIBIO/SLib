@@ -45,7 +45,7 @@ namespace slib
 				ret = new _priv_Win32AsyncFileStreamInstance();
 				if (ret.isNotNull()) {
 					ret->setHandle(handle);
-					if (mode == FileMode::Append) {
+					if (mode & FileMode::SeekToEnd) {
 						ret->seek(File::getSize(handle));
 					}
 					return ret;
@@ -61,7 +61,7 @@ namespace slib
 			setHandle(SLIB_FILE_INVALID_HANDLE);
 		}
 
-		void onOrder()
+		void onOrder() override
 		{
 			sl_file handle = getHandle();
 			if (handle == SLIB_FILE_INVALID_HANDLE) {
@@ -71,18 +71,22 @@ namespace slib
 				Ref<AsyncStreamRequest> req;
 				if (popReadRequest(req)) {
 					if (req.isNotNull()) {
-						Base::resetMemory(&m_overlappedRead, 0, sizeof(m_overlappedRead));
-						m_overlappedRead.Offset = (DWORD)m_offset;
-						m_overlappedRead.OffsetHigh = (DWORD)(m_offset >> 32);
-						if (::ReadFile((HANDLE)handle, req->data, req->size, NULL, &m_overlappedRead)) {
-							doInput(req.get(), 0, sl_true);
-						} else {
-							DWORD dwErr = ::GetLastError();
-							if (dwErr == ERROR_IO_PENDING) {
-								m_requestOperating = req;
-							} else {
+						if (req->data && req->size) {
+							Base::resetMemory(&m_overlappedRead, 0, sizeof(m_overlappedRead));
+							m_overlappedRead.Offset = (DWORD)m_offset;
+							m_overlappedRead.OffsetHigh = (DWORD)(m_offset >> 32);
+							if (::ReadFile((HANDLE)handle, req->data, req->size, NULL, &m_overlappedRead)) {
 								doInput(req.get(), 0, sl_true);
+							} else {
+								DWORD dwErr = ::GetLastError();
+								if (dwErr == ERROR_IO_PENDING) {
+									m_requestOperating = req;
+								} else {
+									doInput(req.get(), 0, sl_true);
+								}
 							}
+						} else {
+							doInput(req.get(), req->size, sl_false);
 						}
 					}
 				}
@@ -91,25 +95,29 @@ namespace slib
 				Ref<AsyncStreamRequest> req;
 				if (popWriteRequest(req)) {
 					if (req.isNotNull()) {
-						Base::resetMemory(&m_overlappedWrite, 0, sizeof(m_overlappedWrite));
-						m_overlappedWrite.Offset = (DWORD)m_offset;
-						m_overlappedWrite.OffsetHigh = (DWORD)(m_offset >> 32);
-						if (::WriteFile((HANDLE)handle, req->data, req->size, NULL, &m_overlappedWrite)) {
-							doOutput(req.get(), 0, sl_true);
-						} else {
-							DWORD dwErr = ::GetLastError();
-							if (dwErr == ERROR_IO_PENDING) {
-								m_requestOperating = req;
-							} else {
+						if (req->data && req->size) {
+							Base::resetMemory(&m_overlappedWrite, 0, sizeof(m_overlappedWrite));
+							m_overlappedWrite.Offset = (DWORD)m_offset;
+							m_overlappedWrite.OffsetHigh = (DWORD)(m_offset >> 32);
+							if (::WriteFile((HANDLE)handle, req->data, req->size, NULL, &m_overlappedWrite)) {
 								doOutput(req.get(), 0, sl_true);
+							} else {
+								DWORD dwErr = ::GetLastError();
+								if (dwErr == ERROR_IO_PENDING) {
+									m_requestOperating = req;
+								} else {
+									doOutput(req.get(), 0, sl_true);
+								}
 							}
+						} else {
+							doOutput(req.get(), req->size, sl_false);
 						}
 					}
 				}
 			}
 		}
 
-		void onEvent(EventDesc* pev)
+		void onEvent(EventDesc* pev) override
 		{
 			sl_file handle = getHandle();
 			if (handle == SLIB_FILE_INVALID_HANDLE) {
@@ -122,7 +130,11 @@ namespace slib
 				flagError = sl_true;
 				close();
 			}
-			m_offset += dwSize;
+			if (dwSize > 0) {
+				m_offset += dwSize;
+			} else {
+				flagError = sl_true;
+			}
 
 			Ref<AsyncStreamRequest> req = m_requestOperating;
 			m_requestOperating.setNull();
@@ -134,6 +146,8 @@ namespace slib
 					doOutput(req.get(), dwSize, flagError);
 				}
 			}
+
+			requestOrder();
 		}
 
 		void doInput(AsyncStreamRequest* req, sl_uint32 size, sl_bool flagError)
@@ -152,18 +166,18 @@ namespace slib
 			}
 		}
 
-		sl_bool isSeekable()
+		sl_bool isSeekable() override
 		{
 			return sl_true;
 		}
 
-		sl_bool seek(sl_uint64 pos)
+		sl_bool seek(sl_uint64 pos) override
 		{
 			m_offset = pos;
 			return sl_true;
 		}
 
-		sl_uint64 getSize()
+		sl_uint64 getSize() override
 		{
 			sl_file handle = getHandle();
 			return File::getSize(handle);
@@ -176,33 +190,35 @@ namespace slib
 				return (sl_file)-1;
 			}
 
+			DWORD dwShareMode = (mode & FileMode::Read) ? FILE_SHARE_READ : 0;
 			DWORD dwDesiredAccess = 0;
-			DWORD dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 			DWORD dwCreateDisposition = 0;
 			DWORD dwFlags = FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED;
 
-			switch (mode) {
-			case FileMode::Read:
+			if (mode & FileMode::Write) {
+				dwDesiredAccess = GENERIC_WRITE;
+				if (mode & FileMode::Read) {
+					dwDesiredAccess |= GENERIC_READ;
+				}
+				if (mode & FileMode::NotCreate) {
+					if (mode & FileMode::NotTruncate) {
+						dwCreateDisposition = OPEN_EXISTING;
+					} else {
+						dwCreateDisposition = TRUNCATE_EXISTING;
+					}
+				} else {
+					if (mode & FileMode::NotTruncate) {
+						dwCreateDisposition = OPEN_ALWAYS;
+					} else {
+						dwCreateDisposition = CREATE_ALWAYS;
+					}
+				}
+			} else {
 				dwDesiredAccess = GENERIC_READ;
 				dwCreateDisposition = OPEN_EXISTING;
-				break;
-			case FileMode::Write:
-				dwDesiredAccess = GENERIC_WRITE;
-				dwCreateDisposition = CREATE_ALWAYS;
-				break;
-			case FileMode::ReadWrite:
-				dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
-				dwCreateDisposition = CREATE_ALWAYS;
-				break;
-			case FileMode::Append:
-				dwDesiredAccess = GENERIC_WRITE;
-				dwCreateDisposition = OPEN_ALWAYS;
-				break;
-			case FileMode::RandomAccess:
-				dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
-				dwCreateDisposition = OPEN_ALWAYS;
+			}
+			if (mode & FileMode::HintRandomAccess) {
 				dwFlags |= FILE_FLAG_RANDOM_ACCESS;
-				break;
 			}
 
 			HANDLE handle = ::CreateFileW(

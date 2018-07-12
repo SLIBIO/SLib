@@ -108,24 +108,28 @@ namespace slib
 				Ref<AsyncStreamRequest> req;
 				if (popReadRequest(req)) {
 					if (req.isNotNull()) {
-						Base::zeroMemory(&m_overlappedRead, sizeof(m_overlappedRead));
-						m_bufRead.buf = (CHAR*)(req->data);
-						m_bufRead.len = req->size;
-						m_flagsRead = 0;
-						DWORD dwRead = 0;
-						int ret = ::WSARecv((SOCKET)handle, &m_bufRead, 1, &dwRead, &m_flagsRead, &m_overlappedRead, NULL);
-						if (ret == 0) {
-							m_requestReading = req;
-							EventDesc desc;
-							desc.pOverlapped = &m_overlappedRead;
-							onEvent(&desc);
-						} else {
-							DWORD dwErr = ::WSAGetLastError();
-							if (dwErr == WSA_IO_PENDING) {
+						if (req->data && req->size) {
+							Base::zeroMemory(&m_overlappedRead, sizeof(m_overlappedRead));
+							m_bufRead.buf = (CHAR*)(req->data);
+							m_bufRead.len = req->size;
+							m_flagsRead = 0;
+							DWORD dwRead = 0;
+							int ret = ::WSARecv((SOCKET)handle, &m_bufRead, 1, &dwRead, &m_flagsRead, &m_overlappedRead, NULL);
+							if (ret == 0) {
 								m_requestReading = req;
+								EventDesc desc;
+								desc.pOverlapped = &m_overlappedRead;
+								onEvent(&desc);
 							} else {
-								_onReceive(req.get(), 0, sl_true);
+								DWORD dwErr = ::WSAGetLastError();
+								if (dwErr == WSA_IO_PENDING) {
+									m_requestReading = req;
+								} else {
+									_onReceive(req.get(), 0, sl_true);
+								}
 							}
+						} else {
+							_onReceive(req.get(), req->size, sl_false);
 						}
 					}
 				}
@@ -134,23 +138,27 @@ namespace slib
 				Ref<AsyncStreamRequest> req;
 				if (popWriteRequest(req)) {
 					if (req.isNotNull()) {
-						Base::zeroMemory(&m_overlappedWrite, sizeof(m_overlappedWrite));
-						m_bufWrite.buf = (CHAR*)(req->data);
-						m_bufWrite.len = req->size;
-						DWORD dwWrite = 0;
-						int ret = ::WSASend((SOCKET)handle, &m_bufWrite, 1, &dwWrite, 0, &m_overlappedWrite, NULL);
-						if (ret == 0) {
-							m_requestWriting = req;
-							EventDesc desc;
-							desc.pOverlapped = &m_overlappedWrite;
-							onEvent(&desc);
-						} else {
-							int dwErr = ::WSAGetLastError();
-							if (dwErr == WSA_IO_PENDING) {
+						if (req->data && req->size) {
+							Base::zeroMemory(&m_overlappedWrite, sizeof(m_overlappedWrite));
+							m_bufWrite.buf = (CHAR*)(req->data);
+							m_bufWrite.len = req->size;
+							DWORD dwWrite = 0;
+							int ret = ::WSASend((SOCKET)handle, &m_bufWrite, 1, &dwWrite, 0, &m_overlappedWrite, NULL);
+							if (ret == 0) {
 								m_requestWriting = req;
+								EventDesc desc;
+								desc.pOverlapped = &m_overlappedWrite;
+								onEvent(&desc);
 							} else {
-								_onSend(req.get(), 0, sl_true);
+								int dwErr = ::WSAGetLastError();
+								if (dwErr == WSA_IO_PENDING) {
+									m_requestWriting = req;
+								} else {
+									_onSend(req.get(), 0, sl_true);
+								}
 							}
+						} else {
+							_onSend(req.get(), req->size, sl_false);
 						}
 					}
 				}

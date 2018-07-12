@@ -800,9 +800,6 @@ namespace slib
 
 	sl_bool HttpService::processAsset(const Ref<HttpServiceContext>& context, const String& path)
 	{
-		if (context->getMethod() != HttpMethod::GET) {
-			return sl_false;
-		}
 		FilePathSegments seg;
 		seg.parsePath(path);
 		if (seg.parentLevel == 0) {
@@ -831,10 +828,6 @@ namespace slib
 
 	sl_bool HttpService::processFile(const Ref<HttpServiceContext>& context, const String& path)
 	{
-		if (context->getMethod() != HttpMethod::GET) {
-			return sl_false;
-		}
-
 		if (File::exists(path) && !(File::isDirectory(path))) {
 
 			sl_uint64 totalSize = File::getSize(path);
