@@ -18,40 +18,55 @@ namespace slib
 {
 
 	SLIB_DEFINE_ROOT_OBJECT(Object)
-
+	
 	Object::Object() noexcept
+	 : m_locker(sl_null), m_properties(sl_null)
 	{
 	}
 
 	Object::~Object() noexcept
 	{
+		if (m_locker) {
+			delete m_locker;
+		}
+		if (m_properties) {
+			delete ((CHashMap<String, Variant>*)(m_properties));
+		}
 	}
 
 	Mutex* Object::getLocker() const noexcept
 	{
-		return (Mutex*)(&m_locker);
+		if (m_locker) {
+			return m_locker;
+		} else {
+			SpinLocker lock(&m_lockPrivate);
+			if (!m_locker) {
+				m_locker = new Mutex;
+			}
+			return m_locker;
+		}
 	}
 
 	void Object::lock() const noexcept
 	{
-		m_locker.lock();
+		getLocker()->lock();
 	}
 
 	void Object::unlock() const noexcept
 	{
-		m_locker.unlock();
+		getLocker()->unlock();
 	}
 
 	sl_bool Object::tryLock() const noexcept
 	{
-		return m_locker.tryLock();
+		return getLocker()->tryLock();
 	}
 	
 	Variant Object::getProperty(const String& name) noexcept
 	{
-		MutexLocker lock(&m_locker);
-		if (m_properties.isNotNull()) {
-			CHashMap<String, Variant>* map = static_cast<CHashMap<String, Variant>*>(m_properties.get());
+		SpinLocker lock(&m_lockPrivate);
+		if (m_properties) {
+			CHashMap<String, Variant>* map = static_cast<CHashMap<String, Variant>*>(m_properties);
 			return map->getValue_NoLock(name);
 		}
 		return Variant::null();
@@ -59,10 +74,10 @@ namespace slib
 	
 	void Object::setProperty(const String& name, const Variant& value) noexcept
 	{
-		MutexLocker lock(&m_locker);
+		SpinLocker lock(&m_lockPrivate);
 		CHashMap<String, Variant>* map;
-		if (m_properties.isNotNull()) {
-			map = static_cast<CHashMap<String, Variant>*>(m_properties.get());
+		if (m_properties) {
+			map = static_cast<CHashMap<String, Variant>*>(m_properties);
 		} else {
 			map = new CHashMap<String, Variant>;
 			if (map) {
@@ -76,9 +91,9 @@ namespace slib
 	
 	void Object::clearProperty(const String& name) noexcept
 	{
-		MutexLocker lock(&m_locker);
-		if (m_properties.isNotNull()) {
-			CHashMap<String, Variant>* map = static_cast<CHashMap<String, Variant>*>(m_properties.get());
+		SpinLocker lock(&m_lockPrivate);
+		if (m_properties) {
+			CHashMap<String, Variant>* map = static_cast<CHashMap<String, Variant>*>(m_properties);
 			map->remove_NoLock(name);
 		}
 	}
