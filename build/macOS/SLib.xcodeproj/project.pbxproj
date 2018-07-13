@@ -1587,7 +1587,7 @@
 		26050B2220CFBD6B00032B2C /* jmemmgr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jmemmgr.c; path = ../../external/src/libjpeg/jmemmgr.c; sourceTree = "<group>"; };
 		26050B2520CFBDD300032B2C /* systemdependent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = systemdependent.c; path = ../../external/src/libvpx/vp8/common/generic/systemdependent.c; sourceTree = "<group>"; };
 		26072FFD20D97B66004EB272 /* url_request_curl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url_request_curl.cpp; sourceTree = "<group>"; };
-		2607300220D985BF004EB272 /* url_request_common.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = url_request_common.inc; sourceTree = "<group>"; };
+		2607300220D985BF004EB272 /* url_request_common.inc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = url_request_common.inc; sourceTree = "<group>"; };
 		2607300D20DCE367004EB272 /* rw_lock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rw_lock.cpp; sourceTree = "<group>"; };
 		2609E5591E37E03A00CFBDBB /* timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = timer.cpp; sourceTree = "<group>"; };
 		260A402D1D2AAAD8009CFCE8 /* render_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_resource.cpp; sourceTree = "<group>"; };

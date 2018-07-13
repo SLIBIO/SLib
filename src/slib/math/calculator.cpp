@@ -41,7 +41,7 @@ namespace slib
 	}
 
 	template <class RT, class CT>
-	sl_reg _priv_Calculator_calculate(RT* result, sl_bool* isDivisionByZero, const CT* sz, sl_size posBegin, sl_size posEnd) noexcept
+	static sl_reg _priv_Calculator_calculate(RT* result, sl_bool* isDivisionByZero, const CT* sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
 		sl_bool flagDivisionByZero = sl_false;
 		RT accum1 = 0;
