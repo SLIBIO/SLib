@@ -528,9 +528,12 @@ namespace slib
 			}
 			m_step = STEP_COMPLETE;
 			onComplete();
-			UrlRequest_Session* session = getSession();
-			if (session) {
-				session->connectionPool.push(m_connection, MAX_CONNECTION_POOL_SIZE);
+
+			if (m_sizeContentTotal == m_sizeContentReceived || m_responseHeaders.getValue("Transfer-Encoding").compareIgnoreCase("chunked") == 0) {
+				UrlRequest_Session* session = getSession();
+				if (session) {
+					session->connectionPool.push(m_connection, MAX_CONNECTION_POOL_SIZE);
+				}
 			}
 			clean();
 		}
