@@ -14,8 +14,7 @@
 #include "definition.h"
 
 #include "view.h"
-
-#include "../graphics/text.h"
+#include "text.h"
 
 namespace slib
 {
