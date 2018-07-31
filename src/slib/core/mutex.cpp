@@ -22,90 +22,116 @@ namespace slib
 {
 
 	Mutex::Mutex() noexcept
+	 : m_object(sl_null)
 	{
-		_init();
 	}
 
 	Mutex::Mutex(const Mutex& other) noexcept
+	 : m_object(sl_null)
 	{
-		_init();
 	}
 	
 	Mutex::Mutex(Mutex&& other) noexcept
+	 : m_object(sl_null)
 	{
-		_init();
 	}
 
 	Mutex::~Mutex() noexcept
 	{
-		_free();
-	}
-
-	void Mutex::_init() noexcept
-	{
-#if defined(SLIB_PLATFORM_IS_WINDOWS)
-		m_pObject = Base::createMemory(sizeof(CRITICAL_SECTION));
-#	if defined(SLIB_PLATFORM_IS_WIN32)
-		::InitializeCriticalSection((PCRITICAL_SECTION)m_pObject);
-#	else
-		::InitializeCriticalSectionEx((PCRITICAL_SECTION)m_pObject, NULL, NULL);
-#	endif
-#elif defined(SLIB_PLATFORM_IS_UNIX)
-		m_pObject = Base::createMemory(sizeof(pthread_mutex_t));
-		pthread_mutexattr_t attr;
-		::pthread_mutexattr_init(&attr);
-		::pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-		::pthread_mutex_init((pthread_mutex_t*)(m_pObject), &attr);
-		::pthread_mutexattr_destroy(&attr);
-#endif
-	}
-
-	void Mutex::_free() noexcept
-	{
-#if defined(SLIB_PLATFORM_IS_WINDOWS)
-		::DeleteCriticalSection((PCRITICAL_SECTION)m_pObject);
-		Base::freeMemory(m_pObject);
-#elif defined(SLIB_PLATFORM_IS_UNIX)
-		::pthread_mutex_destroy((pthread_mutex_t*)(m_pObject));
-		Base::freeMemory(m_pObject);
-#endif
-		m_pObject = sl_null;
-	}
-
-	void Mutex::lock() const noexcept
-	{
-		if (!m_pObject) {
+		void* object = m_object;
+		if (!object) {
 			return;
 		}
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-		::EnterCriticalSection((PCRITICAL_SECTION)m_pObject);
+		::DeleteCriticalSection((PCRITICAL_SECTION)object);
+		Base::freeMemory(object);
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-		::pthread_mutex_lock((pthread_mutex_t*)(m_pObject));
+		::pthread_mutex_destroy((pthread_mutex_t*)(object));
+		Base::freeMemory(object);
+#endif
+		m_object = (void*)((sl_size)1);
+	}
+
+	void* Mutex::_initObject() const noexcept
+	{
+		SpinLocker lock(&m_lock);
+		void* object = m_object;
+		if (object) {
+			return object;
+		}
+#if defined(SLIB_PLATFORM_IS_WINDOWS)
+		object = Base::createMemory(sizeof(CRITICAL_SECTION));
+#	if defined(SLIB_PLATFORM_IS_WIN32)
+		::InitializeCriticalSection((PCRITICAL_SECTION)object);
+#	else
+		::InitializeCriticalSectionEx((PCRITICAL_SECTION)object, NULL, NULL);
+#	endif
+#elif defined(SLIB_PLATFORM_IS_UNIX)
+		object = Base::createMemory(sizeof(pthread_mutex_t));
+		pthread_mutexattr_t attr;
+		::pthread_mutexattr_init(&attr);
+		::pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+		::pthread_mutex_init((pthread_mutex_t*)(object), &attr);
+		::pthread_mutexattr_destroy(&attr);
+#endif
+		m_object = object;
+		return object;
+	}
+
+	SLIB_INLINE void* Mutex::_getObject() const noexcept
+	{
+		void* object = m_object;
+		if ((sl_size)object > 1) {
+			return object;
+		}
+		if (object) {
+			return sl_null;
+		}
+		return _initObject();
+	}
+	
+	void Mutex::lock() const noexcept
+	{
+		void* object = _getObject();
+		if (!object) {
+			return;
+		}
+#if defined(SLIB_PLATFORM_IS_WINDOWS)
+		::EnterCriticalSection((PCRITICAL_SECTION)object);
+#elif defined(SLIB_PLATFORM_IS_UNIX)
+		::pthread_mutex_lock((pthread_mutex_t*)(object));
 #endif
 	}
 
 	sl_bool Mutex::tryLock() const noexcept
 	{
-		if (!m_pObject) {
+		void* object = _getObject();
+		if (!object) {
 			return sl_false;
 		}
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-		return ::TryEnterCriticalSection((PCRITICAL_SECTION)m_pObject) != 0;
+		return ::TryEnterCriticalSection((PCRITICAL_SECTION)object) != 0;
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-		return ::pthread_mutex_trylock((pthread_mutex_t*)(m_pObject)) == 0;
+		return ::pthread_mutex_trylock((pthread_mutex_t*)(object)) == 0;
 #endif
 	}
 
 	void Mutex::unlock() const noexcept
 	{
-		if (!m_pObject) {
+		void* object = _getObject();
+		if (!object) {
 			return;
 		}
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-		::LeaveCriticalSection((PCRITICAL_SECTION)m_pObject);
+		::LeaveCriticalSection((PCRITICAL_SECTION)object);
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-		::pthread_mutex_unlock((pthread_mutex_t*)(m_pObject));
+		::pthread_mutex_unlock((pthread_mutex_t*)(object));
 #endif
+	}
+	
+	SpinLock* Mutex::getSpinLock() const noexcept
+	{
+		return const_cast<SpinLock*>(&m_lock);
 	}
 
 	Mutex& Mutex::operator=(const Mutex& other) noexcept

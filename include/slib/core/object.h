@@ -57,8 +57,7 @@ namespace slib
 		Object& operator=(Object&& other) = delete;
 	
 	private:
-		SpinLock m_lockPrivate;
-		mutable Mutex* m_locker;
+		Mutex m_locker;
 		void* m_properties;
 
 	};

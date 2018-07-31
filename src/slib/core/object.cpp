@@ -20,15 +20,12 @@ namespace slib
 	SLIB_DEFINE_ROOT_OBJECT(Object)
 	
 	Object::Object() noexcept
-	 : m_locker(sl_null), m_properties(sl_null)
+	 : m_properties(sl_null)
 	{
 	}
 
 	Object::~Object() noexcept
 	{
-		if (m_locker) {
-			delete m_locker;
-		}
 		if (m_properties) {
 			delete ((CHashMap<String, Variant>*)(m_properties));
 		}
@@ -36,35 +33,27 @@ namespace slib
 
 	Mutex* Object::getLocker() const noexcept
 	{
-		if (m_locker) {
-			return m_locker;
-		} else {
-			SpinLocker lock(&m_lockPrivate);
-			if (!m_locker) {
-				m_locker = new Mutex;
-			}
-			return m_locker;
-		}
+		return const_cast<Mutex*>(&m_locker);
 	}
 
 	void Object::lock() const noexcept
 	{
-		getLocker()->lock();
+		m_locker.lock();
 	}
 
 	void Object::unlock() const noexcept
 	{
-		getLocker()->unlock();
+		m_locker.unlock();
 	}
 
 	sl_bool Object::tryLock() const noexcept
 	{
-		return getLocker()->tryLock();
+		return m_locker.tryLock();
 	}
 	
 	Variant Object::getProperty(const String& name) noexcept
 	{
-		SpinLocker lock(&m_lockPrivate);
+		SpinLocker lock(m_locker.getSpinLock());
 		if (m_properties) {
 			CHashMap<String, Variant>* map = static_cast<CHashMap<String, Variant>*>(m_properties);
 			return map->getValue_NoLock(name);
@@ -74,7 +63,7 @@ namespace slib
 	
 	void Object::setProperty(const String& name, const Variant& value) noexcept
 	{
-		SpinLocker lock(&m_lockPrivate);
+		SpinLocker lock(m_locker.getSpinLock());
 		CHashMap<String, Variant>* map;
 		if (m_properties) {
 			map = static_cast<CHashMap<String, Variant>*>(m_properties);
@@ -91,7 +80,7 @@ namespace slib
 	
 	void Object::clearProperty(const String& name) noexcept
 	{
-		SpinLocker lock(&m_lockPrivate);
+		SpinLocker lock(m_locker.getSpinLock());
 		if (m_properties) {
 			CHashMap<String, Variant>* map = static_cast<CHashMap<String, Variant>*>(m_properties);
 			map->remove_NoLock(name);

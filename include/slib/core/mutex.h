@@ -13,6 +13,8 @@
 
 #include "definition.h"
 
+#include "spin_lock.h"
+
 namespace slib
 {
 	
@@ -33,6 +35,8 @@ namespace slib
 		void lock() const noexcept;
 
 		void unlock() const noexcept;
+		
+		SpinLock* getSpinLock() const noexcept;
 
 	public:
 		Mutex& operator=(const Mutex& other) noexcept;
@@ -40,12 +44,13 @@ namespace slib
 		Mutex& operator=(Mutex&& other) noexcept;
 		
 	private:
-		mutable void* m_pObject;
+		mutable void* m_object;
+		SpinLock m_lock;
 
 	private:
-		void _init() noexcept;
-
-		void _free() noexcept;
+		void* _initObject() const noexcept;
+		
+		void* _getObject() const noexcept;
 
 	};
 	
