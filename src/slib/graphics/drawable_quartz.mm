@@ -64,7 +64,6 @@ namespace slib
 	{
 		CGImageRef image = GraphicsPlatform::loadCGImageFromMemory(mem, size);
 		if (image) {
-			CGImageRetain(image);
 			Ref<Drawable> ret = GraphicsPlatform::createImageDrawable(image);
 			CGImageRelease(image);
 			return ret;

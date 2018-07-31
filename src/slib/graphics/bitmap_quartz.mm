@@ -88,31 +88,44 @@ namespace slib
 			return ret;
 		}
 		
+		static Ref<_priv_Quartz_Bitmap> create(CGImageRef image)
+		{
+			if (!image) {
+				return sl_null;
+			}
+			
+			sl_uint32 width = (sl_uint32)(CGImageGetWidth(image));
+			sl_uint32 height = (sl_uint32)(CGImageGetHeight(image));
+
+			Ref<_priv_Quartz_Bitmap> ret = create(width, height);
+
+			if (ret.isNotNull()) {
+				CGRect rect;
+				rect.origin.x = 0;
+				rect.origin.y = 0;
+				rect.size.width = width;
+				rect.size.height = height;
+				
+				CGContextSaveGState(ret->m_bitmap);
+				CGContextTranslateCTM(ret->m_bitmap, 0, height);
+				CGContextScaleCTM(ret->m_bitmap, 1, -1);
+				CGContextDrawImage(ret->m_bitmap, rect, image);
+				CGContextRestoreGState(ret->m_bitmap);
+				
+			}
+			
+			return ret;
+		}
+		
 		static Ref<_priv_Quartz_Bitmap> loadFromMemory(const void* mem, sl_size size)
 		{
-			Ref<_priv_Quartz_Bitmap> ret;
 			CGImageRef image = GraphicsPlatform::loadCGImageFromMemory(mem, size);
 			if (image) {
-				CGImageRetain(image);
-				sl_uint32 width = (sl_uint32)(CGImageGetWidth(image));
-				sl_uint32 height = (sl_uint32)(CGImageGetHeight(image));
-				ret = create(width, height);
-				if (ret.isNotNull()) {
-					CGRect rect;
-					rect.origin.x = 0;
-					rect.origin.y = 0;
-					rect.size.width = width;
-					rect.size.height = height;
-					
-					CGContextSaveGState(ret->m_bitmap);
-					CGContextTranslateCTM(ret->m_bitmap, 0, height);
-					CGContextScaleCTM(ret->m_bitmap, 1, -1);
-					CGContextDrawImage(ret->m_bitmap, rect, image);
-					CGContextRestoreGState(ret->m_bitmap);
-				}
+				Ref<_priv_Quartz_Bitmap> ret = create(image);
 				CGImageRelease(image);
+				return ret;
 			}
-			return ret;
+			return sl_null;
 		}
 		
 		sl_uint32 getBitmapWidth() override
@@ -277,6 +290,11 @@ namespace slib
 	Ref<Bitmap> Bitmap::loadFromMemory(const void* mem, sl_size size)
 	{
 		return _priv_Quartz_Bitmap::loadFromMemory(mem, size);
+	}
+
+	Ref<Bitmap> GraphicsPlatform::createImageBitmap(CGImageRef image)
+	{
+		return _priv_Quartz_Bitmap::create(image);
 	}
 
 }

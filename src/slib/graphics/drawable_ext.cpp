@@ -11,6 +11,7 @@
 #include "slib/graphics/drawable.h"
 
 #include "slib/graphics/image.h"
+#include "slib/graphics/platform.h"
 
 #include "slib/core/file.h"
 #include "slib/core/asset.h"
@@ -51,6 +52,14 @@ namespace slib
 		if (mem.isNotEmpty()) {
 			return PlatformDrawable::loadFromMemory(mem);
 		}
+#if defined(SLIB_PLATFORM_IS_APPLE)
+		CGImageRef image = GraphicsPlatform::loadCGImageFromApp(path);
+		if (image) {
+			Ref<Drawable> ret = GraphicsPlatform::createImageDrawable(image);
+			CGImageRelease(image);
+			return ret;
+		}
+#endif
 		return sl_null;
 	}
 

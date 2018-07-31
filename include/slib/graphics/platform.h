@@ -61,7 +61,7 @@ namespace slib
 		static void drawImage(Canvas* canvas, const Rectangle& rectDst, Gdiplus::Image* image, const Rectangle& rectSrc, const DrawParam& param);
 
 		static Ref<Drawable> createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease = sl_true, Referable* ref = sl_null);
-		static Gdiplus::Image* getImageHandle(Drawable* drawable);
+		static Gdiplus::Image* getImageDrawableHandle(Drawable* drawable);
 		static Gdiplus::Bitmap* getBitmapHandle(Bitmap* bitmap);
 	
 #elif defined(SLIB_GRAPHICS_IS_ANDROID)
@@ -88,7 +88,7 @@ namespace slib
 
 		static Ref<Drawable> createImageDrawable(CGImageRef image, sl_bool flagFlipped = sl_false);
 		static CGImageRef getImageDrawableHandle(Drawable* drawable);
-
+		static Ref<Bitmap> createImageBitmap(CGImageRef image);
 
 #	if defined(__OBJC__)
 #		if defined(SLIB_PLATFORM_IS_MACOS)
@@ -122,6 +122,7 @@ namespace slib
 
 #if defined(SLIB_PLATFORM_IS_APPLE)
 		static CGImageRef loadCGImageFromMemory(const void* buf, sl_size size);
+		static CGImageRef loadCGImageFromApp(const String& name);
 
 #	if defined(__OBJC__)
 #		if defined(SLIB_PLATFORM_IS_MACOS)

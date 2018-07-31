@@ -105,7 +105,7 @@ namespace slib
 		return _priv_Gdiplus_ImageDrawable::create(image, flagFreeOnRelease, ref);
 	}
 
-	Gdiplus::Image* GraphicsPlatform::getImageHandle(Drawable* _drawable)
+	Gdiplus::Image* GraphicsPlatform::getImageDrawableHandle(Drawable* _drawable)
 	{
 		if (_priv_Gdiplus_ImageDrawable* drawable = CastInstance<_priv_Gdiplus_ImageDrawable>(_drawable)) {
 			return drawable->m_image;

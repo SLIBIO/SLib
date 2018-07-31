@@ -1312,9 +1312,13 @@ namespace slib
 		Ref<Image> ret;
 		Memory mem = Assets::readAllBytes(path);
 		if (mem.isNotEmpty()) {
-			ret = loadFromMemory(mem, width, height);
+			return loadFromMemory(mem, width, height);
 		}
-		return ret;
+#if defined(SLIB_PLATFORM_IS_APPLE)
+		return Image::create(Bitmap::loadFromAsset(path));
+#else
+		return sl_null;
+#endif
 	}
 	
 	Ref<Drawable> Image::getDrawableCache(Canvas* canvas)

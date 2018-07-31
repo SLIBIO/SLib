@@ -29,6 +29,23 @@ namespace slib
 			return NULL;
 		}
 		ret = [image CGImageForProposedRect:NULL context:NULL hints:NULL];
+		if (ret) {
+			CGImageRetain(ret);
+		}
+		return ret;
+	}
+	
+	CGImageRef GraphicsPlatform::loadCGImageFromApp(const String& name)
+	{
+		CGImageRef ret;
+		NSImage* image = [NSImage imageNamed:(Apple::getNSStringFromString(name))];
+		if (image == nil) {
+			return NULL;
+		}
+		ret = [image CGImageForProposedRect:NULL context:NULL hints:NULL];
+		if (ret) {
+			CGImageRetain(ret);
+		}
 		return ret;
 	}
 
@@ -93,6 +110,23 @@ namespace slib
 			return NULL;
 		}
 		ret = image.CGImage;
+		if (ret) {
+			CGImageRetain(ret);
+		}
+		return ret;
+	}
+
+	CGImageRef GraphicsPlatform::loadCGImageFromApp(const String& name)
+	{
+		CGImageRef ret;
+		UIImage* image = [UIImage imageNamed:(Apple::getNSStringFromString(name))];
+		if (image == nil) {
+			return NULL;
+		}
+		ret = image.CGImage;
+		if (ret) {
+			CGImageRetain(ret);
+		}
 		return ret;
 	}
 
