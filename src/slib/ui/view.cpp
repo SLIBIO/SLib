@@ -126,7 +126,7 @@ namespace slib
 		flagRelativeMarginBottom = sl_false;
 		relativeMarginBottomWeight = 0;
 	
-		flagOnUpdateLayoutEnabled = sl_false;
+		flagAlwaysOnUpdateLayout = sl_false;
 		flagInvalidLayoutInParent = sl_false;
 	}
 
@@ -1109,6 +1109,8 @@ namespace slib
 		}
 		
 		UIRect frame = _frame;
+		_restrictSize(frame);
+		
 		UIRect frameOld = m_frame;
 		
 		sl_bool flagNotMoveX = Math::isAlmostZero(frameOld.left - frame.left);
@@ -1939,23 +1941,18 @@ namespace slib
 			
 			_restrictSize(frame);
 			
-			if (step == 0) {
+			if (step != 0) {
+				break;
+			}
 				
-				if (!(oldFrame.getSize().isAlmostEqual(frame.getSize()))) {
-					m_flagInvalidLayout = sl_true;
-				}
-				
-				oldFrame = frame;
-				
-				_updateLayout();
-				
-				frame = layoutAttrs->layoutFrame;
-				
-				if (frame.isAlmostEqual(oldFrame)) {
-					break;
-				}
-				
-			} else {
+			if (!(oldFrame.getSize().isAlmostEqual(frame.getSize()))) {
+				m_flagInvalidLayout = sl_true;
+			}
+			_updateLayout();
+			
+			oldFrame = frame;
+			frame = layoutAttrs->layoutFrame;
+			if (frame.isAlmostEqual(oldFrame)) {
 				break;
 			}
 		}
@@ -2005,24 +2002,27 @@ namespace slib
 					}
 				}
 			}
-			if (layoutAttrs.isNotNull() && layoutAttrs->flagOnUpdateLayoutEnabled) {
-				onUpdateLayout();
-			}
-			if (children.count == 0) {
+			if (layoutAttrs.isNull()) {
 				break;
 			}
-			if (layoutAttrs.isNotNull()) {
+			if (layoutAttrs->flagAlwaysOnUpdateLayout || layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
+				onUpdateLayout();
 				_restrictSize(layoutAttrs->layoutFrame);
+				if (step != 0) {
+					break;
+				}
 				UIRect oldFrame = frame;
 				frame = layoutAttrs->layoutFrame;
 				if (frame.isAlmostEqual(oldFrame)) {
 					break;
 				}
-			} else {
+			}
+			if (children.count == 0) {
 				break;
 			}
 		}
 		m_flagInvalidLayout = sl_false;
+		
 	}
 	
 	void View::_applyLayout(UIUpdateMode mode)
@@ -2070,6 +2070,9 @@ namespace slib
 			return;
 		}
 		
+		if (layoutAttrs.isNotNull()) {
+			_restrictSize(layoutAttrs->layoutFrame);
+		}
 		_updateLayout();
 		
 		if (!m_flagNeedApplyLayout && layoutAttrs.isNotNull()) {
@@ -2142,21 +2145,22 @@ namespace slib
 		}
 	}
 	
-	sl_bool View::isOnUpdateLayoutEnabled()
+	sl_bool View::isAlwaysOnUpdateLayout()
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
-			return attrs->flagOnUpdateLayoutEnabled;
+			return attrs->flagAlwaysOnUpdateLayout;
 		}
 		return sl_false;
 	}
 	
-	void View::setOnUpdateLayoutEnabled(sl_bool flagEnabled, UIUpdateMode mode)
+	void View::setAlwaysOnUpdateLayout(sl_bool flagEnabled, UIUpdateMode mode)
 	{
 		_initializeLayoutAttributes();
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
-			attrs->flagOnUpdateLayoutEnabled = flagEnabled;
+			attrs->flagAlwaysOnUpdateLayout = flagEnabled;
+			invalidateLayout(mode);
 		}
 	}
 	
@@ -2226,7 +2230,7 @@ namespace slib
 			if (layoutAttrs.isNull()) {
 				break;
 			}
-			if (layoutAttrs->widthMode != SizeMode::Wrapping && layoutAttrs->heightMode != SizeMode::Wrapping) {
+			if (!(layoutAttrs->flagAlwaysOnUpdateLayout || layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping)) {
 				break;
 			}
 			Ref<View> parent = view->m_parent;
@@ -2270,7 +2274,7 @@ namespace slib
 			if (layoutAttrs.isNull()) {
 				break;
 			}
-			if (layoutAttrs->widthMode != SizeMode::Wrapping && layoutAttrs->heightMode != SizeMode::Wrapping) {
+			if (!(layoutAttrs->flagAlwaysOnUpdateLayout || layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping)) {
 				break;
 			}
 			parent = view->m_parent;
@@ -2283,7 +2287,7 @@ namespace slib
 		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
 			if (layoutAttrs.isNotNull()) {
-				if (layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
+				if (layoutAttrs->flagAlwaysOnUpdateLayout || layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
 					invalidateLayout();
 					return;
 				}

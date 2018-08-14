@@ -310,10 +310,10 @@ namespace slib
 		
 		void measureLayoutWrappingSize(sl_bool flagHorizontalWrapping, sl_bool flagVerticalWrapping);
 		
-		sl_bool isOnUpdateLayoutEnabled();
+		sl_bool isAlwaysOnUpdateLayout();
 		
-		void setOnUpdateLayoutEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
-				
+		void setAlwaysOnUpdateLayout(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		
 		const UIRect& getLayoutFrame();
 		
 		void setLayoutFrame(const UIRect& frame);
@@ -1507,7 +1507,7 @@ namespace slib
 			sl_bool flagRelativeMarginBottom;
 			sl_real relativeMarginBottomWeight;
 			
-			sl_bool flagOnUpdateLayoutEnabled;
+			sl_bool flagAlwaysOnUpdateLayout;
 			sl_bool flagInvalidLayoutInParent;
 			
 		public:
