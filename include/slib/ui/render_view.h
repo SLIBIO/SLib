@@ -40,9 +40,9 @@ namespace slib
 		
 		void requestRender();
 		
-		void invalidate() override;
+		void invalidate(UIUpdateMode mode = UIUpdateMode::Redraw) override;
 		
-		void invalidate(const UIRect& rect) override;
+		void invalidate(const UIRect& rect, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 		
 		void renderViewContent(RenderEngine* engine);
 		

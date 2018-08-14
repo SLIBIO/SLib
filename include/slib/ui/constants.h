@@ -233,11 +233,16 @@ namespace slib
 	
 	enum class UIUpdateMode
 	{
-		Init = 0,
+		None = 0,
 		Redraw = 1,
-		NoRedraw = 2
+		UpdateLayout = 3,
+		Init = 0x8000
 	};
 	
+#define SLIB_UI_UPDATE_MODE_IS_REDRAW(mode) (((int)(mode)) & ((int)(UIUpdateMode::Redraw)))
+#define SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode) (((int)(mode)) & ((int)(UIUpdateMode::UpdateLayout)))
+#define SLIB_UI_UPDATE_MODE_IS_INIT(mode) ((mode) == UIUpdateMode::Init)
+
 	enum class RedrawMode
 	{
 		Continuously = 0,

@@ -103,12 +103,12 @@ namespace slib
 		}
 	}
 
-	void RenderView::invalidate()
+	void RenderView::invalidate(UIUpdateMode mode)
 	{
 		requestRender();
 	}
 
-	void RenderView::invalidate(const UIRect& rect)
+	void RenderView::invalidate(const UIRect& rect, UIUpdateMode mode)
 	{
 		requestRender();
 	}

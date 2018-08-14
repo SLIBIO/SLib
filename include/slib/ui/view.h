@@ -41,8 +41,6 @@ namespace slib
 	class GestureDetector;
 	class GestureEvent;
 
-	struct ViewPrepareLayoutParam;
-
 	class SLIB_EXPORT View : public Object
 	{
 		SLIB_DECLARE_OBJECT
@@ -121,15 +119,15 @@ namespace slib
 		
 		Ref<View> getChild(sl_size index);
 		
-		void addChild(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void addChild(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
-		void insertChild(sl_size index, const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void insertChild(sl_size index, const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
-		void removeChild(sl_size index, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void removeChild(sl_size index, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
-		void removeChild(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void removeChild(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void removeAllChildren(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void removeAllChildren(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		Ref<View> getChildAt(sl_ui_pos x, sl_ui_pos y);
 		
@@ -141,11 +139,11 @@ namespace slib
 		
 		sl_bool isRootView();
 		
-		Ref<View> getInstanceView();
+		Ref<View> getNearestViewWithInstance();
 		
-		Ref<ViewInstance> getInstanceViewInstance();
+		Ref<ViewInstance> getNearestViewInstance();
 		
-		Ref<ViewPage> getParentPage();
+		Ref<ViewPage> getNearestViewPage();
 		
 		void removeFromParent();
 		
@@ -163,15 +161,15 @@ namespace slib
 		
 		void setOnRemoveChildEnabled(sl_bool flagEnabled);
 		
-		void bringToFront(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void bringToFront(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
 		
-		virtual void invalidate();
+		virtual void invalidate(UIUpdateMode mode = UIUpdateMode::Redraw);
 
 		// local coordinate
-		virtual void invalidate(const UIRect& rect);
+		virtual void invalidate(const UIRect& rect, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void invalidateBoundsInParent();
+		void invalidateBoundsInParent(UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		void updateAndInvalidateBoundsInParent(UIUpdateMode mode = UIUpdateMode::Redraw);
 
@@ -179,51 +177,63 @@ namespace slib
 		
 		
 		// parent coordinate
-		const UIRect& getFrame();
-		
-		// parent coordinate
 		UIRect getInstanceFrame();
 		
 		// parent coordinate
-		void setFrame(const UIRect& frame, UIUpdateMode mode = UIUpdateMode::Redraw);
+		const UIRect& getFrame();
 		
 		// parent coordinate
-		void setFrame(sl_ui_pos x, sl_ui_pos y, sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setFrame(const UIRect& frame, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		
+		// parent coordinate
+		void setFrame(sl_ui_pos x, sl_ui_pos y, sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_len getWidth();
 		
-		void setWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_len getHeight();
 		
-		void setHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		UISize getSize();
 		
-		void setSize(const UISize& size, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setSize(const UISize& size, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
 		// parent coordinate
 		sl_ui_pos getLeft();
 		
 		// parent coordinate
+		void setLeft(sl_ui_pos x, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		
+		// parent coordinate
 		sl_ui_pos getTop();
 		
 		// parent coordinate
-		void setLeft(sl_ui_pos x, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setTop(sl_ui_pos y, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+
+		// parent coordinate
+		sl_ui_pos getRight();
 		
 		// parent coordinate
-		void setTop(sl_ui_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setRight(sl_ui_pos x, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		
+		// parent coordinate
+		sl_ui_pos getBottom();
+		
+		// parent coordinate
+		void setBottom(sl_ui_pos y, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
 		// parent coordinate
 		UIPoint getPosition();
 		
 		// parent coordinate
-		void setPosition(sl_ui_pos x, sl_ui_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setPosition(const UIPoint& point, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		// parent coordinate
-		void setPosition(const UIPoint& point, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setPosition(sl_ui_pos x, sl_ui_pos y, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		// local coordinate
 		UIRect getBounds();
@@ -233,18 +243,15 @@ namespace slib
 		
 		// parent coordinate
 		UIRect getBoundsInParent();
-		
-		// parent coordinate
-		void requestFrame(const UIRect& frame, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 		
 		Visibility getVisibility();
 		
-		void setVisibility(Visibility visibility, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setVisibility(Visibility visibility, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isVisible();
 		
-		void setVisible(sl_bool flagVisible, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setVisible(sl_bool flagVisible, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isEnabled();
 		
@@ -301,53 +308,47 @@ namespace slib
 		void setCursor(const Ref<Cursor>& cursor);
 
 		
-		void measureLayout(const UIRect& currentFrame);
-
-		void measureLayout();
+		void measureLayoutWrappingSize(sl_bool flagHorizontalWrapping, sl_bool flagVerticalWrapping);
 		
-		sl_ui_len getMeasuredWidth();
+		sl_bool isOnUpdateLayoutEnabled();
 		
-		void setMeasuredWidth(sl_ui_len width);
-		
-		sl_ui_len getMeasuredHeight();
-		
-		void setMeasuredHeight(sl_ui_len height);
-
-		void invalidateLayoutFromResize(UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		void invalidateLayoutFromResizeContent(UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		void invalidateParentLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setOnUpdateLayoutEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 				
-		UIRect getLayoutFrame();
+		const UIRect& getLayoutFrame();
 		
-		void setLayoutFrame(const UIRect& rect);
+		void setLayoutFrame(const UIRect& frame);
 		
-		sl_bool isLayoutFrameUpdated();
+		void setLayoutSize(sl_ui_len width, sl_ui_len height);
 		
-		void setLayoutFrameUpdated(sl_bool flag);
+		void setLayoutSize(const UISize& size);
 		
-		sl_bool isOnPrepareLayoutEnabled();
+		void setLayoutWidth(sl_ui_len width);
 		
-		void setOnPrepareLayoutEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setLayoutHeight(sl_ui_len height);
+
+		void invalidateLayout(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+
+		void invalidateParentLayout(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+
+		void invalidateSelfAndParentLayout(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		sl_bool isOnMakeLayoutEnabled();
-		
-		void setOnMakeLayoutEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
+		void invalidateLayoutOfWrappingControl(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+
+		void requestFrame(UIRect frame, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+
 		SizeMode getWidthMode();
 		
 		SizeMode getHeightMode();
 		
 		sl_bool isWidthFixed();
 		
-		void setWidthFixed(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setWidthFixed(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isHeightFixed();
 		
-		void setHeightFixed(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setHeightFixed(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setSizeFixed(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setSizeFixed(UISize size, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_real getWidthWeight();
 		
@@ -355,232 +356,234 @@ namespace slib
 		
 		sl_bool isWidthFilling();
 		
-		void setWidthFilling(sl_real weight = 1, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setWidthFilling(sl_real weight = 1, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isHeightFilling();
 		
-		void setHeightFilling(sl_real weight = 1, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setHeightFilling(sl_real weight = 1, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setSizeFilling(sl_real widthWeight = 1, sl_real heightWeight = 1, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setSizeFilling(sl_real widthWeight = 1, sl_real heightWeight = 1, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isWidthWrapping();
 		
-		void setWidthWrapping(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setWidthWrapping(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isHeightWrapping();
 		
-		void setHeightWrapping(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setHeightWrapping(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setSizeWrapping(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setSizeWrapping(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isWidthWeight();
 		
-		void setWidthWeight(sl_real weight = 1, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setWidthWeight(sl_real weight = 1, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isHeightWeight();
 		
-		void setHeightWeight(sl_real weight = 1, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setHeightWeight(sl_real weight = 1, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setSizeWeight(sl_real widthWeight = 1, sl_real heightWeight = 1, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setSizeWeight(sl_real widthWeight = 1, sl_real heightWeight = 1, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
-		sl_bool isLayoutLeftFixed();
+		void setPositionFixed(UIPoint point, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setLayoutLeftFixed(UIUpdateMode mode = UIUpdateMode::Redraw);
+		sl_bool isLeftFixed();
+		
+		void setLeftFixed(sl_ui_pos left, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAlignParentLeft();
 		
-		void setAlignParentLeft(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAlignParentLeft(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAlignLeft();
 		
-		void setAlignLeft(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAlignLeft(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isRightOf();
 		
-		void setRightOf(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setRightOf(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		Ref<View> getLayoutLeftReferingView();
 		
-		sl_bool isLayoutRightFixed();
+		sl_bool isRightFixed();
 		
-		void setLayoutRightFixed(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setRightFixed(sl_ui_pos right, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAlignParentRight();
 		
-		void setAlignParentRight(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAlignParentRight(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAlignRight();
 		
-		void setAlignRight(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAlignRight(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isLeftOf();
 		
-		void setLeftOf(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setLeftOf(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		Ref<View> getLayoutRightReferingView();
 
-		sl_bool isLayoutTopFixed();
+		sl_bool isTopFixed();
 		
-		void setLayoutTopFixed(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setTopFixed(sl_ui_pos top, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAlignParentTop();
 		
-		void setAlignParentTop(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAlignParentTop(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAlignTop();
 		
-		void setAlignTop(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAlignTop(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isBelow();
 		
-		void setBelow(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setBelow(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		Ref<View> getLayoutTopReferingView();
 		
-		sl_bool isLayoutBottomFixed();
+		sl_bool isBottomFixed();
 		
-		void setLayoutBottomFixed(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setBottomFixed(sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAlignParentBottom();
 		
-		void setAlignParentBottom(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAlignParentBottom(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAlignBottom();
 		
-		void setAlignBottom(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAlignBottom(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAbove();
 		
-		void setAbove(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAbove(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
 		Ref<View> getLayoutBottomReferingView();
 		
 		sl_bool isCenterHorizontal();
 		
-		void setCenterHorizontal(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setCenterHorizontal(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isCenterVertical();
 		
-		void setCenterVertical(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setCenterVertical(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setCenterInParent(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setCenterInParent(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAlignCenterHorizontal();
 		
-		void setAlignCenterHorizontal(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAlignCenterHorizontal(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAlignCenterVertical();
 		
-		void setAlignCenterVertical(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAlignCenterVertical(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		
 		sl_ui_len getMinimumWidth();
 		
-		void setMinimumWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setMinimumWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_len getMaximumWidth();
 		
-		void setMaximumWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setMaximumWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_len getMinimumHeight();
 		
-		void setMinimumHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setMinimumHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_len getMaximumHeight();
 		
-		void setMaximumHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setMaximumHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		AspectRatioMode getAspectRatioMode();
 		
-		void setAspectRatioMode(AspectRatioMode aspectRatioMode, UIUpdateMode updateMode = UIUpdateMode::Redraw);
+		void setAspectRatioMode(AspectRatioMode aspectRatioMode, UIUpdateMode updateMode = UIUpdateMode::UpdateLayout);
 		
 		sl_real getAspectRatio();
 		
-		void setAspectRatio(sl_real ratio, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAspectRatio(sl_real ratio, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		
 		sl_ui_pos getMarginLeft();
 		
-		void setMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getMarginTop();
 		
-		void setMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getMarginRight();
 		
-		void setMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getMarginBottom();
 		
-		void setMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setMargin(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setMargin(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isRelativeMarginLeft();
 		
 		sl_real getRelativeMarginLeftWeight();
 		
-		void setRelativeMarginLeft(sl_real weight, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setRelativeMarginLeft(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getAbsoluteMarginLeft();
 		
-		void setAbsoluteMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAbsoluteMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
 		sl_bool isRelativeMarginTop();
 		
 		sl_real getRelativeMarginTopWeight();
 		
-		void setRelativeMarginTop(sl_real weight, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setRelativeMarginTop(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getAbsoluteMarginTop();
 
-		void setAbsoluteMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAbsoluteMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isRelativeMarginRight();
 
 		sl_real getRelativeMarginRightWeight();
 		
-		void setRelativeMarginRight(sl_real weight, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setRelativeMarginRight(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getAbsoluteMarginRight();
 
-		void setAbsoluteMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAbsoluteMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
 		sl_bool isRelativeMarginBottom();
 		
 		sl_real getRelativeMarginBottomWeight();
 		
-		void setRelativeMarginBottom(sl_real weight, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setRelativeMarginBottom(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getAbsoluteMarginBottom();
 
-		void setAbsoluteMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setAbsoluteMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		void applyRelativeMargins(sl_ui_len parentWidth, sl_ui_len parentHeight);
 		
 		
 		sl_ui_pos getPaddingLeft();
 		
-		void setPaddingLeft(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setPaddingLeft(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getPaddingTop();
 		
-		void setPaddingTop(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setPaddingTop(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getPaddingRight();
 		
-		void setPaddingRight(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setPaddingRight(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getPaddingBottom();
 		
-		void setPaddingBottom(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setPaddingBottom(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setPadding(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setPadding(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setPadding(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setPadding(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		
 		sl_bool getFinalTransform(Matrix3* _out);
@@ -749,15 +752,15 @@ namespace slib
 		
 		Ref<Font> getFont();
 		
-		virtual void setFont(const Ref<Font>& font, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setFont(const Ref<Font>& font, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_real getFontSize();
 		
-		void setFontSize(sl_real size, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setFontSize(sl_real size, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		String getFontFamily();
 		
-		void setFontFamily(const String& fontFamily, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setFontFamily(const String& fontFamily, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
 		sl_bool isUsingFont();
 		
@@ -1255,11 +1258,7 @@ namespace slib
 		
 		virtual void onRemoveChild(View* child);
 		
-		virtual void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame);
-		
-		virtual void onPrepareLayout(ViewPrepareLayoutParam& param);
-		
-		virtual void onMakeLayout();
+		virtual void onUpdateLayout();
 		
 		virtual void onChangePadding();
 		
@@ -1323,27 +1322,29 @@ namespace slib
 	private:
 		void _processAttachOnUiThread();
 		
-		void _addChild(const Ref<View>& view, UIUpdateMode mode);
-		
-		void _removeChild(const Ref<View>& view);
+		void _addChild(View* child, UIUpdateMode mode);
+
+		void _removeChild(View* child);
 		
 		void _killFocusFromParent();
 		
 		void _setFocusedChild(View* child, UIUpdateMode mode);
 		
-		void _setFrame(const UIRect& frame, UIUpdateMode mode, sl_bool flagLayouting);
-		
 		void _restrictSize(sl_ui_len& width, sl_ui_len& height);
 		
-		void _prepareLayout(ViewPrepareLayoutParam& param);
+		void _restrictSize(UIRect& rect);
 		
-		void _makeLayout(sl_bool flagApplyLayout);
+		void _updateLayoutFrameInParent(void* param);
 		
-		void _measureRelativeBoundWidth();
+		void _updateLayout();
 		
-		void _measureRelativeBoundHeight();
+		void _applyLayout(UIUpdateMode mode);
 		
-		void _requestMakeLayout();
+		void _updateAndApplyChildLayout(View* child);
+
+		void _updateAndApplyLayoutWithMode(UIUpdateMode mode);
+
+		void _updateAndApplyLayout();
 		
 		void _applyCalcTransform(UIUpdateMode mode);
 		
@@ -1353,7 +1354,7 @@ namespace slib
 		
 		void _refreshBorderPen(UIUpdateMode mode);
 		
-		void _setFontInvalidateChildInstances();
+		void _setFontInvalidateChildren();
 		
 
 		void _resetTransformAnimation();
@@ -1395,8 +1396,6 @@ namespace slib
 		
 		void _processContentScrollingFlow(Timer* timer);
 		
-	protected:
-		void measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 		
 	public:
 		void _setFrame_NI(const UIRect& frame);
@@ -1421,6 +1420,12 @@ namespace slib
 		
 		UIRect m_frame;
 		UIRect m_boundsInParent;
+		sl_bool m_flagInvalidLayout;
+		sl_bool m_flagNeedApplyLayout;
+		sl_ui_pos m_paddingLeft;
+		sl_ui_pos m_paddingTop;
+		sl_ui_pos m_paddingRight;
+		sl_ui_pos m_paddingBottom;
 		
 		Visibility m_visibility;
 		sl_bool m_flagEnabled;
@@ -1462,16 +1467,12 @@ namespace slib
 		
 		AtomicRef<GestureDetector> m_gestureDetector;
 		
-		sl_bool m_flagInvalidLayout;
-		sl_ui_pos m_paddingLeft;
-		sl_ui_pos m_paddingTop;
-		sl_ui_pos m_paddingRight;
-		sl_ui_pos m_paddingBottom;
-		
 	protected:
 		class LayoutAttributes : public Referable
 		{
 		public:
+			UIRect layoutFrame;
+
 			SizeMode widthMode;
 			SizeMode heightMode;
 			sl_real widthWeight;
@@ -1490,25 +1491,8 @@ namespace slib
 			sl_ui_len maxWidth;
 			sl_ui_len minHeight;
 			sl_ui_len maxHeight;
-			
 			AspectRatioMode aspectRatioMode;
 			sl_real aspectRatio;
-			
-			sl_ui_len measuredWidth;
-			sl_ui_len measuredHeight;
-			UIRect frame;
-			UIRect requestedFrame;
-			sl_bool flagInvalidMeasure;
-
-			sl_ui_len measuredRelativeBoundWidth;
-			sl_bool flagInvalidRelativeBoundWidth;
-			sl_bool flagBadRelativeBoundWidth;
-			sl_ui_len measuredRelativeBoundHeight;
-			sl_bool flagInvalidRelativeBoundHeight;
-			sl_bool flagBadRelativeBoundHeight;
-
-			sl_bool flagOnPrepareLayout;
-			sl_bool flagOnMakeLayout;
 			
 			sl_ui_pos marginLeft;
 			sl_ui_pos marginTop;
@@ -1523,7 +1507,8 @@ namespace slib
 			sl_bool flagRelativeMarginBottom;
 			sl_real relativeMarginBottomWeight;
 			
-			sl_bool flagUpdatedLayoutFrame;
+			sl_bool flagOnUpdateLayoutEnabled;
+			sl_bool flagInvalidLayoutInParent;
 			
 		public:
 			LayoutAttributes();
@@ -1710,12 +1695,6 @@ namespace slib
 		
 		friend class ListView;
 
-	};
-
-	struct ViewPrepareLayoutParam
-	{
-		UIRect parentContentFrame;
-		sl_bool flagUseLayoutFrame;
 	};
 
 	class SLIB_EXPORT ViewInstance : public Object
