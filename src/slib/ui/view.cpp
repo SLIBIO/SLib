@@ -2007,6 +2007,14 @@ namespace slib
 			}
 			if (layoutAttrs->flagAlwaysOnUpdateLayout || layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
 				onUpdateLayout();
+				if (!m_flagNeedApplyLayout) {
+					for (i = 0; i < children.count; i++) {
+						Ref<View>& child = children[i];
+						if (child->m_flagNeedApplyLayout) {
+							m_flagNeedApplyLayout = sl_true;
+						}
+					}
+				}
 				_restrictSize(layoutAttrs->layoutFrame);
 				if (step != 0) {
 					break;
@@ -2041,8 +2049,9 @@ namespace slib
 		}
 		
 		if (layoutAttrs.isNotNull()) {
-			setFrame(layoutAttrs->layoutFrame, mode);
+			setFrame(layoutAttrs->layoutFrame, UIUpdateMode::None);
 		}
+		invalidate(mode);
 	}
 
 	void View::_updateAndApplyChildLayout(View* child)
@@ -2177,7 +2186,17 @@ namespace slib
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
+			if (rect.isAlmostEqual(attrs->layoutFrame)) {
+				return;
+			}
+			m_flagNeedApplyLayout = sl_true;
 			attrs->layoutFrame = rect;
+		} else {
+			if (rect.isAlmostEqual(m_frame)) {
+				return;
+			}
+			m_flagNeedApplyLayout = sl_true;
+			setFrame(rect, UIUpdateMode::None);
 		}
 	}
 	
@@ -2185,23 +2204,40 @@ namespace slib
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
+			if (Math::isAlmostZero(width - attrs->layoutFrame.getWidth()) && Math::isAlmostZero(height - attrs->layoutFrame.getHeight())) {
+				return;
+			}
+			m_flagNeedApplyLayout = sl_true;
 			attrs->layoutFrame.setSize(width, height);
+		} else {
+			if (Math::isAlmostZero(width - m_frame.getWidth()) && Math::isAlmostZero(height - m_frame.getHeight())) {
+				return;
+			}
+			m_flagNeedApplyLayout = sl_true;
+			setSize(width, height, UIUpdateMode::None);
 		}
 	}
 	
 	void View::setLayoutSize(const UISize& size)
 	{
-		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
-		if (attrs.isNotNull()) {
-			attrs->layoutFrame.setSize(size);
-		}
+		setLayoutSize(size.x, size.y);
 	}
 	
 	void View::setLayoutWidth(sl_ui_len width)
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
+			if (Math::isAlmostZero(width - attrs->layoutFrame.getWidth())) {
+				return;
+			}
+			m_flagNeedApplyLayout = sl_true;
 			attrs->layoutFrame.setWidth(width);
+		} else {
+			if (Math::isAlmostZero(width - m_frame.getWidth())) {
+				return;
+			}
+			m_flagNeedApplyLayout = sl_true;
+			setWidth(width, UIUpdateMode::None);
 		}
 	}
 	
@@ -2209,7 +2245,17 @@ namespace slib
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
+			if (Math::isAlmostZero(height - attrs->layoutFrame.getHeight())) {
+				return;
+			}
+			m_flagNeedApplyLayout = sl_true;
 			attrs->layoutFrame.setHeight(height);
+		} else {
+			if (Math::isAlmostZero(height - m_frame.getHeight())) {
+				return;
+			}
+			m_flagNeedApplyLayout = sl_true;
+			setHeight(height, UIUpdateMode::None);
 		}
 	}
 
