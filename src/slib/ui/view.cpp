@@ -2179,7 +2179,7 @@ namespace slib
 		if (attrs.isNotNull()) {
 			return attrs->layoutFrame;
 		}
-		return getFrame();
+		return m_frame;
 	}
 	
 	void View::setLayoutFrame(const UIRect& rect)
@@ -2198,6 +2198,15 @@ namespace slib
 			m_flagNeedApplyLayout = sl_true;
 			setFrame(rect, UIUpdateMode::None);
 		}
+	}
+	
+	UISize View::getLayoutSize()
+	{
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->layoutFrame.getSize();
+		}
+		return m_frame.getSize();
 	}
 	
 	void View::setLayoutSize(sl_ui_len width, sl_ui_len height)
@@ -2223,6 +2232,15 @@ namespace slib
 		setLayoutSize(size.x, size.y);
 	}
 	
+	sl_ui_len View::getLayoutWidth()
+	{
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->layoutFrame.getWidth();
+		}
+		return m_frame.getWidth();
+	}
+	
 	void View::setLayoutWidth(sl_ui_len width)
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
@@ -2239,6 +2257,15 @@ namespace slib
 			m_flagNeedApplyLayout = sl_true;
 			setWidth(width, UIUpdateMode::None);
 		}
+	}
+	
+	sl_ui_len View::getLayoutHeight()
+	{
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->layoutFrame.getHeight();
+		}
+		return m_frame.getHeight();
 	}
 	
 	void View::setLayoutHeight(sl_ui_len height)

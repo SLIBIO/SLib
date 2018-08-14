@@ -318,11 +318,17 @@ namespace slib
 		
 		void setLayoutFrame(const UIRect& frame);
 		
+		UISize getLayoutSize();
+		
 		void setLayoutSize(sl_ui_len width, sl_ui_len height);
 		
 		void setLayoutSize(const UISize& size);
 		
+		sl_ui_len getLayoutWidth();
+		
 		void setLayoutWidth(sl_ui_len width);
+		
+		sl_ui_len getLayoutHeight();
 		
 		void setLayoutHeight(sl_ui_len height);
 
