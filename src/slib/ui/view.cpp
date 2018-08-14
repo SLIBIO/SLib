@@ -2230,7 +2230,7 @@ namespace slib
 			if (layoutAttrs.isNull()) {
 				break;
 			}
-			if (!(layoutAttrs->flagAlwaysOnUpdateLayout || layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping)) {
+			if (!(layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping)) {
 				break;
 			}
 			Ref<View> parent = view->m_parent;
@@ -2274,7 +2274,7 @@ namespace slib
 			if (layoutAttrs.isNull()) {
 				break;
 			}
-			if (!(layoutAttrs->flagAlwaysOnUpdateLayout || layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping)) {
+			if (!(layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping)) {
 				break;
 			}
 			parent = view->m_parent;
@@ -2287,7 +2287,7 @@ namespace slib
 		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
 			if (layoutAttrs.isNotNull()) {
-				if (layoutAttrs->flagAlwaysOnUpdateLayout || layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
+				if (layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
 					invalidateLayout();
 					return;
 				}
