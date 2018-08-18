@@ -51,7 +51,7 @@ namespace slib
 		if (isNativeWidget()) {
 			_setText_NW(text);
 		}
-		invalidateLayoutFromResizeContent(mode);
+		invalidateLayoutOfWrappingControl(mode);
 	}
 	
 	Color LabelView::getTextColor()
@@ -65,9 +65,7 @@ namespace slib
 		if (isNativeWidget()) {
 			_setTextColor_NW(color);
 		} else {
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 	
@@ -82,9 +80,7 @@ namespace slib
 		if (isNativeWidget()) {
 			_setTextAlignment_NW(align);
 		} else {
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 	
@@ -96,7 +92,7 @@ namespace slib
 	void LabelView::setMultiLineMode(MultiLineMode multiLineMode, UIUpdateMode updateMode)
 	{
 		m_multiLineMode = multiLineMode;
-		invalidateLayoutFromResizeContent(updateMode);
+		invalidateLayoutOfWrappingControl(updateMode);
 	}
 	
 	void LabelView::onDraw(Canvas* canvas)
@@ -104,19 +100,22 @@ namespace slib
 		m_textBox.draw(canvas, m_text, getFont(), getBoundsInnerPadding(), isWidthWrapping(), m_multiLineMode, m_textAlignment, m_textColor);
 	}
 	
-	void LabelView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
+	void LabelView::onUpdateLayout()
 	{
+		sl_bool flagHorizontal = isWidthWrapping();
+		sl_bool flagVertical = isHeightWrapping();
+		
 		if (!flagVertical && !flagHorizontal) {
 			return;
 		}
 		
 		sl_ui_pos paddingWidth = getPaddingLeft() + getPaddingRight();
-		m_textBox.update(m_text, getFont(), (sl_real)(currentFrame.getWidth() - paddingWidth), isWidthWrapping(), m_multiLineMode, m_textAlignment);
+		m_textBox.update(m_text, getFont(), (sl_real)(getLayoutWidth() - paddingWidth), isWidthWrapping(), m_multiLineMode, m_textAlignment);
 		if (flagHorizontal) {
-			setMeasuredWidth((sl_ui_pos)(m_textBox.getContentWidth()) + paddingWidth);
+			setLayoutWidth((sl_ui_pos)(m_textBox.getContentWidth()) + paddingWidth);
 		}
 		if (flagVertical) {
-			setMeasuredHeight((sl_ui_pos)(m_textBox.getContentHeight()) + getPaddingTop() + getPaddingBottom());
+			setLayoutHeight((sl_ui_pos)(m_textBox.getContentHeight()) + getPaddingTop() + getPaddingBottom());
 		}
 		
 	}

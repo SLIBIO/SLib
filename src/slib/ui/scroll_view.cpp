@@ -42,38 +42,35 @@ namespace slib
 	void ScrollView::setContentView(const Ref<slib::View>& view, UIUpdateMode mode)
 	{
 		ObjectLocker lock(this);
-		if (m_viewContent != view) {
-			Ref<View> viewOld = m_viewContent;
-			removeChild(viewOld, UIUpdateMode::NoRedraw);
-			m_viewContent = view;
-			if (view.isNotNull()) {
-				view->setParent(this);
-				view->setCreatingInstance(sl_true);
-				view->setAttachMode(UIAttachMode::NotAttach);
-				if (mode == UIUpdateMode::Init) {
-					addChild(view, UIUpdateMode::Init);
-				} else {
-					addChild(view, UIUpdateMode::NoRedraw);
-				}
-				View::setContentSize(view->getWidth(), view->getHeight(), UIUpdateMode::NoRedraw);
+		Ref<View> viewOld = m_viewContent;
+		if (viewOld == view) {
+			return;
+		}
+		UIUpdateMode uiUpdateModeNone = SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::None;
+		removeChild(viewOld, uiUpdateModeNone);
+		m_viewContent = view;
+		if (view.isNotNull()) {
+			view->setParent(this);
+			view->setCreatingInstance(sl_true);
+			view->setAttachMode(UIAttachMode::NotAttach);
+			addChild(view, uiUpdateModeNone);
+			View::setContentSize(view->getWidth(), view->getHeight(), uiUpdateModeNone);
+		} else {
+			View::setContentSize(0, 0, uiUpdateModeNone);
+		}
+		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
+			return;
+		}
+		if (isNativeWidget()) {
+			if (UI::isUiThread()) {
+				_setContentView_NW(view);
 			} else {
-				View::setContentSize(0, 0, UIUpdateMode::NoRedraw);
+				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setContentView_NW, this, view));
 			}
-			if (mode != UIUpdateMode::Init) {
-				if (isNativeWidget()) {
-					if (UI::isUiThread()) {
-						_setContentView_NW(view);
-					} else {
-						UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setContentView_NW, this, view));
-					}
-				} else {
-					UIPoint pt = View::getScrollPosition();
-					scrollTo(pt.x, pt.y, UIUpdateMode::NoRedraw);
-					if (mode == UIUpdateMode::Redraw) {
-						invalidate();
-					}
-				}
-			}
+		} else {
+			UIPoint pt = View::getScrollPosition();
+			scrollTo(pt.x, pt.y, UIUpdateMode::None);
+			invalidate(mode);
 		}
 	}
 	
@@ -90,11 +87,7 @@ namespace slib
 		ObjectLocker lock(this);
 		Ref<View> viewContent = m_viewContent;
 		if (viewContent.isNotNull()) {
-			if (mode == UIUpdateMode::Init) {
-				viewContent->setSize(width, height, UIUpdateMode::Init);
-			} else {
-				viewContent->setSize(width, height, UIUpdateMode::NoRedraw);
-			}
+			viewContent->setSize(width, height, mode);
 		}
 		View::setContentSize(_width, _height, mode);
 		if (isNativeWidget()) {
@@ -190,10 +183,6 @@ namespace slib
 		}
 	}
 	
-	void ScrollView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
-	{
-	}
-	
 	void ScrollView::onUpdatePaging()
 	{
 		if (isNativeWidget()) {
@@ -204,7 +193,7 @@ namespace slib
 	void ScrollView::_onScroll_NW(sl_scroll_pos x, sl_scroll_pos y)
 	{
 		if (isNativeWidget()) {
-			View::scrollTo(x, y, UIUpdateMode::NoRedraw);
+			View::scrollTo(x, y, UIUpdateMode::None);
 		}
 	}
 	

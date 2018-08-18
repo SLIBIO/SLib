@@ -139,7 +139,7 @@ namespace slib
 	{
 		m_flagChecked = flag;
 		if (isNativeWidget()) {
-			setCurrentCategory(flag ? 1 : 0, UIUpdateMode::NoRedraw);
+			setCurrentCategory(flag ? 1 : 0, UIUpdateMode::None);
 			_setChecked_NW(flag);
 		} else {
 			setCurrentCategory(flag ? 1 : 0, mode);

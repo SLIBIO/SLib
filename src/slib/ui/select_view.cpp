@@ -115,7 +115,6 @@ namespace slib
 		}
 		
 		m_clickedIconNo = ICON_NONE;
-		
 	}
 	
 	SelectView::~SelectView()
@@ -134,15 +133,13 @@ namespace slib
 		if (isNativeWidget()) {
 			_refreshItemsCount_NW();
 			if (m_indexSelected >= n) {
-				selectIndex(0, UIUpdateMode::NoRedraw);
+				selectIndex(0, UIUpdateMode::None);
 			}
 		} else {
 			if (m_indexSelected >= n) {
-				selectIndex(0, UIUpdateMode::NoRedraw);
+				selectIndex(0, UIUpdateMode::None);
 			}
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 	
@@ -183,9 +180,7 @@ namespace slib
 			if (isNativeWidget()) {
 				_setItemTitle_NW(index, title);
 			} else {
-				if (mode == UIUpdateMode::Redraw) {
-					invalidate();
-				}
+				invalidate(mode);
 			}
 		}
 	}
@@ -202,16 +197,14 @@ namespace slib
 			_refreshItemsContent_NW();
 			sl_uint32 n = (sl_uint32)(m_titles.getCount());
 			if (m_indexSelected >= n) {
-				selectIndex(0, UIUpdateMode::NoRedraw);
+				selectIndex(0, UIUpdateMode::None);
 			}
 		} else {
 			sl_uint32 n = (sl_uint32)(m_titles.getCount());
 			if (m_indexSelected >= n) {
-				selectIndex(0, UIUpdateMode::NoRedraw);
+				selectIndex(0, UIUpdateMode::None);
 			}
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 	
@@ -222,9 +215,7 @@ namespace slib
 			if (isNativeWidget()) {
 				_select_NW(index);
 			} else {
-				if (mode == UIUpdateMode::Redraw) {
-					invalidate();
-				}
+				invalidate(mode);
 			}
 		} else {
 			if (index == 0) {
@@ -267,9 +258,7 @@ namespace slib
 	void SelectView::setIconSize(const UISize& size, UIUpdateMode mode)
 	{
 		m_iconSize = size;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidateLayoutOfWrappingControl(mode);
 	}
 	
 	void SelectView::setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode)
@@ -310,9 +299,7 @@ namespace slib
 	void SelectView::setLeftIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 	{
 		m_leftIcon = icon;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	Ref<Drawable> SelectView::getRightIcon()
@@ -323,9 +310,7 @@ namespace slib
 	void SelectView::setRightIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 	{
 		m_rightIcon = icon;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	Color SelectView::getTextColor()
@@ -336,9 +321,7 @@ namespace slib
 	void SelectView::setTextColor(const Color& color, UIUpdateMode mode)
 	{
 		m_textColor = color;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void SelectView::onDraw(Canvas* canvas)
@@ -388,8 +371,11 @@ namespace slib
 		}
 	}
 	
-	void SelectView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
+	void SelectView::onUpdateLayout()
 	{
+		sl_bool flagHorizontal = isWidthWrapping();
+		sl_bool flagVertical = isHeightWrapping();
+		
 		if (!flagVertical && !flagHorizontal) {
 			return;
 		}
@@ -399,7 +385,7 @@ namespace slib
 			if (width < 0) {
 				width = 0;
 			}
-			setMeasuredWidth(width);
+			setLayoutWidth(width);
 		}
 		if (flagVertical) {
 			sl_ui_pos height = 0;
@@ -417,7 +403,7 @@ namespace slib
 			if (height < 0) {
 				height = 0;
 			}
-			setMeasuredHeight(height);
+			setLayoutHeight(height);
 		}
 	}
 	

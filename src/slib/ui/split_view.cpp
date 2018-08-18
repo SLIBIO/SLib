@@ -42,7 +42,6 @@ namespace slib
 		m_weightDown = 0;
 		
 		m_cursor = Cursor::getResizeLeftRight();
-		
 	}
 	
 	SplitView::~SplitView()
@@ -74,7 +73,7 @@ namespace slib
 			return;
 		}
 		m_orientation = orientation;
-		if (mode != UIUpdateMode::Init) {
+		if (!SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 			ObjectLocker lock(this);
 			_refreshItemFrames(mode);
 		}
@@ -377,9 +376,7 @@ namespace slib
 		Item* item = m_items.getPointerAt(index);
 		if (item) {
 			item->dividerBackground = background;
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 	
@@ -399,9 +396,7 @@ namespace slib
 		Item* item = m_items.getPointerAt(index);
 		if (item) {
 			item->dividerColor = color;
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 	
@@ -425,9 +420,7 @@ namespace slib
 	void SplitView::setDividerBackground(const Ref<Drawable>& background, UIUpdateMode mode)
 	{
 		m_dividerBackground = background;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	Color SplitView::getDividerColor()
@@ -438,9 +431,7 @@ namespace slib
 	void SplitView::setDividerColor(const Color& color, UIUpdateMode mode)
 	{
 		m_dividerColor = color;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	sl_ui_len SplitView::getCursorMargin()
@@ -462,7 +453,7 @@ namespace slib
 	void SplitView::onResize(sl_ui_len width, sl_ui_len height)
 	{
 		ObjectLocker lock(this);
-		_resetWeights(UIUpdateMode::Redraw);
+		_resetWeights(UIUpdateMode::UpdateLayout);
 	}
 	
 	void SplitView::onDraw(Canvas* canvas)
@@ -513,14 +504,6 @@ namespace slib
 				}
 			}
 		}
-	}
-	
-	void SplitView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
-	{
-	}
-	
-	void SplitView::onMakeLayout()
-	{
 	}
 	
 	void SplitView::dispatchMouseEvent(UIEvent* ev)
@@ -617,7 +600,7 @@ namespace slib
 	
 	void SplitView::_refreshItemFrames(UIUpdateMode mode)
 	{
-		if (mode == UIUpdateMode::Init) {
+		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 			return;
 		}
 		
@@ -640,9 +623,9 @@ namespace slib
 			}
 			if (item.view.isNotNull()) {
 				if (orientation == LayoutOrientation::Horizontal) {
-					item.view->setFrame(UIRect(pos, 0, pos + width, height), UIUpdateMode::NoRedraw);
+					item.view->setFrame(UIRect(pos, 0, pos + width, height));
 				} else {
-					item.view->setFrame(UIRect(0, pos, height, pos + width), UIUpdateMode::NoRedraw);
+					item.view->setFrame(UIRect(0, pos, height, pos + width));
 				}
 			}
 			
@@ -660,9 +643,7 @@ namespace slib
 			pos += dw;
 		}
 		
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void SplitView::_resetWeights(UIUpdateMode mode)

@@ -157,7 +157,7 @@ namespace slib
 		if (isNativeWidget()) {
 			_setText_NW(text);
 		}
-		invalidateLayoutFromResizeContent(mode);
+		invalidateLayoutOfWrappingControl(mode);
 	}
 
 	sl_bool Button::isDefaultButton()
@@ -169,16 +169,14 @@ namespace slib
 	{
 		m_flagDefaultButton = flag;
 		if (flag) {
-			setCurrentCategory(1, UIUpdateMode::NoRedraw);
+			setCurrentCategory(1, UIUpdateMode::None);
 		} else {
-			setCurrentCategory(0, UIUpdateMode::NoRedraw);
+			setCurrentCategory(0, UIUpdateMode::None);
 		}
 		if (isNativeWidget()) {
 			_setDefaultButton_NW(flag);
 		} else {
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}		
+			invalidate(mode);
 		}
 	}
 
@@ -201,9 +199,7 @@ namespace slib
 	{
 		if (n < m_nCategories) {
 			m_category = n;
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 
@@ -215,7 +211,7 @@ namespace slib
 	void Button::setMultiLine(sl_bool flag, UIUpdateMode mode)
 	{
 		m_flagMultiLine = flag;
-		invalidateLayoutFromResizeContent(mode);
+		invalidateLayoutOfWrappingControl(mode);
 	}
 
 	const UISize& Button::getIconSize()
@@ -226,7 +222,7 @@ namespace slib
 	void Button::setIconSize(const UISize& size, UIUpdateMode mode)
 	{
 		m_iconSize = size;
-		invalidateLayoutFromResizeContent(mode);
+		invalidateLayoutOfWrappingControl(mode);
 	}
 
 	void Button::setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode)
@@ -267,9 +263,7 @@ namespace slib
 	void Button::setGravity(Alignment align, UIUpdateMode mode)
 	{
 		m_gravity = align;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 
 	Alignment Button::getIconAlignment()
@@ -280,7 +274,7 @@ namespace slib
 	void Button::setIconAlignment(Alignment align, UIUpdateMode mode)
 	{
 		m_iconAlignment = align;
-		invalidateLayoutFromResizeContent(mode);
+		invalidateLayoutOfWrappingControl(mode);
 	}
 
 	Alignment Button::getTextAlignment()
@@ -291,7 +285,7 @@ namespace slib
 	void Button::setTextAlignment(Alignment align, UIUpdateMode mode)
 	{
 		m_textAlignment = align;
-		invalidateLayoutFromResizeContent(mode);
+		invalidateLayoutOfWrappingControl(mode);
 	}
 
 	sl_bool Button::isTextBeforeIcon()
@@ -302,7 +296,7 @@ namespace slib
 	void Button::setTextBeforeIcon(sl_bool flag, UIUpdateMode mode)
 	{
 		m_flagTextBeforeIcon = flag;
-		invalidateLayoutFromResizeContent(mode);
+		invalidateLayoutOfWrappingControl(mode);
 	}
 
 	LayoutOrientation Button::getLayoutOrientation()
@@ -313,7 +307,7 @@ namespace slib
 	void Button::setLayoutOrientation(LayoutOrientation orientation, UIUpdateMode mode)
 	{
 		m_layoutOrientation = orientation;
-		invalidateLayoutFromResizeContent(mode);
+		invalidateLayoutOfWrappingControl(mode);
 	}
 
 	void Button::setIconMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode)
@@ -322,7 +316,7 @@ namespace slib
 		m_iconMarginTop = top;
 		m_iconMarginRight = right;
 		m_iconMarginBottom = bottom;
-		invalidateLayoutFromResizeContent(mode);
+		invalidateLayoutOfWrappingControl(mode);
 	}
 
 	void Button::setIconMargin(sl_ui_pos margin, UIUpdateMode mode)
@@ -376,7 +370,7 @@ namespace slib
 		m_textMarginTop = top;
 		m_textMarginRight = right;
 		m_textMarginBottom = bottom;
-		invalidateLayoutFromResizeContent(mode);
+		invalidateLayoutOfWrappingControl(mode);
 	}
 
 	void Button::setTextMargin(sl_ui_pos margin, UIUpdateMode mode)
@@ -437,9 +431,7 @@ namespace slib
 	{
 		if (category < m_nCategories) {
 			m_categories[category].properties[(int)state].textColor = color;
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 
@@ -451,9 +443,7 @@ namespace slib
 	void Button::setTextColor(const Color& color, UIUpdateMode mode)
 	{
 		m_textColorDefault = color;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 
 	Ref<Drawable> Button::getIcon(ButtonState state, sl_uint32 category)
@@ -469,9 +459,7 @@ namespace slib
 	{
 		if (category < m_nCategories) {
 			m_categories[category].properties[(int)state].icon = icon;
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 
@@ -483,9 +471,7 @@ namespace slib
 	void Button::setIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 	{
 		m_iconDefault = icon;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 
 	Ref<Drawable> Button::getBackground(ButtonState state, sl_uint32 category)
@@ -501,9 +487,7 @@ namespace slib
 	{
 		if (category < m_nCategories) {
 			m_categories[category].properties[(int)state].background = background;
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 
@@ -535,9 +519,7 @@ namespace slib
 	{
 		if (category < m_nCategories) {
 			m_categories[category].properties[(int)state].border = pen;
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 
@@ -564,41 +546,33 @@ namespace slib
 	void Button::setUsingDefaultColorFilter(sl_bool flag, UIUpdateMode mode)
 	{
 		m_flagUseDefaultColorFilter = flag;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 
 	void Button::setEnabled(sl_bool flagEnabled, UIUpdateMode mode)
 	{
 		if (isEnabled() != flagEnabled) {
-			View::setEnabled(flagEnabled, UIUpdateMode::NoRedraw);
+			View::setEnabled(flagEnabled, UIUpdateMode::None);
 			_invalidateButtonState();
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 
 	void Button::setPressedState(sl_bool flagState, UIUpdateMode mode)
 	{
 		if (isPressedState() != flagState) {
-			View::setPressedState(flagState, UIUpdateMode::NoRedraw);
+			View::setPressedState(flagState, UIUpdateMode::None);
 			_invalidateButtonState();
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 
 	void Button::setHoverState(sl_bool flagState, UIUpdateMode mode)
 	{
 		if (isHoverState() != flagState) {
-			View::setHoverState(flagState, UIUpdateMode::NoRedraw);
+			View::setHoverState(flagState, UIUpdateMode::None);
 			_invalidateButtonState();
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 
@@ -701,8 +675,11 @@ namespace slib
 		}
 	}
 
-	void Button::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
+	void Button::onUpdateLayout()
 	{
+		sl_bool flagHorizontal = isWidthWrapping();
+		sl_bool flagVertical = isHeightWrapping();
+		
 		if (!flagVertical && !flagHorizontal) {
 			return;
 		}
@@ -724,7 +701,7 @@ namespace slib
 				width = 0;
 			}
 			width += paddingNativeWidth;
-			setMeasuredWidth(width);
+			setLayoutWidth(width);
 		}
 		if (flagVertical) {
 			if (size.y < 0) {
@@ -735,7 +712,7 @@ namespace slib
 				height = 0;
 			}
 			height += paddingNativeHeight;
-			setMeasuredHeight(height);
+			setLayoutHeight(height);
 		}
 	}
 

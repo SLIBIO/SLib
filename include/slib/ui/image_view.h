@@ -33,7 +33,7 @@ namespace slib
 	public:
 		Ref<Drawable> getSource();
 		
-		virtual void setSource(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setSource(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		
 		ScaleMode getScaleMode();
@@ -48,7 +48,7 @@ namespace slib
 	public:
 		void onDraw(Canvas* canvas) override;
 		
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame) override;
+		void onUpdateLayout() override;
 		
 	protected:
 		AtomicRef<Drawable> m_source;

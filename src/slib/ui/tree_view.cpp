@@ -268,9 +268,7 @@ namespace slib
 	void TreeViewItem::setText(const String& text, UIUpdateMode mode)
 	{
 		m_text = text;
-		if (mode == UIUpdateMode::Redraw) {
-			_redrawTree();
-		}
+		_redrawTree(mode);
 	}
 	
 	Ref<Drawable> TreeViewItem::getIcon()
@@ -335,9 +333,7 @@ namespace slib
 	void TreeViewItem::setTextColor(const Color& color, UIUpdateMode mode)
 	{
 		m_textColor = color;
-		if (mode == UIUpdateMode::Redraw) {
-			_redrawTree();
-		}
+		_redrawTree(mode);
 	}
 	
 	Color TreeViewItem::getHoverTextColor()
@@ -348,9 +344,7 @@ namespace slib
 	void TreeViewItem::setHoverTextColor(const Color& color, UIUpdateMode mode)
 	{
 		m_hoverTextColor = color;
-		if (mode == UIUpdateMode::Redraw) {
-			_redrawTree();
-		}
+		_redrawTree(mode);
 	}
 	
 	Color TreeViewItem::getSelectedTextColor()
@@ -361,9 +355,7 @@ namespace slib
 	void TreeViewItem::setSelectedTextColor(const Color& color, UIUpdateMode mode)
 	{
 		m_selectedTextColor = color;
-		if (mode == UIUpdateMode::Redraw) {
-			_redrawTree();
-		}
+		_redrawTree(mode);
 	}
 	
 	sl_ui_len TreeViewItem::getHeight()
@@ -416,11 +408,11 @@ namespace slib
 		}
 	}
 	
-	void TreeViewItem::_redrawTree()
+	void TreeViewItem::_redrawTree(UIUpdateMode mode)
 	{
 		Ref<TreeView> tree = m_tree;
 		if (tree.isNotNull()) {
-			tree->_redrawContent();
+			tree->_redrawContent(mode);
 		}
 	}
 	
@@ -694,9 +686,7 @@ namespace slib
 	void TreeView::setSelectedItemBackgroundColor(const Color& color, UIUpdateMode mode)
 	{
 		m_selectedItemBackgroundColor = color;
-		if (mode == UIUpdateMode::Redraw) {
-			_redrawContent();
-		}
+		_redrawContent(mode);
 	}
 	
 	Color TreeView::getItemTextColor()
@@ -707,9 +697,7 @@ namespace slib
 	void TreeView::setItemTextColor(const Color& color, UIUpdateMode mode)
 	{
 		m_itemTextColor = color;
-		if (mode == UIUpdateMode::Redraw) {
-			_redrawContent();
-		}
+		_redrawContent(mode);
 	}
 	
 	Color TreeView::getHoverItemTextColor()
@@ -720,9 +708,7 @@ namespace slib
 	void TreeView::setHoverItemTextColor(const Color& color, UIUpdateMode mode)
 	{
 		m_hoverItemTextColor = color;
-		if (mode == UIUpdateMode::Redraw) {
-			_redrawContent();
-		}
+		_redrawContent(mode);
 	}
 	
 	Color TreeView::getSelectedItemTextColor()
@@ -733,9 +719,7 @@ namespace slib
 	void TreeView::setSelectedItemTextColor(const Color& color, UIUpdateMode mode)
 	{
 		m_selectedItemTextColor = color;
-		if (mode == UIUpdateMode::Redraw) {
-			_redrawContent();
-		}
+		_redrawContent(mode);
 	}
 	
 	sl_ui_len TreeView::getItemHeight()
@@ -779,9 +763,7 @@ namespace slib
 	void TreeView::setTextIndent(sl_ui_pos indent, UIUpdateMode mode)
 	{
 		m_textIndent = indent;
-		if (mode == UIUpdateMode::Redraw) {
-			_redrawContent();
-		}
+		_redrawContent(mode);
 	}
 	
 	void TreeView::onSelectItem(TreeViewItem* item)
@@ -799,14 +781,14 @@ namespace slib
 		ScrollView::onResize(width, height);
 		Ref<TreeContentViewImpl> content = m_content;
 		if (content.isNotNull()) {
-			content->setWidth(width, UIUpdateMode::NoRedraw);
-			_relayoutContent(UIUpdateMode::NoRedraw);
+			content->setWidth(width, UIUpdateMode::None);
+			_relayoutContent(UIUpdateMode::None);
 		}
 	}
 	
 	void TreeView::onChangePadding()
 	{
-		_relayoutContent(UIUpdateMode::NoRedraw);
+		_relayoutContent(UIUpdateMode::None);
 	}
 	
 	void TreeView::dispatchSelectItem(TreeViewItem* item)
@@ -841,17 +823,15 @@ namespace slib
 		Ref<TreeContentViewImpl> content = m_content;
 		if (content.isNotNull()) {
 			m_flagInvalidLayout = sl_true;
-			if (mode == UIUpdateMode::Redraw) {
-				content->invalidate();
-			}
+			content->invalidate(mode);
 		}
 	}
 	
-	void TreeView::_redrawContent()
+	void TreeView::_redrawContent(UIUpdateMode mode)
 	{
 		Ref<TreeContentViewImpl> view = m_content;
 		if (view.isNotNull()) {
-			view->invalidate();
+			view->invalidate(mode);
 		}
 	}
 	
@@ -885,7 +865,7 @@ namespace slib
 			}
 			Ref<TreeContentViewImpl> content = m_content;
 			if (content.isNotNull()) {
-				content->setHeight(top, UIUpdateMode::NoRedraw);
+				content->setHeight(top, UIUpdateMode::None);
 			}
 		}
 		
@@ -1099,7 +1079,7 @@ namespace slib
 					if (action == UIAction::MouseMove) {
 						if (m_itemHover != item) {
 							m_itemHover = item;
-							_redrawContent();
+							_redrawContent(UIUpdateMode::Redraw);
 						}
 					}
 				}

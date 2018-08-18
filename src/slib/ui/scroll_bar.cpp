@@ -140,9 +140,7 @@ namespace slib
 	void ScrollBar::setOrientation(LayoutOrientation orientation, UIUpdateMode mode)
 	{
 		m_orientation = orientation;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	sl_bool ScrollBar::isVertical()
@@ -185,17 +183,13 @@ namespace slib
 		}
 		m_value = value;
 		dispatchChange(value);
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void ScrollBar::setValueOfOutRange(sl_scroll_pos value, UIUpdateMode mode)
 	{
 		m_value = value;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	sl_scroll_pos ScrollBar::getPage()
@@ -206,9 +200,7 @@ namespace slib
 	void ScrollBar::setPage(sl_scroll_pos page, UIUpdateMode mode)
 	{
 		m_page = page;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	sl_scroll_pos ScrollBar::getLine()
@@ -219,9 +211,7 @@ namespace slib
 	void ScrollBar::setLine(sl_scroll_pos line, UIUpdateMode mode)
 	{
 		m_line = line;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	sl_scroll_pos ScrollBar::getMinimumValue()
@@ -232,10 +222,8 @@ namespace slib
 	void ScrollBar::setMinimumValue(sl_scroll_pos value, UIUpdateMode mode)
 	{
 		m_value_min = value;
-		setValue(m_value, UIUpdateMode::NoRedraw);
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		setValue(m_value, UIUpdateMode::None);
+		invalidate(mode);
 	}
 	
 	sl_scroll_pos ScrollBar::getMaximumValue()
@@ -246,10 +234,8 @@ namespace slib
 	void ScrollBar::setMaximumValue(sl_scroll_pos value, UIUpdateMode mode)
 	{
 		m_value_max = value;
-		setValue(m_value, UIUpdateMode::NoRedraw);
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		setValue(m_value, UIUpdateMode::None);
+		invalidate(mode);
 	}
 	
 	sl_scroll_pos ScrollBar::getRange()
@@ -267,10 +253,8 @@ namespace slib
 			range = 0;
 		}
 		m_value_max = m_value_min + range;
-		setValue(m_value, UIUpdateMode::NoRedraw);
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		setValue(m_value, UIUpdateMode::None);
+		invalidate(mode);
 	}
 	
 	Ref<Drawable> ScrollBar::getThumbDrawable()
@@ -281,9 +265,7 @@ namespace slib
 	void ScrollBar::setThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
 		m_thumb = drawable;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void ScrollBar::setThumbColor(const Color& color, UIUpdateMode mode)
@@ -299,9 +281,7 @@ namespace slib
 	void ScrollBar::setPressedThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
 		m_pressedThumb = drawable;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void ScrollBar::setPressedThumbColor(const Color& color, UIUpdateMode mode)
@@ -317,9 +297,7 @@ namespace slib
 	void ScrollBar::setHoverThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
 		m_hoverThumb = drawable;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void ScrollBar::setHoverThumbColor(const Color& color, UIUpdateMode mode)
@@ -335,9 +313,7 @@ namespace slib
 	void ScrollBar::setTrackDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
 		m_track = drawable;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void ScrollBar::setTrackColor(const Color& color, UIUpdateMode mode)
@@ -353,9 +329,7 @@ namespace slib
 	void ScrollBar::setPressedTrackDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
 		m_pressedTrack = drawable;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void ScrollBar::setPressedTrackColor(const Color& color, UIUpdateMode mode)
@@ -371,9 +345,7 @@ namespace slib
 	void ScrollBar::setHoverTrackDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
 		m_hoverTrack = drawable;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void ScrollBar::setHoverTrackColor(const Color& color, UIUpdateMode mode)

@@ -38,7 +38,7 @@ namespace slib
 	public:
 		String getText();
 		
-		virtual void setText(const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setText(const String& text, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		Color getTextColor();
 		
@@ -50,7 +50,7 @@ namespace slib
 		
 		MultiLineMode getMultiLineMode();
 		
-		virtual void setMultiLineMode(MultiLineMode multiLineMode, UIUpdateMode updateMode = UIUpdateMode::Redraw);
+		virtual void setMultiLineMode(MultiLineMode multiLineMode, UIUpdateMode updateMode = UIUpdateMode::UpdateLayout);
 		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
@@ -58,7 +58,7 @@ namespace slib
 	protected:
 		void onDraw(Canvas* canvas) override;
 		
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame) override;
+		void onUpdateLayout() override;
 		
 	private:
 		void _setText_NW(const String& text);

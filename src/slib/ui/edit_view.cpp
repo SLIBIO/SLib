@@ -11,7 +11,6 @@
 #include "slib/ui/edit_view.h"
 
 #include "slib/ui/mobile_app.h"
-#include "slib/ui/scroll_view.h"
 #include "slib/ui/resource.h"
 #include "slib/ui/core.h"
 #include "slib/ui/button.h"
@@ -34,6 +33,7 @@ namespace slib
 		setCreatingNativeWidget(sl_true);
 		setUsingFont(sl_true);
 		setFocusable(sl_true);
+		
 		m_textAlignment = Alignment::MiddleCenter;
 		m_flagReadOnly = sl_false;
 		m_flagMultiLine = sl_false;
@@ -64,9 +64,7 @@ namespace slib
 		if (isNativeWidget()) {
 			_setText_NW(text);
 		} else {
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 
@@ -81,9 +79,7 @@ namespace slib
 		if (isNativeWidget()) {
 			_setTextAlignment_NW(align);
 		} else {
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 
@@ -98,9 +94,7 @@ namespace slib
 		if (isNativeWidget()) {
 			_setHintText_NW(str);
 		} else {
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 
@@ -115,9 +109,7 @@ namespace slib
 		if (isNativeWidget()) {
 			_setReadOnly_NW(flag);
 		} else {
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 
@@ -132,9 +124,7 @@ namespace slib
 		if (isNativeWidget()) {
 			_setMultiLine_NW(flag);
 		} else {
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 
@@ -149,9 +139,7 @@ namespace slib
 		if (isNativeWidget()) {
 			_setTextColor_NW(color);
 		} else {
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 	
@@ -166,9 +154,7 @@ namespace slib
 		if (isNativeWidget()) {
 			_setHintTextColor_NW(color);
 		} else {
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 
@@ -216,8 +202,11 @@ namespace slib
 		m_flagAutoDismissKeyboard = flag;
 	}
 
-	void EditView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
+	void EditView::onUpdateLayout()
 	{
+		sl_bool flagHorizontal = isWidthWrapping();
+		sl_bool flagVertical = isHeightWrapping();
+		
 		if (!flagHorizontal && !flagVertical) {
 			return;
 		}
@@ -227,7 +216,7 @@ namespace slib
 			if (width < 0) {
 				width = 0;
 			}
-			setMeasuredWidth(width);
+			setLayoutWidth(width);
 		}
 		if (flagVertical) {
 			sl_ui_pos height = 0;
@@ -242,7 +231,7 @@ namespace slib
 			if (height < 0) {
 				height = 0;
 			}
-			setMeasuredHeight(height);
+			setLayoutHeight(height);
 		}
 	}
 	

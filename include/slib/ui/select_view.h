@@ -66,19 +66,19 @@ namespace slib
 		
 		const UISize& getIconSize();
 		
-		virtual void setIconSize(const UISize& size, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setIconSize(const UISize& size, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setIconSize(sl_ui_len size, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setIconSize(sl_ui_len size, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_len getIconWidth();
 		
-		void setIconWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setIconWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_len getIconHeight();
 		
-		void setIconHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setIconHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		
 		Ref<Drawable> getLeftIcon();
@@ -103,7 +103,7 @@ namespace slib
 		
 		void onMouseEvent(UIEvent* ev) override;
 		
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame) override;
+		void onUpdateLayout() override;
 		
 		virtual void onSelectItem(sl_uint32 index);
 		

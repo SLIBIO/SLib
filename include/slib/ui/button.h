@@ -51,7 +51,7 @@ namespace slib
 	public:
 		String getText();
 		
-		virtual void setText(const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setText(const String& text, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isDefaultButton();
 		
@@ -70,23 +70,23 @@ namespace slib
 		
 		sl_bool isMultiLine();
 		
-		void setMultiLine(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setMultiLine(sl_bool flag, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
 		const UISize& getIconSize();
 		
-		virtual void setIconSize(const UISize& size, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setIconSize(const UISize& size, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setIconSize(sl_ui_len size, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setIconSize(sl_ui_len size, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_len getIconWidth();
 		
-		void setIconWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setIconWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_len getIconHeight();
 		
-		void setIconHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setIconHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		
 		Alignment getGravity();
@@ -95,61 +95,61 @@ namespace slib
 		
 		Alignment getIconAlignment();
 		
-		virtual void setIconAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setIconAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		Alignment getTextAlignment();
 		
-		virtual void setTextAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setTextAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isTextBeforeIcon();
 		
-		virtual void setTextBeforeIcon(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setTextBeforeIcon(sl_bool flag, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		LayoutOrientation getLayoutOrientation();
 		
-		virtual void setLayoutOrientation(LayoutOrientation orientation, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setLayoutOrientation(LayoutOrientation orientation, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		
-		virtual void setIconMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setIconMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setIconMargin(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setIconMargin(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getIconMarginLeft();
 		
-		void setIconMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setIconMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getIconMarginTop();
 		
-		void setIconMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setIconMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getIconMarginRight();
 		
-		void setIconMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setIconMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getIconMarginBottom();
 		
-		void setIconMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setIconMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		
-		virtual void setTextMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setTextMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setTextMargin(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setTextMargin(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getTextMarginLeft();
 		
-		void setTextMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setTextMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getTextMarginTop();
 		
-		void setTextMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setTextMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getTextMarginRight();
 		
-		void setTextMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setTextMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_pos getTextMarginBottom();
 		
-		void setTextMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setTextMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		
 		Color getTextColor(ButtonState state, sl_uint32 category = 0);
@@ -212,7 +212,7 @@ namespace slib
 		
 		void onDrawBorder(Canvas* canvas) override;
 		
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame) override;
+		void onUpdateLayout() override;
 		
 		void onKeyEvent(UIEvent* ev) override;
 

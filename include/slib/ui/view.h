@@ -1698,7 +1698,6 @@ namespace slib
 		
 		void _initializeEventAttributes();
 
-		
 		friend class ListView;
 
 	};

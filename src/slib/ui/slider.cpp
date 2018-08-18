@@ -43,7 +43,6 @@ namespace slib
 	
 	Slider::Slider(LayoutOrientation orientation) : ProgressBar(orientation)
 	{
-		
 		SLIB_REFERABLE_CONSTRUCTOR
 		
 		_priv_Slider_Static* s = _priv_Slider_getStatic();
@@ -62,7 +61,6 @@ namespace slib
 		m_indexHoverThumb = -1;
 		m_indexPressedThumb = -1;
 		
-		
 		setFocusable(sl_true);
 	}
 	
@@ -78,9 +76,7 @@ namespace slib
 	void Slider::setThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
 		m_thumb = drawable;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void Slider::setThumbColor(const Color& color, UIUpdateMode mode)
@@ -96,9 +92,7 @@ namespace slib
 	void Slider::setPressedThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
 		m_pressedThumb = drawable;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void Slider::setPressedThumbColor(const Color& color, UIUpdateMode mode)
@@ -114,9 +108,7 @@ namespace slib
 	void Slider::setHoverThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
 		m_hoverThumb = drawable;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void Slider::setHoverThumbColor(const Color& color, UIUpdateMode mode)
@@ -132,9 +124,7 @@ namespace slib
 	void Slider::setThumbSize(const UISize& size, UIUpdateMode mode)
 	{
 		m_thumbSize = size;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void Slider::setThumbSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode)

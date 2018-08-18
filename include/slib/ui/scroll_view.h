@@ -32,9 +32,9 @@ namespace slib
 		
 		virtual void setContentView(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::Redraw) override;
+		void setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::UpdateLayout) override;
 		
-		void setContentSize(const ScrollPoint& size, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setContentSize(const ScrollPoint& size, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		ScrollPoint getScrollPosition() override;
 		
@@ -59,8 +59,6 @@ namespace slib
 		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
 		void onResizeChild(View* child, sl_ui_len width, sl_ui_len height) override;
-		
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame) override;
 		
 		void onUpdatePaging() override;
 		

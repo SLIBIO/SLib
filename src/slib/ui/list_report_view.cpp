@@ -52,9 +52,7 @@ namespace slib
 		if (isNativeWidget()) {
 			_refreshColumnsCount_NW();
 		} else {
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 	
@@ -73,9 +71,7 @@ namespace slib
 		if (isNativeWidget()) {
 			_refreshRowsCount_NW();
 		} else {
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 	
@@ -116,7 +112,7 @@ namespace slib
 				ListReportViewCell* cell = row.getPointerAt(iCol);
 				cell->text = text;
 			}
-			if (mode == UIUpdateMode::Redraw) {
+			if (SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
 				if (isNativeWidget()) {
 					_refreshRowsCount_NW();
 				} else {
@@ -145,9 +141,7 @@ namespace slib
 			if (isNativeWidget()) {
 				_setHeaderText_NW(iCol, text);
 			} else {
-				if (mode == UIUpdateMode::Redraw) {
-					invalidate();
-				}
+				invalidate(mode);
 			}
 		}
 	}
@@ -171,9 +165,7 @@ namespace slib
 			if (isNativeWidget()) {
 				_setColumnWidth_NW(iCol, width);
 			} else {
-				if (mode == UIUpdateMode::Redraw) {
-					invalidate();
-				}
+				invalidate(mode);
 			}
 		}
 	}
@@ -197,9 +189,7 @@ namespace slib
 			if (isNativeWidget()) {
 				_setHeaderAlignment_NW(iCol, align);
 			} else {
-				if (mode == UIUpdateMode::Redraw) {
-					invalidate();
-				}
+				invalidate(mode);
 			}
 		}
 	}
@@ -223,9 +213,7 @@ namespace slib
 			if (isNativeWidget()) {
 				_setColumnAlignment_NW(iCol, align);
 			} else {
-				if (mode == UIUpdateMode::Redraw) {
-					invalidate();
-				}
+				invalidate(mode);
 			}
 		}
 	}

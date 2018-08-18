@@ -168,7 +168,7 @@ namespace slib
 		virtual void onDrawTab(Canvas* canvas, const UIRect& rect, sl_uint32 index, const String& label);
 		
 	protected:
-		void _invalidateTabBar();
+		void _invalidateTabBar(UIUpdateMode mode);
 		
 		void _relayout(UIUpdateMode mode);
 		

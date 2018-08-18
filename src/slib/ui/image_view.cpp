@@ -54,9 +54,7 @@ namespace slib
 				setAspectRatio(source->getDrawableWidth() / h, mode);
 			}
 		}
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidateLayoutOfWrappingControl(mode);
 	}
 	
 	ScaleMode ImageView::getScaleMode()
@@ -67,9 +65,7 @@ namespace slib
 	void ImageView::setScaleMode(ScaleMode scaleMode, UIUpdateMode updateMode)
 	{
 		m_scaleMode = scaleMode;
-		if (updateMode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(updateMode);
 	}
 	
 	Alignment ImageView::getGravity()
@@ -80,9 +76,7 @@ namespace slib
 	void ImageView::setGravity(Alignment align, UIUpdateMode mode)
 	{
 		m_gravity = align;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void ImageView::onDraw(Canvas* canvas)
@@ -90,18 +84,22 @@ namespace slib
 		canvas->draw(getBoundsInnerPadding(), m_source, m_scaleMode, m_gravity);
 	}
 	
-	void ImageView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame)
+	void ImageView::onUpdateLayout()
 	{
+		sl_bool flagHorizontal = isWidthWrapping();
+		sl_bool flagVertical = isHeightWrapping();
+		
 		if (!flagVertical && !flagHorizontal) {
 			return;
 		}
+		
 		Ref<Drawable> source = m_source;
 		if (source.isNotNull()) {
 			if (flagHorizontal) {
-				setMeasuredWidth((sl_ui_len)(source->getDrawableWidth()));
+				setLayoutWidth((sl_ui_len)(source->getDrawableWidth()));
 			}
 			if (flagVertical) {
-				setMeasuredHeight((sl_ui_len)(source->getDrawableHeight()));
+				setLayoutHeight((sl_ui_len)(source->getDrawableHeight()));
 			}
 		}
 	}

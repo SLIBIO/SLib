@@ -58,15 +58,13 @@ namespace slib
 		if (isNativeWidget()) {
 			_refreshItemsCount_NW();
 			if (m_indexSelected >= n) {
-				selectIndex(0, UIUpdateMode::NoRedraw);
+				selectIndex(0, UIUpdateMode::None);
 			}
 		} else {
 			if (m_indexSelected >= n) {
-				selectIndex(0, UIUpdateMode::NoRedraw);
+				selectIndex(0, UIUpdateMode::None);
 			}
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 	
@@ -107,9 +105,7 @@ namespace slib
 			if (isNativeWidget()) {
 				_setItemTitle_NW(index, title);
 			} else {
-				if (mode == UIUpdateMode::Redraw) {
-					invalidate();
-				}
+				invalidate(mode);
 			}
 		}
 	}
@@ -126,16 +122,14 @@ namespace slib
 			_refreshItemsContent_NW();
 			sl_uint32 n = (sl_uint32)(m_titles.getCount());
 			if (m_indexSelected >= n) {
-				selectIndex(0, UIUpdateMode::NoRedraw);
+				selectIndex(0, UIUpdateMode::None);
 			}
 		} else {
 			sl_uint32 n = (sl_uint32)(m_titles.getCount());
 			if (m_indexSelected >= n) {
-				selectIndex(0, UIUpdateMode::NoRedraw);
+				selectIndex(0, UIUpdateMode::None);
 			}
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 	
@@ -146,9 +140,7 @@ namespace slib
 			if (isNativeWidget()) {
 				_select_NW(index);
 			} else {
-				if (mode == UIUpdateMode::Redraw) {
-					invalidate();
-				}
+				invalidate(mode);
 			}
 		} else {
 			if (index == 0) {
@@ -191,9 +183,7 @@ namespace slib
 	void PickerView::setTextColor(const Color& color, UIUpdateMode mode)
 	{
 		m_textColor = color;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void PickerView::onDraw(Canvas* canvas)

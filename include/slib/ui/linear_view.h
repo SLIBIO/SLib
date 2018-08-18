@@ -30,20 +30,18 @@ namespace slib
 	public:
 		LayoutOrientation getOrientation();
 		
-		void setOrientation(LayoutOrientation orientation, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setOrientation(LayoutOrientation orientation, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isHorizontal();
 		
-		void setHorizontal(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setHorizontal(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isVertical();
 		
-		void setVertical(UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setVertical(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 	protected:
-		void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical, const UIRect& currentFrame) override;
-		
-		void onMakeLayout() override;
+		void onUpdateLayout() override;
 		
 	private:
 		LayoutOrientation m_orientation;

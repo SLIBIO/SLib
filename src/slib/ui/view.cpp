@@ -2108,8 +2108,9 @@ namespace slib
 		if (!flagVertical && !flagHorizontal) {
 			return;
 		}
-		sl_ui_pos measuredWidth = m_paddingLeft + m_paddingRight;
-		sl_ui_pos measuredHeight = m_paddingTop + m_paddingBottom;
+		
+		sl_ui_pos measuredWidth = m_paddingLeft;
+		sl_ui_pos measuredHeight = m_paddingTop;
 		
 		ListElements< Ref<View> > children(getChildren());
 		
@@ -2119,13 +2120,13 @@ namespace slib
 				Ref<LayoutAttributes>& childLayoutAttrs = child->m_layoutAttrs;
 				if (childLayoutAttrs.isNotNull()) {
 					if (flagHorizontal) {
-						sl_ui_pos w = childLayoutAttrs->layoutFrame.right + childLayoutAttrs->marginRight + m_paddingRight;
+						sl_ui_pos w = childLayoutAttrs->layoutFrame.right + childLayoutAttrs->marginRight;
 						if (w > measuredWidth) {
 							measuredWidth = w;
 						}
 					}
 					if (flagVertical) {
-						sl_ui_pos h = childLayoutAttrs->layoutFrame.bottom + childLayoutAttrs->marginBottom + m_paddingBottom;
+						sl_ui_pos h = childLayoutAttrs->layoutFrame.bottom + childLayoutAttrs->marginBottom;
 						if (h > measuredHeight) {
 							measuredHeight = h;
 						}
@@ -2146,6 +2147,8 @@ namespace slib
 				}
 			}
 		}
+		measuredWidth += m_paddingRight;
+		measuredHeight += m_paddingBottom;
 		if (flagHorizontal) {
 			layoutAttrs->layoutFrame.setWidth(measuredWidth);
 		}

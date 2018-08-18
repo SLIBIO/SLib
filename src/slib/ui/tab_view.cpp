@@ -90,17 +90,15 @@ namespace slib
 		if (nOrig > nNew) {
 			for (sl_uint32 i = nOrig; i > nNew; i--) {
 				TabViewItem& item = items[i-1];
-				removeChild(item.contentView, UIUpdateMode::NoRedraw);
+				removeChild(item.contentView, SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::None);
 			}
 		}
 		m_items.setCount(nNew);
 		if (isNativeWidget()) {
 			_refreshTabsCount_NW();
 		}
-		selectTab(m_indexSelected, UIUpdateMode::NoRedraw);
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		selectTab(m_indexSelected, UIUpdateMode::None);
+		invalidate(mode);
 	}
 	
 	String TabView::getTabLabel(sl_uint32 index)
@@ -122,9 +120,7 @@ namespace slib
 			if (isNativeWidget()) {
 				_setTabLabel_NW(index, text);
 			} else {
-				if (mode == UIUpdateMode::Redraw) {
-					_invalidateTabBar();
-				}
+				_invalidateTabBar(mode);
 			}
 		}
 	}
@@ -145,17 +141,12 @@ namespace slib
 		if (index < m_items.getCount()) {
 			TabViewItem* item = m_items.getPointerAt(index);
 			if (item->contentView != view) {
-				removeChild(item->contentView, UIUpdateMode::NoRedraw);
+				removeChild(item->contentView, SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::None);
 				if (view.isNotNull()) {
 					view->setCreatingInstance(sl_true);
 					view->setAttachMode(UIAttachMode::NotAttachInNativeWidget);
-					if (mode == UIUpdateMode::Init) {
-						view->setFrame(getTabContentRegion(), UIUpdateMode::Init);
-						addChild(view, UIUpdateMode::Init);
-					} else {
-						view->setFrame(getTabContentRegion(), UIUpdateMode::NoRedraw);
-						addChild(view, UIUpdateMode::NoRedraw);
-					}
+					view->setFrame(getTabContentRegion(), SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::UpdateLayout);
+					addChild(view, SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::None);
 				}
 				item->contentView = view;
 				if (isNativeWidget()) {
@@ -165,10 +156,8 @@ namespace slib
 						UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), TabView, _setTabContentView_NW, this, index, view));
 					}
 				} else {
-					selectTab(m_indexSelected, UIUpdateMode::NoRedraw);
-					if (mode == UIUpdateMode::Redraw) {
-						invalidate();
-					}
+					selectTab(m_indexSelected, UIUpdateMode::None);
+					invalidate(mode);
 				}
 			}
 		}
@@ -199,15 +188,13 @@ namespace slib
 				Ref<View> view = items[i].contentView;
 				if (view.isNotNull()) {
 					if (i == index) {
-						view->setVisible(sl_true, UIUpdateMode::NoRedraw);
+						view->setVisible(sl_true, SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::None);
 					} else {
-						view->setVisible(sl_false, UIUpdateMode::NoRedraw);
+						view->setVisible(sl_false, SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::None);
 					}
 				}
 			}
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
+			invalidate(mode);
 		}
 	}
 	
@@ -273,9 +260,7 @@ namespace slib
 	void TabView::setBarBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
 		m_barBackground = drawable;
-		if (mode == UIUpdateMode::Redraw) {
-			_invalidateTabBar();
-		}
+		_invalidateTabBar(mode);
 	}
 	
 	void TabView::setBarBackground(const Color& color, UIUpdateMode mode)
@@ -291,9 +276,7 @@ namespace slib
 	void TabView::setContentBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
 		m_contentBackground = drawable;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void TabView::setContentBackground(const Color& color, UIUpdateMode mode)
@@ -309,9 +292,7 @@ namespace slib
 	void TabView::setTabBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
 		m_tabBackground = drawable;
-		if (mode == UIUpdateMode::Redraw) {
-			_invalidateTabBar();
-		}
+		_invalidateTabBar(mode);
 	}
 	
 	void TabView::setTabBackground(const Color& color, UIUpdateMode mode)
@@ -327,9 +308,7 @@ namespace slib
 	void TabView::setSelectedTabBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
 		m_selectedTabBackground = drawable;
-		if (mode == UIUpdateMode::Redraw) {
-			_invalidateTabBar();
-		}
+		_invalidateTabBar(mode);
 	}
 	
 	void TabView::setSelectedTabBackground(const Color& color, UIUpdateMode mode)
@@ -345,9 +324,7 @@ namespace slib
 	void TabView::setHoverTabBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 	{
 		m_hoverTabBackground = drawable;
-		if (mode == UIUpdateMode::Redraw) {
-			_invalidateTabBar();
-		}
+		_invalidateTabBar(mode);
 	}
 	
 	void TabView::setHoverTabBackground(const Color& color, UIUpdateMode mode)
@@ -363,9 +340,7 @@ namespace slib
 	void TabView::setLabelColor(const Color& color, UIUpdateMode mode)
 	{
 		m_labelColor = color;
-		if (mode == UIUpdateMode::Redraw) {
-			_invalidateTabBar();
-		}
+		_invalidateTabBar(mode);
 	}
 
 	Color TabView::getSelectedLabelColor()
@@ -376,9 +351,7 @@ namespace slib
 	void TabView::setSelectedLabelColor(const Color& color, UIUpdateMode mode)
 	{
 		m_selectedLabelColor = color;
-		if (mode == UIUpdateMode::Redraw) {
-			_invalidateTabBar();
-		}
+		_invalidateTabBar(mode);
 	}
 	
 	Color TabView::getHoverLabelColor()
@@ -389,9 +362,7 @@ namespace slib
 	void TabView::setHoverLabelColor(const Color& color, UIUpdateMode mode)
 	{
 		m_hoverLabelColor = color;
-		if (mode == UIUpdateMode::Redraw) {
-			_invalidateTabBar();
-		}
+		_invalidateTabBar(mode);
 	}
 	
 	Alignment TabView::getLabelAlignment()
@@ -402,9 +373,7 @@ namespace slib
 	void TabView::setLabelAlignment(Alignment align, UIUpdateMode mode)
 	{
 		m_labelAlignment = align;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void TabView::setLabelMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode)
@@ -413,9 +382,7 @@ namespace slib
 		m_labelMarginTop = top;
 		m_labelMarginRight = right;
 		m_labelMarginBottom = bottom;
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void TabView::setLabelMargin(sl_ui_pos margin, UIUpdateMode mode)
@@ -530,9 +497,11 @@ namespace slib
 		return ret;
 	}
 	
-	void TabView::_invalidateTabBar()
+	void TabView::_invalidateTabBar(UIUpdateMode mode)
 	{
-		invalidate(getTabBarRegion());
+		if (SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
+			invalidate(getTabBarRegion());
+		}
 	}
 	
 	void TabView::_relayout(UIUpdateMode mode)
@@ -543,16 +512,10 @@ namespace slib
 		for (sl_size i = 0; i < items.count; i++) {
 			Ref<View> view = items[i].contentView;
 			if (view.isNotNull()) {
-				if (mode == UIUpdateMode::Init) {
-					view->setFrame(bound, UIUpdateMode::Init);
-				} else {
-					view->setFrame(bound, UIUpdateMode::NoRedraw);
-				}
+				view->setFrame(bound, SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::UpdateLayout);
 			}
 		}
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
+		invalidate(mode);
 	}
 	
 	void TabView::dispatchSelectTab(sl_uint32 index)
@@ -584,7 +547,7 @@ namespace slib
 	{
 		if (ev->getAction() == UIAction::MouseLeave) {
 			m_indexHover = -1;
-			_invalidateTabBar();
+			_invalidateTabBar(UIUpdateMode::Redraw);
 		} else if (ev->getAction() == UIAction::MouseMove) {
 			UIPoint pt = ev->getPoint();
 			ObjectLocker lock(this);
@@ -594,14 +557,14 @@ namespace slib
 				if (getTabRegion(i).containsPoint(pt)) {
 					if (i != m_indexHover) {
 						m_indexHover = i;
-						_invalidateTabBar();
+						_invalidateTabBar(UIUpdateMode::Redraw);
 					}
 					return;
 				}
 			}
 			if (-1 != m_indexHover) {
 				m_indexHover = -1;
-				_invalidateTabBar();
+				_invalidateTabBar(UIUpdateMode::Redraw);
 			}
 		}
 	}

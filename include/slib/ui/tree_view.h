@@ -132,7 +132,7 @@ namespace slib
 		
 		void _relayoutTree(UIUpdateMode mode);
 		
-		void _redrawTree();
+		void _redrawTree(UIUpdateMode mode);
 		
 		Ref<TreeContentViewImpl> _getContentView();
 		
@@ -273,7 +273,7 @@ namespace slib
 		
 		void _relayoutContent(UIUpdateMode mode);
 		
-		void _redrawContent();
+		void _redrawContent(UIUpdateMode mode);
 		
 		void _drawContent(Canvas* canvas);
 		
