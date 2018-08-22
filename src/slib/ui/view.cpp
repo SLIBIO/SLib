@@ -6610,7 +6610,7 @@ namespace slib
 				
 				View* child = children[i].get();
 			
-				if (child->isVisible()) {
+				if (child && child->isVisible()) {
 					
 					sl_ui_pos offx = child->m_frame.left;
 					sl_ui_pos offy = child->m_frame.top;
@@ -6668,7 +6668,7 @@ namespace slib
 				
 				View* child = children[i].get();
 			
-				if (child->isVisible()) {
+				if (child && child->isVisible()) {
 					
 					if (child->isInstance()) {
 #if defined(SLIB_UI_IS_WIN32)
@@ -7493,7 +7493,7 @@ namespace slib
 		return UIAction::Unknown;
 	}
 
-#define POINT_EVENT_CHECK_CHILD(c) (!(c->isInstance()) && c->isVisible() && c->isHitTestable())
+#define POINT_EVENT_CHECK_CHILD(c) (c && !(c->isInstance()) && c->isVisible() && c->isHitTestable())
 
 	void View::dispatchMouseEvent(UIEvent* ev)
 	{
