@@ -85,7 +85,7 @@ namespace slib
 		ScrollView::setContentView(m_contentView);
 #else
 		m_contentView->setAttachMode(UIAttachMode::AttachInNativeWidget);
-		addChild(m_contentView, UIUpdateMode::NoRedraw);
+		addChild(m_contentView, UIUpdateMode::None);
 		setCreatingChildInstances(sl_true);
 #endif
 		
@@ -708,11 +708,22 @@ namespace slib
 							rect.top = y;
 							rect.bottom = b;
 							rect.fixSizeError();
-							if (view->getParent() != contentView) {
-								view->_setFrame(rect, UIUpdateMode::NoRedraw, sl_true);
-								contentView->addChild(view, UIUpdateMode::NoRedraw);
+							Ref<LayoutAttributes>& childLayoutAttrs = view->m_layoutAttrs;
+							if (childLayoutAttrs.isNotNull()) {
+								if (!(childLayoutAttrs->layoutFrame.isAlmostEqual(rect))) {
+									childLayoutAttrs->layoutFrame = rect;
+									view->m_flagInvalidLayout = sl_true;
+									view->_updateAndApplyLayoutWithMode(UIUpdateMode::None);
+								}
 							} else {
-								view->_setFrame(rect, UIUpdateMode::NoRedraw, sl_true);
+								if (!(view->m_frame.isAlmostEqual(rect))) {
+									view->setFrame(rect, UIUpdateMode::None);
+									view->m_flagInvalidLayout = sl_true;
+									view->_updateAndApplyLayoutWithMode(UIUpdateMode::None);
+								}
+							}
+							if (view->getParent() != contentView) {
+								contentView->addChild(view, UIUpdateMode::None);
 							}
 						}
 						y = b;
@@ -742,12 +753,12 @@ namespace slib
 					rcContent.top += scrollY;
 					rcContent.bottom += scrollY;
 					rcContent.fixSizeError();
-					contentView->setFrame(rcContent, UIUpdateMode::NoRedraw);
+					contentView->setFrame(rcContent, UIUpdateMode::None);
 				} else {
-					contentView->setFrame(getBounds(), UIUpdateMode::NoRedraw);
+					contentView->setFrame(getBounds(), UIUpdateMode::None);
 				}
 #else
-				contentView->setFrame(getBounds(), UIUpdateMode::NoRedraw);
+				contentView->setFrame(getBounds(), UIUpdateMode::None);
 #endif
 #endif
 				if (!fromDraw) {
@@ -772,8 +783,8 @@ namespace slib
 					ret = (sl_ui_len)((sl_real)widthList * itemView->getWidthWeight());
 					break;
 				case SizeMode::Wrapping:
-					itemView->measureLayout();
-					ret = itemView->getMeasuredWidth();
+					itemView->_updateLayout();
+					ret = itemView->getLayoutWidth();
 					break;
 				default:
 					ret = itemView->getWidth();
@@ -794,8 +805,8 @@ namespace slib
 					ret = (sl_ui_len)((sl_real)heightList * itemView->getHeightWeight());
 					break;
 				case SizeMode::Wrapping:
-					itemView->measureLayout();
-					ret = itemView->getMeasuredHeight();
+					itemView->_updateLayout();
+					ret = itemView->getLayoutHeight();
 					break;
 				default:
 					ret = itemView->getHeight();
