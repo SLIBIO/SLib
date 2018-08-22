@@ -97,14 +97,14 @@ namespace slib
 		}
 		page->setParent(this);
 		ObjectLocker lock(this);
-		if (mode == UIUpdateMode::Init) {
+		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 			page->setFrame(getBoundsInnerPadding(), mode);
 			m_pages.addIfNotExist_NoLock(page);
 		} else {
 			if (m_pages.getCount() == 0) {
 				m_pages.add_NoLock(page);
 				lock.unlock();
-				page->setFrame(getBoundsInnerPadding(), mode);
+				page->setFrame(getBoundsInnerPadding());
 				addChild(page, mode);
 				dispatchPageAction(page.get(), UIPageAction::Push);
 				dispatchPageAction(page.get(), UIPageAction::Resume);
@@ -141,7 +141,7 @@ namespace slib
 					newPage = m_pages.getData()[index];
 				}
 				lock.unlock();
-				if (mode != UIUpdateMode::Init) {
+				if (!SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 					if (oldPage.isNotNull()) {
 						if (oldPage->getParent().isNotNull()) {
 							dispatchPageAction(oldPage.get(), UIPageAction::Pause);
@@ -171,7 +171,7 @@ namespace slib
 		}
 		Ref<View>* pages = m_pages.getData();
 		Ref<View> viewIn = pages[index];
-		if (mode == UIUpdateMode::Init) {
+		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 			m_indexCurrent = index;
 			addChild(viewIn, mode);
 			dispatchPageAction(viewIn.get(), UIPageAction::Resume);
@@ -184,7 +184,7 @@ namespace slib
 			if (viewOut == viewIn) {
 				return;
 			}
-			addChild(viewIn, mode);
+			addChild(viewIn, UIUpdateMode::None);
 			dispatchPageAction(viewOut.get(), UIPageAction::Pause);
 			dispatchPageAction(viewIn.get(), UIPageAction::Resume);
 			removeChild(viewOut, mode);
@@ -214,7 +214,7 @@ namespace slib
 	{
 		view->setTranslation(0, 0, UIUpdateMode::Init);
 		view->setScale(1, 1, UIUpdateMode::Init);
-		view->setRotation(0, UIUpdateMode::NoRedraw);
+		view->setRotation(0, UIUpdateMode::None);
 		view->setAlpha(1, UIUpdateMode::Redraw);
 	}
 
@@ -256,8 +256,8 @@ namespace slib
 #endif
 
 		setEnabled(sl_false);
-		viewOut->setEnabled(sl_false, UIUpdateMode::NoRedraw);
-		viewIn->setEnabled(sl_false, UIUpdateMode::NoRedraw);
+		viewOut->setEnabled(sl_false, UIUpdateMode::None);
+		viewIn->setEnabled(sl_false, UIUpdateMode::None);
 		
 		Ref<Animation> animationPause, animationResume;
 		if (flagNext) {
@@ -278,7 +278,7 @@ namespace slib
 			animationResume->dispatchStartFrame();
 		}
 		
-		addChild(viewIn, UIUpdateMode::NoRedraw);
+		addChild(viewIn, UIUpdateMode::None);
 		
 		dispatchPageAction(viewOut.get(), UIPageAction::Pause);
 		
@@ -289,10 +289,10 @@ namespace slib
 		}
 		
 		if (flagNext) {
-			viewIn->bringToFront(UIUpdateMode::NoRedraw);
+			viewIn->bringToFront(UIUpdateMode::None);
 		} else {
-			viewIn->bringToFront(UIUpdateMode::NoRedraw);
-			viewOut->bringToFront(UIUpdateMode::NoRedraw);
+			viewIn->bringToFront(UIUpdateMode::None);
+			viewOut->bringToFront(UIUpdateMode::None);
 		}
 		viewIn->setVisibility(Visibility::Visible);
 		
@@ -389,13 +389,13 @@ namespace slib
 			ScopedCounter counter(&m_countActiveTransitionAnimations);
 			m_indexCurrent = 0;
 			m_pages.add_NoLock(viewIn);
-			viewIn->setFrame(getBoundsInnerPadding(), UIUpdateMode::NoRedraw);
+			viewIn->setFrame(getBoundsInnerPadding(), UIUpdateMode::None);
 			_resetAnimationStatus(viewIn);
-			addChild(viewIn, UIUpdateMode::NoRedraw);
+			addChild(viewIn, UIUpdateMode::None);
 			dispatchPageAction(viewIn.get(), UIPageAction::Push);
 			dispatchPageAction(viewIn.get(), UIPageAction::Resume);
 			dispatchEndPageAnimation(viewIn.get(), UIPageAction::Push);
-			viewIn->setVisibility(Visibility::Visible, UIUpdateMode::NoRedraw);
+			viewIn->setVisibility(Visibility::Visible, UIUpdateMode::None);
 			viewIn->bringToFront();
 			return;
 		}
@@ -412,11 +412,11 @@ namespace slib
 
 		m_indexCurrent = n;
 
-		viewIn->setFrame(getBoundsInnerPadding(), UIUpdateMode::NoRedraw);
+		viewIn->setFrame(getBoundsInnerPadding(), UIUpdateMode::None);
 		
 		setEnabled(sl_false);
-		viewBack->setEnabled(sl_false, UIUpdateMode::NoRedraw);
-		viewIn->setEnabled(sl_false, UIUpdateMode::NoRedraw);
+		viewBack->setEnabled(sl_false, UIUpdateMode::None);
+		viewIn->setEnabled(sl_false, UIUpdateMode::None);
 		
 		_applyDefaultPushTransition(transition);
 		Ref<Animation> animationPause = Transition::createAnimation(viewBack, transition, UIPageAction::Pause, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation,this, viewBack, UIPageAction::Pause));
@@ -431,7 +431,7 @@ namespace slib
 			animationPush->dispatchStartFrame();
 		}
 
-		addChild(viewIn, UIUpdateMode::NoRedraw);
+		addChild(viewIn, UIUpdateMode::None);
 		
 		dispatchPageAction(viewBack.get(), UIPageAction::Pause);
 		
@@ -451,7 +451,7 @@ namespace slib
 			animationPause->dispatchStartFrame();
 		}
 
-		viewIn->bringToFront(UIUpdateMode::NoRedraw);
+		viewIn->bringToFront(UIUpdateMode::None);
 		viewIn->setVisibility(Visibility::Visible);
 		
 		if (animationPause.isNull()) {
@@ -520,7 +520,7 @@ namespace slib
 			dispatchPageAction(viewOut.get(), UIPageAction::Pop);
 			dispatchEndPageAnimation(viewOut.get(), UIPageAction::Pop);
 			removeChild(viewOut);
-			viewOut->setVisibility(Visibility::Hidden, UIUpdateMode::NoRedraw);
+			viewOut->setVisibility(Visibility::Hidden, UIUpdateMode::None);
 			m_pages.removeAll_NoLock();
 			m_indexCurrent = 0;
 			return;
@@ -536,8 +536,8 @@ namespace slib
 		}
 		
 		setEnabled(sl_false);
-		viewBack->setEnabled(sl_false, UIUpdateMode::NoRedraw);
-		viewOut->setEnabled(sl_false, UIUpdateMode::NoRedraw);
+		viewBack->setEnabled(sl_false, UIUpdateMode::None);
+		viewOut->setEnabled(sl_false, UIUpdateMode::None);
 		
 		_applyDefaultPopTransition(transition);
 		Ref<Animation> animationPop = Transition::createAnimation(viewOut, transition, UIPageAction::Pop, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation,this, viewOut, UIPageAction::Pop));
@@ -552,7 +552,7 @@ namespace slib
 			animationResume->dispatchStartFrame();
 		}
 
-		addChild(viewBack, UIUpdateMode::NoRedraw);
+		addChild(viewBack, UIUpdateMode::None);
 
 		dispatchPageAction(viewOut.get(), UIPageAction::Pause);
 		dispatchPageAction(viewOut.get(), UIPageAction::Pop);
@@ -565,8 +565,8 @@ namespace slib
 			animationResume->start();
 		}
 		
-		viewBack->bringToFront(UIUpdateMode::NoRedraw);
-		viewOut->bringToFront(UIUpdateMode::NoRedraw);
+		viewBack->bringToFront(UIUpdateMode::None);
+		viewOut->bringToFront(UIUpdateMode::None);
 		
 		viewBack->setVisibility(Visibility::Visible);
 		
@@ -1167,19 +1167,19 @@ namespace slib
 			viewAdd = this;
 		}
 		
-		setVisibility(Visibility::Hidden, UIUpdateMode::NoRedraw);
+		setVisibility(Visibility::Hidden, UIUpdateMode::None);
 		setTranslation(0, 0, UIUpdateMode::Init);
 		setScale(1, 1, UIUpdateMode::Init);
-		setRotation(0, UIUpdateMode::NoRedraw);
-		setAlpha(1, UIUpdateMode::NoRedraw);
+		setRotation(0, UIUpdateMode::None);
+		setAlpha(1, UIUpdateMode::None);
 		
 		_applyDefaultOpeningPopupTransition(transition);
 		
-		setEnabled(sl_false, UIUpdateMode::NoRedraw);
+		setEnabled(sl_false, UIUpdateMode::None);
 		
 		Ref<Animation> animation = Transition::createPopupAnimation(this, transition, UIPageAction::Push, SLIB_BIND_WEAKREF(void(), ViewPage, _finishPopupAnimation, this, UIPageAction::Push));
 		
-		parent->addChild(viewAdd, UIUpdateMode::NoRedraw);
+		parent->addChild(viewAdd, UIUpdateMode::None);
 		
 		Base::interlockedIncrement(&m_countActiveTransitionAnimations);
 		
@@ -1218,7 +1218,7 @@ namespace slib
 
 		_applyDefaultClosingPopupTransition(transition);
 		
-		setEnabled(sl_false, UIUpdateMode::NoRedraw);
+		setEnabled(sl_false, UIUpdateMode::None);
 		
 		Ref<View> parent = getParent();
 		if (parent.isNotNull()) {
@@ -1268,7 +1268,7 @@ namespace slib
 			m_popupState = PopupState::None;
 			
 		} else {
-			setEnabled(sl_true, UIUpdateMode::NoRedraw);
+			setEnabled(sl_true, UIUpdateMode::None);
 		}
 		
 		Base::interlockedDecrement(&m_countActiveTransitionAnimations);
