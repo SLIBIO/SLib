@@ -2380,8 +2380,14 @@ namespace slib
 				dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, requestFrame, this, frame, mode));
 				return;
 			}
+			if (frame.isAlmostEqual(layoutAttrs->layoutFrame)) {
+				return;
+			}
 			layoutAttrs->layoutFrame = frame;
 		} else {
+			if (frame.isAlmostEqual(m_frame)) {
+				return;
+			}
 			setFrame(frame, UIUpdateMode::None);
 		}
 		invalidateSelfAndParentLayout(mode);
