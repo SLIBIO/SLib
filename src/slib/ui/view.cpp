@@ -1760,7 +1760,7 @@ namespace slib
 							referView->_updateLayoutFrameInParent(&param);
 						}
 						UIRect referFrame = referView->getLayoutFrame();
-						frame.left = referFrame.right + referView->getMarginRight() + layoutAttrs->marginLeft;
+						frame.left = referFrame.right + layoutAttrs->marginLeft;
 					} else {
 						frame.left = param.parentContentFrame.left + layoutAttrs->marginLeft;
 					}
@@ -1793,7 +1793,7 @@ namespace slib
 							referView->_updateLayoutFrameInParent(&param);
 						}
 						UIRect referFrame = referView->getLayoutFrame();
-						frame.right = referFrame.left - referView->getMarginLeft() - layoutAttrs->marginRight;
+						frame.right = referFrame.left - layoutAttrs->marginRight;
 					} else {
 						frame.right = param.parentContentFrame.right - layoutAttrs->marginRight;
 					}
@@ -1837,7 +1837,7 @@ namespace slib
 							referView->_updateLayoutFrameInParent(&param);
 						}
 						UIRect referFrame = referView->getLayoutFrame();
-						frame.top = referFrame.bottom + referView->getMarginBottom() + layoutAttrs->marginTop;
+						frame.top = referFrame.bottom + layoutAttrs->marginTop;
 					} else {
 						frame.top = param.parentContentFrame.top + layoutAttrs->marginTop;
 					}
@@ -1872,7 +1872,7 @@ namespace slib
 							referView->_updateLayoutFrameInParent(&param);
 						}
 						UIRect referFrame = referView->getLayoutFrame();
-						frame.bottom = referFrame.top - referView->getMarginTop() - layoutAttrs->marginBottom;
+						frame.bottom = referFrame.top - layoutAttrs->marginBottom;
 					} else {
 						frame.bottom = param.parentContentFrame.bottom - layoutAttrs->marginBottom;
 					}
@@ -3311,9 +3311,6 @@ namespace slib
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->marginLeft = marginLeft;
-			if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
-				attrs->leftMode = PositionMode::ParentEdge;
-			}
 			invalidateSelfAndParentLayout(mode);
 		}
 	}
@@ -3333,9 +3330,6 @@ namespace slib
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->marginTop = marginTop;
-			if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
-				attrs->topMode = PositionMode::ParentEdge;
-			}
 			invalidateSelfAndParentLayout(mode);
 		}
 	}
