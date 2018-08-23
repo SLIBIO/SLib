@@ -547,7 +547,7 @@ namespace slib
 				}
 			}
 			if (!m_flagDrawing && flagDrawChildren) {
-				setDrawing(sl_true, UIUpdateMode::None);
+				setDrawing(sl_true);
 			}
 			onAttach();
 		}
@@ -1405,9 +1405,8 @@ namespace slib
 		Ref<ViewInstance> instance = m_instance;
 		if (instance.isNotNull()) {
 			instance->setDrawing(flagDrawing);
-		} else {
-			invalidate(mode);
 		}
+		invalidate(mode);
 	}
 	
 	sl_bool View::isSavingCanvasState()

@@ -882,7 +882,9 @@ namespace slib
 				Ref<View> view = m_viewContent;
 				if (view.isNotNull()) {
 					view->removeParent();
-					view->detach();
+					contentViewInstance->setEnabled(view->isEnabled());
+					contentViewInstance->setOpaque(view->isOpaque());
+					contentViewInstance->setDrawing(view->isDrawing());
 					view->attach(contentViewInstance);
 				}
 			}
