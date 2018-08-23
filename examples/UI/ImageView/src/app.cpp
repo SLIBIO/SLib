@@ -18,6 +18,7 @@ ExampleImageViewApp::ExampleImageViewApp()
 
 void ExampleImageViewApp::onStart()
 {
+	getMainWindow()->setResizable(sl_true);
 	Ref<ImageView> imageView = new ImageView;
 	imageView->setWidthFilling();
 	imageView->setHeightFilling();
