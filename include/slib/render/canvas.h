@@ -89,46 +89,65 @@ namespace slib
 		
 		Rectangle getClipBounds() override;
 		
+		using Canvas::clipToRectangle;
 		void clipToRectangle(const Rectangle& rect) override;
 		
+		using Canvas::clipToPath;
 		void clipToPath(const Ref<GraphicsPath>& path) override;
 		
+		using Canvas::clipToRoundRect;
 		void clipToRoundRect(const Rectangle& rect, const Size& radius) override;
 		
+		using Canvas::clipToEllipse;
 		void clipToEllipse(const Rectangle& rect) override;
 		
+		using Canvas::concatMatrix;
 		void concatMatrix(const Matrix3& matrix) override;
 		
+		using Canvas::translate;
 		void translate(sl_real dx, sl_real dy) override;
 		
+		using Canvas::measureText;
 		Size measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine = sl_false) override;
 		
+		using Canvas::measureText16;
 		Size measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false) override;
 		
 		static Size measureRenderingText(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false);
 		
+		using Canvas::drawText;
 		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) override;
 		
+		using Canvas::drawText16;
 		void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) override;
 		
+		using Canvas::drawLine;
 		void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen) override;
 		
+		using Canvas::drawLines;
 		void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen) override;
 		
+		using Canvas::drawArc;
 		void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen) override;
 		
+		using Canvas::drawRectangle;
 		void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush) override;
 		
 		void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor) override;
 		
+		using Canvas::drawRoundRect;
 		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Ref<Brush>& brush) override;
 		
+		using Canvas::drawEllipse;
 		void drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush) override;
 		
+		using Canvas::drawPolygon;
 		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = FillMode::Alternate) override;
 		
+		using Canvas::drawPie;
 		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush) override;
 		
+		using Canvas::drawPath;
 		void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Ref<Brush>& brush) override;
 		
 		

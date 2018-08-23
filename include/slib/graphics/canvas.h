@@ -311,30 +311,43 @@ namespace slib
 		~CanvasExt();
 		
 	public:
+		using Canvas::clipToRoundRect;
 		void clipToRoundRect(const Rectangle& rect, const Size& radius) override;
 		
+		using Canvas::clipToEllipse;
 		void clipToEllipse(const Rectangle& rect) override;
 		
+		using Canvas::measureText;
 		Size measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine = sl_false) override;
 		
+		using Canvas::measureText16;
 		Size measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false) override;
 		
+		using Canvas::drawText;
 		void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment, sl_bool flagMultiLine = sl_false) override;
 		
+		using Canvas::drawText16;
 		void drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment, sl_bool flagMultiLine = sl_false) override;
 
+		using Canvas::drawRectangle;
 		void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor) override;
 	
+		using Canvas::drawRoundRect;
 		void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Color& fillColor) override;
 		
+		using Canvas::drawEllipse;
 		void drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor) override;
 		
+		using Canvas::drawPolygon;
 		void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Color& fillColor, FillMode fillMode = FillMode::Alternate) override;
 		
+		using Canvas::drawPie;
 		void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Color& fillColor) override;
 		
+		using Canvas::drawPath;
 		void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Color& fillColor) override;
 		
+		using Canvas::draw;
 		void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param) override;
 		
 		void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param) override;
