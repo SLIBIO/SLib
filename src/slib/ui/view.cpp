@@ -1948,9 +1948,12 @@ namespace slib
 			if (!(oldFrame.getSize().isAlmostEqual(frame.getSize()))) {
 				m_flagInvalidLayout = sl_true;
 			}
+
+			oldFrame = frame;
+			layoutAttrs->layoutFrame = frame;
+			
 			_updateLayout();
 			
-			oldFrame = frame;
 			frame = layoutAttrs->layoutFrame;
 			if (frame.isAlmostEqual(oldFrame)) {
 				break;
