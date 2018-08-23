@@ -56,8 +56,8 @@ namespace slib
 		T h = bottom - top;
 		left = _x;
 		top = _y;
-		right = left + w;
-		bottom = top + h;
+		right = _x + w;
+		bottom = _y + h;
 	}
 
 	template <class T, class FT>
@@ -67,8 +67,40 @@ namespace slib
 		T h = bottom - top;
 		left = location.x;
 		top = location.y;
-		right = left + w;
-		bottom = top + h;
+		right = location.x + w;
+		bottom = location.y + h;
+	}
+
+	template <class T, class FT>
+	void RectangleT<T, FT>::setLocationLeft(T _x) noexcept
+	{
+		T w = right - left;
+		left = _x;
+		right = _x + w;
+	}
+
+	template <class T, class FT>
+	void RectangleT<T, FT>::setLocationTop(T _y) noexcept
+	{
+		T h = bottom - top;
+		top = _y;
+		bottom = _y + h;
+	}
+
+	template <class T, class FT>
+	void RectangleT<T, FT>::setLocationRight(T _x) noexcept
+	{
+		T w = right - left;
+		left = _x - w;
+		right = _x;
+	}
+
+	template <class T, class FT>
+	void RectangleT<T, FT>::setLocationBottom(T _y) noexcept
+	{
+		T h = bottom - top;
+		top = _y - h;
+		bottom = _y;
 	}
 
 	template <class T, class FT>

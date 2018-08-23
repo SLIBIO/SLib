@@ -73,7 +73,15 @@ namespace slib
 		void setLocation(T _x, T _y) noexcept;
 
 		void setLocation(const PointT<T, FT>& location) noexcept;
+		
+		void setLocationLeft(T _x) noexcept;
+		
+		void setLocationTop(T _y) noexcept;
 
+		void setLocationRight(T _x) noexcept;
+		
+		void setLocationBottom(T _y) noexcept;
+		
 		void translate(T tx, T ty) noexcept;
 
 		void translate(const PointT<T, FT>& t) noexcept;
