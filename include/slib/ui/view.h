@@ -187,6 +187,9 @@ namespace slib
 		
 		// parent coordinate
 		void setFrame(sl_ui_pos x, sl_ui_pos y, sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+
+		// parent coordinate
+		void requestFrame(const UIRect& frame, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_ui_len getWidth();
 		
@@ -215,25 +218,13 @@ namespace slib
 		void setTop(sl_ui_pos y, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
 		// parent coordinate
-		sl_ui_pos getRight();
+		UIPoint getLocation();
 		
 		// parent coordinate
-		void setRight(sl_ui_pos x, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		void setLocation(const UIPoint& point, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		// parent coordinate
-		sl_ui_pos getBottom();
-		
-		// parent coordinate
-		void setBottom(sl_ui_pos y, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
-
-		// parent coordinate
-		UIPoint getPosition();
-		
-		// parent coordinate
-		void setPosition(const UIPoint& point, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
-		
-		// parent coordinate
-		void setPosition(sl_ui_pos x, sl_ui_pos y, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		void setLocation(sl_ui_pos x, sl_ui_pos y, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		// local coordinate
 		UIRect getBounds();
@@ -340,21 +331,17 @@ namespace slib
 		
 		void invalidateLayoutOfWrappingControl(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
-		void requestFrame(UIRect frame, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
-
 		SizeMode getWidthMode();
 		
 		SizeMode getHeightMode();
 		
 		sl_bool isWidthFixed();
 		
-		void setWidthFixed(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		void setWidthFixed(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isHeightFixed();
 		
-		void setHeightFixed(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
-		
-		void setSizeFixed(UISize size, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		void setHeightFixed(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_real getWidthWeight();
 		
@@ -368,8 +355,6 @@ namespace slib
 		
 		void setHeightFilling(sl_real weight = 1, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setSizeFilling(sl_real widthWeight = 1, sl_real heightWeight = 1, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
-		
 		sl_bool isWidthWrapping();
 		
 		void setWidthWrapping(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
@@ -377,8 +362,6 @@ namespace slib
 		sl_bool isHeightWrapping();
 		
 		void setHeightWrapping(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
-		
-		void setSizeWrapping(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isWidthWeight();
 		
@@ -388,13 +371,9 @@ namespace slib
 		
 		void setHeightWeight(sl_real weight = 1, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setSizeWeight(sl_real widthWeight = 1, sl_real heightWeight = 1, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
-
-		void setPositionFixed(UIPoint point, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		sl_bool isLeftFree();
 		
-		sl_bool isLeftFixed();
-		
-		void setLeftFixed(sl_ui_pos left, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		void setLeftFree(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAlignParentLeft();
 		
@@ -410,9 +389,9 @@ namespace slib
 		
 		Ref<View> getLayoutLeftReferingView();
 		
-		sl_bool isRightFixed();
+		sl_bool isRightFree();
 		
-		void setRightFixed(sl_ui_pos right, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		void setRightFree(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAlignParentRight();
 		
@@ -428,9 +407,9 @@ namespace slib
 		
 		Ref<View> getLayoutRightReferingView();
 
-		sl_bool isTopFixed();
+		sl_bool isTopFree();
 		
-		void setTopFixed(sl_ui_pos top, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		void setTopFree(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAlignParentTop();
 		
@@ -446,9 +425,9 @@ namespace slib
 		
 		Ref<View> getLayoutTopReferingView();
 		
-		sl_bool isBottomFixed();
+		sl_bool isBottomFree();
 		
-		void setBottomFixed(sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		void setBottomFree(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isAlignParentBottom();
 		
@@ -1478,6 +1457,8 @@ namespace slib
 		{
 		public:
 			UIRect layoutFrame;
+			UIRect requestedFrame;
+			sl_bool flagRequestedFrame;
 
 			SizeMode widthMode;
 			SizeMode heightMode;

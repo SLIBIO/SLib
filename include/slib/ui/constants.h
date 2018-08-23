@@ -272,7 +272,7 @@ namespace slib
 	
 	enum class PositionMode
 	{
-		Fixed = 0,
+		Free = 0,
 		ParentEdge = 1,
 		OtherStart = 2,
 		OtherEnd = 3,

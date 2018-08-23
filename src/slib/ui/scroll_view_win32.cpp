@@ -133,7 +133,7 @@ namespace slib
 				int y = si.nPos;
 				Ref<View> viewContent = view->getContentView();
 				if (viewContent.isNotNull()) {
-					viewContent->setPosition((sl_ui_pos)(-x), (sl_ui_pos)(-y));
+					viewContent->setLocation((sl_ui_pos)(-x), (sl_ui_pos)(-y));
 				}
 				if (flagFromEvent) {
 					view->_onScroll_NW((sl_scroll_pos)x, (sl_scroll_pos)y);

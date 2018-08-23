@@ -42,7 +42,7 @@ namespace slib
 		m_flagCreatingNativeWidget = sl_false;
 		m_attachMode = UIAttachMode::NotAttachInNativeWidget;
 		
-		m_flagInvalidLayout = sl_false;
+		m_flagInvalidLayout = sl_true;
 		m_flagNeedApplyLayout = sl_false;
 		
 		m_frame.left = 0;
@@ -95,15 +95,17 @@ namespace slib
 
 	View::LayoutAttributes::LayoutAttributes()
 	{
+		flagRequestedFrame = sl_false;
+		
 		widthMode = SizeMode::Fixed;
 		heightMode = SizeMode::Fixed;
 		widthWeight = 1;
 		heightWeight = 1;
 		
-		leftMode = PositionMode::Fixed;
-		topMode = PositionMode::Fixed;
-		rightMode = PositionMode::Fixed;
-		bottomMode = PositionMode::Fixed;
+		leftMode = PositionMode::Free;
+		topMode = PositionMode::Free;
+		rightMode = PositionMode::Free;
+		bottomMode = PositionMode::Free;
 		
 		minWidth = 0;
 		maxWidth = DEFAULT_MAX_SIZE;
@@ -149,6 +151,7 @@ namespace slib
 			return;
 		}
 		attrs->layoutFrame = m_frame;
+		attrs->requestedFrame = m_frame;
 	}
 
 	View::TransformAttributes::TransformAttributes()
@@ -1108,6 +1111,8 @@ namespace slib
 			return;
 		}
 		
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
+
 		UIRect frame = _frame;
 		_restrictSize(frame);
 		
@@ -1123,6 +1128,9 @@ namespace slib
 		}
 		
 		m_frame = frame;
+		if (layoutAttrs.isNotNull()) {
+			layoutAttrs->requestedFrame = frame;
+		}
 		if (m_instance.isNotNull()) {
 			_setFrame_NI(frame);
 		}
@@ -1139,6 +1147,19 @@ namespace slib
 		setFrame(UIRect(x, y, x+width, y+height), mode);
 	}
 
+	void View::requestFrame(const UIRect& frame, UIUpdateMode mode)
+	{
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
+		if (layoutAttrs.isNotNull()) {
+			layoutAttrs->requestedFrame = frame;
+			_restrictSize(layoutAttrs->requestedFrame);
+			layoutAttrs->flagRequestedFrame = sl_true;
+		} else {
+			setFrame(frame, UIUpdateMode::None);
+		}
+		invalidateSelfAndParentLayout(mode);
+	}
+
 	sl_ui_len View::getWidth()
 	{
 		return m_frame.getWidth();
@@ -1147,7 +1168,17 @@ namespace slib
 	void View::setWidth(sl_ui_len width, UIUpdateMode mode)
 	{
 		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
-			setWidthFixed(width, mode);
+			Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
+			if (layoutAttrs.isNotNull()) {
+				layoutAttrs->requestedFrame.setWidth(width);
+				_restrictSize(layoutAttrs->requestedFrame);
+				layoutAttrs->flagRequestedFrame = sl_true;
+			} else {
+				UIRect frame = m_frame;
+				frame.setWidth(width);
+				setFrame(frame, UIUpdateMode::None);
+			}
+			invalidateSelfAndParentLayout(mode);
 			return;
 		}
 		UIRect frame = m_frame;
@@ -1163,7 +1194,17 @@ namespace slib
 	void View::setHeight(sl_ui_len height, UIUpdateMode mode)
 	{
 		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
-			setHeightFixed(height, mode);
+			Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
+			if (layoutAttrs.isNotNull()) {
+				layoutAttrs->requestedFrame.setHeight(height);
+				_restrictSize(layoutAttrs->requestedFrame);
+				layoutAttrs->flagRequestedFrame = sl_true;
+			} else {
+				UIRect frame = m_frame;
+				frame.setHeight(height);
+				setFrame(frame, UIUpdateMode::None);
+			}
+			invalidateSelfAndParentLayout(mode);
 			return;
 		}
 		UIRect frame = m_frame;
@@ -1178,19 +1219,23 @@ namespace slib
 
 	void View::setSize(const UISize& size, UIUpdateMode mode)
 	{
-		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
-			setSizeFixed(size, mode);
-			return;
-		}
-		UIRect frame = m_frame;
-		frame.setSize(size);
-		setFrame(frame, mode);
+		setSize(size.x, size.y, mode);
 	}
 
 	void View::setSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode)
 	{
 		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
-			setSizeFixed(UISize(width, height), mode);
+			Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
+			if (layoutAttrs.isNotNull()) {
+				layoutAttrs->requestedFrame.setSize(width, height);
+				_restrictSize(layoutAttrs->requestedFrame);
+				layoutAttrs->flagRequestedFrame = sl_true;
+			} else {
+				UIRect frame = m_frame;
+				frame.setSize(width, height);
+				setFrame(frame, UIUpdateMode::None);
+			}
+			invalidateSelfAndParentLayout(mode);
 			return;
 		}
 		UIRect frame = m_frame;
@@ -1206,11 +1251,21 @@ namespace slib
 	void View::setLeft(sl_ui_pos x, UIUpdateMode mode)
 	{
 		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
-			setLeftFixed(x, mode);
+			Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
+			if (layoutAttrs.isNotNull()) {
+				layoutAttrs->requestedFrame.setLocationLeft(x);
+				_restrictSize(layoutAttrs->requestedFrame);
+				layoutAttrs->flagRequestedFrame = sl_true;
+			} else {
+				UIRect frame = m_frame;
+				frame.setLocationLeft(x);
+				setFrame(frame, UIUpdateMode::None);
+			}
+			invalidateSelfAndParentLayout(mode);
 			return;
 		}
 		UIRect frame = m_frame;
-		frame.left = x;
+		frame.setLocationLeft(x);
 		setFrame(frame, mode);
 	}
 
@@ -1222,72 +1277,52 @@ namespace slib
 	void View::setTop(sl_ui_pos y, UIUpdateMode mode)
 	{
 		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
-			setTopFixed(y, mode);
+			Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
+			if (layoutAttrs.isNotNull()) {
+				layoutAttrs->requestedFrame.setLocationTop(y);
+				_restrictSize(layoutAttrs->requestedFrame);
+				layoutAttrs->flagRequestedFrame = sl_true;
+			} else {
+				UIRect frame = m_frame;
+				frame.setLocationTop(y);
+				setFrame(frame, UIUpdateMode::None);
+			}
+			invalidateSelfAndParentLayout(mode);
 			return;
 		}
 		UIRect frame = m_frame;
-		frame.top = y;
+		frame.setLocationTop(y);
 		setFrame(frame, mode);
 	}
 
-	sl_ui_pos View::getRight()
+	UIPoint View::getLocation()
 	{
-		return m_frame.right;
+		return m_frame.getLocation();
 	}
 
-	void View::setRight(sl_ui_pos x, UIUpdateMode mode)
+	void View::setLocation(const UIPoint& point, UIUpdateMode mode)
+	{
+		setLocation(point.x, point.y, mode);
+	}
+
+	void View::setLocation(sl_ui_pos x, sl_ui_pos y, UIUpdateMode mode)
 	{
 		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
-			setRightFixed(x, mode);
+			Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
+			if (layoutAttrs.isNotNull()) {
+				layoutAttrs->requestedFrame.setLocation(x, y);
+				_restrictSize(layoutAttrs->requestedFrame);
+				layoutAttrs->flagRequestedFrame = sl_true;
+			} else {
+				UIRect frame = m_frame;
+				frame.setLocation(x, y);
+				setFrame(frame, UIUpdateMode::None);
+			}
+			invalidateSelfAndParentLayout(mode);
 			return;
 		}
 		UIRect frame = m_frame;
-		frame.right = x;
-		setFrame(frame, mode);
-	}
-
-	sl_ui_pos View::getBottom()
-	{
-		return m_frame.bottom;
-	}
-
-	void View::setBottom(sl_ui_pos y, UIUpdateMode mode)
-	{
-		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
-			setBottomFixed(y, mode);
-			return;
-		}
-		UIRect frame = m_frame;
-		frame.bottom = y;
-		setFrame(frame, mode);
-	}
-
-	UIPoint View::getPosition()
-	{
-		return m_frame.getLeftTop();
-	}
-
-	void View::setPosition(const UIPoint& point, UIUpdateMode mode)
-	{
-		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
-			setPositionFixed(point, mode);
-			return;
-		}
-		UIRect frame = m_frame;
-		frame.left = point.x;
-		frame.top = point.y;
-		setFrame(frame, mode);
-	}
-
-	void View::setPosition(sl_ui_pos x, sl_ui_pos y, UIUpdateMode mode)
-	{
-		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
-			setPositionFixed(UIPoint(x, y), mode);
-			return;
-		}
-		UIRect frame = m_frame;
-		frame.left = x;
-		frame.top = y;
+		frame.setLocation(x, y);
 		setFrame(frame, mode);
 	}
 
@@ -1649,8 +1684,15 @@ namespace slib
 		}
 		layoutAttrs->flagInvalidLayoutInParent = sl_false;
 		
+
 		UIRect oldFrame = layoutAttrs->layoutFrame;
-		UIRect frame = oldFrame;
+		UIRect frame;
+		if (layoutAttrs->flagRequestedFrame) {
+			frame = layoutAttrs->requestedFrame;
+			layoutAttrs->flagRequestedFrame = sl_false;
+		} else {
+			frame = oldFrame;
+		}
 
 		SizeMode widthMode = layoutAttrs->widthMode;
 		SizeMode heightMode = layoutAttrs->heightMode;
@@ -1663,35 +1705,35 @@ namespace slib
 		if (widthMode == SizeMode::Filling) {
 			if (leftMode == PositionMode::CenterInParent || leftMode == PositionMode::CenterInOther) {
 				widthMode = SizeMode::Weight;
-				rightMode = PositionMode::Fixed;
+				rightMode = PositionMode::Free;
 			} else {
-				if (leftMode == PositionMode::Fixed) {
+				if (leftMode == PositionMode::Free) {
 					leftMode = PositionMode::ParentEdge;
 				}
-				if (rightMode == PositionMode::Fixed) {
+				if (rightMode == PositionMode::Free) {
 					rightMode = PositionMode::ParentEdge;
 				}
 			}
 		} else {
-			if (leftMode != PositionMode::Fixed) {
-				rightMode = PositionMode::Fixed;
+			if (leftMode != PositionMode::Free) {
+				rightMode = PositionMode::Free;
 			}
 		}
 		if (heightMode == SizeMode::Filling) {
 			if (topMode == PositionMode::CenterInParent || topMode == PositionMode::CenterInOther) {
 				heightMode = SizeMode::Weight;
-				bottomMode = PositionMode::Fixed;
+				bottomMode = PositionMode::Free;
 			} else {
-				if (topMode == PositionMode::Fixed) {
+				if (topMode == PositionMode::Free) {
 					topMode = PositionMode::ParentEdge;
 				}
-				if (bottomMode == PositionMode::Fixed) {
+				if (bottomMode == PositionMode::Free) {
 					bottomMode = PositionMode::ParentEdge;
 				}
 			}
 		} else {
-			if (topMode != PositionMode::Fixed) {
-				bottomMode = PositionMode::Fixed;
+			if (topMode != PositionMode::Free) {
+				bottomMode = PositionMode::Free;
 			}
 		}
 		
@@ -1905,12 +1947,8 @@ namespace slib
 					}
 				}
 			} else {
-				if (leftMode == PositionMode::Fixed) {
-					if (rightMode != PositionMode::Fixed) {
-						frame.left = frame.right - width;
-					} else {
-						frame.right = frame.left + width;
-					}
+				if (leftMode == PositionMode::Free && rightMode != PositionMode::Free) {
+					frame.left = frame.right - width;
 				} else {
 					frame.right = frame.left + width;
 				}
@@ -1927,12 +1965,8 @@ namespace slib
 					}
 				}
 			} else {
-				if (topMode == PositionMode::Fixed) {
-					if (bottomMode != PositionMode::Fixed) {
-						frame.top = frame.bottom - height;
-					} else {
-						frame.bottom = frame.top + height;
-					}
+				if (topMode == PositionMode::Free && bottomMode != PositionMode::Free) {
+					frame.top = frame.bottom - height;
 				} else {
 					frame.bottom = frame.top + height;
 				}
@@ -2082,8 +2116,12 @@ namespace slib
 		}
 		
 		if (layoutAttrs.isNotNull()) {
-			_restrictSize(layoutAttrs->layoutFrame);
+			if (layoutAttrs->flagRequestedFrame) {
+				layoutAttrs->layoutFrame = layoutAttrs->requestedFrame;
+				layoutAttrs->flagRequestedFrame = sl_false;
+			}
 		}
+		
 		_updateLayout();
 		
 		if (!m_flagNeedApplyLayout && layoutAttrs.isNotNull()) {
@@ -2374,27 +2412,6 @@ namespace slib
 		invalidate(mode);
 	}
 
-	void View::requestFrame(UIRect frame, UIUpdateMode mode)
-	{
-		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
-		if (layoutAttrs.isNotNull()) {
-			if (!(isDrawingThread())) {
-				dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, requestFrame, this, frame, mode));
-				return;
-			}
-			if (frame.isAlmostEqual(layoutAttrs->layoutFrame)) {
-				return;
-			}
-			layoutAttrs->layoutFrame = frame;
-		} else {
-			if (frame.isAlmostEqual(m_frame)) {
-				return;
-			}
-			setFrame(frame, UIUpdateMode::None);
-		}
-		invalidateSelfAndParentLayout(mode);
-	}
-
 	SizeMode View::getWidthMode()
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
@@ -2422,20 +2439,13 @@ namespace slib
 		return sl_true;
 	}
 
-	void View::setWidthFixed(sl_ui_len width, UIUpdateMode mode)
+	void View::setWidthFixed(UIUpdateMode mode)
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
-			if (!(isDrawingThread())) {
-				dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, setWidthFixed, this, width, mode));
-				return;
-			}
 			attrs->widthMode = SizeMode::Fixed;
-			attrs->layoutFrame.setWidth(width);
-		} else {
-			setWidth(width, UIUpdateMode::None);
+			invalidateParentLayout(mode);
 		}
-		invalidateSelfAndParentLayout(mode);
 	}
 
 	sl_bool View::isHeightFixed()
@@ -2447,37 +2457,13 @@ namespace slib
 		return sl_true;
 	}
 
-	void View::setHeightFixed(sl_ui_len height, UIUpdateMode mode)
+	void View::setHeightFixed(UIUpdateMode mode)
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
-			if (!(isDrawingThread())) {
-				dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, setHeightFixed, this, height, mode));
-				return;
-			}
 			attrs->heightMode = SizeMode::Fixed;
-			attrs->layoutFrame.setHeight(height);
-		} else {
-			setHeight(height, UIUpdateMode::None);
+			invalidateParentLayout(mode);
 		}
-		invalidateSelfAndParentLayout(mode);
-	}
-
-	void View::setSizeFixed(UISize size, UIUpdateMode mode)
-	{
-		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
-		if (attrs.isNotNull()) {
-			if (!(isDrawingThread())) {
-				dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, setSizeFixed, this, size, mode));
-				return;
-			}
-			attrs->widthMode = SizeMode::Fixed;
-			attrs->heightMode = SizeMode::Fixed;
-			attrs->layoutFrame.setSize(size);
-		} else {
-			setSize(size, UIUpdateMode::None);
-		}
-		invalidateSelfAndParentLayout(mode);
 	}
 
 	sl_real View::getWidthWeight()
@@ -2538,19 +2524,6 @@ namespace slib
 		}
 	}
 
-	void View::setSizeFilling(sl_real widthWeight, sl_real heightWeight, UIUpdateMode mode)
-	{
-		_initializeLayoutAttributes();
-		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
-		if (attrs.isNotNull()) {
-			attrs->widthMode = SizeMode::Filling;
-			attrs->widthWeight = widthWeight;
-			attrs->heightMode = SizeMode::Filling;
-			attrs->heightWeight = heightWeight;
-			invalidateParentLayout(mode);
-		}
-	}
-
 	sl_bool View::isWidthWrapping()
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
@@ -2584,17 +2557,6 @@ namespace slib
 		_initializeLayoutAttributes();
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
-			attrs->heightMode = SizeMode::Wrapping;
-			invalidateSelfAndParentLayout(mode);
-		}
-	}
-
-	void View::setSizeWrapping(UIUpdateMode mode)
-	{
-		_initializeLayoutAttributes();
-		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
-		if (attrs.isNotNull()) {
-			attrs->widthMode = SizeMode::Wrapping;
 			attrs->heightMode = SizeMode::Wrapping;
 			invalidateSelfAndParentLayout(mode);
 		}
@@ -2640,42 +2602,22 @@ namespace slib
 		}
 	}
 
-	void View::setSizeWeight(sl_real widthWeight, sl_real heightWeight, UIUpdateMode mode)
-	{
-		_initializeLayoutAttributes();
-		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
-		if (attrs.isNotNull()) {
-			attrs->widthMode = SizeMode::Weight;
-			attrs->widthWeight = widthWeight;
-			attrs->heightMode = SizeMode::Weight;
-			attrs->heightWeight = heightWeight;
-			invalidateParentLayout(mode);
-		}
-	}
-
-	sl_bool View::isLeftFixed()
+	sl_bool View::isLeftFree()
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
-			return attrs->leftMode == PositionMode::Fixed;
+			return attrs->leftMode == PositionMode::Free;
 		}
 		return sl_true;
 	}
 
-	void View::setLeftFixed(sl_ui_pos left, UIUpdateMode mode)
+	void View::setLeftFree(UIUpdateMode mode)
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
-			if (!(isDrawingThread())) {
-				dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, setLeftFixed, this, left, mode));
-				return;
-			}
-			attrs->leftMode = PositionMode::Fixed;
-			attrs->layoutFrame.left = left;
-		} else {
-			setLeft(left, UIUpdateMode::None);
+			attrs->leftMode = PositionMode::Free;
+			invalidateSelfAndParentLayout(mode);
 		}
-		invalidateSelfAndParentLayout(mode);
 	}
 
 	sl_bool View::isAlignParentLeft()
@@ -2752,29 +2694,22 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool View::isRightFixed()
+	sl_bool View::isRightFree()
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
-			return attrs->rightMode == PositionMode::Fixed;
+			return attrs->rightMode == PositionMode::Free;
 		}
 		return sl_true;
 	}
 
-	void View::setRightFixed(sl_ui_pos right, UIUpdateMode mode)
+	void View::setRightFree(UIUpdateMode mode)
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
-			if (!(isDrawingThread())) {
-				dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, setRightFixed, this, right, mode));
-				return;
-			}
-			attrs->rightMode = PositionMode::Fixed;
-			attrs->layoutFrame.right = right;
-		} else {
-			setRight(right, UIUpdateMode::None);
+			attrs->rightMode = PositionMode::Free;
+			invalidateSelfAndParentLayout(mode);
 		}
-		invalidateSelfAndParentLayout(mode);
 	}
 
 	sl_bool View::isAlignParentRight()
@@ -2851,29 +2786,22 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool View::isTopFixed()
+	sl_bool View::isTopFree()
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
-			return attrs->topMode == PositionMode::Fixed;
+			return attrs->topMode == PositionMode::Free;
 		}
 		return sl_true;
 	}
 
-	void View::setTopFixed(sl_ui_pos top, UIUpdateMode mode)
+	void View::setTopFree(UIUpdateMode mode)
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
-			if (!(isDrawingThread())) {
-				dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, setTopFixed, this, top, mode));
-				return;
-			}
-			attrs->topMode = PositionMode::Fixed;
-			attrs->layoutFrame.top = top;
-		} else {
-			setTop(top, UIUpdateMode::None);
+			attrs->topMode = PositionMode::Free;
+			invalidateSelfAndParentLayout(mode);
 		}
-		invalidateSelfAndParentLayout(mode);
 	}
 
 	sl_bool View::isAlignParentTop()
@@ -2950,29 +2878,22 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool View::isBottomFixed()
+	sl_bool View::isBottomFree()
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
-			return attrs->bottomMode == PositionMode::Fixed;
+			return attrs->bottomMode == PositionMode::Free;
 		}
 		return sl_true;
 	}
 
-	void View::setBottomFixed(sl_ui_pos bottom, UIUpdateMode mode)
+	void View::setBottomFree(UIUpdateMode mode)
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
-			if (!(isDrawingThread())) {
-				dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, setBottomFixed, this, bottom, mode));
-				return;
-			}
-			attrs->bottomMode = PositionMode::Fixed;
-			attrs->layoutFrame.bottom = bottom;
-		} else {
-			setBottom(bottom, UIUpdateMode::None);
+			attrs->bottomMode = PositionMode::Free;
+			invalidateSelfAndParentLayout(mode);
 		}
-		invalidateSelfAndParentLayout(mode);
 	}
 
 	sl_bool View::isAlignParentBottom()
@@ -3142,24 +3063,6 @@ namespace slib
 			attrs->topReferingView = view;
 			invalidateParentLayout(mode);
 		}
-	}
-
-	void View::setPositionFixed(UIPoint position, UIUpdateMode mode)
-	{
-		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
-		if (attrs.isNotNull()) {
-			if (!(isDrawingThread())) {
-				dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, setPositionFixed, this, position, mode));
-				return;
-			}
-			attrs->leftMode = PositionMode::Fixed;
-			attrs->topMode = PositionMode::Fixed;
-			attrs->layoutFrame.left = position.x;
-			attrs->layoutFrame.top = position.y;
-		} else {
-			setPosition(position, UIUpdateMode::None);
-		}
-		invalidateSelfAndParentLayout(mode);
 	}
 
 	sl_ui_len View::getMinimumWidth()
@@ -3423,9 +3326,6 @@ namespace slib
 		if (attrs.isNotNull()) {
 			attrs->flagRelativeMarginLeft = sl_true;
 			attrs->relativeMarginLeftWeight = weight;
-			if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
-				attrs->leftMode = PositionMode::ParentEdge;
-			}
 			invalidateSelfAndParentLayout(mode);
 		}
 	}
@@ -3434,9 +3334,6 @@ namespace slib
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull() && !(attrs->flagRelativeMarginLeft)) {
-			if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
-				return 0;
-			}
 			return attrs->marginLeft;
 		}
 		return 0;
@@ -3449,9 +3346,6 @@ namespace slib
 		if (attrs.isNotNull()) {
 			attrs->flagRelativeMarginLeft = sl_false;
 			attrs->marginLeft = margin;
-			if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
-				attrs->leftMode = PositionMode::ParentEdge;
-			}
 			invalidateSelfAndParentLayout(mode);
 		}
 	}
@@ -3481,9 +3375,6 @@ namespace slib
 		if (attrs.isNotNull()) {
 			attrs->flagRelativeMarginTop = sl_true;
 			attrs->relativeMarginTopWeight = weight;
-			if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
-				attrs->topMode = PositionMode::ParentEdge;
-			}
 			invalidateSelfAndParentLayout(mode);
 		}
 	}
@@ -3492,9 +3383,6 @@ namespace slib
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull() && !(attrs->flagRelativeMarginTop)) {
-			if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
-				return 0;
-			}
 			return attrs->marginTop;
 		}
 		return 0;
@@ -3507,9 +3395,6 @@ namespace slib
 		if (attrs.isNotNull()) {
 			attrs->flagRelativeMarginTop = sl_false;
 			attrs->marginTop = margin;
-			if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
-				attrs->topMode = PositionMode::ParentEdge;
-			}
 			invalidateSelfAndParentLayout(mode);
 		}
 	}
@@ -3547,9 +3432,6 @@ namespace slib
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull() && !(attrs->flagRelativeMarginRight)) {
-			if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
-				return 0;
-			}
 			return attrs->marginRight;
 		}
 		return 0;
@@ -3599,9 +3481,6 @@ namespace slib
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull() && !(attrs->flagRelativeMarginBottom)) {
-			if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
-				return 0;
-			}
 			return attrs->marginBottom;
 		}
 		return 0;

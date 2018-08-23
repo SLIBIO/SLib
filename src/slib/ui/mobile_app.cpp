@@ -29,7 +29,8 @@ namespace slib
 		m_contentView = window->getContentView();
 		
 		m_pager = new ViewPager;
-		m_pager->setSizeFilling(1, 1, UIUpdateMode::Init);
+		m_pager->setWidthFilling(1, UIUpdateMode::Init);
+		m_pager->setHeightFilling(1, UIUpdateMode::Init);
 		m_pager->setOpaque(sl_true, UIUpdateMode::Init);
 		m_pager->setBackgroundColor(Color::White);
 		m_pager->setMinimumPagesCount(1);

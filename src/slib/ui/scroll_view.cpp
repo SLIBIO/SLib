@@ -161,7 +161,7 @@ namespace slib
 		Ref<View> view = m_viewContent;
 		if (view.isNotNull()) {
 			if (!(isNativeWidget())) {
-				view->setPosition((sl_ui_pos)-x, (sl_ui_pos)-y);
+				view->setLocation((sl_ui_pos)-x, (sl_ui_pos)-y);
 			}
 		}
 	}

@@ -25,7 +25,8 @@ namespace slib
 		m_contentView->addChild(m_gameView, UIUpdateMode::Init);
 		m_contentView = m_gameView;
 		
-		m_gameView->setSizeFilling(1, 1, UIUpdateMode::Init);
+		m_gameView->setWidthFilling(1, UIUpdateMode::Init);
+		m_gameView->setHeightFilling(1, UIUpdateMode::Init);
 		m_gameView->setOpaque(sl_true, UIUpdateMode::Init);
 		m_gameView->addChild(m_pager, UIUpdateMode::Init);
 		

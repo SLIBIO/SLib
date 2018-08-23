@@ -260,7 +260,8 @@ namespace slib
 #endif
 			}
 			m_editViewNative->setText(m_text, UIUpdateMode::Init);
-			m_editViewNative->setSizeFilling(sl_true, sl_true, UIUpdateMode::Init);
+			m_editViewNative->setWidthFilling(1, UIUpdateMode::Init);
+			m_editViewNative->setHeightFilling(1, UIUpdateMode::Init);
 			m_editViewNative->setMargin(UIResource::getScreenMinimum()/20);
 			m_editViewNative->setBorder(sl_false, UIUpdateMode::Init);
 			m_editViewNative->setGravity(Alignment::TopLeft, UIUpdateMode::Init);
