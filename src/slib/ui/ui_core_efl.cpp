@@ -121,7 +121,8 @@ namespace slib
 		return ret;
 	}
 
-	void UI::openUrl(const String& url) {
+	void UI::openUrl(const String& url)
+	{
 		app_control_h app_control;
 		if (0 == ::app_control_create(&app_control)) {
 			::app_control_set_operation(app_control, APP_CONTROL_OPERATION_DEFAULT);
