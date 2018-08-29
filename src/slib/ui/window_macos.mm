@@ -200,12 +200,12 @@ namespace slib
 			m_window = nil;
 		}
 		
-		Ref<ViewInstance> getContentView()
+		Ref<ViewInstance> getContentView() override
 		{
 			return m_viewContent;
 		}
 		
-		void close()
+		void close() override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -226,7 +226,7 @@ namespace slib
 			}
 		}
 		
-		sl_bool isClosed()
+		sl_bool isClosed() override
 		{
 			return m_window == nil;
 		}
@@ -243,7 +243,7 @@ namespace slib
 			return sl_null;
 		}
 		
-		sl_bool setParent(const Ref<WindowInstance>& windowInst)
+		sl_bool setParent(const Ref<WindowInstance>& windowInst) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -267,7 +267,7 @@ namespace slib
 			return sl_false;
 		}
 		
-		sl_bool setFocus()
+		sl_bool setFocus() override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -277,7 +277,7 @@ namespace slib
 			return sl_false;
 		}
 		
-		UIRect getFrame()
+		UIRect getFrame() override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -290,7 +290,7 @@ namespace slib
 			}
 		}
 		
-		sl_bool setFrame(const UIRect& frame)
+		sl_bool setFrame(const UIRect& frame) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -308,25 +308,21 @@ namespace slib
 			return sl_false;
 		}
 		
-		UIRect getClientFrame()
+		UIRect getClientFrame() override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
 				NSRect fr = [window frame];
 				NSRect cr = [window contentRectForFrameRect:fr];
-				UIRect ret;
-				ret.left = (sl_ui_pos)(cr.origin.x - fr.origin.x);
-				ret.top = (sl_ui_pos)((fr.origin.y + fr.size.height) - (cr.origin.y + cr.size.height));
-				ret.setWidth((sl_ui_pos)(cr.size.width));
-				ret.setHeight((sl_ui_pos)(cr.size.height));
-				ret.fixSizeError();
-				return ret;
+				UIRect frame;
+				_getFrame(frame, cr, m_heightScreen);
+				return frame;
 			} else {
 				return UIRect::zero();
 			}
 		}
 		
-		UISize getClientSize()
+		UISize getClientSize() override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -337,7 +333,7 @@ namespace slib
 			}
 		}
 		
-		sl_bool setClientSize(const UISize& _size)
+		sl_bool setClientSize(const UISize& _size) override
 		{
 			UISize size = _size;
 			NSWindow* window = m_window;
@@ -367,7 +363,7 @@ namespace slib
 			return sl_null;
 		}
 		
-		sl_bool setTitle(const String& title)
+		sl_bool setTitle(const String& title) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -391,7 +387,7 @@ namespace slib
 			return Color::Transparent;
 		}
 		
-		sl_bool setBackgroundColor(const Color& _color)
+		sl_bool setBackgroundColor(const Color& _color) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -413,7 +409,7 @@ namespace slib
 			return sl_false;
 		}
 
-		sl_bool isMinimized()
+		sl_bool isMinimized() override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -428,7 +424,7 @@ namespace slib
 			}
 		}
 		
-		sl_bool setMinimized(sl_bool flag)
+		sl_bool setMinimized(sl_bool flag) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -460,7 +456,7 @@ namespace slib
 			return sl_false;
 		}
 		
-		sl_bool isMaximized()
+		sl_bool isMaximized() override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -475,7 +471,7 @@ namespace slib
 			}
 		}
 		
-		sl_bool setMaximized(sl_bool flag)
+		sl_bool setMaximized(sl_bool flag) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -514,7 +510,7 @@ namespace slib
 			}
 		}
 		
-		sl_bool setVisible(sl_bool flag)
+		sl_bool setVisible(sl_bool flag) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -562,7 +558,7 @@ namespace slib
 			return sl_false;
 		}
 		
-		sl_bool setAlwaysOnTop(sl_bool flag)
+		sl_bool setAlwaysOnTop(sl_bool flag) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -602,7 +598,7 @@ namespace slib
 			return sl_false;
 		}
 		
-		sl_bool setCloseButtonEnabled(sl_bool flag)
+		sl_bool setCloseButtonEnabled(sl_bool flag) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -651,7 +647,7 @@ namespace slib
 			return sl_false;
 		}
 		
-		sl_bool setMinimizeButtonEnabled(sl_bool flag)
+		sl_bool setMinimizeButtonEnabled(sl_bool flag) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -698,7 +694,7 @@ namespace slib
 			return sl_false;
 		}
 		
-		sl_bool setMaximizeButtonEnabled(sl_bool flag)
+		sl_bool setMaximizeButtonEnabled(sl_bool flag) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -737,7 +733,7 @@ namespace slib
 			return sl_false;
 		}
 
-		sl_bool setResizable(sl_bool flag)
+		sl_bool setResizable(sl_bool flag) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -779,7 +775,7 @@ namespace slib
 			return 1;
 		}
 		
-		sl_bool setAlpha(sl_real _alpha)
+		sl_bool setAlpha(sl_real _alpha) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -812,7 +808,7 @@ namespace slib
 			return sl_false;
 		}
 		
-		sl_bool setTransparent(sl_bool flag)
+		sl_bool setTransparent(sl_bool flag) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -823,7 +819,7 @@ namespace slib
 		}
 		
 		
-		UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen)
+		UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -843,7 +839,7 @@ namespace slib
 			}
 		}
 		
-		UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow)
+		UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -863,7 +859,7 @@ namespace slib
 			}
 		}
 		
-		UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen)
+		UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -883,7 +879,7 @@ namespace slib
 			}
 		}
 		
-		UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient)
+		UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -903,7 +899,7 @@ namespace slib
 			}
 		}
 		
-		UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow)
+		UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -918,7 +914,7 @@ namespace slib
 			}
 		}
 		
-		UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient)
+		UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -933,7 +929,7 @@ namespace slib
 			}
 		}
 		
-		UISize getWindowSizeFromClientSize(const UISize& sizeClient)
+		UISize getWindowSizeFromClientSize(const UISize& sizeClient) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -954,7 +950,7 @@ namespace slib
 			}
 		}
 		
-		UISize getClientSizeFromWindowSize(const UISize& sizeWindow)
+		UISize getClientSizeFromWindowSize(const UISize& sizeWindow) override
 		{
 			NSWindow* window = m_window;
 			if (window != nil) {
@@ -1063,6 +1059,22 @@ namespace slib
 	}
 }
 
+- (void)windowDidBecomeKey:(NSNotification *)notification
+{
+	slib::Ref<slib::_priv_macOS_Window> window = m_window;
+	if (window.isNotNull()) {
+		window->onActivate();
+	}
+}
+
+- (void)windowDidResignKey:(NSNotification *)notification
+{
+	slib::Ref<slib::_priv_macOS_Window> window = m_window;
+	if (window.isNotNull()) {
+		window->onDeactivate();
+	}
+}
+
 - (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)frameSize
 {
 	slib::Ref<slib::_priv_macOS_Window> window = m_window;
@@ -1085,7 +1097,9 @@ namespace slib
 {
 	slib::Ref<slib::_priv_macOS_Window> window = m_window;
 	if (window.isNotNull()) {
-		NSSize size = self.frame.size;
+		NSRect fr = [self frame];
+		NSRect cr = [self contentRectForFrameRect:fr];
+		NSSize size = cr.size;
 		window->onResize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
 	}
 }
