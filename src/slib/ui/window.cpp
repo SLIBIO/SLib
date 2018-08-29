@@ -26,7 +26,12 @@ namespace slib
 		flagDialog = sl_false;
 		flagModal = sl_false;
 		
+#if defined(SLIB_UI_IS_ANDROID)
 		activity = sl_null;
+#endif
+#if defined(SLIB_UI_IS_GTK)
+		flagClientSize = sl_false;
+#endif
 	}
 
 	WindowInstanceParam::~WindowInstanceParam()
@@ -49,6 +54,29 @@ namespace slib
 		}
 		frame.fixSizeError();
 		return frame;
+	}
+	
+	static void _priv_Window_constrainSize(UISize& size, const UISize& sizeMin, const UISize& sizeMax)
+	{
+		if (size.x < sizeMin.x) {
+			size.x = sizeMin.x;
+		}
+		if (size.y < sizeMin.y) {
+			size.y = sizeMin.y;
+		}
+		if (sizeMax.x > 0 && size.x > sizeMax.x) {
+			size.x = sizeMax.x;
+		}
+		if (sizeMax.y > 0 && size.y > sizeMax.y) {
+			size.y = sizeMax.y;
+		}
+	}
+	
+	static void _priv_Window_constrainSize(UIRect& frame, const UISize& sizeMin, const UISize& sizeMax)
+	{
+		UISize size = frame.getSize();
+		_priv_Window_constrainSize(size, sizeMin, sizeMax);
+		frame.setSize(size);
 	}
 
 #define CHECK_INSTANCE(instance) (instance.isNotNull() && !(instance->isClosed()))
@@ -90,7 +118,7 @@ namespace slib
 		m_flagBorderless = sl_false;
 		m_flagShowTitleBar = sl_true;
 		m_flagFullScreenOnCreate = 
-#ifdef SLIB_PLATFORM_IS_MOBILE
+#if defined(SLIB_PLATFORM_IS_MOBILE)
 			sl_true;
 #else
 			sl_false;
@@ -99,8 +127,14 @@ namespace slib
 		
 		m_flagUseClientSizeRequested = sl_false;
 		
-		m_activity = sl_null;
+		m_sizeMin.x = 0;
+		m_sizeMin.y = 0;
+		m_sizeMax.x = 0;
+		m_sizeMax.y = 0;
 		
+#if defined(SLIB_UI_IS_ANDROID)
+		m_activity = sl_null;
+#endif
 	}
 
 	Window::~Window()
@@ -222,8 +256,10 @@ namespace slib
 		return m_frame;
 	}
 
-	void Window::setFrame(const UIRect& frame)
+	void Window::setFrame(const UIRect& _frame)
 	{
+		UIRect frame = _frame;
+		_priv_Window_constrainSize(frame, m_sizeMin, m_sizeMax);
 		m_frame = frame;
 		Ref<WindowInstance> instance = m_instance;
 		if (CHECK_INSTANCE(instance)) {
@@ -351,7 +387,9 @@ namespace slib
 		Ref<WindowInstance> instance = m_instance;
 		if (CHECK_INSTANCE(instance)) {
 			m_flagUseClientSizeRequested = sl_false;
-			instance->setClientSize(size);
+			if (!(instance->setClientSize(size))) {
+				setSize(size);
+			}
 		} else {
 			m_flagUseClientSizeRequested = sl_true;
 			m_clientSizeRequested = size;
@@ -673,6 +711,92 @@ namespace slib
 			return UISize::zero();
 		}
 	}
+	
+	void Window::setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum)
+	{
+		m_sizeMin = sizeMinimum;
+		m_sizeMax = sizeMaximum;
+		Ref<WindowInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			instance->setSizeRange(sizeMinimum, sizeMaximum);
+		}
+		UIRect frame = m_frame;
+		UIRect frameOld = frame;
+		_priv_Window_constrainSize(frame, m_sizeMin, m_sizeMax);
+		if (!(frame.isAlmostEqual(frameOld))) {
+			setFrame(frame);
+		}
+	}
+	
+	UISize Window::getMinimumSize()
+	{
+		return m_sizeMin;
+	}
+	
+	void Window::setMinimumSize(const UISize& sizeMinimum)
+	{
+		setSizeRange(sizeMinimum, m_sizeMax);
+	}
+	
+	void Window::setMinimumSize(sl_ui_len width, sl_ui_len height)
+	{
+		setSizeRange(UISize(width, height), m_sizeMax);
+	}
+	
+	sl_ui_len Window::getMinimumWidth()
+	{
+		return m_sizeMin.x;
+	}
+	
+	void Window::setMinimumWidth(sl_ui_len width)
+	{
+		setSizeRange(UISize(width, m_sizeMin.y), m_sizeMax);
+	}
+	
+	sl_ui_len Window::getMinimumHeight()
+	{
+		return m_sizeMin.y;
+	}
+	
+	void Window::setMinimumHeight(sl_ui_len height)
+	{
+		setSizeRange(UISize(m_sizeMin.x, height), m_sizeMax);
+	}
+	
+	UISize Window::getMaximumSize()
+	{
+		return m_sizeMax;
+	}
+	
+	void Window::setMaximumSize(const UISize& sizeMaximum)
+	{
+		setSizeRange(m_sizeMin, sizeMaximum);
+	}
+	
+	void Window::setMaximumSize(sl_ui_len width, sl_ui_len height)
+	{
+		setSizeRange(m_sizeMin, UISize(width, height));
+	}
+	
+	sl_ui_len Window::getMaximumWidth()
+	{
+		return m_sizeMax.x;
+	}
+	
+	void Window::setMaximumWidth(sl_ui_len width)
+	{
+		setSizeRange(m_sizeMin, UISize(width, m_sizeMax.y));
+	}
+	
+	sl_ui_len Window::getMaximumHeight()
+	{
+		return m_sizeMax.y;
+	}
+	
+	void Window::setMaximumHeight(sl_ui_len height)
+	{
+		setSizeRange(m_sizeMin, UISize(m_sizeMax.x, height));
+	}
 
 	sl_bool Window::isModal()
 	{
@@ -734,6 +858,7 @@ namespace slib
 		m_flagCenterScreenOnCreate = flag;
 	}
 
+#if defined(SLIB_UI_IS_ANDROID)
 	void* Window::getActivity()
 	{
 		return m_activity;
@@ -743,6 +868,7 @@ namespace slib
 	{
 		m_activity = activity;
 	}
+#endif
 
 	Ref<WindowInstance> Window::getWindowInstance()
 	{
@@ -825,8 +951,16 @@ namespace slib
 		param.size = m_frame.getSize();
 		param.title = m_title;
 		param.flagShowTitleBar = m_flagShowTitleBar;
+#if defined(SLIB_UI_IS_ANDROID)
 		param.activity = m_activity;
-		
+#endif
+#if defined(SLIB_UI_IS_GTK)
+		param.flagClientSize = m_flagUseClientSizeRequested;
+		if (m_flagUseClientSizeRequested) {
+			param.size = m_clientSizeRequested;
+		}
+#endif
+
 		Ref<WindowInstance> window = createWindowInstance(param);
 		
 		if (window.isNotNull()) {
@@ -845,13 +979,17 @@ namespace slib
 			window->setAlpha(m_alpha);
 			window->setTransparent(m_flagTransparent);
 			
+			window->setSizeRange(m_sizeMin, m_sizeMax);
+			
+#if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_WIN32)
 			if (m_flagUseClientSizeRequested) {
 				UISize size = window->getWindowSizeFromClientSize(m_clientSizeRequested);
 				m_frame = window->getFrame();
 				m_frame.setSize(size);
 				window->setFrame(m_frame);
 			}
-			
+#endif
+
 			window->setVisible(sl_true);
 
 			attach(window, sl_false);
@@ -956,11 +1094,7 @@ namespace slib
 	{
 	}
 
-	void Window::onResizing(UISize& size)
-	{
-	}
-
-	void Window::onResize(sl_ui_len width, sl_ui_len height)
+	void Window::onResize(sl_ui_len clientWidth, sl_ui_len clientHeight)
 	{
 	}
 
@@ -1055,20 +1189,10 @@ namespace slib
 		getOnMove()(this);
 	}
 
-	void Window::dispatchResizing(UISize& size)
-	{
-		onResizing(size);
-		PtrLocker<IWindowListener> listener(getEventListener());
-		if (listener.isNotNull()) {
-			listener->onResizing(this, size);
-		}
-		getOnResizing()(this, size);
-	}
-
-	void Window::dispatchResize(sl_ui_len width, sl_ui_len height)
+	void Window::dispatchResize(sl_ui_len clientWidth, sl_ui_len clientHeight)
 	{
 		_refreshSize();
-		if (width > 0 && height > 0) {
+		if (clientWidth > 0 && clientHeight > 0) {
 			Ref<View> viewContent = m_viewContent;
 			if (viewContent.isNotNull()) {
 				if (!(viewContent->isInstance())) {
@@ -1076,12 +1200,12 @@ namespace slib
 				}
 			}
 		}
-		onResize(width, height);
+		onResize(clientWidth, clientHeight);
 		PtrLocker<IWindowListener> listener(getEventListener());
 		if (listener.isNotNull()) {
-			listener->onResize(this, width, height);
+			listener->onResize(this, clientWidth, clientHeight);
 		}
-		getOnResize()(this, width, height);
+		getOnResize()(this, clientWidth, clientHeight);
 	}
 
 	void Window::dispatchMinimize()
@@ -1174,6 +1298,10 @@ namespace slib
 
 	WindowInstance::WindowInstance()
 	{
+		m_sizeMin.x = 0;
+		m_sizeMin.y = 0;
+		m_sizeMax.x = 0;
+		m_sizeMax.y = 0;
 	}
 
 	WindowInstance::~WindowInstance()
@@ -1192,6 +1320,12 @@ namespace slib
 
 	void WindowInstance::setMenu(const Ref<Menu>& menu)
 	{
+	}
+	
+	void WindowInstance::setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum)
+	{
+		m_sizeMin = sizeMinimum;
+		m_sizeMax = sizeMaximum;
 	}
 
 	sl_bool WindowInstance::onClose()
@@ -1235,17 +1369,14 @@ namespace slib
 
 	void WindowInstance::onResizing(UISize& size)
 	{
-		Ref<Window> window = getWindow();
-		if (window.isNotNull()) {
-			window->dispatchResizing(size);
-		}
+		_priv_Window_constrainSize(size, m_sizeMin, m_sizeMax);
 	}
 
-	void WindowInstance::onResize(sl_ui_len width, sl_ui_len height)
+	void WindowInstance::onResize(sl_ui_len clientWidth, sl_ui_len clientHeight)
 	{
 		Ref<Window> window = getWindow();
 		if (window.isNotNull()) {
-			window->dispatchResize(width, height);
+			window->dispatchResize(clientWidth, clientHeight);
 		}
 	}
 

@@ -50,9 +50,15 @@ namespace slib
 		String title;
 		sl_bool flagShowTitleBar;
 
+#if defined(SLIB_UI_IS_ANDROID)
 		// jobject
 		void* activity;
+#endif
 
+#if defined(SLIB_UI_IS_GTK)
+		sl_bool flagClientSize;
+#endif
+		
 	public:
 		WindowInstanceParam();
 		
@@ -238,6 +244,37 @@ namespace slib
 		virtual UISize getClientSizeFromWindowSize(const UISize& sizeWindow);
 
 		
+		virtual void setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum);
+		
+		UISize getMinimumSize();
+		
+		void setMinimumSize(const UISize& sizeMinimum);
+		
+		void setMinimumSize(sl_ui_len width, sl_ui_len height);
+		
+		sl_ui_len getMinimumWidth();
+		
+		void setMinimumWidth(sl_ui_len width);
+		
+		sl_ui_len getMinimumHeight();
+		
+		void setMinimumHeight(sl_ui_len height);
+
+		UISize getMaximumSize();
+		
+		void setMaximumSize(const UISize& sizeMaximum);
+		
+		void setMaximumSize(sl_ui_len width, sl_ui_len height);
+
+		sl_ui_len getMaximumWidth();
+		
+		void setMaximumWidth(sl_ui_len width);
+		
+		sl_ui_len getMaximumHeight();
+		
+		void setMaximumHeight(sl_ui_len height);
+
+		
 		sl_bool isModal();
 		
 		void setModal(sl_bool flag);
@@ -268,10 +305,11 @@ namespace slib
 		void setCenterScreenOnCreate(sl_bool flag);
 		
 		
+#if defined(SLIB_UI_IS_ANDROID)
 		void* getActivity();
 		
 		void setActivity(void* activity);
-
+#endif
 		
 	public:
 		Ref<WindowInstance> getWindowInstance();
@@ -310,8 +348,6 @@ namespace slib
 		
 		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnMove)
 		
-		SLIB_PROPERTY(AtomicFunction<void(Window*, UISize&)>, OnResizing)
-		
 		SLIB_PROPERTY(AtomicFunction<void(Window*, sl_ui_len, sl_ui_len)>, OnResize)
 		
 		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnMinimize)
@@ -341,9 +377,7 @@ namespace slib
 		
 		virtual void onMove();
 		
-		virtual void onResizing(UISize& size);
-		
-		virtual void onResize(sl_ui_len width, sl_ui_len height);
+		virtual void onResize(sl_ui_len clientWidth, sl_ui_len clientHeight);
 
 		virtual void onMinimize();
 		
@@ -372,9 +406,7 @@ namespace slib
 		
 		virtual void dispatchMove();
 		
-		virtual void dispatchResizing(UISize& size);
-		
-		virtual void dispatchResize(sl_ui_len width, sl_ui_len height);
+		virtual void dispatchResize(sl_ui_len clientWidth, sl_ui_len clientHeight);
 		
 		virtual void dispatchMinimize();
 		
@@ -433,9 +465,14 @@ namespace slib
 		
 		UISize m_clientSizeRequested;
 		sl_bool m_flagUseClientSizeRequested;
+		
+		UISize m_sizeMin;
+		UISize m_sizeMax;
 
+#if defined(SLIB_UI_IS_ANDROID)
 		// jobject
 		void* m_activity;
+#endif
 		
 	};
 
@@ -529,6 +566,9 @@ namespace slib
 		
 		virtual UISize getClientSizeFromWindowSize(const UISize& sizeWindow) = 0;
 		
+		
+		virtual void setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum);
+		
 	public:
 		sl_bool onClose();
 		
@@ -540,7 +580,7 @@ namespace slib
 		
 		void onResizing(UISize& size);
 		
-		void onResize(sl_ui_len width, sl_ui_len height);
+		void onResize(sl_ui_len clientWidth, sl_ui_len clientHeight);
 		
 		void onMinimize();
 		
@@ -552,6 +592,10 @@ namespace slib
 
 	private:
 		AtomicWeakRef<Window> m_window;
+		
+	protected:
+		UISize m_sizeMin;
+		UISize m_sizeMax;
 		
 	};
 
