@@ -61,10 +61,12 @@ namespace slib
 				style |= WS_VISIBLE;
 			}
 
+			sl_ui_pos x = frame.left;
+			sl_ui_pos y = frame.top;
 			Vector2 t;
 			if (view->getFinalTranslationRotationScale(&t, NULL, NULL, NULL)) {
-				frame.left += (sl_ui_pos)(t.x);
-				frame.top += (sl_ui_pos)(t.y);
+				x += (sl_ui_pos)(t.x);
+				y += (sl_ui_pos)(t.y);
 			}
 
 			HWND hWnd = ::CreateWindowExW(
@@ -72,7 +74,7 @@ namespace slib
 				, wndClass
 				, text
 				, style
-				, (int)(frame.left), (int)(frame.top)
+				, (int)(x), (int)(y)
 				, (int)(frame.getWidth()), (int)(frame.getHeight())
 				, hWndParent // parent
 				, NULL // menu
