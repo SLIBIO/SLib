@@ -307,6 +307,24 @@ namespace slib
 	static sl_int32 _g_ui_run_loop_level = 0;
 	static sl_bool _g_ui_flag_quit_app = 0;
 
+	static void _priv_UI_quitLoop()
+	{
+		if (_g_ui_run_loop_level > 0) {
+			UIPlatform::quitLoop();
+		} else {
+			UIPlatform::quitApp();
+		}
+	}
+
+	static void _priv_UI_quitApp()
+	{
+		if (_g_ui_flag_quit_app) {
+			return;
+		}
+		_g_ui_flag_quit_app = sl_true;
+		_priv_UI_quitLoop();
+	}
+
 	void UI::runLoop()
 	{
 		if (!(UI::isUiThread())) {
@@ -316,24 +334,16 @@ namespace slib
 		UIPlatform::runLoop(_g_ui_run_loop_level);
 		_g_ui_run_loop_level--;
 		if (_g_ui_flag_quit_app) {
-			if (_g_ui_run_loop_level > 0) {
-				UIPlatform::quitLoop();			
-			} else {
-				UIPlatform::quitApp();
-			}
+			_priv_UI_quitLoop();
 		}
 	}
 
 	void UI::quitLoop()
 	{
-		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThread(&(UI::quitLoop));
-			return;
-		}
-		if (_g_ui_run_loop_level > 0) {
-			UIPlatform::quitLoop();
+		if (UI::isUiThread()) {
+			_priv_UI_quitLoop();
 		} else {
-			quitApp();
+			UI::dispatchToUiThread(&_priv_UI_quitLoop);
 		}
 	}
 
@@ -344,18 +354,10 @@ namespace slib
 
 	void UI::quitApp()
 	{
-		if (_g_ui_flag_quit_app) {
-			return;
-		}
-		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThread(&(UI::quitApp));
-			return;
-		}
-		_g_ui_flag_quit_app = sl_true;
-		if (_g_ui_run_loop_level > 0) {
-			UIPlatform::quitLoop();
+		if (UI::isUiThread()) {
+			_priv_UI_quitApp();
 		} else {
-			UIPlatform::quitApp();
+			UI::dispatchToUiThread(&_priv_UI_quitApp);
 		}
 	}
 
