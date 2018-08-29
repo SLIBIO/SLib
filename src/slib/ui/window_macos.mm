@@ -78,7 +78,7 @@ namespace slib
 					ret->m_heightScreen = heightScreen;
 					NSView* view = [window contentView];
 					if (view != nil) {
-						Ref<ViewInstance> content = UIPlatform::createViewInstance(view, sl_false);
+						Ref<ViewInstance> content = UIPlatform::createViewInstance(view);
 						if (content.isNotNull()) {
 							content->setWindowContent(sl_true);
 							ret->m_viewContent = content;

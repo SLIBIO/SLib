@@ -29,16 +29,13 @@ namespace slib
 		~macOS_ViewInstance();
 		
 	public:
-		static Ref<macOS_ViewInstance> create(NSView* handle, sl_bool flagFreeOnRelease);
+		static Ref<macOS_ViewInstance> create(NSView* handle);
 		
 		static Ref<macOS_ViewInstance> create(NSView* handle, NSView* parent, View* view);
 		
 	public:
-		static void freeHandle(NSView* handle);
-		
 		NSView* getHandle();
 		
-	public:
 		sl_bool isValid() override;
 		
 		void setFocus() override;
@@ -95,7 +92,6 @@ namespace slib
 		
 	protected:
 		NSView* m_handle;
-		sl_bool m_flagFreeOnRelease;
 		
 	};
 

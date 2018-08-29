@@ -28,6 +28,9 @@
 #if defined(SLIB_UI_IS_ANDROID)
 #	include "../core/platform_android.h"
 #endif
+#if defined(SLIB_UI_IS_GTK)
+#	include "gtk/gtk.h"
+#endif
 #if defined(SLIB_UI_IS_EFL)
 enum class EFL_ViewType
 {
@@ -81,7 +84,7 @@ namespace slib
 
 #elif defined(SLIB_UI_IS_MACOS)		
 #	if defined(__OBJC__)
-		static Ref<ViewInstance> createViewInstance(NSView* handle, sl_bool flagFreeOnRelease = sl_true);
+		static Ref<ViewInstance> createViewInstance(NSView* handle);
 		static void registerViewInstance(NSView* handle, ViewInstance* instance);
 		static Ref<ViewInstance> getViewInstance(NSView* handle);
 		static void removeViewInstance(NSView* handle);
@@ -109,7 +112,7 @@ namespace slib
 #	endif		
 #elif defined(SLIB_UI_IS_IOS)
 #	if defined(__OBJC__)
-		static Ref<ViewInstance> createViewInstance(UIView* handle, sl_bool flagFreeOnRelease = sl_true);
+		static Ref<ViewInstance> createViewInstance(UIView* handle);
 		static void registerViewInstance(UIView* handle, ViewInstance* instance);
 		static Ref<ViewInstance> getViewInstance(UIView* handle);
 		static void removeViewInstance(UIView* handle);
@@ -143,7 +146,28 @@ namespace slib
 		static Ref<WindowInstance> getWindowInstance(jobject window);
 		static void removeWindowInstance(jobject window);
 		static jobject getWindowHandle(WindowInstance* instance);
+
+#elif defined(SLIB_UI_IS_GTK)
+		static Ref<ViewInstance> createViewInstance(GtkWidget* handle);
+		static void registerViewInstance(GtkWidget* handle, ViewInstance* instance);
+		static Ref<ViewInstance> getViewInstance(GtkWidget* handle);
+		static Ref<View> getView(GtkWidget* handle);
+		static void removeViewInstance(GtkWidget* handle);
+		static GtkWidget* getViewHandle(ViewInstance* instance);
+		static GtkWidget* getViewHandle(View* view);
 		
+		static Ref<WindowInstance> createWindowInstance(GtkWindow* handle);
+		static Ref<WindowInstance> getWindowInstance(GtkWindow* handle);
+		static void removeWindowInstance(GtkWindow* handle);
+		static GtkWindow* getWindowHandle(WindowInstance* instance);
+		static GtkWindow* getWindowHandle(Window* window);
+
+		static Ref<Screen> createScreen(GdkScreen* handle);
+		static GdkScreen* getScreenHandle(Screen* screen);
+		
+		static sl_bool initializeGtk();
+		static void getGdkColor(const Color& color, GdkColor* outGdkColor);
+
 #elif defined(SLIB_UI_IS_EFL)
 		static Ref<ViewInstance> createViewInstance(EFL_ViewType type, Evas_Object* handle, sl_bool flagFreeOnRelease = sl_true);
 		static void registerViewInstance(Evas_Object* handle, ViewInstance* instance);
@@ -160,6 +184,7 @@ namespace slib
 		static Evas_Object* getWindowHandle(Window* window);
 
 		static Evas_Object* getMainWindow();
+		
 #endif
 		
 	private:

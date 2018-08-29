@@ -29,16 +29,13 @@ namespace slib
 		~iOS_ViewInstance();
 		
 	public:
-		static Ref<iOS_ViewInstance> create(UIView* handle, sl_bool flagFreeOnRelease);
+		static Ref<iOS_ViewInstance> create(UIView* handle);
 		
 		static Ref<iOS_ViewInstance> create(UIView* handle, UIView* parent, View* view);
 
 	public:
-		static void freeHandle(UIView* handle);
-		
 		UIView* getHandle();
 		
-	public:
 		sl_bool isValid() override;
 		
 		void setFocus() override;
@@ -85,7 +82,6 @@ namespace slib
 		
 	protected:
 		UIView* m_handle;
-		sl_bool m_flagFreeOnRelease;
 		sl_bool m_flagDrawing;
 		
 		UISwipeGestureRecognizer* m_gestureSwipeLeft;

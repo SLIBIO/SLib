@@ -37,32 +37,17 @@ namespace slib
 	void iOS_ViewInstance::_release()
 	{
 		UIPlatform::removeViewInstance(m_handle);
-		if (m_flagFreeOnRelease) {
-			freeHandle(m_handle);
-		}
 		m_handle = nil;
 	}
 	
-	void iOS_ViewInstance::freeHandle(UIView* handle)
-	{
-		if (handle != nil) {
-			[handle removeFromSuperview];
-		}
-	}
-	
-	Ref<iOS_ViewInstance> iOS_ViewInstance::create(UIView* handle, sl_bool flagFreeOnRelease)
+	Ref<iOS_ViewInstance> iOS_ViewInstance::create(UIView* handle)
 	{
 		if (handle != nil) {
 			Ref<iOS_ViewInstance> ret = new iOS_ViewInstance();
 			if (ret.isNotNull()) {
 				ret->m_handle = handle;
-				ret->m_flagFreeOnRelease = flagFreeOnRelease;
 				UIPlatform::registerViewInstance(handle, ret.get());
 				return ret;
-			} else {
-				if (flagFreeOnRelease) {
-					freeHandle(handle);
-				}
 			}
 		}
 		return sl_null;
@@ -73,7 +58,7 @@ namespace slib
 
 		if (handle != nil) {
 			
-			Ref<iOS_ViewInstance> instance = create(handle, sl_true);
+			Ref<iOS_ViewInstance> instance = create(handle);
 			
 			if (instance.isNotNull()) {
 				
@@ -554,13 +539,13 @@ IOS_VIEW_EVENTS
 
 namespace slib
 {
-	Ref<ViewInstance> UIPlatform::createViewInstance(UIView* handle, sl_bool flagFreeOnRelease)
+	Ref<ViewInstance> UIPlatform::createViewInstance(UIView* handle)
 	{
 		Ref<ViewInstance> ret = UIPlatform::_getViewInstance((__bridge void*)handle);
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		return iOS_ViewInstance::create(handle, flagFreeOnRelease);
+		return iOS_ViewInstance::create(handle);
 	}
 	
 	void UIPlatform::registerViewInstance(UIView* handle, ViewInstance* instance)
