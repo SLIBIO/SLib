@@ -167,6 +167,7 @@ namespace slib
 		
 		static sl_bool initializeGtk();
 		static void getGdkColor(const Color& color, GdkColor* outGdkColor);
+		static void getScreenLocationOfWidget(GtkWidget* widget, sl_ui_len* out_x = sl_null, sl_ui_len* out_y = sl_null);
 
 #elif defined(SLIB_UI_IS_EFL)
 		static Ref<ViewInstance> createViewInstance(EFL_ViewType type, Evas_Object* handle, sl_bool flagFreeOnRelease = sl_true);
