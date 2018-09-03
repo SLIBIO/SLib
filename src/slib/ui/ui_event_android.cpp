@@ -213,46 +213,6 @@ namespace slib
 		return Keycode::Unknown;
 	}
 
-	sl_bool UI::checkKeyPressed(Keycode key)
-	{
-		return sl_false;
-	}
-
-	sl_bool UI::checkCapsLockOn()
-	{
-		return sl_false;
-	}
-
-	sl_bool UI::checkNumLockOn()
-	{
-		return sl_false;
-	}
-
-	sl_bool UI::checkScrollLockOn()
-	{
-		return sl_false;
-	}
-
-	UIPoint UI::getCursorPos()
-	{
-		return UIPoint(0, 0);
-	}
-
-	sl_bool UI::checkLeftButtonPressed()
-	{
-		return sl_false;
-	}
-
-	sl_bool UI::checkRightButtonPressed()
-	{
-		return sl_false;
-	}
-
-	sl_bool UI::checkMiddleButtonPressed()
-	{
-		return sl_false;
-	}
-
 }
 
 #endif

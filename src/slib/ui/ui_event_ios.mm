@@ -18,6 +18,7 @@
 
 namespace slib
 {
+	
 	sl_uint32 UIEvent::getSystemKeycode(Keycode key)
 	{
 		return -1;
@@ -28,46 +29,6 @@ namespace slib
 		return Keycode::Unknown;
 	}
 	
-	sl_bool UI::checkKeyPressed(Keycode key)
-	{
-		return sl_false;
-	}
-	
-	sl_bool UI::checkCapsLockOn()
-	{
-		return sl_false;
-	}
-	
-	sl_bool UI::checkNumLockOn()
-	{
-		return sl_false;
-	}
-	
-	sl_bool UI::checkScrollLockOn()
-	{
-		return sl_false;
-	}
-	
-	
-	UIPoint UI::getCursorPos()
-	{
-		return UIPoint::zero();
-	}
-	
-	sl_bool UI::checkLeftButtonPressed()
-	{
-		return sl_false;
-	}
-	
-	sl_bool UI::checkRightButtonPressed()
-	{
-		return sl_false;
-	}
-	
-	sl_bool UI::checkMiddleButtonPressed()
-	{
-		return sl_false;
-	}	
 }
 
 #endif

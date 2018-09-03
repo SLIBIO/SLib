@@ -93,30 +93,26 @@ namespace slib
 		static void showAlert(const String& caption, const String& text, const Function<void()>& onOk);
 		
 		
-		// HID related functions (Platform Specific, only for desktop apps)
+		// HID related functions (Platform Specific)
+#if defined(SLIB_UI_IS_WIN32) || defined(SLIB_UI_IS_MACOS)
 		static sl_bool checkKeyPressed(Keycode key);
-		
-		static sl_bool checkCapsLockOn();
-		
+
 		static sl_bool checkScrollLockOn();
 		
 		static sl_bool checkNumLockOn();
 		
-		static UIPoint getCursorPos();
-		
 		static sl_bool checkLeftButtonPressed();
 		
 		static sl_bool checkRightButtonPressed();
-		
-		static sl_bool checkMiddleButtonPressed();
-		
-		static String getStatesDescription();
-		
-		
-		// HID related functions
-		static String getKeyName(Keycode key, sl_bool flagShort = sl_false);
 
-		static Keycode getKeycodeFromName(const String& keyName);
+		static sl_bool checkMiddleButtonPressed();				
+#endif
+		
+#if defined(SLIB_UI_IS_WIN32) || defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_GTK)
+		static sl_bool checkCapsLockOn();
+		
+		static UIPoint getCursorPos();
+#endif
 		
 		// UI Thread
 		static sl_bool isUiThread();

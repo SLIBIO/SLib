@@ -129,7 +129,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 			sb.addStatic("Alt+", 4);
 #endif
 		}
-		sb.add(UI::getKeyName(getKeycode(), sl_true));
+		sb.add(UIEvent::getKeyName(getKeycode(), sl_true));
 		return sb.merge();
 	}
 
@@ -151,7 +151,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 			} else if (s == "command" || s == "window" || s == "win") {
 				km |= Modifiers::Windows;
 			} else {
-				Keycode keycode = UI::getKeycodeFromName(s);
+				Keycode keycode = UIEvent::getKeycodeFromName(s);
 				if (keycode == Keycode::Unknown) {
 					return sl_false;
 				}
@@ -818,7 +818,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	SLIB_SAFE_STATIC_GETTER(_priv_UIKeyNameMapper, _priv_UI_getKeyNameMapper)
 
-	String UI::getKeyName(Keycode code, sl_bool flagShort)
+	String UIEvent::getKeyName(Keycode code, sl_bool flagShort)
 	{
 		_priv_UIKeyNameMapper* mapper = _priv_UI_getKeyNameMapper();
 		if (mapper) {
@@ -827,7 +827,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 		return sl_null;
 	}
 
-	Keycode UI::getKeycodeFromName(const String& keyName)
+	Keycode UIEvent::getKeycodeFromName(const String& keyName)
 	{
 		_priv_UIKeyNameMapper* mapper = _priv_UI_getKeyNameMapper();
 		if (mapper) {
@@ -1069,7 +1069,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 		}
 		Log(name, "%s %s VK-%d %s",
 			str,
-			UI::getKeyName(event->getKeycode()),
+			UIEvent::getKeyName(event->getKeycode()),
 			event->getSystemKeycode(),
 			getModifierText(event));
 	}
@@ -1160,55 +1160,6 @@ sl_bool UIEvent::is##NAME##Key() const \
 	void UIEventLogListener::processMouseWheel(String name, UIEvent* event)
 	{
 		Log(name, "MouseWheel (%f, %f) %s", event->getDeltaX(), event->getDeltaY(), getModifierText(event));
-	}
-
-	String UI::getStatesDescription()
-	{
-		String str;
-		if (UI::checkKeyPressed(Keycode::LeftShift)) {
-			str += "LSHIFT ";
-		}
-		if (UI::checkKeyPressed(Keycode::RightShift)) {
-			str += "RSHIFT ";
-		}
-		if (UI::checkKeyPressed(Keycode::LeftControl)) {
-			str += "LCTRL ";
-		}
-		if (UI::checkKeyPressed(Keycode::RightControl)) {
-			str += "RCTRL ";
-		}
-		if (UI::checkKeyPressed(Keycode::LeftCommand)) {
-			str += "LWIN ";
-		}
-		if (UI::checkKeyPressed(Keycode::RightCommand)) {
-			str += "RWIN ";
-		}
-		if (UI::checkKeyPressed(Keycode::LeftAlt)) {
-			str += "LALT ";
-		}
-		if (UI::checkKeyPressed(Keycode::RightAlt)) {
-			str += "RALT ";
-		}
-		if (UI::checkCapsLockOn()) {
-			str += "CAPS ";
-		}
-		if (UI::checkScrollLockOn()) {
-			str += "SCROLL ";
-		}
-		if (UI::checkNumLockOn()) {
-			str += "NUM ";
-		}
-		if (UI::checkLeftButtonPressed()) {
-			str += "LBUTTON ";
-		}
-		if (UI::checkRightButtonPressed()) {
-			str += "RBUTTON ";
-		}
-		if (UI::checkMiddleButtonPressed()) {
-			str += "MBUTTON ";
-		}
-		Point pt = getCursorPos();
-		return String::format("%s MOUSE(%d, %d)", str, (sl_int32)(pt.x), (sl_int32)(pt.y));
 	}
 
 }

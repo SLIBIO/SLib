@@ -322,7 +322,11 @@ namespace slib
 		static sl_uint32 getSystemKeycode(Keycode key);
 		
 		static Keycode getKeycodeFromSystemKeycode(sl_uint32 systemKeycode);
-
+		
+		static String getKeyName(Keycode key, sl_bool flagShort = sl_false);
+		
+		static Keycode getKeycodeFromName(const String& keyName);
+		
 	protected:
 		sl_uint32 m_flags;
 		UIAction m_action;
