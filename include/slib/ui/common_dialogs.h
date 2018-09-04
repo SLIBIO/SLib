@@ -30,73 +30,19 @@ namespace slib
 		YesNoCancel = 3
 	};
 
+	enum class AlertDialogIcon
+	{
+		None = 0,
+		Information = 1,
+		Warning = 2,
+		Question = 3,
+		Error = 4
+	};
+	
 	class Window;
 
 	class SLIB_EXPORT AlertDialog : public Referable
 	{
-	public:
-		static void run(const String& text);
-		
-		static void run(const Ref<Window>& parent, const String& text);
-		
-		static void run(const String& caption, const String& text);
-		
-		static void run(const Ref<Window>& parent, const String& caption, const String& text);
-		
-		static void show(const String& text);
-
-		static void show(const String& text, const Function<void()>& onOk);
-		
-		static void show(const String& caption, const String& text, const Function<void()>& onOk);
-
-		static DialogResult runOkCancel(const String& text);
-		
-		static DialogResult runOkCancel(const Ref<Window>& parent, const String& text);
-		
-		static DialogResult runOkCancel(const String& caption, const String& text);
-		
-		static DialogResult runOkCancel(const Ref<Window>& parent, const String& caption, const String& text);
-		
-		static void showOkCancel(const String& text, const Function<void()>& onOk, const Function<void()>& onCancel);
-		
-		static void showOkCancel(const String& caption, const String& text, const Function<void()>& onOk, const Function<void()>& onCancel);
-		
-		static void showOkCancel(const String& text, const Function<void()>& onOk);
-		
-		static void showOkCancel(const String& caption, const String& text, const Function<void()>& onOk);
-		
-		static DialogResult runYesNo(const String& text);
-		
-		static DialogResult runYesNo(const Ref<Window>& parent, const String& text);
-		
-		static DialogResult runYesNo(const String& caption, const String& text);
-		
-		static DialogResult runYesNo(const Ref<Window>& parent, const String& caption, const String& text);
-		
-		static void showYesNo(const String& text, const Function<void()>& onYes, const Function<void()>& onNo);
-		
-		static void showYesNo(const String& caption, const String& text, const Function<void()>& onYes, const Function<void()>& onNo);
-		
-		static void showYesNo(const String& text, const Function<void()>& onYes);
-		
-		static void showYesNo(const String& caption, const String& text, const Function<void()>& onYes);
-		
-		static DialogResult runYesNoCancel(const String& text);
-		
-		static DialogResult runYesNoCancel(const Ref<Window>& parent, const String& text);
-		
-		static DialogResult runYesNoCancel(const String& caption, const String& text);
-		
-		static DialogResult runYesNoCancel(const Ref<Window>& parent, const String& caption, const String& text);
-		
-		static void showYesNoCancel(const String& text, const Function<void()>& onYes, const Function<void()>& onNo, const Function<void()>& onCancel);
-		
-		static void showYesNoCancel(const String& caption, const String& text, const Function<void()>& onYes, const Function<void()>& onNo, const Function<void()>& onCancel);
-		
-		static void showYesNoCancel(const String& text, const Function<void()>& onYes, const Function<void()>& onNo);
-		
-		static void showYesNoCancel(const String& caption, const String& text, const Function<void()>& onYes, const Function<void()>& onNo);
-		
 	public:
 		AlertDialog();
 		
@@ -110,11 +56,12 @@ namespace slib
 		void show();
 
 	public:
-		AlertDialogButtons buttons;
 		Ref<Window> parent;
 		String caption;
 		String text;
-		
+		AlertDialogButtons buttons;
+		AlertDialogIcon icon;
+
 		String titleOk;
 		String titleCancel;
 		String titleYes;

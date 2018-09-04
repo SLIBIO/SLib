@@ -57,7 +57,19 @@ namespace slib
 
 		NSAlert* alert = [[NSAlert alloc] init];
 		[alert setMessageText:text];
-		[alert setAlertStyle:NSInformationalAlertStyle];
+		NSAlertStyle style;
+		switch (icon) {
+			case AlertDialogIcon::Error:
+				style = NSAlertStyleCritical;
+				break;
+			case AlertDialogIcon::Warning:
+				style = NSAlertStyleWarning;
+				break;
+			default:
+				style = NSAlertStyleInformational;
+				break;
+		}
+		[alert setAlertStyle:style];
 		[[alert window] setTitle:caption];
 		if (buttons == AlertDialogButtons::OkCancel) {
 			[alert addButtonWithTitle:titleOk];

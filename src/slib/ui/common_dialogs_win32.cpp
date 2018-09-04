@@ -92,7 +92,8 @@ namespace slib
 
 	DialogResult AlertDialog::_run()
 	{
-		int style = MB_OK;
+		int style;
+
 		switch (buttons) {
 		case AlertDialogButtons::OkCancel:
 			style = MB_OKCANCEL;
@@ -103,7 +104,28 @@ namespace slib
 		case AlertDialogButtons::YesNoCancel:
 			style = MB_YESNOCANCEL;
 			break;
+		default:
+			style = MB_OK;
+			break;
 		}
+
+		switch (icon) {
+		case AlertDialogIcon::Error:
+			style |= MB_ICONERROR;
+			break;
+		case AlertDialogIcon::Warning:
+			style |= MB_ICONWARNING;
+			break;
+		case AlertDialogIcon::Question:
+			style |= MB_ICONQUESTION;
+			break;
+		case AlertDialogIcon::Information:
+			style |= MB_ICONINFORMATION;
+			break;
+		default:
+			break;
+		}
+
 		HWND hWndParent = UIPlatform::getWindowHandle(parent.get());
 		if (!hWndParent) {
 			style |= MB_TASKMODAL;
