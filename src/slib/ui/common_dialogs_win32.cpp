@@ -46,14 +46,14 @@ namespace slib
 		String16 caption = alert->caption;
 		::SetWindowTextW(hWndMsg, (LPCWSTR)(caption.getData()));
 
-		switch (alert->type) {
-		case AlertDialogType::Ok:
+		switch (alert->buttons) {
+		case AlertDialogButtons::Ok:
 			if (alert->titleOk.isNotNull()) {
 				String16 titleOk = alert->titleOk;
 				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleOk.getData()));
 			}
 			break;
-		case AlertDialogType::OkCancel:
+		case AlertDialogButtons::OkCancel:
 			if (alert->titleOk.isNotNull()) {
 				String16 titleOk = alert->titleOk;
 				::SetDlgItemTextW(hWndMsg, 1, (LPCWSTR)(titleOk.getData()));
@@ -63,7 +63,7 @@ namespace slib
 				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getData()));
 			}
 			break;
-		case AlertDialogType::YesNo:
+		case AlertDialogButtons::YesNo:
 			if (alert->titleYes.isNotNull()) {
 				String16 titleYes = alert->titleYes;
 				::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getData()));
@@ -73,7 +73,7 @@ namespace slib
 				::SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getData()));
 			}
 			break;
-		case AlertDialogType::YesNoCancel:
+		case AlertDialogButtons::YesNoCancel:
 			if (alert->titleYes.isNotNull()) {
 				String16 titleYes = alert->titleYes;
 				::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getData()));
@@ -93,14 +93,14 @@ namespace slib
 	DialogResult AlertDialog::_run()
 	{
 		int style = MB_OK;
-		switch (type) {
-		case AlertDialogType::OkCancel:
+		switch (buttons) {
+		case AlertDialogButtons::OkCancel:
 			style = MB_OKCANCEL;
 			break;
-		case AlertDialogType::YesNo:
+		case AlertDialogButtons::YesNo:
 			style = MB_YESNO;
 			break;
-		case AlertDialogType::YesNoCancel:
+		case AlertDialogButtons::YesNoCancel:
 			style = MB_YESNOCANCEL;
 			break;
 		}

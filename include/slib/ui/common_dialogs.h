@@ -22,7 +22,7 @@
 namespace slib
 {
 
-	enum class AlertDialogType
+	enum class AlertDialogButtons
 	{
 		Ok = 0,
 		OkCancel = 1,
@@ -110,7 +110,7 @@ namespace slib
 		void show();
 
 	public:
-		AlertDialogType type;
+		AlertDialogButtons buttons;
 		Ref<Window> parent;
 		String caption;
 		String text;

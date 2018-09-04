@@ -85,7 +85,7 @@ namespace slib
 
 				JniLocal<jobject> jalert = JAndroidAlert::init.newObject(sl_null);
 				if (jalert.isNotNull()) {
-					JAndroidAlert::type.set(jalert, (int)(type));
+					JAndroidAlert::type.set(jalert, (int)(buttons));
 					JAndroidAlert::caption.set(jalert, caption);
 					JAndroidAlert::text.set(jalert, text);
 					jlong lresult = (jlong)(result.get());

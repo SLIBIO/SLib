@@ -22,7 +22,7 @@ namespace slib
 
 	AlertDialog::AlertDialog()
 	{
-		type = AlertDialogType::Ok;
+		buttons = AlertDialogButtons::Ok;
 	}
 
 	AlertDialog::AlertDialog(const AlertDialog& other) = default;
@@ -169,9 +169,9 @@ namespace slib
 	void _priv_AlertDialog_Show(const Ref<AlertDialog>& alert)
 	{
 		if (!(alert->_show())) {
-			if (alert->type == AlertDialogType::Ok) {
+			if (alert->buttons == AlertDialogButtons::Ok) {
 				alert->onOk();
-			} else if (alert->type == AlertDialogType::YesNo) {
+			} else if (alert->buttons == AlertDialogButtons::YesNo) {
 				alert->onNo();
 			} else {
 				alert->onCancel();
@@ -205,9 +205,9 @@ namespace slib
 				alert->onNo();
 				break;
 			default:
-				if (alert->type == AlertDialogType::Ok) {
+				if (alert->buttons == AlertDialogButtons::Ok) {
 					alert->onOk();
-				} else if (alert->type == AlertDialogType::YesNo) {
+				} else if (alert->buttons == AlertDialogButtons::YesNo) {
 					alert->onNo();
 				} else {
 					alert->onCancel();
@@ -292,7 +292,7 @@ namespace slib
 	DialogResult AlertDialog::runOkCancel(const String& text)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::OkCancel;
+		alert.buttons = AlertDialogButtons::OkCancel;
 		alert.text = text;
 		return alert.run();
 	}
@@ -300,7 +300,7 @@ namespace slib
 	DialogResult AlertDialog::runOkCancel(const Ref<Window>& parent, const String& text)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::OkCancel;
+		alert.buttons = AlertDialogButtons::OkCancel;
 		alert.text = text;
 		alert.parent = parent;
 		return alert.run();
@@ -309,7 +309,7 @@ namespace slib
 	DialogResult AlertDialog::runOkCancel(const String& caption, const String& text)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::OkCancel;
+		alert.buttons = AlertDialogButtons::OkCancel;
 		alert.caption = caption;
 		alert.text = text;
 		return alert.run();
@@ -318,7 +318,7 @@ namespace slib
 	DialogResult AlertDialog::runOkCancel(const Ref<Window>& parent, const String& caption, const String& text)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::OkCancel;
+		alert.buttons = AlertDialogButtons::OkCancel;
 		alert.caption = caption;
 		alert.text = text;
 		alert.parent = parent;
@@ -328,7 +328,7 @@ namespace slib
 	void AlertDialog::showOkCancel(const String& text, const Function<void()>& onOk, const Function<void()>& onCancel)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::OkCancel;
+		alert.buttons = AlertDialogButtons::OkCancel;
 		alert.text = text;
 		alert.onOk = onOk;
 		alert.onCancel = onCancel;
@@ -338,7 +338,7 @@ namespace slib
 	void AlertDialog::showOkCancel(const String& caption, const String& text, const Function<void()>& onOk, const Function<void()>& onCancel)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::OkCancel;
+		alert.buttons = AlertDialogButtons::OkCancel;
 		alert.caption = caption;
 		alert.text = text;
 		alert.onOk = onOk;
@@ -349,7 +349,7 @@ namespace slib
 	void AlertDialog::showOkCancel(const String& text, const Function<void()>& onOk)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::OkCancel;
+		alert.buttons = AlertDialogButtons::OkCancel;
 		
 		alert.text = text;
 		alert.onOk = onOk;
@@ -359,7 +359,7 @@ namespace slib
 	void AlertDialog::showOkCancel(const String& caption, const String& text, const Function<void()>& onOk)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::OkCancel;
+		alert.buttons = AlertDialogButtons::OkCancel;
 		alert.caption = caption;
 		alert.text = text;
 		alert.onOk = onOk;
@@ -369,7 +369,7 @@ namespace slib
 	DialogResult AlertDialog::runYesNo(const String& text)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNo;
+		alert.buttons = AlertDialogButtons::YesNo;
 		alert.text = text;
 		return alert.run();
 	}
@@ -377,7 +377,7 @@ namespace slib
 	DialogResult AlertDialog::runYesNo(const Ref<Window>& parent, const String& text)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNo;
+		alert.buttons = AlertDialogButtons::YesNo;
 		alert.text = text;
 		alert.parent = parent;
 		return alert.run();
@@ -386,7 +386,7 @@ namespace slib
 	DialogResult AlertDialog::runYesNo(const String& caption, const String& text)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNo;
+		alert.buttons = AlertDialogButtons::YesNo;
 		alert.caption = caption;
 		alert.text = text;
 		return alert.run();
@@ -395,7 +395,7 @@ namespace slib
 	DialogResult AlertDialog::runYesNo(const Ref<Window>& parent, const String& caption, const String& text)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNo;
+		alert.buttons = AlertDialogButtons::YesNo;
 		alert.caption = caption;
 		alert.text = text;
 		alert.parent = parent;
@@ -405,7 +405,7 @@ namespace slib
 	void AlertDialog::showYesNo(const String& text, const Function<void()>& onYes, const Function<void()>& onNo)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNo;
+		alert.buttons = AlertDialogButtons::YesNo;
 		alert.text = text;
 		alert.onYes = onYes;
 		alert.onNo = onNo;
@@ -415,7 +415,7 @@ namespace slib
 	void AlertDialog::showYesNo(const String& caption, const String& text, const Function<void()>& onYes, const Function<void()>& onNo)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNo;
+		alert.buttons = AlertDialogButtons::YesNo;
 		alert.caption = caption;
 		alert.text = text;
 		alert.onYes = onYes;
@@ -426,7 +426,7 @@ namespace slib
 	void AlertDialog::showYesNo(const String& text, const Function<void()>& onYes)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNo;
+		alert.buttons = AlertDialogButtons::YesNo;
 		
 		alert.text = text;
 		alert.onYes = onYes;
@@ -436,7 +436,7 @@ namespace slib
 	void AlertDialog::showYesNo(const String& caption, const String& text, const Function<void()>& onYes)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNo;
+		alert.buttons = AlertDialogButtons::YesNo;
 		alert.caption = caption;
 		alert.text = text;
 		alert.onYes = onYes;
@@ -446,7 +446,7 @@ namespace slib
 	DialogResult AlertDialog::runYesNoCancel(const String& text)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNoCancel;
+		alert.buttons = AlertDialogButtons::YesNoCancel;
 		alert.text = text;
 		return alert.run();
 	}
@@ -454,7 +454,7 @@ namespace slib
 	DialogResult AlertDialog::runYesNoCancel(const Ref<Window>& parent, const String& text)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNoCancel;
+		alert.buttons = AlertDialogButtons::YesNoCancel;
 		alert.text = text;
 		alert.parent = parent;
 		return alert.run();
@@ -463,7 +463,7 @@ namespace slib
 	DialogResult AlertDialog::runYesNoCancel(const String& caption, const String& text)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNoCancel;
+		alert.buttons = AlertDialogButtons::YesNoCancel;
 		alert.caption = caption;
 		alert.text = text;
 		return alert.run();
@@ -472,7 +472,7 @@ namespace slib
 	DialogResult AlertDialog::runYesNoCancel(const Ref<Window>& parent, const String& caption, const String& text)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNoCancel;
+		alert.buttons = AlertDialogButtons::YesNoCancel;
 		alert.caption = caption;
 		alert.text = text;
 		alert.parent = parent;
@@ -482,7 +482,7 @@ namespace slib
 	void AlertDialog::showYesNoCancel(const String& text, const Function<void()>& onYes, const Function<void()>& onNo, const Function<void()>& onCancel)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNoCancel;
+		alert.buttons = AlertDialogButtons::YesNoCancel;
 		alert.text = text;
 		alert.onYes = onYes;
 		alert.onNo = onNo;
@@ -493,7 +493,7 @@ namespace slib
 	void AlertDialog::showYesNoCancel(const String& caption, const String& text, const Function<void()>& onYes, const Function<void()>& onNo, const Function<void()>& onCancel)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNoCancel;
+		alert.buttons = AlertDialogButtons::YesNoCancel;
 		alert.caption = caption;
 		alert.text = text;
 		alert.onYes = onYes;
@@ -505,7 +505,7 @@ namespace slib
 	void AlertDialog::showYesNoCancel(const String& text, const Function<void()>& onYes, const Function<void()>& onNo)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNoCancel;
+		alert.buttons = AlertDialogButtons::YesNoCancel;
 		alert.text = text;
 		alert.onYes = onYes;
 		alert.onNo = onNo;
@@ -515,7 +515,7 @@ namespace slib
 	void AlertDialog::showYesNoCancel(const String& caption, const String& text, const Function<void()>& onYes, const Function<void()>& onNo)
 	{
 		AlertDialog alert;
-		alert.type = AlertDialogType::YesNoCancel;
+		alert.buttons = AlertDialogButtons::YesNoCancel;
 		alert.caption = caption;
 		alert.text = text;
 		alert.onYes = onYes;

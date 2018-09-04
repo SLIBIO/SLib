@@ -39,7 +39,7 @@ namespace slib
 	
 	sl_bool AlertDialog::_show()
 	{
-		AlertDialogType type = this->type;
+		AlertDialogButtons buttons = this->buttons;
 		NSString* caption = Apple::getNSStringFromString(this->caption);
 		NSString* text = Apple::getNSStringFromString(this->text);
 		NSString* titleOk = Apple::getNSStringFromString(this->titleOk);
@@ -67,7 +67,7 @@ namespace slib
 		
 		if (alert != nil) {
 			
-			if (type == AlertDialogType::OkCancel) {
+			if (buttons == AlertDialogButtons::OkCancel) {
 				UIAlertAction* actionOK = [UIAlertAction actionWithTitle:titleOk style:UIAlertActionStyleDefault handler:
 										   ^(UIAlertAction *) {
 											   onOk();
@@ -78,7 +78,7 @@ namespace slib
 											   }];
 				[alert addAction:actionOK];
 				[alert addAction:actionCancel];
-			} else if (type == AlertDialogType::YesNo) {
+			} else if (buttons == AlertDialogButtons::YesNo) {
 				UIAlertAction* actionYes = [UIAlertAction actionWithTitle:titleYes style:UIAlertActionStyleDefault handler:
 											^(UIAlertAction *) {
 												onYes();
@@ -89,7 +89,7 @@ namespace slib
 										   }];
 				[alert addAction:actionYes];
 				[alert addAction:actionNo];
-			} else if (type == AlertDialogType::YesNoCancel) {
+			} else if (buttons == AlertDialogButtons::YesNoCancel) {
 				UIAlertAction* actionYes = [UIAlertAction actionWithTitle:titleYes style:UIAlertActionStyleDefault handler:
 											^(UIAlertAction *) {
 												onYes();

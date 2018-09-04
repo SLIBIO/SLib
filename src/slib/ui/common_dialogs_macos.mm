@@ -59,19 +59,19 @@ namespace slib
 		[alert setMessageText:text];
 		[alert setAlertStyle:NSInformationalAlertStyle];
 		[[alert window] setTitle:caption];
-		if (type == AlertDialogType::OkCancel) {
+		if (buttons == AlertDialogButtons::OkCancel) {
 			[alert addButtonWithTitle:titleOk];
 			NSButton* btnCancel = [alert addButtonWithTitle:titleCancel];
 			[btnCancel setKeyEquivalent:@"Cancel"];
 			result1 = DialogResult::Ok;
 			result2 = DialogResult::Cancel;
-		} else if (type == AlertDialogType::YesNo) {
+		} else if (buttons == AlertDialogButtons::YesNo) {
 			[alert addButtonWithTitle:titleYes];
 			NSButton* btnNo = [alert addButtonWithTitle:titleNo];
 			[btnNo setKeyEquivalent:@"Don't Save"];
 			result1 = DialogResult::Yes;
 			result2 = DialogResult::No;
-		} else if (type == AlertDialogType::YesNoCancel) {
+		} else if (buttons == AlertDialogButtons::YesNoCancel) {
 			[alert addButtonWithTitle:titleYes];
 			NSButton* btnCancel = [alert addButtonWithTitle:titleCancel];
 			[btnCancel setKeyEquivalent:@"Cancel"];

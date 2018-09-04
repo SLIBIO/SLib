@@ -96,7 +96,7 @@ namespace slib
 
 	sl_bool AlertDialog::_show()
 	{
-		AlertDialogType type = this->type;
+		AlertDialogButtons buttons = this->buttons;
 
 		Evas_Object* win;
 		Ref<Window> parent = this->parent;
@@ -151,7 +151,7 @@ namespace slib
 			titleNo = "No";
 		}
 		
-		if (type == AlertDialogType::OkCancel) {
+		if (buttons == AlertDialogButtons::OkCancel) {
 			Evas_Object* button1 = ::elm_button_add(popup);
 			::elm_object_text_set(button1, titleOk.getData());
 			::evas_object_smart_callback_add(button1, "clicked", _priv_AlertDialog_ok_cb, container);
@@ -162,7 +162,7 @@ namespace slib
 			::elm_object_part_content_set(popup, "button2", button2);
 			::eext_object_event_callback_add(popup, EEXT_CALLBACK_BACK, _priv_AlertDialog_cancel_cb, container);
 			::evas_object_smart_callback_add(popup, "block,clicked", _priv_AlertDialog_cancel_cb, container);
-		} else if (type == AlertDialogType::YesNo) {
+		} else if (buttons == AlertDialogButtons::YesNo) {
 			Evas_Object* button1 = ::elm_button_add(popup);
 			::elm_object_text_set(button1, titleYes.getData());
 			::evas_object_smart_callback_add(button1, "clicked", _priv_AlertDialog_yes_cb, container);
@@ -171,7 +171,7 @@ namespace slib
 			::elm_object_text_set(button2, titleNo.getData());
 			::evas_object_smart_callback_add(button2, "clicked", _priv_AlertDialog_no_cb, container);
 			::elm_object_part_content_set(popup, "button2", button2);
-		} else if (type == AlertDialogType::YesNoCancel) {
+		} else if (buttons == AlertDialogButtons::YesNoCancel) {
 			Evas_Object* button1 = ::elm_button_add(popup);
 			::elm_object_text_set(button1, titleYes.getData());
 			::evas_object_smart_callback_add(button1, "clicked", _priv_AlertDialog_yes_cb, container);
