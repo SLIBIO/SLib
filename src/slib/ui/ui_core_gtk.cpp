@@ -55,7 +55,6 @@ namespace slib
 				if (ret.isNotNull()) {
 					g_object_ref_sink(screen);
 					ret->m_screen = screen;
-					ret->m_flagFreeOnRelease = flagFreeOnRelease;
 					UIRect region;
 					region.left = 0;
 					region.top = 0;
@@ -114,10 +113,10 @@ namespace slib
 
 	Ref<Screen> UIPlatform::createScreen(GdkScreen* handle)
 	{
-		return _priv_GTK_Screen::create(handle, flagFreeOnRelease);
+		return _priv_GTK_Screen::create(handle);
 	}
 	
-	GdkScreen* UIPlatform::getScreenHandle(Screen* screen)
+	GdkScreen* UIPlatform::getScreenHandle(Screen* _screen)
 	{
 		_priv_GTK_Screen* screen = (_priv_GTK_Screen*)_screen;
 		if (screen) {

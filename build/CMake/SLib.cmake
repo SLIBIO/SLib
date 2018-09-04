@@ -35,10 +35,20 @@ if (SLIB_ARM AND NOT SLIB_ARM64)
  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpu=neon") 
 endif ()
 
-include_directories (
- "${SLIB_PATH}/include"
- "${SLIB_PATH}/external/include"
-)
+if (ANDROID)
+ include_directories (
+  "${SLIB_PATH}/include"
+  "${SLIB_PATH}/external/include"
+ )
+else ()
+ include_directories (
+  "${SLIB_PATH}/include"
+  "${SLIB_PATH}/external/include"
+  "${SLIB_PATH}/external/include/glib"
+  "${SLIB_PATH}/external/include/gtk"
+ )
+endif ()
+
 link_directories(
  "${SLIB_LIB_PATH}"
 )
@@ -96,8 +106,11 @@ else ()
  file (
   GLOB SLIB_EXTRA_FILES
   "${SLIB_PATH}/src/slib/graphics/*.cpp"
+  "${SLIB_PATH}/src/slib/render/*.cpp"
+  "${SLIB_PATH}/src/slib/ui/*.cpp"
   "${SLIB_PATH}/src/slib/media/*.cpp"
   "${SLIB_PATH}/src/slib/db/*.cpp"
+  "${SLIB_PATH}/src/slib/geo/*.cpp"
   "${SLIB_PATH}/src/slib/web/*.cpp"
  )
 endif ()

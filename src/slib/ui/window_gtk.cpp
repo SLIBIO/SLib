@@ -84,7 +84,7 @@ namespace slib
 				gtk_container_add((GtkContainer*)window, contentWidget);
 				gtk_widget_show(contentWidget);
 			}
-			Ref<GTK_ViewInstance> content = GTK_ViewInstance::create<GTK_ViewInstance>(window);
+			Ref<GTK_ViewInstance> content = GTK_ViewInstance::create<GTK_ViewInstance>((GtkWidget*)window);
 			if (content.isNotNull()) {
 				content->setChildrenContainer(contentWidget);
 				content->setWindowContent(sl_true);
