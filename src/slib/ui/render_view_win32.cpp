@@ -113,9 +113,8 @@ namespace slib
 					return ret;
 				}
 			}
-			ret.setNull();
 		}
-		return ret;
+		return sl_null;
 	}
 
 	void RenderView::_setRedrawMode_NW(RedrawMode mode)
