@@ -16,6 +16,7 @@
 #include "opengl_engine.h"
 #include "opengl_wgl.h"
 #include "opengl_egl.h"
+#include "opengl_glx.h"
 
 #define PRIV_SLIB_RENDER_ENTRIES_CLASS GLES
 #define PRIV_SLIB_RENDER_ENTRIES_CLASS_GLES
