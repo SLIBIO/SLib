@@ -104,17 +104,18 @@ namespace slib
 		
 		static void applyModifiers(UIEvent* event, guint state);
 		
-		gboolean onExposeEvent(GdkEventExpose* event);
+	public:
+		virtual gboolean onExposeEvent(GdkEventExpose* event);
 		
-		gboolean onMotionNotifyEvent(GdkEventMotion* event);
+		virtual gboolean onMotionNotifyEvent(GdkEventMotion* event);
 		
-		gboolean onButtonEvent(GdkEventButton* event);
+		virtual gboolean onButtonEvent(GdkEventButton* event);
 		
-		gboolean onCrossingEvent(GdkEventCrossing* event);
+		virtual gboolean onCrossingEvent(GdkEventCrossing* event);
 
-		gboolean onKeyEvent(GdkEventKey* event);
+		virtual gboolean onKeyEvent(GdkEventKey* event);
 
-		gboolean onScrollEvent(GdkEventScroll* event);
+		virtual gboolean onScrollEvent(GdkEventScroll* event);
 		
 	private:
 		void _init(GtkWidget* handle);
