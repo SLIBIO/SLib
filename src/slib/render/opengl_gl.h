@@ -1130,6 +1130,13 @@ namespace slib
 
 #define PRIV_GL_ENTRY(name) name
 
+#else
+
+#define GL3_PROTOTYPES
+#include "gl/GL/gl3.h"
+
+#define PRIV_GL_ENTRY(name) name
+
 #endif
 
 #endif
