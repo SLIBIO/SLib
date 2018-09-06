@@ -87,6 +87,7 @@ namespace slib
 							}
 						}
 					}
+					UIPlatform::registerWindowInstance(window, ret.get());
 					return ret;
 				}
 			}
@@ -158,7 +159,7 @@ namespace slib
 				[window setReleasedWhenClosed:NO];
 				[window setContentView:[[_priv_Slib_macOS_ViewHandle alloc] init]];
 
-				Ref<_priv_macOS_Window> ret = Ref<_priv_macOS_Window>::from(UIPlatform::createWindowInstance(window));
+				Ref<_priv_macOS_Window> ret = create(window);
 				
 				if (ret.isNotNull()) {
 					
@@ -1185,11 +1186,12 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		ret = _priv_macOS_Window::create(window);
-		if (ret.isNotNull()) {
-			UIPlatform::_registerWindowInstance((__bridge void*)window, ret.get());
-		}
-		return ret;
+		return _priv_macOS_Window::create(window);
+	}
+
+	void UIPlatform::registerWindowInstance(NSWindow* window, WindowInstance* instance)
+	{
+		UIPlatform::_registerWindowInstance((__bridge void*)window, instance);
 	}
 
 	Ref<WindowInstance> UIPlatform::getWindowInstance(NSWindow* window)

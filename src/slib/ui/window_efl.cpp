@@ -83,6 +83,8 @@ namespace slib
 						_ui_main_window = ret;
 					}
 
+					UIPlatform::registerWindowInstance(window, ret.get());
+
 					return ret;
 
 				}
@@ -158,7 +160,7 @@ namespace slib
 					::evas_object_resize(win, (Evas_Coord)(rect.getWidth()), (Evas_Coord)(rect.getHeight()));
 				}
 
-				Ref<_priv_EFL_Window> ret = Ref<_priv_EFL_Window>::from(UIPlatform::createWindowInstance(win));
+				Ref<_priv_EFL_Window> ret = create(win);
 				if (ret.isNotNull()) {
 					::elm_win_autodel_set(win, EINA_TRUE);
 					return ret;
@@ -399,11 +401,12 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		ret = _priv_EFL_Window::create(window);
-		if (ret.isNotNull()) {
-			UIPlatform::_registerWindowInstance(window, ret.get());
-		}
-		return ret;
+		return _priv_EFL_Window::create(window);
+	}
+	
+	void UIPlatform::registerWindowInstance(Evas_Object* window, WindowInstance* instance)
+	{
+		UIPlatform::_registerWindowInstance(window, instance);
 	}
 	
 	Ref<WindowInstance> UIPlatform::getWindowInstance(Evas_Object* window)

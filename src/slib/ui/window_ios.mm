@@ -72,6 +72,7 @@ namespace slib
 							}
 						}
 					}
+					UIPlatform::registerWindowInstance(window, ret.get());
 					return ret;
 				}
 			}
@@ -125,7 +126,7 @@ namespace slib
 						view.opaque = NO;
 						controller.view = view;
 						window.rootViewController = controller;
-						Ref<iOS_Window> ret = Ref<iOS_Window>::from(UIPlatform::createWindowInstance(window));
+						Ref<iOS_Window> ret = create(window);
 						if (ret.isNotNull()) {
 							controller->m_window = ret;
 							ret->setFocus();
@@ -760,11 +761,12 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		ret = iOS_Window::create(window);
-		if (ret.isNotNull()) {
-			UIPlatform::_registerWindowInstance((__bridge void*)window, ret.get());
-		}
-		return ret;
+		return iOS_Window::create(window);
+	}
+	
+	void UIPlatform::registerWindowInstance(UIView* window, WindowInstance* instance)
+	{
+		UIPlatform::_registerWindowInstance((__bridge void*)window, instance);
 	}
 	
 	Ref<WindowInstance> UIPlatform::getWindowInstance(UIView* window)

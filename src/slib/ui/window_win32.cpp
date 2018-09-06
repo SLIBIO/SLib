@@ -63,6 +63,7 @@ namespace slib
 						content->setWindowContent(sl_true);
 					}
 					ret->m_viewContent = content;
+					UIPlatform::registerWindowInstance(hWnd, ret.get());
 					return ret;
 				}
 				if (flagDestroyOnRelease) {
@@ -939,7 +940,7 @@ namespace slib
 	{
 		HWND hWnd = _priv_Win32_Window::createHandle(param);
 		if (hWnd) {
-			return UIPlatform::createWindowInstance(hWnd);
+			return _priv_Win32_Window::create(hWnd, sl_true);
 		}
 		return sl_null;
 	}
@@ -950,11 +951,12 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		ret = _priv_Win32_Window::create(hWnd, flagDestroyOnRelease);
-		if (ret.isNotNull()) {
-			UIPlatform::_registerWindowInstance((void*)hWnd, ret.get());
-		}
-		return ret;
+		return _priv_Win32_Window::create(hWnd, flagDestroyOnRelease);
+	}
+
+	void UIPlatform::registerWindowInstance(HWND hWnd, WindowInstance* instance)
+	{
+		UIPlatform::_registerWindowInstance((void*)hWnd, instance);
 	}
 
 	Ref<WindowInstance> UIPlatform::getWindowInstance(HWND hWnd)

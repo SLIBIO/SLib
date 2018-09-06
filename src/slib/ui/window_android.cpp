@@ -96,6 +96,7 @@ namespace slib
 					ret->m_viewContent = content;
 					jlong instance = (jlong)(window.get());
 					JAndroidWindow::instance.set(jwindow, instance);
+					UIPlatform::registerWindowInstance(jwindow, ret.get());
 					return ret;
 				}
 			}
@@ -483,7 +484,7 @@ namespace slib
 	{
 		JniLocal<jobject> jwindow = _priv_Android_Window::createHandle(param);
 		if (jwindow.isNotNull()) {
-			return UIPlatform::createWindowInstance(jwindow);
+			return _priv_Android_Window::create(jwindow);
 		}
 		return sl_null;
 	}
@@ -495,11 +496,12 @@ namespace slib
 		if (window.isNotNull()) {
 			return window;
 		}
-		Ref<_priv_Android_Window> ret = _priv_Android_Window::create(jwindow);
-		if (ret.isNotNull()) {
-			UIPlatform::_registerWindowInstance((void*)(ret->m_window.get()), ret.get());
-		}
-		return ret;
+		return _priv_Android_Window::create(jwindow);
+	}
+
+	void UIPlatform::registerWindowInstance(jobject jwindow, WindowInstance* instance)
+	{
+		UIPlatform::_registerWindowInstance((void*)jwindow, instance);
 	}
 
 	Ref<WindowInstance> UIPlatform::getWindowInstance(jobject jwindow)

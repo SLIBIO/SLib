@@ -71,6 +71,7 @@ namespace slib
 		static HWND getViewHandle(View* view);
 		
 		static Ref<WindowInstance> createWindowInstance(HWND hWnd, sl_bool flagDestroyOnRelease = sl_true);
+		static void registerWindowInstance(HWND hWnd, WindowInstance* instance);
 		static Ref<WindowInstance> getWindowInstance(HWND hWnd);
 		static void removeWindowInstance(HWND hWnd);
 		static HWND getWindowHandle(WindowInstance* instance);
@@ -92,6 +93,7 @@ namespace slib
 		static NSView* getViewHandle(View* view);
 		
 		static Ref<WindowInstance> createWindowInstance(NSWindow* handle);
+		static void registerWindowInstance(NSWindow* handle, WindowInstance* instance);
 		static Ref<WindowInstance> getWindowInstance(NSWindow* handle);
 		static void removeWindowInstance(NSWindow* handle);
 		static NSWindow* getWindowHandle(WindowInstance* instance);
@@ -120,6 +122,7 @@ namespace slib
 		static UIView* getViewHandle(View* view);
 		
 		static Ref<WindowInstance> createWindowInstance(UIView* handle);
+		static void registerWindowInstance(UIView* handle, WindowInstance* instance);
 		static Ref<WindowInstance> getWindowInstance(UIView* handle);
 		static void removeWindowInstance(UIView* handle);
 		static UIView* getWindowHandle(WindowInstance* instance);
@@ -143,6 +146,7 @@ namespace slib
 		static jobject getViewHandle(View* view);
 		
 		static Ref<WindowInstance> createWindowInstance(jobject window);
+		static void registerWindowInstance(jobject window, WindowInstance* instance);
 		static Ref<WindowInstance> getWindowInstance(jobject window);
 		static void removeWindowInstance(jobject window);
 		static jobject getWindowHandle(WindowInstance* instance);
@@ -157,6 +161,7 @@ namespace slib
 		static GtkWidget* getViewHandle(View* view);
 		
 		static Ref<WindowInstance> createWindowInstance(GtkWindow* handle);
+		static void registerWindowInstance(GtkWindow* handle, WindowInstance* instance);
 		static Ref<WindowInstance> getWindowInstance(GtkWindow* handle);
 		static void removeWindowInstance(GtkWindow* handle);
 		static GtkWindow* getWindowHandle(WindowInstance* instance);
@@ -179,6 +184,7 @@ namespace slib
 		static Evas_Object* getViewHandle(View* view);
 
 		static Ref<WindowInstance> createWindowInstance(Evas_Object* handle);
+		static void registerWindowInstance(Evas_Object* handle, WindowInstance* instance);
 		static Ref<WindowInstance> getWindowInstance(Evas_Object* handle);
 		static void removeWindowInstance(Evas_Object* handle);
 		static Evas_Object* getWindowHandle(WindowInstance* instance);

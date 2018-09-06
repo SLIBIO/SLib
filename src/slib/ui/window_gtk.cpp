@@ -106,6 +106,8 @@ namespace slib
 			m_location.y = y;
 			m_size.x = width;
 			m_size.y = height;
+
+			UIPlatform::registerWindowInstance(window, this);
 		}
 		
 		static void _release_handle(GtkWindow* window)
@@ -773,11 +775,12 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		ret = _priv_GTK_Window::create(window);
-		if (ret.isNotNull()) {
-			UIPlatform::_registerWindowInstance(window, ret.get());
-		}
-		return ret;
+		return _priv_GTK_Window::create(window);
+	}
+	
+	void UIPlatform::registerWindowInstance(GtkWindow* window, WindowInstance* instance)
+	{
+		UIPlatform::_registerWindowInstance(window, instance);
 	}
 	
 	Ref<WindowInstance> UIPlatform::getWindowInstance(GtkWindow* window)
