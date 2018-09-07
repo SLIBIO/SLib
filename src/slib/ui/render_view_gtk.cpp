@@ -74,14 +74,14 @@ namespace slib
 		GtkWidget* handle = gtk_drawing_area_new();
 		
 		if (handle) {
-			gtk_widget_set_has_window(handle, sl_true);
-			gtk_widget_set_can_focus(handle, sl_true);
+			GTK_WIDGET_UNSET_FLAGS(handle, GTK_NO_WINDOW);
+			GTK_WIDGET_SET_FLAGS(handle, GTK_CAN_FOCUS);
 			Ref<GTK_RenderViewInstance> ret = GTK_ViewInstance::create<GTK_RenderViewInstance>(this, parent, handle);
 			if (ret.isNotNull()) {
 				GtkWidget* handle = ret->getHandle();
 				if (handle) {
 					gtk_widget_realize(handle);
-					GdkWindow* gwindow = gtk_widget_get_window(handle);
+					GdkWindow* gwindow = handle->window;
 					if (gwindow) {
 						void* xdisplay = GDK_WINDOW_XDISPLAY(gwindow);
 						XID xwindow = GDK_WINDOW_XWINDOW(gwindow);

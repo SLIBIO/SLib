@@ -302,7 +302,7 @@ namespace slib
 				UI::dispatchToUiThread(SLIB_FUNCTION_WEAKREF(GTK_ViewInstance, bringToFront, this));
 				return;
 			}
-			GdkWindow* window = gtk_widget_get_window(handle);
+			GdkWindow* window = handle->window;
 			if (window) {
 				gdk_window_raise(window);
 			}
@@ -380,12 +380,11 @@ namespace slib
 	{
 		GtkWidget* handle = m_handle;
 		if (handle) {
-			GdkWindow* window = gtk_widget_get_window(handle);
+			GdkWindow* window = handle->window;
 			if (window) {
 				cairo_t* cairo = gdk_cairo_create(window);
 				if (cairo) {
-					GtkAllocation region = {0};
-					gtk_widget_get_allocation(handle, &region);
+					GtkAllocation region = handle->allocation;
 					Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, cairo, region.width, region.height);
 					if (canvas.isNotNull()) {
 						Rectangle rect;
@@ -462,7 +461,7 @@ namespace slib
 			time.setMillisecondsCount(gevent->time);
 			gdouble x = gevent->x;
 			gdouble y = gevent->y;
-			GdkWindow* window = gtk_widget_get_window(handle);
+			GdkWindow* window = handle->window;
 			if (window && window != gevent->window) {
 				gint wx = 0, wy = 0;
 				gdk_window_get_origin(window, &wx, &wy);
@@ -495,7 +494,7 @@ namespace slib
 			time.setMillisecondsCount(gevent->time);
 			gdouble x = gevent->x;
 			gdouble y = gevent->y;
-			GdkWindow* window = gtk_widget_get_window(handle);
+			GdkWindow* window = handle->window;
 			if (window && window != gevent->window) {
 				gint wx = 0, wy = 0;
 				gdk_window_get_origin(window, &wx, &wy);
@@ -547,7 +546,7 @@ namespace slib
 			time.setMillisecondsCount(gevent->time);
 			gdouble x = gevent->x;
 			gdouble y = gevent->y;
-			GdkWindow* window = gtk_widget_get_window(handle);
+			GdkWindow* window = handle->window;
 			if (window && window != gevent->window) {
 				gint wx = 0, wy = 0;
 				gdk_window_get_origin(window, &wx, &wy);
@@ -598,8 +597,8 @@ namespace slib
 		}
 		
 		if (handle) {
-			gtk_widget_set_has_window(handle, sl_true);
-			gtk_widget_set_can_focus(handle, sl_true);
+			GTK_WIDGET_UNSET_FLAGS(handle, GTK_NO_WINDOW);
+			GTK_WIDGET_SET_FLAGS(handle, GTK_CAN_FOCUS);
 			Ref<GTK_ViewInstance> ret = GTK_ViewInstance::create<GTK_ViewInstance>(this, parent, handle);
 			if (ret.isNotNull()) {
 				return ret;

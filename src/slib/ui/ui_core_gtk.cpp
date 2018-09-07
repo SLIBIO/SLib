@@ -205,13 +205,12 @@ namespace slib
 	{
 		sl_ui_len x = 0;
 		sl_ui_len y = 0;
-		GdkWindow* window = gtk_widget_get_window(widget);
+		GdkWindow* window = widget->window;
 		if (window) {
 			gint ox = 0;
 			gint oy = 0;
 			gdk_window_get_origin(window, &ox, &oy);
-			GtkAllocation allocation;
-			gtk_widget_get_allocation(widget, &allocation);
+			GtkAllocation allocation = widget->allocation;
 			x = ox + allocation.x;
 			y = oy + allocation.y;
 		}
