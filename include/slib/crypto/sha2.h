@@ -36,7 +36,7 @@ namespace slib
 		~_priv_SHA256Base();
 
 	public:
-		void update(const void* input, sl_size n) override;
+		void update(const void* input, sl_size n) final;
 	
 	protected:
 		void _start();
@@ -55,19 +55,23 @@ namespace slib
 	class SLIB_EXPORT SHA224 : public _priv_SHA256Base
 	{
 	public:
+		enum {
+			HashSize = 28,
+			BlockSize = 64
+		};
+		
+	public:
 		SHA224();
 
 		~SHA224();
 
 	public:
-		void start() override;
+		void start() final;
 
-		void finish(void* output) override;
+		void finish(void* output) final;
 	
 	public: /* common functions for CryptoHash */
 		static void hash(const void* input, sl_size n, void* output);
-
-		static sl_uint32 getHashSize();
 
 		static void hash(const String& s, void* output);
 
@@ -79,21 +83,27 @@ namespace slib
 
 		static Memory hash(const Memory& data);
 
-		sl_uint32 getSize() const override;
+		sl_uint32 getSize() const final;
 
 	};
 	
 	class SLIB_EXPORT SHA256 : public _priv_SHA256Base
 	{
 	public:
+		enum {
+			HashSize = 32,
+			BlockSize = 64
+		};
+		
+	public:
 		SHA256();
 
 		~SHA256();
 
 	public:
-		void start() override;
+		void start() final;
 
-		void finish(void* output) override;
+		void finish(void* output) final;
 
 	public:
 		static sl_uint32 make32bitChecksum(const void* input, sl_size n);
@@ -101,8 +111,6 @@ namespace slib
 	public: /* common functions for CryptoHash */
 		static void hash(const void* input, sl_size n, void* output);
 
-		static sl_uint32 getHashSize();
-
 		static void hash(const String& s, void* output);
 
 		static void hash(const Memory& data, void* output);
@@ -113,7 +121,7 @@ namespace slib
 
 		static Memory hash(const Memory& data);
 
-		sl_uint32 getSize() const override;
+		sl_uint32 getSize() const final;
 
 	};
 	
@@ -125,7 +133,7 @@ namespace slib
 		~_priv_SHA512Base();
 	
 	public:
-		void update(const void* input, sl_size n) override;
+		void update(const void* input, sl_size n) final;
 	
 	protected:
 		void _start();
@@ -145,19 +153,23 @@ namespace slib
 	class SLIB_EXPORT SHA384 : public _priv_SHA512Base
 	{
 	public:
+		enum {
+			HashSize = 48,
+			BlockSize = 128
+		};
+		
+	public:
 		SHA384();
 
 		~SHA384();
 
 	public:
-		void start() override;
+		void start() final;
 
-		void finish(void* output) override;
+		void finish(void* output) final;
 
 	public: /* common functions for CryptoHash */
 		static void hash(const void* input, sl_size n, void* output);
-
-		static sl_uint32 getHashSize();
 
 		static void hash(const String& s, void* output);
 
@@ -169,26 +181,30 @@ namespace slib
 
 		static Memory hash(const Memory& data);
 
-		sl_uint32 getSize() const override;
+		sl_uint32 getSize() const final;
 
 	};
 	
 	class SLIB_EXPORT SHA512 : public _priv_SHA512Base
 	{
 	public:
+		enum {
+			HashSize = 64,
+			BlockSize = 128
+		};
+		
+	public:
 		SHA512();
 
 		~SHA512();
 
 	public:
-		void start() override;
+		void start() final;
 
-		void finish(void* output) override;
+		void finish(void* output) final;
 
 	public: /* common functions for CryptoHash */
 		static void hash(const void* input, sl_size n, void* output);
-
-		static sl_uint32 getHashSize();
 
 		static void hash(const String& s, void* output);
 
@@ -200,7 +216,7 @@ namespace slib
 
 		static Memory hash(const Memory& data);
 
-		sl_uint32 getSize() const override;
+		sl_uint32 getSize() const final;
 
 	};
 

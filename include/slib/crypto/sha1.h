@@ -27,21 +27,25 @@ namespace slib
 	class SLIB_EXPORT SHA1 : public CryptoHash
 	{
 	public:
+		enum {
+			HashSize = 20,
+			BlockSize = 64
+		};
+		
+	public:
 		SHA1();
 
 		~SHA1();
 	
 	public:
-		void start() override;
+		void start() final;
 
-		void update(const void* input, sl_size n) override;
+		void update(const void* input, sl_size n) final;
 
-		void finish(void* output) override;
+		void finish(void* output) final;
 
 	public: /* common functions for CryptoHash */
 		static void hash(const void* input, sl_size n, void* output);
-
-		static sl_uint32 getHashSize();
 
 		static void hash(const String& s, void* output);
 
@@ -53,8 +57,8 @@ namespace slib
 
 		static Memory hash(const Memory& data);
 
-		sl_uint32 getSize() const override;
-	
+		sl_uint32 getSize() const final;
+
 	private:
 		void _updateSection(const sl_uint8* input);
 	

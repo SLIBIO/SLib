@@ -15,6 +15,7 @@
 #include "crypto/sha1.h"
 #include "crypto/sha2.h"
 #include "crypto/hash.h"
+#include "crypto/hmac.h"
 
 #include "crypto/gcm.h"
 #include "crypto/block_cipher.h"

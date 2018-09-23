@@ -125,17 +125,13 @@ namespace slib
 	}
 
 
-#define DEFINE_CRYPTO_HASH(CLASS, HASH_SIZE) \
+#define DEFINE_CRYPTO_HASH(CLASS) \
 	void CLASS::hash(const void* input, sl_size n, void* output) \
 	{ \
 		CLASS h; \
 		h.CLASS::start(); \
 		h.CLASS::update(input, n); \
 		h.CLASS::finish(output); \
-	} \
-	sl_uint32 CLASS::getHashSize() \
-	{ \
-		return HASH_SIZE; \
 	} \
 	void CLASS::hash(const String& s, void* output) \
 	{ \
@@ -147,32 +143,32 @@ namespace slib
 	} \
 	Memory CLASS::hash(const void* input, sl_size n) \
 	{ \
-		char v[HASH_SIZE]; \
+		char v[HashSize]; \
 		CLASS::hash(input, n, v); \
-		return Memory::create(v, HASH_SIZE); \
+		return Memory::create(v, HashSize); \
 	} \
 	Memory CLASS::hash(const String& s) \
 	{ \
-		char v[HASH_SIZE]; \
+		char v[HashSize]; \
 		CLASS::hash(s.getData(), s.getLength(), v); \
-		return Memory::create(v, HASH_SIZE); \
+		return Memory::create(v, HashSize); \
 	} \
 	Memory CLASS::hash(const Memory& data) \
 	{ \
-		char v[HASH_SIZE]; \
+		char v[HashSize]; \
 		CLASS::hash(data.getData(), data.getSize(), v); \
-		return Memory::create(v, HASH_SIZE); \
+		return Memory::create(v, HashSize); \
 	} \
 	sl_uint32 CLASS::getSize() const \
 	{ \
-		return getHashSize(); \
+		return HashSize; \
 	}
 
-	DEFINE_CRYPTO_HASH(MD5, 16)
-	DEFINE_CRYPTO_HASH(SHA1, 20)
-	DEFINE_CRYPTO_HASH(SHA224, 28)
-	DEFINE_CRYPTO_HASH(SHA256, 32)
-	DEFINE_CRYPTO_HASH(SHA384, 48)
-	DEFINE_CRYPTO_HASH(SHA512, 64)
+	DEFINE_CRYPTO_HASH(MD5)
+	DEFINE_CRYPTO_HASH(SHA1)
+	DEFINE_CRYPTO_HASH(SHA224)
+	DEFINE_CRYPTO_HASH(SHA256)
+	DEFINE_CRYPTO_HASH(SHA384)
+	DEFINE_CRYPTO_HASH(SHA512)
 
 }
