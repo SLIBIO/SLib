@@ -190,7 +190,7 @@ namespace slib
 		Ref<File> file = File::openForWrite(filePath);
 		if (file.isNotNull()) {
 			Memory mem = saveJPEG(image, quality);
-			if (mem.isNotEmpty()) {
+			if (mem.isNotNull()) {
 				sl_reg size = mem.getSize();
 				if (file->write(mem.getData(), size) == size) {
 					return sl_true;

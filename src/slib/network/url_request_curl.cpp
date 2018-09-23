@@ -161,7 +161,7 @@ namespace slib
 				::curl_easy_setopt(curl, CURLOPT_POSTFIELDS, requestBody.getData());
 				::curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, requestBody.getSize());
 			} else {
-				if (requestBody.isNotEmpty()) {
+				if (requestBody.isNotNull()) {
 					::curl_easy_setopt(curl, CURLOPT_READFUNCTION, CurlRequest_Impl::callbackRead);
 					::curl_easy_setopt(curl, CURLOPT_READDATA, (void*)this);
 				}

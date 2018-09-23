@@ -30,7 +30,7 @@ namespace slib
 	
 	Ref<Drawable> PlatformDrawable::loadFromMemory(const Memory& mem)
 	{
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			return PlatformDrawable::loadFromMemory(mem.getData(), mem.getSize());
 		}
 		return sl_null;
@@ -40,7 +40,7 @@ namespace slib
 	Ref<Drawable> PlatformDrawable::loadFromFile(const String& filePath)
 	{
 		Memory mem = File::readAllBytes(filePath);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			return PlatformDrawable::loadFromMemory(mem);
 		}
 		return sl_null;
@@ -49,7 +49,7 @@ namespace slib
 	Ref<Drawable> PlatformDrawable::loadFromAsset(const String& path)
 	{
 		Memory mem = Assets::readAllBytes(path);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			return PlatformDrawable::loadFromMemory(mem);
 		}
 #if defined(SLIB_PLATFORM_IS_APPLE)

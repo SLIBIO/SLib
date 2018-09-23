@@ -7887,7 +7887,7 @@ namespace slib
 				
 				if (n > 0) {
 					Array<TouchPoint> arrConverted = arr.duplicate();
-					if (arrConverted.isEmpty()) {
+					if (arrConverted.isNull()) {
 						return;
 					}
 					TouchPoint* pts = arr.getData();

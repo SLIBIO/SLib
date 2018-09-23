@@ -691,7 +691,7 @@ namespace slib
 	{
 		sl_size size = getMostSignificantBytes();
 		Memory mem = Memory::create(size);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			sl_uint8* bytes = (sl_uint8*)(mem.getData());
 			for (sl_size i = 0; i < size; i++) {
 				bytes[i] = (sl_uint8)(elements[i >> 2] >> ((i & 3) << 3));
@@ -774,7 +774,7 @@ namespace slib
 	{
 		sl_size size = getMostSignificantBytes();
 		Memory mem = Memory::create(size);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			sl_uint8* bytes = (sl_uint8*)(mem.getData());
 			sl_size m = size - 1;
 			for (sl_size i = 0; i < size; i++) {

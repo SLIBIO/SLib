@@ -469,7 +469,7 @@ namespace slib
 	Memory IReader::readToMemory(sl_size size)
 	{
 		Memory mem = Memory::create(size);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			size = readFully(mem.getData(), size);
 			if (size > 0) {
 				mem = mem.sub(0, size);
@@ -539,7 +539,7 @@ namespace slib
 	{
 		Memory mem;
 		if (readSection(&mem, maxLen)) {
-			if (mem.isEmpty()) {
+			if (mem.isNull()) {
 				str->setNull();
 				return sl_true;
 			}
@@ -577,7 +577,7 @@ namespace slib
 	{
 		Memory mem;
 		if (readSection(&mem, maxLen)) {
-			if (mem.isEmpty()) {
+			if (mem.isNull()) {
 				v->setNull();
 				return sl_true;
 			}

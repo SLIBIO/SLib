@@ -114,7 +114,7 @@ namespace slib
 				}
 			}
 			JniLocal<jbyteArray> jbody;
-			if (m_requestBody.isNotEmpty()) {
+			if (m_requestBody.isNotNull()) {
 				Memory mem = m_requestBody;
 				sl_uint32 n = (sl_uint32)(mem.getSize());
 				jbody = Jni::newByteArray(n);
@@ -175,7 +175,7 @@ namespace slib
 #define STACK_BUF_SIZE 4096
 			if (n > STACK_BUF_SIZE) {
 				Memory mem = Memory::create(n);
-				if (mem.isNotEmpty()) {
+				if (mem.isNotNull()) {
 					Jni::getByteArrayRegion(data, 0, n, (jbyte*)(mem.getData()));
 					onReceiveContent(mem.getData(), n, mem);
 				} else {

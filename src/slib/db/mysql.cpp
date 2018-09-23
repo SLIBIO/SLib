@@ -460,7 +460,7 @@ namespace slib
 			Memory _getBlobEx(sl_uint32 index)
 			{
 				Memory mem = Memory::create(m_fds[index].length);
-				if (mem.isNotEmpty()) {
+				if (mem.isNotNull()) {
 					MYSQL_BIND bind = m_bind[index];
 					bind.buffer = mem.getData();
 					bind.buffer_length = (sl_uint32)(mem.getSize());

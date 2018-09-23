@@ -145,7 +145,7 @@ namespace slib
 			sizeChunk = 4096;
 		}
 		Memory memChunk = Memory::create(sizeChunk);
-		if (memChunk.isEmpty()) {
+		if (memChunk.isNull()) {
 			return ret;
 		}
 		sl_uint8* chunk = (sl_uint8*)(memChunk.getData());
@@ -267,7 +267,7 @@ namespace slib
 			sizeChunk = 4096;
 		}
 		Memory memChunk = Memory::create(sizeChunk);
-		if (memChunk.isEmpty()) {
+		if (memChunk.isNull()) {
 			return ret;
 		}
 		sl_uint8* chunk = (sl_uint8*)(memChunk.getData());

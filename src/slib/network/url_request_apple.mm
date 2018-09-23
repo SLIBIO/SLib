@@ -109,7 +109,7 @@ namespace slib
 						if (param.downloadFilePath.isNotEmpty()) {
 							task = [session downloadTaskWithRequest:req];
 						} else {
-							if (param.requestBody.isNotEmpty()) {
+							if (param.requestBody.isNotNull()) {
 								NSData* data = req.HTTPBody;
 								req.HTTPBody = nil;
 								task = [session uploadTaskWithRequest:req fromData:data];

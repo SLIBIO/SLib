@@ -81,7 +81,7 @@ namespace slib
 			Ref<Image> ret;
 			sl_uint32 size = (width*height) << 2;
 			Memory mem = Memory::create(size);
-			if (mem.isNotEmpty()) {
+			if (mem.isNotNull()) {
 				ret = new Image;
 				if (ret.isNotNull()) {
 					ret->m_desc.width = width;
@@ -107,7 +107,7 @@ namespace slib
 		}
 		sl_uint32 size = (width*height) << 2;
 		Memory mem = Memory::create(size);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			ret = new Image;
 			if (ret.isNotNull()) {
 				ret->m_desc.width = width;
@@ -146,7 +146,7 @@ namespace slib
 			return ret;
 		}
 		Memory mem = Memory::create((width*height) << 2);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			Color* buf = (Color*)(mem.getData());
 			if (bitmap->readPixels(x, y, width, height, buf)) {
 				ImageDesc desc;
@@ -170,7 +170,7 @@ namespace slib
 		sl_uint32 width = bitmap->getWidth();
 		sl_uint32 height = bitmap->getHeight();
 		Memory mem = Memory::create((width*height) << 2);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			Color* buf = (Color*)(mem.getData());
 			if (bitmap->readPixels(0, 0, width, height, buf)) {
 				ImageDesc desc;
@@ -1301,7 +1301,7 @@ namespace slib
 	{
 		Ref<Image> ret;
 		Memory mem = File::readAllBytes(filePath);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			ret = loadFromMemory(mem, width, height);
 		}
 		return ret;
@@ -1311,7 +1311,7 @@ namespace slib
 	{
 		Ref<Image> ret;
 		Memory mem = Assets::readAllBytes(path);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			return loadFromMemory(mem, width, height);
 		}
 #if defined(SLIB_PLATFORM_IS_APPLE)

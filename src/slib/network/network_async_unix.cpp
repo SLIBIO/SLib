@@ -399,7 +399,7 @@ namespace slib
 	Ref<AsyncUdpSocketInstance> AsyncUdpSocket::_createInstance(const Ref<Socket>& socket, sl_uint32 packetSize)
 	{
 		Memory buffer = Memory::create(packetSize);
-		if (buffer.isNotEmpty()) {
+		if (buffer.isNotNull()) {
 			return _priv_Unix_AsyncUdpSocketInstance::create(socket, buffer);
 		}
 		return sl_null;

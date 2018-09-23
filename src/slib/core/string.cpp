@@ -4577,7 +4577,7 @@ namespace slib
 		}
 		Memory mem = toUtf16();
 		output.refer = mem.ref;
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			output.sz16 = (const sl_char16*)(mem.getData());
 			output.len = mem.getSize() / 2 - 1;
 			if (output.sz16) {
@@ -4597,7 +4597,7 @@ namespace slib
 			return sl_true;
 		}
 		Memory mem = toUtf8();
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			output.sz8 = (const sl_char8*)(mem.getData());
 			output.len = mem.getSize() - 1;
 			if (output.sz8) {
@@ -4639,7 +4639,7 @@ namespace slib
 		sl_size len8 = getLength();
 		sl_size len16 = Charsets::utf8ToUtf16(sz8, len8, sl_null, -1);
 		Memory memory = Memory::create(2 * (len16 + 1));
-		if (memory.isNotEmpty()) {
+		if (memory.isNotNull()) {
 			sl_char16* buf = (sl_char16*)(memory.getData());
 			Charsets::utf8ToUtf16(sz8, len8, buf, len16);
 			buf[len16] = 0;
@@ -4653,7 +4653,7 @@ namespace slib
 		sl_size len16 = getLength();
 		sl_size len8 = Charsets::utf16ToUtf8(sz16, len16, sl_null, -1);
 		Memory memory = Memory::create(len8 + 1);
-		if (memory.isNotEmpty()) {
+		if (memory.isNotNull()) {
 			sl_char8* buf = (sl_char8*)(memory.getData());
 			Charsets::utf16ToUtf8(sz16, len16, buf, len8);
 			buf[len8] = 0;
@@ -4686,7 +4686,7 @@ namespace slib
 			return sl_true;
 		}
 		Memory mem = toUtf32();
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			output.sz32 = (const sl_char32*)(mem.getData());
 			output.len = mem.getSize() / 4 - 1;
 			if (output.sz32) {
@@ -4716,7 +4716,7 @@ namespace slib
 		sl_size len8 = getLength();
 		sl_size len32 = Charsets::utf8ToUtf32(sz8, len8, sl_null, -1);
 		Memory memory = Memory::create(4 * (len32 + 1));
-		if (memory.isNotEmpty()) {
+		if (memory.isNotNull()) {
 			sl_char32* buf = (sl_char32*)(memory.getData());
 			Charsets::utf8ToUtf32(sz8, len8, buf, len32);
 			buf[len32] = 0;
@@ -8549,7 +8549,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		Link<StringData>* front = m_queue.getFront();
 		sl_size total = m_len;
 		Memory ret = Memory::create(total);
-		if (ret.isNotEmpty()) {
+		if (ret.isNotNull()) {
 			sl_char8* buf = (sl_char8*)(ret.getData());
 			sl_size offset = 0;
 			Link<StringData>* item = front;
@@ -8572,7 +8572,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		Link<StringData>* front = m_queue.getFront();
 		sl_size total = m_len;
 		Memory ret = Memory::create(total * 2);
-		if (ret.isNotEmpty()) {
+		if (ret.isNotNull()) {
 			sl_char16* buf = (sl_char16*)(ret.getData());
 			sl_size offset = 0;
 			Link<StringData>* item = front;

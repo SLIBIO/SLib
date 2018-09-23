@@ -141,7 +141,7 @@ namespace slib
 		}
 		sl_size size = len / 4 * 3;
 		Memory mem = Memory::create(size);
-		if (mem.isEmpty()) {
+		if (mem.isNull()) {
 			return sl_null;
 		}
 		sl_size sizeOutput = decode(base64, mem.getData(), size);

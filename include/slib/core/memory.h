@@ -63,10 +63,6 @@ namespace slib
 	public:
 		sl_size getSize() const;
 
-		sl_bool isEmpty() const;
-
-		sl_bool isNotEmpty() const;
-
 		Memory sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const;
 
 		sl_size read(sl_size startSource, sl_size len, void* bufDst) const;
@@ -102,10 +98,6 @@ namespace slib
 		void* getData() const;
 
 		sl_size getSize() const;
-
-		sl_bool isEmpty() const;
-
-		sl_bool isNotEmpty() const;
 
 		Memory sub(sl_size start, sl_size size = SLIB_SIZE_MAX) const;
 

@@ -412,7 +412,7 @@ namespace slib
 			return;
 		}
 		if (m_flagStoreResponseContent) {
-			if (mem.isNotEmpty()) {
+			if (mem.isNotNull()) {
 				m_bufResponseContent.add(mem);
 			} else {
 				m_bufResponseContent.add(Memory::create(data, len));

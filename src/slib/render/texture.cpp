@@ -95,7 +95,7 @@ namespace slib
 	
 	Ref<Texture> Texture::loadFromMemory(const Memory& mem)
 	{
-		if (mem.isEmpty()) {
+		if (mem.isNull()) {
 			return sl_null;
 		}
 		return loadFromMemory(mem.getData(), mem.getSize());

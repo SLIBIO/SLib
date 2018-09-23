@@ -68,7 +68,7 @@ namespace slib
 
 	Ref<FreeType> FreeType::loadFromMemory(const Memory& mem, sl_uint32 index)
 	{
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			Ref<_priv_FreeTypeLibrary> libraryRef = new _priv_FreeTypeLibrary;
 			if (libraryRef.isNotNull()) {
 				FT_Library library = libraryRef->m_library;

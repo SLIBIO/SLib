@@ -761,7 +761,7 @@ namespace slib
 	{
 		sl_uint16 id = m_idLast++;
 		Memory mem = DnsPacket::buildQuestionPacket(id, hostName);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			m_udp->sendTo(serverAddress, mem);
 		}
 	}
@@ -1096,7 +1096,7 @@ namespace slib
 		if (m_flagEncryptDefaultForward) {
 			packet = m_encrypt.encrypt_CBC_PKCS7Padding(packet);
 		}
-		if (packet.isEmpty()) {
+		if (packet.isNull()) {
 			return;
 		}
 
@@ -1120,7 +1120,7 @@ namespace slib
 			if (fe.flagEncrypted) {
 				packet = m_encrypt.encrypt_CBC_PKCS7Padding(packet);
 			}
-			if (packet.isEmpty()) {
+			if (packet.isNull()) {
 				return;
 			}
 
@@ -1130,7 +1130,7 @@ namespace slib
 
 	void DnsServer::_sendPacket(sl_bool flagEncrypted, const SocketAddress& targetAddress, const Memory& packet)
 	{
-		if (packet.isNotEmpty()) {
+		if (packet.isNotNull()) {
 			Ref<AsyncUdpSocket> socket;
 			if (flagEncrypted) {
 				socket = m_udpEncrypt;
@@ -1168,7 +1168,7 @@ namespace slib
 		if (socket == m_udpEncrypt) {
 			flagEncrypted = sl_true;
 			memDecrypt = m_encrypt.decrypt_CBC_PKCS7Padding(data, size);
-			if (memDecrypt.isEmpty()) {
+			if (memDecrypt.isNull()) {
 				return;
 			}
 			data = memDecrypt.getData();

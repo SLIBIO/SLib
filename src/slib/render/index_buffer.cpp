@@ -59,7 +59,7 @@ namespace slib
 	
 	Ref<IndexBuffer> IndexBuffer::create(const Memory& mem)
 	{
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			Ref<IndexBuffer> ret = new IndexBuffer();
 			if (ret.isNotNull()) {
 				ret->m_mem = mem;

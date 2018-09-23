@@ -137,16 +137,6 @@ namespace slib
 		return 0;
 	}
 
-	sl_bool Memory::isEmpty() const
-	{
-		return ref.isNull();
-	}
-
-	sl_bool Memory::isNotEmpty() const
-	{
-		return ref.isNotNull();
-	}
-
 	Memory Memory::sub(sl_size start, sl_size size) const
 	{
 		CMemory* obj = ref._ptr;
@@ -225,24 +215,6 @@ namespace slib
 			return obj->getCount();
 		}
 		return 0;
-	}
-
-	sl_bool Atomic<Memory>::isEmpty() const
-	{
-		Ref<CMemory> obj(ref);
-		if (obj.isNotNull()) {
-			return obj->getCount() == 0;
-		}
-		return sl_true;
-	}
-
-	sl_bool Atomic<Memory>::isNotEmpty() const
-	{
-		Ref<CMemory> obj(ref);
-		if (obj.isNotNull()) {
-			return obj->getCount() != 0;
-		}
-		return sl_false;
 	}
 
 	Memory Atomic<Memory>::sub(sl_size start, sl_size count) const
@@ -648,7 +620,7 @@ namespace slib
 		}
 		sl_size total = m_size;
 		Memory ret = Memory::create(total);
-		if (ret.isNotEmpty()) {
+		if (ret.isNotNull()) {
 			char* buf = (char*)(ret.getData());
 			sl_size offset = 0;
 			if (m_memCurrent.size > 0) {

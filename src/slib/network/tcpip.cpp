@@ -581,7 +581,7 @@ namespace slib
 				return sl_null;
 			}
 			packet->header = Memory::create(ip, ip->getHeaderSize());
-			if (packet->header.isEmpty()) {
+			if (packet->header.isNull()) {
 				return sl_null;
 			}
 			IPv4Packet* headerNew = (IPv4Packet*)(packet->header.getData());
@@ -641,7 +641,7 @@ namespace slib
 		if (packet->sizeContent > 0 && packet->sizeAccumulated == packet->sizeContent) {
 			m_packets.remove(id);
 			Memory mem = Memory::create(packet->header.getSize() + packet->sizeContent);
-			if (mem.isNotEmpty()) {
+			if (mem.isNotNull()) {
 				Base::copyMemory(mem.getData(), packet->header.getData(), packet->header.getSize());
 				data = (sl_uint8*)(mem.getData()) + packet->header.getSize();
 				ListLocker<IPv4Fragment> fragments(packet->fragments);
@@ -683,7 +683,7 @@ namespace slib
 				n = sizeContent - offset;
 			}
 			Memory mem = Memory::create(sizeHeader + n);
-			if (mem.isEmpty()) {
+			if (mem.isNull()) {
 				return sl_null;
 			}
 			sl_uint8* buf = (sl_uint8*)(mem.getData());

@@ -59,7 +59,7 @@ namespace slib
 	
 	Ref<VertexBuffer> VertexBuffer::create(const Memory& mem)
 	{
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			Ref<VertexBuffer> ret = new VertexBuffer();
 			if (ret.isNotNull()) {
 				ret->m_mem = mem;

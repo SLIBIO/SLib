@@ -541,18 +541,6 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE sl_bool Array<T>::isEmpty() const noexcept
-	{
-		return ref.isNull();
-	}
-
-	template <class T>
-	SLIB_INLINE sl_bool Array<T>::isNotEmpty() const noexcept
-	{
-		return ref.isNotNull();
-	}
-
-	template <class T>
 	T* Array<T>::getPointerAt(sl_size index) const noexcept
 	{
 		CArray<T>* obj = ref._ptr;
@@ -839,18 +827,6 @@ namespace slib
 		return 0;
 	}
 
-	template <class T>
-	sl_bool Atomic< Array<T> >::isEmpty() const noexcept
-	{
-		return ref.isNull();
-	}
-
-	template <class T>
-	sl_bool Atomic< Array<T> >::isNotEmpty() const noexcept
-	{
-		return ref.isNotNull();
-	}
-	
 	template <class T>
 	sl_bool Atomic< Array<T> >::getAt(sl_size index, T* _out) const noexcept
 	{

@@ -41,7 +41,7 @@ namespace slib
 	
 	Ref<Bitmap> Bitmap::loadFromMemory(const Memory& mem)
 	{
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			return Bitmap::loadFromMemory(mem.getData(), mem.getSize());
 		}
 		return sl_null;
@@ -50,7 +50,7 @@ namespace slib
 	Ref<Bitmap> Bitmap::loadFromFile(const String& filePath)
 	{
 		Memory mem = File::readAllBytes(filePath);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			return Bitmap::loadFromMemory(mem);
 		}
 		return sl_null;
@@ -59,7 +59,7 @@ namespace slib
 	Ref<Bitmap> Bitmap::loadFromAsset(const String& path)
 	{
 		Memory mem = Assets::readAllBytes(path);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			return Bitmap::loadFromMemory(mem);
 		}
 #if defined(SLIB_PLATFORM_IS_APPLE)

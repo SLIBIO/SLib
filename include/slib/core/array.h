@@ -253,10 +253,6 @@ namespace slib
 
 		sl_size getCount() const noexcept;
 
-		sl_bool isEmpty() const noexcept;
-
-		sl_bool isNotEmpty() const noexcept;
-
 	public:
 		T* getPointerAt(sl_size index) const noexcept;
 
@@ -354,10 +350,6 @@ namespace slib
 		static Atomic< Array<T> >& from(const Atomic< Array<VALUE> >& other) noexcept;
 
 		sl_size getCount() const noexcept;
-
-		sl_bool isEmpty() const noexcept;
-
-		sl_bool isNotEmpty() const noexcept;
 
 	public:
 		sl_bool getAt(sl_size index, T* _out = sl_null) const noexcept;

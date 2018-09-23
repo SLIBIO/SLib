@@ -377,7 +377,7 @@ namespace slib
 								SLIB_SCOPED_BUFFER(BYTE, 512, buf, size);
 								if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, buf, &size)) {
 									Memory mem = Memory::create(buf, size);
-									if (mem.isNotEmpty()) {
+									if (mem.isNotNull()) {
 										out->setMemory(mem);
 										flagSuccess = sl_true;
 									}

@@ -170,7 +170,7 @@ namespace slib
 	{
 		if (service && io) {
 			Memory bufRead = Memory::create(SIZE_READ_BUF);
-			if (bufRead.isNotEmpty()) {
+			if (bufRead.isNotNull()) {
 				Ref<HttpServiceConnection> ret = new HttpServiceConnection;
 				if (ret.isNotNull()) {
 					AsyncOutputParam op;
@@ -275,11 +275,11 @@ namespace slib
 			_context->setProcessingByThread(param.flagProcessByThreads);
 		}
 		HttpServiceContext* context = _context.get();
-		if (context->m_requestHeader.isEmpty()) {
+		if (context->m_requestHeader.isNull()) {
 			sl_size posBody;
 			if (context->m_requestHeaderReader.add(data, size, posBody)) {
 				context->m_requestHeader = context->m_requestHeaderReader.mergeHeader();
-				if (context->m_requestHeader.isEmpty()) {
+				if (context->m_requestHeader.isNull()) {
 					sendResponse_ServerError();
 					return;
 				}
@@ -320,13 +320,13 @@ namespace slib
 				return;
 			}
 		}
-		if (context->m_requestHeader.isNotEmpty()) {
+		if (context->m_requestHeader.isNotNull()) {
 			if (context->m_requestBodyBuffer.getSize() >= context->m_requestContentLength) {
 
 				m_contextCurrent.setNull();
 
 				context->m_requestBody = context->m_requestBodyBuffer.merge();
-				if (context->m_requestContentLength > 0 && context->m_requestBody.isEmpty()) {
+				if (context->m_requestContentLength > 0 && context->m_requestBody.isNull()) {
 					sendResponse_ServerError();
 					return;
 				}
@@ -380,7 +380,7 @@ namespace slib
 			context->setResponseContentType(ContentTypes::TextHtml_Utf8);
 		}
 		Memory header = context->makeResponsePacket();
-		if (header.isEmpty()) {
+		if (header.isNull()) {
 			close();
 			return;
 		}
@@ -414,7 +414,7 @@ namespace slib
 
 	void HttpServiceConnection::sendResponse(const Memory& mem)
 	{
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			if (m_io->writeFromMemory(mem, sl_null)) {
 				return;
 			}
@@ -424,7 +424,7 @@ namespace slib
 
 	void HttpServiceConnection::sendResponseAndRestart(const Memory& mem)
 	{
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			if (m_io->writeFromMemory(mem, sl_null)) {
 				start();
 				return;
@@ -454,7 +454,7 @@ namespace slib
 
 	void HttpServiceConnection::sendResponseAndClose(const Memory& mem)
 	{
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			Ref<_priv_HttpServiceConnection_SendResponseAndCloseListener> listener(new _priv_HttpServiceConnection_SendResponseAndCloseListener(this));
 			if (m_io->writeFromMemory(mem, SLIB_FUNCTION_REF(_priv_HttpServiceConnection_SendResponseAndCloseListener, onWriteStream, listener))) {
 				return;
@@ -809,7 +809,7 @@ namespace slib
 				return processFile(context, filePath);
 			} else {
 				Memory mem = Assets::readAllBytes(path);
-				if (mem.isNotEmpty()) {
+				if (mem.isNotNull()) {
 					String oldResponseContentType = context->getResponseContentType();
 					if (oldResponseContentType.isEmpty()) {
 						ContentType contentType = ContentTypes::getFromFileExtension(ext);
@@ -871,7 +871,7 @@ namespace slib
 					return sl_true;
 				} else {
 					Memory mem = File::readAllBytes(path);
-					if (mem.isNotEmpty()) {
+					if (mem.isNotNull()) {
 						context->write(mem);
 						return sl_true;
 					}

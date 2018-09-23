@@ -438,7 +438,7 @@ namespace slib
 				Ref<AsyncStream> file = m_fileDownload;
 				if (file.isNotNull()) {
 					Memory mem = Memory::create(m_memReceiving.getData(), (sl_uint32)m_offsetReceiving);
-					if (mem.isEmpty()) {
+					if (mem.isNull()) {
 						processError("Error on writing download file");
 					} else {
 						Base::interlockedAdd(&m_sizeDownloadWriting, m_offsetReceiving);

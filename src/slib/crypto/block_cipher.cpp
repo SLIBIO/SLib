@@ -219,7 +219,7 @@ namespace slib
 	{
 		sl_uint32 block = crypto->getBlockSize();
 		Memory mem = Memory::create(size + block * 2);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			sl_size n = encrypt(crypto, src, size, mem.getData());
 			if (n) {
 				return mem.sub(0, n);
@@ -275,7 +275,7 @@ namespace slib
 	Memory BlockCipher_CBC<BlockCipher, Padding>::decrypt(const BlockCipher* crypto, const void* src, sl_size size)
 	{
 		Memory mem = Memory::create(size);
-		if (mem.isNotEmpty()) {
+		if (mem.isNotNull()) {
 			sl_size n = decrypt(crypto, src, size, mem.getData());
 			if (n) {
 				return mem.sub(0, n);

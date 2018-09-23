@@ -33,7 +33,7 @@ namespace slib
 
 			if (size > 0) {
 				Memory mem = Memory::create(size);
-				if (mem.isNotEmpty()) {
+				if (mem.isNotNull()) {
 					png_bytep buffer = (png_bytep)(mem.getData());
 					if (png_image_finish_read(&image, NULL, buffer, (png_int_32)pitch, NULL)) {
 						ret = Image::createStatic(image.width, image.height, (Color*)buffer, image.width, mem.ref.get());
@@ -125,7 +125,7 @@ namespace slib
 		Ref<File> file = File::openForWrite(filePath);
 		if (file.isNotNull()) {
 			Memory mem = savePNG(image);
-			if (mem.isNotEmpty()) {
+			if (mem.isNotNull()) {
 				sl_reg size = mem.getSize();
 				if (file->write(mem.getData(), size) == size) {
 					return sl_true;

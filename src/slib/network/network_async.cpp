@@ -538,7 +538,7 @@ namespace slib
 	sl_bool AsyncUdpSocketInstance::sendTo(const SocketAddress& addressTo, const Memory& data)
 	{
 		if (isOpened()) {
-			if (data.isNotEmpty()) {
+			if (data.isNotNull()) {
 				SendRequest request;
 				request.addressTo = addressTo;
 				request.data = data;

@@ -162,7 +162,7 @@ namespace slib
 					}
 				}
 				Memory mem = Memory::create(MAX_PACKET_SIZE);
-				if (mem.isNotEmpty()) {
+				if (mem.isNotNull()) {
 					Ref<_priv_NetRawPacketCapture> ret = new _priv_NetRawPacketCapture;
 					if (ret.isNotNull()) {
 						ret->_initWithParam(param);
@@ -339,7 +339,7 @@ namespace slib
 				socketUDP->setOption_IncludeIpHeader(sl_true);
 				socketICMP->setOption_IncludeIpHeader(sl_true);
 				Memory mem = Memory::create(MAX_PACKET_SIZE);
-				if (mem.isNotEmpty()) {
+				if (mem.isNotNull()) {
 					Ref<_priv_NetRawIPv4Capture> ret = new _priv_NetRawIPv4Capture;
 					if (ret.isNotNull()) {
 						ret->_initWithParam(param);

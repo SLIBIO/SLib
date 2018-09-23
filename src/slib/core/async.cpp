@@ -1185,7 +1185,7 @@ namespace slib
 			ret->m_sizeTotal = param.size;
 			for (sl_uint32 i = 0; i < param.bufferCount; i++) {
 				Memory mem = Memory::create(param.bufferSize);
-				if (mem.isNotEmpty()) {
+				if (mem.isNotNull()) {
 					Ref<Buffer> buf = new Buffer;
 					if (buf.isNotNull()) {
 						buf->mem = mem;
@@ -1312,14 +1312,14 @@ namespace slib
 		if (bufferReading.isNotNull()) {
 			m_sizeRead += result->size;
 			Memory memWrite = bufferReading->mem.sub(0, result->size);
-			if (memWrite.isEmpty()) {
+			if (memWrite.isNull()) {
 				m_flagReadError = sl_true;
 			} else {
 				PtrLocker<IAsyncCopyListener> listener(m_listener);
 				if (listener.isNotNull()) {
 					memWrite = listener->onAsyncCopyRead(this, memWrite);
 				}
-				if (memWrite.isNotEmpty()) {
+				if (memWrite.isNotNull()) {
 					bufferReading->memWrite = memWrite;
 					m_buffersWrite.pushBack(bufferReading);
 				} else {
@@ -1392,7 +1392,7 @@ namespace slib
 				buffer->memRead = buffer->mem.sub(0, size);
 				sl_bool bRet = sl_false;
 				m_bufferReading = buffer;
-				if (buffer->memRead.isNotEmpty()) {
+				if (buffer->memRead.isNotNull()) {
 					Ref<AsyncStream> source = m_source;
 					if (source.isNotNull()) {
 						bRet = source->readToMemory(buffer->memRead, SLIB_FUNCTION_WEAKREF(AsyncCopy, onReadStream, this));
@@ -1531,7 +1531,7 @@ namespace slib
 
 	sl_bool AsyncOutputBuffer::write(const Memory& mem)
 	{
-		if (mem.isEmpty()) {
+		if (mem.isNull()) {
 			return sl_false;
 		}
 		ObjectLocker lock(this);
@@ -1688,7 +1688,7 @@ namespace slib
 			return sl_null;
 		}
 		Memory buffer = Memory::create(param.bufferSize);
-		if (buffer.isEmpty()) {
+		if (buffer.isNull()) {
 			return sl_null;
 		}
 		Ref<AsyncOutput> ret = new AsyncOutput;
@@ -1887,7 +1887,7 @@ namespace slib
 		if (size > 0) {
 			MutexLocker lock(&m_lockReading);
 			Memory memConv = filterRead(data, size, userObject);
-			if (memConv.isNotEmpty()) {
+			if (memConv.isNotNull()) {
 				m_bufReadConverted.add(memConv);
 			}
 		}
@@ -1895,7 +1895,7 @@ namespace slib
 
 	void AsyncStreamFilter::addReadData(const Memory& data)
 	{
-		if (data.isNotEmpty()) {
+		if (data.isNotNull()) {
 			sl_size size = data.getSize();
 			if (size >= 0x80000000) {
 				return;
@@ -1939,7 +1939,7 @@ namespace slib
 				}
 			}
 			Memory mem = m_memReading;
-			if (mem.isEmpty()) {
+			if (mem.isNull()) {
 				mem = Memory::create(SLIB_ASYNC_STREAM_FILTER_DEFAULT_BUFFER_SIZE);
 				if (mem.isNull()) {
 					break;
