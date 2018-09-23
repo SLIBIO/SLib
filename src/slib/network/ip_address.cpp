@@ -31,16 +31,18 @@ namespace slib
 		d = _d;
 	}
 
-	void IPv4Address::getBytes(sl_uint8* bytes) const noexcept
+	void IPv4Address::getBytes(void* _bytes) const noexcept
 	{
+		sl_uint8* bytes = (sl_uint8*)_bytes;
 		bytes[0] = a;
 		bytes[1] = b;
 		bytes[2] = c;
 		bytes[3] = d;
 	}
 
-	void IPv4Address::setBytes(const sl_uint8* bytes) noexcept
+	void IPv4Address::setBytes(const void* _bytes) noexcept
 	{
+		const sl_uint8* bytes = (const sl_uint8*)_bytes;
 		a = bytes[0];
 		b = bytes[1];
 		c = bytes[2];
@@ -364,12 +366,12 @@ namespace slib
 		m[15] = (sl_uint8)(s7);
 	}
 
-	void IPv6Address::getBytes(sl_uint8* bytes) const noexcept
+	void IPv6Address::getBytes(void* bytes) const noexcept
 	{
 		Base::copyMemory(bytes, m, 16);
 	}
 
-	void IPv6Address::setBytes(const sl_uint8* bytes) noexcept
+	void IPv6Address::setBytes(const void* bytes) noexcept
 	{
 		Base::copyMemory(m, bytes, 16);
 	}

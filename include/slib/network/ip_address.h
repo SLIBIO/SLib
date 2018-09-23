@@ -59,9 +59,9 @@ namespace slib
 		
 		void setInt(sl_uint32 addr) noexcept;
 		
-		void getBytes(sl_uint8* bytes) const noexcept;
+		void getBytes(void* bytes) const noexcept;
 		
-		void setBytes(const sl_uint8* bytes) noexcept;
+		void setBytes(const void* bytes) noexcept;
 		
 		static const IPv4Address& zero() noexcept;
 		
@@ -231,10 +231,10 @@ namespace slib
 		void setElements(sl_uint16 s0, sl_uint16 s1, sl_uint16 s2, sl_uint16 s3, sl_uint16 s4, sl_uint16 s5, sl_uint16 s6, sl_uint16 s7) noexcept;
 		
 		// 16 elements
-		void getBytes(sl_uint8* bytes) const noexcept;
+		void getBytes(void* bytes) const noexcept;
 		
 		// 16 elements
-		void setBytes(const sl_uint8* bytes) noexcept;
+		void setBytes(const void* bytes) noexcept;
 		
 		static const IPv6Address& zero() noexcept;
 		
