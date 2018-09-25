@@ -385,7 +385,7 @@ namespace slib
 		size_t len = 0;
 		::getline(&line, &len, stdin);
 		if (line) {
-			ret = String::fromUtf8(line, (sl_int32)len);
+			ret = String(line, Base::getStringLength(line, (sl_int32)len));
 			::free(line);
 		}
 		return ret;

@@ -94,7 +94,7 @@ namespace slib
 			sockaddr_in& out = *((sockaddr_in*)addr);
 			Base::resetMemory(&out, 0, sizeof(sockaddr_in));
 			out.sin_family = AF_INET;
-			out.sin_addr.s_addr = htonl(ip.getIPv4().getInt());
+			ip.getIPv4().getBytes(&(out.sin_addr));
 			out.sin_port = htons((sl_uint16)(port));
 			return sizeof(sockaddr_in);
 		} else if (ip.isIPv6()) {
@@ -102,10 +102,7 @@ namespace slib
 			sockaddr_in6& out = *((sockaddr_in6*)addr);
 			Base::resetMemory(&out, 0, sizeof(sockaddr_in6));
 			out.sin6_family = AF_INET6;
-			for (int i = 0; i < 8; i++) {
-				sl_uint16* w = (sl_uint16*)(&(out.sin6_addr));
-				w[i] = htons(ipv6.getElement(i));
-			}
+			ip.getIPv6().getBytes(&(out.sin6_addr));
 			out.sin6_port = htons((sl_uint16)(port));
 			return sizeof(sockaddr_in6);
 		}
@@ -118,19 +115,14 @@ namespace slib
 		if (in.ss_family == AF_INET) {
 			if (size == 0 || size == sizeof(sockaddr_in)) {
 				sockaddr_in& addr = *((sockaddr_in*)&in);
-				ip = IPv4Address(ntohl(addr.sin_addr.s_addr));
+				ip = IPv4Address((sl_uint8*)&(addr.sin_addr));
 				port = ntohs(addr.sin_port);
 				return sl_true;
 			}
 		} else if (in.ss_family == AF_INET6) {
 			if (size == 0 || size == sizeof(sockaddr_in6)) {
 				sockaddr_in6& addr = *((sockaddr_in6*)&in);
-				IPv6Address ipv6;
-				for (int i = 0; i < 8; i++) {
-					sl_uint16* w = (sl_uint16*)(&(addr.sin6_addr));
-					ipv6.setElement(i, ntohs(w[i]));
-				}
-				ip = ipv6;
+				ip = IPv6Address((sl_uint8*)&(addr.sin6_addr));
 				port = ntohs(addr.sin6_port);
 				return sl_true;
 			}
