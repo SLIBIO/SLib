@@ -965,6 +965,8 @@
 		26D9D9F41E968240005F7BD3 /* http_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D9D9F31E968240005F7BD3 /* http_io.cpp */; };
 		26F2F8D91EC2E0EB0074C29E /* red_black_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F2F8D81EC2E0EB0074C29E /* red_black_tree.cpp */; };
 		26F2F8DA1EC2E0EB0074C29E /* red_black_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F2F8D81EC2E0EB0074C29E /* red_black_tree.cpp */; };
+		26FADD30215676D50057F7EA /* stun.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FADD2F215676D40057F7EA /* stun.cpp */; };
+		26FADD31215676D90057F7EA /* stun.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FADD2F215676D40057F7EA /* stun.cpp */; };
 		26FBB34B1ED5581F0086C27A /* ui_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FBB34A1ED5581F0086C27A /* ui_text.cpp */; };
 /* End PBXBuildFile section */
 
@@ -1814,6 +1816,7 @@
 		26F5B3181E9010D100F9FB7F /* latlon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = latlon.cpp; sourceTree = "<group>"; };
 		26F900641D994ED0001A6EE9 /* animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = animation.cpp; sourceTree = "<group>"; };
 		26FA807B1C98891B0074F76B /* quaternion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = quaternion.cpp; sourceTree = "<group>"; };
+		26FADD2F215676D40057F7EA /* stun.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stun.cpp; sourceTree = "<group>"; };
 		26FBB34A1ED5581F0086C27A /* ui_text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_text.cpp; sourceTree = "<group>"; };
 		26FBC26C1DF9E83F00D76774 /* function.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = function.cpp; sourceTree = "<group>"; };
 		26FBDE4E1DA2B3EC00FF1B55 /* canvas_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = canvas_quartz.mm; sourceTree = "<group>"; };
@@ -3149,6 +3152,7 @@
 				266DD4D31C11940A00D47AB0 /* socket_address.cpp */,
 				266DD4D41C11940A00D47AB0 /* socket_event.cpp */,
 				266DD4D51C11940A00D47AB0 /* socket_event_unix.cpp */,
+				26FADD2F215676D40057F7EA /* stun.cpp */,
 				266DD4D71C11940A00D47AB0 /* tcpip.cpp */,
 				26C13E421DDA30FD00612945 /* url.cpp */,
 				26C13E441DDA32F000612945 /* url_request.cpp */,
@@ -3991,6 +3995,7 @@
 				26D158D81E93A29B003BD61A /* aes.cpp in Sources */,
 				26D158D91E93A29B003BD61A /* block_cipher.cpp in Sources */,
 				26D158C71E93A28C003BD61A /* ptr.cpp in Sources */,
+				26FADD31215676D90057F7EA /* stun.cpp in Sources */,
 				26D158F31E93A2A5003BD61A /* triangle3.cpp in Sources */,
 				26D158DD1E93A29B003BD61A /* gcm.cpp in Sources */,
 				2605A2401EA26AE3005CC1D3 /* url.cpp in Sources */,
@@ -4591,6 +4596,7 @@
 				26D9D9EF1E96468D005F7BD3 /* window.cpp in Sources */,
 				26D9D8F91E9645CE005F7BD3 /* map.cpp in Sources */,
 				26D9D9A01E96467B005F7BD3 /* network_os.cpp in Sources */,
+				26FADD30215676D50057F7EA /* stun.cpp in Sources */,
 				26D9D9E81E96468D005F7BD3 /* ui_resource.cpp in Sources */,
 				26D9D8FA1E9645CE005F7BD3 /* compress_zlib.cpp in Sources */,
 				26D9D9C51E96468D005F7BD3 /* list_report_view_macos.mm in Sources */,

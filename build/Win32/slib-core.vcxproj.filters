@@ -365,5 +365,11 @@
     <ClCompile Include="..\..\src\slib\math\calculator.cpp">
       <Filter>src\math</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\network\stun.cpp">
+      <Filter>src\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\network\url_request_curl.cpp">
+      <Filter>src\network</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

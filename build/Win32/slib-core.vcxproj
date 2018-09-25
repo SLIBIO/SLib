@@ -132,9 +132,11 @@
     <ClCompile Include="..\..\src\slib\network\socket_address.cpp" />
     <ClCompile Include="..\..\src\slib\network\socket_event.cpp" />
     <ClCompile Include="..\..\src\slib\network\socket_event_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\network\stun.cpp" />
     <ClCompile Include="..\..\src\slib\network\tcpip.cpp" />
     <ClCompile Include="..\..\src\slib\network\url.cpp" />
     <ClCompile Include="..\..\src\slib\network\url_request.cpp" />
+    <ClCompile Include="..\..\src\slib\network\url_request_curl.cpp" />
     <ClCompile Include="..\..\src\slib\network\url_request_win32.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
