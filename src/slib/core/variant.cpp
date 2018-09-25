@@ -1561,6 +1561,20 @@ namespace slib
 		Ref<Referable> obj(getObject());
 		if (CList<Variant>* p = CastInstance< CList<Variant> >(obj._ptr)) {
 			return p;
+		} else if (CList< Map<String, Variant> >* p2 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
+			VariantList ret;
+			ListLocker<VariantMap> list(*p2);
+			for (sl_size i = 0; list.count; i++) {
+				ret.add_NoLock(list[i]);
+			}
+			return ret;
+		} else if (CList< HashMap<String, Variant> >* p3 = CastInstance< CList< HashMap<String, Variant> > >(obj._ptr)) {
+			VariantList ret;
+			ListLocker<VariantHashMap> list(*p3);
+			for (sl_size i = 0; list.count; i++) {
+				ret.add_NoLock(list[i]);
+			}
+			return ret;
 		}
 		return sl_null;
 	}
@@ -1589,6 +1603,13 @@ namespace slib
 		Ref<Referable> obj(getObject());
 		if (CMap<String, Variant>* p = CastInstance< CMap<String, Variant> >(obj._ptr)) {
 			return p;
+		} else if (CHashMap<String, Variant>* p2 = CastInstance< CHashMap<String, Variant> >(obj._ptr)) {
+			ObjectLocker lock(p2);
+			VariantMap ret;
+			for (auto& item: *p2) {
+				ret.add_NoLock(item.key, item.value);
+			}
+			return ret;
 		}
 		return sl_null;
 	}
@@ -1608,6 +1629,13 @@ namespace slib
 		Ref<Referable> obj(getObject());
 		if (CHashMap<String, Variant>* p = CastInstance< CHashMap<String, Variant> >(obj._ptr)) {
 			return p;
+		} else if (CMap<String, Variant>* p2 = CastInstance< CMap<String, Variant> >(obj._ptr)) {
+			ObjectLocker lock(p2);
+			VariantHashMap ret;
+			for (auto& item: *p2) {
+				ret.add_NoLock(item.key, item.value);
+			}
+			return ret;
 		}
 		return sl_null;
 	}
