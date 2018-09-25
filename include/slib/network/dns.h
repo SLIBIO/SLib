@@ -18,6 +18,7 @@
 
 #include "../core/string.h"
 #include "../core/hash_map.h"
+#include "../core/json.h"
 #include "../crypto/aes.h"
 
 /********************************************************************
@@ -564,7 +565,7 @@ namespace slib
 		~DnsServerParam();
 		
 	public:
-		void parse(const Variant& config);
+		void parse(const Json& config);
 		
 	};
 	
