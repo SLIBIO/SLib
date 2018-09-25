@@ -9,7 +9,7 @@ add_executable(ExampleImageView
   main.cpp
 )
 
-set_target_properties(ExampleImageView PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++")
+set_target_properties(ExampleImageView PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++ -Wl,--wrap=memcpy")
 
 target_link_libraries (
   ExampleImageView
