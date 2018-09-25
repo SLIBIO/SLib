@@ -1,0 +1,1 @@
+$(dirname $0)/build-app-cmake.sh Debug $1
