@@ -106,25 +106,29 @@ namespace slib
 					if (pcap_set_buffer_size(handle, param.sizeBuffer) == 0) {
 						if (pcap_set_promisc(handle, param.flagPromiscuous) == 0) {
 							if (pcap_set_timeout(handle, param.timeoutRead) == 0) {
-								int iRet = pcap_activate(handle);
-								if (iRet == 0 || iRet == PCAP_WARNING || iRet == PCAP_WARNING_PROMISC_NOTSUP || iRet == PCAP_WARNING_TSTAMP_TYPE_NOTSUP) {
-									Ref<_priv_NetPcapCapture> ret = new _priv_NetPcapCapture;
-									if (ret.isNotNull()) {
-										ret->_initWithParam(param);
-										ret->m_handle = handle;
-										ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_priv_NetPcapCapture, _run, ret.get()));
-										if (ret->m_thread.isNotNull()) {
-											ret->m_flagInit = sl_true;
-											if (param.flagAutoStart) {
-												ret->start();
+								if (pcap_set_immediate_mode(handle, param.flagImmediate) == 0) {
+									int iRet = pcap_activate(handle);
+									if (iRet == 0 || iRet == PCAP_WARNING || iRet == PCAP_WARNING_PROMISC_NOTSUP || iRet == PCAP_WARNING_TSTAMP_TYPE_NOTSUP) {
+										Ref<_priv_NetPcapCapture> ret = new _priv_NetPcapCapture;
+										if (ret.isNotNull()) {
+											ret->_initWithParam(param);
+											ret->m_handle = handle;
+											ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_priv_NetPcapCapture, _run, ret.get()));
+											if (ret->m_thread.isNotNull()) {
+												ret->m_flagInit = sl_true;
+												if (param.flagAutoStart) {
+													ret->start();
+												}
+												return ret;
+											} else {
+												LogError(TAG, "Failed to create thread");
 											}
-											return ret;
-										} else {
-											LogError(TAG, "Failed to create thread");
 										}
+									} else {
+										LogError(TAG, "Activate Failed");
 									}
 								} else {
-									LogError(TAG, "Activate Failed");
+									LogError(TAG, "Set Immediate-Mode Failed");
 								}
 							} else {
 								LogError(TAG, "Set Timeout Failed");

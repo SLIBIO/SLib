@@ -52,7 +52,8 @@ namespace slib
 	NetCaptureParam::NetCaptureParam()
 	{
 		flagPromiscuous = sl_false;
-		timeoutRead = 100;
+		timeoutRead = 0; // no timeout specified
+		flagImmediate = sl_false;
 		sizeBuffer = 0x200000; // 2MB (16Mb)
 		
 		preferedLinkDeviceType = NetworkLinkDeviceType::Ethernet;

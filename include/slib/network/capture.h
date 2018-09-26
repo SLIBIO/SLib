@@ -84,9 +84,10 @@ namespace slib
 	public:
 		String deviceName; // <null> or <empty string> for any devices
 		
-		sl_bool flagPromiscuous; // ignored for "any devices" mode, used in pcap mode
-		sl_uint32 timeoutRead; // read timeout, in milliseconds, used in pcap mode
-		sl_uint32 sizeBuffer; // buffer size, used in pcap mode
+		sl_bool flagPromiscuous; // ignored for "any devices" mode, used in pcap
+		sl_uint32 timeoutRead; // read timeout, in milliseconds, used in pcap
+		sl_bool flagImmediate; // immediate mode, used in pcap
+		sl_uint32 sizeBuffer; // buffer size, used in pcap
 		
 		NetworkLinkDeviceType preferedLinkDeviceType; // NetworkLinkDeviceType, used in Packet Socket mode. now supported Ethernet and Raw
 		
