@@ -99,7 +99,7 @@ namespace slib
 	int IPv4Address::compare(const IPv4Address& other) const noexcept
 	{
 		sl_uint32 p1 = getInt();
-		sl_uint32 p2 = getInt();
+		sl_uint32 p2 = other.getInt();
 		return (p1 < p2) ? -1 : (p1 > p2);
 	}
 
@@ -575,7 +575,7 @@ namespace slib
 
 	sl_bool IPv6Address::operator!=(const IPv6Address& other) const noexcept
 	{
-		return !(*this == other);
+		return Base::compareMemory(m, other.m, 16) != 0;
 	}
 
 	sl_bool IPv6Address::operator<=(const IPv6Address& other) const noexcept
