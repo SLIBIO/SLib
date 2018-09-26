@@ -66,6 +66,15 @@ int main(int argc, const char * argv[])
 		}
 	};
 	
+	Println("Input the UDP binding address. Format: [HOST:]PORT, Default: 0");
+	String strAddressBind = Console::readLine().trim();
+	sl_uint32 bindPort;
+	if (strAddressBind.parseUint32(10, &bindPort)) {
+		param.bindAddress.port = (sl_uint16)bindPort;
+	} else {
+		param.bindAddress.setString(strAddressBind);
+	}
+	
 	for (;;) {
 		Println("Is IPv6? Y/N, default: N");
 		String v = Console::readLine().trim();
@@ -77,13 +86,14 @@ int main(int argc, const char * argv[])
 			break;
 		}
 	}
-	
+
+	Println("Creating Async UDP Socket, %s, Bind: %s", param.flagIPv6 ? "IPv6" : "IPv4", param.bindAddress.toString());
+
 	Ref<AsyncUdpSocket> socket = AsyncUdpSocket::create(param);
 	if (socket.isNull()) {
 		Println("Unable to create Async UDP Socket.");
 		return -1;
 	}
-	Println("Opened Async UDP Socket");
 	
 	Ref<Timer> timerSTUN = Timer::start([socket, stunAddress](Timer* timer) {
 		static sl_uint32 transactionID[3] = {0};
