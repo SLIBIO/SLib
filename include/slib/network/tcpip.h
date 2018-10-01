@@ -490,7 +490,7 @@ namespace slib
 		static sl_bool isNeededReassembly(const void* ip, sl_uint32 size, sl_bool flagCheckedHeader = sl_false);
 
 		// returns a combined IP packet
-		Memory reassembleFragment(const void* ip, sl_uint32 size, sl_bool flagCheckedHeader = sl_false);
+		Memory reassemble(const void* ip, sl_uint32 size, sl_bool flagCheckedHeader = sl_false);
 
 		List<Memory> makeFragments(const IPv4Packet* header, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu = 1500);
 

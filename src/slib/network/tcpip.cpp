@@ -562,7 +562,7 @@ namespace slib
 		return sl_true;
 	}
 	
-	Memory IPv4Fragmentation::reassembleFragment(const void* _ip, sl_uint32 size, sl_bool flagCheckedHeader)
+	Memory IPv4Fragmentation::reassemble(const void* _ip, sl_uint32 size, sl_bool flagCheckedHeader)
 	{
 		IPv4Packet* ip = (IPv4Packet*)(_ip);
 		if (!flagCheckedHeader) {
