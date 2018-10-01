@@ -53,7 +53,7 @@ namespace slib
 	{
 		flagPromiscuous = sl_false;
 		timeoutRead = 0; // no timeout specified
-		flagImmediate = sl_false;
+		flagImmediate = sl_true;
 		sizeBuffer = 0x200000; // 2MB (16Mb)
 		
 		preferedLinkDeviceType = NetworkLinkDeviceType::Ethernet;

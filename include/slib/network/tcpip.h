@@ -102,6 +102,12 @@ namespace slib
 	class SLIB_EXPORT IPv4Packet
 	{
 	public:
+		enum
+		{
+			HeaderSizeBeforeOptions = 20
+		};
+
+	public:
 		static sl_bool isIPv4Header(const void* header);
 		
 		// 4 bits, version is 4 for IPv4
@@ -235,7 +241,7 @@ namespace slib
 		sl_uint8 m_TOS_DSCP_ECN;
 		sl_uint8 _totalLength[2];
 		sl_uint8 _identification[2];
-		sl_uint8 _flagsAndFlagmentOffset[2];
+		sl_uint8 _flagsAndFragmentOffset[2];
 		sl_uint8 _timeToLive;
 		sl_uint8 _protocol;
 		sl_uint8 _headerChecksum[2];
@@ -248,6 +254,12 @@ namespace slib
 
 	class SLIB_EXPORT TcpSegment
 	{
+	public:
+		enum
+		{
+			HeaderSizeBeforeOptions = 20
+		};
+		
 	public:
 		sl_uint16 getSourcePort() const;
 		
@@ -436,8 +448,7 @@ namespace slib
 	class SLIB_EXPORT IPv4Fragment
 	{
 	public:
-		sl_uint32 start;
-		sl_uint32 end;
+		sl_uint32 offset;
 		Memory data;
 		
 	public:
@@ -452,8 +463,6 @@ namespace slib
 	public:
 		Memory header;
 		List<IPv4Fragment> fragments;
-		sl_uint32 sizeAccumulated;
-		sl_uint32 sizeContent;
 		
 	public:
 		IPv4FragmentedPacket();
@@ -473,6 +482,10 @@ namespace slib
 		void setupExpiringDuration(sl_uint32 ms, const Ref<DispatchLoop>& loop);
 		
 		void setupExpiringDuration(sl_uint32 ms);
+		
+		sl_uint32 getMaximumContentSize();
+		
+		void setMaximumContentSize(sl_uint32 max);
 
 		static sl_bool isNeededCombine(const void* ip, sl_uint32 size, sl_bool flagCheckedHeader = sl_false);
 
@@ -486,6 +499,7 @@ namespace slib
 	protected:
 		ExpiringMap< IPv4PacketIdentifier, Ref<IPv4FragmentedPacket> > m_packets;
 		sl_int32 m_currentIdentifier;
+		sl_uint32 m_maxContentSize;
 		
 	};
 

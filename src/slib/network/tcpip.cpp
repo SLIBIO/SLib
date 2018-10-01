@@ -98,33 +98,33 @@ namespace slib
 	
 	sl_bool IPv4Packet::isDF() const
 	{
-		return (_flagsAndFlagmentOffset[0] & 0x40) != 0;
+		return (_flagsAndFragmentOffset[0] & 0x40) != 0;
 	}
 	
 	void IPv4Packet::setDF(sl_bool flag)
 	{
-		_flagsAndFlagmentOffset[0] = (sl_uint8)((_flagsAndFlagmentOffset[0] & 0xBF) | (flag ? 0x40 : 0));
+		_flagsAndFragmentOffset[0] = (sl_uint8)((_flagsAndFragmentOffset[0] & 0xBF) | (flag ? 0x40 : 0));
 	}
 	
 	sl_bool IPv4Packet::isMF() const
 	{
-		return (_flagsAndFlagmentOffset[0] & 0x20) != 0;
+		return (_flagsAndFragmentOffset[0] & 0x20) != 0;
 	}
 	
 	void IPv4Packet::setMF(sl_bool flag)
 	{
-		_flagsAndFlagmentOffset[0] = (sl_uint8)((_flagsAndFlagmentOffset[0] & 0xDF) | (flag ? 0x20 : 0));
+		_flagsAndFragmentOffset[0] = (sl_uint8)((_flagsAndFragmentOffset[0] & 0xDF) | (flag ? 0x20 : 0));
 	}
 	
 	sl_uint32 IPv4Packet::getFragmentOffset() const
 	{
-		return (((sl_uint32)(_flagsAndFlagmentOffset[0] & 0x1F)) << 8) | _flagsAndFlagmentOffset[1];
+		return (((sl_uint32)(_flagsAndFragmentOffset[0] & 0x1F)) << 8) | _flagsAndFragmentOffset[1];
 	}
 	
 	void IPv4Packet::setFragmentOffset(sl_uint32 offset)
 	{
-		_flagsAndFlagmentOffset[1] = (sl_uint8)offset;
-		_flagsAndFlagmentOffset[0] = (sl_uint8)((_flagsAndFlagmentOffset[0] & 0xE0) | ((offset >> 8) & 0x1F));
+		_flagsAndFragmentOffset[1] = (sl_uint8)offset;
+		_flagsAndFragmentOffset[0] = (sl_uint8)((_flagsAndFragmentOffset[0] & 0xE0) | ((offset >> 8) & 0x1F));
 	}
 	
 	sl_uint8 IPv4Packet::getTTL() const
@@ -521,6 +521,7 @@ namespace slib
 	IPv4Fragmentation::IPv4Fragmentation()
 	{
 		m_currentIdentifier = 0;
+		m_maxContentSize = 0x100000;
 	}
 	
 	IPv4Fragmentation::~IPv4Fragmentation()
@@ -535,6 +536,16 @@ namespace slib
 	void IPv4Fragmentation::setupExpiringDuration(sl_uint32 ms)
 	{
 		m_packets.setupTimer(ms);
+	}
+	
+	sl_uint32 IPv4Fragmentation::getMaximumContentSize()
+	{
+		return m_maxContentSize;
+	}
+	
+	void IPv4Fragmentation::setMaximumContentSize(sl_uint32 max)
+	{
+		m_maxContentSize = max;
 	}
 	
 	sl_bool IPv4Fragmentation::isNeededCombine(const void* _ip, sl_uint32 size, sl_bool flagCheckedHeader)
@@ -564,7 +575,7 @@ namespace slib
 			return Memory::create(ip, ip->getTotalSize());
 		}
 		
-		sl_uint32 offset = ip->getFragmentOffset() * 8;
+		sl_uint32 offset = ip->getFragmentOffset() << 3;
 		
 		IPv4PacketIdentifier id;
 		id.source = ip->getSourceAddress();
@@ -572,8 +583,8 @@ namespace slib
 		id.identification = ip->getIdentification();
 		id.protocol = ip->getProtocol();
 		
-		// get packet
 		ObjectLocker lock(this);
+		
 		Ref<IPv4FragmentedPacket> packet;
 		if (offset == 0) {
 			packet = new IPv4FragmentedPacket;
@@ -584,12 +595,6 @@ namespace slib
 			if (packet->header.isNull()) {
 				return sl_null;
 			}
-			IPv4Packet* headerNew = (IPv4Packet*)(packet->header.getData());
-			headerNew->setMF(sl_false);
-			headerNew->updateChecksum();
-			packet->sizeAccumulated = 0;
-			packet->sizeContent = 0;
-			packet->fragments.removeAll();
 			if (!(m_packets.put(id, packet))) {
 				return sl_null;
 			}
@@ -602,56 +607,52 @@ namespace slib
 		
 		sl_uint8* data = (sl_uint8*)(ip->getContent());
 		sl_uint32 sizeContent = ip->getContentSize();
-		sl_uint32 start = offset;
-		sl_uint32 end = start + sizeContent;
-		
-		// last fragment, then we can know the size of content
-		if (!(ip->isMF())) {
-			packet->sizeContent = end;
-			if (end == 0) {
-				m_packets.remove(id);
-				return sl_null;
-			}
-		}
-		
-		// check overlapping
-		if (sizeContent > 0) {
-			ListLocker<IPv4Fragment> fragments(packet->fragments);
-			for (sl_size i = 0; i < fragments.count; i++) {
-				if (fragments[i].start <= start && start < fragments[i].end) {
-					start = fragments[i].end;
-				}
-				if (fragments[i].start < end && end <= fragments[i].end) {
-					end = fragments[i].start;
-				}
-				if (start >= end) {
-					return sl_null;
-				}
-			}
-		} else {
+
+		if (sizeContent > m_maxContentSize) {
 			return sl_null;
 		}
-		IPv4Fragment fragment;
-		fragment.start = start;
-		fragment.end = end;
-		fragment.data = Memory::create(data + (start - offset), end - start);
-		packet->fragments.add(fragment);
-		packet->sizeAccumulated += (end - start);
-		// check completed
-		if (packet->sizeContent > 0 && packet->sizeAccumulated == packet->sizeContent) {
-			m_packets.remove(id);
-			Memory mem = Memory::create(packet->header.getSize() + packet->sizeContent);
-			if (mem.isNotNull()) {
-				Base::copyMemory(mem.getData(), packet->header.getData(), packet->header.getSize());
-				data = (sl_uint8*)(mem.getData()) + packet->header.getSize();
-				ListLocker<IPv4Fragment> fragments(packet->fragments);
-				for (sl_size i = 0; i < fragments.count; i++) {
-					Base::copyMemory(data + fragments[i].start, fragments[i].data.getData(), fragments[i].end - fragments[i].start);
-				}
-				return mem;
+		
+		if (ip->isMF()) {
+			IPv4Fragment fragment;
+			fragment.offset = offset;
+			fragment.data = Memory::create(data, sizeContent);
+			packet->fragments.add_NoLock(fragment);
+			return sl_null;
+		}
+		
+		m_packets.remove(id);
+		
+		sl_uint32 sizeHeader = (sl_uint32)(packet->header.getSize());
+		sl_uint32 sizeTotal = offset + sizeContent;
+		
+		if (sizeTotal > m_maxContentSize) {
+			return sl_null;
+		}
+		
+		Memory mem = Memory::create(sizeHeader + sizeTotal);
+		if (mem.isNull()) {
+			return sl_null;
+		}
+		
+		IPv4Packet* headerTotal = (IPv4Packet*)(mem.getData());
+		sl_uint8* dataTotal = (sl_uint8*)(headerTotal) + sizeHeader;
+
+		Base::copyMemory(headerTotal, packet->header.getData(), sizeHeader);
+		
+		ListElements<IPv4Fragment> fragments(packet->fragments);
+		for (sl_size i = 0; i < fragments.count; i++) {
+			sl_size sizeFragment = fragments[i].data.getSize();
+			if (fragments[i].offset + sizeFragment <= sizeTotal) {
+				Base::copyMemory(dataTotal + fragments[i].offset, fragments[i].data.getData(), sizeFragment);
 			}
 		}
-		return sl_null;
+		Base::copyMemory(dataTotal + offset, data, sizeContent);
+
+		headerTotal->setMF(sl_false);
+		headerTotal->setTotalSize(sizeHeader + sizeTotal);
+		headerTotal->updateChecksum();
+
+		return mem;
 	}
 	
 	List<Memory> IPv4Fragmentation::makeFragments(const IPv4Packet* header, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu)
