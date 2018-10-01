@@ -487,10 +487,10 @@ namespace slib
 		
 		void setMaximumContentSize(sl_uint32 max);
 
-		static sl_bool isNeededCombine(const void* ip, sl_uint32 size, sl_bool flagCheckedHeader = sl_false);
+		static sl_bool isNeededReassembly(const void* ip, sl_uint32 size, sl_bool flagCheckedHeader = sl_false);
 
 		// returns a combined IP packet
-		Memory combineFragment(const void* ip, sl_uint32 size, sl_bool flagCheckedHeader = sl_false);
+		Memory reassembleFragment(const void* ip, sl_uint32 size, sl_bool flagCheckedHeader = sl_false);
 
 		List<Memory> makeFragments(const IPv4Packet* header, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu = 1500);
 

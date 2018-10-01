@@ -548,7 +548,7 @@ namespace slib
 		m_maxContentSize = max;
 	}
 	
-	sl_bool IPv4Fragmentation::isNeededCombine(const void* _ip, sl_uint32 size, sl_bool flagCheckedHeader)
+	sl_bool IPv4Fragmentation::isNeededReassembly(const void* _ip, sl_uint32 size, sl_bool flagCheckedHeader)
 	{
 		IPv4Packet* ip = (IPv4Packet*)(_ip);
 		if (!flagCheckedHeader) {
@@ -562,7 +562,7 @@ namespace slib
 		return sl_true;
 	}
 	
-	Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size, sl_bool flagCheckedHeader)
+	Memory IPv4Fragmentation::reassembleFragment(const void* _ip, sl_uint32 size, sl_bool flagCheckedHeader)
 	{
 		IPv4Packet* ip = (IPv4Packet*)(_ip);
 		if (!flagCheckedHeader) {
