@@ -333,11 +333,13 @@ namespace slib
 		
 		void setChecksum(sl_uint16 checksum);
 
-		void updateChecksum(const IPv4Packet* ipv4, sl_uint32 sizeContent);
+		void updateChecksum(const IPv4Packet* ipv4, sl_uint32 sizeTcp);
 		
-		sl_bool checkChecksum(const IPv4Packet* ipv4, sl_uint32 sizeContent) const;
+		sl_bool checkChecksum(const IPv4Packet* ipv4, sl_uint32 sizeTcp) const;
 
-		sl_bool check(IPv4Packet* ip, sl_uint32 sizeContent) const;
+		sl_bool checkSize(sl_uint32 sizeTcp) const;
+
+		sl_bool check(IPv4Packet* ip, sl_uint32 sizeTcp) const;
 
 		sl_uint16 getUrgentPointer() const;
 		
@@ -395,8 +397,10 @@ namespace slib
 		void updateChecksum(const IPv4Packet* ipv4);
 		
 		sl_bool checkChecksum(const IPv4Packet* ipv4) const;
+		
+		sl_bool checkSize(sl_uint32 sizeUdp) const;
 
-		sl_bool check(IPv4Packet* ip, sl_uint32 sizeContent) const;
+		sl_bool check(IPv4Packet* ip, sl_uint32 sizeUdp) const;
 		
 		const sl_uint8* getContent() const;
 		
@@ -487,18 +491,16 @@ namespace slib
 		
 		void setMaximumContentSize(sl_uint32 max);
 
-		static sl_bool isNeededReassembly(const void* ip, sl_uint32 size, sl_bool flagCheckedHeader = sl_false);
+		static sl_bool isNeededReassembly(const IPv4Packet* packet);
 
-		// returns a combined IP packet
-		Memory reassemble(const void* ip, sl_uint32 size, sl_bool flagCheckedHeader = sl_false);
+		Memory reassemble(const IPv4Packet* packet);
 
-		List<Memory> makeFragments(const IPv4Packet* header, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu = 1500);
-
-		static List<Memory> makeFragments(const IPv4Packet* header, sl_uint16 identifier, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu = 1500);
+		static sl_bool isNeededFragmentation(const IPv4Packet* packet, sl_uint32 mtu = 1500);
+		
+		static List<Memory> makeFragments(const IPv4Packet* packet, sl_uint32 mtu = 1500);
 		
 	protected:
 		ExpiringMap< IPv4PacketIdentifier, Ref<IPv4FragmentedPacket> > m_packets;
-		sl_int32 m_currentIdentifier;
 		sl_uint32 m_maxContentSize;
 		
 	};

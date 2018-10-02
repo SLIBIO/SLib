@@ -45,26 +45,26 @@ namespace slib
 		MIO::writeUint16BE(_checksum, checksum);
 	}
 
-	void IcmpHeaderFormat::updateChecksum(sl_uint32 sizeContent)
+	void IcmpHeaderFormat::updateChecksum(sl_uint32 sizeICMP)
 	{
 		_checksum[0] = 0;
 		_checksum[1] = 0;
-		sl_uint16 checksum = TCP_IP::calculateChecksum(this, sizeContent);
+		sl_uint16 checksum = TCP_IP::calculateChecksum(this, sizeICMP);
 		setChecksum(checksum);
 	}
 
-	sl_bool IcmpHeaderFormat::checkChecksum(sl_uint32 sizeContent) const
+	sl_bool IcmpHeaderFormat::checkChecksum(sl_uint32 sizeICMP) const
 	{
-		sl_uint16 checksum = TCP_IP::calculateChecksum(this, sizeContent);
+		sl_uint16 checksum = TCP_IP::calculateChecksum(this, sizeICMP);
 		return checksum == 0;
 	}
 
-	sl_bool IcmpHeaderFormat::check(sl_uint32 sizeContent) const
+	sl_bool IcmpHeaderFormat::check(sl_uint32 sizeICMP) const
 	{
-		if (sizeContent < sizeof(IcmpHeaderFormat)) {
+		if (sizeICMP < sizeof(IcmpHeaderFormat)) {
 			return sl_false;
 		}
-		if (!(checkChecksum(sizeContent))) {
+		if (!(checkChecksum(sizeICMP))) {
 			return sl_false;
 		}
 		return sl_true;
@@ -128,6 +128,36 @@ namespace slib
 	void IcmpHeaderFormat::setTimestampSequenceNumber(sl_uint16 sn)
 	{
 		MIO::writeUint16BE(_rest + 2, sn);
+	}
+
+	sl_uint16 IcmpHeaderFormat::getAddressMaskIdentifier() const
+	{
+		return MIO::readUint16BE(_rest);
+	}
+	
+	void IcmpHeaderFormat::setAddressMaskIdentifier(sl_uint16 id)
+	{
+		MIO::writeUint16BE(_rest, id);
+	}
+	
+	sl_uint16 IcmpHeaderFormat::getAddressMaskSequenceNumber() const
+	{
+		return MIO::readUint16BE(_rest + 2);
+	}
+	
+	void IcmpHeaderFormat::setAddressMaskSequenceNumber(sl_uint16 sn)
+	{
+		MIO::writeUint16BE(_rest + 2, sn);
+	}
+
+	sl_uint16 IcmpHeaderFormat::getNextHopMTU() const
+	{
+		return MIO::readUint16BE(_rest + 2);
+	}
+	
+	void IcmpHeaderFormat::setNextHopMTU(sl_uint16 mtu)
+	{
+		MIO::writeUint16BE(_rest + 2, mtu);
 	}
 
 	const sl_uint8* IcmpHeaderFormat::getContent() const

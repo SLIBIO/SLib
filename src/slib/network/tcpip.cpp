@@ -156,6 +156,9 @@ namespace slib
 	
 	sl_bool IPv4Packet::checkChecksum() const
 	{
+		if ((_headerChecksum[0] | _headerChecksum[1]) == 0) {
+			return sl_true;
+		}
 		sl_uint16 checksum = TCP_IP::calculateChecksum(this, getHeaderSize());
 		return checksum == 0;
 	}
@@ -380,21 +383,21 @@ namespace slib
 		MIO::writeUint16BE(_checksum, checksum);
 	}
 	
-	void TcpSegment::updateChecksum(const IPv4Packet* ipv4, sl_uint32 sizeContent)
+	void TcpSegment::updateChecksum(const IPv4Packet* ipv4, sl_uint32 sizeTcp)
 	{
 		_checksum[0] = 0;
 		_checksum[1] = 0;
-		sl_uint16 checksum = ipv4->getChecksumForContent(this, sizeContent);
+		sl_uint16 checksum = ipv4->getChecksumForContent(this, sizeTcp);
 		MIO::writeUint16BE(_checksum, checksum);
 	}
 	
-	sl_bool TcpSegment::checkChecksum(const IPv4Packet* ipv4, sl_uint32 sizeContent) const
+	sl_bool TcpSegment::checkChecksum(const IPv4Packet* ipv4, sl_uint32 sizeTcp) const
 	{
-		sl_uint16 checksum = ipv4->getChecksumForContent(this, sizeContent);
+		sl_uint16 checksum = ipv4->getChecksumForContent(this, sizeTcp);
 		return checksum == 0;
 	}
 	
-	sl_bool TcpSegment::check(IPv4Packet* ip, sl_uint32 sizeTcp) const
+	sl_bool TcpSegment::checkSize(sl_uint32 sizeTcp) const
 	{
 		if (sizeTcp < sizeof(TcpSegment)) {
 			return sl_false;
@@ -402,10 +405,12 @@ namespace slib
 		if (sizeTcp < getHeaderSize()) {
 			return sl_false;
 		}
-		if (!(checkChecksum(ip, sizeTcp))) {
-			return sl_false;
-		}
 		return sl_true;
+	}
+	
+	sl_bool TcpSegment::check(IPv4Packet* ip, sl_uint32 sizeTcp) const
+	{
+		return checkSize(sizeTcp) && checkChecksum(ip, sizeTcp);
 	}
 	
 	sl_uint16 TcpSegment::getUrgentPointer() const
@@ -452,14 +457,14 @@ namespace slib
 	
 	sl_bool UdpDatagram::checkChecksum(const IPv4Packet* ipv4) const
 	{
-		if (getChecksum() == 0) {
+		if ((_checksum[0] | _checksum[1]) == 0) {
 			return sl_true;
 		}
 		sl_uint16 checksum = ipv4->getChecksumForContent(this, getTotalSize());
 		return checksum == 0 || checksum == 0xFFFF;
 	}
 	
-	sl_bool UdpDatagram::check(IPv4Packet* ip, sl_uint32 sizeUdp) const
+	sl_bool UdpDatagram::checkSize(sl_uint32 sizeUdp) const
 	{
 		if (sizeUdp < HeaderSize) {
 			return sl_false;
@@ -467,10 +472,12 @@ namespace slib
 		if (sizeUdp != getTotalSize()) {
 			return sl_false;
 		}
-		if (!(checkChecksum(ip))) {
-			return sl_false;
-		}
 		return sl_true;
+	}
+	
+	sl_bool UdpDatagram::check(IPv4Packet* ip, sl_uint32 sizeUdp) const
+	{
+		return checkSize(sizeUdp) && checkChecksum(ip);
 	}
 	
 	
@@ -520,7 +527,6 @@ namespace slib
 	
 	IPv4Fragmentation::IPv4Fragmentation()
 	{
-		m_currentIdentifier = 0;
 		m_maxContentSize = 0x100000;
 	}
 	
@@ -548,29 +554,16 @@ namespace slib
 		m_maxContentSize = max;
 	}
 	
-	sl_bool IPv4Fragmentation::isNeededReassembly(const void* _ip, sl_uint32 size, sl_bool flagCheckedHeader)
+	sl_bool IPv4Fragmentation::isNeededReassembly(const IPv4Packet* ip)
 	{
-		IPv4Packet* ip = (IPv4Packet*)(_ip);
-		if (!flagCheckedHeader) {
-			if (!(IPv4Packet::check(ip, size))) {
-				return sl_false;
-			}
-		}
 		if (ip->getFragmentOffset() == 0 && !(ip->isMF())) {
 			return sl_false;
 		}
 		return sl_true;
 	}
 	
-	Memory IPv4Fragmentation::reassemble(const void* _ip, sl_uint32 size, sl_bool flagCheckedHeader)
+	Memory IPv4Fragmentation::reassemble(const IPv4Packet* ip)
 	{
-		IPv4Packet* ip = (IPv4Packet*)(_ip);
-		if (!flagCheckedHeader) {
-			if (!(IPv4Packet::check(ip, size))) {
-				return sl_null;
-			}
-		}
-		
 		if (ip->getFragmentOffset() == 0 && !(ip->isMF())) {
 			return Memory::create(ip, ip->getTotalSize());
 		}
@@ -655,34 +648,47 @@ namespace slib
 		return mem;
 	}
 	
-	List<Memory> IPv4Fragmentation::makeFragments(const IPv4Packet* header, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu)
+	sl_bool IPv4Fragmentation::isNeededFragmentation(const IPv4Packet* header, sl_uint32 mtu)
 	{
-		sl_int32 id = Base::interlockedIncrement32(&m_currentIdentifier);
-		return makeFragments(header, (sl_uint16)id, ipContent, sizeContent, mtu);
+		if (header->isDF()) {
+			return sl_false;
+		}
+		if (header->getTotalSize() <= mtu) {
+			return sl_false;
+		}
+		return sl_true;
 	}
 	
-	List<Memory> IPv4Fragmentation::makeFragments(const IPv4Packet* header, sl_uint16 identifier, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu)
+	List<Memory> IPv4Fragmentation::makeFragments(const IPv4Packet* header, sl_uint32 mtu)
 	{
-		List<Memory> ret;
 		sl_uint32 sizeHeader = header->getHeaderSize();
-		if (mtu < sizeHeader + 8) {
-			return ret;
-		}
+		sl_uint32 sizeContent = header->getContentSize();
+		
 		if (sizeContent == 0) {
-			return ret;
+			return sl_null;
 		}
-		if (sizeContent > SLIB_UINT16_MAX) {
-			return ret;
+		if (sizeHeader + 8 > mtu) {
+			return sl_null;
 		}
-		sl_uint8* data = (sl_uint8*)(ipContent);
+		
+		sl_uint8* data = (sl_uint8*)(header->getContent());
+		
 		sl_uint32 sizeFragment = mtu - sizeHeader;
 		sizeFragment = (sizeFragment & 0xFFF8);
+		
+		sl_uint32 offsetOriginal = header->getFragmentOffset();
+		sl_bool flagMFOriginal = header->isMF();
+		
+		List<Memory> ret;
 		sl_uint32 offset = 0;
+		
 		while (offset < sizeContent) {
+			
 			sl_uint32 n = sizeFragment;
 			if (offset + n > sizeContent) {
 				n = sizeContent - offset;
 			}
+			
 			Memory mem = Memory::create(sizeHeader + n);
 			if (mem.isNull()) {
 				return sl_null;
@@ -690,13 +696,13 @@ namespace slib
 			sl_uint8* buf = (sl_uint8*)(mem.getData());
 			Base::copyMemory(buf, header, sizeHeader);
 			Base::copyMemory(buf + sizeHeader, data + offset, n);
+			
 			IPv4Packet* h = (IPv4Packet*)buf;
-			h->setIdentification(identifier);
 			h->setTotalSize(sizeHeader + n);
 			h->setDF(sl_false);
-			h->setFragmentOffset(offset >> 3);
+			h->setFragmentOffset(offsetOriginal + (offset >> 3));
 			offset += sizeFragment;
-			h->setMF(offset < sizeContent);
+			h->setMF(offset < sizeContent ? sl_true : flagMFOriginal);
 			h->updateChecksum();
 			
 			ret.add_NoLock(mem);

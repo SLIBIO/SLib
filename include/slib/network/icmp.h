@@ -166,7 +166,9 @@ namespace slib
 		TimeExceeded = 11,
 		ParameterProblem = 12,
 		Timestamp = 13,
-		TimestampReply = 14
+		TimestampReply = 14,
+		AddressMaskRequest = 17,
+		AddressMaskReply = 18
 	};
 	
 	class SLIB_EXPORT IcmpHeaderFormat
@@ -184,11 +186,11 @@ namespace slib
 		
 		void setChecksum(sl_uint16 checksum);
 		
-		void updateChecksum(sl_uint32 sizeContent);
+		void updateChecksum(sl_uint32 sizeICMP);
 		
-		sl_bool checkChecksum(sl_uint32 sizeContent) const;
+		sl_bool checkChecksum(sl_uint32 sizeICMP) const;
 		
-		sl_bool check(sl_uint32 sizeContent) const;
+		sl_bool check(sl_uint32 sizeICMP) const;
 		
 		sl_uint16 getEchoIdentifier() const;
 		
@@ -213,7 +215,19 @@ namespace slib
 		sl_uint16 getTimestampSequenceNumber() const;
 		
 		void setTimestampSequenceNumber(sl_uint16 sn);
-		
+
+		sl_uint16 getAddressMaskIdentifier() const;
+
+		void setAddressMaskIdentifier(sl_uint16 id);
+
+		sl_uint16 getAddressMaskSequenceNumber() const;
+
+		void setAddressMaskSequenceNumber(sl_uint16 sn);
+
+		sl_uint16 getNextHopMTU() const;
+
+		void setNextHopMTU(sl_uint16 mtu);
+
 		const sl_uint8* getContent() const;
 		
 		sl_uint8* getContent();
