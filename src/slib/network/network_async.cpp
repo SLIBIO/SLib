@@ -188,8 +188,8 @@ namespace slib
 				if (instance->isSupportingConnect()) {
 					SocketType type = socket->getType();
 					SocketAddress addr = address;
-					if (addr.ip.isIPv4() && type == SocketType::Tcp) {
-					} else if ((addr.ip.isIPv4() || addr.ip.isIPv6()) && type == SocketType::TcpIPv6) {
+					if (addr.ip.isIPv4() && type == SocketType::Stream) {
+					} else if ((addr.ip.isIPv4() || addr.ip.isIPv6()) && type == SocketType::StreamIPv6) {
 						if (addr.ip.isIPv4()) {
 							addr.ip = IPv6Address(addr.ip.getIPv4());
 						}

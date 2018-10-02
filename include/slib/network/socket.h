@@ -56,14 +56,19 @@ namespace slib
 	enum class SocketType
 	{
 		None = 0,
-		Tcp = 0x01,
-		Udp = 0x02,
+		Stream = 0x01,
+		Datagram = 0x02,
 		Raw = 0x03,
-		TcpIPv6 = 0x11,
-		UdpIPv6 = 0x12,
+		StreamIPv6 = 0x11,
+		DatagramIPv6 = 0x12,
 		RawIPv6 = 0x13,
-		PacketRaw = 0x80,
-		PacketDatagram = 0x81
+		PacketRaw = 0x81,
+		PacketDatagram = 0x82,
+		
+		MASK_ADDRESS_FAMILY = 0xF0,
+		ADDRESS_FAMILY_IPv4 = 0x00,
+		ADDRESS_FAMILY_IPv6 = 0x10,
+		ADDRESS_FAMILY_PACKET = 0x80
 	};
 	
 	enum class SocketShutdownMode
@@ -130,13 +135,21 @@ namespace slib
 	public:
 		static Ref<Socket> open(SocketType type, sl_uint32 protocol = 0);
 		
+		static Ref<Socket> openStream(NetworkInternetProtocol internetProtocol);
+
 		static Ref<Socket> openTcp();
-		
+
+		static Ref<Socket> openDatagram(NetworkInternetProtocol internetProtocol);
+
 		static Ref<Socket> openUdp();
 		
 		static Ref<Socket> openRaw(NetworkInternetProtocol internetProtocol);
 		
+		static Ref<Socket> openStream_IPv6(NetworkInternetProtocol internetProtocol);
+
 		static Ref<Socket> openTcp_IPv6();
+		
+		static Ref<Socket> openDatagram_IPv6(NetworkInternetProtocol internetProtocol);
 		
 		static Ref<Socket> openUdp_IPv6();
 		
@@ -157,15 +170,19 @@ namespace slib
 		
 		String getTypeText() const;
 		
-		sl_bool isTcp() const;
+		sl_bool isStream() const;
 		
-		sl_bool isUdp() const;
+		sl_bool isDatagram() const;
 		
 		sl_bool isRaw() const;
 		
 		sl_bool isPacket() const;
 		
+		static sl_bool isIPv4(SocketType type);
+		
 		sl_bool isIPv4() const;
+		
+		static sl_bool isIPv6(SocketType type);
 		
 		sl_bool isIPv6() const;
 		

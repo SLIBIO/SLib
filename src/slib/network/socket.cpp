@@ -69,9 +69,9 @@ namespace slib
 
 	SLIB_INLINE static sl_uint32 _priv_Socket_apply_address(SocketType type, sockaddr_storage& addr, SocketAddress in)
 	{
-		if (in.ip.isIPv4() && (type == SocketType::Tcp || type == SocketType::Udp || type == SocketType::Raw)) {
+		if (in.ip.isIPv4() && Socket::isIPv4(type)) {
 			return in.getSystemSocketAddress(&addr);
-		} else if ((in.ip.isIPv4() || in.ip.isIPv6()) && (type == SocketType::TcpIPv6 || type == SocketType::UdpIPv6 || type == SocketType::RawIPv6)) {
+		} else if ((in.ip.isIPv4() || in.ip.isIPv6()) && Socket::isIPv6(type)) {
 			if (in.ip.isIPv4()) {
 				in.ip = IPv6Address(in.ip.getIPv4());
 			}
@@ -126,43 +126,48 @@ namespace slib
 
 		int af = 0;
 		int st = 0;
-		int protocol = 0;
-		if (type == SocketType::Tcp) {
-			af = AF_INET;
-			st = SOCK_STREAM;
-		} else if (type == SocketType::Udp) {
-			af = AF_INET;
-			st = SOCK_DGRAM;
-		} else if (type == SocketType::Raw) {
-			af = AF_INET;
-			st = SOCK_RAW;
-			protocol = _protocol;
-		} else if (type == SocketType::TcpIPv6) {
-			af = AF_INET6;
-			st = SOCK_STREAM;
-		} else if (type == SocketType::UdpIPv6) {
-			af = AF_INET6;
-			st = SOCK_DGRAM;
-		} else if (type == SocketType::RawIPv6) {
-			af = AF_INET6;
-			st = SOCK_RAW;
-			protocol = _protocol;
-		}
+		int protocol = _protocol;
+		switch (type) {
+			case SocketType::Stream:
+				af = AF_INET;
+				st = SOCK_STREAM;
+				break;
+			case SocketType::Datagram:
+				af = AF_INET;
+				st = SOCK_DGRAM;
+				break;
+			case SocketType::Raw:
+				af = AF_INET;
+				st = SOCK_RAW;
+				break;
+			case SocketType::StreamIPv6:
+				af = AF_INET6;
+				st = SOCK_STREAM;
+				break;
+			case SocketType::DatagramIPv6:
+				af = AF_INET6;
+				st = SOCK_DGRAM;
+				break;
+			case SocketType::RawIPv6:
+				af = AF_INET6;
+				st = SOCK_RAW;
+				break;
 #if defined(SLIB_PLATFORM_IS_LINUX)
-		else if (type == SocketType::PacketRaw) {
-			af = AF_PACKET;
-			st = SOCK_RAW;
-			protocol = htons(_protocol);
-		} else if (type == SocketType::PacketDatagram) {
-			af = AF_PACKET;
-			st = SOCK_DGRAM;
-			protocol = htons(_protocol);
-		}
+			case SocketType::PacketRaw:
+				af = AF_PACKET;
+				st = SOCK_RAW;
+				protocol = htons(_protocol);
+				break;
+			case SocketType::PacketDatagram:
+				af = AF_PACKET;
+				st = SOCK_DGRAM;
+				protocol = htons(_protocol);
+				break;
 #endif
-		else {
-			return sl_null;
+			default:
+				return sl_null;
 		}
-
+		
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 		sl_socket handle = (sl_socket)(::WSASocketW(af, st, protocol, NULL, 0, WSA_FLAG_OVERLAPPED));
 #else
@@ -173,7 +178,7 @@ namespace slib
 			if (ret.isNotNull()) {
 				ret->m_socket = handle;
 				ret->m_type = type;
-				if (type == SocketType::TcpIPv6 || type == SocketType::UdpIPv6 || type == SocketType::RawIPv6) {
+				if (isIPv6(type)) {
 					ret->setOption_IPv6Only(sl_false);
 				}
 #if defined(SLIB_PLATFORM_IS_APPLE)
@@ -186,14 +191,24 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<Socket> Socket::openTcp()
+	Ref<Socket> Socket::openStream(NetworkInternetProtocol internetProtocol)
 	{
-		return open(SocketType::Tcp);
+		return open(SocketType::Stream, (sl_uint32)internetProtocol);
 	}
 
+	Ref<Socket> Socket::openTcp()
+	{
+		return open(SocketType::Stream);
+	}
+
+	Ref<Socket> Socket::openDatagram(NetworkInternetProtocol internetProtocol)
+	{
+		return open(SocketType::Datagram, (sl_uint32)internetProtocol);
+	}
+	
 	Ref<Socket> Socket::openUdp()
 	{
-		return open(SocketType::Udp);
+		return open(SocketType::Datagram);
 	}
 
 	Ref<Socket> Socket::openRaw(NetworkInternetProtocol internetProtocol)
@@ -201,14 +216,24 @@ namespace slib
 		return open(SocketType::Raw, (sl_uint32)internetProtocol);
 	}
 
+	Ref<Socket> Socket::openStream_IPv6(NetworkInternetProtocol internetProtocol)
+	{
+		return open(SocketType::StreamIPv6, (sl_uint32)internetProtocol);
+	}
+
 	Ref<Socket> Socket::openTcp_IPv6()
 	{
-		return open(SocketType::TcpIPv6);
+		return open(SocketType::StreamIPv6);
+	}
+
+	Ref<Socket> Socket::openDatagram_IPv6(NetworkInternetProtocol internetProtocol)
+	{
+		return open(SocketType::DatagramIPv6, (sl_uint32)internetProtocol);
 	}
 
 	Ref<Socket> Socket::openUdp_IPv6()
 	{
-		return open(SocketType::UdpIPv6);
+		return open(SocketType::DatagramIPv6);
 	}
 
 	Ref<Socket> Socket::openRaw_IPv6(NetworkInternetProtocol internetProtocol)
@@ -254,44 +279,44 @@ namespace slib
 	String Socket::getTypeText() const
 	{
 		switch (getType()) {
-			case SocketType::Tcp:
+			case SocketType::Stream:
 			{
-				SLIB_STATIC_STRING(s, "TCP/IP");
+				SLIB_STATIC_STRING(s, "Stream/IPv4");
 				return s;
 			}
-			case SocketType::Udp:
+			case SocketType::Datagram:
 			{
-				SLIB_STATIC_STRING(s, "UDP/IP");
+				SLIB_STATIC_STRING(s, "Datagram/IPv4");
 				return s;
 			}
 			case SocketType::Raw:
 			{
-				SLIB_STATIC_STRING(s, "RAW/IP");
+				SLIB_STATIC_STRING(s, "Raw/IPv4");
 				return s;
 			}
-			case SocketType::TcpIPv6:
+			case SocketType::StreamIPv6:
 			{
-				SLIB_STATIC_STRING(s, "TCP/IPv6");
+				SLIB_STATIC_STRING(s, "Stream/IPv6");
 				return s;
 			}
-			case SocketType::UdpIPv6:
+			case SocketType::DatagramIPv6:
 			{
-				SLIB_STATIC_STRING(s, "UDP/IPv6");
+				SLIB_STATIC_STRING(s, "Datagram/IPv6");
 				return s;
 			}
 			case SocketType::RawIPv6:
 			{
-				SLIB_STATIC_STRING(s, "RAW/IPv6");
+				SLIB_STATIC_STRING(s, "Raw/IPv6");
 				return s;
 			}
 			case SocketType::PacketRaw:
 			{
-				SLIB_STATIC_STRING(s, "PACKET/RAW");
+				SLIB_STATIC_STRING(s, "Raw/Packet");
 				return s;
 			}
 			case SocketType::PacketDatagram:
 			{
-				SLIB_STATIC_STRING(s, "PACKET/DATAGRAM");
+				SLIB_STATIC_STRING(s, "Datagram/Packet");
 				return s;
 			}
 			default:
@@ -302,14 +327,14 @@ namespace slib
 		}
 	}
 
-	sl_bool Socket::isTcp() const
+	sl_bool Socket::isStream() const
 	{
-		return m_type == SocketType::Tcp || m_type == SocketType::TcpIPv6;
+		return m_type == SocketType::Stream || m_type == SocketType::StreamIPv6;
 	}
 
-	sl_bool Socket::isUdp() const
+	sl_bool Socket::isDatagram() const
 	{
-		return m_type == SocketType::Udp || m_type == SocketType::UdpIPv6;
+		return m_type == SocketType::Datagram || m_type == SocketType::DatagramIPv6;
 	}
 
 	sl_bool Socket::isRaw() const
@@ -322,14 +347,24 @@ namespace slib
 		return m_type == SocketType::PacketRaw || m_type == SocketType::PacketDatagram;
 	}
 
+	sl_bool Socket::isIPv4(SocketType type)
+	{
+		return ((int)type & (int)(SocketType::MASK_ADDRESS_FAMILY)) == (int)(SocketType::ADDRESS_FAMILY_IPv4);
+	}
+	
 	sl_bool Socket::isIPv4() const
 	{
-		return m_type == SocketType::Tcp || m_type == SocketType::Udp || m_type == SocketType::Raw;
+		return isIPv4(m_type);
+	}
+	
+	sl_bool Socket::isIPv6(SocketType type)
+	{
+		return ((int)type & (int)(SocketType::MASK_ADDRESS_FAMILY)) == (int)(SocketType::ADDRESS_FAMILY_IPv6);
 	}
 
 	sl_bool Socket::isIPv6() const
 	{
-		return m_type == SocketType::TcpIPv6 || m_type == SocketType::UdpIPv6 || m_type == SocketType::RawIPv6;
+		return isIPv6(m_type);
 	}
 
 	SocketError Socket::getLastError() const
@@ -367,7 +402,7 @@ namespace slib
 		if (isOpened()) {
 			sockaddr_storage addr;
 			sl_uint32 size_addr = 0;
-			if (m_type == SocketType::Tcp || m_type == SocketType::Udp || m_type == SocketType::Raw) {
+			if (isIPv4()) {
 				if (address.ip.isIPv4()) {
 					size_addr = _priv_Socket_apply_address(m_type, addr, address);
 				} else if (address.ip.isNone()) {
@@ -379,7 +414,7 @@ namespace slib
 					_setError(SocketError::BindInvalidAddress);
 					return sl_false;
 				}
-			} else if (m_type == SocketType::TcpIPv6 || m_type == SocketType::UdpIPv6 || m_type == SocketType::RawIPv6) {
+			} else if (isIPv6()) {
 				if (address.ip.isIPv4()) {
 					size_addr = _priv_Socket_apply_address(m_type, addr, address);
 				} else if (address.ip.isIPv6()) {
@@ -413,7 +448,7 @@ namespace slib
 	sl_bool Socket::listen()
 	{
 		if (isOpened()) {
-			if (m_type != SocketType::Tcp && m_type != SocketType::TcpIPv6) {
+			if (!(isStream())) {
 				_setError(SocketError::ListenIsNotSupported);
 				return sl_false;
 			}
@@ -433,7 +468,7 @@ namespace slib
 	sl_bool Socket::accept(Ref<Socket>& socketClient, SocketAddress& address)
 	{
 		if (isOpened()) {
-			if (m_type != SocketType::Tcp && m_type != SocketType::TcpIPv6) {
+			if (!(isStream())) {
 				_setError(SocketError::AcceptIsNotSupported);
 				return sl_false;
 			}
@@ -469,7 +504,7 @@ namespace slib
 	sl_bool Socket::connect(const SocketAddress& address)
 	{
 		if (isOpened()) {
-			if (m_type != SocketType::Tcp && m_type != SocketType::TcpIPv6) {
+			if (!(isStream())) {
 				_setError(SocketError::ConnectIsNotSupported);
 				return sl_false;
 			}
@@ -503,7 +538,7 @@ namespace slib
 			if (size == 0) {
 				return 0;
 			}
-			if (m_type != SocketType::Tcp && m_type != SocketType::TcpIPv6) {
+			if (!(isStream())) {
 				_setError(SocketError::SendIsNotSupported);
 				return -1;
 			}
@@ -536,7 +571,7 @@ namespace slib
 			if (size == 0) {
 				return 0;
 			}
-			if (m_type != SocketType::Tcp && m_type != SocketType::TcpIPv6) {
+			if (!(isStream())) {
 				_setError(SocketError::ReceiveIsNotSupported);
 				return -1;
 			}
@@ -565,7 +600,7 @@ namespace slib
 			if (size == 0) {
 				return 0;
 			}
-			if (m_type != SocketType::Udp && m_type != SocketType::UdpIPv6 && m_type != SocketType::Raw && m_type != SocketType::RawIPv6) {
+			if (!(isDatagram() || isRaw())) {
 				_setError(SocketError::SendToIsNotSupported);
 				return -1;
 			}
@@ -600,7 +635,7 @@ namespace slib
 			if (size == 0) {
 				return 0;
 			}
-			if (m_type != SocketType::Udp && m_type != SocketType::UdpIPv6 && m_type != SocketType::Raw && m_type != SocketType::RawIPv6) {
+			if (!(isDatagram() || isRaw())) {
 				_setError(SocketError::ReceiveFromIsNotSupported);
 				return -1;
 			}
