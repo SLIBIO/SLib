@@ -40,6 +40,7 @@ namespace slib
 	
 	enum class NetworkInternetProtocol
 	{
+		IPv6_HopOption = 0, // IPv6 Hop-by-Hop Option, RFC 8200
 		ICMP = 1, // Internet Control Message Protocol, RFC 792
 		IGMP = 2, // Internet Group Management Protocol, RFC 1112
 		GGP = 3, // Gateway-to-Gateway Protocol, RFC 823
@@ -50,6 +51,11 @@ namespace slib
 		UDP = 17, // User Datagram, RFC 768
 		RDP = 27, // Reliable Datagram Protocol, RFC 908
 		IRTP = 28, // Internet Reliable Transaction Protocol, RFC 938
+		IPv6_Route = 43, // Routing Header for IPv6, RFC 8200
+		IPv6_Fragment = 44, // Fragment Header for IPv6, RFC 8200
+		IPv6_ICMP = 58, // ICMP for IPv6, RFC 4443, RFC 4884
+		IPv6_NoNext = 59, // No Next Header for IPv6, RFC 8200
+		IPv6_Options = 60, // Destination Options for IPv6, RFC 8200
 		Raw = 0xFF // Reserved for Socket api, for sendind the raw ip packets of any kind of protocols (sending only, not receiving)
 	};
 

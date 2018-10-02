@@ -501,11 +501,12 @@ namespace slib
 					address.ip = ip->getDestinationAddress();
 					address.port = 0;
 					Ref<Socket> socket;
-					if (ip->isTCP()) {
+					NetworkInternetProtocol protocol = ip->getProtocol();
+					if (protocol == NetworkInternetProtocol::TCP) {
 						socket = m_socketTCP;
-					} else if (ip->isUDP()) {
+					} else if (protocol == NetworkInternetProtocol::UDP) {
 						socket = m_socketUDP;
-					} else if (ip->isICMP()) {
+					} else if (protocol == NetworkInternetProtocol::ICMP) {
 						socket = m_socketICMP;
 					}
 					if (socket.isNotNull()) {

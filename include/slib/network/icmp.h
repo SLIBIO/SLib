@@ -186,12 +186,14 @@ namespace slib
 		
 		void setChecksum(sl_uint16 checksum);
 		
+	public:
 		void updateChecksum(sl_uint32 sizeICMP);
 		
 		sl_bool checkChecksum(sl_uint32 sizeICMP) const;
 		
 		sl_bool check(sl_uint32 sizeICMP) const;
 		
+	public:
 		sl_uint16 getEchoIdentifier() const;
 		
 		void setEchoIdentifier(sl_uint16 id);

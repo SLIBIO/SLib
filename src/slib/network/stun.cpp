@@ -267,6 +267,10 @@ namespace slib
 		if (attributes.flagHaveFingerprint) {
 			sizeMessage += (4 + 4);
 		}
+
+		if (sizeMessage > 0xFFFF - HeaderSize) {
+			return sl_null;
+		}
 		
 		Memory memPacket = Memory::create(HeaderSize + sizeMessage);
 		if (memPacket.isNull()) {
@@ -276,7 +280,7 @@ namespace slib
 		StunPacket* packet = (StunPacket*)(memPacket.getData());
 		packet->setMessageClass(_class);
 		packet->setMethod(method);
-		packet->setMessageLength(sizeMessage);
+		packet->setMessageLength((sl_uint16)sizeMessage);
 		packet->setMagicCookie();
 		Base::copyMemory(packet->getTransactionID(), transactionID, 12);
 		

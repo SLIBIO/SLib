@@ -86,6 +86,32 @@
 				|          data octets ...
 				+---------------- ...
 
+ 
+ 
+ 
+             IPv6 Header from RFC 2460, RFC 8200
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |Version| Traffic Class |           Flow Label                  |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |         Payload Length        |  Next Header  |   Hop Limit   |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                                                               |
+ +                                                               +
+ |                                                               |
+ +                         Source Address                        +
+ |                                                               |
+ +                                                               +
+ |                                                               |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                                                               |
+ +                                                               +
+ |                                                               |
+ +                      Destination Address                      +
+ |                                                               |
+ +                                                               +
+ |                                                               |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
 ********************************************************************/
 
 namespace slib
@@ -108,25 +134,23 @@ namespace slib
 		};
 
 	public:
-		static sl_bool isIPv4Header(const void* header);
+		// 4 bits, version is 4 for IPv4
+		sl_uint8 getVersion() const;
 		
 		// 4 bits, version is 4 for IPv4
-		sl_uint32 getVersion() const;
-		
-		// 4 bits, version is 4 for IPv4
-		void setVersion(sl_uint32 version = 4);
+		void setVersion(sl_uint8 version = 4);
 
 		// 4 bits, get the count of 32bit words for the header including options and padding
-		sl_uint32 getHeaderLength() const;
+		sl_uint8 getHeaderLength() const;
 		
 		// 4 bits, set the count of 32bit words for the header including options and padding (5 if no option is included)
-		void setHeaderLength(sl_uint32 length = 5);
+		void setHeaderLength(sl_uint8 length = 5);
 		
 		// header size in bytes
-		sl_uint32 getHeaderSize() const;
+		sl_uint8 getHeaderSize() const;
 		
 		// header size in bytes
-		void setHeaderSize(sl_uint32 size);
+		void setHeaderSize(sl_uint8 size);
 		
 		// 8 bits, TOS is deprecated and replaced with DSCP&ECN
 		sl_uint8 getTypeOfService() const;
@@ -135,16 +159,16 @@ namespace slib
 		void setTypeOfService(sl_uint8 TOS);
 		
 		// 6 bits
-		sl_uint32 getDSCP() const;
+		sl_uint8 getDSCP() const;
 		
 		// 6 bits
-		void setDSCP(sl_uint32 DSCP);
+		void setDSCP(sl_uint8 DSCP);
 		
 		// 2 bits
-		sl_uint32 getECN() const;
+		sl_uint8 getECN() const;
 		
 		// 2 bits
-		void setECN(sl_uint32 ECN);
+		void setECN(sl_uint8 ECN);
 		
 		// 16 bits, total size (including header and data) in bytes
 		sl_uint16 getTotalSize() const;
@@ -171,10 +195,10 @@ namespace slib
 		void setMF(sl_bool flag);
 		
 		// 13 bits, the fragment offset measured in units of 8 octets (64 bits)
-		sl_uint32 getFragmentOffset() const;
+		sl_uint16 getFragmentOffset() const;
 		
 		// 13 bits, the fragment offset measured in units of 8 octets (64 bits)
-		void setFragmentOffset(sl_uint32 offset);
+		void setFragmentOffset(sl_uint16 offset);
 		
 		// Time To Live
 		sl_uint8 getTTL() const;
@@ -190,10 +214,6 @@ namespace slib
 		
 		void setChecksum(sl_uint16 checksum);
 		
-		void updateChecksum();
-		
-		sl_bool checkChecksum() const;
-
 		IPv4Address getSourceAddress() const;
 		
 		void setSourceAddress(const IPv4Address& address);
@@ -211,28 +231,21 @@ namespace slib
 		sl_uint8* getContent();
 		
 		sl_uint16 getContentSize() const;
+	
+public:
+		void updateChecksum();
 		
+		sl_bool checkChecksum() const;
+
 		// used in TCP/UDP protocol
 		sl_uint16 getChecksumForContent(const void* content, sl_uint16 size) const;
-		
-		sl_uint16 getChecksumForContent() const;
 
 #ifdef check
 #undef check
 #endif
-		static sl_bool check(const void* packetIP, sl_uint32 sizeTotal);
+		static sl_bool check(const void* packet, sl_size sizePacket);
 		
-		static sl_bool checkHeader(const void* packetIP, sl_uint32 sizeTotal);
-
-		sl_bool isTCP() const;
-		
-		sl_bool isUDP() const;
-		
-		sl_bool isICMP() const;
-
-		sl_bool isFirstFragment() const;
-		
-		sl_bool isLastFragment() const;
+		static sl_bool checkHeader(const void* packet, sl_size sizePacket);
 		
 		sl_bool getPortsForTcpUdp(sl_uint16& src, sl_uint16& dst) const;
 
@@ -251,7 +264,72 @@ namespace slib
 		
 	};
 
+	class SLIB_EXPORT IPv6Packet
+	{
+	public:
+		enum
+		{
+			HeaderSize = 40
+		};
+		
+	public:
+		// 4 bits, version is 6 for IPv6
+		sl_uint8 getVersion() const;
+		
+		// 4 bits, version is 6 for IPv6
+		void setVersion(sl_uint8 version = 6);
+		
+		sl_uint8 getTrafficClass() const;
+		
+		void setTrafficClass(sl_uint8 value);
+		
+		sl_uint32 getFlowLabel() const;
+		
+		void setFlowLabel(sl_uint32 value);
+		
+		sl_uint16 getPayloadLength() const;
+		
+		void setPayloadLength(sl_uint16 length);
+		
+		NetworkInternetProtocol getNextHeader() const;
+		
+		void setNextHeader(NetworkInternetProtocol protocol);
+		
+		sl_uint8 getHopLimit() const;
+		
+		void setHopLimit(sl_uint8 limit);
+		
+		IPv6Address getSourceAddress() const;
+		
+		void setSourceAddresss(const IPv6Address& address);
+		
+		IPv6Address getDestinationAddress() const;
+		
+		void setDestinationAddresss(const IPv6Address& address);
+		
+		const sl_uint8* getContent() const;
+		
+		sl_uint8* getContent();
 
+	public:
+		// used in TCP/UDP protocol
+		sl_uint16 getChecksumForContent(const void* content, sl_uint32 size) const;
+		
+		static sl_bool check(const void* packet, sl_size sizePacket);
+		
+		static sl_bool checkHeader(const void* packet, sl_size sizePacket);
+		
+	private:
+		sl_uint8 _version_TrafficClass_FlowLabel[4];
+		sl_uint8 _payloadLength[2];
+		sl_uint8 _nextHeader;
+		sl_uint8 _hopLimit;
+		sl_uint8 _sourceAddress[16];
+		sl_uint8 _destinationAddress[16];
+		
+	};
+
+	
 	class SLIB_EXPORT TcpSegment
 	{
 	public:
@@ -278,16 +356,16 @@ namespace slib
 		void setAcknowledgmentNumber(sl_uint32 num);
 		
 		// 4 bits, the size of the TCP header in 32-bit words
-		sl_uint32 getHeaderLength() const;
+		sl_uint8 getHeaderLength() const;
 		
 		// 4 bits, the size of the TCP header in 32-bit words
-		void setHeaderLength(sl_uint32 length = 5);
+		void setHeaderLength(sl_uint8 length = 5);
 
 		// header size in bytes
-		sl_uint32 getHeaderSize() const;
+		sl_uint8 getHeaderSize() const;
 		
 		// header size in bytes
-		void setHeaderSize(sl_uint32 size);
+		void setHeaderSize(sl_uint8 size);
 
 		sl_bool isNS() const;
 		
@@ -333,14 +411,6 @@ namespace slib
 		
 		void setChecksum(sl_uint16 checksum);
 
-		void updateChecksum(const IPv4Packet* ipv4, sl_uint32 sizeTcp);
-		
-		sl_bool checkChecksum(const IPv4Packet* ipv4, sl_uint32 sizeTcp) const;
-
-		sl_bool checkSize(sl_uint32 sizeTcp) const;
-
-		sl_bool check(IPv4Packet* ip, sl_uint32 sizeTcp) const;
-
 		sl_uint16 getUrgentPointer() const;
 		
 		void setUrgentPointer(sl_uint16 urgentPointer);
@@ -352,6 +422,21 @@ namespace slib
 		const sl_uint8* getContent() const;
 		
 		sl_uint8* getContent();
+
+	public:
+		sl_bool checkSize(sl_size sizeTcp) const;
+		
+		void updateChecksum(const IPv4Packet* ipv4, sl_size sizeTcp);
+		
+		sl_bool checkChecksum(const IPv4Packet* ipv4, sl_size sizeTcp) const;
+
+		sl_bool check(IPv4Packet* ip, sl_size sizeTcp) const;
+
+		void updateChecksum(const IPv6Packet* ipv4, sl_size sizeTcp);
+		
+		sl_bool checkChecksum(const IPv6Packet* ipv4, sl_size sizeTcp) const;
+		
+		sl_bool check(IPv6Packet* ip, sl_size sizeTcp) const;
 
 	private:
 		sl_uint8 _sourcePort[2];
@@ -394,20 +479,27 @@ namespace slib
 		
 		void setChecksum(sl_uint16 checksum);
 		
-		void updateChecksum(const IPv4Packet* ipv4);
-		
-		sl_bool checkChecksum(const IPv4Packet* ipv4) const;
-		
-		sl_bool checkSize(sl_uint32 sizeUdp) const;
-
-		sl_bool check(IPv4Packet* ip, sl_uint32 sizeUdp) const;
-		
 		const sl_uint8* getContent() const;
 		
 		sl_uint8* getContent();
 		
 		sl_uint16 getContentSize() const;
 		
+	public:
+		sl_bool checkSize(sl_size sizeUdp) const;
+		
+		void updateChecksum(const IPv4Packet* ipv4);
+		
+		sl_bool checkChecksum(const IPv4Packet* ipv4) const;
+		
+		sl_bool check(IPv4Packet* ipv4, sl_size sizeUdp) const;
+
+		void updateChecksum(const IPv6Packet* ipv6);
+		
+		sl_bool checkChecksum(const IPv6Packet* ipv6) const;
+		
+		sl_bool check(IPv6Packet* ipv6, sl_size sizeUdp) const;
+
 	private:
 		sl_uint8 _sourcePort[2];
 		sl_uint8 _destinationPort[2];
@@ -452,7 +544,7 @@ namespace slib
 	class SLIB_EXPORT IPv4Fragment
 	{
 	public:
-		sl_uint32 offset;
+		sl_uint16 offset;
 		Memory data;
 		
 	public:
@@ -487,24 +579,19 @@ namespace slib
 		
 		void setupExpiringDuration(sl_uint32 ms);
 		
-		sl_uint32 getMaximumContentSize();
-		
-		void setMaximumContentSize(sl_uint32 max);
-
 		static sl_bool isNeededReassembly(const IPv4Packet* packet);
 
 		Memory reassemble(const IPv4Packet* packet);
 
-		static sl_bool isNeededFragmentation(const IPv4Packet* packet, sl_uint32 mtu = 1500);
+		static sl_bool isNeededFragmentation(const IPv4Packet* packet, sl_uint16 mtu = 1500);
 		
-		static List<Memory> makeFragments(const IPv4Packet* packet, sl_uint32 mtu = 1500);
+		static List<Memory> makeFragments(const IPv4Packet* packet, sl_uint16 mtu = 1500);
 		
 	protected:
 		ExpiringMap< IPv4PacketIdentifier, Ref<IPv4FragmentedPacket> > m_packets;
-		sl_uint32 m_maxContentSize;
 		
 	};
-
+	
 }
 
 #include "detail/tcpip.inc"
