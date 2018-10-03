@@ -21,5 +21,11 @@ public:
 	void onStart() override;
 	
 private:
+	void onClickTest1(View* button);
+	
+	void onClickTest2(View* button);
+	
+private:
 	Ref<WebView> m_webView;
+	
 };
