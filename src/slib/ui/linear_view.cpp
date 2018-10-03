@@ -71,6 +71,9 @@ namespace slib
 		sl_uint32 countFullFill = 0;
 		sl_uint32 countPartFill = 0;
 		
+		sl_ui_len widthContainer = getLayoutWidth();
+		sl_ui_len heightContainer = getLayoutHeight();
+
 		ListElements< Ref<View> > children(getChildren());
 		sl_size i;
 		for (i = 0; i < children.count; i++) {
@@ -79,8 +82,7 @@ namespace slib
 				if (flagHorizontalLayout) {
 					sizeSum += child->getMarginLeft();
 					if (child->getWidthMode() != SizeMode::Filling) {
-						UIRect frame = child->getLayoutFrame();
-						sizeSum += frame.getWidth();
+						sizeSum += child->getLayoutWidth();
 					} else {
 						if (Math::isAlmostZero(child->getWidthWeight() - 1)) {
 							countFullFill++;
@@ -92,8 +94,7 @@ namespace slib
 				} else {
 					sizeSum += child->getMarginTop();
 					if (child->getHeightMode() != SizeMode::Filling) {
-						UIRect frame = child->getLayoutFrame();
-						sizeSum += frame.getHeight();
+						sizeSum += child->getLayoutHeight();
 					} else {
 						if (Math::isAlmostZero(child->getHeightWeight() - 1)) {
 							countFullFill++;
@@ -113,14 +114,14 @@ namespace slib
 		if (countPartFill > 0) {
 			sl_ui_pos remainedSize;
 			if (flagHorizontalLayout) {
-				sl_ui_len n = getWidth();
+				sl_ui_len n = widthContainer;
 				if (n > (sl_ui_len)sizeSum) {
 					remainedSize = n - sizeSum;
 				} else {
 					remainedSize = 0;
 				}
 			} else {
-				sl_ui_len n = getHeight();
+				sl_ui_len n = heightContainer;
 				if (n > (sl_ui_len)sizeSum) {
 					remainedSize = n - sizeSum;
 				} else {
@@ -163,14 +164,14 @@ namespace slib
 		if (countFullFill > 0) {
 			sl_ui_pos remainedSize;
 			if (flagHorizontalLayout) {
-				sl_ui_len n = getWidth();
+				sl_ui_len n = widthContainer;
 				if (n > (sl_ui_len)sizeSum) {
 					remainedSize = n - sizeSum;
 				} else {
 					remainedSize = 0;
 				}
 			} else {
-				sl_ui_len n = getHeight();
+				sl_ui_len n = heightContainer;
 				if (n > (sl_ui_len)sizeSum) {
 					remainedSize = n - sizeSum;
 				} else {
