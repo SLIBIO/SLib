@@ -243,10 +243,15 @@ public:
 #ifdef check
 #undef check
 #endif
+		
 		static sl_bool check(const void* packet, sl_size sizePacket);
+
+		static sl_bool checkSize(const void* packet, sl_size sizePacket);
 		
 		static sl_bool checkHeader(const void* packet, sl_size sizePacket);
 		
+		static sl_bool checkHeaderSize(const void* packet, sl_size sizePacket);
+
 		sl_bool getPortsForTcpUdp(sl_uint16& src, sl_uint16& dst) const;
 
 	private:

@@ -86,7 +86,31 @@ namespace slib
 		return sl_true;
 	}
 	
+	sl_bool IPv4Packet::checkSize(const void* packet, sl_size sizePacket)
+	{
+		if (!(checkHeaderSize(packet, sizePacket))) {
+			return sl_false;
+		}
+		const IPv4Packet* header = (const IPv4Packet*)(packet);
+		if (header->getTotalSize() > sizePacket) {
+			return sl_false;
+		}
+		return sl_true;
+	}
+	
 	sl_bool IPv4Packet::checkHeader(const void* packet, sl_size sizePacket)
+	{
+		if (!(checkHeaderSize(packet, sizePacket))) {
+			return sl_false;
+		}
+		const IPv4Packet* header = (const IPv4Packet*)(packet);
+		if (!(header->checkChecksum())) {
+			return sl_false;
+		}
+		return sl_true;
+	}
+	
+	sl_bool IPv4Packet::checkHeaderSize(const void* packet, sl_size sizePacket)
 	{
 		if (!packet) {
 			return sl_false;
@@ -103,9 +127,6 @@ namespace slib
 			return sl_false;
 		}
 		if (sizeHeader > header->getTotalSize()) {
-			return sl_false;
-		}
-		if (!(header->checkChecksum())) {
 			return sl_false;
 		}
 		return sl_true;
