@@ -29,6 +29,7 @@ using namespace Platform;
 
 #include "slib/core/app.h"
 #include "slib/core/file.h"
+#include "slib/core/console.h"
 #include "slib/core/list.h"
 #include "slib/core/string_buffer.h"
 #include "slib/core/log.h"

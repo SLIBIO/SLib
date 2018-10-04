@@ -11,6 +11,7 @@
 #include "slib/core/system.h"
 
 #include "slib/core/file.h"
+#include "slib/core/console.h"
 #include "slib/core/log.h"
 #include "slib/core/list.h"
 #include "slib/core/safe_static.h"
@@ -154,6 +155,12 @@ namespace slib
 	}
 
 #endif
+
+	void Console::println(const String& s)
+	{
+		SLIB_STATIC_STRING(l, "\n");
+		print(s + l);
+	}
 
 #if defined(SLIB_PLATFORM_IS_MOBILE)
 	String Console::readLine()

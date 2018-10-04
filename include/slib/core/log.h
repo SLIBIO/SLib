@@ -23,25 +23,6 @@ namespace slib
 
 	class LoggerSet;
 	
-	class SLIB_EXPORT Console
-	{
-	public:
-		static void print(const String& s);
-
-		template <class... ARGS>
-		static void print(const String& format, ARGS&&... args);
-	
-		static void println(const String& s);
-
-		template <class... ARGS>
-		static void println(const String& format, ARGS&&... args);
-	
-		static String readLine();
-
-		static sl_char16 readChar(sl_bool flagPrintEcho = sl_false);
-
-	};
-	
 	class SLIB_EXPORT Logger : public Object
 	{
 		SLIB_DECLARE_OBJECT
@@ -119,13 +100,7 @@ namespace slib
 		CList< Ref<Logger> > m_listErrorLoggers;
 	
 	};
-	
-	template <class... ARGS>
-	void Printf(const String& format, ARGS&&... args);
-	
-	template <class... ARGS>
-	void Println(const String& format, ARGS&&... args);
-	
+
 	template <class... ARGS>
 	void Log(const String& tag, const String& format, ARGS&&... args);
 	

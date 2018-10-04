@@ -68,6 +68,7 @@
 #include "core/animation.h"
 
 #include "core/system.h"
+#include "core/console.h"
 #include "core/event.h"
 #include "core/thread.h"
 #include "core/thread_pool.h"

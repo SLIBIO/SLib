@@ -11,6 +11,7 @@
 #include "slib/core/log.h"
 
 #include "slib/core/file.h"
+#include "slib/core/console.h"
 #include "slib/core/variant.h"
 #include "slib/core/safe_static.h"
 
@@ -24,20 +25,6 @@
 
 namespace slib
 {
-
-	void Console::println(const String& s)
-	{
-		SLIB_STATIC_STRING(l, "\n");
-		print(s + l);
-	}
-
-#if defined(SLIB_PLATFORM_IS_MOBILE)
-	String Console::readLine()
-	{
-		return sl_null;
-	}
-#endif
-
 
 	SLIB_DEFINE_OBJECT(Logger, Object)
 
