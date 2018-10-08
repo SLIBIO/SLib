@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		260D833820C7DAF90013B34E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260D833720C7DAF90013B34E /* app.cpp */; };
+		26F2DDE0216BDAD1007CE8E6 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F5DE492051C9CC00BC4998 /* CoreMedia.framework */; };
 		26F5DE272051ACD500BC4998 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 26F5DE262051ACD500BC4998 /* ViewController.m */; };
 		26F5DE2A2051ACD500BC4998 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 26F5DE282051ACD500BC4998 /* Main.storyboard */; };
 		26F5DE2C2051ACD500BC4998 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26F5DE2B2051ACD500BC4998 /* Assets.xcassets */; };
@@ -15,7 +16,6 @@
 		26F5DE322051ACD500BC4998 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26F5DE312051ACD500BC4998 /* main.mm */; };
 		26F5DE452051C9AF00BC4998 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F5DE432051B62F00BC4998 /* GLKit.framework */; };
 		26F5DE462051C9B700BC4998 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F5DE3F2051B61100BC4998 /* AVFoundation.framework */; };
-		26F5DE4A2051C9CD00BC4998 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F5DE492051C9CC00BC4998 /* CoreMedia.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,11 +29,8 @@
 		26F5DE2E2051ACD500BC4998 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		26F5DE302051ACD500BC4998 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		26F5DE312051ACD500BC4998 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
-		26F5DE3D2051B60600BC4998 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		26F5DE3F2051B61100BC4998 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		26F5DE412051B61D00BC4998 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		26F5DE432051B62F00BC4998 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
-		26F5DE472051C9BC00BC4998 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		26F5DE492051C9CC00BC4998 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -42,7 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26F5DE4A2051C9CD00BC4998 /* CoreMedia.framework in Frameworks */,
+				26F2DDE0216BDAD1007CE8E6 /* CoreMedia.framework in Frameworks */,
 				26F5DE462051C9B700BC4998 /* AVFoundation.framework in Frameworks */,
 				26F5DE452051C9AF00BC4998 /* GLKit.framework in Frameworks */,
 			);
@@ -96,11 +93,8 @@
 			isa = PBXGroup;
 			children = (
 				26F5DE492051C9CC00BC4998 /* CoreMedia.framework */,
-				26F5DE472051C9BC00BC4998 /* CoreImage.framework */,
 				26F5DE432051B62F00BC4998 /* GLKit.framework */,
-				26F5DE412051B61D00BC4998 /* OpenGLES.framework */,
 				26F5DE3F2051B61100BC4998 /* AVFoundation.framework */,
-				26F5DE3D2051B60600BC4998 /* QuartzCore.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
