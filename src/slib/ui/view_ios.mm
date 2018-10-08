@@ -634,3 +634,16 @@ namespace slib
 #endif
 
 
+@interface SLibEmptyViewController : UIViewController
+@end
+
+@implementation SLibEmptyViewController
+- (void)viewDidLoad {
+	[super viewDidLoad];
+}
+
+- (void)didReceiveMemoryWarning {
+	[super didReceiveMemoryWarning];
+}
+@end
+

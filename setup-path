@@ -6,8 +6,9 @@ SLIB_PATH=`pwd`
 echo "SLIB_PATH=$SLIB_PATH"
 
 echo "Creating Bash Setup Shell"
-mkdir ~/.SLib.io
-echo "export SLIB_PATH=$SLIB_PATH" > ~/.SLib.io/setup_bash
+mkdir -p ~/.SLib.io
+echo "export SLIB_PATH=$SLIB_PATH
+export PATH=\$PATH:$SLIB_PATH/tool/bin" > ~/.SLib.io/setup_bash
 chmod a+x ~/.SLib.io/setup_bash
 
 if [[ `cat ~/.bash_profile` == *"source ~/.SLib.io/setup_bash"* ]]; then

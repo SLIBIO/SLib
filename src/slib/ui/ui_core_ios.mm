@@ -143,8 +143,9 @@ namespace slib
 	
 	void UIPlatform::runApp()
 	{
+		char* args[] = {sl_null};
 		@autoreleasepool {
-			UIApplicationMain(0, nil, nil, NSStringFromClass([_priv_Slib_iOS_AppDelegate class]));
+			UIApplicationMain(0, args, nil, NSStringFromClass([_priv_Slib_iOS_AppDelegate class]));
 		}
 	}
 	

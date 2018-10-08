@@ -1,0 +1,26 @@
+CURRENT_PATH=`pwd`
+if [ -z $SLIB_PATH ]; then
+ bash $(dirname $0)/../../setup-path
+fi
+cd $CURRENT_PATH
+echo "Please input the application name:"
+APP_NAME=$1
+if [ -z $APP_NAME ]; then
+ read APP_NAME
+ APP_NAME=`echo $APP_NAME | sed 's/[^a-zA-Z0-9_]//g'`
+ if [ -z $APP_NAME ]; then
+  exit
+ fi
+fi
+echo "New SLib Mobile App (iOS): $APP_NAME"
+cp -R "$SLIB_PATH/tool/template/iOS/.gitignore" "$CURRENT_PATH"
+cp -R "$SLIB_PATH/tool/template/iOS/Project.xcodeproj" "$CURRENT_PATH"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/Project.xcodeproj/project.pbxproj"
+mv "$CURRENT_PATH/Project.xcodeproj" "$CURRENT_PATH/$APP_NAME.xcodeproj"
+cp -R "$SLIB_PATH/tool/template/iOS/project" "$CURRENT_PATH"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/project/Base.lproj/LaunchScreen.storyboard"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/project/main.mm"
+cp "$SLIB_PATH/tool/template/mobile/app.h" "$CURRENT_PATH"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/app.h"
+cp "$SLIB_PATH/tool/template/mobile/app.cpp" "$CURRENT_PATH"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/app.cpp"
