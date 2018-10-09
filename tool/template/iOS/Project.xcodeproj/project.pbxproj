@@ -126,7 +126,7 @@
 			dependencies = (
 			);
 			name = SLIB_TEMPLATE_APP_NAME;
-			productName = ExampleCameraView;
+			productName = SLIB_TEMPLATE_APP_NAME;
 			productReference = 26F5DE1F2051ACD500BC4998 /* SLIB_TEMPLATE_APP_NAME.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -137,7 +137,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0940;
-				ORGANIZATIONNAME = SLIBIO;
+				ORGANIZATIONNAME = YourOrganization;
 				TargetAttributes = {
 					26F5DE1E2051ACD500BC4998 = {
 						CreatedOnToolsVersion = 9.2;
@@ -325,7 +325,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				OTHER_LDFLAGS = "-lslib";
-				PRODUCT_BUNDLE_IDENTIFIER = io.slib.SLIB_TEMPLATE_APP_NAME;
+				PRODUCT_BUNDLE_IDENTIFIER = your_bundle_id.SLIB_TEMPLATE_APP_NAME;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -339,7 +339,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				OTHER_LDFLAGS = "-lslib";
-				PRODUCT_BUNDLE_IDENTIFIER = io.slib.SLIB_TEMPLATE_APP_NAME;
+				PRODUCT_BUNDLE_IDENTIFIER = your_bundle_id.SLIB_TEMPLATE_APP_NAME;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

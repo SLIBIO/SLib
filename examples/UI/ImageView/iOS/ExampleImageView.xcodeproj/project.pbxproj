@@ -129,7 +129,7 @@
 			dependencies = (
 			);
 			name = ExampleImageView;
-			productName = ExampleCameraView;
+			productName = ExampleImageView;
 			productReference = 26F5DE1F2051ACD500BC4998 /* ExampleImageView.app */;
 			productType = "com.apple.product-type.application";
 		};
