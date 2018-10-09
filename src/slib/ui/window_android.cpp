@@ -96,7 +96,7 @@ namespace slib
 					ret->m_viewContent = content;
 					jlong instance = (jlong)(window.get());
 					JAndroidWindow::instance.set(jwindow, instance);
-					UIPlatform::registerWindowInstance(jwindow, ret.get());
+					UIPlatform::registerWindowInstance(window.get(), ret.get());
 					return ret;
 				}
 			}
