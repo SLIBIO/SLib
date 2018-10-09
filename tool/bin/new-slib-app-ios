@@ -3,9 +3,9 @@ if [ -z $SLIB_PATH ]; then
  bash $(dirname $0)/../../setup-path
 fi
 cd $CURRENT_PATH
-echo "Please input the application name:"
 APP_NAME=$1
 if [ -z $APP_NAME ]; then
+ echo "Please input the application name:"
  read APP_NAME
  APP_NAME=`echo $APP_NAME | sed 's/[^a-zA-Z0-9_]//g'`
  if [ -z $APP_NAME ]; then
