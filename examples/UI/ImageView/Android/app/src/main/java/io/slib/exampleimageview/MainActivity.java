@@ -1,4 +1,4 @@
-package io.slib;
+package io.slib.exampleimageview;
 
 import android.os.Bundle;
 
