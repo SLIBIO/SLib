@@ -13,7 +13,7 @@ if [ -z $APP_NAME ]; then
  fi
 fi
 echo "New SLib Mobile App (iOS): $APP_NAME"
-cp -R "$SLIB_PATH/tool/template/iOS/.gitignore" "$CURRENT_PATH"
+cp "$SLIB_PATH/tool/template/iOS/.gitignore" "$CURRENT_PATH"
 cp -R "$SLIB_PATH/tool/template/iOS/Project.xcodeproj" "$CURRENT_PATH"
 sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/Project.xcodeproj/project.pbxproj"
 mv "$CURRENT_PATH/Project.xcodeproj" "$CURRENT_PATH/$APP_NAME.xcodeproj"
