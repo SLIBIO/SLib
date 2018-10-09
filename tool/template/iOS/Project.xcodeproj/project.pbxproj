@@ -325,7 +325,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				OTHER_LDFLAGS = "-lslib";
-				PRODUCT_BUNDLE_IDENTIFIER = your_bundle_id.SLIB_TEMPLATE_APP_NAME;
+				PRODUCT_BUNDLE_IDENTIFIER = your-bundle-id.SLIB_TEMPLATE_APP_NAME;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -339,7 +339,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				OTHER_LDFLAGS = "-lslib";
-				PRODUCT_BUNDLE_IDENTIFIER = your_bundle_id.SLIB_TEMPLATE_APP_NAME;
+				PRODUCT_BUNDLE_IDENTIFIER = your-bundle-id.SLIB_TEMPLATE_APP_NAME;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

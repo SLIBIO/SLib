@@ -12,11 +12,11 @@
 
 using namespace slib;
 
-class SLIB_TEMPLATE_APP_NAME_App : public MobileApp
+class SLIB_TEMPLATE_APP_NAMEApp : public MobileApp
 {
-	SLIB_DECLARE_APPLICATION(SLIB_TEMPLATE_APP_NAME_App)
+	SLIB_DECLARE_APPLICATION(SLIB_TEMPLATE_APP_NAMEApp)
 public:
-	SLIB_TEMPLATE_APP_NAME_App();
+	SLIB_TEMPLATE_APP_NAMEApp();
 	
 protected:
 	void onStart() override;
