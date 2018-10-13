@@ -1,0 +1,34 @@
+CURRENT_PATH=`pwd`
+if [ -z $SLIB_PATH ]; then
+ bash $(dirname $0)/../../setup-path
+fi
+cd $CURRENT_PATH
+APP_NAME=$1
+if [ -z $APP_NAME ]; then
+ echo "Please input the application name:"
+ read APP_NAME
+ APP_NAME=`echo $APP_NAME | sed 's/[^a-zA-Z0-9_]//g'`
+ if [ -z $APP_NAME ]; then
+  exit
+ fi
+fi
+echo "New SLib Desktop App (Linux): $APP_NAME"
+cp "$SLIB_PATH/tool/template/Linux/.gitignore" "$CURRENT_PATH"
+cp "$SLIB_PATH/tool/template/Linux/cmake-debug.sh" "$CURRENT_PATH"
+cp "$SLIB_PATH/tool/template/Linux/cmake-release.sh" "$CURRENT_PATH"
+cp "$SLIB_PATH/tool/template/Linux/CMakeLists.txt" "$CURRENT_PATH"
+cp "$SLIB_PATH/tool/template/Linux/main.cpp" "$CURRENT_PATH"
+cp "$SLIB_PATH/tool/template/desktop/app.h" "$CURRENT_PATH"
+cp "$SLIB_PATH/tool/template/desktop/app.cpp" "$CURRENT_PATH"
+
+if [[ `uname` == 'Darwin' ]]; then
+ sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/CMakeLists.txt"
+ sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/main.cpp"
+ sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/app.h"
+ sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/app.cpp"
+else
+ sed -i "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/CMakeLists.txt"
+ sed -i "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/main.cpp"
+ sed -i "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/app.h"
+ sed -i "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/app.cpp"
+fi
