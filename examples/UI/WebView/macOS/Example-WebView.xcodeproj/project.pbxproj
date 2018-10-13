@@ -23,7 +23,6 @@
 		26B906862110223800D972FB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		26B906882110223800D972FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		26B906892110223800D972FB /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
-		26B9068B2110223800D972FB /* Example_WebView.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Example_WebView.entitlements; sourceTree = "<group>"; };
 		26B906942110233700D972FB /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = ../src/app.h; sourceTree = "<group>"; };
 		26B906952110233700D972FB /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = ../src/app.cpp; sourceTree = "<group>"; };
 		26B906982110244B00D972FB /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -68,7 +67,6 @@
 				26B906852110223800D972FB /* MainMenu.xib */,
 				26B906882110223800D972FB /* Info.plist */,
 				26B906892110223800D972FB /* main.mm */,
-				26B9068B2110223800D972FB /* Example_WebView.entitlements */,
 			);
 			path = "Example-WebView";
 			sourceTree = "<group>";
@@ -292,7 +290,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "Example-WebView/Example_WebView.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
@@ -313,7 +310,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "Example-WebView/Example_WebView.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";

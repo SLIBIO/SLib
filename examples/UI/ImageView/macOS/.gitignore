@@ -1,6 +1,3 @@
+.DS_Store
 project.xcworkspace/
 xcuserdata/
-.vs
-Debug
-Release
-x64

@@ -7,26 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		26840C2A2111FA0200A01A29 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 26840C292111FA0200A01A29 /* AppDelegate.m */; };
+		265BF19121723BCD0073F7B8 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 265BF19021723BCD0073F7B8 /* OpenGL.framework */; };
+		265BF19321723BFB0073F7B8 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 265BF19221723BFB0073F7B8 /* AppKit.framework */; };
+		265BF19421723C220073F7B8 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 265BF18E21723BBA0073F7B8 /* Quartz.framework */; };
+		265BF197217240D90073F7B8 /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265BF196217240D90073F7B8 /* app.cpp */; };
+		265BF199217240F00073F7B8 /* images in Resources */ = {isa = PBXBuildFile; fileRef = 265BF198217240F00073F7B8 /* images */; };
 		26840C2C2111FA0300A01A29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26840C2B2111FA0300A01A29 /* Assets.xcassets */; };
 		26840C2F2111FA0300A01A29 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 26840C2D2111FA0300A01A29 /* MainMenu.xib */; };
-		26840C322111FA0300A01A29 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26840C312111FA0300A01A29 /* main.mm */; };
-		26840C3C2111FB3800A01A29 /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26840C3B2111FB3800A01A29 /* app.cpp */; };
-		26840C3E2111FB4600A01A29 /* images in Resources */ = {isa = PBXBuildFile; fileRef = 26840C3D2111FB4600A01A29 /* images */; };
+		26840C322111FA0300A01A29 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26840C312111FA0300A01A29 /* main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		26840C252111FA0200A01A29 /* Example-ImageView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Example-ImageView.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		26840C282111FA0200A01A29 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		26840C292111FA0200A01A29 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		265BF18E21723BBA0073F7B8 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		265BF19021723BCD0073F7B8 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		265BF19221723BFB0073F7B8 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		265BF195217240D90073F7B8 /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = ../src/app.h; sourceTree = "<group>"; };
+		265BF196217240D90073F7B8 /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = ../src/app.cpp; sourceTree = "<group>"; };
+		265BF198217240F00073F7B8 /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; name = images; path = ../images; sourceTree = "<group>"; };
+		26840C252111FA0200A01A29 /* ExampleImageView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleImageView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26840C2B2111FA0300A01A29 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		26840C2E2111FA0300A01A29 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		26840C302111FA0300A01A29 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		26840C312111FA0300A01A29 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
-		26840C332111FA0300A01A29 /* Example_ImageView.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Example_ImageView.entitlements; sourceTree = "<group>"; };
-		26840C3A2111FB3800A01A29 /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = ../src/app.h; sourceTree = "<group>"; };
-		26840C3B2111FB3800A01A29 /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = ../src/app.cpp; sourceTree = "<group>"; };
-		26840C3D2111FB4600A01A29 /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; name = images; path = ../images; sourceTree = "<group>"; };
+		26840C312111FA0300A01A29 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -34,49 +36,61 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				265BF19421723C220073F7B8 /* Quartz.framework in Frameworks */,
+				265BF19321723BFB0073F7B8 /* AppKit.framework in Frameworks */,
+				265BF19121723BCD0073F7B8 /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		265BF18B21723BB30073F7B8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				265BF19221723BFB0073F7B8 /* AppKit.framework */,
+				265BF19021723BCD0073F7B8 /* OpenGL.framework */,
+				265BF18E21723BBA0073F7B8 /* Quartz.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		26840C1C2111FA0100A01A29 = {
 			isa = PBXGroup;
 			children = (
+				26840C272111FA0200A01A29 /* project */,
 				26840C392111FB2E00A01A29 /* src */,
-				26840C272111FA0200A01A29 /* Example-ImageView */,
 				26840C262111FA0200A01A29 /* Products */,
+				265BF18B21723BB30073F7B8 /* Frameworks */,
 			);
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		26840C262111FA0200A01A29 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				26840C252111FA0200A01A29 /* Example-ImageView.app */,
+				26840C252111FA0200A01A29 /* ExampleImageView.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		26840C272111FA0200A01A29 /* Example-ImageView */ = {
+		26840C272111FA0200A01A29 /* project */ = {
 			isa = PBXGroup;
 			children = (
-				26840C282111FA0200A01A29 /* AppDelegate.h */,
-				26840C292111FA0200A01A29 /* AppDelegate.m */,
 				26840C2B2111FA0300A01A29 /* Assets.xcassets */,
 				26840C2D2111FA0300A01A29 /* MainMenu.xib */,
 				26840C302111FA0300A01A29 /* Info.plist */,
-				26840C312111FA0300A01A29 /* main.mm */,
-				26840C332111FA0300A01A29 /* Example_ImageView.entitlements */,
+				26840C312111FA0300A01A29 /* main.cpp */,
 			);
-			path = "Example-ImageView";
+			path = project;
 			sourceTree = "<group>";
 		};
 		26840C392111FB2E00A01A29 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				26840C3D2111FB4600A01A29 /* images */,
-				26840C3B2111FB3800A01A29 /* app.cpp */,
-				26840C3A2111FB3800A01A29 /* app.h */,
+				265BF198217240F00073F7B8 /* images */,
+				265BF196217240D90073F7B8 /* app.cpp */,
+				265BF195217240D90073F7B8 /* app.h */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -84,9 +98,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		26840C242111FA0200A01A29 /* Example-ImageView */ = {
+		26840C242111FA0200A01A29 /* ExampleImageView */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 26840C362111FA0300A01A29 /* Build configuration list for PBXNativeTarget "Example-ImageView" */;
+			buildConfigurationList = 26840C362111FA0300A01A29 /* Build configuration list for PBXNativeTarget "ExampleImageView" */;
 			buildPhases = (
 				26840C212111FA0200A01A29 /* Sources */,
 				26840C222111FA0200A01A29 /* Frameworks */,
@@ -96,9 +110,9 @@
 			);
 			dependencies = (
 			);
-			name = "Example-ImageView";
-			productName = "Example-ImageView";
-			productReference = 26840C252111FA0200A01A29 /* Example-ImageView.app */;
+			name = ExampleImageView;
+			productName = ExampleImageView;
+			productReference = 26840C252111FA0200A01A29 /* ExampleImageView.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -108,14 +122,14 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0940;
-				ORGANIZATIONNAME = SLIBIO;
+				ORGANIZATIONNAME = YourOrganization;
 				TargetAttributes = {
 					26840C242111FA0200A01A29 = {
 						CreatedOnToolsVersion = 9.4;
 					};
 				};
 			};
-			buildConfigurationList = 26840C202111FA0200A01A29 /* Build configuration list for PBXProject "Example-ImageView" */;
+			buildConfigurationList = 26840C202111FA0200A01A29 /* Build configuration list for PBXProject "ExampleImageView" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -128,7 +142,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				26840C242111FA0200A01A29 /* Example-ImageView */,
+				26840C242111FA0200A01A29 /* ExampleImageView */,
 			);
 		};
 /* End PBXProject section */
@@ -138,7 +152,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26840C3E2111FB4600A01A29 /* images in Resources */,
+				265BF199217240F00073F7B8 /* images in Resources */,
 				26840C2C2111FA0300A01A29 /* Assets.xcassets in Resources */,
 				26840C2F2111FA0300A01A29 /* MainMenu.xib in Resources */,
 			);
@@ -151,9 +165,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26840C3C2111FB3800A01A29 /* app.cpp in Sources */,
-				26840C322111FA0300A01A29 /* main.mm in Sources */,
-				26840C2A2111FA0200A01A29 /* AppDelegate.m in Sources */,
+				26840C322111FA0300A01A29 /* main.cpp in Sources */,
+				265BF197217240D90073F7B8 /* app.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,20 +297,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "Example-ImageView/Example_ImageView.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
-				INFOPLIST_FILE = "Example-ImageView/Info.plist";
+				INFOPLIST_FILE = project/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)";
 				OTHER_LDFLAGS = "-lslib";
-				PRODUCT_BUNDLE_IDENTIFIER = "io.slib.Example-ImageView";
+				PRODUCT_BUNDLE_IDENTIFIER = "your-bundle-id.SLIB-TEMPLATE-APP-NAME";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				USE_HEADERMAP = NO;
+				USE_HEADERMAP = YES;
 			};
 			name = Debug;
 		};
@@ -305,27 +316,25 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "Example-ImageView/Example_ImageView.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
-				INFOPLIST_FILE = "Example-ImageView/Info.plist";
+				INFOPLIST_FILE = project/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)";
 				OTHER_LDFLAGS = "-lslib";
-				PRODUCT_BUNDLE_IDENTIFIER = "io.slib.Example-ImageView";
+				PRODUCT_BUNDLE_IDENTIFIER = "your-bundle-id.SLIB-TEMPLATE-APP-NAME";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				USE_HEADERMAP = NO;
+				USE_HEADERMAP = YES;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		26840C202111FA0200A01A29 /* Build configuration list for PBXProject "Example-ImageView" */ = {
+		26840C202111FA0200A01A29 /* Build configuration list for PBXProject "ExampleImageView" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				26840C342111FA0300A01A29 /* Debug */,
@@ -334,7 +343,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		26840C362111FA0300A01A29 /* Build configuration list for PBXNativeTarget "Example-ImageView" */ = {
+		26840C362111FA0300A01A29 /* Build configuration list for PBXNativeTarget "ExampleImageView" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				26840C372111FA0300A01A29 /* Debug */,
