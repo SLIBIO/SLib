@@ -20,12 +20,11 @@ import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.view.Surface;
 
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
+import slib.platform.android.helper.AppHelper;
 
 public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 
@@ -187,7 +186,7 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 			return false;
 		}
 		Context context = activity.getApplicationContext();
-		int result = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA);
+		int result = AppHelper.checkSelfPermission(context, Manifest.permission.CAMERA);
 		return result == PackageManager.PERMISSION_GRANTED;
 	}
 
@@ -197,7 +196,7 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 			flagRequestPermission = true;
 			return;
 		}
-		ActivityCompat.requestPermissions(activity, new String[]{ Manifest.permission.CAMERA }, SlibActivity.PERMISSION_REQUEST_CAMERA);
+		AppHelper.requestPermissions(activity, new String[]{ Manifest.permission.CAMERA }, SlibActivity.PERMISSION_REQUEST_CAMERA);
 	}
 
 	public static void onRequestPermissionsResult() {
