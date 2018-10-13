@@ -1,6 +1,5 @@
-project.xcworkspace/
-xcuserdata/
 .vs
+*.vcxproj.user
 Debug
 Release
 x64
