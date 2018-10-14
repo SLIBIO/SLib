@@ -107,6 +107,42 @@ On Windows, you'll need to run the `setup-path.bat` batch file on Command Prompt
 
 After setting up the environment variables, please close all the running IDEs(Xcode, Android Studio, Tizen Studio,...) and terminal (or konsole) windows, and then reopen them. (on macOS, press Command+Q to completely close the IDEs).
 
+
+### Creating new projects based on SLib
+
+After setting up environment using `setup-path`(`setup-path.bat`), please reopen `Terminal` (`Command Prompt`) window.
+
+And then please create an empty directory, and then create a C++ project using following commands.
+
+| Platform | Application Type | Command |
+| ----|----|----|
+| Android | Mobile App | `new-slib-app-android YOUR_PROJECT_NAME YOUR_APPLICATION_ID` |
+| iOS | Mobile App | `new-slib-app-ios YOUR_PROJECT_NAME` |
+| macOS | Desktop App | `new-slib-app-macos YOUR_PROJECT_NAME` |
+| macOS | Console App | `new-slib-console-macos YOUR_PROJECT_NAME` |
+| Win32 | Desktop App | `new-slib-app-win32 YOUR_PROJECT_NAME` |
+| Win32 | Console App | `new-slib-console-win32 YOUR_PROJECT_NAME` |
+| Linux | Desktop App | `new-slib-app-linux YOUR_PROJECT_NAME` |
+| Linux | Console App | `new-slib-console-linux YOUR_PROJECT_NAME` |
+
+Here is an example for creating an Android project.
+
+```
+mkdir ~/SLibAndroidExample
+cd ~/SLibAndroidExample
+new-slib-app-android TestApp org.example.testapp
+```
+
+Here is an example for creating a macOS Desktop project.
+
+```
+mkdir ~/SLibMacOSExample
+cd ~/SLibMacOSExample
+new-slib-app-macos TestApp
+```
+
+After creating projects, you can share same source code across the projects by adding same sources using IDE.
+
 ## Integrating SLib with existing C++ projects
 
 It is very easy to integrate `SLib` into your existing C++ project. You just need to setup `include` and `lib` directories into your existing C++ project.
