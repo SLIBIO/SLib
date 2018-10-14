@@ -34,6 +34,7 @@ namespace slib
 		m_pager->setOpaque(sl_true, UIUpdateMode::Init);
 		m_pager->setBackgroundColor(Color::White);
 		m_pager->setMinimumPagesCount(1);
+		m_pager->setVisibility(Visibility::Hidden, UIUpdateMode::Init);
 		m_contentView->addChild(m_pager, UIUpdateMode::Init);
 		
 	}
@@ -386,6 +387,7 @@ namespace slib
 		if (m_pager->getPagesCount() == 0) {
 			Ref<View> page = m_startupPage;
 			if (page.isNotNull()) {
+				m_pager->setVisibility(Visibility::Visible);
 				openHomePage(page);
 			}
 		}
