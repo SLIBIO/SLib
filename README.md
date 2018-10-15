@@ -125,6 +125,8 @@ And then please create an empty directory, and then create a C++ project using f
 | Linux | Desktop App | `new-slib-app-linux YOUR_PROJECT_NAME` |
 | Linux | Console App | `new-slib-console-linux YOUR_PROJECT_NAME` |
 
+Note that you have to compile SLib before creating new SLib application projects.
+
 Here is an example for creating an Android project.
 
 ```
@@ -142,6 +144,7 @@ new-slib-app-macos TestApp
 ```
 
 After creating projects, you can share same source code across the projects by adding same sources using IDE.
+
 
 ## Integrating SLib with existing C++ projects
 
