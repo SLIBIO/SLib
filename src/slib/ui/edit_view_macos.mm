@@ -21,8 +21,6 @@
 	
 	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 	
-	@public sl_bool m_flagMultiLine;
-	
 }
 @end
 
@@ -201,7 +199,6 @@ namespace slib
 		if (handle != nil) {
 			_priv_Slib_macOS_TextFieldCell* cell = [[_priv_Slib_macOS_TextFieldCell alloc] init];
 			handle.cell = cell;
-			handle->m_flagMultiLine = m_flagMultiLine;
 			((EditView_Impl*)this)->_applyProperties(handle);
 			[handle setDelegate:handle];
 		}
@@ -389,14 +386,9 @@ namespace slib
 			}
 		}
 	}
-
+	
 	void EditView::_setMultiLine_NW(sl_bool flag)
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_TextField class]]) {
-			_priv_Slib_macOS_TextField* tv = (_priv_Slib_macOS_TextField*)handle;
-			tv->m_flagMultiLine = flag;
-		}
 	}
 
 	void EditView::_setTextColor_NW(const Color& color)
@@ -491,28 +483,12 @@ namespace slib
 
 @implementation _priv_Slib_macOS_TextField
 
--(void)controlTextDidChange:(NSNotification *)obj
+- (void)controlTextDidChange:(NSNotification *)obj
 {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::EditView_Impl::onChangeTextField(instance.get(), self);
 	}
-}
-
-- (BOOL)control:(NSControl*)control textView:(NSTextView*)textView doCommandBySelector:(SEL)commandSelector
-{
-	BOOL result = NO;
-	if (m_flagMultiLine) {
-		if (commandSelector == @selector(insertNewline:)) {
-			[textView insertNewlineIgnoringFieldEditor:self];
-			result = YES;
-		}
-		else if (commandSelector == @selector(insertTab:)) {
-			[textView insertTabIgnoringFieldEditor:self];
-			result = YES;
-		}
-	}
-	return result;
 }
 
 - (void)keyUp:(NSEvent*)theEvent
