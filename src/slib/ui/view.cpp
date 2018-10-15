@@ -2160,15 +2160,31 @@ namespace slib
 				Ref<LayoutAttributes>& childLayoutAttrs = child->m_layoutAttrs;
 				if (childLayoutAttrs.isNotNull()) {
 					if (flagHorizontal) {
-						sl_ui_pos w = childLayoutAttrs->layoutFrame.right + childLayoutAttrs->marginRight;
-						if (w > measuredWidth) {
-							measuredWidth = w;
+						if (childLayoutAttrs->widthMode != SizeMode::Filling) {
+							sl_ui_pos w = childLayoutAttrs->layoutFrame.right + childLayoutAttrs->marginRight;
+							if (w > measuredWidth) {
+								measuredWidth = w;
+							}
+							if (childLayoutAttrs->leftMode != PositionMode::Free || childLayoutAttrs->rightMode != PositionMode::Free) {
+								sl_ui_pos w = childLayoutAttrs->layoutFrame.right - childLayoutAttrs->layoutFrame.left + childLayoutAttrs->marginLeft + childLayoutAttrs->marginRight;
+								if (w > measuredWidth) {
+									measuredWidth = w;
+								}
+							}
 						}
 					}
 					if (flagVertical) {
-						sl_ui_pos h = childLayoutAttrs->layoutFrame.bottom + childLayoutAttrs->marginBottom;
-						if (h > measuredHeight) {
-							measuredHeight = h;
+						if (childLayoutAttrs->heightMode != SizeMode::Filling) {
+							sl_ui_pos h = childLayoutAttrs->layoutFrame.bottom + childLayoutAttrs->marginBottom;
+							if (h > measuredHeight) {
+								measuredHeight = h;
+							}
+							if (childLayoutAttrs->topMode != PositionMode::Free || childLayoutAttrs->bottomMode != PositionMode::Free) {
+								h = childLayoutAttrs->layoutFrame.bottom - childLayoutAttrs->layoutFrame.top + childLayoutAttrs->marginTop + childLayoutAttrs->marginBottom;
+								if (h > measuredHeight) {
+									measuredHeight = h;
+								}
+							}
 						}
 					}
 				} else {
