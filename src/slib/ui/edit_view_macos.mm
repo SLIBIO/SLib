@@ -621,11 +621,17 @@ namespace slib
 
 @implementation _priv_Slib_macOS_TextFieldCell
 
+#define TEXT_HEIGHT_FACTOR 1.5
+#define TEXT_PADDING_FACTOR 0.4
+#define LABEL_PADDING_FACTOR 0.1
+
 - (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
 	if (((NSTextField*)controlView).currentEditor == nil) {
 		cellFrame = [self drawingRectForBounds:cellFrame];
-		cellFrame.origin.y -= 1;
+		if (self.font != nil) {
+			cellFrame.origin.y -= self.font.pointSize * LABEL_PADDING_FACTOR;
+		}
 		[self.attributedStringValue drawInRect:cellFrame];
 	}
 }
@@ -634,8 +640,8 @@ namespace slib
 {
 	if (self.font != nil) {
 		rect = [super drawingRectForBounds: rect];
-		rect.origin.y -= self.font.pointSize * 0.5;
-		rect.size.height = self.font.pointSize * 1.5;
+		rect.origin.y -= self.font.pointSize * TEXT_PADDING_FACTOR;
+		rect.size.height = self.font.pointSize * TEXT_HEIGHT_FACTOR;
 		return rect;
 	} else {
 		return [super drawingRectForBounds: rect];
@@ -650,7 +656,9 @@ namespace slib
 {
 	if (((NSTextField*)controlView).currentEditor == nil) {
 		cellFrame = [self drawingRectForBounds:cellFrame];
-		cellFrame.origin.y -= 1;
+		if (self.font != nil) {
+			cellFrame.origin.y -= self.font.pointSize * LABEL_PADDING_FACTOR;
+		}
 		NSMutableAttributedString* password = [self.attributedStringValue mutableCopy];
 		NSMutableString* str = password.mutableString;
 		[str setString:[@"" stringByPaddingToLength:str.length withString:@"•" startingAtIndex:0]];
@@ -662,8 +670,8 @@ namespace slib
 {
 	if (self.font != nil) {
 		rect = [super drawingRectForBounds: rect];
-		rect.origin.y -= self.font.pointSize * 0.5;
-		rect.size.height = self.font.pointSize * 1.5;
+		rect.origin.y -= self.font.pointSize * TEXT_PADDING_FACTOR;
+		rect.size.height = self.font.pointSize * TEXT_HEIGHT_FACTOR;
 		return rect;
 	} else {
 		return [super drawingRectForBounds: rect];
