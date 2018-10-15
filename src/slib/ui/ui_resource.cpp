@@ -143,8 +143,8 @@ namespace slib
 	
 	void WindowLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)
 	{
-		Window::dispatchResize(width, height);
 		_layoutViews_safe();
+		Window::dispatchResize(width, height);
 	}
 	
 	void WindowLayoutResource::_layoutViews_safe()

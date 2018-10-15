@@ -2356,7 +2356,7 @@ namespace slib
 				break;
 			}
 		}
-		view->dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(View, _updateAndApplyLayout, this));
+		view->dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(View, _updateAndApplyLayout, view.get()));
 	}
 
 	void View::invalidateParentLayout(UIUpdateMode mode)
@@ -2395,7 +2395,7 @@ namespace slib
 			}
 			parent = view->m_parent;
 		}
-		view->dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(View, _updateAndApplyLayout, this));
+		view->dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(View, _updateAndApplyLayout, view.get()));
 	}
 	
 	void View::invalidateLayoutOfWrappingControl(UIUpdateMode mode)
