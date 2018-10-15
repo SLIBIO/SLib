@@ -860,7 +860,7 @@ namespace slib
 				{
 					RECT& rect = *(RECT*)(lParam);
 					UISize size((sl_ui_pos)(rect.right - rect.left), (sl_ui_pos)(rect.bottom - rect.top));
-					window->onResizing(size);
+					window->onResizing(size, wParam != WMSZ_TOP && wParam != WMSZ_BOTTOM);
 					if (size.x < 0) {
 						size.x = 0;
 					}
@@ -879,6 +879,7 @@ namespace slib
 						rect.top = (int)(rect.bottom - size.y);
 						break;
 					case WMSZ_TOP:
+						rect.right = (int)(rect.left + size.x);
 						rect.top = (int)(rect.bottom - size.y);
 						break;
 					case WMSZ_TOPRIGHT:
@@ -887,15 +888,18 @@ namespace slib
 						break;
 					case WMSZ_LEFT:
 						rect.left = (int)(rect.right - size.x);
+						rect.bottom = (int)(rect.top + size.y);
 						break;
 					case WMSZ_RIGHT:
 						rect.right = (int)(rect.left + size.x);
+						rect.bottom = (int)(rect.top + size.y);
 						break;
 					case WMSZ_BOTTOMLEFT:
 						rect.left = (int)(rect.right - size.x);
 						rect.bottom = (int)(rect.top + size.y);
 						break;
 					case WMSZ_BOTTOM:
+						rect.right = (int)(rect.left + size.x);
 						rect.bottom = (int)(rect.top + size.y);
 						break;
 					case WMSZ_BOTTOMRIGHT:

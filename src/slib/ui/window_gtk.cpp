@@ -732,32 +732,52 @@ namespace slib
 			return UISize(sizeWindow.x - m_origin.x, sizeWindow.y - m_origin.y);
 		}
 		
-		void setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum) override
+		void setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum, float aspectRatioMinimum, float aspectRatioMaximum) override
 		{
 			if (!m_flagClosed) {
 				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), _priv_GTK_Window, setSizeRange, this, sizeMinimum, sizeMaximum));
+					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), _priv_GTK_Window, setSizeRange, this, sizeMinimum, sizeMaximum, aspectRatioMinimum, aspectRatioMaximum));
 					return;
 				}
 				GtkWindow* window = m_window;
 				if (window) {
 					GdkGeometry geometry;
-					geometry.min_width = sizeMinimum.x;
-					geometry.min_height = sizeMinimum.y;
-					if (sizeMaximum.x > 0) {
-						geometry.max_width = sizeMaximum.x;
-					} else {
-						geometry.max_width = 100000;
+					Base::zeroMemory(&geometry, sizeof(geometry));
+
+					gint hints = GDK_HINT_MIN_SIZE;
+					geometry.min_width = SLIB_MAX(0, sizeMinimum.x);
+					geometry.min_height = SLIB_MAX(0, sizeMinimum.y);
+
+					if (sizeMaximum.x > 0 || sizeMaximum.y > 0) {
+						hints |= GDK_HINT_MAX_SIZE;
+						gint w = sizeMaximum.x;
+						if (w <= 0) {
+							w = 100000;
+						}
+						geometry.max_width = w;
+						gint h = sizeMaximum.y;
+						if (h <= 0) {
+							h = 100000;
+						}
+						geometry.max_height = h;
 					}
-					if (sizeMaximum.x > 0) {
-						geometry.max_height = sizeMaximum.y;
-					} else {
-						geometry.max_height = 100000;
+					if (aspectRatioMinimum > 0 || aspectRatioMaximum > 0) {
+						hints |= GDK_HINT_ASPECT;
+						gdouble r;
+						r = aspectRatioMinimum;
+						if (r <= 0) {
+							r = 0.00001;
+						}
+						geometry.min_aspect = r;
+						r = aspectRatioMaximum;
+						if (r <= 0) {
+							r = 100000;
+						}
+						geometry.max_aspect = r;
 					}
-					gtk_window_set_geometry_hints(window, (GtkWidget*)window, &geometry, (GdkWindowHints)(GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE));
+					gtk_window_set_geometry_hints(window, (GtkWidget*)window, &geometry, (GdkWindowHints)(hints));
 				}
 			}
-			WindowInstance::setSizeRange(sizeMinimum, sizeMaximum);
 		}
 		
 	};

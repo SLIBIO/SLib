@@ -243,8 +243,8 @@ namespace slib
 		
 		virtual UISize getClientSizeFromWindowSize(const UISize& sizeWindow);
 
-		
-		virtual void setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum);
+		// aspect = width / height
+		virtual void setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum, float aspectRatioMinimum = -1, float aspectRatioMaximum = -1);
 		
 		UISize getMinimumSize();
 		
@@ -273,6 +273,16 @@ namespace slib
 		sl_ui_len getMaximumHeight();
 		
 		void setMaximumHeight(sl_ui_len height);
+		
+		float getMinimumAspectRatio();
+		
+		void setMinimumAspectRatio(float ratio);
+		
+		float getMaximumAspectRatio();
+		
+		void setMaximumAspectRatio(float ratio);
+		
+		void setAspectRatio(float ratio);
 
 		
 		sl_bool isModal();
@@ -348,6 +358,8 @@ namespace slib
 		
 		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnMove)
 		
+		SLIB_PROPERTY(AtomicFunction<void(Window*, UISize&)>, OnResizing)
+		
 		SLIB_PROPERTY(AtomicFunction<void(Window*, sl_ui_len, sl_ui_len)>, OnResize)
 		
 		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnMinimize)
@@ -376,6 +388,8 @@ namespace slib
 		virtual void onDeactivate();
 		
 		virtual void onMove();
+		
+		virtual void onResizing(UISize& size);
 		
 		virtual void onResize(sl_ui_len clientWidth, sl_ui_len clientHeight);
 
@@ -406,6 +420,8 @@ namespace slib
 		
 		virtual void dispatchMove();
 		
+		virtual void dispatchResizing(UISize& size);
+		
 		virtual void dispatchResize(sl_ui_len clientWidth, sl_ui_len clientHeight);
 		
 		virtual void dispatchMinimize();
@@ -432,6 +448,10 @@ namespace slib
 		void _attachContent();
 		
 		void _refreshSize();
+		
+		void _constrainSize(UISize& size, sl_bool flagAdjustHeight);
+		
+		void _constrainSize(UIRect& frame, sl_bool flagAdjustHeight);
 		
 	private:
 		AtomicRef<WindowInstance> m_instance;
@@ -468,11 +488,15 @@ namespace slib
 		
 		UISize m_sizeMin;
 		UISize m_sizeMax;
+		float m_aspectRatioMinimum;
+		float m_aspectRatioMaximum;
+		sl_bool m_flagStateResizingWidth;
 
 #if defined(SLIB_UI_IS_ANDROID)
 		// jobject
 		void* m_activity;
 #endif
+		friend class WindowInstance;
 		
 	};
 
@@ -567,7 +591,7 @@ namespace slib
 		virtual UISize getClientSizeFromWindowSize(const UISize& sizeWindow) = 0;
 		
 		
-		virtual void setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum);
+		virtual void setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum, float aspectRatioMinimum, float aspectRatioMaximum);
 		
 	public:
 		sl_bool onClose();
@@ -578,7 +602,7 @@ namespace slib
 		
 		void onMove();
 		
-		void onResizing(UISize& size);
+		void onResizing(UISize& size, sl_bool flagResizingWidth);
 		
 		void onResize(sl_ui_len clientWidth, sl_ui_len clientHeight);
 		
@@ -592,10 +616,6 @@ namespace slib
 
 	private:
 		AtomicWeakRef<Window> m_window;
-		
-	protected:
-		UISize m_sizeMin;
-		UISize m_sizeMax;
 		
 	};
 

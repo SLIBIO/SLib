@@ -55,29 +55,6 @@ namespace slib
 		frame.fixSizeError();
 		return frame;
 	}
-	
-	static void _priv_Window_constrainSize(UISize& size, const UISize& sizeMin, const UISize& sizeMax)
-	{
-		if (size.x < sizeMin.x) {
-			size.x = sizeMin.x;
-		}
-		if (size.y < sizeMin.y) {
-			size.y = sizeMin.y;
-		}
-		if (sizeMax.x > 0 && size.x > sizeMax.x) {
-			size.x = sizeMax.x;
-		}
-		if (sizeMax.y > 0 && size.y > sizeMax.y) {
-			size.y = sizeMax.y;
-		}
-	}
-	
-	static void _priv_Window_constrainSize(UIRect& frame, const UISize& sizeMin, const UISize& sizeMax)
-	{
-		UISize size = frame.getSize();
-		_priv_Window_constrainSize(size, sizeMin, sizeMax);
-		frame.setSize(size);
-	}
 
 #define CHECK_INSTANCE(instance) (instance.isNotNull() && !(instance->isClosed()))
 
@@ -127,10 +104,13 @@ namespace slib
 		
 		m_flagUseClientSizeRequested = sl_false;
 		
-		m_sizeMin.x = 0;
-		m_sizeMin.y = 0;
-		m_sizeMax.x = 0;
-		m_sizeMax.y = 0;
+		m_sizeMin.x = -1;
+		m_sizeMin.y = -1;
+		m_sizeMax.x = -1;
+		m_sizeMax.y = -1;
+		m_aspectRatioMinimum = -1;
+		m_aspectRatioMaximum = -1;
+		m_flagStateResizingWidth = sl_false;
 		
 #if defined(SLIB_UI_IS_ANDROID)
 		m_activity = sl_null;
@@ -259,7 +239,7 @@ namespace slib
 	void Window::setFrame(const UIRect& _frame)
 	{
 		UIRect frame = _frame;
-		_priv_Window_constrainSize(frame, m_sizeMin, m_sizeMax);
+		_constrainSize(frame, frame.getWidth() > 0);
 		m_frame = frame;
 		Ref<WindowInstance> instance = m_instance;
 		if (CHECK_INSTANCE(instance)) {
@@ -712,17 +692,19 @@ namespace slib
 		}
 	}
 	
-	void Window::setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum)
+	void Window::setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum, float aspectRatioMinimum, float aspectRatioMaximum)
 	{
 		m_sizeMin = sizeMinimum;
 		m_sizeMax = sizeMaximum;
+		m_aspectRatioMinimum = aspectRatioMinimum;
+		m_aspectRatioMaximum = aspectRatioMaximum;
 		Ref<WindowInstance> instance = m_instance;
 		if (instance.isNotNull()) {
-			instance->setSizeRange(sizeMinimum, sizeMaximum);
+			instance->setSizeRange(sizeMinimum, sizeMaximum, aspectRatioMinimum, m_aspectRatioMaximum);
 		}
 		UIRect frame = m_frame;
 		UIRect frameOld = frame;
-		_priv_Window_constrainSize(frame, m_sizeMin, m_sizeMax);
+		_constrainSize(frame, frame.getWidth() > 0);
 		if (!(frame.isAlmostEqual(frameOld))) {
 			setFrame(frame);
 		}
@@ -798,6 +780,31 @@ namespace slib
 		setSizeRange(m_sizeMin, UISize(m_sizeMax.x, height));
 	}
 
+	float Window::getMinimumAspectRatio()
+	{
+		return m_aspectRatioMinimum;
+	}
+	
+	void Window::setMinimumAspectRatio(float ratio)
+	{
+		setSizeRange(m_sizeMin, m_sizeMax, ratio, m_aspectRatioMaximum);
+	}
+	
+	float Window::getMaximumAspectRatio()
+	{
+		return m_aspectRatioMaximum;
+	}
+	
+	void Window::setMaximumAspectRatio(float ratio)
+	{
+		setSizeRange(m_sizeMin, m_sizeMax, m_aspectRatioMinimum, ratio);
+	}
+	
+	void Window::setAspectRatio(float ratio)
+	{
+		setSizeRange(m_sizeMin, m_sizeMax, ratio, ratio);
+	}
+	
 	sl_bool Window::isModal()
 	{
 		return m_flagModal;
@@ -979,7 +986,7 @@ namespace slib
 			window->setAlpha(m_alpha);
 			window->setTransparent(m_flagTransparent);
 			
-			window->setSizeRange(m_sizeMin, m_sizeMax);
+			window->setSizeRange(m_sizeMin, m_sizeMax, m_aspectRatioMinimum, m_aspectRatioMaximum);
 			
 #if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_WIN32)
 			if (m_flagUseClientSizeRequested) {
@@ -1093,6 +1100,10 @@ namespace slib
 	void Window::onMove()
 	{
 	}
+	
+	void Window::onResizing(UISize& size)
+	{
+	}
 
 	void Window::onResize(sl_ui_len clientWidth, sl_ui_len clientHeight)
 	{
@@ -1187,6 +1198,17 @@ namespace slib
 			listener->onMove(this);
 		}
 		getOnMove()(this);
+	}
+	
+	void Window::dispatchResizing(UISize& size)
+	{
+		_constrainSize(size, m_flagStateResizingWidth);
+		onResizing(size);
+		PtrLocker<IWindowListener> listener(getEventListener());
+		if (listener.isNotNull()) {
+			listener->onResizing(this, size);
+		}
+		getOnResizing()(this, size);
 	}
 
 	void Window::dispatchResize(sl_ui_len clientWidth, sl_ui_len clientHeight)
@@ -1293,15 +1315,62 @@ namespace slib
 		}
 	}
 
+	void Window::_constrainSize(UISize& size, sl_bool flagAdjustHeight)
+	{
+		if (m_aspectRatioMinimum > 0 || m_aspectRatioMaximum > 0) {
+			if (m_aspectRatioMinimum > 0) {
+				if (flagAdjustHeight) {
+					sl_ui_len maxY = (sl_ui_len)(size.x / m_aspectRatioMinimum);
+					if (size.y > maxY) {
+						size.y = maxY;
+					}
+				} else {
+					sl_ui_len minX = (sl_ui_len)(size.y * m_aspectRatioMinimum);
+					if (size.x < minX) {
+						size.x = minX;
+					}
+				}
+			}
+			if (m_aspectRatioMaximum > 0) {
+				if (flagAdjustHeight) {
+					sl_ui_len minY = (sl_ui_len)(size.x / m_aspectRatioMaximum);
+					if (size.y < minY) {
+						size.y = minY;
+					}
+				} else {
+					sl_ui_len maxX = (sl_ui_len)(size.y * m_aspectRatioMaximum);
+					if (size.x > maxX) {
+						size.x = maxX;
+					}
+				}
+			}
+		}
+		if (m_sizeMin.x > 0 && size.x < m_sizeMin.x) {
+			size.x = m_sizeMin.x;
+		}
+		if (m_sizeMin.y > 0 && size.y < m_sizeMin.y) {
+			size.y = m_sizeMin.y;
+		}
+		if (m_sizeMax.x > 0 && size.x > m_sizeMax.x) {
+			size.x = m_sizeMax.x;
+		}
+		if (m_sizeMax.y > 0 && size.y > m_sizeMax.y) {
+			size.y = m_sizeMax.y;
+		}
+	}
+	
+	void Window::_constrainSize(UIRect& frame, sl_bool flagAdjustHeight)
+	{
+		UISize size = frame.getSize();
+		_constrainSize(size, flagAdjustHeight);
+		frame.setSize(size);
+	}
+	
 
 	SLIB_DEFINE_OBJECT(WindowInstance, Object)
 
 	WindowInstance::WindowInstance()
 	{
-		m_sizeMin.x = 0;
-		m_sizeMin.y = 0;
-		m_sizeMax.x = 0;
-		m_sizeMax.y = 0;
 	}
 
 	WindowInstance::~WindowInstance()
@@ -1322,10 +1391,8 @@ namespace slib
 	{
 	}
 	
-	void WindowInstance::setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum)
+	void WindowInstance::setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum, float aspectRatioMinimum, float aspectRatioMaximum)
 	{
-		m_sizeMin = sizeMinimum;
-		m_sizeMax = sizeMaximum;
 	}
 
 	sl_bool WindowInstance::onClose()
@@ -1367,9 +1434,13 @@ namespace slib
 		}
 	}
 
-	void WindowInstance::onResizing(UISize& size)
+	void WindowInstance::onResizing(UISize& size, sl_bool flagResizingWidth)
 	{
-		_priv_Window_constrainSize(size, m_sizeMin, m_sizeMax);
+		Ref<Window> window = getWindow();
+		if (window.isNotNull()) {
+			window->m_flagStateResizingWidth = flagResizingWidth;
+			window->dispatchResizing(size);
+		}
 	}
 
 	void WindowInstance::onResize(sl_ui_len clientWidth, sl_ui_len clientHeight)

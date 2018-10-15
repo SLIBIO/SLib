@@ -26,11 +26,12 @@ namespace slib
 }
 
 @interface _priv_Slib_macOS_Window : NSWindow<NSWindowDelegate> {
-@public slib::WeakRef<slib::_priv_macOS_Window> m_window;
 	
-@public sl_bool m_flagClosing;
-@public sl_bool m_flagModal;
-
+	@public slib::WeakRef<slib::_priv_macOS_Window> m_window;
+	
+	@public sl_bool m_flagClosing;
+	@public sl_bool m_flagModal;
+	@public sl_bool m_flagStateResizingWidth;
 }
 @end
 
@@ -156,6 +157,7 @@ namespace slib
 			
 				window->m_flagClosing = sl_false;
 				window->m_flagModal = flagModal;
+				window->m_flagStateResizingWidth = sl_false;
 				[window setReleasedWhenClosed:NO];
 				[window setContentView:[[_priv_Slib_macOS_ViewHandle alloc] init]];
 
@@ -1087,11 +1089,19 @@ namespace slib
 		if (size.y < 0) {
 			size.y = 0;
 		}
-		window->onResizing(size);
+		if (size.x != self.frame.size.width) {
+			m_flagStateResizingWidth = sl_true;
+		}
+		window->onResizing(size, m_flagStateResizingWidth);
 		frameSize.width = (CGFloat)(size.x);
 		frameSize.height = (CGFloat)(size.y);
 	}
 	return frameSize;
+}
+
+- (void)windowWillStartLiveResize:(NSNotification *)notification
+{
+	m_flagStateResizingWidth = sl_false;
 }
 
 - (void)windowDidResize:(NSNotification *)notification
