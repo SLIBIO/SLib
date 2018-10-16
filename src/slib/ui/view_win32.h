@@ -129,10 +129,12 @@ namespace slib
 
 		void applyModifiers(UIEvent* ev);
 
+		void setGenericView(sl_bool flag);
+
 	protected:
 		HWND m_handle;
+		sl_bool m_flagGenericView;
 		sl_bool m_flagDestroyOnRelease;
-
 		UIAction m_actionMouseCapture;
 
 	};

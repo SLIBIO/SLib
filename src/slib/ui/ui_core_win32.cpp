@@ -173,14 +173,6 @@ namespace slib
 				_priv_Win32_processMenuCommand(msg.wParam, msg.lParam);
 			} else {
 				do {
-					HWND hWnd = ::GetActiveWindow();
-					if (hWnd) {
-						if (::GetWindowLongW(hWnd, GWL_STYLE) & WS_POPUP) {
-							if (::IsDialogMessageW(hWnd, &msg)) {
-								break;
-							}
-						}
-					}
 					if (_priv_Win32_processMenuShortcutKey(msg)) {
 						break;
 					}
@@ -192,6 +184,14 @@ namespace slib
 								break;
 							}
 							if (instance->preprocessWindowMessage(msg)) {
+								break;
+							}
+						}
+					}
+					HWND hWnd = ::GetActiveWindow();
+					if (hWnd) {
+						if (::GetWindowLongW(hWnd, GWL_STYLE) & WS_POPUP) {
+							if (::IsDialogMessageW(hWnd, &msg)) {
 								break;
 							}
 						}

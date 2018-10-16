@@ -30,6 +30,7 @@ namespace slib
 	Win32_ViewInstance::Win32_ViewInstance()
 	{
 		m_handle = NULL;
+		m_flagGenericView = sl_false;
 		m_flagDestroyOnRelease = sl_false;
 		m_actionMouseCapture = UIAction::MouseMove;
 	}
@@ -410,8 +411,23 @@ namespace slib
 		}
 	}
 
+	void Win32_ViewInstance::setGenericView(sl_bool flag)
+	{
+		m_flagGenericView = flag;
+	}
+
 	sl_bool Win32_ViewInstance::preprocessWindowMessage(MSG& msg)
 	{
+		if (m_flagGenericView) {
+			return sl_false;
+		}
+		if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
+			LRESULT lr;
+			sl_bool flag = Win32_ViewInstance::processWindowMessage(msg.message, msg.wParam, msg.lParam, lr);
+			if (flag) {
+				return sl_true;
+			}
+		}
 		return sl_false;
 	}
 
@@ -901,6 +917,9 @@ namespace slib
 			styleEx = WS_EX_CONTROLPARENT;
 		}
 		Ref<Win32_ViewInstance> ret = Win32_ViewInstance::create<Win32_ViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
+		if (ret.isNotNull()) {
+			ret->setGenericView(sl_true);
+		}
 		return ret;
 	}
 

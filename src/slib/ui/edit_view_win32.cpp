@@ -64,18 +64,6 @@ namespace slib
 			::InvalidateRect(handle, NULL, TRUE);
 		}
 
-		sl_bool preprocessWindowMessage(MSG& msg) override
-		{
-			if (msg.message == WM_KEYUP) {
-				LRESULT lr;
-				sl_bool flag = Win32_ViewInstance::processWindowMessage(msg.message, msg.wParam, msg.lParam, lr);
-				if (flag) {
-					return sl_true;
-				}
-			}
-			return sl_false;
-		}
-
 		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
 		{
 			return sl_false;
