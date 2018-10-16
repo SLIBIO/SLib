@@ -237,6 +237,9 @@ namespace slib
 			ofn.lStructSize = sizeof(ofn);
 			ofn.hwndOwner = UIPlatform::getWindowHandle(parent.get());
 
+			String16 _defaultFileExt = defaultFileExt;
+			ofn.lpstrDefExt = (LPCWSTR)(_defaultFileExt.getData());
+
 			sl_size lenSzFilters = 0;
 			CList<_priv_FileDialog_FilterW> wfilters;
 			{

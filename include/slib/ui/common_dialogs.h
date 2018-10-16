@@ -128,6 +128,7 @@ namespace slib
 		String title;
 		sl_bool flagShowHiddenFiles;
 
+		String defaultFileExt;
 		struct Filter
 		{
 			String title;
