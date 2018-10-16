@@ -244,7 +244,7 @@ namespace slib
 		virtual UISize getClientSizeFromWindowSize(const UISize& sizeWindow);
 
 		// aspect = width / height
-		virtual void setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum, float aspectRatioMinimum = -1, float aspectRatioMaximum = -1);
+		virtual void setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum, float aspectRatioMinimum = 0, float aspectRatioMaximum = 0);
 		
 		UISize getMinimumSize();
 		

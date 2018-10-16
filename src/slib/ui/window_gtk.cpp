@@ -752,12 +752,12 @@ namespace slib
 						hints |= GDK_HINT_MAX_SIZE;
 						gint w = sizeMaximum.x;
 						if (w <= 0) {
-							w = 100000;
+							w = 1000000;
 						}
 						geometry.max_width = w;
 						gint h = sizeMaximum.y;
 						if (h <= 0) {
-							h = 100000;
+							h = 1000000;
 						}
 						geometry.max_height = h;
 					}

@@ -104,12 +104,12 @@ namespace slib
 		
 		m_flagUseClientSizeRequested = sl_false;
 		
-		m_sizeMin.x = -1;
-		m_sizeMin.y = -1;
-		m_sizeMax.x = -1;
-		m_sizeMax.y = -1;
-		m_aspectRatioMinimum = -1;
-		m_aspectRatioMaximum = -1;
+		m_sizeMin.x = 0;
+		m_sizeMin.y = 0;
+		m_sizeMax.x = 0;
+		m_sizeMax.y = 0;
+		m_aspectRatioMinimum = 0;
+		m_aspectRatioMaximum = 0;
 		m_flagStateResizingWidth = sl_false;
 		
 #if defined(SLIB_UI_IS_ANDROID)
@@ -692,16 +692,38 @@ namespace slib
 		}
 	}
 	
-	void Window::setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum, float aspectRatioMinimum, float aspectRatioMaximum)
+	void Window::setSizeRange(const UISize& _sizeMinimum, const UISize& _sizeMaximum, float aspectRatioMinimum, float aspectRatioMaximum)
 	{
+		UISize sizeMinimum = _sizeMinimum;
+		if (sizeMinimum.x < 0) {
+			sizeMinimum.x = 0;
+		}
+		if (sizeMinimum.y < 0) {
+			sizeMinimum.y = 0;
+		}
 		m_sizeMin = sizeMinimum;
+		UISize sizeMaximum = _sizeMaximum;
+		if (sizeMaximum.x < 0) {
+			sizeMaximum.x = 0;
+		}
+		if (sizeMaximum.y < 0) {
+			sizeMaximum.y = 0;
+		}
 		m_sizeMax = sizeMaximum;
+		if (aspectRatioMinimum < 0) {
+			aspectRatioMinimum = 0;
+		}
 		m_aspectRatioMinimum = aspectRatioMinimum;
+		if (aspectRatioMaximum < 0) {
+			aspectRatioMaximum = 0;
+		}
 		m_aspectRatioMaximum = aspectRatioMaximum;
+		
 		Ref<WindowInstance> instance = m_instance;
 		if (instance.isNotNull()) {
 			instance->setSizeRange(sizeMinimum, sizeMaximum, aspectRatioMinimum, m_aspectRatioMaximum);
 		}
+		
 		UIRect frame = m_frame;
 		UIRect frameOld = frame;
 		_constrainSize(frame, frame.getWidth() > 0);
@@ -717,12 +739,12 @@ namespace slib
 	
 	void Window::setMinimumSize(const UISize& sizeMinimum)
 	{
-		setSizeRange(sizeMinimum, m_sizeMax);
+		setSizeRange(sizeMinimum, m_sizeMax, m_aspectRatioMinimum, m_aspectRatioMaximum);
 	}
 	
 	void Window::setMinimumSize(sl_ui_len width, sl_ui_len height)
 	{
-		setSizeRange(UISize(width, height), m_sizeMax);
+		setSizeRange(UISize(width, height), m_sizeMax, m_aspectRatioMinimum, m_aspectRatioMaximum);
 	}
 	
 	sl_ui_len Window::getMinimumWidth()
@@ -732,7 +754,7 @@ namespace slib
 	
 	void Window::setMinimumWidth(sl_ui_len width)
 	{
-		setSizeRange(UISize(width, m_sizeMin.y), m_sizeMax);
+		setSizeRange(UISize(width, m_sizeMin.y), m_sizeMax, m_aspectRatioMinimum, m_aspectRatioMaximum);
 	}
 	
 	sl_ui_len Window::getMinimumHeight()
@@ -742,7 +764,7 @@ namespace slib
 	
 	void Window::setMinimumHeight(sl_ui_len height)
 	{
-		setSizeRange(UISize(m_sizeMin.x, height), m_sizeMax);
+		setSizeRange(UISize(m_sizeMin.x, height), m_sizeMax, m_aspectRatioMinimum, m_aspectRatioMaximum);
 	}
 	
 	UISize Window::getMaximumSize()
@@ -752,12 +774,12 @@ namespace slib
 	
 	void Window::setMaximumSize(const UISize& sizeMaximum)
 	{
-		setSizeRange(m_sizeMin, sizeMaximum);
+		setSizeRange(m_sizeMin, sizeMaximum, m_aspectRatioMinimum, m_aspectRatioMaximum);
 	}
 	
 	void Window::setMaximumSize(sl_ui_len width, sl_ui_len height)
 	{
-		setSizeRange(m_sizeMin, UISize(width, height));
+		setSizeRange(m_sizeMin, UISize(width, height), m_aspectRatioMinimum, m_aspectRatioMaximum);
 	}
 	
 	sl_ui_len Window::getMaximumWidth()
@@ -767,7 +789,7 @@ namespace slib
 	
 	void Window::setMaximumWidth(sl_ui_len width)
 	{
-		setSizeRange(m_sizeMin, UISize(width, m_sizeMax.y));
+		setSizeRange(m_sizeMin, UISize(width, m_sizeMax.y), m_aspectRatioMinimum, m_aspectRatioMaximum);
 	}
 	
 	sl_ui_len Window::getMaximumHeight()
@@ -777,7 +799,7 @@ namespace slib
 	
 	void Window::setMaximumHeight(sl_ui_len height)
 	{
-		setSizeRange(m_sizeMin, UISize(m_sizeMax.x, height));
+		setSizeRange(m_sizeMin, UISize(m_sizeMax.x, height), m_aspectRatioMinimum, m_aspectRatioMaximum);
 	}
 
 	float Window::getMinimumAspectRatio()
@@ -1317,45 +1339,69 @@ namespace slib
 
 	void Window::_constrainSize(UISize& size, sl_bool flagAdjustHeight)
 	{
-		if (m_aspectRatioMinimum > 0 || m_aspectRatioMaximum > 0) {
-			if (m_aspectRatioMinimum > 0) {
+		sl_ui_len minX = m_sizeMin.x;
+		sl_ui_len minY = m_sizeMin.y;
+		sl_ui_len maxX = m_sizeMax.x;
+		if (maxX <= 0) {
+			maxX = 1000000;
+		}
+		sl_ui_len maxY = m_sizeMax.y;
+		if (maxY <= 0) {
+			maxY = 1000000;
+		}
+
+		size.x = Math::clamp(size.x, minX, maxX);
+		size.y = Math::clamp(size.y, minY, maxY);
+
+		float minAspect = m_aspectRatioMinimum;
+		float maxAspect = m_aspectRatioMaximum;
+		if (minAspect > 0 || maxAspect > 0) {
+			if (minAspect > 0) {
 				if (flagAdjustHeight) {
-					sl_ui_len maxY = (sl_ui_len)(size.x / m_aspectRatioMinimum);
-					if (size.y > maxY) {
-						size.y = maxY;
+					sl_ui_len ay = (sl_ui_len)(Math::min(size.x / minAspect, 1000000.0f));
+					if (size.y > ay) {
+						if (ay > minY) {
+							size.y = ay;
+						} else {
+							size.y = minY;
+							size.x = (sl_ui_len)(Math::min(minY * minAspect, 1000000.0f));
+						}
 					}
 				} else {
-					sl_ui_len minX = (sl_ui_len)(size.y * m_aspectRatioMinimum);
-					if (size.x < minX) {
-						size.x = minX;
+					sl_ui_len ax = (sl_ui_len)(Math::min(size.y * minAspect, 1000000.0f));
+					if (size.x < ax) {
+						if (ax < maxX) {
+							size.x = ax;
+						} else {
+							size.x = maxX;
+							size.y = (sl_ui_len)(Math::min(maxX / minAspect, 1000000.0f));
+						}
 					}
 				}
 			}
-			if (m_aspectRatioMaximum > 0) {
+			if (maxAspect > 0) {
 				if (flagAdjustHeight) {
-					sl_ui_len minY = (sl_ui_len)(size.x / m_aspectRatioMaximum);
-					if (size.y < minY) {
-						size.y = minY;
+					sl_ui_len ay = (sl_ui_len)(Math::min(size.x / maxAspect, 1000000.0f));
+					if (size.y < ay) {
+						if (ay < maxY) {
+							size.y = ay;
+						} else {
+							size.y = maxY;
+							size.x = (sl_ui_len)(Math::min(maxY * maxAspect, 1000000.0f));
+						}
 					}
 				} else {
-					sl_ui_len maxX = (sl_ui_len)(size.y * m_aspectRatioMaximum);
-					if (size.x > maxX) {
-						size.x = maxX;
+					sl_ui_len ax = (sl_ui_len)(size.y * maxAspect);
+					if (size.x > ax) {
+						if (ax > minX) {
+							size.x = ax;
+						} else {
+							size.x = minX;
+							size.y = (sl_ui_len)(Math::min(minX / maxAspect, 1000000.0f));
+						}
 					}
 				}
 			}
-		}
-		if (m_sizeMin.x > 0 && size.x < m_sizeMin.x) {
-			size.x = m_sizeMin.x;
-		}
-		if (m_sizeMin.y > 0 && size.y < m_sizeMin.y) {
-			size.y = m_sizeMin.y;
-		}
-		if (m_sizeMax.x > 0 && size.x > m_sizeMax.x) {
-			size.x = m_sizeMax.x;
-		}
-		if (m_sizeMax.y > 0 && size.y > m_sizeMax.y) {
-			size.y = m_sizeMax.y;
 		}
 	}
 	
