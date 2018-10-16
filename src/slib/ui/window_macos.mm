@@ -195,12 +195,11 @@ namespace slib
 		
 		void release()
 		{
+			close();
 			NSWindow* window = m_window;
 			if (window != nil) {
 				UIPlatform::removeWindowInstance(window);
 			}
-			m_viewContent.setNull();
-			m_window = nil;
 		}
 		
 		Ref<ViewInstance> getContentView() override
@@ -226,7 +225,9 @@ namespace slib
 						[w close];
 					}
 				}
+				m_window = nil;
 			}
+			m_viewContent.setNull();
 		}
 		
 		sl_bool isClosed() override
