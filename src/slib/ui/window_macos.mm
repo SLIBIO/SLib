@@ -196,10 +196,6 @@ namespace slib
 		void release()
 		{
 			close();
-			NSWindow* window = m_window;
-			if (window != nil) {
-				UIPlatform::removeWindowInstance(window);
-			}
 		}
 		
 		Ref<ViewInstance> getContentView() override
@@ -209,8 +205,10 @@ namespace slib
 		
 		void close() override
 		{
+			m_viewContent.setNull();
 			NSWindow* window = m_window;
 			if (window != nil) {
+				UIPlatform::removeWindowInstance(window);
 				if ([window isKindOfClass:[_priv_Slib_macOS_Window class]]) {
 					_priv_Slib_macOS_Window* w = (_priv_Slib_macOS_Window*)window;
 					if (w->m_flagModal) {
@@ -227,7 +225,6 @@ namespace slib
 				}
 				m_window = nil;
 			}
-			m_viewContent.setNull();
 		}
 		
 		sl_bool isClosed() override
