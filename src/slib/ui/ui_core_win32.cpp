@@ -157,6 +157,7 @@ namespace slib
 
 	void UIPlatform::runLoop(sl_uint32 level)
 	{
+		::ReleaseCapture();
 		MSG msg;
 		while (::GetMessageW(&msg, NULL, 0, 0)) {
 			if (msg.message == WM_QUIT) {
