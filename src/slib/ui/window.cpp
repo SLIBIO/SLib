@@ -25,6 +25,7 @@ namespace slib
 		flagCenterScreen = sl_true;
 		flagDialog = sl_false;
 		flagModal = sl_false;
+		flagSheet = sl_false;
 		
 #if defined(SLIB_UI_IS_ANDROID)
 		activity = sl_null;
@@ -91,6 +92,7 @@ namespace slib
 		m_flagTransparent = sl_false;
 		
 		m_flagModal = sl_false;
+		m_flagSheet = sl_false;
 		m_flagDialog = sl_false;
 		m_flagBorderless = sl_false;
 		m_flagShowTitleBar = sl_true;
@@ -112,6 +114,8 @@ namespace slib
 		m_aspectRatioMaximum = 0;
 		m_flagStateResizingWidth = sl_false;
 		
+		m_flagStateDoModal = sl_false;
+		
 #if defined(SLIB_UI_IS_ANDROID)
 		m_activity = sl_null;
 #endif
@@ -130,6 +134,10 @@ namespace slib
 			detach();
 			lock.unlock();
 			dispatchDestroy();
+		}
+		if (m_flagStateDoModal) {
+			m_flagStateDoModal = sl_false;
+			UI::quitLoop();
 		}
 	}
 
@@ -837,6 +845,16 @@ namespace slib
 		m_flagModal = flag;
 	}
 
+	sl_bool Window::isSheet()
+	{
+		return m_flagSheet;
+	}
+	
+	void Window::setSheet(sl_bool flag)
+	{
+		m_flagSheet = flag;
+	}
+
 	sl_bool Window::isDialog()
 	{
 		return m_flagDialog;
@@ -976,6 +994,7 @@ namespace slib
 		param.flagCenterScreen = m_flagCenterScreenOnCreate;
 		param.flagDialog = m_flagDialog;
 		param.flagModal = m_flagModal;
+		param.flagSheet = m_flagSheet;
 		param.location = m_frame.getLocation();
 		param.size = m_frame.getSize();
 		param.title = m_title;
@@ -1027,6 +1046,12 @@ namespace slib
 			UISize sizeClient = getClientSize();
 			dispatchResize(sizeClient.x, sizeClient.y);
 #endif
+#if defined(SLIB_UI_IS_WIN32)
+			if (m_flagDialog) {
+				UISize sizeClient = getClientSize();
+				dispatchResize(sizeClient.x, sizeClient.y);
+			}
+#endif
 
 			dispatchCreate();
 			
@@ -1055,6 +1080,24 @@ namespace slib
 					view->attach(contentViewInstance);
 				}
 			}
+		}
+	}
+	
+	void Window::doModal()
+	{
+		if (!(UI::isUiThread())) {
+			return;
+		}
+		setModal(sl_true);
+		forceCreate();
+		Ref<WindowInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			if (instance->doModal()) {
+				return;
+			}
+			m_flagStateDoModal = sl_true;
+			UI::runLoop();
+			m_flagStateDoModal = sl_false;
 		}
 	}
 
@@ -1190,6 +1233,10 @@ namespace slib
 			listener->onCancel(this);
 		}
 		getOnDestroy()(this);
+		if (m_flagStateDoModal) {
+			m_flagStateDoModal = sl_false;
+			UI::quitLoop();
+		}
 	}
 
 	void Window::dispatchActivate()
@@ -1439,6 +1486,11 @@ namespace slib
 	
 	void WindowInstance::setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum, float aspectRatioMinimum, float aspectRatioMaximum)
 	{
+	}
+
+	sl_bool WindowInstance::doModal()
+	{
+		return sl_false;
 	}
 
 	sl_bool WindowInstance::onClose()

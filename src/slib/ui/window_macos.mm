@@ -29,8 +29,6 @@ namespace slib
 	
 	@public slib::WeakRef<slib::_priv_macOS_Window> m_window;
 	
-	@public sl_bool m_flagClosing;
-	@public sl_bool m_flagModal;
 	@public sl_bool m_flagStateResizingWidth;
 }
 @end
@@ -48,9 +46,16 @@ namespace slib
 		
 		AtomicRef<ViewInstance> m_viewContent;
 		
+		sl_bool m_flagClosing;
+		sl_bool m_flagSheet;
+		sl_bool m_flagDoModal;
+
 	public:
 		_priv_macOS_Window()
 		{
+			m_flagClosing = sl_false;
+			m_flagSheet = sl_false;
+			m_flagDoModal = sl_false;
 		}
 		
 		~_priv_macOS_Window()
@@ -104,13 +109,13 @@ namespace slib
 				parent = w->m_window;
 			}
 			
-			sl_bool flagModal = param.flagModal && parent != nil;
-			
+			sl_bool flagSheet = param.flagSheet && parent != nil;
+
 			NSScreen* screen = nil;
 			int styleMask = 0;
 			NSRect rect;
 			
-			if (flagModal) {
+			if (flagSheet) {
 				
 				rect.origin.x = 0;
 				rect.origin.y = 0;
@@ -155,8 +160,6 @@ namespace slib
 			
 			if (window != nil) {
 			
-				window->m_flagClosing = sl_false;
-				window->m_flagModal = flagModal;
 				window->m_flagStateResizingWidth = sl_false;
 				[window setReleasedWhenClosed:NO];
 				[window setContentView:[[_priv_Slib_macOS_ViewHandle alloc] init]];
@@ -174,10 +177,14 @@ namespace slib
 						[window setTitle: title];
 					}
 					
-					if (flagModal) {
-						window->m_flagModal = sl_true;
+					if (flagSheet) {
+						ret->m_flagSheet = sl_true;
+						WeakRef<_priv_macOS_Window> retWeak = ret;
 						[parent beginSheet:window completionHandler:^(NSModalResponse returnCode) {
-							window->m_flagModal = sl_false;
+							Ref<_priv_macOS_Window> w = retWeak;
+							if (w.isNotNull()) {
+								w->m_flagSheet = sl_false;
+							}
 						}];
 					} else {
 						if (parent != nil) {
@@ -209,19 +216,20 @@ namespace slib
 			NSWindow* window = m_window;
 			if (window != nil) {
 				UIPlatform::removeWindowInstance(window);
-				if ([window isKindOfClass:[_priv_Slib_macOS_Window class]]) {
-					_priv_Slib_macOS_Window* w = (_priv_Slib_macOS_Window*)window;
-					if (w->m_flagModal) {
-						w->m_flagModal = sl_false;
-						NSWindow* parent = m_parent;
-						if (parent != nil) {
-							[parent endSheet: window];
-							return;
-						}
+				if (m_flagSheet) {
+					m_flagSheet = sl_false;
+					NSWindow* parent = m_parent;
+					if (parent != nil) {
+						[parent endSheet: window];
+						return;
 					}
-					if (!(w->m_flagClosing)) {
-						[w close];
-					}
+				}
+				if (m_flagDoModal) {
+					m_flagDoModal = sl_false;
+					[NSApp stopModal];
+				}
+				if (!m_flagClosing) {
+					[window close];
 				}
 				m_window = nil;
 			}
@@ -972,6 +980,20 @@ namespace slib
 			}
 		}
 		
+		sl_bool doModal() override
+		{
+			NSWindow* window = m_window;
+			if (window != nil) {
+				if (m_flagSheet) {
+					return sl_false;
+				}
+				m_flagDoModal = sl_true;
+				[NSApp runModalForWindow:window];
+				return sl_true;
+			}
+			return sl_false;
+		}
+		
 	private:
 		static void _applyRectLimit(NSRect& rect)
 		{
@@ -1038,17 +1060,17 @@ namespace slib
 - (BOOL)windowShouldClose:(id)sender
 {
 	BOOL ret = YES;
-	m_flagClosing = sl_true;
 	slib::Ref<slib::_priv_macOS_Window> window = m_window;
 	if (window.isNotNull()) {
+		window->m_flagClosing = sl_true;
 		if (window->onClose()) {
 			window->close();
 			ret = YES;
 		} else {
 			ret = NO;
 		}
+		window->m_flagClosing = sl_false;
 	}
-	m_flagClosing = sl_false;
 	return ret;
 }
 

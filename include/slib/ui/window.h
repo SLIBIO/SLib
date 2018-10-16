@@ -44,6 +44,7 @@ namespace slib
 		sl_bool flagCenterScreen;
 		sl_bool flagDialog;
 		sl_bool flagModal;
+		sl_bool flagSheet; // Used in macOS
 		UIPoint location;
 		UISize size;
 
@@ -289,6 +290,11 @@ namespace slib
 		
 		void setModal(sl_bool flag);
 		
+		
+		sl_bool isSheet();
+		
+		void setSheet(sl_bool flag);
+		
 
 		sl_bool isDialog();
 		
@@ -331,6 +337,8 @@ namespace slib
 		void create();
 		
 		void forceCreate();
+		
+		void doModal();
 
 		
 		void addView(const Ref<View>& view);
@@ -477,6 +485,7 @@ namespace slib
 		sl_bool m_flagTransparent;
 		
 		sl_bool m_flagModal;
+		sl_bool m_flagSheet;
 		sl_bool m_flagDialog;
 		sl_bool m_flagBorderless;
 		sl_bool m_flagShowTitleBar;
@@ -491,6 +500,8 @@ namespace slib
 		float m_aspectRatioMinimum;
 		float m_aspectRatioMaximum;
 		sl_bool m_flagStateResizingWidth;
+		
+		sl_bool m_flagStateDoModal;
 
 #if defined(SLIB_UI_IS_ANDROID)
 		// jobject
@@ -592,6 +603,8 @@ namespace slib
 		
 		
 		virtual void setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum, float aspectRatioMinimum, float aspectRatioMaximum);
+		
+		virtual sl_bool doModal();
 		
 	public:
 		sl_bool onClose();
