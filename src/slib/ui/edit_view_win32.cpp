@@ -26,6 +26,7 @@ namespace slib
 		Color m_colorText;
 		Color m_colorBackground;
 		HBRUSH m_hBrushBackground;
+		sl_bool m_flagMultiLine;
 		
 	public:
 		Win32_EditViewInstance()
@@ -33,6 +34,7 @@ namespace slib
 			m_hBrushBackground = NULL;
 			m_colorText = Color::zero();
 			m_colorBackground = Color::zero();
+			m_flagMultiLine = sl_false;
 		}
 
 		~Win32_EditViewInstance()
@@ -50,6 +52,21 @@ namespace slib
 			::InvalidateRect(handle, NULL, TRUE);
 		}
 
+		void setMultiLine(sl_bool flag)
+		{
+			HWND handle = m_handle;
+			if (handle) {
+				LONG old = ::GetWindowLongW(handle, GWL_STYLE);
+				if (flag) {
+					::SetWindowLongW(handle, GWL_STYLE, old | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN);
+				} else {
+					::SetWindowLongW(handle, GWL_STYLE, old & (~(ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN)));
+				}
+				::SetWindowPos(handle, NULL, 0, 0, 0, 0
+					, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+			}
+		}
+
 		void setBackgroundColor(const Color& color)
 		{
 			HWND handle = getHandle();
@@ -62,6 +79,19 @@ namespace slib
 				m_hBrushBackground = ::CreateSolidBrush(GraphicsPlatform::getColorRef(color));
 			}
 			::InvalidateRect(handle, NULL, TRUE);
+		}
+
+		sl_bool preprocessWindowMessage(MSG& msg)
+		{
+			if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
+				if (msg.wParam == VK_ESCAPE) {
+					return onEventKey(msg.message == WM_KEYDOWN, msg.wParam, msg.lParam);
+				}
+			}
+			if (m_flagMultiLine) {
+				return sl_false;
+			}
+			return Win32_ViewInstance::preprocessWindowMessage(msg);
 		}
 
 		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
@@ -163,6 +193,7 @@ namespace slib
 				::SendMessageW(handle, 0x1501 /*EM_SETCUEBANNER*/, FALSE, (LPARAM)(LPCWSTR)(hintText.getData()));
 				ret->setTextColor(m_textColor);
 				ret->setBackgroundColor(getBackgroundColor());
+				ret->m_flagMultiLine = m_flagMultiLine;
 			}
 			return ret;
 		}
@@ -238,16 +269,9 @@ namespace slib
 
 	void EditView::_setMultiLine_NW(sl_bool flag)
 	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			LONG old = ::GetWindowLongW(handle, GWL_STYLE);
-			if (flag) {
-				::SetWindowLongW(handle, GWL_STYLE, old | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN);
-			} else {
-				::SetWindowLongW(handle, GWL_STYLE, old & (~(ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN)));
-			}
-			::SetWindowPos(handle, NULL, 0, 0, 0, 0
-				, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+		Ref<ViewInstance> _instance = getViewInstance();
+		if (Win32_EditViewInstance* instance = CastInstance<Win32_EditViewInstance>(_instance.get())) {
+			instance->setMultiLine(flag);
 		}
 	}
 

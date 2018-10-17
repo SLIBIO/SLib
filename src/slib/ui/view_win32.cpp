@@ -422,11 +422,7 @@ namespace slib
 			return sl_false;
 		}
 		if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
-			LRESULT lr;
-			sl_bool flag = Win32_ViewInstance::processWindowMessage(msg.message, msg.wParam, msg.lParam, lr);
-			if (flag) {
-				return sl_true;
-			}
+			return onEventKey(msg.message == WM_KEYDOWN, msg.wParam, msg.lParam);
 		}
 		return sl_false;
 	}
@@ -646,8 +642,8 @@ namespace slib
 				}
 			case WM_LBUTTONUP:
 				{
-					sl_bool flag = onEventMouse(UIAction::LeftButtonUp, wParam, lParam);
 					::ReleaseCapture();
+					sl_bool flag = onEventMouse(UIAction::LeftButtonUp, wParam, lParam);
 					return flag;
 				}
 			case WM_RBUTTONDOWN:
@@ -663,8 +659,8 @@ namespace slib
 				}
 			case WM_RBUTTONUP:
 				{
-					sl_bool flag = onEventMouse(UIAction::RightButtonUp, wParam, lParam);
 					::ReleaseCapture();
+					sl_bool flag = onEventMouse(UIAction::RightButtonUp, wParam, lParam);
 					return flag;
 				}
 			case WM_MBUTTONDOWN:
@@ -680,8 +676,8 @@ namespace slib
 				}
 			case WM_MBUTTONUP:
 				{
-					sl_bool flag = onEventMouse(UIAction::MiddleButtonUp, wParam, lParam);
 					::ReleaseCapture();
+					sl_bool flag = onEventMouse(UIAction::MiddleButtonUp, wParam, lParam);
 					return flag;
 				}
 			case WM_MOUSEMOVE:

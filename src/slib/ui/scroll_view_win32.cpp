@@ -35,6 +35,11 @@ namespace slib
 		Color m_backgroundColor;
 
 	public:
+		sl_bool preprocessWindowMessage(MSG& msg) override
+		{
+			return sl_false;
+		}
+
 		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
 		{
 			HWND handle = getHandle();
