@@ -130,10 +130,12 @@ namespace slib
 		NSView* handle = m_handle;
 		if (handle != nil) {
 			if (UI::isUiThread()) {
-				[handle setNeedsDisplay: TRUE];
+				[handle setNeedsDisplay: YES];
+				[handle displayIfNeeded];
 			} else {
 				dispatch_async(dispatch_get_main_queue(), ^{
-					[handle setNeedsDisplay: TRUE];
+					[handle setNeedsDisplay: YES];
+					[handle displayIfNeeded];
 				});
 			}
 		}
@@ -150,9 +152,11 @@ namespace slib
 			_rect.size.height = (CGFloat)(rect.getHeight());
 			if (UI::isUiThread()) {
 				[handle setNeedsDisplayInRect: _rect];
+				[handle displayIfNeeded];
 			} else {
 				dispatch_async(dispatch_get_main_queue(), ^{
 					[handle setNeedsDisplayInRect: _rect];
+					[handle displayIfNeeded];
 				});
 			}
 		}
