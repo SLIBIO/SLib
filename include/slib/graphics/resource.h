@@ -118,7 +118,11 @@
 			return slib::_priv_ImageResource_get(entries, WIDTH, HEIGHT); \
 		} \
 		slib::Ref<slib::Drawable> get() { \
-			return slib::_priv_ImageResource_get(entries, WIDTH, HEIGHT); \
+			SLIB_SAFE_STATIC(slib::Ref<slib::Drawable>, value, slib::_priv_ImageResource_get(entries, WIDTH, HEIGHT)); \
+			if (SLIB_SAFE_STATIC_CHECK_FREED(value)) { \
+				return sl_null; \
+			} \
+			return value; \
 		} \
 	}
 

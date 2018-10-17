@@ -47,6 +47,9 @@ namespace slib
 	
 	void ImageView::setSource(const Ref<Drawable>& source, UIUpdateMode mode)
 	{
+		if (m_source == source) {
+			return;
+		}
 		m_source = source;
 		if (source.isNotNull()) {
 			sl_real h = source->getDrawableHeight();
