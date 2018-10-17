@@ -133,8 +133,8 @@ namespace slib
 			_applyPlaceholder(handle);
 			[tv setTextColor:(GraphicsPlatform::getNSColorFromColor(m_textColor))];
 			[tv setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
-			[tv setEditable:(m_flagReadOnly?FALSE:TRUE)];
-			[tv setSelectable:TRUE];
+			[tv setEditable:(m_flagReadOnly?NO:YES)];
+			[tv setSelectable:YES];
 			
 			Ref<Font> font = getFont();
 			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
@@ -569,11 +569,13 @@ namespace slib
 
 - (void)keyDown:(NSEvent*)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventKey(sl_true, theEvent);
-		if (flagNoDefault) {
-			return;
+	if ([theEvent keyCode] == 0x35) {
+		slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+		if (instance.isNotNull()) {
+			sl_bool flagNoDefault = instance->onEventKey(sl_true, theEvent);
+			if (flagNoDefault) {
+				return;
+			}
 		}
 	}
 	[super keyDown:theEvent];
