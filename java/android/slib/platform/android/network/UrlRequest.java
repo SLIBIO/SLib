@@ -10,6 +10,7 @@
 
 package slib.platform.android.network;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -131,23 +132,29 @@ public class UrlRequest {
 				return;
 			}
 
-			InputStream streamContent = connection.getInputStream();
+			InputStream streamContent = null;
+			try {
+				streamContent = connection.getInputStream();
+			} catch (FileNotFoundException e) {}
+
 			request.streamContent = streamContent;
 
-			byte[] packet = new byte[PACKET_SIZE];
-			while (true) {
-				int n = streamContent.read(packet);
-				if (n <= 0) {
-					break;
-				}
-				if (downloadFilePath != null) {
-					streamDownload.write(packet, 0, n);
-					request.onDownloadContent(n);
-				} else {
-					request.onReceiveContent(packet, n);
-				}
-				if (!(request.flagOpened)) {
-					return;
+			if (streamContent != null) {
+				byte[] packet = new byte[PACKET_SIZE];
+				while (true) {
+					int n = streamContent.read(packet);
+					if (n <= 0) {
+						break;
+					}
+					if (downloadFilePath != null) {
+						streamDownload.write(packet, 0, n);
+						request.onDownloadContent(n);
+					} else {
+						request.onReceiveContent(packet, n);
+					}
+					if (!(request.flagOpened)) {
+						return;
+					}
 				}
 			}
 
@@ -157,7 +164,6 @@ public class UrlRequest {
 
 		} catch (Exception e) {
 			request.processError(e);
-			return;
 		}
 
 	}
