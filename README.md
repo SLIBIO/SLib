@@ -405,4 +405,4 @@ We sincerely appreciate your support and suggestions. For contributing pull requ
 
 ## License
 
-SLib is dual-licensed. It is currently licensed under the Mozilla Public License v2.0, but also under a separate proprietary license. If you feel like you need to purchase a proprietary license for SLib, please contact us at contact@slib.io.
+SLib is dual-licensed. It is currently licensed under the MIT License, but also under a separate proprietary license. If you feel like you need to purchase a proprietary license for SLib, please contact us at contact@slib.io.
