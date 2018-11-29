@@ -98,7 +98,7 @@ namespace slib
 		if (jactivity) {
 			return (sl_uint32)(JAndroidDeviceInformation::getDevicePPI.callInt(sl_null, jactivity));
 		}
-		return -1;
+		return 0;
 	}
 
 }
