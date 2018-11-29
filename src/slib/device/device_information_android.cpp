@@ -80,16 +80,17 @@ namespace slib
 
 	Size DeviceInformation::getScreenSize()
 	{
-		Size ret;
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JniLocal<jobject> jpt = JAndroidDeviceInformation::getScreenSize.callObject(sl_null, jactivity);
 			if (jpt.isNotNull()) {
+				Size ret;
 				ret.x = JAndroidPoint::x.get(jpt);
 				ret.y = JAndroidPoint::y.get(jpt);
+				return ret;
 			}
 		}
-		return ret;
+		return Size::zero();
 	}
 
 	sl_uint32 DeviceInformation::getDevicePPI()
