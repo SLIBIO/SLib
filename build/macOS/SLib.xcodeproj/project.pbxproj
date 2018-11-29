@@ -629,6 +629,13 @@
 		264AF11721AED0C0004E58CB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF10921AECFA4004E58CB /* main.cpp */; };
 		264AF11821AED0C0004E58CB /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF10A21AECFA4004E58CB /* util.cpp */; };
 		264AF11C21AEE6BE004E58CB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF11B21AEE6BE004E58CB /* Cocoa.framework */; };
+		264AF13621B05AAE004E58CB /* sapp_document.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF12721B05AAE004E58CB /* sapp_document.cpp */; };
+		264AF13E21B05AAE004E58CB /* sapp_resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF12F21B05AAE004E58CB /* sapp_resources.cpp */; };
+		264AF14021B05AAE004E58CB /* sapp_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF13121B05AAE004E58CB /* sapp_util.cpp */; };
+		264AF14221B05AAE004E58CB /* sapp_values.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF13321B05AAE004E58CB /* sapp_values.cpp */; };
+		264AF15321B06E00004E58CB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF14721B05BC9004E58CB /* main.cpp */; };
+		264AF15421B072CF004E58CB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF11B21AEE6BE004E58CB /* Cocoa.framework */; };
+		264AF15521B072D4004E58CB /* libsapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF12121B0590C004E58CB /* libsapp.a */; };
 		26A39D8920EFBCBB004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8820EFBCBB004707C9 /* calculator.cpp */; };
 		26A39D8A20EFBCBB004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8820EFBCBB004707C9 /* calculator.cpp */; };
 		26C1B62C20D4305100E36539 /* bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C1B62B20D4305000E36539 /* bitmap.cpp */; };
@@ -1006,6 +1013,15 @@
 
 /* Begin PBXCopyFilesBuildPhase section */
 		264AF10E21AED095004E58CB /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		264AF14A21B05BFF004E58CB /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -1638,6 +1654,24 @@
 		264AF10B21AECFA4004E58CB /* util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
 		264AF11021AED095004E58CB /* AddCopyrightNotice */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AddCopyrightNotice; sourceTree = BUILT_PRODUCTS_DIR; };
 		264AF11B21AEE6BE004E58CB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		264AF12121B0590C004E58CB /* libsapp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsapp.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		264AF12621B05AAE004E58CB /* sapp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sapp.h; sourceTree = "<group>"; };
+		264AF12721B05AAE004E58CB /* sapp_document.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sapp_document.cpp; sourceTree = "<group>"; };
+		264AF12821B05AAE004E58CB /* sapp_document.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sapp_document.h; sourceTree = "<group>"; };
+		264AF12921B05AAE004E58CB /* sapp_document_color.inc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = sapp_document_color.inc; sourceTree = "<group>"; };
+		264AF12A21B05AAE004E58CB /* sapp_document_drawable.inc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = sapp_document_drawable.inc; sourceTree = "<group>"; };
+		264AF12B21B05AAE004E58CB /* sapp_document_layout.inc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = sapp_document_layout.inc; sourceTree = "<group>"; };
+		264AF12C21B05AAE004E58CB /* sapp_document_menu.inc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = sapp_document_menu.inc; sourceTree = "<group>"; };
+		264AF12D21B05AAE004E58CB /* sapp_document_raw.inc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = sapp_document_raw.inc; sourceTree = "<group>"; };
+		264AF12E21B05AAE004E58CB /* sapp_document_string.inc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = sapp_document_string.inc; sourceTree = "<group>"; };
+		264AF12F21B05AAE004E58CB /* sapp_resources.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sapp_resources.cpp; sourceTree = "<group>"; };
+		264AF13021B05AAE004E58CB /* sapp_resources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sapp_resources.h; sourceTree = "<group>"; };
+		264AF13121B05AAE004E58CB /* sapp_util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sapp_util.cpp; sourceTree = "<group>"; };
+		264AF13221B05AAE004E58CB /* sapp_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sapp_util.h; sourceTree = "<group>"; };
+		264AF13321B05AAE004E58CB /* sapp_values.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sapp_values.cpp; sourceTree = "<group>"; };
+		264AF13421B05AAE004E58CB /* sapp_values.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sapp_values.h; sourceTree = "<group>"; };
+		264AF14721B05BC9004E58CB /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		264AF14C21B05BFF004E58CB /* sapp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sapp; sourceTree = BUILT_PRODUCTS_DIR; };
 		2653358E1E2E8A5A00199C76 /* ui_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_animation.cpp; sourceTree = "<group>"; };
 		26599DB91BEA5DD2008659BB /* thread_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_pool.cpp; sourceTree = "<group>"; };
 		265EBF1F1C23041600AD81D9 /* database_cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_cursor.cpp; sourceTree = "<group>"; };
@@ -1913,6 +1947,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				264AF11C21AEE6BE004E58CB /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		264AF11F21B0590C004E58CB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		264AF14921B05BFF004E58CB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				264AF15521B072D4004E58CB /* libsapp.a in Frameworks */,
+				264AF15421B072CF004E58CB /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3127,6 +3177,7 @@
 		264AF10721AECF7F004E58CB /* tool */ = {
 			isa = PBXGroup;
 			children = (
+				264AF14621B05BC9004E58CB /* sapp */,
 				264AF10821AECFA4004E58CB /* AddCopyrightNotice */,
 			);
 			name = tool;
@@ -3141,6 +3192,37 @@
 			);
 			name = AddCopyrightNotice;
 			path = ../../tool/src/AddCopyrightNotice;
+			sourceTree = "<group>";
+		};
+		264AF12521B05AAE004E58CB /* sapp */ = {
+			isa = PBXGroup;
+			children = (
+				264AF12621B05AAE004E58CB /* sapp.h */,
+				264AF12721B05AAE004E58CB /* sapp_document.cpp */,
+				264AF12821B05AAE004E58CB /* sapp_document.h */,
+				264AF12921B05AAE004E58CB /* sapp_document_color.inc */,
+				264AF12A21B05AAE004E58CB /* sapp_document_drawable.inc */,
+				264AF12B21B05AAE004E58CB /* sapp_document_layout.inc */,
+				264AF12C21B05AAE004E58CB /* sapp_document_menu.inc */,
+				264AF12D21B05AAE004E58CB /* sapp_document_raw.inc */,
+				264AF12E21B05AAE004E58CB /* sapp_document_string.inc */,
+				264AF12F21B05AAE004E58CB /* sapp_resources.cpp */,
+				264AF13021B05AAE004E58CB /* sapp_resources.h */,
+				264AF13121B05AAE004E58CB /* sapp_util.cpp */,
+				264AF13221B05AAE004E58CB /* sapp_util.h */,
+				264AF13321B05AAE004E58CB /* sapp_values.cpp */,
+				264AF13421B05AAE004E58CB /* sapp_values.h */,
+			);
+			path = sapp;
+			sourceTree = "<group>";
+		};
+		264AF14621B05BC9004E58CB /* sapp */ = {
+			isa = PBXGroup;
+			children = (
+				264AF14721B05BC9004E58CB /* main.cpp */,
+			);
+			name = sapp;
+			path = ../../tool/src/sapp;
 			sourceTree = "<group>";
 		};
 		266DD4751C1193AB00D47AB0 /* device */ = {
@@ -3396,6 +3478,8 @@
 				260D8CD120CBDC7C0013B34E /* libyasm.a */,
 				2605064620CF828E00032B2C /* yasm */,
 				264AF11021AED095004E58CB /* AddCopyrightNotice */,
+				264AF12121B0590C004E58CB /* libsapp.a */,
+				264AF14C21B05BFF004E58CB /* sapp */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3413,6 +3497,7 @@
 			isa = PBXGroup;
 			children = (
 				A25F2F911B03A33700854DAF /* slib */,
+				264AF12521B05AAE004E58CB /* sapp */,
 			);
 			name = src;
 			path = ../../src;
@@ -3570,6 +3655,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		264AF11D21B0590C004E58CB /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		26D158931E93A237003BD61A /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -3685,6 +3777,40 @@
 			name = AddCopyrightNotice;
 			productName = AddCopyrightNotice;
 			productReference = 264AF11021AED095004E58CB /* AddCopyrightNotice */;
+			productType = "com.apple.product-type.tool";
+		};
+		264AF12021B0590C004E58CB /* libsapp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 264AF12221B0590C004E58CB /* Build configuration list for PBXNativeTarget "libsapp" */;
+			buildPhases = (
+				264AF11D21B0590C004E58CB /* Headers */,
+				264AF11E21B0590C004E58CB /* Sources */,
+				264AF11F21B0590C004E58CB /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = libsapp;
+			productName = libsapp;
+			productReference = 264AF12121B0590C004E58CB /* libsapp.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		264AF14B21B05BFF004E58CB /* sapp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 264AF15021B05BFF004E58CB /* Build configuration list for PBXNativeTarget "sapp" */;
+			buildPhases = (
+				264AF14821B05BFF004E58CB /* Sources */,
+				264AF14921B05BFF004E58CB /* Frameworks */,
+				264AF14A21B05BFF004E58CB /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = sapp;
+			productName = sapp;
+			productReference = 264AF14C21B05BFF004E58CB /* sapp */;
 			productType = "com.apple.product-type.tool";
 		};
 		26D157921E93A237003BD61A /* slib-core */ = {
@@ -3858,6 +3984,14 @@
 						CreatedOnToolsVersion = 10.0;
 						ProvisioningStyle = Automatic;
 					};
+					264AF12021B0590C004E58CB = {
+						CreatedOnToolsVersion = 10.0;
+						ProvisioningStyle = Automatic;
+					};
+					264AF14B21B05BFF004E58CB = {
+						CreatedOnToolsVersion = 10.0;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 28CE364D1A0FEDC600AB513C /* Build configuration list for PBXProject "SLib" */;
@@ -3883,6 +4017,8 @@
 				26D15C531E93A9B4003BD61A /* vpx */,
 				260D8CCA20CBDC7C0013B34E /* libyasm */,
 				2605036220CEC39100032B2C /* yasm */,
+				264AF12021B0590C004E58CB /* libsapp */,
+				264AF14B21B05BFF004E58CB /* sapp */,
 				264AF10F21AED095004E58CB /* AddCopyrightNotice */,
 			);
 		};
@@ -3988,6 +4124,25 @@
 			files = (
 				264AF11721AED0C0004E58CB /* main.cpp in Sources */,
 				264AF11821AED0C0004E58CB /* util.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		264AF11E21B0590C004E58CB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				264AF13E21B05AAE004E58CB /* sapp_resources.cpp in Sources */,
+				264AF13621B05AAE004E58CB /* sapp_document.cpp in Sources */,
+				264AF14221B05AAE004E58CB /* sapp_values.cpp in Sources */,
+				264AF14021B05AAE004E58CB /* sapp_util.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		264AF14821B05BFF004E58CB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				264AF15321B06E00004E58CB /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5103,6 +5258,105 @@
 			};
 			name = Release;
 		};
+		264AF12321B0590C004E58CB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				EXECUTABLE_PREFIX = lib;
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_THREADSAFE_STATICS = NO;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../include";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = sapp;
+				SKIP_INSTALL = YES;
+				USE_HEADERMAP = NO;
+			};
+			name = Debug;
+		};
+		264AF12421B0590C004E58CB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_PREFIX = lib;
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_THREADSAFE_STATICS = NO;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../include";
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = sapp;
+				SKIP_INSTALL = YES;
+				USE_HEADERMAP = NO;
+			};
+			name = Release;
+		};
+		264AF15121B05BFF004E58CB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../bin/macOS";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../include",
+					"$(PROJECT_DIR)/../../src/sapp",
+				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		264AF15221B05BFF004E58CB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../bin/macOS";
+				COPY_PHASE_STRIP = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../include",
+					"$(PROJECT_DIR)/../../src/sapp",
+				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		26D1589F1E93A237003BD61A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -5446,7 +5700,6 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_THREADSAFE_STATICS = NO;
 				HEADER_SEARCH_PATHS = (
@@ -5607,6 +5860,24 @@
 			buildConfigurations = (
 				264AF11521AED095004E58CB /* Debug */,
 				264AF11621AED095004E58CB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		264AF12221B0590C004E58CB /* Build configuration list for PBXNativeTarget "libsapp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				264AF12321B0590C004E58CB /* Debug */,
+				264AF12421B0590C004E58CB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		264AF15021B05BFF004E58CB /* Build configuration list for PBXNativeTarget "sapp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				264AF15121B05BFF004E58CB /* Debug */,
+				264AF15221B05BFF004E58CB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
