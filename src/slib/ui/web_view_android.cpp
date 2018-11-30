@@ -89,6 +89,7 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(goForward, "_goForward", "(Landroid/view/View;)V");
 		SLIB_JNI_STATIC_METHOD(reload, "_reload", "(Landroid/view/View;)V");
 		SLIB_JNI_STATIC_METHOD(runJavaScript, "_runJavaScript", "(Landroid/view/View;Ljava/lang/String;)V");
+		SLIB_JNI_STATIC_METHOD(setCustomUserAgent, "_setCustomUserAgent", "(Landroid/view/View;Ljava/lang/String;)V");
 
 		SLIB_JNI_NATIVE(nativeOnStartLoad, "nativeOnStartLoad", "(JLjava/lang/String;)V", _priv_WebView::nativeOnStartLoad);
 		SLIB_JNI_NATIVE(nativeOnFinishLoad, "nativeOnFinishLoad", "(JLjava/lang/String;)V", _priv_WebView::nativeOnFinishLoad);
@@ -117,6 +118,11 @@ namespace slib
 			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
+				String customUserAgent = m_customUserAgent;
+				if (customUserAgent.isNotEmpty()) {
+					JniLocal<jstring> jvalue = Jni::getJniString(customUserAgent);
+					JAndroidWebView::setCustomUserAgent.call(sl_null, handle, jvalue.get());
+				}
 				((_priv_WebView*)this)->_load(handle);
 			}
 		}
@@ -183,6 +189,15 @@ namespace slib
 		if (handle) {
 			JniLocal<jstring> jscript = Jni::getJniString(script);
 			JAndroidWebView::runJavaScript.call(sl_null, handle, jscript.get());
+		}
+	}
+
+	void WebView::_setCustomUserAgent_NW()
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			JniLocal<jstring> jvalue = Jni::getJniString(m_customUserAgent);
+			JAndroidWebView::setCustomUserAgent.call(sl_null, handle, jvalue.get());
 		}
 	}
 

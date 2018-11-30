@@ -69,15 +69,11 @@ public class UiWebView extends WebView implements IView {
 		}
 		if (view instanceof WebView) {
 			final WebView wv = (WebView)view;
-			wv.post(new Runnable() {
-				public void run() {
-					try {
-						wv.loadUrl(url);						
-					} catch (Exception e) {
-						Logger.exception(e);
-					}
-				}
-			});
+			try {
+				wv.loadUrl(url);
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
 		}
 	}
 	
@@ -92,19 +88,15 @@ public class UiWebView extends WebView implements IView {
 		}
 		if (view instanceof WebView) {
 			final WebView wv = (WebView)view;
-			wv.post(new Runnable() {
-				public void run() {
-					try {
-						if (url == null || url.length() == 0) {
-							wv.loadData(url, "text/html", "utf-8");
-						} else {
-							wv.loadDataWithBaseURL(url, html, "text/html", "utf-8", null);
-						}						
-					} catch (Exception e) {
-						Logger.exception(e);
-					}
+			try {
+				if (url == null || url.length() == 0) {
+					wv.loadData(url, "text/html", "utf-8");
+				} else {
+					wv.loadDataWithBaseURL(url, html, "text/html", "utf-8", null);
 				}
-			});
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
 		}
 	}
 
@@ -143,15 +135,11 @@ public class UiWebView extends WebView implements IView {
 		}
 		if (view instanceof WebView) {
 			final WebView wv = (WebView)view;
-			wv.post(new Runnable() {
-				public void run() {
-					try {
-						wv.goBack();						
-					} catch (Exception e) {
-						Logger.exception(e);
-					}
-				}
-			});
+			try {
+				wv.goBack();
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
 		}
 	}
 
@@ -166,15 +154,11 @@ public class UiWebView extends WebView implements IView {
 		}
 		if (view instanceof WebView) {
 			final WebView wv = (WebView)view;
-			wv.post(new Runnable() {
-				public void run() {
-					try {
-						wv.goForward();						
-					} catch (Exception e) {
-						Logger.exception(e);
-					}
-				}
-			});
+			try {
+				wv.goForward();
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
 		}
 	}
 
@@ -189,15 +173,11 @@ public class UiWebView extends WebView implements IView {
 		}
 		if (view instanceof WebView) {
 			final WebView wv = (WebView)view;
-			wv.post(new Runnable() {
-				public void run() {
-					try {
-						wv.reload();						
-					} catch (Exception e) {
-						Logger.exception(e);
-					}
-				}
-			});
+			try {
+				wv.reload();
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
 		}
 	}
 
@@ -213,16 +193,31 @@ public class UiWebView extends WebView implements IView {
 		if (script != null && script.length() > 0) {
 			if (view instanceof WebView) {
 				final WebView wv = (WebView)view;
-				wv.post(new Runnable() {
-					public void run() {
-						try {
-							wv.loadUrl("javascript:" + script);
-						} catch (Exception e) {
-							Logger.exception(e);
-						}
-					}
-				});
-			}				
+				try {
+					wv.loadUrl("javascript:" + script);
+				} catch (Exception e) {
+					Logger.exception(e);
+				}
+			}
+		}
+	}
+
+	public static void _setCustomUserAgent(final View view, final String userAgent) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setCustomUserAgent(view, userAgent);
+				}
+			});
+			return;
+		}
+		if (view instanceof WebView) {
+			final WebView wv = (WebView) view;
+			try {
+				wv.getSettings().setUserAgentString(userAgent);
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
 		}
 	}
 

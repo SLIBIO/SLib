@@ -64,6 +64,11 @@ namespace slib
 		
 		String getErrorMessage();
 		
+		
+		String getCustomUserAgent();
+		
+		void setCustomUserAgent(const String& userAgent);
+		
 	public:
 		SLIB_PROPERTY(AtomicFunction<void(WebView*, String)>, OnStartLoad)
 		
@@ -106,12 +111,16 @@ namespace slib
 		
 		void _runJavaScript_NW(const String& script);
 		
+		void _setCustomUserAgent_NW();
+		
 	protected:
 		AtomicString m_urlOrigin;
 		AtomicString m_offlineContentHTML;
 		sl_bool m_flagOfflineContent;
 		AtomicString m_lastErrorMessage;
 		
+		AtomicString m_customUserAgent;
+
 	};
 
 }

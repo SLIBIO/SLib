@@ -77,6 +77,7 @@ namespace slib
 		
 		void _applyProperties(OSWebView* handle)
 		{
+			[handle setCustomUserAgent:(Apple::getNSStringFromString(m_customUserAgent, nil))];
 			_load(handle);
 		}
 		
@@ -255,6 +256,15 @@ namespace slib
 		}
 	}
 
+	void WebView::_setCustomUserAgent_NW()
+	{
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
+			OSWebView* wv = (OSWebView*)handle;
+			[wv setCustomUserAgent:(Apple::getNSStringFromString(m_customUserAgent, nil))];
+		}
+	}
+	
 }
 
 @implementation _priv_Slib_macOS_WebView

@@ -71,7 +71,7 @@ namespace slib
 				});
 				return;
 			}
-			
+			[handle setCustomUserAgent:(Apple::getNSStringFromString(m_customUserAgent, nil))];
 			_load(handle);
 		}
 		
@@ -242,6 +242,21 @@ namespace slib
 			if (_script != nil && _script.length != 0) {
 				[wv evaluateJavaScript:_script completionHandler:nil];
 			}
+		}
+	}
+	
+	void WebView::_setCustomUserAgent_NW()
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_setCustomUserAgent_NW();
+			});
+			return;
+		}
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
+			OSWebView* wv = (OSWebView*)handle;
+			[wv setCustomUserAgent:(Apple::getNSStringFromString(m_customUserAgent, nil))];
 		}
 	}
 }

@@ -904,7 +904,15 @@ namespace slib
 						::VariantInit(&varURL);
 						varURL.vt = VT_BSTR;
 						varURL.bstrVal = (BSTR)(url.getData());
-						browser->Navigate2(&varURL, NULL, NULL, NULL, NULL);
+						if (m_customUserAgent.isNotEmpty()) {
+							String16 headers = "User-Agent: " + m_customUserAgent;
+							VARIANT varHeaders;
+							varHeaders.vt = VT_BSTR;
+							varHeaders.bstrVal = (BSTR)(headers.getData());
+							browser->Navigate2(&varURL, NULL, NULL, NULL, &varHeaders);
+						} else {
+							browser->Navigate2(&varURL, NULL, NULL, NULL, NULL);
+						}
 					}
 				}
 			}
@@ -1092,6 +1100,10 @@ namespace slib
 				}
 			}
 		}
+	}
+
+	void WebView::_setCustomUserAgent_NW()
+	{
 	}
 
 }

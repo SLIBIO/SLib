@@ -120,6 +120,17 @@ namespace slib
 		return m_lastErrorMessage;
 	}
 	
+	String WebView::getCustomUserAgent()
+	{
+		return m_customUserAgent;
+	}
+	
+	void WebView::setCustomUserAgent(const String& userAgent)
+	{
+		m_customUserAgent = userAgent;
+		_setCustomUserAgent_NW();
+	}
+	
 	void WebView::onStartLoad(const String& url)
 	{
 	}
@@ -196,6 +207,10 @@ namespace slib
 	}
 	
 	void WebView::_runJavaScript_NW(const String& script)
+	{
+	}
+	
+	void WebView::_setCustomUserAgent_NW()
 	{
 	}
 	
