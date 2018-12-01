@@ -2105,17 +2105,14 @@ namespace slib
 	void View::_updateAndApplyChildLayout(View* child)
 	{
 		Ref<LayoutAttributes>& childLayoutAttrs = child->m_layoutAttrs;
-		if (childLayoutAttrs.isNull()) {
+		if (childLayoutAttrs.isNotNull()) {
+			childLayoutAttrs->flagInvalidLayoutInParent = sl_true;
+			_priv_View_UpdateLayoutFrameParam param;
+			param.parentContentFrame = getBoundsInnerPadding();
+			child->_updateLayoutFrameInParent(&param);
+		} else {
 			child->_updateLayout();
-			return;
 		}
-		
-		childLayoutAttrs->flagInvalidLayoutInParent = sl_true;
-		
-		_priv_View_UpdateLayoutFrameParam param;
-		param.parentContentFrame = getBoundsInnerPadding();
-		child->_updateLayoutFrameInParent(&param);
-		
 		child->_applyLayout(UIUpdateMode::Redraw);
 	}
 	
