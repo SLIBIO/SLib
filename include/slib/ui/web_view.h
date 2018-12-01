@@ -69,6 +69,8 @@ namespace slib
 		
 		void setCustomUserAgent(const String& userAgent);
 		
+		void queryUserAgent(const Function<void(WebView*, String)>& callbackQueryCompletion);
+		
 	public:
 		SLIB_PROPERTY(AtomicFunction<void(WebView*, String)>, OnStartLoad)
 		
@@ -120,6 +122,7 @@ namespace slib
 		AtomicString m_lastErrorMessage;
 		
 		AtomicString m_customUserAgent;
+		AtomicFunction<void(WebView*, String)> m_callbackQueryUserAgentCompletion;
 
 	};
 

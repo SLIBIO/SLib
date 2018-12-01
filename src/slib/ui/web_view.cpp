@@ -131,6 +131,15 @@ namespace slib
 		_setCustomUserAgent_NW();
 	}
 	
+	void WebView::queryUserAgent(const Function<void(WebView*, String)>& callbackQueryCompletion)
+	{
+		if (!m_flagOfflineContent && m_urlOrigin.isEmpty()) {
+			loadHTML("", "http://localhost");
+		}
+		m_callbackQueryUserAgentCompletion = callbackQueryCompletion;
+		runJavaScript("slib_send('result_query_user_agent', navigator.userAgent);");
+	}
+
 	void WebView::onStartLoad(const String& url)
 	{
 	}
@@ -160,10 +169,21 @@ namespace slib
 	{
 		onFinishLoad(url, flagFailed);
 		getOnFinishLoad()(this, url, flagFailed);
+		if (!flagFailed && m_callbackQueryUserAgentCompletion.isNotNull()) {
+			runJavaScript("slib_send('result_query_user_agent', navigator.userAgent);");
+		}
 	}
 	
 	void WebView::dispatchMessageFromJavaScript(const String& msg, const String& param)
 	{
+		if (msg == "result_query_user_agent") {
+			Function<void(WebView*, String)> callback = m_callbackQueryUserAgentCompletion;
+			if (callback.isNotNull()) {
+				callback(this, param);
+				m_callbackQueryUserAgentCompletion.setNull();
+			}
+			return;
+		}
 		onMessageFromJavaScript(msg, param);
 		getOnMessageFromJavaScript()(this, msg, param);
 	}
