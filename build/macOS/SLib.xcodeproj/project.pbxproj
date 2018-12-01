@@ -635,7 +635,6 @@
 		264AF14221B05AAE004E58CB /* sapp_values.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF13321B05AAE004E58CB /* sapp_values.cpp */; };
 		264AF15321B06E00004E58CB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF14721B05BC9004E58CB /* main.cpp */; };
 		264AF15421B072CF004E58CB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF11B21AEE6BE004E58CB /* Cocoa.framework */; };
-		264AF15521B072D4004E58CB /* libsapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF12121B0590C004E58CB /* libsapp.a */; };
 		26A39D8920EFBCBB004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8820EFBCBB004707C9 /* calculator.cpp */; };
 		26A39D8A20EFBCBB004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8820EFBCBB004707C9 /* calculator.cpp */; };
 		26C1B62C20D4305100E36539 /* bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C1B62B20D4305000E36539 /* bitmap.cpp */; };
@@ -1003,6 +1002,27 @@
 			remoteInfo = yasm;
 		};
 		264AF11921AEE694004E58CB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 28CE364A1A0FEDC600AB513C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 26D9D8F61E9645CE005F7BD3;
+			remoteInfo = slib;
+		};
+		264AF16721B2C54E004E58CB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 28CE364A1A0FEDC600AB513C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 26D9D8F61E9645CE005F7BD3;
+			remoteInfo = slib;
+		};
+		264AF16921B2C551004E58CB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 28CE364A1A0FEDC600AB513C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 264AF12021B0590C004E58CB;
+			remoteInfo = libsapp;
+		};
+		264AF16B21B2C585004E58CB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 28CE364A1A0FEDC600AB513C /* Project object */;
 			proxyType = 1;
@@ -1961,7 +1981,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				264AF15521B072D4004E58CB /* libsapp.a in Frameworks */,
 				264AF15421B072CF004E58CB /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3790,6 +3809,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				264AF16C21B2C585004E58CB /* PBXTargetDependency */,
 			);
 			name = libsapp;
 			productName = libsapp;
@@ -3807,6 +3827,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				264AF16A21B2C551004E58CB /* PBXTargetDependency */,
+				264AF16821B2C54E004E58CB /* PBXTargetDependency */,
 			);
 			name = sapp;
 			productName = sapp;
@@ -5103,6 +5125,21 @@
 			target = 26D9D8F61E9645CE005F7BD3 /* slib */;
 			targetProxy = 264AF11921AEE694004E58CB /* PBXContainerItemProxy */;
 		};
+		264AF16821B2C54E004E58CB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 26D9D8F61E9645CE005F7BD3 /* slib */;
+			targetProxy = 264AF16721B2C54E004E58CB /* PBXContainerItemProxy */;
+		};
+		264AF16A21B2C551004E58CB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 264AF12021B0590C004E58CB /* libsapp */;
+			targetProxy = 264AF16921B2C551004E58CB /* PBXContainerItemProxy */;
+		};
+		264AF16C21B2C585004E58CB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 26D9D8F61E9645CE005F7BD3 /* slib */;
+			targetProxy = 264AF16B21B2C585004E58CB /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -5330,6 +5367,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"-lsapp",
+					"-lslib",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -5353,6 +5394,10 @@
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"-lsapp",
+					"-lslib",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
