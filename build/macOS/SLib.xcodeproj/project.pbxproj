@@ -635,6 +635,12 @@
 		264AF14221B05AAE004E58CB /* sapp_values.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF13321B05AAE004E58CB /* sapp_values.cpp */; };
 		264AF15321B06E00004E58CB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF14721B05BC9004E58CB /* main.cpp */; };
 		264AF15421B072CF004E58CB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF11B21AEE6BE004E58CB /* Cocoa.framework */; };
+		264AF16F21B3FFE8004E58CB /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF16E21B3FFE8004E58CB /* CoreImage.framework */; };
+		264AF17121B3FFF2004E58CB /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF17021B3FFF2004E58CB /* GLKit.framework */; };
+		264AF17321B3FFF7004E58CB /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF17221B3FFF7004E58CB /* OpenGL.framework */; };
+		264AF17521B40019004E58CB /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF17421B40019004E58CB /* Quartz.framework */; };
+		264AF17721B40025004E58CB /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF17621B40025004E58CB /* AVFoundation.framework */; };
+		264AF17921B4003E004E58CB /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF17821B4003D004E58CB /* WebKit.framework */; };
 		26A39D8920EFBCBB004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8820EFBCBB004707C9 /* calculator.cpp */; };
 		26A39D8A20EFBCBB004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8820EFBCBB004707C9 /* calculator.cpp */; };
 		26C1B62C20D4305100E36539 /* bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C1B62B20D4305000E36539 /* bitmap.cpp */; };
@@ -1692,6 +1698,12 @@
 		264AF13421B05AAE004E58CB /* sapp_values.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sapp_values.h; sourceTree = "<group>"; };
 		264AF14721B05BC9004E58CB /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		264AF14C21B05BFF004E58CB /* sapp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sapp; sourceTree = BUILT_PRODUCTS_DIR; };
+		264AF16E21B3FFE8004E58CB /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
+		264AF17021B3FFF2004E58CB /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
+		264AF17221B3FFF7004E58CB /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		264AF17421B40019004E58CB /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		264AF17621B40025004E58CB /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		264AF17821B4003D004E58CB /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		2653358E1E2E8A5A00199C76 /* ui_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_animation.cpp; sourceTree = "<group>"; };
 		26599DB91BEA5DD2008659BB /* thread_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_pool.cpp; sourceTree = "<group>"; };
 		265EBF1F1C23041600AD81D9 /* database_cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_cursor.cpp; sourceTree = "<group>"; };
@@ -1981,6 +1993,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				264AF17921B4003E004E58CB /* WebKit.framework in Frameworks */,
+				264AF17721B40025004E58CB /* AVFoundation.framework in Frameworks */,
+				264AF17521B40019004E58CB /* Quartz.framework in Frameworks */,
+				264AF17321B3FFF7004E58CB /* OpenGL.framework in Frameworks */,
+				264AF17121B3FFF2004E58CB /* GLKit.framework in Frameworks */,
+				264AF16F21B3FFE8004E58CB /* CoreImage.framework in Frameworks */,
 				264AF15421B072CF004E58CB /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2106,6 +2124,12 @@
 		2605036A20CEC3C500032B2C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				264AF17821B4003D004E58CB /* WebKit.framework */,
+				264AF17621B40025004E58CB /* AVFoundation.framework */,
+				264AF17421B40019004E58CB /* Quartz.framework */,
+				264AF17221B3FFF7004E58CB /* OpenGL.framework */,
+				264AF17021B3FFF2004E58CB /* GLKit.framework */,
+				264AF16E21B3FFE8004E58CB /* CoreImage.framework */,
 				264AF11B21AEE6BE004E58CB /* Cocoa.framework */,
 			);
 			name = Frameworks;

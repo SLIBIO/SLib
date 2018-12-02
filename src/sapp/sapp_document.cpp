@@ -126,6 +126,12 @@ namespace slib
 
 #define RAW_MAX_SIZE 0x1000000 // 16MB
 
+	SAppSimulateLayoutParam::SAppSimulateLayoutParam()
+	{
+		windowSize.x = 450;
+		windowSize.y = 800;
+	}
+	
 	SAppDocument::SAppDocument()
 	{
 		m_flagOpened = sl_false;
@@ -272,7 +278,7 @@ namespace slib
 			String path = pathDir + "/" + fileName;
 			if (File::exists(path)) {
 				if (!(File::isDirectory(path))) {
-					if (File::getFileExtension(fileName) == "xml") {
+					if (File::getFileExtension(fileName) == "xml" || File::getFileExtension(fileName) == "uiml") {
 						String localNamespace = File::getFileNameOnly(fileName);
 						if (localNamespace.isNotEmpty()) {
 							if (SAppUtil::checkName(localNamespace.getData())) {
@@ -357,7 +363,7 @@ namespace slib
 		
 	}
 
-	void SAppDocument::simulateLayoutInWindow(const String& layoutName)
+	void SAppDocument::simulateLayoutInWindow(const String& layoutName, const SAppSimulateLayoutParam& param)
 	{
 		ObjectLocker lock(this);
 		
@@ -367,7 +373,7 @@ namespace slib
 
 		Ref<SAppLayoutResource> layout = m_layouts.getValue(layoutName, Ref<SAppLayoutResource>::null());
 		if (layout.isNotNull()) {
-			_simulateLayoutInWindow(layout.get());
+			_simulateLayoutInWindow(layout.get(), param);
 		}
 		
 	}

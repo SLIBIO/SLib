@@ -480,10 +480,12 @@ namespace slib
 		return sl_true;
 	}
 
-	void SAppDocument::_simulateLayoutInWindow(SAppLayoutResource* layout)
+	void SAppDocument::_simulateLayoutInWindow(SAppLayoutResource* layout, const SAppSimulateLayoutParam& param)
 	{
 		Ref<SAppLayoutSimulationWindow> window = new SAppLayoutSimulationWindow;
 		if (window.isNotNull()) {
+			window->setClientSize(param.windowSize);
+			window->setOnClose(param.onCloseWindow);
 			window->open(this, layout);
 		}
 	}

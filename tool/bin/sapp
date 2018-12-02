@@ -1,0 +1,7 @@
+if [[ `uname` == 'Linux' ]]; then
+  $(dirname $0)/../../bin/Linux/sapp $@
+fi
+
+if [[ `uname` == 'Darwin' ]]; then
+ $(dirname $0)/../../bin/macOS/sapp $@
+fi

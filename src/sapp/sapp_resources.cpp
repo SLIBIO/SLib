@@ -574,7 +574,6 @@ namespace slib
 			m_simulationContentView = getContentView();
 		} else {
 			setCenterScreenOnCreate(sl_true);
-			setClientSize(450, 800);
 			setResizable(sl_true);
 			viewContent = new ViewGroup;
 			m_simulationContentView = viewContent;

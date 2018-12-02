@@ -21,6 +21,7 @@
  */
 
 #include <slib/core.h>
+#include <slib/ui.h>
 
 #include "sapp.h"
 
@@ -28,9 +29,92 @@ using namespace slib;
 
 int main(int argc, const char * argv[])
 {
-	if (argc != 5) {
+	if (argc < 2) {
+		Println("Command parameter is missing");
 		return -1;
 	}
-	
+	String command = argv[1];
+	if (command == "gen") {
+		String path;
+		if (argc < 3) {
+			path = System::getCurrentDirectory();
+		} else {
+			path = argv[2];
+		}
+		if (File::isDirectory(path)) {
+			path += "/sapp.xml";
+			if (!(File::isFile(path))) {
+				Println("sapp.xml is not found in %s", path);
+				return -1;
+			}
+		} else {
+			if (!(File::isFile(path))) {
+				Println("sapp file is not found in %s", path);
+				return -1;
+			}
+		}
+		Ref<SAppDocument> doc = new SAppDocument;
+		if (!(doc->open(path))) {
+			return -1;
+		}
+		if (!(doc->openResources())) {
+			return -1;
+		}
+		if (!(doc->generateCpp())) {
+			return -1;
+		}
+	} else {
+		String path = command;
+		if (File::isFile(path + ".xml")) {
+			path += ".xml";
+		} else if (File::isFile(path + ".uiml")) {
+			path += ".uiml";
+		} else if (!(File::isFile(path))) {
+			Println("File is not found in %s", path);
+			return -1;
+		}
+		path = File::getRealPath(path);
+		if (!(File::isFile(path))) {
+			Println("File is not found in %s", path);
+			return -1;
+		}
+		String pathDir = File::getParentDirectoryPath(path);
+		if (File::getFileName(pathDir) == "ui") {
+			String pathApp = File::getParentDirectoryPath(pathDir);
+			if (!(File::isFile(pathApp + "/sapp.xml"))) {
+				Println("sapp.xml is not found in %s", pathApp);
+				return -1;
+			}
+			Ref<SAppDocument> doc = new SAppDocument;
+			if (!(doc->open(pathApp + "/sapp.xml"))) {
+				return -1;
+			}
+			if (!(doc->openResources())) {
+				return -1;
+			}
+			String layoutName = File::getFileNameOnly(path);
+			SAppSimulateLayoutParam param;
+			String pathConfig = pathApp + "/.sapp.conf";
+			Json config = Json::parseJsonFromTextFile(pathConfig);
+			param.windowSize.x = config["simulator_window_width"].getInt32(param.windowSize.x);
+			param.windowSize.y = config["simulator_window_height"].getInt32(param.windowSize.y);
+			param.onCloseWindow = [pathConfig](Window* window, UIEvent* ev) {
+				Json config = Json::parseJsonFromTextFile(pathConfig);
+				if (config.isNull()) {
+					config = Json::createMap();
+				}
+				UISize size = window->getClientSize();
+				config.putItem("simulator_window_width", size.x);
+				config.putItem("simulator_window_height", size.y);
+				File::writeAllTextUTF8(pathConfig, config.toJsonString());
+				UI::quitApp();
+			};
+			doc->simulateLayoutInWindow(layoutName, param);
+			UI::runApp();
+		} else {
+			Println("Not supported file: %s", path);
+			return -1;
+		}
+	}
 	return 0;
 }

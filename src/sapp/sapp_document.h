@@ -42,6 +42,16 @@ namespace slib
 		
 	};
 	
+	class SAppSimulateLayoutParam
+	{
+	public:
+		UISize windowSize;
+		Function<void(Window*, UIEvent*)> onCloseWindow;
+
+	public:
+		SAppSimulateLayoutParam();
+	};
+	
 	class SAppDocument : public Object
 	{
 	public:
@@ -73,7 +83,7 @@ namespace slib
 		
 		List< Ref<SAppLayoutResource> > getLayouts();
 		
-		void simulateLayoutInWindow(const String& layoutName);
+		void simulateLayoutInWindow(const String& layoutName, const SAppSimulateLayoutParam& param);
 		
 		
 		// Utilities
@@ -156,7 +166,7 @@ namespace slib
 		sl_bool _generateLayoutsCpp(const String& targetPath);
 		sl_bool _generateLayoutsCpp_Layout(const String& targetPath, SAppLayoutResource* layout);
 		sl_bool _generateLayoutsCpp_Item(SAppLayoutResource* layout, SAppLayoutResourceItem* item, SAppLayoutResourceItem* parent, StringBuffer& sbDeclare, StringBuffer& sbDefineInit, StringBuffer& sbDefineLayout, const String& addStatement);
-		void _simulateLayoutInWindow(SAppLayoutResource* layout);
+		void _simulateLayoutInWindow(SAppLayoutResource* layout, const SAppSimulateLayoutParam& param);
 		void _registerLayoutSimulationWindow(const Ref<SAppLayoutSimulationWindow>& window);
 		void _removeLayoutSimulationWindow(const Ref<SAppLayoutSimulationWindow>& window);
 		Ref<View> _simulateLayoutCreateOrLayoutView(SAppLayoutSimulator* simulator, SAppLayoutResourceItem* item, SAppLayoutResourceItem* parent, View* parentView, sl_bool flagOnLayout);
