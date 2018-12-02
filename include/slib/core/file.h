@@ -305,6 +305,8 @@ namespace slib
 #if defined(SLIB_PLATFORM_IS_UNIX)
 		static sl_bool setNonBlocking(int fd, sl_bool flag);
 #endif
+		
+		static String getRealPath(const String& filePath);
 
 	private:
 		static sl_file _open(const String& filePath, const FileMode& mode, const FilePermissions& permissions);

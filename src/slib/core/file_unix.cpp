@@ -557,6 +557,13 @@ namespace slib
 			return sl_false;
 		}
 	}
+	
+	String File::getRealPath(const String& filePath)
+	{
+		char path[4096];
+		path[0] = 0;
+		return realpath(filePath.getData(), path);
+	}
 
 }
 

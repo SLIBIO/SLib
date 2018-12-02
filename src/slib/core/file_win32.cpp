@@ -557,6 +557,17 @@ namespace slib
 		return ret != 0;
 	}
 
+	String File::getRealPath(const String& _filePath)
+	{
+		String16 path = _filePath;
+		WCHAR buf[4096];
+		buf[0] = 0;
+		if (::GetFullPathNameW((LPCWSTR)(path.getData()), 4096, buf, NULL)) {
+			return buf;
+		}
+		return sl_null;
+	}
+
 }
 
 #endif
