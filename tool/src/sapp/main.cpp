@@ -29,11 +29,18 @@ using namespace slib;
 
 int main(int argc, const char * argv[])
 {
+	String command;
 	if (argc < 2) {
-		Println("Command parameter is missing");
-		return -1;
+		while (1) {
+			Println("Input the command or file path");
+			command = Console::readLine().trim();
+			if (command.isNotNull()) {
+				break;
+			}
+		}
+	} else {
+		command = argv[1];
 	}
-	String command = argv[1];
 	if (command == "gen") {
 		String path;
 		if (argc < 3) {

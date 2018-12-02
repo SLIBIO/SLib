@@ -1879,7 +1879,9 @@ namespace slib
 			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(boundShape, setBoundShape)
 			if (flagRoot) {
 				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadiusX, setRoundRectBoundShapeRadiusX, checkForRootViewScalarSize)
+				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadiusY, setRoundRectBoundShapeRadiusY, checkForRootViewScalarSize)
 			} else {
+				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadiusX, setRoundRectBoundShapeRadiusX, checkScalarSize)
 				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadiusY, setRoundRectBoundShapeRadiusY, checkScalarSize)
 			}
 			if (op == OP_PARSE) {
