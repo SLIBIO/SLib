@@ -1,7 +1,6 @@
-<sapp version='1'>
+<sapp>
 	<layout
 		type='page'
-		name='HelloWorld'
 		background='@drawable/background'
 		backgroundScale='cover'
 		>

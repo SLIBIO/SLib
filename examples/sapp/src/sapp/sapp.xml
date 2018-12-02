@@ -1,9 +1,8 @@
-<sapp version='1'>
+<sapp>
 	<configuration>
-		<app-path>./sapp</app-path>
 		<generate-cpp>
+			<target-path>../gen</target-path>
 			<namespace>example</namespace>
-			<target-path>./cpp/gen</target-path>
 		</generate-cpp>
 	</configuration>
 </sapp>
