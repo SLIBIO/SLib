@@ -1,12 +1,12 @@
 #include "app.h"
 
-#include "../gen/resources.h"
+#include "MainMenu.h"
 
 SLIB_DEFINE_APPLICATION(SAppExampleApp, MobileApp)
 
 SAppExampleApp::SAppExampleApp()
 {
-	setStartupPage(new example::ui::HelloWorld);
+	setStartupPage(new MainMenu);
 }
 
 void SAppExampleApp::onStart()

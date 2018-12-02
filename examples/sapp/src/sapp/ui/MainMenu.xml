@@ -1,0 +1,19 @@
+<sapp>
+	<layout
+		type='page'
+		>
+		
+		<linear
+			width='wrap'
+			height='wrap'
+			alignCenter='true'
+		>
+
+			<button name='btnHelloWorld' text='Hello World' width='50%sw' height='8%sw' fontSize='5%sw' nativeWidget='false' boundShape='round-rect' boundRadius='2%sw'/>
+
+			<button name='btnViewPager' text='View Pager' marginTop='1%sw' width='50%sw' height='8%sw' fontSize='5%sw' nativeWidget='false' boundShape='round-rect' boundRadius='2%sw'/>
+
+		</linear>
+
+ 	</layout>
+</sapp>
