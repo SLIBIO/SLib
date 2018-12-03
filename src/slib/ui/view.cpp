@@ -1142,6 +1142,7 @@ namespace slib
 		m_frame = frame;
 		if (layoutAttrs.isNotNull()) {
 			layoutAttrs->requestedFrame = frame;
+			layoutAttrs->layoutFrame = frame;
 		}
 		if (m_instance.isNotNull()) {
 			_setFrame_NI(frame);
