@@ -1,3 +1,5 @@
+#pragma once
+
 #include <slib.h>
 
 using namespace slib;
