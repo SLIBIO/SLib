@@ -37,6 +37,8 @@ namespace slib
 		AtomicRef<Drawable> background;
 		AtomicRef<Pen> border;
 		AtomicRef<Drawable> icon;
+		sl_bool flagFilter;
+		ColorMatrix filter;
 		
 	public:
 		ButtonCategoryProperties();
@@ -204,6 +206,15 @@ namespace slib
 		void setBorder(sl_bool flagBorder, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		
+		ColorMatrix* getColorFilter(ButtonState state, sl_uint32 category = 0);
+		
+		virtual void setColorFilter(ColorMatrix* filter, ButtonState state, sl_uint32 category = 0, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		ColorMatrix* getColorFilter();
+		
+		void setColorFilter(ColorMatrix* filter, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		
 		sl_bool isUsingDefaultColorFilter();
 		
 		void setUsingDefaultColorFilter(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -236,6 +247,8 @@ namespace slib
 		virtual void layoutIconAndText(sl_ui_len widthFrame, sl_ui_len heightFrame, UISize& sizeContent, UIRect& frameIcon, UIRect& frameText);
 		
 		virtual void drawButtonContent(Canvas* canvas, const Ref<Drawable>& icon, const String& text, const Color& textColor);
+		
+		const ColorMatrix* getCurrentColorFilter();
 		
 	private:
 		void _invalidateButtonState();

@@ -61,6 +61,7 @@ namespace slib
 	ButtonCategoryProperties::ButtonCategoryProperties()
 	{
 		textColor = Color::zero();
+		flagFilter = sl_false;
 	}
 
 	class _priv_Button_Categories
@@ -550,6 +551,41 @@ namespace slib
 		View::setBorder(flagBorder, mode);
 	}
 
+	ColorMatrix* Button::getColorFilter(ButtonState state, sl_uint32 category)
+	{
+		if (category < m_nCategories) {
+			ButtonCategoryProperties& props = m_categories[category].properties[(int)state];
+			if (props.flagFilter) {
+				return &(props.filter);
+			}
+		}
+		return sl_null;
+	}
+	
+	void Button::setColorFilter(ColorMatrix* filter, ButtonState state, sl_uint32 category, UIUpdateMode mode)
+	{
+		if (category < m_nCategories) {
+			ButtonCategoryProperties& props = m_categories[category].properties[(int)state];
+			if (filter) {
+				props.flagFilter = sl_true;
+				props.filter = *filter;
+			} else {
+				props.flagFilter = sl_false;
+			}
+			invalidate(mode);
+		}
+	}
+	
+	ColorMatrix* Button::getColorFilter()
+	{
+		return getColorFilter(ButtonState::Normal);
+	}
+	
+	void Button::setColorFilter(ColorMatrix* filter, UIUpdateMode mode)
+	{
+		setColorFilter(filter, ButtonState::Normal, 0, mode);
+	}
+	
 	sl_bool Button::isUsingDefaultColorFilter()
 	{
 		return m_flagUseDefaultColorFilter;
@@ -594,22 +630,7 @@ namespace slib
 		Color textColor = params.textColor;
 		Ref<Drawable> icon = params.icon;
 		if (textColor.isZero() || icon.isNull()) {
-			const ColorMatrix* cm = sl_null;
-			if (m_flagUseDefaultColorFilter) {
-				switch (m_state) {
-					case ButtonState::Hover:
-						cm = &_g_button_colorMatrix_hover;
-						break;
-					case ButtonState::Pressed:
-						cm = &_g_button_colorMatrix_pressed;
-						break;
-					case ButtonState::Disabled:
-						cm = &_g_button_colorMatrix_disabled;
-						break;
-					default:
-						break;
-				}
-			}
+			const ColorMatrix* cm = getCurrentColorFilter();
 			if (textColor.isZero()) {
 				textColor = m_textColorDefault;
 				if (cm) {
@@ -652,20 +673,7 @@ namespace slib
 		}
 		
 		if (m_flagUseDefaultColorFilter) {
-			const ColorMatrix* cm = sl_null;
-			switch (m_state) {
-				case ButtonState::Hover:
-					cm = &_g_button_colorMatrix_hover;
-					break;
-				case ButtonState::Pressed:
-					cm = &_g_button_colorMatrix_pressed;
-					break;
-				case ButtonState::Disabled:
-					cm = &_g_button_colorMatrix_disabled;
-					break;
-				default:
-					break;
-			}
+			const ColorMatrix* cm = getCurrentColorFilter();
 			if (cm) {
 				if (background.isNotNull()) {
 					background = background->filter(*cm);
@@ -933,6 +941,32 @@ namespace slib
 				canvas->drawText(text, (sl_real)(rcText.left), (sl_real)(rcText.top), getFont(), textColor);
 			}
 		}
+	}
+	
+	const ColorMatrix* Button::getCurrentColorFilter()
+	{
+		ButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
+		if (params.flagFilter) {
+			return &(params.filter);
+		}
+		if (m_flagUseDefaultColorFilter) {
+			switch (m_state) {
+				case ButtonState::Hover:
+					return &_g_button_colorMatrix_hover;
+				case ButtonState::Pressed:
+					return &_g_button_colorMatrix_pressed;
+				case ButtonState::Disabled:
+					return &_g_button_colorMatrix_disabled;
+				default:
+					break;
+			}
+		} else if (m_state != ButtonState::Normal) {
+			ButtonCategoryProperties& paramsDefault = m_categories[m_category].properties[(int)(ButtonState::Normal)];
+			if (paramsDefault.flagFilter) {
+				return &(params.filter);
+			}
+		}
+		return sl_null;
 	}
 
 	void Button::_invalidateButtonState()
