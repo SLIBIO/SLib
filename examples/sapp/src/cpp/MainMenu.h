@@ -37,4 +37,6 @@ public:
 	
 	void onClickViewPager(View* view);
 	
+	void onClickWebView(View* view);
+
 };

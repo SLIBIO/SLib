@@ -1,0 +1,13 @@
+<sapp>
+	<layout
+		type='page'
+		>
+		
+		<web 
+			width='fill'
+			height='fill'
+			url="http://www.baidu.com" 
+			/>
+
+ 	</layout>
+</sapp>

@@ -1,0 +1,10 @@
+<sapp>
+	<layout
+		type='page'
+		background='white'
+		>
+		
+		<include src='common_header'/>
+
+ 	</layout>
+</sapp>

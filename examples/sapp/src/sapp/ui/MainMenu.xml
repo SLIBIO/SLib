@@ -9,11 +9,28 @@
 			alignCenter='true'
 		>
 
-			<button name='btnHelloWorld' text='Hello World' width='50%sw' height='8%sw' fontSize='5%sw' nativeWidget='false' boundShape='round-rect' boundRadius='2%sw'/>
+			<button name='btnHelloWorld' text='Hello World' styles='menu_button'/>
 
-			<button name='btnViewPager' text='View Pager' marginTop='1%sw' width='50%sw' height='8%sw' fontSize='5%sw' nativeWidget='false' boundShape='round-rect' boundRadius='2%sw'/>
+			<button name='btnViewPager' text='ViewPager' marginTop='1%sw' styles='menu_button'/>
+
+			<button name='btnWebView' text='WebView' marginTop='1%sw' styles='menu_button'/>
 
 		</linear>
 
  	</layout>
+
+	<layout-style
+		name='menu_button'
+		width='50%sw'
+		height='8%sw'
+		fontSize='4%sw'
+		nativeWidget='false'
+		background='@color/button_back_color'
+		textColor='@color/button_text_color'
+		boundShape='round-rect'
+		boundRadius='2%sw'
+		border='false'
+		clipping='true'
+		/>
+
 </sapp>
