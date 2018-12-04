@@ -38,6 +38,7 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Build.VERSION;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -454,6 +455,27 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 			UiView.setFrame(keyboardScrollView, frame.left, frame.top, frame.right, frame.bottom);
 			keyboardScrollView = null;
 		}
+	}
+
+	int locationOfFoucsView[] = new int[2];
+	int locationOfWindow[] = new int[2];
+
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent ev) {
+		boolean ret = super.dispatchTouchEvent(ev);
+		if (ev.getAction() == MotionEvent.ACTION_UP) {
+			View view = activity.getCurrentFocus();
+			if (view != null) {
+				view.getLocationOnScreen(locationOfFoucsView);
+				getLocationOnScreen(locationOfWindow);
+				float x = ev.getX() + locationOfWindow[0];
+				float y = ev.getY() + locationOfWindow[1];
+				if (x < locationOfFoucsView[0] || x > locationOfFoucsView[0] + view.getWidth() || y < locationOfFoucsView[1] || y > locationOfFoucsView[1] + view.getHeight()) {
+					Util.dismissKeyboard(activity);
+				}
+			}
+		}
+		return ret;
 	}
 
 }
