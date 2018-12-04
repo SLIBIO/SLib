@@ -417,6 +417,40 @@ namespace slib
 		String16 operator()(double v) const noexcept;
 	};
 	
+	
+	class Variant;
+	
+	template <>
+	class Cast<Variant, String>
+	{
+	public:
+		String operator()(const Variant& var) const noexcept;
+	};
+
+	template <>
+	class Cast<Variant, String16>
+	{
+	public:
+		String16 operator()(const Variant& var) const noexcept;
+	};
+	
+	
+	class Json;
+	
+	template <>
+	class Cast<Json, String>
+	{
+	public:
+		String operator()(const Json& json) const noexcept;
+	};
+	
+	template <>
+	class Cast<Json, String16>
+	{
+	public:
+		String16 operator()(const Json& json) const noexcept;
+	};
+	
 }
 
 #endif

@@ -30,6 +30,7 @@
 #include "slib/core/endian.h"
 #include "slib/core/scoped.h"
 #include "slib/core/variant.h"
+#include "slib/core/json.h"
 #include "slib/core/cast.h"
 #include "slib/core/math.h"
 
@@ -8360,7 +8361,28 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return String16::fromDouble(v);
 	}
 
+	
+	String Cast<Variant, String>::operator()(const Variant& var) const noexcept
+	{
+		return var.getString();
+	}
 
+	String16 Cast<Variant, String16>::operator()(const Variant& var) const noexcept
+	{
+		return var.getString();
+	}
+
+	String Cast<Json, String>::operator()(const Json& json) const noexcept
+	{
+		return json.getString();
+	}
+	
+	String16 Cast<Json, String16>::operator()(const Json& json) const noexcept
+	{
+		return json.getString();
+	}
+
+	
 /**********************************************************
 				String Buffer
 **********************************************************/
