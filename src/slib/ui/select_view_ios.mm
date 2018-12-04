@@ -94,6 +94,8 @@ namespace slib
 			if (hFont != nil) {
 				[handle setFont:hFont];
 			}
+			[handle setBorderStyle:isBorder() ? UITextBorderStyleRoundedRect : UITextBorderStyleNone];
+
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -187,6 +189,23 @@ namespace slib
 			}
 		}
 	}
+	
+	void SelectView::_setBorder_NW(sl_bool flag)
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_setBorder_NW(flag);
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
+			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
+			[v setBorderStyle:flag ? UITextBorderStyleRoundedRect : UITextBorderStyleNone];
+		}
+	}
+	
 }
 
 #define DROP_ICON_WIDTH 20
@@ -246,7 +265,6 @@ namespace slib
 		
 		[self setDelegate:self];
 		[self setBackgroundColor:[UIColor whiteColor]];
-		[self setBorderStyle:UITextBorderStyleRoundedRect];
 		
 		// hide the caret and its blinking
 		[[self valueForKey:@"textInputTraits"] setValue:[UIColor clearColor] forKey:@"insertionPointColor"];

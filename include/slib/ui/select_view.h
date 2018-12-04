@@ -142,6 +142,8 @@ namespace slib
 		
 		void _setFont_NW(const Ref<Font>& font) override;
 		
+		void _setBorder_NW(sl_bool flag) override;
+		
 	protected:
 		AtomicList<String> m_values;
 		AtomicList<String> m_titles;

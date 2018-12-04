@@ -505,5 +505,11 @@ namespace slib
 	{
 	}
 #endif
+	
+#if !defined(SLIB_UI_IS_IOS)
+	void SelectView::_setBorder_NW(sl_bool flag)
+	{
+	}
+#endif
 
 }
