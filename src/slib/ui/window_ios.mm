@@ -597,20 +597,6 @@ namespace slib
 	}
 }
 
-UIView* iOS_Window_findFirstResponder(UIView* root)
-{
-	if (root.isFirstResponder) {
-		return root;
-	}
-	for (UIView* subView in root.subviews) {
-		UIView* v = iOS_Window_findFirstResponder(subView);
-		if (v != nil) {
-			return v;
-		}
-	}
-	return nil;
-}
-
 @implementation _priv_Slib_iOS_Window_RootViewController
 
 - (BOOL)prefersStatusBarHidden
@@ -642,7 +628,7 @@ UIView* iOS_Window_findFirstResponder(UIView* root)
 
 -(UIView*)findFirstResponderText
 {
-	UIView* view = iOS_Window_findFirstResponder(self.view);
+	UIView* view = slib::UIPlatform::findFirstResponder(self.view);
 	if (view != nil) {
 		if ([view isKindOfClass:[UITextField class]] || [view isKindOfClass:[UITextView class]]) {
 			return view;
@@ -680,7 +666,6 @@ CGRect _g_ui_keyboard_scrollview_original_frame;
 		parent = parent.superview;
 	}
 
-	self.view.transform = CGAffineTransformIdentity;
 	if (scroll != _g_ui_keyboard_scrollview) {
 		[self restoreKeyboardScrollView];
 	}
@@ -689,7 +674,7 @@ CGRect _g_ui_keyboard_scrollview_original_frame;
 	CGSize kbSize = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
 	CGRect rcScreen = [[UIScreen mainScreen] bounds];
 	CGRect rcTextLocal = view.bounds;
-	CGRect rcTextScreen = [view convertRect:rcTextLocal toView:nil];
+	CGRect rcTextScreen = [view convertRect:rcTextLocal toView:self.view];
 	CGFloat yText = rcTextScreen.origin.y + rcTextScreen.size.height + rcScreen.size.height / 100;
 	
 	if (scroll != nil) {
@@ -718,12 +703,15 @@ CGRect _g_ui_keyboard_scrollview_original_frame;
 				pos.y -= offset;
 				scroll.contentOffset = pos;
 			}
+			self.view.transform = CGAffineTransformIdentity;
 		} else {
 			CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, offset);
 			[UIView animateWithDuration:0.3 animations:^(void) {
 				self.view.transform = transform;
 			}];
 		}
+	} else {
+		self.view.transform = CGAffineTransformIdentity;
 	}
 }
 
@@ -761,6 +749,12 @@ CGRect _g_ui_keyboard_scrollview_original_frame;
 	[[NSNotificationCenter defaultCenter] removeObserver:self
 													name:UIKeyboardWillHideNotification
 												  object:nil];
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+	[super touchesEnded: touches withEvent: event];
+	[self.view endEditing:NO];
 }
 
 @end

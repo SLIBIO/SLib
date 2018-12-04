@@ -137,8 +137,9 @@ namespace slib
 					return UITextAutocapitalizationTypeSentences;
 			}
 		}
-		
-#define ADD_TOOL_BAR(handle) UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 0, 44)];\
+	
+#define ADD_TOOL_BAR(handle)
+#define ADD_TOOL_BAR1(handle) UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 0, 44)];\
 	toolbar.barTintColor = [UIColor colorWithRed:181.0/255 green:187.0/255 blue:193.0/255 alpha:1];\
 	UIBarButtonItem *flex = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:handle action:nil];\
 	UIBarButtonItem* barButtonDone;\

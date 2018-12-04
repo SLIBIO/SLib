@@ -169,6 +169,11 @@ namespace slib
 		}
 	}
 
+	void UI::dismissKeyboard()
+	{
+		Android::dismissKeyboard();
+	}
+
 	void _priv_AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this)
 	{
 		_priv_UIDispatcher::processCallbacks();

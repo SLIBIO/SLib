@@ -395,4 +395,10 @@ namespace slib
 		}
 	}
 
+#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
+	void UI::dismissKeyboard()
+	{
+	}
+#endif
+	
 }

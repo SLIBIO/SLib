@@ -234,7 +234,7 @@ namespace slib
 	CGContextBeginPath(context);
 	float pl = DROP_ICON_WIDTH * 0.2f;
 	float pr = DROP_ICON_WIDTH * 0.3f;
-	float ph = DROP_ICON_HEIGHT * 0.2f;
+	float ph = DROP_ICON_HEIGHT * 0.3f;
 	CGContextSetAllowsAntialiasing(context, YES);
 	CGContextSetShouldAntialias(context, YES);
 	CGContextMoveToPoint(context, pl, ph);
@@ -243,7 +243,7 @@ namespace slib
 	CGContextSetLineWidth(context, 2);
 	CGContextSetLineCap(context, kCGLineCapRound);
 	CGContextSetLineJoin(context, kCGLineJoinRound);
-	CGContextSetRGBStrokeColor(context, 0, 0, 0, 1);
+	CGContextSetRGBStrokeColor(context, 0.4, 0.4, 0.4, 1);
 	CGContextStrokePath(context);
 }
 

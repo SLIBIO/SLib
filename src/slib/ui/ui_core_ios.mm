@@ -141,6 +141,21 @@ namespace slib
 		}
 	}
 	
+	void UI::dismissKeyboard()
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				dismissKeyboard();
+			});
+			return;
+		}
+		
+		UIWindow* window = UIPlatform::getKeyWindow();
+		if (window != nil) {
+			[window endEditing:YES];
+		}
+	}
+	
 	void UIPlatform::runLoop(sl_uint32 level)
 	{
 		@autoreleasepool {
@@ -181,6 +196,20 @@ namespace slib
 			return window;
 		}
 		return UIPlatform::getMainWindow();
+	}
+	
+	UIView* UIPlatform::findFirstResponder(UIView* root)
+	{
+		if (root.isFirstResponder) {
+			return root;
+		}
+		for (UIView* subView in root.subviews) {
+			UIView* v = findFirstResponder(subView);
+			if (v != nil) {
+				return v;
+			}
+		}
+		return nil;
 	}
 	
 	CGFloat _g_slib_ios_global_scale_factor = 0;
