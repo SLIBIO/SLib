@@ -31,7 +31,6 @@
 					fontSize='4%sw'
 					height='6%sw'
 					gravity='left'
-					hintText='@string/server_hint'
 					border='false'
 					alignTop='true'
 				>
