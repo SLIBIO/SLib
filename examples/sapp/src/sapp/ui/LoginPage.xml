@@ -1,0 +1,123 @@
+<sapp>
+	<layout
+		type='page'
+		background='#f7f7f5'
+		>
+		
+		<linear
+			width='fill'
+			height='wrap'
+			centerVertical='true'
+		>
+			<image
+				src='@drawable/slib_icon'
+				width='50%sw'
+				centerHorizontal='true'
+				/>
+
+			<hlinear styles='login_section'>
+				<label
+					styles='label'
+					text='Job'
+					width='30%sw'
+					gravity='center'
+					centerVertical='true'
+					alignTop='true'
+					/>
+				
+				<select
+					name='selectJob'
+					width='*'
+					fontSize='4%sw'
+					height='6%sw'
+					gravity='left'
+					hintText='@string/server_hint'
+					border='false'
+					alignTop='true'
+				>
+					<item value='0' title='Student' selected='true'/>
+					<item value='1' title='Teacher'/>
+				</select>
+			</hlinear>
+
+			<view styles='border' />
+
+			<hlinear styles='login_section'>
+				<label
+					styles='label'
+					text='Email'
+					width='30%sw'
+					gravity='center'
+					centerVertical='true'
+					alignTop='true'
+					/>
+				
+				<edit
+					name='txtEmail'
+					styles='edit'
+					width='*'
+					gravity='left'
+					hintText='Input your email address'
+					border='false'
+					alignTop='true'
+					/>
+			</hlinear>
+
+			<view styles='border' />
+
+			<hlinear styles='login_section'>
+				<label
+					styles='label'
+					text='Password'
+					width='30%sw'
+					gravity='center'
+					centerVertical='true'
+					alignTop='true'
+					/>
+				
+				<password
+					name='txtPassword'
+					styles='edit'
+					width='*'
+					gravity='left'
+					hintText='Enter password'
+					border='false'
+					alignTop='true'
+					/>
+			</hlinear>
+
+			<view styles='border' />
+
+			<button
+				name='btnLogin'
+				margin='6%sw'
+				styles='button'
+				text='Login'
+				width='fill'
+				/>
+
+		</linear>
+
+ 	</layout>
+
+	<layout-style name='label' fontSize='4%sw' textColor='black' width='wrap' height='wrap'/>
+
+	<layout-style name='edit' fontSize='4%sw' textColor='black' height='6%sw'/>
+
+	<layout-style name='login_section' width='fill' height='wrap' paddingTop='3%sw' background='white' />
+
+	<layout-style name='border' width='fill' height='1px' background='#c0c0c0'/>
+
+	<layout-style
+		name='button'
+		fontSize='5%sw'
+		height='10%sw'
+		background='#408000'
+		textColor='white'
+		boundShape='round-rect'
+		boundRadius='1%sw'
+		border='false'
+		clipping='true'
+		/>
+
+</sapp>

@@ -39,4 +39,6 @@ public:
 	
 	void onClickWebView(View* view);
 
+	void onClickLoginPage(View* view);
+	
 };
