@@ -48,6 +48,8 @@
 
 *****************************************************************************/
 
+#include "url.h"
+
 #include "../core/string.h"
 #include "../core/content_type.h"
 #include "../core/hash_map.h"
@@ -311,6 +313,12 @@ namespace slib
 		 */
 		sl_reg parseRequestPacket(const void* packet, sl_size size);
 		
+		template <class KT, class VT, class KEY_COMPARE>
+		static String buildFormUrlEncodedFromMap(const Map<KT, VT, KEY_COMPARE>& map);
+		
+		template <class KT, class VT, class HASH, class KEY_COMPARE>
+		static String buildFormUrlEncodedFromHashMap(const HashMap<KT, VT, HASH, KEY_COMPARE>& map);
+		
 	protected:
 		HttpMethod m_method;
 		String m_methodText;
@@ -425,6 +433,8 @@ namespace slib
 	};
 	
 }
+
+#include "detail/http.inc"
 
 #endif
 

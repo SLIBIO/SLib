@@ -39,55 +39,67 @@ namespace slib
 		
 		static Ref<UrlRequest> send(const String& url, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
-		static Ref<UrlRequest> send(const String& url, const HashMap<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete);
+		static Ref<UrlRequest> send(const String& url, const HttpHeaderMap& headers, const Function<void(UrlRequest*)>& onComplete);
 		
-		static Ref<UrlRequest> send(const String& url, const HashMap<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
+		static Ref<UrlRequest> send(const String& url, const HttpHeaderMap& headers, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
 		static Ref<UrlRequest> send(HttpMethod method, const String& url, const Function<void(UrlRequest*)>& onComplete);
 		
 		static Ref<UrlRequest> send(HttpMethod method, const String& url, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
-		static Ref<UrlRequest> send(HttpMethod method, const String& url, const HashMap<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
+		static Ref<UrlRequest> send(HttpMethod method, const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
 		
-		static Ref<UrlRequest> send(HttpMethod method, const String& url, const HashMap<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
+		static Ref<UrlRequest> send(HttpMethod method, const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
-		static Ref<UrlRequest> sendJson(HttpMethod method, const String& url, const HashMap<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete);
+		static Ref<UrlRequest> send(HttpMethod method, const String& url, const HttpHeaderMap& headers, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
 		
-		static Ref<UrlRequest> sendJson(HttpMethod method, const String& url, const HashMap<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
+		static Ref<UrlRequest> send(HttpMethod method, const String& url, const HttpHeaderMap& headers, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
+		
+		static Ref<UrlRequest> sendJson(HttpMethod method, const String& url, const Json& json, const Function<void(UrlRequest*)>& onComplete);
+		
+		static Ref<UrlRequest> sendJson(HttpMethod method, const String& url, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
+		
+		static Ref<UrlRequest> sendJson(HttpMethod method, const String& url, const HttpHeaderMap& headers, const Json& json, const Function<void(UrlRequest*)>& onComplete);
+		
+		static Ref<UrlRequest> sendJson(HttpMethod method, const String& url, const HttpHeaderMap& headers, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
 		static Ref<UrlRequest> post(const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
 		
 		static Ref<UrlRequest> post(const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
-		static Ref<UrlRequest> post(const String& url, const HashMap<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
+		static Ref<UrlRequest> post(const String& url, const HttpHeaderMap& headers, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
 		
-		static Ref<UrlRequest> post(const String& url, const HashMap<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
+		static Ref<UrlRequest> post(const String& url, const HttpHeaderMap& headers, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
 		static Ref<UrlRequest> postJson(const String& url, const Json& json, const Function<void(UrlRequest*)>& onComplete);
 		
 		static Ref<UrlRequest> postJson(const String& url, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
-		static Ref<UrlRequest> postJson(const String& url, const HashMap<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete);
+		static Ref<UrlRequest> postJson(const String& url, const HttpHeaderMap& headers, const Json& json, const Function<void(UrlRequest*)>& onComplete);
 		
-		static Ref<UrlRequest> postJson(const String& url, const HashMap<String, Variant>& params, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
+		static Ref<UrlRequest> postJson(const String& url, const HttpHeaderMap& headers, const Json& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher);
 		
 		static Ref<UrlRequest> sendSynchronous(const String& url);
 		
-		static Ref<UrlRequest> sendSynchronous(const String& url, const HashMap<String, Variant>& params);
+		static Ref<UrlRequest> sendSynchronous(const String& url, const HttpHeaderMap& headers);
 		
 		static Ref<UrlRequest> sendSynchronous(HttpMethod method, const String& url);
 		
-		static Ref<UrlRequest> sendSynchronous(HttpMethod method, const String& url, const HashMap<String, Variant>& params, const Variant& body);
+		static Ref<UrlRequest> sendSynchronous(HttpMethod method, const String& url, const Variant& body);
 		
-		static Ref<UrlRequest> sendJsonSynchronous(HttpMethod method, const String& url, const HashMap<String, Variant>& params, const Json& json);
+		static Ref<UrlRequest> sendSynchronous(HttpMethod method, const String& url, const HttpHeaderMap& headers, const Variant& body);
+		
+		static Ref<UrlRequest> sendJsonSynchronous(HttpMethod method, const String& url, const Json& json);
+		
+		static Ref<UrlRequest> sendJsonSynchronous(HttpMethod method, const String& url, const HttpHeaderMap& headers, const Json& json);
 		
 		static Ref<UrlRequest> postSynchronous(const String& url, const Variant& body);
 		
-		static Ref<UrlRequest> postSynchronous(const String& url, const HashMap<String, Variant>& params, const Variant& body);
+		static Ref<UrlRequest> postSynchronous(const String& url, const HttpHeaderMap& headers, const Variant& body);
 		
 		static Ref<UrlRequest> postJsonSynchronous(const String& url, const Json& json);
 		
-		static Ref<UrlRequest> postJsonSynchronous(const String& url, const HashMap<String, Variant>& params, const Json& json);
+		static Ref<UrlRequest> postJsonSynchronous(const String& url, const HttpHeaderMap& headers, const Json& json);
 		
 	protected:
 		static Ref<UrlRequest> _create(const UrlRequestParam& param, const String& url);

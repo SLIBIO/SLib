@@ -24,7 +24,6 @@
 
 #include "slib/network/url.h"
 #include "slib/core/json.h"
-#include "slib/core/string_buffer.h"
 #include "slib/core/thread_pool.h"
 #include "slib/core/safe_static.h"
 #include "slib/core/event.h"
@@ -76,6 +75,11 @@ namespace slib
 	{
 	}
 	
+	void UrlRequestParam::setRequestBodyAsMemory(const Memory &mem)
+	{
+		requestBody = mem;
+	}
+	
 	void UrlRequestParam::setRequestBodyAsString(const String& str)
 	{
 		requestBody = str.toMemory();
@@ -94,6 +98,39 @@ namespace slib
 			requestBody.setNull();
 		}
 	}
+	
+	void UrlRequestParam::setRequestBody(const Variant& varBody)
+	{
+		if (varBody.isNotNull()) {
+			if (varBody.isObject()) {
+				Ref<Referable> obj = varBody.getObject();
+				if (obj.isNotNull()) {
+					if (CMap<String, Variant>* map = CastInstance< CMap<String, Variant> >(obj.get())) {
+						setRequestBodyAsMap(Map<String, Variant>(map));
+					} else if (CHashMap<String, Variant>* hashMap = CastInstance< CHashMap<String, Variant> >(obj.get())) {
+						setRequestBodyAsHashMap(HashMap<String, Variant>(hashMap));
+					} else if (CMap<String, String>* smap = CastInstance< CMap<String, String> >(obj.get())) {
+						setRequestBodyAsMap(Map<String, String>(smap));
+					} else if (CHashMap<String, String>* shashMap = CastInstance< CHashMap<String, String> >(obj.get())) {
+						setRequestBodyAsHashMap(HashMap<String, String>(shashMap));
+					} else if (IsInstanceOf< CList<Json> >(obj.get()) || IsInstanceOf< CHashMap<String, Json> >(obj.get()) || IsInstanceOf< CList< HashMap<String, Json> > >(obj.get()) || IsInstanceOf< CMap<String, Json> >(obj.get()) || IsInstanceOf< CList< Map<String, Json> > >(obj.get())) {
+						requestBody = varBody.toJsonString().toMemory();
+					} else if (XmlDocument* xml = CastInstance<XmlDocument>(obj.get())) {
+						requestBody = xml->toString().toMemory();
+					} else if (CMemory* mem = CastInstance<CMemory>(obj.get())) {
+						requestBody = mem;
+					}
+				} else {
+					requestBody.setNull();
+				}
+			} else {
+				requestBody = varBody.getString().toMemory();
+			}
+		} else {
+			requestBody.setNull();
+		}
+	}
+	
 	
 	SLIB_DEFINE_OBJECT(UrlRequest, Object)
 	
@@ -466,62 +503,6 @@ namespace slib
 	void UrlRequest::_runCallback(const Function<void(UrlRequest*)>& callback)
 	{
 		callback(this);
-	}
-	
-	String UrlRequest::_buildParameters(const Map<String, Variant>& params)
-	{
-		StringBuffer sb;
-		sl_bool flagFirst = sl_true;
-		for (auto& pair : params) {
-			if (!flagFirst) {
-				sb.addStatic("&", 1);
-			}
-			flagFirst = sl_false;
-			sb.add(pair.key);
-			sb.addStatic("=", 1);
-			sb.add(Url::encodeUriComponentByUTF8(pair.value.getString()));
-		}
-		return sb.merge();
-	}
-	
-	String UrlRequest::_buildParameters(const HashMap<String, Variant>& params)
-	{
-		StringBuffer sb;
-		sl_bool flagFirst = sl_true;
-		for (auto& pair : params) {
-			if (!flagFirst) {
-				sb.addStatic("&", 1);
-			}
-			flagFirst = sl_false;
-			sb.add(pair.key);
-			sb.addStatic("=", 1);
-			sb.add(Url::encodeUriComponentByUTF8(pair.value.getString()));
-		}
-		return sb.merge();
-	}
-	
-	Memory UrlRequest::_buildRequestBody(const Variant& varBody)
-	{
-		Memory body;
-		if (varBody.isNotNull()) {
-			if (varBody.isObject()) {
-				Ref<Referable> obj = varBody.getObject();
-				if (obj.isNotNull()) {
-					if (CMap<String, Variant>* map = CastInstance< CMap<String, Variant> >(obj.get())) {
-						body = _buildParameters(map).toMemory();
-					} else if (CHashMap<String, Variant>* hashMap = CastInstance< CHashMap<String, Variant> >(obj.get())) {
-						body = _buildParameters(hashMap).toMemory();
-					} else if (XmlDocument* xml = CastInstance<XmlDocument>(obj.get())) {
-						body = xml->toString().toMemory();
-					} else if (CMemory* mem = CastInstance<CMemory>(obj.get())) {
-						body = mem;
-					}
-				}
-			} else {
-				body = varBody.getString().toMemory();
-			}
-		}
-		return body;
 	}
 	
 }
