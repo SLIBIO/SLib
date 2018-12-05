@@ -687,6 +687,9 @@ namespace slib
 		}
 		NODE* node = RedBlackTree::find(*pEntry, key, m_compare);
 		if (node) {
+			if (outValue) {
+				*outValue = Move(node->value);
+			}
 			_unlinkNode(node);
 			RedBlackTree::removeNode(pEntry, m_table.count, node);
 			return sl_true;
