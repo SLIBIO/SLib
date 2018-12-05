@@ -50,6 +50,7 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 
 	private Activity activity;
 	public long instance;
+	private boolean flagClosed = false;
 	private int backgroundColor;
 	private boolean flagFullScreen;
 	private int mLeft, mTop, mRight, mBottom;
@@ -105,6 +106,10 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 
 	public void close() {
 		try {
+			if (flagClosed) {
+				return;
+			}
+			flagClosed = true;
 			instance = 0;
 			if (activity instanceof SlibActivity) {
 				if (((SlibActivity) activity).onCloseWindow(this)) {
