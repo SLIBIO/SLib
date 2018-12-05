@@ -1488,6 +1488,27 @@ namespace slib
 						}
 					}
 				}
+
+				sl_bool flagParentLinear = sl_false;
+				sl_bool flagParentHlinear = sl_false;
+				if (params->parentResourceItem && params->parentResourceItem->attrsLinear.isNotNull()) {
+					if (params->parentResourceItem->attrsLinear->orientation.value == LayoutOrientation::Horizontal) {
+						flagParentHlinear = sl_true;
+					} else {
+						flagParentLinear = sl_true;
+					}
+				}
+				if (!flagParentHlinear && !(attr->left.flagDefined)) {
+					if (attr->leftMode == PositionMode::Free && attr->rightMode == PositionMode::Free) {
+						attr->leftMode = PositionMode::ParentEdge;
+					}
+				}
+				if (!flagParentLinear && !(attr->top.flagDefined)) {
+					if (attr->topMode == PositionMode::Free && attr->topMode == PositionMode::Free) {
+						attr->topMode = PositionMode::ParentEdge;
+					}
+				}
+
 			} else if (op == OP_GENERATE_CPP) {
 				if (attr->leftMode == PositionMode::CenterInParent) {
 					params->sbDefineInit->add(String::format("%s%s->setCenterHorizontal(slib::UIUpdateMode::Init);%n", strTab, name, attr->leftReferingView));
