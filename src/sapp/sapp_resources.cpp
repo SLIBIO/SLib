@@ -188,9 +188,6 @@ namespace slib
 		if (iconHeight.flagDefined) {
 			return sl_true;
 		}
-		if (textColor.flagDefined) {
-			return sl_true;
-		}
 		return sl_false;
 	}
 

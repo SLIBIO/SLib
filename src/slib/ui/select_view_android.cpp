@@ -46,6 +46,10 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(applyList, "_applyList", "(Landroid/view/View;[Ljava/lang/String;)V");
 		SLIB_JNI_STATIC_METHOD(getSelectedIndex, "_getSelectedIndex", "(Landroid/view/View;)I");
 		SLIB_JNI_STATIC_METHOD(select, "_select", "(Landroid/view/View;I)V");
+		SLIB_JNI_STATIC_METHOD(setAlignment, "_setAlignment", "(Landroid/view/View;I)Z");
+		SLIB_JNI_STATIC_METHOD(setTextColor, "_setTextColor", "(Landroid/view/View;I)Z");
+		SLIB_JNI_STATIC_METHOD(setBorder, "_setBorder", "(Landroid/view/View;Z)Z");
+		SLIB_JNI_STATIC_METHOD(setBackgroundColor, "_setBackgroundColor", "(Landroid/view/View;I)Z");
 		SLIB_JNI_STATIC_METHOD(setFont, "_setFont", "(Landroid/view/View;Lslib/platform/android/ui/UiFont;)Z");
 
 		SLIB_JNI_NATIVE(nativeOnSelect, "nativeOnSelect", "(JI)V", _priv_JAndroidSelectView_nativeOnSelect);
@@ -98,6 +102,11 @@ namespace slib
 
 				((_priv_SelectView*)this)->_copyItems(handle);
 
+				JAndroidSelectView::setAlignment.callBoolean(sl_null, handle, m_textAlignment.value);
+				JAndroidSelectView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
+				JAndroidSelectView::setBorder.callBoolean(sl_null, handle, isBorder());
+				JAndroidSelectView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
+
 				Ref<Font> font = getFont();
 				jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 				if (jfont) {
@@ -145,6 +154,38 @@ namespace slib
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			((_priv_SelectView*)this)->_copyItems(handle);
+		}
+	}
+
+	void SelectView::_setTextAlignment_NW(Alignment align)
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			JAndroidSelectView::setAlignment.callBoolean(sl_null, handle, align.value);
+		}
+	}
+
+	void SelectView::_setTextColor_NW(const Color& color)
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			JAndroidSelectView::setTextColor.callBoolean(sl_null, handle, color.getARGB());
+		}
+	}
+
+	void SelectView::_setBorder_NW(sl_bool flag)
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			JAndroidSelectView::setBorder.callBoolean(sl_null, handle, flag);
+		}
+	}
+
+	void SelectView::_setBackgroundColor_NW(const Color& color)
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			JAndroidSelectView::setBackgroundColor.callBoolean(sl_null, handle, color.getARGB());
 		}
 	}
 

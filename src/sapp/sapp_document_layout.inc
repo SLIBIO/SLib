@@ -2614,7 +2614,8 @@ namespace slib
 		}
 		
 		LAYOUT_CONTROL_COLOR_ATTR(textColor, setTextColor)
-		
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(gravity, setGravity)
+
 		LAYOUT_CONTROL_SET_NATIVE_WIDGET
 		
 		if (op == OP_PARSE) {

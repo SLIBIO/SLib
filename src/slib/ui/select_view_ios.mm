@@ -80,6 +80,17 @@ namespace slib
 			v.text = _getItemTitle(row);
 			[v->m_picker selectRow:row inComponent:0 animated:NO];
 		}
+		
+		static NSTextAlignment translateAlignment(Alignment _align)
+		{
+			Alignment align = _align & Alignment::HorizontalMask;
+			if (align == Alignment::Center) {
+				return NSTextAlignmentCenter;
+			} else if (align == Alignment::Right) {
+				return NSTextAlignmentRight;
+			}
+			return NSTextAlignmentLeft;
+		}
 	};
 	
 	Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
@@ -89,13 +100,17 @@ namespace slib
 		if (handle != nil) {
 			((_priv_SelectView*)this)->_selectItem(handle, m_indexSelected);
 			
+			[handle setTextAlignment:(_priv_SelectView::translateAlignment(m_textAlignment))];
+			[handle setTextColor:(GraphicsPlatform::getUIColorFromColor(m_textColor))];
+			[handle setBorderStyle:isBorder() ? UITextBorderStyleRoundedRect : UITextBorderStyleNone];
+			Color backColor = getBackgroundColor();
+			[handle setBackgroundColor:(backColor.isZero() ? nil : GraphicsPlatform::getUIColorFromColor(backColor))];
+			
 			Ref<Font> font = getFont();
 			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
 			if (hFont != nil) {
 				[handle setFont:hFont];
 			}
-			[handle setBorderStyle:isBorder() ? UITextBorderStyleRoundedRect : UITextBorderStyleNone];
-
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -170,6 +185,72 @@ namespace slib
 		}
 	}
 	
+	void SelectView::_setTextAlignment_NW(Alignment align)
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_setTextAlignment_NW(align);
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
+			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
+			[v setTextAlignment:(_priv_SelectView::translateAlignment(align))];
+		}
+	}
+	
+	void SelectView::_setTextColor_NW(const Color& color)
+	{
+		if (![NSThread isMainThread]) {
+			Color _color = color;
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_setTextColor_NW(_color);
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
+			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
+			[v setTextColor:(GraphicsPlatform::getUIColorFromColor(color))];
+		}
+	}
+	
+	void SelectView::_setBorder_NW(sl_bool flag)
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_setBorder_NW(flag);
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
+			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
+			[v setBorderStyle:flag ? UITextBorderStyleRoundedRect : UITextBorderStyleNone];
+		}
+	}
+	
+	void SelectView::_setBackgroundColor_NW(const Color& color)
+	{
+		if (![NSThread isMainThread]) {
+			Color _color = color;
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_setBackgroundColor_NW(_color);
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
+			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
+			[v setBackgroundColor:(color.isZero() ? nil : GraphicsPlatform::getUIColorFromColor(color))];
+		}
+	}
+	
 	void SelectView::_setFont_NW(const Ref<Font>& font)
 	{
 		if (![NSThread isMainThread]) {
@@ -187,22 +268,6 @@ namespace slib
 			if (hFont != nil) {
 				[v setFont:hFont];
 			}
-		}
-	}
-	
-	void SelectView::_setBorder_NW(sl_bool flag)
-	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setBorder_NW(flag);
-			});
-			return;
-		}
-		
-		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
-			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
-			[v setBorderStyle:flag ? UITextBorderStyleRoundedRect : UITextBorderStyleNone];
 		}
 	}
 	

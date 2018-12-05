@@ -450,6 +450,7 @@ namespace slib
 		SAppDrawableValue leftIcon;
 		SAppDrawableValue rightIcon;
 		SAppColorValue textColor;
+		SAppAlignmentValue gravity;
 		
 		CList<SAppLayoutSelectItem> items;
 		

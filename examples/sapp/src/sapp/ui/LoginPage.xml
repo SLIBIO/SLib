@@ -22,7 +22,6 @@
 					width='30%sw'
 					gravity='center'
 					centerVertical='true'
-					alignTop='true'
 					/>
 				
 				<select
@@ -30,9 +29,8 @@
 					width='*'
 					fontSize='4%sw'
 					height='6%sw'
-					gravity='left'
 					border='false'
-					alignTop='true'
+					centerVertical='true'
 				>
 					<item value='0' title='Student' selected='true'/>
 					<item value='1' title='Teacher'/>
@@ -48,7 +46,6 @@
 					width='30%sw'
 					gravity='center'
 					centerVertical='true'
-					alignTop='true'
 					/>
 				
 				<edit
@@ -58,7 +55,7 @@
 					gravity='left'
 					hintText='Input your email address'
 					border='false'
-					alignTop='true'
+					centerVertical='true'
 					/>
 			</hlinear>
 
@@ -71,7 +68,6 @@
 					width='30%sw'
 					gravity='center'
 					centerVertical='true'
-					alignTop='true'
 					/>
 				
 				<password
@@ -81,7 +77,7 @@
 					gravity='left'
 					hintText='Enter password'
 					border='false'
-					alignTop='true'
+					centerVertical='true'
 					/>
 			</hlinear>
 

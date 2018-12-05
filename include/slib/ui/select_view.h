@@ -102,6 +102,11 @@ namespace slib
 		virtual void setRightIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		
+
+		Alignment getGravity();
+		
+		virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
+
 		Color getTextColor();
 		
 		virtual void setTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -140,9 +145,15 @@ namespace slib
 		
 		void _setItemTitle_NW(sl_uint32 index, const String& title);
 		
-		void _setFont_NW(const Ref<Font>& font) override;
-		
+		void _setTextAlignment_NW(Alignment align);
+
+		void _setTextColor_NW(const Color& color);
+
 		void _setBorder_NW(sl_bool flag) override;
+		
+		void _setBackgroundColor_NW(const Color& color) override;
+
+		void _setFont_NW(const Ref<Font>& font) override;
 		
 	protected:
 		AtomicList<String> m_values;
@@ -154,6 +165,7 @@ namespace slib
 		AtomicRef<Drawable> m_rightIcon;
 		int m_clickedIconNo;
 		
+		Alignment m_textAlignment;
 		Color m_textColor;
 		
 	};

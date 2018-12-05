@@ -111,6 +111,7 @@ namespace slib
 		setCreatingNativeWidget(sl_true);
 		setUsingFont(sl_true);
 		setBorder(sl_true, UIUpdateMode::Init);
+		setBackgroundColor(Color::White, UIUpdateMode::Init);
 		setSavingCanvasState(sl_false);
 		
 		m_indexSelected = 0;
@@ -118,6 +119,7 @@ namespace slib
 		m_iconSize.x = 0;
 		m_iconSize.y = 0;
 		
+		m_textAlignment = Alignment::MiddleLeft;
 		m_textColor = Color::Black;
 		
 		_priv_SelectView_DefaultResources* def = _priv_SelectView_getDefaultResources();
@@ -325,6 +327,21 @@ namespace slib
 		invalidate(mode);
 	}
 	
+	Alignment SelectView::getGravity()
+	{
+		return m_textAlignment;
+	}
+	
+	void SelectView::setGravity(Alignment align, UIUpdateMode mode)
+	{
+		m_textAlignment = align;
+		if (isNativeWidget()) {
+			_setTextAlignment_NW(align);
+		} else {
+			invalidate(mode);
+		}
+	}
+	
 	Color SelectView::getTextColor()
 	{
 		return m_textColor;
@@ -333,7 +350,11 @@ namespace slib
 	void SelectView::setTextColor(const Color& color, UIUpdateMode mode)
 	{
 		m_textColor = color;
-		invalidate(mode);
+		if (isNativeWidget()) {
+			_setTextColor_NW(color);
+		} else {
+			invalidate(mode);
+		}
 	}
 	
 	void SelectView::onDraw(Canvas* canvas)
@@ -506,8 +527,20 @@ namespace slib
 	}
 #endif
 	
-#if !defined(SLIB_UI_IS_IOS)
+#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
+	void SelectView::_setTextAlignment_NW(Alignment align)
+	{
+	}
+	
+	void SelectView::_setTextColor_NW(const Color& color)
+	{
+	}
+	
 	void SelectView::_setBorder_NW(sl_bool flag)
+	{
+	}
+	
+	void SelectView::_setBackgroundColor_NW(const Color& color)
 	{
 	}
 #endif
