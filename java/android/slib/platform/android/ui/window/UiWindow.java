@@ -112,7 +112,7 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 				}
 			}
 			ViewParent parent = getParent();
-			if (parent != null && parent instanceof ViewGroup) {
+			if (parent instanceof ViewGroup) {
 				((ViewGroup) parent).removeView(this);
 			}
 		} catch (Exception e) {

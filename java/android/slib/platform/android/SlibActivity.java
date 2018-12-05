@@ -88,7 +88,7 @@ public class SlibActivity extends Activity {
 			return;
 		}
 
-		if (windows.isEmpty()) {
+		if (windows.isEmpty() || windows.size() == 1) {
 			super.onBackPressed();
 			return;
 		}
