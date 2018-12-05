@@ -263,6 +263,7 @@ public class UiSelectView extends Spinner implements IView {
 	Paint paintFill;
 	Paint paintDropdown;
 	Paint paintText;
+	Rect boundsText = new Rect();
 
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -330,12 +331,13 @@ public class UiSelectView extends Spinner implements IView {
 			paintText.setColor(textColor);
 			paintText.setTypeface(font.getTypeface());
 			paintText.setTextSize(font.getSize());
-			float y = (h + font.getSize()) / 2;
+			paintText.getTextBounds(text, 0, text.length(), boundsText);
+			float y = (h + boundsText.height()) / 2;
 			int align = textAlignment & Gravity.HORIZONTAL_GRAVITY_MASK;
 			if (align == Gravity.LEFT) {
 				canvas.drawText(text, border ? h / 10 : 2, y, paintText);
 			} else {
-				float tw = paintText.measureText(text);
+				float tw = boundsText.width();
 				if (align == Gravity.RIGHT) {
 					canvas.drawText(text, w - h - tw, y, paintText);
 				} else {
