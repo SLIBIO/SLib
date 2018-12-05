@@ -49,11 +49,7 @@ public class UiSelectView extends Spinner implements IView {
 	public void setInstance(long instance) { this.mInstance = instance; }
 	private int mLeft, mTop, mRight, mBottom;
 	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
-
-	public void setUIFrame(int left, int top, int right, int bottom) {
-		mLeft = left; mTop = top; mRight = right; mBottom = bottom;
-		setPadding(2, 0, (bottom - top) + 2, 0);
-	}
+	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
 
 	public static UiSelectView _create(Context context)
 	{
@@ -206,7 +202,7 @@ public class UiSelectView extends Spinner implements IView {
 		}
 	}
 
-	int textAlignment = Gravity.CENTER;
+	int textAlignment = Gravity.LEFT;
 	int textColor = Color.BLACK;
 	boolean border = true;
 	int backgroundColor = 0;
@@ -218,6 +214,7 @@ public class UiSelectView extends Spinner implements IView {
 		this.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				invalidate();
 				if (position < 0) {
 					position = 0;
 				}
@@ -229,31 +226,25 @@ public class UiSelectView extends Spinner implements IView {
 			}
 		});
 		setBackgroundColor(0);
+		setPadding(2, 0,  2, 0);
 	}
 	
 	class MyAdapter extends ArrayAdapter<String> {
 		
 		MyAdapter(String[] items) {
-			super(UiSelectView.this.getContext(), R.layout.slib_spinner_default_item, items);
+			super(UiSelectView.this.getContext(), android.R.layout.simple_spinner_item, items);
 			setDropDownViewResource(R.layout.slib_spinner_default_dropdown_item);
 		}
-		
+
+		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			View ret = super.getView(position, convertView, parent);
-			if (font != null) {
-				if (ret != null) {
-					if (ret instanceof TextView) {
-						TextView tv = (TextView)ret;
-						tv.setGravity(textAlignment);
-						tv.setTextColor(textColor);
-						tv.setTypeface(font.getTypeface());
-						tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, font.getSize());
-					}
-				}
+			if (convertView != null) {
+				return convertView;
 			}
-			return ret;
+			return new View(parent.getContext());
 		}
-		
+
+		@Override
 		public View getDropDownView(int position, View convertView, ViewGroup parent) {
 			View ret = super.getDropDownView(position, convertView, parent);
 			if (font != null) {
@@ -271,6 +262,7 @@ public class UiSelectView extends Spinner implements IView {
 	Paint paintBorder;
 	Paint paintFill;
 	Paint paintDropdown;
+	Paint paintText;
 
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -292,8 +284,16 @@ public class UiSelectView extends Spinner implements IView {
 			paintDropdown.setStyle(Paint.Style.STROKE);
 			paintDropdown.setStrokeCap(Paint.Cap.ROUND);
 		}
+		if (paintText == null) {
+			paintText = new Paint();
+			paintText.setAntiAlias(true);
+			paintDropdown.setStyle(Paint.Style.STROKE);
+			paintDropdown.setStrokeCap(Paint.Cap.ROUND);
+		}
+
 		int w = getWidth();
 		int h = getHeight();
+
 		paintFill.setColor(backgroundColor);
 		if (border) {
 			if (Build.VERSION.SDK_INT >= 21) {
@@ -324,6 +324,26 @@ public class UiSelectView extends Spinner implements IView {
 		int y2 = h2 + h / 7;
 		canvas.drawLine(x1, y1, x2, y2, paintDropdown);
 		canvas.drawLine(x2, y2, x3, y1, paintDropdown);
+
+		String text = (String)(getSelectedItem());
+		if (text != null && text.length() > 0) {
+			paintText.setColor(textColor);
+			paintText.setTypeface(font.getTypeface());
+			paintText.setTextSize(font.getSize());
+			float y = (h + font.getSize()) / 2;
+			int align = textAlignment & Gravity.HORIZONTAL_GRAVITY_MASK;
+			if (align == Gravity.LEFT) {
+				canvas.drawText(text, border ? h / 10 : 2, y, paintText);
+			} else {
+				float tw = paintText.measureText(text);
+				if (align == Gravity.RIGHT) {
+					canvas.drawText(text, w - h - tw, y, paintText);
+				} else {
+					canvas.drawText(text, (w - tw) / 2, y, paintText);
+				}
+			}
+		}
+
 	}
 
 	@Override

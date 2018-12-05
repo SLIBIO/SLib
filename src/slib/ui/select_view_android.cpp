@@ -100,8 +100,6 @@ namespace slib
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
 
-				((_priv_SelectView*)this)->_copyItems(handle);
-
 				JAndroidSelectView::setAlignment.callBoolean(sl_null, handle, m_textAlignment.value);
 				JAndroidSelectView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
 				JAndroidSelectView::setBorder.callBoolean(sl_null, handle, isBorder());
@@ -112,6 +110,8 @@ namespace slib
 				if (jfont) {
 					JAndroidSelectView::setFont.callBoolean(sl_null, handle, jfont);
 				}
+
+				((_priv_SelectView*)this)->_copyItems(handle);
 			}
 		}
 		return ret;
