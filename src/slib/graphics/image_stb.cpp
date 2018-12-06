@@ -44,19 +44,58 @@ namespace slib
 	Ref<Image> Image::loadSTB(const void* content, sl_size size)
 	{
 		Ref<Image> ret;
-		int width;
-		int height;
-		int channels;
-		unsigned char *map = stbi_load_from_memory((stbi_uc*)content, (int)size, &width, &height, &channels, 4);
-		if (map) {
-			ret = Image::create(width, height);
-			if (ret.isNotNull()) {
-				Base::copyMemory(ret->getColors(), map, width * height * 4);
+		int width = 0;
+		int height = 0;
+		int nComponents = 0;
+		unsigned char * colors = stbi_load_from_memory((stbi_uc*)content, (int)size, &width, &height, &nComponents, 4);
+		if (colors) {
+			if (nComponents == 4 && width > 0 && height > 0) {
+				ret = Image::create(width, height);
+				if (ret.isNotNull()) {
+					Base::copyMemory(ret->getColors(), colors, width * height * 4);
+				}
 			}
-			stbi_image_free(map);
+			stbi_image_free(colors);
 		}
 		return ret;
 	}
 
+	Ref<AnimationDrawable> Image::loadSTB_GIF(const void* content, sl_size size)
+	{
+		Ref<AnimationDrawable> ret;
+		int* delays = sl_null;
+		int width = 0;
+		int height = 0;
+		int nComponents = 0;
+		int nLayers = 0;
+		unsigned char* colors = stbi_load_gif_from_memory((stbi_uc*)content, (int)size, &delays, &width, &height, &nLayers, &nComponents, 4);
+		if (colors) {
+			if (nComponents == 4 && width > 0 && height > 0 && nLayers > 0) {
+				ret = new AnimationDrawable;
+				if (ret.isNotNull()) {
+					int duration = 0;
+					int size = width * height * 4;
+					for (int i = 0; i < nLayers; i++) {
+						Ref<Image> image = Image::create(width, height);
+						if (image.isNotNull()) {
+							Base::copyMemory(image->getColors(), colors + size * i, size);
+						}
+						ret->addDrawable(image);
+						if (delays[i]) {
+							duration += delays[i];
+						} else {
+							duration += 100;
+						}
+					}
+					ret->setAnimationDuration((float)duration / 1000.0f);
+				}
+			}
+			stbi_image_free(colors);
+		}
+		if (delays) {
+			stbi_image_free(delays);
+		}
+		return ret;
+	}
+	
 }
-

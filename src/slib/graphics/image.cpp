@@ -1278,6 +1278,9 @@ namespace slib
 		if (size > 12 && mem[0] == 'B' && mem[1] == 'M') {
 			return ImageFileType::BMP;
 		}
+		if (size > 4 && mem[0] == 'G' && mem[1] == 'I' && mem[2] == 'F' && mem[3] == '8') {
+			return ImageFileType::GIF;
+		}
 		if (size > 4 && mem[0] == 'D' && mem[1] == 'D' && mem[2] == 'S' && mem[3] == ' ') {
 			return ImageFileType::DDS;
 		}
@@ -1311,26 +1314,64 @@ namespace slib
 
 	Ref<Image> Image::loadFromFile(const String& filePath, sl_uint32 width, sl_uint32 height)
 	{
-		Ref<Image> ret;
 		Memory mem = File::readAllBytes(filePath);
 		if (mem.isNotNull()) {
-			ret = loadFromMemory(mem, width, height);
+			return loadFromMemory(mem, width, height);
 		}
-		return ret;
+		return sl_null;
 	}
 
 	Ref<Image> Image::loadFromAsset(const String& path, sl_uint32 width, sl_uint32 height)
 	{
-		Ref<Image> ret;
 		Memory mem = Assets::readAllBytes(path);
 		if (mem.isNotNull()) {
 			return loadFromMemory(mem, width, height);
 		}
 #if defined(SLIB_PLATFORM_IS_APPLE)
-		return Image::create(Bitmap::loadFromAsset(path));
-#else
-		return sl_null;
+		Ref<Image> ret = Image::create(Bitmap::loadFromAsset(path));
+		if (ret.isNotNull()) {
+			if (width == 0 || height == 0) {
+				return ret;
+			}
+			if (ret->getWidth() != width && ret->getHeight() != height) {
+				ret = ret->scale(width, height);
+			}
+			return ret;
+		}
 #endif
+		return sl_null;
+	}
+	
+	Ref<AnimationDrawable> Image::loadAnimationFromMemory(const void* mem, sl_size size)
+	{
+		ImageFileType type = getFileType(mem, size);
+		if (type == ImageFileType::GIF) {
+			return loadSTB_GIF(mem, size);
+		}
+		return sl_null;
+	}
+	
+	Ref<AnimationDrawable> Image::loadAnimationFromMemory(Memory mem)
+	{
+		return loadAnimationFromMemory(mem.getData(), mem.getSize());
+	}
+	
+	Ref<AnimationDrawable> Image::loadAnimationFromFile(const String& filePath)
+	{
+		Memory mem = File::readAllBytes(filePath);
+		if (mem.isNotNull()) {
+			return loadAnimationFromMemory(mem);
+		}
+		return sl_null;
+	}
+	
+	Ref<AnimationDrawable> Image::loadAnimationFromAsset(const String& path)
+	{
+		Memory mem = Assets::readAllBytes(path);
+		if (mem.isNotNull()) {
+			return loadAnimationFromMemory(mem);
+		}
+		return sl_null;
 	}
 	
 	Ref<Drawable> Image::getDrawableCache(Canvas* canvas)
@@ -1351,6 +1392,13 @@ namespace slib
 	
 	void Image::onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)
 	{
+		if (m_customDrawable.isNotNull()) {
+			Ref<Drawable> drawable = m_customDrawable;
+			if (drawable.isNotNull()) {
+				drawable->onDraw(canvas, rectDst, rectSrc, param);
+				return;
+			}
+		}
 		Ref<Drawable> drawableCached = getDrawableCache(canvas);
 		if (drawableCached.isNotNull()) {
 			drawableCached->onDraw(canvas, rectDst, rectSrc, param);
@@ -1359,10 +1407,71 @@ namespace slib
 
 	void Image::onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
 	{
+		if (m_customDrawable.isNotNull()) {
+			Ref<Drawable> drawable = m_customDrawable;
+			if (drawable.isNotNull()) {
+				drawable->onDrawAll(canvas, rectDst, param);
+				return;
+			}
+		}
 		Ref<Drawable> drawableCached = getDrawableCache(canvas);
 		if (drawableCached.isNotNull()) {
 			drawableCached->onDrawAll(canvas, rectDst, param);
 		}
 	}
-
+	
+	Ref<Drawable> Image::getCustomDrawable()
+	{
+		return m_customDrawable;
+	}
+	
+	void Image::setCustomDrawable(const Ref<Drawable>& drawable)
+	{
+		m_customDrawable = drawable;
+	}
+	
+	sl_real Image::getDrawableWidth()
+	{
+		if (m_customDrawable.isNotNull()) {
+			Ref<Drawable> drawable = m_customDrawable;
+			if (drawable.isNotNull()) {
+				return drawable->getDrawableWidth();
+			}
+		}
+		return Bitmap::getDrawableWidth();
+	}
+	
+	sl_real Image::getDrawableHeight()
+	{
+		if (m_customDrawable.isNotNull()) {
+			Ref<Drawable> drawable = m_customDrawable;
+			if (drawable.isNotNull()) {
+				return drawable->getDrawableHeight();
+			}
+		}
+		return Bitmap::getDrawableHeight();
+	}
+	
+	float Image::getAnimationDuration()
+	{
+		if (m_customDrawable.isNotNull()) {
+			Ref<Drawable> drawable = m_customDrawable;
+			if (drawable.isNotNull()) {
+				return drawable->getAnimationDuration();
+			}
+		}
+		return 0;
+	}
+	
+	float Image::getAnimationFramesPerSecond()
+	{
+		if (m_customDrawable.isNotNull()) {
+			Ref<Drawable> drawable = m_customDrawable;
+			if (drawable.isNotNull()) {
+				return drawable->getAnimationFramesPerSecond();
+			}
+		}
+		return 0;
+	}
+	
 }

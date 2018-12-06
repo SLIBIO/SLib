@@ -156,8 +156,18 @@ namespace slib
 
 		static Ref<Image> loadFromAsset(const String& path, sl_uint32 width = 0, sl_uint32 height = 0);
 		
+		static Ref<AnimationDrawable> loadAnimationFromMemory(const void* mem, sl_size size);
+		
+		static Ref<AnimationDrawable> loadAnimationFromMemory(Memory mem);
+		
+		static Ref<AnimationDrawable> loadAnimationFromFile(const String& filePath);
+		
+		static Ref<AnimationDrawable> loadAnimationFromAsset(const String& path);
+		
 		
 		static Ref<Image> loadSTB(const void* content, sl_size size);
+		
+		static Ref<AnimationDrawable> loadSTB_GIF(const void* content, sl_size size);
 	
 		
 		static Ref<Image> loadPNG(const void* content, sl_size size);
@@ -182,15 +192,29 @@ namespace slib
 		sl_bool saveJPEG(const String& filePath, float quality = 0.5f);
 
 		
+		Ref<Drawable> getCustomDrawable();
+		
+		void setCustomDrawable(const Ref<Drawable>& drawable);
+		
+		sl_real getDrawableWidth() override;
+		
+		sl_real getDrawableHeight() override;
+		
+		float getAnimationDuration() override;
+		
+		float getAnimationFramesPerSecond() override;
+		
+
 	protected:
 		Ref<Drawable> getDrawableCache(Canvas* canvas);
 	
 		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override;
 
 		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
-
+		
 	protected:
 		ImageDesc m_desc;
+		AtomicRef<Drawable> m_customDrawable;
 		
 	};
 

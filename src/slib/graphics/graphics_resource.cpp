@@ -39,6 +39,9 @@ namespace slib
 			return s;
 		}
 		s = Image::loadFromMemory(source_bytes, source_size);
+		if (s.isNotNull()) {
+			s->setCustomDrawable(Image::loadAnimationFromMemory(source_bytes, source_size));
+		}
 		flag_load = sl_true;
 		return s;
 	}
@@ -71,10 +74,14 @@ namespace slib
 		}
 		if (zoomLevel <= 2) {
 			s = Image::loadFromMemory(source_bytes, source_size);
+			if (s.isNotNull()) {
+				s->setCustomDrawable(Image::loadAnimationFromMemory(source_bytes, source_size));
+			}
 			flag_load = sl_true;
 		} else {
 			Ref<Image> t = Image::loadFromMemory(source_bytes, source_size);
 			if (t.isNotNull()) {
+				t->setCustomDrawable(Image::loadAnimationFromMemory(source_bytes, source_size));
 				zoomLevel >>= 1;
 				s = t->scale(width / zoomLevel, height / zoomLevel);
 			}
