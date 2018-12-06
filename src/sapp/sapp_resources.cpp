@@ -32,7 +32,11 @@ namespace slib
 	{
 		ObjectLocker lock(this);
 		if (image.isNull()) {
-			image = Image::loadFromFile(filePath);
+			Ref<Image> image = Image::loadFromFile(filePath);
+			if (image.isNotNull()) {
+				image->setCustomDrawable(Image::loadAnimationFromFile(filePath));
+			}
+			this->image = image;
 		}
 		return image;
 	}

@@ -49,7 +49,7 @@ namespace slib
 		int nComponents = 0;
 		unsigned char * colors = stbi_load_from_memory((stbi_uc*)content, (int)size, &width, &height, &nComponents, 4);
 		if (colors) {
-			if (nComponents == 4 && width > 0 && height > 0) {
+			if (width > 0 && height > 0) {
 				ret = Image::create(width, height);
 				if (ret.isNotNull()) {
 					Base::copyMemory(ret->getColors(), colors, width * height * 4);
@@ -70,7 +70,7 @@ namespace slib
 		int nLayers = 0;
 		unsigned char* colors = stbi_load_gif_from_memory((stbi_uc*)content, (int)size, &delays, &width, &height, &nLayers, &nComponents, 4);
 		if (colors) {
-			if (nComponents == 4 && width > 0 && height > 0 && nLayers > 0) {
+			if (width > 0 && height > 0 && nLayers > 0) {
 				ret = new AnimationDrawable;
 				if (ret.isNotNull()) {
 					int duration = 0;

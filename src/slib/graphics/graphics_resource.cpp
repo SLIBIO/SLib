@@ -110,7 +110,7 @@ namespace slib
 		_priv_ImageResourceEntry* entry;
 		if (requiredWidth == 0 && requiredHeight == 0) {
 			entry = entries;
-			while (entry->flagValid) {
+			if (entry->flagValid) {
 				return entry->getImage();
 			}
 			return sl_null;
@@ -231,6 +231,28 @@ namespace slib
 			}
 		}
 		
+		float getAnimationDuration() override
+		{
+			if (m_entries->flagValid) {
+				Ref<Image> image = m_entries->getImage();
+				if (image.isNotNull()) {
+					return image->getAnimationDuration();
+				}
+			}
+			return 0;
+		}
+		
+		float getAnimationFramesPerSecond() override
+		{
+			if (m_entries->flagValid) {
+				Ref<Image> image = m_entries->getImage();
+				if (image.isNotNull()) {
+					return image->getAnimationFramesPerSecond();
+				}
+			}
+			return 0;
+		}
+		
 	};
 
 	SLIB_DEFINE_OBJECT(_priv_ImageResource_Drawable, Drawable)
@@ -294,6 +316,24 @@ namespace slib
 					canvas->draw(rectDst, image, param);
 				}
 			}
+		}
+		
+		float getAnimationDuration() override
+		{
+			Ref<Image> image = m_entry->getImage();
+			if (image.isNotNull()) {
+				return image->getAnimationDuration();
+			}
+			return 0;
+		}
+		
+		float getAnimationFramesPerSecond() override
+		{
+			Ref<Image> image = m_entry->getImage();
+			if (image.isNotNull()) {
+				return image->getAnimationFramesPerSecond();
+			}
+			return 0;
 		}
 		
 	};

@@ -336,7 +336,7 @@ namespace slib
 			const String& fileName = list[i];
 			if (!(fileName.startsWith('.'))) {
 				String ext = File::getFileExtension(fileName);
-				if (ext == "png" || ext == "jpg" || ext == "jpeg") {
+				if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "gif") {
 					String name = File::getFileNameOnly(fileName);
 					sl_reg indexSharp = name.indexOf('#');
 					sl_bool flagMain = sl_true;
