@@ -48,6 +48,8 @@ namespace slib
 
 		sl_bool useBlur;
 		sl_real blurRadius;
+		
+		float time; // In seconds, used for animations
 
 	public:
 		DrawParam();
@@ -94,6 +96,11 @@ namespace slib
 		virtual void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
 
 		virtual void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+		
+		// Seconds, 0 means no animation
+		virtual float getAnimationDuration();
+		
+		virtual float getAnimationFramesPerSecond();
 
 	public:
 		sl_bool isBitmap();
@@ -502,6 +509,49 @@ namespace slib
 		sl_real m_width;
 		sl_real m_height;
 
+	};
+	
+	class AnimationDrawable : public Drawable
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		AnimationDrawable();
+		
+		~AnimationDrawable();
+		
+	public:
+		sl_real getDrawableWidth() override;
+		
+		void setDrawableWidth(sl_real width);
+		
+		sl_real getDrawableHeight() override;
+		
+		void setDrawableHeight(sl_real height);
+
+		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override;
+		
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
+
+		float getAnimationDuration() override;
+		
+		void setAnimationDuration(float duration);
+		
+		float getAnimationFramesPerSecond() override;
+				
+		List< Ref<Drawable> > getDrawables();
+		
+		void addDrawable(const Ref<Drawable>& drawable);
+		
+		// `time` in seconds
+		Ref<Drawable> getDrawableAtTime(float time);
+
+	protected:
+		sl_real m_width;
+		sl_real m_height;
+		List< Ref<Drawable> > m_drawables;
+		float m_duration;
+		
 	};
 
 }

@@ -101,7 +101,8 @@ namespace slib
 		JPEG = 10,
 		PNG = 11,
 		BMP = 12,
-		DDS = 13
+		GIF = 13,
+		DDS = 20
 	};
 
 	enum class StretchMode

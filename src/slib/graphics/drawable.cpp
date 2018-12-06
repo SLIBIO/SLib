@@ -33,12 +33,12 @@ namespace slib
 {
 
 	DrawParam::DrawParam()
-	: useAlpha(sl_false), alpha(1), tiled(sl_false), useColorMatrix(sl_false), useBlur(sl_false), blurRadius(10)
+	 : useAlpha(sl_false), alpha(1), tiled(sl_false), useColorMatrix(sl_false), useBlur(sl_false), blurRadius(10), time(0)
 	{
 	}
 
 	DrawParam::DrawParam(const DrawParam& other)
-	: useAlpha(other.useAlpha), alpha(other.alpha), tiled(other.tiled), useColorMatrix(other.useColorMatrix), useBlur(other.useBlur), blurRadius(other.blurRadius)
+	 : useAlpha(other.useAlpha), alpha(other.alpha), tiled(other.tiled), useColorMatrix(other.useColorMatrix), useBlur(other.useBlur), blurRadius(other.blurRadius), time(other.time)
 	{
 		if (other.useColorMatrix) {
 			colorMatrix = other.colorMatrix;
@@ -60,6 +60,7 @@ namespace slib
 		}
 		useBlur = other.useBlur;
 		blurRadius = other.blurRadius;
+		time = other.time;
 		return *this;
 	}
 
@@ -160,6 +161,16 @@ namespace slib
 	void Drawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
 	{
 		onDraw(canvas, rectDst, Rectangle(0, 0, getDrawableWidth(), getDrawableHeight()), param);
+	}
+
+	float Drawable::getAnimationDuration()
+	{
+		return 0;
+	}
+	
+	float Drawable::getAnimationFramesPerSecond()
+	{
+		return 0;
 	}
 
 	sl_bool Drawable::isBitmap()
@@ -1246,4 +1257,119 @@ namespace slib
 		}
 	}
 
+	
+	SLIB_DEFINE_OBJECT(AnimationDrawable, Drawable)
+	
+	AnimationDrawable::AnimationDrawable()
+	{
+		m_width = 0;
+		m_height = 0;
+		m_drawables = List< Ref<Drawable> >::create();
+		m_duration = 1;
+	}
+	
+	AnimationDrawable::~AnimationDrawable()
+	{
+	}
+
+	sl_real AnimationDrawable::getDrawableWidth()
+	{
+		sl_real width = m_width;
+		if (width > 0) {
+			return width;
+		}
+		return 1;
+	}
+	
+	void AnimationDrawable::setDrawableWidth(sl_real width)
+	{
+		m_width = width;
+	}
+	
+	sl_real AnimationDrawable::getDrawableHeight()
+	{
+		sl_real height = m_height;
+		if (height > 0) {
+			return height;
+		}
+		return 1;
+	}
+
+	void AnimationDrawable::setDrawableHeight(sl_real height)
+	{
+		m_height = height;
+	}
+	
+	void AnimationDrawable::onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)
+	{
+		Ref<Drawable> drawable = getDrawableAtTime(param.time);
+		if (drawable.isNotNull())  {
+			drawable->onDraw(canvas, rectDst, rectSrc, param);
+		}
+	}
+	
+	void AnimationDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
+	{
+		Ref<Drawable> drawable = getDrawableAtTime(param.time);
+		if (drawable.isNotNull())  {
+			drawable->onDrawAll(canvas, rectDst, param);
+		}
+	}
+	
+	float AnimationDrawable::getAnimationDuration()
+	{
+		return m_duration;
+	}
+	
+	void AnimationDrawable::setAnimationDuration(float duration)
+	{
+		m_duration = duration;
+	}
+	
+	float AnimationDrawable::getAnimationFramesPerSecond()
+	{
+		float duration = m_duration;
+		if (duration < 0.001f) {
+			return 0;
+		}
+		return (float)(m_drawables.getCount()) / duration;
+	}
+	
+	List< Ref<Drawable> > AnimationDrawable::getDrawables()
+	{
+		return m_drawables;
+	}
+	
+	void AnimationDrawable::addDrawable(const Ref<Drawable>& drawable)
+	{
+		m_drawables.add(drawable);
+		if (drawable.isNotNull()) {
+			if (m_width == 0) {
+				m_width = drawable->getDrawableWidth();
+			}
+			if (m_height == 0) {
+				m_height = drawable->getDrawableHeight();
+			}
+		}
+	}
+	
+	Ref<Drawable> AnimationDrawable::getDrawableAtTime(float time)
+	{
+		if (time < 0.001f) {
+			return m_drawables.getValueAt(0);
+		}
+		float duration = m_duration;
+		if (duration < 0.001f) {
+			return m_drawables.getValueAt(0);
+		}
+		float n = Math::floor(time / duration);
+		float t = time - n * duration;
+		sl_size count = m_drawables.getCount();
+		sl_size index = (sl_size)((float)(count) * t / duration);
+		if (index >= count) {
+			index = count - 1;
+		}
+		return m_drawables.getValueAt(index);
+	}
+	
 }
