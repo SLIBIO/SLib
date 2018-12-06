@@ -80,6 +80,9 @@ namespace slib
 		sl_bool flagStoreResponseContent;
 		sl_bool flagSynchronous;
 		
+		sl_uint32 timeout; // In milliseconds
+		sl_bool flagAllowInsecureConnection;
+		
 	public:
 		UrlRequestParam();
 		
@@ -186,6 +189,16 @@ namespace slib
 		
 		static Ref<UrlRequest> postJsonSynchronous(const String& url, const HttpHeaderMap& headers, const Json& json);
 		
+		// In milliseconds
+		static sl_uint32 getDefaultTimeout();
+		
+		// In milliseconds
+		static void setDefaultTimeout(sl_uint32 ms);
+		
+		static sl_bool isDefaultAllowInsecureConnection();
+		
+		static void setDefaultAllowInsecureConnection(sl_bool flag);
+		
 	public:
 		const String& getUrl();
 		
@@ -282,7 +295,7 @@ namespace slib
 		void onUploadBody(sl_uint64 size);
 		
 		void _runCallback(const Function<void(UrlRequest*)>& callback);
-				
+		
 	protected:
 		String m_url;
 		String m_downloadFilePath;
@@ -305,6 +318,9 @@ namespace slib
 		sl_bool m_flagUseBackgroundSession;
 		sl_bool m_flagSelfAlive;
 		sl_bool m_flagStoreResponseContent;
+		
+		sl_uint32 m_timeout;
+		sl_bool m_flagAllowInsecureConnection;
 		
 		sl_uint64 m_sizeBodySent;
 		sl_uint64 m_sizeContentTotal;

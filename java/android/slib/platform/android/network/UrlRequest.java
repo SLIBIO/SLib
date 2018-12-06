@@ -29,13 +29,21 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Vector;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import slib.platform.android.Logger;
 
 public class UrlRequest {
 
-	final static int NETWORK_TIMEOUT = 30000;
 	final static int PACKET_SIZE = 4096;
 
 	boolean flagOpened = true;
@@ -50,7 +58,7 @@ public class UrlRequest {
 		this.instance = instance;
 	}
 
-	public static void execute(long instance, String _url, String method, String[] headers, String[] additionalHeaders, byte[] uploadBody, String downloadFilePath) {
+	public static void execute(long instance, String _url, String method, String[] headers, String[] additionalHeaders, byte[] uploadBody, String downloadFilePath, int timeout, boolean flagAllowInsecureConnection) {
 
 		if (downloadFilePath != null && downloadFilePath.length() == 0) {
 			downloadFilePath = null;
@@ -77,6 +85,36 @@ public class UrlRequest {
 			}
 			request.http = http;
 
+			if (flagAllowInsecureConnection) {
+				if (connection instanceof HttpsURLConnection) {
+					try {
+						HttpsURLConnection https = (HttpsURLConnection)connection;
+						SSLContext context = SSLContext.getInstance("TLS");
+						TrustManager tm = new X509TrustManager() {
+							public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+							}
+
+							public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+							}
+
+							public X509Certificate[] getAcceptedIssuers() {
+								return null;
+							}
+						};
+						context.init(null, new TrustManager[] {tm}, null);
+						https.setSSLSocketFactory(context.getSocketFactory());
+						https.setHostnameVerifier(new HostnameVerifier() {
+							@Override
+							public boolean verify(String hostname, SSLSession session) {
+								return true;
+							}
+						});
+					} catch (Exception e) {
+						Logger.exception(e);
+					}
+				}
+			}
+
 			if (!(request.flagOpened)) {
 				return;
 			}
@@ -85,8 +123,8 @@ public class UrlRequest {
 					http.setDoOutput(true);
 				}
 				http.setDoInput(true);
-				http.setConnectTimeout(NETWORK_TIMEOUT);
-				http.setReadTimeout(NETWORK_TIMEOUT);
+				http.setConnectTimeout(timeout);
+				http.setReadTimeout(timeout);
 				http.setRequestMethod(method);
 				if (headers != null) {
 					for (int i = 0; i < headers.length - 1; i += 2) {
@@ -147,7 +185,14 @@ public class UrlRequest {
 			InputStream streamContent = null;
 			try {
 				streamContent = connection.getInputStream();
-			} catch (FileNotFoundException e) {}
+			} catch (FileNotFoundException e) {
+				if (http != null) {
+					try {
+						streamContent = http.getErrorStream();
+					} catch (Exception e2) {
+					}
+				}
+			}
 
 			request.streamContent = streamContent;
 

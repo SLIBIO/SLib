@@ -67,6 +67,8 @@ namespace slib
 		flagSelfAlive = sl_true;
 		flagStoreResponseContent = sl_true;
 		flagSynchronous = sl_false;
+		timeout = UrlRequest::getDefaultTimeout();
+		flagAllowInsecureConnection = UrlRequest::isDefaultAllowInsecureConnection();
 	}
 	
 	UrlRequestParam::UrlRequestParam(const UrlRequestParam& other) = default;
@@ -160,6 +162,31 @@ namespace slib
 	
 #define URL_REQUEST UrlRequest
 #include "url_request_common.inc"
+	
+	
+	sl_uint32 _g_priv_UrlRequest_default_timeout = 60000;
+	
+	sl_uint32 UrlRequest::getDefaultTimeout()
+	{
+		return _g_priv_UrlRequest_default_timeout;
+	}
+	
+	void UrlRequest::setDefaultTimeout(sl_uint32 ms)
+	{
+		_g_priv_UrlRequest_default_timeout = ms;
+	}
+	
+	sl_bool _g_priv_UrlRequest_default_allowInsecureConnection = sl_false;
+
+	sl_bool UrlRequest::isDefaultAllowInsecureConnection()
+	{
+		return _g_priv_UrlRequest_default_allowInsecureConnection;
+	}
+	
+	void UrlRequest::setDefaultAllowInsecureConnection(sl_bool flag)
+	{
+		_g_priv_UrlRequest_default_allowInsecureConnection = flag;
+	}
 	
 	const String& UrlRequest::getUrl()
 	{
@@ -388,6 +415,9 @@ namespace slib
 		m_flagUseBackgroundSession = param.flagUseBackgroundSession;
 		m_flagSelfAlive = param.flagSelfAlive && !(param.flagSynchronous);
 		m_flagStoreResponseContent = param.flagStoreResponseContent;
+		
+		m_timeout = param.timeout;
+		m_flagAllowInsecureConnection = param.flagAllowInsecureConnection;
 		
 		if (m_flagSelfAlive) {
 			_priv_UrlRequestMap* map = _getUrlRequestMap();

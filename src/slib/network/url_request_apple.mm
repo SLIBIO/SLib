@@ -107,6 +107,7 @@ namespace slib
 					if (req != nil) {
 						req.HTTPMethod = Apple::getNSStringFromString(HttpMethods::toString(param.method));
 						req.HTTPBody = [NSData dataWithBytes:param.requestBody.getData() length:param.requestBody.getSize()];
+						req.timeoutInterval = NSTimeInterval(param.timeout) / 1000;
 						{
 							for (auto& pair : param.requestHeaders) {
 								[req setValue:(Apple::getNSStringFromString(pair.value)) forHTTPHeaderField:(Apple::getNSStringFromString(pair.key))];
@@ -170,10 +171,12 @@ namespace slib
 		
 		static Ref<UrlRequest_Impl> fromTask(NSURLSessionTask* task)
 		{
-			UrlRequest_Shared* shared = Get_UrlRequestShared();
-			if (shared) {
-				NSUInteger taskId = [task taskIdentifier];
-				return shared->requests.getValue(taskId, WeakRef<UrlRequest_Impl>::null());
+			if (task != nil) {
+				UrlRequest_Shared* shared = Get_UrlRequestShared();
+				if (shared) {
+					NSUInteger taskId = [task taskIdentifier];
+					return shared->requests.getValue(taskId, WeakRef<UrlRequest_Impl>::null());
+				}
 			}
 			return sl_null;
 		}
