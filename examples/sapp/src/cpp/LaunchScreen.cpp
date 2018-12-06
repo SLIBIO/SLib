@@ -20,17 +20,15 @@
  *   THE SOFTWARE.
  */
 
-#include "app.h"
-
 #include "LaunchScreen.h"
 
-SLIB_DEFINE_APPLICATION(SAppExampleApp, MobileApp)
+#include "MainMenu.h"
 
-SAppExampleApp::SAppExampleApp()
+void LaunchScreen::onOpen()
 {
-	setStartupPage(new LaunchScreen);
-}
-
-void SAppExampleApp::onStart()
-{
+	AnimationFrames<float> frames(1, 0);
+	frames.addFrame(0.8, 1);
+	imgLoading->startAlphaAnimation(frames, 4, [this]() {
+		this->goToHomePage(new MainMenu());
+	});
 }

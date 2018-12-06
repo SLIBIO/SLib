@@ -16,6 +16,7 @@
 		264AF19121B41343004E58CB /* drawables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF18B21B41343004E58CB /* drawables.cpp */; };
 		264AF19B21B41A77004E58CB /* MainMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF19A21B41A77004E58CB /* MainMenu.cpp */; };
 		264AF1BB21B51167004E58CB /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF1BA21B51167004E58CB /* WebKit.framework */; };
+		264AF1CD21B8F378004E58CB /* LaunchScreen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF1CB21B8F377004E58CB /* LaunchScreen.cpp */; };
 		26F2DDF0216BDE39007CE8E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDEF216BDE39007CE8E6 /* UIKit.framework */; };
 		26F2DDF2216BDE44007CE8E6 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF1216BDE44007CE8E6 /* GLKit.framework */; };
 		26F2DDF4216BDE4D007CE8E6 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF3216BDE4D007CE8E6 /* OpenGLES.framework */; };
@@ -49,6 +50,8 @@
 		264AF19921B41A77004E58CB /* MainMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainMenu.h; sourceTree = "<group>"; };
 		264AF19A21B41A77004E58CB /* MainMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MainMenu.cpp; sourceTree = "<group>"; };
 		264AF1BA21B51167004E58CB /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		264AF1CB21B8F377004E58CB /* LaunchScreen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LaunchScreen.cpp; sourceTree = "<group>"; };
+		264AF1CC21B8F378004E58CB /* LaunchScreen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LaunchScreen.h; sourceTree = "<group>"; };
 		26F2DDEF216BDE39007CE8E6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		26F2DDF1216BDE44007CE8E6 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		26F2DDF3216BDE4D007CE8E6 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -97,6 +100,8 @@
 			children = (
 				264AF17B21B41323004E58CB /* app.cpp */,
 				264AF17C21B41323004E58CB /* app.h */,
+				264AF1CB21B8F377004E58CB /* LaunchScreen.cpp */,
+				264AF1CC21B8F378004E58CB /* LaunchScreen.h */,
 				264AF19A21B41A77004E58CB /* MainMenu.cpp */,
 				264AF19921B41A77004E58CB /* MainMenu.h */,
 			);
@@ -270,6 +275,7 @@
 				264AF18F21B41343004E58CB /* colors.cpp in Sources */,
 				264AF19021B41343004E58CB /* raws.cpp in Sources */,
 				264AF17D21B41323004E58CB /* app.cpp in Sources */,
+				264AF1CD21B8F378004E58CB /* LaunchScreen.cpp in Sources */,
 				264AF18C21B41343004E58CB /* strings.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
