@@ -45,6 +45,7 @@
 
 #include "network/url.h"
 #include "network/url_request.h"
+#include "network/curl.h"
 #include "network/http.h"
 #include "network/stun.h"
 

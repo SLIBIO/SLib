@@ -78,6 +78,7 @@ namespace slib
 	public:
 		NSURLSessionTask* m_task;
 		NSUInteger m_taskId;
+		using UrlRequest::m_flagAllowInsecureConnection;
 		
 	public:
 		UrlRequest_Impl()
@@ -272,6 +273,16 @@ namespace slib
 }
 
 @implementation _priv_Slib_UrlRequestListener
+
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler
+{
+	slib::Ref<slib::UrlRequest_Impl> req = slib::UrlRequest_Impl::fromTask(task);
+	if (req.isNotNull() && req->m_flagAllowInsecureConnection) {
+		completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+	} else {
+		completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+	}
+}
 
 -(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didSendBodyData:(int64_t)bytesSent totalBytesSent:(int64_t)totalBytesSent totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend
 {

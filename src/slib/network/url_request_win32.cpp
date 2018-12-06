@@ -234,6 +234,15 @@ namespace slib
 						session->requests.put(taskId, ret);
 						HINTERNET hRequest = ::WinHttpOpenRequest(connection->hConnect, (LPCWSTR)(verb.getData()), (LPCWSTR)(path.getData()), NULL, NULL, NULL, flags);
 						if (hRequest) {
+							::WinHttpSetTimeouts(hRequest, param.timeout, param.timeout, param.timeout, param.timeout);
+							if (connection->flagHttps && param.flagAllowInsecureConnection) {
+								DWORD dwFlags =
+									SECURITY_FLAG_IGNORE_UNKNOWN_CA |
+									SECURITY_FLAG_IGNORE_CERT_WRONG_USAGE |
+									SECURITY_FLAG_IGNORE_CERT_CN_INVALID |
+									SECURITY_FLAG_IGNORE_CERT_DATE_INVALID;
+								::WinHttpSetOption(hRequest, WINHTTP_OPTION_SECURITY_FLAGS, &dwFlags, sizeof(dwFlags));
+							}
 							ret->m_hRequest = hRequest;
 							return ret;
 						}

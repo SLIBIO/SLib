@@ -125,6 +125,14 @@ namespace slib
 
 			::curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 			::curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 10L);
+			
+			::curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, m_timeout);
+			::curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, m_timeout);
+			
+			if (m_flagAllowInsecureConnection) {
+				::curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+				::curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
+			}
 
 			// Set http method
 			switch(m_method) {
