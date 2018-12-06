@@ -71,6 +71,23 @@ namespace slib
 
 	};
 	
+	class DrawableAnimationInfo
+	{
+	public:
+		float duration; // In seconds
+		float framesPerSecond;
+		
+	public:
+		DrawableAnimationInfo();
+		
+		DrawableAnimationInfo(const DrawableAnimationInfo& other);
+		
+		DrawableAnimationInfo& operator=(const DrawableAnimationInfo& other);
+		
+		~DrawableAnimationInfo();
+		
+	};
+	
 	class ImageDesc;
 	class Image;
 	class Canvas;
@@ -97,10 +114,8 @@ namespace slib
 
 		virtual void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
 		
-		// Seconds, 0 means no animation
-		virtual float getAnimationDuration();
-		
-		virtual float getAnimationFramesPerSecond();
+		// return sl_true for Animation
+		virtual sl_bool getAnimationInfo(DrawableAnimationInfo* info);
 
 	public:
 		sl_bool isBitmap();
@@ -110,6 +125,11 @@ namespace slib
 		sl_bool isColor();
 		
 		sl_bool getColor(Color* color = sl_null);
+		
+		// Seconds, 0 means no animation
+		float getAnimationDuration();
+		
+		float getAnimationFramesPerSecond();
 
 	public:
 		Ref<Drawable> filter(const ColorMatrix& colorMatrix, sl_real alpha = 1, sl_real blurRadius = 0);
@@ -220,7 +240,9 @@ namespace slib
 		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override;
 
 		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
-
+		
+		sl_bool getAnimationInfo(DrawableAnimationInfo* info) override;
+		
 	protected:
 		Ref<Drawable> m_src;
 		sl_real m_x;
@@ -254,6 +276,8 @@ namespace slib
 		void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override;
 
 		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
+		
+		sl_bool getAnimationInfo(DrawableAnimationInfo* info) override;
 
 	protected:
 		Ref<Drawable> m_src;
@@ -287,6 +311,8 @@ namespace slib
 
 		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
+		sl_bool getAnimationInfo(DrawableAnimationInfo* info) override;
+		
 	protected:
 		Ref<Drawable> m_src;
 		Rectangle m_rectSrc;
@@ -318,6 +344,8 @@ namespace slib
 
 		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
+		sl_bool getAnimationInfo(DrawableAnimationInfo* info) override;
+		
 	protected:
 		void _prepareParam(DrawParam& dst, const DrawParam& src);
 
@@ -497,6 +525,8 @@ namespace slib
 
 		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
+		sl_bool getAnimationInfo(DrawableAnimationInfo* info) override;
+		
 	protected:
 		struct Source
 		{
@@ -533,11 +563,9 @@ namespace slib
 		
 		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 
-		float getAnimationDuration() override;
+		sl_bool getAnimationInfo(DrawableAnimationInfo* info) override;
 		
 		void setAnimationDuration(float duration);
-		
-		float getAnimationFramesPerSecond() override;
 				
 		List< Ref<Drawable> > getDrawables();
 		

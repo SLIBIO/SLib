@@ -200,10 +200,8 @@ namespace slib
 		
 		sl_real getDrawableHeight() override;
 		
-		float getAnimationDuration() override;
-		
-		float getAnimationFramesPerSecond() override;
-		
+		sl_bool getAnimationInfo(DrawableAnimationInfo* info) override;
+
 
 	protected:
 		Ref<Drawable> getDrawableCache(Canvas* canvas);

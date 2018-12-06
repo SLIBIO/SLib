@@ -122,6 +122,29 @@ namespace slib
 		}
 	}
 
+	
+	DrawableAnimationInfo::DrawableAnimationInfo()
+	 : duration(0), framesPerSecond(0)
+	{
+	}
+	
+	DrawableAnimationInfo::DrawableAnimationInfo(const DrawableAnimationInfo& other)
+	 : duration(other.duration), framesPerSecond(other.framesPerSecond)
+	{
+	}
+	
+	DrawableAnimationInfo::~DrawableAnimationInfo()
+	{
+	}
+	
+	DrawableAnimationInfo& DrawableAnimationInfo::operator=(const DrawableAnimationInfo& other)
+	{
+		duration = other.duration;
+		framesPerSecond = other.framesPerSecond;
+		return *this;
+	}
+	
+
 	SLIB_DEFINE_OBJECT(Drawable, Object)
 
 	Drawable::Drawable()
@@ -162,15 +185,10 @@ namespace slib
 	{
 		onDraw(canvas, rectDst, Rectangle(0, 0, getDrawableWidth(), getDrawableHeight()), param);
 	}
-
-	float Drawable::getAnimationDuration()
-	{
-		return 0;
-	}
 	
-	float Drawable::getAnimationFramesPerSecond()
+	sl_bool Drawable::getAnimationInfo(DrawableAnimationInfo* info)
 	{
-		return 0;
+		return sl_false;
 	}
 
 	sl_bool Drawable::isBitmap()
@@ -191,6 +209,24 @@ namespace slib
 	sl_bool Drawable::getColor(Color* color)
 	{
 		return ColorDrawable::check(this, color);
+	}
+
+	float Drawable::getAnimationDuration()
+	{
+		DrawableAnimationInfo info;
+		if (getAnimationInfo(&info)) {
+			return info.duration;
+		}
+		return 0;
+	}
+	
+	float Drawable::getAnimationFramesPerSecond()
+	{
+		DrawableAnimationInfo info;
+		if (getAnimationInfo(&info)) {
+			return info.framesPerSecond;
+		}
+		return 0;
 	}
 
 	Ref<Drawable> Drawable::filter(const ColorMatrix& colorMatrix, sl_real alpha, sl_real blurRadius)
@@ -410,7 +446,11 @@ namespace slib
 		canvas->draw(rectDst, m_src, Rectangle(m_x, m_y, m_x + m_width, m_y + m_height), param);
 	}
 
-
+	sl_bool SubDrawable::getAnimationInfo(DrawableAnimationInfo* info)
+	{
+		return m_src->getAnimationInfo(info);
+	}
+	
 	SLIB_DEFINE_OBJECT(ScaledDrawable, Drawable)
 
 	ScaledDrawable::ScaledDrawable()
@@ -476,6 +516,11 @@ namespace slib
 		canvas->draw(rectDst, m_src, param);
 	}
 
+	sl_bool ScaledDrawable::getAnimationInfo(DrawableAnimationInfo* info)
+	{
+		return m_src->getAnimationInfo(info);
+	}
+	
 
 	SLIB_DEFINE_OBJECT(ScaledSubDrawable, Drawable)
 
@@ -548,6 +593,11 @@ namespace slib
 		canvas->draw(rectDst, m_src, m_rectSrc, param);
 	}
 
+	sl_bool ScaledSubDrawable::getAnimationInfo(DrawableAnimationInfo* info)
+	{
+		return m_src->getAnimationInfo(info);
+	}
+	
 
 	SLIB_DEFINE_OBJECT(FilterDrawable, Drawable)
 
@@ -643,6 +693,11 @@ namespace slib
 		}
 	}
 
+	sl_bool FilterDrawable::getAnimationInfo(DrawableAnimationInfo* info)
+	{
+		return m_src->getAnimationInfo(info);
+	}
+	
 
 	SLIB_DEFINE_OBJECT(NinePiecesDrawable, Drawable)
 
@@ -1257,6 +1312,15 @@ namespace slib
 		}
 	}
 
+	sl_bool MipmapDrawable::getAnimationInfo(DrawableAnimationInfo* info)
+	{
+		Source source;
+		if (m_sources.getAt(0, &source)) {
+			return source.drawable->getAnimationInfo(info);
+		}
+		return sl_false;
+	}
+	
 	
 	SLIB_DEFINE_OBJECT(AnimationDrawable, Drawable)
 	
@@ -1316,23 +1380,19 @@ namespace slib
 		}
 	}
 	
-	float AnimationDrawable::getAnimationDuration()
+	sl_bool AnimationDrawable::getAnimationInfo(DrawableAnimationInfo* info)
 	{
-		return m_duration;
+		if (info) {
+			float duration = m_duration;
+			info->duration = duration;
+			info->framesPerSecond = duration < 0.001f ? 0 : (float)(m_drawables.getCount()) / duration;
+		}
+		return sl_true;
 	}
 	
 	void AnimationDrawable::setAnimationDuration(float duration)
 	{
 		m_duration = duration;
-	}
-	
-	float AnimationDrawable::getAnimationFramesPerSecond()
-	{
-		float duration = m_duration;
-		if (duration < 0.001f) {
-			return 0;
-		}
-		return (float)(m_drawables.getCount()) / duration;
 	}
 	
 	List< Ref<Drawable> > AnimationDrawable::getDrawables()

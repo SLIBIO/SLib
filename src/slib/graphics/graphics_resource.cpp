@@ -231,26 +231,15 @@ namespace slib
 			}
 		}
 		
-		float getAnimationDuration() override
+		sl_bool getAnimationInfo(DrawableAnimationInfo* info) override
 		{
 			if (m_entries->flagValid) {
 				Ref<Image> image = m_entries->getImage();
 				if (image.isNotNull()) {
-					return image->getAnimationDuration();
+					return image->getAnimationInfo(info);
 				}
 			}
-			return 0;
-		}
-		
-		float getAnimationFramesPerSecond() override
-		{
-			if (m_entries->flagValid) {
-				Ref<Image> image = m_entries->getImage();
-				if (image.isNotNull()) {
-					return image->getAnimationFramesPerSecond();
-				}
-			}
-			return 0;
+			return sl_false;
 		}
 		
 	};
@@ -318,22 +307,13 @@ namespace slib
 			}
 		}
 		
-		float getAnimationDuration() override
+		sl_bool getAnimationInfo(DrawableAnimationInfo* info) override
 		{
 			Ref<Image> image = m_entry->getImage();
 			if (image.isNotNull()) {
-				return image->getAnimationDuration();
+				return image->getAnimationInfo(info);
 			}
-			return 0;
-		}
-		
-		float getAnimationFramesPerSecond() override
-		{
-			Ref<Image> image = m_entry->getImage();
-			if (image.isNotNull()) {
-				return image->getAnimationFramesPerSecond();
-			}
-			return 0;
+			return sl_false;
 		}
 		
 	};

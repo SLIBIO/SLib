@@ -1452,26 +1452,15 @@ namespace slib
 		return Bitmap::getDrawableHeight();
 	}
 	
-	float Image::getAnimationDuration()
+	sl_bool Image::getAnimationInfo(DrawableAnimationInfo* info)
 	{
 		if (m_customDrawable.isNotNull()) {
 			Ref<Drawable> drawable = m_customDrawable;
 			if (drawable.isNotNull()) {
-				return drawable->getAnimationDuration();
+				return drawable->getAnimationInfo(info);
 			}
 		}
-		return 0;
-	}
-	
-	float Image::getAnimationFramesPerSecond()
-	{
-		if (m_customDrawable.isNotNull()) {
-			Ref<Drawable> drawable = m_customDrawable;
-			if (drawable.isNotNull()) {
-				return drawable->getAnimationFramesPerSecond();
-			}
-		}
-		return 0;
+		return sl_false;
 	}
 	
 }

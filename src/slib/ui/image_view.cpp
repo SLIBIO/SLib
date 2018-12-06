@@ -71,8 +71,9 @@ namespace slib
 			if (h > 0.0000001) {
 				setAspectRatio(source->getDrawableWidth() / h, mode);
 			}
-			if (source->getAnimationDuration() > 0.001f) {
-				float fps = source->getAnimationFramesPerSecond();
+			DrawableAnimationInfo animation;
+			if (source->getAnimationInfo(&animation)) {
+				float fps = animation.framesPerSecond;
 				if (fps < 1) {
 					fps = 1;
 				}
