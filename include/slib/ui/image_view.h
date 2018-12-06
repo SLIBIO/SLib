@@ -57,15 +57,19 @@ namespace slib
 		
 		virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-	public:
+	protected:
 		void onDraw(Canvas* canvas) override;
 		
 		void onUpdateLayout() override;
+		
+		void onAnimationFrame(Timer* timer);
 		
 	protected:
 		AtomicRef<Drawable> m_source;
 		ScaleMode m_scaleMode;
 		Alignment m_gravity;
+		AtomicRef<Timer> m_timerAnimation;
+		Time m_timeStartAnimation;
 		
 	};
 

@@ -22,6 +22,8 @@
 
 #include "slib/ui/image_view.h"
 
+#include "slib/core/timer.h"
+
 namespace slib
 {
 	SLIB_DEFINE_OBJECT(ImageView, View)
@@ -63,10 +65,23 @@ namespace slib
 			return;
 		}
 		m_source = source;
+		m_timerAnimation.setNull();
 		if (source.isNotNull()) {
 			sl_real h = source->getDrawableHeight();
 			if (h > 0.0000001) {
 				setAspectRatio(source->getDrawableWidth() / h, mode);
+			}
+			if (source->getAnimationDuration() > 0.001f) {
+				float fps = source->getAnimationFramesPerSecond();
+				if (fps < 1) {
+					fps = 1;
+				}
+				sl_uint32 interval = (sl_int32)(1000 / fps);
+				if (interval > 60) {
+					interval = 60;
+				}
+				m_timeStartAnimation = Time::now();
+				m_timerAnimation = startTimer(SLIB_FUNCTION_WEAKREF(ImageView, onAnimationFrame, this), interval);
 			}
 		}
 		invalidateLayoutOfWrappingControl(mode);
@@ -96,7 +111,14 @@ namespace slib
 	
 	void ImageView::onDraw(Canvas* canvas)
 	{
-		canvas->draw(getBoundsInnerPadding(), m_source, m_scaleMode, m_gravity);
+		if (m_timerAnimation.isNotNull()) {
+			double time = (Time::now() - m_timeStartAnimation).getSecondsCountf();
+			DrawParam param;
+			param.time = (float)time;
+			canvas->draw(getBoundsInnerPadding(), m_source, m_scaleMode, m_gravity, param);
+		} else {
+			canvas->draw(getBoundsInnerPadding(), m_source, m_scaleMode, m_gravity);
+		}
 	}
 	
 	void ImageView::onUpdateLayout()
@@ -117,6 +139,11 @@ namespace slib
 				setLayoutHeight((sl_ui_len)(source->getDrawableHeight()));
 			}
 		}
+	}
+	
+	void ImageView::onAnimationFrame(Timer* timer)
+	{
+		invalidate();
 	}
 
 }
