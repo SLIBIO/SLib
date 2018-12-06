@@ -88,7 +88,7 @@ namespace slib
 
 	Button::Button() : Button(2)
 	{
-		setCreatingNativeWidget(sl_true);
+		setCreatingNativeWidget(sl_false);
 		setSavingCanvasState(sl_false);
 	}
 
