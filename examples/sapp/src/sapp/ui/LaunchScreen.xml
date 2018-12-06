@@ -1,0 +1,16 @@
+<sapp>
+	<layout
+		type='page'
+		background='white'
+		backgroundScale='cover'
+		>
+				
+		<image
+			name='imgLoading'
+			src='@drawable/loading'
+			width='20%sw'
+			alignCenter='true'
+			/>
+
+ 	</layout>
+</sapp>
