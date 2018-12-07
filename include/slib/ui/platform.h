@@ -26,6 +26,7 @@
 #include "definition.h"
 
 #include "../core/ref.h"
+#include "../core/function.h"
 #include "../graphics/platform.h"
 
 #include "event.h"
@@ -148,6 +149,8 @@ namespace slib
 		
 		static CGFloat getGlobalScaleFactor();
 		static void setGlobalScaleFactor(CGFloat factor);
+		
+		static void registerDidReceiveRemoteNotificationCallback(const Function<void(NSDictionary*)>& callback);
 		
 #	endif
 #elif defined(SLIB_UI_IS_ANDROID)

@@ -34,6 +34,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import java.lang.reflect.Field;
+
 import slib.platform.android.Logger;
 
 public class Util {
@@ -63,7 +65,20 @@ public class Util {
 	public static float getDisplayDensity(Activity activity) {
 		return activity.getResources().getDisplayMetrics().density;
 	}
-	
+
+	public static int getStatusBarHeight(Activity activity) {
+		try {
+			Class<?> c = Class.forName("com.android.internal.R$dimen");
+			Object obj = c.newInstance();
+			Field field = c.getField("status_bar_height");
+			int x = Integer.parseInt(field.get(obj).toString());
+			return activity.getResources().getDimensionPixelSize(x);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
+	}
+
 	public static int getAndroidAlignment(int align) {
 		int ret = 0;
 		int horz = align & 3;

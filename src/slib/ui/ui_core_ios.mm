@@ -33,6 +33,7 @@
 #include "slib/core/log.h"
 #include "slib/core/json.h"
 #include "slib/core/variant.h"
+#include "slib/core/safe_static.h"
 #include "slib/core/platform_apple.h"
 
 @interface _priv_Slib_iOS_AppDelegate : UIResponder <UIApplicationDelegate>
@@ -156,6 +157,12 @@ namespace slib
 		}
 	}
 	
+	sl_ui_len UI::getScreenStatusBarHeight()
+	{
+		CGRect rectOfStatusbar = [[UIApplication sharedApplication] statusBarFrame];
+		return (sl_ui_len)(rectOfStatusbar.size.height * UIPlatform::getGlobalScaleFactor());
+	}
+	
 	void UIPlatform::runLoop(sl_uint32 level)
 	{
 		@autoreleasepool {
@@ -232,7 +239,15 @@ namespace slib
 	void UIPlatform::setGlobalScaleFactor(CGFloat factor)
 	{
 		_g_slib_ios_global_scale_factor = factor;
-	}	
+	}
+	
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<void(NSDictionary*)> >, _g_slib_ios_callbacks_didReceiveRemoteNotification);
+	
+	void UIPlatform::registerDidReceiveRemoteNotificationCallback(const Function<void(NSDictionary*)>& callback)
+	{
+		_g_slib_ios_callbacks_didReceiveRemoteNotification.add(callback);
+	}
+	
 }
 
 @implementation _priv_Slib_iOS_AppDelegate
@@ -314,6 +329,11 @@ namespace slib
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
+	
+	for (auto& callback : slib::_g_slib_ios_callbacks_didReceiveRemoteNotification) {
+		callback(userInfo);
+	}
+	
     NSError *err;
 	NSData* jsonData = [NSJSONSerialization dataWithJSONObject:userInfo options:0 error:&err];
 	NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
@@ -344,6 +364,8 @@ namespace slib
 			callback(message);
 		}
 	}
+	
+	completionHandler(UIBackgroundFetchResultNewData);
 }
 
 @end

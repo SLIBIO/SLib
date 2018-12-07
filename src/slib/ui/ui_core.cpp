@@ -401,4 +401,10 @@ namespace slib
 	}
 #endif
 	
+#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
+	sl_ui_len UI::getScreenStatusBarHeight()
+	{
+		return 0;
+	}
+#endif
 }

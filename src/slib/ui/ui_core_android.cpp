@@ -46,6 +46,7 @@ namespace slib
 	SLIB_JNI_BEGIN_CLASS(JAndroidUtil, "slib/platform/android/ui/Util")
 		SLIB_JNI_STATIC_METHOD(getDefaultDisplay, "getDefaultDisplay", "(Landroid/app/Activity;)Landroid/view/Display;");
 		SLIB_JNI_STATIC_METHOD(getDisplaySize, "getDisplaySize", "(Landroid/view/Display;)Landroid/graphics/Point;");
+		SLIB_JNI_STATIC_METHOD(getStatusBarHeight, "getStatusBarHeight", "(Landroid/app/Activity;)I");
 		SLIB_JNI_STATIC_METHOD(openURL, "openURL", "(Landroid/app/Activity;Ljava/lang/String;)V");
 	SLIB_JNI_END_CLASS
 
@@ -174,6 +175,15 @@ namespace slib
 		Android::dismissKeyboard();
 	}
 
+	sl_ui_len UI::getScreenStatusBarHeight()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			return JAndroidUtil::getStatusBarHeight.callInt(sl_null, jactivity);
+		}
+		return 0;
+	}
+	
 	void _priv_AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this)
 	{
 		_priv_UIDispatcher::processCallbacks();

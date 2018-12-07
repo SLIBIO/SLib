@@ -150,6 +150,8 @@ namespace slib
 		static void openUrl(const String& url);
 		
 		static void dismissKeyboard();
+		
+		static sl_ui_len getScreenStatusBarHeight();
 
 	};
 
