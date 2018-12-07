@@ -30,36 +30,50 @@ ExampleWebViewApp::ExampleWebViewApp()
 
 void ExampleWebViewApp::onStart()
 {
+#ifdef SLIB_PLATFORM_IS_DESKTOP
+	int fontSize = 20;
+#else
+	int fontSize = UI::getScreenWidth() / 25;
+#endif
+	
 	getMainWindow()->setResizable(sl_true);
 	
 	m_webView = new WebView;
 	m_webView->setWidthFilling();
 	m_webView->setHeightFilling();
-	m_webView->loadURL("http://mozilla.org/MPL/2.0/");
+
+	m_webView->loadURL("https://en.wikipedia.org");
 
 	Ref<LinearView> linear = new LinearView;
-	linear->setBackgroundColor(Color::LightGray);
+	linear->setBackgroundColor(Color::White);
 	linear->setWidthFilling();
 	linear->setHeightFilling();
 	linear->addChild(m_webView);
 	
 	Ref<LinearView> linear2 = new HorizontalLinearView;
+	linear2->setPadding(fontSize/2);
 	linear2->setWidthWrapping();
 	linear2->setHeightWrapping();
 	linear2->setCenterHorizontal();
 	linear->addChild(linear2);
 
 	Ref<Button> button1 = new Button;
-	button1->setWidth(130);
-	button1->setHeight(40);
+	button1->setWidthWrapping();
+	button1->setHeightWrapping();
+	button1->setAlignParentTop();
+	button1->setFontSize(fontSize);
+	button1->setBackgroundColor(Color::LightGray);
 	button1->setText("Start Test");
 	button1->setOnClick(SLIB_FUNCTION_WEAKREF(ExampleWebViewApp, onClickTest1, this));
 	linear2->addChild(button1);
 	
 	Ref<Button> button2 = new Button;
-	button2->setMarginLeft(30);
-	button2->setWidth(130);
-	button2->setHeight(40);
+	button2->setMarginLeft(fontSize);
+	button2->setWidthWrapping();
+	button2->setHeightWrapping();
+	button2->setAlignParentTop();
+	button2->setFontSize(fontSize);
+	button2->setBackgroundColor(Color::LightGray);
 	button2->setText("Call Javascript");
 	button2->setOnClick(SLIB_FUNCTION_WEAKREF(ExampleWebViewApp, onClickTest2, this));
 	linear2->addChild(button2);
@@ -89,7 +103,7 @@ void ExampleWebViewApp::onClickTest1(View* button)
 	 			function call_cpp()
 	 			{
 					window.call_cpp_count++;
-					slib_send('MyMessage1', window.call_cpp_count);
+					slib.send('MyMessage1', window.call_cpp_count);
 				}
 	 		</script>
 		</html>
