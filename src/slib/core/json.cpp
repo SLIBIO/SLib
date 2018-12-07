@@ -77,7 +77,7 @@ namespace slib
 	{
 	}
 	
-	Json::Json(const std::initializer_list<JsonPair>& pairs): Variant(VariantHashMap(*(reinterpret_cast<const std::initializer_list< Pair<String, Variant> >*>(&pairs))))
+	Json::Json(const std::initializer_list<JsonItem>& pairs): Variant(VariantHashMap(*(reinterpret_cast<const std::initializer_list< Pair<String, Variant> >*>(&pairs))))
 	{
 	}
 	
@@ -285,7 +285,7 @@ namespace slib
 		return *this;
 	}
 	
-	Json& Json::operator=(const std::initializer_list<JsonPair>& pairs)
+	Json& Json::operator=(const std::initializer_list<JsonItem>& pairs)
 	{
 		return *this = Json(pairs);
 	}

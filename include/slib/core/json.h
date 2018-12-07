@@ -76,8 +76,8 @@ namespace slib
 	typedef AtomicHashMap<String, Json> AtomicJsonMap;
 	typedef List< HashMap<String, Json> > JsonMapList;
 	typedef AtomicList< HashMap<String, Json> > AtomicJsonMapList;
-	typedef Pair<String, Json> JsonPair;
-	
+	typedef Pair<String, Json> JsonItem;
+
 	class SLIB_EXPORT Json : public Variant
 	{
 	public:
@@ -205,7 +205,7 @@ namespace slib
 		Json(const AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& map);
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		Json(const std::initializer_list<JsonPair>& pairs);
+		Json(const std::initializer_list<JsonItem>& pairs);
 		
 		Json(const std::initializer_list<Json>& elements);
 #endif
@@ -232,7 +232,7 @@ namespace slib
 		Json& operator=(sl_null_t);
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		Json& operator=(const std::initializer_list<JsonPair>& pairs);
+		Json& operator=(const std::initializer_list<JsonItem>& pairs);
 		
 		Json& operator=(const std::initializer_list<Json>& elements);
 #endif
@@ -523,14 +523,14 @@ namespace slib
 		
 	};
 	
-	SLIB_INLINE JsonPair operator<<=(const String& str, const Json& v)
+	SLIB_INLINE JsonItem operator<<=(const String& str, const Json& v)
 	{
-		return Pair<String, Json>(str, v);
+		return JsonItem(str, v);
 	}
 	
-	SLIB_INLINE JsonPair operator>>=(const String& str, const Json& v)
+	SLIB_INLINE JsonItem operator>>=(const String& str, const Json& v)
 	{
-		return JsonPair(str, v);
+		return JsonItem(str, v);
 	}
 
 }
