@@ -137,7 +137,7 @@ namespace slib
 			loadHTML("", "http://localhost");
 		}
 		m_callbackQueryUserAgentCompletion = callbackQueryCompletion;
-		runJavaScript("slib_send('result_query_user_agent', navigator.userAgent);");
+		runJavaScript("slib.send('result_query_user_agent', navigator.userAgent)");
 	}
 
 	void WebView::onStartLoad(const String& url)
@@ -170,7 +170,7 @@ namespace slib
 		onFinishLoad(url, flagFailed);
 		getOnFinishLoad()(this, url, flagFailed);
 		if (!flagFailed && m_callbackQueryUserAgentCompletion.isNotNull()) {
-			runJavaScript("slib_send('result_query_user_agent', navigator.userAgent);");
+			runJavaScript("slib.send('result_query_user_agent', navigator.userAgent);");
 		}
 	}
 	

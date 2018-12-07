@@ -270,7 +270,7 @@ namespace slib
 		[self setUIDelegate:self];
 		
 		[self.configuration.userContentController addScriptMessageHandler:self name:@"slib_send"];
-		WKUserScript* script = [[WKUserScript alloc] initWithSource:@"window.slib_send=function(msg,param){window.webkit.messageHandlers.slib_send.postMessage(msg+'::'+param);}" injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
+		WKUserScript* script = [[WKUserScript alloc] initWithSource:@"window.slib = {send: function(msg,param){window.webkit.messageHandlers.slib_send.postMessage(msg+'::'+param);}}" injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
 		[self.configuration.userContentController addUserScript:script];
 	}
 	return self;

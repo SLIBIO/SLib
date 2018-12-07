@@ -25,6 +25,7 @@ package slib.platform.android.ui.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.os.Build;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
@@ -258,14 +259,30 @@ public class UiWebView extends WebView implements IView {
 		
 		WebSettings webSettings = this.getSettings();
 		webSettings.setJavaScriptEnabled(true);
-		//webSettings.setBuiltInZoomControls(true);
+
+		webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
+		webSettings.setBuiltInZoomControls(false); // Hide zoom control
+		webSettings.setDisplayZoomControls(false);
+		webSettings.setSupportZoom(false); // No scaling
+		webSettings.setAllowFileAccess(true);
+		if (Build.VERSION.SDK_INT >= 16) {
+			webSettings.setAllowFileAccessFromFileURLs(true);
+			webSettings.setAllowUniversalAccessFromFileURLs(true);
+		}
+		webSettings.setAllowContentAccess(true);
+		webSettings.setDomStorageEnabled(true);
+		webSettings.setDatabaseEnabled(true);
+		String cacheDirPath = context.getFilesDir().getAbsolutePath()+ "/webcache";
+		webSettings.setDatabasePath(cacheDirPath);
+		webSettings.setAppCachePath(cacheDirPath);
+		webSettings.setAppCacheEnabled(true);
 		
 		setWebViewClient(new MyWebViewClient());
 		setWebChromeClient(new MyWebChromeClient());
 		
 		requestFocusFromTouch();
 		
-		addJavascriptInterface(new MyJavaScriptObject(), "SlibNative");
+		addJavascriptInterface(new MyJavaScriptObject(), "slib");
 	}
 
 	@Override
@@ -282,11 +299,6 @@ public class UiWebView extends WebView implements IView {
 		
 		public void onPageStarted(WebView view, String url, Bitmap favicon) {
 			onStartLoad(UiWebView.this, url);
-			try {
-				UiWebView.this.loadUrl("javascript:window.slib_send=function(msg, param) {SlibNative.send(msg, param);};");
-			} catch (Exception e) {
-				Logger.exception(e);
-			}
 		}
 		
 		public void onPageFinished(WebView view, String url) {
