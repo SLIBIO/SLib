@@ -66,7 +66,6 @@ namespace slib
 		HttpMethod method;
 		HashMap<String, Variant> parameters;
 		HttpHeaderMap requestHeaders;
-		HttpHeaderMap additionalRequestHeaders;
 		Memory requestBody;
 		String downloadFilePath;
 		
@@ -215,8 +214,6 @@ namespace slib
 		
 		HttpHeaderMap getRequestHeaders();
 		
-		HttpHeaderMap getAdditionalRequestHeaders();
-		
 		
 		Memory getResponseContent();
 		
@@ -304,7 +301,6 @@ namespace slib
 		Memory m_requestBody;
 		HashMap<String, Variant> m_parameters;
 		HttpHeaderMap m_requestHeaders;
-		HttpHeaderMap m_additionalRequestHeaders;
 		
 		MemoryQueue m_bufResponseContent;
 		HttpStatus m_responseStatus;

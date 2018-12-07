@@ -109,13 +109,9 @@ namespace slib
 						req.HTTPMethod = Apple::getNSStringFromString(HttpMethods::toString(param.method));
 						req.HTTPBody = [NSData dataWithBytes:param.requestBody.getData() length:param.requestBody.getSize()];
 						req.timeoutInterval = NSTimeInterval(param.timeout) / 1000;
+						req.HTTPShouldHandleCookies = NO;
 						{
 							for (auto& pair : param.requestHeaders) {
-								[req setValue:(Apple::getNSStringFromString(pair.value)) forHTTPHeaderField:(Apple::getNSStringFromString(pair.key))];
-							}
-						}
-						{
-							for (auto& pair : param.additionalRequestHeaders) {
 								[req addValue:(Apple::getNSStringFromString(pair.value)) forHTTPHeaderField:(Apple::getNSStringFromString(pair.key))];
 							}
 						}
@@ -193,15 +189,17 @@ namespace slib
 			if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
 				NSHTTPURLResponse* http = (NSHTTPURLResponse*)response;
 				m_responseStatus = (HttpStatus)(http.statusCode);
-				
 				NSDictionary* dict = http.allHeaderFields;
 				if (dict != nil && [dict count] > 0) {
 					HttpHeaderMap map;
+					
 					map.init();
 					auto cmap = map.ref.get();
 					if (cmap) {
-						[dict enumerateKeysAndObjectsUsingBlock:^(id key, id value, BOOL *stop) {
-							cmap->add_NoLock(Apple::getStringFromNSString((NSString*)key), Apple::getStringFromNSString((NSString*)value));
+						[dict enumerateKeysAndObjectsUsingBlock:^(id _key, id _value, BOOL *stop) {
+							String key = Apple::getStringFromNSString((NSString*)_key);
+							String value = Apple::getStringFromNSString((NSString*)_value);
+							cmap->add_NoLock(key, value);
 						}];
 						m_responseHeaders = map;
 					}

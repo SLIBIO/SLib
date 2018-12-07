@@ -174,13 +174,6 @@ namespace slib
 					headerChunk = ::curl_slist_append(headerChunk, s.getData());
 				}
 			}
-			if(m_additionalRequestHeaders.isNotEmpty())
-			{
-				for (auto& pair : m_additionalRequestHeaders) {
-					String s = pair.key + ": " + pair.value;
-					headerChunk = ::curl_slist_append(headerChunk, s.getData());
-				}
-			}
 			if (headerChunk) {
 				::curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerChunk);
 			}

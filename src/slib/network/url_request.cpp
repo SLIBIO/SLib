@@ -108,19 +108,25 @@ namespace slib
 				Ref<Referable> obj = varBody.getObject();
 				if (obj.isNotNull()) {
 					if (CMap<String, Variant>* map = CastInstance< CMap<String, Variant> >(obj.get())) {
-						setRequestBodyAsMap(Map<String, Variant>(map));
+						if (requestHeaders.getValue(HttpHeaders::ContentType).compareIgnoreCase(ContentTypes::toString(ContentType::Json)) == 0) {
+							requestBody = varBody.toJsonString().toMemory();
+						} else {
+							setRequestBodyAsMap(Map<String, Variant>(map));
+						}
 					} else if (CHashMap<String, Variant>* hashMap = CastInstance< CHashMap<String, Variant> >(obj.get())) {
-						setRequestBodyAsHashMap(HashMap<String, Variant>(hashMap));
-					} else if (CMap<String, String>* smap = CastInstance< CMap<String, String> >(obj.get())) {
-						setRequestBodyAsMap(Map<String, String>(smap));
-					} else if (CHashMap<String, String>* shashMap = CastInstance< CHashMap<String, String> >(obj.get())) {
-						setRequestBodyAsHashMap(HashMap<String, String>(shashMap));
-					} else if (IsInstanceOf< CList<Json> >(obj.get()) || IsInstanceOf< CHashMap<String, Json> >(obj.get()) || IsInstanceOf< CList< HashMap<String, Json> > >(obj.get()) || IsInstanceOf< CMap<String, Json> >(obj.get()) || IsInstanceOf< CList< Map<String, Json> > >(obj.get())) {
+						if (requestHeaders.getValue(HttpHeaders::ContentType).compareIgnoreCase(ContentTypes::toString(ContentType::Json)) == 0) {
+							requestBody = varBody.toJsonString().toMemory();
+						} else {
+							setRequestBodyAsHashMap(HashMap<String, Variant>(hashMap));
+						}
+					} else if (IsInstanceOf< CList<Variant> >(obj.get()) || IsInstanceOf< CList< HashMap<String, Json> > >(obj.get()) || IsInstanceOf< CList< Map<String, Json> > >(obj.get())) {
 						requestBody = varBody.toJsonString().toMemory();
 					} else if (XmlDocument* xml = CastInstance<XmlDocument>(obj.get())) {
 						requestBody = xml->toString().toMemory();
 					} else if (CMemory* mem = CastInstance<CMemory>(obj.get())) {
 						requestBody = mem;
+					} else {
+						requestBody = varBody.getString().toMemory();
 					}
 				} else {
 					requestBody.setNull();
@@ -221,11 +227,6 @@ namespace slib
 	HttpHeaderMap UrlRequest::getRequestHeaders()
 	{
 		return m_requestHeaders;
-	}
-	
-	HttpHeaderMap UrlRequest::getAdditionalRequestHeaders()
-	{
-		return m_additionalRequestHeaders;
 	}
 	
 	Memory UrlRequest::getResponseContent()
@@ -406,7 +407,6 @@ namespace slib
 		m_requestBody = param.requestBody;
 		m_parameters = param.parameters;
 		m_requestHeaders = param.requestHeaders;
-		m_additionalRequestHeaders = param.additionalRequestHeaders;
 		
 		m_listener = param.listener;
 		m_onComplete = param.onComplete;

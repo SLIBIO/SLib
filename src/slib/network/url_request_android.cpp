@@ -41,7 +41,7 @@ namespace slib
 	void JNICALL JUrlRequest_onError(JNIEnv* env, jobject _this, jlong jinstance, jstring errorMessage);
 
 	SLIB_JNI_BEGIN_CLASS(JUrlRequest, "slib/platform/android/network/UrlRequest")
-		SLIB_JNI_STATIC_METHOD(execute, "execute", "(JLjava/lang/String;Ljava/lang/String;[Ljava/lang/String;[Ljava/lang/String;[BLjava/lang/String;IZ)V")
+		SLIB_JNI_STATIC_METHOD(execute, "execute", "(JLjava/lang/String;Ljava/lang/String;[Ljava/lang/String;[BLjava/lang/String;IZ)V")
 		SLIB_JNI_METHOD(close, "close", "()V")
 
 		SLIB_JNI_NATIVE(onInit, "nativeOnInit", "(J)V", JUrlRequest_onInit)
@@ -104,27 +104,6 @@ namespace slib
 					}
 				}
 			}
-			JniLocal<jobjectArray> jadditionalHeaders;
-			{
-				CList<String> list;
-				for (auto& pair : m_additionalRequestHeaders) {
-					list.add_NoLock(pair.key);
-					list.add_NoLock(pair.value);
-				}
-				ListElements<String> m(list);
-				if (m.count > 0) {
-					jadditionalHeaders = Jni::newStringArray(m.count);
-					if (jadditionalHeaders.isNotNull()) {
-						for (sl_size i = 0; i < m.count; i++) {
-							Jni::setStringArrayElement(jadditionalHeaders, i, m[i]);
-						}
-					} else {
-						m_lastErrorMessage = "Memory Failure";
-						onError();
-						return;
-					}
-				}
-			}
 			JniLocal<jbyteArray> jbody;
 			if (m_requestBody.isNotNull()) {
 				Memory mem = m_requestBody;
@@ -139,7 +118,7 @@ namespace slib
 				}
 			}
 			JniLocal<jstring> downloadFilePath = Jni::getJniString(m_downloadFilePath);
-			JUrlRequest::execute.call(sl_null, (jlong)((sl_reg)((void*)this)), url.get(), method.get(), jheaders.get(), jadditionalHeaders.get(), jbody.get(), downloadFilePath.get(), m_timeout, m_flagAllowInsecureConnection);
+			JUrlRequest::execute.call(sl_null, (jlong)((sl_reg)((void*)this)), url.get(), method.get(), jheaders.get(), jbody.get(), downloadFilePath.get(), m_timeout, m_flagAllowInsecureConnection);
 		}
 
 		void clear() {

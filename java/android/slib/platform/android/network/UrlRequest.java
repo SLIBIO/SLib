@@ -58,7 +58,7 @@ public class UrlRequest {
 		this.instance = instance;
 	}
 
-	public static void execute(long instance, String _url, String method, String[] headers, String[] additionalHeaders, byte[] uploadBody, String downloadFilePath, int timeout, boolean flagAllowInsecureConnection) {
+	public static void execute(long instance, String _url, String method, String[] headers, byte[] uploadBody, String downloadFilePath, int timeout, boolean flagAllowInsecureConnection) {
 
 		if (downloadFilePath != null && downloadFilePath.length() == 0) {
 			downloadFilePath = null;
@@ -128,12 +128,7 @@ public class UrlRequest {
 				http.setRequestMethod(method);
 				if (headers != null) {
 					for (int i = 0; i < headers.length - 1; i += 2) {
-						http.setRequestProperty(headers[i], headers[i+1]);
-					}
-				}
-				if (additionalHeaders != null) {
-					for (int i = 0; i < additionalHeaders.length - 1; i += 2) {
-						http.addRequestProperty(additionalHeaders[i], additionalHeaders[i+1]);
+						http.addRequestProperty(headers[i], headers[i+1]);
 					}
 				}
 			}

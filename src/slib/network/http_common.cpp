@@ -169,6 +169,9 @@ namespace slib
 	DEFINE_HTTP_HEADER(Origin, "Origin")
 	DEFINE_HTTP_HEADER(AccessControlAllowOrigin, "Access-Control-Allow-Origin")
 
+	DEFINE_HTTP_HEADER(SetCookie, "Set-Cookie")
+	DEFINE_HTTP_HEADER(Cookie, "Cookie")
+
 	sl_reg HttpHeaders::parseHeaders(HttpHeaderMap& map, const void* _data, sl_size size)
 	{
 		const sl_char8* data = (const sl_char8*)_data;
@@ -885,6 +888,7 @@ namespace slib
 	{
 		setResponseHeader(HttpHeaders::AccessControlAllowOrigin, origin);
 	}
+	
 
 	sl_bool HttpResponse::isChunkedResponse() const
 	{

@@ -167,6 +167,9 @@ namespace slib
 		static const String& Origin;
 		static const String& AccessControlAllowOrigin;
 		
+		static const String& SetCookie;
+		static const String& Cookie;
+
 	public:
 		
 		/*
@@ -411,7 +414,7 @@ namespace slib
 		String getResponseAccessControlAllowOrigin() const;
 		
 		void setResponseAccessControlAllowOrigin(const String& origin);
-		
+				
 		
 		Memory makeResponsePacket() const;
 		

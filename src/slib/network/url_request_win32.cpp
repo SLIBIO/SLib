@@ -287,25 +287,14 @@ namespace slib
 			{
 				for (auto& pair : m_requestHeaders) {
 					String16 line = String16::format("%s: %s\r\n", pair.key, pair.value);
-					::WinHttpAddRequestHeaders(m_hRequest, (LPCWSTR)(line.getData()), (DWORD)(line.getLength()), WINHTTP_ADDREQ_FLAG_ADD | WINHTTP_ADDREQ_FLAG_REPLACE);
+					::WinHttpAddRequestHeaders(m_hRequest, (LPCWSTR)(line.getData()), (DWORD)(line.getLength()), WINHTTP_ADDREQ_FLAG_ADD);
 				}
 			}
-			StringBuffer16 sb;
-			{
-				for (auto& pair : m_additionalRequestHeaders) {
-					String16 str = pair.key;
-					sb.addStatic(str.getData(), str.getLength());
-					sb.addStatic(SLIB_UNICODE(": "), 2);
-					str = pair.value;
-					sb.addStatic(str.getData(), str.getLength());
-					sb.addStatic(SLIB_UNICODE("\r\n"), 2);
-				}
-			}
-			String16 s = sb.merge();
+
 			Memory body = m_requestBody;
 
 			m_step = STEP_SENDING_REQUEST;
-			if (!(::WinHttpSendRequest(m_hRequest, (LPCWSTR)(s.getData()), (DWORD)(s.getLength()), body.getData(), (DWORD)(body.getSize()), (DWORD)(body.getSize()), (DWORD_PTR)m_taskId))) {
+			if (!(::WinHttpSendRequest(m_hRequest, NULL, 0, body.getData(), (DWORD)(body.getSize()), (DWORD)(body.getSize()), (DWORD_PTR)m_taskId))) {
 				processLastError();
 			}
 		}
