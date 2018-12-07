@@ -120,6 +120,7 @@ namespace slib
 			Ref<View> _view = getView();
 			if (WebView* view = CastInstance<WebView>(_view.get())) {
 				_installExternal();
+				view->runJavaScript("window.slib = {send: slib_send};");
 			}
 		}
 
@@ -494,11 +495,6 @@ namespace slib
 							String param = params.getValueAt(1);
 							view->dispatchMessageFromJavaScript(msg, param);
 						}
-						/*
-						::VariantInit(pVarResult);
-						pVarResult->vt = VT_BSTR;
-						pVarResult->bstrVal = ::SysAllocString(ret.getData());
-						*/
 					}
 				}
 				break;
@@ -847,31 +843,6 @@ namespace slib
 		}
 	}
 
-	String _priv_WebView_getSource(IHTMLDocument2* doc)
-	{
-		String ret;
-		HRESULT hr;
-
-		IPersistStreamInit* streamInit = NULL;
-		hr = doc->QueryInterface(IID_IPersistStreamInit, (void**)(&streamInit));
-		if (hr == S_OK) {
-			IStream* stream = NULL;
-			hr = ::CreateStreamOnHGlobal(NULL, TRUE, &stream);
-			if (hr == S_OK) {
-				hr = streamInit->Save(stream, FALSE);
-				if (hr == S_OK) {
-					Memory mem = Win32_COM::readAllBytesFromStream(stream);
-					String ret = String::fromUtf(mem);
-					return ret;
-				}
-				stream->Release();
-			}
-			streamInit->Release();
-		}
-		return ret;
-	}
-
-
 	class _priv_WebView : public WebView
 	{
 	public:
@@ -1031,47 +1002,6 @@ namespace slib
 		}
 	}
 
-	String _priv_WebView_evalJavascript(IHTMLWindow2* win, const String& _script)
-	{
-		String ret;
-		IDispatchEx* disp = NULL;
-		HRESULT hr = win->QueryInterface(IID_IDispatchEx, (void**)(&disp));
-		if (disp) {
-			DISPID dispid;
-			hr = disp->GetDispID(L"eval", fdexNameCaseSensitive, &dispid);
-			if (hr == S_OK) {
-				VARIANT var;
-				::VariantInit(&var);
-				DISPPARAMS params;
-				VARIANT vars[1];
-				params.cArgs = 1;
-				params.rgvarg = vars;
-				params.cNamedArgs = 0;
-				params.rgdispidNamedArgs = NULL;
-				String16 script = _script;
-				::VariantInit(&(vars[0]));
-				vars[0].vt = VT_BSTR;
-				vars[0].bstrVal = ::SysAllocString((OLECHAR*)(script.getData()));
-				disp->InvokeEx(dispid, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &params, &var, NULL, NULL);
-				if (var.vt == VT_BSTR) {
-					ret = String((sl_char16*)(var.bstrVal));
-				} else {
-					VARIANT varStr;
-					::VariantInit(&varStr);
-					::VariantChangeType(&varStr, &var, 0, VT_BSTR);
-					if (varStr.vt == VT_BSTR) {
-						ret = String((sl_char16*)(varStr.bstrVal));
-					}
-					::VariantClear(&varStr);
-				}
-				::VariantClear(&(vars[0]));
-				::VariantClear(&var);
-			}
-			disp->Release();
-		}
-		return ret;
-	}
-
 	void WebView::_runJavaScript_NW(const String& _script)
 	{
 		String16 script = _script;
@@ -1084,7 +1014,6 @@ namespace slib
 					IHTMLWindow2* win = NULL;
 					hr = doc2->get_parentWindow(&win);
 					if (hr == S_OK) {
-						//_priv_WebView_evalJavascript(win, _script);
 						BSTR s = (BSTR)(::SysAllocString((OLECHAR*)(script.getData())));
 						if (s) {
 							VARIANT var;
