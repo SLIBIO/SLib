@@ -146,7 +146,6 @@ namespace slib
 				NODE* node = right;
 				for (;;) {
 					if (key_compare(node->key, key) != 0) {
-						last_equal = node;
 						NODE* left = node->left;
 						if (left) {
 							node = left;
@@ -154,6 +153,7 @@ namespace slib
 							break;
 						}
 					} else {
+						last_equal = node;
 						right = node->right;
 						if (right) {
 							node = right;
