@@ -31,9 +31,9 @@ ExampleWebViewApp::ExampleWebViewApp()
 void ExampleWebViewApp::onStart()
 {
 #ifdef SLIB_PLATFORM_IS_DESKTOP
-	int fontSize = 20;
+	sl_real fontSize = 20;
 #else
-	int fontSize = UI::getScreenWidth() / 25;
+	sl_real fontSize = UI::getScreenWidth() / 25;
 #endif
 	
 	getMainWindow()->setResizable(sl_true);
@@ -51,7 +51,7 @@ void ExampleWebViewApp::onStart()
 	linear->addChild(m_webView);
 	
 	Ref<LinearView> linear2 = new HorizontalLinearView;
-	linear2->setPadding(fontSize/2);
+	linear2->setPadding((sl_ui_pos)fontSize/2);
 	linear2->setWidthWrapping();
 	linear2->setHeightWrapping();
 	linear2->setCenterHorizontal();
@@ -68,7 +68,7 @@ void ExampleWebViewApp::onStart()
 	linear2->addChild(button1);
 	
 	Ref<Button> button2 = new Button;
-	button2->setMarginLeft(fontSize);
+	button2->setMarginLeft((sl_ui_pos)fontSize);
 	button2->setWidthWrapping();
 	button2->setHeightWrapping();
 	button2->setAlignParentTop();
