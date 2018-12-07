@@ -71,6 +71,7 @@ namespace slib
 				});
 				return;
 			}
+			handle.scrollView.bounces = NO;
 			[handle setCustomUserAgent:(Apple::getNSStringFromString(m_customUserAgent, nil))];
 			_load(handle);
 		}
