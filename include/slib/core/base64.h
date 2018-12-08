@@ -36,6 +36,8 @@ namespace slib
 		static String encode(const void* byte, sl_size size);
 
 		static String encode(const Memory& mem);
+		
+		static String encode(const String& str);
 
 		static sl_size decode(const String& base64, void* buf, sl_size size);
 

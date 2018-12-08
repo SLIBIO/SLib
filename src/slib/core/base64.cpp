@@ -67,6 +67,11 @@ namespace slib
 		return encode(mem.getData(), mem.getSize());
 	}
 
+	String Base64::encode(const String& str)
+	{
+		return encode(str.getData(), str.getLength());
+	}
+
 	SLIB_INLINE sl_uint32 _priv_Base64_index(sl_char8 c)
 	{
 		if (c >= 'A' && c <= 'Z') {
