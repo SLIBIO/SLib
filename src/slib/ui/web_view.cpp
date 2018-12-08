@@ -35,6 +35,7 @@ namespace slib
 	{
 		setCreatingNativeWidget(sl_true);
 		m_flagOfflineContent = sl_false;
+		m_flagClearCacheOnAttach = sl_false;
 	}
 	
 	WebView::~WebView()
@@ -115,6 +116,19 @@ namespace slib
 		}
 	}
 	
+	void WebView::clearCache()
+	{
+#if defined(SLIB_PLATFORM_IS_APPLE) || defined(SLIB_PLATFORM_IS_WIN32)
+		_clearCache_NW();
+#else
+		if (isNativeWidget()) {
+			_clearCache_NW();
+		} else {
+			m_flagClearCacheOnAttach = sl_true;
+		}
+#endif
+	}
+	
 	String WebView::getErrorMessage()
 	{
 		return m_lastErrorMessage;
@@ -152,8 +166,18 @@ namespace slib
 	{
 	}
 	
-	void WebView::onResize(sl_ui_len width, sl_ui_len height)
+	void WebView::dispatchAttach()
 	{
+		View::dispatchAttach();
+		if (m_flagClearCacheOnAttach) {
+			m_flagClearCacheOnAttach = sl_false;
+			clearCache();
+		}
+	}
+	
+	void WebView::dispatchResize(sl_ui_len width, sl_ui_len height)
+	{
+		View::dispatchResize(width, height);
 		if (isNativeWidget()) {
 			_refreshSize_NW();
 		}
@@ -227,6 +251,10 @@ namespace slib
 	}
 	
 	void WebView::_runJavaScript_NW(const String& script)
+	{
+	}
+	
+	void WebView::_clearCache_NW()
 	{
 	}
 	

@@ -203,6 +203,31 @@ public class UiWebView extends WebView implements IView {
 		}
 	}
 
+	public static void _clearCache(final View view) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_clearCache(view);
+				}
+			});
+			return;
+		}
+
+		if (view instanceof WebView) {
+			final WebView wv = (WebView)view;
+			try {
+				Logger.info("WebView: Clear Cache");
+				wv.clearHistory();
+				wv.clearCache(true);
+				wv.clearFormData();
+				wv.clearMatches();
+				wv.clearSslPreferences();
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
+	}
+
 	public static void _setCustomUserAgent(final View view, final String userAgent) {
 		if (!(UiThread.isUiThread())) {
 			view.post(new Runnable() {

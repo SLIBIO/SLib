@@ -246,6 +246,27 @@ namespace slib
 		}
 	}
 	
+	void WebView::_clearCache_NW()
+	{
+		NSSet* websiteDataTypes = [NSSet setWithArray:@[
+														WKWebsiteDataTypeDiskCache,
+														WKWebsiteDataTypeOfflineWebApplicationCache,
+														WKWebsiteDataTypeMemoryCache,
+														WKWebsiteDataTypeLocalStorage,
+														WKWebsiteDataTypeCookies,
+														WKWebsiteDataTypeSessionStorage,
+														WKWebsiteDataTypeIndexedDBDatabases,
+														WKWebsiteDataTypeWebSQLDatabases,
+														//WKWebsiteDataTypeFetchCache, //(iOS 11.3, *)
+														//WKWebsiteDataTypeServiceWorkerRegistrations, //(iOS 11.3, *)
+														]];
+		
+		NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
+
+		[[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{
+		}];
+	}
+	
 	void WebView::_setCustomUserAgent_NW()
 	{
 		if (![NSThread isMainThread]) {

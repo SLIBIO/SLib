@@ -62,8 +62,10 @@ namespace slib
 		
 		virtual void runJavaScript(const String& script);
 		
-		String getErrorMessage();
+		virtual void clearCache();
 		
+		
+		String getErrorMessage();
 		
 		String getCustomUserAgent();
 		
@@ -85,7 +87,9 @@ namespace slib
 		
 		virtual void onMessageFromJavaScript(const String& msg, const String& param);
 		
-		void onResize(sl_ui_len width, sl_ui_len height) override;
+		void dispatchAttach() override;
+		
+		void dispatchResize(sl_ui_len width, sl_ui_len height) override;
 		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
@@ -113,6 +117,8 @@ namespace slib
 		
 		void _runJavaScript_NW(const String& script);
 		
+		void _clearCache_NW();
+		
 		void _setCustomUserAgent_NW();
 		
 	protected:
@@ -121,6 +127,7 @@ namespace slib
 		sl_bool m_flagOfflineContent;
 		AtomicString m_lastErrorMessage;
 		
+		sl_bool m_flagClearCacheOnAttach;
 		AtomicString m_customUserAgent;
 		AtomicFunction<void(WebView*, String)> m_callbackQueryUserAgentCompletion;
 

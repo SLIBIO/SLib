@@ -34,6 +34,9 @@
 #include <mshtml.h>
 #include <mshtmhst.h>
 
+#include <wininet.h>
+#pragma comment(lib, "wininet.lib")
+
 #include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
 
@@ -1028,6 +1031,25 @@ namespace slib
 					doc2->Release();
 				}
 			}
+		}
+	}
+
+	void WebView::_clearCache_NW()
+	{
+		GROUPID groupId;
+		HANDLE handle = ::FindFirstUrlCacheGroup(0, CACHEGROUP_SEARCH_ALL, NULL, 0, &groupId, NULL);
+		if (handle) {
+			for (;;) {
+				GROUPID next = groupId;
+				BOOL bRet = ::FindNextUrlCacheGroup(handle, &next, NULL);
+				::DeleteUrlCacheGroup(groupId, CACHEGROUP_FLAG_FLUSHURL_ONDELETE, NULL);
+				if (bRet) {
+					groupId = next;
+				} else {
+					break;
+				}
+			}
+			::FindCloseUrlCache(handle);
 		}
 	}
 
