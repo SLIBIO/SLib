@@ -347,7 +347,7 @@ public class UiWebView extends WebView implements IView {
 		public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
 			try {
 				final AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-				builder.setTitle("Alert").setMessage(message).setPositiveButton("OK", null);
+				builder.setTitle("").setMessage(message).setPositiveButton(android.R.string.ok, null);
 				builder.setOnKeyListener(new DialogInterface.OnKeyListener() {
 					public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
 						return true;
@@ -368,14 +368,14 @@ public class UiWebView extends WebView implements IView {
 		public boolean onJsConfirm(WebView view, String url, String message, final JsResult result) {
 			try {
 				final AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-				builder.setTitle("Confirm")
+				builder.setTitle("")
 						.setMessage(message)
-						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,int which) {
 								result.confirm();
 							}
 						})
-						.setNeutralButton("No", new DialogInterface.OnClickListener() {
+						.setNeutralButton(android.R.string.no, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int which) {
 								result.cancel();
 							}
@@ -405,18 +405,18 @@ public class UiWebView extends WebView implements IView {
 		public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, final JsPromptResult result) {
 			try {
 				final AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-				builder.setTitle("Prompt").setMessage(message);
+				builder.setTitle("").setMessage(message);
 				final EditText et = new EditText(view.getContext());
 				et.setSingleLine();
 				et.setText(defaultValue);
 				builder.setView(et)
-						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int which) {
 								result.confirm(et.getText().toString());
 							}
 
 						})
-						.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+						.setNeutralButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int which) {
 								result.cancel();
 							}
