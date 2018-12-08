@@ -503,7 +503,7 @@ namespace slib
 		if (instance.isNotNull()) {
 			instance->setView(sl_null);
 			m_instance.setNull();
-			onDetach();
+			dispatchDetach();
 		}
 	}
 
@@ -564,7 +564,7 @@ namespace slib
 			if (!m_flagDrawing && flagDrawChildren) {
 				setDrawing(sl_true);
 			}
-			onAttach();
+			dispatchAttach();
 		}
 	}
 
@@ -6928,6 +6928,42 @@ namespace slib
 		}
 	}
 
+	Function<void(View*)> View::getOnAttach()
+	{
+		Ref<EventAttributes>& attrs = m_eventAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->attach;
+		}
+		return sl_null;
+	}
+	
+	void View::setOnAttach(const Function<void(View*)>& callback)
+	{
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
+		if (attrs.isNotNull()) {
+			attrs->attach = callback;
+		}
+	}
+	
+	Function<void(View*)> View::getOnDetach()
+	{
+		Ref<EventAttributes>& attrs = m_eventAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->detach;
+		}
+		return sl_null;
+	}
+	
+	void View::setOnDetach(const Function<void(View*)>& callback)
+	{
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
+		if (attrs.isNotNull()) {
+			attrs->detach = callback;
+		}
+	}
+	
 	Function<void(View*, Canvas*)> View::getOnDraw()
 	{
 		Ref<EventAttributes>& attrs = m_eventAttrs;
@@ -7180,7 +7216,33 @@ namespace slib
 			attrs->cancel = callback;
 		}
 	}
+	
+	void View::dispatchAttach()
+	{
+		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
+		if (eventAttrs.isNotNull()) {
+			(eventAttrs->attach)(this);
+			PtrLocker<IViewListener> listener(eventAttrs->listener);
+			if (listener.isNotNull()) {
+				listener->onAttach(this);
+			}
+		}
+		onAttach();
+	}
 
+	void View::dispatchDetach()
+	{
+		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
+		if (eventAttrs.isNotNull()) {
+			(eventAttrs->detach)(this);
+			PtrLocker<IViewListener> listener(eventAttrs->listener);
+			if (listener.isNotNull()) {
+				listener->onDetach(this);
+			}
+		}
+		onDetach();
+	}
+	
 	void View::dispatchDraw(Canvas* canvas)
 	{
 		

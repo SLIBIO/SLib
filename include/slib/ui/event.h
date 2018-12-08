@@ -368,6 +368,10 @@ namespace slib
 		virtual ~IViewListener();
 
 	public:
+		virtual void onAttach(View* view);
+		
+		virtual void onDetach(View* view);
+
 		virtual void onMouseEvent(View* view, UIEvent* ev);
 		
 		virtual void onTouchEvent(View* view, UIEvent* ev);

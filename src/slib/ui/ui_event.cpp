@@ -856,6 +856,14 @@ sl_bool UIEvent::is##NAME##Key() const \
 	IViewListener::~IViewListener()
 	{
 	}
+	
+	void IViewListener::onAttach(View* view)
+	{		
+	}
+	
+	void IViewListener::onDetach(View* view)
+	{
+	}
 
 	void IViewListener::onMouseEvent(View* view, UIEvent* event)
 	{

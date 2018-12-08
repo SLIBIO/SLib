@@ -1154,6 +1154,14 @@ namespace slib
 		
 		void setEventListener(const Ptr<IViewListener>& listener);
 		
+		Function<void(View*)> getOnAttach();
+		
+		void setOnAttach(const Function<void(View*)>& callback);
+		
+		Function<void(View*)> getOnDetach();
+		
+		void setOnDetach(const Function<void(View*)>& callback);
+
 		Function<void(View*, Canvas*)> getOnDraw();
 		
 		void setOnDraw(const Function<void(View*, Canvas*)>& callback);
@@ -1266,6 +1274,10 @@ namespace slib
 		virtual void onCancel(UIEvent* ev);
 		
 	public:
+		virtual void dispatchAttach();
+		
+		virtual void dispatchDetach();
+		
 		virtual void dispatchDraw(Canvas* canvas);
 		
 		virtual void dispatchMouseEvent(UIEvent* ev);
@@ -1665,6 +1677,8 @@ namespace slib
 		{
 		public:
 			AtomicPtr<IViewListener> listener;
+			AtomicFunction<void(View*)> attach;
+			AtomicFunction<void(View*)> detach;
 			AtomicFunction<void(View*, Canvas*)> draw;
 			AtomicFunction<void(View*, Canvas*)> preDraw;
 			AtomicFunction<void(View*, Canvas*)> postDraw;
