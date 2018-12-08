@@ -604,6 +604,16 @@ namespace slib
 	return NO;
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+	[super viewDidAppear:animated];
+	slib::Ref<slib::iOS_Window> w = m_window;
+	if (w.isNotNull()) {
+		slib::Size size = w->getClientSize();
+		w->onResize(size.x, size.y);
+	}
+}
+
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
 {
 	[super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];

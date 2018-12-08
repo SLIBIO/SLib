@@ -1054,7 +1054,7 @@ namespace slib
 
 			attach(window, sl_false);
 			
-#if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_IOS) || defined(SLIB_UI_IS_EFL)
+#if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_EFL)
 			UISize sizeClient = getClientSize();
 			dispatchResize(sizeClient.x, sizeClient.y);
 #endif
