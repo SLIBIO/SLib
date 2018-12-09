@@ -39,7 +39,10 @@ private:
 	
 	void onClickTest2(View* button);
 	
+	void onClickTest3(View* button);
+	
 private:
 	Ref<WebView> m_webView;
+	Ref<HttpService> m_http;
 	
 };

@@ -29,10 +29,11 @@ android {
             path "CMakeLists.txt"
         }
     }
+    sourceSets { main { assets.srcDirs = ['../../asset'] } }
 }
 
 repositories {
-    flatDir{
+    flatDir {
         dirs "${System.env.SLIB_PATH}/lib/Android"
     }
 }

@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		264AF15821B11534004E58CB /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF15721B11534004E58CB /* app.cpp */; };
 		264AF15A21B1156F004E58CB /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF15921B1156E004E58CB /* WebKit.framework */; };
+		264AF20621BD5746004E58CB /* web in Resources */ = {isa = PBXBuildFile; fileRef = 264AF20521BD5746004E58CB /* web */; };
+		264AF20821BD5868004E58CB /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF20721BD5868004E58CB /* libz.tbd */; };
 		26F2DDF0216BDE39007CE8E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDEF216BDE39007CE8E6 /* UIKit.framework */; };
 		26F2DDF2216BDE44007CE8E6 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF1216BDE44007CE8E6 /* GLKit.framework */; };
 		26F2DDF4216BDE4D007CE8E6 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF3216BDE4D007CE8E6 /* OpenGLES.framework */; };
@@ -26,6 +28,8 @@
 		264AF15621B11534004E58CB /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = ../src/app.h; sourceTree = "<group>"; };
 		264AF15721B11534004E58CB /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = ../src/app.cpp; sourceTree = "<group>"; };
 		264AF15921B1156E004E58CB /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		264AF20521BD5746004E58CB /* web */ = {isa = PBXFileReference; lastKnownFileType = folder; name = web; path = ../asset/web; sourceTree = "<group>"; };
+		264AF20721BD5868004E58CB /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		26F2DDEF216BDE39007CE8E6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		26F2DDF1216BDE44007CE8E6 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		26F2DDF3216BDE4D007CE8E6 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -46,6 +50,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				264AF20821BD5868004E58CB /* libz.tbd in Frameworks */,
 				264AF15A21B1156F004E58CB /* WebKit.framework in Frameworks */,
 				26F2DDFC216BDE66007CE8E6 /* QuartzCore.framework in Frameworks */,
 				26F2DDFA216BDE5E007CE8E6 /* CoreImage.framework in Frameworks */,
@@ -74,6 +79,7 @@
 			children = (
 				26F5DE212051ACD500BC4998 /* project */,
 				260D833520C7DAE60013B34E /* src */,
+				264AF20521BD5746004E58CB /* web */,
 				26F5DE202051ACD500BC4998 /* Products */,
 				26F5DE3C2051B60500BC4998 /* Frameworks */,
 			);
@@ -102,6 +108,7 @@
 		26F5DE3C2051B60500BC4998 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				264AF20721BD5868004E58CB /* libz.tbd */,
 				264AF15921B1156E004E58CB /* WebKit.framework */,
 				26F2DDFB216BDE66007CE8E6 /* QuartzCore.framework */,
 				26F2DDF9216BDE5E007CE8E6 /* CoreImage.framework */,
@@ -173,6 +180,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				26F5DE2F2051ACD500BC4998 /* LaunchScreen.storyboard in Resources */,
+				264AF20621BD5746004E58CB /* web in Resources */,
 				26F5DE2C2051ACD500BC4998 /* Assets.xcassets in Resources */,
 				26F5DE2A2051ACD500BC4998 /* Main.storyboard in Resources */,
 			);

@@ -74,11 +74,23 @@ void ExampleWebViewApp::onStart()
 	button2->setAlignParentTop();
 	button2->setFontSize(fontSize);
 	button2->setBackgroundColor(Color::LightGray);
-	button2->setText("Call Javascript");
+	button2->setText("Call Script");
 	button2->setOnClick(SLIB_FUNCTION_WEAKREF(ExampleWebViewApp, onClickTest2, this));
 	linear2->addChild(button2);
 	
+	Ref<Button> button3 = new Button;
+	button3->setMarginLeft((sl_ui_pos)fontSize);
+	button3->setWidthWrapping();
+	button3->setHeightWrapping();
+	button3->setAlignParentTop();
+	button3->setFontSize(fontSize);
+	button3->setBackgroundColor(Color::LightGray);
+	button3->setText("Local Server");
+	button3->setOnClick(SLIB_FUNCTION_WEAKREF(ExampleWebViewApp, onClickTest3, this));
+	linear2->addChild(button3);
+	
 	addViewToContent(linear);
+	
 }
 
 void ExampleWebViewApp::onClickTest1(View* button)
@@ -119,4 +131,21 @@ void ExampleWebViewApp::onClickTest2(View* button)
 	static int n = 0;
 	n++;
 	m_webView->runJavaScript(String::format("test_func(%d, '%s')", n, Time::now()));
+}
+
+void ExampleWebViewApp::onClickTest3(View *button)
+{
+	if (m_http.isNull()) {
+		HttpServiceParam param;
+		param.flagUseAsset = sl_true;
+		param.prefixAsset = "web/";
+		for (int port = 50000; port < 50100; port++) {
+			param.port = port;
+			m_http = HttpService::create(param);
+			if (m_http.isNotNull()) {
+				break;
+			}
+		}
+	}
+	m_webView->loadURL(String::format("http://127.0.0.1:%d/index.html", m_http->getParam().port));
 }
