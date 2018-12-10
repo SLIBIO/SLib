@@ -31,25 +31,39 @@ namespace slib
 	void PushNotification::_doInit()
 	{
 		UIPlatform::registerDidReceiveRemoteNotificationCallback([](NSDictionary* _userInfo) {
-			NSError* error;
-			NSData* dataUserInfo = [NSJSONSerialization dataWithJSONObject:_userInfo options:0 error:&error];
-			String strUserInfo = Apple::getStringFromNSString([[NSString alloc] initWithData:dataUserInfo encoding:NSUTF8StringEncoding]);
-			Json userInfo = Json::parseJson(strUserInfo);
-			if (userInfo.isNotNull()) {
-				PushNotificationMessage message;
-				Json aps = userInfo["aps"];
-				Json alert = aps["alert"];
-				message.title = alert["title"].getString();
-				message.content = alert["body"].getString();
-				message.badge = aps["badge"].getUint32();
-				message.sound = aps["sound"].getString();				
+			PushNotificationMessage message;
+			if (UIPlatform::parseRemoteNotificationInfo(_userInfo, message)) {
 				_onNotificationReceived(message);
 			}
 		});
+		
 		UIApplication* application = [UIApplication sharedApplication];
+		
+		[application registerForRemoteNotifications];
+
 		UIUserNotificationSettings* notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert categories:nil];
 		[application registerUserNotificationSettings:notificationSettings];
 	}
+	
+	sl_bool UIPlatform::parseRemoteNotificationInfo(NSDictionary* _userInfo, PushNotificationMessage& message)
+	{
+		NSError* error;
+		NSData* dataUserInfo = [NSJSONSerialization dataWithJSONObject:_userInfo options:0 error:&error];
+		String strUserInfo = Apple::getStringFromNSString([[NSString alloc] initWithData:dataUserInfo encoding:NSUTF8StringEncoding]);
+		Json userInfo = Json::parseJson(strUserInfo);
+		if (userInfo.isNotNull()) {
+			Json aps = userInfo["aps"];
+			Json alert = aps["alert"];
+			message.title = alert["title"].getString();
+			message.content = alert["body"].getString();
+			message.badge = aps["badge"].getUint32();
+			message.sound = aps["sound"].getString();
+			message.data = userInfo["custom"];
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
 }
 
 #endif

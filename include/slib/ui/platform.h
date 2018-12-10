@@ -66,6 +66,7 @@ namespace slib
 	class Cursor;
 	class Menu;
 	class MenuItem;
+	class PushNotificationMessage;
 	
 	class SLIB_EXPORT UIPlatform
 	{
@@ -151,6 +152,8 @@ namespace slib
 		static void setGlobalScaleFactor(CGFloat factor);
 		
 		static void registerDidReceiveRemoteNotificationCallback(const Function<void(NSDictionary*)>& callback);
+		
+		static sl_bool parseRemoteNotificationInfo(NSDictionary* userInfo, PushNotificationMessage& _out);
 		
 #	endif
 #elif defined(SLIB_UI_IS_ANDROID)
