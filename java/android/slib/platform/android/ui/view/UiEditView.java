@@ -22,6 +22,7 @@
 
 package slib.platform.android.ui.view;
 
+import io.slib.R;
 import slib.platform.android.Logger;
 import slib.platform.android.ui.UiFont;
 import slib.platform.android.ui.UiThread;
@@ -48,6 +49,9 @@ public class UiEditView extends EditText implements IView {
 	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
 
 	boolean flagPassword = false;
+
+	boolean mFlagBorder = false;
+	int mBackgroundColor = 0;
 
 	public static View _create(Context context, int type)
 	{
@@ -121,7 +125,25 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 	
-	public static boolean _setBorder(View view, boolean flag) {
+	public static boolean _setBorder(final View view, final boolean flag) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setBorder(view, flag);
+				}
+			});
+			return true;
+		}
+		if (view instanceof UiEditView) {
+			UiEditView tv = (UiEditView)view;
+			tv.mFlagBorder = flag;
+			if (flag && tv.mBackgroundColor == 0) {
+				tv.setBackgroundResource(R.drawable.slib_rounded_border_background);
+			} else {
+				tv.setBackgroundColor(tv.mBackgroundColor);
+			}
+			return true;
+		}
 		return false;
 	}
 	
@@ -244,7 +266,15 @@ public class UiEditView extends EditText implements IView {
 			});
 			return true;
 		}
-		if (view instanceof TextView) {
+		if (view instanceof UiEditView) {
+			UiEditView tv = (UiEditView) view;
+			tv.mBackgroundColor = color;
+			if (tv.mFlagBorder && color == 0) {
+				tv.setBackgroundResource(R.drawable.slib_rounded_border_background);
+			} else {
+				tv.setBackgroundColor(color);
+			}
+		} else if (view instanceof TextView) {
 			TextView tv = (TextView)view;
 			tv.setBackgroundColor(color);				
 			return true;
