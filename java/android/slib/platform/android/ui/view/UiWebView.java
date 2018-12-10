@@ -22,17 +22,21 @@
 
 package slib.platform.android.ui.view;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Build;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -40,7 +44,9 @@ import android.webkit.WebViewClient;
 import android.widget.EditText;
 
 import slib.platform.android.Logger;
+import slib.platform.android.SlibActivity;
 import slib.platform.android.ui.UiThread;
+import slib.platform.android.ui.helper.WebViewFileChooser;
 
 public class UiWebView extends WebView implements IView {
 
@@ -434,6 +440,28 @@ public class UiWebView extends WebView implements IView {
 				return false;
 			}
 		}
+
+		public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+			fileChooser = new WebViewFileChooser(webView, SlibActivity.REQUEST_WEBVIEW_CHOOSE_FILE);
+			fileChooser.chooseFile(filePathCallback, fileChooserParams);
+			return true;
+		}
+
+		public void openFileChooser(ValueCallback<Uri> uploadMsg) {
+			fileChooser = new WebViewFileChooser(UiWebView.this, SlibActivity.REQUEST_WEBVIEW_CHOOSE_FILE);
+			fileChooser.chooseFile(uploadMsg);
+		}
+
+		public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType) {
+			fileChooser = new WebViewFileChooser(UiWebView.this, SlibActivity.REQUEST_WEBVIEW_CHOOSE_FILE);
+			fileChooser.chooseFile(uploadMsg, acceptType);
+		}
+
+		public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+			fileChooser = new WebViewFileChooser(UiWebView.this, SlibActivity.REQUEST_WEBVIEW_CHOOSE_FILE);
+			fileChooser.chooseFile(uploadMsg, acceptType, capture);
+		}
+
 	}
 	
 	class MyJavaScriptObject {
@@ -441,6 +469,15 @@ public class UiWebView extends WebView implements IView {
 		@JavascriptInterface
 		public void send(String msg, String param) {
 			onMessage(UiWebView.this, msg, param);
+		}
+	}
+
+	static WebViewFileChooser fileChooser;
+
+	public static void onResult(Activity activity, int resultCode, Intent data) {
+		if (fileChooser != null) {
+			fileChooser.processActivityResult(resultCode, data);
+			fileChooser = null;
 		}
 	}
 

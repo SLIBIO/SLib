@@ -25,10 +25,7 @@ package slib.platform.android.camera;
 import java.util.List;
 import java.util.Vector;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
@@ -36,7 +33,7 @@ import android.view.Surface;
 
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
-import slib.platform.android.helper.AppHelper;
+import slib.platform.android.helper.Permissions;
 
 public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 
@@ -180,16 +177,12 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 	}
 
 	private static boolean grantPermission() {
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-			if (checkPermission()) {
-				return true;
-			} else {
-				requestPermission();
-				return false;
-			}
-		} else {
-			return true;
+		Activity activity = lastRunningActivity;
+		if (activity == null) {
+			flagRequestPermission = true;
+			return false;
 		}
+		return Permissions.grantCameraPermission(activity, SlibActivity.PERMISSION_REQUEST_CAMERA);
 	}
 
 	private static boolean checkPermission() {
@@ -197,18 +190,7 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 		if (activity == null) {
 			return false;
 		}
-		Context context = activity.getApplicationContext();
-		int result = AppHelper.checkSelfPermission(context, Manifest.permission.CAMERA);
-		return result == PackageManager.PERMISSION_GRANTED;
-	}
-
-	private static void requestPermission() {
-		Activity activity = lastRunningActivity;
-		if (activity == null) {
-			flagRequestPermission = true;
-			return;
-		}
-		AppHelper.requestPermissions(activity, new String[]{ Manifest.permission.CAMERA }, SlibActivity.PERMISSION_REQUEST_CAMERA);
+		return Permissions.checkCameraPermission(activity);
 	}
 
 	public static void onRequestPermissionsResult() {

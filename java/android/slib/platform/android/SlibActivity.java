@@ -28,7 +28,9 @@ import slib.platform.android.camera.SCamera;
 import slib.platform.android.camera.TakePhoto;
 import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.view.UiGLView;
+import slib.platform.android.ui.view.UiWebView;
 import slib.platform.android.ui.window.UiWindow;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -41,9 +43,10 @@ public class SlibActivity extends Activity {
 
 	boolean flagVisible;
 
-	public static final int REQUEST_IMAGE_CAPTURE = 0x0000ff;
+	public static final int REQUEST_IMAGE_CAPTURE = 0x000100;
+	public static final int REQUEST_WEBVIEW_CHOOSE_FILE = 0x000101;
 
-	public static final int PERMISSION_REQUEST_CAMERA = 0xA00001;
+	public static final int PERMISSION_REQUEST_CAMERA = 0x000201;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +159,8 @@ public class SlibActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_IMAGE_CAPTURE) {
 			TakePhoto.onResult(this, resultCode, data);
+		} else if (requestCode == REQUEST_WEBVIEW_CHOOSE_FILE) {
+			UiWebView.onResult(this, resultCode, data);
 		}
 	}
 
