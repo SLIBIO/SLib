@@ -222,6 +222,26 @@ namespace slib
 		}
 	}
 	
+	void SelectView::addItem(const String& value, const String& title, UIUpdateMode mode)
+	{
+		sl_size n = m_values.getCount();
+		m_values.setCount(n + 1);
+		m_titles.setCount(n + 1);
+		m_values.setAt(n, value);
+		m_titles.setAt(n, title);
+		if (isNativeWidget()) {
+			_refreshItemsCount_NW();
+			if (m_indexSelected >= n) {
+				selectIndex(0, UIUpdateMode::None);
+			}
+		} else {
+			if (m_indexSelected >= n) {
+				selectIndex(0, UIUpdateMode::None);
+			}
+			invalidate(mode);
+		}
+	}
+	
 	void SelectView::selectIndex(sl_uint32 index, UIUpdateMode mode)
 	{
 		if (index < m_titles.getCount()) {
