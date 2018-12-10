@@ -37,13 +37,15 @@ import android.view.inputmethod.InputMethodManager;
 import java.lang.reflect.Field;
 
 import slib.platform.android.Logger;
+import slib.platform.android.SlibActivity;
+import slib.platform.android.helper.Permissions;
 
 public class Util {
 
 	public static Display getDefaultDisplay(Activity activity) {
 		return activity.getWindowManager().getDefaultDisplay();
 	}
-	
+
 	public static Point getDisplaySize(Display display) {
 		Point pt = new Point();
 		DisplayMetrics metrics;
@@ -61,7 +63,7 @@ public class Util {
 	public static Point getDisplaySize(Activity activity) {
 		return getDisplaySize(getDefaultDisplay(activity));
 	}
-	
+
 	public static float getDisplayDensity(Activity activity) {
 		return activity.getResources().getDisplayMetrics().density;
 	}
@@ -87,7 +89,7 @@ public class Util {
 		} else if (horz == 2) {
 			ret |= Gravity.RIGHT;
 		} else {
-			ret |= Gravity.CENTER_HORIZONTAL;			
+			ret |= Gravity.CENTER_HORIZONTAL;
 		}
 		int vert = align & 12;
 		if (vert == 4) {
@@ -95,7 +97,7 @@ public class Util {
 		} else if (vert == 8) {
 			ret |= Gravity.BOTTOM;
 		} else {
-			ret |= Gravity.CENTER_VERTICAL;			
+			ret |= Gravity.CENTER_VERTICAL;
 		}
 		return ret;
 	}
@@ -174,4 +176,44 @@ public class Util {
 			}
 		});
 	}
+
+	public static void grantCameraPermission(final Activity activity) {
+		if (!(UiThread.isUiThread())) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					grantCameraPermission(activity);
+				}
+			});
+			return;
+		}
+		Permissions.grantCameraPermission(activity, SlibActivity.PERMISSION_REQUEST_CAMERA);
+	}
+
+	public static void grantRecordAudioPermission(final Activity activity) {
+		if (!(UiThread.isUiThread())) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					grantRecordAudioPermission(activity);
+				}
+			});
+			return;
+		}
+		Permissions.grantRecordAudioPermission(activity, SlibActivity.PERMISSION_REQUEST_RECORD_AUDIO);
+	}
+
+	public static void grantWriteExternalStoragePermission(final Activity activity) {
+		if (!(UiThread.isUiThread())) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					grantWriteExternalStoragePermission(activity);
+				}
+			});
+			return;
+		}
+		Permissions.grantWriteExternalStoragePermission(activity, SlibActivity.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE);
+	}
+
 }

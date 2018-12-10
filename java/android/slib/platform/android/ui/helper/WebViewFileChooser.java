@@ -41,7 +41,7 @@ public class WebViewFileChooser implements FileChooserListener {
 	private ValueCallback<Uri[]> callback;
 	private ValueCallback<Uri> callbackOld;
 
-	private boolean flagUseDefaultFileChooserParams = true;
+	private boolean flagUseDefaultFileChooserParams;
 
 	public WebViewFileChooser(WebView webView, int requestCode) {
 		this.webView = webView;
@@ -71,7 +71,7 @@ public class WebViewFileChooser implements FileChooserListener {
 			if (acceptTypeTotal.length() == 0) {
 				acceptTypeTotal = "*";
 			}
-			chooseFile(acceptTypeTotal, "filesystem", null, callback);
+			chooseFile(acceptTypeTotal, fileChooserParams.isCaptureEnabled() ? "capture" : "filesystem", null, callback);
 		}
 	}
 
@@ -115,19 +115,19 @@ public class WebViewFileChooser implements FileChooserListener {
 				}
 			}
 			if (acceptType.startsWith("image/")) {
-				if (!flagFileSystem && mediaSource.equals("camera")) {
+				if (!flagFileSystem && (mediaSource.equals("camera") || mediaSource.equals("capture"))) {
 					fileChooser.captureImage();
 				} else {
 					fileChooser.chooseImage();
 				}
 			} else if (acceptType.startsWith("video/")) {
-				if (!flagFileSystem && mediaSource.equals("camcorder")) {
+				if (!flagFileSystem && (mediaSource.equals("camcorder") || mediaSource.equals("capture"))) {
 					fileChooser.captureVideo();
 				} else {
 					fileChooser.chooseVideo();
 				}
 			} else if (acceptType.startsWith("audio/")) {
-				if (!flagFileSystem && mediaSource.equals("microphone")) {
+				if (!flagFileSystem && (mediaSource.equals("microphone") || mediaSource.equals("capture"))) {
 					fileChooser.captureAudio();
 				} else {
 					fileChooser.chooseAudio();

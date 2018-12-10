@@ -26,16 +26,22 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Vector;
 
 import io.slib.R;
+import slib.platform.android.Logger;
+import slib.platform.android.helper.Permissions;
+import slib.util.Time;
 
 public class FileChooser {
 
@@ -58,31 +64,50 @@ public class FileChooser {
 		this.flagLoadingContent = flag;
 	}
 
-	void captureImage() {
+	public void captureImage() {
+		filePathImageCapture = null;
 		start(createImageCaptureIntent());
 	}
 
-	void chooseImage() {
-		start(createChooseFileIntent("image/*", createImageCaptureIntent()));
+	public void chooseImage() {
+		filePathImageCapture = null;
+		if (Permissions.checkCameraPermission(activity) && Permissions.checkWriteExternalStoragePermission(activity)) {
+			start(createChooseFileIntent("image/*", createImageCaptureIntent()));
+		} else {
+			start(createChooseFileIntent("image/*"));
+		}
 	}
 
-	void captureVideo() {
+	public void captureVideo() {
+		filePathImageCapture = null;
 		start(createVideoCaptureIntent());
 	}
 
-	void chooseVideo() {
-		start(createChooseFileIntent("video/*", createVideoCaptureIntent()));
+	public void chooseVideo() {
+		filePathImageCapture = null;
+		if (Permissions.checkCameraPermission(activity)) {
+			start(createChooseFileIntent("video/*", createVideoCaptureIntent()));
+		} else {
+			start(createChooseFileIntent("video/*"));
+		}
 	}
 
-	void captureAudio() {
+	public void captureAudio() {
+		filePathImageCapture = null;
 		start(createRecordSoundIntent());
 	}
 
-	void chooseAudio() {
-		start(createChooseFileIntent("audio/*", createRecordSoundIntent()));
+	public void chooseAudio() {
+		filePathImageCapture = null;
+		if (Permissions.checkRecordAudioPermission(activity)) {
+			start(createChooseFileIntent("audio/*", createRecordSoundIntent()));
+		} else {
+			start(createChooseFileIntent("audio/*"));
+		}
 	}
 
-	void chooseFile() {
+	public void chooseFile() {
+		filePathImageCapture = null;
 		start(createChooseFileIntent());
 	}
 
@@ -93,15 +118,21 @@ public class FileChooser {
 		}
 		flagIgnoreActivityResult = false;
 		Uri result = null;
-		if (intent != null && resultCode == Activity.RESULT_OK) {
-			result = intent.getData();
-			if (result != null) {
-				File cameraFile = new File(filePathImageCapture);
-				if (cameraFile.exists()) {
-					result = Uri.fromFile(cameraFile);
-					activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, result));
+		try {
+			if (resultCode == Activity.RESULT_OK) {
+				if (filePathImageCapture != null) {
+					File cameraFile = new File(filePathImageCapture);
+					if (cameraFile.exists()) {
+						result = Uri.fromFile(cameraFile);
+						activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, result));
+					}
+				}
+				if (result == null && intent != null) {
+					result = intent.getData();
 				}
 			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		listener.onChooseFile(result, null);
 	}
@@ -123,10 +154,15 @@ public class FileChooser {
 	private Intent createImageCaptureIntent() {
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		File dirDCIM = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-		filePathImageCapture = dirDCIM.getAbsolutePath() + File.separator + "IMG_" + timeStamp + ".jpg";
+		String fileName = new Time().format("IMG_%Y%M%D_%H%I%S_%n.jpg");
+		filePathImageCapture = dirDCIM.getAbsolutePath() + File.separator + fileName;
 		File fileCapture = new File(filePathImageCapture);
-		intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(fileCapture));
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			Uri photoURI = FileProvider.getUriForFile(activity, "slib.android.fileprovider", fileCapture);
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+		} else {
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(fileCapture));
+		}
 		return intent;
 	}
 
@@ -146,10 +182,23 @@ public class FileChooser {
 	}
 
 	private Intent createChooseFileIntent() {
-		return createChooseFileIntent("*/*", createImageCaptureIntent(), createVideoCaptureIntent(), createRecordSoundIntent());
+		Vector<Intent> intents = new Vector<Intent>();
+		if (Permissions.checkCameraPermission(activity)) {
+			if (Permissions.checkWriteExternalStoragePermission(activity)) {
+				intents.add(createImageCaptureIntent());
+			}
+			intents.add(createVideoCaptureIntent());
+		}
+		if (Permissions.checkRecordAudioPermission(activity)) {
+			intents.add(createRecordSoundIntent());
+		}
+		return createChooseFileIntent("*/*", intents.toArray(new Intent[] {}));
 	}
 
 	private Intent createChooserIntent(Intent extraIntent, Intent... initialIntents) {
+		if (initialIntents.length == 0) {
+			return extraIntent;
+		}
 		Intent chooser = new Intent(Intent.ACTION_CHOOSER);
 		chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, initialIntents);
 		chooser.putExtra(Intent.EXTRA_INTENT, extraIntent);

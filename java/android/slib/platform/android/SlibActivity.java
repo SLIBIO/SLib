@@ -47,6 +47,8 @@ public class SlibActivity extends Activity {
 	public static final int REQUEST_WEBVIEW_CHOOSE_FILE = 0x000101;
 
 	public static final int PERMISSION_REQUEST_CAMERA = 0x000201;
+	public static final int PERMISSION_REQUEST_RECORD_AUDIO = 0x000202;
+	public static final int PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 0x000203;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

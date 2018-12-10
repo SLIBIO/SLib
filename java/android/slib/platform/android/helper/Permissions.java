@@ -47,6 +47,14 @@ public class Permissions {
 		return grantPermission(activity, Manifest.permission.CAMERA, requestCode);
 	}
 
+	public static boolean checkRecordAudioPermission(Context context) {
+		return checkPermission(context, Manifest.permission.RECORD_AUDIO);
+	}
+
+	public static boolean grantRecordAudioPermission(Activity activity, int requestCode) {
+		return grantPermission(activity, Manifest.permission.RECORD_AUDIO, requestCode);
+	}
+
 	public static boolean checkWriteExternalStoragePermission(Context context) {
 		return checkPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 	}
