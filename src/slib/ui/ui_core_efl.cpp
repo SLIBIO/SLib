@@ -83,14 +83,12 @@ namespace slib
 				rotation = ::elm_win_rotation_get(win);
 			}
 
-#if defined(SLIB_PLATFORM_IS_TIZEN)
-			List<int> orientations = Tizen::getAvailableScreenOrientations();
+			List<int> orientations = UI::getAvailableScreenOrientations();
 			if(orientations.getCount() > 0) {
 				if(orientations.indexOf(rotation) == -1) {
 					rotation = orientations.getValueAt(0);
 				}
 			}
-#endif
 
 			UIRect ret;
 			ret.left = 0;

@@ -141,14 +141,12 @@ namespace slib
 			Evas_Object* win = ::elm_win_util_standard_add("", "");
 			if (win) {
 
-#if defined(SLIB_PLATFORM_IS_TIZEN)
-				List<int> orientations = Tizen::getAvailableScreenOrientations();
+				List<int> orientations = UI::getAvailableScreenOrientations();
 				if (orientations.isNotNull()) {
 					if (::elm_win_wm_rotation_supported_get(win)) {
 						::elm_win_wm_rotation_available_rotations_set(win, orientations.getData(), (unsigned int)(orientations.getCount()));
 					}
 				}
-#endif
 
 				if (!(param.flagFullScreen)) {
 					UIRect screenFrame;

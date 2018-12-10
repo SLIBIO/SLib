@@ -146,13 +146,43 @@ namespace slib
 		
 		static void quitApp();
 		
+
+		enum {
+			ScreenOrientationPortrait = 0,
+			ScreenOrientationLandscapeRight = 90,
+			ScreenOrientationPortraitUpsideDown = 180,
+			ScreenOrientationLandscapeLeft = 270
+		};
+		
+		static List<int> getAvailableScreenOrientations();
+		
+		static void setAvailableScreenOrientations(const List<int>& orientations);
+
+		// ScreenOrientationPortrait
+		static void setAvailableScreenOrientationsPortrait();
+
+		// ScreenOrientationLandscapeRight, ScreenOrientationLandscapeLeft
+		static void setAvailableScreenOrientationsLandscape();
+
 		
 		static void openUrl(const String& url);
 		
 		static void dismissKeyboard();
 		
 		static sl_ui_len getScreenStatusBarHeight();
+		
+		
+		static sl_uint32 getBadgeNumber();
+		
+		static void setBadgeNumber(sl_uint32 number);
 
+		
+		static void grantCameraPermission();
+		
+		static void grantRecordAudioPermission();
+		
+		static void grantWriteExternalStoragePermission();
+		
 	};
 
 }

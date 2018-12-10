@@ -394,17 +394,64 @@ namespace slib
 			UI::dispatchToUiThread(&_priv_UI_quitApp);
 		}
 	}
+	
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicList<int>, _g_ui_available_screen_orientations);
+	
+	List<int> UI::getAvailableScreenOrientations()
+	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_ui_available_screen_orientations)) {
+			return sl_null;
+		}
+		return _g_ui_available_screen_orientations;
+	}
+	
+	void UI::setAvailableScreenOrientations(const List<int>& orientations)
+	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_ui_available_screen_orientations)) {
+			return;
+		}
+		_g_ui_available_screen_orientations = orientations;
+	}
+
+	void UI::setAvailableScreenOrientationsPortrait()
+	{
+		setAvailableScreenOrientations(List<int>::createFromElements(ScreenOrientationPortrait));
+	}
+	
+	void UI::setAvailableScreenOrientationsLandscape()
+	{
+		setAvailableScreenOrientations(List<int>::createFromElements(ScreenOrientationLandscapeRight, ScreenOrientationLandscapeLeft));
+	}
 
 #if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
 	void UI::dismissKeyboard()
 	{
 	}
-#endif
 	
-#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
 	sl_ui_len UI::getScreenStatusBarHeight()
 	{
 		return 0;
 	}
 #endif
+	
+#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID) && !defined(SLIB_UI_IS_MACOS)
+	void UI::setBadgeNumber(sl_uint32 number)
+	{
+	}
+#endif
+	
+#if !defined(SLIB_UI_IS_ANDROID)
+	void UI::grantCameraPermission()
+	{
+	}
+	
+	void UI::grantRecordAudioPermission()
+	{
+	}
+	
+	void UI::grantWriteExternalStoragePermission()
+	{
+	}
+#endif
+	
 }

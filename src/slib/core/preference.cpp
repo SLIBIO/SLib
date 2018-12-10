@@ -31,11 +31,17 @@ namespace slib
 
 	String Preference::getApplicationKeyName()
 	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_preference_app_key)) {
+			return sl_null;
+		}
 		return _g_preference_app_key;
 	}
 
 	void Preference::setApplicationKeyName(const String& name)
 	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_preference_app_key)) {
+			return;
+		}
 		_g_preference_app_key = name;
 	}
 

@@ -1,0 +1,4 @@
+<resources>
+    <string name="slib_util_file_chooser_choose_file">Choose File</string>
+    <string name="slib_util_file_chooser_activity_not_found">Activity is not found.</string>
+</resources>

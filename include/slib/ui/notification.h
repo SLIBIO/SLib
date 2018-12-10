@@ -36,13 +36,19 @@ namespace slib
 	{
 	public:
 		String title;
-		String body;
-		JsonMap data;
+		String content;
 
+		Json data; // custom message
+		
+		sl_int32 badge;
+		String sound;
+		
 	public:
 		PushNotificationMessage();
-
-		~PushNotificationMessage();
+		
+		PushNotificationMessage(const PushNotificationMessage& other) = default;
+		
+		PushNotificationMessage& operator=(const PushNotificationMessage& other) = default;
 
 	};
 	
@@ -50,13 +56,25 @@ namespace slib
 	{
 	public:
 		static String getDeviceToken();
-		static void setTokenRefreshCallback(const Function<void(String)>& callback);
-		static void setNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback);
-		static Function<void(String)> getTokenRefreshCallback();
-		static Function<void(PushNotificationMessage&)> getNotificationReceivedCallback();
 		
+		static void addTokenRefreshCallback(const Function<void(String)>& callback);
+		
+		static void removeTokenRefreshCallback(const Function<void(String)>& callback);
+
+		static void addNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback);
+		
+		static void removeNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback);
+
 	private:
-		static void _initToken();
+		static void _init();
+		
+		static void _doInit();
+		
+	public:
+		static void _onRefreshToken(const String& token);
+		
+		static void _onNotificationReceived(PushNotificationMessage& message);
+		
 	};
 
 }

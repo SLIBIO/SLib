@@ -38,10 +38,6 @@ namespace slib
 	public:
 		static String getAssetFilePath(const String& path);
 
-		static List<int> getAvailableScreenOrientations();
-
-		static void setAvailableScreenOrientations(const List<int>& orientations);
-
 	};
 
 }

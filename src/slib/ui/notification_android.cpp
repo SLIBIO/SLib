@@ -44,22 +44,19 @@ namespace slib
 	SLIB_JNI_END_CLASS
 
 
-	void PushNotification::_initToken()
+	void PushNotification::_doInit()
 	{
 		JAndroidFirebaseInstanceIDService::getToken.call(sl_null);
 	}
 
-	void _priv_Notification_onTokenRefresh(JNIEnv* env, jobject _this, jstring token)
+	void _priv_Notification_onTokenRefresh(JNIEnv* env, jobject _this, jstring _token)
 	{
-		String tokenString = Jni::getString(token);
-		Function<void (String)> callback = PushNotification::getTokenRefreshCallback();
-		if (callback.isNotNull()) {
-			callback(tokenString);
-		}
+		String token = Jni::getString(_token);
+		PushNotification::_onRefreshToken(token);
 	}
 
 
-	void _priv_Notification_onMessageReceived(JNIEnv* env, jobject _this, jstring title, jstring body, jobjectArray data)
+	void _priv_Notification_onMessageReceived(JNIEnv* env, jobject _this, jstring title, jstring content, jobjectArray data)
 	{
 		JsonMap _data;
 		if (data) {
@@ -85,17 +82,14 @@ namespace slib
 		}
 
 		String _title = Jni::getString(title);
-		String _body = Jni::getString(body);
+		String _content = Jni::getString(content);
 
 		PushNotificationMessage message;
 		message.title = _title;
-		message.body = _body;
+		message.content = _content;
 		message.data = _data;
 
-		Function<void(PushNotificationMessage&)> callback = PushNotification::getNotificationReceivedCallback();
-		if (callback.isNotNull()) {
-			callback(message);
-		}
+		PushNotification::_onNotificationReceived(message);
 	}
 
 }

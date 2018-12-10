@@ -55,6 +55,9 @@ namespace slib
 
 	void Application::setApp(Application* app)
 	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_app)) {
+			return;
+		}
 		_g_app = app;
 	}
 

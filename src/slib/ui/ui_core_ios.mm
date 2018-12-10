@@ -163,6 +163,26 @@ namespace slib
 		return (sl_ui_len)(rectOfStatusbar.size.height * UIPlatform::getGlobalScaleFactor());
 	}
 	
+	sl_uint32 UI::getBadgeNumber()
+	{
+		NSInteger number = [[UIApplication sharedApplication] applicationIconBadgeNumber];
+		if (number > 0) {
+			return (sl_uint32)number;
+		}
+		return 0;
+	}
+	
+	void UI::setBadgeNumber(sl_uint32 number)
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				setBadgeNumber(number);
+			});
+			return;
+		}
+		[[UIApplication sharedApplication] setApplicationIconBadgeNumber:number];
+	}
+	
 	void UIPlatform::runLoop(sl_uint32 level)
 	{
 		@autoreleasepool {
@@ -258,8 +278,6 @@ namespace slib
 	
 	slib::UIApp::dispatchStartToApp();
 	
-	[application registerForRemoteNotifications];
-	
 	slib::MobileApp::dispatchCreateActivityToApp();
 	
 	return YES;
@@ -307,25 +325,40 @@ namespace slib
 	slib::UIApp::dispatchExitToApp();
 }
 
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(nullable UIWindow *)window
+{
+	UIInterfaceOrientationMask mask = 0;
+	for (int value : slib::UI::getAvailableScreenOrientations()) {
+		switch (value) {
+			case slib::UI::ScreenOrientationPortrait:
+				mask |= UIInterfaceOrientationMaskPortrait;
+				break;
+			case slib::UI::ScreenOrientationLandscapeRight:
+				mask |= UIInterfaceOrientationMaskLandscapeRight;
+				break;
+			case slib::UI::ScreenOrientationPortraitUpsideDown:
+				mask |= UIInterfaceOrientationMaskPortraitUpsideDown;
+				break;
+			case slib::UI::ScreenOrientationLandscapeLeft:
+				mask |= UIInterfaceOrientationMaskLandscapeLeft;
+				break;
+		}
+	}
+	if (mask) {
+		return mask;
+	} else {
+		return UIInterfaceOrientationMaskAll;
+	}	
+}
+
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-	const sl_uint8* bytes = (const sl_uint8* )[deviceToken bytes];
-	slib::String tokenString = "";
-	for (sl_uint32 i = 0; i < [deviceToken length]; i++) {
-		tokenString += slib::String::format("%02x", bytes[i]);
-	}
-	
-	slib::Function<void (slib::String)> callback = slib::PushNotification::getTokenRefreshCallback();
-	if (callback.isNotNull()) {
-		callback(tokenString);
-	}
+	slib::String token = slib::String::makeHexString([deviceToken bytes], [deviceToken length]);
+	slib::PushNotification::_onRefreshToken(token);
 }
 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
 {
-	slib::Function<void (slib::String)> callback = slib::PushNotification::getTokenRefreshCallback();
-	if (callback.isNotNull()) {
-		callback(slib::String::null());
-	}
+	slib::PushNotification::_onRefreshToken(sl_null);
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
@@ -333,38 +366,6 @@ namespace slib
 	for (auto& callback : slib::_g_slib_ios_callbacks_didReceiveRemoteNotification) {
 		callback(userInfo);
 	}
-	
-    NSError *err;
-	NSData* jsonData = [NSJSONSerialization dataWithJSONObject:userInfo options:0 error:&err];
-	NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-	if (jsonString) {
-        NSDictionary* aps = userInfo[@"aps"];
-        id alert;
-        if (aps != nil) {
-            alert = aps[@"alert"];
-        }
-        
-		slib::Json _userInfo = slib::Json::parseJson(slib::Apple::getStringFromNSString(jsonString));
-        slib::PushNotificationMessage message;
-        message.data = _userInfo.getJsonMap();
-        
-        if (alert) {
-            if ([alert isKindOfClass:[NSString class]]) {
-                message.title = slib::Apple::getStringFromNSString(alert);
-            } else {
-                NSString* title = alert[@"title"];
-                NSString* body = alert[@"body"];
-                message.title = slib::Apple::getStringFromNSString(title);
-                message.body = slib::Apple::getStringFromNSString(body);
-            }
-        }
-        
-		slib::Function<void(slib::PushNotificationMessage&)> callback = slib::PushNotification::getNotificationReceivedCallback();
-		if (callback.isNotNull()) {
-			callback(message);
-		}
-	}
-	
 	completionHandler(UIBackgroundFetchResultNewData);
 }
 

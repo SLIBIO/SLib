@@ -24,12 +24,28 @@
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
-#include <UIKit/UIKit.h>
+#include "slib/ui/platform.h"
 
 namespace slib
 {
-	void PushNotification::_initToken()
+	void PushNotification::_doInit()
 	{
+		UIPlatform::registerDidReceiveRemoteNotificationCallback([](NSDictionary* _userInfo) {
+			NSError* error;
+			NSData* dataUserInfo = [NSJSONSerialization dataWithJSONObject:_userInfo options:0 error:&error];
+			String strUserInfo = Apple::getStringFromNSString([[NSString alloc] initWithData:dataUserInfo encoding:NSUTF8StringEncoding]);
+			Json userInfo = Json::parseJson(strUserInfo);
+			if (userInfo.isNotNull()) {
+				PushNotificationMessage message;
+				Json aps = userInfo["aps"];
+				Json alert = aps["alert"];
+				message.title = alert["title"].getString();
+				message.content = alert["body"].getString();
+				message.badge = aps["badge"].getUint32();
+				message.sound = aps["sound"].getString();				
+				_onNotificationReceived(message);
+			}
+		});
 		UIApplication* application = [UIApplication sharedApplication];
 		UIUserNotificationSettings* notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert categories:nil];
 		[application registerUserNotificationSettings:notificationSettings];

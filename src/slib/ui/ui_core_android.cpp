@@ -48,6 +48,9 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(getDisplaySize, "getDisplaySize", "(Landroid/view/Display;)Landroid/graphics/Point;");
 		SLIB_JNI_STATIC_METHOD(getStatusBarHeight, "getStatusBarHeight", "(Landroid/app/Activity;)I");
 		SLIB_JNI_STATIC_METHOD(openURL, "openURL", "(Landroid/app/Activity;Ljava/lang/String;)V");
+		SLIB_JNI_STATIC_METHOD(grantCameraPermission, "grantCameraPermission", "(Landroid/app/Activity;)V");
+		SLIB_JNI_STATIC_METHOD(grantRecordAudioPermission, "grantRecordAudioPermission", "(Landroid/app/Activity;)V");
+		SLIB_JNI_STATIC_METHOD(grantWriteExternalStoragePermission, "grantWriteExternalStoragePermission", "(Landroid/app/Activity;)V");
 	SLIB_JNI_END_CLASS
 
 	void _priv_AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this);
@@ -184,6 +187,30 @@ namespace slib
 		return 0;
 	}
 	
+	void UI::grantCameraPermission()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JAndroidUtil::grantCameraPermission.call(sl_null, jactivity);
+		}
+	}
+	
+	void UI::grantRecordAudioPermission()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JAndroidUtil::grantRecordAudioPermission.call(sl_null, jactivity);
+		}
+	}
+	
+	void UI::grantWriteExternalStoragePermission()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JAndroidUtil::grantWriteExternalStoragePermission.call(sl_null, jactivity);
+		}
+	}
+
 	void _priv_AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this)
 	{
 		_priv_UIDispatcher::processCallbacks();
