@@ -95,6 +95,9 @@ void ExampleWebViewApp::onStart()
 
 void ExampleWebViewApp::onClickTest1(View* button)
 {
+	UI::grantCameraPermission();
+	UI::grantWriteExternalStoragePermission();
+
 	String html = SLIB_STRINGIFY
 	(
 		<html>
@@ -104,6 +107,8 @@ void ExampleWebViewApp::onClickTest1(View* button)
 	 			<div id='result' style='color:red'></div>
 	 			<BR>
 				<a href='javascript:call_cpp()'>Call C++ Function</a>
+	 			<BR>
+	 			<input type="file" accept="image/*">
 	 		</body>
 	 		<script>
 	 			function test_func(p1, p2)
