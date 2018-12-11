@@ -135,15 +135,7 @@ namespace slib
 		}
 		return ret;
 	}
-
-	void SelectView::_getSelectedIndex_NW()
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			m_indexSelected = ((_priv_SelectView*)this)->_getSelectedIndex(handle);
-		}
-	}
-
+	
 	void SelectView::_select_NW(sl_uint32 index)
 	{
 		HWND handle = UIPlatform::getViewHandle(this);

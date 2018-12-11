@@ -58,7 +58,6 @@ namespace slib
 		
 		void _onSelectItem(_priv_Slib_iOS_PickerView* v, sl_uint32 row)
 		{
-			m_indexSelected = row;
 			dispatchSelectItem(row);
 		}
 		
@@ -85,10 +84,6 @@ namespace slib
 			((_priv_PickerView*)this)->_selectItem(handle, m_indexSelected);
 		}
 		return ret;
-	}
-	
-	void PickerView::_getSelectedIndex_NW()
-	{
 	}
 	
 	void PickerView::_select_NW(sl_uint32 index)

@@ -44,7 +44,6 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;)Lslib/platform/android/ui/view/UiSelectView;");
 
 		SLIB_JNI_STATIC_METHOD(applyList, "_applyList", "(Landroid/view/View;[Ljava/lang/String;)V");
-		SLIB_JNI_STATIC_METHOD(getSelectedIndex, "_getSelectedIndex", "(Landroid/view/View;)I");
 		SLIB_JNI_STATIC_METHOD(select, "_select", "(Landroid/view/View;I)V");
 		SLIB_JNI_STATIC_METHOD(setAlignment, "_setAlignment", "(Landroid/view/View;I)Z");
 		SLIB_JNI_STATIC_METHOD(setTextColor, "_setTextColor", "(Landroid/view/View;I)Z");
@@ -74,15 +73,6 @@ namespace slib
 			}
 		}
 
-		sl_uint32 _getSelectedIndex(jobject jview)
-		{
-			jint n = JAndroidSelectView::getSelectedIndex.callInt(sl_null, jview);
-			if (n < 0) {
-				n = 0;
-			}
-			return n;
-		}
-		
 		void _select(jobject jview, sl_uint32 n)
 		{
 			JAndroidSelectView::select.call(sl_null, jview, n);
@@ -115,14 +105,6 @@ namespace slib
 			}
 		}
 		return ret;
-	}
-
-	void SelectView::_getSelectedIndex_NW()
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			m_indexSelected = ((_priv_SelectView*)this)->_getSelectedIndex(handle);
-		}
 	}
 
 	void SelectView::_select_NW(sl_uint32 index)

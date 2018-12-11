@@ -112,9 +112,7 @@ namespace slib
 		
 		void _animationCallback(Timer* timer);
 		
-		
-		void _getSelectedIndex_NW();
-		
+				
 		void _select_NW(sl_uint32 index);
 		
 		void _refreshItemsCount_NW();

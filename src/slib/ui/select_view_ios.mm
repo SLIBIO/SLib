@@ -56,7 +56,6 @@ namespace slib
 		
 		void _onSelectItem(_priv_Slib_iOS_SelectView* v, sl_uint32 row)
 		{
-			m_indexSelected = row;
 			v.text = _getItemTitle(row);
 			dispatchSelectItem(row);
 		}
@@ -114,10 +113,6 @@ namespace slib
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
-	}
-	
-	void SelectView::_getSelectedIndex_NW()
-	{
 	}
 	
 	void SelectView::_select_NW(sl_uint32 index)

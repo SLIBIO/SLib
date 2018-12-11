@@ -126,15 +126,6 @@ namespace slib
 		return ret;
 	}
 
-	void SelectView::_getSelectedIndex_NW()
-	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
-			NSPopUpButton* v = (NSPopUpButton*)handle;
-			m_indexSelected = ((_priv_SelectView*)this)->_getSelectedIndex(v);
-		}
-	}
-
 	void SelectView::_select_NW(sl_uint32 index)
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);

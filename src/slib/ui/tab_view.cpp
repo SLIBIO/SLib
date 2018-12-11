@@ -177,9 +177,6 @@ namespace slib
 	
 	sl_uint32 TabView::getSelectedTabIndex()
 	{
-		if (isNativeWidget()) {
-			_getSelectedTabIndex_NW();
-		}
 		return m_indexSelected;
 	}
 	
@@ -532,6 +529,7 @@ namespace slib
 	
 	void TabView::dispatchSelectTab(sl_uint32 index)
 	{
+		m_indexSelected = index;
 		onSelectTab(index);
 		getOnSelectTab()(this, index);
 	}
@@ -661,10 +659,6 @@ namespace slib
 	}
 	
 	void TabView::_setTabContentView_NW(sl_uint32 index, const Ref<View>& view)
-	{
-	}
-	
-	void TabView::_getSelectedTabIndex_NW()
 	{
 	}
 	

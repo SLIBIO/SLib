@@ -93,7 +93,6 @@ namespace slib
 			if (index >= n) {
 				index = 0;
 			}
-			m_indexSelected = index;
 			::SendMessageW(hWnd, TCM_SETCURSEL, (WPARAM)m_indexSelected, 0);
 			_applyTabContents(hWnd, viewInstance);
 		}
@@ -106,7 +105,6 @@ namespace slib
 		void _onSelectTab(HWND hWnd, ViewInstance* viewInstance)
 		{
 			sl_uint32 index = _getSelectedIndex(hWnd);
-			m_indexSelected = index;
 			dispatchSelectTab(index);
 			_applyTabContents(hWnd, viewInstance);
 		}
@@ -243,14 +241,6 @@ namespace slib
 		if (viewInstance.isNotNull()) {
 			HWND handle = UIPlatform::getViewHandle(viewInstance.get());
 			((_priv_TabView*)this)->_applyTabContents(handle, viewInstance.get());
-		}
-	}
-
-	void TabView::_getSelectedTabIndex_NW()
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			m_indexSelected = (sl_uint32)(((_priv_TabView*)this)->_getSelectedIndex(handle));
 		}
 	}
 

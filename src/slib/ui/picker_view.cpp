@@ -171,9 +171,6 @@ namespace slib
 	
 	sl_uint32 PickerView::getSelectedIndex()
 	{
-		if (isNativeWidget()) {
-			_getSelectedIndex_NW();
-		}
 		return m_indexSelected;
 	}
 	
@@ -323,6 +320,7 @@ namespace slib
 	
 	void PickerView::dispatchSelectItem(sl_uint32 index)
 	{
+		m_indexSelected = index;
 		onSelectItem(index);
 		getOnSelectItem()(this, index);
 	}
@@ -467,10 +465,6 @@ namespace slib
 	Ref<ViewInstance> PickerView::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;
-	}
-	
-	void PickerView::_getSelectedIndex_NW()
-	{
 	}
 	
 	void PickerView::_select_NW(sl_uint32 index)

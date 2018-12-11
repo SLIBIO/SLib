@@ -268,9 +268,6 @@ namespace slib
 	
 	sl_uint32 SelectView::getSelectedIndex()
 	{
-		if (isNativeWidget()) {
-			_getSelectedIndex_NW();
-		}
 		return m_indexSelected;
 	}
 	
@@ -466,6 +463,7 @@ namespace slib
 	
 	void SelectView::dispatchSelectItem(sl_uint32 index)
 	{
+		m_indexSelected = index;
 		onSelectItem(index);
 		getOnSelectItem()(this, index);
 	}
@@ -520,10 +518,6 @@ namespace slib
 	Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;
-	}
-	
-	void SelectView::_getSelectedIndex_NW()
-	{
 	}
 	
 	void SelectView::_select_NW(sl_uint32 index)

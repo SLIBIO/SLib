@@ -185,15 +185,6 @@ namespace slib
 		}
 	}
 
-	void TabView::_getSelectedTabIndex_NW()
-	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[NSTabView class]]) {
-			NSTabView* tv = (NSTabView*)handle;
-			m_indexSelected = (sl_uint32)([tv indexOfTabViewItem:[tv selectedTabViewItem]]);
-		}
-	}
-
 	void TabView::_selectTab_NW(sl_uint32 index)
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);

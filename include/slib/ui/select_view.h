@@ -137,9 +137,7 @@ namespace slib
 		
 		virtual void dispatchSelectItem(sl_uint32 index);
 		
-	private:
-		void _getSelectedIndex_NW();
-		
+	private:		
 		void _select_NW(sl_uint32 index);
 		
 		void _refreshItemsCount_NW();
