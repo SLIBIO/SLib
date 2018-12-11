@@ -33,9 +33,6 @@ import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Vector;
 
 import io.slib.R;
@@ -158,7 +155,7 @@ public class FileChooser {
 		filePathImageCapture = dirDCIM.getAbsolutePath() + File.separator + fileName;
 		File fileCapture = new File(filePathImageCapture);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			Uri photoURI = FileProvider.getUriForFile(activity, "slib.android.fileprovider", fileCapture);
+			Uri photoURI = FileProvider.getUriForFile(activity, activity.getPackageName() + ".slib.filechooser", fileCapture);
 			intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
 		} else {
 			intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(fileCapture));

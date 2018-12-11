@@ -182,7 +182,7 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 			flagRequestPermission = true;
 			return false;
 		}
-		return Permissions.grantCameraPermission(activity, SlibActivity.PERMISSION_REQUEST_CAMERA);
+		return Permissions.grantCameraPermission(activity, SlibActivity.REQUEST_SCAMERA_PERMISSION);
 	}
 
 	private static boolean checkPermission() {

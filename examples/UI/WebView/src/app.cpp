@@ -99,8 +99,7 @@ void ExampleWebViewApp::onStart()
 
 void ExampleWebViewApp::onClickTest1(View* button)
 {
-	UI::grantCameraPermission();
-	UI::grantWriteExternalStoragePermission();
+	UI::grantPermissions(UI::CameraPermission | UI::WriteExternalStoragePermission);
 
 	String html = SLIB_STRINGIFY
 	(

@@ -446,15 +446,7 @@ namespace slib
 #endif
 	
 #if !defined(SLIB_UI_IS_ANDROID)
-	void UI::grantCameraPermission()
-	{
-	}
-	
-	void UI::grantRecordAudioPermission()
-	{
-	}
-	
-	void UI::grantWriteExternalStoragePermission()
+	void UI::grantPermissions(sl_uint32 permissions)
 	{
 	}
 #endif

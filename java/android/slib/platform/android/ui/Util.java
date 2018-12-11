@@ -22,6 +22,7 @@
 
 package slib.platform.android.ui;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +36,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import java.lang.reflect.Field;
+import java.util.Vector;
 
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
@@ -177,43 +179,31 @@ public class Util {
 		});
 	}
 
-	public static void grantCameraPermission(final Activity activity) {
+	public static void grantPermissions(final Activity activity, final int permissions) {
 		if (!(UiThread.isUiThread())) {
 			activity.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					grantCameraPermission(activity);
+					grantPermissions(activity, permissions);
 				}
 			});
 			return;
 		}
-		Permissions.grantCameraPermission(activity, SlibActivity.PERMISSION_REQUEST_CAMERA);
+		Vector<String> list = new Vector<String>();
+		if ((permissions & 0x00000001) != 0) {
+			list.add(Manifest.permission.CAMERA);
+		}
+		if ((permissions & 0x00000002) != 0) {
+			list.add(Manifest.permission.RECORD_AUDIO);
+		}
+		if ((permissions & 0x00000004) != 0) {
+			list.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		}
+		if (list.size() == 0) {
+			return;
+		}
+		Permissions.grantPermissions(activity, list.toArray(new String[] {}), SlibActivity.REQUEST_PERMISSIONS);
 	}
 
-	public static void grantRecordAudioPermission(final Activity activity) {
-		if (!(UiThread.isUiThread())) {
-			activity.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					grantRecordAudioPermission(activity);
-				}
-			});
-			return;
-		}
-		Permissions.grantRecordAudioPermission(activity, SlibActivity.PERMISSION_REQUEST_RECORD_AUDIO);
-	}
-
-	public static void grantWriteExternalStoragePermission(final Activity activity) {
-		if (!(UiThread.isUiThread())) {
-			activity.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					grantWriteExternalStoragePermission(activity);
-				}
-			});
-			return;
-		}
-		Permissions.grantWriteExternalStoragePermission(activity, SlibActivity.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE);
-	}
 
 }

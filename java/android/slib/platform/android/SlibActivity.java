@@ -46,9 +46,8 @@ public class SlibActivity extends Activity {
 	public static final int REQUEST_IMAGE_CAPTURE = 0x000100;
 	public static final int REQUEST_WEBVIEW_CHOOSE_FILE = 0x000101;
 
-	public static final int PERMISSION_REQUEST_CAMERA = 0x000201;
-	public static final int PERMISSION_REQUEST_RECORD_AUDIO = 0x000202;
-	public static final int PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 0x000203;
+	public static final int REQUEST_PERMISSIONS = 0x000201;
+	public static final int REQUEST_SCAMERA_PERMISSION = 0x000201;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -167,7 +166,7 @@ public class SlibActivity extends Activity {
 	}
 
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-		if (requestCode == PERMISSION_REQUEST_CAMERA) {
+		if (requestCode == REQUEST_SCAMERA_PERMISSION) {
 			SCamera.onRequestPermissionsResult();
 		}
 	}

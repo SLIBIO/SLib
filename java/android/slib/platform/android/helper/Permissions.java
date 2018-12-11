@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Process;
 
+import java.util.Vector;
+
 public class Permissions {
 
 	public static void requestPermissions(Activity activity, String[] permissions, int requestCode) {
@@ -34,6 +36,24 @@ public class Permissions {
 				requestPermission(activity, permission, requestCode);
 				return false;
 			}
+		} else {
+			return true;
+		}
+	}
+
+	public static boolean grantPermissions(Activity activity, String[] permissions, int requestCode) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			Vector<String> list = new Vector<String>();
+			for (int i = 0; i < permissions.length; i++) {
+				if (!(checkPermission(activity, permissions[i]))) {
+					list.add(permissions[i]);
+				}
+			}
+			if (list.size() == 0) {
+				return true;
+			}
+			requestPermissions(activity, list.toArray(new String[] {}), requestCode);
+			return false;
 		} else {
 			return true;
 		}
