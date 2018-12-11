@@ -27,6 +27,8 @@ import slib.platform.android.Logger;
 import slib.platform.android.ui.UiFont;
 import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.Util;
+
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.text.Editable;
@@ -476,10 +478,12 @@ public class UiEditView extends EditText implements IView {
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if (event == null) {
 					onEventDone(UiEditView.this);
+					Util.dismissKeyboard((Activity)(getContext()));
 					return true;
 				} else {
 					if (!(event.isShiftPressed())) {
 						onEventReturn(UiEditView.this);
+						return true;
 					}
 				}
 				return false;
