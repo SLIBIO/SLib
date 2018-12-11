@@ -434,7 +434,7 @@ namespace slib
 	}
 #endif
 	
-#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID) && !defined(SLIB_UI_IS_MACOS)
+#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_MACOS)
 	sl_uint32 UI::getBadgeNumber()
 	{
 		return 0;

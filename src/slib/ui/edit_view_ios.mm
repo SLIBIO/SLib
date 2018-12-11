@@ -181,7 +181,7 @@ namespace slib
 			
 			[handle setText:(Apple::getNSStringFromString(m_text))];
 			[handle setTextAlignment:translateAlignment(m_textAlignment)];
-			[handle setBorderStyle:(isBorder()?UITextBorderStyleBezel:UITextBorderStyleNone)];
+			[handle setBorderStyle:(isBorder()?UITextBorderStyleRoundedRect:UITextBorderStyleNone)];
 			applyPlaceholder(handle);
 			[handle setTextColor:(GraphicsPlatform::getUIColorFromColor(m_textColor))];
 			[handle setBackgroundColor:(GraphicsPlatform::getUIColorFromColor(getBackgroundColor()))];
@@ -390,7 +390,7 @@ namespace slib
 		if (flag) {
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
-				[tv setBorderStyle:(flag?UITextBorderStyleBezel:UITextBorderStyleNone)];
+				[tv setBorderStyle:(flag?UITextBorderStyleRoundedRect:UITextBorderStyleNone)];
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
 				if (flag) {

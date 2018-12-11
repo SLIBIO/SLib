@@ -28,7 +28,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.os.Build;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -158,7 +157,7 @@ public class UiSelectView extends Spinner implements IView {
 		if (view instanceof UiSelectView) {
 			UiSelectView sv = (UiSelectView)view;
 			sv.border = flag;
-			sv.invalidate();
+			sv.applyBackground();
 			return true;
 		}
 		return false;
@@ -176,7 +175,7 @@ public class UiSelectView extends Spinner implements IView {
 		if (view instanceof UiSelectView) {
 			UiSelectView sv = (UiSelectView)view;
 			sv.backgroundColor = color;
-			sv.invalidate();
+			sv.applyBackground();
 			return true;
 		}
 		return false;
@@ -258,25 +257,13 @@ public class UiSelectView extends Spinner implements IView {
 		}
 	}
 
-	Paint paintBorder;
-	Paint paintFill;
 	Paint paintDropdown;
 	Paint paintText;
 	Rect boundsText = new Rect();
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		if (paintBorder == null) {
-			paintBorder = new Paint();
-			paintBorder.setAntiAlias(true);
-			paintBorder.setColor(0xFFB0B0B0);
-			paintBorder.setStrokeWidth(1);
-			paintBorder.setStyle(Paint.Style.STROKE);
-		}
-		if (paintFill == null) {
-			paintFill = new Paint();
-			paintFill.setStyle(Paint.Style.FILL);
-		}
+
 		if (paintDropdown == null) {
 			paintDropdown = new Paint();
 			paintDropdown.setAntiAlias(true);
@@ -293,27 +280,6 @@ public class UiSelectView extends Spinner implements IView {
 
 		int w = getWidth();
 		int h = getHeight();
-
-		paintFill.setColor(backgroundColor);
-		if (border) {
-			if (Build.VERSION.SDK_INT >= 21) {
-				int min = w > h ? h : w;
-				int radius = min / 6;
-				if (backgroundColor != 0) {
-					canvas.drawRoundRect(0, 0, w, h, radius, radius, paintFill);
-				}
-				canvas.drawRoundRect(0, 0, w, h, radius, radius, paintBorder);
-			} else {
-				if (backgroundColor != 0) {
-					canvas.drawRect(0, 0, w, h, paintFill);
-				}
-				canvas.drawRect(0, 0, w, h, paintBorder);
-			}
-		} else {
-			if (backgroundColor != 0) {
-				canvas.drawRect(0, 0, w, h, paintFill);
-			}
-		}
 
 		paintDropdown.setStrokeWidth(h / 10);
 		int h2 = h / 2;
@@ -351,6 +317,10 @@ public class UiSelectView extends Spinner implements IView {
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		setMeasuredDimension(UiView.resolveMeasure(mRight-mLeft, widthMeasureSpec), UiView.resolveMeasure(mBottom-mTop, heightMeasureSpec));
+	}
+
+	void applyBackground() {
+		UiEditView.applyBackground(this, border, backgroundColor);
 	}
 
 }

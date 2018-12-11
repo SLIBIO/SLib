@@ -137,11 +137,7 @@ public class UiEditView extends EditText implements IView {
 		if (view instanceof UiEditView) {
 			UiEditView tv = (UiEditView)view;
 			tv.mFlagBorder = flag;
-			if (flag && tv.mBackgroundColor == 0) {
-				tv.setBackgroundResource(R.drawable.slib_rounded_border_background);
-			} else {
-				tv.setBackgroundColor(tv.mBackgroundColor);
-			}
+			tv.applyBackground();
 			return true;
 		}
 		return false;
@@ -269,11 +265,7 @@ public class UiEditView extends EditText implements IView {
 		if (view instanceof UiEditView) {
 			UiEditView tv = (UiEditView) view;
 			tv.mBackgroundColor = color;
-			if (tv.mFlagBorder && color == 0) {
-				tv.setBackgroundResource(R.drawable.slib_rounded_border_background);
-			} else {
-				tv.setBackgroundColor(color);
-			}
+			tv.applyBackground();
 		} else if (view instanceof TextView) {
 			TextView tv = (TextView)view;
 			tv.setBackgroundColor(color);				
@@ -509,6 +501,18 @@ public class UiEditView extends EditText implements IView {
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		setMeasuredDimension(UiView.resolveMeasure(mRight-mLeft, widthMeasureSpec), UiView.resolveMeasure(mBottom-mTop, heightMeasureSpec));
+	}
+
+	void applyBackground() {
+		applyBackground(this, mFlagBorder, mBackgroundColor);
+	}
+
+	public static void applyBackground(View view, boolean flag, int color) {
+		if (flag && ((color & 0xFF000000) == 0 || (color & 0xFFFFFF) == 0xFFFFFF)) {
+			view.setBackgroundResource(R.drawable.slib_rounded_border_background);
+		} else {
+			view.setBackgroundColor(color);
+		}
 	}
 
 }
