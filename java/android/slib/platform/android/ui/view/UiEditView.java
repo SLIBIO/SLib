@@ -48,8 +48,6 @@ public class UiEditView extends EditText implements IView {
 	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
 	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
 
-	boolean flagPassword = false;
-
 	boolean mFlagBorder = false;
 	int mBackgroundColor = 0;
 
@@ -61,13 +59,6 @@ public class UiEditView extends EditText implements IView {
 				UiEditView view = new UiEditView(context);
 				view.setPadding(3, 0, 3, 0);
 				return view;				
-			} else if (type == 1) {
-				// PasswordView
-				UiEditView view = new UiEditView(context);
-				view.flagPassword = true;
-				view.setPadding(3, 0, 3, 0);
-				view.setInputType(InputType.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD);
-				return view;
 			} else if (type == 2) {
 				// TextArea
 				UiTextArea view = new UiTextArea(context);
@@ -358,85 +349,85 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 
-	public static boolean _setInputType(final View view, final int keyboardType, final int autoCapType) {
-
-		if (view instanceof UiEditView && ((UiEditView)view).flagPassword) {
-			return true;
-		}
+	public static boolean _setInputType(final View view, final int keyboardType, final int autoCapType, final boolean flagPassword) {
 
 		if (!(UiThread.isUiThread())) {
 			view.post(new Runnable() {
 				public void run() {
-					_setInputType(view, keyboardType, autoCapType);
+					_setInputType(view, keyboardType, autoCapType, flagPassword);
 				}
 			});
 			return true;
 		}
 
-		if (view instanceof  TextView) {
+		if (view instanceof TextView) {
 			TextView tv = (TextView)view;
 			int type;
-			if (view instanceof UiTextArea) {
-				type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+			if (flagPassword) {
+				type = InputType.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD;
 			} else {
-				switch (keyboardType) {
-					case 0:
-						type = InputType.TYPE_CLASS_TEXT;
-						break;
-					case 1:
-						type = InputType.TYPE_CLASS_NUMBER;
-						break;
-					case 2:
-						type = InputType.TYPE_CLASS_PHONE;
-						break;
-					case 3:
-						type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
-						break;
-					case 4:
-						type = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL;
-						break;
-					case 5:
-						type = InputType.TYPE_CLASS_TEXT;
-						break;
-					case 6:
-						type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
-						break;
-					case 7:
-						type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT;
-						break;
-					case 8:
-						type = InputType.TYPE_CLASS_TEXT;
-						break;
-					case  9:
-						type = InputType.TYPE_CLASS_TEXT;
-						break;
-					case 10:
-						type = InputType.TYPE_CLASS_TEXT;
-						break;
-					case 11:
-						type = InputType.TYPE_CLASS_TEXT;
-						break;
-					case 12:
-						type = InputType.TYPE_CLASS_TEXT;
-						break;
-					default:
-						type = InputType.TYPE_CLASS_TEXT;
-						break;
+				if (view instanceof UiTextArea) {
+					type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+				} else {
+					switch (keyboardType) {
+						case 0:
+							type = InputType.TYPE_CLASS_TEXT;
+							break;
+						case 1:
+							type = InputType.TYPE_CLASS_NUMBER;
+							break;
+						case 2:
+							type = InputType.TYPE_CLASS_PHONE;
+							break;
+						case 3:
+							type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+							break;
+						case 4:
+							type = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL;
+							break;
+						case 5:
+							type = InputType.TYPE_CLASS_TEXT;
+							break;
+						case 6:
+							type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
+							break;
+						case 7:
+							type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT;
+							break;
+						case 8:
+							type = InputType.TYPE_CLASS_TEXT;
+							break;
+						case 9:
+							type = InputType.TYPE_CLASS_TEXT;
+							break;
+						case 10:
+							type = InputType.TYPE_CLASS_TEXT;
+							break;
+						case 11:
+							type = InputType.TYPE_CLASS_TEXT;
+							break;
+						case 12:
+							type = InputType.TYPE_CLASS_TEXT;
+							break;
+						default:
+							type = InputType.TYPE_CLASS_TEXT;
+							break;
+					}
 				}
-			}
-			if ((type & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_TEXT) {
-				switch (autoCapType) {
-					case 1:
-						type = type | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
-						break;
-					case 2:
-						type = type | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
-						break;
-					case 3:
-						type = type | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
-						break;
-					default:
-						break;
+				if ((type & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_TEXT) {
+					switch (autoCapType) {
+						case 1:
+							type = type | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
+							break;
+						case 2:
+							type = type | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
+							break;
+						case 3:
+							type = type | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
+							break;
+						default:
+							break;
+					}
 				}
 			}
 			tv.setInputType(type);

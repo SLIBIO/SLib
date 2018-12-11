@@ -36,13 +36,6 @@
 }
 @end
 
-@interface _priv_Slib_macOS_SecureTextField : NSSecureTextField<NSTextFieldDelegate> {
-	
-	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
-
-}
-@end
-
 @interface _priv_Slib_macOS_TextArea_TextView : NSTextView {
 	
 	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
@@ -119,6 +112,13 @@ namespace slib
 
 		void _applyProperties(NSTextField* handle)
 		{
+			NSTextFieldCell* cell;
+			if (m_flagPassword) {
+				cell = [[_priv_Slib_macOS_SecureTextFieldCell alloc] init];
+			} else {
+				cell = [[_priv_Slib_macOS_TextFieldCell alloc] init];
+			}
+			handle.cell = cell;
 			[handle setStringValue:(Apple::getNSStringFromString(m_text))];
 			[handle setAlignment:translateAlignment(m_textAlignment)];
 			[handle setBordered: (isBorder() ? YES : NO)];
@@ -209,22 +209,6 @@ namespace slib
 		MACOS_VIEW_CREATE_INSTANCE_BEGIN
 		_priv_Slib_macOS_TextField* handle = [[_priv_Slib_macOS_TextField alloc] initWithFrame:frame];
 		if (handle != nil) {
-			_priv_Slib_macOS_TextFieldCell* cell = [[_priv_Slib_macOS_TextFieldCell alloc] init];
-			handle.cell = cell;
-			((EditView_Impl*)this)->_applyProperties(handle);
-			[handle setDelegate:handle];
-		}
-		MACOS_VIEW_CREATE_INSTANCE_END
-		return ret;
-	}
-
-	Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* _parent)
-	{
-		MACOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_macOS_SecureTextField* handle = [[_priv_Slib_macOS_SecureTextField alloc] initWithFrame:frame];
-		if (handle != nil) {
-			_priv_Slib_macOS_SecureTextFieldCell* cell = [[_priv_Slib_macOS_SecureTextFieldCell alloc] init];
-			handle.cell = cell;
 			((EditView_Impl*)this)->_applyProperties(handle);
 			[handle setDelegate:handle];
 		}
@@ -399,6 +383,30 @@ namespace slib
 		}
 	}
 	
+	void EditView::_setPassword_NW(sl_bool flag)
+	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setPassword_NW, this, flag));
+			return;
+		}
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			if ([handle isKindOfClass:[NSTextField class]]) {
+				NSTextField* tv = (NSTextField*)handle;
+				if (m_flagPassword) {
+					if ([tv.cell isKindOfClass:[_priv_Slib_macOS_SecureTextFieldCell class]]) {
+						return;
+					}
+				} else {
+					if ([tv.cell isKindOfClass:[_priv_Slib_macOS_TextFieldCell class]]) {
+						return;
+					}
+				}
+				((EditView_Impl*)this)->_applyProperties(tv);
+			}
+		}
+	}
+	
 	void EditView::_setMultiLine_NW(sl_bool flag)
 	{
 	}
@@ -514,30 +522,6 @@ namespace slib
 	}
 	[super keyUp:theEvent];
 }
-@end
-
-@implementation _priv_Slib_macOS_SecureTextField
-
--(void)controlTextDidChange:(NSNotification *)obj
-{
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		slib::EditView_Impl::onChangeTextField(instance.get(), self);
-	}
-}
-
-- (void)keyUp:(NSEvent*)theEvent
-{
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
-		if (flagNoDefault) {
-			return;
-		}
-	}
-	[super keyUp:theEvent];
-}
-
 @end
 
 @implementation _priv_Slib_macOS_TextArea

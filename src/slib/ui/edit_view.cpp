@@ -48,6 +48,7 @@ namespace slib
 		
 		m_textAlignment = Alignment::MiddleCenter;
 		m_flagReadOnly = sl_false;
+		m_flagPassword = sl_false;
 		m_flagMultiLine = sl_false;
 		m_textColor = Color::Black;
 		m_hintTextColor = Color(180, 180, 180);
@@ -120,6 +121,21 @@ namespace slib
 		m_flagReadOnly = flag;
 		if (isNativeWidget()) {
 			_setReadOnly_NW(flag);
+		} else {
+			invalidate(mode);
+		}
+	}
+
+	sl_bool EditView::isPassword()
+	{
+		return m_flagPassword;
+	}
+	
+	void EditView::setPassword(sl_bool flag, UIUpdateMode mode)
+	{
+		m_flagPassword = flag;
+		if (isNativeWidget()) {
+			_setPassword_NW(flag);
 		} else {
 			invalidate(mode);
 		}
@@ -252,7 +268,11 @@ namespace slib
 		if (m_text.isEmpty()) {
 			canvas->drawText(m_hintText, getBoundsInnerPadding(), getFont(), m_hintTextColor, m_textAlignment);
 		} else {
-			canvas->drawText(m_text, getBoundsInnerPadding(), getFont(), m_textColor, m_textAlignment);
+			if (m_flagPassword) {
+				canvas->drawText(String('*', m_text.getLength()), getBoundsInnerPadding(), getFont(), m_textColor, m_textAlignment);
+			} else {
+				canvas->drawText(m_text, getBoundsInnerPadding(), getFont(), m_textColor, m_textAlignment);
+			}
 		}
 	}
 	
@@ -413,32 +433,9 @@ namespace slib
 		PasswordView
 	***********************/
 
-	SLIB_DEFINE_OBJECT(PasswordView, EditView)
-
 	PasswordView::PasswordView()
 	{
-	}
-
-	PasswordView::~PasswordView()
-	{
-	}
-
-	sl_bool PasswordView::isMultiLine()
-	{
-		return sl_false;
-	}
-
-	void PasswordView::setMultiLine(sl_bool flag, UIUpdateMode mode)
-	{
-	}
-	
-	void PasswordView::onDraw(Canvas* canvas)
-	{
-		if (m_text.isEmpty()) {
-			canvas->drawText(m_hintText, getBoundsInnerPadding(), getFont(), m_hintTextColor, m_textAlignment);
-		} else {
-			canvas->drawText(String('*', m_text.getLength()), getBoundsInnerPadding(), getFont(), m_textColor, m_textAlignment);
-		}
+		m_flagPassword = sl_true;
 	}
 
 	/**********************
@@ -493,6 +490,10 @@ namespace slib
 	{
 	}
 
+	void EditView::_setPassword_NW(sl_bool flag)
+	{
+	}
+	
 	void EditView::_setMultiLine_NW(sl_bool flag)
 	{
 	}
@@ -515,11 +516,6 @@ namespace slib
 
 	void EditView::_setBackgroundColor_NW(const Color& color)
 	{
-	}
-
-	Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* parent)
-	{
-		return sl_null;
 	}
 
 	Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* parent)

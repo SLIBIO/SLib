@@ -180,14 +180,15 @@ namespace slib
 				if (m_flagMultiLine) {
 					style |= ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN;
 				}
-			} else if (type == 1) {
-				style |= ES_PASSWORD;
 			} else if (type == 2) {
 				style |= WS_HSCROLL | WS_VSCROLL | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL | ES_WANTRETURN;
 			}
 			if (m_flagReadOnly) {
 				style |= ES_READONLY;
-			}		
+			}
+			if (m_flagPassword) {
+				style |= ES_PASSWORD;
+			}
 			style |= ES_AUTOHSCROLL;
 			String16 text = m_text;
 			Ref<Win32_EditViewInstance> ret = Win32_ViewInstance::create<Win32_EditViewInstance>(this, parent, L"EDIT", (LPCWSTR)(text.getData()), style, 0);
@@ -217,11 +218,6 @@ namespace slib
 	Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* parent)
 	{
 		return ((EditView_Impl*)this)->_createInstance(parent, 0);
-	}
-
-	Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* parent)
-	{
-		return ((EditView_Impl*)this)->_createInstance(parent, 1);
 	}
 
 	Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* parent)
@@ -276,6 +272,15 @@ namespace slib
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			::SendMessageW(handle, EM_SETREADONLY, (WPARAM)(flag ? TRUE : FALSE), 0);
+		}
+	}
+
+	void EditView::_setPassword_NW(sl_bool flag)
+	{
+		HWND handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			::SendMessageW(handle, EM_SETPASSWORDCHAR, (WPARAM)(flag ? TRUE : FALSE), 0);
+			::InvalidateRect(handle, NULL, TRUE);
 		}
 	}
 

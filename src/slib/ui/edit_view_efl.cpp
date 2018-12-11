@@ -74,9 +74,7 @@ namespace slib
 		
 		void _applyProperties(Evas_Object* handle, int type)
 		{
-			if (type == 1) {
-				::elm_entry_password_set(handle, EINA_TRUE);
-			} else if (type == 2) {
+			if (type == 2) {
 				::elm_entry_single_line_set(handle, EINA_FALSE);
 			} else {
 				::elm_entry_single_line_set(handle, m_flagMultiLine ? EINA_FALSE : EINA_TRUE);
@@ -92,6 +90,7 @@ namespace slib
 			}
 
 			::elm_entry_editable_set(handle, m_flagReadOnly ? EINA_FALSE : EINA_TRUE);
+			::elm_entry_password_set(handle, m_flagPassword ? EINA_TRUE : EINA_FALSE);
 
 			::elm_entry_input_panel_return_key_type_set(handle, _convertReturnKeyType(m_returnKeyType));
 			::elm_entry_input_panel_layout_set(handle, _convertKeyboardType(m_keyboardType, type == 1));
@@ -350,11 +349,6 @@ namespace slib
 		return ((EditView_Impl*)this)->_createInstance(parent, 0);
 	}
 	
-	Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* parent)
-	{
-		return ((EditView_Impl*)this)->_createInstance(parent, 1);
-	}
-	
 	Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* parent)
 	{
 		return ((EditView_Impl*)this)->_createInstance(parent, 2);
@@ -424,6 +418,14 @@ namespace slib
 		}
 	}
 	
+	void EditView::_setPassword_NW(sl_bool flag)
+	{
+		Evas_Object* handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			::elm_entry_password_set(handle, flag ? EINA_TRUE : EINA_FALSE);
+		}
+	}
+
 	void EditView::_setMultiLine_NW(sl_bool flag)
 	{
 		Evas_Object* handle = UIPlatform::getViewHandle(this);

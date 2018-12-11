@@ -186,6 +186,7 @@ namespace slib
 			[handle setTextColor:(GraphicsPlatform::getUIColorFromColor(m_textColor))];
 			[handle setBackgroundColor:(GraphicsPlatform::getUIColorFromColor(getBackgroundColor()))];
 			[handle setEnabled:(m_flagReadOnly ? NO : YES)];
+			[handle setSecureTextEntry:(m_flagPassword ? YES : NO)];
 			Ref<Font> font = getFont();
 			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
 			if (hFont != nil) {
@@ -308,19 +309,6 @@ namespace slib
 		_priv_Slib_iOS_TextField* handle = [[_priv_Slib_iOS_TextField alloc] initWithFrame:frame];
 		
 		if (handle != nil) {
-			((EditView_Impl*)this)->applyProperties(handle);
-		}
-		IOS_VIEW_CREATE_INSTANCE_END
-		return ret;
-	}
-	
-	Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* _parent)
-	{
-		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_iOS_TextField* handle = [[_priv_Slib_iOS_TextField alloc] initWithFrame:frame];
-		
-		if (handle != nil) {
-			handle.secureTextEntry = TRUE;
 			((EditView_Impl*)this)->applyProperties(handle);
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
@@ -489,6 +477,24 @@ namespace slib
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
 				[tv setEditable:(flag?NO:YES)];
+			}
+		}
+	}
+	
+	void EditView::_setPassword_NW(sl_bool flag)
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_setPassword_NW(flag);
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			if ([handle isKindOfClass:[UITextField class]]) {
+				UITextField* tv = (UITextField*)handle;
+				[tv setSecureTextEntry:(flag?YES:NO)];
 			}
 		}
 	}

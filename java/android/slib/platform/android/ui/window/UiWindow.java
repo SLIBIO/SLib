@@ -467,7 +467,7 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
-		boolean ret = super.dispatchTouchEvent(ev);
+		super.dispatchTouchEvent(ev);
 		if (ev.getAction() == MotionEvent.ACTION_UP) {
 			View view = activity.getCurrentFocus();
 			if (view != null) {
@@ -480,7 +480,7 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 				}
 			}
 		}
-		return ret;
+		return true;
 	}
 
 }

@@ -56,6 +56,10 @@ namespace slib
 		
 		virtual void setReadOnly(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		sl_bool isPassword();
+		
+		virtual void setPassword(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
 		virtual sl_bool isMultiLine();
 		
 		virtual void setMultiLine(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -127,6 +131,8 @@ namespace slib
 		
 		void _setReadOnly_NW(sl_bool flag);
 		
+		void _setPassword_NW(sl_bool flag);
+
 		void _setMultiLine_NW(sl_bool flag);
 		
 		void _setTextColor_NW(const Color& color);
@@ -160,6 +166,7 @@ namespace slib
 		Alignment m_textAlignment;
 		AtomicString m_hintText;
 		sl_bool m_flagReadOnly;
+		sl_bool m_flagPassword;
 		sl_bool m_flagMultiLine;
 		Color m_textColor;
 		Color m_hintTextColor;
@@ -175,23 +182,8 @@ namespace slib
 	
 	class PasswordView : public EditView
 	{
-		SLIB_DECLARE_OBJECT
-		
 	public:
 		PasswordView();
-		
-		~PasswordView();
-
-	public:
-		sl_bool isMultiLine() override;
-		
-		virtual void setMultiLine(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw) override;
-		
-	public:
-		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
-		
-	protected:
-		void onDraw(Canvas* canvas) override;
 		
 	};
 	

@@ -75,7 +75,7 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(setBackgroundColor, "_setBackgroundColor", "(Landroid/view/View;I)Z");
 		SLIB_JNI_STATIC_METHOD(setFont, "_setFont", "(Landroid/view/View;Lslib/platform/android/ui/UiFont;)Z");
 		SLIB_JNI_STATIC_METHOD(setReturnKeyType, "_setReturnKeyType", "(Landroid/view/View;I)Z");
-		SLIB_JNI_STATIC_METHOD(setInputType, "_setInputType", "(Landroid/view/View;II)Z");
+		SLIB_JNI_STATIC_METHOD(setInputType, "_setInputType", "(Landroid/view/View;IIZ)Z");
 
 		SLIB_JNI_NATIVE(nativeOnChange, "nativeOnChange", "(J)V", Android_EditView_nativeOnChange);
 		SLIB_JNI_NATIVE(nativeOnDone, "nativeOnDone", "(J)V", Android_EditView_nativeOnDone);
@@ -105,7 +105,7 @@ namespace slib
 				JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
 			}
 			JAndroidEditView::setReturnKeyType.callBoolean(sl_null, handle, (int)m_returnKeyType);
-			JAndroidEditView::setInputType.callBoolean(sl_null, handle, (int)m_keyboardType, (int)m_autoCapitalizationType);
+			JAndroidEditView::setInputType.callBoolean(sl_null, handle, (int)m_keyboardType, (int)m_autoCapitalizationType, m_flagPassword ? 1 : 0);
 		}
 	};
 
@@ -115,21 +115,6 @@ namespace slib
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
 			JniLocal<jobject> handle = JAndroidEditView::create.callObject(sl_null, parent->getContext(), 0);
-			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
-			if (ret.isNotNull()) {
-				jobject handle = ret->getHandle();
-				((EditView_Impl*)this)->applyParameters(handle);
-			}
-		}
-		return ret;
-	}
-
-	Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* _parent)
-	{
-		Ref<Android_ViewInstance> ret;
-		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
-		if (parent) {
-			JniLocal<jobject> handle = JAndroidEditView::create.callObject(sl_null, parent->getContext(), 1);
 			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
@@ -259,7 +244,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			JAndroidEditView::setInputType.callBoolean(sl_null, handle, (int)type, (int)m_autoCapitalizationType);
+			JAndroidEditView::setInputType.callBoolean(sl_null, handle, (int)type, (int)m_autoCapitalizationType, m_flagPassword ? 1 : 0);
 		}
 	}
 
@@ -267,7 +252,15 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			JAndroidEditView::setInputType.callBoolean(sl_null, handle, m_keyboardType, (int)type);
+			JAndroidEditView::setInputType.callBoolean(sl_null, handle, (int)m_keyboardType, (int)type, m_flagPassword ? 1 : 0);
+		}
+	}
+
+	void EditView::_setPassword_NW(sl_bool flag)
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			JAndroidEditView::setInputType.callBoolean(sl_null, handle, (int)m_keyboardType, (int)m_autoCapitalizationType, flag ? 1 : 0);
 		}
 	}
 
