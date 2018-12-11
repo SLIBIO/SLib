@@ -35,6 +35,10 @@ void ExampleWebViewApp::onStart()
 #else
 	sl_real fontSize = UI::getScreenWidth() / 25;
 #endif
+#ifdef SLIB_PLATFORM_IS_WIN32
+	String path = Application::findFileAndSetAppPath("asset/web/index.html");
+	Application::setApplicationDirectory(path + "/asset");
+#endif
 	
 	getMainWindow()->setResizable(sl_true);
 	

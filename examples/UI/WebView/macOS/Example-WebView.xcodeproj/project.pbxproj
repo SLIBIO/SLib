@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2628EAC621BF883F00D8CD00 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 2628EAC521BF883F00D8CD00 /* libz.tbd */; };
+		2628EACA21BF899200D8CD00 /* web in Resources */ = {isa = PBXBuildFile; fileRef = 2628EAC921BF899200D8CD00 /* web */; };
 		26B906822110223700D972FB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 26B906812110223700D972FB /* AppDelegate.m */; };
 		26B906842110223800D972FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26B906832110223800D972FB /* Assets.xcassets */; };
 		26B906872110223800D972FB /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 26B906852110223800D972FB /* MainMenu.xib */; };
@@ -16,6 +18,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2628EAC521BF883F00D8CD00 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		2628EAC921BF899200D8CD00 /* web */ = {isa = PBXFileReference; lastKnownFileType = folder; name = web; path = ../asset/web; sourceTree = "<group>"; };
 		26B9067D2110223700D972FB /* Example-WebView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Example-WebView.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		26B906802110223700D972FB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		26B906812110223700D972FB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -33,6 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2628EAC621BF883F00D8CD00 /* libz.tbd in Frameworks */,
 				26B906992110244B00D972FB /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -44,6 +49,7 @@
 			isa = PBXGroup;
 			children = (
 				26B906932110232E00D972FB /* src */,
+				2628EAC921BF899200D8CD00 /* web */,
 				26B9067F2110223700D972FB /* Example-WebView */,
 				26B9067E2110223700D972FB /* Products */,
 				26B906972110244B00D972FB /* Frameworks */,
@@ -83,6 +89,7 @@
 		26B906972110244B00D972FB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2628EAC521BF883F00D8CD00 /* libz.tbd */,
 				26B906982110244B00D972FB /* WebKit.framework */,
 			);
 			name = Frameworks;
@@ -145,6 +152,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2628EACA21BF899200D8CD00 /* web in Resources */,
 				26B906842110223800D972FB /* Assets.xcassets in Resources */,
 				26B906872110223800D972FB /* MainMenu.xib in Resources */,
 			);
