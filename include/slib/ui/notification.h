@@ -40,8 +40,12 @@ namespace slib
 
 		Json data; // custom message
 		
+		// Sending Params
 		sl_int32 badge;
 		String sound;
+		
+		// Received Params
+		sl_bool flagClicked;
 		
 	public:
 		PushNotificationMessage();

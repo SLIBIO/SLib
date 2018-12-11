@@ -56,8 +56,6 @@ namespace slib
 			Json alert = aps["alert"];
 			message.title = alert["title"].getString();
 			message.content = alert["body"].getString();
-			message.badge = aps["badge"].getUint32();
-			message.sound = aps["sound"].getString();
 			message.data = userInfo["custom"];
 			return sl_true;
 		}
