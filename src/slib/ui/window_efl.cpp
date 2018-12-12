@@ -141,10 +141,10 @@ namespace slib
 			Evas_Object* win = ::elm_win_util_standard_add("", "");
 			if (win) {
 
-				List<int> orientations = UI::getAvailableScreenOrientations();
+				List<ScreenOrientation> orientations = UI::getAvailableScreenOrientations();
 				if (orientations.isNotNull()) {
 					if (::elm_win_wm_rotation_supported_get(win)) {
-						::elm_win_wm_rotation_available_rotations_set(win, orientations.getData(), (unsigned int)(orientations.getCount()));
+						::elm_win_wm_rotation_available_rotations_set(win, (int*)(orientations.getData()), (unsigned int)(orientations.getCount()));
 					}
 				}
 

@@ -83,10 +83,10 @@ namespace slib
 				rotation = ::elm_win_rotation_get(win);
 			}
 
-			List<int> orientations = UI::getAvailableScreenOrientations();
+			List<ScreenOrientation> orientations = UI::getAvailableScreenOrientations();
 			if(orientations.getCount() > 0) {
-				if(orientations.indexOf(rotation) == -1) {
-					rotation = orientations.getValueAt(0);
+				if(orientations.indexOf((ScreenOrientation)rotation) == -1) {
+					rotation = (int)(orientations.getValueAt(0));
 				}
 			}
 

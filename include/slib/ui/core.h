@@ -147,16 +147,9 @@ namespace slib
 		static void quitApp();
 		
 
-		enum {
-			ScreenOrientationPortrait = 0,
-			ScreenOrientationLandscapeRight = 90,
-			ScreenOrientationPortraitUpsideDown = 180,
-			ScreenOrientationLandscapeLeft = 270
-		};
+		static List<ScreenOrientation> getAvailableScreenOrientations();
 		
-		static List<int> getAvailableScreenOrientations();
-		
-		static void setAvailableScreenOrientations(const List<int>& orientations);
+		static void setAvailableScreenOrientations(const List<ScreenOrientation>& orientations);
 
 		// ScreenOrientationPortrait
 		static void setAvailableScreenOrientationsPortrait();

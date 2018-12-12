@@ -325,18 +325,18 @@ namespace slib
 - (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(nullable UIWindow *)window
 {
 	UIInterfaceOrientationMask mask = 0;
-	for (int value : slib::UI::getAvailableScreenOrientations()) {
+	for (slib::ScreenOrientation value : slib::UI::getAvailableScreenOrientations()) {
 		switch (value) {
-			case slib::UI::ScreenOrientationPortrait:
+			case slib::ScreenOrientation::Portrait:
 				mask |= UIInterfaceOrientationMaskPortrait;
 				break;
-			case slib::UI::ScreenOrientationLandscapeRight:
+			case slib::ScreenOrientation::LandscapeRight:
 				mask |= UIInterfaceOrientationMaskLandscapeRight;
 				break;
-			case slib::UI::ScreenOrientationPortraitUpsideDown:
+			case slib::ScreenOrientation::PortraitUpsideDown:
 				mask |= UIInterfaceOrientationMaskPortraitUpsideDown;
 				break;
-			case slib::UI::ScreenOrientationLandscapeLeft:
+			case slib::ScreenOrientation::LandscapeLeft:
 				mask |= UIInterfaceOrientationMaskLandscapeLeft;
 				break;
 		}

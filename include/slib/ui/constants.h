@@ -386,6 +386,13 @@ namespace slib
 		AllCharacters = 3
 	};
 
+	enum class ScreenOrientation {
+		Portrait = 0,
+		LandscapeRight = 90,
+		PortraitUpsideDown = 180,
+		LandscapeLeft = 270
+	};
+	
 }
 
 #endif

@@ -395,9 +395,9 @@ namespace slib
 		}
 	}
 	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicList<int>, _g_ui_available_screen_orientations);
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicList<ScreenOrientation>, _g_ui_available_screen_orientations);
 	
-	List<int> UI::getAvailableScreenOrientations()
+	List<ScreenOrientation> UI::getAvailableScreenOrientations()
 	{
 		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_ui_available_screen_orientations)) {
 			return sl_null;
@@ -405,7 +405,7 @@ namespace slib
 		return _g_ui_available_screen_orientations;
 	}
 	
-	void UI::setAvailableScreenOrientations(const List<int>& orientations)
+	void UI::setAvailableScreenOrientations(const List<ScreenOrientation>& orientations)
 	{
 		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_ui_available_screen_orientations)) {
 			return;
@@ -415,12 +415,12 @@ namespace slib
 
 	void UI::setAvailableScreenOrientationsPortrait()
 	{
-		setAvailableScreenOrientations(List<int>::createFromElements(ScreenOrientationPortrait));
+		setAvailableScreenOrientations(List<ScreenOrientation>::createFromElements(ScreenOrientation::Portrait));
 	}
 	
 	void UI::setAvailableScreenOrientationsLandscape()
 	{
-		setAvailableScreenOrientations(List<int>::createFromElements(ScreenOrientationLandscapeRight, ScreenOrientationLandscapeLeft));
+		setAvailableScreenOrientations(List<ScreenOrientation>::createFromElements(ScreenOrientation::LandscapeRight, ScreenOrientation::LandscapeLeft));
 	}
 
 #if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
