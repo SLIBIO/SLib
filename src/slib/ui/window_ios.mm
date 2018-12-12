@@ -202,14 +202,16 @@ namespace slib
 		{
 			UIView* view = m_window;
 			if (view != nil) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					if ([view isKindOfClass:[UIWindow class]]) {
-						UIWindow* window = (UIWindow*)view;
-						[window makeKeyAndVisible];
-					} else {
-						[view becomeFirstResponder];
-					}
-				});
+				if (!(UI::isUiThread())) {
+					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_Window, setFocus, this));
+					return sl_true;
+				}
+				if ([view isKindOfClass:[UIWindow class]]) {
+					UIWindow* window = (UIWindow*)view;
+					[window makeKeyAndVisible];
+				} else {
+					[view becomeFirstResponder];
+				}
 				return sl_true;
 			}
 			return sl_false;
@@ -232,20 +234,21 @@ namespace slib
 			}
 		}
 		
-		sl_bool setFrame(const UIRect& _frame)
+		sl_bool setFrame(const UIRect& frame)
 		{
-			UIRect frame = _frame;
 			UIView* window = m_window;
 			if (window != nil) {
+				if (!(UI::isUiThread())) {
+					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_Window, setFrame, this, frame));
+					return sl_true;
+				}
 				CGFloat f = UIPlatform::getGlobalScaleFactor();
-				dispatch_async(dispatch_get_main_queue(), ^{
-					CGRect rect;
-					rect.origin.x = (CGFloat)(frame.left) / f;
-					rect.origin.y = (CGFloat)(frame.top) / f;
-					rect.size.width = (CGFloat)(frame.getWidth()) / f;
-					rect.size.height = (CGFloat)(frame.getHeight()) / f;
-					[window setFrame:rect];
-				});
+				CGRect rect;
+				rect.origin.x = (CGFloat)(frame.left) / f;
+				rect.origin.y = (CGFloat)(frame.top) / f;
+				rect.size.width = (CGFloat)(frame.getWidth()) / f;
+				rect.size.height = (CGFloat)(frame.getHeight()) / f;
+				[window setFrame:rect];
 				return sl_true;
 			}
 			return sl_false;
@@ -271,18 +274,19 @@ namespace slib
 			}
 		}
 		
-		sl_bool setClientSize(const UISize& _size)
+		sl_bool setClientSize(const UISize& size)
 		{
-			UISize size = _size;
 			UIView* window = m_window;
 			if (window != nil) {
+				if (!(UI::isUiThread())) {
+					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_Window, setClientSize, this, size));
+					return sl_true;
+				}
 				CGFloat f = UIPlatform::getGlobalScaleFactor();
-				dispatch_async(dispatch_get_main_queue(), ^{
-					CGRect frame = [window frame];
-					frame.size.width = (CGFloat)(size.x) / f;
-					frame.size.height = (CGFloat)(size.y) / f;
-					[window setFrame:frame];
-				});
+				CGRect frame = [window frame];
+				frame.size.width = (CGFloat)(size.x) / f;
+				frame.size.height = (CGFloat)(size.y) / f;
+				[window setFrame:frame];
 				return sl_true;
 			}
 			return sl_false;
@@ -315,15 +319,17 @@ namespace slib
 		{
 			UIView* window = m_window;
 			if (window != nil) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					UIColor* color;
-					if (_color.isZero()) {
-						color = nil;
-					} else {
-						color = GraphicsPlatform::getUIColorFromColor(_color);
-					}
-					[window setBackgroundColor:color];
-				});
+				if (!(UI::isUiThread())) {
+					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_Window, setBackgroundColor, this, _color));
+					return sl_true;
+				}
+				UIColor* color;
+				if (_color.isZero()) {
+					color = nil;
+				} else {
+					color = GraphicsPlatform::getUIColorFromColor(_color);
+				}
+				[window setBackgroundColor:color];
 				return sl_true;
 			}
 			return sl_false;
@@ -368,9 +374,11 @@ namespace slib
 		{
 			UIView* window = m_window;
 			if (window != nil) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[window setHidden:(flag?NO:YES)];
-				});
+				if (!(UI::isUiThread())) {
+					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_Window, setVisible, this, flag));
+					return sl_true;
+				}
+				[window setHidden:(flag ? NO : YES)];
 				return sl_true;
 			} else {
 				return sl_false;
@@ -398,14 +406,16 @@ namespace slib
 			UIView* view = m_window;
 			if (view != nil) {
 				if ([view isKindOfClass:[UIWindow class]]) {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						UIWindow* window = (UIWindow*)view;
-						if (flag) {
-							window.windowLevel = UIWindowLevelAlert + 1;
-						} else {
-							window.windowLevel = UIWindowLevelNormal + 1;
-						}
-					});
+					if (!(UI::isUiThread())) {
+						UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_Window, setAlwaysOnTop, this, flag));
+						return sl_true;
+					}
+					UIWindow* window = (UIWindow*)view;
+					if (flag) {
+						window.windowLevel = UIWindowLevelAlert + 1;
+					} else {
+						window.windowLevel = UIWindowLevelNormal + 1;
+					}
 					return sl_true;
 				}
 			}
@@ -466,16 +476,18 @@ namespace slib
 		{
 			UIView* window = m_window;
 			if (window != nil) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					sl_real alpha = _alpha;
-					if (alpha < 0) {
-						alpha = 0;
-					}
-					if (alpha > 1) {
-						alpha = 1;
-					}
-					window.alpha = alpha;
-				});
+				if (!(UI::isUiThread())) {
+					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_Window, setAlpha, this, _alpha));
+					return sl_true;
+				}
+				sl_real alpha = _alpha;
+				if (alpha < 0) {
+					alpha = 0;
+				}
+				if (alpha > 1) {
+					alpha = 1;
+				}
+				window.alpha = alpha;
 				return sl_true;
 			} else {
 				return sl_false;

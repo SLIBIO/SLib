@@ -170,13 +170,6 @@ namespace slib
 		
 		void applyProperties(UITextField* handle)
 		{
-			if (![NSThread isMainThread]) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					applyProperties(handle);
-				});
-				return;
-			}
-			
 			ADD_TOOL_BAR(handle)
 			
 			[handle setText:(Apple::getNSStringFromString(m_text))];
@@ -199,13 +192,6 @@ namespace slib
 		
 		void applyProperties(_priv_Slib_iOS_TextArea* handle)
 		{
-			if (![NSThread isMainThread]) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					applyProperties(handle);
-				});
-				return;
-			}
-			
 			ADD_TOOL_BAR(handle)
 			
 			[handle setText:(Apple::getNSStringFromString(m_text))];
@@ -345,14 +331,10 @@ namespace slib
 	
 	void EditView::_setText_NW(const String& value)
 	{
-		if (![NSThread isMainThread]) {
-			String _value = value;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setText_NW(_value);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setText_NW, this, value));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
@@ -367,13 +349,10 @@ namespace slib
 	
 	void EditView::_setBorder_NW(sl_bool flag)
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setBorder_NW(flag);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setBorder_NW, this, flag));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (flag) {
 			if ([handle isKindOfClass:[UITextField class]]) {
@@ -393,13 +372,10 @@ namespace slib
 	
 	void EditView::_setTextAlignment_NW(Alignment align)
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setTextAlignment_NW(align);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setTextAlignment_NW, this, align));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
@@ -415,14 +391,10 @@ namespace slib
 	
 	void EditView::_setHintText_NW(const String& value)
 	{
-		if (![NSThread isMainThread]) {
-			String _value = value;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setHintText_NW(_value);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setHintText_NW, this, value));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
@@ -439,14 +411,10 @@ namespace slib
 	
 	void EditView::_setHintTextColor_NW(const Color& value)
 	{
-		if (![NSThread isMainThread]) {
-			Color _value = value;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setHintTextColor_NW(_value);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setHintTextColor_NW, this, value));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
@@ -462,13 +430,10 @@ namespace slib
 
 	void EditView::_setReadOnly_NW(sl_bool flag)
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setReadOnly_NW(flag);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setReadOnly_NW, this, flag));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
@@ -483,13 +448,10 @@ namespace slib
 	
 	void EditView::_setPassword_NW(sl_bool flag)
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setPassword_NW(flag);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setPassword_NW, this, flag));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
@@ -505,14 +467,10 @@ namespace slib
 	
 	void EditView::_setTextColor_NW(const Color& color)
 	{
-		if (![NSThread isMainThread]) {
-			Color _color = color;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setTextColor_NW(_color);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setTextColor_NW, this, color));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
@@ -527,14 +485,10 @@ namespace slib
 	
 	void EditView::_setBackgroundColor_NW(const Color& color)
 	{
-		if (![NSThread isMainThread]) {
-			Color _color = color;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setBackgroundColor_NW(_color);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setBackgroundColor_NW, this, color));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
@@ -549,14 +503,10 @@ namespace slib
 	
 	void EditView::_setFont_NW(const Ref<Font>& font)
 	{
-		if (![NSThread isMainThread]) {
-			Ref<Font> _font = font;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setFont_NW(_font);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setFont_NW, this, font));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
@@ -578,13 +528,10 @@ namespace slib
 	
 	void EditView::_setReturnKeyType_NW(UIReturnKeyType type)
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setReturnKeyType_NW(type);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setReturnKeyType_NW, this, type));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
@@ -599,13 +546,10 @@ namespace slib
 	
 	void EditView::_setKeyboardType_NW(UIKeyboardType type)
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setKeyboardType_NW(type);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setKeyboardType_NW, this, type));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
@@ -620,13 +564,10 @@ namespace slib
 	
 	void EditView::_setAutoCapitalizationType_NW(UIAutoCapitalizationType type)
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setAutoCapitalizationType_NW(type);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setAutoCapitalizationType_NW, this, type));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {

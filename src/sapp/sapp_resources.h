@@ -411,6 +411,7 @@ namespace slib
 		SAppAlignmentValue gravity;
 		SAppStringValue hintText;
 		SAppBooleanValue readOnly;
+		SAppBooleanValue password;
 		SAppBooleanValue multiLine;
 		SAppColorValue textColor;
 		SAppColorValue hintTextColor;

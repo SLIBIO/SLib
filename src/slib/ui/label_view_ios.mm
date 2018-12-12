@@ -42,13 +42,6 @@ namespace slib
 	public:
 		void applyProperties(UILabel* handle)
 		{
-			if (![NSThread isMainThread]) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					applyProperties(handle);
-				});
-				return;
-			}
-			
 			[handle setText:(Apple::getNSStringFromString(m_text))];
 			[handle setTextAlignment:translateAlignment(m_textAlignment)];
 			if (isBorder()) {
@@ -101,14 +94,10 @@ namespace slib
 	
 	void LabelView::_setText_NW(const String& value)
 	{
-		if (![NSThread isMainThread]) {
-			String _value = value;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setText_NW(_value);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), LabelView, _setText_NW, this, value));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 			UILabel* tv = (UILabel*)handle;
@@ -118,13 +107,10 @@ namespace slib
 	
 	void LabelView::_setTextAlignment_NW(Alignment align)
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setTextAlignment_NW(align);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), LabelView, _setTextAlignment_NW, this, align));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 			UILabel* tv = (UILabel*)handle;
@@ -134,14 +120,10 @@ namespace slib
 	
 	void LabelView::_setTextColor_NW(const Color& color)
 	{
-		if (![NSThread isMainThread]) {
-			Color _color = color;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setTextColor_NW(color);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), LabelView, _setTextColor_NW, this, color));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 			UILabel* tv = (UILabel*)handle;
@@ -151,14 +133,10 @@ namespace slib
 	
 	void LabelView::_setFont_NW(const Ref<Font>& font)
 	{
-		if (![NSThread isMainThread]) {
-			Ref<Font> _font = font;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setFont_NW(_font);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), LabelView, _setFont_NW, this, font));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 			UILabel* tv = (UILabel*)handle;
@@ -171,13 +149,10 @@ namespace slib
 	
 	void LabelView::_setBorder_NW(sl_bool flag)
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setBorder_NW(flag);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), LabelView, _setBorder_NW, this, flag));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 			UILabel* tv = (UILabel*)handle;
@@ -192,14 +167,10 @@ namespace slib
 	
 	void LabelView::_setBackgroundColor_NW(const Color& color)
 	{
-		if (![NSThread isMainThread]) {
-			Color _color = color;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setBackgroundColor_NW(_color);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), LabelView, _setBackgroundColor_NW, this, color));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 			UILabel* tv = (UILabel*)handle;

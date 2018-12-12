@@ -2511,6 +2511,7 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(gravity, setGravity)
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(hintText, setHintText)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(readOnly, setReadOnly)
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(password, setPassword)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(multiLine, setMultiLine)
 		LAYOUT_CONTROL_COLOR_ATTR(textColor, setTextColor)
 		LAYOUT_CONTROL_COLOR_ATTR(hintTextColor, setHintTextColor)

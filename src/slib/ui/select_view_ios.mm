@@ -64,8 +64,9 @@ namespace slib
 		{
 			sl_uint32 n = m_indexSelected;
 			v->m_selectionBefore = n;
+			UIPickerView* picker = v->m_picker;
 			dispatch_async(dispatch_get_main_queue(), ^{
-				[v->m_picker selectRow:n inComponent:0 animated:NO];
+				[picker selectRow:n inComponent:0 animated:NO];
 			});
 		}
 		
@@ -117,13 +118,10 @@ namespace slib
 	
 	void SelectView::_select_NW(sl_uint32 index)
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_select_NW(index);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), SelectView, _select_NW, this, index));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
 			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
@@ -133,13 +131,10 @@ namespace slib
 	
 	void SelectView::_refreshItemsCount_NW()
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_refreshItemsCount_NW();
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_FUNCTION_WEAKREF(SelectView, _refreshItemsCount_NW, this));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
 			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
@@ -149,13 +144,10 @@ namespace slib
 	
 	void SelectView::_refreshItemsContent_NW()
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_refreshItemsContent_NW();
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_FUNCTION_WEAKREF(SelectView, _refreshItemsContent_NW, this));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
 			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
@@ -165,14 +157,10 @@ namespace slib
 	
 	void SelectView::_setItemTitle_NW(sl_uint32 index, const String& title)
 	{
-		if (![NSThread isMainThread]) {
-			String _title = title;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setItemTitle_NW(index, _title);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), SelectView, _setItemTitle_NW, this, index, title));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
 			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
@@ -182,13 +170,10 @@ namespace slib
 	
 	void SelectView::_setTextAlignment_NW(Alignment align)
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setTextAlignment_NW(align);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), SelectView, _setTextAlignment_NW, this, align));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
 			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
@@ -198,14 +183,10 @@ namespace slib
 	
 	void SelectView::_setTextColor_NW(const Color& color)
 	{
-		if (![NSThread isMainThread]) {
-			Color _color = color;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setTextColor_NW(_color);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), SelectView, _setTextColor_NW, this, color));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
 			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
@@ -215,13 +196,10 @@ namespace slib
 	
 	void SelectView::_setBorder_NW(sl_bool flag)
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setBorder_NW(flag);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), SelectView, _setBorder_NW, this, flag));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
 			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
@@ -231,14 +209,10 @@ namespace slib
 	
 	void SelectView::_setBackgroundColor_NW(const Color& color)
 	{
-		if (![NSThread isMainThread]) {
-			Color _color = color;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setBackgroundColor_NW(_color);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), SelectView, _setBackgroundColor_NW, this, color));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
 			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
@@ -248,14 +222,10 @@ namespace slib
 	
 	void SelectView::_setFont_NW(const Ref<Font>& font)
 	{
-		if (![NSThread isMainThread]) {
-			Ref<Font> _font = font;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setFont_NW(_font);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), SelectView, _setFont_NW, this, font));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
 			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;

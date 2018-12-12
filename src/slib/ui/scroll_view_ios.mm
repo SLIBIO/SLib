@@ -53,13 +53,6 @@ namespace slib
 	public:
 		void _applyContentSize(_priv_Slib_iOS_ScrollView* sv)
 		{
-			if (![NSThread isMainThread]) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					_applyContentSize(sv);
-				});
-				return;
-			}
-			
 			ScrollPoint size = getContentSize();
 			if (!(isHorizontalScrolling())) {
 				size.x = 0;
@@ -73,13 +66,6 @@ namespace slib
 		
 		void _applyContent(_priv_Slib_iOS_ScrollView* sv)
 		{
-			if (![NSThread isMainThread]) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					_applyContent(sv);
-				});
-				return;
-			}
-			
 			if (sv->m_contentView != nil) {
 				[sv->m_contentView removeFromSuperview];
 				sv->m_contentView = nil;
@@ -101,13 +87,6 @@ namespace slib
 		
 		void _applyProperties(_priv_Slib_iOS_ScrollView* handle)
 		{
-			if (![NSThread isMainThread]) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					_applyProperties(handle);
-				});
-				return;
-			}
-			
 			handle.backgroundColor = GraphicsPlatform::getUIColorFromColor(getBackgroundColor());
 			
 			if (isPaging()) {
@@ -145,13 +124,10 @@ namespace slib
 	
 	void ScrollView::_refreshContentSize_NW()
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_refreshContentSize_NW();
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_FUNCTION_WEAKREF(ScrollView, _refreshContentSize_NW, this));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_ScrollView class]]) {
 			_priv_Slib_iOS_ScrollView* sv = (_priv_Slib_iOS_ScrollView*)handle;
@@ -161,14 +137,10 @@ namespace slib
 	
 	void ScrollView::_setContentView_NW(const Ref<View>& view)
 	{
-		if (![NSThread isMainThread]) {
-			Ref<View> _view = view;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setContentView_NW(_view);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setContentView_NW, this, view));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_ScrollView class]]) {
 			_priv_Slib_iOS_ScrollView* sv = (_priv_Slib_iOS_ScrollView*)handle;
@@ -178,13 +150,10 @@ namespace slib
 	
 	void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate)
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_scrollTo_NW(x, y, flagAnimate);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _scrollTo_NW, this, x, y, flagAnimate));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			CGFloat f = UIPlatform::getGlobalScaleFactor();
@@ -241,14 +210,10 @@ namespace slib
 	
 	void ScrollView::_setBackgroundColor_NW(const Color& color)
 	{
-		if (![NSThread isMainThread]) {
-			Color _color = color;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setBackgroundColor_NW(_color);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setBackgroundColor_NW, this, color));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
 			UIScrollView* sv = (UIScrollView*)handle;
@@ -258,6 +223,10 @@ namespace slib
 	
 	void ScrollView::_setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setPaging_NW, this, flagPaging, pageWidth, pageHeight));
+			return;
+		}
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_ScrollView class]]) {
 			_priv_Slib_iOS_ScrollView* sv = (_priv_Slib_iOS_ScrollView*)handle;
@@ -267,6 +236,10 @@ namespace slib
 	
 	void ScrollView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setScrollBarsVisible_NW, this, flagHorizontal, flagVertical));
+			return;
+		}
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
 			UIScrollView* sv = (UIScrollView*)handle;

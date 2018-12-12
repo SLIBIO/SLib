@@ -127,33 +127,30 @@ namespace slib
 	
 	void UI::openUrl(const String& _url)
 	{
-		if (![NSThread isMainThread]) {
-			String s = _url;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				openUrl(s);
-			});
-			return;
-		}
-		
 		if (_url.isNotEmpty()) {
 			NSString* s = Apple::getNSStringFromString(_url);
 			NSURL* url = [NSURL URLWithString:s];
-			[[UIApplication sharedApplication] openURL:url];
+			if (![NSThread isMainThread]) {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[[UIApplication sharedApplication] openURL:url];
+				});
+			} else {
+				[[UIApplication sharedApplication] openURL:url];
+			}
 		}
 	}
 	
 	void UI::dismissKeyboard()
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				dismissKeyboard();
-			});
-			return;
-		}
-		
 		UIWindow* window = UIPlatform::getKeyWindow();
 		if (window != nil) {
-			[window endEditing:YES];
+			if (![NSThread isMainThread]) {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[window endEditing:YES];
+				});
+			} else {
+				[window endEditing:YES];
+			}
 		}
 	}
 	
@@ -176,11 +173,11 @@ namespace slib
 	{
 		if (![NSThread isMainThread]) {
 			dispatch_async(dispatch_get_main_queue(), ^{
-				setBadgeNumber(number);
+				[[UIApplication sharedApplication] setApplicationIconBadgeNumber:number];
 			});
-			return;
+		} else {
+			[[UIApplication sharedApplication] setApplicationIconBadgeNumber:number];
 		}
-		[[UIApplication sharedApplication] setApplicationIconBadgeNumber:number];
 	}
 	
 	void UIPlatform::runLoop(sl_uint32 level)

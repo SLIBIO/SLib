@@ -88,13 +88,10 @@ namespace slib
 	
 	void PickerView::_select_NW(sl_uint32 index)
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_select_NW(index);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), PickerView, _select_NW, this, index));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_PickerView class]]) {
 			_priv_Slib_iOS_PickerView* v = (_priv_Slib_iOS_PickerView*)handle;
@@ -104,13 +101,10 @@ namespace slib
 	
 	void PickerView::_refreshItemsCount_NW()
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_refreshItemsCount_NW();
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_FUNCTION_WEAKREF(PickerView, _refreshItemsCount_NW, this));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_PickerView class]]) {
 			_priv_Slib_iOS_PickerView* v = (_priv_Slib_iOS_PickerView*)handle;
@@ -121,13 +115,10 @@ namespace slib
 	
 	void PickerView::_refreshItemsContent_NW()
 	{
-		if (![NSThread isMainThread]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_refreshItemsContent_NW();
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_FUNCTION_WEAKREF(PickerView, _refreshItemsContent_NW, this));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_PickerView class]]) {
 			_priv_Slib_iOS_PickerView* v = (_priv_Slib_iOS_PickerView*)handle;
@@ -138,14 +129,10 @@ namespace slib
 	
 	void PickerView::_setItemTitle_NW(sl_uint32 index, const String& title)
 	{
-		if (![NSThread isMainThread]) {
-			String _title = title;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setItemTitle_NW(index, _title);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), PickerView, _setItemTitle_NW, this, index, title));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_PickerView class]]) {
 			_priv_Slib_iOS_PickerView* v = (_priv_Slib_iOS_PickerView*)handle;
@@ -155,14 +142,10 @@ namespace slib
 	
 	void PickerView::_setFont_NW(const Ref<Font>& font)
 	{
-		if (![NSThread isMainThread]) {
-			Ref<Font> _font = font;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_setFont_NW(_font);
-			});
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), PickerView, _setFont_NW, this, font));
 			return;
 		}
-		
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_PickerView class]]) {
 			_priv_Slib_iOS_PickerView* v = (_priv_Slib_iOS_PickerView*)handle;

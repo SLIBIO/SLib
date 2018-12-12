@@ -6886,6 +6886,21 @@ namespace slib
 		}
 	}
 
+	sl_bool View::isUiThread()
+	{
+		return UI::isUiThread();
+	}
+	
+	void View::dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMillis)
+	{
+		UI::dispatchToUiThread(callback, delayMillis);
+	}
+	
+	void View::runOnUiThread(const Function<void()>& callback)
+	{
+		UI::runOnUiThread(callback);
+	}
+	
 	Ref<Dispatcher> View::getDispatcher()
 	{
 		if (isInstance()) {

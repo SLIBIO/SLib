@@ -59,6 +59,10 @@ namespace slib
 	
 	void Button::_setText_NW(const String& text)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), Button, _setText_NW, this, text));
+			return;
+		}
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[UIButton class]]) {
 			UIButton* v = (UIButton*)handle;
@@ -72,6 +76,10 @@ namespace slib
 	
 	void Button::_setFont_NW(const Ref<Font>& font)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), Button, _setFont_NW, this, font));
+			return;
+		}
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[UIButton class]]) {
 			UIButton* v = (UIButton*)handle;

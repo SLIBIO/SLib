@@ -1143,6 +1143,12 @@ namespace slib
 		
 		virtual void runOnDrawingThread(const Function<void()>& callback);
 		
+		static sl_bool isUiThread();
+		
+		static void dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMillis = 0);
+
+		static void runOnUiThread(const Function<void()>& callback);
+		
 		virtual Ref<Dispatcher> getDispatcher();
 		
 		Ref<Timer> createTimer(const Function<void(Timer*)>& task, sl_uint32 interval_ms);

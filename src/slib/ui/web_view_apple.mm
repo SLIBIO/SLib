@@ -22,23 +22,32 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_UI_IS_MACOS)
+#if defined(SLIB_UI_IS_IOS) || defined(SLIB_UI_IS_MACOS)
 
 #include "slib/ui/web_view.h"
 
-#include "view_macos.h"
+#if defined(SLIB_UI_IS_IOS)
+#	include "view_ios.h"
+typedef UIView OSView;
+typedef slib::iOS_ViewInstance WebViewInstance;
+#else
+#	include "view_macos.h"
+typedef NSView OSView;
+typedef slib::macOS_ViewInstance WebViewInstance;
+#endif
+
 #import <WebKit/WebKit.h>
 
 typedef WKWebView OSWebView;
-@interface _priv_Slib_macOS_WebView : OSWebView<WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
+
+@interface _priv_Slib_Apple_WebView : OSWebView<WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
 {
-	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<WebViewInstance> m_viewInstance;
 }
 @end
 
 namespace slib
 {
-
 	class _priv_WebView : public WebView
 	{
 	public:
@@ -66,6 +75,9 @@ namespace slib
 		
 		void _applyProperties(OSWebView* handle)
 		{
+#if defined(SLIB_UI_IS_IOS)
+			handle.scrollView.bounces = NO;
+#endif
 			[handle setCustomUserAgent:(Apple::getNSStringFromString(m_customUserAgent, nil))];
 			_load(handle);
 		}
@@ -101,50 +113,52 @@ namespace slib
 			}
 		}
 		
-		void _onInvokeMethod(OSWebView* handle, NSArray* args)
-		{
-			sl_uint32 n = (sl_uint32)([args count]);
-			List<String> params;
-			for (sl_uint32 i = 0; i < n; i++) {
-				id val = [args objectAtIndex:i];
-				NSString* s = [NSString stringWithFormat:@"%@", val];
-				params.add(Apple::getStringFromNSString(s));
-			}
-			String msg = params.getValueAt(0);
-			if (msg.isNotEmpty()) {
-				String param = params.getValueAt(0);
-				dispatchMessageFromJavaScript(msg, param);
-			}
-		}
 	};
-
+	
+#if defined(SLIB_UI_IS_IOS)
+	Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* _parent)
+	{
+		IOS_VIEW_CREATE_INSTANCE_BEGIN
+		_priv_Slib_Apple_WebView* handle = [[_priv_Slib_Apple_WebView alloc] initWithFrame:frame];
+		if (handle != nil) {
+			((_priv_WebView*)this)->_applyProperties(handle);
+		}
+		IOS_VIEW_CREATE_INSTANCE_END
+		return ret;
+	}
+#else
 	Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* _parent)
 	{
 		MACOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_macOS_WebView* handle = [[_priv_Slib_macOS_WebView alloc] initWithFrame:frame];
+		_priv_Slib_Apple_WebView* handle = [[_priv_Slib_Apple_WebView alloc] initWithFrame:frame];
 		if (handle != nil) {
 			((_priv_WebView*)this)->_applyProperties(handle);
 		}
 		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
-
+#endif
+	
 	void WebView::_refreshSize_NW()
 	{
 	}
-
+	
 	void WebView::_load_NW()
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_FUNCTION_WEAKREF(WebView, _load_NW, this));
+			return;
+		}
+		OSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 			OSWebView* wv = (OSWebView*)handle;
 			((_priv_WebView*)this)->_load(wv);
 		}
 	}
-
+	
 	String WebView::_getURL_NW()
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
+		OSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 			OSWebView* wv = (OSWebView*)handle;
 			NSString* s = wv.URL.absoluteString;
@@ -152,49 +166,64 @@ namespace slib
 		}
 		return m_urlOrigin;
 	}
-
+	
 	String WebView::_getPageTitle_NW()
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
+		OSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 			OSWebView* wv = (OSWebView*)handle;
 			NSString* title = wv.title;
-			String ret = Apple::getStringFromNSString(title);
-			return ret;
+			return Apple::getStringFromNSString(title);
 		}
 		return sl_null;
 	}
-
+	
 	void WebView::_goBack_NW()
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_FUNCTION_WEAKREF(WebView, _goBack_NW, this));
+			return;
+		}
+		OSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 			OSWebView* wv = (OSWebView*)handle;
 			[wv goBack];
 		}
 	}
-
+	
 	void WebView::_goForward_NW()
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_FUNCTION_WEAKREF(WebView, _goForward_NW, this));
+			return;
+		}
+		OSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 			OSWebView* wv = (OSWebView*)handle;
 			[wv goForward];
 		}
 	}
-
+	
 	void WebView::_reload_NW()
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_FUNCTION_WEAKREF(WebView, _reload_NW, this));
+			return;
+		}
+		OSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 			OSWebView* wv = (OSWebView*)handle;
-			[wv reload:nil];
+			[wv reload];
 		}
 	}
-
+	
 	void WebView::_runJavaScript_NW(const String& script)
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), WebView, _runJavaScript_NW, this, script));
+			return;
+		}
+		OSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 			OSWebView* wv = (OSWebView*)handle;
 			NSString* _script = Apple::getNSStringFromString(script);
@@ -203,41 +232,44 @@ namespace slib
 			}
 		}
 	}
-
+	
 	void WebView::_clearCache_NW()
 	{
 		NSSet* websiteDataTypes = [NSSet setWithArray:@[
-													   WKWebsiteDataTypeDiskCache,
-													   WKWebsiteDataTypeOfflineWebApplicationCache,
-													   WKWebsiteDataTypeMemoryCache,
-													   WKWebsiteDataTypeLocalStorage,
-													   WKWebsiteDataTypeCookies,
-													   WKWebsiteDataTypeSessionStorage,
-													   WKWebsiteDataTypeIndexedDBDatabases,
-													   WKWebsiteDataTypeWebSQLDatabases,
-													   //WKWebsiteDataTypeFetchCache, //(iOS 11.3, *)
-													   //WKWebsiteDataTypeServiceWorkerRegistrations, //(iOS 11.3, *)
-													   ]];
+														WKWebsiteDataTypeDiskCache,
+														WKWebsiteDataTypeOfflineWebApplicationCache,
+														WKWebsiteDataTypeMemoryCache,
+														WKWebsiteDataTypeLocalStorage,
+														WKWebsiteDataTypeCookies,
+														WKWebsiteDataTypeSessionStorage,
+														WKWebsiteDataTypeIndexedDBDatabases,
+														WKWebsiteDataTypeWebSQLDatabases,
+														//WKWebsiteDataTypeFetchCache, //(iOS 11.3, *)
+														//WKWebsiteDataTypeServiceWorkerRegistrations, //(iOS 11.3, *)
+														]];
 		
 		NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
-		
+
 		[[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{
 		}];
 	}
 	
 	void WebView::_setCustomUserAgent_NW()
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_FUNCTION_WEAKREF(WebView, _setCustomUserAgent_NW, this));
+			return;
+		}
+		OSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 			OSWebView* wv = (OSWebView*)handle;
 			[wv setCustomUserAgent:(Apple::getNSStringFromString(m_customUserAgent, nil))];
 		}
 	}
-	
 }
 
-@implementation _priv_Slib_macOS_WebView
--(id)initWithFrame:(NSRect)frame
+@implementation _priv_Slib_Apple_WebView
+-(id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
 	if (self != nil) {
@@ -245,7 +277,7 @@ namespace slib
 		[self setUIDelegate:self];
 		
 		[self.configuration.userContentController addScriptMessageHandler:self name:@"slib_send"];
-		WKUserScript* script = [[WKUserScript alloc] initWithSource:@"window.slib={send:function(msg,param){window.webkit.messageHandlers.slib_send.postMessage(msg+'::'+param);}}" injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
+		WKUserScript* script = [[WKUserScript alloc] initWithSource:@"window.slib = {send: function(msg,param){window.webkit.messageHandlers.slib_send.postMessage(msg+'::'+param);}}" injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
 		[self.configuration.userContentController addUserScript:script];
 	}
 	return self;
@@ -253,25 +285,76 @@ namespace slib
 
 - (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
 {
+#if defined(SLIB_UI_IS_IOS)
+	UIAlertController *alertController = [UIAlertController alertControllerWithTitle:message message:@"" preferredStyle:UIAlertControllerStyleAlert];
+	[alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+		completionHandler();
+	}]];
+	UIWindow* window = slib::UIPlatform::getKeyWindow();
+	if (window != nil) {
+		UIViewController* rootController = [window rootViewController];
+		[rootController presentViewController:alertController animated:YES completion:nil];
+	}
+#else
 	NSAlert *alert = [[NSAlert alloc] init];
 	[alert addButtonWithTitle:@"OK"];
 	[alert setMessageText:message];
 	[alert runModal];
 	completionHandler();
+#endif
 }
 
 - (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL result))completionHandler
 {
+#if defined(SLIB_UI_IS_IOS)
+	UIAlertController *alertController = [UIAlertController alertControllerWithTitle:message message:@"" preferredStyle:UIAlertControllerStyleAlert];
+	[alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+		completionHandler(YES);
+	}]];
+	[alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *) {
+		completionHandler(NO);
+	 }]];
+	UIWindow* window = slib::UIPlatform::getKeyWindow();
+	if (window != nil) {
+		UIViewController* rootController = [window rootViewController];
+		[rootController presentViewController:alertController animated:YES completion:nil];
+	}
+#else
 	NSAlert* alert = [[NSAlert alloc] init];
 	[alert addButtonWithTitle:@"OK"];
 	[alert addButtonWithTitle:@"Cancel"];
 	[alert setMessageText:message];
 	BOOL ret = ([alert runModal] == NSAlertFirstButtonReturn);
 	completionHandler(ret);
+#endif
 }
 
 - (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(nullable NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString * __nullable result))completionHandler
 {
+#if defined(SLIB_UI_IS_IOS)
+	UIAlertController *alertController = [UIAlertController alertControllerWithTitle:prompt message:@"" preferredStyle:UIAlertControllerStyleAlert];
+	__weak UIAlertController* _alertController = alertController;
+	[alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+		textField.text = defaultText;
+	}];
+	[alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+		UIAlertController* c = _alertController;
+		if (c != nil) {
+			NSString *input = ((UITextField *)c.textFields.firstObject).text;
+			completionHandler(input);
+		} else {
+			completionHandler(@"");
+		}
+	}]];
+	[alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+		completionHandler(nil);
+	}]];
+	UIWindow* window = slib::UIPlatform::getKeyWindow();
+	if (window != nil) {
+		UIViewController* rootController = [window rootViewController];
+		[rootController presentViewController:alertController animated:YES completion:nil];
+	}
+#else
 	NSAlert* alert = [NSAlert alertWithMessageText:prompt defaultButton:@"OK" alternateButton:@"Cancel" otherButton:nil informativeTextWithFormat:@""];
 	NSTextField* input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 300, 24)];
 	[input setStringValue:defaultText];
@@ -283,6 +366,7 @@ namespace slib
 		ret = [input stringValue];
 	}
 	completionHandler(ret);
+#endif
 }
 
 - (void)webView:(WKWebView *)webView didReceiveServerRedirectForProvisionalNavigation:(null_unspecified WKNavigation *)navigation
@@ -291,7 +375,7 @@ namespace slib
 
 - (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(null_unspecified WKNavigation *)navigation
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	slib::Ref<WebViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
 		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
@@ -302,7 +386,7 @@ namespace slib
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(null_unspecified WKNavigation *)navigation
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	slib::Ref<WebViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
 		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
@@ -310,10 +394,10 @@ namespace slib
 		}
 	}
 }
-	
+
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(null_unspecified WKNavigation *)navigation withError:(NSError *)error
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	slib::Ref<WebViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
 		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
@@ -324,7 +408,7 @@ namespace slib
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(null_unspecified WKNavigation *)navigation withError:(NSError *)error
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	slib::Ref<WebViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
 		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
@@ -332,11 +416,11 @@ namespace slib
 		}
 	}
 }
-	
+
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message
 {
 	id body = message.body;
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	slib::Ref<WebViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> _view = instance->getView();
 		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {

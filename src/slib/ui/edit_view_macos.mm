@@ -248,145 +248,107 @@ namespace slib
 
 	void EditView::_setText_NW(const String& _value)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setText_NW, this, _value));
+			return;
+		}
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			NSString* value = Apple::getNSStringFromString(_value);
 			if ([handle isKindOfClass:[NSTextField class]]) {
 				NSTextField* tv = (NSTextField*)handle;
-				if (UI::isUiThread()) {
-					[tv setStringValue:value];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[tv setStringValue:value];
-					});
-				}
+				[tv setStringValue:value];
 			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
 				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
-				if (UI::isUiThread()) {
-					[tv->m_textView setString:value];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[tv->m_textView setString:value];
-					});
-				}
+				[tv->m_textView setString:value];
 			}
 		}
 	}
 
 	void EditView::_setBorder_NW(sl_bool flag)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setBorder_NW, this, flag));
+			return;
+		}
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[NSTextField class]]) {
 				NSTextField* tv = (NSTextField*)handle;
-				if (UI::isUiThread()) {
-					[tv setBordered:(flag?TRUE:FALSE)];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[tv setBordered:(flag?TRUE:FALSE)];
-					});
-				}
+				[tv setBordered:(flag?TRUE:FALSE)];
 			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
 				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
-				if (UI::isUiThread()) {
-					[tv setBorderType:(flag?NSBezelBorder:NSNoBorder)];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[tv setBorderType:(flag?NSBezelBorder:NSNoBorder)];
-					});
-				}
+				[tv setBorderType:(flag?NSBezelBorder:NSNoBorder)];
 			}
 		}
 	}
 
 	void EditView::_setTextAlignment_NW(Alignment align)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setTextAlignment_NW, this, align));
+			return;
+		}
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[NSTextField class]]) {
 				NSTextField* tv = (NSTextField*)handle;
-				if (UI::isUiThread()) {
-					[tv setAlignment:EditView_Impl::translateAlignment(align)];
-					((EditView_Impl*)this)->_applyPlaceholder(handle);
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[tv setAlignment:EditView_Impl::translateAlignment(align)];
-						((EditView_Impl*)this)->_applyPlaceholder(handle);
-					});
-				}
+				[tv setAlignment:EditView_Impl::translateAlignment(align)];
+				((EditView_Impl*)this)->_applyPlaceholder(handle);
 			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
 				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
-				if (UI::isUiThread()) {
-					[tv->m_textView setAlignment:EditView_Impl::translateAlignment(align)];
-					((EditView_Impl*)this)->_applyPlaceholder(handle);
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[tv->m_textView setAlignment:EditView_Impl::translateAlignment(align)];
-						((EditView_Impl*)this)->_applyPlaceholder(handle);
-					});
-				}
+				[tv->m_textView setAlignment:EditView_Impl::translateAlignment(align)];
+				((EditView_Impl*)this)->_applyPlaceholder(handle);
 			}
 		}
 	}
 
 	void EditView::_setHintText_NW(const String& value)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setHintText_NW, this, value));
+			return;
+		}
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
-			if (UI::isUiThread()) {
-				((EditView_Impl*)this)->_applyPlaceholder(handle);
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					((EditView_Impl*)this)->_applyPlaceholder(handle);
-				});
-			}
+			((EditView_Impl*)this)->_applyPlaceholder(handle);
 		}
 	}
 	
 	void EditView::_setHintTextColor_NW(const Color& value)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setHintTextColor_NW, this, value));
+			return;
+		}
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
-			if (UI::isUiThread()) {
-				((EditView_Impl*)this)->_applyPlaceholder(handle);
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					((EditView_Impl*)this)->_applyPlaceholder(handle);
-				});
-			}
+			((EditView_Impl*)this)->_applyPlaceholder(handle);
 		}
 	}
 	
 	void EditView::_setReadOnly_NW(sl_bool flag)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setReadOnly_NW, this, flag));
+			return;
+		}
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[NSTextField class]]) {
 				NSTextField* tv = (NSTextField*)handle;
-				if (UI::isUiThread()) {
-					[tv setEditable:(flag ? FALSE : TRUE)];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[tv setEditable:(flag ? FALSE : TRUE)];
-					});
-				}
+				[tv setEditable:(flag ? FALSE : TRUE)];
 			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
 				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
-				if (UI::isUiThread()) {
-					[tv->m_textView setEditable:(flag ? FALSE : TRUE)];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[tv->m_textView setEditable:(flag ? FALSE : TRUE)];
-					});
-				}
+				[tv->m_textView setEditable:(flag ? FALSE : TRUE)];
 			}
 		}
 	}
 	
 	void EditView::_setPassword_NW(sl_bool flag)
 	{
-		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setPassword_NW, this, flag));
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setPassword_NW, this, flag));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -413,87 +375,58 @@ namespace slib
 
 	void EditView::_setTextColor_NW(const Color& color)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setTextColor_NW, this, color));
+			return;
+		}
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[NSTextField class]]) {
 				NSTextField* tv = (NSTextField*)handle;
-				if (UI::isUiThread()) {
-					[tv setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[tv setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
-					});
-				}
+				[tv setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
 			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
 				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
-				if (UI::isUiThread()) {
-					[tv->m_textView setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[tv->m_textView setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
-					});
-				}
+				[tv->m_textView setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
 			}
 		}
 	}
 
 	void EditView::_setBackgroundColor_NW(const Color& color)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setBackgroundColor_NW, this, color));
+			return;
+		}
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
 			if ([handle isKindOfClass:[NSTextField class]]) {
 				NSTextField* tv = (NSTextField*)handle;
-				if (UI::isUiThread()) {
-					[tv setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(color))];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[tv setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(color))];
-					});
-				}
+				[tv setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(color))];
 			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
 				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
-				if (UI::isUiThread()) {
-					[tv->m_textView setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(color))];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[tv->m_textView setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(color))];
-					});
-				}
+				[tv->m_textView setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(color))];
 			}
 		}
 	}
 
 	void EditView::_setFont_NW(const Ref<Font>& font)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setFont_NW, this, font));
+			return;
+		}
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
-			if ([handle isKindOfClass:[NSTextField class]]) {
-				NSTextField* tv = (NSTextField*)handle;
-				NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-				if (hFont != nil) {
-					if (UI::isUiThread()) {
-						[tv setFont:hFont];
-						((EditView_Impl*)this)->_applyPlaceholder(handle);
-					} else {
-						dispatch_async(dispatch_get_main_queue(), ^{
-							[tv setFont:hFont];
-							((EditView_Impl*)this)->_applyPlaceholder(handle);
-						});
-					}
-				}
-			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
-				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
-				NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-				if (hFont != nil) {
-					if (UI::isUiThread()) {
-						[tv->m_textView setFont:hFont];
-						((EditView_Impl*)this)->_applyPlaceholder(handle);
-					} else {
-						dispatch_async(dispatch_get_main_queue(), ^{
-							[tv->m_textView setFont:hFont];
-							((EditView_Impl*)this)->_applyPlaceholder(handle);
-						});
-					}
+			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
+			if (hFont != nil) {
+				if ([handle isKindOfClass:[NSTextField class]]) {
+					NSTextField* tv = (NSTextField*)handle;
+					[tv setFont:hFont];
+					((EditView_Impl*)this)->_applyPlaceholder(handle);
+				} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+					_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
+					[tv->m_textView setFont:hFont];
+					((EditView_Impl*)this)->_applyPlaceholder(handle);
 				}
 			}
 		}
