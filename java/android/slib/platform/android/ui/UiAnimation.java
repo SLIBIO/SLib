@@ -28,6 +28,7 @@ import android.animation.ValueAnimator;
 import android.animation.TimeInterpolator;
 
 import slib.platform.android.Logger;
+import slib.platform.android.ui.view.IView;
 
 public class UiAnimation {
 
@@ -70,7 +71,6 @@ public class UiAnimation {
 	long mId;
 	ValueAnimator mAnimator;
 	View mView;
-	boolean mIsViewShown = false;
 	boolean mIsStopped = false;
 
 	Animator.AnimatorListener mListener = new Animator.AnimatorListener() {
@@ -128,17 +128,13 @@ public class UiAnimation {
 					if (view == null) {
 						return;
 					}
-					if (animation.mIsViewShown) {
-						if (!(view.isShown())) {
-							animation.mIsViewShown = false;
-							animation._stop();
-							animator.cancel();
-							return;
-						}
-					} else {
-						if (view.isShown()) {
-							animation.mIsViewShown = true;
-						}
+					if (view instanceof IView && ((IView)view).getInstance() == 0) {
+						animation._stop();
+						animator.cancel();
+						return;
+					}
+					if (!(view.isShown())) {
+						return;
 					}
 					final float f = (Float) (va.getAnimatedValue());
 					if (flagTranslate || flagRotate || flagScale) {

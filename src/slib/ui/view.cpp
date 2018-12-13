@@ -5437,6 +5437,30 @@ namespace slib
 	{
 		return createBackgroundColorAnimation(AnimationFrames<Color4f>(getBackgroundColor(), toValue), duration, onStop, curve, flags | AnimationFlags::NotUpdateWhenStart | AnimationFlags::AutoStart);
 	}
+	
+	void View::_attachNativeAnimations()
+	{
+		Ref<TransformAttributes>& attrs = m_transformAttrs;
+		if (attrs.isNotNull()) {
+			_attachNativeAnimation(attrs->m_animationTransform);
+			_attachNativeAnimation(attrs->m_animationTranslate);
+			_attachNativeAnimation(attrs->m_animationScale);
+			_attachNativeAnimation(attrs->m_animationRotate);
+			_attachNativeAnimation(attrs->m_animationFrame);
+			_attachNativeAnimation(attrs->m_animationAlpha);
+			_attachNativeAnimation(attrs->m_animationBackgroundColor);
+		}
+	}
+	
+	void View::_attachNativeAnimation(const Ref<Animation>& animation)
+	{
+		if (animation.isNotNull()) {
+			if (animation->isNativeEnabled() && animation->isRepeatForever()) {
+				animation->stop();
+				animation->start();
+			}
+		}
+	}
 
 	sl_bool View::isHorizontalScrolling()
 	{
@@ -7243,6 +7267,7 @@ namespace slib
 			}
 		}
 		onAttach();
+		_attachNativeAnimations();
 	}
 
 	void View::dispatchDetach()

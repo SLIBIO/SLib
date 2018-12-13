@@ -1371,20 +1371,10 @@ namespace slib
 		
 		void _setFontInvalidateChildren();
 		
-
-		void _resetTransformAnimation();
 		
-		void _resetTranslateAnimation();
+		void _attachNativeAnimations();
 		
-		void _resetScaleAnimation();
-		
-		void _resetRotateAnimation();
-		
-		void _resetFrameAnimation();
-		
-		void _resetAlphaAnimation();
-		
-		void _resetBackgroundColorAnimation();
+		void _attachNativeAnimation(const Ref<Animation>& animation);
 
 		
 		Ref<ScrollBar> _createHorizontalScrollBar();

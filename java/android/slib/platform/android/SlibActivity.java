@@ -96,6 +96,10 @@ public class SlibActivity extends Activity {
 			super.onBackPressed();
 			return;
 		}
+		if (windows.size() == 1) {
+			moveTaskToBack(false);
+			return;
+		}
 		try {
 			UiWindow window = windows.get(windows.size() - 1);
 			window.onClose();
