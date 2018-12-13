@@ -607,6 +607,8 @@
 		260D8CC720CAC9800013B34E /* loopfilter_16_neon.asm.S in Sources */ = {isa = PBXBuildFile; fileRef = 260D8CBB20CAC97F0013B34E /* loopfilter_16_neon.asm.S */; };
 		260D8CC820CAC9800013B34E /* intrapred_neon_asm.asm.S in Sources */ = {isa = PBXBuildFile; fileRef = 260D8CBC20CAC9800013B34E /* intrapred_neon_asm.asm.S */; };
 		260D8CC920CAC9800013B34E /* loopfilter_4_neon.asm.S in Sources */ = {isa = PBXBuildFile; fileRef = 260D8CBD20CAC9800013B34E /* loopfilter_4_neon.asm.S */; };
+		2628EAD121C184D400D8CD00 /* regex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EAD021C184D400D8CD00 /* regex.cpp */; };
+		2628EAD221C184D400D8CD00 /* regex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EAD021C184D400D8CD00 /* regex.cpp */; };
 		262B6A3320D03B430094927F /* loopfilter_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D89D720C917500013B34E /* loopfilter_sse2.c */; };
 		26A39D8C20EFE16D004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8B20EFE16D004707C9 /* calculator.cpp */; };
 		26A39D8D20EFE16D004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8B20EFE16D004707C9 /* calculator.cpp */; };
@@ -1696,6 +1698,7 @@
 		260D8CBD20CAC9800013B34E /* loopfilter_4_neon.asm.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = loopfilter_4_neon.asm.S; path = ../../external/src/libvpx/gen/asm_apple/armv7/vpx_dsp/arm/loopfilter_4_neon.asm.S; sourceTree = "<group>"; };
 		261B4C841DB10149000A385A /* transition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = transition.cpp; sourceTree = "<group>"; };
 		2621F7201CCF174B00C4615C /* ui_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_menu.cpp; sourceTree = "<group>"; };
+		2628EAD021C184D400D8CD00 /* regex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = regex.cpp; sourceTree = "<group>"; };
 		2629F8731DFAF4AE005CF43D /* ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ref.cpp; sourceTree = "<group>"; };
 		2629F8751DFAF4B8005CF43D /* ptr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ptr.cpp; sourceTree = "<group>"; };
 		2631B77D1DDB14E600729A87 /* url.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url.cpp; sourceTree = "<group>"; };
@@ -3206,6 +3209,7 @@
 				2629F8751DFAF4B8005CF43D /* ptr.cpp */,
 				26FAA8851EC768C1007BC67F /* red_black_tree.cpp */,
 				2629F8731DFAF4AE005CF43D /* ref.cpp */,
+				2628EAD021C184D400D8CD00 /* regex.cpp */,
 				A25F2EDF1B039EF600854DAF /* resource.cpp */,
 				2607301020DD22C8004EB272 /* rw_lock.cpp */,
 				A25F2EE01B039EF600854DAF /* service.cpp */,
@@ -4090,6 +4094,7 @@
 				26D15D6E1E93AD05003BD61A /* base64.cpp in Sources */,
 				26D15D971E93AD05003BD61A /* thread_apple.mm in Sources */,
 				2607300120D9846B004EB272 /* url_request_curl.cpp in Sources */,
+				2628EAD221C184D400D8CD00 /* regex.cpp in Sources */,
 				26D15D811E93AD05003BD61A /* memory.cpp in Sources */,
 				26EAB7D61EA288DA00ED96FA /* nat.cpp in Sources */,
 				26D15D9D1E93AD16003BD61A /* aes.cpp in Sources */,
@@ -4612,6 +4617,7 @@
 				26D9D8851E96295A005F7BD3 /* audio_recorder_opensl_es.cpp in Sources */,
 				26D9D82E1E9628E0005F7BD3 /* system.cpp in Sources */,
 				26D9D8CB1E962976005F7BD3 /* picker_view_ios.mm in Sources */,
+				2628EAD121C184D400D8CD00 /* regex.cpp in Sources */,
 				26D9D8A41E962962005F7BD3 /* socket_event.cpp in Sources */,
 				26D9D8691E96294F005F7BD3 /* drawable.cpp in Sources */,
 				26D9D82F1E9628E0005F7BD3 /* time.cpp in Sources */,
@@ -4790,7 +4796,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_THREADSAFE_STATICS = NO;
 				HEADER_SEARCH_PATHS = (
@@ -4808,7 +4813,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_THREADSAFE_STATICS = NO;
@@ -5068,7 +5072,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_THREADSAFE_STATICS = NO;
 				HEADER_SEARCH_PATHS = (
@@ -5086,7 +5089,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_THREADSAFE_STATICS = NO;

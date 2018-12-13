@@ -839,5 +839,8 @@
     <ClCompile Include="..\..\src\slib\network\stun.cpp">
       <Filter>src\network</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\core\regex.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

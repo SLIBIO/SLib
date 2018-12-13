@@ -371,5 +371,8 @@
     <ClCompile Include="..\..\src\slib\network\url_request_curl.cpp">
       <Filter>src\network</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\core\regex.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

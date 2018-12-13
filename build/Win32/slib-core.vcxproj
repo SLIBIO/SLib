@@ -63,6 +63,7 @@
     <ClCompile Include="..\..\src\slib\core\asset.cpp" />
     <ClCompile Include="..\..\src\slib\core\red_black_tree.cpp" />
     <ClCompile Include="..\..\src\slib\core\ref.cpp" />
+    <ClCompile Include="..\..\src\slib\core\regex.cpp" />
     <ClCompile Include="..\..\src\slib\core\resource.cpp" />
     <ClCompile Include="..\..\src\slib\core\rw_lock.cpp" />
     <ClCompile Include="..\..\src\slib\core\service.cpp" />

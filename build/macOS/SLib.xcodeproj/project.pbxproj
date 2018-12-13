@@ -627,6 +627,8 @@
 		2607300E20DCE368004EB272 /* rw_lock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2607300D20DCE367004EB272 /* rw_lock.cpp */; };
 		2607300F20DCE368004EB272 /* rw_lock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2607300D20DCE367004EB272 /* rw_lock.cpp */; };
 		2628EACC21C1059800D8CD00 /* web_view_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2628EACB21C1059700D8CD00 /* web_view_apple.mm */; };
+		2628EACE21C157A800D8CD00 /* regex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EACD21C157A800D8CD00 /* regex.cpp */; };
+		2628EACF21C157A800D8CD00 /* regex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EACD21C157A800D8CD00 /* regex.cpp */; };
 		264AF11721AED0C0004E58CB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF10921AECFA4004E58CB /* main.cpp */; };
 		264AF11821AED0C0004E58CB /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF10A21AECFA4004E58CB /* util.cpp */; };
 		264AF11C21AEE6BE004E58CB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF11B21AEE6BE004E58CB /* Cocoa.framework */; };
@@ -1666,6 +1668,7 @@
 		2626C12E1E15AA55004E150C /* collection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = collection.cpp; sourceTree = "<group>"; };
 		2626C1301E15AA73004E150C /* preference.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = preference.cpp; sourceTree = "<group>"; };
 		2628EACB21C1059700D8CD00 /* web_view_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = web_view_apple.mm; sourceTree = "<group>"; };
+		2628EACD21C157A800D8CD00 /* regex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = regex.cpp; sourceTree = "<group>"; };
 		2640BC381CAA65EF004AA780 /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xml.cpp; sourceTree = "<group>"; };
 		26483B2B1C99D8F3009075BF /* yuv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yuv.cpp; sourceTree = "<group>"; };
 		2648D5411D0965C400819E09 /* mobile_game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mobile_game.cpp; sourceTree = "<group>"; };
@@ -3609,6 +3612,7 @@
 				A2774E0B1B1A005B00538A7B /* ptr.cpp */,
 				26F2F8D81EC2E0EB0074C29E /* red_black_tree.cpp */,
 				A25F2FB31B03A33700854DAF /* ref.cpp */,
+				2628EACD21C157A800D8CD00 /* regex.cpp */,
 				26D3A1A31C85894A00FB8DBD /* resource.cpp */,
 				2607300D20DCE367004EB272 /* rw_lock.cpp */,
 				A25F2FB51B03A33700854DAF /* service.cpp */,
@@ -4282,6 +4286,7 @@
 				26D158AE1E93A28C003BD61A /* content_type.cpp in Sources */,
 				26D158D31E93A28C003BD61A /* thread_pool.cpp in Sources */,
 				26D158AB1E93A28C003BD61A /* base64.cpp in Sources */,
+				2628EACF21C157A800D8CD00 /* regex.cpp in Sources */,
 				26D158D81E93A29B003BD61A /* aes.cpp in Sources */,
 				26D158D91E93A29B003BD61A /* block_cipher.cpp in Sources */,
 				26D158C71E93A28C003BD61A /* ptr.cpp in Sources */,
@@ -5027,6 +5032,7 @@
 				26D9D9C31E96468D005F7BD3 /* linear_view.cpp in Sources */,
 				26D9D97E1E964675005F7BD3 /* audio_player.cpp in Sources */,
 				26D9D9B41E96468D005F7BD3 /* button.cpp in Sources */,
+				2628EACE21C157A800D8CD00 /* regex.cpp in Sources */,
 				26D9D9681E96466A005F7BD3 /* color.cpp in Sources */,
 				26D9D9981E96467B005F7BD3 /* ip_address.cpp in Sources */,
 				26D9D9271E9645CE005F7BD3 /* matrix2.cpp in Sources */,
@@ -5432,7 +5438,6 @@
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				EXECUTABLE_PREFIX = lib;
 				GCC_DYNAMIC_NO_PIC = YES;
-				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_THREADSAFE_STATICS = NO;
 				HEADER_SEARCH_PATHS = (
@@ -5453,7 +5458,6 @@
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				EXECUTABLE_PREFIX = lib;
 				GCC_DYNAMIC_NO_PIC = YES;
-				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_THREADSAFE_STATICS = NO;
@@ -5768,7 +5772,6 @@
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				EXECUTABLE_PREFIX = lib;
 				GCC_DYNAMIC_NO_PIC = YES;
-				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_THREADSAFE_STATICS = NO;
 				HEADER_SEARCH_PATHS = (
@@ -5789,7 +5792,6 @@
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				EXECUTABLE_PREFIX = lib;
 				GCC_DYNAMIC_NO_PIC = YES;
-				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_THREADSAFE_STATICS = NO;
