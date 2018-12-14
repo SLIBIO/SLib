@@ -20,14 +20,15 @@
  *   THE SOFTWARE.
  */
 
-#include "slib/core/base64.h"
+#include "slib/crypto/base64.h"
 
 #define BASE64_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+#define BASE64_CHARS_URL "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
 
 namespace slib
 {
-
-	String Base64::encode(const void* buf, sl_size size)
+	
+	SLIB_INLINE String _priv_Base64_encode(const char* patterns, const void* buf, sl_size size)
 	{
 		if (size == 0) {
 			return sl_null;
@@ -45,10 +46,10 @@ namespace slib
 			sl_uint8 n0 = input[0];
 			sl_uint8 n1 = (n + 1 < size) ? input[1] : 0;
 			sl_uint8 n2 = (n + 2 < size) ? input[2] : 0;
-			output[0] = BASE64_CHARS[(n0 & 0xFC) >> 2];
-			output[1] = BASE64_CHARS[((n0 & 0x03) << 4) + ((n1 & 0xF0) >> 4)];
-			output[2] = BASE64_CHARS[((n1 & 0x0F) << 2) + ((n2 & 0xC0) >> 6)];
-			output[3] = BASE64_CHARS[n2 & 0x3F];
+			output[0] = patterns[(n0 & 0xFC) >> 2];
+			output[1] = patterns[((n0 & 0x03) << 4) + ((n1 & 0xF0) >> 4)];
+			output[2] = patterns[((n1 & 0x0F) << 2) + ((n2 & 0xC0) >> 6)];
+			output[3] = patterns[n2 & 0x3F];
 			input += 3;
 			n += 3;
 			output += 4;
@@ -62,16 +63,36 @@ namespace slib
 		return ret;
 	}
 
+	String Base64::encode(const void* buf, sl_size size)
+	{
+		return _priv_Base64_encode(BASE64_CHARS, buf, size);
+	}
+
+	String Base64::encodeUrl(const void* buf, sl_size size)
+	{
+		return _priv_Base64_encode(BASE64_CHARS_URL, buf, size);
+	}
+
 	String Base64::encode(const Memory &mem)
 	{
-		return encode(mem.getData(), mem.getSize());
+		return _priv_Base64_encode(BASE64_CHARS, mem.getData(), mem.getSize());
+	}
+
+	String Base64::encodeUrl(const Memory &mem)
+	{
+		return _priv_Base64_encode(BASE64_CHARS_URL, mem.getData(), mem.getSize());
 	}
 
 	String Base64::encode(const String& str)
 	{
-		return encode(str.getData(), str.getLength());
+		return _priv_Base64_encode(BASE64_CHARS, str.getData(), str.getLength());
 	}
 
+	String Base64::encodeUrl(const String& str)
+	{
+		return _priv_Base64_encode(BASE64_CHARS_URL, str.getData(), str.getLength());
+	}
+	
 	SLIB_INLINE sl_uint32 _priv_Base64_index(sl_char8 c)
 	{
 		if (c >= 'A' && c <= 'Z') {
@@ -87,6 +108,12 @@ namespace slib
 			return 62;
 		}
 		if (c == '/') {
+			return 63;
+		}
+		if (c == '-') {
+			return 62;
+		}
+		if (c == '_') {
 			return 63;
 		}
 		return 64;

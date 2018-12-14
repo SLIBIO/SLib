@@ -20,26 +20,9 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_CRYPTO_HEADER
-#define CHECKHEADER_SLIB_CRYPTO_HEADER
+#include "slib/crypto/jwt.h"
 
-#include "crypto/base64.h"
+namespace slib
+{
 
-#include "crypto/md5.h"
-#include "crypto/sha1.h"
-#include "crypto/sha2.h"
-#include "crypto/hash.h"
-#include "crypto/hmac.h"
-
-#include "crypto/gcm.h"
-#include "crypto/block_cipher.h"
-#include "crypto/aes.h"
-#include "crypto/blowfish.h"
-
-#include "crypto/rsa.h"
-
-#include "crypto/jwt.h"
-
-#include "crypto/zlib.h"
-
-#endif
+}

@@ -20,12 +20,12 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_CORE_BASE64
-#define CHECKHEADER_SLIB_CORE_BASE64
+#ifndef CHECKHEADER_SLIB_CRYPTO_BASE64
+#define CHECKHEADER_SLIB_CRYPTO_BASE64
 
 #include "definition.h"
 
-#include "string.h"
+#include "../core/string.h"
 
 namespace slib
 {
@@ -35,14 +35,20 @@ namespace slib
 	public:
 		static String encode(const void* byte, sl_size size);
 
-		static String encode(const Memory& mem);
+		static String encodeUrl(const void* byte, sl_size size);
 		
+		static String encode(const Memory& mem);
+				
+		static String encodeUrl(const Memory& mem);
+
 		static String encode(const String& str);
 
+		static String encodeUrl(const String& str);
+		
 		static sl_size decode(const String& base64, void* buf, sl_size size);
 
 		static Memory decode(const String& base64);
-	
+		
 	};
 
 }

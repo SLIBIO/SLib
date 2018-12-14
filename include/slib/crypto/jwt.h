@@ -20,26 +20,25 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_CRYPTO_HEADER
-#define CHECKHEADER_SLIB_CRYPTO_HEADER
+#ifndef CHECKHEADER_SLIB_CRYPTO_JWT
+#define CHECKHEADER_SLIB_CRYPTO_JWT
 
-#include "crypto/base64.h"
+#include "definition.h"
 
-#include "crypto/md5.h"
-#include "crypto/sha1.h"
-#include "crypto/sha2.h"
-#include "crypto/hash.h"
-#include "crypto/hmac.h"
+/*
+	JSON Web Token: JSON-based open standard for creating access tokens that assert some number of claims (RFC 7519)
+*/
 
-#include "crypto/gcm.h"
-#include "crypto/block_cipher.h"
-#include "crypto/aes.h"
-#include "crypto/blowfish.h"
+namespace slib
+{
+	
+	class SLIB_EXPORT Jwt
+	{
+	public:
+		
+		
+	};
 
-#include "crypto/rsa.h"
-
-#include "crypto/jwt.h"
-
-#include "crypto/zlib.h"
+}
 
 #endif
