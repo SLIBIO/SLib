@@ -22,6 +22,8 @@
 
 #include "slib/db/database.h"
 
+#include "slib/core/log.h"
+
 namespace slib
 {
 
@@ -29,13 +31,47 @@ namespace slib
 
 	Database::Database()
 	{
+		m_flagLogSQL = sl_false;
+		m_flagLogErrors = sl_true;
 	}
 
 	Database::~Database()
 	{
 	}
+	
+	sl_int64 Database::_execute(const String& sql)
+	{
+		return executeBy(sql, sl_null, 0);
+	}
 
-	sl_int64 Database::executeBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	sl_int64 Database::execute(const String& sql)
+	{
+		sl_int64 ret = _execute(sql);
+		if (ret < 0) {
+			_logError(sql);
+		} else {
+			_logSQL(sql);
+		}
+		return ret;
+	}
+	
+	Ref<DatabaseCursor> Database::_query(const String& sql)
+	{
+		return queryBy(sql, sl_null, 0);
+	}
+	
+	Ref<DatabaseCursor> Database::query(const String& sql)
+	{
+		Ref<DatabaseCursor> ret = queryBy(sql, sl_null, 0);
+		if (ret.isNull()) {
+			_logError(sql);
+		} else {
+			_logSQL(sql);
+		}
+		return ret;
+	}
+	
+	sl_int64 Database::_executeBy(const String& sql, const Variant* params, sl_uint32 nParams)
 	{
 		Ref<DatabaseStatement> statement = prepareStatement(sql);
 		if (statement.isNotNull()) {
@@ -44,7 +80,18 @@ namespace slib
 		return -1;
 	}
 
-	Ref<DatabaseCursor> Database::queryBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	sl_int64 Database::executeBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	{
+		sl_int64 ret = _executeBy(sql, params, nParams);
+		if (ret < 0) {
+			_logError(sql, params, nParams);
+		} else {
+			_logSQL(sql, params, nParams);
+		}
+		return ret;
+	}
+	
+	Ref<DatabaseCursor> Database::_queryBy(const String& sql, const Variant* params, sl_uint32 nParams)
 	{
 		Ref<DatabaseStatement> statement = prepareStatement(sql);
 		if (statement.isNotNull()) {
@@ -53,55 +100,30 @@ namespace slib
 		return sl_null;
 	}
 
-	List< HashMap<String, Variant> > Database::getListForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	Ref<DatabaseCursor> Database::queryBy(const String& sql, const Variant* params, sl_uint32 nParams)
 	{
-		Ref<DatabaseStatement> statement = prepareStatement(sql);
-		if (statement.isNotNull()) {
-			return statement->getListForQueryResultBy(params, nParams);
-		}
-		return sl_null;
-	}
-
-	HashMap<String, Variant> Database::getRecordForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams)
-	{
-		Ref<DatabaseStatement> statement = prepareStatement(sql);
-		if (statement.isNotNull()) {
-			return statement->getRecordForQueryResultBy(params, nParams);
-		}
-		return sl_null;
-	}
-
-	Variant Database::getValueForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams)
-	{
-		Ref<DatabaseStatement> statement = prepareStatement(sql);
-		if (statement.isNotNull()) {
-			return statement->getValueForQueryResultBy(params, nParams);
-		}
-		return sl_null;
-	}
-
-	sl_int64 Database::execute(const String& sql)
-	{
-		return executeBy(sql, sl_null, 0);
-	}
-
-	Ref<DatabaseCursor> Database::query(const String& sql)
-	{
-		return queryBy(sql, sl_null, 0);
-	}
-
-	List< HashMap<String, Variant> > Database::getListForQueryResult(const String& sql)
-	{
-		List< HashMap<String, Variant> > ret;
-		Ref<DatabaseCursor> cursor = query(sql);
-		if (cursor.isNotNull()) {
-			while (cursor->moveNext()) {
-				ret.add_NoLock(cursor->getRow());
-			}
+		Ref<DatabaseCursor> ret = _queryBy(sql, params, nParams);
+		if (ret.isNull()) {
+			_logError(sql, params, nParams);
+		} else {
+			_logSQL(sql, params, nParams);
 		}
 		return ret;
 	}
 
+	List< HashMap<String, Variant> > Database::getListForQueryResult(const String& sql)
+	{
+		Ref<DatabaseCursor> cursor = query(sql);
+		if (cursor.isNotNull()) {
+			List< HashMap<String, Variant> > ret;
+			while (cursor->moveNext()) {
+				ret.add_NoLock(cursor->getRow());
+			}
+			return ret;
+		}
+		return sl_null;
+	}
+	
 	HashMap<String, Variant> Database::getRecordForQueryResult(const String& sql)
 	{
 		Ref<DatabaseCursor> cursor = query(sql);
@@ -112,7 +134,7 @@ namespace slib
 		}
 		return sl_null;
 	}
-
+	
 	Variant Database::getValueForQueryResult(const String& sql)
 	{
 		Ref<DatabaseCursor> cursor = query(sql);
@@ -122,6 +144,89 @@ namespace slib
 			}
 		}
 		return sl_null;
+	}
+	
+	List< HashMap<String, Variant> > Database::getListForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	{
+		Ref<DatabaseCursor> cursor = queryBy(sql, params, nParams);
+		if (cursor.isNotNull()) {
+			List< HashMap<String, Variant> > ret;
+			while (cursor->moveNext()) {
+				ret.add_NoLock(cursor->getRow());
+			}
+			return ret;
+		}
+		return sl_null;
+	}
+
+	HashMap<String, Variant> Database::getRecordForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	{
+		Ref<DatabaseCursor> cursor = queryBy(sql, params, nParams);
+		if (cursor.isNotNull()) {
+			if (cursor->moveNext()) {
+				return cursor->getRow();
+			}
+		}
+		return sl_null;
+	}
+
+	Variant Database::getValueForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	{
+		Ref<DatabaseCursor> cursor = queryBy(sql, params, nParams);
+		if (cursor.isNotNull()) {
+			if (cursor->moveNext()) {
+				return cursor->getValue(0);
+			}
+		}
+		return sl_null;
+	}
+
+	sl_bool Database::isLoggingSQL()
+	{
+		return m_flagLogSQL;
+	}
+	
+	void Database::setLoggingSQL(sl_bool flag)
+	{
+		m_flagLogSQL = flag;
+	}
+	
+	sl_bool Database::isLoggingErrors()
+	{
+		return m_flagLogErrors;
+	}
+	
+	void Database::setLoggingErrors(sl_bool flag)
+	{
+		m_flagLogErrors = flag;
+	}
+	
+	void Database::_logSQL(const String& sql)
+	{
+		if (m_flagLogSQL) {
+			Log((char*)(getObjectType()), "SQL: %s", sql);
+		}
+	}
+	
+	void Database::_logSQL(const String& sql, const Variant* params, sl_uint32 nParams)
+	{
+		if (m_flagLogSQL) {
+			Log((char*)(getObjectType()), "SQL: %s Params=%s", sql, Variant(VariantList(params, nParams)).toJsonString());
+		}
+	}
+	
+	void Database::_logError(const String& sql)
+	{
+		if (m_flagLogErrors) {
+			LogError((char*)(getObjectType()), "Error: %s SQL: %s", getErrorMessage(), sql);
+		}
+	}
+
+	void Database::_logError(const String& sql, const Variant* params, sl_uint32 nParams)
+	{
+		if (m_flagLogErrors) {
+			LogError((char*)(getObjectType()), "Error: %s SQL: %s Params=%s", getErrorMessage(), sql, Variant(VariantList(params, nParams)).toJsonString());
+		}
 	}
 
 }

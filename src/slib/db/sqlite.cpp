@@ -25,6 +25,9 @@
 #include "slib/db/sqlite.h"
 
 #include "slib/core/file.h"
+#include "slib/core/log.h"
+
+#define TAG "SQLiteDatabase"
 
 namespace slib
 {	
@@ -54,32 +57,33 @@ namespace slib
 			::sqlite3_close(m_db);
 		}
 
-		static Ref<_priv_Sqlite3Database> connect(const String& filePath)
+		static Ref<_priv_Sqlite3Database> connect(const String& filePath, sl_bool flagCreate, sl_bool flagReadonly)
 		{
 			Ref<_priv_Sqlite3Database> ret;
 			sqlite3* db = sl_null;
-			if (File::exists(filePath)) {
-				sl_int32 iResult = ::sqlite3_open(filePath.getData(), &db);
-				if (SQLITE_OK == iResult) {
-					ret = new _priv_Sqlite3Database();
-					if (ret.isNotNull()) {
-						ret->m_db = db;
-						return ret;
-					}
-					::sqlite3_close(db);
+			int flags;
+			if (flagCreate) {
+				flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE;
+			} else {
+				flags = flagReadonly ? SQLITE_OPEN_READONLY : SQLITE_OPEN_READWRITE;
+			}
+			sl_int32 iResult = ::sqlite3_open_v2(filePath.getData(), &db, flags, sl_null);
+			if (SQLITE_OK == iResult) {
+				ret = new _priv_Sqlite3Database();
+				if (ret.isNotNull()) {
+					ret->m_db = db;
+					return ret;
 				}
+				::sqlite3_close(db);
 			}
 			return ret;
 		}
 
-		sl_int64 execute(const String& sql) override
+		sl_int64 _execute(const String& sql) override
 		{
 			ObjectLocker lock(this);
-			char* zErrMsg = 0;
-			if (SQLITE_OK == ::sqlite3_exec(m_db, sql.getData(), 0, 0, &zErrMsg)) {
+			if (SQLITE_OK == ::sqlite3_exec(m_db, sql.getData(), 0, 0, sl_null)) {
 				return ::sqlite3_changes(m_db);
-			} else {
-				::sqlite3_free(zErrMsg);
 			}
 			return -1;
 		}
@@ -367,7 +371,15 @@ namespace slib
 			{
 				::sqlite3_finalize(m_statement);
 			}
-
+			
+			sl_bool isLoggingErrors()
+			{
+				if (m_db.isNotNull()) {
+					return m_db->isLoggingErrors();
+				}
+				return sl_false;
+			}
+			
 			sl_bool _execute(const Variant* _params, sl_uint32 nParams)
 			{
 				::sqlite3_reset(m_statement);
@@ -390,34 +402,34 @@ namespace slib
 							Variant& var = (params.getData())[i];
 							switch (var.getType()) {
 							case VariantType::Null:
-								iRet = ::sqlite3_bind_null(m_statement, i);
+								iRet = ::sqlite3_bind_null(m_statement, i+1);
 								break;
 							case VariantType::Boolean:
 							case VariantType::Int32:
-								iRet = ::sqlite3_bind_int(m_statement, i, var.getInt32());
+								iRet = ::sqlite3_bind_int(m_statement, i+1, var.getInt32());
 								break;
 							case VariantType::Uint32:
 							case VariantType::Int64:
 							case VariantType::Uint64:
-								iRet = ::sqlite3_bind_int64(m_statement, i, var.getInt64());
+								iRet = ::sqlite3_bind_int64(m_statement, i+1, var.getInt64());
 								break;
 							case VariantType::Float:
 							case VariantType::Double:
-								iRet = ::sqlite3_bind_double(m_statement, i, var.getDouble());
+								iRet = ::sqlite3_bind_double(m_statement, i+1, var.getDouble());
 								break;
 							default:
 								if (var.isMemory()) {
 									Memory mem = var.getMemory();
 									sl_size size = mem.getSize();
 									if (size > 0x7fffffff) {
-										iRet = ::sqlite3_bind_blob64(m_statement, i, mem.getData(), size, SQLITE_STATIC);
+										iRet = ::sqlite3_bind_blob64(m_statement, i+1, mem.getData(), size, SQLITE_STATIC);
 									} else {
-										iRet = ::sqlite3_bind_blob(m_statement, i, mem.getData(), (sl_uint32)size, SQLITE_STATIC);
+										iRet = ::sqlite3_bind_blob(m_statement, i+1, mem.getData(), (sl_uint32)size, SQLITE_STATIC);
 									}
 								} else {
 									String str = var.getString();
 									var = str;
-									iRet = ::sqlite3_bind_text(m_statement, i, str.getData(), (sl_uint32)(str.getLength()), SQLITE_STATIC);
+									iRet = ::sqlite3_bind_text(m_statement, i+1, str.getData(), (sl_uint32)(str.getLength()), SQLITE_STATIC);
 								}
 							}
 							if (iRet != SQLITE_OK) {
@@ -427,6 +439,10 @@ namespace slib
 					}
 					m_boundParams = params;
 					return sl_true;
+				} else {
+					if (isLoggingErrors()) {
+						LogError(TAG, "Bind error: requires %d params but %d params provided", n, nParams);
+					}
 				}
 				return sl_false;
 			}
@@ -477,13 +493,17 @@ namespace slib
 
 		String getErrorMessage() override
 		{
-			return ::sqlite3_errmsg(m_db);
+			String error = ::sqlite3_errmsg(m_db);
+			if (error.isEmpty() || error == "not an error") {
+				return sl_null;
+			}
+			return error;
 		}
 	};
-
-	Ref<SQLiteDatabase> SQLiteDatabase::connect(const String& path)
+	
+	Ref<SQLiteDatabase> SQLiteDatabase::connect(const String& path, sl_bool flagCreate, sl_bool flagReadonly)
 	{
-		return _priv_Sqlite3Database::connect(path);
+		return _priv_Sqlite3Database::connect(path, flagCreate, flagReadonly);
 	}
 
 }

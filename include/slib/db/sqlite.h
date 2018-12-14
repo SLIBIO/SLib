@@ -38,7 +38,7 @@ namespace slib
 		~SQLiteDatabase();
 
 	public:
-		static Ref<SQLiteDatabase> connect(const String& filePath);
+		static Ref<SQLiteDatabase> connect(const String& filePath, sl_bool flagCreate = sl_true, sl_bool flagReadonly = sl_false);
 
 	};
 

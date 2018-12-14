@@ -216,65 +216,90 @@ namespace slib
 	public:
 		virtual Ref<DatabaseStatement> prepareStatement(const String& sql) = 0;
 	
-		virtual sl_int64 execute(const String& sql);
+		virtual String getErrorMessage() = 0;
+		
+		sl_int64 execute(const String& sql);
 
-		virtual Ref<DatabaseCursor> query(const String& sql);
+		Ref<DatabaseCursor> query(const String& sql);
+
+		sl_int64 executeBy(const String& sql, const Variant* params, sl_uint32 nParams);
+		
+		Ref<DatabaseCursor> queryBy(const String& sql, const Variant* params, sl_uint32 nParams);
+
+		List< HashMap<String, Variant> > getListForQueryResult(const String& sql);
+
+		HashMap<String, Variant> getRecordForQueryResult(const String& sql);
+
+		Variant getValueForQueryResult(const String& sql);
 	
+		List< HashMap<String, Variant> > getListForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
 
-		virtual List< HashMap<String, Variant> > getListForQueryResult(const String& sql);
+		HashMap<String, Variant> getRecordForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
 
-		virtual HashMap<String, Variant> getRecordForQueryResult(const String& sql);
-
-		virtual Variant getValueForQueryResult(const String& sql);
-
-
-		virtual sl_int64 executeBy(const String& sql, const Variant* params, sl_uint32 nParams);
-
+		Variant getValueForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
+	
 		template <class... ARGS>
 		SLIB_INLINE sl_int64 execute(const String& sql, ARGS&&... args)
 		{
 			Variant params[] = {Forward<ARGS>(args)...};
 			return executeBy(sql, params, sizeof...(args));
 		}
-
-		virtual Ref<DatabaseCursor> queryBy(const String& sql, const Variant* params, sl_uint32 nParams);
-	
 		template <class... ARGS>
 		SLIB_INLINE Ref<DatabaseCursor> query(const String& sql, ARGS&&... args)
 		{
 			Variant params[] = {Forward<ARGS>(args)...};
 			return queryBy(sql, params, sizeof...(args));
 		}
-	
-		virtual List< HashMap<String, Variant> > getListForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
-
+				
 		template <class... ARGS>
 		SLIB_INLINE List< HashMap<String, Variant> > getListForQueryResult(const String& sql, ARGS&&... args)
 		{
 			Variant params[] = {Forward<ARGS>(args)...};
 			return getListForQueryResultBy(sql, params, sizeof...(args));
 		}
-	
-		virtual HashMap<String, Variant> getRecordForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
-
+		
 		template <class... ARGS>
 		SLIB_INLINE HashMap<String, Variant> getRecordForQueryResult(const String& sql, ARGS&&... args)
 		{
 			Variant params[] = {Forward<ARGS>(args)...};
 			return getRecordForQueryResultBy(sql, params, sizeof...(args));
 		}
-
-		virtual Variant getValueForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
-	
+		
 		template <class... ARGS>
 		SLIB_INLINE Variant getValueForQueryResult(const String& sql, ARGS&&... args)
 		{
 			Variant params[] = {Forward<ARGS>(args)...};
 			return getValueForQueryResultBy(sql, params, sizeof...(args));
 		}
-	
-		virtual String getErrorMessage() = 0;
 
+		sl_bool isLoggingSQL();
+		
+		void setLoggingSQL(sl_bool flag);
+		
+		sl_bool isLoggingErrors();
+		
+		void setLoggingErrors(sl_bool flag);
+		
+	protected:
+		virtual sl_int64 _execute(const String& sql);
+		
+		virtual Ref<DatabaseCursor> _query(const String& sql);
+		
+		virtual sl_int64 _executeBy(const String& sql, const Variant* params, sl_uint32 nParams);
+		
+		virtual Ref<DatabaseCursor> _queryBy(const String& sql, const Variant* params, sl_uint32 nParams);
+		
+		void _logSQL(const String& sql);
+		
+		void _logSQL(const String& sql, const Variant* params, sl_uint32 nParams);
+		
+		void _logError(const String& sql);
+		
+		void _logError(const String& sql, const Variant* params, sl_uint32 nParams);
+
+	protected:
+		sl_bool m_flagLogSQL;
+		sl_bool m_flagLogErrors;
 	
 	};
 

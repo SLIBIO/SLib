@@ -32,7 +32,7 @@
 #include "slib/core/log.h"
 #include "slib/core/safe_static.h"
 
-#define TAG "MySQL"
+#define TAG "MySQL_Database"
 
 namespace slib
 {
@@ -181,14 +181,13 @@ namespace slib
 			return sl_false;
 		}
 
-		sl_int64 execute(const String& sql) override
+		sl_int64 _execute(const String& sql) override
 		{
 			initThread();
 			ObjectLocker lock(this);
 			if (0 == ::mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
 				return ::mysql_affected_rows(m_mysql);
 			}
-			LogError(TAG, "Execute Error: %s, SQL:%s", ::mysql_error(m_mysql), sql);
 			return -1;
 		}
 
@@ -313,24 +312,21 @@ namespace slib
 			}
 		};
 
-		Ref<DatabaseCursor> query(const String& sql) override
+		Ref<DatabaseCursor> _query(const String& sql) override
 		{
 			initThread();
 			ObjectLocker lock(this);
-			Ref<DatabaseCursor> ret;
 			if (0 == mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
 				MYSQL_RES* res = ::mysql_use_result(m_mysql);
 				if (res) {
-					ret = new _priv_DatabaseCursor(this, res);
+					Ref<DatabaseCursor> ret = new _priv_DatabaseCursor(this, res);
 					if (ret.isNotNull()) {
 						return ret;
 					}
 					::mysql_free_result(res);
 				}
-			} else {
-				LogError(TAG, "Query Error: %s, SQL:", ::mysql_error(m_mysql), sql);
 			}
-			return ret;
+			return sl_null;
 		}
 
 #define PRIV_FIELD_DESC_BUFFER_SIZE 64
@@ -897,6 +893,14 @@ namespace slib
 			{
 				close();
 			}
+			
+			sl_bool isLoggingErrors()
+			{
+				if (m_db.isNotNull()) {
+					return m_db->isLoggingErrors();
+				}
+				return sl_false;
+			}
 
 			sl_bool prepare()
 			{
@@ -908,7 +912,9 @@ namespace slib
 						m_statement = statement;
 						return sl_true;
 					}
-					LogError(TAG, "Prepare Error: %s, SQL:%s", ::mysql_stmt_error(statement), m_sql);
+					if (isLoggingErrors()) {
+						LogError(TAG, "Prepare Error: %s, SQL:%s", ::mysql_stmt_error(statement), m_sql);
+					}
 					::mysql_stmt_close(statement);
 				}
 				return sl_false;
@@ -1006,16 +1012,22 @@ namespace slib
 							if (0 == ::mysql_stmt_bind_param(m_statement, bind)) {
 								return sl_true;
 							} else {
-								LogError(TAG, "Bind Error: %s, SQL:%s", ::mysql_stmt_error(m_statement), m_sql);
+								if (isLoggingErrors()) {
+									LogError(TAG, "Bind Error: %s", ::mysql_stmt_error(m_statement));
+								}
 							}
 						} else {
-							LogError(TAG, "Bind error: Can't create memory for parameter binding, SQL:%s", m_sql);
+							if (isLoggingErrors()) {
+								LogError(TAG, "Bind error: Can't create memory for parameter binding");
+							}
 						}
 					} else {
 						return sl_true;
 					}
 				} else {
-					LogError(TAG, "Bind error: requires %d params but %d params provided, SQL:%s", n, nParams, m_sql);
+					if (isLoggingErrors()) {
+						LogError(TAG, "Bind error: requires %d params but %d params provided", n, nParams);
+					}
 				}
 				return sl_false;
 			}
@@ -1038,12 +1050,16 @@ namespace slib
 									if (0 == ::mysql_stmt_execute(m_statement)) {
 										return sl_true;
 									} else {
-										LogError(TAG, "Execute Statement Error: %s, SQL:%s", ::mysql_stmt_error(m_statement), m_sql);
+										if (isLoggingErrors()) {
+											LogError(TAG, "Execute Statement Error: %s, SQL:%s", ::mysql_stmt_error(m_statement), m_sql);
+										}
 									}
 								}
 							}
 						} else {
-							LogError(TAG, "Execute Statement Error: %s, SQL:%s", ::mysql_stmt_error(m_statement), m_sql);
+							if (isLoggingErrors()) {
+								LogError(TAG, "Execute Statement Error: %s, SQL:%s", ::mysql_stmt_error(m_statement), m_sql);
+							}
 						}
 					}
 				}
@@ -1175,7 +1191,11 @@ namespace slib
 
 		String getErrorMessage() override
 		{
-			return ::mysql_error(m_mysql);
+			String error = ::mysql_error(m_mysql);
+			if (error.isEmpty()) {
+				return sl_null;
+			}
+			return error;
 		}
 	};
 
