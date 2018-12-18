@@ -20,56 +20,57 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_UI_HEADER
-#define CHECKHEADER_SLIB_UI_HEADER
+#ifndef CHECKHEADER_SLIB_UI_QR_CODE_SCANNER
+#define CHECKHEADER_SLIB_UI_QR_CODE_SCANNER
 
-#include "ui/core.h"
-#include "ui/cursor.h"
-#include "ui/event.h"
-#include "ui/text.h"
-#include "ui/screen.h"
-#include "ui/window.h"
-#include "ui/menu.h"
-#include "ui/common_dialogs.h"
+#include "definition.h"
 
-#include "ui/view.h"
+#include "camera_view.h"
 
-#include "ui/label_view.h"
-#include "ui/button.h"
-#include "ui/image_view.h"
-#include "ui/edit_view.h"
-#include "ui/check_box.h"
-#include "ui/radio_button.h"
-#include "ui/select_view.h"
-#include "ui/progress_bar.h"
-#include "ui/slider.h"
-#include "ui/picker_view.h"
-#include "ui/text_view.h"
+#include "../core/timer.h"
 
-#include "ui/scroll_bar.h"
-#include "ui/scroll_view.h"
-#include "ui/linear_view.h"
-#include "ui/list_view.h"
-#include "ui/list_report_view.h"
-#include "ui/split_view.h"
-#include "ui/tab_view.h"
-#include "ui/tree_view.h"
-#include "ui/view_page.h"
+namespace slib
+{
 
-#include "ui/render_view.h"
-#include "ui/web_view.h"
-#include "ui/video_view.h"
-#include "ui/camera_view.h"
-#include "ui/qr_code_scanner.h"
+	class SLIB_EXPORT QRCodeScanner : public CameraView
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		QRCodeScanner();
+		
+		~QRCodeScanner();
 
-#include "ui/transition.h"
-#include "ui/motion_tracker.h"
-#include "ui/gesture.h"
+	public:
+		void start();
+		
+		void start(const CameraParam& param) override;
+		
+		void stop() override;
+		
+	public:
+		SLIB_PROPERTY(AtomicFunction<void(QRCodeScanner*, String)>, OnDetect)
+		
+	protected:
+		virtual void onDetect(const String& code);
+		
+	public:
+		virtual void dispatchDetect(const String& code);
+		
+	protected:
+		void onDraw(Canvas* canvas) override;
+		
+		void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame) override;
+		
+		void onRunScanner(Timer* timer);
 
-#include "ui/app.h"
-#include "ui/mobile_app.h"
-#include "ui/mobile_game.h"
+	protected:
+		Ref<RenderProgram2D_Position> m_programScanBar;
+		Ref<Timer> m_timerScanner;
+		sl_bool m_flagUpdateCameraFrame;
+		
+	};
 
-#include "ui/notification.h"
+}
 
 #endif
