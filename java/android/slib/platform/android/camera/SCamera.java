@@ -251,33 +251,24 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 	private void setCamera(Camera camera) {
 		this.camera = camera;
 		camera.setErrorCallback(this);
-		if (flagSetPreferedFrameSettings) {
-			setPreferedFrameSettings(preferedWidth, preferedHeight);
-		}
+		setSettings(0, 0);
 	}
 
-	private boolean flagSetPreferedFrameSettings = false;
-	private int preferedWidth = 0;
-	private int preferedHeight = 0;
-
-	public void setPreferedFrameSettings(int width, int height) {
-		preferedWidth = width;
-		preferedHeight = height;
-		flagSetPreferedFrameSettings = true;
+	public void setSettings(int preferedWidth, int preferedHeight) {
 		if (camera == null) {
 			return;
 		}
 		try {
-			if (width > 0 && height > 0) {
-				Camera.Parameters params = camera.getParameters();
+			Camera.Parameters params = camera.getParameters();
+			if (preferedWidth > 0 && preferedHeight > 0) {
 				List<Size> sizes = params.getSupportedPreviewSizes();
 				int widthSel = 0, heightSel = 0;
 				int distMin = -1;
 				for (int i = 0; i < sizes.size(); i++) {
 					Size size = sizes.get(i);
 					if (size != null) {
-						int dist1 = (size.width - width) * (size.width - width) + (size.height - height) * (size.height - height);
-						int dist2 = (size.width - height) * (size.width - height) + (size.height - width) * (size.height - width);
+						int dist1 = (size.width - preferedWidth) * (size.width - preferedWidth) + (size.height - preferedHeight) * (size.height - preferedHeight);
+						int dist2 = (size.width - preferedHeight) * (size.width - preferedHeight) + (size.height - preferedWidth) * (size.height - preferedWidth);
 						int dist = Math.min(dist1, dist2);
 						if (distMin < 0 || dist < distMin) {
 							widthSel = size.width;
@@ -288,9 +279,10 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 				}
 				if (widthSel > 0 && heightSel > 0) {
 					params.setPreviewSize(widthSel, heightSel);
-					camera.setParameters(params);				
 				}
 			}
+			params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+			camera.setParameters(params);
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
@@ -353,6 +345,13 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 			flagRunning = true;
 			
 			log("Started: " + size.width + "x" + size.height + " Format:" + params.getPreviewFormat());
+
+			camera.autoFocus(new Camera.AutoFocusCallback() {
+				@Override
+				public void onAutoFocus(boolean success, Camera camera) {
+				}
+			});
+
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
