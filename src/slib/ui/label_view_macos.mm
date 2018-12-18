@@ -68,15 +68,6 @@ namespace slib
 			return NSLeftTextAlignment;
 		}
 		
-		static Alignment translateAlignmentReverse(NSTextAlignment align)
-		{
-			if (align == NSCenterTextAlignment) {
-				return Alignment::Center;
-			} else if (align == NSRightTextAlignment) {
-				return Alignment::Right;
-			}
-			return Alignment::Left;
-		}
 	};
 
 	Ref<ViewInstance> LabelView::createNativeWidget(ViewInstance* _parent)

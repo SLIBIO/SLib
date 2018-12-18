@@ -230,16 +230,6 @@ namespace slib
 			return NSTextAlignmentLeft;
 		}
 		
-		static Alignment translateAlignmentReverse(NSTextAlignment align)
-		{
-			if (align == NSTextAlignmentCenter) {
-				return Alignment::Center;
-			} else if (align == NSTextAlignmentRight) {
-				return Alignment::Right;
-			}
-			return Alignment::Left;
-		}
-		
 		static void onChangeText(iOS_ViewInstance* instance, UITextField* field, UITextView* area)
 		{
 			Ref<View> _view = instance->getView();

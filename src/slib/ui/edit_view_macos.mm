@@ -166,16 +166,6 @@ namespace slib
 			return NSLeftTextAlignment;
 		}
 		
-		static Alignment translateAlignmentReverse(NSTextAlignment align)
-		{
-			if (align == NSCenterTextAlignment) {
-				return Alignment::Center;
-			} else if (align == NSRightTextAlignment) {
-				return Alignment::Right;
-			}
-			return Alignment::Left;
-		}
-		
 		static void onChangeTextField(macOS_ViewInstance* instance, NSTextField* control)
 		{
 			Ref<View> _view = instance->getView();
@@ -455,6 +445,7 @@ namespace slib
 	}
 	[super keyUp:theEvent];
 }
+
 @end
 
 @implementation _priv_Slib_macOS_TextArea
@@ -484,7 +475,7 @@ namespace slib
 	return self;
 }
 
--(void)controlTextDidChange:(NSNotification *)obj
+-(void)textDidChange:(NSNotification *)obj
 {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
