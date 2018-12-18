@@ -31,6 +31,10 @@
 
 namespace slib
 {
+	
+#if defined(SLIB_PLATFORM_IS_IOS)
+	UIInterfaceOrientation _g_slib_ui_screen_orientation = UIInterfaceOrientationPortrait;
+#endif
 
 	NSString* Apple::getNSStringFromString(const String& str, NSString* def)
 	{

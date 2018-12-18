@@ -607,6 +607,8 @@ namespace slib
 	{
 		return iOS_Window::create(param);
 	}
+	
+	void _priv_slib_ui_reset_orienation();
 }
 
 @implementation _priv_Slib_iOS_Window_RootViewController
@@ -629,6 +631,9 @@ namespace slib
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
 {
 	[super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+	
+	slib::_priv_slib_ui_reset_orienation();
+
 	UIWindow* window = self.view.window;
 	if (window == nil) {
 		return;

@@ -223,6 +223,41 @@ namespace slib
 		return getScreenSize().y;
 	}
 
+#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
+	ScreenOrientation UI::getScreenOrientation()
+	{
+		return ScreenOrientation::Portrait;
+	}
+#endif
+
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicList<ScreenOrientation>, _g_ui_available_screen_orientations);
+	
+	List<ScreenOrientation> UI::getAvailableScreenOrientations()
+	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_ui_available_screen_orientations)) {
+			return sl_null;
+		}
+		return _g_ui_available_screen_orientations;
+	}
+	
+	void UI::setAvailableScreenOrientations(const List<ScreenOrientation>& orientations)
+	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_ui_available_screen_orientations)) {
+			return;
+		}
+		_g_ui_available_screen_orientations = orientations;
+	}
+	
+	void UI::setAvailableScreenOrientationsPortrait()
+	{
+		setAvailableScreenOrientations(List<ScreenOrientation>::createFromElements(ScreenOrientation::Portrait));
+	}
+	
+	void UI::setAvailableScreenOrientationsLandscape()
+	{
+		setAvailableScreenOrientations(List<ScreenOrientation>::createFromElements(ScreenOrientation::LandscapeRight, ScreenOrientation::LandscapeLeft));
+	}
+
 	void UI::alert(const String& text)
 	{
 		AlertDialog alert;
@@ -395,34 +430,6 @@ namespace slib
 		}
 	}
 	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicList<ScreenOrientation>, _g_ui_available_screen_orientations);
-	
-	List<ScreenOrientation> UI::getAvailableScreenOrientations()
-	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_ui_available_screen_orientations)) {
-			return sl_null;
-		}
-		return _g_ui_available_screen_orientations;
-	}
-	
-	void UI::setAvailableScreenOrientations(const List<ScreenOrientation>& orientations)
-	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_ui_available_screen_orientations)) {
-			return;
-		}
-		_g_ui_available_screen_orientations = orientations;
-	}
-
-	void UI::setAvailableScreenOrientationsPortrait()
-	{
-		setAvailableScreenOrientations(List<ScreenOrientation>::createFromElements(ScreenOrientation::Portrait));
-	}
-	
-	void UI::setAvailableScreenOrientationsLandscape()
-	{
-		setAvailableScreenOrientations(List<ScreenOrientation>::createFromElements(ScreenOrientation::LandscapeRight, ScreenOrientation::LandscapeLeft));
-	}
-
 #if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
 	void UI::dismissKeyboard()
 	{

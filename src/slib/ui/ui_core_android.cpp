@@ -46,6 +46,7 @@ namespace slib
 	SLIB_JNI_BEGIN_CLASS(JAndroidUtil, "slib/platform/android/ui/Util")
 		SLIB_JNI_STATIC_METHOD(getDefaultDisplay, "getDefaultDisplay", "(Landroid/app/Activity;)Landroid/view/Display;");
 		SLIB_JNI_STATIC_METHOD(getDisplaySize, "getDisplaySize", "(Landroid/view/Display;)Landroid/graphics/Point;");
+		SLIB_JNI_STATIC_METHOD(getScreenOrientation, "getScreenOrientation", "(Landroid/app/Activity;)I");
 		SLIB_JNI_STATIC_METHOD(getStatusBarHeight, "getStatusBarHeight", "(Landroid/app/Activity;)I");
 		SLIB_JNI_STATIC_METHOD(openURL, "openURL", "(Landroid/app/Activity;Ljava/lang/String;)V");
 		SLIB_JNI_STATIC_METHOD(grantPermissions, "grantPermissions", "(Landroid/app/Activity;I)V");
@@ -139,6 +140,15 @@ namespace slib
 			ret.add_NoLock(screen);
 		}
 		return ret;
+	}
+
+	ScreenOrientation UI::getScreenOrientation()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			return (ScreenOrientation)(JAndroidUtil::getScreenOrientation.callInt(sl_null, jactivity));
+		}
+		return ScreenOrientation::Portrait;
 	}
 
 	void UI::openUrl(const String& _url) {

@@ -84,6 +84,18 @@ namespace slib
 		
 		static sl_ui_len getScreenHeight();
 		
+		static ScreenOrientation getScreenOrientation();
+		
+		static List<ScreenOrientation> getAvailableScreenOrientations();
+		
+		static void setAvailableScreenOrientations(const List<ScreenOrientation>& orientations);
+		
+		// ScreenOrientationPortrait
+		static void setAvailableScreenOrientationsPortrait();
+		
+		// ScreenOrientationLandscapeRight, ScreenOrientationLandscapeLeft
+		static void setAvailableScreenOrientationsLandscape();
+
 		
 		// Message Box
 		// Run on UI thread
@@ -146,17 +158,6 @@ namespace slib
 		
 		static void quitApp();
 		
-
-		static List<ScreenOrientation> getAvailableScreenOrientations();
-		
-		static void setAvailableScreenOrientations(const List<ScreenOrientation>& orientations);
-
-		// ScreenOrientationPortrait
-		static void setAvailableScreenOrientationsPortrait();
-
-		// ScreenOrientationLandscapeRight, ScreenOrientationLandscapeLeft
-		static void setAvailableScreenOrientationsLandscape();
-
 		
 		static void openUrl(const String& url);
 		

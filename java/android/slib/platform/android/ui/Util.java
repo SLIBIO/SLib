@@ -32,6 +32,7 @@ import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.Surface;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -68,6 +69,51 @@ public class Util {
 
 	public static float getDisplayDensity(Activity activity) {
 		return activity.getResources().getDisplayMetrics().density;
+	}
+
+	public static int getScreenOrientation(Activity activity) {
+		try {
+			DisplayMetrics metrics;
+			Display display = activity.getWindowManager().getDefaultDisplay();
+			if (display == null) {
+				return 0;
+			}
+			metrics = new DisplayMetrics();
+			display.getMetrics(metrics);
+			int rotation = display.getRotation();
+			int width = metrics.widthPixels;
+			int height = metrics.heightPixels;
+			if (((rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) && height > width) || ((rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) && width > height)) {
+				switch(rotation) {
+					case Surface.ROTATION_0:
+						return 0;
+					case Surface.ROTATION_90:
+						return 90;
+					case Surface.ROTATION_180:
+						return 180;
+					case Surface.ROTATION_270:
+						return 270;
+					default:
+						break;
+				}
+			} else {
+				switch(rotation) {
+					case Surface.ROTATION_0:
+						return 90;
+					case Surface.ROTATION_90:
+						return 0;
+					case Surface.ROTATION_180:
+						return 270;
+					case Surface.ROTATION_270:
+						return 180;
+					default:
+						break;
+				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return 0;
 	}
 
 	public static int getStatusBarHeight(Activity activity) {

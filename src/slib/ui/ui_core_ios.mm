@@ -125,6 +125,30 @@ namespace slib
 		return getPrimaryScreen();
 	}
 	
+	extern UIInterfaceOrientation _g_slib_ui_screen_orientation;
+	
+	ScreenOrientation UI::getScreenOrientation()
+	{
+		switch (_g_slib_ui_screen_orientation) {
+			case UIInterfaceOrientationPortrait:
+				return ScreenOrientation::Portrait;
+			case UIInterfaceOrientationPortraitUpsideDown:
+				return ScreenOrientation::PortraitUpsideDown;
+			case UIInterfaceOrientationLandscapeLeft:
+				return ScreenOrientation::LandscapeLeft;
+			case UIInterfaceOrientationLandscapeRight:
+				return ScreenOrientation::LandscapeRight;
+			default:
+				break;
+		}
+		return ScreenOrientation::Portrait;
+	}
+	
+	void _priv_slib_ui_reset_orienation()
+	{
+		_g_slib_ui_screen_orientation = [[UIApplication sharedApplication] statusBarOrientation];
+	}
+	
 	void UI::openUrl(const String& _url)
 	{
 		if (_url.isNotEmpty()) {
@@ -273,6 +297,8 @@ namespace slib
 	
 	slib::Log("App", "Finished Launching");
 	
+	slib::_priv_slib_ui_reset_orienation();
+	
 	slib::UIApp::dispatchStartToApp();
 	
 	slib::MobileApp::dispatchCreateActivityToApp();
@@ -302,6 +328,8 @@ namespace slib
 	
 	slib::Log("App", "Enter Foreground");
 
+	slib::_priv_slib_ui_reset_orienation();
+
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -309,6 +337,8 @@ namespace slib
 
 	slib::Log("App", "Become Active");
 
+	slib::_priv_slib_ui_reset_orienation();
+	
 	slib::MobileApp::dispatchResumeToApp();
 }
 
