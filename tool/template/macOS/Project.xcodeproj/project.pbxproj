@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		263916F221C8F86C008B335B /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 263916F121C8F86C008B335B /* CoreMedia.framework */; };
+		263916F421C8F870008B335B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 263916F321C8F870008B335B /* AVFoundation.framework */; };
 		265BF18A217239A30073F7B8 /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265BF188217239A30073F7B8 /* app.cpp */; };
 		265BF19121723BCD0073F7B8 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 265BF19021723BCD0073F7B8 /* OpenGL.framework */; };
 		265BF19321723BFB0073F7B8 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 265BF19221723BFB0073F7B8 /* AppKit.framework */; };
@@ -17,6 +19,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		263916F121C8F86C008B335B /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		263916F321C8F870008B335B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		265BF188217239A30073F7B8 /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = app.cpp; sourceTree = "<group>"; };
 		265BF189217239A30073F7B8 /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = app.h; sourceTree = "<group>"; };
 		265BF18E21723BBA0073F7B8 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
@@ -34,6 +38,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				263916F421C8F870008B335B /* AVFoundation.framework in Frameworks */,
+				263916F221C8F86C008B335B /* CoreMedia.framework in Frameworks */,
 				265BF19421723C220073F7B8 /* Quartz.framework in Frameworks */,
 				265BF19321723BFB0073F7B8 /* AppKit.framework in Frameworks */,
 				265BF19121723BCD0073F7B8 /* OpenGL.framework in Frameworks */,
@@ -46,6 +52,8 @@
 		265BF18B21723BB30073F7B8 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				263916F321C8F870008B335B /* AVFoundation.framework */,
+				263916F121C8F86C008B335B /* CoreMedia.framework */,
 				265BF19221723BFB0073F7B8 /* AppKit.framework */,
 				265BF19021723BCD0073F7B8 /* OpenGL.framework */,
 				265BF18E21723BBA0073F7B8 /* Quartz.framework */,
