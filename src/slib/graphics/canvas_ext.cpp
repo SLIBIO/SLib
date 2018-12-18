@@ -249,88 +249,50 @@ namespace slib
 		if (param.isTransparent()) {
 			return;
 		}
-		sl_real dw = rectDst.getWidth();
-		if (dw < SLIB_EPSILON) {
-			return;
-		}
-		sl_real dh = rectDst.getHeight();
-		if (dh < SLIB_EPSILON) {
-			return;
-		}
-		sl_real sw = source->getDrawableWidth();
-		if (sw < SLIB_EPSILON) {
-			return;
-		}
-		sl_real sh = source->getDrawableHeight();
-		if (sh < SLIB_EPSILON) {
-			return;
-		}
-		
-		switch (scaleMode) {
-			case ScaleMode::None:
-			{
-				Point pt = GraphicsUtil::calculateAlignPosition(rectDst, sw, sh, alignment);
-				Rectangle rectDraw;
-				rectDraw.left = pt.x;
-				rectDraw.top = pt.y;
-				rectDraw.right = rectDraw.left + sw;
-				rectDraw.bottom = rectDraw.top + sh;
+		if (scaleMode == ScaleMode::Cover) {
+			sl_real dw = rectDst.getWidth();
+			if (dw < SLIB_EPSILON) {
+				return;
+			}
+			sl_real dh = rectDst.getHeight();
+			if (dh < SLIB_EPSILON) {
+				return;
+			}
+			sl_real sw = source->getDrawableWidth();
+			if (sw < SLIB_EPSILON) {
+				return;
+			}
+			sl_real sh = source->getDrawableHeight();
+			if (sh < SLIB_EPSILON) {
+				return;
+			}
+			sl_real fw = sw / dw;
+			sl_real fh = sh / dh;
+			sl_real tw, th;
+			if (fw > fh) {
+				th = sh;
+				tw = dw * fh;
+			} else {
+				tw = sw;
+				th = dh * fw;
+			}
+			Rectangle rectSrc;
+			rectSrc.left = 0;
+			rectSrc.top = 0;
+			rectSrc.right = sw;
+			rectSrc.bottom = sh;
+			Point pt = GraphicsUtil::calculateAlignPosition(rectSrc, tw, th, alignment);
+			rectSrc.left = pt.x;
+			rectSrc.top = pt.y;
+			rectSrc.right = rectSrc.left + tw;
+			rectSrc.bottom = rectSrc.top + th;
+			onDraw(rectDst, source, rectSrc, param);
+		} else {
+			Rectangle rectDraw;
+			if (GraphicsUtil::calculateAlignRectangle(rectDraw, rectDst, source->getDrawableWidth(), source->getDrawableHeight(), scaleMode, alignment)) {
 				onDrawAll(rectDraw, source, param);
-				break;
-			}
-			case ScaleMode::Stretch:
-			{
-				onDrawAll(rectDst, source, param);
-				break;
-			}
-			case ScaleMode::Contain:
-			{
-				sl_real fw = dw / sw;
-				sl_real fh = dh / sh;
-				sl_real tw, th;
-				if (fw > fh) {
-					th = dh;
-					tw = sw * fh;
-				} else {
-					tw = dw;
-					th = sh * fw;
-				}
-				Point pt = GraphicsUtil::calculateAlignPosition(rectDst, tw, th, alignment);
-				Rectangle rectDraw;
-				rectDraw.left = pt.x;
-				rectDraw.top = pt.y;
-				rectDraw.right = rectDraw.left + tw;
-				rectDraw.bottom = rectDraw.top + th;
-				onDrawAll(rectDraw, source, param);
-				break;
-			}
-			case ScaleMode::Cover:
-			{
-				sl_real fw = sw / dw;
-				sl_real fh = sh / dh;
-				sl_real tw, th;
-				if (fw > fh) {
-					th = sh;
-					tw = dw * fh;
-				} else {
-					tw = sw;
-					th = dh * fw;
-				}
-				Rectangle rectSrc;
-				rectSrc.left = 0;
-				rectSrc.top = 0;
-				rectSrc.right = sw;
-				rectSrc.bottom = sh;
-				Point pt = GraphicsUtil::calculateAlignPosition(rectSrc, tw, th, alignment);
-				rectSrc.left = pt.x;
-				rectSrc.top = pt.y;
-				rectSrc.right = rectSrc.left + tw;
-				rectSrc.bottom = rectSrc.top + th;
-				onDraw(rectDst, source, rectSrc, param);
-				break;
 			}
 		}
-		
 	}
 	
 	void CanvasExt::onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param)

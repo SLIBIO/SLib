@@ -24,6 +24,7 @@
 
 #include "slib/render/canvas.h"
 #include "slib/graphics/image.h"
+#include "slib/graphics/util.h"
 
 namespace slib
 {
@@ -53,6 +54,13 @@ namespace slib
 		
 		m_renderVideoParam.onUpdateFrame = SLIB_FUNCTION_WEAKREF(VideoView, updateCurrentFrame, this);
 		
+		m_frameFlipApplied = FlipMode::None;
+		m_frameRotationApplied = RotationMode::Rotate0;
+		m_userFlipApplied = FlipMode::None;
+		m_userRotationApplied = RotationMode::Rotate0;
+
+		m_scaleMode = ScaleMode::Stretch;
+		m_gravity = Alignment::MiddleCenter;
 	}
 	
 	VideoView::~VideoView()
@@ -190,8 +198,34 @@ namespace slib
 		requestRender();
 	}
 	
+	ScaleMode VideoView::getScaleMode()
+	{
+		return m_scaleMode;
+	}
+	
+	void VideoView::setScaleMode(ScaleMode scaleMode)
+	{
+		m_scaleMode = scaleMode;
+		requestRender();
+	}
+	
+	Alignment VideoView::getGravity()
+	{
+		return m_gravity;
+	}
+	
+	void VideoView::setGravity(Alignment align)
+	{
+		m_gravity = align;
+		requestRender();
+	}
+	
 	void VideoView::onDraw(Canvas* _canvas)
 	{
+		Rectangle rectBounds = getBounds();
+		if (rectBounds.getWidth() < SLIB_EPSILON || rectBounds.getHeight() < SLIB_EPSILON) {
+			return;
+		}
 		RenderCanvas* canvas = CastInstance<RenderCanvas>(_canvas);
 		if (canvas) {
 			Ref<RenderEngine> engine = canvas->getEngine();
@@ -219,7 +253,19 @@ namespace slib
 				}
 				Ref<VertexBuffer> vb = m_vbFrame;
 				if (vb.isNotNull() && texture.isNotNull() && program.isNotNull()) {
-					Matrix3 mat = canvas->getTransformMatrixForRectangle(getBounds());
+					sl_real sw = (sl_real)(texture->getWidth());
+					sl_real sh = (sl_real)(texture->getHeight());
+					if (m_frameRotationApplied == RotationMode::Rotate90 || m_frameRotationApplied == RotationMode::Rotate270) {
+						Swap(sw, sh);
+					}
+					if (m_userRotationApplied == RotationMode::Rotate90 || m_userRotationApplied == RotationMode::Rotate270) {
+						Swap(sw, sh);
+					}
+					Rectangle rectDraw;
+					if (!(GraphicsUtil::calculateAlignRectangle(rectDraw, rectBounds, sw, sh, m_scaleMode, m_gravity))) {
+						return;
+					}
+					Matrix3 mat = canvas->getTransformMatrixForRectangle(rectDraw);
 					RenderProgramScope<RenderProgramState2D_PositionTexture> scope;
 					if (scope.begin(engine.get(), program)) {
 						scope->setTransform(mat);
@@ -323,6 +369,10 @@ namespace slib
 		}
 		Ref<VertexBuffer> vb = VertexBuffer::create(v, sizeof(v));
 		m_vbFrame = vb;
+		m_frameFlipApplied = frameFlip;
+		m_frameRotationApplied = frameRotation;
+		m_userFlipApplied = userFlip;
+		m_userRotationApplied = userRotation;
 		return vb;
 	}
 

@@ -47,6 +47,7 @@ namespace slib
 		
 		void setMediaPlayer(const Ref<MediaPlayer>& player);
 		
+		
 		void openUrl(const String& url);
 		
 		void openFile(const String& filePath);
@@ -55,26 +56,40 @@ namespace slib
 		
 		void setSource(const String& source);
 		
+		
 		sl_bool isRepeat();
 		
 		void setRepeat(sl_bool flagRepeat);
+		
 		
 		RotationMode getRotation();
 		
 		void setRotation(const RotationMode& rotation);
 		
+		
 		FlipMode getFlip();
 		
 		void setFlip(const FlipMode& flip);
 
+		
 		void updateCurrentFrame(const VideoFrame* frame);
+		
+		
+		ScaleMode getScaleMode();
+		
+		void setScaleMode(ScaleMode scaleMode);
+		
+		
+		Alignment getGravity();
+		
+		virtual void setGravity(Alignment align);
 		
 	protected:
 		void onDraw(Canvas* canvas) override;
 		
 	protected:
 		Ref<VertexBuffer> _applyFrameRotationAndFlip(FlipMode frameFlip, RotationMode frameRotation, FlipMode userFlip, RotationMode userRotation);
-		
+				
 	protected:
 		AtomicRef<MediaPlayer> m_mediaPlayer;
 		sl_bool m_flagRepeat;
@@ -95,6 +110,9 @@ namespace slib
 		RotationMode m_userRotationApplied;
 
 		MediaPlayerRenderVideoParam m_renderVideoParam;
+		
+		ScaleMode m_scaleMode;
+		Alignment m_gravity;
 		
 	};
 

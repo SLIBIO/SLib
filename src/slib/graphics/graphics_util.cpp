@@ -121,12 +121,85 @@ namespace slib
 		return topDst;
 	}
 
-	Point GraphicsUtil::calculateAlignPosition(const Rectangle &rcDst, sl_real widthSrc, sl_real heightSrc, Alignment align)
+	Point GraphicsUtil::calculateAlignPosition(const Rectangle& rcDst, sl_real widthSrc, sl_real heightSrc, Alignment align)
 	{
 		Point ret;
 		ret.x = calculateAlignX(rcDst.left, rcDst.right, widthSrc, align);
 		ret.y = calculateAlignY(rcDst.top, rcDst.bottom, heightSrc, align);
 		return ret;
+	}
+	
+	sl_bool GraphicsUtil::calculateAlignRectangle(Rectangle& rectOutput, const Rectangle& rectDst, sl_real sw, sl_real sh, ScaleMode scaleMode, Alignment alignment)
+	{
+		if (sw < SLIB_EPSILON) {
+			return sl_false;
+		}
+		if (sh < SLIB_EPSILON) {
+			return sl_false;
+		}
+		sl_real dw = rectDst.getWidth();
+		if (dw < SLIB_EPSILON) {
+			return sl_false;
+		}
+		sl_real dh = rectDst.getHeight();
+		if (dh < SLIB_EPSILON) {
+			return sl_false;
+		}
+		switch (scaleMode) {
+			case ScaleMode::None:
+			{
+				Point pt = calculateAlignPosition(rectDst, sw, sh, alignment);
+				rectOutput.left = pt.x;
+				rectOutput.top = pt.y;
+				rectOutput.right = rectOutput.left + sw;
+				rectOutput.bottom = rectOutput.top + sh;
+				return sl_true;
+			}
+			case ScaleMode::Stretch:
+			{
+				rectOutput = rectDst;
+				return sl_true;
+			}
+			case ScaleMode::Contain:
+			{
+				sl_real fw = dw / sw;
+				sl_real fh = dh / sh;
+				sl_real tw, th;
+				if (fw > fh) {
+					th = dh;
+					tw = sw * fh;
+				} else {
+					tw = dw;
+					th = sh * fw;
+				}
+				Point pt = GraphicsUtil::calculateAlignPosition(rectDst, tw, th, alignment);
+				rectOutput.left = pt.x;
+				rectOutput.top = pt.y;
+				rectOutput.right = rectOutput.left + tw;
+				rectOutput.bottom = rectOutput.top + th;
+				return sl_true;
+			}
+			case ScaleMode::Cover:
+			{
+				sl_real fw = dw / sw;
+				sl_real fh = dh / sh;
+				sl_real tw, th;
+				if (fw < fh) {
+					th = dh;
+					tw = sw * fh;
+				} else {
+					tw = dw;
+					th = sh * fw;
+				}
+				Point pt = GraphicsUtil::calculateAlignPosition(rectDst, tw, th, alignment);
+				rectOutput.left = pt.x;
+				rectOutput.top = pt.y;
+				rectOutput.right = rectOutput.left + tw;
+				rectOutput.bottom = rectOutput.top + th;
+				return sl_true;
+			}
+		}
+		return sl_false;
 	}
 
 	Rectangle GraphicsUtil::transformRectangle(const Rectangle& rectTransform, const Rectangle& rectFrom, const Rectangle& rectTo)
