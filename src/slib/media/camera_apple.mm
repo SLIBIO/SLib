@@ -47,7 +47,10 @@ namespace slib
 
 namespace slib
 {
-
+#if defined(SLIB_PLATFORM_IS_IOS)
+	extern UIInterfaceOrientation _g_slib_ui_screen_orientation;
+#endif
+	
 	class _priv_AVFoundation_Camera_Static
 	{
 	public:
@@ -69,6 +72,9 @@ namespace slib
 		AVCaptureDevice* m_device;
 		AVCaptureDeviceInput* m_input;
 		AVCaptureVideoDataOutput* m_output;
+#if defined(SLIB_PLATFORM_IS_IOS)
+		UIInterfaceOrientation m_orientation;
+#endif
 		
 		sl_bool m_flagRunning;
 		
@@ -147,10 +153,12 @@ namespace slib
 			[session addInput:input];
 			[session addOutput:output];
 			
+#if defined(SLIB_PLATFORM_IS_IOS)
 			AVCaptureConnection *videoConnection = [output connectionWithMediaType:AVMediaTypeVideo];
 			if ([videoConnection isVideoOrientationSupported]) {
-				[videoConnection setVideoOrientation:AVCaptureVideoOrientationPortrait];
+				[videoConnection setVideoOrientation:_getVideoOrientation(_g_slib_ui_screen_orientation)];
 			}
+#endif
 			
 			ret = new _priv_AVFoundation_Camera();
 			if (ret.isNotNull()) {
@@ -160,6 +168,9 @@ namespace slib
 				ret->m_device = device;
 				ret->m_input = input;
 				ret->m_output = output;
+#if defined(SLIB_PLATFORM_IS_IOS)
+				ret->m_orientation = _g_slib_ui_screen_orientation;
+#endif
 				ret->_init(param);
 				if (param.flagAutoStart) {
 					ret->start();
@@ -207,6 +218,25 @@ namespace slib
 			}
 		}
 		
+#if defined(SLIB_PLATFORM_IS_IOS)
+		static AVCaptureVideoOrientation _getVideoOrientation(UIInterfaceOrientation orientation) {
+			switch (orientation) {
+				case UIInterfaceOrientationPortrait:
+					return AVCaptureVideoOrientationPortrait;
+				case UIInterfaceOrientationPortraitUpsideDown:
+					return AVCaptureVideoOrientationPortraitUpsideDown;
+					break;
+				case UIInterfaceOrientationLandscapeRight:
+					return AVCaptureVideoOrientationLandscapeRight;
+				case UIInterfaceOrientationLandscapeLeft:
+					return AVCaptureVideoOrientationLandscapeLeft;
+				default:
+					break;
+			}
+			return AVCaptureVideoOrientationPortrait;
+		}
+#endif
+
 		static AVCaptureDevice* _selectDevice(String deviceId)
 		{
 #if !defined(SLIB_PLATFORM_IS_IOS_DEVICE)
@@ -287,6 +317,16 @@ namespace slib
 		}
 
 		void _onFrame(CMSampleBufferRef sampleBuffer) {
+			
+#if defined(SLIB_PLATFORM_IS_IOS)
+			if (m_orientation != _g_slib_ui_screen_orientation) {
+				AVCaptureConnection *videoConnection = [m_output connectionWithMediaType:AVMediaTypeVideo];
+				if ([videoConnection isVideoOrientationSupported]) {
+					[videoConnection setVideoOrientation:_getVideoOrientation(_g_slib_ui_screen_orientation)];
+				}
+				m_orientation = _g_slib_ui_screen_orientation;
+			}
+#endif
 			
 			CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
 			
