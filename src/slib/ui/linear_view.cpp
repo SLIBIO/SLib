@@ -22,6 +22,8 @@
 
 #include "slib/ui/linear_view.h"
 
+#include "slib/core/scoped.h"
+
 namespace slib
 {
 
@@ -87,10 +89,14 @@ namespace slib
 		sl_ui_len heightContainer = getLayoutHeight();
 
 		ListElements< Ref<View> > children(getChildren());
+		
+		SLIB_SCOPED_BUFFER(Size, 512, childSizes, children.count);
+		
 		sl_size i;
 		for (i = 0; i < children.count; i++) {
 			Ref<View>& child = children[i];
 			if (child->getVisibility() != Visibility::Gone) {
+				childSizes[i] = child->getLayoutSize();
 				if (flagHorizontalLayout) {
 					sizeSum += child->getMarginLeft();
 					if (child->getWidthMode() != SizeMode::Filling) {
@@ -245,6 +251,9 @@ namespace slib
 					child->setLayoutFrame(frame);
 					pos += height;
 					pos += child->getMarginBottom();
+				}
+				if (!(childSizes[i].isAlmostEqual(child->getLayoutSize()))) {
+					child->forceUpdateLayout();
 				}
 			}
 		}

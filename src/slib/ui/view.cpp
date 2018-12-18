@@ -2437,6 +2437,12 @@ namespace slib
 		}
 		invalidate(mode);
 	}
+	
+	void View::forceUpdateLayout()
+	{
+		m_flagInvalidLayout = sl_true;
+		_updateLayout();
+	}
 
 	SizeMode View::getWidthMode()
 	{

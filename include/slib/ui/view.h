@@ -342,6 +342,8 @@ namespace slib
 		void invalidateSelfAndParentLayout(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		void invalidateLayoutOfWrappingControl(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		
+		void forceUpdateLayout();
 
 		SizeMode getWidthMode();
 		
