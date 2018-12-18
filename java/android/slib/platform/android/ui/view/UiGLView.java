@@ -66,7 +66,7 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 	public static boolean _setRenderMode(final View view, final int mode) {
 		if (view instanceof GLSurfaceView) {
 			if (mode == 0) {
-				((GLSurfaceView)view).setRenderMode(UiGLView.RENDERMODE_CONTINUOUSLY);				
+				((GLSurfaceView)view).setRenderMode(UiGLView.RENDERMODE_CONTINUOUSLY);
 			} else {
 				((GLSurfaceView)view).setRenderMode(UiGLView.RENDERMODE_WHEN_DIRTY);				
 			}
@@ -100,6 +100,8 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 	
 	public UiGLView(Context context) {
 		super(context);
+
+		setZOrderOnTop(true);
 		
 		setEGLContextClientVersion(2);
 		setEGLConfigChooser(new ConfigChooser(true, false));
@@ -131,13 +133,13 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 			return super.dispatchTouchEvent(event);
 		}
 	}
-	
+
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		onEventCreate(this);
 		synchronized (sync) {
 			if (!(glViewList.contains(this))) {
-				glViewList.add(this);			
+				glViewList.add(this);
 			}
 		}
 	}
@@ -150,11 +152,11 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 
 	int widthViewport = 0;
 	int heightViewport = 0;
+
 	@Override
 	public void onDrawFrame(GL10 gl) {
 		onEventFrame(this, widthViewport, heightViewport);
 	}
-	
 	
 	public static void removeView(final View view) {
 		if (!(UiThread.isUiThread())) {
