@@ -47,4 +47,6 @@
 #include "graphics/text.h"
 #include "graphics/util.h"
 
+#include "graphics/zxing.h"
+
 #endif
