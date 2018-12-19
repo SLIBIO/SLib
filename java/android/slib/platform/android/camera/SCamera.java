@@ -281,7 +281,7 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 					params.setPreviewSize(widthSel, heightSel);
 				}
 			}
-			params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+			params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
 			camera.setParameters(params);
 		} catch (Exception e) {
 			Logger.exception(e);
