@@ -150,6 +150,7 @@ namespace slib
 		sl_bool m_flagClosed;
 		Memory m_bufRead;
 		sl_bool m_flagReading;
+		sl_bool m_flagKeepAlive;
 		
 	protected:
 		void _read();

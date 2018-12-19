@@ -171,6 +171,7 @@ namespace slib
 	{
 		m_flagClosed = sl_true;
 		m_flagReading = sl_false;
+		m_flagKeepAlive = sl_true;
 	}
 
 	HttpServiceConnection::~HttpServiceConnection()
@@ -332,7 +333,9 @@ namespace slib
 				return;
 			}
 		}
+		
 		if (context->m_requestHeader.isNotNull()) {
+			
 			if (context->m_requestBodyBuffer.getSize() >= context->m_requestContentLength) {
 
 				m_contextCurrent.setNull();
@@ -355,11 +358,12 @@ namespace slib
 				if (context->isProcessingByThread()) {
 					Ref<ThreadPool> threadPool = service->getThreadPool();
 					if (threadPool.isNotNull()) {
+						_read();
 						threadPool->addTask(SLIB_BIND_WEAKREF(void(), HttpServiceConnection, _processContext, this, _context));
 					} else {
 						sendResponse_ServerError();
-						return;
 					}
+					return;
 				} else {
 					_processContext(context);
 				}
@@ -402,7 +406,11 @@ namespace slib
 		}
 		m_output->mergeBuffer(&(context->m_bufferOutput));
 		m_output->startWriting();
-		start();
+		if (context->isKeepAlive()) {
+			start();
+		} else {
+			m_flagKeepAlive = sl_false;
+		}
 	}
 
 	void HttpServiceConnection::onReadStream(AsyncStreamResult* result)
@@ -417,6 +425,9 @@ namespace slib
 
 	void HttpServiceConnection::onAsyncOutputComplete(AsyncOutput* output)
 	{
+		if (!m_flagKeepAlive) {
+			close();
+		}
 	}
 
 	void HttpServiceConnection::onAsyncOutputError(AsyncOutput* output)

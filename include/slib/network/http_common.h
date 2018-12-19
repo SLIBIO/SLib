@@ -159,7 +159,8 @@ namespace slib
 		static const String& AcceptEncoding;
 		static const String& TransferEncoding;
 		static const String& ContentEncoding;
-		
+		static const String& Connection;
+
 		static const String& Range;
 		static const String& ContentRange;
 		static const String& AcceptRanges;
@@ -256,6 +257,10 @@ namespace slib
 		String getHost() const;
 		
 		void setHost(const String& type);
+		
+		sl_bool isKeepAlive() const;
+		
+		void setKeepAlive();
 		
 		String getRequestRange() const;
 		

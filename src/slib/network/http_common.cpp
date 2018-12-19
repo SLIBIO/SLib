@@ -161,6 +161,7 @@ namespace slib
 	DEFINE_HTTP_HEADER(AcceptEncoding, "Accept-Encoding")
 	DEFINE_HTTP_HEADER(TransferEncoding, "Transfer-Encoding")
 	DEFINE_HTTP_HEADER(ContentEncoding, "Content-Encoding")
+	DEFINE_HTTP_HEADER(Connection, "Connection")
 
 	DEFINE_HTTP_HEADER(Range, "Range")
 	DEFINE_HTTP_HEADER(ContentRange, "Content-Range")
@@ -428,7 +429,19 @@ namespace slib
 	{
 		setRequestHeader(HttpHeaders::Host, type);
 	}
-
+	
+	sl_bool HttpRequest::isKeepAlive() const
+	{
+		SLIB_STATIC_STRING(str, "Keep-Alive");
+		return getRequestHeader(HttpHeaders::Connection).equalsIgnoreCase(str);
+	}
+	
+	void HttpRequest::setKeepAlive()
+	{
+		SLIB_STATIC_STRING(str, "Keep-Alive");
+		setRequestHeader(HttpHeaders::Connection, str);
+	}
+	
 	String HttpRequest::getRequestRange() const
 	{
 		return getRequestHeader(HttpHeaders::Range);
