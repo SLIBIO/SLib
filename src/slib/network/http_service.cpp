@@ -358,15 +358,14 @@ namespace slib
 				if (context->isProcessingByThread()) {
 					Ref<ThreadPool> threadPool = service->getThreadPool();
 					if (threadPool.isNotNull()) {
-						_read();
 						threadPool->addTask(SLIB_BIND_WEAKREF(void(), HttpServiceConnection, _processContext, this, _context));
 					} else {
 						sendResponse_ServerError();
 					}
-					return;
 				} else {
 					_processContext(context);
 				}
+				return;
 			}
 		}
 		_read();
@@ -405,11 +404,13 @@ namespace slib
 			return;
 		}
 		m_output->mergeBuffer(&(context->m_bufferOutput));
-		m_output->startWriting();
 		if (context->isKeepAlive()) {
+			m_output->startWriting();
 			start();
 		} else {
+			m_contextCurrent.setNull();
 			m_flagKeepAlive = sl_false;
+			m_output->startWriting();
 		}
 	}
 
