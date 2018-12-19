@@ -121,6 +121,11 @@ namespace slib
 				return ret;
 			}
 			
+			if ([device lockForConfiguration:nil]) {
+				device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
+				[device unlockForConfiguration];
+			}
+			
 			NSError* error;
 			AVCaptureDeviceInput* input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
 			if (input == nil) {

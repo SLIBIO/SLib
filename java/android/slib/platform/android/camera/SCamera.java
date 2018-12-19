@@ -281,7 +281,7 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 					params.setPreviewSize(widthSel, heightSel);
 				}
 			}
-			params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+			params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
 			camera.setParameters(params);
 		} catch (Exception e) {
 			Logger.exception(e);
@@ -345,12 +345,6 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 			flagRunning = true;
 			
 			log("Started: " + size.width + "x" + size.height + " Format:" + params.getPreviewFormat());
-
-			camera.autoFocus(new Camera.AutoFocusCallback() {
-				@Override
-				public void onAutoFocus(boolean success, Camera camera) {
-				}
-			});
 
 		} catch (Exception e) {
 			Logger.exception(e);
