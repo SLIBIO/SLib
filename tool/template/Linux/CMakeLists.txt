@@ -14,6 +14,7 @@ set_target_properties(SLIB_TEMPLATE_APP_NAME PROPERTIES LINK_FLAGS "-static-libg
 target_link_libraries (
   SLIB_TEMPLATE_APP_NAME
   slib
+  zlib
   pthread
   gtk-x11-2.0
   gdk-x11-2.0
