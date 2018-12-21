@@ -1,0 +1,1 @@
+$SLIB_PATH/tool/build-app-cmake-release.sh $(dirname $0)
