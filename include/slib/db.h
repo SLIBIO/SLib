@@ -28,4 +28,6 @@
 #include "db/sqlite.h"
 #include "db/mysql.h"
 
+#include "db/redis.h"
+
 #endif
