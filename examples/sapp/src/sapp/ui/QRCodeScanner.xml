@@ -1,0 +1,25 @@
+<sapp>
+	<layout
+		type='page'
+		>
+		
+		<QRCodeScanner 
+			name='scanner'
+			width='fill'
+			height='70%'
+			autoStart='true'
+			/>
+
+		<TextArea
+			name='result'
+			width='fill'
+			height='fill'
+			below='scanner'
+			background='white'
+			fontSize='4%vw'
+			text='QR Code'
+			readOnly='true'
+			/>
+
+ 	</layout>
+</sapp>

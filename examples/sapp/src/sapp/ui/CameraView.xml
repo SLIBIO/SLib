@@ -3,10 +3,12 @@
 		type='page'
 		>
 		
-		<web 
+		<camera 
 			width='fill'
 			height='fill'
-			url="http://www.bing.com" 
+			autoStart='true'
+			device='front'
+			scale='contain'
 			/>
 
  	</layout>

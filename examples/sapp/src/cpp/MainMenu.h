@@ -39,6 +39,10 @@ public:
 	
 	void onClickWebView(View* view);
 
+	void onClickCameraView(View* view);
+
 	void onClickLoginPage(View* view);
+	
+	void onClickQRCodeScanner(View* view);
 	
 };

@@ -20,46 +20,11 @@
  *   THE SOFTWARE.
  */
 
-#include "MainMenu.h"
-
 #include "QRCodeScanner.h"
 
-void MainMenu::onOpen()
+void QRCodeScannerPage::onOpen()
 {
-	btnHelloWorld->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickHelloWorld, this));
-	btnViewPager->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickViewPager, this));
-	btnWebView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickWebView, this));
-	btnCameraView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickCameraView, this));
-	btnLoginPage->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickLoginPage, this));
-	btnQRCodeScanner->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickQRCodeScanner, this));
-}
-
-void MainMenu::onClickHelloWorld(View* view)
-{
-	goToPage(new example::ui::HelloWorld);
-}
-
-void MainMenu::onClickViewPager(View* view)
-{
-	goToPage(new example::ui::ViewPager);
-}
-
-void MainMenu::onClickWebView(View* view)
-{
-	goToPage(new example::ui::WebView);
-}
-
-void MainMenu::onClickCameraView(View* view)
-{
-	goToPage(new example::ui::CameraView);
-}
-
-void MainMenu::onClickLoginPage(View* view)
-{
-	goToPage(new example::ui::LoginPage);
-}
-
-void MainMenu::onClickQRCodeScanner(View* view)
-{
-	goToPage(new QRCodeScannerPage);
+	scanner->setOnDetect([this](slib::QRCodeScanner*, String qr_code) {
+		result->setText(String::format("%s\n\nDetected on %s", qr_code, Time::now()));
+	});
 }

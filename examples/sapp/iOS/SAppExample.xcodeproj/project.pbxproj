@@ -7,13 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2639190821CC02AA008B335B /* layouts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639190221CC02A9008B335B /* layouts.cpp */; };
+		2639190921CC02AA008B335B /* drawables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639190321CC02AA008B335B /* drawables.cpp */; };
+		2639190A21CC02AA008B335B /* menus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639190421CC02AA008B335B /* menus.cpp */; };
+		2639190B21CC02AA008B335B /* strings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639190521CC02AA008B335B /* strings.cpp */; };
+		2639190C21CC02AA008B335B /* raws.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639190621CC02AA008B335B /* raws.cpp */; };
+		2639190D21CC02AA008B335B /* colors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639190721CC02AA008B335B /* colors.cpp */; };
+		2639191121CC25CF008B335B /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2639191021CC25CE008B335B /* CoreMedia.framework */; };
+		2639191321CC25D5008B335B /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2639191221CC25D5008B335B /* CoreVideo.framework */; };
+		2639191521CC25DB008B335B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2639191421CC25DB008B335B /* AVFoundation.framework */; };
+		2639191821CC2B58008B335B /* QRCodeScanner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639191621CC2B58008B335B /* QRCodeScanner.cpp */; };
 		264AF17D21B41323004E58CB /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF17B21B41323004E58CB /* app.cpp */; };
-		264AF18C21B41343004E58CB /* strings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF17F21B41343004E58CB /* strings.cpp */; };
-		264AF18D21B41343004E58CB /* layouts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF18121B41343004E58CB /* layouts.cpp */; };
-		264AF18E21B41343004E58CB /* menus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF18221B41343004E58CB /* menus.cpp */; };
-		264AF18F21B41343004E58CB /* colors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF18421B41343004E58CB /* colors.cpp */; };
-		264AF19021B41343004E58CB /* raws.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF18721B41343004E58CB /* raws.cpp */; };
-		264AF19121B41343004E58CB /* drawables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF18B21B41343004E58CB /* drawables.cpp */; };
 		264AF19B21B41A77004E58CB /* MainMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF19A21B41A77004E58CB /* MainMenu.cpp */; };
 		264AF1BB21B51167004E58CB /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF1BA21B51167004E58CB /* WebKit.framework */; };
 		264AF1CD21B8F378004E58CB /* LaunchScreen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF1CB21B8F377004E58CB /* LaunchScreen.cpp */; };
@@ -31,22 +35,21 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2639190221CC02A9008B335B /* layouts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layouts.cpp; path = ../../src/gen/layouts.cpp; sourceTree = "<group>"; };
+		2639190321CC02AA008B335B /* drawables.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = drawables.cpp; path = ../../src/gen/drawables.cpp; sourceTree = "<group>"; };
+		2639190421CC02AA008B335B /* menus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = menus.cpp; path = ../../src/gen/menus.cpp; sourceTree = "<group>"; };
+		2639190521CC02AA008B335B /* strings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = strings.cpp; path = ../../src/gen/strings.cpp; sourceTree = "<group>"; };
+		2639190621CC02AA008B335B /* raws.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raws.cpp; path = ../../src/gen/raws.cpp; sourceTree = "<group>"; };
+		2639190721CC02AA008B335B /* colors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = colors.cpp; path = ../../src/gen/colors.cpp; sourceTree = "<group>"; };
+		2639190E21CC02CF008B335B /* ui */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ui; path = ../../src/gen/ui; sourceTree = "<group>"; };
+		2639190F21CC02DB008B335B /* sapp */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sapp; path = ../src/sapp; sourceTree = "<group>"; };
+		2639191021CC25CE008B335B /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		2639191221CC25D5008B335B /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		2639191421CC25DB008B335B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		2639191621CC2B58008B335B /* QRCodeScanner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = QRCodeScanner.cpp; sourceTree = "<group>"; };
+		2639191721CC2B58008B335B /* QRCodeScanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QRCodeScanner.h; sourceTree = "<group>"; };
 		264AF17B21B41323004E58CB /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = app.cpp; sourceTree = "<group>"; };
 		264AF17C21B41323004E58CB /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = app.h; sourceTree = "<group>"; };
-		264AF17F21B41343004E58CB /* strings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = strings.cpp; path = ../../src/gen/strings.cpp; sourceTree = "<group>"; };
-		264AF18021B41343004E58CB /* layouts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = layouts.h; path = ../../src/gen/layouts.h; sourceTree = "<group>"; };
-		264AF18121B41343004E58CB /* layouts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layouts.cpp; path = ../../src/gen/layouts.cpp; sourceTree = "<group>"; };
-		264AF18221B41343004E58CB /* menus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = menus.cpp; path = ../../src/gen/menus.cpp; sourceTree = "<group>"; };
-		264AF18321B41343004E58CB /* raws.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = raws.h; path = ../../src/gen/raws.h; sourceTree = "<group>"; };
-		264AF18421B41343004E58CB /* colors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = colors.cpp; path = ../../src/gen/colors.cpp; sourceTree = "<group>"; };
-		264AF18521B41343004E58CB /* drawables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = drawables.h; path = ../../src/gen/drawables.h; sourceTree = "<group>"; };
-		264AF18621B41343004E58CB /* menus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = menus.h; path = ../../src/gen/menus.h; sourceTree = "<group>"; };
-		264AF18721B41343004E58CB /* raws.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raws.cpp; path = ../../src/gen/raws.cpp; sourceTree = "<group>"; };
-		264AF18821B41343004E58CB /* colors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = colors.h; path = ../../src/gen/colors.h; sourceTree = "<group>"; };
-		264AF18921B41343004E58CB /* resources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resources.h; path = ../../src/gen/resources.h; sourceTree = "<group>"; };
-		264AF18A21B41343004E58CB /* strings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = strings.h; path = ../../src/gen/strings.h; sourceTree = "<group>"; };
-		264AF18B21B41343004E58CB /* drawables.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = drawables.cpp; path = ../../src/gen/drawables.cpp; sourceTree = "<group>"; };
-		264AF19721B41360004E58CB /* ui */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ui; path = ../../src/gen/ui; sourceTree = "<group>"; };
 		264AF19921B41A77004E58CB /* MainMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainMenu.h; sourceTree = "<group>"; };
 		264AF19A21B41A77004E58CB /* MainMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MainMenu.cpp; sourceTree = "<group>"; };
 		264AF1BA21B51167004E58CB /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -72,6 +75,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2639191521CC25DB008B335B /* AVFoundation.framework in Frameworks */,
+				2639191321CC25D5008B335B /* CoreVideo.framework in Frameworks */,
+				2639191121CC25CF008B335B /* CoreMedia.framework in Frameworks */,
 				264AF1BB21B51167004E58CB /* WebKit.framework in Frameworks */,
 				26F2DDFC216BDE66007CE8E6 /* QuartzCore.framework in Frameworks */,
 				26F2DDFA216BDE5E007CE8E6 /* CoreImage.framework in Frameworks */,
@@ -89,10 +95,25 @@
 		260D833520C7DAE60013B34E /* src */ = {
 			isa = PBXGroup;
 			children = (
-				264AF17E21B41330004E58CB /* gen */,
+				2639190F21CC02DB008B335B /* sapp */,
 				264AF17A21B41323004E58CB /* cpp */,
+				2639190121CC028D008B335B /* gen */,
 			);
 			name = src;
+			sourceTree = "<group>";
+		};
+		2639190121CC028D008B335B /* gen */ = {
+			isa = PBXGroup;
+			children = (
+				2639190721CC02AA008B335B /* colors.cpp */,
+				2639190321CC02AA008B335B /* drawables.cpp */,
+				2639190221CC02A9008B335B /* layouts.cpp */,
+				2639190421CC02AA008B335B /* menus.cpp */,
+				2639190621CC02AA008B335B /* raws.cpp */,
+				2639190521CC02AA008B335B /* strings.cpp */,
+				2639190E21CC02CF008B335B /* ui */,
+			);
+			path = gen;
 			sourceTree = "<group>";
 		};
 		264AF17A21B41323004E58CB /* cpp */ = {
@@ -104,30 +125,11 @@
 				264AF1CC21B8F378004E58CB /* LaunchScreen.h */,
 				264AF19A21B41A77004E58CB /* MainMenu.cpp */,
 				264AF19921B41A77004E58CB /* MainMenu.h */,
+				2639191621CC2B58008B335B /* QRCodeScanner.cpp */,
+				2639191721CC2B58008B335B /* QRCodeScanner.h */,
 			);
 			name = cpp;
 			path = ../src/cpp;
-			sourceTree = "<group>";
-		};
-		264AF17E21B41330004E58CB /* gen */ = {
-			isa = PBXGroup;
-			children = (
-				264AF18421B41343004E58CB /* colors.cpp */,
-				264AF18821B41343004E58CB /* colors.h */,
-				264AF18B21B41343004E58CB /* drawables.cpp */,
-				264AF18521B41343004E58CB /* drawables.h */,
-				264AF18121B41343004E58CB /* layouts.cpp */,
-				264AF18021B41343004E58CB /* layouts.h */,
-				264AF18221B41343004E58CB /* menus.cpp */,
-				264AF18621B41343004E58CB /* menus.h */,
-				264AF18721B41343004E58CB /* raws.cpp */,
-				264AF18321B41343004E58CB /* raws.h */,
-				264AF18921B41343004E58CB /* resources.h */,
-				264AF17F21B41343004E58CB /* strings.cpp */,
-				264AF18A21B41343004E58CB /* strings.h */,
-				264AF19721B41360004E58CB /* ui */,
-			);
-			path = gen;
 			sourceTree = "<group>";
 		};
 		26F5DE162051ACD500BC4998 = {
@@ -163,6 +165,9 @@
 		26F5DE3C2051B60500BC4998 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2639191421CC25DB008B335B /* AVFoundation.framework */,
+				2639191221CC25D5008B335B /* CoreVideo.framework */,
+				2639191021CC25CE008B335B /* CoreMedia.framework */,
 				264AF1BA21B51167004E58CB /* WebKit.framework */,
 				26F2DDFB216BDE66007CE8E6 /* QuartzCore.framework */,
 				26F2DDF9216BDE5E007CE8E6 /* CoreImage.framework */,
@@ -207,7 +212,7 @@
 				TargetAttributes = {
 					26F5DE1E2051ACD500BC4998 = {
 						CreatedOnToolsVersion = 9.2;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -258,7 +263,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SLIB_PATH}/bin/macOS/sapp\" gen \"${PROJECT_DIR}/../src/sapp\"\n";
+			shellScript = "\"${SLIB_PATH}/tool/bin/sapp\" gen \"${PROJECT_DIR}/../src/sapp\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -267,16 +272,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2639190821CC02AA008B335B /* layouts.cpp in Sources */,
+				2639190A21CC02AA008B335B /* menus.cpp in Sources */,
+				2639190C21CC02AA008B335B /* raws.cpp in Sources */,
 				26F5DE322051ACD500BC4998 /* main.mm in Sources */,
 				264AF19B21B41A77004E58CB /* MainMenu.cpp in Sources */,
-				264AF18D21B41343004E58CB /* layouts.cpp in Sources */,
-				264AF18E21B41343004E58CB /* menus.cpp in Sources */,
-				264AF19121B41343004E58CB /* drawables.cpp in Sources */,
-				264AF18F21B41343004E58CB /* colors.cpp in Sources */,
-				264AF19021B41343004E58CB /* raws.cpp in Sources */,
+				2639191821CC2B58008B335B /* QRCodeScanner.cpp in Sources */,
+				2639190D21CC02AA008B335B /* colors.cpp in Sources */,
+				2639190921CC02AA008B335B /* drawables.cpp in Sources */,
 				264AF17D21B41323004E58CB /* app.cpp in Sources */,
+				2639190B21CC02AA008B335B /* strings.cpp in Sources */,
 				264AF1CD21B8F378004E58CB /* LaunchScreen.cpp in Sources */,
-				264AF18C21B41343004E58CB /* strings.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -414,13 +420,20 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 56WV5U3VJT;
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
 				INFOPLIST_FILE = project/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				OTHER_LDFLAGS = "-lslib";
-				PRODUCT_BUNDLE_IDENTIFIER = "your-bundle-id.SAppExample";
+				OTHER_LDFLAGS = (
+					"-lslib",
+					"-lzxing",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.slib.SAppExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
 		};
@@ -428,13 +441,20 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 56WV5U3VJT;
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
 				INFOPLIST_FILE = project/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				OTHER_LDFLAGS = "-lslib";
-				PRODUCT_BUNDLE_IDENTIFIER = "your-bundle-id.SAppExample";
+				OTHER_LDFLAGS = (
+					"-lslib",
+					"-lzxing",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.slib.SAppExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Release;
 		};

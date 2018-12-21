@@ -20,46 +20,17 @@
  *   THE SOFTWARE.
  */
 
-#include "MainMenu.h"
+#pragma once
 
-#include "QRCodeScanner.h"
+#include <slib.h>
 
-void MainMenu::onOpen()
+#include "../gen/resources.h"
+
+using namespace slib;
+
+class QRCodeScannerPage : public example::ui::QRCodeScanner
 {
-	btnHelloWorld->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickHelloWorld, this));
-	btnViewPager->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickViewPager, this));
-	btnWebView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickWebView, this));
-	btnCameraView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickCameraView, this));
-	btnLoginPage->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickLoginPage, this));
-	btnQRCodeScanner->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickQRCodeScanner, this));
-}
-
-void MainMenu::onClickHelloWorld(View* view)
-{
-	goToPage(new example::ui::HelloWorld);
-}
-
-void MainMenu::onClickViewPager(View* view)
-{
-	goToPage(new example::ui::ViewPager);
-}
-
-void MainMenu::onClickWebView(View* view)
-{
-	goToPage(new example::ui::WebView);
-}
-
-void MainMenu::onClickCameraView(View* view)
-{
-	goToPage(new example::ui::CameraView);
-}
-
-void MainMenu::onClickLoginPage(View* view)
-{
-	goToPage(new example::ui::LoginPage);
-}
-
-void MainMenu::onClickQRCodeScanner(View* view)
-{
-	goToPage(new QRCodeScannerPage);
-}
+public:
+	void onOpen() override;
+	
+};

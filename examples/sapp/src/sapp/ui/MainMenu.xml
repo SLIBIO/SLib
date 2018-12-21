@@ -13,9 +13,13 @@
 
 			<button name='btnViewPager' text='ViewPager' marginTop='1%sw' styles='menu_button'/>
 
+			<button name='btnCameraView' text='CameraView' marginTop='1%sw' styles='menu_button'/>
+
 			<button name='btnWebView' text='WebView' marginTop='1%sw' styles='menu_button'/>
 
 			<button name='btnLoginPage' text='Login Page' marginTop='1%sw' styles='menu_button'/>
+
+			<button name='btnQRCodeScanner' text='QRCodeScanner' marginTop='1%sw' styles='menu_button'/>
 
 		</linear>
 
