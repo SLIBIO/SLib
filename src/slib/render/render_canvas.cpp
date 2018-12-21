@@ -781,7 +781,7 @@ namespace slib
 			return;
 		}
 		
-		sl_real penWidthHalf = pen->getWidth() / 2;
+		sl_real penWidthHalf = (pen->getWidth() + 0.5f) / 2;
 		
 		if (Math::abs(pt1.x - pt2.x) < 0.0000001f || Math::abs(pt1.y - pt2.y) < 0.0000001f) {
 			_fillRectangle(Rectangle(pt1.x - penWidthHalf, pt1.y - penWidthHalf, pt2.x + penWidthHalf, pt2.y + penWidthHalf), pen->getColor());
