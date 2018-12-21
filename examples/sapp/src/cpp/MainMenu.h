@@ -37,9 +37,11 @@ public:
 	
 	void onClickViewPager(View* view);
 	
-	void onClickWebView(View* view);
+	void onClickVideoView(View* view);
 
 	void onClickCameraView(View* view);
+
+	void onClickWebView(View* view);
 
 	void onClickLoginPage(View* view);
 	

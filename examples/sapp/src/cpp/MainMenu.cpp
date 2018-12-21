@@ -28,8 +28,9 @@ void MainMenu::onOpen()
 {
 	btnHelloWorld->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickHelloWorld, this));
 	btnViewPager->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickViewPager, this));
-	btnWebView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickWebView, this));
+	btnVideoView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickVideoView, this));
 	btnCameraView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickCameraView, this));
+	btnWebView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickWebView, this));
 	btnLoginPage->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickLoginPage, this));
 	btnQRCodeScanner->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickQRCodeScanner, this));
 }
@@ -44,14 +45,19 @@ void MainMenu::onClickViewPager(View* view)
 	goToPage(new example::ui::ViewPager);
 }
 
-void MainMenu::onClickWebView(View* view)
+void MainMenu::onClickVideoView(View* view)
 {
-	goToPage(new example::ui::WebView);
+	goToPage(new example::ui::VideoView);
 }
 
 void MainMenu::onClickCameraView(View* view)
 {
 	goToPage(new example::ui::CameraView);
+}
+
+void MainMenu::onClickWebView(View* view)
+{
+	goToPage(new example::ui::WebView);
 }
 
 void MainMenu::onClickLoginPage(View* view)

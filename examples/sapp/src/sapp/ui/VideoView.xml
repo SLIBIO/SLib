@@ -1,0 +1,15 @@
+<sapp>
+	<layout
+		type='page'
+		>
+		
+		<video 
+			width='fill'
+			height='fill'
+			src="https://us-videos.dji.net/video_trans/89b9e946c5f94876ac9cfa9b4cafab0f/720.mp4" 
+			scale='contain'
+			controls='true'
+			/>
+
+ 	</layout>
+</sapp>
