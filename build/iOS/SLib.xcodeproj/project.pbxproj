@@ -4468,7 +4468,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"${PROJECT_DIR}/../../build/macOS\"\nif ! [ -e \"${PROJECT_DIR}/../../bin/macOS/sapp\" ]\nthen\n${DEVELOPER_BIN_DIR}/xcodebuild -project SLib.xcodeproj -scheme sapp -configuration Release -derivedDataPath \"${DERIVED_FILE_DIR}/sapp\"\nfi\n";
+			shellScript = "cd \"${PROJECT_DIR}/../../build/macOS\"\nif ! [ -e \"${PROJECT_DIR}/../../bin/macOS/sapp.app/Contents/MacOS/sapp\" ]\nthen\n${DEVELOPER_BIN_DIR}/xcodebuild -project SLib.xcodeproj -scheme sapp -configuration Release -derivedDataPath \"${DERIVED_FILE_DIR}/sapp\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

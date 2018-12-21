@@ -182,8 +182,8 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "264AF14B21B05BFF004E58CB"
-               BuildableName = "sapp"
+               BlueprintIdentifier = "263918D821CBA047008B335B"
+               BuildableName = "sapp.app"
                BlueprintName = "sapp"
                ReferencedContainer = "container:SLib.xcodeproj">
             </BuildableReference>
