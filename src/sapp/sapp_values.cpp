@@ -2149,12 +2149,12 @@ namespace slib
 			UIAutoCapitalizationType
 	************************************************/
 
-	SAppUIAutoCapitalizationType::SAppUIAutoCapitalizationType()
+	SAppUIAutoCapitalizationTypeValue::SAppUIAutoCapitalizationTypeValue()
 	: flagDefined(sl_false), value(UIAutoCapitalizationType::None)
 	{
 	}
 
-	String SAppUIAutoCapitalizationType::getAccessString()
+	String SAppUIAutoCapitalizationTypeValue::getAccessString()
 	{
 		if (!flagDefined) {
 			return "slib::UIAutoCapitalizationType::None";
@@ -2174,7 +2174,7 @@ namespace slib
 		return "slib::UIAutoCapitalizationType::None";
 	}
 
-	sl_bool SAppUIAutoCapitalizationType::parse(const String& _str)
+	sl_bool SAppUIAutoCapitalizationTypeValue::parse(const String& _str)
 	{
 		String str = _str.trim();
 		if (str.isEmpty()) {
@@ -2202,4 +2202,118 @@ namespace slib
 		return sl_false;
 	}
 
+	/************************************************
+	 				RotationMode
+	************************************************/
+	
+	SAppRotationModeValue::SAppRotationModeValue()
+	: flagDefined(sl_false), value(RotationMode::Rotate0)
+	{
+	}
+	
+	String SAppRotationModeValue::getAccessString()
+	{
+		if (!flagDefined) {
+			return "slib::RotationMode::Rotate0";
+		}
+		switch (value) {
+			case RotationMode::Rotate0:
+				return "slib::RotationMode::Rotate0";
+			case RotationMode::Rotate90:
+				return "slib::RotationMode::Rotate90";
+			case RotationMode::Rotate180:
+				return "slib::RotationMode::Rotate180";
+			case RotationMode::Rotate270:
+				return "slib::RotationMode::Rotate270";
+			default:
+				break;
+		}
+		return "slib::RotationMode::Rotate0";
+	}
+	
+	sl_bool SAppRotationModeValue::parse(const String& _str)
+	{
+		String str = _str.trim();
+		if (str.isEmpty()) {
+			flagDefined = sl_false;
+			return sl_true;
+		}
+		str = str.toLower();
+		if (str == "0") {
+			value = RotationMode::Rotate0;
+			flagDefined = sl_true;
+			return sl_true;
+		} else if (str == "90") {
+			value = RotationMode::Rotate90;
+			flagDefined = sl_true;
+			return sl_true;
+		} else if (str == "180") {
+			value = RotationMode::Rotate180;
+			flagDefined = sl_true;
+			return sl_true;
+		} else if (str == "270") {
+			value = RotationMode::Rotate270;
+			flagDefined = sl_true;
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
+	/************************************************
+	 				FlipMode
+	************************************************/
+	
+	SAppFlipModeValue::SAppFlipModeValue()
+	: flagDefined(sl_false), value(FlipMode::None)
+	{
+	}
+	
+	String SAppFlipModeValue::getAccessString()
+	{
+		if (!flagDefined) {
+			return "slib::FlipMode::None";
+		}
+		switch (value) {
+			case FlipMode::None:
+				return "slib::FlipMode::None";
+			case FlipMode::Horizontal:
+				return "slib::FlipMode::Horizontal";
+			case FlipMode::Vertical:
+				return "slib::FlipMode::Vertical";
+			case FlipMode::Both:
+				return "slib::FlipMode::Both";
+			default:
+				break;
+		}
+		return "slib::FlipMode::None";
+	}
+	
+	sl_bool SAppFlipModeValue::parse(const String& _str)
+	{
+		String str = _str.trim();
+		if (str.isEmpty()) {
+			flagDefined = sl_false;
+			return sl_true;
+		}
+		str = str.toLower();
+		if (str == "none") {
+			value = FlipMode::None;
+			flagDefined = sl_true;
+			return sl_true;
+		} else if (str == "horizontal") {
+			value = FlipMode::Horizontal;
+			flagDefined = sl_true;
+			return sl_true;
+		} else if (str == "vertical") {
+			value = FlipMode::Vertical;
+			flagDefined = sl_true;
+			return sl_true;
+		} else if (str == "both") {
+			value = FlipMode::Both;
+			flagDefined = sl_true;
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
 }

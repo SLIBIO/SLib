@@ -747,6 +747,8 @@ namespace slib
 			PROCESS_CONTROL_SWITCH(Picker)
 			PROCESS_CONTROL_SWITCH(Pager)
 			PROCESS_CONTROL_SWITCH(Video)
+			PROCESS_CONTROL_SWITCH(Camera)
+			PROCESS_CONTROL_SWITCH(QRCodeScanner)
 			default:
 				return sl_false;
 		}
@@ -3702,7 +3704,11 @@ namespace slib
 		LAYOUT_CONTROL_PROCESS_SUPER(View)
 		
 		LAYOUT_CONTROL_GENERIC_ATTR(repeat, setRepeat)
-		
+		LAYOUT_CONTROL_GENERIC_ATTR(rotation, setRotation)
+		LAYOUT_CONTROL_GENERIC_ATTR(flip, setFlip)
+		LAYOUT_CONTROL_GENERIC_ATTR(scale, setScaleMode)
+		LAYOUT_CONTROL_GENERIC_ATTR(gravity, setGravity)
+
 		if (op == OP_PARSE || op == OP_GENERATE_CPP) {
 			LAYOUT_CONTROL_STRING_ATTR(src, setSource)
 		} else {
@@ -3725,4 +3731,25 @@ namespace slib
 	}
 	END_PROCESS_LAYOUT_CONTROL
 
+	BEGIN_PROCESS_LAYOUT_CONTROL(Camera, CameraView)
+	{
+		LAYOUT_CONTROL_PROCESS_SUPER(Video)
+		
+		LAYOUT_CONTROL_STRING_ATTR(device, setDeviceId)
+		LAYOUT_CONTROL_GENERIC_ATTR(autoStart, setAutoStart)
+		
+		LAYOUT_CONTROL_ADD_STATEMENT
+	}
+	END_PROCESS_LAYOUT_CONTROL
+	
+#define SAppLayoutQRCodeScannerAttributes SAppLayoutCameraAttributes
+#define attrsQRCodeScanner attrsCamera
+	BEGIN_PROCESS_LAYOUT_CONTROL(QRCodeScanner, QRCodeScanner)
+	{
+		if (!(_processLayoutResourceControl_Camera(params))) {
+			return sl_false;
+		}
+	}
+	END_PROCESS_LAYOUT_CONTROL
+	
 }

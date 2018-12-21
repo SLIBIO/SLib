@@ -542,14 +542,14 @@ namespace slib
 		
 	};
 
-	class SAppUIAutoCapitalizationType
+	class SAppUIAutoCapitalizationTypeValue
 	{
 	public:
 		sl_bool flagDefined;
 		UIAutoCapitalizationType value;
 		
 	public:
-		SAppUIAutoCapitalizationType();
+		SAppUIAutoCapitalizationTypeValue();
 		
 	public:
 		String getAccessString();
@@ -558,6 +558,38 @@ namespace slib
 		
 	};
 
+	class SAppRotationModeValue
+	{
+	public:
+		sl_bool flagDefined;
+		RotationMode value;
+		
+	public:
+		SAppRotationModeValue();
+		
+	public:
+		String getAccessString();
+		
+		sl_bool parse(const String& str);
+		
+	};
+	
+	class SAppFlipModeValue
+	{
+	public:
+		sl_bool flagDefined;
+		FlipMode value;
+		
+	public:
+		SAppFlipModeValue();
+		
+	public:
+		String getAccessString();
+		
+		sl_bool parse(const String& str);
+		
+	};
+	
 }
 
 #endif

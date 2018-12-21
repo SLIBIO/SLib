@@ -426,6 +426,14 @@ namespace slib
 				prefix = "video";
 				pN = &nAutoIncreaseNameVideo;
 				break;
+			case SAppLayoutItemType::Camera:
+				prefix = "camera";
+				pN = &nAutoIncreaseNameCamera;
+				break;
+			case SAppLayoutItemType::QRCodeScanner:
+				prefix = "qrCodeScanner";
+				pN = &nAutoIncreaseNameQRCodeScanner;
+				break;
 			default:
 				return String::null();
 		}
@@ -495,6 +503,10 @@ namespace slib
 			type = SAppLayoutItemType::Pager;
 		} else if (strType == "video") {
 			type = SAppLayoutItemType::Video;
+		} else if (strType == "camera") {
+			type = SAppLayoutItemType::Camera;
+		} else if (strType == "qrcodescanner" || strType == "qr-code-scanner") {
+			type = SAppLayoutItemType::QRCodeScanner;
 		}
 		return type;
 	}
@@ -595,13 +607,19 @@ namespace slib
 		}
 	}
 
+	void SAppLayoutSimulationWindow::dispatchResize(sl_ui_len width, sl_ui_len height)
+	{
+		WindowLayoutResource::dispatchResize(width, height);
+		layoutViews(width, height);
+	}
+	
 	void SAppLayoutSimulationWindow::layoutViews(sl_ui_len width, sl_ui_len height)
 	{
 		Ref<SAppDocument> doc = m_document;
 		Ref<SAppLayoutResource> layout = m_layoutResource;
 		if (doc.isNotNull() && layout.isNotNull()) {
 			doc->_simulateLayoutCreateOrLayoutView(this, layout.get(), sl_null, sl_null, sl_true);
-		} 
+		}
 	}
 
 	void SAppLayoutSimulationWindow::onClose(UIEvent* ev)

@@ -417,7 +417,7 @@ namespace slib
 		SAppColorValue hintTextColor;
 		SAppUIReturnKeyTypeValue returnKey;
 		SAppUIKeyboardTypeValue keyboard;
-		SAppUIAutoCapitalizationType autoCap;
+		SAppUIAutoCapitalizationTypeValue autoCap;
 		
 	public:
 		sl_bool isNotRequiredNative();
@@ -679,10 +679,21 @@ namespace slib
 	public:
 		SAppStringValue src;
 		SAppBooleanValue repeat;
+		SAppRotationModeValue rotation;
+		SAppFlipModeValue flip;
+		SAppScaleModeValue scale;
+		SAppAlignmentValue gravity;
 		
 	};
 
-
+	class SAppLayoutCameraAttributes : public Referable
+	{
+	public:
+		SAppStringValue device;
+		SAppBooleanValue autoStart;
+		
+	};
+	
 	class SAppLayoutStyle : public Referable
 	{
 	public:
@@ -736,7 +747,9 @@ namespace slib
 		Slider = 0x0241,
 		Picker = 0x0242,
 		Pager = 0x0243,
-		Video = 0x0244
+		Video = 0x0244,
+		Camera = 0x0245,
+		QRCodeScanner = 0x0246
 	};
 
 	class SAppLayoutResourceItem : public Referable
@@ -774,6 +787,7 @@ namespace slib
 		Ref<SAppLayoutPickerAttributes> attrsPicker;
 		Ref<SAppLayoutPagerAttributes> attrsPager;
 		Ref<SAppLayoutVideoAttributes> attrsVideo;
+		Ref<SAppLayoutCameraAttributes> attrsCamera;
 
 		CList< Ref<SAppLayoutStyle> > styles;
 		CList< Ref<SAppLayoutResourceItem> > children;
@@ -823,7 +837,9 @@ namespace slib
 		sl_uint32 nAutoIncreaseNamePicker;
 		sl_uint32 nAutoIncreaseNamePager;
 		sl_uint32 nAutoIncreaseNameVideo;
-		
+		sl_uint32 nAutoIncreaseNameCamera;
+		sl_uint32 nAutoIncreaseNameQRCodeScanner;
+
 	public:
 		SAppLayoutResource();
 		
@@ -891,11 +907,11 @@ namespace slib
 		void open(SAppDocument* doc, SAppLayoutResource* layout);
 		
 	protected:
-		// override
-		void layoutViews(sl_ui_len width, sl_ui_len height);
+		void dispatchResize(sl_ui_len width, sl_ui_len height) override;
 		
-		// override
-		void onClose(UIEvent* ev);
+		void layoutViews(sl_ui_len width, sl_ui_len height) override;
+		
+		void onClose(UIEvent* ev) override;
 		
 	};
 
@@ -907,8 +923,7 @@ namespace slib
 	public:
 		void init(SAppLayoutSimulator* simulator, SAppLayoutResource* layout);
 		
-		// override
-		void layoutViews(sl_ui_len width, sl_ui_len height);
+		void layoutViews(sl_ui_len width, sl_ui_len height) override;
 		
 	};
 
