@@ -251,7 +251,6 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 	private void setCamera(Camera camera) {
 		this.camera = camera;
 		camera.setErrorCallback(this);
-		setSettings(0, 0);
 	}
 
 	public void setSettings(int preferedWidth, int preferedHeight) {

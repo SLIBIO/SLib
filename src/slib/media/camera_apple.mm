@@ -34,6 +34,8 @@
 #import <AVFoundation/AVFoundation.h>
 #import <CoreMedia/CoreMedia.h>
 
+#define TAG "Camera"
+
 namespace slib
 {
 	class _priv_AVFoundation_Camera;
@@ -97,11 +99,11 @@ namespace slib
 		
 	public:
 		static void logError(String error) {
-			Log("Camera", error);
+			Log(TAG, error);
 		}
 		
 		static void logError(String error, NSError* err) {
-			Log("Camera", "%s: [%s]", error, [err localizedDescription]);
+			Log(TAG, "%s: [%s]", error, [err localizedDescription]);
 		}
 
 		static Ref<_priv_AVFoundation_Camera> _create(const CameraParam& param)
@@ -121,9 +123,11 @@ namespace slib
 				return ret;
 			}
 			
-			if ([device lockForConfiguration:nil]) {
-				device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
-				[device unlockForConfiguration];
+			if ([device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
+				if ([device lockForConfiguration:nil]) {
+					device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
+					[device unlockForConfiguration];
+				}
 			}
 			
 			NSError* error;

@@ -70,27 +70,21 @@ namespace slib
 		m_flagUpdateCameraFrame = sl_false;
 		setScaleMode(ScaleMode::Cover);
 		m_programScanBar = new _priv_QRCodeScanner_ScanBar_Program;
-		m_timerScanner = Timer::start(SLIB_FUNCTION_WEAKREF(QRCodeScanner, onRunScanner, this), 500);
 	}
 	
 	QRCodeScanner::~QRCodeScanner()
 	{
 	}
 
-	void QRCodeScanner::start()
-	{
-		CameraParam param;
-		param.setBackCamera();
-		start(param);
-	}
-	
 	void QRCodeScanner::start(const CameraParam& param)
 	{
 		CameraView::start(param);
+		m_timerScanner = Timer::start(SLIB_FUNCTION_WEAKREF(QRCodeScanner, onRunScanner, this), 500);
 	}
 	
 	void QRCodeScanner::stop()
 	{
+		m_timerScanner.setNull();
 		CameraView::stop();
 	}
 	
@@ -132,7 +126,7 @@ namespace slib
 		} else {
 			box_size = width;
 		}
-		box_size *= 0.65f;
+		box_size = (sl_real)((int)(box_size * 0.65f) >> 1 << 1);
 		sl_real box_half = Math::floor(box_size / 2);
 		
 		sl_real scanner_height = Math::floor(box_size / 20);

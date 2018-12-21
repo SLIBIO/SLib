@@ -29,12 +29,35 @@ namespace slib
 	
 	CameraView::CameraView()
 	{
+		m_flagAutoStart = sl_false;
 	}
 	
 	CameraView::~CameraView()
 	{
 	}
 
+	void CameraView::start()
+	{
+		Ref<Camera> camera = m_camera;
+		if (camera.isNotNull()) {
+			return;
+		}
+		CameraParam param;
+		String deviceId = m_deviceId;
+		if (deviceId.isNotEmpty()) {
+			if (deviceId.equalsIgnoreCase("FRONT")) {
+				param.setFrontCamera();
+			} else if (deviceId.equalsIgnoreCase("BACK")) {
+				param.setBackCamera();
+			} else {
+				param.deviceId = deviceId;
+			}
+		} else {
+			param.setBackCamera();
+		}
+		start(param);
+	}
+	
 	void CameraView::start(const CameraParam& _param)
 	{
 		stop();
@@ -52,9 +75,36 @@ namespace slib
 		m_camera.setNull();
 	}
 	
+	sl_bool CameraView::isAutoStart()
+	{
+		return sl_true;
+	}
+	
+	void CameraView::setAutoStart(sl_bool flagAutoStart)
+	{
+		m_flagAutoStart = flagAutoStart;
+	}
+	
+	String CameraView::getDeviceId()
+	{
+		return m_deviceId;
+	}
+	
+	void CameraView::setDeviceId(const String& deviceId)
+	{
+		m_deviceId = deviceId;
+	}
+	
 	void CameraView::onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame)
 	{
 		updateCurrentFrame(frame);
 	}
 
+	void CameraView::onAttach()
+	{
+		if (m_flagAutoStart) {
+			start();
+		}
+	}
+	
 }

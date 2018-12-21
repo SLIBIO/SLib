@@ -42,9 +42,19 @@ namespace slib
 		~CameraView();
 
 	public:
+		void start();
+		
 		virtual void start(const CameraParam& param);
 		
 		virtual void stop();
+		
+		sl_bool isAutoStart();
+		
+		void setAutoStart(sl_bool flagAutoStart);
+		
+		String getDeviceId();
+		
+		void setDeviceId(const String& deviceId);
 		
 	public:
 		SLIB_PROPERTY(AtomicPtr<IVideoCaptureListener>, FrameListener)
@@ -52,8 +62,12 @@ namespace slib
 	protected:
 		void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame) override;
 		
+		void onAttach() override;
+		
 	protected:
 		AtomicRef<Camera> m_camera;
+		sl_bool m_flagAutoStart;
+		AtomicString m_deviceId;
 		
 	};
 

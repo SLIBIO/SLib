@@ -273,6 +273,8 @@ namespace slib
 	class PickerView;
 	class ViewPager;
 	class VideoView;
+	class CameraView;
+	class QRCodeScanner;
 
 }
 

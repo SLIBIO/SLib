@@ -43,7 +43,7 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(getCamerasList, "getCamerasList", "()[Lslib/platform/android/camera/SCameraInfo;");
 		SLIB_JNI_STATIC_METHOD(create, "create", "(Ljava/lang/String;J)Lslib/platform/android/camera/SCamera;");
 
-		SLIB_JNI_METHOD(setPreferedFrameSettings, "setPreferedFrameSettings", "(II)V");
+		SLIB_JNI_METHOD(setSettings, "setSettings", "(II)V");
 		SLIB_JNI_METHOD(release, "release", "()V");
 		SLIB_JNI_METHOD(start, "start", "()V");
 		SLIB_JNI_METHOD(stop, "stop", "()V");
@@ -86,7 +86,7 @@ namespace slib
 				if (jcamera.isNotNull()) {
 					ret->m_camera = jcamera;
 					ret->_init(param);
-					JAndroidCamera::setPreferedFrameSettings.call(jcamera,
+					JAndroidCamera::setSettings.call(jcamera,
 							param.preferedFrameWidth,
 							param.preferedFrameHeight);
 					if (param.flagAutoStart) {
