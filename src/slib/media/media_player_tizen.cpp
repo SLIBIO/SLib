@@ -178,12 +178,12 @@ namespace slib
 
 		}
 
-		void release()
+		void release() override
 		{
 			_release(sl_false);
 		}
 
-		void resume()
+		void resume() override
 		{
 			ObjectLocker lock(this);
 
@@ -207,7 +207,7 @@ namespace slib
 
 		}
 
-		void pause()
+		void pause() override
 		{
 			ObjectLocker lock(this);
 
@@ -231,17 +231,17 @@ namespace slib
 
 		}
 
-		sl_bool isPlaying()
+		sl_bool isPlaying() override
 		{
 			return m_flagPlaying;
 		}
 
-		sl_real getVolume()
+		sl_real getVolume() override
 		{
 			return m_volume;
 		}
 
-		void setVolume(sl_real volume)
+		void setVolume(sl_real volume) override
 		{
 			ObjectLocker lock(this);
 
@@ -256,7 +256,39 @@ namespace slib
 			m_volume = volume;
 		}
 
-		void renderVideo(MediaPlayerRenderVideoParam& param)
+		double getDuration() override
+		{
+			ObjectLocker lock(this);
+			if (m_flagInited && m_flagPrepared) {
+				int duration = 0;
+				if (player_get_duration(m_player, &duration) == 0) {
+					return (double)duration / 1000;
+				}
+			}
+			return 0;
+		}
+
+		double getCurrentTime() override
+		{
+			ObjectLocker lock(this);
+			if (m_flagInited && m_flagPrepared) {
+				int position = 0;
+				if (player_get_play_position(m_player, &position) == 0) {
+					return (double)duration / 1000;
+				}
+			}
+			return 0;
+		}
+		
+		void seekTo(double seconds) override
+		{
+			ObjectLocker lock(this);
+			if (m_flagInited && m_flagPrepared) {
+				player_set_play_position(m_player, (int)(seconds * 1000), sl_false, sl_null, sl_null);
+			}
+		}
+
+		void renderVideo(MediaPlayerRenderVideoParam& param) override
 		{
 		}
 

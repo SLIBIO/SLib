@@ -53,9 +53,14 @@ namespace slib
 		SLIB_JNI_METHOD(pause, "pause", "()V");
 		SLIB_JNI_METHOD(stop, "stop", "()V");
 		SLIB_JNI_METHOD(isPlaying, "isPlaying", "()Z");
-		SLIB_JNI_METHOD(setVolume, "setVolume", "(F)V");
 		SLIB_JNI_METHOD(getVolume, "getVolume", "()F");
+		SLIB_JNI_METHOD(setVolume, "setVolume", "(F)V");
+		SLIB_JNI_METHOD(getDuration, "getDuration", "()D");
+		SLIB_JNI_METHOD(getCurrentTime, "getCurrentTime", "()D");
+		SLIB_JNI_METHOD(seekTo, "seekTo", "(D)V");
 		SLIB_JNI_METHOD(setLooping, "setLooping", "(Z)V");
+		SLIB_JNI_METHOD(getVideoWidth, "getVideoWidth", "()I");
+		SLIB_JNI_METHOD(getVideoHeight, "getVideoHeight", "()I");
 		SLIB_JNI_METHOD(renderVideo, "renderVideo", "(IZ)Z");
 		SLIB_JNI_NATIVE(onCompleted, "nativeOnCompleted", "(J)V", _priv_MediaPlayer_onCompleted);
 		SLIB_JNI_NATIVE(onPrepared, "nativeOnPrepared", "(J)V", _priv_MediaPlayer_onPrepared);
@@ -197,8 +202,33 @@ namespace slib
 			if (!m_flagInited) {
 				return;
 			}
-
 			JAndroidMediaPlayer::setVolume.call(m_player.get(), volume);
+		}
+
+		double getDuration() override
+		{
+			ObjectLocker lock(this);
+			if (m_flagInited) {
+				return JAndroidMediaPlayer::getDuration.callDouble(m_player.get());
+			}
+			return 0;
+		}
+
+		double getCurrentTime() override
+		{
+			ObjectLocker lock(this);
+			if (m_flagInited) {
+				return JAndroidMediaPlayer::getCurrentTime.callDouble(m_player.get());
+			}
+			return 0;
+		}
+		
+		void seekTo(double seconds) override
+		{
+			ObjectLocker lock(this);
+			if (m_flagInited) {
+				JAndroidMediaPlayer::seekTo.call(m_player.get(), seconds);
+			}
 		}
 
 		void setAutoRepeat(sl_bool flagRepeat) override
@@ -246,6 +276,11 @@ namespace slib
 					return;
 				}
 			}
+
+			EngineTexture* engineTexture = (EngineTexture*)(param.glTextureOES.get());
+			engineTexture->setWidth(JAndroidMediaPlayer::getVideoWidth.callInt(m_player.get()));
+			engineTexture->setHeight(JAndroidMediaPlayer::getVideoHeight.callInt(m_player.get()));
+
 			param.flagUpdated = JAndroidMediaPlayer::renderVideo.callBoolean(m_player.get(), textureName, flagResetTexture) != 0;
 			if (param.flagUpdated) {
 				JniLocal<jfloatArray> arr = (jfloatArray)(JAndroidMediaPlayer::mTextureMatrix.get(m_player.get()));

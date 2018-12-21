@@ -134,6 +134,10 @@ namespace slib
 		
 		void setLinkedObject(const Ref<Referable>& object);
 		
+		void setWidth(sl_uint32 width);
+		
+		void setHeight(sl_uint32 height);
+		
 	protected:
 		AtomicRef<Referable> m_linkedObject;
 		

@@ -155,12 +155,22 @@ namespace slib
 		
 		virtual void setVolume(sl_real) = 0;
 		
+		// Seconds, negative means the infinite duration
+		virtual double getDuration() = 0;
+		
+		// Seconds
+		virtual double getCurrentTime() = 0;
+		
+		// Seconds
+		virtual void seekTo(double seconds) = 0;
+
 		virtual void renderVideo(MediaPlayerRenderVideoParam& param) = 0;
 		
+	public:
 		sl_bool isAutoRepeat();
 		
 		virtual void setAutoRepeat(sl_bool flagRepeat);
-		
+				
 	public:
 		SLIB_PROPERTY(AtomicPtr<IMediaPlayerListener>, Listener)
 		

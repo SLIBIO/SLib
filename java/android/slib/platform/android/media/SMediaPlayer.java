@@ -104,6 +104,10 @@ public class SMediaPlayer implements MediaPlayer.OnCompletionListener, MediaPlay
 		return false;
 	}
 
+	public float getVolume() {
+		return mVolume;
+	}
+
 	public void setVolume(float volume) {
 		float prevVolume = mVolume;
 		try {
@@ -115,8 +119,35 @@ public class SMediaPlayer implements MediaPlayer.OnCompletionListener, MediaPlay
 		}
 	}
 
-	public float getVolume() {
-		return mVolume;
+	public double getDuration() {
+		try {
+			int duration = mPlayer.getDuration();
+			if (duration >= 0) {
+				return (double)(duration) / 1000;
+			} else {
+				return -1;
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return 0;
+	}
+
+	public double getCurrentTime() {
+		try {
+			return (double)(mPlayer.getCurrentPosition()) / 1000;
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return 0;
+	}
+
+	public void seekTo(double time) {
+		try {
+			mPlayer.seekTo((int)(time * 1000));
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
 	}
 	
 	public void setLooping(boolean flag) {
@@ -126,7 +157,25 @@ public class SMediaPlayer implements MediaPlayer.OnCompletionListener, MediaPlay
 			Logger.exception(e);
 		}
 	}
-	
+
+	public int getVideoWidth() {
+		try {
+			return mPlayer.getVideoWidth();
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return 0;
+	}
+
+	public int getVideoHeight() {
+		try {
+			return mPlayer.getVideoHeight();
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return 0;
+	}
+
 	private SurfaceTexture mTexture;
 	private Surface mSurface;
 	private boolean mFlagUpdatedVideo = false;

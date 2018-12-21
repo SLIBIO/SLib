@@ -196,8 +196,41 @@ namespace slib
 			if (m_status == AVPlayerStatusReadyToPlay) {
 				[m_player setVolume:volume];
 			}
-			
 			m_volume = volume;
+		}
+		
+		double convertCMTime(const CMTime& time)
+		{
+			if (CMTIME_IS_NUMERIC(time)) {
+				return (double)(time.value) / (double)(time.timescale);
+			}
+			return -1;
+		}
+		
+		double getDuration() override
+		{
+			ObjectLocker lock(this);
+			if (m_flagInited) {
+				return convertCMTime(m_player.currentItem.duration);
+			}
+			return 0;
+		}
+		
+		double getCurrentTime() override
+		{
+			ObjectLocker lock(this);
+			if (m_flagInited) {
+				return convertCMTime(m_player.currentTime);
+			}
+			return 0;
+		}
+		
+		void seekTo(double time) override
+		{
+			ObjectLocker lock(this);
+			if (m_flagInited) {
+				[m_player seekToTime:CMTimeMakeWithSeconds(time, 1000)];
+			}
 		}
 		
 		void renderVideo(MediaPlayerRenderVideoParam& param) override

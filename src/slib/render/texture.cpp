@@ -61,6 +61,8 @@ namespace slib
 		setWrapX(TextureWrapMode::Clamp);
 		setWrapY(TextureWrapMode::Clamp);
 		setFreeSourceOnUpdate(sl_false);
+		m_width = 0;
+		m_height = 0;
 	}
 	
 	Texture::~Texture()
@@ -258,6 +260,16 @@ namespace slib
 	void EngineTexture::setLinkedObject(const Ref<Referable>& object)
 	{
 		m_linkedObject = object;
+	}
+	
+	void EngineTexture::setWidth(sl_uint32 width)
+	{
+		m_width = width;
+	}
+	
+	void EngineTexture::setHeight(sl_uint32 height)
+	{
+		m_height = height;
 	}
 	
 }
