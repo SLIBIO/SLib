@@ -23,6 +23,7 @@
 #include "slib/network/http_service.h"
 
 #include "slib/network/url.h"
+#include "slib/core/app.h"
 #include "slib/core/asset.h"
 #include "slib/core/file.h"
 #include "slib/core/log.h"
@@ -631,6 +632,7 @@ namespace slib
 		maxThreadsCount = 32;
 		flagProcessByThreads = sl_true;
 		
+		flagUseWebRoot = sl_false;
 		flagUseAsset = sl_false;
 		
 		maxRequestHeadersSize = 0x10000; // 64KB
@@ -796,6 +798,35 @@ namespace slib
 				}
 			}
 			
+			if (m_param.flagUseWebRoot) {
+				if (context->getMethod() == HttpMethod::GET) {
+					String path = context->getPath();
+					if (path.startsWith('/')) {
+						path = path.substring(1);
+					}
+					FilePathSegments seg;
+					seg.parsePath(path);
+					if (seg.parentLevel == 0) {
+						String webRootPath = m_param.webRootPath;
+						if (webRootPath.isEmpty()) {
+							webRootPath = Application::getApplicationDirectory();
+						}
+						path = webRootPath + "/" + path;
+						if (processFile(context, path)) {
+							break;
+						}
+						if (path.endsWith('/')) {
+							if (processFile(context, path + "index.html")) {
+								break;
+							}
+							if (processFile(context, path + "index.htm")) {
+								break;
+							}
+						}
+					}
+				}
+			}
+			
 			if (m_param.flagUseAsset) {
 				if (context->getMethod() == HttpMethod::GET) {
 					String path = context->getPath();
@@ -806,8 +837,13 @@ namespace slib
 					if (processAsset(context, path)) {
 						break;
 					}
-					if (processAsset(context, path + "/index.html")) {
-						break;
+					if (path.endsWith('/')) {
+						if (processAsset(context, path + "index.html")) {
+							break;
+						}
+						if (processAsset(context, path + "index.htm")) {
+							break;
+						}
 					}
 				}
 			}

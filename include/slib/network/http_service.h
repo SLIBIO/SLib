@@ -214,6 +214,9 @@ namespace slib
 		sl_uint32 maxThreadsCount;
 		sl_bool flagProcessByThreads;
 		
+		sl_bool flagUseWebRoot;
+		String webRootPath;
+
 		sl_bool flagUseAsset;
 		String prefixAsset;
 		
