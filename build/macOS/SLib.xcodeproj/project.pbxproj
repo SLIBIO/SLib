@@ -934,7 +934,6 @@
 		2639193F21CD23DF008B335B /* sds.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639193521CD23DF008B335B /* sds.c */; };
 		2639194121CD23DF008B335B /* hiredis.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639193621CD23DF008B335B /* hiredis.c */; };
 		2639194421CD2510008B335B /* redis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639194321CD2510008B335B /* redis.cpp */; };
-		2639194521CD2510008B335B /* redis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639194321CD2510008B335B /* redis.cpp */; };
 		264AF11721AED0C0004E58CB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF10921AECFA4004E58CB /* main.cpp */; };
 		264AF11821AED0C0004E58CB /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF10A21AECFA4004E58CB /* util.cpp */; };
 		264AF11C21AEE6BE004E58CB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF11B21AEE6BE004E58CB /* Cocoa.framework */; };
@@ -5510,7 +5509,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2639194521CD2510008B335B /* redis.cpp in Sources */,
 				263918FD21CBA29F008B335B /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
