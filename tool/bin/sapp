@@ -3,5 +3,5 @@ if [[ `uname` == 'Linux' ]]; then
 fi
 
 if [[ `uname` == 'Darwin' ]]; then
- $(dirname $0)/../../bin/macOS/sapp $@
+ $(dirname $0)/../../bin/macOS/sapp.app/Contents/MacOS/sapp $@
 fi

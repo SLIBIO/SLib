@@ -29,8 +29,18 @@ using namespace slib;
 
 int main(int argc, const char * argv[])
 {
+	CList<String> args;
+	for (int i = 0; i < argc; i++) {
+		String arg = argv[i];
+		arg = arg.trim();
+		if (arg == "-NSDocumentRevisionsDebugMode") {
+			i++;
+		} else {
+			args.add_NoLock(arg);
+		}
+	}
 	String command;
-	if (argc < 2) {
+	if (args.getCount() < 2) {
 		while (1) {
 			Println("Input the command or file path");
 			command = Console::readLine().trim();
@@ -39,14 +49,14 @@ int main(int argc, const char * argv[])
 			}
 		}
 	} else {
-		command = argv[1];
+		command = args[1];
 	}
 	if (command == "gen") {
 		String path;
-		if (argc < 3) {
+		if (args.getCount() < 3) {
 			path = System::getCurrentDirectory();
 		} else {
-			path = argv[2];
+			path = args[2];
 		}
 		if (File::isDirectory(path)) {
 			path += "/sapp.xml";
