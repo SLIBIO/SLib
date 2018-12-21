@@ -27,6 +27,8 @@
 
 #include "render_view.h"
 
+#include "slider.h"
+
 #include "../media/video_frame.h"
 #include "../media/media_player.h"
 
@@ -72,9 +74,6 @@ namespace slib
 		void setFlip(const FlipMode& flip);
 
 		
-		void updateCurrentFrame(const VideoFrame* frame);
-		
-		
 		ScaleMode getScaleMode();
 		
 		void setScaleMode(ScaleMode scaleMode);
@@ -84,11 +83,23 @@ namespace slib
 		
 		virtual void setGravity(Alignment align);
 		
+		
+		sl_bool isControlsVisible();
+		
+		void setControlsVisible(sl_bool flag);
+		
+		
+		void updateCurrentFrame(const VideoFrame* frame);
+		
 	protected:
 		void onDraw(Canvas* canvas) override;
 		
 	protected:
 		Ref<VertexBuffer> _applyFrameRotationAndFlip(FlipMode frameFlip, RotationMode frameRotation, FlipMode userFlip, RotationMode userRotation);
+		
+		void _updateControls();
+		
+		void _onSeek(Slider* slider, float value);
 				
 	protected:
 		AtomicRef<MediaPlayer> m_mediaPlayer;
@@ -113,6 +124,9 @@ namespace slib
 		
 		ScaleMode m_scaleMode;
 		Alignment m_gravity;
+		
+		sl_bool m_flagControlsVisible;
+		Ref<Slider> m_sliderSeek;
 		
 	};
 

@@ -61,6 +61,8 @@ namespace slib
 
 		m_scaleMode = ScaleMode::Stretch;
 		m_gravity = Alignment::MiddleCenter;
+		
+		m_flagControlsVisible = sl_false;
 	}
 	
 	VideoView::~VideoView()
@@ -166,6 +168,55 @@ namespace slib
 		m_flip = flip;
 	}
 	
+	ScaleMode VideoView::getScaleMode()
+	{
+		return m_scaleMode;
+	}
+	
+	void VideoView::setScaleMode(ScaleMode scaleMode)
+	{
+		m_scaleMode = scaleMode;
+		requestRender();
+	}
+	
+	Alignment VideoView::getGravity()
+	{
+		return m_gravity;
+	}
+	
+	void VideoView::setGravity(Alignment align)
+	{
+		m_gravity = align;
+		requestRender();
+	}
+	
+	sl_bool VideoView::isControlsVisible()
+	{
+		return m_gravity;
+	}
+	
+	void VideoView::setControlsVisible(sl_bool flag)
+	{
+		ObjectLocker lock(this);
+		m_flagControlsVisible = flag;
+		if (flag) {
+			if (m_sliderSeek.isNull()) {
+				m_sliderSeek = new Slider;
+				if (m_sliderSeek.isNotNull()) {
+					m_sliderSeek->setWidthFilling(1.0f, UIUpdateMode::Init);
+					m_sliderSeek->setHeightWeight(0.05, UIUpdateMode::Init);
+					m_sliderSeek->setAlignParentBottom(UIUpdateMode::Init);
+					addChild(m_sliderSeek);
+					m_sliderSeek->setOnChange(SLIB_FUNCTION_WEAKREF(VideoView, _onSeek, this));
+				}
+			}
+			_updateControls();
+		}
+		if (m_sliderSeek.isNotNull()) {
+			m_sliderSeek->setVisible(sl_true);
+		}
+	}
+	
 	void VideoView::updateCurrentFrame(const VideoFrame* frame)
 	{
 		ColorSpace colorSpace = BitmapFormats::getColorSpace(frame->image.format);
@@ -198,30 +249,9 @@ namespace slib
 		requestRender();
 	}
 	
-	ScaleMode VideoView::getScaleMode()
-	{
-		return m_scaleMode;
-	}
-	
-	void VideoView::setScaleMode(ScaleMode scaleMode)
-	{
-		m_scaleMode = scaleMode;
-		requestRender();
-	}
-	
-	Alignment VideoView::getGravity()
-	{
-		return m_gravity;
-	}
-	
-	void VideoView::setGravity(Alignment align)
-	{
-		m_gravity = align;
-		requestRender();
-	}
-	
 	void VideoView::onDraw(Canvas* _canvas)
 	{
+		_updateControls();
 		Rectangle rectBounds = getBounds();
 		if (rectBounds.getWidth() < SLIB_EPSILON || rectBounds.getHeight() < SLIB_EPSILON) {
 			return;
@@ -374,6 +404,34 @@ namespace slib
 		m_userFlipApplied = userFlip;
 		m_userRotationApplied = userRotation;
 		return vb;
+	}
+	
+	void VideoView::_updateControls()
+	{
+		Ref<MediaPlayer> player = m_mediaPlayer;
+		if (player.isNull()) {
+			return;
+		}
+		if (m_sliderSeek.isNotNull()) {
+			float duration = player->getDuration();
+			if (duration > 0) {
+				m_sliderSeek->setMaximumValue((float)duration, UIUpdateMode::None);
+				m_sliderSeek->setValue((float)(player->getCurrentTime()));
+			} else {
+				m_sliderSeek->setMaximumValue(1, UIUpdateMode::None);
+				m_sliderSeek->setValue(0);
+			}
+		}
+	}
+	
+	void VideoView::_onSeek(Slider* slider, float value)
+	{
+		if (slider->isDuringEvent()) {
+			Ref<MediaPlayer> player = m_mediaPlayer;
+			if (player.isNotNull()) {
+				player->seekTo(value);
+			}
+		}
 	}
 
 }

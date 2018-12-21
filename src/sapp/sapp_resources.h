@@ -683,6 +683,7 @@ namespace slib
 		SAppFlipModeValue flip;
 		SAppScaleModeValue scale;
 		SAppAlignmentValue gravity;
+		SAppBooleanValue controls;
 		
 	};
 

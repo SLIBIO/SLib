@@ -2088,7 +2088,7 @@ namespace slib
 		
 		LAYOUT_CONTROL_GENERIC_ATTR(touchMultipleChildren, setTouchMultipleChildren)
 		if (flagView) {
-			LAYOUT_CONTROL_GENERIC_ATTR(tabStop, setProcessingTabStop)
+			LAYOUT_CONTROL_GENERIC_ATTR(tabStop, setTabStopEnabled)
 		}
 		
 		if (flagView) {
@@ -3708,6 +3708,7 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR(flip, setFlip)
 		LAYOUT_CONTROL_GENERIC_ATTR(scale, setScaleMode)
 		LAYOUT_CONTROL_GENERIC_ATTR(gravity, setGravity)
+		LAYOUT_CONTROL_GENERIC_ATTR(controls, setControlsVisible)
 
 		if (op == OP_PARSE || op == OP_GENERATE_CPP) {
 			LAYOUT_CONTROL_STRING_ATTR(src, setSource)
