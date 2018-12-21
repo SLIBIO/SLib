@@ -24,13 +24,31 @@
 
 using namespace slib;
 
-#define PORT 8080
-
 int main(int argc, const char * argv[])
 {
+	// Find configuration file
+	Json conf = Json::parseJsonFromTextFile(Application::getApplicationDirectory() + "/slib_http.conf");
+	if (conf.isNull()) {
+		conf = Json::parseJsonFromTextFile(Application::getApplicationDirectory() + "/../slib_http.conf");
+	}
+	if (conf.isNull()) {
+		conf = Json::parseJsonFromTextFile(Application::getApplicationDirectory() + "/../../slib_http.conf");
+	}
+	if (conf.isNull()) {
+		conf = Json::parseJsonFromTextFile("/etc/slib_http.conf");
+	}
+
+	// Set configuration
 	HttpServiceParam param;
-	param.port = PORT;
+	param.flagUseWebRoot = sl_true;
+	param.port = (sl_uint16)(conf["port"].getUint32(8080));
+	param.flagLogDebug = conf["debug"].getBoolean(sl_false);
+	param.webRootPath = conf["root"].getString();
+
 	param.onRequest = [](HttpService* service, HttpServiceContext* context) {
+		if (context->getPath() != "/") {
+			return sl_false;
+		}
 		Console::println("Method: %s, Path: %s", context->getMethodText(), context->getPath());
 		Console::println("Headers:");
 		for (auto& pair : context->getRequestHeaders()) {
@@ -42,11 +60,14 @@ int main(int argc, const char * argv[])
 		context->write("Welcome");
 		return sl_true;
 	};
+	
 	Ref<HttpService> service = HttpService::create(param);
 	if (service.isNull()) {
 		return -1;
 	}
-	Console::println("Server is running on port: %d", PORT);
+	
+	Console::println("Server is running on port: %d, Webroot: %s", param.port, param.webRootPath);
+	
 	for(;;) {
 		Console::println("\nPress x to exit!!!");
 		if (Console::readChar() == 'x') {
