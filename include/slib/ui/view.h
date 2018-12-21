@@ -1080,9 +1080,9 @@ namespace slib
 		void setPassingEventsToChildren(sl_bool flag);
 		
 		
-		sl_bool isProcessingOkCancel();
+		sl_bool isOkCancelEnabled();
 		
-		void setProcessingOkCancel(sl_bool flag);
+		void setOkCancelEnabled(sl_bool flag);
 
 		
 		Ref<View> getNextFocusableView();
@@ -1093,9 +1093,9 @@ namespace slib
 		
 		Ref<View> getLastFocusableDescendant();
 		
-		sl_bool isProcessingTabStop();
+		sl_bool isTabStopEnabled();
 		
-		void setProcessingTabStop(sl_bool flag);
+		void setTabStopEnabled(sl_bool flag);
 		
 		Ref<View> getNextTabStop();
 		
@@ -1111,6 +1111,11 @@ namespace slib
 		void setCapturingChildInstanceEvents(sl_bool flag);
 		
 		virtual sl_bool hitTestForCapturingChildInstanceEvents(const UIPoint& pt);
+		
+		
+		sl_bool isDuringEvent();
+		
+		void setDuringEvent(sl_bool flag);
 		
 		
 		Ref<GestureDetector> createGestureDetector();
@@ -1462,17 +1467,18 @@ namespace slib
 		sl_bool m_flagTouchMultipleChildren;
 		sl_bool m_flagPassEventToChildren;
 		AtomicRef<View> m_childFocused;
+		sl_bool m_flagDuringEvent;
 		
-		sl_bool m_flagOnAddChild;
-		sl_bool m_flagOnRemoveChild;
-		
-		sl_bool m_flagProcessingOkCancel;
-		sl_bool m_flagProcessingTabStop;
+		sl_bool m_flagOkCancelEnabled;
+		sl_bool m_flagTabStopEnabled;
 		AtomicWeakRef<View> m_viewNextTabStop;
 		AtomicWeakRef<View> m_viewPrevTabStop;
 		sl_bool m_flagCapturingChildInstanceEvents;
 		
 		AtomicRef<GestureDetector> m_gestureDetector;
+		
+		sl_bool m_flagOnAddChild;
+		sl_bool m_flagOnRemoveChild;
 		
 	protected:
 		class LayoutAttributes : public Referable

@@ -88,9 +88,9 @@ namespace slib
 		m_actionMouseDown = UIAction::Unknown;
 		m_flagTouchMultipleChildren = sl_false;
 		m_flagPassEventToChildren = sl_true;
-		m_flagProcessingOkCancel = sl_true;
-		m_flagProcessingTabStop = sl_true;
-		
+		m_flagDuringEvent = sl_false;
+		m_flagOkCancelEnabled = sl_true;
+		m_flagTabStopEnabled = sl_true;
 		m_flagCapturingChildInstanceEvents = sl_false;
 		
 		m_flagOnAddChild = sl_false;
@@ -6262,14 +6262,24 @@ namespace slib
 		m_flagPassEventToChildren = flag;
 	}
 
-	sl_bool View::isProcessingOkCancel()
+	sl_bool View::isDuringEvent()
 	{
-		return m_flagProcessingOkCancel;
+		return isUiThread() && m_flagDuringEvent;
+	}
+	
+	void View::setDuringEvent(sl_bool flag)
+	{
+		m_flagDuringEvent = flag;
 	}
 
-	void View::setProcessingOkCancel(sl_bool flag)
+	sl_bool View::isOkCancelEnabled()
 	{
-		m_flagProcessingOkCancel = flag;
+		return m_flagOkCancelEnabled;
+	}
+
+	void View::setOkCancelEnabled(sl_bool flag)
+	{
+		m_flagOkCancelEnabled = flag;
 	}
 
 	Ref<View> View::getNextFocusableView()
@@ -6374,14 +6384,14 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool View::isProcessingTabStop()
+	sl_bool View::isTabStopEnabled()
 	{
-		return m_flagProcessingTabStop;
+		return m_flagTabStopEnabled;
 	}
 
-	void View::setProcessingTabStop(sl_bool flag)
+	void View::setTabStopEnabled(sl_bool flag)
 	{
-		m_flagProcessingTabStop = flag;
+		m_flagTabStopEnabled = flag;
 	}
 
 	Ref<View> View::getNextTabStop()
@@ -6436,7 +6446,7 @@ namespace slib
 	{
 		return sl_true;
 	}
-
+	
 	Ref<GestureDetector> View::createGestureDetector()
 	{
 		Ref<GestureDetector> gesture = m_gestureDetector;
@@ -7501,6 +7511,24 @@ namespace slib
 		}
 		return UIAction::Unknown;
 	}
+	
+	class _priv_View_DuringEventScope
+	{
+	public:
+		View* view;
+		
+		SLIB_INLINE _priv_View_DuringEventScope(View* view)
+		{
+			this->view = view;
+			view->setDuringEvent(sl_true);
+		}
+		
+		SLIB_INLINE ~_priv_View_DuringEventScope()
+		{
+			view->setDuringEvent(sl_false);
+		}
+		
+	};
 
 #define POINT_EVENT_CHECK_CHILD(c) (c && !(c->isInstance()) && c->isVisible() && c->isHitTestable())
 
@@ -7564,6 +7592,8 @@ namespace slib
 		}
 		
 		ev->resetStates();
+		
+		_priv_View_DuringEventScope scope(this);
 		
 		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
@@ -7768,6 +7798,8 @@ namespace slib
 		
 		ev->resetStates();
 		
+		_priv_View_DuringEventScope scope(this);
+
 		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->touch)(this, ev);
@@ -8081,6 +8113,8 @@ namespace slib
 		
 		ev->resetStates();
 		
+		_priv_View_DuringEventScope scope(this);
+
 		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->mouseWheel)(this, ev);
@@ -8166,6 +8200,8 @@ namespace slib
 		
 		ev->resetStates();
 		
+		_priv_View_DuringEventScope scope(this);
+
 		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->key)(this, ev);
@@ -8191,7 +8227,7 @@ namespace slib
 			_processContentScrollingEvents(ev);
 		}
 		
-		if (m_flagProcessingTabStop) {
+		if (m_flagTabStopEnabled) {
 			if (ev->getAction() == UIAction::KeyUp) {
 				if (ev->getKeycode() == Keycode::Tab) {
 					if (ev->isShiftKey()) {
@@ -8213,7 +8249,7 @@ namespace slib
 			}
 		}
 		
-		if (m_flagProcessingOkCancel) {
+		if (m_flagOkCancelEnabled) {
 			if (ev->getAction() == UIAction::KeyDown) {
 				Keycode keycode = ev->getKeycode();
 				if (keycode == Keycode::Enter) {
