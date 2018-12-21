@@ -740,6 +740,13 @@
 		263918B621C94569008B335B /* TextUtfEncoding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639183121C94569008B335B /* TextUtfEncoding.cpp */; };
 		263918B721C94569008B335B /* WhiteRectDetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639183321C94569008B335B /* WhiteRectDetector.cpp */; };
 		263918B821C94569008B335B /* ZXBigInteger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639183521C94569008B335B /* ZXBigInteger.cpp */; };
+		2639196621CD4605008B335B /* dict.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639196021CD4605008B335B /* dict.c */; };
+		2639196721CD4605008B335B /* async.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639196121CD4605008B335B /* async.c */; };
+		2639196821CD4605008B335B /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639196221CD4605008B335B /* net.c */; };
+		2639196921CD4605008B335B /* read.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639196321CD4605008B335B /* read.c */; };
+		2639196A21CD4605008B335B /* sds.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639196421CD4605008B335B /* sds.c */; };
+		2639196B21CD4605008B335B /* hiredis.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639196521CD4605008B335B /* hiredis.c */; };
+		2639196E21CD469E008B335B /* redis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639196C21CD469B008B335B /* redis.cpp */; };
 		26A39D8C20EFE16D004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8B20EFE16D004707C9 /* calculator.cpp */; };
 		26A39D8D20EFE16D004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8B20EFE16D004707C9 /* calculator.cpp */; };
 		26C1B64620D51D3D00E36539 /* drawable_ext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C1B64520D51D3D00E36539 /* drawable_ext.cpp */; };
@@ -1134,6 +1141,15 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		2639170E21C94260008B335B /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2639195A21CD45C2008B335B /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
@@ -2129,6 +2145,14 @@
 		2639183A21C94569008B335B /* ZXNumeric.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZXNumeric.h; sourceTree = "<group>"; };
 		2639183B21C94569008B335B /* ZXStrConvWorkaround.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZXStrConvWorkaround.h; sourceTree = "<group>"; };
 		2639183C21C94569008B335B /* ZXTestSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZXTestSupport.h; sourceTree = "<group>"; };
+		2639195E21CD45C2008B335B /* libhiredis.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libhiredis.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		2639196021CD4605008B335B /* dict.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dict.c; path = ../../external/src/hiredis/dict.c; sourceTree = "<group>"; };
+		2639196121CD4605008B335B /* async.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = async.c; path = ../../external/src/hiredis/async.c; sourceTree = "<group>"; };
+		2639196221CD4605008B335B /* net.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = net.c; path = ../../external/src/hiredis/net.c; sourceTree = "<group>"; };
+		2639196321CD4605008B335B /* read.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = read.c; path = ../../external/src/hiredis/read.c; sourceTree = "<group>"; };
+		2639196421CD4605008B335B /* sds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sds.c; path = ../../external/src/hiredis/sds.c; sourceTree = "<group>"; };
+		2639196521CD4605008B335B /* hiredis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hiredis.c; path = ../../external/src/hiredis/hiredis.c; sourceTree = "<group>"; };
+		2639196C21CD469B008B335B /* redis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis.cpp; sourceTree = "<group>"; };
 		2640CB6D1DC27BC7006376AC /* font_atlas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = font_atlas.cpp; sourceTree = "<group>"; };
 		2648D5471D096AB000819E09 /* ui_app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_app.cpp; sourceTree = "<group>"; };
 		2648D5491D096AC400819E09 /* mobile_app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mobile_app.cpp; sourceTree = "<group>"; };
@@ -2387,6 +2411,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		2639170D21C94260008B335B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2639195921CD45C2008B335B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3835,6 +3866,19 @@
 			path = textcodec;
 			sourceTree = "<group>";
 		};
+		2639195F21CD45E1008B335B /* hiredis */ = {
+			isa = PBXGroup;
+			children = (
+				2639196121CD4605008B335B /* async.c */,
+				2639196021CD4605008B335B /* dict.c */,
+				2639196521CD4605008B335B /* hiredis.c */,
+				2639196221CD4605008B335B /* net.c */,
+				2639196321CD4605008B335B /* read.c */,
+				2639196421CD4605008B335B /* sds.c */,
+			);
+			name = hiredis;
+			sourceTree = "<group>";
+		};
 		266DD3581C11705C00D47AB0 /* media */ = {
 			isa = PBXGroup;
 			children = (
@@ -3877,6 +3921,7 @@
 				260D876A20C85CD80013B34E /* opus */,
 				260D88E620C912D30013B34E /* libvpx */,
 				2639171B21C94568008B335B /* zxing */,
+				2639195F21CD45E1008B335B /* hiredis */,
 			);
 			name = external;
 			sourceTree = "<group>";
@@ -4038,6 +4083,7 @@
 				265EBF2A1C23051F00AD81D9 /* database_cursor.cpp */,
 				265EBF2B1C23051F00AD81D9 /* database_statement.cpp */,
 				265EBF2C1C23051F00AD81D9 /* database.cpp */,
+				2639196C21CD469B008B335B /* redis.cpp */,
 				265EBF2D1C23051F00AD81D9 /* sqlite.cpp */,
 			);
 			path = db;
@@ -4224,6 +4270,7 @@
 				26D9D8501E9628E0005F7BD3 /* libslib.a */,
 				260D88E520C912440013B34E /* libvpx.a */,
 				2639171221C94260008B335B /* libzxing.a */,
+				2639195E21CD45C2008B335B /* libhiredis.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -4265,6 +4312,23 @@
 			name = zxing;
 			productName = slib;
 			productReference = 2639171221C94260008B335B /* libzxing.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		2639194821CD45C2008B335B /* hiredis */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2639195B21CD45C2008B335B /* Build configuration list for PBXNativeTarget "hiredis" */;
+			buildPhases = (
+				2639194921CD45C2008B335B /* Sources */,
+				2639195921CD45C2008B335B /* Frameworks */,
+				2639195A21CD45C2008B335B /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = hiredis;
+			productName = slib;
+			productReference = 2639195E21CD45C2008B335B /* libhiredis.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		26D15C5F1E93ACBD003BD61A /* slib-core */ = {
@@ -4435,6 +4499,7 @@
 				26D15F951E93D9F7003BD61A /* opus */,
 				260D88B220C912440013B34E /* vpx */,
 				263916FC21C94260008B335B /* zxing */,
+				2639194821CD45C2008B335B /* hiredis */,
 			);
 		};
 /* End PBXProject section */
@@ -4930,6 +4995,19 @@
 				2639185F21C94569008B335B /* MCDecoder.cpp in Sources */,
 				263918A121C94569008B335B /* QRMatrixUtil.cpp in Sources */,
 				2639188121C94569008B335B /* ODRSSFieldParser.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2639194921CD45C2008B335B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2639196821CD4605008B335B /* net.c in Sources */,
+				2639196721CD4605008B335B /* async.c in Sources */,
+				2639196621CD4605008B335B /* dict.c in Sources */,
+				2639196A21CD4605008B335B /* sds.c in Sources */,
+				2639196B21CD4605008B335B /* hiredis.c in Sources */,
+				2639196921CD4605008B335B /* read.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5592,6 +5670,7 @@
 				26D9D85D1E962937005F7BD3 /* geo_location.cpp in Sources */,
 				2628EAE321C410CF00D8CD00 /* jwt.cpp in Sources */,
 				26D9D83C1E9628E0005F7BD3 /* object.cpp in Sources */,
+				2639196E21CD469E008B335B /* redis.cpp in Sources */,
 				26D9D89C1E962962005F7BD3 /* net_capture_pcap.cpp in Sources */,
 				26D9D83D1E9628E0005F7BD3 /* app.cpp in Sources */,
 				26D9D83E1E9628E0005F7BD3 /* ref.cpp in Sources */,
@@ -5764,6 +5843,42 @@
 				GCC_WARN_UNUSED_FUNCTION = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../external/src/zxing/zxing";
+				LLVM_LTO = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				USE_HEADERMAP = NO;
+			};
+			name = Release;
+		};
+		2639195C21CD45C2008B335B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_COMMA = NO;
+				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				LLVM_LTO = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				USE_HEADERMAP = NO;
+			};
+			name = Debug;
+		};
+		2639195D21CD45C2008B335B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_COMMA = NO;
+				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
 				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6198,6 +6313,15 @@
 			buildConfigurations = (
 				2639171021C94260008B335B /* Debug */,
 				2639171121C94260008B335B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2639195B21CD45C2008B335B /* Build configuration list for PBXNativeTarget "hiredis" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2639195C21CD45C2008B335B /* Debug */,
+				2639195D21CD45C2008B335B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

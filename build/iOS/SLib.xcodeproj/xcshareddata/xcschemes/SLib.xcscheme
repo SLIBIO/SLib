@@ -146,6 +146,20 @@
                ReferencedContainer = "container:SLib.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "2639194821CD45C2008B335B"
+               BuildableName = "libhiredis.a"
+               BlueprintName = "hiredis"
+               ReferencedContainer = "container:SLib.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

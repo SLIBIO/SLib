@@ -927,6 +927,14 @@
 		263918FE21CBA3B5008B335B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF17221B3FFF7004E58CB /* OpenGL.framework */; };
 		263918FF21CBA3BB008B335B /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF17021B3FFF2004E58CB /* GLKit.framework */; };
 		2639190021CBA3C0008B335B /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF17821B4003D004E58CB /* WebKit.framework */; };
+		2639193721CD23DF008B335B /* dict.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639193121CD23DE008B335B /* dict.c */; };
+		2639193921CD23DF008B335B /* async.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639193221CD23DE008B335B /* async.c */; };
+		2639193B21CD23DF008B335B /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639193321CD23DE008B335B /* net.c */; };
+		2639193D21CD23DF008B335B /* read.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639193421CD23DF008B335B /* read.c */; };
+		2639193F21CD23DF008B335B /* sds.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639193521CD23DF008B335B /* sds.c */; };
+		2639194121CD23DF008B335B /* hiredis.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639193621CD23DF008B335B /* hiredis.c */; };
+		2639194421CD2510008B335B /* redis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639194321CD2510008B335B /* redis.cpp */; };
+		2639194521CD2510008B335B /* redis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639194321CD2510008B335B /* redis.cpp */; };
 		264AF11721AED0C0004E58CB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF10921AECFA4004E58CB /* main.cpp */; };
 		264AF11821AED0C0004E58CB /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF10A21AECFA4004E58CB /* util.cpp */; };
 		264AF11C21AEE6BE004E58CB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF11B21AEE6BE004E58CB /* Cocoa.framework */; };
@@ -2247,6 +2255,14 @@
 		263918ED21CBA121008B335B /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
 		263918EF21CBA128008B335B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		263918F421CBA1AF008B335B /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		2639192F21CD2389008B335B /* libhiredis.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libhiredis.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		2639193121CD23DE008B335B /* dict.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dict.c; path = ../../external/src/hiredis/dict.c; sourceTree = "<group>"; };
+		2639193221CD23DE008B335B /* async.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = async.c; path = ../../external/src/hiredis/async.c; sourceTree = "<group>"; };
+		2639193321CD23DE008B335B /* net.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = net.c; path = ../../external/src/hiredis/net.c; sourceTree = "<group>"; };
+		2639193421CD23DF008B335B /* read.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = read.c; path = ../../external/src/hiredis/read.c; sourceTree = "<group>"; };
+		2639193521CD23DF008B335B /* sds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sds.c; path = ../../external/src/hiredis/sds.c; sourceTree = "<group>"; };
+		2639193621CD23DF008B335B /* hiredis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hiredis.c; path = ../../external/src/hiredis/hiredis.c; sourceTree = "<group>"; };
+		2639194321CD2510008B335B /* redis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis.cpp; sourceTree = "<group>"; };
 		2640BC381CAA65EF004AA780 /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xml.cpp; sourceTree = "<group>"; };
 		26483B2B1C99D8F3009075BF /* yuv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yuv.cpp; sourceTree = "<group>"; };
 		2648D5411D0965C400819E09 /* mobile_game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mobile_game.cpp; sourceTree = "<group>"; };
@@ -2572,6 +2588,13 @@
 				263918F321CBA1A8008B335B /* CoreMedia.framework in Frameworks */,
 				263918F221CBA1A3008B335B /* Cocoa.framework in Frameworks */,
 				263918F121CBA198008B335B /* AVFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2639192A21CD2389008B335B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3802,6 +3825,7 @@
 				2605064F20CF87F900032B2C /* opus */,
 				2605064E20CF87F100032B2C /* libvpx */,
 				2628F11721C429FD00D8CD00 /* zxing */,
+				2639193021CD23BB008B335B /* hiredis */,
 				2605032320CBDD3900032B2C /* yasm */,
 			);
 			name = external;
@@ -4160,6 +4184,19 @@
 			path = textcodec;
 			sourceTree = "<group>";
 		};
+		2639193021CD23BB008B335B /* hiredis */ = {
+			isa = PBXGroup;
+			children = (
+				2639193221CD23DE008B335B /* async.c */,
+				2639193121CD23DE008B335B /* dict.c */,
+				2639193621CD23DF008B335B /* hiredis.c */,
+				2639193321CD23DE008B335B /* net.c */,
+				2639193421CD23DF008B335B /* read.c */,
+				2639193521CD23DF008B335B /* sds.c */,
+			);
+			name = hiredis;
+			sourceTree = "<group>";
+		};
 		264AF10721AECF7F004E58CB /* tool */ = {
 			isa = PBXGroup;
 			children = (
@@ -4472,6 +4509,7 @@
 				264AF12121B0590C004E58CB /* libsapp.a */,
 				2628EB1921C41FFF00D8CD00 /* libzxing.a */,
 				263918D921CBA047008B335B /* sapp.app */,
+				2639192F21CD2389008B335B /* libhiredis.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -4604,6 +4642,7 @@
 				265EBF201C23041600AD81D9 /* database_statement.cpp */,
 				265EBF211C23041600AD81D9 /* database.cpp */,
 				265EBF221C23041600AD81D9 /* mysql.cpp */,
+				2639194321CD2510008B335B /* redis.cpp */,
 				265EBF231C23041600AD81D9 /* sqlite.cpp */,
 			);
 			path = db;
@@ -4813,6 +4852,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2639192B21CD2389008B335B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		264AF11D21B0590C004E58CB /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -4955,6 +5001,23 @@
 			productName = sapp;
 			productReference = 263918D921CBA047008B335B /* sapp.app */;
 			productType = "com.apple.product-type.application";
+		};
+		2639191921CD2389008B335B /* hiredis */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2639192C21CD2389008B335B /* Build configuration list for PBXNativeTarget "hiredis" */;
+			buildPhases = (
+				2639191A21CD2389008B335B /* Sources */,
+				2639192A21CD2389008B335B /* Frameworks */,
+				2639192B21CD2389008B335B /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = hiredis;
+			productName = Slib;
+			productReference = 2639192F21CD2389008B335B /* libhiredis.a */;
+			productType = "com.apple.product-type.library.static";
 		};
 		264AF10F21AED095004E58CB /* AddCopyrightNotice */ = {
 			isa = PBXNativeTarget;
@@ -5196,6 +5259,7 @@
 				26D15C491E93A97C003BD61A /* opus */,
 				26D15C531E93A9B4003BD61A /* vpx */,
 				2628EB0321C41FFF00D8CD00 /* zxing */,
+				2639191921CD2389008B335B /* hiredis */,
 				260D8CCA20CBDC7C0013B34E /* libyasm */,
 				2605036220CEC39100032B2C /* yasm */,
 				264AF12021B0590C004E58CB /* libsapp */,
@@ -5446,7 +5510,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2639194521CD2510008B335B /* redis.cpp in Sources */,
 				263918FD21CBA29F008B335B /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2639191A21CD2389008B335B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2639193B21CD23DF008B335B /* net.c in Sources */,
+				2639193921CD23DF008B335B /* async.c in Sources */,
+				2639193721CD23DF008B335B /* dict.c in Sources */,
+				2639193F21CD23DF008B335B /* sds.c in Sources */,
+				2639194121CD23DF008B335B /* hiredis.c in Sources */,
+				2639193D21CD23DF008B335B /* read.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6239,6 +6317,7 @@
 				26D9D90F1E9645CE005F7BD3 /* mutex.cpp in Sources */,
 				26D9D9E41E96468D005F7BD3 /* ui_event_macos.mm in Sources */,
 				26D9D98D1E964675005F7BD3 /* media_player.cpp in Sources */,
+				2639194421CD2510008B335B /* redis.cpp in Sources */,
 				26D9D9D51E96468D005F7BD3 /* slider.cpp in Sources */,
 				26D9D9651E964669005F7BD3 /* brush.cpp in Sources */,
 				26D9D9101E9645CE005F7BD3 /* math.cpp in Sources */,
@@ -6668,6 +6747,45 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.slib.sapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+			};
+			name = Release;
+		};
+		2639192D21CD2389008B335B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_COMMA = NO;
+				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				LLVM_LTO = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_MODULE_NAME = slib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USE_HEADERMAP = NO;
+			};
+			name = Debug;
+		};
+		2639192E21CD2389008B335B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_COMMA = NO;
+				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_MODULE_NAME = slib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USE_HEADERMAP = NO;
 			};
 			name = Release;
 		};
@@ -7278,6 +7396,15 @@
 			buildConfigurations = (
 				263918E821CBA049008B335B /* Debug */,
 				263918E921CBA049008B335B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2639192C21CD2389008B335B /* Build configuration list for PBXNativeTarget "hiredis" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2639192D21CD2389008B335B /* Debug */,
+				2639192E21CD2389008B335B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
