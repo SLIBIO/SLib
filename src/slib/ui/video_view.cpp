@@ -47,17 +47,19 @@ namespace slib
 		m_flip = FlipMode::None;
 		
 		m_flagYUV = sl_false;
-		
+		m_rotationFrame = RotationMode::Rotate0;
+		m_flipFrame = FlipMode::None;
+
 		m_programRGB = new RenderProgram2D_PositionTexture;
 		m_programYUV = new RenderProgram2D_PositionTextureYUV;
 		m_programOES = new RenderProgram2D_PositionTextureOES;
 		
 		m_renderVideoParam.onUpdateFrame = SLIB_FUNCTION_WEAKREF(VideoView, updateCurrentFrame, this);
 		
-		m_frameFlipApplied = FlipMode::None;
-		m_frameRotationApplied = RotationMode::Rotate0;
-		m_userFlipApplied = FlipMode::None;
-		m_userRotationApplied = RotationMode::Rotate0;
+		m_flipFrameApplied = FlipMode::None;
+		m_rotationFrameApplied = RotationMode::Rotate0;
+		m_flipApplied = FlipMode::None;
+		m_rotationApplied = RotationMode::Rotate0;
 
 		m_scaleMode = ScaleMode::Stretch;
 		m_gravity = Alignment::MiddleCenter;
@@ -241,10 +243,11 @@ namespace slib
 			} else {
 				m_flagYUV = sl_false;
 			}
+			m_rotationFrame = frame->rotation;
+			m_flipFrame = frame->flip;
 			bitmapData.copyPixelsFrom(frame->image);
 			texture->update();
 			m_textureFrame = texture;
-			_applyFrameRotationAndFlip(frame->flip, frame->rotation, m_flip, m_rotation);
 		}
 		requestRender();
 	}
@@ -281,14 +284,14 @@ namespace slib
 						program = m_programRGB;
 					}
 				}
-				Ref<VertexBuffer> vb = m_vbFrame;
+				Ref<VertexBuffer> vb = _applyFrameRotationAndFlip(m_flipFrame, m_rotationFrame, m_flip, m_rotation);
 				if (vb.isNotNull() && texture.isNotNull() && program.isNotNull()) {
 					sl_real sw = (sl_real)(texture->getWidth());
 					sl_real sh = (sl_real)(texture->getHeight());
-					if (m_frameRotationApplied == RotationMode::Rotate90 || m_frameRotationApplied == RotationMode::Rotate270) {
+					if (m_rotationFrameApplied == RotationMode::Rotate90 || m_rotationFrameApplied == RotationMode::Rotate270) {
 						Swap(sw, sh);
 					}
-					if (m_userRotationApplied == RotationMode::Rotate90 || m_userRotationApplied == RotationMode::Rotate270) {
+					if (m_rotationApplied == RotationMode::Rotate90 || m_rotationApplied == RotationMode::Rotate270) {
 						Swap(sw, sh);
 					}
 					Rectangle rectDraw;
@@ -311,7 +314,7 @@ namespace slib
 	
 	Ref<VertexBuffer> VideoView::_applyFrameRotationAndFlip(FlipMode frameFlip, RotationMode frameRotation, FlipMode userFlip, RotationMode userRotation)
 	{
-		if (m_vbFrame.isNotNull() && m_frameFlipApplied == frameFlip && m_frameRotationApplied == frameRotation && m_userFlipApplied == userFlip && m_userRotationApplied == userRotation) {
+		if (m_vbFrame.isNotNull() && m_flipFrameApplied == frameFlip && m_rotationFrameApplied == frameRotation && m_flipApplied == userFlip && m_rotationApplied == userRotation) {
 			return m_vbFrame;
 		}
 		RenderVertex2D_PositionTexture v[] = {
@@ -399,10 +402,10 @@ namespace slib
 		}
 		Ref<VertexBuffer> vb = VertexBuffer::create(v, sizeof(v));
 		m_vbFrame = vb;
-		m_frameFlipApplied = frameFlip;
-		m_frameRotationApplied = frameRotation;
-		m_userFlipApplied = userFlip;
-		m_userRotationApplied = userRotation;
+		m_flipFrameApplied = frameFlip;
+		m_rotationFrameApplied = frameRotation;
+		m_flipApplied = userFlip;
+		m_rotationApplied = userRotation;
 		return vb;
 	}
 	

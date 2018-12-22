@@ -106,7 +106,9 @@ namespace slib
 		sl_bool m_flagRepeat;
 		RotationMode m_rotation;
 		FlipMode m_flip;
-		
+		RotationMode m_rotationFrame;
+		FlipMode m_flipFrame;
+
 		AtomicRef<Texture> m_textureFrame;
 		sl_bool m_flagYUV;
 		
@@ -115,10 +117,10 @@ namespace slib
 		Ref<RenderProgram2D_PositionTextureOES> m_programOES;
 		
 		AtomicRef<VertexBuffer> m_vbFrame;
-		FlipMode m_frameFlipApplied;
-		RotationMode m_frameRotationApplied;
-		FlipMode m_userFlipApplied;
-		RotationMode m_userRotationApplied;
+		FlipMode m_flipFrameApplied;
+		RotationMode m_rotationFrameApplied;
+		FlipMode m_flipApplied;
+		RotationMode m_rotationApplied;
 
 		MediaPlayerRenderVideoParam m_renderVideoParam;
 		
