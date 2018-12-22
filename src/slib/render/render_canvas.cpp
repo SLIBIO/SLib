@@ -781,13 +781,26 @@ namespace slib
 			return;
 		}
 		
-		sl_real penWidthHalf = (pen->getWidth() + 0.5f) / 2;
+		sl_real penWidth = pen->getWidth();
+		sl_real penWidthHalf = penWidth / 2;
 		
-		if (Math::abs(pt1.x - pt2.x) < 0.0000001f || Math::abs(pt1.y - pt2.y) < 0.0000001f) {
-			_fillRectangle(Rectangle(pt1.x - penWidthHalf, pt1.y - penWidthHalf, pt2.x + penWidthHalf, pt2.y + penWidthHalf), pen->getColor());
-			return;
+		RenderCanvasState* state = m_state.get();
+		if (penWidth < 1.0000001f && Vector2(state->matrix.m00, state->matrix.m10).getLength2p() <= 1.000001f && Vector2(state->matrix.m01, state->matrix.m11).getLength2p() <= 1.000001f) {
+			if (Math::abs(pt1.x - pt2.x) < 0.0000001f) {
+				_fillRectangle(Rectangle(pt1.x, pt1.y, pt1.x + 1, pt2.y), pen->getColor());
+				return;
+			}
+			if (Math::abs(pt1.y - pt2.y) < 0.0000001f) {
+				_fillRectangle(Rectangle(pt1.x, pt1.y, pt2.x, pt1.y + 1), pen->getColor());
+				return;
+			}
+		} else {
+			if (Math::abs(pt1.x - pt2.x) < 0.0000001f || Math::abs(pt1.y - pt2.y) < 0.0000001f) {
+				_fillRectangle(Rectangle(pt1.x - penWidthHalf, pt1.y - penWidthHalf, pt2.x + penWidthHalf, pt2.y + penWidthHalf), pen->getColor());
+				return;
+			}
 		}
-		
+				
 		sl_real angle = Math::arctan((pt1.y - pt2.y) / (pt1.x - pt2.x));
 		sl_real c = Math::cos(-angle);
 		sl_real s = Math::sin(-angle);
