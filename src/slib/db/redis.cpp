@@ -326,7 +326,8 @@ namespace slib
 		sl_bool execute(const String& command, Variant* pValue) override
 		{
 			ObjectLocker lock(this);
-			redisReply* reply = (redisReply*)(redisCommand(m_context, "%s", command.getData()));
+			String s = command.replaceAll("%", "%%");
+			redisReply* reply = (redisReply*)(redisCommand(m_context, s.getData()));
 			return _processReply(reply, pValue);
 		}
 		
