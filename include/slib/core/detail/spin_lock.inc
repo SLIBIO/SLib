@@ -31,7 +31,10 @@ namespace slib
 	
 	extern template class SpinLockPool<-21>;
 	typedef SpinLockPool<-21> SpinLockPoolForMap;
-	
+
+	extern template class SpinLockPool<-30>;
+	typedef SpinLockPool<-30> SpinLockPoolForVariant;
+
 	template <int CATEGORY>
 	sl_int32 SpinLockPool<CATEGORY>::m_locks[SLIB_SPINLOCK_POOL_SIZE] = { 0 };
 	

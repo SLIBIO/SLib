@@ -151,4 +151,6 @@ namespace slib
 
 	template class SpinLockPool<-21>;
 
+	template class SpinLockPool<-30>;
+
 }
