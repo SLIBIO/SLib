@@ -207,7 +207,7 @@ namespace slib
 													ret->m_surface = surface;
 													ret->m_context = context;
 													ret->m_config = config;
-													ret->m_callback = param.callback;
+													ret->initWithParam(param);
 
 													ret->m_threadRender = Thread::start(SLIB_FUNCTION_CLASS(_priv_EGLRendererImpl, run, ret.get()));
 
@@ -279,28 +279,25 @@ namespace slib
 
 		void runStep(RenderEngine* engine)
 		{
-			PtrLocker<IRenderCallback> callback(m_callback);
-			if (callback.isNotNull()) {
-				if (!isWindowVisible(m_hWindow)) {
-					return;
-				}
-				sl_bool flagUpdate = sl_false;
-				if (isRenderingContinuously()) {
+			if (!isWindowVisible(m_hWindow)) {
+				return;
+			}
+			sl_bool flagUpdate = sl_false;
+			if (isRenderingContinuously()) {
+				flagUpdate = sl_true;
+			} else {
+				if (m_flagRequestRender) {
 					flagUpdate = sl_true;
-				} else {
-					if (m_flagRequestRender) {
-						flagUpdate = sl_true;
-					}
 				}
-				m_flagRequestRender = sl_false;
-				if (flagUpdate) {
-					Sizei size = getWindowSize(m_hWindow);
-					if (size.x != 0 && size.y != 0) {
-						engine->setViewport(0, 0, size.x, size.y);
-						callback->onFrame(engine);
-						PRIV_EGL_ENTRY(eglSwapInterval)(m_display, 0);
-						PRIV_EGL_ENTRY(eglSwapBuffers)(m_display, m_surface);
-					}
+			}
+			m_flagRequestRender = sl_false;
+			if (flagUpdate) {
+				Sizei size = getWindowSize(m_hWindow);
+				if (size.x != 0 && size.y != 0) {
+					engine->setViewport(0, 0, size.x, size.y);
+					dispatchFrame(engine);
+					PRIV_EGL_ENTRY(eglSwapInterval)(m_display, 0);
+					PRIV_EGL_ENTRY(eglSwapBuffers)(m_display, m_surface);
 				}
 			}
 		}

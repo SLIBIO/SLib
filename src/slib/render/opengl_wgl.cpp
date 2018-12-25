@@ -99,10 +99,10 @@ namespace slib
 								ret->m_hDC = hDC;
 								ret->m_context = context;
 
+								ret->initWithParam(param);
+
 								ret->m_threadRender = Thread::start(SLIB_FUNCTION_CLASS(_priv_WGLRendererImpl, run, ret.get()));
-
-								ret->m_callback = param.callback;
-
+								
 								return ret;
 							}
 
@@ -161,28 +161,25 @@ namespace slib
 
 		void runStep(RenderEngine* engine)
 		{
-			PtrLocker<IRenderCallback> callback(m_callback);
-			if (callback.isNotNull()) {
-				if (!(Windows::isWindowVisible(m_hWindow))) {
-					return;
-				}
-				sl_bool flagUpdate = sl_false;
-				if (isRenderingContinuously()) {
+			if (!(Windows::isWindowVisible(m_hWindow))) {
+				return;
+			}
+			sl_bool flagUpdate = sl_false;
+			if (isRenderingContinuously()) {
+				flagUpdate = sl_true;
+			} else {
+				if (m_flagRequestRender) {
 					flagUpdate = sl_true;
-				} else {
-					if (m_flagRequestRender) {
-						flagUpdate = sl_true;
-					}
 				}
-				m_flagRequestRender = sl_false;
-				if (flagUpdate) {
-					RECT rect;
-					::GetClientRect(m_hWindow, &rect);
-					if (rect.right != 0 && rect.bottom != 0) {
-						engine->setViewport(0, 0, rect.right, rect.bottom);
-						callback->onFrame(engine);
-						::SwapBuffers(m_hDC);
-					}
+			}
+			m_flagRequestRender = sl_false;
+			if (flagUpdate) {
+				RECT rect;
+				::GetClientRect(m_hWindow, &rect);
+				if (rect.right != 0 && rect.bottom != 0) {
+					engine->setViewport(0, 0, rect.right, rect.bottom);
+					dispatchFrame(engine);
+					::SwapBuffers(m_hDC);
 				}
 			}
 		}

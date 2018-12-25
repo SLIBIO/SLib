@@ -94,9 +94,9 @@ namespace slib
 				ret->m_xwindow = xwindow;
 				ret->m_context = context;
 				
-				ret->m_threadRender = Thread::start(SLIB_FUNCTION_CLASS(_priv_GLXRendererImpl, run, ret.get()));
+				ret->initWithParam(param);
 				
-				ret->m_callback = param.callback;
+				ret->m_threadRender = Thread::start(SLIB_FUNCTION_CLASS(_priv_GLXRendererImpl, run, ret.get()));
 				
 				return ret;
 			}
@@ -150,30 +150,27 @@ namespace slib
 
 		void runStep(RenderEngine* engine)
 		{
-			PtrLocker<IRenderCallback> callback(m_callback);
-			if (callback.isNotNull()) {
-				XWindowAttributes attrs;
-				if (!(XGetWindowAttributes(m_xdisplay, m_xwindow, &attrs))) {
-					return;
-				}
-				if (attrs.map_state != IsViewable) {
-					return;
-				}
-				sl_bool flagUpdate = sl_false;
-				if (isRenderingContinuously()) {
+			XWindowAttributes attrs;
+			if (!(XGetWindowAttributes(m_xdisplay, m_xwindow, &attrs))) {
+				return;
+			}
+			if (attrs.map_state != IsViewable) {
+				return;
+			}
+			sl_bool flagUpdate = sl_false;
+			if (isRenderingContinuously()) {
+				flagUpdate = sl_true;
+			} else {
+				if (m_flagRequestRender) {
 					flagUpdate = sl_true;
-				} else {
-					if (m_flagRequestRender) {
-						flagUpdate = sl_true;
-					}
 				}
-				m_flagRequestRender = sl_false;
-				if (flagUpdate) {
-					if (attrs.width != 0 && attrs.height != 0) {
-						engine->setViewport(0, 0, attrs.width, attrs.height);
-						callback->onFrame(engine);
-						glXSwapBuffers(m_xdisplay, m_xwindow);
-					}
+			}
+			m_flagRequestRender = sl_false;
+			if (flagUpdate) {
+				if (attrs.width != 0 && attrs.height != 0) {
+					engine->setViewport(0, 0, attrs.width, attrs.height);
+					dispatchFrame(engine);
+					glXSwapBuffers(m_xdisplay, m_xwindow);
 				}
 			}
 		}

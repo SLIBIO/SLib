@@ -32,7 +32,7 @@
 namespace slib
 {
 
-	class Win32_RenderViewInstance : public Win32_ViewInstance, public IRenderCallback
+	class Win32_RenderViewInstance : public Win32_ViewInstance
 	{
 	public:
 		AtomicRef<Renderer> m_renderer;
@@ -82,7 +82,7 @@ namespace slib
 			return Win32_ViewInstance::processWindowMessage(msg, wParam, lParam, result);
 		}
 
-		void onFrame(RenderEngine* engine) override
+		void onFrame(RenderEngine* engine)
 		{
 			Ref<View> _view = getView();
 			if (RenderView* view = CastInstance<RenderView>(_view.get())) {
@@ -115,7 +115,7 @@ namespace slib
 			}
 			if (engineType == RenderEngineType::OpenGL_ES) {
 				RendererParam rp;
-				rp.callback = WeakRef<Win32_RenderViewInstance>(ret);
+				rp.onFrame = SLIB_FUNCTION_WEAKREF(Win32_RenderViewInstance, onFrame, ret);
 				Ref<Renderer> renderer = EGL::createRenderer((void*)(ret->getHandle()), rp);
 				if (renderer.isNotNull()) {
 					ret->setRenderer(renderer, m_redrawMode);
@@ -123,7 +123,7 @@ namespace slib
 				}
 			} else if (engineType == RenderEngineType::OpenGL) {
 				RendererParam rp;
-				rp.callback = WeakRef<Win32_RenderViewInstance>(ret);
+				rp.onFrame = SLIB_FUNCTION_WEAKREF(Win32_RenderViewInstance, onFrame, ret);
 				Ref<Renderer> renderer = WGL::createRenderer((void*)(ret->getHandle()), rp);
 				if (renderer.isNotNull()) {
 					ret->setRenderer(renderer, m_redrawMode);

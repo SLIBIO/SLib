@@ -32,7 +32,7 @@
 #include "program.h"
 
 #include "../core/time.h"
-#include "../core/ptr.h"
+#include "../core/function.h"
 #include "../graphics/color.h"
 #include "../graphics/font.h"
 #include "../math/line_segment.h"
@@ -153,18 +153,6 @@ namespace slib
 		GreaterEqual = 7,
 	};
 	
-	class SLIB_EXPORT IRenderCallback
-	{
-	public:
-		IRenderCallback();
-
-		virtual ~IRenderCallback();
-
-	public:
-		virtual void onFrame(RenderEngine* engine) = 0;
-
-	};
-	
 	class SLIB_EXPORT RendererParam
 	{
 	public:
@@ -177,7 +165,7 @@ namespace slib
 		sl_int32 nStencilBits;
 		sl_bool flagMultisample;
 		
-		Ptr<IRenderCallback> callback;
+		Function<void(RenderEngine*)> onFrame;
 		
 	public:
 		RendererParam();
@@ -185,6 +173,8 @@ namespace slib
 		~RendererParam();
 		
 	};
+	
+	class RenderEngine;
 	
 	class SLIB_EXPORT Renderer : public Object
 	{
@@ -204,7 +194,12 @@ namespace slib
 		SLIB_BOOLEAN_PROPERTY(RenderingContinuously)
 		
 	protected:
-		Ptr<IRenderCallback> m_callback;
+		void initWithParam(const RendererParam& param);
+		
+		void dispatchFrame(RenderEngine* engine);
+		
+	protected:
+		Function<void(RenderEngine*)> m_onFrame;
 		
 	};
 	

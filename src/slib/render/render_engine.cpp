@@ -78,14 +78,6 @@ namespace slib
 	}
 	
 	
-	IRenderCallback::IRenderCallback()
-	{
-	}
-
-	IRenderCallback::~IRenderCallback()
-	{
-	}
-
 	RendererParam::RendererParam()
 	{
 		nRedBits = 8;
@@ -112,6 +104,16 @@ namespace slib
 	
 	Renderer::~Renderer()
 	{
+	}
+	
+	void Renderer::initWithParam(const RendererParam& param)
+	{
+		m_onFrame = param.onFrame;
+	}
+	
+	void Renderer::dispatchFrame(RenderEngine* engine)
+	{
+		m_onFrame(engine);
 	}
 	
 	

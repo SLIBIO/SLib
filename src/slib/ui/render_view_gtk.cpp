@@ -34,7 +34,7 @@
 namespace slib
 {
 
-	class GTK_RenderViewInstance : public GTK_ViewInstance, public IRenderCallback
+	class GTK_RenderViewInstance : public GTK_ViewInstance
 	{
 	public:
 		AtomicRef<Renderer> m_renderer;
@@ -71,7 +71,7 @@ namespace slib
 			return sl_false;
 		}
 
-		void onFrame(RenderEngine* engine) override
+		void onFrame(RenderEngine* engine)
 		{
 			Ref<View> _view = getView();
 			if (RenderView* view = CastInstance<RenderView>(_view.get())) {
@@ -99,7 +99,7 @@ namespace slib
 						XID xwindow = GDK_WINDOW_XWINDOW(gwindow);
 						if (xdisplay && xwindow != None) {
 							RendererParam rp;
-							rp.callback = WeakRef<GTK_RenderViewInstance>(ret);
+							rp.onFrame = SLIB_FUNCTION_WEAKREF(GTK_RenderViewInstance, onFrame, ret);
 							Ref<Renderer> renderer = GLX::createRenderer(xdisplay, xwindow, rp);
 							if (renderer.isNotNull()) {
 								ret->setRenderer(renderer, m_redrawMode);
