@@ -28,23 +28,6 @@
 namespace slib
 {
 
-	IMediaPlayerListener::IMediaPlayerListener()
-	{
-	}
-
-	IMediaPlayerListener::~IMediaPlayerListener()
-	{
-	}
-
-	void IMediaPlayerListener::onReadyToPlay(MediaPlayer* player)
-	{
-	}
-	
-	void IMediaPlayerListener::onComplete(MediaPlayer* player)
-	{
-	}
-
-
 	MediaPlayerParam::MediaPlayerParam()
 	{
 		flagVideo = sl_false;
@@ -150,19 +133,11 @@ namespace slib
 
 	void MediaPlayer::_onReadyToPlay()
 	{
-		PtrLocker<IMediaPlayerListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onReadyToPlay(this);
-		}
 		getOnReadyToPlay()(this);
 	}
 	
 	void MediaPlayer::_onComplete()
 	{
-		PtrLocker<IMediaPlayerListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onComplete(this);
-		}
 		getOnComplete()(this);
 	}
 
@@ -170,7 +145,6 @@ namespace slib
 	{
 		m_flagAutoRepeat = param.flagAutoRepeat;
 		m_flagSelfAlive = param.flagSelfAlive;
-		setListener(param.listener);
 		setOnReadyToPlay(param.onReadyToPlay);
 		setOnComplete(param.onComplete);
 	}

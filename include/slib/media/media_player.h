@@ -28,7 +28,6 @@
 #include "../core/object.h"
 #include "../core/memory.h"
 #include "../core/string.h"
-#include "../core/ptr.h"
 #include "../core/function.h"
 
 #include "../media/video_frame.h"
@@ -38,20 +37,6 @@
 namespace slib
 {
 	class MediaPlayer;
-	
-	class IMediaPlayerListener
-	{
-	public:
-		IMediaPlayerListener();
-
-		virtual ~IMediaPlayerListener();
-
-	public:
-		virtual void onReadyToPlay(MediaPlayer* player);
-		
-		virtual void onComplete(MediaPlayer* player);
-		
-	};
 	
 	class SLIB_EXPORT MediaPlayerParam
 	{
@@ -67,7 +52,6 @@ namespace slib
 		
 		sl_bool flagSelfAlive;
 		
-		Ptr<IMediaPlayerListener> listener;
 		Function<void(MediaPlayer*)> onReadyToPlay;
 		Function<void(MediaPlayer*)> onComplete;
 		
@@ -172,8 +156,6 @@ namespace slib
 		virtual void setAutoRepeat(sl_bool flagRepeat);
 				
 	public:
-		SLIB_PROPERTY(AtomicPtr<IMediaPlayerListener>, Listener)
-		
 		SLIB_PROPERTY(AtomicFunction<void(MediaPlayer*)>, OnReadyToPlay)
 		
 		SLIB_PROPERTY(AtomicFunction<void(MediaPlayer*)>, OnComplete)
