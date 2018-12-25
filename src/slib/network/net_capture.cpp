@@ -53,13 +53,6 @@ namespace slib
 	{
 	}
 	
-	INetCaptureListener::INetCaptureListener()
-	{
-	}
-
-	INetCaptureListener::~INetCaptureListener()
-	{
-	}
 
 	NetCaptureParam::NetCaptureParam()
 	{
@@ -100,16 +93,11 @@ namespace slib
 	
 	void NetCapture::_initWithParam(const NetCaptureParam& param)
 	{
-		m_listener = param.listener;
 		m_onCapturePacket = param.onCapturePacket;
 	}
 	
 	void NetCapture::_onCapturePacket(NetCapturePacket* packet)
 	{
-		PtrLocker<INetCaptureListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onCapturePacket(this, packet);
-		}
 		m_onCapturePacket(this, packet);
 	}
 	

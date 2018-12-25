@@ -38,7 +38,6 @@
 #include "ip_address.h"
 
 #include "../core/object.h"
-#include "../core/ptr.h"
 #include "../core/time.h"
 #include "../core/string.h"
 #include "../core/function.h"
@@ -79,18 +78,6 @@ namespace slib
 	
 	class NetCapture;
 	
-	class SLIB_EXPORT INetCaptureListener
-	{
-	public:
-		INetCaptureListener();
-
-		virtual ~INetCaptureListener();
-
-	public:
-		virtual void onCapturePacket(NetCapture* capture, NetCapturePacket* packet) = 0;
-		
-	};
-	
 	class SLIB_EXPORT NetCaptureParam
 	{
 	public:
@@ -105,7 +92,6 @@ namespace slib
 		
 		sl_bool flagAutoStart; // default: true
 		
-		Ptr<INetCaptureListener> listener;
 		Function<void(NetCapture*, NetCapturePacket*)> onCapturePacket;
 		
 	public:
@@ -161,7 +147,6 @@ namespace slib
 		void _onCapturePacket(NetCapturePacket* packet);
 		
 	protected:
-		Ptr<INetCaptureListener> m_listener;
 		Function<void(NetCapture*, NetCapturePacket*)> m_onCapturePacket;
 		
 	};
