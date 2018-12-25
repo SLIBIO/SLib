@@ -32,34 +32,6 @@
 namespace slib
 {
 
-	IUrlRequestListener::IUrlRequestListener()
-	{
-	}
-
-	IUrlRequestListener::~IUrlRequestListener()
-	{
-	}
-
-	void IUrlRequestListener::onComplete(UrlRequest *request)
-	{
-	}
-	
-	void IUrlRequestListener::onResponse(UrlRequest* request, HttpStatus status)
-	{
-	}
-	
-	void IUrlRequestListener::onReceiveContent(UrlRequest* request, const void* data, sl_size len)
-	{
-	}
-	
-	void IUrlRequestListener::onDownloadContent(UrlRequest* request, sl_uint64 len)
-	{
-	}
-	
-	void IUrlRequestListener::onUploadBody(UrlRequest* request, sl_uint64 len)
-	{
-	}
-	
 	UrlRequestParam::UrlRequestParam()
 	{
 		method = HttpMethod::GET;
@@ -273,26 +245,6 @@ namespace slib
 		return m_responseHeaders.getValue(name, String::null());
 	}
 	
-	const Ptr<IUrlRequestListener>& UrlRequest::getListener()
-	{
-		return m_listener;
-	}
-	
-	const Function<void(UrlRequest*)>& UrlRequest::getOnComplete()
-	{
-		return m_onComplete;
-	}
-	
-	const Function<void(UrlRequest*, const void*, sl_size)>& UrlRequest::getOnReceiveContent()
-	{
-		return m_onReceiveContent;
-	}
-	
-	const Ref<Dispatcher>& UrlRequest::getDispatcher()
-	{
-		return m_dispatcher;
-	}
-	
 	sl_bool UrlRequest::isUsingBackgroundSession()
 	{
 		return m_flagUseBackgroundSession;
@@ -407,11 +359,14 @@ namespace slib
 		m_requestBody = param.requestBody;
 		m_parameters = param.parameters;
 		m_requestHeaders = param.requestHeaders;
-		
-		m_listener = param.listener;
+
 		m_onComplete = param.onComplete;
+		m_onResponse = param.onResponse;
 		m_onReceiveContent = param.onReceiveContent;
+		m_onDownloadContent = param.onDownloadContent;
+		m_onUploadBody = param.onUploadBody;
 		m_dispatcher = param.dispatcher;
+		
 		m_flagUseBackgroundSession = param.flagUseBackgroundSession;
 		m_flagSelfAlive = param.flagSelfAlive && !(param.flagSynchronous);
 		m_flagStoreResponseContent = param.flagStoreResponseContent;
@@ -448,10 +403,6 @@ namespace slib
 			return;
 		}
 		m_flagClosed = sl_true;
-		PtrLocker<IUrlRequestListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onComplete(this);
-		}
 		if (m_onComplete.isNotNull()) {
 			if (m_dispatcher.isNotNull()) {
 				m_dispatcher->dispatch(SLIB_BIND_REF(void(), UrlRequest, _runCallback, this, m_onComplete));
@@ -479,10 +430,7 @@ namespace slib
 		}
 		m_sizeContentReceived = 0;
 		m_bufResponseContent.clear();
-		PtrLocker<IUrlRequestListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onResponse(this, m_responseStatus);
-		}
+		m_onResponse(this, m_responseStatus);
 	}
 	
 	void UrlRequest::onReceiveContent(const void* data, sl_size len, const Memory& mem)
@@ -501,10 +449,6 @@ namespace slib
 			m_sizeContentReceived += len;
 		}
 		m_onReceiveContent(this, data, len);
-		PtrLocker<IUrlRequestListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onReceiveContent(this, data, len);
-		}
 	}
 	
 	void UrlRequest::onDownloadContent(sl_uint64 size)
@@ -513,10 +457,7 @@ namespace slib
 			return;
 		}
 		m_sizeContentReceived += size;
-		PtrLocker<IUrlRequestListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onDownloadContent(this, size);
-		}
+		m_onDownloadContent(this, size);
 	}
 	
 	void UrlRequest::onUploadBody(sl_uint64 size)
@@ -524,10 +465,7 @@ namespace slib
 		if (m_flagClosed) {
 			return;
 		}
-		PtrLocker<IUrlRequestListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onUploadBody(this, size);
-		}
+		m_onUploadBody(this, size);
 	}
 	
 	void UrlRequest::_runCallback(const Function<void(UrlRequest*)>& callback)

@@ -39,26 +39,6 @@ namespace slib
 
 	class UrlRequest;
 	
-	class SLIB_EXPORT IUrlRequestListener
-	{
-	public:
-		IUrlRequestListener();
-
-		virtual ~IUrlRequestListener();
-
-	public:
-		virtual void onComplete(UrlRequest* request);
-		
-		virtual void onResponse(UrlRequest* request, HttpStatus status);
-		
-		virtual void onReceiveContent(UrlRequest* request, const void* data, sl_size len);
-		
-		virtual void onDownloadContent(UrlRequest* request, sl_uint64 len);
-		
-		virtual void onUploadBody(UrlRequest* request, sl_uint64 len);
-		
-	};
-	
 	class SLIB_EXPORT UrlRequestParam
 	{
 	public:
@@ -69,9 +49,11 @@ namespace slib
 		Memory requestBody;
 		String downloadFilePath;
 		
-		Ptr<IUrlRequestListener> listener;
 		Function<void(UrlRequest*)> onComplete;
-		Function<void(UrlRequest*, const void*, sl_size)> onReceiveContent;
+		Function<void(UrlRequest*, HttpStatus)> onResponse;
+		Function<void(UrlRequest*, const void* data, sl_size len)> onReceiveContent;
+		Function<void(UrlRequest*, sl_uint64 len)> onDownloadContent;
+		Function<void(UrlRequest*, sl_uint64 len)> onUploadBody;
 		Ref<Dispatcher> dispatcher;
 		
 		sl_bool flagUseBackgroundSession;
@@ -233,14 +215,6 @@ namespace slib
 		String getResponseHeader(const String& name);
 		
 		
-		const Ptr<IUrlRequestListener>& getListener();
-		
-		const Function<void(UrlRequest*)>& getOnComplete();
-		
-		const Function<void(UrlRequest*, const void*, sl_size)>& getOnReceiveContent();
-		
-		const Ref<Dispatcher>& getDispatcher();
-		
 		sl_bool isUsingBackgroundSession();
 		
 		sl_bool isSelfAlive();
@@ -307,10 +281,13 @@ namespace slib
 		AtomicString m_responseMessage;
 		Atomic<HttpHeaderMap> m_responseHeaders;
 		
-		Ptr<IUrlRequestListener> m_listener;
 		Function<void(UrlRequest*)> m_onComplete;
-		Function<void(UrlRequest*, const void*, sl_size)> m_onReceiveContent;
+		Function<void(UrlRequest*, HttpStatus)> m_onResponse;
+		Function<void(UrlRequest*, const void* data, sl_size len)> m_onReceiveContent;
+		Function<void(UrlRequest*, sl_uint64 len)> m_onDownloadContent;
+		Function<void(UrlRequest*, sl_uint64 len)> m_onUploadBody;
 		Ref<Dispatcher> m_dispatcher;
+		
 		sl_bool m_flagUseBackgroundSession;
 		sl_bool m_flagSelfAlive;
 		sl_bool m_flagStoreResponseContent;
