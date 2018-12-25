@@ -760,10 +760,8 @@ namespace slib
 		
 		do {
 			
-			if (m_param.onRequest.isNotNull()) {
-				if (m_param.onRequest(this, context.get())) {
-					break;
-				}
+			if (dispatchRequest(context.get())) {
+				break;
 			}
 		
 			if (m_param.flagUseWebRoot) {
@@ -816,13 +814,12 @@ namespace slib
 				}
 			}
 			
-			context->setResponseCode(HttpStatus::NotFound);
-			onPostProcessRequest(context, sl_false);
+			dispatchPostRequest(context.get(), sl_false);
 			return;
 		
 		} while (0);
 		
-		onPostProcessRequest(context, sl_true);
+		dispatchPostRequest(context.get(), sl_true);
 		
 	}
 
@@ -973,9 +970,33 @@ namespace slib
 		context->setResponseCode(HttpStatus::PartialContent);
 		return sl_true;
 	}
-
-	void HttpService::onPostProcessRequest(const Ref<HttpServiceContext>& context, sl_bool flagProcessed)
+	
+	sl_bool HttpService::onRequest(HttpServiceContext* context)
 	{
+		return sl_false;
+	}
+	
+	sl_bool HttpService::dispatchRequest(HttpServiceContext* context)
+	{
+		if (m_param.onRequest.isNotNull()) {
+			if (m_param.onRequest(this, context)) {
+				return sl_true;
+			}
+		}
+		return onRequest(context);
+	}
+	
+	void HttpService::onPostRequest(HttpServiceContext* context, sl_bool flagProcessed)
+	{
+	}
+	
+	void HttpService::dispatchPostRequest(HttpServiceContext* context, sl_bool flagProcessed)
+	{
+		if (!flagProcessed) {
+			context->setResponseCode(HttpStatus::NotFound);
+		}
+		m_param.onPostRequest(this, context, flagProcessed);
+		onPostRequest(context, flagProcessed);
 		if (m_param.flagAlwaysRespondAcceptRangesHeader) {
 			if (context->getMethod() == HttpMethod::GET) {
 				context->setResponseAcceptRangesIfNotDefined(sl_false);

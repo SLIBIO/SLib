@@ -190,7 +190,7 @@ namespace slib
 		WeakRef<HttpService> m_service;
 		
 	};
-		
+	
 	class SLIB_EXPORT HttpServiceParam
 	{
 	public:
@@ -215,7 +215,8 @@ namespace slib
 		sl_bool flagLogDebug;
 		
 		Function<sl_bool(HttpService*, HttpServiceContext*)> onRequest;
-		
+		Function<void(HttpService*, HttpServiceContext*, sl_bool flagProcessed)> onPostRequest;
+
 	public:
 		HttpServiceParam();
 		
@@ -266,7 +267,13 @@ namespace slib
 		virtual void closeConnection(HttpServiceConnection* connection);
 		
 	protected:
-		virtual void onPostProcessRequest(const Ref<HttpServiceContext>& context, sl_bool flagProcessed);
+		virtual sl_bool onRequest(HttpServiceContext* context);
+		
+		sl_bool dispatchRequest(HttpServiceContext* context);
+		
+		virtual void onPostRequest(HttpServiceContext* context, sl_bool flagProcessed);
+		
+		void dispatchPostRequest(HttpServiceContext* context, sl_bool flagProcessed);
 		
 	public:
 		void addConnectionProvider(const Ref<HttpServiceConnectionProvider>& provider);

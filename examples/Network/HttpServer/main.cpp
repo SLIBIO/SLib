@@ -45,7 +45,7 @@ int main(int argc, const char * argv[])
 	param.flagLogDebug = conf["debug"].getBoolean(sl_false);
 	param.webRootPath = conf["root"].getString();
 
-	param.onRequest = [](HttpService* service, HttpServiceContext* context) {
+	param.onRequest = [](HttpService*, HttpServiceContext* context) {
 		if (context->getPath() != "/") {
 			return sl_false;
 		}
@@ -59,6 +59,13 @@ int main(int argc, const char * argv[])
 		Console::println("");
 		context->write("Welcome");
 		return sl_true;
+	};
+	
+	param.onPostRequest = [](HttpService*, HttpServiceContext* context, sl_bool flagProcessed) {
+		if (!flagProcessed) {
+			context->setResponseCode(HttpStatus::NotFound);
+			context->write("Not found the specified file!");
+		}
 	};
 	
 	Ref<HttpService> service = HttpService::create(param);
