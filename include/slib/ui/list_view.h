@@ -27,6 +27,8 @@
 
 #include "scroll_view.h"
 
+#include "../core/ptr.h"
+
 namespace slib
 {
 	class ListView;
@@ -67,7 +69,6 @@ namespace slib
 		}
 		
 	};
-	
 	
 	
 	class _priv_ListContentView;

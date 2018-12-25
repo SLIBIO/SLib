@@ -27,7 +27,6 @@
 
 #include "object.h"
 #include "function.h"
-#include "ptr.h"
 #include "hash_map.h"
 #include "math.h"
 #include "interpolation.h"

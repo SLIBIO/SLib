@@ -30,7 +30,6 @@
 #include "cursor.h"
 
 #include "../core/object.h"
-#include "../core/ptr.h"
 #include "../core/function.h"
 #include "../core/animation.h"
 #include "../core/time.h"
