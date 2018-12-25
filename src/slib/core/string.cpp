@@ -7633,6 +7633,18 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 						sl_bool flagError = sl_false;
 						
 						if (arg.isTime()) {
+							const TimeZone* zone;
+							if (ch == 'u' || ch == 'U') {
+								zone = &(TimeZone::UTC());
+								if (pos < len) {
+									ch = format[pos];
+									pos++;
+								} else {
+									ch = 's';
+								}
+							} else {
+								zone = &(TimeZone::Local);
+							}
 							ST content;
 							Time time = arg.getTime();
 							switch (ch) {
@@ -7643,9 +7655,9 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 												minWidth = 4;
 											}
 										}
-										content = ST::fromInt32(time.getYear(), 10, minWidth);
+										content = ST::fromInt32(time.getYear(*zone), 10, minWidth);
 									} else {
-										content = ST::fromInt32(time.getYear());
+										content = ST::fromInt32(time.getYear(*zone));
 									}
 									break;
 								case 'm':
@@ -7655,9 +7667,9 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 												minWidth = 2;
 											}
 										}
-										content = ST::fromInt32(time.getMonth(), 10, minWidth);
+										content = ST::fromInt32(time.getMonth(*zone), 10, minWidth);
 									} else {
-										content = ST::fromInt32(time.getMonth());
+										content = ST::fromInt32(time.getMonth(*zone));
 									}
 									break;
 								case 'd':
@@ -7667,16 +7679,16 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 												minWidth = 2;
 											}
 										}
-										content = ST::fromInt32(time.getDay(), 10, minWidth);
+										content = ST::fromInt32(time.getDay(*zone), 10, minWidth);
 									} else {
-										content = ST::fromInt32(time.getDay());
+										content = ST::fromInt32(time.getDay(*zone));
 									}
 									break;
 								case 'w':
-									content = time.getWeekday(sl_true);
+									content = time.getWeekday(sl_true, *zone);
 									break;
 								case 'W':
-									content = time.getWeekday(sl_false);
+									content = time.getWeekday(sl_false, *zone);
 									break;
 								case 'H':
 									if (flagZeroPadded) {
@@ -7685,9 +7697,9 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 												minWidth = 2;
 											}
 										}
-										content = ST::fromInt32(time.getHour(), 10, minWidth);
+										content = ST::fromInt32(time.getHour(*zone), 10, minWidth);
 									} else {
-										content = ST::fromInt32(time.getHour());
+										content = ST::fromInt32(time.getHour(*zone));
 									}
 									break;
 								case 'M':
@@ -7697,9 +7709,9 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 												minWidth = 2;
 											}
 										}
-										content = ST::fromInt32(time.getMinute(), 10, minWidth);
+										content = ST::fromInt32(time.getMinute(*zone), 10, minWidth);
 									} else {
-										content = ST::fromInt32(time.getMinute());
+										content = ST::fromInt32(time.getMinute(*zone));
 									}
 									break;
 								case 'S':
@@ -7709,9 +7721,9 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 												minWidth = 2;
 											}
 										}
-										content = ST::fromInt32(time.getSecond(), 10, minWidth);
+										content = ST::fromInt32(time.getSecond(*zone), 10, minWidth);
 									} else {
-										content = ST::fromInt32(time.getSecond());
+										content = ST::fromInt32(time.getSecond(*zone));
 									}
 									break;
 								case 'l':
@@ -7723,23 +7735,23 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 									break;
 								case 'D':
 									if (sizeof(CT) == 1) {
-										content = time.getDateString();
+										content = time.getDateString(*zone);
 									} else {
-										content = time.getDateString16();
+										content = time.getDateString16(*zone);
 									}
 									break;
 								case 'T':
 									if (sizeof(CT) == 1) {
-										content = time.getTimeString();
+										content = time.getTimeString(*zone);
 									} else {
-										content = time.getTimeString16();
+										content = time.getTimeString16(*zone);
 									}
 									break;
 								case 's':
 									if (sizeof(CT) == 1) {
-										content = time.toString();
+										content = time.toString(*zone);
 									} else {
-										content = time.toString16();
+										content = time.toString16(*zone);
 									}
 									break;
 								default:
