@@ -361,9 +361,7 @@ namespace slib
 		
 		void removeAllViews();
 
-	public:
-		SLIB_PROPERTY(AtomicPtr<IWindowListener>, EventListener)
-		
+	public:		
 		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnCreate)
 		
 		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnCreateFailed)

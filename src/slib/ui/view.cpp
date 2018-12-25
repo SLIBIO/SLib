@@ -6965,24 +6965,6 @@ namespace slib
 		return Timer::startWithDispatcher(getDispatcher(), task, interval_ms);
 	}
 	
-	Ptr<IViewListener> View::getEventListener()
-	{
-		Ref<EventAttributes>& attrs = m_eventAttrs;
-		if (attrs.isNotNull()) {
-			return attrs->listener;
-		}
-		return sl_null;
-	}
-
-	void View::setEventListener(const Ptr<IViewListener>& listener)
-	{
-		_initializeEventAttributes();
-		Ref<EventAttributes>& attrs = m_eventAttrs;
-		if (attrs.isNotNull()) {
-			attrs->listener = listener;
-		}
-	}
-
 	Function<void(View*)> View::getOnAttach()
 	{
 		Ref<EventAttributes>& attrs = m_eventAttrs;
@@ -7199,6 +7181,24 @@ namespace slib
 			attrs->resize = callback;
 		}
 	}
+	
+	Function<void(View*, Visibility, Visibility)> View::getOnChangeVisibility()
+	{
+		Ref<EventAttributes>& attrs = m_eventAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->changeVisibility;
+		}
+		return sl_null;
+	}
+	
+	void View::setOnChangeVisibility(const Function<void(View*, Visibility oldVisibility, Visibility newVisibility)>& callback)
+	{
+		_initializeEventAttributes();
+		Ref<EventAttributes>& attrs = m_eventAttrs;
+		if (attrs.isNotNull()) {
+			attrs->changeVisibility = callback;
+		}
+	}
 
 	Function<void(View*, sl_scroll_pos, sl_scroll_pos)> View::getOnScroll()
 	{
@@ -7277,10 +7277,6 @@ namespace slib
 		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->attach)(this);
-			PtrLocker<IViewListener> listener(eventAttrs->listener);
-			if (listener.isNotNull()) {
-				listener->onAttach(this);
-			}
 		}
 		onAttach();
 		_attachNativeAnimations();
@@ -7291,10 +7287,6 @@ namespace slib
 		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->detach)(this);
-			PtrLocker<IViewListener> listener(eventAttrs->listener);
-			if (listener.isNotNull()) {
-				listener->onDetach(this);
-			}
 		}
 		onDetach();
 	}
@@ -7601,13 +7593,6 @@ namespace slib
 			if (ev->isPreventedDefault()) {
 				return;
 			}
-			PtrLocker<IViewListener> listener(eventAttrs->listener);
-			if (listener.isNotNull()) {
-				listener->onMouseEvent(this, ev);
-				if (ev->isPreventedDefault()) {
-					return;
-				}
-			}
 		}
 
 		onMouseEvent(ev);
@@ -7809,17 +7794,6 @@ namespace slib
 			(eventAttrs->mouse)(this, ev);
 			if (ev->isPreventedDefault()) {
 				return;
-			}
-			PtrLocker<IViewListener> listener(eventAttrs->listener);
-			if (listener.isNotNull()) {
-				listener->onTouchEvent(this, ev);
-				if (ev->isPreventedDefault()) {
-					return;
-				}
-				listener->onMouseEvent(this, ev);
-				if (ev->isPreventedDefault()) {
-					return;
-				}
 			}
 		}
 
@@ -8121,13 +8095,6 @@ namespace slib
 			if (ev->isPreventedDefault()) {
 				return;
 			}
-			PtrLocker<IViewListener> listener(eventAttrs->listener);
-			if (listener.isNotNull()) {
-				listener->onMouseWheelEvent(this, ev);
-				if (ev->isPreventedDefault()) {
-					return;
-				}
-			}
 		}
 		
 		onMouseWheelEvent(ev);
@@ -8208,13 +8175,6 @@ namespace slib
 			if (ev->isPreventedDefault()) {
 				return;
 			}
-			PtrLocker<IViewListener> listener(eventAttrs->listener);
-			if (listener.isNotNull()) {
-				listener->onKeyEvent(this, ev);
-				if (ev->isPreventedDefault()) {
-					return;
-				}
-			}
 		}
 		
 		onKeyEvent(ev);
@@ -8278,13 +8238,6 @@ namespace slib
 		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
 			(eventAttrs->click)(this);
-			PtrLocker<IViewListener> listener(eventAttrs->listener);
-			if (listener.isNotNull()) {
-				listener->onClick(this, ev);
-				if (ev->isPreventedDefault()) {
-					return;
-				}
-			}
 		}
 		
 		onClick(ev);
@@ -8336,13 +8289,6 @@ namespace slib
 			(eventAttrs->setCursor)(this, ev);
 			if (ev->isPreventedDefault()) {
 				return;
-			}
-			PtrLocker<IViewListener> listener(eventAttrs->listener);
-			if (listener.isNotNull()) {
-				listener->onSetCursor(this, ev);
-				if (ev->isPreventedDefault()) {
-					return;
-				}
 			}
 		}
 		
@@ -8404,10 +8350,6 @@ namespace slib
 		onResize(width, height);
 		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
-			PtrLocker<IViewListener> listener(eventAttrs->listener);
-			if (listener.isNotNull()) {
-				listener->onResize(this, width, height);
-			}
 			(eventAttrs->resize)(this, width, height);
 		}
 		Ref<View> parent = getParent();
@@ -8421,10 +8363,7 @@ namespace slib
 		onChangeVisibility(oldVisibility, newVisibility);
 		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
-			PtrLocker<IViewListener> listener(eventAttrs->listener);
-			if (listener.isNotNull()) {
-				listener->onChangeVisibility(this, oldVisibility, newVisibility);
-			}
+			(eventAttrs->changeVisibility)(this, oldVisibility, newVisibility);
 		}
 		Ref<View> parent = getParent();
 		if (parent.isNotNull()) {
@@ -8437,10 +8376,6 @@ namespace slib
 		onScroll(x, y);
 		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
-			PtrLocker<IViewListener> listener(eventAttrs->listener);
-			if (listener.isNotNull()) {
-				listener->onScroll(this, x, y);
-			}
 			(eventAttrs->scroll)(this, x, y);
 		}
 	}
@@ -8450,10 +8385,6 @@ namespace slib
 		onSwipe(ev);
 		Ref<EventAttributes>& eventAttrs = m_eventAttrs;
 		if (eventAttrs.isNotNull()) {
-			PtrLocker<IViewListener> listener(eventAttrs->listener);
-			if (listener.isNotNull()) {
-				listener->onSwipe(this, ev);
-			}
 			(eventAttrs->swipe)(this, ev);
 		}
 	}

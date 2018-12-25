@@ -1225,10 +1225,6 @@ namespace slib
 	void Window::dispatchClose(UIEvent* ev)
 	{
 		onClose(ev);
-		PtrLocker<IWindowListener> listener(getEventListener());
-		if (listener.isNotNull()) {
-			listener->onClose(this, ev);
-		}
 		getOnClose()(this,ev);
 		if (ev->isPreventedDefault()) {
 			return;
@@ -1240,10 +1236,6 @@ namespace slib
 	void Window::dispatchDestroy()
 	{
 		onDestroy();
-		PtrLocker<IWindowListener> listener(getEventListener());
-		if (listener.isNotNull()) {
-			listener->onCancel(this);
-		}
 		getOnDestroy()(this);
 		if (m_flagStateDoModal) {
 			m_flagStateDoModal = sl_false;
@@ -1254,30 +1246,18 @@ namespace slib
 	void Window::dispatchActivate()
 	{
 		onActivate();
-		PtrLocker<IWindowListener> listener(getEventListener());
-		if (listener.isNotNull()) {
-			listener->onActivate(this);
-		}
 		getOnActivate()(this);
 	}
 
 	void Window::dispatchDeactivate()
 	{
 		onDeactivate();
-		PtrLocker<IWindowListener> listener(getEventListener());
-		if (listener.isNotNull()) {
-			listener->onDeactivate(this);
-		}
 		getOnDeactivate()(this);
 	}
 
 	void Window::dispatchMove()
 	{
 		onMove();
-		PtrLocker<IWindowListener> listener(getEventListener());
-		if (listener.isNotNull()) {
-			listener->onMove(this);
-		}
 		getOnMove()(this);
 	}
 	
@@ -1285,10 +1265,6 @@ namespace slib
 	{
 		_constrainSize(size, m_flagStateResizingWidth);
 		onResizing(size);
-		PtrLocker<IWindowListener> listener(getEventListener());
-		if (listener.isNotNull()) {
-			listener->onResizing(this, size);
-		}
 		getOnResizing()(this, size);
 	}
 
@@ -1304,30 +1280,18 @@ namespace slib
 			}
 		}
 		onResize(clientWidth, clientHeight);
-		PtrLocker<IWindowListener> listener(getEventListener());
-		if (listener.isNotNull()) {
-			listener->onResize(this, clientWidth, clientHeight);
-		}
 		getOnResize()(this, clientWidth, clientHeight);
 	}
 
 	void Window::dispatchMinimize()
 	{
 		onMinimize();
-		PtrLocker<IWindowListener> listener(getEventListener());
-		if (listener.isNotNull()) {
-			listener->onMinimize(this);
-		}
 		getOnMinimize()(this);
 	}
 
 	void Window::dispatchDeminimize()
 	{
 		onDeminimize();
-		PtrLocker<IWindowListener> listener(getEventListener());
-		if (listener.isNotNull()) {
-			listener->onDeminimize(this);
-		}
 		getOnDeminimize()(this);
 	}
 
@@ -1335,10 +1299,6 @@ namespace slib
 	{
 		_refreshSize();
 		onMaximize();
-		PtrLocker<IWindowListener> listener(getEventListener());
-		if (listener.isNotNull()) {
-			listener->onMaximize(this);
-		}
 		getOnMaximize()(this);
 	}
 
@@ -1346,10 +1306,6 @@ namespace slib
 	{
 		_refreshSize();
 		onDemaximize();
-		PtrLocker<IWindowListener> listener(getEventListener());
-		if (listener.isNotNull()) {
-			listener->onDemaximize(this);
-		}
 		getOnDemaximize()(this);
 	}
 

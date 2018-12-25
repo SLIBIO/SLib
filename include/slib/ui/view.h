@@ -1163,10 +1163,6 @@ namespace slib
 		Ref<Timer> startTimer(const Function<void(Timer*)>& task, sl_uint32 interval_ms);
 
 	public:
-		Ptr<IViewListener> getEventListener();
-		
-		void setEventListener(const Ptr<IViewListener>& listener);
-		
 		Function<void(View*)> getOnAttach();
 		
 		void setOnAttach(const Function<void(View*)>& callback);
@@ -1215,8 +1211,12 @@ namespace slib
 		
 		void setOnResize(const Function<void(View*, sl_ui_len, sl_ui_len)>& callback);
 		
-		Function<void(View*, sl_scroll_pos, sl_scroll_pos)> getOnScroll();
+		Function<void(View*, Visibility, Visibility)> getOnChangeVisibility();
 		
+		void setOnChangeVisibility(const Function<void(View*, Visibility oldVisibility, Visibility newVisibility)>& callback);
+		
+		Function<void(View*, sl_scroll_pos, sl_scroll_pos)> getOnScroll();
+
 		void setOnScroll(const Function<void(View*, sl_scroll_pos, sl_scroll_pos)>& callback);
 		
 		Function<void(View*, GestureEvent*)> getOnSwipe();
@@ -1680,7 +1680,6 @@ namespace slib
 		class EventAttributes : public Referable
 		{
 		public:
-			AtomicPtr<IViewListener> listener;
 			AtomicFunction<void(View*)> attach;
 			AtomicFunction<void(View*)> detach;
 			AtomicFunction<void(View*, Canvas*)> draw;
@@ -1693,6 +1692,7 @@ namespace slib
 			AtomicFunction<void(View*)> click;
 			AtomicFunction<void(View*, UIEvent*)> setCursor;
 			AtomicFunction<void(View*, sl_ui_len, sl_ui_len)> resize;
+			AtomicFunction<void(View*, Visibility, Visibility)> changeVisibility;
 			AtomicFunction<void(View*, sl_scroll_pos, sl_scroll_pos)> scroll;
 			AtomicFunction<void(View*, GestureEvent*)> swipe;
 			AtomicFunction<void(View*, UIEvent*)> ok;
