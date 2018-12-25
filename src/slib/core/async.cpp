@@ -1121,26 +1121,6 @@ namespace slib
 /*************************************
 		AsyncCopy
 **************************************/
-	IAsyncCopyListener::IAsyncCopyListener()
-	{
-	}
-
-	IAsyncCopyListener::~IAsyncCopyListener()
-	{
-	}
-
-	Memory IAsyncCopyListener::onAsyncCopyRead(AsyncCopy* task, const Memory& input)
-	{
-		return input;
-	}
-
-	void IAsyncCopyListener::onAsyncCopyWrite(AsyncCopy* task)
-	{
-	}
-
-	void IAsyncCopyListener::onAsyncCopyExit(AsyncCopy* task)
-	{
-	}
 
 	AsyncCopyParam::AsyncCopyParam()
 	{
@@ -1192,8 +1172,9 @@ namespace slib
 		if (ret.isNotNull()) {
 			ret->m_source = param.source;
 			ret->m_target = param.target;
-			ret->m_listener = param.listener;
-			ret->m_callback = param.callback;
+			ret->m_onRead = param.onRead;
+			ret->m_onWrite = param.onWrite;
+			ret->m_onEnd = param.onEnd;
 			ret->m_sizeTotal = param.size;
 			for (sl_uint32 i = 0; i < param.bufferCount; i++) {
 				Memory mem = Memory::create(param.bufferSize);
@@ -1234,10 +1215,7 @@ namespace slib
 		ObjectLocker lock(this);
 		if (m_flagRunning) {
 			m_flagRunning = sl_false;
-			PtrLocker<IAsyncCopyListener> listener(m_listener);
-			if (listener.isNotNull()) {
-				listener->onAsyncCopyExit(this);
-			}
+			dispatchEnd();
 			m_source.setNull();
 			m_target.setNull();
 			m_bufferReading.setNull();
@@ -1327,10 +1305,7 @@ namespace slib
 			if (memWrite.isNull()) {
 				m_flagReadError = sl_true;
 			} else {
-				PtrLocker<IAsyncCopyListener> listener(m_listener);
-				if (listener.isNotNull()) {
-					memWrite = listener->onAsyncCopyRead(this, memWrite);
-				}
+				memWrite = dispatchRead(memWrite);
 				if (memWrite.isNotNull()) {
 					bufferReading->memWrite = memWrite;
 					m_buffersWrite.pushBack(bufferReading);
@@ -1362,16 +1337,12 @@ namespace slib
 			m_sizeWritten += result->size;
 			bufferWriting->memWrite.setNull();
 			m_buffersRead.pushBack(bufferWriting);
-			PtrLocker<IAsyncCopyListener> listener(m_listener);
-			if (listener.isNotNull()) {
-				listener->onAsyncCopyWrite(this);
-			}
-			m_callback(this);
+			dispatchWrite();
 		}
 
 		enqueue();
 	}
-
+	
 	void AsyncCopy::enqueue()
 	{
 		if (!m_flagRunning) {
@@ -1446,6 +1417,25 @@ namespace slib
 
 		m_flagEnqueue = sl_false;
 
+	}
+	
+	Memory AsyncCopy::dispatchRead(const Memory& input)
+	{
+		if (m_onRead.isNotNull()) {
+			return m_onRead(this, input);
+		} else {
+			return input;
+		}
+	}
+	
+	void AsyncCopy::dispatchWrite()
+	{
+		m_onWrite(this);
+	}
+	
+	void AsyncCopy::dispatchEnd()
+	{
+		m_onEnd(this, isErrorOccured());
 	}
 
 
@@ -1637,22 +1627,7 @@ namespace slib
 /**********************************************
 				AsyncOutput
 **********************************************/
-	IAsyncOutputListener::IAsyncOutputListener()
-	{
-	}
-
-	IAsyncOutputListener::~IAsyncOutputListener()
-	{
-	}
-
-	void IAsyncOutputListener::onAsyncOutputError(AsyncOutput* output)
-	{
-	}
-
-	void IAsyncOutputListener::onAsyncOutputComplete(AsyncOutput* output)
-	{
-	}
-
+	
 	AsyncOutputParam::AsyncOutputParam()
 	{
 		bufferSize = 0x10000;
@@ -1708,8 +1683,7 @@ namespace slib
 			ret->m_streamOutput = param.stream;
 			ret->m_bufferSize = param.bufferSize;
 			ret->m_bufferCount = param.bufferCount;
-			ret->m_listener = param.listener;
-			ret->m_callback = param.callback;
+			ret->m_onEnd = param.onEnd;
 			ret->m_bufWrite = buffer;
 			return ret;
 		}
@@ -1774,7 +1748,7 @@ namespace slib
 				param.size = sizeBody;
 				param.bufferSize = m_bufferSize;
 				param.bufferCount = m_bufferCount;
-				param.listener.setWeak(this);
+				param.onEnd = SLIB_FUNCTION_WEAKREF(AsyncOutput, onAsyncCopyEnd, this);
 				Ref<AsyncCopy> copy = AsyncCopy::create(param);
 				if (copy.isNotNull()) {
 					m_copy = copy;
@@ -1786,17 +1760,13 @@ namespace slib
 		}
 	}
 
-	void AsyncOutput::onAsyncCopyExit(AsyncCopy* task)
+	void AsyncOutput::onAsyncCopyEnd(AsyncCopy* task, sl_bool flagError)
 	{
 		m_flagWriting = sl_false;
-		if (task->isErrorOccured()) {
+		if (flagError || !(task->isCompleted())) {
 			_onError();
-			return;
-		}
-		if (task->isCompleted()) {
-			_write(sl_true);
 		} else {
-			_onError();
+			_write(sl_true);
 		}
 	}
 
@@ -1812,18 +1782,12 @@ namespace slib
 
 	void AsyncOutput::_onError()
 	{
-		PtrLocker<IAsyncOutputListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onAsyncOutputError(this);
-		}
+		m_onEnd(this, sl_true);
 	}
 
 	void AsyncOutput::_onComplete()
 	{
-		PtrLocker<IAsyncOutputListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onAsyncOutputComplete(this);
-		}
+		m_onEnd(this, sl_false);
 	}
 
 

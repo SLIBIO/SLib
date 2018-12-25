@@ -189,7 +189,7 @@ namespace slib
 				if (ret.isNotNull()) {
 					AsyncOutputParam op;
 					op.stream = io;
-					op.listener.setWeak(ret);
+					op.onEnd = SLIB_FUNCTION_WEAKREF(HttpServiceConnection, onAsyncOutputEnd, ret);
 					op.bufferSize = SIZE_COPY_BUF;
 					Ref<AsyncOutput> output = AsyncOutput::create(op);
 					if (output.isNotNull()) {
@@ -425,16 +425,11 @@ namespace slib
 		}
 	}
 
-	void HttpServiceConnection::onAsyncOutputComplete(AsyncOutput* output)
+	void HttpServiceConnection::onAsyncOutputEnd(AsyncOutput* output, sl_bool flagError)
 	{
-		if (!m_flagKeepAlive) {
+		if (flagError || !m_flagKeepAlive) {
 			close();
 		}
-	}
-
-	void HttpServiceConnection::onAsyncOutputError(AsyncOutput* output)
-	{
-		close();
 	}
 
 	void HttpServiceConnection::sendResponse(const Memory& mem)

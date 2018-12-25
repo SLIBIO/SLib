@@ -532,24 +532,7 @@ namespace slib
 
 	};
 	
-	
 	class AsyncCopy;
-	
-	class SLIB_EXPORT IAsyncCopyListener
-	{
-	public:
-		IAsyncCopyListener();
-
-		virtual ~IAsyncCopyListener();
-
-	public:
-		virtual Memory onAsyncCopyRead(AsyncCopy* task, const Memory& input);
-
-		virtual void onAsyncCopyWrite(AsyncCopy* task);
-
-		virtual void onAsyncCopyExit(AsyncCopy* task);
-
-	};
 	
 	class SLIB_EXPORT AsyncCopyParam
 	{
@@ -564,9 +547,10 @@ namespace slib
 		sl_uint32 bufferCount; // default: 8
 		sl_bool flagAutoStart; // default: true
 
-		Ptr<IAsyncCopyListener> listener;
-		Function<void(AsyncCopy*)> callback;
-	
+		Function<Memory(AsyncCopy*, const Memory& input)> onRead;
+		Function<void(AsyncCopy*)> onWrite;
+		Function<void(AsyncCopy*, sl_bool flagError)> onEnd;
+
 	public:
 		AsyncCopyParam();
 
@@ -621,12 +605,19 @@ namespace slib
 		void onWriteStream(AsyncStreamResult* result);
 	
 		void enqueue();
+		
+		Memory dispatchRead(const Memory& input);
+		
+		void dispatchWrite();
+		
+		void dispatchEnd();
 	
 	private:
 		Ref<AsyncStream> m_source;
 		Ref<AsyncStream> m_target;
-		Ptr<IAsyncCopyListener> m_listener;
-		Function<void(AsyncCopy*)> m_callback;
+		Function<Memory(AsyncCopy*, const Memory& input)> m_onRead;
+		Function<void(AsyncCopy*)> m_onWrite;
+		Function<void(AsyncCopy*, sl_bool flagError)> m_onEnd;
 		sl_uint64 m_sizeRead;
 		sl_uint64 m_sizeWritten;
 		sl_uint64 m_sizeTotal;
@@ -713,22 +704,7 @@ namespace slib
 		friend class AsyncOutput;
 	};
 	
-	
 	class AsyncOutput;
-	
-	class SLIB_EXPORT IAsyncOutputListener
-	{
-	public:
-		IAsyncOutputListener();
-
-		virtual ~IAsyncOutputListener();
-
-	public:
-		virtual void onAsyncOutputError(AsyncOutput* output);
-
-		virtual void onAsyncOutputComplete(AsyncOutput* output);
-
-	};
 	
 	class AsyncOutputParam
 	{
@@ -739,8 +715,7 @@ namespace slib
 		sl_uint32 bufferSize;
 		sl_uint32 bufferCount;
 
-		Ptr<IAsyncOutputListener> listener;
-		Function<void(AsyncOutput*)> callback;
+		Function<void(AsyncOutput*, sl_bool flagError)> onEnd;
 
 	public:
 		AsyncOutputParam();
@@ -749,7 +724,7 @@ namespace slib
 
 	};
 	
-	class SLIB_EXPORT AsyncOutput : public AsyncOutputBuffer, public IAsyncCopyListener
+	class SLIB_EXPORT AsyncOutput : public AsyncOutputBuffer
 	{
 		SLIB_DECLARE_OBJECT
 
@@ -768,10 +743,9 @@ namespace slib
 
 		void close();
 
-	protected:
-		void onAsyncCopyExit(AsyncCopy* task) override;
-	
 	private:
+		void onAsyncCopyEnd(AsyncCopy* task, sl_bool flagError);
+		
 		void onWriteStream(AsyncStreamResult* result);
 
 	protected:
@@ -786,8 +760,7 @@ namespace slib
 		sl_uint32 m_bufferSize;
 		sl_uint32 m_bufferCount;
 	
-		Ptr<IAsyncOutputListener> m_listener;
-		Function<void(AsyncOutput*)> m_callback;
+		Function<void(AsyncOutput*, sl_bool)> m_onEnd;
 
 		Ref<AsyncOutputBufferElement> m_elementWriting;
 		Ref<AsyncCopy> m_copy;

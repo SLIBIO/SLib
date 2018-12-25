@@ -97,7 +97,7 @@ namespace slib
 		
 	};
 	
-	class SLIB_EXPORT HttpServiceConnection : public Object, public IAsyncOutputListener, public IClosable
+	class SLIB_EXPORT HttpServiceConnection : public Object, public IClosable
 	{
 	protected:
 		HttpServiceConnection();
@@ -163,10 +163,8 @@ namespace slib
 		
 	protected:
 		void onReadStream(AsyncStreamResult* result);
-		
-		void onAsyncOutputComplete(AsyncOutput* output) override;
-		
-		void onAsyncOutputError(AsyncOutput* output) override;
+
+		void onAsyncOutputEnd(AsyncOutput* output, sl_bool flagError);
 		
 		friend class HttpServiceContext;
 		
