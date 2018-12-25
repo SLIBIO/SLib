@@ -190,19 +190,7 @@ namespace slib
 		WeakRef<HttpService> m_service;
 		
 	};
-	
-	
-	class SLIB_EXPORT IHttpServiceProcessor
-	{
-	public:
-		IHttpServiceProcessor();
-
-		virtual ~IHttpServiceProcessor();
-
-	public:
-		virtual sl_bool onHttpRequest(const Ref<HttpServiceContext>& context) = 0;
-	};
-	
+		
 	class SLIB_EXPORT HttpServiceParam
 	{
 	public:
@@ -226,8 +214,7 @@ namespace slib
 		
 		sl_bool flagLogDebug;
 		
-		Ptr<IHttpServiceProcessor> processor;
-		Function<sl_bool(HttpService*, HttpServiceContext* context)> onRequest;
+		Function<sl_bool(HttpService*, HttpServiceContext*)> onRequest;
 		
 	public:
 		HttpServiceParam();
@@ -282,13 +269,6 @@ namespace slib
 		virtual void onPostProcessRequest(const Ref<HttpServiceContext>& context, sl_bool flagProcessed);
 		
 	public:
-		void addProcessor(const Ptr<IHttpServiceProcessor>& processor);
-		
-		void removeProcessor(const Ptr<IHttpServiceProcessor>& processor);
-		
-		List< Ptr<IHttpServiceProcessor> > getProcessors();
-		
-		
 		void addConnectionProvider(const Ref<HttpServiceConnectionProvider>& provider);
 		
 		void removeConnectionProvider(const Ref<HttpServiceConnectionProvider>& provider);
@@ -311,8 +291,6 @@ namespace slib
 		
 		CHashMap< HttpServiceConnection*, Ref<HttpServiceConnection> > m_connections;
 		
-		CList< Ptr<IHttpServiceProcessor> > m_processors;
-		AtomicList< Ptr<IHttpServiceProcessor> > m_processorsCached;
 		CList< Ref<HttpServiceConnectionProvider> > m_connectionProviders;
 		
 		HttpServiceParam m_param;

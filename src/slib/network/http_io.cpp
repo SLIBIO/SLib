@@ -166,14 +166,6 @@ namespace slib
 						HttpContentReader
 ***********************************************************************/
 
-	IHttpContentReaderListener::IHttpContentReaderListener()
-	{
-	}
-
-	IHttpContentReaderListener::~IHttpContentReaderListener()
-	{
-	}
-
 	HttpContentReader::HttpContentReader()
 	{
 		m_flagDecompressing = sl_false;
@@ -213,7 +205,7 @@ namespace slib
 	};
 
 	Ref<HttpContentReader> HttpContentReader::createPersistent(const Ref<AsyncStream>& io,
-															   const Ptr<IHttpContentReaderListener>& listener,
+															   const HttpContentReaderOnComplete& onComplete,
 															   sl_uint64 contentLength,
 															   sl_uint32 bufferSize,
 															   sl_bool flagDecompress)
@@ -227,7 +219,7 @@ namespace slib
 		}
 		if (ret.isNotNull()) {
 			ret->m_sizeTotal = contentLength;
-			ret->m_listener = listener;
+			ret->m_onComplete = onComplete;
 			ret->setReadingBufferSize(bufferSize);
 			ret->setSourceStream(io);
 			if (flagDecompress) {
@@ -382,7 +374,7 @@ namespace slib
 	};
 
 	Ref<HttpContentReader> HttpContentReader::createChunked(const Ref<AsyncStream>& io,
-															const Ptr<IHttpContentReaderListener>& listener,
+															const HttpContentReaderOnComplete& onComplete,
 															sl_uint32 bufferSize,
 															sl_bool flagDecompress)
 	{
@@ -394,7 +386,7 @@ namespace slib
 			return ret;
 		}
 		if (ret.isNotNull()) {
-			ret->m_listener = listener;
+			ret->m_onComplete = onComplete;
 			ret->setReadingBufferSize(bufferSize);
 			ret->setSourceStream(io);
 			if (flagDecompress) {
@@ -416,7 +408,7 @@ namespace slib
 	};
 
 	Ref<HttpContentReader> HttpContentReader::createTearDown(const Ref<AsyncStream>& io,
-															 const Ptr<IHttpContentReaderListener>& listener,
+															 const HttpContentReaderOnComplete& onComplete,
 															 sl_uint32 bufferSize,
 															 sl_bool flagDecompress)
 	{
@@ -428,7 +420,7 @@ namespace slib
 			return ret;
 		}
 		if (ret.isNotNull()) {
-			ret->m_listener = listener;
+			ret->m_onComplete = onComplete;
 			ret->setReadingBufferSize(bufferSize);
 			ret->setSourceStream(io);
 			if (flagDecompress) {
@@ -459,20 +451,14 @@ namespace slib
 	void HttpContentReader::setCompleted(void* dataRemain, sl_uint32 size)
 	{
 		setReadingEnded();
-		PtrLocker<IHttpContentReaderListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onCompleteReadHttpContent(dataRemain, size, isReadingError());
-		}
+		m_onComplete(dataRemain, size, isReadingError());
 		setReadingError();
 	}
 
 	void HttpContentReader::setError()
 	{
 		setReadingEnded();
-		PtrLocker<IHttpContentReaderListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onCompleteReadHttpContent(sl_null, 0, sl_true);
-		}
+		m_onComplete(sl_null, 0, sl_true);
 		setReadingError();
 	}
 

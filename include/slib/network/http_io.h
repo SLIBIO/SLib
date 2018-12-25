@@ -85,17 +85,7 @@ namespace slib
 		
 	};
 	
-	class SLIB_EXPORT IHttpContentReaderListener
-	{
-	public:
-		IHttpContentReaderListener();
-
-		virtual ~IHttpContentReaderListener();
-
-	public:
-		virtual void onCompleteReadHttpContent(void* dataRemained, sl_uint32 sizeRemained, sl_bool flagError) = 0;
-		
-	};
+	typedef Function<void(void* dataRemained, sl_uint32 sizeRemained, sl_bool flagError)> HttpContentReaderOnComplete;
 	
 	class SLIB_EXPORT HttpContentReader : public AsyncStreamFilter
 	{
@@ -106,18 +96,18 @@ namespace slib
 		
 	public:
 		static Ref<HttpContentReader> createPersistent(const Ref<AsyncStream>& io,
-													   const Ptr<IHttpContentReaderListener>& listener,
+													   const HttpContentReaderOnComplete& onComplete,
 													   sl_uint64 contentLength,
 													   sl_uint32 bufferSize,
 													   sl_bool flagDecompress);
 		
 		static Ref<HttpContentReader> createChunked(const Ref<AsyncStream>& io,
-													const Ptr<IHttpContentReaderListener>& listener,
+													const HttpContentReaderOnComplete& onComplete,
 													sl_uint32 bufferSize,
 													sl_bool flagDecompress);
 		
 		static Ref<HttpContentReader> createTearDown(const Ref<AsyncStream>& io,
-													 const Ptr<IHttpContentReaderListener>& listener,
+													 const HttpContentReaderOnComplete& onComplete,
 													 sl_uint32 bufferSize,
 													 sl_bool flagDecompress);
 	public:
@@ -140,8 +130,8 @@ namespace slib
 	protected:
 		sl_bool m_flagDecompressing;
 		ZlibDecompress m_zlib;
-		Ptr<IHttpContentReaderListener> m_listener;
-		
+		HttpContentReaderOnComplete m_onComplete;
+
 	};
 
 }

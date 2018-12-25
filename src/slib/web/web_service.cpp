@@ -30,6 +30,7 @@ namespace slib
 	WebService::WebService()
 	{
 		m_controller = WebController::create();
+		m_httpParam.onRequest = SLIB_FUNCTION_CLASS(WebService, onHttpRequest, this);
 	}
 
 	WebService::~WebService()
@@ -73,7 +74,6 @@ namespace slib
 		if (Service::dispatchStartService()) {
 			m_http = HttpService::create(m_httpParam);
 			if (m_http.isNotNull()) {
-				m_http->addProcessor(m_controller);
 				return sl_true;
 			}
 		}
@@ -88,6 +88,14 @@ namespace slib
 		}
 		m_controller.setNull();
 		Service::dispatchStopService();
+	}
+	
+	sl_bool WebService::onHttpRequest(HttpService*, HttpServiceContext* context)
+	{
+		if (m_controller.isNotNull()) {
+			return m_controller->processHttpRequest(context);
+		}
+		return sl_false;
 	}
 
 }

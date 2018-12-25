@@ -535,7 +535,7 @@ namespace slib
 		m_service = service;
 	}
 
-	class _priv_DefaultHttpServiceConnectionProvider : public HttpServiceConnectionProvider, public IAsyncTcpServerListener
+	class _priv_DefaultHttpServiceConnectionProvider : public HttpServiceConnectionProvider
 	{
 	public:
 		Ref<AsyncTcpServer> m_server;
@@ -562,7 +562,7 @@ namespace slib
 					ret->setService(service);
 					AsyncTcpServerParam sp;
 					sp.bindAddress = addressListen;
-					sp.listener.setWeak(ret);
+					sp.onAccept = SLIB_FUNCTION_WEAKREF(_priv_DefaultHttpServiceConnectionProvider, onAccept, ret);
 					sp.ioLoop = loop;
 					Ref<AsyncTcpServer> server = AsyncTcpServer::create(sp);
 					if (server.isNotNull()) {
@@ -602,23 +602,11 @@ namespace slib
 			}
 		}
 
-		void onError(AsyncTcpServer* socketListen)
-		{
-			LogError(SERVICE_TAG, "Accept Error");
-		}
 	};
 
 /******************************************************
 					HttpService
 ******************************************************/
-
-	IHttpServiceProcessor::IHttpServiceProcessor()
-	{
-	}
-
-	IHttpServiceProcessor::~IHttpServiceProcessor()
-	{
-	}
 
 	HttpServiceParam::HttpServiceParam()
 	{
@@ -661,9 +649,13 @@ namespace slib
 	sl_bool HttpService::_init(const HttpServiceParam& param)
 	{
 		Ref<AsyncIoLoop> ioLoop = AsyncIoLoop::create(sl_false);
+		
 		if (ioLoop.isNotNull()) {
+			
 			Ref<ThreadPool> threadPool = ThreadPool::create();
+			
 			if (threadPool.isNotNull()) {
+				
 				threadPool->setMaximumThreadsCount(param.maxThreadsCount);
 				
 				m_ioLoop = ioLoop;
@@ -673,9 +665,6 @@ namespace slib
 					if (! (addHttpService(param.addressBind, param.port))) {
 						return sl_false;
 					}
-				}
-				if (param.processor.isNotNull()) {
-					addProcessor(param.processor);
 				}
 				
 				ioLoop->start();
@@ -777,22 +766,6 @@ namespace slib
 				}
 			}
 		
-			ListElements< Ptr<IHttpServiceProcessor> > processors(m_processorsCached);
-			{
-				sl_size i = 0;
-				for (; i < processors.count; i++) {
-					PtrLocker<IHttpServiceProcessor> processor(processors[i]);
-					if (processor.isNotNull()) {
-						if (processor->onHttpRequest(context)) {
-							break;
-						}
-					}
-				}
-				if (i < processors.count) {
-					break;
-				}
-			}
-			
 			if (m_param.flagUseWebRoot) {
 				if (context->getMethod() == HttpMethod::GET) {
 					String path = context->getPath();
@@ -1039,23 +1012,6 @@ namespace slib
 			Log(SERVICE_TAG, "[%s] Connection Closed", String::fromPointerValue(connection));
 		}
 		m_connections.remove(connection);
-	}
-
-	void HttpService::addProcessor(const Ptr<IHttpServiceProcessor>& processor)
-	{
-		m_processors.add(processor);
-		m_processorsCached = m_processors.duplicate();
-	}
-
-	void HttpService::removeProcessor(const Ptr<IHttpServiceProcessor>& processor)
-	{
-		m_processors.remove(processor);
-		m_processorsCached = m_processors.duplicate();
-	}
-
-	List< Ptr<IHttpServiceProcessor> > HttpService::getProcessors()
-	{
-		return m_processorsCached;
 	}
 
 	void HttpService::addConnectionProvider(const Ref<HttpServiceConnectionProvider>& provider)
