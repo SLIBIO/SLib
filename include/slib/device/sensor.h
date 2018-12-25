@@ -26,7 +26,6 @@
 #include "definition.h"
 
 #include "../core/object.h"
-#include "../core/ptr.h"
 #include "../core/function.h"
 #include "../geo/geo_location.h"
 
@@ -35,30 +34,12 @@ namespace slib
 	
 	class Sensor;
 	
-	class SLIB_EXPORT ISensorListener
-	{
-	public:
-		ISensorListener();
-
-		virtual ~ISensorListener();
-
-	public:
-		virtual void onLocationChanged(Sensor* sensor, const GeoLocation& location);
-	
-		// degree, 0 - North, 180 - South, 90 - East, 270 - West
-		virtual void onCompassChanged(Sensor* sensor, float declination);
-
-		virtual void onAccelerometerChanged(Sensor* sensor, float xAccel, float yAccel, float zAccel);
-
-	};
-	
 	enum class LocationProviderType
 	{
 		GPS = 0,
 		MobileNetwork = 1,
 		Passive = 2
 	};
-	
 	
 	class SLIB_EXPORT SensorParam
 	{
@@ -71,10 +52,9 @@ namespace slib
 
 		sl_bool flagAutoStart;
 
-		Ptr<ISensorListener> listener;
-		Function<void(const GeoLocation& location)> onLocationChanged;
-		Function<void(float declination)> onCompassChanged;
-		Function<void(float xAccel, float yAccel, float zAccel)> onAccelerometerChanged;
+		Function<void(Sensor*, const GeoLocation&)> onLocationChanged;
+		Function<void(Sensor*, float declination)> onCompassChanged;
+		Function<void(Sensor*, float xAccel, float yAccel, float zAccel)> onAccelerometerChanged;
 
 	public:
 		SensorParam();
@@ -152,28 +132,12 @@ namespace slib
 		} m_lastAccelerometer;
 		sl_bool m_flagValidAccerometer;
 
-		Ptr<ISensorListener> m_listener;
-		Function<void(const GeoLocation& location)> m_onLocationChanged;
-		Function<void(float declination)> m_onCompassChanged;
-		Function<void(float xAccel, float yAccel, float zAccel)> m_onAccelerometerChanged;
+		Function<void(Sensor*, const GeoLocation&)> m_onLocationChanged;
+		Function<void(Sensor*, float declination)> m_onCompassChanged;
+		Function<void(Sensor*, float xAccel, float yAccel, float zAccel)> m_onAccelerometerChanged;
 
 	};
 	
-	class SLIB_EXPORT SensorLogListener : public Referable, public ISensorListener
-	{
-	public:
-		SensorLogListener();
-
-		~SensorLogListener();
-
-	public:
-		void onLocationChanged(Sensor* sensor, const GeoLocation& location) override;
-	
-		void onCompassChanged(Sensor* sensor, float declination) override;
-
-		void onAccelerometerChanged(Sensor* sensor, float xAccel, float yAccel, float zAccel) override;
-	};
-
 }
 
 #endif

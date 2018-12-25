@@ -22,32 +22,10 @@
 
 #include "slib/device/sensor.h"
 
-#include "slib/core/log.h"
 #include "slib/core/system.h"
 
 namespace slib
 {
-
-	ISensorListener::ISensorListener()
-	{
-	}
-
-	ISensorListener::~ISensorListener()
-	{
-	}
-
-	void ISensorListener::onLocationChanged(Sensor* sensor, const GeoLocation& location)
-	{
-	}
-
-	void ISensorListener::onCompassChanged(Sensor* sensor, float declination)
-	{
-	}
-
-	void ISensorListener::onAccelerometerChanged(Sensor* sensor, float xAccel, float yAccel, float zAccel)
-	{
-	}
-
 
 	SensorParam::SensorParam()
 	{
@@ -176,7 +154,6 @@ namespace slib
 
 	void Sensor::_init(const SensorParam& param)
 	{
-		m_listener = param.listener;
 		m_onLocationChanged = param.onLocationChanged;
 		m_onCompassChanged = param.onCompassChanged;
 		m_onAccelerometerChanged = param.onAccelerometerChanged;
@@ -187,11 +164,7 @@ namespace slib
 		m_lastLocation = location;
 		m_flagValidLocation = sl_true;
 
-		m_onLocationChanged(location);
-		PtrLocker<ISensorListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onLocationChanged(this, location);
-		}
+		m_onLocationChanged(this, location);
 	};
 
 	void Sensor::_onCompassChanged(float declination)
@@ -199,11 +172,7 @@ namespace slib
 		m_lastCompassDeclination = declination;
 		m_flagValidCompassDeclination = sl_true;
 		
-		m_onCompassChanged(declination);
-		PtrLocker<ISensorListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onCompassChanged(this, declination);
-		}
+		m_onCompassChanged(this, declination);
 	}
 
 	void Sensor::_onAccelerometerChanged(float xAccel, float yAccel, float zAccel)
@@ -213,38 +182,7 @@ namespace slib
 		m_lastAccelerometer.zAccel = zAccel;
 		m_flagValidAccerometer = sl_true;
 
-		m_onAccelerometerChanged(xAccel, yAccel, zAccel);
-		PtrLocker<ISensorListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onAccelerometerChanged(this, xAccel, yAccel, zAccel);
-		}
-	}
-
-
-	SensorLogListener::SensorLogListener()
-	{
-	}
-
-	SensorLogListener::~SensorLogListener()
-	{
-	}
-
-	void SensorLogListener::onLocationChanged(Sensor* sensor, const GeoLocation& location)
-	{
-		String str = "Location(" + String::fromDouble(location.latitude) + "," + location.longitude + "," + location.altitude + ")";
-		Log("Sensor", str);
-	}
-
-	void SensorLogListener::onCompassChanged(Sensor* sensor, float declination)
-	{
-		String str = String("Compass(") + declination + ")";
-		Log("Sensor", str);
-	}
-
-	void SensorLogListener::onAccelerometerChanged(Sensor* sensor, float xAccel, float yAccel, float zAccel)
-	{
-		String str = String("Accelerometer(") + xAccel + "," + yAccel + "," + zAccel + ")";
-		Log("Sensor", str);
+		m_onAccelerometerChanged(this, xAccel, yAccel, zAccel);
 	}
 
 #if defined(SLIB_PLATFORM_IS_DESKTOP)
