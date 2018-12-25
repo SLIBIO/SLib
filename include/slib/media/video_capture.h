@@ -29,7 +29,6 @@
 
 #include "../core/object.h"
 #include "../core/string.h"
-#include "../core/ptr.h"
 #include "../core/function.h"
 
 namespace slib
@@ -45,24 +44,11 @@ namespace slib
 		
 	};
 	
-	class SLIB_EXPORT IVideoCaptureListener
-	{
-	public:
-		IVideoCaptureListener();
-
-		virtual ~IVideoCaptureListener();
-
-	public:
-		virtual void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame) = 0;
-		
-	};
-	
 	class SLIB_EXPORT VideoCaptureParam
 	{
 	public:
 		sl_bool flagAutoStart;
 		
-		Ptr<IVideoCaptureListener> listener;
 		Function<void(VideoCapture*, VideoCaptureFrame*)> onCaptureVideoFrame;
 		
 	public:
@@ -94,8 +80,6 @@ namespace slib
 		
 	public:
 		SLIB_PROPERTY(AtomicFunction<void(VideoCapture*, VideoCaptureFrame*)>, OnCaptureVideoFrame)
-		
-		SLIB_PROPERTY(AtomicPtr<IVideoCaptureListener>, Listener)
 		
 	protected:
 		void _init(const VideoCaptureParam& param);

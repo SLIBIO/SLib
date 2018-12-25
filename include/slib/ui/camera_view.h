@@ -32,7 +32,7 @@
 namespace slib
 {
 
-	class SLIB_EXPORT CameraView : public VideoView, public IVideoCaptureListener
+	class SLIB_EXPORT CameraView : public VideoView
 	{
 		SLIB_DECLARE_OBJECT
 		
@@ -57,13 +57,16 @@ namespace slib
 		void setDeviceId(const String& deviceId);
 		
 	public:
-		SLIB_PROPERTY(AtomicPtr<IVideoCaptureListener>, FrameListener)
+		SLIB_PROPERTY(Function<void(CameraView*, VideoCaptureFrame*)>, OnCapture)
 		
 	protected:
-		void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame) override;
+		virtual void onCapture(VideoCaptureFrame* frame);
 		
 		void onAttach() override;
 		
+	private:
+		void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame);
+
 	protected:
 		AtomicRef<Camera> m_camera;
 		sl_bool m_flagAutoStart;

@@ -62,7 +62,7 @@ namespace slib
 	{
 		stop();
 		CameraParam param(_param);
-		param.listener = (WeakRef<CameraView>)(this);
+		param.onCaptureVideoFrame = SLIB_FUNCTION_WEAKREF(CameraView, onCaptureVideoFrame, this);
 		m_camera = Camera::create(param);
 	}
 	
@@ -95,11 +95,10 @@ namespace slib
 		m_deviceId = deviceId;
 	}
 	
-	void CameraView::onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame)
+	void CameraView::onCapture(VideoCaptureFrame* frame)
 	{
-		updateCurrentFrame(frame);
 	}
-
+	
 	void CameraView::onAttach()
 	{
 		if (m_flagAutoStart) {
@@ -107,4 +106,11 @@ namespace slib
 		}
 	}
 	
+	void CameraView::onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame)
+	{
+		onCapture(frame);
+		getOnCapture()(this, frame);
+		updateCurrentFrame(frame);
+	}
+
 }

@@ -34,15 +34,6 @@ namespace slib
 	}
 
 
-	IVideoCaptureListener::IVideoCaptureListener()
-	{
-	}
-
-	IVideoCaptureListener::~IVideoCaptureListener()
-	{
-	}
-
-
 	VideoCaptureParam::VideoCaptureParam()
 	{
 		flagAutoStart = sl_true;
@@ -65,16 +56,11 @@ namespace slib
 
 	void VideoCapture::_init(const VideoCaptureParam& param)
 	{
-		setListener(param.listener);
 		setOnCaptureVideoFrame(param.onCaptureVideoFrame);
 	}
 
 	void VideoCapture::_onCaptureVideoFrame(VideoCaptureFrame* frame)
 	{
-		PtrLocker<IVideoCaptureListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onCaptureVideoFrame(this, frame);
-		}
 		getOnCaptureVideoFrame()(this, frame);
 	}
 
