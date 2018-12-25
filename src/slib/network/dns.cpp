@@ -725,14 +725,6 @@ namespace slib
 				DnsClient
 *************************************************************/
 
-	IDnsClientListener::IDnsClientListener()
-	{
-	}
-
-	IDnsClientListener::~IDnsClientListener()
-	{
-	}
-
 	DnsClientParam::DnsClientParam()
 	{
 	}
@@ -756,9 +748,9 @@ namespace slib
 	{
 		Ref<DnsClient> ret = new DnsClient;
 		if (ret.isNotNull()) {
-			ret->m_listener = param.listener;
+			ret->m_onAnswer = param.onAnswer;
 			AsyncUdpSocketParam up;
-			up.listener.setWeak(ret);
+			up.onReceiveFrom = SLIB_FUNCTION_WEAKREF(DnsClient, _onReceiveFrom, ret);
 			up.packetSize = 4096;
 			up.ioLoop = param.ioLoop;
 			Ref<AsyncUdpSocket> socket = AsyncUdpSocket::create(up);
@@ -783,20 +775,17 @@ namespace slib
 		sendQuestion(SocketAddress(serverIp, SLIB_NETWORK_DNS_PORT), hostName);
 	}
 
-	void DnsClient::onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive)
+	void DnsClient::_onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive)
 	{
 		DnsPacket packet;
 		if (packet.parsePacket(data, sizeReceive)) {
-			_onDnsAnswer(address, packet);
+			_onAnswer(address, packet);
 		}
 	}
 
-	void DnsClient::_onDnsAnswer(const SocketAddress& serverAddress, const DnsPacket& packet)
+	void DnsClient::_onAnswer(const SocketAddress& serverAddress, const DnsPacket& packet)
 	{
-		PtrLocker<IDnsClientListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onDnsAnswer(this, serverAddress, packet);
-		}
+		m_onAnswer(this, serverAddress, packet);
 	}
 
 /*************************************************************
@@ -812,15 +801,6 @@ namespace slib
 	}
 
 	DnsResolveHostParam::~DnsResolveHostParam()
-	{
-	}
-
-
-	IDnsServerListener::IDnsServerListener()
-	{
-	}
-
-	IDnsServerListener::~IDnsServerListener()
 	{
 	}
 
@@ -883,7 +863,7 @@ namespace slib
 		if (ret.isNotNull()) {
 
 			AsyncUdpSocketParam up;
-			up.listener.setWeak(ret);
+			up.onReceiveFrom = SLIB_FUNCTION_WEAKREF(DnsServer, _onReceiveFrom, ret);
 			up.packetSize = 4096;
 			up.ioLoop = param.ioLoop;
 			up.flagAutoStart = sl_false;
@@ -914,7 +894,8 @@ namespace slib
 				ret->m_defaultForwardAddress = param.defaultForwardAddress;
 				ret->m_flagEncryptDefaultForward = param.flagEncryptDefaultForward;
 
-				ret->m_listener = param.listener;
+				ret->m_onResolve = param.onResolve;
+				ret->m_onCache = param.onCache;
 
 				ret->m_flagInit = sl_true;
 				if (param.flagAutoStart) {
@@ -978,7 +959,7 @@ namespace slib
 		rp.hostName = hostName;
 		rp.forwardAddress = m_defaultForwardAddress;
 		rp.flagEncryptForward = m_flagEncryptDefaultForward;
-		_resolveDnsHost(rp);
+		_onResolve(rp);
 		if (rp.flagIgnoreRequest) {
 			return;
 		}
@@ -1034,10 +1015,10 @@ namespace slib
 					DnsPacket::Address& address = addresses[n - 1 - i];
 					if (address.address.isNotNone()) {
 						if (address.address.isIPv4() && address.address.getIPv4().isHost()) {
-							_cacheDnsHost(address.name, address.address);
+							_onCache(address.name, address.address);
 							aliasAddresses4.put_NoLock(address.name.toLower(), address.address.getIPv4());
 						} else if (address.address.isIPv6()) {
-							_cacheDnsHost(address.name, address.address);
+							_onCache(address.name, address.address);
 							aliasAddresses6.put_NoLock(address.name.toLower(), address.address.getIPv6());
 						}
 						if (reqNameLower == address.name.toLower()) {
@@ -1064,7 +1045,7 @@ namespace slib
 						sl_bool flagAddr = sl_false;
 						if (aliasAddresses4.get_NoLock(alias.alias.toLower(), &addr4)) {
 							aliasAddresses4.put_NoLock(alias.name.toLower(), addr4);
-							_cacheDnsHost(alias.name, addr4);
+							_onCache(alias.name, addr4);
 							if (reqNameLower == alias.name.toLower()) {
 								if (resolvedAddress.isZero()) {
 									resolvedAddress = addr4;
@@ -1075,7 +1056,7 @@ namespace slib
 						}
 						if (aliasAddresses6.get_NoLock(alias.alias.toLower(), &addr6)) {
 							aliasAddresses6.put_NoLock(alias.name.toLower(), addr6);
-							_cacheDnsHost(alias.name, addr6);
+							_onCache(alias.name, addr6);
 							flagProcess = sl_true;
 							flagAddr = sl_true;
 						}
@@ -1173,7 +1154,7 @@ namespace slib
 		return mem;
 	}
 
-	void DnsServer::onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& addressFrom, void* data, sl_uint32 size)
+	void DnsServer::_onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& addressFrom, void* data, sl_uint32 size)
 	{
 		sl_bool flagEncrypted = sl_false;
 		Memory memDecrypt;
@@ -1214,20 +1195,14 @@ namespace slib
 		}
 	}
 
-	void DnsServer::_resolveDnsHost(DnsResolveHostParam& param)
+	void DnsServer::_onResolve(DnsResolveHostParam& param)
 	{
-		PtrLocker<IDnsServerListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->resolveDnsHost(this, param);
-		}
+		m_onResolve(this, param);
 	}
 
-	void DnsServer::_cacheDnsHost(const String& hostName, const IPAddress& hostAddress)
+	void DnsServer::_onCache(const String& hostName, const IPAddress& hostAddress)
 	{
-		PtrLocker<IDnsServerListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->cacheDnsHost(this, hostName, hostAddress);
-		}
+		m_onCache(this, hostName, hostAddress);
 	}
 
 }

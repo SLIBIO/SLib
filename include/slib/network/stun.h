@@ -282,7 +282,7 @@ namespace slib
 		
 	};
 	
-	class SLIB_EXPORT StunServer : public Object, public IAsyncUdpSocketListener
+	class SLIB_EXPORT StunServer : public Object
 	{
 		SLIB_DECLARE_OBJECT
 		
@@ -302,7 +302,7 @@ namespace slib
 		sl_bool isRunning();
 		
 	protected:
-		void onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive) override;
+		void _onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive);
 		
 	private:
 		sl_bool m_flagInit;

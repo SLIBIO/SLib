@@ -35,20 +35,6 @@ namespace slib
 	class AsyncTcpSocket;
 	class AsyncTcpSocketInstance;
 	
-	class SLIB_EXPORT IAsyncTcpSocketListener
-	{
-	public:
-		IAsyncTcpSocketListener();
-
-		virtual ~IAsyncTcpSocketListener();
-
-	public:
-		virtual void onConnect(AsyncTcpSocket* socket, const SocketAddress& address, sl_bool flagError) = 0;
-		
-		virtual void onError(AsyncTcpSocket* socketListen);
-		
-	};
-	
 	class SLIB_EXPORT AsyncTcpSocketParam
 	{
 	public:
@@ -60,7 +46,6 @@ namespace slib
 		sl_bool flagLogError; // default: true
 		Ref<AsyncIoLoop> ioLoop;
 		
-		Ptr<IAsyncTcpSocketListener> listener;
 		Function<void(AsyncTcpSocket*, const SocketAddress&, sl_bool)> onConnect;
 		Function<void(AsyncTcpSocket*)> onError;
 		
@@ -111,8 +96,7 @@ namespace slib
 		static Ref<AsyncTcpSocketInstance> _createInstance(const Ref<Socket>& socket);
 		
 	protected:
-		Ptr<IAsyncTcpSocketListener> m_listener;
-		Function<void(AsyncTcpSocket*, const SocketAddress&, sl_bool)> m_onConnect;
+		Function<void(AsyncTcpSocket*, const SocketAddress&, sl_bool flagError)> m_onConnect;
 		Function<void(AsyncTcpSocket*)> m_onError;
 		
 		friend class AsyncTcpSocketInstance;
@@ -122,20 +106,6 @@ namespace slib
 	
 	class AsyncTcpServer;
 	class AsyncTcpServerInstance;
-	
-	class SLIB_EXPORT IAsyncTcpServerListener
-	{
-	public:
-		IAsyncTcpServerListener();
-
-		virtual ~IAsyncTcpServerListener();
-
-	public:
-		virtual void onAccept(AsyncTcpServer* socketListen, const Ref<Socket>& socketAccept, const SocketAddress& address) = 0;
-		
-		virtual void onError(AsyncTcpServer* socketListen);
-		
-	};
 	
 	class SLIB_EXPORT AsyncTcpServerParam
 	{
@@ -149,7 +119,6 @@ namespace slib
 		sl_bool flagLogError; // default: true
 		Ref<AsyncIoLoop> ioLoop;
 		
-		Ptr<IAsyncTcpServerListener> listener;
 		Function<void(AsyncTcpServer*, Socket*, const SocketAddress&)> onAccept;
 		Function<void(AsyncTcpServer*)> onError;
 		
@@ -194,7 +163,6 @@ namespace slib
 		static Ref<AsyncTcpServerInstance> _createInstance(const Ref<Socket>& socket);
 		
 	protected:
-		Ptr<IAsyncTcpServerListener> m_listener;
 		Function<void(AsyncTcpServer*, Socket*, const SocketAddress&)> m_onAccept;
 		Function<void(AsyncTcpServer*)> m_onError;
 		
@@ -205,20 +173,7 @@ namespace slib
 	
 	class AsyncUdpSocket;
 	class AsyncUdpSocketInstance;
-	
-	class SLIB_EXPORT IAsyncUdpSocketListener
-	{
-	public:
-		IAsyncUdpSocketListener();
 
-		virtual ~IAsyncUdpSocketListener();
-
-	public:
-		virtual void onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceived) = 0;
-		
-	};
-	
-	
 	class SLIB_EXPORT AsyncUdpSocketParam
 	{
 	public:
@@ -232,8 +187,7 @@ namespace slib
 		sl_uint32 packetSize; // default: 65536
 		Ref<AsyncIoLoop> ioLoop;
 		
-		Ptr<IAsyncUdpSocketListener> listener;
-		Function<void(AsyncUdpSocket*, const SocketAddress&, void*, sl_uint32)> onReceiveFrom;
+		Function<void(AsyncUdpSocket*, const SocketAddress&, void* data, sl_uint32 sizeReceived)> onReceiveFrom;
 		
 	public:
 		AsyncUdpSocketParam();
@@ -285,8 +239,7 @@ namespace slib
 		static Ref<AsyncUdpSocketInstance> _createInstance(const Ref<Socket>& socket, sl_uint32 packetSize);
 		
 	protected:
-		Ptr<IAsyncUdpSocketListener> m_listener;
-		Function<void(AsyncUdpSocket*, const SocketAddress&, void*, sl_uint32)> m_onReceiveFrom;
+		Function<void(AsyncUdpSocket*, const SocketAddress&, void* data, sl_uint32 sizeReceived)> m_onReceiveFrom;
 		
 		friend class AsyncUdpSocketInstance;
 		

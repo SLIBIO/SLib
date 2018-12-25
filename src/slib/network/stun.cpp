@@ -634,7 +634,7 @@ namespace slib
 		if (ret.isNotNull()) {
 			
 			AsyncUdpSocketParam up;
-			up.listener.setWeak(ret);
+			up.onReceiveFrom = SLIB_FUNCTION_WEAKREF(StunServer, _onReceiveFrom, ret);
 			up.packetSize = 4096;
 			up.ioLoop = param.ioLoop;
 			up.flagAutoStart = sl_false;
@@ -698,7 +698,7 @@ namespace slib
 		return m_flagRunning;
 	}
 	
-	void StunServer::onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& addressFrom, void* data, sl_uint32 size)
+	void StunServer::_onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& addressFrom, void* data, sl_uint32 size)
 	{
 		StunPacket* packet = (StunPacket*)data;
 		StunAttributes attrs;

@@ -60,6 +60,8 @@ namespace slib
 		sl_bool dispatchStartService() override;
 
 		void dispatchStopService() override;
+		
+		sl_bool onHttpRequest(HttpService*, HttpServiceContext*);
 
 	protected:
 		Ref<HttpService> m_http;

@@ -36,7 +36,7 @@ namespace slib
 
 	typedef Function<Variant(SWEB_HANDLER_PARAMS_LIST)> WebHandler;
 
-	class WebController : public Object, public IHttpServiceProcessor
+	class WebController : public Object
 	{
 		SLIB_DECLARE_OBJECT
 
@@ -49,8 +49,7 @@ namespace slib
 	public:
 		void registerHandler(HttpMethod method, const String& path, const WebHandler& handler);
 		
-	protected:
-		sl_bool onHttpRequest(const Ref<HttpServiceContext>& context) override;
+		sl_bool processHttpRequest(HttpServiceContext* context);
 		
 	protected:
 		static String _getHandlerSignature(HttpMethod method, const String& path);

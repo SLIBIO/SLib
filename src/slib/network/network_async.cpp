@@ -83,18 +83,6 @@ namespace slib
 	}
 
 
-	IAsyncTcpSocketListener::IAsyncTcpSocketListener()
-	{
-	}
-
-	IAsyncTcpSocketListener::~IAsyncTcpSocketListener()
-	{
-	}
-
-	void IAsyncTcpSocketListener::onError(AsyncTcpSocket* socketListen)
-	{
-	}
-
 	AsyncTcpSocketParam::AsyncTcpSocketParam()
 	{
 		flagIPv6 = sl_false;
@@ -155,7 +143,6 @@ namespace slib
 			Ref<AsyncTcpSocket> ret = new AsyncTcpSocket;
 			if (ret.isNotNull()) {
 				if (ret->_initialize(instance.get(), AsyncIoMode::InOut, loop)) {
-					ret->m_listener = param.listener;
 					ret->m_onConnect = param.onConnect;
 					ret->m_onError = param.onError;
 					if (param.connectAddress.isValid()) {
@@ -268,19 +255,11 @@ namespace slib
 
 	void AsyncTcpSocket::_onConnect(const SocketAddress& address, sl_bool flagError)
 	{
-		PtrLocker<IAsyncTcpSocketListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onConnect(this, address, flagError);
-		}
 		m_onConnect(this, address, flagError);
 	}
 
 	void AsyncTcpSocket::_onError()
 	{
-		PtrLocker<IAsyncTcpSocketListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onError(this);
-		}
 		m_onError(this);
 	}
 
@@ -339,18 +318,6 @@ namespace slib
 		}
 	}
 
-
-	IAsyncTcpServerListener::IAsyncTcpServerListener()
-	{
-	}
-
-	IAsyncTcpServerListener::~IAsyncTcpServerListener()
-	{
-	}
-
-	void IAsyncTcpServerListener::onError(AsyncTcpServer* socketListen)
-	{
-	}
 
 	AsyncTcpServerParam::AsyncTcpServerParam()
 	{
@@ -424,7 +391,6 @@ namespace slib
 				}
 				Ref<AsyncTcpServer> ret = new AsyncTcpServer;
 				if (ret.isNotNull()) {
-					ret->m_listener = param.listener;
 					ret->m_onAccept = param.onAccept;
 					ret->m_onError = param.onError;
 					instance->setObject(ret.get());
@@ -490,19 +456,11 @@ namespace slib
 
 	void AsyncTcpServer::_onAccept(const Ref<Socket>& socketAccept, const SocketAddress& address)
 	{
-		PtrLocker<IAsyncTcpServerListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onAccept(this, socketAccept, address);
-		}
 		m_onAccept(this, socketAccept.get(), address);
 	}
 
 	void AsyncTcpServer::_onError()
 	{
-		PtrLocker<IAsyncTcpServerListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onError(this);
-		}
 		m_onError(this);
 	}
 
@@ -572,14 +530,6 @@ namespace slib
 		}
 	}
 
-
-	IAsyncUdpSocketListener::IAsyncUdpSocketListener()
-	{
-	}
-
-	IAsyncUdpSocketListener::~IAsyncUdpSocketListener()
-	{
-	}
 
 	AsyncUdpSocketParam::AsyncUdpSocketParam()
 	{
@@ -658,7 +608,6 @@ namespace slib
 			}
 			Ref<AsyncUdpSocket> ret = new AsyncUdpSocket;
 			if (ret.isNotNull()) {
-				ret->m_listener = param.listener;
 				ret->m_onReceiveFrom = param.onReceiveFrom;
 				instance->setObject(ret.get());
 				ret->setIoInstance(instance.get());
@@ -763,10 +712,6 @@ namespace slib
 
 	void AsyncUdpSocket::_onReceive(const SocketAddress& address, void* data, sl_uint32 sizeReceived)
 	{
-		PtrLocker<IAsyncUdpSocketListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onReceiveFrom(this, address, data, sizeReceived);
-		}
 		m_onReceiveFrom(this, address, data, sizeReceived);
 	}
 

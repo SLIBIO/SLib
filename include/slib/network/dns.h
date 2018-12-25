@@ -452,22 +452,11 @@ namespace slib
 	
 	class DnsClient;
 	
-	class SLIB_EXPORT IDnsClientListener
-	{
-	public:
-		IDnsClientListener();
-
-		virtual ~IDnsClientListener();
-
-	public:
-		virtual void onDnsAnswer(DnsClient* client, const SocketAddress& serverAddress, const DnsPacket& packet) = 0;
-	};
-	
 	class SLIB_EXPORT DnsClientParam
 	{
 	public:
-		Ptr<IDnsClientListener> listener;
-		
+		Function<void(DnsClient*, const SocketAddress&, const DnsPacket&)> onAnswer;
+
 		Ref<AsyncIoLoop> ioLoop;
 		
 	public:
@@ -477,7 +466,7 @@ namespace slib
 		
 	};
 	
-	class SLIB_EXPORT DnsClient : public Object, public IAsyncUdpSocketListener
+	class SLIB_EXPORT DnsClient : public Object
 	{
 		SLIB_DECLARE_OBJECT
 		
@@ -495,17 +484,16 @@ namespace slib
 		void sendQuestion(const IPv4Address& serverIp, const String& hostName);
 		
 	protected:
-		void onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive) override;
-		
-	protected:
-		void _onDnsAnswer(const SocketAddress& serverAddress, const DnsPacket& packet);
+		void _onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive);
+
+		void _onAnswer(const SocketAddress& serverAddress, const DnsPacket& packet);
 		
 	protected:
 		Ref<AsyncUdpSocket> m_udp;
 		sl_uint16 m_idLast;
 		
-		Ptr<IDnsClientListener> m_listener;
-		
+		Function<void(DnsClient*, const SocketAddress&, const DnsPacket&)> m_onAnswer;
+
 	};
 	
 	class DnsServer;
@@ -538,20 +526,6 @@ namespace slib
 		
 	};
 	
-	class SLIB_EXPORT IDnsServerListener
-	{
-	public:
-		IDnsServerListener();
-
-		virtual ~IDnsServerListener();
-
-	public:
-		virtual void resolveDnsHost(DnsServer* server, DnsResolveHostParam& param) = 0;
-		
-		virtual void cacheDnsHost(DnsServer* server, const String& hostName, const IPAddress& hostAddress) = 0;
-		
-	};
-	
 	class SLIB_EXPORT DnsServerParam
 	{
 	public:
@@ -569,8 +543,9 @@ namespace slib
 		
 		Ref<AsyncIoLoop> ioLoop;
 		
-		Ptr<IDnsServerListener> listener;
-		
+		Function<void(DnsServer*, DnsResolveHostParam&)> onResolve;
+		Function<void(DnsServer*, const String& hostName, const IPAddress& hostAddress)> onCache;
+
 	public:
 		DnsServerParam();
 		
@@ -581,8 +556,7 @@ namespace slib
 		
 	};
 	
-	
-	class SLIB_EXPORT DnsServer : public Object, public IAsyncUdpSocketListener
+	class SLIB_EXPORT DnsServer : public Object
 	{
 		SLIB_DECLARE_OBJECT
 		
@@ -617,12 +591,11 @@ namespace slib
 		Memory _buildHostAddressAnswerPacket(sl_uint16 id, const String& hostName, const IPv4Address& hostAddress, sl_bool flagEncrypt);
 		
 	protected:
-		void onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive) override;
+		void _onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive);
 		
-	protected:
-		void _resolveDnsHost(DnsResolveHostParam& param);
+		void _onResolve(DnsResolveHostParam& param);
 		
-		void _cacheDnsHost(const String& hostName, const IPAddress& hostAddress);
+		void _onCache(const String& hostName, const IPAddress& hostAddress);
 		
 	private:
 		sl_bool m_flagInit;
@@ -649,8 +622,9 @@ namespace slib
 		};
 		CHashMap<sl_uint16, ForwardElement> m_mapForward;
 		
-		Ptr<IDnsServerListener> m_listener;
-		
+		Function<void(DnsServer*, DnsResolveHostParam&)> m_onResolve;
+		Function<void(DnsServer*, const String& hostName, const IPAddress& hostAddress)> m_onCache;
+
 	};
 
 }
