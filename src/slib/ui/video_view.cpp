@@ -206,7 +206,7 @@ namespace slib
 				m_sliderSeek = new Slider;
 				if (m_sliderSeek.isNotNull()) {
 					m_sliderSeek->setWidthFilling(1.0f, UIUpdateMode::Init);
-					m_sliderSeek->setHeightWeight(0.05, UIUpdateMode::Init);
+					m_sliderSeek->setHeightWeight(0.05f, UIUpdateMode::Init);
 					m_sliderSeek->setAlignParentBottom(UIUpdateMode::Init);
 					addChild(m_sliderSeek);
 					m_sliderSeek->setOnChange(SLIB_FUNCTION_WEAKREF(VideoView, _onSeek, this));
@@ -416,7 +416,7 @@ namespace slib
 			return;
 		}
 		if (m_sliderSeek.isNotNull()) {
-			float duration = player->getDuration();
+			double duration = player->getDuration();
 			if (duration > 0) {
 				m_sliderSeek->setMaximumValue((float)duration, UIUpdateMode::None);
 				m_sliderSeek->setValue((float)(player->getCurrentTime()));
