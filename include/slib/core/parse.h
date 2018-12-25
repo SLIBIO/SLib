@@ -40,6 +40,14 @@ namespace slib
 
 	};
 
+	template <class ObjectType, class CharType, class ArgType>
+	class Parser2
+	{
+	public:
+		static sl_reg parse(ObjectType* _out, const ArgType& arg, CharType const* sz, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX) noexcept;
+		
+	};
+
 	template <class ObjectType, class CharType>
 	class IntParser
 	{
@@ -47,7 +55,6 @@ namespace slib
 		static sl_reg parse(ObjectType* _out, sl_uint32 radix, CharType const* sz, sl_size posBegin = 0, sl_size posEnd = SLIB_SIZE_MAX) noexcept;
 
 	};
-
 
 	template <class T>
 	sl_bool Parse(const String& str, T* _out) noexcept;
@@ -68,6 +75,25 @@ namespace slib
 	sl_bool Parse(const sl_char16* sz, T* _out) noexcept;
 
 
+	template <class T, class ArgType>
+	sl_bool Parse(const String& str, const ArgType& arg, T* _out) noexcept;
+	
+	template <class T, class ArgType>
+	sl_bool Parse(const String16& str, const ArgType& arg, T* _out) noexcept;
+	
+	template <class T, class ArgType>
+	sl_bool Parse(const AtomicString& _str, const ArgType& arg, T* _out) noexcept;
+	
+	template <class T, class ArgType>
+	sl_bool Parse(const AtomicString16& _str, const ArgType& arg, T* _out) noexcept;
+	
+	template <class T, class ArgType>
+	sl_bool Parse(const sl_char8* sz, const ArgType& arg, T* _out) noexcept;
+	
+	template <class T, class ArgType>
+	sl_bool Parse(const sl_char16* sz, const ArgType& arg, T* _out) noexcept;
+
+	
 	template <class T>
 	sl_bool ParseInt(const String& str, T* _out, sl_uint32 radix = 10) noexcept;
 

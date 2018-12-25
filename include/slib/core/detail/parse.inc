@@ -86,6 +86,69 @@ namespace slib
 	}
 
 
+	template <class T, class ArgType>
+	sl_bool Parse(const String& str, const ArgType& arg, T* _out) noexcept
+	{
+		sl_size n = str.getLength();
+		if (n == 0) {
+			return sl_false;
+		}
+		return Parser2<T, sl_char8, ArgType>::parse(_out, arg, str.getData(), 0, n) == (sl_reg)n;
+	}
+	
+	template <class T, class ArgType>
+	sl_bool Parse(const String16& str, const ArgType& arg, T* _out) noexcept
+	{
+		sl_size n = str.getLength();
+		if (n == 0) {
+			return sl_false;
+		}
+		return Parser2<T, sl_char16, ArgType>::parse(_out, arg, str.getData(), 0, n) == (sl_reg)n;
+	}
+	
+	template <class T, class ArgType>
+	sl_bool Parse(const AtomicString& _str, const ArgType& arg, T* _out) noexcept
+	{
+		String str(_str);
+		sl_size n = str.getLength();
+		if (n == 0) {
+			return sl_false;
+		}
+		return Parser2<T, sl_char8, ArgType>::parse(_out, arg, str.getData(), 0, n) == (sl_reg)n;
+	}
+	
+	template <class T, class ArgType>
+	sl_bool Parse(const AtomicString16& _str, const ArgType& arg, T* _out) noexcept
+	{
+		String16 str(_str);
+		sl_size n = str.getLength();
+		if (n == 0) {
+			return sl_false;
+		}
+		return Parser2<T, sl_char16, ArgType>::parse(_out, arg, str.getData(), 0, n) == (sl_reg)n;
+	}
+	
+	template <class T, class ArgType>
+	sl_bool Parse(const sl_char8* sz, const ArgType& arg, T* _out) noexcept
+	{
+		sl_reg ret = Parser2<T, sl_char8, ArgType>::parse(_out, arg, sz, 0, SLIB_SIZE_MAX);
+		if (ret != SLIB_PARSE_ERROR && sz[ret] == 0) {
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
+	template <class T, class ArgType>
+	sl_bool Parse(const sl_char16* sz, const ArgType& arg, T* _out) noexcept
+	{
+		sl_reg ret = Parser2<T, sl_char16, ArgType>::parse(_out, arg, sz, 0, SLIB_SIZE_MAX);
+		if (ret != SLIB_PARSE_ERROR && sz[ret] == 0) {
+			return sl_true;
+		}
+		return sl_false;
+	}
+
+	
 	template <class T>
 	sl_bool ParseInt(const String& str, T* _out, sl_uint32 radix) noexcept
 	{
