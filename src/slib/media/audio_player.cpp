@@ -37,15 +37,6 @@ namespace slib
 	}
 
 
-	IAudioPlayerBufferListener::IAudioPlayerBufferListener()
-	{
-	}
-
-	IAudioPlayerBufferListener::~IAudioPlayerBufferListener()
-	{
-	}
-
-
 	AudioPlayerBufferParam::AudioPlayerBufferParam()
 	{
 		samplesPerSecond = 16000;
@@ -77,7 +68,6 @@ namespace slib
 	{
 		m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
 		m_nChannels = param.channelsCount;
-		m_listener = param.listener;
 		m_onRequireAudioData = param.onRequireAudioData;
 		m_event = param.event;
 	}
@@ -130,10 +120,6 @@ namespace slib
 			m_event->set();
 		}
 		m_onRequireAudioData(this, count / m_nChannels);
-		PtrLocker<IAudioPlayerBufferListener> listener(m_listener);
-		if (listener.isNotNull()) {
-			listener->onRequireAudioData(this, count / m_nChannels);
-		}
 		if (!(m_queue.pop(s, count))) {
 			for (sl_uint32 i = 0; i < count; i++) {
 				s[i] = m_lastSample;

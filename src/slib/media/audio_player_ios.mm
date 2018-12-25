@@ -27,7 +27,6 @@
 #include "slib/media/audio_player.h"
 
 #include "slib/core/log.h"
-#include "slib/core/ptr.h"
 #include "slib/core/platform_apple.h"
 
 #import <Foundation/Foundation.h>

@@ -31,7 +31,6 @@
 #include "../core/event.h"
 #include "../core/loop_queue.h"
 #include "../core/string.h"
-#include "../core/ptr.h"
 #include "../core/function.h"
 
 namespace slib
@@ -52,17 +51,6 @@ namespace slib
 	
 	class AudioRecorder;
 	
-	class SLIB_EXPORT IAudioRecorderListener
-	{
-	public:
-		IAudioRecorderListener();
-
-		virtual ~IAudioRecorderListener();
-
-	public:
-		virtual void onRecordAudio(AudioRecorder* recorder, const AudioData& audio) = 0;
-	};
-	
 	class SLIB_EXPORT AudioRecorderParam
 	{
 	public:
@@ -74,7 +62,6 @@ namespace slib
 		
 		sl_bool flagAutoStart;
 		
-		Ptr<IAudioRecorderListener> listener;
 		Function<void(AudioRecorder*, AudioData const&)> onRecordAudio;
 		Ref<Event> event;
 		
@@ -125,7 +112,6 @@ namespace slib
 		sl_uint32 m_nChannels;
 		AtomicArray<sl_int16> m_processData;
 		
-		Ptr<IAudioRecorderListener> m_listener;
 		Function<void(AudioRecorder*, AudioData const&)> m_onRecordAudio;
 		Ref<Event> m_event;
 		

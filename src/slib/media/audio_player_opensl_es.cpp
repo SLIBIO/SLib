@@ -25,7 +25,6 @@
 #ifdef SLIB_AUDIO_SUPPORT_OPENSL_ES
 
 #include "slib/core/log.h"
-#include "slib/core/ptr.h"
 
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 #include <SLES/OpenSLES.h>

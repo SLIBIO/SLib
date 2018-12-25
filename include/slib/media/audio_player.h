@@ -33,7 +33,6 @@
 #include "../core/loop_queue.h"
 #include "../core/string.h"
 #include "../core/memory.h"
-#include "../core/ptr.h"
 #include "../core/function.h"
 
 namespace slib
@@ -54,17 +53,6 @@ namespace slib
 	
 	class AudioPlayerBuffer;
 	
-	class SLIB_EXPORT IAudioPlayerBufferListener
-	{
-	public:
-		IAudioPlayerBufferListener();
-
-		virtual ~IAudioPlayerBufferListener();
-
-	public:
-		virtual void onRequireAudioData(AudioPlayerBuffer* player, sl_uint32 requestedSamplesCount) = 0;
-	};
-	
 	class SLIB_EXPORT AudioPlayerBufferParam
 	{
 	public:
@@ -75,8 +63,7 @@ namespace slib
 		
 		sl_bool flagAutoStart;
 		
-		Ptr<IAudioPlayerBufferListener> listener;
-		Function<void(AudioPlayerBuffer*, sl_uint32)> onRequireAudioData;
+		Function<void(AudioPlayerBuffer*, sl_uint32 requestedSamplesCount)> onRequireAudioData;
 		Ref<Event> event;
 		
 	public:
@@ -122,8 +109,7 @@ namespace slib
 		sl_uint32 m_nChannels;
 		AtomicArray<sl_int16> m_processData;
 		
-		Ptr<IAudioPlayerBufferListener> m_listener;
-		Function<void(AudioPlayerBuffer*, sl_uint32)> m_onRequireAudioData;
+		Function<void(AudioPlayerBuffer*, sl_uint32 requestedSamplesCount)> m_onRequireAudioData;
 		Ref<Event> m_event;
 		
 	};

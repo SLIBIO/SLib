@@ -35,16 +35,7 @@ namespace slib
 	{
 	}
 
-
-	IAudioRecorderListener::IAudioRecorderListener()
-	{
-	}
-
-	IAudioRecorderListener::~IAudioRecorderListener()
-	{
-	}
-
-
+	
 	AudioRecorderParam::AudioRecorderParam()
 	{
 		samplesPerSecond = 16000;
@@ -109,7 +100,6 @@ namespace slib
 	{
 		m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
 		m_nChannels = param.channelsCount;
-		m_listener = param.listener;
 		m_onRecordAudio = param.onRecordAudio;
 		m_event = param.event;
 	}
@@ -128,8 +118,7 @@ namespace slib
 
 	void AudioRecorder::_processFrame(sl_int16* s, sl_uint32 count)
 	{
-		PtrLocker<IAudioRecorderListener> listener(m_listener);
-		if (listener.isNotNull() || m_onRecordAudio.isNotNull()) {
+		if (m_onRecordAudio.isNotNull()) {
 			AudioData audio;
 			AudioFormat format;
 			sl_uint32 nChannels = m_nChannels;
@@ -141,7 +130,6 @@ namespace slib
 			audio.format = format;
 			audio.count = count / nChannels;
 			audio.data = s;
-			listener->onRecordAudio(this, audio);
 			m_onRecordAudio(this, audio);
 		}
 		m_queue.push(s, count);
