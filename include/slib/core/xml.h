@@ -39,7 +39,7 @@
 #include "definition.h"
 
 #include "variant.h"
-#include "ptr.h"
+#include "function.h"
 
 namespace slib
 {
@@ -61,36 +61,6 @@ namespace slib
 		ProcessingInstruction = 4,
 		Comment = 5,
 		WhiteSpace = 6
-	};
-	
-	class SLIB_EXPORT IXmlParseListener
-	{
-	public:
-		IXmlParseListener();
-
-		virtual ~IXmlParseListener();
-
-	public:
-		virtual void onStartDocument(XmlParseControl* control, XmlDocument* document);
-
-		virtual void onEndDocument(XmlParseControl* control, XmlDocument* document);
-
-		virtual void onStartElement(XmlParseControl* control, XmlElement* element);
-
-		virtual void onEndElement(XmlParseControl* control, XmlElement* element);
-
-		virtual void onText(XmlParseControl* control, const String& text);
-
-		virtual void onCDATA(XmlParseControl* control, const String& text);
-
-		virtual void onProcessingInstruction(XmlParseControl* control, const String& target, const String& content);
-
-		virtual void onComment(XmlParseControl* control, const String& content);
-
-		virtual void onStartPrefixMapping(XmlParseControl* control, const String& prefix, const String& uri);
-
-		virtual void onEndPrefixMapping(XmlParseControl* control, const String& prefix);
-
 	};
 	
 	class SLIB_EXPORT XmlNode : public Referable
@@ -497,8 +467,17 @@ namespace slib
 		// in
 		sl_bool flagCheckWellFormed;
 
-		// in
-		Ptr<IXmlParseListener> listener;
+		// in, callbacks
+		Function<void(XmlParseControl*, XmlDocument*)> onStartDocument;
+		Function<void(XmlParseControl*, XmlDocument*)> onEndDocument;
+		Function<void(XmlParseControl*, XmlElement*)> onStartElement;
+		Function<void(XmlParseControl*, XmlElement*)> onEndElement;
+		Function<void(XmlParseControl*, const String& text)> onText;
+		Function<void(XmlParseControl*, const String& text)> onCDATA;
+		Function<void(XmlParseControl*, const String& target, const String& content)> onProcessingInstruction;
+		Function<void(XmlParseControl*, const String& content)> onComment;
+		Function<void(XmlParseControl*, const String& prefix, const String& uri)> onStartPrefixMapping;
+		Function<void(XmlParseControl*, const String& prefix)> onEndPrefixMapping;
 
 		// in
 		sl_bool flagLogError;

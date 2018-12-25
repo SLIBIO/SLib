@@ -29,56 +29,6 @@
 namespace slib
 {
 
-	IXmlParseListener::IXmlParseListener()
-	{
-	}
-
-	IXmlParseListener::~IXmlParseListener()
-	{
-	}
-
-	void IXmlParseListener::onStartDocument(XmlParseControl* control, XmlDocument* document)
-	{
-	}
-
-	void IXmlParseListener::onEndDocument(XmlParseControl* control, XmlDocument* document)
-	{
-	}
-
-	void IXmlParseListener::onStartElement(XmlParseControl* control, XmlElement* element)
-	{
-	}
-
-	void IXmlParseListener::onEndElement(XmlParseControl* control, XmlElement* element)
-	{
-	}
-
-	void IXmlParseListener::onText(XmlParseControl* control, const String& text)
-	{
-	}
-
-	void IXmlParseListener::onCDATA(XmlParseControl* control, const String& text)
-	{
-	}
-
-	void IXmlParseListener::onProcessingInstruction(XmlParseControl* control, const String& target, const String& content)
-	{
-	}
-
-	void IXmlParseListener::onComment(XmlParseControl* control, const String& content)
-	{
-	}
-
-	void IXmlParseListener::onStartPrefixMapping(XmlParseControl* control, const String& prefix, const String& uri)
-	{
-	}
-
-	void IXmlParseListener::onEndPrefixMapping(XmlParseControl* control, const String& prefix)
-	{
-	}
-
-	
-	
 	SLIB_DEFINE_ROOT_OBJECT(XmlNode)
 
 	XmlNode::XmlNode(XmlNodeType type) : m_type(type), m_positionStartInSource(0), m_positionEndInSource(0), m_lineInSource(1), m_columnInSource(1)
@@ -1379,7 +1329,6 @@ namespace slib
 		sl_size posForLineColumn;
 		
 		Ref<XmlDocument> document;
-		Ptr<IXmlParseListener> listener;
 		XmlParseControl control;
 		
 		XmlParseParam param;
@@ -1483,14 +1432,14 @@ namespace slib
 	SLIB_STATIC_STRING(_g_xml_error_msg_content_include_lt, "Content must not include less-than(<) character")
 	SLIB_STATIC_STRING(_g_xml_error_msg_document_not_wellformed, "Document must be well-formed")
 
-#define CALL_LISTENER(NAME, NODE, ...) \
+#define CALL_CALLBACK(NAME, NODE, ...) \
 	{ \
-		PtrLocker<IXmlParseListener> _listener(listener); \
-		if (_listener.isNotNull()) { \
+		auto _callback = param.NAME; \
+		if (_callback.isNotNull()) { \
 			control.parsingPosition = pos; \
 			control.flagChangeSource = sl_false; \
 			control.currentNode = NODE; \
-			_listener->NAME(&control, __VA_ARGS__); \
+			_callback(&control, __VA_ARGS__); \
 			if (control.flagStopParsing) { \
 				flagError = sl_true; \
 				errorMessage = _g_xml_error_msg_user_stop; \
@@ -1722,9 +1671,9 @@ namespace slib
 							if (!(parent->addChild(comment))) {
 								REPORT_ERROR(_g_xml_error_msg_memory_lack)
 							}
-							CALL_LISTENER(onComment, comment.get(), str)
+							CALL_CALLBACK(onComment, comment.get(), str)
 						} else {
-							CALL_LISTENER(onComment, sl_null, str)
+							CALL_CALLBACK(onComment, sl_null, str)
 						}
 					}
 					pos += 3;
@@ -1770,9 +1719,9 @@ namespace slib
 						if (!(parent->addChild(text))) {
 							REPORT_ERROR(_g_xml_error_msg_memory_lack)
 						}
-						CALL_LISTENER(onCDATA, text.get(), str)
+						CALL_CALLBACK(onCDATA, text.get(), str)
 					} else {
-						CALL_LISTENER(onCDATA, sl_null, str)
+						CALL_CALLBACK(onCDATA, sl_null, str)
 					}
 				}
 				pos += 3;
@@ -1832,9 +1781,9 @@ namespace slib
 						if (!(parent->addChild(PI))) {
 							REPORT_ERROR(_g_xml_error_msg_memory_lack)
 						}
-						CALL_LISTENER(onProcessingInstruction, PI.get(), target, str)
+						CALL_CALLBACK(onProcessingInstruction, PI.get(), target, str)
 					} else {
-						CALL_LISTENER(onProcessingInstruction, sl_null, target, str)
+						CALL_CALLBACK(onProcessingInstruction, sl_null, target, str)
 					}
 				}
 				pos += 2;
@@ -2022,7 +1971,7 @@ namespace slib
 						if (!(listPrefixMappings.add(String::null()))) {
 							REPORT_ERROR(_g_xml_error_msg_memory_lack)
 						}
-						CALL_LISTENER(onStartPrefixMapping, element.get(), String::null(), defNamespace);
+						CALL_CALLBACK(onStartPrefixMapping, element.get(), String::null(), defNamespace);
 					} else if (prefix == "xmlns" && attr.localName.isNotEmpty() && attr.value.isNotEmpty()) {
 						if (namespaces == _namespaces) {
 							namespaces = _namespaces.duplicate();
@@ -2033,7 +1982,7 @@ namespace slib
 						if (!(listPrefixMappings.add(attr.localName))) {
 							REPORT_ERROR(_g_xml_error_msg_memory_lack)
 						}
-						CALL_LISTENER(onStartPrefixMapping, element.get(), attr.localName, attr.value)
+						CALL_CALLBACK(onStartPrefixMapping, element.get(), attr.localName, attr.value)
 					}
 				}
 			}
@@ -2074,7 +2023,7 @@ namespace slib
 				REPORT_ERROR(_g_xml_error_msg_memory_lack)
 			}
 		}
-		CALL_LISTENER(onStartElement, element.get(), element.get())
+		CALL_CALLBACK(onStartElement, element.get(), element.get())
 		if (!flagEmptyTag) {
 			parseNodes(parent ? element.get() : sl_null, defNamespace, namespaces);
 			if (flagError) {
@@ -2109,11 +2058,11 @@ namespace slib
 			pos++;
 		}
 		element->setEndPositionInSource(pos);
-		CALL_LISTENER(onEndElement, element.get(), element.get());
+		CALL_CALLBACK(onEndElement, element.get(), element.get());
 		if (param.flagProcessNamespaces) {
 			ListLocker<String> prefixes(listPrefixMappings);
 			for (sl_size i = 0; i < prefixes.count; i++) {
-				CALL_LISTENER(onEndPrefixMapping, element.get(), prefixes[i]);
+				CALL_CALLBACK(onEndPrefixMapping, element.get(), prefixes[i]);
 			}
 		}
 	}
@@ -2195,9 +2144,9 @@ namespace slib
 					if (!(parent->addChild(node))) {
 						REPORT_ERROR(_g_xml_error_msg_memory_lack)
 					}
-					CALL_LISTENER(onText, node.get(), text)
+					CALL_CALLBACK(onText, node.get(), text)
 				} else {
-					CALL_LISTENER(onText, sl_null, text)
+					CALL_CALLBACK(onText, sl_null, text)
 				}
 			}
 			createWhiteSpace(parent, startWhiteSpace, pos);
@@ -2258,7 +2207,7 @@ namespace slib
 	template <class ST, class CT, class BT>
 	void _priv_Xml_Parser<ST, CT, BT>::parseXml()
 	{
-		CALL_LISTENER(onStartDocument, document.get(), document.get())
+		CALL_CALLBACK(onStartDocument, document.get(), document.get())
 		parseNodes(document.get(), String::null(), HashMap<String, String>::null());
 		if (flagError) {
 			return;
@@ -2271,7 +2220,7 @@ namespace slib
 				REPORT_ERROR(_g_xml_error_msg_document_not_wellformed);
 			}
 		}
-		CALL_LISTENER(onEndDocument, document.get(), document.get())
+		CALL_CALLBACK(onEndDocument, document.get(), document.get())
 	}
 
 	template <class ST, class CT, class BT>
@@ -2295,7 +2244,6 @@ namespace slib
 			}
 		}
 		parser.param = param;
-		parser.listener = param.listener;
 		parser.control.source.sz8 = (sl_char8*)(buf);
 		parser.control.source.len = len;
 		parser.control.characterSize = sizeof(CT);
