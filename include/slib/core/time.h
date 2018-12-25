@@ -26,6 +26,7 @@
 #include "definition.h"
 
 #include "string.h"
+#include "object.h"
 #include "parse.h"
 
 /*******************************************************
@@ -36,13 +37,118 @@
 
 namespace slib
 {
-
-	struct SLIB_EXPORT DATE
+	
+	class Time;
+	class TimeZone;
+	
+	class CTimeZone: public Object
 	{
-		int year;
-		int month;
-		int day;
-		int dayOfWeek;
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		CTimeZone() noexcept;
+		
+		~CTimeZone() noexcept;
+		
+	public:
+		// In seconds
+		sl_int64 getOffset();
+		
+		// In seconds
+		virtual sl_int64 getOffset(const Time& time) = 0;
+		
+	};
+	
+	class GenericTimeZone : public CTimeZone
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		GenericTimeZone(sl_int64 offsetSeconds = 0);
+		
+		~GenericTimeZone();
+		
+	public:
+		using CTimeZone::getOffset;
+		
+		sl_int64 getOffset(const Time& time) override;
+		
+	protected:
+		sl_int64 m_offset;
+		
+	};
+	
+	
+	template <>
+	class SLIB_EXPORT Atomic<TimeZone>
+	{
+		SLIB_ATOMIC_REF_WRAPPER(CTimeZone)
+		
+	public:
+		sl_bool isLocal() const noexcept;
+		
+		sl_bool isUTC() const noexcept;
+		
+		// In seconds
+		sl_int64 getOffset() const;
+		
+		// In seconds
+		sl_int64 getOffset(const Time& time) const;
+		
+	public:
+		AtomicRef<CTimeZone> ref;
+		
+	};
+	
+	typedef Atomic<TimeZone> AtomicTimeZone;
+	
+	class TimeZone
+	{
+		SLIB_REF_WRAPPER(TimeZone, CTimeZone)
+		
+	public:
+		static const TimeZone& Local;
+		
+		static const TimeZone& UTC() noexcept;
+		
+		static TimeZone create(sl_int64 offset) noexcept;
+		
+	public:
+		sl_bool isLocal() const noexcept;
+		
+		sl_bool isUTC() const noexcept;
+
+		// In seconds
+		sl_int64 getOffset() const;
+		
+		// In seconds
+		sl_int64 getOffset(const Time& time) const;
+
+	public:
+		Ref<CTimeZone> ref;
+		
+	};
+
+	class SLIB_EXPORT TimeComponents
+	{
+	public:
+		sl_int32 year;
+		sl_uint8 month;
+		sl_uint8 day;
+		sl_uint8 dayOfWeek;
+		sl_uint8 hour;
+		sl_uint8 minute;
+		sl_uint8 second;
+		sl_uint16 milliseconds;
+		sl_uint16 microseconds;
+		
+	public:
+		TimeComponents() noexcept;
+		
+		SLIB_INLINE TimeComponents(const TimeComponents& other) noexcept = default;
+		
+		SLIB_INLINE TimeComponents& operator=(const TimeComponents& other) noexcept = default;
+
 	};
 	
 	class SLIB_EXPORT Time
@@ -63,21 +169,23 @@ namespace slib
 
 		SLIB_INLINE constexpr Time(sl_uint64 time) noexcept: m_time(time) {}
 
-		Time(int year, int month, int date) noexcept;
+		Time(int year, int month, int date, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		Time(int year, int month, int date, int hour, int minute, int second) noexcept;
+		Time(int year, int month, int date, int hour, int minute, int second, int milliseconds = 0, int microseconds = 0, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		Time(const String& str) noexcept;
+		Time(const TimeComponents& comps, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		Time(const String16& str) noexcept;
+		Time(const String& str, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		Time(const AtomicString& str) noexcept;
+		Time(const String16& str, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		Time(const AtomicString16& str) noexcept;
+		Time(const AtomicString& str, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		Time(const sl_char8* str) noexcept;
+		Time(const AtomicString16& str, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		Time(const sl_char16* str) noexcept;
+		Time(const sl_char8* str, const TimeZone& zone = TimeZone::Local) noexcept;
+
+		Time(const sl_char16* str, const TimeZone& zone = TimeZone::Local) noexcept;
 	
 	public:
 		static Time now() noexcept;
@@ -162,73 +270,81 @@ namespace slib
 		Time& operator-=(const Time& time) noexcept;
 
 	public:
-		void setElements(int year, int month, int date, int hour, int minute, int second) noexcept;
-
 		void setNow() noexcept;
 
-		void setToSystem() noexcept;
+		static sl_bool setSystemTime(const Time& time) noexcept;
 
-		void getDate(DATE* date) const noexcept;
+		void get(TimeComponents& output, const TimeZone& zone = TimeZone::Local) const noexcept;
+		
+		void getUTC(TimeComponents& output) const noexcept;
+		
+		void set(const TimeComponents& comps, const TimeZone& zone = TimeZone::Local) noexcept;
+		
+		void setUTC(const TimeComponents& comps) noexcept;
 
-		void setDate(int year, int month, int day) noexcept;
+		void set(int year, int month, int date, int hour = 0, int minute = 0, int second = 0, int milliseconds = 0, int microseconds = 0, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		int getYear() const noexcept;
+		void setUTC(int year, int month, int date, int hour = 0, int minute = 0, int second = 0, int milliseconds = 0, int microseconds = 0) noexcept;
 
-		void setYear(int year) noexcept;
+		void setDate(int year, int month, int day, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void addYears(int years) noexcept;
+		int getYear(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		int getMonth() const noexcept;
+		void setYear(int year, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void setMonth(int month) noexcept;
+		void addYears(int years, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void addMonths(int months) noexcept;
+		int getMonth(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		int getDay() const noexcept;
+		void setMonth(int month, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void setDay(int day) noexcept;
+		void addMonths(int months, const TimeZone& zone = TimeZone::Local) noexcept;
+
+		int getDay(const TimeZone& zone = TimeZone::Local) const noexcept;
+
+		void setDay(int day, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		void addDays(sl_int64 days) noexcept;
 
-		double getDayf() const noexcept;
+		double getDayf(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setDayf(double day) noexcept;
+		void setDayf(double day, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		void addDaysf(double days) noexcept;
 
-		int getHour() const noexcept;
+		int getHour(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setHour(int hour) noexcept;
+		void setHour(int hour, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		void addHours(sl_int64 hours) noexcept;
 
-		double getHourf() const noexcept;
+		double getHourf(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setHourf(double hour) noexcept;
+		void setHourf(double hour, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		void addHoursf(double hours) noexcept;
 
-		int getMinute() const noexcept;
+		int getMinute(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setMinute(int minute) noexcept;
+		void setMinute(int minute, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		void addMinutes(sl_int64 minutes) noexcept;
 
-		double getMinutef() const noexcept;
+		double getMinutef(const TimeZone& zone = TimeZone::Local) const noexcept;
 	
-		void setMinutef(double minute) noexcept;
+		void setMinutef(double minute, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		void addMinutesf(double minutes) noexcept;
 
-		int getSecond() const noexcept;
+		int getSecond(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setSecond(int second) noexcept;
+		void setSecond(int second, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		void addSeconds(sl_int64 seconds) noexcept;
 
-		double getSecondf() const noexcept;
+		double getSecondf(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setSecondf(double second) noexcept;
+		void setSecondf(double second, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		void addSecondsf(double seconds) noexcept;
 
@@ -256,13 +372,13 @@ namespace slib
 
 		void addMicrosecondsf(double micros) noexcept;
 
-		int getDayOfWeek() const noexcept;
+		int getDayOfWeek(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setDayOfWeek(int day) noexcept;
+		void setDayOfWeek(int day, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		int getDayOfYear() const noexcept;
+		int getDayOfYear(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setDayOfYear(int day) noexcept;
+		void setDayOfYear(int day, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		sl_int64 getDaysCount() const noexcept;
 
@@ -312,41 +428,45 @@ namespace slib
 	
 		void setMicrosecondsCountf(double micros) noexcept;
 	
+		// In Seconds
+		sl_int64 getLocalTimeOffset() const noexcept;
 
-		int getDaysCountInMonth() const noexcept;
+		int getDaysCountInMonth(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		int getDaysCountInYear() const noexcept;
+		int getDaysCountInYear(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		int getQuarter() const noexcept;
+		int getQuarter(const TimeZone& zone = TimeZone::Local) const noexcept;
 	
-		String getWeekday(sl_bool flagShort = sl_true) const noexcept;
-	
-		Time getTimeOnly() const noexcept;
+		String getWeekday(sl_bool flagShort, const TimeZone& zone = TimeZone::Local) const noexcept;
+		
+		String getWeekday(const TimeZone& zone = TimeZone::Local) const noexcept;
+
+		Time getTimeOnly(const TimeZone& zone = TimeZone::Local) const noexcept;
 
 
-		String toString() const noexcept;
+		String toString(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		String16 toString16() const noexcept;
+		String16 toString16(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		String getDateString() const noexcept;
+		String getDateString(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		String16 getDateString16() const noexcept;
+		String16 getDateString16(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		String getTimeString() const noexcept;
+		String getTimeString(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		String16 getTimeString16() const noexcept;
+		String16 getTimeString16(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		sl_bool setString(const String& str) noexcept;
+		sl_bool setString(const String& str, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		sl_bool setString(const String16& str) noexcept;
+		sl_bool setString(const String16& str, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		sl_bool setString(const AtomicString& str) noexcept;
+		sl_bool setString(const AtomicString& str, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		sl_bool setString(const AtomicString16& str) noexcept;
+		sl_bool setString(const AtomicString16& str, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		sl_bool setString(const sl_char8* str) noexcept;
+		sl_bool setString(const sl_char8* str, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		sl_bool setString(const sl_char16* str) noexcept;
+		sl_bool setString(const sl_char16* str, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		String format(const String& fmt) const noexcept;
 
@@ -360,23 +480,12 @@ namespace slib
 
 		String format(const sl_char16* fmt) const noexcept;
 	
-
-		static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char8* sz, sl_size posStart = 0, sl_size posEnd = SLIB_SIZE_MAX) noexcept;
-
-		static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char16* sz, sl_size posStart = 0, sl_size posEnd = SLIB_SIZE_MAX) noexcept;
-
-		static sl_bool parseElements(const String& time, sl_int32* outArrayYMDHMS) noexcept;
-
-		static sl_bool parseElements(const String16& time, sl_int32* outArrayYMDHMS) noexcept;
-
-		static sl_bool parseElements(const AtomicString& time, sl_int32* outArrayYMDHMS) noexcept;
-
-		static sl_bool parseElements(const AtomicString16& time, sl_int32* outArrayYMDHMS) noexcept;
-
-		static sl_bool parseElements(const sl_char8* time, sl_int32* outArrayYMDHMS) noexcept;
-
-		static sl_bool parseElements(const sl_char16* time, sl_int32* outArrayYMDHMS) noexcept;
-
+		template <class ST>
+		static sl_bool parse(const ST& str, TimeComponents* _out) noexcept
+		{
+			return Parse(str, _out);
+		}
+		
 		template <class ST>
 		static sl_bool parse(const ST& str, Time* _out) noexcept
 		{
@@ -388,18 +497,36 @@ namespace slib
 		{
 			return Parse(str, this);
 		}
-
+		
+		template <class ST>
+		static sl_bool parse(const ST& str, const TimeZone& zone, Time* _out) noexcept
+		{
+			return Parse(str, zone, _out);
+		}
+		
+		template <class ST>
+		sl_bool parse(const ST& str, const TimeZone& zone) noexcept
+		{
+			return Parse(str, zone, this);
+		}
+		
 		/* platform functions */
 	protected:
-		sl_bool _getDate(DATE* date) const noexcept;
+		sl_bool _get(TimeComponents& output, sl_bool flagUTC) const noexcept;
 
-		void _setElements(int year, int month, int date, int hour, int minute, int second) noexcept;
+		static sl_int64 _set(int year, int month, int date, int hour, int minute, int second, sl_bool flagUTC) noexcept;
 
 		void _setNow() noexcept;
 
-		void _setToSystem() noexcept;
+		sl_bool _setToSystem() const noexcept;
 
 	};
+	
+	template <>
+	sl_reg Parser<TimeComponents, sl_char8>::parse(TimeComponents* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept;
+	
+	template <>
+	sl_reg Parser<TimeComponents, sl_char16>::parse(TimeComponents* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept;
 	
 	template <>
 	sl_reg Parser<Time, sl_char8>::parse(Time* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept;
@@ -407,6 +534,12 @@ namespace slib
 	template <>
 	sl_reg Parser<Time, sl_char16>::parse(Time* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept;
 	
+	template <>
+	sl_reg Parser2<Time, sl_char8, TimeZone>::parse(Time* _out, const TimeZone& zone, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept;
+	
+	template <>
+	sl_reg Parser2<Time, sl_char16, TimeZone>::parse(Time* _out, const TimeZone& zone, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept;
+
 	class SLIB_EXPORT TimeCounter
 	{
 	public:
