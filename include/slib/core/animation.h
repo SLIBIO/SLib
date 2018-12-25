@@ -41,24 +41,6 @@
 namespace slib
 {
 	
-	class Animation;
-	
-	class IAnimationListener
-	{
-	public:
-		IAnimationListener();
-
-		virtual ~IAnimationListener();
-
-	public:
-		virtual void onAnimationFrame(Animation* animation, float seconds);
-
-		virtual void onRepeatAnimation(Animation* animation, sl_int32 nRemainingRepeatCount);
-
-		virtual void onStopAnimation(Animation* animation);
-
-	};
-	
 	enum class AnimationCurve
 	{
 		Linear = 0,
@@ -240,9 +222,13 @@ namespace slib
 		void update(float elapsedSeconds);
 
 	public:
-		SLIB_PROPERTY(AtomicPtr<IAnimationListener>, Listener)
-
 		SLIB_PROPERTY(AtomicFunction<void()>, OnStop)
+
+		SLIB_PROPERTY(AtomicFunction<void(Animation*, float seconds)>, OnAnimationFrame)
+
+		SLIB_PROPERTY(AtomicFunction<void(Animation*, sl_int32 nRemainingRepeatCount)>, OnRepeatAnimation)
+
+		SLIB_PROPERTY(AtomicFunction<void(Animation*)>, OnStopAnimation)
 
 	protected:
 		virtual void onAnimationFrame(float seconds);

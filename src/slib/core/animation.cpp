@@ -30,26 +30,6 @@
 namespace slib
 {
 
-	IAnimationListener::IAnimationListener()
-	{
-	}
-
-	IAnimationListener::~IAnimationListener()
-	{
-	}
-
-	void IAnimationListener::onAnimationFrame(Animation* animation, float time)
-	{
-	}
-
-	void IAnimationListener::onRepeatAnimation(Animation* animation, sl_int32 nRemainingRepeatCount)
-	{
-	}
-
-	void IAnimationListener::onStopAnimation(Animation* animation)
-	{
-	}
-
 	SLIB_DEFINE_OBJECT(Animation, Object)
 
 	Animation::Animation()
@@ -648,10 +628,7 @@ namespace slib
 	void Animation::dispatchAnimationFrame(float time)
 	{
 		onAnimationFrame(time);
-		PtrLocker<IAnimationListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onAnimationFrame(this, time);
-		}
+		getOnAnimationFrame()(this, time);
 		float fraction = _getFraction(time);
 		ListLocker< Ref<AnimationTarget> > _targets(m_targets);
 		sl_size n = _targets.count;
@@ -682,23 +659,14 @@ namespace slib
 	void Animation::dispatchRepeatAnimation(sl_int32 nRemainingRepeatCount)
 	{
 		onRepeatAnimation(nRemainingRepeatCount);
-		PtrLocker<IAnimationListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onRepeatAnimation(this, nRemainingRepeatCount);
-		}
+		getOnRepeatAnimation()(this, nRemainingRepeatCount);
 	}
 	
 	void Animation::dispatchStopAnimation()
 	{
 		onStopAnimation();
-		Function<void()> onStop(getOnStop());
-		if (onStop.isNotNull()) {
-			onStop();
-		}
-		PtrLocker<IAnimationListener> listener(getListener());
-		if (listener.isNotNull()) {
-			listener->onStopAnimation(this);
-		}
+		getOnStop()();
+		getOnStopAnimation()(this);
 
 		ListLocker< Ref<Animation> > linkedAnimations(m_linkedAnimations);
 		for (sl_size i = 0; i < linkedAnimations.count; i++) {
