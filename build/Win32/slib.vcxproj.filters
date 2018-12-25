@@ -116,9 +116,6 @@
     <ClCompile Include="..\..\src\slib\core\base.cpp">
       <Filter>src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\slib\core\base64.cpp">
-      <Filter>src\core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\slib\core\event.cpp">
       <Filter>src\core</Filter>
     </ClCompile>
@@ -841,6 +838,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\slib\core\regex.cpp">
       <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\crypto\base64.cpp">
+      <Filter>src\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\crypto\jwt.cpp">
+      <Filter>src\crypto</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

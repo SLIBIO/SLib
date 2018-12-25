@@ -39,7 +39,6 @@
     <ClCompile Include="..\..\src\slib\core\async_win32.cpp" />
     <ClCompile Include="..\..\src\slib\core\atomic.cpp" />
     <ClCompile Include="..\..\src\slib\core\base.cpp" />
-    <ClCompile Include="..\..\src\slib\core\base64.cpp" />
     <ClCompile Include="..\..\src\slib\core\charset.cpp" />
     <ClCompile Include="..\..\src\slib\core\collection.cpp" />
     <ClCompile Include="..\..\src\slib\core\content_type.cpp" />
@@ -89,11 +88,13 @@
     <ClCompile Include="..\..\src\slib\core\win32_com.cpp" />
     <ClCompile Include="..\..\src\slib\core\xml.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\aes.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\base64.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\block_cipher.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\blowfish.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\compress_zlib.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\crypto_hash.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\gcm.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\jwt.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\md5.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\rsa.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\sha1.cpp" />
