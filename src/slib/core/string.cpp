@@ -294,7 +294,7 @@ namespace slib
 			_priv_StringContainer_std* container = (_priv_StringContainer_std*)(Base::createMemory(sizeof(_priv_StringContainer_std)));
 			if (container) {
 				new (container) _priv_StringContainer_std(str);
-				container->sz = (sl_char8*)(str.c_str());
+				container->sz = (sl_char8*)(container->str.c_str());
 				container->len = len;
 				container->hash = 0;
 				container->type = STRING_CONTAINER_TYPE_STD;
@@ -321,7 +321,7 @@ namespace slib
 			_priv_StringContainer16_std* container = (_priv_StringContainer16_std*)(Base::createMemory(sizeof(_priv_StringContainer16_std)));
 			if (container) {
 				new (container) _priv_StringContainer16_std(str);
-				container->sz = (sl_char16*)(str.c_str());
+				container->sz = (sl_char16*)(container->str.c_str());
 				container->len = len;
 				container->hash = 0;
 				container->type = STRING_CONTAINER_TYPE_STD;
