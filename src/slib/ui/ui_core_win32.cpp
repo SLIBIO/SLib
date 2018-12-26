@@ -145,6 +145,14 @@ namespace slib
 		}
 	}
 
+	void UI::openUrl(const String& url)
+	{
+		Windows::ShellExecuteParam param;
+		param.operation = "open";
+		param.path = url;
+		Windows::shellExecute(param);
+	}
+
 	void _priv_Win32_processMenuCommand(WPARAM wParam, LPARAM lParam);
 	sl_bool _priv_Win32_processMenuShortcutKey(MSG& msg);
 	void _priv_Win32_processCustomMsgBox(WPARAM wParam, LPARAM lParam);

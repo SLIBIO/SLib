@@ -573,6 +573,8 @@ namespace slib
 		sei.cbSize = sizeof(sei);
 		if (param.runAsAdmin) {
 			sei.lpVerb = L"runas";
+		} else if (param.operation.isNotEmpty()) {
+			sei.lpVerb = (LPCWSTR)(param.operation.getData());
 		}
 		sei.lpFile = (LPCWSTR)(param.path.getData());
 		if (param.params.isNotEmpty()) {

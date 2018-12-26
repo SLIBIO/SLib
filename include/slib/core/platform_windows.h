@@ -108,6 +108,7 @@ namespace slib
 		class ShellExecuteParam
 		{
 		public:
+			String16 operation;
 			String16 path;
 			String16 params;
 			sl_bool runAsAdmin; // `shellExecute` returns sl_false if the user refused the elevation
