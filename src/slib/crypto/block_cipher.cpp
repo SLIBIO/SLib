@@ -28,6 +28,7 @@
 
 #include "slib/crypto/aes.h"
 #include "slib/crypto/blowfish.h"
+#include "slib/crypto/des.h"
 
 namespace slib
 {
@@ -415,5 +416,7 @@ namespace slib
 
 	DEFINE_BLOCKCIPHER(AES);
 	DEFINE_BLOCKCIPHER(Blowfish);
+	DEFINE_BLOCKCIPHER(DES);
+	DEFINE_BLOCKCIPHER(TripleDES);
 
 }
