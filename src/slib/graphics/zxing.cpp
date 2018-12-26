@@ -89,6 +89,7 @@ namespace slib
 			case ZXingFormat::UPC_EAN_EXTENSION:
 				return BarcodeFormat::UPC_EAN_EXTENSION;
 		}
+		return BarcodeFormat::QR_CODE;
 	}
 
 	Ref<Image> ZXing::generate(const ZXingGenerateParam& param)

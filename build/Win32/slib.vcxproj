@@ -144,6 +144,7 @@
     <ClCompile Include="..\..\src\slib\graphics\pen.cpp" />
     <ClCompile Include="..\..\src\slib\graphics\pen_gdi.cpp" />
     <ClCompile Include="..\..\src\slib\graphics\yuv.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\zxing.cpp" />
     <ClCompile Include="..\..\src\slib\math\bezier.cpp" />
     <ClCompile Include="..\..\src\slib\math\bigint.cpp" />
     <ClCompile Include="..\..\src\slib\math\box.cpp" />
@@ -252,6 +253,7 @@
     <ClCompile Include="..\..\src\slib\ui\motion_tracker.cpp" />
     <ClCompile Include="..\..\src\slib\ui\picker_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\progress_bar.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\qr_code_scanner.cpp" />
     <ClCompile Include="..\..\src\slib\ui\radio_button.cpp" />
     <ClCompile Include="..\..\src\slib\ui\radio_button_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\render_view.cpp" />
