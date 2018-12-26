@@ -130,6 +130,7 @@ namespace slib
 		static Color getColorFromColorRef(COLORREF cr);
 
 		static HBITMAP createDIBFromBitmap(const Ref<Bitmap>& bitmap);
+		static HICON createIconFromBitmap(const Ref<Bitmap>& bitmap, sl_bool flagCursor = sl_false, sl_uint32 xHotspot = 0, sl_uint32 yHotspot = 0);
 #endif
 
 #if defined(SLIB_PLATFORM_IS_APPLE)

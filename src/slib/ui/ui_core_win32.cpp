@@ -30,11 +30,13 @@
 
 #include "slib/ui/screen.h"
 #include "slib/ui/app.h"
+#include "slib/ui/window.h"
 #include "slib/core/queue.h"
 #include "slib/core/dispatch.h"
 #include "slib/core/safe_static.h"
 
 #include <commctrl.h>
+#include <shobjidl.h>
 
 #if defined _M_IX86
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -153,6 +155,82 @@ namespace slib
 		Windows::shellExecute(param);
 	}
 
+	UINT _g_priv_ui_taskbutton_message = 0;
+
+	void _priv_UI_initTaskbarList()
+	{
+		if (!_g_priv_ui_taskbutton_message) {
+			_g_priv_ui_taskbutton_message = RegisterWindowMessageW(L"TaskbarButtonCreated");
+		}
+	}
+
+	sl_uint32 _g_priv_ui_badge_number = 0;
+	
+	void _priv_UI_applyBadgeNumber()
+	{
+		SLIB_SAFE_STATIC(Ref<Font>, font1, Font::create("Courier", 24, sl_true));
+		if (SLIB_SAFE_STATIC_CHECK_FREED(font1)) {
+			return;
+		}
+		SLIB_SAFE_STATIC(Ref<Font>, font2, Font::create("Courier", 20, sl_true));
+		if (SLIB_SAFE_STATIC_CHECK_FREED(font2)) {
+			return;
+		}
+		Ref<UIApp> app = UIApp::getApp();
+		if (app.isNull()) {
+			return;
+		}
+		Ref<Window> window = app->getMainWindow();
+		HWND hWnd = UIPlatform::getWindowHandle(window.get());
+		if (!hWnd) {
+			return;
+		}
+		ITaskbarList3* pList = NULL;
+		CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pList));
+		if (pList) {
+			HRESULT hr = pList->HrInit();
+			if (SUCCEEDED(hr)) {
+				HICON hIcon = NULL;
+				sl_uint32 n = _g_priv_ui_badge_number;
+				if (n > 0) {
+					if (n >= 100) {
+						n = 99;
+					}
+					Ref<Bitmap> bitmap = Bitmap::create(32, 32);
+					if (bitmap.isNotNull()) {
+						bitmap->resetPixels(Color::zero());
+						Ref<Canvas> canvas = bitmap->getCanvas();
+						if (canvas.isNotNull()) {
+							canvas->setAntiAlias(sl_true);
+							canvas->fillEllipse(0, 0, 32, 32, Color::Red);
+							canvas->setAntiAlias(sl_false);
+							canvas->drawText(String::fromUint32(n), Rectangle(0, 0, 32, 30), n < 10 ? font1 : font2, Color::White, Alignment::MiddleCenter);
+							canvas.setNull();
+							hIcon = GraphicsPlatform::createIconFromBitmap(bitmap);
+						}
+					}
+				}
+				pList->SetOverlayIcon(hWnd, hIcon, L"Status");
+				if (hIcon) {
+					DestroyIcon(hIcon);
+				}
+			}
+			pList->Release();
+		}
+	}
+
+	sl_uint32 UI::getBadgeNumber()
+	{
+		return _g_priv_ui_badge_number;
+	}
+
+	void UI::setBadgeNumber(sl_uint32 num)
+	{
+		_g_priv_ui_badge_number = num;
+		_priv_UI_initTaskbarList();
+		_priv_UI_applyBadgeNumber();
+	}
+
 	void _priv_Win32_processMenuCommand(WPARAM wParam, LPARAM lParam);
 	sl_bool _priv_Win32_processMenuShortcutKey(MSG& msg);
 	void _priv_Win32_processCustomMsgBox(WPARAM wParam, LPARAM lParam);
@@ -191,6 +269,8 @@ namespace slib
 				::DestroyWindow(msg.hwnd);
 			} else if (msg.message == WM_MENUCOMMAND) {
 				_priv_Win32_processMenuCommand(msg.wParam, msg.lParam);
+			} else if (_g_priv_ui_taskbutton_message && msg.message == _g_priv_ui_taskbutton_message) {
+				_priv_UI_applyBadgeNumber();
 			} else {
 				do {
 					if (_priv_Win32_processMenuShortcutKey(msg)) {

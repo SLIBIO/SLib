@@ -26,6 +26,8 @@
 
 #include "slib/graphics/platform.h"
 
+#include "slib/core/scoped.h"
+
 namespace slib
 {
 
@@ -74,6 +76,40 @@ namespace slib
 				}
 				::DeleteObject(hbm);
 			}
+		}
+		return NULL;
+	}
+
+	HICON GraphicsPlatform::createIconFromBitmap(const Ref<Bitmap>& bitmap, sl_bool flagCursor, sl_uint32 xHotspot, sl_uint32 yHotspot)
+	{
+		if (bitmap.isNull()) {
+			return NULL;
+		}
+		sl_uint32 width = bitmap->getWidth();
+		sl_uint32 height = bitmap->getHeight();
+		if (width <= 0 || height <= 0) {
+			return NULL;
+		}
+		HBITMAP dib = createDIBFromBitmap(bitmap);
+		if (dib) {
+			HICON hIcon = NULL;
+			sl_uint32 maskWidth = BitmapData::calculatePitchAlign4(width, 1);
+			sl_uint32 size = maskWidth * height;
+			SLIB_SCOPED_BUFFER(sl_uint8, 4096, bits, size);
+			Base::resetMemory(bits, 0xFF, size);
+			HBITMAP mask = CreateBitmap(width, height, 1, 1, bits);
+			if (mask) {
+				ICONINFO info;
+				info.fIcon = flagCursor ? FALSE : TRUE;
+				info.xHotspot = xHotspot;
+				info.yHotspot = yHotspot;
+				info.hbmMask = mask;
+				info.hbmColor = dib;
+				hIcon = CreateIconIndirect(&info);
+				DeleteObject(mask);
+			}
+			DeleteObject(dib);
+			return hIcon;
 		}
 		return NULL;
 	}
