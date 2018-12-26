@@ -20,27 +20,30 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_CRYPTO_HEADER
-#define CHECKHEADER_SLIB_CRYPTO_HEADER
+#include "slib/crypto/des.h"
 
-#include "crypto/base64.h"
+#include "slib/core/mio.h"
 
-#include "crypto/md5.h"
-#include "crypto/sha1.h"
-#include "crypto/sha2.h"
-#include "crypto/hash.h"
-#include "crypto/hmac.h"
+/*
+	DES - Data Encryption Standard
 
-#include "crypto/gcm.h"
-#include "crypto/block_cipher.h"
-#include "crypto/aes.h"
-#include "crypto/blowfish.h"
-#include "crypto/des.h"
+	https://csrc.nist.gov/CSRC/media/Publications/fips/46/3/archive/1999-10-25/documents/fips46-3.pdf
+*/
 
-#include "crypto/rsa.h"
+namespace slib
+{
 
-#include "crypto/jwt.h"
+	DES::DES()
+	{
+	}
 
-#include "crypto/zlib.h"
+	DES::~DES()
+	{
+	}
 
-#endif
+	sl_uint32 DES::getBlockSize()
+	{
+		return 8;
+	}
+
+}

@@ -24,7 +24,10 @@
 #define CHECKHEADER_SLIB_WEB_HEADER
 
 #include "web/constants.h"
+
 #include "web/service.h"
 #include "web/controller.h"
+
+#include "web/ginger.h"
 
 #endif

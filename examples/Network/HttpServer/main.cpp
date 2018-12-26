@@ -57,7 +57,18 @@ int main(int argc, const char * argv[])
 		Console::println("Body:");
 		Console::println("%s", String::fromMemory(context->getRequestBody()));
 		Console::println("");
-		context->write("Welcome");
+		
+		Json data = {
+			JsonItem("remote", context->getRemoteAddress().toString()),
+			JsonItem("http", Json({
+				JsonItem("method", context->getMethodText()),
+				JsonItem("path", context->getPath()),
+				JsonItem("list", Json({
+					"item0", "item1"
+				}))
+			}))
+		};
+		context->write(Ginger::render("Welcome ${remote}. Method:${http.method}  Path:${http.path}<BR> $for x in http.list {{ ${x} }}", data));
 		return sl_true;
 	};
 	

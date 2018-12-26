@@ -11,6 +11,7 @@ hiredis 0.14.0
 
 # Header-File Library
 stb_image 2.19
+ginger
 
 # Headers
 gl

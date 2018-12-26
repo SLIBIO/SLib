@@ -93,6 +93,7 @@
     <ClCompile Include="..\..\src\slib\crypto\blowfish.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\compress_zlib.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\crypto_hash.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\des.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\gcm.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\jwt.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\md5.cpp" />
@@ -286,6 +287,7 @@
     <ClCompile Include="..\..\src\slib\ui\web_view_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\window.cpp" />
     <ClCompile Include="..\..\src\slib\ui\window_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\web\ginger.cpp" />
     <ClCompile Include="..\..\src\slib\web\web_controller.cpp" />
     <ClCompile Include="..\..\src\slib\web\web_service.cpp" />
   </ItemGroup>

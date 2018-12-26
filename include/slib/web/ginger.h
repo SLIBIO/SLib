@@ -20,27 +20,25 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_CRYPTO_HEADER
-#define CHECKHEADER_SLIB_CRYPTO_HEADER
+#ifndef CHECKHEADER_SLIB_WEB_GINGER
+#define CHECKHEADER_SLIB_WEB_GINGER
 
-#include "crypto/base64.h"
+#include "definition.h"
 
-#include "crypto/md5.h"
-#include "crypto/sha1.h"
-#include "crypto/sha2.h"
-#include "crypto/hash.h"
-#include "crypto/hmac.h"
+#include "../core/json.h"
 
-#include "crypto/gcm.h"
-#include "crypto/block_cipher.h"
-#include "crypto/aes.h"
-#include "crypto/blowfish.h"
-#include "crypto/des.h"
+namespace slib
+{
+	
+	class SLIB_EXPORT Ginger
+	{
+	public:
+		static String render(const String& _template, const Json& data);
+		
+		static String renderFile(const String& filePath, const Json& data);
 
-#include "crypto/rsa.h"
-
-#include "crypto/jwt.h"
-
-#include "crypto/zlib.h"
+	};
+	
+}
 
 #endif
