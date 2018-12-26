@@ -58,10 +58,10 @@ namespace slib
 	
 		void decrypt(sl_uint32& d0, sl_uint32& d1, sl_uint32& d2, sl_uint32& d3) const;
 		
-		// 128 bit (16 byte) block
+		// 128 bits (16 bytes) block
 		void encryptBlock(const void* src, void* dst) const;
 
-		// 128 bit (16 byte) block
+		// 128 bits (16 bytes) block
 		void decryptBlock(const void* src, void* dst) const;
 
 	public: /* common functions for block ciphers */
