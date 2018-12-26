@@ -101,6 +101,7 @@ if (ANDROID)
   "${SLIB_PATH}/src/slib/device/*.cpp"
   "${SLIB_PATH}/src/slib/db/*.cpp"
   "${SLIB_PATH}/src/slib/geo/*.cpp"
+  "${SLIB_PATH}/src/slib/web/*.cpp"
  )
 else ()
  file (
