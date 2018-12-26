@@ -49,18 +49,18 @@ namespace slib
 	public:
 		static sl_uint32 getBlockSize();
 
-		sl_bool setKey(const void* key, sl_uint32 lenKey /* 16, 24, 32 bytes */);
+		// 64 bit (8 bytes), note that most significant bit of each byte is not used
+		void setKey(const void* key);
+		void setKey(sl_uint64 key);
+		
+		sl_uint64 encrypt(sl_uint64 data) const;
+		
+		sl_uint64 decrypt(sl_uint64 data) const;
 
-		void setKey_SHA256(const String& key);
-		
-		void encrypt(sl_uint32& d0, sl_uint32& d1, sl_uint32& d2, sl_uint32& d3) const;
-	
-		void decrypt(sl_uint32& d0, sl_uint32& d1, sl_uint32& d2, sl_uint32& d3) const;
-		
-		// 128 bit (16 byte) block
+		// 64 bits (8 bytes) block
 		void encryptBlock(const void* src, void* dst) const;
 
-		// 128 bit (16 byte) block
+		// 64 bits (8 bytes) block
 		void decryptBlock(const void* src, void* dst) const;
 
 	public: /* common functions for block ciphers */
@@ -95,9 +95,71 @@ namespace slib
 		sl_size encrypt_CTR(const void* iv, sl_uint64 pos, const void* input, sl_size size, void* output) const;
 
 	private:
-		sl_uint32 m_roundKeyEnc[64];
-		sl_uint32 m_roundKeyDec[64];
-		sl_uint32 m_nCountRounds;
+		sl_uint64 m_K[16];
+		
+	};
+	
+	class SLIB_EXPORT TripleDES : public Object
+	{
+	public:
+		TripleDES();
+		
+		~TripleDES();
+		
+	public:
+		static sl_uint32 getBlockSize();
+		
+		// 3 x 64 bit (8 bytes), note that most significant bit of each byte is not used
+		void setKey(const void* key1, const void* key2, const void* key3);
+		void setKey(sl_uint64 key1, sl_uint64 key2, sl_uint64 key3);
+		void setKey(const void* key1, const void* key2);
+		void setKey(sl_uint64 key1, sl_uint64 key2);
+
+		sl_uint64 encrypt(sl_uint64 data) const;
+		
+		sl_uint64 decrypt(sl_uint64 data) const;
+		
+		// 64 bits (8 bytes) block
+		void encryptBlock(const void* src, void* dst) const;
+		
+		// 64 bits (8 bytes) block
+		void decryptBlock(const void* src, void* dst) const;
+		
+	public: /* common functions for block ciphers */
+		sl_size encryptBlocks(const void* src, void* dst, sl_size size) const;
+		
+		sl_size decryptBlocks(const void* src, void* dst, sl_size size) const;
+		
+		sl_size encrypt_ECB_PKCS7Padding(const void* src, sl_size size, void* dst) const;
+		
+		sl_size decrypt_ECB_PKCS7Padding(const void* src, sl_size size, void* dst) const;
+		
+		sl_size encrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size, void* dst) const;
+		
+		sl_size decrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size, void* dst) const;
+		
+		sl_size encrypt_CBC_PKCS7Padding(const void* src, sl_size size, void* dst) const;
+		
+		sl_size decrypt_CBC_PKCS7Padding(const void* src, sl_size size, void* dst) const;
+		
+		Memory encrypt_CBC_PKCS7Padding(const void* src, sl_size size) const;
+		
+		Memory decrypt_CBC_PKCS7Padding(const void* src, sl_size size) const;
+		
+		Memory encrypt_CBC_PKCS7Padding(const Memory& mem) const;
+		
+		Memory decrypt_CBC_PKCS7Padding(const Memory& mem) const;
+		
+		sl_size encrypt_CTR(const void* input, sl_size size, void* output, void* counter, sl_uint32 offset = 0) const;
+		
+		sl_size encrypt_CTR(const void* iv, sl_uint64 counter, sl_uint32 offset, const void* input, sl_size size, void* output) const;
+		
+		sl_size encrypt_CTR(const void* iv, sl_uint64 pos, const void* input, sl_size size, void* output) const;
+		
+	private:
+		DES m_des1;
+		DES m_des2;
+		DES m_des3;
 
 	};
 	
