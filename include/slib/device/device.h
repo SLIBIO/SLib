@@ -20,12 +20,32 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_DEVICE_HEADER
-#define CHECKHEADER_SLIB_DEVICE_HEADER
+#ifndef CHECKHEADER_SLIB_DEVICE_DEVICE
+#define CHECKHEADER_SLIB_DEVICE_DEVICE
 
-#include "device/device.h"
-#include "device/information.h"
-#include "device/sensor.h"
-#include "device/vibrator.h"
+#include "definition.h"
+
+namespace slib
+{
+
+	enum class DeviceAudioCategory
+	{
+		Default = 0,
+		Playback = 1,
+		Record = 2,
+		PlayAndRecord = 3,
+		PlayVideo = 4,
+		RecordVideo = 5,
+		VideoChat = 6
+	};
+	
+	class SLIB_EXPORT Device
+	{
+	public:
+		static void setAudioCategory(const DeviceAudioCategory& category);
+
+	};
+
+}
 
 #endif

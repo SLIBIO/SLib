@@ -20,12 +20,15 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_DEVICE_HEADER
-#define CHECKHEADER_SLIB_DEVICE_HEADER
+#include "slib/device/device.h"
 
-#include "device/device.h"
-#include "device/information.h"
-#include "device/sensor.h"
-#include "device/vibrator.h"
+namespace slib
+{
 
+#if !defined(SLIB_PLATFORM_IS_IOS)
+	void Device::setAudioCategory(const DeviceAudioCategory& category)
+	{
+	}
 #endif
+
+}
