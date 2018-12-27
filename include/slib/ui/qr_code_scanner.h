@@ -42,6 +42,8 @@ namespace slib
 		~QRCodeScanner();
 
 	public:
+		using CameraView::start;
+		
 		void start(const CameraParam& param) override;
 		
 		void stop() override;
