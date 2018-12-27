@@ -37,8 +37,8 @@ namespace slib
 		if (session == nil) {
 			return;
 		}
-		AVAudioSessionCategory category;
-		AVAudioSessionMode mode;
+		NSString* category;
+		NSString* mode;
 		switch (_category) {
 			case DeviceAudioCategory::Playback:
 				category = AVAudioSessionCategoryPlayback;
