@@ -511,6 +511,7 @@ namespace slib
 		sl_bool m_flagStateResizingWidth;
 		
 		sl_bool m_flagStateDoModal;
+		sl_bool m_flagDispatchedDestroy;
 
 #if defined(SLIB_UI_IS_ANDROID)
 		// jobject

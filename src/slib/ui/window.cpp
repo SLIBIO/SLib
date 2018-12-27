@@ -127,7 +127,8 @@ namespace slib
 		m_flagStateResizingWidth = sl_false;
 		
 		m_flagStateDoModal = sl_false;
-		
+		m_flagDispatchedDestroy = sl_false;
+
 #if defined(SLIB_UI_IS_ANDROID)
 		m_activity = sl_null;
 #endif
@@ -1235,6 +1236,10 @@ namespace slib
 
 	void Window::dispatchDestroy()
 	{
+		if (m_flagDispatchedDestroy) {
+			return;
+		}
+		m_flagDispatchedDestroy = sl_true;
 		onDestroy();
 		getOnDestroy()(this);
 		if (m_flagStateDoModal) {
@@ -1327,6 +1332,10 @@ namespace slib
 	{
 		onCancel(ev);
 		getOnCancel()(this, ev);
+		if (ev->isPreventedDefault()) {
+			return;
+		}
+		dispatchClose(ev);
 		if (ev->isPreventedDefault()) {
 			return;
 		}
