@@ -4484,7 +4484,6 @@
 				26D9D7F21E9628E0005F7BD3 /* Sources */,
 				26D9D84B1E9628E0005F7BD3 /* Frameworks */,
 				26D9D84C1E9628E0005F7BD3 /* CopyFiles */,
-				264AF19C21B41C20004E58CB /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -4544,23 +4543,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd \"${PROJECT_DIR}/../../build/macOS\"\nif ! [ -e \"${PROJECT_DIR}/../../bin/macOS/yasm\" ]\nthen\n    ${DEVELOPER_BIN_DIR}/xcodebuild -project SLib.xcodeproj -scheme yasm -configuration Release -derivedDataPath \"${DERIVED_FILE_DIR}/yasm\"\nfi\n";
-		};
-		264AF19C21B41C20004E58CB /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd \"${PROJECT_DIR}/../../build/macOS\"\nif ! [ -e \"${PROJECT_DIR}/../../bin/macOS/sapp.app/Contents/MacOS/sapp\" ]\nthen\n${DEVELOPER_BIN_DIR}/xcodebuild -project SLib.xcodeproj -scheme sapp -configuration Release -derivedDataPath \"${DERIVED_FILE_DIR}/sapp\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
