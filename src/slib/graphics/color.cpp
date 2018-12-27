@@ -558,5 +558,24 @@ namespace slib
 	{
 		return transformColor(Color4f(src.x, src.y, src.z, 1));
 	}
+	
+	void ColorMatrix::setOverlay(const Color4f& c) noexcept
+	{
+		red = Color4f::zero();
+		green = Color4f::zero();
+		blue = Color4f::zero();
+		alpha = Color4f(0, 0, 0, c.w);
+		bias = Color4f(c.x, c.y, c.z, 0);
+	}
 
+	void ColorMatrix::setOverlay(const Color& c) noexcept
+	{
+		setOverlay((Color4f)c);
+	}
+	
+	void ColorMatrix::setOverlay(const Color3f& c) noexcept
+	{
+		setOverlay(Color4f(c.x, c.y, c.z, 1));
+	}
+	
 }

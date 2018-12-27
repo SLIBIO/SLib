@@ -214,6 +214,10 @@ namespace slib
 		
 		void setColorFilter(ColorMatrix* filter, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		void setColorOverlay(const Color& color, ButtonState state, sl_uint32 category = 0, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void setColorOverlay(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
+
 		
 		sl_bool isUsingDefaultColorFilter();
 		

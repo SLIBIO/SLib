@@ -145,6 +145,9 @@ namespace slib
 		if (defaultColorFilter.flagDefined) {
 			return sl_true;
 		}
+		if (colorOverlay.flagDefined) {
+			return sl_true;
+		}
 		for (sl_uint32 i = 0; i < SLIB_SAPP_LAYOUT_BUTTON_CATEGORY_MAX; i++) {
 			SAppLayoutButtonCategory& category = categories[i];
 			for (sl_uint32 k = 0; k < (sl_uint32)(ButtonState::Count); k++) {
@@ -158,6 +161,9 @@ namespace slib
 					return sl_true;
 				}
 				if (category.borderWidth[k].flagDefined || category.borderColor[k].flagDefined || category.borderStyle[k].flagDefined) {
+					return sl_true;
+				}
+				if (category.colorOverlay[k].flagDefined) {
 					return sl_true;
 				}
 			}

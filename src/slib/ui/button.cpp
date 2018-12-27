@@ -564,6 +564,7 @@ namespace slib
 	
 	void Button::setColorFilter(ColorMatrix* filter, ButtonState state, sl_uint32 category, UIUpdateMode mode)
 	{
+		setUsingDefaultColorFilter(sl_false, UIUpdateMode::None);
 		if (category < m_nCategories) {
 			ButtonCategoryProperties& props = m_categories[category].properties[(int)state];
 			if (filter) {
@@ -584,6 +585,22 @@ namespace slib
 	void Button::setColorFilter(ColorMatrix* filter, UIUpdateMode mode)
 	{
 		setColorFilter(filter, ButtonState::Normal, 0, mode);
+	}
+	
+	void Button::setColorOverlay(const Color& color, ButtonState state, sl_uint32 category, UIUpdateMode mode)
+	{
+		if (color.isZero()) {
+			setColorFilter(sl_null, state, category, mode);
+		} else {
+			ColorMatrix cm;
+			cm.setOverlay(color);
+			setColorFilter(&cm, state, category, mode);
+		}
+	}
+	
+	void Button::setColorOverlay(const Color& color, UIUpdateMode mode)
+	{
+		setColorOverlay(color, ButtonState::Normal, 0, mode);
 	}
 	
 	sl_bool Button::isUsingDefaultColorFilter()
@@ -672,15 +689,13 @@ namespace slib
 			}
 		}
 		
-		if (m_flagUseDefaultColorFilter) {
+		if (background.isNotNull()) {
 			const ColorMatrix* cm = getCurrentColorFilter();
 			if (cm) {
-				if (background.isNotNull()) {
-					background = background->filter(*cm);
-				}
+				background = background->filter(*cm);
 			}
+			drawBackground(canvas, background);
 		}
-		drawBackground(canvas, background);
 
 	}
 
@@ -963,7 +978,7 @@ namespace slib
 		} else if (m_state != ButtonState::Normal) {
 			ButtonCategoryProperties& paramsDefault = m_categories[m_category].properties[(int)(ButtonState::Normal)];
 			if (paramsDefault.flagFilter) {
-				return &(params.filter);
+				return &(paramsDefault.filter);
 			}
 		}
 		return sl_null;

@@ -922,6 +922,25 @@ namespace slib
 	}
 
 
+#define LAYOUT_CONTROL_NOPARAM_ATTR(NAME, SETFUNC) \
+	if (op == OP_PARSE) { \
+		String str = resourceItem->getXmlAttribute(#NAME); \
+		if (!(attr->NAME.parse(str))) { \
+			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			return sl_false; \
+		} \
+	} else if (op == OP_GENERATE_CPP) { \
+		if (attr->NAME.flagDefined && attr->NAME.value) { \
+			params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "();%n", strTab, name)); \
+		} \
+	} else if (op == OP_SIMULATE) { \
+		if (!flagOnLayout) { \
+			if (attr->NAME.flagDefined && attr->NAME.value) { \
+				view->SETFUNC(); \
+			} \
+		} \
+	}
+	
 #define _LAYOUT_CONTROL_DIMENSION_ATTR(NAME, SETFUNC, CHECKFUNC, TYPE) \
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
@@ -2098,6 +2117,12 @@ namespace slib
 		}
 		LAYOUT_CONTROL_GENERIC_ATTR(childInstances, setCreatingChildInstances)
 		
+		if (flagView) {
+			LAYOUT_CONTROL_GENERIC_ATTR(okCancelEnabled, setOkCancelEnabled)
+			LAYOUT_CONTROL_NOPARAM_ATTR(ok, setOkOnClick)
+			LAYOUT_CONTROL_NOPARAM_ATTR(cancel, setCancelOnClick)
+		}
+		
 		LAYOUT_CONTROL_ADD_STATEMENT
 		
 	}
@@ -2265,8 +2290,8 @@ namespace slib
 			}
 		}
 		
-		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(defaultColorFilter, setUsingDefaultColorFilter)
-		
+		LAYOUT_CONTROL_COLOR_ATTR(colorOverlay, setColorOverlay)
+
 		String strStates[] = {"Normal", "Hover", "Pressed", "Disabled"};
 		ButtonState states[] = {ButtonState::Normal, ButtonState::Hover, ButtonState::Pressed, ButtonState::Disabled};
 		for (sl_uint32 i = 0; i < SLIB_SAPP_LAYOUT_BUTTON_CATEGORY_MAX; i++) {
@@ -2311,6 +2336,11 @@ namespace slib
 					String _strBorderColor = resourceItem->getXmlAttribute("borderColor" + suffix);
 					if (!(category.borderColor[k].parse(_strBorderColor))) {
 						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("borderColor" + suffix, _strBorderColor));
+						return sl_false;
+					}
+					String _strColorOverlay = resourceItem->getXmlAttribute("colorOverlay" + suffix);
+					if (!(category.colorOverlay[k].parse(_strColorOverlay))) {
+						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("colorOverlay" + suffix, _strColorOverlay));
 						return sl_false;
 					}
 				} else if (op == OP_GENERATE_CPP) {
@@ -2369,6 +2399,14 @@ namespace slib
 								_borderStyle = "slib::PenStyle::Solid";
 							}
 							sb->add(String::format("%s%s->setBorder(slib::Pen::create(%s, %s, %s), slib::ButtonState::%s, %d, %s);%n", strTab, name, _borderStyle, _borderWidth, _borderColor, strStates[k], i, strUpdateMode));
+						}
+					}
+					if (category.colorOverlay[k].flagDefined) {
+						String strColorOverlay;
+						if (_getColorAccessString(resource->name, category.colorOverlay[k], element, strColorOverlay)) {
+							params->sbDefineInit->add(String::format("%s%s->setColorOverlay(%s, slib::ButtonState::%s, %d, slib::UIUpdateMode::Init);%n", strTab, name, strColorOverlay, strStates[k], i));
+						} else {
+							return sl_false;
 						}
 					}
 				} else if (op == OP_SIMULATE) {
@@ -2430,10 +2468,21 @@ namespace slib
 							}
 						}
 					}
+					if (category.colorOverlay[k].flagDefined) {
+						Color _colorOverlay;
+						if (!(_getColorValue(resource->name, category.colorOverlay[k], element, _colorOverlay))) {
+							return sl_false;
+						}
+						if (!flagOnLayout) {
+							view->setColorOverlay(_colorOverlay, states[k], i, UIUpdateMode::Init);
+						}
+					}
 				}
 			}
 		}
 		
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(defaultColorFilter, setUsingDefaultColorFilter)
+
 		LAYOUT_CONTROL_SET_NATIVE_WIDGET_CHECK_BACKGROUND_COLOR
 		
 		LAYOUT_CONTROL_ADD_STATEMENT

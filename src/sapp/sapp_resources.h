@@ -317,6 +317,10 @@ namespace slib
 		SAppBooleanValue nativeWidget;
 		SAppBooleanValue hardwareLayer;
 		
+		SAppBooleanValue okCancelEnabled;
+		SAppBooleanValue ok;
+		SAppBooleanValue cancel;
+		
 	public:
 		SAppLayoutViewAttributes();
 		
@@ -340,7 +344,7 @@ namespace slib
 		SAppDimensionFloatValue borderWidth[(int)(ButtonState::Count)];
 		SAppColorValue borderColor[(int)(ButtonState::Count)];
 		SAppPenStyleValue borderStyle[(int)(ButtonState::Count)];
-		
+		SAppColorValue colorOverlay[(int)(ButtonState::Count)];
 	};
 
 	#define SLIB_SAPP_LAYOUT_BUTTON_CATEGORY_MAX 4
@@ -369,6 +373,7 @@ namespace slib
 		SAppDimensionValue textMarginRight;
 		SAppDimensionValue textMarginBottom;
 		SAppBooleanValue defaultColorFilter;
+		SAppColorValue colorOverlay;
 		
 		SAppLayoutButtonCategory categories[SLIB_SAPP_LAYOUT_BUTTON_CATEGORY_MAX];
 		

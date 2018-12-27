@@ -75,7 +75,7 @@ namespace slib
 		m_animationLoop = new _priv_RenderView_AnimationLoop(this);
 		m_lastRenderingThreadId = 0;
 		
-		m_flagDebugTextVisible = sl_true;
+		m_flagDebugTextVisible = sl_false;
 		m_flagDebugTextVisibleOnRelease = sl_false;
 		
 		setBackgroundColor(Color::Black, UIUpdateMode::Init);

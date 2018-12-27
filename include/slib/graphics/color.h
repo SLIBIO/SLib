@@ -403,6 +403,10 @@ namespace slib
 		Color4f transformColor(const Color4f& s) const noexcept;
 		Color4f transformColor(const Color& s) const noexcept;
 		Color4f transformColor(const Color3f& s) const noexcept;
+		
+		void setOverlay(const Color4f& c) noexcept;
+		void setOverlay(const Color& c) noexcept;
+		void setOverlay(const Color3f& c) noexcept;
 
 	};
 
