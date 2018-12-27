@@ -3,7 +3,13 @@
 		type='page'
 		>
 		
+		<button
+			name='btnBack'
+			styles='button_back'
+			/>
+
 		<web 
+			below='btnBack'
 			width='fill'
 			height='fill'
 			url="http://www.bing.com" 

@@ -1,0 +1,13 @@
+<sapp>
+
+	<layout-style
+		name='button_back'
+		width='10%sw'
+		height='10%sw'
+		background='@drawable/back'
+		border='false'
+		top='5%sw'
+		cancel='true'
+		/>
+
+</sapp>

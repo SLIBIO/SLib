@@ -4,14 +4,15 @@
 		>		
 		<pager
 			name='scene_pager' 
-			width='100%sw'
-			height='100%sh'
+			width='fill'
+			height='fill'
 			swipe='true'
+			margin='10%'
 		>
 			<item>
 				<view
-					width='100%sw'
-					height='100%sh'
+					width='fill'
+					height='fill'
 					background='red'
 					/>
 
@@ -19,8 +20,8 @@
 
 			<item selected='true'>
 				<group
-					width='100%sw'
-					height='100%sh'
+					width='fill'
+					height='fill'
 					background='green'
 				>
 					<label width='wrap' height='wrap' alignCenter='true' text='Swipe' fontSize='20%sw'/>
@@ -29,11 +30,14 @@
 
 			<item>
 				<view
-					width='100%sw'
-					height='100%sh'
+					width='fill'
+					height='fill'
 					background='blue'/>
 			</item>
 		</pager>
-
+		
+		<button
+			styles='button_back'
+			/>
  	</layout>
 </sapp>

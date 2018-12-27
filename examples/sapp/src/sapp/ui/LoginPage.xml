@@ -93,6 +93,9 @@
 
 		</linear>
 
+		<button
+			styles='button_back'
+			/>
  	</layout>
 
 	<layout-style name='label' fontSize='4%sw' textColor='black' width='wrap' height='wrap'/>

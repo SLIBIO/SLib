@@ -1,15 +1,25 @@
 <sapp>
 	<layout
 		type='page'
+		background='black'
 		>
-		
-		<video 
-			width='fill'
-			height='fill'
-			src="https://us-videos.dji.net/video_trans/89b9e946c5f94876ac9cfa9b4cafab0f/720.mp4" 
-			scale='contain'
-			controls='true'
-			/>
 
+		<render width='fill' height='fill' >
+
+			<video 
+				width='fill'
+				height='fill'
+				src="https://us-videos.dji.net/video_trans/89b9e946c5f94876ac9cfa9b4cafab0f/720.mp4" 
+				scale='contain'
+				controls='true'
+				/>
+
+			<button
+				styles='button_back'
+				colorOverlay='white'
+				colorOverlayPressed='blue'
+				/>
+
+		</render>
  	</layout>
 </sapp>

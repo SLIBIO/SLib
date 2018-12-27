@@ -1,9 +1,18 @@
 <sapp>
 	<layout
 		type='page'
+		background='black'
 		>
 		
-		<camera 
+		<button
+			name='btnBack'
+			styles='button_back'
+			colorOverlay='white'
+			colorOverlayPressed='blue'
+			/>
+
+		<camera
+			below='btnBack'
 			width='fill'
 			height='fill'
 			autoStart='true'
