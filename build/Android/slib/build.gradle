@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion '27.0.3'
     defaultConfig {
         minSdkVersion 15
@@ -38,21 +38,27 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':external_ShortcutBadger')
     implementation 'com.google.firebase:firebase-core:10.2.1'
     implementation 'com.google.firebase:firebase-messaging:10.2.1'
 }
 
 tasks.all { task ->
     if (task.name == "assembleDebug" || task.name == "assembleRelease") {
+        task.dependsOn(project(":external_ShortcutBadger").getTasksByName(task.name, true)[0])
         task.doLast {
+            def copyArr = { srcDir, srcFileName, dstFileName ->
+                def sourceFile = projectDir.getPath() + "/" + srcDir + "/" + srcFileName + (task.name == "assembleDebug" ? "-debug.aar" : "-release.aar");
+                def targetDir = projectDir.getPath() + "/../../../lib/Android";
+                def targetFileName = dstFileName + ".aar";
+                def targetFile = targetDir + "/" + targetFileName;
+                new File(targetDir).mkdirs()
+                new File(targetFile).delete();
+                new File(sourceFile).renameTo(targetFile);
+            }
             System.out.println("Moving slib.aar into lib!")
-            def sourceFile = projectDir.getPath() + "/build/outputs/aar/" + (task.name == "assembleDebug" ? "slib-debug.aar" : "slib-release.aar");
-            def targetDir = projectDir.getPath() + "/../../../lib/Android";
-            def targetFileName = "slib.aar";
-            def targetFile = targetDir + "/" + targetFileName;
-            new File(targetDir).mkdirs()
-            new File(targetFile).delete();
-            new File(sourceFile).renameTo(targetFile);
+            copyArr("build/outputs/aar", "slib", "slib")
+            copyArr("../../../external/java/ShortcutBadger/build/outputs/aar", "external_ShortcutBadger", "ShortcutBadger")
         }
     }
 }

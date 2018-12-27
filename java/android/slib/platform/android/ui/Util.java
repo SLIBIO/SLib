@@ -39,6 +39,7 @@ import android.view.inputmethod.InputMethodManager;
 import java.lang.reflect.Field;
 import java.util.Vector;
 
+import me.leolin.shortcutbadger.ShortcutBadger;
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
 import slib.platform.android.helper.Permissions;
@@ -223,6 +224,14 @@ public class Util {
 				}
 			}
 		});
+	}
+
+	public static void setBadgeNumber(final Activity activity, int count) {
+		try {
+			ShortcutBadger.applyCount(activity, count);
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
 	}
 
 	public static void grantPermissions(final Activity activity, final int permissions) {

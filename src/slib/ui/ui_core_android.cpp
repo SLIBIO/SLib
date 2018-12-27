@@ -47,8 +47,9 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(getDefaultDisplay, "getDefaultDisplay", "(Landroid/app/Activity;)Landroid/view/Display;");
 		SLIB_JNI_STATIC_METHOD(getDisplaySize, "getDisplaySize", "(Landroid/view/Display;)Landroid/graphics/Point;");
 		SLIB_JNI_STATIC_METHOD(getScreenOrientation, "getScreenOrientation", "(Landroid/app/Activity;)I");
-		SLIB_JNI_STATIC_METHOD(getStatusBarHeight, "getStatusBarHeight", "(Landroid/app/Activity;)I");
 		SLIB_JNI_STATIC_METHOD(openURL, "openURL", "(Landroid/app/Activity;Ljava/lang/String;)V");
+		SLIB_JNI_STATIC_METHOD(getStatusBarHeight, "getStatusBarHeight", "(Landroid/app/Activity;)I");
+		SLIB_JNI_STATIC_METHOD(setBadgeNumber, "setBadgeNumber", "(Landroid/app/Activity;I)V");
 		SLIB_JNI_STATIC_METHOD(grantPermissions, "grantPermissions", "(Landroid/app/Activity;I)V");
 	SLIB_JNI_END_CLASS
 
@@ -151,14 +152,6 @@ namespace slib
 		return ScreenOrientation::Portrait;
 	}
 
-	void UI::openUrl(const String& _url) {
-		jobject jactivity = Android::getCurrentActivity();
-		if (jactivity) {
-			JniLocal<jstring> jurl = Jni::getJniString(_url);
-			JAndroidUtil::openURL.call(sl_null, jactivity, jurl.get());
-		}
-	}
-	
 	sl_bool UI::isUiThread()
 	{
 		return JAndroidUiThread::isUiThread.callBoolean(sl_null) != 0;
@@ -181,6 +174,14 @@ namespace slib
 		}
 	}
 
+	void UI::openUrl(const String& _url) {
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JniLocal<jstring> jurl = Jni::getJniString(_url);
+			JAndroidUtil::openURL.call(sl_null, jactivity, jurl.get());
+		}
+	}
+	
 	void UI::dismissKeyboard()
 	{
 		Android::dismissKeyboard();
@@ -193,6 +194,21 @@ namespace slib
 			return JAndroidUtil::getStatusBarHeight.callInt(sl_null, jactivity);
 		}
 		return 0;
+	}
+	
+	sl_uint32 _g_UI_core_badge_number = 0;
+
+	sl_uint32 UI::getBadgeNumber() {
+		return _g_UI_core_badge_number;
+	}
+
+	void UI::setBadgeNumber(sl_uint32 number)
+	{
+		_g_UI_core_badge_number = number;
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JAndroidUtil::setBadgeNumber.call(sl_null, jactivity, number);
+		}
 	}
 	
 	void UI::grantPermissions(sl_uint32 permissions)
