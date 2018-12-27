@@ -62,9 +62,9 @@ namespace slib
 	{
 	}
 
-	FileLogger::FileLogger(const String& fileName)
+	FileLogger::FileLogger(const String& fileNameFormat)
 	{
-		setFileName(fileName);
+		m_fileNameFormat = fileNameFormat;
 	}
 
 	FileLogger::~FileLogger()
@@ -82,6 +82,11 @@ namespace slib
 			ObjectLocker lock(this);
 			File::appendAllTextUTF8(fileName, s);
 		}
+	}
+	
+	String FileLogger::getFileName()
+	{
+		return String::format(m_fileNameFormat, Time::now());
 	}
 	
 	class ConsoleLogger : public Logger
@@ -156,6 +161,12 @@ namespace slib
 		m_listLoggers.remove(logger);
 	}
 
+	void LoggerSet::setDefaultLogger(const Ref<Logger>& logger)
+	{
+		m_listLoggers.removeAll();
+		m_listLoggers.add(logger);
+	}
+
 
 	void LoggerSet::clearErrorLogger()
 	{
@@ -172,6 +183,12 @@ namespace slib
 		m_listErrorLoggers.remove(logger);
 	}
 
+	void LoggerSet::setErrorLogger(const Ref<Logger>& logger)
+	{
+		m_listErrorLoggers.removeAll();
+		m_listErrorLoggers.add(logger);
+	}
+
 
 	void LoggerSet::log(const String& tag, const String& content)
 	{
@@ -183,7 +200,7 @@ namespace slib
 
 	void LoggerSet::logError(const String& tag, const String& content)
 	{
-		ListLocker< Ref<Logger> > list(m_listLoggers);
+		ListLocker< Ref<Logger> > list(m_listErrorLoggers);
 		for (sl_size i = 0; i < list.count; i++) {
 			list[i]->logError(tag, content);
 		}
@@ -208,9 +225,9 @@ namespace slib
 		return logger;
 	}
 
-	Ref<Logger> Logger::createFileLogger(const String& fileName)
+	Ref<Logger> Logger::createFileLogger(const String& fileNameFormat)
 	{
-		return new FileLogger(fileName);
+		return new FileLogger(fileNameFormat);
 	}
 
 	void Logger::logGlobal(const String& tag, const String& content)

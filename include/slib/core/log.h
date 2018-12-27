@@ -54,7 +54,7 @@ namespace slib
 
 		static Ref<Logger> getConsoleLogger();
 
-		static Ref<Logger> createFileLogger(const String& fileName);
+		static Ref<Logger> createFileLogger(const String& fileNameFormat);
 
 		static void logGlobal(const String& tag, const String& content);
 
@@ -67,16 +67,18 @@ namespace slib
 	public:
 		FileLogger();
 
-		FileLogger(const String& fileName);
+		FileLogger(const String& fileNameFormat);
 
 		~FileLogger();
 	
 	public:
 		void log(const String& tag, const String& content) override;
 	
-	public:
-		SLIB_PROPERTY(AtomicString, FileName)
-	
+		virtual String getFileName();
+		
+	protected:
+		String m_fileNameFormat;
+		
 	};
 	
 	class SLIB_EXPORT LoggerSet : public Logger
@@ -95,6 +97,8 @@ namespace slib
 
 		void removeDefaultLogger(const Ref<Logger>& logger);
 
+		void setDefaultLogger(const Ref<Logger>& logger);
+		
 
 		void clearErrorLogger();
 
@@ -102,6 +106,8 @@ namespace slib
 
 		void removeErrorLogger(const Ref<Logger>& logger);
 
+		void setErrorLogger(const Ref<Logger>& logger);
+		
 	public:
 		void log(const String& tag, const String& content) override;
 
