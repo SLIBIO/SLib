@@ -109,24 +109,20 @@ namespace slib
 		}
 		page->setParent(this);
 		ObjectLocker lock(this);
-		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
-			page->setFrame(getBoundsInnerPadding(), mode);
-			m_pages.addIfNotExist_NoLock(page);
-		} else {
-			if (m_pages.getCount() == 0) {
-				m_pages.add_NoLock(page);
+		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode) || m_pages.getCount() > 0) {
+			if (m_pages.addIfNotExist_NoLock(page)) {
 				lock.unlock();
-				page->setFrame(getBoundsInnerPadding());
-				addChild(page, mode);
+				page->setFrame(getBoundsInnerPadding(), mode);
 				dispatchPageAction(page.get(), UIPageAction::Push);
-				dispatchPageAction(page.get(), UIPageAction::Resume);
-				m_indexCurrent = 0;
-			} else {
-				if (m_pages.addIfNotExist_NoLock(page)) {
-					lock.unlock();
-					dispatchPageAction(page.get(), UIPageAction::Push);
-				}
 			}
+		} else {
+			m_pages.add_NoLock(page);
+			lock.unlock();
+			page->setFrame(getBoundsInnerPadding());
+			addChild(page, mode);
+			dispatchPageAction(page.get(), UIPageAction::Push);
+			dispatchPageAction(page.get(), UIPageAction::Resume);
+			m_indexCurrent = 0;
 		}
 	}
 
@@ -153,12 +149,14 @@ namespace slib
 					newPage = m_pages.getData()[index];
 				}
 				lock.unlock();
-				if (!SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
+				if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 					if (oldPage.isNotNull()) {
-						if (oldPage->getParent().isNotNull()) {
-							dispatchPageAction(oldPage.get(), UIPageAction::Pause);
-							dispatchPageAction(oldPage.get(), UIPageAction::Pop);
-						}
+						dispatchPageAction(oldPage.get(), UIPageAction::Pop);
+					}
+				} else {
+					if (oldPage.isNotNull()) {
+						dispatchPageAction(oldPage.get(), UIPageAction::Pause);
+						dispatchPageAction(oldPage.get(), UIPageAction::Pop);
 						removeChild(oldPage, mode);
 					}
 					if (newPage.isNotNull()) {
@@ -270,16 +268,17 @@ namespace slib
 		setEnabled(sl_false);
 		viewOut->setEnabled(sl_false, UIUpdateMode::None);
 		viewIn->setEnabled(sl_false, UIUpdateMode::None);
+		viewIn->setFrame(getBoundsInnerPadding(), UIUpdateMode::None);
 		
 		Ref<Animation> animationPause, animationResume;
 		if (flagNext) {
 			_applyDefaultPushTransition(transition);
-			animationPause = Transition::createAnimation(viewOut, transition, UIPageAction::Pause, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation,this, viewOut, UIPageAction::Pause));
-			animationResume = Transition::createAnimation(viewIn, transition, UIPageAction::Push, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation,this, viewIn, UIPageAction::Resume));
+			animationPause = Transition::createAnimation(viewOut, transition, UIPageAction::Pause, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation, this, viewOut, UIPageAction::Pause));
+			animationResume = Transition::createAnimation(viewIn, transition, UIPageAction::Push, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation, this, viewIn, UIPageAction::Resume));
 		} else {
 			_applyDefaultPopTransition(transition);
-			animationPause = Transition::createAnimation(viewOut, transition, UIPageAction::Pop, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation,this, viewOut, UIPageAction::Pause));
-			animationResume = Transition::createAnimation(viewIn, transition, UIPageAction::Resume, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation,this, viewIn, UIPageAction::Resume));
+			animationPause = Transition::createAnimation(viewOut, transition, UIPageAction::Pop, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation, this, viewOut, UIPageAction::Pause));
+			animationResume = Transition::createAnimation(viewIn, transition, UIPageAction::Resume, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation, this, viewIn, UIPageAction::Resume));
 		}
 		
 		Base::interlockedIncrement(&m_countActiveTransitionAnimations);
