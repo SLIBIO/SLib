@@ -28,6 +28,8 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 
+import slib.platform.android.Logger;
+
 public class UiGestureDetector extends SimpleOnGestureListener {
 
     public interface GestureListener {
@@ -42,64 +44,24 @@ public class UiGestureDetector extends SimpleOnGestureListener {
     public final static int SWIPE_UP = 2;
     public final static int SWIPE_DOWN = 3;
 
-    public final static int MODE_TRANSPARENT = 0;
-    public final static int MODE_SOLID = 1;
-    public final static int MODE_DYNAMIC = 2;
-
-    private final static int ACTION_FAKE = -13; // just an unlikely number
     private int swipe_Min_Distance = 50;
     private int swipe_Max_Distance = 2000;
     private int swipe_Min_Velocity = 50;
 
-    private int mode = MODE_DYNAMIC;
-    private boolean bEnabled = true;
-    private boolean tapIndicator = false;
-
     private GestureDetector detector;
     private GestureListener listener;
 
-    private Context context;
-
     public UiGestureDetector(Context context, GestureListener listener) {
-        this.context = context;
         this.detector = new GestureDetector(context, this);
         this.listener = listener;
     }
 
     public void onTouchEvent(MotionEvent event) {
-
-        if (! this.bEnabled) {
-            return;
-        }
-
         try {
-            boolean result = this.detector.onTouchEvent(event);
-
-            if (this.mode == MODE_SOLID) {
-                event.setAction(MotionEvent.ACTION_CANCEL);
-            } else if (this.mode == MODE_DYNAMIC) {
-                if (event.getAction() == ACTION_FAKE) {
-                    event.setAction(MotionEvent.ACTION_UP);
-                } else if (result) {
-                    event.setAction(MotionEvent.ACTION_CANCEL);
-                } else if (this.tapIndicator) {
-                    event.setAction(MotionEvent.ACTION_DOWN);
-                    this.tapIndicator = false;
-                }
-            }
-        } catch (Exception e) {}
-    }
-
-    public void setMode(int mode) {
-        this.mode = mode;
-    }
-
-    public int getMode() {
-        return this.mode;
-    }
-
-    public void setEnabled(boolean status) {
-        this.bEnabled = status;
+            this.detector.onTouchEvent(event);
+        } catch (Exception e) {
+            Logger.exception(e);
+        }
     }
 
     public void setSwipeMaxDistance(int distance) {
@@ -161,15 +123,14 @@ public class UiGestureDetector extends SimpleOnGestureListener {
     }
 
     @Override
-    public boolean onSingleTapUp(MotionEvent ev) {
-        this.tapIndicator = true;
-        return false;
-    }
-
-    @Override
     public boolean onDoubleTap(MotionEvent ev) {
         listener.onDoubleTap();
         return true;
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent ev) {
+        return false;
     }
 
     @Override
@@ -179,13 +140,6 @@ public class UiGestureDetector extends SimpleOnGestureListener {
 
     @Override
     public boolean onSingleTapConfirmed(MotionEvent ev) {
-
-        if (mode == MODE_DYNAMIC) { // we owe an ACTION_UP, so we fake an action which will be converted to an ACTION_UP later
-            ev.setAction(ACTION_FAKE);
-            if (context instanceof Activity) {
-                ((Activity)context).dispatchTouchEvent(ev);
-            }
-        }
         return false;
     }
 
