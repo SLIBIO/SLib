@@ -1,27 +1,29 @@
 <sapp>
 	<layout
 		type='page'
-		>		
+		>
+
+		<button
+			name='btnBack'
+			styles='button_back'
+			/>
+
 		<pager
 			name='scene_pager' 
 			width='fill'
 			height='fill'
-			swipe='true'
 			margin='10%'
+			swipe='true'
+			clipping='true'
 		>
 			<item>
 				<view
-					width='fill'
-					height='fill'
 					background='red'
 					/>
-
 			</item>
 
 			<item selected='true'>
 				<group
-					width='fill'
-					height='fill'
 					background='green'
 				>
 					<label width='wrap' height='wrap' alignCenter='true' text='Swipe' fontSize='20%sw'/>
@@ -29,15 +31,26 @@
 			</item>
 
 			<item>
-				<view
-					width='fill'
-					height='fill'
-					background='blue'/>
+				<group
+					background='blue'
+				>
+					<button 
+						text='Button'
+						alignCenter='true'
+						width='50%sw'
+						height='8%sw'
+						fontSize='4%sw'
+						nativeWidget='false'
+						background='@color/button_back_color'
+						textColor='@color/button_text_color'
+						boundShape='round-rect'
+						boundRadius='2%sw'
+						border='false'
+						clipping='true'
+						/>
+				</group>
 			</item>
 		</pager>
-		
-		<button
-			styles='button_back'
-			/>
+
  	</layout>
 </sapp>

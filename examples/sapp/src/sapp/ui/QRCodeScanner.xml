@@ -3,8 +3,14 @@
 		type='page'
 		>
 		
+		<button
+			name='btnBack'
+			styles='button_back'
+			/>
+
 		<QRCodeScanner 
 			name='scanner'
+			below='btnBack'
 			width='fill'
 			height='70%'
 			autoStart='true'
@@ -21,9 +27,6 @@
 			readOnly='true'
 			/>
 
-		<button
-			styles='button_back'
-			/>
-			
+
  	</layout>
 </sapp>
