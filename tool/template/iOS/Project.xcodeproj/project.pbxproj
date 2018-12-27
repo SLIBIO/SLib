@@ -10,6 +10,7 @@
 		2639171621C943F9008B335B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2639171521C943F9008B335B /* AVFoundation.framework */; };
 		263918BA21C94584008B335B /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 263918B921C94584008B335B /* CoreMedia.framework */; };
 		263918BC21C9458B008B335B /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 263918BB21C9458B008B335B /* CoreVideo.framework */; };
+		26B92D6121D4DA80003F6F82 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26B92D6021D4DA80003F6F82 /* UserNotifications.framework */; };
 		26F2DDD5216BBF8C007CE8E6 /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F2DDD4216BBF8C007CE8E6 /* app.cpp */; };
 		26F2DDF0216BDE39007CE8E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDEF216BDE39007CE8E6 /* UIKit.framework */; };
 		26F2DDF2216BDE44007CE8E6 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF1216BDE44007CE8E6 /* GLKit.framework */; };
@@ -28,6 +29,7 @@
 		2639171521C943F9008B335B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		263918B921C94584008B335B /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		263918BB21C9458B008B335B /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		26B92D6021D4DA80003F6F82 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		26F2DDD3216BBF8C007CE8E6 /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = app.h; sourceTree = "<group>"; };
 		26F2DDD4216BBF8C007CE8E6 /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = app.cpp; sourceTree = "<group>"; };
 		26F2DDEF216BDE39007CE8E6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -50,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26B92D6121D4DA80003F6F82 /* UserNotifications.framework in Frameworks */,
 				263918BC21C9458B008B335B /* CoreVideo.framework in Frameworks */,
 				263918BA21C94584008B335B /* CoreMedia.framework in Frameworks */,
 				2639171621C943F9008B335B /* AVFoundation.framework in Frameworks */,
@@ -108,6 +111,7 @@
 		26F5DE3C2051B60500BC4998 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				26B92D6021D4DA80003F6F82 /* UserNotifications.framework */,
 				263918BB21C9458B008B335B /* CoreVideo.framework */,
 				263918B921C94584008B335B /* CoreMedia.framework */,
 				2639171521C943F9008B335B /* AVFoundation.framework */,
