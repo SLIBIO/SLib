@@ -1082,6 +1082,10 @@ namespace slib
 		sl_bool isOkCancelEnabled();
 		
 		void setOkCancelEnabled(sl_bool flag);
+		
+		void setOkOnClick();
+		
+		void setCancelOnClick();
 
 		
 		Ref<View> getNextFocusableView();

@@ -6282,6 +6282,20 @@ namespace slib
 		m_flagOkCancelEnabled = flag;
 	}
 
+	void View::setOkOnClick()
+	{
+		setOnClick([](View* view) {
+			view->dispatchOK();
+		});
+	}
+	
+	void View::setCancelOnClick()
+	{
+		setOnClick([](View* view) {
+			view->dispatchCancel();
+		});
+	}
+	
 	Ref<View> View::getNextFocusableView()
 	{
 		Ref<View> parent = getParent();
