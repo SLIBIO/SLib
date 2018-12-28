@@ -444,6 +444,8 @@ namespace slib
 		Variant getItem(const String& key) const noexcept;
 	
 		sl_bool putItem(const String& key, const Variant& value) noexcept;
+		
+		sl_bool removeItem(const String& key) noexcept;
 	
 
 		String toString() const noexcept;
@@ -955,6 +957,8 @@ namespace slib
 		Variant getItem(const String& key) const noexcept;
 
 		sl_bool putItem(const String& key, const Variant& value) noexcept;
+
+		sl_bool removeItem(const String& key) noexcept;
 
 
 		String toString() const noexcept;

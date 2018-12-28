@@ -827,6 +827,11 @@ namespace slib
 	{
 		return Variant::putItem(key, value);
 	}
+	
+	sl_bool Json::removeItem(const String& key)
+	{
+		return Variant::removeItem(key);
+	}
 
 	void Json::get(Json& _out) const
 	{

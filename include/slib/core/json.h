@@ -308,6 +308,8 @@ namespace slib
 
 		sl_bool putItem(const String& key, const Json& value);
 		
+		sl_bool removeItem(const String& key);
+		
 	public:
 		void get(Json& _out) const;
 		void set(const Json& _in);

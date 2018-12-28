@@ -1834,6 +1834,18 @@ namespace slib
 		VAIRANT_PUT_ITEM
 	}
 
+	sl_bool Variant::removeItem(const String& key) noexcept
+	{
+		Ref<Referable> obj(getObject());
+		if (obj.isNotNull()) {
+			if (CMap<String, Variant>* p1 = CastInstance< CMap<String, Variant> >(obj._ptr)) {
+				return p1->remove(key);
+			} else if (CHashMap<String, Variant>* p2 = CastInstance< CHashMap<String, Variant> >(obj._ptr)) {
+				return p2->remove(key);
+			}
+		}
+		return sl_false;
+	}
 
 	static sl_bool _priv_Variant_getVariantListJsonString(StringBuffer& ret, const List<Variant>& list) noexcept;
 	static sl_bool _priv_Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map) noexcept;
@@ -3472,6 +3484,12 @@ namespace slib
 	sl_bool Atomic<Variant>::putItem(const String& key, const Variant& value) noexcept
 	{
 		VAIRANT_PUT_ITEM
+	}
+	
+	sl_bool Atomic<Variant>::removeItem(const String& key) noexcept
+	{
+		Variant var(*this);
+		return var.removeItem(key);
 	}
 
 	String Atomic<Variant>::toString() const noexcept
