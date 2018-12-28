@@ -20,18 +20,37 @@
  *   THE SOFTWARE.
  */
 
-#include "app.h"
+#include "ControlScreenPage.h"
 
-#include "LaunchScreen.h"
-
-SLIB_DEFINE_APPLICATION(SAppExampleApp, MobileApp)
-
-SAppExampleApp::SAppExampleApp()
+void ControlScreenPage::onOpen()
 {
-	setStartupPage(new LaunchScreen);
-}
-
-void SAppExampleApp::onStart()
-{
-	UI::setAvailableScreenOrientationsPortrait();
+	btnSetOrientationPortrait->setOnClick([](View*) {
+		UI::setAvailableScreenOrientation(ScreenOrientation::Portrait);
+	});
+	btnSetOrientationPortraitUpDown->setOnClick([](View*) {
+		UI::setAvailableScreenOrientation(ScreenOrientation::PortraitUpsideDown);
+	});
+	btnSetOrientationLandscapeLeft->setOnClick([](View*) {
+		UI::setAvailableScreenOrientation(ScreenOrientation::LandscapeLeft);
+	});
+	btnSetOrientationLandscapeRight->setOnClick([](View*) {
+		UI::setAvailableScreenOrientation(ScreenOrientation::LandscapeRight);
+	});
+	btnSetOrientationLandscape->setOnClick([](View*) {
+		UI::setAvailableScreenOrientationsLandscape();
+	});
+	btnSetOrientationAll->setOnClick([](View*) {
+		UI::setAvailableScreenOrientationsAll();
+	});
+	btnBlackStatusBar->setOnClick([this](View*) {
+		UI::setStatusBarStyle(StatusBarStyle::Dark);
+		this->setBackgroundColor(Color::White);
+	});
+	btnLightStatusBar->setOnClick([this](View*) {
+		UI::setStatusBarStyle(StatusBarStyle::Light);
+		this->setBackgroundColor(Color::Black);
+	});
+	btnHideStatusBar->setOnClick([](View*) {
+		UI::setStatusBarStyle(StatusBarStyle::Hidden);
+	});
 }

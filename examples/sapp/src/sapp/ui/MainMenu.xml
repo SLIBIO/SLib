@@ -2,43 +2,40 @@
 	<layout
 		type='page'
 		>
-		
-		<linear
-			width='wrap'
-			height='wrap'
-			alignCenter='true'
-		>
+		<scroll width='fill' height='fill' horizontal='false'>
+			<group width='fill' height='wrap' minHeight='100%vh'>
+				<linear
+					width='wrap'
+					height='wrap'
+					alignCenter='true'
+					padding='10%smin'
+				>
 
-			<button name='btnHelloWorld' text='Hello World' styles='menu_button'/>
+					<button name='btnHelloWorld' text='Hello World' styles='button_normal,menu_button'/>
 
-			<button name='btnViewPager' text='ViewPager' marginTop='1%sw' styles='menu_button'/>
+					<button name='btnViewPager' text='ViewPager' styles='button_normal,menu_button'/>
 
-			<button name='btnVideoView' text='VideoView' marginTop='1%sw' styles='menu_button'/>
+					<button name='btnVideoView' text='VideoView' styles='button_normal,menu_button'/>
 
-			<button name='btnCameraView' text='CameraView' marginTop='1%sw' styles='menu_button'/>
+					<button name='btnCameraView' text='CameraView' styles='button_normal,menu_button'/>
 
-			<button name='btnWebView' text='WebView' marginTop='1%sw' styles='menu_button'/>
+					<button name='btnWebView' text='WebView' styles='button_normal,menu_button'/>
 
-			<button name='btnLoginPage' text='Login Page' marginTop='1%sw' styles='menu_button'/>
+					<button name='btnControlScreen' text='Control Screen' styles='button_normal,menu_button'/>
 
-			<button name='btnQRCodeScanner' text='QRCodeScanner' marginTop='1%sw' styles='menu_button'/>
+					<button name='btnLoginPage' text='Login Page' styles='button_normal,menu_button'/>
 
-		</linear>
+					<button name='btnQRCodeScanner' text='QRCodeScanner' styles='button_normal,menu_button'/>
 
+				</linear>
+			</group>
+		</scroll>
  	</layout>
 
 	<layout-style
 		name='menu_button'
-		width='50%sw'
-		height='8%sw'
-		fontSize='4%sw'
-		nativeWidget='false'
-		background='@color/button_back_color'
-		textColor='@color/button_text_color'
-		boundShape='round-rect'
-		boundRadius='2%sw'
-		border='false'
-		clipping='true'
+		width='50%smin'
+		marginTop='1%smin'
 		/>
 
 </sapp>

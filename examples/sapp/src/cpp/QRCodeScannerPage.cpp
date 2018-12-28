@@ -20,7 +20,7 @@
  *   THE SOFTWARE.
  */
 
-#include "QRCodeScanner.h"
+#include "QRCodeScannerPage.h"
 
 void QRCodeScannerPage::onOpen()
 {

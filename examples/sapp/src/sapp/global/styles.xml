@@ -2,12 +2,26 @@
 
 	<layout-style
 		name='button_back'
-		width='10%sw'
-		height='10%sw'
+		width='10%smin'
+		height='10%smin'
 		background='@drawable/back'
 		border='false'
-		top='5%sw'
+		top='5%smin'
 		cancel='true'
+		/>
+
+
+	<layout-style
+		name='button_normal'
+		height='8%smin'
+		fontSize='4%smin'
+		nativeWidget='false'
+		background='@color/button_back_color'
+		textColor='@color/button_text_color'
+		boundShape='round-rect'
+		boundRadius='2%smin'
+		border='false'
+		clipping='true'
 		/>
 
 </sapp>

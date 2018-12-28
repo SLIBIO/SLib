@@ -20,18 +20,17 @@
  *   THE SOFTWARE.
  */
 
-#include "app.h"
+#pragma once
 
-#include "LaunchScreen.h"
+#include <slib.h>
 
-SLIB_DEFINE_APPLICATION(SAppExampleApp, MobileApp)
+#include "../gen/resources.h"
 
-SAppExampleApp::SAppExampleApp()
+using namespace slib;
+
+class ControlScreenPage : public example::ui::ControlScreen
 {
-	setStartupPage(new LaunchScreen);
-}
-
-void SAppExampleApp::onStart()
-{
-	UI::setAvailableScreenOrientationsPortrait();
-}
+public:
+	void onOpen() override;
+	
+};

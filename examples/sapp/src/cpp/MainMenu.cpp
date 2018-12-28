@@ -22,7 +22,8 @@
 
 #include "MainMenu.h"
 
-#include "QRCodeScanner.h"
+#include "ControlScreenPage.h"
+#include "QRCodeScannerPage.h"
 
 void MainMenu::onOpen()
 {
@@ -31,6 +32,7 @@ void MainMenu::onOpen()
 	btnVideoView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickVideoView, this));
 	btnCameraView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickCameraView, this));
 	btnWebView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickWebView, this));
+	btnControlScreen->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickControlScreen, this));
 	btnLoginPage->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickLoginPage, this));
 	btnQRCodeScanner->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickQRCodeScanner, this));
 }
@@ -58,6 +60,11 @@ void MainMenu::onClickCameraView(View* view)
 void MainMenu::onClickWebView(View* view)
 {
 	goToPage(new example::ui::WebView);
+}
+
+void MainMenu::onClickControlScreen(View* view)
+{
+	goToPage(new ControlScreenPage);
 }
 
 void MainMenu::onClickLoginPage(View* view)

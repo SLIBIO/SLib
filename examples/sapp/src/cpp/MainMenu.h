@@ -43,6 +43,8 @@ public:
 
 	void onClickWebView(View* view);
 
+	void onClickControlScreen(View* view);
+	
 	void onClickLoginPage(View* view);
 	
 	void onClickQRCodeScanner(View* view);
