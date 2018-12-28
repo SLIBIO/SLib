@@ -33,21 +33,21 @@ namespace slib
 	class SLIB_EXPORT Base64
 	{
 	public:
-		static String encode(const void* byte, sl_size size);
+		static String encode(const void* byte, sl_size size, sl_char8 padding = '=');
 
-		static String encodeUrl(const void* byte, sl_size size);
+		static String encodeUrl(const void* byte, sl_size size, sl_char8 padding = 0);
 		
-		static String encode(const Memory& mem);
+		static String encode(const Memory& mem, sl_char8 padding = '=');
 				
-		static String encodeUrl(const Memory& mem);
+		static String encodeUrl(const Memory& mem, sl_char8 padding = 0);
 
-		static String encode(const String& str);
+		static String encode(const String& str, sl_char8 padding = '=');
 
-		static String encodeUrl(const String& str);
+		static String encodeUrl(const String& str, sl_char8 padding = 0);
 		
-		static sl_size decode(const String& base64, void* buf, sl_size size);
+		static sl_size decode(const String& base64, void* buf, sl_size size, sl_char8 padding = '=');
 
-		static Memory decode(const String& base64);
+		static Memory decode(const String& base64, sl_char8 padding = '=');
 		
 	};
 

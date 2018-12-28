@@ -28,7 +28,7 @@
 namespace slib
 {
 	
-	SLIB_INLINE String _priv_Base64_encode(const char* patterns, const void* buf, sl_size size)
+	SLIB_INLINE String _priv_Base64_encode(const char* patterns, const void* buf, sl_size size, char padding)
 	{
 		if (size == 0) {
 			return sl_null;
@@ -36,7 +36,7 @@ namespace slib
 		const sl_uint8* input = (const sl_uint8*)buf;
 		sl_uint32 last = (sl_uint32)(size % 3);
 		sl_size countBlock = (size / 3) + (last ? 1 : 0);
-		String ret = String::allocate(countBlock * 4);
+		String ret = String::allocate(countBlock << 2);
 		if (ret.isEmpty()) {
 			return ret;
 		}
@@ -54,43 +54,51 @@ namespace slib
 			n += 3;
 			output += 4;
 		}
-		if (last == 1) {
-			*(output - 2) = '=';
-		}
-		if (last >= 1) {
-			*(output - 1) = '=';
+		if (padding) {
+			if (last == 1) {
+				*(output - 2) = padding;
+			}
+			if (last >= 1) {
+				*(output - 1) = padding;
+			}
+		} else {
+			if (last == 1) {
+				ret.setLength((countBlock << 2) - 2);
+			} else if (last > 1) {
+				ret.setLength((countBlock << 2) - 1);
+			}
 		}
 		return ret;
 	}
 
-	String Base64::encode(const void* buf, sl_size size)
+	String Base64::encode(const void* buf, sl_size size, sl_char8 padding)
 	{
-		return _priv_Base64_encode(BASE64_CHARS, buf, size);
+		return _priv_Base64_encode(BASE64_CHARS, buf, size, padding);
 	}
 
-	String Base64::encodeUrl(const void* buf, sl_size size)
+	String Base64::encodeUrl(const void* buf, sl_size size, sl_char8 padding)
 	{
-		return _priv_Base64_encode(BASE64_CHARS_URL, buf, size);
+		return _priv_Base64_encode(BASE64_CHARS_URL, buf, size, padding);
 	}
 
-	String Base64::encode(const Memory &mem)
+	String Base64::encode(const Memory &mem, sl_char8 padding)
 	{
-		return _priv_Base64_encode(BASE64_CHARS, mem.getData(), mem.getSize());
+		return _priv_Base64_encode(BASE64_CHARS, mem.getData(), mem.getSize(), padding);
 	}
 
-	String Base64::encodeUrl(const Memory &mem)
+	String Base64::encodeUrl(const Memory &mem, sl_char8 padding)
 	{
-		return _priv_Base64_encode(BASE64_CHARS_URL, mem.getData(), mem.getSize());
+		return _priv_Base64_encode(BASE64_CHARS_URL, mem.getData(), mem.getSize(), padding);
 	}
 
-	String Base64::encode(const String& str)
+	String Base64::encode(const String& str, sl_char8 padding)
 	{
-		return _priv_Base64_encode(BASE64_CHARS, str.getData(), str.getLength());
+		return _priv_Base64_encode(BASE64_CHARS, str.getData(), str.getLength(), padding);
 	}
 
-	String Base64::encodeUrl(const String& str)
+	String Base64::encodeUrl(const String& str, sl_char8 padding)
 	{
-		return _priv_Base64_encode(BASE64_CHARS_URL, str.getData(), str.getLength());
+		return _priv_Base64_encode(BASE64_CHARS_URL, str.getData(), str.getLength(), padding);
 	}
 	
 	SLIB_INLINE sl_uint32 _priv_Base64_index(sl_char8 c)
@@ -119,7 +127,7 @@ namespace slib
 		return 64;
 	}
 
-	sl_size Base64::decode(const String& str, void* buf, sl_size size)
+	sl_size Base64::decode(const String& str, void* buf, sl_size size, sl_char8 padding)
 	{
 		sl_uint8* output = (sl_uint8*)buf;
 		sl_size len = str.getLength();
@@ -127,68 +135,66 @@ namespace slib
 		// trim right (CR, LF)
 		while (len > 0) {
 			sl_char16 ch = input[len - 1];
-			if (ch == '\r' || ch == '\n' || ch == ' ') {
+			if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
 				len--;
 			} else {
 				break;
 			}
 		}
-		if (len < 4) {
-			return 0;
-		}
 		sl_uint32 data[4];
 		sl_size indexInput = 0;
-		sl_size indexBlock = 0;
+		sl_size indexOutput = 0;
 		sl_uint32 posInBlock = 0;
-		sl_uint32 countPadding = 0;
-		if (input[len - 1] == '=') {
-			countPadding = 1;
-			if (input[len - 2] == '=') {
-				countPadding = 2;
-			}
-		}
 		while (indexInput < len) {
 			sl_char8 ch = input[indexInput];
-			if (ch == '\r' || ch == '\n' || ch == ' ') {
+			if (SLIB_CHAR_IS_WHITE_SPACE(ch) || ch == padding) {
 				indexInput++;
 				continue;
 			}
 			sl_uint32 sig = _priv_Base64_index(ch);
-			if (ch == '=' && indexInput >= len - countPadding) {
-				sig = 0;
-			}
 			if (sig >= 64) {
-				break;
+				return 0;
 			}
-			data[posInBlock++] = sig;
-			if (posInBlock >= 4) {
-				posInBlock = 0;
-				sl_size p = indexBlock * 3;
-				output[p] = (sl_uint8)((data[0] << 2) + ((data[1] & 0x30) >> 4));
-				output[p + 1] = (sl_uint8)(((data[1] & 0xf) << 4) + ((data[2] & 0x3c) >> 2));
-				output[p + 2] = (sl_uint8)(((data[2] & 0x3) << 6) + data[3]);
-				indexBlock++;
+			data[posInBlock] = sig;
+			switch (posInBlock) {
+				case 0:
+					++posInBlock;
+					break;
+				case 1:
+					output[indexOutput] = (sl_uint8)((data[0] << 2) + ((data[1] & 0x30) >> 4));
+					++indexOutput;
+					++posInBlock;
+					break;
+				case 2:
+					output[indexOutput] = (sl_uint8)(((data[1] & 0xf) << 4) + ((data[2] & 0x3c) >> 2));
+					++indexOutput;
+					++posInBlock;
+					break;
+				case 3:
+					output[indexOutput] = (sl_uint8)(((data[2] & 0x3) << 6) + data[3]);
+					++indexOutput;
+					posInBlock = 0;
+					break;
 			}
 			indexInput++;
 		}
-		if (indexInput == len && indexBlock > 0 && posInBlock == 0) {
-			return indexBlock * 3 - countPadding;
-		}
-		return 0;
+		return indexOutput;
 	}
 
-	Memory Base64::decode(const String& base64)
+	Memory Base64::decode(const String& base64, sl_char8 padding)
 	{
 		sl_size len = base64.getLength();
-		if (len < 4) {
-			return sl_null;
+		sl_size size = (len >> 2) * 3;
+		if ((len & 3) == 2) {
+			size++;
+		} else if ((len & 3) == 3) {
+			size += 2;
 		}
-		sl_size size = len / 4 * 3;
 		Memory mem = Memory::create(size);
 		if (mem.isNull()) {
 			return sl_null;
 		}
-		sl_size sizeOutput = decode(base64, mem.getData(), size);
+		sl_size sizeOutput = decode(base64, mem.getData(), size, padding);
 		if (sizeOutput > 0) {
 			return mem.sub(0, sizeOutput);
 		}
