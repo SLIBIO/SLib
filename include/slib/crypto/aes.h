@@ -43,6 +43,10 @@ namespace slib
 	class SLIB_EXPORT AES : public Object
 	{
 	public:
+		enum {
+			BlockSize = 16
+		};
+	public:
 		AES();
 
 		~AES();

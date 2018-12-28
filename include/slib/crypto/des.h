@@ -42,6 +42,10 @@ namespace slib
 	class SLIB_EXPORT DES : public Object
 	{
 	public:
+		enum {
+			BlockSize = 8
+		};
+	public:
 		DES();
 
 		~DES();
@@ -101,6 +105,10 @@ namespace slib
 	
 	class SLIB_EXPORT TripleDES : public Object
 	{
+	public:
+		enum {
+			BlockSize = 8
+		};
 	public:
 		TripleDES();
 		

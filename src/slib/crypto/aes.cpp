@@ -44,7 +44,7 @@ namespace slib
 
 	sl_uint32 AES::getBlockSize()
 	{
-		return 16;
+		return BlockSize;
 	}
 
 #define TO_BYTE(x) ((sl_uint8)(x))

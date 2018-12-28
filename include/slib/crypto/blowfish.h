@@ -42,6 +42,11 @@ namespace slib
 	class SLIB_EXPORT Blowfish : public Object
 	{
 	public:
+		enum {
+			BlockSize = 8
+		};
+		
+	public:
 		Blowfish();
 
 		~Blowfish();

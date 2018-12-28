@@ -170,7 +170,7 @@ namespace slib
 
 	sl_uint32 DES::getBlockSize()
 	{
-		return 8;
+		return BlockSize;
 	}
 
 	void DES::setKey(const void* key)
@@ -297,7 +297,7 @@ namespace slib
 	
 	sl_uint32 TripleDES::getBlockSize()
 	{
-		return 8;
+		return BlockSize;
 	}
 	
 	void TripleDES::setKey(const void* key1, const void* key2, const void* key3)
