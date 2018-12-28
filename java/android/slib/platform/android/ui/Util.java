@@ -27,13 +27,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.net.Uri;
+import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.Surface;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import java.lang.reflect.Field;
@@ -117,6 +121,10 @@ public class Util {
 		return 0;
 	}
 
+	public static void setScreenOrientations(Activity activity, boolean flag0, boolean flag90, boolean flag180, boolean flag270) {
+
+	}
+
 	public static int getStatusBarHeight(Activity activity) {
 		try {
 			Class<?> c = Class.forName("com.android.internal.R$dimen");
@@ -127,6 +135,19 @@ public class Util {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return 0;
+		}
+	}
+
+	public static void setStatusBarStyle(Activity activity, int style) {
+		try {
+			Window window = activity.getWindow();
+			if (style > 0) {
+				window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			} else {
+				window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 

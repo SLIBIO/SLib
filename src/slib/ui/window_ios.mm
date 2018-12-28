@@ -608,19 +608,133 @@ namespace slib
 		return iOS_Window::create(param);
 	}
 	
-	void _priv_slib_ui_reset_orienation();
+	extern UIInterfaceOrientation _g_slib_ui_screen_orientation;
+	
+	void _priv_slib_ui_reset_orienation()
+	{
+		_g_slib_ui_screen_orientation = [[UIApplication sharedApplication] statusBarOrientation];
+	}
+	
+	ScreenOrientation _priv_getScreenOrientation(UIInterfaceOrientation orientation)
+	{
+		switch (orientation) {
+			case UIInterfaceOrientationPortraitUpsideDown:
+				return ScreenOrientation::PortraitUpsideDown;
+			case UIInterfaceOrientationLandscapeLeft:
+				return ScreenOrientation::LandscapeLeft;
+			case UIInterfaceOrientationLandscapeRight:
+				return ScreenOrientation::LandscapeRight;
+			default:
+				return ScreenOrientation::Portrait;
+		}
+	}
+
+	UIInterfaceOrientation _priv_getUIInterfaceOrientation(ScreenOrientation orientation)
+	{
+		switch (orientation) {
+			case ScreenOrientation::PortraitUpsideDown:
+				return UIInterfaceOrientationPortraitUpsideDown;
+			case ScreenOrientation::LandscapeLeft:
+				return UIInterfaceOrientationLandscapeLeft;
+			case ScreenOrientation::LandscapeRight:
+				return UIInterfaceOrientationLandscapeRight;
+			default:
+				return UIInterfaceOrientationPortrait;
+		}
+	}
+	
+	ScreenOrientation UI::getScreenOrientation()
+	{
+		switch (_g_slib_ui_screen_orientation) {
+			case UIInterfaceOrientationPortrait:
+				return ScreenOrientation::Portrait;
+			case UIInterfaceOrientationPortraitUpsideDown:
+				return ScreenOrientation::PortraitUpsideDown;
+			case UIInterfaceOrientationLandscapeLeft:
+				return ScreenOrientation::LandscapeLeft;
+			case UIInterfaceOrientationLandscapeRight:
+				return ScreenOrientation::LandscapeRight;
+			default:
+				break;
+		}
+		return _priv_getScreenOrientation(_g_slib_ui_screen_orientation);
+	}
+	
+	void UI::attemptRotateScreenOrientation()
+	{
+		[UIViewController attemptRotationToDeviceOrientation];
+		List<ScreenOrientation> orientations(UI::getAvailableScreenOrientations());
+		if (orientations.isEmpty()) {
+			return;
+		}
+		if (orientations.contains(_priv_getScreenOrientation([[UIApplication sharedApplication] statusBarOrientation]))) {
+			return;
+		}
+		ScreenOrientation orientation = orientations.getValueAt(0, ScreenOrientation::Portrait);
+		@try {
+			[[UIDevice currentDevice] setValue:[NSNumber numberWithInteger:_priv_getUIInterfaceOrientation(orientation)] forKey:@"orientation"];
+		} @catch (NSError* error) {
+			NSLog(@"[Error] %@", error.localizedDescription);
+		}
+	}
+
+	__weak _priv_Slib_iOS_Window_RootViewController* _g_priv_ui_current_root_controller = nil;
+	sl_bool _g_priv_ui_flag_set_statusbar_style = sl_false;
+	StatusBarStyle _g_priv_ui_statusbar_style = StatusBarStyle::Dark;
+	
+	void UI::setStatusBarStyle(StatusBarStyle style)
+	{
+		_g_priv_ui_flag_set_statusbar_style = sl_true;
+		_g_priv_ui_statusbar_style = style;
+		_priv_Slib_iOS_Window_RootViewController* controller = _g_priv_ui_current_root_controller;
+		if (controller != nil) {
+			[controller setNeedsStatusBarAppearanceUpdate];
+		}
+	}
+	
 }
 
 @implementation _priv_Slib_iOS_Window_RootViewController
 
 - (BOOL)prefersStatusBarHidden
 {
-	return NO;
+	if (slib::_g_priv_ui_flag_set_statusbar_style) {
+		if (slib::_g_priv_ui_statusbar_style == slib::StatusBarStyle::Hidden) {
+			return YES;
+		}
+		return NO;
+	}
+	return [super prefersStatusBarHidden];
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+	if (slib::_g_priv_ui_flag_set_statusbar_style) {
+		if (slib::_g_priv_ui_statusbar_style == slib::StatusBarStyle::Light) {
+			return UIStatusBarStyleLightContent;
+		}
+		return UIStatusBarStyleDefault;
+	}
+	return [super preferredStatusBarStyle];
+}
+
+- (BOOL)shouldAutorotate
+{
+	return YES;
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
+	return UIInterfaceOrientationMaskAll;
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
 	[super viewDidAppear:animated];
+	slib::_g_priv_ui_current_root_controller = self;
+	if (slib::_g_priv_ui_flag_set_statusbar_style) {
+		[self setNeedsStatusBarAppearanceUpdate];
+	}
 	slib::Ref<slib::iOS_Window> w = m_window;
 	if (w.isNotNull()) {
 		slib::Size size = w->getClientSize();
@@ -648,11 +762,6 @@ namespace slib
 	}
 }
 
-- (BOOL)shouldAutorotate
-{
-	return YES;
-}
-
 -(UIView*)findFirstResponderText
 {
 	UIView* view = slib::UIPlatform::findFirstResponder(self.view);
@@ -664,14 +773,14 @@ namespace slib
 	return nil;
 }
 
-UIScrollView* _g_ui_keyboard_scrollview = nil;
-CGRect _g_ui_keyboard_scrollview_original_frame;
+UIScrollView* _g_slib_ui_keyboard_scrollview = nil;
+CGRect _g_slib_ui_keyboard_scrollview_original_frame;
 
 -(void)restoreKeyboardScrollView
 {
-	if (_g_ui_keyboard_scrollview != nil) {
-		_g_ui_keyboard_scrollview.frame = _g_ui_keyboard_scrollview_original_frame;
-		_g_ui_keyboard_scrollview = nil;
+	if (_g_slib_ui_keyboard_scrollview != nil) {
+		_g_slib_ui_keyboard_scrollview.frame = _g_slib_ui_keyboard_scrollview_original_frame;
+		_g_slib_ui_keyboard_scrollview = nil;
 	}
 }
 
@@ -693,7 +802,7 @@ CGRect _g_ui_keyboard_scrollview_original_frame;
 		parent = parent.superview;
 	}
 
-	if (scroll != _g_ui_keyboard_scrollview) {
+	if (scroll != _g_slib_ui_keyboard_scrollview) {
 		[self restoreKeyboardScrollView];
 	}
 	
@@ -706,20 +815,20 @@ CGRect _g_ui_keyboard_scrollview_original_frame;
 	
 	if (scroll != nil) {
 		CGRect rcScrollLocal = scroll.bounds;
-		if (_g_ui_keyboard_scrollview == scroll) {
-			rcScrollLocal.size = _g_ui_keyboard_scrollview_original_frame.size;
+		if (_g_slib_ui_keyboard_scrollview == scroll) {
+			rcScrollLocal.size = _g_slib_ui_keyboard_scrollview_original_frame.size;
 		}
 		CGRect rcScrollScreen = [scroll convertRect:rcScrollLocal toView:nil];
 		CGFloat yScroll = rcScrollScreen.origin.y + rcScrollScreen.size.height;
 		if (yScroll > rcScreen.size.height - kbSize.height) {
 			CGRect rc = scroll.frame;
-			if (_g_ui_keyboard_scrollview == scroll) {
-				rc = _g_ui_keyboard_scrollview_original_frame;
+			if (_g_slib_ui_keyboard_scrollview == scroll) {
+				rc = _g_slib_ui_keyboard_scrollview_original_frame;
 			}
-			_g_ui_keyboard_scrollview_original_frame = rc;
+			_g_slib_ui_keyboard_scrollview_original_frame = rc;
 			rc.size.height -= yScroll - (rcScreen.size.height - kbSize.height);
 			scroll.frame = rc;
-			_g_ui_keyboard_scrollview = scroll;
+			_g_slib_ui_keyboard_scrollview = scroll;
 		}
 	}
 	if (yText > rcScreen.size.height - kbSize.height) {
@@ -748,7 +857,6 @@ CGRect _g_ui_keyboard_scrollview_original_frame;
 	}];
 	[self restoreKeyboardScrollView];
 }
-
 
 - (void)viewWillAppear:(BOOL)animated
 {

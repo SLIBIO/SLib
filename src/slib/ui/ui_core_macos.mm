@@ -148,15 +148,6 @@ namespace slib
 		}
 	}
 	
-	sl_uint32 UI::getBadgeNumber()
-	{
-		int number = [[[NSApp dockTile] badgeLabel] intValue];
-		if (number > 0) {
-			return (sl_uint32)number;
-		}
-		return number;
-	}
-	
 	void UI::setBadgeNumber(sl_uint32 number)
 	{
 		[[NSApp dockTile] setBadgeLabel:[NSString stringWithFormat:@"%d", number]];

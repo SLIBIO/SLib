@@ -284,6 +284,7 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 
 	public void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
+		Logger.info("Window Resized - Size(" + w + "," + h + ")");
 		mWidth = w;
 		mHeight = h;
 		if (instance != 0) {

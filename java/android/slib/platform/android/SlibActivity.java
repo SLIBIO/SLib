@@ -33,6 +33,7 @@ import slib.platform.android.ui.window.UiWindow;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -57,7 +58,7 @@ public class SlibActivity extends Activity {
 		Android.onCreateActivity(this);
 
 		Window window = getWindow();
-		window.setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED, WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+		window.addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 		window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 	}
 
@@ -111,6 +112,11 @@ public class SlibActivity extends Activity {
 	@Override
 	public void finish() {
 		super.finish();
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
 	}
 
 	public boolean isVisible() {

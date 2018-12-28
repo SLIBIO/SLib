@@ -223,13 +223,6 @@ namespace slib
 		return getScreenSize().y;
 	}
 
-#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
-	ScreenOrientation UI::getScreenOrientation()
-	{
-		return ScreenOrientation::Portrait;
-	}
-#endif
-
 	SLIB_STATIC_ZERO_INITIALIZED(AtomicList<ScreenOrientation>, _g_ui_available_screen_orientations);
 	
 	List<ScreenOrientation> UI::getAvailableScreenOrientations()
@@ -246,17 +239,40 @@ namespace slib
 			return;
 		}
 		_g_ui_available_screen_orientations = orientations;
+		attemptRotateScreenOrientation();
+	}
+	
+	void UI::setAvailableScreenOrientation(const ScreenOrientation& orientation)
+	{
+		setAvailableScreenOrientations(List<ScreenOrientation>::createFromElements(orientation));
 	}
 	
 	void UI::setAvailableScreenOrientationsPortrait()
 	{
-		setAvailableScreenOrientations(List<ScreenOrientation>::createFromElements(ScreenOrientation::Portrait));
+		setAvailableScreenOrientations(List<ScreenOrientation>::createFromElements(ScreenOrientation::Portrait, ScreenOrientation::PortraitUpsideDown));
 	}
 	
 	void UI::setAvailableScreenOrientationsLandscape()
 	{
 		setAvailableScreenOrientations(List<ScreenOrientation>::createFromElements(ScreenOrientation::LandscapeRight, ScreenOrientation::LandscapeLeft));
 	}
+	
+	void UI::setAvailableScreenOrientationsAll()
+	{
+		setAvailableScreenOrientations(sl_null);
+	}
+	
+
+#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
+	ScreenOrientation UI::getScreenOrientation()
+	{
+		return ScreenOrientation::Portrait;
+	}
+
+	void UI::attemptRotateScreenOrientation()
+	{
+	}
+#endif
 
 	void UI::alert(const String& text)
 	{
@@ -439,14 +455,13 @@ namespace slib
 	{
 		return 0;
 	}
+	
+	void UI::setStatusBarStyle(StatusBarStyle style)
+	{
+	}
 #endif
 	
 #if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_ANDROID) && !defined(SLIB_UI_IS_WIN32)
-	sl_uint32 UI::getBadgeNumber()
-	{
-		return 0;
-	}
-	
 	void UI::setBadgeNumber(sl_uint32 number)
 	{
 	}

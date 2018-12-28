@@ -47,8 +47,10 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(getDefaultDisplay, "getDefaultDisplay", "(Landroid/app/Activity;)Landroid/view/Display;");
 		SLIB_JNI_STATIC_METHOD(getDisplaySize, "getDisplaySize", "(Landroid/view/Display;)Landroid/graphics/Point;");
 		SLIB_JNI_STATIC_METHOD(getScreenOrientation, "getScreenOrientation", "(Landroid/app/Activity;)I");
+		SLIB_JNI_STATIC_METHOD(setScreenOrientations, "setScreenOrientations", "(Landroid/app/Activity;ZZZZ)V");
 		SLIB_JNI_STATIC_METHOD(openURL, "openURL", "(Landroid/app/Activity;Ljava/lang/String;)V");
 		SLIB_JNI_STATIC_METHOD(getStatusBarHeight, "getStatusBarHeight", "(Landroid/app/Activity;)I");
+		SLIB_JNI_STATIC_METHOD(setStatusBarStyle, "setStatusBarStyle", "(Landroid/app/Activity;I)");		
 		SLIB_JNI_STATIC_METHOD(setBadgeNumber, "setBadgeNumber", "(Landroid/app/Activity;I)V");
 		SLIB_JNI_STATIC_METHOD(grantPermissions, "grantPermissions", "(Landroid/app/Activity;I)V");
 	SLIB_JNI_END_CLASS
@@ -151,6 +153,24 @@ namespace slib
 		}
 		return ScreenOrientation::Portrait;
 	}
+	
+	void UI::attemptRotateScreenOrientation()
+	{
+		List<ScreenOrientation> orientations(getAvailableScreenOrientations());
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			if (orientations.isEmpty()) {
+				JAndroidUtil::setScreenOrientations.call(sl_null, jactivity, sl_true, sl_true, sl_true, sl_true);
+			} else {
+				JAndroidUtil::setScreenOrientations.call(sl_null, jactivity,
+					orientations.contains(ScreenOrientation::Portrait),
+					orientations.contains(ScreenOrientation::LandscapeRight),
+					orientations.contains(ScreenOrientation::PortraitUpsideDown),
+					orientations.contains(ScreenOrientation::LandscapeLeft)
+					);
+			}
+		}
+	}
 
 	sl_bool UI::isUiThread()
 	{
@@ -195,16 +215,17 @@ namespace slib
 		}
 		return 0;
 	}
-	
-	sl_uint32 _g_UI_core_badge_number = 0;
 
-	sl_uint32 UI::getBadgeNumber() {
-		return _g_UI_core_badge_number;
+	void UI::setStatusBarStyle(StatusBarStyle style)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JAndroidUtil::setStatusBarStyle.call(sl_null, jactivity, (int)style);
+		}
 	}
 
 	void UI::setBadgeNumber(sl_uint32 number)
 	{
-		_g_UI_core_badge_number = number;
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JAndroidUtil::setBadgeNumber.call(sl_null, jactivity, number);

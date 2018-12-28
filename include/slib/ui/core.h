@@ -84,18 +84,24 @@ namespace slib
 		
 		static sl_ui_len getScreenHeight();
 		
-		static ScreenOrientation getScreenOrientation();
-		
 		static List<ScreenOrientation> getAvailableScreenOrientations();
 		
 		static void setAvailableScreenOrientations(const List<ScreenOrientation>& orientations);
+		
+		static void setAvailableScreenOrientation(const ScreenOrientation& orientation);
 		
 		// ScreenOrientationPortrait
 		static void setAvailableScreenOrientationsPortrait();
 		
 		// ScreenOrientationLandscapeRight, ScreenOrientationLandscapeLeft
 		static void setAvailableScreenOrientationsLandscape();
-
+		
+		static void setAvailableScreenOrientationsAll();
+		
+		static ScreenOrientation getScreenOrientation();
+		
+		static void attemptRotateScreenOrientation();
+		
 		
 		// Message Box
 		// Run on UI thread
@@ -164,9 +170,8 @@ namespace slib
 		static void dismissKeyboard();
 		
 		static sl_ui_len getScreenStatusBarHeight();
-		
-		
-		static sl_uint32 getBadgeNumber();
+				
+		static void setStatusBarStyle(StatusBarStyle style);
 		
 		static void setBadgeNumber(sl_uint32 number);
 

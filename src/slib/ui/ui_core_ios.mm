@@ -127,30 +127,6 @@ namespace slib
 		return getPrimaryScreen();
 	}
 	
-	extern UIInterfaceOrientation _g_slib_ui_screen_orientation;
-	
-	ScreenOrientation UI::getScreenOrientation()
-	{
-		switch (_g_slib_ui_screen_orientation) {
-			case UIInterfaceOrientationPortrait:
-				return ScreenOrientation::Portrait;
-			case UIInterfaceOrientationPortraitUpsideDown:
-				return ScreenOrientation::PortraitUpsideDown;
-			case UIInterfaceOrientationLandscapeLeft:
-				return ScreenOrientation::LandscapeLeft;
-			case UIInterfaceOrientationLandscapeRight:
-				return ScreenOrientation::LandscapeRight;
-			default:
-				break;
-		}
-		return ScreenOrientation::Portrait;
-	}
-	
-	void _priv_slib_ui_reset_orienation()
-	{
-		_g_slib_ui_screen_orientation = [[UIApplication sharedApplication] statusBarOrientation];
-	}
-	
 	void UI::openUrl(const String& _url)
 	{
 		if (_url.isNotEmpty()) {
@@ -184,15 +160,6 @@ namespace slib
 	{
 		CGRect rectOfStatusbar = [[UIApplication sharedApplication] statusBarFrame];
 		return (sl_ui_len)(rectOfStatusbar.size.height * UIPlatform::getGlobalScaleFactor());
-	}
-	
-	sl_uint32 UI::getBadgeNumber()
-	{
-		NSInteger number = [[UIApplication sharedApplication] applicationIconBadgeNumber];
-		if (number > 0) {
-			return (sl_uint32)number;
-		}
-		return 0;
 	}
 	
 	void UI::setBadgeNumber(sl_uint32 number)
@@ -290,7 +257,10 @@ namespace slib
 	{
 		_g_slib_ios_callbacks_didReceiveRemoteNotification.add(callback);
 	}
+
 	
+	void _priv_slib_ui_reset_orienation();
+
 }
 
 @implementation _priv_Slib_iOS_AppDelegate
@@ -377,7 +347,7 @@ namespace slib
 		return mask;
 	} else {
 		return UIInterfaceOrientationMaskAll;
-	}	
+	}
 }
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {

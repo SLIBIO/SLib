@@ -219,11 +219,6 @@ namespace slib
 		}
 	}
 
-	sl_uint32 UI::getBadgeNumber()
-	{
-		return _g_priv_ui_badge_number;
-	}
-
 	void UI::setBadgeNumber(sl_uint32 num)
 	{
 		_g_priv_ui_badge_number = num;
