@@ -32,7 +32,16 @@ namespace slib
 	{
 		return m_time;
 	}
-	
+
+	SLIB_INLINE sl_int64 Time::toUnixTime() const noexcept
+	{
+		sl_int64 n = m_time / 1000000;
+		if ((m_time % 1000000) < 0) {
+			n += 1;
+		}
+		return n;
+	}
+
 	SLIB_INLINE Time& Time::operator=(const Time& other) noexcept
 	{
 		m_time = other.m_time;

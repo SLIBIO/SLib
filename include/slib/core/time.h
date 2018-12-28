@@ -210,7 +210,15 @@ namespace slib
 		sl_int64 toInt() const noexcept;
 	
 		void setInt(sl_int64 time) noexcept;
+		
+		static Time fromInt(sl_int64 time) noexcept;
+		
+		sl_int64 toUnixTime() const noexcept;
 
+		void setUnixTime(sl_int64 time) noexcept;
+		
+		static Time fromUnixTime(sl_int64 time) noexcept;
+		
 		void add(sl_int64 time) noexcept;
 
 		void add(const Time& other) noexcept;

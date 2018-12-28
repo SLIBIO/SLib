@@ -206,6 +206,21 @@ namespace slib
 		m_time = time;
 	}
 
+	Time Time::fromInt(sl_int64 time) noexcept
+	{
+		return time;
+	}
+	
+	void Time::setUnixTime(sl_int64 time) noexcept
+	{
+		m_time = time * TIME_SECOND;
+	}
+	
+	Time Time::fromUnixTime(sl_int64 time) noexcept
+	{
+		return time * TIME_SECOND;
+	}
+
 	void Time::add(sl_int64 time) noexcept
 	{
 		m_time += time;
