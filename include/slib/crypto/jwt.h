@@ -25,18 +25,93 @@
 
 #include "definition.h"
 
+#include "../core/json.h"
+
 /*
 	JSON Web Token: JSON-based open standard for creating access tokens that assert some number of claims (RFC 7519)
+ 
+ 		https://tools.ietf.org/html/rfc7519
+ 		https://tools.ietf.org/html/rfc7518
 */
 
 namespace slib
 {
 	
+	enum class JwtAlgorithm
+	{
+		None = 0, // No digital signature or MAC performed
+		HS256 = 10, // HMAC using SHA-256
+		HS384 = 11, // HMAC using SHA-384
+		HS512 = 12, // HMAC using SHA-512
+		RS256 = 20, // RSASSA-PKCS1-v1_5 using SHA-256
+		RS384 = 21, // RSASSA-PKCS1-v1_5 using SHA-384
+		RS512 = 22, // RSASSA-PKCS1-v1_5 using SHA-512
+		ES256 = 30, // ECDSA using P-256 and SHA-256
+		ES384 = 31, // ECDSA using P-384 and SHA-384
+		ES512 = 32, // ECDSA using P-512 and SHA-512
+		PS256 = 40, // RSASSA-PSS using SHA-256 and MGF1 with SHA-256
+		PS384 = 41, // RSASSA-PSS using SHA-384 and MGF1 with SHA-384
+		PS512 = 42  // RSASSA-PSS using SHA-512 and MGF1 with SHA-512
+	};
+	
 	class SLIB_EXPORT Jwt
 	{
 	public:
+		Json header;
+		Json payload;
 		
+	public:
+		Jwt() noexcept;
 		
+		Jwt(const Jwt& other) noexcept;
+		
+		Jwt(Jwt&& other) noexcept;
+		
+		Jwt& operator=(const Jwt& other) noexcept;
+		
+		Jwt& operator=(Jwt&& other) noexcept;
+
+	public:
+		String encode(const Memory& secret) const noexcept;
+		
+		sl_bool decode(const Memory& secret, const String& token) noexcept;
+		
+		String generateSignature(const Memory& secret, const void* data, sl_size size) const noexcept;
+		
+		// header
+	public:
+		String getType() const noexcept;
+		void setType(const String& value) noexcept;
+		
+		String getContentType() const noexcept;
+		void setContentType(const String& value) noexcept;
+		
+		JwtAlgorithm getAlgorithm() const noexcept;
+		void setAlgorithm(const JwtAlgorithm& value) noexcept;
+		
+		// payload
+	public:
+		String getIssuer() const noexcept;
+		void setIssuer(const String& value) noexcept;
+		
+		String getSubject() const noexcept;
+		void setSubject(const String& value) noexcept;
+		
+		String getAudience() const noexcept;
+		void setAudience(const String& value) noexcept;
+		
+		Time getExpirationTime() const noexcept;
+		void setExpirationTime(const Time& value) noexcept;
+		
+		Time getNotBefore() const noexcept;
+		void setNotBefore(const Time& value) noexcept;
+		
+		String getIssuedAt() const noexcept;
+		void setIssuedAt(const String& value) noexcept;
+
+		String getId() const noexcept;
+		void setId(const String& value) noexcept;
+
 	};
 
 }
