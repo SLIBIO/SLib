@@ -133,6 +133,7 @@ namespace slib
 		 * This does not copy the data of the string, but keep the reference to the original string.
 		 */
 		String16(const std::u16string& str) noexcept;
+		String16(std::u16string&& str) noexcept;
 #endif
 		
 	public:
@@ -345,6 +346,7 @@ namespace slib
 		String16& operator=(const char32_t* other) noexcept;
 #ifdef SLIB_SUPPORT_STD_TYPES
 		String16& operator=(const std::u16string& other) noexcept;
+		String16& operator=(std::u16string&& other) noexcept;
 #endif
 		
 		/**
@@ -1279,6 +1281,7 @@ namespace slib
 		 * This does not copy the data of the string, but keep the reference to the original string.
 		 */
 		Atomic(const std::u16string& str) noexcept;
+		Atomic(std::u16string&& str) noexcept;
 #endif
 		
 	public:
@@ -1362,6 +1365,7 @@ namespace slib
 		AtomicString16& operator=(const char32_t* other) noexcept;
 #ifdef SLIB_SUPPORT_STD_TYPES
 		AtomicString16& operator=(const std::u16string& other) noexcept;
+		AtomicString16& operator=(std::u16string&& other) noexcept;
 #endif
 		
 		/**

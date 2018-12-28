@@ -130,6 +130,10 @@ namespace slib
 		{
 		}
 		
+		_priv_StringContainer_std(std::string&& _str): str(Move(_str))
+		{
+		}
+
 	};
 	
 	class _priv_StringContainer_ref : public StringContainer
@@ -170,6 +174,10 @@ namespace slib
 		
 	public:
 		_priv_StringContainer16_std(const std::u16string& _str): str(_str)
+		{
+		}
+		
+		_priv_StringContainer16_std(std::u16string&& _str): str(Move(_str))
 		{
 		}
 
@@ -278,7 +286,8 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE static StringContainer* _priv_String_alloc_std(const std::string& str) noexcept
+	template <class T>
+	SLIB_INLINE static StringContainer* _priv_String_alloc_std(T&& str) noexcept
 	{
 		sl_size len = (sl_size)(str.length());
 		if (len == 0) {
@@ -293,7 +302,7 @@ namespace slib
 		} else {
 			_priv_StringContainer_std* container = (_priv_StringContainer_std*)(Base::createMemory(sizeof(_priv_StringContainer_std)));
 			if (container) {
-				new (container) _priv_StringContainer_std(str);
+				new (container) _priv_StringContainer_std(Forward<T>(str));
 				container->sz = (sl_char8*)(container->str.c_str());
 				container->len = len;
 				container->hash = 0;
@@ -305,7 +314,8 @@ namespace slib
 		return sl_null;
 	}
 	
-	SLIB_INLINE static StringContainer16* _priv_String16_alloc_std(const std::u16string& str) noexcept
+	template <class T>
+	SLIB_INLINE static StringContainer16* _priv_String16_alloc_std(T&& str) noexcept
 	{
 		sl_size len = (sl_size)(str.length());
 		if (len == 0) {
@@ -320,7 +330,7 @@ namespace slib
 		} else {
 			_priv_StringContainer16_std* container = (_priv_StringContainer16_std*)(Base::createMemory(sizeof(_priv_StringContainer16_std)));
 			if (container) {
-				new (container) _priv_StringContainer16_std(str);
+				new (container) _priv_StringContainer16_std(Forward<T>(str));
 				container->sz = (sl_char16*)(container->str.c_str());
 				container->len = len;
 				container->hash = 0;
@@ -1410,9 +1420,19 @@ namespace slib
 		m_container = _priv_String_alloc_std(str);
 	}
 	
+	String::String(std::string&& str) noexcept
+	{
+		m_container = _priv_String_alloc_std(Move(str));
+	}
+	
 	String16::String16(const std::u16string& str) noexcept
 	{
 		m_container = _priv_String16_alloc_std(str);
+	}
+	
+	String16::String16(std::u16string&& str) noexcept
+	{
+		m_container = _priv_String16_alloc_std(Move(str));
 	}
 	
 	Atomic<String>::Atomic(const std::string& str) noexcept
@@ -1420,9 +1440,19 @@ namespace slib
 		m_container = _priv_String_alloc_std(str);
 	}
 	
+	Atomic<String>::Atomic(std::string&& str) noexcept
+	{
+		m_container = _priv_String_alloc_std(Move(str));
+	}
+	
 	Atomic<String16>::Atomic(const std::u16string& str) noexcept
 	{
 		m_container = _priv_String16_alloc_std(str);
+	}
+
+	Atomic<String16>::Atomic(std::u16string&& str) noexcept
+	{
+		m_container = _priv_String16_alloc_std(Move(str));
 	}
 
 
@@ -2546,9 +2576,21 @@ namespace slib
 		return *this;
 	}
 	
+	String& String::operator=(std::string&& str) noexcept
+	{
+		_replaceContainer(_priv_String_alloc_std(Move(str)));
+		return *this;
+	}
+	
 	String16& String16::operator=(const std::u16string& str) noexcept
 	{
 		_replaceContainer(_priv_String16_alloc_std(str));
+		return *this;
+	}
+	
+	String16& String16::operator=(std::u16string&& str) noexcept
+	{
+		_replaceContainer(_priv_String16_alloc_std(Move(str)));
 		return *this;
 	}
 	
@@ -2558,12 +2600,24 @@ namespace slib
 		return *this;
 	}
 	
+	AtomicString& Atomic<String>::operator=(std::string&& str) noexcept
+	{
+		_replaceContainer(_priv_String_alloc_std(Move(str)));
+		return *this;
+	}
+	
 	AtomicString16& Atomic<String16>::operator=(const std::u16string& str) noexcept
 	{
 		_replaceContainer(_priv_String16_alloc_std(str));
 		return *this;
 	}
 
+	AtomicString16& Atomic<String16>::operator=(std::u16string&& str) noexcept
+	{
+		_replaceContainer(_priv_String16_alloc_std(Move(str)));
+		return *this;
+	}
+	
 	
 	String String::operator+(const String& other) const noexcept
 	{
