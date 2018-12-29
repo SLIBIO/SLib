@@ -2172,7 +2172,7 @@ namespace slib
 					if (flagHorizontal) {
 						if (childLayoutAttrs->widthMode != SizeMode::Filling) {
 							if (childLayoutAttrs->leftMode != PositionMode::Free || childLayoutAttrs->rightMode != PositionMode::Free) {
-								sl_ui_pos w = childLayoutAttrs->layoutFrame.right - childLayoutAttrs->layoutFrame.left + childLayoutAttrs->marginLeft + childLayoutAttrs->marginRight;
+								sl_ui_pos w = m_paddingLeft + childLayoutAttrs->layoutFrame.right - childLayoutAttrs->layoutFrame.left + childLayoutAttrs->marginLeft + childLayoutAttrs->marginRight;
 								if (w > measuredWidth) {
 									measuredWidth = w;
 								}
@@ -2187,7 +2187,7 @@ namespace slib
 					if (flagVertical) {
 						if (childLayoutAttrs->heightMode != SizeMode::Filling) {
 							if (childLayoutAttrs->topMode != PositionMode::Free || childLayoutAttrs->bottomMode != PositionMode::Free) {
-								sl_ui_pos h = childLayoutAttrs->layoutFrame.bottom - childLayoutAttrs->layoutFrame.top + childLayoutAttrs->marginTop + childLayoutAttrs->marginBottom;
+								sl_ui_pos h = m_paddingTop + childLayoutAttrs->layoutFrame.bottom - childLayoutAttrs->layoutFrame.top + childLayoutAttrs->marginTop + childLayoutAttrs->marginBottom;
 								if (h > measuredHeight) {
 									measuredHeight = h;
 								}
