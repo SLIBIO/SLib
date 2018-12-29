@@ -25,6 +25,7 @@ package slib.platform.android.camera;
 import java.util.List;
 import java.util.Vector;
 
+import android.Manifest;
 import android.app.Activity;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -55,7 +56,7 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 				flagRunningActivity = true;
 				if (flagRequestPermission) {
 					flagRequestPermission = false;
-					if (grantPermission()) {
+					if (!(grantPermission())) {
 						onRequestPermissionsResult();
 					}
 				}
@@ -159,7 +160,7 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 			if (info == null) {
 				return null;
 			}
-			if (!(grantPermission())) {
+			if (grantPermission()) {
 				SCamera ret = new SCamera(null, info, nativeObject);
 				cameraObjectList.add(ret);
 				return ret;
@@ -180,9 +181,9 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 		Activity activity = lastRunningActivity;
 		if (activity == null) {
 			flagRequestPermission = true;
-			return false;
+			return true;
 		}
-		return Permissions.grantCameraPermission(activity, SlibActivity.REQUEST_SCAMERA_PERMISSION);
+		return Permissions.grantPermission(activity, Manifest.permission.CAMERA, SlibActivity.REQUEST_SCAMERA_PERMISSION);
 	}
 
 	private static boolean checkPermission() {
@@ -190,7 +191,7 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 		if (activity == null) {
 			return false;
 		}
-		return Permissions.checkCameraPermission(activity);
+		return Permissions.checkPermission(activity, Manifest.permission.CAMERA);
 	}
 
 	public static void onRequestPermissionsResult() {

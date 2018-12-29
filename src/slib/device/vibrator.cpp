@@ -22,16 +22,16 @@
 
 #include "slib/device/vibrator.h"
 
-#if defined(SLIB_PLATFORM_IS_DESKTOP)
 
 namespace slib
 {
 
+#if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID)
 	sl_bool Vibrator::vibrate(sl_int32 millisec)
 	{
 		return sl_false;
 	}
+#endif
 
 }
 
-#endif

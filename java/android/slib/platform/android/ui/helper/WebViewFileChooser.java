@@ -47,7 +47,6 @@ public class WebViewFileChooser implements FileChooserListener {
 		this.webView = webView;
 		this.requestCode = requestCode;
 		this.fileChooser = new FileChooser((Activity)(webView.getContext()), requestCode, this);
-		this.fileChooser.setLoadingContent(false);
 	}
 
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)

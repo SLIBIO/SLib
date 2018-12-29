@@ -31,4 +31,80 @@ namespace slib
 	}
 #endif
 
+#if !defined(SLIB_UI_IS_ANDROID)
+	sl_bool Device::checkPermissions(const DevicePermissions& permissions)
+	{
+		return sl_true;
+	}
+	
+	void Device::grantPermissions(const DevicePermissions& permissions, const Function<void()>& callback)
+	{
+		callback();
+	}
+#endif
+	
+	String Device::getIMEI()
+	{
+		return getIMEIs().getValueAt(0);
+	}
+
+	String Device::getPhoneNumber()
+	{
+		return getPhoneNumbers().getValueAt(0);
+	}
+
+#if !defined(SLIB_PLATFORM_IS_ANDROID)
+	List<String> Device::getIMEIs()
+	{
+		return sl_null;
+	}
+
+	List<String> Device::getPhoneNumbers()
+	{
+		return sl_null;
+	}
+#endif
+	
+#if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_TIZEN)
+	String Device::getDeviceId()
+	{
+		return sl_null;
+	}
+	
+	String Device::getDeviceName()
+	{
+		return sl_null;
+	}
+	
+	String Device::getSystemVersion()
+	{
+		return sl_null;
+	}
+	
+	String Device::getSystemName()
+	{
+		return sl_null;
+	}
+	
+	sl_uint32 Device::getDevicePPI()
+	{
+		return 72;
+	}
+	
+	Size Device::getScreenSize()
+	{
+		return UI::getScreenSize();
+	}
+#endif
+	
+	sl_uint32 Device::getScreenWidth()
+	{
+		return (sl_uint32)(getScreenSize().x);
+	}
+
+	sl_uint32 Device::getScreenHeight()
+	{
+		return (sl_uint32)(getScreenSize().y);
+	}
+
 }

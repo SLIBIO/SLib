@@ -22,6 +22,7 @@
 
 package slib.platform.android.ui.helper;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -46,8 +47,6 @@ public class FileChooser {
 	private int requestCode;
 	private FileChooserListener listener;
 
-	private boolean flagLoadingContent;
-
 	private String filePathImageCapture;
 	private boolean flagIgnoreActivityResult;
 
@@ -57,10 +56,6 @@ public class FileChooser {
 		this.listener = listener;
 	}
 
-	public void setLoadingContent(boolean flag) {
-		this.flagLoadingContent = flag;
-	}
-
 	public void captureImage() {
 		filePathImageCapture = null;
 		start(createImageCaptureIntent());
@@ -68,7 +63,7 @@ public class FileChooser {
 
 	public void chooseImage() {
 		filePathImageCapture = null;
-		if (Permissions.checkCameraPermission(activity) && Permissions.checkWriteExternalStoragePermission(activity)) {
+		if (Permissions.checkPermission(activity, Manifest.permission.CAMERA) && Permissions.checkPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 			start(createChooseFileIntent("image/*", createImageCaptureIntent()));
 		} else {
 			start(createChooseFileIntent("image/*"));
@@ -82,7 +77,7 @@ public class FileChooser {
 
 	public void chooseVideo() {
 		filePathImageCapture = null;
-		if (Permissions.checkCameraPermission(activity)) {
+		if (Permissions.checkPermission(activity, Manifest.permission.CAMERA)) {
 			start(createChooseFileIntent("video/*", createVideoCaptureIntent()));
 		} else {
 			start(createChooseFileIntent("video/*"));
@@ -96,7 +91,7 @@ public class FileChooser {
 
 	public void chooseAudio() {
 		filePathImageCapture = null;
-		if (Permissions.checkRecordAudioPermission(activity)) {
+		if (Permissions.checkPermission(activity, Manifest.permission.RECORD_AUDIO)) {
 			start(createChooseFileIntent("audio/*", createRecordSoundIntent()));
 		} else {
 			start(createChooseFileIntent("audio/*"));
@@ -180,13 +175,13 @@ public class FileChooser {
 
 	private Intent createChooseFileIntent() {
 		Vector<Intent> intents = new Vector<Intent>();
-		if (Permissions.checkCameraPermission(activity)) {
-			if (Permissions.checkWriteExternalStoragePermission(activity)) {
+		if (Permissions.checkPermission(activity, Manifest.permission.CAMERA)) {
+			if (Permissions.checkPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 				intents.add(createImageCaptureIntent());
 			}
 			intents.add(createVideoCaptureIntent());
 		}
-		if (Permissions.checkRecordAudioPermission(activity)) {
+		if (Permissions.checkPermission(activity, Manifest.permission.RECORD_AUDIO)) {
 			intents.add(createRecordSoundIntent());
 		}
 		return createChooseFileIntent("*/*", intents.toArray(new Intent[] {}));

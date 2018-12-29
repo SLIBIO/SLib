@@ -52,7 +52,6 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(getStatusBarHeight, "getStatusBarHeight", "(Landroid/app/Activity;)I");
 		SLIB_JNI_STATIC_METHOD(setStatusBarStyle, "setStatusBarStyle", "(Landroid/app/Activity;I)V");		
 		SLIB_JNI_STATIC_METHOD(setBadgeNumber, "setBadgeNumber", "(Landroid/app/Activity;I)V");
-		SLIB_JNI_STATIC_METHOD(grantPermissions, "grantPermissions", "(Landroid/app/Activity;I)V");
 	SLIB_JNI_END_CLASS
 
 	void _priv_AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this);
@@ -229,14 +228,6 @@ namespace slib
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JAndroidUtil::setBadgeNumber.call(sl_null, jactivity, number);
-		}
-	}
-	
-	void UI::grantPermissions(sl_uint32 permissions)
-	{
-		jobject jactivity = Android::getCurrentActivity();
-		if (jactivity) {
-			JAndroidUtil::grantPermissions.call(sl_null, jactivity, permissions);
 		}
 	}
 	

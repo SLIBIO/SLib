@@ -467,10 +467,4 @@ namespace slib
 	}
 #endif
 	
-#if !defined(SLIB_UI_IS_ANDROID)
-	void UI::grantPermissions(sl_uint32 permissions)
-	{
-	}
-#endif
-	
 }

@@ -26,6 +26,7 @@ import java.util.Vector;
 
 import slib.platform.android.camera.SCamera;
 import slib.platform.android.camera.TakePhoto;
+import slib.platform.android.device.Device;
 import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.view.UiGLView;
 import slib.platform.android.ui.view.UiWebView;
@@ -47,7 +48,7 @@ public class SlibActivity extends Activity {
 	public static final int REQUEST_IMAGE_CAPTURE = 0x000100;
 	public static final int REQUEST_WEBVIEW_CHOOSE_FILE = 0x000101;
 
-	public static final int REQUEST_PERMISSIONS = 0x000201;
+	public static final int REQUEST_PERMISSIONS = 0x000200;
 	public static final int REQUEST_SCAMERA_PERMISSION = 0x000201;
 
 	@Override
@@ -168,16 +169,25 @@ public class SlibActivity extends Activity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == REQUEST_IMAGE_CAPTURE) {
-			TakePhoto.onResult(this, resultCode, data);
-		} else if (requestCode == REQUEST_WEBVIEW_CHOOSE_FILE) {
-			UiWebView.onResult(this, resultCode, data);
+		switch (requestCode) {
+			case REQUEST_IMAGE_CAPTURE:
+				TakePhoto.onResult(this, resultCode, data);
+				break;
+			case REQUEST_WEBVIEW_CHOOSE_FILE:
+				UiWebView.onResult(this, resultCode, data);
+				break;
 		}
 	}
 
+	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-		if (requestCode == REQUEST_SCAMERA_PERMISSION) {
-			SCamera.onRequestPermissionsResult();
+		switch (requestCode) {
+			case REQUEST_PERMISSIONS:
+				Device.onRequestPermissionsResult();
+				break;
+			case REQUEST_SCAMERA_PERMISSION:
+				SCamera.onRequestPermissionsResult();
+				break;
 		}
 	}
 

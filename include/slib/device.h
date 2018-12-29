@@ -24,7 +24,6 @@
 #define CHECKHEADER_SLIB_DEVICE_HEADER
 
 #include "device/device.h"
-#include "device/information.h"
 #include "device/sensor.h"
 #include "device/vibrator.h"
 

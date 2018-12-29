@@ -22,7 +22,6 @@
 
 package slib.platform.android.ui;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -42,12 +41,9 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import java.lang.reflect.Field;
-import java.util.Vector;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import slib.platform.android.Logger;
-import slib.platform.android.SlibActivity;
-import slib.platform.android.helper.Permissions;
 
 public class Util {
 
@@ -323,32 +319,5 @@ public class Util {
 			Logger.exception(e);
 		}
 	}
-
-	public static void grantPermissions(final Activity activity, final int permissions) {
-		if (!(UiThread.isUiThread())) {
-			activity.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					grantPermissions(activity, permissions);
-				}
-			});
-			return;
-		}
-		Vector<String> list = new Vector<String>();
-		if ((permissions & 0x00000001) != 0) {
-			list.add(Manifest.permission.CAMERA);
-		}
-		if ((permissions & 0x00000002) != 0) {
-			list.add(Manifest.permission.RECORD_AUDIO);
-		}
-		if ((permissions & 0x00000004) != 0) {
-			list.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-		}
-		if (list.size() == 0) {
-			return;
-		}
-		Permissions.grantPermissions(activity, list.toArray(new String[] {}), SlibActivity.REQUEST_PERMISSIONS);
-	}
-
 
 }

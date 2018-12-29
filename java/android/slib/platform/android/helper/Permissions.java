@@ -7,38 +7,43 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Process;
 
+import java.security.Permission;
 import java.util.Vector;
+
+import slib.platform.android.Logger;
 
 public class Permissions {
 
-	public static void requestPermissions(Activity activity, String[] permissions, int requestCode) {
+	public static boolean requestPermissions(Activity activity, String[] permissions, int requestCode) {
 		if (Build.VERSION.SDK_INT >= 23) {
-			activity.requestPermissions(permissions, requestCode);
+			try {
+				if (permissions.length == 0) {
+					return false;
+				}
+				activity.requestPermissions(permissions, requestCode);
+				return true;
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
 		}
+		return false;
 	}
 
-	public static void requestPermission(Activity activity, String permission, int requestCode) {
-		requestPermissions(activity, new String[] {permission}, requestCode);
+	public static boolean requestPermission(Activity activity, String permission, int requestCode) {
+		return requestPermissions(activity, new String[] {permission}, requestCode);
 	}
 
 	public static boolean checkPermission(Context context, String permission) {
-		if (permission == null) {
-			throw new IllegalArgumentException("permission is null");
-		}
 		return context.checkPermission(permission, Process.myPid(), Process.myUid()) == PackageManager.PERMISSION_GRANTED;
 	}
 
-	public static boolean grantPermission(Activity activity, String permission, int requestCode) {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (checkPermission(activity, permission)) {
-				return true;
-			} else {
-				requestPermission(activity, permission, requestCode);
+	public static boolean checkPermissions(Context context, String[] permissions) {
+		for (int i = 0; i < permissions.length; i++) {
+			if (!(checkPermission(context, permissions[i]))) {
 				return false;
 			}
-		} else {
-			return true;
 		}
+		return true;
 	}
 
 	public static boolean grantPermissions(Activity activity, String[] permissions, int requestCode) {
@@ -50,37 +55,24 @@ public class Permissions {
 				}
 			}
 			if (list.size() == 0) {
-				return true;
+				return false;
 			}
-			requestPermissions(activity, list.toArray(new String[] {}), requestCode);
-			return false;
+			return requestPermissions(activity, list.toArray(new String[] {}), requestCode);
 		} else {
-			return true;
+			return false;
 		}
 	}
 
-	public static boolean checkCameraPermission(Context context) {
-		return checkPermission(context, Manifest.permission.CAMERA);
-	}
-
-	public static boolean grantCameraPermission(Activity activity, int requestCode) {
-		return grantPermission(activity, Manifest.permission.CAMERA, requestCode);
-	}
-
-	public static boolean checkRecordAudioPermission(Context context) {
-		return checkPermission(context, Manifest.permission.RECORD_AUDIO);
-	}
-
-	public static boolean grantRecordAudioPermission(Activity activity, int requestCode) {
-		return grantPermission(activity, Manifest.permission.RECORD_AUDIO, requestCode);
-	}
-
-	public static boolean checkWriteExternalStoragePermission(Context context) {
-		return checkPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-	}
-
-	public static boolean grantWriteExternalStoragePermission(Activity activity, int requestCode) {
-		return grantPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, requestCode);
+	public static boolean grantPermission(Activity activity, String permission, int requestCode) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			if (checkPermission(activity, permission)) {
+				return false;
+			} else {
+				return requestPermission(activity, permission, requestCode);
+			}
+		} else {
+			return false;
+		}
 	}
 
 }

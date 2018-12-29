@@ -939,8 +939,6 @@
 		26D9D8521E96292E005F7BD3 /* database_statement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF2B1C23051F00AD81D9 /* database_statement.cpp */; };
 		26D9D8531E96292E005F7BD3 /* database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF2C1C23051F00AD81D9 /* database.cpp */; };
 		26D9D8541E96292E005F7BD3 /* sqlite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF2D1C23051F00AD81D9 /* sqlite.cpp */; };
-		26D9D8551E962932005F7BD3 /* device_information.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1E4EDB11DF08931002221C5 /* device_information.cpp */; };
-		26D9D8561E962932005F7BD3 /* device_information_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1E4EDAF1DF08924002221C5 /* device_information_ios.mm */; };
 		26D9D8571E962932005F7BD3 /* sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A34D1C128D80005690FE /* sensor.cpp */; };
 		26D9D8581E962932005F7BD3 /* sensor_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */; };
 		26D9D8591E962932005F7BD3 /* vibrator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A34F1C128D80005690FE /* vibrator.cpp */; };
@@ -2411,8 +2409,6 @@
 		E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = sensor_ios.mm; sourceTree = "<group>"; };
 		E1D3A4281E14A2FC00007A98 /* preference.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = preference.cpp; sourceTree = "<group>"; };
 		E1D3A42A1E14A38C00007A98 /* preference_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = preference_apple.mm; sourceTree = "<group>"; };
-		E1E4EDAF1DF08924002221C5 /* device_information_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = device_information_ios.mm; sourceTree = "<group>"; };
-		E1E4EDB11DF08931002221C5 /* device_information.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = device_information.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -3976,8 +3972,6 @@
 			children = (
 				26B92D5A21D4CF22003F6F82 /* device.cpp */,
 				26B92D5C21D4CF28003F6F82 /* device_ios.mm */,
-				E1E4EDB11DF08931002221C5 /* device_information.cpp */,
-				E1E4EDAF1DF08924002221C5 /* device_information_ios.mm */,
 				26C0A34D1C128D80005690FE /* sensor.cpp */,
 				E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */,
 				26C0A34F1C128D80005690FE /* vibrator.cpp */,
@@ -5704,7 +5698,6 @@
 				26D9D8421E9628E0005F7BD3 /* line.cpp in Sources */,
 				26D9D8631E96294F005F7BD3 /* bitmap_format.cpp in Sources */,
 				2607301120DD22C9004EB272 /* rw_lock.cpp in Sources */,
-				26D9D8561E962932005F7BD3 /* device_information_ios.mm in Sources */,
 				26D9D8431E9628E0005F7BD3 /* service.cpp in Sources */,
 				26D9D8CE1E962976005F7BD3 /* render_view.cpp in Sources */,
 				2628EAE021C410C100D8CD00 /* base64.cpp in Sources */,
@@ -5717,7 +5710,6 @@
 				26D9D8451E9628E0005F7BD3 /* line_segment.cpp in Sources */,
 				26D9D8DC1E962976005F7BD3 /* ui_animation_apple.mm in Sources */,
 				26D9D8831E96295A005F7BD3 /* audio_recorder_dsound.cpp in Sources */,
-				26D9D8551E962932005F7BD3 /* device_information.cpp in Sources */,
 				26D9D8461E9628E0005F7BD3 /* locale.cpp in Sources */,
 				26CF4DF21ED69AD600954B7A /* ui_text_ios.mm in Sources */,
 				26D9D8471E9628E0005F7BD3 /* compress_zlib.cpp in Sources */,

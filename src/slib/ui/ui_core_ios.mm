@@ -36,8 +36,6 @@
 #include "slib/core/safe_static.h"
 #include "slib/core/platform_apple.h"
 
-#include <UserNotifications/UserNotifications.h>
-
 @interface _priv_Slib_iOS_AppDelegate : UIResponder <UIApplicationDelegate>
 @property (strong, nonatomic) UIWindow *window;
 @end
@@ -160,17 +158,6 @@ namespace slib
 	{
 		CGRect rectOfStatusbar = [[UIApplication sharedApplication] statusBarFrame];
 		return (sl_ui_len)(rectOfStatusbar.size.height * UIPlatform::getGlobalScaleFactor());
-	}
-	
-	void UI::setBadgeNumber(sl_uint32 number)
-	{
-		[[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:UNAuthorizationOptionBadge completionHandler:^(BOOL granted, NSError* error) {
-			if (granted) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[[UIApplication sharedApplication] setApplicationIconBadgeNumber:number];
-				});
-			}
-		}];
 	}
 	
 	void UIPlatform::runLoop(sl_uint32 level)

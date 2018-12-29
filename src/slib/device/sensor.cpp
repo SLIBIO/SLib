@@ -185,7 +185,7 @@ namespace slib
 		m_onAccelerometerChanged(this, xAccel, yAccel, zAccel);
 	}
 
-#if defined(SLIB_PLATFORM_IS_DESKTOP)
+#if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID)
 
 	Ref<Sensor> Sensor::create(const SensorParam& param)
 	{
@@ -194,7 +194,7 @@ namespace slib
 
 	sl_bool Sensor::isAvailableLocation()
 	{
-		return sl_true;
+		return sl_false;
 	}
 
 	sl_bool Sensor::isAvailableCompass()

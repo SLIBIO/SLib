@@ -25,8 +25,12 @@
 #if defined(SLIB_PLATFORM_IS_IOS)
 
 #include "slib/device/device.h"
+#include "slib/core/variant.h"
+#include "slib/core/platform_apple.h"
 
 #import <AVFoundation/AVFoundation.h>
+#import <UIKit/UIKit.h>
+#import <sys/utsname.h>
 
 namespace slib
 {
@@ -74,6 +78,48 @@ namespace slib
 		} @catch(NSError* e) {
 			NSLog(@"[Exception][Device][setAudioCategory] %@", e.localizedDescription);
 		}
+	}
+	
+	String Device::getDeviceId()
+	{
+		UIDevice* device = [UIDevice currentDevice];
+		NSString* currentDeviceId = [[device identifierForVendor] UUIDString];
+		return Apple::getStringFromNSString(currentDeviceId);
+	}
+	
+	String Device::getDeviceName()
+	{
+		struct utsname systemInfo;
+		uname(&systemInfo);
+		
+		return systemInfo.machine;
+	}
+	
+	String Device::getSystemVersion()
+	{
+		UIDevice* device = [UIDevice currentDevice];
+		return Apple::getStringFromNSString(device.systemVersion);
+	}
+	
+	String Device::getSystemName()
+	{
+		String osVersion = getSystemVersion();
+		return String::format("iOS %s", osVersion);
+	}
+	
+	Size Device::getScreenSize()
+	{
+		CGRect screenRect = [[UIScreen mainScreen] bounds];
+		Size ret;
+		CGFloat scale = [[UIScreen mainScreen] scale];
+		ret.x = (sl_real)(screenRect.size.width * scale);
+		ret.y = (sl_real)(screenRect.size.height * scale);
+		return ret;
+	}
+	
+	sl_uint32 Device::getDevicePPI()
+	{
+		return (sl_uint32)([[UIScreen mainScreen] scale] * 160);
 	}
 
 }

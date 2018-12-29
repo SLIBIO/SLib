@@ -175,15 +175,6 @@ namespace slib
 		
 		static void setBadgeNumber(sl_uint32 number);
 
-		
-		enum {
-			CameraPermission = 0x00000001,
-			RecordAudioPermission = 0x00000002,
-			WriteExternalStoragePermission = 0x00000004
-		};
-		
-		static void grantPermissions(sl_uint32 permissions);
-		
 	};
 
 }

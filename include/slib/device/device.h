@@ -25,24 +25,50 @@
 
 #include "definition.h"
 
+#include "constants.h"
+
+#include "../core/string.h"
+#include "../core/list.h"
+#include "../core/function.h"
+#include "../math/size.h"
+
 namespace slib
 {
 
-	enum class DeviceAudioCategory
-	{
-		Default = 0,
-		Playback = 1,
-		Record = 2,
-		PlayAndRecord = 3,
-		PlayVideo = 4,
-		RecordVideo = 5,
-		VideoChat = 6
-	};
-	
 	class SLIB_EXPORT Device
 	{
 	public:
 		static void setAudioCategory(const DeviceAudioCategory& category);
+		
+		
+		static sl_bool checkPermissions(const DevicePermissions& permissions);
+
+		static void grantPermissions(const DevicePermissions& permissions, const Function<void()>& callback = sl_null);
+
+		
+		static String getIMEI();
+		
+		static List<String> getIMEIs();
+
+		static String getPhoneNumber();
+
+		static List<String> getPhoneNumbers();
+		
+		static String getDeviceId();
+		
+		static String getDeviceName();
+		
+		static String getSystemVersion();
+		
+		static String getSystemName();
+		
+		static sl_uint32 getDevicePPI();
+		
+		static Size getScreenSize();
+		
+		static sl_uint32 getScreenWidth();
+		
+		static sl_uint32 getScreenHeight();
 
 	};
 

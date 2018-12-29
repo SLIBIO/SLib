@@ -24,7 +24,10 @@
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
+#include "slib/ui/core.h"
 #include "slib/ui/platform.h"
+
+#include <UserNotifications/UserNotifications.h>
 
 namespace slib
 {
@@ -43,6 +46,17 @@ namespace slib
 
 		UIUserNotificationSettings* notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert categories:nil];
 		[application registerUserNotificationSettings:notificationSettings];
+	}
+	
+	void UI::setBadgeNumber(sl_uint32 number)
+	{
+		[[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:UNAuthorizationOptionBadge completionHandler:^(BOOL granted, NSError* error) {
+			if (granted) {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[[UIApplication sharedApplication] setApplicationIconBadgeNumber:number];
+				});
+			}
+		}];
 	}
 	
 	sl_bool UIPlatform::parseRemoteNotificationInfo(NSDictionary* _userInfo, PushNotificationMessage& message)

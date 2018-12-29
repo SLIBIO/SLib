@@ -35,7 +35,7 @@
 namespace slib
 {
 
-	String DeviceInformation::getDeviceId()
+	String Device::getDeviceId()
 	{
 		char *value = NULL;
 		int ret = ::system_info_get_platform_string("http://tizen.org/system/tizenid", &value);
@@ -47,7 +47,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String DeviceInformation::getDeviceName()
+	String Device::getDeviceName()
 	{
 		char* platform_name = NULL;
 		int ret = ::system_info_get_platform_string("http://tizen.org/system/platform.name", &platform_name);
@@ -64,7 +64,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String DeviceInformation::getSystemVersion()
+	String Device::getSystemVersion()
 	{
 		char *value = NULL;
 		int ret = ::system_info_get_platform_string("http://tizen.org/feature/platform.version", &value);
@@ -76,13 +76,13 @@ namespace slib
 		return version;
 	}
 
-	String DeviceInformation::getSystemName()
+	String Device::getSystemName()
 	{
 		String osVersion = getSystemVersion();
 		return String::format("Tizen %s", osVersion);
 	}
 
-	Size DeviceInformation::getScreenSize()
+	Size Device::getScreenSize()
 	{
 		Size size;
 		int value;
@@ -99,7 +99,7 @@ namespace slib
 		return size;
 	}
 
-	sl_uint32 DeviceInformation::getDevicePPI()
+	sl_uint32 Device::getDevicePPI()
 	{
 		int value;
 		int ret = ::system_info_get_platform_int("http://tizen.org/feature/screen.dpi", &value);
