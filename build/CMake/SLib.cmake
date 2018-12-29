@@ -91,30 +91,18 @@ set_target_properties (
  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_LIB_PATH}"
 )
 
-if (ANDROID)
- file (
-  GLOB SLIB_EXTRA_FILES
-  "${SLIB_PATH}/src/slib/graphics/*.cpp"
-  "${SLIB_PATH}/src/slib/render/*.cpp"
-  "${SLIB_PATH}/src/slib/ui/*.cpp"
-  "${SLIB_PATH}/src/slib/media/*.cpp"
-  "${SLIB_PATH}/src/slib/device/*.cpp"
-  "${SLIB_PATH}/src/slib/db/*.cpp"
-  "${SLIB_PATH}/src/slib/geo/*.cpp"
-  "${SLIB_PATH}/src/slib/web/*.cpp"
- )
-else ()
- file (
-  GLOB SLIB_EXTRA_FILES
-  "${SLIB_PATH}/src/slib/graphics/*.cpp"
-  "${SLIB_PATH}/src/slib/render/*.cpp"
-  "${SLIB_PATH}/src/slib/ui/*.cpp"
-  "${SLIB_PATH}/src/slib/media/*.cpp"
-  "${SLIB_PATH}/src/slib/db/*.cpp"
-  "${SLIB_PATH}/src/slib/geo/*.cpp"
-  "${SLIB_PATH}/src/slib/web/*.cpp"
- )
-endif ()
+file (
+ GLOB SLIB_EXTRA_FILES
+ "${SLIB_PATH}/src/slib/graphics/*.cpp"
+ "${SLIB_PATH}/src/slib/render/*.cpp"
+ "${SLIB_PATH}/src/slib/ui/*.cpp"
+ "${SLIB_PATH}/src/slib/media/*.cpp"
+ "${SLIB_PATH}/src/slib/device/*.cpp"
+ "${SLIB_PATH}/src/slib/db/*.cpp"
+ "${SLIB_PATH}/src/slib/geo/*.cpp"
+ "${SLIB_PATH}/src/slib/web/*.cpp"
+)
+
 add_library (
  slib STATIC
  ${SLIB_CORE_FILES}
