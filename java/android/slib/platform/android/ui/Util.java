@@ -138,11 +138,34 @@ public class Util {
 		}
 	}
 
-	public static void setStatusBarStyle(Activity activity, int style) {
+	public static void setStatusBarStyle(final Activity activity, final int style) {
+		if (!(UiThread.isUiThread())) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					setStatusBarStyle(activity, style);
+				}
+			});
+			return;
+		}
 		try {
 			Window window = activity.getWindow();
 			if (style > 0) {
 				window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+					window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+					int flagSystemUI = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+					if (style == 1) {
+						flagSystemUI |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+					}
+					window.getDecorView().setSystemUiVisibility(flagSystemUI);
+					window.setStatusBarColor(Color.TRANSPARENT);
+				} else {
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+						window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+					}
+				}
 			} else {
 				window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
