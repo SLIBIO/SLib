@@ -26,6 +26,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -121,8 +122,53 @@ public class Util {
 		return 0;
 	}
 
-	public static void setScreenOrientations(Activity activity, boolean flag0, boolean flag90, boolean flag180, boolean flag270) {
-
+	public static void setScreenOrientations(final Activity activity, final boolean flag0, final boolean flag90, final boolean flag180, final boolean flag270) {
+		if (!(UiThread.isUiThread())) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					setScreenOrientations(activity, flag0, flag90, flag180, flag270);
+				}
+			});
+			return;
+		}
+		try {
+			int orientation;
+			if (flag90 || flag270) {
+				if (flag0 || flag180) {
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+						orientation = ActivityInfo.SCREEN_ORIENTATION_FULL_USER;
+					} else {
+						orientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
+					}
+				} else if (flag90 && flag270) {
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+						orientation = ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE;
+					} else {
+						orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+					}
+				} else if (flag270) {
+					orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+				} else {
+					orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+				}
+			} else {
+				if (flag0 && flag180) {
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+						orientation = ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT;
+					} else {
+						orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+					}
+				} else if (flag180) {
+					orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
+				} else {
+					orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+				}
+			}
+			activity.setRequestedOrientation(orientation);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static int getStatusBarHeight(Activity activity) {
