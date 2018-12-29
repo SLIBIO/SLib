@@ -857,5 +857,11 @@
     <ClCompile Include="..\..\src\slib\ui\qr_code_scanner.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\device\device.cpp">
+      <Filter>src\device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\device\device_win32.cpp">
+      <Filter>src\device</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

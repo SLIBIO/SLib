@@ -65,6 +65,13 @@ namespace slib
 	}
 #endif
 	
+#if !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_MACOS) && !defined(SLIB_PLATFORM_IS_TIZEN)
+	String Device::getDeviceId()
+	{
+		return sl_null;
+	}
+#endif
+	
 	sl_uint32 Device::getScreenWidth()
 	{
 		return (sl_uint32)(getScreenSize().x);
