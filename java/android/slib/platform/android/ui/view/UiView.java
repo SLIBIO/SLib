@@ -39,7 +39,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.AbsoluteLayout;
-import android.widget.Button;
 import android.widget.FrameLayout;
 
 @SuppressWarnings("deprecation")
@@ -163,10 +162,6 @@ public class UiView {
 		if (bottom < top) {
 			bottom = top;
 		}
-		if (view instanceof Button) {
-			top -= 5;
-			bottom += 5;
-		}
 		int width = right - left;
 		int height = bottom - top;
 
@@ -191,9 +186,7 @@ public class UiView {
 					params.height = height;
 					view.setLayoutParams(params);
 				}
-				if (UiThread.isUiThread()) {
-					view.layout(left, top, right, bottom);
-				}
+				view.layout(left, top, right, bottom);
 			}
 			return true;
 		} catch (Exception e) {

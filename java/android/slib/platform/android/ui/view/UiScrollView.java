@@ -129,9 +129,26 @@ public class UiScrollView extends ScrollView implements IView {
 		onEventScroll(this, l, t);
 	}
 
+	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		setMeasuredDimension(resolveSizeAndState(mRight-mLeft, widthMeasureSpec, 0), resolveSizeAndState(mBottom-mTop, heightMeasureSpec, 0));
+	}
+
+	@Override
+	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+		super.onLayout(changed, l, t, r, b);
+		int count = getChildCount();
+		for (int i = 0; i < count; i++) {
+			View child = getChildAt(i);
+			if (child.getVisibility() != GONE) {
+				if (child instanceof IView) {
+					IView view = (IView)child;
+					Rect frame = view.getUIFrame();
+					child.layout(frame.left, frame.top, frame.right, frame.bottom);
+				}
+			}
+		}
 	}
 
 	boolean flagFling = false;
@@ -146,6 +163,7 @@ public class UiScrollView extends ScrollView implements IView {
 	}
 
 	@SuppressLint("ClickableViewAccessibility")
+	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
 		flagFling = false;
 		boolean flag = super.onTouchEvent(ev);

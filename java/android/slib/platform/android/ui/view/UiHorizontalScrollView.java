@@ -62,9 +62,26 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 		UiScrollView.onEventScroll(this, l, t);
 	}
 
+	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		setMeasuredDimension(UiView.resolveMeasure(mRight-mLeft, widthMeasureSpec), UiView.resolveMeasure(mBottom-mTop, heightMeasureSpec));
+	}
+
+	@Override
+	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+		super.onLayout(changed, l, t, r, b);
+		int count = getChildCount();
+		for (int i = 0; i < count; i++) {
+			View child = getChildAt(i);
+			if (child.getVisibility() != GONE) {
+				if (child instanceof IView) {
+					IView view = (IView)child;
+					Rect frame = view.getUIFrame();
+					child.layout(frame.left, frame.top, frame.right, frame.bottom);
+				}
+			}
+		}
 	}
 
 	boolean flagFling = false;
@@ -79,6 +96,7 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 	}
 
 	@SuppressLint("ClickableViewAccessibility")
+	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
 		flagFling = false;
 		boolean flag = super.onTouchEvent(ev);

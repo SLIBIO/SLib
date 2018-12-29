@@ -46,19 +46,23 @@ public class UiGroupView extends AbsoluteLayout implements IView {
 	public UiGroupView(Context context) {
 		super(context);
 	}
-	
+
+	@Override
 	public void onDraw(Canvas canvas) {
 		UiView.onEventDraw(this, canvas);
 	}
 
+	@Override
 	public boolean onKeyDown(int keycode, KeyEvent event) {
 		return UiView.onEventKey(this, true, keycode, event);
 	}
-	
+
+	@Override
 	public boolean onKeyUp(int keycode, KeyEvent event) {
 		return UiView.onEventKey(this, false, keycode, event);
 	}
-	
+
+	@Override
 	public boolean onInterceptTouchEvent(MotionEvent event) {
 		if (UiView.onHitTestTouchEvent(this, (int)(event.getX()), (int)(event.getY()))) {
 			return true;
@@ -67,11 +71,13 @@ public class UiGroupView extends AbsoluteLayout implements IView {
 	};
 	
 	@SuppressLint("ClickableViewAccessibility")
-	public boolean onTouchEvent(MotionEvent event) {		
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
 		UiView.onEventTouch(this, event);
 		return true;
 	}
 
+	@Override
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		if (gestureDetector != null) {
 			gestureDetector.onTouchEvent(event);
@@ -82,6 +88,7 @@ public class UiGroupView extends AbsoluteLayout implements IView {
 		}
 	}
 
+	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		measureChildren(widthMeasureSpec, heightMeasureSpec);
 		setMeasuredDimension(UiView.resolveMeasure(mRight-mLeft, widthMeasureSpec), UiView.resolveMeasure(mBottom-mTop, heightMeasureSpec));
