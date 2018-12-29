@@ -5972,6 +5972,9 @@ namespace slib
 		if (countPattern == 0) {
 			return sl_null;
 		}
+		if (str.isEmpty()) {
+			return sl_null;
+		}
 		CList<ST>* ret = CList<ST>::create();
 		if (ret) {
 			sl_reg start = 0;
