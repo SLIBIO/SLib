@@ -27,6 +27,7 @@
 #include "slib/core/platform_apple.h"
 
 #include "slib/core/file.h"
+#include "slib/core/variant.h"
 #include "slib/core/safe_static.h"
 
 namespace slib
@@ -153,9 +154,10 @@ namespace slib
 #if defined(SLIB_PLATFORM_IS_MACOS)
 			double v = NSAppKitVersionNumber;
 			if (v >= NSAppKitVersionNumber10_10) {
-				_g_system_version = "10.10";
-				_g_system_version_major = 10;
-				_g_system_version_minor = 10;
+				NSOperatingSystemVersion version = [[NSProcessInfo processInfo] operatingSystemVersion];
+				_g_system_version_major = (sl_uint32)(version.majorVersion);
+				_g_system_version_minor = (sl_uint32)(version.minorVersion);
+				_g_system_version = String::format("%d.%d", _g_system_version_major, _g_system_version_minor);
 			} else if (v >= NSAppKitVersionNumber10_9) {
 				_g_system_version = "10.9";
 				_g_system_version_major = 10;
