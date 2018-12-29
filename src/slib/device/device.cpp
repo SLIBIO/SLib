@@ -22,8 +22,6 @@
 
 #include "slib/device/device.h"
 
-#include "slib/ui/core.h"
-
 namespace slib
 {
 
@@ -64,40 +62,6 @@ namespace slib
 	List<String> Device::getPhoneNumbers()
 	{
 		return sl_null;
-	}
-#endif
-	
-#if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_TIZEN) && !defined(SLIB_PLATFORM_IS_MACOS)
-	String Device::getDeviceId()
-	{
-		return sl_null;
-	}
-	
-	String Device::getDeviceName()
-	{
-		return sl_null;
-	}
-	
-	String Device::getSystemVersion()
-	{
-		return sl_null;
-	}
-	
-	String Device::getSystemName()
-	{
-		return sl_null;
-	}
-	
-	double Device::getScreenPPI()
-	{
-		return 72;
-	}
-#endif
-	
-#if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_TIZEN)
-	Size Device::getScreenSize()
-	{
-		return UI::getScreenSize();
 	}
 #endif
 	

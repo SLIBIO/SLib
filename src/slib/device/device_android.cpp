@@ -134,19 +134,19 @@ namespace slib
 		return String::format("Android %s", osVersion);
 	}
 
-	Size Device::getScreenSize()
+	Sizei Device::getScreenSize()
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JniLocal<jobject> jpt = JAndroidDevice::getScreenSize.callObject(sl_null, jactivity);
 			if (jpt.isNotNull()) {
-				Size ret;
+				Sizei ret;
 				ret.x = JAndroidPoint::x.get(jpt);
 				ret.y = JAndroidPoint::y.get(jpt);
 				return ret;
 			}
 		}
-		return Size::zero();
+		return Sizei::zero();
 	}
 
 	double Device::getScreenPPI()

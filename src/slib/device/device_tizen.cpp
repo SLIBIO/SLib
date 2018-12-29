@@ -82,9 +82,9 @@ namespace slib
 		return String::format("Tizen %s", osVersion);
 	}
 
-	Size Device::getScreenSize()
+	Sizei Device::getScreenSize()
 	{
-		Size size;
+		Sizei size;
 		int value;
 		int ret = ::system_info_get_platform_int("http://tizen.org/feature/screen.height", &value);
 		if (ret != SYSTEM_INFO_ERROR_NONE) {
