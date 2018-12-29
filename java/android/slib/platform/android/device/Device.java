@@ -282,7 +282,7 @@ public class Device {
 		return new Point(dm.widthPixels, dm.heightPixels);
 	}
 
-	public static int getDevicePPI(Activity context) {
+	public static int getScreenPPI(Activity context) {
 		DisplayMetrics dm = new DisplayMetrics();
 		context.getWindowManager().getDefaultDisplay().getMetrics(dm);
 		return dm.densityDpi;

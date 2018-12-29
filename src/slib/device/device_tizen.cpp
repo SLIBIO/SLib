@@ -99,7 +99,7 @@ namespace slib
 		return size;
 	}
 
-	sl_uint32 Device::getDevicePPI()
+	double Device::getScreenPPI()
 	{
 		int value;
 		int ret = ::system_info_get_platform_int("http://tizen.org/feature/screen.dpi", &value);

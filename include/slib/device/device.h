@@ -38,6 +38,7 @@ namespace slib
 	class SLIB_EXPORT Device
 	{
 	public:
+		// Works on iOS
 		static void setAudioCategory(const DeviceAudioCategory& category);
 		
 		
@@ -46,12 +47,16 @@ namespace slib
 		static void grantPermissions(const DevicePermissions& permissions, const Function<void()>& callback = sl_null);
 
 		
+		// Works on Android
 		static String getIMEI();
 		
+		// Works on Android
 		static List<String> getIMEIs();
 
+		// Works on Android
 		static String getPhoneNumber();
 
+		// Works on Android
 		static List<String> getPhoneNumbers();
 		
 		static String getDeviceId();
@@ -62,7 +67,7 @@ namespace slib
 		
 		static String getSystemName();
 		
-		static sl_uint32 getDevicePPI();
+		static double getScreenPPI();
 		
 		static Size getScreenSize();
 		

@@ -91,14 +91,12 @@ namespace slib
 	{
 		struct utsname systemInfo;
 		uname(&systemInfo);
-		
 		return systemInfo.machine;
 	}
 	
 	String Device::getSystemVersion()
 	{
-		UIDevice* device = [UIDevice currentDevice];
-		return Apple::getStringFromNSString(device.systemVersion);
+		return Apple::getSystemVersion();
 	}
 	
 	String Device::getSystemName()
@@ -117,9 +115,9 @@ namespace slib
 		return ret;
 	}
 	
-	sl_uint32 Device::getDevicePPI()
+	double Device::getScreenPPI()
 	{
-		return (sl_uint32)([[UIScreen mainScreen] scale] * 160);
+		return [[UIScreen mainScreen] scale] * 160;
 	}
 
 }

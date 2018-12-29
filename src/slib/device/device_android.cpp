@@ -46,7 +46,7 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(getDeviceOSVersion, "getDeviceOSVersion", "()Ljava/lang/String;");
 		SLIB_JNI_STATIC_METHOD(getDeviceName, "getDeviceName", "()Ljava/lang/String;");
 		SLIB_JNI_STATIC_METHOD(getScreenSize, "getScreenSize", "(Landroid/app/Activity;)Landroid/graphics/Point;");
-		SLIB_JNI_STATIC_METHOD(getDevicePPI, "getDevicePPI", "(Landroid/app/Activity;)I");
+		SLIB_JNI_STATIC_METHOD(getScreenPPI, "getScreenPPI", "(Landroid/app/Activity;)I");
 	SLIB_JNI_END_CLASS
 
 	sl_bool Device::checkPermissions(const DevicePermissions& permissions)
@@ -149,11 +149,11 @@ namespace slib
 		return Size::zero();
 	}
 
-	sl_uint32 Device::getDevicePPI()
+	double Device::getScreenPPI()
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return (sl_uint32)(JAndroidDevice::getDevicePPI.callInt(sl_null, jactivity));
+			return JAndroidDevice::getScreenPPI.callInt(sl_null, jactivity);
 		}
 		return 0;
 	}

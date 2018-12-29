@@ -22,6 +22,8 @@
 
 #include "slib/device/device.h"
 
+#include "slib/ui/core.h"
+
 namespace slib
 {
 
@@ -65,7 +67,7 @@ namespace slib
 	}
 #endif
 	
-#if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_TIZEN)
+#if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_TIZEN) && !defined(SLIB_PLATFORM_IS_MACOS)
 	String Device::getDeviceId()
 	{
 		return sl_null;
@@ -86,11 +88,13 @@ namespace slib
 		return sl_null;
 	}
 	
-	sl_uint32 Device::getDevicePPI()
+	double Device::getScreenPPI()
 	{
 		return 72;
 	}
+#endif
 	
+#if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_TIZEN)
 	Size Device::getScreenSize()
 	{
 		return UI::getScreenSize();
