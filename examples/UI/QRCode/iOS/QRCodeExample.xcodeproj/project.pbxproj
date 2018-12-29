@@ -11,6 +11,7 @@
 		2639171421C943D0008B335B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2639171321C943D0008B335B /* AVFoundation.framework */; };
 		2639171821C944CA008B335B /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2639171721C944C9008B335B /* CoreMedia.framework */; };
 		2639171A21C944D2008B335B /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2639171921C944D2008B335B /* CoreVideo.framework */; };
+		26B92D6E21D7AEB1003F6F82 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26B92D6D21D7AEB1003F6F82 /* UserNotifications.framework */; };
 		26F2DDF0216BDE39007CE8E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDEF216BDE39007CE8E6 /* UIKit.framework */; };
 		26F2DDF2216BDE44007CE8E6 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF1216BDE44007CE8E6 /* GLKit.framework */; };
 		26F2DDF4216BDE4D007CE8E6 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF3216BDE4D007CE8E6 /* OpenGLES.framework */; };
@@ -30,6 +31,7 @@
 		2639171321C943D0008B335B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		2639171721C944C9008B335B /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		2639171921C944D2008B335B /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		26B92D6D21D7AEB1003F6F82 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		26F2DDEF216BDE39007CE8E6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		26F2DDF1216BDE44007CE8E6 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		26F2DDF3216BDE4D007CE8E6 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -50,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26B92D6E21D7AEB1003F6F82 /* UserNotifications.framework in Frameworks */,
 				2639171A21C944D2008B335B /* CoreVideo.framework in Frameworks */,
 				2639171821C944CA008B335B /* CoreMedia.framework in Frameworks */,
 				2639171421C943D0008B335B /* AVFoundation.framework in Frameworks */,
@@ -108,6 +111,7 @@
 		26F5DE3C2051B60500BC4998 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				26B92D6D21D7AEB1003F6F82 /* UserNotifications.framework */,
 				2639171921C944D2008B335B /* CoreVideo.framework */,
 				2639171721C944C9008B335B /* CoreMedia.framework */,
 				2639171321C943D0008B335B /* AVFoundation.framework */,

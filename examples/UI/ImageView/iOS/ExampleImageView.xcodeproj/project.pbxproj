@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		26B92D6C21D7AE8D003F6F82 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26B92D6B21D7AE8D003F6F82 /* UserNotifications.framework */; };
 		26F2DDF0216BDE39007CE8E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDEF216BDE39007CE8E6 /* UIKit.framework */; };
 		26F2DDF2216BDE44007CE8E6 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF1216BDE44007CE8E6 /* GLKit.framework */; };
 		26F2DDF4216BDE4D007CE8E6 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF3216BDE4D007CE8E6 /* OpenGLES.framework */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		26B92D6B21D7AE8D003F6F82 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		26F2DDEF216BDE39007CE8E6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		26F2DDF1216BDE44007CE8E6 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		26F2DDF3216BDE4D007CE8E6 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -46,6 +48,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26B92D6C21D7AE8D003F6F82 /* UserNotifications.framework in Frameworks */,
 				26F2DDFC216BDE66007CE8E6 /* QuartzCore.framework in Frameworks */,
 				26F2DDFA216BDE5E007CE8E6 /* CoreImage.framework in Frameworks */,
 				26F2DDF8216BDE58007CE8E6 /* CoreText.framework in Frameworks */,
@@ -102,6 +105,7 @@
 		26F5DE3C2051B60500BC4998 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				26B92D6B21D7AE8D003F6F82 /* UserNotifications.framework */,
 				26F2DDFB216BDE66007CE8E6 /* QuartzCore.framework */,
 				26F2DDF9216BDE5E007CE8E6 /* CoreImage.framework */,
 				26F2DDF7216BDE58007CE8E6 /* CoreText.framework */,
