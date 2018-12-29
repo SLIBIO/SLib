@@ -2150,7 +2150,6 @@ namespace slib
 	
 	void View::measureLayoutWrappingSize(sl_bool flagHorizontal, sl_bool flagVertical)
 	{
-		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		if (m_layoutAttrs.isNull()) {
 			return;
 		}
@@ -2159,8 +2158,8 @@ namespace slib
 			return;
 		}
 		
-		sl_ui_pos measuredWidth = m_paddingLeft;
-		sl_ui_pos measuredHeight = m_paddingTop;
+		sl_ui_pos measuredWidth = m_paddingLeft + m_paddingRight;
+		sl_ui_pos measuredHeight = m_paddingTop + m_paddingBottom;
 		
 		ListElements< Ref<View> > children(getChildren());
 		
@@ -2172,12 +2171,12 @@ namespace slib
 					if (flagHorizontal) {
 						if (childLayoutAttrs->widthMode != SizeMode::Filling) {
 							if (childLayoutAttrs->leftMode != PositionMode::Free || childLayoutAttrs->rightMode != PositionMode::Free) {
-								sl_ui_pos w = m_paddingLeft + childLayoutAttrs->layoutFrame.right - childLayoutAttrs->layoutFrame.left + childLayoutAttrs->marginLeft + childLayoutAttrs->marginRight;
+								sl_ui_pos w = m_paddingLeft + childLayoutAttrs->layoutFrame.right - childLayoutAttrs->layoutFrame.left + childLayoutAttrs->marginLeft + childLayoutAttrs->marginRight + m_paddingRight;
 								if (w > measuredWidth) {
 									measuredWidth = w;
 								}
 							} else {
-								sl_ui_pos w = childLayoutAttrs->layoutFrame.right + childLayoutAttrs->marginRight;
+								sl_ui_pos w = childLayoutAttrs->layoutFrame.right;
 								if (w > measuredWidth) {
 									measuredWidth = w;
 								}
@@ -2187,12 +2186,12 @@ namespace slib
 					if (flagVertical) {
 						if (childLayoutAttrs->heightMode != SizeMode::Filling) {
 							if (childLayoutAttrs->topMode != PositionMode::Free || childLayoutAttrs->bottomMode != PositionMode::Free) {
-								sl_ui_pos h = m_paddingTop + childLayoutAttrs->layoutFrame.bottom - childLayoutAttrs->layoutFrame.top + childLayoutAttrs->marginTop + childLayoutAttrs->marginBottom;
+								sl_ui_pos h = m_paddingTop + childLayoutAttrs->layoutFrame.bottom - childLayoutAttrs->layoutFrame.top + childLayoutAttrs->marginTop + childLayoutAttrs->marginBottom + m_paddingBottom;
 								if (h > measuredHeight) {
 									measuredHeight = h;
 								}
 							} else {
-								sl_ui_pos h = childLayoutAttrs->layoutFrame.bottom + childLayoutAttrs->marginBottom;
+								sl_ui_pos h = childLayoutAttrs->layoutFrame.bottom;
 								if (h > measuredHeight) {
 									measuredHeight = h;
 								}
@@ -2215,13 +2214,11 @@ namespace slib
 				}
 			}
 		}
-		measuredWidth += m_paddingRight;
-		measuredHeight += m_paddingBottom;
 		if (flagHorizontal) {
-			layoutAttrs->layoutFrame.setWidth(measuredWidth);
+			setLayoutWidth(measuredWidth);
 		}
 		if (flagVertical) {
-			layoutAttrs->layoutFrame.setHeight(measuredHeight);
+			setLayoutHeight(measuredHeight);
 		}
 	}
 	

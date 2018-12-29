@@ -258,7 +258,20 @@ namespace slib
 			}
 		}
 		
-		View::onUpdateLayout();
+		if (flagHorizontalLayout) {
+			measureLayoutWrappingSize(sl_false, isHeightWrapping());
+			if (isWidthWrapping()) {
+				pos += getPaddingRight();
+				setLayoutWidth(pos);
+			}
+		} else {
+			measureLayoutWrappingSize(isWidthWrapping(), sl_false);
+			if (isHeightWrapping()) {
+				pos += getPaddingBottom();
+				setLayoutHeight(pos);
+			}
+		}
+
 	}
 	
 	VerticalLinearView::VerticalLinearView()
