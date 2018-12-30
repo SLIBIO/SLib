@@ -225,13 +225,15 @@ namespace slib
 		m_viewportWidth = 1;
 		m_viewportHeight = 1;
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_surfaceNeedsUpdate:) name:NSViewGlobalFrameDidChangeNotification object:self];
-		m_thread = slib::Thread::start(slib::Function<void()>::bind(&(slib::_priv_macOS_GLView_thread), self));
+		__weak _priv_Slib_macOS_GLView* weak = self;
+		m_thread = slib::Thread::start(slib::Function<void()>::bind(&(slib::_priv_macOS_GLView_thread), weak));
 	}
 	return self;
 }
 
 -(void)dealloc
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	slib::Ref<slib::Thread> thread = m_thread;
 	if (thread.isNotNull()) {
 		thread->finishAndWait();

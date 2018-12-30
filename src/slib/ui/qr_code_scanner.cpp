@@ -137,8 +137,8 @@ namespace slib
 		float ftime = (float)(time.getMillisecondsCount() % 4000) / 2000;
 		sl_real scanner_y;
 		if (ftime < 1) {
-			scanner_y = (box_size - scanner_height) * ftime;
 			ftime = (Math::cos((ftime + 1) * SLIB_PI) / 2) + 0.5f;
+			scanner_y = (box_size - scanner_height) * ftime;
 		} else {
 			ftime -= 1;
 			ftime = (Math::cos((ftime + 1) * SLIB_PI) / 2) + 0.5f;

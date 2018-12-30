@@ -746,6 +746,7 @@ namespace slib
 @end
 
 @implementation _priv_Slib_macOS_ViewHandle
+
 - (id)init
 {
 	self = [super init];

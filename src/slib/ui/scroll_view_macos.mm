@@ -206,6 +206,11 @@ namespace slib
 	return self;
 }
 
+-(void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)boundDidChange:(NSNotification *)notification {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
