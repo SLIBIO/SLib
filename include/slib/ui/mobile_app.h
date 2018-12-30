@@ -111,13 +111,25 @@ namespace slib
 		
 		virtual void dispatchPause();
 		
+		static Function<void()> addOnPause(const Function<void()>& callback);
+		
+		static void removeOnPause(const Function<void()>& callback);
+
 		static void dispatchPauseToApp();
 		
 		virtual void dispatchResume();
 		
+		static Function<void()> addOnResume(const Function<void()>& callback);
+		
+		static void removeOnResume(const Function<void()>& callback);
+		
 		static void dispatchResumeToApp();
 		
 		virtual void dispatchBack(UIEvent* ev);
+		
+		static Function<void()> addOnBack(const Function<void()>& callback);
+		
+		static void removeOnBack(const Function<void()>& callback);
 		
 		static sl_bool dispatchBackToApp();
 		
@@ -131,6 +143,10 @@ namespace slib
 		
 		virtual void dispatchResize(sl_ui_len width, sl_ui_len height);
 		
+		static Function<void(sl_ui_len, sl_ui_len)> addOnResize(const Function<void(sl_ui_len, sl_ui_len)>& callback);
+		
+		static void removeOnResize(const Function<void(sl_ui_len, sl_ui_len)>& callback);
+
 		static void dispatchResizeToApp(sl_ui_len width, sl_ui_len height);
 		
 	protected:

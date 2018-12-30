@@ -261,9 +261,32 @@ namespace slib
 		}
 	}
 	
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<void()> >, _g_priv_ui_mobile_app_callback_list_onPause)
+	
+	Function<void()> MobileApp::addOnPause(const Function<void()>& callback)
+	{
+		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onPause))) {
+			_g_priv_ui_mobile_app_callback_list_onPause.addIfNotExist(callback);
+		}
+		return callback;
+	}
+	
+	void MobileApp::removeOnPause(const Function<void()>& callback)
+	{
+		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onPause))) {
+			_g_priv_ui_mobile_app_callback_list_onPause.remove(callback);
+		}
+	}
+	
 	void MobileApp::dispatchPauseToApp()
 	{
 		m_flagPaused = sl_true;
+		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onPause))) {
+			ListLocker< Function<void()> > list(_g_priv_ui_mobile_app_callback_list_onPause);
+			for (sl_size i = 0; i < list.count; i++) {
+				list[i]();
+			}
+		}
 		Ref<MobileApp> app = getApp();
 		if (app.isNotNull()) {
 			app->dispatchPause();
@@ -313,9 +336,32 @@ namespace slib
 		}
 	}
 	
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<void()> >, _g_priv_ui_mobile_app_callback_list_onResume)
+	
+	Function<void()> MobileApp::addOnResume(const Function<void()>& callback)
+	{
+		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onResume))) {
+			_g_priv_ui_mobile_app_callback_list_onResume.addIfNotExist(callback);
+		}
+		return callback;
+	}
+	
+	void MobileApp::removeOnResume(const Function<void()>& callback)
+	{
+		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onResume))) {
+			_g_priv_ui_mobile_app_callback_list_onResume.remove(callback);
+		}
+	}
+	
 	void MobileApp::dispatchResumeToApp()
 	{
 		m_flagPaused = sl_false;
+		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onResume))) {
+			ListLocker< Function<void()> > list(_g_priv_ui_mobile_app_callback_list_onResume);
+			for (sl_size i = 0; i < list.count; i++) {
+				list[i]();
+			}
+		}
 		Ref<MobileApp> app = getApp();
 		if (app.isNotNull()) {
 			app->dispatchResume();
@@ -348,8 +394,31 @@ namespace slib
 		}
 	}
 	
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<void()> >, _g_priv_ui_mobile_app_callback_list_onBack)
+	
+	Function<void()> MobileApp::addOnBack(const Function<void()>& callback)
+	{
+		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onBack))) {
+			_g_priv_ui_mobile_app_callback_list_onBack.addIfNotExist(callback);
+		}
+		return callback;
+	}
+	
+	void MobileApp::removeOnBack(const Function<void()>& callback)
+	{
+		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onBack))) {
+			_g_priv_ui_mobile_app_callback_list_onBack.remove(callback);
+		}
+	}
+	
 	sl_bool MobileApp::dispatchBackToApp()
 	{
+		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onBack))) {
+			ListLocker< Function<void()> > list(_g_priv_ui_mobile_app_callback_list_onBack);
+			for (sl_size i = 0; i < list.count; i++) {
+				list[i]();
+			}
+		}
 		Ref<MobileApp> app = getApp();
 		if (app.isNotNull()) {
 			Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
@@ -406,8 +475,31 @@ namespace slib
 		onResize(width, height);
 	}
 	
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<void(sl_ui_len, sl_ui_len)> >, _g_priv_ui_mobile_app_callback_list_onResize)
+	
+	Function<void(sl_ui_len, sl_ui_len)> MobileApp::addOnResize(const Function<void(sl_ui_len, sl_ui_len)>& callback)
+	{
+		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onResize))) {
+			_g_priv_ui_mobile_app_callback_list_onResize.addIfNotExist(callback);
+		}
+		return callback;
+	}
+	
+	void MobileApp::removeOnResize(const Function<void(sl_ui_len, sl_ui_len)>& callback)
+	{
+		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onResize))) {
+			_g_priv_ui_mobile_app_callback_list_onResize.remove(callback);
+		}
+	}
+	
 	void MobileApp::dispatchResizeToApp(sl_ui_len width, sl_ui_len height)
 	{
+		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onResize))) {
+			ListLocker< Function<void(sl_ui_len,sl_ui_len)> > list(_g_priv_ui_mobile_app_callback_list_onResize);
+			for (sl_size i = 0; i < list.count; i++) {
+				list[i](width, height);
+			}
+		}
 		Ref<MobileApp> app = getApp();
 		if (app.isNotNull()) {
 			app->dispatchResize(width, height);
