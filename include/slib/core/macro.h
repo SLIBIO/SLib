@@ -85,12 +85,12 @@
 #define SLIB_GET_DWORD0(A)			((sl_uint32)(A))
 #define SLIB_GET_DWORD1(A)			((sl_uint32)((A) >> 32))
 
-#define SLIB_MAKE_WORD(A,B)					((((sl_uint16)(A))<<8) | ((sl_uint16)(B)))
-#define SLIB_MAKE_DWORD(A,B,C,D)			((((sl_uint32)(A))<<24) | (((sl_uint32)(B))<<16) | (((sl_uint32)(C))<<8) | ((sl_uint32)(D)))
-#define SLIB_MAKE_DWORD2(A,B)				((((sl_uint32)(A))<<16) | ((sl_uint32)(B)))
+#define SLIB_MAKE_WORD(A,B)					((((sl_uint16)(sl_uint8)(A))<<8) | ((sl_uint8)(B)))
+#define SLIB_MAKE_DWORD(A,B,C,D)			((((sl_uint32)(sl_uint8)(A))<<24) | (((sl_uint32)(sl_uint8)(B))<<16) | (((sl_uint32)(sl_uint8)(C))<<8) | ((sl_uint32)(sl_uint8)(D)))
+#define SLIB_MAKE_DWORD2(A,B)				((((sl_uint32)(sl_uint16)(A))<<16) | ((sl_uint32)(sl_uint16)(B)))
 #define SLIB_MAKE_QWORD(A,B,C,D,E,F,G,H)	(((sl_uint64)(SLIB_MAKE_DWORD(A,B,C,D)) << 32) | SLIB_MAKE_DWORD(E,F,G,H))
 #define SLIB_MAKE_QWORD2(A,B,C,D)			(((sl_uint64)(SLIB_MAKE_DWORD2(A,B)) << 32) | SLIB_MAKE_DWORD2(C,D))
-#define SLIB_MAKE_QWORD4(A,B)				((((sl_uint64)(A)) << 32) | (B))
+#define SLIB_MAKE_QWORD4(A,B)				((((sl_uint64)(sl_uint32)(A)) << 32) | (sl_uint32)(B))
 
 #if defined(SLIB_COMPILER_IS_VC)
 #	define SLIB_HAS_FEATURE_iS_CONVERTIBLE_TO
