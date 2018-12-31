@@ -747,6 +747,8 @@
 		2639196A21CD4605008B335B /* sds.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639196421CD4605008B335B /* sds.c */; };
 		2639196B21CD4605008B335B /* hiredis.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639196521CD4605008B335B /* hiredis.c */; };
 		2639196E21CD469E008B335B /* redis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639196C21CD469B008B335B /* redis.cpp */; };
+		266E66EC21D9566300D92386 /* locale_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266E66EB21D9566300D92386 /* locale_apple.mm */; };
+		266E66ED21D9566300D92386 /* locale_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266E66EB21D9566300D92386 /* locale_apple.mm */; };
 		26A39D8C20EFE16D004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8B20EFE16D004707C9 /* calculator.cpp */; };
 		26A39D8D20EFE16D004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8B20EFE16D004707C9 /* calculator.cpp */; };
 		26B92D5021D357AD003F6F82 /* des.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D4F21D357AD003F6F82 /* des.cpp */; };
@@ -2255,6 +2257,7 @@
 		266DD4531C1191FE00D47AB0 /* web_view_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = web_view_apple.mm; sourceTree = "<group>"; };
 		266DD46B1C11934A00D47AB0 /* compress_zlib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compress_zlib.cpp; sourceTree = "<group>"; };
 		266DD5F51C11E09B00D47AB0 /* camera_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = camera_apple.mm; path = media/camera_apple.mm; sourceTree = "<group>"; };
+		266E66EB21D9566300D92386 /* locale_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = locale_apple.mm; sourceTree = "<group>"; };
 		266F92691D51CD290040166C /* ui_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_resource.cpp; sourceTree = "<group>"; };
 		266F926B1D51CD450040166C /* list_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_view.cpp; sourceTree = "<group>"; };
 		266F926D1D51CD5D0040166C /* render_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_resource.cpp; sourceTree = "<group>"; };
@@ -4040,6 +4043,7 @@
 				A25F2ED61B039EF600854DAF /* json.cpp */,
 				26B571461C9D43D70099E69B /* list.cpp */,
 				26B571471C9D43D70099E69B /* locale.cpp */,
+				266E66EB21D9566300D92386 /* locale_apple.mm */,
 				A25F2ED71B039EF600854DAF /* log.cpp */,
 				26B5714A1C9D43E30099E69B /* map.cpp */,
 				260251FD1BF18BC200DEFAB1 /* math.cpp */,
@@ -5091,6 +5095,7 @@
 				26D15D841E93AD05003BD61A /* parse.cpp in Sources */,
 				26EAB7DE1EA288DA00ED96FA /* socket_event_unix.cpp in Sources */,
 				26D15D911E93AD05003BD61A /* spin_lock.cpp in Sources */,
+				266E66ED21D9566300D92386 /* locale_apple.mm in Sources */,
 				26D15DA81E93AD24003BD61A /* bigint.cpp in Sources */,
 				26EAB7DB1EA288DA00ED96FA /* network_io.cpp in Sources */,
 				26EAB7E21EA288DA00ED96FA /* url.cpp in Sources */,
@@ -5669,6 +5674,7 @@
 				26D9D8BE1E962976005F7BD3 /* gesture.cpp in Sources */,
 				26D9D8D71E962976005F7BD3 /* tab_view.cpp in Sources */,
 				26C1B64620D51D3D00E36539 /* drawable_ext.cpp in Sources */,
+				266E66EC21D9566300D92386 /* locale_apple.mm in Sources */,
 				26D9D8A21E962962005F7BD3 /* socket_address.cpp in Sources */,
 				26D9D8381E9628E0005F7BD3 /* thread_apple.mm in Sources */,
 				26D9D8AE1E962969005F7BD3 /* render_canvas.cpp in Sources */,

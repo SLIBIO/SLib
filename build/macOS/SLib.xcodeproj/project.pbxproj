@@ -941,6 +941,8 @@
 		264AF13E21B05AAE004E58CB /* sapp_resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF12F21B05AAE004E58CB /* sapp_resources.cpp */; };
 		264AF14021B05AAE004E58CB /* sapp_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF13121B05AAE004E58CB /* sapp_util.cpp */; };
 		264AF14221B05AAE004E58CB /* sapp_values.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF13321B05AAE004E58CB /* sapp_values.cpp */; };
+		266E66E121D7F68F00D92386 /* locale_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266E66E021D7F68F00D92386 /* locale_apple.mm */; };
+		266E66E221D7F68F00D92386 /* locale_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266E66E021D7F68F00D92386 /* locale_apple.mm */; };
 		26A39D8920EFBCBB004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8820EFBCBB004707C9 /* calculator.cpp */; };
 		26A39D8A20EFBCBB004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8820EFBCBB004707C9 /* calculator.cpp */; };
 		26B92D4921D33E6E003F6F82 /* des.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D4821D33E6E003F6F82 /* des.cpp */; };
@@ -2418,6 +2420,7 @@
 		266DD5401C11940A00D47AB0 /* web_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = web_view.cpp; sourceTree = "<group>"; };
 		266DD5451C11940A00D47AB0 /* window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = "<group>"; };
 		266DD5481C11940A00D47AB0 /* window_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = window_macos.mm; sourceTree = "<group>"; };
+		266E66E021D7F68F00D92386 /* locale_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = locale_apple.mm; sourceTree = "<group>"; };
 		266F12B21C97A13F00DE26FF /* block_cipher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = block_cipher.cpp; sourceTree = "<group>"; };
 		267C16B81CE779D8000318C2 /* scroll_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scroll_bar.cpp; sourceTree = "<group>"; };
 		267D008B1E32AA5A002CC949 /* render_drawable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_drawable.cpp; sourceTree = "<group>"; };
@@ -4591,6 +4594,7 @@
 				A25F2FAB1B03A33700854DAF /* json.cpp */,
 				2620412C1C88AE3B00AF48F2 /* list.cpp */,
 				26D3A1A51C85940700FB8DBD /* locale.cpp */,
+				266E66E021D7F68F00D92386 /* locale_apple.mm */,
 				A25F2FAC1B03A33700854DAF /* log.cpp */,
 				2620412E1C88AF9300AF48F2 /* map.cpp */,
 				26D53C441BDF25090010BDA4 /* math.cpp */,
@@ -5601,6 +5605,7 @@
 				2605A2411EA26AE3005CC1D3 /* url_request.cpp in Sources */,
 				26D158EA1E93A2A5003BD61A /* matrix3.cpp in Sources */,
 				26D158BB1E93A28C003BD61A /* log.cpp in Sources */,
+				266E66E221D7F68F00D92386 /* locale_apple.mm in Sources */,
 				26D158D11E93A28C003BD61A /* thread.cpp in Sources */,
 				26D158DA1E93A29B003BD61A /* blowfish.cpp in Sources */,
 				2605A2381EA26AE3005CC1D3 /* network_async_unix.cpp in Sources */,
@@ -6338,6 +6343,7 @@
 				26D9D9D81E96468D005F7BD3 /* tab_view_macos.mm in Sources */,
 				26D9D9621E964669005F7BD3 /* bitmap_data.cpp in Sources */,
 				26D9D9111E9645CE005F7BD3 /* xml.cpp in Sources */,
+				266E66E121D7F68F00D92386 /* locale_apple.mm in Sources */,
 				26D9D9D31E96468D005F7BD3 /* select_view.cpp in Sources */,
 				26D9D9791E96466A005F7BD3 /* pen.cpp in Sources */,
 				26D9D96E1E96466A005F7BD3 /* font_freetype.cpp in Sources */,

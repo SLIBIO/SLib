@@ -352,6 +352,7 @@ namespace slib
 
 	LOAD_LIBRARY(kernel32, "kernel32.dll")
 	GET_API(kernel32, GetQueuedCompletionStatusEx)
+	GET_API(kernel32, GetUserDefaultLocaleName)
 
 	LOAD_LIBRARY(wininet, "wininet.dll")
 

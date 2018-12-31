@@ -22,6 +22,7 @@
 
 package slib.platform.android.ui.window;
 
+import slib.platform.android.Android;
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
 import slib.platform.android.ui.UiThread;
@@ -477,7 +478,7 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 				float x = ev.getX() + locationOfWindow[0];
 				float y = ev.getY() + locationOfWindow[1];
 				if (x < locationOfFoucsView[0] || x > locationOfFoucsView[0] + view.getWidth() || y < locationOfFoucsView[1] || y > locationOfFoucsView[1] + view.getHeight()) {
-					Util.dismissKeyboard(activity);
+					Android.dismissKeyboard(activity);
 				}
 			}
 		}

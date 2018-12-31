@@ -92,7 +92,7 @@
 				static slib::_priv_ImageResourceEntry entries[] = { \
 
 #define SLIB_DEFINE_IMAGE_RESOURCE_LIST_BEGIN(LOCALE) \
-			localeSource = SLIB_LOCALE(LOCALE); \
+			localeSource = slib::Locale(#LOCALE); \
 			if (locale == localeSource || lang == localeSource) { \
 				static slib::_priv_ImageResourceEntry entries[] = {
 

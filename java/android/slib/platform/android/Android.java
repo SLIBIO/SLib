@@ -25,7 +25,13 @@ package slib.platform.android;
 import java.io.InputStream;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.AssetManager;
+import android.os.Build;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+
+import slib.platform.android.ui.UiThread;
 
 public class Android {
 	
@@ -46,6 +52,73 @@ public class Android {
 		} catch (Throwable e) {
 			Logger.exception(e);
 			return null;
+		}
+	}
+
+	static String getCurrentLocale() {
+		try {
+			java.util.Locale locale =  java.util.Locale.getDefault();
+			if (locale != null) {
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					String script = locale.getScript();
+					if (script != null && script.length() > 0) {
+						return locale.getLanguage() + "_" + script + "_" + locale.getCountry();
+					} else {
+						return locale.getLanguage() + "_" + locale.getCountry();
+					}
+				} else {
+					return locale.getLanguage() + "_" + locale.getCountry();
+				}
+			}
+		} catch (Throwable e) {
+			Logger.exception(e);
+		}
+		return null;
+	}
+
+	public static void showKeyboard(final Activity activity) {
+		if (!(UiThread.isUiThread())) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					showKeyboard(activity);
+				}
+			});
+			return;
+		}
+		try {
+			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+			if (imm != null) {
+				View view = activity.getCurrentFocus();
+				if (view != null) {
+					imm.showSoftInput(view, 0);
+				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	public static void dismissKeyboard(final Activity activity) {
+		if (!(UiThread.isUiThread())) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					dismissKeyboard(activity);
+				}
+			});
+			return;
+		}
+		try {
+			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+			if (imm != null) {
+				View view = activity.getCurrentFocus();
+				if (view != null) {
+					imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 
@@ -73,10 +146,16 @@ public class Android {
 	{
 		return nativeOnBack(activity);
 	}
-	
+
+	public static void onConfigurationChanged(Activity activity) {
+		nativeOnConfigurationChanged(activity);
+	}
+
 	private static native void nativeOnCreateActivity(Activity activity);
 	private static native void nativeOnResumeActivity(Activity activity);
 	private static native void nativeOnPauseActivity(Activity activity);
 	private static native void nativeOnDestroyActivity(Activity activity);
 	private static native boolean nativeOnBack(Activity activity);
+	private static native void nativeOnConfigurationChanged(Activity activity);
+
 }

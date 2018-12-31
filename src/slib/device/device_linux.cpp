@@ -22,7 +22,7 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_UI_GTK)
+#if defined(SLIB_UI_IS_GTK)
 
 #include "slib/device/device.h"
 

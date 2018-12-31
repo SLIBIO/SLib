@@ -29,6 +29,7 @@
 #include "slib/ui/screen.h"
 #include "slib/ui/platform.h"
 #include "slib/ui/mobile_app.h"
+#include "slib/core/locale.h"
 #include "slib/core/io.h"
 #include "slib/core/log.h"
 #include "slib/core/safe_static.h"
@@ -73,6 +74,7 @@ namespace slib
 	void _priv_Android_onResumeActivity(JNIEnv* env, jobject _this, jobject activity);
 	void _priv_Android_onPauseActivity(JNIEnv* env, jobject _this, jobject activity);
 	jboolean _priv_Android_onBack(JNIEnv* env, jobject _this, jobject activity);
+	void _priv_Android_onConfigurationChanged(JNIEnv* env, jobject _this, jobject activity);
 
 	SLIB_JNI_BEGIN_CLASS(JAndroid, "slib/platform/android/Android")
 		SLIB_JNI_NATIVE(onCreateActivity, "nativeOnCreateActivity", "(Landroid/app/Activity;)V", _priv_Android_onCreateActivity);
@@ -80,6 +82,7 @@ namespace slib
 		SLIB_JNI_NATIVE(onResumeActivity, "nativeOnResumeActivity", "(Landroid/app/Activity;)V", _priv_Android_onResumeActivity);
 		SLIB_JNI_NATIVE(onPauseActivity, "nativeOnPauseActivity", "(Landroid/app/Activity;)V", _priv_Android_onPauseActivity);
 		SLIB_JNI_NATIVE(onBack, "nativeOnBack", "(Landroid/app/Activity;)Z", _priv_Android_onBack);
+		SLIB_JNI_NATIVE(onConfigurationChanged, "nativeOnConfigurationChanged", "(Landroid/app/Activity;)V", _priv_Android_onConfigurationChanged);
 	SLIB_JNI_END_CLASS
 
 	class _priv_Android_Screen : public Screen
@@ -263,7 +266,7 @@ namespace slib
 
 	void _priv_Android_onCreateActivity(JNIEnv* env, jobject _this, jobject activity)
 	{
-		Log("Activity", "Created");
+		Log("Activity", "onCreateActivity");
 		Android::setCurrentActivity(activity);
 		Ref<UIApp> app = UIApp::getApp();
 		if (app.isNotNull()) {
@@ -274,31 +277,38 @@ namespace slib
 			}
 			MobileApp::dispatchCreateActivityToApp();
 		}
+		Locale::dispatchChangeCurrentLocale();
 	}
 
 	void _priv_Android_onDestroyActivity(JNIEnv* env, jobject _this, jobject activity)
 	{
-		Log("Activity", "Destroyed");
+		Log("Activity", "onDestroyActivity");
 		MobileApp::dispatchDestroyActivityToApp();
 	}
 
 	void _priv_Android_onResumeActivity(JNIEnv* env, jobject _this, jobject activity)
 	{
-		Log("Activity", "Resumed");
+		Log("Activity", "onResumeActivity");
 		Android::setCurrentActivity(activity);
 		MobileApp::dispatchResumeToApp();
 	}
 
 	void _priv_Android_onPauseActivity(JNIEnv* env, jobject _this, jobject activity)
 	{
-		Log("Activity", "Paused");
+		Log("Activity", "onPauseActivity");
 		MobileApp::dispatchPauseToApp();
 	}
 
 	jboolean _priv_Android_onBack(JNIEnv* env, jobject _this, jobject activity)
 	{
-		Log("Activity", "BackPressed");
+		Log("Activity", "onBackPressed");
 		return (jboolean)(MobileApp::dispatchBackToApp());
+	}
+
+	void _priv_Android_onConfigurationChanged(JNIEnv* env, jobject _this, jobject activity)
+	{
+		Log("Activity", "onConfigurationChanged");
+		Locale::dispatchChangeCurrentLocale();
 	}
 
 }

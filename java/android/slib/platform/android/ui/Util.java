@@ -23,7 +23,6 @@
 package slib.platform.android.ui;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
@@ -38,7 +37,6 @@ import android.view.Surface;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 
 import java.lang.reflect.Field;
 
@@ -250,52 +248,6 @@ public class Util {
 			ret |= 8;
 		}
 		return ret;
-	}
-
-	public static void showKeyboard(final Activity activity) {
-		if (!(UiThread.isUiThread())) {
-			activity.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					showKeyboard(activity);
-				}
-			});
-			return;
-		}
-		try {
-			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-			if (imm != null) {
-				View view = activity.getCurrentFocus();
-				if (view != null) {
-					imm.showSoftInput(view, 0);
-				}
-			}
-		} catch (Exception e) {
-			Logger.exception(e);
-		}
-	}
-
-	public static void dismissKeyboard(final Activity activity) {
-		if (!(UiThread.isUiThread())) {
-			activity.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					dismissKeyboard(activity);
-				}
-			});
-			return;
-		}
-		try {
-			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-			if (imm != null) {
-				View view = activity.getCurrentFocus();
-				if (view != null) {
-					imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-				}
-			}
-		} catch (Exception e) {
-			Logger.exception(e);
-		}
 	}
 
 	public static void openURL(final Activity activity, final String url) {

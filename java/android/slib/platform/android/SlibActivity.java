@@ -111,13 +111,14 @@ public class SlibActivity extends Activity {
 	}
 
 	@Override
-	public void finish() {
-		super.finish();
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		Android.onConfigurationChanged(this);
 	}
 
 	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
+	public void finish() {
+		super.finish();
 	}
 
 	public boolean isVisible() {

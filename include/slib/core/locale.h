@@ -25,7 +25,10 @@
 
 #include "definition.h"
 
+#include "macro.h"
 #include "string.h"
+#include "parse.h"
+#include "function.h"
 
 namespace slib
 {
@@ -34,10 +37,10 @@ namespace slib
 	Language Code by ISO 639-1
 */
 
-#define SLIB_LANGUAGE(CODE) (slib::Language)((((sl_uint32)((#CODE)[1])) << 8) | ((sl_uint32)((#CODE)[0])))
+#define SLIB_LANGUAGE(CODE) (slib::Language)(SLIB_MAKE_WORD((#CODE)[1], (#CODE)[0]))
 
 #define SLIB_DEFINE_LANGUAGE_CODE(CODE, NAME) \
-	CODE = ((((sl_uint32)((#CODE)[1])) << 8) | ((sl_uint32)((#CODE)[0]))), \
+	CODE = (int)(SLIB_LANGUAGE(CODE)), \
 	NAME = CODE
 
 	enum class Language
@@ -259,10 +262,10 @@ namespace slib
 	Country Code by ISO 3166-1 alpha-2
 */
 
-#define SLIB_COUNTRY(CODE) (slib::Country)((((sl_uint32)((#CODE)[1])) << 8) | ((sl_uint32)((#CODE)[0])))
+#define SLIB_COUNTRY(CODE) (slib::Country)(SLIB_MAKE_WORD((#CODE)[1], (#CODE)[0]))
 
 #define SLIB_DEFINE_COUNTRY_CODE(CODE, NAME) \
-	CODE = ((((sl_uint32)((#CODE)[1])) << 8) | ((sl_uint32)((#CODE)[0]))), \
+	CODE = (int)(SLIB_COUNTRY(CODE)), \
 	NAME = CODE
 
 #ifdef IN
@@ -528,95 +531,323 @@ namespace slib
 	};
 
 
-#define SLIB_DEFINE_LOCALE_CODE(LANG, COUNTRY) (((sl_uint32)(LANG)) | (((sl_uint32)(COUNTRY)) << 16))
-
-#define SLIB_LOCALE(CODE) slib::Locale((((sl_uint32)((#CODE "\0\0\0")[4])) << 24) | (((sl_uint32)((#CODE "\0\0\0")[3])) << 16) | (((sl_uint32)((#CODE)[1])) << 8) | ((sl_uint32)((#CODE)[0])))
+/*
+	 Script Code by ISO 15924 (4 letter)
+*/
 	
+#define SLIB_LANGUAGE_SCRIPT(CODE) (slib::LanguageScript)(SLIB_MAKE_DWORD((#CODE)[3], (#CODE)[2], (#CODE)[1], (#CODE)[0]))
+	
+#define SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(CODE, NAME) \
+	CODE = (int)(SLIB_LANGUAGE_SCRIPT(CODE)), \
+	NAME = CODE
+	
+#define SLIB_DEFINE_LANGUAGE_SCRIPT_CODE1(CODE) \
+	CODE = (int)(SLIB_LANGUAGE_SCRIPT(CODE))
+
+	enum class LanguageScript
+	{
+		Unknown = 0,
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Adlm, Adlam),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Afak, Afaka),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Aghb, CaucasianAlbanian),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE1(Ahom),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Arab, Arabic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Aran, ArabicNastaliq),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Armi, ImperialAramaic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Armn, ArmenianArmenia),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Avst, Avestan),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Bali, Balinese),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Bamu, Bamum),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Bass, BassaVah),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Batk, Batak),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Beng, Bengali),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Bhks, Bhaiksuki),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Blis, Blissymbols),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Bopo, Bopomofo),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Brah, Brahmi),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Brai, Braille),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Bugi, Buginese),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Buhd, Buhid),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Cakm, Chakma),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Cans, UnifiedCanadianAboriginalSyllabics),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Cari, Carian),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE1(Cham),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Cher, Cherokee),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Cirt, Cirth),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Copt, Coptic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Cpmn, CyproMinoan),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Cprt, CypriotSyllabary),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Cyrl, Cyrillic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Cyrs, Cyrillic_OldChurchSlavonic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Deva, Devanagari),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Dogr, Dogra),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Dsrt, Deseret),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Dupl, DuployanShorthand),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Egyd, EgyptianDemotic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Egyh, EgyptianHieratic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Egyp, EgyptianHieroglyphs),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Elba, Elbasan),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Elym, Elymaic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Ethi, Ethiopic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Geok, Khutsuri),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Geor, Georgian),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Glag, Glagolitic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Gong, GunjalaGondi),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Gonm, MasaramGondi),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Goth, Gothic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Gran, Grantha),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Grek, Greek),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Gujr, Gujarati),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Guru, Gurmukhi),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Hanb, HanBopomofo),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Hang, Hangul),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Hani, Han),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Hano, Hanunoo),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Hans, ChineseSimplified),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Hant, ChineseTraditional),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Hatr, Hatran),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Hebr, Hebrew),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Hira, Hiragana),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Hluw, AnatolianHieroglyphs),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Hmng, PahawhHmong),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Hmnp, NyiakengPuachueHmong),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Hrkt, JapaneseSyllabaries),
+		KatakanaHiragana = Hrkt,
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Hung, OldHungarian),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Inds, Indus),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Ital, OldItalic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE1(Jamo), // Subset of Korean
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Java, Javanese),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Jpan, Japanese),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Jurc, Jurchen),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Kali, KayahLi),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Kana, Katakana),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Khar, Kharoshthi),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Khmr, Khmer),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Khoj, Khojki),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Kitl, KhitanLarge),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Kits, KhitanSmall),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Knda, Kannada),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Kore, Korean),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Kpel, Kpelle),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Kthi, Kaithi),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Lana, TaiTham),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Laoo, Lao),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Latf, LatinFraktur),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Latg, LatinGaelic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Latn, Latin),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE1(Leke),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Lepc, Lepcha),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Limb, Limbu),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Lina, LinearA),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Linb, LinearB),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE1(Lisu),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE1(Loma),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Lyci, Lycian),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Lydi, Lydian),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Mahj, Mahajani),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Maka, Makasar),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Mand, Mandaic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Mani, Manichaean),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Marc, Marchen),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Maya, MayanHieroglyphs),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Medf, Medefaidrin),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Mend, MendeKikakui),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Merc, MeroiticCursive),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Mero, MeroiticHieroglyphs),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Mlym, Malayalam),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE1(Modi),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Mong, Mongolian),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE1(Moon),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Mroo, Mro),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Mtei, MeiteiMayek),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Mult, Multani),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Mymr, Myanmar),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Nand, Nandinagari),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Narb, OldNorthArabian),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Nbat, Nabataean),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Newa, Newar),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Nkdb, NaxiDongba),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Nkgb, NakhiGeba),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Nkoo, NKo),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Nshu, Nushu),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Ogam, Ogham),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Olck, OlChiki),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Orkh, OldTurkic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Orya, Oriya),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Osge, Osage),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Osma, Osmanya),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Palm, Palmyrene),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Pauc, PauCinHau),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Perm, OldPermic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Phag, Phags_pa),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Phli, InscriptionalPahlavi),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Phlp, PsalterPahlavi),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Phlv, BookPahlavi),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Phnx, Phoenician),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Piqd, Klingon),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Plrd, Miao),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Prti, InscriptionalParthian),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Rjng, Rejang),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Rohg, HanifiRohingya),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Roro, Rongorongo),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Runr, Runic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Samr, Samaritan),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Sara, Sarati),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Sarb, OldSouthArabian),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Saur, Saurashtra),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Sgnw, SignWriting),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Shaw, Shavian),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Shrd, Sharada),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Shui, Shuishu),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Sidd, Siddham),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Sind, Khudawadi),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Sinh, Sinhala),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Sogd, Sogdian),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Sogo, OldSogdian),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Sora, SoraSompeng),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Soyo, Soyombo),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Sund, Sundanese),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Sylo, SylotiNagri),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Syrc, Syriac),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Syre, SyriacEstrangelo),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Syrj, SyriacWestern),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Syrn, SyriacEastern),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Tagb, Tagbanwa),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Takr, Takri),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Tale, TaiLe),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Talu, NewTaiLue),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Taml, Tamil),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Tang, Tangut),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Tavt, TaiViet),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Telu, Telugu),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Teng, Tengwar),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Tfng, Tifinagh),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Tglg, Tagalog),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Thaa, Thaana),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE1(Thai),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Tibt, Tibetan),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Tirh, Tirhuta),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Ugar, Ugaritic),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Vaii, Vai),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Visp, VisibleSpeech),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Wara, WarangCiti),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Wcho, Wancho),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Wole, Woleai),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Xpeo, OldPersian),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Xsux, Cuneiform),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Yiii, Yi),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Zanb, ZanabazarSquare),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Zinh, InheritedScript),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Zmth, MathematicalNotation),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Zsye, SymbolsEmoji),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Zsym, Symbols),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Zxxx, UnwrittenDocuments),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Zyyy, UndeterminedScript),
+		SLIB_DEFINE_LANGUAGE_SCRIPT_CODE(Zzzz, UncodedScript)
+		
+	};
+
+	
+#define SLIB_LOCALE(LANG, SCRIPT, COUNTRY) SLIB_MAKE_QWORD4(SCRIPT, SLIB_MAKE_DWORD2(COUNTRY, LANG))
+
 	class Locale
 	{
 	public:
-		int value;
-		SLIB_MEMBERS_OF_PRIMITIVE_WRAPPER(Locale, int, value)
+		sl_uint64 value;
+		SLIB_MEMBERS_OF_PRIMITIVE_WRAPPER(Locale, sl_uint64, value)
 	
-		enum {
+		enum : sl_uint64 {
 			Unknown = 0,
-			ar = SLIB_DEFINE_LOCALE_CODE(Language::Arabic, Country::Unknown),
+			ar = SLIB_LOCALE(Language::Arabic, LanguageScript::Unknown, Country::Unknown),
 			Arabic = ar,
-			zh = SLIB_DEFINE_LOCALE_CODE(Language::Chinese, Country::Unknown),
+			zh = SLIB_LOCALE(Language::Chinese, LanguageScript::Unknown, Country::Unknown),
 			Chinese = zh,
-			zh_CN = SLIB_DEFINE_LOCALE_CODE(Language::Chinese, Country::China),
+			zh_CN = SLIB_LOCALE(Language::Chinese, LanguageScript::ChineseSimplified, Country::China),
 			China = zh_CN,
-			zh_TW = SLIB_DEFINE_LOCALE_CODE(Language::Chinese, Country::Taiwan),
+			zh_TW = SLIB_LOCALE(Language::Chinese, LanguageScript::ChineseTraditional, Country::Taiwan),
 			Taiwan = zh_TW,
-			en = SLIB_DEFINE_LOCALE_CODE(Language::English, Country::Unknown),
+			en = SLIB_LOCALE(Language::English, LanguageScript::Unknown, Country::Unknown),
 			English = en,
-			en_GB = SLIB_DEFINE_LOCALE_CODE(Language::English, Country::UnitedKingdom),
+			en_GB = SLIB_LOCALE(Language::English, LanguageScript::Unknown, Country::UnitedKingdom),
 			UnitedKingdom = en_GB,
 			UK = en_GB,
-			en_US = SLIB_DEFINE_LOCALE_CODE(Language::English, Country::UnitedStates),
+			en_US = SLIB_LOCALE(Language::English, LanguageScript::Unknown, Country::UnitedStates),
 			UnitedStates = en_US,
 			US = en_US,
-			fr = SLIB_DEFINE_LOCALE_CODE(Language::French, Country::Unknown),
+			fr = SLIB_LOCALE(Language::French, LanguageScript::Unknown, Country::Unknown),
 			French = fr,
-			fr_FR = SLIB_DEFINE_LOCALE_CODE(Language::French, Country::France),
+			fr_FR = SLIB_LOCALE(Language::French, LanguageScript::Unknown, Country::France),
 			France = fr_FR,
-			de = SLIB_DEFINE_LOCALE_CODE(Language::German, Country::Unknown),
+			de = SLIB_LOCALE(Language::German, LanguageScript::Unknown, Country::Unknown),
 			German = de,
-			de_DE = SLIB_DEFINE_LOCALE_CODE(Language::German, Country::Germany),
+			de_DE = SLIB_LOCALE(Language::German, LanguageScript::Unknown, Country::Germany),
 			Germany = de_DE,
-			it = SLIB_DEFINE_LOCALE_CODE(Language::Italian, Country::Unknown),
+			it = SLIB_LOCALE(Language::Italian, LanguageScript::Unknown, Country::Unknown),
 			Italian = it,
-			it_IT = SLIB_DEFINE_LOCALE_CODE(Language::Italian, Country::Italy),
+			it_IT = SLIB_LOCALE(Language::Italian, LanguageScript::Unknown, Country::Italy),
 			Italy = it_IT,
-			ja = SLIB_DEFINE_LOCALE_CODE(Language::Japanese, Country::Unknown),
+			ja = SLIB_LOCALE(Language::Japanese, LanguageScript::Unknown, Country::Unknown),
 			Japanese = ja,
-			ja_JP = SLIB_DEFINE_LOCALE_CODE(Language::Japanese, Country::Japan),
+			ja_JP = SLIB_LOCALE(Language::Japanese, LanguageScript::Unknown, Country::Japan),
 			Japan = ja_JP,
-			ko = SLIB_DEFINE_LOCALE_CODE(Language::Korean, Country::Unknown),
+			ko = SLIB_LOCALE(Language::Korean, LanguageScript::Unknown, Country::Unknown),
 			Korean = ko,
-			ko_KP = SLIB_DEFINE_LOCALE_CODE(Language::Korean, Country::NorthKorea),
+			ko_KP = SLIB_LOCALE(Language::Korean, LanguageScript::Unknown, Country::NorthKorea),
 			NorthKorea = ko_KP,
 			DPRK = ko_KP,
-			ko_KR = SLIB_DEFINE_LOCALE_CODE(Language::Korean, Country::SouthKorea),
+			ko_KR = SLIB_LOCALE(Language::Korean, LanguageScript::Unknown, Country::SouthKorea),
 			SouthKorea = ko_KR,
-			es = SLIB_DEFINE_LOCALE_CODE(Language::Spanish, Country::Unknown),
+			es = SLIB_LOCALE(Language::Spanish, LanguageScript::Unknown, Country::Unknown),
 			Spanish = es,
-			es_ES = SLIB_DEFINE_LOCALE_CODE(Language::Spanish, Country::Spain),
+			es_ES = SLIB_LOCALE(Language::Spanish, LanguageScript::Unknown, Country::Spain),
 			Spain = es_ES,
-			ru = SLIB_DEFINE_LOCALE_CODE(Language::Russian, Country::Unknown),
+			ru = SLIB_LOCALE(Language::Russian, LanguageScript::Unknown, Country::Unknown),
 			Russian = ru,
-			ru_RU = SLIB_DEFINE_LOCALE_CODE(Language::Russian, Country::Russia),
+			ru_RU = SLIB_LOCALE(Language::Russian, LanguageScript::Unknown, Country::Russia),
 			Russia = ru_RU
 		};
 
 	public:
 		constexpr Locale() : value(Locale::Unknown) {}
 
+		Locale(Language language);
+
 		Locale(Language language, Country country);
 
-		// 2 or 5 characters ([ISO 639-1]-[ISO 3166-1 alpha-2]  or  [ISO 639-1]_[ISO 3166-1 alpha-2])
-		Locale(const sl_char8* name);
-
-		// 2 or 5 characters ([ISO 639-1]-[ISO 3166-1 alpha-2]  or  [ISO 639-1]_[ISO 3166-1 alpha-2])
-		Locale(const sl_char16* name);
-
-		// 2 or 5 characters ([ISO 639-1]-[ISO 3166-1 alpha-2]  or  [ISO 639-1]_[ISO 3166-1 alpha-2])
+		Locale(Language language, LanguageScript script, Country country);
+		
+		// [ISO 639-1]-[ISO 3166-1 alpha-2]  or  [ISO 639-1]-[ISO 15924]-[ISO 3166-1 alpha-2])
 		Locale(const String& name);
-
+		
 	public:
+		sl_bool isValid() const;
+		
+		sl_bool isInvalid() const;
+		
+		
 		Language getLanguage() const;
-
+		
+		void setLanguage(const Language& language);
+		
 		// ISO 639-1
 		String getLanguageCode() const;
 
 		String getLanguageName() const;
 
+		
+		LanguageScript getScript() const;
+		
+		void setScript(const LanguageScript& script);
+		
+		// ISO 15924
+		String getScriptCode() const;
+		
+		
 		Country getCountry() const;
-
-		sl_bool isValid() const;
-
-		sl_bool isInvalid() const;
 	
+		void setCountry(const Country& country);
+
 		// ISO 3166-1 alpha-2
 		String getCountryCode() const;
 
@@ -624,11 +855,21 @@ namespace slib
 
 		String getCountryLongName() const;
 
-		String toString(sl_char8 delimiter='_') const;
+		
+		String toString(sl_char8 delimiter='-') const;
+		
+		template <class ST>
+		static sl_bool parse(const ST& str, Locale* _out) noexcept
+		{
+			return Parse(str, _out);
+		}
+		
+		template <class ST>
+		sl_bool parse(const ST& str) noexcept
+		{
+			return Parse(str, this);
+		}
 
-		String16 toString16(sl_char16 delimiter='_') const;
-
-		// Languages
 	public:
 		static String getLanguageName(Language language);
 
@@ -642,12 +883,30 @@ namespace slib
 		static Language getLanguageFromCode(const String& code);
 
 		// ISO 639-1
+		static void getLanguageCode(Language language, sl_char8* _output);
+		
+		// ISO 639-1
 		static String getLanguageCode(Language language);
 
 		static sl_bool isValidLanguageCode(Language language);
+		
 
-		// Countries
-	public:
+		// ISO 15924
+		static LanguageScript getScriptFromCode(const sl_char8* code);
+		
+		// ISO 15924
+		static LanguageScript getScriptFromCode(const sl_char16* code);
+		
+		// ISO 15924
+		static LanguageScript getScriptFromCode(const String& code);
+		
+		// ISO 15924
+		static void getScriptCode(LanguageScript language, sl_char8* _output);
+		
+		// ISO 15924
+		static String getScriptCode(LanguageScript language);
+		
+		
 		static String getCountryName(Country country);
 
 		static String getCountryLongName(Country country);
@@ -662,9 +921,24 @@ namespace slib
 		static Country getCountryFromCode(const String& code);
 
 		// ISO 3166-1 alpha-2
+		static void getCountryCode(Country country, sl_char8* _output);
+		
+		// ISO 3166-1 alpha-2
 		static String getCountryCode(Country country);
 
 		static sl_bool isValidCountryCode(Country country);
+		
+	public:
+		static Locale getCurrent();
+		
+		static Function<void()> addOnChangeCurrentLocale(const Function<void()>& callback);
+		
+		static void removeOnChangeCurrentLocale(const Function<void()>& callback);
+
+		static void dispatchChangeCurrentLocale();
+		
+	private:
+		static void _setupOnChangeCurrentLocale();
 		
 	};
 	
@@ -674,11 +948,17 @@ namespace slib
 	public:
 		constexpr sl_size operator()(const Locale& locale) const
 		{
-			return Rehash32(locale.value);
+			return Rehash64ToSize(locale.value);
 		}
 
 	};
 
+	template <>
+	sl_reg Parser<Locale, sl_char8>::parse(Locale* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept;
+	
+	template <>
+	sl_reg Parser<Locale, sl_char16>::parse(Locale* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept;
+	
 }
 
 #endif

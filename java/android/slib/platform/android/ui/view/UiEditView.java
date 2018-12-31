@@ -23,6 +23,7 @@
 package slib.platform.android.ui.view;
 
 import io.slib.R;
+import slib.platform.android.Android;
 import slib.platform.android.Logger;
 import slib.platform.android.ui.UiFont;
 import slib.platform.android.ui.UiThread;
@@ -478,7 +479,7 @@ public class UiEditView extends EditText implements IView {
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if (event == null) {
 					onEventDone(UiEditView.this);
-					Util.dismissKeyboard((Activity)(getContext()));
+					Android.dismissKeyboard((Activity)(getContext()));
 					return true;
 				} else {
 					if (!(event.isShiftPressed())) {

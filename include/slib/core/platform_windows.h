@@ -36,7 +36,7 @@
 namespace slib
 {
 	
-	typedef BOOL(WINAPI *WINAPI_GetQueuedCompletionStatusEx)
+	typedef BOOL (WINAPI *WINAPI_GetQueuedCompletionStatusEx)
 	(
 		HANDLE CompletionPort,
 		LPOVERLAPPED_ENTRY lpCompletionPortEntries,
@@ -44,6 +44,11 @@ namespace slib
 		PULONG ulNumEntriesRemoved,
 		DWORD dwMilliseconds,
 		BOOL fAlertable
+	);
+	
+	typedef int (WINAPI *WINAPI_GetUserDefaultLocaleName)(
+		LPWSTR lpLocaleName,
+		int cchLocaleName
 	);
 
 	class Variant;
@@ -88,6 +93,8 @@ namespace slib
 		static HMODULE loadLibrary_kernel32();
 
 		static WINAPI_GetQueuedCompletionStatusEx getAPI_GetQueuedCompletionStatusEx();
+
+		static WINAPI_GetUserDefaultLocaleName getAPI_GetUserDefaultLocaleName();
 
 		static HMODULE loadLibrary_wininet();
 
