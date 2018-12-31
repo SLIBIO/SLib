@@ -32,16 +32,24 @@ import android.preference.PreferenceManager;
 public class Preference {
 
     public static void setValue(SlibActivity activity, String key, String value) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putString(key, value);
-        editor.commit();
+        try {
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString(key, value);
+            editor.commit();
+        } catch (Exception e) {
+            Logger.exception(e);
+        }
     }
 
     public static String getValue(SlibActivity activity, String key) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
-        String value = sp.getString(key, null);
-        return value;
+        try {
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
+            return sp.getString(key, null);
+        } catch (Exception e) {
+            Logger.exception(e);
+        }
+        return null;
     }
 
 }
