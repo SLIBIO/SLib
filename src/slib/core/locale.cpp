@@ -677,6 +677,9 @@ namespace slib
 			value = Locale::Unknown;
 		}
 	}
+	
+	sl_uint64 _priv_Locale_Unknown = 0;
+	const Locale& Locale::Unknown = *((Locale*)&_priv_Locale_Unknown);
 
 	sl_bool Locale::isValid() const
 	{

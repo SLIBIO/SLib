@@ -758,7 +758,6 @@ namespace slib
 		SLIB_MEMBERS_OF_PRIMITIVE_WRAPPER(Locale, sl_uint64, value)
 	
 		enum : sl_uint64 {
-			Unknown = 0,
 			ar = SLIB_LOCALE(Language::Arabic, LanguageScript::Unknown, Country::Unknown),
 			Arabic = ar,
 			zh = SLIB_LOCALE(Language::Chinese, LanguageScript::Unknown, Country::Unknown),
@@ -809,7 +808,7 @@ namespace slib
 		};
 
 	public:
-		constexpr Locale() : value(Locale::Unknown) {}
+		constexpr Locale() : value(0) {}
 
 		Locale(Language language);
 
@@ -821,6 +820,8 @@ namespace slib
 		Locale(const String& name);
 		
 	public:
+		static const Locale& Unknown;
+		
 		sl_bool isValid() const;
 		
 		sl_bool isInvalid() const;
