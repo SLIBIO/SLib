@@ -85,13 +85,16 @@ namespace slib
 			sl_bool fontBold = param.font->isBold();
 			Ref<Font> fontSource = Font::create(fontFamily, fontSize, fontBold);
 			if (fontSource.isNotNull()) {
+				Ref<Font> fontDraw;
 				if (fontSize > FONT_SIZE_MAX) {
 					fontSize = FONT_SIZE_MAX;
-				}
-				if (fontSize < FONT_SIZE_MIN) {
+					fontDraw = Font::create(fontFamily, fontSize, fontBold);
+				} else if (fontSize < FONT_SIZE_MIN) {
 					fontSize = FONT_SIZE_MIN;
+					fontDraw = Font::create(fontFamily, fontSize, fontBold);
+				} else {
+					fontDraw = fontSource;
 				}
-				Ref<Font> fontDraw = Font::create(fontFamily, fontSize, fontBold);
 				if (fontDraw.isNotNull()) {
 					sl_uint32 planeWidth = param.planeWidth;
 					if (planeWidth == 0) {
@@ -277,25 +280,17 @@ namespace slib
 			return sl_true;
 		}
 		if (m_map.get_NoLock(ch, &_out)) {
-			
 			if (_out.fontWidth <= 0 || _out.fontHeight <= 0) {
 				return sl_false;
 			}
-			
 			if (flagSizeOnly) {
 				return sl_true;
 			}
-			
 			if (_out.bitmap.isNotNull()) {
 				return sl_true;
 			}
-			
 		} else {
-			
-			String s(&ch, 1);
-			
-			Size sizeFont = m_fontSource->measureSingleLineText(s);
-			
+			Size sizeFont = m_fontSource->measureSingleLineText(String(&ch, 1));
 			if (sizeFont.x <= 0 || sizeFont.y <= 0) {
 				FontAtlasChar fac;
 				fac.fontWidth = 0;
@@ -303,15 +298,12 @@ namespace slib
 				m_map.put_NoLock(ch, fac);
 				return sl_false;
 			}
-			
 			_out.fontWidth = sizeFont.x;
 			_out.fontHeight = sizeFont.y;
 			_out.bitmap.setNull();
-			
 			if (flagSizeOnly) {
 				return m_map.put_NoLock(ch, _out);
 			}
-			
 		}
 		
 		String s(&ch, 1);
