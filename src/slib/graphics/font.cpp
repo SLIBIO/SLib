@@ -180,6 +180,9 @@ namespace slib
 
 	Size Font::measureSingleLineText(const String& text)
 	{
+		if (text.isEmpty()) {
+			return Size::zero();
+		}
 		return _measureText_PO(text);
 	}
 
