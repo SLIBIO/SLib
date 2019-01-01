@@ -48,11 +48,14 @@ namespace slib
 		m_pager->setMinimumPagesCount(1);
 		m_pager->setVisibility(Visibility::Hidden, UIUpdateMode::Init);
 		m_contentView->addChild(m_pager, UIUpdateMode::Init);
-		
+
+		m_callbackOnChangeLocale = SLIB_FUNCTION_CLASS(MobileApp, onChangeCurrentLocale, this);
+		Locale::addOnChangeCurrentLocale(m_callbackOnChangeLocale);
 	}
 	
 	MobileApp::~MobileApp()
 	{
+		Locale::removeOnChangeCurrentLocale(m_callbackOnChangeLocale);
 	}
 
 	Ref<MobileApp> MobileApp::getApp()
@@ -91,14 +94,14 @@ namespace slib
 		return m_pager;
 	}
 	
+	Ref<View> MobileApp::getLoadingPage()
+	{
+		return getStartupPage();
+	}
+
 	Ref<View> MobileApp::getStartupPage()
 	{
-		return m_startupPage;
-	}
-	
-	void MobileApp::setStartupPage(const Ref<View>& page)
-	{
-		m_startupPage = page;
+		return sl_null;
 	}
 	
 	void MobileApp::addViewToRoot(const Ref<View>& view)
@@ -207,6 +210,16 @@ namespace slib
 		closePopup(Transition());
 	}
 	
+	void MobileApp::openStartupPage()
+	{
+		Ref<View> page = getStartupPage();
+		if (page.isNotNull()) {
+			Transition transition;
+			transition.type = TransitionType::None;
+			openHomePage(page, transition);
+		}
+	}
+	
 	void MobileApp::onPause()
 	{
 	}
@@ -229,6 +242,11 @@ namespace slib
 	
 	void MobileApp::onResize(sl_ui_len width, sl_ui_len height)
 	{
+	}
+	
+	void MobileApp::onChangeCurrentLocale()
+	{
+		openStartupPage();
 	}
 	
 	void MobileApp::dispatchStart()
@@ -466,10 +484,12 @@ namespace slib
 	{
 		UIResource::updateDefaultScreenSize();
 		if (m_pager->getPagesCount() == 0) {
-			Ref<View> page = m_startupPage;
+			Ref<View> page = getLoadingPage();
 			if (page.isNotNull()) {
 				m_pager->setVisibility(Visibility::Visible);
-				openHomePage(page);
+				Transition transition;
+				transition.type = TransitionType::None;
+				openHomePage(page, transition);
 			}
 		}
 		onResize(width, height);

@@ -57,9 +57,9 @@ namespace slib
 		
 		Ref<ViewPager> getPager();
 		
-		Ref<View> getStartupPage();
-		
-		void setStartupPage(const Ref<View>& page);
+		virtual Ref<View> getLoadingPage();
+
+		virtual Ref<View> getStartupPage();
 		
 		void addViewToRoot(const Ref<View>& view);
 		
@@ -93,6 +93,8 @@ namespace slib
 		
 		void closePopup();
 		
+		void openStartupPage();
+		
 	protected:
 		virtual void onPause();
 		
@@ -105,6 +107,8 @@ namespace slib
 		virtual void onDestroyActivity();
 		
 		virtual void onResize(sl_ui_len width, sl_ui_len height);
+		
+		virtual void onChangeCurrentLocale();
 		
 	public:
 		void dispatchStart() override;
@@ -154,8 +158,8 @@ namespace slib
 		
 		Ref<View> m_contentView;
 		Ref<ViewPager> m_pager;
-		Ref<View> m_startupPage;
 		CList< Ref<ViewPage> > m_popupPages;
+		Function<void()> m_callbackOnChangeLocale;
 		
 		friend class ViewPage;
 		
