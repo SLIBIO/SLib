@@ -13,7 +13,7 @@
 
 			<image
 				src='@drawable/lion'
-				width='15%sw'
+				width='35%sw'
 				centerHorizontal='true'/>
 			
 			<label
