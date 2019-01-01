@@ -82,8 +82,6 @@
 			return slib::_priv_ImageResource_get(_getEntries(slib::Resources::getCurrentLocale()), WIDTH, HEIGHT); \
 		} \
 		slib::_priv_ImageResourceEntry* _getEntries(const slib::Locale& locale) { \
-			int lang = (int)(locale.getLanguage()); \
-			SLIB_UNUSED(lang) \
 			slib::Locale localeSource; \
 			SLIB_UNUSED(localeSource)
 
@@ -93,7 +91,7 @@
 
 #define SLIB_DEFINE_IMAGE_RESOURCE_LIST_BEGIN(LOCALE) \
 			localeSource = slib::Locale(#LOCALE); \
-			if (locale == localeSource || lang == localeSource) { \
+			if (locale == localeSource || slib::Locale(locale.getLanguage()) == localeSource || slib::Locale(locale.getLanguage(), locale.getCountry()) == localeSource || slib::Locale(locale.getLanguage(), locale.getScript(), slib::Country::Unknown) == localeSource) { \
 				static slib::_priv_ImageResourceEntry entries[] = {
 
 #define SLIB_DEFINE_IMAGE_RESOURCE_ITEM(WIDTH, HEIGHT, SIZE, BYTES) \

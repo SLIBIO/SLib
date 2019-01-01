@@ -468,10 +468,9 @@ namespace slib
 			sbCpp.add(String::format("\t\tSLIB_DEFINE_IMAGE_RESOURCE_BEGIN(%s, %d, %d)%n", res->name, defaultWidth, defaultHeight));
 			
 			CList< Pair<Locale, List< Ref<SAppDrawableResourceImageItem> > > > listPairs;
-			// locales
 			{
 				for (auto& pairItems : imageAttr->images) {
-					if (pairItems.key.getCountry() != Country::Unknown) {
+					if (pairItems.key.getCountry() != Country::Unknown && pairItems.key.getScript() != LanguageScript::Unknown) {
 						if (!(listPairs.add_NoLock(pairItems.key, pairItems.value))) {
 							_logError(_g_sdev_sapp_error_out_of_memory);
 							return sl_false;
@@ -479,10 +478,29 @@ namespace slib
 					}
 				}
 			}
-			// languages
 			{
 				for (auto& pairItems : imageAttr->images) {
-					if (pairItems.key.getCountry() == Country::Unknown) {
+					if (pairItems.key.getCountry() != Country::Unknown && pairItems.key.getScript() == LanguageScript::Unknown) {
+						if (!(listPairs.add_NoLock(pairItems.key, pairItems.value))) {
+							_logError(_g_sdev_sapp_error_out_of_memory);
+							return sl_false;
+						}
+					}
+				}
+			}
+			{
+				for (auto& pairItems : imageAttr->images) {
+					if (pairItems.key.getCountry() == Country::Unknown && pairItems.key.getScript() != LanguageScript::Unknown) {
+						if (!(listPairs.add_NoLock(pairItems.key, pairItems.value))) {
+							_logError(_g_sdev_sapp_error_out_of_memory);
+							return sl_false;
+						}
+					}
+				}
+			}
+			{
+				for (auto& pairItems : imageAttr->images) {
+					if (pairItems.key.getCountry() == Country::Unknown && pairItems.key.getScript() == LanguageScript::Unknown) {
 						if (!(listPairs.add_NoLock(pairItems.key, pairItems.value))) {
 							_logError(_g_sdev_sapp_error_out_of_memory);
 							return sl_false;
@@ -547,11 +565,64 @@ namespace slib
 	{
 		SAppDrawableResourceImageAttributes* imageAttr = res->imageAttrs.get();
 		
-		Ref<SAppDrawableResourceImageItem> item;
 
-		sl_size n = imageAttr->defaultImages.getCount();
+		List< Ref<SAppDrawableResourceImageItem> > listItems;
+		do {
+			Locale locale = getCurrentSimulatorLocale();
+			{
+				for (auto& item : imageAttr->images) {
+					if (item.key == locale) {
+						listItems = item.value;
+						break;
+					}
+				}
+				if (listItems.isNotNull()) {
+					break;
+				}
+			}
+			{
+				for (auto& item : imageAttr->images) {
+					if (item.key == Locale(locale.getLanguage(), locale.getCountry())) {
+						listItems = item.value;
+						break;
+					}
+				}
+				if (listItems.isNotNull()) {
+					break;
+				}
+			}
+			{
+				for (auto& item : imageAttr->images) {
+					if (item.key == Locale(locale.getLanguage(), locale.getScript(), Country::Unknown)) {
+						listItems = item.value;
+						break;
+					}
+				}
+				if (listItems.isNotNull()) {
+					break;
+				}
+			}
+			{
+				for (auto& item : imageAttr->images) {
+					if (item.key == Locale(locale.getLanguage())) {
+						listItems = item.value;
+						break;
+					}
+				}
+				if (listItems.isNotNull()) {
+					break;
+				}
+			}
+		} while (0);
+		
+		if (listItems.isNull()) {
+			listItems = imageAttr->defaultImages;
+		}
+		
+		Ref<SAppDrawableResourceImageItem> item;
+		sl_size n = listItems.getCount();
 		if (n == 1) {
-			if (imageAttr->defaultImages.getAt(0, &item)) {
+			if (listItems.getAt(0, &item)) {
 				if (item.isNotNull()) {
 					Ref<Image> image = item->loadImage();
 					if (image.isNotNull()) {
@@ -567,7 +638,7 @@ namespace slib
 			if (mipmap.isNotNull()) {
 				sl_real defaultWidth = 1;
 				sl_real defaultHeight = 1;
-				ListLocker< Ref<SAppDrawableResourceImageItem> > items(imageAttr->defaultImages);
+				ListLocker< Ref<SAppDrawableResourceImageItem> > items(listItems);
 				for (sl_size i = 0; i < items.count; i++) {
 					item = items[i];
 					if (item.isNotNull()) {

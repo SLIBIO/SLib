@@ -238,7 +238,7 @@ namespace slib
 						return sl_false;
 					}
 				} else if (fileName.startsWith("image-")) {
-					String strLocale = fileName.substring(9);
+					String strLocale = fileName.substring(6);
 					Locale locale = Locale::Unknown;
 					if (strLocale.isNotEmpty()) {
 						locale = Locale(strLocale);
