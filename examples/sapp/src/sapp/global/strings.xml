@@ -1,2 +1,5 @@
 <sapp>
+	<strings>
+		<string name='hello_world'>Hello World</string>
+	</strings>
 </sapp>

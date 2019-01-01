@@ -4,5 +4,8 @@
 			<target-path>../gen</target-path>
 			<namespace>example</namespace>
 		</generate-cpp>
+		<simulator>
+			<locale></locale>
+		</simulator>
 	</configuration>
 </sapp>

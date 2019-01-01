@@ -17,12 +17,13 @@
 				centerHorizontal='true'/>
 			
 			<label
-				text='Hello World!'
+				text='@string/hello_world'
 				width='wrap'
 				height='wrap'
 				marginTop='2%sh'
 				fontSize='5%sw'
 				textColor='white'
+				centerHorizontal='true'
 				/>
 
 		</linear>

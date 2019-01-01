@@ -11,7 +11,7 @@
 					padding='10%smin'
 				>
 
-					<button name='btnHelloWorld' text='Hello World' styles='button_normal,menu_button'/>
+					<button name='btnHelloWorld' text='@string/hello_world' styles='button_normal,menu_button'/>
 
 					<button name='btnViewPager' text='ViewPager' styles='button_normal,menu_button'/>
 

@@ -23,12 +23,22 @@
 #include "app.h"
 
 #include "LaunchScreen.h"
+#include "MainMenu.h"
 
 SLIB_DEFINE_APPLICATION(SAppExampleApp, MobileApp)
 
 SAppExampleApp::SAppExampleApp()
 {
-	setStartupPage(new LaunchScreen);
+}
+
+Ref<View> SAppExampleApp::getLoadingPage()
+{
+	return new LaunchScreen;
+}
+
+Ref<View> SAppExampleApp::getStartupPage()
+{
+	return new MainMenu;
 }
 
 void SAppExampleApp::onStart()
