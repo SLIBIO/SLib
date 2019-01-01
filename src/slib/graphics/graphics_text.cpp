@@ -157,6 +157,42 @@ namespace slib
 		return Size::zero();
 	}
 	
+	void TextWordItem::draw(Canvas* canvas, sl_real x, sl_real y, const Color& color)
+	{
+#if defined(SLIB_PLATFORM_IS_MACOS)
+		CanvasType canvasType = canvas->getType();
+		if (canvasType != CanvasType::View && canvasType != CanvasType::Bitmap) {
+			canvas->drawText16(m_text, x, y, getFont(), color);
+			return;
+		}
+		Ref<Font> font = getFont();
+		if (font.isNull()) {
+			return;
+		}
+		Ref<FontAtlas> atlas = font->getSharedAtlas();
+		if (atlas.isNull()) {
+			return;
+		}
+		String16 str = m_text;
+		sl_char16* sz = str.getData();
+		sl_size len = str.getLength();
+		if (!len) {
+			return;
+		}
+		String16 s = String16::allocate(1);
+		sl_char16* t = s.getData();
+		for (sl_size i = 0; i < len; i++) {
+			sl_char16 ch = sz[i];
+			Size size = atlas->getFontSize(ch);
+			t[0] = ch;
+			canvas->drawText16(s, x, y, font, color);
+			x += size.x;
+		}
+#else
+		canvas->drawText16(m_text, x, y, getFont(), color);
+#endif
+	}
+	
 	
 	SLIB_DEFINE_OBJECT(TextSpaceItem, TextItem)
 
@@ -738,7 +774,7 @@ namespace slib
 							if (backColor.a > 0) {
 								canvas->fillRectangle(Rectangle(x + frame.left, y + frame.top, x + frame.right, y + frame.bottom), backColor);
 							}
-							canvas->drawText16(wordItem->getText(), x + frame.left, y + frame.top, wordItem->getFont(), style->textColor);
+							wordItem->draw(canvas, x + frame.left, y + frame.top, style->textColor);
 						}
 					}
 				}

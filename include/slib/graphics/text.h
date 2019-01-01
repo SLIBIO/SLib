@@ -157,6 +157,8 @@ namespace slib
 
 		Size getSize() noexcept;
 		
+		void draw(Canvas* canvas, sl_real x, sl_real y, const Color& color);
+		
 	private:
 		AtomicString16 m_text;
 

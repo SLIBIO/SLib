@@ -169,19 +169,25 @@ namespace slib
 																		&kCFCopyStringDictionaryKeyCallBacks,
 																		&kCFTypeDictionaryValueCallBacks);
 						if (attributes) {
+							
 							CFAttributedStringRef attrString = CFAttributedStringCreate(kCFAllocatorDefault, string, attributes);
+							
 							if (attrString) {
+								
 								CTLineRef line = CTLineCreateWithAttributedString(attrString);
+								
 								if (line) {
-									CGFloat ascent, descent, leading;
-									CTLineGetTypographicBounds(line, &ascent, &descent, &leading);
+									CGFloat leading = CTFontGetLeading(font);
+									CGFloat ascent = CTFontGetAscent(font);
+									CGFloat descent = CTFontGetDescent(font);
+									
 									CGAffineTransform trans;
 									trans.a = 1;
 									trans.b = 0;
 									trans.c = 0;
 									trans.d = -1;
 									trans.tx = x;
-									trans.ty = y + ascent + leading;
+									trans.ty = y + leading + ascent;
 									
 									CGContextSaveGState(m_graphics);
 									CGContextSetTextMatrix(m_graphics, trans);
@@ -189,8 +195,9 @@ namespace slib
 									CTLineDraw(line, m_graphics);
 									
 									if (_font->isStrikeout()) {
-										CGFloat yStrike = descent + ascent / 2;
-										CGFloat widthStrike = _font->measureText(text).x;
+										CGFloat yStrike = leading + ascent / 2 + descent;
+										CGRect rect = CTLineGetBoundsWithOptions(line, 0);
+										CGFloat widthStrike = rect.size.width;
 										CGContextBeginPath(m_graphics);
 										CGContextMoveToPoint(m_graphics, 0, yStrike);
 										CGContextAddLineToPoint(m_graphics, widthStrike, yStrike);
