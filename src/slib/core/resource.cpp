@@ -29,7 +29,11 @@ namespace slib
 
 	Locale Resources::getCurrentLocale()
 	{
-		return _g_resource_current_locale;
+		Locale locale = _g_resource_current_locale;
+		if (locale != Locale::Unknown) {
+			return locale;
+		}
+		return Locale::getCurrent();
 	}
 
 	void Resources::setCurrentLocale(const Locale& locale)

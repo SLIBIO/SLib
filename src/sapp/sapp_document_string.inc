@@ -156,18 +156,30 @@ namespace slib
 					
 					sbCpp.add(String::format("\t\tSLIB_DEFINE_STRING_RESOURCE_BEGIN(%s, \"%s\")%n", pair.key, ParseUtil::applyBackslashEscapes(defValue, sl_true, sl_false, sl_true)));
 					
-					// locales
 					{
 						for (auto& pairValues : pair.value->values) {
-							if (pairValues.key.getCountry() != Country::Unknown) {
+							if (pairValues.key.getCountry() != Country::Unknown && pairValues.key.getScript() != LanguageScript::Unknown) {
 								sbCpp.add(String::format("\t\t\tSLIB_DEFINE_STRING_RESOURCE_VALUE(%s, \"%s\")%n", pairValues.key.toString(), ParseUtil::applyBackslashEscapes(pairValues.value, sl_true, sl_false, sl_true)));
 							}
 						}
 					}
-					// languages
 					{
 						for (auto& pairValues : pair.value->values) {
-							if (pairValues.key.getCountry() == Country::Unknown) {
+							if (pairValues.key.getCountry() != Country::Unknown && pairValues.key.getScript() == LanguageScript::Unknown) {
+								sbCpp.add(String::format("\t\t\tSLIB_DEFINE_STRING_RESOURCE_VALUE(%s, \"%s\")%n", pairValues.key.toString(), ParseUtil::applyBackslashEscapes(pairValues.value, sl_true, sl_false, sl_true)));
+							}
+						}
+					}
+					{
+						for (auto& pairValues : pair.value->values) {
+							if (pairValues.key.getCountry() == Country::Unknown && pairValues.key.getScript() != LanguageScript::Unknown) {
+								sbCpp.add(String::format("\t\t\tSLIB_DEFINE_STRING_RESOURCE_VALUE(%s, \"%s\")%n", pairValues.key.toString(), ParseUtil::applyBackslashEscapes(pairValues.value, sl_true, sl_false, sl_true)));
+							}
+						}
+					}
+					{
+						for (auto& pairValues : pair.value->values) {
+							if (pairValues.key.getCountry() == Country::Unknown && pairValues.key.getScript() == LanguageScript::Unknown) {
 								sbCpp.add(String::format("\t\t\tSLIB_DEFINE_STRING_RESOURCE_VALUE(%s, \"%s\")%n", pairValues.key.toString(), ParseUtil::applyBackslashEscapes(pairValues.value, sl_true, sl_false, sl_true)));
 							}
 						}
@@ -236,6 +248,7 @@ namespace slib
 
 	sl_bool SAppDocument::_getStringValue(const String& localNamespace, const SAppStringValue& value, const Ref<XmlElement>& element, String& result)
 	{
+		Locale locale = getCurrentSimulatorLocale();
 		if (!(value.flagDefined)) {
 			result = String::null();
 			return sl_true;
@@ -243,6 +256,38 @@ namespace slib
 		if (value.flagReferResource) {
 			Ref<SAppStringResource> resource;
 			if (_checkStringName(localNamespace, value.valueOrName, element, sl_null, &resource)) {
+				{
+					for (auto& item : resource->values) {
+						if (item.key == locale) {
+							result = item.value;
+							return sl_true;
+						}
+					}
+				}
+				{
+					for (auto& item : resource->values) {
+						if (item.key == Locale(locale.getLanguage(), locale.getCountry())) {
+							result = item.value;
+							return sl_true;
+						}
+					}
+				}
+				{
+					for (auto& item : resource->values) {
+						if (item.key == Locale(locale.getLanguage(), locale.getScript(), Country::Unknown)) {
+							result = item.value;
+							return sl_true;
+						}
+					}
+				}
+				{
+					for (auto& item : resource->values) {
+						if (item.key == Locale(locale.getLanguage())) {
+							result = item.value;
+							return sl_true;
+						}
+					}
+				}
 				result = resource->defaultValue;
 				return sl_true;
 			} else {

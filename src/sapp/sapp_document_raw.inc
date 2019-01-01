@@ -102,7 +102,7 @@ namespace slib
 				
 				sbHeader.add(String::format("\t\tSLIB_DECLARE_RAW_RESOURCE(%s)%n", res->name));
 				
-				sl_size size = File::getSize(res->filePath);
+				sl_size size = (sl_size)(File::getSize(res->filePath));
 				if (size > RAW_MAX_SIZE) {
 					_logError(_g_sdev_sapp_error_resource_raw_size_big.arg(res->filePath));
 					return sl_false;

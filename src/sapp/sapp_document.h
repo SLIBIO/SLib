@@ -27,6 +27,7 @@
 #include "sapp_resources.h"
 
 #include "slib/core/map.h"
+#include "slib/core/locale.h"
 
 namespace slib
 {
@@ -35,10 +36,22 @@ namespace slib
 	{
 	public:
 		String app_path;
+		
 		String generate_cpp_target_path;
 		String generate_cpp_namespace;
 		CList<String> generate_cpp_layout_include_headers;
 		CList<String> generate_cpp_layout_include_headers_in_cpp;
+		
+		Locale simulator_locale;
+		
+	public:
+		SAppConfiguration();
+		
+		SAppConfiguration(SAppConfiguration&& other);
+
+		~SAppConfiguration();
+				
+		SAppConfiguration& operator=(SAppConfiguration&& other);
 		
 	};
 	
@@ -84,6 +97,8 @@ namespace slib
 		List< Ref<SAppLayoutResource> > getLayouts();
 		
 		void simulateLayoutInWindow(const String& layoutName, const SAppSimulateLayoutParam& param);
+		
+		Locale getCurrentSimulatorLocale();
 		
 		
 		// Utilities

@@ -126,11 +126,26 @@ namespace slib
 
 #define RAW_MAX_SIZE 0x1000000 // 16MB
 
+	
+	SAppConfiguration::SAppConfiguration()
+	{
+		simulator_locale = Locale::Unknown;
+	}
+	
+	SAppConfiguration::SAppConfiguration(SAppConfiguration&& other) = default;
+	
+	SAppConfiguration::~SAppConfiguration()
+	{
+	}
+		
+	SAppConfiguration& SAppConfiguration::operator=(SAppConfiguration&& other) = default;
+	
 	SAppSimulateLayoutParam::SAppSimulateLayoutParam()
 	{
 		windowSize.x = 450;
 		windowSize.y = 800;
 	}
+	
 	
 	SAppDocument::SAppDocument()
 	{
@@ -377,6 +392,15 @@ namespace slib
 		}
 		
 	}
+	
+	Locale SAppDocument::getCurrentSimulatorLocale()
+	{
+		Locale locale = m_conf.simulator_locale;
+		if (locale == Locale::Unknown) {
+			locale = Locale::getCurrent();
+		}
+		return locale;
+	}
 
 	/***************************************************
 	 					Utilities
@@ -572,6 +596,24 @@ namespace slib
 								conf.generate_cpp_layout_include_headers_in_cpp.add(str);
 							}
 						}
+					}
+				}
+			}
+		}
+		
+		// simulator
+		Ref<XmlElement> el_simulator = root->getFirstChildElement("simulator");
+		if (el_simulator.isNotNull()) {
+			Ref<XmlElement> el_locale = el_simulator->getFirstChildElement("locale");
+			if (el_locale.isNotNull()) {
+				String strLocale = el_locale->getText();
+				if (strLocale.isNotEmpty()) {
+					Locale locale;
+					if (locale.parse(strLocale)) {
+						conf.simulator_locale = locale;
+					} else {
+						_logError(el_locale, _g_sdev_sapp_error_configuration_value_invalid.arg("locale", strLocale));
+						return sl_false;
 					}
 				}
 			}

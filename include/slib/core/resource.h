@@ -57,14 +57,12 @@ namespace slib
 	namespace NAME { \
 		SLIB_STATIC_STRING(def, DEFAULT); \
 		slib::String get(const slib::Locale& locale) { \
-			int lang = (int)(locale.getLanguage()); \
-			SLIB_UNUSED(lang) \
 			slib::Locale localeSource; \
 			SLIB_UNUSED(localeSource)
 
 #define SLIB_DEFINE_STRING_RESOURCE_VALUE(LOCALE, VALUE) \
 			localeSource = slib::Locale(#LOCALE); \
-			if (locale == localeSource || lang == localeSource) { \
+if (locale == localeSource || slib::Locale(locale.getLanguage()) == localeSource || slib::Locale(locale.getLanguage(), locale.getCountry()) == localeSource || slib::Locale(locale.getLanguage(), locale.getScript(), slib::Country::Unknown) == localeSource) { \
 				SLIB_STATIC_STRING(str, VALUE); \
 				return str; \
 			}
