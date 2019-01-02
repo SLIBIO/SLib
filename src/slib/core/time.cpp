@@ -149,12 +149,12 @@ namespace slib
 	}
 	
 
-	Time::Time(int year, int month, int date, const TimeZone& zone) noexcept
+	Time::Time(sl_int32 year, sl_int32 month, sl_int32 date, const TimeZone& zone) noexcept
 	{
 		set(year, month, date, 0, 0, 0, 0, 0, zone);
 	}
 
-	Time::Time(int year, int month, int date, int hour, int minute, int second, int milliseconds, int microseconds, const TimeZone& zone) noexcept
+	Time::Time(sl_int32 year, sl_int32 month, sl_int32 date, sl_int32 hour, sl_int32 minute, sl_int32 second, sl_int32 milliseconds, sl_int32 microseconds, const TimeZone& zone) noexcept
 	{
 		set(year, month, date, hour, minute, second, milliseconds, microseconds, zone);
 	}
@@ -281,7 +281,7 @@ namespace slib
 		set(comps, TimeZone::UTC());
 	}
 	
-	void Time::set(int year, int month, int day, int hour, int minute, int second, int milliseconds, int microseconds, const TimeZone& zone) noexcept
+	void Time::set(sl_int32 year, sl_int32 month, sl_int32 day, sl_int32 hour, sl_int32 minute, sl_int32 second, sl_int32 milliseconds, sl_int32 microseconds, const TimeZone& zone) noexcept
 	{
 		if (year == 0 && month == 0 && day == 0) {
 			m_time = hour * TIME_HOUR + minute * TIME_MINUTE + second * TIME_SECOND;
@@ -305,12 +305,12 @@ namespace slib
 		m_time = t + milliseconds * 1000 + microseconds;
 	}
 
-	void Time::setUTC(int year, int month, int day, int hour, int minute, int second, int milliseconds, int microseconds) noexcept
+	void Time::setUTC(sl_int32 year, sl_int32 month, sl_int32 day, sl_int32 hour, sl_int32 minute, sl_int32 second, sl_int32 milliseconds, sl_int32 microseconds) noexcept
 	{
 		set(year, month, day, hour, minute, second, milliseconds, microseconds, TimeZone::UTC());
 	}
 	
-	void Time::setDate(int year, int month, int day, const TimeZone& zone) noexcept
+	void Time::setDate(sl_int32 year, sl_int32 month, sl_int32 day, const TimeZone& zone) noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
@@ -320,14 +320,14 @@ namespace slib
 		set(comps, zone);
 	}
 
-	int Time::getYear(const TimeZone& zone) const noexcept
+	sl_int32 Time::getYear(const TimeZone& zone) const noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
 		return comps.year;
 	}
 
-	void Time::setYear(int year, const TimeZone& zone) noexcept
+	void Time::setYear(sl_int32 year, const TimeZone& zone) noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
@@ -335,7 +335,7 @@ namespace slib
 		set(comps, zone);
 	}
 
-	void Time::addYears(int years, const TimeZone& zone) noexcept
+	void Time::addYears(sl_int32 years, const TimeZone& zone) noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
@@ -343,19 +343,19 @@ namespace slib
 		set(comps, zone);
 	}
 
-	int Time::getMonth(const TimeZone& zone) const noexcept
+	sl_int32 Time::getMonth(const TimeZone& zone) const noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
 		return comps.month;
 	}
 
-	void Time::setMonth(int month, const TimeZone& zone) noexcept
+	void Time::setMonth(sl_int32 month, const TimeZone& zone) noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
-		int monthNew = (month - 1) % 12;
-		int yearAdd = (month - 1) / 12;
+		sl_int32 monthNew = (month - 1) % 12;
+		sl_int32 yearAdd = (month - 1) / 12;
 		if (monthNew < 0) {
 			monthNew += 12;
 			yearAdd--;
@@ -365,13 +365,13 @@ namespace slib
 		set(comps, zone);
 	}
 
-	void Time::addMonths(int months, const TimeZone& zone) noexcept
+	void Time::addMonths(sl_int32 months, const TimeZone& zone) noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
 		months += comps.month;
-		int monthNew = (months - 1) % 12;
-		int yearAdd = (months - 1) / 12;
+		sl_int32 monthNew = (months - 1) % 12;
+		sl_int32 yearAdd = (months - 1) / 12;
 		if (monthNew < 0) {
 			monthNew += 12;
 			yearAdd--;
@@ -381,14 +381,14 @@ namespace slib
 		set(comps, zone);
 	}
 
-	int Time::getDay(const TimeZone& zone) const noexcept
+	sl_int32 Time::getDay(const TimeZone& zone) const noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
 		return comps.day;
 	}
 
-	void Time::setDay(int day, const TimeZone& zone) noexcept
+	void Time::setDay(sl_int32 day, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)(day - getDay(zone))*TIME_DAY;
 	}
@@ -415,14 +415,14 @@ namespace slib
 		m_time += (sl_int64)(days*TIME_DAYF);
 	}
 
-	int Time::getHour(const TimeZone& zone) const noexcept
+	sl_int32 Time::getHour(const TimeZone& zone) const noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
 		return comps.hour;
 	}
 
-	void Time::setHour(int hour, const TimeZone& zone) noexcept
+	void Time::setHour(sl_int32 hour, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)(hour - getHour(zone))*TIME_HOUR;
 	}
@@ -449,14 +449,14 @@ namespace slib
 		m_time += (sl_int64)(hours*TIME_HOURF);
 	}
 
-	int Time::getMinute(const TimeZone& zone) const noexcept
+	sl_int32 Time::getMinute(const TimeZone& zone) const noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
 		return comps.minute;
 	}
 
-	void Time::setMinute(int minute, const TimeZone& zone) noexcept
+	void Time::setMinute(sl_int32 minute, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)(minute - getMinute(zone))*TIME_MINUTE;
 	}
@@ -483,14 +483,14 @@ namespace slib
 		m_time += (sl_int64)(minutes*TIME_MINUTEF);
 	}
 
-	int Time::getSecond(const TimeZone& zone) const noexcept
+	sl_int32 Time::getSecond(const TimeZone& zone) const noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
 		return comps.second;
 	}
 
-	void Time::setSecond(int second, const TimeZone& zone) noexcept
+	void Time::setSecond(sl_int32 second, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)(second - getSecond(zone))*TIME_SECOND;
 	}
@@ -517,16 +517,16 @@ namespace slib
 		m_time += (sl_int64)(seconds*TIME_SECONDF);
 	}
 
-	int Time::getMillisecond() const noexcept
+	sl_int32 Time::getMillisecond() const noexcept
 	{
-		int n = (int)(m_time % TIME_SECOND);
+		sl_int32 n = (sl_int32)(m_time % TIME_SECOND);
 		if (n < 0) {
 			n += TIME_SECOND;
 		}
 		return n / TIME_MILLIS;
 	}
 
-	void Time::setMillisecond(int millis) noexcept
+	void Time::setMillisecond(sl_int32 millis) noexcept
 	{
 		m_time += (sl_int64)(millis - getMillisecond())*TIME_MILLIS;
 	}
@@ -538,7 +538,7 @@ namespace slib
 
 	double Time::getMillisecondf() const noexcept
 	{
-		int n = (int)(m_time % TIME_SECOND);
+		sl_int32 n = (sl_int32)(m_time % TIME_SECOND);
 		if (n < 0) {
 			n += TIME_SECOND;
 		}
@@ -555,16 +555,16 @@ namespace slib
 		m_time += (sl_int64)(milis*TIME_MILLISF);
 	}
 
-	int Time::getMicrosecond() const noexcept
+	sl_int32 Time::getMicrosecond() const noexcept
 	{
-		int n = (int)(m_time % TIME_MILLIS);
+		sl_int32 n = (sl_int32)(m_time % TIME_MILLIS);
 		if (n < 0) {
 			n += TIME_MILLIS;
 		}
 		return n;
 	}
 
-	void Time::setMicrosecond(int micros) noexcept
+	void Time::setMicrosecond(sl_int32 micros) noexcept
 	{
 		m_time += (micros - getMicrosecond());
 	}
@@ -581,7 +581,7 @@ namespace slib
 
 	void Time::setMicrosecondf(double micros) noexcept
 	{
-		setMicrosecond((int)micros);
+		setMicrosecond((sl_int32)micros);
 	}
 
 	void Time::addMicrosecondsf(double micros) noexcept
@@ -589,24 +589,24 @@ namespace slib
 		m_time += (sl_int64)micros;
 	}
 
-	int Time::getDayOfWeek(const TimeZone& zone) const noexcept
+	sl_int32 Time::getDayOfWeek(const TimeZone& zone) const noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
 		return comps.dayOfWeek;
 	}
 
-	void Time::setDayOfWeek(int day, const TimeZone& zone) noexcept
+	void Time::setDayOfWeek(sl_int32 day, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)(day - getDayOfWeek(zone))*TIME_DAY;
 	}
 
-	int Time::getDayOfYear(const TimeZone& zone) const noexcept
+	sl_int32 Time::getDayOfYear(const TimeZone& zone) const noexcept
 	{
-		return (int)((m_time - Time(getYear(zone), 1, 1, zone).m_time) / TIME_DAY) + 1;
+		return (sl_int32)((m_time - Time(getYear(zone), 1, 1, zone).m_time) / TIME_DAY) + 1;
 	}
 
-	void Time::setDayOfYear(int day, const TimeZone& zone) noexcept
+	void Time::setDayOfYear(sl_int32 day, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)(day - getDayOfYear(zone))*TIME_DAY;
 	}
@@ -740,96 +740,28 @@ namespace slib
 		return (t - o).getSecondsCount();
 	}
 
-	int Time::getDaysCountInMonth(const TimeZone& zone) const noexcept
+	sl_int32 Time::getDaysCountInMonth(const TimeZone& zone) const noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
 		Time timeStart(comps.year, comps.month, 1, zone);
 		Time timeEnd = timeStart;
 		timeEnd.addMonths(1, zone);
-		return (int)((timeEnd.m_time - timeStart.m_time) / TIME_DAY);
+		return (sl_int32)((timeEnd.m_time - timeStart.m_time) / TIME_DAY);
 	}
 
-	int Time::getDaysCountInYear(const TimeZone& zone) const noexcept
+	sl_int32 Time::getDaysCountInYear(const TimeZone& zone) const noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
 		Time timeStart(comps.year, 1, 1, zone);
 		Time timeEnd(comps.year + 1, 1, 1, zone);
-		return (int)((timeEnd.m_time - timeStart.m_time) / TIME_DAY);
+		return (sl_int32)((timeEnd.m_time - timeStart.m_time) / TIME_DAY);
 	}
 
-	int Time::getQuarter(const TimeZone& zone) const noexcept
+	sl_int32 Time::getQuarter(const TimeZone& zone) const noexcept
 	{
 		return ((getMonth(zone) - 1) / 3) + 1;
-	}
-
-	String Time::getWeekday(sl_bool flagShort, const TimeZone& zone) const noexcept
-	{
-		switch (getDayOfWeek(zone)) {
-		case 0:
-			if (flagShort) {
-				SLIB_STATIC_STRING(s, "Sun");
-				return s;
-			} else {
-				SLIB_STATIC_STRING(s, "Sunday");
-				return s;
-			}
-		case 1:
-			if (flagShort) {
-				SLIB_STATIC_STRING(s, "Mon");
-				return s;
-			} else {
-				SLIB_STATIC_STRING(s, "Monday");
-				return s;
-			}
-		case 2:
-			if (flagShort) {
-				SLIB_STATIC_STRING(s, "Tue");
-				return s;
-			} else {
-				SLIB_STATIC_STRING(s, "Tuesday");
-				return s;
-			}
-		case 3:
-			if (flagShort) {
-				SLIB_STATIC_STRING(s, "Wed");
-				return s;
-			} else {
-				SLIB_STATIC_STRING(s, "Wednesday");
-				return s;
-			}
-		case 4:
-			if (flagShort) {
-				SLIB_STATIC_STRING(s, "Thu");
-				return s;
-			} else {
-				SLIB_STATIC_STRING(s, "Thursday");
-				return s;
-			}
-		case 5:
-			if (flagShort) {
-				SLIB_STATIC_STRING(s, "Fri");
-				return s;
-			} else {
-				SLIB_STATIC_STRING(s, "Friday");
-				return s;
-			}
-		case 6:
-			if (flagShort) {
-				SLIB_STATIC_STRING(s, "Sat");
-				return s;
-			} else {
-				SLIB_STATIC_STRING(s, "Saturday");
-				return s;
-			}
-		}
-		return sl_null;
-	}
-
-	String Time::getWeekday(const TimeZone& zone) const noexcept
-	{
-		return getWeekday(sl_false, zone);
 	}
 	
 	Time Time::getTimeOnly(const TimeZone& zone) const noexcept
@@ -837,6 +769,363 @@ namespace slib
 		TimeComponents comps;
 		get(comps, zone);
 		return comps.hour * TIME_HOUR + comps.minute * TIME_MINUTE + comps.second * TIME_SECOND + comps.milliseconds * TIME_MILLIS + comps.microseconds;
+	}
+	
+	String Time::getWeekdayText(sl_int32 weekday, TimeTextType type, const Locale& _locale) noexcept
+	{
+		Locale locale = _locale;
+		if (locale == Locale::Unknown) {
+			locale = Locale::getCurrent();
+		}
+		switch (locale.getLanguage()) {
+			case Language::Korean:
+				switch (type) {
+					case TimeTextType::Long:
+						switch (weekday) {
+							case 0: SLIB_RETURN_STRING("\xec\x9d\xbc\xec\x9a\x94\xec\x9d\xbc");
+							case 1: SLIB_RETURN_STRING("\xec\x9b\x94\xec\x9a\x94\xec\x9d\xbc");
+							case 2: SLIB_RETURN_STRING("\xed\x99\x94\xec\x9a\x94\xec\x9d\xbc");
+							case 3: SLIB_RETURN_STRING("\xec\x88\x98\xec\x9a\x94\xec\x9d\xbc");
+							case 4: SLIB_RETURN_STRING("\xeb\xaa\xa9\xec\x9a\x94\xec\x9d\xbc");
+							case 5: SLIB_RETURN_STRING("\xea\xb8\x88\xec\x9a\x94\xec\x9d\xbc");
+							case 6: SLIB_RETURN_STRING("\xed\x86\xa0\xec\x9a\x94\xec\x9d\xbc");
+						}
+						return sl_null;
+					case TimeTextType::Short:
+					case TimeTextType::SingleChar:
+						switch (weekday) {
+							case 0: SLIB_RETURN_STRING("\xec\x9d\xbc");
+							case 1: SLIB_RETURN_STRING("\xec\x9b\x94");
+							case 2: SLIB_RETURN_STRING("\xed\x99\x94");
+							case 3: SLIB_RETURN_STRING("\xec\x88\x98");
+							case 4: SLIB_RETURN_STRING("\xeb\xaa\xa9");
+							case 5: SLIB_RETURN_STRING("\xea\xb8\x88");
+							case 6: SLIB_RETURN_STRING("\xed\x86\xa0");
+						}
+						return sl_null;
+				}
+				return sl_null;
+			case Language::Chinese:
+				switch (type) {
+					case TimeTextType::Long:
+						switch (weekday) {
+							case 0: SLIB_RETURN_STRING("\xe6\x98\x9f\xe6\x9c\x9f\xe6\x97\xa5");
+							case 1: SLIB_RETURN_STRING("\xe6\x98\x9f\xe6\x9c\x9f\xe4\xb8\x80");
+							case 2: SLIB_RETURN_STRING("\xe6\x98\x9f\xe6\x9c\x9f\xe4\xba\x8c");
+							case 3: SLIB_RETURN_STRING("\xe6\x98\x9f\xe6\x9c\x9f\xe4\xb8\x89");
+							case 4: SLIB_RETURN_STRING("\xe6\x98\x9f\xe6\x9c\x9f\xe5\x9b\x9b");
+							case 5: SLIB_RETURN_STRING("\xe6\x98\x9f\xe6\x9c\x9f\xe4\xba\x94");
+							case 6: SLIB_RETURN_STRING("\xe6\x98\x9f\xe6\x9c\x9f\xe5\x85\xad");
+						}
+						return sl_null;
+					case TimeTextType::Short:
+						if (locale.getScript() == LanguageScript::Hant) {
+							switch (weekday) {
+								case 0: SLIB_RETURN_STRING("\xe9\x80\xb1\xe6\x97\xa5");
+								case 1: SLIB_RETURN_STRING("\xe9\x80\xb1\xe4\xb8\x80");
+								case 2: SLIB_RETURN_STRING("\xe9\x80\xb1\xe4\xba\x8c");
+								case 3: SLIB_RETURN_STRING("\xe9\x80\xb1\xe4\xb8\x89");
+								case 4: SLIB_RETURN_STRING("\xe9\x80\xb1\xe5\x9b\x9b");
+								case 5: SLIB_RETURN_STRING("\xe9\x80\xb1\xe4\xba\x94");
+								case 6: SLIB_RETURN_STRING("\xe9\x80\xb1\xe5\x85\xad");
+							}
+						} else {
+							switch (weekday) {
+								case 0: SLIB_RETURN_STRING("\xe5\x91\xa8\xe6\x97\xa5");
+								case 1: SLIB_RETURN_STRING("\xe5\x91\xa8\xe4\xb8\x80");
+								case 2: SLIB_RETURN_STRING("\xe5\x91\xa8\xe4\xba\x8c");
+								case 3: SLIB_RETURN_STRING("\xe5\x91\xa8\xe4\xb8\x89");
+								case 4: SLIB_RETURN_STRING("\xe5\x91\xa8\xe5\x9b\x9b");
+								case 5: SLIB_RETURN_STRING("\xe5\x91\xa8\xe4\xba\x94");
+								case 6: SLIB_RETURN_STRING("\xe5\x91\xa8\xe5\x85\xad");
+							}
+						}
+						return sl_null;
+					case TimeTextType::SingleChar:
+						switch (weekday) {
+							case 0: SLIB_RETURN_STRING("\xe6\x97\xa5");
+							case 1: SLIB_RETURN_STRING("\xe4\xb8\x80");
+							case 2: SLIB_RETURN_STRING("\xe4\xba\x8c");
+							case 3: SLIB_RETURN_STRING("\xe4\xb8\x89");
+							case 4: SLIB_RETURN_STRING("\xe5\x9b\x9b");
+							case 5: SLIB_RETURN_STRING("\xe4\xba\x94");
+							case 6: SLIB_RETURN_STRING("\xe5\x85\xad");
+						}
+						return sl_null;
+				}
+				return sl_null;
+			case Language::Japanese:
+				switch (type) {
+					case TimeTextType::Long:
+						switch (weekday) {
+							case 0: SLIB_RETURN_STRING("\xe6\x97\xa5\xe6\x9b\x9c\xe6\x97\xa5");
+							case 1: SLIB_RETURN_STRING("\xe6\x9c\x88\xe6\x9b\x9c\xe6\x97\xa5");
+							case 2: SLIB_RETURN_STRING("\xe7\x81\xab\xe6\x9b\x9c\xe6\x97\xa5");
+							case 3: SLIB_RETURN_STRING("\xe6\xb0\xb4\xe6\x9b\x9c\xe6\x97\xa5");
+							case 4: SLIB_RETURN_STRING("\xe6\x9c\xa8\xe6\x9b\x9c\xe6\x97\xa5");
+							case 5: SLIB_RETURN_STRING("\xe9\x87\x91\xe6\x9b\x9c\xe6\x97\xa5");
+							case 6: SLIB_RETURN_STRING("\xe5\x9c\x9f\xe6\x9b\x9c\xe6\x97\xa5");
+						}
+						return sl_null;
+					case TimeTextType::Short:
+					case TimeTextType::SingleChar:
+						switch (weekday) {
+							case 0: SLIB_RETURN_STRING("\xe6\x97\xa5");
+							case 1: SLIB_RETURN_STRING("\xe6\x9c\x88");
+							case 2: SLIB_RETURN_STRING("\xe7\x81\xab");
+							case 3: SLIB_RETURN_STRING("\xe6\xb0\xb4");
+							case 4: SLIB_RETURN_STRING("\xe6\x9c\xa8");
+							case 5: SLIB_RETURN_STRING("\xe9\x87\x91");
+							case 6: SLIB_RETURN_STRING("\xe5\x9c\x9f");
+						}
+						return sl_null;
+				}
+				return sl_null;
+			default:
+				switch (type) {
+					case TimeTextType::Long:
+						switch (weekday) {
+							case 0: SLIB_RETURN_STRING("Sunday");
+							case 1: SLIB_RETURN_STRING("Monday");
+							case 2: SLIB_RETURN_STRING("Tuesday");
+							case 3: SLIB_RETURN_STRING("Wednesday");
+							case 4: SLIB_RETURN_STRING("Thursday");
+							case 5: SLIB_RETURN_STRING("Friday");
+							case 6: SLIB_RETURN_STRING("Saturday");
+						}
+						return sl_null;
+					case TimeTextType::Short:
+						switch (weekday) {
+							case 0: SLIB_RETURN_STRING("Sun");
+							case 1: SLIB_RETURN_STRING("Mon");
+							case 2: SLIB_RETURN_STRING("Tue");
+							case 3: SLIB_RETURN_STRING("Wed");
+							case 4: SLIB_RETURN_STRING("Thu");
+							case 5: SLIB_RETURN_STRING("Fri");
+							case 6: SLIB_RETURN_STRING("Sat");
+						}
+						return sl_null;
+					case TimeTextType::SingleChar:
+						switch (weekday) {
+							case 0: SLIB_RETURN_STRING("S");
+							case 1: SLIB_RETURN_STRING("M");
+							case 2: SLIB_RETURN_STRING("T");
+							case 3: SLIB_RETURN_STRING("W");
+							case 4: SLIB_RETURN_STRING("T");
+							case 5: SLIB_RETURN_STRING("F");
+							case 6: SLIB_RETURN_STRING("S");
+						}
+						return sl_null;
+				}
+				return sl_null;
+		}
+	}
+
+	String Time::getWeekdayShort(const TimeZone& zone, const Locale& locale) const noexcept
+	{
+		sl_int32 day = getDayOfWeek(zone);
+		return getWeekdayText(day, TimeTextType::Short, locale);
+	}
+	
+	String Time::getWeekdayShort(const Locale& locale) const noexcept
+	{
+		sl_int32 day = getDayOfWeek();
+		return getWeekdayText(day, TimeTextType::Short, locale);
+	}
+	
+	String Time::getWeekdayLong(const TimeZone& zone, const Locale& locale) const noexcept
+	{
+		sl_int32 day = getDayOfWeek(zone);
+		return getWeekdayText(day, TimeTextType::Long, locale);
+	}
+	
+	String Time::getWeekdayLong(const Locale& locale) const noexcept
+	{
+		sl_int32 day = getDayOfWeek();
+		return getWeekdayText(day, TimeTextType::Long, locale);
+	}
+	
+	String Time::getWeekday(const TimeZone& zone, const Locale& locale) const noexcept
+	{
+		return getWeekdayLong(zone, locale);
+	}
+	
+	String Time::getWeekday(const Locale& locale) const noexcept
+	{
+		return getWeekdayLong(locale);
+	}
+	
+	String Time::getMonthText(sl_int32 month, TimeTextType type) noexcept
+	{
+		switch (type) {
+			case TimeTextType::Long:
+				switch (month) {
+					case 1: SLIB_RETURN_STRING("January");
+					case 2: SLIB_RETURN_STRING("February");
+					case 3: SLIB_RETURN_STRING("March");
+					case 4: SLIB_RETURN_STRING("April");
+					case 5: SLIB_RETURN_STRING("May");
+					case 6: SLIB_RETURN_STRING("June");
+					case 7: SLIB_RETURN_STRING("July");
+					case 8: SLIB_RETURN_STRING("August");
+					case 9: SLIB_RETURN_STRING("September");
+					case 10: SLIB_RETURN_STRING("October");
+					case 11: SLIB_RETURN_STRING("November");
+					case 12: SLIB_RETURN_STRING("December");
+				}
+				return sl_null;
+			case TimeTextType::Short:
+			case TimeTextType::SingleChar:
+				switch (month) {
+					case 1: SLIB_RETURN_STRING("Jan");
+					case 2: SLIB_RETURN_STRING("Feb");
+					case 3: SLIB_RETURN_STRING("Mar");
+					case 4: SLIB_RETURN_STRING("Apr");
+					case 5: SLIB_RETURN_STRING("May");
+					case 6: SLIB_RETURN_STRING("Jun");
+					case 7: SLIB_RETURN_STRING("Jul");
+					case 8: SLIB_RETURN_STRING("Aug");
+					case 9: SLIB_RETURN_STRING("Sep");
+					case 10: SLIB_RETURN_STRING("Oct");
+					case 11: SLIB_RETURN_STRING("Nov");
+					case 12: SLIB_RETURN_STRING("Dec");
+				}
+				return sl_null;
+		}
+	}
+	
+	String Time::getMonthShort(const TimeZone& zone) const noexcept
+	{
+		sl_int32 month = getMonth(zone);
+		return getMonthText(month, TimeTextType::Short);
+	}
+	
+	String Time::getMonthLong(const TimeZone& zone) const noexcept
+	{
+		sl_int32 month = getMonth(zone);
+		return getMonthText(month, TimeTextType::Long);
+	}
+	
+	String Time::toHttpDate() const noexcept
+	{
+		TimeComponents d;
+		getUTC(d);
+		return String::format("%s, %02d %s %04d %02d:%02d:%02d GMT", getWeekdayText(d.dayOfWeek, TimeTextType::Short, Locale::en), d.day, getMonthText(d.month, TimeTextType::Short), d.year, d.hour, d.minute, d.second);
+	}
+	
+	sl_reg Time::parseHttpDate(Time* _output, const sl_char8* buf, sl_size posBegin, sl_size posEnd) noexcept
+	{
+		static char const* weekdays[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+		static char const* months[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+		if (posBegin + 29 > posEnd) {
+			return SLIB_PARSE_ERROR;
+		}
+		sl_int32 i;
+		const sl_char8* p = buf + posBegin;
+		for (i = 0; i < 7; i++) {
+			if (Base::equalsMemory(p, weekdays[i], 3)) {
+				break;
+			}
+		}
+		if (i == 7) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (p[3] != ',') {
+			return SLIB_PARSE_ERROR;
+		}
+		if (p[4] != ' ') {
+			return SLIB_PARSE_ERROR;
+		}
+		if (!SLIB_CHAR_IS_DIGIT(p[5])) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (!SLIB_CHAR_IS_DIGIT(p[6])) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (p[7] != ' ') {
+			return SLIB_PARSE_ERROR;
+		}
+		for (i = 0; i < 12; i++) {
+			if (Base::equalsMemory(p + 8, months[i], 3)) {
+				break;
+			}
+		}
+		if (i == 12) {
+			return SLIB_PARSE_ERROR;
+		}
+		sl_int32 month = i + 1;
+		if (p[11] != ' ') {
+			return SLIB_PARSE_ERROR;
+		}
+		if (!SLIB_CHAR_IS_DIGIT(p[12])) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (!SLIB_CHAR_IS_DIGIT(p[13])) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (!SLIB_CHAR_IS_DIGIT(p[14])) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (!SLIB_CHAR_IS_DIGIT(p[15])) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (p[16] != ' ') {
+			return SLIB_PARSE_ERROR;
+		}
+		if (!SLIB_CHAR_IS_DIGIT(p[17])) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (!SLIB_CHAR_IS_DIGIT(p[18])) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (p[19] != ':') {
+			return SLIB_PARSE_ERROR;
+		}
+		if (!SLIB_CHAR_IS_DIGIT(p[20])) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (!SLIB_CHAR_IS_DIGIT(p[21])) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (p[22] != ':') {
+			return SLIB_PARSE_ERROR;
+		}
+		if (!SLIB_CHAR_IS_DIGIT(p[23])) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (!SLIB_CHAR_IS_DIGIT(p[24])) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (p[25] != ' ') {
+			return SLIB_PARSE_ERROR;
+		}
+		if (p[26] != 'G') {
+			return SLIB_PARSE_ERROR;
+		}
+		if (p[27] != 'M') {
+			return SLIB_PARSE_ERROR;
+		}
+		if (p[28] != 'T') {
+			return SLIB_PARSE_ERROR;
+		}
+		if (_output) {
+			sl_int32 year = ((sl_int32)(p[12]-'0')) * 1000 + ((sl_int32)(p[13] - '0')) * 100 + ((sl_int32)(p[14] - '0')) * 10 + ((sl_int32)(p[15] - '0'));
+			sl_int32 day = ((sl_int32)(p[5]-'0')) * 10 + ((sl_int32)(p[6] - '0'));
+			sl_int32 hour = ((sl_int32)(p[17]-'0')) * 10 + ((sl_int32)(p[18] - '0'));
+			sl_int32 minute = ((sl_int32)(p[20]-'0')) * 10 + ((sl_int32)(p[21] - '0'));
+			sl_int32 second = ((sl_int32)(p[23]-'0')) * 10 + ((sl_int32)(p[24] - '0'));
+			_output->setUTC(year, month, day, hour, minute, second);
+		}
+		return posBegin + 29;
+	}
+	
+	sl_bool Time::parseHttpDate(const String& date) noexcept
+	{
+		sl_size len = date.getLength();
+		if (len != 29) {
+			return sl_false;
+		}
+		return parseHttpDate(this, date.getData(), 0, len) == len;
 	}
 
 	String Time::toString(const TimeZone& zone) const noexcept
@@ -955,7 +1244,7 @@ namespace slib
 		sb.add(String16::fromInt32(d.second, 10, 2));
 		return sb.merge();
 	}
-
+	
 	sl_bool Time::setString(const String& str, const TimeZone& zone) noexcept
 	{
 		if (parse(str, zone)) {
@@ -1072,7 +1361,7 @@ namespace slib
 			if (i >= n) {
 				break;
 			}
-			int value = 0;
+			sl_int32 value = 0;
 			sl_bool flagNumber = sl_false;
 			do {
 				CT ch = sz[i];
@@ -1248,7 +1537,7 @@ namespace slib
 		return sl_true;
 	}
 
-	sl_int64 Time::_set(int year, int month, int day, int hour, int minute, int second, sl_bool flagUTC) noexcept
+	sl_int64 Time::_set(sl_int32 year, sl_int32 month, sl_int32 day, sl_int32 hour, sl_int32 minute, sl_int32 second, sl_bool flagUTC) noexcept
 	{
 		SYSTEMTIME st;
 		st.wYear = (WORD)year;
@@ -1306,7 +1595,7 @@ namespace slib
 		return sl_true;
 	}
 	
-	sl_int64 Time::_set(int year, int month, int day, int hour, int minute, int second, sl_bool flagUTC) noexcept
+	sl_int64 Time::_set(sl_int32 year, sl_int32 month, sl_int32 day, sl_int32 hour, sl_int32 minute, sl_int32 second, sl_bool flagUTC) noexcept
 	{
 		tm v;
 		Base::resetMemory(&v, 0, sizeof(tm));

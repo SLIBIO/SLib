@@ -7742,10 +7742,10 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 									}
 									break;
 								case 'w':
-									content = time.getWeekday(sl_true, *zone);
+									content = time.getWeekdayShort(*zone);
 									break;
 								case 'W':
-									content = time.getWeekday(sl_false, *zone);
+									content = time.getWeekdayLong(*zone);
 									break;
 								case 'H':
 									if (flagZeroPadded) {
