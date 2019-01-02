@@ -92,9 +92,8 @@ namespace slib
 	String Apple::getFilePathFromNSURL(NSURL* url)
 	{
 		if (url != nil) {
-			SLIB_STATIC_STRING(prefix, "file://");
 			String path = Apple::getStringFromNSString([url path]);
-			if (path.startsWith(prefix)) {
+			if (path.startsWith("file://")) {
 				path = path.substring(7);
 			}
 			return path;

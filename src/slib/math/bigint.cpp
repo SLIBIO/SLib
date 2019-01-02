@@ -915,8 +915,7 @@ namespace slib
 		}
 		sl_size nb = getMostSignificantBits();
 		if (nb == 0) {
-			SLIB_STATIC_STRING(s, "0");
-			return s;
+			SLIB_RETURN_STRING("0");
 		}
 		if (radix == 16) {
 			sl_size nh = (nb + 3) >> 2;
@@ -2624,8 +2623,7 @@ namespace slib
 		if (o) {
 			return o->toString(radix);
 		} else {
-			SLIB_STATIC_STRING(s, "0");
-			return s;
+			SLIB_RETURN_STRING("0");
 		}
 	}
 

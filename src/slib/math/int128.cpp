@@ -784,8 +784,7 @@ namespace slib
 		}
 		Uint128 m = *this;
 		if (m.isZero()) {
-			SLIB_STATIC_STRING(s, "0");
-			return s;
+			SLIB_RETURN_STRING("0");
 		}
 		if (radix == 16) {
 			char buf[33];

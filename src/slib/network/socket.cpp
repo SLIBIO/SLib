@@ -291,51 +291,15 @@ namespace slib
 	String Socket::getTypeText() const
 	{
 		switch (getType()) {
-			case SocketType::Stream:
-			{
-				SLIB_STATIC_STRING(s, "Stream/IPv4");
-				return s;
-			}
-			case SocketType::Datagram:
-			{
-				SLIB_STATIC_STRING(s, "Datagram/IPv4");
-				return s;
-			}
-			case SocketType::Raw:
-			{
-				SLIB_STATIC_STRING(s, "Raw/IPv4");
-				return s;
-			}
-			case SocketType::StreamIPv6:
-			{
-				SLIB_STATIC_STRING(s, "Stream/IPv6");
-				return s;
-			}
-			case SocketType::DatagramIPv6:
-			{
-				SLIB_STATIC_STRING(s, "Datagram/IPv6");
-				return s;
-			}
-			case SocketType::RawIPv6:
-			{
-				SLIB_STATIC_STRING(s, "Raw/IPv6");
-				return s;
-			}
-			case SocketType::PacketRaw:
-			{
-				SLIB_STATIC_STRING(s, "Raw/Packet");
-				return s;
-			}
-			case SocketType::PacketDatagram:
-			{
-				SLIB_STATIC_STRING(s, "Datagram/Packet");
-				return s;
-			}
-			default:
-			{
-				SLIB_STATIC_STRING(s, "None");
-				return s;
-			}
+			case SocketType::Stream:			SLIB_RETURN_STRING("Stream/IPv4");
+			case SocketType::Datagram:			SLIB_RETURN_STRING("Datagram/IPv4");
+			case SocketType::Raw:				SLIB_RETURN_STRING("Raw/IPv4");
+			case SocketType::StreamIPv6:		SLIB_RETURN_STRING("Stream/IPv6");
+			case SocketType::DatagramIPv6:		SLIB_RETURN_STRING("Datagram/IPv6");
+			case SocketType::RawIPv6:			SLIB_RETURN_STRING("Raw/IPv6");
+			case SocketType::PacketRaw:			SLIB_RETURN_STRING("Raw/Packet");
+			case SocketType::PacketDatagram:	SLIB_RETURN_STRING("Datagram/Packet");
+			default:							SLIB_RETURN_STRING("None");
 		}
 	}
 

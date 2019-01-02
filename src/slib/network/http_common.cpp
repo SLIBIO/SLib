@@ -30,8 +30,7 @@ namespace slib
 {
 
 #define HTTP_STATUS_CASE(name, text) \
-	case HttpStatus::name: \
-	{ SLIB_STATIC_STRING(s, text); return s; }
+	case HttpStatus::name: SLIB_RETURN_STRING(text);
 
 	String HttpStatuses::toString(HttpStatus status)
 	{

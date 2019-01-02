@@ -63,8 +63,7 @@ namespace slib
 #define SLIB_DEFINE_STRING_RESOURCE_VALUE(LOCALE, VALUE) \
 			localeSource = slib::Locale(#LOCALE); \
 if (locale == localeSource || slib::Locale(locale.getLanguage()) == localeSource || slib::Locale(locale.getLanguage(), locale.getCountry()) == localeSource || slib::Locale(locale.getLanguage(), locale.getScript(), slib::Country::Unknown) == localeSource) { \
-				SLIB_STATIC_STRING(str, VALUE); \
-				return str; \
+				SLIB_RETURN_STRING(VALUE); \
 			}
 
 #define SLIB_DEFINE_STRING_RESOURCE_END \
