@@ -762,6 +762,10 @@ namespace slib
 			Arabic = ar,
 			zh = SLIB_LOCALE(Language::Chinese, LanguageScript::Unknown, Country::Unknown),
 			Chinese = zh,
+			zh_Hans = SLIB_LOCALE(Language::Chinese, LanguageScript::ChineseSimplified, Country::Unknown),
+			ChineseSimplified = zh_Hans,
+			zh_Hant = SLIB_LOCALE(Language::Chinese, LanguageScript::ChineseTraditional, Country::Unknown),
+			ChineseTraditional = zh_Hant,
 			zh_CN = SLIB_LOCALE(Language::Chinese, LanguageScript::ChineseSimplified, Country::China),
 			China = zh_CN,
 			zh_TW = SLIB_LOCALE(Language::Chinese, LanguageScript::ChineseTraditional, Country::Taiwan),
@@ -932,6 +936,8 @@ namespace slib
 	public:
 		static Locale getCurrent();
 		
+		static void setCurrent(const Locale& locale);
+		
 		static Function<void()> addOnChangeCurrentLocale(const Function<void()>& callback);
 		
 		static void removeOnChangeCurrentLocale(const Function<void()>& callback);
@@ -939,6 +945,8 @@ namespace slib
 		static void dispatchChangeCurrentLocale();
 		
 	private:
+		static Locale _getCurrent();
+		
 		static void _setupOnChangeCurrentLocale();
 		
 	};

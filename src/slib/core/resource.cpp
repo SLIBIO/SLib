@@ -25,20 +25,14 @@
 namespace slib
 {
 
-	static Locale _g_resource_current_locale = Locale::Unknown;
-
 	Locale Resources::getCurrentLocale()
 	{
-		Locale locale = _g_resource_current_locale;
-		if (locale != Locale::Unknown) {
-			return locale;
-		}
 		return Locale::getCurrent();
 	}
 
 	void Resources::setCurrentLocale(const Locale& locale)
 	{
-		_g_resource_current_locale = locale;
+		Locale::setCurrent(locale);
 	}
 
 	String Resources::makeResourceName(const String& path)

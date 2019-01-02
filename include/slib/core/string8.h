@@ -2115,5 +2115,6 @@ namespace slib
 	static slib::_priv_String_Const _static_string_null_##name = {sl_null, 0}; \
 	static const slib::AtomicString& name = *(reinterpret_cast<slib::AtomicString*>(&_static_string_null_##name));
 
+#define SLIB_RETURN_STRING(str) { SLIB_STATIC_STRING(_priv_ret_string_val, str) return _priv_ret_string_val; }
 
 #endif

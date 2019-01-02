@@ -29,8 +29,7 @@ namespace slib
 {
 
 #define DEFINE_LANGUAGE_CASE(LANG, NAME) \
-	case Language::LANG: \
-		{ SLIB_STATIC_STRING(s, NAME); return s; }
+	case Language::LANG: SLIB_RETURN_STRING(NAME);
 
 	String Locale::getLanguageName(Language lang)
 	{
@@ -311,8 +310,7 @@ namespace slib
 
 
 #define DEFINE_COUNTRY_CASE(COUNTRY, NAME) \
-	case Country::COUNTRY: \
-		{ SLIB_STATIC_STRING(s, NAME); return s; }
+	case Country::COUNTRY: SLIB_RETURN_STRING(NAME);
 
 	String Locale::getCountryName(Country country)
 	{
@@ -887,6 +885,22 @@ namespace slib
 	}
 	
 
+	static Locale _g_priv_locale_current = Locale::Unknown;
+	
+	Locale Locale::getCurrent()
+	{
+		Locale locale = _g_priv_locale_current;
+		if (locale != Locale::Unknown) {
+			return locale;
+		}
+		return _getCurrent();
+	}
+	
+	void Locale::setCurrent(const Locale& locale)
+	{
+		_g_priv_locale_current = locale;
+	}
+
 	SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<void()> >, _g_priv_locale_callback_onChangeCurrent)
 	Locale _g_priv_Locale_lastCurrent;
 
@@ -945,7 +959,7 @@ namespace slib
 
 namespace slib
 {
-	Locale Locale::getCurrent()
+	Locale Locale::_getCurrent()
 	{
 		WINAPI_GetUserDefaultLocaleName api = Windows::getAPI_GetUserDefaultLocaleName();
 		if (api) {
@@ -976,7 +990,7 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(getCurrentLocale, "getCurrentLocale", "()Ljava/lang/String;");
 	SLIB_JNI_END_CLASS
 
-	Locale Locale::getCurrent()
+	Locale Locale::_getCurrent()
 	{
 		String str = JAndroid::getCurrentLocale.callString(sl_null);
 		return Locale(str);
@@ -993,7 +1007,7 @@ namespace slib
 
 namespace slib
 {
-	Locale Locale::getCurrent()
+	Locale Locale::_getCurrent()
 	{
 		String locale = getenv("LANG");
 		sl_reg index = locale.indexOf('.');

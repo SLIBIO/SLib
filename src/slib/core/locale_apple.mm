@@ -44,7 +44,7 @@
 namespace slib
 {
 
-	Locale Locale::getCurrent()
+	Locale Locale::_getCurrent()
 	{
 		NSArray* arr = [NSLocale preferredLanguages];
 		if (arr != nil && arr.count > 0) {

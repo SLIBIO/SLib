@@ -2088,4 +2088,6 @@ namespace slib
 		static slib::_priv_String16_Const _static_string_null_##name = {sl_null, 0}; \
 		static const slib::AtomicString16& name = *(reinterpret_cast<slib::AtomicString16*>(&_static_string_null_##name));
 
+#define SLIB_RETURN_STRING16(str) { SLIB_STATIC_STRING16(_priv_ret_string16_val, str) return _priv_ret_string16_val; }
+
 #endif
