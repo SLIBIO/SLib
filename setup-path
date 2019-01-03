@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 cd $(dirname $0)
 SLIB_PATH=`pwd`
@@ -29,10 +29,11 @@ if [[ `uname` == 'Linux' ]]; then
   echo "source ~/.SLib.io/setup_bash" >> ~/.bashrc
  fi
 
- echo "Registering KDevelop environment variable"
- echo "[Environment Settings][default]" >> ~/.kde/share/config/kdeveloprc
- echo "SLIB_PATH=$SLIB_PATH" >> ~/.kde/share/config/kdeveloprc
-
+ if [[ -e ~/.kde/share/config/kdeveloprc ]]; then
+  echo "Registering KDevelop environment variable"
+  echo "[Environment Settings][default]" >> ~/.kde/share/config/kdeveloprc
+  echo "SLIB_PATH=$SLIB_PATH" >> ~/.kde/share/config/kdeveloprc
+ fi
 fi
 
 if [[ `uname` == 'Darwin' ]]; then
