@@ -23,6 +23,8 @@
 #ifndef CHECKHEADER_SLIB_CORE_NULL_VALUE
 #define CHECKHEADER_SLIB_CORE_NULL_VALUE
 
+#include "definition.h"
+
 namespace slib
 {
 	
@@ -33,15 +35,23 @@ namespace slib
 		{
 			return T();
 		}
+		
+		SLIB_INLINE static void get(T* _out)
+		{
+		}
 	};
 	
 #define SLIB_DEFINE_NULL_VALUE(T, VALUE) \
 	template <> \
 	struct NullValue<T> \
 	{ \
-		SLIB_INLINE static T get() \
+		SLIB_INLINE static constexpr T get() noexcept \
 		{ \
 			return VALUE; \
+		} \
+		SLIB_INLINE static void get(T* _out) noexcept \
+		{ \
+			*_out = VALUE; \
 		} \
 	};
 	
@@ -66,9 +76,14 @@ namespace slib
 	template <class T>
 	struct NullValue<T*>
 	{
-		SLIB_INLINE static T* get()
+		SLIB_INLINE static constexpr T* get() noexcept
 		{
 			return sl_null;
+		}
+		
+		SLIB_INLINE static void get(T* _out) noexcept
+		{
+			*_out = sl_null;
 		}
 	};
 	
