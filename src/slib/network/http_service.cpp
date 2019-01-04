@@ -623,7 +623,7 @@ namespace slib
 		
 		flagAllowCrossOrigin = sl_false;
 		
-		flagUseCacheControl = sl_false;
+		flagUseCacheControl = sl_true;
 		flagCacheControlNoCache = sl_false;
 		cacheControlMaxAge = 600;
 		
