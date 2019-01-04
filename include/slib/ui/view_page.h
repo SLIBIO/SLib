@@ -337,7 +337,8 @@ namespace slib
 		// For mobile platforms
 		virtual void onBackPressed(UIEvent* ev);
 		
-		virtual void onCloseWindow(UIEvent* ev);
+		// Pressed mobile back button or Closed popup window
+		virtual void onBack(UIEvent* ev);
 		
 	public:
 		virtual void dispatchPageAction(ViewPager* pager, UIPageAction action);
@@ -354,7 +355,7 @@ namespace slib
 		
 		virtual void dispatchBackPressed(UIEvent* ev);
 		
-		virtual void dispatchCloseWindow(UIEvent* ev);
+		virtual void dispatchBack(UIEvent* ev);
 		
 		void dispatchOK(UIEvent* ev) override;
 
@@ -367,7 +368,7 @@ namespace slib
 		
 		void _finishPopupAnimation(UIPageAction action);
 		
-		sl_bool _dispatchCloseWindow();
+		sl_bool _dispatchBack();
 		
 		void _applyDefaultOpeningPopupTransition(Transition& transition);
 		
@@ -390,7 +391,7 @@ namespace slib
 		
 		SLIB_PROPERTY(AtomicFunction<void(ViewPage*, UIEvent* ev)>, OnBackPressed);
 		
-		SLIB_PROPERTY(AtomicFunction<void(ViewPage*, UIEvent* ev)>, OnCloseWindow);
+		SLIB_PROPERTY(AtomicFunction<void(ViewPage*, UIEvent* ev)>, OnBack);
 		
 	protected:
 		AtomicWeakRef<ViewPager> m_pager;

@@ -1285,11 +1285,11 @@ namespace slib
 		Base::interlockedDecrement(&m_countActiveTransitionAnimations);
 	}
 
-	sl_bool ViewPage::_dispatchCloseWindow()
+	sl_bool ViewPage::_dispatchBack()
 	{
 		Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
 		if (ev.isNotNull()) {
-			dispatchCloseWindow(ev.get());
+			dispatchBack(ev.get());
 			if (ev->isPreventedDefault()) {
 				return sl_false;
 			}
@@ -1370,7 +1370,7 @@ namespace slib
 	{
 		ObjectLocker lock(this);
 		if (m_popupState == PopupState::ShowWindow) {
-			if (_dispatchCloseWindow()) {
+			if (_dispatchBack()) {
 				m_popupState = PopupState::None;
 				lock.unlock();
 				dispatchPause();
@@ -1580,7 +1580,7 @@ namespace slib
 	{
 	}
 
-	void ViewPage::onCloseWindow(UIEvent* ev)
+	void ViewPage::onBack(UIEvent* ev)
 	{
 	}
 
@@ -1642,15 +1642,15 @@ namespace slib
 		if (ev->isPreventedDefault()) {
 			return;
 		}
-		if (_dispatchCloseWindow()) {
+		if (_dispatchBack()) {
 			close();
 		}
 	}
 
-	void ViewPage::dispatchCloseWindow(UIEvent* ev)
+	void ViewPage::dispatchBack(UIEvent* ev)
 	{
-		onCloseWindow(ev);
-		getOnCloseWindow()(this, ev);
+		onBack(ev);
+		getOnBack()(this, ev);
 	}
 
 	void ViewPage::dispatchOK(UIEvent* ev)
@@ -1668,7 +1668,9 @@ namespace slib
 		if (ev->isPreventedDefault()) {
 			return;
 		}
-		close();
+		if (_dispatchBack()) {
+			close();
+		}
 	}
 
 }
