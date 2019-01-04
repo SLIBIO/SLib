@@ -203,7 +203,7 @@ namespace slib
 			return 0;
 		}
 
-		void setZero() noexcept;
+		Time& setZero() noexcept;
 
 		SLIB_INLINE constexpr sl_bool isZero() const
 		{
@@ -217,19 +217,19 @@ namespace slib
 
 		sl_int64 toInt() const noexcept;
 	
-		void setInt(sl_int64 time) noexcept;
+		Time& setInt(sl_int64 time) noexcept;
 		
 		static Time fromInt(sl_int64 time) noexcept;
 		
 		sl_int64 toUnixTime() const noexcept;
 
-		void setUnixTime(sl_int64 time) noexcept;
+		Time& setUnixTime(sl_int64 time) noexcept;
 		
 		static Time fromUnixTime(sl_int64 time) noexcept;
 		
-		void add(sl_int64 time) noexcept;
+		Time& add(sl_int64 time) noexcept;
 
-		void add(const Time& other) noexcept;
+		Time& add(const Time& other) noexcept;
 	
 	public:
 		Time& operator=(const Time& other) noexcept;
@@ -286,7 +286,7 @@ namespace slib
 		Time& operator-=(const Time& time) noexcept;
 
 	public:
-		void setNow() noexcept;
+		Time& setNow() noexcept;
 
 		static sl_bool setSystemTime(const Time& time) noexcept;
 
@@ -294,155 +294,155 @@ namespace slib
 		
 		void getUTC(TimeComponents& output) const noexcept;
 		
-		void set(const TimeComponents& comps, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& set(const TimeComponents& comps, const TimeZone& zone = TimeZone::Local) noexcept;
 		
-		void setUTC(const TimeComponents& comps) noexcept;
+		Time& setUTC(const TimeComponents& comps) noexcept;
 
-		void set(sl_int32 year, sl_int32 month, sl_int32 date, sl_int32 hour = 0, sl_int32 minute = 0, sl_int32 second = 0, sl_int32 milliseconds = 0, sl_int32 microseconds = 0, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& set(sl_int32 year, sl_int32 month, sl_int32 date, sl_int32 hour = 0, sl_int32 minute = 0, sl_int32 second = 0, sl_int32 milliseconds = 0, sl_int32 microseconds = 0, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void setUTC(sl_int32 year, sl_int32 month, sl_int32 date, sl_int32 hour = 0, sl_int32 minute = 0, sl_int32 second = 0, sl_int32 milliseconds = 0, sl_int32 microseconds = 0) noexcept;
+		Time& setUTC(sl_int32 year, sl_int32 month, sl_int32 date, sl_int32 hour = 0, sl_int32 minute = 0, sl_int32 second = 0, sl_int32 milliseconds = 0, sl_int32 microseconds = 0) noexcept;
 
-		void setDate(sl_int32 year, sl_int32 month, sl_int32 day, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& setDate(sl_int32 year, sl_int32 month, sl_int32 day, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		sl_int32 getYear(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setYear(sl_int32 year, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& setYear(sl_int32 year, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void addYears(sl_int32 years, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& addYears(sl_int32 years, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		sl_int32 getMonth(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setMonth(sl_int32 month, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& setMonth(sl_int32 month, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void addMonths(sl_int32 months, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& addMonths(sl_int32 months, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		sl_int32 getDay(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setDay(sl_int32 day, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& setDay(sl_int32 day, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void addDays(sl_int64 days) noexcept;
+		Time& addDays(sl_int64 days) noexcept;
 
 		double getDayf(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setDayf(double day, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& setDayf(double day, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void addDaysf(double days) noexcept;
+		Time& addDaysf(double days) noexcept;
 
 		sl_int32 getHour(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setHour(sl_int32 hour, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& setHour(sl_int32 hour, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void addHours(sl_int64 hours) noexcept;
+		Time& addHours(sl_int64 hours) noexcept;
 
 		double getHourf(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setHourf(double hour, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& setHourf(double hour, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void addHoursf(double hours) noexcept;
+		Time& addHoursf(double hours) noexcept;
 
 		sl_int32 getMinute(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setMinute(sl_int32 minute, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& setMinute(sl_int32 minute, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void addMinutes(sl_int64 minutes) noexcept;
+		Time& addMinutes(sl_int64 minutes) noexcept;
 
 		double getMinutef(const TimeZone& zone = TimeZone::Local) const noexcept;
 	
-		void setMinutef(double minute, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& setMinutef(double minute, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void addMinutesf(double minutes) noexcept;
+		Time& addMinutesf(double minutes) noexcept;
 
 		sl_int32 getSecond(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setSecond(sl_int32 second, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& setSecond(sl_int32 second, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void addSeconds(sl_int64 seconds) noexcept;
+		Time& addSeconds(sl_int64 seconds) noexcept;
 
 		double getSecondf(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setSecondf(double second, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& setSecondf(double second, const TimeZone& zone = TimeZone::Local) noexcept;
 
-		void addSecondsf(double seconds) noexcept;
+		Time& addSecondsf(double seconds) noexcept;
 
 		sl_int32 getMillisecond() const noexcept;
 
-		void setMillisecond(sl_int32 millis) noexcept;
+		Time& setMillisecond(sl_int32 millis) noexcept;
 
-		void addMilliseconds(sl_int64 millis) noexcept;
+		Time& addMilliseconds(sl_int64 millis) noexcept;
 
 		double getMillisecondf() const noexcept;
 
-		void setMillisecondf(double millis) noexcept;
+		Time& setMillisecondf(double millis) noexcept;
 
-		void addMillisecondsf(double millis) noexcept;
+		Time& addMillisecondsf(double millis) noexcept;
 
 		sl_int32 getMicrosecond() const noexcept;
 
-		void setMicrosecond(sl_int32 micros) noexcept;
+		Time& setMicrosecond(sl_int32 micros) noexcept;
 
-		void addMicroseconds(sl_int64 micros) noexcept;
+		Time& addMicroseconds(sl_int64 micros) noexcept;
 
 		double getMicrosecondf() const noexcept;
 	
-		void setMicrosecondf(double micros) noexcept;
+		Time& setMicrosecondf(double micros) noexcept;
 
-		void addMicrosecondsf(double micros) noexcept;
+		Time& addMicrosecondsf(double micros) noexcept;
 
 		sl_int32 getDayOfWeek(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setDayOfWeek(sl_int32 day, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& setDayOfWeek(sl_int32 day, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		sl_int32 getDayOfYear(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		void setDayOfYear(sl_int32 day, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time& setDayOfYear(sl_int32 day, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		sl_int64 getDaysCount() const noexcept;
 
-		void setDaysCount(sl_int64 days) noexcept;
+		Time& setDaysCount(sl_int64 days) noexcept;
 
 		double getDaysCountf() const noexcept;
 
-		void setDaysCountf(double days) noexcept;
+		Time& setDaysCountf(double days) noexcept;
 
 		sl_int64 getHoursCount() const noexcept;
 
-		void setHoursCount(sl_int64 hours) noexcept;
+		Time& setHoursCount(sl_int64 hours) noexcept;
 
 		double getHoursCountf() const noexcept;
 
-		void setHoursCountf(double hours) noexcept;
+		Time& setHoursCountf(double hours) noexcept;
 
 		sl_int64 getMinutesCount() const noexcept;
 
-		void setMinutesCount(sl_int64 minutes) noexcept;
+		Time& setMinutesCount(sl_int64 minutes) noexcept;
 
 		double getMinutesCountf() const noexcept;
 
-		void setMinutesCountf(double minutes) noexcept;
+		Time& setMinutesCountf(double minutes) noexcept;
 
 		sl_int64 getSecondsCount() const noexcept;
 
-		void setSecondsCount(sl_int64 seconds) noexcept;
+		Time& setSecondsCount(sl_int64 seconds) noexcept;
 
 		double getSecondsCountf() const noexcept;
 
-		void setSecondsCountf(double seconds) noexcept;
+		Time& setSecondsCountf(double seconds) noexcept;
 
 		sl_int64 getMillisecondsCount() const noexcept;
 
-		void setMillisecondsCount(sl_int64 milis) noexcept;
+		Time& setMillisecondsCount(sl_int64 milis) noexcept;
 
 		double getMillisecondsCountf() const noexcept;
 
-		void setMillisecondsCountf(double milis) noexcept;
+		Time& setMillisecondsCountf(double milis) noexcept;
 
 		sl_int64 getMicrosecondsCount() const noexcept;
 
-		void setMicrosecondsCount(sl_int64 micros) noexcept;
+		Time& setMicrosecondsCount(sl_int64 micros) noexcept;
 
 		double getMicrosecondsCountf() const noexcept;
 	
-		void setMicrosecondsCountf(double micros) noexcept;
+		Time& setMicrosecondsCountf(double micros) noexcept;
 	
 		// In Seconds
 		sl_int64 getLocalTimeOffset() const noexcept;

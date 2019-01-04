@@ -23,9 +23,10 @@
 namespace slib
 {
 
-	SLIB_INLINE void Time::setZero() noexcept
+	SLIB_INLINE Time& Time::setZero() noexcept
 	{
 		m_time = 0;
+		return *this;
 	}
 	
 	SLIB_INLINE sl_int64 Time::toInt() const noexcept

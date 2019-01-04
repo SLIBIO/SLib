@@ -201,9 +201,10 @@ namespace slib
 		return ret;
 	}
 
-	void Time::setInt(sl_int64 time) noexcept
+	Time& Time::setInt(sl_int64 time) noexcept
 	{
 		m_time = time;
+		return *this;
 	}
 
 	Time Time::fromInt(sl_int64 time) noexcept
@@ -211,9 +212,10 @@ namespace slib
 		return time;
 	}
 	
-	void Time::setUnixTime(sl_int64 time) noexcept
+	Time& Time::setUnixTime(sl_int64 time) noexcept
 	{
 		m_time = time * TIME_SECOND;
+		return *this;
 	}
 	
 	Time Time::fromUnixTime(sl_int64 time) noexcept
@@ -221,19 +223,22 @@ namespace slib
 		return time * TIME_SECOND;
 	}
 
-	void Time::add(sl_int64 time) noexcept
+	Time& Time::add(sl_int64 time) noexcept
 	{
 		m_time += time;
+		return *this;
 	}
 
-	void Time::add(const Time& other) noexcept
+	Time& Time::add(const Time& other) noexcept
 	{
 		m_time += other.m_time;
+		return *this;
 	}
 
-	void Time::setNow() noexcept
+	Time& Time::setNow() noexcept
 	{
 		_setNow();
+		return *this;
 	}
 	
 	sl_bool Time::setSystemTime(const Time& time) noexcept
@@ -271,21 +276,23 @@ namespace slib
 		get(output, TimeZone::UTC());
 	}
 	
-	void Time::set(const TimeComponents& comps, const TimeZone& zone) noexcept
+	Time& Time::set(const TimeComponents& comps, const TimeZone& zone) noexcept
 	{
 		set(comps.year, comps.month, comps.day, comps.hour, comps.minute, comps.second, comps.milliseconds, comps.microseconds, zone);
+		return *this;
 	}
 
-	void Time::setUTC(const TimeComponents& comps) noexcept
+	Time& Time::setUTC(const TimeComponents& comps) noexcept
 	{
 		set(comps, TimeZone::UTC());
+		return *this;
 	}
 	
-	void Time::set(sl_int32 year, sl_int32 month, sl_int32 day, sl_int32 hour, sl_int32 minute, sl_int32 second, sl_int32 milliseconds, sl_int32 microseconds, const TimeZone& zone) noexcept
+	Time& Time::set(sl_int32 year, sl_int32 month, sl_int32 day, sl_int32 hour, sl_int32 minute, sl_int32 second, sl_int32 milliseconds, sl_int32 microseconds, const TimeZone& zone) noexcept
 	{
 		if (year == 0 && month == 0 && day == 0) {
 			m_time = hour * TIME_HOUR + minute * TIME_MINUTE + second * TIME_SECOND;
-			return;
+			return *this;
 		}
 		if (month <= 0) {
 			month = 1;
@@ -303,14 +310,16 @@ namespace slib
 			t -= zone.getOffset(t) * TIME_SECOND;
 		}
 		m_time = t + milliseconds * 1000 + microseconds;
+		return *this;
 	}
 
-	void Time::setUTC(sl_int32 year, sl_int32 month, sl_int32 day, sl_int32 hour, sl_int32 minute, sl_int32 second, sl_int32 milliseconds, sl_int32 microseconds) noexcept
+	Time& Time::setUTC(sl_int32 year, sl_int32 month, sl_int32 day, sl_int32 hour, sl_int32 minute, sl_int32 second, sl_int32 milliseconds, sl_int32 microseconds) noexcept
 	{
 		set(year, month, day, hour, minute, second, milliseconds, microseconds, TimeZone::UTC());
+		return *this;
 	}
 	
-	void Time::setDate(sl_int32 year, sl_int32 month, sl_int32 day, const TimeZone& zone) noexcept
+	Time& Time::setDate(sl_int32 year, sl_int32 month, sl_int32 day, const TimeZone& zone) noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
@@ -318,6 +327,7 @@ namespace slib
 		comps.month = month;
 		comps.day = day;
 		set(comps, zone);
+		return *this;
 	}
 
 	sl_int32 Time::getYear(const TimeZone& zone) const noexcept
@@ -327,20 +337,22 @@ namespace slib
 		return comps.year;
 	}
 
-	void Time::setYear(sl_int32 year, const TimeZone& zone) noexcept
+	Time& Time::setYear(sl_int32 year, const TimeZone& zone) noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
 		comps.year = year;
 		set(comps, zone);
+		return *this;
 	}
 
-	void Time::addYears(sl_int32 years, const TimeZone& zone) noexcept
+	Time& Time::addYears(sl_int32 years, const TimeZone& zone) noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
 		comps.year += years;
 		set(comps, zone);
+		return *this;
 	}
 
 	sl_int32 Time::getMonth(const TimeZone& zone) const noexcept
@@ -350,7 +362,7 @@ namespace slib
 		return comps.month;
 	}
 
-	void Time::setMonth(sl_int32 month, const TimeZone& zone) noexcept
+	Time& Time::setMonth(sl_int32 month, const TimeZone& zone) noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
@@ -363,9 +375,10 @@ namespace slib
 		comps.year += yearAdd;
 		comps.month = monthNew + 1;
 		set(comps, zone);
+		return *this;
 	}
 
-	void Time::addMonths(sl_int32 months, const TimeZone& zone) noexcept
+	Time& Time::addMonths(sl_int32 months, const TimeZone& zone) noexcept
 	{
 		TimeComponents comps;
 		get(comps, zone);
@@ -379,6 +392,7 @@ namespace slib
 		comps.year += yearAdd;
 		comps.month = monthNew + 1;
 		set(comps, zone);
+		return *this;
 	}
 
 	sl_int32 Time::getDay(const TimeZone& zone) const noexcept
@@ -388,14 +402,16 @@ namespace slib
 		return comps.day;
 	}
 
-	void Time::setDay(sl_int32 day, const TimeZone& zone) noexcept
+	Time& Time::setDay(sl_int32 day, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)(day - getDay(zone))*TIME_DAY;
+		return *this;
 	}
 
-	void Time::addDays(sl_int64 days) noexcept
+	Time& Time::addDays(sl_int64 days) noexcept
 	{
 		m_time += days*TIME_DAY;
+		return *this;
 	}
 
 	double Time::getDayf(const TimeZone& zone) const noexcept
@@ -405,14 +421,16 @@ namespace slib
 		return comps.day + (comps.hour * TIME_HOUR + comps.minute * TIME_MINUTE + comps.second * TIME_SECOND + comps.milliseconds * TIME_MILLIS + comps.microseconds) / TIME_DAYF;
 	}
 
-	void Time::setDayf(double day, const TimeZone& zone) noexcept
+	Time& Time::setDayf(double day, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)((day - getDayf(zone))*TIME_DAYF);
+		return *this;
 	}
 
-	void Time::addDaysf(double days) noexcept
+	Time& Time::addDaysf(double days) noexcept
 	{
 		m_time += (sl_int64)(days*TIME_DAYF);
+		return *this;
 	}
 
 	sl_int32 Time::getHour(const TimeZone& zone) const noexcept
@@ -422,14 +440,16 @@ namespace slib
 		return comps.hour;
 	}
 
-	void Time::setHour(sl_int32 hour, const TimeZone& zone) noexcept
+	Time& Time::setHour(sl_int32 hour, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)(hour - getHour(zone))*TIME_HOUR;
+		return *this;
 	}
 
-	void Time::addHours(sl_int64 hours) noexcept
+	Time& Time::addHours(sl_int64 hours) noexcept
 	{
 		m_time += hours*TIME_HOUR;
+		return *this;
 	}
 
 	double Time::getHourf(const TimeZone& zone) const noexcept
@@ -439,14 +459,16 @@ namespace slib
 		return comps.hour + (comps.minute * TIME_MINUTE + comps.second * TIME_SECOND + comps.milliseconds * TIME_MILLIS + comps.microseconds) / TIME_HOURF;
 	}
 
-	void Time::setHourf(double hour, const TimeZone& zone) noexcept
+	Time& Time::setHourf(double hour, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)((hour - getHourf(zone))*TIME_HOURF);
+		return *this;
 	}
 
-	void Time::addHoursf(double hours) noexcept
+	Time& Time::addHoursf(double hours) noexcept
 	{
 		m_time += (sl_int64)(hours*TIME_HOURF);
+		return *this;
 	}
 
 	sl_int32 Time::getMinute(const TimeZone& zone) const noexcept
@@ -456,14 +478,16 @@ namespace slib
 		return comps.minute;
 	}
 
-	void Time::setMinute(sl_int32 minute, const TimeZone& zone) noexcept
+	Time& Time::setMinute(sl_int32 minute, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)(minute - getMinute(zone))*TIME_MINUTE;
+		return *this;
 	}
 
-	void Time::addMinutes(sl_int64 minutes) noexcept
+	Time& Time::addMinutes(sl_int64 minutes) noexcept
 	{
 		m_time += minutes*TIME_MINUTE;
+		return *this;
 	}
 
 	double Time::getMinutef(const TimeZone& zone) const noexcept
@@ -473,14 +497,16 @@ namespace slib
 		return comps.minute + (comps.second * TIME_SECOND + comps.milliseconds * TIME_MILLIS + comps.microseconds) / TIME_MINUTEF;
 	}
 
-	void Time::setMinutef(double minute, const TimeZone& zone) noexcept
+	Time& Time::setMinutef(double minute, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)((minute - getMinutef(zone))*TIME_MINUTEF);
+		return *this;
 	}
 
-	void Time::addMinutesf(double minutes) noexcept
+	Time& Time::addMinutesf(double minutes) noexcept
 	{
 		m_time += (sl_int64)(minutes*TIME_MINUTEF);
+		return *this;
 	}
 
 	sl_int32 Time::getSecond(const TimeZone& zone) const noexcept
@@ -490,14 +516,16 @@ namespace slib
 		return comps.second;
 	}
 
-	void Time::setSecond(sl_int32 second, const TimeZone& zone) noexcept
+	Time& Time::setSecond(sl_int32 second, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)(second - getSecond(zone))*TIME_SECOND;
+		return *this;
 	}
 
-	void Time::addSeconds(sl_int64 seconds) noexcept
+	Time& Time::addSeconds(sl_int64 seconds) noexcept
 	{
 		m_time += seconds*TIME_SECOND;
+		return *this;
 	}
 
 	double Time::getSecondf(const TimeZone& zone) const noexcept
@@ -507,14 +535,16 @@ namespace slib
 		return comps.second + (comps.milliseconds * TIME_MILLIS + comps.microseconds) / TIME_SECONDF;
 	}
 
-	void Time::setSecondf(double second, const TimeZone& zone) noexcept
+	Time& Time::setSecondf(double second, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)((second - getSecondf(zone))*TIME_SECONDF);
+		return *this;
 	}
 
-	void Time::addSecondsf(double seconds) noexcept
+	Time& Time::addSecondsf(double seconds) noexcept
 	{
 		m_time += (sl_int64)(seconds*TIME_SECONDF);
+		return *this;
 	}
 
 	sl_int32 Time::getMillisecond() const noexcept
@@ -526,14 +556,16 @@ namespace slib
 		return n / TIME_MILLIS;
 	}
 
-	void Time::setMillisecond(sl_int32 millis) noexcept
+	Time& Time::setMillisecond(sl_int32 millis) noexcept
 	{
 		m_time += (sl_int64)(millis - getMillisecond())*TIME_MILLIS;
+		return *this;
 	}
 
-	void Time::addMilliseconds(sl_int64 milis) noexcept
+	Time& Time::addMilliseconds(sl_int64 milis) noexcept
 	{
 		m_time += milis*TIME_MILLIS;
+		return *this;
 	}
 
 	double Time::getMillisecondf() const noexcept
@@ -545,14 +577,16 @@ namespace slib
 		return n / TIME_MILLISF;
 	}
 
-	void Time::setMillisecondf(double millis) noexcept
+	Time& Time::setMillisecondf(double millis) noexcept
 	{
 		m_time += (sl_int64)((millis - getMillisecondf())*TIME_MILLIS);
+		return *this;
 	}
 
-	void Time::addMillisecondsf(double milis) noexcept
+	Time& Time::addMillisecondsf(double milis) noexcept
 	{
 		m_time += (sl_int64)(milis*TIME_MILLISF);
+		return *this;
 	}
 
 	sl_int32 Time::getMicrosecond() const noexcept
@@ -564,14 +598,16 @@ namespace slib
 		return n;
 	}
 
-	void Time::setMicrosecond(sl_int32 micros) noexcept
+	Time& Time::setMicrosecond(sl_int32 micros) noexcept
 	{
 		m_time += (micros - getMicrosecond());
+		return *this;
 	}
 
-	void Time::addMicroseconds(sl_int64 micros) noexcept
+	Time& Time::addMicroseconds(sl_int64 micros) noexcept
 	{
 		m_time += micros;
+		return *this;
 	}
 
 	double Time::getMicrosecondf() const noexcept
@@ -579,14 +615,16 @@ namespace slib
 		return (double)(getMicrosecond());
 	}
 
-	void Time::setMicrosecondf(double micros) noexcept
+	Time& Time::setMicrosecondf(double micros) noexcept
 	{
 		setMicrosecond((sl_int32)micros);
+		return *this;
 	}
 
-	void Time::addMicrosecondsf(double micros) noexcept
+	Time& Time::addMicrosecondsf(double micros) noexcept
 	{
 		m_time += (sl_int64)micros;
+		return *this;
 	}
 
 	sl_int32 Time::getDayOfWeek(const TimeZone& zone) const noexcept
@@ -596,9 +634,10 @@ namespace slib
 		return comps.dayOfWeek;
 	}
 
-	void Time::setDayOfWeek(sl_int32 day, const TimeZone& zone) noexcept
+	Time& Time::setDayOfWeek(sl_int32 day, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)(day - getDayOfWeek(zone))*TIME_DAY;
+		return *this;
 	}
 
 	sl_int32 Time::getDayOfYear(const TimeZone& zone) const noexcept
@@ -606,9 +645,10 @@ namespace slib
 		return (sl_int32)((m_time - Time(getYear(zone), 1, 1, zone).m_time) / TIME_DAY) + 1;
 	}
 
-	void Time::setDayOfYear(sl_int32 day, const TimeZone& zone) noexcept
+	Time& Time::setDayOfYear(sl_int32 day, const TimeZone& zone) noexcept
 	{
 		m_time += (sl_int64)(day - getDayOfYear(zone))*TIME_DAY;
+		return *this;
 	}
 
 	sl_int64 Time::getDaysCount() const noexcept
@@ -616,9 +656,10 @@ namespace slib
 		return (m_time / TIME_DAY);
 	}
 
-	void Time::setDaysCount(sl_int64 days) noexcept
+	Time& Time::setDaysCount(sl_int64 days) noexcept
 	{
 		m_time = days*TIME_DAY + (m_time % TIME_DAY);
+		return *this;
 	}
 
 	double Time::getDaysCountf() const noexcept
@@ -626,9 +667,10 @@ namespace slib
 		return (m_time / TIME_DAYF);
 	}
 
-	void Time::setDaysCountf(double days) noexcept
+	Time& Time::setDaysCountf(double days) noexcept
 	{
 		m_time = (sl_int64)(days*TIME_DAYF);
+		return *this;
 	}
 
 	sl_int64 Time::getHoursCount() const noexcept
@@ -636,9 +678,10 @@ namespace slib
 		return (m_time / TIME_HOUR);
 	}
 
-	void Time::setHoursCount(sl_int64 hours) noexcept
+	Time& Time::setHoursCount(sl_int64 hours) noexcept
 	{
 		m_time = hours*TIME_HOUR + (m_time % TIME_HOUR);
+		return *this;
 	}
 
 	double Time::getHoursCountf() const noexcept
@@ -646,9 +689,10 @@ namespace slib
 		return (m_time / TIME_HOURF);
 	}
 
-	void Time::setHoursCountf(double hours) noexcept
+	Time& Time::setHoursCountf(double hours) noexcept
 	{
 		m_time = (sl_int64)(hours*TIME_HOURF);
+		return *this;
 	}
 
 	sl_int64 Time::getMinutesCount() const noexcept
@@ -656,9 +700,10 @@ namespace slib
 		return (m_time / TIME_MINUTE);
 	}
 
-	void Time::setMinutesCount(sl_int64 minutes) noexcept
+	Time& Time::setMinutesCount(sl_int64 minutes) noexcept
 	{
 		m_time = minutes*TIME_MINUTE + (m_time % TIME_MINUTE);
+		return *this;
 	}
 
 	double Time::getMinutesCountf() const noexcept
@@ -666,9 +711,10 @@ namespace slib
 		return (m_time / TIME_MINUTEF);
 	}
 
-	void Time::setMinutesCountf(double minutes) noexcept
+	Time& Time::setMinutesCountf(double minutes) noexcept
 	{
 		m_time = (sl_int64)(minutes*TIME_MINUTEF);
+		return *this;
 	}
 
 	sl_int64 Time::getSecondsCount() const noexcept
@@ -676,9 +722,10 @@ namespace slib
 		return (m_time / TIME_SECOND);
 	}
 
-	void Time::setSecondsCount(sl_int64 seconds) noexcept
+	Time& Time::setSecondsCount(sl_int64 seconds) noexcept
 	{
 		m_time = seconds*TIME_SECOND + (m_time % TIME_SECOND);
+		return *this;
 	}
 
 	double Time::getSecondsCountf() const noexcept
@@ -686,9 +733,10 @@ namespace slib
 		return (m_time / TIME_SECONDF);
 	}
 
-	void Time::setSecondsCountf(double seconds) noexcept
+	Time& Time::setSecondsCountf(double seconds) noexcept
 	{
 		m_time = (sl_int64)(seconds*TIME_SECONDF);
+		return *this;
 	}
 
 	sl_int64 Time::getMillisecondsCount() const noexcept
@@ -696,9 +744,10 @@ namespace slib
 		return (m_time / TIME_MILLIS);
 	}
 
-	void Time::setMillisecondsCount(sl_int64 millis) noexcept
+	Time& Time::setMillisecondsCount(sl_int64 millis) noexcept
 	{
 		m_time = millis*TIME_MILLIS + (m_time % TIME_MILLIS);
+		return *this;
 	}
 
 	double Time::getMillisecondsCountf() const noexcept
@@ -706,9 +755,10 @@ namespace slib
 		return (m_time / TIME_MILLISF);
 	}
 
-	void Time::setMillisecondsCountf(double millis) noexcept
+	Time& Time::setMillisecondsCountf(double millis) noexcept
 	{
 		m_time = (sl_int64)(millis*TIME_MILLISF);
+		return *this;
 	}
 
 	sl_int64 Time::getMicrosecondsCount() const noexcept
@@ -716,9 +766,10 @@ namespace slib
 		return m_time;
 	}
 
-	void Time::setMicrosecondsCount(sl_int64 micros) noexcept
+	Time& Time::setMicrosecondsCount(sl_int64 micros) noexcept
 	{
 		m_time = micros;
+		return *this;
 	}
 
 	double Time::getMicrosecondsCountf() const noexcept
@@ -726,9 +777,10 @@ namespace slib
 		return (double)m_time;
 	}
 
-	void Time::setMicrosecondsCountf(double micros) noexcept
+	Time& Time::setMicrosecondsCountf(double micros) noexcept
 	{
 		m_time = (sl_int64)(micros);
+		return *this;
 	}
 	
 	sl_int64 Time::getLocalTimeOffset() const noexcept
@@ -992,6 +1044,7 @@ namespace slib
 				}
 				return sl_null;
 		}
+		return sl_null;
 	}
 	
 	String Time::getMonthShort(const TimeZone& zone) const noexcept
