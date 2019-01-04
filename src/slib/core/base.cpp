@@ -657,7 +657,10 @@ namespace slib
 
 	sl_size Base::getStringLength(const sl_char8* sz, sl_reg count) noexcept
 	{
-		if (count == 0) {
+		if (!sz) {
+			return 0;
+		}
+		if (!count) {
 			return 0;
 		}
 		if (count < 0) {
@@ -668,7 +671,10 @@ namespace slib
 
 	sl_size Base::getStringLength2(const sl_char16* sz, sl_reg count) noexcept
 	{
-		if (count == 0) {
+		if (!sz) {
+			return 0;
+		}
+		if (!count) {
 			return 0;
 		}
 		if (count < 0) {
@@ -688,7 +694,10 @@ namespace slib
 
 	sl_size Base::getStringLength4(const sl_char32* sz, sl_reg count) noexcept
 	{
-		if (count == 0) {
+		if (!sz) {
+			return 0;
+		}
+		if (!count) {
 			return 0;
 		}
 		if (count < 0) {
