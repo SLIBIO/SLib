@@ -918,7 +918,7 @@ namespace slib
 			}
 			flagSetup = sl_true;
 		}
-		_g_priv_Locale_lastCurrent = Locale::getCurrent();
+		_g_priv_Locale_lastCurrent = _getCurrent();
 		_setupOnChangeCurrentLocale();
 		return callback;
 	}
@@ -932,7 +932,7 @@ namespace slib
 	
 	void Locale::dispatchChangeCurrentLocale()
 	{
-		Locale locale = Locale::getCurrent();
+		Locale locale = _getCurrent();
 		if (_g_priv_Locale_lastCurrent == locale) {
 			return;
 		}
