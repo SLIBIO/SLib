@@ -610,7 +610,7 @@ namespace slib
 
 	HttpServiceParam::HttpServiceParam()
 	{
-		port = 80;
+		port = 8080;
 		
 		maxThreadsCount = 32;
 		flagProcessByThreads = sl_true;
@@ -622,7 +622,10 @@ namespace slib
 		maxRequestBodySize = 0x2000000; // 32MB
 		
 		flagAllowCrossOrigin = sl_false;
-		flagAlwaysRespondAcceptRangesHeader = sl_true;
+		
+		flagUseCacheControl = sl_false;
+		flagCacheControlNoCache = sl_false;
+		cacheControlMaxAge = 600;
 		
 		flagLogDebug = sl_false;
 	}
@@ -631,6 +634,50 @@ namespace slib
 
 	HttpServiceParam::~HttpServiceParam()
 	{
+	}
+	
+	void HttpServiceParam::setJson(const Json& conf)
+	{
+		port = (sl_uint16)(conf["port"].getUint32(port));
+		{
+			String s = conf["root"].getString();
+			if (s.isNotNull()) {
+				webRootPath = s;
+				flagUseWebRoot = sl_true;
+			}
+		}
+		{
+			List<String> s;
+			conf["allowedFileExtensions"].get(s);
+			if (s.isNotNull()) {
+				allowedFileExtensions = s;
+			}
+		}
+		{
+			List<String> s;
+			conf["blockedFileExtensions"].get(s);
+			if (s.isNotNull()) {
+				blockedFileExtensions = s;
+			}
+		}
+		
+		Json cacheControl = conf["cache_control"];
+		if (cacheControl.isNotNull()) {
+			flagUseCacheControl = sl_true;
+			flagCacheControlNoCache = cacheControl["no_cache"].getBoolean(flagCacheControlNoCache);
+			cacheControlMaxAge = cacheControl["max_age"].getUint32(cacheControlMaxAge);
+		}
+	}
+	
+	sl_bool HttpServiceParam::parseJsonFile(const String& filePath)
+	{
+		Json json = Json::parseJsonFromTextFile(filePath);
+		if (json.isNotNull()) {
+			setJson(json);
+			return sl_true;
+		} else {
+			return sl_false;
+		}
 	}
 
 
@@ -764,6 +811,19 @@ namespace slib
 				break;
 			}
 		
+			sl_bool flagProcessAsResource = sl_true;
+			if ((m_param.flagUseWebRoot || m_param.flagUseAsset) && (m_param.allowedFileExtensions.isNotEmpty() || m_param.blockedFileExtensions.isNotEmpty())) {
+				String ext = File::getFileExtension(context->getPath()).trim();
+				if (m_param.blockedFileExtensions.isNotEmpty()) {
+					if (m_param.blockedFileExtensions.contains(ext)) {
+						flagProcessAsResource = sl_false;
+					}
+				} else if (m_param.allowedFileExtensions.isNotEmpty()) {
+					if (!(m_param.allowedFileExtensions.contains(ext))) {
+						flagProcessAsResource = sl_false;
+					}
+				}
+			}
 			if (m_param.flagUseWebRoot) {
 				if (context->getMethod() == HttpMethod::GET) {
 					String path = context->getPath();
@@ -843,6 +903,7 @@ namespace slib
 						}
 						context->setResponseContentType(contentType);
 					}
+					_processCacheControl(context);
 					context->write(mem);
 					return sl_true;
 				}
@@ -869,7 +930,17 @@ namespace slib
 			}
 
 			context->setResponseAcceptRanges(sl_true);
+			
+			_processCacheControl(context);
 
+			Time lastModifiedTime = File::getModifiedTime(path);
+			context->setResponseLastModified(lastModifiedTime);
+			Time ifModifiedSince = context->getRequestIfModifiedSince();
+			if (ifModifiedSince.isNotZero() && ifModifiedSince == lastModifiedTime) {
+				context->setResponseCode(HttpStatus::NotModified);
+				return sl_true;
+			}
+			
 			String rangeHeader = context->getRequestRange();
 			
 			if (rangeHeader.isNotEmpty()) {
@@ -904,9 +975,20 @@ namespace slib
 			}
 			
 		}
-		
 		return sl_false;
-		
+	}
+	
+	void HttpService::_processCacheControl(const Ref<HttpServiceContext>& context)
+	{
+		if (m_param.flagUseCacheControl) {
+			HttpCacheControlResponse cc;
+			if (m_param.flagCacheControlNoCache) {
+				cc.no_cache = sl_true;
+			} else {
+				cc.max_age = m_param.cacheControlMaxAge;
+			}
+			context->setResponseCacheControl(cc);
+		}
 	}
 
 	sl_bool HttpService::processRangeRequest(const Ref<HttpServiceContext>& context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength)
@@ -997,11 +1079,6 @@ namespace slib
 		}
 		m_param.onPostRequest(this, context, flagProcessed);
 		onPostRequest(context, flagProcessed);
-		if (m_param.flagAlwaysRespondAcceptRangesHeader) {
-			if (context->getMethod() == HttpMethod::GET) {
-				context->setResponseAcceptRangesIfNotDefined(sl_false);
-			}
-		}
 		if (m_param.flagAllowCrossOrigin) {
 			context->setResponseAccessControlAllowOrigin("*");
 			if (!flagProcessed && context->getMethod() == HttpMethod::OPTIONS) {

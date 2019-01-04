@@ -210,7 +210,13 @@ namespace slib
 		sl_uint64 maxRequestBodySize;
 		
 		sl_bool flagAllowCrossOrigin;
-		sl_bool flagAlwaysRespondAcceptRangesHeader;
+		
+		List<String> allowedFileExtensions;
+		List<String> blockedFileExtensions;
+		
+		sl_bool flagUseCacheControl;
+		sl_bool flagCacheControlNoCache;
+		sl_uint32 cacheControlMaxAge;
 		
 		sl_bool flagLogDebug;
 		
@@ -223,6 +229,11 @@ namespace slib
 		HttpServiceParam(const HttpServiceParam& other);
 		
 		~HttpServiceParam();
+		
+	public:
+		void setJson(const Json& json);
+		
+		sl_bool parseJsonFile(const String& filePath);
 		
 	};
 	
@@ -290,6 +301,8 @@ namespace slib
 		
 	protected:
 		sl_bool _init(const HttpServiceParam& param);
+		
+		void _processCacheControl(const Ref<HttpServiceContext>& context);
 		
 	protected:
 		AtomicRef<AsyncIoLoop> m_ioLoop;

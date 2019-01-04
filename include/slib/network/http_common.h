@@ -51,13 +51,16 @@
 #include "url.h"
 
 #include "../core/string.h"
+#include "../core/time.h"
 #include "../core/content_type.h"
 #include "../core/hash_map.h"
+#include "../core/nullable.h"
 
 namespace slib
 {
 	
 	typedef HashMap<String, String, HashIgnoreCaseString, CompareIgnoreCaseString> HttpHeaderMap;
+	typedef HashMap<String, String, HashIgnoreCaseString, CompareIgnoreCaseString> HttpHeaderValueMap;
 
 	enum class HttpStatus
 	{
@@ -153,24 +156,31 @@ namespace slib
 	class SLIB_EXPORT HttpHeaders
 	{
 	public:
+		// General Headers
+		static const String& Connection;
+		static const String& CacheControl;
+		
+		// Entity Headers
 		static const String& ContentLength;
 		static const String& ContentType;
+		static const String& ContentEncoding;
+
+		// Request Headers
 		static const String& Host;
 		static const String& AcceptEncoding;
-		static const String& TransferEncoding;
-		static const String& ContentEncoding;
-		static const String& Connection;
-
-		static const String& Range;
-		static const String& ContentRange;
-		static const String& AcceptRanges;
-		
 		static const String& Origin;
-		static const String& AccessControlAllowOrigin;
-		
-		static const String& SetCookie;
 		static const String& Cookie;
-
+		static const String& Range;
+		static const String& IfModifiedSince;
+		
+		// Response Headers
+		static const String& TransferEncoding;
+		static const String& AccessControlAllowOrigin;
+		static const String& SetCookie;
+		static const String& AcceptRanges;
+		static const String& ContentRange;
+		static const String& LastModified;
+		
 	public:
 		
 		/*
@@ -178,8 +188,75 @@ namespace slib
 		 <0: error
 		 =0: incomplete packet
 		 >0: size of the headers (ending with [CR][LF][CR][LF])
+		 No Thread Safe
 		 */
 		static sl_reg parseHeaders(HttpHeaderMap& outMap, const void* headers, sl_size size);
+		
+		// No Thread Safe
+		static void splitValue(const String& value, List<String>* values, HttpHeaderValueMap* map, HashMap<String, String>* mapCaseSensitive, sl_char8 delimiter=',');
+		
+		static List<String> splitValueToList(const String& value, sl_char8 delimiter=',');
+		
+		static HttpHeaderValueMap splitValueToMap(const String& value, sl_char8 delimiter=',');
+		
+		// value con't contain quots
+		static String makeSafeValue(const String& value, sl_char8 delimiter=',');
+
+		static String mergeValues(const List<String>& list, sl_char8 delimiter=',');
+
+		static String mergeValueMap(const HttpHeaderValueMap& map, sl_char8 delimiter=',');
+
+		static String mergeValueMapCaseSensitive(const HashMap<String, String>& map, sl_char8 delimiter=',');
+
+	};
+	
+	
+	struct SLIB_EXPORT HttpCacheControlRequest
+	{
+		Nullable<sl_int32> max_age;
+		Nullable<sl_int32> max_stale;
+		Nullable<sl_int32> min_fresh;
+		sl_bool no_cache = sl_false;
+		sl_bool no_store = sl_false;
+		sl_bool no_transform = sl_false;
+		sl_bool only_if_cached = sl_false;
+	};
+	
+	struct SLIB_EXPORT HttpCacheControlResponse
+	{
+		sl_bool must_revalidate = sl_false;
+		sl_bool no_cache = sl_false;
+		sl_bool no_store = sl_false;
+		sl_bool no_transform = sl_false;
+		sl_bool public_ = sl_false;
+		sl_bool private_ = sl_false;
+		sl_bool proxy_revalidate = sl_false;
+		Nullable<sl_int32> max_age;
+		Nullable<sl_int32> s_maxage;
+
+		sl_bool immutable = sl_false;
+		Nullable<sl_int32> stale_while_revalidate;
+		Nullable<sl_int32> stale_if_error;
+	};
+	
+	class SLIB_EXPORT HttpCookie
+	{
+	public:
+		String name;
+		String value;
+		
+		Time expires;
+		Nullable<sl_int32> max_age;
+		String domain;
+		String path;
+		sl_bool secure = sl_false;
+		sl_bool http_only = sl_false;
+		String same_site;
+		
+	public:
+		String toHeaderValue() const;
+		
+		void parseHeaderValue(const String& value);
 		
 	};
 	
@@ -208,7 +285,7 @@ namespace slib
 		
 		String getQuery() const;
 		
-		void setQuery(String query);
+		void setQuery(const String& query);
 		
 		String getRequestVersion() const;
 		
@@ -217,17 +294,27 @@ namespace slib
 		
 		const HttpHeaderMap& getRequestHeaders() const;
 		
-		String getRequestHeader(String name) const;
+		String getRequestHeader(const String& name) const;
 		
-		List<String> getRequestHeaderValues(String name) const;
+		void setRequestHeader(const String& name, const String& value);
 		
-		void setRequestHeader(String name, String value);
+		void addRequestHeader(const String& name, const String& value);
 		
-		void addRequestHeader(String name, String value);
+		sl_bool containsRequestHeader(const String& name) const;
 		
-		sl_bool containsRequestHeader(String name) const;
+		void removeRequestHeader(const String& name);
 		
-		void removeRequestHeader(String name);
+		List<String> getRequestHeaderValues(const String& name) const;
+		
+		void setRequestHeaderValues(const String& name, const List<String>& list);
+		
+		void addRequestHeaderValues(const String& name, const List<String>& list);
+		
+		HttpHeaderValueMap getRequestHeaderValueMap(const String& name) const;
+		
+		void setRequestHeaderValueMap(const String& name, const HttpHeaderValueMap& map);
+		
+		void addRequestHeaderValueMap(const String& name, const HttpHeaderValueMap& map);
 		
 		void clearRequestHeaders();
 		
@@ -276,6 +363,22 @@ namespace slib
 		
 		void setRequestOrigin(const String& origin);
 		
+		Time getRequestIfModifiedSince() const;
+		
+		void setRequestIfModifiedSince(const Time& time);
+		
+		HttpCacheControlRequest getRequestCacheControl() const;
+		
+		void setRequestCacheControl(const HttpCacheControlRequest&);
+		
+		HashMap<String, String> getRequestCookies() const;
+		
+		void setRequestCookies(const HashMap<String, String>&);
+		
+		String getRequestCookie(const String& cookie) const;
+		
+		void setRequestCookie(const String& name, const String& value);
+		
 		
 		const HashMap<String, String>& getParameters() const;
 		
@@ -287,19 +390,19 @@ namespace slib
 		
 		const HashMap<String, String>& getQueryParameters() const;
 		
-		String getQueryParameter(String name) const;
+		String getQueryParameter(const String& name) const;
 		
-		List<String> getQueryParameterValues(String name) const;
+		List<String> getQueryParameterValues(const String& name) const;
 		
-		sl_bool containsQueryParameter(String name) const;
+		sl_bool containsQueryParameter(const String& name) const;
 		
 		const HashMap<String, String>& getPostParameters() const;
 		
-		String getPostParameter(String name) const;
+		String getPostParameter(const String& name) const;
 		
-		List<String> getPostParameterValues(String name) const;
+		List<String> getPostParameterValues(const String& name) const;
 		
-		sl_bool containsPostParameter(String name) const;
+		sl_bool containsPostParameter(const String& name) const;
 		
 		void applyPostParameters(const void* data, sl_size size);
 		
@@ -356,7 +459,7 @@ namespace slib
 		
 		String getResponseMessage() const;
 		
-		void setResponseMessage(String message);
+		void setResponseMessage(const String& message);
 		
 		String getResponseVersion() const;
 		
@@ -365,17 +468,27 @@ namespace slib
 		
 		const HttpHeaderMap& getResponseHeaders() const;
 		
-		String getResponseHeader(String name) const;
+		String getResponseHeader(const String& name) const;
 		
-		List<String> getResponseHeaderValues(String name) const;
+		void setResponseHeader(const String& name, const String& value);
 		
-		void setResponseHeader(String name, String value);
+		void addResponseHeader(const String& name, const String& value);
 		
-		void addResponseHeader(String name, String value);
+		sl_bool containsResponseHeader(const String& name) const;
 		
-		sl_bool containsResponseHeader(String name) const;
+		void removeResponseHeader(const String& name);
 		
-		void removeResponseHeader(String name);
+		List<String> getResponseHeaderValues(const String& name) const;
+		
+		void setResponseHeaderValues(const String& name, const List<String>& list);
+		
+		void addResponseHeaderValues(const String& name, const List<String>& list);
+		
+		HttpHeaderValueMap getResponseHeaderValueMap(const String& name) const;
+		
+		void setResponseHeaderValueMap(const String& name, const HttpHeaderValueMap& map);
+		
+		void addResponseHeaderValueMap(const String& name, const HttpHeaderValueMap& map);
 		
 		void clearResponseHeaders();
 		
@@ -419,7 +532,31 @@ namespace slib
 		String getResponseAccessControlAllowOrigin() const;
 		
 		void setResponseAccessControlAllowOrigin(const String& origin);
-				
+		
+		Time getResponseLastModified() const;
+		
+		void setResponseLastModified(const Time& time);
+		
+		HttpCacheControlResponse getResponseCacheControl() const;
+		
+		void setResponseCacheControl(const HttpCacheControlResponse&);
+
+		List<HttpCookie> getResponseCookies() const;
+		
+		void setResponseCookies(const List<HttpCookie>&);
+		
+		HashMap<String, HttpCookie> getResponseCookieMap() const;
+		
+		void setResponseCookieMap(const HashMap<String, HttpCookie>&);
+		
+		sl_bool getResponseCookie(const String& name, HttpCookie* cookie);
+		
+		String getResponseCookie(const String& name);
+		
+		void setResponseCookie(const HttpCookie& cookie);
+		
+		void addResponseCookie(const HttpCookie& cookie);
+		
 		
 		Memory makeResponsePacket() const;
 		
