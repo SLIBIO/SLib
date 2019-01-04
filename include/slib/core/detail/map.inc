@@ -218,6 +218,41 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
+	SLIB_INLINE sl_bool CMap<KT, VT, KEY_COMPARE>::get_NoLock(const KT& key, Nullable<VT>* _out) const noexcept
+	{
+		NODE* node = RedBlackTree::find(m_root, key, m_compare);
+		if (node) {
+			if (_out) {
+				*_out = node->value;
+			}
+			return sl_true;
+		} else {
+			if (_out) {
+				_out->setNull();
+			}
+			return sl_false;
+		}
+	}
+	
+	template <class KT, class VT, class KEY_COMPARE>
+	sl_bool CMap<KT, VT, KEY_COMPARE>::get(const KT& key, Nullable<VT>* _out) const noexcept
+	{
+		ObjectLocker lock(this);
+		NODE* node = RedBlackTree::find(m_root, key, m_compare);
+		if (node) {
+			if (_out) {
+				*_out = node->value;
+			}
+			return sl_true;
+		} else {
+			if (_out) {
+				_out->setNull();
+			}
+			return sl_false;
+		}
+	}
+	
+	template <class KT, class VT, class KEY_COMPARE>
 	SLIB_INLINE VT CMap<KT, VT, KEY_COMPARE>::getValue_NoLock(const KT& key) const noexcept
 	{
 		NODE* node = RedBlackTree::find(m_root, key, m_compare);
@@ -1020,6 +1055,26 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
+	SLIB_INLINE sl_bool Map<KT, VT, KEY_COMPARE>::get_NoLock(const KT& key, Nullable<VT>* _out) const noexcept
+	{
+		CMAP* obj = ref._ptr;
+		if (obj) {
+			return obj->get_NoLock(key, _out);
+		}
+		return sl_false;
+	}
+	
+	template <class KT, class VT, class KEY_COMPARE>
+	SLIB_INLINE sl_bool Map<KT, VT, KEY_COMPARE>::get(const KT& key, Nullable<VT>* _out) const noexcept
+	{
+		CMAP* obj = ref._ptr;
+		if (obj) {
+			return obj->get(key, _out);
+		}
+		return sl_false;
+	}
+
+	template <class KT, class VT, class KEY_COMPARE>
 	SLIB_INLINE VT Map<KT, VT, KEY_COMPARE>::getValue_NoLock(const KT& key) const noexcept
 	{
 		CMAP* obj = ref._ptr;
@@ -1764,6 +1819,16 @@ namespace slib
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	sl_bool Atomic< Map<KT, VT, KEY_COMPARE> >::get(const KT& key, VT* _out) const noexcept
+	{
+		Ref<CMAP> obj(ref);
+		if (obj.isNotNull()) {
+			return obj->get(key, _out);
+		}
+		return sl_false;
+	}
+
+	template <class KT, class VT, class KEY_COMPARE>
+	sl_bool Atomic< Map<KT, VT, KEY_COMPARE> >::get(const KT& key, Nullable<VT>* _out) const noexcept
 	{
 		Ref<CMAP> obj(ref);
 		if (obj.isNotNull()) {

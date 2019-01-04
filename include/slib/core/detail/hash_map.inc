@@ -26,8 +26,7 @@ namespace slib
 	template <class KT, class VT>
 	template <class KEY, class... VALUE_ARGS>
 	SLIB_INLINE HashMapNode<KT, VT>::HashMapNode(KEY&& _key, VALUE_ARGS&&... value_args) noexcept
-     : key(Forward<KEY>(_key)), value(Forward<VALUE_ARGS>(value_args)...),
-       parent(sl_null), left(sl_null), right(sl_null), flagRed(sl_false)
+	 : key(Forward<KEY>(_key)), value(Forward<VALUE_ARGS>(value_args)...), parent(sl_null), left(sl_null), right(sl_null), flagRed(sl_false)
 	{}
 	
 	template <class KT, class VT>
@@ -173,10 +172,10 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
-	SLIB_INLINE sl_bool CHashMap<KT, VT, HASH, KEY_COMPARE>::getEqualRange(const KT& key, HashMapNode<KT, VT>** pStart, HashMapNode<KT, VT>** pEnd) const noexcept
+	SLIB_INLINE sl_bool CHashMap<KT, VT, HASH, KEY_COMPARE>::getEqualRange(const KT& key, MapNode<KT, VT>** pStart, MapNode<KT, VT>** pEnd) const noexcept
 	{
 		NODE* entry = _getEntry(key);
-		return RedBlackTree::getEqualRange(entry, key, m_compare, pStart, pEnd);
+		return RedBlackTree::getEqualRange(entry, key, m_compare, (NODE**)pStart, (NODE**)pEnd);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
@@ -246,6 +245,43 @@ namespace slib
 			return sl_true;
 		}
 		return sl_false;
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	SLIB_INLINE sl_bool CHashMap<KT, VT, HASH, KEY_COMPARE>::get_NoLock(const KT& key, Nullable<VT>* _out) const noexcept
+	{
+		NODE* entry = _getEntry(key);
+		NODE* node = RedBlackTree::find(entry, key, m_compare);
+		if (node) {
+			if (_out) {
+				*_out = node->value;
+			}
+			return sl_true;
+		} else {
+			if (_out) {
+				_out->setNull();
+			}
+			return sl_false;
+		}
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	sl_bool CHashMap<KT, VT, HASH, KEY_COMPARE>::get(const KT& key, Nullable<VT>* _out) const noexcept
+	{
+		ObjectLocker lock(this);
+		NODE* entry = _getEntry(key);
+		NODE* node = RedBlackTree::find(entry, key, m_compare);
+		if (node) {
+			if (_out) {
+				*_out = node->value;
+			}
+			return sl_true;
+		} else {
+			if (_out) {
+				_out->setNull();
+			}
+			return sl_false;
+		}
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
@@ -1349,7 +1385,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
-	SLIB_INLINE sl_bool HashMap<KT, VT, HASH, KEY_COMPARE>::getEqualRange(const KT& key, HashMapNode<KT, VT>** pStart, HashMapNode<KT, VT>** pEnd) const noexcept
+	SLIB_INLINE sl_bool HashMap<KT, VT, HASH, KEY_COMPARE>::getEqualRange(const KT& key, MapNode<KT, VT>** pStart, MapNode<KT, VT>** pEnd) const noexcept
 	{
 		CMAP* obj = ref._ptr;
 		if (obj) {
@@ -1421,6 +1457,26 @@ namespace slib
 		return sl_false;
 	}
 	
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	SLIB_INLINE sl_bool HashMap<KT, VT, HASH, KEY_COMPARE>::get_NoLock(const KT& key, Nullable<VT>* _out) const noexcept
+	{
+		CMAP* obj = ref._ptr;
+		if (obj) {
+			return obj->get_NoLock(key, _out);
+		}
+		return sl_false;
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	SLIB_INLINE sl_bool HashMap<KT, VT, HASH, KEY_COMPARE>::get(const KT& key, Nullable<VT>* _out) const noexcept
+	{
+		CMAP* obj = ref._ptr;
+		if (obj) {
+			return obj->get(key, _out);
+		}
+		return sl_false;
+	}
+
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	SLIB_INLINE VT HashMap<KT, VT, HASH, KEY_COMPARE>::getValue_NoLock(const KT& key) const noexcept
 	{
@@ -2238,6 +2294,16 @@ namespace slib
 		return sl_false;
 	}
 	
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	sl_bool Atomic< HashMap<KT, VT, HASH, KEY_COMPARE> >::get(const KT& key, Nullable<VT>* _out) const noexcept
+	{
+		Ref<CMAP> obj(ref);
+		if (obj.isNotNull()) {
+			return obj->get(key, _out);
+		}
+		return sl_false;
+	}
+
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	VT Atomic< HashMap<KT, VT, HASH, KEY_COMPARE> >::getValue(const KT& key) const noexcept
 	{

@@ -27,6 +27,7 @@
 #include "ref.h"
 #include "time.h"
 #include "string.h"
+#include "nullable.h"
 #include "list.h"
 #include "map.h"
 #include "hash_map.h"
@@ -133,6 +134,9 @@ namespace slib
 		Variant(const void* ptr) noexcept;
 
 		template <class T>
+		Variant(const Nullable<T>& value) noexcept;
+
+		template <class T>
 		Variant(const Ref<T>& ref) noexcept;
 
 		template <class T>
@@ -208,6 +212,9 @@ namespace slib
 		static Variant fromTime(const Time& value) noexcept;
 
 		static Variant fromPointer(const void* value) noexcept;
+
+		template <class T>
+		static Variant fromNullable(const Nullable<T>& value) noexcept;
 
 		template <class T>
 		static Variant fromRef(const Ref<T>& ref) noexcept;
@@ -549,6 +556,11 @@ namespace slib
 		void set(const void* _in) noexcept;
 		
 		template <class T>
+		void get(Nullable<T>& _out) const noexcept;
+		template <class T>
+		void set(const Nullable<T>& _in) noexcept;
+		
+		template <class T>
 		void get(Ref<T>& _out) const noexcept;
 		template <class T>
 		void set(const Ref<T>& _in) noexcept;
@@ -700,6 +712,9 @@ namespace slib
 
 		Atomic(const void* ptr) noexcept;
 	
+		template <class T>
+		Atomic(const Nullable<T>& value) noexcept;
+
 		template <class T>
 		Atomic(const Ref<T>& ref) noexcept;
 
@@ -1061,6 +1076,11 @@ namespace slib
 		void get(void const*& _out) const noexcept;
 		void get(void const*& _out, const void* def) const noexcept;
 		void set(const void* ptr) noexcept;
+		
+		template <class T>
+		void get(Nullable<T>& _out) const noexcept;
+		template <class T>
+		void set(const Nullable<T>& value) noexcept;
 		
 		template <class T>
 		void get(Ref<T>& _out) const noexcept;

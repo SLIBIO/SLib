@@ -90,6 +90,17 @@ namespace slib
 
 
 	template <class T>
+	SLIB_INLINE Variant::Variant(const Nullable<T>& value) noexcept
+	{
+		if (value.isNotNull()) {
+			new (this) Variant(value.value);
+		} else {
+			_type = VariantType::Null;
+			_value = 0;
+		}
+	}
+	
+	template <class T>
 	SLIB_INLINE Variant::Variant(const Ref<T>& ref) noexcept
 	{
 		_constructorRef(&ref);
@@ -116,6 +127,12 @@ namespace slib
 	SLIB_INLINE const Variant& Variant::null() noexcept
 	{
 		return *(reinterpret_cast<Variant const*>(&_priv_Variant_Null));
+	}
+	
+	template <class T>
+	SLIB_INLINE Variant Variant::fromNullable(const Nullable<T>& value) noexcept
+	{
+		return value;
 	}
 	
 	template <class T>
@@ -173,6 +190,27 @@ namespace slib
 	}
 	
 	template <class T>
+	SLIB_INLINE void Variant::get(Nullable<T>& _out) const noexcept
+	{
+		if (isNull()) {
+			_out->setNull();
+		} else {
+			_out.flagNull = sl_false;
+			get(_out.value);
+		}
+	}
+	
+	template <class T>
+	SLIB_INLINE void Variant::set(const Nullable<T>& _in) noexcept
+	{
+		if (_in.isNull()) {
+			setNull();
+		} else {
+			set(_in.value);
+		}
+	}
+	
+	template <class T>
 	SLIB_INLINE void Variant::get(Ref<T>& _out) const noexcept
 	{
 		_out = CastRef<T>(getObject());
@@ -220,6 +258,17 @@ namespace slib
 		_assignAtomicWeakRef(&_in);
 	}
 
+	
+	template <class T>
+	SLIB_INLINE Atomic<Variant>::Atomic(const Nullable<T>& value) noexcept
+	{
+		if (value.isNotNull()) {
+			new (this) Atomic<Variant>(value.value);
+		} else {
+			_type = VariantType::Null;
+			_value = 0;
+		}
+	}
 	
 	template <class T>
 	SLIB_INLINE Atomic<Variant>::Atomic(const Ref<T>& ref) noexcept
@@ -289,6 +338,27 @@ namespace slib
 	SLIB_INLINE void Atomic<Variant>::setWeak(const WeakRef<T>& weak) noexcept
 	{
 		_assignWeakRef(&weak);
+	}
+	
+	template <class T>
+	SLIB_INLINE void Atomic<Variant>::get(Nullable<T>& _out) const noexcept
+	{
+		if (isNull()) {
+			_out.setNull();
+		} else {
+			_out.flagNull = sl_false;
+			get(_out.value);
+		}
+	}
+	
+	template <class T>
+	SLIB_INLINE void Atomic<Variant>::set(const Nullable<T>& _in) noexcept
+	{
+		if (_in.isNull()) {
+			setNull();
+		} else {
+			set(_in.value);
+		}
 	}
 	
 	template <class T>

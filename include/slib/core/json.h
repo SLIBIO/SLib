@@ -143,6 +143,9 @@ namespace slib
 		Json(const Time& value);
 		
 		template <class T>
+		Json(const Nullable<T>& value);
+		
+		template <class T>
 		Json(const Ref<T>& ref);
 		
 		template <class T>
@@ -404,6 +407,11 @@ namespace slib
 		void get(Time& _out) const;
 		void get(Time& _out, const Time& def) const;
 		void set(const Time& _in);
+		
+		template <class T>
+		void get(Nullable<T>& _out) const;
+		template <class T>
+		void set(const Nullable<T>& ref);
 		
 		template <class T>
 		void get(Ref<T>& _out) const;

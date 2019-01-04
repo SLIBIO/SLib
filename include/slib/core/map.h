@@ -30,6 +30,7 @@
 #include "node_position.h"
 #include "pair.h"
 #include "red_black_tree.h"
+#include "nullable.h"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 #include <initializer_list>
@@ -156,6 +157,10 @@ namespace slib
 		sl_bool get_NoLock(const KT& key, VT* _out = sl_null) const noexcept;
 		
 		sl_bool get(const KT& key, VT* _out = sl_null) const noexcept;
+		
+		sl_bool get_NoLock(const KT& key, Nullable<VT>* _out) const noexcept;
+		
+		sl_bool get(const KT& key, Nullable<VT>* _out) const noexcept;
 		
 		VT getValue_NoLock(const KT& key) const noexcept;
 		
@@ -389,6 +394,10 @@ namespace slib
 		
 		sl_bool get(const KT& key, VT* _out = sl_null) const noexcept;
 		
+		sl_bool get_NoLock(const KT& key, Nullable<VT>* _out) const noexcept;
+		
+		sl_bool get(const KT& key, Nullable<VT>* _out) const noexcept;
+		
 		VT getValue_NoLock(const KT& key) const noexcept;
 		
 		VT getValue(const KT& key) const noexcept;
@@ -580,6 +589,8 @@ namespace slib
 		
 		sl_bool get(const KT& key, VT* _out = sl_null) const noexcept;
 		
+		sl_bool get(const KT& key, Nullable<VT>* _out) const noexcept;
+
 		VT getValue(const KT& key) const noexcept;
 		
 		VT getValue(const KT& key, const VT& def) const noexcept;

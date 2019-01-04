@@ -25,18 +25,11 @@
 
 #include "definition.h"
 
-#include "object.h"
-#include "map_common.h"
-#include "node_position.h"
-#include "pair.h"
-#include "red_black_tree.h"
+#include "map.h"
+
 #include "hash.h"
 #include "hash_table.h"
 #include "math.h"
-
-#ifdef SLIB_SUPPORT_STD_TYPES
-#include <initializer_list>
-#endif
 
 namespace slib
 {
@@ -161,7 +154,7 @@ namespace slib
 		sl_bool find(const KT& key) const noexcept;
 		
 		/* unsynchronized function */
-		sl_bool getEqualRange(const KT& key, NODE** pStart = sl_null, NODE** pEnd = sl_null) const noexcept;
+		sl_bool getEqualRange(const KT& key, MapNode<KT, VT>** pStart = sl_null, MapNode<KT, VT>** pEnd = sl_null) const noexcept;
 		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		NODE* findKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
@@ -179,6 +172,10 @@ namespace slib
 		sl_bool get_NoLock(const KT& key, VT* _out = sl_null) const noexcept;
 		
 		sl_bool get(const KT& key, VT* _out = sl_null) const noexcept;
+		
+		sl_bool get_NoLock(const KT& key, Nullable<VT>* _out) const noexcept;
+		
+		sl_bool get(const KT& key, Nullable<VT>* _out) const noexcept;
 		
 		VT getValue_NoLock(const KT& key) const noexcept;
 		
@@ -417,7 +414,7 @@ namespace slib
 		sl_bool find(const KT& key) const noexcept;
 		
 		/* unsynchronized function */
-		sl_bool getEqualRange(const KT& key, NODE** pStart = sl_null, NODE** pEnd = sl_null) const noexcept;
+		sl_bool getEqualRange(const KT& key, MapNode<KT, VT>** pStart = sl_null, MapNode<KT, VT>** pEnd = sl_null) const noexcept;
 		
 		template < class VALUE, class VALUE_EQUALS = Equals<VT, VALUE> >
 		NODE* findKeyAndValue_NoLock(const KT& key, const VALUE& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const noexcept;
@@ -435,6 +432,10 @@ namespace slib
 		sl_bool get_NoLock(const KT& key, VT* _out = sl_null) const noexcept;
 		
 		sl_bool get(const KT& key, VT* _out = sl_null) const noexcept;
+		
+		sl_bool get_NoLock(const KT& key, Nullable<VT>* _out) const noexcept;
+		
+		sl_bool get(const KT& key, Nullable<VT>* _out) const noexcept;
 		
 		VT getValue_NoLock(const KT& key) const noexcept;
 		
@@ -641,6 +642,8 @@ namespace slib
 		
 		sl_bool get(const KT& key, VT* _out = sl_null) const noexcept;
 		
+		sl_bool get(const KT& key, Nullable<VT>* _out) const noexcept;
+
 		VT getValue(const KT& key) const noexcept;
 		
 		VT getValue(const KT& key, const VT& def) const noexcept;

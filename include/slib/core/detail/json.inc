@@ -24,6 +24,9 @@ namespace slib
 {
 	
 	template <class T>
+	SLIB_INLINE Json::Json(const Nullable<T>& value) : Variant(value) {}
+	
+	template <class T>
 	SLIB_INLINE Json::Json(const Ref<T>& ref)
 	{
 		set(ref);
@@ -113,6 +116,27 @@ namespace slib
 		getItem(key).get(_out);
 	}
 
+	template <class T>
+	void Json::get(Nullable<T>& _out) const
+	{
+		if (isNull()) {
+			_out.setNull();
+		} else {
+			_out.flagNull = sl_false;
+			get(_out.value);
+		}
+	}
+	
+	template <class T>
+	SLIB_INLINE void Json::set(const Nullable<T>& _in)
+	{
+		if (_in.isNull()) {
+			setNull();
+		} else {
+			set(_in.value);
+		}
+	}
+	
 	template <class T>
 	void Json::get(Ref<T>& _out) const
 	{
