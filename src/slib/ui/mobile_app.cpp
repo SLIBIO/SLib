@@ -246,7 +246,9 @@ namespace slib
 	
 	void MobileApp::onChangeCurrentLocale()
 	{
-		openStartupPage();
+		if (m_pager->getPagesCount() > 0) {
+			openStartupPage();
+		}
 	}
 	
 	void MobileApp::dispatchStart()
