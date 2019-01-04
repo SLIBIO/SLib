@@ -26,25 +26,18 @@ using namespace slib;
 
 int main(int argc, const char * argv[])
 {
-	// Find configuration file
-	Json conf = Json::parseJsonFromTextFile(Application::getApplicationDirectory() + "/slib_http.conf");
-	if (conf.isNull()) {
-		conf = Json::parseJsonFromTextFile(Application::getApplicationDirectory() + "/../slib_http.conf");
-	}
-	if (conf.isNull()) {
-		conf = Json::parseJsonFromTextFile(Application::getApplicationDirectory() + "/../../slib_http.conf");
-	}
-	if (conf.isNull()) {
-		conf = Json::parseJsonFromTextFile("/etc/slib_http.conf");
-	}
-
 	// Set configuration
 	HttpServiceParam param;
-	param.flagUseWebRoot = sl_true;
-	param.port = (sl_uint16)(conf["port"].getUint32(8080));
-	param.flagLogDebug = conf["debug"].getBoolean(sl_false);
-	param.webRootPath = conf["root"].getString();
-
+	do {
+		if (param.parseJsonFile(Application::getApplicationDirectory() + "/../slib_http.conf")) {
+			break;
+		}
+		if (param.parseJsonFile(Application::getApplicationDirectory() + "/../../slib_http.conf")) {
+			break;
+		}
+		param.parseJsonFile("/etc/slib_http.conf");
+	} while (0);
+	
 	param.onRequest = [](HttpService*, HttpServiceContext* context) {
 		if (context->getPath() != "/") {
 			return sl_false;
@@ -54,10 +47,20 @@ int main(int argc, const char * argv[])
 		for (auto& pair : context->getRequestHeaders()) {
 			Console::println("%s: %s", pair.key, pair.value);
 		}
+		Console::println("Cookies: %s", Json(context->getRequestCookies()));
 		Console::println("Body:");
 		Console::println("%s", String::fromMemory(context->getRequestBody()));
 		Console::println("");
 		
+		HttpCookie cookie;
+		cookie.name = "Cookie1";
+		cookie.value = Time::now().toHttpDate();
+		context->addResponseCookie(cookie);
+		cookie.expires = Time::now().addSeconds(10);
+		cookie.name = "Cookie2";
+		cookie.value = "This Cookie will be expired after 10 seconds";
+		context->addResponseCookie(cookie);
+
 		Json data = {
 			JsonItem("remote", context->getRemoteAddress().toString()),
 			JsonItem("http", Json({
@@ -66,9 +69,18 @@ int main(int argc, const char * argv[])
 				JsonItem("list", Json({
 					"item0", "item1"
 				}))
-			}))
+			})),
+			JsonItem("cookie1", context->getRequestCookie("Cookie1")),
+			JsonItem("cookie2", context->getRequestCookie("Cookie2"))
 		};
-		context->write(Ginger::render("Welcome ${remote}. Method:${http.method}  Path:${http.path}<BR> $for x in http.list {{ ${x} }}", data));
+		context->write(Ginger::render(SLIB_STRINGIFY(
+			Welcome ${remote} <BR>
+			Method: ${http.method} <BR>
+			Path: ${http.path} <BR>
+			Cookie1: ${cookie1} <BR>
+			Cookie2: ${cookie2} <BR>
+			$for x in http.list {{ ${x} }}
+		), data));
 		return sl_true;
 	};
 	
