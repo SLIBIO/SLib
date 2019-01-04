@@ -57,6 +57,8 @@
 #include "core/variant.h"
 
 #include "core/cast.h"
+#include "core/nullable.h"
+#include "core/null_value.h"
 #include "core/compare.h"
 #include "core/hash.h"
 #include "core/search.h"
