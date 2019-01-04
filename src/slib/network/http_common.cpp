@@ -25,6 +25,8 @@
 #include "slib/network/url.h"
 #include "slib/core/safe_static.h"
 #include "slib/core/variant.h"
+#include "slib/core/file.h"
+#include "slib/core/scoped.h"
 
 namespace slib
 {
@@ -129,14 +131,14 @@ namespace slib
 		
 		_priv_HttpMethod_Mapping()
 		{
-			maps.put(_g_priv_http_method_GET, HttpMethod::GET);
-			maps.put(_g_priv_http_method_HEAD, HttpMethod::HEAD);
-			maps.put(_g_priv_http_method_POST, HttpMethod::POST);
-			maps.put(_g_priv_http_method_PUT, HttpMethod::PUT);
-			maps.put(_g_priv_http_method_DELETE, HttpMethod::DELETE);
-			maps.put(_g_priv_http_method_CONNECT, HttpMethod::CONNECT);
-			maps.put(_g_priv_http_method_OPTIONS, HttpMethod::OPTIONS);
-			maps.put(_g_priv_http_method_TRACE, HttpMethod::TRACE);
+			maps.put_NoLock(_g_priv_http_method_GET, HttpMethod::GET);
+			maps.put_NoLock(_g_priv_http_method_HEAD, HttpMethod::HEAD);
+			maps.put_NoLock(_g_priv_http_method_POST, HttpMethod::POST);
+			maps.put_NoLock(_g_priv_http_method_PUT, HttpMethod::PUT);
+			maps.put_NoLock(_g_priv_http_method_DELETE, HttpMethod::DELETE);
+			maps.put_NoLock(_g_priv_http_method_CONNECT, HttpMethod::CONNECT);
+			maps.put_NoLock(_g_priv_http_method_OPTIONS, HttpMethod::OPTIONS);
+			maps.put_NoLock(_g_priv_http_method_TRACE, HttpMethod::TRACE);
 		}
 	};
 
@@ -156,6 +158,7 @@ namespace slib
 
 	DEFINE_HTTP_HEADER(Connection, "Connection")
 	DEFINE_HTTP_HEADER(CacheControl, "Cache-Control")
+	DEFINE_HTTP_HEADER(ContentDisposition, "Content-Disposition")
 
 	DEFINE_HTTP_HEADER(ContentLength, "Content-Length")
 	DEFINE_HTTP_HEADER(ContentType, "Content-Type")
@@ -200,7 +203,7 @@ namespace slib
 				return 0;
 			}
 			if (data[posCurrent + 1] != '\n') {
-				return -1;
+				return SLIB_PARSE_ERROR;
 			}
 
 			if (posCurrent == posStart) {
@@ -540,6 +543,52 @@ namespace slib
 		same_site = map.getValue_NoLock(_g_priv_http_set_cookie_same_site);
 	}
 	
+	
+	HttpUploadFile::HttpUploadFile(const String& fileName, const HttpHeaderMap& headers, void* data, sl_size size, const Ref<Referable>& ref)
+	 : m_fileName(fileName), m_headers(headers), m_data(data), m_size(size), m_ref(ref)
+	{
+	}
+	
+	HttpUploadFile::~HttpUploadFile()
+	{
+	}
+	
+	String HttpUploadFile::getFileName()
+	{
+		return m_fileName;
+	}
+	
+	const HttpHeaderMap& HttpUploadFile::getHeaders()
+	{
+		return m_headers;
+	}
+	
+	String HttpUploadFile::getHeader(const String& name)
+	{
+		return m_headers.getValue_NoLock(name);
+	}
+	
+	String HttpUploadFile::getContentType()
+	{
+		return getHeader(HttpHeaders::ContentType);
+	}
+	
+	void* HttpUploadFile::getData()
+	{
+		return m_data;
+	}
+	
+	sl_size HttpUploadFile::getSize()
+	{
+		return m_size;
+	}
+	
+	sl_bool HttpUploadFile::saveToFile(const String& path)
+	{
+		return File::writeAllBytes(path, m_data, m_size);
+	}
+	
+	
 /***********************************************************************
 							HttpRequest
 ***********************************************************************/
@@ -750,6 +799,22 @@ namespace slib
 		setRequestHeader(HttpHeaders::ContentType, ContentTypes::toString(type));
 	}
 
+	sl_bool HttpRequest::isRequestMultipartFormData() const
+	{
+		return getRequestContentTypeNoParams().trim().equalsIgnoreCase(ContentTypes::MultipartFormData);
+	}
+	
+	String HttpRequest::getRequestMultipartFormDataBoundary() const
+	{
+		String value = getRequestContentType();
+		HttpHeaderValueMap map = HttpHeaders::splitValueToMap(value, ';');
+		if (map.find_NoLock(ContentTypes::MultipartFormData)) {
+			SLIB_STATIC_STRING(t, "boundary")
+			return map.getValue_NoLock(t);
+		}
+		return sl_null;
+	}
+	
 	String HttpRequest::getRequestContentEncoding() const
 	{
 		return getRequestHeader(HttpHeaders::ContentEncoding);
@@ -1028,8 +1093,8 @@ namespace slib
 	void HttpRequest::applyPostParameters(const void* data, sl_size size)
 	{
 		HashMap<String, String> params = parseParameters(data, size);
-		m_postParameters.putAll_NoLock(params);
-		m_parameters.putAll_NoLock(params);
+		m_postParameters.addAll_NoLock(params);
+		m_parameters.addAll_NoLock(params);
 	}
 
 	void HttpRequest::applyPostParameters(const String& str)
@@ -1040,8 +1105,8 @@ namespace slib
 	void HttpRequest::applyQueryToParameters()
 	{
 		HashMap<String, String> params = parseParameters(m_query);
-		m_queryParameters.putAll_NoLock(params);
-		m_parameters.putAll_NoLock(params);
+		m_queryParameters.addAll_NoLock(params);
+		m_parameters.addAll_NoLock(params);
 	}
 
 	HashMap<String, String> HttpRequest::parseParameters(const String& str)
@@ -1051,6 +1116,12 @@ namespace slib
 
 	HashMap<String, String> HttpRequest::parseParameters(const void* data, sl_size len)
 	{
+		if (!data) {
+			return sl_null;
+		}
+		if (!len) {
+			return sl_null;
+		}
 		HashMap<String, String> ret;
 		sl_char8* buf = (sl_char8*)data;
 		sl_size start = 0;
@@ -1071,10 +1142,10 @@ namespace slib
 					indexSplit++;
 					String value = String::fromUtf8(buf + indexSplit, pos - indexSplit);
 					value = Url::decodeUriComponentByUTF8(value);
-					ret.put_NoLock(name, value);
+					ret.add_NoLock(name, value);
 				} else {
 					String name = String::fromUtf8(buf + start, pos - start);
-					ret.put_NoLock(name, String::null());
+					ret.add_NoLock(name, String::null());
 				}
 				start = pos + 1;
 				indexSplit = start;
@@ -1082,7 +1153,94 @@ namespace slib
 		}
 		return ret;
 	}
+	
+	const HashMap< String, Ref<HttpUploadFile> >& HttpRequest::getUploadFiles() const
+	{
+		return m_uploadFiles;
+	}
+	
+	Ref<HttpUploadFile> HttpRequest::getUploadFile(const String& name) const
+	{
+		return m_uploadFiles.getValue_NoLock(name);
+	}
+	
+	List< Ref<HttpUploadFile> > HttpRequest::getUploadFiles(const String& name) const
+	{
+		return m_uploadFiles.getValues_NoLock(name);
+	}
+	
+	sl_bool HttpRequest::containsUploadFile(const String& name) const
+	{
+		return m_uploadFiles.find_NoLock(name);
+	}
 
+	void HttpRequest::applyMultipartFormData(const String& _boundary, const Memory& body)
+	{
+		SLIB_STATIC_STRING(s1, "name")
+		SLIB_STATIC_STRING(s2, "filename")
+		sl_char8* data = (sl_char8*)(body.getData());
+		sl_size size = body.getSize();
+		sl_size sizeBoundary = 2 + _boundary.getLength();
+		SLIB_SCOPED_BUFFER(sl_char8, 512, boundary, sizeBoundary)
+		boundary[0] = '-';
+		boundary[1] = '-';
+		Base::copyMemory(boundary + 2, _boundary.getData(), sizeBoundary - 2);
+		if (sizeBoundary + 2 > size) {
+			return;
+		}
+		if (!(Base::equalsMemory(data, boundary, sizeBoundary))) {
+			return;
+		}
+		if (data[sizeBoundary] != '\r' || data[sizeBoundary + 1] != '\n') {
+			return;
+		}
+		sl_size i = sizeBoundary + 2;
+		for (;;) {
+			HttpHeaderMap map;
+			sl_reg lenHeader = HttpHeaders::parseHeaders(map, data + i, size - i);
+			if (lenHeader <= 0) {
+				return;
+			}
+			i += lenHeader;
+			if (i > size) {
+				return;
+			}
+			sl_size posStart = i;
+			sl_size posEnd = size;
+			for (; i + 2 + sizeBoundary <= size;) {
+				if (data[i] == '\r' && data[i + 1] == '\n' && Base::equalsMemory(data + i + 2, boundary, sizeBoundary)) {
+					posEnd = i;
+					break;
+				} else {
+					i++;
+				}
+			}
+			String header = map.getValue_NoLock(HttpHeaders::ContentDisposition);
+			HttpHeaderMap fields = HttpHeaders::splitValueToMap(header, ';');
+			String name = fields.getValue_NoLock(s1);
+			String fileName = fields.getValue_NoLock(s2);
+			if (fileName.isNull()) {
+				String value(data + posStart, posEnd - posStart);
+				m_postParameters.add_NoLock(name, value);
+				m_parameters.add_NoLock(name, value);
+			} else {
+				Ref<HttpUploadFile> file = new HttpUploadFile(fileName, map, data + posStart, posEnd - posStart, body.ref);
+				m_uploadFiles.add_NoLock(name, file);
+			}
+			if (i + 2 + sizeBoundary >= size) {
+				return;
+			}
+			i += 2 + sizeBoundary;
+			if (i + 2 >= size) {
+				return;
+			}
+			if (data[i] != '\r' || data[i + 1] != '\n') {
+				return;
+			}
+			i += 2;
+		}
+	}
+	
 	Memory HttpRequest::makeRequestPacket() const
 	{
 		MemoryBuffer msg;
@@ -1386,6 +1544,47 @@ namespace slib
 		setResponseHeader(HttpHeaders::TransferEncoding, type);
 	}
 
+	sl_bool HttpResponse::isChunkedResponse() const
+	{
+		String te = getResponseTransferEncoding();
+		if (te.endsWith("chunked")) {
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
+	sl_bool HttpResponse::isAttachmentResponse() const
+	{
+		String value = getResponseHeader(HttpHeaders::ContentDisposition);
+		if (value.startsWith("attachment")) {
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
+	String HttpResponse::getResponseAttachmentFileName() const
+	{
+		HttpHeaderValueMap map = getResponseHeaderValueMap(HttpHeaders::ContentDisposition);
+		SLIB_STATIC_STRING(s, "filename")
+		return map.getValue_NoLock(s);
+	}
+	
+	void HttpResponse::setResponseInline()
+	{
+		SLIB_STATIC_STRING(s, "inline")
+		setResponseHeader(HttpHeaders::ContentDisposition, s);
+	}
+	
+	void HttpResponse::setResponseAttachment(const String& fileName)
+	{
+		if (fileName.isEmpty()) {
+			SLIB_STATIC_STRING(s, "attachment")
+			setResponseHeader(HttpHeaders::ContentDisposition, s);
+		} else {
+			setResponseHeader(HttpHeaders::ContentDisposition, String::format("attachment; filename=\"%s\"", fileName));
+		}
+	}
+	
 	String HttpResponse::getResponseContentRange() const
 	{
 		return getResponseHeader(HttpHeaders::ContentRange);
@@ -1621,15 +1820,6 @@ namespace slib
 		m_responseHeaders.add_NoLock(HttpHeaders::SetCookie, cookie.toHeaderValue());
 	}
 	
-	sl_bool HttpResponse::isChunkedResponse() const
-	{
-		String te = getResponseTransferEncoding();
-		if (te.endsWith("chunked")) {
-			return sl_true;
-		}
-		return sl_false;
-	}
-
 	Memory HttpResponse::makeResponsePacket() const
 	{
 		MemoryBuffer msg;

@@ -159,6 +159,7 @@ namespace slib
 		// General Headers
 		static const String& Connection;
 		static const String& CacheControl;
+		static const String& ContentDisposition;
 		
 		// Entity Headers
 		static const String& ContentLength;
@@ -260,6 +261,37 @@ namespace slib
 		
 	};
 	
+	class SLIB_EXPORT HttpUploadFile : public Referable
+	{
+	public:
+		HttpUploadFile(const String& fileName, const HttpHeaderMap& headers, void* data, sl_size size, const Ref<Referable>& ref);
+		
+		~HttpUploadFile();
+		
+	public:
+		String getFileName();
+		
+		const HttpHeaderMap& getHeaders();
+		
+		String getHeader(const String& name);
+		
+		String getContentType();
+		
+		void* getData();
+		
+		sl_size getSize();
+		
+		sl_bool saveToFile(const String& path);
+		
+	public:
+		String m_fileName;
+		HttpHeaderMap m_headers;
+		void* m_data;
+		sl_size m_size;
+		Ref<Referable> m_ref;
+		
+	};
+	
 	
 	class SLIB_EXPORT HttpRequest
 	{
@@ -330,6 +362,10 @@ namespace slib
 		void setRequestContentType(const String& type);
 		
 		void setRequestContentType(ContentType type);
+		
+		sl_bool isRequestMultipartFormData() const;
+		
+		String getRequestMultipartFormDataBoundary() const;
 		
 		String getRequestContentEncoding() const;
 		
@@ -414,6 +450,16 @@ namespace slib
 		
 		static HashMap<String, String> parseParameters(const String& str);
 		
+		const HashMap< String, Ref<HttpUploadFile> >& getUploadFiles() const;
+		
+		Ref<HttpUploadFile> getUploadFile(const String& name) const;
+		
+		List< Ref<HttpUploadFile> > getUploadFiles(const String& name) const;
+		
+		sl_bool containsUploadFile(const String& name) const;
+		
+		void applyMultipartFormData(const String& boundary, const Memory& body);
+		
 		Memory makeRequestPacket() const;
 		
 		/*
@@ -442,6 +488,7 @@ namespace slib
 		HashMap<String, String> m_parameters;
 		HashMap<String, String> m_queryParameters;
 		HashMap<String, String> m_postParameters;
+		HashMap< String, Ref<HttpUploadFile> > m_uploadFiles;
 		
 	};
 	
@@ -512,6 +559,14 @@ namespace slib
 		void setResponseTransferEncoding(const String& type);
 		
 		sl_bool isChunkedResponse() const;
+		
+		sl_bool isAttachmentResponse() const;
+		
+		String getResponseAttachmentFileName() const;
+		
+		void setResponseInline();
+		
+		void setResponseAttachment(const String& fileName);
 		
 		String getResponseContentRange() const;
 		

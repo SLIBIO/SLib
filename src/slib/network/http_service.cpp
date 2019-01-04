@@ -348,7 +348,11 @@ namespace slib
 				}
 				context->m_requestBodyBuffer.clear();
 
-				if (context->getMethod() == HttpMethod::POST) {
+				String multipartBoundary = context->getRequestMultipartFormDataBoundary();
+				if (multipartBoundary.isNotEmpty()) {
+					Memory body = context->getRequestBody();
+					context->applyMultipartFormData(multipartBoundary, body);
+				} else if (context->getMethod() == HttpMethod::POST) {
 					String reqContentType = context->getRequestContentTypeNoParams();
 					if (reqContentType == ContentTypes::WebForm) {
 						Memory body = context->getRequestBody();
@@ -648,14 +652,14 @@ namespace slib
 		}
 		{
 			List<String> s;
-			conf["allowedFileExtensions"].get(s);
+			conf["allowed_file_extensions"].get(s);
 			if (s.isNotNull()) {
 				allowedFileExtensions = s;
 			}
 		}
 		{
 			List<String> s;
-			conf["blockedFileExtensions"].get(s);
+			conf["blocked_file_extensions"].get(s);
 			if (s.isNotNull()) {
 				blockedFileExtensions = s;
 			}
@@ -666,6 +670,13 @@ namespace slib
 			flagUseCacheControl = sl_true;
 			flagCacheControlNoCache = cacheControl["no_cache"].getBoolean(flagCacheControlNoCache);
 			cacheControlMaxAge = cacheControl["max_age"].getUint32(cacheControlMaxAge);
+		}
+		
+		{
+			sl_uint32 n;
+			if (conf["max_request_body"].getString().parseUint32(10, &n)) {
+				maxRequestBodySize = n * 1024 * 1024;
+			}
 		}
 	}
 	
@@ -811,8 +822,8 @@ namespace slib
 				break;
 			}
 		
-			sl_bool flagProcessAsResource = sl_true;
-			if ((m_param.flagUseWebRoot || m_param.flagUseAsset) && (m_param.allowedFileExtensions.isNotEmpty() || m_param.blockedFileExtensions.isNotEmpty())) {
+			sl_bool flagProcessAsResource = m_param.flagUseWebRoot || m_param.flagUseAsset;
+			if (flagProcessAsResource && (m_param.allowedFileExtensions.isNotEmpty() || m_param.blockedFileExtensions.isNotEmpty())) {
 				String ext = File::getFileExtension(context->getPath()).trim();
 				if (m_param.blockedFileExtensions.isNotEmpty()) {
 					if (m_param.blockedFileExtensions.contains(ext)) {
@@ -824,51 +835,54 @@ namespace slib
 					}
 				}
 			}
-			if (m_param.flagUseWebRoot) {
-				if (context->getMethod() == HttpMethod::GET) {
-					String path = context->getPath();
-					if (path.startsWith('/')) {
-						path = path.substring(1);
-					}
-					FilePathSegments seg;
-					seg.parsePath(path);
-					if (seg.parentLevel == 0) {
-						String webRootPath = m_param.webRootPath;
-						if (webRootPath.isEmpty()) {
-							webRootPath = Application::getApplicationDirectory();
+			
+			if (flagProcessAsResource) {
+				if (m_param.flagUseWebRoot) {
+					if (context->getMethod() == HttpMethod::GET) {
+						String path = context->getPath();
+						if (path.startsWith('/')) {
+							path = path.substring(1);
 						}
-						path = webRootPath + "/" + path;
-						if (processFile(context, path)) {
-							break;
-						}
-						if (path.endsWith('/')) {
-							if (processFile(context, path + "index.html")) {
+						FilePathSegments seg;
+						seg.parsePath(path);
+						if (seg.parentLevel == 0) {
+							String webRootPath = m_param.webRootPath;
+							if (webRootPath.isEmpty()) {
+								webRootPath = Application::getApplicationDirectory();
+							}
+							path = webRootPath + "/" + path;
+							if (processFile(context, path)) {
 								break;
 							}
-							if (processFile(context, path + "index.htm")) {
-								break;
+							if (path.endsWith('/')) {
+								if (processFile(context, path + "index.html")) {
+									break;
+								}
+								if (processFile(context, path + "index.htm")) {
+									break;
+								}
 							}
 						}
 					}
 				}
-			}
-			
-			if (m_param.flagUseAsset) {
-				if (context->getMethod() == HttpMethod::GET) {
-					String path = context->getPath();
-					if (path.startsWith('/')) {
-						path = path.substring(1);
-					}
-					path = m_param.prefixAsset + path;
-					if (processAsset(context, path)) {
-						break;
-					}
-					if (path.endsWith('/')) {
-						if (processAsset(context, path + "index.html")) {
+				
+				if (m_param.flagUseAsset) {
+					if (context->getMethod() == HttpMethod::GET) {
+						String path = context->getPath();
+						if (path.startsWith('/')) {
+							path = path.substring(1);
+						}
+						path = m_param.prefixAsset + path;
+						if (processAsset(context, path)) {
 							break;
 						}
-						if (processAsset(context, path + "index.htm")) {
-							break;
+						if (path.endsWith('/')) {
+							if (processAsset(context, path + "index.html")) {
+								break;
+							}
+							if (processAsset(context, path + "index.htm")) {
+								break;
+							}
 						}
 					}
 				}
