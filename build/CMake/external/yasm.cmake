@@ -102,7 +102,10 @@ set_target_properties (
  PROPERTIES
  ARCHIVE_OUTPUT_NAME "yasm"
 )
-
+target_compile_options (
+ ${TARGET_NAME}
+ PRIVATE -Wno-unused-result
+)
 
 set (TARGET_NAME yasm)
 
