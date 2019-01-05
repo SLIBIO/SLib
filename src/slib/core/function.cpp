@@ -27,4 +27,6 @@ namespace slib
 
 	SLIB_DEFINE_ROOT_OBJECT(CallableBase)
 
+	const char _priv_FunctionList_ClassID[] = "FunctionList";
+
 }

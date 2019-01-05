@@ -147,6 +147,8 @@ namespace slib
 
 	template class SpinLockPool<-10>;
 
+	template class SpinLockPool<-11>;
+
 	template class SpinLockPool<-20>;
 
 	template class SpinLockPool<-21>;

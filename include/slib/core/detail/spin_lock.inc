@@ -26,6 +26,9 @@ namespace slib
 	extern template class SpinLockPool<-10>;
 	typedef SpinLockPool<-10> SpinLockPoolForBase;
 	
+	extern template class SpinLockPool<-11>;
+	typedef SpinLockPool<-11> SpinLockPoolForFunction;
+
 	extern template class SpinLockPool<-20>;
 	typedef SpinLockPool<-20> SpinLockPoolForList;
 	

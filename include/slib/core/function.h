@@ -25,9 +25,10 @@
 
 #include "definition.h"
 
-#include "object.h"
+#include "ref.h"
 #include "tuple.h"
 #include "null_value.h"
+#include "list.h"
 
 namespace slib
 {
@@ -41,6 +42,9 @@ namespace slib
 	template <class T>
 	using AtomicFunction = Atomic< Function<T> >;
 	
+	template <class T>
+	class FunctionList;
+
 	class CallableBase : public Referable
 	{
 	public:
@@ -71,7 +75,15 @@ namespace slib
 		Function& operator=(const FUNC& func) noexcept;
 
 		RET_TYPE operator()(ARGS... args) const;
-	
+		
+		Function& operator+=(const Function&) noexcept;
+		
+		Function operator+(const Function&) noexcept;
+		
+		Function& operator-=(const Function&) noexcept;
+
+		Function operator-(const Function&) noexcept;
+
 	public:
 		template <class FUNC>
 		static Function<RET_TYPE(ARGS...)> create(const FUNC& func) noexcept;
@@ -96,7 +108,22 @@ namespace slib
 
 		template <class CLASS, class FUNC, class... BINDS>
 		static Function<RET_TYPE(ARGS...)> bindWeakRef(const WeakRef<CLASS>& object, FUNC func, const BINDS&... binds) noexcept;
+		
+		static Function<RET_TYPE(ARGS...)> fromList(const List< Function<RET_TYPE(ARGS...)> >&) noexcept;
+		
+	public:
+		sl_bool isList() const noexcept;
+		
+		const List< Function<RET_TYPE(ARGS...)> >& getList() const noexcept;
 
+		void add(const Function& function) noexcept;
+		
+		void addIfNotExist(const Function& function) noexcept;
+		
+		void remove(const Function& function, sl_bool flagRemoveAllMatch = sl_false) noexcept;
+		
+		sl_bool contains(const Function& function) const noexcept;
+		
 	};
 	
 	template <class RET_TYPE, class... ARGS>
@@ -115,9 +142,57 @@ namespace slib
 		Atomic& operator=(const FUNC& func) noexcept;
 
 		RET_TYPE operator()(ARGS... args) const;
-
+		
+		Atomic& operator+=(const Function<RET_TYPE(ARGS...)>&) noexcept;
+		
+		Function<RET_TYPE(ARGS...)> operator+(const Function<RET_TYPE(ARGS...)>&) noexcept;
+		
+		Atomic& operator-=(const Function<RET_TYPE(ARGS...)>&) noexcept;
+		
+		Function<RET_TYPE(ARGS...)> operator-(const Function<RET_TYPE(ARGS...)>&) noexcept;
+		
+	public:
+		sl_bool isList() const noexcept;
+		
+		const List< Function<RET_TYPE(ARGS...)> >& getList() const noexcept;
+		
+		void add(const Function<RET_TYPE(ARGS...)>& function) noexcept;
+		
+		void addIfNotExist(const Function<RET_TYPE(ARGS...)>& function) noexcept;
+		
+		void remove(const Function<RET_TYPE(ARGS...)>& function, sl_bool flagRemoveAllMatch = sl_false) noexcept;
+		
+		sl_bool contains(const Function<RET_TYPE(ARGS...)>& function) const noexcept;
+		
 	};
 
+	
+	template <class RET_TYPE, class... ARGS>
+	class SLIB_EXPORT FunctionList<RET_TYPE(ARGS...)> : public Callable<RET_TYPE(ARGS...)>
+	{
+	public:
+		List< Function<RET_TYPE(ARGS...)> > list;
+		
+	public:
+		static sl_object_type ObjectType() noexcept;
+		
+		static sl_bool isDerivedFrom(sl_object_type type) noexcept;
+		
+		sl_object_type getObjectType() const noexcept override;
+		
+		sl_bool isInstanceOf(sl_object_type type) const noexcept override;
+		
+	public:
+		SLIB_INLINE FunctionList() noexcept {}
+		
+		SLIB_INLINE FunctionList(const List< Function<RET_TYPE(ARGS...)> >& _list) noexcept : list(_list) {}
+		
+	public:
+		RET_TYPE invoke(ARGS... params) override;
+		
+	};
+	
+	
 }
 
 #define SLIB_BIND_CLASS(TYPE, CLASS, CALLBACK, OBJECT, ...) slib::Function<TYPE>::bindClass(OBJECT, &CLASS::CALLBACK, ##__VA_ARGS__)
