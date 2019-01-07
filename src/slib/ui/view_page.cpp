@@ -1280,18 +1280,6 @@ namespace slib
 		Base::interlockedDecrement(&m_countActiveTransitionAnimations);
 	}
 
-	sl_bool ViewPage::_dispatchBack()
-	{
-		Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
-		if (ev.isNotNull()) {
-			dispatchBack(ev.get());
-			if (ev->isPreventedDefault()) {
-				return sl_false;
-			}
-		}
-		return sl_true;
-	}
-
 	void ViewPage::popup(const Ref<View>& parent, const Transition& transition, sl_bool flagFillParentBackground)
 	{
 		if (parent.isNull()) {
@@ -1365,14 +1353,14 @@ namespace slib
 	{
 		ObjectLocker lock(this);
 		if (m_popupState == PopupState::ShowWindow) {
-			if (_dispatchBack()) {
-				m_popupState = PopupState::None;
-				lock.unlock();
-				dispatchPause();
-				dispatchClose();
-			} else {
-				ev->preventDefault();
+			dispatchBack(ev);
+			if (ev->isPreventedDefault()) {
+				return;
 			}
+			m_popupState = PopupState::None;
+			lock.unlock();
+			dispatchPause();
+			dispatchClose();
 		}
 	}
 
@@ -1614,13 +1602,7 @@ namespace slib
 	{
 		SLIB_INVOKE_EVENT_HANDLER(BackPressed, ev)
 		
-		if (ev->isPreventedDefault()) {
-			return;
-		}
-		if (_dispatchBack()) {
-			close();
-		}
-		ev->preventDefault();
+		dispatchBack(ev);
 	}
 
 	SLIB_DEFINE_EVENT_HANDLER(ViewPage, Back, UIEvent* ev)
@@ -1637,17 +1619,15 @@ namespace slib
 
 	void ViewPage::dispatchCancel(UIEvent* ev)
 	{
-		onCancel(ev);
-		getOnCancel()(this, ev);
-		if (ev->isStoppedPropagation()) {
-			return;
-		}
+		SLIB_INVOKE_EVENT_HANDLER(Cancel, ev)
+
+		dispatchBack(ev);
+		
 		if (ev->isPreventedDefault()) {
 			return;
 		}
-		if (_dispatchBack()) {
-			close();
-		}
+		
+		close();
 	}
 
 }

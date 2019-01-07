@@ -334,9 +334,7 @@ namespace slib
 		void _closePopup(Transition transition);
 		
 		void _finishPopupAnimation(UIPageAction action);
-		
-		sl_bool _dispatchBack();
-		
+				
 		void _applyDefaultOpeningPopupTransition(Transition& transition);
 		
 		void _applyDefaultClosingPopupTransition(Transition& transition);

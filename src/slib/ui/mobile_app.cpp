@@ -332,16 +332,25 @@ namespace slib
 				Ref<ViewPage> page = popups[popups.count-1];
 				if (page.isNotNull()) {
 					page->dispatchBackPressed(ev);
+					if (!(ev->isPreventedDefault())) {
+						page->close();
+						ev->preventDefault();
+					}
 				}
 				return;
 			}
 		}
-		if (m_pager->getPagesCount() > 1) {
-			Ref<View> page = m_pager->getCurrentPage();
-			if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
-				_page->dispatchBackPressed(ev);
+		Ref<View> _page = m_pager->getCurrentPage();
+		if (ViewPage* page = CastInstance<ViewPage>(_page.get())) {
+			page->dispatchBackPressed(ev);
+			if (!(ev->isPreventedDefault())) {
+				if (m_pager->getPagesCount() > 1) {
+					page->close();
+					ev->preventDefault();
+				}
 			}
 		}
+
 	}
 	
 	sl_bool MobileApp::dispatchBackPressedToApp()
