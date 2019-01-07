@@ -594,7 +594,7 @@ namespace slib
 						sl_reg index = list.indexOf_NoLock(function);
 						if (index >= 0) {
 							List< Function<RET_TYPE(ARGS...)> > newList(data, index);
-							if (index + 1 < count) {
+							if ((sl_size)index + 1 < count) {
 								newList.addElements_NoLock(data + index + 1, count - index - 1);
 							}
 							return (Callable<RET_TYPE(ARGS...)>*)(new FunctionList<RET_TYPE(ARGS...)>(newList));

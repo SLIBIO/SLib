@@ -131,7 +131,7 @@ namespace slib
 
 		static void _ui_win_back_cb(void* data, Evas_Object* win, void* event_info)
 		{
-			if (MobileApp::dispatchBackToApp()) {
+			if (MobileApp::dispatchBackPressedToApp()) {
 				::elm_win_lower(win);
 			}
 		}

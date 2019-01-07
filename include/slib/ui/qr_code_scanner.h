@@ -49,13 +49,7 @@ namespace slib
 		void stop() override;
 		
 	public:
-		SLIB_PROPERTY(AtomicFunction<void(QRCodeScanner*, String)>, OnDetect)
-		
-	protected:
-		virtual void onDetect(const String& code);
-		
-	public:
-		virtual void dispatchDetect(const String& code);
+		SLIB_DECLARE_EVENT_HANDLER(QRCodeScanner, Detect, const String& code)
 		
 	protected:
 		void onDraw(Canvas* canvas) override;

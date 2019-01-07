@@ -100,34 +100,14 @@ namespace slib
 		
 		virtual void removeAllRows(UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-	public:		
-		SLIB_PROPERTY(Function<void(ListReportView*, sl_uint32)>, OnSelectRow)
-		
-		SLIB_PROPERTY(Function<void(ListReportView*, sl_uint32, const UIPoint&)>, OnClickRow)
-		
-		SLIB_PROPERTY(Function<void(ListReportView*, sl_uint32, const UIPoint&)>, OnRightButtonClickRow)
-		
-		SLIB_PROPERTY(Function<void(ListReportView*, sl_uint32, const UIPoint&)>, OnDoubleClickRow)
-		
-	protected:
-		virtual void onSelectRow(sl_uint32 row);
-		
-		virtual void onClickRow(sl_uint32 row, const UIPoint& pt);
-		
-		virtual void onRightButtonClickRow(sl_uint32 row, const UIPoint& pt);
-		
-		virtual void onDoubleClickRow(sl_uint32 row, const UIPoint& pt);
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(ListReportView, SelectRow, sl_uint32 row)
+		SLIB_DECLARE_EVENT_HANDLER(ListReportView, ClickRow, sl_uint32 row, const UIPoint& pt)
+		SLIB_DECLARE_EVENT_HANDLER(ListReportView, RightButtonClickRow, sl_uint32 row, const UIPoint& pt)
+		SLIB_DECLARE_EVENT_HANDLER(ListReportView, DoubleClickRow, sl_uint32 row, const UIPoint& pt)
 		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
-		
-		virtual void dispatchSelectRow(sl_uint32 row);
-		
-		virtual void dispatchClickRow(sl_uint32 row, const UIPoint& pt);
-		
-		virtual void dispatchRightButtonClickRow(sl_uint32 row, const UIPoint& pt);
-		
-		virtual void dispatchDoubleClickRow(sl_uint32 row, const UIPoint& pt);
 		
 	protected:
 		void _refreshColumnsCount_NW();

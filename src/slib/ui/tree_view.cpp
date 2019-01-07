@@ -778,10 +778,6 @@ namespace slib
 		_redrawContent(mode);
 	}
 	
-	void TreeView::onSelectItem(TreeViewItem* item)
-	{
-	}
-	
 	void TreeView::onDraw(Canvas* canvas)
 	{
 		_calcTextHeight(canvas);
@@ -803,10 +799,12 @@ namespace slib
 		_relayoutContent(UIUpdateMode::None);
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(TreeView, SelectItem, TreeViewItem* item)
+	
 	void TreeView::dispatchSelectItem(TreeViewItem* item)
 	{
-		onSelectItem(item);
-		getOnSelectItem()(this, item);
+		SLIB_INVOKE_EVENT_HANDLER(SelectItem, item)
+		
 		(item->getOnSelect())(item);
 	}
 	

@@ -129,6 +129,9 @@ namespace slib
 		sl_scroll_pos getValueFromThumbPosition(sl_ui_pos pos);
 		
 		sl_bool isValid();
+
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(ScrollBar, Change, sl_scroll_pos value)
 		
 	protected:
 		void onDraw(Canvas* canvas) override;
@@ -136,14 +139,6 @@ namespace slib
 		void onMouseEvent(UIEvent* ev) override;
 		
 		void onMouseWheelEvent(UIEvent* ev) override;
-		
-		virtual void onChange(sl_scroll_pos value);
-		
-	public:
-		virtual void dispatchChange(sl_scroll_pos value);
-		
-	public:
-		SLIB_PROPERTY(AtomicFunction<void(ScrollBar*, sl_scroll_pos)>, OnChange)
 		
 	protected:
 		void _setHoverThumb(sl_bool flag);

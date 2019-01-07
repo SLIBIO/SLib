@@ -95,62 +95,28 @@ namespace slib
 		
 		void openStartupPage();
 		
-	protected:
-		virtual void onPause();
-		
-		virtual void onResume();
-		
-		virtual void onBack(UIEvent* ev);
-		
-		virtual void onCreateActivity();
-		
-		virtual void onDestroyActivity();
-		
-		virtual void onResize(sl_ui_len width, sl_ui_len height);
-		
-		virtual void onChangeCurrentLocale();
-		
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(MobileApp, Pause)
+		SLIB_DECLARE_EVENT_HANDLER(MobileApp, Resume)
+		SLIB_DECLARE_EVENT_HANDLER(MobileApp, BackPressed, UIEvent* ev)
+		SLIB_DECLARE_EVENT_HANDLER(MobileApp, CreateActivity)
+		SLIB_DECLARE_EVENT_HANDLER(MobileApp, DestroyActivity)
+		SLIB_DECLARE_EVENT_HANDLER(MobileApp, Resize, sl_ui_len width, sl_ui_len height)
+		SLIB_DECLARE_EVENT_HANDLER(MobileApp, ChangeCurrentLocale)
+
 	public:
 		void dispatchStart() override;
-		
-		virtual void dispatchPause();
-		
-		static Function<void()> addOnPause(const Function<void()>& callback);
-		
-		static void removeOnPause(const Function<void()>& callback);
 
 		static void dispatchPauseToApp();
 		
-		virtual void dispatchResume();
-		
-		static Function<void()> addOnResume(const Function<void()>& callback);
-		
-		static void removeOnResume(const Function<void()>& callback);
-		
 		static void dispatchResumeToApp();
 		
-		virtual void dispatchBack(UIEvent* ev);
-		
-		static Function<void()> addOnBack(const Function<void()>& callback);
-		
-		static void removeOnBack(const Function<void()>& callback);
-		
-		static sl_bool dispatchBackToApp();
-		
-		virtual void dispatchCreateActivity();
+		static sl_bool dispatchBackPressedToApp();
 		
 		static void dispatchCreateActivityToApp();
 		
-		virtual void dispatchDestroyActivity();
-		
 		static void dispatchDestroyActivityToApp();
 		
-		virtual void dispatchResize(sl_ui_len width, sl_ui_len height);
-		
-		static Function<void(sl_ui_len, sl_ui_len)> addOnResize(const Function<void(sl_ui_len, sl_ui_len)>& callback);
-		
-		static void removeOnResize(const Function<void(sl_ui_len, sl_ui_len)>& callback);
-
 		static void dispatchResizeToApp(sl_ui_len width, sl_ui_len height);
 		
 	protected:

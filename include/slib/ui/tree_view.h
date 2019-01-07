@@ -131,7 +131,7 @@ namespace slib
 		void setHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 	public:
-		SLIB_PROPERTY(AtomicFunction<void(TreeViewItem*)>, OnSelect)
+		SLIB_PROPERTY_FUNCTION(void(TreeViewItem*), OnSelect)
 		SLIB_PROPERTY(AtomicRef<Referable>, UserObject)
 		SLIB_PROPERTY(AtomicVariant, UserData)
 		
@@ -264,19 +264,14 @@ namespace slib
 		void setTextIndent(sl_ui_pos indent, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 	public:
-		SLIB_PROPERTY(AtomicFunction<void(TreeView*, TreeViewItem*)>, OnSelectItem)
+		SLIB_DECLARE_EVENT_HANDLER(TreeView, SelectItem, TreeViewItem* item)
 		
-	public:
-		virtual void onSelectItem(TreeViewItem* item);
-		
+	protected:
 		void onDraw(Canvas* canvas) override;
 		
 		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
 		void onChangePadding() override;
-		
-	protected:
-		virtual void dispatchSelectItem(TreeViewItem* item);
 		
 	private:
 		void _createRootItem();

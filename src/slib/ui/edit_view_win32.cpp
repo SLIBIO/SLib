@@ -119,7 +119,8 @@ namespace slib
 					Ref<View> _view = getView();
 					if (EditView* view = CastInstance<EditView>(_view.get())) {
 						String text = Windows::getWindowText(m_handle);
-						String textNew = view->dispatchChange(text);
+						String textNew = text;
+						view->dispatchChange(&textNew);
 						if (text != textNew) {
 							Windows::setWindowText(m_handle, textNew);
 						}

@@ -57,15 +57,13 @@ namespace slib
 		void setDeviceId(const String& deviceId);
 		
 	public:
-		SLIB_PROPERTY(Function<void(CameraView*, VideoCaptureFrame*)>, OnCapture)
-		
+		SLIB_DECLARE_EVENT_HANDLER(CameraView, Capture, VideoCaptureFrame* frame)
+
 	protected:
-		virtual void onCapture(VideoCaptureFrame* frame);
-		
 		void onAttach() override;
 		
 	private:
-		void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame);
+		void _onCaptureCameraFrame(VideoCapture* capture, VideoCaptureFrame* frame);
 
 	protected:
 		AtomicRef<Camera> m_camera;

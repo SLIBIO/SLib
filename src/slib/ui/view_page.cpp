@@ -785,29 +785,24 @@ namespace slib
 		}
 	}
 	
-	void ViewPager::onPageAction(View* page, UIPageAction action)
-	{
-	}
-
-	void ViewPager::onEndPageAnimation(View* page, UIPageAction action)
-	{
-	}
+	SLIB_DEFINE_EVENT_HANDLER(ViewPager, PageAction, View* page, UIPageAction action)
 
 	void ViewPager::dispatchPageAction(View* page, UIPageAction action)
 	{
 		if (page) {
-			onPageAction(page, action);
+			SLIB_INVOKE_EVENT_HANDLER(PageAction, page, action)
 			if (ViewPage* _page = CastInstance<ViewPage>(page)) {
 				_page->dispatchPageAction(this, action);
 			}
-			getOnPageAction()(this, page, action);
 		}
 	}
 
+	SLIB_DEFINE_EVENT_HANDLER(ViewPager, EndPageAnimation, View* page, UIPageAction action)
+	
 	void ViewPager::dispatchEndPageAnimation(View* page, UIPageAction action)
 	{
 		if (page) {
-			onEndPageAnimation(page, action);
+			SLIB_INVOKE_EVENT_HANDLER(EndPageAnimation, page, action)
 			if (ViewPage* _page = CastInstance<ViewPage>(page)) {
 				_page->dispatchEndPageAnimation(this, action);
 			}
@@ -1552,43 +1547,42 @@ namespace slib
 		}
 	}
 
-	void ViewPage::onOpen()
+	SLIB_DEFINE_EVENT_HANDLER(ViewPage, Open)
+
+	void ViewPage::dispatchOpen()
 	{
+		SLIB_INVOKE_EVENT_HANDLER(Open)
+	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(ViewPage, Close)
+	
+	void ViewPage::dispatchClose()
+	{
+		SLIB_INVOKE_EVENT_HANDLER(Close)
+	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(ViewPage, Resume)
+	
+	void ViewPage::dispatchResume()
+	{
+		SLIB_INVOKE_EVENT_HANDLER(Resume)
 	}
 
-	void ViewPage::onClose()
+	SLIB_DEFINE_EVENT_HANDLER(ViewPage, Pause)
+	
+	void ViewPage::dispatchPause()
 	{
+		SLIB_INVOKE_EVENT_HANDLER(Pause)
 	}
 
-	void ViewPage::onResume()
-	{
-	}
-
-	void ViewPage::onPause()
-	{
-	}
-
-	void ViewPage::onPageAction(UIPageAction action)
-	{
-	}
-
-	void ViewPage::onEndPageAnimation(UIPageAction action)
-	{
-	}
-
-	void ViewPage::onBackPressed(UIEvent* ev)
-	{
-	}
-
-	void ViewPage::onBack(UIEvent* ev)
-	{
-	}
-
+	SLIB_DEFINE_EVENT_HANDLER(ViewPage, PageAction, ViewPager* pager, UIPageAction action)
+	
 	void ViewPage::dispatchPageAction(ViewPager* pager, UIPageAction action)
 	{
 		m_pager = pager;
-		onPageAction(action);
-		getOnPageAction()(this, pager, action);
+		
+		SLIB_INVOKE_EVENT_HANDLER(PageAction, pager, action)
+		
 		switch (action) {
 			case UIPageAction::Push:
 				dispatchOpen();
@@ -1605,52 +1599,35 @@ namespace slib
 		}
 	}
 
+	SLIB_DEFINE_EVENT_HANDLER(ViewPage, EndPageAnimation, ViewPager* pager, UIPageAction action)
+
 	void ViewPage::dispatchEndPageAnimation(ViewPager* pager, UIPageAction action)
 	{
 		m_pager = pager;
-		onEndPageAnimation(action);
-		getOnEndPageAnimation()(this, pager, action);
+		
+		SLIB_INVOKE_EVENT_HANDLER(EndPageAnimation, pager, action)
 	}
 
-	void ViewPage::dispatchOpen()
-	{
-		onOpen();
-		getOnOpen()(this);
-	}
-
-	void ViewPage::dispatchClose()
-	{
-		onClose();
-		getOnClose()(this);
-	}
-
-	void ViewPage::dispatchResume()
-	{
-		onResume();
-		getOnResume()(this);
-	}
-
-	void ViewPage::dispatchPause()
-	{
-		onPause();
-		getOnPause()(this);
-	}
+	SLIB_DEFINE_EVENT_HANDLER(ViewPage, BackPressed, UIEvent* ev)
 
 	void ViewPage::dispatchBackPressed(UIEvent* ev)
 	{
-		onBackPressed(ev);
+		SLIB_INVOKE_EVENT_HANDLER(BackPressed, ev)
+		
 		if (ev->isPreventedDefault()) {
 			return;
 		}
 		if (_dispatchBack()) {
 			close();
 		}
+		ev->preventDefault();
 	}
+
+	SLIB_DEFINE_EVENT_HANDLER(ViewPage, Back, UIEvent* ev)
 
 	void ViewPage::dispatchBack(UIEvent* ev)
 	{
-		onBack(ev);
-		getOnBack()(this, ev);
+		SLIB_INVOKE_EVENT_HANDLER(Back, ev)
 	}
 
 	void ViewPage::dispatchOK(UIEvent* ev)

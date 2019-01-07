@@ -156,9 +156,9 @@ namespace slib
 		virtual void setAutoRepeat(sl_bool flagRepeat);
 				
 	public:
-		SLIB_PROPERTY(AtomicFunction<void(MediaPlayer*)>, OnReadyToPlay)
+		SLIB_PROPERTY_FUNCTION(void(MediaPlayer*), OnReadyToPlay)
 		
-		SLIB_PROPERTY(AtomicFunction<void(MediaPlayer*)>, OnComplete)
+		SLIB_PROPERTY_FUNCTION(void(MediaPlayer*), OnComplete)
 		
 	protected:
 		void _onReadyToPlay();

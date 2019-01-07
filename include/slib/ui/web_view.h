@@ -74,31 +74,16 @@ namespace slib
 		void queryUserAgent(const Function<void(WebView*, String)>& callbackQueryCompletion);
 		
 	public:
-		SLIB_PROPERTY(AtomicFunction<void(WebView*, String)>, OnStartLoad)
-		
-		SLIB_PROPERTY(AtomicFunction<void(WebView*, String, sl_bool)>, OnFinishLoad)
-		
-		SLIB_PROPERTY(AtomicFunction<void(WebView*, String, String)>, OnMessageFromJavaScript)
-		
-	protected:
-		virtual void onStartLoad(const String& url);
-		
-		virtual void onFinishLoad(const String& url, sl_bool flagFailed);
-		
-		virtual void onMessageFromJavaScript(const String& msg, const String& param);
-		
-		void dispatchAttach() override;
-		
-		void dispatchResize(sl_ui_len width, sl_ui_len height) override;
+		SLIB_DECLARE_EVENT_HANDLER(WebView, StartLoad, const String& url)
+		SLIB_DECLARE_EVENT_HANDLER(WebView, FinishLoad, const String& url, sl_bool flagFailed)
+		SLIB_DECLARE_EVENT_HANDLER(WebView, MessageFromJavaScript, const String& msg, const String& param)
 		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
+
+		void dispatchAttach() override;
 		
-		virtual void dispatchStartLoad(const String& url);
-		
-		virtual void dispatchFinishLoad(const String& url, sl_bool flagFailed);
-		
-		virtual void dispatchMessageFromJavaScript(const String& msg, const String& param);
+		void dispatchResize(sl_ui_len width, sl_ui_len height) override;
 		
 	private:
 		void _refreshSize_NW();

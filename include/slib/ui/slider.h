@@ -75,6 +75,10 @@ namespace slib
 		
 		void setThumbHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(Slider, Change, float value)
+		SLIB_DECLARE_EVENT_HANDLER(Slider, ChangeSecondary, float value)
+		
 	protected:
 		void onDraw(Canvas* canvas) override;
 		
@@ -83,15 +87,6 @@ namespace slib
 		void onMouseWheelEvent(UIEvent* ev) override;
 		
 		void onKeyEvent(UIEvent* event) override;
-		
-		virtual void onChange(float value);
-		
-		virtual void onChangeSecondary(float value);
-		
-	public:
-		void dispatchChange(float value) override;
-		
-		void dispatchChangeSecondary(float value) override;
 		
 	protected:
 		void _drawTrack(Canvas* canvas, const Ref<Drawable>& track, const Rectangle& rectDst);
@@ -114,10 +109,7 @@ namespace slib
 		
 		void _setHoverThumb(int index);
 		
-	public:
-		SLIB_PROPERTY(AtomicFunction<void(Slider*, float)>, OnChange)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Slider*, float)>, OnChangeSecondary)
+		void _changeValue(float value, sl_bool flagChange2);
 		
 	protected:
 		AtomicRef<Drawable> m_thumb;

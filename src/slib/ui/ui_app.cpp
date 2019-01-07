@@ -77,22 +77,17 @@ namespace slib
 	}
 #endif
 	
-	void UIApp::onStart()
-	{
-	}
-	
-	void UIApp::onExit()
-	{
-	}
-	
 	void UIApp::onRunApp()
 	{
 		UI::runApp();
 	}
 	
+	
+	SLIB_DEFINE_EVENT_HANDLER(UIApp, Start)
+	
 	void UIApp::dispatchStart()
 	{
-		onStart();
+		SLIB_INVOKE_EVENT_HANDLER(Start)
 	}
 	
 	void UIApp::dispatchStartToApp()
@@ -103,9 +98,11 @@ namespace slib
 		}
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(UIApp, Exit)
+
 	void UIApp::dispatchExit()
 	{
-		onExit();
+		SLIB_INVOKE_EVENT_HANDLER(Exit)
 	}
 	
 	void UIApp::dispatchExitToApp()

@@ -276,7 +276,7 @@ namespace slib
 		}
 	}
 	
-	void EditView::onClick(UIEvent* ev)
+	void EditView::onClick()
 	{
 #if defined(SLIB_PLATFORM_IS_MOBILE)
 		if (!m_flagReadOnly) {
@@ -336,17 +336,15 @@ namespace slib
 #endif
 	}
 	
-	String EditView::_onChangeEditViewNative(EditView* ev, const String& text)
+	void EditView::_onChangeEditViewNative(EditView* ev, String* text)
 	{
-		String _text = dispatchChange(text);
+		dispatchChange(text);
 		if (!m_flagMultiLine) {
-			sl_reg index = ParseUtil::indexOfLine(_text);
+			sl_reg index = ParseUtil::indexOfLine(*text);
 			if (index >= 0) {
-				_text = _text.mid(0, index);
+				*text = text->mid(0, index);
 			}
 		}
-		m_text = _text;
-		return _text;
 	}
 	
 	void EditView::_onReturnKeyEditViewNative(EditView* ev)
@@ -382,19 +380,27 @@ namespace slib
 		dispatchDoneEdit();
 	}
 
-	String EditView::onChange(const String& newValue)
+	SLIB_DEFINE_EVENT_HANDLER(EditView, Change, String* value)
+
+	void EditView::dispatchChange(String* value)
 	{
-		return newValue;
+		SLIB_INVOKE_EVENT_HANDLER(Change, value)
 	}
 
-	void EditView::onReturnKey()
+	SLIB_DEFINE_EVENT_HANDLER(EditView, ReturnKey)
+
+	void EditView::dispatchReturnKey()
 	{
+		SLIB_INVOKE_EVENT_HANDLER(ReturnKey)
 	}
 	
-	void EditView::onDoneEdit()
+	SLIB_DEFINE_EVENT_HANDLER(EditView, DoneEdit)
+
+	void EditView::dispatchDoneEdit()
 	{
+		SLIB_INVOKE_EVENT_HANDLER(DoneEdit)
 	}
-	
+
 	void EditView::dispatchKeyEvent(UIEvent* ev)
 	{
 		View::dispatchKeyEvent(ev);
@@ -405,28 +411,6 @@ namespace slib
 				}
 			}
 		}
-	}
-
-	String EditView::dispatchChange(const String& newValue)
-	{
-		String value = onChange(newValue);
-		Function<String(EditView*, String)> callback = getOnChange();
-		if (callback.isNotNull()) {
-			value = callback(this, value);
-		}
-		return value;
-	}
-
-	void EditView::dispatchReturnKey()
-	{
-		onReturnKey();
-		getOnReturnKey()(this);
-	}
-	
-	void EditView::dispatchDoneEdit()
-	{
-		onDoneEdit();
-		getOnDoneEdit()(this);
 	}
 
 	/**********************

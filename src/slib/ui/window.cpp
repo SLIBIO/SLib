@@ -1151,82 +1151,26 @@ namespace slib
 		}
 	}
 
-	void Window::onCreate()
-	{
-	}
-
-	void Window::onCreateFailed()
-	{
-	}
-
-	void Window::onClose(UIEvent* ev)
-	{
-	}
-
-	void Window::onDestroy()
-	{
-	}
-
-	void Window::onActivate()
-	{
-	}
-
-	void Window::onDeactivate()
-	{
-	}
-
-	void Window::onMove()
-	{
-	}
+	SLIB_DEFINE_EVENT_HANDLER(Window, Create)
 	
-	void Window::onResizing(UISize& size)
-	{
-	}
-
-	void Window::onResize(sl_ui_len clientWidth, sl_ui_len clientHeight)
-	{
-	}
-
-	void Window::onMinimize()
-	{
-	}
-
-	void Window::onDeminimize()
-	{
-	}
-
-	void Window::onMaximize()
-	{
-	}
-
-	void Window::onDemaximize()
-	{
-	}
-
-	void Window::onOK(UIEvent* ev)
-	{
-	}
-
-	void Window::onCancel(UIEvent* ev)
-	{
-	}
-
 	void Window::dispatchCreate()
 	{
-		onCreate();
-		getOnCreate()(this);
+		SLIB_INVOKE_EVENT_HANDLER(Create)
 	}
+
+	SLIB_DEFINE_EVENT_HANDLER(Window, CreateFailed)
 
 	void Window::dispatchCreateFailed()
 	{
-		onCreateFailed();
-		getOnCreateFailed()(this);
+		SLIB_INVOKE_EVENT_HANDLER(CreateFailed)
 	}
+
+	SLIB_DEFINE_EVENT_HANDLER(Window, Close, UIEvent* ev)
 
 	void Window::dispatchClose(UIEvent* ev)
 	{
-		onClose(ev);
-		getOnClose()(this,ev);
+		SLIB_INVOKE_EVENT_HANDLER(Close, ev)
+
 		if (ev->isPreventedDefault()) {
 			return;
 		}
@@ -1234,44 +1178,54 @@ namespace slib
 		dispatchDestroy();
 	}
 
+	SLIB_DEFINE_EVENT_HANDLER(Window, Destroy)
+
 	void Window::dispatchDestroy()
 	{
 		if (m_flagDispatchedDestroy) {
 			return;
 		}
 		m_flagDispatchedDestroy = sl_true;
-		onDestroy();
-		getOnDestroy()(this);
+		
+		SLIB_INVOKE_EVENT_HANDLER(Destroy)
+		
 		if (m_flagStateDoModal) {
 			m_flagStateDoModal = sl_false;
 			UI::quitLoop();
 		}
 	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(Window, Activate)
 
 	void Window::dispatchActivate()
 	{
-		onActivate();
-		getOnActivate()(this);
+		SLIB_INVOKE_EVENT_HANDLER(Activate)
 	}
+
+	SLIB_DEFINE_EVENT_HANDLER(Window, Deactivate)
 
 	void Window::dispatchDeactivate()
 	{
-		onDeactivate();
-		getOnDeactivate()(this);
+		SLIB_INVOKE_EVENT_HANDLER(Deactivate)
 	}
+
+	SLIB_DEFINE_EVENT_HANDLER(Window, Move)
 
 	void Window::dispatchMove()
 	{
-		onMove();
-		getOnMove()(this);
+		SLIB_INVOKE_EVENT_HANDLER(Move)
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(Window, Resizing, UISize& size)
+
 	void Window::dispatchResizing(UISize& size)
 	{
 		_constrainSize(size, m_flagStateResizingWidth);
-		onResizing(size);
-		getOnResizing()(this, size);
+		
+		SLIB_INVOKE_EVENT_HANDLER(Resizing, size)
 	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(Window, Resize, sl_ui_len clientWidth, sl_ui_len clientHeight)
 
 	void Window::dispatchResize(sl_ui_len clientWidth, sl_ui_len clientHeight)
 	{
@@ -1284,40 +1238,47 @@ namespace slib
 				}
 			}
 		}
-		onResize(clientWidth, clientHeight);
-		getOnResize()(this, clientWidth, clientHeight);
+		
+		SLIB_INVOKE_EVENT_HANDLER(Resize, clientWidth, clientHeight)
 	}
+
+	SLIB_DEFINE_EVENT_HANDLER(Window, Minimize)
 
 	void Window::dispatchMinimize()
 	{
-		onMinimize();
-		getOnMinimize()(this);
+		SLIB_INVOKE_EVENT_HANDLER(Minimize)
 	}
+
+	SLIB_DEFINE_EVENT_HANDLER(Window, Deminimize)
 
 	void Window::dispatchDeminimize()
 	{
-		onDeminimize();
-		getOnDeminimize()(this);
+		SLIB_INVOKE_EVENT_HANDLER(Deminimize)
 	}
+
+	SLIB_DEFINE_EVENT_HANDLER(Window, Maximize)
 
 	void Window::dispatchMaximize()
 	{
 		_refreshSize();
-		onMaximize();
-		getOnMaximize()(this);
+		
+		SLIB_INVOKE_EVENT_HANDLER(Maximize)
 	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(Window, Demaximize)
 
 	void Window::dispatchDemaximize()
 	{
 		_refreshSize();
-		onDemaximize();
-		getOnDemaximize()(this);
+		
+		SLIB_INVOKE_EVENT_HANDLER(Demaximize)
 	}
+
+	SLIB_DEFINE_EVENT_HANDLER(Window, OK, UIEvent* ev)
 
 	void Window::dispatchOK(UIEvent* ev)
 	{
-		onOK(ev);
-		getOnOK()(this, ev);
+		SLIB_INVOKE_EVENT_HANDLER(OK, ev)
 	}
 
 	void Window::dispatchOK()
@@ -1328,10 +1289,12 @@ namespace slib
 		}
 	}
 
+	SLIB_DEFINE_EVENT_HANDLER(Window, Cancel, UIEvent* ev)
+
 	void Window::dispatchCancel(UIEvent* ev)
 	{
-		onCancel(ev);
-		getOnCancel()(this, ev);
+		SLIB_INVOKE_EVENT_HANDLER(Cancel, ev)
+
 		if (ev->isPreventedDefault()) {
 			return;
 		}

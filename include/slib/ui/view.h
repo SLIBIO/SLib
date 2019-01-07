@@ -1116,9 +1116,9 @@ namespace slib
 		virtual sl_bool hitTestForCapturingChildInstanceEvents(const UIPoint& pt);
 		
 		
-		sl_bool isDuringEvent();
+		Ref<UIEvent> getCurrentEvent();
 		
-		void setDuringEvent(sl_bool flag);
+		void setCurrentEvent(UIEvent* ev);
 		
 		
 		Ref<GestureDetector> createGestureDetector();
@@ -1164,186 +1164,74 @@ namespace slib
 		Ref<Timer> createTimer(const Function<void(Timer*)>& task, sl_uint32 interval_ms);
 		
 		Ref<Timer> startTimer(const Function<void(Timer*)>& task, sl_uint32 interval_ms);
-
-	public:
-		Function<void(View*)> getOnAttach();
-		
-		void setOnAttach(const Function<void(View*)>& callback);
-		
-		Function<void(View*)> getOnDetach();
-		
-		void setOnDetach(const Function<void(View*)>& callback);
-
-		Function<void(View*, Canvas*)> getOnDraw();
-		
-		void setOnDraw(const Function<void(View*, Canvas*)>& callback);
-		
-		Function<void(View*, Canvas*)> getOnPreDraw();
-		
-		void setOnPreDraw(const Function<void(View*, Canvas*)>& callback);
-		
-		Function<void(View*, Canvas*)> getOnPostDraw();
-		
-		void setOnPostDraw(const Function<void(View*, Canvas*)>& callback);
-
-		Function<void(View*, UIEvent*)> getOnMouseEvent();
-		
-		void setOnMouseEvent(const Function<void(View*, UIEvent*)>& callback);
-		
-		Function<void(View*, UIEvent*)> getOnTouchEvent();
-		
-		void setOnTouchEvent(const Function<void(View*, UIEvent*)>& callback);
-		
-		Function<void(View*, UIEvent*)> getOnKeyEvent();
-		
-		void setOnKeyEvent(const Function<void(View*, UIEvent*)>& callback);
-		
-		Function<void(View*, UIEvent*)> getOnMouseWheelEvent();
-		
-		void setOnMouseWheelEvent(const Function<void(View*, UIEvent*)>& callback);
-		
-		Function<void(View*)> getOnClick();
-		
-		void setOnClick(const Function<void(View*)>& callback);
-		
-		Function<void(View*, UIEvent*)> getOnSetCursor();
-		
-		void setOnSetCursor(const Function<void(View*, UIEvent*)>& callback);
-		
-		Function<void(View*, sl_ui_len, sl_ui_len)> getOnResize();
-		
-		void setOnResize(const Function<void(View*, sl_ui_len, sl_ui_len)>& callback);
-		
-		Function<void(View*, Visibility, Visibility)> getOnChangeVisibility();
-		
-		void setOnChangeVisibility(const Function<void(View*, Visibility oldVisibility, Visibility newVisibility)>& callback);
-		
-		Function<void(View*, sl_scroll_pos, sl_scroll_pos)> getOnScroll();
-
-		void setOnScroll(const Function<void(View*, sl_scroll_pos, sl_scroll_pos)>& callback);
-		
-		Function<void(View*, GestureEvent*)> getOnSwipe();
-		
-		void setOnSwipe(const Function<void(View*, GestureEvent*)>& callback);
-		
-		Function<void(View*, UIEvent*)> getOnOK();
-		
-		void setOnOK(const Function<void(View*, UIEvent*)>& callback);
-		
-		Function<void(View*, UIEvent*)> getOnCancel();
-		
-		void setOnCancel(const Function<void(View*, UIEvent*)>& callback);
 		
 	protected:
-		virtual void onDraw(Canvas* canvas);
-		
-		virtual void onPreDraw(Canvas* canvas);
-		
-		virtual void onPostDraw(Canvas* canvas);
-		
-		virtual void onDrawBackground(Canvas* canvas);
-		
-		virtual void onDrawBorder(Canvas* canvas);
-		
-		virtual void onMouseEvent(UIEvent* ev);
-		
-		virtual void onTouchEvent(UIEvent* ev);
-		
-		virtual void onMouseWheelEvent(UIEvent* ev);
-		
-		virtual void onKeyEvent(UIEvent* ev);
-		
-		virtual void onClick(UIEvent* ev);
-		
-		virtual void onSetCursor(UIEvent* ev);
-		
-		virtual void onResize(sl_ui_len width, sl_ui_len height);
-		
-		virtual void onResizeChild(View* child, sl_ui_len width, sl_ui_len height);
-		
-		virtual void onChangeVisibility(Visibility oldVisibility, Visibility newVisibility);
-		
-		virtual void onChangeVisibilityOfChild(View* child, Visibility oldVisibility, Visibility newVisibility);
-		
-		virtual void onScroll(sl_scroll_pos x, sl_scroll_pos y);
-		
-		virtual void onResizeContent(sl_scroll_pos width, sl_scroll_pos height);
-								
-		virtual void onSwipe(GestureEvent* ev);
-
-		virtual void onAttach();
-		
-		virtual void onDetach();
+		virtual void onChangeParent(View* oldParent, View* newParent);
 		
 		virtual void onAddChild(View* child);
 		
 		virtual void onRemoveChild(View* child);
-		
+
 		virtual void onUpdateLayout();
 		
 		virtual void onChangePadding();
 		
 		virtual void onUpdatePaging();
 		
-		virtual void onOK(UIEvent* ev);
+		virtual void onDrawBackground(Canvas* canvas);
 		
-		virtual void onCancel(UIEvent* ev);
+		virtual void onDrawBorder(Canvas* canvas);
+
+		virtual void onResizeChild(View* child, sl_ui_len width, sl_ui_len height);
+
+		virtual void onChangeVisibilityOfChild(View* child, Visibility oldVisibility, Visibility newVisibility);
+
+		virtual void onResizeContent(sl_scroll_pos width, sl_scroll_pos height);
 		
 	public:
-		virtual void dispatchAttach();
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Attach)
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Detach)
 		
-		virtual void dispatchDetach();
-		
-		virtual void dispatchDraw(Canvas* canvas);
-		
-		virtual void dispatchMouseEvent(UIEvent* ev);
-		
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Draw, Canvas* canvas)
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_DISPATCH(View, PreDraw, Canvas* canvas)
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_DISPATCH(View, PostDraw, Canvas* canvas)
+
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, MouseEvent, UIEvent* ev)
 		sl_bool dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* children, sl_size count);
-		
 		void dispatchMouseEventToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints = sl_true);
-		
-		virtual void dispatchTouchEvent(UIEvent* ev);
-		
+
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, TouchEvent, UIEvent* ev)
 		sl_bool dispatchTouchEventToChildren(UIEvent* ev, const Ref<View>* children, sl_size count);
-		
 		void dispatchTouchEventToMultipleChildren(UIEvent* ev, const Ref<View>* children, sl_size count);
-		
 		void dispatchTouchEventToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints = sl_true);
-		
-		virtual void dispatchMouseWheelEvent(UIEvent* ev);
-		
+
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, MouseWheelEvent, UIEvent* ev)
 		sl_bool dispatchMouseWheelEventToChildren(UIEvent* ev, const Ref<View>* children, sl_size count);
-		
 		void dispatchMouseWheelEventToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints = sl_true);
+
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, KeyEvent, UIEvent* ev)
 		
-		virtual void dispatchKeyEvent(UIEvent* ev);
-		
-		virtual void dispatchClick(UIEvent* ev);
-		
-		void dispatchClick();
-		
-		virtual void dispatchSetCursor(UIEvent* ev);
-		
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Click)
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, ClickEvent, UIEvent* ev)
+
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, SetCursor, UIEvent* ev)
 		sl_bool dispatchSetCursorToChildren(UIEvent* ev, const Ref<View>* children, sl_size count);
-		
 		void dispatchSetCursorToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints = sl_true);
 		
-		virtual void dispatchResize(sl_ui_len width, sl_ui_len height);
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Resize, sl_ui_len width, sl_ui_len height)
 		
-		virtual void dispatchChangeVisibility(Visibility oldVisibility, Visibility newVisibility);
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, ChangeVisibility, Visibility oldVisibility, Visibility newVisibility)
 		
-		virtual void dispatchScroll(sl_scroll_pos x, sl_scroll_pos y);
-
-		virtual void dispatchSwipe(GestureEvent* ev);
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Scroll, sl_scroll_pos x, sl_scroll_pos y)
 		
-		virtual void dispatchOK(UIEvent* ev);
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Swipe, GestureEvent* ev)
 		
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, OK, UIEvent* ev)
 		void dispatchOK();
-		
-		virtual void dispatchCancel(UIEvent* ev);
-		
+
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Cancel, UIEvent* ev)
 		void dispatchCancel();
-		
+
 	private:
 		void _processAttachOnUiThread();
 		
@@ -1470,7 +1358,7 @@ namespace slib
 		sl_bool m_flagTouchMultipleChildren;
 		sl_bool m_flagPassEventToChildren;
 		AtomicRef<View> m_childFocused;
-		sl_bool m_flagDuringEvent;
+		AtomicRef<UIEvent> m_currentEvent;
 		
 		sl_bool m_flagOkCancelEnabled;
 		sl_bool m_flagTabStopEnabled;
@@ -1683,23 +1571,24 @@ namespace slib
 		class EventAttributes : public Referable
 		{
 		public:
-			AtomicFunction<void(View*)> attach;
-			AtomicFunction<void(View*)> detach;
-			AtomicFunction<void(View*, Canvas*)> draw;
-			AtomicFunction<void(View*, Canvas*)> preDraw;
-			AtomicFunction<void(View*, Canvas*)> postDraw;
-			AtomicFunction<void(View*, UIEvent*)> mouse;
-			AtomicFunction<void(View*, UIEvent*)> touch;
-			AtomicFunction<void(View*, UIEvent*)> key;
-			AtomicFunction<void(View*, UIEvent*)> mouseWheel;
-			AtomicFunction<void(View*)> click;
-			AtomicFunction<void(View*, UIEvent*)> setCursor;
-			AtomicFunction<void(View*, sl_ui_len, sl_ui_len)> resize;
-			AtomicFunction<void(View*, Visibility, Visibility)> changeVisibility;
-			AtomicFunction<void(View*, sl_scroll_pos, sl_scroll_pos)> scroll;
-			AtomicFunction<void(View*, GestureEvent*)> swipe;
-			AtomicFunction<void(View*, UIEvent*)> ok;
-			AtomicFunction<void(View*, UIEvent*)> cancel;
+			AtomicFunction<void(View*)> onAttach;
+			AtomicFunction<void(View*)> onDetach;
+			AtomicFunction<void(View*, Canvas*)> onDraw;
+			AtomicFunction<void(View*, Canvas*)> onPreDraw;
+			AtomicFunction<void(View*, Canvas*)> onPostDraw;
+			AtomicFunction<void(View*, UIEvent*)> onMouseEvent;
+			AtomicFunction<void(View*, UIEvent*)> onTouchEvent;
+			AtomicFunction<void(View*, UIEvent*)> onKeyEvent;
+			AtomicFunction<void(View*, UIEvent*)> onMouseWheelEvent;
+			AtomicFunction<void(View*)> onClick;
+			AtomicFunction<void(View*, UIEvent*)> onClickEvent;
+			AtomicFunction<void(View*, UIEvent*)> onSetCursor;
+			AtomicFunction<void(View*, sl_ui_len, sl_ui_len)> onResize;
+			AtomicFunction<void(View*, Visibility, Visibility)> onChangeVisibility;
+			AtomicFunction<void(View*, sl_scroll_pos, sl_scroll_pos)> onScroll;
+			AtomicFunction<void(View*, GestureEvent*)> onSwipe;
+			AtomicFunction<void(View*, UIEvent*)> onOK;
+			AtomicFunction<void(View*, UIEvent*)> onCancel;
 			
 		public:
 			EventAttributes();

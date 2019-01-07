@@ -35,22 +35,19 @@ namespace slib
 	{
 	}
 	
-	void RenderDrawable::onRender(RenderCanvas* canvas, const Rectangle& rectDst, const DrawParam& param)
-	{
-	}
-	
-	void RenderDrawable::dispatchRender(RenderCanvas* canvas, const Rectangle& rectDst, const DrawParam& param)
-	{
-		onRender(canvas, rectDst, param);
-		getOnRender()(canvas, rectDst, param);
-	}
-	
 	void RenderDrawable::onDrawAll(Canvas* _canvas, const Rectangle& rectDst, const DrawParam& param)
 	{
 		RenderCanvas* canvas = CastInstance<RenderCanvas>(_canvas);
 		if (canvas) {
 			dispatchRender(canvas, rectDst, param);
 		}
+	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(RenderDrawable, Render, RenderCanvas* canvas, const Rectangle& rectDst, const DrawParam& param)
+	
+	void RenderDrawable::dispatchRender(RenderCanvas* canvas, const Rectangle& rectDst, const DrawParam& param)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(Render, canvas, rectDst, param)
 	}
 	
 	

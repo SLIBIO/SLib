@@ -88,37 +88,22 @@ namespace slib
 		
 		void setAutoDismissKeyboard(sl_bool flag);
 		
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(EditView, Change, String* pValue);
+		SLIB_DECLARE_EVENT_HANDLER(EditView, ReturnKey)
+		SLIB_DECLARE_EVENT_HANDLER(EditView, DoneEdit);
+		
 	protected:
 		void onUpdateLayout() override;
 		
 		void onDraw(Canvas* canvas) override;
 
-		void onClick(UIEvent* ev) override;
-		
-	public:
-		SLIB_PROPERTY(AtomicFunction<String(EditView*, String)>, OnChange)
-		
-		SLIB_PROPERTY(AtomicFunction<void(EditView*)>, OnReturnKey)
-		
-		SLIB_PROPERTY(AtomicFunction<void(EditView*)>, OnDoneEdit)
-		
-	protected:
-		virtual String onChange(const String& newValue);
-		
-		virtual void onReturnKey();
-		
-		virtual void onDoneEdit();
+		void onClick() override;
 		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
 		void dispatchKeyEvent(UIEvent* ev) override;
-		
-		virtual String dispatchChange(const String& newValue);
-		
-		virtual void dispatchReturnKey();
-		
-		virtual void dispatchDoneEdit();
 		
 	private:
 		void _getText_NW();
@@ -151,7 +136,7 @@ namespace slib
 		
 		void _setBackgroundColor_NW(const Color& color) override;
 		
-		String _onChangeEditViewNative(EditView* ev, const String& text);
+		void _onChangeEditViewNative(EditView* ev, String* text);
 		
 		void _onReturnKeyEditViewNative(EditView* ev);
 		

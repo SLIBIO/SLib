@@ -154,16 +154,38 @@ namespace slib
 		runJavaScript("slib.send('result_query_user_agent', navigator.userAgent)");
 	}
 
-	void WebView::onStartLoad(const String& url)
+	SLIB_DEFINE_EVENT_HANDLER(WebView, StartLoad, const String& url)
+	
+	void WebView::dispatchStartLoad(const String& url)
 	{
+		SLIB_INVOKE_EVENT_HANDLER(StartLoad, url)
 	}
 	
-	void WebView::onFinishLoad(const String& url, sl_bool flagFailed)
+	SLIB_DEFINE_EVENT_HANDLER(WebView, FinishLoad, const String& url, sl_bool flagFailed)
+
+	void WebView::dispatchFinishLoad(const String& url, sl_bool flagFailed)
 	{
+		SLIB_INVOKE_EVENT_HANDLER(FinishLoad, url, flagFailed)
+		
+		if (!flagFailed && m_callbackQueryUserAgentCompletion.isNotNull()) {
+			runJavaScript("slib.send('result_query_user_agent', navigator.userAgent);");
+		}
 	}
 	
-	void WebView::onMessageFromJavaScript(const String& msg, const String& param)
+	SLIB_DEFINE_EVENT_HANDLER(WebView, MessageFromJavaScript, const String& msg, const String& param)
+
+	void WebView::dispatchMessageFromJavaScript(const String& msg, const String& param)
 	{
+		if (msg == "result_query_user_agent") {
+			Function<void(WebView*, String)> callback = m_callbackQueryUserAgentCompletion;
+			if (callback.isNotNull()) {
+				callback(this, param);
+				m_callbackQueryUserAgentCompletion.setNull();
+			}
+			return;
+		}
+		
+		SLIB_INVOKE_EVENT_HANDLER(MessageFromJavaScript, msg, param)
 	}
 	
 	void WebView::dispatchAttach()
@@ -181,35 +203,6 @@ namespace slib
 		if (isNativeWidget()) {
 			_refreshSize_NW();
 		}
-	}
-	
-	void WebView::dispatchStartLoad(const String& url)
-	{
-		onStartLoad(url);
-		getOnStartLoad()(this, url);
-	}
-	
-	void WebView::dispatchFinishLoad(const String& url, sl_bool flagFailed)
-	{
-		onFinishLoad(url, flagFailed);
-		getOnFinishLoad()(this, url, flagFailed);
-		if (!flagFailed && m_callbackQueryUserAgentCompletion.isNotNull()) {
-			runJavaScript("slib.send('result_query_user_agent', navigator.userAgent);");
-		}
-	}
-	
-	void WebView::dispatchMessageFromJavaScript(const String& msg, const String& param)
-	{
-		if (msg == "result_query_user_agent") {
-			Function<void(WebView*, String)> callback = m_callbackQueryUserAgentCompletion;
-			if (callback.isNotNull()) {
-				callback(this, param);
-				m_callbackQueryUserAgentCompletion.setNull();
-			}
-			return;
-		}
-		onMessageFromJavaScript(msg, param);
-		getOnMessageFromJavaScript()(this, msg, param);
 	}
 	
 	

@@ -88,14 +88,11 @@ namespace slib
 		CameraView::stop();
 	}
 	
-	void QRCodeScanner::onDetect(const String& code)
-	{
-	}
-	
+	SLIB_DEFINE_EVENT_HANDLER(QRCodeScanner, Detect, const String& code)
+
 	void QRCodeScanner::dispatchDetect(const String& code)
 	{
-		getOnDetect()(this, code);
-		onDetect(code);
+		SLIB_INVOKE_EVENT_HANDLER(Detect, code)
 	}
 	
 	void QRCodeScanner::onDraw(Canvas* _canvas)

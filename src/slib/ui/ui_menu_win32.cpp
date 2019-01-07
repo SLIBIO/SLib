@@ -282,7 +282,7 @@ namespace slib
 				ret->m_icon = param.icon;
 				ret->m_checkedIcon = param.checkedIcon;
 				ret->m_submenu = param.submenu;
-				ret->m_action = param.action;
+				ret->setAction(param.action);
 				ret->m_hbmUnchecked = mii.hbmpUnchecked;
 				ret->m_hbmChecked = mii.hbmpChecked;
 				return ret;

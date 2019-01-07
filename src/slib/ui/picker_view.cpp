@@ -314,15 +314,13 @@ namespace slib
 		}
 	}
 	
-	void PickerView::onSelectItem(sl_uint32 index)
-	{
-	}
-	
+	SLIB_DEFINE_EVENT_HANDLER(PickerView, SelectItem, sl_uint32 index)
+
 	void PickerView::dispatchSelectItem(sl_uint32 index)
 	{
 		m_indexSelected = index;
-		onSelectItem(index);
-		getOnSelectItem()(this, index);
+		
+		SLIB_INVOKE_EVENT_HANDLER(SelectItem, index)
 	}
 	
 	void PickerView::_selectIndexInner(sl_int32 index)

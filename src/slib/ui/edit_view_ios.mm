@@ -240,7 +240,8 @@ namespace slib
 				} else if (area != nil) {
 					text = Apple::getStringFromNSString([area text]);
 				}
-				String textNew = view->dispatchChange(text);
+				String textNew = text;
+				view->dispatchChange(&textNew);
 				if (text != textNew) {
 					NSString* str = Apple::getNSStringFromString(textNew);
 					if (field != nil) {

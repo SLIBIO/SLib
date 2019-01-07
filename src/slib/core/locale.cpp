@@ -901,7 +901,7 @@ namespace slib
 		_g_priv_locale_current = locale;
 	}
 
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<void()> >, _g_priv_locale_callback_onChangeCurrent)
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void()>, _g_priv_locale_callback_onChangeCurrent)
 	Locale _g_priv_Locale_lastCurrent;
 
 	Function<void()> Locale::addOnChangeCurrentLocale(const Function<void()>& callback)
@@ -909,7 +909,7 @@ namespace slib
 		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_locale_callback_onChangeCurrent)) {
 			return callback;
 		}
-		_g_priv_locale_callback_onChangeCurrent.addIfNotExist(callback);
+		_g_priv_locale_callback_onChangeCurrent.add(callback);
 		{
 			SLIB_STATIC_SPINLOCKER(lock)
 			static sl_bool flagSetup = sl_false;
@@ -938,10 +938,7 @@ namespace slib
 		}
 		_g_priv_Locale_lastCurrent = locale;
 		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_locale_callback_onChangeCurrent))) {
-			ListLocker< Function<void()> > list(_g_priv_locale_callback_onChangeCurrent);
-			for (sl_size i = 0; i < list.count; i++) {
-				list[i]();
-			}
+			_g_priv_locale_callback_onChangeCurrent();
 		}
 	}
 	

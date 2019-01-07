@@ -159,17 +159,13 @@ namespace slib
 		virtual UIRect getTabContentRegion();
 		
 	public:
-		SLIB_PROPERTY(AtomicFunction<void(TabView*, sl_uint32)>, OnSelectTab)
+		SLIB_DECLARE_EVENT_HANDLER(TabView, SelectTab, sl_uint32 index)
 		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
-		virtual void dispatchSelectTab(sl_uint32 index);
-		
 	protected:
-		virtual void onSelectTab(sl_uint32 index);
-		
-		void onClick(UIEvent* ev) override;
+		void onClickEvent(UIEvent* ev) override;
 		
 		void onMouseEvent(UIEvent* ev) override;
 		

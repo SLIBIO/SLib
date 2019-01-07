@@ -243,8 +243,8 @@ namespace slib
 		
 		void onKeyEvent(UIEvent* ev) override;
 
-		void onClick(UIEvent* ev) override;
-		
+		void onClickEvent(UIEvent* ev) override;
+
 	protected:
 		virtual UISize measureContentSize();
 

@@ -49,9 +49,7 @@ namespace slib
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
-		void dispatchClick(UIEvent* ev) override;
-
-		void dispatchClick();
+		void dispatchClickEvent(UIEvent* ev) override;
 		
 	public:
 		void _getChecked_NW();

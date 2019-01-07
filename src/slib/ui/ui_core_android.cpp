@@ -302,7 +302,7 @@ namespace slib
 	jboolean _priv_Android_onBack(JNIEnv* env, jobject _this, jobject activity)
 	{
 		Log("Activity", "onBackPressed");
-		return (jboolean)(MobileApp::dispatchBackToApp());
+		return (jboolean)(MobileApp::dispatchBackPressedToApp());
 	}
 
 	void _priv_Android_onConfigurationChanged(JNIEnv* env, jobject _this, jobject activity)

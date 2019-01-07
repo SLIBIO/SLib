@@ -82,21 +82,17 @@ namespace slib
 		virtual void setTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		
-	public:
-		SLIB_PROPERTY(AtomicFunction<void(PickerView*, sl_uint32)>, OnSelectItem)
-		
+	public:		
+		SLIB_DECLARE_EVENT_HANDLER(PickerView, SelectItem, sl_uint32 index)
+
 	protected:
 		void onDraw(Canvas* canvas) override;
 		
 		void onMouseEvent(UIEvent* ev) override;
 		
-		virtual void onSelectItem(sl_uint32 index);
-		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
-		
-		virtual void dispatchSelectItem(sl_uint32 index);
-		
+				
 	private:
 		void _selectIndexInner(sl_int32 index);
 		

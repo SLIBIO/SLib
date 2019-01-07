@@ -26,6 +26,7 @@
 #include "definition.h"
 
 #include "../core/app.h"
+#include "../core/function.h"
 
 namespace slib
 {
@@ -61,19 +62,14 @@ namespace slib
 		void setMenu(const Ref<Menu>& menu);
 		
 	protected:
-		virtual void onStart();
-		
-		virtual void onExit();
-		
 		void onRunApp() override;
 		
 	public:
-		virtual void dispatchStart();
-		
+		SLIB_DECLARE_EVENT_HANDLER(UIApp, Start)
+		SLIB_DECLARE_EVENT_HANDLER(UIApp, Exit)
+	
+	public:
 		static void dispatchStartToApp();
-		
-		virtual void dispatchExit();
-		
 		static void dispatchExitToApp();
 		
 	private:

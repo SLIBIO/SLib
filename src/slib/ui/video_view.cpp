@@ -429,11 +429,9 @@ namespace slib
 	
 	void VideoView::_onSeek(Slider* slider, float value)
 	{
-		if (slider->isDuringEvent()) {
-			Ref<MediaPlayer> player = m_mediaPlayer;
-			if (player.isNotNull()) {
-				player->seekTo(value);
-			}
+		Ref<MediaPlayer> player = m_mediaPlayer;
+		if (player.isNotNull()) {
+			player->seekTo(value);
 		}
 	}
 

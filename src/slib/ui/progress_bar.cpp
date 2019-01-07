@@ -131,20 +131,6 @@ namespace slib
 		invalidate(mode);
 	}
 	
-	float ProgressBar::getRange()
-	{
-		float range = m_value_max - m_value_min;
-		if (range < 0) {
-			range = 0;
-		}
-		return range;
-	}
-	
-	void ProgressBar::setRange(float range, UIUpdateMode mode)
-	{
-		setMaximumValue(m_value_min + range, mode);
-	}
-	
 	float ProgressBar::getValue()
 	{
 		return m_value;
@@ -152,18 +138,10 @@ namespace slib
 	
 	void ProgressBar::setValue(float value, UIUpdateMode mode)
 	{
-		value = _refineValue(value);
-		if (Math::isAlmostZero(value - m_value)) {
+		if (tryChangeValue(value, m_value2, sl_false)) {
 			m_value = value;
-			return;
+			invalidate(mode);
 		}
-		m_value = value;
-		dispatchChange(value);
-		if (m_flagDualValues && value > m_value2) {
-			m_value2 = value;
-			dispatchChangeSecondary(value);
-		}
-		invalidate(mode);
 	}
 	
 	float ProgressBar::getSecondaryValue()
@@ -173,18 +151,10 @@ namespace slib
 	
 	void ProgressBar::setSecondaryValue(float value, UIUpdateMode mode)
 	{
-		value = _refineValue(value);
-		if (Math::isAlmostZero(value - m_value2)) {
+		if (tryChangeValue(m_value, value, sl_true)) {
 			m_value2 = value;
-			return;
+			invalidate(mode);
 		}
-		m_value2 = value;
-		dispatchChangeSecondary(value);
-		if (m_flagDualValues && value < m_value) {
-			m_value = value;
-			dispatchChange(value);
-		}
-		invalidate(mode);
 	}
 	
 	sl_bool ProgressBar::isDualValues()
@@ -195,12 +165,7 @@ namespace slib
 	void ProgressBar::setDualValues(sl_bool flagDualValues, UIUpdateMode mode)
 	{
 		m_flagDualValues = flagDualValues;
-		if (flagDualValues) {
-			if (m_value2 < m_value) {
-				m_value2 = m_value;
-				dispatchChangeSecondary(m_value2);
-			}
-		}
+		tryChangeValue(m_value, m_value2, sl_false);
 		invalidate(mode);
 	}
 	
@@ -300,7 +265,7 @@ namespace slib
 		}
 		if (progress.isNotNull() || progress2.isNotNull()) {
 			UIRect rc, rc2;
-			_getProgressRegions(rc, rc2);
+			getProgressRegions(rc, rc2);
 			if (progress2.isNotNull() && rc2.isValidSize()) {
 				canvas->draw(rc2, progress2);
 			}
@@ -310,10 +275,10 @@ namespace slib
 		}
 	}
 	
-	float ProgressBar::_refineValue(float value)
+	float ProgressBar::refineValue(float value)
 	{
 		if (m_flagDiscrete) {
-			float step = _refineStep();
+			float step = refineStep();
 			if (step > SLIB_EPSILON) {
 				value = (float)((int)((value - m_value_min) / step) * step + m_value_min);
 			}
@@ -327,22 +292,49 @@ namespace slib
 		return value;
 	}
 	
-	float ProgressBar::_refineStep()
+	int ProgressBar::tryChangeValue(float& value, float& value2, sl_bool flagChange2)
+	{
+		int ret = 0;
+		float newValue = refineValue(value);
+		if (m_flagDualValues) {
+			float newValue2 = refineValue(value2);
+			if (flagChange2) {
+				if (newValue > newValue2) {
+					newValue = newValue2;
+				}
+			} else {
+				if (newValue > newValue2) {
+					newValue2 = newValue;
+				}
+			}
+			if (!(Math::isAlmostZero(newValue2 - m_value2))) {
+				ret |= 2;
+			}
+			value2 = newValue2;
+		}
+		if (!(Math::isAlmostZero(newValue - m_value))) {
+			ret |= 1;
+		}
+		value = newValue;
+		return ret;
+	}
+	
+	float ProgressBar::refineStep()
 	{
 		sl_real step = m_step;
 		if (step > SLIB_EPSILON) {
 			return step;
 		}
-		float range = getRange();
+		float range = m_value_max - m_value_min;
 		if (m_flagDiscrete && range > 1) {
 			return 1;
 		} else {
-			step = getRange() / 20;
+			step = range / 20;
 		}
 		return step;
 	}
 	
-	sl_ui_pos ProgressBar::_getPositionFromValue(float value)
+	sl_ui_pos ProgressBar::getPositionFromValue(float value)
 	{
 		sl_ui_pos paddingLeft = getPaddingLeft();
 		sl_ui_pos paddingTop = getPaddingTop();
@@ -371,12 +363,12 @@ namespace slib
 		}
 	}
 	
-	void ProgressBar::_getProgressRegions(UIRect& outProgress, UIRect& outSecondaryProgress)
+	void ProgressBar::getProgressRegions(UIRect& outProgress, UIRect& outSecondaryProgress)
 	{
-		sl_ui_pos pos1 = _getPositionFromValue(m_value);
+		sl_ui_pos pos1 = getPositionFromValue(m_value);
 		sl_ui_pos pos2 = 0;
 		if (m_flagDualValues && m_value2 > m_value) {
-			pos2 = _getPositionFromValue(m_value2);
+			pos2 = getPositionFromValue(m_value2);
 		}
 		if (m_orientation == LayoutOrientation::Horizontal) {
 			if (m_flagReversed) {
@@ -413,12 +405,4 @@ namespace slib
 		}
 	}
 	
-	void ProgressBar::dispatchChange(float value)
-	{
-	}
-	
-	void ProgressBar::dispatchChangeSecondary(float value)
-	{
-	}
-
 }

@@ -457,15 +457,13 @@ namespace slib
 		}
 	}
 	
-	void SelectView::onSelectItem(sl_uint32 index)
-	{
-	}
-	
+	SLIB_DEFINE_EVENT_HANDLER(SelectView, SelectItem, sl_uint32 index)
+
 	void SelectView::dispatchSelectItem(sl_uint32 index)
 	{
 		m_indexSelected = index;
-		onSelectItem(index);
-		getOnSelectItem()(this, index);
+		
+		SLIB_INVOKE_EVENT_HANDLER(SelectItem, index)
 	}
 	
 	UIRect SelectView::getLeftIconRegion()

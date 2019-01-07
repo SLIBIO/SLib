@@ -238,11 +238,6 @@ namespace slib
 		}
 	}
 
-	void RenderView::onFrame(RenderEngine* engine)
-	{
-		renderViewContent(engine);
-	}
-
 	void RenderView::onAttach()
 	{
 		requestRender();
@@ -260,6 +255,13 @@ namespace slib
 		} else {
 			View::onDrawBackground(canvas);
 		}
+	}
+
+	SLIB_DEFINE_EVENT_HANDLER_WITHOUT_ON(RenderView, Frame, RenderEngine* engine)
+	
+	void RenderView::onFrame(RenderEngine* engine)
+	{
+		renderViewContent(engine);
 	}
 
 	void RenderView::dispatchFrame(RenderEngine* engine)
@@ -299,9 +301,7 @@ namespace slib
 			} while (0);
 		}
 		
-		onFrame(engine);
-		
-		getOnFrame()(this, engine);
+		SLIB_INVOKE_EVENT_HANDLER(Frame, engine)
 		
 		if (m_flagDebugTextVisible) {
 #if defined(SLIB_DEBUG)

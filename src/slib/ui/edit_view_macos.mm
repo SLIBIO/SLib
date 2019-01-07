@@ -171,7 +171,8 @@ namespace slib
 			Ref<View> _view = instance->getView();
 			if (EditView_Impl* view = CastInstance<EditView_Impl>(_view.get())) {
 				String text = Apple::getStringFromNSString([control stringValue]);
-				String textNew = view->dispatchChange(text);
+				String textNew = text;
+				view->dispatchChange(&textNew);
 				if (text != textNew) {
 					NSString* str = Apple::getNSStringFromString(textNew);
 					[control setStringValue:str];
@@ -184,7 +185,8 @@ namespace slib
 			Ref<View> _view = instance->getView();
 			if (EditView_Impl* view = CastInstance<EditView_Impl>(_view.get())) {
 				String text = Apple::getStringFromNSString([control->m_textView string]);
-				String textNew = view->dispatchChange(text);
+				String textNew = text;
+				view->dispatchChange(&textNew);
 				if (text != textNew) {
 					NSString* str = Apple::getNSStringFromString(textNew);
 					[control->m_textView setString:str];

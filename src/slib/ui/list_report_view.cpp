@@ -269,52 +269,42 @@ namespace slib
 		setRowsCount(0, mode);
 	}
 	
-	void ListReportView::onSelectRow(sl_uint32 row)
-	{
-	}
-	
-	void ListReportView::onClickRow(sl_uint32 row, const UIPoint& pt)
-	{
-	}
-	
-	void ListReportView::onRightButtonClickRow(sl_uint32 row, const UIPoint& pt)
-	{
-	}
-	
-	void ListReportView::onDoubleClickRow(sl_uint32 row, const UIPoint& pt)
-	{
-	}
-	
+	SLIB_DEFINE_EVENT_HANDLER(ListReportView, SelectRow, sl_uint32 row)
+
 	void ListReportView::dispatchSelectRow(sl_uint32 row)
 	{
-		onSelectRow(row);
-		getOnSelectRow()(this, row);
+		SLIB_INVOKE_EVENT_HANDLER(SelectRow, row)
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(ListReportView, ClickRow, sl_uint32 row, const UIPoint& pt)
+
 	void ListReportView::dispatchClickRow(sl_uint32 row, const UIPoint& pt)
 	{
 		Ref<UIEvent> ev = UIEvent::createMouseEvent(UIAction::Unknown, (sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y), Time::zero());
 		if (ev.isNotNull()) {
-			dispatchClick(ev.get());
+			dispatchClickEvent(ev.get());
 		}
-		onClickRow(row, pt);
-		getOnClickRow()(this, row, pt);
+		
+		SLIB_INVOKE_EVENT_HANDLER(ClickRow, row, pt)
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(ListReportView, RightButtonClickRow, sl_uint32 row, const UIPoint& pt)
+
 	void ListReportView::dispatchRightButtonClickRow(sl_uint32 row, const UIPoint& pt)
 	{
-		onRightButtonClickRow(row, pt);
-		getOnRightButtonClickRow()(this, row, pt);
+		SLIB_INVOKE_EVENT_HANDLER(RightButtonClickRow, row, pt)
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(ListReportView, DoubleClickRow, sl_uint32 row, const UIPoint& pt)
+
 	void ListReportView::dispatchDoubleClickRow(sl_uint32 row, const UIPoint& pt)
 	{
 		Ref<UIEvent> ev = UIEvent::createMouseEvent(UIAction::LeftButtonDoubleClick, (sl_real)(pt.x), (sl_real)(pt.y), Time::zero());
 		if (ev.isNotNull()) {
 			dispatchMouseEvent(ev.get());
 		}
-		onDoubleClickRow(row, pt);
-		getOnDoubleClickRow()(this, row, pt);
+
+		SLIB_INVOKE_EVENT_HANDLER(DoubleClickRow, row, pt)
 	}
 	
 	

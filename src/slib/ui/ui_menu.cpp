@@ -121,16 +121,6 @@ namespace slib
 		m_submenu = menu;
 	}
 	
-	Function<void()> MenuItem::getAction() const
-	{
-		return m_action;
-	}
-	
-	void MenuItem::setAction(const Function<void()>& action)
-	{
-		m_action = action;
-	}
-	
 	sl_bool MenuItem::isSeparator() const
 	{
 		return sl_false;
@@ -155,7 +145,7 @@ namespace slib
 	{
 		if (km != 0) {
 			if (km == m_shortcutKey) {
-				m_action();
+				getAction()();
 				return sl_true;
 			}
 			Ref<Menu> submenu = m_submenu;

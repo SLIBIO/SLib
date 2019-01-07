@@ -221,31 +221,14 @@ namespace slib
 		void update(float elapsedSeconds);
 
 	public:
-		SLIB_PROPERTY(AtomicFunction<void()>, OnStop)
-
-		SLIB_PROPERTY(AtomicFunction<void(Animation*, float seconds)>, OnAnimationFrame)
-
-		SLIB_PROPERTY(AtomicFunction<void(Animation*, sl_int32 nRemainingRepeatCount)>, OnRepeatAnimation)
-
-		SLIB_PROPERTY(AtomicFunction<void(Animation*)>, OnStopAnimation)
-
-	protected:
-		virtual void onAnimationFrame(float seconds);
-
-		virtual void onRepeatAnimation(sl_int32 nRemainingRepeatCount);
-
-		virtual void onStopAnimation();
+		SLIB_PROPERTY_FUNCTION(void(), OnStop)
+		SLIB_DECLARE_EVENT_HANDLER(Animation, AnimationFrame, float seconds)
+		SLIB_DECLARE_EVENT_HANDLER(Animation, RepeatAnimation, sl_int32 nRemainingRepeatCount)
+		SLIB_DECLARE_EVENT_HANDLER(Animation, StopAnimation)
 
 	public:
-		void dispatchAnimationFrame(float seconds);
-
 		void dispatchStartFrame();
-
 		void dispatchEndFrame();
-	
-		void dispatchRepeatAnimation(sl_int32 nRemainingRepeatCount);
-
-		void dispatchStopAnimation();
 
 	private:
 		float _getTime(sl_uint32& iRepeat, sl_bool& flagStop);

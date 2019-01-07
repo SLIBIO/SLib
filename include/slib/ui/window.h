@@ -360,100 +360,25 @@ namespace slib
 		
 		void removeAllViews();
 
-	public:		
-		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnCreate)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnCreateFailed)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Window*, UIEvent*)>, OnClose)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnDestroy)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnActivate)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnDeactivate)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnMove)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Window*, UISize&)>, OnResizing)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Window*, sl_ui_len, sl_ui_len)>, OnResize)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnMinimize)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnDeminimize)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnMaximize)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnDemaximize)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Window*, UIEvent* ev)>, OnOK)
-		
-		SLIB_PROPERTY(AtomicFunction<void(Window*, UIEvent* ev)>, OnCancel)
-
-	protected:
-		virtual void onCreate();
-		
-		virtual void onCreateFailed();
-		
-		virtual void onClose(UIEvent* ev);
-		
-		virtual void onDestroy();
-		
-		virtual void onActivate();
-		
-		virtual void onDeactivate();
-		
-		virtual void onMove();
-		
-		virtual void onResizing(UISize& size);
-		
-		virtual void onResize(sl_ui_len clientWidth, sl_ui_len clientHeight);
-
-		virtual void onMinimize();
-		
-		virtual void onDeminimize();
-		
-		virtual void onMaximize();
-		
-		virtual void onDemaximize();
-		
-		virtual void onOK(UIEvent* ev);
-		
-		virtual void onCancel(UIEvent* ev);
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(Window, Create)
+		SLIB_DECLARE_EVENT_HANDLER(Window, CreateFailed)
+		SLIB_DECLARE_EVENT_HANDLER(Window, Close, UIEvent* ev)
+		SLIB_DECLARE_EVENT_HANDLER(Window, Destroy)
+		SLIB_DECLARE_EVENT_HANDLER(Window, Activate)
+		SLIB_DECLARE_EVENT_HANDLER(Window, Deactivate)
+		SLIB_DECLARE_EVENT_HANDLER(Window, Move)
+		SLIB_DECLARE_EVENT_HANDLER(Window, Resizing, UISize& size)
+		SLIB_DECLARE_EVENT_HANDLER(Window, Resize, sl_ui_len clientWidth, sl_ui_len clientHeight)
+		SLIB_DECLARE_EVENT_HANDLER(Window, Minimize)
+		SLIB_DECLARE_EVENT_HANDLER(Window, Deminimize)
+		SLIB_DECLARE_EVENT_HANDLER(Window, Maximize)
+		SLIB_DECLARE_EVENT_HANDLER(Window, Demaximize)
+		SLIB_DECLARE_EVENT_HANDLER(Window, OK, UIEvent* ev)
+		SLIB_DECLARE_EVENT_HANDLER(Window, Cancel, UIEvent* ev)
 
 	public:
-		virtual void dispatchCreate();
-		
-		virtual void dispatchCreateFailed();
-		
-		virtual void dispatchClose(UIEvent* ev);
-		
-		virtual void dispatchDestroy();
-		
-		virtual void dispatchActivate();
-		
-		virtual void dispatchDeactivate();
-		
-		virtual void dispatchMove();
-		
-		virtual void dispatchResizing(UISize& size);
-		
-		virtual void dispatchResize(sl_ui_len clientWidth, sl_ui_len clientHeight);
-		
-		virtual void dispatchMinimize();
-		
-		virtual void dispatchDeminimize();
-		
-		virtual void dispatchMaximize();
-		
-		virtual void dispatchDemaximize();
-		
-		virtual void dispatchOK(UIEvent* ev);
-		
 		void dispatchOK();
-		
-		virtual void dispatchCancel(UIEvent* ev);
 		
 		void dispatchCancel();
 		

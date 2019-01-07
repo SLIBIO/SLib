@@ -602,14 +602,12 @@ namespace slib
 		ev->stopPropagation();
 	}
 	
-	void ScrollBar::onChange(sl_scroll_pos value)
-	{
-	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(ScrollBar, Change, sl_scroll_pos value)
 	
 	void ScrollBar::dispatchChange(sl_scroll_pos value)
 	{
-		onChange(value);
-		getOnChange()(this, value);
+		SLIB_INVOKE_EVENT_HANDLER(Change, value)
 	}
 	
 	void ScrollBar::_setHoverThumb(sl_bool flag)

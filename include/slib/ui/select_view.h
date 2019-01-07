@@ -114,18 +114,15 @@ namespace slib
 		
 		virtual void setTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		
 	public:
-		SLIB_PROPERTY(AtomicFunction<void(SelectView*, sl_uint32)>, OnSelectItem)
-		
+		SLIB_DECLARE_EVENT_HANDLER(SelectView, SelectItem, sl_uint32 index)		
+
 	protected:
 		void onDraw(Canvas* canvas) override;
 		
 		void onMouseEvent(UIEvent* ev) override;
 		
 		void onUpdateLayout() override;
-		
-		virtual void onSelectItem(sl_uint32 index);
 		
 	protected:
 		UIRect getLeftIconRegion();
@@ -134,8 +131,6 @@ namespace slib
 		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
-		
-		virtual void dispatchSelectItem(sl_uint32 index);
 		
 	private:		
 		void _select_NW(sl_uint32 index);

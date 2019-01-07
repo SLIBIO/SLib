@@ -318,7 +318,8 @@ namespace slib
 						::free(t);
 					}
 				}
-				String textNew = view->dispatchChange(text);
+				String textNew = text;
+				view->dispatchChange(&textNew);
 				if (text != textNew) {
 					if (textNew.isEmpty()) {
 						::elm_entry_entry_set(obj, "");

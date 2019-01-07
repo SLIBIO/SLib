@@ -169,6 +169,20 @@ namespace slib
 		setThumbSize(UISize(m_thumbSize.x, height), mode);
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(Slider, Change, float value)
+	
+	void Slider::dispatchChange(float value)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(Change, value)
+	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(Slider, ChangeSecondary, float value)
+	
+	void Slider::dispatchChangeSecondary(float value)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(ChangeSecondary, value)
+	}
+
 	void Slider::onDraw(Canvas* canvas)
 	{
 		Ref<Drawable> progress = m_progress;
@@ -269,9 +283,9 @@ namespace slib
 				if (m_indexPressedThumb >= 0) {
 					float value = _getValueFromPosition(pos);
 					if (m_indexPressedThumb == 0) {
-						setValue(value);
+						_changeValue(value, sl_false);
 					} else {
-						setSecondaryValue(value);
+						_changeValue(value, sl_true);
 					}
 				}
 				break;
@@ -291,7 +305,7 @@ namespace slib
 	
 	void Slider::onMouseWheelEvent(UIEvent* ev)
 	{
-		float step = _refineStep();
+		float step = refineStep();
 		sl_real delta;
 		if (isVertical()) {
 			delta = ev->getDeltaY();
@@ -299,9 +313,9 @@ namespace slib
 			delta = ev->getDeltaX();
 		}
 		if (delta > SLIB_EPSILON) {
-			setValue(m_value - step);
+			_changeValue(m_value - step, sl_false);
 		} else if (delta < -SLIB_EPSILON) {
-			setValue(m_value + step);
+			_changeValue(m_value + step, sl_false);
 		}
 		
 		ev->stopPropagation();
@@ -309,42 +323,22 @@ namespace slib
 	
 	void Slider::onKeyEvent(UIEvent* ev)
 	{
-		float step = _refineStep();
+		float step = refineStep();
 		if (ev->getAction() == UIAction::KeyDown) {
 			switch (ev->getKeycode()) {
 				case Keycode::Left:
 				case Keycode::Up:
-					setValue(getValue() - step);
+					_changeValue(m_value - step, sl_false);
 					break;
 				case Keycode::Right:
 				case Keycode::Down:
-					setValue(getValue() + step);
+					_changeValue(m_value + step, sl_false);
 					break;
 				default:
 					return;
 			}
 			ev->stopPropagation();
 		}
-	}
-	
-	void Slider::onChange(float value)
-	{
-	}
-	
-	void Slider::onChangeSecondary(float value)
-	{
-	}
-	
-	void Slider::dispatchChange(float value)
-	{
-		onChange(value);
-		getOnChange()(this, value);
-	}
-	
-	void Slider::dispatchChangeSecondary(float value)
-	{
-		onChangeSecondary(value);
-		getOnChangeSecondary()(this, value);
 	}
 	
 	void Slider::_drawTrack(Canvas* canvas, const Ref<Drawable>& track, const Rectangle& rectDst)
@@ -590,4 +584,28 @@ namespace slib
 			invalidate();
 		}
 	}
+	
+	void Slider::_changeValue(float v, sl_bool flagChange2)
+	{
+		float value, value2;
+		if (flagChange2) {
+			value = m_value;
+			value2 = v;
+		} else {
+			value = v;
+			value2 = m_value2;
+		}
+		int n = tryChangeValue(value, value2, flagChange2);
+		m_value = value;
+		if (n & 1) {
+			dispatchChange(value);
+		}
+		if (isDualValues()) {
+			m_value2 = value2;
+			if (n & 2) {
+				dispatchChangeSecondary(value2);
+			}
+		}
+	}
+	
 }

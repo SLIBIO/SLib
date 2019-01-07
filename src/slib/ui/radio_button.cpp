@@ -123,20 +123,14 @@ namespace slib
 	{
 	}
 
-	void RadioButton::dispatchClick(UIEvent* ev)
+	void RadioButton::dispatchClickEvent(UIEvent* ev)
 	{
-		CheckBox::dispatchClick(ev);
+		CheckBox::dispatchClickEvent(ev);
 		Ref<RadioGroup> group = getRadioGroup();
 		if (group.isNotNull()) {
 			group->select(this);
 		}
 	}
-
-	void RadioButton::dispatchClick()
-	{
-		View::dispatchClick();
-	}
-
 
 	SLIB_DEFINE_OBJECT(RadioGroup, Object)
 

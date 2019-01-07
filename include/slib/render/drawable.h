@@ -41,17 +41,12 @@ namespace slib
 		RenderDrawable();
 		
 		~RenderDrawable();
-		
-	protected:
-		virtual void onRender(RenderCanvas* canvas, const Rectangle& rectDst, const DrawParam& param);
-		
+
 	public:
-		virtual void dispatchRender(RenderCanvas* canvas, const Rectangle& rectDst, const DrawParam& param);
-		
 		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
 		
 	public:
-		SLIB_PROPERTY(AtomicFunction<void(RenderCanvas*, Rectangle const&, DrawParam const&)>, OnRender)
+		SLIB_DECLARE_EVENT_HANDLER(RenderDrawable, Render, RenderCanvas*, Rectangle const&, DrawParam const&)
 		
 	};
 	

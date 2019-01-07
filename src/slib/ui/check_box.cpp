@@ -158,19 +158,14 @@ namespace slib
 		}
 	}
 
-	void CheckBox::dispatchClick(UIEvent* ev)
+	void CheckBox::dispatchClickEvent(UIEvent* ev)
 	{
 		if (isNativeWidget()) {
 			_getChecked_NW();
 		} else {
 			setChecked(!m_flagChecked);
 		}
-		Button::dispatchClick(ev);
-	}
-
-	void CheckBox::dispatchClick()
-	{
-		View::dispatchClick();
+		Button::dispatchClickEvent(ev);
 	}
 
 #if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_WIN32)

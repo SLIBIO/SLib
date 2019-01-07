@@ -527,18 +527,16 @@ namespace slib
 		invalidate(mode);
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(TabView, SelectTab, sl_uint32 index)
+
 	void TabView::dispatchSelectTab(sl_uint32 index)
 	{
 		m_indexSelected = index;
-		onSelectTab(index);
-		getOnSelectTab()(this, index);
+		
+		SLIB_INVOKE_EVENT_HANDLER(SelectTab, index)
 	}
 
-	void TabView::onSelectTab(sl_uint32 index)
-	{
-	}
-
-	void TabView::onClick(UIEvent* ev)
+	void TabView::onClickEvent(UIEvent* ev)
 	{
 		UIPoint pt = ev->getPoint();
 		ObjectLocker lock(this);

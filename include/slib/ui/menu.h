@@ -81,15 +81,14 @@ namespace slib
 		
 		virtual void setSubmenu(const Ref<Menu>& menu);
 		
-		Function<void()> getAction() const;
-		
-		virtual void setAction(const Function<void()>& action);
-		
 		virtual sl_bool isSeparator() const;
 		
 		static Ref<MenuItem> createSeparator();
 		
 		sl_bool processShortcutKey(const KeycodeAndModifiers& km);
+
+	public:
+		SLIB_PROPERTY_FUNCTION(void(), Action)
 		
 	protected:
 		WeakRef<Menu> m_parent;
@@ -102,7 +101,6 @@ namespace slib
 		AtomicRef<Bitmap> m_icon;
 		AtomicRef<Bitmap> m_checkedIcon;
 		AtomicRef<Menu> m_submenu;
-		AtomicFunction<void()> m_action;
 		
 	};
 	

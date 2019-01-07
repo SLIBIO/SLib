@@ -36,7 +36,8 @@ namespace slib
 		Ref<View> _view = Android_ViewInstance::findView(instance);
 		if (EditView* view = CastInstance<EditView>(_view.get())) {
 			String text = view->getText();
-			String textNew = view->dispatchChange(text);
+			String textNew = text;
+			view->dispatchChange(&textNew);
 			if (text != textNew) {
 				view->setText(text);
 			}

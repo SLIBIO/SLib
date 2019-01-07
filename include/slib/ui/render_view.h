@@ -81,19 +81,16 @@ namespace slib
 	public:
 		SLIB_PROPERTY(RenderEngineType, PreferredEngineType)
 		
-		SLIB_PROPERTY(AtomicFunction<void(RenderView*, RenderEngine*)>, OnFrame)
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(RenderView, Frame, RenderEngine* engine)
 
 	protected:
-		virtual void onFrame(RenderEngine* engine);
-		
 		void onAttach() override;
 		
 		void onDrawBackground(Canvas* canvas) override;
 		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* _parent) override;
-		
-		virtual void dispatchFrame(RenderEngine* engine);
 		
 		void dispatchMouseEvent(UIEvent* ev) override;
 		

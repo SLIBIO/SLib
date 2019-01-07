@@ -60,10 +60,6 @@ namespace slib
 		
 		void setMaximumValue(float value, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		float getRange();
-		
-		void setRange(float range, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
 		float getValue();
 		
 		void setValue(float value, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -111,17 +107,15 @@ namespace slib
 		void onDraw(Canvas* canvas) override;
 		
 	protected:
-		float _refineValue(float value);
+		float refineValue(float value);
 		
-		float _refineStep();
+		int tryChangeValue(float& value, float& value2, sl_bool flagChange2);
+
+		float refineStep();
 		
-		sl_ui_pos _getPositionFromValue(float value);
+		sl_ui_pos getPositionFromValue(float value);
 		
-		void _getProgressRegions(UIRect& outProgress, UIRect& outSecondaryProgress);
-		
-		virtual void dispatchChange(float value);
-		
-		virtual void dispatchChangeSecondary(float value);
+		void getProgressRegions(UIRect& outProgress, UIRect& outSecondaryProgress);
 		
 	protected:
 		LayoutOrientation m_orientation;

@@ -761,7 +761,7 @@ namespace slib
 		}
 	}
 
-	void Button::onClick(UIEvent* ev)
+	void Button::onClickEvent(UIEvent* ev)
 	{
 		dispatchOK(ev);
 	}

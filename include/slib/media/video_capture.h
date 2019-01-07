@@ -79,7 +79,7 @@ namespace slib
 		virtual sl_bool isRunning() = 0;
 		
 	public:
-		SLIB_PROPERTY(AtomicFunction<void(VideoCapture*, VideoCaptureFrame*)>, OnCaptureVideoFrame)
+		SLIB_PROPERTY_FUNCTION(void(VideoCapture*, VideoCaptureFrame*), OnCaptureVideoFrame)
 		
 	protected:
 		void _init(const VideoCaptureParam& param);

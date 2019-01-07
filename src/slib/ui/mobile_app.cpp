@@ -49,7 +49,7 @@ namespace slib
 		m_pager->setVisibility(Visibility::Hidden, UIUpdateMode::Init);
 		m_contentView->addChild(m_pager, UIUpdateMode::Init);
 
-		m_callbackOnChangeLocale = SLIB_FUNCTION_CLASS(MobileApp, onChangeCurrentLocale, this);
+		m_callbackOnChangeLocale = SLIB_FUNCTION_CLASS(MobileApp, dispatchChangeCurrentLocale, this);
 		Locale::addOnChangeCurrentLocale(m_callbackOnChangeLocale);
 	}
 	
@@ -220,37 +220,6 @@ namespace slib
 		}
 	}
 	
-	void MobileApp::onPause()
-	{
-	}
-	
-	void MobileApp::onResume()
-	{
-	}
-	
-	void MobileApp::onBack(UIEvent* ev)
-	{
-	}
-	
-	void MobileApp::onCreateActivity()
-	{
-	}
-	
-	void MobileApp::onDestroyActivity()
-	{
-	}
-	
-	void MobileApp::onResize(sl_ui_len width, sl_ui_len height)
-	{
-	}
-	
-	void MobileApp::onChangeCurrentLocale()
-	{
-		if (m_pager->getPagesCount() > 0) {
-			openStartupPage();
-		}
-	}
-	
 	void MobileApp::dispatchStart()
 	{
 		UIApp::dispatchStart();
@@ -262,9 +231,12 @@ namespace slib
 #endif
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(MobileApp, Pause)
+
 	void MobileApp::dispatchPause()
 	{
-		onPause();
+		SLIB_INVOKE_EVENT_HANDLER(Pause)
+		
 		Ref<ViewPager> pager = m_pager;
 		if (pager.isNotNull()) {
 			Ref<View> page = pager->getCurrentPage();
@@ -281,32 +253,9 @@ namespace slib
 		}
 	}
 	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<void()> >, _g_priv_ui_mobile_app_callback_list_onPause)
-	
-	Function<void()> MobileApp::addOnPause(const Function<void()>& callback)
-	{
-		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onPause))) {
-			_g_priv_ui_mobile_app_callback_list_onPause.addIfNotExist(callback);
-		}
-		return callback;
-	}
-	
-	void MobileApp::removeOnPause(const Function<void()>& callback)
-	{
-		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onPause))) {
-			_g_priv_ui_mobile_app_callback_list_onPause.remove(callback);
-		}
-	}
-	
 	void MobileApp::dispatchPauseToApp()
 	{
 		m_flagPaused = sl_true;
-		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onPause))) {
-			ListLocker< Function<void()> > list(_g_priv_ui_mobile_app_callback_list_onPause);
-			for (sl_size i = 0; i < list.count; i++) {
-				list[i]();
-			}
-		}
 		Ref<MobileApp> app = getApp();
 		if (app.isNotNull()) {
 			app->dispatchPause();
@@ -325,22 +274,34 @@ namespace slib
 		}
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(MobileApp, Resume)
+
 	void MobileApp::dispatchResume()
 	{
-		onResume();
+		SLIB_INVOKE_EVENT_HANDLER(Resume)
+		
 		Ref<ViewPager> pager = m_pager;
 		if (pager.isNotNull()) {
 			Ref<View> page = pager->getCurrentPage();
 			if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
-				_page->dispatchPause();
+				_page->dispatchResume();
 			}
 		}
 		ListLocker< Ref<ViewPage> > popups(m_popupPages);
 		for (sl_size i = 0; i < popups.count; i++) {
 			Ref<ViewPage> page = popups[i];
 			if (page.isNotNull()) {
-				page->dispatchPause();
+				page->dispatchResume();
 			}
+		}
+	}
+	
+	void MobileApp::dispatchResumeToApp()
+	{
+		m_flagPaused = sl_false;
+		Ref<MobileApp> app = getApp();
+		if (app.isNotNull()) {
+			app->dispatchResume();
 		}
 		{
 			Ref<UIAnimationLoop> al = UIAnimationLoop::getInstance();
@@ -356,41 +317,12 @@ namespace slib
 		}
 	}
 	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<void()> >, _g_priv_ui_mobile_app_callback_list_onResume)
-	
-	Function<void()> MobileApp::addOnResume(const Function<void()>& callback)
+	SLIB_DEFINE_EVENT_HANDLER(MobileApp, BackPressed, UIEvent* ev)
+
+	void MobileApp::dispatchBackPressed(UIEvent* ev)
 	{
-		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onResume))) {
-			_g_priv_ui_mobile_app_callback_list_onResume.addIfNotExist(callback);
-		}
-		return callback;
-	}
-	
-	void MobileApp::removeOnResume(const Function<void()>& callback)
-	{
-		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onResume))) {
-			_g_priv_ui_mobile_app_callback_list_onResume.remove(callback);
-		}
-	}
-	
-	void MobileApp::dispatchResumeToApp()
-	{
-		m_flagPaused = sl_false;
-		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onResume))) {
-			ListLocker< Function<void()> > list(_g_priv_ui_mobile_app_callback_list_onResume);
-			for (sl_size i = 0; i < list.count; i++) {
-				list[i]();
-			}
-		}
-		Ref<MobileApp> app = getApp();
-		if (app.isNotNull()) {
-			app->dispatchResume();
-		}
-	}
-	
-	void MobileApp::dispatchBack(UIEvent* ev)
-	{
-		onBack(ev);
+		SLIB_INVOKE_EVENT_HANDLER(BackPressed, ev)
+		
 		if (ev->isPreventedDefault()) {
 			return;
 		}
@@ -400,7 +332,6 @@ namespace slib
 				Ref<ViewPage> page = popups[popups.count-1];
 				if (page.isNotNull()) {
 					page->dispatchBackPressed(ev);
-					ev->preventDefault();
 				}
 				return;
 			}
@@ -409,41 +340,17 @@ namespace slib
 			Ref<View> page = m_pager->getCurrentPage();
 			if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
 				_page->dispatchBackPressed(ev);
-				ev->preventDefault();
 			}
 		}
 	}
 	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<void()> >, _g_priv_ui_mobile_app_callback_list_onBack)
-	
-	Function<void()> MobileApp::addOnBack(const Function<void()>& callback)
+	sl_bool MobileApp::dispatchBackPressedToApp()
 	{
-		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onBack))) {
-			_g_priv_ui_mobile_app_callback_list_onBack.addIfNotExist(callback);
-		}
-		return callback;
-	}
-	
-	void MobileApp::removeOnBack(const Function<void()>& callback)
-	{
-		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onBack))) {
-			_g_priv_ui_mobile_app_callback_list_onBack.remove(callback);
-		}
-	}
-	
-	sl_bool MobileApp::dispatchBackToApp()
-	{
-		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onBack))) {
-			ListLocker< Function<void()> > list(_g_priv_ui_mobile_app_callback_list_onBack);
-			for (sl_size i = 0; i < list.count; i++) {
-				list[i]();
-			}
-		}
 		Ref<MobileApp> app = getApp();
 		if (app.isNotNull()) {
 			Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
 			if (ev.isNotNull()) {
-				app->dispatchBack(ev.get());
+				app->dispatchBackPressed(ev.get());
 				if (ev->isPreventedDefault()) {
 					return sl_false;
 				}
@@ -452,13 +359,16 @@ namespace slib
 		return sl_true;
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(MobileApp, CreateActivity)
+
 	void MobileApp::dispatchCreateActivity()
 	{
 		Ref<MobileMainWindow> window = getMainWindow();
 		if (window.isNotNull()) {
 			window->forceCreate();
 		}
-		onCreateActivity();
+		
+		SLIB_INVOKE_EVENT_HANDLER(CreateActivity)
 	}
 	
 	void MobileApp::dispatchCreateActivityToApp()
@@ -469,9 +379,11 @@ namespace slib
 		}
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(MobileApp, DestroyActivity)
+	
 	void MobileApp::dispatchDestroyActivity()
 	{
-		onDestroyActivity();
+		SLIB_INVOKE_EVENT_HANDLER(DestroyActivity)
 	}
 	
 	void MobileApp::dispatchDestroyActivityToApp()
@@ -482,6 +394,8 @@ namespace slib
 		}
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(MobileApp, Resize, sl_ui_len width, sl_ui_len height)
+
 	void MobileApp::dispatchResize(sl_ui_len width, sl_ui_len height)
 	{
 		UIResource::updateDefaultScreenSize();
@@ -494,38 +408,27 @@ namespace slib
 				openHomePage(page, transition);
 			}
 		}
-		onResize(width, height);
-	}
-	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<void(sl_ui_len, sl_ui_len)> >, _g_priv_ui_mobile_app_callback_list_onResize)
-	
-	Function<void(sl_ui_len, sl_ui_len)> MobileApp::addOnResize(const Function<void(sl_ui_len, sl_ui_len)>& callback)
-	{
-		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onResize))) {
-			_g_priv_ui_mobile_app_callback_list_onResize.addIfNotExist(callback);
-		}
-		return callback;
-	}
-	
-	void MobileApp::removeOnResize(const Function<void(sl_ui_len, sl_ui_len)>& callback)
-	{
-		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onResize))) {
-			_g_priv_ui_mobile_app_callback_list_onResize.remove(callback);
-		}
+		
+		SLIB_INVOKE_EVENT_HANDLER(Resize, width, height);
 	}
 	
 	void MobileApp::dispatchResizeToApp(sl_ui_len width, sl_ui_len height)
 	{
-		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_ui_mobile_app_callback_list_onResize))) {
-			ListLocker< Function<void(sl_ui_len,sl_ui_len)> > list(_g_priv_ui_mobile_app_callback_list_onResize);
-			for (sl_size i = 0; i < list.count; i++) {
-				list[i](width, height);
-			}
-		}
 		Ref<MobileApp> app = getApp();
 		if (app.isNotNull()) {
 			app->dispatchResize(width, height);
 		}
+	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(MobileApp, ChangeCurrentLocale)
+
+	void MobileApp::dispatchChangeCurrentLocale()
+	{
+		if (m_pager->getPagesCount() > 0) {
+			openStartupPage();
+		}
+		
+		SLIB_INVOKE_EVENT_HANDLER(ChangeCurrentLocale)
 	}
 	
 	

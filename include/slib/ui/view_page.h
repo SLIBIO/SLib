@@ -145,26 +145,16 @@ namespace slib
 		
 		static void _runAnimationProc(const Ref<View>& view, const Function<void()>& callback);
 		
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(ViewPager, PageAction, View* page, UIPageAction action)
+		SLIB_DECLARE_EVENT_HANDLER(ViewPager, EndPageAnimation, View* page, UIPageAction action)
+
 	protected:
-		virtual void onPageAction(View* page, UIPageAction action);
-		
-		virtual void onEndPageAnimation(View* page, UIPageAction action);
-		
-	public:
-		virtual void dispatchPageAction(View* page, UIPageAction action);
-		
-		virtual void dispatchEndPageAnimation(View* page, UIPageAction action);
-		
-	public:
 		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
 		void onChangePadding() override;
 		
 		void onSwipe(GestureEvent* ev) override;
-		
-	public:
-		SLIB_PROPERTY(AtomicFunction<void(ViewPager*, View*, UIPageAction)>, OnPageAction)
-		SLIB_PROPERTY(AtomicFunction<void(ViewPager*, View*, UIPageAction)>, OnEndPageAnimation)
 		
 	protected:
 		CList< Ref<View> > m_pages;
@@ -321,42 +311,19 @@ namespace slib
 		
 		void setGlobalPopupBackgroundColor(const Color& color);
 
-	protected:
-		virtual void onOpen();
-		
-		virtual void onClose();
-		
-		virtual void onResume();
-		
-		virtual void onPause();
-		
-		virtual void onPageAction(UIPageAction action);
-		
-		virtual void onEndPageAnimation(UIPageAction action);
-		
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(ViewPage, Open)
+		SLIB_DECLARE_EVENT_HANDLER(ViewPage, Close)
+		SLIB_DECLARE_EVENT_HANDLER(ViewPage, Resume)
+		SLIB_DECLARE_EVENT_HANDLER(ViewPage, Pause)
+		SLIB_DECLARE_EVENT_HANDLER(ViewPage, PageAction, ViewPager* pager, UIPageAction action)
+		SLIB_DECLARE_EVENT_HANDLER(ViewPage, EndPageAnimation, ViewPager* pager, UIPageAction action)
 		// For mobile platforms
-		virtual void onBackPressed(UIEvent* ev);
-		
+		SLIB_DECLARE_EVENT_HANDLER(ViewPage, BackPressed, UIEvent* ev)
 		// Pressed mobile back button or Closed popup window
-		virtual void onBack(UIEvent* ev);
+		SLIB_DECLARE_EVENT_HANDLER(ViewPage, Back, UIEvent* ev)
 		
 	public:
-		virtual void dispatchPageAction(ViewPager* pager, UIPageAction action);
-		
-		virtual void dispatchEndPageAnimation(ViewPager* pager, UIPageAction action);
-		
-		virtual void dispatchOpen();
-		
-		virtual void dispatchClose();
-		
-		virtual void dispatchResume();
-		
-		virtual void dispatchPause();
-		
-		virtual void dispatchBackPressed(UIEvent* ev);
-		
-		virtual void dispatchBack(UIEvent* ev);
-		
 		void dispatchOK(UIEvent* ev) override;
 
 		void dispatchCancel(UIEvent* ev) override;
@@ -376,23 +343,6 @@ namespace slib
 		
 		void _onClosePopupWindow(Window* window, UIEvent* ev);
 
-	public:
-		SLIB_PROPERTY(AtomicFunction<void(ViewPage*, ViewPager* pager, UIPageAction action)>, OnPageAction);
-		
-		SLIB_PROPERTY(AtomicFunction<void(ViewPage*, ViewPager* pager, UIPageAction action)>, OnEndPageAnimation);
-		
-		SLIB_PROPERTY(AtomicFunction<void(ViewPage*)>, OnOpen);
-		
-		SLIB_PROPERTY(AtomicFunction<void(ViewPage*)>, OnClose);
-
-		SLIB_PROPERTY(AtomicFunction<void(ViewPage*)>, OnResume);
-		
-		SLIB_PROPERTY(AtomicFunction<void(ViewPage*)>, OnPause);
-		
-		SLIB_PROPERTY(AtomicFunction<void(ViewPage*, UIEvent* ev)>, OnBackPressed);
-		
-		SLIB_PROPERTY(AtomicFunction<void(ViewPage*, UIEvent* ev)>, OnBack);
-		
 	protected:
 		AtomicWeakRef<ViewPager> m_pager;
 		
