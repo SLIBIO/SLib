@@ -625,7 +625,6 @@ namespace slib
 		SAppLayoutOrientationValue orientation;
 		SAppFloatValue min;
 		SAppFloatValue max;
-		SAppFloatValue range;
 		SAppFloatValue value;
 		SAppFloatValue value2;
 		SAppBooleanValue dual;
