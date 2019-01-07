@@ -116,9 +116,11 @@ namespace slib
 		
 		const List< Function<RET_TYPE(ARGS...)> >& getList() const noexcept;
 
-		void add(const Function& function) noexcept;
+		// return `function`
+		Function<RET_TYPE(ARGS...)> add(const Function& function) noexcept;
 		
-		void addIfNotExist(const Function& function) noexcept;
+		// return `function`
+		Function<RET_TYPE(ARGS...)> addIfNotExist(const Function& function) noexcept;
 		
 		void remove(const Function& function, sl_bool flagRemoveAllMatch = sl_false) noexcept;
 		
@@ -156,9 +158,11 @@ namespace slib
 		
 		const List< Function<RET_TYPE(ARGS...)> >& getList() const noexcept;
 		
-		void add(const Function<RET_TYPE(ARGS...)>& function) noexcept;
+		// return `function`
+		Function<RET_TYPE(ARGS...)> add(const Function<RET_TYPE(ARGS...)>& function) noexcept;
 		
-		void addIfNotExist(const Function<RET_TYPE(ARGS...)>& function) noexcept;
+		// return `function`
+		Function<RET_TYPE(ARGS...)> addIfNotExist(const Function<RET_TYPE(ARGS...)>& function) noexcept;
 		
 		void remove(const Function<RET_TYPE(ARGS...)>& function, sl_bool flagRemoveAllMatch = sl_false) noexcept;
 		
@@ -202,6 +206,42 @@ namespace slib
 #define SLIB_FUNCTION_CLASS(CLASS, CALLBACK, OBJECT) slib::CreateFunctionFromClass(OBJECT, &CLASS::CALLBACK)
 #define SLIB_FUNCTION_REF(CLASS, CALLBACK, OBJECT) slib::CreateFunctionFromRef(slib::Ref<CLASS>(OBJECT), &CLASS::CALLBACK)
 #define SLIB_FUNCTION_WEAKREF(CLASS, CALLBACK, OBJECT) slib::CreateFunctionFromWeakRef(slib::WeakRef<CLASS>(OBJECT), &CLASS::CALLBACK)
+
+#define SLIB_PROPERTY_FUNCTION(TYPE, NAME) \
+protected:	slib::AtomicFunction<TYPE> m_function_##NAME; \
+public:		SLIB_INLINE slib::Function<TYPE> get##NAME() const { return m_function_##NAME; } \
+ 			SLIB_INLINE slib::Function<TYPE> set##NAME(const slib::Function<TYPE>& value) { m_function_##NAME = value; return value; } \
+			SLIB_INLINE slib::Function<TYPE> add##NAME(const slib::Function<TYPE>& value) { return m_function_##NAME.add(value); } \
+			SLIB_INLINE void remove##NAME(const slib::Function<TYPE>& value) { m_function_##NAME.remove(value); }
+
+#define SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_DISPATCH(CLASS, NAME, ...) \
+protected:	virtual void on##NAME(__VA_ARGS__); \
+public:		slib::Function<void(CLASS* sender, ##__VA_ARGS__)> getOn##NAME() const; \
+			slib::Function<void(CLASS* sender, ##__VA_ARGS__)> setOn##NAME(const slib::Function<void(CLASS* sender, ##__VA_ARGS__)>& handler); \
+			slib::Function<void(CLASS* sender, ##__VA_ARGS__)> addOn##NAME(const slib::Function<void(CLASS* sender, ##__VA_ARGS__)>& handler); \
+			void removeOn##NAME(const slib::Function<void(CLASS* sender, ##__VA_ARGS__)>& handler);
+
+#define SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(CLASS, NAME, ...) \
+			SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_DISPATCH(CLASS, NAME, ##__VA_ARGS__) \
+public:		virtual void dispatch##NAME(__VA_ARGS__);
+
+#define SLIB_DECLARE_EVENT_HANDLER(CLASS, NAME, ...) \
+protected:	slib::AtomicFunction<void(CLASS* sender, ##__VA_ARGS__)> m_eventHandler_on##NAME; \
+			SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(CLASS, NAME, ##__VA_ARGS__)
+
+#define SLIB_DEFINE_EVENT_HANDLER_WITHOUT_ON(CLASS, NAME, ...) \
+	slib::Function<void(CLASS* sender, ##__VA_ARGS__)> CLASS::getOn##NAME() const { return m_eventHandler_on##NAME; } \
+	slib::Function<void(CLASS* sender, ##__VA_ARGS__)> CLASS::setOn##NAME(const slib::Function<void(CLASS* sender, ##__VA_ARGS__)>& handler) { m_eventHandler_on##NAME = handler; return handler; } \
+	slib::Function<void(CLASS* sender, ##__VA_ARGS__)> CLASS::addOn##NAME(const slib::Function<void(CLASS* sender, ##__VA_ARGS__)>& handler) { return m_eventHandler_on##NAME.add(handler); } \
+	void CLASS::removeOn##NAME(const slib::Function<void(CLASS* sender, ##__VA_ARGS__)>& handler) { m_eventHandler_on##NAME.remove(handler); }
+
+#define SLIB_DEFINE_EVENT_HANDLER(CLASS, NAME, ...) \
+	SLIB_DEFINE_EVENT_HANDLER_WITHOUT_ON(CLASS, NAME, ##__VA_ARGS__) \
+	void CLASS::on##NAME(__VA_ARGS__) {}
+
+#define SLIB_INVOKE_EVENT_HANDLER(NAME, ...) \
+	getOn##NAME()(this, ##__VA_ARGS__); \
+	on##NAME(__VA_ARGS__);
 
 #include "detail/function.inc"
 

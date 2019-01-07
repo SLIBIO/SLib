@@ -421,10 +421,10 @@ namespace slib
 	}
 	
 	template <class RET_TYPE, class... ARGS>
-	void Function<RET_TYPE(ARGS...)>::add(const Function<RET_TYPE(ARGS...)>& function) noexcept
+	Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::add(const Function<RET_TYPE(ARGS...)>& function) noexcept
 	{
 		if (function.isNull()) {
-			return;
+			return function;
 		}
 		Callable<RET_TYPE(ARGS...)>* object = ref._ptr;
 		if (object) {
@@ -436,13 +436,14 @@ namespace slib
 		} else {
 			ref = function.ref;
 		}
+		return function;
 	}
 	
 	template <class RET_TYPE, class... ARGS>
-	void Function<RET_TYPE(ARGS...)>::addIfNotExist(const Function<RET_TYPE(ARGS...)>& function) noexcept
+	Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::addIfNotExist(const Function<RET_TYPE(ARGS...)>& function) noexcept
 	{
 		if (function.isNull()) {
-			return;
+			return function;
 		}
 		Callable<RET_TYPE(ARGS...)>* object = ref._ptr;
 		if (object) {
@@ -456,6 +457,7 @@ namespace slib
 		} else {
 			ref = function.ref;
 		}
+		return function;
 	}
 	
 	template <class RET_TYPE, class... ARGS>
@@ -622,21 +624,23 @@ namespace slib
 	}
 
 	template <class RET_TYPE, class... ARGS>
-	void Atomic< Function<RET_TYPE(ARGS...)> >::add(const Function<RET_TYPE(ARGS...)>& function) noexcept
+	Function<RET_TYPE(ARGS...)> Atomic< Function<RET_TYPE(ARGS...)> >::add(const Function<RET_TYPE(ARGS...)>& function) noexcept
 	{
 		SpinLocker lock(SpinLockPoolForFunction::get(this));
 		Function<RET_TYPE(ARGS...)> _this(*this);
 		*this = _this + function;
+		return function;
 	}
 	
 	template <class RET_TYPE, class... ARGS>
-	void Atomic< Function<RET_TYPE(ARGS...)> >::addIfNotExist(const Function<RET_TYPE(ARGS...)>& function) noexcept
+	Function<RET_TYPE(ARGS...)> Atomic< Function<RET_TYPE(ARGS...)> >::addIfNotExist(const Function<RET_TYPE(ARGS...)>& function) noexcept
 	{
 		SpinLocker lock(SpinLockPoolForFunction::get(this));
 		Function<RET_TYPE(ARGS...)> _this(*this);
 		if (!(_this.contains(function))) {
 			*this = _this + function;
 		}
+		return function;
 	}
 	
 	template <class RET_TYPE, class... ARGS>
