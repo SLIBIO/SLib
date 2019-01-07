@@ -240,7 +240,7 @@ namespace slib
 														WKWebsiteDataTypeOfflineWebApplicationCache,
 														WKWebsiteDataTypeMemoryCache,
 														WKWebsiteDataTypeLocalStorage,
-														WKWebsiteDataTypeCookies,
+														//WKWebsiteDataTypeCookies,
 														WKWebsiteDataTypeSessionStorage,
 														WKWebsiteDataTypeIndexedDBDatabases,
 														WKWebsiteDataTypeWebSQLDatabases,
