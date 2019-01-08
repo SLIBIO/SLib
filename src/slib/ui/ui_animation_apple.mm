@@ -46,6 +46,7 @@ typedef UIView* NativeView;
 
 @interface _priv_Slib_NativeAnimationDelegate : NSObject<CAAnimationDelegate>
 {
+	@public __weak CALayer* layer;
 	@public slib::Function<void()> onStop;
 }
 @end
@@ -148,6 +149,7 @@ namespace slib
 		_priv_UIAnimation_setAnimation(group, animation, sl_true);
 		
 		_priv_Slib_NativeAnimationDelegate* delegate = [[_priv_Slib_NativeAnimationDelegate alloc] init];
+		delegate->layer = handle.layer;
 		delegate->onStop = onStop;
 		group.delegate = delegate;
 		
@@ -282,6 +284,7 @@ namespace slib
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
 {
+	[layer removeAnimationForKey:@"_slib_native_animation"];
 	onStop();
 }
 
