@@ -863,5 +863,8 @@
     <ClCompile Include="..\..\src\slib\device\device_win32.cpp">
       <Filter>src\device</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\drawer.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

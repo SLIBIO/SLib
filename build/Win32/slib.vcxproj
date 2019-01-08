@@ -240,6 +240,7 @@
     <ClCompile Include="..\..\src\slib\ui\common_dialogs_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\cursor.cpp" />
     <ClCompile Include="..\..\src\slib\ui\cursor_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\drawer.cpp" />
     <ClCompile Include="..\..\src\slib\ui\edit_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\edit_view_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\gesture.cpp" />
