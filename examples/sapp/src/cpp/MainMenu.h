@@ -37,6 +37,8 @@ public:
 	
 	void onClickViewPager(View* view);
 	
+	void onClickDrawer(View* view);
+	
 	void onClickVideoView(View* view);
 
 	void onClickCameraView(View* view);

@@ -29,6 +29,7 @@ void MainMenu::onOpen()
 {
 	btnHelloWorld->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickHelloWorld, this));
 	btnViewPager->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickViewPager, this));
+	btnDrawer->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickDrawer, this));
 	btnVideoView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickVideoView, this));
 	btnCameraView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickCameraView, this));
 	btnWebView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickWebView, this));
@@ -45,6 +46,11 @@ void MainMenu::onClickHelloWorld(View* view)
 void MainMenu::onClickViewPager(View* view)
 {
 	goToPage(new example::ui::ViewPager);
+}
+
+void MainMenu::onClickDrawer(View* view)
+{
+	goToPage(new example::ui::Drawer);
 }
 
 void MainMenu::onClickVideoView(View* view)
