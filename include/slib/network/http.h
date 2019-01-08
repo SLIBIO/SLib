@@ -39,7 +39,7 @@
 *****************************************/
 
 #include "http_common.h"
-#include "http_service.h"
+#include "http_server.h"
 
 #endif
 

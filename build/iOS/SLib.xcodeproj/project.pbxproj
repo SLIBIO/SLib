@@ -1005,7 +1005,7 @@
 		26D9D8941E962962005F7BD3 /* dns.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3BB1C1181B500D47AB0 /* dns.cpp */; };
 		26D9D8951E962962005F7BD3 /* ethernet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3BC1C1181B500D47AB0 /* ethernet.cpp */; };
 		26D9D8961E962962005F7BD3 /* http_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3BE1C1181B500D47AB0 /* http_common.cpp */; };
-		26D9D8971E962962005F7BD3 /* http_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C01C1181B500D47AB0 /* http_service.cpp */; };
+		26D9D8971E962962005F7BD3 /* http_server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C01C1181B500D47AB0 /* http_server.cpp */; };
 		26D9D8981E962962005F7BD3 /* icmp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C11C1181B500D47AB0 /* icmp.cpp */; };
 		26D9D8991E962962005F7BD3 /* ip_address.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C21C1181B500D47AB0 /* ip_address.cpp */; };
 		26D9D89A1E962962005F7BD3 /* mac_address.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C31C1181B500D47AB0 /* mac_address.cpp */; };
@@ -1099,7 +1099,7 @@
 		26EAB7CF1EA288DA00ED96FA /* ethernet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3BC1C1181B500D47AB0 /* ethernet.cpp */; };
 		26EAB7D01EA288DA00ED96FA /* http_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3BE1C1181B500D47AB0 /* http_common.cpp */; };
 		26EAB7D11EA288DA00ED96FA /* http_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D9D9F61E968364005F7BD3 /* http_io.cpp */; };
-		26EAB7D21EA288DA00ED96FA /* http_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C01C1181B500D47AB0 /* http_service.cpp */; };
+		26EAB7D21EA288DA00ED96FA /* http_server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C01C1181B500D47AB0 /* http_server.cpp */; };
 		26EAB7D31EA288DA00ED96FA /* icmp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C11C1181B500D47AB0 /* icmp.cpp */; };
 		26EAB7D41EA288DA00ED96FA /* ip_address.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C21C1181B500D47AB0 /* ip_address.cpp */; };
 		26EAB7D51EA288DA00ED96FA /* mac_address.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3C31C1181B500D47AB0 /* mac_address.cpp */; };
@@ -2208,7 +2208,7 @@
 		266DD3BB1C1181B500D47AB0 /* dns.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dns.cpp; sourceTree = "<group>"; };
 		266DD3BC1C1181B500D47AB0 /* ethernet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ethernet.cpp; sourceTree = "<group>"; };
 		266DD3BE1C1181B500D47AB0 /* http_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_common.cpp; sourceTree = "<group>"; };
-		266DD3C01C1181B500D47AB0 /* http_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_service.cpp; sourceTree = "<group>"; };
+		266DD3C01C1181B500D47AB0 /* http_server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_server.cpp; sourceTree = "<group>"; };
 		266DD3C11C1181B500D47AB0 /* icmp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = icmp.cpp; sourceTree = "<group>"; };
 		266DD3C21C1181B500D47AB0 /* ip_address.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ip_address.cpp; sourceTree = "<group>"; };
 		266DD3C31C1181B500D47AB0 /* mac_address.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mac_address.cpp; sourceTree = "<group>"; };
@@ -4154,7 +4154,7 @@
 				266DD3BC1C1181B500D47AB0 /* ethernet.cpp */,
 				266DD3BE1C1181B500D47AB0 /* http_common.cpp */,
 				26D9D9F61E968364005F7BD3 /* http_io.cpp */,
-				266DD3C01C1181B500D47AB0 /* http_service.cpp */,
+				266DD3C01C1181B500D47AB0 /* http_server.cpp */,
 				266DD3C11C1181B500D47AB0 /* icmp.cpp */,
 				266DD3C21C1181B500D47AB0 /* ip_address.cpp */,
 				266DD3C31C1181B500D47AB0 /* mac_address.cpp */,
@@ -5079,7 +5079,7 @@
 				26D15DAA1E93AD24003BD61A /* int128.cpp in Sources */,
 				26EAB7D91EA288DA00ED96FA /* network_async_unix.cpp in Sources */,
 				26D15DB41E93AD24003BD61A /* sphere.cpp in Sources */,
-				26EAB7D21EA288DA00ED96FA /* http_service.cpp in Sources */,
+				26EAB7D21EA288DA00ED96FA /* http_server.cpp in Sources */,
 				26D15DA71E93AD24003BD61A /* bezier.cpp in Sources */,
 				26D15D701E93AD05003BD61A /* collection.cpp in Sources */,
 				26EAB7CF1EA288DA00ED96FA /* ethernet.cpp in Sources */,
@@ -5473,7 +5473,7 @@
 				26FAA8861EC768C1007BC67F /* red_black_tree.cpp in Sources */,
 				26D9D7F31E9628E0005F7BD3 /* box.cpp in Sources */,
 				26D9D7F41E9628E0005F7BD3 /* map.cpp in Sources */,
-				26D9D8971E962962005F7BD3 /* http_service.cpp in Sources */,
+				26D9D8971E962962005F7BD3 /* http_server.cpp in Sources */,
 				26D9D89B1E962962005F7BD3 /* nat.cpp in Sources */,
 				26D9D7F51E9628E0005F7BD3 /* plane.cpp in Sources */,
 				26D9D7F61E9628E0005F7BD3 /* xml.cpp in Sources */,

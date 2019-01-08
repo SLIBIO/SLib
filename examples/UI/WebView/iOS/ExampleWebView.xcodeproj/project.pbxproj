@@ -11,6 +11,7 @@
 		264AF15A21B1156F004E58CB /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF15921B1156E004E58CB /* WebKit.framework */; };
 		264AF20621BD5746004E58CB /* web in Resources */ = {isa = PBXBuildFile; fileRef = 264AF20521BD5746004E58CB /* web */; };
 		264AF20821BD5868004E58CB /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF20721BD5868004E58CB /* libz.tbd */; };
+		268256A521E518A60079600F /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 268256A421E518A60079600F /* AVFoundation.framework */; };
 		26B92D6A21D7AE29003F6F82 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26B92D6921D7AE29003F6F82 /* UserNotifications.framework */; };
 		26F2DDF0216BDE39007CE8E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDEF216BDE39007CE8E6 /* UIKit.framework */; };
 		26F2DDF2216BDE44007CE8E6 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF1216BDE44007CE8E6 /* GLKit.framework */; };
@@ -31,6 +32,7 @@
 		264AF15921B1156E004E58CB /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		264AF20521BD5746004E58CB /* web */ = {isa = PBXFileReference; lastKnownFileType = folder; name = web; path = ../asset/web; sourceTree = "<group>"; };
 		264AF20721BD5868004E58CB /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		268256A421E518A60079600F /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		26B92D6921D7AE29003F6F82 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		26F2DDEF216BDE39007CE8E6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		26F2DDF1216BDE44007CE8E6 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
@@ -52,6 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				268256A521E518A60079600F /* AVFoundation.framework in Frameworks */,
 				26B92D6A21D7AE29003F6F82 /* UserNotifications.framework in Frameworks */,
 				264AF20821BD5868004E58CB /* libz.tbd in Frameworks */,
 				264AF15A21B1156F004E58CB /* WebKit.framework in Frameworks */,
@@ -111,6 +114,7 @@
 		26F5DE3C2051B60500BC4998 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				268256A421E518A60079600F /* AVFoundation.framework */,
 				26B92D6921D7AE29003F6F82 /* UserNotifications.framework */,
 				264AF20721BD5868004E58CB /* libz.tbd */,
 				264AF15921B1156E004E58CB /* WebKit.framework */,

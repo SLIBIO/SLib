@@ -43,7 +43,7 @@ namespace slib
 		return CastRef<WebService>(app);
 	}
 
-	HttpServiceParam& WebService::getHttpParam()
+	HttpServerParam& WebService::getHttpParam()
 	{
 		return m_httpParam;
 	}
@@ -72,7 +72,7 @@ namespace slib
 	sl_bool WebService::dispatchStartService()
 	{
 		if (Service::dispatchStartService()) {
-			m_http = HttpService::create(m_httpParam);
+			m_http = HttpServer::create(m_httpParam);
 			if (m_http.isNotNull()) {
 				return sl_true;
 			}
@@ -90,7 +90,7 @@ namespace slib
 		Service::dispatchStopService();
 	}
 	
-	sl_bool WebService::onHttpRequest(HttpService*, HttpServiceContext* context)
+	sl_bool WebService::onHttpRequest(HttpServer*, HttpServerContext* context)
 	{
 		if (m_controller.isNotNull()) {
 			return m_controller->processHttpRequest(context);

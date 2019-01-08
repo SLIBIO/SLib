@@ -500,9 +500,6 @@
     <ClCompile Include="..\..\src\slib\network\http_common.cpp">
       <Filter>src\network</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\slib\network\http_service.cpp">
-      <Filter>src\network</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\slib\network\icmp.cpp">
       <Filter>src\network</Filter>
     </ClCompile>
@@ -865,6 +862,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\slib\ui\drawer.cpp">
       <Filter>src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\network\http_server.cpp">
+      <Filter>src\network</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

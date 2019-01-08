@@ -144,12 +144,12 @@ void ExampleWebViewApp::onClickTest2(View* button)
 void ExampleWebViewApp::onClickTest3(View *button)
 {
 	if (m_http.isNull()) {
-		HttpServiceParam param;
+		HttpServerParam param;
 		param.flagUseAsset = sl_true;
 		param.prefixAsset = "web/";
 		for (int port = 50000; port < 50100; port++) {
 			param.port = port;
-			m_http = HttpService::create(param);
+			m_http = HttpServer::create(param);
 			if (m_http.isNotNull()) {
 				break;
 			}

@@ -47,7 +47,7 @@ namespace slib
 		}
 	}
 
-	sl_bool WebController::processHttpRequest(HttpServiceContext* context)
+	sl_bool WebController::processHttpRequest(HttpServerContext* context)
 	{
 		HttpMethod method = context->getMethod();
 		String path = context->getPath();

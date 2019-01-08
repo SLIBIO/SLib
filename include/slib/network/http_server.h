@@ -20,8 +20,8 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_NETWORK_HTTP_SERVICE
-#define CHECKHEADER_SLIB_NETWORK_HTTP_SERVICE
+#ifndef CHECKHEADER_SLIB_NETWORK_HTTP_SERVER
+#define CHECKHEADER_SLIB_NETWORK_HTTP_SERVER
 
 #include "definition.h"
 
@@ -34,20 +34,20 @@
 namespace slib
 {
 
-	class HttpService;
-	class HttpServiceConnection;
+	class HttpServer;
+	class HttpServerConnection;
 	
-	class SLIB_EXPORT HttpServiceContext : public Object, public HttpRequest, public HttpResponse, public HttpOutputBuffer
+	class SLIB_EXPORT HttpServerContext : public Object, public HttpRequest, public HttpResponse, public HttpOutputBuffer
 	{
 		SLIB_DECLARE_OBJECT
 		
 	protected:
-		HttpServiceContext();
+		HttpServerContext();
 		
-		~HttpServiceContext();
+		~HttpServerContext();
 		
 	public:
-		static Ref<HttpServiceContext> create(const Ref<HttpServiceConnection>& connection);
+		static Ref<HttpServerContext> create(const Ref<HttpServerConnection>& connection);
 		
 	public:
 		Memory getRawRequestHeader() const;
@@ -60,9 +60,9 @@ namespace slib
 		
 		sl_uint64 getResponseContentLength() const;
 		
-		Ref<HttpService> getService();
+		Ref<HttpServer> getService();
 		
-		Ref<HttpServiceConnection> getConnection();
+		Ref<HttpServerConnection> getConnection();
 		
 		Ref<AsyncStream> getIO();
 		
@@ -91,21 +91,21 @@ namespace slib
 		sl_bool m_flagAsynchronousResponse;
 		
 	private:
-		WeakRef<HttpServiceConnection> m_connection;
+		WeakRef<HttpServerConnection> m_connection;
 		
-		friend class HttpServiceConnection;
+		friend class HttpServerConnection;
 		
 	};
 	
-	class SLIB_EXPORT HttpServiceConnection : public Object, public IClosable
+	class SLIB_EXPORT HttpServerConnection : public Object, public IClosable
 	{
 	protected:
-		HttpServiceConnection();
+		HttpServerConnection();
 		
-		~HttpServiceConnection();
+		~HttpServerConnection();
 		
 	public:
-		static Ref<HttpServiceConnection> create(HttpService* service, AsyncStream* io);
+		static Ref<HttpServerConnection> create(HttpServer* service, AsyncStream* io);
 		
 	public:
 		void close() override;
@@ -114,9 +114,9 @@ namespace slib
 		
 		Ref<AsyncStream> getIO();
 		
-		Ref<HttpService> getService();
+		Ref<HttpServer> getService();
 		
-		Ref<HttpServiceContext> getCurrentContext();
+		Ref<HttpServerContext> getCurrentContext();
 		
 		void sendResponse(const Memory& mem);
 		
@@ -141,11 +141,11 @@ namespace slib
 		SLIB_PROPERTY(AtomicRef<Referable>, UserObject)
 		
 	protected:
-		WeakRef<HttpService> m_service;
+		WeakRef<HttpServer> m_service;
 		Ref<AsyncStream> m_io;
 		Ref<AsyncOutput> m_output;
 		
-		AtomicRef<HttpServiceContext> m_contextCurrent;
+		AtomicRef<HttpServerContext> m_contextCurrent;
 		
 		sl_bool m_flagClosed;
 		Memory m_bufRead;
@@ -157,41 +157,41 @@ namespace slib
 		
 		void _processInput(const void* data, sl_uint32 size);
 		
-		void _processContext(const Ref<HttpServiceContext>& context);
+		void _processContext(const Ref<HttpServerContext>& context);
 		
-		void _completeResponse(HttpServiceContext* context);
+		void _completeResponse(HttpServerContext* context);
 		
 	protected:
 		void onReadStream(AsyncStreamResult* result);
 
 		void onAsyncOutputEnd(AsyncOutput* output, sl_bool flagError);
 		
-		friend class HttpServiceContext;
+		friend class HttpServerContext;
 		
 	};
 	
 	
-	class SLIB_EXPORT HttpServiceConnectionProvider : public Object
+	class SLIB_EXPORT HttpServerConnectionProvider : public Object
 	{
 	public:
-		HttpServiceConnectionProvider();
+		HttpServerConnectionProvider();
 		
-		~HttpServiceConnectionProvider();
+		~HttpServerConnectionProvider();
 		
 	public:
 		virtual void release() = 0;
 		
 	public:
-		Ref<HttpService> getService();
+		Ref<HttpServer> getService();
 		
-		void setService(const Ref<HttpService>& service);
+		void setService(const Ref<HttpServer>& service);
 		
 	private:
-		WeakRef<HttpService> m_service;
+		WeakRef<HttpServer> m_service;
 		
 	};
 	
-	class SLIB_EXPORT HttpServiceParam
+	class SLIB_EXPORT HttpServerParam
 	{
 	public:
 		IPAddress addressBind;
@@ -220,15 +220,15 @@ namespace slib
 		
 		sl_bool flagLogDebug;
 		
-		Function<sl_bool(HttpService*, HttpServiceContext*)> onRequest;
-		Function<void(HttpService*, HttpServiceContext*, sl_bool flagProcessed)> onPostRequest;
+		Function<sl_bool(HttpServer*, HttpServerContext*)> onRequest;
+		Function<void(HttpServer*, HttpServerContext*, sl_bool flagProcessed)> onPostRequest;
 
 	public:
-		HttpServiceParam();
+		HttpServerParam();
 		
-		HttpServiceParam(const HttpServiceParam& other);
+		HttpServerParam(const HttpServerParam& other);
 		
-		~HttpServiceParam();
+		~HttpServerParam();
 		
 	public:
 		void setJson(const Json& json);
@@ -237,17 +237,17 @@ namespace slib
 		
 	};
 	
-	class SLIB_EXPORT HttpService : public Object
+	class SLIB_EXPORT HttpServer : public Object
 	{
 		SLIB_DECLARE_OBJECT
 		
 	protected:
-		HttpService();
+		HttpServer();
 		
-		~HttpService();
+		~HttpServer();
 		
 	public:
-		static Ref<HttpService> create(const HttpServiceParam& param);
+		static Ref<HttpServer> create(const HttpServerParam& param);
 		
 	public:
 		void release();
@@ -258,62 +258,62 @@ namespace slib
 		
 		Ref<ThreadPool> getThreadPool();
 		
-		const HttpServiceParam& getParam();
+		const HttpServerParam& getParam();
 		
 	public:
 		// called before processing body, returns true if the service is trying to process the connection itself.
-		virtual sl_bool preprocessRequest(const Ref<HttpServiceContext>& context);
+		virtual sl_bool preprocessRequest(const Ref<HttpServerContext>& context);
 		
 		// called after inputing body
-		virtual void processRequest(const Ref<HttpServiceContext>& context);
+		virtual void processRequest(const Ref<HttpServerContext>& context);
 		
-		virtual sl_bool processAsset(const Ref<HttpServiceContext>& context, const String& path);
+		virtual sl_bool processAsset(const Ref<HttpServerContext>& context, const String& path);
 		
-		sl_bool processFile(const Ref<HttpServiceContext>& context, const String& path);
+		sl_bool processFile(const Ref<HttpServerContext>& context, const String& path);
 		
-		sl_bool processRangeRequest(const Ref<HttpServiceContext>& context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength);
+		sl_bool processRangeRequest(const Ref<HttpServerContext>& context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength);
 		
-		virtual Ref<HttpServiceConnection> addConnection(const Ref<AsyncStream>& stream, const SocketAddress& remoteAddress, const SocketAddress& localAddress);
+		virtual Ref<HttpServerConnection> addConnection(const Ref<AsyncStream>& stream, const SocketAddress& remoteAddress, const SocketAddress& localAddress);
 		
-		virtual void closeConnection(HttpServiceConnection* connection);
+		virtual void closeConnection(HttpServerConnection* connection);
 		
 	protected:
-		virtual sl_bool onRequest(HttpServiceContext* context);
+		virtual sl_bool onRequest(HttpServerContext* context);
 		
-		sl_bool dispatchRequest(HttpServiceContext* context);
+		sl_bool dispatchRequest(HttpServerContext* context);
 		
-		virtual void onPostRequest(HttpServiceContext* context, sl_bool flagProcessed);
+		virtual void onPostRequest(HttpServerContext* context, sl_bool flagProcessed);
 		
-		void dispatchPostRequest(HttpServiceContext* context, sl_bool flagProcessed);
+		void dispatchPostRequest(HttpServerContext* context, sl_bool flagProcessed);
 		
 	public:
-		void addConnectionProvider(const Ref<HttpServiceConnectionProvider>& provider);
+		void addConnectionProvider(const Ref<HttpServerConnectionProvider>& provider);
 		
-		void removeConnectionProvider(const Ref<HttpServiceConnectionProvider>& provider);
+		void removeConnectionProvider(const Ref<HttpServerConnectionProvider>& provider);
 		
 		
-		sl_bool addHttpService(const SocketAddress& addr);
+		sl_bool addHttpServer(const SocketAddress& addr);
 		
-		sl_bool addHttpService(sl_uint32 port = 80);
+		sl_bool addHttpServer(sl_uint32 port = 80);
 		
-		sl_bool addHttpService(const IPAddress& addr, sl_uint32 port = 80);
+		sl_bool addHttpServer(const IPAddress& addr, sl_uint32 port = 80);
 		
 		
 	protected:
-		sl_bool _init(const HttpServiceParam& param);
+		sl_bool _init(const HttpServerParam& param);
 		
-		void _processCacheControl(const Ref<HttpServiceContext>& context);
+		void _processCacheControl(const Ref<HttpServerContext>& context);
 		
 	protected:
 		AtomicRef<AsyncIoLoop> m_ioLoop;
 		AtomicRef<ThreadPool> m_threadPool;
 		sl_bool m_flagRunning;
 		
-		CHashMap< HttpServiceConnection*, Ref<HttpServiceConnection> > m_connections;
+		CHashMap< HttpServerConnection*, Ref<HttpServerConnection> > m_connections;
 		
-		CList< Ref<HttpServiceConnectionProvider> > m_connectionProviders;
+		CList< Ref<HttpServerConnectionProvider> > m_connectionProviders;
 		
-		HttpServiceParam m_param;
+		HttpServerParam m_param;
 		
 	};
 

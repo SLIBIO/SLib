@@ -37,7 +37,7 @@ SLib enables software developers to build multi-platform(Android/iOS/MacOS/Tizen
 
 * network
 
-    UrlRequest, Socket, Asynchronous I/O, HttpService, ...
+    UrlRequest, Socket, Asynchronous I/O, HttpServer, ...
 
 * render
 

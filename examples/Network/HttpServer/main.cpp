@@ -27,7 +27,7 @@ using namespace slib;
 int main(int argc, const char * argv[])
 {
 	// Set configuration
-	HttpServiceParam param;
+	HttpServerParam param;
 	do {
 		if (param.parseJsonFile(Application::getApplicationDirectory() + "/../slib_http.conf")) {
 			break;
@@ -38,7 +38,7 @@ int main(int argc, const char * argv[])
 		param.parseJsonFile("/etc/slib_http.conf");
 	} while (0);
 	
-	param.onRequest = [](HttpService*, HttpServiceContext* context) {
+	param.onRequest = [](HttpServer*, HttpServerContext* context) {
 		if (context->getPath() != "/") {
 			return sl_false;
 		}
@@ -84,15 +84,15 @@ int main(int argc, const char * argv[])
 		return sl_true;
 	};
 	
-	param.onPostRequest = [](HttpService*, HttpServiceContext* context, sl_bool flagProcessed) {
+	param.onPostRequest = [](HttpServer*, HttpServerContext* context, sl_bool flagProcessed) {
 		if (!flagProcessed) {
 			context->setResponseCode(HttpStatus::NotFound);
 			context->write("Not found the specified file!");
 		}
 	};
 	
-	Ref<HttpService> service = HttpService::create(param);
-	if (service.isNull()) {
+	Ref<HttpServer> server = HttpServer::create(param);
+	if (server.isNull()) {
 		return -1;
 	}
 	

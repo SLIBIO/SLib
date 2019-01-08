@@ -20,7 +20,7 @@
  *   THE SOFTWARE.
  */
 
-#include "slib/network/http_service.h"
+#include "slib/network/http_server.h"
 
 #include "slib/network/url.h"
 #include "slib/core/app.h"
@@ -36,12 +36,12 @@ namespace slib
 {
 
 /**********************************************
-			HttpServiceContext
+			HttpServerContext
 **********************************************/
 
-	SLIB_DEFINE_OBJECT(HttpServiceContext, Object)
+	SLIB_DEFINE_OBJECT(HttpServerContext, Object)
 
-	HttpServiceContext::HttpServiceContext()
+	HttpServerContext::HttpServerContext()
 	{
 		m_requestContentLength = 0;
 		m_flagAsynchronousResponse = sl_false;
@@ -50,15 +50,15 @@ namespace slib
 		setProcessingByThread(sl_true);
 	}
 
-	HttpServiceContext::~HttpServiceContext()
+	HttpServerContext::~HttpServerContext()
 	{
 	}
 
-	Ref<HttpServiceContext> HttpServiceContext::create(const Ref<HttpServiceConnection>& connection)
+	Ref<HttpServerContext> HttpServerContext::create(const Ref<HttpServerConnection>& connection)
 	{
-		Ref<HttpServiceContext> ret;
+		Ref<HttpServerContext> ret;
 		if (connection.isNotNull()) {
-			ret = new HttpServiceContext;
+			ret = new HttpServerContext;
 			if (ret.isNotNull()) {
 				ret->m_connection = connection;
 			}
@@ -66,66 +66,66 @@ namespace slib
 		return ret;
 	}
 
-	Memory HttpServiceContext::getRawRequestHeader() const
+	Memory HttpServerContext::getRawRequestHeader() const
 	{
 		return m_requestHeader;
 	}
 
-	sl_uint64 HttpServiceContext::getRequestContentLength() const
+	sl_uint64 HttpServerContext::getRequestContentLength() const
 	{
 		return m_requestContentLength;
 	}
 
-	Memory HttpServiceContext::getRequestBody() const
+	Memory HttpServerContext::getRequestBody() const
 	{
 		return m_requestBody;
 	}
 
-	Variant HttpServiceContext::getRequestBodyAsJson() const
+	Variant HttpServerContext::getRequestBodyAsJson() const
 	{
 		return Json::parseJson16Utf8(m_requestBody);
 	}
 
-	sl_uint64 HttpServiceContext::getResponseContentLength() const
+	sl_uint64 HttpServerContext::getResponseContentLength() const
 	{
 		return getOutputLength();
 	}
 
-	Ref<HttpService> HttpServiceContext::getService()
+	Ref<HttpServer> HttpServerContext::getService()
 	{
-		Ref<HttpServiceConnection> connection = getConnection();
+		Ref<HttpServerConnection> connection = getConnection();
 		if (connection.isNotNull()) {
 			return connection->getService();
 		}
 		return sl_null;
 	}
 
-	Ref<HttpServiceConnection> HttpServiceContext::getConnection()
+	Ref<HttpServerConnection> HttpServerContext::getConnection()
 	{
 		return m_connection;
 	}
 
-	Ref<AsyncStream> HttpServiceContext::getIO()
+	Ref<AsyncStream> HttpServerContext::getIO()
 	{
-		Ref<HttpServiceConnection> connection = m_connection;
+		Ref<HttpServerConnection> connection = m_connection;
 		if (connection.isNotNull()) {
 			return connection->getIO();
 		}
 		return sl_null;
 	}
 
-	Ref<AsyncIoLoop> HttpServiceContext::getAsyncIoLoop()
+	Ref<AsyncIoLoop> HttpServerContext::getAsyncIoLoop()
 	{
-		Ref<HttpService> service = getService();
+		Ref<HttpServer> service = getService();
 		if (service.isNotNull()) {
 			return service->getAsyncIoLoop();
 		}
 		return sl_null;
 	}
 
-	const SocketAddress& HttpServiceContext::getLocalAddress()
+	const SocketAddress& HttpServerContext::getLocalAddress()
 	{
-		Ref<HttpServiceConnection> connection = getConnection();
+		Ref<HttpServerConnection> connection = getConnection();
 		if (connection.isNotNull()) {
 			return connection->getLocalAddress();
 		} else {
@@ -133,9 +133,9 @@ namespace slib
 		}
 	}
 
-	const SocketAddress& HttpServiceContext::getRemoteAddress()
+	const SocketAddress& HttpServerContext::getRemoteAddress()
 	{
-		Ref<HttpServiceConnection> connection = getConnection();
+		Ref<HttpServerConnection> connection = getConnection();
 		if (connection.isNotNull()) {
 			return connection->getRemoteAddress();
 		} else {
@@ -143,19 +143,19 @@ namespace slib
 		}
 	}
 
-	sl_bool HttpServiceContext::isAsynchronousResponse()
+	sl_bool HttpServerContext::isAsynchronousResponse()
 	{
 		return m_flagAsynchronousResponse;
 	}
 
-	void HttpServiceContext::setAsynchronousResponse(sl_bool flagAsync)
+	void HttpServerContext::setAsynchronousResponse(sl_bool flagAsync)
 	{
 		m_flagAsynchronousResponse = flagAsync;
 	}
 
-	void HttpServiceContext::completeResponse()
+	void HttpServerContext::completeResponse()
 	{
-		Ref<HttpServiceConnection> connection = m_connection;
+		Ref<HttpServerConnection> connection = m_connection;
 		if (connection.isNotNull()) {
 			connection->_completeResponse(this);
 			connection.setNull();
@@ -163,33 +163,33 @@ namespace slib
 	}
 
 /******************************************************
-			HttpServiceConnection
+			HttpServerConnection
 ******************************************************/
 #define SIZE_READ_BUF 0x10000
 #define SIZE_COPY_BUF 0x10000
 
-	HttpServiceConnection::HttpServiceConnection()
+	HttpServerConnection::HttpServerConnection()
 	{
 		m_flagClosed = sl_true;
 		m_flagReading = sl_false;
 		m_flagKeepAlive = sl_true;
 	}
 
-	HttpServiceConnection::~HttpServiceConnection()
+	HttpServerConnection::~HttpServerConnection()
 	{
 		close();
 	}
 
-	Ref<HttpServiceConnection> HttpServiceConnection::create(HttpService* service, AsyncStream* io)
+	Ref<HttpServerConnection> HttpServerConnection::create(HttpServer* service, AsyncStream* io)
 	{
 		if (service && io) {
 			Memory bufRead = Memory::create(SIZE_READ_BUF);
 			if (bufRead.isNotNull()) {
-				Ref<HttpServiceConnection> ret = new HttpServiceConnection;
+				Ref<HttpServerConnection> ret = new HttpServerConnection;
 				if (ret.isNotNull()) {
 					AsyncOutputParam op;
 					op.stream = io;
-					op.onEnd = SLIB_FUNCTION_WEAKREF(HttpServiceConnection, onAsyncOutputEnd, ret);
+					op.onEnd = SLIB_FUNCTION_WEAKREF(HttpServerConnection, onAsyncOutputEnd, ret);
 					op.bufferSize = SIZE_COPY_BUF;
 					Ref<AsyncOutput> output = AsyncOutput::create(op);
 					if (output.isNotNull()) {
@@ -206,7 +206,7 @@ namespace slib
 		return sl_null;
 	}
 
-	void HttpServiceConnection::close()
+	void HttpServerConnection::close()
 	{
 		ObjectLocker lock(this);
 		if (m_flagClosed) {
@@ -214,7 +214,7 @@ namespace slib
 		}
 		m_flagClosed = sl_true;
 		
-		Ref<HttpService> service = m_service;
+		Ref<HttpServer> service = m_service;
 		if (service.isNotNull()) {
 			service->closeConnection(this);
 		}
@@ -222,7 +222,7 @@ namespace slib
 		m_output->close();
 	}
 
-	void HttpServiceConnection::start(const void* data, sl_uint32 size)
+	void HttpServerConnection::start(const void* data, sl_uint32 size)
 	{
 		m_contextCurrent.setNull();
 		if (data && size > 0) {
@@ -232,22 +232,22 @@ namespace slib
 		}
 	}
 
-	Ref<AsyncStream> HttpServiceConnection::getIO()
+	Ref<AsyncStream> HttpServerConnection::getIO()
 	{
 		return m_io;
 	}
 
-	Ref<HttpService> HttpServiceConnection::getService()
+	Ref<HttpServer> HttpServerConnection::getService()
 	{
 		return m_service;
 	}
 
-	Ref<HttpServiceContext> HttpServiceConnection::getCurrentContext()
+	Ref<HttpServerContext> HttpServerConnection::getCurrentContext()
 	{
 		return m_contextCurrent;
 	}
 
-	void HttpServiceConnection::_read()
+	void HttpServerConnection::_read()
 	{
 		ObjectLocker lock(this);
 		if (m_flagClosed) {
@@ -257,15 +257,15 @@ namespace slib
 			return;
 		}
 		m_flagReading = sl_true;
-		if (!(m_io->readToMemory(m_bufRead, SLIB_FUNCTION_WEAKREF(HttpServiceConnection, onReadStream, this)))) {
+		if (!(m_io->readToMemory(m_bufRead, SLIB_FUNCTION_WEAKREF(HttpServerConnection, onReadStream, this)))) {
 			m_flagReading = sl_false;
 			close();
 		}
 	}
 
-	void HttpServiceConnection::_processInput(const void* _data, sl_uint32 size)
+	void HttpServerConnection::_processInput(const void* _data, sl_uint32 size)
 	{
-		Ref<HttpService> service = m_service;
+		Ref<HttpServer> service = m_service;
 		if (service.isNull()) {
 			return;
 		}
@@ -273,14 +273,14 @@ namespace slib
 			return;
 		}
 		
-		const HttpServiceParam& param = service->getParam();
+		const HttpServerParam& param = service->getParam();
 		sl_uint64 maxRequestHeadersSize = param.maxRequestHeadersSize;
 		sl_uint64 maxRequestBodySize = param.maxRequestBodySize;
 
 		char* data = (char*)_data;
-		Ref<HttpServiceContext> _context = m_contextCurrent;
+		Ref<HttpServerContext> _context = m_contextCurrent;
 		if (_context.isNull()) {
-			_context = HttpServiceContext::create(this);
+			_context = HttpServerContext::create(this);
 			if (_context.isNull()) {
 				sendResponse_ServerError();
 				return;
@@ -288,7 +288,7 @@ namespace slib
 			m_contextCurrent = _context;
 			_context->setProcessingByThread(param.flagProcessByThreads);
 		}
-		HttpServiceContext* context = _context.get();
+		HttpServerContext* context = _context.get();
 		if (context->m_requestHeader.isNull()) {
 			sl_size posBody;
 			if (context->m_requestHeaderReader.add(data, size, posBody)) {
@@ -363,7 +363,7 @@ namespace slib
 				if (context->isProcessingByThread()) {
 					Ref<ThreadPool> threadPool = service->getThreadPool();
 					if (threadPool.isNotNull()) {
-						threadPool->addTask(SLIB_BIND_WEAKREF(void(), HttpServiceConnection, _processContext, this, _context));
+						threadPool->addTask(SLIB_BIND_WEAKREF(void(), HttpServerConnection, _processContext, this, _context));
 					} else {
 						sendResponse_ServerError();
 					}
@@ -376,9 +376,9 @@ namespace slib
 		_read();
 	}
 
-	void HttpServiceConnection::_processContext(const Ref<HttpServiceContext>& context)
+	void HttpServerConnection::_processContext(const Ref<HttpServerContext>& context)
 	{
-		Ref<HttpService> service = getService();
+		Ref<HttpServer> service = getService();
 		if (service.isNull()) {
 			return;
 		}
@@ -392,7 +392,7 @@ namespace slib
 		}
 	}
 
-	void HttpServiceConnection::_completeResponse(HttpServiceContext* context)
+	void HttpServerConnection::_completeResponse(HttpServerContext* context)
 	{
 		context->setResponseHeader(HttpHeaders::ContentLength, String::fromUint64(context->getResponseContentLength()));
 		String oldResponseContentType = context->getResponseContentType();
@@ -419,7 +419,7 @@ namespace slib
 		}
 	}
 
-	void HttpServiceConnection::onReadStream(AsyncStreamResult* result)
+	void HttpServerConnection::onReadStream(AsyncStreamResult* result)
 	{
 		m_flagReading = sl_false;
 		if (result->flagError) {
@@ -429,14 +429,14 @@ namespace slib
 		}
 	}
 
-	void HttpServiceConnection::onAsyncOutputEnd(AsyncOutput* output, sl_bool flagError)
+	void HttpServerConnection::onAsyncOutputEnd(AsyncOutput* output, sl_bool flagError)
 	{
 		if (flagError || !m_flagKeepAlive) {
 			close();
 		}
 	}
 
-	void HttpServiceConnection::sendResponse(const Memory& mem)
+	void HttpServerConnection::sendResponse(const Memory& mem)
 	{
 		if (mem.isNotNull()) {
 			if (m_io->writeFromMemory(mem, sl_null)) {
@@ -446,7 +446,7 @@ namespace slib
 		close();
 	}
 
-	void HttpServiceConnection::sendResponseAndRestart(const Memory& mem)
+	void HttpServerConnection::sendResponseAndRestart(const Memory& mem)
 	{
 		if (mem.isNotNull()) {
 			if (m_io->writeFromMemory(mem, sl_null)) {
@@ -457,116 +457,116 @@ namespace slib
 		close();
 	}
 
-	class _priv_HttpServiceConnection_SendResponseAndCloseListener : public Referable
+	class _priv_HttpServerConnection_SendResponseAndCloseListener : public Referable
 	{
 	public:
-		WeakRef<HttpServiceConnection> m_connection;
+		WeakRef<HttpServerConnection> m_connection;
 
-		_priv_HttpServiceConnection_SendResponseAndCloseListener(HttpServiceConnection* connection)
+		_priv_HttpServerConnection_SendResponseAndCloseListener(HttpServerConnection* connection)
 		{
 			m_connection = connection;
 		}
 
 		void onWriteStream(AsyncStreamResult* result)
 		{
-			Ref<HttpServiceConnection> connection = m_connection;
+			Ref<HttpServerConnection> connection = m_connection;
 			if (connection.isNotNull()) {
 				connection->close();
 			}
 		}
 	};
 
-	void HttpServiceConnection::sendResponseAndClose(const Memory& mem)
+	void HttpServerConnection::sendResponseAndClose(const Memory& mem)
 	{
 		if (mem.isNotNull()) {
-			Ref<_priv_HttpServiceConnection_SendResponseAndCloseListener> listener(new _priv_HttpServiceConnection_SendResponseAndCloseListener(this));
-			if (m_io->writeFromMemory(mem, SLIB_FUNCTION_REF(_priv_HttpServiceConnection_SendResponseAndCloseListener, onWriteStream, listener))) {
+			Ref<_priv_HttpServerConnection_SendResponseAndCloseListener> listener(new _priv_HttpServerConnection_SendResponseAndCloseListener(this));
+			if (m_io->writeFromMemory(mem, SLIB_FUNCTION_REF(_priv_HttpServerConnection_SendResponseAndCloseListener, onWriteStream, listener))) {
 				return;
 			}
 		}
 		close();
 	}
 
-	void HttpServiceConnection::sendResponse_BadRequest()
+	void HttpServerConnection::sendResponse_BadRequest()
 	{
 		SLIB_STATIC_STRING(s, "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n");
 		sendResponseAndRestart(Memory::create(s.getData(), s.getLength()));
 	}
 
-	void HttpServiceConnection::sendResponse_ServerError()
+	void HttpServerConnection::sendResponse_ServerError()
 	{
 		SLIB_STATIC_STRING(s, "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n");
 		sendResponseAndRestart(Memory::create(s.getData(), s.getLength()));
 	}
 
-	void HttpServiceConnection::sendConnectResponse_Successed()
+	void HttpServerConnection::sendConnectResponse_Successed()
 	{
 		SLIB_STATIC_STRING(s, "HTTP/1.1 200 Connection established\r\n\r\n");
 		sendResponse(Memory::create(s.getData(), s.getLength()));
 	}
 
-	void HttpServiceConnection::sendConnectResponse_Failed()
+	void HttpServerConnection::sendConnectResponse_Failed()
 	{
 		SLIB_STATIC_STRING(s, "HTTP/1.1 500 Tunneling is not supported\r\n\r\n");
 		sendResponseAndClose(Memory::create(s.getData(), s.getLength()));
 	}
 
-	void HttpServiceConnection::sendProxyResponse_Failed()
+	void HttpServerConnection::sendProxyResponse_Failed()
 	{
 		SLIB_STATIC_STRING(s, "HTTP/1.1 500 Internal Error\r\nContent-Length: 0\r\n\r\n");
 		sendResponseAndRestart(Memory::create(s.getData(), s.getLength()));
 	}
 
 /******************************************************
-			HttpServiceConnectionProvider
+			HttpServerConnectionProvider
 ******************************************************/
 
-	HttpServiceConnectionProvider::HttpServiceConnectionProvider()
+	HttpServerConnectionProvider::HttpServerConnectionProvider()
 	{
 	}
 
-	HttpServiceConnectionProvider::~HttpServiceConnectionProvider()
+	HttpServerConnectionProvider::~HttpServerConnectionProvider()
 	{
 	}
 
-	Ref<HttpService> HttpServiceConnectionProvider::getService()
+	Ref<HttpServer> HttpServerConnectionProvider::getService()
 	{
 		return m_service;
 	}
 
-	void HttpServiceConnectionProvider::setService(const Ref<HttpService>& service)
+	void HttpServerConnectionProvider::setService(const Ref<HttpServer>& service)
 	{
 		m_service = service;
 	}
 
-	class _priv_DefaultHttpServiceConnectionProvider : public HttpServiceConnectionProvider
+	class _priv_DefaultHttpServerConnectionProvider : public HttpServerConnectionProvider
 	{
 	public:
 		Ref<AsyncTcpServer> m_server;
 		Ref<AsyncIoLoop> m_loop;
 
 	public:
-		_priv_DefaultHttpServiceConnectionProvider()
+		_priv_DefaultHttpServerConnectionProvider()
 		{
 		}
 
-		~_priv_DefaultHttpServiceConnectionProvider()
+		~_priv_DefaultHttpServerConnectionProvider()
 		{
 			release();
 		}
 
 	public:
-		static Ref<HttpServiceConnectionProvider> create(HttpService* service, const SocketAddress& addressListen)
+		static Ref<HttpServerConnectionProvider> create(HttpServer* service, const SocketAddress& addressListen)
 		{
 			Ref<AsyncIoLoop> loop = service->getAsyncIoLoop();
 			if (loop.isNotNull()) {
-				Ref<_priv_DefaultHttpServiceConnectionProvider> ret = new _priv_DefaultHttpServiceConnectionProvider;
+				Ref<_priv_DefaultHttpServerConnectionProvider> ret = new _priv_DefaultHttpServerConnectionProvider;
 				if (ret.isNotNull()) {
 					ret->m_loop = loop;
 					ret->setService(service);
 					AsyncTcpServerParam sp;
 					sp.bindAddress = addressListen;
-					sp.onAccept = SLIB_FUNCTION_WEAKREF(_priv_DefaultHttpServiceConnectionProvider, onAccept, ret);
+					sp.onAccept = SLIB_FUNCTION_WEAKREF(_priv_DefaultHttpServerConnectionProvider, onAccept, ret);
 					sp.ioLoop = loop;
 					Ref<AsyncTcpServer> server = AsyncTcpServer::create(sp);
 					if (server.isNotNull()) {
@@ -588,7 +588,7 @@ namespace slib
 
 		void onAccept(AsyncTcpServer* socketListen, const Ref<Socket>& socketAccept, const SocketAddress& address)
 		{
-			Ref<HttpService> service = getService();
+			Ref<HttpServer> service = getService();
 			if (service.isNotNull()) {
 				Ref<AsyncIoLoop> loop = m_loop;
 				if (loop.isNull()) {
@@ -609,10 +609,10 @@ namespace slib
 	};
 
 /******************************************************
-					HttpService
+					HttpServer
 ******************************************************/
 
-	HttpServiceParam::HttpServiceParam()
+	HttpServerParam::HttpServerParam()
 	{
 		port = 8080;
 		
@@ -634,13 +634,13 @@ namespace slib
 		flagLogDebug = sl_false;
 	}
 
-	HttpServiceParam::HttpServiceParam(const HttpServiceParam& other) = default;
+	HttpServerParam::HttpServerParam(const HttpServerParam& other) = default;
 
-	HttpServiceParam::~HttpServiceParam()
+	HttpServerParam::~HttpServerParam()
 	{
 	}
 	
-	void HttpServiceParam::setJson(const Json& conf)
+	void HttpServerParam::setJson(const Json& conf)
 	{
 		port = (sl_uint16)(conf["port"].getUint32(port));
 		{
@@ -680,7 +680,7 @@ namespace slib
 		}
 	}
 	
-	sl_bool HttpServiceParam::parseJsonFile(const String& filePath)
+	sl_bool HttpServerParam::parseJsonFile(const String& filePath)
 	{
 		Json json = Json::parseJsonFromTextFile(filePath);
 		if (json.isNotNull()) {
@@ -692,19 +692,19 @@ namespace slib
 	}
 
 
-	SLIB_DEFINE_OBJECT(HttpService, Object)
+	SLIB_DEFINE_OBJECT(HttpServer, Object)
 
-	HttpService::HttpService()
+	HttpServer::HttpServer()
 	{
 		m_flagRunning = sl_true;
 	}
 
-	HttpService::~HttpService()
+	HttpServer::~HttpServer()
 	{
 		release();
 	}
 
-	sl_bool HttpService::_init(const HttpServiceParam& param)
+	sl_bool HttpServer::_init(const HttpServerParam& param)
 	{
 		Ref<AsyncIoLoop> ioLoop = AsyncIoLoop::create(sl_false);
 		
@@ -720,7 +720,7 @@ namespace slib
 				m_threadPool = threadPool;
 				m_param = param;
 				if (param.port) {
-					if (! (addHttpService(param.addressBind, param.port))) {
+					if (! (addHttpServer(param.addressBind, param.port))) {
 						return sl_false;
 					}
 				}
@@ -733,9 +733,9 @@ namespace slib
 		return sl_false;
 	}
 
-	Ref<HttpService> HttpService::create(const HttpServiceParam& param)
+	Ref<HttpServer> HttpServer::create(const HttpServerParam& param)
 	{
-		Ref<HttpService> ret = new HttpService;
+		Ref<HttpServer> ret = new HttpServer;
 		if (ret.isNotNull()) {
 			if (ret->_init(param)) {
 				return ret;
@@ -744,7 +744,7 @@ namespace slib
 		return sl_null;
 	}
 
-	void HttpService::release()
+	void HttpServer::release()
 	{
 		ObjectLocker lock(this);
 		
@@ -755,7 +755,7 @@ namespace slib
 		m_flagRunning = sl_false;
 		
 		{
-			ListLocker< Ref<HttpServiceConnectionProvider> > cp(m_connectionProviders);
+			ListLocker< Ref<HttpServerConnectionProvider> > cp(m_connectionProviders);
 			for (sl_size i = 0; i < cp.count; i++) {
 				cp[i]->release();
 			}
@@ -776,34 +776,34 @@ namespace slib
 		m_connections.removeAll();
 	}
 
-	sl_bool HttpService::isRunning()
+	sl_bool HttpServer::isRunning()
 	{
 		return m_flagRunning;
 	}
 
-	Ref<AsyncIoLoop> HttpService::getAsyncIoLoop()
+	Ref<AsyncIoLoop> HttpServer::getAsyncIoLoop()
 	{
 		return m_ioLoop;
 	}
 
-	Ref<ThreadPool> HttpService::getThreadPool()
+	Ref<ThreadPool> HttpServer::getThreadPool()
 	{
 		return m_threadPool;
 	}
 
-	const HttpServiceParam& HttpService::getParam()
+	const HttpServerParam& HttpServer::getParam()
 	{
 		return m_param;
 	}
 
-	sl_bool HttpService::preprocessRequest(const Ref<HttpServiceContext>& context)
+	sl_bool HttpServer::preprocessRequest(const Ref<HttpServerContext>& context)
 	{
 		return sl_false;
 	}
 
-	void HttpService::processRequest(const Ref<HttpServiceContext>& context)
+	void HttpServer::processRequest(const Ref<HttpServerContext>& context)
 	{
-		Ref<HttpServiceConnection> connection = context->getConnection();
+		Ref<HttpServerConnection> connection = context->getConnection();
 		if (connection.isNull()) {
 			return;
 		}
@@ -897,7 +897,7 @@ namespace slib
 		
 	}
 
-	sl_bool HttpService::processAsset(const Ref<HttpServiceContext>& context, const String& path)
+	sl_bool HttpServer::processAsset(const Ref<HttpServerContext>& context, const String& path)
 	{
 		FilePathSegments seg;
 		seg.parsePath(path);
@@ -926,7 +926,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool HttpService::processFile(const Ref<HttpServiceContext>& context, const String& path)
+	sl_bool HttpServer::processFile(const Ref<HttpServerContext>& context, const String& path)
 	{
 		if (File::exists(path) && !(File::isDirectory(path))) {
 
@@ -992,7 +992,7 @@ namespace slib
 		return sl_false;
 	}
 	
-	void HttpService::_processCacheControl(const Ref<HttpServiceContext>& context)
+	void HttpServer::_processCacheControl(const Ref<HttpServerContext>& context)
 	{
 		if (m_param.flagUseCacheControl) {
 			HttpCacheControlResponse cc;
@@ -1005,7 +1005,7 @@ namespace slib
 		}
 	}
 
-	sl_bool HttpService::processRangeRequest(const Ref<HttpServiceContext>& context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength)
+	sl_bool HttpServer::processRangeRequest(const Ref<HttpServerContext>& context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength)
 	{
 		if (range.getLength() < 2 || !(range.startsWith("bytes="))) {
 			context->setResponseCode(HttpStatus::BadRequest);
@@ -1067,12 +1067,12 @@ namespace slib
 		return sl_true;
 	}
 	
-	sl_bool HttpService::onRequest(HttpServiceContext* context)
+	sl_bool HttpServer::onRequest(HttpServerContext* context)
 	{
 		return sl_false;
 	}
 	
-	sl_bool HttpService::dispatchRequest(HttpServiceContext* context)
+	sl_bool HttpServer::dispatchRequest(HttpServerContext* context)
 	{
 		if (m_param.onRequest.isNotNull()) {
 			if (m_param.onRequest(this, context)) {
@@ -1082,11 +1082,11 @@ namespace slib
 		return onRequest(context);
 	}
 	
-	void HttpService::onPostRequest(HttpServiceContext* context, sl_bool flagProcessed)
+	void HttpServer::onPostRequest(HttpServerContext* context, sl_bool flagProcessed)
 	{
 	}
 	
-	void HttpService::dispatchPostRequest(HttpServiceContext* context, sl_bool flagProcessed)
+	void HttpServer::dispatchPostRequest(HttpServerContext* context, sl_bool flagProcessed)
 	{
 		if (!flagProcessed) {
 			context->setResponseCode(HttpStatus::NotFound);
@@ -1101,9 +1101,9 @@ namespace slib
 		}
 	}
 
-	Ref<HttpServiceConnection> HttpService::addConnection(const Ref<AsyncStream>& stream, const SocketAddress& remoteAddress, const SocketAddress& localAddress)
+	Ref<HttpServerConnection> HttpServer::addConnection(const Ref<AsyncStream>& stream, const SocketAddress& remoteAddress, const SocketAddress& localAddress)
 	{
-		Ref<HttpServiceConnection> connection = HttpServiceConnection::create(this, stream.get());
+		Ref<HttpServerConnection> connection = HttpServerConnection::create(this, stream.get());
 		if (connection.isNotNull()) {
 			if (m_param.flagLogDebug) {
 				Log(SERVICE_TAG, "[%s] Connection Created - Address: %s",
@@ -1118,7 +1118,7 @@ namespace slib
 		return connection;
 	}
 
-	void HttpService::closeConnection(HttpServiceConnection* connection)
+	void HttpServer::closeConnection(HttpServerConnection* connection)
 	{
 		if (m_param.flagLogDebug) {
 			Log(SERVICE_TAG, "[%s] Connection Closed", String::fromPointerValue(connection));
@@ -1126,19 +1126,19 @@ namespace slib
 		m_connections.remove(connection);
 	}
 
-	void HttpService::addConnectionProvider(const Ref<HttpServiceConnectionProvider>& provider)
+	void HttpServer::addConnectionProvider(const Ref<HttpServerConnectionProvider>& provider)
 	{
 		m_connectionProviders.add(provider);
 	}
 
-	void HttpService::removeConnectionProvider(const Ref<HttpServiceConnectionProvider>& provider)
+	void HttpServer::removeConnectionProvider(const Ref<HttpServerConnectionProvider>& provider)
 	{
 		m_connectionProviders.remove(provider);
 	}
 
-	sl_bool HttpService::addHttpService(const SocketAddress& addr)
+	sl_bool HttpServer::addHttpServer(const SocketAddress& addr)
 	{
-		Ref<HttpServiceConnectionProvider> provider = _priv_DefaultHttpServiceConnectionProvider::create(this, addr);
+		Ref<HttpServerConnectionProvider> provider = _priv_DefaultHttpServerConnectionProvider::create(this, addr);
 		if (provider.isNotNull()) {
 			addConnectionProvider(provider);
 			return sl_true;
@@ -1146,14 +1146,14 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool HttpService::addHttpService(sl_uint32 port)
+	sl_bool HttpServer::addHttpServer(sl_uint32 port)
 	{
-		return addHttpService(SocketAddress(port));
+		return addHttpServer(SocketAddress(port));
 	}
 
-	sl_bool HttpService::addHttpService(const IPAddress& addr, sl_uint32 port)
+	sl_bool HttpServer::addHttpServer(const IPAddress& addr, sl_uint32 port)
 	{
-		return addHttpService(SocketAddress(addr, port));
+		return addHttpServer(SocketAddress(addr, port));
 	}
 
 }
