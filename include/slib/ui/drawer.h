@@ -26,6 +26,7 @@
 #include "definition.h"
 
 #include "view.h"
+#include "motion_tracker.h"
 
 namespace slib
 {
@@ -40,19 +41,61 @@ namespace slib
 		~Drawer();
 		
 	public:
-		Ref<View> getHover();
+		sl_bool isOpened();
+		
+		virtual void open();
+		
+		virtual void close();
+		
+		Ref<View> getContent();
+		
+		void setContent(const Ref<View>& view);
+		
+		sl_ui_len getDrawerSize();
+		
+		void setDrawerSize(sl_ui_len size);
+		
+		sl_ui_len getDragEdgeSize();
+		
+		void setDragEdgeSize(sl_ui_len size);
+		
+		Alignment getGravity();
+		
+		void setGravity(const Alignment& align);
 		
 	protected:
 		void onChangeParent(View* oldParent, View* newParent) override;
 		
-	private:
-		void _onParentMouseEvent(View* view, UIEvent* ev);
+		void onMouseEvent(UIEvent* ev) override;
+		
+		void onCancel(UIEvent* ev) override;
 		
 	private:
-		WeakRef<View> m_content;
-		Ref<View> m_viewHover;
+		void _onEndOpenAnimation();
+		
+		void _onEndCloseAnimation();
+		
+		void _onParentMouseEvent(View* view, UIEvent* ev);
+				
+		Vector2 _makeContentTranslation(sl_real t);
+		
+		sl_real _getContentTranslation();
+
+		void _setContentTranslation(sl_real t);
+		
+
+	private:
+		sl_bool m_flagOpened;
+		sl_ui_len m_drawerSize;
+		sl_ui_len m_dragEdgeSize;
+		Alignment m_gravity;
+
+		AtomicRef<Animation> m_animation;
 		Function<void(View*, UIEvent*)> m_callbackParentMouseEvent;
 		
+		sl_bool m_flagMouseDown;
+		sl_real m_posMouseDown;
+		MotionTracker m_motionTracker;
 	};
 	
 }

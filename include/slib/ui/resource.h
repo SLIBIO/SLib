@@ -303,6 +303,7 @@ namespace slib
 	class VideoView;
 	class CameraView;
 	class QRCodeScanner;
+	class Drawer;
 
 }
 
