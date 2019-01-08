@@ -90,7 +90,6 @@ namespace slib
 		m_flagPassEventToChildren = sl_true;
 		m_flagOkCancelEnabled = sl_true;
 		m_flagTabStopEnabled = sl_true;
-		m_flagCapturingChildInstanceEvents = sl_false;
 		
 		m_flagOnAddChild = sl_false;
 		m_flagOnRemoveChild = sl_false;
@@ -6442,19 +6441,14 @@ namespace slib
 		}
 	}
 
-	sl_bool View::isCapturingChildInstanceEvents()
+	Function<sl_bool(const UIPoint& pt)> View::getCapturingChildInstanceEvents()
 	{
-		return m_flagCapturingChildInstanceEvents;
+		return m_hitTestCapturingChildInstanceEvents;
 	}
 
-	void View::setCapturingChildInstanceEvents(sl_bool flag)
+	void View::setCapturingChildInstanceEvents(const Function<sl_bool(const UIPoint& pt)>& hitTestCaturing)
 	{
-		m_flagCapturingChildInstanceEvents = flag;
-	}
-
-	sl_bool View::hitTestForCapturingChildInstanceEvents(const UIPoint& pt)
-	{
-		return sl_true;
+		m_hitTestCapturingChildInstanceEvents = hitTestCaturing;
 	}
 	
 	Ref<UIEvent> View::getCurrentEvent()

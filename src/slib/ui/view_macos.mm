@@ -1023,8 +1023,9 @@ namespace slib
 			if (!(view->isEnabled())) {
 				return nil;
 			}
-			if (view->isCapturingChildInstanceEvents()) {
-				if (view->hitTestForCapturingChildInstanceEvents(slib::UIPoint((sl_ui_pos)(aPoint.x), (sl_ui_pos)(aPoint.y)))) {
+			slib::Function<sl_bool(const slib::UIPoint&)> hitTestCapture(view->getCapturingChildInstanceEvents());
+			if (hitTestCapture.isNotNull()) {
+				if (hitTestCapture(slib::UIPoint((sl_ui_pos)(aPoint.x), (sl_ui_pos)(aPoint.y)))) {
 					return self;
 				}
 			}

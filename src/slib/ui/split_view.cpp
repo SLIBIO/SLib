@@ -32,8 +32,9 @@ namespace slib
 		SLIB_REFERABLE_CONSTRUCTOR
 		
 		setCreatingChildInstances(sl_true);		
-		setCapturingChildInstanceEvents(sl_true);
 		setSavingCanvasState(sl_false);
+
+		setCapturingChildInstanceEvents(SLIB_FUNCTION_WEAKREF(SplitView, _hitTestForCapturingChildInstanceEvents, this));
 		
 		m_orientation = LayoutOrientation::Horizontal;
 		
@@ -577,13 +578,6 @@ namespace slib
 		
 	}
 	
-	sl_bool SplitView::hitTestForCapturingChildInstanceEvents(const UIPoint& pt)
-	{
-		ObjectLocker lock(this);
-		sl_int32 index = _getDividerIndexAtPoint(pt);
-		return index >= 0;
-	}
-	
 	sl_ui_len SplitView::_getTotalSize()
 	{
 		sl_ui_pos total;
@@ -709,7 +703,14 @@ namespace slib
 		}
 		return -1;
 	}
-	
+		
+	sl_bool SplitView::_hitTestForCapturingChildInstanceEvents(const UIPoint& pt)
+	{
+		ObjectLocker lock(this);
+		sl_int32 index = _getDividerIndexAtPoint(pt);
+		return index >= 0;
+	}
+
 	VerticalSplitView::VerticalSplitView()
 	{
 		setOrientation(LayoutOrientation::Vertical, UIUpdateMode::Init);

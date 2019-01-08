@@ -124,9 +124,7 @@ namespace slib
 		
 		void dispatchSetCursor(UIEvent* ev) override;
 		
-		sl_bool hitTestForCapturingChildInstanceEvents(const UIPoint& pt) override;
-		
-	protected:
+	private:
 		sl_ui_len _getTotalSize();
 		
 		void _refreshItemFrames(UIUpdateMode mode);
@@ -134,6 +132,8 @@ namespace slib
 		void _resetWeights(UIUpdateMode mode);
 		
 		sl_int32 _getDividerIndexAtPoint(const UIPoint& pt);
+		
+		sl_bool _hitTestForCapturingChildInstanceEvents(const UIPoint& pt);
 		
 	private:
 		LayoutOrientation m_orientation;

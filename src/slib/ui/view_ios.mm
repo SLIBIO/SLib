@@ -530,9 +530,10 @@ namespace slib
 			if (!(view->isEnabled())) {
 				return nil;
 			}
-			if (view->isCapturingChildInstanceEvents()) {
+			slib::Function<sl_bool(const slib::UIPoint&)> hitTestCapture(view->getCapturingChildInstanceEvents());
+			if (hitTestCapture.isNotNull()) {
 				CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
-				if (view->hitTestForCapturingChildInstanceEvents(slib::UIPoint((sl_ui_pos)(aPoint.x * f), (sl_ui_pos)(aPoint.y * f)))) {
+				if (hitTestCapture(slib::UIPoint((sl_ui_pos)(aPoint.x * f), (sl_ui_pos)(aPoint.y * f)))) {
 					return self;
 				}
 			}

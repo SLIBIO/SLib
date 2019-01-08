@@ -1109,11 +1109,9 @@ namespace slib
 		void setPreviousTabStop(const Ref<View>& view);
 		
 		
-		sl_bool isCapturingChildInstanceEvents();
+		Function<sl_bool(const UIPoint& pt)> getCapturingChildInstanceEvents();
 		
-		void setCapturingChildInstanceEvents(sl_bool flag);
-		
-		virtual sl_bool hitTestForCapturingChildInstanceEvents(const UIPoint& pt);
+		void setCapturingChildInstanceEvents(const Function<sl_bool(const UIPoint& pt)>& hitTestCapture);
 		
 		
 		Ref<UIEvent> getCurrentEvent();
@@ -1364,7 +1362,7 @@ namespace slib
 		sl_bool m_flagTabStopEnabled;
 		AtomicWeakRef<View> m_viewNextTabStop;
 		AtomicWeakRef<View> m_viewPrevTabStop;
-		sl_bool m_flagCapturingChildInstanceEvents;
+		AtomicFunction<sl_bool(const UIPoint& pt)> m_hitTestCapturingChildInstanceEvents;
 		
 		AtomicRef<GestureDetector> m_gestureDetector;
 		
