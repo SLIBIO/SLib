@@ -558,7 +558,7 @@ namespace slib
 
 	sl_bool SAppDimensionValue::isGlobalUnit(int unit)
 	{
-		return unit == PX || unit == SW || unit == SH || unit == SMIN || unit == SMAX || unit == INCH || unit == M | unit == CM || unit == MM || unit == PT || unit == DP;
+		return unit == PX || unit == SW || unit == SH || unit == SMIN || unit == SMAX || unit == INCH || unit == M || unit == CM || unit == MM || unit == PT || unit == DP;
 	}
 
 	sl_bool SAppDimensionValue::isViewportUnit(int unit)
