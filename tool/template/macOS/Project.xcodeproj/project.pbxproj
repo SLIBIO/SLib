@@ -13,6 +13,7 @@
 		265BF19121723BCD0073F7B8 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 265BF19021723BCD0073F7B8 /* OpenGL.framework */; };
 		265BF19321723BFB0073F7B8 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 265BF19221723BFB0073F7B8 /* AppKit.framework */; };
 		265BF19421723C220073F7B8 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 265BF18E21723BBA0073F7B8 /* Quartz.framework */; };
+		268256A121E464A50079600F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 268256A021E464A50079600F /* IOKit.framework */; };
 		26840C2C2111FA0300A01A29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26840C2B2111FA0300A01A29 /* Assets.xcassets */; };
 		26840C2F2111FA0300A01A29 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 26840C2D2111FA0300A01A29 /* MainMenu.xib */; };
 		26840C322111FA0300A01A29 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26840C312111FA0300A01A29 /* main.cpp */; };
@@ -26,6 +27,7 @@
 		265BF18E21723BBA0073F7B8 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
 		265BF19021723BCD0073F7B8 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		265BF19221723BFB0073F7B8 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		268256A021E464A50079600F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		26840C252111FA0200A01A29 /* SLIB_TEMPLATE_APP_NAME.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SLIB_TEMPLATE_APP_NAME.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26840C2B2111FA0300A01A29 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		26840C2E2111FA0300A01A29 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -38,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				268256A121E464A50079600F /* IOKit.framework in Frameworks */,
 				263916F421C8F870008B335B /* AVFoundation.framework in Frameworks */,
 				263916F221C8F86C008B335B /* CoreMedia.framework in Frameworks */,
 				265BF19421723C220073F7B8 /* Quartz.framework in Frameworks */,
@@ -52,6 +55,7 @@
 		265BF18B21723BB30073F7B8 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				268256A021E464A50079600F /* IOKit.framework */,
 				263916F321C8F870008B335B /* AVFoundation.framework */,
 				263916F121C8F86C008B335B /* CoreMedia.framework */,
 				265BF19221723BFB0073F7B8 /* AppKit.framework */,
@@ -116,7 +120,7 @@
 			dependencies = (
 			);
 			name = SLIB_TEMPLATE_APP_NAME;
-			productName = "SLIB_TEMPLATE_APP_NAME";
+			productName = SLIB_TEMPLATE_APP_NAME;
 			productReference = 26840C252111FA0200A01A29 /* SLIB_TEMPLATE_APP_NAME.app */;
 			productType = "com.apple.product-type.application";
 		};
