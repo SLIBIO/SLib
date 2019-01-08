@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "slib-core", "slib-core.vcxproj", "{9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "slib", "slib.vcxproj", "{FF088AB2-B7A3-4548-8608-4DFACDE182A2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "external\zlib.vcxproj", "{78039D5C-C2B0-463B-AA81-27BAA602185F}"
@@ -37,7 +35,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tool", "tool", "{3AE9B313-4
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReplaceTextInFile", "..\..\tool\src\ReplaceTextInFile\ReplaceTextInFile.vcxproj", "{D1153F23-72DA-4CFF-B753-6FA6C5F95292}"
 	ProjectSection(ProjectDependencies) = postProject
-		{9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3} = {9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3}
+		{FF088AB2-B7A3-4548-8608-4DFACDE182A2} = {FF088AB2-B7A3-4548-8608-4DFACDE182A2}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "slib-libsapp", "slib-libsapp.vcxproj", "{C489039E-F8D4-40E7-887C-341C0D76407D}"
@@ -59,14 +57,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3}.Debug|x64.ActiveCfg = Debug|x64
-		{9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3}.Debug|x64.Build.0 = Debug|x64
-		{9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3}.Debug|x86.ActiveCfg = Debug|Win32
-		{9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3}.Debug|x86.Build.0 = Debug|Win32
-		{9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3}.Release|x64.ActiveCfg = Release|x64
-		{9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3}.Release|x64.Build.0 = Release|x64
-		{9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3}.Release|x86.ActiveCfg = Release|Win32
-		{9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3}.Release|x86.Build.0 = Release|Win32
 		{FF088AB2-B7A3-4548-8608-4DFACDE182A2}.Debug|x64.ActiveCfg = Debug|x64
 		{FF088AB2-B7A3-4548-8608-4DFACDE182A2}.Debug|x64.Build.0 = Debug|x64
 		{FF088AB2-B7A3-4548-8608-4DFACDE182A2}.Debug|x86.ActiveCfg = Debug|Win32

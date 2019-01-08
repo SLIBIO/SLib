@@ -10,7 +10,7 @@ set_target_properties(ExampleUdpHolepunching PROPERTIES LINK_FLAGS "-static-libg
 
 target_link_libraries (
   ExampleUdpHolepunching
-  slib-core
+  slib
   zlib
   pthread
 )
