@@ -599,6 +599,18 @@ namespace slib
 				return (sl_ui_pos)(value.amount * SLIB_MAX(m_layoutSimulationParams.viewportWidth, m_layoutSimulationParams.viewportHeight));
 			case SAppDimensionValue::SP:
 				return (sl_ui_pos)(value.amount * m_layoutSimulationParams.sp);
+			case SAppDimensionValue::DP:
+				return (sl_ui_pos)(slib::UIResource::dpToPixel(value.amount));
+			case SAppDimensionValue::PT:
+				return (sl_ui_pos)(slib::UIResource::pointToPixel(value.amount));
+			case SAppDimensionValue::M:
+				return (sl_ui_pos)(slib::UIResource::meterToPixel(value.amount));
+			case SAppDimensionValue::CM:
+				return (sl_ui_pos)(slib::UIResource::centimeterToPixel(value.amount));
+			case SAppDimensionValue::MM:
+				return (sl_ui_pos)(slib::UIResource::millimeterToPixel(value.amount));
+			case SAppDimensionValue::INCH:
+				return (sl_ui_pos)(slib::UIResource::inchToPixel(value.amount));
 		}
 		return 0;
 	}
@@ -629,6 +641,18 @@ namespace slib
 				return value.amount * (sl_real)(SLIB_MAX(m_layoutSimulationParams.viewportWidth, m_layoutSimulationParams.viewportHeight));
 			case SAppDimensionValue::SP:
 				return value.amount * m_layoutSimulationParams.sp;
+			case SAppDimensionValue::DP:
+				return slib::UIResource::dpToPixel(value.amount);
+			case SAppDimensionValue::PT:
+				return slib::UIResource::pointToPixel(value.amount);
+			case SAppDimensionValue::M:
+				return slib::UIResource::meterToPixel(value.amount);
+			case SAppDimensionValue::CM:
+				return slib::UIResource::centimeterToPixel(value.amount);
+			case SAppDimensionValue::MM:
+				return slib::UIResource::millimeterToPixel(value.amount);
+			case SAppDimensionValue::INCH:
+				return slib::UIResource::inchToPixel(value.amount);
 		}
 		return 0;
 	}

@@ -27,6 +27,7 @@
 #include "slib/ui/screen.h"
 #include "slib/ui/common_dialogs.h"
 #include "slib/graphics/font.h"
+#include "slib/device/device.h"
 #include "slib/core/safe_static.h"
 
 namespace slib
@@ -274,6 +275,76 @@ namespace slib
 	}
 #endif
 
+	double UI::getScreenPPI()
+	{
+		double ppi = Device::getScreenPPI();
+		if (ppi < 1) {
+			return 1;
+		} else {
+			return ppi;
+		}
+	}
+	
+	sl_real UI::pixelToInch(sl_real px)
+	{
+		return (sl_real)(px / getScreenPPI());
+	}
+	
+	sl_real UI::inchToPixel(sl_real inch)
+	{
+		return (sl_real)(inch * getScreenPPI());
+	}
+	
+	sl_real UI::pixelToMeter(sl_real px)
+	{
+		return (sl_real)(px / getScreenPPI() * 0.0254);
+	}
+	
+	sl_real UI::meterToPixel(sl_real meters)
+	{
+		return (sl_real)(meters * 39.3701 * getScreenPPI());
+	}
+
+	sl_real UI::pixelToCentimeter(sl_real px)
+	{
+		return (sl_real)(px * 2.54 / getScreenPPI());
+	}
+	
+	sl_real UI::centimeterToPixel(sl_real cm)
+	{
+		return (sl_real)(cm * getScreenPPI() * 0.393701);
+	}
+	
+	sl_real UI::pixelToMillimeter(sl_real px)
+	{
+		return (sl_real)(px * 25.4 / getScreenPPI());
+	}
+	
+	sl_real UI::millimeterToPixel(sl_real mm)
+	{
+		return (sl_real)(mm * getScreenPPI() * 0.0393701);
+	}
+	
+	sl_real UI::pixelToPoint(sl_real px)
+	{
+		return (sl_real)(px * 72 / getScreenPPI());
+	}
+	
+	sl_real UI::pointToPixel(sl_real pt)
+	{
+		return (sl_real)(pt * getScreenPPI() / 72);
+	}
+	
+	sl_real UI::pixelToDp(sl_real px)
+	{
+		return (sl_real)(px * 160 / getScreenPPI());
+	}
+	
+	sl_real UI::dpToPixel(sl_real dp)
+	{
+		return (sl_real)(dp * getScreenPPI() / 160);
+	}
+	
 	void UI::alert(const String& text)
 	{
 		AlertDialog alert;

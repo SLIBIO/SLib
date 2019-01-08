@@ -39,6 +39,8 @@ namespace slib
 	class UIResource
 	{
 	public:
+		static void updateDefaultScreenSize();
+		
 		static sl_ui_len getScreenWidth();
 		
 		static void setScreenWidth(sl_ui_len width);
@@ -51,7 +53,33 @@ namespace slib
 		
 		static sl_ui_len getScreenMaximum();
 		
-		static void updateDefaultScreenSize();
+		static double getScreenPPI();
+		
+		static void setScreenPPI(double ppi);
+		
+		static sl_real pixelToInch(sl_real px);
+		
+		static sl_real inchToPixel(sl_real inch);
+		
+		static sl_real pixelToMeter(sl_real px);
+		
+		static sl_real meterToPixel(sl_real meters);
+		
+		static sl_real pixelToCentimeter(sl_real px);
+		
+		static sl_real centimeterToPixel(sl_real cm);
+		
+		static sl_real pixelToMillimeter(sl_real px);
+		
+		static sl_real millimeterToPixel(sl_real mm);
+		
+		static sl_real pixelToPoint(sl_real px);
+		
+		static sl_real pointToPixel(sl_real dp);
+		
+		static sl_real pixelToDp(sl_real px);
+		
+		static sl_real dpToPixel(sl_real dp);
 		
 	};
 	

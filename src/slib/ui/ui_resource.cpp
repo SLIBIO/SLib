@@ -26,41 +26,59 @@
 namespace slib
 {
 
-	sl_ui_len _g_ui_resource_screenWidth = 0;
-	sl_ui_len _g_ui_resource_screenHeight = 0;
-	sl_ui_len _g_ui_resource_defaultScreenWidth = 0;
-	sl_ui_len _g_ui_resource_defaultScreenHeight = 0;
+	sl_ui_len _g_priv_ui_resource_screenWidth = 0;
+	sl_ui_len _g_priv_ui_resource_screenHeight = 0;
+	sl_ui_len _g_priv_ui_resource_defaultScreenWidth = 0;
+	sl_ui_len _g_priv_ui_resource_defaultScreenHeight = 0;
+	double _g_priv_ui_resource_screenPPI = 0;
+	double _g_priv_ui_resource_defaultScreenPPI = 0;
+
+	void UIResource::updateDefaultScreenSize()
+	{
+		UISize size = UI::getScreenSize();
+		_g_priv_ui_resource_defaultScreenWidth = size.x;
+		_g_priv_ui_resource_defaultScreenHeight = size.y;
+		_g_priv_ui_resource_defaultScreenPPI = UI::getScreenPPI();
+	}
 	
 	sl_ui_len UIResource::getScreenWidth()
 	{
-		if (_g_ui_resource_screenWidth == 0) {
-			if (_g_ui_resource_defaultScreenWidth == 0) {
+		sl_ui_len ret = _g_priv_ui_resource_screenWidth;
+		if (ret < 1) {
+			if (_g_priv_ui_resource_defaultScreenWidth < 1) {
 				updateDefaultScreenSize();
 			}
-			return _g_ui_resource_defaultScreenWidth;
+			ret = _g_priv_ui_resource_defaultScreenWidth;
+			if (ret < 1) {
+				ret = 1;
+			}
 		}
-		return _g_ui_resource_screenWidth;
+		return ret;
 	}
 	
 	void UIResource::setScreenWidth(sl_ui_len width)
 	{
-		_g_ui_resource_screenWidth = width;
+		_g_priv_ui_resource_screenWidth = width;
 	}
 	
 	sl_ui_len UIResource::getScreenHeight()
 	{
-		if (_g_ui_resource_screenHeight == 0) {
-			if (_g_ui_resource_defaultScreenHeight == 0) {
+		sl_ui_len ret = _g_priv_ui_resource_screenHeight;
+		if (ret < 1) {
+			if (_g_priv_ui_resource_defaultScreenHeight < 1) {
 				updateDefaultScreenSize();
 			}
-			return _g_ui_resource_defaultScreenHeight;
+			ret = _g_priv_ui_resource_defaultScreenHeight;
+			if (ret < 1) {
+				ret = 1;
+			}
 		}
-		return _g_ui_resource_screenHeight;
+		return ret;
 	}
 	
 	void UIResource::setScreenHeight(sl_ui_len height)
 	{
-		_g_ui_resource_screenHeight = height;
+		_g_priv_ui_resource_screenHeight = height;
 	}
 	
 	sl_ui_len UIResource::getScreenMinimum()
@@ -73,12 +91,86 @@ namespace slib
 		return SLIB_MAX(getScreenWidth(), getScreenHeight());
 	}
 	
-	void UIResource::updateDefaultScreenSize()
+	double UIResource::getScreenPPI()
 	{
-		UISize size = UI::getScreenSize();
-		_g_ui_resource_defaultScreenWidth = size.x;
-		_g_ui_resource_defaultScreenHeight = size.y;
+		double ret = _g_priv_ui_resource_screenPPI;
+		if (ret < 1) {
+			if (_g_priv_ui_resource_defaultScreenPPI < 1) {
+				updateDefaultScreenSize();
+			}
+			ret = _g_priv_ui_resource_defaultScreenPPI;
+			if (ret < 1) {
+				ret = 1;
+			}
+		}
+		return ret;
 	}
+	
+	void UIResource::setScreenPPI(double ppi)
+	{
+		_g_priv_ui_resource_screenPPI = ppi;
+	}
+	
+	sl_real UIResource::pixelToInch(sl_real px)
+	{
+		return (sl_real)(px / getScreenPPI());
+	}
+	
+	sl_real UIResource::inchToPixel(sl_real inch)
+	{
+		return (sl_real)(inch * getScreenPPI());
+	}
+	
+	sl_real UIResource::pixelToMeter(sl_real px)
+	{
+		return (sl_real)(px * 0.0254 / getScreenPPI());
+	}
+	
+	sl_real UIResource::meterToPixel(sl_real meters)
+	{
+		return (sl_real)(meters * getScreenPPI() * 39.3701);
+	}
+
+	sl_real UIResource::pixelToCentimeter(sl_real px)
+	{
+		return (sl_real)(px * 2.54 / getScreenPPI());
+	}
+	
+	sl_real UIResource::centimeterToPixel(sl_real cm)
+	{
+		return (sl_real)(cm * getScreenPPI() * 0.393701);
+	}
+	
+	sl_real UIResource::pixelToMillimeter(sl_real px)
+	{
+		return (sl_real)(px * 25.4 / getScreenPPI());
+	}
+	
+	sl_real UIResource::millimeterToPixel(sl_real mm)
+	{
+		return (sl_real)(mm * getScreenPPI() * 0.0393701);
+	}
+	
+	sl_real UIResource::pixelToPoint(sl_real px)
+	{
+		return (sl_real)(px * 72 / getScreenPPI());
+	}
+	
+	sl_real UIResource::pointToPixel(sl_real pt)
+	{
+		return (sl_real)(pt * getScreenPPI() / 72);
+	}
+	
+	sl_real UIResource::pixelToDp(sl_real px)
+	{
+		return (sl_real)(px * 160 / getScreenPPI());
+	}
+	
+	sl_real UIResource::dpToPixel(sl_real dp)
+	{
+		return (sl_real)(dp * getScreenPPI() / 160);
+	}
+	
 	
 	UILayoutResource::UILayoutResource(sl_real sp)
 	{

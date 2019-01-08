@@ -159,6 +159,18 @@ namespace slib
 				} else {
 					return String::format("(sl_ui_pos)(%ff*getScaledPixel())", amount);
 				}
+			case DP:
+				return String::format("(sl_ui_pos)(slib::UIResource::dpToPixel(%ff))", amount);
+			case PT:
+				return String::format("(sl_ui_pos)(slib::UIResource::pointToPixel(%ff))", amount);
+			case M:
+				return String::format("(sl_ui_pos)(slib::UIResource::meterToPixel(%ff))", amount);
+			case CM:
+				return String::format("(sl_ui_pos)(slib::UIResource::centimeterToPixel(%ff))", amount);
+			case MM:
+				return String::format("(sl_ui_pos)(slib::UIResource::millimeterToPixel(%ff))", amount);
+			case INCH:
+				return String::format("(sl_ui_pos)(slib::UIResource::inchToPixel(%ff))", amount);
 		}
 		return "0";
 	}
@@ -225,7 +237,18 @@ namespace slib
 				} else {
 					return String::format("%ff*getScaledPixel()", amount);
 				}
-
+			case DP:
+				return String::format("slib::UIResource::dpToPixel(%ff)", amount);
+			case PT:
+				return String::format("slib::UIResource::pointToPixel(%ff)", amount);
+			case M:
+				return String::format("slib::UIResource::meterToPixel(%ff)", amount);
+			case CM:
+				return String::format("slib::UIResource::centimeterToPixel(%ff)", amount);
+			case MM:
+				return String::format("slib::UIResource::millimeterToPixel(%ff)", amount);
+			case INCH:
+				return String::format("slib::UIResource::inchToPixel(%ff)", amount);
 		}
 		return "0";
 	}
@@ -297,6 +320,10 @@ namespace slib
 					amount = f;
 					unit = FILL;
 					break;
+				} else if (sz[pos] == 'm') {
+					amount = f;
+					unit = M;
+					break;
 				}
 			} else if (pos + 2 == len) {
 				if (sz[pos] == 's') {
@@ -328,6 +355,44 @@ namespace slib
 						if (!flagPercent) {
 							amount = f;
 							unit = PX;
+							break;
+						}
+					} else if (sz[pos + 1] == 't') {
+						if (!flagPercent) {
+							amount = f;
+							unit = PT;
+							break;
+						}
+					}
+				} else if (sz[pos] == 'd') {
+					if (sz[pos + 1] == 'p') {
+						if (!flagPercent) {
+							amount = f;
+							unit = DP;
+							break;
+						}
+					}
+				} else if (sz[pos] == 'm') {
+					if (sz[pos + 1] == 'm') {
+						if (!flagPercent) {
+							amount = f;
+							unit = MM;
+							break;
+						}
+					}
+				} else if (sz[pos] == 'c') {
+					if (sz[pos + 1] == 'm') {
+						if (!flagPercent) {
+							amount = f;
+							unit = CM;
+							break;
+						}
+					}
+				} else if (sz[pos] == 'i') {
+					if (sz[pos + 1] == 'n') {
+						if (!flagPercent) {
+							amount = f;
+							unit = INCH;
 							break;
 						}
 					}
@@ -493,7 +558,7 @@ namespace slib
 
 	sl_bool SAppDimensionValue::isGlobalUnit(int unit)
 	{
-		return unit == PX || unit == SW || unit == SH || unit == SMIN || unit == SMAX;
+		return unit == PX || unit == SW || unit == SH || unit == SMIN || unit == SMAX || unit == INCH || unit == M | unit == CM || unit == MM || unit == PT || unit == DP;
 	}
 
 	sl_bool SAppDimensionValue::isViewportUnit(int unit)

@@ -103,6 +103,32 @@ namespace slib
 		static void attemptRotateScreenOrientation();
 		
 		
+		static double getScreenPPI();
+		
+		static sl_real pixelToInch(sl_real px);
+		
+		static sl_real inchToPixel(sl_real inch);
+		
+		static sl_real pixelToMeter(sl_real px);
+
+		static sl_real meterToPixel(sl_real meters);
+		
+		static sl_real pixelToCentimeter(sl_real px);
+		
+		static sl_real centimeterToPixel(sl_real cm);
+		
+		static sl_real pixelToMillimeter(sl_real px);
+		
+		static sl_real millimeterToPixel(sl_real mm);
+		
+		static sl_real pixelToPoint(sl_real px);
+		
+		static sl_real pointToPixel(sl_real dp);
+		
+		static sl_real pixelToDp(sl_real px);
+		
+		static sl_real dpToPixel(sl_real dp);
+		
 		// Message Box
 		// Run on UI thread
 		static void alert(const String& text);
