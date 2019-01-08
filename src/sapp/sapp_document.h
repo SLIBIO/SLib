@@ -238,6 +238,7 @@ namespace slib
 		sl_bool _processLayoutResourceControl_Video(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Camera(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_QRCodeScanner(LayoutControlProcessParams* params);
+		sl_bool _processLayoutResourceControl_Drawer(LayoutControlProcessParams* params);
 
 	private:
 		sl_bool m_flagOpened;

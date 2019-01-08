@@ -773,6 +773,7 @@ namespace slib
 			PROCESS_CONTROL_SWITCH(Video)
 			PROCESS_CONTROL_SWITCH(Camera)
 			PROCESS_CONTROL_SWITCH(QRCodeScanner)
+			PROCESS_CONTROL_SWITCH(Drawer)
 			default:
 				return sl_false;
 		}
@@ -781,6 +782,7 @@ namespace slib
 			case SAppLayoutItemType::ViewGroup:
 			case SAppLayoutItemType::Linear:
 			case SAppLayoutItemType::Render:
+			case SAppLayoutItemType::Drawer:
 				if (op == OP_PARSE) {
 					ListLocker< Ref<XmlElement> > children(_getLayoutItemChildElements(resourceItem, params->resource->name, String::null()));
 					for (sl_size i = 0; i < children.count; i++) {
@@ -3822,6 +3824,18 @@ namespace slib
 		if (!(_processLayoutResourceControl_Camera(params))) {
 			return sl_false;
 		}
+	}
+	END_PROCESS_LAYOUT_CONTROL
+	
+	BEGIN_PROCESS_LAYOUT_CONTROL(Drawer, Drawer)
+	{
+		LAYOUT_CONTROL_PROCESS_SUPER(ViewGroup)
+		
+		LAYOUT_CONTROL_INT_DIMENSION_ATTR(drawerSize, setDrawerSize, checkSize)
+		LAYOUT_CONTROL_INT_DIMENSION_ATTR(dragEdgeSize, setDragEdgeSize, checkSize)
+		LAYOUT_CONTROL_GENERIC_ATTR(gravity, setGravity)
+		
+		LAYOUT_CONTROL_ADD_STATEMENT
 	}
 	END_PROCESS_LAYOUT_CONTROL
 	

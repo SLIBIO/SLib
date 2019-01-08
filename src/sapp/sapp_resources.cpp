@@ -440,6 +440,10 @@ namespace slib
 				prefix = "qrCodeScanner";
 				pN = &nAutoIncreaseNameQRCodeScanner;
 				break;
+			case SAppLayoutItemType::Drawer:
+				prefix = "drawer";
+				pN = &nAutoIncreaseNameDrawer;
+				break;
 			default:
 				return String::null();
 		}
@@ -513,6 +517,8 @@ namespace slib
 			type = SAppLayoutItemType::Camera;
 		} else if (strType == "qrcodescanner" || strType == "qr-code-scanner") {
 			type = SAppLayoutItemType::QRCodeScanner;
+		} else if (strType == "drawer") {
+			type = SAppLayoutItemType::Drawer;
 		}
 		return type;
 	}

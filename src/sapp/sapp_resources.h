@@ -699,6 +699,15 @@ namespace slib
 		
 	};
 	
+	class SAppLayoutDrawerAttributes : public Referable
+	{
+	public:
+		SAppDimensionValue drawerSize;
+		SAppDimensionValue dragEdgeSize;
+		SAppAlignmentValue gravity;
+		
+	};
+	
 	class SAppLayoutStyle : public Referable
 	{
 	public:
@@ -754,7 +763,8 @@ namespace slib
 		Pager = 0x0243,
 		Video = 0x0244,
 		Camera = 0x0245,
-		QRCodeScanner = 0x0246
+		QRCodeScanner = 0x0246,
+		Drawer = 0x0247
 	};
 
 	class SAppLayoutResourceItem : public Referable
@@ -793,6 +803,7 @@ namespace slib
 		Ref<SAppLayoutPagerAttributes> attrsPager;
 		Ref<SAppLayoutVideoAttributes> attrsVideo;
 		Ref<SAppLayoutCameraAttributes> attrsCamera;
+		Ref<SAppLayoutDrawerAttributes> attrsDrawer;
 
 		CList< Ref<SAppLayoutStyle> > styles;
 		CList< Ref<SAppLayoutResourceItem> > children;
@@ -844,6 +855,7 @@ namespace slib
 		sl_uint32 nAutoIncreaseNameVideo;
 		sl_uint32 nAutoIncreaseNameCamera;
 		sl_uint32 nAutoIncreaseNameQRCodeScanner;
+		sl_uint32 nAutoIncreaseNameDrawer;
 
 	public:
 		SAppLayoutResource();
