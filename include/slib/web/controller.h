@@ -27,9 +27,9 @@
 
 #include "../core/function.h"
 #include "../core/variant.h"
-#include "../network/http_service.h"
+#include "../network/http_server.h"
 
-#define SWEB_HANDLER_PARAMS_LIST const slib::Ref<slib::HttpServiceContext>& context, HttpMethod method, const slib::String& path
+#define SWEB_HANDLER_PARAMS_LIST const slib::Ref<slib::HttpServerContext>& context, HttpMethod method, const slib::String& path
 
 namespace slib
 {
@@ -49,7 +49,7 @@ namespace slib
 	public:
 		void registerHandler(HttpMethod method, const String& path, const WebHandler& handler);
 		
-		sl_bool processHttpRequest(HttpServiceContext* context);
+		sl_bool processHttpRequest(HttpServerContext* context);
 		
 	protected:
 		static String _getHandlerSignature(HttpMethod method, const String& path);

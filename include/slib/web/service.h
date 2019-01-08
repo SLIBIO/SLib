@@ -28,7 +28,7 @@
 #include "controller.h"
 
 #include "../core/service.h"
-#include "../network/http_service.h"
+#include "../network/http_server.h"
 
 namespace slib
 {
@@ -46,7 +46,7 @@ namespace slib
 		static Ref<WebService> getApp();
 
 	public:
-		HttpServiceParam& getHttpParam();
+		HttpServerParam& getHttpParam();
 
 		sl_uint16 getHttpPort();
 
@@ -61,11 +61,11 @@ namespace slib
 
 		void dispatchStopService() override;
 		
-		sl_bool onHttpRequest(HttpService*, HttpServiceContext*);
+		sl_bool onHttpRequest(HttpServer*, HttpServerContext*);
 
 	protected:
-		Ref<HttpService> m_http;
-		HttpServiceParam m_httpParam;
+		Ref<HttpServer> m_http;
+		HttpServerParam m_httpParam;
 		Ref<WebController> m_controller;
 
 	};
