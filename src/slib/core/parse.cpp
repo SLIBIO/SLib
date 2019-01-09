@@ -224,6 +224,7 @@ namespace slib
 							case '\\':
 							case '"':
 							case '\'':
+							case '/':
 								break;
 							case 'n':
 								ch = '\n';
@@ -297,6 +298,7 @@ namespace slib
 									i++;
 									sl_uint16 t = 0;
 									for (int k = 0; k < 4; k++) {
+										ch = sz[i];
 										sl_uint16 h = SLIB_CHAR_HEX_TO_INT(ch);
 										if (h < 16) {
 											t = (t << 4) | h;
@@ -334,6 +336,7 @@ namespace slib
 									i++;
 									sl_uint32 t = 0;
 									for (int k = 0; k < 4; k++) {
+										ch = sz[i];
 										sl_uint32 h = SLIB_CHAR_HEX_TO_INT(ch);
 										if (h < 16) {
 											t = (t << 4) | h;
