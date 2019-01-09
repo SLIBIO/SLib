@@ -317,8 +317,10 @@ namespace slib
 		String pathDir = m_pathApp + "/ui";
 		for (auto& fileName : File::getFiles(pathDir)) {
 			String path = pathDir + "/" + fileName;
-			if (!(_openUiResource(path))) {
-				return sl_false;
+			if (File::getFileExtension(fileName) == "xml" || File::getFileExtension(fileName) == "uiml") {
+				if (!(_openUiResource(path))) {
+					return sl_false;
+				}
 			}
 		}
 		return sl_true;
@@ -329,13 +331,11 @@ namespace slib
 		if (File::exists(path)) {
 			if (!(File::isDirectory(path))) {
 				String fileName = File::getFileName(path);
-				if (File::getFileExtension(fileName) == "xml" || File::getFileExtension(fileName) == "uiml") {
-					String localNamespace = File::getFileNameOnly(fileName);
-					if (localNamespace.isNotEmpty()) {
-						if (SAppUtil::checkName(localNamespace.getData())) {
-							if (_parseResourcesXml(localNamespace, path)) {
-								return sl_true;
-							}
+				String localNamespace = File::getFileNameOnly(fileName);
+				if (localNamespace.isNotEmpty()) {
+					if (SAppUtil::checkName(localNamespace.getData())) {
+						if (_parseResourcesXml(localNamespace, path)) {
+							return sl_true;
 						}
 					}
 				}
