@@ -60,7 +60,7 @@ namespace slib
 		
 		sl_uint64 getResponseContentLength() const;
 		
-		Ref<HttpServer> getService();
+		Ref<HttpServer> getServer();
 		
 		Ref<HttpServerConnection> getConnection();
 		
@@ -105,7 +105,7 @@ namespace slib
 		~HttpServerConnection();
 		
 	public:
-		static Ref<HttpServerConnection> create(HttpServer* service, AsyncStream* io);
+		static Ref<HttpServerConnection> create(HttpServer* server, AsyncStream* io);
 		
 	public:
 		void close() override;
@@ -114,7 +114,7 @@ namespace slib
 		
 		Ref<AsyncStream> getIO();
 		
-		Ref<HttpServer> getService();
+		Ref<HttpServer> getServer();
 		
 		Ref<HttpServerContext> getCurrentContext();
 		
@@ -141,7 +141,7 @@ namespace slib
 		SLIB_PROPERTY(AtomicRef<Referable>, UserObject)
 		
 	protected:
-		WeakRef<HttpServer> m_service;
+		WeakRef<HttpServer> m_server;
 		Ref<AsyncStream> m_io;
 		Ref<AsyncOutput> m_output;
 		
@@ -182,12 +182,12 @@ namespace slib
 		virtual void release() = 0;
 		
 	public:
-		Ref<HttpServer> getService();
+		Ref<HttpServer> getServer();
 		
-		void setService(const Ref<HttpServer>& service);
+		void setServer(const Ref<HttpServer>& server);
 		
 	private:
-		WeakRef<HttpServer> m_service;
+		WeakRef<HttpServer> m_server;
 		
 	};
 	
@@ -261,7 +261,7 @@ namespace slib
 		const HttpServerParam& getParam();
 		
 	public:
-		// called before processing body, returns true if the service is trying to process the connection itself.
+		// called before processing body, returns true if the server is trying to process the connection itself.
 		virtual sl_bool preprocessRequest(const Ref<HttpServerContext>& context);
 		
 		// called after inputing body
