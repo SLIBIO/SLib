@@ -136,6 +136,15 @@ cd ~/SLibMobileExample
 new-slib-app-mobile TestApp org.example.testapp
 ```
 
+To preview the user interface xml files
+
+```
+cd src/sapp/ui
+sapp LaunchScreen
+sapp MainPage
+```
+
+
 Here is an example for creating an Android project.
 
 ```
