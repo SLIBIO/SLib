@@ -350,26 +350,30 @@ namespace slib
 		if (instance.isNotNull()) {
 			switch (event->type) {
 				case GDK_EXPOSE:
-					return instance->onExposeEvent((GdkEventExpose*)event);
+					instance->onExposeEvent((GdkEventExpose*)event);
+					break;
 				case GDK_MOTION_NOTIFY:
-					return instance->onMotionNotifyEvent((GdkEventMotion*)event);
+					instance->onMotionNotifyEvent((GdkEventMotion*)event);
+					break;
 				case GDK_BUTTON_PRESS:
 				case GDK_2BUTTON_PRESS:
 				case GDK_BUTTON_RELEASE:
-					return instance->onButtonEvent((GdkEventButton*)event);
+					instance->onButtonEvent((GdkEventButton*)event);
+					break;
 				case GDK_ENTER_NOTIFY:
 				case GDK_LEAVE_NOTIFY:
-					return instance->onCrossingEvent((GdkEventCrossing*)event);
+					instance->onCrossingEvent((GdkEventCrossing*)event);
+					break;
 				case GDK_KEY_PRESS:
 				case GDK_KEY_RELEASE:
-					return instance->onKeyEvent((GdkEventKey*)event);
+					instance->onKeyEvent((GdkEventKey*)event);
+					break;
 				case GDK_SCROLL:
-					return instance->onScrollEvent((GdkEventScroll*)event);
-				default:
+					instance->onScrollEvent((GdkEventScroll*)event);
 					break;
 			}
 		}
-		return sl_false;
+		return sl_true;
 	}
 	
 	void GTK_ViewInstance::applyModifiers(UIEvent* event, guint state)
@@ -410,7 +414,7 @@ namespace slib
 				}
 			}
 		}
-		return sl_false;
+		return sl_true;
 	}
 	
 	gboolean GTK_ViewInstance::onMotionNotifyEvent(GdkEventMotion* gevent)
@@ -423,7 +427,7 @@ namespace slib
 			if (event.isNotNull()) {
 				applyModifiers(event.get(), gevent->state);
 				onMouseEvent(event.get());
-				if (event->isStoppedPropagation()) {
+				if (event->isPreventedDefault()) {
 					return sl_true;
 				}
 			}
@@ -484,7 +488,7 @@ namespace slib
 			if (event.isNotNull()) {
 				applyModifiers(event.get(), gevent->state);
 				onMouseEvent(event.get());
-				if (event->isStoppedPropagation()) {
+				if (event->isPreventedDefault()) {
 					return sl_true;
 				}
 			}
@@ -517,7 +521,7 @@ namespace slib
 			if (event.isNotNull()) {
 				applyModifiers(event.get(), gevent->state);
 				onMouseEvent(event.get());
-				if (event->isStoppedPropagation()) {
+				if (event->isPreventedDefault()) {
 					return sl_true;
 				}
 			}
@@ -542,7 +546,7 @@ namespace slib
 			if (event.isNotNull()) {
 				applyModifiers(event.get(), gevent->state);
 				ViewInstance::onKeyEvent(event.get());
-				if (event->isStoppedPropagation()) {
+				if (event->isPreventedDefault()) {
 					return sl_true;
 				}
 			}
@@ -588,7 +592,7 @@ namespace slib
 			if (event.isNotNull()) {
 				applyModifiers(event.get(), gevent->state);
 				onMouseWheelEvent(event.get());
-				if (event->isStoppedPropagation()) {
+				if (event->isPreventedDefault()) {
 					return sl_true;
 				}
 			}

@@ -470,32 +470,17 @@ public class UiView {
 	public static boolean onEventKey(IView view, boolean flagDown, int keycode, KeyEvent event) {
 		long instance = view.getInstance();
 		if (instance != 0) {
-			boolean ret;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				ret = nativeOnKeyEvent(
-						instance,
-						flagDown, keycode,
-						event.isCtrlPressed(),
-						event.isShiftPressed(),
-						event.isAltPressed(),
-						event.isMetaPressed(),
-						event.getEventTime()
-				);
-			} else {
-				ret = nativeOnKeyEvent(
-						instance,
-						flagDown,
-						keycode,
-						false,
-						event.isShiftPressed(),
-						event.isAltPressed(),
-						false,
-						event.getEventTime()
-				);
-			}
-			return ret;
+			return nativeOnKeyEvent(
+					instance,
+					flagDown, keycode,
+					event.isCtrlPressed(),
+					event.isShiftPressed(),
+					event.isAltPressed(),
+					event.isMetaPressed(),
+					event.getEventTime()
+			);
 		}
-		return true;
+		return false;
 	}
 	
 	private static native boolean nativeOnTouchEvent(long instance, int action, UiTouchPoint[] pts, long time);

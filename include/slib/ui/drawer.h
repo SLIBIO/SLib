@@ -66,8 +66,10 @@ namespace slib
 	protected:
 		void onChangeParent(View* oldParent, View* newParent) override;
 		
-		void onMouseEvent(UIEvent* ev) override;
+		void dispatchMouseEvent(UIEvent* ev) override;
 		
+		void dispatchTouchEvent(UIEvent* ev) override;
+
 		void onCancel(UIEvent* ev) override;
 		
 	private:
@@ -76,7 +78,9 @@ namespace slib
 		void _onEndCloseAnimation();
 		
 		void _onParentMouseEvent(View* view, UIEvent* ev);
-				
+		
+		void _onMouseEvent(UIEvent* ev);
+		
 		Vector2 _makeContentTranslation(sl_real t);
 		
 		sl_real _getContentTranslation();

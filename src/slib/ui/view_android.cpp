@@ -84,7 +84,7 @@ namespace slib
 					ev->setWindowsKey();
 				}
 				instance->onKeyEvent(ev.get());
-				if (ev->isStoppedPropagation()) {
+				if (ev->isPreventedDefault()) {
 					return 1;
 				}
 			}
@@ -116,7 +116,7 @@ namespace slib
 					Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, t);
 					if (ev.isNotNull()) {
 						instance->onTouchEvent(ev.get());
-						if (ev->isStoppedPropagation()) {
+						if (ev->isPreventedDefault()) {
 							return 1;
 						}
 					}

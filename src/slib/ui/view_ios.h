@@ -87,7 +87,7 @@ namespace slib
 	public:
 		void onDraw(CGRect rectDirty);
 		
-		sl_bool onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event);
+		void onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event);
 		
 	private:
 		void _release();
@@ -144,45 +144,29 @@ namespace slib
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		sl_bool flagStopPropagation = instance->onEventTouch(slib::UIAction::TouchBegin, touches, theEvent); \
-		if (flagStopPropagation) { \
-			return; \
-		} \
+		instance->onEventTouch(slib::UIAction::TouchBegin, touches, theEvent); \
 	} \
-	[super touchesBegan:touches withEvent:theEvent];\
 } \
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)theEvent \
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		sl_bool flagStopPropagation = instance->onEventTouch(slib::UIAction::TouchMove, touches, theEvent); \
-		if (flagStopPropagation) { \
-			return; \
-		} \
+		instance->onEventTouch(slib::UIAction::TouchMove, touches, theEvent); \
 	} \
-	[super touchesMoved:touches withEvent:theEvent];\
 } \
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)theEvent \
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		sl_bool flagStopPropagation = instance->onEventTouch(slib::UIAction::TouchEnd, touches, theEvent); \
-		if (flagStopPropagation) { \
-			return; \
-		} \
+		instance->onEventTouch(slib::UIAction::TouchEnd, touches, theEvent); \
 	} \
-	[super touchesEnded:touches withEvent:theEvent];\
 } \
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)theEvent \
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		sl_bool flagStopPropagation = instance->onEventTouch(slib::UIAction::TouchCancel, touches, theEvent); \
-		if (flagStopPropagation) { \
-			return; \
-		} \
+		instance->onEventTouch(slib::UIAction::TouchCancel, touches, theEvent); \
 	} \
-	[super touchesCancelled:touches withEvent:theEvent];\
 } \
 - (void)onSwipeLeft \
 { \

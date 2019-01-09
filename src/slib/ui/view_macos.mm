@@ -474,7 +474,7 @@ namespace slib
 			if (ev.isNotNull()) {
 				applyModifiers(ev.get(), event);
 				onKeyEvent(ev.get());
-				return ev->isStoppedPropagation();
+				return ev->isPreventedDefault();
 			}
 		}
 		return sl_false;
@@ -496,7 +496,7 @@ namespace slib
 				if (ev.isNotNull()) {
 					applyModifiers(ev.get(), event);
 					onMouseEvent(ev.get());
-					return ev->isStoppedPropagation();
+					return ev->isPreventedDefault();
 				}
 			}
 		}
@@ -516,7 +516,7 @@ namespace slib
 				Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y, t);
 				if (ev.isNotNull()) {
 					onMouseEvent(ev.get());
-					return ev->isStoppedPropagation();
+					return ev->isPreventedDefault();
 				}
 			}
 		}
@@ -542,7 +542,7 @@ namespace slib
 			if (ev.isNotNull()) {
 				applyModifiers(ev.get(), event);
 				onMouseWheelEvent(ev.get());
-				return ev->isStoppedPropagation();
+				return ev->isPreventedDefault();
 			}
 		}
 		return sl_false;
@@ -813,36 +813,24 @@ namespace slib
 {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagStopPropagation = instance->onEventKey(sl_true, theEvent);
-		if (flagStopPropagation) {
-			return;
-		}
+		instance->onEventKey(sl_true, theEvent);
 	}
-	[[self nextResponder] keyDown:theEvent];
 }
 
 - (void)keyUp:(NSEvent*)theEvent
 {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagStopPropagation = instance->onEventKey(sl_false, theEvent);
-		if (flagStopPropagation) {
-			return;
-		}
+		instance->onEventKey(sl_false, theEvent);
 	}
-	[[self nextResponder] keyUp:theEvent];
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::LeftButtonDown, theEvent);
-		if (flagStopPropagation) {
-			return;
-		}
+		instance->onEventMouse(slib::UIAction::LeftButtonDown, theEvent);
 	}
-	[[self nextResponder] mouseDown:theEvent];
 }
 
 - (void)mouseUp:(NSEvent *)theEvent
@@ -852,37 +840,25 @@ namespace slib
 		instance->onEventMouse(slib::UIAction::LeftButtonUp, theEvent);
 		NSInteger clicks = [theEvent clickCount];
 		if (clicks == 2) {
-			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::LeftButtonDoubleClick, theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
+			instance->onEventMouse(slib::UIAction::LeftButtonDoubleClick, theEvent);
 		}
 	}
-	[[self nextResponder] mouseUp:theEvent];
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::LeftButtonDrag, theEvent);
-		if (flagStopPropagation) {
-			return;
-		}
+		instance->onEventMouse(slib::UIAction::LeftButtonDrag, theEvent);
 	}
-	[[self nextResponder] mouseDragged:theEvent];
 }
 
 - (void)rightMouseDown:(NSEvent *)theEvent
 {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::RightButtonDown, theEvent);
-		if (flagStopPropagation) {
-			return;
-		}
+		instance->onEventMouse(slib::UIAction::RightButtonDown, theEvent);
 	}
-	[[self nextResponder] rightMouseDown:theEvent];
 }
 
 - (void)rightMouseUp:(NSEvent *)theEvent
@@ -892,37 +868,25 @@ namespace slib
 		instance->onEventMouse(slib::UIAction::RightButtonUp, theEvent);
 		NSInteger clicks = [theEvent clickCount];
 		if (clicks == 2) {
-			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::RightButtonDoubleClick, theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
+			instance->onEventMouse(slib::UIAction::RightButtonDoubleClick, theEvent);
 		}
 	}
-	[[self nextResponder] rightMouseUp:theEvent];
 }
 
 - (void)rightMouseDragged:(NSEvent *)theEvent
 {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::RightButtonDrag, theEvent);
-		if (flagStopPropagation) {
-			return;
-		}
+		instance->onEventMouse(slib::UIAction::RightButtonDrag, theEvent);
 	}
-	[[self nextResponder] rightMouseDragged:theEvent];
 }
 
 - (void)otherMouseDown:(NSEvent *)theEvent
 {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MiddleButtonDown, theEvent);
-		if (flagStopPropagation) {
-			return;
-		}
+		instance->onEventMouse(slib::UIAction::MiddleButtonDown, theEvent);
 	}
-	[[self nextResponder] otherMouseDown:theEvent];
 }
 
 - (void)otherMouseUp:(NSEvent *)theEvent
@@ -932,25 +896,17 @@ namespace slib
 		instance->onEventMouse(slib::UIAction::MiddleButtonUp, theEvent);
 		NSInteger clicks = [theEvent clickCount];
 		if (clicks == 2) {
-			sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MiddleButtonDoubleClick, theEvent);
-			if (flagStopPropagation) {
-				return;
-			}
+			instance->onEventMouse(slib::UIAction::MiddleButtonDoubleClick, theEvent);
 		}
 	}
-	[[self nextResponder] otherMouseUp:theEvent];
 }
 
 - (void)otherMouseDragged:(NSEvent *)theEvent
 {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MiddleButtonDrag, theEvent);
-		if (flagStopPropagation) {
-			return;
-		}
+		instance->onEventMouse(slib::UIAction::MiddleButtonDrag, theEvent);
 	}
-	[[self nextResponder] otherMouseDragged:theEvent];
 }
 
 - (void)mouseMoved:(NSEvent *)theEvent
@@ -958,48 +914,32 @@ namespace slib
 	[[self window] invalidateCursorRectsForView:self];
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MouseMove, theEvent);
-		if (flagStopPropagation) {
-			return;
-		}
+		instance->onEventMouse(slib::UIAction::MouseMove, theEvent);
 	}
-	[[self nextResponder] mouseMoved:theEvent];
 }
 
 - (void)mouseEntered:(NSEvent *)theEvent
 {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MouseEnter, theEvent);
-		if (flagStopPropagation) {
-			return;
-		}
+		instance->onEventMouse(slib::UIAction::MouseEnter, theEvent);
 	}
-	[[self nextResponder] mouseEntered:theEvent];
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
 {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagStopPropagation = instance->onEventMouse(slib::UIAction::MouseLeave, theEvent);
-		if (flagStopPropagation) {
-			return;
-		}
+		instance->onEventMouse(slib::UIAction::MouseLeave, theEvent);
 	}
-	[[self nextResponder] mouseExited:theEvent];
 }
 
 - (void)scrollWheel:(NSEvent *)theEvent
 {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagStopPropagation = instance->onEventMouseWheel(theEvent);
-		if (flagStopPropagation) {
-			return;
-		}
+		instance->onEventMouseWheel(theEvent);
 	}
-	[[self nextResponder] scrollWheel:theEvent];
 }
 
 - (void)cursorUpdate:(NSEvent *)theEvent

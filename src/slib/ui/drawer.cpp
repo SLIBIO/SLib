@@ -154,7 +154,7 @@ namespace slib
 	{
 		sl_ui_len ret = m_dragEdgeSize;
 		if (ret <= 0) {
-			ret = UI::millimeterToPixel(5);
+			ret = (sl_ui_len)(UI::millimeterToPixel(5));
 		}
 		return ret;
 	}
@@ -194,7 +194,19 @@ namespace slib
 		}
 	}
 	
-	void Drawer::onMouseEvent(UIEvent* ev)
+	void Drawer::dispatchMouseEvent(UIEvent *ev)
+	{
+		_onMouseEvent(ev);
+		ViewGroup::dispatchMouseEvent(ev);
+	}
+	
+	void Drawer::dispatchTouchEvent(UIEvent *ev)
+	{
+		_onMouseEvent(ev);
+		ViewGroup::dispatchTouchEvent(ev);
+	}
+
+	void Drawer::_onMouseEvent(UIEvent* ev)
 	{
 		if (!m_flagOpened) {
 			return;
@@ -286,7 +298,7 @@ namespace slib
 		if (t < 0) {
 			t = 0;
 		}
-		sl_real size = getDrawerSize();
+		sl_real size = (sl_real)(getDrawerSize());
 		t -= size;
 		if (t > 0) {
 			t = 0;
@@ -315,7 +327,7 @@ namespace slib
 		if (content.isNull()) {
 			return 0;
 		}
-		sl_real size = getDrawerSize();
+		sl_real size = (sl_real)(getDrawerSize());
 		sl_real t;
 		if (m_gravity == Alignment::Left) {
 			t = content->getTranslationX();

@@ -328,7 +328,11 @@ namespace slib
 		sl_bool isPassedToNext();
 		
 		void setPassedToNext(sl_bool flag);
-				
+		
+		sl_bool isFromChildInstance();
+		
+		void setFromChildInstance(sl_bool flag);
+		
 		Ref<UIEvent> duplicate();
 		
 		static sl_uint32 getSystemKeycode(Keycode key);

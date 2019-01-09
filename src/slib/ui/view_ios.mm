@@ -434,7 +434,7 @@ namespace slib
 		}
 	}
 	
-	sl_bool iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event)
+	void iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event)
 	{
 		UIView* handle = m_handle;
 		
@@ -482,9 +482,6 @@ namespace slib
 					
 					if (ev.isNotNull()) {
 						onTouchEvent(ev.get());
-						if (ev->isStoppedPropagation()) {
-							return sl_true;
-						}
 					}
 
 				}
@@ -493,7 +490,6 @@ namespace slib
 			
 		}
 		
-		return sl_false;
 	}
 	
 	

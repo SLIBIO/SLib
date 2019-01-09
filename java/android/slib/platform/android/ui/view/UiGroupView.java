@@ -54,12 +54,18 @@ public class UiGroupView extends AbsoluteLayout implements IView {
 
 	@Override
 	public boolean onKeyDown(int keycode, KeyEvent event) {
-		return UiView.onEventKey(this, true, keycode, event);
+		if (!(UiView.onEventKey(this, true, keycode, event))) {
+			super.onKeyDown(keycode, event);
+		}
+		return true;
 	}
 
 	@Override
 	public boolean onKeyUp(int keycode, KeyEvent event) {
-		return UiView.onEventKey(this, false, keycode, event);
+		if (!(UiView.onEventKey(this, false, keycode, event))) {
+			super.onKeyUp(keycode, event);
+		}
+		return true;
 	}
 
 	@Override
@@ -73,7 +79,9 @@ public class UiGroupView extends AbsoluteLayout implements IView {
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		UiView.onEventTouch(this, event);
+		if (!(UiView.onEventTouch(this, event))) {
+			super.onTouchEvent(event);
+		}
 		return true;
 	}
 
