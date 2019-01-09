@@ -169,6 +169,7 @@ namespace slib
 	
 	void ImageView::onCompleteLoadingUrl(UrlRequest* request)
 	{
+		m_request.setNull();
 		if (request->isError()) {
 			return;
 		}
