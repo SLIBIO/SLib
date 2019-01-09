@@ -27,9 +27,11 @@
 
 #include "view.h"
 
+#include "../network/url_request.h"
+
 namespace slib
 {
-
+	
 	class SLIB_EXPORT ImageView : public View
 	{
 		SLIB_DECLARE_OBJECT
@@ -57,12 +59,19 @@ namespace slib
 		
 		virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		
+		void loadUrl(const String& url);
+		
+		void loadUrl(const UrlRequestParam& param);
+
 	protected:
 		void onDraw(Canvas* canvas) override;
 		
 		void onUpdateLayout() override;
 		
-		void onAnimationFrame(Timer* timer);
+		virtual void onAnimationFrame(Timer* timer);
+		
+		virtual void onCompleteLoadingUrl(UrlRequest* request);
 		
 	protected:
 		AtomicRef<Drawable> m_source;
@@ -70,6 +79,7 @@ namespace slib
 		Alignment m_gravity;
 		AtomicRef<Timer> m_timerAnimation;
 		Time m_timeStartAnimation;
+		AtomicRef<UrlRequest> m_request;
 		
 	};
 

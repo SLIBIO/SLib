@@ -23,6 +23,7 @@
 #include "slib/ui/image_view.h"
 
 #include "slib/core/timer.h"
+#include "slib/graphics/image.h"
 
 namespace slib
 {
@@ -110,6 +111,25 @@ namespace slib
 		invalidate(mode);
 	}
 	
+	void ImageView::loadUrl(const String& url)
+	{
+		UrlRequestParam param;
+		param.url = url;
+		loadUrl(param);
+	}
+	
+	void ImageView::loadUrl(const UrlRequestParam& _param)
+	{
+		if (_param.url.isEmpty()) {
+			setSource(sl_null);
+			return;
+		}
+		UrlRequestParam param = _param;
+		param.flagSelfAlive = sl_false;
+		param.onComplete += SLIB_FUNCTION_WEAKREF(ImageView, onCompleteLoadingUrl, this);
+		m_request = UrlRequest::send(param);
+	}
+	
 	void ImageView::onDraw(Canvas* canvas)
 	{
 		if (m_timerAnimation.isNotNull()) {
@@ -145,6 +165,15 @@ namespace slib
 	void ImageView::onAnimationFrame(Timer* timer)
 	{
 		invalidate();
+	}
+	
+	void ImageView::onCompleteLoadingUrl(UrlRequest* request)
+	{
+		if (request->isError()) {
+			return;
+		}
+		Memory mem = request->getResponseContent();
+		setSource(Image::loadFromMemory(mem));
 	}
 
 }

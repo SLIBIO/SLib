@@ -435,6 +435,7 @@ namespace slib
 		SAppDrawableValue src;
 		SAppScaleModeValue scale;
 		SAppAlignmentValue gravity;
+		SAppStringValue url;
 		
 	};
 
