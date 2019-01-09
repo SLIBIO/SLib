@@ -98,6 +98,7 @@ namespace slib
 	SLIB_STATIC_STRING(_g_priv_http_method_CONNECT, "CONNECT");
 	SLIB_STATIC_STRING(_g_priv_http_method_OPTIONS, "OPTIONS");
 	SLIB_STATIC_STRING(_g_priv_http_method_TRACE, "TRACE");
+	SLIB_STATIC_STRING(_g_priv_http_method_PATCH, "PATCH");
 
 	String HttpMethods::toString(HttpMethod method)
 	{
@@ -118,6 +119,8 @@ namespace slib
 				return _g_priv_http_method_OPTIONS;
 			case HttpMethod::TRACE:
 				return _g_priv_http_method_TRACE;
+			case HttpMethod::PATCH:
+				return _g_priv_http_method_PATCH;
 			default:
 				break;
 		}
@@ -139,6 +142,7 @@ namespace slib
 			maps.put_NoLock(_g_priv_http_method_CONNECT, HttpMethod::CONNECT);
 			maps.put_NoLock(_g_priv_http_method_OPTIONS, HttpMethod::OPTIONS);
 			maps.put_NoLock(_g_priv_http_method_TRACE, HttpMethod::TRACE);
+			maps.put_NoLock(_g_priv_http_method_PATCH, HttpMethod::PATCH);
 		}
 	};
 

@@ -140,7 +140,8 @@ namespace slib
 		DELETE,
 		CONNECT,
 		OPTIONS,
-		TRACE
+		TRACE,
+		PATCH // https://tools.ietf.org/html/rfc5789
 	};
 	
 	class SLIB_EXPORT HttpMethods
