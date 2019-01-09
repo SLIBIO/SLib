@@ -1,0 +1,14 @@
+<sapp>
+	<layout
+		type='page'
+		background='white'
+		>
+		
+		<image
+			src='@drawable/slib_icon'
+			width='80%'
+			alignCenter='true'
+			/>
+
+ 	</layout>
+</sapp>

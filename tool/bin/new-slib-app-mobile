@@ -1,0 +1,49 @@
+CURRENT_PATH=`pwd`
+if [ -z $SLIB_PATH ]; then
+ bash $(dirname $0)/../../setup-path
+fi
+cd $CURRENT_PATH
+APP_NAME=$1
+if [ -z $APP_NAME ]; then
+ echo "Please input the application name:"
+ read APP_NAME
+ APP_NAME=`echo $APP_NAME | sed 's/[^a-zA-Z0-9_]//g'`
+ if [ -z $APP_NAME ]; then
+  exit
+ fi
+fi
+APP_ID=$2
+if [ -z $APP_ID ]; then
+ echo "Please input the application bundle id (package):"
+ read APP_ID
+ APP_ID=`echo $APP_ID | sed 's/[^a-zA-Z0-9_\.]//g'`
+ if [ -z $APP_ID ]; then
+  exit
+ fi
+fi
+
+echo "New SLib App (Mobile): $APP_NAME ($APP_ID)"
+
+cp -R "$SLIB_PATH/tool/template/mobile-sapp/Android" "$CURRENT_PATH"
+cp -R "$SLIB_PATH/tool/template/mobile-sapp/iOS" "$CURRENT_PATH"
+cp -R "$SLIB_PATH/tool/template/mobile-sapp/src" "$CURRENT_PATH"
+
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/Android/settings.gradle"
+sed -i '' "s/SLIB_TEMPLATE_APP_ID/$APP_ID/g" "$CURRENT_PATH/Android/app/build.gradle"
+sed -i '' "s/SLIB_TEMPLATE_APP_ID/$APP_ID/g" "$CURRENT_PATH/Android/app/src/main/AndroidManifest.xml"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/Android/app/src/main/res/values/strings.xml"
+sed -i '' "s/SLIB_TEMPLATE_APP_ID/$APP_ID/g" "$CURRENT_PATH/Android/app/src/main/java/MainActivity.java"
+PACKAGE_DIR=`echo $APP_ID | sed 's/\./\//g'`
+mkdir -p "$CURRENT_PATH/Android/app/src/main/java/$PACKAGE_DIR"
+mv "$CURRENT_PATH/Android/app/src/main/java/MainActivity.java" "$CURRENT_PATH/Android/app/src/main/java/$PACKAGE_DIR/MainActivity.java"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/Android/app/src/main/cpp/native-lib.cpp"
+
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/iOS/Project.xcodeproj/project.pbxproj"
+sed -i '' "s/SLIB-TEMPLATE-APP-ID/$APP_ID/g" "$CURRENT_PATH/iOS/Project.xcodeproj/project.pbxproj"
+mv "$CURRENT_PATH/iOS/Project.xcodeproj" "$CURRENT_PATH/iOS/$APP_NAME.xcodeproj"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/iOS/project/Base.lproj/LaunchScreen.storyboard"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/iOS/project/main.mm"
+
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/src/cpp/app.h"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/src/cpp/app.cpp"
+mv "$CURRENT_PATH/src/template_gen" "$CURRENT_PATH/src/gen"

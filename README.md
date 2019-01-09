@@ -9,15 +9,15 @@ SLib enables software developers to build multi-platform(Android/iOS/MacOS/Tizen
 
 * core
 
-    Auto Reference Counting, String, List, Map, File, Thread, Synchronizing, Time, Variant, Json, ...
+    Auto Reference Counting, String, List, Map, File, Thread, Synchronizing, Time, Variant, Json, Xml, ...
 
 * crypto
    
-    AES, RSA, GZIP, SHA1/2, GCM, MD5, Blowfish, ...
+    AES, RSA, GZIP, SHA1/2, GCM, MD5, Blowfish, DES, TripleDES, ...
 
 * db
 
-    SQLite, MySQL
+    SQLite, MySQL, Redis
 
 * device
     
@@ -61,7 +61,7 @@ SLib enables software developers to build multi-platform(Android/iOS/MacOS/Tizen
 ### Prerequisites
 
  * Xcode 9.4 or higher for compiling macOS/iOS packages
- * Android Studio 3.0 or higher for compiling Android packages
+ * Android Studio 3.2 or higher for compiling Android packages
  * Visual Studio 2017 or higher for compiling Win32 packages
  * Tizen Studio 1.1.1 or higher for compiling Tizen packages
  * CMake (>=3.0), GCC/C++ (>=4.8.1) for compiling Linux packages. Optional: KDevelop(>=4.7)
@@ -116,6 +116,7 @@ And then please create an empty directory, and then create a C++ project using f
 
 | Platform | Application Type | Command |
 | ----|----|----|
+| Android & iOS | Mobile App | `new-slib-app-mobile YOUR_PROJECT_NAME YOUR_APPLICATION_ID` |
 | Android | Mobile App | `new-slib-app-android YOUR_PROJECT_NAME YOUR_APPLICATION_ID` |
 | iOS | Mobile App | `new-slib-app-ios YOUR_PROJECT_NAME` |
 | macOS | Desktop App | `new-slib-app-macos YOUR_PROJECT_NAME` |
@@ -126,6 +127,14 @@ And then please create an empty directory, and then create a C++ project using f
 | Linux | Console App | `new-slib-console-linux YOUR_PROJECT_NAME` |
 
 Note that you have to compile SLib before creating new SLib application projects.
+
+Here is an example for creating a mobile app project.
+
+```
+mkdir ~/SLibMobileExample
+cd ~/SLibMobileExample
+new-slib-app-mobile TestApp org.example.testapp
+```
 
 Here is an example for creating an Android project.
 
