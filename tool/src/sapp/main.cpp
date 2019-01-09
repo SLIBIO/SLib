@@ -106,7 +106,7 @@ int main(int argc, const char * argv[])
 			if (!(doc->open(pathApp + "/sapp.xml"))) {
 				return -1;
 			}
-			if (!(doc->openResources())) {
+			if (!(doc->openUiResource(path))) {
 				return -1;
 			}
 			String layoutName = File::getFileNameOnly(path);

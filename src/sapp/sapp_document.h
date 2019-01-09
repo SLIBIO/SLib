@@ -83,13 +83,7 @@ namespace slib
 		
 		sl_bool openResources();
 		
-		sl_bool openImageResources();
-		
-		sl_bool openRawResources();
-		
-		sl_bool openGlobalResources();
-		
-		sl_bool openUiResources();
+		sl_bool openUiResource(const String& filePath);
 		
 		
 		sl_bool generateCpp();
@@ -107,6 +101,12 @@ namespace slib
 		static String getNameInLocalNamespace(const String& localNamespace, const String& name);
 		
 	protected:
+		sl_bool _openImageResources();
+		sl_bool _openRawResources();
+		sl_bool _openGlobalResources();
+		sl_bool _openUiResources();
+		sl_bool _openUiResource(const String& path);
+
 		// Log
 		void _log(const String& text);
 		void _logError(const String& text);

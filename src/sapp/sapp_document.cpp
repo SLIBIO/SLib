@@ -213,23 +213,49 @@ namespace slib
 		
 		_freeResources();
 		
-		if (!(openRawResources())) {
+		if (!(_openRawResources())) {
 			return sl_false;
 		}
-		if (!(openImageResources())) {
+		if (!(_openImageResources())) {
 			return sl_false;
 		}
-		if (!(openGlobalResources())) {
+		if (!(_openGlobalResources())) {
 			return sl_false;
 		}
-		if (!(openUiResources())) {
+		if (!(_openUiResources())) {
 			return sl_false;
 		}
 
 		return sl_true;
 	}
 	
-	sl_bool SAppDocument::openImageResources()
+	sl_bool SAppDocument::openUiResource(const String& filePath)
+	{
+		ObjectLocker lock(this);
+		
+		if (!m_flagOpened) {
+			return sl_false;
+		}
+		
+		_freeResources();
+		
+		if (!(_openRawResources())) {
+			return sl_false;
+		}
+		if (!(_openImageResources())) {
+			return sl_false;
+		}
+		if (!(_openGlobalResources())) {
+			return sl_false;
+		}
+		if (!(_openUiResource(filePath))) {
+			return sl_false;
+		}
+		
+		return sl_true;
+	}
+	
+	sl_bool SAppDocument::_openImageResources()
 	{
 		for (auto& fileName : File::getFiles(m_pathApp)) {
 			if (fileName.isNotNull()) {
@@ -256,7 +282,7 @@ namespace slib
 		return sl_true;
 	}
 	
-	sl_bool SAppDocument::openRawResources()
+	sl_bool SAppDocument::_openRawResources()
 	{
 		m_raws.removeAll();
 		String path = m_pathApp + "/raw";
@@ -268,7 +294,7 @@ namespace slib
 		return sl_true;
 	}
 	
-	sl_bool SAppDocument::openGlobalResources()
+	sl_bool SAppDocument::_openGlobalResources()
 	{
 		String pathDir = m_pathApp + "/global";
 		for (auto& fileName : File::getFiles(pathDir)) {
@@ -286,27 +312,36 @@ namespace slib
 		return sl_true;
 	}
 	
-	sl_bool SAppDocument::openUiResources()
+	sl_bool SAppDocument::_openUiResources()
 	{
 		String pathDir = m_pathApp + "/ui";
 		for (auto& fileName : File::getFiles(pathDir)) {
 			String path = pathDir + "/" + fileName;
-			if (File::exists(path)) {
-				if (!(File::isDirectory(path))) {
-					if (File::getFileExtension(fileName) == "xml" || File::getFileExtension(fileName) == "uiml") {
-						String localNamespace = File::getFileNameOnly(fileName);
-						if (localNamespace.isNotEmpty()) {
-							if (SAppUtil::checkName(localNamespace.getData())) {
-								if (!(_parseResourcesXml(localNamespace, path))) {
-									return sl_false;
-								}
+			if (!(_openUiResource(path))) {
+				return sl_false;
+			}
+		}
+		return sl_true;
+	}
+	
+	sl_bool SAppDocument::_openUiResource(const String& path)
+	{
+		if (File::exists(path)) {
+			if (!(File::isDirectory(path))) {
+				String fileName = File::getFileName(path);
+				if (File::getFileExtension(fileName) == "xml" || File::getFileExtension(fileName) == "uiml") {
+					String localNamespace = File::getFileNameOnly(fileName);
+					if (localNamespace.isNotEmpty()) {
+						if (SAppUtil::checkName(localNamespace.getData())) {
+							if (_parseResourcesXml(localNamespace, path)) {
+								return sl_true;
 							}
 						}
 					}
 				}
 			}
 		}
-		return sl_true;
+		return sl_false;
 	}
 
 	sl_bool SAppDocument::generateCpp()
