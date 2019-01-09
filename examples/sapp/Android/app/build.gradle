@@ -4,6 +4,10 @@ task generate_sapp(type: Exec, description: 'Generating sapp resources') {
     commandLine 'sapp', 'gen', "${projectDir}/../../src/sapp"
 }
 
+project.afterEvaluate {
+    preBuild.dependsOn("generate_sapp")
+}
+
 android {
     compileSdkVersion 26
     buildToolsVersion "27.0.3"
@@ -33,10 +37,6 @@ android {
             path "CMakeLists.txt"
         }
     }
-}
-
-project.afterEvaluate {
-    preBuild.dependsOn("generate_sapp")
 }
 
 repositories {
