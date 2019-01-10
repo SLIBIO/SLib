@@ -482,6 +482,7 @@ namespace slib
 					
 					if (ev.isNotNull()) {
 						onTouchEvent(ev.get());
+						[handle.window endEditing:NO];
 					}
 
 				}

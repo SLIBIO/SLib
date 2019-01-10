@@ -886,12 +886,6 @@ CGRect _g_slib_ui_keyboard_scrollview_original_frame;
 												  object:nil];
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
-{
-	[super touchesEnded: touches withEvent: event];
-	[self.view endEditing:NO];
-}
-
 @end
 
 
