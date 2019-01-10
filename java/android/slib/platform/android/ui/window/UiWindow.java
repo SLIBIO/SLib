@@ -30,6 +30,7 @@ import slib.platform.android.ui.Util;
 import slib.platform.android.ui.view.IView;
 import slib.platform.android.ui.view.UiScrollView;
 import slib.platform.android.ui.view.UiView;
+import slib.platform.android.ui.view.UiWebView;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -37,7 +38,6 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
-import android.os.Build.VERSION;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -235,11 +235,7 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 	}
 
 	public float getWindowAlpha() {
-		if (VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			return _getAlpha();
-		} else {
-			return 1;
-		}
+		return _getAlpha();
 	}
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -254,9 +250,7 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 		if (alpha > 1) {
 			alpha = 1;
 		}
-		if (VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			_setAlpha(alpha);
-		}
+		_setAlpha(alpha);
 	}
 
 	public void focus() {
@@ -402,29 +396,33 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 		}
 	}
 
-	static UiScrollView keyboardScrollView = null;
+	static IView keyboardScrollView = null;
 	static Rect originalFrame_keyboardScrollView = null;
 
 	static void processKeyboardAppeared(Activity activity, int keyboardHeight) {
 		Logger.info("Keyboard is appeared, height=" + keyboardHeight);
 		View focusedView = activity.getCurrentFocus();
-		if (focusedView instanceof EditText) {
-			UiScrollView scroll = null;
-			ViewParent _parent = focusedView.getParent();
-			View parent = null;
-			if (_parent instanceof View) {
-				parent = (View)_parent;
-			}
-			while (parent != null) {
-				if (parent instanceof UiScrollView) {
-					scroll = (UiScrollView)parent;
-					break;
-				}
-				_parent = parent.getParent();
+		if (focusedView instanceof EditText || focusedView instanceof UiWebView) {
+			IView scroll = null;
+			if (focusedView instanceof UiWebView) {
+				scroll = (UiWebView)focusedView;
+			} else {
+				ViewParent _parent = focusedView.getParent();
+				View parent = null;
 				if (_parent instanceof View) {
 					parent = (View)_parent;
-				} else {
-					parent = null;
+				}
+				while (parent != null) {
+					if (parent instanceof UiScrollView) {
+						scroll = (UiScrollView)parent;
+						break;
+					}
+					_parent = parent.getParent();
+					if (_parent instanceof View) {
+						parent = (View)_parent;
+					} else {
+						parent = null;
+					}
 				}
 			}
 			if (keyboardScrollView != scroll) {
@@ -437,11 +435,11 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 				if (keyboardScrollView == scroll) {
 					scrollFrame = originalFrame_keyboardScrollView;
 				}
-				int yScroll = UiView.convertCoordinateFromViewToScreen(scroll, 0, scrollFrame.height()).y;
+				int yScroll = UiView.convertCoordinateFromViewToScreen((View)scroll, 0, scrollFrame.height()).y;
 				if (yScroll > heightScreen - keyboardHeight) {
 					originalFrame_keyboardScrollView = new Rect(scrollFrame);
 					scrollFrame.bottom -= yScroll - (heightScreen - keyboardHeight);
-					UiView.setFrame(scroll, scrollFrame.left, scrollFrame.top, scrollFrame.right, scrollFrame.bottom);
+					UiView.setFrame((View)scroll, scrollFrame.left, scrollFrame.top, scrollFrame.right, scrollFrame.bottom);
 					keyboardScrollView = scroll;
 				}
 			}
@@ -459,7 +457,7 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 	static void restoreKeyboardScrollView() {
 		if (keyboardScrollView != null) {
 			Rect frame = originalFrame_keyboardScrollView;
-			UiView.setFrame(keyboardScrollView, frame.left, frame.top, frame.right, frame.bottom);
+			UiView.setFrame((View)keyboardScrollView, frame.left, frame.top, frame.right, frame.bottom);
 			keyboardScrollView = null;
 		}
 	}
