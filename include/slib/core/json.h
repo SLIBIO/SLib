@@ -572,6 +572,8 @@ public: \
 	{
 
 #define SLIB_JSON_ADD_MEMBER(MEMBER_NAME, JSON_NAME) if (isFromJson) slib::FromJson(json.getItem(JSON_NAME), MEMBER_NAME); else json.putItem(JSON_NAME, MEMBER_NAME);
+#define SLIB_JSON_ADD_MEMBER_FROM(MEMBER_NAME, JSON_NAME) if (isFromJson) slib::FromJson(json.getItem(JSON_NAME), MEMBER_NAME);
+#define SLIB_JSON_ADD_MEMBER_TO(MEMBER_NAME, JSON_NAME) if (!isFromJson) json.putItem(JSON_NAME, MEMBER_NAME);
 
 #define PRIV_SLIB_JSON_ADD_MEMBERS0
 #define PRIV_SLIB_JSON_ADD_MEMBERS1(NAME) SLIB_JSON_ADD_MEMBER(NAME, #NAME)
