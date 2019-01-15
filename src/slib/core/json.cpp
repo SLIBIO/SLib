@@ -295,16 +295,6 @@ namespace slib
 		return *this = Json(elements);
 	}
 	
-	Json Json::operator[](sl_size indexForVariantList) const
-	{
-		return (*(static_cast<const Variant*>(this)))[indexForVariantList];
-	}
-	
-	Json Json::operator[](const String& keyForVariantMap) const
-	{
-		return (*(static_cast<const Variant*>(this)))[keyForVariantMap];
-	}
-	
 	template <class ST, class CT>
 	class _priv_Json_Parser
 	{
@@ -832,475 +822,486 @@ namespace slib
 	{
 		return Variant::removeItem(key);
 	}
+	
+	Json Json::operator[](sl_size list_index) const
+	{
+		return (*(static_cast<const Variant*>(this)))[list_index];
+	}
+	
+	Json Json::operator[](const String& map_key) const
+	{
+		return (*(static_cast<const Variant*>(this)))[map_key];
+	}
+	
+	
+	void FromJson(const Json& json, Json& _out)
+	{
+		_out = json;
+	}
+	
+	void ToJson(Json& json, const Json& _in)
+	{
+		json = _in;
+	}
 
-	void Json::get(Json& _out) const
+	void FromJson(const Json& json, Variant& _out)
 	{
-		_out = *this;
+		_out = json;
 	}
 	
-	void Json::set(const Json& _in)
+	void ToJson(Json& json, const Variant& _in)
 	{
-		*this = _in;
-	}
-
-	void Json::get(Variant& _out) const
-	{
-		_out = *this;
+		json = _in;
 	}
 	
-	void Json::set(const Variant& _in)
+	void FromJson(const Json& json, AtomicVariant& _out)
 	{
-		*this = _in;
-	}
-	
-	void Json::get(AtomicVariant& _out) const
-	{
-		_out = *this;
+		_out = json;
 	}
 		
-	void Json::set(const AtomicVariant& _in)
+	void ToJson(Json& json, const AtomicVariant& _in)
 	{
-		*this = _in;
+		json = _in;
 	}
 	
-	void Json::get(signed char& _out) const
+	void FromJson(const Json& json, signed char& _out)
 	{
-		_out = (char)(getInt32());
+		_out = (char)(json.getInt32());
 	}
 	
-	void Json::get(signed char& _out, signed char def) const
+	void FromJson(const Json& json, signed char& _out, signed char def)
 	{
-		_out = (char)(getInt32((sl_int32)def));
+		_out = (char)(json.getInt32((sl_int32)def));
 	}
 	
-	void Json::set(signed char _in)
+	void ToJson(Json& json, signed char _in)
 	{
-		setInt32((sl_int32)_in);
+		json.setInt32((sl_int32)_in);
 	}
 	
-	void Json::get(unsigned char& _out) const
+	void FromJson(const Json& json, unsigned char& _out)
 	{
-		_out = (unsigned char)(getUint32());
+		_out = (unsigned char)(json.getUint32());
 	}
 	
-	void Json::get(unsigned char& _out, unsigned char def) const
+	void FromJson(const Json& json, unsigned char& _out, unsigned char def)
 	{
-		_out = (unsigned char)(getUint32((sl_uint32)def));
+		_out = (unsigned char)(json.getUint32((sl_uint32)def));
 	}
 	
-	void Json::set(unsigned char _in)
+	void ToJson(Json& json, unsigned char _in)
 	{
-		setUint32((sl_uint32)_in);
+		json.setUint32((sl_uint32)_in);
 	}
 	
-	void Json::get(short& _out) const
+	void FromJson(const Json& json, short& _out)
 	{
-		_out = (short)(getInt32());
+		_out = (short)(json.getInt32());
 	}
 	
-	void Json::get(short& _out, short def) const
+	void FromJson(const Json& json, short& _out, short def)
 	{
-		_out = (short)(getInt32((sl_int32)def));
+		_out = (short)(json.getInt32((sl_int32)def));
 	}
 	
-	void Json::set(short _in)
+	void ToJson(Json& json, short _in)
 	{
-		setInt32((sl_int32)_in);
+		json.setInt32((sl_int32)_in);
 	}
 	
-	void Json::get(unsigned short& _out) const
+	void FromJson(const Json& json, unsigned short& _out)
 	{
-		_out = (unsigned short)(getUint32());
+		_out = (unsigned short)(json.getUint32());
 	}
 	
-	void Json::get(unsigned short& _out, unsigned short def) const
+	void FromJson(const Json& json, unsigned short& _out, unsigned short def)
 	{
-		_out = (unsigned short)(getUint32((sl_uint32)def));
+		_out = (unsigned short)(json.getUint32((sl_uint32)def));
 	}
 	
-	void Json::set(unsigned short _in)
+	void ToJson(Json& json, unsigned short _in)
 	{
-		setUint32((sl_uint32)_in);
+		json.setUint32((sl_uint32)_in);
 	}
 	
-	void Json::get(int& _out) const
+	void FromJson(const Json& json, int& _out)
 	{
-		_out = (int)(getInt32());
+		_out = (int)(json.getInt32());
 	}
 	
-	void Json::get(int& _out, int def) const
+	void FromJson(const Json& json, int& _out, int def)
 	{
-		_out = (int)(getInt32((sl_int32)def));
+		_out = (int)(json.getInt32((sl_int32)def));
 	}
 	
-	void Json::set(int _in)
+	void ToJson(Json& json, int _in)
 	{
-		setInt32((sl_int32)_in);
+		json.setInt32((sl_int32)_in);
 	}
 	
-	void Json::get(unsigned int& _out) const
+	void FromJson(const Json& json, unsigned int& _out)
 	{
-		_out = (unsigned int)(getUint32());
+		_out = (unsigned int)(json.getUint32());
 	}
 	
-	void Json::get(unsigned int& _out, unsigned int def) const
+	void FromJson(const Json& json, unsigned int& _out, unsigned int def)
 	{
-		_out = (unsigned int)(getUint32((sl_uint32)def));
+		_out = (unsigned int)(json.getUint32((sl_uint32)def));
 	}
 	
-	void Json::set(unsigned int _in)
+	void ToJson(Json& json, unsigned int _in)
 	{
-		setUint32((sl_uint32)_in);
+		json.setUint32((sl_uint32)_in);
 	}
 	
-	void Json::get(long& _out) const
+	void FromJson(const Json& json, long& _out)
 	{
-		_out = (long)(getInt32());
+		_out = (long)(json.getInt32());
 	}
 	
-	void Json::get(long& _out, long def) const
+	void FromJson(const Json& json, long& _out, long def)
 	{
-		_out = (long)(getInt32((sl_int32)def));
+		_out = (long)(json.getInt32((sl_int32)def));
 	}
 	
-	void Json::set(long _in)
+	void ToJson(Json& json, long _in)
 	{
-		setInt32((sl_int32)_in);
+		json.setInt32((sl_int32)_in);
 	}
 	
-	void Json::get(unsigned long& _out) const
+	void FromJson(const Json& json, unsigned long& _out)
 	{
-		_out = (unsigned long)(getUint32());
+		_out = (unsigned long)(json.getUint32());
 	}
 	
-	void Json::get(unsigned long& _out, unsigned long def) const
+	void FromJson(const Json& json, unsigned long& _out, unsigned long def)
 	{
-		_out = (unsigned long)(getUint32((sl_uint32)def));
+		_out = (unsigned long)(json.getUint32((sl_uint32)def));
 	}
 	
-	void Json::set(unsigned long _in)
+	void ToJson(Json& json, unsigned long _in)
 	{
-		setUint32((sl_uint32)_in);
+		json.setUint32((sl_uint32)_in);
 	}
 	
-	void Json::get(sl_int64& _out) const
+	void FromJson(const Json& json, sl_int64& _out)
 	{
-		_out = getInt64();
+		_out = json.getInt64();
 	}
 	
-	void Json::get(sl_int64& _out, sl_int64 def) const
+	void FromJson(const Json& json, sl_int64& _out, sl_int64 def)
 	{
-		_out = getInt64(def);
+		_out = json.getInt64(def);
 	}
 	
-	void Json::set(sl_int64 _in)
+	void ToJson(Json& json, sl_int64 _in)
 	{
-		setInt64(_in);
+		json.setInt64(_in);
 	}
 	
-	void Json::get(sl_uint64& _out) const
+	void FromJson(const Json& json, sl_uint64& _out)
 	{
-		_out = getUint64();
+		_out = json.getUint64();
 	}
 	
-	void Json::get(sl_uint64& _out, sl_uint64 def) const
+	void FromJson(const Json& json, sl_uint64& _out, sl_uint64 def)
 	{
-		_out = getUint64(def);
+		_out = json.getUint64(def);
 	}
 	
-	void Json::set(sl_uint64 _in)
+	void ToJson(Json& json, sl_uint64 _in)
 	{
-		setUint64(_in);
+		json.setUint64(_in);
 	}
 	
-	void Json::get(float& _out) const
+	void FromJson(const Json& json, float& _out)
 	{
-		_out = getFloat();
+		_out = json.getFloat();
 	}
 	
-	void Json::get(float& _out, float def) const
+	void FromJson(const Json& json, float& _out, float def)
 	{
-		_out = getFloat(def);
+		_out = json.getFloat(def);
 	}
 	
-	void Json::set(float _in)
+	void ToJson(Json& json, float _in)
 	{
-		setFloat(_in);
+		json.setFloat(_in);
 	}
 	
-	void Json::get(double& _out) const
+	void FromJson(const Json& json, double& _out)
 	{
-		_out = getDouble();
+		_out = json.getDouble();
 	}
 	
-	void Json::get(double& _out, double def) const
+	void FromJson(const Json& json, double& _out, double def)
 	{
-		_out = getDouble(def);
+		_out = json.getDouble(def);
 	}
 	
-	void Json::set(double _in)
+	void ToJson(Json& json, double _in)
 	{
-		setDouble(_in);
+		json.setDouble(_in);
 	}
 	
-	void Json::get(bool& _out) const
+	void FromJson(const Json& json, bool& _out)
 	{
-		_out = getBoolean();
+		_out = json.getBoolean();
 	}
 	
-	void Json::get(bool& _out, bool def) const
+	void FromJson(const Json& json, bool& _out, bool def)
 	{
-		_out = getBoolean(def);
+		_out = json.getBoolean(def);
 	}
 	
-	void Json::set(bool _in)
+	void ToJson(Json& json, bool _in)
 	{
-		setBoolean(_in);
+		json.setBoolean(_in);
 	}
 	
-	void Json::get(String& _out) const
+	void FromJson(const Json& json, String& _out)
 	{
-		_out = getString();
+		_out = json.getString();
 	}
 	
-	void Json::get(String& _out, const String& def) const
+	void FromJson(const Json& json, String& _out, const String& def)
 	{
-		_out = getString(def);
+		_out = json.getString(def);
 	}
 	
-	void Json::set(const String& _in)
+	void ToJson(Json& json, const String& _in)
 	{
-		setString(_in);
+		json.setString(_in);
 	}
 	
-	void Json::get(AtomicString& _out) const
+	void FromJson(const Json& json, AtomicString& _out)
 	{
-		_out = getString();
+		_out = json.getString();
 	}
 	
-	void Json::get(AtomicString& _out, const String& def) const
+	void FromJson(const Json& json, AtomicString& _out, const String& def)
 	{
-		_out = getString(def);
+		_out = json.getString(def);
 	}
 	
-	void Json::set(const AtomicString& _in)
+	void ToJson(Json& json, const AtomicString& _in)
 	{
-		setString(_in);
+		json.setString(_in);
 	}
 	
-	void Json::get(String16& _out) const
+	void FromJson(const Json& json, String16& _out)
 	{
-		_out = getString16();
+		_out = json.getString16();
 	}
 	
-	void Json::get(String16& _out, const String16& def) const
+	void FromJson(const Json& json, String16& _out, const String16& def)
 	{
-		_out = getString16(def);
+		_out = json.getString16(def);
 	}
 	
-	void Json::set(const String16& _in)
+	void ToJson(Json& json, const String16& _in)
 	{
-		setString(_in);
+		json.setString(_in);
 	}
 	
-	void Json::get(AtomicString16& _out) const
+	void FromJson(const Json& json, AtomicString16& _out)
 	{
-		_out = getString16();
+		_out = json.getString16();
 	}
 	
-	void Json::get(AtomicString16& _out, const String16& def) const
+	void FromJson(const Json& json, AtomicString16& _out, const String16& def)
 	{
-		_out = getString16(def);
+		_out = json.getString16(def);
 	}
 	
-	void Json::set(const AtomicString16& _in)
+	void ToJson(Json& json, const AtomicString16& _in)
 	{
-		setString(_in);
+		json.setString(_in);
 	}
 	
-	void Json::set(const sl_char8* _in)
+	void ToJson(Json& json, const sl_char8* _in)
 	{
-		setString(_in);
+		json.setString(_in);
 	}
 	
-	void Json::set(const sl_char16* _in)
+	void ToJson(Json& json, const sl_char16* _in)
 	{
-		setString(_in);
+		json.setString(_in);
 	}
 	
-	void Json::get(Time& _out) const
+	void FromJson(const Json& json, Time& _out)
 	{
-		_out = getTime();
+		_out = json.getTime();
 	}
 	
-	void Json::get(Time& _out, const Time& def) const
+	void FromJson(const Json& json, Time& _out, const Time& def)
 	{
-		_out = getTime(def);
+		_out = json.getTime(def);
 	}
 	
-	void Json::set(const Time& _in)
+	void ToJson(Json& json, const Time& _in)
 	{
-		setTime(_in);
+		json.setTime(_in);
 	}
 	
-	void Json::get(VariantList& _out) const
+	void FromJson(const Json& json, VariantList& _out)
 	{
-		_out = getVariantList();
+		_out = json.getVariantList();
 	}
 	
-	void Json::set(const VariantList& _in)
+	void ToJson(Json& json, const VariantList& _in)
 	{
-		setVariantList(_in);
+		json.setVariantList(_in);
 	}
 	
-	void Json::get(AtomicVariantList& _out) const
+	void FromJson(const Json& json, AtomicVariantList& _out)
 	{
-		_out = getVariantList();
+		_out = json.getVariantList();
 	}
 	
-	void Json::set(const AtomicVariantList& _in)
+	void ToJson(Json& json, const AtomicVariantList& _in)
 	{
-		setVariantList(_in);
+		json.setVariantList(_in);
 	}
 	
-	void Json::get(VariantMap& _out) const
+	void FromJson(const Json& json, VariantMap& _out)
 	{
-		_out = getVariantMap();
+		_out = json.getVariantMap();
 	}
 	
-	void Json::set(const VariantMap& _in)
+	void ToJson(Json& json, const VariantMap& _in)
 	{
-		setVariantMap(_in);
+		json.setVariantMap(_in);
 	}
 	
-	void Json::get(AtomicVariantMap& _out) const
+	void FromJson(const Json& json, AtomicVariantMap& _out)
 	{
-		_out = getVariantMap();
+		_out = json.getVariantMap();
 	}
 	
-	void Json::set(const AtomicVariantMap& _in)
+	void ToJson(Json& json, const AtomicVariantMap& _in)
 	{
-		setVariantMap(_in);
+		json.setVariantMap(_in);
 	}
 	
-	void Json::get(VariantHashMap& _out) const
+	void FromJson(const Json& json, VariantHashMap& _out)
 	{
-		_out = getVariantHashMap();
+		_out = json.getVariantHashMap();
 	}
 	
-	void Json::set(const VariantHashMap& _in)
+	void ToJson(Json& json, const VariantHashMap& _in)
 	{
-		setVariantHashMap(_in);
+		json.setVariantHashMap(_in);
 	}
 	
-	void Json::get(AtomicVariantHashMap& _out) const
+	void FromJson(const Json& json, AtomicVariantHashMap& _out)
 	{
-		_out = getVariantHashMap();
+		_out = json.getVariantHashMap();
 	}
 	
-	void Json::set(const AtomicVariantHashMap& _in)
+	void ToJson(Json& json, const AtomicVariantHashMap& _in)
 	{
-		setVariantHashMap(_in);
+		json.setVariantHashMap(_in);
 	}
 	
-	void Json::get(VariantMapList& _out) const
+	void FromJson(const Json& json, VariantMapList& _out)
 	{
-		_out = getVariantMapList();
+		_out = json.getVariantMapList();
 	}
 	
-	void Json::set(const VariantMapList& _in)
+	void ToJson(Json& json, const VariantMapList& _in)
 	{
-		setVariantMapList(_in);
+		json.setVariantMapList(_in);
 	}
 	
-	void Json::get(AtomicVariantMapList& _out) const
+	void FromJson(const Json& json, AtomicVariantMapList& _out)
 	{
-		_out = getVariantMapList();
+		_out = json.getVariantMapList();
 	}
 	
-	void Json::set(const AtomicVariantMapList& _in)
+	void ToJson(Json& json, const AtomicVariantMapList& _in)
 	{
-		setVariantMapList(_in);
+		json.setVariantMapList(_in);
 	}
 
-	void Json::get(VariantHashMapList& _out) const
+	void FromJson(const Json& json, VariantHashMapList& _out)
 	{
-		_out = getVariantHashMapList();
+		_out = json.getVariantHashMapList();
 	}
 	
-	void Json::set(const VariantHashMapList& _in)
+	void ToJson(Json& json, const VariantHashMapList& _in)
 	{
-		setVariantHashMapList(_in);
+		json.setVariantHashMapList(_in);
 	}
 	
-	void Json::get(AtomicVariantHashMapList& _out) const
+	void FromJson(const Json& json, AtomicVariantHashMapList& _out)
 	{
-		_out = getVariantHashMapList();
+		_out = json.getVariantHashMapList();
 	}
 	
-	void Json::set(const AtomicVariantHashMapList& _in)
+	void ToJson(Json& json, const AtomicVariantHashMapList& _in)
 	{
-		setVariantHashMapList(_in);
+		json.setVariantHashMapList(_in);
 	}
 	
-	void Json::get(JsonList& _out) const
+	void FromJson(const Json& json, JsonList& _out)
 	{
-		_out = getJsonList();
+		_out = json.getJsonList();
 	}
 	
-	void Json::set(const JsonList& _in)
+	void ToJson(Json& json, const JsonList& _in)
 	{
-		setJsonList(_in);
+		json.setJsonList(_in);
 	}
 	
-	void Json::get(AtomicJsonList& _out) const
+	void FromJson(const Json& json, AtomicJsonList& _out)
 	{
-		_out = getJsonList();
+		_out = json.getJsonList();
 	}
 	
-	void Json::set(const AtomicJsonList& _in)
+	void ToJson(Json& json, const AtomicJsonList& _in)
 	{
-		setJsonList(_in);
+		json.setJsonList(_in);
 	}
 	
-	void Json::get(JsonMap& _out) const
+	void FromJson(const Json& json, JsonMap& _out)
 	{
-		_out = getJsonMap();
+		_out = json.getJsonMap();
 	}
 	
-	void Json::set(const JsonMap& _in)
+	void ToJson(Json& json, const JsonMap& _in)
 	{
-		setJsonMap(_in);
+		json.setJsonMap(_in);
 	}
 	
-	void Json::get(AtomicJsonMap& _out) const
+	void FromJson(const Json& json, AtomicJsonMap& _out)
 	{
-		_out = getJsonMap();
+		_out = json.getJsonMap();
 	}
 	
-	void Json::set(const AtomicJsonMap& _in)
+	void ToJson(Json& json, const AtomicJsonMap& _in)
 	{
-		setJsonMap(_in);
+		json.setJsonMap(_in);
 	}
 	
-	void Json::get(JsonMapList& _out) const
+	void FromJson(const Json& json, JsonMapList& _out)
 	{
-		_out = getJsonMapList();
+		_out = json.getJsonMapList();
 	}
 	
-	void Json::set(const JsonMapList& _in)
+	void ToJson(Json& json, const JsonMapList& _in)
 	{
-		setJsonMapList(_in);
+		json.setJsonMapList(_in);
 	}
 	
-	void Json::get(AtomicJsonMapList& _out) const
+	void FromJson(const Json& json, AtomicJsonMapList& _out)
 	{
-		_out = getJsonMapList();
+		_out = json.getJsonMapList();
 	}
 	
-	void Json::set(const AtomicJsonMapList& _in)
+	void ToJson(Json& json, const AtomicJsonMapList& _in)
 	{
-		setJsonMapList(_in);
+		json.setJsonMapList(_in);
 	}
 	
 }

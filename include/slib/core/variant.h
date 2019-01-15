@@ -84,7 +84,6 @@ namespace slib
 		~Variant() noexcept;
 
 	public:
-		
 		Variant(signed char value) noexcept;
 		
 		Variant(unsigned char value) noexcept;
@@ -248,9 +247,9 @@ namespace slib
 		template <class T>
 		Variant& operator=(const T& value) noexcept;
 		
-		Variant operator[](sl_size indexForVariantList) const noexcept;
+		Variant operator[](sl_size list_index) const noexcept;
 
-		Variant operator[](const String& keyForVariantMap) const noexcept;
+		Variant operator[](const String& map_key) const noexcept;
 
 	public:
 		VariantType getType() const noexcept;
@@ -768,9 +767,9 @@ namespace slib
 		template <class T>
 		AtomicVariant& operator=(const T& value) noexcept;
 		
-		Variant operator[](sl_size indexForVariantList) const noexcept;
+		Variant operator[](sl_size list_index) const noexcept;
 
-		Variant operator[](const String& keyForVariantMap) const noexcept;
+		Variant operator[](const String& map_key) const noexcept;
 	
 	public:
 		VariantType getType() const noexcept;

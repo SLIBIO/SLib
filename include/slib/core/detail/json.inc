@@ -29,67 +29,61 @@ namespace slib
 	template <class T>
 	SLIB_INLINE Json::Json(const Ref<T>& ref)
 	{
-		set(ref);
+		ToJson(*this, ref);
 	}
 	
 	template <class T>
 	SLIB_INLINE Json::Json(const AtomicRef<T>& ref)
 	{
-		set(ref);
+		ToJson(*this, ref);
 	}
 	
 	template <class T>
 	SLIB_INLINE Json::Json(const WeakRef<T>& weak)
 	{
-		set(weak);
+		ToJson(*this, weak);
 	}
 	
 	template <class T>
 	SLIB_INLINE Json::Json(const AtomicWeakRef<T>& weak)
 	{
-		set(weak);
+		ToJson(*this, weak);
 	}
 	
 	template <class T>
 	SLIB_INLINE Json::Json(const List<T>& list)
 	{
-		set(list);
+		ToJson(*this, list);
 	}
 	
 	template <class T>
 	SLIB_INLINE Json::Json(const AtomicList<T>& list)
 	{
-		set(list);
+		ToJson(*this, list);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	SLIB_INLINE Json::Json(const Map<KT, VT, KEY_COMPARE>& map)
 	{
-		set(map);
+		ToJson(*this, map);
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
 	SLIB_INLINE Json::Json(const AtomicMap<KT, VT, KEY_COMPARE>& map)
 	{
-		set(map);
+		ToJson(*this, map);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	SLIB_INLINE Json::Json(const HashMap<KT, VT, HASH, KEY_COMPARE>& map)
 	{
-		set(map);
+		ToJson(*this, map);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	SLIB_INLINE Json::Json(const AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& map)
 	{
-		set(map);
-	}
-	
-	template <class T>
-	SLIB_INLINE Json::Json(const T& value)
-	{
-		set(value);
+		ToJson(*this, map);
 	}
 	
 	SLIB_INLINE const Json& Json::null()
@@ -98,52 +92,45 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE Json& Json::operator=(const T& value)
-	{
-		set(value);
-		return *this;
-	}
-	
-	template <class T>
 	SLIB_INLINE void Json::getElement(sl_size index, T& _out) const
 	{
-		getElement(index).get(_out);
+		FromJson(getElement(index), _out);
 	}
 	
 	template <class T>
 	SLIB_INLINE void Json::getItem(const String& key, T& _out) const
 	{
-		getItem(key).get(_out);
+		FromJson(getItem(key), _out);
 	}
 
 	template <class T>
-	void Json::get(Nullable<T>& _out) const
+	SLIB_INLINE void FromJson(const Json& json, Nullable<T>& _out)
 	{
-		if (isNull()) {
+		if (json.isNull()) {
 			_out.setNull();
 		} else {
 			_out.flagNull = sl_false;
-			get(_out.value);
+			FromJson(json, _out.value);
 		}
 	}
 	
 	template <class T>
-	SLIB_INLINE void Json::set(const Nullable<T>& _in)
+	SLIB_INLINE void ToJson(Json& json, const Nullable<T>& _in)
 	{
 		if (_in.isNull()) {
-			setNull();
+			json.setNull();
 		} else {
-			set(_in.value);
+			ToJson(json, _in.value);
 		}
 	}
 	
 	template <class T>
-	void Json::get(Ref<T>& _out) const
+	SLIB_INLINE void FromJson(const Json& json, Ref<T>& _out)
 	{
-		if (isNotNull()) {
+		if (json.isNotNull()) {
 			Ref<T> o = new T;
 			if (o.isNotNull()) {
-				o->fromJson(*this);
+				FromJson(json, *(o._ptr));
 				_out = Move(o);
 				return;
 			}
@@ -152,53 +139,53 @@ namespace slib
 	}
 	
 	template <class T>
-	SLIB_INLINE void Json::set(const Ref<T>& _in)
+	SLIB_INLINE void ToJson(Json& json, const Ref<T>& _in)
 	{
 		if (_in.isNotNull()) {
-			*this = _in->toJson();
+			json = _in->toJson();
 		} else {
-			setNull();
+			json.setNull();
 		}
 	}
 	
 	template <class T>
-	SLIB_INLINE void Json::get(AtomicRef<T>& _out) const
+	SLIB_INLINE void FromJson(const Json& json, AtomicRef<T>& _out)
 	{
 		Ref<T> t;
-		get(t);
+		FromJson(json, t);
 		_out = Move(t);
 	}
 	
 	template <class T>
-	SLIB_INLINE void Json::set(const AtomicRef<T>& _in)
+	SLIB_INLINE void ToJson(Json& json, const AtomicRef<T>& _in)
 	{
-		set(Ref<T>(_in));
+		ToJson(json, Ref<T>(_in));
 	}
 	
 	template <class T>
-	SLIB_INLINE void Json::set(const WeakRef<T>& _in)
+	SLIB_INLINE void ToJson(Json& json, const WeakRef<T>& _in)
 	{
-		set(Ref<T>(_in));
+		ToJson(json, Ref<T>(_in));
 	}
 	
 	template <class T>
-	SLIB_INLINE void Json::set(const AtomicWeakRef<T>& _in)
+	SLIB_INLINE void ToJson(Json& json, const AtomicWeakRef<T>& _in)
 	{
-		set(Ref<T>(_in));
+		ToJson(json, Ref<T>(_in));
 	}
 
 	template <class T>
-	void Json::get(List<T>& _out) const
+	void FromJson(const Json& json, List<T>& _out)
 	{
 		List<T> dst;
-		Ref<Referable> obj(getObject());
+		Ref<Referable> obj(json.getObject());
 		if (obj.isNotNull()) {
 			if (CList<Variant>* s1 = CastInstance< CList<Variant> >(obj.get())) {
 				ListLocker<Variant> src(*s1);
 				for (sl_size i = 0; i < src.count; i++) {
 					Json& v = *(static_cast<Json*>(&(src[i])));
 					T o;
-					v.get(o);
+					FromJson(v, o);
 					dst.add_NoLock(Move(o));
 				}
 			} else if (CList< Map<String, Variant> >* s2 = CastInstance< CList< Map<String, Variant> > >(obj.get())) {
@@ -206,7 +193,7 @@ namespace slib
 				for (sl_size i = 0; i < src.count; i++) {
 					Json v(src[i]);
 					T o;
-					v.get(o);
+					FromJson(v, o);
 					dst.add_NoLock(Move(o));
 				}
 			} else if (CList< HashMap<String, Variant> >* s3 = CastInstance< CList< HashMap<String, Variant> > >(obj.get())) {
@@ -214,7 +201,7 @@ namespace slib
 				for (sl_size i = 0; i < src.count; i++) {
 					Json v(src[i]);
 					T o;
-					v.get(o);
+					FromJson(v, o);
 					dst.add_NoLock(Move(o));
 				}
 			}
@@ -223,7 +210,7 @@ namespace slib
 	}
 	
 	template <class T>
-	void Json::set(const List<T>& _in)
+	void ToJson(Json& json, const List<T>& _in)
 	{
 		if (_in.isNotNull()) {
 			JsonList list;
@@ -232,31 +219,31 @@ namespace slib
 				T& o = src[i];
 				list.add_NoLock(Json(o));
 			}
-			*this = Move(list);
+			json = Move(list);
 		} else {
-			setNull();
+			json.setNull();
 		}
 	}
 	
 	template <class T>
-	SLIB_INLINE void Json::get(AtomicList<T>& _out) const
+	SLIB_INLINE void FromJson(const Json& json, AtomicList<T>& _out)
 	{
 		List<T> t;
-		get(t);
+		FromJson(json, t);
 		_out = Move(t);
 	}
 	
 	template <class T>
-	SLIB_INLINE void Json::set(const AtomicList<T>& _in)
+	SLIB_INLINE void ToJson(Json& json, const AtomicList<T>& _in)
 	{
-		set(List<T>(_in));
+		ToJson(json, List<T>(_in));
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	void Json::get(Map<KT, VT, KEY_COMPARE>& _out) const
+	void FromJson(const Json& json, Map<KT, VT, KEY_COMPARE>& _out)
 	{
 		Map<KT, VT, KEY_COMPARE> dst;
-		Ref<Referable> obj(getObject());
+		Ref<Referable> obj(json.getObject());
 		if (obj.isNotNull()) {
 			if (CMap<String, Variant>* s1 = CastInstance< CMap<String, Variant> >(obj.get())) {
 				CMap<String, Variant>& map = *s1;
@@ -264,7 +251,7 @@ namespace slib
 				for (auto& pair : map) {
 					Json& v = *(static_cast<Json*>(&(pair.value)));
 					VT o;
-					v.get(o);
+					FromJson(v, o);
 					dst.add_NoLock(Cast<String, KT>()(pair.key), Move(o));
 				}
 			} else if (CHashMap<String, Variant>* s2 = CastInstance< CHashMap<String, Variant> >(obj.get())) {
@@ -273,7 +260,7 @@ namespace slib
 				for (auto& pair : map) {
 					Json& v = *(static_cast<Json*>(&(pair.value)));
 					VT o;
-					v.get(o);
+					FromJson(v, o);
 					dst.add_NoLock(Cast<String, KT>()(pair.key), Move(o));
 				}
 			}
@@ -282,7 +269,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	void Json::set(const Map<KT, VT, KEY_COMPARE>& _in)
+	void ToJson(Json& json, const Map<KT, VT, KEY_COMPARE>& _in)
 	{
 		if (_in.isNotNull()) {
 			MutexLocker locker(_in.getLocker());
@@ -290,31 +277,31 @@ namespace slib
 			for (auto& pair : _in) {
 				map.put_NoLock(Cast<KT, String>()(pair.key), Json(pair.value));
 			}
-			*this = Move(map);
+			json = Move(map);
 		} else {
-			setNull();
+			json.setNull();
 		}
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	SLIB_INLINE void Json::get(AtomicMap<KT, VT, KEY_COMPARE>& _out) const
+	SLIB_INLINE void FromJson(const Json& json, AtomicMap<KT, VT, KEY_COMPARE>& _out)
 	{
 		Map<KT, VT, KEY_COMPARE> t;
-		get(t);
+		FromJson(json, t);
 		_out = Move(t);
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	SLIB_INLINE void Json::set(const AtomicMap<KT, VT, KEY_COMPARE>& _in)
+	SLIB_INLINE void ToJson(Json& json, const AtomicMap<KT, VT, KEY_COMPARE>& _in)
 	{
-		set(Map<KT, VT, KEY_COMPARE>(_in));
+		ToJson(json, Map<KT, VT, KEY_COMPARE>(_in));
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
-	void Json::get(HashMap<KT, VT, HASH, KEY_COMPARE>& _out) const
+	void FromJson(const Json& json, HashMap<KT, VT, HASH, KEY_COMPARE>& _out)
 	{
 		HashMap<KT, VT, HASH, KEY_COMPARE> dst;
-		Ref<Referable> obj(getObject());
+		Ref<Referable> obj(json.getObject());
 		if (obj.isNotNull()) {
 			if (CMap<String, Variant>* s1 = CastInstance< CMap<String, Variant> >(obj.get())) {
 				CMap<String, Variant>& map = *s1;
@@ -322,7 +309,7 @@ namespace slib
 				for (auto& pair : map) {
 					Json& v = *(static_cast<Json*>(&(pair.value)));
 					VT o;
-					v.get(o);
+					FromJson(v, o);
 					dst.add_NoLock(Cast<String, KT>()(pair.key), Move(o));
 				}
 			} else if (CHashMap<String, Variant>* s2 = CastInstance< CHashMap<String, Variant> >(obj.get())) {
@@ -331,7 +318,7 @@ namespace slib
 				for (auto& pair : map) {
 					Json& v = *(static_cast<Json*>(&(pair.value)));
 					VT o;
-					v.get(o);
+					FromJson(v, o);
 					dst.add_NoLock(Cast<String, KT>()(pair.key), Move(o));
 				}
 			}
@@ -340,7 +327,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
-	void Json::set(const HashMap<KT, VT, HASH, KEY_COMPARE>& _in)
+	void ToJson(Json& json, const HashMap<KT, VT, HASH, KEY_COMPARE>& _in)
 	{
 		if (_in.isNotNull()) {
 			MutexLocker locker(_in.getLocker());
@@ -348,38 +335,63 @@ namespace slib
 			for (auto& pair : _in) {
 				map.put_NoLock(Cast<KT, String>()(pair.key), Json(pair.value));
 			}
-			*this = Move(map);
+			json = Move(map);
 		} else {
-			setNull();
+			json.setNull();
 		}
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
-	SLIB_INLINE void Json::get(AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& _out) const
+	SLIB_INLINE void FromJson(const Json& json, AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& _out)
 	{
 		HashMap<KT, VT, HASH, KEY_COMPARE> t;
-		get(t);
+		FromJson(json, t);
 		_out = Move(t);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
-	SLIB_INLINE void Json::set(const AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& _in)
+	SLIB_INLINE void ToJson(Json& json, const AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& _in)
 	{
-		set(HashMap<KT, VT, HASH, KEY_COMPARE>(_in));
+		ToJson(json, HashMap<KT, VT, HASH, KEY_COMPARE>(_in));
 	}
 	
 	template <class T>
-	SLIB_INLINE void Json::get(T& _out) const
+	SLIB_INLINE void FromJson(const Json& json, T& _out)
 	{
-		_out.fromJson(*this);
+		_out.fromJson(json);
 	}
 	
 	template <class T>
-	SLIB_INLINE void Json::set(const T& _in)
+	SLIB_INLINE void ToJson(Json& json, const T& _in)
 	{
-		*this = _in.toJson();
+		json = _in.toJson();
 	}
 	
+	template <class T>
+	SLIB_INLINE Json::Json(const T& value)
+	{
+		ToJson(*this, value);
+	}
+	
+	template <class T>
+	SLIB_INLINE Json& Json::operator=(const T& value)
+	{
+		ToJson(*this, value);
+		return *this;
+	}
+	
+	template <class T>
+	SLIB_INLINE void Json::get(T& value) const
+	{
+		FromJson(*this, value);
+	}
+	
+	template <class T>
+	SLIB_INLINE void Json::set(const T& value)
+	{
+		ToJson(*this, value);
+	}
+
 	
 	template <>
 	SLIB_INLINE sl_object_type CMap<String, Json>::ObjectType() noexcept

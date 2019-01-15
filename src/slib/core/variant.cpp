@@ -701,14 +701,14 @@ namespace slib
 		return *this;
 	}
 	
-	Variant Variant::operator[](sl_size indexForVariantList) const noexcept
+	Variant Variant::operator[](sl_size list_index) const noexcept
 	{
-		return getElement(indexForVariantList);
+		return getElement(list_index);
 	}
 
-	Variant Variant::operator[](const String& keyForVariantMap) const noexcept
+	Variant Variant::operator[](const String& map_key) const noexcept
 	{
-		return getItem(keyForVariantMap);
+		return getItem(map_key);
 	}
 
 	void Variant::setNull() noexcept
@@ -1744,40 +1744,40 @@ namespace slib
 	}
 	
 #define VARIANT_ADD_ELEMENT \
-	{\
+	{ \
 		Ref<Referable> obj(getObject());\
-		if (obj.isNotNull()) {\
-			if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {\
-				return p1->add(value);\
-			} else if (CList< Map<String, Variant> >* p2 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {\
-				return p2->add(value.getVariantMap());\
-			} else if (CList< HashMap<String, Variant> >* p3 = CastInstance< CList< HashMap<String, Variant> > >(obj._ptr)) {\
-				return p3->add(value.getVariantHashMap());\
-			}\
-			return sl_false;\
-		}\
-	}\
-	{\
-		SpinLocker lock(SpinLockPoolForVariant::get(this));\
-		Ref<Referable> obj(getObject());\
-		if (obj.isNotNull()) {\
-			lock.unlock();\
-			if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {\
-				return p1->add(value);\
-			} else if (CList< Map<String, Variant> >* p2 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {\
-				return p2->add(value.getVariantMap());\
-			} else if (CList< HashMap<String, Variant> >* p3 = CastInstance< CList< HashMap<String, Variant> > >(obj._ptr)) {\
-				return p3->add(value.getVariantHashMap());\
-			}\
-			return sl_false;\
-		}\
-		VariantList list = VariantList::create();\
-		if (list.isNotNull()) {\
-			set(list);\
-			lock.unlock();\
-			return list.add(value);\
-		}\
-	}\
+		if (obj.isNotNull()) { \
+			if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) { \
+				return p1->add(value); \
+			} else if (CList< Map<String, Variant> >* p2 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) { \
+				return p2->add(value.getVariantMap()); \
+			} else if (CList< HashMap<String, Variant> >* p3 = CastInstance< CList< HashMap<String, Variant> > >(obj._ptr)) { \
+				return p3->add(value.getVariantHashMap()); \
+			} \
+			return sl_false; \
+		} \
+	} \
+	{ \
+		SpinLocker lock(SpinLockPoolForVariant::get(this)); \
+		Ref<Referable> obj(getObject()); \
+		if (obj.isNotNull()) { \
+			lock.unlock(); \
+			if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) { \
+				return p1->add(value); \
+			} else if (CList< Map<String, Variant> >* p2 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) { \
+				return p2->add(value.getVariantMap()); \
+			} else if (CList< HashMap<String, Variant> >* p3 = CastInstance< CList< HashMap<String, Variant> > >(obj._ptr)) { \
+				return p3->add(value.getVariantHashMap()); \
+			} \
+			return sl_false; \
+		} \
+		VariantList list = VariantList::create(); \
+		if (list.isNotNull()) { \
+			set(list); \
+			lock.unlock(); \
+			return list.add(value); \
+		} \
+	} \
 	return sl_false;
 
 	sl_bool Variant::addElement(const Variant& value) noexcept
@@ -2932,14 +2932,14 @@ namespace slib
 		return *this;
 	}
 	
-	Variant Atomic<Variant>::operator[](sl_size indexForVariantList) const noexcept
+	Variant Atomic<Variant>::operator[](sl_size list_index) const noexcept
 	{
-		return getElement(indexForVariantList);
+		return getElement(list_index);
 	}
 
-	Variant Atomic<Variant>::operator[](const String& keyForVariantMap) const noexcept
+	Variant Atomic<Variant>::operator[](const String& map_key) const noexcept
 	{
-		return getItem(keyForVariantMap);
+		return getItem(map_key);
 	}
 
 	void Atomic<Variant>::setNull() noexcept
