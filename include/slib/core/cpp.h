@@ -40,6 +40,12 @@ namespace slib
 	template <class T> struct RemoveConstReference<T&> { typedef T Type; };
 	template <class T> struct RemoveConstReference<T&&> { typedef T Type; };
 
+	template <class T>
+	constexpr T* RemoveConstPointerVariable(const T* t)
+	{
+		return (T*)t;
+	}
+
 	template <class T, T v> struct ConstValue { constexpr static T value = v; };
 
 	template <class T> struct IsLValueHelper : ConstValue<bool, false> {};
