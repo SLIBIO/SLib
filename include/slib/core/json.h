@@ -77,7 +77,7 @@ namespace slib
 	typedef List< HashMap<String, Json> > JsonMapList;
 	typedef AtomicList< HashMap<String, Json> > AtomicJsonMapList;
 	typedef Pair<String, Json> JsonItem;
-
+	
 	class SLIB_EXPORT Json : public Variant
 	{
 	public:
@@ -213,9 +213,6 @@ namespace slib
 		Json(const std::initializer_list<Json>& elements);
 #endif
 
-		template <class T>
-		Json(const T& value);
-		
 	public:
 		static const Json& null();
 		
@@ -239,13 +236,6 @@ namespace slib
 		
 		Json& operator=(const std::initializer_list<Json>& elements);
 #endif
-		
-		template <class T>
-		Json& operator=(const T& value);
-
-		Json operator[](sl_size indexForVariantList) const;
-		
-		Json operator[](const String& keyForVariantMap) const;
 		
 	public:
 		static Json parseJson(const sl_char8* sz, sl_size len, JsonParseParam& param);
@@ -313,224 +303,27 @@ namespace slib
 		
 		sl_bool removeItem(const String& key);
 		
-	public:
-		void get(Json& _out) const;
-		void set(const Json& _in);
-		
-		void get(Variant& _out) const;
-		void set(const Variant& _in);
-		
-		void get(AtomicVariant& _out) const;
-		void set(const AtomicVariant& _in);
-		
-		void get(signed char& _out) const;
-		void get(signed char& _out, signed char def) const;
-		void set(signed char _in);
-		
-		void get(unsigned char& _out) const;
-		void get(unsigned char& _out, unsigned char def) const;
-		void set(unsigned char _in);
-		
-		void get(short& _out) const;
-		void get(short& _out, short def) const;
-		void set(short _in);
-		
-		void get(unsigned short& _out) const;
-		void get(unsigned short& _out, unsigned short def) const;
-		void set(unsigned short _in);
-		
-		void get(int& _out) const;
-		void get(int& _out, int def) const;
-		void set(int _in);
-		
-		void get(unsigned int& _out) const;
-		void get(unsigned int& _out, unsigned int def) const;
-		void set(unsigned int _in);
-		
-		void get(long& _out) const;
-		void get(long& _out, long def) const;
-		void set(long _in);
-		
-		void get(unsigned long& _out) const;
-		void get(unsigned long& _out, unsigned long def) const;
-		void set(unsigned long _in);
-		
-		void get(sl_int64& _out) const;
-		void get(sl_int64& _out, sl_int64 def) const;
-		void set(sl_int64 _in);
-		
-		void get(sl_uint64& _out) const;
-		void get(sl_uint64& _out, sl_uint64 def) const;
-		void set(sl_uint64 _in);
-		
-		void get(float& _out) const;
-		void get(float& _out, float def) const;
-		void set(float _in);
-		
-		void get(double& _out) const;
-		void get(double& _out, double def) const;
-		void set(double _in);
-		
-		void get(bool& _out) const;
-		void get(bool& _out, bool def) const;
-		void set(bool _in);
-		
-		void get(String& _out) const;
-		void get(String& _out, const String& def) const;
-		void set(const String& _in);
-		
-		void get(AtomicString& _out) const;
-		void get(AtomicString& _out, const String& def) const;
-		void set(const AtomicString& _in);
-		
-		void get(String16& _out) const;
-		void get(String16& _out, const String16& def) const;
-		void set(const String16& _in);
-		
-		void get(AtomicString16& _out) const;
-		void get(AtomicString16& _out, const String16& def) const;
-		void set(const AtomicString16& _in);
-		
-		void set(const sl_char8* sz8);
-		void set(const sl_char16* sz16);
-		
-#ifdef SLIB_SUPPORT_STD_TYPES
-		void get(std::string& _out) const;
-		void get(std::string& _out, const std::string& def) const;
-		void set(const std::string& _in);
-
-		void get(std::u16string& _out) const;
-		void get(std::u16string& _out, const std::u16string& def) const;
-		void set(const std::u16string& _in);
-#endif
-
-		void get(Time& _out) const;
-		void get(Time& _out, const Time& def) const;
-		void set(const Time& _in);
-		
-		template <class T>
-		void get(Nullable<T>& _out) const;
-		template <class T>
-		void set(const Nullable<T>& ref);
-		
-		template <class T>
-		void get(Ref<T>& _out) const;
-		template <class T>
-		void set(const Ref<T>& ref);
-		
-		template <class T>
-		void get(AtomicRef<T>& _out) const;
-		template <class T>
-		void set(const AtomicRef<T>& _in);
-		
-		template <class T>
-		void set(const WeakRef<T>& _in);
-		template <class T>
-		void set(const AtomicWeakRef<T>& _in);
-		
-		void get(List<Variant>& _out) const;
-		void set(const List<Variant>& _in);
-		
-		void get(AtomicList<Variant>& _out) const;
-		void set(const AtomicList<Variant>& _in);
-		
-		void get(Map<String, Variant>& _out) const;
-		void set(const Map<String, Variant>& _in);
-		
-		void get(AtomicMap<String, Variant>& _out) const;
-		void set(const AtomicMap<String, Variant>& _in);
-		
-		void get(HashMap<String, Variant>& _out) const;
-		void set(const HashMap<String, Variant>& _in);
-		
-		void get(AtomicHashMap<String, Variant>& _out) const;
-		void set(const AtomicHashMap<String, Variant>& _in);
-		
-		void get(List< Map<String, Variant> >& _out) const;
-		void set(const List< Map<String, Variant> >& _in);
-		
-		void get(AtomicList< Map<String, Variant> >& _out) const;
-		void set(const AtomicList< Map<String, Variant> >& _in);
-		
-		void get(List< HashMap<String, Variant> >& _out) const;
-		void set(const List< HashMap<String, Variant> >& _in);
-		
-		void get(AtomicList< HashMap<String, Variant> >& _out) const;
-		void set(const AtomicList< HashMap<String, Variant> >& _in);
-		
-		void get(JsonList& _out) const;
-		void set(const JsonList& _in);
-		
-		void get(AtomicJsonList& _out) const;
-		void set(const AtomicJsonList& _in);
-		
-		void get(JsonMap& _out) const;
-		void set(const JsonMap& _in);
-		
-		void get(AtomicJsonMap& _out) const;
-		void set(const AtomicJsonMap& _in);
-		
-		void get(JsonMapList& _out) const;
-		void set(const JsonMapList& _in);
-		
-		void get(AtomicJsonMapList& _out) const;
-		void set(const AtomicJsonMapList& _in);
-		
-		template <class T>
-		void get(List<T>& _out) const;
-		template <class T>
-		void set(const List<T>& _in);
-		
-		template <class T>
-		void get(AtomicList<T>& _out) const;
-		template <class T>
-		void set(const AtomicList<T>& _in);
-		
-		template <class KT, class VT, class KEY_COMPARE>
-		void get(Map<KT, VT, KEY_COMPARE>& _out) const;
-		template <class KT, class VT, class KEY_COMPARE>
-		void set(const Map<KT, VT, KEY_COMPARE>& _in);
-		
-		template <class KT, class VT, class KEY_COMPARE>
-		void get(AtomicMap<KT, VT, KEY_COMPARE>& _out) const;
-		template <class KT, class VT, class KEY_COMPARE>
-		void set(const AtomicMap<KT, VT, KEY_COMPARE>& _in);
-		
-		template <class KT, class VT, class HASH, class KEY_COMPARE>
-		void get(HashMap<KT, VT, HASH, KEY_COMPARE>& _out) const;
-		template <class KT, class VT, class HASH, class KEY_COMPARE>
-		void set(const HashMap<KT, VT, HASH, KEY_COMPARE>& _in);
-		
-		template <class KT, class VT, class HASH, class KEY_COMPARE>
-		void get(AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& _out) const;
-		template <class KT, class VT, class HASH, class KEY_COMPARE>
-		void set(const AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& _in);
-		
-#ifdef SLIB_SUPPORT_STD_TYPES
-		template <class T>
-		void get(std::vector<T>& _out) const;
-		template <class T>
-		void set(const std::vector<T>& _in);
-		
-		template <class KT, class VT, class COMPARE, class ALLOC>
-		void get(std::map<KT, VT, COMPARE, ALLOC>& _out) const;
-		template <class KT, class VT, class COMPARE, class ALLOC>
-		void set(const std::map<KT, VT, COMPARE, ALLOC>& _in);
-		
-		template <class KT, class VT, class HASH, class PRED, class ALLOC>
-		void get(std::unordered_map<KT, VT, HASH, PRED, ALLOC>& _out) const;
-		template <class KT, class VT, class HASH, class PRED, class ALLOC>
-		void set(const std::unordered_map<KT, VT, HASH, PRED, ALLOC>& _in);
-#endif
-
-		template <class T>
-		void get(T& _out) const;
-		template <class T>
-		void set(const T& _in);
-
 	protected:
 		String toString() const;
 		
+	public:
+		Json operator[](sl_size list_index) const;
+
+		Json operator[](const String& map_key) const;
+
+	public:
+		template <class T>
+		Json(const T& value);
+		
+		template <class T>
+		Json& operator=(const T& value);
+		
+		template <class T>
+		void get(T& value) const;
+		
+		template <class T>
+		void set(const T& value);
+
 	};
 	
 	SLIB_INLINE JsonItem operator<<=(const String& str, const Json& v)
@@ -542,6 +335,221 @@ namespace slib
 	{
 		return JsonItem(str, v);
 	}
+
+	void FromJson(const Json& json, Json& _out);
+	void ToJson(Json& json, const Json& _in);
+	
+	void FromJson(const Json& json, Variant& _out);
+	void ToJson(Json& json, const Variant& _in);
+	
+	void FromJson(const Json& json, AtomicVariant& _out);
+	void ToJson(Json& json, const AtomicVariant& _in);
+	
+	void FromJson(const Json& json, signed char& _out);
+	void FromJson(const Json& json, signed char& _out, signed char def);
+	void ToJson(Json& json, signed char _in);
+	
+	void FromJson(const Json& json, unsigned char& _out);
+	void FromJson(const Json& json, unsigned char& _out, unsigned char def);
+	void ToJson(Json& json, unsigned char _in);
+	
+	void FromJson(const Json& json, short& _out);
+	void FromJson(const Json& json, short& _out, short def);
+	void ToJson(Json& json, short _in);
+	
+	void FromJson(const Json& json, unsigned short& _out);
+	void FromJson(const Json& json, unsigned short& _out, unsigned short def);
+	void ToJson(Json& json, unsigned short _in);
+	
+	void FromJson(const Json& json, int& _out);
+	void FromJson(const Json& json, int& _out, int def);
+	void ToJson(Json& json, int _in);
+	
+	void FromJson(const Json& json, unsigned int& _out);
+	void FromJson(const Json& json, unsigned int& _out, unsigned int def);
+	void ToJson(Json& json, unsigned int _in);
+	
+	void FromJson(const Json& json, long& _out);
+	void FromJson(const Json& json, long& _out, long def);
+	void ToJson(Json& json, long _in);
+	
+	void FromJson(const Json& json, unsigned long& _out);
+	void FromJson(const Json& json, unsigned long& _out, unsigned long def);
+	void ToJson(Json& json, unsigned long _in);
+	
+	void FromJson(const Json& json, sl_int64& _out);
+	void FromJson(const Json& json, sl_int64& _out, sl_int64 def);
+	void ToJson(Json& json, sl_int64 _in);
+	
+	void FromJson(const Json& json, sl_uint64& _out);
+	void FromJson(const Json& json, sl_uint64& _out, sl_uint64 def);
+	void ToJson(Json& json, sl_uint64 _in);
+	
+	void FromJson(const Json& json, float& _out);
+	void FromJson(const Json& json, float& _out, float def);
+	void ToJson(Json& json, float _in);
+	
+	void FromJson(const Json& json, double& _out);
+	void FromJson(const Json& json, double& _out, double def);
+	void ToJson(Json& json, double _in);
+	
+	void FromJson(const Json& json, bool& _out);
+	void FromJson(const Json& json, bool& _out, bool def);
+	void ToJson(Json& json, bool _in);
+	
+	void FromJson(const Json& json, String& _out);
+	void FromJson(const Json& json, String& _out, const String& def);
+	void ToJson(Json& json, const String& _in);
+	
+	void FromJson(const Json& json, AtomicString& _out);
+	void FromJson(const Json& json, AtomicString& _out, const String& def);
+	void ToJson(Json& json, const AtomicString& _in);
+	
+	void FromJson(const Json& json, String16& _out);
+	void FromJson(const Json& json, String16& _out, const String16& def);
+	void ToJson(Json& json, const String16& _in);
+	
+	void FromJson(const Json& json, AtomicString16& _out);
+	void FromJson(const Json& json, AtomicString16& _out, const String16& def);
+	void ToJson(Json& json, const AtomicString16& _in);
+	
+	void ToJson(Json& json, const sl_char8* sz8);
+	void ToJson(Json& json, const sl_char16* sz16);
+	
+#ifdef SLIB_SUPPORT_STD_TYPES
+	void FromJson(const Json& json, std::string& _out);
+	void FromJson(const Json& json, std::string& _out, const std::string& def);
+	void ToJson(Json& json, const std::string& _in);
+	
+	void FromJson(const Json& json, std::u16string& _out);
+	void FromJson(const Json& json, std::u16string& _out, const std::u16string& def);
+	void ToJson(Json& json, const std::u16string& _in);
+#endif
+	
+	void FromJson(const Json& json, Time& _out);
+	void FromJson(const Json& json, Time& _out, const Time& def);
+	void ToJson(Json& json, const Time& _in);
+	
+	template <class T>
+	void FromJson(const Json& json, Nullable<T>& _out);
+	template <class T>
+	void ToJson(Json& json, const Nullable<T>& ref);
+	
+	template <class T>
+	void FromJson(const Json& json, Ref<T>& _out);
+	template <class T>
+	void ToJson(Json& json, const Ref<T>& ref);
+	
+	template <class T>
+	void FromJson(const Json& json, AtomicRef<T>& _out);
+	template <class T>
+	void ToJson(Json& json, const AtomicRef<T>& _in);
+	
+	template <class T>
+	void ToJson(Json& json, const WeakRef<T>& _in);
+	template <class T>
+	void ToJson(Json& json, const AtomicWeakRef<T>& _in);
+	
+	void FromJson(const Json& json, List<Variant>& _out);
+	void ToJson(Json& json, const List<Variant>& _in);
+	
+	void FromJson(const Json& json, AtomicList<Variant>& _out);
+	void ToJson(Json& json, const AtomicList<Variant>& _in);
+	
+	void FromJson(const Json& json, Map<String, Variant>& _out);
+	void ToJson(Json& json, const Map<String, Variant>& _in);
+	
+	void FromJson(const Json& json, AtomicMap<String, Variant>& _out);
+	void ToJson(Json& json, const AtomicMap<String, Variant>& _in);
+	
+	void FromJson(const Json& json, HashMap<String, Variant>& _out);
+	void ToJson(Json& json, const HashMap<String, Variant>& _in);
+	
+	void FromJson(const Json& json, AtomicHashMap<String, Variant>& _out);
+	void ToJson(Json& json, const AtomicHashMap<String, Variant>& _in);
+	
+	void FromJson(const Json& json, List< Map<String, Variant> >& _out);
+	void ToJson(Json& json, const List< Map<String, Variant> >& _in);
+	
+	void FromJson(const Json& json, AtomicList< Map<String, Variant> >& _out);
+	void ToJson(Json& json, const AtomicList< Map<String, Variant> >& _in);
+	
+	void FromJson(const Json& json, List< HashMap<String, Variant> >& _out);
+	void ToJson(Json& json, const List< HashMap<String, Variant> >& _in);
+	
+	void FromJson(const Json& json, AtomicList< HashMap<String, Variant> >& _out);
+	void ToJson(Json& json, const AtomicList< HashMap<String, Variant> >& _in);
+	
+	void FromJson(const Json& json, JsonList& _out);
+	void ToJson(Json& json, const JsonList& _in);
+	
+	void FromJson(const Json& json, AtomicJsonList& _out);
+	void ToJson(Json& json, const AtomicJsonList& _in);
+	
+	void FromJson(const Json& json, JsonMap& _out);
+	void ToJson(Json& json, const JsonMap& _in);
+	
+	void FromJson(const Json& json, AtomicJsonMap& _out);
+	void ToJson(Json& json, const AtomicJsonMap& _in);
+	
+	void FromJson(const Json& json, JsonMapList& _out);
+	void ToJson(Json& json, const JsonMapList& _in);
+	
+	void FromJson(const Json& json, AtomicJsonMapList& _out);
+	void ToJson(Json& json, const AtomicJsonMapList& _in);
+	
+	template <class T>
+	void FromJson(const Json& json, List<T>& _out);
+	template <class T>
+	void ToJson(Json& json, const List<T>& _in);
+	
+	template <class T>
+	void FromJson(const Json& json, AtomicList<T>& _out);
+	template <class T>
+	void ToJson(Json& json, const AtomicList<T>& _in);
+	
+	template <class KT, class VT, class KEY_COMPARE>
+	void FromJson(const Json& json, Map<KT, VT, KEY_COMPARE>& _out);
+	template <class KT, class VT, class KEY_COMPARE>
+	void ToJson(Json& json, const Map<KT, VT, KEY_COMPARE>& _in);
+	
+	template <class KT, class VT, class KEY_COMPARE>
+	void FromJson(const Json& json, AtomicMap<KT, VT, KEY_COMPARE>& _out);
+	template <class KT, class VT, class KEY_COMPARE>
+	void ToJson(Json& json, const AtomicMap<KT, VT, KEY_COMPARE>& _in);
+	
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	void FromJson(const Json& json, HashMap<KT, VT, HASH, KEY_COMPARE>& _out);
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	void ToJson(Json& json, const HashMap<KT, VT, HASH, KEY_COMPARE>& _in);
+	
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	void FromJson(const Json& json, AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& _out);
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	void ToJson(Json& json, const AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& _in);
+	
+#ifdef SLIB_SUPPORT_STD_TYPES
+	template <class T>
+	void FromJson(const Json& json, std::vector<T>& _out);
+	template <class T>
+	void ToJson(Json& json, const std::vector<T>& _in);
+	
+	template <class KT, class VT, class COMPARE, class ALLOC>
+	void FromJson(const Json& json, std::map<KT, VT, COMPARE, ALLOC>& _out);
+	template <class KT, class VT, class COMPARE, class ALLOC>
+	void ToJson(Json& json, const std::map<KT, VT, COMPARE, ALLOC>& _in);
+	
+	template <class KT, class VT, class HASH, class PRED, class ALLOC>
+	void FromJson(const Json& json, std::unordered_map<KT, VT, HASH, PRED, ALLOC>& _out);
+	template <class KT, class VT, class HASH, class PRED, class ALLOC>
+	void ToJson(Json& json, const std::unordered_map<KT, VT, HASH, PRED, ALLOC>& _in);
+#endif
+
+	template <class T>
+	void FromJson(const Json& json, T& _out);
+	
+	template <class T>
+	void ToJson(Json& json, const T& _in);
 
 }
 
