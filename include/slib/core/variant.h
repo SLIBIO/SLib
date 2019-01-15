@@ -71,7 +71,7 @@ namespace slib
 	public:
 		SLIB_INLINE constexpr Variant() noexcept : _value(0), _type(VariantType::Null) {}
 
-		SLIB_INLINE constexpr Variant(sl_null_t) noexcept : _value(0), _type(VariantType::Null) {}
+		SLIB_INLINE constexpr Variant(sl_null_t) noexcept : _value(1), _type(VariantType::Null) {}
 
 		Variant(Variant&& other) noexcept;
 
@@ -172,6 +172,8 @@ namespace slib
 		Variant(const AtomicList< HashMap<String, Variant> >& list) noexcept;
 		
 	public:
+		static const Variant& undefined() noexcept;
+		
 		static const Variant& null() noexcept;
 		
 		
@@ -253,6 +255,12 @@ namespace slib
 
 	public:
 		VariantType getType() const noexcept;
+
+		void setUndefined() noexcept;
+		
+		sl_bool isUndefined() const noexcept;
+		
+		sl_bool isNotUndefined() const noexcept;
 
 		void setNull() noexcept;
 
@@ -650,7 +658,7 @@ namespace slib
 	public:
 		SLIB_INLINE constexpr Atomic() : _value(0), _type(VariantType::Null) {}
 
-		SLIB_INLINE constexpr Atomic(sl_null_t) : _value(0), _type(VariantType::Null) {}
+		SLIB_INLINE constexpr Atomic(sl_null_t) : _value(1), _type(VariantType::Null) {}
 		
 		Atomic(AtomicVariant&& other) noexcept;
 
@@ -751,6 +759,8 @@ namespace slib
 		Atomic(const AtomicList< HashMap<String, Variant> >& list) noexcept;
 
 	public:
+		static const AtomicVariant& undefined() noexcept;
+		
 		static const AtomicVariant& null() noexcept;
 
 	public:
@@ -773,6 +783,12 @@ namespace slib
 	
 	public:
 		VariantType getType() const noexcept;
+
+		void setUndefined() noexcept;
+		
+		sl_bool isUndefined() const noexcept;
+		
+		sl_bool isNotUndefined() const noexcept;
 
 		void setNull() noexcept;
 

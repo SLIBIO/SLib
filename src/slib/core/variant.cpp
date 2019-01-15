@@ -82,7 +82,8 @@ namespace slib
 	const char _priv_VariantMapList_ClassID[] = "VariantMapList";
 	const char _priv_VariantHashMapList_ClassID[] = "VariantHashMapList";
 
-	const _priv_Variant_Const _priv_Variant_Null = {0, VariantType::Null, 0};
+	const _priv_Variant_Const _priv_Variant_Undefined = {0, VariantType::Null, 0};
+	const _priv_Variant_Const _priv_Variant_Null = {1, VariantType::Null, 0};
 
 	void Variant::_constructorRef(const void* ptr)
 	{
@@ -92,6 +93,7 @@ namespace slib
 			new (reinterpret_cast<Ref<Referable>*>(&_value)) Ref<Referable>(ref);
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 	
@@ -103,6 +105,7 @@ namespace slib
 			_type = VariantType::Object;
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 	
@@ -114,6 +117,7 @@ namespace slib
 			new (reinterpret_cast<WeakRef<Referable>*>(&_value)) WeakRef<Referable>(ref);
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 	
@@ -125,6 +129,7 @@ namespace slib
 			_type = VariantType::Weak;
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 	
@@ -160,6 +165,7 @@ namespace slib
 			new (reinterpret_cast<Ref<Referable>*>(&_value)) Ref<Referable>(ref);
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 	
@@ -171,6 +177,7 @@ namespace slib
 			_type = VariantType::Object;
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 	
@@ -182,6 +189,7 @@ namespace slib
 			new (reinterpret_cast<WeakRef<Referable>*>(&_value)) WeakRef<Referable>(ref);
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 	
@@ -193,6 +201,7 @@ namespace slib
 			_type = VariantType::Weak;
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 	
@@ -204,7 +213,7 @@ namespace slib
 			new (reinterpret_cast<Ref<Referable>*>(&v)) Ref<Referable>(ref);
 			_replace(VariantType::Object, v);
 		} else {
-			_replace(VariantType::Null, 0);
+			setNull();
 		}
 	}
 	
@@ -216,7 +225,7 @@ namespace slib
 		if (target->isNotNull()) {
 			_replace(VariantType::Object, v);
 		} else {
-			_replace(VariantType::Null, 0);
+			setNull();
 		}
 	}
 	
@@ -228,7 +237,7 @@ namespace slib
 			new (reinterpret_cast<WeakRef<Referable>*>(&v)) WeakRef<Referable>(ref);
 			_replace(VariantType::Weak, v);
 		} else {
-			_replace(VariantType::Null, 0);
+			setNull();
 		}
 	}
 	
@@ -240,7 +249,7 @@ namespace slib
 		if (target->isNotNull()) {
 			_replace(VariantType::Object, v);
 		} else {
-			_replace(VariantType::Null, 0);
+			setNull();
 		}
 	}
 	
@@ -392,6 +401,7 @@ namespace slib
 			new PTR_VAR(String, _value) String(value);
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 
@@ -402,6 +412,7 @@ namespace slib
 			new PTR_VAR(String16, _value) String16(value);
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 
@@ -413,6 +424,7 @@ namespace slib
 			new PTR_VAR(String, _value) String(value);
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 
@@ -424,6 +436,7 @@ namespace slib
 			new PTR_VAR(String16, _value) String16(value);
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 
@@ -434,6 +447,7 @@ namespace slib
 			REF_VAR(const sl_char8*, _value) = sz8;
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 
@@ -444,6 +458,7 @@ namespace slib
 			REF_VAR(const sl_char16*, _value) = sz16;
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 	
@@ -472,6 +487,7 @@ namespace slib
 			REF_VAR(const void*, _value) = ptr;
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 
@@ -711,12 +727,22 @@ namespace slib
 		return getItem(map_key);
 	}
 
+	void Variant::setUndefined() noexcept
+	{
+		if (_type != VariantType::Null) {
+			_priv_Variant_free(_type, _value);
+			_type = VariantType::Null;
+		}
+		_value = 0;
+	}
+
 	void Variant::setNull() noexcept
 	{
 		if (_type != VariantType::Null) {
 			_priv_Variant_free(_type, _value);
 			_type = VariantType::Null;
 		}
+		_value = 1;
 	}
 
 	sl_bool Variant::isInt32() const noexcept
@@ -1339,69 +1365,69 @@ namespace slib
 
 	void Variant::setString(const String& value) noexcept
 	{
-		_priv_Variant_free(_type, _value);
 		if (value.isNotNull()) {
+			_priv_Variant_free(_type, _value);
 			_type = VariantType::String8;
 			new PTR_VAR(String, _value) String(value);
 		} else {
-			_type = VariantType::Null;
+			setNull();
 		}
 	}
 
 	void Variant::setString(const String16& value) noexcept
 	{
-		_priv_Variant_free(_type, _value);
 		if (value.isNotNull()) {
+			_priv_Variant_free(_type, _value);
 			_type = VariantType::String16;
 			new PTR_VAR(String16, _value) String16(value);
 		} else {
-			_type = VariantType::Null;
+			setNull();
 		}
 	}
 
 	void Variant::setString(const AtomicString& s) noexcept
 	{
-		_priv_Variant_free(_type, _value);
 		String value(s);
 		if (value.isNotNull()) {
+			_priv_Variant_free(_type, _value);
 			_type = VariantType::String8;
 			new PTR_VAR(String, _value) String(value);
 		} else {
-			_type = VariantType::Null;
+			setNull();
 		}
 	}
 
 	void Variant::setString(const AtomicString16& s) noexcept
 	{
-		_priv_Variant_free(_type, _value);
 		String value(s);
 		if (value.isNotNull()) {
+			_priv_Variant_free(_type, _value);
 			_type = VariantType::String16;
 			new PTR_VAR(String16, _value) String16(value);
 		} else {
-			_type = VariantType::Null;
+			setNull();
 		}
 	}
 
 	void Variant::setString(const sl_char8* value) noexcept
 	{
-		_priv_Variant_free(_type, _value);
 		if (value) {
+			_priv_Variant_free(_type, _value);
 			_type = VariantType::Sz8;
 			REF_VAR(const sl_char8*, _value) = value;
 		} else {
-			_type = VariantType::Null;
+			setNull();
 		}
 	}
 
 	void Variant::setString(const sl_char16* value) noexcept
 	{
-		_priv_Variant_free(_type, _value);
 		if (value) {
+			_priv_Variant_free(_type, _value);
 			_type = VariantType::Sz16;
 			REF_VAR(const sl_char16*, _value) = value;
 		} else {
-			_type = VariantType::Null;
+			setNull();
 		}
 	}
 	
@@ -1490,12 +1516,12 @@ namespace slib
 
 	void Variant::setPointer(const void *ptr) noexcept
 	{
-		_priv_Variant_free(_type, _value);
 		if (ptr) {
+			_priv_Variant_free(_type, _value);
 			_type = VariantType::Pointer;
 			REF_VAR(const void*, _value) = ptr;
 		} else {
-			_type = VariantType::Null;
+			setNull();
 		}
 	}
 
@@ -1797,6 +1823,9 @@ namespace slib
 	}
 	
 #define VAIRANT_PUT_ITEM \
+	if (value.isUndefined()) { \
+		return removeItem(key); \
+	} \
 	{\
 		Ref<Referable> obj(getObject());\
 		if (obj.isNotNull()) {\
@@ -1924,21 +1953,23 @@ namespace slib
 		sl_bool flagFirst = sl_true;
 		for (auto& pair : map) {
 			Variant& v = pair.value;
-			if (!flagFirst) {
-				if (!(ret.addStatic(", ", 2))) {
+			if (v.isNotUndefined()) {
+				if (!flagFirst) {
+					if (!(ret.addStatic(", ", 2))) {
+						return sl_false;
+					}
+				}
+				if (!(ret.add(ParseUtil::applyBackslashEscapes(pair.key)))) {
 					return sl_false;
 				}
+				if (!(ret.addStatic(": ", 2))) {
+					return sl_false;
+				}
+				if (!_priv_Variant_getVariantJsonString(ret, v)) {
+					return sl_false;
+				}
+				flagFirst = sl_false;
 			}
-			if (!(ret.add(ParseUtil::applyBackslashEscapes(pair.key)))) {
-				return sl_false;
-			}
-			if (!(ret.addStatic(": ", 2))) {
-				return sl_false;
-			}
-			if (!_priv_Variant_getVariantJsonString(ret, v)) {
-				return sl_false;
-			}
-			flagFirst = sl_false;
 		}
 		if (!(ret.addStatic("}", 1))) {
 			return sl_false;
@@ -1955,21 +1986,23 @@ namespace slib
 		sl_bool flagFirst = sl_true;
 		for (auto& pair : map) {
 			Variant& v = pair.value;
-			if (!flagFirst) {
-				if (!(ret.addStatic(", ", 2))) {
+			if (v.isNotUndefined()) {
+				if (!flagFirst) {
+					if (!(ret.addStatic(", ", 2))) {
+						return sl_false;
+					}
+				}
+				if (!(ret.add(ParseUtil::applyBackslashEscapes(pair.key)))) {
 					return sl_false;
 				}
+				if (!(ret.addStatic(": ", 2))) {
+					return sl_false;
+				}
+				if (!_priv_Variant_getVariantJsonString(ret, v)) {
+					return sl_false;
+				}
+				flagFirst = sl_false;
 			}
-			if (!(ret.add(ParseUtil::applyBackslashEscapes(pair.key)))) {
-				return sl_false;
-			}
-			if (!(ret.addStatic(": ", 2))) {
-				return sl_false;
-			}
-			if (!_priv_Variant_getVariantJsonString(ret, v)) {
-				return sl_false;
-			}
-			flagFirst = sl_false;
 		}
 		if (!(ret.addStatic("}", 1))) {
 			return sl_false;
@@ -2745,6 +2778,7 @@ namespace slib
 			new PTR_VAR(String, _value) String(value);
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 
@@ -2755,6 +2789,7 @@ namespace slib
 			new PTR_VAR(String16, _value) String16(value);
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 
@@ -2766,6 +2801,7 @@ namespace slib
 			new PTR_VAR(String, _value) String(value);
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 
@@ -2777,6 +2813,7 @@ namespace slib
 			new PTR_VAR(String16, _value) String16(value);
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 
@@ -2787,6 +2824,7 @@ namespace slib
 			REF_VAR(const sl_char8*, _value) = value;
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 
@@ -2797,6 +2835,7 @@ namespace slib
 			REF_VAR(const sl_char16*, _value) = value;
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 	
@@ -2825,6 +2864,7 @@ namespace slib
 			REF_VAR(const void*, _value) = ptr;
 		} else {
 			_type = VariantType::Null;
+			_value = 1;
 		}
 	}
 
@@ -2942,10 +2982,17 @@ namespace slib
 		return getItem(map_key);
 	}
 
+	void Atomic<Variant>::setUndefined() noexcept
+	{
+		if (_type != VariantType::Null || _value != 0) {
+			_replace(VariantType::Null, 0);
+		}
+	}
+
 	void Atomic<Variant>::setNull() noexcept
 	{
-		if (_type != VariantType::Null) {
-			_replace(VariantType::Null, 0);
+		if (_type != VariantType::Null || _value == 0) {
+			_replace(VariantType::Null, 1);
 		}
 	}
 
@@ -3159,7 +3206,7 @@ namespace slib
 			new PTR_VAR(String, v) String(value);
 			_replace(VariantType::String8, v);
 		} else {
-			_replace(VariantType::Null, 0);
+			setNull();
 		}
 	}
 
@@ -3170,7 +3217,7 @@ namespace slib
 			new PTR_VAR(String16, v) String16(value);
 			_replace(VariantType::String16, v);
 		} else {
-			_replace(VariantType::Null, 0);
+			setNull();
 		}
 	}
 
@@ -3182,7 +3229,7 @@ namespace slib
 			new PTR_VAR(String, v) String(value);
 			_replace(VariantType::String8, v);
 		} else {
-			_replace(VariantType::Null, 0);
+			setNull();
 		}
 	}
 
@@ -3194,7 +3241,7 @@ namespace slib
 			new PTR_VAR(String16*, v) String16(value);
 			_replace(VariantType::String16, v);
 		} else {
-			_replace(VariantType::Null, 0);
+			setNull();
 		}
 	}
 
@@ -3205,7 +3252,7 @@ namespace slib
 			REF_VAR(const sl_char8*, v) = value;
 			_replace(VariantType::Sz8, v);
 		} else {
-			_replace(VariantType::Null, 0);
+			setNull();
 		}
 	}
 
@@ -3216,7 +3263,7 @@ namespace slib
 			REF_VAR(const sl_char16*, v) = value;
 			_replace(VariantType::Sz16, v);
 		} else {
-			_replace(VariantType::Null, 0);
+			setNull();
 		}
 	}
 	
@@ -3300,7 +3347,7 @@ namespace slib
 			REF_VAR(const void*, v) = ptr;
 			_replace(VariantType::Pointer, v);
 		} else {
-			_replace(VariantType::Null, 0);
+			setNull();
 		}
 	}
 

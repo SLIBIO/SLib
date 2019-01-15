@@ -214,6 +214,8 @@ namespace slib
 #endif
 
 	public:
+		static const Json& undefined();
+
 		static const Json& null();
 		
 		static Json createList();

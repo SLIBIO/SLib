@@ -89,7 +89,7 @@ namespace slib
 	{
 	}
 
-	Json::Json(sl_null_t)
+	Json::Json(sl_null_t) : Variant(sl_null)
 	{
 	}
 	
@@ -308,6 +308,7 @@ namespace slib
 		sl_bool flagError = sl_false;
 		String errorMessage;
 		
+		ST strUndefined;
 		ST strNull;
 		ST strTrue;
 		ST strFalse;
@@ -327,6 +328,8 @@ namespace slib
 	template <>
 	_priv_Json_Parser<String, sl_char8>::_priv_Json_Parser()
 	{
+		SLIB_STATIC_STRING(_undefined, "undefined");
+		strUndefined = _undefined;
 		SLIB_STATIC_STRING(_null, "null");
 		strNull = _null;
 		SLIB_STATIC_STRING(_true, "true");
@@ -338,6 +341,8 @@ namespace slib
 	template <>
 	_priv_Json_Parser<String16, sl_char16>::_priv_Json_Parser()
 	{
+		SLIB_STATIC_STRING16_BY_ARRAY(_undefined, 'u', 'n', 'd', 'e', 'f', 'i', 'n', 'e', 'd');
+		strUndefined = _undefined;
 		SLIB_STATIC_STRING16_BY_ARRAY(_null, 'n', 'u', 'l', 'l');
 		strNull = _null;
 		SLIB_STATIC_STRING16_BY_ARRAY(_true, 't', 'r', 'u', 'e');
@@ -561,7 +566,9 @@ namespace slib
 					if (flagError) {
 						return sl_null;
 					}
-					map.put_NoLock(key, item);
+					if (item.isNotUndefined()) {
+						map.put_NoLock(key, item);
+					}
 				}
 				flagFirst = sl_false;
 			}
@@ -585,6 +592,9 @@ namespace slib
 				return sl_null;
 			}
 			ST str(buf + s, pos - s);
+			if (str == strUndefined) {
+				return Json::undefined();
+			}
 			if (str == strNull) {
 				return sl_null;
 			}

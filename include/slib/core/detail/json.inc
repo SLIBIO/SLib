@@ -85,7 +85,12 @@ namespace slib
 	{
 		ToJson(*this, map);
 	}
-	
+
+	SLIB_INLINE const Json& Json::undefined()
+	{
+		return *(reinterpret_cast<Json const*>(&_priv_Variant_Undefined));
+	}
+
 	SLIB_INLINE const Json& Json::null()
 	{
 		return *(reinterpret_cast<Json const*>(&_priv_Variant_Null));

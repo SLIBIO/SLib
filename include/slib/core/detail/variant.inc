@@ -30,6 +30,7 @@ namespace slib
 		sl_int32 lock;
 	};
 	
+	extern const _priv_Variant_Const _priv_Variant_Undefined;
 	extern const _priv_Variant_Const _priv_Variant_Null;
 	
 	template <class... ARGS>
@@ -123,7 +124,12 @@ namespace slib
 	{
 		_constructorAtomicWeakRef(&weak);
 	}
-	
+
+	SLIB_INLINE const Variant& Variant::undefined() noexcept
+	{
+		return *(reinterpret_cast<Variant const*>(&_priv_Variant_Undefined));
+	}
+
 	SLIB_INLINE const Variant& Variant::null() noexcept
 	{
 		return *(reinterpret_cast<Variant const*>(&_priv_Variant_Null));
@@ -159,7 +165,17 @@ namespace slib
 	{
 		return _type;
 	}
-	
+
+	SLIB_INLINE sl_bool Variant::isUndefined() const noexcept
+	{
+		return _type == VariantType::Null && _value == 0;
+	}
+
+	SLIB_INLINE sl_bool Variant::isNotUndefined() const noexcept
+	{
+		return _type != VariantType::Null || _value != 0;
+	}
+
 	SLIB_INLINE sl_bool Variant::isNull() const noexcept
 	{
 		return _type == VariantType::Null;
@@ -192,7 +208,7 @@ namespace slib
 	template <class T>
 	SLIB_INLINE void Variant::get(Nullable<T>& _out) const noexcept
 	{
-		if (isNull()) {
+		if (isUndefined()) {
 			_out->setNull();
 		} else {
 			_out.flagNull = sl_false;
@@ -204,7 +220,7 @@ namespace slib
 	SLIB_INLINE void Variant::set(const Nullable<T>& _in) noexcept
 	{
 		if (_in.isNull()) {
-			setNull();
+			setUndefined();
 		} else {
 			set(_in.value);
 		}
@@ -293,7 +309,12 @@ namespace slib
 	{
 		_constructorAtomicWeakRef(&weak);
 	}
-	
+
+	SLIB_INLINE const AtomicVariant& Atomic<Variant>::undefined() noexcept
+	{
+		return *(reinterpret_cast<AtomicVariant const*>(&_priv_Variant_Undefined));
+	}
+
 	SLIB_INLINE const AtomicVariant& Atomic<Variant>::null() noexcept
 	{
 		return *(reinterpret_cast<AtomicVariant const*>(&_priv_Variant_Null));
@@ -310,7 +331,17 @@ namespace slib
 	{
 		return _type;
 	}
-	
+
+	SLIB_INLINE sl_bool Atomic<Variant>::isUndefined() const noexcept
+	{
+		return _type == VariantType::Null && _value == 0;
+	}
+
+	SLIB_INLINE sl_bool Atomic<Variant>::isNotUndefined() const noexcept
+	{
+		return _type != VariantType::Null || _value != 0;
+	}
+
 	SLIB_INLINE sl_bool Atomic<Variant>::isNull() const noexcept
 	{
 		return _type == VariantType::Null;
