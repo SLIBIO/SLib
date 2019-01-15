@@ -359,19 +359,54 @@ namespace slib
 	{
 		ToJson(json, HashMap<KT, VT, HASH, KEY_COMPARE>(_in));
 	}
-	
+
+	template <class T, sl_bool isClass=__is_class(T), sl_bool isEnum=__is_enum(T)>
+	class _priv_JsonConverter
+	{
+	};
+
+	template <class T>
+	class _priv_JsonConverter<T, sl_true, sl_false>
+	{
+	public:
+		SLIB_INLINE static void fromJson(const Json& json, T& _out)
+		{
+			_out.fromJson(json);
+		}
+
+		SLIB_INLINE static void toJson(Json& json, const T& _in)
+		{
+			json = _in.toJson();
+		}
+	};
+
+	template <class T>
+	class _priv_JsonConverter<T, sl_false, sl_true>
+	{
+	public:
+		SLIB_INLINE static void fromJson(const Json& json, T& _out)
+		{
+			_out = (T)(json.getInt64((sl_int64)_out));
+		}
+
+		SLIB_INLINE static void toJson(Json& json, const T& _in)
+		{
+			json.setInt64((sl_int64)_in);
+		}
+	};
+
 	template <class T>
 	SLIB_INLINE void FromJson(const Json& json, T& _out)
 	{
-		_out.fromJson(json);
+		_priv_JsonConverter<T>::fromJson(json, _out);
 	}
 	
 	template <class T>
 	SLIB_INLINE void ToJson(Json& json, const T& _in)
 	{
-		json = _in.toJson();
+		_priv_JsonConverter<T>::toJson(json, _in);
 	}
-	
+
 	template <class T>
 	SLIB_INLINE Json::Json(const T& value)
 	{

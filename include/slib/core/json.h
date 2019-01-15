@@ -558,20 +558,20 @@ namespace slib
 
 #define SLIB_JSON_BEGIN_MEMBERS \
 public: \
-	Json toJson() const \
+	slib::Json toJson() const \
 	{ \
-		Json json = Json::createMap(); \
-		RemoveConstPointerVariable(this)->doJson(json, sl_false); \
+		slib::Json json = slib::Json::createMap(); \
+		slib::RemoveConstPointerVariable(this)->doJson(json, sl_false); \
 		return json; \
 	} \
-	void fromJson(const Json& json) \
+	void fromJson(const slib::Json& json) \
 	{ \
-		doJson(*((Json*)&json), sl_true); \
+		doJson(*((slib::Json*)&json), sl_true); \
 	} \
-	void doJson(Json& json, sl_bool isFromJson) \
+	void doJson(slib::Json& json, sl_bool isFromJson) \
 	{
 
-#define SLIB_JSON_ADD_MEMBER(MEMBER_NAME, JSON_NAME) if (isFromJson) FromJson(json.getItem(JSON_NAME), MEMBER_NAME); else json.putItem(JSON_NAME, MEMBER_NAME);
+#define SLIB_JSON_ADD_MEMBER(MEMBER_NAME, JSON_NAME) if (isFromJson) slib::FromJson(json.getItem(JSON_NAME), MEMBER_NAME); else json.putItem(JSON_NAME, MEMBER_NAME);
 
 #define PRIV_SLIB_JSON_ADD_MEMBERS0
 #define PRIV_SLIB_JSON_ADD_MEMBERS1(NAME) SLIB_JSON_ADD_MEMBER(NAME, #NAME)
