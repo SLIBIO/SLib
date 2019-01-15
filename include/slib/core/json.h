@@ -556,7 +556,7 @@ namespace slib
 }
 
 
-#define SLIB_JSON_BEGIN_MEMBERS \
+#define SLIB_JSON \
 public: \
 	slib::Json toJson() const \
 	{ \
@@ -568,8 +568,7 @@ public: \
 	{ \
 		doJson(*((slib::Json*)&json), sl_true); \
 	} \
-	void doJson(slib::Json& json, sl_bool isFromJson) \
-	{
+	void doJson(slib::Json& json, sl_bool isFromJson)
 
 #define SLIB_JSON_ADD_MEMBER(MEMBER_NAME, JSON_NAME) if (isFromJson) slib::FromJson(json.getItem(JSON_NAME), MEMBER_NAME); else json.putItem(JSON_NAME, MEMBER_NAME);
 #define SLIB_JSON_ADD_MEMBER_FROM(MEMBER_NAME, JSON_NAME) if (isFromJson) slib::FromJson(json.getItem(JSON_NAME), MEMBER_NAME);
@@ -643,14 +642,11 @@ public: \
 
 #define SLIB_JSON_ADD_MEMBERS(...) SLIB_MACRO_CONCAT(SLIB_MACRO_OVERLOAD(PRIV_SLIB_JSON_ADD_MEMBERS, __VA_ARGS__)(__VA_ARGS__),)
 
-#define SLIB_JSON_END_MEMBERS \
-	}
-
 #define SLIB_JSON_MEMBERS(...) \
-	SLIB_JSON_BEGIN_MEMBERS \
+	SLIB_JSON \
+	{ \
 		SLIB_JSON_ADD_MEMBERS(__VA_ARGS__) \
-	SLIB_JSON_END_MEMBERS
-
+	}
 
 #include "detail/json.inc"
 
