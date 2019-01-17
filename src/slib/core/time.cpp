@@ -1236,32 +1236,36 @@ namespace slib
 
 	String Time::getDateString(const TimeZone& zone) const noexcept
 	{
+		return getDateString('-', zone);
+	}
+	
+	String16 Time::getDateString16(const TimeZone& zone) const noexcept
+	{
+		return getDateString16('-', zone);
+	}
+
+	String Time::getDateString(sl_char8 delimiter, const TimeZone& zone) const noexcept
+	{
 		TimeComponents d;
 		get(d, zone);
 		StringBuffer sb;
 		sb.add(String::fromInt32(d.year, 10, 4));
-		sb.addStatic("-", 1);
+		sb.addStatic(&delimiter, 1);
 		sb.add(String::fromInt32(d.month, 10, 2));
-		sb.addStatic("-", 1);
+		sb.addStatic(&delimiter, 1);
 		sb.add(String::fromInt32(d.day, 10, 2));
 		return sb.merge();
 	}
 
-	String16 Time::getDateString16(const TimeZone& zone) const noexcept
+	String16 Time::getDateString16(sl_char16 delimiter, const TimeZone& zone) const noexcept
 	{
 		TimeComponents d;
 		get(d, zone);
 		StringBuffer16 sb;
 		sb.add(String16::fromInt32(d.year, 10, 4));
-		{
-			const sl_char16 ch = '-';
-			sb.addStatic(&ch, 1);
-		}
+		sb.addStatic(&delimiter, 1);
 		sb.add(String16::fromInt32(d.month, 10, 2));
-		{
-			const sl_char16 ch = '-';
-			sb.addStatic(&ch, 1);
-		}
+		sb.addStatic(&delimiter, 1);
 		sb.add(String16::fromInt32(d.day, 10, 2));
 		return sb.merge();
 	}
