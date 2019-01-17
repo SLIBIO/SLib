@@ -495,6 +495,10 @@ namespace slib
 
 		String16 getDateString16(const TimeZone& zone = TimeZone::Local) const noexcept;
 
+		String getDateString(sl_char8 delimiter, const TimeZone& zone = TimeZone::Local) const noexcept;
+		
+		String16 getDateString16(sl_char16 delimiter, const TimeZone& zone = TimeZone::Local) const noexcept;
+
 		String getTimeString(const TimeZone& zone = TimeZone::Local) const noexcept;
 
 		String16 getTimeString16(const TimeZone& zone = TimeZone::Local) const noexcept;
