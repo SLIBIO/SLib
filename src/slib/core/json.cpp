@@ -833,6 +833,36 @@ namespace slib
 		return Variant::removeItem(key);
 	}
 	
+	void Json::merge(const Json& other)
+	{
+		if (other.isNull()) {
+			return;
+		}
+		if (isNull()) {
+			*this = other;
+			return;
+		}
+		Ref<Referable> obj(getObject());
+		{
+			if (CHashMap<String, Json>* p = CastInstance< CHashMap<String, Json> >(obj._ptr)) {
+				Ref<Referable> objOther(other.getObject());
+				if (CHashMap<String, Json>* pOther = CastInstance< CHashMap<String, Json> >(objOther._ptr)) {
+					p->putAll(*pOther);
+				}
+				return;
+			}
+		}
+		{
+			if (CList<Json>* p = CastInstance< CList<Json> >(obj._ptr)) {
+				Ref<Referable> objOther(other.getObject());
+				if (CList<Json>* pOther = CastInstance< CList<Json> >(objOther._ptr)) {
+					p->addAll(pOther);
+				}
+				return;
+			}
+		}
+	}
+	
 	Json Json::operator[](sl_size list_index) const
 	{
 		return (*(static_cast<const Variant*>(this)))[list_index];

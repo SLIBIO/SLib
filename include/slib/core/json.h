@@ -305,6 +305,8 @@ namespace slib
 		
 		sl_bool removeItem(const String& key);
 		
+		void merge(const Json& other);
+		
 	protected:
 		String toString() const;
 		
