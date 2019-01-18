@@ -802,30 +802,32 @@ namespace slib
 			heightText = 0;
 		}
 		
-		sl_bool flagFillIconWidth = sl_false;
-		if (widthFrame > 0 && m_iconSize.x <= 0) {
-			flagFillIconWidth = sl_true;
-			if (m_layoutOrientation == LayoutOrientation::Horizontal) {
-				widthIcon = widthFrame - widthText;
-			} else {
-				widthIcon = widthFrame;
+		if (m_iconDefault.isNotNull()) {
+			sl_bool flagFillIconWidth = sl_false;
+			if (widthFrame > 0 && m_iconSize.x <= 0) {
+				flagFillIconWidth = sl_true;
+				if (m_layoutOrientation == LayoutOrientation::Horizontal) {
+					widthIcon = widthFrame - widthText;
+				} else {
+					widthIcon = widthFrame;
+				}
+			}
+			sl_bool flagFillIconHeight = sl_false;
+			if (heightFrame > 0 && m_iconSize.y <= 0) {
+				flagFillIconHeight = sl_true;
+				if (m_layoutOrientation == LayoutOrientation::Horizontal) {
+					heightIcon = heightFrame;
+				} else {
+					heightIcon = heightFrame - heightText;
+				}
+			}
+			if (flagFillIconWidth && flagFillIconHeight) {
+				sl_ui_pos size = Math::min(widthIcon - m_iconMarginLeft - m_iconMarginRight, heightIcon - m_iconMarginTop - m_iconMarginBottom);
+				widthIcon = size + m_iconMarginLeft + m_iconMarginRight;
+				heightIcon = size + m_iconMarginTop + m_iconMarginBottom;
 			}
 		}
-		sl_bool flagFillIconHeight = sl_false;
-		if (heightFrame > 0 && m_iconSize.y <= 0) {
-			flagFillIconHeight = sl_true;
-			if (m_layoutOrientation == LayoutOrientation::Horizontal) {
-				heightIcon = heightFrame;
-			} else {
-				heightIcon = heightFrame - heightText;
-			}
-		}
-		if (flagFillIconWidth && flagFillIconHeight) {
-			sl_ui_pos size = Math::min(widthIcon - m_iconMarginLeft - m_iconMarginRight, heightIcon - m_iconMarginTop - m_iconMarginBottom);
-			widthIcon = size + m_iconMarginLeft + m_iconMarginRight;
-			heightIcon = size + m_iconMarginTop + m_iconMarginBottom;
-		}
-		
+
 		Alignment alignIcon = m_iconAlignment;
 		Alignment horzIcon = alignIcon & Alignment::HorizontalMask;
 		Alignment vertIcon = alignIcon & Alignment::VerticalMask;
