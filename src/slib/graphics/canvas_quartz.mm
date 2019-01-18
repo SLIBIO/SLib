@@ -539,12 +539,33 @@ namespace slib
 			if (ciImage != nil) {
 				if (param.useColorMatrix) {
 					CIFilter* filter = [CIFilter filterWithName:@"CIColorMatrix"];
+					[filter setDefaults];
 					[filter setValue:ciImage forKey:kCIInputImageKey];
 					[filter setValue:_getCIVector(param.colorMatrix.red) forKey:@"inputRVector"];
 					[filter setValue:_getCIVector(param.colorMatrix.green) forKey:@"inputGVector"];
 					[filter setValue:_getCIVector(param.colorMatrix.blue) forKey:@"inputBVector"];
 					[filter setValue:_getCIVector(param.colorMatrix.alpha) forKey:@"inputAVector"];
-					[filter setValue:_getCIVector(param.colorMatrix.bias) forKey:@"inputBiasVector"];
+					// Convert bias color space from DeviceRGB to GenericRGBLinear
+					CGColorSpaceRef colorSpaceDst = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGBLinear);
+					if (colorSpaceDst) {
+						CGColorSpaceRef colorSpaceSrc = CGColorSpaceCreateDeviceRGB();
+						if (colorSpaceSrc) {
+							Vector4f const& v = param.colorMatrix.bias;
+							CGFloat f[4] = {v.x, v.y, v.z, v.w};
+							CGColorRef colorSrc = CGColorCreate(colorSpaceSrc, f);
+							if (colorSrc) {
+								CGColorRef colorDst = CGColorCreateCopyByMatchingToColorSpace(colorSpaceDst, kCGRenderingIntentDefault, colorSrc, NULL);
+								if (colorDst) {
+									CGFloat const* c = CGColorGetComponents(colorDst);
+									[filter setValue:([CIVector vectorWithX:c[0] Y:c[1] Z:c[2] W:c[3]]) forKey:@"inputBiasVector"];
+									CGColorRelease(colorDst);
+								}
+								CGColorRelease(colorSrc);
+							}
+							CGColorSpaceRelease(colorSpaceSrc);
+						}
+						CGColorSpaceRelease(colorSpaceDst);
+					}
 					ciImage = [filter outputImage];
 				}
 				if (flagBlur) {
