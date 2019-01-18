@@ -114,15 +114,17 @@ namespace slib
 		m_flagTextBeforeIcon = sl_false;
 		m_layoutOrientation = LayoutOrientation::Horizontal;
 		
-		m_iconMarginLeft = 0;
-		m_iconMarginTop = 0;
-		m_iconMarginRight = 0;
-		m_iconMarginBottom = 0;
+		m_iconMarginLeft = 1;
+		m_iconMarginTop = 1;
+		m_iconMarginRight = 1;
+		m_iconMarginBottom = 1;
 		
-		m_textMarginLeft = 2;
-		m_textMarginTop = 2;
-		m_textMarginRight = 2;
-		m_textMarginBottom = 2;
+		m_textMarginLeft = 1;
+		m_textMarginTop = 1;
+		m_textMarginRight = 1;
+		m_textMarginBottom = 1;
+		
+		setPadding(1, 1, 1, 1, UIUpdateMode::Init);
 		
 		m_flagUseDefaultColorFilter = sl_true;
 
@@ -798,6 +800,30 @@ namespace slib
 		sl_ui_pos heightText = sizeText.y + m_textMarginTop + m_textMarginBottom;
 		if (heightText < 0) {
 			heightText = 0;
+		}
+		
+		sl_bool flagFillIconWidth = sl_false;
+		if (widthFrame > 0 && m_iconSize.x <= 0) {
+			flagFillIconWidth = sl_true;
+			if (m_layoutOrientation == LayoutOrientation::Horizontal) {
+				widthIcon = widthFrame - widthText;
+			} else {
+				widthIcon = widthFrame;
+			}
+		}
+		sl_bool flagFillIconHeight = sl_false;
+		if (heightFrame > 0 && m_iconSize.y <= 0) {
+			flagFillIconHeight = sl_true;
+			if (m_layoutOrientation == LayoutOrientation::Horizontal) {
+				heightIcon = heightFrame;
+			} else {
+				heightIcon = heightFrame - heightText;
+			}
+		}
+		if (flagFillIconWidth && flagFillIconHeight) {
+			sl_ui_pos size = Math::min(widthIcon - m_iconMarginLeft - m_iconMarginRight, heightIcon - m_iconMarginTop - m_iconMarginBottom);
+			widthIcon = size + m_iconMarginLeft + m_iconMarginRight;
+			heightIcon = size + m_iconMarginTop + m_iconMarginBottom;
 		}
 		
 		Alignment alignIcon = m_iconAlignment;
