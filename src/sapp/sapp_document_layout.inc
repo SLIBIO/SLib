@@ -1551,7 +1551,7 @@ namespace slib
 					}
 				}
 				if (!flagParentLinear && !(attr->top.flagDefined)) {
-					if (attr->topMode == PositionMode::Free && attr->topMode == PositionMode::Free) {
+					if (attr->topMode == PositionMode::Free && attr->bottomMode == PositionMode::Free) {
 						attr->topMode = PositionMode::ParentEdge;
 					}
 				}
