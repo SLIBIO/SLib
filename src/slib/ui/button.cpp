@@ -645,22 +645,23 @@ namespace slib
 	{
 		ButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
 		Color textColor = params.textColor;
-		Ref<Drawable> icon = params.icon;
-		if (textColor.isZero() || icon.isNull()) {
-			const ColorMatrix* cm = getCurrentColorFilter();
+		{
+			const ColorMatrix* cm = getCurrentColorFilter(textColor.isZero() && m_flagUseDefaultColorFilter);
 			if (textColor.isZero()) {
 				textColor = m_textColorDefault;
-				if (cm) {
-					textColor = cm->transformColor(textColor);
-				}
 			}
+			if (cm) {
+				textColor = cm->transformColor(textColor);
+			}
+		}
+		Ref<Drawable> icon = params.icon;
+		{
+			const ColorMatrix* cm = getCurrentColorFilter(icon.isNull() && m_flagUseDefaultColorFilter);
 			if (icon.isNull()) {
 				icon = m_iconDefault;
-				if (icon.isNotNull()) {
-					if (cm) {
-						icon = icon->filter(*cm);
-					}
-				}
+			}
+			if (icon.isNotNull() && cm) {
+				icon = icon->filter(*cm);
 			}
 		}
 		drawButtonContent(canvas, icon, m_text, textColor);
@@ -670,6 +671,7 @@ namespace slib
 	{
 		ButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
 		Ref<Drawable> background = params.background;
+		sl_bool flagUseDefaultColorFilter = m_flagUseDefaultColorFilter;
 		if (background.isNull()) {
 			Ref<DrawAttributes>& attrs = m_drawAttrs;
 			if (attrs.isNotNull()) {
@@ -685,18 +687,20 @@ namespace slib
 				}
 				if (background.isNull()) {
 					background = attrs->background;
+				} else {
+					flagUseDefaultColorFilter = sl_false;
 				}
 			}
+		} else {
+			flagUseDefaultColorFilter = sl_false;
 		}
-		
 		if (background.isNotNull()) {
-			const ColorMatrix* cm = getCurrentColorFilter();
+			const ColorMatrix* cm = getCurrentColorFilter(flagUseDefaultColorFilter);
 			if (cm) {
 				background = background->filter(*cm);
 			}
 			drawBackground(canvas, background);
 		}
-
 	}
 
 	void Button::onDrawBorder(Canvas* canvas)
@@ -958,13 +962,13 @@ namespace slib
 		}
 	}
 	
-	const ColorMatrix* Button::getCurrentColorFilter()
+	const ColorMatrix* Button::getCurrentColorFilter(sl_bool flagUseDefaultFilter)
 	{
 		ButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
 		if (params.flagFilter) {
 			return &(params.filter);
 		}
-		if (m_flagUseDefaultColorFilter) {
+		if (flagUseDefaultFilter) {
 			switch (m_state) {
 				case ButtonState::Hover:
 					return &_g_button_colorMatrix_hover;

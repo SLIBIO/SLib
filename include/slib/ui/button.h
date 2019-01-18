@@ -252,7 +252,7 @@ namespace slib
 		
 		virtual void drawButtonContent(Canvas* canvas, const Ref<Drawable>& icon, const String& text, const Color& textColor);
 		
-		const ColorMatrix* getCurrentColorFilter();
+		const ColorMatrix* getCurrentColorFilter(sl_bool flagUseDefaultFilter);
 		
 	private:
 		void _invalidateButtonState();
