@@ -1391,9 +1391,13 @@ namespace slib
 				if (oldVisibility == Visibility::Gone) {
 					invalidateParentLayout(mode);
 				} else {
+#if defined(SLIB_PLATFORM_IS_WIN32)
+					invalidateBoundsInParent(mode);
+#else
 					if (instance.isNull()) {
 						invalidateBoundsInParent(mode);
 					}
+#endif
 				}
 				break;
 			case Visibility::Gone:
