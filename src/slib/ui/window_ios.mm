@@ -746,20 +746,23 @@ namespace slib
 {
 	[super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 	
-	slib::_priv_slib_ui_reset_orienation();
-
-	UIWindow* window = self.view.window;
-	if (window == nil) {
-		return;
-	}
-	slib::Ref<slib::iOS_Window> w = m_window;
-	if (w.isNotNull()) {
-		CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
-		CGRect r = window.frame;
-		r.size = size;
-		window.frame = r;
-		w->onResize((sl_ui_pos)(size.width * f), (sl_ui_pos)(size.height * f));
-	}
+	dispatch_async(dispatch_get_main_queue(), ^{
+		
+		slib::_priv_slib_ui_reset_orienation();
+		
+		UIWindow* window = self.view.window;
+		if (window == nil) {
+			return;
+		}
+		slib::Ref<slib::iOS_Window> w = self->m_window;
+		if (w.isNotNull()) {
+			CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
+			CGRect r = window.frame;
+			r.size = size;
+			window.frame = r;
+			w->onResize((sl_ui_pos)(size.width * f), (sl_ui_pos)(size.height * f));
+		}
+	});
 }
 
 -(UIView*)findFirstResponderText

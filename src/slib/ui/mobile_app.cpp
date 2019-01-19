@@ -408,6 +408,7 @@ namespace slib
 	void MobileApp::dispatchResize(sl_ui_len width, sl_ui_len height)
 	{
 		UIResource::updateDefaultScreenSize();
+		
 		if (m_pager->getPagesCount() == 0) {
 			Ref<View> page = getLoadingPage();
 			if (page.isNotNull()) {
