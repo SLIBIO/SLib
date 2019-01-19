@@ -466,7 +466,7 @@ public class UiView {
 	
 	private static native boolean nativeOnKeyEvent(long instance, boolean flagDown, int vkey
 			, boolean flagControl, boolean flagShift, boolean flagAlt, boolean flagWin, long time);
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+
 	public static boolean onEventKey(IView view, boolean flagDown, int keycode, KeyEvent event) {
 		long instance = view.getInstance();
 		if (instance != 0) {

@@ -426,6 +426,7 @@ namespace slib
 			Ref<UIEvent> event = UIEvent::createMouseEvent(m_actionDrag, gevent->x, gevent->y, time);
 			if (event.isNotNull()) {
 				applyModifiers(event.get(), gevent->state);
+				event->addFlag(UIEventFlags::DispatchToParentInstance);
 				onMouseEvent(event.get());
 				if (event->isPreventedDefault()) {
 					return sl_true;
@@ -487,6 +488,7 @@ namespace slib
 			Ref<UIEvent> event = UIEvent::createMouseEvent(action, x, y, time);
 			if (event.isNotNull()) {
 				applyModifiers(event.get(), gevent->state);
+				event->addFlag(UIEventFlags::DispatchToParentInstance);
 				onMouseEvent(event.get());
 				if (event->isPreventedDefault()) {
 					return sl_true;
@@ -520,6 +522,7 @@ namespace slib
 			Ref<UIEvent> event = UIEvent::createMouseEvent(action, x, y, time);
 			if (event.isNotNull()) {
 				applyModifiers(event.get(), gevent->state);
+				event->addFlag(UIEventFlags::DispatchToParentInstance);
 				onMouseEvent(event.get());
 				if (event->isPreventedDefault()) {
 					return sl_true;
@@ -545,6 +548,7 @@ namespace slib
 			Ref<UIEvent> event = UIEvent::createKeyEvent(action, key, gevent->keyval, time);
 			if (event.isNotNull()) {
 				applyModifiers(event.get(), gevent->state);
+				event->addFlag(UIEventFlags::DispatchToParentInstance);
 				ViewInstance::onKeyEvent(event.get());
 				if (event->isPreventedDefault()) {
 					return sl_true;

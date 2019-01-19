@@ -87,15 +87,15 @@ namespace slib
 	public:
 		void onDraw(NSRect rectDirty);
 		
-		sl_bool onEventKey(sl_bool flagDown, NSEvent* event);
+		UIEventFlags onEventKey(sl_bool flagDown, NSEvent* event);
 		
-		sl_bool onEventMouse(UIAction action, NSEvent* event);
+		UIEventFlags onEventMouse(UIAction action, NSEvent* event);
 		
-		sl_bool onEventMouse(UIAction action, const NSPoint& point);
+		UIEventFlags onEventMouse(UIAction action, const NSPoint& point);
 
-		sl_bool onEventMouseWheel(NSEvent* event);
+		UIEventFlags onEventMouseWheel(NSEvent* event);
 		
-		sl_bool onEventUpdateCursor(NSEvent* event);
+		UIEventFlags onEventUpdateCursor(NSEvent* event);
 		
 		void applyModifiers(UIEvent* ev, NSEvent* event);
 		

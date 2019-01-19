@@ -308,8 +308,14 @@ namespace slib
 		
 		sl_bool isCommandKey() const;
 		
-		// event management
-		void resetStates();
+		// flags
+		UIEventFlags getFlags() const;
+		
+		void resetFlags();
+		
+		void addFlag(UIEventFlags flags);
+		
+		void removeFlag(UIEventFlags flags);
 		
 		void preventDefault();
 		
@@ -329,10 +335,6 @@ namespace slib
 		
 		void setPassedToNext(sl_bool flag);
 		
-		sl_bool isFromChildInstance();
-		
-		void setFromChildInstance(sl_bool flag);
-		
 		Ref<UIEvent> duplicate();
 		
 		static sl_uint32 getSystemKeycode(Keycode key);
@@ -344,7 +346,7 @@ namespace slib
 		static Keycode getKeycodeFromName(const String& keyName);
 		
 	protected:
-		sl_uint32 m_flags;
+		UIEventFlags m_flags;
 		UIAction m_action;
 		Time m_time;
 		

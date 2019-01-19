@@ -537,85 +537,80 @@ sl_bool UIEvent::is##NAME##Key() const \
 		}
 	}
 
+	UIEventFlags UIEvent::getFlags() const
+	{
+		return m_flags;
+	}
 	
-#define FLAG_PREVENT_DEFAULT		0x1
-#define FLAG_STOP_PROPAGATION		0x2
-#define FLAG_PASS_TO_NEXT			0x4
-#define FLAG_FROM_CHILD_INSTANCE	0x8
-	
-	void UIEvent::resetStates()
+	void UIEvent::resetFlags()
 	{
 		m_flags = 0;
 	}
 	
+	void UIEvent::addFlag(UIEventFlags flags)
+	{
+		SLIB_SET_FLAG(m_flags, flags);
+	}
+	
+	void UIEvent::removeFlag(UIEventFlags flags)
+	{
+		SLIB_RESET_FLAG(m_flags, flags);
+	}
+	
 	void UIEvent::preventDefault()
 	{
-		SLIB_SET_FLAG(m_flags, FLAG_PREVENT_DEFAULT);
+		SLIB_SET_FLAG(m_flags, UIEventFlags::PreventDefault);
 	}
 
 	sl_bool UIEvent::isPreventedDefault() const
 	{
-		return SLIB_CHECK_FLAG(m_flags, FLAG_PREVENT_DEFAULT);
+		return SLIB_CHECK_FLAG(m_flags, UIEventFlags::PreventDefault);
 	}
 
 	void UIEvent::setPreventedDefault(sl_bool flag)
 	{
 		if (flag) {
-			SLIB_SET_FLAG(m_flags, FLAG_PREVENT_DEFAULT);
+			SLIB_SET_FLAG(m_flags, UIEventFlags::PreventDefault);
 		} else {
-			SLIB_RESET_FLAG(m_flags, FLAG_PREVENT_DEFAULT);
+			SLIB_RESET_FLAG(m_flags, UIEventFlags::PreventDefault);
 		}
 	}
 
 	void UIEvent::stopPropagation()
 	{
-		SLIB_SET_FLAG(m_flags, FLAG_STOP_PROPAGATION);
+		SLIB_SET_FLAG(m_flags, UIEventFlags::StopPropagation);
 	}
 
 	sl_bool UIEvent::isStoppedPropagation() const
 	{
-		return SLIB_CHECK_FLAG(m_flags, FLAG_STOP_PROPAGATION);
+		return SLIB_CHECK_FLAG(m_flags, UIEventFlags::StopPropagation);
 	}
 
 	void UIEvent::setStoppedPropagation(sl_bool flag)
 	{
 		if (flag) {
-			SLIB_SET_FLAG(m_flags, FLAG_STOP_PROPAGATION);
+			SLIB_SET_FLAG(m_flags, UIEventFlags::StopPropagation);
 		} else {
-			SLIB_RESET_FLAG(m_flags, FLAG_STOP_PROPAGATION);
+			SLIB_RESET_FLAG(m_flags, UIEventFlags::StopPropagation);
 		}
 	}
 
 	void UIEvent::passToNext()
 	{
-		SLIB_SET_FLAG(m_flags, FLAG_PASS_TO_NEXT);
+		SLIB_SET_FLAG(m_flags, UIEventFlags::PassToNext);
 	}
 
 	sl_bool UIEvent::isPassedToNext()
 	{
-		return SLIB_CHECK_FLAG(m_flags, FLAG_PASS_TO_NEXT);
+		return SLIB_CHECK_FLAG(m_flags, UIEventFlags::PassToNext);
 	}
 
 	void UIEvent::setPassedToNext(sl_bool flag)
 	{
 		if (flag) {
-			SLIB_SET_FLAG(m_flags, FLAG_PASS_TO_NEXT);
+			SLIB_SET_FLAG(m_flags, UIEventFlags::PassToNext);
 		} else {
-			SLIB_RESET_FLAG(m_flags, FLAG_PASS_TO_NEXT);
-		}
-	}
-
-	sl_bool UIEvent::isFromChildInstance()
-	{
-		return SLIB_CHECK_FLAG(m_flags, FLAG_FROM_CHILD_INSTANCE);
-	}
-	
-	void UIEvent::setFromChildInstance(sl_bool flag)
-	{
-		if (flag) {
-			SLIB_SET_FLAG(m_flags, FLAG_FROM_CHILD_INSTANCE);
-		} else {
-			SLIB_RESET_FLAG(m_flags, FLAG_FROM_CHILD_INSTANCE);
+			SLIB_RESET_FLAG(m_flags, UIEventFlags::PassToNext);
 		}
 	}
 	

@@ -55,7 +55,7 @@ public class UiGroupView extends AbsoluteLayout implements IView {
 	@Override
 	public boolean onKeyDown(int keycode, KeyEvent event) {
 		if (!(UiView.onEventKey(this, true, keycode, event))) {
-			super.onKeyDown(keycode, event);
+			return super.onKeyDown(keycode, event);
 		}
 		return true;
 	}
@@ -63,7 +63,7 @@ public class UiGroupView extends AbsoluteLayout implements IView {
 	@Override
 	public boolean onKeyUp(int keycode, KeyEvent event) {
 		if (!(UiView.onEventKey(this, false, keycode, event))) {
-			super.onKeyUp(keycode, event);
+			return super.onKeyUp(keycode, event);
 		}
 		return true;
 	}

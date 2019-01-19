@@ -7198,7 +7198,7 @@ namespace slib
 		UIAction action = ev->getAction();
 
 		// pass event to children
-		if (!(ev->isFromChildInstance())) {
+		if (!(ev->getFlags() & UIEventFlags::FromChildInstance)) {
 			Ref<View> oldChildMouseMove;
 			if (action == UIAction::MouseMove || action == UIAction::MouseEnter) {
 				oldChildMouseMove = m_childMouseMove;
@@ -7245,7 +7245,7 @@ namespace slib
 			}
 		}
 		
-		ev->resetStates();
+		ev->resetFlags();
 		
 		_priv_View_DuringEventScope scope(this, ev);
 		
@@ -7380,7 +7380,7 @@ namespace slib
 	void View::dispatchMouseEventToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints)
 	{
 		if (child) {
-			ev->resetStates();
+			ev->resetFlags();
 			if (flagTransformPoints) {
 				UIPointf ptMouse = ev->getPoint();
 				ev->setPoint(child->convertCoordinateFromParent(ptMouse));
@@ -7406,7 +7406,7 @@ namespace slib
 		UIAction action = ev->getAction();
 		
 		// pass event to children
-		if (!(ev->isFromChildInstance())) {
+		if (!(ev->getFlags() & UIEventFlags::FromChildInstance)) {
 			Ref<View> scrollBars[2];
 			_getScrollBars(scrollBars);
 			if (!(dispatchTouchEventToChildren(ev, scrollBars, 2))) {
@@ -7438,7 +7438,7 @@ namespace slib
 			}
 		}
 		
-		ev->resetStates();
+		ev->resetFlags();
 		
 		_priv_View_DuringEventScope scope(this, ev);
 
@@ -7659,7 +7659,7 @@ namespace slib
 	{
 		if (child) {
 			
-			ev->resetStates();
+			ev->resetFlags();
 			
 			if (flagTranformPoints) {
 				
@@ -7713,7 +7713,7 @@ namespace slib
 		}
 		
 		// pass event to children
-		if (!(ev->isFromChildInstance())) {
+		{
 			Ref<View> scrollBars[2];
 			_getScrollBars(scrollBars);
 			if (!(dispatchMouseWheelEventToChildren(ev, scrollBars, 2))) {
@@ -7730,7 +7730,7 @@ namespace slib
 			return;
 		}
 		
-		ev->resetStates();
+		ev->resetFlags();
 		
 		_priv_View_DuringEventScope scope(this, ev);
 
@@ -7773,7 +7773,7 @@ namespace slib
 	void View::dispatchMouseWheelEventToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints)
 	{
 		if (child) {
-			ev->resetStates();
+			ev->resetFlags();
 			if (flagTransformPoints) {
 				UIPointf ptMouse = ev->getPoint();
 				ev->setPoint(child->convertCoordinateFromParent(ptMouse));
@@ -7796,7 +7796,7 @@ namespace slib
 			return;
 		}
 		
-		if (!(ev->isFromChildInstance())) {
+		if (!(ev->getFlags() & UIEventFlags::FromChildInstance)) {
 			Ref<View> viewFocusedChild = m_childFocused;
 			if (viewFocusedChild.isNotNull() && !(viewFocusedChild->isInstance())) {
 				viewFocusedChild->dispatchKeyEvent(ev);
@@ -7807,7 +7807,7 @@ namespace slib
 			return;
 		}
 		
-		ev->resetStates();
+		ev->resetFlags();
 		
 		_priv_View_DuringEventScope scope(this, ev);
 
@@ -7900,7 +7900,7 @@ namespace slib
 		}
 		
 		// pass event to children
-		if (!(ev->isFromChildInstance())) {
+		{
 			Ref<View> scrollBars[2];
 			_getScrollBars(scrollBars);
 			if (!(dispatchSetCursorToChildren(ev, scrollBars, 2))) {
@@ -7920,7 +7920,7 @@ namespace slib
 			return;
 		}
 		
-		ev->resetStates();
+		ev->resetFlags();
 		
 		SLIB_INVOKE_EVENT_HANDLER(SetCursor, ev)
 		
@@ -7963,7 +7963,7 @@ namespace slib
 	void View::dispatchSetCursorToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints)
 	{
 		if (child) {
-			ev->resetStates();
+			ev->resetFlags();
 			if (flagTransformPoints) {
 				UIPointf ptMouse = ev->getPoint();
 				ev->setPoint(child->convertCoordinateFromParent(ptMouse));
@@ -8489,7 +8489,7 @@ namespace slib
 /**********************
 	ViewInstance
 **********************/
-
+	
 	SLIB_DEFINE_OBJECT(ViewInstance, Object)
 
 	ViewInstance::ViewInstance()
@@ -8566,12 +8566,18 @@ namespace slib
 	{
 		Ref<View> view = getView();
 		if (view.isNotNull()) {
-			view->dispatchKeyEvent(ev);
-			view = view->getParent();
-			while (view.isNotNull()) {
-				ev->setFromChildInstance(sl_true);
+			if (ev->getFlags() & UIEventFlags::DispatchToParentInstance) {
 				view->dispatchKeyEvent(ev);
 				view = view->getParent();
+				while (view.isNotNull()) {
+					if (!(view->isNativeWidget())) {
+						ev->addFlag(UIEventFlags::FromChildInstance);
+						view->dispatchKeyEvent(ev);
+					}
+					view = view->getParent();
+				}
+			} else {
+				view->dispatchKeyEvent(ev);
 			}
 		}
 	}
@@ -8580,17 +8586,23 @@ namespace slib
 	{
 		Ref<View> view = getView();
 		if (view.isNotNull()) {
-			view->dispatchMouseEvent(ev);
-			UIPoint pt = ev->getPoint();
-			Ref<View> child = view;
-			view = view->getParent();
-			while (view.isNotNull()) {
-				pt = child->convertCoordinateToParent(pt);
-				ev->setPoint(pt);
-				ev->setFromChildInstance(sl_true);
+			if (ev->getFlags() & UIEventFlags::DispatchToParentInstance) {
 				view->dispatchMouseEvent(ev);
-				child = view;
+				UIPoint pt = ev->getPoint();
+				Ref<View> child = view;
 				view = view->getParent();
+				while (view.isNotNull()) {
+					pt = child->convertCoordinateToParent(pt);
+					if (!(view->isNativeWidget())) {
+						ev->setPoint(pt);
+						ev->addFlag(UIEventFlags::FromChildInstance);
+						view->dispatchMouseEvent(ev);
+					}
+					child = view;
+					view = view->getParent();
+				}
+			} else {
+				view->dispatchMouseEvent(ev);
 			}
 		}
 	}
@@ -8600,42 +8612,49 @@ namespace slib
 		Ref<View> view = getView();
 		
 		if (view.isNotNull()) {
+		
+			if (ev->getFlags() & UIEventFlags::DispatchToParentInstance) {
 			
-			view->dispatchTouchEvent(ev);
-			
-			UIPoint pt = ev->getPoint();
-			Array<TouchPoint> arrPts = ev->getTouchPoints();
-			sl_size nPts = arrPts.getCount();
-			TouchPoint* pts;
+				view->dispatchTouchEvent(ev);
+				
+				UIPoint pt = ev->getPoint();
+				Array<TouchPoint> arrPts = ev->getTouchPoints();
+				sl_size nPts = arrPts.getCount();
+				TouchPoint* pts;
 
-			Ref<View> child = view;
-			view = view->getParent();
-			
-			if (view.isNotNull()) {
-				if (nPts > 0) {
-					arrPts = arrPts.duplicate();
-					if (arrPts.isNull()) {
+				Ref<View> child = view;
+				view = view->getParent();
+				
+				if (view.isNotNull()) {
+					if (nPts > 0) {
+						arrPts = arrPts.duplicate();
+						if (arrPts.isNull()) {
+							return;
+						}
+					}
+					pts = arrPts.getData();
+				} else {
+					return;
+				}
+				for (;;) {
+					pt = child->convertCoordinateToParent(pt);
+					for (sl_size i = 0; i < nPts; i++) {
+						pts[i].point = child->convertCoordinateToParent(pts[i].point);
+					}
+					if (!(view->isNativeWidget())) {
+						ev->setPoint(pt);
+						ev->setTouchPoints(arrPts);
+						ev->addFlag(UIEventFlags::FromChildInstance);
+						view->dispatchTouchEvent(ev);
+					}
+					child = view;
+					view = view->getParent();
+					if (view.isNull()) {
 						return;
 					}
 				}
-				pts = arrPts.getData();
-				ev->setTouchPoints(arrPts);
 			} else {
-				return;
-			}
-			for (;;) {
-				pt = child->convertCoordinateToParent(pt);
-				ev->setPoint(pt);
-				for (sl_size i = 0; i < nPts; i++) {
-					pts[i].point = child->convertCoordinateToParent(pts[i].point);
-				}
-				ev->setFromChildInstance(sl_true);
 				view->dispatchTouchEvent(ev);
-				child = view;
-				view = view->getParent();
-				if (view.isNull()) {
-					return;
-				}
 			}
 		}
 	}
@@ -8645,12 +8664,6 @@ namespace slib
 		Ref<View> view = getView();
 		if (view.isNotNull()) {
 			view->dispatchMouseWheelEvent(ev);
-			view = view->getParent();
-			while (view.isNotNull()) {
-				ev->setFromChildInstance(sl_true);
-				view->dispatchMouseWheelEvent(ev);
-				view = view->getParent();
-			}
 		}
 	}
 
@@ -8659,12 +8672,6 @@ namespace slib
 		Ref<View> view = getView();
 		if (view.isNotNull()) {
 			view->dispatchSetCursor(ev);
-			view = view->getParent();
-			while (view.isNotNull()) {
-				ev->setFromChildInstance(sl_true);
-				view->dispatchSetCursor(ev);
-				view = view->getParent();
-			}
 		}
 	}
 

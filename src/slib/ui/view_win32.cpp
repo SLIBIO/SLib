@@ -317,11 +317,12 @@ namespace slib
 			Keycode key = UIEvent::getKeycodeFromSystemKeycode(vkey);
 			Time t;
 			t.setMillisecondsCount(::GetMessageTime());
-			Ref<UIEvent> ke = UIEvent::createKeyEvent(action, key, vkey, t);
-			if (ke.isNotNull()) {
-				applyModifiers(ke.get());
-				onKeyEvent(ke.get());
-				if (ke->isPreventedDefault()) {
+			Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey, t);
+			if (ev.isNotNull()) {
+				applyModifiers(ev.get());
+				ev->addFlag(UIEventFlags::DispatchToParentInstance);
+				onKeyEvent(ev.get());
+				if (ev->isPreventedDefault()) {
 					return sl_true;
 				}
 			}
@@ -341,11 +342,12 @@ namespace slib
 
 			Time t;
 			t.setMillisecondsCount(::GetMessageTime());
-			Ref<UIEvent> me = UIEvent::createMouseEvent(action, x, y, t);
-			if (me.isNotNull()) {
-				applyModifiers(me.get());
-				onMouseEvent(me.get());
-				if (me->isPreventedDefault()) {
+			Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y, t);
+			if (ev.isNotNull()) {
+				applyModifiers(ev.get());
+				ev->addFlag(UIEventFlags::DispatchToParentInstance);
+				onMouseEvent(ev.get());
+				if (ev->isPreventedDefault()) {
 					return sl_true;
 				}
 			}
@@ -373,11 +375,11 @@ namespace slib
 			::ScreenToClient(hWnd, &pt);
 			Time t;
 			t.setMillisecondsCount(::GetMessageTime());
-			Ref<UIEvent> me = UIEvent::createMouseWheelEvent((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y), deltaX, deltaY, t);
-			if (me.isNotNull()) {
-				applyModifiers(me.get());
-				onMouseWheelEvent(me.get());
-				if (me->isPreventedDefault()) {
+			Ref<UIEvent> ev = UIEvent::createMouseWheelEvent((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y), deltaX, deltaY, t);
+			if (ev.isNotNull()) {
+				applyModifiers(ev.get());
+				onMouseWheelEvent(ev.get());
+				if (ev->isPreventedDefault()) {
 					return sl_true;
 				}
 			}

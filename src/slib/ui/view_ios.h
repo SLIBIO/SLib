@@ -87,7 +87,7 @@ namespace slib
 	public:
 		void onDraw(CGRect rectDirty);
 		
-		void onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event);
+		UIEventFlags onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event);
 		
 	private:
 		void _release();
@@ -144,29 +144,45 @@ namespace slib
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		instance->onEventTouch(slib::UIAction::TouchBegin, touches, theEvent); \
+		slib::UIEventFlags flags = instance->onEventTouch(slib::UIAction::TouchBegin, touches, theEvent); \
+		if (flags & slib::UIEventFlags::StopPropagation) { \
+			return; \
+		} \
 	} \
+	[super touchesBegan:touches withEvent:theEvent]; \
 } \
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)theEvent \
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		instance->onEventTouch(slib::UIAction::TouchMove, touches, theEvent); \
+		slib::UIEventFlags flags = instance->onEventTouch(slib::UIAction::TouchMove, touches, theEvent); \
+		if (flags & slib::UIEventFlags::StopPropagation) { \
+			return; \
+		} \
 	} \
+	[super touchesMoved:touches withEvent:theEvent]; \
 } \
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)theEvent \
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		instance->onEventTouch(slib::UIAction::TouchEnd, touches, theEvent); \
+		slib::UIEventFlags flags = instance->onEventTouch(slib::UIAction::TouchEnd, touches, theEvent); \
+		if (flags & slib::UIEventFlags::StopPropagation) { \
+			return; \
+		} \
 	} \
+	[super touchesEnded:touches withEvent:theEvent]; \
 } \
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)theEvent \
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		instance->onEventTouch(slib::UIAction::TouchCancel, touches, theEvent); \
+		slib::UIEventFlags flags = instance->onEventTouch(slib::UIAction::TouchCancel, touches, theEvent); \
+		if (flags & slib::UIEventFlags::StopPropagation) { \
+			return; \
+		} \
 	} \
+	[super touchesCancelled:touches withEvent:theEvent]; \
 } \
 - (void)onSwipeLeft \
 { \

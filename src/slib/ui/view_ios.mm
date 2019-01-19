@@ -434,7 +434,7 @@ namespace slib
 		}
 	}
 	
-	void iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event)
+	UIEventFlags iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event)
 	{
 		UIView* handle = m_handle;
 		
@@ -483,6 +483,7 @@ namespace slib
 					if (ev.isNotNull()) {
 						onTouchEvent(ev.get());
 						[handle.window endEditing:NO];
+						return ev->getFlags();
 					}
 
 				}
@@ -490,6 +491,8 @@ namespace slib
 			}
 			
 		}
+		
+		return 0;
 		
 	}
 	

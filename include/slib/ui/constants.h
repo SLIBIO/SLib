@@ -63,6 +63,22 @@ namespace slib
 		SetCursor = 0x0401
 	};
 	
+	class UIEventFlags
+	{
+	public:
+		int value;
+		SLIB_MEMBERS_OF_FLAGS(UIEventFlags, value)
+		
+	public:
+		enum {
+			PreventDefault = 0x0001,
+			StopPropagation = 0x0002,
+			PassToNext = 0x0004,
+			DispatchToParentInstance = 0x1000,
+			FromChildInstance = 0x2000
+		};
+	};
+	
 	enum class TouchPhase
 	{
 		Move = 0,

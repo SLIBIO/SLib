@@ -83,6 +83,7 @@ namespace slib
 				if (flagWin) {
 					ev->setWindowsKey();
 				}
+				ev->addFlag(UIEventFlags::DispatchToParentInstance);
 				instance->onKeyEvent(ev.get());
 				if (ev->isPreventedDefault()) {
 					return 1;
@@ -115,6 +116,7 @@ namespace slib
 					t.setMillisecondsCount(time);
 					Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, t);
 					if (ev.isNotNull()) {
+						ev->addFlag(UIEventFlags::DispatchToParentInstance);
 						instance->onTouchEvent(ev.get());
 						if (ev->isPreventedDefault()) {
 							return 1;
