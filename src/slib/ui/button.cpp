@@ -782,27 +782,31 @@ namespace slib
 
 	void Button::layoutIconAndText(sl_ui_len widthFrame, sl_ui_len heightFrame, UISize& sizeContent, UIRect& frameIcon, UIRect& frameText)
 	{
-		sl_ui_pos widthIcon = m_iconSize.x + m_iconMarginLeft + m_iconMarginRight;
-		if (widthIcon < 0) {
-			widthIcon = 0;
+		sl_ui_pos widthText = 0;
+		sl_ui_pos heightText = 0;
+		sl_ui_pos widthIcon = 0;
+		sl_ui_pos heightIcon = 0;
+		String text = m_text;
+		if (text.isNotEmpty()) {
+			UISize sizeText = measureText(text, getFont(), m_flagMultiLine);
+			widthText = sizeText.x + m_textMarginLeft + m_textMarginRight;
+			if (widthText < 0) {
+				widthText = 0;
+			}
+			heightText = sizeText.y + m_textMarginTop + m_textMarginBottom;
+			if (heightText < 0) {
+				heightText = 0;
+			}
 		}
-		sl_ui_pos heightIcon = m_iconSize.y + m_iconMarginTop + m_iconMarginBottom;
-		if (heightIcon < 0) {
-			heightIcon = 0;
-		}
-		
-		UISize sizeText = measureText(m_text, getFont(), m_flagMultiLine);
-
-		sl_ui_pos widthText = sizeText.x + m_textMarginLeft + m_textMarginRight;
-		if (widthText < 0) {
-			widthText = 0;
-		}
-		sl_ui_pos heightText = sizeText.y + m_textMarginTop + m_textMarginBottom;
-		if (heightText < 0) {
-			heightText = 0;
-		}
-		
 		if (m_iconDefault.isNotNull()) {
+			widthIcon = m_iconSize.x + m_iconMarginLeft + m_iconMarginRight;
+			if (widthIcon < 0) {
+				widthIcon = 0;
+			}
+			heightIcon = m_iconSize.y + m_iconMarginTop + m_iconMarginBottom;
+			if (heightIcon < 0) {
+				heightIcon = 0;
+			}
 			sl_bool flagFillIconWidth = sl_false;
 			if (widthFrame > 0 && m_iconSize.x <= 0) {
 				flagFillIconWidth = sl_true;
