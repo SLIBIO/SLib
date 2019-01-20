@@ -91,6 +91,11 @@ namespace slib
 		m_list = list;
 	}
 	
+	void ViewListAdapter::addView(const Ref<View>& view)
+	{
+		m_list.add(view);
+	}
+	
 	sl_uint64 ViewListAdapter::getItemsCount()
 	{
 		return m_list.getCount();

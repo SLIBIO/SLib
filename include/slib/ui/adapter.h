@@ -152,6 +152,8 @@ namespace slib
 		
 		void setList(const List< Ref<View> >& list);
 		
+		void addView(const Ref<View>& view);
+		
 	public:
 		sl_uint64 getItemsCount() override;
 		
