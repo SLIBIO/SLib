@@ -26,50 +26,10 @@
 #include "definition.h"
 
 #include "scroll_view.h"
-
-#include "../core/ptr.h"
+#include "adapter.h"
 
 namespace slib
 {
-	class ListView;
-	
-	class SLIB_EXPORT IListViewAdapter
-	{
-	public:
-		IListViewAdapter();
-
-		virtual ~IListViewAdapter();
-
-	public:
-		virtual sl_uint64 getItemsCount(ListView* lv) = 0;
-		
-		virtual Ref<View> getView(ListView* lv, sl_uint64 index, View* original) = 0;
-		
-		virtual sl_ui_len getAverageItemHeight(ListView* lv);
-		
-	};
-	
-	template <class T>
-	class SLIB_EXPORT IListViewAdapterT : public IListViewAdapter
-	{
-	public:
-		virtual void onBindView(ListView* lv, sl_uint64 index, T* view) = 0;
-		
-	public:
-		Ref<View> getView(ListView* lv, sl_uint64 index, View* original) override
-		{
-			Ref<T> view;
-			if (original) {
-				view = (T*)original;
-			} else {
-				view = new T;
-			}
-			onBindView(lv, index, view.get());
-			return view;
-		}
-		
-	};
-	
 	
 	class _priv_ListContentView;
 	
@@ -83,7 +43,9 @@ namespace slib
 		~ListView();
 		
 	public:
-		void setAdapter(const Ptr<IListViewAdapter>& adapter);
+		Ref<ViewAdapter> getAdapter();
+		
+		void setAdapter(const Ref<ViewAdapter>& adapter);
 		
 		void refreshItems();
 		
@@ -106,7 +68,7 @@ namespace slib
 		sl_ui_len _measureItemHeight(const Ref<View>& itemView, sl_ui_len heightList);
 		
 	protected:
-		AtomicPtr<IListViewAdapter> m_adapter;
+		AtomicRef<ViewAdapter> m_adapter;
 		
 		Ref<_priv_ListContentView> m_contentView;
 		sl_bool m_flagResetAdapter;

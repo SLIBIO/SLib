@@ -53,20 +53,6 @@ namespace slib
 		
 	};
 	
-
-	IListViewAdapter::IListViewAdapter()
-	{
-	}
-
-	IListViewAdapter::~IListViewAdapter()
-	{
-	}
-
-	sl_ui_len IListViewAdapter::getAverageItemHeight(ListView* lv)
-	{
-		return 0;
-	}
-	
 	SLIB_DEFINE_OBJECT(ListView, VerticalScrollView)
 	
 	ListView::ListView()
@@ -114,7 +100,12 @@ namespace slib
 		Base::freeMemory(m_heightsVisibleItems);
 	}
 	
-	void ListView::setAdapter(const Ptr<IListViewAdapter>& adapter)
+	Ref<ViewAdapter> ListView::getAdapter()
+	{
+		return m_adapter;
+	}
+	
+	void ListView::setAdapter(const Ref<ViewAdapter>& adapter)
 	{
 		m_adapter = adapter;
 		m_flagResetAdapter = sl_true;
@@ -391,7 +382,7 @@ namespace slib
 			return;
 		}
 		
-		PtrLocker<IListViewAdapter> adapter(m_adapter);
+		Ref<ViewAdapter> adapter(m_adapter);
 		
 		if (adapter.isNotNull()) {
 			
@@ -441,7 +432,7 @@ namespace slib
 				
 				if (flagRefresh) {
 					
-					countTotalItems = adapter->getItemsCount(this);
+					countTotalItems = adapter->getItemsCount();
 					
 					flagClearAll = sl_true;
 					
@@ -600,7 +591,7 @@ namespace slib
 								countFreeViews--;
 							}
 						}
-						Ref<View> view = adapter->getView(this, indexGoUp - 1, viewFree.get());
+						Ref<View> view = adapter->getView(indexGoUp - 1, viewFree.get(), this);
 						sl_ui_len h = _measureItemHeight(view, heightListView);
 						viewsGoUpItems[countGoUpViews] = view;
 						heightsGoUpItems[countGoUpViews] = h;
@@ -627,7 +618,7 @@ namespace slib
 								countFreeViews--;
 							}
 						}
-						Ref<View> view = adapter->getView(this, indexGoDown, viewFree.get());
+						Ref<View> view = adapter->getView(indexGoDown, viewFree.get(), this);
 						sl_ui_len h = _measureItemHeight(view, heightListView);
 						viewsGoDownItems[countGoDownViews] = view;
 						heightsGoDownItems[countGoDownViews] = h;

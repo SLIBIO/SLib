@@ -316,6 +316,7 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/ui/text_view.cpp"
  "${SLIB_PATH}/src/slib/ui/transition.cpp"
  "${SLIB_PATH}/src/slib/ui/tree_view.cpp"
+ "${SLIB_PATH}/src/slib/ui/ui_adapter.cpp"
  "${SLIB_PATH}/src/slib/ui/ui_animation.cpp"
  "${SLIB_PATH}/src/slib/ui/ui_app.cpp"
  "${SLIB_PATH}/src/slib/ui/ui_core.cpp"

@@ -30,6 +30,7 @@
 #include "ui/screen.h"
 #include "ui/window.h"
 #include "ui/menu.h"
+#include "ui/adapter.h"
 #include "ui/common_dialogs.h"
 
 #include "ui/view.h"

@@ -866,5 +866,8 @@
     <ClCompile Include="..\..\src\slib\network\http_server.cpp">
       <Filter>src\network</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\ui_adapter.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

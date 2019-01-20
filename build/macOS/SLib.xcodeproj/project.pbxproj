@@ -921,6 +921,7 @@
 		26B92D4E21D34698003F6F82 /* ginger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D4D21D34698003F6F82 /* ginger.cpp */; };
 		26B92D6621D770F0003F6F82 /* device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D6521D770F0003F6F82 /* device.cpp */; };
 		26B92D7021D7C237003F6F82 /* device_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D6F21D7C237003F6F82 /* device_macos.mm */; };
+		26BB17D021F4BA690089C7EC /* ui_adapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17CF21F4BA680089C7EC /* ui_adapter.cpp */; };
 		26C1B62C20D4305100E36539 /* bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C1B62B20D4305000E36539 /* bitmap.cpp */; };
 		26C1B63520D4FF5200E36539 /* canvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4801C1193C400D47AB0 /* canvas.cpp */; };
 		26C1B63720D513D200E36539 /* canvas_ext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C1B63620D513D200E36539 /* canvas_ext.cpp */; };
@@ -2345,6 +2346,7 @@
 		26B92D4D21D34698003F6F82 /* ginger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ginger.cpp; sourceTree = "<group>"; };
 		26B92D6521D770F0003F6F82 /* device.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = device.cpp; sourceTree = "<group>"; };
 		26B92D6F21D7C237003F6F82 /* device_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = device_macos.mm; sourceTree = "<group>"; };
+		26BB17CF21F4BA680089C7EC /* ui_adapter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_adapter.cpp; sourceTree = "<group>"; };
 		26BB61391D872FB10049A5C3 /* progress_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = progress_bar.cpp; sourceTree = "<group>"; };
 		26BBBEC71D8FDF1F00735947 /* view_page.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view_page.cpp; sourceTree = "<group>"; };
 		26BC2EC71E2E09B500D0801E /* dispatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dispatch.cpp; sourceTree = "<group>"; };
@@ -4285,6 +4287,7 @@
 				26B1C9A01DC7ABB60092C84F /* text_view.cpp */,
 				26C4E26A1DB47A7200A9211F /* transition.cpp */,
 				26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */,
+				26BB17CF21F4BA680089C7EC /* ui_adapter.cpp */,
 				26BF169B1E307DC000C9878C /* ui_animation.h */,
 				2653358E1E2E8A5A00199C76 /* ui_animation.cpp */,
 				26E63F441E337B2300F50E8A /* ui_animation_apple.mm */,
@@ -6074,6 +6077,7 @@
 				26D9D9D81E96468D005F7BD3 /* tab_view_macos.mm in Sources */,
 				26D9D9621E964669005F7BD3 /* bitmap_data.cpp in Sources */,
 				26D9D9111E9645CE005F7BD3 /* xml.cpp in Sources */,
+				26BB17D021F4BA690089C7EC /* ui_adapter.cpp in Sources */,
 				266E66E121D7F68F00D92386 /* locale_apple.mm in Sources */,
 				26D9D9D31E96468D005F7BD3 /* select_view.cpp in Sources */,
 				26D9D9791E96466A005F7BD3 /* pen.cpp in Sources */,
