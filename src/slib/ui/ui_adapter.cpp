@@ -62,6 +62,8 @@ namespace slib
 	}
 
 	
+	SLIB_DEFINE_OBJECT(ViewListAdapter, ViewAdapter)
+	
 	ViewListAdapter::ViewListAdapter()
 	{
 	}

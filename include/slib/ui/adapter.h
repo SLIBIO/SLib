@@ -136,6 +136,8 @@ namespace slib
 	
 	class ViewListAdapter : public ViewAdapter
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		ViewListAdapter();
 		
