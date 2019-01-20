@@ -171,6 +171,48 @@ namespace slib
 				return String::format("(sl_ui_pos)(slib::UIResource::millimeterToPixel(%ff))", amount);
 			case INCH:
 				return String::format("(sl_ui_pos)(slib::UIResource::inchToPixel(%ff))", amount);
+			case SBAR:
+				if (Math::isAlmostZero(amount - 1)) {
+					return "slib::UIResource::getStatusBarHeight()";
+				} else {
+					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getStatusBarHeight())", amount);
+				}
+			case SAFE_L:
+				if (Math::isAlmostZero(amount - 1)) {
+					return "slib::UIResource::getSafeAreaInsetLeft()";
+				} else {
+					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getSafeAreaInsetLeft())", amount);
+				}
+			case SAFE_T:
+				if (Math::isAlmostZero(amount - 1)) {
+					return "slib::UIResource::getSafeAreaInsetTop()";
+				} else {
+					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getSafeAreaInsetTop())", amount);
+				}
+			case SAFE_R:
+				if (Math::isAlmostZero(amount - 1)) {
+					return "slib::UIResource::getSafeAreaInsetRight()";
+				} else {
+					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getSafeAreaInsetRight())", amount);
+				}
+			case SAFE_B:
+				if (Math::isAlmostZero(amount - 1)) {
+					return "slib::UIResource::getSafeAreaInsetBottom()";
+				} else {
+					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getSafeAreaInsetBottom())", amount);
+				}
+			case SAFE_W:
+				if (Math::isAlmostZero(amount - 1)) {
+					return "slib::UIResource::getSafeAreaWidth()";
+				} else {
+					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getSafeAreaWidth())", amount);
+				}
+			case SAFE_H:
+				if (Math::isAlmostZero(amount - 1)) {
+					return "slib::UIResource::getSafeAreaHeight()";
+				} else {
+					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getSafeAreaHeight())", amount);
+				}
 		}
 		return "0";
 	}
@@ -249,6 +291,48 @@ namespace slib
 				return String::format("slib::UIResource::millimeterToPixel(%ff)", amount);
 			case INCH:
 				return String::format("slib::UIResource::inchToPixel(%ff)", amount);
+			case SBAR:
+				if (Math::isAlmostZero(amount - 1)) {
+					return "(sl_real)(slib::UIResource::getStatusBarHeight())";
+				} else {
+					return String::format("%ff*(sl_real)(slib::UIResource::getStatusBarHeight())", amount);
+				}
+			case SAFE_L:
+				if (Math::isAlmostZero(amount - 1)) {
+					return "(sl_real)(slib::UIResource::getSafeAreaInsetLeft())";
+				} else {
+					return String::format("%ff*(sl_real)(slib::UIResource::getSafeAreaInsetLeft())", amount);
+				}
+			case SAFE_T:
+				if (Math::isAlmostZero(amount - 1)) {
+					return "(sl_real)(slib::UIResource::getSafeAreaInsetTop())";
+				} else {
+					return String::format("%ff*(sl_real)(slib::UIResource::getSafeAreaInsetTop())", amount);
+				}
+			case SAFE_R:
+				if (Math::isAlmostZero(amount - 1)) {
+					return "(sl_real)(slib::UIResource::getSafeAreaInsetRight())";
+				} else {
+					return String::format("%ff*(sl_real)(slib::UIResource::getSafeAreaInsetRight())", amount);
+				}
+			case SAFE_B:
+				if (Math::isAlmostZero(amount - 1)) {
+					return "(sl_real)(slib::UIResource::getSafeAreaInsetBottom())";
+				} else {
+					return String::format("%ff*(sl_real)(slib::UIResource::getSafeAreaInsetBottom())", amount);
+				}
+			case SAFE_W:
+				if (Math::isAlmostZero(amount - 1)) {
+					return "(sl_real)(slib::UIResource::getSafeAreaWidth())";
+				} else {
+					return String::format("%ff*(sl_real)(slib::UIResource::getSafeAreaWidth())", amount);
+				}
+			case SAFE_H:
+				if (Math::isAlmostZero(amount - 1)) {
+					return "(sl_real)(slib::UIResource::getSafeAreaHeight())";
+				} else {
+					return String::format("%ff*(sl_real)(slib::UIResource::getSafeAreaHeight())", amount);
+				}
 		}
 		return "0";
 	}
@@ -409,6 +493,12 @@ namespace slib
 							unit = SMIN;
 							break;
 						}
+					} else if (sz[pos + 1] == 'b') {
+						if (sz[pos + 2] == 'a' && sz[pos + 3] == 'r') {
+							amount = f;
+							unit = SBAR;
+							break;
+						}
 					}
 				} else if (sz[pos] == 'v') {
 					if (sz[pos + 1] == 'm') {
@@ -421,6 +511,34 @@ namespace slib
 							unit = VMIN;
 							break;
 						}
+					}
+				}
+			} else if (pos + 5 == len) {
+				if (sz[pos] == 's' && sz[pos + 1] == 'a' && sz[pos + 2] == 'f' && sz[pos + 3] == 'e') {
+					if (sz[pos + 4] == 'l') {
+						amount = f;
+						unit = SAFE_L;
+						break;
+					} else if (sz[pos + 4] == 't') {
+						amount = f;
+						unit = SAFE_T;
+						break;
+					} else if (sz[pos + 4] == 'r') {
+						amount = f;
+						unit = SAFE_R;
+						break;
+					} else if (sz[pos + 4] == 'b') {
+						amount = f;
+						unit = SAFE_B;
+						break;
+					} else if (sz[pos + 4] == 'w') {
+						amount = f;
+						unit = SAFE_W;
+						break;
+					} else if (sz[pos + 4] == 'h') {
+						amount = f;
+						unit = SAFE_H;
+						break;
 					}
 				}
 			}
@@ -558,7 +676,7 @@ namespace slib
 
 	sl_bool SAppDimensionValue::isGlobalUnit(int unit)
 	{
-		return unit == PX || unit == SW || unit == SH || unit == SMIN || unit == SMAX || unit == INCH || unit == M || unit == CM || unit == MM || unit == PT || unit == DP;
+		return unit == PX || unit == SW || unit == SH || unit == SMIN || unit == SMAX || unit == INCH || unit == M || unit == CM || unit == MM || unit == PT || unit == DP || unit == SBAR || unit == SAFE_L || unit == SAFE_T || unit == SAFE_R || unit == SAFE_B || unit == SAFE_W || unit == SAFE_H;
 	}
 
 	sl_bool SAppDimensionValue::isViewportUnit(int unit)

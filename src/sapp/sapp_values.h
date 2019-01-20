@@ -55,7 +55,14 @@ namespace slib
 	public:
 		sl_bool flagDefined;
 		enum {
-			FILL, WRAP, WEIGHT, PX, SW, SH, SMIN, SMAX, VW, VH, VMIN, VMAX, SP, DP, PT, MM, CM, M, INCH
+			FILL, WRAP, WEIGHT,
+			PX,
+			SW, SH, SMIN, SMAX,
+			VW, VH, VMIN, VMAX,
+			SP,
+			DP, PT, MM, CM, M, INCH,
+			SBAR,
+			SAFE_L, SAFE_T, SAFE_R, SAFE_B, SAFE_W, SAFE_H
 		};
 		int unit;
 		sl_real amount;

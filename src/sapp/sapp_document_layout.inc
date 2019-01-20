@@ -582,8 +582,10 @@ namespace slib
 			case SAppDimensionValue::PX:
 				return (sl_ui_pos)(value.amount);
 			case SAppDimensionValue::SW:
+			case SAppDimensionValue::SAFE_W:
 				return (sl_ui_pos)(value.amount * m_layoutSimulationParams.screenWidth);
 			case SAppDimensionValue::SH:
+			case SAppDimensionValue::SAFE_H:
 				return (sl_ui_pos)(value.amount * m_layoutSimulationParams.screenHeight);
 			case SAppDimensionValue::SMIN:
 				return (sl_ui_pos)(value.amount * SLIB_MIN(m_layoutSimulationParams.screenWidth, m_layoutSimulationParams.screenHeight));
