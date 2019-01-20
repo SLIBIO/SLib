@@ -2858,7 +2858,7 @@ namespace slib
 	END_PROCESS_LAYOUT_CONTROL
 
 
-	class _SAppDocument_SimuationListViewAdapter : public Referable, public IListViewAdapter
+	class _SAppDocument_SimuationListViewAdapter : public ViewAdapter
 	{
 	public:
 		WeakRef<Referable> refer;
@@ -2866,12 +2866,12 @@ namespace slib
 		Ref<SAppLayoutResource> layout;
 		
 	public:
-		sl_uint64 getItemsCount(ListView* lv)
+		sl_uint64 getItemsCount() override
 		{
 			return 100;
 		}
 		
-		Ref<View> getView(ListView* lv, sl_uint64 index, View* original)
+		Ref<View> getView(sl_uint64 index, View* original, View* parent) override
 		{
 			if (original) {
 				return original;
