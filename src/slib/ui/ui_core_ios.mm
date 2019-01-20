@@ -154,7 +154,29 @@ namespace slib
 		}
 	}
 	
-	sl_ui_len UI::getScreenStatusBarHeight()
+	UIEdgeInsets UI::getSafeAreaInsets()
+	{
+		UIWindow* window = UIPlatform::getKeyWindow();
+		if (window != nil) {
+			if (@available(iOS 11.0, *)) {
+				::UIEdgeInsets insets = window.safeAreaInsets;
+				UIEdgeInsets ret;
+				ret.left = (sl_ui_len)(insets.left * UIPlatform::getGlobalScaleFactor());
+				ret.top = (sl_ui_len)(insets.top * UIPlatform::getGlobalScaleFactor());
+				ret.right = (sl_ui_len)(insets.right * UIPlatform::getGlobalScaleFactor());
+				ret.bottom = (sl_ui_len)(insets.bottom * UIPlatform::getGlobalScaleFactor());
+				return ret;
+			}
+		}
+		UIEdgeInsets ret;
+		ret.left = 0;
+		ret.top = getStatusBarHeight();
+		ret.right = 0;
+		ret.bottom = 0;
+		return ret;
+	}
+
+	sl_ui_len UI::getStatusBarHeight()
 	{
 		CGRect rectOfStatusbar = [[UIApplication sharedApplication] statusBarFrame];
 		return (sl_ui_len)(rectOfStatusbar.size.height * UIPlatform::getGlobalScaleFactor());

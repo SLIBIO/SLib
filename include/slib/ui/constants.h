@@ -417,6 +417,14 @@ namespace slib
 		Light = 2
 	};
 	
+	struct UIEdgeInsets
+	{
+		sl_ui_len left;
+		sl_ui_len top;
+		sl_ui_len right;
+		sl_ui_len bottom;
+	};
+	
 }
 
 #endif

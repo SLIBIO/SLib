@@ -35,15 +35,18 @@ import slib.platform.android.ui.window.UiWindow;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
+import android.view.WindowInsets;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 
 public class SlibActivity extends Activity {
-
-	boolean flagVisible;
 
 	public static final int REQUEST_IMAGE_CAPTURE = 0x000100;
 	public static final int REQUEST_WEBVIEW_CHOOSE_FILE = 0x000101;
@@ -56,11 +59,31 @@ public class SlibActivity extends Activity {
 
 		super.onCreate(savedInstanceState);
 
-		Android.onCreateActivity(this);
-
 		Window window = getWindow();
 		window.addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 		window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+			View monitorInsetView = new View(this);
+			monitorInsetView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+				@Override
+				public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+					if (latestInsets == null) {
+						latestInsets = new Rect();
+					}
+					latestInsets.left = insets.getSystemWindowInsetLeft();
+					latestInsets.top = insets.getSystemWindowInsetTop();
+					latestInsets.right = insets.getSystemWindowInsetRight();
+					latestInsets.bottom = insets.getSystemWindowInsetBottom();
+					Android.onChangeWindowInsets(SlibActivity.this);
+					return insets;
+				}
+			});
+			addContentView(monitorInsetView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+		}
+
+		Android.onCreateActivity(this);
+
 	}
 
 	@Override
@@ -123,6 +146,10 @@ public class SlibActivity extends Activity {
 
 	public boolean isVisible() {
 		return flagVisible;
+	}
+
+	public Rect getLatestInsets() {
+		return latestInsets;
 	}
 
 	Vector<UiWindow> windows = new Vector<UiWindow>();
@@ -191,5 +218,8 @@ public class SlibActivity extends Activity {
 				break;
 		}
 	}
+
+	boolean flagVisible;
+	Rect latestInsets;
 
 }

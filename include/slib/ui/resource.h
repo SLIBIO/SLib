@@ -57,6 +57,30 @@ namespace slib
 		
 		static void setScreenPPI(double ppi);
 		
+		static sl_ui_len getStatusBarHeight();
+		
+		static void setStatusBarHeight(sl_ui_len height);
+		
+		static sl_ui_len getSafeAreaInsetLeft();
+		
+		static void setSafeAreaInsetLeft(sl_ui_len left);
+		
+		static sl_ui_len getSafeAreaInsetTop();
+		
+		static void setSafeAreaInsetTop(sl_ui_len top);
+		
+		static sl_ui_len getSafeAreaInsetRight();
+		
+		static void setSafeAreaInsetRight(sl_ui_len right);
+		
+		static sl_ui_len getSafeAreaInsetBottom();
+		
+		static void setSafeAreaInsetBottom(sl_ui_len bottom);
+
+		static sl_ui_len getSafeAreaWidth();
+
+		static sl_ui_len getSafeAreaHeight();
+
 		static sl_real pixelToInch(sl_real px);
 		
 		static sl_real inchToPixel(sl_real inch);

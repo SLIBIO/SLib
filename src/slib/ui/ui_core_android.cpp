@@ -29,6 +29,8 @@
 #include "slib/ui/screen.h"
 #include "slib/ui/platform.h"
 #include "slib/ui/mobile_app.h"
+#include "slib/ui/resource.h"
+
 #include "slib/core/locale.h"
 #include "slib/core/io.h"
 #include "slib/core/log.h"
@@ -44,12 +46,20 @@ namespace slib
 		SLIB_JNI_INT_FIELD(y);
 	SLIB_JNI_END_CLASS
 
+	SLIB_JNI_BEGIN_CLASS(JAndroidRect, "android/graphics/Rect")
+		SLIB_JNI_INT_FIELD(left);
+		SLIB_JNI_INT_FIELD(top);
+		SLIB_JNI_INT_FIELD(right);
+		SLIB_JNI_INT_FIELD(bottom);
+	SLIB_JNI_END_CLASS
+
 	SLIB_JNI_BEGIN_CLASS(JAndroidUtil, "slib/platform/android/ui/Util")
 		SLIB_JNI_STATIC_METHOD(getDefaultDisplay, "getDefaultDisplay", "(Landroid/app/Activity;)Landroid/view/Display;");
 		SLIB_JNI_STATIC_METHOD(getDisplaySize, "getDisplaySize", "(Landroid/view/Display;)Landroid/graphics/Point;");
 		SLIB_JNI_STATIC_METHOD(getScreenOrientation, "getScreenOrientation", "(Landroid/app/Activity;)I");
 		SLIB_JNI_STATIC_METHOD(setScreenOrientations, "setScreenOrientations", "(Landroid/app/Activity;ZZZZ)V");
 		SLIB_JNI_STATIC_METHOD(openURL, "openURL", "(Landroid/app/Activity;Ljava/lang/String;)V");
+		SLIB_JNI_STATIC_METHOD(getSafeAreaInsets, "getSafeAreaInsets", "(Landroid/app/Activity;)Landroid/graphics/Rect;");
 		SLIB_JNI_STATIC_METHOD(getStatusBarHeight, "getStatusBarHeight", "(Landroid/app/Activity;)I");
 		SLIB_JNI_STATIC_METHOD(setStatusBarStyle, "setStatusBarStyle", "(Landroid/app/Activity;I)V");		
 		SLIB_JNI_STATIC_METHOD(setBadgeNumber, "setBadgeNumber", "(Landroid/app/Activity;I)V");
@@ -75,6 +85,7 @@ namespace slib
 	void _priv_Android_onPauseActivity(JNIEnv* env, jobject _this, jobject activity);
 	jboolean _priv_Android_onBack(JNIEnv* env, jobject _this, jobject activity);
 	void _priv_Android_onConfigurationChanged(JNIEnv* env, jobject _this, jobject activity);
+	void _priv_Android_onChangeWindowInsets(JNIEnv* env, jobject _this, jobject activity);
 
 	SLIB_JNI_BEGIN_CLASS(JAndroid, "slib/platform/android/Android")
 		SLIB_JNI_NATIVE(onCreateActivity, "nativeOnCreateActivity", "(Landroid/app/Activity;)V", _priv_Android_onCreateActivity);
@@ -83,6 +94,7 @@ namespace slib
 		SLIB_JNI_NATIVE(onPauseActivity, "nativeOnPauseActivity", "(Landroid/app/Activity;)V", _priv_Android_onPauseActivity);
 		SLIB_JNI_NATIVE(onBack, "nativeOnBack", "(Landroid/app/Activity;)Z", _priv_Android_onBack);
 		SLIB_JNI_NATIVE(onConfigurationChanged, "nativeOnConfigurationChanged", "(Landroid/app/Activity;)V", _priv_Android_onConfigurationChanged);
+		SLIB_JNI_NATIVE(onChangeWindowInsets, "nativeOnChangeWindowInsets", "(Landroid/app/Activity;)V", _priv_Android_onChangeWindowInsets);
 	SLIB_JNI_END_CLASS
 
 	class _priv_Android_Screen : public Screen
@@ -209,7 +221,25 @@ namespace slib
 		Android::dismissKeyboard();
 	}
 
-	sl_ui_len UI::getScreenStatusBarHeight()
+	UIEdgeInsets UI::getSafeAreaInsets()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JniLocal<jobject> jrect = JAndroidUtil::getSafeAreaInsets.callObject(sl_null, jactivity);
+			if (jrect.isNotNull()) {
+				UIEdgeInsets ret;
+				ret.left = (sl_ui_len)(JAndroidRect::left.get(jrect));
+				ret.top = (sl_ui_len)(JAndroidRect::top.get(jrect));
+				ret.right = (sl_ui_len)(JAndroidRect::right.get(jrect));
+				ret.bottom = (sl_ui_len)(JAndroidRect::bottom.get(jrect));
+				return ret;
+			}
+		}
+		UIEdgeInsets ret = {0, 0, 0, 0};
+		return ret;
+	}
+
+	sl_ui_len UI::getStatusBarHeight()
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
@@ -223,6 +253,7 @@ namespace slib
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JAndroidUtil::setStatusBarStyle.call(sl_null, jactivity, (int)style);
+			UIResource::updateDefaultScreenSize();
 		}
 	}
 
@@ -309,6 +340,12 @@ namespace slib
 	{
 		Log("Activity", "onConfigurationChanged");
 		Locale::dispatchChangeCurrentLocale();
+	}
+
+	void _priv_Android_onChangeWindowInsets(JNIEnv* env, jobject _this, jobject activity)
+	{
+		Log("Activity", "onChangeWindowInsets");
+		UIResource::updateDefaultScreenSize();
 	}
 
 }

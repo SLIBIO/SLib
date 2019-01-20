@@ -29,6 +29,7 @@
 #include "slib/ui/screen.h"
 #include "slib/ui/core.h"
 #include "slib/ui/platform.h"
+#include "slib/ui/resource.h"
 
 #include "view_ios.h"
 
@@ -690,6 +691,7 @@ namespace slib
 		if (controller != nil) {
 			[controller setNeedsStatusBarAppearanceUpdate];
 		}
+		UIResource::updateDefaultScreenSize();
 	}
 	
 }

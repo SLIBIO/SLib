@@ -28,6 +28,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.util.DisplayMetrics;
@@ -42,6 +43,7 @@ import java.lang.reflect.Field;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import slib.platform.android.Logger;
+import slib.platform.android.SlibActivity;
 
 public class Util {
 
@@ -162,6 +164,42 @@ public class Util {
 			activity.setRequestedOrientation(orientation);
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	public static Rect getSafeAreaInsets(Activity activity) {
+		if (activity instanceof SlibActivity) {
+			Rect rect = ((SlibActivity)activity).getLatestInsets();
+			if (rect != null) {
+				return rect;
+			}
+		}
+		Rect rect = new Rect(0, 0, 0, 0);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			try {
+				Window window = activity.getWindow();
+				if ((window.getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) == 0) {
+					if ((window.getAttributes().flags & WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS) != 0 || (window.getDecorView().getSystemUiVisibility() & View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN) != 0) {
+						rect.top = getStatusBarHeight(activity);
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return rect;
+	}
+
+	public static int getNavigationBarHeight(Activity activity) {
+		try {
+			Class<?> c = Class.forName("com.android.internal.R$dimen");
+			Object obj = c.newInstance();
+			Field field = c.getField("navigation_bar_height");
+			int x = Integer.parseInt(field.get(obj).toString());
+			return activity.getResources().getDimensionPixelSize(x);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
 		}
 	}
 

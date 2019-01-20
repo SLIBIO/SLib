@@ -195,8 +195,10 @@ namespace slib
 		
 		static void dismissKeyboard();
 		
-		static sl_ui_len getScreenStatusBarHeight();
-				
+		static UIEdgeInsets getSafeAreaInsets();
+		
+		static sl_ui_len getStatusBarHeight();
+		
 		static void setStatusBarStyle(StatusBarStyle style);
 		
 		static void setBadgeNumber(sl_uint32 number);

@@ -522,7 +522,17 @@ namespace slib
 	{
 	}
 	
-	sl_ui_len UI::getScreenStatusBarHeight()
+	UIEdgeInsets UI::getSafeAreaInsets()
+	{
+		UIEdgeInsets ret;
+		ret.left = 0;
+		ret.top = getStatusBarHeight();
+		ret.right = 0;
+		ret.bottom = 0;
+		return ret;
+	}
+
+	sl_ui_len UI::getStatusBarHeight()
 	{
 		return 0;
 	}

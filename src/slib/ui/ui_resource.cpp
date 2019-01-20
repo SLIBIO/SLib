@@ -32,6 +32,16 @@ namespace slib
 	sl_ui_len _g_priv_ui_resource_defaultScreenHeight = 0;
 	double _g_priv_ui_resource_screenPPI = 0;
 	double _g_priv_ui_resource_defaultScreenPPI = 0;
+	sl_ui_len _g_priv_ui_resource_statusBarHeight = -1;
+	sl_ui_len _g_priv_ui_resource_defaultStatusBarHeight = -1;
+	sl_ui_len _g_priv_ui_resource_safeAreaLeft = -1;
+	sl_ui_len _g_priv_ui_resource_safeAreaTop = -1;
+	sl_ui_len _g_priv_ui_resource_safeAreaRight = -1;
+	sl_ui_len _g_priv_ui_resource_safeAreaBottom = -1;
+	sl_ui_len _g_priv_ui_resource_defaultSafeAreaLeft = -1;
+	sl_ui_len _g_priv_ui_resource_defaultSafeAreaTop = -1;
+	sl_ui_len _g_priv_ui_resource_defaultSafeAreaRight = -1;
+	sl_ui_len _g_priv_ui_resource_defaultSafeAreaBottom = -1;
 
 	void UIResource::updateDefaultScreenSize()
 	{
@@ -39,6 +49,12 @@ namespace slib
 		_g_priv_ui_resource_defaultScreenWidth = size.x;
 		_g_priv_ui_resource_defaultScreenHeight = size.y;
 		_g_priv_ui_resource_defaultScreenPPI = UI::getScreenPPI();
+		_g_priv_ui_resource_defaultStatusBarHeight = UI::getStatusBarHeight();
+		UIEdgeInsets insets = UI::getSafeAreaInsets();
+		_g_priv_ui_resource_defaultSafeAreaLeft = insets.left;
+		_g_priv_ui_resource_defaultSafeAreaTop = insets.top;
+		_g_priv_ui_resource_defaultSafeAreaRight = insets.right;
+		_g_priv_ui_resource_defaultSafeAreaBottom = insets.bottom;
 	}
 	
 	sl_ui_len UIResource::getScreenWidth()
@@ -109,6 +125,124 @@ namespace slib
 	void UIResource::setScreenPPI(double ppi)
 	{
 		_g_priv_ui_resource_screenPPI = ppi;
+	}
+	
+	sl_ui_len UIResource::getStatusBarHeight()
+	{
+		sl_ui_len ret = _g_priv_ui_resource_statusBarHeight;
+		if (ret < 0) {
+			if (_g_priv_ui_resource_defaultStatusBarHeight < 0) {
+				updateDefaultScreenSize();
+			}
+			ret = _g_priv_ui_resource_defaultStatusBarHeight;
+			if (ret < 0) {
+				ret = 0;
+			}
+		}
+		return ret;
+	}
+	
+	void UIResource::setStatusBarHeight(sl_ui_len height)
+	{
+		_g_priv_ui_resource_statusBarHeight = height;
+	}
+	
+	sl_ui_len UIResource::getSafeAreaInsetLeft()
+	{
+		sl_ui_len ret = _g_priv_ui_resource_safeAreaLeft;
+		if (ret < 0) {
+			if (_g_priv_ui_resource_defaultSafeAreaLeft < 0) {
+				updateDefaultScreenSize();
+			}
+			ret = _g_priv_ui_resource_defaultSafeAreaLeft;
+			if (ret < 0) {
+				ret = 0;
+			}
+		}
+		return ret;
+	}
+	
+	void UIResource::setSafeAreaInsetLeft(sl_ui_len left)
+	{
+		_g_priv_ui_resource_safeAreaLeft = left;
+	}
+	
+	sl_ui_len UIResource::getSafeAreaInsetTop()
+	{
+		sl_ui_len ret = _g_priv_ui_resource_safeAreaTop;
+		if (ret < 0) {
+			if (_g_priv_ui_resource_defaultSafeAreaTop < 0) {
+				updateDefaultScreenSize();
+			}
+			ret = _g_priv_ui_resource_defaultSafeAreaTop;
+			if (ret < 0) {
+				ret = 0;
+			}
+		}
+		return ret;
+	}
+	
+	void UIResource::setSafeAreaInsetTop(sl_ui_len top)
+	{
+		_g_priv_ui_resource_safeAreaTop = top;
+	}
+	
+	sl_ui_len UIResource::getSafeAreaInsetRight()
+	{
+		sl_ui_len ret = _g_priv_ui_resource_safeAreaRight;
+		if (ret < 0) {
+			if (_g_priv_ui_resource_defaultSafeAreaRight < 0) {
+				updateDefaultScreenSize();
+			}
+			ret = _g_priv_ui_resource_defaultSafeAreaRight;
+			if (ret < 0) {
+				ret = 0;
+			}
+		}
+		return ret;
+	}
+	
+	void UIResource::setSafeAreaInsetRight(sl_ui_len right)
+	{
+		_g_priv_ui_resource_safeAreaRight = right;
+	}
+	
+	sl_ui_len UIResource::getSafeAreaInsetBottom()
+	{
+		sl_ui_len ret = _g_priv_ui_resource_safeAreaBottom;
+		if (ret < 0) {
+			if (_g_priv_ui_resource_defaultSafeAreaBottom < 0) {
+				updateDefaultScreenSize();
+			}
+			ret = _g_priv_ui_resource_defaultSafeAreaBottom;
+			if (ret < 0) {
+				ret = 0;
+			}
+		}
+		return ret;
+	}
+	
+	void UIResource::setSafeAreaInsetBottom(sl_ui_len bottom)
+	{
+		_g_priv_ui_resource_safeAreaBottom = bottom;
+	}
+	
+	sl_ui_len UIResource::getSafeAreaWidth()
+	{
+		sl_ui_len w = getScreenWidth() - getSafeAreaInsetLeft() - getSafeAreaInsetRight();
+		if (w < 0) {
+			w = 0;
+		}
+		return w;
+	}
+	
+	sl_ui_len UIResource::getSafeAreaHeight()
+	{
+		sl_ui_len h = getScreenHeight() - getSafeAreaInsetTop() - getSafeAreaInsetBottom();
+		if (h < 0) {
+			h = 0;
+		}
+		return h;
 	}
 	
 	sl_real UIResource::pixelToInch(sl_real px)

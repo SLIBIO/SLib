@@ -151,11 +151,16 @@ public class Android {
 		nativeOnConfigurationChanged(activity);
 	}
 
+	public static void onChangeWindowInsets(Activity activity) {
+		nativeOnChangeWindowInsets(activity);
+	}
+
 	private static native void nativeOnCreateActivity(Activity activity);
 	private static native void nativeOnResumeActivity(Activity activity);
 	private static native void nativeOnPauseActivity(Activity activity);
 	private static native void nativeOnDestroyActivity(Activity activity);
 	private static native boolean nativeOnBack(Activity activity);
 	private static native void nativeOnConfigurationChanged(Activity activity);
+	private static native void nativeOnChangeWindowInsets(Activity activity);
 
 }
