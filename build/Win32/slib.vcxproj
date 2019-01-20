@@ -288,6 +288,8 @@
     <ClCompile Include="..\..\src\slib\ui\video_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\view_page.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\view_pager.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\view_page_navigation.cpp" />
     <ClCompile Include="..\..\src\slib\ui\view_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\web_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\web_view_win32.cpp" />

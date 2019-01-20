@@ -20,58 +20,47 @@
  *   THE SOFTWARE.
  */
 
-#include "slib/ui/mobile_game.h"
+#ifndef CHECKHEADER_SLIB_VIEW_PAGER
+#define CHECKHEADER_SLIB_VIEW_PAGER
+
+#include "definition.h"
+
+#include "view.h"
+#include "adapter.h"
 
 namespace slib
 {
 
-	SLIB_DEFINE_OBJECT(MobileGame, MobileApp)
-	
-	MobileGame::MobileGame()
+	class SLIB_EXPORT ViewPager : public View
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
+		SLIB_DECLARE_OBJECT
 		
-		m_gameView = new MobileGameView;
+	public:
+		ViewPager();
 		
-		m_contentView->removeAllChildren(UIUpdateMode::Init);
-		m_contentView->addChild(m_gameView, UIUpdateMode::Init);
-		m_contentView = m_gameView;
-		
-		m_gameView->setWidthFilling(1, UIUpdateMode::Init);
-		m_gameView->setHeightFilling(1, UIUpdateMode::Init);
-		m_gameView->setOpaque(sl_true, UIUpdateMode::Init);
-		m_gameView->addChild(m_navigationController, UIUpdateMode::Init);
-		
-	}
-	
-	MobileGame::~MobileGame()
-	{
-	}
+		~ViewPager();
 
-	Ref<MobileGame> MobileGame::getApp()
-	{
-		return CastRef<MobileGame>(Application::getApp());
-	}
-	
-	Ref<MobileGameView> MobileGame::getGameView()
-	{
-		return m_gameView;
-	}
-	
-	
-	SLIB_DEFINE_OBJECT(MobileGameView, RenderView)
-	
-	MobileGameView::MobileGameView()
-	{
-		SLIB_REFERABLE_CONSTRUCTOR
+	public:
+		void setAdapter(const Ref<ViewAdapter>& adapter, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		setRedrawMode(RedrawMode::WhenDirty);
-		setDispatchingEventsToRenderingThread(sl_true);
-		
-	}
+		void addPage(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 
-	MobileGameView::~MobileGameView()
-	{
-	}
+		sl_uint64 getCurrentIndex();
+		
+		void selectPage(sl_uint64 index, UIUpdateMode mode = UIUpdateMode::Redraw);
+
+	protected:
+		void onResize(sl_ui_len width, sl_ui_len height) override;
+		
+		void onChangePadding() override;
+		
+	protected:
+		AtomicRef<ViewAdapter> m_adapter;
+		CHashMap< sl_uint64, Ref<View> > m_cache;
+		sl_uint64 m_indexCurrent;
+
+	};
 
 }
+
+#endif

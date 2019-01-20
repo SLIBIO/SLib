@@ -55,7 +55,7 @@ namespace slib
 		
 		Ref<View> getContentView();
 		
-		Ref<ViewPager> getPager();
+		Ref<ViewPageNavigationController> getNavigationController();
 		
 		virtual Ref<View> getLoadingPage();
 
@@ -123,7 +123,7 @@ namespace slib
 		static sl_bool m_flagPaused;
 		
 		Ref<View> m_contentView;
-		Ref<ViewPager> m_pager;
+		Ref<ViewPageNavigationController> m_navigationController;
 		CList< Ref<ViewPage> > m_popupPages;
 		Function<void()> m_callbackOnChangeLocale;
 		

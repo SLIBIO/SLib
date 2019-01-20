@@ -869,5 +869,11 @@
     <ClCompile Include="..\..\src\slib\ui\ui_adapter.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\view_page_navigation.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\view_pager.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

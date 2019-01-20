@@ -22,11 +22,7 @@
 
 #include "slib/ui/view_page.h"
 
-#include "slib/ui/core.h"
 #include "slib/ui/mobile_app.h"
-#include "slib/ui/render_view.h"
-
-#include "slib/core/scoped.h"
 
 #if defined(SLIB_UI_IS_ANDROID)
 #	include "slib/core/platform_android.h"
@@ -34,813 +30,6 @@
 
 namespace slib
 {
-
-	SLIB_DEFINE_OBJECT(ViewPager, View)
-
-	ViewPager::ViewPager()
-	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
-		setCreatingChildInstances(sl_true);
-		
-		m_indexCurrent = 0;
-		m_minimumPagesCount = 0;
-		m_flagSwipeNavigation = sl_false;
-		
-		m_pushTransitionType = TransitionType::Push;
-		m_pushTransitionDirection = TransitionDirection::FromRightToLeft;
-		m_pushTransitionCurve = AnimationCurve::EaseInOut;
-		m_pushTransitionDuration = 0.5f;
-		m_popTransitionType = TransitionType::Push;
-		m_popTransitionDirection = TransitionDirection::FromLeftToRight;
-		m_popTransitionCurve = AnimationCurve::EaseInOut;
-		m_popTransitionDuration = 0.5f;
-		
-		m_countActiveTransitionAnimations = 0;
-	}
-
-	ViewPager::~ViewPager()
-	{
-		ListElements< Ref<View> > pages(m_pages);
-		sl_size indexCurrent = m_indexCurrent;
-		if (indexCurrent < pages.count) {
-			dispatchPageAction(pages[indexCurrent].get(), UIPageAction::Pause);
-		}
-		for (sl_size i = 0; i < pages.count; i++) {
-			dispatchPageAction(pages[i].get(), UIPageAction::Pop);
-		}
-	}
-
-	sl_size ViewPager::getPagesCount()
-	{
-		return m_pages.getCount();
-	}
-
-	sl_size ViewPager::getCurrentPageIndex()
-	{
-		return m_indexCurrent;
-	}
-
-	Ref<View> ViewPager::getCurrentPage()
-	{
-		ObjectLocker lock(this);
-		sl_size index = m_indexCurrent;
-		if (index < m_pages.getCount()) {
-			return m_pages.getData()[index];
-		} else {
-			return sl_null;
-		}
-	}
-
-	sl_size ViewPager::getMinimumPagesCount()
-	{
-		return m_minimumPagesCount;
-	}
-
-	void ViewPager::setMinimumPagesCount(sl_size count)
-	{
-		m_minimumPagesCount = count;
-	}
-
-	void ViewPager::addPage(const Ref<View>& page, UIUpdateMode mode)
-	{
-		if (page.isNull()) {
-			return;
-		}
-		page->setParent(this);
-		ObjectLocker lock(this);
-		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode) || m_pages.getCount() > 0) {
-			if (m_pages.addIfNotExist_NoLock(page)) {
-				lock.unlock();
-				page->setFrame(getBoundsInnerPadding(), mode);
-				dispatchPageAction(page.get(), UIPageAction::Push);
-			}
-		} else {
-			m_pages.add_NoLock(page);
-			lock.unlock();
-			page->setFrame(getBoundsInnerPadding());
-			addChild(page, mode);
-			dispatchPageAction(page.get(), UIPageAction::Push);
-			dispatchPageAction(page.get(), UIPageAction::Resume);
-			m_indexCurrent = 0;
-		}
-	}
-
-	void ViewPager::removePageAt(sl_size index, UIUpdateMode mode)
-	{
-		ObjectLocker lock(this);
-		sl_size n = m_pages.getCount();
-		if (n <= m_minimumPagesCount) {
-			return;
-		}
-		if (index < n) {
-			Ref<View> oldPage = m_pages.getData()[index];
-			if (index == m_indexCurrent) {
-				Ref<View> newPage;
-				m_pages.removeAt_NoLock(index);
-				n--;
-				if (n == 0) {
-					m_indexCurrent = 0;
-				} else {
-					if (index == n) {
-						index--;
-						m_indexCurrent = index;
-					}
-					newPage = m_pages.getData()[index];
-				}
-				lock.unlock();
-				if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
-					if (oldPage.isNotNull()) {
-						dispatchPageAction(oldPage.get(), UIPageAction::Pop);
-					}
-				} else {
-					if (oldPage.isNotNull()) {
-						dispatchPageAction(oldPage.get(), UIPageAction::Pause);
-						dispatchPageAction(oldPage.get(), UIPageAction::Pop);
-						removeChild(oldPage, mode);
-					}
-					if (newPage.isNotNull()) {
-						newPage->setFrame(getBoundsInnerPadding());
-						addChild(newPage, mode);
-						dispatchPageAction(newPage.get(), UIPageAction::Resume);
-					}
-				}
-			} else {
-				m_pages.removeAt_NoLock(index);
-				lock.unlock();
-				dispatchPageAction(oldPage.get(), UIPageAction::Pop);
-			}
-		}
-	}
-
-	void ViewPager::selectPage(sl_size index, UIUpdateMode mode)
-	{
-		ObjectLocker lock(this);
-		if (index >= m_pages.getCount()) {
-			return;
-		}
-		Ref<View>* pages = m_pages.getData();
-		Ref<View> viewIn = pages[index];
-		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
-			m_indexCurrent = index;
-			addChild(viewIn, mode);
-			dispatchPageAction(viewIn.get(), UIPageAction::Resume);
-		} else {
-			if (m_indexCurrent == index) {
-				return;
-			}
-			Ref<View> viewOut = pages[m_indexCurrent];
-			m_indexCurrent = index;
-			if (viewOut == viewIn) {
-				return;
-			}
-			addChild(viewIn, UIUpdateMode::None);
-			dispatchPageAction(viewOut.get(), UIPageAction::Pause);
-			dispatchPageAction(viewIn.get(), UIPageAction::Resume);
-			removeChild(viewOut, mode);
-		}
-	}
-
-	void ViewPager::_onFinishAnimation(const Ref<View>& view, UIPageAction action)
-	{
-		dispatchEndPageAnimation(view.get(), action);
-		switch (action) {
-			case UIPageAction::Pause:
-			case UIPageAction::Pop:
-				if (getCurrentPage() != view) {
-					view->setVisibility(Visibility::Hidden);
-					removeChild(view);
-				}
-				break;
-			default:
-				view->setEnabled(sl_true);
-				break;
-		}
-		setEnabled(sl_true);
-		Base::interlockedDecrement(&m_countActiveTransitionAnimations);
-	}
-
-	void ViewPager::_resetAnimationStatus(const Ref<View>& view)
-	{
-		view->setTranslation(0, 0, UIUpdateMode::Init);
-		view->setScale(1, 1, UIUpdateMode::Init);
-		view->setRotation(0, UIUpdateMode::None);
-		view->setAlpha(1, UIUpdateMode::Redraw);
-	}
-
-	void ViewPager::_goTo(sl_size index, const Transition& _transition)
-	{
-
-		Transition transition = _transition;
-
-		ObjectLocker lock(this);
-		
-		if (m_countActiveTransitionAnimations) {
-			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPager, _goTo, this, index, transition), 100);
-			return;
-		}
-
-		if (m_indexCurrent == index) {
-			return;
-		}
-		if (index >= m_pages.getCount()) {
-			return;
-		}
-		sl_bool flagNext;
-		if (index > m_indexCurrent) {
-			flagNext = sl_true;
-		} else {
-			flagNext = sl_false;
-		}
-		
-		Ref<View>* pages = m_pages.getData();
-		Ref<View> viewOut = pages[m_indexCurrent];
-		Ref<View> viewIn = pages[index];
-		m_indexCurrent = index;
-		if (viewOut == viewIn) {
-			return;
-		}
-
-#if defined(SLIB_UI_IS_ANDROID)
-		Android::dismissKeyboard();
-#endif
-
-		setEnabled(sl_false);
-		viewOut->setEnabled(sl_false, UIUpdateMode::None);
-		viewIn->setEnabled(sl_false, UIUpdateMode::None);
-		viewIn->setFrame(getBoundsInnerPadding(), UIUpdateMode::None);
-		
-		Ref<Animation> animationPause, animationResume;
-		if (flagNext) {
-			_applyDefaultPushTransition(transition);
-			animationPause = Transition::createAnimation(viewOut, transition, UIPageAction::Pause, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation, this, viewOut, UIPageAction::Pause));
-			animationResume = Transition::createAnimation(viewIn, transition, UIPageAction::Push, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation, this, viewIn, UIPageAction::Resume));
-		} else {
-			_applyDefaultPopTransition(transition);
-			animationPause = Transition::createAnimation(viewOut, transition, UIPageAction::Pop, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation, this, viewOut, UIPageAction::Pause));
-			animationResume = Transition::createAnimation(viewIn, transition, UIPageAction::Resume, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation, this, viewIn, UIPageAction::Resume));
-		}
-		
-		Base::interlockedIncrement(&m_countActiveTransitionAnimations);
-		Base::interlockedIncrement(&m_countActiveTransitionAnimations);
-		
-		_resetAnimationStatus(viewIn);
-		if (animationResume.isNotNull()) {
-			animationResume->dispatchStartFrame();
-		}
-		
-		addChild(viewIn, UIUpdateMode::None);
-		
-		dispatchPageAction(viewOut.get(), UIPageAction::Pause);
-		
-		dispatchPageAction(viewIn.get(), UIPageAction::Resume);
-		
-		if (animationPause.isNotNull()) {
-			animationPause->dispatchStartFrame();
-		}
-		
-		if (flagNext) {
-			viewIn->bringToFront(UIUpdateMode::None);
-		} else {
-			viewIn->bringToFront(UIUpdateMode::None);
-			viewOut->bringToFront(UIUpdateMode::None);
-		}
-		viewIn->setVisibility(Visibility::Visible);
-		
-		if (animationPause.isNull()) {
-			_onFinishAnimation(viewOut, UIPageAction::Pause);
-		}
-		if (animationResume.isNull()) {
-			_onFinishAnimation(viewIn, UIPageAction::Resume);
-		}
-		
-		_runAnimationProc(viewIn, [animationPause, animationResume]() {
-			if (animationPause.isNotNull()) {
-				animationPause->start();
-			}
-			if (animationResume.isNotNull()) {
-				animationResume->start();
-			}
-		});
-		
-	}
-
-	void ViewPager::goToPageAt(sl_size index, const Transition& transition)
-	{
-		if (isDrawingThread()) {
-			_goTo(index, transition);
-		} else {
-			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPager, _goTo, this, index, transition));
-		}
-	}
-
-	void ViewPager::goToPageAt(sl_size index)
-	{
-		goToPageAt(index, Transition());
-	}
-
-	void ViewPager::goPrev(const Transition& transition)
-	{
-		sl_size index = m_indexCurrent;
-		if (index > 0) {
-			goToPageAt(index - 1, transition);
-		}
-	}
-
-	void ViewPager::goPrev()
-	{
-		sl_size index = m_indexCurrent;
-		if (index > 0) {
-			goToPageAt(index - 1);
-		}
-	}
-
-	void ViewPager::goNext(const Transition& transition)
-	{
-		sl_size index = m_indexCurrent;
-		if (index + 1 < m_pages.getCount()) {
-			goToPageAt(index + 1, transition);
-		}
-	}
-
-	void ViewPager::goNext()
-	{
-		sl_size index = m_indexCurrent;
-		if (index + 1 < m_pages.getCount()) {
-			goToPageAt(index + 1);
-		}
-	}
-
-	void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl_bool flagRemoveAllBackPages)
-	{
-
-		if (viewIn.isNull()) {
-			return;
-		}
-
-		viewIn->setParent(this);
-		
-		ObjectLocker lock(this);
-		
-		if (m_countActiveTransitionAnimations) {
-			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPager, _push, this, viewIn, _transition, flagRemoveAllBackPages), 100);
-			return;
-		}
-
-		Transition transition(_transition);
-		
-		sl_size n = m_pages.getCount();
-		
-		if (n == 0) {
-
-#if defined(SLIB_UI_IS_ANDROID)
-			Android::dismissKeyboard();
-#endif
-
-			ScopedCounter counter(&m_countActiveTransitionAnimations);
-			m_indexCurrent = 0;
-			m_pages.add_NoLock(viewIn);
-			viewIn->setFrame(getBoundsInnerPadding(), UIUpdateMode::None);
-			_resetAnimationStatus(viewIn);
-			addChild(viewIn, UIUpdateMode::None);
-			dispatchPageAction(viewIn.get(), UIPageAction::Push);
-			dispatchPageAction(viewIn.get(), UIPageAction::Resume);
-			dispatchEndPageAnimation(viewIn.get(), UIPageAction::Push);
-			viewIn->setVisibility(Visibility::Visible, UIUpdateMode::None);
-			viewIn->bringToFront();
-			return;
-		}
-		
-		Ref<View>* pages = m_pages.getData();
-		Ref<View> viewBack = pages[m_indexCurrent];
-		if (viewBack == viewIn) {
-			return;
-		}
-
-#if defined(SLIB_UI_IS_ANDROID)
-		Android::dismissKeyboard();
-#endif
-
-		m_indexCurrent = n;
-
-		viewIn->setFrame(getBoundsInnerPadding(), UIUpdateMode::None);
-		
-		setEnabled(sl_false);
-		viewBack->setEnabled(sl_false, UIUpdateMode::None);
-		viewIn->setEnabled(sl_false, UIUpdateMode::None);
-		
-		_applyDefaultPushTransition(transition);
-		Ref<Animation> animationPause = Transition::createAnimation(viewBack, transition, UIPageAction::Pause, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation,this, viewBack, UIPageAction::Pause));
-		
-		Ref<Animation> animationPush = Transition::createAnimation(viewIn, transition, UIPageAction::Push, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation,this, viewIn, UIPageAction::Push));
-		
-		Base::interlockedIncrement(&m_countActiveTransitionAnimations);
-		Base::interlockedIncrement(&m_countActiveTransitionAnimations);
-		
-		_resetAnimationStatus(viewIn);
-		if (animationPush.isNotNull()) {
-			animationPush->dispatchStartFrame();
-		}
-
-		addChild(viewIn, UIUpdateMode::None);
-		
-		dispatchPageAction(viewBack.get(), UIPageAction::Pause);
-		
-		if (flagRemoveAllBackPages) {
-			for (sl_size i = 0; i < n; i++) {
-				dispatchPageAction(pages[i].get(), UIPageAction::Pop);
-			}
-			m_pages.removeAll_NoLock();
-			m_indexCurrent = 0;
-		}
-		
-		m_pages.add_NoLock(viewIn);
-		dispatchPageAction(viewIn.get(), UIPageAction::Push);
-		dispatchPageAction(viewIn.get(), UIPageAction::Resume);
-		
-		if (animationPause.isNotNull()) {
-			animationPause->dispatchStartFrame();
-		}
-
-		viewIn->bringToFront(UIUpdateMode::None);
-		viewIn->setVisibility(Visibility::Visible);
-		
-		if (animationPause.isNull()) {
-			_onFinishAnimation(viewBack, UIPageAction::Pause);
-		}
-		if (animationPush.isNull()) {
-			_onFinishAnimation(viewIn, UIPageAction::Push);
-		}
-		
-		_runAnimationProc(viewIn, [animationPause, animationPush]() {
-			if (animationPause.isNotNull()) {
-				animationPause->start();
-			}
-			if (animationPush.isNotNull()) {
-				animationPush->start();
-			}
-		});
-		
-	}
-
-	void ViewPager::push(const Ref<View>& viewIn, const Transition& transition, sl_bool flagRemoveAllBackPages)
-	{
-		if (isDrawingThread()) {
-			_push(viewIn, transition, flagRemoveAllBackPages);
-		} else {
-			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPager, _push, this, viewIn, transition, flagRemoveAllBackPages));
-		}
-	}
-
-	void ViewPager::push(const Ref<View>& viewIn, sl_bool flagRemoveAllBackPages)
-	{
-		push(viewIn, Transition(), flagRemoveAllBackPages);
-	}
-
-	void ViewPager::_pop(const Ref<View>& _viewOut, const Transition& _transition)
-	{
-
-		ObjectLocker lock(this);
-		
-		if (m_countActiveTransitionAnimations) {
-			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPager, _pop, this, _viewOut, _transition), 100);
-			return;
-		}
-
-		Transition transition = _transition;
-		
-		sl_size n = m_pages.getCount();
-		
-		if (n <= m_minimumPagesCount) {
-			return;
-		}
-		
-		sl_size indexPop = m_indexCurrent;
-		Ref<View> viewOut = *(m_pages.getPointerAt(indexPop));
-		if (_viewOut.isNotNull() && _viewOut != viewOut) {
-			return;
-		}
-
-#if defined(SLIB_UI_IS_ANDROID)
-		Android::dismissKeyboard();
-#endif
-
-		if (n == 1) {
-			ScopedCounter counter(&m_countActiveTransitionAnimations);
-			dispatchPageAction(viewOut.get(), UIPageAction::Pause);
-			dispatchPageAction(viewOut.get(), UIPageAction::Pop);
-			dispatchEndPageAnimation(viewOut.get(), UIPageAction::Pop);
-			removeChild(viewOut);
-			viewOut->setVisibility(Visibility::Hidden, UIUpdateMode::None);
-			m_pages.removeAll_NoLock();
-			m_indexCurrent = 0;
-			return;
-		}
-		
-		Ref<View> viewBack;
-		if (indexPop > 0) {
-			m_indexCurrent = indexPop - 1;
-			viewBack = *(m_pages.getPointerAt(indexPop - 1));
-		} else {
-			m_indexCurrent = 0;
-			viewBack = *(m_pages.getPointerAt(1));
-		}
-		
-		setEnabled(sl_false);
-		viewBack->setEnabled(sl_false, UIUpdateMode::None);
-		viewOut->setEnabled(sl_false, UIUpdateMode::None);
-		
-		_applyDefaultPopTransition(transition);
-		Ref<Animation> animationPop = Transition::createAnimation(viewOut, transition, UIPageAction::Pop, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation,this, viewOut, UIPageAction::Pop));
-		
-		Ref<Animation> animationResume = Transition::createAnimation(viewBack, transition, UIPageAction::Resume, SLIB_BIND_REF(void(), ViewPager, _onFinishAnimation,this, viewBack, UIPageAction::Resume));
-		
-		Base::interlockedIncrement(&m_countActiveTransitionAnimations);
-		Base::interlockedIncrement(&m_countActiveTransitionAnimations);
-		
-		_resetAnimationStatus(viewBack);
-		if (animationResume.isNotNull()) {
-			animationResume->dispatchStartFrame();
-		}
-
-		addChild(viewBack, UIUpdateMode::None);
-
-		dispatchPageAction(viewOut.get(), UIPageAction::Pause);
-		dispatchPageAction(viewOut.get(), UIPageAction::Pop);
-		dispatchPageAction(viewBack.get(), UIPageAction::Resume);
-		
-		if (animationPop.isNotNull()) {
-			animationPop->start();
-		}
-		if (animationResume.isNotNull()) {
-			animationResume->start();
-		}
-		
-		viewBack->bringToFront(UIUpdateMode::None);
-		viewOut->bringToFront(UIUpdateMode::None);
-		
-		viewBack->setVisibility(Visibility::Visible);
-		
-		m_pages.removeAt_NoLock(indexPop);
-		
-		if (animationPop.isNull()) {
-			_onFinishAnimation(viewOut, UIPageAction::Pop);
-		}
-		if (animationResume.isNull()) {
-			_onFinishAnimation(viewBack, UIPageAction::Resume);
-		}
-		
-	}
-
-	void ViewPager::pop(const Ref<View>& viewOut, const Transition& transition)
-	{
-		if (isDrawingThread()) {
-			_pop(viewOut, transition);
-		} else {
-			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPager, _pop, this, viewOut, transition));
-		}
-	}
-
-	void ViewPager::pop(const Ref<View>& viewOut)
-	{
-		pop(viewOut, Transition());
-	}
-
-	void ViewPager::pop(const Transition& transition)
-	{
-		pop(Ref<View>::null(), transition);
-	}
-
-	void ViewPager::pop()
-	{
-		pop(Ref<View>::null(), Transition());
-	}
-
-	void ViewPager::setSwipeNavigation(sl_bool flag)
-	{
-		m_flagSwipeNavigation = flag;
-		if (flag) {
-			Ref<GestureDetector> gesture = createGestureDetector();
-			if (gesture.isNotNull()) {
-				gesture->enable(GestureType::SwipeLeft);
-				gesture->enable(GestureType::SwipeRight);
-			}
-		}
-	}
-
-	TransitionType ViewPager::getPushTransitionType()
-	{
-		return m_pushTransitionType;
-	}
-
-	void ViewPager::setPushTransitionType(TransitionType type)
-	{
-		m_pushTransitionType = type;
-	}
-
-	TransitionType ViewPager::getPopTransitionType()
-	{
-		return m_popTransitionType;
-	}
-
-	void ViewPager::setPopTransitionType(TransitionType type)
-	{
-		m_popTransitionType = type;
-	}
-
-	void ViewPager::setTransitionType(TransitionType type)
-	{
-		m_pushTransitionType = type;
-		m_popTransitionType = type;
-	}
-
-	TransitionDirection ViewPager::getPushTransitionDirection()
-	{
-		return m_pushTransitionDirection;
-	}
-
-	void ViewPager::setPushTransitionDirection(TransitionDirection direction)
-	{
-		m_pushTransitionDirection = direction;
-	}
-
-	TransitionDirection ViewPager::getPopTransitionDirection()
-	{
-		return m_popTransitionDirection;
-	}
-
-	void ViewPager::setPopTransitionDirection(TransitionDirection direction)
-	{
-		m_popTransitionDirection = direction;
-	}
-
-	void ViewPager::setTransitionDirection(TransitionDirection direction)
-	{
-		m_pushTransitionDirection = direction;
-		m_popTransitionDirection = direction;
-	}
-
-	float ViewPager::getPushTransitionDuration()
-	{
-		return m_pushTransitionDuration;
-	}
-
-	void ViewPager::setPushTransitionDuration(float duration)
-	{
-		m_pushTransitionDuration = duration;
-	}
-
-	float ViewPager::getPopTransitionDuration()
-	{
-		return m_popTransitionDuration;
-	}
-
-	void ViewPager::setPopTransitionDuration(float duration)
-	{
-		m_popTransitionDuration = duration;
-	}
-
-	void ViewPager::setTransitionDuration(float duration)
-	{
-		m_pushTransitionDuration = duration;
-		m_popTransitionDuration = duration;
-	}
-
-	AnimationCurve ViewPager::getPushTransitionCurve()
-	{
-		return m_pushTransitionCurve;
-	}
-
-	void ViewPager::setPushTransitionCurve(AnimationCurve curve)
-	{
-		m_pushTransitionCurve = curve;
-	}
-
-	AnimationCurve ViewPager::getPopTransitionCurve()
-	{
-		return m_popTransitionCurve;
-	}
-
-	void ViewPager::setPopTransitionCurve(AnimationCurve curve)
-	{
-		m_popTransitionCurve = curve;
-	}
-
-	void ViewPager::setTransitionCurve(AnimationCurve curve)
-	{
-		m_pushTransitionCurve = curve;
-		m_popTransitionCurve = curve;
-	}
-
-	void ViewPager::_applyDefaultPushTransition(Transition& transition)
-	{
-		if (transition.type == TransitionType::Default) {
-			transition.type = m_pushTransitionType;
-		}
-		if (transition.direction == TransitionDirection::Default) {
-			transition.direction = m_pushTransitionDirection;
-		}
-		if (transition.duration < SLIB_EPSILON) {
-			transition.duration = m_pushTransitionDuration;
-		}
-		if (transition.curve == AnimationCurve::Default) {
-			transition.curve = m_pushTransitionCurve;
-		}
-	}
-
-	void ViewPager::_applyDefaultPopTransition(Transition& transition)
-	{
-		if (transition.type == TransitionType::Default) {
-			transition.type = m_popTransitionType;
-		}
-		if (transition.direction == TransitionDirection::Default) {
-			transition.direction = m_popTransitionDirection;
-		}
-		if (transition.duration < SLIB_EPSILON) {
-			transition.duration = m_popTransitionDuration;
-		}
-		if (transition.curve == AnimationCurve::Default) {
-			transition.curve = m_popTransitionCurve;
-		}
-	}
-	
-	void ViewPager::_runAnimationProc(const Ref<View>& view, const Function<void()>& callback)
-	{
-		sl_bool flagRender = sl_false;
-		Ref<View> t = view;
-		while (1) {
-			if (IsInstanceOf<RenderView>(t)) {
-				flagRender = sl_true;
-				break;
-			}
-			t = t->getParent();
-			if (t.isNull()) {
-				break;
-			}
-		}
-		if (flagRender) {
-			view->runAfterDraw(callback);
-		} else {
-			view->dispatchToDrawingThread(callback, 10);
-		}
-	}
-	
-	SLIB_DEFINE_EVENT_HANDLER(ViewPager, PageAction, View* page, UIPageAction action)
-
-	void ViewPager::dispatchPageAction(View* page, UIPageAction action)
-	{
-		if (page) {
-			SLIB_INVOKE_EVENT_HANDLER(PageAction, page, action)
-			if (ViewPage* _page = CastInstance<ViewPage>(page)) {
-				_page->dispatchPageAction(this, action);
-			}
-		}
-	}
-
-	SLIB_DEFINE_EVENT_HANDLER(ViewPager, EndPageAnimation, View* page, UIPageAction action)
-	
-	void ViewPager::dispatchEndPageAnimation(View* page, UIPageAction action)
-	{
-		if (page) {
-			SLIB_INVOKE_EVENT_HANDLER(EndPageAnimation, page, action)
-			if (ViewPage* _page = CastInstance<ViewPage>(page)) {
-				_page->dispatchEndPageAnimation(this, action);
-			}
-		}
-	}
-
-	void ViewPager::onResize(sl_ui_len width, sl_ui_len height)
-	{
-		UIRect rect(getPaddingLeft(), getPaddingTop(), width - getPaddingRight(), height - getPaddingBottom());
-		ObjectLocker lock(this);
-		ListElements< Ref<View> > pages(m_pages);
-		for (sl_size i = 0; i < pages.count; i++) {
-			pages[i]->setFrame(rect);
-		}
-	}
-
-	void ViewPager::onChangePadding()
-	{
-		Rectangle rect(getBoundsInnerPadding());
-		ObjectLocker lock(this);
-		ListElements< Ref<View> > pages(m_pages);
-		for (sl_size i = 0; i < pages.count; i++) {
-			pages[i]->setFrame(rect);
-		}
-	}
-
-	void ViewPager::onSwipe(GestureEvent* ev)
-	{
-		if (m_flagSwipeNavigation) {
-			GestureType type = ev->type;
-			if (type == GestureType::SwipeLeft) {
-				goNext();
-			} else if (type == GestureType::SwipeRight) {
-				goPrev();
-			}
-		}
-	}
-
 
 	SLIB_DEFINE_OBJECT(ViewPage, ViewGroup)
 
@@ -861,46 +50,46 @@ namespace slib
 	{
 	}
 
-	Ref<ViewPager> ViewPage::getPager()
+	Ref<ViewPageNavigationController> ViewPage::getNavigationController()
 	{
-		return m_pager;
+		return m_navigationController;
 	}
 
-	void ViewPage::setPager(const Ref<ViewPager>& pager)
+	void ViewPage::setNavigationController(const Ref<ViewPageNavigationController>& controller)
 	{
-		m_pager = pager;
+		m_navigationController = controller;
 	}
 
-	void ViewPage::open(const Ref<ViewPager>& pager, const Transition& transition)
+	void ViewPage::open(const Ref<ViewPageNavigationController>& controller, const Transition& transition)
 	{
-		if (pager.isNotNull()) {
+		if (controller.isNotNull()) {
 			ObjectLocker lock(this);
 			if (m_popupState != PopupState::None) {
 				return;
 			}
-			pager->push(this, transition);
+			controller->push(this, transition);
 		}
 	}
 
-	void ViewPage::open(const Ref<ViewPager>& pager)
+	void ViewPage::open(const Ref<ViewPageNavigationController>& controller)
 	{
-		open(pager, Transition());
+		open(controller, Transition());
 	}
 
-	void ViewPage::openHome(const Ref<ViewPager>& pager, const Transition& transition)
+	void ViewPage::openHome(const Ref<ViewPageNavigationController>& controller, const Transition& transition)
 	{
-		if (pager.isNotNull()) {
+		if (controller.isNotNull()) {
 			ObjectLocker lock(this);
 			if (m_popupState != PopupState::None) {
 				return;
 			}
-			pager->push(this, transition, sl_true);
+			controller->push(this, transition, sl_true);
 		}
 	}
 
-	void ViewPage::openHome(const Ref<ViewPager>& pager)
+	void ViewPage::openHome(const Ref<ViewPageNavigationController>& controller)
 	{
-		openHome(pager, Transition());
+		openHome(controller, Transition());
 	}
 
 	void ViewPage::close(const Transition& transition)
@@ -927,9 +116,9 @@ namespace slib
 				dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPage, _closePopup, this, transition));
 			}
 		} else {
-			Ref<ViewPager> pager = getPager();
-			if (pager.isNotNull()) {
-				pager->pop(this, transition);
+			Ref<ViewPageNavigationController> controller = getNavigationController();
+			if (controller.isNotNull()) {
+				controller->pop(this, transition);
 			}
 		}
 	}
@@ -941,12 +130,12 @@ namespace slib
 
 	void ViewPage::goToPage(const Ref<View>& page, const Transition& transition)
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
 			if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
-				_page->open(pager, transition);
+				_page->open(controller, transition);
 			} else {
-				pager->push(page, transition);
+				controller->push(page, transition);
 			}
 		}
 	}
@@ -958,12 +147,12 @@ namespace slib
 
 	void ViewPage::goToHomePage(const Ref<View>& page, const Transition& transition)
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
 			if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
-				_page->openHome(pager, transition);
+				_page->openHome(controller, transition);
 			} else {
-				pager->push(page, transition, sl_true);
+				controller->push(page, transition, sl_true);
 			}
 		}
 	}
@@ -975,169 +164,169 @@ namespace slib
 
 	TransitionType ViewPage::getGlobalOpeningTransitionType()
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			return pager->getPushTransitionType();
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			return controller->getPushTransitionType();
 		}
 		return TransitionType::Default;
 	}
 
 	void ViewPage::setGlobalOpeningTransitionType(TransitionType type)
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			pager->setPushTransitionType(type);
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			controller->setPushTransitionType(type);
 		}
 	}
 
 	TransitionType ViewPage::getGlobalClosingTransitionType()
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			return pager->getPopTransitionType();
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			return controller->getPopTransitionType();
 		}
 		return TransitionType::Default;
 	}
 
 	void ViewPage::setGlobalClosingTransitionType(TransitionType type)
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			pager->setPopTransitionType(type);
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			controller->setPopTransitionType(type);
 		}
 	}
 
 	void ViewPage::setGlobalTransitionType(TransitionType type)
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			pager->setTransitionType(type);
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			controller->setTransitionType(type);
 		}
 	}
 
 	TransitionDirection ViewPage::getGlobalOpeningTransitionDirection()
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			return pager->getPushTransitionDirection();
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			return controller->getPushTransitionDirection();
 		}
 		return TransitionDirection::Default;
 	}
 
 	void ViewPage::setGlobalOpeningTransitionDirection(TransitionDirection direction)
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			pager->setPushTransitionDirection(direction);
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			controller->setPushTransitionDirection(direction);
 		}
 	}
 
 	TransitionDirection ViewPage::getGlobalClosingTransitionDirection()
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			return pager->getPopTransitionDirection();
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			return controller->getPopTransitionDirection();
 		}
 		return TransitionDirection::Default;
 	}
 
 	void ViewPage::setGlobalClosingTransitionDirection(TransitionDirection direction)
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			pager->setPopTransitionDirection(direction);
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			controller->setPopTransitionDirection(direction);
 		}
 	}
 
 	void ViewPage::setGlobalTransitionDirection(TransitionDirection direction)
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			pager->setTransitionDirection(direction);
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			controller->setTransitionDirection(direction);
 		}
 	}
 
 	float ViewPage::getGlobalOpeningTransitionDuration()
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			return pager->getPushTransitionDuration();
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			return controller->getPushTransitionDuration();
 		}
 		return 0;
 	}
 
 	void ViewPage::setGlobalOpeningTransitionDuration(float duration)
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			pager->setPushTransitionDuration(duration);
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			controller->setPushTransitionDuration(duration);
 		}
 	}
 
 	float ViewPage::getGlobalClosingTransitionDuration()
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			return pager->getPopTransitionDuration();
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			return controller->getPopTransitionDuration();
 		}
 		return 0;
 	}
 
 	void ViewPage::setGlobalClosingTransitionDuration(float duration)
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			pager->setPopTransitionDuration(duration);
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			controller->setPopTransitionDuration(duration);
 		}
 	}
 
 	void ViewPage::setGlobalTransitionDuration(float duration)
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			pager->setTransitionDuration(duration);
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			controller->setTransitionDuration(duration);
 		}
 	}
 
 	AnimationCurve ViewPage::getGlobalOpeningTransitionCurve()
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			return pager->getPushTransitionCurve();
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			return controller->getPushTransitionCurve();
 		}
 		return AnimationCurve::Default;
 	}
 
 	void ViewPage::setGlobalOpeningTransitionCurve(AnimationCurve curve)
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			pager->setPushTransitionCurve(curve);
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			controller->setPushTransitionCurve(curve);
 		}
 	}
 
 	AnimationCurve ViewPage::getGlobalClosingTransitionCurve()
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			return pager->getPopTransitionCurve();
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			return controller->getPopTransitionCurve();
 		}
 		return AnimationCurve::Default;
 	}
 
 	void ViewPage::setGlobalClosingTransitionCurve(AnimationCurve curve)
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			pager->setPopTransitionCurve(curve);
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			controller->setPopTransitionCurve(curve);
 		}
 	}
 
 	void ViewPage::setGlobalTransitionCurve(AnimationCurve curve)
 	{
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			pager->setTransitionCurve(curve);
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			controller->setTransitionCurve(curve);
 		}
 	}
 
@@ -1202,7 +391,7 @@ namespace slib
 		if (animation.isNull()) {
 			_finishPopupAnimation(UIPageAction::Push);
 		} else {
-			ViewPager::_runAnimationProc(this, [animation]() {
+			ViewPageNavigationController::_runAnimationProc(this, [animation]() {
 				animation->start();
 			});
 		}
@@ -1563,13 +752,13 @@ namespace slib
 		SLIB_INVOKE_EVENT_HANDLER(Pause)
 	}
 
-	SLIB_DEFINE_EVENT_HANDLER(ViewPage, PageAction, ViewPager* pager, UIPageAction action)
+	SLIB_DEFINE_EVENT_HANDLER(ViewPage, PageAction, ViewPageNavigationController* controller, UIPageAction action)
 	
-	void ViewPage::dispatchPageAction(ViewPager* pager, UIPageAction action)
+	void ViewPage::dispatchPageAction(ViewPageNavigationController* controller, UIPageAction action)
 	{
-		m_pager = pager;
+		m_navigationController = controller;
 		
-		SLIB_INVOKE_EVENT_HANDLER(PageAction, pager, action)
+		SLIB_INVOKE_EVENT_HANDLER(PageAction, controller, action)
 		
 		switch (action) {
 			case UIPageAction::Push:
@@ -1587,13 +776,13 @@ namespace slib
 		}
 	}
 
-	SLIB_DEFINE_EVENT_HANDLER(ViewPage, EndPageAnimation, ViewPager* pager, UIPageAction action)
+	SLIB_DEFINE_EVENT_HANDLER(ViewPage, EndPageAnimation, ViewPageNavigationController* controller, UIPageAction action)
 
-	void ViewPage::dispatchEndPageAnimation(ViewPager* pager, UIPageAction action)
+	void ViewPage::dispatchEndPageAnimation(ViewPageNavigationController* controller, UIPageAction action)
 	{
-		m_pager = pager;
+		m_navigationController = controller;
 		
-		SLIB_INVOKE_EVENT_HANDLER(EndPageAnimation, pager, action)
+		SLIB_INVOKE_EVENT_HANDLER(EndPageAnimation, controller, action)
 	}
 
 	SLIB_DEFINE_EVENT_HANDLER(ViewPage, BackPressed, UIEvent* ev)

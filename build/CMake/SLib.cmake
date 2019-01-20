@@ -329,6 +329,8 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/ui/video_view.cpp"
  "${SLIB_PATH}/src/slib/ui/view.cpp"
  "${SLIB_PATH}/src/slib/ui/view_page.cpp"
+ "${SLIB_PATH}/src/slib/ui/view_page_navigation.cpp"
+ "${SLIB_PATH}/src/slib/ui/view_pager.cpp"
  "${SLIB_PATH}/src/slib/ui/web_view.cpp"
  "${SLIB_PATH}/src/slib/ui/window.cpp"
 )

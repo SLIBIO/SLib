@@ -324,6 +324,7 @@ namespace slib
 	class Slider;
 	class PickerView;
 	class ViewPager;
+	class ViewPageNavigationController;
 	class VideoView;
 	class CameraView;
 	class QRCodeScanner;

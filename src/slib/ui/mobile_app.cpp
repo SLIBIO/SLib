@@ -40,14 +40,13 @@ namespace slib
 		
 		m_contentView = window->getContentView();
 		
-		m_pager = new ViewPager;
-		m_pager->setWidthFilling(1, UIUpdateMode::Init);
-		m_pager->setHeightFilling(1, UIUpdateMode::Init);
-		m_pager->setOpaque(sl_true, UIUpdateMode::Init);
-		m_pager->setBackgroundColor(Color::White);
-		m_pager->setMinimumPagesCount(1);
-		m_pager->setVisibility(Visibility::Hidden, UIUpdateMode::Init);
-		m_contentView->addChild(m_pager, UIUpdateMode::Init);
+		m_navigationController = new ViewPageNavigationController;
+		m_navigationController->setWidthFilling(1, UIUpdateMode::Init);
+		m_navigationController->setHeightFilling(1, UIUpdateMode::Init);
+		m_navigationController->setOpaque(sl_true, UIUpdateMode::Init);
+		m_navigationController->setBackgroundColor(Color::White);
+		m_navigationController->setVisibility(Visibility::Hidden, UIUpdateMode::Init);
+		m_contentView->addChild(m_navigationController, UIUpdateMode::Init);
 
 		m_callbackOnChangeLocale = SLIB_FUNCTION_CLASS(MobileApp, dispatchChangeCurrentLocale, this);
 		Locale::addOnChangeCurrentLocale(m_callbackOnChangeLocale);
@@ -89,9 +88,9 @@ namespace slib
 		return m_contentView;
 	}
 	
-	Ref<ViewPager> MobileApp::getPager()
+	Ref<ViewPageNavigationController> MobileApp::getNavigationController()
 	{
-		return m_pager;
+		return m_navigationController;
 	}
 	
 	Ref<View> MobileApp::getLoadingPage()
@@ -122,42 +121,42 @@ namespace slib
 	
 	void MobileApp::openPage(const Ref<View>& page, const Transition& transition)
 	{
-		m_pager->push(page, transition);
+		m_navigationController->push(page, transition);
 	}
 	
 	void MobileApp::openPage(const Ref<View>& page)
 	{
-		m_pager->push(page);
+		m_navigationController->push(page);
 	}
 	
 	void MobileApp::openHomePage(const Ref<View>& page, const Transition& transition)
 	{
-		m_pager->push(page, transition, sl_true);
+		m_navigationController->push(page, transition, sl_true);
 	}
 	
 	void MobileApp::openHomePage(const Ref<View>& page)
 	{
-		m_pager->push(page, sl_true);
+		m_navigationController->push(page, sl_true);
 	}
 	
 	void MobileApp::closePage(const Ref<View>& page, const Transition& transition)
 	{
-		m_pager->pop(page, transition);
+		m_navigationController->pop(page, transition);
 	}
 	
 	void MobileApp::closePage(const Ref<View>& page)
 	{
-		m_pager->pop(page);
+		m_navigationController->pop(page);
 	}
 	
 	void MobileApp::closePage(const Transition& transition)
 	{
-		m_pager->pop(transition);
+		m_navigationController->pop(transition);
 	}
 	
 	void MobileApp::closePage()
 	{
-		m_pager->pop();
+		m_navigationController->pop();
 	}
 	
 	void MobileApp::popupPage(const Ref<ViewPage>& page, const Transition& transition, sl_bool flagFillParentBackground)
@@ -237,9 +236,9 @@ namespace slib
 	{
 		SLIB_INVOKE_EVENT_HANDLER(Pause)
 		
-		Ref<ViewPager> pager = m_pager;
-		if (pager.isNotNull()) {
-			Ref<View> page = pager->getCurrentPage();
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			Ref<View> page = controller->getCurrentPage();
 			if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
 				_page->dispatchPause();
 			}
@@ -280,9 +279,9 @@ namespace slib
 	{
 		SLIB_INVOKE_EVENT_HANDLER(Resume)
 		
-		Ref<ViewPager> pager = m_pager;
-		if (pager.isNotNull()) {
-			Ref<View> page = pager->getCurrentPage();
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			Ref<View> page = controller->getCurrentPage();
 			if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
 				_page->dispatchResume();
 			}
@@ -340,17 +339,19 @@ namespace slib
 				return;
 			}
 		}
-		Ref<View> _page = m_pager->getCurrentPage();
-		if (ViewPage* page = CastInstance<ViewPage>(_page.get())) {
-			page->dispatchBackPressed(ev);
-			if (!(ev->isPreventedDefault())) {
-				if (m_pager->getPagesCount() > 1) {
-					page->close();
-					ev->preventDefault();
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			Ref<View> _page = controller->getCurrentPage();
+			if (ViewPage* page = CastInstance<ViewPage>(_page.get())) {
+				page->dispatchBackPressed(ev);
+				if (!(ev->isPreventedDefault())) {
+					if (controller->getPagesCount() > 1) {
+						page->close();
+						ev->preventDefault();
+					}
 				}
 			}
 		}
-
 	}
 	
 	sl_bool MobileApp::dispatchBackPressedToApp()
@@ -409,10 +410,10 @@ namespace slib
 	{
 		UIResource::updateDefaultScreenSize();
 		
-		if (m_pager->getPagesCount() == 0) {
+		if (m_navigationController->getPagesCount() == 0) {
 			Ref<View> page = getLoadingPage();
 			if (page.isNotNull()) {
-				m_pager->setVisibility(Visibility::Visible);
+				m_navigationController->setVisibility(Visibility::Visible);
 				Transition transition;
 				transition.type = TransitionType::None;
 				openHomePage(page, transition);
@@ -434,7 +435,7 @@ namespace slib
 
 	void MobileApp::dispatchChangeCurrentLocale()
 	{
-		if (m_pager->getPagesCount() > 0) {
+		if (m_navigationController->getPagesCount() > 0) {
 			openStartupPage();
 		}
 		

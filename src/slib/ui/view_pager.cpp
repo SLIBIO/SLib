@@ -20,58 +20,59 @@
  *   THE SOFTWARE.
  */
 
-#include "slib/ui/mobile_game.h"
+#include "slib/ui/view_pager.h"
 
 namespace slib
 {
 
-	SLIB_DEFINE_OBJECT(MobileGame, MobileApp)
-	
-	MobileGame::MobileGame()
-	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
-		m_gameView = new MobileGameView;
-		
-		m_contentView->removeAllChildren(UIUpdateMode::Init);
-		m_contentView->addChild(m_gameView, UIUpdateMode::Init);
-		m_contentView = m_gameView;
-		
-		m_gameView->setWidthFilling(1, UIUpdateMode::Init);
-		m_gameView->setHeightFilling(1, UIUpdateMode::Init);
-		m_gameView->setOpaque(sl_true, UIUpdateMode::Init);
-		m_gameView->addChild(m_navigationController, UIUpdateMode::Init);
-		
-	}
-	
-	MobileGame::~MobileGame()
-	{
-	}
+	SLIB_DEFINE_OBJECT(ViewPager, View)
 
-	Ref<MobileGame> MobileGame::getApp()
+	ViewPager::ViewPager()
 	{
-		return CastRef<MobileGame>(Application::getApp());
+		m_indexCurrent = 0;
 	}
 	
-	Ref<MobileGameView> MobileGame::getGameView()
-	{
-		return m_gameView;
-	}
-	
-	
-	SLIB_DEFINE_OBJECT(MobileGameView, RenderView)
-	
-	MobileGameView::MobileGameView()
-	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
-		setRedrawMode(RedrawMode::WhenDirty);
-		setDispatchingEventsToRenderingThread(sl_true);
-		
-	}
-
-	MobileGameView::~MobileGameView()
+	ViewPager::~ViewPager()
 	{
 	}
-
+	
+	void ViewPager::setAdapter(const Ref<ViewAdapter>& adapter, UIUpdateMode mode)
+	{
+		m_adapter = adapter;
+	}
+	
+	void ViewPager::addPage(const Ref<View>& view, UIUpdateMode mode)
+	{
+		Ref<ViewAdapter> adapter = m_adapter;
+		Ref<ViewListAdapter> listAdapter;
+		if (adapter.isNotNull()) {
+			listAdapter = CastInstance<ViewListAdapter>(adapter.get());
+		} else {
+			listAdapter = new ViewListAdapter;
+		}
+		if (listAdapter.isNull()) {
+			return;
+		}
+		listAdapter->addView(view);
+		setAdapter(listAdapter, mode);
+	}
+	
+	sl_uint64 ViewPager::getCurrentIndex()
+	{
+		return m_indexCurrent;
+	}
+	
+	void ViewPager::selectPage(sl_uint64 index, UIUpdateMode mode)
+	{
+		m_indexCurrent = index;
+	}
+	
+	void ViewPager::onResize(sl_ui_len width, sl_ui_len height)
+	{
+	}
+	
+	void ViewPager::onChangePadding()
+	{
+	}
+	
 }

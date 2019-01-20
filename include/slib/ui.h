@@ -34,6 +34,8 @@
 #include "ui/common_dialogs.h"
 
 #include "ui/view.h"
+#include "ui/view_page.h"
+#include "ui/view_page_navigation.h"
 
 #include "ui/label_view.h"
 #include "ui/button.h"
@@ -55,7 +57,7 @@
 #include "ui/split_view.h"
 #include "ui/tab_view.h"
 #include "ui/tree_view.h"
-#include "ui/view_page.h"
+#include "ui/view_pager.h"
 #include "ui/drawer.h"
 
 #include "ui/render_view.h"

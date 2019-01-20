@@ -25,158 +25,10 @@
 
 #include "definition.h"
 
-#include "view.h"
-#include "transition.h"
-#include "window.h"
-
-#include "../core/event.h"
+#include "view_page_navigation.h"
 
 namespace slib
 {
-
-	class ViewPage;
-
-	class SLIB_EXPORT ViewPager : public View
-	{
-		SLIB_DECLARE_OBJECT
-		
-	public:
-		ViewPager();
-		
-		~ViewPager();
-
-	public:
-		sl_size getPagesCount();
-		
-		sl_size getCurrentPageIndex();
-		
-		Ref<View> getCurrentPage();
-		
-		sl_size getMinimumPagesCount();
-		
-		void setMinimumPagesCount(sl_size count);
-		
-		void addPage(const Ref<View>& page, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		void removePageAt(sl_size index, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		void selectPage(sl_size index, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		void goToPageAt(sl_size index, const Transition& transition);
-		
-		void goToPageAt(sl_size index);
-		
-		void goPrev(const Transition& transition);
-		
-		void goPrev();
-		
-		void goNext(const Transition& transition);
-		
-		void goNext();
-		
-		void push(const Ref<View>& page, const Transition& transition, sl_bool flagRemoveAllBackPages = sl_false);
-
-		void push(const Ref<View>& page, sl_bool flagRemoveAllBackPages = sl_false);
-		
-		void pop(const Ref<View>& page, const Transition& transition);
-		
-		void pop(const Ref<View>& page);
-		
-		void pop(const Transition& transition);
-		
-		void pop();
-		
-		void setSwipeNavigation(sl_bool flag);
-		
-		TransitionType getPushTransitionType();
-		
-		void setPushTransitionType(TransitionType type);
-		
-		TransitionType getPopTransitionType();
-		
-		void setPopTransitionType(TransitionType type);
-		
-		void setTransitionType(TransitionType type);
-		
-		TransitionDirection getPushTransitionDirection();
-		
-		void setPushTransitionDirection(TransitionDirection direction);
-		
-		TransitionDirection getPopTransitionDirection();
-		
-		void setPopTransitionDirection(TransitionDirection direction);
-		
-		void setTransitionDirection(TransitionDirection direction);
-		
-		float getPushTransitionDuration();
-		
-		void setPushTransitionDuration(float duration);
-
-		float getPopTransitionDuration();
-		
-		void setPopTransitionDuration(float duration);
-		
-		void setTransitionDuration(float duration);
-		
-		AnimationCurve getPushTransitionCurve();
-		
-		void setPushTransitionCurve(AnimationCurve curve);
-		
-		AnimationCurve getPopTransitionCurve();
-		
-		void setPopTransitionCurve(AnimationCurve curve);
-		
-		void setTransitionCurve(AnimationCurve curve);
-		
-	protected:
-		void _onFinishAnimation(const Ref<View>& view, UIPageAction action);
-		
-		void _resetAnimationStatus(const Ref<View>& view);
-			
-		void _goTo(sl_size index, const Transition& transition);
-		
-		void _push(const Ref<View>& page, const Transition& transition, sl_bool flagRemoveAllBackPages);
-		
-		void _pop(const Ref<View>& page, const Transition& transition);
-		
-		void _applyDefaultPushTransition(Transition& transition);
-		
-		void _applyDefaultPopTransition(Transition& transition);
-		
-		static void _runAnimationProc(const Ref<View>& view, const Function<void()>& callback);
-		
-	public:
-		SLIB_DECLARE_EVENT_HANDLER(ViewPager, PageAction, View* page, UIPageAction action)
-		SLIB_DECLARE_EVENT_HANDLER(ViewPager, EndPageAnimation, View* page, UIPageAction action)
-
-	protected:
-		void onResize(sl_ui_len width, sl_ui_len height) override;
-		
-		void onChangePadding() override;
-		
-		void onSwipe(GestureEvent* ev) override;
-		
-	protected:
-		CList< Ref<View> > m_pages;
-		sl_size m_indexCurrent;
-		sl_size m_minimumPagesCount;
-
-		sl_bool m_flagSwipeNavigation;
-
-		TransitionType m_pushTransitionType;
-		TransitionType m_popTransitionType;
-		TransitionDirection m_pushTransitionDirection;
-		TransitionDirection m_popTransitionDirection;
-		float m_pushTransitionDuration; // seconds
-		float m_popTransitionDuration; // seconds
-		AnimationCurve m_pushTransitionCurve;
-		AnimationCurve m_popTransitionCurve;
-		
-		sl_reg m_countActiveTransitionAnimations;
-		
-		friend class ViewPage;
-		
-	};
 
 	class SLIB_EXPORT ViewPage : public ViewGroup
 	{
@@ -188,18 +40,18 @@ namespace slib
 		~ViewPage();
 
 	public:
-		Ref<ViewPager> getPager();
+		Ref<ViewPageNavigationController> getNavigationController();
 		
-		void setPager(const Ref<ViewPager>& pager);
+		void setNavigationController(const Ref<ViewPageNavigationController>& controller);
 		
 		
-		void open(const Ref<ViewPager>& pager, const Transition& transition);
+		void open(const Ref<ViewPageNavigationController>& controller, const Transition& transition);
 		
-		void open(const Ref<ViewPager>& pager);
+		void open(const Ref<ViewPageNavigationController>& controller);
 		
-		void openHome(const Ref<ViewPager>& pager, const Transition& transition);
+		void openHome(const Ref<ViewPageNavigationController>& controller, const Transition& transition);
 		
-		void openHome(const Ref<ViewPager>& pager);
+		void openHome(const Ref<ViewPageNavigationController>& controller);
 		
 		void close(const Transition& transition);
 		
@@ -316,8 +168,8 @@ namespace slib
 		SLIB_DECLARE_EVENT_HANDLER(ViewPage, Close)
 		SLIB_DECLARE_EVENT_HANDLER(ViewPage, Resume)
 		SLIB_DECLARE_EVENT_HANDLER(ViewPage, Pause)
-		SLIB_DECLARE_EVENT_HANDLER(ViewPage, PageAction, ViewPager* pager, UIPageAction action)
-		SLIB_DECLARE_EVENT_HANDLER(ViewPage, EndPageAnimation, ViewPager* pager, UIPageAction action)
+		SLIB_DECLARE_EVENT_HANDLER(ViewPage, PageAction, ViewPageNavigationController* controller, UIPageAction action)
+		SLIB_DECLARE_EVENT_HANDLER(ViewPage, EndPageAnimation, ViewPageNavigationController* controller, UIPageAction action)
 		// For mobile platforms
 		SLIB_DECLARE_EVENT_HANDLER(ViewPage, BackPressed, UIEvent* ev)
 		// Pressed mobile back button or Closed popup window
@@ -342,7 +194,7 @@ namespace slib
 		void _onClosePopupWindow(Window* window, UIEvent* ev);
 
 	protected:
-		AtomicWeakRef<ViewPager> m_pager;
+		AtomicWeakRef<ViewPageNavigationController> m_navigationController;
 		
 		enum class PopupState
 		{
