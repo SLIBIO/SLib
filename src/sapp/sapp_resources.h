@@ -673,10 +673,13 @@ namespace slib
 	class SAppLayoutPagerAttributes : public Referable
 	{
 	public:
-		SAppBooleanValue swipe;
-		
 		CList<SAppLayoutPagerItem> items;
-		
+	};
+
+	class SAppLayoutNavigationAttributes : public Referable
+	{
+	public:
+		SAppBooleanValue swipe;
 	};
 
 	class SAppLayoutVideoAttributes : public Referable
@@ -762,10 +765,11 @@ namespace slib
 		Slider = 0x0241,
 		Picker = 0x0242,
 		Pager = 0x0243,
-		Video = 0x0244,
-		Camera = 0x0245,
-		QRCodeScanner = 0x0246,
-		Drawer = 0x0247
+		Navigation = 0x0244,
+		Video = 0x0245,
+		Camera = 0x0246,
+		QRCodeScanner = 0x0247,
+		Drawer = 0x0248
 	};
 
 	class SAppLayoutResourceItem : public Referable
@@ -802,6 +806,7 @@ namespace slib
 		Ref<SAppLayoutSliderAttributes> attrsSlider;
 		Ref<SAppLayoutPickerAttributes> attrsPicker;
 		Ref<SAppLayoutPagerAttributes> attrsPager;
+		Ref<SAppLayoutNavigationAttributes> attrsNavigation;
 		Ref<SAppLayoutVideoAttributes> attrsVideo;
 		Ref<SAppLayoutCameraAttributes> attrsCamera;
 		Ref<SAppLayoutDrawerAttributes> attrsDrawer;
@@ -828,35 +833,36 @@ namespace slib
 		CMap<String, sl_bool> customClasses;
 		CMap<String, sl_bool> radioGroups;
 
-		sl_uint32 nAutoIncreaseNameView;
-		sl_uint32 nAutoIncreaseNameViewGroup;
-		sl_uint32 nAutoIncreaseNameImport;
-		sl_uint32 nAutoIncreaseNameButton;
-		sl_uint32 nAutoIncreaseNameLabel;
-		sl_uint32 nAutoIncreaseNameCheck;
-		sl_uint32 nAutoIncreaseNameRadio;
-		sl_uint32 nAutoIncreaseNameEdit;
-		sl_uint32 nAutoIncreaseNamePassword;
-		sl_uint32 nAutoIncreaseNameTextArea;
-		sl_uint32 nAutoIncreaseNameImage;
-		sl_uint32 nAutoIncreaseNameSelect;
-		sl_uint32 nAutoIncreaseNameScroll;
-		sl_uint32 nAutoIncreaseNameLinear;
-		sl_uint32 nAutoIncreaseNameList;
-		sl_uint32 nAutoIncreaseNameListReport;
-		sl_uint32 nAutoIncreaseNameRender;
-		sl_uint32 nAutoIncreaseNameTab;
-		sl_uint32 nAutoIncreaseNameTree;
-		sl_uint32 nAutoIncreaseNameWeb;
-		sl_uint32 nAutoIncreaseNameSplit;
-		sl_uint32 nAutoIncreaseNameProgress;
-		sl_uint32 nAutoIncreaseNameSlider;
-		sl_uint32 nAutoIncreaseNamePicker;
-		sl_uint32 nAutoIncreaseNamePager;
-		sl_uint32 nAutoIncreaseNameVideo;
-		sl_uint32 nAutoIncreaseNameCamera;
-		sl_uint32 nAutoIncreaseNameQRCodeScanner;
-		sl_uint32 nAutoIncreaseNameDrawer;
+		sl_uint32 nAutoIncreaseNameView = 0;
+		sl_uint32 nAutoIncreaseNameViewGroup = 0;
+		sl_uint32 nAutoIncreaseNameImport = 0;
+		sl_uint32 nAutoIncreaseNameButton = 0;
+		sl_uint32 nAutoIncreaseNameLabel = 0;
+		sl_uint32 nAutoIncreaseNameCheck = 0;
+		sl_uint32 nAutoIncreaseNameRadio = 0;
+		sl_uint32 nAutoIncreaseNameEdit = 0;
+		sl_uint32 nAutoIncreaseNamePassword = 0;
+		sl_uint32 nAutoIncreaseNameTextArea = 0;
+		sl_uint32 nAutoIncreaseNameImage = 0;
+		sl_uint32 nAutoIncreaseNameSelect = 0;
+		sl_uint32 nAutoIncreaseNameScroll = 0;
+		sl_uint32 nAutoIncreaseNameLinear = 0;
+		sl_uint32 nAutoIncreaseNameList = 0;
+		sl_uint32 nAutoIncreaseNameListReport = 0;
+		sl_uint32 nAutoIncreaseNameRender = 0;
+		sl_uint32 nAutoIncreaseNameTab = 0;
+		sl_uint32 nAutoIncreaseNameTree = 0;
+		sl_uint32 nAutoIncreaseNameWeb = 0;
+		sl_uint32 nAutoIncreaseNameSplit = 0;
+		sl_uint32 nAutoIncreaseNameProgress = 0;
+		sl_uint32 nAutoIncreaseNameSlider = 0;
+		sl_uint32 nAutoIncreaseNamePicker = 0;
+		sl_uint32 nAutoIncreaseNamePager = 0;
+		sl_uint32 nAutoIncreaseNameNavigation = 0;
+		sl_uint32 nAutoIncreaseNameVideo = 0;
+		sl_uint32 nAutoIncreaseNameCamera = 0;
+		sl_uint32 nAutoIncreaseNameQRCodeScanner = 0;
+		sl_uint32 nAutoIncreaseNameDrawer = 0;
 
 	public:
 		SAppLayoutResource();

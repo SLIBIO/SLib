@@ -235,6 +235,7 @@ namespace slib
 		sl_bool _processLayoutResourceControl_Slider(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Picker(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Pager(LayoutControlProcessParams* params);
+		sl_bool _processLayoutResourceControl_Navigation(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Video(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Camera(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_QRCodeScanner(LayoutControlProcessParams* params);

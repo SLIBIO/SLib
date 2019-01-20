@@ -293,32 +293,6 @@ namespace slib
 	{
 		layoutType = SAppLayoutType::View;
 		itemType = SAppLayoutItemType::ViewGroup;
-		nAutoIncreaseNameView = 0;
-		nAutoIncreaseNameViewGroup = 0;
-		nAutoIncreaseNameImport = 0;
-		nAutoIncreaseNameButton = 0;
-		nAutoIncreaseNameLabel = 0;
-		nAutoIncreaseNameCheck = 0;
-		nAutoIncreaseNameRadio = 0;
-		nAutoIncreaseNameEdit = 0;
-		nAutoIncreaseNamePassword = 0;
-		nAutoIncreaseNameTextArea = 0;
-		nAutoIncreaseNameImage = 0;
-		nAutoIncreaseNameSelect = 0;
-		nAutoIncreaseNameScroll = 0;
-		nAutoIncreaseNameLinear = 0;
-		nAutoIncreaseNameList = 0;
-		nAutoIncreaseNameListReport = 0;
-		nAutoIncreaseNameRender = 0;
-		nAutoIncreaseNameTab = 0;
-		nAutoIncreaseNameTree = 0;
-		nAutoIncreaseNameWeb = 0;
-		nAutoIncreaseNameSplit = 0;
-		nAutoIncreaseNameProgress = 0;
-		nAutoIncreaseNameSlider = 0;
-		nAutoIncreaseNamePicker = 0;
-		nAutoIncreaseNamePager = 0;
-		nAutoIncreaseNameVideo = 0;
 	}
 
 	String SAppLayoutResource::getAutoIncreasingName(SAppLayoutItemType type)
@@ -428,6 +402,10 @@ namespace slib
 				prefix = "pager";
 				pN = &nAutoIncreaseNamePager;
 				break;
+			case SAppLayoutItemType::Navigation:
+				prefix = "navigation";
+				pN = &nAutoIncreaseNameNavigation;
+				break;
 			case SAppLayoutItemType::Video:
 				prefix = "video";
 				pN = &nAutoIncreaseNameVideo;
@@ -511,6 +489,8 @@ namespace slib
 			type = SAppLayoutItemType::Picker;
 		} else if (strType == "pager") {
 			type = SAppLayoutItemType::Pager;
+		} else if (strType == "navigation") {
+			type = SAppLayoutItemType::Navigation;
 		} else if (strType == "video") {
 			type = SAppLayoutItemType::Video;
 		} else if (strType == "camera") {

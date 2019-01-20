@@ -772,6 +772,7 @@ namespace slib
 			PROCESS_CONTROL_SWITCH(Slider)
 			PROCESS_CONTROL_SWITCH(Picker)
 			PROCESS_CONTROL_SWITCH(Pager)
+			PROCESS_CONTROL_SWITCH(Navigation)
 			PROCESS_CONTROL_SWITCH(Video)
 			PROCESS_CONTROL_SWITCH(Camera)
 			PROCESS_CONTROL_SWITCH(QRCodeScanner)
@@ -3679,8 +3680,6 @@ namespace slib
 	{
 		LAYOUT_CONTROL_PROCESS_SUPER(View)
 		
-		LAYOUT_CONTROL_GENERIC_ATTR(swipe, setSwipeNavigation)
-		
 		if (op == OP_PARSE) {
 			ListLocker< Ref<XmlElement> > itemXmls(_getLayoutItemChildElements(resourceItem, resource->name, "item"));
 			for (sl_size i = 0; i < itemXmls.count; i++) {
@@ -3773,6 +3772,15 @@ namespace slib
 				params->sbDefineInit->add(String::format("%s%s->selectPage(%d, slib::UIUpdateMode::Init);%n", strTab, name, indexSelected));
 			}
 		}
+		
+	}
+	END_PROCESS_LAYOUT_CONTROL
+
+	BEGIN_PROCESS_LAYOUT_CONTROL(Navigation, ViewPageNavigationController)
+	{
+		LAYOUT_CONTROL_PROCESS_SUPER(View)
+		
+		LAYOUT_CONTROL_GENERIC_ATTR(swipe, setSwipeNavigation)
 		
 	}
 	END_PROCESS_LAYOUT_CONTROL
