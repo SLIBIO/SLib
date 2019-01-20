@@ -61,4 +61,42 @@ namespace slib
 		populateInto(parent.get(), mode);
 	}
 
+	
+	ViewListAdapter::ViewListAdapter()
+	{
+	}
+	
+	ViewListAdapter::~ViewListAdapter()
+	{
+	}
+	
+	ViewListAdapter::ViewListAdapter(const List< Ref<View> >& list): m_list(list)
+	{
+	}
+
+	Ref<ViewListAdapter> ViewListAdapter::create(const List< Ref<View> >& list)
+	{
+		return new ViewListAdapter(list);
+	}
+	
+	List< Ref<View> > ViewListAdapter::getList()
+	{
+		return m_list;
+	}
+	
+	void ViewListAdapter::setList(const List< Ref<View> >& list)
+	{
+		m_list = list;
+	}
+	
+	sl_uint64 ViewListAdapter::getItemsCount()
+	{
+		return m_list.getCount();
+	}
+	
+	Ref<View> ViewListAdapter::getView(sl_uint64 index, View* original, View* parent)
+	{
+		return m_list.getValueAt((sl_size)index);
+	}
+	
 }

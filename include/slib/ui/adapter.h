@@ -134,6 +134,32 @@ namespace slib
 		
 	};
 	
+	class ViewListAdapter : public ViewAdapter
+	{
+	public:
+		ViewListAdapter();
+		
+		~ViewListAdapter();
+		
+		ViewListAdapter(const List< Ref<View> >& list);
+		
+	public:
+		static Ref<ViewListAdapter> create(const List< Ref<View> >& list);
+		
+		List< Ref<View> > getList();
+		
+		void setList(const List< Ref<View> >& list);
+		
+	public:
+		sl_uint64 getItemsCount() override;
+		
+		Ref<View> getView(sl_uint64 index, View* original, View* parent) override;
+		
+	protected:
+		AtomicList< Ref<View> > m_list;
+
+	};
+	
 }
 
 #endif
