@@ -13,8 +13,6 @@
 			width='fill'
 			height='fill'
 			margin='10%'
-			swipe='true'
-			clipping='true'
 		>
 			<item>
 				<view

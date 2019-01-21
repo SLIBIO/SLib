@@ -45,20 +45,50 @@ namespace slib
 		
 		void addPage(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 
+		sl_uint64 getPagesCount();
+		
 		sl_uint64 getCurrentIndex();
 		
-		void selectPage(sl_uint64 index, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void selectPage(sl_uint64 index, UIUpdateMode mode = UIUpdateMode::Animate);
+
+		void goToPrevious(UIUpdateMode mode = UIUpdateMode::Animate);
+		
+		void goToNext(UIUpdateMode mode = UIUpdateMode::Animate);
 
 	protected:
+		void onMouseEvent(UIEvent* ev) override;
+		
 		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
 		void onChangePadding() override;
+		
+	private:
+		Ref<View> _loadPage(sl_uint64 index);
+		
+		sl_real _getPagePosition(sl_uint64 index);
+		
+		void _relocatePages();
+		
+		void _resizePages();
+		
+		void _reloadPages();
+
+		void _cleanCache();
+		
+		void _onAnimation(Timer* timer);
 		
 	protected:
 		AtomicRef<ViewAdapter> m_adapter;
 		CHashMap< sl_uint64, Ref<View> > m_cache;
 		sl_uint64 m_indexCurrent;
 
+		MotionTracker m_motionTracker;
+		sl_bool m_flagMouseDown;
+		sl_real m_posMouseDown;
+		sl_real m_offsetPages;
+		sl_real m_offsetPagesMouseDown;
+
+		AtomicRef<Timer> m_timer;
 	};
 
 }

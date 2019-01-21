@@ -3741,10 +3741,10 @@ namespace slib
 						}
 					}
 					
-					if (!flagOnLayout) {
-						view->selectPage(indexSelected, UIUpdateMode::Init);
-					}
-					
+				}
+				
+				if (!flagOnLayout) {
+					view->selectPage(indexSelected);
 				}
 				
 			}
@@ -3769,7 +3769,7 @@ namespace slib
 						indexSelected = i;
 					}
 				}
-				params->sbDefineInit->add(String::format("%s%s->selectPage(%d, slib::UIUpdateMode::Init);%n", strTab, name, indexSelected));
+				params->sbDefineInit->add(String::format("%s%s->selectPage(%d);%n", strTab, name, indexSelected));
 			}
 		}
 		

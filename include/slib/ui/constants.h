@@ -264,11 +264,13 @@ namespace slib
 		None = 0,
 		Redraw = 1,
 		UpdateLayout = 3,
+		Animate = 5,
 		Init = 0x8000
 	};
 	
 #define SLIB_UI_UPDATE_MODE_IS_REDRAW(mode) (((int)(mode)) & ((int)(UIUpdateMode::Redraw)))
 #define SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode) (((int)(mode)) & ((int)(UIUpdateMode::UpdateLayout)))
+#define SLIB_UI_UPDATE_MODE_IS_ANIMATE(mode) (((int)(mode)) & ((int)(UIUpdateMode::Animate)))
 #define SLIB_UI_UPDATE_MODE_IS_INIT(mode) ((mode) == UIUpdateMode::Init)
 
 	enum class RedrawMode
