@@ -44,14 +44,14 @@ namespace slib
 		
 		m_flagSwipeNavigation = sl_false;
 		
-		m_pushTransitionType = TransitionType::Push;
+		m_pushTransitionType = TransitionType::Slide;
 		m_pushTransitionDirection = TransitionDirection::FromRightToLeft;
 		m_pushTransitionCurve = AnimationCurve::EaseInOut;
-		m_pushTransitionDuration = 0.5f;
-		m_popTransitionType = TransitionType::Push;
+		m_pushTransitionDuration = 0.2f;
+		m_popTransitionType = TransitionType::Slide;
 		m_popTransitionDirection = TransitionDirection::FromLeftToRight;
 		m_popTransitionCurve = AnimationCurve::EaseInOut;
-		m_popTransitionDuration = 0.5f;
+		m_popTransitionDuration = 0.2f;
 		
 		m_countActiveTransitionAnimations = 0;
 	}
