@@ -172,6 +172,21 @@ namespace slib
 				}
 			}
 		}
+		String strStyle = element->getAttribute("style").trim();
+		if (strStyle.isNotEmpty()) {
+			ListLocker<String> arr(strStyles.split(","));
+			for (sl_size i = 0; i < arr.count; i++) {
+				String s = arr[i].trim();
+				Ref<SAppLayoutStyle> style;
+				getItemFromMap(m_layoutStyles, layout->name, s, sl_null, &style);
+				if (style.isNotNull()) {
+					item->styles.add(style);
+				} else {
+					_logError(element, _g_sdev_sapp_error_layout_style_not_found.arg(s));
+					return sl_false;
+				}
+			}
+		}
 		
 		if (parent) {
 			String name = element->getAttribute("name");
