@@ -6,7 +6,7 @@
 		height='10%smin'
 		background='@drawable/back'
 		border='false'
-		top='5%smin'
+		top='1safeT'
 		cancel='true'
 		/>
 

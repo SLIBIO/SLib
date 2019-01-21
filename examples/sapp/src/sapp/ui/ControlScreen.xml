@@ -1,10 +1,11 @@
 <sapp>
 	<layout
 		type='page'
+		background='white'
 		>
 		<button
 			name='btnBack'
-			styles='button_back'
+			style='button_back'
 			/>
 		<scroll width='fill' height='fill' below='btnBack'>
 			<group width='fill' height='wrap' minHeight='85%vh' padding='10%smin'>
@@ -13,23 +14,23 @@
 					height='wrap'
 					alignCenter='true'
 				>
-					<button name='btnSetOrientationPortrait' text='Portrait' styles='button_normal,menu_button' />
+					<button name='btnSetOrientationPortrait' text='Portrait' style='button_normal,menu_button' />
 
-					<button name='btnSetOrientationPortraitUpDown' text='Portrait UpDown' styles='button_normal,menu_button'/>
+					<button name='btnSetOrientationPortraitUpDown' text='Portrait UpDown' style='button_normal,menu_button'/>
 
-					<button name='btnSetOrientationLandscapeRight' text='Landscape Right' styles='button_normal,menu_button'/>
+					<button name='btnSetOrientationLandscapeRight' text='Landscape Right' style='button_normal,menu_button'/>
 
-					<button name='btnSetOrientationLandscapeLeft' text='Landscape Left' styles='button_normal,menu_button'/>
+					<button name='btnSetOrientationLandscapeLeft' text='Landscape Left' style='button_normal,menu_button'/>
 
-					<button name='btnSetOrientationLandscape' text='Landscape Left/Right' styles='button_normal,menu_button'/>
+					<button name='btnSetOrientationLandscape' text='Landscape Left/Right' style='button_normal,menu_button'/>
 
-					<button name='btnSetOrientationAll' text='All Orientation' styles='button_normal,menu_button'/>
+					<button name='btnSetOrientationAll' text='All Orientation' style='button_normal,menu_button'/>
 
-					<button name='btnBlackStatusBar' text='Black Status Bar' styles='button_normal,menu_button'/>
+					<button name='btnBlackStatusBar' text='Black Status Bar' style='button_normal,menu_button'/>
 
-					<button name='btnLightStatusBar' text='Light Status Bar' styles='button_normal,menu_button'/>
+					<button name='btnLightStatusBar' text='Light Status Bar' style='button_normal,menu_button'/>
 
-					<button name='btnHideStatusBar' text='Hide Status Bar' styles='button_normal,menu_button'/>
+					<button name='btnHideStatusBar' text='Hide Status Bar' style='button_normal,menu_button'/>
 					
 				</linear>
 			</group>

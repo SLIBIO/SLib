@@ -6,7 +6,7 @@
 		
 		<button
 			name='btnBack'
-			styles='button_back'
+			style='button_back'
 			colorOverlay='white'
 			colorOverlayPressed='blue'
 			/>

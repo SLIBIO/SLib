@@ -29,14 +29,14 @@
 		</linear>
 
 		<button
-			styles='button_back'
+			style='button_back'
 			colorOverlay='white'
 			colorOverlayPressed='blue'
 			/>
 
 		<drawer gravity='left' dragEdgeSize='6mm'>
 			<group width='50%sw' height='fill' background='#a0a0a0'>
-				<button text='Close' styles='button_normal' width='25%smin' alignCenter='true' cancel='true' />
+				<button text='Close' style='button_normal' width='25%smin' alignCenter='true' cancel='true' />
 			</group>
 		</drawer>
 

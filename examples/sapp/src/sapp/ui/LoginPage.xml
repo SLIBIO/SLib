@@ -15,9 +15,9 @@
 				centerHorizontal='true'
 				/>
 
-			<hlinear styles='login_section'>
+			<hlinear style='login_section'>
 				<label
-					styles='label'
+					style='label'
 					text='Job'
 					width='30%sw'
 					gravity='center'
@@ -37,11 +37,11 @@
 				</select>
 			</hlinear>
 
-			<view styles='border' />
+			<view style='border' />
 
-			<hlinear styles='login_section'>
+			<hlinear style='login_section'>
 				<label
-					styles='label'
+					style='label'
 					text='Email'
 					width='30%sw'
 					gravity='center'
@@ -50,7 +50,7 @@
 				
 				<edit
 					name='txtEmail'
-					styles='edit'
+					style='edit'
 					width='*'
 					gravity='left'
 					hintText='Input your email address'
@@ -59,11 +59,11 @@
 					/>
 			</hlinear>
 
-			<view styles='border' />
+			<view style='border' />
 
-			<hlinear styles='login_section'>
+			<hlinear style='login_section'>
 				<label
-					styles='label'
+					style='label'
 					text='Password'
 					width='30%sw'
 					gravity='center'
@@ -72,7 +72,7 @@
 				
 				<password
 					name='txtPassword'
-					styles='edit'
+					style='edit'
 					width='*'
 					gravity='left'
 					hintText='Enter password'
@@ -81,12 +81,12 @@
 					/>
 			</hlinear>
 
-			<view styles='border' />
+			<view style='border' />
 
 			<button
 				name='btnLogin'
 				margin='6%sw'
-				styles='button'
+				style='button'
 				text='Login'
 				width='fill'
 				/>
@@ -94,7 +94,7 @@
 		</linear>
 
 		<button
-			styles='button_back'
+			style='button_back'
 			/>
  	</layout>
 

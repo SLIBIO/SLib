@@ -1,11 +1,12 @@
 <sapp>
 	<layout
 		type='page'
+		background='white'
 		>
 
 		<button
 			name='btnBack'
-			styles='button_back'
+			style='button_back'
 			/>
 
 		<pager

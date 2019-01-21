@@ -1,6 +1,7 @@
 <sapp>
 	<layout
 		type='page'
+		background='white'
 		>
 		<scroll width='fill' height='fill' horizontal='false'>
 			<group width='fill' height='wrap' minHeight='100%vh'>
@@ -11,23 +12,23 @@
 					padding='10%smin'
 				>
 
-					<button name='btnHelloWorld' text='@string/hello_world' styles='button_normal,menu_button'/>
+					<button name='btnHelloWorld' text='@string/hello_world' style='button_normal,menu_button'/>
 
-					<button name='btnViewPager' text='ViewPager' styles='button_normal,menu_button'/>
+					<button name='btnViewPager' text='ViewPager' style='button_normal,menu_button'/>
 
-					<button name='btnDrawer' text='Drawer' styles='button_normal,menu_button'/>
+					<button name='btnDrawer' text='Drawer' style='button_normal,menu_button'/>
 
-					<button name='btnVideoView' text='VideoView' styles='button_normal,menu_button'/>
+					<button name='btnVideoView' text='VideoView' style='button_normal,menu_button'/>
 
-					<button name='btnCameraView' text='CameraView' styles='button_normal,menu_button'/>
+					<button name='btnCameraView' text='CameraView' style='button_normal,menu_button'/>
 
-					<button name='btnWebView' text='WebView' styles='button_normal,menu_button'/>
+					<button name='btnWebView' text='WebView' style='button_normal,menu_button'/>
 
-					<button name='btnControlScreen' text='Control Screen' styles='button_normal,menu_button'/>
+					<button name='btnControlScreen' text='Control Screen' style='button_normal,menu_button'/>
 
-					<button name='btnLoginPage' text='Login Page' styles='button_normal,menu_button'/>
+					<button name='btnLoginPage' text='Login Page' style='button_normal,menu_button'/>
 
-					<button name='btnQRCodeScanner' text='QRCodeScanner' styles='button_normal,menu_button'/>
+					<button name='btnQRCodeScanner' text='QRCodeScanner' style='button_normal,menu_button'/>
 
 				</linear>
 			</group>

@@ -172,8 +172,8 @@ namespace slib
 				}
 			}
 		}
-		String strStyle = element->getAttribute("style").trim();
-		if (strStyle.isNotEmpty()) {
+		strStyles = element->getAttribute("style").trim();
+		if (strStyles.isNotEmpty()) {
 			ListLocker<String> arr(strStyles.split(","));
 			for (sl_size i = 0; i < arr.count; i++) {
 				String s = arr[i].trim();
