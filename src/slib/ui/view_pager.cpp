@@ -273,13 +273,13 @@ namespace slib
 			if (n > 100) {
 				n = 100;
 			}
-			return getWidth() * (sl_ui_len)n;
+			return (sl_real)(getWidth()) * (sl_real)n;
 		} else {
 			sl_uint64 n = cur - index;
 			if (n > 100) {
 				n = 100;
 			}
-			return - (getWidth() * (sl_ui_len)n);
+			return - ((sl_real)(getWidth()) * (sl_real)n);
 		}
 	}
 	
