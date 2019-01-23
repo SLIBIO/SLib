@@ -389,7 +389,8 @@ namespace slib
 		SAppColorValue textColor;
 		SAppAlignmentValue gravity;
 		SAppMultiLineModeValue multiLine;
-		
+		SAppEllipsizeModeValue ellipsize;
+
 	public:
 		sl_bool isNotRequiredNative();
 

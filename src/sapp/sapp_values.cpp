@@ -2499,4 +2499,62 @@ namespace slib
 		return sl_false;
 	}
 	
+
+	/************************************************
+	 				EllipsizeMode
+	************************************************/
+	
+	SAppEllipsizeModeValue::SAppEllipsizeModeValue()
+	: flagDefined(sl_false), value(EllipsizeMode::None)
+	{
+	}
+	
+	String SAppEllipsizeModeValue::getAccessString()
+	{
+		if (!flagDefined) {
+			return "slib::EllipsizeMode::None";
+		}
+		switch (value) {
+			case EllipsizeMode::None:
+				return "slib::EllipsizeMode::None";
+			case EllipsizeMode::End:
+				return "slib::EllipsizeMode::End";
+			case EllipsizeMode::Start:
+				return "slib::EllipsizeMode::Start";
+			case EllipsizeMode::Middle:
+				return "slib::EllipsizeMode::Middle";
+			default:
+				break;
+		}
+		return "slib::EllipsizeMode::None";
+	}
+	
+	sl_bool SAppEllipsizeModeValue::parse(const String& _str)
+	{
+		String str = _str.trim();
+		if (str.isEmpty()) {
+			flagDefined = sl_false;
+			return sl_true;
+		}
+		str = str.toLower();
+		if (str == "none") {
+			value = EllipsizeMode::None;
+			flagDefined = sl_true;
+			return sl_true;
+		} else if (str == "end") {
+			value = EllipsizeMode::End;
+			flagDefined = sl_true;
+			return sl_true;
+		} else if (str == "start") {
+			value = EllipsizeMode::Start;
+			flagDefined = sl_true;
+			return sl_true;
+		} else if (str == "middle") {
+			value = EllipsizeMode::Middle;
+			flagDefined = sl_true;
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
 }

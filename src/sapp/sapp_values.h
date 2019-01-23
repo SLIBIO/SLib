@@ -597,6 +597,22 @@ namespace slib
 		
 	};
 	
+	class SAppEllipsizeModeValue
+	{
+	public:
+		sl_bool flagDefined;
+		EllipsizeMode value;
+		
+	public:
+		SAppEllipsizeModeValue();
+		
+	public:
+		String getAccessString();
+		
+		sl_bool parse(const String& str);
+		
+	};
+	
 }
 
 #endif
