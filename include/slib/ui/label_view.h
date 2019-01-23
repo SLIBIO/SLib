@@ -60,9 +60,13 @@ namespace slib
 		
 		virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		MultiLineMode getMultiLineMode();
+		MultiLineMode getMultiLine();
 		
-		virtual void setMultiLineMode(MultiLineMode multiLineMode, UIUpdateMode updateMode = UIUpdateMode::UpdateLayout);
+		virtual void setMultiLine(MultiLineMode multiLineMode, UIUpdateMode updateMode = UIUpdateMode::UpdateLayout);
+		
+		EllipsizeMode getEllipsize();
+		
+		virtual void setEllipsize(EllipsizeMode ellipsizeMode, UIUpdateMode updateMode = UIUpdateMode::UpdateLayout);
 		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
@@ -90,6 +94,7 @@ namespace slib
 		Color m_textColor;
 		Alignment m_textAlignment;
 		MultiLineMode m_multiLineMode;
+		EllipsizeMode m_ellipsizeMode;
 		
 		SimpleTextBox m_textBox;
 		

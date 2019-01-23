@@ -39,6 +39,7 @@ namespace slib
 		m_textAlignment = Alignment::Left;
 		m_textColor = Color::Black;
 		m_multiLineMode = MultiLineMode::Single;
+		m_ellipsizeMode = EllipsizeMode::None;
 		
 		setPadding(1, 1, 1, 1, UIUpdateMode::Init);
 	}
@@ -96,20 +97,31 @@ namespace slib
 		}
 	}
 	
-	MultiLineMode LabelView::getMultiLineMode()
+	MultiLineMode LabelView::getMultiLine()
 	{
 		return m_multiLineMode;
 	}
 	
-	void LabelView::setMultiLineMode(MultiLineMode multiLineMode, UIUpdateMode updateMode)
+	void LabelView::setMultiLine(MultiLineMode multiLineMode, UIUpdateMode updateMode)
 	{
 		m_multiLineMode = multiLineMode;
 		invalidateLayoutOfWrappingControl(updateMode);
 	}
 	
+	EllipsizeMode LabelView::getEllipsize()
+	{
+		return m_ellipsizeMode;
+	}
+	
+	void LabelView::setEllipsize(EllipsizeMode ellipsizeMode, UIUpdateMode updateMode)
+	{
+		m_ellipsizeMode = ellipsizeMode;
+		invalidate(updateMode);
+	}
+	
 	void LabelView::onDraw(Canvas* canvas)
 	{
-		m_textBox.draw(canvas, m_text, getFont(), getBoundsInnerPadding(), isWidthWrapping(), m_multiLineMode, m_textAlignment, m_textColor);
+		m_textBox.draw(canvas, m_text, getFont(), getBoundsInnerPadding(), isWidthWrapping(), m_multiLineMode, m_ellipsizeMode, m_textAlignment, m_textColor);
 	}
 	
 	void LabelView::onUpdateLayout()
@@ -122,7 +134,7 @@ namespace slib
 		}
 		
 		sl_ui_pos paddingWidth = getPaddingLeft() + getPaddingRight();
-		m_textBox.update(m_text, getFont(), (sl_real)(getLayoutWidth() - paddingWidth), isWidthWrapping(), m_multiLineMode, m_textAlignment);
+		m_textBox.update(m_text, getFont(), (sl_real)(getLayoutWidth() - paddingWidth), isWidthWrapping(), m_multiLineMode, m_ellipsizeMode, m_textAlignment);
 		if (flagHorizontal) {
 			setLayoutWidth((sl_ui_pos)(m_textBox.getContentWidth()) + paddingWidth);
 		}

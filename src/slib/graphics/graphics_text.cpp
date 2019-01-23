@@ -411,6 +411,7 @@ namespace slib
 		sl_real m_layoutWidth;
 		Alignment m_align;
 		MultiLineMode m_multiLineMode;
+		EllipsizeMode m_ellipsizeMode;
 		sl_real m_tabMargin;
 		sl_real m_tabWidth;
 		
@@ -431,6 +432,7 @@ namespace slib
 			m_layoutWidth = param.width;
 			m_align = param.align & Alignment::HorizontalMask;
 			m_multiLineMode = param.multiLineMode;
+			m_ellipsizeMode = param.ellipsisMode;
 			m_tabWidth = param.tabWidth;
 			m_tabMargin = param.tabMargin;
 			
@@ -457,6 +459,11 @@ namespace slib
 			} else {
 				x = 0;
 			}
+			if (m_ellipsizeMode != EllipsizeMode::None) {
+				if (m_lineWidth > m_layoutWidth) {
+					x = 0;
+				}
+			}
 			sl_real bottom = m_y + m_lineHeight;
 			Ref<TextItem>* p = m_lineItems.getData();
 			for (sl_size i = 0; i < n; i++) {
@@ -472,6 +479,13 @@ namespace slib
 				}
 				x += size.x;
 			}
+			
+			if (m_ellipsizeMode != EllipsizeMode::None) {
+				if (m_lineWidth > m_layoutWidth) {
+					endEllipsize();
+				}
+			}
+			
 			m_lineItems.removeAll_NoLock();
 			if (m_lineWidth > m_maxWidth) {
 				m_maxWidth = m_lineWidth;
@@ -480,6 +494,168 @@ namespace slib
 			m_lineWidth = 0;
 			m_y = bottom;
 			m_lineHeight = 0;
+			
+		}
+		
+		void endEllipsize() noexcept
+		{
+			SLIB_STATIC_STRING16_BY_ARRAY(strEllipsis, '.', '.', '.')
+			sl_size nItems = m_layoutItems->getCount();
+			Ref<TextItem>* items = m_layoutItems->getData();
+			if (nItems < 1) {
+				return;
+			}
+			Ref<TextStyle> style = items[nItems - 1]->getStyle();
+			Ref<TextWordItem> itemEllipsis = TextWordItem::create(strEllipsis, style);
+			if (itemEllipsis.isNull()) {
+				return;
+			}
+			Size sizeEllipsis = itemEllipsis->getSize();
+			if (m_layoutWidth < sizeEllipsis.x) {
+				return;
+			}
+			sl_real xLimit = m_layoutWidth - sizeEllipsis.x;
+			if (m_ellipsizeMode == EllipsizeMode::End) {
+				for (sl_size i = 0; i < nItems; i++) {
+					TextItem* item = items[i].get();
+					Point pos = item->getLayoutPosition();
+					if (pos.x + item->getLayoutSize().x > xLimit) {
+						itemEllipsis->setLayoutPosition(pos);
+						itemEllipsis->setLayoutSize(sizeEllipsis);
+						if (item->getType() == TextItemType::Word) {
+							String16 text = ((TextWordItem*)item)->getText();
+							Ref<TextWordItem> word = TextWordItem::create(text, item->getStyle());
+							if (word.isNotNull()) {
+								sl_real widthLimit = xLimit - pos.x;
+								sl_size n = text.getLength();
+								sl_size k = n;
+								for (; k > 0; k--) {
+									word->setText(text.substring(0, k));
+									if (word->getSize().x <= widthLimit) {
+										break;
+									}
+								}
+								m_layoutItems->setCount_NoLock(i);
+								if (k > 0) {
+									word->setLayoutPosition(item->getLayoutPosition());
+									word->setLayoutSize(word->getSize());
+									m_layoutItems->add_NoLock(word);
+									pos.x += word->getSize().x;
+									itemEllipsis->setLayoutPosition(pos);
+								}
+							} else {
+								m_layoutItems->setCount_NoLock(i);
+							}
+						} else {
+							m_layoutItems->setCount_NoLock(i);
+						}
+						m_layoutItems->add_NoLock(itemEllipsis);
+						m_flagEnd = sl_true;
+						return;
+					}
+				}
+			} else if (m_ellipsizeMode == EllipsizeMode::Start) {
+				for (sl_size i = 0; i < nItems; i++) {
+					TextItem* item = items[nItems - 1 - i].get();
+					Point pos = item->getLayoutPosition();
+					pos.x = m_layoutWidth - m_lineWidth + pos.x;
+					item->setLayoutPosition(pos);
+					if (pos.x < sizeEllipsis.x) {
+						if (i > 0) {
+							itemEllipsis->setLayoutPosition(Point(items[nItems - i]->getLayoutPosition().x - sizeEllipsis.x, item->getLayoutPosition().y));
+						} else {
+							itemEllipsis->setLayoutPosition(Point(pos.x + item->getLayoutSize().x - sizeEllipsis.x, item->getLayoutPosition().y));
+						}
+						itemEllipsis->setLayoutSize(sizeEllipsis);
+						if (item->getType() == TextItemType::Word) {
+							sl_real widthWord = item->getLayoutSize().x;
+							String16 text = ((TextWordItem*)item)->getText();
+							Ref<TextWordItem> word = TextWordItem::create(text, item->getStyle());
+							if (word.isNotNull()) {
+								sl_real widthLimit = widthWord - (sizeEllipsis.x - pos.x);
+								sl_size n = text.getLength();
+								sl_size k = n;
+								for (; k > 0; k--) {
+									word->setText(text.substring(n - k, n));
+									if (word->getSize().x <= widthLimit) {
+										break;
+									}
+								}
+								m_layoutItems->removeRange_NoLock(0, nItems - i);
+								if (k > 0) {
+									pos.x = pos.x + widthWord - word->getSize().x;
+									word->setLayoutPosition(pos);
+									word->setLayoutSize(word->getSize());
+									m_layoutItems->add_NoLock(word);
+									pos.x -= sizeEllipsis.x;
+									itemEllipsis->setLayoutPosition(pos);
+								}
+							} else {
+								m_layoutItems->removeRange_NoLock(0, nItems - i);
+							}
+						} else {
+							m_layoutItems->removeRange_NoLock(0, nItems - i);
+						}
+						m_layoutItems->insert_NoLock(0, itemEllipsis);
+						m_flagEnd = sl_true;
+						return;
+					}
+				}
+			} else if (m_ellipsizeMode == EllipsizeMode::Middle) {
+				sl_real xEllipsis = 0;
+				itemEllipsis->setLayoutSize(sizeEllipsis);
+				sl_size i;
+				for (i = 0; i < nItems; i++) {
+					TextItem* item = items[i].get();
+					Point pos = item->getLayoutPosition();
+					if (pos.x + item->getLayoutSize().x > xLimit / 2) {
+						xEllipsis = pos.x;
+						break;
+					}
+				}
+				itemEllipsis->setLayoutPosition(Point(xEllipsis, items[0]->getLayoutPosition().y));
+				sl_size indexMid = i;
+				for (i = 0; i < nItems - indexMid; i++) {
+					TextItem* item = items[nItems - 1 - i].get();
+					Point pos = item->getLayoutPosition();
+					pos.x = m_layoutWidth - m_lineWidth + pos.x;
+					item->setLayoutPosition(pos);
+					if (pos.x < itemEllipsis->getLayoutFrame().right + sizeEllipsis.x * 0.2f) {
+						if (item->getType() == TextItemType::Word) {
+							sl_real widthWord = item->getLayoutSize().x;
+							String16 text = ((TextWordItem*)item)->getText();
+							Ref<TextWordItem> word = TextWordItem::create(text, item->getStyle());
+							if (word.isNotNull()) {
+								sl_real widthLimit = widthWord - (itemEllipsis->getLayoutFrame().right + sizeEllipsis.x * 0.2f - pos.x);
+								sl_size n = text.getLength();
+								sl_size k = n;
+								for (; k > 0; k--) {
+									word->setText(text.substring(n - k, n));
+									if (word->getSize().x <= widthLimit) {
+										break;
+									}
+								}
+								m_layoutItems->removeRange(indexMid, nItems - indexMid - i);
+								if (k > 0) {
+									pos.x = pos.x + widthWord - word->getSize().x;
+									word->setLayoutPosition(pos);
+									word->setLayoutSize(word->getSize());
+									m_layoutItems->insert_NoLock(indexMid, word);
+									pos.x -= sizeEllipsis.x + sizeEllipsis.x * 0.2f;
+									itemEllipsis->setLayoutPosition(pos);
+								}
+							} else {
+								m_layoutItems->removeRange_NoLock(indexMid, nItems - indexMid - i);
+							}
+						} else {
+							m_layoutItems->removeRange_NoLock(indexMid, nItems - indexMid - i);
+						}
+						m_layoutItems->insert_NoLock(indexMid, itemEllipsis);
+						m_flagEnd = sl_true;
+						return;
+					}
+				}
+			}
 		}
 		
 		void breakWord(TextWordItem* breakItem) noexcept
@@ -816,7 +992,7 @@ namespace slib
 	{
 	}
 
-	void SimpleTextBox::update(const String& text, const Ref<Font>& font, sl_real width, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, const Alignment& _align) noexcept
+	void SimpleTextBox::update(const String& text, const Ref<Font>& font, sl_real width, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& _align) noexcept
 	{
 		ObjectLocker lock(this);
 		
@@ -834,11 +1010,15 @@ namespace slib
 			if (multiLineMode != MultiLineMode::Single) {
 				multiLineMode = MultiLineMode::Multiple;
 			}
+			ellipsizeMode = EllipsizeMode::None;
+		}
+		if (multiLineMode != MultiLineMode::Single) {
+			ellipsizeMode = EllipsizeMode::None;
 		}
 		
 		Alignment align = _align & Alignment::HorizontalMask;
 		
-		if (align == Alignment::Left && (multiLineMode == MultiLineMode::Single || multiLineMode == MultiLineMode::Multiple)) {
+		if (align == Alignment::Left && (multiLineMode == MultiLineMode::Single || multiLineMode == MultiLineMode::Multiple) && ellipsizeMode == EllipsizeMode::None) {
 			width = 0;
 		}
 		
@@ -863,7 +1043,7 @@ namespace slib
 			if (m_font != font) {
 				flagReLayout = sl_true;
 			}
-			if (!(Math::isAlmostZero(m_width - width)) || m_multiLineMode != multiLineMode || m_align != align) {
+			if (!(Math::isAlmostZero(m_width - width)) || m_multiLineMode != multiLineMode || m_ellipsisMode != ellipsizeMode || m_align != align) {
 				flagReLayout = sl_true;
 			}
 			if (flagReLayout) {
@@ -872,11 +1052,13 @@ namespace slib
 				param.tabWidth = font->getFontHeight() * 2;
 				param.tabMargin = param.tabWidth / 4;
 				param.multiLineMode = multiLineMode;
+				param.ellipsisMode = ellipsizeMode;
 				param.align = align;
 				m_paragraph->layout(param);
 				
 				m_font = font;
 				m_multiLineMode = multiLineMode;
+				m_ellipsisMode = ellipsizeMode;
 				m_align = align;
 				m_width = width;
 				
@@ -886,7 +1068,7 @@ namespace slib
 		}
 	}
 
-	void SimpleTextBox::draw(Canvas* canvas, const String& text, const Ref<Font>& font, const Rectangle& frame, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, const Alignment& align, const Color& color) noexcept
+	void SimpleTextBox::draw(Canvas* canvas, const String& text, const Ref<Font>& font, const Rectangle& frame, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align, const Color& color) noexcept
 	{
 		if (color.isZero()) {
 			return;
@@ -898,7 +1080,7 @@ namespace slib
 		ObjectLocker lock(this);
 		Ref<TextParagraph> paragraphOld = m_paragraph;
 		m_style->textColor = color;
-		update(text, font, width, flagWrappingWidth, multiLineMode, align);
+		update(text, font, width, flagWrappingWidth, multiLineMode, ellipsizeMode, align);
 		if (m_paragraph.isNotNull()) {
 			sl_real height = m_paragraph->getTotalHeight();
 			Alignment valign = align & Alignment::VerticalMask;

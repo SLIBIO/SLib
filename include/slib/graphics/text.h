@@ -245,6 +245,7 @@ namespace slib
 		sl_real tabMargin;
 		Alignment align;
 		MultiLineMode multiLineMode;
+		EllipsizeMode ellipsisMode;
 
 	public:
 		TextParagraphLayoutParam() noexcept;
@@ -294,9 +295,9 @@ namespace slib
 		~SimpleTextBox() noexcept;
 
 	public:
-		void update(const String& text, const Ref<Font>& font, sl_real width, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, const Alignment& align) noexcept;
+		void update(const String& text, const Ref<Font>& font, sl_real width, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align) noexcept;
 
-		void draw(Canvas* canvas, const String& text, const Ref<Font>& font, const Rectangle& frame, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, const Alignment& align, const Color& color) noexcept;
+		void draw(Canvas* canvas, const String& text, const Ref<Font>& font, const Rectangle& frame, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align, const Color& color) noexcept;
 
 		sl_real getContentWidth() noexcept;
 
@@ -310,6 +311,7 @@ namespace slib
 		Ref<Font> m_font;
 		sl_real m_width;
 		MultiLineMode m_multiLineMode;
+		EllipsizeMode m_ellipsisMode;
 		Alignment m_align;
 
 		sl_real m_contentWidth;

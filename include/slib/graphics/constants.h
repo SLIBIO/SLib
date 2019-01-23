@@ -161,7 +161,15 @@ namespace slib
 		WordWrap, // Break at TAB, Spaces, CR/LF
 		BreakWord // Break at any position
 	};
-
+	
+	enum class EllipsizeMode
+	{
+		None = 0,
+		End = 1,
+		Start = 2,
+		Middle = 3
+	};
+	
 }
 
 #endif
