@@ -81,10 +81,10 @@ namespace slib
 		
 		ListViewAdapter(const List<DataType>& list): m_list(list) {}
 		
-		ListViewAdapter(const List<DataType>& list, const Function<void(const DataType& data, ViewType* view, View* parent)>& onBindView): m_list(list), m_onBindView(onBindView) {}
+		ListViewAdapter(const List<DataType>& list, const Function<void(DataType& data, ViewType* view, View* parent)>& onBindView): m_list(list), m_onBindView(onBindView) {}
 
 	public:
-		static Ref<ListViewAdapter> create(const List<DataType>& list, const Function<void(const DataType& data, ViewType* view, View* parent)>& onBindView)
+		static Ref<ListViewAdapter> create(const List<DataType>& list, const Function<void(DataType& data, ViewType* view, View* parent)>& onBindView)
 		{
 			return new ListViewAdapter(list, onBindView);
 		}
@@ -99,12 +99,12 @@ namespace slib
 			m_list = list;
 		}
 		
-		Function<void(const DataType& data, ViewType* view, View* parent)> getOnBindView()
+		Function<void(DataType& data, ViewType* view, View* parent)> getOnBindView()
 		{
 			return m_onBindView;
 		}
 		
-		void setOnBindView(const Function<void(const DataType& data, ViewType* view, View* parent)>& onBindView)
+		void setOnBindView(const Function<void(DataType& data, ViewType* view, View* parent)>& onBindView)
 		{
 			m_onBindView = onBindView;
 		}
@@ -115,7 +115,7 @@ namespace slib
 		}
 		
 	public:
-		virtual void onBindView(const DataType& data, ViewType* view, View* parent)
+		virtual void onBindView(DataType& data, ViewType* view, View* parent)
 		{
 			m_onBindView(data, view, parent);
 		}
@@ -130,7 +130,7 @@ namespace slib
 		
 	protected:
 		AtomicList<DataType> m_list;
-		AtomicFunction<void(const DataType& data, ViewType* view, View* parent)> m_onBindView;
+		AtomicFunction<void(DataType& data, ViewType* view, View* parent)> m_onBindView;
 		
 	};
 	
