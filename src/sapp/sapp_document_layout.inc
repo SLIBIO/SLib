@@ -1547,6 +1547,7 @@ namespace slib
 							attr->leftMode = PositionMode::CenterInOther;
 							attr->topMode = PositionMode::CenterInOther;
 							attr->leftReferingView = alignCenter.referingView;
+							attr->topReferingView = alignCenter.referingView;
 						} else {
 							LOG_ERROR_LAYOUT_CONTROL_ATTR(alignCenter)
 							return sl_false;
@@ -1576,7 +1577,7 @@ namespace slib
 
 			} else if (op == OP_GENERATE_CPP) {
 				if (attr->leftMode == PositionMode::CenterInParent) {
-					params->sbDefineInit->add(String::format("%s%s->setCenterHorizontal(slib::UIUpdateMode::Init);%n", strTab, name, attr->leftReferingView));
+					params->sbDefineInit->add(String::format("%s%s->setCenterHorizontal(slib::UIUpdateMode::Init);%n", strTab, name));
 				} else if (attr->leftMode == PositionMode::CenterInOther) {
 					params->sbDefineInit->add(String::format("%s%s->setAlignCenterHorizontal(%s, slib::UIUpdateMode::Init);%n", strTab, name, attr->leftReferingView));
 				} else {
@@ -1597,7 +1598,7 @@ namespace slib
 				}
 				
 				if (attr->topMode == PositionMode::CenterInParent) {
-					params->sbDefineInit->add(String::format("%s%s->setCenterVertical(slib::UIUpdateMode::Init);%n", strTab, name, attr->topReferingView));
+					params->sbDefineInit->add(String::format("%s%s->setCenterVertical(slib::UIUpdateMode::Init);%n", strTab, name));
 				} else if (attr->topMode == PositionMode::CenterInOther) {
 					params->sbDefineInit->add(String::format("%s%s->setAlignCenterVertical(%s, slib::UIUpdateMode::Init);%n", strTab, name, attr->topReferingView));
 				} else {
