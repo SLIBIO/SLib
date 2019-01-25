@@ -2158,6 +2158,200 @@ namespace slib
 		_updateAndApplyLayoutWithMode(UIUpdateMode::Redraw);
 	}
 	
+	sl_ui_len View::_measureLayoutWrappingSize_Horz(View* view, Pair<sl_ui_len, sl_ui_len>& insets, HashMap< View*, Pair<sl_ui_len, sl_ui_len> >& map)
+	{
+		LayoutAttributes* layoutAttrs = view->m_layoutAttrs.get();
+		if (!layoutAttrs) {
+			insets.first = view->m_frame.left;
+			insets.second = 0;
+			return view->m_frame.getWidth();
+		}
+		SizeMode widthMode = layoutAttrs->widthMode;
+		PositionMode leftMode = layoutAttrs->leftMode;
+		PositionMode rightMode = layoutAttrs->rightMode;
+		if (widthMode == SizeMode::Filling) {
+			if (leftMode == PositionMode::CenterInParent || leftMode == PositionMode::CenterInOther) {
+				widthMode = SizeMode::Weight;
+				rightMode = PositionMode::Free;
+			} else {
+				if (leftMode == PositionMode::Free) {
+					leftMode = PositionMode::ParentEdge;
+				}
+				if (rightMode == PositionMode::Free) {
+					rightMode = PositionMode::ParentEdge;
+				}
+			}
+		} else {
+			if (leftMode != PositionMode::Free) {
+				rightMode = PositionMode::Free;
+			}
+		}
+		if (leftMode != PositionMode::OtherStart && leftMode != PositionMode::OtherEnd && leftMode != PositionMode::CenterInOther && rightMode != PositionMode::OtherStart && rightMode != PositionMode::OtherEnd) {
+			if (leftMode == PositionMode::Free && rightMode == PositionMode::Free) {
+				insets.first = layoutAttrs->layoutFrame.left;
+				insets.second = 0;
+			} else {
+				insets.first = m_paddingLeft + layoutAttrs->marginLeft;
+				insets.second = m_paddingRight + layoutAttrs->marginRight;
+			}
+		} else {
+			if (!(map.get_NoLock(view, &insets))) {
+				insets.first = m_paddingLeft + layoutAttrs->marginLeft;
+				insets.second = m_paddingRight + layoutAttrs->marginRight;
+				if (leftMode == PositionMode::CenterInOther) {
+					Ref<View> refer = layoutAttrs->leftReferingView;
+					if (layoutAttrs->widthMode != SizeMode::Filling && refer.isNotNull()) {
+						Pair<sl_ui_len, sl_ui_len> insetsRefer;
+						sl_ui_len widthRefer = _measureLayoutWrappingSize_Horz(refer.get(), insetsRefer, map);
+						sl_ui_len diff = widthRefer / 2 - layoutAttrs->layoutFrame.getWidth() / 2;
+						insets.first = Math::max(insets.first, insetsRefer.first + diff);
+						insets.second = Math::max(insets.second, insetsRefer.second + diff);
+					}
+				} else {
+					if (leftMode == PositionMode::OtherStart || leftMode == PositionMode::OtherEnd) {
+						Ref<View> refer = layoutAttrs->leftReferingView;
+						if (refer.isNotNull()) {
+							Pair<sl_ui_len, sl_ui_len> insetsRefer;
+							sl_ui_len widthRefer = _measureLayoutWrappingSize_Horz(refer.get(), insetsRefer, map);
+							insets.first = insetsRefer.first + layoutAttrs->marginLeft;
+							if (leftMode == PositionMode::OtherEnd) {
+								insets.first += widthRefer;
+							}
+							if (rightMode == PositionMode::Free) {
+								sl_ui_len t = insetsRefer.second - layoutAttrs->layoutFrame.getWidth();
+								if (leftMode == PositionMode::OtherStart) {
+									t += widthRefer;
+								}
+								insets.second = Math::max(insets.second, t);
+							}
+						}
+					}
+					if (rightMode == PositionMode::OtherStart || rightMode == PositionMode::OtherEnd) {
+						Ref<View> refer = layoutAttrs->rightReferingView;
+						if (refer.isNotNull()) {
+							Pair<sl_ui_len, sl_ui_len> insetsRefer;
+							sl_ui_len widthRefer = _measureLayoutWrappingSize_Horz(refer.get(), insetsRefer, map);
+							insets.second = insetsRefer.second + layoutAttrs->marginRight;
+							if (rightMode == PositionMode::OtherStart) {
+								insets.second += widthRefer;
+							}
+							if (leftMode == PositionMode::Free) {
+								sl_ui_len t = insetsRefer.first - layoutAttrs->layoutFrame.getWidth();
+								if (rightMode == PositionMode::OtherEnd) {
+									t += widthRefer;
+								}
+								insets.first = Math::max(insets.first, t);
+							}
+						}
+					}
+				}
+				map.put_NoLock(view, insets);
+			}
+		}
+		if (layoutAttrs->widthMode != SizeMode::Filling) {
+			return layoutAttrs->layoutFrame.getWidth();
+		} else {
+			return 0;
+		}
+	}
+	
+	sl_ui_len View::_measureLayoutWrappingSize_Vert(View* view, Pair<sl_ui_len, sl_ui_len>& insets, HashMap< View*, Pair<sl_ui_len, sl_ui_len> >& map)
+	{
+		LayoutAttributes* layoutAttrs = view->m_layoutAttrs.get();
+		if (!layoutAttrs) {
+			insets.first = view->m_frame.top;
+			insets.second = 0;
+			return view->m_frame.getHeight();
+		}
+		SizeMode heightMode = layoutAttrs->heightMode;
+		PositionMode topMode = layoutAttrs->topMode;
+		PositionMode bottomMode = layoutAttrs->bottomMode;
+		if (heightMode == SizeMode::Filling) {
+			if (topMode == PositionMode::CenterInParent || topMode == PositionMode::CenterInOther) {
+				heightMode = SizeMode::Weight;
+				bottomMode = PositionMode::Free;
+			} else {
+				if (topMode == PositionMode::Free) {
+					topMode = PositionMode::ParentEdge;
+				}
+				if (bottomMode == PositionMode::Free) {
+					bottomMode = PositionMode::ParentEdge;
+				}
+			}
+		} else {
+			if (topMode != PositionMode::Free) {
+				bottomMode = PositionMode::Free;
+			}
+		}
+		if (topMode != PositionMode::OtherStart && topMode != PositionMode::OtherEnd && topMode != PositionMode::CenterInOther && bottomMode != PositionMode::OtherStart && bottomMode != PositionMode::OtherEnd) {
+			if (topMode == PositionMode::Free && bottomMode == PositionMode::Free) {
+				insets.first = layoutAttrs->layoutFrame.top;
+				insets.second = 0;
+			} else {
+				insets.first = m_paddingTop + layoutAttrs->marginTop;
+				insets.second = m_paddingBottom + layoutAttrs->marginBottom;
+			}
+		} else {
+			if (!(map.get_NoLock(view, &insets))) {
+				insets.first = m_paddingTop + layoutAttrs->marginTop;
+				insets.second = m_paddingBottom + layoutAttrs->marginBottom;
+				if (topMode == PositionMode::CenterInOther) {
+					Ref<View> refer = layoutAttrs->topReferingView;
+					if (layoutAttrs->heightMode != SizeMode::Filling && refer.isNotNull()) {
+						Pair<sl_ui_len, sl_ui_len> insetsRefer;
+						sl_ui_len heightRefer = _measureLayoutWrappingSize_Vert(refer.get(), insetsRefer, map);
+						sl_ui_len diff = heightRefer / 2 - layoutAttrs->layoutFrame.getHeight() / 2;
+						insets.first = Math::max(insets.first, insetsRefer.first + diff);
+						insets.second = Math::max(insets.second, insetsRefer.second + diff);
+					}
+				} else {
+					if (topMode == PositionMode::OtherStart || topMode == PositionMode::OtherEnd) {
+						Ref<View> refer = layoutAttrs->topReferingView;
+						if (refer.isNotNull()) {
+							Pair<sl_ui_len, sl_ui_len> insetsRefer;
+							sl_ui_len heightRefer = _measureLayoutWrappingSize_Vert(refer.get(), insetsRefer, map);
+							insets.first = insetsRefer.first + layoutAttrs->marginTop;
+							if (topMode == PositionMode::OtherEnd) {
+								insets.first += heightRefer;
+							}
+							if (bottomMode == PositionMode::Free) {
+								sl_ui_len t = insetsRefer.second - layoutAttrs->layoutFrame.getHeight();
+								if (topMode == PositionMode::OtherStart) {
+									t += heightRefer;
+								}
+								insets.second = Math::max(insets.second, t);
+							}
+						}
+					}
+					if (bottomMode == PositionMode::OtherStart || bottomMode == PositionMode::OtherEnd) {
+						Ref<View> refer = layoutAttrs->bottomReferingView;
+						if (refer.isNotNull()) {
+							Pair<sl_ui_len, sl_ui_len> insetsRefer;
+							sl_ui_len heightRefer = _measureLayoutWrappingSize_Vert(refer.get(), insetsRefer, map);
+							insets.second = insetsRefer.second + layoutAttrs->marginBottom;
+							if (bottomMode == PositionMode::OtherStart) {
+								insets.second += heightRefer;
+							}
+							if (topMode == PositionMode::Free) {
+								sl_ui_len t = insetsRefer.first - layoutAttrs->layoutFrame.getHeight();
+								if (bottomMode == PositionMode::OtherEnd) {
+									t += heightRefer;
+								}
+								insets.first = Math::max(insets.first, t);
+							}
+						}
+					}
+				}
+				map.put_NoLock(view, insets);
+			}
+		}
+		if (heightMode != SizeMode::Filling) {
+			return layoutAttrs->layoutFrame.getHeight();
+		} else {
+			return 0;
+		}
+	}
+	
 	void View::measureLayoutWrappingSize(sl_bool flagHorizontal, sl_bool flagVertical)
 	{
 		if (m_layoutAttrs.isNull()) {
@@ -2168,6 +2362,9 @@ namespace slib
 			return;
 		}
 		
+		HashMap< View*, Pair<sl_ui_len, sl_ui_len> > mapHorzInsets;
+		HashMap< View*, Pair<sl_ui_len, sl_ui_len> > mapVertInsets;
+
 		sl_ui_pos measuredWidth = m_paddingLeft + m_paddingRight;
 		sl_ui_pos measuredHeight = m_paddingTop + m_paddingBottom;
 		
@@ -2176,50 +2373,20 @@ namespace slib
 		for (sl_size i = 0; i < children.count; i++) {
 			Ref<View>& child = children[i];
 			if (child->getVisibility() != Visibility::Gone) {
-				Ref<LayoutAttributes>& childLayoutAttrs = child->m_layoutAttrs;
-				if (childLayoutAttrs.isNotNull()) {
-					if (flagHorizontal) {
-						if (childLayoutAttrs->widthMode != SizeMode::Filling) {
-							if (childLayoutAttrs->leftMode != PositionMode::Free || childLayoutAttrs->rightMode != PositionMode::Free) {
-								sl_ui_pos w = m_paddingLeft + childLayoutAttrs->layoutFrame.right - childLayoutAttrs->layoutFrame.left + childLayoutAttrs->marginLeft + childLayoutAttrs->marginRight + m_paddingRight;
-								if (w > measuredWidth) {
-									measuredWidth = w;
-								}
-							} else {
-								sl_ui_pos w = childLayoutAttrs->layoutFrame.right;
-								if (w > measuredWidth) {
-									measuredWidth = w;
-								}
-							}
-						}
+				if (flagHorizontal) {
+					Pair<sl_ui_len, sl_ui_len> insetsHorz;
+					sl_ui_pos w = _measureLayoutWrappingSize_Horz(child.get(), insetsHorz, mapHorzInsets);
+					w += insetsHorz.first + insetsHorz.second;
+					if (w > measuredWidth) {
+						measuredWidth = w;
 					}
-					if (flagVertical) {
-						if (childLayoutAttrs->heightMode != SizeMode::Filling) {
-							if (childLayoutAttrs->topMode != PositionMode::Free || childLayoutAttrs->bottomMode != PositionMode::Free) {
-								sl_ui_pos h = m_paddingTop + childLayoutAttrs->layoutFrame.bottom - childLayoutAttrs->layoutFrame.top + childLayoutAttrs->marginTop + childLayoutAttrs->marginBottom + m_paddingBottom;
-								if (h > measuredHeight) {
-									measuredHeight = h;
-								}
-							} else {
-								sl_ui_pos h = childLayoutAttrs->layoutFrame.bottom;
-								if (h > measuredHeight) {
-									measuredHeight = h;
-								}
-							}
-						}
-					}
-				} else {
-					if (flagHorizontal) {
-						sl_ui_pos w = child->m_frame.right;
-						if (w > measuredWidth) {
-							measuredWidth = w;
-						}
-					}
-					if (flagVertical) {
-						sl_ui_pos h = child->m_frame.bottom;
-						if (h > measuredHeight) {
-							measuredHeight = h;
-						}
+				}
+				if (flagVertical) {
+					Pair<sl_ui_len, sl_ui_len> insetsVert;
+					sl_ui_pos h = _measureLayoutWrappingSize_Vert(child.get(), insetsVert, mapVertInsets);
+					h += insetsVert.first + insetsVert.second;
+					if (h > measuredHeight) {
+						measuredHeight = h;
 					}
 				}
 			}

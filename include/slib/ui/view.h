@@ -1257,6 +1257,10 @@ namespace slib
 
 		void _updateAndApplyLayout();
 		
+		sl_ui_len _measureLayoutWrappingSize_Horz(View* view, Pair<sl_ui_len, sl_ui_len>& insets, HashMap< View*, Pair<sl_ui_len, sl_ui_len> >& map);
+		
+		sl_ui_len _measureLayoutWrappingSize_Vert(View* view, Pair<sl_ui_len, sl_ui_len>& insets, HashMap< View*, Pair<sl_ui_len, sl_ui_len> >& map);
+
 		void _applyCalcTransform(UIUpdateMode mode);
 		
 		void _applyFinalTransform(UIUpdateMode mode);
