@@ -90,6 +90,7 @@ namespace slib
 				}
 				
 				[handle setOpaque:(view->isOpaque() ? YES : NO)];
+				[handle setClearsContextBeforeDrawing: (view->isOpaque()? NO : YES)];
 				
 				if (!([handle isKindOfClass:[_priv_Slib_iOS_ViewHandle class]])) {
 					sl_real alpha = view->getAlpha();
