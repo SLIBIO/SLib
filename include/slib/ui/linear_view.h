@@ -53,6 +53,8 @@ namespace slib
 		void setVertical(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 	protected:
+		void onAddChild(View* child) override;
+		
 		void onUpdateLayout() override;
 		
 	private:

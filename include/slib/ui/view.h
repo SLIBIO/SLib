@@ -163,15 +163,7 @@ namespace slib
 		void addChildInstance(const Ref<ViewInstance>& instance);
 		
 		void removeChildInstance(const Ref<ViewInstance>& instance);
-		
-		sl_bool isOnAddChildEnabled();
-		
-		void setOnAddChildEnabled(sl_bool flagEnabled);
-		
-		sl_bool isOnRemoveChildEnabled();
-		
-		void setOnRemoveChildEnabled(sl_bool flagEnabled);
-		
+				
 		void bringToFront(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
 		
@@ -1251,6 +1243,8 @@ namespace slib
 		
 		void _applyLayout(UIUpdateMode mode);
 		
+		void _updateChildLayout(View* child);
+
 		void _updateAndApplyChildLayout(View* child);
 
 		void _updateAndApplyLayoutWithMode(UIUpdateMode mode);
@@ -1369,9 +1363,6 @@ namespace slib
 		AtomicFunction<sl_bool(const UIPoint& pt)> m_hitTestCapturingChildInstanceEvents;
 		
 		AtomicRef<GestureDetector> m_gestureDetector;
-		
-		sl_bool m_flagOnAddChild;
-		sl_bool m_flagOnRemoveChild;
 		
 	protected:
 		class LayoutAttributes : public Referable

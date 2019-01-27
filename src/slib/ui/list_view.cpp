@@ -365,6 +365,20 @@ namespace slib
 		}
 	}
 	
+	Ref<View> ListView::_getView(ViewAdapter* adapter, sl_uint64 index, View* original)
+	{
+		Ref<View> view = adapter->getView(index, original, m_contentView.get());
+		if (view.isNotNull()) {
+			View::LayoutAttributes* attrs = view->m_layoutAttrs.get();
+			if (attrs) {
+				attrs->topMode = PositionMode::Free;
+				attrs->bottomMode = PositionMode::Free;
+			}
+			return view;
+		}
+		return sl_null;
+	}
+	
 	void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool flagRefresh)
 	{
 		if (!(isDrawingThread())) {
@@ -591,7 +605,7 @@ namespace slib
 								countFreeViews--;
 							}
 						}
-						Ref<View> view = adapter->getView(indexGoUp - 1, viewFree.get(), this);
+						Ref<View> view = _getView(adapter.get(), indexGoUp - 1, viewFree.get());
 						sl_ui_len h = _measureItemHeight(view, heightListView);
 						viewsGoUpItems[countGoUpViews] = view;
 						heightsGoUpItems[countGoUpViews] = h;
@@ -618,7 +632,7 @@ namespace slib
 								countFreeViews--;
 							}
 						}
-						Ref<View> view = adapter->getView(indexGoDown, viewFree.get(), this);
+						Ref<View> view = _getView(adapter.get(), indexGoDown, viewFree.get());
 						sl_ui_len h = _measureItemHeight(view, heightListView);
 						viewsGoDownItems[countGoDownViews] = view;
 						heightsGoDownItems[countGoDownViews] = h;
@@ -786,7 +800,7 @@ namespace slib
 					ret = (sl_ui_len)((sl_real)widthList * itemView->getWidthWeight());
 					break;
 				case SizeMode::Wrapping:
-					itemView->_updateLayout();
+					_updateChildLayout(itemView.get());
 					ret = itemView->getLayoutWidth();
 					break;
 				default:
@@ -808,7 +822,7 @@ namespace slib
 					ret = (sl_ui_len)((sl_real)heightList * itemView->getHeightWeight());
 					break;
 				case SizeMode::Wrapping:
-					itemView->_updateLayout();
+					_updateChildLayout(itemView.get());
 					ret = itemView->getLayoutHeight();
 					break;
 				default:

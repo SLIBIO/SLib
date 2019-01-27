@@ -61,6 +61,8 @@ namespace slib
 		
 		void _resetAdapter();
 		
+		Ref<View> _getView(ViewAdapter* adapter, sl_uint64 index, View* original);
+		
 		void _layoutItemViews(sl_bool flagFromDraw, sl_bool flagFromScroll, sl_bool flagRefresh);
 		
 		sl_ui_len _measureItemWidth(const Ref<View>& itemView, sl_ui_len heightList);

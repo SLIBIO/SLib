@@ -77,6 +77,17 @@ namespace slib
 		setOrientation(LayoutOrientation::Vertical, mode);
 	}
 	
+	void LinearView::onAddChild(View* child)
+	{
+		if (m_orientation == LayoutOrientation::Vertical) {
+			child->setTopFree(UIUpdateMode::Init);
+			child->setBottomFree(UIUpdateMode::Init);
+		} else {
+			child->setLeftFree(UIUpdateMode::Init);
+			child->setRightFree(UIUpdateMode::Init);
+		}
+	}
+	
 	void LinearView::onUpdateLayout()
 	{
 		sl_bool flagHorizontalLayout = m_orientation == LayoutOrientation::Horizontal;

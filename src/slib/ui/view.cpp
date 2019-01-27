@@ -91,8 +91,6 @@ namespace slib
 		m_flagOkCancelEnabled = sl_true;
 		m_flagTabStopEnabled = sl_true;
 		
-		m_flagOnAddChild = sl_false;
-		m_flagOnRemoveChild = sl_false;
 	}
 
 	View::~View()
@@ -858,26 +856,6 @@ namespace slib
 		}
 	}
 
-	sl_bool View::isOnAddChildEnabled()
-	{
-		return m_flagOnAddChild;
-	}
-
-	void View::setOnAddChildEnabled(sl_bool flagEnabled)
-	{
-		m_flagOnAddChild = flagEnabled;
-	}
-
-	sl_bool View::isOnRemoveChildEnabled()
-	{
-		return m_flagOnRemoveChild;
-	}
-
-	void View::setOnRemoveChildEnabled(sl_bool flagEnabled)
-	{
-		m_flagOnRemoveChild = flagEnabled;
-	}
-
 	void View::bringToFront(UIUpdateMode mode)
 	{
 		Ref<ViewInstance> instance = m_instance;
@@ -903,13 +881,14 @@ namespace slib
 	void View::_addChild(View* child, UIUpdateMode mode)
 	{
 		SLIB_REFERABLE_MEMBER
+		
 		if (!SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 			child->setFocus(sl_false, UIUpdateMode::None);
 		}
+		
 		child->setParent(this);
-		if (m_flagOnAddChild) {
-			onAddChild(child);
-		}
+		onAddChild(child);
+		
 		if (!SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 			if (child->isDrawingThread()) {
 				_updateAndApplyChildLayout(child);
@@ -949,9 +928,9 @@ namespace slib
 	void View::_removeChild(View* child)
 	{
 		child->_cancelPressState();
-		if (m_flagOnRemoveChild) {
-			onRemoveChild(child);
-		}
+
+		onRemoveChild(child);
+		
 		Ref<ViewInstance> instanceChild = child->getViewInstance();
 		if (instanceChild.isNotNull()) {
 			removeChildInstance(instanceChild);
@@ -2111,6 +2090,19 @@ namespace slib
 			setFrame(layoutAttrs->layoutFrame, UIUpdateMode::None);
 		}
 		invalidate(mode);
+	}
+
+	void View::_updateChildLayout(View* child)
+	{
+		Ref<LayoutAttributes>& childLayoutAttrs = child->m_layoutAttrs;
+		if (childLayoutAttrs.isNotNull()) {
+			childLayoutAttrs->flagInvalidLayoutInParent = sl_true;
+			_priv_View_UpdateLayoutFrameParam param;
+			param.parentContentFrame = getBoundsInnerPadding();
+			child->_updateLayoutFrameInParent(&param);
+		} else {
+			child->_updateLayout();
+		}
 	}
 
 	void View::_updateAndApplyChildLayout(View* child)
