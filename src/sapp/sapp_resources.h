@@ -828,6 +828,7 @@ namespace slib
 	public:
 		SAppLayoutType layoutType;
 		
+		String baseClassName;
 		SAppDimensionFloatValue sp;
 		
 		CHashMap< String, Ref<SAppLayoutResourceItem> > itemsByName;
@@ -923,7 +924,7 @@ namespace slib
 
 	};
 
-	class SAppLayoutSimulationWindow : public WindowLayoutResource, public SAppLayoutSimulator
+	class SAppLayoutSimulationWindow : public WindowLayout, public SAppLayoutSimulator
 	{
 	public:
 		SAppLayoutSimulationWindow();
@@ -940,7 +941,7 @@ namespace slib
 		
 	};
 
-	class SAppLayoutImportView : public ViewLayoutResource, public SAppLayoutSimulator
+	class SAppLayoutImportView : public ViewLayout, public SAppLayoutSimulator
 	{
 	public:
 		SAppLayoutImportView();

@@ -137,7 +137,9 @@ namespace slib
 			return sl_false;
 		}
 		layout->name = localNamespace;
-			
+		
+		layout->baseClassName = layout->getXmlAttribute("base");
+
 		if (!(_parseLayoutResourceItem(layout.get(), layout.get(), sl_null))) {
 			return sl_false;
 		}
@@ -387,17 +389,22 @@ namespace slib
 		sbHeader.add("\r\n\r\n");
 		sbCpp.add("\r\n\r\n");
 		
-		if (layout->layoutType == SAppLayoutType::Window) {
-			sbHeader.add(String::format("\t\tSLIB_DECLARE_WINDOW_LAYOUT_BEGIN(%s)%n", name));
-			sbCpp.add(String::format("\t\tSLIB_DEFINE_WINDOW_LAYOUT(%s)%n%n", name));
-		} else if (layout->layoutType == SAppLayoutType::Page) {
-			sbHeader.add(String::format("\t\tSLIB_DECLARE_PAGE_LAYOUT_BEGIN(%s)%n", name));
-			sbCpp.add(String::format("\t\tSLIB_DEFINE_PAGE_LAYOUT(%s)%n%n", name));
-		} else if (layout->layoutType == SAppLayoutType::View) {
-			sbHeader.add(String::format("\t\tSLIB_DECLARE_VIEW_LAYOUT_BEGIN(%s)%n", name));
-			sbCpp.add(String::format("\t\tSLIB_DEFINE_VIEW_LAYOUT(%s)%n%n", name));
+		if (layout->baseClassName.isNotEmpty()) {
+			sbHeader.add(String::format("\t\tSLIB_DECLARE_UILAYOUT_BEGIN(%s, %s)%n", name, layout->baseClassName));
+			sbCpp.add(String::format("\t\tSLIB_DEFINE_UILAYOUT(%s, %s)%n%n", name, layout->baseClassName));
 		} else {
-			return sl_false;
+			if (layout->layoutType == SAppLayoutType::Window) {
+				sbHeader.add(String::format("\t\tSLIB_DECLARE_WINDOW_LAYOUT_BEGIN(%s)%n", name));
+				sbCpp.add(String::format("\t\tSLIB_DEFINE_WINDOW_LAYOUT(%s)%n%n", name));
+			} else if (layout->layoutType == SAppLayoutType::Page) {
+				sbHeader.add(String::format("\t\tSLIB_DECLARE_PAGE_LAYOUT_BEGIN(%s)%n", name));
+				sbCpp.add(String::format("\t\tSLIB_DEFINE_PAGE_LAYOUT(%s)%n%n", name));
+			} else if (layout->layoutType == SAppLayoutType::View) {
+				sbHeader.add(String::format("\t\tSLIB_DECLARE_VIEW_LAYOUT_BEGIN(%s)%n", name));
+				sbCpp.add(String::format("\t\tSLIB_DEFINE_VIEW_LAYOUT(%s)%n%n", name));
+			} else {
+				return sl_false;
+			}
 		}
 		
 		sbCpp.add(String::format("\t\tvoid %s::initialize()%n\t\t{%n", name));
@@ -433,17 +440,22 @@ namespace slib
 		static sl_char8 strEndCpp[] = "\t\t}\r\n\r\n";
 		sbCpp.addStatic(strEndCpp, sizeof(strEndCpp)-1);
 		
-		if (layout->layoutType == SAppLayoutType::Window) {
-			static sl_char8 strEndHeader[] = "\t\tSLIB_DECLARE_WINDOW_LAYOUT_END\r\n\r\n";
+		if (layout->baseClassName.isNotEmpty()) {
+			static sl_char8 strEndHeader[] = "\t\tSLIB_DECLARE_UILAYOUT_END\r\n\r\n";
 			sbHeader.addStatic(strEndHeader, sizeof(strEndHeader)-1);
-		} else if (layout->layoutType == SAppLayoutType::Page) {
-			static sl_char8 strEndHeader[] = "\t\tSLIB_DECLARE_PAGE_LAYOUT_END\r\n\r\n";
-			sbHeader.addStatic(strEndHeader, sizeof(strEndHeader)-1);
-		} else if (layout->layoutType == SAppLayoutType::View) {
-			static sl_char8 strEndHeader[] = "\t\tSLIB_DECLARE_VIEW_LAYOUT_END\r\n\r\n";
-			sbHeader.addStatic(strEndHeader, sizeof(strEndHeader)-1);
+		} else {
+			if (layout->layoutType == SAppLayoutType::Window) {
+				static sl_char8 strEndHeader[] = "\t\tSLIB_DECLARE_WINDOW_LAYOUT_END\r\n\r\n";
+				sbHeader.addStatic(strEndHeader, sizeof(strEndHeader)-1);
+			} else if (layout->layoutType == SAppLayoutType::Page) {
+				static sl_char8 strEndHeader[] = "\t\tSLIB_DECLARE_PAGE_LAYOUT_END\r\n\r\n";
+				sbHeader.addStatic(strEndHeader, sizeof(strEndHeader)-1);
+			} else if (layout->layoutType == SAppLayoutType::View) {
+				static sl_char8 strEndHeader[] = "\t\tSLIB_DECLARE_VIEW_LAYOUT_END\r\n\r\n";
+				sbHeader.addStatic(strEndHeader, sizeof(strEndHeader)-1);
+			}
 		}
-		
+			
 		String pathHeader = targetPath + "/ui/" + name + ".h.inc";
 		String contentHeader = sbHeader.merge();
 		if (File::readAllTextUTF8(pathHeader) != contentHeader) {
@@ -1991,6 +2003,12 @@ namespace slib
 					}
 					if (!(attr->boundRadiusY.flagDefined)) {
 						attr->boundRadiusY = boundRadius;
+					}
+				}
+				if (attr->boundRadiusX.flagDefined && attr->boundRadiusY.flagDefined) {
+					if (!(attr->boundShape.flagDefined)) {
+						attr->boundShape.flagDefined = sl_true;
+						attr->boundShape.value = BoundShape::RoundRect;
 					}
 				}
 			}

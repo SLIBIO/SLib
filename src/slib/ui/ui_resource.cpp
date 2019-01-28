@@ -306,9 +306,9 @@ namespace slib
 	}
 	
 	
-	UILayoutResource::UILayoutResource(sl_real sp)
+	UILayoutResource::UILayoutResource()
 	{
-		m_sp = sp;
+		m_sp = 1;
 		m_countRecursiveLayout = 0;
 		m_flagInitialized = sl_false;
 		m_contentView = sl_null;
@@ -359,10 +359,9 @@ namespace slib
 		m_flagInitialized = sl_true;
 	}
 	
-	SLIB_DEFINE_OBJECT(WindowLayoutResource, Window)
+	SLIB_DEFINE_OBJECT(WindowLayout, Window)
 	
-	WindowLayoutResource::WindowLayoutResource(sl_real sp)
-	: UILayoutResource(sp)
+	WindowLayout::WindowLayout()
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
 		Ref<View> view = Window::getContentView();
@@ -370,72 +369,70 @@ namespace slib
 		m_contentView = view.get();
 	}
 	
-	WindowLayoutResource::~WindowLayoutResource()
+	WindowLayout::~WindowLayout()
 	{
 	}
 
-	UISize WindowLayoutResource::getContentSize()
+	UISize WindowLayout::getContentSize()
 	{
 		return getClientSize();
 	}
 	
-	void WindowLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)
+	void WindowLayout::dispatchResize(sl_ui_len width, sl_ui_len height)
 	{
 		_layoutViews_safe();
 		Window::dispatchResize(width, height);
 	}
 	
-	void WindowLayoutResource::_layoutViews_safe()
+	void WindowLayout::_layoutViews_safe()
 	{
 		UISize size = getClientSize();
 		UILayoutResource::_layoutViews_safe(size.x, size.y);
 	}
 	
 	
-	SLIB_DEFINE_OBJECT(ViewLayoutResource, ViewGroup)
+	SLIB_DEFINE_OBJECT(ViewLayout, ViewGroup)
 	
-	ViewLayoutResource::ViewLayoutResource(sl_real sp)
-	: UILayoutResource(sp)
+	ViewLayout::ViewLayout()
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
 		m_contentView = this;
 	}
 	
-	ViewLayoutResource::~ViewLayoutResource()
+	ViewLayout::~ViewLayout()
 	{
 	}
 
-	UISize ViewLayoutResource::getContentSize()
+	UISize ViewLayout::getContentSize()
 	{
 		return getSize();
 	}
 	
-	void ViewLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)
+	void ViewLayout::dispatchResize(sl_ui_len width, sl_ui_len height)
 	{
 		_layoutViews_safe(width, height);
 		ViewGroup::dispatchResize(width, height);
 	}
 	
 	
-	SLIB_DEFINE_OBJECT(PageLayoutResource, ViewPage)
+	SLIB_DEFINE_OBJECT(PageLayout, ViewPage)
 	
-	PageLayoutResource::PageLayoutResource(sl_real sp)
-	: UILayoutResource(sp)
+	PageLayout::PageLayout()
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
 		m_contentView = this;
 	}
 	
-	PageLayoutResource::~PageLayoutResource()
+	PageLayout::~PageLayout()
 	{
 	}
 
-	UISize PageLayoutResource::getContentSize()
+	UISize PageLayout::getContentSize()
 	{
 		return getSize();
 	}
 	
-	void PageLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)
+	void PageLayout::dispatchResize(sl_ui_len width, sl_ui_len height)
 	{
 		_layoutViews_safe(width, height);
 		ViewPage::dispatchResize(width, height);

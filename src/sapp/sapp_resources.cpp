@@ -601,7 +601,7 @@ namespace slib
 
 	void SAppLayoutSimulationWindow::dispatchResize(sl_ui_len width, sl_ui_len height)
 	{
-		WindowLayoutResource::dispatchResize(width, height);
+		WindowLayout::dispatchResize(width, height);
 		layoutViews(width, height);
 	}
 	

@@ -161,7 +161,7 @@ namespace slib
 	{ \
 		SLIB_DECLARE_OBJECT \
 	public: \
-		NAME(sl_real sp = 1); \
+		NAME(); \
 	protected: \
 		void initialize(); \
 		void layoutViews(sl_ui_len width, sl_ui_len height) override; \
@@ -172,7 +172,7 @@ namespace slib
 	
 #define SLIB_DEFINE_UILAYOUT(NAME, BASE_CLASS) \
 	SLIB_DEFINE_OBJECT(NAME, BASE_CLASS) \
-	NAME::NAME(sl_real sp): BASE_CLASS(sp) \
+	NAME::NAME() \
 	{ \
 		SLIB_REFERABLE_CONSTRUCTOR \
 		initialize(); \
@@ -186,7 +186,7 @@ namespace slib
 	class UILayoutResource
 	{
 	public:
-		UILayoutResource(sl_real sp = 1);
+		UILayoutResource();
 		
 		virtual ~UILayoutResource();
 
@@ -219,23 +219,23 @@ namespace slib
 	};
 	
 #define SLIB_DECLARE_WINDOW_LAYOUT_BEGIN(NAME) \
-	SLIB_DECLARE_UILAYOUT_BEGIN(NAME, slib::WindowLayoutResource)
+	SLIB_DECLARE_UILAYOUT_BEGIN(NAME, slib::WindowLayout)
 	
 #define SLIB_DECLARE_WINDOW_LAYOUT_END \
 	SLIB_DECLARE_UILAYOUT_END
 	
 #define SLIB_DEFINE_WINDOW_LAYOUT(NAME) \
-	SLIB_DEFINE_UILAYOUT(NAME, slib::WindowLayoutResource)
+	SLIB_DEFINE_UILAYOUT(NAME, slib::WindowLayout)
 	
 	
-	class WindowLayoutResource : public Window, public UILayoutResource
+	class WindowLayout : public Window, public UILayoutResource
 	{
 		SLIB_DECLARE_OBJECT
 
 	public:
-		WindowLayoutResource(sl_real sp = 1);
+		WindowLayout();
 		
-		~WindowLayoutResource();
+		~WindowLayout();
 
 	public:
 		UISize getContentSize();
@@ -249,21 +249,21 @@ namespace slib
 	};
 	
 #define SLIB_DECLARE_VIEW_LAYOUT_BEGIN(NAME) \
-	SLIB_DECLARE_UILAYOUT_BEGIN(NAME, slib::ViewLayoutResource)
+	SLIB_DECLARE_UILAYOUT_BEGIN(NAME, slib::ViewLayout)
 	
 #define SLIB_DECLARE_VIEW_LAYOUT_END \
 	SLIB_DECLARE_UILAYOUT_END
 	
 #define SLIB_DEFINE_VIEW_LAYOUT(NAME) \
-	SLIB_DEFINE_UILAYOUT(NAME, slib::ViewLayoutResource)
+	SLIB_DEFINE_UILAYOUT(NAME, slib::ViewLayout)
 	
-	class ViewLayoutResource : public ViewGroup, public UILayoutResource
+	class ViewLayout : public ViewGroup, public UILayoutResource
 	{
 		SLIB_DECLARE_OBJECT
 	public:
-		ViewLayoutResource(sl_real sp = 1);
+		ViewLayout();
 		
-		~ViewLayoutResource();
+		~ViewLayout();
 
 	public:
 		UISize getContentSize();
@@ -275,22 +275,22 @@ namespace slib
 	
 	
 #define SLIB_DECLARE_PAGE_LAYOUT_BEGIN(NAME) \
-	SLIB_DECLARE_UILAYOUT_BEGIN(NAME, slib::PageLayoutResource)
+	SLIB_DECLARE_UILAYOUT_BEGIN(NAME, slib::PageLayout)
 	
 #define SLIB_DECLARE_PAGE_LAYOUT_END \
 	SLIB_DECLARE_UILAYOUT_END
 	
 #define SLIB_DEFINE_PAGE_LAYOUT(NAME) \
-	SLIB_DEFINE_UILAYOUT(NAME, slib::PageLayoutResource)
+	SLIB_DEFINE_UILAYOUT(NAME, slib::PageLayout)
 	
-	class PageLayoutResource : public ViewPage, public UILayoutResource
+	class PageLayout : public ViewPage, public UILayoutResource
 	{
 		SLIB_DECLARE_OBJECT
 
 	public:
-		PageLayoutResource(sl_real sp = 1);
+		PageLayout();
 		
-		~PageLayoutResource();
+		~PageLayout();
 
 	public:
 		UISize getContentSize();
