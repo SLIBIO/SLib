@@ -278,7 +278,7 @@ namespace slib
 		}
 		ListLocker< Ref<SAppLayoutStyle> > _styles(styles);
 		for (sl_size i = 0; i < _styles.count; i++) {
-			Ref<SAppLayoutStyle> style = _styles[i];
+			Ref<SAppLayoutStyle> style = _styles[_styles.count - 1 - i];
 			if (style.isNotNull()) {
 				value = style->element->getAttribute(name);
 				if (value.isNotNull()) {

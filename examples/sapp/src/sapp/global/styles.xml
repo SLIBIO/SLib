@@ -15,7 +15,6 @@
 		name='button_normal'
 		height='8%smin'
 		fontSize='4%smin'
-		nativeWidget='false'
 		background='@color/button_back_color'
 		textColor='@color/button_text_color'
 		boundRadius='2%smin'
