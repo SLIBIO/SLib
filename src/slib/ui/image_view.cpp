@@ -37,6 +37,10 @@ namespace slib
 		
 		m_scaleMode = ScaleMode::Stretch;
 		m_gravity = Alignment::MiddleCenter;
+		
+		m_flagAutoAspectRatio = sl_false;
+		m_aspectRatioMin = -1;
+		m_aspectRatioMax = -1;
 	}
 	
 	ImageView::~ImageView()
@@ -68,9 +72,24 @@ namespace slib
 		m_source = source;
 		m_timerAnimation.setNull();
 		if (source.isNotNull()) {
-			sl_real h = source->getDrawableHeight();
-			if (h > 0.0000001) {
-				setAspectRatio(source->getDrawableWidth() / h, mode);
+			if (m_flagAutoAspectRatio) {
+				sl_real h = source->getDrawableHeight();
+				if (h > 0.0000001) {
+					sl_real ratio = source->getDrawableWidth() / h;
+					sl_real min = m_aspectRatioMin;
+					if (min > 0.0000001) {
+						if (ratio < min) {
+							ratio = min;
+						}
+					}
+					sl_real max = m_aspectRatioMax;
+					if (max > 0) {
+						if (ratio > max) {
+							ratio = max;
+						}
+					}
+					setAspectRatio(ratio, mode);
+				}
 			}
 			DrawableAnimationInfo animation;
 			if (source->getAnimationInfo(&animation)) {
@@ -109,6 +128,36 @@ namespace slib
 	{
 		m_gravity = align;
 		invalidate(mode);
+	}
+	
+	sl_bool ImageView::isAutoAspectRatio()
+	{
+		return m_flagAutoAspectRatio;
+	}
+	
+	void ImageView::setAutoAspectRatio(sl_bool flag)
+	{
+		m_flagAutoAspectRatio = flag;
+	}
+	
+	sl_real ImageView::getMinimumAutoAspectRatio()
+	{
+		return m_aspectRatioMin;
+	}
+	
+	void ImageView::setMinimumAutoAspectRatio(sl_real ratio)
+	{
+		m_aspectRatioMin = ratio;
+	}
+	
+	sl_real ImageView::getMaximumAutoAspectRatio()
+	{
+		return m_aspectRatioMax;
+	}
+	
+	void ImageView::setMaximumAutoAspectRatio(sl_real ratio)
+	{
+		m_aspectRatioMax = ratio;
 	}
 	
 	void ImageView::loadUrl(const String& url)

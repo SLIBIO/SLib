@@ -60,6 +60,19 @@ namespace slib
 		virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		
+		sl_bool isAutoAspectRatio();
+		
+		void setAutoAspectRatio(sl_bool flag);
+		
+		sl_real getMinimumAutoAspectRatio();
+		
+		void setMinimumAutoAspectRatio(sl_real ratio);
+		
+		sl_real getMaximumAutoAspectRatio();
+		
+		void setMaximumAutoAspectRatio(sl_real ratio);
+		
+
 		void loadUrl(const String& url);
 		
 		void loadUrl(const UrlRequestParam& param);
@@ -77,6 +90,10 @@ namespace slib
 		AtomicRef<Drawable> m_source;
 		ScaleMode m_scaleMode;
 		Alignment m_gravity;
+		sl_bool m_flagAutoAspectRatio;
+		sl_real m_aspectRatioMin;
+		sl_real m_aspectRatioMax;
+
 		AtomicRef<Timer> m_timerAnimation;
 		Time m_timeStartAnimation;
 		AtomicRef<UrlRequest> m_request;

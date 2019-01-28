@@ -436,6 +436,8 @@ namespace slib
 		SAppDrawableValue src;
 		SAppScaleModeValue scale;
 		SAppAlignmentValue gravity;
+		SAppFloatValue minAspectRatio;
+		SAppFloatValue maxAspectRatio;
 		SAppStringValue url;
 		
 	};

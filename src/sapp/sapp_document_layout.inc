@@ -2733,15 +2733,19 @@ namespace slib
 		LAYOUT_CONTROL_DRAWABLE_ATTR(src, setSource)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(gravity, setGravity)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(scale, setScaleMode)
-		
+		LAYOUT_CONTROL_GENERIC_ATTR(minAspectRatio, setMinimumAutoAspectRatio)
+		LAYOUT_CONTROL_GENERIC_ATTR(maxAspectRatio, setMaximumAutoAspectRatio)
+
 		if (!(resourceItem->attrsView->aspectRatio.flagDefined)) {
 			if (op == OP_GENERATE_CPP) {
 				if (resourceItem->attrsView->width.flagDefined) {
 					if (!(resourceItem->attrsView->height.flagDefined)) {
+						params->sbDefineInit->add(String::format("%s%s->setAutoAspectRatio(sl_true);%n", strTab, name));
 						params->sbDefineInit->add(String::format("%s%s->setAspectRatioMode(slib::AspectRatioMode::AdjustHeight, slib::UIUpdateMode::Init);%n", strTab, name));
 					}
 				} else {
 					if (resourceItem->attrsView->height.flagDefined) {
+						params->sbDefineInit->add(String::format("%s%s->setAutoAspectRatio(sl_true);%n", strTab, name));
 						params->sbDefineInit->add(String::format("%s%s->setAspectRatioMode(slib::AspectRatioMode::AdjustWidth, slib::UIUpdateMode::Init);%n", strTab, name));
 					}
 				}
@@ -2749,10 +2753,12 @@ namespace slib
 				if (!flagOnLayout) {
 					if (resourceItem->attrsView->width.flagDefined) {
 						if (!(resourceItem->attrsView->height.flagDefined)) {
+							view->setAutoAspectRatio(sl_true);
 							view->setAspectRatioMode(AspectRatioMode::AdjustHeight, slib::UIUpdateMode::Init);
 						}
 					} else {
 						if (resourceItem->attrsView->height.flagDefined) {
+							view->setAutoAspectRatio(sl_true);
 							view->setAspectRatioMode(AspectRatioMode::AdjustWidth, slib::UIUpdateMode::Init);
 						}
 					}
