@@ -358,6 +358,13 @@ namespace slib
 			back->setBackgroundColor(color);
 			back->setWidthFilling(1, UIUpdateMode::Init);
 			back->setHeightFilling(1, UIUpdateMode::Init);
+			WeakRef<ViewPage> page = this;
+			back->setOnClickEvent([page](View*, UIEvent* ev) {
+				Ref<ViewPage> _page = page;
+				if (_page.isNotNull()) {
+					_page->dispatchClickBackground(ev);
+				}
+			});
 			back->addChild(this, UIUpdateMode::Init);
 			viewAdd = back;
 		} else {
@@ -570,6 +577,13 @@ namespace slib
 		m_popupBackgroundColor = color;
 	}
 
+	void ViewPage::setCloseOnClickBackground()
+	{
+		setOnClickBackground([](ViewPage* page, UIEvent*) {
+			page->close();
+		});
+	}
+	
 	TransitionType _g_viewPage_globalOpeningPopupTransitionType = TransitionType::Zoom;
 	TransitionDirection _g_viewPage_globalOpeningPopupTransitionDirection = TransitionDirection::FromBottomToTop;
 	float _g_viewPage_globalOpeningPopupTransitionDuration = 0.3f;
@@ -801,6 +815,13 @@ namespace slib
 	void ViewPage::dispatchBack(UIEvent* ev)
 	{
 		SLIB_INVOKE_EVENT_HANDLER(Back, ev)
+	}
+
+	SLIB_DEFINE_EVENT_HANDLER(ViewPage, ClickBackground, UIEvent* ev)
+	
+	void ViewPage::dispatchClickBackground(UIEvent* ev)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(ClickBackground, ev)
 	}
 
 	void ViewPage::dispatchOK(UIEvent* ev)

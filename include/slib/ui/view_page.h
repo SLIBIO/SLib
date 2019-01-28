@@ -119,6 +119,8 @@ namespace slib
 		
 		void setPopupBackgroundColor(const Color& color);
 		
+		void setCloseOnClickBackground();
+		
 		TransitionType getGlobalOpeningPopupTransitionType();
 		
 		void setGlobalOpeningPopupTransitionType(TransitionType type);
@@ -174,7 +176,8 @@ namespace slib
 		SLIB_DECLARE_EVENT_HANDLER(ViewPage, BackPressed, UIEvent* ev)
 		// Pressed mobile back button or Closed popup window
 		SLIB_DECLARE_EVENT_HANDLER(ViewPage, Back, UIEvent* ev)
-		
+		SLIB_DECLARE_EVENT_HANDLER(ViewPage, ClickBackground, UIEvent* ev)
+
 	public:
 		void dispatchOK(UIEvent* ev) override;
 
