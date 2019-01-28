@@ -98,21 +98,20 @@
 			/>
  	</layout>
 
-	<layout-style name='label' fontSize='4%sw' textColor='black' width='wrap' height='wrap'/>
+	<style name='label' fontSize='4%sw' textColor='black' width='wrap' height='wrap'/>
 
-	<layout-style name='edit' fontSize='4%sw' textColor='black' height='6%sw'/>
+	<style name='edit' fontSize='4%sw' textColor='black' height='6%sw'/>
 
-	<layout-style name='login_section' width='fill' height='wrap' paddingTop='3%sw' background='white' />
+	<style name='login_section' width='fill' height='wrap' paddingTop='3%sw' background='white' />
 
-	<layout-style name='border' width='fill' height='1px' background='#c0c0c0'/>
+	<style name='border' width='fill' height='1px' background='#c0c0c0'/>
 
-	<layout-style
+	<style
 		name='button'
 		fontSize='5%sw'
 		height='10%sw'
 		background='#408000'
 		textColor='white'
-		boundShape='round-rect'
 		boundRadius='1%sw'
 		border='false'
 		clipping='true'

@@ -2125,31 +2125,6 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(opaque, setOpaque)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(layer, setLayer)
 		
-		if (!(attr->opaque.flagDefined) && op == OP_PARSE) {
-			if (attr->background.flagDefined && attr->background.flagColor && attr->background.color.a == 255) {
-				do {
-					if (attr->pressedBackground.flagDefined) {
-						if (!(attr->pressedBackground.flagColor)) {
-							break;
-						}
-						if (attr->pressedBackground.color.a < 255) {
-							break;
-						}
-					}
-					if (attr->hoverBackground.flagDefined) {
-						if (!(attr->hoverBackground.flagColor)) {
-							break;
-						}
-						if (attr->hoverBackground.color.a < 255) {
-							break;
-						}
-					}
-					attr->opaque.flagDefined = sl_true;
-					attr->opaque.value = sl_true;
-				} while (0);
-			}
-		}
-		
 		if (op == OP_PARSE) {
 			LAYOUT_CONTROL_PARSE_ATTR(attr->, scrolling)
 			if (!(attr->scrolling.flagDefined)) {

@@ -1,5 +1,5 @@
 <sapp>
-	<layout-include name='common_header'>
+	<include name='common_header'>
 		<label
 			text='Included Layout'
 			width='wrap'
@@ -7,5 +7,5 @@
 			fontSize='5%sw'
 			alignCenter='true'
 			/>
- 	</layout-include>
+ 	</include>
 </sapp>

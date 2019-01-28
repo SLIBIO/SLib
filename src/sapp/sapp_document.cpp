@@ -65,8 +65,8 @@ namespace slib
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_drawable_not_image, "Drawable resource is not image: %s")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_load_image_failed, "Failed to load image drawable resource: %s")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_menu_not_found, "Menu resource is not defined: %s")
-	SLIB_STATIC_STRING(_g_sdev_sapp_error_layout_style_not_found, "layout-style is not found: %s")
-	SLIB_STATIC_STRING(_g_sdev_sapp_error_layout_include_not_found, "layout-include is not found: %s")
+	SLIB_STATIC_STRING(_g_sdev_sapp_error_layout_style_not_found, "style is not found: %s")
+	SLIB_STATIC_STRING(_g_sdev_sapp_error_layout_include_not_found, "include is not found: %s")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_layout_not_found, "layout is not found: %s")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_layout_is_not_view, "layout is not a view: %s")
 
@@ -703,7 +703,7 @@ namespace slib
 		for (i = 0; i < children.count; i++) {
 			Ref<XmlElement>& child = children[i];
 			if (child.isNotNull()) {
-				if (child->getName() == "layout-include") {
+				if (child->getName() == "layout-include" || child->getName() == "include") {
 					if (!_parseLayoutInclude(localNamespace, child)) {
 						return sl_false;
 					}
@@ -713,7 +713,7 @@ namespace slib
 		for (i = 0; i < children.count; i++) {
 			Ref<XmlElement>& child = children[i];
 			if (child.isNotNull()) {
-				if (child->getName() == "layout-style") {
+				if (child->getName() == "layout-style" || child->getName() == "style") {
 					if (!_parseLayoutStyle(localNamespace, child)) {
 						return sl_false;
 					}
@@ -748,7 +748,9 @@ namespace slib
 						return sl_false;
 					}
 				} else if (child->getName() == "layout-style") {
+				} else if (child->getName() == "style") {
 				} else if (child->getName() == "layout-include") {
+				} else if (child->getName() == "include") {
 				} else if (child->getName() == "layout") {
 					if (!_parseLayoutResource(localNamespace, child)) {
 						return sl_false;

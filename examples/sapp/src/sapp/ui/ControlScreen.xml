@@ -37,7 +37,7 @@
 		</scroll>
  	</layout>
 
-	<layout-style
+	<style
 		name='menu_button'
 		width='80%smin'
 		marginTop='2%smin'
