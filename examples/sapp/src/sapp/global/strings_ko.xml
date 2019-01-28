@@ -1,5 +1,5 @@
 <sapp>
-	<strings locale='ko'>
+	<strings>
 		<string name='hello_world'>환영합니다</string>
 	</strings>
 </sapp>

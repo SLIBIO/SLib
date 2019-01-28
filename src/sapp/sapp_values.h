@@ -35,6 +35,8 @@
 namespace slib
 {
 	
+	class SAppDocument;
+	
 	class SAppStringValue
 	{
 	public:
@@ -73,7 +75,7 @@ namespace slib
 	public:
 		String getAccessString() const;
 		
-		sl_bool parse(const String& str);
+		sl_bool parse(const String& str, SAppDocument* doc);
 		
 		sl_bool checkGlobal();
 		
@@ -369,7 +371,7 @@ namespace slib
 		SAppDrawableValue();
 		
 	public:
-		sl_bool parse(const String& str);
+		sl_bool parse(const String& str, SAppDocument* doc);
 
 		sl_bool parseWhole(const String& str);
 		

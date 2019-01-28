@@ -104,6 +104,41 @@ namespace slib
 		return sl_true;
 	}
 
+	sl_bool SAppDocument::_parseLayoutUnit(const String& localNamespace, const Ref<XmlElement>& element)
+	{
+		if (element.isNull()) {
+			return sl_false;
+		}
+		
+		String name = element->getAttribute("name").trim();
+		if (name.isEmpty()) {
+			_logError(element, _g_sdev_sapp_error_resource_layout_name_is_empty);
+			return sl_false;
+		}
+		
+		name = getNameInLocalNamespace(localNamespace, name);
+		
+		if (m_layoutUnits.find(name)) {
+			_logError(element, _g_sdev_sapp_error_resource_layout_name_redefined.arg(name));
+			return sl_false;
+		}
+		
+		String strValue = element->getText();
+		
+		SAppDimensionValue value;
+		if (!(value.parse(strValue, this))) {
+			_logError(element, _g_sdev_sapp_error_resource_layout_value_invalid.arg(strValue));
+			return sl_false;
+		}
+
+		if (!(m_layoutUnits.put(name, value))) {
+			_logError(element, _g_sdev_sapp_error_out_of_memory);
+			return sl_false;
+		}
+		
+		return sl_true;
+	}
+	
 	sl_bool SAppDocument::_parseLayoutResource(const String& localNamespace, const Ref<XmlElement>& element)
 	{
 		if (element.isNull()) {
@@ -231,7 +266,7 @@ namespace slib
 		
 		if (!parent) {
 			String strSP = layout->getXmlAttribute("sp");
-			if (!(layout->sp.parse(strSP))) {
+			if (!(layout->sp.parse(strSP, this))) {
 				_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("sp", strSP));
 			}
 			if (!(layout->sp.checkSP())) {
@@ -748,6 +783,7 @@ namespace slib
 
 	sl_bool SAppDocument::_processLayoutResourceControl(LayoutControlProcessParams *params)
 	{
+		m_currentLocalNamespace = params->resource->name;
 		SAppLayoutResourceItem* resourceItem = params->resourceItem;
 		int op = params->op;
 		switch (resourceItem->itemType)
@@ -927,6 +963,19 @@ namespace slib
 		return sl_false; \
 	}
 
+#define LAYOUT_CONTROL_PARSE_XML_DIMENSION_ATTR(XML, ATTR, NAME) \
+	String str_##NAME = XML->getAttribute(#NAME); \
+	if (!(ATTR NAME.parse(str_##NAME, this))) { \
+		LOG_ERROR_LAYOUT_CONTROL_XML_ATTR(XML, NAME) \
+		return sl_false; \
+	}
+
+#define LAYOUT_CONTROL_PARSE_XML_DRAWABLE_ATTR(XML, ATTR, NAME) \
+	String str_##NAME = XML->getAttribute(#NAME); \
+	if (!(ATTR NAME.parse(str_##NAME, this))) { \
+		LOG_ERROR_LAYOUT_CONTROL_XML_ATTR(XML, NAME) \
+		return sl_false; \
+	}
 
 #define LOG_ERROR_LAYOUT_CONTROL_ATTR(NAME) \
 	_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str_##NAME));
@@ -937,8 +986,21 @@ namespace slib
 		LOG_ERROR_LAYOUT_CONTROL_ATTR(NAME) \
 		return sl_false; \
 	}
+	
+#define LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(ATTR, NAME) \
+	String str_##NAME = resourceItem->getXmlAttribute(#NAME); \
+	if (!(ATTR NAME.parse(str_##NAME, this))) { \
+		LOG_ERROR_LAYOUT_CONTROL_ATTR(NAME) \
+		return sl_false; \
+	}
 
-
+#define LAYOUT_CONTROL_PARSE_DRAWABLE_ATTR(ATTR, NAME) \
+	String str_##NAME = resourceItem->getXmlAttribute(#NAME); \
+	if (!(ATTR NAME.parse(str_##NAME, this))) { \
+		LOG_ERROR_LAYOUT_CONTROL_ATTR(NAME) \
+		return sl_false; \
+	}
+	
 #define LAYOUT_CONTROL_GENERIC_ATTR(NAME, SETFUNC) \
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
@@ -1000,7 +1062,7 @@ namespace slib
 #define _LAYOUT_CONTROL_DIMENSION_ATTR(NAME, SETFUNC, CHECKFUNC, TYPE) \
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
-		if (!(attr->NAME.parse(str))) { \
+		if (!(attr->NAME.parse(str, this))) { \
 			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
@@ -1027,7 +1089,7 @@ namespace slib
 #define _LAYOUT_CONTROL_DIMENSION_ATTR_NOREDRAW(NAME, SETFUNC, CHECKFUNC, TYPE) \
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
-		if (!(attr->NAME.parse(str))) { \
+		if (!(attr->NAME.parse(str, this))) { \
 			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
@@ -1143,7 +1205,7 @@ namespace slib
 #define LAYOUT_CONTROL_DRAWABLE_ATTR(NAME, SETFUNC) \
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
-		if (!(attr->NAME.parse(str))) { \
+		if (!(attr->NAME.parse(str, this))) { \
 			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
@@ -1759,7 +1821,7 @@ namespace slib
 					LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginBottom, setMarginBottom, checkMargin)
 				}
 				SAppDimensionValue margin;
-				LAYOUT_CONTROL_PARSE_ATTR(, margin)
+				LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, margin)
 				if (flagRoot) {
 					if (!(margin.checkForRootViewMargin())) {
 						LOG_ERROR_LAYOUT_CONTROL_ATTR(margin)
@@ -1867,7 +1929,7 @@ namespace slib
 		}
 		if (op == OP_PARSE) {
 			SAppDimensionValue padding;
-			LAYOUT_CONTROL_PARSE_ATTR(, padding)
+			LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, padding)
 			if (flagRoot) {
 				if (!(padding.checkForRootViewPosition())) {
 					LOG_ERROR_LAYOUT_CONTROL_ATTR(padding)
@@ -1985,7 +2047,7 @@ namespace slib
 			}
 			if (op == OP_PARSE) {
 				SAppDimensionFloatValue boundRadius;
-				LAYOUT_CONTROL_PARSE_ATTR(, boundRadius)
+				LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, boundRadius)
 				if (flagRoot) {
 					if (!(boundRadius.checkForRootViewScalarSize())) {
 						LOG_ERROR_LAYOUT_CONTROL_ATTR(boundRadius)
@@ -2023,7 +2085,7 @@ namespace slib
 					attr->finalFontFamily = params->parentResourceItem->attrsView->finalFontFamily;
 				}
 			}
-			LAYOUT_CONTROL_PARSE_ATTR(attr->, fontSize)
+			LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(attr->, fontSize)
 			if (flagRoot) {
 				if (!(attr->fontSize.checkForRootViewPosition())) {
 					LOG_ERROR_LAYOUT_CONTROL_ATTR(fontSize)
@@ -2278,7 +2340,7 @@ namespace slib
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(iconHeight, setIconHeight, checkScalarSize)
 		if (op == OP_PARSE) {
 			SAppDimensionValue iconSize;
-			LAYOUT_CONTROL_PARSE_ATTR(, iconSize)
+			LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, iconSize)
 			if (!(iconSize.checkScalarSize())) {
 				LOG_ERROR_LAYOUT_CONTROL_ATTR(iconSize)
 				return sl_false;
@@ -2305,7 +2367,7 @@ namespace slib
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(iconMarginBottom, setIconMarginBottom, checkPosition)
 		if (op == OP_PARSE) {
 			SAppDimensionValue iconMargin;
-			LAYOUT_CONTROL_PARSE_ATTR(, iconMargin)
+			LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, iconMargin)
 			if (!(iconMargin.checkPosition())) {
 				LOG_ERROR_LAYOUT_CONTROL_ATTR(iconMargin)
 				return sl_false;
@@ -2332,7 +2394,7 @@ namespace slib
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(textMarginBottom, setTextMarginBottom, checkPosition)
 		if (op == OP_PARSE) {
 			SAppDimensionValue textMargin;
-			LAYOUT_CONTROL_PARSE_ATTR(, textMargin)
+			LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, textMargin)
 			if (!(textMargin.checkPosition())) {
 				LOG_ERROR_LAYOUT_CONTROL_ATTR(textMargin)
 				return sl_false;
@@ -2373,12 +2435,12 @@ namespace slib
 						return sl_false;
 					}
 					String _strIcon = resourceItem->getXmlAttribute("icon" + suffix);
-					if (!(category.icon[k].parse(_strIcon))) {
+					if (!(category.icon[k].parse(_strIcon, this))) {
 						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("icon" + suffix, _strIcon));
 						return sl_false;
 					}
 					String _strBackground = resourceItem->getXmlAttribute("background" + suffix);
-					if (!(category.background[k].parse(_strBackground))) {
+					if (!(category.background[k].parse(_strBackground, this))) {
 						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("background" + suffix, _strBackground));
 						return sl_false;
 					}
@@ -2388,7 +2450,7 @@ namespace slib
 						return sl_false;
 					}
 					String _strBorderWidth = resourceItem->getXmlAttribute("borderWidth" + suffix);
-					if (!(category.borderWidth[k].parse(_strBorderWidth))) {
+					if (!(category.borderWidth[k].parse(_strBorderWidth, this))) {
 						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("borderWidth" + suffix, _strBorderWidth));
 						return sl_false;
 					}
@@ -2716,7 +2778,7 @@ namespace slib
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(iconHeight, setIconHeight, checkScalarSize)
 		if (op == OP_PARSE) {
 			SAppDimensionValue iconSize;
-			LAYOUT_CONTROL_PARSE_ATTR(, iconSize)
+			LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, iconSize)
 			if (!(iconSize.checkScalarSize())) {
 				LOG_ERROR_LAYOUT_CONTROL_ATTR(iconSize)
 				return sl_false;
@@ -2973,7 +3035,7 @@ namespace slib
 				if (columnXml.isNotNull()) {
 					SAppLayoutListReportColumn column;
 					LAYOUT_CONTROL_PARSE_XML_ATTR(columnXml, column., title)
-					LAYOUT_CONTROL_PARSE_XML_ATTR(columnXml, column., width)
+					LAYOUT_CONTROL_PARSE_XML_DIMENSION_ATTR(columnXml, column., width)
 					if (!(column.width.checkScalarSize())) {
 						LOG_ERROR_LAYOUT_CONTROL_XML_ATTR(columnXml, width)
 						return sl_false;
@@ -3089,7 +3151,7 @@ namespace slib
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(labelMarginBottom, setLabelMarginBottom, checkPosition)
 		if (op == OP_PARSE) {
 			SAppDimensionValue labelMargin;
-			LAYOUT_CONTROL_PARSE_ATTR(, labelMargin)
+			LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, labelMargin)
 			if (!(labelMargin.checkPosition())) {
 				LOG_ERROR_LAYOUT_CONTROL_ATTR(labelMargin)
 				return sl_false;
@@ -3289,22 +3351,22 @@ namespace slib
 					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., weight)
 					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., minWeight)
 					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., maxWeight)
-					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., minSize)
+					LAYOUT_CONTROL_PARSE_XML_DIMENSION_ATTR(itemXml, subItem., minSize)
 					if (!(subItem.minSize.checkScalarSize())) {
 						LOG_ERROR_LAYOUT_CONTROL_XML_ATTR(itemXml, minSize)
 						return sl_false;
 					}
-					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., maxSize)
+					LAYOUT_CONTROL_PARSE_XML_DIMENSION_ATTR(itemXml, subItem., maxSize)
 					if (!(subItem.maxSize.checkScalarSize())) {
 						LOG_ERROR_LAYOUT_CONTROL_XML_ATTR(itemXml, maxSize)
 						return sl_false;
 					}
-					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., dividerWidth)
+					LAYOUT_CONTROL_PARSE_XML_DIMENSION_ATTR(itemXml, subItem., dividerWidth)
 					if (!(subItem.dividerWidth.checkScalarSize())) {
 						LOG_ERROR_LAYOUT_CONTROL_XML_ATTR(itemXml, dividerWidth)
 						return sl_false;
 					}
-					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., dividerBackground)
+					LAYOUT_CONTROL_PARSE_XML_DRAWABLE_ATTR(itemXml, subItem., dividerBackground)
 					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., dividerColor)
 					
 					sl_size nViews = itemXml->getChildElementsCount();
@@ -3592,7 +3654,7 @@ namespace slib
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(thumbHeight, setThumbHeight, checkScalarSize);
 		if (op == OP_PARSE) {
 			SAppDimensionValue thumbSize;
-			LAYOUT_CONTROL_PARSE_ATTR(, thumbSize)
+			LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, thumbSize)
 			if (!(thumbSize.checkScalarSize())) {
 				LOG_ERROR_LAYOUT_CONTROL_ATTR(thumbSize)
 				return sl_false;

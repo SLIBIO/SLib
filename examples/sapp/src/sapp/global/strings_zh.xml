@@ -1,8 +1,5 @@
 <sapp>
-	<strings locale='zh'>
+	<strings>
 		<string name='hello_world'>欢迎</string>
-	</strings>
-	<strings locale='zh-Hant'>
-		<string name='hello_world'>歡迎</string>
 	</strings>
 </sapp>

@@ -670,7 +670,7 @@ namespace slib
 
 #define PARSE_AND_CHECK_NINEPIECES_ATTR(ATTR, NAME) \
 	String str_##NAME = element->getAttribute(#NAME); \
-	if (!(ATTR NAME.parse(str_##NAME))) { \
+	if (!(ATTR NAME.parse(str_##NAME, this))) { \
 		LOG_ERROR_NINEPIECES_ATTR(NAME) \
 		return sl_false; \
 	}
@@ -857,6 +857,19 @@ namespace slib
 #define LOG_ERROR_NINEPATCH_ATTR(NAME) \
 	_logError(element, _g_sdev_sapp_error_resource_ninepatch_attribute_invalid.arg(#NAME, str_##NAME));
 
+#define PARSE_AND_CHECK_NINEPATCH_DIMENSION_ATTR(ATTR, NAME) \
+	String str_##NAME = element->getAttribute(#NAME); \
+	if (!(ATTR NAME.parse(str_##NAME, this))) { \
+		LOG_ERROR_NINEPATCH_ATTR(NAME) \
+		return sl_false; \
+	}
+#define PARSE_AND_CHECK_NINEPATCH_DRAWABLE_ATTR(ATTR, NAME) \
+	String str_##NAME = element->getAttribute(#NAME); \
+	if (!(ATTR NAME.parse(str_##NAME, this))) { \
+		LOG_ERROR_NINEPATCH_ATTR(NAME) \
+		return sl_false; \
+	}
+	
 #define PARSE_AND_CHECK_NINEPATCH_ATTR(ATTR, NAME) \
 	String str_##NAME = element->getAttribute(#NAME); \
 	if (!(ATTR NAME.parse(str_##NAME))) { \
@@ -905,28 +918,28 @@ namespace slib
 		attr->element = element;
 		attr->localNamespace = localNamespace;
 		
-		PARSE_AND_CHECK_NINEPATCH_ATTR(attr->, dstLeftWidth)
+		PARSE_AND_CHECK_NINEPATCH_DIMENSION_ATTR(attr->, dstLeftWidth)
 		if (!(attr->dstLeftWidth.checkGlobal())) {
 			LOG_ERROR_NINEPATCH_ATTR(dstLeftWidth)
 			return sl_false;
 		}
-		PARSE_AND_CHECK_NINEPATCH_ATTR(attr->, dstRightWidth)
+		PARSE_AND_CHECK_NINEPATCH_DIMENSION_ATTR(attr->, dstRightWidth)
 		if (!(attr->dstRightWidth.checkGlobal())) {
 			LOG_ERROR_NINEPATCH_ATTR(dstRightWidth)
 			return sl_false;
 		}
-		PARSE_AND_CHECK_NINEPATCH_ATTR(attr->, dstTopHeight)
+		PARSE_AND_CHECK_NINEPATCH_DIMENSION_ATTR(attr->, dstTopHeight)
 		if (!(attr->dstTopHeight.checkGlobal())) {
 			LOG_ERROR_NINEPATCH_ATTR(dstTopHeight)
 			return sl_false;
 		}
-		PARSE_AND_CHECK_NINEPATCH_ATTR(attr->, dstBottomHeight)
+		PARSE_AND_CHECK_NINEPATCH_DIMENSION_ATTR(attr->, dstBottomHeight)
 		if (!(attr->dstBottomHeight.checkGlobal())) {
 			LOG_ERROR_NINEPATCH_ATTR(dstBottomHeight)
 			return sl_false;
 		}
 		
-		PARSE_AND_CHECK_NINEPATCH_ATTR(attr->, src)
+		PARSE_AND_CHECK_NINEPATCH_DRAWABLE_ATTR(attr->, src)
 		if (!(attr->src.flagDefined)) {
 			LOG_ERROR_NINEPATCH_ATTR(src)
 			return sl_false;

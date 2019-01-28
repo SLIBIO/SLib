@@ -126,8 +126,8 @@ namespace slib
 		sl_bool _generateRawDataFile(const String& targetPath, const String& sourcePath, const String& resourceName);
 		
 		// String Resources
-		sl_bool _parseStringResources(const String& localNamespace, const Ref<XmlElement>& element);
-		sl_bool _parseStringResource(const String& localNamespace, const Ref<XmlElement>& element, Locale locale);
+		sl_bool _parseStringResources(const String& localNamespace, const Ref<XmlElement>& element, const Locale& localeDefault);
+		sl_bool _parseStringResource(const String& localNamespace, const Ref<XmlElement>& element, const Locale& localeDefault);
 		sl_bool _generateStringsCpp(const String& targetPath);
 		sl_bool _getStringAccessString(const String& localNamespace, const SAppStringValue& value, const Ref<XmlElement>& element, String& result);
 		sl_bool _getStringValue(const String& localNamespace, const SAppStringValue& value, const Ref<XmlElement>& element, String& result);
@@ -175,6 +175,7 @@ namespace slib
 		// Layout Resources
 		sl_bool _parseLayoutStyle(const String& localNamespace, const Ref<XmlElement>& element);
 		sl_bool _parseLayoutInclude(const String& localNamespace, const Ref<XmlElement>& element);
+		sl_bool _parseLayoutUnit(const String& localNamespace, const Ref<XmlElement>& element);
 		sl_bool _parseLayoutResource(const String& localNamespace, const Ref<XmlElement>& element);
 		sl_bool _parseLayoutResourceItem(SAppLayoutResource* layout, SAppLayoutResourceItem* item, SAppLayoutResourceItem* parent);
 		Ref<SAppLayoutResourceItem> _parseLayoutResourceItemChild(SAppLayoutResource* layout, SAppLayoutResourceItem* parentItem, const Ref<XmlElement>& element);
@@ -255,13 +256,17 @@ namespace slib
 		CMap< String, Ref<SAppMenuResource> > m_menus;
 		CHashMap< String, Ref<SAppLayoutStyle> > m_layoutStyles;
 		CHashMap< String, Ref<SAppLayoutInclude> > m_layoutIncludes;
+		CHashMap< String, SAppDimensionValue > m_layoutUnits;
 		CMap< String, Ref<SAppLayoutResource> > m_layouts;
 		
 		CList< Ref<SAppLayoutSimulationWindow> > m_layoutSimulationWindows;
 		SAppLayoutSimulationParams m_layoutSimulationParams;
 		
+		String m_currentLocalNamespace;
+		
 		friend class SAppLayoutSimulationWindow;
 		friend class SAppLayoutImportView;
+		friend class SAppDimensionValue;
 		
 		template <class MAP, class ITEM>
 		static sl_bool getItemFromMap(const MAP& map, const String& localNamespace, const String& name, String* outName, ITEM* _out);

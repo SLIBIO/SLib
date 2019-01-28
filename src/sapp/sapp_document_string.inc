@@ -23,11 +23,12 @@
 namespace slib
 {
 	
-	sl_bool SAppDocument::_parseStringResources(const String& localNamespace, const Ref<XmlElement>& element)
+	sl_bool SAppDocument::_parseStringResources(const String& localNamespace, const Ref<XmlElement>& element, const Locale& localeDefault)
 	{
 		if (element.isNull()) {
 			return sl_false;
 		}
+		
 		String strLocale = element->getAttribute("locale");
 		Locale locale = Locale::Unknown;
 		if (strLocale.isNotEmpty()) {
@@ -37,6 +38,10 @@ namespace slib
 				return sl_false;
 			}
 		}
+		if (locale == Locale::Unknown) {
+			locale = localeDefault;
+		}
+
 		ListLocker< Ref<XmlElement> > children(element->getChildElements());
 		for (sl_size i = 0; i < children.count; i++) {
 			Ref<XmlElement>& child = children[i];
@@ -54,7 +59,7 @@ namespace slib
 		return sl_true;
 	}
 
-	sl_bool SAppDocument::_parseStringResource(const String& localNamespace, const Ref<XmlElement>& element, Locale localeDefault)
+	sl_bool SAppDocument::_parseStringResource(const String& localNamespace, const Ref<XmlElement>& element, const Locale& localeDefault)
 	{
 		if (element.isNull()) {
 			return sl_false;

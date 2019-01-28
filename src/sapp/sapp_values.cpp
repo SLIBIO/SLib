@@ -22,10 +22,12 @@
 
 #include "sapp_values.h"
 
+#include "sapp_document.h"
 #include "sapp_util.h"
 
 #include "slib/core/variant.h"
 #include "slib/math/calculator.h"
+#include "slib/ui/radio_button.h"
 
 namespace slib
 {
@@ -337,7 +339,7 @@ namespace slib
 		return "0";
 	}
 
-	sl_bool SAppDimensionValue::parse(const String& _str)
+	sl_bool SAppDimensionValue::parse(const String& _str, SAppDocument* doc)
 	{
 		do {
 			String str = _str.trim();
@@ -391,7 +393,8 @@ namespace slib
 					break;
 				}
 			}
-			if (pos == len) {
+			
+			if (pos >= len) {
 				amount = f;
 				if (flagPercent) {
 					unit = WEIGHT;
@@ -399,154 +402,65 @@ namespace slib
 					unit = PX;
 				}
 				break;
-			} else if (pos + 1 == len) {
-				if (sz[pos] == '*') {
-					amount = f;
-					unit = FILL;
+			}
+			
+			String strUnit(sz + pos, len - pos);
+			
+			if (doc) {
+				SAppDimensionValue refer;
+				String strUnitLocal = SAppDocument::getNameInLocalNamespace(doc->m_currentLocalNamespace, strUnit);
+				if (doc->m_layoutUnits.get(strUnitLocal, &refer)) {
+					amount = refer.amount * f;
+					unit = refer.unit;
 					break;
-				} else if (sz[pos] == 'm') {
-					amount = f;
-					unit = M;
+				}
+				if (doc->m_layoutUnits.get(strUnit, &refer)) {
+					amount = refer.amount * f;
+					unit = refer.unit;
 					break;
-				}
-			} else if (pos + 2 == len) {
-				if (sz[pos] == 's') {
-					if (sz[pos + 1] == 'w') {
-						amount = f;
-						unit = SW;
-						break;
-					} else if (sz[pos + 1] == 'h') {
-						amount = f;
-						unit = SH;
-						break;
-					} else if (sz[pos + 1] == 'p') {
-						amount = f;
-						unit = SP;
-						break;
-					}
-				} else if (sz[pos] == 'v') {
-					if (sz[pos + 1] == 'w') {
-						amount = f;
-						unit = VW;
-						break;
-					} else if (sz[pos + 1] == 'h') {
-						amount = f;
-						unit = VH;
-						break;
-					}
-				} else if (sz[pos] == 'p') {
-					if (sz[pos + 1] == 'x') {
-						if (!flagPercent) {
-							amount = f;
-							unit = PX;
-							break;
-						}
-					} else if (sz[pos + 1] == 't') {
-						if (!flagPercent) {
-							amount = f;
-							unit = PT;
-							break;
-						}
-					}
-				} else if (sz[pos] == 'd') {
-					if (sz[pos + 1] == 'p') {
-						if (!flagPercent) {
-							amount = f;
-							unit = DP;
-							break;
-						}
-					}
-				} else if (sz[pos] == 'm') {
-					if (sz[pos + 1] == 'm') {
-						if (!flagPercent) {
-							amount = f;
-							unit = MM;
-							break;
-						}
-					}
-				} else if (sz[pos] == 'c') {
-					if (sz[pos + 1] == 'm') {
-						if (!flagPercent) {
-							amount = f;
-							unit = CM;
-							break;
-						}
-					}
-				} else if (sz[pos] == 'i') {
-					if (sz[pos + 1] == 'n') {
-						if (!flagPercent) {
-							amount = f;
-							unit = INCH;
-							break;
-						}
-					}
-				}
-			} else if (pos + 4 == len) {
-				if (sz[pos] == 's') {
-					if (sz[pos + 1] == 'm') {
-						if (sz[pos + 2] == 'a' && sz[pos + 3] == 'x') {
-							amount = f;
-							unit = SMAX;
-							break;
-						} else if (sz[pos + 2] == 'i' && sz[pos + 3] == 'n') {
-							amount = f;
-							unit = SMIN;
-							break;
-						}
-					} else if (sz[pos + 1] == 'b') {
-						if (sz[pos + 2] == 'a' && sz[pos + 3] == 'r') {
-							amount = f;
-							unit = SBAR;
-							break;
-						}
-					}
-				} else if (sz[pos] == 'v') {
-					if (sz[pos + 1] == 'm') {
-						if (sz[pos + 2] == 'a' && sz[pos + 3] == 'x') {
-							amount = f;
-							unit = VMAX;
-							break;
-						} else if (sz[pos + 2] == 'i' && sz[pos + 3] == 'n') {
-							amount = f;
-							unit = VMIN;
-							break;
-						}
-					}
-				}
-			} else if (pos + 5 == len) {
-				if (sz[pos] == 's' && sz[pos + 1] == 'a' && sz[pos + 2] == 'f' && sz[pos + 3] == 'e') {
-					if (sz[pos + 4] == 'l') {
-						amount = f;
-						unit = SAFE_L;
-						break;
-					} else if (sz[pos + 4] == 't') {
-						amount = f;
-						unit = SAFE_T;
-						break;
-					} else if (sz[pos + 4] == 'r') {
-						amount = f;
-						unit = SAFE_R;
-						break;
-					} else if (sz[pos + 4] == 'b') {
-						amount = f;
-						unit = SAFE_B;
-						break;
-					} else if (sz[pos + 4] == 'w') {
-						amount = f;
-						unit = SAFE_W;
-						break;
-					} else if (sz[pos + 4] == 'h') {
-						amount = f;
-						unit = SAFE_H;
-						break;
-					}
 				}
 			}
+			
+			typedef HashMap<String, int> UnitMap;
+			SLIB_SAFE_STATIC(UnitMap, units);
+			if (units.isNull()) {
+				units.put("px", PX);
+				units.put("sw", SW);
+				units.put("sh", SH);
+				units.put("smin", SMIN);
+				units.put("smax", SMAX);
+				units.put("vw", VW);
+				units.put("vh", VH);
+				units.put("vmin", VMIN);
+				units.put("vmax", VMAX);
+				units.put("sp", SP);
+				units.put("dp", DP);
+				units.put("pt", PT);
+				units.put("m", M);
+				units.put("cm", CM);
+				units.put("mm", MM);
+				units.put("in", INCH);
+				units.put("inch", INCH);
+				units.put("sbar", SBAR);
+				units.put("safel", SAFE_L);
+				units.put("safet", SAFE_T);
+				units.put("safer", SAFE_R);
+				units.put("safeb", SAFE_B);
+				units.put("safew", SAFE_W);
+				units.put("safeh", SAFE_H);
+			}
+			
+			if (units.get(strUnit, &unit)) {
+				amount = f;
+				break;
+			}
+
 			return sl_false;
 			
 		} while (0);
 		
-		if (amount == 0) {
+		if (Math::isAlmostZero(amount)) {
+			amount = 0;
 			unit = PX;
 		}
 		flagDefined = sl_true;
@@ -1327,7 +1241,7 @@ namespace slib
 	{
 	}
 
-	sl_bool SAppDrawableValue::parse(const String& _str)
+	sl_bool SAppDrawableValue::parse(const String& _str, SAppDocument* doc)
 	{
 		String str = _str;
 		if (str.isEmpty()) {
@@ -1520,7 +1434,7 @@ namespace slib
 						if (s.isEmpty()) {
 							return sl_false;
 						}
-						if (!(f[i].parse(s))) {
+						if (!(f[i].parse(s, doc))) {
 							return sl_false;
 						}
 						if (!(f[i].flagDefined)) {

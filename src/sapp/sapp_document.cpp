@@ -119,6 +119,7 @@ namespace slib
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_name_is_empty, "Layout Resource: name attribute is empty")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_name_invalid, "Layout Resource: Invalid name attribute value: %s")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_name_redefined, "Layout Resource: name is redefined: %s")
+	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_value_invalid, "Layout Resource: Invalid value: %s")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_attribute_invalid, "Layout Resource: Invalid %s attribute value: %s")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_scrollview_must_contain_one_child, "Layout Resource: ScrollView can contain only one child")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_item_must_contain_one_child, "Layout Resource: item can contain only one child")
@@ -703,28 +704,16 @@ namespace slib
 		for (i = 0; i < children.count; i++) {
 			Ref<XmlElement>& child = children[i];
 			if (child.isNotNull()) {
-				if (child->getName() == "layout-include" || child->getName() == "include") {
-					if (!_parseLayoutInclude(localNamespace, child)) {
-						return sl_false;
-					}
-				}
-			}
-		}
-		for (i = 0; i < children.count; i++) {
-			Ref<XmlElement>& child = children[i];
-			if (child.isNotNull()) {
-				if (child->getName() == "layout-style" || child->getName() == "style") {
-					if (!_parseLayoutStyle(localNamespace, child)) {
-						return sl_false;
-					}
-				}
-			}
-		}
-		for (i = 0; i < children.count; i++) {
-			Ref<XmlElement>& child = children[i];
-			if (child.isNotNull()) {
 				if (child->getName() == "strings") {
-					if (!_parseStringResources(localNamespace, child)) {
+					String fileName = File::getFileNameOnly(filePath);
+					Locale locale = Locale::Unknown;
+					if (fileName.startsWith("strings_")) {
+						locale = Locale(fileName.substring(8));
+						if (locale.isInvalid()) {
+							locale = Locale::Unknown;
+						}
+					}
+					if (!_parseStringResources(localNamespace, child, locale)) {
 						return sl_false;
 					}
 				} else if (child->getName() == "string") {
@@ -747,17 +736,32 @@ namespace slib
 					if (!_parseMenuResource(localNamespace, child)) {
 						return sl_false;
 					}
-				} else if (child->getName() == "layout-style") {
-				} else if (child->getName() == "style") {
-				} else if (child->getName() == "layout-include") {
-				} else if (child->getName() == "include") {
-				} else if (child->getName() == "layout") {
-					if (!_parseLayoutResource(localNamespace, child)) {
+				} else if (child->getName() == "layout-include" || child->getName() == "include") {
+					if (!_parseLayoutInclude(localNamespace, child)) {
 						return sl_false;
 					}
+				} else if (child->getName() == "layout-style" || child->getName() == "style") {
+					if (!_parseLayoutStyle(localNamespace, child)) {
+						return sl_false;
+					}
+				} else if (child->getName() == "unit") {
+					if (!_parseLayoutUnit(localNamespace, child)) {
+						return sl_false;
+					}
+				} else if (child->getName() == "layout") {
 				} else {
 					_logError(child, _g_sdev_sapp_error_invalid_tag.arg(child->getName()));
 					return sl_false;
+				}
+			}
+		}
+		for (i = 0; i < children.count; i++) {
+			Ref<XmlElement>& child = children[i];
+			if (child.isNotNull()) {
+				if (child->getName() == "layout") {
+					if (!_parseLayoutResource(localNamespace, child)) {
+						return sl_false;
+					}
 				}
 			}
 		}
