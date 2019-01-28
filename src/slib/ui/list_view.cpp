@@ -443,7 +443,13 @@ namespace slib
 					}
 				}
 				sl_ui_pos originalScrollY = scrollY;
-				
+
+				sl_ui_pos windowStart = scrollY - heightListView / 2;
+				if (windowStart < 0) {
+					windowStart = 0;
+				}
+				sl_ui_pos windowEnd = scrollY + heightListView + heightListView / 2;
+
 				if (flagRefresh) {
 					
 					countTotalItems = adapter->getItemsCount();
@@ -480,7 +486,7 @@ namespace slib
 					sl_uint32 iItem;
 					for (iItem = 0; iItem < lastCountVisibleItems; iItem++) {
 						sl_ui_pos h = heightsVisibleItems[iItem];
-						if (yItem + h > scrollY) {
+						if (yItem + h > windowStart) {
 							break;
 						}
 						yItem += h;
@@ -497,7 +503,7 @@ namespace slib
 					sl_uint32 iStart = iItem;
 					
 					// reuse visible items
-					for (; iItem < lastCountVisibleItems && yItem < scrollY + heightListView; iItem++) {
+					for (; iItem < lastCountVisibleItems && yItem < windowEnd; iItem++) {
 						Ref<View> view = viewsVisibleItems[iItem];
 						sl_ui_len h = _measureItemHeight(view, heightListView);
 						yItem += h;
@@ -511,7 +517,7 @@ namespace slib
 					yGoDown = yItem;
 					indexGoDown = lastIndexFirstItem + iItem;
 					
-					if (iStart >= lastCountVisibleItems || yGoUp >= scrollY + heightListView) {
+					if (iStart >= lastCountVisibleItems || yGoUp >= windowEnd) {
 						flagClearAll = sl_true;
 					}
 					
@@ -551,7 +557,7 @@ namespace slib
 							if (h <= 0) {
 								h = lastAverageItemHeight;
 							}
-							if (yTop + h > scrollY) {
+							if (yTop + h > windowStart) {
 								y = yTop;
 								index = i;
 								flagFound = sl_true;
@@ -561,7 +567,7 @@ namespace slib
 							if (h <= 0) {
 								h = lastAverageItemHeight;
 							}
-							if (yBottom - h < scrollY) {
+							if (yBottom - h < windowStart) {
 								y = yBottom;
 								index = countTotalItems - i;
 								flagFound = sl_true;
@@ -572,7 +578,7 @@ namespace slib
 						}
 						
 						if (!flagFound) {
-							y = scrollY;
+							y = windowStart;
 							if (i < MAX_ITEMS_VISIBLE || Math::isAlmostZero(lastAverageMidItemHeight)) {
 								index = 0;
 							} else {
@@ -597,7 +603,7 @@ namespace slib
 				
 				// Go Up
 				{
-					while (yGoUp > scrollY && indexGoUp > 0 && countGoUpViews < MAX_ITEMS_VISIBLE) {
+					while (yGoUp > windowStart && indexGoUp > 0 && countGoUpViews < MAX_ITEMS_VISIBLE) {
 						Ref<View> viewFree;
 						if (countFreeViews > 0) {
 							viewFree = viewsFreeItems[countFreeViews - 1];
@@ -624,7 +630,7 @@ namespace slib
 				
 				// Go Down
 				{
-					while (yGoDown < scrollY + heightListView && indexGoDown < countTotalItems && countGoDownViews < MAX_ITEMS_VISIBLE) {
+					while (yGoDown < windowEnd && indexGoDown < countTotalItems && countGoDownViews < MAX_ITEMS_VISIBLE) {
 						Ref<View> viewFree;
 						if (countFreeViews > 0) {
 							viewFree = viewsFreeItems[countFreeViews - 1];
