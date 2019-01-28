@@ -359,7 +359,10 @@ namespace slib
 			back->setWidthFilling(1, UIUpdateMode::Init);
 			back->setHeightFilling(1, UIUpdateMode::Init);
 			WeakRef<ViewPage> page = this;
-			back->setOnClickEvent([page](View*, UIEvent* ev) {
+			back->setOnClickEvent([page](View* view, UIEvent* ev) {
+				if (view->getChildAt(ev->getPoint()).isNotNull()) {
+					return;
+				}
 				Ref<ViewPage> _page = page;
 				if (_page.isNotNull()) {
 					_page->dispatchClickBackground(ev);
@@ -586,11 +589,11 @@ namespace slib
 	
 	TransitionType _g_viewPage_globalOpeningPopupTransitionType = TransitionType::Zoom;
 	TransitionDirection _g_viewPage_globalOpeningPopupTransitionDirection = TransitionDirection::FromBottomToTop;
-	float _g_viewPage_globalOpeningPopupTransitionDuration = 0.3f;
+	float _g_viewPage_globalOpeningPopupTransitionDuration = 0.25f;
 	AnimationCurve _g_viewPage_globalOpeningPopupTransitionCurve = AnimationCurve::Overshoot;
 	TransitionType _g_viewPage_globalClosingPopupTransitionType = TransitionType::Fade;
 	TransitionDirection _g_viewPage_globalClosingPopupTransitionDirection = TransitionDirection::FromTopToBottom;
-	float _g_viewPage_globalClosingPopupTransitionDuration = 0.3f;
+	float _g_viewPage_globalClosingPopupTransitionDuration = 0.2f;
 	AnimationCurve _g_viewPage_globalClosingPopupTransitionCurve = AnimationCurve::Linear;
 	SLIB_STATIC_COLOR(_g_viewPage_globalPopupBackgroundColor, 0, 0, 0, 120)
 
