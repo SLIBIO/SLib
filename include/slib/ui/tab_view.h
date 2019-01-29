@@ -34,7 +34,7 @@ namespace slib
 	{
 	public:
 		AtomicString label;
-		
+		AtomicRef<Drawable> icon;
 		AtomicRef<View> contentView;
 		
 	public:
@@ -62,6 +62,10 @@ namespace slib
 		
 		virtual void setTabLabel(sl_uint32 index, const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		Ref<Drawable> getTabIcon(sl_uint32 index);
+		
+		virtual void setTabIcon(sl_uint32 index, const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
 		Ref<View> getTabContentView(sl_uint32 index);
 		
 		virtual void setTabContentView(sl_uint32 index, const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -76,13 +80,13 @@ namespace slib
 		
 		void setOrientation(LayoutOrientation orientation, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		sl_ui_len getTabWidth();
+		sl_real getTabWidth();
 		
-		virtual void setTabWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setTabWidth(sl_real width, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		sl_ui_len getTabHeight();
+		sl_real getTabHeight();
 		
-		virtual void setTabHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setTabHeight(sl_real height, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		Ref<Drawable> getBarBackground();
 		
@@ -126,29 +130,49 @@ namespace slib
 		
 		void setHoverLabelColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		Alignment getLabelAlignment();
+		Alignment getTabAlignment();
 		
-		virtual void setLabelAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setTabAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		virtual void setLabelMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setTabPadding(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void setLabelMargin(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setTabPadding(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		sl_ui_pos getLabelMarginLeft();
+		sl_ui_pos getTabPaddingLeft();
 		
-		void setLabelMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setTabPaddingLeft(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		sl_ui_pos getLabelMarginTop();
+		sl_ui_pos getTabPaddingTop();
 		
-		void setLabelMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setTabPaddingTop(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		sl_ui_pos getLabelMarginRight();
+		sl_ui_pos getTabPaddingRight();
 		
-		void setLabelMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setTabPaddingRight(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		sl_ui_pos getLabelMarginBottom();
+		sl_ui_pos getTabPaddingBottom();
 		
-		void setLabelMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setTabPaddingBottom(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		sl_ui_pos getTabSpaceSize();
+		
+		virtual void setTabSpaceSize(sl_ui_pos size, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		UISize getIconSize();
+
+		virtual void setIconSize(const UISize& size, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void setIconSize(sl_ui_len size, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		sl_ui_len getIconWidth();
+		
+		void setIconWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		sl_ui_len getIconHeight();
+		
+		void setIconHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		virtual UIRect getTabBarRegion();
 		
@@ -173,7 +197,7 @@ namespace slib
 		
 		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
-		virtual void onDrawTab(Canvas* canvas, const UIRect& rect, sl_uint32 index, const String& label);
+		virtual void onDrawTab(Canvas* canvas, const UIRect& rect, sl_uint32 index, const Ref<Drawable>& icon, const String& label);
 		
 	protected:
 		void _invalidateTabBar(UIUpdateMode mode);
@@ -201,8 +225,8 @@ namespace slib
 		sl_int32 m_indexHover;
 		
 		LayoutOrientation m_orientation;
-		sl_ui_len m_tabWidth;
-		sl_ui_len m_tabHeight;
+		sl_real m_tabWidth;
+		sl_real m_tabHeight;
 		
 		AtomicRef<Drawable> m_barBackground;
 		AtomicRef<Drawable> m_contentBackground;
@@ -212,11 +236,14 @@ namespace slib
 		Color m_labelColor;
 		Color m_selectedLabelColor;
 		Color m_hoverLabelColor;
-		Alignment m_labelAlignment;
-		sl_ui_pos m_labelMarginLeft;
-		sl_ui_pos m_labelMarginTop;
-		sl_ui_pos m_labelMarginRight;
-		sl_ui_pos m_labelMarginBottom;
+		Alignment m_tabAlignment;
+		sl_ui_pos m_tabPaddingLeft;
+		sl_ui_pos m_tabPaddingTop;
+		sl_ui_pos m_tabPaddingRight;
+		sl_ui_pos m_tabPaddingBottom;
+		sl_ui_pos m_tabSpaceSize;
+		sl_ui_len m_iconWidth;
+		sl_ui_len m_iconHeight;
 		
 	};
 

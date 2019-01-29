@@ -23,6 +23,7 @@
 #include "slib/ui/tab_view.h"
 
 #include "slib/ui/core.h"
+#include "slib/graphics/util.h"
 
 #define MAX_TABS_COUNT 100
 
@@ -48,6 +49,7 @@ namespace slib
 		
 		setCreatingNativeWidget(sl_true);
 		setCreatingChildInstances(sl_true);
+		setUsingLayout(sl_false);
 		setUsingFont(sl_true);
 		setDrawing(sl_true, UIUpdateMode::Init);
 		setSavingCanvasState(sl_false);
@@ -65,15 +67,17 @@ namespace slib
 		m_hoverLabelColor = Color(0, 20, 250);
 		
 		m_orientation = LayoutOrientation::Horizontal;
-		m_tabWidth = 90;
-		m_tabHeight = 24;
+		m_tabWidth = 0;
+		m_tabHeight = 0;
 		
-		m_labelAlignment = Alignment::MiddleCenter;
-		m_labelMarginLeft = 0;
-		m_labelMarginTop = 0;
-		m_labelMarginRight = 0;
-		m_labelMarginBottom = 0;
-		
+		m_tabAlignment = Alignment::MiddleCenter;
+		m_tabPaddingLeft = 0;
+		m_tabPaddingTop = 0;
+		m_tabPaddingRight = 0;
+		m_tabPaddingBottom = 0;
+		m_tabSpaceSize = 0;
+		m_iconWidth = 0;
+		m_iconHeight = 0;
 	}
 	
 	TabView::~TabView()
@@ -132,6 +136,28 @@ namespace slib
 			if (isNativeWidget()) {
 				_setTabLabel_NW(index, text);
 			} else {
+				_invalidateTabBar(mode);
+			}
+		}
+	}
+	
+	Ref<Drawable> TabView::getTabIcon(sl_uint32 index)
+	{
+		MutexLocker lock(m_items.getLocker());
+		if (index < m_items.getCount()) {
+			TabViewItem* item = m_items.getPointerAt(index);
+			return item->icon;
+		}
+		return sl_null;
+	}
+	
+	void TabView::setTabIcon(sl_uint32 index, const Ref<Drawable>& icon, UIUpdateMode mode)
+	{
+		ObjectLocker lock(this);
+		if (index < m_items.getCount()) {
+			TabViewItem* item = m_items.getPointerAt(index);
+			item->icon = icon;
+			if (!(isNativeWidget())) {
 				_invalidateTabBar(mode);
 			}
 		}
@@ -235,12 +261,25 @@ namespace slib
 		}
 	}
 	
-	sl_ui_len TabView::getTabWidth()
+	sl_real TabView::getTabWidth()
 	{
-		return m_tabWidth;
+		sl_real width = m_tabWidth;
+		if (width > 0) {
+			return width;
+		}
+		if (m_orientation == LayoutOrientation::Horizontal) {
+			sl_size n = m_items.getCount();
+			if (n > 0) {
+				return (sl_real)(getWidth()) / (sl_real)n;
+			} else {
+				return (sl_real)(getWidth());
+			}
+		} else {
+			return getFontSize() * 2;
+		}
 	}
 	
-	void TabView::setTabWidth(sl_ui_len width, UIUpdateMode mode)
+	void TabView::setTabWidth(sl_real width, UIUpdateMode mode)
 	{
 		m_tabWidth = width;
 		if (!(isNativeWidget())) {
@@ -248,12 +287,25 @@ namespace slib
 		}
 	}
 	
-	sl_ui_len TabView::getTabHeight()
+	sl_real TabView::getTabHeight()
 	{
-		return m_tabHeight;
+		sl_real height = m_tabHeight;
+		if (height > 0) {
+			return height;
+		}
+		if (m_orientation == LayoutOrientation::Vertical) {
+			sl_size n = m_items.getCount();
+			if (n > 0) {
+				return (sl_real)(getHeight()) / (sl_real)n;
+			} else {
+				return (sl_real)(getHeight());
+			}
+		} else {
+			return getFontSize() * 2;
+		}
 	}
 	
-	void TabView::setTabHeight(sl_ui_len height, UIUpdateMode mode)
+	void TabView::setTabHeight(sl_real height, UIUpdateMode mode)
 	{
 		m_tabHeight = height;
 		if (!(isNativeWidget())) {
@@ -374,71 +426,124 @@ namespace slib
 		_invalidateTabBar(mode);
 	}
 	
-	Alignment TabView::getLabelAlignment()
+	Alignment TabView::getTabAlignment()
 	{
-		return m_labelAlignment;
+		return m_tabAlignment;
 	}
 	
-	void TabView::setLabelAlignment(Alignment align, UIUpdateMode mode)
+	void TabView::setTabAlignment(Alignment align, UIUpdateMode mode)
 	{
-		m_labelAlignment = align;
+		m_tabAlignment = align;
 		invalidate(mode);
 	}
 	
-	void TabView::setLabelMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode)
+	void TabView::setTabPadding(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode)
 	{
-		m_labelMarginLeft = left;
-		m_labelMarginTop = top;
-		m_labelMarginRight = right;
-		m_labelMarginBottom = bottom;
+		m_tabPaddingLeft = left;
+		m_tabPaddingTop = top;
+		m_tabPaddingRight = right;
+		m_tabPaddingBottom = bottom;
 		invalidate(mode);
 	}
 	
-	void TabView::setLabelMargin(sl_ui_pos margin, UIUpdateMode mode)
+	void TabView::setTabPadding(sl_ui_pos margin, UIUpdateMode mode)
 	{
-		setLabelMargin(margin, margin, margin, margin, mode);
+		setTabPadding(margin, margin, margin, margin, mode);
 	}
 	
-	sl_ui_pos TabView::getLabelMarginLeft()
+	sl_ui_pos TabView::getTabPaddingLeft()
 	{
-		return m_labelMarginLeft;
+		return m_tabPaddingLeft;
 	}
 	
-	void TabView::setLabelMarginLeft(sl_ui_pos margin, UIUpdateMode mode)
+	void TabView::setTabPaddingLeft(sl_ui_pos padding, UIUpdateMode mode)
 	{
-		setLabelMargin(margin, m_labelMarginTop, m_labelMarginRight, m_labelMarginBottom, mode);
+		setTabPadding(padding, m_tabPaddingTop, m_tabPaddingRight, m_tabPaddingBottom, mode);
 	}
 	
-	sl_ui_pos TabView::getLabelMarginTop()
+	sl_ui_pos TabView::getTabPaddingTop()
 	{
-		return m_labelMarginTop;
+		return m_tabPaddingTop;
 	}
 	
-	void TabView::setLabelMarginTop(sl_ui_pos margin, UIUpdateMode mode)
+	void TabView::setTabPaddingTop(sl_ui_pos padding, UIUpdateMode mode)
 	{
-		setLabelMargin(m_labelMarginLeft, margin, m_labelMarginRight, m_labelMarginBottom, mode);
+		setTabPadding(m_tabPaddingLeft, padding, m_tabPaddingRight, m_tabPaddingBottom, mode);
 	}
 	
-	sl_ui_pos TabView::getLabelMarginRight()
+	sl_ui_pos TabView::getTabPaddingRight()
 	{
-		return m_labelMarginRight;
+		return m_tabPaddingRight;
 	}
 	
-	void TabView::setLabelMarginRight(sl_ui_pos margin, UIUpdateMode mode)
+	void TabView::setTabPaddingRight(sl_ui_pos padding, UIUpdateMode mode)
 	{
-		setLabelMargin(m_labelMarginLeft, m_labelMarginTop, margin, m_labelMarginBottom, mode);
+		setTabPadding(m_tabPaddingLeft, m_tabPaddingTop, padding, m_tabPaddingBottom, mode);
 	}
 	
-	sl_ui_pos TabView::getLabelMarginBottom()
+	sl_ui_pos TabView::getTabPaddingBottom()
 	{
-		return m_labelMarginBottom;
+		return m_tabPaddingBottom;
 	}
 	
-	void TabView::setLabelMarginBottom(sl_ui_pos margin, UIUpdateMode mode)
+	void TabView::setTabPaddingBottom(sl_ui_pos padding, UIUpdateMode mode)
 	{
-		setLabelMargin(m_labelMarginLeft, m_labelMarginTop, m_labelMarginRight, margin, mode);
+		setTabPadding(m_tabPaddingLeft, m_tabPaddingTop, m_tabPaddingRight, padding, mode);
 	}
 
+	sl_ui_pos TabView::getTabSpaceSize()
+	{
+		return m_tabSpaceSize;
+	}
+	
+	void TabView::setTabSpaceSize(sl_ui_pos size, UIUpdateMode mode)
+	{
+		m_tabSpaceSize = size;
+		invalidate(mode);
+	}
+	
+	UISize TabView::getIconSize()
+	{
+		return UISize(m_iconWidth, m_iconHeight);
+	}
+	
+	void TabView::setIconSize(const UISize& size, UIUpdateMode mode)
+	{
+		m_iconWidth = size.x;
+		m_iconHeight = size.y;
+		invalidate(mode);
+	}
+	
+	void TabView::setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode)
+	{
+		setIconSize(UISize(width, height), mode);
+	}
+	
+	void TabView::setIconSize(sl_ui_len size, UIUpdateMode mode)
+	{
+		setIconSize(UISize(size, size), mode);
+	}
+	
+	sl_ui_len TabView::getIconWidth()
+	{
+		return m_iconWidth;
+	}
+	
+	void TabView::setIconWidth(sl_ui_len width, UIUpdateMode mode)
+	{
+		setIconSize(UISize(width, m_iconHeight), mode);
+	}
+	
+	sl_ui_len TabView::getIconHeight()
+	{
+		return m_iconHeight;
+	}
+	
+	void TabView::setIconHeight(sl_ui_len height, UIUpdateMode mode)
+	{
+		setIconSize(UISize(m_iconWidth, height), mode);
+	}
+	
 	UIRect TabView::getTabBarRegion()
 	{
 		UISize size = getSize();
@@ -446,13 +551,13 @@ namespace slib
 		if (m_orientation == LayoutOrientation::Vertical) {
 			ret.left = 0;
 			ret.top = 0;
-			ret.right = m_tabWidth;
+			ret.right = (sl_ui_len)(getTabWidth());
 			ret.bottom = size.y;
 		} else {
 			ret.left = 0;
 			ret.top = 0;
 			ret.right = size.x;
-			ret.bottom = m_tabHeight;
+			ret.bottom = (sl_ui_len)(getTabHeight());
 		}
 		ret.fixSizeError();
 		return ret;
@@ -463,14 +568,14 @@ namespace slib
 		UIRect ret;
 		if (m_orientation == LayoutOrientation::Vertical) {
 			ret.left = 0;
-			ret.top = (sl_ui_len)index * m_tabHeight;
-			ret.right = m_tabWidth;
-			ret.bottom = (sl_ui_len)(index + 1) * m_tabHeight;
+			ret.top = (sl_ui_len)(index * getTabHeight());
+			ret.right = (sl_ui_len)(getTabWidth());
+			ret.bottom = (sl_ui_len)((index + 1) * getTabHeight());
 		} else {
-			ret.left = (sl_ui_len)index * m_tabWidth;
+			ret.left = (sl_ui_len)(index * getTabWidth());
 			ret.top = 0;
-			ret.right = (sl_ui_len)(index + 1) * m_tabWidth;
-			ret.bottom = m_tabHeight;
+			ret.right = (sl_ui_len)((index + 1) * getTabWidth());
+			ret.bottom = (sl_ui_len)(getTabHeight());
 		}
 		ret.fixSizeError();
 		return ret;
@@ -480,9 +585,9 @@ namespace slib
 	{
 		UIRect ret = getBounds();
 		if (m_orientation == LayoutOrientation::Vertical) {
-			ret.left += m_tabWidth;
+			ret.left += (sl_ui_len)(getTabWidth());
 		} else {
-			ret.top += m_tabHeight;
+			ret.top += (sl_ui_len)(getTabHeight());
 		}
 		ret.fixSizeError();
 		return ret;
@@ -492,13 +597,13 @@ namespace slib
 	{
 		UIRect ret = getBounds();
 		if (m_orientation == LayoutOrientation::Vertical) {
-			ret.left += m_tabWidth + getPaddingLeft();
+			ret.left += (sl_ui_len)(getTabWidth()) + getPaddingLeft();
 			ret.top += getPaddingTop();
 			ret.right -= getPaddingRight();
 			ret.bottom -= getPaddingBottom();
 		} else {
 			ret.left += getPaddingLeft();
-			ret.top += m_tabHeight + getPaddingTop();
+			ret.top += (sl_ui_len)(getTabHeight()) + getPaddingTop();
 			ret.right -= getPaddingRight();
 			ret.bottom -= getPaddingBottom();
 		}
@@ -553,10 +658,10 @@ namespace slib
 	
 	void TabView::onMouseEvent(UIEvent* ev)
 	{
-		if (ev->getAction() == UIAction::MouseLeave) {
+		if (ev->getAction() == UIAction::MouseLeave || ev->getAction() == UIAction::LeftButtonUp || ev->getAction() == UIAction::TouchEnd || ev->getAction() == UIAction::TouchCancel) {
 			m_indexHover = -1;
 			_invalidateTabBar(UIUpdateMode::Redraw);
-		} else if (ev->getAction() == UIAction::MouseMove) {
+		} else if (ev->getAction() == UIAction::MouseMove || ev->getAction() == UIAction::LeftButtonDrag || ev->getAction() == UIAction::TouchBegin || ev->getAction() == UIAction::TouchMove) {
 			UIPoint pt = ev->getPoint();
 			ObjectLocker lock(this);
 			ListLocker<TabViewItem> items(m_items);
@@ -585,15 +690,17 @@ namespace slib
 		ListLocker<TabViewItem> items(m_items);
 		sl_uint32 n = (sl_uint32)(items.count);
 		for (sl_uint32 i = 0; i < n; i++) {
-			onDrawTab(canvas, getTabRegion(i), i, items[i].label);
+			onDrawTab(canvas, getTabRegion(i), i, items[i].icon, items[i].label);
 		}
 	}
 	
-	void TabView::onDrawTab(Canvas* canvas, const UIRect& rect, sl_uint32 index, const String& label)
+	void TabView::onDrawTab(Canvas* canvas, const UIRect& rect, sl_uint32 index, const Ref<Drawable>& icon, const String& label)
 	{
 		UIRect rc = getTabRegion(index);
+		
 		Color labelColor;
 		Ref<Drawable> background;
+		
 		if (m_indexSelected == index) {
 			background = m_selectedTabBackground;
 			labelColor = m_selectedLabelColor;
@@ -604,27 +711,81 @@ namespace slib
 			background = m_tabBackground;
 			labelColor = m_labelColor;
 		}
+		
 		if (background.isNull()) {
 			background = m_tabBackground;
 		}
 		if (labelColor.isZero()) {
 			labelColor = m_labelColor;
 		}
+		
 		if (background.isNotNull()) {
 			canvas->draw(rc, background);
 		}
-		if (label.isNotEmpty() && labelColor.isNotZero()) {
-			Ref<Font> font = getFont();
-			rc.left += m_labelMarginLeft;
-			rc.top += m_labelMarginTop;
-			rc.right -= m_labelMarginRight;
-			rc.bottom -= m_labelMarginBottom;
-			rc.fixSizeError();
-			if (m_orientation == LayoutOrientation::Vertical) {
-				canvas->drawText(label, rc, font, labelColor, m_labelAlignment);
-			} else {
-				canvas->drawText(label, rc, font, labelColor, m_labelAlignment);
+		
+		rc.left += m_tabPaddingLeft;
+		rc.top += m_tabPaddingTop;
+		rc.right -= m_tabPaddingRight;
+		rc.bottom -= m_tabPaddingBottom;
+		if (!(rc.isValidSize())) {
+			return;
+		}
+		
+		sl_ui_pos space = m_tabSpaceSize;
+		sl_ui_len widthIcon = m_iconWidth;
+		sl_ui_len heightIcon = m_iconHeight;
+		if (icon.isNotNull()) {
+			if (heightIcon <= 0) {
+				if (widthIcon > 0) {
+					sl_real w = icon->getDrawableWidth();
+					if (w > 0.00001f) {
+						heightIcon = (sl_ui_len)(icon->getDrawableHeight() * widthIcon / w);
+					}
+				} else {
+					heightIcon = Math::min(rc.getWidth(), rc.getHeight());
+				}
 			}
+			if (widthIcon <= 0 && heightIcon > 0) {
+				sl_real h = icon->getDrawableHeight();
+				if (h > 0.00001f) {
+					widthIcon = (sl_ui_len)(icon->getDrawableWidth() * heightIcon / h);
+				}
+			}
+		} else {
+			space = 0;
+		}
+		sl_ui_len widthLabel = 0;
+		sl_ui_len heightLabel = 0;
+		Ref<Font> font;
+		if (label.isNotEmpty()) {
+			font = getFont();
+			if (font.isNotNull()) {
+				UISize size = canvas->measureText(font, label);
+				widthLabel = size.x;
+				heightLabel = size.y;
+			}
+		} else {
+			space = 0;
+		}
+		
+		sl_ui_len widthTotal = widthIcon + space + widthLabel;
+		sl_ui_len heightTotal = Math::max(heightIcon, heightLabel);
+		if (widthTotal <= 0 || heightTotal <= 0) {
+			return;
+		}
+		
+		UIPoint pt = GraphicsUtil::calculateAlignPosition(rc, (sl_real)widthTotal, (sl_real)heightTotal, m_tabAlignment);
+		
+		if (icon.isNotNull() && widthIcon > 0 && heightIcon > 0) {
+			UIRect rcIcon;
+			rcIcon.left = pt.x;
+			rcIcon.right = rcIcon.left + widthIcon;
+			rcIcon.top = pt.y + heightTotal / 2 - heightIcon / 2;
+			rcIcon.bottom = rcIcon.top + heightIcon;
+			canvas->draw(rcIcon, icon);
+		}
+		if (label.isNotEmpty() && labelColor.isNotZero() && font.isNotNull() && widthLabel > 0 && heightLabel > 0) {
+			canvas->drawText(label, (sl_real)(pt.x + widthIcon + space), (sl_real)(pt.y + heightTotal / 2 - heightLabel / 2), font, labelColor);
 		}
 	}
 	

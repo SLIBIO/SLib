@@ -3139,8 +3139,8 @@ namespace slib
 		LAYOUT_CONTROL_PROCESS_SUPER(View)
 		
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(orientation, setOrientation)
-		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(tabWidth, setTabWidth, checkScalarSize)
-		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(tabHeight, setTabHeight, checkScalarSize)
+		LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(tabWidth, setTabWidth, checkScalarSize)
+		LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(tabHeight, setTabHeight, checkScalarSize)
 		LAYOUT_CONTROL_DRAWABLE_ATTR(barBackground, setBarBackground)
 		LAYOUT_CONTROL_DRAWABLE_ATTR(contentBackground, setContentBackground)
 		LAYOUT_CONTROL_DRAWABLE_ATTR(tabBackground, setTabBackground)
@@ -3149,31 +3149,52 @@ namespace slib
 		LAYOUT_CONTROL_COLOR_ATTR(labelColor, setLabelColor)
 		LAYOUT_CONTROL_COLOR_ATTR(selectedLabelColor, setSelectedLabelColor)
 		LAYOUT_CONTROL_COLOR_ATTR(hoverLabelColor, setHoverLabelColor)
-		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(labelAlign, setLabelAlignment)
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(tabAlign, setTabAlignment)
 		
-		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(labelMarginLeft, setLabelMarginLeft, checkPosition)
-		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(labelMarginTop, setLabelMarginTop, checkPosition)
-		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(labelMarginRight, setLabelMarginRight, checkPosition)
-		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(labelMarginBottom, setLabelMarginBottom, checkPosition)
+		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(tabPaddingLeft, setTabPaddingLeft, checkPosition)
+		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(tabPaddingTop, setTabPaddingTop, checkPosition)
+		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(tabPaddingRight, setTabPaddingRight, checkPosition)
+		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(tabPaddingBottom, setTabPaddingBottom, checkPosition)
 		if (op == OP_PARSE) {
-			SAppDimensionValue labelMargin;
-			LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, labelMargin)
-			if (!(labelMargin.checkPosition())) {
-				LOG_ERROR_LAYOUT_CONTROL_ATTR(labelMargin)
+			SAppDimensionValue tabPadding;
+			LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, tabPadding)
+			if (!(tabPadding.checkPosition())) {
+				LOG_ERROR_LAYOUT_CONTROL_ATTR(tabPadding)
 				return sl_false;
 			}
-			if (labelMargin.flagDefined) {
-				if (!(attr->labelMarginLeft.flagDefined)) {
-					attr->labelMarginLeft = labelMargin;
+			if (tabPadding.flagDefined) {
+				if (!(attr->tabPaddingLeft.flagDefined)) {
+					attr->tabPaddingLeft = tabPadding;
 				}
-				if (!(attr->labelMarginTop.flagDefined)) {
-					attr->labelMarginTop = labelMargin;
+				if (!(attr->tabPaddingTop.flagDefined)) {
+					attr->tabPaddingTop = tabPadding;
 				}
-				if (!(attr->labelMarginRight.flagDefined)) {
-					attr->labelMarginRight = labelMargin;
+				if (!(attr->tabPaddingRight.flagDefined)) {
+					attr->tabPaddingRight = tabPadding;
 				}
-				if (!(attr->labelMarginBottom.flagDefined)) {
-					attr->labelMarginBottom = labelMargin;
+				if (!(attr->tabPaddingBottom.flagDefined)) {
+					attr->tabPaddingBottom = tabPadding;
+				}
+			}
+		}
+		
+		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(tabSpaceSize, setTabSpaceSize, checkPosition)
+
+		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(iconWidth, setIconWidth, checkScalarSize)
+		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(iconHeight, setIconHeight, checkScalarSize)
+		if (op == OP_PARSE) {
+			SAppDimensionValue iconSize;
+			LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, iconSize)
+			if (!(iconSize.checkScalarSize())) {
+				LOG_ERROR_LAYOUT_CONTROL_ATTR(iconSize)
+				return sl_false;
+			}
+			if (iconSize.flagDefined) {
+				if (!(attr->iconWidth.flagDefined)) {
+					attr->iconWidth = iconSize;
+				}
+				if (!(attr->iconHeight.flagDefined)) {
+					attr->iconHeight = iconSize;
 				}
 			}
 		}
@@ -3185,6 +3206,7 @@ namespace slib
 				if (itemXml.isNotNull()) {
 					SAppLayoutTabItem subItem;
 					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., label)
+					LAYOUT_CONTROL_PARSE_XML_DRAWABLE_ATTR(itemXml, subItem., icon)
 					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., selected)
 					
 					sl_size nViews = itemXml->getChildElementsCount();
@@ -3228,6 +3250,13 @@ namespace slib
 						}
 						params->sbDefineInit->add(String::format("%s%s->setTabLabel(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, i, strItemLabel));
 					}
+					if (subItem.icon.flagDefined) {
+						String strItemIcon;
+						if (!(_getDrawableAccessString(resource->name, subItem.icon, element, strItemIcon))) {
+							return sl_false;
+						}
+						params->sbDefineInit->add(String::format("%s%s->setTabIcon(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, i, strItemIcon));
+					}
 					if (subItem.selected.flagDefined && subItem.selected.value) {
 						flagSelected = sl_true;
 						indexSelected = i;
@@ -3260,6 +3289,15 @@ namespace slib
 								return sl_false;
 							}
 							view->setTabLabel(i, itemLabel, UIUpdateMode::Init);
+						}
+					}
+					if (subItem.icon.flagDefined) {
+						if (!flagOnLayout) {
+							Ref<Drawable> itemIcon;
+							if (!(_getDrawableValue(resource->name, subItem.icon, subItem.element, itemIcon))) {
+								return sl_false;
+							}
+							view->setTabIcon(i, itemIcon, UIUpdateMode::Init);
 						}
 					}
 					if (subItem.selected.flagDefined && subItem.selected.value) {

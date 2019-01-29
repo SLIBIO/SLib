@@ -515,6 +515,7 @@ namespace slib
 	struct SAppLayoutTabItem
 	{
 		SAppStringValue label;
+		SAppDrawableValue icon;
 		SAppBooleanValue selected;
 		Ref<SAppLayoutResourceItem> view;
 		
@@ -526,8 +527,8 @@ namespace slib
 	{
 	public:
 		SAppLayoutOrientationValue orientation;
-		SAppDimensionValue tabWidth;
-		SAppDimensionValue tabHeight;
+		SAppDimensionFloatValue tabWidth;
+		SAppDimensionFloatValue tabHeight;
 		SAppDrawableValue barBackground;
 		SAppDrawableValue contentBackground;
 		SAppDrawableValue tabBackground;
@@ -536,12 +537,15 @@ namespace slib
 		SAppColorValue labelColor;
 		SAppColorValue selectedLabelColor;
 		SAppColorValue hoverLabelColor;
-		SAppAlignmentValue labelAlign;
-		SAppDimensionValue labelMarginLeft;
-		SAppDimensionValue labelMarginTop;
-		SAppDimensionValue labelMarginRight;
-		SAppDimensionValue labelMarginBottom;
-		
+		SAppAlignmentValue tabAlign;
+		SAppDimensionValue tabPaddingLeft;
+		SAppDimensionValue tabPaddingTop;
+		SAppDimensionValue tabPaddingRight;
+		SAppDimensionValue tabPaddingBottom;
+		SAppDimensionValue tabSpaceSize;
+		SAppDimensionValue iconWidth;
+		SAppDimensionValue iconHeight;
+
 		CList<SAppLayoutTabItem> items;
 		
 	public:

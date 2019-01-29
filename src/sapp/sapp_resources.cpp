@@ -237,19 +237,28 @@ namespace slib
 		if (hoverLabelColor.flagDefined) {
 			return sl_true;
 		}
-		if (labelAlign.flagDefined) {
+		if (tabAlign.flagDefined) {
 			return sl_true;
 		}
-		if (labelMarginLeft.flagDefined) {
+		if (tabPaddingLeft.flagDefined) {
 			return sl_true;
 		}
-		if (labelMarginTop.flagDefined) {
+		if (tabPaddingTop.flagDefined) {
 			return sl_true;
 		}
-		if (labelMarginRight.flagDefined) {
+		if (tabPaddingRight.flagDefined) {
 			return sl_true;
 		}
-		if (labelMarginBottom.flagDefined) {
+		if (tabPaddingBottom.flagDefined) {
+			return sl_true;
+		}
+		if (tabSpaceSize.flagDefined) {
+			return sl_true;
+		}
+		if (iconWidth.flagDefined) {
+			return sl_true;
+		}
+		if (iconHeight.flagDefined) {
 			return sl_true;
 		}
 		return sl_false;
