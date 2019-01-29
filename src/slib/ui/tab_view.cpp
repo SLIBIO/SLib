@@ -49,7 +49,7 @@ namespace slib
 		
 		setCreatingNativeWidget(sl_true);
 		setCreatingChildInstances(sl_true);
-		setUsingLayout(sl_false);
+		setUsingChildLayouts(sl_false);
 		setUsingFont(sl_true);
 		setDrawing(sl_true, UIUpdateMode::Init);
 		setSavingCanvasState(sl_false);

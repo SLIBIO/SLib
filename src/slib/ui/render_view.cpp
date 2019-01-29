@@ -29,7 +29,7 @@
 namespace slib
 {
 
-	SLIB_DEFINE_OBJECT(RenderView, View)
+	SLIB_DEFINE_OBJECT(RenderView, ViewGroup)
 
 	class _priv_RenderView_AnimationLoop : public AnimationLoop
 	{
@@ -66,6 +66,7 @@ namespace slib
 		
 		setCreatingNativeWidget(sl_true);
 		setCreatingChildInstances(sl_false);
+		setDrawing(sl_true, UIUpdateMode::Init);
 		
 		setPreferredEngineType(RenderEngineType::OpenGL_ES);
 		

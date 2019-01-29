@@ -32,7 +32,7 @@
 namespace slib
 {
 
-	class SLIB_EXPORT RenderView : public View
+	class SLIB_EXPORT RenderView : public ViewGroup
 	{
 		SLIB_DECLARE_OBJECT
 		

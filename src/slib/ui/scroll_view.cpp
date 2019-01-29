@@ -26,7 +26,7 @@
 namespace slib
 {
 
-	SLIB_DEFINE_OBJECT(ScrollView, View)
+	SLIB_DEFINE_OBJECT(ScrollView, ViewGroup)
 	
 	ScrollView::ScrollView()
 	{
@@ -65,6 +65,14 @@ namespace slib
 			view->setParent(this);
 			view->setCreatingInstance(sl_true);
 			view->setAttachMode(UIAttachMode::NotAttach);
+			if (isVerticalScrolling()) {
+				view->setTopFree(UIUpdateMode::Init);
+				view->setBottomFree(UIUpdateMode::Init);
+			}
+			if (isHorizontalScrolling()) {
+				view->setLeftFree(UIUpdateMode::Init);
+				view->setRightFree(UIUpdateMode::Init);
+			}
 			addChild(view, uiUpdateModeNone);
 			View::setContentSize(view->getWidth(), view->getHeight(), uiUpdateModeNone);
 		} else {

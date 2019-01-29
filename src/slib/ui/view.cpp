@@ -56,7 +56,8 @@ namespace slib
 		
 		m_flagInvalidLayout = sl_true;
 		m_flagNeedApplyLayout = sl_false;
-		
+		m_flagUsingChildLayouts = sl_true;
+
 		m_frame.left = 0;
 		m_frame.top = 0;
 		m_frame.right = 0;
@@ -1120,15 +1121,16 @@ namespace slib
 		sl_bool flagNotResizeWidth = Math::isAlmostZero(frameOld.getWidth() - frame.getWidth());
 		sl_bool flagNotResizeHeight = Math::isAlmostZero(frameOld.getHeight() - frame.getHeight());
 		
-		if (flagNotMoveX && flagNotMoveY && flagNotResizeWidth && flagNotResizeHeight) {
-			return;
-		}
-		
 		m_frame = frame;
 		if (layoutAttrs.isNotNull()) {
 			layoutAttrs->requestedFrame = frame;
 			layoutAttrs->layoutFrame = frame;
 		}
+		
+		if (flagNotMoveX && flagNotMoveY && flagNotResizeWidth && flagNotResizeHeight) {
+			return;
+		}
+		
 		if (m_instance.isNotNull()) {
 			_setFrame_NI(frame);
 		}
@@ -1451,9 +1453,9 @@ namespace slib
 		return m_flagSavingCanvasState;
 	}
 	
-	void View::setSavingCanvasState(sl_bool flagDrawing)
+	void View::setSavingCanvasState(sl_bool flag)
 	{
-		m_flagSavingCanvasState = flagDrawing;
+		m_flagSavingCanvasState = flag;
 	}
 
 	sl_bool View::isHitTestable()
@@ -1669,6 +1671,7 @@ namespace slib
 	struct _priv_View_UpdateLayoutFrameParam
 	{
 		UIRect parentContentFrame;
+		sl_bool flagUseLayout;
 	};
 	
 	void View::_updateLayoutFrameInParent(void* _param)
@@ -1694,6 +1697,20 @@ namespace slib
 			layoutAttrs->flagRequestedFrame = sl_false;
 		} else {
 			frame = oldFrame;
+		}
+		
+		if (!(param.flagUseLayout)) {
+			if (!(oldFrame.getSize().isAlmostEqual(frame.getSize()))) {
+				m_flagInvalidLayout = sl_true;
+			}
+			layoutAttrs->layoutFrame = frame;
+			_updateLayout();
+			if (!m_flagNeedApplyLayout) {
+				if (!(layoutAttrs->layoutFrame.isAlmostEqual(m_frame))) {
+					m_flagNeedApplyLayout = sl_true;
+				}
+			}
+			return;
 		}
 
 		SizeMode widthMode = layoutAttrs->widthMode;
@@ -2025,6 +2042,7 @@ namespace slib
 				param.parentContentFrame.top = m_paddingTop;
 				param.parentContentFrame.right = frame.getWidth() - m_paddingRight;
 				param.parentContentFrame.bottom = frame.getHeight() - m_paddingBottom;
+				param.flagUseLayout = m_flagUsingChildLayouts;
 				for (i = 0; i < children.count; i++) {
 					Ref<View>& child = children[i];
 					Ref<LayoutAttributes>& childLayoutAttrs = child->m_layoutAttrs;
@@ -2054,6 +2072,9 @@ namespace slib
 					}
 				}
 				_restrictSize(layoutAttrs->layoutFrame);
+				if (!m_flagUsingChildLayouts) {
+					break;
+				}
 				if (step != 0) {
 					break;
 				}
@@ -2099,6 +2120,7 @@ namespace slib
 			childLayoutAttrs->flagInvalidLayoutInParent = sl_true;
 			_priv_View_UpdateLayoutFrameParam param;
 			param.parentContentFrame = getBoundsInnerPadding();
+			param.flagUseLayout = m_flagUsingChildLayouts;
 			child->_updateLayoutFrameInParent(&param);
 		} else {
 			child->_updateLayout();
@@ -2112,6 +2134,7 @@ namespace slib
 			childLayoutAttrs->flagInvalidLayoutInParent = sl_true;
 			_priv_View_UpdateLayoutFrameParam param;
 			param.parentContentFrame = getBoundsInnerPadding();
+			param.flagUseLayout = m_flagUsingChildLayouts;
 			child->_updateLayoutFrameInParent(&param);
 		} else {
 			child->_updateLayout();
@@ -3715,7 +3738,17 @@ namespace slib
 			}
 		}
 	}
-
+	
+	sl_bool View::isUsingChildLayouts()
+	{
+		return m_flagUsingChildLayouts;
+	}
+	
+	void View::setUsingChildLayouts(sl_bool flag)
+	{
+		m_flagUsingChildLayouts = flag;
+	}
+	
 	sl_ui_pos View::getPaddingLeft()
 	{
 		return m_paddingLeft;

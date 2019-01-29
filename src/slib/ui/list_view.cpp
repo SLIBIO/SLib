@@ -83,7 +83,7 @@ namespace slib
 		ScrollView::setContentView(m_contentView);
 #else
 		m_contentView->setAttachMode(UIAttachMode::AttachInNativeWidget);
-		addChild(m_contentView, UIUpdateMode::None);
+		addChild(m_contentView, UIUpdateMode::Init);
 		setCreatingChildInstances(sl_true);
 #endif
 		

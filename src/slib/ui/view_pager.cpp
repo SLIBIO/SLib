@@ -27,12 +27,14 @@
 namespace slib
 {
 
-	SLIB_DEFINE_OBJECT(ViewPager, View)
+	SLIB_DEFINE_OBJECT(ViewPager, ViewGroup)
 
 	ViewPager::ViewPager()
 	{
-		m_indexCurrent = 0;
+		setUsingChildLayouts(sl_false);
 		setClipping(sl_true, UIUpdateMode::Init);
+		
+		m_indexCurrent = 0;
 		
 		m_flagMouseDown = sl_false;
 		m_posMouseDown = 0;

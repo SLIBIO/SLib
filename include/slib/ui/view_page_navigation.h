@@ -33,7 +33,7 @@ namespace slib
 
 	class ViewPage;
 
-	class SLIB_EXPORT ViewPageNavigationController : public View
+	class SLIB_EXPORT ViewPageNavigationController : public ViewGroup
 	{
 		SLIB_DECLARE_OBJECT
 		

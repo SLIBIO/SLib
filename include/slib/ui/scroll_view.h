@@ -30,7 +30,7 @@
 namespace slib
 {
 
-	class SLIB_EXPORT ScrollView : public View
+	class SLIB_EXPORT ScrollView : public ViewGroup
 	{
 		SLIB_DECLARE_OBJECT
 		

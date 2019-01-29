@@ -31,7 +31,7 @@
 namespace slib
 {
 
-	class SLIB_EXPORT ViewPager : public View
+	class SLIB_EXPORT ViewPager : public ViewGroup
 	{
 		SLIB_DECLARE_OBJECT
 		

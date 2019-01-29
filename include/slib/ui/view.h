@@ -261,7 +261,7 @@ namespace slib
 		
 		sl_bool isSavingCanvasState();
 		
-		void setSavingCanvasState(sl_bool flagDrawing);
+		void setSavingCanvasState(sl_bool flag);
 		
 		
 		sl_bool isHitTestable();
@@ -553,6 +553,11 @@ namespace slib
 		void setAbsoluteMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		void applyRelativeMargins(sl_ui_len parentWidth, sl_ui_len parentHeight);
+		
+		
+		sl_bool isUsingChildLayouts();
+		
+		void setUsingChildLayouts(sl_bool flag);
 		
 		
 		sl_ui_pos getPaddingLeft();
@@ -1321,6 +1326,7 @@ namespace slib
 		UIRect m_boundsInParent;
 		sl_bool m_flagInvalidLayout;
 		sl_bool m_flagNeedApplyLayout;
+		sl_bool m_flagUsingChildLayouts;
 		sl_ui_pos m_paddingLeft;
 		sl_ui_pos m_paddingTop;
 		sl_ui_pos m_paddingRight;
