@@ -22,6 +22,8 @@
 
 #include "slib/ui/adapter.h"
 
+#include "slib/ui/linear_view.h"
+
 namespace slib
 {
 	
@@ -104,6 +106,135 @@ namespace slib
 	Ref<View> ViewListAdapter::getView(sl_uint64 index, View* original, View* parent)
 	{
 		return m_list.getValueAt((sl_size)index);
+	}
+	
+	
+	SLIB_DEFINE_OBJECT(ViewRowAdapter, ViewAdapter)
+	
+	ViewRowAdapter::ViewRowAdapter()
+	 : m_nColumns(1)
+	{
+	}
+	
+	ViewRowAdapter::~ViewRowAdapter()
+	{
+	}
+	
+	Ref<ViewRowAdapter> ViewRowAdapter::create(sl_uint32 nColumns, const Ref<ViewAdapter>& itemAdapter)
+	{
+		if (itemAdapter.isNull()) {
+			return sl_null;
+		}
+		if (nColumns < 1) {
+			return sl_null;
+		}
+		Ref<ViewRowAdapter> ret = new ViewRowAdapter;
+		if (ret.isNotNull()) {
+			ret->m_nColumns = nColumns;
+			ret->m_itemAdapter = itemAdapter;
+			return ret;
+		}
+		return sl_null;
+	}
+	
+	sl_uint32 ViewRowAdapter::getColumnsCount()
+	{
+		return m_nColumns;
+	}
+	
+	void ViewRowAdapter::setColumnsCount(sl_uint32 nColumns)
+	{
+		m_nColumns = nColumns;
+	}
+	
+	Ref<ViewAdapter> ViewRowAdapter::getItemAdapter()
+	{
+		return m_itemAdapter;
+	}
+	
+	void ViewRowAdapter::setItemAdapter(const Ref<ViewAdapter>& adapter)
+	{
+		m_itemAdapter = adapter;
+	}
+	
+	sl_uint64 ViewRowAdapter::getItemsCount()
+	{
+		Ref<ViewAdapter> adapter = m_itemAdapter;
+		if (adapter.isNotNull()) {
+			sl_uint32 m = m_nColumns;
+			if (m >= 1) {
+				sl_uint64 n = adapter->getItemsCount();
+				sl_uint64 r = n / m;
+				if (n % m) {
+					r++;
+				}
+				return r;
+			}
+		}
+		return 0;
+	}
+	
+	Ref<View> ViewRowAdapter::getView(sl_uint64 index, View* original, View* parent)
+	{
+		Ref<ViewAdapter> adapter = m_itemAdapter;
+		if (adapter.isNotNull()) {
+			sl_uint32 m = m_nColumns;
+			if (m >= 1) {
+				sl_uint64 nTotal = adapter->getItemsCount();
+				sl_uint64 start = index * m;
+				sl_uint32 n = m;
+				if (start + n > nTotal) {
+					n = (sl_uint32)(nTotal - start);
+				}
+				Ref<LinearView> group = (LinearView*)original;
+				sl_bool flagNewGroup = sl_false;
+				if (group.isNull()) {
+					group = new LinearView;
+					if (group.isNull()) {
+						return sl_null;
+					}
+					group->setOrientation(LayoutOrientation::Horizontal, UIUpdateMode::Init);
+					group->setWidthFilling(1.0f, UIUpdateMode::Init);
+					group->setHeightWrapping(UIUpdateMode::Init);
+					flagNewGroup = sl_true;
+				}
+				sl_bool flagRebuild = sl_false;
+				Queue< Ref<View> > children;
+				for (sl_uint32 i = 0; i < n; i++) {
+					Ref<View> child = group->getChild(i);
+					Ref<View> childNew = adapter->getView(start + i, child.get(), group.get());
+					if (child != childNew) {
+						flagRebuild = sl_true;
+					}
+					if (childNew.isNotNull()) {
+						children.push_NoLock(childNew);
+					}
+				}
+				sl_size nChildren = group->getChildrenCount();
+				if (flagRebuild || nChildren != children.getCount()) {
+					if (nChildren) {
+						group->removeAllChildren(UIUpdateMode::None);
+					}
+					for (auto& child : children) {
+						group->addChild(child, flagNewGroup ? UIUpdateMode::Init : UIUpdateMode::None);
+					}
+					if (!flagNewGroup) {
+						group->invalidateLayout();
+					}
+				}
+				return group;
+			}
+		}
+		return sl_null;
+	}
+	
+	sl_ui_len ViewRowAdapter::getAverageItemHeight(View* parent)
+	{
+		Ref<ViewAdapter> adapter = m_itemAdapter;
+		if (adapter.isNotNull()) {
+			return adapter->getAverageItemHeight(parent);
+		}
+		return ViewAdapter::getAverageItemHeight(parent);
 	}
 	
 }

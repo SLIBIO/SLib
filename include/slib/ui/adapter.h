@@ -164,6 +164,41 @@ namespace slib
 
 	};
 	
+	
+	class ViewRowAdapter : public ViewAdapter
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		ViewRowAdapter();
+		
+		~ViewRowAdapter();
+		
+	public:
+		static Ref<ViewRowAdapter> create(sl_uint32 nColumns, const Ref<ViewAdapter>& itemAdapter);
+		
+	public:
+		sl_uint32 getColumnsCount();
+		
+		void setColumnsCount(sl_uint32 nColumns);
+		
+		Ref<ViewAdapter> getItemAdapter();
+		
+		void setItemAdapter(const Ref<ViewAdapter>& adapter);
+		
+	public:
+		sl_uint64 getItemsCount() override;
+		
+		Ref<View> getView(sl_uint64 index, View* original, View* parent) override;
+		
+		sl_ui_len getAverageItemHeight(View* parent) override;
+		
+	protected:
+		sl_uint32 m_nColumns;
+		AtomicRef<ViewAdapter> m_itemAdapter;
+		
+	};
+	
 }
 
 #endif
