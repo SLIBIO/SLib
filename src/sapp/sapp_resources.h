@@ -325,6 +325,8 @@ namespace slib
 		SAppLayoutViewAttributes();
 		
 		sl_bool isNotRequiredNative(sl_bool flagCheckBackgroundColor);
+		
+		void resetLayout();
 
 	};
 

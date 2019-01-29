@@ -88,6 +88,31 @@ namespace slib
 		return sl_false;
 	}
 
+	void SAppLayoutViewAttributes::resetLayout()
+	{
+		width.flagDefined = sl_false;
+		height.flagDefined = sl_false;
+
+		leftMode = PositionMode::Free;
+		topMode = PositionMode::Free;
+		rightMode = PositionMode::Free;
+		bottomMode = PositionMode::Free;
+		
+		left.flagDefined = sl_false;
+		top.flagDefined = sl_false;
+		
+		minWidth.flagDefined = sl_false;
+		maxWidth.flagDefined = sl_false;
+		minHeight.flagDefined = sl_false;
+		maxHeight.flagDefined = sl_false;
+		
+		aspectRatio.flagDefined = sl_false;
+		
+		marginLeft.flagDefined = sl_false;
+		marginTop.flagDefined = sl_false;
+		marginRight.flagDefined = sl_false;
+		marginBottom.flagDefined = sl_false;
+	}
 
 	sl_bool SAppLayoutButtonAttributes::isNotRequiredNative()
 	{

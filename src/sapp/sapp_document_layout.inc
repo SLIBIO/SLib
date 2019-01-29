@@ -858,6 +858,15 @@ namespace slib
 							if (childItem.isNull()) {
 								return sl_false;
 							}
+							if (resourceItem->itemType == SAppLayoutItemType::Linear) {
+								if (!(resourceItem->attrsLinear->orientation.flagDefined) || resourceItem->attrsLinear->orientation.value == LayoutOrientation::Vertical) {
+									childItem->attrsView->topMode = PositionMode::Free;
+									childItem->attrsView->bottomMode = PositionMode::Free;
+								} else {
+									childItem->attrsView->leftMode = PositionMode::Free;
+									childItem->attrsView->rightMode = PositionMode::Free;
+								}
+							}
 							if (!(resourceItem->children.add(childItem))) {
 								_logError(resourceItem->element, _g_sdev_sapp_error_out_of_memory);
 								return sl_false;
@@ -1629,21 +1638,12 @@ namespace slib
 					}
 				}
 
-				sl_bool flagParentLinear = sl_false;
-				sl_bool flagParentHlinear = sl_false;
-				if (params->parentResourceItem && params->parentResourceItem->attrsLinear.isNotNull()) {
-					if (params->parentResourceItem->attrsLinear->orientation.value == LayoutOrientation::Horizontal) {
-						flagParentHlinear = sl_true;
-					} else {
-						flagParentLinear = sl_true;
-					}
-				}
-				if (!flagParentHlinear && !(attr->left.flagDefined)) {
+				if (!(attr->left.flagDefined)) {
 					if (attr->leftMode == PositionMode::Free && attr->rightMode == PositionMode::Free) {
 						attr->leftMode = PositionMode::ParentEdge;
 					}
 				}
-				if (!flagParentLinear && !(attr->top.flagDefined)) {
+				if (!(attr->top.flagDefined)) {
 					if (attr->topMode == PositionMode::Free && attr->bottomMode == PositionMode::Free) {
 						attr->topMode = PositionMode::ParentEdge;
 					}
@@ -2915,6 +2915,14 @@ namespace slib
 					if (contentItem.isNull()) {
 						return sl_false;
 					}
+					if (!(resourceItem->attrsView->scrollBars.flagDefined) || resourceItem->attrsView->scrollBars.verticalScrollBar) {
+						contentItem->attrsView->topMode = PositionMode::Free;
+						contentItem->attrsView->bottomMode = PositionMode::Free;
+					}
+					if (!(resourceItem->attrsView->scrollBars.flagDefined) || resourceItem->attrsView->scrollBars.horizontalScrollBar) {
+						contentItem->attrsView->leftMode = PositionMode::Free;
+						contentItem->attrsView->rightMode = PositionMode::Free;
+					}
 					attr->content = contentItem;
 				}
 			}
@@ -3221,6 +3229,7 @@ namespace slib
 							if (subItemView.isNull()) {
 								return sl_false;
 							}
+							subItemView->attrsView->resetLayout();
 							subItem.view = subItemView;
 						}
 					}
@@ -3841,6 +3850,7 @@ namespace slib
 							if (subItemView.isNull()) {
 								return sl_false;
 							}
+							subItemView->attrsView->resetLayout();
 							subItem.view = subItemView;
 						}
 					}
