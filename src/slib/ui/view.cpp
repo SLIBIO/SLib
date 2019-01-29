@@ -7256,7 +7256,6 @@ namespace slib
 
 	void View::dispatchDetach()
 	{
-		bringToFront();
 		SLIB_INVOKE_EVENT_HANDLER(Detach)
 	}
 	
