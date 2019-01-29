@@ -657,17 +657,27 @@ namespace slib
 				{
 					sl_uint32 i;
 					sl_uint32 k = countGoUpViews - 1;
-					for (i = 0; i < countGoUpViews && countVisibleItems < MAX_ITEMS_VISIBLE; i++) {
-						viewsVisibleItems[countVisibleItems] = viewsGoUpItems[k];
-						heightsVisibleItems[countVisibleItems] = heightsGoUpItems[k];
-						countVisibleItems++;
+					for (i = 0; i < countGoUpViews; i++) {
+						if (countVisibleItems < MAX_ITEMS_VISIBLE) {
+							viewsVisibleItems[countVisibleItems] = viewsGoUpItems[k];
+							heightsVisibleItems[countVisibleItems] = heightsGoUpItems[k];
+							countVisibleItems++;
+						} else {
+							viewsFreeItems[countFreeViews] = viewsGoUpItems[k];
+							countFreeViews++;
+						}
 						viewsGoUpItems[k].setNull();
 						k--;
 					}
-					for (i = 0; i < countGoDownViews && countVisibleItems < MAX_ITEMS_VISIBLE; i++) {
-						viewsVisibleItems[countVisibleItems] = viewsGoDownItems[i];
-						heightsVisibleItems[countVisibleItems] = heightsGoDownItems[i];
-						countVisibleItems++;
+					for (i = 0; i < countGoDownViews; i++) {
+						if (countVisibleItems < MAX_ITEMS_VISIBLE) {
+							viewsVisibleItems[countVisibleItems] = viewsGoDownItems[i];
+							heightsVisibleItems[countVisibleItems] = heightsGoDownItems[i];
+							countVisibleItems++;
+						} else {
+							viewsFreeItems[countFreeViews] = viewsGoDownItems[i];
+							countFreeViews++;
+						}
 						viewsGoDownItems[i].setNull();
 					}
 				}
