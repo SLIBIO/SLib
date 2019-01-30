@@ -47,7 +47,7 @@ namespace slib
 		if (!parent) {
 			return;
 		}
-		UIUpdateMode _mode = mode == UIUpdateMode::Init ? UIUpdateMode::Init : UIUpdateMode::None;
+		UIUpdateMode _mode = SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::None;
 		sl_uint64 n = getItemsCount();
 		for (sl_uint64 i = 0; i < n; i++) {
 			Ref<View> view = getView(i, sl_null, parent);
