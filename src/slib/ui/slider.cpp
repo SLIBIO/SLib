@@ -53,6 +53,20 @@ namespace slib
 	
 	SLIB_SAFE_STATIC_GETTER(_priv_Slider_Static, _priv_Slider_getStatic)
 	
+	static Ref<Drawable> const& _priv_Slider_resolveDrawable(const Ref<Drawable>& drawableOriginal, const Ref<Drawable>& drawableCommon, const Ref<Drawable>& drawableShared)
+	{
+		if (drawableOriginal.isNotNull()) {
+			return drawableOriginal;
+		}
+		if (drawableCommon.isNotNull()) {
+			if (drawableCommon->isColor()) {
+				return drawableShared;
+			}
+			return drawableCommon;
+		}
+		return Ref<Drawable>::null();
+	}
+	
 	Slider::Slider(LayoutOrientation orientation) : ProgressBar(orientation)
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
@@ -96,21 +110,7 @@ namespace slib
 	
 	Ref<Drawable> Slider::getPressedThumbDrawable()
 	{
-		Ref<Drawable> drawable = m_pressedThumb;
-		if (drawable.isNotNull()) {
-			return drawable;
-		}
-		drawable = m_thumb;
-		if (drawable.isNotNull()) {
-			if (drawable->isColor()) {
-				_priv_Slider_Static* s = _priv_Slider_getStatic();
-				if (s) {
-					return s->defaultPressedThumb;
-				}
-			}
-			return drawable;
-		}
-		return sl_null;
+		return m_pressedThumb;
 	}
 	
 	void Slider::setPressedThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
@@ -126,21 +126,7 @@ namespace slib
 	
 	Ref<Drawable> Slider::getHoverThumbDrawable()
 	{
-		Ref<Drawable> drawable = m_hoverThumb;
-		if (drawable.isNotNull()) {
-			return drawable;
-		}
-		drawable = m_thumb;
-		if (drawable.isNotNull()) {
-			if (drawable->isColor()) {
-				_priv_Slider_Static* s = _priv_Slider_getStatic();
-				if (s) {
-					return s->defaultHoverThumb;
-				}
-			}
-			return drawable;
-		}
-		return sl_null;
+		return m_hoverThumb;
 	}
 	
 	void Slider::setHoverThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
@@ -211,13 +197,17 @@ namespace slib
 
 	void Slider::onDraw(Canvas* canvas)
 	{
+		_priv_Slider_Static* s = _priv_Slider_getStatic();
+		if (!s) {
+			return;
+		}
 		Ref<Drawable> progress = m_progress;
 		Ref<Drawable> progress2 = m_progress2;
 		Ref<Drawable> thumb;
 		if (m_indexPressedThumb == 0) {
-			thumb = getPressedThumbDrawable();
+			thumb = _priv_Slider_resolveDrawable(m_pressedThumb, m_thumb, s->defaultPressedThumb);
 		} else if (m_indexHoverThumb == 0) {
-			thumb = getHoverThumbDrawable();
+			thumb = _priv_Slider_resolveDrawable(m_hoverThumb, m_thumb, s->defaultHoverThumb);
 		}
 		if (thumb.isNull()) {
 			thumb = m_thumb;
@@ -240,9 +230,9 @@ namespace slib
 		if (isDualValues() && rcThumb2.isValidSize()) {
 			Ref<Drawable> thumb2;
 			if (m_indexPressedThumb == 1) {
-				thumb2 = getPressedThumbDrawable();
+				thumb2 = _priv_Slider_resolveDrawable(m_pressedThumb, m_thumb, s->defaultPressedThumb);
 			} else if (m_indexHoverThumb == 1) {
-				thumb2 = getHoverThumbDrawable();
+				thumb2 = _priv_Slider_resolveDrawable(m_hoverThumb, m_thumb, s->defaultHoverThumb);
 			}
 			if (thumb2.isNull()) {
 				thumb2 = m_thumb;
