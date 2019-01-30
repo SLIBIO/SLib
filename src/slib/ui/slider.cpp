@@ -63,8 +63,6 @@ namespace slib
 			m_progress = s->defaultProgress;
 			m_progress2 = s->defaultProgress2;
 			m_thumb = s->defaultThumb;
-			m_pressedThumb = s->defaultPressedThumb;
-			m_hoverThumb = s->defaultHoverThumb;
 		}
 		
 		m_thumbSize.x = 0;
@@ -98,7 +96,21 @@ namespace slib
 	
 	Ref<Drawable> Slider::getPressedThumbDrawable()
 	{
-		return m_pressedThumb;
+		Ref<Drawable> drawable = m_pressedThumb;
+		if (drawable.isNotNull()) {
+			return drawable;
+		}
+		drawable = m_thumb;
+		if (drawable.isNotNull()) {
+			if (drawable->isColor()) {
+				_priv_Slider_Static* s = _priv_Slider_getStatic();
+				if (s) {
+					return s->defaultPressedThumb;
+				}
+			}
+			return drawable;
+		}
+		return sl_null;
 	}
 	
 	void Slider::setPressedThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
@@ -114,7 +126,21 @@ namespace slib
 	
 	Ref<Drawable> Slider::getHoverThumbDrawable()
 	{
-		return m_hoverThumb;
+		Ref<Drawable> drawable = m_hoverThumb;
+		if (drawable.isNotNull()) {
+			return drawable;
+		}
+		drawable = m_thumb;
+		if (drawable.isNotNull()) {
+			if (drawable->isColor()) {
+				_priv_Slider_Static* s = _priv_Slider_getStatic();
+				if (s) {
+					return s->defaultHoverThumb;
+				}
+			}
+			return drawable;
+		}
+		return sl_null;
 	}
 	
 	void Slider::setHoverThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
@@ -189,9 +215,9 @@ namespace slib
 		Ref<Drawable> progress2 = m_progress2;
 		Ref<Drawable> thumb;
 		if (m_indexPressedThumb == 0) {
-			thumb = m_pressedThumb;
+			thumb = getPressedThumbDrawable();
 		} else if (m_indexHoverThumb == 0) {
-			thumb = m_hoverThumb;
+			thumb = getHoverThumbDrawable();
 		}
 		if (thumb.isNull()) {
 			thumb = m_thumb;
@@ -214,9 +240,9 @@ namespace slib
 		if (isDualValues() && rcThumb2.isValidSize()) {
 			Ref<Drawable> thumb2;
 			if (m_indexPressedThumb == 1) {
-				thumb2 = m_pressedThumb;
+				thumb2 = getPressedThumbDrawable();
 			} else if (m_indexHoverThumb == 1) {
-				thumb2 = m_hoverThumb;
+				thumb2 = getHoverThumbDrawable();
 			}
 			if (thumb2.isNull()) {
 				thumb2 = m_thumb;
@@ -606,6 +632,7 @@ namespace slib
 				dispatchChangeSecondary(value2);
 			}
 		}
+		invalidate();
 	}
 	
 }
