@@ -875,5 +875,8 @@
     <ClCompile Include="..\..\src\slib\ui\view_pager.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\switch_view.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

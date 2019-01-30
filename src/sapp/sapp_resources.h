@@ -658,6 +658,43 @@ namespace slib
 		
 	};
 
+	class SAppLayoutSwitchAttributes : public Referable
+	{
+	public:
+		SAppBooleanValue value;
+		
+		SAppDrawableValue thumbOff;
+		SAppDrawableValue thumbOn;
+		SAppDrawableValue thumb;
+		SAppDrawableValue trackOff;
+		SAppDrawableValue trackOn;
+		SAppDrawableValue track;
+		SAppDrawableValue pressedThumbOff;
+		SAppDrawableValue pressedThumbOn;
+		SAppDrawableValue pressedThumb;
+		SAppDrawableValue pressedTrackOn;
+		SAppDrawableValue pressedTrack;
+		SAppDrawableValue pressedTrackOff;
+		SAppDrawableValue hoverThumbOff;
+		SAppDrawableValue hoverThumbOn;
+		SAppDrawableValue hoverThumb;
+		SAppDrawableValue hoverTrackOff;
+		SAppDrawableValue hoverTrackOn;
+		SAppDrawableValue hoverTrack;
+
+	};
+
+	class SAppLayoutSwitchLabelAttributes : public Referable
+	{
+	public:
+		SAppStringValue leftText;
+		SAppStringValue rightText;
+
+		SAppColorValue textColor;
+		SAppColorValue selectedTextColor;
+
+	};
+
 	class SAppLayoutPickerAttributes : public Referable
 	{
 	public:
@@ -772,13 +809,15 @@ namespace slib
 		
 		Progress = 0x0240,
 		Slider = 0x0241,
-		Picker = 0x0242,
-		Pager = 0x0243,
-		Navigation = 0x0244,
-		Video = 0x0245,
-		Camera = 0x0246,
-		QRCodeScanner = 0x0247,
-		Drawer = 0x0248
+		Switch = 0x0242,
+		SwitchLabel = 0x0243,
+		Picker = 0x0244,
+		Pager = 0x0245,
+		Navigation = 0x0246,
+		Video = 0x0247,
+		Camera = 0x0248,
+		QRCodeScanner = 0x0249,
+		Drawer = 0x024a
 	};
 
 	class SAppLayoutResourceItem : public Referable
@@ -813,6 +852,8 @@ namespace slib
 		Ref<SAppLayoutWebAttributes> attrsWeb;
 		Ref<SAppLayoutProgressAttributes> attrsProgress;
 		Ref<SAppLayoutSliderAttributes> attrsSlider;
+		Ref<SAppLayoutSwitchAttributes> attrsSwitch;
+		Ref<SAppLayoutSwitchLabelAttributes> attrsSwitchLabel;
 		Ref<SAppLayoutPickerAttributes> attrsPicker;
 		Ref<SAppLayoutPagerAttributes> attrsPager;
 		Ref<SAppLayoutNavigationAttributes> attrsNavigation;
@@ -866,6 +907,7 @@ namespace slib
 		sl_uint32 nAutoIncreaseNameSplit = 0;
 		sl_uint32 nAutoIncreaseNameProgress = 0;
 		sl_uint32 nAutoIncreaseNameSlider = 0;
+		sl_uint32 nAutoIncreaseNameSwitch = 0;
 		sl_uint32 nAutoIncreaseNamePicker = 0;
 		sl_uint32 nAutoIncreaseNamePager = 0;
 		sl_uint32 nAutoIncreaseNameNavigation = 0;

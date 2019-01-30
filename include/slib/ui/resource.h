@@ -322,6 +322,8 @@ namespace slib
 	class SplitView;
 	class ProgressBar;
 	class Slider;
+	class SwitchView;
+	class SwitchLabelView;
 	class PickerView;
 	class ViewPager;
 	class ViewPageNavigationController;

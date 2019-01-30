@@ -428,6 +428,11 @@ namespace slib
 				prefix = "slider";
 				pN = &nAutoIncreaseNameSlider;
 				break;
+			case SAppLayoutItemType::Switch:
+			case SAppLayoutItemType::SwitchLabel:
+				prefix = "switch";
+				pN = &nAutoIncreaseNameSwitch;
+				break;
 			case SAppLayoutItemType::Picker:
 				prefix = "picker";
 				pN = &nAutoIncreaseNamePicker;
@@ -519,6 +524,10 @@ namespace slib
 			type = SAppLayoutItemType::Progress;
 		} else if (strType == "slider") {
 			type = SAppLayoutItemType::Slider;
+		} else if (strType == "switch") {
+			type = SAppLayoutItemType::Switch;
+		} else if (strType == "switchlabel" || strType == "switch-label") {
+			type = SAppLayoutItemType::SwitchLabel;
 		} else if (strType == "picker") {
 			type = SAppLayoutItemType::Picker;
 		} else if (strType == "pager") {

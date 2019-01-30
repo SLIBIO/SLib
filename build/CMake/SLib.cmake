@@ -312,6 +312,7 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/ui/select_view.cpp"
  "${SLIB_PATH}/src/slib/ui/slider.cpp"
  "${SLIB_PATH}/src/slib/ui/split_view.cpp"
+ "${SLIB_PATH}/src/slib/ui/switch_view.cpp"
  "${SLIB_PATH}/src/slib/ui/tab_view.cpp"
  "${SLIB_PATH}/src/slib/ui/text_view.cpp"
  "${SLIB_PATH}/src/slib/ui/transition.cpp"
