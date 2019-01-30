@@ -189,6 +189,7 @@ namespace slib
 		sl_ui_pos _getDimensionIntValue(const SAppDimensionValue& value);
 		sl_real _getDimensionFloatValue(const SAppDimensionFloatValue& value);
 		List< Ref<XmlElement> > _getLayoutItemChildElements(SAppLayoutResourceItem* item, const String& localNamespace, const String& tagName);
+		sl_bool _addLayoutStyleChildElements(List< Ref<XmlElement> >& list, SAppLayoutStyle* style, const String& localNamespace, const String& tagName);
 		sl_bool _addXmlChildElements(List< Ref<XmlElement> >& list, const Ref<XmlElement>& parent, const String& localNamespace, const String& tagName);
 
 		struct LayoutControlProcessParams

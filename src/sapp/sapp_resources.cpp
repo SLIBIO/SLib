@@ -298,6 +298,25 @@ namespace slib
 	}
 
 
+	String SAppLayoutStyle::getXmlAttribute(const String& name)
+	{
+		String value = element->getAttribute(name);
+		if (value.isNotNull()) {
+			return value;
+		}
+		ListLocker< Ref<SAppLayoutStyle> > _styles(inherit);
+		for (sl_size i = 0; i < _styles.count; i++) {
+			Ref<SAppLayoutStyle> style = _styles[_styles.count - 1 - i];
+			if (style.isNotNull()) {
+				value = style->getXmlAttribute(name);
+				if (value.isNotNull()) {
+					return value;
+				}
+			}
+		}
+		return String::null();
+	}
+
 	SAppLayoutResourceItem::SAppLayoutResourceItem()
 	{
 		itemType = SAppLayoutItemType::Unknown;
@@ -314,7 +333,7 @@ namespace slib
 		for (sl_size i = 0; i < _styles.count; i++) {
 			Ref<SAppLayoutStyle> style = _styles[_styles.count - 1 - i];
 			if (style.isNotNull()) {
-				value = style->element->getAttribute(name);
+				value = style->getXmlAttribute(name);
 				if (value.isNotNull()) {
 					return value;
 				}

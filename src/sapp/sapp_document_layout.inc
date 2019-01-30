@@ -64,6 +64,22 @@ namespace slib
 			_logError(element, _g_sdev_sapp_error_out_of_memory);
 			return sl_false;
 		}
+		
+		String strInherit = element->getAttribute("inherit").trim();
+		if (strInherit.isNotEmpty()) {
+			ListLocker<String> arr(strInherit.split(","));
+			for (sl_size i = 0; i < arr.count; i++) {
+				String s = arr[i].trim();
+				Ref<SAppLayoutStyle> inheritStyle;
+				getItemFromMap(m_layoutStyles, localNamespace, s, sl_null, &inheritStyle);
+				if (inheritStyle.isNotNull()) {
+					style->inherit.add(inheritStyle);
+				} else {
+					_logError(element, _g_sdev_sapp_error_layout_style_not_found.arg(s));
+					return sl_false;
+				}
+			}
+		}
 
 		return sl_true;
 	}
@@ -732,13 +748,29 @@ namespace slib
 			for (sl_size i = 0; i < _styles.count; i++) {
 				Ref<SAppLayoutStyle> style = _styles[i];
 				if (style.isNotNull()) {
-					if (!_addXmlChildElements(ret, style->element, localNamespace, tagName)) {
+					if (!_addLayoutStyleChildElements(ret, style.get(), localNamespace, tagName)) {
 						return sl_null;
 					}
 				}
 			}
 		}
 		return ret;
+	}
+
+	sl_bool SAppDocument::_addLayoutStyleChildElements(List< Ref<XmlElement> >& list, SAppLayoutStyle* style, const String& localNamespace, const String& tagName)
+	{
+		{
+			ListLocker< Ref<SAppLayoutStyle> > _styles(style->inherit);
+			for (sl_size i = 0; i < _styles.count; i++) {
+				Ref<SAppLayoutStyle> other = _styles[i];
+				if (other.isNotNull()) {
+					if (!_addLayoutStyleChildElements(list, other.get(), localNamespace, tagName)) {
+						return sl_false;
+					}
+				}
+			}
+		}
+		return _addXmlChildElements(list, style->element, localNamespace, tagName);
 	}
 
 	sl_bool SAppDocument::_addXmlChildElements(List< Ref<XmlElement> >& list, const Ref<XmlElement>& parent, const String& localNamespace, const String& tagName)

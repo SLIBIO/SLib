@@ -763,6 +763,11 @@ namespace slib
 	public:
 		Ref<XmlElement> element;
 		String name;
+		List< Ref<SAppLayoutStyle> > inherit;
+		
+	public:
+		String getXmlAttribute(const String& name);
+		
 	};
 
 	class SAppLayoutInclude : public Referable
