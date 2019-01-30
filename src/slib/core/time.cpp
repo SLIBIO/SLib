@@ -1399,11 +1399,10 @@ namespace slib
 		if (i >= n) {
 			return SLIB_PARSE_ERROR;
 		}
-		sl_int32 YMDHMS[6];
-		Base::resetMemory4(YMDHMS, 0, 6);
+		sl_int32 YMDHMS[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 		sl_size index = 0;
 		sl_size posParsed = i;
-		while (i < n && index < 6) {
+		while (i < n && index < 8) {
 			if (sz[i] == 0) {
 				break;
 			}
@@ -1449,16 +1448,42 @@ namespace slib
 					break;
 				}
 			} while (i < n);
+			
+			posParsed = i;
+
+			if (index >= 8) {
+				break;
+			}
+			
 			if (i < n) {
 				CT ch = sz[i];
 				if (!SLIB_CHAR_IS_DIGIT(ch)) {
-					if (ch != '/' && ch != '-' && ch != ':') {
-						break;
-					}
-					if (ch == ':') {
-						if (index < 3) {
+					if (ch == '/' || ch == '-') {
+						if (index >= 3) {
+							break;
+						}
+					} else if (ch == 'T') {
+						if (index > 3) {
+							break;
+						} else {
 							index = 3;
 						}
+					} else if (ch == ':') {
+						if (index == 1) {
+							index = 4;
+							YMDHMS[3] = YMDHMS[0];
+							YMDHMS[0] = 0;
+						} else if (index < 4) {
+							break;
+						} else if (index >= 6) {
+							break;
+						}
+					} else if (ch == '.') {
+						if (index < 6) {
+							break;
+						}
+					} else {
+						break;
 					}
 					i++;
 				}
@@ -1475,6 +1500,8 @@ namespace slib
 				comps->hour = YMDHMS[3];
 				comps->minute = YMDHMS[4];
 				comps->second = YMDHMS[5];
+				comps->milliseconds = YMDHMS[6];
+				comps->microseconds = YMDHMS[7];
 			}
 			return posParsed;
 		}
