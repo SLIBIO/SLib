@@ -89,27 +89,27 @@ namespace slib
 		void onKeyEvent(UIEvent* event) override;
 		
 	protected:
-		void _drawTrack(Canvas* canvas, const Ref<Drawable>& track, const Rectangle& rectDst);
+		void drawTrack(Canvas* canvas, const Ref<Drawable>& track, const Rectangle& rectDst);
 		
-		void _drawThumb(Canvas* canvas, const Ref<Drawable>& thumb, const Rectangle& rectDst);
+		void drawThumb(Canvas* canvas, const Ref<Drawable>& thumb, const Rectangle& rectDst);
 		
-		sl_ui_pos _getThumbLength();
+		sl_ui_pos getThumbLength();
 		
-		sl_ui_pos _getStartPadding();
+		sl_ui_pos getStartPadding();
 		
-		sl_ui_pos _getEndPadding();
+		sl_ui_pos getEndPadding();
 		
-		sl_ui_pos _getMinimumPadding();
+		sl_ui_pos getMinimumPadding();
 		
-		sl_ui_pos _getPositionFromValue(float value);
+		sl_ui_pos getPositionFromValue(float value);
 		
-		float _getValueFromPosition(sl_ui_pos pos);
+		float getValueFromPosition(sl_ui_pos pos);
 		
-		void _getRegions(UIRect& outTrack, UIRect& outProgress, UIRect& outSecondaryProgress, UIRect& outThumb, UIRect& outSecondaryThumb);
+		void getRegions(UIRect& outTrack, UIRect& outProgress, UIRect& outSecondaryProgress, UIRect& outThumb, UIRect& outSecondaryThumb);
 		
-		void _setHoverThumb(int index);
+		void setHoverThumb(int index);
 		
-		void _changeValue(float value, sl_bool flagChange2);
+		void changeValue(float value, sl_bool flagChange2);
 		
 	protected:
 		AtomicRef<Drawable> m_thumb;

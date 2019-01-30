@@ -224,18 +224,18 @@ namespace slib
 		}
 		
 		UIRect rcTrack, rcProgress, rcProgress2, rcThumb, rcThumb2;
-		_getRegions(rcTrack, rcProgress, rcProgress2, rcThumb, rcThumb2);
+		getRegions(rcTrack, rcProgress, rcProgress2, rcThumb, rcThumb2);
 		if (rcTrack.isValidSize()) {
-			_drawTrack(canvas, m_track, rcTrack);
+			drawTrack(canvas, m_track, rcTrack);
 		}
 		if (rcProgress2.isValidSize()) {
-			_drawTrack(canvas, progress2, rcProgress2);
+			drawTrack(canvas, progress2, rcProgress2);
 		}
 		if (rcProgress.isValidSize()) {
-			_drawTrack(canvas, progress, rcProgress);
+			drawTrack(canvas, progress, rcProgress);
 		}
 		if (rcThumb.isValidSize()) {
-			_drawThumb(canvas, thumb, rcThumb);
+			drawThumb(canvas, thumb, rcThumb);
 		}
 		if (isDualValues() && rcThumb2.isValidSize()) {
 			Ref<Drawable> thumb2;
@@ -247,7 +247,7 @@ namespace slib
 			if (thumb2.isNull()) {
 				thumb2 = m_thumb;
 			}
-			_drawThumb(canvas, thumb2, rcThumb2);
+			drawThumb(canvas, thumb2, rcThumb2);
 		}
 	}
 	
@@ -266,28 +266,28 @@ namespace slib
 			case UIAction::MouseEnter:
 			{
 				UIRect rcTrack, rcProgress, rcProgress2, rcThumb, rcThumb2;
-				_getRegions(rcTrack, rcProgress, rcProgress2, rcThumb, rcThumb2);
+				getRegions(rcTrack, rcProgress, rcProgress2, rcThumb, rcThumb2);
 				if (isDualValues()) {
 					if (rcThumb2.containsPoint(ev->getPoint())) {
-						_setHoverThumb(1);
+						setHoverThumb(1);
 						return;
 					}
 				}
 				if (rcThumb.containsPoint(ev->getPoint())) {
-					_setHoverThumb(0);
+					setHoverThumb(0);
 					return;
 				}
-				_setHoverThumb(-1);
+				setHoverThumb(-1);
 				return;
 			}
 			case UIAction::MouseLeave:
-				_setHoverThumb(-1);
+				setHoverThumb(-1);
 				return;
 			case UIAction::LeftButtonDown:
 			case UIAction::TouchBegin:
 				if (isDualValues()) {
 					UIRect rcTrack, rcProgress, rcProgress2, rcThumb, rcThumb2;
-					_getRegions(rcTrack, rcProgress, rcProgress2, rcThumb, rcThumb2);
+					getRegions(rcTrack, rcProgress, rcProgress2, rcThumb, rcThumb2);
 					if (isVertical()) {
 						if (pos >= (rcThumb.bottom + rcThumb2.top) / 2) {
 							m_indexPressedThumb = 1;
@@ -307,11 +307,11 @@ namespace slib
 			case UIAction::LeftButtonDrag:
 			case UIAction::TouchMove:
 				if (m_indexPressedThumb >= 0) {
-					float value = _getValueFromPosition(pos);
+					float value = getValueFromPosition(pos);
 					if (m_indexPressedThumb == 0) {
-						_changeValue(value, sl_false);
+						changeValue(value, sl_false);
 					} else {
-						_changeValue(value, sl_true);
+						changeValue(value, sl_true);
 					}
 				}
 				break;
@@ -339,9 +339,9 @@ namespace slib
 			delta = ev->getDeltaX();
 		}
 		if (delta > SLIB_EPSILON) {
-			_changeValue(m_value - step, sl_false);
+			changeValue(m_value - step, sl_false);
 		} else if (delta < -SLIB_EPSILON) {
-			_changeValue(m_value + step, sl_false);
+			changeValue(m_value + step, sl_false);
 		}
 		
 		ev->stopPropagation();
@@ -354,11 +354,11 @@ namespace slib
 			switch (ev->getKeycode()) {
 				case Keycode::Left:
 				case Keycode::Up:
-					_changeValue(m_value - step, sl_false);
+					changeValue(m_value - step, sl_false);
 					break;
 				case Keycode::Right:
 				case Keycode::Down:
-					_changeValue(m_value + step, sl_false);
+					changeValue(m_value + step, sl_false);
 					break;
 				default:
 					return;
@@ -367,7 +367,7 @@ namespace slib
 		}
 	}
 	
-	void Slider::_drawTrack(Canvas* canvas, const Ref<Drawable>& track, const Rectangle& rectDst)
+	void Slider::drawTrack(Canvas* canvas, const Ref<Drawable>& track, const Rectangle& rectDst)
 	{
 		if (track.isNull()) {
 			return;
@@ -387,7 +387,7 @@ namespace slib
 		}
 	}
 	
-	void Slider::_drawThumb(Canvas* canvas, const Ref<Drawable>& thumb, const Rectangle& rectDst)
+	void Slider::drawThumb(Canvas* canvas, const Ref<Drawable>& thumb, const Rectangle& rectDst)
 	{
 		if (thumb.isNull()) {
 			return;
@@ -408,7 +408,7 @@ namespace slib
 		}
 	}
 	
-	sl_ui_pos Slider::_getStartPadding()
+	sl_ui_pos Slider::getStartPadding()
 	{
 		sl_ui_pos padding;
 		if (isVertical()) {
@@ -419,10 +419,10 @@ namespace slib
 		if (padding != 0) {
 			return padding;
 		}
-		return _getMinimumPadding();
+		return getMinimumPadding();
 	}
 	
-	sl_ui_pos Slider::_getEndPadding()
+	sl_ui_pos Slider::getEndPadding()
 	{
 		sl_ui_pos padding;
 		if (isVertical()) {
@@ -433,10 +433,10 @@ namespace slib
 		if (padding != 0) {
 			return padding;
 		}
-		return _getMinimumPadding();
+		return getMinimumPadding();
 	}
 	
-	sl_ui_pos Slider::_getMinimumPadding()
+	sl_ui_pos Slider::getMinimumPadding()
 	{
 		sl_ui_pos padding;
 		if (isVertical()) {
@@ -459,14 +459,14 @@ namespace slib
 		}
 	}
 	
-	sl_ui_pos Slider::_getPositionFromValue(float value)
+	sl_ui_pos Slider::getPositionFromValue(float value)
 	{
 		float range = m_value_max - m_value_min;
 		if (range < SLIB_EPSILON) {
 			return 0;
 		}
-		sl_ui_pos paddingStart = _getStartPadding();
-		sl_ui_pos paddingEnd = _getEndPadding();
+		sl_ui_pos paddingStart = getStartPadding();
+		sl_ui_pos paddingEnd = getEndPadding();
 		sl_ui_pos len;
 		if (isVertical()) {
 			len = getHeight() - paddingStart - paddingEnd;
@@ -481,14 +481,14 @@ namespace slib
 		}
 	}
 	
-	float Slider::_getValueFromPosition(sl_ui_pos pos)
+	float Slider::getValueFromPosition(sl_ui_pos pos)
 	{
 		float range = m_value_max - m_value_min;
 		if (range < SLIB_EPSILON) {
 			return 0;
 		}
-		sl_ui_pos paddingStart = _getStartPadding();
-		sl_ui_pos paddingEnd = _getEndPadding();
+		sl_ui_pos paddingStart = getStartPadding();
+		sl_ui_pos paddingEnd = getEndPadding();
 		sl_ui_pos len;
 		if (isVertical()) {
 			len = getHeight() - paddingStart - paddingEnd;
@@ -506,12 +506,12 @@ namespace slib
 		return ((float)pos * range / (float)len) + getMinimumValue();
 	}
 	
-	void Slider::_getRegions(UIRect& outTrack, UIRect& outProgress, UIRect& outSecondaryProgress, UIRect& outThumb, UIRect& outSecondaryThumb)
+	void Slider::getRegions(UIRect& outTrack, UIRect& outProgress, UIRect& outSecondaryProgress, UIRect& outThumb, UIRect& outSecondaryThumb)
 	{
-		sl_ui_pos pos1 = _getPositionFromValue(m_value);
+		sl_ui_pos pos1 = getPositionFromValue(m_value);
 		sl_ui_pos pos2 = 0;
 		if (m_value2 > m_value) {
-			pos2 = _getPositionFromValue(m_value2);
+			pos2 = getPositionFromValue(m_value2);
 		} else {
 			pos2 = pos1;
 		}
@@ -535,8 +535,8 @@ namespace slib
 			}
 		}
 		if (isVertical()) {
-			outTrack.top = _getStartPadding();
-			outTrack.bottom = getHeight() - _getEndPadding();
+			outTrack.top = getStartPadding();
+			outTrack.bottom = getHeight() - getEndPadding();
 			outTrack.left = getPaddingLeft();
 			outTrack.right = getWidth() - getPaddingRight();
 			if (isReversed()) {
@@ -568,8 +568,8 @@ namespace slib
 				outSecondaryThumb.setZero();
 			}
 		} else {
-			outTrack.left = _getStartPadding();
-			outTrack.right = getWidth() - _getEndPadding();
+			outTrack.left = getStartPadding();
+			outTrack.right = getWidth() - getEndPadding();
 			outTrack.top = getPaddingTop();
 			outTrack.bottom = getHeight() - getPaddingBottom();
 			if (isReversed()) {
@@ -603,7 +603,7 @@ namespace slib
 		}
 	}
 	
-	void Slider::_setHoverThumb(int index)
+	void Slider::setHoverThumb(int index)
 	{
 		if (m_indexHoverThumb != index) {
 			m_indexHoverThumb = index;
@@ -611,7 +611,7 @@ namespace slib
 		}
 	}
 	
-	void Slider::_changeValue(float v, sl_bool flagChange2)
+	void Slider::changeValue(float v, sl_bool flagChange2)
 	{
 		float value, value2;
 		if (flagChange2) {
