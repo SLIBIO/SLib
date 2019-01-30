@@ -731,6 +731,13 @@ namespace slib
 		if (isCreatingNativeWidget()) {
 			paddingNativeWidth = 30;
 			paddingNativeHeight = 8;
+		} else {
+			if (size.x > 0) {
+				size.x += size.x / 3;
+			}
+			if (size.y > 0) {
+				size.y += size.y / 3;
+			}
 		}
 		
 		if (flagHorizontal) {
