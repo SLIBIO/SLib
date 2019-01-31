@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		260D833820C7DAF90013B34E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260D833720C7DAF90013B34E /* app.cpp */; };
+		26BB17F0220342F80089C7EC /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26BB17EF220342F80089C7EC /* UserNotifications.framework */; };
 		26F2DDE0216BDAD1007CE8E6 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F5DE492051C9CC00BC4998 /* CoreMedia.framework */; };
 		26F5DE272051ACD500BC4998 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 26F5DE262051ACD500BC4998 /* ViewController.m */; };
 		26F5DE2A2051ACD500BC4998 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 26F5DE282051ACD500BC4998 /* Main.storyboard */; };
@@ -21,6 +22,7 @@
 /* Begin PBXFileReference section */
 		260D833620C7DAF90013B34E /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = ../src/app.h; sourceTree = "<group>"; };
 		260D833720C7DAF90013B34E /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = ../src/app.cpp; sourceTree = "<group>"; };
+		26BB17EF220342F80089C7EC /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		26F5DE1F2051ACD500BC4998 /* Example-CameraView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Example-CameraView.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		26F5DE252051ACD500BC4998 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		26F5DE262051ACD500BC4998 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
@@ -39,6 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26BB17F0220342F80089C7EC /* UserNotifications.framework in Frameworks */,
 				26F2DDE0216BDAD1007CE8E6 /* CoreMedia.framework in Frameworks */,
 				26F5DE462051C9B700BC4998 /* AVFoundation.framework in Frameworks */,
 				26F5DE452051C9AF00BC4998 /* GLKit.framework in Frameworks */,
@@ -92,6 +95,7 @@
 		26F5DE3C2051B60500BC4998 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				26BB17EF220342F80089C7EC /* UserNotifications.framework */,
 				26F5DE492051C9CC00BC4998 /* CoreMedia.framework */,
 				26F5DE432051B62F00BC4998 /* GLKit.framework */,
 				26F5DE3F2051B61100BC4998 /* AVFoundation.framework */,
