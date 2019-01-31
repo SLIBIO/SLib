@@ -2228,6 +2228,10 @@ namespace slib
 					attr->scrolling.flagDefined = sl_true;
 					attr->scrolling.horizontal = sl_true;
 					attr->scrolling.vertical = sl_false;
+				} else if (element->getName() == "vscroll") {
+					attr->scrolling.flagDefined = sl_true;
+					attr->scrolling.horizontal = sl_false;
+					attr->scrolling.vertical = sl_true;
 				}
 			}
 		} else if (op == OP_GENERATE_CPP) {
@@ -2992,6 +2996,9 @@ namespace slib
 				if (element->getName() == "hlinear") {
 					attr->orientation.flagDefined = sl_true;
 					attr->orientation.value = LayoutOrientation::Horizontal;
+				} else if (element->getName() == "vlinear") {
+					attr->orientation.flagDefined = sl_true;
+					attr->orientation.value = LayoutOrientation::Vertical;
 				}
 			}
 		}

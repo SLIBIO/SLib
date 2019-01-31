@@ -521,9 +521,9 @@ namespace slib
 			type = SAppLayoutItemType::Image;
 		} else if (strType == "select") {
 			type = SAppLayoutItemType::Select;
-		} else if (strType == "scroll" || strType == "hscroll") {
+		} else if (strType == "scroll" || strType == "hscroll" || strType == "vscroll") {
 			type = SAppLayoutItemType::Scroll;
-		} else if (strType == "linear" || strType == "hlinear") {
+		} else if (strType == "linear" || strType == "hlinear" || strType == "vlinear") {
 			type = SAppLayoutItemType::Linear;
 		} else if (strType == "list") {
 			type = SAppLayoutItemType::List;
