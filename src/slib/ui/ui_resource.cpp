@@ -302,19 +302,22 @@ namespace slib
 	
 	sl_real UIResource::dpToPixel(sl_real dp)
 	{
-		sl_real ret = (sl_real)(dp * getScreenPPI() / 160);
-		if (Math::isAlmostZero(ret)) {
-			return 0;
-		}
-		if (ret > 0 && ret < 1) {
-			return 1;
-		}
-		if (ret < 0 && ret > -1) {
-			return -1;
-		}
-		return ret;
+		return (sl_real)(dp * getScreenPPI() / 160);
 	}
 	
+	sl_ui_pos UIResource::toUiPos(sl_real f)
+	{
+		if (Math::isAlmostZero(f)) {
+			return 0;
+		}
+		if (f > 0 && f < 1) {
+			return 1;
+		}
+		if (f < 0 && f > -1) {
+			return -1;
+		}
+		return (sl_ui_pos)f;
+	}
 	
 	UILayoutResource::UILayoutResource()
 	{

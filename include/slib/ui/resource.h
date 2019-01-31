@@ -105,6 +105,8 @@ namespace slib
 		
 		static sl_real dpToPixel(sl_real dp);
 		
+		static sl_ui_pos toUiPos(sl_real f);
+		
 	};
 	
 #define SLIB_DECLARE_MENU_BEGIN(NAME) \

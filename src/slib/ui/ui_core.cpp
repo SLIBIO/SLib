@@ -342,17 +342,7 @@ namespace slib
 	
 	sl_real UI::dpToPixel(sl_real dp)
 	{
-		sl_real ret = (sl_real)(dp * getScreenPPI() / 160);
-		if (Math::isAlmostZero(ret)) {
-			return 0;
-		}
-		if (ret > 0 && ret < 1) {
-			return 1;
-		}
-		if (ret < 0 && ret > -1) {
-			return -1;
-		}
-		return ret;
+		return (sl_real)(dp * getScreenPPI() / 160);
 	}
 	
 	void UI::alert(const String& text)

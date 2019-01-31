@@ -111,109 +111,109 @@ namespace slib
 				if (Math::isAlmostZero(amount - 1)) {
 					return "slib::UIResource::getScreenWidth()";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getScreenWidth())", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*slib::UIResource::getScreenWidth())", amount);
 				}
 			case SH:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "slib::UIResource::getScreenHeight()";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getScreenHeight())", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*slib::UIResource::getScreenHeight())", amount);
 				}
 			case SMIN:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "slib::UIResource::getScreenMinimum()";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getScreenMinimum())", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*slib::UIResource::getScreenMinimum())", amount);
 				}
 			case SMAX:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "slib::UIResource::getScreenMaximum()";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getScreenMaximum())", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*slib::UIResource::getScreenMaximum())", amount);
 				}
 			case VW:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "CONTENT_WIDTH";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*CONTENT_WIDTH)", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*CONTENT_WIDTH)", amount);
 				}
 			case VH:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "CONTENT_HEIGHT";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*CONTENT_HEIGHT)", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*CONTENT_HEIGHT)", amount);
 				}
 			case VMIN:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "SLIB_MIN(CONTENT_WIDTH, CONTENT_HEIGHT)";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*SLIB_MIN(CONTENT_WIDTH, CONTENT_HEIGHT))", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*SLIB_MIN(CONTENT_WIDTH, CONTENT_HEIGHT))", amount);
 				}
 			case VMAX:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "SLIB_MAX(CONTENT_WIDTH, CONTENT_HEIGHT)";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*SLIB_MAX(CONTENT_WIDTH, CONTENT_HEIGHT))", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*SLIB_MAX(CONTENT_WIDTH, CONTENT_HEIGHT))", amount);
 				}
 			case SP:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "(sl_ui_pos)(getScaledPixel())";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*getScaledPixel())", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*getScaledPixel())", amount);
 				}
 			case DP:
-				return String::format("(sl_ui_pos)(slib::UIResource::dpToPixel(%ff))", amount);
+				return String::format("slib::UIResource::toUiPos(slib::UIResource::dpToPixel(%ff))", amount);
 			case PT:
-				return String::format("(sl_ui_pos)(slib::UIResource::pointToPixel(%ff))", amount);
+				return String::format("slib::UIResource::toUiPos(slib::UIResource::pointToPixel(%ff))", amount);
 			case M:
-				return String::format("(sl_ui_pos)(slib::UIResource::meterToPixel(%ff))", amount);
+				return String::format("slib::UIResource::toUiPos(slib::UIResource::meterToPixel(%ff))", amount);
 			case CM:
-				return String::format("(sl_ui_pos)(slib::UIResource::centimeterToPixel(%ff))", amount);
+				return String::format("slib::UIResource::toUiPos(slib::UIResource::centimeterToPixel(%ff))", amount);
 			case MM:
-				return String::format("(sl_ui_pos)(slib::UIResource::millimeterToPixel(%ff))", amount);
+				return String::format("slib::UIResource::toUiPos(slib::UIResource::millimeterToPixel(%ff))", amount);
 			case INCH:
-				return String::format("(sl_ui_pos)(slib::UIResource::inchToPixel(%ff))", amount);
+				return String::format("slib::UIResource::toUiPos(slib::UIResource::inchToPixel(%ff))", amount);
 			case SBAR:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "slib::UIResource::getStatusBarHeight()";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getStatusBarHeight())", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*slib::UIResource::getStatusBarHeight())", amount);
 				}
 			case SAFE_L:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "slib::UIResource::getSafeAreaInsetLeft()";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getSafeAreaInsetLeft())", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*slib::UIResource::getSafeAreaInsetLeft())", amount);
 				}
 			case SAFE_T:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "slib::UIResource::getSafeAreaInsetTop()";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getSafeAreaInsetTop())", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*slib::UIResource::getSafeAreaInsetTop())", amount);
 				}
 			case SAFE_R:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "slib::UIResource::getSafeAreaInsetRight()";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getSafeAreaInsetRight())", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*slib::UIResource::getSafeAreaInsetRight())", amount);
 				}
 			case SAFE_B:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "slib::UIResource::getSafeAreaInsetBottom()";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getSafeAreaInsetBottom())", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*slib::UIResource::getSafeAreaInsetBottom())", amount);
 				}
 			case SAFE_W:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "slib::UIResource::getSafeAreaWidth()";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getSafeAreaWidth())", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*slib::UIResource::getSafeAreaWidth())", amount);
 				}
 			case SAFE_H:
 				if (Math::isAlmostZero(amount - 1)) {
 					return "slib::UIResource::getSafeAreaHeight()";
 				} else {
-					return String::format("(sl_ui_pos)(%ff*slib::UIResource::getSafeAreaHeight())", amount);
+					return String::format("slib::UIResource::toUiPos(%ff*slib::UIResource::getSafeAreaHeight())", amount);
 				}
 		}
 		return "0";
@@ -360,10 +360,12 @@ namespace slib
 				unit = WRAP;
 				break;
 			}
+			
 			const sl_char8* sz = str.getData();
 			sl_size len = str.getLength();
+			
 			float f;
-			sl_reg ret = _priv_SApp_parseFloat(&f, sz, 0, len);
+			sl_reg ret = _priv_SApp_parseFloat(&f, sz, 0, str.endsWith('*') ? len - 1 : len);
 			if (ret == SLIB_PARSE_ERROR) {
 				return sl_false;
 			}
@@ -424,6 +426,8 @@ namespace slib
 			typedef HashMap<String, int> UnitMap;
 			SLIB_SAFE_STATIC(UnitMap, units);
 			if (units.isNull()) {
+				units.put("*", FILL);
+				units.put("p", WEIGHT);
 				units.put("px", PX);
 				units.put("sw", SW);
 				units.put("sh", SH);

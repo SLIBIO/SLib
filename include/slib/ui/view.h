@@ -1242,6 +1242,8 @@ namespace slib
 		
 		void _restrictSize(UIRect& rect);
 		
+		UIRect _updateLayoutFrameInParent_getReferFrame(void* param, View* refer);
+		
 		void _updateLayoutFrameInParent(void* param);
 		
 		void _updateLayout();

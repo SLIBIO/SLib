@@ -658,39 +658,39 @@ namespace slib
 		}
 		switch (value.unit) {
 			case SAppDimensionValue::PX:
-				return (sl_ui_pos)(value.amount);
+				return UIResource::toUiPos(value.amount);
 			case SAppDimensionValue::SW:
 			case SAppDimensionValue::SAFE_W:
-				return (sl_ui_pos)(value.amount * m_layoutSimulationParams.screenWidth);
+				return UIResource::toUiPos(value.amount * m_layoutSimulationParams.screenWidth);
 			case SAppDimensionValue::SH:
 			case SAppDimensionValue::SAFE_H:
-				return (sl_ui_pos)(value.amount * m_layoutSimulationParams.screenHeight);
+				return UIResource::toUiPos(value.amount * m_layoutSimulationParams.screenHeight);
 			case SAppDimensionValue::SMIN:
-				return (sl_ui_pos)(value.amount * SLIB_MIN(m_layoutSimulationParams.screenWidth, m_layoutSimulationParams.screenHeight));
+				return UIResource::toUiPos(value.amount * SLIB_MIN(m_layoutSimulationParams.screenWidth, m_layoutSimulationParams.screenHeight));
 			case SAppDimensionValue::SMAX:
-				return (sl_ui_pos)(value.amount * SLIB_MAX(m_layoutSimulationParams.screenWidth, m_layoutSimulationParams.screenHeight));
+				return UIResource::toUiPos(value.amount * SLIB_MAX(m_layoutSimulationParams.screenWidth, m_layoutSimulationParams.screenHeight));
 			case SAppDimensionValue::VW:
-				return (sl_ui_pos)(value.amount * m_layoutSimulationParams.viewportWidth);
+				return UIResource::toUiPos(value.amount * m_layoutSimulationParams.viewportWidth);
 			case SAppDimensionValue::VH:
-				return (sl_ui_pos)(value.amount * m_layoutSimulationParams.viewportHeight);
+				return UIResource::toUiPos(value.amount * m_layoutSimulationParams.viewportHeight);
 			case SAppDimensionValue::VMIN:
-				return (sl_ui_pos)(value.amount * SLIB_MIN(m_layoutSimulationParams.viewportWidth, m_layoutSimulationParams.viewportHeight));
+				return UIResource::toUiPos(value.amount * SLIB_MIN(m_layoutSimulationParams.viewportWidth, m_layoutSimulationParams.viewportHeight));
 			case SAppDimensionValue::VMAX:
-				return (sl_ui_pos)(value.amount * SLIB_MAX(m_layoutSimulationParams.viewportWidth, m_layoutSimulationParams.viewportHeight));
+				return UIResource::toUiPos(value.amount * SLIB_MAX(m_layoutSimulationParams.viewportWidth, m_layoutSimulationParams.viewportHeight));
 			case SAppDimensionValue::SP:
-				return (sl_ui_pos)(value.amount * m_layoutSimulationParams.sp);
+				return UIResource::toUiPos(value.amount * m_layoutSimulationParams.sp);
 			case SAppDimensionValue::DP:
-				return (sl_ui_pos)(slib::UIResource::dpToPixel(value.amount));
+				return UIResource::toUiPos(slib::UIResource::dpToPixel(value.amount));
 			case SAppDimensionValue::PT:
-				return (sl_ui_pos)(slib::UIResource::pointToPixel(value.amount));
+				return UIResource::toUiPos(slib::UIResource::pointToPixel(value.amount));
 			case SAppDimensionValue::M:
-				return (sl_ui_pos)(slib::UIResource::meterToPixel(value.amount));
+				return UIResource::toUiPos(slib::UIResource::meterToPixel(value.amount));
 			case SAppDimensionValue::CM:
-				return (sl_ui_pos)(slib::UIResource::centimeterToPixel(value.amount));
+				return UIResource::toUiPos(slib::UIResource::centimeterToPixel(value.amount));
 			case SAppDimensionValue::MM:
-				return (sl_ui_pos)(slib::UIResource::millimeterToPixel(value.amount));
+				return UIResource::toUiPos(slib::UIResource::millimeterToPixel(value.amount));
 			case SAppDimensionValue::INCH:
-				return (sl_ui_pos)(slib::UIResource::inchToPixel(value.amount));
+				return UIResource::toUiPos(slib::UIResource::inchToPixel(value.amount));
 		}
 		return 0;
 	}

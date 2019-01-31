@@ -93,9 +93,10 @@ namespace slib
 		sl_bool flagHorizontalLayout = m_orientation == LayoutOrientation::Horizontal;
 		
 		sl_ui_pos sizeSum = 0;
-		sl_uint32 countFullFill = 0;
-		sl_uint32 countPartFill = 0;
-		
+		sl_uint32 countAbsoluteFill = 0;
+		sl_uint32 countFill = 0;
+		sl_real sumFillWeights = 0;
+
 		sl_ui_len widthContainer = getLayoutWidth();
 		sl_ui_len heightContainer = getLayoutHeight();
 
@@ -113,10 +114,12 @@ namespace slib
 					if (child->getWidthMode() != SizeMode::Filling) {
 						sizeSum += child->getLayoutWidth();
 					} else {
-						if (Math::isAlmostZero(child->getWidthWeight() - 1)) {
-							countFullFill++;
+						sl_real weight = child->getWidthWeight();
+						if (weight < 0) {
+							countAbsoluteFill++;
 						} else {
-							countPartFill++;
+							countFill++;
+							sumFillWeights += weight;
 						}
 					}
 					sizeSum += child->getMarginRight();
@@ -125,10 +128,12 @@ namespace slib
 					if (child->getHeightMode() != SizeMode::Filling) {
 						sizeSum += child->getLayoutHeight();
 					} else {
-						if (Math::isAlmostZero(child->getHeightWeight() - 1)) {
-							countFullFill++;
+						sl_real weight = child->getHeightWeight();
+						if (weight < 0) {
+							countAbsoluteFill++;
 						} else {
-							countPartFill++;
+							countFill++;
+							sumFillWeights += weight;
 						}
 					}
 					sizeSum += child->getMarginBottom();
@@ -140,7 +145,7 @@ namespace slib
 			sizeSum = 0;
 		}
 		
-		if (countPartFill > 0) {
+		if (countAbsoluteFill > 0) {
 			sl_ui_pos remainedSize;
 			if (flagHorizontalLayout) {
 				sl_ui_len n = widthContainer;
@@ -166,8 +171,8 @@ namespace slib
 					if (flagHorizontalLayout) {
 						if (child->getWidthMode() == SizeMode::Filling) {
 							sl_real weight = child->getWidthWeight();
-							if (!(Math::isAlmostZero(weight - 1))) {
-								sl_ui_pos width = (sl_ui_pos)((sl_real)(remainedSize) * weight);
+							if (weight < 0) {
+								sl_ui_pos width = (sl_ui_pos)((sl_real)(remainedSize) * -weight);
 								sizeSum += width;
 								child->setLayoutWidth(width);
 							}
@@ -175,8 +180,8 @@ namespace slib
 					} else {
 						if (child->getHeightMode() == SizeMode::Filling) {
 							sl_real weight = child->getHeightWeight();
-							if (!(Math::isAlmostZero(weight - 1))) {
-								sl_ui_pos height = (sl_ui_pos)((sl_real)(remainedSize) * weight);
+							if (weight < 0) {
+								sl_ui_pos height = (sl_ui_pos)((sl_real)(remainedSize) * -weight);
 								sizeSum += height;
 								child->setLayoutHeight(height);
 							}
@@ -190,7 +195,7 @@ namespace slib
 			sizeSum = 0;
 		}
 		
-		if (countFullFill > 0) {
+		if (countFill > 0) {
 			sl_ui_pos remainedSize;
 			if (flagHorizontalLayout) {
 				sl_ui_len n = widthContainer;
@@ -210,23 +215,25 @@ namespace slib
 			if (remainedSize < 0) {
 				remainedSize = 0;
 			}
+			if (sumFillWeights < SLIB_EPSILON) {
+				sumFillWeights = 1;
+			}
 			
-			sl_ui_pos sizeAvg = remainedSize / countFullFill;
 			for (i = 0; i < children.count; i++) {
 				Ref<View>& child = children[i];
 				if (child->getVisibility() != Visibility::Gone) {
 					if (flagHorizontalLayout) {
 						if (child->getWidthMode() == SizeMode::Filling) {
 							sl_real weight = child->getWidthWeight();
-							if (Math::isAlmostZero(weight - 1)) {
-								child->setLayoutWidth(sizeAvg);
+							if (weight >= 0) {
+								child->setLayoutWidth((sl_ui_len)(remainedSize * weight / sumFillWeights));
 							}
 						}
 					} else {
 						if (child->getHeightMode() == SizeMode::Filling) {
 							sl_real weight = child->getHeightWeight();
-							if (Math::isAlmostZero(weight - 1)) {
-								child->setLayoutHeight(sizeAvg);
+							if (weight >= 0) {
+								child->setLayoutHeight((sl_ui_len)(remainedSize * weight / sumFillWeights));
 							}
 						}
 					}
