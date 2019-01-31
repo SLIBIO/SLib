@@ -81,6 +81,8 @@ namespace slib
 		static void abort(const String& msg, const String& file, sl_uint32 line);
 
 		static void setCrashHandler(SIGNAL_HANDLER handler);
+		
+		static void setDebugFlags();
 
 
 		static void registerApplicationRunAtStartup(const String& path);

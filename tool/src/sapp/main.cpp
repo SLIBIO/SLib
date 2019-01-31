@@ -22,7 +22,6 @@
 
 #include <slib/core.h>
 #include <slib/ui.h>
-#include <slib/core/platform_windows.h>
 
 #include "sapp.h"
 
@@ -30,9 +29,8 @@ using namespace slib;
 
 int main(int argc, const char * argv[])
 {
-#ifdef SLIB_PLATFORM_IS_WIN32
-	Windows::setDebugFlags();
-#endif
+	System::setDebugFlags();
+
 	CList<String> args;
 	for (int i = 0; i < argc; i++) {
 		String arg = argv[i];

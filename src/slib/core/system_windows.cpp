@@ -278,6 +278,11 @@ namespace slib
 	}
 #endif
 
+	void System::setDebugFlags()
+	{
+		Windows::setDebugFlags();
+	}
+
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
 	class _priv_GlobalUniqueInstance : public GlobalUniqueInstance

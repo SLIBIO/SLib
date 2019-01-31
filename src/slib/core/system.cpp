@@ -76,6 +76,12 @@ namespace slib
 		LogError("System::setCrashHandler", "Not supported");
 	}
 #endif
+	
+#if !defined(SLIB_PLATFORM_IS_WIN32)
+	void System::setDebugFlags()
+	{
+	}
+#endif
 
 	void System::yield(sl_uint32 elapsed)
 	{
