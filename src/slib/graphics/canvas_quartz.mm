@@ -282,7 +282,6 @@ namespace slib
 			}
 			if (pen.isNotNull()) {
 				_applyPen(pen.get());
-				rect.origin.y++;
 				CGContextStrokeRect(m_graphics, rect);
 			}
 		}
