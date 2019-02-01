@@ -318,8 +318,6 @@ namespace slib
 
 	void PickerView::dispatchSelectItem(sl_uint32 index)
 	{
-		m_indexSelected = index;
-		
 		SLIB_INVOKE_EVENT_HANDLER(SelectItem, index)
 	}
 	
