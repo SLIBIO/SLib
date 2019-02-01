@@ -246,8 +246,10 @@ namespace slib
 		void onClickEvent(UIEvent* ev) override;
 
 	protected:
-		virtual UISize measureContentSize();
-
+		UISize measureContentSize();
+		
+		virtual UISize measureLayoutContentSize();
+		
 		virtual void layoutIconAndText(sl_ui_len widthFrame, sl_ui_len heightFrame, UISize& sizeContent, UIRect& frameIcon, UIRect& frameText);
 		
 		virtual void drawButtonContent(Canvas* canvas, const Ref<Drawable>& icon, const String& text, const Color& textColor);

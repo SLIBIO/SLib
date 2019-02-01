@@ -196,19 +196,6 @@ namespace slib
 		return sl_false;
 	}
 
-
-	sl_bool SAppLayoutLabelAttributes::isNotRequiredNative()
-	{
-		return sl_false;
-	}
-
-
-	sl_bool SAppLayoutEditAttributes::isNotRequiredNative()
-	{
-		return sl_false;
-	}
-
-
 	sl_bool SAppLayoutSelectAttributes::isNotRequiredNative()
 	{
 		if (leftIcon.flagDefined) {
@@ -225,7 +212,6 @@ namespace slib
 		}
 		return sl_false;
 	}
-
 
 	sl_bool SAppLayoutTabAttributes::isNotRequiredNative()
 	{

@@ -66,10 +66,6 @@ public class UiEditView extends EditText implements IView {
 				// TextArea
 				UiTextArea view = new UiTextArea(context);
 				return view;
-			} else {
-				// LabelView
-				UiLabelView view = new UiLabelView(context);
-				return view;
 			}
 		} catch (Exception e) {
 			Logger.exception(e);

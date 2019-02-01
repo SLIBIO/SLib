@@ -32,12 +32,6 @@
 namespace slib
 {
 
-	struct TextLine {
-		String16 text;
-		sl_ui_len width;
-		sl_ui_len height;
-	};
-	
 	class SLIB_EXPORT LabelView : public View
 	{
 		SLIB_DECLARE_OBJECT
@@ -68,26 +62,10 @@ namespace slib
 		
 		virtual void setEllipsize(EllipsizeMode ellipsizeMode, UIUpdateMode updateMode = UIUpdateMode::UpdateLayout);
 		
-	public:
-		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
-		
 	protected:
 		void onDraw(Canvas* canvas) override;
 		
 		void onUpdateLayout() override;
-		
-	private:
-		void _setText_NW(const String& text);
-		
-		void _setTextColor_NW(const Color& color);
-		
-		void _setTextAlignment_NW(Alignment align);
-		
-		void _setFont_NW(const Ref<Font>& font) override;
-		
-		void _setBorder_NW(sl_bool flag) override;
-		
-		void _setBackgroundColor_NW(const Color& color) override;
 		
 	protected:
 		AtomicString m_text;

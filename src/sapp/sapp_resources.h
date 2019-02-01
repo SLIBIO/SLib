@@ -381,7 +381,7 @@ namespace slib
 		
 	public:
 		sl_bool isNotRequiredNative();
-		
+
 	};
 
 	class SAppLayoutLabelAttributes : public Referable
@@ -392,9 +392,6 @@ namespace slib
 		SAppAlignmentValue gravity;
 		SAppMultiLineModeValue multiLine;
 		SAppEllipsizeModeValue ellipsize;
-
-	public:
-		sl_bool isNotRequiredNative();
 
 	};
 
@@ -409,6 +406,7 @@ namespace slib
 	{
 	public:
 		String group;
+		SAppStringValue value;
 		
 	};
 
@@ -427,9 +425,6 @@ namespace slib
 		SAppUIKeyboardTypeValue keyboard;
 		SAppUIAutoCapitalizationTypeValue autoCap;
 		
-	public:
-		sl_bool isNotRequiredNative();
-
 	};
 
 	class SAppLayoutImageAttributes : public Referable
