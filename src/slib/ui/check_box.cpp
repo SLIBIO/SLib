@@ -133,7 +133,8 @@ namespace slib
 		setBackground(Ref<Drawable>::null(), UIUpdateMode::Init);
 		
 		setTextColor(Color::Black, UIUpdateMode::Init);
-		setTextMarginLeft(2 * UIResource::toUiPos(UIResource::dpToPixel(1)), UIUpdateMode::Init);
+		setTextMargin(2 * UIResource::toUiPos(UIResource::dpToPixel(1)), 1, 1, 2, UIUpdateMode::Init);
+		setIconMargin(1, 2, 1, 1, UIUpdateMode::Init);
 	}
 
 	CheckBox::~CheckBox()
