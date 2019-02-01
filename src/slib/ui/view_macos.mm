@@ -414,37 +414,6 @@ namespace slib
 				
 				CGContextRef context = (CGContextRef)([graphics graphicsPort]);
 				
-				/******
-					adjust transform when NSView's alphaValue is less than 1 and, bounds scale is not equal to 1 or frame rotation is not equal to 0.
-					This error is found at macOS Sierra, but it seems to be the common problem of all series of macOS system
-					Later, decided to do not use alphaValue!
-				*****/
-				/*
-				BOOL flagAdjustTransform = FALSE;
-				if (handle.alphaValue < 1 - SLIB_EPSILON) {
-					CGFloat w = handle.frame.size.width;
-					if (w < 1) {
-						return;
-					}
-					CGFloat h = handle.frame.size.height;
-					if (h < 1) {
-						return;
-					}
-					CGFloat bw = handle.bounds.size.width;
-					CGFloat bh = handle.bounds.size.height;
-					CGFloat sx = bw / w;
-					CGFloat sy = bh / h;
-					CGFloat r = handle.frameRotation;
-					if (Math::abs(sx - 1) > 0.0000001 || Math::abs(sy - 1) > 0.0000001 || Math::abs(r) > 0.0000001) {
-						flagAdjustTransform = TRUE;
-						CGContextSaveGState(context);
-						CGContextTranslateCTM(context, 0, bh/2);
-						CGContextScaleCTM(context, sx, sy);
-						CGContextTranslateCTM(context, 0, h/2-bh);
-					}
-				}
-				*/
-				
 				NSRect rectBound = [handle bounds];
 				Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, context, (sl_uint32)(rectBound.size.width), (sl_uint32)(rectBound.size.height));
 				if (canvas.isNotNull()) {
@@ -452,11 +421,6 @@ namespace slib
 					ViewInstance::onDraw(canvas.get());
 				}
 				
-				/*
-				if (flagAdjustTransform) {
-					CGContextRestoreGState(context);
-				}
-				*/
 			}
 		}
 	}

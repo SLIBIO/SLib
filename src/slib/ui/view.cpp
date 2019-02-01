@@ -6695,8 +6695,14 @@ namespace slib
 				case BoundShape::Rectangle:
 				default:
 					if (isInstance()) {
+#ifndef SLIB_PLATFORM_IS_WIN32
 						rc.right -= 1;
+#endif
+#ifdef SLIB_PLATFORM_IS_APPLE
+						rc.top += 1;
+#else
 						rc.bottom -= 1;
+#endif
 					}
 					rc.fixSizeError();
 					sl_bool flagAntiAlias = canvas->isAntiAlias();
