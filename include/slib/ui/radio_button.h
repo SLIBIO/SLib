@@ -42,14 +42,27 @@ namespace slib
 		RadioButton(sl_uint32 nCategories, ButtonCategory* categories);
 
 		~RadioButton();
+		
+	public:
+		Ref<RadioGroup> getGroup();
+		
+		String getValue();
+		
+		void setValue(const String& value);
+		
+		void setChecked(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
-		void dispatchClickEvent(UIEvent* ev) override;
+	protected:
+		void onClickEvent(UIEvent* ev) override;
 
 	public:
-		SLIB_PROPERTY(AtomicWeakRef<RadioGroup>, RadioGroup)
+		AtomicWeakRef<RadioGroup> m_group;
+		AtomicString m_value;
+		
+		friend class RadioGroup;
 		
 	};
 
@@ -63,17 +76,29 @@ namespace slib
 		~RadioGroup();
 
 	public:
-		void add(const Ref<RadioButton>& view);
+		void add(const Ref<RadioButton>& button);
 		
-		void remove(const Ref<RadioButton>& view);
+		void remove(const Ref<RadioButton>& button);
 		
-		void select(const Ref<RadioButton>& view);
+		void select(const Ref<RadioButton>& button);
 		
 		Ref<RadioButton> getSelected();
 		
+		void selectValue(const String& value);
+		
+		String getSelectedValue();
+		
+	private:
+		void _setChecked(RadioButton* button, sl_bool flag, UIUpdateMode mode);
+		
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(RadioGroup, Select, RadioButton*)
+		
 	protected:
-		CList< Ref<RadioButton> > m_views;
-		AtomicRef<RadioButton> m_viewSelected;
+		CList< Ref<RadioButton> > m_buttons;
+		Ref<RadioButton> m_buttonSelected;
+		
+		friend class RadioButton;
 		
 	};
 

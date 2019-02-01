@@ -23,6 +23,7 @@
 #include "slib/ui/check_box.h"
 
 #include "slib/ui/core.h"
+#include "slib/ui/resource.h"
 #include "slib/core/safe_static.h"
 
 namespace slib
@@ -48,9 +49,17 @@ namespace slib
 	public:
 		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
 		{
+			Rectangle rect = rectDst;
+			sl_real px = rect.getWidth() / 6;
+			rect.left += px;
+			rect.right -= px;
+			sl_real py = rect.getHeight() / 6;
+			rect.top += py;
+			rect.bottom -= py;
+			
 			sl_bool flagAntiAlias = canvas->isAntiAlias();
 			canvas->setAntiAlias(sl_false);
-			canvas->drawRectangle(rectDst, m_penBorder, m_brush);
+			canvas->drawRectangle(rect, m_penBorder, m_brush);
 			canvas->setAntiAlias(flagAntiAlias);
 			
 			if (m_penCheck.isNotNull()) {
@@ -59,8 +68,8 @@ namespace slib
 				pts[1] = Point(0.4f, 0.8f);
 				pts[2] = Point(0.8f, 0.3f);
 				for (int i = 0; i < 3; i++) {
-					pts[i].x = rectDst.left + rectDst.getWidth() * pts[i].x;
-					pts[i].y = rectDst.top + rectDst.getHeight() * pts[i].y;
+					pts[i].x = rect.left + rect.getWidth() * pts[i].x;
+					pts[i].y = rect.top + rect.getHeight() * pts[i].y;
 				}
 				canvas->drawLines(pts, 3, m_penCheck);
 			}
@@ -76,18 +85,19 @@ namespace slib
 	public:
 		_priv_CheckBox_Categories()
 		{
+			sl_real w = (sl_real)(UIResource::toUiPos(UIResource::dpToPixel(1)));
 			Color colorBackNormal = Color::White;
 			Color colorBackHover = Color::White;
 			Color colorBackDown(220, 230, 255);
 			Color colorBackDisabled(220, 220, 220);
-			Ref<Pen> penNormal = Pen::createSolidPen(1, Color::Black);
-			Ref<Pen> penHover = Pen::createSolidPen(1, Color(0, 80, 200));
+			Ref<Pen> penNormal = Pen::createSolidPen(w, Color::Black);
+			Ref<Pen> penHover = Pen::createSolidPen(w, Color(0, 80, 200));
 			Ref<Pen> penDown = penHover;
-			Ref<Pen> penDisabled = Pen::createSolidPen(1, Color(90, 90, 90));
-			Ref<Pen> penCheckNormal = Pen::createSolidPen(2, Color::Black);
-			Ref<Pen> penCheckHover = Pen::createSolidPen(2, Color(0, 80, 200));
+			Ref<Pen> penDisabled = Pen::createSolidPen(w, Color(90, 90, 90));
+			Ref<Pen> penCheckNormal = Pen::createSolidPen(w*2, Color::Black);
+			Ref<Pen> penCheckHover = Pen::createSolidPen(w*2, Color(0, 80, 200));
 			Ref<Pen> penCheckDown = penCheckHover;
-			Ref<Pen> penCheckDisabled = Pen::createSolidPen(2, Color(90, 90, 90));
+			Ref<Pen> penCheckDisabled = Pen::createSolidPen(w*2, Color(90, 90, 90));
 			categories[0].properties[(int)ButtonState::Normal].icon = new _priv_CheckBox_Icon(penNormal, colorBackNormal, Ref<Pen>::null());
 			categories[0].properties[(int)ButtonState::Disabled].icon = new _priv_CheckBox_Icon(penDisabled, colorBackDisabled, Ref<Pen>::null());
 			categories[0].properties[(int)ButtonState::Hover].icon = new _priv_CheckBox_Icon(penHover, colorBackHover, Ref<Pen>::null());
@@ -115,7 +125,6 @@ namespace slib
 
 	CheckBox::CheckBox() : CheckBox(2, _priv_CheckBox_Categories::getCategories())
 	{
-		setCreatingNativeWidget(sl_true);
 	}
 
 	CheckBox::CheckBox(sl_uint32 nCategories, ButtonCategory* categories) : Button(nCategories, categories)
@@ -123,16 +132,15 @@ namespace slib
 		setCreatingNativeWidget(sl_false);
 		
 		m_flagChecked = sl_false;
-		setIconSize((sl_ui_pos)(UI::getDefaultFontSize()));
-		setIconMargin(2);
-		setTextMargin(2, 0, 2, 2);
-		setGravity(Alignment::MiddleLeft);
-		setIconAlignment(Alignment::MiddleLeft);
-		setTextAlignment(Alignment::MiddleLeft);
+		
+		setGravity(Alignment::MiddleLeft, UIUpdateMode::Init);
+		setIconAlignment(Alignment::MiddleLeft, UIUpdateMode::Init);
+		setTextAlignment(Alignment::MiddleLeft, UIUpdateMode::Init);
 		
 		setBorder(sl_false, UIUpdateMode::Init);
 		setBackground(Ref<Drawable>::null(), UIUpdateMode::Init);
 		
+		setTextColor(Color::Black, UIUpdateMode::Init);
 	}
 
 	CheckBox::~CheckBox()
@@ -157,15 +165,32 @@ namespace slib
 			setCurrentCategory(flag ? 1 : 0, mode);
 		}
 	}
+	
+	UISize _priv_CheckBox_macOS_measureSize(Button* view);
+	UISize _priv_CheckBox_Win32_measureSize(Button* view);
 
-	void CheckBox::dispatchClickEvent(UIEvent* ev)
+	UISize CheckBox::measureLayoutContentSize()
+	{
+#if defined(SLIB_PLATFORM_IS_MACOS)
+		if (isCreatingNativeWidget()) {
+			return _priv_CheckBox_macOS_measureSize(this);
+		}
+#endif
+#if defined(SLIB_PLATFORM_IS_WIN32)
+		if (isCreatingNativeWidget()) {
+			return _priv_CheckBox_Win32_measureSize(this);
+		}
+#endif
+		return measureContentSize();
+	}
+
+	void CheckBox::onClickEvent(UIEvent* ev)
 	{
 		if (isNativeWidget()) {
 			_getChecked_NW();
 		} else {
 			setChecked(!m_flagChecked);
 		}
-		Button::dispatchClickEvent(ev);
 	}
 
 #if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_WIN32)

@@ -22,6 +22,7 @@
 
 #include "slib/ui/radio_button.h"
 
+#include "slib/ui/resource.h"
 #include "slib/core/safe_static.h"
 
 namespace slib
@@ -49,12 +50,20 @@ namespace slib
 	public:
 		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
 		{
-			canvas->drawEllipse(rectDst, m_penBorder, m_brushBack);
+			Rectangle rect = rectDst;
+			sl_real px = rect.getWidth() / 6;
+			rect.left += px;
+			rect.right -= px;
+			sl_real py = rect.getHeight() / 6;
+			rect.top += py;
+			rect.bottom -= py;
+
+			canvas->drawEllipse(rect, m_penBorder, m_brushBack);
 			if (m_brushCheck.isNotNull()) {
 				Rectangle rcCheck;
-				rcCheck.setLeftTop(rectDst.getCenter());
-				sl_real w = rectDst.getWidth() / 2;
-				sl_real h = rectDst.getHeight() / 2;
+				rcCheck.setLeftTop(rect.getCenter());
+				sl_real w = rect.getWidth() / 2;
+				sl_real h = rect.getHeight() / 2;
 				rcCheck.left -= w / 2;
 				rcCheck.top -= h / 2;
 				rcCheck.right = rcCheck.left + w;
@@ -72,14 +81,15 @@ namespace slib
 		
 		_priv_RadioButton_Categories()
 		{
+			sl_real w = (sl_real)(UIResource::toUiPos(UIResource::dpToPixel(1)));
 			Color colorBackNormal = Color::White;
 			Color colorBackHover = Color::White;
 			Color colorBackDown(220, 230, 255);
 			Color colorBackDisabled = Color(220, 220, 220);
-			Ref<Pen> penNormal = Pen::createSolidPen(1, Color::Black);
-			Ref<Pen> penHover = Pen::createSolidPen(1, Color(0, 80, 200));
+			Ref<Pen> penNormal = Pen::createSolidPen(w, Color::Black);
+			Ref<Pen> penHover = Pen::createSolidPen(w, Color(0, 80, 200));
 			Ref<Pen> penDown = penHover;
-			Ref<Pen> penDisabled = Pen::createSolidPen(1, Color(90, 90, 90));
+			Ref<Pen> penDisabled = Pen::createSolidPen(w, Color(90, 90, 90));
 			Color colorCheckNormal = Color::Black;
 			Color colorCheckDisabled = Color(90, 90, 90);
 			Color colorCheckHover = Color(0, 80, 200);
@@ -112,7 +122,6 @@ namespace slib
 
 	RadioButton::RadioButton() : CheckBox(2, _priv_RadioButton_Categories::getCategories())
 	{
-		setCreatingNativeWidget(sl_true);
 	}
 
 	RadioButton::RadioButton(sl_uint32 nCategories, ButtonCategory* categories) : CheckBox(nCategories, categories)
@@ -122,16 +131,44 @@ namespace slib
 	RadioButton::~RadioButton()
 	{
 	}
-
-	void RadioButton::dispatchClickEvent(UIEvent* ev)
+	
+	Ref<RadioGroup> RadioButton::getGroup()
 	{
-		CheckBox::dispatchClickEvent(ev);
-		Ref<RadioGroup> group = getRadioGroup();
+		return m_group;
+	}
+	
+	String RadioButton::getValue()
+	{
+		return m_value;
+	}
+	
+	void RadioButton::setValue(const String& value)
+	{
+		m_value = value;
+	}
+	
+	void RadioButton::setChecked(sl_bool flag, UIUpdateMode mode)
+	{
+		Ref<RadioGroup> group = m_group;
+		if (group.isNotNull()) {
+			group->_setChecked(this, flag, mode);
+			return;
+		}
+		CheckBox::setChecked(flag, mode);
+	}
+	
+	void RadioButton::onClickEvent(UIEvent* ev)
+	{
+		Ref<RadioGroup> group = m_group;
 		if (group.isNotNull()) {
 			group->select(this);
+			group->dispatchSelect(this);
+			return;
 		}
+		CheckBox::setChecked(sl_true);
 	}
 
+	
 	SLIB_DEFINE_OBJECT(RadioGroup, Object)
 
 	RadioGroup::RadioGroup()
@@ -142,45 +179,107 @@ namespace slib
 	{
 	}
 
-	void RadioGroup::add(const Ref<RadioButton>& view)
+	void RadioGroup::add(const Ref<RadioButton>& button)
 	{
-		if (view.isNotNull()) {
-			view->setRadioGroup(this);
-			m_views.addIfNotExist(view);
-			select(m_viewSelected);
+		if (button.isNull()) {
+			return;
+		}
+		button->m_group = this;
+		ObjectLocker lock(this);
+		m_buttons.addIfNotExist_NoLock(button);
+		if (button->isChecked()) {
+			if (button != m_buttonSelected) {
+				if (m_buttonSelected.isNotNull()) {
+					m_buttonSelected->CheckBox::setChecked(sl_false);
+				}
+				m_buttonSelected = button;
+			}
 		}
 	}
 
-	void RadioGroup::remove(const Ref<RadioButton>& view)
+	void RadioGroup::remove(const Ref<RadioButton>& button)
 	{
-		if (view.isNotNull()) {
-			if (view->getRadioGroup() == this) {
-				view->setRadioGroup(Ref<RadioGroup>::null());
-			}
-			m_views.remove(view);
+		if (button.isNull()) {
+			return;
+		}
+		button->m_group.setNull();
+		ObjectLocker lock(this);
+		m_buttons.remove_NoLock(button);
+		if (m_buttonSelected == button) {
+			m_buttonSelected.setNull();
 		}
 	}
 
-	void RadioGroup::select(const Ref<RadioButton>& sel)
+	void RadioGroup::select(const Ref<RadioButton>& button)
 	{
-		m_viewSelected = sel;
-		ListLocker< Ref<RadioButton> > views(m_views);
-		for (sl_size i = 0; i < views.count; i++) {
-			Ref<RadioButton> view = views[i];
-			if (view.isNotNull() && view != sel) {
-				view->setChecked(sl_false);
+		ObjectLocker lock(this);
+		if (button != m_buttonSelected) {
+			if (m_buttonSelected.isNotNull()) {
+				m_buttonSelected->CheckBox::setChecked(sl_false);
 			}
-		}
-		if (sel.isNotNull()) {
-			sel->setChecked(sl_true);
+			m_buttonSelected = button;
+			if (button.isNotNull()) {
+				button->CheckBox::setChecked(sl_true);
+			}
 		}
 	}
 
 	Ref<RadioButton> RadioGroup::getSelected()
 	{
-		return m_viewSelected;
+		ObjectLocker lock(this);
+		return m_buttonSelected;
 	}
 
+	void RadioGroup::selectValue(const String& value)
+	{
+		ObjectLocker lock(this);
+		ListElements< Ref<RadioButton> > buttons(m_buttons);
+		Ref<RadioButton> selected;
+		for (sl_size i = 0; i < buttons.count; i++) {
+			Ref<RadioButton>& button = buttons[i];
+			if (button->m_value == value) {
+				selected = button;
+				break;
+			}
+		}
+		select(selected);
+	}
+	
+	String RadioGroup::getSelectedValue()
+	{
+		ObjectLocker lock(this);
+		if (m_buttonSelected.isNotNull()) {
+			return m_buttonSelected->m_value;
+		}
+		return sl_null;
+	}
+	
+	void RadioGroup::_setChecked(RadioButton* button, sl_bool flag, UIUpdateMode mode)
+	{
+		ObjectLocker lock(this);
+		if (flag) {
+			if (button != m_buttonSelected) {
+				if (m_buttonSelected.isNotNull()) {
+					m_buttonSelected->CheckBox::setChecked(sl_false);
+				}
+				m_buttonSelected = button;
+				button->CheckBox::setChecked(sl_true, mode);
+			}
+		} else {
+			if (button == m_buttonSelected) {
+				m_buttonSelected.setNull();
+			}
+			button->CheckBox::setChecked(sl_false, mode);
+		}
+	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(RadioGroup, Select, RadioButton*)
+	
+	void RadioGroup::dispatchSelect(RadioButton* button)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(Select, button)
+	}
+	
 
 #if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_WIN32)
 	Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* parent)

@@ -46,12 +46,16 @@ namespace slib
 		
 		virtual void setChecked(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+	protected:
+		UISize measureLayoutContentSize() override;
+		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
-		void dispatchClickEvent(UIEvent* ev) override;
+	protected:
+		void onClickEvent(UIEvent* ev) override;
 		
-	public:
+	private:
 		void _getChecked_NW();
 		
 		void _setChecked_NW(sl_bool flag);

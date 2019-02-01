@@ -76,6 +76,30 @@ namespace slib
 		}
 	}
 
+	UISize _priv_CheckBox_macOS_measureSize(Button* view)
+	{
+		NSView* handle = UIPlatform::getViewHandle(view);
+		if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
+			NSButton* button = (NSButton*)handle;
+			NSSize size = button.fittingSize;
+			return UISize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
+		} else {
+			NSButton* button = [[NSButton alloc] init];
+			if (button != nil) {
+				button.buttonType = NSSwitchButton;
+				button.title = Apple::getNSStringFromString(view->getText());
+				Ref<Font> font = view->getFont();
+				NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
+				if (hFont != nil) {
+					[button setFont:hFont];
+				}
+				NSSize size = button.fittingSize;
+				return UISize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
+			}
+		}
+		return UISize::zero();
+	}
+	
 }
 
 @implementation _priv_Slib_macOS_CheckBox

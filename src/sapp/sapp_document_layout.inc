@@ -2664,8 +2664,6 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(multiLine, setMultiLine)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(ellipsize, setEllipsize)
 
-		LAYOUT_CONTROL_SET_NATIVE_WIDGET
-
 		LAYOUT_CONTROL_ADD_STATEMENT
 
 	}
@@ -2688,6 +2686,8 @@ namespace slib
 	{
 		LAYOUT_CONTROL_PROCESS_SUPER(Check)
 		
+		LAYOUT_CONTROL_STRING_ATTR(value, setValue)
+
 		if (op == OP_PARSE) {
 			attr->group = resourceItem->getXmlAttribute("group");
 			if (attr->group.isNotEmpty()) {
@@ -2733,9 +2733,7 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR(returnKey, setReturnKeyType)
 		LAYOUT_CONTROL_GENERIC_ATTR(keyboard, setKeyboardType)
 		LAYOUT_CONTROL_GENERIC_ATTR(autoCap, setAutoCapitalizationType)
-		
-		LAYOUT_CONTROL_SET_NATIVE_WIDGET
-		
+				
 		LAYOUT_CONTROL_ADD_STATEMENT
 		
 	}

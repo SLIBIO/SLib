@@ -45,7 +45,6 @@ namespace slib
 		_priv_Slib_macOS_Button* handle = [[_priv_Slib_macOS_Button alloc] initWithFrame:frame];
 		if (handle != nil) {
 			handle.title = Apple::getNSStringFromString(m_text);
-			
 			Ref<Font> font = getFont();
 			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 			if (hFont != nil) {
@@ -92,6 +91,30 @@ namespace slib
 				[v setFont:hFont];
 			}
 		}
+	}
+	
+	UISize _priv_Button_macOS_measureSize(Button* view)
+	{
+		NSView* handle = UIPlatform::getViewHandle(view);
+		if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
+			NSButton* button = (NSButton*)handle;
+			NSSize size = button.fittingSize;
+			return UISize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
+		} else {
+			NSButton* button = [[NSButton alloc] init];
+			if (button != nil) {
+				button.title = Apple::getNSStringFromString(view->getText());
+				Ref<Font> font = view->getFont();
+				NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
+				if (hFont != nil) {
+					[button setFont:hFont];
+				}
+				button.bezelStyle = NSRoundedBezelStyle;
+				NSSize size = button.fittingSize;
+				return UISize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
+			}
+		}
+		return UISize::zero();
 	}
 	
 }

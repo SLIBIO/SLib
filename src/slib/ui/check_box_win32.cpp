@@ -95,6 +95,19 @@ namespace slib
 		}
 	}
 
+	UISize _priv_CheckBox_Win32_measureSize(Button* view)
+	{
+		Ref<Font> font = view->getFont();
+		if (font.isNotNull()) {
+			UISize size = font->measureText(view->getText());
+			size.x += (sl_ui_len)(::GetSystemMetrics(SM_CXMENUCHECK));
+			sl_ui_len cy = (sl_ui_len)(::GetSystemMetrics(SM_CYMENUCHECK));
+			size.y = SLIB_MAX(size.y, cy);
+			return size;
+		}
+		return UISize::zero();
+	}
+
 }
 
 #endif

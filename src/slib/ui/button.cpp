@@ -36,16 +36,17 @@ namespace slib
 		0, 0.5f, 0, 0,
 		0, 0, 0.5f, 0,
 		0, 0, 0, 1,
-		0, 0, 0.5f, 0
+		0.2f, 0.3f, 0.4f, 0
 	};
 	const ColorMatrix& _g_button_colorMatrix_hover = *((const ColorMatrix*)((void*)_g_button_colorMatrix_hover_buf));
 
 	const sl_real _g_button_colorMatrix_pressed_buf[20] = {
-		0.6f, 0, 0, 0,
-		0, 0.6f, 0, 0,
-		0, 0, 0.6f, 0,
+		0.5f, 0, 0, 0,
+		0, 0.5f, 0, 0,
+		0, 0, 0.5f, 0,
 		0, 0, 0, 1,
-		0, 0, 0, 0
+		0.3f, 0.4f, 0.6f, 0
+
 	};
 	const ColorMatrix& _g_button_colorMatrix_pressed = *((const ColorMatrix*)((void*)_g_button_colorMatrix_pressed_buf));
 
@@ -88,8 +89,6 @@ namespace slib
 
 	Button::Button() : Button(2)
 	{
-		setCreatingNativeWidget(sl_false);
-		setSavingCanvasState(sl_false);
 	}
 
 	Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
@@ -150,9 +149,7 @@ namespace slib
 		
 		setUsingFont(sl_true);
 		
-		setBorder(Pen::create(PenStyle::Solid, 1, Color(100, 100, 100)), UIUpdateMode::Init);
-
-		m_textColorDefault = Color::Black;
+		m_textColorDefault = Color(0, 100, 200);
 		
 	}
 
@@ -725,42 +722,12 @@ namespace slib
 			return;
 		}
 		
-		UISize size = measureContentSize();
-		sl_ui_pos paddingNativeWidth = 0;
-		sl_ui_pos paddingNativeHeight = 0;
-		if (isCreatingNativeWidget()) {
-			paddingNativeWidth = 30;
-			paddingNativeHeight = 8;
-		} else {
-			if (size.x > 0) {
-				size.x += size.x / 3;
-			}
-			if (size.y > 0) {
-				size.y += size.y / 3;
-			}
-		}
-		
+		UISize size = measureLayoutContentSize();
 		if (flagHorizontal) {
-			if (size.x < 0) {
-				size.x = 0;
-			}
-			sl_ui_pos width = size.x + getPaddingLeft() + getPaddingRight();
-			if (width < 0) {
-				width = 0;
-			}
-			width += paddingNativeWidth;
-			setLayoutWidth(width);
+			setLayoutWidth(size.x + getPaddingLeft() + getPaddingRight());
 		}
 		if (flagVertical) {
-			if (size.y < 0) {
-				size.y = 0;
-			}
-			sl_ui_pos height = size.y + getPaddingTop() + getPaddingBottom();
-			if (height < 0) {
-				height = 0;
-			}
-			height += paddingNativeHeight;
-			setLayoutHeight(height);
+			setLayoutHeight(size.y + getPaddingTop() + getPaddingBottom());
 		}
 	}
 
@@ -784,6 +751,31 @@ namespace slib
 		UISize size;
 		UIRect rcIcon, rcText;
 		layoutIconAndText(0, 0, size, rcIcon, rcText);
+		if (size.x < 0) {
+			size.x = 0;
+		}
+		if (size.y < 0) {
+			size.y = 0;
+		}
+		return size;
+	}
+	
+	UISize _priv_Button_macOS_measureSize(Button* view);
+
+	UISize Button::measureLayoutContentSize()
+	{
+#if defined(SLIB_PLATFORM_IS_MACOS)
+		if (isCreatingNativeWidget()) {
+			return _priv_Button_macOS_measureSize(this);
+		}
+#endif
+		UISize size = measureContentSize();
+		if (size.x > 0) {
+			size.x += size.x / 3;
+		}
+		if (size.y > 0) {
+			size.y += size.y / 3;
+		}
 		return size;
 	}
 
@@ -805,37 +797,70 @@ namespace slib
 				heightText = 0;
 			}
 		}
-		if (m_iconDefault.isNotNull()) {
-			widthIcon = m_iconSize.x + m_iconMarginLeft + m_iconMarginRight;
+		sl_bool flagUseIcon = m_iconDefault.isNotNull() || m_iconSize.x > 0 || m_iconSize.y > 0;
+		if (!flagUseIcon) {
+			for (sl_uint32 i = 0; i < m_nCategories; i++) {
+				ButtonCategory& category = m_categories[i];
+				for (sl_uint32 j = 0; j < (sl_uint32)(ButtonState::Count); j++) {
+					if (category.properties[j].icon.isNotNull()) {
+						flagUseIcon = sl_true;
+					}
+				}
+			}
+		}
+		if (flagUseIcon) {
+			widthIcon = m_iconSize.x;
+			heightIcon = m_iconSize.y;
+			sl_ui_len marginWidth = m_iconMarginLeft + m_iconMarginRight;
+			sl_ui_len marginHeight = m_iconMarginTop + m_iconMarginBottom;
+			sl_ui_len defaultHeight = heightText;
+			if (widthIcon <= 0 || heightIcon <= 0) {
+				if (defaultHeight <= 0) {
+					if (widthFrame <= 0 || heightFrame <= 0) {
+						Ref<Font> font = getFont();
+						if (font.isNotNull()) {
+							defaultHeight = (sl_ui_len)(font->getFontHeight());
+						}
+					}
+				}
+			}
+			if (widthIcon <= 0) {
+				if (heightIcon <= 0) {
+					if (widthFrame > 0) {
+						if (m_layoutOrientation == LayoutOrientation::Horizontal) {
+							widthIcon = widthFrame - widthText - marginWidth;
+						} else {
+							widthIcon = widthFrame - marginWidth;
+						}
+					} else {
+						widthIcon = defaultHeight - marginWidth;
+					}
+					if (heightFrame > 0) {
+						if (m_layoutOrientation == LayoutOrientation::Vertical) {
+							heightIcon = heightFrame - heightText - marginHeight;
+						} else {
+							heightIcon = heightFrame - marginHeight;
+						}
+					} else {
+						heightIcon = defaultHeight - marginHeight;
+					}
+					widthIcon = Math::min(widthIcon, heightIcon);
+					heightIcon = widthIcon;
+				} else {
+					widthIcon = heightIcon;
+				}
+			} else {
+				if (heightIcon <= 0) {
+					heightIcon = widthIcon;
+				}
+			}
+			widthIcon += marginWidth;
 			if (widthIcon < 0) {
 				widthIcon = 0;
 			}
-			heightIcon = m_iconSize.y + m_iconMarginTop + m_iconMarginBottom;
+			heightIcon += marginHeight;
 			if (heightIcon < 0) {
 				heightIcon = 0;
-			}
-			sl_bool flagFillIconWidth = sl_false;
-			if (widthFrame > 0 && m_iconSize.x <= 0) {
-				flagFillIconWidth = sl_true;
-				if (m_layoutOrientation == LayoutOrientation::Horizontal) {
-					widthIcon = widthFrame - widthText;
-				} else {
-					widthIcon = widthFrame;
-				}
-			}
-			sl_bool flagFillIconHeight = sl_false;
-			if (heightFrame > 0 && m_iconSize.y <= 0) {
-				flagFillIconHeight = sl_true;
-				if (m_layoutOrientation == LayoutOrientation::Horizontal) {
-					heightIcon = heightFrame;
-				} else {
-					heightIcon = heightFrame - heightText;
-				}
-			}
-			if (flagFillIconWidth && flagFillIconHeight) {
-				sl_ui_pos size = Math::min(widthIcon - m_iconMarginLeft - m_iconMarginRight, heightIcon - m_iconMarginTop - m_iconMarginBottom);
-				widthIcon = size + m_iconMarginLeft + m_iconMarginRight;
-				heightIcon = size + m_iconMarginTop + m_iconMarginBottom;
 			}
 		}
 
@@ -986,7 +1011,11 @@ namespace slib
 			rcIcon.top += pt.y;
 			rcIcon.right += pt.x;
 			rcIcon.bottom += pt.y;
-			canvas->draw(rcIcon, icon);
+			if (m_iconSize.x > 0 && m_iconSize.y > 0) {
+				canvas->draw(rcIcon, icon);
+			} else {
+				canvas->draw(rcIcon, icon, ScaleMode::Contain, Alignment::MiddleCenter);
+			}
 		}
 		if (text.isNotEmpty() && rcText.getWidth() > 0 && rcText.getHeight() > 0) {
 			rcText.left += pt.x;
@@ -1042,7 +1071,7 @@ namespace slib
 		}
 	}
 
-#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_WIN32) && !defined(SLIB_UI_IS_ANDROID)
+#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_WIN32)
 	Ref<ViewInstance> Button::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;
