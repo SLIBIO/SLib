@@ -30,8 +30,6 @@ namespace slib
 		OP_SIMULATE
 	};
 
-#define RADIOGROUP_NAME_PREFIX "radioGroup_"
-	
 	sl_bool SAppDocument::_parseLayoutStyle(const String& localNamespace, const Ref<XmlElement>& element)
 	{
 		if (element.isNull()) {
@@ -252,6 +250,10 @@ namespace slib
 					_logError(element, _g_sdev_sapp_error_resource_layout_name_redefined.arg(name));
 					return sl_false;
 				}
+				if (layout->radioGroups.find(name)) {
+					_logError(element, _g_sdev_sapp_error_resource_layout_name_redefined.arg(name));
+					return sl_false;
+				}
 			} else {
 				name = layout->getAutoIncreasingName(item->itemType);
 				item->flagGeneratedName = sl_true;
@@ -463,8 +465,8 @@ namespace slib
 		{
 			ListElements<String> radioGroups(layout->radioGroups.getAllKeys());
 			for (sl_size i = 0; i < radioGroups.count; i++) {
-				sbHeader.add(String::format("\t\t\tslib::Ref<slib::RadioGroup> " RADIOGROUP_NAME_PREFIX "%s;%n", radioGroups[i]));
-				sbCpp.add(String::format("\t\t\t" RADIOGROUP_NAME_PREFIX "%s = new slib::RadioGroup;%n", radioGroups[i]));
+				sbHeader.add(String::format("\t\t\tslib::Ref<slib::RadioGroup> %s;%n", radioGroups[i]));
+				sbCpp.add(String::format("\t\t\t%s = new slib::RadioGroup;%n", radioGroups[i]));
 			}
 			if (radioGroups.count > 0) {
 				sbHeader.add("\r\n");
@@ -2695,11 +2697,15 @@ namespace slib
 					_logError(element, _g_sdev_sapp_error_resource_layout_name_invalid.arg(attr->group));
 					return sl_false;
 				}
+				if (params->resource->itemsByName.find(attr->group)) {
+					_logError(element, _g_sdev_sapp_error_resource_layout_name_redefined.arg(attr->group));
+					return sl_false;
+				}
 				params->resource->radioGroups.put(attr->group, sl_true);
 			}
 		} else if (op == OP_GENERATE_CPP) {
 			if (attr->group.isNotEmpty()) {
-				params->sbDefineInit->add(String::format("%s" RADIOGROUP_NAME_PREFIX "%s->add(%s);%n", strTab, attr->group, name));
+				params->sbDefineInit->add(String::format("%s%s->add(%s);%n", strTab, attr->group, name));
 			}
 		} else if (op == OP_SIMULATE) {
 			if (!flagOnLayout) {
@@ -2733,7 +2739,7 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR(returnKey, setReturnKeyType)
 		LAYOUT_CONTROL_GENERIC_ATTR(keyboard, setKeyboardType)
 		LAYOUT_CONTROL_GENERIC_ATTR(autoCap, setAutoCapitalizationType)
-				
+		
 		LAYOUT_CONTROL_ADD_STATEMENT
 		
 	}
