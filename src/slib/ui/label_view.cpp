@@ -22,7 +22,6 @@
 
 #include "slib/ui/label_view.h"
 
-#include "slib/core/scoped.h"
 #include "slib/graphics/util.h"
 
 namespace slib
@@ -31,7 +30,6 @@ namespace slib
 	
 	LabelView::LabelView()
 	{
-		setCreatingNativeWidget(sl_false);
 		setSavingCanvasState(sl_false);
 		
 		setUsingFont(sl_true);
@@ -55,15 +53,7 @@ namespace slib
 	
 	void LabelView::setText(const String& text, UIUpdateMode mode)
 	{
-		if (m_text == text) {
-			return;
-		}
-		
 		m_text = text;
-		
-		if (isNativeWidget()) {
-			_setText_NW(text);
-		}
 		invalidateLayoutOfWrappingControl(mode);
 	}
 	
@@ -75,11 +65,7 @@ namespace slib
 	void LabelView::setTextColor(const Color& color, UIUpdateMode mode)
 	{
 		m_textColor = color;
-		if (isNativeWidget()) {
-			_setTextColor_NW(color);
-		} else {
-			invalidate(mode);
-		}
+		invalidate(mode);
 	}
 	
 	Alignment LabelView::getGravity()
@@ -90,11 +76,7 @@ namespace slib
 	void LabelView::setGravity(Alignment align, UIUpdateMode mode)
 	{
 		m_textAlignment = align;
-		if (isNativeWidget()) {
-			_setTextAlignment_NW(align);
-		} else {
-			invalidate(mode);
-		}
+		invalidate(mode);
 	}
 	
 	MultiLineMode LabelView::getMultiLine()
@@ -140,39 +122,7 @@ namespace slib
 		}
 		if (flagVertical) {
 			setLayoutHeight((sl_ui_pos)(m_textBox.getContentHeight()) + getPaddingTop() + getPaddingBottom());
-		}
-		
+		}		
 	}
 	
-#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_WIN32) && !defined(SLIB_UI_IS_ANDROID)
-	Ref<ViewInstance> LabelView::createNativeWidget(ViewInstance* parent)
-	{
-		return sl_null;
-	}
-	
-	void LabelView::_setText_NW(const String& text)
-	{
-	}
-	
-	void LabelView::_setTextColor_NW(const Color& color)
-	{
-	}
-	
-	void LabelView::_setTextAlignment_NW(Alignment align)
-	{
-	}
-	
-	void LabelView::_setFont_NW(const Ref<Font>& font)
-	{
-	}
-	
-	void LabelView::_setBorder_NW(sl_bool flag)
-	{
-	}
-	
-	void LabelView::_setBackgroundColor_NW(const Color& color)
-	{
-	}
-#endif
-
 }

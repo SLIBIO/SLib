@@ -635,9 +635,6 @@
     <ClCompile Include="..\..\src\slib\ui\label_view.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\slib\ui\label_view_win32.cpp">
-      <Filter>src\ui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\slib\ui\linear_view.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>

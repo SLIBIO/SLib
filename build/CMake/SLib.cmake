@@ -356,10 +356,8 @@ if(ANDROID)
   "${SLIB_PATH}/src/slib/device/sensor_android.cpp"
   "${SLIB_PATH}/src/slib/device/vibrator_android.cpp"
 
-  "${SLIB_PATH}/src/slib/ui/button_android.cpp"
   "${SLIB_PATH}/src/slib/ui/common_dialogs_android.cpp"
   "${SLIB_PATH}/src/slib/ui/edit_view_android.cpp"
-  "${SLIB_PATH}/src/slib/ui/label_view_android.cpp"
   "${SLIB_PATH}/src/slib/ui/notification_android.cpp"
   "${SLIB_PATH}/src/slib/ui/render_view_android.cpp"
   "${SLIB_PATH}/src/slib/ui/scroll_view_android.cpp"

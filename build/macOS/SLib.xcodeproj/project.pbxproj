@@ -1123,7 +1123,6 @@
 		26D9D9BF1E96468D005F7BD3 /* gesture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E17DADF01E0C9A1E006161F6 /* gesture.cpp */; };
 		26D9D9C01E96468D005F7BD3 /* image_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD51E1C11940A00D47AB0 /* image_view.cpp */; };
 		26D9D9C11E96468D005F7BD3 /* label_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD50C1C11940A00D47AB0 /* label_view.cpp */; };
-		26D9D9C21E96468D005F7BD3 /* label_view_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD50F1C11940A00D47AB0 /* label_view_macos.mm */; };
 		26D9D9C31E96468D005F7BD3 /* linear_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C7E37D1D00097000C0A769 /* linear_view.cpp */; };
 		26D9D9C41E96468D005F7BD3 /* list_report_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5111C11940A00D47AB0 /* list_report_view.cpp */; };
 		26D9D9C51E96468D005F7BD3 /* list_report_view_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5121C11940A00D47AB0 /* list_report_view_macos.mm */; };
@@ -2286,7 +2285,6 @@
 		266DD5001C11940A00D47AB0 /* edit_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = edit_view.cpp; sourceTree = "<group>"; };
 		266DD5031C11940A00D47AB0 /* edit_view_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = edit_view_macos.mm; sourceTree = "<group>"; };
 		266DD50C1C11940A00D47AB0 /* label_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = label_view.cpp; sourceTree = "<group>"; };
-		266DD50F1C11940A00D47AB0 /* label_view_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = label_view_macos.mm; sourceTree = "<group>"; };
 		266DD5111C11940A00D47AB0 /* list_report_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_report_view.cpp; sourceTree = "<group>"; };
 		266DD5121C11940A00D47AB0 /* list_report_view_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = list_report_view_macos.mm; sourceTree = "<group>"; };
 		266DD5141C11940A00D47AB0 /* radio_button.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = radio_button.cpp; sourceTree = "<group>"; };
@@ -4266,7 +4264,6 @@
 				E17DADF01E0C9A1E006161F6 /* gesture.cpp */,
 				266DD51E1C11940A00D47AB0 /* image_view.cpp */,
 				266DD50C1C11940A00D47AB0 /* label_view.cpp */,
-				266DD50F1C11940A00D47AB0 /* label_view_macos.mm */,
 				26C7E37D1D00097000C0A769 /* linear_view.cpp */,
 				266DD5111C11940A00D47AB0 /* list_report_view.cpp */,
 				266DD5121C11940A00D47AB0 /* list_report_view_macos.mm */,
@@ -6142,7 +6139,6 @@
 				26D9D9951E96467B005F7BD3 /* http_common.cpp in Sources */,
 				26D9D9BF1E96468D005F7BD3 /* gesture.cpp in Sources */,
 				26D9D9231E9645CE005F7BD3 /* bezier.cpp in Sources */,
-				26D9D9C21E96468D005F7BD3 /* label_view_macos.mm in Sources */,
 				26D9D99E1E96467B005F7BD3 /* network_async_unix.cpp in Sources */,
 				26D9D9241E9645CE005F7BD3 /* sha1.cpp in Sources */,
 				26D9D9901E964675005F7BD3 /* video_codec.cpp in Sources */,
