@@ -47,16 +47,8 @@ namespace slib
 		}
 		
 	public:
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
+		void onDrawAll(Canvas* canvas, const Rectangle& rect, const DrawParam& param) override
 		{
-			Rectangle rect = rectDst;
-			sl_real px = rect.getWidth() / 6;
-			rect.left += px;
-			rect.right -= px;
-			sl_real py = rect.getHeight() / 6;
-			rect.top += py;
-			rect.bottom -= py;
-			
 			sl_bool flagAntiAlias = canvas->isAntiAlias();
 			canvas->setAntiAlias(sl_false);
 			canvas->drawRectangle(rect, m_penBorder, m_brush);
@@ -141,6 +133,7 @@ namespace slib
 		setBackground(Ref<Drawable>::null(), UIUpdateMode::Init);
 		
 		setTextColor(Color::Black, UIUpdateMode::Init);
+		setTextMarginLeft(2 * UIResource::toUiPos(UIResource::dpToPixel(1)), UIUpdateMode::Init);
 	}
 
 	CheckBox::~CheckBox()

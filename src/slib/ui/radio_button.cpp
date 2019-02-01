@@ -48,16 +48,8 @@ namespace slib
 		}
 		
 	public:
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
+		void onDrawAll(Canvas* canvas, const Rectangle& rect, const DrawParam& param) override
 		{
-			Rectangle rect = rectDst;
-			sl_real px = rect.getWidth() / 6;
-			rect.left += px;
-			rect.right -= px;
-			sl_real py = rect.getHeight() / 6;
-			rect.top += py;
-			rect.bottom -= py;
-
 			canvas->drawEllipse(rect, m_penBorder, m_brushBack);
 			if (m_brushCheck.isNotNull()) {
 				Rectangle rcCheck;
