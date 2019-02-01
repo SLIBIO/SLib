@@ -385,6 +385,7 @@ namespace slib
 	void EditView::dispatchChange(String* value)
 	{
 		SLIB_INVOKE_EVENT_HANDLER(Change, value)
+		m_text = *value;
 	}
 
 	SLIB_DEFINE_EVENT_HANDLER(EditView, ReturnKey)
