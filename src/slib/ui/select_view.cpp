@@ -421,6 +421,8 @@ namespace slib
 		}
 	}
 	
+	UISize _priv_SelectView_macOS_measureSize(SelectView* view);
+
 	void SelectView::onUpdateLayout()
 	{
 		sl_bool flagHorizontal = isWidthWrapping();
@@ -430,6 +432,18 @@ namespace slib
 			return;
 		}
 		
+#ifdef SLIB_UI_IS_MACOS
+		if (isCreatingNativeWidget()) {
+			UISize size = _priv_SelectView_macOS_measureSize(this);
+			if (flagHorizontal) {
+				setLayoutWidth(size.x);
+			}
+			if (flagVertical) {
+				setLayoutHeight(size.y);
+			}
+			return;
+		}
+#endif
 		if (flagHorizontal) {
 			sl_ui_pos width = m_iconSize.x * 2 + getPaddingLeft() + getPaddingRight();
 			if (width < 0) {
