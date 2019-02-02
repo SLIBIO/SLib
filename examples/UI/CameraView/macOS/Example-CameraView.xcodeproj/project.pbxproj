@@ -14,6 +14,7 @@
 		264A3BFC205306D90070817E /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 264A3BFB205306D90070817E /* main.mm */; };
 		264A3C09205308A70070817E /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264A3C08205308A70070817E /* AVFoundation.framework */; };
 		264A3C0B205308AF0070817E /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264A3C0A205308AF0070817E /* CoreMedia.framework */; };
+		26BB18172205AA7E0089C7EC /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26BB18162205AA7E0089C7EC /* IOKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		264A3BFB205306D90070817E /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		264A3C08205308A70070817E /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		264A3C0A205308AF0070817E /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		26BB18162205AA7E0089C7EC /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26BB18172205AA7E0089C7EC /* IOKit.framework in Frameworks */,
 				264A3C0B205308AF0070817E /* CoreMedia.framework in Frameworks */,
 				264A3C09205308A70070817E /* AVFoundation.framework in Frameworks */,
 			);
@@ -86,6 +89,7 @@
 		264A3C07205308A70070817E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				26BB18162205AA7E0089C7EC /* IOKit.framework */,
 				264A3C0A205308AF0070817E /* CoreMedia.framework */,
 				264A3C08205308A70070817E /* AVFoundation.framework */,
 			);

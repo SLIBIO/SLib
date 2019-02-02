@@ -15,6 +15,7 @@
 		26B9068A2110223800D972FB /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26B906892110223800D972FB /* main.mm */; };
 		26B906962110233800D972FB /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B906952110233700D972FB /* app.cpp */; };
 		26B906992110244B00D972FB /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26B906982110244B00D972FB /* WebKit.framework */; };
+		26BB18192205AA860089C7EC /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26BB18182205AA860089C7EC /* IOKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		26B906942110233700D972FB /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = ../src/app.h; sourceTree = "<group>"; };
 		26B906952110233700D972FB /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = ../src/app.cpp; sourceTree = "<group>"; };
 		26B906982110244B00D972FB /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		26BB18182205AA860089C7EC /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,6 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26BB18192205AA860089C7EC /* IOKit.framework in Frameworks */,
 				2628EAC621BF883F00D8CD00 /* libz.tbd in Frameworks */,
 				26B906992110244B00D972FB /* WebKit.framework in Frameworks */,
 			);
@@ -89,6 +92,7 @@
 		26B906972110244B00D972FB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				26BB18182205AA860089C7EC /* IOKit.framework */,
 				2628EAC521BF883F00D8CD00 /* libz.tbd */,
 				26B906982110244B00D972FB /* WebKit.framework */,
 			);
