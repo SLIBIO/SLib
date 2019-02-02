@@ -1,0 +1,35 @@
+CURRENT_PATH=`pwd`
+if [ -z $SLIB_PATH ]; then
+ bash $(dirname $0)/../../setup-path
+fi
+cd $CURRENT_PATH
+APP_NAME=$1
+if [ -z $APP_NAME ]; then
+ echo "Please input the application name:"
+ read APP_NAME
+ APP_NAME=`echo $APP_NAME | sed 's/[^a-zA-Z0-9_]//g'`
+ if [ -z $APP_NAME ]; then
+  exit
+ fi
+fi
+
+echo "New SLib App (Desktop): $APP_NAME"
+
+cp -R "$SLIB_PATH/tool/template/desktop-sapp/src" "$CURRENT_PATH"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/src/cpp/app.h"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/src/cpp/app.cpp"
+mv "$CURRENT_PATH/src/template_gen" "$CURRENT_PATH/src/gen"
+
+cp -R "$SLIB_PATH/tool/template/desktop-sapp/macOS" "$CURRENT_PATH"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/macOS/Project.xcodeproj/project.pbxproj"
+mv "$CURRENT_PATH/macOS/Project.xcodeproj" "$CURRENT_PATH/macOS/$APP_NAME.xcodeproj"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/macOS/project/Base.lproj/MainMenu.xib"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/macOS/project/main.mm"
+
+cp -R "$SLIB_PATH/tool/template/desktop-sapp/Win32" "$CURRENT_PATH"
+mv "$CURRENT_PATH/Win32/SLIB_TEMPLATE_APP_NAME.sln" "$CURRENT_PATH/Win32/$APP_NAME.sln"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/Win32/$APP_NAME.sln"
+mv "$CURRENT_PATH/Win32/SLIB_TEMPLATE_APP_NAME.vcxproj" "$CURRENT_PATH/Win32/$APP_NAME.vcxproj"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/Win32/$APP_NAME.vcxproj"
+mv "$CURRENT_PATH/Win32/SLIB_TEMPLATE_APP_NAME.vcxproj.filters" "$CURRENT_PATH/Win32/$APP_NAME.vcxproj.filters"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/Win32/main.cpp"

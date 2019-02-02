@@ -1,0 +1,11 @@
+<sapp>
+	<configuration>
+		<generate-cpp>
+			<target-path>../gen</target-path>
+			<namespace>sapp</namespace>
+		</generate-cpp>
+		<simulator>
+			<locale></locale>
+		</simulator>
+	</configuration>
+</sapp>

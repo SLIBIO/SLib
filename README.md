@@ -116,15 +116,16 @@ And then please create an empty directory, and then create a C++ project using f
 
 | Platform | Application Type | Command |
 | ----|----|----|
-| Android & iOS | Mobile App | `new-slib-app-mobile YOUR_PROJECT_NAME YOUR_APPLICATION_ID` |
-| Android | Mobile App | `new-slib-app-android YOUR_PROJECT_NAME YOUR_APPLICATION_ID` |
-| iOS | Mobile App | `new-slib-app-ios YOUR_PROJECT_NAME` |
-| macOS | Desktop App | `new-slib-app-macos YOUR_PROJECT_NAME` |
-| macOS | Console App | `new-slib-console-macos YOUR_PROJECT_NAME` |
-| Win32 | Desktop App | `new-slib-app-win32 YOUR_PROJECT_NAME` |
-| Win32 | Console App | `new-slib-console-win32 YOUR_PROJECT_NAME` |
-| Linux | Desktop App | `new-slib-app-linux YOUR_PROJECT_NAME` |
-| Linux | Console App | `new-slib-console-linux YOUR_PROJECT_NAME` |
+| Android & iOS | Mobile App (With `sapp`) | `new-slib-app-mobile YOUR_PROJECT_NAME YOUR_APPLICATION_ID` |
+| macOS & Win32 | Desktop App (With `sapp`) | `new-slib-app-desktop YOUR_PROJECT_NAME` |
+| Android | Mobile App (Without `sapp`) | `new-slib-app-android YOUR_PROJECT_NAME YOUR_APPLICATION_ID` |
+| iOS | Mobile App (Without `sapp`) | `new-slib-app-ios YOUR_PROJECT_NAME` |
+| macOS | Desktop App (Without `sapp`) | `new-slib-app-macos YOUR_PROJECT_NAME` |
+| macOS | Console App (Without `sapp`) | `new-slib-console-macos YOUR_PROJECT_NAME` |
+| Win32 | Desktop App (Without `sapp`) | `new-slib-app-win32 YOUR_PROJECT_NAME` |
+| Win32 | Console App (Without `sapp`) | `new-slib-console-win32 YOUR_PROJECT_NAME` |
+| Linux | Desktop App (Without `sapp`) | `new-slib-app-linux YOUR_PROJECT_NAME` |
+| Linux | Console App (Without `sapp`) | `new-slib-console-linux YOUR_PROJECT_NAME` |
 
 Note that you have to compile SLib before creating new SLib application projects.
 
@@ -133,7 +134,7 @@ Here is an example for creating a mobile app project.
 ```
 mkdir ~/SLibMobileExample
 cd ~/SLibMobileExample
-new-slib-app-mobile TestApp org.example.testapp
+new-slib-app-mobile Test org.example.testapp
 ```
 
 To preview the user interface xml files
@@ -145,12 +146,21 @@ sapp MainPage
 ```
 
 
+Here is an example for creating a desktop app project.
+
+```
+mkdir ~/SLibDesktopExample
+cd ~/SLibDesktopExample
+new-slib-app-desktop Test
+```
+
+
 Here is an example for creating an Android project.
 
 ```
 mkdir ~/SLibAndroidExample
 cd ~/SLibAndroidExample
-new-slib-app-android TestApp org.example.testapp
+new-slib-app-android Test org.example.testapp
 ```
 
 Here is an example for creating a macOS Desktop project.
@@ -158,7 +168,7 @@ Here is an example for creating a macOS Desktop project.
 ```
 mkdir ~/SLibMacOSExample
 cd ~/SLibMacOSExample
-new-slib-app-macos TestApp
+new-slib-app-macos Test
 ```
 
 After creating projects, you can share same source code across the projects by adding same sources using IDE.

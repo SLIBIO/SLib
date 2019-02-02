@@ -19,7 +19,7 @@ sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/Project.xcodepro
 mv "$CURRENT_PATH/Project.xcodeproj" "$CURRENT_PATH/$APP_NAME.xcodeproj"
 cp -R "$SLIB_PATH/tool/template/macOS/project" "$CURRENT_PATH"
 sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/project/Base.lproj/MainMenu.xib"
-sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/project/main.cpp"
+sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/project/main.mm"
 cp "$SLIB_PATH/tool/template/desktop/app.h" "$CURRENT_PATH"
 sed -i '' "s/SLIB_TEMPLATE_APP_NAME/$APP_NAME/g" "$CURRENT_PATH/app.h"
 cp "$SLIB_PATH/tool/template/desktop/app.cpp" "$CURRENT_PATH"

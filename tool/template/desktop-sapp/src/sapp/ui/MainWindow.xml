@@ -1,0 +1,27 @@
+<sapp>
+	<layout
+		type='window'
+		title='Hello'
+		width='400'
+		height='300'
+		centerScreen='true'
+		>
+		
+		<linear alignCenter='true'>
+
+			<image
+				src='@drawable/slib_icon'
+				width='150'
+				/>
+
+			<label
+				text='Hello World'
+				fontSize='20'
+				textColor='black'
+				centerHorizontal='true'
+				/>
+
+		</linear>
+
+ 	</layout>
+</sapp>

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		263916F221C8F86C008B335B /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 263916F121C8F86C008B335B /* CoreMedia.framework */; };
 		263916F421C8F870008B335B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 263916F321C8F870008B335B /* AVFoundation.framework */; };
-		265BF18A217239A30073F7B8 /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265BF188217239A30073F7B8 /* app.cpp */; };
 		265BF19121723BCD0073F7B8 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 265BF19021723BCD0073F7B8 /* OpenGL.framework */; };
 		265BF19321723BFB0073F7B8 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 265BF19221723BFB0073F7B8 /* AppKit.framework */; };
 		265BF19421723C220073F7B8 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 265BF18E21723BBA0073F7B8 /* Quartz.framework */; };
@@ -17,13 +16,19 @@
 		26840C2C2111FA0300A01A29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26840C2B2111FA0300A01A29 /* Assets.xcassets */; };
 		26840C2F2111FA0300A01A29 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 26840C2D2111FA0300A01A29 /* MainMenu.xib */; };
 		26840C322111FA0300A01A29 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26840C312111FA0300A01A29 /* main.mm */; };
+		26BB17F82205A6EA0089C7EC /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17F52205A6EA0089C7EC /* app.cpp */; };
+		26BB17F92205A6EA0089C7EC /* MainWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17F72205A6EA0089C7EC /* MainWindow.cpp */; };
+		26BB180A2205A7430089C7EC /* layouts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17FD2205A7420089C7EC /* layouts.cpp */; };
+		26BB180B2205A7430089C7EC /* colors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17FF2205A7420089C7EC /* colors.cpp */; };
+		26BB180C2205A7430089C7EC /* strings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB18012205A7420089C7EC /* strings.cpp */; };
+		26BB180D2205A7430089C7EC /* raws.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB18032205A7420089C7EC /* raws.cpp */; };
+		26BB180E2205A7430089C7EC /* drawables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB18062205A7420089C7EC /* drawables.cpp */; };
+		26BB180F2205A7430089C7EC /* menus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB18092205A7430089C7EC /* menus.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		263916F121C8F86C008B335B /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		263916F321C8F870008B335B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		265BF188217239A30073F7B8 /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = app.cpp; sourceTree = "<group>"; };
-		265BF189217239A30073F7B8 /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = app.h; sourceTree = "<group>"; };
 		265BF18E21723BBA0073F7B8 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
 		265BF19021723BCD0073F7B8 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		265BF19221723BFB0073F7B8 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -33,6 +38,25 @@
 		26840C2E2111FA0300A01A29 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		26840C302111FA0300A01A29 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		26840C312111FA0300A01A29 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		26BB17F42205A6EA0089C7EC /* MainWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MainWindow.h; path = ../src/cpp/MainWindow.h; sourceTree = "<group>"; };
+		26BB17F52205A6EA0089C7EC /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = ../src/cpp/app.cpp; sourceTree = "<group>"; };
+		26BB17F62205A6EA0089C7EC /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = ../src/cpp/app.h; sourceTree = "<group>"; };
+		26BB17F72205A6EA0089C7EC /* MainWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MainWindow.cpp; path = ../src/cpp/MainWindow.cpp; sourceTree = "<group>"; };
+		26BB17FC2205A72E0089C7EC /* sapp */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sapp; path = ../src/sapp; sourceTree = "<group>"; };
+		26BB17FD2205A7420089C7EC /* layouts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layouts.cpp; path = ../src/gen/layouts.cpp; sourceTree = "<group>"; };
+		26BB17FE2205A7420089C7EC /* resources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = resources.h; path = ../src/gen/resources.h; sourceTree = "<group>"; };
+		26BB17FF2205A7420089C7EC /* colors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = colors.cpp; path = ../src/gen/colors.cpp; sourceTree = "<group>"; };
+		26BB18002205A7420089C7EC /* layouts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = layouts.h; path = ../src/gen/layouts.h; sourceTree = "<group>"; };
+		26BB18012205A7420089C7EC /* strings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = strings.cpp; path = ../src/gen/strings.cpp; sourceTree = "<group>"; };
+		26BB18022205A7420089C7EC /* drawables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = drawables.h; path = ../src/gen/drawables.h; sourceTree = "<group>"; };
+		26BB18032205A7420089C7EC /* raws.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raws.cpp; path = ../src/gen/raws.cpp; sourceTree = "<group>"; };
+		26BB18042205A7420089C7EC /* menus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = menus.h; path = ../src/gen/menus.h; sourceTree = "<group>"; };
+		26BB18052205A7420089C7EC /* strings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = strings.h; path = ../src/gen/strings.h; sourceTree = "<group>"; };
+		26BB18062205A7420089C7EC /* drawables.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = drawables.cpp; path = ../src/gen/drawables.cpp; sourceTree = "<group>"; };
+		26BB18072205A7420089C7EC /* colors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = colors.h; path = ../src/gen/colors.h; sourceTree = "<group>"; };
+		26BB18082205A7420089C7EC /* raws.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = raws.h; path = ../src/gen/raws.h; sourceTree = "<group>"; };
+		26BB18092205A7430089C7EC /* menus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = menus.cpp; path = ../src/gen/menus.cpp; sourceTree = "<group>"; };
+		26BB18102205A74C0089C7EC /* ui */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ui; path = ../src/gen/ui; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,10 +122,43 @@
 		26840C392111FB2E00A01A29 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				265BF188217239A30073F7B8 /* app.cpp */,
-				265BF189217239A30073F7B8 /* app.h */,
+				26BB17F32205A6CA0089C7EC /* cpp */,
+				26BB17FC2205A72E0089C7EC /* sapp */,
+				26BB17FA2205A7160089C7EC /* gen */,
 			);
 			name = src;
+			sourceTree = "<group>";
+		};
+		26BB17F32205A6CA0089C7EC /* cpp */ = {
+			isa = PBXGroup;
+			children = (
+				26BB17F52205A6EA0089C7EC /* app.cpp */,
+				26BB17F62205A6EA0089C7EC /* app.h */,
+				26BB17F72205A6EA0089C7EC /* MainWindow.cpp */,
+				26BB17F42205A6EA0089C7EC /* MainWindow.h */,
+			);
+			name = cpp;
+			sourceTree = "<group>";
+		};
+		26BB17FA2205A7160089C7EC /* gen */ = {
+			isa = PBXGroup;
+			children = (
+				26BB17FF2205A7420089C7EC /* colors.cpp */,
+				26BB18072205A7420089C7EC /* colors.h */,
+				26BB18062205A7420089C7EC /* drawables.cpp */,
+				26BB18022205A7420089C7EC /* drawables.h */,
+				26BB17FD2205A7420089C7EC /* layouts.cpp */,
+				26BB18002205A7420089C7EC /* layouts.h */,
+				26BB18092205A7430089C7EC /* menus.cpp */,
+				26BB18042205A7420089C7EC /* menus.h */,
+				26BB18032205A7420089C7EC /* raws.cpp */,
+				26BB18082205A7420089C7EC /* raws.h */,
+				26BB17FE2205A7420089C7EC /* resources.h */,
+				26BB18012205A7420089C7EC /* strings.cpp */,
+				26BB18052205A7420089C7EC /* strings.h */,
+				26BB18102205A74C0089C7EC /* ui */,
+			);
+			name = gen;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -111,6 +168,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 26840C362111FA0300A01A29 /* Build configuration list for PBXNativeTarget "SLIB_TEMPLATE_APP_NAME" */;
 			buildPhases = (
+				26BB18112205A7FF0089C7EC /* ShellScript */,
 				26840C212111FA0200A01A29 /* Sources */,
 				26840C222111FA0200A01A29 /* Frameworks */,
 				26840C232111FA0200A01A29 /* Resources */,
@@ -168,13 +226,40 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		26BB18112205A7FF0089C7EC /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "${SLIB_PATH}/tool/bin/sapp gen ${PROJECT_DIR}/../src/sapp\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		26840C212111FA0200A01A29 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26BB180F2205A7430089C7EC /* menus.cpp in Sources */,
+				26BB180B2205A7430089C7EC /* colors.cpp in Sources */,
 				26840C322111FA0300A01A29 /* main.mm in Sources */,
-				265BF18A217239A30073F7B8 /* app.cpp in Sources */,
+				26BB180C2205A7430089C7EC /* strings.cpp in Sources */,
+				26BB180E2205A7430089C7EC /* drawables.cpp in Sources */,
+				26BB180A2205A7430089C7EC /* layouts.cpp in Sources */,
+				26BB180D2205A7430089C7EC /* raws.cpp in Sources */,
+				26BB17F92205A6EA0089C7EC /* MainWindow.cpp in Sources */,
+				26BB17F82205A6EA0089C7EC /* app.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
