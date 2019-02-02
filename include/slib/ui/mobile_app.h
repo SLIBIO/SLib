@@ -143,8 +143,6 @@ namespace slib
 	protected:
 		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
-		void onClose(UIEvent* ev) override;
-		
 	};
 
 }

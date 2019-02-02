@@ -62,6 +62,13 @@ namespace slib
 		void* _thiz = this;
 		if (_thiz) {
 			m_mainWindow = window;
+#ifdef SLIB_PLATFORM_IS_DESKTOP
+			if (window.isNotNull()) {
+				window->addOnDestroy([](Window*) {
+					UI::quitApp();
+				});
+			}
+#endif
 		}
 	}
 	

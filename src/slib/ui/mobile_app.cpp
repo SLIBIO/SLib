@@ -458,12 +458,5 @@ namespace slib
 	{
 		MobileApp::dispatchResizeToApp(width, height);
 	}
-	
-	void MobileMainWindow::onClose(UIEvent* ev)
-	{
-#ifdef SLIB_PLATFORM_IS_DESKTOP
-		MobileApp::quit();
-#endif
-	}
 
 }
