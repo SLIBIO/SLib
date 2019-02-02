@@ -116,16 +116,16 @@ And then please create an empty directory, and then create a C++ project using f
 
 | Platform | Application Type | Command |
 | ----|----|----|
-| Android & iOS | Mobile App (With `sapp`) | `new-slib-app-mobile YOUR_PROJECT_NAME YOUR_APPLICATION_ID` |
-| macOS & Win32 | Desktop App (With `sapp`) | `new-slib-app-desktop YOUR_PROJECT_NAME` |
-| Android | Mobile App (Without `sapp`) | `new-slib-app-android YOUR_PROJECT_NAME YOUR_APPLICATION_ID` |
-| iOS | Mobile App (Without `sapp`) | `new-slib-app-ios YOUR_PROJECT_NAME` |
-| macOS | Desktop App (Without `sapp`) | `new-slib-app-macos YOUR_PROJECT_NAME` |
-| macOS | Console App (Without `sapp`) | `new-slib-console-macos YOUR_PROJECT_NAME` |
-| Win32 | Desktop App (Without `sapp`) | `new-slib-app-win32 YOUR_PROJECT_NAME` |
-| Win32 | Console App (Without `sapp`) | `new-slib-console-win32 YOUR_PROJECT_NAME` |
-| Linux | Desktop App (Without `sapp`) | `new-slib-app-linux YOUR_PROJECT_NAME` |
-| Linux | Console App (Without `sapp`) | `new-slib-console-linux YOUR_PROJECT_NAME` |
+| Android <br/> iOS | Mobile App <br/>(With `sapp`) | `new-slib-app-mobile YOUR_PROJECT_NAME YOUR_APPLICATION_ID` |
+| macOS <br/> Win32 | Desktop App <br/>(With `sapp`) | `new-slib-app-desktop YOUR_PROJECT_NAME` |
+| Android | Mobile App <br/>(Without `sapp`) | `new-slib-app-android YOUR_PROJECT_NAME YOUR_APPLICATION_ID` |
+| iOS | Mobile App <br/>(Without `sapp`) | `new-slib-app-ios YOUR_PROJECT_NAME` |
+| macOS | Desktop App <br/>(Without `sapp`) | `new-slib-app-macos YOUR_PROJECT_NAME` |
+| macOS | Console App <br/>(Without `sapp`) | `new-slib-console-macos YOUR_PROJECT_NAME` |
+| Win32 | Desktop App <br/>(Without `sapp`) | `new-slib-app-win32 YOUR_PROJECT_NAME` |
+| Win32 | Console App <br/>(Without `sapp`) | `new-slib-console-win32 YOUR_PROJECT_NAME` |
+| Linux | Desktop App <br/>(Without `sapp`) | `new-slib-app-linux YOUR_PROJECT_NAME` |
+| Linux | Console App <br/>(Without `sapp`) | `new-slib-console-linux YOUR_PROJECT_NAME` |
 
 Note that you have to compile SLib before creating new SLib application projects.
 
