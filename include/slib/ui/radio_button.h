@@ -55,8 +55,9 @@ namespace slib
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
-	protected:
-		void onClickEvent(UIEvent* ev) override;
+		void dispatchClickEvent(UIEvent* ev) override;
+		
+		void dispatchClick() override;
 
 	public:
 		AtomicWeakRef<RadioGroup> m_group;

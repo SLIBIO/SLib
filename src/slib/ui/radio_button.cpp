@@ -149,15 +149,28 @@ namespace slib
 		CheckBox::setChecked(flag, mode);
 	}
 	
-	void RadioButton::onClickEvent(UIEvent* ev)
+	void RadioButton::dispatchClickEvent(UIEvent* ev)
 	{
 		Ref<RadioGroup> group = m_group;
 		if (group.isNotNull()) {
 			group->select(this);
 			group->dispatchSelect(this);
-			return;
+		} else {
+			CheckBox::setChecked(sl_true);
 		}
-		CheckBox::setChecked(sl_true);
+		Button::dispatchClickEvent(ev);
+	}
+
+	void RadioButton::dispatchClick()
+	{
+		Ref<RadioGroup> group = m_group;
+		if (group.isNotNull()) {
+			group->select(this);
+			group->dispatchSelect(this);
+		} else {
+			CheckBox::setChecked(sl_true);
+		}
+		Button::dispatchClick();
 	}
 
 	
