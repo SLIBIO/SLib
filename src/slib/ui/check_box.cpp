@@ -165,12 +165,12 @@ namespace slib
 
 	UISize CheckBox::measureLayoutContentSize()
 	{
-#if defined(SLIB_PLATFORM_IS_MACOS)
+#if defined(SLIB_UI_IS_MACOS)
 		if (isCreatingNativeWidget()) {
 			return _priv_CheckBox_macOS_measureSize(this);
 		}
 #endif
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_UI_IS_WIN32)
 		if (isCreatingNativeWidget()) {
 			return _priv_CheckBox_Win32_measureSize(this);
 		}
