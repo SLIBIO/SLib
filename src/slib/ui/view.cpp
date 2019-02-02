@@ -7157,7 +7157,25 @@ namespace slib
 	
 	void View::onUpdateLayout()
 	{
-		measureLayoutWrappingSize(isWidthWrapping(), isHeightWrapping());
+		if (m_children.isNotEmpty()) {
+			measureLayoutWrappingSize(isWidthWrapping(), isHeightWrapping());
+		} else {
+#if defined(SLIB_PLATFORM_IS_MOBILE)
+			if (isWidthWrapping()) {
+				setLayoutWidth(UI::getScreenWidth() / 4);
+			}
+			if (isHeightWrapping()) {
+				setLayoutHeight(UI::getScreenWidth() / 6);
+			}
+#else
+			if (isWidthWrapping()) {
+				setLayoutWidth(80);
+			}
+			if (isHeightWrapping()) {
+				setLayoutHeight(60);
+			}
+#endif
+		}
 	}
 	
 	void View::onChangePadding()

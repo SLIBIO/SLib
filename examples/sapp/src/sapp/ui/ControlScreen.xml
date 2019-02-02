@@ -8,37 +8,37 @@
 			style='button_back'
 			/>
 		<scroll width='fill' height='fill' below='btnBack'>
-			<group width='fill' height='wrap' minHeight='85%vh' padding='10%smin'>
-				<linear
-					width='wrap'
-					height='wrap'
-					alignCenter='true'
-				>
-					<button name='btnSetOrientationPortrait' text='Portrait' style='button_normal,menu_button' />
+			<group width='fill' minHeight='85%vh' padding='10%smin'>
 
-					<button name='btnSetOrientationPortraitUpDown' text='Portrait UpDown' style='button_normal,menu_button'/>
+				<linear alignCenter='true'>
 
-					<button name='btnSetOrientationLandscapeRight' text='Landscape Right' style='button_normal,menu_button'/>
+					<button name='btnSetOrientationPortrait' text='Portrait' style='menu_button' />
 
-					<button name='btnSetOrientationLandscapeLeft' text='Landscape Left' style='button_normal,menu_button'/>
+					<button name='btnSetOrientationPortraitUpDown' text='Portrait UpDown' style='menu_button'/>
 
-					<button name='btnSetOrientationLandscape' text='Landscape Left/Right' style='button_normal,menu_button'/>
+					<button name='btnSetOrientationLandscapeRight' text='Landscape Right' style='menu_button'/>
 
-					<button name='btnSetOrientationAll' text='All Orientation' style='button_normal,menu_button'/>
+					<button name='btnSetOrientationLandscapeLeft' text='Landscape Left' style='menu_button'/>
 
-					<button name='btnBlackStatusBar' text='Black Status Bar' style='button_normal,menu_button'/>
+					<button name='btnSetOrientationLandscape' text='Landscape Left/Right' style='menu_button'/>
 
-					<button name='btnLightStatusBar' text='Light Status Bar' style='button_normal,menu_button'/>
+					<button name='btnSetOrientationAll' text='All Orientation' style='menu_button'/>
 
-					<button name='btnHideStatusBar' text='Hide Status Bar' style='button_normal,menu_button'/>
+					<button name='btnBlackStatusBar' text='Black Status Bar' style='menu_button'/>
+
+					<button name='btnLightStatusBar' text='Light Status Bar' style='menu_button'/>
+
+					<button name='btnHideStatusBar' text='Hide Status Bar' style='menu_button'/>
 					
 				</linear>
+
 			</group>
 		</scroll>
  	</layout>
 
 	<style
 		name='menu_button'
+		inherit='button_normal'
 		width='80%smin'
 		marginTop='2%smin'
 		/>

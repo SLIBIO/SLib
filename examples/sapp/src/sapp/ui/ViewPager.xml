@@ -25,7 +25,7 @@
 				<group
 					background='green'
 				>
-					<label width='wrap' height='wrap' alignCenter='true' text='Swipe' fontSize='20%sw'/>
+					<label alignCenter='true' text='Swipe' fontSize='20%sw'/>
 				</group>
 			</item>
 

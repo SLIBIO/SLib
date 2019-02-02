@@ -6,8 +6,6 @@
 		
 		<label
 			text='Hello World'
-			width='wrap'
-			height='wrap'
 			fontSize='5mm'
 			textColor='black'
 			alignCenter='true'

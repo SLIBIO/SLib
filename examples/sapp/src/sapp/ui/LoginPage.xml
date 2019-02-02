@@ -6,7 +6,6 @@
 		
 		<linear
 			width='fill'
-			height='wrap'
 			centerVertical='true'
 		>
 			<image
@@ -28,7 +27,6 @@
 					name='selectJob'
 					width='*'
 					fontSize='4%sw'
-					height='6%sw'
 					border='false'
 					centerVertical='true'
 				>
@@ -98,11 +96,11 @@
 			/>
  	</layout>
 
-	<style name='label' fontSize='4%sw' textColor='black' width='wrap' height='wrap'/>
+	<style name='label' fontSize='4%sw' textColor='black' />
 
 	<style name='edit' fontSize='4%sw' textColor='black' height='6%sw'/>
 
-	<style name='login_section' width='fill' height='wrap' paddingTop='3%sw' background='white' />
+	<style name='login_section' width='fill' paddingTop='3%sw' background='white' />
 
 	<style name='border' width='fill' height='1px' background='#c0c0c0'/>
 

@@ -2,8 +2,6 @@
 	<include name='common_header'>
 		<label
 			text='Included Layout'
-			width='wrap'
-			height='wrap'
 			fontSize='5%sw'
 			alignCenter='true'
 			/>

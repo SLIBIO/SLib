@@ -106,6 +106,8 @@ namespace slib
 	protected:
 		void onDraw(Canvas* canvas) override;
 		
+		void onUpdateLayout() override;
+
 	protected:
 		float refineValue(float value);
 		

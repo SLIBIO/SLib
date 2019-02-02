@@ -275,6 +275,45 @@ namespace slib
 		}
 	}
 	
+	void ProgressBar::onUpdateLayout()
+	{
+		sl_bool flagHorizontal = isWidthWrapping();
+		sl_bool flagVertical = isHeightWrapping();
+		
+		if (!flagVertical && !flagHorizontal) {
+			return;
+		}
+		
+		Ref<Font> font = getFont();
+
+		if (flagHorizontal) {
+			sl_ui_pos width = getPaddingLeft() + getPaddingRight();
+			if (font.isNotNull()) {
+				sl_ui_pos t = (sl_ui_pos)(font->getFontHeight());
+				if (t > 0) {
+					width += t * 10;
+				}
+			}
+			if (width < 0) {
+				width = 0;
+			}
+			setLayoutWidth(width);
+		}
+		if (flagVertical) {
+			sl_ui_pos height = getPaddingTop() + getPaddingBottom();
+			if (font.isNotNull()) {
+				sl_ui_pos t = (sl_ui_pos)(font->getFontHeight());
+				if (t > 0) {
+					height += t;
+				}
+			}
+			if (height < 0) {
+				height = 0;
+			}
+			setLayoutHeight(height);
+		}
+	}
+	
 	float ProgressBar::refineValue(float value)
 	{
 		if (m_flagDiscrete) {

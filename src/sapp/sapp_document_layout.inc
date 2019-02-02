@@ -1241,7 +1241,7 @@ namespace slib
 				if (!(_getStringValue(resource->name, attr->NAME, element, _stringValue))) { \
 					return sl_false; \
 				} \
-				view->SETFUNC(_stringValue, UIUpdateMode::Init); \
+				view->SETFUNC(_stringValue); \
 			} \
 		} \
 	}
@@ -1269,7 +1269,7 @@ namespace slib
 				if (!(_getDrawableValue(resource->name, attr->NAME, element, _drawableValue))) { \
 					return sl_false; \
 				} \
-				view->SETFUNC(_drawableValue, UIUpdateMode::None); \
+				view->SETFUNC(_drawableValue); \
 			} \
 		} \
 	}
@@ -1297,7 +1297,7 @@ namespace slib
 				if (!(_getColorValue(resource->name, attr->NAME, element, _colorValue))) { \
 					return sl_false; \
 				} \
-				view->SETFUNC(_colorValue, UIUpdateMode::None); \
+				view->SETFUNC(_colorValue); \
 			} \
 		} \
 	}
@@ -1400,6 +1400,7 @@ namespace slib
 		
 		params->name = "m_contentView";
 		if (!(_processLayoutResourceControl_View(params))) {
+			params->resourceItem->attrsView->resetLayout();
 			return sl_false;
 		}
 		
@@ -1674,14 +1675,16 @@ namespace slib
 					}
 				}
 
-				if (!(attr->left.flagDefined)) {
-					if (attr->leftMode == PositionMode::Free && attr->rightMode == PositionMode::Free) {
-						attr->leftMode = PositionMode::ParentEdge;
+				if (resourceItem->itemType != SAppLayoutItemType::Import) {
+					if (!(attr->left.flagDefined)) {
+						if (attr->leftMode == PositionMode::Free && attr->rightMode == PositionMode::Free) {
+							attr->leftMode = PositionMode::ParentEdge;
+						}
 					}
-				}
-				if (!(attr->top.flagDefined)) {
-					if (attr->topMode == PositionMode::Free && attr->bottomMode == PositionMode::Free) {
-						attr->topMode = PositionMode::ParentEdge;
+					if (!(attr->top.flagDefined)) {
+						if (attr->topMode == PositionMode::Free && attr->bottomMode == PositionMode::Free) {
+							attr->topMode = PositionMode::ParentEdge;
+						}
 					}
 				}
 
@@ -1816,6 +1819,30 @@ namespace slib
 			}
 			
 			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(aspectRatio, setAspectRatio)
+			if (op == OP_PARSE) {
+				if (!flagRoot || resource->layoutType == SAppLayoutType::View) {
+					if (resourceItem->itemType != SAppLayoutItemType::Import && resourceItem->itemType != SAppLayoutItemType::Drawer && resourceItem->itemType != SAppLayoutItemType::Image) {
+						if (attr->aspectRatio.flagDefined) {
+							if (!(attr->width.flagDefined) && !(attr->height.flagDefined)) {
+								attr->width.flagDefined = sl_true;
+								attr->width.amount = 1;
+								attr->width.unit = SAppDimensionValue::WRAP;
+							}
+						} else {
+							if (!(attr->width.flagDefined)) {
+								attr->width.flagDefined = sl_true;
+								attr->width.amount = 1;
+								attr->width.unit = SAppDimensionValue::WRAP;
+							}
+							if (!(attr->height.flagDefined)) {
+								attr->height.flagDefined = sl_true;
+								attr->height.amount = 1;
+								attr->height.unit = SAppDimensionValue::WRAP;
+							}
+						}
+					}
+				}
+			}
 			if (op == OP_GENERATE_CPP) {
 				if (attr->aspectRatio.flagDefined) {
 					if (attr->width.flagDefined) {
@@ -2778,6 +2805,23 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR(minAspectRatio, setMinimumAutoAspectRatio)
 		LAYOUT_CONTROL_GENERIC_ATTR(maxAspectRatio, setMaximumAutoAspectRatio)
 
+		
+		if (op == OP_PARSE) {
+			if (!(resourceItem->attrsView->width.flagDefined) && !(resourceItem->attrsView->height.flagDefined)) {
+				if (resourceItem->attrsView->aspectRatio.flagDefined) {
+					resourceItem->attrsView->width.flagDefined = sl_true;
+					resourceItem->attrsView->width.amount = 1;
+					resourceItem->attrsView->width.unit = SAppDimensionValue::WRAP;
+				} else {
+					resourceItem->attrsView->width.flagDefined = sl_true;
+					resourceItem->attrsView->width.amount = 1;
+					resourceItem->attrsView->width.unit = SAppDimensionValue::WRAP;
+					resourceItem->attrsView->height.flagDefined = sl_true;
+					resourceItem->attrsView->height.amount = 1;
+					resourceItem->attrsView->height.unit = SAppDimensionValue::WRAP;
+				}
+			}
+		}
 		if (!(resourceItem->attrsView->aspectRatio.flagDefined)) {
 			if (op == OP_GENERATE_CPP) {
 				if (resourceItem->attrsView->width.flagDefined) {

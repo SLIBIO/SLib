@@ -444,8 +444,15 @@ namespace slib
 			return;
 		}
 #endif
+		Ref<Font> font = getFont();
 		if (flagHorizontal) {
 			sl_ui_pos width = m_iconSize.x * 2 + getPaddingLeft() + getPaddingRight();
+			if (font.isNotNull()) {
+				sl_ui_pos t = (sl_ui_pos)(font->getFontHeight());
+				if (t > 0) {
+					width += t * 4;
+				}
+			}
 			if (width < 0) {
 				width = 0;
 			}
@@ -453,7 +460,6 @@ namespace slib
 		}
 		if (flagVertical) {
 			sl_ui_pos height = 0;
-			Ref<Font> font = getFont();
 			if (font.isNotNull()) {
 				height = (sl_ui_pos)(font->getFontHeight() * 1.5f);
 				if (height < 0) {
