@@ -97,8 +97,8 @@ namespace slib
 		sl_uint32 countFill = 0;
 		sl_real sumFillWeights = 0;
 
-		sl_ui_len widthContainer = getLayoutWidth();
-		sl_ui_len heightContainer = getLayoutHeight();
+		sl_ui_len widthContainer = getLayoutWidth() - getPaddingLeft() - getPaddingTop();
+		sl_ui_len heightContainer = getLayoutHeight() - getPaddingTop() - getPaddingBottom();
 
 		ListElements< Ref<View> > children(getChildren());
 		
