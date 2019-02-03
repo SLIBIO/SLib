@@ -306,7 +306,6 @@ namespace slib
 			m_editViewNative->setMultiLine(isMultiLine(), UIUpdateMode::Init);
 			m_editViewNative->setOnChange(SLIB_FUNCTION_WEAKREF(EditView, _onChangeEditViewNative, this));
 			m_editViewNative->setOnReturnKey(SLIB_FUNCTION_WEAKREF(EditView, _onReturnKeyEditViewNative, this));
-			m_editViewNative->setOnDoneEdit(SLIB_FUNCTION_WEAKREF(EditView, _onDoneEditViewNative, this));
 			if (m_returnKeyType == UIReturnKeyType::Default && !m_flagMultiLine) {
 				m_editViewNative->setReturnKeyType(UIReturnKeyType::Done);
 			} else {
@@ -320,24 +319,28 @@ namespace slib
 			m_windowEdit->setOnClose(SLIB_FUNCTION_WEAKREF(EditView, _onCloseWindowEditViewNative, this));
 			m_editViewNative->setFocus();
 
+			sl_bool flagDoneButton = m_flagMultiLine;
 #if defined(SLIB_UI_IS_ANDROID)
 			UI::dispatchToUiThread([] {
 				Android::showKeyboard();
 			}, 500);
-			sl_ui_pos sw = UIResource::getScreenMinimum();
-			m_editViewNative->setMarginRight(sw / 5 - sw / 20);
-			Ref<Button> btnDone = new Button;
-			btnDone = new Button;
-			btnDone->setText("Done");
-			btnDone->setWidth(sw / 5);
-			btnDone->setMargin(sw / 20);
-			btnDone->setMarginRight(sw / 40);
-			btnDone->setHeight(sw / 10);
-			btnDone->setFont(Font::create(getFontFamily(), sw/20));
-			btnDone->setAlignParentRight();
-			btnDone->setOnClick(SLIB_FUNCTION_WEAKREF(EditView, _onDoneEditViewNativeButton, this));
-			m_windowEdit->addView(btnDone);
+			flagDoneButton = sl_true;
 #endif
+			if (flagDoneButton) {
+				sl_ui_pos sw = UIResource::getScreenMinimum();
+				m_editViewNative->setMarginRight(sw / 5 - sw / 20);
+				Ref<Button> btnDone = new Button;
+				btnDone = new Button;
+				btnDone->setText("Done");
+				btnDone->setWidth(sw / 5);
+				btnDone->setMargin(sw / 20);
+				btnDone->setMarginRight(sw / 40);
+				btnDone->setHeight(sw / 10);
+				btnDone->setFont(Font::create(getFontFamily(), sw/20));
+				btnDone->setAlignParentRight();
+				btnDone->setOnClick(SLIB_FUNCTION_WEAKREF(EditView, _onDoneEditViewNativeButton, this));
+				m_windowEdit->addView(btnDone);
+			}
 		}
 #endif
 	}
@@ -355,27 +358,21 @@ namespace slib
 	
 	void EditView::_onReturnKeyEditViewNative(EditView* ev)
 	{
-		dispatchReturnKey();
 		if (!m_flagMultiLine) {
-			_onDoneEditViewNative(ev);
+			_onDoneEditViewNativeButton(sl_null);
 		}
+		dispatchReturnKey();
 	}
 	
-	void EditView::_onDoneEditViewNative(EditView* ev)
+	void EditView::_onDoneEditViewNativeButton(View* view)
 	{
 		m_windowEdit->close();
 		m_windowEdit.setNull();
 		m_editViewNative.setNull();
 		invalidate();
-		dispatchDoneEdit();
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 		Android::dismissKeyboard();
 #endif
-	}
-
-	void EditView::_onDoneEditViewNativeButton(View* view)
-	{
-		_onDoneEditViewNative(sl_null);
 	}
 
 	void EditView::_onCloseWindowEditViewNative(Window* window, UIEvent* ev)
@@ -383,7 +380,8 @@ namespace slib
 		m_windowEdit.setNull();
 		m_editViewNative.setNull();
 		invalidate();
-		dispatchDoneEdit();
+		_onDoneEditViewNativeButton(sl_null);
+		dispatchReturnKey();
 	}
 
 	SLIB_DEFINE_EVENT_HANDLER(EditView, Change, String* value)
@@ -401,13 +399,6 @@ namespace slib
 		SLIB_INVOKE_EVENT_HANDLER(ReturnKey)
 	}
 	
-	SLIB_DEFINE_EVENT_HANDLER(EditView, DoneEdit)
-
-	void EditView::dispatchDoneEdit()
-	{
-		SLIB_INVOKE_EVENT_HANDLER(DoneEdit)
-	}
-
 	void EditView::dispatchKeyEvent(UIEvent* ev)
 	{
 		View::dispatchKeyEvent(ev);

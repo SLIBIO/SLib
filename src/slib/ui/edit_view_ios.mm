@@ -34,8 +34,6 @@
 	
 }
 
--(void) onDoneEdit;
-
 @end
 
 @interface _priv_Slib_iOS_TextArea : UITextView<UITextViewDelegate> {
@@ -49,8 +47,6 @@
 @property (nonatomic, retain) UILabel *placeHolderLabel;
 
 -(void) refreshPlaceholder;
-
--(void) onDoneEdit;
 
 @end
 
@@ -138,15 +134,6 @@ namespace slib
 			}
 		}
 	
-#define ADD_TOOL_BAR(handle)
-#define ADD_TOOL_BAR1(handle) UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 0, 44)];\
-	toolbar.barTintColor = [UIColor colorWithRed:181.0/255 green:187.0/255 blue:193.0/255 alpha:1];\
-	UIBarButtonItem *flex = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:handle action:nil];\
-	UIBarButtonItem* barButtonDone;\
-	barButtonDone = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:handle action:@selector(onDoneEdit)];\
-	toolbar.items = [NSArray arrayWithObjects:flex, flex, barButtonDone, nil];\
-	handle.inputAccessoryView = toolbar;
-		
 		void applyPlaceholder(UITextField* handle)
 		{
 			NSAttributedString* attr;
@@ -170,8 +157,6 @@ namespace slib
 		
 		void applyProperties(UITextField* handle)
 		{
-			ADD_TOOL_BAR(handle)
-			
 			[handle setText:(Apple::getNSStringFromString(m_text))];
 			[handle setTextAlignment:translateAlignment(m_textAlignment)];
 			[handle setBorderStyle:(isBorder()?UITextBorderStyleRoundedRect:UITextBorderStyleNone)];
@@ -192,8 +177,6 @@ namespace slib
 		
 		void applyProperties(_priv_Slib_iOS_TextArea* handle)
 		{
-			ADD_TOOL_BAR(handle)
-			
 			[handle setText:(Apple::getNSStringFromString(m_text))];
 			[handle setTextAlignment:translateAlignment(m_textAlignment)];
 			if (isBorder()) {
@@ -267,14 +250,6 @@ namespace slib
 						[area resignFirstResponder];
 					}
 				}
-			}
-		}
-		
-		static void onDoneEdit(iOS_ViewInstance* instance)
-		{
-			Ref<View> _view = instance->getView();
-			if (EditView_Impl* view = CastInstance<EditView_Impl>(_view.get())) {
-				view->dispatchDoneEdit();
 			}
 		}
 
@@ -603,15 +578,6 @@ namespace slib
 	return NO;
 }
 
--(void) onDoneEdit
-{
-	[self resignFirstResponder];
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		slib::EditView_Impl::onDoneEdit(instance.get());
-	}
-}
-
 @end
 
 @implementation _priv_Slib_iOS_TextArea
@@ -690,16 +656,6 @@ namespace slib
 {
 	[self refreshPlaceholder];
 	[super drawRect:rect];
-}
-
-
--(void)onDoneEdit
-{
-	[self resignFirstResponder];
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		slib::EditView_Impl::onDoneEdit(instance.get());
-	}
 }
 
 @end

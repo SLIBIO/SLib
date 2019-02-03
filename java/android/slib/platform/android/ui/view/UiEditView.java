@@ -442,14 +442,6 @@ public class UiEditView extends EditText implements IView {
 		}
 	}
 
-	private static native void nativeOnDone(long instance);
-	public static void onEventDone(IView view) {
-		long instance = view.getInstance();
-		if (instance != 0) {
-			nativeOnDone(instance);
-		}
-	}
-
 	private static native void nativeOnReturn(long instance);
 	public static void onEventReturn(IView view) {
 		long instance = view.getInstance();
@@ -474,7 +466,7 @@ public class UiEditView extends EditText implements IView {
 		this.setOnEditorActionListener(new OnEditorActionListener() {
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if (event == null) {
-					onEventDone(UiEditView.this);
+					onEventReturn(UiEditView.this);
 					Android.dismissKeyboard((Activity)(getContext()));
 					return true;
 				} else {

@@ -736,10 +736,9 @@ namespace slib
 						sl_ui_pos b = y + heightsVisibleItems[i];
 						if (view.isNotNull()) {
 							UIRect rect;
-							rect.left = 0;
-							rect.right = _measureItemWidth(view, widthListView);
-							rect.top = y;
-							rect.bottom = b;
+							_measureItemLeftRight(view, widthListView, rect.left, rect.right);
+							rect.top = y + view->getMarginTop();
+							rect.bottom = b - view->getMarginBottom();
 							rect.fixSizeError();
 							if (!(view->m_frame.isAlmostEqual(rect))) {
 								view->setFrame(rect, UIUpdateMode::None);
@@ -796,35 +795,58 @@ namespace slib
 		}
 	}
 	
-	sl_ui_len ListView::_measureItemWidth(const Ref<View>& itemView, sl_ui_len widthList)
+	void ListView::_measureItemLeftRight(const Ref<View>& itemView, sl_ui_len widthList, sl_ui_pos& left, sl_ui_pos& right)
 	{
-		sl_ui_len ret = 0;
+		left = 0;
+		right = widthList;
 		if (itemView.isNotNull()) {
 			Ref<LayoutAttributes>& layoutAttrs = itemView->m_layoutAttrs;
-			if (layoutAttrs.isNotNull() && layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustWidth) {
-				sl_ui_len height = _measureItemHeight(itemView, getHeight());
-				ret = (sl_ui_pos)(height * layoutAttrs->aspectRatio);
-			} else {
-				SizeMode mode = itemView->getWidthMode();
-				switch (mode) {
-					case SizeMode::Filling:
-					case SizeMode::Weight:
-						ret = (sl_ui_len)((sl_real)widthList * Math::abs(itemView->getWidthWeight()));
-						break;
-					case SizeMode::Wrapping:
-						_updateChildLayout(itemView.get());
-						ret = itemView->getLayoutWidth();
-						break;
-					default:
-						ret = itemView->getWidth();
-						break;
-				}
-			}
 			if (layoutAttrs.isNotNull()) {
-				ret = Math::clamp(ret, layoutAttrs->minWidth, layoutAttrs->maxWidth);
+				sl_ui_len width = 0;
+				if (layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustWidth) {
+					sl_ui_len height = _measureItemHeight(itemView, getHeight());
+					width = (sl_ui_pos)(height * layoutAttrs->aspectRatio);
+				} else {
+					SizeMode mode = itemView->getWidthMode();
+					switch (mode) {
+						case SizeMode::Filling:
+						case SizeMode::Weight:
+							width = (sl_ui_len)((sl_real)widthList * Math::abs(itemView->getWidthWeight()));
+							break;
+						case SizeMode::Wrapping:
+							_updateChildLayout(itemView.get());
+							width = itemView->getLayoutWidth();
+							break;
+						default:
+							width = itemView->getWidth();
+							break;
+					}
+				}
+				width = Math::clamp(width, layoutAttrs->minWidth, layoutAttrs->maxWidth);
+				if (layoutAttrs->flagRelativeMarginLeft) {
+					layoutAttrs->marginLeft = (sl_ui_pos)((sl_real)widthList * layoutAttrs->relativeMarginLeftWeight);
+				}
+				if (layoutAttrs->flagRelativeMarginRight) {
+					layoutAttrs->marginRight = (sl_ui_pos)((sl_real)widthList * layoutAttrs->relativeMarginRightWeight);
+				}
+				if (layoutAttrs->leftMode == PositionMode::Free && layoutAttrs->rightMode == PositionMode::ParentEdge) {
+					right = widthList - layoutAttrs->marginRight;
+					left = right - width;
+				} else if (layoutAttrs->leftMode == PositionMode::CenterInParent) {
+					left = (widthList - layoutAttrs->marginLeft - layoutAttrs->marginRight - width) / 2 + layoutAttrs->marginLeft;
+					right = left + width;
+				} else if (layoutAttrs->leftMode != PositionMode::Free) {
+					left = layoutAttrs->marginLeft;
+					right = left + width;
+				} else {
+					left = itemView->getLeft();
+					right = left + width;
+				}
+			} else {
+				left = itemView->getLeft();
+				right = left + itemView->getWidth();
 			}
 		}
-		return ret;
 	}
 	
 	sl_ui_len ListView::_measureItemHeight(const Ref<View>& itemView, sl_ui_len heightList)
@@ -832,31 +854,39 @@ namespace slib
 		sl_ui_len ret = 0;
 		if (itemView.isNotNull()) {
 			Ref<LayoutAttributes>& layoutAttrs = itemView->m_layoutAttrs;
-			if (layoutAttrs.isNotNull() && layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustHeight) {
-				sl_ui_len width = _measureItemWidth(itemView, getWidth());
-				if (layoutAttrs->aspectRatio > 0.0000001f) {
-					ret = (sl_ui_pos)(width / layoutAttrs->aspectRatio);
-				} else {
-					ret = 0;
-				}
-			} else {
-				SizeMode mode = itemView->getHeightMode();
-				switch (mode) {
-					case SizeMode::Filling:
-					case SizeMode::Weight:
-						ret = (sl_ui_len)((sl_real)heightList * Math::abs(itemView->getHeightWeight()));
-						break;
-					case SizeMode::Wrapping:
-						_updateChildLayout(itemView.get());
-						ret = itemView->getLayoutHeight();
-						break;
-					default:
-						ret = itemView->getHeight();
-						break;
-				}
-			}
 			if (layoutAttrs.isNotNull()) {
-				ret = Math::clamp(ret, layoutAttrs->minHeight, layoutAttrs->maxHeight);
+				if (layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustHeight) {
+					sl_ui_pos left, right;
+					if (layoutAttrs->aspectRatio > 0.0000001f) {
+						_measureItemLeftRight(itemView, getWidth(), left, right);
+						ret = (sl_ui_pos)((right - left) / layoutAttrs->aspectRatio);
+					} else {
+						ret = 0;
+					}
+				} else {
+					SizeMode mode = itemView->getHeightMode();
+					switch (mode) {
+						case SizeMode::Filling:
+						case SizeMode::Weight:
+							ret = (sl_ui_len)((sl_real)heightList * Math::abs(itemView->getHeightWeight()));
+							break;
+						case SizeMode::Wrapping:
+							_updateChildLayout(itemView.get());
+							ret = itemView->getLayoutHeight();
+							break;
+						default:
+							ret = itemView->getHeight();
+							break;
+					}
+					ret = Math::clamp(ret, layoutAttrs->minHeight, layoutAttrs->maxHeight);
+					if (layoutAttrs->flagRelativeMarginTop) {
+						layoutAttrs->marginTop = (sl_ui_pos)((sl_real)heightList * layoutAttrs->relativeMarginTopWeight);
+					}
+					if (layoutAttrs->flagRelativeMarginBottom) {
+						layoutAttrs->marginBottom = (sl_ui_pos)((sl_real)heightList * layoutAttrs->relativeMarginBottomWeight);
+					}
+					ret += layoutAttrs->marginTop + layoutAttrs->marginBottom;
+				}
 			}
 		}
 		sl_ui_len minItemHeight = (heightList / MAX_ITEMS_VISIBLE) + 1;

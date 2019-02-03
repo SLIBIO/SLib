@@ -91,7 +91,6 @@ namespace slib
 	public:
 		SLIB_DECLARE_EVENT_HANDLER(EditView, Change, String* pValue);
 		SLIB_DECLARE_EVENT_HANDLER(EditView, ReturnKey)
-		SLIB_DECLARE_EVENT_HANDLER(EditView, DoneEdit);
 		
 	protected:
 		void onUpdateLayout() override;
@@ -140,8 +139,6 @@ namespace slib
 		
 		void _onReturnKeyEditViewNative(EditView* ev);
 		
-		void _onDoneEditViewNative(EditView* ev);
-
 		void _onDoneEditViewNativeButton(View* view);
 
 		void _onCloseWindowEditViewNative(Window* window, UIEvent* ev);
