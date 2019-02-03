@@ -8690,4 +8690,52 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 		return ret;
 	}
 	
+	String StringBuffer::join(const String& delimiter, const List<String>& list, sl_size startIndex, sl_size count)
+	{
+		if (count == 0) {
+			return sl_null;
+		}
+		StringBuffer buf;
+		ListLocker<String> items(list);
+		sl_size endIndex = items.count;
+		if (endIndex <= startIndex) {
+			return sl_null;
+		}
+		if (endIndex - startIndex > count) {
+			endIndex = startIndex + count;
+		}
+		count = SLIB_MIN(count, items.count);
+		for (sl_size i = startIndex; i < endIndex; i++) {
+			if (i > startIndex) {
+				buf.add(delimiter);
+			}
+			buf.add(items[i]);
+		}
+		return buf.merge();
+	}
+	
+	String16 StringBuffer16::join(const String16& delimiter, const List<String16>& list, sl_size startIndex, sl_size count)
+	{
+		if (count == 0) {
+			return sl_null;
+		}
+		StringBuffer buf;
+		ListLocker<String16> items(list);
+		sl_size endIndex = items.count;
+		if (endIndex <= startIndex) {
+			return sl_null;
+		}
+		if (endIndex - startIndex > count) {
+			endIndex = startIndex + count;
+		}
+		count = SLIB_MIN(count, items.count);
+		for (sl_size i = startIndex; i < endIndex; i++) {
+			if (i > startIndex) {
+				buf.add(delimiter);
+			}
+			buf.add(items[i]);
+		}
+		return buf.merge();
+	}
+	
 }
