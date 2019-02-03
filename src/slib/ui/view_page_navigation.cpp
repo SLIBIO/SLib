@@ -132,7 +132,7 @@ namespace slib
 			m_pages.add_NoLock(viewIn);
 			viewIn->setFrame(getBoundsInnerPadding(), UIUpdateMode::None);
 			_resetAnimationStatus(viewIn);
-			addChild(viewIn, UIUpdateMode::None);
+			addChild(viewIn);
 			dispatchPageAction(viewIn.get(), UIPageAction::Push);
 			dispatchPageAction(viewIn.get(), UIPageAction::Resume);
 			dispatchEndPageAnimation(viewIn.get(), UIPageAction::Push);
@@ -170,7 +170,7 @@ namespace slib
 			animationPush->dispatchStartFrame();
 		}
 
-		addChild(viewIn, UIUpdateMode::None);
+		addChild(viewIn);
 		
 		dispatchPageAction(viewBack.get(), UIPageAction::Pause);
 		

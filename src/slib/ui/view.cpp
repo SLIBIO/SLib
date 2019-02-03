@@ -891,8 +891,12 @@ namespace slib
 		onAddChild(child);
 		
 		if (!SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
-			if (child->isDrawingThread()) {
-				_updateAndApplyChildLayout(child);
+			if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
+				if (child->isDrawingThread()) {
+					_updateAndApplyChildLayout(child);
+				}
+			} else {
+				child->invalidateLayout(UIUpdateMode::None);
 			}
 			if (isInstance()) {
 				sl_bool flagAttach = sl_false;
@@ -922,8 +926,8 @@ namespace slib
 					setDrawing(sl_true, UIUpdateMode::None);
 				}
 			}
+			invalidateLayout(mode);
 		}
-		invalidateLayout(mode);
 	}
 	
 	void View::_removeChild(View* child)

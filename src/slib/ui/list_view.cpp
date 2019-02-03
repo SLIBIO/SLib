@@ -741,19 +741,10 @@ namespace slib
 							rect.top = y;
 							rect.bottom = b;
 							rect.fixSizeError();
-							Ref<LayoutAttributes>& childLayoutAttrs = view->m_layoutAttrs;
-							if (childLayoutAttrs.isNotNull()) {
-								if (!(childLayoutAttrs->layoutFrame.isAlmostEqual(rect))) {
-									childLayoutAttrs->layoutFrame = rect;
-									view->m_flagInvalidLayout = sl_true;
-									view->_updateAndApplyLayoutWithMode(UIUpdateMode::None);
-								}
-							} else {
-								if (!(view->m_frame.isAlmostEqual(rect))) {
-									view->setFrame(rect, UIUpdateMode::None);
-									view->m_flagInvalidLayout = sl_true;
-									view->_updateAndApplyLayoutWithMode(UIUpdateMode::None);
-								}
+							if (!(view->m_frame.isAlmostEqual(rect))) {
+								view->setFrame(rect, UIUpdateMode::None);
+								view->m_flagInvalidLayout = sl_true;
+								view->_updateAndApplyLayoutWithMode(UIUpdateMode::None);
 							}
 							if (view->getParent() != contentView) {
 								contentView->addChild(view, UIUpdateMode::None);

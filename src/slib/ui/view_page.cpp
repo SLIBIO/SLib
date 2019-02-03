@@ -43,7 +43,6 @@ namespace slib
 		m_countActiveTransitionAnimations = 0;
 		
 		setClipping(sl_true, UIUpdateMode::Init);
-		setOpaque(sl_true, UIUpdateMode::Init);
 		setBackgroundColor(Color::White, UIUpdateMode::Init);
 
 	}
@@ -386,7 +385,7 @@ namespace slib
 		
 		Ref<Animation> animation = Transition::createPopupAnimation(this, transition, UIPageAction::Push, SLIB_BIND_WEAKREF(void(), ViewPage, _finishPopupAnimation, this, UIPageAction::Push));
 		
-		parent->addChild(viewAdd, UIUpdateMode::None);
+		parent->addChild(viewAdd);
 		
 		Base::interlockedIncrement(&m_countActiveTransitionAnimations);
 		

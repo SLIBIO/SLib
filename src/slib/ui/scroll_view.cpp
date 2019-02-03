@@ -73,7 +73,7 @@ namespace slib
 				view->setLeftFree(UIUpdateMode::Init);
 				view->setRightFree(UIUpdateMode::Init);
 			}
-			addChild(view, uiUpdateModeNone);
+			addChild(view);
 			View::setContentSize(view->getWidth(), view->getHeight(), uiUpdateModeNone);
 		} else {
 			View::setContentSize(0, 0, uiUpdateModeNone);

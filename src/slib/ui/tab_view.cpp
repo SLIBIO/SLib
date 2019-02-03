@@ -184,7 +184,7 @@ namespace slib
 					view->setCreatingInstance(sl_true);
 					view->setAttachMode(UIAttachMode::NotAttachInNativeWidget);
 					view->setFrame(getTabContentRegion(), SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::UpdateLayout);
-					addChild(view, SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::None);
+					addChild(view, SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::UpdateLayout);
 				}
 				item->contentView = view;
 				if (isNativeWidget()) {
