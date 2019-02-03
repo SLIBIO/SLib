@@ -177,11 +177,11 @@ namespace slib
 		
 		Ref<Drawable> getIcon(ButtonState state, sl_uint32 category = 0);
 		
-		virtual void setIcon(const Ref<Drawable>& icon, ButtonState state, sl_uint32 category = 0, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setIcon(const Ref<Drawable>& icon, ButtonState state, sl_uint32 category = 0, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		Ref<Drawable> getIcon();
 		
-		virtual void setIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		
 		Ref<Drawable> getBackground(ButtonState state, sl_uint32 category = 0);
@@ -246,9 +246,9 @@ namespace slib
 		void onClickEvent(UIEvent* ev) override;
 
 	protected:
-		UISize measureContentSize();
+		UISize measureContentSize(sl_ui_len widthFrame, sl_ui_len heightFrame);
 		
-		virtual UISize measureLayoutContentSize();
+		virtual UISize measureLayoutContentSize(sl_ui_len widthFrame, sl_ui_len heightFrame);
 		
 		virtual void layoutIconAndText(sl_ui_len widthFrame, sl_ui_len heightFrame, UISize& sizeContent, UIRect& frameIcon, UIRect& frameText);
 		

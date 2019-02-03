@@ -276,7 +276,7 @@ namespace slib
 		UIView* handle = m_handle;
 		if (handle != nil) {
 			if (UI::isUiThread()) {
-				[handle setOpaque:(flag?YES:NO)];
+				[handle setOpaque:(flag ? YES : NO)];
 			} else {
 				dispatch_async(dispatch_get_main_queue(), ^{
 					[handle setOpaque:(flag ? YES : NO)];

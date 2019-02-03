@@ -163,7 +163,7 @@ namespace slib
 	UISize _priv_CheckBox_macOS_measureSize(Button* view);
 	UISize _priv_CheckBox_Win32_measureSize(Button* view);
 
-	UISize CheckBox::measureLayoutContentSize()
+	UISize CheckBox::measureLayoutContentSize(sl_ui_len widthFrame, sl_ui_len heightFrame)
 	{
 #if defined(SLIB_UI_IS_MACOS)
 		if (isCreatingNativeWidget()) {
@@ -175,7 +175,7 @@ namespace slib
 			return _priv_CheckBox_Win32_measureSize(this);
 		}
 #endif
-		return measureContentSize();
+		return measureContentSize(widthFrame, heightFrame);
 	}
 
 	void CheckBox::dispatchClickEvent(UIEvent* ev)

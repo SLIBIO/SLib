@@ -471,7 +471,7 @@ namespace slib
 	{
 		if (category < m_nCategories) {
 			m_categories[category].properties[(int)state].icon = icon;
-			invalidate(mode);
+			invalidateLayoutOfWrappingControl(mode);
 		}
 	}
 
@@ -483,7 +483,7 @@ namespace slib
 	void Button::setIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 	{
 		m_iconDefault = icon;
-		invalidate(mode);
+		invalidateLayoutOfWrappingControl(mode);
 	}
 
 	Ref<Drawable> Button::getBackground(ButtonState state, sl_uint32 category)
@@ -722,7 +722,7 @@ namespace slib
 			return;
 		}
 		
-		UISize size = measureLayoutContentSize();
+		UISize size = measureLayoutContentSize(flagHorizontal ? 0 : getLayoutWidth(), flagVertical ? 0 : getLayoutHeight());
 		if (flagHorizontal) {
 			setLayoutWidth(size.x + getPaddingLeft() + getPaddingRight());
 		}
@@ -746,11 +746,11 @@ namespace slib
 		dispatchOK(ev);
 	}
 
-	UISize Button::measureContentSize()
+	UISize Button::measureContentSize(sl_ui_len widthFrame, sl_ui_len heightFrame)
 	{
 		UISize size;
 		UIRect rcIcon, rcText;
-		layoutIconAndText(0, 0, size, rcIcon, rcText);
+		layoutIconAndText(widthFrame, heightFrame, size, rcIcon, rcText);
 		if (size.x < 0) {
 			size.x = 0;
 		}
@@ -762,21 +762,14 @@ namespace slib
 	
 	UISize _priv_Button_macOS_measureSize(Button* view);
 
-	UISize Button::measureLayoutContentSize()
+	UISize Button::measureLayoutContentSize(sl_ui_len widthFrame, sl_ui_len heightFrame)
 	{
 #if defined(SLIB_UI_IS_MACOS)
 		if (isCreatingNativeWidget()) {
 			return _priv_Button_macOS_measureSize(this);
 		}
 #endif
-		UISize size = measureContentSize();
-		if (size.x > 0) {
-			size.x += size.x / 3;
-		}
-		if (size.y > 0) {
-			size.y += size.y / 3;
-		}
-		return size;
+		return measureContentSize(widthFrame, heightFrame);
 	}
 
 	void Button::layoutIconAndText(sl_ui_len widthFrame, sl_ui_len heightFrame, UISize& sizeContent, UIRect& frameIcon, UIRect& frameText)
@@ -823,30 +816,36 @@ namespace slib
 						sl_ui_len defaultHeight = heightText;
 						if (defaultHeight <= 0) {
 							if (font.isNotNull()) {
-								defaultHeight = (sl_ui_len)(font->getFontHeight()) + m_textMarginTop + m_textMarginBottom;
+								defaultHeight = (sl_ui_len)(font->getFontHeight());
+							} else {
+								defaultHeight = 20;
 							}
 						}
 						defaultHeight = (sl_ui_len)(defaultHeight * 0.7f);
 						widthIcon = defaultHeight;
 						heightIcon = defaultHeight;
 					} else {
-						sl_ui_len defaultHeight = heightText;
-						if (defaultHeight <= 0) {
-							if (widthFrame <= 0 || heightFrame <= 0) {
+						if (widthFrame <= 0) {
+							if (heightFrame <= 0) {
+								font = getFont();
 								if (font.isNotNull()) {
-									defaultHeight = (sl_ui_len)(font->getFontHeight()) + m_textMarginTop + m_textMarginBottom;
+									widthIcon = (sl_ui_len)(font->getFontHeight());
+								} else {
+									widthIcon = 20;
 								}
+								heightIcon = widthIcon;
+							} else {
+								widthIcon = heightFrame;
+								heightIcon = heightFrame;
 							}
-						}
-						if (widthFrame > 0) {
-							widthIcon = widthFrame;
 						} else {
-							widthIcon = defaultHeight;
-						}
-						if (heightFrame > 0) {
-							heightIcon = heightFrame;
-						} else {
-							heightIcon = defaultHeight;
+							if (heightFrame <= 0) {
+								widthIcon = widthFrame;
+								heightIcon = widthFrame;
+							} else {
+								widthIcon = widthFrame;
+								heightIcon = heightFrame;
+							}
 						}
 					}
 					widthIcon -= marginWidth;

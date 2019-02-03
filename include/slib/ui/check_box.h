@@ -47,7 +47,7 @@ namespace slib
 		virtual void setChecked(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 	protected:
-		UISize measureLayoutContentSize() override;
+		UISize measureLayoutContentSize(sl_ui_len widthFrame, sl_ui_len heightFrame) override;
 		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
