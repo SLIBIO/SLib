@@ -42,9 +42,7 @@ namespace slib
 		
 		m_countActiveTransitionAnimations = 0;
 		
-		setClipping(sl_true, UIUpdateMode::Init);
 		setBackgroundColor(Color::White, UIUpdateMode::Init);
-
 	}
 
 	ViewPage::~ViewPage()
