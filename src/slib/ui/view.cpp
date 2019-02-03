@@ -2536,6 +2536,8 @@ namespace slib
 			}
 		}
 		view->dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(View, _updateAndApplyLayout, view.get()));
+		void (View::*f)(UIUpdateMode) = &View::invalidate;
+		view->dispatchToDrawingThread(Function<void()>::bindWeakRef(WeakRef<View>(this), f, mode));
 	}
 
 	void View::invalidateParentLayout(UIUpdateMode mode)
