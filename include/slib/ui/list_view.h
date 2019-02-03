@@ -65,7 +65,7 @@ namespace slib
 		
 		void _layoutItemViews(sl_bool flagFromDraw, sl_bool flagFromScroll, sl_bool flagRefresh);
 		
-		sl_ui_len _measureItemWidth(const Ref<View>& itemView, sl_ui_len heightList);
+		void _measureItemLeftRight(const Ref<View>& itemView, sl_ui_len heightList, sl_ui_pos& left, sl_ui_pos& right);
 		
 		sl_ui_len _measureItemHeight(const Ref<View>& itemView, sl_ui_len heightList);
 		

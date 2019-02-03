@@ -73,7 +73,7 @@ namespace slib
 		
 	};
 	
-	template <class ViewType, class DataType>
+	template <class DataType, class ViewType>
 	class SLIB_EXPORT ListViewAdapter : public ViewAdapterT<ViewType>
 	{
 	public:

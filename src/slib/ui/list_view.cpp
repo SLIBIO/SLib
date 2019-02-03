@@ -800,19 +800,28 @@ namespace slib
 	{
 		sl_ui_len ret = 0;
 		if (itemView.isNotNull()) {
-			SizeMode mode = itemView->getWidthMode();
-			switch (mode) {
-				case SizeMode::Filling:
-				case SizeMode::Weight:
-					ret = (sl_ui_len)((sl_real)widthList * Math::abs(itemView->getWidthWeight()));
-					break;
-				case SizeMode::Wrapping:
-					_updateChildLayout(itemView.get());
-					ret = itemView->getLayoutWidth();
-					break;
-				default:
-					ret = itemView->getWidth();
-					break;
+			Ref<LayoutAttributes>& layoutAttrs = itemView->m_layoutAttrs;
+			if (layoutAttrs.isNotNull() && layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustWidth) {
+				sl_ui_len height = _measureItemHeight(itemView, getHeight());
+				ret = (sl_ui_pos)(height * layoutAttrs->aspectRatio);
+			} else {
+				SizeMode mode = itemView->getWidthMode();
+				switch (mode) {
+					case SizeMode::Filling:
+					case SizeMode::Weight:
+						ret = (sl_ui_len)((sl_real)widthList * Math::abs(itemView->getWidthWeight()));
+						break;
+					case SizeMode::Wrapping:
+						_updateChildLayout(itemView.get());
+						ret = itemView->getLayoutWidth();
+						break;
+					default:
+						ret = itemView->getWidth();
+						break;
+				}
+			}
+			if (layoutAttrs.isNotNull()) {
+				ret = Math::clamp(ret, layoutAttrs->minWidth, layoutAttrs->maxWidth);
 			}
 		}
 		return ret;
@@ -822,19 +831,32 @@ namespace slib
 	{
 		sl_ui_len ret = 0;
 		if (itemView.isNotNull()) {
-			SizeMode mode = itemView->getHeightMode();
-			switch (mode) {
-				case SizeMode::Filling:
-				case SizeMode::Weight:
-					ret = (sl_ui_len)((sl_real)heightList * Math::abs(itemView->getHeightWeight()));
-					break;
-				case SizeMode::Wrapping:
-					_updateChildLayout(itemView.get());
-					ret = itemView->getLayoutHeight();
-					break;
-				default:
-					ret = itemView->getHeight();
-					break;
+			Ref<LayoutAttributes>& layoutAttrs = itemView->m_layoutAttrs;
+			if (layoutAttrs.isNotNull() && layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustHeight) {
+				sl_ui_len width = _measureItemWidth(itemView, getWidth());
+				if (layoutAttrs->aspectRatio > 0.0000001f) {
+					ret = (sl_ui_pos)(width / layoutAttrs->aspectRatio);
+				} else {
+					ret = 0;
+				}
+			} else {
+				SizeMode mode = itemView->getHeightMode();
+				switch (mode) {
+					case SizeMode::Filling:
+					case SizeMode::Weight:
+						ret = (sl_ui_len)((sl_real)heightList * Math::abs(itemView->getHeightWeight()));
+						break;
+					case SizeMode::Wrapping:
+						_updateChildLayout(itemView.get());
+						ret = itemView->getLayoutHeight();
+						break;
+					default:
+						ret = itemView->getHeight();
+						break;
+				}
+			}
+			if (layoutAttrs.isNotNull()) {
+				ret = Math::clamp(ret, layoutAttrs->minHeight, layoutAttrs->maxHeight);
 			}
 		}
 		sl_ui_len minItemHeight = (heightList / MAX_ITEMS_VISIBLE) + 1;
