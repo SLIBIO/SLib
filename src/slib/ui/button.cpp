@@ -432,7 +432,7 @@ namespace slib
 
 	Color Button::getTextColor(ButtonState state, sl_uint32 category)
 	{
-		if (category < m_nCategories) {
+		if (category < m_nCategories && (int)state < (int)(ButtonState::Count)) {
 			return m_categories[category].properties[(int)state].textColor;
 		} else {
 			return Color::zero();
@@ -442,7 +442,13 @@ namespace slib
 	void Button::setTextColor(const Color& color, ButtonState state, sl_uint32 category, UIUpdateMode mode)
 	{
 		if (category < m_nCategories) {
-			m_categories[category].properties[(int)state].textColor = color;
+			if ((int)state < (int)(ButtonState::Count)) {
+				m_categories[category].properties[(int)state].textColor = color;
+			} else {
+				for (int i = 0; i < (int)(ButtonState::Count); i++) {
+					m_categories[category].properties[i].textColor = color;
+				}
+			}
 			invalidate(mode);
 		}
 	}
@@ -460,7 +466,7 @@ namespace slib
 
 	Ref<Drawable> Button::getIcon(ButtonState state, sl_uint32 category)
 	{
-		if (category < m_nCategories) {
+		if (category < m_nCategories && (int)state < (int)(ButtonState::Count)) {
 			return m_categories[category].properties[(int)state].icon;
 		} else {
 			return sl_null;
@@ -470,7 +476,13 @@ namespace slib
 	void Button::setIcon(const Ref<Drawable>& icon, ButtonState state, sl_uint32 category, UIUpdateMode mode)
 	{
 		if (category < m_nCategories) {
-			m_categories[category].properties[(int)state].icon = icon;
+			if ((int)state < (int)(ButtonState::Count)) {
+				m_categories[category].properties[(int)state].icon = icon;
+			} else {
+				for (int i = 0; i < (int)(ButtonState::Count); i++) {
+					m_categories[category].properties[i].icon = icon;
+				}
+			}
 			invalidateLayoutOfWrappingControl(mode);
 		}
 	}
@@ -488,7 +500,7 @@ namespace slib
 
 	Ref<Drawable> Button::getBackground(ButtonState state, sl_uint32 category)
 	{
-		if (category < m_nCategories) {
+		if (category < m_nCategories && (int)state < (int)(ButtonState::Count)) {
 			return m_categories[category].properties[(int)state].background;
 		} else {
 			return sl_null;
@@ -498,7 +510,13 @@ namespace slib
 	void Button::setBackground(const Ref<Drawable>& background, ButtonState state, sl_uint32 category, UIUpdateMode mode)
 	{
 		if (category < m_nCategories) {
-			m_categories[category].properties[(int)state].background = background;
+			if ((int)state < (int)(ButtonState::Count)) {
+				m_categories[category].properties[(int)state].background = background;
+			} else {
+				for (int i = 0; i < (int)(ButtonState::Count); i++) {
+					m_categories[category].properties[i].background = background;
+				}
+			}
 			invalidate(mode);
 		}
 	}
@@ -520,7 +538,7 @@ namespace slib
 
 	Ref<Pen> Button::getBorder(ButtonState state, sl_uint32 category)
 	{
-		if (category < m_nCategories) {
+		if (category < m_nCategories && (int)state < (int)(ButtonState::Count)) {
 			return m_categories[category].properties[(int)state].border;
 		} else {
 			return sl_null;
@@ -530,7 +548,13 @@ namespace slib
 	void Button::setBorder(const Ref<Pen>& pen, ButtonState state, sl_uint32 category, UIUpdateMode mode)
 	{
 		if (category < m_nCategories) {
-			m_categories[category].properties[(int)state].border = pen;
+			if ((int)state < (int)(ButtonState::Count)) {
+				m_categories[category].properties[(int)state].border = pen;
+			} else {
+				for (int i = 0; i < (int)(ButtonState::Count); i++) {
+					m_categories[category].properties[i].border = pen;
+				}
+			}
 			invalidate(mode);
 		}
 	}
@@ -552,7 +576,7 @@ namespace slib
 
 	ColorMatrix* Button::getColorFilter(ButtonState state, sl_uint32 category)
 	{
-		if (category < m_nCategories) {
+		if (category < m_nCategories && (int)state < (int)(ButtonState::Count)) {
 			ButtonCategoryProperties& props = m_categories[category].properties[(int)state];
 			if (props.flagFilter) {
 				return &(props.filter);
@@ -565,12 +589,24 @@ namespace slib
 	{
 		setUsingDefaultColorFilter(sl_false, UIUpdateMode::None);
 		if (category < m_nCategories) {
-			ButtonCategoryProperties& props = m_categories[category].properties[(int)state];
-			if (filter) {
-				props.flagFilter = sl_true;
-				props.filter = *filter;
+			if ((int)state < (int)(ButtonState::Count)) {
+				ButtonCategoryProperties& props = m_categories[category].properties[(int)state];
+				if (filter) {
+					props.flagFilter = sl_true;
+					props.filter = *filter;
+				} else {
+					props.flagFilter = sl_false;
+				}
 			} else {
-				props.flagFilter = sl_false;
+				for (int i = 0; i < (int)(ButtonState::Count); i++) {
+					ButtonCategoryProperties& props = m_categories[category].properties[i];
+					if (filter) {
+						props.flagFilter = sl_true;
+						props.filter = *filter;
+					} else {
+						props.flagFilter = sl_false;
+					}
+				}
 			}
 			invalidate(mode);
 		}

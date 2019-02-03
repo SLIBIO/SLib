@@ -2488,6 +2488,7 @@ namespace slib
 		ButtonState states[] = {ButtonState::Normal, ButtonState::Hover, ButtonState::Pressed, ButtonState::Disabled};
 		for (sl_uint32 i = 0; i < SLIB_SAPP_LAYOUT_BUTTON_CATEGORY_MAX; i++) {
 			SAppLayoutButtonCategory& category = attr->categories[i];
+			String suffixAll = String::format("%d", i);
 			for (sl_uint32 k = 0; k < (sl_uint32)(ButtonState::Count); k++) {
 				if (op == OP_PARSE) {
 					String suffix;
@@ -2496,45 +2497,26 @@ namespace slib
 					} else {
 						suffix = strStates[k];
 					}
-					String _strTextColor = resourceItem->getXmlAttribute("textColor" + suffix);
-					if (!(category.textColor[k].parse(_strTextColor))) {
-						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("textColor" + suffix, _strTextColor));
-						return sl_false;
+#define BUTTON_STATE_GET_VALUE(NAME, ...) \
+					String value_##NAME##_name = #NAME + suffix; \
+					String value_##NAME = resourceItem->getXmlAttribute(value_##NAME##_name); \
+					if (value_##NAME.isEmpty()) { \
+						value_##NAME##_name = #NAME + suffixAll; \
+						value_##NAME = resourceItem->getXmlAttribute(value_##NAME##_name); \
+					} \
+					if (!(category.NAME[k].parse(value_##NAME, ##__VA_ARGS__))) { \
+						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(value_##NAME##_name, value_##NAME)); \
+						return sl_false; \
 					}
-					String _strIcon = resourceItem->getXmlAttribute("icon" + suffix);
-					if (!(category.icon[k].parse(_strIcon, this))) {
-						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("icon" + suffix, _strIcon));
-						return sl_false;
-					}
-					String _strBackground = resourceItem->getXmlAttribute("background" + suffix);
-					if (!(category.background[k].parse(_strBackground, this))) {
-						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("background" + suffix, _strBackground));
-						return sl_false;
-					}
-					String _strBorderStyle = resourceItem->getXmlAttribute("borderStyle" + suffix);
-					if (!(category.borderStyle[k].parse(_strBorderStyle))) {
-						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("borderStyle" + suffix, _strBorderStyle));
-						return sl_false;
-					}
-					String _strBorderWidth = resourceItem->getXmlAttribute("borderWidth" + suffix);
-					if (!(category.borderWidth[k].parse(_strBorderWidth, this))) {
-						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("borderWidth" + suffix, _strBorderWidth));
-						return sl_false;
-					}
-					if (!(category.borderWidth[k].checkScalarSize())) {
-						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("borderWidth" + suffix, _strBorderWidth));
-						return sl_false;
-					}
-					String _strBorderColor = resourceItem->getXmlAttribute("borderColor" + suffix);
-					if (!(category.borderColor[k].parse(_strBorderColor))) {
-						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("borderColor" + suffix, _strBorderColor));
-						return sl_false;
-					}
-					String _strColorOverlay = resourceItem->getXmlAttribute("colorOverlay" + suffix);
-					if (!(category.colorOverlay[k].parse(_strColorOverlay))) {
-						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("colorOverlay" + suffix, _strColorOverlay));
-						return sl_false;
-					}
+
+					BUTTON_STATE_GET_VALUE(textColor)
+					BUTTON_STATE_GET_VALUE(icon, this)
+					BUTTON_STATE_GET_VALUE(background, this)
+					BUTTON_STATE_GET_VALUE(borderStyle)
+					BUTTON_STATE_GET_VALUE(borderWidth, this)
+					BUTTON_STATE_GET_VALUE(borderColor)
+					BUTTON_STATE_GET_VALUE(colorOverlay)
+
 				} else if (op == OP_GENERATE_CPP) {
 					if (category.textColor[k].flagDefined) {
 						String strTextColor;

@@ -256,7 +256,8 @@ namespace slib
 		Pressed = 2,
 		Disabled = 3,
 		
-		Count = 4
+		Count = 4,
+		All = 4
 	};
 	
 	enum class UIUpdateMode
