@@ -857,7 +857,7 @@ namespace slib
 								defaultHeight = 20;
 							}
 						}
-						defaultHeight = (sl_ui_len)(defaultHeight * 0.7f);
+						defaultHeight = (sl_ui_len)(defaultHeight * 0.9f);
 						widthIcon = defaultHeight;
 						heightIcon = defaultHeight;
 					} else {
