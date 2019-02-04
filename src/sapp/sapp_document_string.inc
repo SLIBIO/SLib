@@ -90,7 +90,12 @@ namespace slib
 		
 		name = getNameInLocalNamespace(localNamespace, name);
 		
-		String value = element->getInnerXml().getNotNull();
+		String value;
+		if (element->getChildElementsCount()) {
+			value = element->getInnerXml().getNotNull();
+		} else {
+			value = element->getText();
+		}
 		
 		Ref<SAppStringResource> res = m_strings.getValue(name, Ref<SAppStringResource>::null());
 		if (res.isNull()) {
