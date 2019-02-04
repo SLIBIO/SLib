@@ -50,7 +50,7 @@ namespace slib
 		
 		sl_bool isValid() override;
 		
-		void setFocus() override;
+		void setFocus(sl_bool flagFocus) override;
 		
 		void invalidate() override;
 		
@@ -111,18 +111,24 @@ namespace slib
 
 }
 
-@interface _priv_Slib_macOS_ViewBase : NSView {
+@interface _priv_Slib_macOS_ViewBase : NSView
+{
 	@public sl_bool m_flagOpaque;
 	@public sl_bool m_flagClipping;
 	@public sl_bool m_flagDrawing;
 }
 @end
 
-@interface _priv_Slib_macOS_ViewHandle : _priv_Slib_macOS_ViewBase {
-
+@interface _priv_Slib_macOS_ViewHandle : _priv_Slib_macOS_ViewBase
+{
 	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
-
 	NSTrackingArea* m_trackingArea;
+}
+@end
+
+@interface _priv_Slib_macOS_Button : NSButton
+{
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 }
 @end
 
@@ -155,6 +161,40 @@ namespace slib
 		if (ret.isNotNull()) { \
 			handle->m_viewInstance = ret; \
 		} \
+	}
+
+#define MACOS_VIEW_DEFINE_ON_FOCUS \
+	- (BOOL)becomeFirstResponder \
+	{ \
+		slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance; \
+		if (instance.isNotNull()) { \
+			instance->onSetFocus(); \
+		} \
+		return [super becomeFirstResponder]; \
+	}
+
+#define MACOS_VIEW_DEFINE_ON_KEY \
+	- (void)keyDown:(NSEvent*)theEvent \
+	{ \
+		slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance; \
+		if (instance.isNotNull()) { \
+			sl_bool flagNoDefault = instance->onEventKey(sl_true, theEvent) & slib::UIEventFlags::PreventDefault; \
+			if (flagNoDefault) { \
+				return; \
+			} \
+		} \
+		[super keyDown:theEvent]; \
+	} \
+	- (void)keyUp:(NSEvent*)theEvent \
+	{ \
+		slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance; \
+		if (instance.isNotNull()) { \
+			sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent) & slib::UIEventFlags::PreventDefault; \
+			if (flagNoDefault) { \
+				return; \
+			} \
+		} \
+		[super keyUp:theEvent]; \
 	}
 
 

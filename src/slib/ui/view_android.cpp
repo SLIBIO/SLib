@@ -128,6 +128,14 @@ namespace slib
 		return 0;
 	}
 
+	void JNICALL _priv_AndroidView_nativeOnSetFocus(JNIEnv* env, jobject _this, jlong jinstance)
+	{
+		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
+		if (instance.isNotNull()) {
+			instance->onSetFocus();
+		}
+	}
+
 	void JNICALL _priv_AndroidView_nativeOnClick(JNIEnv* env, jobject _this, jlong jinstance)
 	{
 		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
@@ -173,7 +181,7 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(createGeneric, "createGeneric", "(Landroid/content/Context;)Landroid/view/View;");
 		SLIB_JNI_STATIC_METHOD(createGroup, "createGroup", "(Landroid/content/Context;)Landroid/view/View;");
 
-		SLIB_JNI_STATIC_METHOD(setFocus, "setFocus", "(Landroid/view/View;)V");
+		SLIB_JNI_STATIC_METHOD(setFocus, "setFocus", "(Landroid/view/View;Z)V");
 		SLIB_JNI_STATIC_METHOD(invalidate, "invalidate", "(Landroid/view/View;)V");
 		SLIB_JNI_STATIC_METHOD(invalidateRect, "invalidateRect", "(Landroid/view/View;IIII)V");
 		SLIB_JNI_STATIC_METHOD(getFrame, "getFrame", "(Landroid/view/View;)Landroid/graphics/Rect;");
@@ -198,6 +206,7 @@ namespace slib
 		SLIB_JNI_NATIVE(nativeOnDraw, "nativeOnDraw", "(JLslib/platform/android/ui/Graphics;)V", _priv_AndroidView_nativeOnDraw);
 		SLIB_JNI_NATIVE(nativeOnKeyEvent, "nativeOnKeyEvent", "(JZIZZZZJ)Z", _priv_AndroidView_nativeOnKeyEvent);
 		SLIB_JNI_NATIVE(nativeOnTouchEvent, "nativeOnTouchEvent", "(JI[Lslib/platform/android/ui/view/UiTouchPoint;J)Z", _priv_AndroidView_nativeOnTouchEvent);
+		SLIB_JNI_NATIVE(nativeOnSetFocus, "nativeOnSetFocus", "(J)V", _priv_AndroidView_nativeOnSetFocus);
 		SLIB_JNI_NATIVE(nativeOnClick, "nativeOnClick", "(J)V", _priv_AndroidView_nativeOnClick);
 		SLIB_JNI_NATIVE(nativeHitTestTouchEvent, "nativeHitTestTouchEvent", "(JII)Z", _priv_AndroidView_nativeHitTestTouchEvent);
 		SLIB_JNI_NATIVE(nativeOnSwipe, "nativeOnSwipe", "(JI)V", _priv_AndroidView_nativeOnSwipe);
@@ -310,11 +319,11 @@ namespace slib
 		return sl_true;
 	}
 
-	void Android_ViewInstance::setFocus()
+	void Android_ViewInstance::setFocus(sl_bool flag)
 	{
 		jobject handle = m_handle.get();
 		if (handle) {
-			JAndroidView::setFocus.call(sl_null, handle);
+			JAndroidView::setFocus.call(sl_null, handle, flag ? sl_true : sl_false);
 		}
 	}
 

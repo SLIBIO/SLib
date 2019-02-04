@@ -147,6 +147,14 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 	}
 
 	@Override
+	protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
+		super.onFocusChanged(focused, direction, previouslyFocusedRect);
+		if (focused) {
+			UiView.onEventSetFocus(this);
+		}
+	}
+
+	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		onEventCreate(this);
 		synchronized (sync) {

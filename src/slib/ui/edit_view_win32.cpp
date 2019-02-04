@@ -93,24 +93,6 @@ namespace slib
 			::InvalidateRect(handle, NULL, TRUE);
 		}
 
-		sl_bool preprocessWindowMessage(MSG& msg)
-		{
-			if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
-				if (msg.wParam == VK_ESCAPE) {
-					return onEventKey(msg.message == WM_KEYDOWN, msg.wParam, msg.lParam);
-				}
-			}
-			if (m_flagMultiLine) {
-				return sl_false;
-			}
-			return Win32_ViewInstance::preprocessWindowMessage(msg);
-		}
-
-		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
-		{
-			return sl_false;
-		}
-
 		sl_bool processCommand(SHORT code, LRESULT& result) override
 		{
 			switch (code) {

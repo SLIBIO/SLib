@@ -84,7 +84,7 @@ namespace slib
 	public:
 		sl_bool isValid() override;
 
-		void setFocus() override;
+		void setFocus(sl_bool flag) override;
 
 		void invalidate() override;
 

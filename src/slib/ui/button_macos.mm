@@ -28,14 +28,6 @@
 
 #include "view_macos.h"
 
-@interface _priv_Slib_macOS_Button : NSButton {
-	
-	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
-
-}
-
-@end
-
 namespace slib
 {
 
@@ -121,6 +113,9 @@ namespace slib
 
 @implementation _priv_Slib_macOS_Button
 
+MACOS_VIEW_DEFINE_ON_FOCUS
+MACOS_VIEW_DEFINE_ON_KEY
+
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -142,35 +137,6 @@ namespace slib
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
 	return NO;
-}
-
-- (void)setFrame:(NSRect)frame
-{
-	[super setFrame:frame];
-}
-
-- (void)keyDown:(NSEvent*)theEvent
-{
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventKey(sl_true, theEvent);
-		if (flagNoDefault) {
-			return;
-		}
-	}
-	[super keyDown:theEvent];
-}
-
-- (void)keyUp:(NSEvent*)theEvent
-{
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
-		if (flagNoDefault) {
-			return;
-		}
-	}
-	[super keyUp:theEvent];
 }
 
 @end

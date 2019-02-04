@@ -67,6 +67,14 @@ public class UiGenericView extends View implements IView {
 	}
 
 	@Override
+	protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
+		super.onFocusChanged(focused, direction, previouslyFocusedRect);
+		if (focused) {
+			UiView.onEventSetFocus(this);
+		}
+	}
+
+	@Override
 	@SuppressLint("ClickableViewAccessibility")
 	public boolean onTouchEvent(MotionEvent event) {
 		if (!(UiView.onEventTouch(this, event))) {

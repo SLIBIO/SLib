@@ -256,6 +256,7 @@ namespace slib
 }
 
 @implementation _priv_Slib_macOS_ListReportView
+
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -305,9 +306,14 @@ namespace slib
 		}
 	}
 }
+
 @end
 
 @implementation _priv_Slib_macOS_ListReportView_TableView
+
+MACOS_VIEW_DEFINE_ON_FOCUS
+MACOS_VIEW_DEFINE_ON_KEY
+
 - (void)mouseDown:(NSEvent *)theEvent
 {
 	NSInteger indexRowBefore = [self selectedRow];
@@ -355,6 +361,7 @@ namespace slib
 		}
 	}
 }
+
 @end
 
 #endif

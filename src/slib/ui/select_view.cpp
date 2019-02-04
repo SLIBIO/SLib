@@ -113,6 +113,7 @@ namespace slib
 		setBorder(sl_true, UIUpdateMode::Init);
 		setBackgroundColor(Color::White, UIUpdateMode::Init);
 		setSavingCanvasState(sl_false);
+		setFocusable(sl_true);
 		
 		m_indexSelected = 0;
 		

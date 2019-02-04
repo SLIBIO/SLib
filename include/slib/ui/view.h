@@ -1206,13 +1206,17 @@ namespace slib
 
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, KeyEvent, UIEvent* ev)
 		
-		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Click)
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_ON(View, Click)
+		void dispatchClick();
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, ClickEvent, UIEvent* ev)
 
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, SetCursor, UIEvent* ev)
 		sl_bool dispatchSetCursorToChildren(UIEvent* ev, const Ref<View>* children, sl_size count);
 		void dispatchSetCursorToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints = sl_true);
 		
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, SetFocus)
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, KillFocus)
+
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Resize, sl_ui_len width, sl_ui_len height)
 		
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, ChangeVisibility, Visibility oldVisibility, Visibility newVisibility)
@@ -1234,7 +1238,11 @@ namespace slib
 
 		void _removeChild(View* child);
 		
-		void _killFocusFromParent();
+		void _setFocus(sl_bool flagFocused, sl_bool flagApplyInstance, UIUpdateMode mode);
+		
+		void _setFocusedFlag(sl_bool flagFocused, sl_bool flagApplyInstance);
+		
+		void _killChildFocus();
 		
 		void _setFocusedChild(View* child, UIUpdateMode mode);
 		
@@ -1584,6 +1592,8 @@ namespace slib
 			AtomicFunction<void(View*)> onClick;
 			AtomicFunction<void(View*, UIEvent*)> onClickEvent;
 			AtomicFunction<void(View*, UIEvent*)> onSetCursor;
+			AtomicFunction<void(View*)> onSetFocus;
+			AtomicFunction<void(View*)> onKillFocus;
 			AtomicFunction<void(View*, sl_ui_len, sl_ui_len)> onResize;
 			AtomicFunction<void(View*, Visibility, Visibility)> onChangeVisibility;
 			AtomicFunction<void(View*, sl_scroll_pos, sl_scroll_pos)> onScroll;
@@ -1602,6 +1612,7 @@ namespace slib
 		
 		void _initializeEventAttributes();
 
+		friend class ViewInstance;
 		friend class ListView;
 
 	};
@@ -1631,7 +1642,7 @@ namespace slib
 	public:
 		virtual sl_bool isValid() = 0;
 		
-		virtual void setFocus() = 0;
+		virtual void setFocus(sl_bool flagFocus) = 0;
 		
 		virtual void invalidate() = 0;
 
@@ -1679,6 +1690,8 @@ namespace slib
 		void onMouseWheelEvent(UIEvent* event);
 		
 		void onSetCursor(UIEvent* event);
+		
+		void onSetFocus();
 		
 		void onSwipe(GestureType ev);
 		

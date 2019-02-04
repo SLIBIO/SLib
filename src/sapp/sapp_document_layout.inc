@@ -2301,6 +2301,24 @@ namespace slib
 		if (flagView) {
 			LAYOUT_CONTROL_GENERIC_ATTR(tabStop, setTabStopEnabled)
 		}
+		if (!flagRoot) {
+			if (op == OP_PARSE) {
+				attr->nextTabStop = resourceItem->getXmlAttribute("nextTabStop");
+				attr->previousTabStop = resourceItem->getXmlAttribute("previousTabStop");
+			} else if (op == OP_GENERATE_CPP) {
+				if (params->resource->itemsByName.find(attr->nextTabStop)) {
+					params->sbDefineInit->add(String::format("%s%s->setNextTabStop(%s);%n", strTab, name, attr->nextTabStop));
+				}
+				if (params->resource->itemsByName.find(attr->previousTabStop)) {
+					params->sbDefineInit->add(String::format("%s%s->setPreviousTabStop(%s);%n", strTab, name, attr->previousTabStop));
+				}
+			} else if (op == OP_SIMULATE) {
+				if (!flagOnLayout) {
+					view->setNextTabStop(params->simulator->getViewByName(attr->nextTabStop));
+					view->setPreviousTabStop(params->simulator->getViewByName(attr->previousTabStop));
+				}
+			}
+		}
 		
 		if (flagView) {
 			LAYOUT_CONTROL_GENERIC_ATTR(instance, setCreatingInstance)
@@ -2748,6 +2766,7 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR(returnKey, setReturnKeyType)
 		LAYOUT_CONTROL_GENERIC_ATTR(keyboard, setKeyboardType)
 		LAYOUT_CONTROL_GENERIC_ATTR(autoCap, setAutoCapitalizationType)
+		LAYOUT_CONTROL_NOPARAM_ATTR(focusNextOnReturnKey, setFocusNextOnReturnKey)
 		
 		LAYOUT_CONTROL_ADD_STATEMENT
 		
@@ -2781,7 +2800,6 @@ namespace slib
 	{
 		LAYOUT_CONTROL_PROCESS_SUPER(View)
 		
-		LAYOUT_CONTROL_DRAWABLE_ATTR(src, setSource)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(gravity, setGravity)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(scale, setScaleMode)
 		LAYOUT_CONTROL_GENERIC_ATTR(minAspectRatio, setMinimumAutoAspectRatio)
@@ -2834,6 +2852,7 @@ namespace slib
 			}
 		}
 		
+		LAYOUT_CONTROL_DRAWABLE_ATTR(src, setSource)
 		LAYOUT_CONTROL_STRING_ATTR(url, loadUrl)
 
 		LAYOUT_CONTROL_ADD_STATEMENT

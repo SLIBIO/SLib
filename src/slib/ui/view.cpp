@@ -520,7 +520,7 @@ namespace slib
 			updateAndInvalidateBoundsInParent(UIUpdateMode::None);
 #endif
 			if (m_flagFocused && m_flagFocusable) {
-				instance->setFocus();
+				instance->setFocus(sl_true);
 			}
 			Ref<GestureDetector> gesture = m_gestureDetector;
 			if (gesture.isNotNull()) {
@@ -1508,44 +1508,82 @@ namespace slib
 
 	void View::setFocus(sl_bool flagFocused, UIUpdateMode mode)
 	{
-		m_flagFocused = flagFocused;
-		if (flagFocused) {
-			Ref<ViewInstance> instance = getNearestViewInstance();
-			if (instance.isNotNull()) {
-				instance->setFocus();
-			}
+		if (isUiThread()) {
+			_setFocus(flagFocused, sl_true, mode);
 		} else {
-			_killFocusFromParent();
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), View, _setFocus, this, flagFocused, sl_true, mode));
 		}
+	}
+	
+	void View::_setFocus(sl_bool flagFocused, sl_bool flagApplyInstance, UIUpdateMode mode)
+	{
+		_killChildFocus();
+		_setFocusedFlag(flagFocused, flagApplyInstance);
 		Ref<View> parent = getParent();
 		if (parent.isNotNull()) {
 			if (flagFocused) {
 				parent->_setFocusedChild(this, mode);
-				return;
 			} else {
-				if (m_childFocused == this) {
-					m_childFocused.setNull();
-				}
+				parent->_setFocusedChild(sl_null, mode);
 			}
+			return;
 		}
 		invalidate(mode);
 	}
-
-	void View::_killFocusFromParent()
+	
+	void View::_setFocusedFlag(sl_bool flagFocused, sl_bool flagApplyInstance)
 	{
-		m_flagFocused = sl_false;
+		if (flagApplyInstance) {
+			Ref<ViewInstance> instance = getNearestViewInstance();
+			if (instance.isNotNull()) {
+				instance->setFocus(flagFocused);
+			}
+		}
+		if (m_flagFocused != flagFocused) {
+			m_flagFocused = flagFocused;
+			if (flagFocused) {
+				dispatchSetFocus();
+			} else {
+				dispatchKillFocus();
+			}
+		}
+	}
+
+	void View::_killChildFocus()
+	{
 		Ref<View> child = m_childFocused;
 		if (child.isNotNull()) {
-			child->_killFocusFromParent();
+			child->_setFocusedFlag(sl_false, sl_false);
+			child->_killChildFocus();
 		}
 		m_childFocused.setNull();
+	}
+
+	void View::_setFocusedChild(View* child, UIUpdateMode mode)
+	{
+		Ref<View> old = m_childFocused;
+		if (old != child) {
+			if (old.isNotNull()) {
+				old->_setFocusedFlag(sl_false, sl_false);
+				old->_killChildFocus();
+			}
+			m_childFocused = child;
+		}
+		if (child) {
+			Ref<View> parent = getParent();
+			if (parent.isNotNull()) {
+				parent->_setFocusedChild(this, mode);
+				return;
+			}
+		}
+		invalidate(mode);
 	}
 
 	Ref<View> View::getFocusedChild()
 	{
 		return m_childFocused;
 	}
-
+	
 	Ref<View> View::getFocusedDescendant()
 	{
 		Ref<View> focused = m_childFocused;
@@ -1557,26 +1595,6 @@ namespace slib
 			return focused;
 		}
 		return sl_null;
-	}
-
-	void View::_setFocusedChild(View* child, UIUpdateMode mode)
-	{
-		Ref<View> old = m_childFocused;
-		if (old != child) {
-			if (old.isNotNull()) {
-				old->_killFocusFromParent();
-			}
-			m_childFocused = child;
-		}
-		if (child) {
-			m_flagFocused = sl_true;
-			Ref<View> parent = getParent();
-			if (parent.isNotNull()) {
-				parent->_setFocusedChild(this, mode);
-				return;
-			}
-		}
-		invalidate(mode);
 	}
 
 	sl_bool View::isPressedState()
@@ -8016,7 +8034,7 @@ namespace slib
 			_processContentScrollingEvents(ev);
 		}
 		
-		if (m_flagTabStopEnabled) {
+		if (isTabStopEnabled() && m_childFocused.isNull()) {
 			if (ev->getAction() == UIAction::KeyUp) {
 				if (ev->getKeycode() == Keycode::Tab) {
 					if (ev->isShiftKey()) {
@@ -8055,19 +8073,13 @@ namespace slib
 		
 	}
 	
-	DEFINE_VIEW_EVENT_HANDLER(Click)
+	DEFINE_VIEW_EVENT_HANDLER_WITHOUT_ON(Click)
 
 	void View::dispatchClick()
 	{
-		if (! m_flagEnabled) {
-			return;
-		}
-		
-		SLIB_INVOKE_EVENT_HANDLER(Click)
-		
 		Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
 		if (ev.isNotNull()) {
-			SLIB_INVOKE_EVENT_HANDLER(ClickEvent, ev.get())
+			dispatchClickEvent(ev.get());
 		}
 	}
 
@@ -8078,9 +8090,8 @@ namespace slib
 		if (! m_flagEnabled) {
 			return;
 		}
-		
 		SLIB_INVOKE_EVENT_HANDLER(ClickEvent, ev)
-		SLIB_INVOKE_EVENT_HANDLER(Click)
+		getOnClick()(this);
 	}
 	
 	DEFINE_VIEW_EVENT_HANDLER(SetCursor, UIEvent* ev)
@@ -8168,6 +8179,20 @@ namespace slib
 				child->dispatchSetCursor(ev);
 			}
 		}
+	}
+
+	DEFINE_VIEW_EVENT_HANDLER(SetFocus)
+	
+	void View::dispatchSetFocus()
+	{
+		SLIB_INVOKE_EVENT_HANDLER(SetFocus)
+	}
+
+	DEFINE_VIEW_EVENT_HANDLER(KillFocus)
+	
+	void View::dispatchKillFocus()
+	{
+		SLIB_INVOKE_EVENT_HANDLER(KillFocus)
 	}
 
 	DEFINE_VIEW_EVENT_HANDLER(Resize, sl_ui_len width, sl_ui_len height)
@@ -8867,6 +8892,14 @@ namespace slib
 		Ref<View> view = getView();
 		if (view.isNotNull()) {
 			view->dispatchSetCursor(ev);
+		}
+	}
+	
+	void ViewInstance::onSetFocus()
+	{
+		Ref<View> view = getView();
+		if (view.isNotNull()) {
+			view->_setFocus(sl_true, sl_false, UIUpdateMode::Redraw);
 		}
 	}
 

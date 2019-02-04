@@ -65,16 +65,6 @@ namespace slib
 			return sl_false;
 		}
 
-		sl_bool processCommand(SHORT code, LRESULT& result) override
-		{
-			return sl_false;
-		}
-
-		sl_bool processNotify(NMHDR* nmhdr, LRESULT& result) override
-		{
-			return sl_false;
-		}
-
 		sl_bool _initialize();
 
 		void _resize()

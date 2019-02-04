@@ -161,18 +161,6 @@ namespace slib
 		Button::dispatchClickEvent(ev);
 	}
 
-	void RadioButton::dispatchClick()
-	{
-		Ref<RadioGroup> group = m_group;
-		if (group.isNotNull()) {
-			group->select(this);
-			group->dispatchSelect(this);
-		} else {
-			CheckBox::setChecked(sl_true);
-		}
-		Button::dispatchClick();
-	}
-
 	
 	SLIB_DEFINE_OBJECT(RadioGroup, Object)
 

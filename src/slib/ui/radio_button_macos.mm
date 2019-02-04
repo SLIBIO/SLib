@@ -28,19 +28,13 @@
 
 #include "view_macos.h"
 
-@interface _priv_Slib_macOS_RadioButton : NSButton {
-	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
-}
-
-@end
-
 namespace slib
 {
 
 	Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* _parent)
 	{
 		MACOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_macOS_RadioButton* handle = [[_priv_Slib_macOS_RadioButton alloc] initWithFrame:frame];
+		_priv_Slib_macOS_Button* handle = [[_priv_Slib_macOS_Button alloc] initWithFrame:frame];
 		if (handle != nil) {
 			handle.title = Apple::getNSStringFromString(getText());
 			[handle setButtonType:NSRadioButton];
@@ -57,25 +51,5 @@ namespace slib
 	}
 
 }
-
-@implementation _priv_Slib_macOS_RadioButton
--(id)initWithFrame:(NSRect)frame
-{
-	self = [super initWithFrame:frame];
-	if (self != nil) {
-		[self setAction: @selector(onClick)];
-		[self setTarget:self];
-	}
-	return self;
-}
-
--(void)onClick
-{
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		instance->onClick();
-	}
-}
-@end
 
 #endif

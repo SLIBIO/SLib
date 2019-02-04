@@ -88,6 +88,8 @@ namespace slib
 		
 		void setAutoDismissKeyboard(sl_bool flag);
 		
+		void setFocusNextOnReturnKey();
+		
 	public:
 		SLIB_DECLARE_EVENT_HANDLER(EditView, Change, String* pValue);
 		SLIB_DECLARE_EVENT_HANDLER(EditView, ReturnKey)
@@ -97,7 +99,7 @@ namespace slib
 		
 		void onDraw(Canvas* canvas) override;
 
-		void onClick() override;
+		void onClickEvent(UIEvent* ev) override;
 		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;

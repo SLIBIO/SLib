@@ -89,18 +89,22 @@ public class UiView {
 		return null;
 	}
 	
-	public static void setFocus(final View view) {
+	public static void setFocus(final View view, final boolean flag) {
 		try {
 			if (!(UiThread.isUiThread())) {
 				view.post(new Runnable() {
 					public void run() {
-						setFocus(view);
+						setFocus(view, flag);
 					}
 				});
 			} else {
 				view.setFocusable(true);
 				view.setFocusableInTouchMode(true);
-				view.requestFocus();
+				if (flag) {
+					view.requestFocus();
+				} else {
+					view.clearFocus();
+				}
 			}
 		} catch (Exception e) {
 			Logger.exception(e);
@@ -280,17 +284,6 @@ public class UiView {
 	}
 
 	public static void setClipping(final View view, final boolean flag) {
-		if (view instanceof ViewGroup) {
-			if (UiThread.isUiThread()) {
-				((ViewGroup)view).setClipChildren(flag);
-			} else {
-				view.post(new Runnable() {
-					public void run() {
-						((ViewGroup)view).setClipChildren(flag);
-					}
-				});
-			}			
-		}
 	}
 
 	public static void setDrawing(final View view, final boolean flag) {
@@ -543,7 +536,15 @@ public class UiView {
 		}
 		return false;
 	}
-	
+
+	private static native void nativeOnSetFocus(long instance);
+	public static void onEventSetFocus(IView view) {
+		long instance = view.getInstance();
+		if (instance != 0) {
+			nativeOnSetFocus(instance);
+		}
+	}
+
 	private static native void nativeOnClick(long instance);
 	public static void onEventClick(IView view) {
 		long instance = view.getInstance();

@@ -311,6 +311,8 @@ namespace slib
 		
 		SAppBooleanValue touchMultipleChildren;
 		SAppBooleanValue tabStop;
+		String nextTabStop;
+		String previousTabStop;
 
 		SAppBooleanValue instance;
 		SAppBooleanValue childInstances;
@@ -424,6 +426,7 @@ namespace slib
 		SAppUIReturnKeyTypeValue returnKey;
 		SAppUIKeyboardTypeValue keyboard;
 		SAppUIAutoCapitalizationTypeValue autoCap;
+		SAppBooleanValue focusNextOnReturnKey;
 		
 	};
 

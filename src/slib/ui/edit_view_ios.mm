@@ -548,6 +548,9 @@ namespace slib
 }
 
 @implementation _priv_Slib_iOS_TextField
+
+IOS_VIEW_DEFINE_ON_FOCUS
+
 -(id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -581,6 +584,8 @@ namespace slib
 @end
 
 @implementation _priv_Slib_iOS_TextArea
+
+IOS_VIEW_DEFINE_ON_FOCUS
 
 -(id)initWithFrame:(CGRect)frame
 {

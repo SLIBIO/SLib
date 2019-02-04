@@ -75,7 +75,7 @@ namespace slib
 
 		sl_bool isValid() override;
 
-		void setFocus() override;
+		void setFocus(sl_bool flag) override;
 
 		void invalidate() override;
 
@@ -129,6 +129,8 @@ namespace slib
 
 		virtual gboolean onScrollEvent(GdkEventScroll* event);
 		
+		virtual gboolean onFocusEvent(GdkEventFocus* event);
+
 	private:
 		void _init(GtkWidget* handle);
 

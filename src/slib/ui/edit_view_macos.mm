@@ -428,24 +428,15 @@ namespace slib
 
 @implementation _priv_Slib_macOS_TextField
 
+MACOS_VIEW_DEFINE_ON_FOCUS
+MACOS_VIEW_DEFINE_ON_KEY
+
 - (void)controlTextDidChange:(NSNotification *)obj
 {
 	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::EditView_Impl::onChangeTextField(instance.get(), self);
 	}
-}
-
-- (void)keyUp:(NSEvent*)theEvent
-{
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
-		if (flagNoDefault) {
-			return;
-		}
-	}
-	[super keyUp:theEvent];
 }
 
 @end
@@ -489,34 +480,14 @@ namespace slib
 
 @implementation _priv_Slib_macOS_TextArea_TextView
 
-- (void)keyDown:(NSEvent*)theEvent
-{
-	if ([theEvent keyCode] == 0x35) {
-		slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			sl_bool flagNoDefault = instance->onEventKey(sl_true, theEvent);
-			if (flagNoDefault) {
-				return;
-			}
-		}
-	}
-	[super keyDown:theEvent];
-}
-
-- (void)keyUp:(NSEvent*)theEvent
-{
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
-		if (flagNoDefault) {
-			return;
-		}
-	}
-	[super keyUp:theEvent];
-}
+MACOS_VIEW_DEFINE_ON_KEY
 
 - (BOOL)becomeFirstResponder
 {
+	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onSetFocus();
+	}
 	if (m_placeholderString != nil) {
 		[self setNeedsDisplay:YES];
 	}

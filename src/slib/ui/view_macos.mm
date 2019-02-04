@@ -87,16 +87,6 @@ namespace slib
 					((_priv_Slib_macOS_ViewBase*)handle)->m_flagDrawing = view->isDrawing();
 				}
 				
-				/*****************
-				Don't use alphaValue because this causes displaying error when used with frameRotation or bounds
-				******************/
-				/*
-				sl_real alpha = view->getFinalAlpha();
-				if (alpha < 1 - SLIB_EPSILON) {
-					handle.alphaValue = alpha;
-				}
-				*/
-				
 				if (parent != nil) {
 					[parent addSubview:handle];				
 				}
@@ -120,18 +110,22 @@ namespace slib
 		return sl_true;
 	}
 
-	void macOS_ViewInstance::setFocus()
+	void macOS_ViewInstance::setFocus(sl_bool flagFocus)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
 			NSWindow* window = [handle window];
 			if (window != nil) {
-				if (UI::isUiThread()) {
+				if (!(UI::isUiThread())) {
+					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), macOS_ViewInstance, setFocus, this, flagFocus));
+					return;
+				}
+				if (flagFocus) {
 					[window makeFirstResponder:handle];
 				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[window makeFirstResponder:handle];
-					});
+					if (window.firstResponder == handle) {
+						[window makeFirstResponder:nil];
+					}
 				}
 			}
 		}
@@ -259,18 +253,6 @@ namespace slib
 
 	void macOS_ViewInstance::setAlpha(sl_real alpha)
 	{
-		/*********
-			Don't use alphaValue because this causes displaying error when used with frameRotation or bounds
-		*********/
-		
-		/*
-		NSView* handle = m_handle;
-		if (handle != nil) {
-			handle.alphaValue = alpha;
-			[handle setNeedsDisplay:YES];
-		}
-		*/
-		
 		NSView* handle = m_handle;
 		if (handle != nil) {
 			if (UI::isUiThread()) {
@@ -281,7 +263,6 @@ namespace slib
 				});
 			}
 		}
-		
 	}
 	
 	void macOS_ViewInstance::setClipping(sl_bool flag)
@@ -710,6 +691,8 @@ namespace slib
 @end
 
 @implementation _priv_Slib_macOS_ViewHandle
+
+MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (id)init
 {

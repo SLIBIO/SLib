@@ -119,11 +119,17 @@ namespace slib
 		return sl_false;
 	}
 
-	void Win32_ViewInstance::setFocus()
+	void Win32_ViewInstance::setFocus(sl_bool flag)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
-			::SetFocus(hWnd);
+			if (flag) {
+				::SetFocus(hWnd);
+			} else {
+				if (::GetFocus() == hWnd) {
+					::SetFocus(NULL);
+				}
+			}
 		}
 	}
 
@@ -432,11 +438,23 @@ namespace slib
 
 	sl_bool Win32_ViewInstance::preprocessWindowMessage(MSG& msg)
 	{
-		if (m_flagGenericView) {
-			return sl_false;
-		}
-		if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
-			return onEventKey(msg.message == WM_KEYDOWN, msg.wParam, msg.lParam);
+		UINT message = msg.message;
+		WPARAM wParam = msg.wParam;
+		LPARAM lParam = msg.lParam;
+		switch (message) {
+			case WM_KEYDOWN:
+				{
+					return onEventKey(sl_true, wParam, lParam);
+				}
+			case WM_KEYUP:
+				{
+					return onEventKey(sl_false, wParam, lParam);
+				}
+			case WM_SETFOCUS:
+				{
+					onSetFocus();
+					return sl_false;
+				}
 		}
 		return sl_false;
 	}
@@ -633,15 +651,6 @@ namespace slib
 					}
 					result = TRUE;
 					return sl_true;
-				}
-
-			case WM_KEYDOWN:
-				{
-					return onEventKey(sl_true, wParam, lParam);
-				}
-			case WM_KEYUP:
-				{
-					return onEventKey(sl_false, wParam, lParam);
 				}
 			case WM_LBUTTONDOWN:
 				{

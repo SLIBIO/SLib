@@ -269,6 +269,7 @@ namespace slib
 }
 
 @implementation _priv_Slib_Apple_WebView
+
 -(id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -427,6 +428,15 @@ namespace slib
 			view->_onInvokeMethod(self, body);
 		}
 	}
+}
+
+- (BOOL)becomeFirstResponder
+{
+	slib::Ref<WebViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onSetFocus();
+	}
+	return YES;
 }
 
 @end

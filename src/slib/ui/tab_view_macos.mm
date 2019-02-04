@@ -221,6 +221,10 @@ namespace slib
 }
 
 @implementation _priv_Slib_macOS_TabView
+
+MACOS_VIEW_DEFINE_ON_FOCUS
+MACOS_VIEW_DEFINE_ON_KEY
+
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];

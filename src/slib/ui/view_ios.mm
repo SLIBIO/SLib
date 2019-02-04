@@ -129,16 +129,20 @@ namespace slib
 		return sl_true;
 	}
 	
-	void iOS_ViewInstance::setFocus()
+	void iOS_ViewInstance::setFocus(sl_bool flag)
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
-			if (UI::isUiThread()) {
-				[handle becomeFirstResponder];
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
+			if (!(UI::isUiThread())) {
+				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_ViewInstance, setFocus, this, flag));
+				return;
+			}
+			if (flag) {
+				if (handle.window != nil) {
 					[handle becomeFirstResponder];
-				});
+				}
+			} else {
+				[handle resignFirstResponder];
 			}
 		}
 	}

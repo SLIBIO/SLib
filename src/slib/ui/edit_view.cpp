@@ -229,6 +229,16 @@ namespace slib
 	{
 		m_flagAutoDismissKeyboard = flag;
 	}
+	
+	void EditView::setFocusNextOnReturnKey()
+	{
+		setOnReturnKey([](EditView* view) {
+			Ref<View> next = view->getNextTabStop();
+			if (next.isNotNull()) {
+				next->setFocus();
+			}
+		});
+	}
 
 	void EditView::onUpdateLayout()
 	{
@@ -282,7 +292,7 @@ namespace slib
 		}
 	}
 	
-	void EditView::onClick()
+	void EditView::onClickEvent(UIEvent* ev)
 	{
 #if defined(SLIB_PLATFORM_IS_MOBILE)
 		if (!m_flagReadOnly) {
@@ -401,13 +411,15 @@ namespace slib
 	
 	void EditView::dispatchKeyEvent(UIEvent* ev)
 	{
-		View::dispatchKeyEvent(ev);
-		if (!(isMultiLine())) {
+		if (!(isMultiLine()) || ev->getKeycode() == Keycode::Escape) {
 			if (ev->getAction() == UIAction::KeyDown) {
 				if (ev->getKeycode() == Keycode::Enter) {
 					dispatchReturnKey();
 				}
 			}
+			View::dispatchKeyEvent(ev);
+		} else {
+			ev->stopPropagation();
 		}
 	}
 

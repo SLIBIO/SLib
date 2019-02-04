@@ -59,11 +59,6 @@ namespace slib
 			}
 		}
 
-		sl_bool preprocessWindowMessage(MSG& msg) override
-		{
-			return sl_false;
-		}
-
 		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
 		{
 			if (msg == WM_PAINT) {

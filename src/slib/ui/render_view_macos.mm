@@ -214,6 +214,7 @@ namespace slib
 }
 
 @implementation _priv_Slib_macOS_GLView
+
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];

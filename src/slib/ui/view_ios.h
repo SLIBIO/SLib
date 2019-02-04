@@ -50,7 +50,7 @@ namespace slib
 		
 		sl_bool isValid() override;
 		
-		void setFocus() override;
+		void setFocus(sl_bool flag) override;
 		
 		void invalidate() override;
 		
@@ -135,7 +135,19 @@ namespace slib
 		} \
 	}
 
+
+#define IOS_VIEW_DEFINE_ON_FOCUS \
+	- (BOOL)becomeFirstResponder \
+	{ \
+		slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
+		if (instance.isNotNull()) { \
+			instance->onSetFocus(); \
+		} \
+		return [super becomeFirstResponder]; \
+	}
+
 #define IOS_VIEW_EVENTS \
+IOS_VIEW_DEFINE_ON_FOCUS \
 - (BOOL)canBecomeFirstResponder \
 { \
 	return NO; \

@@ -117,15 +117,17 @@ namespace slib
 		return sl_true;
 	}
 	
-	void GTK_ViewInstance::setFocus()
+	void GTK_ViewInstance::setFocus(sl_bool flag)
 	{
 		GtkWidget* handle = m_handle;
 		if (handle) {
 			if (!(UI::isUiThread())) {
-				UI::dispatchToUiThread(SLIB_FUNCTION_WEAKREF(GTK_ViewInstance, setFocus, this));
+				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_ViewInstance, setFocus, this, flag));
 				return;
 			}
-			gtk_widget_grab_focus(handle);
+			if (flag) {
+				gtk_widget_grab_focus(handle);
+			}
 		}
 	}
 	
@@ -334,13 +336,15 @@ namespace slib
 			g_signal_connect(handle, "key-press-event", G_CALLBACK(eventCallback), sl_null);
 			g_signal_connect(handle, "key-release-event", G_CALLBACK(eventCallback), sl_null);
 			g_signal_connect(handle, "scroll-event", G_CALLBACK(eventCallback), sl_null);
+			g_signal_connect(handle, "focus-in-event", G_CALLBACK(eventCallback), sl_null);
 			gtk_widget_set_events(handle,
 								  GDK_EXPOSURE_MASK |
 								  GDK_POINTER_MOTION_MASK | GDK_BUTTON_MOTION_MASK |
 								  GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
 								  GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
 								  GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK |
-								  GDK_SCROLL_MASK);
+								  GDK_SCROLL_MASK |
+								  GDK_FOCUS_CHANGE_MASK);
 		}
 	}
 	
@@ -370,6 +374,9 @@ namespace slib
 					break;
 				case GDK_SCROLL:
 					instance->onScrollEvent((GdkEventScroll*)event);
+					break;
+				case GDK_FOCUS_CHANGE:
+					instance->onFocusEvent((GdkEventFocus*)event);
 					break;
 			}
 		}
@@ -599,6 +606,17 @@ namespace slib
 				if (event->isPreventedDefault()) {
 					return sl_true;
 				}
+			}
+		}
+		return sl_false;
+	}
+	
+	gboolean GTK_ViewInstance::onFocusEvent(GdkEventFocus* gevent)
+	{
+		GtkWidget* handle = m_handle;
+		if (handle) {
+			if (gevent->in) {
+				onSetFocus();
 			}
 		}
 		return sl_false;

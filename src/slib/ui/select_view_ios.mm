@@ -248,6 +248,7 @@ namespace slib
 @end
 
 @implementation _priv_Slib_iOS_SelectView_DropIcon
+
 - (id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -285,6 +286,9 @@ namespace slib
 @end
 
 @implementation _priv_Slib_iOS_SelectView
+
+IOS_VIEW_DEFINE_ON_FOCUS
+
 -(id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];

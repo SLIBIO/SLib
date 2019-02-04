@@ -54,8 +54,6 @@ namespace slib
 		
 		void dispatchClickEvent(UIEvent* ev) override;
 		
-		void dispatchClick() override;
-
 	private:
 		void _getChecked_NW();
 		
