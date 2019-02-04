@@ -214,12 +214,15 @@ public:		SLIB_INLINE slib::Function<TYPE> get##NAME() const { return m_function_
 			SLIB_INLINE slib::Function<TYPE> add##NAME(const slib::Function<TYPE>& value) { return m_function_##NAME.add(value); } \
 			SLIB_INLINE void remove##NAME(const slib::Function<TYPE>& value) { m_function_##NAME.remove(value); }
 
-#define SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_DISPATCH(CLASS, NAME, ...) \
-protected:	virtual void on##NAME(__VA_ARGS__); \
+#define SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_ON(CLASS, NAME, ...) \
 public:		slib::Function<void(CLASS* sender, ##__VA_ARGS__)> getOn##NAME() const; \
 			slib::Function<void(CLASS* sender, ##__VA_ARGS__)> setOn##NAME(const slib::Function<void(CLASS* sender, ##__VA_ARGS__)>& handler); \
 			slib::Function<void(CLASS* sender, ##__VA_ARGS__)> addOn##NAME(const slib::Function<void(CLASS* sender, ##__VA_ARGS__)>& handler); \
 			void removeOn##NAME(const slib::Function<void(CLASS* sender, ##__VA_ARGS__)>& handler);
+
+#define SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_DISPATCH(CLASS, NAME, ...) \
+protected:	virtual void on##NAME(__VA_ARGS__); \
+			SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_ON(CLASS, NAME, ##__VA_ARGS__);
 
 #define SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(CLASS, NAME, ...) \
 			SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_DISPATCH(CLASS, NAME, ##__VA_ARGS__) \
