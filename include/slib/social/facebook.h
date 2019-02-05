@@ -27,9 +27,41 @@
 
 #include "../core/function.h"
 #include "../core/string.h"
+#include "../core/list.h"
+#include "../core/time.h"
 
 namespace slib
 {
+	
+	struct SLIB_EXPORT FacebookAccessToken
+	{
+		String userId;
+		String token;
+		Time expirationDate = Time::zero();
+		Time refreshDate = Time::zero();
+		List<String> permissions;
+		List<String> declinedPermissions;
+	};
+	
+	struct SLIB_EXPORT FacebookLoginResult
+	{
+		sl_bool flagError = sl_true;
+		String errorMessage;
+
+		sl_bool flagCancel = sl_false;
+		
+		List<String> grantedPermissions;
+		List<String> declinedPermissions;
+		
+		FacebookAccessToken token;
+	};
+	
+	struct SLIB_EXPORT FacebookLoginParam
+	{
+		sl_bool flagPublishPermissions = sl_false;
+		List<String> permissions;
+		Function<void(FacebookLoginResult& result)> onComplete;
+	};
 	
 	class SLIB_EXPORT Facebook
 	{
@@ -37,7 +69,11 @@ namespace slib
 		// call this function at `onStart()` in your application class
 		static void initializeOnStartApp();
 		
-		static void login(const Function<void(String userId, String token)>& callback);
+		static sl_bool getCurrentToken(FacebookAccessToken* _out = sl_null);
+		
+		static void login(const FacebookLoginParam& param);
+		
+		static void loginWithReadPermissions(const Function<void(FacebookLoginResult&)>& callback);
 		
 	};
 	

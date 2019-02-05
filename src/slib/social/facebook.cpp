@@ -25,15 +25,28 @@
 namespace slib
 {
 	
+	void Facebook::loginWithReadPermissions(const Function<void(FacebookLoginResult&)>& callback)
+	{
+		FacebookLoginParam param;
+		param.onComplete = callback;
+		login(param);
+	}
+	
 #if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID)
 	
 	void Facebook::initializeOnStartApp()
 	{
 	}
 	
-	void Facebook::login(const Function<void(String userId, String token)>& callback)
+	sl_bool Facebook::getCurrentToken(FacebookAccessToken* _out)
 	{
-		callback(sl_null, sl_null);
+		return sl_false;
+	}
+	
+	void Facebook::login(const FacebookLoginParam& param)
+	{
+		FacebookLoginResult result;
+		callback(result);
 	}
 	
 #endif
