@@ -260,13 +260,19 @@ namespace slib
 		_g_slib_ios_global_scale_factor = factor;
 	}
 	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<void(NSDictionary*)> >, _g_slib_ios_callbacks_didReceiveRemoteNotification);
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void(NSDictionary*)>, _g_slib_ios_callback_didFinishLaunching);
+	
+	void UIPlatform::registerDidFinishLaunchingCallback(const Function<void(NSDictionary*)>& callback)
+	{
+		_g_slib_ios_callback_didFinishLaunching.add(callback);
+	}
+
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void(NSDictionary*)>, _g_slib_ios_callback_didReceiveRemoteNotification);
 	
 	void UIPlatform::registerDidReceiveRemoteNotificationCallback(const Function<void(NSDictionary*)>& callback)
 	{
-		_g_slib_ios_callbacks_didReceiveRemoteNotification.add(callback);
+		_g_slib_ios_callback_didReceiveRemoteNotification.add(callback);
 	}
-
 	
 	void _priv_slib_ui_reset_orienation();
 
@@ -281,6 +287,8 @@ namespace slib
 	slib::_priv_slib_ui_reset_orienation();
 	
 	slib::UIApp::dispatchStartToApp();
+	
+	slib::_g_slib_ios_callback_didFinishLaunching(launchOptions);
 	
 	slib::MobileApp::dispatchCreateActivityToApp();
 	
@@ -371,9 +379,7 @@ namespace slib
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
 	
-	for (auto& callback : slib::_g_slib_ios_callbacks_didReceiveRemoteNotification) {
-		callback(userInfo);
-	}
+	slib::_g_slib_ios_callback_didReceiveRemoteNotification(userInfo);
 	completionHandler(UIBackgroundFetchResultNewData);
 }
 

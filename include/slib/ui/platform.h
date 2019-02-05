@@ -150,7 +150,8 @@ namespace slib
 		
 		static CGFloat getGlobalScaleFactor();
 		static void setGlobalScaleFactor(CGFloat factor);
-		
+				
+		static void registerDidFinishLaunchingCallback(const Function<void(NSDictionary*)>& callback);
 		static void registerDidReceiveRemoteNotificationCallback(const Function<void(NSDictionary*)>& callback);
 		
 		static sl_bool parseRemoteNotificationInfo(NSDictionary* userInfo, PushNotificationMessage& _out);
