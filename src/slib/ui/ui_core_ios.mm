@@ -274,6 +274,13 @@ namespace slib
 		_g_slib_ios_callback_didReceiveRemoteNotification.add(callback);
 	}
 	
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<BOOL(NSURL*, NSDictionary*)> >, _g_slib_ios_callbacks_openURL);
+	
+	void UIPlatform::registerOpenUrlCallback(const Function<BOOL(NSURL*, NSDictionary*)>& callback)
+	{
+		_g_slib_ios_callbacks_openURL.add(callback);
+	}
+
 	void _priv_slib_ui_reset_orienation();
 
 }
@@ -381,6 +388,15 @@ namespace slib
 	
 	slib::_g_slib_ios_callback_didReceiveRemoteNotification(userInfo);
 	completionHandler(UIBackgroundFetchResultNewData);
+}
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url options:(NSDictionary *)options {
+	for (auto& callback : slib::_g_slib_ios_callbacks_openURL) {
+		if (callback(url, options)) {
+			return YES;
+		}
+	}
+	return NO;
 }
 
 @end

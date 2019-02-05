@@ -153,7 +153,8 @@ namespace slib
 				
 		static void registerDidFinishLaunchingCallback(const Function<void(NSDictionary*)>& callback);
 		static void registerDidReceiveRemoteNotificationCallback(const Function<void(NSDictionary*)>& callback);
-		
+		static void registerOpenUrlCallback(const Function<BOOL(NSURL*, NSDictionary*)>& callback);
+
 		static sl_bool parseRemoteNotificationInfo(NSDictionary* userInfo, PushNotificationMessage& _out);
 		
 #	endif
