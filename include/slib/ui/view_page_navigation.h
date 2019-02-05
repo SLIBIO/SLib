@@ -45,6 +45,8 @@ namespace slib
 	public:
 		sl_size getPagesCount();
 		
+		List< Ref<View> > getPages();
+		
 		Ref<View> getCurrentPage();
 		
 		void push(const Ref<View>& page, const Transition& transition);

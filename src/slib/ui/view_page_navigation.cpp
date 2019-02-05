@@ -69,6 +69,11 @@ namespace slib
 	{
 		return m_pages.getCount();
 	}
+	
+	List< Ref<View> > ViewPageNavigationController::getPages()
+	{
+		return m_pages.duplicate();
+	}
 
 	Ref<View> ViewPageNavigationController::getCurrentPage()
 	{
