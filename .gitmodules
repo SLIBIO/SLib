@@ -1,0 +1,3 @@
+[submodule "module/social-facebook-ios"]
+	path = module/social-facebook-ios
+	url = https://github.com/SLIBIO/slib-facebook-ios
