@@ -213,9 +213,7 @@ namespace slib
 	{
 		Ref<View> page = getStartupPage();
 		if (page.isNotNull()) {
-			Transition transition;
-			transition.type = TransitionType::None;
-			openHomePage(page, transition);
+			openHomePage(page, TransitionType::None);
 		}
 	}
 	
@@ -414,9 +412,7 @@ namespace slib
 			Ref<View> page = getLoadingPage();
 			if (page.isNotNull()) {
 				m_navigationController->setVisibility(Visibility::Visible);
-				Transition transition;
-				transition.type = TransitionType::None;
-				openHomePage(page, transition);
+				openHomePage(page, TransitionType::None);
 			}
 		}
 		

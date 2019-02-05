@@ -61,7 +61,9 @@ namespace slib
 		
 	public:
 		Transition();
-
+		
+		Transition(TransitionType type);
+		
 		Transition(const Transition& other);
 
 		Transition& operator=(const Transition& other);

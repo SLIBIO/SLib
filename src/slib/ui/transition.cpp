@@ -35,6 +35,14 @@ namespace slib
 		curve = AnimationCurve::Default;
 	}
 	
+	Transition::Transition(TransitionType _type)
+	{
+		type = _type;
+		direction = TransitionDirection::Default;
+		duration = 0;
+		curve = AnimationCurve::Default;
+	}
+	
 	Transition::Transition(const Transition& other) = default;
 	
 	Transition& Transition::operator=(const Transition& other) = default;
