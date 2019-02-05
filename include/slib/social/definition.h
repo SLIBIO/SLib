@@ -20,25 +20,9 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_MAIN_HEADER
-#define CHECKHEADER_SLIB_MAIN_HEADER
+#ifndef CHECKHEADER_SLIB_SOCIAL_DEFINITION
+#define CHECKHEADER_SLIB_SOCIAL_DEFINITION
 
-#include "core.h"
-#include "crypto.h"
-#include "math.h"
-#include "network.h"
-#include "graphics.h"
-
-#include "render.h"
-#include "ui.h"
-#include "media.h"
-#include "device.h"
-#include "db.h"
-#include "web.h"
-
-#include "geo.h"
-#include "social.h"
-
-#include "resource.h"
+#include "../core/definition.h"
 
 #endif

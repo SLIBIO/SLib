@@ -745,6 +745,9 @@
 		266E66EC21D9566300D92386 /* locale_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266E66EB21D9566300D92386 /* locale_apple.mm */; };
 		2671F99121E07F7400B39842 /* drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2671F99021E07F7300B39842 /* drawer.cpp */; };
 		26A39D8C20EFE16D004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8B20EFE16D004707C9 /* calculator.cpp */; };
+		26ACB3B9220978310093FF3F /* facebook.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3B8220978310093FF3F /* facebook.cpp */; };
+		26ACB3F4220984FF0093FF3F /* ui_core_badge_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3F3220984FF0093FF3F /* ui_core_badge_ios.mm */; };
+		26ACB3F6220985EE0093FF3F /* device_audio_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3F5220985EE0093FF3F /* device_audio_ios.mm */; };
 		26B92D5021D357AD003F6F82 /* des.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D4F21D357AD003F6F82 /* des.cpp */; };
 		26B92D5721D3E4FC003F6F82 /* ginger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D5421D3E4FC003F6F82 /* ginger.cpp */; };
 		26B92D5821D3E4FC003F6F82 /* web_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D5521D3E4FC003F6F82 /* web_controller.cpp */; };
@@ -2150,6 +2153,9 @@
 		26A39D8B20EFE16D004707C9 /* calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = calculator.cpp; sourceTree = "<group>"; };
 		26A9B7611C172BCC004C9B0E /* camera_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_view.cpp; sourceTree = "<group>"; };
 		26A9B7631C172BDE004C9B0E /* video_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_view.cpp; sourceTree = "<group>"; };
+		26ACB3B8220978310093FF3F /* facebook.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = facebook.cpp; sourceTree = "<group>"; };
+		26ACB3F3220984FF0093FF3F /* ui_core_badge_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_core_badge_ios.mm; sourceTree = "<group>"; };
+		26ACB3F5220985EE0093FF3F /* device_audio_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = device_audio_ios.mm; sourceTree = "<group>"; };
 		26ACCB901C4A35DD00330F88 /* codec_vpx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = codec_vpx.cpp; path = media/codec_vpx.cpp; sourceTree = "<group>"; };
 		26B1C99E1DC76BF50092C84F /* text_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = text_view.cpp; sourceTree = "<group>"; };
 		26B571421C9D43A70099E69B /* asset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = asset.cpp; sourceTree = "<group>"; };
@@ -3828,6 +3834,14 @@
 			name = zlib;
 			sourceTree = "<group>";
 		};
+		26ACB3B7220978310093FF3F /* social */ = {
+			isa = PBXGroup;
+			children = (
+				26ACB3B8220978310093FF3F /* facebook.cpp */,
+			);
+			path = social;
+			sourceTree = "<group>";
+		};
 		26B92D5321D3E4FC003F6F82 /* web */ = {
 			isa = PBXGroup;
 			children = (
@@ -3843,6 +3857,7 @@
 			children = (
 				26B92D5A21D4CF22003F6F82 /* device.cpp */,
 				26B92D5C21D4CF28003F6F82 /* device_ios.mm */,
+				26ACB3F5220985EE0093FF3F /* device_audio_ios.mm */,
 				26C0A34D1C128D80005690FE /* sensor.cpp */,
 				E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */,
 				26C0A34F1C128D80005690FE /* vibrator.cpp */,
@@ -3877,6 +3892,7 @@
 				266DD3581C11705C00D47AB0 /* media */,
 				A25F2F041B039EF600854DAF /* network */,
 				A25F2F131B039EF600854DAF /* render */,
+				26ACB3B7220978310093FF3F /* social */,
 				A25F2F231B039EF600854DAF /* ui */,
 				26B92D5321D3E4FC003F6F82 /* web */,
 			);
@@ -4120,6 +4136,7 @@
 				2682C3F41E2D639000E9CB98 /* ui_core_common.cpp */,
 				2682C3F51E2D639000E9CB98 /* ui_core_common.h */,
 				A25F2F261B039EF600854DAF /* ui_core_ios.mm */,
+				26ACB3F3220984FF0093FF3F /* ui_core_badge_ios.mm */,
 				A25F2F291B039EF600854DAF /* ui_event.cpp */,
 				A2774E271B1CBBF600538A7B /* ui_event_ios.mm */,
 				2621F7201CCF174B00C4615C /* ui_menu.cpp */,
@@ -5365,11 +5382,13 @@
 				26D9D87A1E96294F005F7BD3 /* yuv.cpp in Sources */,
 				26D9D8AA1E962969005F7BD3 /* index_buffer.cpp in Sources */,
 				26D9D8EE1E962976005F7BD3 /* window_ios.mm in Sources */,
+				26ACB3F6220985EE0093FF3F /* device_audio_ios.mm in Sources */,
 				26D9D8871E96295A005F7BD3 /* camera.cpp in Sources */,
 				26A39D8C20EFE16D004707C9 /* calculator.cpp in Sources */,
 				26B92D5D21D4CF29003F6F82 /* device_ios.mm in Sources */,
 				26D9D89E1E962962005F7BD3 /* network_async_unix.cpp in Sources */,
 				26D9D82D1E9628E0005F7BD3 /* timer.cpp in Sources */,
+				26ACB3B9220978310093FF3F /* facebook.cpp in Sources */,
 				26D9D8851E96295A005F7BD3 /* audio_recorder_opensl_es.cpp in Sources */,
 				26D9D82E1E9628E0005F7BD3 /* system.cpp in Sources */,
 				26D9D8CB1E962976005F7BD3 /* picker_view_ios.mm in Sources */,
@@ -5411,6 +5430,7 @@
 				26D9D8CA1E962976005F7BD3 /* picker_view.cpp in Sources */,
 				26D9D85D1E962937005F7BD3 /* geo_location.cpp in Sources */,
 				2628EAE321C410CF00D8CD00 /* jwt.cpp in Sources */,
+				26ACB3F4220984FF0093FF3F /* ui_core_badge_ios.mm in Sources */,
 				26D9D83C1E9628E0005F7BD3 /* object.cpp in Sources */,
 				2639196E21CD469E008B335B /* redis.cpp in Sources */,
 				26D9D89C1E962962005F7BD3 /* net_capture_pcap.cpp in Sources */,

@@ -20,25 +20,27 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_MAIN_HEADER
-#define CHECKHEADER_SLIB_MAIN_HEADER
+#ifndef CHECKHEADER_SLIB_SOCIAL_FACEBOOK
+#define CHECKHEADER_SLIB_SOCIAL_FACEBOOK
 
-#include "core.h"
-#include "crypto.h"
-#include "math.h"
-#include "network.h"
-#include "graphics.h"
+#include "definition.h"
 
-#include "render.h"
-#include "ui.h"
-#include "media.h"
-#include "device.h"
-#include "db.h"
-#include "web.h"
+#include "../core/function.h"
+#include "../core/string.h"
 
-#include "geo.h"
-#include "social.h"
-
-#include "resource.h"
+namespace slib
+{
+	
+	class SLIB_EXPORT Facebook
+	{
+	public:
+		// call this function at `onStart()` in your application class
+		static void initializeOnStartApp();
+		
+		static void login(const Function<void(String userId, String token)>& callback);
+		
+	};
+	
+}
 
 #endif

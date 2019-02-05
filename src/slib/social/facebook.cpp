@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -20,25 +20,22 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_MAIN_HEADER
-#define CHECKHEADER_SLIB_MAIN_HEADER
+#include "slib/social/facebook.h"
 
-#include "core.h"
-#include "crypto.h"
-#include "math.h"
-#include "network.h"
-#include "graphics.h"
-
-#include "render.h"
-#include "ui.h"
-#include "media.h"
-#include "device.h"
-#include "db.h"
-#include "web.h"
-
-#include "geo.h"
-#include "social.h"
-
-#include "resource.h"
-
+namespace slib
+{
+	
+#if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID)
+	
+	void Facebook::initializeOnStartApp()
+	{
+	}
+	
+	void Facebook::login(const Function<void(String userId, String token)>& callback)
+	{
+		callback(sl_null, sl_null);
+	}
+	
 #endif
+	
+}
