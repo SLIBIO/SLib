@@ -47,9 +47,17 @@ namespace slib
 		
 		Ref<View> getCurrentPage();
 		
-		void push(const Ref<View>& page, const Transition& transition, sl_bool flagRemoveAllBackPages = sl_false);
+		void push(const Ref<View>& page, const Transition& transition);
 
-		void push(const Ref<View>& page, sl_bool flagRemoveAllBackPages = sl_false);
+		void push(const Ref<View>& page);
+		
+		void pushPageAfterPopPages(const Ref<View>& page, sl_size countPop, const Transition& transition);
+		
+		void pushPageAfterPopPages(const Ref<View>& page, sl_size countPop);
+		
+		void pushPageAfterPopAllPages(const Ref<View>& page, const Transition& transition);
+		
+		void pushPageAfterPopAllPages(const Ref<View>& page);
 		
 		void pop(const Ref<View>& page, const Transition& transition);
 		
@@ -106,7 +114,7 @@ namespace slib
 		
 		void _resetAnimationStatus(const Ref<View>& page);
 		
-		void _push(const Ref<View>& page, const Transition& transition, sl_bool flagRemoveAllBackPages);
+		void _push(const Ref<View>& page, sl_size countRemoveTop, const Transition& transition);
 		
 		void _pop(const Ref<View>& page, const Transition& transition);
 		

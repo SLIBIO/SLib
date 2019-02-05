@@ -131,12 +131,12 @@ namespace slib
 	
 	void MobileApp::openHomePage(const Ref<View>& page, const Transition& transition)
 	{
-		m_navigationController->push(page, transition, sl_true);
+		m_navigationController->pushPageAfterPopAllPages(page, transition);
 	}
 	
 	void MobileApp::openHomePage(const Ref<View>& page)
 	{
-		m_navigationController->push(page, sl_true);
+		m_navigationController->pushPageAfterPopAllPages(page);
 	}
 	
 	void MobileApp::closePage(const Ref<View>& page, const Transition& transition)

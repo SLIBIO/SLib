@@ -82,7 +82,7 @@ namespace slib
 			if (m_popupState != PopupState::None) {
 				return;
 			}
-			controller->push(this, transition, sl_true);
+			controller->pushPageAfterPopAllPages(this, transition);
 		}
 	}
 
@@ -151,7 +151,7 @@ namespace slib
 			if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
 				_page->openHome(controller, transition);
 			} else {
-				controller->push(page, transition, sl_true);
+				controller->pushPageAfterPopAllPages(page, transition);
 			}
 		}
 	}

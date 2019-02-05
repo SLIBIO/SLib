@@ -102,7 +102,7 @@ namespace slib
 		view->setAlpha(1, UIUpdateMode::Redraw);
 	}
 
-	void ViewPageNavigationController::_push(const Ref<View>& viewIn, const Transition& _transition, sl_bool flagRemoveAllBackPages)
+	void ViewPageNavigationController::_push(const Ref<View>& viewIn, sl_size countRemoveTop, const Transition& _transition)
 	{
 
 		if (viewIn.isNull()) {
@@ -114,7 +114,7 @@ namespace slib
 		ObjectLocker lock(this);
 		
 		if (m_countActiveTransitionAnimations) {
-			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPageNavigationController, _push, this, viewIn, _transition, flagRemoveAllBackPages), 100);
+			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPageNavigationController, _push, this, viewIn, countRemoveTop, _transition), 100);
 			return;
 		}
 
@@ -174,11 +174,15 @@ namespace slib
 		
 		dispatchPageAction(viewBack.get(), UIPageAction::Pause);
 		
-		if (flagRemoveAllBackPages) {
-			for (sl_size i = 0; i < n; i++) {
-				dispatchPageAction(pages[i].get(), UIPageAction::Pop);
+		if (countRemoveTop > 0) {
+			sl_size n = m_pages.getCount();
+			if (countRemoveTop > n) {
+				countRemoveTop = n;
 			}
-			m_pages.removeAll_NoLock();
+			for (sl_size i = 0; i < countRemoveTop; i++) {
+				dispatchPageAction(pages[n - 1 - i].get(), UIPageAction::Pop);
+			}
+			m_pages.setCount_NoLock(n - countRemoveTop);
 		}
 		
 		m_pages.add_NoLock(viewIn);
@@ -210,20 +214,40 @@ namespace slib
 		
 	}
 
-	void ViewPageNavigationController::push(const Ref<View>& viewIn, const Transition& transition, sl_bool flagRemoveAllBackPages)
+	void ViewPageNavigationController::push(const Ref<View>& page, const Transition& transition)
+	{
+		pushPageAfterPopPages(page, 0, transition);
+	}
+	
+	void ViewPageNavigationController::push(const Ref<View>& page)
+	{
+		pushPageAfterPopPages(page, 0, Transition());
+	}
+
+	void ViewPageNavigationController::pushPageAfterPopPages(const Ref<View>& page, sl_size countPop, const Transition& transition)
 	{
 		if (isDrawingThread()) {
-			_push(viewIn, transition, flagRemoveAllBackPages);
+			_push(page, countPop, transition);
 		} else {
-			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPageNavigationController, _push, this, viewIn, transition, flagRemoveAllBackPages));
+			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPageNavigationController, _push, this, page, countPop, transition));
 		}
 	}
-
-	void ViewPageNavigationController::push(const Ref<View>& viewIn, sl_bool flagRemoveAllBackPages)
+	
+	void ViewPageNavigationController::pushPageAfterPopPages(const Ref<View>& page, sl_size countPop)
 	{
-		push(viewIn, Transition(), flagRemoveAllBackPages);
+		pushPageAfterPopPages(page, countPop, Transition());
 	}
-
+	
+	void ViewPageNavigationController::pushPageAfterPopAllPages(const Ref<View>& page, const Transition& transition)
+	{
+		pushPageAfterPopPages(page, SLIB_SIZE_MAX, transition);
+	}
+	
+	void ViewPageNavigationController::pushPageAfterPopAllPages(const Ref<View>& page)
+	{
+		pushPageAfterPopPages(page, SLIB_SIZE_MAX, Transition());
+	}
+	
 	void ViewPageNavigationController::_pop(const Ref<View>& _viewOut, const Transition& _transition)
 	{
 
