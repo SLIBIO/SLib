@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		26B92D6C21D7AE8D003F6F82 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26B92D6B21D7AE8D003F6F82 /* UserNotifications.framework */; };
-		26BB17F2220343980089C7EC /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26BB17F1220343980089C7EC /* AVFoundation.framework */; };
 		26F2DDF0216BDE39007CE8E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDEF216BDE39007CE8E6 /* UIKit.framework */; };
 		26F2DDF2216BDE44007CE8E6 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF1216BDE44007CE8E6 /* GLKit.framework */; };
 		26F2DDF4216BDE4D007CE8E6 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF3216BDE4D007CE8E6 /* OpenGLES.framework */; };
@@ -50,8 +48,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26BB17F2220343980089C7EC /* AVFoundation.framework in Frameworks */,
-				26B92D6C21D7AE8D003F6F82 /* UserNotifications.framework in Frameworks */,
 				26F2DDFC216BDE66007CE8E6 /* QuartzCore.framework in Frameworks */,
 				26F2DDFA216BDE5E007CE8E6 /* CoreImage.framework in Frameworks */,
 				26F2DDF8216BDE58007CE8E6 /* CoreText.framework in Frameworks */,

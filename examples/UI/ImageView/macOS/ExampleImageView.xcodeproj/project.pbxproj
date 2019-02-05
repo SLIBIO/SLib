@@ -15,7 +15,6 @@
 		26840C2C2111FA0300A01A29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26840C2B2111FA0300A01A29 /* Assets.xcassets */; };
 		26840C2F2111FA0300A01A29 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 26840C2D2111FA0300A01A29 /* MainMenu.xib */; };
 		26840C322111FA0300A01A29 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26840C312111FA0300A01A29 /* main.cpp */; };
-		26BB18132205AA110089C7EC /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26BB18122205AA110089C7EC /* IOKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,7 +37,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26BB18132205AA110089C7EC /* IOKit.framework in Frameworks */,
 				265BF19421723C220073F7B8 /* Quartz.framework in Frameworks */,
 				265BF19321723BFB0073F7B8 /* AppKit.framework in Frameworks */,
 				265BF19121723BCD0073F7B8 /* OpenGL.framework in Frameworks */,

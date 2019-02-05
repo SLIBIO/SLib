@@ -20,64 +20,29 @@
  *   THE SOFTWARE.
  */
 
-#include "slib/core/definition.h"
+#include "slib/ui/notification.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
-#include "slib/device/device.h"
-#include "slib/core/variant.h"
-#include "slib/core/platform_apple.h"
+#include "slib/ui/core.h"
+#include "slib/ui/platform.h"
 
-#import <UIKit/UIKit.h>
-#import <sys/utsname.h>
+#include <UserNotifications/UserNotifications.h>
 
 namespace slib
 {
-
-	String Device::getDeviceId()
+	
+	void UI::setBadgeNumber(sl_uint32 number)
 	{
-		UIDevice* device = [UIDevice currentDevice];
-		NSString* currentDeviceId = [[device identifierForVendor] UUIDString];
-		return Apple::getStringFromNSString(currentDeviceId);
+		[[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:UNAuthorizationOptionBadge completionHandler:^(BOOL granted, NSError* error) {
+			if (granted) {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[[UIApplication sharedApplication] setApplicationIconBadgeNumber:number];
+				});
+			}
+		}];
 	}
 	
-	String Device::getDeviceName()
-	{
-		struct utsname systemInfo;
-		uname(&systemInfo);
-		return systemInfo.machine;
-	}
-	
-	String Device::getSystemVersion()
-	{
-		return Apple::getSystemVersion();
-	}
-	
-	String Device::getSystemName()
-	{
-		String osVersion = getSystemVersion();
-		return String::format("iOS %s", osVersion);
-	}
-	
-	Sizei Device::getScreenSize()
-	{
-		UIScreen* screen = [UIScreen mainScreen];
-		if (screen != nil) {
-			Sizei ret;
-			CGRect screenRect = screen.bounds;
-			CGFloat scale = screen.scale;
-			ret.x = (int)(screenRect.size.width * scale);
-			ret.y = (int)(screenRect.size.height * scale);
-			return ret;
-		}
-		return Sizei::zero();
-	}
-	
-	double Device::getScreenPPI()
-	{
-		return [[UIScreen mainScreen] scale] * 160;
-	}
-
 }
 
 #endif

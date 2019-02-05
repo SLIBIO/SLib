@@ -22,62 +22,29 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_PLATFORM_IS_IOS)
+#if defined(SLIB_PLATFORM_IS_MACOS)
 
 #include "slib/device/device.h"
-#include "slib/core/variant.h"
 #include "slib/core/platform_apple.h"
-
-#import <UIKit/UIKit.h>
-#import <sys/utsname.h>
 
 namespace slib
 {
 
 	String Device::getDeviceId()
 	{
-		UIDevice* device = [UIDevice currentDevice];
-		NSString* currentDeviceId = [[device identifierForVendor] UUIDString];
-		return Apple::getStringFromNSString(currentDeviceId);
-	}
-	
-	String Device::getDeviceName()
-	{
-		struct utsname systemInfo;
-		uname(&systemInfo);
-		return systemInfo.machine;
-	}
-	
-	String Device::getSystemVersion()
-	{
-		return Apple::getSystemVersion();
-	}
-	
-	String Device::getSystemName()
-	{
-		String osVersion = getSystemVersion();
-		return String::format("iOS %s", osVersion);
-	}
-	
-	Sizei Device::getScreenSize()
-	{
-		UIScreen* screen = [UIScreen mainScreen];
-		if (screen != nil) {
-			Sizei ret;
-			CGRect screenRect = screen.bounds;
-			CGFloat scale = screen.scale;
-			ret.x = (int)(screenRect.size.width * scale);
-			ret.y = (int)(screenRect.size.height * scale);
-			return ret;
+		/* https://developer.apple.com/library/archive/technotes/tn1103/_index.html */
+		NSString* ret = nil;
+		io_service_t platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"));
+		if (platformExpert) {
+			CFTypeRef serialNumberAsCFString = IORegistryEntryCreateCFProperty(platformExpert, CFSTR(kIOPlatformSerialNumberKey), kCFAllocatorDefault, 0);
+			if (serialNumberAsCFString) {
+				ret = CFBridgingRelease(serialNumberAsCFString);
+			}
+			IOObjectRelease(platformExpert);
 		}
-		return Sizei::zero();
+		return Apple::getStringFromNSString(ret);
 	}
 	
-	double Device::getScreenPPI()
-	{
-		return [[UIScreen mainScreen] scale] * 160;
-	}
-
 }
 
 #endif

@@ -32,21 +32,6 @@
 
 namespace slib
 {
-
-	String Device::getDeviceId()
-	{
-		/* https://developer.apple.com/library/archive/technotes/tn1103/_index.html */
-		NSString* ret = nil;
-		io_service_t platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"));
-		if (platformExpert) {
-			CFTypeRef serialNumberAsCFString = IORegistryEntryCreateCFProperty(platformExpert, CFSTR(kIOPlatformSerialNumberKey), kCFAllocatorDefault, 0);
-			if (serialNumberAsCFString) {
-				ret = CFBridgingRelease(serialNumberAsCFString);
-			}
-			IOObjectRelease(platformExpert);
-		}
-		return Apple::getStringFromNSString(ret);
-	}
 	
 	String Device::getDeviceName()
 	{
