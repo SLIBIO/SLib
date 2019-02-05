@@ -89,6 +89,18 @@ namespace slib
 		return ret;
 	}
 
+	Time Apple::getTimeFromNSDate(NSDate* date)
+	{
+		Time time;
+		time.setSecondsCountf([date timeIntervalSince1970]);
+		return time;
+	}
+	
+	NSDate* Apple::getNSDateFromTime(const Time& time)
+	{
+		return [NSDate dateWithTimeIntervalSince1970:(time.getSecondsCountf())];
+	}
+	
 	String Apple::getFilePathFromNSURL(NSURL* url)
 	{
 		if (url != nil) {

@@ -28,6 +28,7 @@
 #ifdef SLIB_PLATFORM_IS_APPLE
 
 #include "string.h"
+#include "time.h"
 
 #ifdef __OBJC__
 #import <Foundation/Foundation.h>
@@ -55,12 +56,16 @@ namespace slib
 
 		static String16 getString16FromNSString(NSString* str);
 
+		static Time getTimeFromNSDate(NSDate* date);
+		
+		static NSDate* getNSDateFromTime(const Time& time);
+		
 		static String getFilePathFromNSURL(NSURL* url);
 
 		static Memory getMemoryFromNSData(NSData* data);
 
 		static NSData* getNSDataFromMemory(const Memory& memory);
-	
+		
 #endif
 
 		static String getAssetFilePath(const String& path);
