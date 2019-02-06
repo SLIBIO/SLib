@@ -52,7 +52,8 @@ namespace slib
 	class XmlComment;
 	class XmlParseControl;
 	class StringBuffer;
-	
+	class StringBuffer16;
+
 	enum class XmlNodeType
 	{
 		Document = 1,
@@ -62,6 +63,9 @@ namespace slib
 		Comment = 5,
 		WhiteSpace = 6
 	};
+	
+	typedef String16 XmlString;
+	typedef StringBuffer16 XmlStringBuffer;
 	
 	class SLIB_EXPORT XmlNode : public Referable
 	{
@@ -73,13 +77,13 @@ namespace slib
 	public:
 		XmlNodeType getType() const;
 
-		virtual sl_bool buildText(StringBuffer& output) const = 0;
+		virtual sl_bool buildText(XmlStringBuffer& output) const = 0;
 
-		virtual sl_bool buildXml(StringBuffer& output) const = 0;
+		virtual sl_bool buildXml(XmlStringBuffer& output) const = 0;
 
-		virtual String getText() const;
+		virtual XmlString getText() const;
 
-		String toString() const;
+		XmlString toString() const;
 
 		sl_bool isDocumentNode() const;
 
@@ -154,11 +158,11 @@ namespace slib
 		XmlNodeGroup(XmlNodeType type);
 
 	public:
-		sl_bool buildText(StringBuffer& output) const override;
+		sl_bool buildText(XmlStringBuffer& output) const override;
 
-		sl_bool buildInnerXml(StringBuffer& output) const;
+		sl_bool buildInnerXml(XmlStringBuffer& output) const;
 
-		String getInnerXml() const;
+		XmlString getInnerXml() const;
 	
 		sl_size getChildrenCount() const;
 
@@ -170,7 +174,7 @@ namespace slib
 
 		void removeAllChildren(sl_bool flagUnregisterDocument = sl_true);
 
-		String getChildText(sl_size index) const;
+		XmlString getChildText(sl_size index) const;
 
 		Ref<XmlElement> getChildElement(sl_size index) const;
 
@@ -178,41 +182,41 @@ namespace slib
 
 		sl_size getChildElementsCount() const;
 
-		List< Ref<XmlElement> > getChildElements(const String& tagName) const;
+		List< Ref<XmlElement> > getChildElements(const XmlString& tagName) const;
 
-		List< Ref<XmlElement> > getChildElements(const String& uri, const String& localName) const;
+		List< Ref<XmlElement> > getChildElements(const XmlString& uri, const XmlString& localName) const;
 
 		Ref<XmlElement> getFirstChildElement() const;
 
-		Ref<XmlElement> getFirstChildElement(const String& tagName) const;
+		Ref<XmlElement> getFirstChildElement(const XmlString& tagName) const;
 
-		Ref<XmlElement> getFirstChildElement(const String& uri, const String& localName) const;
+		Ref<XmlElement> getFirstChildElement(const XmlString& uri, const XmlString& localName) const;
 
-		String getFirstChildElementText() const;
+		XmlString getFirstChildElementText() const;
 
-		String getFirstChildElementText(const String& tagName) const;
+		XmlString getFirstChildElementText(const XmlString& tagName) const;
 
-		String getFirstChildElementText(const String& uri, const String& localName) const;
+		XmlString getFirstChildElementText(const XmlString& uri, const XmlString& localName) const;
 
-		List< Ref<XmlElement> > getDescendantElements(const String& tagName) const;
+		List< Ref<XmlElement> > getDescendantElements(const XmlString& tagName) const;
 
-		void getDescendantElements(const String& tagName, List< Ref<XmlElement> >& list) const;
+		void getDescendantElements(const XmlString& tagName, List< Ref<XmlElement> >& list) const;
 
-		List< Ref<XmlElement> > getDescendantElements(const String& uri, const String& localName) const;
+		List< Ref<XmlElement> > getDescendantElements(const XmlString& uri, const XmlString& localName) const;
 
-		void getDescendantElements(const String& uri, const String& localName, List< Ref<XmlElement> >& list) const;
+		void getDescendantElements(const XmlString& uri, const XmlString& localName, List< Ref<XmlElement> >& list) const;
 
-		Ref<XmlElement> getFirstDescendantElement(const String& tagName) const;
+		Ref<XmlElement> getFirstDescendantElement(const XmlString& tagName) const;
 
-		Ref<XmlElement> getFirstDescendantElement(const String& uri, const String& localName) const;
+		Ref<XmlElement> getFirstDescendantElement(const XmlString& uri, const XmlString& localName) const;
 
-		String getFirstDescendantElementText(const String& tagName) const;
+		XmlString getFirstDescendantElementText(const XmlString& tagName) const;
 
-		String getFirstDescendantElementText(const String& uri, const String& localName) const;
+		XmlString getFirstDescendantElementText(const XmlString& uri, const XmlString& localName) const;
 
-		Ref<XmlElement> findChildElementByAttribute(const String& name, const String& value) const;
+		Ref<XmlElement> findChildElementByAttribute(const XmlString& name, const XmlString& value) const;
 
-		Ref<XmlElement> findChildElementById(const String& _id) const;
+		Ref<XmlElement> findChildElementById(const XmlString& _id) const;
 	
 	protected:
 		CList< Ref<XmlNode> > m_children;
@@ -223,11 +227,11 @@ namespace slib
 	
 	struct SLIB_EXPORT XmlAttribute
 	{
-		String name;
-		String uri;
-		String localName;
-		String value;
-		String whiteSpacesBeforeName;
+		XmlString name;
+		XmlString uri;
+		XmlString localName;
+		XmlString value;
+		XmlString whiteSpacesBeforeName;
 	};
 	
 	class SLIB_EXPORT XmlElement : public XmlNodeGroup
@@ -238,45 +242,45 @@ namespace slib
 		XmlElement();
 
 	public:
-		static Ref<XmlElement> create(const String& name);
+		static Ref<XmlElement> create(const XmlString& name);
 
-		static Ref<XmlElement> create(const String& name, const String& uri, const String& localName);
+		static Ref<XmlElement> create(const XmlString& name, const XmlString& uri, const XmlString& localName);
 
-		sl_bool buildXml(StringBuffer& output) const override;
+		sl_bool buildXml(XmlStringBuffer& output) const override;
 	
-		String getName() const;
+		XmlString getName() const;
 
-		String getUri() const;
+		XmlString getUri() const;
 
-		String getLocalName() const;
+		XmlString getLocalName() const;
 	
-		sl_bool setName(const String& name);
+		sl_bool setName(const XmlString& name);
 
-		sl_bool setName(const String& name, const String& uri, const String& localName);
+		sl_bool setName(const XmlString& name, const XmlString& uri, const XmlString& localName);
 
 		sl_size getAttributesCount() const;
 
 		sl_bool getAttribute(sl_size index, XmlAttribute* _out = sl_null) const;
 
-		String getAttribute(const String& name) const;
+		XmlString getAttribute(const XmlString& name) const;
 
-		String getAttribute(const String& uri, const String& localName) const;
+		XmlString getAttribute(const XmlString& uri, const XmlString& localName) const;
 
-		sl_bool containsAttribute(const String& name) const;
+		sl_bool containsAttribute(const XmlString& name) const;
 
-		sl_bool setAttribute(sl_size index, const String& value);
+		sl_bool setAttribute(sl_size index, const XmlString& value);
 
-		sl_bool setAttribute(sl_size index, const String& uri, const String& localName, const String& value);
+		sl_bool setAttribute(sl_size index, const XmlString& uri, const XmlString& localName, const XmlString& value);
 
-		sl_bool setAttribute(const String& name, const String& value);
+		sl_bool setAttribute(const XmlString& name, const XmlString& value);
 
 		sl_bool setAttribute(const XmlAttribute& attr);
 
-		sl_bool setAttribute(const String& uri, const String& localName, const String& value);
+		sl_bool setAttribute(const XmlString& uri, const XmlString& localName, const XmlString& value);
 
 		sl_bool removeAttribute(sl_size index);
 
-		sl_bool removeAttribute(const String& name);
+		sl_bool removeAttribute(const XmlString& name);
 
 		void removeAllAttributes();
 		
@@ -289,11 +293,11 @@ namespace slib
 		void setEndContentPositionInSource(sl_size pos);
 
 	protected:
-		AtomicString m_name;
-		AtomicString m_uri;
-		AtomicString m_localName;
+		Atomic<XmlString> m_name;
+		Atomic<XmlString> m_uri;
+		Atomic<XmlString> m_localName;
 		List<XmlAttribute> m_attributes;
-		HashMap<String, String> m_mapAttributes;
+		HashMap<XmlString, XmlString> m_mapAttributes;
 		Mutex m_lockAttributes;
 		sl_size m_positionStartContentInSource;
 		sl_size m_positionEndContentInSource;
@@ -314,18 +318,18 @@ namespace slib
 	public:
 		static Ref<XmlDocument> create();
 
-		sl_bool buildXml(StringBuffer& output) const override;
+		sl_bool buildXml(XmlStringBuffer& output) const override;
 	
-		Ref<XmlElement> getElementById(const String& _id) const;
+		Ref<XmlElement> getElementById(const XmlString& _id) const;
 
-		void registerElementsById(const String& idAttributeName);
+		void registerElementsById(const XmlString& idAttributeName);
 
-		void registerElementsById(const Ref<XmlElement>& element, const String& idAttributeName);
+		void registerElementsById(const Ref<XmlElement>& element, const XmlString& idAttributeName);
 
 		sl_bool checkWellFormed() const;
 
 	protected:
-		HashMap< String, WeakRef<XmlElement> > m_elementsById;
+		HashMap< XmlString, WeakRef<XmlElement> > m_elementsById;
 
 	};
 	
@@ -337,24 +341,24 @@ namespace slib
 		XmlText();
 
 	public:
-		static Ref<XmlText> create(const String& text, sl_bool flagCDATA = sl_false);
+		static Ref<XmlText> create(const XmlString& text, sl_bool flagCDATA = sl_false);
 	
-		static Ref<XmlText> createCDATA(const String& text);
+		static Ref<XmlText> createCDATA(const XmlString& text);
 
-		sl_bool buildText(StringBuffer& output) const override;
+		sl_bool buildText(XmlStringBuffer& output) const override;
 
-		sl_bool buildXml(StringBuffer& output) const override;
+		sl_bool buildXml(XmlStringBuffer& output) const override;
 	
-		String getText() const override;
+		XmlString getText() const override;
 
-		void setText(const String& text);
+		void setText(const XmlString& text);
 
 		sl_bool isCDATA() const;
 
 		void setCDATA(sl_bool flag);
 
 	protected:
-		AtomicString m_text;
+		Atomic<XmlString> m_text;
 		sl_bool m_flagCDATA;
 	
 	};
@@ -367,23 +371,23 @@ namespace slib
 		XmlProcessingInstruction();
 
 	public:
-		static Ref<XmlProcessingInstruction> create(const String& target, const String& content);
+		static Ref<XmlProcessingInstruction> create(const XmlString& target, const XmlString& content);
 
-		sl_bool buildText(StringBuffer& output) const override;
+		sl_bool buildText(XmlStringBuffer& output) const override;
 
-		sl_bool buildXml(StringBuffer& output) const override;
+		sl_bool buildXml(XmlStringBuffer& output) const override;
 
-		String getTarget() const;
+		XmlString getTarget() const;
 
-		sl_bool setTarget(const String& target);
+		sl_bool setTarget(const XmlString& target);
 
-		String getContent() const;
+		XmlString getContent() const;
 
-		void setContent(const String& content);
+		void setContent(const XmlString& content);
 	
 	protected:
-		AtomicString m_target;
-		AtomicString m_content;
+		Atomic<XmlString> m_target;
+		Atomic<XmlString> m_content;
 	
 	};
 	
@@ -395,18 +399,18 @@ namespace slib
 		XmlComment();
 
 	public:
-		static Ref<XmlComment> create(const String& comment);
+		static Ref<XmlComment> create(const XmlString& comment);
 
-		sl_bool buildText(StringBuffer& output) const override;
+		sl_bool buildText(XmlStringBuffer& output) const override;
 
-		sl_bool buildXml(StringBuffer& output) const override;
+		sl_bool buildXml(XmlStringBuffer& output) const override;
 
-		String getComment() const;
+		XmlString getComment() const;
 
-		void setComment(const String& comment);
+		void setComment(const XmlString& comment);
 
 	protected:
-		AtomicString m_comment;
+		Atomic<XmlString> m_comment;
 
 	};
 	
@@ -418,18 +422,18 @@ namespace slib
 		XmlWhiteSpace();
 
 	public:
-		static Ref<XmlWhiteSpace> create(const String& content);
+		static Ref<XmlWhiteSpace> create(const XmlString& content);
 
-		sl_bool buildText(StringBuffer& output) const override;
+		sl_bool buildText(XmlStringBuffer& output) const override;
 
-		sl_bool buildXml(StringBuffer& output) const override;
+		sl_bool buildXml(XmlStringBuffer& output) const override;
 
-		String getContent() const;
+		XmlString getContent() const;
 
-		void setContent(const String& comment);
+		void setContent(const XmlString& comment);
 
 	protected:
-		AtomicString m_content;
+		Atomic<XmlString> m_content;
 
 	};
 	
@@ -482,12 +486,12 @@ namespace slib
 		Function<void(XmlParseControl*, XmlDocument*)> onEndDocument;
 		Function<void(XmlParseControl*, XmlElement*)> onStartElement;
 		Function<void(XmlParseControl*, XmlElement*)> onEndElement;
-		Function<void(XmlParseControl*, const String& text)> onText;
-		Function<void(XmlParseControl*, const String& text)> onCDATA;
-		Function<void(XmlParseControl*, const String& target, const String& content)> onProcessingInstruction;
-		Function<void(XmlParseControl*, const String& content)> onComment;
-		Function<void(XmlParseControl*, const String& prefix, const String& uri)> onStartPrefixMapping;
-		Function<void(XmlParseControl*, const String& prefix)> onEndPrefixMapping;
+		Function<void(XmlParseControl*, const XmlString& text)> onText;
+		Function<void(XmlParseControl*, const XmlString& text)> onCDATA;
+		Function<void(XmlParseControl*, const XmlString& target, const XmlString& content)> onProcessingInstruction;
+		Function<void(XmlParseControl*, const XmlString& content)> onComment;
+		Function<void(XmlParseControl*, const XmlString& prefix, const XmlString& uri)> onStartPrefixMapping;
+		Function<void(XmlParseControl*, const XmlString& prefix)> onEndPrefixMapping;
 
 		// in
 		sl_bool flagLogError;
@@ -557,7 +561,7 @@ namespace slib
 		 * @return XmlDocument object on success
 		 * @return nullptr on failure
 		 */
-		static Ref<XmlDocument> parseXml(const String& xml, XmlParseParam& param);
+		static Ref<XmlDocument> parseXml8(const String& xml, XmlParseParam& param);
 
 		/**
 		 * parses XML text (UTF-8 encoding) contained in `xml`.
@@ -568,7 +572,7 @@ namespace slib
 		 * @return XmlDocument object on success
 		 * @return nullptr on failure
 		 */
-		static Ref<XmlDocument> parseXml(const String& xml);
+		static Ref<XmlDocument> parseXml8(const String& xml);
 
 
 		/**
@@ -581,7 +585,7 @@ namespace slib
 		 * @return XmlDocument object on success
 		 * @return nullptr on failure
 		 */
-		static Ref<XmlDocument> parseXml16(const sl_char16* xml, sl_size length, XmlParseParam& param);
+		static Ref<XmlDocument> parseXml(const sl_char16* xml, sl_size length, XmlParseParam& param);
 
 		/**
 		 * parses XML text (Unicode) contained in `xml`.
@@ -593,7 +597,7 @@ namespace slib
 		 * @return XmlDocument object on success
 		 * @return nullptr on failure
 		 */
-		static Ref<XmlDocument> parseXml16(const sl_char16* xml, sl_size length);
+		static Ref<XmlDocument> parseXml(const sl_char16* xml, sl_size length);
 		
 		/**
 		 * parses XML text (Unicode) contained in `xml`
@@ -605,6 +609,7 @@ namespace slib
 		 * @return nullptr on failure
 		 */
 		static Ref<XmlDocument> parseXml16(const String16& xml, XmlParseParam& param);
+		static Ref<XmlDocument> parseXml(const XmlString& xml, XmlParseParam& param);
 
 		/**
 		 * parses XML text (Unicode) contained in `xml`.
@@ -616,6 +621,7 @@ namespace slib
 		 * @return nullptr on failure
 		 */
 		static Ref<XmlDocument> parseXml16(const String16& xml);
+		static Ref<XmlDocument> parseXml(const XmlString& xml);
 
 		/**
 		 * parses XML text file located in `filePath`.
@@ -649,7 +655,7 @@ namespace slib
 		 *
 		 * @return Encoded result text with XML entities for special characters
 		 */
-		static String encodeTextToEntities(const String& text);
+		static XmlString encodeTextToEntities(const XmlString& text);
 
 		/**
 		 * Encodes speical characters (&lt; &gt; &amp; &quot; &apos;) to XML entities.
@@ -660,7 +666,7 @@ namespace slib
 		 *
 		 * @return `true` on success
 		 */
-		static sl_bool encodeTextToEntities(const String& text, StringBuffer& output);
+		static sl_bool encodeTextToEntities(const XmlString& text, XmlStringBuffer& output);
 		
 		/**
 		 * Decodes XML entities (&amp;lt; &amp;gt; &amp;amp; ...) contained in `text`.
@@ -669,7 +675,7 @@ namespace slib
 		 *
 		 * @return decoded text
 		 */
-		static String decodeTextFromEntities(const String& text);
+		static XmlString decodeTextFromEntities(const XmlString& text);
 
 		/**
 		 * Check the `name` can be used as XML tag name
@@ -698,7 +704,7 @@ namespace slib
 		 *
 		 * @return `true` if the `name` is valid for XML tag name
 		 */
-		static sl_bool checkName(const String& name);
+		static sl_bool checkName(const XmlString& name);
 
 	};
 

@@ -40,18 +40,18 @@ namespace slib
 		return m_type;
 	}
 
-	String XmlNode::getText() const
+	XmlString XmlNode::getText() const
 	{
-		StringBuffer buf;
+		XmlStringBuffer buf;
 		if (buildText(buf)) {
 			return buf.merge();
 		}
 		return sl_null;
 	}
 
-	String XmlNode::toString() const
+	XmlString XmlNode::toString() const
 	{
-		StringBuffer buf;
+		XmlStringBuffer buf;
 		if (buildXml(buf)) {
 			return buf.merge();
 		}
@@ -232,7 +232,7 @@ namespace slib
 	{
 	}
 
-	sl_bool XmlNodeGroup::buildText(StringBuffer& output) const
+	sl_bool XmlNodeGroup::buildText(XmlStringBuffer& output) const
 	{
 		ListLocker< Ref<XmlNode> > children(m_children);
 		for (sl_size i = 0; i < children.count; i++) {
@@ -245,7 +245,7 @@ namespace slib
 		return sl_true;
 	}
 
-	sl_bool XmlNodeGroup::buildInnerXml(StringBuffer& output) const
+	sl_bool XmlNodeGroup::buildInnerXml(XmlStringBuffer& output) const
 	{
 		ListLocker< Ref<XmlNode> > children(m_children);
 		for (sl_size i = 0; i < children.count; i++) {
@@ -258,9 +258,9 @@ namespace slib
 		return sl_true;
 	}
 
-	String XmlNodeGroup::getInnerXml() const
+	XmlString XmlNodeGroup::getInnerXml() const
 	{
-		StringBuffer buf;
+		XmlStringBuffer buf;
 		if (buildInnerXml(buf)) {
 			return buf.merge();
 		}
@@ -315,7 +315,7 @@ namespace slib
 		m_children.removeAll_NoLock();
 	}
 
-	String XmlNodeGroup::getChildText(sl_size index) const
+	XmlString XmlNodeGroup::getChildText(sl_size index) const
 	{
 		Ref<XmlNode> node = m_children.getValueAt(index);
 		if (node.isNotNull()) {
@@ -359,7 +359,7 @@ namespace slib
 		return n;
 	}
 
-	List< Ref<XmlElement> > XmlNodeGroup::getChildElements(const String& tagName) const
+	List< Ref<XmlElement> > XmlNodeGroup::getChildElements(const XmlString& tagName) const
 	{
 		if (tagName.isEmpty()) {
 			return getChildElements();
@@ -377,7 +377,7 @@ namespace slib
 		return ret;
 	}
 
-	List< Ref<XmlElement> > XmlNodeGroup::getChildElements(const String& uri, const String& localName) const
+	List< Ref<XmlElement> > XmlNodeGroup::getChildElements(const XmlString& uri, const XmlString& localName) const
 	{
 		List< Ref<XmlElement> > ret;
 		ListLocker< Ref<XmlNode> > nodes(m_children);
@@ -404,7 +404,7 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<XmlElement> XmlNodeGroup::getFirstChildElement(const String& tagName) const
+	Ref<XmlElement> XmlNodeGroup::getFirstChildElement(const XmlString& tagName) const
 	{
 		if (tagName.isEmpty()) {
 			return getFirstChildElement();
@@ -421,7 +421,7 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<XmlElement> XmlNodeGroup::getFirstChildElement(const String& uri, const String& localName) const
+	Ref<XmlElement> XmlNodeGroup::getFirstChildElement(const XmlString& uri, const XmlString& localName) const
 	{
 		ListLocker< Ref<XmlNode> > nodes(m_children);
 		for (sl_size i = 0; i < nodes.count; i++) {
@@ -435,7 +435,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String XmlNodeGroup::getFirstChildElementText() const
+	XmlString XmlNodeGroup::getFirstChildElementText() const
 	{
 		Ref<XmlElement> e = getFirstChildElement();
 		if (e.isNotNull()) {
@@ -444,7 +444,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String XmlNodeGroup::getFirstChildElementText(const String& tagName) const
+	XmlString XmlNodeGroup::getFirstChildElementText(const XmlString& tagName) const
 	{
 		if (tagName.isEmpty()) {
 			return getFirstChildElementText();
@@ -456,7 +456,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String XmlNodeGroup::getFirstChildElementText(const String& uri, const String& localName) const
+	XmlString XmlNodeGroup::getFirstChildElementText(const XmlString& uri, const XmlString& localName) const
 	{
 		Ref<XmlElement> e = getFirstChildElement(uri, localName);
 		if (e.isNotNull()) {
@@ -465,14 +465,14 @@ namespace slib
 		return sl_null;
 	}
 
-	List< Ref<XmlElement> > XmlNodeGroup::getDescendantElements(const String& tagName) const
+	List< Ref<XmlElement> > XmlNodeGroup::getDescendantElements(const XmlString& tagName) const
 	{
 		List< Ref<XmlElement> > ret;
 		getDescendantElements(tagName, ret);
 		return ret;
 	}
 
-	void XmlNodeGroup::getDescendantElements(const String& tagName, List< Ref<XmlElement> >& list) const
+	void XmlNodeGroup::getDescendantElements(const XmlString& tagName, List< Ref<XmlElement> >& list) const
 	{
 		ListLocker< Ref<XmlNode> > nodes(m_children);
 		for (sl_size i = 0; i < nodes.count; i++) {
@@ -486,14 +486,14 @@ namespace slib
 		}
 	}
 
-	List< Ref<XmlElement> > XmlNodeGroup::getDescendantElements(const String& uri, const String& localName) const
+	List< Ref<XmlElement> > XmlNodeGroup::getDescendantElements(const XmlString& uri, const XmlString& localName) const
 	{
 		List< Ref<XmlElement> > ret;
 		getDescendantElements(uri, localName, ret);
 		return ret;
 	}
 
-	void XmlNodeGroup::getDescendantElements(const String& uri, const String& localName, List< Ref<XmlElement> >& list) const
+	void XmlNodeGroup::getDescendantElements(const XmlString& uri, const XmlString& localName, List< Ref<XmlElement> >& list) const
 	{
 		ListLocker< Ref<XmlNode> > nodes(m_children);
 		for (sl_size i = 0; i < nodes.count; i++) {
@@ -507,7 +507,7 @@ namespace slib
 		}
 	}
 
-	Ref<XmlElement> XmlNodeGroup::getFirstDescendantElement(const String& tagName) const
+	Ref<XmlElement> XmlNodeGroup::getFirstDescendantElement(const XmlString& tagName) const
 	{
 		ListLocker< Ref<XmlNode> > nodes(m_children);
 		for (sl_size i = 0; i < nodes.count; i++) {
@@ -526,7 +526,7 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<XmlElement> XmlNodeGroup::getFirstDescendantElement(const String& uri, const String& localName) const
+	Ref<XmlElement> XmlNodeGroup::getFirstDescendantElement(const XmlString& uri, const XmlString& localName) const
 	{
 		ListLocker< Ref<XmlNode> > nodes(m_children);
 		for (sl_size i = 0; i < nodes.count; i++) {
@@ -545,7 +545,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String XmlNodeGroup::getFirstDescendantElementText(const String& tagName) const
+	XmlString XmlNodeGroup::getFirstDescendantElementText(const XmlString& tagName) const
 	{
 		Ref<XmlElement> e = getFirstDescendantElement(tagName);
 		if (e.isNotNull()) {
@@ -554,7 +554,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String XmlNodeGroup::getFirstDescendantElementText(const String& uri, const String& localName) const
+	XmlString XmlNodeGroup::getFirstDescendantElementText(const XmlString& uri, const XmlString& localName) const
 	{
 		Ref<XmlElement> e = getFirstDescendantElement(uri, localName);
 		if (e.isNotNull()) {
@@ -563,13 +563,13 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<XmlElement> XmlNodeGroup::findChildElementByAttribute(const String& attrName, const String& attrValue) const
+	Ref<XmlElement> XmlNodeGroup::findChildElementByAttribute(const XmlString& attrName, const XmlString& attrValue) const
 	{
 		ListLocker< Ref<XmlNode> > nodes(m_children);
 		for (sl_size i = 0; i < nodes.count; i++) {
 			Ref<XmlElement> e = nodes[i]->toElementNode();
 			if (e.isNotNull()) {
-				String value = e->getAttribute(attrName);
+				XmlString value = e->getAttribute(attrName);
 				if (value == attrValue) {
 					return e;
 				}
@@ -582,9 +582,9 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<XmlElement> XmlNodeGroup::findChildElementById(const String& _id) const
+	Ref<XmlElement> XmlNodeGroup::findChildElementById(const XmlString& _id) const
 	{
-		SLIB_STATIC_STRING_BY_ARRAY(name, 'i', 'd');
+		SLIB_STATIC_STRING16_BY_ARRAY(name, 'i', 'd');
 		return findChildElementByAttribute(name, _id);
 	}
 
@@ -597,7 +597,7 @@ namespace slib
 		m_positionEndContentInSource = 0;
 	}
 
-	Ref<XmlElement> XmlElement::create(const String& name)
+	Ref<XmlElement> XmlElement::create(const XmlString& name)
 	{
 		if (Xml::checkName(name)) {
 			Ref<XmlElement> ret = new XmlElement;
@@ -609,7 +609,7 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<XmlElement> XmlElement::create(const String& name, const String& uri, const String& localName)
+	Ref<XmlElement> XmlElement::create(const XmlString& name, const XmlString& uri, const XmlString& localName)
 	{
 		if (Xml::checkName(name)) {
 			Ref<XmlElement> ret = new XmlElement;
@@ -623,13 +623,13 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool XmlElement::buildXml(StringBuffer& output) const
+	sl_bool XmlElement::buildXml(XmlStringBuffer& output) const
 	{
-		String name = m_name;
+		XmlString name = m_name;
 		if (name.isEmpty()) {
 			return sl_false;
 		}
-		if (!(output.addStatic("<", 1))) {
+		if (!(output.addStatic(SLIB_UNICODE("<"), 1))) {
 			return sl_false;
 		}
 		if (!(output.add(name))) {
@@ -641,7 +641,7 @@ namespace slib
 			ListElements<XmlAttribute> attrs(m_attributes);
 			for (sl_size i = 0; i < attrs.count; i++) {
 				if (attrs[i].whiteSpacesBeforeName.isEmpty()) {
-					if (!(output.addStatic(" ", 1))) {
+					if (!(output.addStatic(SLIB_UNICODE(" "), 1))) {
 						return sl_false;
 					}
 				} else {
@@ -652,13 +652,13 @@ namespace slib
 				if (!(output.add(attrs[i].name))) {
 					return sl_false;
 				}
-				if (!(output.addStatic("=\"", 2))) {
+				if (!(output.addStatic(SLIB_UNICODE("=\""), 2))) {
 					return sl_false;
 				}
 				if (!(Xml::encodeTextToEntities(attrs[i].value, output))) {
 					return sl_false;
 				}
-				if (!(output.addStatic("\"", 1))) {
+				if (!(output.addStatic(SLIB_UNICODE("\""), 1))) {
 					return sl_false;
 				}
 			}
@@ -667,23 +667,23 @@ namespace slib
 		{
 			ObjectLocker lock(&m_children);
 			if (m_children.getCount() == 0) {
-				if (!(output.addStatic(" />", 3))) {
+				if (!(output.addStatic(SLIB_UNICODE(" />"), 3))) {
 					return sl_false;
 				}
 			} else {
-				if (!(output.addStatic(">", 1))) {
+				if (!(output.addStatic(SLIB_UNICODE(">"), 1))) {
 					return sl_false;
 				}
 				if (!(buildInnerXml(output))) {
 					return sl_false;
 				}
-				if (!(output.addStatic("</", 2))) {
+				if (!(output.addStatic(SLIB_UNICODE("</"), 2))) {
 					return sl_false;
 				}
 				if (!(output.add(name))) {
 					return sl_false;
 				}
-				if (!(output.addStatic(">", 1))) {
+				if (!(output.addStatic(SLIB_UNICODE(">"), 1))) {
 					return sl_false;
 				}
 			}
@@ -691,22 +691,22 @@ namespace slib
 		return sl_true;
 	}
 
-	String XmlElement::getName() const
+	XmlString XmlElement::getName() const
 	{
 		return m_name;
 	}
 
-	String XmlElement::getUri() const
+	XmlString XmlElement::getUri() const
 	{
 		return m_uri;
 	}
 
-	String XmlElement::getLocalName() const
+	XmlString XmlElement::getLocalName() const
 	{
 		return m_localName;
 	}
 
-	sl_bool XmlElement::setName(const String& name)
+	sl_bool XmlElement::setName(const XmlString& name)
 	{
 		if (Xml::checkName(name)) {
 			m_name = name;
@@ -715,7 +715,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool XmlElement::setName(const String& name, const String& uri, const String& localName)
+	sl_bool XmlElement::setName(const XmlString& name, const XmlString& uri, const XmlString& localName)
 	{
 		if (Xml::checkName(name)) {
 			m_name = name;
@@ -737,13 +737,13 @@ namespace slib
 		return m_attributes.getAt_NoLock(index, _out);
 	}
 
-	String XmlElement::getAttribute(const String& name) const
+	XmlString XmlElement::getAttribute(const XmlString& name) const
 	{
 		MutexLocker lock(&m_lockAttributes);
-		return m_mapAttributes.getValue_NoLock(name, String::null());
+		return m_mapAttributes.getValue_NoLock(name, XmlString::null());
 	}
 
-	String XmlElement::getAttribute(const String& uri, const String& localName) const
+	XmlString XmlElement::getAttribute(const XmlString& uri, const XmlString& localName) const
 	{
 		MutexLocker lock(&m_lockAttributes);
 		ListElements<XmlAttribute> attrs(m_attributes);
@@ -755,13 +755,13 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool XmlElement::containsAttribute(const String& name) const
+	sl_bool XmlElement::containsAttribute(const XmlString& name) const
 	{
 		MutexLocker lock(&m_lockAttributes);
 		return m_mapAttributes.find_NoLock(name) != sl_null;
 	}
 
-	sl_bool XmlElement::setAttribute(sl_size index, const String& value)
+	sl_bool XmlElement::setAttribute(sl_size index, const XmlString& value)
 	{
 		MutexLocker lock(&m_lockAttributes);
 		XmlAttribute attr;
@@ -773,7 +773,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool XmlElement::setAttribute(sl_size index, const String& uri, const String& localName, const String& value)
+	sl_bool XmlElement::setAttribute(sl_size index, const XmlString& uri, const XmlString& localName, const XmlString& value)
 	{
 		MutexLocker lock(&m_lockAttributes);
 		XmlAttribute attr;
@@ -787,7 +787,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool XmlElement::setAttribute(const String& name, const String& value)
+	sl_bool XmlElement::setAttribute(const XmlString& name, const XmlString& value)
 	{
 		if (!(Xml::checkName(name))) {
 			return sl_false;
@@ -834,7 +834,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool XmlElement::setAttribute(const String& uri, const String& localName, const String& value)
+	sl_bool XmlElement::setAttribute(const XmlString& uri, const XmlString& localName, const XmlString& value)
 	{
 		MutexLocker lock(&m_lockAttributes);
 		ListElements<XmlAttribute> attrs(m_attributes);
@@ -858,7 +858,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool XmlElement::removeAttribute(const String& name)
+	sl_bool XmlElement::removeAttribute(const XmlString& name)
 	{
 		MutexLocker lock(&m_lockAttributes);
 		if (m_mapAttributes.find_NoLock(name)) {
@@ -911,17 +911,17 @@ namespace slib
 		return new XmlDocument;
 	}
 
-	sl_bool XmlDocument::buildXml(StringBuffer& output) const
+	sl_bool XmlDocument::buildXml(XmlStringBuffer& output) const
 	{
 		return buildInnerXml(output);
 	}
 
-	Ref<XmlElement> XmlDocument::getElementById(const String& _id) const
+	Ref<XmlElement> XmlDocument::getElementById(const XmlString& _id) const
 	{
 		return m_elementsById.getValue(_id, Ref<XmlElement>::null());
 	}
 
-	void XmlDocument::registerElementsById(const String& idAttributeName)
+	void XmlDocument::registerElementsById(const XmlString& idAttributeName)
 	{
 		ListLocker< Ref<XmlNode> > nodes(m_children);
 		for (sl_size i = 0; i < nodes.count; i++) {
@@ -932,10 +932,10 @@ namespace slib
 		}
 	}
 
-	void XmlDocument::registerElementsById(const Ref<XmlElement>& element, const String& idAttributeName)
+	void XmlDocument::registerElementsById(const Ref<XmlElement>& element, const XmlString& idAttributeName)
 	{
 		if (element.isNotNull()) {
-			String value = element->getAttribute(idAttributeName);
+			XmlString value = element->getAttribute(idAttributeName);
 			if (value.isNotEmpty()) {
 				m_elementsById.put(value, element);
 			}
@@ -974,7 +974,7 @@ namespace slib
 	{
 	}
 
-	Ref<XmlText> XmlText::create(const String& text, sl_bool flagCDATA)
+	Ref<XmlText> XmlText::create(const XmlString& text, sl_bool flagCDATA)
 	{
 		Ref<XmlText> ret = new XmlText;
 		if (ret.isNotNull()) {
@@ -984,35 +984,35 @@ namespace slib
 		return ret;
 	}
 
-	Ref<XmlText> XmlText::createCDATA(const String& text)
+	Ref<XmlText> XmlText::createCDATA(const XmlString& text)
 	{
 		return create(text, sl_true);
 	}
 
-	sl_bool XmlText::buildText(StringBuffer& output) const
+	sl_bool XmlText::buildText(XmlStringBuffer& output) const
 	{
 		return output.add(m_text);
 	}
 
-	sl_bool XmlText::buildXml(StringBuffer& output) const
+	sl_bool XmlText::buildXml(XmlStringBuffer& output) const
 	{
-		String text = m_text;
+		XmlString text = m_text;
 		if (text.isEmpty()) {
 			return sl_true;
 		}
 		if (m_flagCDATA) {
-			if (!(output.addStatic("<![CDATA[", 9))) {
+			if (!(output.addStatic(SLIB_UNICODE("<![CDATA["), 9))) {
 				return sl_false;
 			}
 			StringData data;
-			data.str8 = text;
-			sl_char8* sz = text.getData();
+			data.str16 = text;
+			sl_char16* sz = text.getData();
 			sl_size len = text.getLength();
 			sl_size start = 0;
 			for (sl_size i = 0; i + 2 < len; i++) {
 				if (sz[i] == ']' && sz[i+1] == ']' && sz[i+2] == '>') {
 					if (i > start) {
-						data.sz8 = sz + start;
+						data.sz16 = sz + start;
 						data.len = i - start;
 						if (!(output.add(data))) {
 							return sl_false;
@@ -1020,19 +1020,19 @@ namespace slib
 						start = i + 3;
 						i = start - 1;
 					}
-					if (!(output.addStatic("]]]]><![CDATA[>", 15))) {
+					if (!(output.addStatic(SLIB_UNICODE("]]]]><![CDATA[>"), 15))) {
 						return sl_false;
 					}
 				}
 			}
 			if (len > start) {
-				data.sz8 = sz + start;
+				data.sz16 = sz + start;
 				data.len = len - start;
 				if (!(output.add(data))) {
 					return sl_false;
 				}
 			}
-			if (!(output.addStatic("]]>", 3))) {
+			if (!(output.addStatic(SLIB_UNICODE("]]>"), 3))) {
 				return sl_false;
 			}
 			return sl_true;
@@ -1041,12 +1041,12 @@ namespace slib
 		}
 	}
 
-	String XmlText::getText() const
+	XmlString XmlText::getText() const
 	{
 		return m_text;
 	}
 
-	void XmlText::setText(const String& text)
+	void XmlText::setText(const XmlString& text)
 	{
 		m_text = text;
 	}
@@ -1068,7 +1068,7 @@ namespace slib
 	{
 	}
 
-	Ref<XmlProcessingInstruction> XmlProcessingInstruction::create(const String& target, const String& content)
+	Ref<XmlProcessingInstruction> XmlProcessingInstruction::create(const XmlString& target, const XmlString& content)
 	{
 		if (Xml::checkName(target)) {
 			Ref<XmlProcessingInstruction> ret = new XmlProcessingInstruction;
@@ -1081,38 +1081,38 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool XmlProcessingInstruction::buildText(StringBuffer& output) const
+	sl_bool XmlProcessingInstruction::buildText(XmlStringBuffer& output) const
 	{
 		return sl_true;
 	}
 
-	sl_bool XmlProcessingInstruction::buildXml(StringBuffer& output) const
+	sl_bool XmlProcessingInstruction::buildXml(XmlStringBuffer& output) const
 	{
-		String target = m_target;
+		XmlString target = m_target;
 		if (target.isEmpty()) {
 			return sl_false;
 		}
-		if (!(output.addStatic("<?", 2))) {
+		if (!(output.addStatic(SLIB_UNICODE("<?"), 2))) {
 			return sl_false;
 		}
 		if (!(output.add(target))) {
 			return sl_false;
 		}
-		if (!(output.addStatic(" ", 1))) {
+		if (!(output.addStatic(SLIB_UNICODE(" "), 1))) {
 			return sl_false;
 		}
 		// content
 		{
-			String content = m_content;
+			XmlString content = m_content;
 			StringData data;
-			data.str8 = content;
-			sl_char8* sz = content.getData();
+			data.str16 = content;
+			sl_char16* sz = content.getData();
 			sl_size len = content.getLength();
 			sl_size start = 0;
 			for (sl_size i = 0; i + 1 < len; i++) {
 				if (sz[i] == '?' && sz[i+1] == '>') {
 					if (i > start) {
-						data.sz8 = sz + start;
+						data.sz16 = sz + start;
 						data.len = i - start;
 						if (!(output.add(data))) {
 							return sl_false;
@@ -1123,25 +1123,25 @@ namespace slib
 				}
 			}
 			if (len > start) {
-				data.sz8 = sz + start;
+				data.sz16 = sz + start;
 				data.len = len - start;
 				if (!(output.add(data))) {
 					return sl_false;
 				}
 			}
 		}
-		if (!(output.addStatic("?>", 2))) {
+		if (!(output.addStatic(SLIB_UNICODE("?>"), 2))) {
 			return sl_false;
 		}
 		return sl_true;
 	}
 
-	String XmlProcessingInstruction::getTarget() const
+	XmlString XmlProcessingInstruction::getTarget() const
 	{
 		return m_target;
 	}
 
-	sl_bool XmlProcessingInstruction::setTarget(const String& target)
+	sl_bool XmlProcessingInstruction::setTarget(const XmlString& target)
 	{
 		if (Xml::checkName(target)) {
 			m_target = target;
@@ -1150,12 +1150,12 @@ namespace slib
 		return sl_false;
 	}
 
-	String XmlProcessingInstruction::getContent() const
+	XmlString XmlProcessingInstruction::getContent() const
 	{
 		return m_content;
 	}
 
-	void XmlProcessingInstruction::setContent(const String& content)
+	void XmlProcessingInstruction::setContent(const XmlString& content)
 	{
 		m_content = content;
 	}
@@ -1167,7 +1167,7 @@ namespace slib
 	{
 	}
 
-	Ref<XmlComment> XmlComment::create(const String& comment)
+	Ref<XmlComment> XmlComment::create(const XmlString& comment)
 	{
 		Ref<XmlComment> ret = new XmlComment;
 		if (ret.isNotNull()) {
@@ -1176,31 +1176,31 @@ namespace slib
 		return ret;
 	}
 
-	sl_bool XmlComment::buildText(StringBuffer& output) const
+	sl_bool XmlComment::buildText(XmlStringBuffer& output) const
 	{
 		return sl_true;
 	}
 
-	sl_bool XmlComment::buildXml(StringBuffer& output) const
+	sl_bool XmlComment::buildXml(XmlStringBuffer& output) const
 	{
-		String comment = m_comment;
+		XmlString comment = m_comment;
 		if (comment.isEmpty()) {
 			return sl_true;
 		}
-		if (!(output.addStatic("<!--", 4))) {
+		if (!(output.addStatic(SLIB_UNICODE("<!--"), 4))) {
 			return sl_false;
 		}
 		// comment
 		{
 			StringData data;
-			data.str8 = comment;
-			sl_char8* sz = comment.getData();
+			data.str16 = comment;
+			sl_char16* sz = comment.getData();
 			sl_size len = comment.getLength();
 			sl_size start = 0;
 			for (sl_size i = 0; i + 1 < len; i++) {
 				if (sz[i] == '-' && sz[i+1] == '-') {
 					if (i > start) {
-						data.sz8 = sz + start;
+						data.sz16 = sz + start;
 						data.len = i - start;
 						if (!(output.add(data))) {
 							return sl_false;
@@ -1211,25 +1211,25 @@ namespace slib
 				}
 			}
 			if (len > start) {
-				data.sz8 = sz + start;
+				data.sz16 = sz + start;
 				data.len = len - start;
 				if (!(output.add(data))) {
 					return sl_false;
 				}
 			}
 		}
-		if (!(output.addStatic("-->", 3))) {
+		if (!(output.addStatic(SLIB_UNICODE("-->"), 3))) {
 			return sl_false;
 		}
 		return sl_true;
 	}
 
-	String XmlComment::getComment() const
+	XmlString XmlComment::getComment() const
 	{
 		return m_comment;
 	}
 
-	void XmlComment::setComment(const String& comment)
+	void XmlComment::setComment(const XmlString& comment)
 	{
 		m_comment = comment;
 	}
@@ -1241,7 +1241,7 @@ namespace slib
 	{
 	}
 
-	Ref<XmlWhiteSpace> XmlWhiteSpace::create(const String& content)
+	Ref<XmlWhiteSpace> XmlWhiteSpace::create(const XmlString& content)
 	{
 		Ref<XmlWhiteSpace> ret = new XmlWhiteSpace;
 		if (ret.isNotNull()) {
@@ -1250,12 +1250,12 @@ namespace slib
 		return ret;
 	}
 
-	sl_bool XmlWhiteSpace::buildText(StringBuffer& output) const
+	sl_bool XmlWhiteSpace::buildText(XmlStringBuffer& output) const
 	{
 		return sl_true;
 	}
 
-	sl_bool XmlWhiteSpace::buildXml(StringBuffer& output) const
+	sl_bool XmlWhiteSpace::buildXml(XmlStringBuffer& output) const
 	{
 		if (!(output.add(m_content))) {
 			return sl_false;
@@ -1263,12 +1263,12 @@ namespace slib
 		return sl_true;
 	}
 
-	String XmlWhiteSpace::getContent() const
+	XmlString XmlWhiteSpace::getContent() const
 	{
 		return m_content;
 	}
 
-	void XmlWhiteSpace::setContent(const String& content)
+	void XmlWhiteSpace::setContent(const XmlString& content)
 	{
 		m_content = content;
 	}
@@ -1368,7 +1368,7 @@ namespace slib
 
 		void unescapeEntity(BT* buf);
 		
-		void parseName(String& name);
+		void parseName(XmlString& name);
 
 		void parseComment(XmlNodeGroup* parent);
 
@@ -1376,15 +1376,15 @@ namespace slib
 		
 		void parsePI(XmlNodeGroup* parent);
 		
-		void processPrefix(const String& name, const String& defNamespace, const HashMap<String, String>& namespaces, String& prefix, String& uri, String& localName);
+		void processPrefix(const XmlString& name, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces, XmlString& prefix, XmlString& uri, XmlString& localName);
 		
-		void parseAttribute(String& name, String& value);
+		void parseAttribute(XmlString& name, XmlString& value);
 		
-		void parseElement(XmlNodeGroup* parent, const String& defNamespace, const HashMap<String, String>& namespaces);
+		void parseElement(XmlNodeGroup* parent, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces);
 		
 		void parseText(XmlNodeGroup* parent);
 		
-		void parseNodes(XmlNodeGroup* parent, const String& defNamespace, const HashMap<String, String>& namespaces);
+		void parseNodes(XmlNodeGroup* parent, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces);
 		
 		void parseXml();
 		
@@ -1537,7 +1537,7 @@ namespace slib
 		}
 		if (param.flagCreateWhiteSpaces) {
 			if (parent) {
-				String content(buf + posStart, posEnd - posStart);
+				XmlString content(buf + posStart, posEnd - posStart);
 				if (content.isNull()) {
 					REPORT_ERROR(_g_xml_error_msg_memory_lack)
 				}
@@ -1638,7 +1638,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parseName(String& name)
+	void _priv_Xml_Parser<ST, CT, BT>::parseName(XmlString& name)
 	{
 		if (pos >= len) {
 			REPORT_ERROR(_g_xml_error_msg_name_missing)
@@ -1656,7 +1656,7 @@ namespace slib
 			}
 			pos++;
 		}
-		name = String(buf + start, pos - start);
+		name = XmlString(buf + start, pos - start);
 		if (name.isNull()) {
 			REPORT_ERROR(_g_xml_error_msg_memory_lack)
 		}
@@ -1675,7 +1675,7 @@ namespace slib
 			if (buf[pos] == '-' && buf[pos + 1] == '-') {
 				if (buf[pos + 2] == '>') {
 					if (param.flagCreateCommentNodes) {
-						String str(buf + startComment, pos - startComment);
+						XmlString str(buf + startComment, pos - startComment);
 						if (str.isNull()) {
 							REPORT_ERROR(_g_xml_error_msg_memory_lack)
 						}
@@ -1723,7 +1723,7 @@ namespace slib
 		while (pos + 2 < len) {
 			if (buf[pos] == ']' && buf[pos + 1] == ']' && buf[pos + 2] == '>') {
 				if (param.flagCreateTextNodes) {
-					String str(buf + startCDATA, pos - startCDATA);
+					XmlString str(buf + startCDATA, pos - startCDATA);
 					if (str.isNull()) {
 						REPORT_ERROR(_g_xml_error_msg_memory_lack)
 					}
@@ -1760,7 +1760,7 @@ namespace slib
 	template <class ST, class CT, class BT>
 	void _priv_Xml_Parser<ST, CT, BT>::parsePI(XmlNodeGroup* parent)
 	{
-		String target;
+		XmlString target;
 		parseName(target);
 		if (flagError) {
 			return;
@@ -1785,7 +1785,7 @@ namespace slib
 		while (pos + 1 < len) {
 			if (buf[pos] == '?' && buf[pos + 1] == '>') {
 				if (param.flagCreateProcessingInstructionNodes) {
-					String str(buf + startPI, pos - startPI);
+					XmlString str(buf + startPI, pos - startPI);
 					if (str.isNull()) {
 						REPORT_ERROR(_g_xml_error_msg_memory_lack)
 					}
@@ -1820,7 +1820,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	SLIB_INLINE void _priv_Xml_Parser<ST, CT, BT>::processPrefix(const String& name, const String& defNamespace, const HashMap<String, String>& namespaces, String& prefix, String& uri, String& localName)
+	SLIB_INLINE void _priv_Xml_Parser<ST, CT, BT>::processPrefix(const XmlString& name, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces, XmlString& prefix, XmlString& uri, XmlString& localName)
 	{
 		sl_reg index = name.indexOf(':');
 		if (index >= 0) {
@@ -1834,7 +1834,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parseAttribute(String& name, String& value)
+	void _priv_Xml_Parser<ST, CT, BT>::parseAttribute(XmlString& name, XmlString& value)
 	{
 		parseName(name);
 		if (flagError) {
@@ -1912,16 +1912,16 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _defNamespace, const HashMap<String, String>& _namespaces)
+	void _priv_Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const XmlString& _defNamespace, const HashMap<XmlString, XmlString>& _namespaces)
 	{
-		String defNamespace = _defNamespace;
-		HashMap<String, String> namespaces = _namespaces;
+		XmlString defNamespace = _defNamespace;
+		HashMap<XmlString, XmlString> namespaces = _namespaces;
 		
 		calcLineNumber();
 		sl_size startLine = lineNumber;
 		sl_size startColumn = columnNumber;
 		sl_size posNameStart = pos;
-		String name;
+		XmlString name;
 		parseName(name);
 		if (flagError) {
 			return;
@@ -1933,7 +1933,7 @@ namespace slib
 			REPORT_ERROR(_g_xml_error_msg_memory_lack)
 		}
 		
-		CList<String> listPrefixMappings;
+		CList<XmlString> listPrefixMappings;
 		sl_size indexAttr = 0;
 		
 		while (pos < len) {
@@ -1972,11 +1972,11 @@ namespace slib
 				if (element->containsAttribute(attr.name)) {
 					REPORT_ERROR(_g_xml_error_msg_element_attr_duplicate)
 				}
-				String prefix;
+				XmlString prefix;
 				processPrefix(attr.name, defNamespace, namespaces, prefix, attr.uri, attr.localName);
 				if (param.flagCreateWhiteSpaces) {
 					if (endWhiteSpace > startWhiteSpace) {
-						String ws(buf + startWhiteSpace, endWhiteSpace - startWhiteSpace);
+						XmlString ws(buf + startWhiteSpace, endWhiteSpace - startWhiteSpace);
 						if (ws.isNull()) {
 							REPORT_ERROR(_g_xml_error_msg_memory_lack)
 						}
@@ -1989,10 +1989,10 @@ namespace slib
 				if (param.flagProcessNamespaces) {
 					if (attr.name == "xmlns") {
 						defNamespace = attr.value;
-						if (!(listPrefixMappings.add(String::null()))) {
+						if (!(listPrefixMappings.add(XmlString::null()))) {
 							REPORT_ERROR(_g_xml_error_msg_memory_lack)
 						}
-						CALL_CALLBACK(onStartPrefixMapping, element.get(), String::null(), defNamespace);
+						CALL_CALLBACK(onStartPrefixMapping, element.get(), XmlString::null(), defNamespace);
 					} else if (prefix == "xmlns" && attr.localName.isNotEmpty() && attr.value.isNotEmpty()) {
 						if (namespaces == _namespaces) {
 							namespaces = _namespaces.duplicate();
@@ -2035,7 +2035,7 @@ namespace slib
 		element->setStartContentPositionInSource(posNameStart);
 		element->setEndContentPositionInSource(posNameStart);
 
-		String prefix, uri, localName;
+		XmlString prefix, uri, localName;
 		processPrefix(name, defNamespace, namespaces, prefix, uri, localName);
 		if (!(element->setName(name, uri, localName))) {
 			REPORT_ERROR(_g_xml_error_msg_unknown)
@@ -2085,7 +2085,7 @@ namespace slib
 		element->setEndPositionInSource(pos);
 		CALL_CALLBACK(onEndElement, element.get(), element.get());
 		if (param.flagProcessNamespaces) {
-			ListLocker<String> prefixes(listPrefixMappings);
+			ListLocker<XmlString> prefixes(listPrefixMappings);
 			for (sl_size i = 0; i < prefixes.count; i++) {
 				CALL_CALLBACK(onEndPrefixMapping, element.get(), prefixes[i]);
 			}
@@ -2151,7 +2151,7 @@ namespace slib
 			} else {
 				startWhiteSpace = pos;
 			}
-			String text = sb->merge();
+			XmlString text = sb->merge();
 			if (text.isNull()) {
 				REPORT_ERROR(_g_xml_error_msg_memory_lack)
 			}
@@ -2182,7 +2182,7 @@ namespace slib
 	}
 
 	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parseNodes(XmlNodeGroup* parent, const String& defNamespace, const HashMap<String, String>& namespaces)
+	void _priv_Xml_Parser<ST, CT, BT>::parseNodes(XmlNodeGroup* parent, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces)
 	{
 		while (pos < len) {
 			if (buf[pos] == '<') { // Element, Comment, PI, CDATA
@@ -2233,7 +2233,7 @@ namespace slib
 	void _priv_Xml_Parser<ST, CT, BT>::parseXml()
 	{
 		CALL_CALLBACK(onStartDocument, document.get(), document.get())
-		parseNodes(document.get(), String::null(), HashMap<String, String>::null());
+		parseNodes(document.get(), XmlString::null(), HashMap<XmlString, XmlString>::null());
 		if (flagError) {
 			return;
 		}
@@ -2303,31 +2303,36 @@ namespace slib
 		return parseXml(sz, len, param);
 	}
 
-	Ref<XmlDocument> Xml::parseXml(const String& xml, XmlParseParam& param)
+	Ref<XmlDocument> Xml::parseXml8(const String& xml, XmlParseParam& param)
 	{
 		return _priv_Xml_Parser<String, sl_char8, StringBuffer>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
 	}
 
-	Ref<XmlDocument> Xml::parseXml(const String& xml)
+	Ref<XmlDocument> Xml::parseXml8(const String& xml)
 	{
 		XmlParseParam param;
 		return parseXml(xml, param);
 	}
 
-	Ref<XmlDocument> Xml::parseXml16(const sl_char16* sz, sl_size len, XmlParseParam& param)
+	Ref<XmlDocument> Xml::parseXml(const sl_char16* sz, sl_size len, XmlParseParam& param)
 	{
 		return _priv_Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(String::null(), sz, len, param);
 	}
 
-	Ref<XmlDocument> Xml::parseXml16(const sl_char16* sz, sl_size len)
+	Ref<XmlDocument> Xml::parseXml(const sl_char16* sz, sl_size len)
 	{
 		XmlParseParam param;
-		return Xml::parseXml16(sz, len, param);
+		return Xml::parseXml(sz, len, param);
 	}
 
 	Ref<XmlDocument> Xml::parseXml16(const String16& xml, XmlParseParam& param)
 	{
 		return _priv_Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
+	}
+
+	Ref<XmlDocument> Xml::parseXml(const XmlString& xml, XmlParseParam& param)
+	{
+		return _priv_Xml_Parser<XmlString, sl_char16, XmlStringBuffer>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
 	}
 
 	Ref<XmlDocument> Xml::parseXml16(const String16& xml)
@@ -2336,35 +2341,41 @@ namespace slib
 		return Xml::parseXml16(xml, param);
 	}
 
+	Ref<XmlDocument> Xml::parseXml(const XmlString& xml)
+	{
+		XmlParseParam param;
+		return Xml::parseXml(xml, param);
+	}
+	
 	Ref<XmlDocument> Xml::parseXmlFromTextFile(const String& filePath, XmlParseParam& param)
 	{
-		String16 xml = File::readAllText16(filePath);
-		return _priv_Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(filePath, xml.getData(), xml.getLength(), param);
+		XmlString xml = File::readAllText16(filePath);
+		return _priv_Xml_Parser<XmlString, sl_char16, XmlStringBuffer>::parseXml(filePath, xml.getData(), xml.getLength(), param);
 	}
 
 	Ref<XmlDocument> Xml::parseXmlFromTextFile(const String& filePath)
 	{
 		XmlParseParam param;
-		String16 xml = File::readAllText16(filePath);
-		return _priv_Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(filePath, xml.getData(), xml.getLength(), param);
+		XmlString xml = File::readAllText16(filePath);
+		return _priv_Xml_Parser<XmlString, sl_char16, XmlStringBuffer>::parseXml(filePath, xml.getData(), xml.getLength(), param);
 	}
 
 	
-	String Xml::encodeTextToEntities(const String& text)
+	XmlString Xml::encodeTextToEntities(const XmlString& text)
 	{
-		StringBuffer buf;
+		XmlStringBuffer buf;
 		if (encodeTextToEntities(text, buf)) {
 			return buf.merge();
 		}
 		return sl_null;
 	}
 
-	sl_bool Xml::encodeTextToEntities(const String& text, StringBuffer& output)
+	sl_bool Xml::encodeTextToEntities(const XmlString& text, XmlStringBuffer& output)
 	{
 		StringData data;
 		StringData dataEscape;
-		data.str8 = text;
-		sl_char8* sz = text.getData();
+		data.str16 = text;
+		sl_char16* sz = text.getData();
 		sl_size len = text.getLength();
 		sl_size start = 0;
 		for (sl_size i = 0; i < len; i++) {
@@ -2372,28 +2383,28 @@ namespace slib
 			sl_bool flagEscape = sl_false;
 			if (ch == '<') {
 				flagEscape = sl_true;
-				dataEscape.sz8 = "&lt;";
+				dataEscape.sz16 = SLIB_UNICODE("&lt;");
 				dataEscape.len = 4;
 			} else if (ch == '>') {
 				flagEscape = sl_true;
-				dataEscape.sz8 = "&gt;";
+				dataEscape.sz16 = SLIB_UNICODE("&gt;");
 				dataEscape.len = 4;
 			} else if (ch == '&') {
 				flagEscape = sl_true;
-				dataEscape.sz8 = "&amp;";
+				dataEscape.sz16 = SLIB_UNICODE("&amp;");
 				dataEscape.len = 5;
 			} else if (ch == '\'') {
 				flagEscape = sl_true;
-				dataEscape.sz8 = "&apos;";
+				dataEscape.sz16 = SLIB_UNICODE("&apos;");
 				dataEscape.len = 6;
 			} else if (ch == '\"') {
 				flagEscape = sl_true;
-				dataEscape.sz8 = "&quot;";
+				dataEscape.sz16 = SLIB_UNICODE("&quot;");
 				dataEscape.len = 6;
 			}
 			if (flagEscape) {
 				if (i > start) {
-					data.sz8 = sz + start;
+					data.sz16 = sz + start;
 					data.len = i - start;
 					if (!(output.add(data))) {
 						return sl_false;
@@ -2406,7 +2417,7 @@ namespace slib
 			}
 		}
 		if (len > start) {
-			data.sz8 = sz + start;
+			data.sz16 = sz + start;
 			data.len = len - start;
 			if (!(output.add(data))) {
 				return sl_false;
@@ -2415,14 +2426,14 @@ namespace slib
 		return sl_true;
 	}
 	
-	String Xml::decodeTextFromEntities(const String& text)
+	XmlString Xml::decodeTextFromEntities(const XmlString& text)
 	{
-		String ret = text.duplicate();
+		XmlString ret = text.duplicate();
 		
 		if (ret.isNotEmpty()) {
 			
-			sl_char8* buf = text.getData();
-			sl_char8* output = ret.getData();
+			sl_char16* buf = text.getData();
+			sl_char16* output = ret.getData();
 			sl_size len = text.getLength();
 			sl_size pos = 0;
 			
@@ -2459,15 +2470,15 @@ namespace slib
 							sl_reg parseRes;
 							if (buf[pos] == 'x') {
 								pos++;
-								parseRes = String::parseUint32(16, &n, buf, pos, len);
+								parseRes = XmlString::parseUint32(16, &n, buf, pos, len);
 							} else {
-								parseRes = String::parseUint32(10, &n, buf, pos, len);
+								parseRes = XmlString::parseUint32(10, &n, buf, pos, len);
 							}
 							if (parseRes != SLIB_PARSE_ERROR) {
 								pos = parseRes;
 								if (pos < len && buf[pos] == ';') {
 									sl_char32 _n = (sl_char32)n;
-									String s(&_n, 1);
+									XmlString s(&_n, 1);
 									if (s.isNotEmpty()) {
 										sl_size t = s.getLength();
 										Base::copyMemory(output + posOutput, s.getData(), t);
@@ -2531,7 +2542,7 @@ namespace slib
 		return _priv_Xml_checkName(sz, len);
 	}
 
-	sl_bool Xml::checkName(const String& tagName)
+	sl_bool Xml::checkName(const XmlString& tagName)
 	{
 		return checkName(tagName.getData(), tagName.getLength());
 	}
