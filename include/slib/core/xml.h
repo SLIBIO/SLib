@@ -279,6 +279,14 @@ namespace slib
 		sl_bool removeAttribute(const String& name);
 
 		void removeAllAttributes();
+		
+		sl_size getStartContentPositionInSource() const;
+		
+		void setStartContentPositionInSource(sl_size pos);
+
+		sl_size getEndContentPositionInSource() const;
+		
+		void setEndContentPositionInSource(sl_size pos);
 
 	protected:
 		AtomicString m_name;
@@ -287,6 +295,8 @@ namespace slib
 		List<XmlAttribute> m_attributes;
 		HashMap<String, String> m_mapAttributes;
 		Mutex m_lockAttributes;
+		sl_size m_positionStartContentInSource;
+		sl_size m_positionEndContentInSource;
 
 	protected:
 		friend class XmlNode;

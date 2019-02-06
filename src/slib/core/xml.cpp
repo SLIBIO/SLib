@@ -593,6 +593,8 @@ namespace slib
 
 	XmlElement::XmlElement() : XmlNodeGroup(XmlNodeType::Element)
 	{
+		m_positionStartContentInSource = 0;
+		m_positionEndContentInSource = 0;
 	}
 
 	Ref<XmlElement> XmlElement::create(const String& name)
@@ -878,6 +880,25 @@ namespace slib
 		m_mapAttributes.removeAll_NoLock();
 	}
 
+	sl_size XmlElement::getStartContentPositionInSource() const
+	{
+		return m_positionStartContentInSource;
+	}
+	
+	void XmlElement::setStartContentPositionInSource(sl_size pos)
+	{
+		m_positionStartContentInSource = pos;
+	}
+	
+	sl_size XmlElement::getEndContentPositionInSource() const
+	{
+		return m_positionEndContentInSource;
+	}
+	
+	void XmlElement::setEndContentPositionInSource(sl_size pos)
+	{
+		m_positionEndContentInSource = pos;
+	}
 
 	SLIB_DEFINE_OBJECT(XmlDocument, XmlNodeGroup)
 
@@ -2011,6 +2032,8 @@ namespace slib
 		element->setLineNumberInSource(startLine);
 		element->setColumnNumberInSource(startColumn);
 		element->setEndPositionInSource(pos);
+		element->setStartContentPositionInSource(posNameStart);
+		element->setEndContentPositionInSource(posNameStart);
 
 		String prefix, uri, localName;
 		processPrefix(name, defNamespace, namespaces, prefix, uri, localName);
@@ -2025,6 +2048,7 @@ namespace slib
 		}
 		CALL_CALLBACK(onStartElement, element.get(), element.get())
 		if (!flagEmptyTag) {
+			element->setStartContentPositionInSource(pos);
 			parseNodes(parent ? element.get() : sl_null, defNamespace, namespaces);
 			if (flagError) {
 				return;
@@ -2035,6 +2059,7 @@ namespace slib
 			if (buf[pos] != '<' || buf[pos+1] != '/') {
 				REPORT_ERROR(_g_xml_error_msg_element_tag_not_matching_end_tag)
 			}
+			element->setEndContentPositionInSource(pos);
 			pos += 2;
 			if (!(Base::equalsMemory(buf + posNameStart, buf + pos, lenName * sizeof(CT)))) {
 				REPORT_ERROR(_g_xml_error_msg_element_tag_not_matching_end_tag)
