@@ -743,7 +743,7 @@ namespace slib
 		return m_mapAttributes.getValue_NoLock(name, XmlString::null());
 	}
 
-	XmlString XmlElement::getAttributeIngoreCase(const XmlString& name) const
+	XmlString XmlElement::getAttributeIgnoreCase(const XmlString& name) const
 	{
 		MutexLocker lock(&m_lockAttributes);
 		ListElements<XmlAttribute> attrs(m_attributes);
