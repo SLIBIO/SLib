@@ -23,7 +23,7 @@
 namespace slib
 {
 	
-	sl_bool SAppDocument::_parseStringResources(const String& localNamespace, const Ref<XmlElement>& element, const Locale& localeDefault)
+	sl_bool SAppDocument::_parseStringResources(const String& localNamespace, const Ref<XmlElement>& element, const Locale& localeDefault, const String16& source)
 	{
 		if (element.isNull()) {
 			return sl_false;
@@ -47,7 +47,7 @@ namespace slib
 			Ref<XmlElement>& child = children[i];
 			if (child.isNotNull()) {
 				if (child->getName() == "string") {
-					if (!_parseStringResource(localNamespace, child, locale)) {
+					if (!_parseStringResource(localNamespace, child, locale, source)) {
 						return sl_false;
 					}
 				} else {
@@ -59,7 +59,7 @@ namespace slib
 		return sl_true;
 	}
 
-	sl_bool SAppDocument::_parseStringResource(const String& localNamespace, const Ref<XmlElement>& element, const Locale& localeDefault)
+	sl_bool SAppDocument::_parseStringResource(const String& localNamespace, const Ref<XmlElement>& element, const Locale& localeDefault, const String16& source)
 	{
 		if (element.isNull()) {
 			return sl_false;
@@ -89,13 +89,7 @@ namespace slib
 		}
 		
 		name = getNameInLocalNamespace(localNamespace, name);
-		
-		String value;
-		if (element->getChildElementsCount()) {
-			value = element->getInnerXml().getNotNull();
-		} else {
-			value = element->getText();
-		}
+		String value = source.substring(element->getStartContentPositionInSource(), element->getEndContentPositionInSource());
 		
 		Ref<SAppStringResource> res = m_strings.getValue(name, Ref<SAppStringResource>::null());
 		if (res.isNull()) {

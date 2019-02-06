@@ -683,7 +683,8 @@ namespace slib
 		XmlParseParam param;
 		param.flagLogError = sl_false;
 		param.setCreatingOnlyElementsAndTexts();
-		Ref<XmlDocument> xml = Xml::parseXmlFromTextFile(filePath, param);
+		String16 textXML = File::readAllText16(filePath);
+		Ref<XmlDocument> xml = Xml::parseXml16(textXML, param);
 		if (param.flagError) {
 			_logError(filePath, param.errorLine, param.errorColumn, param.errorMessage);
 			return sl_false;
@@ -713,11 +714,11 @@ namespace slib
 							locale = Locale::Unknown;
 						}
 					}
-					if (!_parseStringResources(localNamespace, child, locale)) {
+					if (!_parseStringResources(localNamespace, child, locale, textXML)) {
 						return sl_false;
 					}
 				} else if (child->getName() == "string") {
-					if (!_parseStringResource(localNamespace, child, Locale::Unknown)) {
+					if (!_parseStringResource(localNamespace, child, Locale::Unknown, textXML)) {
 						return sl_false;
 					}
 				} else if (child->getName() == "color") {

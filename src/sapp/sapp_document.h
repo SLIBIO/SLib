@@ -126,8 +126,8 @@ namespace slib
 		sl_bool _generateRawDataFile(const String& targetPath, const String& sourcePath, const String& resourceName);
 		
 		// String Resources
-		sl_bool _parseStringResources(const String& localNamespace, const Ref<XmlElement>& element, const Locale& localeDefault);
-		sl_bool _parseStringResource(const String& localNamespace, const Ref<XmlElement>& element, const Locale& localeDefault);
+		sl_bool _parseStringResources(const String& localNamespace, const Ref<XmlElement>& element, const Locale& localeDefault, const String16& source);
+		sl_bool _parseStringResource(const String& localNamespace, const Ref<XmlElement>& element, const Locale& localeDefault, const String16& source);
 		sl_bool _generateStringsCpp(const String& targetPath);
 		sl_bool _getStringAccessString(const String& localNamespace, const SAppStringValue& value, const Ref<XmlElement>& element, String& result);
 		sl_bool _getStringValue(const String& localNamespace, const SAppStringValue& value, const Ref<XmlElement>& element, String& result);
