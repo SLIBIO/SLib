@@ -41,6 +41,7 @@ namespace slib
 		flagSynchronous = sl_false;
 		timeout = UrlRequest::getDefaultTimeout();
 		flagAllowInsecureConnection = UrlRequest::isDefaultAllowInsecureConnection();
+		dispatcher = UrlRequest::getDefaultDispatcher();
 	}
 	
 	UrlRequestParam::UrlRequestParam(const UrlRequestParam& other) = default;
@@ -164,6 +165,24 @@ namespace slib
 	void UrlRequest::setDefaultAllowInsecureConnection(sl_bool flag)
 	{
 		_g_priv_UrlRequest_default_allowInsecureConnection = flag;
+	}
+	
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Dispatcher>, _g_priv_UrlRequest_default_dispatcher)
+	
+	Ref<Dispatcher> UrlRequest::getDefaultDispatcher()
+	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_UrlRequest_default_dispatcher)) {
+			return sl_null;
+		}
+		return _g_priv_UrlRequest_default_dispatcher;
+	}
+	
+	void UrlRequest::setDefaultDispatcher(const Ref<Dispatcher>& dispatcher)
+	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_UrlRequest_default_dispatcher)) {
+			return;
+		}
+		_g_priv_UrlRequest_default_dispatcher = dispatcher;
 	}
 	
 	const String& UrlRequest::getUrl()

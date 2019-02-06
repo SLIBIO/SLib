@@ -21,9 +21,12 @@
  */
 
 #include "slib/ui/app.h"
+
 #include "slib/ui/core.h"
 #include "slib/ui/window.h"
 #include "slib/ui/menu.h"
+
+#include "slib/network/url_request.h"
 
 namespace slib
 {
@@ -94,6 +97,7 @@ namespace slib
 	
 	void UIApp::dispatchStart()
 	{
+		UrlRequest::setDefaultDispatcher(UI::getDispatcher());
 		SLIB_INVOKE_EVENT_HANDLER(Start)
 	}
 	

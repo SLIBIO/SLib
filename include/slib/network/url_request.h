@@ -180,6 +180,10 @@ namespace slib
 		
 		static void setDefaultAllowInsecureConnection(sl_bool flag);
 		
+		static Ref<Dispatcher> getDefaultDispatcher();
+		
+		static void setDefaultDispatcher(const Ref<Dispatcher>& dispatcher);
+		
 	public:
 		const String& getUrl();
 		
