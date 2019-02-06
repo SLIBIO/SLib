@@ -743,6 +743,18 @@ namespace slib
 		return m_mapAttributes.getValue_NoLock(name, XmlString::null());
 	}
 
+	XmlString XmlElement::getAttributeIngoreCase(const XmlString& name) const
+	{
+		MutexLocker lock(&m_lockAttributes);
+		ListElements<XmlAttribute> attrs(m_attributes);
+		for (sl_size i = 0; i < attrs.count; i++) {
+			if (attrs[i].name.equalsIgnoreCase(name)) {
+				return attrs[i].value;
+			}
+		}
+		return sl_null;
+	}
+
 	XmlString XmlElement::getAttribute(const XmlString& uri, const XmlString& localName) const
 	{
 		MutexLocker lock(&m_lockAttributes);
@@ -755,10 +767,34 @@ namespace slib
 		return sl_null;
 	}
 
+	XmlString XmlElement::getAttributeIgnoreCase(const XmlString& uri, const XmlString& localName) const
+	{
+		MutexLocker lock(&m_lockAttributes);
+		ListElements<XmlAttribute> attrs(m_attributes);
+		for (sl_size i = 0; i < attrs.count; i++) {
+			if (attrs[i].uri == uri && attrs[i].localName.equalsIgnoreCase(localName)) {
+				return attrs[i].value;
+			}
+		}
+		return sl_null;
+	}
+
 	sl_bool XmlElement::containsAttribute(const XmlString& name) const
 	{
 		MutexLocker lock(&m_lockAttributes);
 		return m_mapAttributes.find_NoLock(name) != sl_null;
+	}
+
+	sl_bool XmlElement::containsAttributeIgnoreCase(const XmlString& name) const
+	{
+		MutexLocker lock(&m_lockAttributes);
+		ListElements<XmlAttribute> attrs(m_attributes);
+		for (sl_size i = 0; i < attrs.count; i++) {
+			if (attrs[i].name.equalsIgnoreCase(name)) {
+				return sl_true;
+			}
+		}
+		return sl_false;
 	}
 
 	sl_bool XmlElement::setAttribute(sl_size index, const XmlString& value)

@@ -264,9 +264,15 @@ namespace slib
 
 		XmlString getAttribute(const XmlString& name) const;
 
+		XmlString getAttributeIngoreCase(const XmlString& name) const;
+
 		XmlString getAttribute(const XmlString& uri, const XmlString& localName) const;
 
+		XmlString getAttributeIgnoreCase(const XmlString& uri, const XmlString& localName) const;
+
 		sl_bool containsAttribute(const XmlString& name) const;
+
+		sl_bool containsAttributeIgnoreCase(const XmlString& name) const;
 
 		sl_bool setAttribute(sl_size index, const XmlString& value);
 
