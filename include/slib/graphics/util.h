@@ -57,6 +57,35 @@ namespace slib
 
 		static void drawRepeat(Canvas* canvas, const Ref<Drawable>& source, sl_real _dx, sl_real _dy, sl_uint32 nRepeatX, sl_uint32 nRepeatY, const DrawParam& param);
 
+		
+		static sl_real pixelToInch(sl_real px);
+		
+		static sl_real inchToPixel(sl_real inch);
+		
+		static sl_real pixelToMeter(sl_real px);
+		
+		static sl_real meterToPixel(sl_real meters);
+		
+		static sl_real pixelToCentimeter(sl_real px);
+		
+		static sl_real centimeterToPixel(sl_real cm);
+		
+		static sl_real pixelToMillimeter(sl_real px);
+		
+		static sl_real millimeterToPixel(sl_real mm);
+		
+		static sl_real pixelToPoint(sl_real px);
+		
+		static sl_real pointToPixel(sl_real pt);
+		
+		static sl_real pixelToPicas(sl_real px);
+		
+		static sl_real picasToPixel(sl_real pc);
+		
+		static sl_real pixelToDp(sl_real px);
+		
+		static sl_real dpToPixel(sl_real dp);
+		
 	};
 
 }

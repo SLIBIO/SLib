@@ -25,6 +25,7 @@
 #include "slib/core/math.h"
 #include "slib/graphics/canvas.h"
 #include "slib/graphics/drawable.h"
+#include "slib/device/device.h"
 
 namespace slib
 {
@@ -271,5 +272,75 @@ namespace slib
 		}
 
 	}
-
+	
+	sl_real GraphicsUtil::pixelToInch(sl_real px)
+	{
+		return (sl_real)(px / Device::getScreenPPI());
+	}
+	
+	sl_real GraphicsUtil::inchToPixel(sl_real inch)
+	{
+		return (sl_real)(inch * Device::getScreenPPI());
+	}
+	
+	sl_real GraphicsUtil::pixelToMeter(sl_real px)
+	{
+		return (sl_real)(px * 0.0254 / Device::getScreenPPI());
+	}
+	
+	sl_real GraphicsUtil::meterToPixel(sl_real meters)
+	{
+		return (sl_real)(meters * Device::getScreenPPI() * 39.3701);
+	}
+	
+	sl_real GraphicsUtil::pixelToCentimeter(sl_real px)
+	{
+		return (sl_real)(px * 2.54 / Device::getScreenPPI());
+	}
+	
+	sl_real GraphicsUtil::centimeterToPixel(sl_real cm)
+	{
+		return (sl_real)(cm * Device::getScreenPPI() * 0.393701);
+	}
+	
+	sl_real GraphicsUtil::pixelToMillimeter(sl_real px)
+	{
+		return (sl_real)(px * 25.4 / Device::getScreenPPI());
+	}
+	
+	sl_real GraphicsUtil::millimeterToPixel(sl_real mm)
+	{
+		return (sl_real)(mm * Device::getScreenPPI() * 0.0393701);
+	}
+	
+	sl_real GraphicsUtil::pixelToPoint(sl_real px)
+	{
+		return (sl_real)(px * 72 / Device::getScreenPPI());
+	}
+	
+	sl_real GraphicsUtil::pointToPixel(sl_real pt)
+	{
+		return (sl_real)(pt * Device::getScreenPPI() / 72);
+	}
+	
+	sl_real GraphicsUtil::pixelToPicas(sl_real px)
+	{
+		return (sl_real)(px * 12 / Device::getScreenPPI());
+	}
+	
+	sl_real GraphicsUtil::picasToPixel(sl_real pc)
+	{
+		return (sl_real)(pc * Device::getScreenPPI() / 12);
+	}
+	
+	sl_real GraphicsUtil::pixelToDp(sl_real px)
+	{
+		return (sl_real)(px * 160 / Device::getScreenPPI());
+	}
+	
+	sl_real GraphicsUtil::dpToPixel(sl_real dp)
+	{
+		return (sl_real)(dp * Device::getScreenPPI() / 160);
+	}
+	
 }
