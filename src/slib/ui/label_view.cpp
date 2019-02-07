@@ -23,6 +23,7 @@
 #include "slib/ui/label_view.h"
 
 #include "slib/graphics/util.h"
+#include "slib/ui/core.h"
 
 namespace slib
 {
@@ -34,6 +35,7 @@ namespace slib
 		
 		setUsingFont(sl_true);
 		
+		m_flagHyperText = sl_false;
 		m_textAlignment = Alignment::Left;
 		m_textColor = Color::Black;
 		m_multiLineMode = MultiLineMode::Single;
@@ -51,9 +53,22 @@ namespace slib
 		return m_text;
 	}
 	
+	sl_bool LabelView::isHyperText()
+	{
+		return m_flagHyperText;
+	}
+	
 	void LabelView::setText(const String& text, UIUpdateMode mode)
 	{
 		m_text = text;
+		m_flagHyperText = sl_false;
+		invalidateLayoutOfWrappingControl(mode);
+	}
+	
+	void LabelView::setHyperText(const String& text, UIUpdateMode mode)
+	{
+		m_text = text;
+		m_flagHyperText = sl_true;
 		invalidateLayoutOfWrappingControl(mode);
 	}
 	
@@ -101,11 +116,54 @@ namespace slib
 		invalidate(updateMode);
 	}
 	
-	void LabelView::onDraw(Canvas* canvas)
+	
+	SLIB_DEFINE_EVENT_HANDLER(LabelView, ClickLink, const String& href, UIEvent* ev)
+	
+	void LabelView::dispatchClickLink(const String& href, UIEvent *ev)
 	{
-		m_textBox.draw(canvas, m_text, getFont(), getBoundsInnerPadding(), isWidthWrapping(), m_multiLineMode, m_ellipsizeMode, m_textAlignment, m_textColor);
+		SLIB_INVOKE_EVENT_HANDLER(ClickLink, href, ev)
+		if (ev->isPreventedDefault()) {
+			return;
+		}
+		UI::openUrl(href);
 	}
 	
+	
+	void LabelView::onDraw(Canvas* canvas)
+	{
+		m_textBox.draw(canvas, m_text, m_flagHyperText, getFont(), getBoundsInnerPadding(), isWidthWrapping(), m_multiLineMode, m_ellipsizeMode, m_textAlignment, m_textColor);
+	}
+	
+	void LabelView::onClickEvent(UIEvent* ev)
+	{
+		Ref<TextItem> item = m_textBox.getTextItemAtPosition(ev->getX(), ev->getY());
+		if (item.isNotNull()) {
+			Ref<TextStyle> style = item->getStyle();
+			if (style.isNotNull()) {
+				String href = style->href;
+				if (href.isNotEmpty()) {
+					dispatchClickLink(href, ev);
+				}
+			}
+		}
+	}
+	
+	void LabelView::onSetCursor(UIEvent* ev)
+	{
+		Ref<TextItem> item = m_textBox.getTextItemAtPosition(ev->getX(), ev->getY());
+		if (item.isNotNull()) {
+			Ref<TextStyle> style = item->getStyle();
+			if (style.isNotNull()) {
+				String href = style->href;
+				if (href.isNotEmpty()) {
+					setCursor(Cursor::getHand());
+					return;
+				}
+			}
+		}
+		setCursor(Cursor::getArrow());
+	}
+
 	void LabelView::onUpdateLayout()
 	{
 		sl_bool flagHorizontal = isWidthWrapping();
@@ -116,7 +174,7 @@ namespace slib
 		}
 		
 		sl_ui_pos paddingWidth = getPaddingLeft() + getPaddingRight();
-		m_textBox.update(m_text, getFont(), (sl_real)(getLayoutWidth() - paddingWidth), isWidthWrapping(), m_multiLineMode, m_ellipsizeMode, m_textAlignment);
+		m_textBox.update(m_text, m_flagHyperText, getFont(), (sl_real)(getLayoutWidth() - paddingWidth), isWidthWrapping(), m_multiLineMode, m_ellipsizeMode, m_textAlignment);
 		if (flagHorizontal) {
 			setLayoutWidth((sl_ui_pos)(m_textBox.getContentWidth()) + paddingWidth);
 		}

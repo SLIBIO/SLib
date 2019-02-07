@@ -44,8 +44,12 @@ namespace slib
 	public:
 		String getText();
 		
+		sl_bool isHyperText();
+		
 		virtual void setText(const String& text, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
+		virtual void setHyperText(const String& text, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+
 		Color getTextColor();
 		
 		virtual void setTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -62,13 +66,21 @@ namespace slib
 		
 		virtual void setEllipsize(EllipsizeMode ellipsizeMode, UIUpdateMode updateMode = UIUpdateMode::UpdateLayout);
 		
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(LabelView, ClickLink, const String& href, UIEvent* ev)
+		
 	protected:
 		void onDraw(Canvas* canvas) override;
 		
+		void onClickEvent(UIEvent* ev) override;
+		
+		void onSetCursor(UIEvent* ev) override;
+
 		void onUpdateLayout() override;
 		
 	protected:
 		AtomicString m_text;
+		sl_bool m_flagHyperText;
 		Color m_textColor;
 		Alignment m_textAlignment;
 		MultiLineMode m_multiLineMode;

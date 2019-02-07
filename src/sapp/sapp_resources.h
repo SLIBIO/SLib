@@ -390,6 +390,7 @@ namespace slib
 	{
 	public:
 		SAppStringValue text;
+		SAppStringValue hyperText;
 		SAppColorValue textColor;
 		SAppAlignmentValue gravity;
 		SAppMultiLineModeValue multiLine;
