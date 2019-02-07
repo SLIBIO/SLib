@@ -803,9 +803,7 @@ namespace slib
 	public:
 		T* data;
 		sl_size count;
-
-	private:
-		List<T> m_list;
+		List<T> list;
 
 	public:
 		ListLocker(const List<T>& list) noexcept;
@@ -831,9 +829,7 @@ namespace slib
 	public:
 		T* data;
 		sl_size count;
-
-	private:
-		List<T> m_list;
+		List<T> list;
 
 	public:
 		ListElements(const List<T>& list) noexcept;

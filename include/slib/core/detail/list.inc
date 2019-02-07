@@ -3119,12 +3119,11 @@ namespace slib
 
 
 	template <class T>
-	SLIB_INLINE ListLocker<T>::ListLocker(const List<T>& list) noexcept
-	 : ObjectLocker(list.ref._ptr)
+	SLIB_INLINE ListLocker<T>::ListLocker(const List<T>& _list) noexcept
+	 : ObjectLocker(_list.ref._ptr), list(_list)
 	{
-		m_list = list;
-		data = list.getData();
-		count = list.getCount();
+		data = _list.getData();
+		count = _list.getCount();
 	}
 
 	template <class T>
@@ -3160,11 +3159,11 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE ListElements<T>::ListElements(const List<T>& list) noexcept
+	SLIB_INLINE ListElements<T>::ListElements(const List<T>& _list) noexcept
+	 : list(_list)
 	{
-		m_list = list;
-		data = list.getData();
-		count = list.getCount();
+		data = _list.getData();
+		count = _list.getCount();
 	}
 
 	template <class T>
