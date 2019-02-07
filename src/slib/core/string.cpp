@@ -751,11 +751,43 @@ namespace slib
 			if (len2 < 0) {
 				return Base::compareString(str1, str2);
 			} else {
-				return Base::compareString(str1, str2, len2 + 1);
+				for (sl_reg i = 0; i < len2; i++) {
+					if (str1[i] < str2[i]) {
+						return -1;
+					} else if (str1[i] > str2[i]) {
+						return 1;
+					}
+					if (str1[i] == 0) {
+						break;
+					}
+				}
+				if (str1[len2] < 0) {
+					return -1;
+				} else if (str1[len2] > 0) {
+					return 1;
+				} else {
+					return 0;
+				}
 			}
 		} else {
 			if (len2 < 0) {
-				return Base::compareString(str1, str2, len1 + 1);
+				for (sl_reg i = 0; i < len1; i++) {
+					if (str1[i] < str2[i]) {
+						return -1;
+					} else if (str1[i] > str2[i]) {
+						return 1;
+					}
+					if (str1[i] == 0) {
+						break;
+					}
+				}
+				if (0 < str2[len1]) {
+					return -1;
+				} else if (0 > str2[len1]) {
+					return 1;
+				} else {
+					return 0;
+				}
 			} else {
 				return _priv_String_compare_objects(str1, len1, str2, len2);
 			}
@@ -768,11 +800,43 @@ namespace slib
 			if (len2 < 0) {
 				return Base::compareString2(str1, str2);
 			} else {
-				return Base::compareString2(str1, str2, len2 + 1);
+				for (sl_reg i = 0; i < len2; i++) {
+					if (str1[i] < str2[i]) {
+						return -1;
+					} else if (str1[i] > str2[i]) {
+						return 1;
+					}
+					if (str1[i] == 0) {
+						break;
+					}
+				}
+				if (str1[len2] < 0) {
+					return -1;
+				} else if (str1[len2] > 0) {
+					return 1;
+				} else {
+					return 0;
+				}
 			}
 		} else {
 			if (len2 < 0) {
-				return Base::compareString2(str1, str2, len1 + 1);
+				for (sl_reg i = 0; i < len1; i++) {
+					if (str1[i] < str2[i]) {
+						return -1;
+					} else if (str1[i] > str2[i]) {
+						return 1;
+					}
+					if (str1[i] == 0) {
+						break;
+					}
+				}
+				if (0 < str2[len1]) {
+					return -1;
+				} else if (0 > str2[len1]) {
+					return 1;
+				} else {
+					return 0;
+				}
 			} else {
 				return _priv_String16_compare_objects(str1, len1, str2, len2);
 			}
@@ -869,11 +933,27 @@ namespace slib
 			if (len2 < 0) {
 				return Base::equalsString(str1, str2);
 			} else {
-				return Base::equalsString(str1, str2, len2 + 1);
+				for (sl_reg i = 0; i < len2; i++) {
+					if (str1[i] != str2[i]) {
+						return sl_false;
+					}
+					if (str1[i] == 0) {
+						return sl_true;
+					}
+				}
+				return str1[len2] == 0;
 			}
 		} else {
 			if (len2 < 0) {
-				return Base::equalsString(str1, str2, len1 + 1);
+				for (sl_reg i = 0; i < len1; i++) {
+					if (str1[i] != str2[i]) {
+						return sl_false;
+					}
+					if (str1[i] == 0) {
+						return sl_true;
+					}
+				}
+				return str2[len1] == 0;
 			} else {
 				return _priv_String_equals_objects(str1, len1, str2, len2);
 			}
@@ -886,11 +966,27 @@ namespace slib
 			if (len2 < 0) {
 				return Base::equalsString2(str1, str2);
 			} else {
-				return Base::equalsString2(str1, str2, len2);
+				for (sl_reg i = 0; i < len2; i++) {
+					if (str1[i] != str2[i]) {
+						return sl_false;
+					}
+					if (str1[i] == 0) {
+						return sl_true;
+					}
+				}
+				return str1[len2] == 0;
 			}
 		} else {
 			if (len2 < 0) {
-				return Base::equalsString2(str1, str2, len1);
+				for (sl_reg i = 0; i < len1; i++) {
+					if (str1[i] != str2[i]) {
+						return sl_false;
+					}
+					if (str1[i] == 0) {
+						return sl_true;
+					}
+				}
+				return str2[len1] == 0;
 			} else {
 				return _priv_String16_equals_objects(str1, len1, str2, len2);
 			}
