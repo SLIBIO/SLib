@@ -92,13 +92,22 @@ namespace slib
 	{
 	public:
 		AtomicRef<Font> font;
+		sl_bool flagUnderline;
+		sl_bool flagOverline;
+		sl_bool flagLineThrough;
 		Color textColor;
 		Color backgroundColor;
+		String href;
+		sl_real lineHeight;
+		sl_real yOffset;
 		
 	public:
 		TextStyle() noexcept;
 		
 		~TextStyle() noexcept;
+		
+	public:
+		Ref<TextStyle> duplicate() const noexcept;
 
 	};
 	
@@ -254,6 +263,9 @@ namespace slib
 
 	};
 	
+	class XmlNodeGroup;
+	class XmlElement;
+	
 	class SLIB_EXPORT TextParagraph : public Object
 	{
 		SLIB_DECLARE_OBJECT
@@ -265,10 +277,18 @@ namespace slib
 
 	public:
 		void addText(const String16& text, const Ref<TextStyle>& style) noexcept;
+		
+		void addHyperTextNodeGroup(const Ref<XmlNodeGroup>& group, const Ref<TextStyle>& style) noexcept;
+		
+		void addHyperTextElement(const Ref<XmlElement>& element, const Ref<TextStyle>& style) noexcept;
+		
+		void addHyperText(const String16& text, const Ref<TextStyle>& style) noexcept;
 
 		void layout(const TextParagraphLayoutParam& param) noexcept;
 
-		void draw(Canvas* canvas, sl_real x, sl_real y) noexcept;
+		void draw(Canvas* canvas, sl_real x, sl_real y, const Color& colorDefault) noexcept;
+		
+		Ref<TextItem> getTextItemAtPosition(sl_real x, sl_real y) noexcept;
 
 		sl_real getMaximumWidth() noexcept;
 
@@ -295,9 +315,11 @@ namespace slib
 		~SimpleTextBox() noexcept;
 
 	public:
-		void update(const String& text, const Ref<Font>& font, sl_real width, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align) noexcept;
+		void update(const String& text, sl_bool flagHyperText, const Ref<Font>& font, sl_real width, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align) noexcept;
 
-		void draw(Canvas* canvas, const String& text, const Ref<Font>& font, const Rectangle& frame, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align, const Color& color) noexcept;
+		void draw(Canvas* canvas, const String& text, sl_bool flagHyperText, const Ref<Font>& font, const Rectangle& frame, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align, const Color& color) noexcept;
+
+		Ref<TextItem> getTextItemAtPosition(sl_real x, sl_real y) noexcept;
 
 		sl_real getContentWidth() noexcept;
 
@@ -307,6 +329,7 @@ namespace slib
 		Ref<TextParagraph> m_paragraph;
 
 		String m_text;
+		sl_bool m_flagHyperText;
 		Ref<TextStyle> m_style;
 		Ref<Font> m_font;
 		sl_real m_width;
