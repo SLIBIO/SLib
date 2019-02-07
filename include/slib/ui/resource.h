@@ -103,6 +103,10 @@ namespace slib
 		
 		static sl_real pixelToDp(sl_real px);
 		
+		static sl_real pixelToPicas(sl_real px);
+		
+		static sl_real picasToPixel(sl_real pc);
+		
 		static sl_real dpToPixel(sl_real dp);
 		
 		static sl_ui_pos toUiPos(sl_real f);

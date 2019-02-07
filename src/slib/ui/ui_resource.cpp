@@ -295,6 +295,16 @@ namespace slib
 		return (sl_real)(pt * getScreenPPI() / 72);
 	}
 	
+	sl_real UIResource::pixelToPicas(sl_real px)
+	{
+		return (sl_real)(px * 12 / getScreenPPI());
+	}
+	
+	sl_real UIResource::picasToPixel(sl_real pc)
+	{
+		return (sl_real)(pc * getScreenPPI() / 12);
+	}
+	
 	sl_real UIResource::pixelToDp(sl_real px)
 	{
 		return (sl_real)(px * 160 / getScreenPPI());
