@@ -2415,7 +2415,7 @@ namespace slib
 		sl_size len = text.getLength();
 		sl_size start = 0;
 		for (sl_size i = 0; i < len; i++) {
-			sl_char8 ch = sz[i];
+			sl_char16 ch = sz[i];
 			sl_bool flagEscape = sl_false;
 			if (ch == '<') {
 				flagEscape = sl_true;
