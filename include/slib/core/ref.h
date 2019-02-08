@@ -735,6 +735,36 @@ namespace slib
 	template <class T, class OTHER>
 	const Ref<T>& CastRef(const Ref<OTHER>& object, const Ref<T>& def) noexcept;
 
+	template <class T>
+	Ref<T> ToRef(T* object) noexcept;
+
+	template <class T>
+	Ref<T> ToRef(const Ref<T>& other) noexcept;
+	
+	template <class T>
+	Ref<T> ToRef(const AtomicRef<T>& other) noexcept;
+	
+	template <class T>
+	Ref<T> ToRef(const WeakRef<T>& other) noexcept;
+	
+	template <class T>
+	Ref<T> ToRef(const AtomicWeakRef<T>& other) noexcept;
+	
+	template <class T>
+	WeakRef<T> ToWeakRef(T* object) noexcept;
+	
+	template <class T>
+	WeakRef<T> ToWeakRef(const Ref<T>& other) noexcept;
+	
+	template <class T>
+	WeakRef<T> ToWeakRef(const AtomicRef<T>& other) noexcept;
+	
+	template <class T>
+	WeakRef<T> ToWeakRef(const WeakRef<T>& other) noexcept;
+	
+	template <class T>
+	WeakRef<T> ToWeakRef(const AtomicWeakRef<T>& other) noexcept;
+
 }
 
 #include "detail/ref.inc"

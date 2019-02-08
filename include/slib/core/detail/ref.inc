@@ -1792,4 +1792,65 @@ namespace slib
 		return a._ptr < b._ptr;
 	}
 
+
+	template <class T>
+	SLIB_INLINE Ref<T> ToRef(T* other) noexcept
+	{
+		return Ref<T>(other);
+	}
+
+	template <class T>
+	SLIB_INLINE Ref<T> ToRef(const Ref<T>& other) noexcept
+	{
+		return Ref<T>(other);
+	}
+
+	template <class T>
+	SLIB_INLINE Ref<T> ToRef(const AtomicRef<T>& other) noexcept
+	{
+		return Ref<T>(other);
+	}
+
+	template <class T>
+	SLIB_INLINE Ref<T> ToRef(const WeakRef<T>& other) noexcept
+	{
+		return Ref<T>(other);
+	}
+
+	template <class T>
+	SLIB_INLINE Ref<T> ToRef(const AtomicWeakRef<T>& other) noexcept
+	{
+		return Ref<T>(other);
+	}
+
+	template <class T>
+	SLIB_INLINE WeakRef<T> ToWeakRef(T* other) noexcept
+	{
+		return WeakRef<T>(other);
+	}
+
+	template <class T>
+	SLIB_INLINE WeakRef<T> ToWeakRef(const Ref<T>& other) noexcept
+	{
+		return WeakRef<T>(other);
+	}
+
+	template <class T>
+	SLIB_INLINE WeakRef<T> ToWeakRef(const AtomicRef<T>& other) noexcept
+	{
+		return WeakRef<T>(other);
+	}
+
+	template <class T>
+	SLIB_INLINE WeakRef<T> ToWeakRef(const WeakRef<T>& other) noexcept
+	{
+		return WeakRef<T>(other);
+	}
+
+	template <class T>
+	SLIB_INLINE WeakRef<T> ToWeakRef(const AtomicWeakRef<T>& other) noexcept
+	{
+		return WeakRef<T>(other);
+	}
+
 }
