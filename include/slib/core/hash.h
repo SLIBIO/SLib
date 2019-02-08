@@ -60,12 +60,17 @@ namespace slib
 #endif
 	}
 	
+	SLIB_INLINE constexpr sl_uint32 Rehash64To32(sl_uint64 x) noexcept
+	{
+		return Rehash32((sl_uint32)(x >> 32) ^ (sl_uint32)x);
+	}
+	
 	SLIB_INLINE constexpr sl_size Rehash64ToSize(sl_uint64 x) noexcept
 	{
 #ifdef SLIB_ARCH_IS_64BIT
 		return Rehash64(x);
 #else
-		return Rehash32((sl_uint32)(x >> 32) ^ (sl_uint32)x);
+		return Rehash64To32(x);
 #endif
 	}
 	
