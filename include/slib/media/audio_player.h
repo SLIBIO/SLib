@@ -47,7 +47,7 @@ namespace slib
 	public:
 		AudioPlayerInfo();
 		
-		~AudioPlayerInfo();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(AudioPlayerInfo)
 		
 	};
 	
@@ -69,7 +69,7 @@ namespace slib
 	public:
 		AudioPlayerBufferParam();
 		
-		~AudioPlayerBufferParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(AudioPlayerBufferParam)
 		
 	};
 	
@@ -122,7 +122,7 @@ namespace slib
 	public:
 		AudioPlayerParam();
 		
-		~AudioPlayerParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(AudioPlayerParam)
 		
 	};
 	

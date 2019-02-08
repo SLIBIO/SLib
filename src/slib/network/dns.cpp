@@ -173,14 +173,12 @@ namespace slib
 	}
 
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DnsRecord)
+	
 	DnsRecord::DnsRecord()
 	{
 		_type = DnsRecordType::None;
 		_class = DnsClass::IN;
-	}
-
-	DnsRecord::~DnsRecord()
-	{
 	}
 
 	const String& DnsRecord::getName() const
@@ -344,14 +342,12 @@ namespace slib
 	}
 
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DnsQuestionRecord)
+	
 	DnsQuestionRecord::DnsQuestionRecord()
 	{
 	}
-
-	DnsQuestionRecord::~DnsQuestionRecord()
-	{
-	}
-
+	
 	sl_uint32 DnsQuestionRecord::parseRecord(const void* buf, sl_uint32 offset, sl_uint32 size)
 	{
 		return _parseHeader(buf, offset, size);
@@ -363,6 +359,8 @@ namespace slib
 	}
 
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DnsResponseRecord)
+	
 	DnsResponseRecord::DnsResponseRecord()
 	{
 		_message = 0;
@@ -371,10 +369,6 @@ namespace slib
 		_dataLength = 0;
 
 		m_TTL = 0;
-	}
-
-	DnsResponseRecord::~DnsResponseRecord()
-	{
 	}
 
 	sl_uint32 DnsResponseRecord::getTTL() const
@@ -543,14 +537,12 @@ namespace slib
 					DnsPacket
 *************************************************************/
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DnsPacket)
+	
 	DnsPacket::DnsPacket()
 	{
 		id = 0;
 		flagQuestion = sl_false;
-	}
-
-	DnsPacket::~DnsPacket()
-	{
 	}
 
 	sl_bool DnsPacket::parsePacket(const void* packet, sl_uint32 size)
@@ -725,14 +717,13 @@ namespace slib
 				DnsClient
 *************************************************************/
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DnsClientParam)
+	
 	DnsClientParam::DnsClientParam()
 	{
 	}
 
-	DnsClientParam::~DnsClientParam()
-	{
-	}
-
+	
 	SLIB_DEFINE_OBJECT(DnsClient, Object)
 
 	DnsClient::DnsClient()
@@ -791,6 +782,9 @@ namespace slib
 /*************************************************************
 					DnsServer
 *************************************************************/
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DnsResolveHostParam)
+	
 	DnsResolveHostParam::DnsResolveHostParam()
 	{
 		clientAddress.setNone();
@@ -800,10 +794,9 @@ namespace slib
 		flagEncryptForward = sl_false;
 	}
 
-	DnsResolveHostParam::~DnsResolveHostParam()
-	{
-	}
-
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DnsServerParam)
+	
 	DnsServerParam::DnsServerParam()
 	{
 		portDns = SLIB_NETWORK_DNS_PORT;
@@ -816,10 +809,6 @@ namespace slib
 		flagEncryptDefaultForward = sl_false;
 
 		flagAutoStart = sl_true;
-	}
-
-	DnsServerParam::~DnsServerParam()
-	{
 	}
 
 	void DnsServerParam::parse(const Json& conf)

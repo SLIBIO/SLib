@@ -45,9 +45,9 @@ namespace slib
 
 	public:
 		ColorComponentBuffer();
-
-		~ColorComponentBuffer();
-
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(ColorComponentBuffer)
+		
 	};
 	
 	class SLIB_EXPORT BitmapData
@@ -80,11 +80,9 @@ namespace slib
 	public:
 		BitmapData();
 
-		BitmapData(const BitmapData& other);
-
 		BitmapData(sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride = 0);
 
-		~BitmapData();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(BitmapData)
 
 	public:
 		void*& planeData(sl_uint32 plane);
@@ -116,9 +114,6 @@ namespace slib
 
 		void setFromColors(sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride = 0);
 
-	public:
-		BitmapData& operator=(const BitmapData& other);
-	
 	};
 
 }

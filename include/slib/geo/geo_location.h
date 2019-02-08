@@ -38,26 +38,28 @@ namespace slib
 		double altitude; // Unit: m
 	
 	public:
-		constexpr GeoLocation()
+		SLIB_INLINE constexpr GeoLocation()
 		 : latitude(0), longitude(0), altitude(0)
 		{}
 
-		constexpr GeoLocation(const GeoLocation& other)
-		: latitude(other.latitude), longitude(other.longitude), altitude(other.altitude)
+		SLIB_INLINE constexpr GeoLocation(double _latitude, double _longitude, double _altitude)
+		 : latitude(_latitude), longitude(_longitude), altitude(_altitude)
 		{}
 
-		constexpr GeoLocation(double _latitude, double _longitude, double _altitude)
-		: latitude(_latitude), longitude(_longitude), altitude(_altitude)
+		SLIB_INLINE constexpr GeoLocation(const LatLon& latlon, double _altitude)
+		 : latitude(latlon.latitude), longitude(latlon.longitude), altitude(_altitude)
 		{}
-
-		constexpr GeoLocation(const LatLon& latlon, double _altitude)
-		: latitude(latlon.latitude), longitude(latlon.longitude), altitude(_altitude)
-		{}
+		
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(GeoLocation)
 
 	public:
-		GeoLocation& operator=(const GeoLocation& other);
-
-		GeoLocation& operator=(const LatLon& other);
+		SLIB_INLINE GeoLocation& operator=(const LatLon& other)
+		{
+			latitude = other.latitude;
+			longitude = other.longitude;
+			altitude = 0;
+			return *this;
+		}
 
 		sl_bool operator==(const GeoLocation& other) const;
 
@@ -85,7 +87,5 @@ namespace slib
 	}
 
 }
-
-#include "detail/geo_location.inc"
 
 #endif

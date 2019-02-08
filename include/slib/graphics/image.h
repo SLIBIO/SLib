@@ -48,8 +48,8 @@ namespace slib
 
 	public:
 		ImageDesc();
-
-		~ImageDesc();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(ImageDesc)
 
 	};
 	

@@ -41,6 +41,8 @@ namespace slib
 		
 		~GestureEvent();
 		
+		SLIB_DELETE_CLASS_DEFAULT_MEMBERS(GestureEvent)
+		
 	public:
 		Ref<GestureEvent> duplicate();
 		

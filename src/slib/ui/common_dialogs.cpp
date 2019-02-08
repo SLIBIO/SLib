@@ -32,16 +32,12 @@ namespace slib
 			AlertDialog
 ***************************************/
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AlertDialog)
+	
 	AlertDialog::AlertDialog()
 	{
 		buttons = AlertDialogButtons::Ok;
 		icon = AlertDialogIcon::None;
-	}
-
-	AlertDialog::AlertDialog(const AlertDialog& other) = default;
-
-	AlertDialog::~AlertDialog()
-	{
 	}
 	
 	class _priv_AlertDialog_RunOnUIThread
@@ -251,16 +247,12 @@ namespace slib
 		FileDialog
 ***************************************/
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FileDialog)
+	
 	FileDialog::FileDialog()
 	{
 		type = FileDialogType::OpenFile;
 		flagShowHiddenFiles = sl_true;
-	}
-
-	FileDialog::FileDialog(const FileDialog& other) = default;
-
-	FileDialog::~FileDialog()
-	{
 	}
 
 	void FileDialog::addFilter(const String& title, const String& patterns)

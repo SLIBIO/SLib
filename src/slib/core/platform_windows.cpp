@@ -567,6 +567,12 @@ namespace slib
 		nShow = SW_NORMAL;
 	}
 
+	Windows::ShellExecuteParam::~ShellExecuteParam() {}
+	Windows::ShellExecuteParam::ShellExecuteParam(const ShellExecuteParam& other) = default;
+	Windows::ShellExecuteParam::ShellExecuteParam(ShellExecuteParam&& other) = default;
+	Windows::ShellExecuteParam& Windows::ShellExecuteParam::operator=(const ShellExecuteParam& other) = default;
+	Windows::ShellExecuteParam& Windows::ShellExecuteParam::operator=(ShellExecuteParam&& other) = default;
+
 	sl_bool Windows::shellExecute(const ShellExecuteParam& param)
 	{
 		SHELLEXECUTEINFOW sei;

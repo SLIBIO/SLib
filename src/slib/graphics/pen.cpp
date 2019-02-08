@@ -26,6 +26,8 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(PenDesc)
 
 	PenDesc::PenDesc()
 	{
@@ -38,11 +40,7 @@ namespace slib
 		miterLimit = 10;
 	}
 
-	PenDesc::~PenDesc()
-	{
-	}
-
-
+	
 	SLIB_DEFINE_OBJECT(Pen, Object)
 
 	Pen::Pen()

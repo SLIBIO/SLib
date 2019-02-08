@@ -35,6 +35,8 @@ namespace slib
 	
 #define ALIGN4(n) ((((n) - 1) | 3) + 1)
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(StunAttributes)
+	
 	StunAttributes::StunAttributes()
 	{
 		errorCode = StunErrorCode::Success;
@@ -599,15 +601,13 @@ namespace slib
 	}
 	
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(StunServerParam)
+	
 	StunServerParam::StunServerParam()
 	{
 		port = SLIB_NETWORK_STUN_PORT;
 		flagAutoStart = sl_true;
 		flagLogging = sl_false;
-	}
-	
-	StunServerParam::~StunServerParam()
-	{
 	}
 	
 	

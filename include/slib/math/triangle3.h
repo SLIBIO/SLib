@@ -42,10 +42,10 @@ namespace slib
 		Vector3T<T> point3;
 
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(Triangle3T)
+		
 		Triangle3T() noexcept = default;
-
-		Triangle3T(const Triangle3T<T>& other) noexcept = default;
-
+		
 		template <class O>
 		Triangle3T(const Triangle3T<O>& other) noexcept;
 
@@ -84,8 +84,6 @@ namespace slib
 		sl_bool intersectTriangle(const Triangle3T<T>& triangle, Line3T<T>* outLine) const noexcept;
 
 	public:
-		Triangle3T<T>& operator=(const Triangle3T<T>& other) noexcept = default;
-
 		template <class O>
 		Triangle3T<T>& operator=(const Triangle3T<O>& other) noexcept;
 	

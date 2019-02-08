@@ -40,8 +40,8 @@ namespace slib
 	public:
 		TabViewItem();
 
-		~TabViewItem();
-
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TabViewItem)
+		
 	};
 	
 	class SLIB_EXPORT TabView : public ViewGroup

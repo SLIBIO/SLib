@@ -58,10 +58,8 @@ namespace slib
 	public:
 		AlertDialog();
 		
-		AlertDialog(const AlertDialog& other);
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(AlertDialog)
 		
-		~AlertDialog();
-
 	public:
 		DialogResult run();
 		
@@ -124,9 +122,7 @@ namespace slib
 	public:
 		FileDialog();
 		
-		FileDialog(const FileDialog& other);
-		
-		~FileDialog();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FileDialog)
 
 	public:
 		sl_bool run();

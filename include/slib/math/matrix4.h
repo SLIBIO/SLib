@@ -45,21 +45,16 @@ namespace slib
 		T m30; T m31; T m32; T m33;
 	
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(Matrix4T)
+		
 		SLIB_INLINE Matrix4T() noexcept = default;
 
-		SLIB_INLINE constexpr Matrix4T(const Matrix4T<T>& other) noexcept
-		:m00(other.m00), m01(other.m01), m02(other.m02), m03(other.m03),
-		 m10(other.m10), m11(other.m11), m12(other.m12), m13(other.m13),
-		 m20(other.m20), m21(other.m21), m22(other.m22), m23(other.m23),
-		 m30(other.m30), m31(other.m31), m32(other.m32), m33(other.m33)
-		{}
-	
 		template <class O>
 		SLIB_INLINE constexpr Matrix4T(const Matrix4T<O>& other) noexcept
-		:m00((T)(other.m00)), m01((T)(other.m01)), m02((T)(other.m02)), m03((T)(other.m03)),
-		 m10((T)(other.m10)), m11((T)(other.m11)), m12((T)(other.m12)), m13((T)(other.m13)),
-		 m20((T)(other.m20)), m21((T)(other.m21)), m22((T)(other.m22)), m23((T)(other.m23)),
-		 m30((T)(other.m30)), m31((T)(other.m31)), m32((T)(other.m32)), m33((T)(other.m33))
+		 : m00((T)(other.m00)), m01((T)(other.m01)), m02((T)(other.m02)), m03((T)(other.m03)),
+		   m10((T)(other.m10)), m11((T)(other.m11)), m12((T)(other.m12)), m13((T)(other.m13)),
+		   m20((T)(other.m20)), m21((T)(other.m21)), m22((T)(other.m22)), m23((T)(other.m23)),
+		   m30((T)(other.m30)), m31((T)(other.m31)), m32((T)(other.m32)), m33((T)(other.m33))
 		{}
 	
 		SLIB_INLINE Matrix4T(
@@ -68,17 +63,17 @@ namespace slib
 			T _m20, T _m21, T _m22, T _m23,
 			T _m30, T _m31, T _m32, T _m33
 		) noexcept
-		:m00(_m00), m01(_m01), m02(_m02), m03(_m03),
-		 m10(_m10), m11(_m11), m12(_m12), m13(_m13),
-		 m20(_m20), m21(_m21), m22(_m22), m23(_m23),
-		 m30(_m30), m31(_m31), m32(_m32), m33(_m33)
+		 : m00(_m00), m01(_m01), m02(_m02), m03(_m03),
+		   m10(_m10), m11(_m11), m12(_m12), m13(_m13),
+		   m20(_m20), m21(_m21), m22(_m22), m23(_m23),
+		   m30(_m30), m31(_m31), m32(_m32), m33(_m33)
 		{}
 	
 		SLIB_INLINE Matrix4T(const Vector4T<T>& row0, const Vector4T<T>& row1, const Vector4T<T>& row2, const Vector4T<T>& row3) noexcept
-		:m00(row0.x), m01(row0.y), m02(row0.z), m03(row0.w),
-		 m10(row1.x), m11(row1.y), m12(row1.z), m13(row1.w),
-		 m20(row2.x), m21(row2.y), m22(row2.z), m23(row2.w),
-		 m30(row3.x), m31(row3.y), m32(row3.z), m33(row3.w)
+		 : m00(row0.x), m01(row0.y), m02(row0.z), m03(row0.w),
+		   m10(row1.x), m11(row1.y), m12(row1.z), m13(row1.w),
+		   m20(row2.x), m21(row2.y), m22(row2.z), m23(row2.w),
+		   m30(row3.x), m31(row3.y), m32(row3.z), m33(row3.w)
 		{}
 
 	public:
@@ -176,8 +171,6 @@ namespace slib
 		Matrix4T<T> lerp(const Matrix4T<T>& target, float factor) const noexcept;
 	
 	public:
-		Matrix4T<T>& operator=(const Matrix4T<T>& other) noexcept = default;
-
 		template <class O>
 		Matrix4T<T>& operator=(const Matrix4T<O>& other) noexcept;
 	

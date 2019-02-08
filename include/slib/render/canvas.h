@@ -54,7 +54,7 @@ namespace slib
 	public:
 		RenderCanvasClip();
 		
-		~RenderCanvasClip();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(RenderCanvasClip)
 		
 	};
 	
@@ -69,12 +69,7 @@ namespace slib
 	public:
 		RenderCanvasState();
 		
-		RenderCanvasState(RenderCanvasState* other);
-		
-		~RenderCanvasState();
-		
-	public:
-		void copyFrom(RenderCanvasState* other);
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(RenderCanvasState)
 		
 	};
 	

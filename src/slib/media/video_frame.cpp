@@ -24,15 +24,13 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(VideoFrame)
 
 	VideoFrame::VideoFrame()
 	{
 		rotation = RotationMode::Rotate0;
 		flip = FlipMode::None;
-	}
-
-	VideoFrame::~VideoFrame()
-	{
 	}
 
 }

@@ -36,6 +36,8 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(MySQL_Param)
 
 	MySQL_Param::MySQL_Param()
 	{
@@ -43,11 +45,6 @@ namespace slib
 		flagAutoReconnect = sl_true;
 		flagMultipleStatements = sl_true;
 	}
-
-	MySQL_Param::~MySQL_Param()
-	{
-	}
-
 
 	SLIB_DEFINE_OBJECT(MySQL_Database, Database)
 

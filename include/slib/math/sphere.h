@@ -39,9 +39,9 @@ namespace slib
 		T radius;
 
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(SphereT)
+		
 		SphereT() noexcept = default;
-
-		SphereT(const SphereT<T>& other) noexcept = default;
 
 		template <class O>
 		SphereT(const SphereT<O>& other) noexcept;
@@ -57,8 +57,6 @@ namespace slib
 		sl_uint32 intersectLine(const Line3T<T>& line, Vector3T<T>* pOut1, Vector3T<T>* pOut2) const noexcept;
 
 	public:
-		SphereT<T>& operator=(const SphereT<T>& other) noexcept = default;
-
 		template <class O>
 		SphereT<T>& operator=(const SphereT<O>& other) noexcept;
 	

@@ -153,10 +153,8 @@ namespace slib
 	public:
 		TimeComponents() noexcept;
 		
-		SLIB_INLINE TimeComponents(const TimeComponents& other) noexcept = default;
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TimeComponents)
 		
-		SLIB_INLINE TimeComponents& operator=(const TimeComponents& other) noexcept = default;
-
 	};
 	
 	class SLIB_EXPORT Time
@@ -592,8 +590,8 @@ namespace slib
 	{
 	public:
 		TimeCounter() noexcept;
-
-		~TimeCounter() noexcept;
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TimeCounter)
 	
 	public:
 		Time getTime() const noexcept;
@@ -624,7 +622,7 @@ namespace slib
 	public:
 		TimeKeeper() noexcept;
 
-		~TimeKeeper() noexcept;
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TimeKeeper)
 
 	public:
 		void start() noexcept;

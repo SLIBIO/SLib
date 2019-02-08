@@ -122,8 +122,12 @@ namespace slib
 			String16 currentDirectory;
 			HWND hWndParent;
 			int nShow;
+
 		public:
 			ShellExecuteParam();
+
+			SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(ShellExecuteParam)
+
 		};
 
 		static sl_bool shellExecute(const ShellExecuteParam& param);

@@ -256,6 +256,11 @@ namespace slib
 		String same_site;
 		
 	public:
+		HttpCookie();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(HttpCookie)
+		
+	public:
 		String toHeaderValue() const;
 		
 		void parseHeaderValue(const String& value);
@@ -267,7 +272,7 @@ namespace slib
 	public:
 		HttpUploadFile(const String& fileName, const HttpHeaderMap& headers, void* data, sl_size size, const Ref<Referable>& ref);
 		
-		~HttpUploadFile();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(HttpUploadFile)
 		
 	public:
 		String getFileName();
@@ -299,7 +304,7 @@ namespace slib
 	public:
 		HttpRequest();
 		
-		~HttpRequest();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(HttpRequest)
 		
 	public:
 		HttpMethod getMethod() const;
@@ -498,7 +503,7 @@ namespace slib
 	public:
 		HttpResponse();
 		
-		~HttpResponse();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(HttpResponse)
 		
 	public:
 		HttpStatus getResponseCode() const;

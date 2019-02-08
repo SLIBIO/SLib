@@ -143,6 +143,8 @@ namespace slib
 	}
 	
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TimeComponents)
+	
 	TimeComponents::TimeComponents() noexcept
 	{
 		Base::zeroMemory(this, sizeof(TimeComponents));
@@ -1747,13 +1749,11 @@ namespace slib
 #endif
 	
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TimeCounter)
+	
 	TimeCounter::TimeCounter() noexcept
 	{
 		reset();
-	}
-
-	TimeCounter::~TimeCounter() noexcept
-	{
 	}
 
 	Time TimeCounter::getTime() const noexcept
@@ -1806,13 +1806,11 @@ namespace slib
 		m_timeLast = current;
 	}
 
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TimeKeeper)
 
 	TimeKeeper::TimeKeeper() noexcept
 	 : m_flagStarted(sl_false), m_flagRunning(sl_false), m_timeLast(0), m_timeElapsed(0)
-	{
-	}
-
-	TimeKeeper::~TimeKeeper() noexcept
 	{
 	}
 

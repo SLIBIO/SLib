@@ -611,19 +611,17 @@ namespace slib
 	}
 
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FilePathSegments)
+	
 	FilePathSegments::FilePathSegments()
 	{
 		parentLevel = 0;
 	}
 
-	FilePathSegments::~FilePathSegments()
-	{
-	}
-
 	void FilePathSegments::parsePath(const String& path)
 	{
 		parentLevel = 0;
-		segments.removeAll_NoLock();
+		segments.setNull();
 
 		sl_char8* buf = path.getData();
 		sl_size len = path.getLength();

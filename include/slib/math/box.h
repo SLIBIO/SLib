@@ -41,9 +41,9 @@ namespace slib
 		T x2, y2, z2;
 
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(BoxT)
+		
 		BoxT() noexcept = default;
-
-		BoxT(const BoxT<T>& other) noexcept = default;
 
 		template <class O>
 		BoxT(const BoxT<O>& other) noexcept;
@@ -102,8 +102,6 @@ namespace slib
 		void getCornerPoints(Vector3T<T>* _out) const noexcept;
 
 	public:
-		BoxT<T>& operator=(const BoxT<T>& other) noexcept = default;
-
 		template <class O>
 		BoxT<T>& operator=(const BoxT<O>& other) noexcept;
 

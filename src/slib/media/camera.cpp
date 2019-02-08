@@ -26,25 +26,21 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(CameraInfo)
 
 	CameraInfo::CameraInfo()
 	{
 	}
 
-	CameraInfo::~CameraInfo()
-	{
-	}
-
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(CameraParam)
 
 	CameraParam::CameraParam()
 	{
 		preferedFrameWidth = 0;
 		preferedFrameHeight = 0;
 		preferedFrameFormat = BitmapFormat::YUV_NV21;
-	}
-
-	CameraParam::~CameraParam()
-	{
 	}
 
 	void CameraParam::setFrontCamera()
@@ -77,16 +73,15 @@ namespace slib
 		
 	}
 	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TakePhotoParam)
+	
 	TakePhotoParam::TakePhotoParam()
 	{
 		
 	}
 	
-	TakePhotoParam::~TakePhotoParam()
-	{
-		
-	}
-    
+	
 	SLIB_DEFINE_OBJECT(Camera, VideoCapture)
 
 	Camera::Camera()

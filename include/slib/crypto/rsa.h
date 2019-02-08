@@ -40,8 +40,8 @@ namespace slib
 	
 	public:
 		RSAPublicKey();
-
-		~RSAPublicKey();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(RSAPublicKey)
 
 	public:
 		sl_uint32 getLength() const;
@@ -66,7 +66,7 @@ namespace slib
 	public:
 		RSAPrivateKey();
 
-		~RSAPrivateKey();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(RSAPrivateKey)
 
 	public:
 		sl_uint32 getLength() const;

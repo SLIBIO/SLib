@@ -34,6 +34,8 @@
 namespace slib
 {
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(VpxEncoderParam)
+	
 	VpxEncoderParam::VpxEncoderParam()
 	{
 		codec = VpxCodecName::VP8;
@@ -46,19 +48,13 @@ namespace slib
 		threadsCount = 1;
 	}
 
-	VpxEncoderParam::~VpxEncoderParam()
-	{
-	}
-
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(VpxDecoderParam)
 
 	VpxDecoderParam::VpxDecoderParam()
 	{
 		codec = VpxCodecName::VP8;
 		width = height = 192;
-	}
-
-	VpxDecoderParam::~VpxDecoderParam()
-	{
 	}
 
 

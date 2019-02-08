@@ -47,7 +47,7 @@ namespace slib
 	public:
 		Url();
 		
-		~Url();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(Url)
 		
 	public:
 		void parse(const String& url);

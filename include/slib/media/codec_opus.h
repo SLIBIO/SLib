@@ -55,7 +55,7 @@ namespace slib
 	public:
 		OpusEncoderParam();
 		
-		~OpusEncoderParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(OpusEncoderParam)
 		
 	};
 	
@@ -83,7 +83,7 @@ namespace slib
 	public:
 		OpusDecoderParam();
 		
-		~OpusDecoderParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(OpusDecoderParam)
 		
 	};
 	

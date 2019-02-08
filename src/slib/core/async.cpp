@@ -399,6 +399,10 @@ namespace slib
 	 : data((void*)_data), size(_size), userObject(_userObject), callback(_callback), flagRead(_flagRead)
 	{
 	}
+	
+	AsyncStreamRequest::~AsyncStreamRequest()
+	{
+	}
 
 	Ref<AsyncStreamRequest> AsyncStreamRequest::createRead(
 		void* data,
@@ -593,6 +597,8 @@ namespace slib
 /*************************************
 		AsyncStreamBase
 **************************************/
+
+	SLIB_DEFINE_OBJECT(AsyncStreamBase, AsyncStream)
 
 	AsyncStreamBase::AsyncStreamBase()
 	{
@@ -817,6 +823,8 @@ namespace slib
 		AsyncReader
 **************************************/
 
+	SLIB_DEFINE_OBJECT(AsyncReader, AsyncStreamSimulator)
+	
 	AsyncReader::AsyncReader()
 	{
 	}
@@ -894,6 +902,8 @@ namespace slib
 		AsyncWriter
 **************************************/
 
+	SLIB_DEFINE_OBJECT(AsyncWriter, AsyncStreamSimulator)
+	
 	AsyncWriter::AsyncWriter()
 	{
 	}
@@ -1121,6 +1131,8 @@ namespace slib
 /*************************************
 		AsyncCopy
 **************************************/
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AsyncCopyParam)
 
 	AsyncCopyParam::AsyncCopyParam()
 	{
@@ -1128,10 +1140,6 @@ namespace slib
 		bufferSize = 0x10000;
 		bufferCount = 8;
 		flagAutoStart = sl_true;
-	}
-
-	AsyncCopyParam::~AsyncCopyParam()
-	{
 	}
 
 	SLIB_DEFINE_OBJECT(AsyncCopy, Object)
@@ -1442,7 +1450,7 @@ namespace slib
 /**********************************************
 		AsyncOutputBufferElement
 **********************************************/
-
+	
 	AsyncOutputBufferElement::AsyncOutputBufferElement()
 	{
 		m_sizeBody = 0;
@@ -1459,7 +1467,7 @@ namespace slib
 		m_body = stream;
 		m_sizeBody = size;
 	}
-
+	
 	AsyncOutputBufferElement::~AsyncOutputBufferElement()
 	{
 	}
@@ -1511,6 +1519,8 @@ namespace slib
 		AsyncOutputBuffer
 **********************************************/
 
+	SLIB_DEFINE_OBJECT(AsyncOutputBuffer, Object)
+	
 	AsyncOutputBuffer::AsyncOutputBuffer()
 	{
 		m_lengthOutput = 0;
@@ -1628,14 +1638,12 @@ namespace slib
 				AsyncOutput
 **********************************************/
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AsyncOutputParam)
+	
 	AsyncOutputParam::AsyncOutputParam()
 	{
 		bufferSize = 0x10000;
 		bufferCount = 3;
-	}
-
-	AsyncOutputParam::~AsyncOutputParam()
-	{
 	}
 
 	SLIB_DEFINE_OBJECT(AsyncOutput, AsyncOutputBuffer)

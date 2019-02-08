@@ -143,11 +143,9 @@ namespace slib
 		/*78*/	1,		1,		1,		0,		0,		0,		1,		0
 	};
 	
-	Url::Url()
-	{
-	}
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(Url)
 	
-	Url::~Url()
+	Url::Url()
 	{
 	}
 	

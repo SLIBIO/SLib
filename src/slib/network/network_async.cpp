@@ -83,15 +83,13 @@ namespace slib
 	}
 
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AsyncTcpSocketParam)
+	
 	AsyncTcpSocketParam::AsyncTcpSocketParam()
 	{
 		flagIPv6 = sl_false;
 		
 		flagLogError = sl_true;
-	}
-
-	AsyncTcpSocketParam::~AsyncTcpSocketParam()
-	{
 	}
 
 
@@ -319,6 +317,8 @@ namespace slib
 	}
 
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AsyncTcpServerParam)
+	
 	AsyncTcpServerParam::AsyncTcpServerParam()
 	{
 		flagIPv6 = sl_false;
@@ -327,9 +327,6 @@ namespace slib
 		flagLogError = sl_true;
 	}
 
-	AsyncTcpServerParam::~AsyncTcpServerParam()
-	{
-	}
 
 	SLIB_DEFINE_OBJECT(AsyncTcpServer, AsyncIoObject)
 
@@ -530,6 +527,8 @@ namespace slib
 		}
 	}
 
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AsyncUdpSocketParam)
 
 	AsyncUdpSocketParam::AsyncUdpSocketParam()
 	{
@@ -538,10 +537,6 @@ namespace slib
 		flagAutoStart = sl_false;
 		flagLogError = sl_false;
 		packetSize = 65536;
-	}
-
-	AsyncUdpSocketParam::~AsyncUdpSocketParam()
-	{
 	}
 
 

@@ -287,7 +287,7 @@ namespace slib
 	public:
 		DnsRecord();
 		
-		~DnsRecord();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DnsRecord)
 		
 	public:
 		const String& getName() const;
@@ -323,7 +323,7 @@ namespace slib
 	public:
 		DnsQuestionRecord();
 		
-		~DnsQuestionRecord();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DnsQuestionRecord)
 		
 	public:
 		sl_uint32 parseRecord(const void* buf, sl_uint32 offset, sl_uint32 size);
@@ -337,7 +337,7 @@ namespace slib
 	public:
 		DnsResponseRecord();
 		
-		~DnsResponseRecord();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DnsResponseRecord)
 		
 	public:
 		sl_uint32 getTTL() const;
@@ -398,7 +398,7 @@ namespace slib
 	public:
 		DnsPacket();
 		
-		~DnsPacket();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DnsPacket)
 		
 	public:
 		sl_bool flagQuestion;
@@ -462,7 +462,7 @@ namespace slib
 	public:
 		DnsClientParam();
 		
-		~DnsClientParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DnsClientParam)
 		
 	};
 	
@@ -522,7 +522,7 @@ namespace slib
 	public:
 		DnsResolveHostParam();
 		
-		~DnsResolveHostParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DnsResolveHostParam)
 		
 	};
 	
@@ -549,7 +549,7 @@ namespace slib
 	public:
 		DnsServerParam();
 		
-		~DnsServerParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DnsServerParam)
 		
 	public:
 		void parse(const Json& config);

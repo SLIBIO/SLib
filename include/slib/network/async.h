@@ -52,7 +52,7 @@ namespace slib
 	public:
 		AsyncTcpSocketParam();
 		
-		~AsyncTcpSocketParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(AsyncTcpSocketParam)
 		
 	};
 	
@@ -125,7 +125,7 @@ namespace slib
 	public:
 		AsyncTcpServerParam();
 		
-		~AsyncTcpServerParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(AsyncTcpServerParam)
 		
 	};
 	
@@ -192,7 +192,7 @@ namespace slib
 	public:
 		AsyncUdpSocketParam();
 		
-		~AsyncUdpSocketParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(AsyncUdpSocketParam)
 		
 	};
 	

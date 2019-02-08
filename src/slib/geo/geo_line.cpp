@@ -24,26 +24,16 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(GeoLine)
 
 	GeoLine::GeoLine()
-	{
-	}
-
-	GeoLine::GeoLine(const GeoLine& other)
-	: point1(other.point1), point2(other.point2)
 	{
 	}
 
 	GeoLine::GeoLine(const LatLon& _point1, const LatLon& _point2)
 	: point1(_point1), point2(_point2)
 	{
-	}
-
-	GeoLine& GeoLine::operator=(const GeoLine& other)
-	{
-		point1 = other.point1;
-		point2 = other.point2;
-		return *this;
 	}
 
 	sl_bool GeoLine::intersectGeoLine(const GeoLine& line2, LatLon* outIntersectPoint) const

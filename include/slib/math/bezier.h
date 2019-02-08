@@ -54,9 +54,9 @@ namespace slib
 		T x3, y3;
 
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(CubicBezierCurveT)
+		
 		CubicBezierCurveT() = default;
-
-		CubicBezierCurveT(const CubicBezierCurveT<T>& other) = default;
 
 		template <class O>
 		CubicBezierCurveT(const CubicBezierCurveT<O>& other) noexcept;
@@ -78,8 +78,6 @@ namespace slib
 		void describeArc(T cx, T cy, T rx, T ry, T startRadian, T endRadian) noexcept;
 
 	public:
-		CubicBezierCurveT<T>& operator=(const CubicBezierCurveT<T>& other) = default;
-
 		template <class O>
 		CubicBezierCurveT<T>& operator=(const CubicBezierCurveT<O>& other) noexcept;
 

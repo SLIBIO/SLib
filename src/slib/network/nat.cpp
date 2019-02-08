@@ -27,6 +27,8 @@
 namespace slib
 {
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(NatTableParam)
+	
 	NatTableParam::NatTableParam()
 	{
 		targetAddress.setZero();
@@ -40,9 +42,8 @@ namespace slib
 		icmpEchoIdentifier = 30000;
 	}
 
-	NatTableParam::~NatTableParam()
-	{
-	}
+	
+	SLIB_DEFINE_OBJECT(NatTable, Object)
 
 	NatTable::NatTable()
 	{
@@ -223,17 +224,17 @@ namespace slib
 		return sn;
 	}
 
-	_priv_NatTablePort::_priv_NatTablePort()
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(NatTablePort)
+	
+	NatTablePort::NatTablePort()
 	{
 		flagActive = sl_false;
 		timeLastAccess.setZero();
 	}
+	
 
-	_priv_NatTablePort::~_priv_NatTablePort()
-	{
-	}
-
-	_priv_NatTableMapping::_priv_NatTableMapping()
+	NatTableMapping::NatTableMapping()
 	{
 		m_ports = sl_null;
 		m_nPorts = 0;
@@ -243,19 +244,19 @@ namespace slib
 		m_portEnd = 0;
 	}
 
-	_priv_NatTableMapping::~_priv_NatTableMapping()
+	NatTableMapping::~NatTableMapping()
 	{
-		NewHelper<_priv_NatTablePort>::free(m_ports, m_nPorts);
+		NewHelper<NatTablePort>::free(m_ports, m_nPorts);
 	}
 
-	void _priv_NatTableMapping::setup(sl_uint16 portBegin, sl_uint16 portEnd)
+	void NatTableMapping::setup(sl_uint16 portBegin, sl_uint16 portEnd)
 	{
 		ObjectLocker lock(this);
 
 		m_mapPorts.removeAll_NoLock();
 
 		if (m_ports) {
-			NewHelper<_priv_NatTablePort>::free(m_ports, m_nPorts);
+			NewHelper<NatTablePort>::free(m_ports, m_nPorts);
 			m_ports = sl_null;
 		}
 		m_pos = 0;
@@ -265,11 +266,11 @@ namespace slib
 		m_portEnd = portEnd;
 		if (portEnd >= portBegin) {
 			m_nPorts = portEnd - portBegin + 1;
-			m_ports = NewHelper<_priv_NatTablePort>::create(m_nPorts);
+			m_ports = NewHelper<NatTablePort>::create(m_nPorts);
 		}
 	}
 
-	sl_bool _priv_NatTableMapping::mapToExternalPort(const SocketAddress& address, sl_uint16& _port)
+	sl_bool NatTableMapping::mapToExternalPort(const SocketAddress& address, sl_uint16& _port)
 	{
 		ObjectLocker lock(this);
 
@@ -331,7 +332,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool _priv_NatTableMapping::mapToInternalAddress(sl_uint16 port, SocketAddress& address)
+	sl_bool NatTableMapping::mapToInternalAddress(sl_uint16 port, SocketAddress& address)
 	{
 		ObjectLocker lock(this);
 		if (!m_ports) {

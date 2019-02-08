@@ -42,25 +42,22 @@ namespace slib
 		T m10; T m11;
 	
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(Matrix2T)
+		
 		SLIB_INLINE Matrix2T() noexcept = default;
 
-		SLIB_INLINE constexpr Matrix2T(const Matrix2T<T>& other) noexcept
-		:m00(other.m00), m01(other.m01),
-		 m10(other.m10), m11(other.m11)
-		{}
-	
 		template <class O>
 		SLIB_INLINE constexpr Matrix2T(const Matrix2T<O>& other) noexcept
-		:m00((T)(other.m00)), m01((T)(other.m01)),
-		 m10((T)(other.m10)), m11((T)(other.m11))
+		 : m00((T)(other.m00)), m01((T)(other.m01)),
+		   m10((T)(other.m10)), m11((T)(other.m11))
 		{}
 	
 		SLIB_INLINE constexpr Matrix2T(
 			T _m00, T _m01,
 			T _m10, T _m11
 		) noexcept
-		:m00(_m00), m01(_m01),
-		 m10(_m10), m11(_m11)
+		 : m00(_m00), m01(_m01),
+		   m10(_m10), m11(_m11)
 		{}
 
 	public:
@@ -134,8 +131,6 @@ namespace slib
 		Matrix2T<T> lerp(const Matrix2T<T>& target, float factor) const noexcept;
 
 	public:
-		Matrix2T<T>& operator=(const Matrix2T<T>& other) noexcept = default;
-
 		template <class O>
 		Matrix2T<T>& operator=(const Matrix2T<O>& other) noexcept;
 	

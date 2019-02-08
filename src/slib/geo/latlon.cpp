@@ -26,17 +26,17 @@
 
 namespace slib
 {
-
+	
 	sl_bool LatLon::operator==(const LatLon& other) const
 	{
-		return latitude == other.latitude && longitude == other.longitude;
+		return Math::isAlmostZero(latitude - other.latitude) && Math::isAlmostZero(longitude - other.longitude);
 	}
-
+	
 	sl_bool LatLon::operator!=(const LatLon& other) const
 	{
-		return !(*this == other);
+		return !(Math::isAlmostZero(latitude - other.latitude)) || !(Math::isAlmostZero(longitude - other.longitude));
 	}
-
+	
 	LatLon LatLon::getCenter(const LatLon* list, sl_size count)
 	{
 		LatLon ret;

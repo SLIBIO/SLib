@@ -44,11 +44,9 @@ namespace slib
 		T c;
 
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(LineT)
+		
 		SLIB_INLINE LineT() noexcept = default;
-
-		SLIB_INLINE constexpr LineT(const LineT<T>& other) noexcept
-		 : a((T)(other.a)), b((T)(other.b)), c((T)(other.c))
-		{}
 
 		template <class O>
 		SLIB_INLINE constexpr LineT(const LineT<O>& other) noexcept
@@ -87,8 +85,6 @@ namespace slib
 		void transform(const Matrix3T<T>& mat) noexcept;
 
 	public:
-		LineT<T>& operator=(const LineT<T>& other) noexcept = default;
-
 		template <class O>
 		LineT<T>& operator=(const LineT<O>& other) noexcept;
 

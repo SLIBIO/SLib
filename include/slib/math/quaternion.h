@@ -40,11 +40,9 @@ namespace slib
 		T w;
 
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(QuaternionT)
+		
 		SLIB_INLINE QuaternionT() noexcept = default;
-
-		SLIB_INLINE constexpr QuaternionT(const QuaternionT<T>& other)
-		 : x(other.x), y(other.y), z(other.z), w(other.w)
-		 {}
 
 		template <class O>
 		SLIB_INLINE constexpr QuaternionT(const QuaternionT<O>& other)
@@ -91,8 +89,6 @@ namespace slib
 		QuaternionT<T> inverse() const noexcept;
 
 	public:
-		QuaternionT<T>& operator=(const QuaternionT<T>& other) noexcept = default;
-
 		template <class O>
 		QuaternionT<T>& operator=(const QuaternionT<O>& other) noexcept;
 

@@ -50,9 +50,7 @@ namespace slib
 	public:
 		PushNotificationMessage();
 		
-		PushNotificationMessage(const PushNotificationMessage& other) = default;
-		
-		PushNotificationMessage& operator=(const PushNotificationMessage& other) = default;
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(PushNotificationMessage)
 
 	};
 	

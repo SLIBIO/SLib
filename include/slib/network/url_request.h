@@ -67,9 +67,7 @@ namespace slib
 	public:
 		UrlRequestParam();
 		
-		UrlRequestParam(const UrlRequestParam& param);
-		
-		~UrlRequestParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(UrlRequestParam)
 		
 	public:
 		void setRequestBodyAsMemory(const Memory& mem);

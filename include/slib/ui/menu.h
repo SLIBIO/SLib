@@ -120,7 +120,7 @@ namespace slib
 	public:
 		MenuItemParam();
 		
-		~MenuItemParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(MenuItemParam)
 
 	};
 	

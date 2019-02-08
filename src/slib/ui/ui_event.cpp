@@ -29,12 +29,12 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TouchPoint)
 
 	TouchPoint::TouchPoint(): pressure(0), phase(TouchPhase::Move)
 	{
 	}
-
-	TouchPoint::TouchPoint(const TouchPoint& other) = default;
 
 	TouchPoint::TouchPoint(const UIPointf& _point) : point(_point), pressure(0), phase(TouchPhase::Move)
 	{
@@ -55,8 +55,6 @@ namespace slib
 	TouchPoint::TouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real _pressure, TouchPhase _phase) : point(x, y), pressure(_pressure), phase(_phase)
 	{
 	}
-
-	TouchPoint& TouchPoint::operator=(const TouchPoint& other) = default;
 
 
 #define DEFINE_MODIFIER_FUNCS(NAME) \

@@ -40,9 +40,9 @@ namespace slib
 		PointT<T> point3;
 
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(TriangleT)
+		
 		TriangleT() noexcept = default;
-
-		TriangleT(const TriangleT<T>& other) noexcept = default;
 
 		template <class O>
 		TriangleT(const TriangleT<O>& other) noexcept;
@@ -59,8 +59,6 @@ namespace slib
 		void transform(Matrix3T<T>& mat) noexcept;
 
 	public:
-		TriangleT<T>& operator=(const TriangleT<T>& other) noexcept = default;
-
 		template <class O>
 		TriangleT<T>& operator=(const TriangleT<O>& other) noexcept;
 	

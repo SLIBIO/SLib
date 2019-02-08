@@ -326,13 +326,13 @@ namespace slib
 	{
 	public:
 		sl_uint32 parentLevel;
-		CList<String> segments;
+		List<String> segments;
 	
 	public:
 		FilePathSegments();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FilePathSegments)
 
-		~FilePathSegments();
-	
 	public:
 		void parsePath(const String& path);
 

@@ -30,11 +30,9 @@
 namespace slib
 {
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(RSAPublicKey)
+	
 	RSAPublicKey::RSAPublicKey()
-	{
-	}
-
-	RSAPublicKey::~RSAPublicKey()
 	{
 	}
 
@@ -44,14 +42,12 @@ namespace slib
 	}
 
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(RSAPrivateKey)
+	
 	RSAPrivateKey::RSAPrivateKey()
 	{
 	}
-
-	RSAPrivateKey::~RSAPrivateKey()
-	{
-	}
-
+	
 	sl_uint32 RSAPrivateKey::getLength() const
 	{
 		return (sl_uint32)(N.getMostSignificantBytes());

@@ -567,7 +567,7 @@ public:
 	public:
 		IPv4Fragment();
 		
-		~IPv4Fragment();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(IPv4Fragment)
 		
 	};
 
@@ -580,12 +580,14 @@ public:
 	public:
 		IPv4FragmentedPacket();
 		
-		~IPv4FragmentedPacket();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(IPv4FragmentedPacket)
 		
 	};
 
 	class SLIB_EXPORT IPv4Fragmentation : public Object
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		IPv4Fragmentation();
 		

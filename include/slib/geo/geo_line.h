@@ -39,12 +39,9 @@ namespace slib
 	public:
 		GeoLine();
 
-		GeoLine(const GeoLine& other);
-
 		GeoLine(const LatLon& pt1, const LatLon& pt2);
 
-	public:
-		GeoLine& operator=(const GeoLine& other);
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(GeoLine)
 
 	public:
 		sl_bool intersectGeoLine(const GeoLine& otherLine, LatLon* outIntersectPoint = sl_null) const;

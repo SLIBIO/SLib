@@ -74,7 +74,7 @@ namespace slib
 	public:
 		WindowInstanceParam();
 		
-		~WindowInstanceParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WindowInstanceParam)
 		
 	public:
 		UIRect calculateRegion(const UIRect& screenFrame) const;

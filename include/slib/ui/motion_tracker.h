@@ -55,6 +55,8 @@ namespace slib
 		
 		~MotionTracker();
 		
+		SLIB_DELETE_CLASS_DEFAULT_MEMBERS(MotionTracker)
+		
 	public:
 		void addMovement(sl_real x, sl_real y, const Time& time);
 		

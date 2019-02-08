@@ -245,6 +245,8 @@ namespace slib
 
 	protected:
 		AsyncStreamRequest(const void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult*)>& callback, sl_bool flagRead);
+		
+		~AsyncStreamRequest();
 	
 	public:
 		static Ref<AsyncStreamRequest> createRead(void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult*)>& callback);
@@ -338,6 +340,8 @@ namespace slib
 	
 	class SLIB_EXPORT AsyncStreamBase : public AsyncStream
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		AsyncStreamBase();
 
@@ -411,6 +415,8 @@ namespace slib
 	
 	class SLIB_EXPORT AsyncReader : public AsyncStreamSimulator
 	{
+		SLIB_DECLARE_OBJECT
+		
 	protected:
 		AsyncReader();
 
@@ -441,6 +447,8 @@ namespace slib
 	
 	class SLIB_EXPORT AsyncWriter : public AsyncStreamSimulator
 	{
+		SLIB_DECLARE_OBJECT
+		
 	protected:
 		AsyncWriter();
 
@@ -554,8 +562,8 @@ namespace slib
 
 	public:
 		AsyncCopyParam();
-
-		~AsyncCopyParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(AsyncCopyParam)
 
 	};
 	
@@ -650,8 +658,10 @@ namespace slib
 		AsyncOutputBufferElement(const Memory& header);
 
 		AsyncOutputBufferElement(AsyncStream* stream, sl_uint64 size);
-
+		
 		~AsyncOutputBufferElement();
+
+		SLIB_DELETE_CLASS_DEFAULT_MEMBERS(AsyncOutputBufferElement)
 	
 	public:
 		sl_bool isEmpty() const;
@@ -678,6 +688,8 @@ namespace slib
 	
 	class SLIB_EXPORT AsyncOutputBuffer: public Object
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		AsyncOutputBuffer();
 
@@ -721,7 +733,7 @@ namespace slib
 	public:
 		AsyncOutputParam();
 
-		~AsyncOutputParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(AsyncOutputParam)
 
 	};
 	

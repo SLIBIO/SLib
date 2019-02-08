@@ -170,6 +170,16 @@ namespace slib
 		}
 	}
 #endif
+	
+	Referable& Referable::operator=(const Referable& other)
+	{
+		return *this;
+	}
+	
+	Referable& Referable::operator=(Referable&& other)
+	{
+		return *this;
+	}
 
 	
 	SLIB_DEFINE_ROOT_OBJECT(CWeakRef)

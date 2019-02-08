@@ -26,15 +26,13 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(BrushDesc)
 
 	BrushDesc::BrushDesc()
 	{
 		style = BrushStyle::Solid;
 		color = Color::White;
-	}
-
-	BrushDesc::~BrushDesc()
-	{
 	}
 
 	SLIB_DEFINE_ROOT_OBJECT(Brush)

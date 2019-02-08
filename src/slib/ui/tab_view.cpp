@@ -30,17 +30,14 @@
 namespace slib
 {
 
-	SLIB_DEFINE_OBJECT(TabView, ViewGroup)
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TabViewItem)
 	
-
 	TabViewItem::TabViewItem()
 	{
 	}
 
-	TabViewItem::~TabViewItem()
-	{
-	}
 
+	SLIB_DEFINE_OBJECT(TabView, ViewGroup)
 
 	TabView::TabView()
 	{

@@ -34,6 +34,10 @@ namespace slib
 	XmlNode::XmlNode(XmlNodeType type) : m_type(type), m_positionStartInSource(0), m_positionEndInSource(0), m_lineInSource(1), m_columnInSource(1)
 	{
 	}
+	
+	XmlNode::~XmlNode()
+	{
+	}
 
 	XmlNodeType XmlNode::getType() const
 	{
@@ -229,6 +233,10 @@ namespace slib
 	SLIB_DEFINE_OBJECT(XmlNodeGroup, XmlNode)
 
 	XmlNodeGroup::XmlNodeGroup(XmlNodeType type) : XmlNode(type)
+	{
+	}
+	
+	XmlNodeGroup::~XmlNodeGroup()
 	{
 	}
 
@@ -588,6 +596,13 @@ namespace slib
 		return findChildElementByAttribute(name, _id);
 	}
 
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(XmlAttribute)
+	
+	XmlAttribute::XmlAttribute() noexcept
+	{
+	}
+	
 
 	SLIB_DEFINE_OBJECT(XmlElement, XmlNodeGroup)
 
@@ -595,6 +610,10 @@ namespace slib
 	{
 		m_positionStartContentInSource = 0;
 		m_positionEndContentInSource = 0;
+	}
+	
+	XmlElement::~XmlElement()
+	{
 	}
 
 	Ref<XmlElement> XmlElement::create(const XmlString& name)
@@ -941,6 +960,10 @@ namespace slib
 	XmlDocument::XmlDocument() : XmlNodeGroup(XmlNodeType::Document)
 	{
 	}
+	
+	XmlDocument::~XmlDocument()
+	{
+	}
 
 	Ref<XmlDocument> XmlDocument::create()
 	{
@@ -1007,6 +1030,10 @@ namespace slib
 	SLIB_DEFINE_OBJECT(XmlText, XmlNode)
 
 	XmlText::XmlText() : XmlNode(XmlNodeType::Text), m_flagCDATA(sl_false)
+	{
+	}
+	
+	XmlText::~XmlText()
 	{
 	}
 
@@ -1101,6 +1128,10 @@ namespace slib
 	SLIB_DEFINE_OBJECT(XmlProcessingInstruction, XmlNode)
 
 	XmlProcessingInstruction::XmlProcessingInstruction() : XmlNode(XmlNodeType::ProcessingInstruction)
+	{
+	}
+	
+	XmlProcessingInstruction::~XmlProcessingInstruction()
 	{
 	}
 
@@ -1202,6 +1233,10 @@ namespace slib
 	XmlComment::XmlComment() : XmlNode(XmlNodeType::Comment)
 	{
 	}
+	
+	XmlComment::~XmlComment()
+	{
+	}
 
 	Ref<XmlComment> XmlComment::create(const XmlString& comment)
 	{
@@ -1276,6 +1311,10 @@ namespace slib
 	XmlWhiteSpace::XmlWhiteSpace() : XmlNode(XmlNodeType::WhiteSpace)
 	{
 	}
+	
+	XmlWhiteSpace::~XmlWhiteSpace()
+	{
+	}
 
 	Ref<XmlWhiteSpace> XmlWhiteSpace::create(const XmlString& content)
 	{
@@ -1310,6 +1349,8 @@ namespace slib
 	}
 
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(XmlParseParam)
+	
 	XmlParseParam::XmlParseParam()
 	{
 		flagCreateDocument = sl_true;
@@ -1328,7 +1369,7 @@ namespace slib
 		errorColumn = 0;
 		errorPosition = 0;
 	}
-
+	
 	String XmlParseParam::getErrorText()
 	{
 		if (flagError) {
@@ -1364,6 +1405,9 @@ namespace slib
 		flagCreateWhiteSpaces = sl_false;
 	}
 
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(XmlParseControl)
+	
 	XmlParseControl::XmlParseControl()
 	{
 		characterSize = 0;

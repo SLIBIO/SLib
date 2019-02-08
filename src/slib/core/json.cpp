@@ -33,6 +33,8 @@
 namespace slib
 {
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(JsonParseParam)
+	
 	JsonParseParam::JsonParseParam()
 	{
 		flagLogError = sl_true;
@@ -42,10 +44,6 @@ namespace slib
 		errorLine = 0;
 		errorColumn = 0;
 		errorPosition = 0;
-	}
-
-	JsonParseParam::~JsonParseParam()
-	{
 	}
 
 	String JsonParseParam::getErrorText()

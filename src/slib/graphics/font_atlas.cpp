@@ -35,28 +35,20 @@
 namespace slib
 {
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FontAtlasParam)
+	
 	FontAtlasParam::FontAtlasParam()
 	: planeWidth(PLANE_WIDTH_DEFAULT), planeHeight(PLANE_HEIGHT_DEFAULT), maxPlanes(MAX_PLANES_DEFAULT)
 	{
 	}
 
-	FontAtlasParam::~FontAtlasParam()
-	{
-	}
-
-
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FontAtlasChar)
+	
 	FontAtlasChar::FontAtlasChar()
 	{
 		fontWidth = 0;
 		fontHeight = 0;
 	}
-
-	FontAtlasChar::FontAtlasChar(const FontAtlasChar& other) = default;
-
-	FontAtlasChar::~FontAtlasChar()
-	{
-	}
-
 
 	SLIB_DEFINE_OBJECT(FontAtlas, Object)
 

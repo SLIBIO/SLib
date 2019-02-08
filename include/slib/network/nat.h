@@ -43,7 +43,7 @@
 namespace slib
 {
 
-	class _priv_NatTablePort
+	class NatTablePort
 	{
 	public:
 		sl_bool flagActive;
@@ -51,18 +51,18 @@ namespace slib
 		Time timeLastAccess;
 		
 	public:
-		_priv_NatTablePort();
+		NatTablePort();
 		
-		~_priv_NatTablePort();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(NatTablePort)
 		
 	};
 	
-	class _priv_NatTableMapping : public Object
+	class NatTableMapping : public Object
 	{
 	public:
-		_priv_NatTableMapping();
+		NatTableMapping();
 		
-		~_priv_NatTableMapping();
+		~NatTableMapping();
 		
 	public:
 		void setup(sl_uint16 portBegin, sl_uint16 portEnd);
@@ -74,7 +74,7 @@ namespace slib
 	protected:
 		CHashMap< SocketAddress, sl_uint16 > m_mapPorts;
 		
-		_priv_NatTablePort* m_ports;
+		NatTablePort* m_ports;
 		sl_uint16 m_nPorts;
 		sl_uint16 m_pos;
 		
@@ -99,12 +99,14 @@ namespace slib
 	public:
 		NatTableParam();
 		
-		~NatTableParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(NatTableParam)
 		
 	};
 	
 	class SLIB_EXPORT NatTable : public Object
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		NatTable();
 		
@@ -125,9 +127,9 @@ namespace slib
 	protected:
 		NatTableParam m_param;
 		
-		_priv_NatTableMapping m_mappingTcp;
+		NatTableMapping m_mappingTcp;
 		
-		_priv_NatTableMapping m_mappingUdp;
+		NatTableMapping m_mappingUdp;
 		
 		sl_uint16 m_icmpEchoSequenceCurrent;
 		

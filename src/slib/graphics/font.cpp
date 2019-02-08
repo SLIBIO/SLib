@@ -28,6 +28,8 @@
 namespace slib
 {
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FontDesc)
+	
 	FontDesc::FontDesc()
 	{
 		size = Font::getDefaultFontSize();
@@ -35,10 +37,6 @@ namespace slib
 		flagItalic = sl_false;
 		flagUnderline = sl_false;
 		flagStrikeout = sl_false;
-	}
-
-	FontDesc::~FontDesc()
-	{
 	}
 
 	sl_real _g_graphics_font_default_size = 12;

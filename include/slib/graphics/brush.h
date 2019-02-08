@@ -41,8 +41,8 @@ namespace slib
 
 	public:
 		BrushDesc();
-
-		~BrushDesc();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(BrushDesc)
 
 	};
 	

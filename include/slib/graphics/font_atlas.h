@@ -45,7 +45,7 @@ namespace slib
 	public:
 		FontAtlasParam();
 
-		~FontAtlasParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FontAtlasParam)
 
 	};
 	
@@ -60,9 +60,7 @@ namespace slib
 	public:
 		FontAtlasChar();
 
-		FontAtlasChar(const FontAtlasChar& other);
-
-		~FontAtlasChar();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FontAtlasChar)
 
 	};
 	

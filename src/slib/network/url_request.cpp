@@ -31,6 +31,8 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(UrlRequestParam)
 
 	UrlRequestParam::UrlRequestParam()
 	{
@@ -42,12 +44,6 @@ namespace slib
 		timeout = UrlRequest::getDefaultTimeout();
 		flagAllowInsecureConnection = UrlRequest::isDefaultAllowInsecureConnection();
 		dispatcher = UrlRequest::getDefaultDispatcher();
-	}
-	
-	UrlRequestParam::UrlRequestParam(const UrlRequestParam& other) = default;
-	
-	UrlRequestParam::~UrlRequestParam()
-	{
 	}
 	
 	void UrlRequestParam::setRequestBodyAsMemory(const Memory &mem)

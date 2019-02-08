@@ -26,6 +26,8 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(SensorParam)
 
 	SensorParam::SensorParam()
 	{

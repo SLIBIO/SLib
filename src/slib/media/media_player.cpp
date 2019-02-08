@@ -27,6 +27,8 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(MediaPlayerParam)
 
 	MediaPlayerParam::MediaPlayerParam()
 	{
@@ -37,12 +39,10 @@ namespace slib
 		
 		flagSelfAlive = sl_false;
 	}
-
-	MediaPlayerParam::~MediaPlayerParam()
-	{
-	}
-
-
+	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(MediaPlayerRenderVideoParam)
+	
 	MediaPlayerRenderVideoParam::MediaPlayerRenderVideoParam()
 	{
 		flagUpdated = sl_false;
@@ -53,11 +53,7 @@ namespace slib
 		_glTextureNameOES = 0;
 	}
 
-	MediaPlayerRenderVideoParam::~MediaPlayerRenderVideoParam()
-	{
-	}
-
-
+	
 	typedef CHashMap< MediaPlayer*, Ref<MediaPlayer> > _priv_MediaPlayersMap;
 	SLIB_SAFE_STATIC_GETTER(_priv_MediaPlayersMap, _getMediaPlayersMap)
 

@@ -41,14 +41,19 @@ namespace slib
 	public:
 		ListReportViewColumn();
 
-		~ListReportViewColumn();
-
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(ListReportViewColumn)
+		
 	};
 	
 	class ListReportViewCell
 	{
 	public:
 		AtomicString text;
+
+	public:
+		ListReportViewCell();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(ListReportViewCell)
 
 	};
 	

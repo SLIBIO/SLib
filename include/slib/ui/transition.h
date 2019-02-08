@@ -64,11 +64,7 @@ namespace slib
 		
 		Transition(TransitionType type);
 		
-		Transition(const Transition& other);
-
-		Transition& operator=(const Transition& other);
-		
-		~Transition();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(Transition)
 
 	public:
 		static Ref<Animation> start(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Function<void()>& onStop);

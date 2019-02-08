@@ -425,7 +425,13 @@ namespace slib
 	{
 		FromJson(*this, value);
 	}
-	
+
+	template <class T>
+	SLIB_INLINE void Json::get(T& value, const T& defaultValue) const
+	{
+		FromJson(*this, value, defaultValue);
+	}
+
 	template <class T>
 	SLIB_INLINE void Json::set(const T& value)
 	{

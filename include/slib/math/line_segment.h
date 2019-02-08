@@ -39,9 +39,9 @@ namespace slib
 		PointT<T> point2;
 
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(LineSegmentT)
+		
 		LineSegmentT() noexcept = default;
-
-		LineSegmentT(const LineSegmentT<T>& other) noexcept = default;
 
 		template <class O>
 		LineSegmentT(const LineSegmentT<O>& other) noexcept;
@@ -66,8 +66,6 @@ namespace slib
 		T getDistanceFromPointOnInfiniteLine(const PointT<T>& point) const noexcept;
 
 	public:
-		LineSegmentT<T>& operator=(const LineSegmentT<T>& other) noexcept = default;
-
 		template <class O>
 		LineSegmentT<T>& operator=(const LineSegmentT<O>& other) noexcept;
 

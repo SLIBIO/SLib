@@ -300,21 +300,21 @@ namespace slib
 	}
 	
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(IPv4Fragment)
+	
 	IPv4Fragment::IPv4Fragment()
 	{
 	}
 	
-	IPv4Fragment::~IPv4Fragment()
-	{
-	}
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(IPv4FragmentedPacket)
 	
 	IPv4FragmentedPacket::IPv4FragmentedPacket()
 	{
 	}
 	
-	IPv4FragmentedPacket::~IPv4FragmentedPacket()
-	{
-	}
+	
+	SLIB_DEFINE_OBJECT(IPv4Fragmentation, Object)
 	
 	IPv4Fragmentation::IPv4Fragmentation()
 	{

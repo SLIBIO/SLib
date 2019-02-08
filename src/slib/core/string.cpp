@@ -36,6 +36,12 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(StringData)
+	
+	StringData::StringData() noexcept : sz8(0), len(0)
+	{
+	}
 
 	class _priv_TemplateFunc8
 	{

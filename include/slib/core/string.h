@@ -58,6 +58,12 @@ namespace slib
 		Ref<Referable> refer;
 		String str8;
 		String16 str16;
+		
+	public:
+		StringData() noexcept;
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringData)
+		
 	};
 	
 	

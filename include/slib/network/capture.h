@@ -55,7 +55,7 @@ namespace slib
 	public:
 		NetCapturePacket();
 		
-		~NetCapturePacket();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(NetCapturePacket)
 		
 	};
 	
@@ -72,7 +72,7 @@ namespace slib
 	public:
 		NetCaptureDeviceInfo();
 		
-		~NetCaptureDeviceInfo();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(NetCaptureDeviceInfo)
 		
 	};
 	
@@ -97,7 +97,7 @@ namespace slib
 	public:
 		NetCaptureParam();
 		
-		~NetCaptureParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(NetCaptureParam)
 		
 	};
 	

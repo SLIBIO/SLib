@@ -37,15 +37,13 @@ namespace slib
 		double longitude;
 
 	public:
-		constexpr LatLon(): latitude(0), longitude(0) {}
+		SLIB_INLINE constexpr LatLon(): latitude(0), longitude(0) {}
 
-		constexpr LatLon(const LatLon& other): latitude(other.latitude), longitude(other.longitude) {}
-
-		LatLon(double _latitude, double _longitude): latitude(_latitude), longitude(_longitude) {}
+		SLIB_INLINE constexpr LatLon(double _latitude, double _longitude): latitude(_latitude), longitude(_longitude) {}
+		
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(LatLon)
 
 	public:
-		LatLon& operator=(const LatLon& other);
-
 		sl_bool operator==(const LatLon& other) const;
 
 		sl_bool operator!=(const LatLon& other) const;
@@ -70,7 +68,5 @@ namespace slib
 	}
 
 }
-
-#include "detail/latlon.inc"
 
 #endif

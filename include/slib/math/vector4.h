@@ -42,9 +42,9 @@ namespace slib
 		T w;
 
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(Vector4T)
+		
 		SLIB_INLINE Vector4T() noexcept = default;
-
-		SLIB_INLINE constexpr Vector4T(const Vector4T<T, FT>& other) noexcept : x(other.x), y(other.y), z(other.z), w(other.w) {}
 	
 		template <class O, class FO>
 		SLIB_INLINE constexpr Vector4T(const Vector4T<O, FO>& other) noexcept : x((T)(other.x)), y((T)(other.y)), z((T)(other.z)), w((T)(other.w)) {}
@@ -94,8 +94,6 @@ namespace slib
 		Vector4T<T, FT> lerp(const Vector4T<T, FT>& target, float factor) const noexcept;
 	
 	public:
-		Vector4T<T, FT>& operator=(const Vector4T<T, FT>& other) noexcept = default;
-
 		template <class O, class FO>
 		Vector4T<T, FT>& operator=(const Vector4T<O, FO>& other) noexcept;
 

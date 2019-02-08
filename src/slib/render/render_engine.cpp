@@ -29,24 +29,22 @@
 
 namespace slib
 {
-
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(Primitive)
+	
 	Primitive::Primitive(): type(PrimitiveType::Triangle), countElements(0)
 	{
 	}
 	
-	Primitive::~Primitive()
-	{
-	}
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(EnginePrimitive)
 	
 	EnginePrimitive::EnginePrimitive(const Primitive& primitive): Primitive(primitive)
 	{
 	}
 	
-	EnginePrimitive::~EnginePrimitive()
-	{
-	}
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(RenderClearParam)
 	
 	RenderClearParam::RenderClearParam()
 	{
@@ -58,9 +56,8 @@ namespace slib
 		stencil = 0;
 	}
 	
-	RenderClearParam::~RenderClearParam()
-	{
-	}
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(RenderBlendingParam)
 	
 	RenderBlendingParam::RenderBlendingParam()
 	{
@@ -73,10 +70,8 @@ namespace slib
 		blendConstant = Vector4::zero();
 	}
 	
-	RenderBlendingParam::~RenderBlendingParam()
-	{
-	}
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(RendererParam)
 	
 	RendererParam::RendererParam()
 	{
@@ -88,10 +83,6 @@ namespace slib
 		nDepthBits = 24;
 		nStencilBits = 8;
 		flagMultisample = sl_false;
-	}
-	
-	RendererParam::~RendererParam()
-	{
 	}
 	
 	

@@ -27,6 +27,8 @@
 namespace slib
 {
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(Transition)
+	
 	Transition::Transition()
 	{
 		type = TransitionType::Default;
@@ -41,14 +43,6 @@ namespace slib
 		direction = TransitionDirection::Default;
 		duration = 0;
 		curve = AnimationCurve::Default;
-	}
-	
-	Transition::Transition(const Transition& other) = default;
-	
-	Transition& Transition::operator=(const Transition& other) = default;
-	
-	Transition::~Transition()
-	{
 	}
 
 	Ref<Animation> Transition::start(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Function<void()>& onStop)

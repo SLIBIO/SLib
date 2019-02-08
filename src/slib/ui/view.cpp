@@ -6753,7 +6753,7 @@ namespace slib
 			
 			RenderCanvas* render = static_cast<RenderCanvas*>(canvas);
 			RenderCanvasState* currentState = render->getCurrentState();
-			RenderCanvasState savedState(currentState);
+			RenderCanvasState savedState(*currentState);
 			
 			sl_bool flagTransformed = sl_false;
 			
@@ -6779,7 +6779,7 @@ namespace slib
 						UIRect rcInvalidated(rcInvalidatedParent.left - offx, rcInvalidatedParent.top - offy, rcInvalidatedParent.right - offx, rcInvalidatedParent.bottom - offy);
 						if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
 							if (flagTransformed) {
-								currentState->copyFrom(&savedState);
+								*currentState = savedState;
 								flagTransformed = sl_false;
 							}
 							render->translateFromSavedState(&savedState, (sl_real)(offx), (sl_real)(offy));
@@ -6799,7 +6799,7 @@ namespace slib
 							mat.m20 = -ax * mat.m00 - ay * mat.m10 + mat.m20 + ax + (sl_real)(offx);
 							mat.m21 = -ax * mat.m01 - ay * mat.m11 + mat.m21 + ay + (sl_real)(offy);
 							if (i != 0) {
-								currentState->copyFrom(&savedState);
+								*currentState = savedState;
 							}
 							render->concatMatrix(mat);
 							render->setAlpha(alphaParent * child->getAlpha());
@@ -6811,7 +6811,7 @@ namespace slib
 				}
 			}
 			
-			currentState->copyFrom(&savedState);
+			*currentState = savedState;
 			
 		} else {
 			

@@ -24,6 +24,8 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ListReportViewColumn)
 
 	ListReportViewColumn::ListReportViewColumn()
 	{
@@ -32,9 +34,13 @@ namespace slib
 		headerAlign = Alignment::MiddleCenter;
 	}
 	
-	ListReportViewColumn::~ListReportViewColumn()
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ListReportViewCell)
+	
+	ListReportViewCell::ListReportViewCell()
 	{
 	}
+	
 	
 	SLIB_DEFINE_OBJECT(ListReportView, View)
 	

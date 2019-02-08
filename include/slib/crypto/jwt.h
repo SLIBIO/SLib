@@ -63,14 +63,8 @@ namespace slib
 	public:
 		Jwt() noexcept;
 		
-		Jwt(const Jwt& other) noexcept;
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(Jwt)
 		
-		Jwt(Jwt&& other) noexcept;
-		
-		Jwt& operator=(const Jwt& other) noexcept;
-		
-		Jwt& operator=(Jwt&& other) noexcept;
-
 	public:
 		String encode(const Memory& secret) const noexcept;
 		

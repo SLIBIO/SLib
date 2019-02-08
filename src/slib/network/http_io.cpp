@@ -166,6 +166,8 @@ namespace slib
 						HttpContentReader
 ***********************************************************************/
 
+	SLIB_DEFINE_OBJECT(HttpContentReader, AsyncStreamFilter)
+	
 	HttpContentReader::HttpContentReader()
 	{
 		m_flagDecompressing = sl_false;

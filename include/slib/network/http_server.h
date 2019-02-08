@@ -99,6 +99,8 @@ namespace slib
 	
 	class SLIB_EXPORT HttpServerConnection : public Object, public IClosable
 	{
+		SLIB_DECLARE_OBJECT
+		
 	protected:
 		HttpServerConnection();
 		
@@ -173,6 +175,8 @@ namespace slib
 	
 	class SLIB_EXPORT HttpServerConnectionProvider : public Object
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		HttpServerConnectionProvider();
 		
@@ -226,9 +230,7 @@ namespace slib
 	public:
 		HttpServerParam();
 		
-		HttpServerParam(const HttpServerParam& other);
-		
-		~HttpServerParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(HttpServerParam)
 		
 	public:
 		void setJson(const Json& json);

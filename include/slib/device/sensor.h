@@ -59,6 +59,8 @@ namespace slib
 	public:
 		SensorParam();
 
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(SensorParam)
+
 	};
 	
 	

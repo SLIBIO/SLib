@@ -488,6 +488,12 @@ namespace slib
 	SLIB_STATIC_STRING(_g_priv_http_set_cookie_http_only, "HttpOnly")
 	SLIB_STATIC_STRING(_g_priv_http_set_cookie_same_site, "SameSite")
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(HttpCookie)
+	
+	HttpCookie::HttpCookie()
+	{
+	}
+	
 	String HttpCookie::toHeaderValue() const
 	{
 		HttpHeaderValueMap map;
@@ -548,12 +554,10 @@ namespace slib
 	}
 	
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(HttpUploadFile)
+	
 	HttpUploadFile::HttpUploadFile(const String& fileName, const HttpHeaderMap& headers, void* data, sl_size size, const Ref<Referable>& ref)
 	 : m_fileName(fileName), m_headers(headers), m_data(data), m_size(size), m_ref(ref)
-	{
-	}
-	
-	HttpUploadFile::~HttpUploadFile()
 	{
 	}
 	
@@ -597,6 +601,8 @@ namespace slib
 							HttpRequest
 ***********************************************************************/
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(HttpRequest)
+	
 	HttpRequest::HttpRequest()
 	{
 		SLIB_STATIC_STRING(s1, "HTTP/1.1");
@@ -605,10 +611,6 @@ namespace slib
 		SLIB_STATIC_STRING(s2, "GET");
 		m_methodText = s2;
 		m_methodTextUpper = s2;
-	}
-
-	HttpRequest::~HttpRequest()
-	{
 	}
 
 	HttpMethod HttpRequest::getMethod() const
@@ -1361,6 +1363,8 @@ namespace slib
 							HttpResponse
 ***********************************************************************/
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(HttpResponse)
+	
 	HttpResponse::HttpResponse()
 	{
 		SLIB_STATIC_STRING(s1, "HTTP/1.1");
@@ -1368,10 +1372,6 @@ namespace slib
 		m_responseCode = HttpStatus::OK;
 		SLIB_STATIC_STRING(s2, "OK");
 		m_responseMessage = s2;
-	}
-
-	HttpResponse::~HttpResponse()
-	{
 	}
 
 	HttpStatus HttpResponse::getResponseCode() const

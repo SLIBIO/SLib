@@ -26,10 +26,10 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(GeoRectangle)
 
 	GeoRectangle::GeoRectangle() = default;
-
-	GeoRectangle::GeoRectangle(const GeoRectangle& other) = default;
 
 	GeoRectangle::GeoRectangle(const LatLon& pt1, const LatLon& pt2)
 	{
@@ -38,8 +38,6 @@ namespace slib
 		topRight.latitude = SLIB_MAX(pt1.latitude, pt2.latitude);
 		topRight.longitude = SLIB_MAX(pt1.longitude, pt2.longitude);
 	}
-
-	GeoRectangle& GeoRectangle::operator=(const GeoRectangle& other) = default;
 
 	sl_bool GeoRectangle::contains(const LatLon& pt) const
 	{

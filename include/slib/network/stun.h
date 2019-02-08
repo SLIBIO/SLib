@@ -185,6 +185,8 @@ namespace slib
 	public:
 		StunAttributes();
 		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StunAttributes)
+		
 	public:
 		void initialize();
 		
@@ -278,7 +280,7 @@ namespace slib
 	public:
 		StunServerParam();
 		
-		~StunServerParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StunServerParam)
 		
 	};
 	

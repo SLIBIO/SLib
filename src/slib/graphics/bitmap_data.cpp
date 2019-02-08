@@ -27,6 +27,8 @@
 namespace slib
 {
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ColorComponentBuffer)
+	
 	ColorComponentBuffer::ColorComponentBuffer()
 	{
 		width = 0;
@@ -36,9 +38,8 @@ namespace slib
 		pitch = 0;
 	}
 
-	ColorComponentBuffer::~ColorComponentBuffer()
-	{
-	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(BitmapData)
 
 	BitmapData::BitmapData()
 	{
@@ -59,15 +60,9 @@ namespace slib
 		pitch3 = 0;
 	}
 
-	BitmapData::BitmapData(const BitmapData& other) = default;
-
 	BitmapData::BitmapData(sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride)
 	{
 		setFromColors(width, height, colors, stride);
-	}
-
-	BitmapData::~BitmapData()
-	{
 	}
 
 	void*& BitmapData::planeData(sl_uint32 plane)
@@ -1941,7 +1936,5 @@ namespace slib
 		this->data3 = sl_null;
 		this->pitch3 = 0;
 	}
-
-	BitmapData& BitmapData::operator=(const BitmapData& other) = default;
 
 }

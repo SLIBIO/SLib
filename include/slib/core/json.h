@@ -61,7 +61,7 @@ namespace slib
 	public:
 		JsonParseParam();
 
-		~JsonParseParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(JsonParseParam)
 
 	public:
 		String getErrorText();
@@ -324,6 +324,9 @@ namespace slib
 		
 		template <class T>
 		void get(T& value) const;
+		
+		template <class T>
+		void get(T& value, const T& defaultValue) const;
 		
 		template <class T>
 		void set(const T& value);

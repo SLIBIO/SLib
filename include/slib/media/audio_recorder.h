@@ -45,7 +45,7 @@ namespace slib
 	public:
 		AudioRecorderInfo();
 		
-		~AudioRecorderInfo();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(AudioRecorderInfo)
 		
 	};
 	
@@ -68,7 +68,7 @@ namespace slib
 	public:
 		AudioRecorderParam();
 		
-		~AudioRecorderParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(AudioRecorderParam)
 		
 	};
 	

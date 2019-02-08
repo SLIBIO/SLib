@@ -29,15 +29,15 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(GzipParam)
 
 	GzipParam::GzipParam()
 	{
 	}
-
-	GzipParam::~GzipParam()
-	{
-	}
-
+	
+	
+	SLIB_DEFINE_OBJECT(ZlibCompress, Object)
 
 	ZlibCompress::ZlibCompress()
 	{
@@ -194,6 +194,9 @@ namespace slib
 		}
 	}
 
+	
+	SLIB_DEFINE_OBJECT(ZlibDecompress, Object)
+	
 	ZlibDecompress::ZlibDecompress()
 	{
 		m_flagStarted = sl_false;

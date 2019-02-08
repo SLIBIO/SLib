@@ -58,7 +58,7 @@ namespace slib
 	public:
 		MediaPlayerParam();
 		
-		~MediaPlayerParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(MediaPlayerParam)
 		
 	};
 	
@@ -104,7 +104,7 @@ namespace slib
 	public:
 		MediaPlayerRenderVideoParam();
 		
-		~MediaPlayerRenderVideoParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(MediaPlayerRenderVideoParam)
 		
 	};
 	

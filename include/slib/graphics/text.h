@@ -61,15 +61,9 @@ namespace slib
 		
 		SLIB_INLINE constexpr TextRange(sl_text_pos _location, sl_text_pos _length) noexcept : location(_location), length(_length) {}
 		
-		SLIB_INLINE constexpr TextRange(const TextRange& other) noexcept : location(other.location), length(other.length) {};
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(TextRange)
 		
 	public:
-		SLIB_INLINE TextRange& operator=(const TextRange& other) noexcept
-		{
-			location = other.location;
-			length = other.length;
-			return *this;
-		}
 		
 		SLIB_INLINE constexpr sl_bool operator==(const TextRange& other) const noexcept
 		{
@@ -104,7 +98,7 @@ namespace slib
 	public:
 		TextStyle() noexcept;
 		
-		~TextStyle() noexcept;
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TextStyle)
 		
 	public:
 		Ref<TextStyle> duplicate() const noexcept;

@@ -49,7 +49,7 @@ namespace slib
 	public:
 		MySQL_Param();
 
-		~MySQL_Param();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(MySQL_Param)
 
 	};
 

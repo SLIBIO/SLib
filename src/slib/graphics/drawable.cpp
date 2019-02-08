@@ -32,36 +32,11 @@
 namespace slib
 {
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DrawParam)
+	
 	DrawParam::DrawParam()
 	 : useAlpha(sl_false), alpha(1), tiled(sl_false), useColorMatrix(sl_false), useBlur(sl_false), blurRadius(10), time(0)
 	{
-	}
-
-	DrawParam::DrawParam(const DrawParam& other)
-	 : useAlpha(other.useAlpha), alpha(other.alpha), tiled(other.tiled), useColorMatrix(other.useColorMatrix), useBlur(other.useBlur), blurRadius(other.blurRadius), time(other.time)
-	{
-		if (other.useColorMatrix) {
-			colorMatrix = other.colorMatrix;
-		}
-	}
-
-	DrawParam::~DrawParam()
-	{
-	}
-
-	DrawParam& DrawParam::operator=(const DrawParam& other)
-	{
-		useAlpha = other.useAlpha;
-		alpha = other.alpha;
-		tiled = other.tiled;
-		useColorMatrix = other.useColorMatrix;
-		if (other.useColorMatrix) {
-			colorMatrix = other.colorMatrix;
-		}
-		useBlur = other.useBlur;
-		blurRadius = other.blurRadius;
-		time = other.time;
-		return *this;
 	}
 
 	sl_bool DrawParam::isTransparent() const
@@ -123,25 +98,11 @@ namespace slib
 	}
 
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DrawableAnimationInfo)
+	
 	DrawableAnimationInfo::DrawableAnimationInfo()
 	 : duration(0), framesPerSecond(0)
 	{
-	}
-	
-	DrawableAnimationInfo::DrawableAnimationInfo(const DrawableAnimationInfo& other)
-	 : duration(other.duration), framesPerSecond(other.framesPerSecond)
-	{
-	}
-	
-	DrawableAnimationInfo::~DrawableAnimationInfo()
-	{
-	}
-	
-	DrawableAnimationInfo& DrawableAnimationInfo::operator=(const DrawableAnimationInfo& other)
-	{
-		duration = other.duration;
-		framesPerSecond = other.framesPerSecond;
-		return *this;
 	}
 	
 

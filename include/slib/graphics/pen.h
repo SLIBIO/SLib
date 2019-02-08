@@ -45,9 +45,9 @@ namespace slib
 
 	public:
 		PenDesc();
-
-		~PenDesc();
-
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(PenDesc)
+		
 	};
 	
 	class SLIB_EXPORT Pen : public Object

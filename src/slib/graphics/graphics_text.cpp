@@ -31,31 +31,16 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TextStyle)
 
 	TextStyle::TextStyle() noexcept : flagUnderline(sl_false), flagOverline(sl_false), flagLineThrough(sl_false), textColor(Color::Zero), backgroundColor(Color::Zero), lineHeight(-1), yOffset(0)
 	{
 	}
 	
-	TextStyle::~TextStyle() noexcept
-	{
-	}
-	
 	Ref<TextStyle> TextStyle::duplicate() const noexcept
 	{
-		Ref<TextStyle> style = new TextStyle;
-		if (style.isNotNull()) {
-			style->font = font;
-			style->flagUnderline = flagUnderline;
-			style->flagOverline = flagOverline;
-			style->flagLineThrough = flagLineThrough;
-			style->textColor = textColor;
-			style->backgroundColor = backgroundColor;
-			style->href = href;
-			style->lineHeight = lineHeight;
-			style->yOffset = yOffset;
-			return style;
-		}
-		return sl_null;
+		return new TextStyle(*this);
 	}
 	
 	SLIB_DEFINE_OBJECT(TextItem, Object)

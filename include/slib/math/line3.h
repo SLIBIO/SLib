@@ -39,9 +39,9 @@ namespace slib
 		Vector3T<T> point2;
 
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(Line3T)
+		
 		Line3T() noexcept = default;
-
-		Line3T(const Line3T<T>& other) noexcept = default;
 
 		template <class O>
 		Line3T(const Line3T<O>& other) noexcept;
@@ -66,8 +66,6 @@ namespace slib
 		void transform(const Matrix4T<T>& mat) noexcept;
 
 	public:
-		Line3T<T>& operator=(const Line3T<T>& other) noexcept = default;
-
 		template <class O>
 		Line3T<T>& operator=(const Line3T<O>& other) noexcept;
 

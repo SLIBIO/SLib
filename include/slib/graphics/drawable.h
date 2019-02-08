@@ -54,11 +54,7 @@ namespace slib
 	public:
 		DrawParam();
 
-		DrawParam(const DrawParam& other);
-
-		DrawParam& operator=(const DrawParam& other);
-
-		~DrawParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DrawParam)
 
 	public:
 		sl_bool isTransparent() const;
@@ -80,11 +76,7 @@ namespace slib
 	public:
 		DrawableAnimationInfo();
 		
-		DrawableAnimationInfo(const DrawableAnimationInfo& other);
-		
-		DrawableAnimationInfo& operator=(const DrawableAnimationInfo& other);
-		
-		~DrawableAnimationInfo();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DrawableAnimationInfo)
 		
 	};
 	

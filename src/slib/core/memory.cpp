@@ -294,14 +294,10 @@ namespace slib
 			MemoryData
 *******************************************/
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(MemoryData)
+	
 	MemoryData::MemoryData()
 	 : data(sl_null), size(0)
-	{
-	}
-
-	MemoryData::MemoryData(const MemoryData& other) = default;
-
-	MemoryData::~MemoryData()
 	{
 	}
 

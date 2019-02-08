@@ -45,9 +45,9 @@ namespace slib
 		Matrix4T<T> MVP;
 
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(ViewFrustumT)
+		
 		ViewFrustumT() noexcept = default;
-
-		ViewFrustumT(const ViewFrustumT<T>& other) noexcept = default;
 
 		template <class O>
 		ViewFrustumT(const ViewFrustumT<O>& other) noexcept;
@@ -68,8 +68,6 @@ namespace slib
 		sl_bool containsBox(const BoxT<T>& box, sl_bool* pFlagIntersect = sl_null, sl_bool flagSkipNearFar = sl_true) const noexcept;
 
 	public:
-		ViewFrustumT<T>& operator=(const ViewFrustumT<T>& other) noexcept = default;
-
 		template <class O>
 		ViewFrustumT<T>& operator=(const ViewFrustumT<O>& other) noexcept;
 

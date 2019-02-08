@@ -29,6 +29,8 @@
 namespace slib
 {
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WindowInstanceParam)
+	
 	WindowInstanceParam::WindowInstanceParam()
 	{
 		flagBorderless = sl_false;
@@ -45,10 +47,6 @@ namespace slib
 #if defined(SLIB_UI_IS_GTK)
 		flagClientSize = sl_false;
 #endif
-	}
-
-	WindowInstanceParam::~WindowInstanceParam()
-	{
 	}
 
 	UIRect WindowInstanceParam::calculateRegion(const UIRect& screenFrame) const

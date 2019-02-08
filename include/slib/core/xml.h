@@ -73,6 +73,8 @@ namespace slib
 
 	public:
 		XmlNode(XmlNodeType type);
+		
+		~XmlNode();
 
 	public:
 		XmlNodeType getType() const;
@@ -156,6 +158,8 @@ namespace slib
 
 	public:
 		XmlNodeGroup(XmlNodeType type);
+		
+		~XmlNodeGroup();
 
 	public:
 		sl_bool buildText(XmlStringBuffer& output) const override;
@@ -225,13 +229,20 @@ namespace slib
 
 	};
 	
-	struct SLIB_EXPORT XmlAttribute
+	class SLIB_EXPORT XmlAttribute
 	{
+	public:
 		XmlString name;
 		XmlString uri;
 		XmlString localName;
 		XmlString value;
 		XmlString whiteSpacesBeforeName;
+		
+	public:
+		XmlAttribute() noexcept;
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(XmlAttribute)
+		
 	};
 	
 	class SLIB_EXPORT XmlElement : public XmlNodeGroup
@@ -240,6 +251,8 @@ namespace slib
 
 	public:
 		XmlElement();
+		
+		~XmlElement();
 
 	public:
 		static Ref<XmlElement> create(const XmlString& name);
@@ -320,6 +333,8 @@ namespace slib
 
 	public:
 		XmlDocument();
+		
+		~XmlDocument();
 
 	public:
 		static Ref<XmlDocument> create();
@@ -345,6 +360,8 @@ namespace slib
 
 	public:
 		XmlText();
+		
+		~XmlText();
 
 	public:
 		static Ref<XmlText> create(const XmlString& text, sl_bool flagCDATA = sl_false);
@@ -375,6 +392,8 @@ namespace slib
 
 	public:
 		XmlProcessingInstruction();
+		
+		~XmlProcessingInstruction();
 
 	public:
 		static Ref<XmlProcessingInstruction> create(const XmlString& target, const XmlString& content);
@@ -403,6 +422,8 @@ namespace slib
 
 	public:
 		XmlComment();
+		
+		~XmlComment();
 
 	public:
 		static Ref<XmlComment> create(const XmlString& comment);
@@ -426,6 +447,8 @@ namespace slib
 
 	public:
 		XmlWhiteSpace();
+		
+		~XmlWhiteSpace();
 
 	public:
 		static Ref<XmlWhiteSpace> create(const XmlString& content);
@@ -465,6 +488,8 @@ namespace slib
 
 	public:
 		XmlParseControl();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(XmlParseControl)
 
 	};
 	
@@ -515,6 +540,8 @@ namespace slib
 
 	public:
 		XmlParseParam();
+
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(XmlParseParam)
 
 	public:
 		String getErrorText();

@@ -38,6 +38,12 @@ namespace slib
 		sl_size count; // count of samples
 		sl_int32 stride; // bytes offset between samples
 		Ref<Referable> ref;
+		
+	public:
+		AudioChannelBuffer();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(AudioChannelBuffer)
+		
 	};
 	
 	class SLIB_EXPORT AudioData
@@ -57,9 +63,7 @@ namespace slib
 	public:
 		AudioData();
 		
-		AudioData(const AudioData& other);
-		
-		~AudioData();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(AudioData)
 		
 	public:
 		sl_size getSizeForChannel() const;
@@ -72,9 +76,6 @@ namespace slib
 		void copySamplesFrom(const AudioData& other, sl_size count) const;
 		
 		void copySamplesFrom(const AudioData& other) const;
-		
-	public:
-		AudioData& operator=(const AudioData& other);
 		
 	};	
 }

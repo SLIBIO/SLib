@@ -38,9 +38,9 @@ namespace slib
 		T y;
 	
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(Vector2T)
+		
 		SLIB_INLINE Vector2T() noexcept = default;
-
-		SLIB_INLINE constexpr Vector2T(const Vector2T<T, FT>& other) noexcept : x(other.x), y(other.y) {}
 	
 		template <class O, class FO>
 		SLIB_INLINE constexpr Vector2T(const Vector2T<O, FO>& other) noexcept : x((T)(other.x)), y((T)(other.y)) {}
@@ -83,8 +83,6 @@ namespace slib
 		Vector2T<T, FT> lerp(const Vector2T<T, FT>& target, float factor) const noexcept;
 	
 	public:
-		Vector2T<T, FT>& operator=(const Vector2T<T, FT>& other) noexcept = default;
-
 		template <class O, class FO>
 		Vector2T<T, FT>& operator=(const Vector2T<O, FO>& other) noexcept;
 

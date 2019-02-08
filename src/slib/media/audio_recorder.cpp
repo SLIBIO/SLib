@@ -26,15 +26,15 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AudioRecorderInfo)
 
 	AudioRecorderInfo::AudioRecorderInfo()
 	{
 	}
-
-	AudioRecorderInfo::~AudioRecorderInfo()
-	{
-	}
-
+	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AudioRecorderParam)
 	
 	AudioRecorderParam::AudioRecorderParam()
 	{
@@ -43,10 +43,6 @@ namespace slib
 		frameLengthInMilliseconds = 50;
 		bufferLengthInMilliseconds = 1000;
 		flagAutoStart = sl_true;
-	}
-
-	AudioRecorderParam::~AudioRecorderParam()
-	{
 	}
 
 

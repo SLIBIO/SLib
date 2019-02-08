@@ -64,13 +64,7 @@ namespace slib
 	public:
 		ZXingGenerateParam();
 		
-		ZXingGenerateParam(const ZXingGenerateParam& other) = default;
-		
-		ZXingGenerateParam(ZXingGenerateParam&& other) = default;
-		
-		ZXingGenerateParam& operator=(const ZXingGenerateParam& other) = default;
-		
-		ZXingGenerateParam& operator=(ZXingGenerateParam&& other) = default;
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(ZXingGenerateParam)
 		
 	};
 	
@@ -89,13 +83,7 @@ namespace slib
 	public:
 		ZXingScanParam();
 		
-		ZXingScanParam(const ZXingScanParam& other) = default;
-		
-		ZXingScanParam(ZXingScanParam&& other) = default;
-		
-		ZXingScanParam& operator=(const ZXingScanParam& other) = default;
-		
-		ZXingScanParam& operator=(ZXingScanParam&& other) = default;
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(ZXingScanParam)
 		
 	};
 	

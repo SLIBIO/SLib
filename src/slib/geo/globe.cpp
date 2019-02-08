@@ -30,10 +30,10 @@ namespace slib
 /**************************************************
 					Globe
 ***************************************************/
-
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(Globe)
+	
 	Globe::Globe() = default;
-
-	Globe::Globe(const Globe& other) = default;
 
 	void Globe::_initializeParameters()
 	{
@@ -57,8 +57,6 @@ namespace slib
 		inverseFlattening = _inverseFlattening;
 		eccentricitySquared = _eccentricitySquared;
 	}
-
-	Globe& Globe::operator=(const Globe& other) = default;
 
 	double Globe::getEquatorialRadius() const
 	{

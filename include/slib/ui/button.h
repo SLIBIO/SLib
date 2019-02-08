@@ -42,12 +42,21 @@ namespace slib
 		
 	public:
 		ButtonCategoryProperties();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(ButtonCategoryProperties)
+		
 	};
 
 	class SLIB_EXPORT ButtonCategory
 	{
 	public:
 		ButtonCategoryProperties properties[(int)(ButtonState::Count)];
+		
+	public:
+		ButtonCategory();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(ButtonCategory)
+		
 	};
 
 	class SLIB_EXPORT Button : public View

@@ -24,6 +24,7 @@
 #define CHECKHEADER_SLIB_MATH_DEFINITION
 
 #include "../core/definition.h"
+#include "../core/macro.h"
 
 #define SLIB_DEFINE_GEOMETRY_TYPE(TYPE) \
 	template class TYPE##T<float>; \

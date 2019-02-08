@@ -47,8 +47,8 @@ namespace slib
 	
 	public:
 		FontDesc();
-
-		~FontDesc();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FontDesc)
 
 	};
 	

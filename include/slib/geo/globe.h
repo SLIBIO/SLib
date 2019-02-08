@@ -45,15 +45,12 @@ namespace slib
 	public:
 		Globe();
 
-		Globe(const Globe& other);
-
 		Globe(double radiusEquatorial, double radiusPolar);
 	
 		Globe(double radiusEquatorial, double radiusPolar, double inverseFlattening, double eccentricitySquared);
 
-	public:
-		Globe& operator=(const Globe& other);
-	
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(Globe)
+		
 	public:
 		double getEquatorialRadius() const;
 

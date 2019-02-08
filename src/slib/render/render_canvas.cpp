@@ -36,37 +36,21 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(RenderCanvasClip)
+	
 	RenderCanvasClip::RenderCanvasClip(): type(RenderCanvasClipType::Rectangle), rx(0), ry(0), flagTransform(sl_false)
 	{
 	}
 	
-	RenderCanvasClip::~RenderCanvasClip()
-	{
-	}
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(RenderCanvasState)
 	
 	RenderCanvasState::RenderCanvasState()
-	: matrix(Matrix3::identity()), flagClipRect(sl_false)
+	 : matrix(Matrix3::identity()), flagClipRect(sl_false)
 	{
 	}
 	
-	RenderCanvasState::RenderCanvasState(RenderCanvasState* other)
-	: matrix(other->matrix), flagClipRect(other->flagClipRect), clipRect(other->clipRect)
-	{
-		clips = other->clips.duplicate_NoLock();
-	}
-	
-	void RenderCanvasState::copyFrom(RenderCanvasState* other)
-	{
-		matrix = other->matrix;
-		flagClipRect = other->flagClipRect;
-		clipRect = other->clipRect;
-		clips = other->clips.duplicate_NoLock();
-	}
-	
-	RenderCanvasState::~RenderCanvasState()
-	{
-	}
 	
 	SLIB_RENDER_PROGRAM_STATE_BEGIN(RenderCanvasProgramState, RenderVertex2D_Position)
 	SLIB_RENDER_PROGRAM_STATE_UNIFORM_MATRIX3(Transform, u_Transform)
@@ -436,7 +420,7 @@ namespace slib
 	void RenderCanvas::save()
 	{
 		RenderCanvasState* stateOld = m_state.get();
-		Ref<RenderCanvasState> stateNew = new RenderCanvasState(stateOld);
+		Ref<RenderCanvasState> stateNew = new RenderCanvasState(*stateOld);
 		if (stateNew.isNotNull()) {
 			m_stackStates.push_NoLock(stateOld);
 			m_state = stateNew;

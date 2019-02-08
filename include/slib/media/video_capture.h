@@ -40,7 +40,7 @@ namespace slib
 	public:
 		VideoCaptureFrame();
 		
-		~VideoCaptureFrame();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(VideoCaptureFrame)
 		
 	};
 	
@@ -54,7 +54,7 @@ namespace slib
 	public:
 		VideoCaptureParam();
 		
-		~VideoCaptureParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(VideoCaptureParam)
 		
 	};
 	

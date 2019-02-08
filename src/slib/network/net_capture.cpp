@@ -37,23 +37,23 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(NetCapturePacket)
+	
 	NetCapturePacket::NetCapturePacket(): data(sl_null), length(0)
 	{
 	}
 	
-	NetCapturePacket::~NetCapturePacket()
-	{
-	}
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(NetCaptureDeviceInfo)
 	
 	NetCaptureDeviceInfo::NetCaptureDeviceInfo(): flagLoopback(sl_false)
 	{
 	}
 	
-	NetCaptureDeviceInfo::~NetCaptureDeviceInfo()
-	{
-	}
 	
-
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(NetCaptureParam)
+	
 	NetCaptureParam::NetCaptureParam()
 	{
 		flagPromiscuous = sl_false;
@@ -64,10 +64,6 @@ namespace slib
 		preferedLinkDeviceType = NetworkLinkDeviceType::Ethernet;
 		
 		flagAutoStart = sl_true;
-	}
-	
-	NetCaptureParam::~NetCaptureParam()
-	{
 	}
 	
 	

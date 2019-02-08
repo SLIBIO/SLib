@@ -40,7 +40,7 @@ namespace slib
 	public:
 		VideoFrame();
 		
-		~VideoFrame();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(VideoFrame)
 		
 	};	
 }

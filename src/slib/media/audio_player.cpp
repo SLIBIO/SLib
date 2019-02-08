@@ -27,15 +27,15 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AudioPlayerInfo)
 
 	AudioPlayerInfo::AudioPlayerInfo()
 	{
 	}
 
-	AudioPlayerInfo::~AudioPlayerInfo()
-	{
-	}
-
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AudioPlayerBufferParam)
 
 	AudioPlayerBufferParam::AudioPlayerBufferParam()
 	{
@@ -45,10 +45,6 @@ namespace slib
 		bufferLengthInMilliseconds = 1000;
 		
 		flagAutoStart = sl_true;
-	}
-
-	AudioPlayerBufferParam::~AudioPlayerBufferParam()
-	{
 	}
 
 
@@ -128,12 +124,10 @@ namespace slib
 		m_lastSample = s[count - 1];
 	}
 
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AudioPlayerParam)
 
 	AudioPlayerParam::AudioPlayerParam()
-	{
-	}
-
-	AudioPlayerParam::~AudioPlayerParam()
 	{
 	}
 

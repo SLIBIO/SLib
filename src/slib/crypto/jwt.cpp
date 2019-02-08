@@ -31,34 +31,12 @@
 namespace slib
 {
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(Jwt)
+	
 	Jwt::Jwt() noexcept
 	{
 		setType("JWT");
 		setAlgorithm(JwtAlgorithm::HS256);
-	}
-	
-	Jwt::Jwt(const Jwt& other) noexcept
-	 : header(other.header), payload(other.payload)
-	{
-	}
-	
-	Jwt::Jwt(Jwt&& other) noexcept
-	 : header(Move(other.header)), payload(Move(other.payload))
-	{
-	}
-	
-	Jwt& Jwt::operator=(const Jwt& other) noexcept
-	{
-		header = other.header;
-		payload = other.payload;
-		return *this;
-	}
-	
-	Jwt& Jwt::operator=(Jwt&& other) noexcept
-	{
-		header = Move(other.header);
-		payload = Move(other.payload);
-		return *this;
 	}
 	
 	String Jwt::encode(const Memory& secret) const noexcept

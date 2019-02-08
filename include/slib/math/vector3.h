@@ -41,10 +41,10 @@ namespace slib
 		T z;
 	
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(Vector3T)
+		
 		SLIB_INLINE Vector3T() noexcept = default;
 
-		SLIB_INLINE constexpr Vector3T(const Vector3T<T, FT>& other) noexcept : x(other.x), y(other.y), z(other.z) {}
-	
 		template <class O, class FO>
 		SLIB_INLINE constexpr Vector3T(const Vector3T<O, FO>& other) noexcept : x((T)(other.x)), y((T)(other.y)), z((T)(other.z)) {}
 	
@@ -88,8 +88,6 @@ namespace slib
 		Vector3T<T, FT> lerp(const Vector3T<T, FT>& target, float factor) const noexcept;
 	
 	public:
-		Vector3T<T, FT>& operator=(const Vector3T<T, FT>& other) noexcept = default;
-
 		template <class O, class FO>
 		Vector3T<T, FT>& operator=(const Vector3T<O, FO>& other) noexcept;
 

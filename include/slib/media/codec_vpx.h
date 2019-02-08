@@ -59,7 +59,7 @@ namespace slib
 	public:
 		VpxEncoderParam();
 		
-		~VpxEncoderParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(VpxEncoderParam)
 		
 	};
 	
@@ -73,7 +73,7 @@ namespace slib
 	public:
 		VpxDecoderParam();
 		
-		~VpxDecoderParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(VpxDecoderParam)
 		
 	};
 	

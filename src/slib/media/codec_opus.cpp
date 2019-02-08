@@ -32,6 +32,8 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(OpusEncoderParam)
 
 	OpusEncoderParam::OpusEncoderParam()
 	{
@@ -39,10 +41,6 @@ namespace slib
 		channelsCount = 1;
 		bitsPerSecond = 8000;
 		type = OpusEncoderType::Voice;
-	}
-
-	OpusEncoderParam::~OpusEncoderParam()
-	{
 	}
 
 
@@ -259,15 +257,13 @@ namespace slib
 		return _priv_OpusEncoderImpl::create(param);
 	}
 
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(OpusDecoderParam)
 
 	OpusDecoderParam::OpusDecoderParam()
 	{
 		samplesPerSecond = 16000;
 		channelsCount = 1;
-	}
-
-	OpusDecoderParam::~OpusDecoderParam()
-	{
 	}
 
 

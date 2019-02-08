@@ -59,11 +59,22 @@ namespace slib
 	};
 	const ColorMatrix& _g_button_colorMatrix_disabled = *((const ColorMatrix*)((void*)_g_button_colorMatrix_disabled_buf));
 
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ButtonCategoryProperties)
+	
 	ButtonCategoryProperties::ButtonCategoryProperties()
 	{
 		textColor = Color::zero();
 		flagFilter = sl_false;
 	}
+	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ButtonCategory)
+	
+	ButtonCategory::ButtonCategory()
+	{
+	}
+	
 
 	class _priv_Button_Categories
 	{

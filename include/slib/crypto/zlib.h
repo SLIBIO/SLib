@@ -41,12 +41,14 @@ namespace slib
 	public:
 		GzipParam();
 
-		~GzipParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(GzipParam)
 
 	};
 
 	class SLIB_EXPORT ZlibCompress : public Object
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		ZlibCompress();
 
@@ -104,6 +106,8 @@ namespace slib
 	
 	class SLIB_EXPORT ZlibDecompress : public Object
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		ZlibDecompress();
 

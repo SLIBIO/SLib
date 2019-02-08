@@ -40,6 +40,8 @@ namespace slib
 		
 		~HttpOutputBuffer();
 		
+		SLIB_DELETE_CLASS_DEFAULT_MEMBERS(HttpOutputBuffer)
+		
 	public:
 		void clearOutput();
 		
@@ -69,6 +71,8 @@ namespace slib
 		
 		~HttpHeaderReader();
 		
+		SLIB_DELETE_CLASS_DEFAULT_MEMBERS(HttpHeaderReader)
+		
 	public:
 		// return sl_true when body section (\r\n\r\n) is detected
 		sl_bool add(const void* buf, sl_size size, sl_size& posBody);
@@ -89,6 +93,8 @@ namespace slib
 	
 	class SLIB_EXPORT HttpContentReader : public AsyncStreamFilter
 	{
+		SLIB_DECLARE_OBJECT
+		
 	protected:
 		HttpContentReader();
 		

@@ -139,10 +139,8 @@ namespace slib
 	public:
 		MemoryData();
 		
-		MemoryData(const MemoryData& other);
-
-		~MemoryData();
-
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(MemoryData)
+		
 	public:
 		Memory getMemory() const;
 

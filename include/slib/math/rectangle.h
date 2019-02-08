@@ -44,11 +44,9 @@ namespace slib
 		T bottom;
 
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(RectangleT)
+		
 		SLIB_INLINE RectangleT() noexcept = default;
-
-		SLIB_INLINE constexpr RectangleT(const RectangleT<T, FT>& other) noexcept
-		 : left(other.left), top(other.top), right(other.right), bottom(other.bottom)
-		 {}
 
 		template <class O, class FO>
 		SLIB_INLINE constexpr RectangleT(const RectangleT<O, FO>& other) noexcept
@@ -176,8 +174,6 @@ namespace slib
 		RectangleT<T, FT> lerp(const RectangleT<T, FT>& target, float factor) const noexcept;
 	
 	public:
-		RectangleT<T, FT>& operator=(const RectangleT<T, FT>& other) noexcept = default;
-
 		template <class O, class FO>
 		RectangleT<T, FT>& operator=(const RectangleT<O, FO>& other) noexcept;
 

@@ -39,13 +39,10 @@ namespace slib
 	public:
 		GeoRectangle();
 
-		GeoRectangle(const GeoRectangle& other);
-
 		GeoRectangle(const LatLon& pt1, const LatLon& pt2);
 
-	public:
-		GeoRectangle& operator=(const GeoRectangle& other);
-
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(GeoRectangle)
+		
 	public:
 		sl_bool contains(const LatLon& pt) const;
 	

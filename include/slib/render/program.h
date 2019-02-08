@@ -49,6 +49,8 @@ namespace slib
 		
 		~RenderProgramState();
 		
+		SLIB_DELETE_CLASS_DEFAULT_MEMBERS(RenderProgramState)
+		
 	public:
 		void setUniformFloatValue(sl_int32 uniformLocation, float value);
 		

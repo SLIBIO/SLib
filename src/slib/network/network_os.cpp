@@ -30,14 +30,13 @@
 namespace slib
 {
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(NetworkInterfaceInfo)
+	
 	NetworkInterfaceInfo::NetworkInterfaceInfo()
 	{
 	}
 
-	NetworkInterfaceInfo::~NetworkInterfaceInfo()
-	{
-	}
-
+	
 	List<IPv4Address> Network::findAllIPv4Addresses()
 	{
 		List<IPv4Address> list;

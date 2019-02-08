@@ -40,7 +40,7 @@ namespace slib
 	public:
 		CameraInfo();
 		
-		~CameraInfo();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(CameraInfo)
 		
 	};
 	
@@ -56,7 +56,7 @@ namespace slib
 	public:
 		CameraParam();
 		
-		~CameraParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(CameraParam)
 		
 	public:
 		void setFrontCamera();
@@ -95,6 +95,7 @@ namespace slib
 
 	private:
 		Ref<Image> image;
+		
 	};
 	
 	class SLIB_EXPORT TakePhotoParam
@@ -106,7 +107,7 @@ namespace slib
 	public:
 		TakePhotoParam();
 		
-		~TakePhotoParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TakePhotoParam)
 		
 	};
 	

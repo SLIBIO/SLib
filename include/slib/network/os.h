@@ -44,8 +44,8 @@ namespace slib
 		
 	public:
 		NetworkInterfaceInfo();
-		
-		~NetworkInterfaceInfo();
+
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(NetworkInterfaceInfo)
 		
 	};
 	

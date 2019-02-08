@@ -46,11 +46,9 @@ namespace slib
 		T d;
 
 	public:
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(PlaneT)
+		
 		SLIB_INLINE PlaneT() noexcept = default;
-
-		SLIB_INLINE constexpr PlaneT(const PlaneT<T>& other)
-		 : a(other.a), b(other.b), c(other.c), d(other.d)
-		 {}
 
 		template <class O>
 		SLIB_INLINE constexpr PlaneT(const PlaneT<O>& other)
@@ -95,8 +93,6 @@ namespace slib
 		sl_bool intersectPlane(const PlaneT<T>& plane, Line3T<T>* outIntersectLine = sl_null, sl_bool* pFlagParallel = sl_null) const noexcept;
 
 	public:
-		PlaneT<T>& operator=(const PlaneT<T>& other) noexcept = default;
-
 		template <class O>
 		PlaneT<T>& operator=(const PlaneT<O>& other) noexcept;
 	

@@ -27,6 +27,15 @@
 
 namespace slib
 {
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AudioChannelBuffer)
+	
+	AudioChannelBuffer::AudioChannelBuffer() : data(0), count(0), stride(0)
+	{
+	}
+	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AudioData)
 
 	AudioData::AudioData()
 	{
@@ -36,14 +45,6 @@ namespace slib
 		data = sl_null;
 		data1 = sl_null;
 	}
-
-	AudioData::AudioData(const AudioData& other) = default;
-
-	AudioData::~AudioData()
-	{
-	}
-
-	AudioData& AudioData::operator=(const AudioData& other) = default;
 
 	sl_size AudioData::getSizeForChannel() const
 	{

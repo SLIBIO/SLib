@@ -27,14 +27,6 @@
 namespace slib
 {
 
-	GeoLocation& GeoLocation::operator=(const LatLon& other)
-	{
-		latitude = other.latitude;
-		longitude = other.longitude;
-		altitude = 0;
-		return *this;
-	}
-
 	sl_bool GeoLocation::operator==(const GeoLocation& other) const
 	{
 		return Math::isAlmostZero(latitude - other.latitude) && Math::isAlmostZero(longitude - other.longitude) && Math::isAlmostZero(altitude - other.altitude);

@@ -50,8 +50,6 @@ namespace slib
 	public:
 		TouchPoint();
 
-		TouchPoint(const TouchPoint& other);
-		
 		TouchPoint(const UIPointf& point);
 		
 		TouchPoint(const UIPointf& point, sl_real pressure);
@@ -64,8 +62,7 @@ namespace slib
 		
 		TouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real pressure, TouchPhase phase);
 		
-	public:
-		TouchPoint& operator=(const TouchPoint& other);
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TouchPoint)
 
 	};
 
@@ -164,6 +161,8 @@ namespace slib
 		UIEvent();
 		
 		~UIEvent();
+		
+		SLIB_DELETE_CLASS_DEFAULT_MEMBERS(UIEvent)
 		
 	public:
 		static Ref<UIEvent> create(UIAction action);

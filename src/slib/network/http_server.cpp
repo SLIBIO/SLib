@@ -167,6 +167,8 @@ namespace slib
 ******************************************************/
 #define SIZE_READ_BUF 0x10000
 #define SIZE_COPY_BUF 0x10000
+	
+	SLIB_DEFINE_OBJECT(HttpServerConnection, Object)
 
 	HttpServerConnection::HttpServerConnection()
 	{
@@ -520,6 +522,8 @@ namespace slib
 /******************************************************
 			HttpServerConnectionProvider
 ******************************************************/
+	
+	SLIB_DEFINE_OBJECT(HttpServerConnectionProvider, Object)
 
 	HttpServerConnectionProvider::HttpServerConnectionProvider()
 	{
@@ -611,6 +615,8 @@ namespace slib
 /******************************************************
 					HttpServer
 ******************************************************/
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(HttpServerParam)
 
 	HttpServerParam::HttpServerParam()
 	{
@@ -634,12 +640,6 @@ namespace slib
 		flagLogDebug = sl_false;
 	}
 
-	HttpServerParam::HttpServerParam(const HttpServerParam& other) = default;
-
-	HttpServerParam::~HttpServerParam()
-	{
-	}
-	
 	void HttpServerParam::setJson(const Json& conf)
 	{
 		port = (sl_uint16)(conf["port"].getUint32(port));

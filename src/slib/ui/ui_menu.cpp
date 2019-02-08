@@ -157,16 +157,15 @@ namespace slib
 	}
 	
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(MenuItemParam)
+	
 	MenuItemParam::MenuItemParam()
 	{
 		flagEnabled = sl_true;
 		flagChecked = sl_false;
 	}
 	
-	MenuItemParam::~MenuItemParam()
-	{
-	}
-
+	
 	SLIB_DEFINE_OBJECT(Menu, Object)
 	
 	Menu::Menu()

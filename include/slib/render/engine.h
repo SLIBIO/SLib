@@ -63,20 +63,20 @@ namespace slib
 	public:
 		Primitive();
 		
-		~Primitive();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(Primitive)
 		
 	};
 	
 	class SLIB_EXPORT EnginePrimitive : public Primitive
 	{
 	public:
-		EnginePrimitive(const Primitive& primitive);
-		
-		~EnginePrimitive();
-		
-	public:
 		Ref<VertexBufferInstance> vertexBufferInstance;
 		Ref<IndexBufferInstance> indexBufferInstance;
+		
+	public:
+		EnginePrimitive(const Primitive& primitive);
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(EnginePrimitive)
 		
 	};
 	
@@ -93,7 +93,7 @@ namespace slib
 	public:
 		RenderClearParam();
 		
-		~RenderClearParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(RenderClearParam)
 		
 	};
 	
@@ -137,7 +137,7 @@ namespace slib
 	public:
 		RenderBlendingParam();
 		
-		~RenderBlendingParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(RenderBlendingParam)
 		
 	};
 	
@@ -170,7 +170,7 @@ namespace slib
 	public:
 		RendererParam();
 		
-		~RendererParam();
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(RendererParam)
 		
 	};
 	

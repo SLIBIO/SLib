@@ -82,9 +82,9 @@ namespace slib
 		void _free() noexcept;
 		
 	public:
-		Referable& operator=(const Referable& other) = delete;
+		Referable& operator=(const Referable& other);
 		
-		Referable& operator=(Referable&& other) = delete;
+		Referable& operator=(Referable&& other);
 
 	private:
 		sl_reg m_signature;
