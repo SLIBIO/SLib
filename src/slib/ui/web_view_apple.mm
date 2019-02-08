@@ -436,7 +436,7 @@ namespace slib
 	if (instance.isNotNull()) {
 		instance->onSetFocus();
 	}
-	return YES;
+	return [super becomeFirstResponder];
 }
 
 @end

@@ -34,6 +34,8 @@ namespace slib
 	WebView::WebView()
 	{
 		setCreatingNativeWidget(sl_true);
+		setFocusable(sl_true);
+		
 		m_flagOfflineContent = sl_false;
 		m_flagClearCacheOnAttach = sl_false;
 	}
