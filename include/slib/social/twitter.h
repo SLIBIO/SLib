@@ -20,82 +20,85 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_SOCIAL_FACEBOOK
-#define CHECKHEADER_SLIB_SOCIAL_FACEBOOK
+#ifndef CHECKHEADER_SLIB_SOCIAL_TWITTER
+#define CHECKHEADER_SLIB_SOCIAL_TWITTER
 
 #include "definition.h"
 
-#include "../core/function.h"
-#include "../core/string.h"
-#include "../core/list.h"
-#include "../core/time.h"
+#include "oauth.h"
 
 namespace slib
 {
 	
-	class SLIB_EXPORT FacebookAccessToken
+	class TwitterParam : public OAuthParam
+	{
+	public:
+		TwitterParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TwitterParam)
+		
+	};
+	
+	class SLIB_EXPORT TwitterLoginResult : public OAuthLoginResult
 	{
 	public:
 		String userId;
-		String token;
-		Time expirationDate;
-		Time refreshDate;
-		List<String> permissions;
-		List<String> declinedPermissions;
+		String userScreenName;
 		
 	public:
-		FacebookAccessToken();
+		TwitterLoginResult();
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FacebookAccessToken)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TwitterLoginResult)
 		
 	};
-	
-	class SLIB_EXPORT FacebookLoginResult
-	{
-	public:
-		sl_bool flagError;
-		String errorMessage;
 
-		sl_bool flagCancel;
-		
-		List<String> grantedPermissions;
-		List<String> declinedPermissions;
-		
-		FacebookAccessToken token;
+	class SLIB_EXPORT TwitterLoginParam : public OAuthLoginParam
+	{
+	public:
+		Function<void(TwitterLoginResult& result)> onComplete;
 		
 	public:
-		FacebookLoginResult();
+		TwitterLoginParam();
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FacebookLoginResult)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TwitterLoginParam)
+		
+	};
+	
+	class Twitter : public OAuth1
+	{
+		SLIB_DECLARE_OBJECT
+		
+	protected:
+		Twitter(const TwitterParam& param);
+		
+		~Twitter();
+		
+	public:
+		static Ref<Twitter> create(const TwitterParam& param);
+		
+		static void initialize(const TwitterParam& param);
+		
+		static void initialize(const String& consumerKey, const String& consumerSecret, const String& callbackUrl);
 
-	};
-	
-	class SLIB_EXPORT FacebookLoginParam
-	{
+		static Ref<Twitter> getInstance();
+
 	public:
-		sl_bool flagPublishPermissions;
-		List<String> permissions;
+		void login(const TwitterLoginParam& param);
 		
-		Function<void(FacebookLoginResult& result)> onComplete;
+		void login(const Function<void(TwitterLoginResult& result)>& onComplete);
 		
 	public:
-		FacebookLoginParam();
+		String getUserId();
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FacebookLoginParam)
+		void setUserId(const String& userId);
 		
-	};
-	
-	class SLIB_EXPORT Facebook
-	{
-	public:
-		// call this function at `onStart()` in your application class
-		static void initializeOnStartApp();
+		String getUserScreenName();
 		
-		static sl_bool getCurrentToken(FacebookAccessToken* _out = sl_null);
+		void setUserScreenName(const String& name);
 		
-		static void login(const FacebookLoginParam& param);
-		
-		static void loginWithReadPermissions(const Function<void(FacebookLoginResult&)>& callback);
+	protected:
+		AtomicString m_userId;
+		AtomicString m_userScreenName;
 		
 	};
 	

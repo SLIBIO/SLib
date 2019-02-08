@@ -40,6 +40,9 @@
     <Filter Include="src\web">
       <UniqueIdentifier>{f8d3e2b1-d55d-440d-b9b8-01fe4590e459}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\social">
+      <UniqueIdentifier>{1237d79f-474e-4bde-823e-5ebaea64f22c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\slib\core\async_config.h">
@@ -874,6 +877,21 @@
     </ClCompile>
     <ClCompile Include="..\..\src\slib\ui\switch_view.cpp">
       <Filter>src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\facebook.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\oauth.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\twitter.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\oauth_login.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\twitter_login.cpp">
+      <Filter>src\social</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

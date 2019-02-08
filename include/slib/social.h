@@ -23,6 +23,9 @@
 #ifndef CHECKHEADER_SLIB_SOCIAL_HEADER
 #define CHECKHEADER_SLIB_SOCIAL_HEADER
 
+#include "social/oauth.h"
+
 #include "social/facebook.h"
+#include "social/twitter.h"
 
 #endif

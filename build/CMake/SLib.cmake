@@ -285,6 +285,12 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/web/web_controller.cpp"
  "${SLIB_PATH}/src/slib/web/web_service.cpp"
 
+ "${SLIB_PATH}/src/slib/social/facebook.cpp"
+ "${SLIB_PATH}/src/slib/social/oauth.cpp"
+ "${SLIB_PATH}/src/slib/social/oauth_login.cpp"
+ "${SLIB_PATH}/src/slib/social/twitter.cpp"
+ "${SLIB_PATH}/src/slib/social/twitter_login.cpp"
+
  "${SLIB_PATH}/src/slib/ui/button.cpp"
  "${SLIB_PATH}/src/slib/ui/camera_view.cpp"
  "${SLIB_PATH}/src/slib/ui/check_box.cpp"

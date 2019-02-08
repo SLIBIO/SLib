@@ -601,6 +601,12 @@
 		26050B2620CFBDD300032B2C /* systemdependent.c in Sources */ = {isa = PBXBuildFile; fileRef = 26050B2520CFBDD300032B2C /* systemdependent.c */; };
 		26072FFE20D97B66004EB272 /* url_request_curl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26072FFD20D97B66004EB272 /* url_request_curl.cpp */; };
 		2607300E20DCE368004EB272 /* rw_lock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2607300D20DCE367004EB272 /* rw_lock.cpp */; };
+		260B73F1220D7C5D00858EEA /* notification.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B73F0220D7C5D00858EEA /* notification.cpp */; };
+		260B73F5220D7DF600858EEA /* facebook.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B73F3220D7DF600858EEA /* facebook.cpp */; };
+		260B73F6220D7DF600858EEA /* oauth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B73F4220D7DF600858EEA /* oauth.cpp */; };
+		260B73FA220D872F00858EEA /* twitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B73F9220D872F00858EEA /* twitter.cpp */; };
+		260B73FE220DCB1D00858EEA /* oauth_login.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B73FD220DCB1D00858EEA /* oauth_login.cpp */; };
+		260B7402220E012B00858EEA /* twitter_login.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B7401220E012B00858EEA /* twitter_login.cpp */; };
 		2628EACC21C1059800D8CD00 /* web_view_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2628EACB21C1059700D8CD00 /* web_view_apple.mm */; };
 		2628EACE21C157A800D8CD00 /* regex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EACD21C157A800D8CD00 /* regex.cpp */; };
 		2628EAE621C410E500D8CD00 /* base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EAE521C410E500D8CD00 /* base64.cpp */; };
@@ -1848,6 +1854,12 @@
 		2609E5591E37E03A00CFBDBB /* timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = timer.cpp; sourceTree = "<group>"; };
 		260A402D1D2AAAD8009CFCE8 /* render_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_resource.cpp; sourceTree = "<group>"; };
 		260A402F1D2AAAE3009CFCE8 /* ui_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_resource.cpp; sourceTree = "<group>"; };
+		260B73F0220D7C5D00858EEA /* notification.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = notification.cpp; sourceTree = "<group>"; };
+		260B73F3220D7DF600858EEA /* facebook.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = facebook.cpp; path = social/facebook.cpp; sourceTree = "<group>"; };
+		260B73F4220D7DF600858EEA /* oauth.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = oauth.cpp; path = social/oauth.cpp; sourceTree = "<group>"; };
+		260B73F9220D872F00858EEA /* twitter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = twitter.cpp; path = social/twitter.cpp; sourceTree = "<group>"; };
+		260B73FD220DCB1D00858EEA /* oauth_login.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = oauth_login.cpp; path = social/oauth_login.cpp; sourceTree = "<group>"; };
+		260B7401220E012B00858EEA /* twitter_login.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = twitter_login.cpp; path = social/twitter_login.cpp; sourceTree = "<group>"; };
 		260D8CD120CBDC7C0013B34E /* libyasm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libyasm.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		262041261C8895C900AF48F2 /* array.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = array.cpp; sourceTree = "<group>"; };
 		2620412A1C88A95E00AF48F2 /* object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = object.cpp; sourceTree = "<group>"; };
@@ -3713,6 +3725,18 @@
 			name = generic;
 			sourceTree = "<group>";
 		};
+		260B73F2220D7DC600858EEA /* social */ = {
+			isa = PBXGroup;
+			children = (
+				260B73F3220D7DF600858EEA /* facebook.cpp */,
+				260B73F4220D7DF600858EEA /* oauth.cpp */,
+				260B73FD220DCB1D00858EEA /* oauth_login.cpp */,
+				260B73F9220D872F00858EEA /* twitter.cpp */,
+				260B7401220E012B00858EEA /* twitter_login.cpp */,
+			);
+			name = social;
+			sourceTree = "<group>";
+		};
 		260D8CD220CBDD170013B34E /* external */ = {
 			isa = PBXGroup;
 			children = (
@@ -4274,6 +4298,7 @@
 				2648D5431D096A7000819E09 /* mobile_app.cpp */,
 				2648D5411D0965C400819E09 /* mobile_game.cpp */,
 				E17DADEE1E0C9A10006161F6 /* motion_tracker.cpp */,
+				260B73F0220D7C5D00858EEA /* notification.cpp */,
 				E1B34E9E1E0A90C0006217F4 /* picker_view.cpp */,
 				26BB61391D872FB10049A5C3 /* progress_bar.cpp */,
 				263916EB21C8F462008B335B /* qr_code_scanner.cpp */,
@@ -4452,6 +4477,7 @@
 				266DD4A41C11940A00D47AB0 /* media */,
 				266DD4BD1C11940A00D47AB0 /* network */,
 				266DD4D81C11940A00D47AB0 /* render */,
+				260B73F2220D7DC600858EEA /* social */,
 				266DD4E91C11940A00D47AB0 /* ui */,
 				26912BC11DEA81D5008C5FFD /* web */,
 			);
@@ -6034,6 +6060,7 @@
 				26D9D9021E9645CE005F7BD3 /* list.cpp in Sources */,
 				26D9D9031E9645CE005F7BD3 /* system_unix.cpp in Sources */,
 				26D9D9041E9645CE005F7BD3 /* event.cpp in Sources */,
+				260B73F5220D7DF600858EEA /* facebook.cpp in Sources */,
 				26D9D95A1E96465E005F7BD3 /* vibrator.cpp in Sources */,
 				26D9D9051E9645CE005F7BD3 /* timer.cpp in Sources */,
 				26D9D98B1E964675005F7BD3 /* codec_vpx.cpp in Sources */,
@@ -6071,7 +6098,9 @@
 				26D9D95B1E964662005F7BD3 /* earth.cpp in Sources */,
 				26D9D9D01E96468D005F7BD3 /* scroll_bar.cpp in Sources */,
 				26D9D90D1E9645CE005F7BD3 /* charset.cpp in Sources */,
+				260B73F1220D7C5D00858EEA /* notification.cpp in Sources */,
 				26D9D9CC1E96468D005F7BD3 /* radio_button.cpp in Sources */,
+				260B73F6220D7DF600858EEA /* oauth.cpp in Sources */,
 				26D9D9CD1E96468D005F7BD3 /* radio_button_macos.mm in Sources */,
 				26D9D90E1E9645CE005F7BD3 /* string.cpp in Sources */,
 				26D9D9741E96466A005F7BD3 /* graphics_util.cpp in Sources */,
@@ -6081,6 +6110,7 @@
 				2639194421CD2510008B335B /* redis.cpp in Sources */,
 				26D9D9D51E96468D005F7BD3 /* slider.cpp in Sources */,
 				26D9D9651E964669005F7BD3 /* brush.cpp in Sources */,
+				260B7402220E012B00858EEA /* twitter_login.cpp in Sources */,
 				26D9D9101E9645CE005F7BD3 /* math.cpp in Sources */,
 				26D9D9561E964659005F7BD3 /* database.cpp in Sources */,
 				26D9D9D81E96468D005F7BD3 /* tab_view_macos.mm in Sources */,
@@ -6089,6 +6119,7 @@
 				26BB17D021F4BA690089C7EC /* ui_adapter.cpp in Sources */,
 				266E66E121D7F68F00D92386 /* locale_apple.mm in Sources */,
 				26D9D9D31E96468D005F7BD3 /* select_view.cpp in Sources */,
+				260B73FE220DCB1D00858EEA /* oauth_login.cpp in Sources */,
 				26D9D9791E96466A005F7BD3 /* pen.cpp in Sources */,
 				26D9D96E1E96466A005F7BD3 /* font_freetype.cpp in Sources */,
 				26D9D9A31E96467B005F7BD3 /* socket_event.cpp in Sources */,
@@ -6125,6 +6156,7 @@
 				26D9D9751E96466A005F7BD3 /* image_jpeg.cpp in Sources */,
 				26D9D9D41E96468D005F7BD3 /* select_view_macos.mm in Sources */,
 				26D9D9B01E964683005F7BD3 /* render_program.cpp in Sources */,
+				260B73FA220D872F00858EEA /* twitter.cpp in Sources */,
 				26D9D91D1E9645CE005F7BD3 /* transform2d.cpp in Sources */,
 				26D9D9E61E96468D005F7BD3 /* ui_menu_macos.mm in Sources */,
 				26D9D91E1E9645CE005F7BD3 /* resource.cpp in Sources */,

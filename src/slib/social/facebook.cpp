@@ -25,6 +25,31 @@
 namespace slib
 {
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FacebookAccessToken)
+	
+	FacebookAccessToken::FacebookAccessToken()
+	{
+		expirationDate = Time::zero();
+		refreshDate = Time::zero();
+	}
+
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FacebookLoginResult)
+	
+	FacebookLoginResult::FacebookLoginResult()
+	{
+		flagError = sl_true;
+		flagCancel = sl_false;
+	}
+
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FacebookLoginParam)
+	
+	FacebookLoginParam::FacebookLoginParam()
+	{
+	}
+
+
 	void Facebook::loginWithReadPermissions(const Function<void(FacebookLoginResult&)>& callback)
 	{
 		FacebookLoginParam param;
@@ -46,7 +71,7 @@ namespace slib
 	void Facebook::login(const FacebookLoginParam& param)
 	{
 		FacebookLoginResult result;
-		callback(result);
+		param.onComplete(result);
 	}
 	
 #endif

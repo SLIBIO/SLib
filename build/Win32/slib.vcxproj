@@ -231,6 +231,11 @@
     <ClCompile Include="..\..\src\slib\render\render_resource.cpp" />
     <ClCompile Include="..\..\src\slib\render\texture.cpp" />
     <ClCompile Include="..\..\src\slib\render\vertex_buffer.cpp" />
+    <ClCompile Include="..\..\src\slib\social\facebook.cpp" />
+    <ClCompile Include="..\..\src\slib\social\oauth.cpp" />
+    <ClCompile Include="..\..\src\slib\social\oauth_login.cpp" />
+    <ClCompile Include="..\..\src\slib\social\twitter.cpp" />
+    <ClCompile Include="..\..\src\slib\social\twitter_login.cpp" />
     <ClCompile Include="..\..\src\slib\ui\button.cpp" />
     <ClCompile Include="..\..\src\slib\ui\button_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\camera_view.cpp" />
