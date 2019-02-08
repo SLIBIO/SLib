@@ -26,6 +26,8 @@
 #include "definition.h"
 
 #include "cpp.h"
+#include "compare.h"
+#include "hash.h"
 
 namespace slib
 {
@@ -59,6 +61,34 @@ namespace slib
 		SLIB_INLINE Pair& operator=(Pair&& other)
 		 = default;
 
+	};
+	
+	template <class FIRST_T, class SECOND_T>
+	class Compare< Pair<FIRST_T, SECOND_T> >
+	{
+	public:
+		int operator()(const Pair<FIRST_T, SECOND_T>& a, const Pair<FIRST_T, SECOND_T>& b) const noexcept
+		{
+			int ret = Compare<FIRST_T>()(a.first, b.first);
+			if (ret) {
+				return ret;
+			}
+			return Compare<SECOND_T>()(a.second, b.second);
+		}
+	};
+	
+	template <class FIRST_T, class SECOND_T>
+	class Hash< Pair<FIRST_T, SECOND_T> >
+	{
+	public:
+		constexpr sl_size operator()(const Pair<FIRST_T, SECOND_T>& pair) const noexcept
+		{
+#ifdef SLIB_ARCH_IS_64BIT
+			return SLIB_MAKE_QWORD4(Rehash64To32(Hash<FIRST_T>()(pair.first)), Rehash64To32(Hash<SECOND_T>()(pair.second)));
+#else
+			return Rehash64ToSize(SLIB_MAKE_QWORD4(Hash<FIRST_T>()(pair.first), Hash<SECOND_T>()(pair.second)));
+#endif
+		}
 	};
 
 }
