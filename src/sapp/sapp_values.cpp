@@ -500,7 +500,7 @@ namespace slib
 		if (!flagDefined) {
 			return sl_true;
 		}
-		if (unit == FILL || unit == WRAP) {
+		if (unit == WRAP) {
 			return sl_true;
 		}
 		return amount >= 0;
@@ -548,10 +548,10 @@ namespace slib
 		if (!flagDefined) {
 			return sl_true;
 		}
-		if (unit == FILL || unit == WRAP) {
+		if (unit == WRAP) {
 			return sl_true;
 		}
-		if (unit == WEIGHT || isGlobalUnit(unit)) {
+		if (unit == WEIGHT || unit == FILL || isGlobalUnit(unit)) {
 			return amount >= 0;
 		}
 		return sl_false;

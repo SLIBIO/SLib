@@ -93,7 +93,6 @@ namespace slib
 		sl_bool flagHorizontalLayout = m_orientation == LayoutOrientation::Horizontal;
 		
 		sl_ui_pos sizeSum = 0;
-		sl_uint32 countAbsoluteFill = 0;
 		sl_uint32 countFill = 0;
 		sl_real sumFillWeights = 0;
 
@@ -114,13 +113,8 @@ namespace slib
 					if (child->getWidthMode() != SizeMode::Filling) {
 						sizeSum += child->getLayoutWidth();
 					} else {
-						sl_real weight = child->getWidthWeight();
-						if (weight < 0) {
-							countAbsoluteFill++;
-						} else {
-							countFill++;
-							sumFillWeights += weight;
-						}
+						countFill++;
+						sumFillWeights += child->getWidthWeight();
 					}
 					sizeSum += child->getMarginRight();
 				} else {
@@ -128,65 +122,10 @@ namespace slib
 					if (child->getHeightMode() != SizeMode::Filling) {
 						sizeSum += child->getLayoutHeight();
 					} else {
-						sl_real weight = child->getHeightWeight();
-						if (weight < 0) {
-							countAbsoluteFill++;
-						} else {
-							countFill++;
-							sumFillWeights += weight;
-						}
+						countFill++;
+						sumFillWeights += child->getHeightWeight();
 					}
 					sizeSum += child->getMarginBottom();
-				}
-			}
-		}
-		
-		if (sizeSum < 0) {
-			sizeSum = 0;
-		}
-		
-		if (countAbsoluteFill > 0) {
-			sl_ui_pos remainedSize;
-			if (flagHorizontalLayout) {
-				sl_ui_len n = widthContainer;
-				if (n > (sl_ui_len)sizeSum) {
-					remainedSize = n - sizeSum;
-				} else {
-					remainedSize = 0;
-				}
-			} else {
-				sl_ui_len n = heightContainer;
-				if (n > (sl_ui_len)sizeSum) {
-					remainedSize = n - sizeSum;
-				} else {
-					remainedSize = 0;
-				}
-			}
-			if (remainedSize < 0) {
-				remainedSize = 0;
-			}
-			for (i = 0; i < children.count; i++) {
-				Ref<View>& child = children[i];
-				if (child->getVisibility() != Visibility::Gone) {
-					if (flagHorizontalLayout) {
-						if (child->getWidthMode() == SizeMode::Filling) {
-							sl_real weight = child->getWidthWeight();
-							if (weight < 0) {
-								sl_ui_pos width = (sl_ui_pos)((sl_real)(remainedSize) * -weight);
-								sizeSum += width;
-								child->setLayoutWidth(width);
-							}
-						}
-					} else {
-						if (child->getHeightMode() == SizeMode::Filling) {
-							sl_real weight = child->getHeightWeight();
-							if (weight < 0) {
-								sl_ui_pos height = (sl_ui_pos)((sl_real)(remainedSize) * -weight);
-								sizeSum += height;
-								child->setLayoutHeight(height);
-							}
-						}
-					}
 				}
 			}
 		}
@@ -224,17 +163,17 @@ namespace slib
 				if (child->getVisibility() != Visibility::Gone) {
 					if (flagHorizontalLayout) {
 						if (child->getWidthMode() == SizeMode::Filling) {
-							sl_real weight = child->getWidthWeight();
-							if (weight >= 0) {
-								child->setLayoutWidth((sl_ui_len)(remainedSize * weight / sumFillWeights));
-							}
+							sl_ui_len width = (sl_ui_len)(remainedSize * child->getWidthWeight() / sumFillWeights);
+							sl_ui_len height = child->getLayoutHeight();
+							child->_restrictSize(width, height);
+							child->setLayoutSize(width, height);
 						}
 					} else {
 						if (child->getHeightMode() == SizeMode::Filling) {
-							sl_real weight = child->getHeightWeight();
-							if (weight >= 0) {
-								child->setLayoutHeight((sl_ui_len)(remainedSize * weight / sumFillWeights));
-							}
+							sl_ui_len width = getLayoutWidth();
+							sl_ui_len height = (sl_ui_len)(remainedSize * child->getHeightWeight() / sumFillWeights);
+							child->_restrictSize(width, height);
+							child->setLayoutSize(width, height);
 						}
 					}
 				}
@@ -257,7 +196,6 @@ namespace slib
 					pos += child->getMarginLeft();
 					frame.left = pos;
 					frame.right = pos + width;
-					child->_restrictSize(frame);
 					child->setLayoutFrame(frame);
 					pos += width;
 					pos += child->getMarginRight();
@@ -267,7 +205,6 @@ namespace slib
 					pos += child->getMarginTop();
 					frame.top = pos;
 					frame.bottom = pos + height;
-					child->_restrictSize(frame);
 					child->setLayoutFrame(frame);
 					pos += height;
 					pos += child->getMarginBottom();

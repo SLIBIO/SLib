@@ -811,7 +811,7 @@ namespace slib
 					switch (mode) {
 						case SizeMode::Filling:
 						case SizeMode::Weight:
-							width = (sl_ui_len)((sl_real)widthList * Math::abs(itemView->getWidthWeight()));
+							width = (sl_ui_len)((sl_real)widthList * itemView->getWidthWeight());
 							break;
 						case SizeMode::Wrapping:
 							_updateChildLayout(itemView.get());
@@ -863,7 +863,7 @@ namespace slib
 					switch (mode) {
 						case SizeMode::Filling:
 						case SizeMode::Weight:
-							ret = (sl_ui_len)((sl_real)heightList * Math::abs(itemView->getHeightWeight()));
+							ret = (sl_ui_len)((sl_real)heightList * itemView->getHeightWeight());
 							break;
 						case SizeMode::Wrapping:
 							_updateChildLayout(itemView.get());

@@ -1966,7 +1966,7 @@ namespace slib
 			switch (widthMode) {
 				case SizeMode::Filling:
 				case SizeMode::Weight:
-					width = (sl_ui_pos)((sl_real)parentWidth * Math::abs(layoutAttrs->widthWeight));
+					width = (sl_ui_pos)((sl_real)parentWidth * layoutAttrs->widthWeight);
 					break;
 				default:
 					break;
@@ -1975,7 +1975,7 @@ namespace slib
 			switch (heightMode) {
 				case SizeMode::Filling:
 				case SizeMode::Weight:
-					height = (sl_ui_pos)((sl_real)parentHeight * Math::abs(layoutAttrs->heightWeight));
+					height = (sl_ui_pos)((sl_real)parentHeight * layoutAttrs->heightWeight);
 					break;
 				default:
 					break;
@@ -2914,6 +2914,9 @@ namespace slib
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->widthMode = SizeMode::Filling;
+			if (weight < 0) {
+				weight = 0;
+			}
 			attrs->widthWeight = weight;
 			if (attrs->leftMode == PositionMode::Free) {
 				attrs->leftMode = PositionMode::ParentEdge;
@@ -2940,6 +2943,9 @@ namespace slib
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->heightMode = SizeMode::Filling;
+			if (weight < 0) {
+				weight = 0;
+			}
 			attrs->heightWeight = weight;
 			if (attrs->topMode == PositionMode::Free) {
 				attrs->topMode = PositionMode::ParentEdge;
@@ -3004,6 +3010,9 @@ namespace slib
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->widthMode = SizeMode::Weight;
+			if (weight < 0) {
+				weight = 0;
+			}
 			attrs->widthWeight = weight;
 			invalidateParentLayout(mode);
 		}
@@ -3024,6 +3033,9 @@ namespace slib
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
 		if (attrs.isNotNull()) {
 			attrs->heightMode = SizeMode::Weight;
+			if (weight < 0) {
+				weight = 0;
+			}
 			attrs->heightWeight = weight;
 			invalidateParentLayout(mode);
 		}
