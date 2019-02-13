@@ -257,6 +257,7 @@ namespace slib
 					pos += child->getMarginLeft();
 					frame.left = pos;
 					frame.right = pos + width;
+					child->_restrictSize(frame);
 					child->setLayoutFrame(frame);
 					pos += width;
 					pos += child->getMarginRight();
@@ -266,6 +267,7 @@ namespace slib
 					pos += child->getMarginTop();
 					frame.top = pos;
 					frame.bottom = pos + height;
+					child->_restrictSize(frame);
 					child->setLayoutFrame(frame);
 					pos += height;
 					pos += child->getMarginBottom();

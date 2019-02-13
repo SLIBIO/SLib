@@ -1711,6 +1711,7 @@ namespace slib
 
 		friend class ViewInstance;
 		friend class ListView;
+		friend class LinearView;
 
 	};
 
