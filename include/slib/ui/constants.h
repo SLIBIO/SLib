@@ -243,9 +243,10 @@ namespace slib
 	
 	enum class BoundShape
 	{
-		Rectangle = 0,
-		Ellipse = 1,
-		RoundRect = 2,
+		None = 0,
+		Rectangle = 1,
+		Ellipse = 2,
+		RoundRect = 3,
 		Path = 10
 	};
 	

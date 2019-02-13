@@ -282,7 +282,11 @@ namespace slib
 		SAppBoundShapeValue boundShape;
 		SAppDimensionFloatValue boundRadiusX;
 		SAppDimensionFloatValue boundRadiusY;
-		SAppDimensionValue boundRadius;
+		SAppDimensionFloatValue boundRadius;
+		SAppBoundShapeValue contentShape;
+		SAppDimensionFloatValue contentRadiusX;
+		SAppDimensionFloatValue contentRadiusY;
+		SAppDimensionFloatValue contentRadius;
 		
 		SAppStringValue fontFamily;
 		SAppDimensionFloatValue fontSize;

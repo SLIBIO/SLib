@@ -2100,43 +2100,26 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(drawing, setDrawing)
 
 		if (flagView) {
+			if (flagRoot) {
+				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadius, setBoundRadius, checkForRootViewScalarSize)
+				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadiusX, setBoundRadiusX, checkForRootViewScalarSize)
+				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadiusY, setBoundRadiusY, checkForRootViewScalarSize)
+			} else {
+				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadius, setBoundRadius, checkScalarSize)
+				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadiusX, setBoundRadiusX, checkScalarSize)
+				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadiusY, setBoundRadiusY, checkScalarSize)
+			}
 			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(boundShape, setBoundShape)
 			if (flagRoot) {
-				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadiusX, setRoundRectBoundShapeRadiusX, checkForRootViewScalarSize)
-				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadiusY, setRoundRectBoundShapeRadiusY, checkForRootViewScalarSize)
+				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(contentRadius, setContentRadius, checkForRootViewScalarSize)
+				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(contentRadiusX, setContentRadiusX, checkForRootViewScalarSize)
+				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(contentRadiusY, setContentRadiusY, checkForRootViewScalarSize)
 			} else {
-				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadiusX, setRoundRectBoundShapeRadiusX, checkScalarSize)
-				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadiusY, setRoundRectBoundShapeRadiusY, checkScalarSize)
+				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(contentRadius, setContentRadius, checkScalarSize)
+				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(contentRadiusX, setContentRadiusX, checkScalarSize)
+				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(contentRadiusY, setContentRadiusY, checkScalarSize)
 			}
-			if (op == OP_PARSE) {
-				SAppDimensionFloatValue boundRadius;
-				LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, boundRadius)
-				if (flagRoot) {
-					if (!(boundRadius.checkForRootViewScalarSize())) {
-						LOG_ERROR_LAYOUT_CONTROL_ATTR(boundRadius)
-						return sl_false;
-					}
-				} else {
-					if (!(boundRadius.checkScalarSize())) {
-						LOG_ERROR_LAYOUT_CONTROL_ATTR(boundRadius)
-						return sl_false;
-					}
-				}
-				if (boundRadius.flagDefined) {
-					if (!(attr->boundRadiusX.flagDefined)) {
-						attr->boundRadiusX = boundRadius;
-					}
-					if (!(attr->boundRadiusY.flagDefined)) {
-						attr->boundRadiusY = boundRadius;
-					}
-				}
-				if (attr->boundRadiusX.flagDefined && attr->boundRadiusY.flagDefined) {
-					if (!(attr->boundShape.flagDefined)) {
-						attr->boundShape.flagDefined = sl_true;
-						attr->boundShape.value = BoundShape::RoundRect;
-					}
-				}
-			}
+			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(contentShape, setContentShape)
 		}
 
 		if (op == OP_PARSE) {

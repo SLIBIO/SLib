@@ -1882,16 +1882,18 @@ namespace slib
 	************************************************/
 
 	SAppBoundShapeValue::SAppBoundShapeValue()
-	: flagDefined(sl_false), value(BoundShape::Rectangle)
+	: flagDefined(sl_false), value(BoundShape::None)
 	{
 	}
 
 	String SAppBoundShapeValue::getAccessString()
 	{
 		if (!flagDefined) {
-			return "slib::BoundShape::Rectangle";
+			return "slib::BoundShape::None";
 		}
 		switch (value) {
+			case BoundShape::Rectangle:
+				return "slib::BoundShape::Rectangle";
 			case BoundShape::Ellipse:
 				return "slib::BoundShape::Ellipse";
 			case BoundShape::RoundRect:
@@ -1910,7 +1912,11 @@ namespace slib
 			return sl_true;
 		}
 		str = str.toLower();
-		if (str == "rectangle") {
+		if (str == "none") {
+			value = BoundShape::None;
+			flagDefined = sl_true;
+			return sl_true;
+		} else if (str == "rectangle") {
 			value = BoundShape::Rectangle;
 			flagDefined = sl_true;
 			return sl_true;

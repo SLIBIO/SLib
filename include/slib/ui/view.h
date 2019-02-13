@@ -711,21 +711,41 @@ namespace slib
 		
 		void setBoundShape(BoundShape shape, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		const Size& getRoundRectBoundShapeRadius();
+		const Size& getBoundRadius();
 		
-		void setRoundRectBoundShapeRadius(const Size& radius, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setBoundRadius(const Size& radius, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void setRoundRectBoundShapeRadius(sl_real rx, sl_real ry, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setBoundRadius(sl_real rx, sl_real ry, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void setRoundRectBoundShapeRadiusX(sl_real rx, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setBoundRadiusX(sl_real rx, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void setRoundRectBoundShapeRadiusY(sl_real ry, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setBoundRadiusY(sl_real ry, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void setRoundRectBoundShapeRadius(sl_real radius, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setBoundRadius(sl_real radius, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		Ref<GraphicsPath> getBoundShapePath();
+		Ref<GraphicsPath> getBoundPath();
 		
-		void setBoundShapePath(const Ref<GraphicsPath>& path, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setBoundPath(const Ref<GraphicsPath>& path, UIUpdateMode mode = UIUpdateMode::Redraw);
+
+		BoundShape getContentShape();
+		
+		void setContentShape(BoundShape shape, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		const Size& getContentRadius();
+		
+		void setContentRadius(const Size& radius, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void setContentRadius(sl_real rx, sl_real ry, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void setContentRadiusX(sl_real rx, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void setContentRadiusY(sl_real ry, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void setContentRadius(sl_real radius, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		Ref<GraphicsPath> getContentBoundPath();
+		
+		void setContentBoundPath(const Ref<GraphicsPath>& path, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 		
 		sl_bool isPreDrawEnabled();
@@ -1137,6 +1157,8 @@ namespace slib
 		
 		void clipBounds(Canvas* canvas);
 		
+		void clipContentBounds(Canvas* canvas);
+		
 		virtual Size measureText(const String& size, const Ref<Font>& font, sl_bool flagMultiLine = sl_false);
 		
 		
@@ -1492,9 +1514,13 @@ namespace slib
 			Color borderColor;
 			
 			BoundShape boundShape;
-			Size roundRectBoundShapeRadius;
-			AtomicRef<GraphicsPath> boundShapePath;
+			Size boundRadius;
+			AtomicRef<GraphicsPath> boundPath;
 			
+			BoundShape contentShape;
+			Size contentRadius;
+			AtomicRef<GraphicsPath> contentBoundPath;
+
 			sl_bool flagPreDrawEnabled;
 			sl_bool flagPostDrawEnabled;
 			sl_bool flagOnDrawBackgroundAlways;

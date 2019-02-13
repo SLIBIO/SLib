@@ -211,9 +211,12 @@ namespace slib
 		backgroundAlignment = Alignment::MiddleCenter;
 		
 		boundShape = BoundShape::Rectangle;
+		boundRadius.x = 5;
+		boundRadius.y = 5;
 		
-		roundRectBoundShapeRadius.x = 5;
-		roundRectBoundShapeRadius.y = 5;
+		contentShape = BoundShape::None;
+		contentRadius.x = 5;
+		contentRadius.y = 5;
 		
 		borderColor = Color::Black;
 		borderStyle = PenStyle::Solid;
@@ -1477,7 +1480,7 @@ namespace slib
 		UIRect rc(0, 0, getWidth(), getHeight());
 		switch (getBoundShape()) {
 			case BoundShape::RoundRect:
-				return GraphicsUtil::containsPointInRoundRect(Point((sl_real)x, (sl_real)y), rc, getRoundRectBoundShapeRadius());
+				return GraphicsUtil::containsPointInRoundRect(Point((sl_real)x, (sl_real)y), rc, getBoundRadius());
 			case BoundShape::Ellipse:
 				return GraphicsUtil::containsPointInEllipse(Point((sl_real)x, (sl_real)y), rc);
 			default:
@@ -4692,74 +4695,165 @@ namespace slib
 		}
 	}
 
-	const Size& View::getRoundRectBoundShapeRadius()
+	const Size& View::getBoundRadius()
 	{
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
-			return attrs->roundRectBoundShapeRadius;
+			return attrs->boundRadius;
 		}
 		return Size::zero();
 	}
 
-	void View::setRoundRectBoundShapeRadius(const Size& radius, UIUpdateMode mode)
+	void View::setBoundRadius(const Size& radius, UIUpdateMode mode)
 	{
 		_initializeDrawAttributes();
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
-			attrs->roundRectBoundShapeRadius = radius;
+			attrs->boundRadius = radius;
+			if (radius.x > SLIB_EPSILON && radius.y > SLIB_EPSILON) {
+				attrs->boundShape = BoundShape::RoundRect;
+			} else {
+				attrs->boundShape = BoundShape::Rectangle;
+			}
 			invalidate(mode);
 		}
 	}
 
-	void View::setRoundRectBoundShapeRadius(sl_real rx, sl_real ry, UIUpdateMode mode)
+	void View::setBoundRadius(sl_real rx, sl_real ry, UIUpdateMode mode)
 	{
-		setRoundRectBoundShapeRadius(Size(rx, ry), mode);
+		setBoundRadius(Size(rx, ry), mode);
 	}
 
-	void View::setRoundRectBoundShapeRadiusX(sl_real rx, UIUpdateMode mode)
+	void View::setBoundRadiusX(sl_real rx, UIUpdateMode mode)
 	{
-		_initializeDrawAttributes();
-		Ref<DrawAttributes>& attrs = m_drawAttrs;
-		if (attrs.isNotNull()) {
-			attrs->roundRectBoundShapeRadius.x = rx;
-			invalidate(mode);
-		}
+		Size size = getBoundRadius();
+		size.x = rx;
+		setBoundRadius(size, mode);
 	}
 
-	void View::setRoundRectBoundShapeRadiusY(sl_real ry, UIUpdateMode mode)
+	void View::setBoundRadiusY(sl_real ry, UIUpdateMode mode)
 	{
-		_initializeDrawAttributes();
-		Ref<DrawAttributes>& attrs = m_drawAttrs;
-		if (attrs.isNotNull()) {
-			attrs->roundRectBoundShapeRadius.y = ry;
-			invalidate(mode);
-		}
+		Size size = getBoundRadius();
+		size.y = ry;
+		setBoundRadius(size, mode);
 	}
 
-	void View::setRoundRectBoundShapeRadius(sl_real radius, UIUpdateMode mode)
+	void View::setBoundRadius(sl_real radius, UIUpdateMode mode)
 	{
-		setRoundRectBoundShapeRadius(Size(radius, radius), mode);
+		setBoundRadius(Size(radius, radius), mode);
 	}
 
-	Ref<GraphicsPath> View::getBoundShapePath()
+	Ref<GraphicsPath> View::getBoundPath()
 	{
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
-			return attrs->boundShapePath;
+			return attrs->boundPath;
 		}
 		return sl_null;
 	}
 
-	void View::setBoundShapePath(const Ref<GraphicsPath>& path, UIUpdateMode mode)
+	void View::setBoundPath(const Ref<GraphicsPath>& path, UIUpdateMode mode)
 	{
 		_initializeDrawAttributes();
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
-			attrs->boundShapePath = path;
+			attrs->boundPath = path;
+			if (path.isNotNull()) {
+				attrs->boundShape = BoundShape::Path;
+			}
 			invalidate(mode);
 		}
 	}
 
+	BoundShape View::getContentShape()
+	{
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->contentShape;
+		}
+		return BoundShape::None;
+	}
+	
+	void View::setContentShape(BoundShape shape, UIUpdateMode mode)
+	{
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			attrs->contentShape = shape;
+			invalidate(mode);
+		}
+	}
+	
+	const Size& View::getContentRadius()
+	{
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->contentRadius;
+		}
+		return Size::zero();
+	}
+	
+	void View::setContentRadius(const Size& radius, UIUpdateMode mode)
+	{
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			attrs->contentRadius = radius;
+			if (radius.x > SLIB_EPSILON && radius.y > SLIB_EPSILON) {
+				attrs->contentShape = BoundShape::RoundRect;
+			} else {
+				attrs->contentShape = BoundShape::Rectangle;
+			}
+			invalidate(mode);
+		}
+	}
+	
+	void View::setContentRadius(sl_real rx, sl_real ry, UIUpdateMode mode)
+	{
+		setContentRadius(Size(rx, ry), mode);
+	}
+	
+	void View::setContentRadiusX(sl_real rx, UIUpdateMode mode)
+	{
+		Size size = getContentRadius();
+		size.x = rx;
+		setContentRadius(size, mode);
+	}
+	
+	void View::setContentRadiusY(sl_real ry, UIUpdateMode mode)
+	{
+		Size size = getContentRadius();
+		size.y = ry;
+		setContentRadius(size, mode);
+	}
+	
+	void View::setContentRadius(sl_real radius, UIUpdateMode mode)
+	{
+		setContentRadius(Size(radius, radius), mode);
+	}
+	
+	Ref<GraphicsPath> View::getContentBoundPath()
+	{
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->contentBoundPath;
+		}
+		return sl_null;
+	}
+	
+	void View::setContentBoundPath(const Ref<GraphicsPath>& path, UIUpdateMode mode)
+	{
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			attrs->contentBoundPath = path;
+			if (path.isNotNull()) {
+				attrs->contentShape = BoundShape::Path;
+			}
+			invalidate(mode);
+		}
+	}
+	
 	sl_bool View::isPreDrawEnabled()
 	{
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
@@ -6697,13 +6791,32 @@ namespace slib
 		UIRect rc(0, 0, m_frame.getWidth(), m_frame.getHeight());
 		if (pen.isNotNull()) {
 			switch (getBoundShape()) {
+				case BoundShape::Rectangle:
+					{
+						if (isInstance()) {
+#ifndef SLIB_PLATFORM_IS_WIN32
+							rc.right -= 1;
+#endif
+#ifdef SLIB_PLATFORM_IS_APPLE
+							rc.top += 1;
+#else
+							rc.bottom -= 1;
+#endif
+						}
+						rc.fixSizeError();
+						sl_bool flagAntiAlias = canvas->isAntiAlias();
+						canvas->setAntiAlias(sl_false);
+						canvas->drawRectangle(rc, pen);
+						canvas->setAntiAlias(flagAntiAlias);
+						break;
+					}
 				case BoundShape::RoundRect:
 					rc.left += 1;
 					rc.top += 1;
 					rc.right -= 2;
 					rc.bottom -= 2;
 					rc.fixSizeError();
-					canvas->drawRoundRect(rc, getRoundRectBoundShapeRadius(), pen);
+					canvas->drawRoundRect(rc, getBoundRadius(), pen);
 					break;
 				case BoundShape::Ellipse:
 					rc.left += 1;
@@ -6714,25 +6827,9 @@ namespace slib
 					canvas->drawEllipse(rc, pen);
 					break;
 				case BoundShape::Path:
-					canvas->drawPath(getBoundShapePath(), pen);
+					canvas->drawPath(getBoundPath(), pen);
 					break;
-				case BoundShape::Rectangle:
 				default:
-					if (isInstance()) {
-#ifndef SLIB_PLATFORM_IS_WIN32
-						rc.right -= 1;
-#endif
-#ifdef SLIB_PLATFORM_IS_APPLE
-						rc.top += 1;
-#else
-						rc.bottom -= 1;
-#endif
-					}
-					rc.fixSizeError();
-					sl_bool flagAntiAlias = canvas->isAntiAlias();
-					canvas->setAntiAlias(sl_false);
-					canvas->drawRectangle(rc, pen);
-					canvas->setAntiAlias(flagAntiAlias);
 					break;
 			}
 		}
@@ -6895,7 +6992,7 @@ namespace slib
 		Ref<DrawAttributes>& drawAttrs = m_drawAttrs;
 		Ref<ScrollAttributes>& scrollAttrs = m_scrollAttrs;
 	
-		if (m_flagSavingCanvasState || scrollAttrs.isNotNull()) {
+		if (m_flagSavingCanvasState || scrollAttrs.isNotNull() || getContentShape() != BoundShape::None) {
 			CanvasStateScope scope(canvas);
 			if (drawAttrs.isNotNull()) {
 				if (drawAttrs->flagOnDrawBackgroundAlways || drawAttrs->background.isNotNull()) {
@@ -6909,6 +7006,7 @@ namespace slib
 					canvas->translate(-scrollX, -scrollY);
 				}
 			}
+			clipContentBounds(canvas);
 			SLIB_INVOKE_EVENT_HANDLER(Draw, canvas)
 		} else {
 			if (drawAttrs.isNotNull()) {
@@ -6989,7 +7087,7 @@ namespace slib
 			bitmap->resetPixels((sl_uint32)(rc.left), (sl_uint32)(rc.top), (sl_uint32)(rc.getWidth()), (sl_uint32)(rc.getHeight()), Color::zero());
 		} while (0);
 
-		if (m_flagClipping && drawAttrs->boundShape != BoundShape::Rectangle) {
+		if (m_flagClipping && (drawAttrs->boundShape != BoundShape::Rectangle && drawAttrs->boundShape != BoundShape::None)) {
 			CanvasStateScope scope(canvas);
 			clipBounds(canvas.get());
 			drawContent(canvas.get());
@@ -7011,8 +7109,8 @@ namespace slib
 				return;
 			}
 		}
-		
-		if (m_flagClipping) {
+		BoundShape boundShape = getBoundShape();
+		if (m_flagClipping && boundShape != BoundShape::None) {
 			CanvasStateScope scope(canvas);
 			clipBounds(canvas);
 			drawContent(canvas);
@@ -7023,25 +7121,46 @@ namespace slib
 	
 	void View::clipBounds(Canvas* canvas)
 	{
-		Rectangle rcClip(0, 0, (sl_real)(m_frame.getWidth()), (sl_real)(m_frame.getHeight()));
+		Rectangle rcClip = getBounds();
 		switch (getBoundShape()) {
 			case BoundShape::Rectangle:
 				canvas->clipToRectangle(rcClip);
 				break;
 			case BoundShape::RoundRect:
-				canvas->clipToRoundRect(rcClip, getRoundRectBoundShapeRadius());
+				canvas->clipToRoundRect(rcClip, getBoundRadius());
 				break;
 			case BoundShape::Ellipse:
 				canvas->clipToEllipse(rcClip);
 				break;
 			case BoundShape::Path:
-				canvas->clipToPath(getBoundShapePath());
+				canvas->clipToPath(getBoundPath());
 				break;
 			default:
 				break;
 		}
 	}
 
+	void View::clipContentBounds(Canvas* canvas)
+	{
+		Rectangle rcClip = getBoundsInnerPadding();
+		switch (getContentShape()) {
+			case BoundShape::Rectangle:
+				canvas->clipToRectangle(rcClip);
+				break;
+			case BoundShape::RoundRect:
+				canvas->clipToRoundRect(rcClip, getContentRadius());
+				break;
+			case BoundShape::Ellipse:
+				canvas->clipToEllipse(rcClip);
+				break;
+			case BoundShape::Path:
+				canvas->clipToPath(getContentBoundPath());
+				break;
+			default:
+				break;
+		}
+	}
+	
 	Size View::measureText(const String& text, const Ref<Font>& _font, sl_bool flagMultiLine)
 	{
 		if (!(isInstance())) {
@@ -7331,7 +7450,7 @@ namespace slib
 				if (m_children.isNotNull()) {
 					ListElements< Ref<View> > children(getChildren());
 					if (children.count > 0) {
-						if (m_flagClipping) {
+						if (m_flagClipping && drawAttrs->boundShape != BoundShape::None) {
 							CanvasStateScope scope(canvas);
 							clipBounds(canvas);
 							drawChildren(canvas, children.data, children.count);
