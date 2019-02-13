@@ -823,12 +823,7 @@ namespace slib
 					}
 				}
 				width = Math::clamp(width, layoutAttrs->minWidth, layoutAttrs->maxWidth);
-				if (layoutAttrs->flagRelativeMarginLeft) {
-					layoutAttrs->marginLeft = (sl_ui_pos)((sl_real)widthList * layoutAttrs->relativeMarginLeftWeight);
-				}
-				if (layoutAttrs->flagRelativeMarginRight) {
-					layoutAttrs->marginRight = (sl_ui_pos)((sl_real)widthList * layoutAttrs->relativeMarginRightWeight);
-				}
+				layoutAttrs->applyMarginWeightsX(widthList);
 				if (layoutAttrs->leftMode == PositionMode::Free && layoutAttrs->rightMode == PositionMode::ParentEdge) {
 					right = widthList - layoutAttrs->marginRight;
 					left = right - width;
@@ -879,12 +874,7 @@ namespace slib
 							break;
 					}
 					ret = Math::clamp(ret, layoutAttrs->minHeight, layoutAttrs->maxHeight);
-					if (layoutAttrs->flagRelativeMarginTop) {
-						layoutAttrs->marginTop = (sl_ui_pos)((sl_real)heightList * layoutAttrs->relativeMarginTopWeight);
-					}
-					if (layoutAttrs->flagRelativeMarginBottom) {
-						layoutAttrs->marginBottom = (sl_ui_pos)((sl_real)heightList * layoutAttrs->relativeMarginBottomWeight);
-					}
+					layoutAttrs->applyMarginWeightsY(heightList);
 					ret += layoutAttrs->marginTop + layoutAttrs->marginBottom;
 				}
 			}

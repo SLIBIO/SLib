@@ -512,52 +512,33 @@ namespace slib
 		
 		void setMargin(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		sl_bool isRelativeMarginLeft();
+		UIEdgeInsets getMargin();
 		
-		sl_real getRelativeMarginLeftWeight();
+		void setMargin(const UIEdgeInsets& margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setRelativeMarginLeft(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		sl_bool isMarginLeftFixed();
 		
-		sl_ui_pos getAbsoluteMarginLeft();
+		sl_real getMarginLeftWeight();
 		
-		void setAbsoluteMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		void setMarginLeftWeight(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
-		sl_bool isRelativeMarginTop();
+		sl_bool isMarginTopFixed();
 		
-		sl_real getRelativeMarginTopWeight();
+		sl_real getMarginTopWeight();
 		
-		void setRelativeMarginTop(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		void setMarginTopWeight(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		sl_ui_pos getAbsoluteMarginTop();
+		sl_bool isMarginRightFixed();
 
-		void setAbsoluteMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		sl_real getMarginRightWeight();
 		
-		sl_bool isRelativeMarginRight();
-
-		sl_real getRelativeMarginRightWeight();
+		void setMarginRightWeight(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setRelativeMarginRight(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		sl_bool isMarginBottomFixed();
 		
-		sl_ui_pos getAbsoluteMarginRight();
-
-		void setAbsoluteMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
-
-		sl_bool isRelativeMarginBottom();
+		sl_real getMarginBottomWeight();
 		
-		sl_real getRelativeMarginBottomWeight();
-		
-		void setRelativeMarginBottom(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
-		
-		sl_ui_pos getAbsoluteMarginBottom();
-
-		void setAbsoluteMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
-		
-		void applyRelativeMargins(sl_ui_len parentWidth, sl_ui_len parentHeight);
-		
-		
-		sl_bool isUsingChildLayouts();
-		
-		void setUsingChildLayouts(sl_bool flag);
+		void setMarginBottomWeight(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		
 		sl_ui_pos getPaddingLeft();
@@ -579,6 +560,39 @@ namespace slib
 		void setPadding(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		void setPadding(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		
+		UIEdgeInsets getPadding();
+		
+		void setPadding(const UIEdgeInsets& padding, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		
+		sl_bool isPaddingLeftFixed();
+		
+		sl_real getPaddingLeftWeight();
+		
+		void setPaddingLeftWeight(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		
+		sl_bool isPaddingTopFixed();
+		
+		sl_real getPaddingTopWeight();
+		
+		void setPaddingTopWeight(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		
+		sl_bool isPaddingRightFixed();
+		
+		sl_real getPaddingRightWeight();
+		
+		void setPaddingRightWeight(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		
+		sl_bool isPaddingBottomFixed();
+		
+		sl_real getPaddingBottomWeight();
+		
+		void setPaddingBottomWeight(sl_real weight, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		
+		
+		sl_bool isUsingChildLayouts();
+		
+		void setUsingChildLayouts(sl_bool flag);
 		
 		
 		sl_bool getFinalTransform(Matrix3* _out);
@@ -747,14 +761,6 @@ namespace slib
 		
 		void setContentBoundPath(const Ref<GraphicsPath>& path, UIUpdateMode mode = UIUpdateMode::Redraw);
 
-		
-		sl_bool isPreDrawEnabled();
-		
-		void setPreDrawEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		sl_bool isPostDrawEnabled();
-		
-		void setPostDrawEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		sl_bool isAlwaysOnDrawBackground();
 		
@@ -1210,8 +1216,8 @@ namespace slib
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Detach)
 		
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Draw, Canvas* canvas)
-		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_DISPATCH(View, PreDraw, Canvas* canvas)
-		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_DISPATCH(View, PostDraw, Canvas* canvas)
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_ON(View, PreDraw, Canvas* canvas)
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_ON(View, PostDraw, Canvas* canvas)
 
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, MouseEvent, UIEvent* ev)
 		sl_bool dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* children, sl_size count);
@@ -1236,8 +1242,7 @@ namespace slib
 		sl_bool dispatchSetCursorToChildren(UIEvent* ev, const Ref<View>* children, sl_size count);
 		void dispatchSetCursorToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints = sl_true);
 		
-		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, SetFocus)
-		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, KillFocus)
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, ChangeFocus, sl_bool flagFocused)
 
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Resize, sl_ui_len width, sl_ui_len height)
 		
@@ -1288,9 +1293,9 @@ namespace slib
 
 		void _updateAndApplyLayout();
 		
-		sl_ui_len _measureLayoutWrappingSize_Horz(View* view, Pair<sl_ui_len, sl_ui_len>& insets, HashMap< View*, Pair<sl_ui_len, sl_ui_len> >& map);
+		sl_ui_len _measureLayoutWrappingSize_Horz(View* view, Pair<sl_ui_len, sl_ui_len>& insets, HashMap< View*, Pair<sl_ui_len, sl_ui_len> >& map, sl_ui_pos paddingLeft, sl_ui_pos paddingRight);
 		
-		sl_ui_len _measureLayoutWrappingSize_Vert(View* view, Pair<sl_ui_len, sl_ui_len>& insets, HashMap< View*, Pair<sl_ui_len, sl_ui_len> >& map);
+		sl_ui_len _measureLayoutWrappingSize_Vert(View* view, Pair<sl_ui_len, sl_ui_len>& insets, HashMap< View*, Pair<sl_ui_len, sl_ui_len> >& map, sl_ui_pos paddingTop, sl_ui_pos paddingBottom);
 
 		void _applyCalcTransform(UIUpdateMode mode);
 		
@@ -1349,66 +1354,53 @@ namespace slib
 		AtomicWeakRef<Window> m_window;
 		AtomicWeakRef<View> m_parent;
 		
-		sl_bool m_flagCreatingInstance;
-		sl_bool m_flagCreatingChildInstances;
-		sl_bool m_flagCreatingNativeWidget;
-		UIAttachMode m_attachMode;
+		sl_bool m_flagCreatingInstance : 1;
+		sl_bool m_flagCreatingChildInstances : 1;
+		sl_bool m_flagCreatingNativeWidget : 1;
+		sl_bool m_flagUsingChildLayouts : 1;
+		sl_bool m_flagEnabled : 1;
+		sl_bool m_flagHitTestable : 1;
+		sl_bool m_flagFocusable : 1;
+		sl_bool m_flagInstanceLayer : 1;
+		sl_bool m_flagClipping : 1;
+		sl_bool m_flagDrawing : 1;
+		sl_bool m_flagSavingCanvasState : 1;
+		sl_bool m_flagOkCancelEnabled : 1;
+		sl_bool m_flagTabStopEnabled : 1;
 		
-		UIRect m_frame;
-		UIRect m_boundsInParent;
-		sl_bool m_flagInvalidLayout;
-		sl_bool m_flagNeedApplyLayout;
-		sl_bool m_flagUsingChildLayouts;
-		sl_ui_pos m_paddingLeft;
-		sl_ui_pos m_paddingTop;
-		sl_ui_pos m_paddingRight;
-		sl_ui_pos m_paddingBottom;
-		
-		Visibility m_visibility;
-		sl_bool m_flagEnabled;
-		sl_bool m_flagHitTestable;
-		sl_bool m_flagFocusable;
-		sl_bool m_flagInstanceLayer;
-		sl_bool m_flagClipping;
-		sl_bool m_flagDrawing;
-		sl_bool m_flagSavingCanvasState;
-
-		sl_bool m_flagFocused;
-		sl_bool m_flagPressed;
-		sl_bool m_flagHover;
-		
-		sl_bool m_flagCurrentDrawing;
-		UIRect m_rectCurrentDrawing;
-		
-		AtomicRef<Cursor> m_cursor;
+		sl_bool m_flagInvalidLayout : 1;
+		sl_bool m_flagNeedApplyLayout : 1;
+		sl_bool m_flagCurrentDrawing : 1;
+		sl_bool m_flagFocused : 1;
+		sl_bool m_flagPressed : 1;
+		sl_bool m_flagHover : 1;
 		
 		AtomicString m_id;
-		AtomicList< Ref<View> > m_children;
-		AtomicList< Ref<View> > m_childrenCache;
-		List< Ref<View> > m_childrenMultiTouch;
-		AtomicRef<View> m_childMouseMove;
-		AtomicRef<View> m_childMouseDown;
+		UIAttachMode m_attachMode;
+		Visibility m_visibility;
+
+		UIRect m_frame;
+		UIRect m_boundsInParent;
+		UIRect m_rectCurrentDrawing;
+		
 		UIAction m_actionMouseDown;
-		sl_bool m_flagTouchMultipleChildren;
-		sl_bool m_flagPassEventToChildren;
-		AtomicRef<View> m_childFocused;
 		AtomicRef<UIEvent> m_currentEvent;
-		
-		sl_bool m_flagOkCancelEnabled;
-		sl_bool m_flagTabStopEnabled;
-		AtomicWeakRef<View> m_viewNextTabStop;
-		AtomicWeakRef<View> m_viewPrevTabStop;
-		AtomicFunction<sl_bool(const UIPoint& pt)> m_hitTestCapturingChildInstanceEvents;
-		
-		AtomicRef<GestureDetector> m_gestureDetector;
-		
+
 	protected:
 		class LayoutAttributes : public Referable
 		{
 		public:
+			sl_bool flagMarginLeftWeight : 1;
+			sl_bool flagMarginTopWeight : 1;
+			sl_bool flagMarginRightWeight : 1;
+			sl_bool flagMarginBottomWeight : 1;
+			sl_bool flagAlwaysOnUpdateLayout : 1;
+			
+			sl_bool flagInvalidLayoutInParent : 1;
+			sl_bool flagRequestedFrame : 1;
+
 			UIRect layoutFrame;
 			UIRect requestedFrame;
-			sl_bool flagRequestedFrame;
 
 			SizeMode widthMode;
 			SizeMode heightMode;
@@ -1435,50 +1427,80 @@ namespace slib
 			sl_ui_pos marginTop;
 			sl_ui_pos marginRight;
 			sl_ui_pos marginBottom;
-			sl_bool flagRelativeMarginLeft;
-			sl_real relativeMarginLeftWeight;
-			sl_bool flagRelativeMarginTop;
-			sl_real relativeMarginTopWeight;
-			sl_bool flagRelativeMarginRight;
-			sl_real relativeMarginRightWeight;
-			sl_bool flagRelativeMarginBottom;
-			sl_real relativeMarginBottomWeight;
-			
-			sl_bool flagAlwaysOnUpdateLayout;
-			sl_bool flagInvalidLayoutInParent;
+			sl_real marginLeftWeight;
+			sl_real marginTopWeight;
+			sl_real marginRightWeight;
+			sl_real marginBottomWeight;
 			
 		public:
 			LayoutAttributes();
 			
 			~LayoutAttributes();
 			
+			SLIB_DELETE_CLASS_DEFAULT_MEMBERS(LayoutAttributes)
+			
+		public:
+			void applyMarginWeightsX(sl_ui_pos parentWidth);
+			void applyMarginWeightsY(sl_ui_pos parentHeight);
+			void applyMarginWeights(sl_ui_pos parentWidth, sl_ui_pos parentHeight);
+
 		};
 		Ref<LayoutAttributes> m_layoutAttrs;
 		
 		void _initializeLayoutAttributes();
+		
+		class PaddingAttributes : public Referable
+		{
+		public:
+			sl_bool flagPaddingLeftWeight : 1;
+			sl_bool flagPaddingTopWeight : 1;
+			sl_bool flagPaddingRightWeight : 1;
+			sl_bool flagPaddingBottomWeight : 1;
+
+			sl_ui_pos paddingLeft;
+			sl_ui_pos paddingTop;
+			sl_ui_pos paddingRight;
+			sl_ui_pos paddingBottom;
+			sl_real paddingLeftWeight;
+			sl_real paddingTopWeight;
+			sl_real paddingRightWeight;
+			sl_real paddingBottomWeight;
+			
+		public:
+			PaddingAttributes();
+			
+			~PaddingAttributes();
+			
+			SLIB_DELETE_CLASS_DEFAULT_MEMBERS(PaddingAttributes)
+
+		public:
+			void applyPaddingWeightsX(sl_ui_pos width);
+			void applyPaddingWeightsY(sl_ui_pos height);
+			void applyPaddingWeights(sl_ui_pos width, sl_ui_pos height);
+			
+		};
+		Ref<PaddingAttributes> m_paddingAttrs;
+		
+		void _initializePaddingAttributes();
 
 		class TransformAttributes : public Referable
 		{
 		public:
-			sl_bool flagTransformFinalInvalid;
-			sl_bool flagTransformFinal;
+			sl_bool flagTransformFinalInvalid : 1;
+			sl_bool flagTransformFinal : 1;
+			sl_bool flagInverseTransformFinalInvalid : 1;
+			sl_bool flagInverseTransformFinal : 1;
+			sl_bool flagTransform : 1;
+			sl_bool flagTransformCalcInvalid : 1;
+			sl_bool flagTransformCalc : 1;
+
 			Matrix3 transformFinal;
-			
-			sl_bool flagInverseTransformFinalInvalid;
-			sl_bool flagInverseTransformFinal;
 			Matrix3 inverseTransformFinal;
-			
-			sl_bool flagTransform;
 			Matrix3 transform;
-			
-			sl_bool flagTransformCalcInvalid;
-			sl_bool flagTransformCalc;
 			Matrix3 transformCalc;
-			
 			Vector2 translation;
 			Vector2 scale;
 			sl_real rotationAngle;
-			
 			Vector2 anchorOffset;
 			
 			AtomicWeakRef<Animation> m_animationTransform;
@@ -1494,6 +1516,8 @@ namespace slib
 			
 			~TransformAttributes();
 			
+			SLIB_DELETE_CLASS_DEFAULT_MEMBERS(TransformAttributes)
+
 		};
 		Ref<TransformAttributes> m_transformAttrs;
 		
@@ -1502,6 +1526,16 @@ namespace slib
 		class DrawAttributes : public Referable
 		{
 		public:
+			sl_bool flagOnDrawBackgroundAlways : 1;
+			sl_bool flagOnDrawBorderAlways : 1;
+			sl_bool flagUsingFont : 1;
+			sl_bool flagOpaque : 1;
+			sl_bool flagLayer : 1;
+			
+			sl_bool flagForcedDraw : 1;
+			sl_bool flagInvalidatedLayer : 1;
+			sl_bool flagInvalidatedWholeLayer : 1;
+
 			AtomicRef<Drawable> background;
 			AtomicRef<Drawable> backgroundPressed;
 			AtomicRef<Drawable> backgroundHover;
@@ -1521,26 +1555,13 @@ namespace slib
 			Size contentRadius;
 			AtomicRef<GraphicsPath> contentBoundPath;
 
-			sl_bool flagPreDrawEnabled;
-			sl_bool flagPostDrawEnabled;
-			sl_bool flagOnDrawBackgroundAlways;
-			sl_bool flagOnDrawBorderAlways;
-			
 			AtomicRef<Font> font;
-			sl_bool flagUsingFont;
-			
-			sl_bool flagOpaque;
 			sl_real alpha;
 			
-			sl_bool flagLayer;
 			AtomicRef<Bitmap> bitmapLayer;
 			AtomicRef<Canvas> canvasLayer;
-			sl_bool flagInvalidatedLayer;
-			sl_bool flagInvalidatedWholeLayer;
 			UIRect rectInvalidatedLayer;
 			
-			sl_bool flagForcedDraw;
-
 			LinkedList< Function<void()> > runAfterDrawCallbacks;
 			
 		public:
@@ -1548,6 +1569,8 @@ namespace slib
 			
 			~DrawAttributes();
 			
+			SLIB_DELETE_CLASS_DEFAULT_MEMBERS(DrawAttributes)
+
 		};
 		Ref<DrawAttributes> m_drawAttrs;
 		
@@ -1556,29 +1579,33 @@ namespace slib
 		class ScrollAttributes : public Referable
 		{
 		public:
-			sl_bool flagHorz;
-			sl_bool flagVert;
-			
+			sl_bool flagHorz : 1;
+			sl_bool flagVert : 1;
+			sl_bool flagHorzScrollBarVisible : 1;
+			sl_bool flagVertScrollBarVisible : 1;
+			sl_bool flagPaging : 1;
+			sl_bool flagContentScrollingByMouse : 1;
+			sl_bool flagContentScrollingByTouch : 1;
+			sl_bool flagContentScrollingByMouseWheel : 1;
+			sl_bool flagContentScrollingByKeyboard : 1;
+			sl_bool flagSmoothContentScrolling : 1;
+
+			sl_bool flagValidHorz : 1;
+			sl_bool flagValidVert : 1;
+			sl_bool flagInitHorzScrollBar : 1;
+			sl_bool flagInitVertScrollBar : 1;
+			sl_bool flagDownContent : 1;
+
 			AtomicRef<ScrollBar> horz;
 			AtomicRef<ScrollBar> vert;
-			sl_bool flagValidHorz;
-			sl_bool flagValidVert;
 			sl_scroll_pos x;
 			sl_scroll_pos y;
 			sl_scroll_pos contentWidth;
 			sl_scroll_pos contentHeight;
 			sl_ui_len barWidth;
-			sl_bool flagPaging;
 			sl_ui_pos pageWidth;
 			sl_ui_pos pageHeight;
 			
-			sl_bool flagContentScrollingByMouse;
-			sl_bool flagContentScrollingByTouch;
-			sl_bool flagContentScrollingByMouseWheel;
-			sl_bool flagContentScrollingByKeyboard;
-			sl_bool flagSmoothContentScrolling;
-			
-			sl_bool flagDownContent;
 			Point mousePointBefore;
 			Ref<MotionTracker> motionTracker;
 			Ref<Timer> timerFlow;
@@ -1588,20 +1615,65 @@ namespace slib
 			sl_scroll_pos xSmoothTarget;
 			sl_scroll_pos ySmoothTarget;
 			
-			sl_bool flagHorzScrollBarVisible;
-			sl_bool flagVertScrollBarVisible;
-			sl_bool flagInitHorzScrollBar;
-			sl_bool flagInitVertScrollBar;
-			
 		public:
 			ScrollAttributes();
 			
 			~ScrollAttributes();
 			
+			SLIB_DELETE_CLASS_DEFAULT_MEMBERS(ScrollAttributes)
+
 		};
 		Ref<ScrollAttributes> m_scrollAttrs;
 		
 		void _initializeScrollAttributes();
+		
+		class ChildAttributes : public Referable
+		{
+		public:
+			sl_bool flagTouchMultipleChildren : 1;
+			sl_bool flagPassEventToChildren : 1;
+			
+			AtomicList< Ref<View> > children;
+			AtomicList< Ref<View> > childrenCache;
+			
+			List< Ref<View> > childrenMultiTouch;
+			AtomicRef<View> childMouseMove;
+			AtomicRef<View> childMouseDown;
+			AtomicRef<View> childFocused;
+
+			AtomicFunction<sl_bool(const UIPoint& pt)> hitTestCapturingChildInstanceEvents;
+			
+		public:
+			ChildAttributes();
+			
+			~ChildAttributes();
+			
+			SLIB_DELETE_CLASS_DEFAULT_MEMBERS(ChildAttributes)
+
+		};
+		Ref<ChildAttributes> m_childAttrs;
+
+		void _initializeChildAttributes();
+
+		class OtherAttributes : public Referable
+		{
+		public:
+			AtomicWeakRef<View> viewNextTabStop;
+			AtomicWeakRef<View> viewPrevTabStop;
+			AtomicRef<Cursor> cursor;
+			AtomicRef<GestureDetector> gestureDetector;
+			
+		public:
+			OtherAttributes();
+			
+			~OtherAttributes();
+			
+			SLIB_DELETE_CLASS_DEFAULT_MEMBERS(OtherAttributes)
+
+		};
+		Ref<OtherAttributes> m_otherAttrs;
+		
+		void _initializeOtherAttributes();
 		
 		class EventAttributes : public Referable
 		{
@@ -1618,8 +1690,7 @@ namespace slib
 			AtomicFunction<void(View*)> onClick;
 			AtomicFunction<void(View*, UIEvent*)> onClickEvent;
 			AtomicFunction<void(View*, UIEvent*)> onSetCursor;
-			AtomicFunction<void(View*)> onSetFocus;
-			AtomicFunction<void(View*)> onKillFocus;
+			AtomicFunction<void(View*, sl_bool flagFocused)> onChangeFocus;
 			AtomicFunction<void(View*, sl_ui_len, sl_ui_len)> onResize;
 			AtomicFunction<void(View*, Visibility, Visibility)> onChangeVisibility;
 			AtomicFunction<void(View*, sl_scroll_pos, sl_scroll_pos)> onScroll;

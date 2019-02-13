@@ -1162,6 +1162,53 @@ namespace slib
 #define LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(NAME, SETFUNC, CHECKFUNC) _LAYOUT_CONTROL_DIMENSION_ATTR_NOREDRAW(NAME, SETFUNC, CHECKFUNC, Int)
 #define LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR(NAME, SETFUNC, CHECKFUNC) _LAYOUT_CONTROL_DIMENSION_ATTR(NAME, SETFUNC, CHECKFUNC, Float)
 #define LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(NAME, SETFUNC, CHECKFUNC) _LAYOUT_CONTROL_DIMENSION_ATTR_NOREDRAW(NAME, SETFUNC, CHECKFUNC, Float)
+	
+	
+#define LAYOUT_CONTROL_MARGIN_ATTR_NOREDRAW(NAME, SETFUNC) \
+	if (op == OP_PARSE) { \
+		String str = resourceItem->getXmlAttribute(#NAME); \
+		if (!(attr->NAME.parse(str, this))) { \
+			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			return sl_false; \
+		} \
+		if (flagRoot) { \
+			if (!(attr->NAME.checkForRootViewMargin())) { \
+				_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+				return sl_false; \
+			} \
+		} else { \
+			if (!(attr->NAME.checkMargin())) { \
+				_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+				return sl_false; \
+			} \
+		} \
+	} else if (op == OP_GENERATE_CPP) { \
+		if (attr->NAME.flagDefined) { \
+			if (attr->NAME.isNeededOnLayoutFunction()) { \
+				if (attr->NAME.unit == SAppDimensionValue::WEIGHT) { \
+					params->sbDefineLayout->add(String::format("%s%s->" #SETFUNC "Weight(%ff);%n", strTab, name, attr->NAME.amount)); \
+				} else { \
+					params->sbDefineLayout->add(String::format("%s%s->" #SETFUNC "(%s);%n", strTab, name, attr->NAME.getAccessString())); \
+				} \
+			} else { \
+				if (attr->NAME.unit == SAppDimensionValue::WEIGHT) { \
+					params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "Weight(%ff, slib::UIUpdateMode::Init);%n", strTab, name, attr->NAME.amount)); \
+				} else { \
+					params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s, slib::UIUpdateMode::Init);%n", strTab, name, attr->NAME.getAccessString())); \
+				} \
+			} \
+		} \
+	} else if (op == OP_SIMULATE) { \
+		if (flagOnLayout) { \
+			if (attr->NAME.flagDefined) { \
+				if (attr->NAME.unit == SAppDimensionValue::WEIGHT) { \
+					view->SETFUNC##Weight(attr->NAME.amount); \
+				} else { \
+					view->SETFUNC(_getDimensionIntValue(attr->NAME)); \
+				} \
+			} \
+		} \
+	}
 
 #define LAYOUT_CONTROL_MENU_ATTR(NAME, SETFUNC) \
 	if (op == OP_PARSE) { \
@@ -1871,18 +1918,11 @@ namespace slib
 				}
 			}
 
+			LAYOUT_CONTROL_MARGIN_ATTR_NOREDRAW(marginLeft, setMarginLeft)
+			LAYOUT_CONTROL_MARGIN_ATTR_NOREDRAW(marginTop, setMarginTop)
+			LAYOUT_CONTROL_MARGIN_ATTR_NOREDRAW(marginRight, setMarginRight)
+			LAYOUT_CONTROL_MARGIN_ATTR_NOREDRAW(marginBottom, setMarginBottom)
 			if (op == OP_PARSE) {
-				if (flagRoot) {
-					LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginLeft, setMarginLeft, checkForRootViewMargin)
-					LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginTop, setMarginTop, checkForRootViewMargin)
-					LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginRight, setMarginRight, checkForRootViewMargin)
-					LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginBottom, setMarginBottom, checkForRootViewMargin)
-				} else {
-					LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginLeft, setMarginLeft, checkMargin)
-					LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginTop, setMarginTop, checkMargin)
-					LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginRight, setMarginRight, checkMargin)
-					LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginBottom, setMarginBottom, checkMargin)
-				}
 				SAppDimensionValue margin;
 				LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, margin)
 				if (flagRoot) {
@@ -1910,96 +1950,23 @@ namespace slib
 						attr->marginBottom = margin;
 					}
 				}
-			} else if (op == OP_GENERATE_CPP) {
-				if (attr->marginLeft.flagDefined) {
-					if (attr->marginLeft.unit == SAppDimensionValue::WEIGHT) {
-						params->sbDefineInit->add(String::format("%s%s->setRelativeMarginLeft(%ff, slib::UIUpdateMode::Init);%n", strTab, name, attr->marginLeft.amount));
-					} else {
-						LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginLeft, setMarginLeft, checkMargin)
-					}
-				}
-				if (attr->marginTop.flagDefined) {
-					if (attr->marginTop.unit == SAppDimensionValue::WEIGHT) {
-						params->sbDefineInit->add(String::format("%s%s->setRelativeMarginTop(%ff, slib::UIUpdateMode::Init);%n", strTab, name, attr->marginTop.amount));
-					} else {
-						LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginTop, setMarginTop, checkMargin)
-					}
-				}
-				if (attr->marginRight.flagDefined) {
-					if (attr->marginRight.unit == SAppDimensionValue::WEIGHT) {
-						params->sbDefineInit->add(String::format("%s%s->setRelativeMarginRight(%ff, slib::UIUpdateMode::Init);%n", strTab, name, attr->marginRight.amount));
-					} else {
-						LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginRight, setMarginRight, checkMargin)
-					}
-				}
-				if (attr->marginBottom.flagDefined) {
-					if (attr->marginBottom.unit == SAppDimensionValue::WEIGHT) {
-						params->sbDefineInit->add(String::format("%s%s->setRelativeMarginBottom(%ff, slib::UIUpdateMode::Init);%n", strTab, name, attr->marginBottom.amount));
-					} else {
-						LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginBottom, setMarginBottom, checkMargin)
-					}
-				}
-			} else if (op == OP_SIMULATE) {
-				if (attr->marginLeft.flagDefined) {
-					if (attr->marginLeft.unit == SAppDimensionValue::WEIGHT) {
-						if (!flagOnLayout) {
-							view->setRelativeMarginLeft(attr->marginLeft.amount, UIUpdateMode::Init);
-						}
-					} else {
-						LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginLeft, setMarginLeft, checkMargin)
-					}
-				}
-				if (attr->marginTop.flagDefined) {
-					if (attr->marginTop.unit == SAppDimensionValue::WEIGHT) {
-						if (!flagOnLayout) {
-							view->setRelativeMarginTop(attr->marginTop.amount, UIUpdateMode::Init);
-						}
-					} else {
-						LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginTop, setMarginTop, checkMargin)
-					}
-				}
-				if (attr->marginRight.flagDefined) {
-					if (attr->marginRight.unit == SAppDimensionValue::WEIGHT) {
-						if (!flagOnLayout) {
-							view->setRelativeMarginRight(attr->marginRight.amount, UIUpdateMode::Init);
-						}
-					} else {
-						LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginRight, setMarginRight, checkMargin)
-					}
-				}
-				if (attr->marginBottom.flagDefined) {
-					if (attr->marginBottom.unit == SAppDimensionValue::WEIGHT) {
-						if (!flagOnLayout) {
-							view->setRelativeMarginBottom(attr->marginBottom.amount, UIUpdateMode::Init);
-						}
-					} else {
-						LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(marginBottom, setMarginBottom, checkMargin)
-					}
-				}
 			}
 		}
 		
-		if (flagRoot) {
-			LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(paddingLeft, setPaddingLeft, checkForRootViewPosition)
-			LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(paddingTop, setPaddingTop, checkForRootViewPosition)
-			LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(paddingRight, setPaddingRight, checkForRootViewPosition)
-			LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(paddingBottom, setPaddingBottom, checkForRootViewPosition)
-		} else {
-			LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(paddingLeft, setPaddingLeft, checkPosition)
-			LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(paddingTop, setPaddingTop, checkPosition)
-			LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(paddingRight, setPaddingRight, checkPosition)
-			LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(paddingBottom, setPaddingBottom, checkPosition)
-		}
+		LAYOUT_CONTROL_MARGIN_ATTR_NOREDRAW(paddingLeft, setPaddingLeft)
+		LAYOUT_CONTROL_MARGIN_ATTR_NOREDRAW(paddingTop, setPaddingTop)
+		LAYOUT_CONTROL_MARGIN_ATTR_NOREDRAW(paddingRight, setPaddingRight)
+		LAYOUT_CONTROL_MARGIN_ATTR_NOREDRAW(paddingBottom, setPaddingBottom)
 		if (op == OP_PARSE) {
 			SAppDimensionValue padding;
 			LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(, padding)
 			if (flagRoot) {
-				if (!(padding.checkForRootViewPosition())) {
+				if (!(padding.checkForRootViewMargin())) {
 					LOG_ERROR_LAYOUT_CONTROL_ATTR(padding)
 					return sl_false;
 				}
 			} else {
-				if (!(padding.checkPosition())) {
+				if (!(padding.checkMargin())) {
 					LOG_ERROR_LAYOUT_CONTROL_ATTR(padding)
 					return sl_false;
 				}
