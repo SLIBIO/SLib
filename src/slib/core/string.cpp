@@ -7596,7 +7596,7 @@ namespace slib
 	}
 
 	template <class ST, class CT>
-	SLIB_INLINE static ST _priv_String_makeHexString(const void* buf, sl_size size) noexcept
+	SLIB_INLINE static ST _priv_String_makeHexString(const void* buf, sl_size size, sl_bool flagUseLowerChar) noexcept
 	{
 		if (!buf || size <= 0) {
 			return sl_null;
@@ -7606,32 +7606,40 @@ namespace slib
 			return str;
 		}
 		CT* sz = (CT*)(str.getData());
-		for (sl_size i = 0; i < size; i++) {
-			sl_uint8 v = ((sl_uint8*)(buf))[i];
-			sz[i << 1] = _string_conv_radix_pattern_lower[v >> 4];
-			sz[(i << 1) + 1] = _string_conv_radix_pattern_lower[v & 15];
+		if (flagUseLowerChar) {
+			for (sl_size i = 0; i < size; i++) {
+				sl_uint8 v = ((sl_uint8*)(buf))[i];
+				sz[i << 1] = _string_conv_radix_pattern_lower[v >> 4];
+				sz[(i << 1) + 1] = _string_conv_radix_pattern_lower[v & 15];
+			}
+		} else {
+			for (sl_size i = 0; i < size; i++) {
+				sl_uint8 v = ((sl_uint8*)(buf))[i];
+				sz[i << 1] = _string_conv_radix_pattern_upper[v >> 4];
+				sz[(i << 1) + 1] = _string_conv_radix_pattern_upper[v & 15];
+			}
 		}
 		return str;
 	}
 
-	String String::makeHexString(const void* buf, sl_size size) noexcept
+	String String::makeHexString(const void* buf, sl_size size, sl_bool flagUseLowerChar) noexcept
 	{
-		return _priv_String_makeHexString<String, sl_char8>(buf, size);
+		return _priv_String_makeHexString<String, sl_char8>(buf, size, flagUseLowerChar);
 	}
 
-	String16 String16::makeHexString(const void* buf, sl_size size) noexcept
+	String16 String16::makeHexString(const void* buf, sl_size size, sl_bool flagUseLowerChar) noexcept
 	{
-		return _priv_String_makeHexString<String16, sl_char16>(buf, size);
+		return _priv_String_makeHexString<String16, sl_char16>(buf, size, flagUseLowerChar);
 	}
 
-	String String::makeHexString(const Memory& mem) noexcept
+	String String::makeHexString(const Memory& mem, sl_bool flagUseLowerChar) noexcept
 	{
-		return makeHexString(mem.getData(), mem.getSize());
+		return makeHexString(mem.getData(), mem.getSize(), flagUseLowerChar);
 	}
 
-	String16 String16::makeHexString(const Memory& mem) noexcept
+	String16 String16::makeHexString(const Memory& mem, sl_bool flagUseLowerChar) noexcept
 	{
-		return makeHexString(mem.getData(), mem.getSize());
+		return makeHexString(mem.getData(), mem.getSize(), flagUseLowerChar);
 	}
 
 /*

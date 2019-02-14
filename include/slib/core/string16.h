@@ -1171,15 +1171,17 @@ namespace slib
 		 *
 		 * @param data The buffer to be converted.
 		 * @param size Size of the buffer.
+		 * @param flagUseLowerChar uses a-f (`true`) or A-F (`false`) for encoding
 		 */
-		static String16 makeHexString(const void* data, sl_size size) noexcept;
+		static String16 makeHexString(const void* data, sl_size size, sl_bool flagUseLowerChar = sl_true) noexcept;
 		
 		/**
 		 * @return the converted hex string from the buffer.
 		 *
 		 * @param mem The buffer to be converted.
+		 * @param flagUseLowerChar uses a-f (`true`) or A-F (`false`) for encoding
 		 */
-		static String16 makeHexString(const Memory& mem) noexcept;
+		static String16 makeHexString(const Memory& mem, sl_bool flagUseLowerChar = sl_true) noexcept;
 		
 		/**
 		 * Returns the formatted string from the format string and arbitrary list of arguments.
