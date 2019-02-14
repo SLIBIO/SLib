@@ -27,10 +27,10 @@
 
 #include "view.h"
 
-#include "../network/url_request.h"
-
 namespace slib
 {
+	
+	class UrlRequestParam;
 	
 	class SLIB_EXPORT ImageView : public View
 	{
@@ -84,8 +84,6 @@ namespace slib
 		
 		virtual void onAnimationFrame(Timer* timer);
 		
-		virtual void onCompleteLoadingUrl(UrlRequest* request);
-		
 	protected:
 		AtomicRef<Drawable> m_source;
 		ScaleMode m_scaleMode;
@@ -96,7 +94,7 @@ namespace slib
 
 		AtomicRef<Timer> m_timerAnimation;
 		Time m_timeStartAnimation;
-		AtomicRef<UrlRequest> m_request;
+		AtomicRef<Referable> m_request;
 		
 	};
 
