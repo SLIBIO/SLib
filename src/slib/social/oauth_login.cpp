@@ -27,8 +27,9 @@
 #include "slib/ui/web_view.h"
 #include "slib/ui/button.h"
 #include "slib/ui/resource.h"
-#include "slib/core/resource.h"
 #include "slib/core/log.h"
+
+#include "../resources.h"
 
 #define TAG "OAuth"
 
@@ -62,7 +63,7 @@ namespace slib
 		{
 			Ref<Button> btnCancel = new Button;
 			btnCancel->setCancelOnClick();
-			btnCancel->setText(res::string::cancel::get(), UIUpdateMode::Init);
+			btnCancel->setText(string::cancel::get(), UIUpdateMode::Init);
 			btnCancel->setAlignParentLeft(UIUpdateMode::Init);
 			btnCancel->setAlignParentTop(UIUpdateMode::Init);
 			btnCancel->setWidthWrapping(UIUpdateMode::Init);

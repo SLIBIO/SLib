@@ -31,6 +31,12 @@
     <ClInclude Include="..\..\src\slib\ui\view_win32.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\res\gen\colors.cpp" />
+    <ClCompile Include="..\..\src\res\gen\drawables.cpp" />
+    <ClCompile Include="..\..\src\res\gen\layouts.cpp" />
+    <ClCompile Include="..\..\src\res\gen\menus.cpp" />
+    <ClCompile Include="..\..\src\res\gen\raws.cpp" />
+    <ClCompile Include="..\..\src\res\gen\strings.cpp" />
     <ClCompile Include="..\..\src\slib\core\animation.cpp" />
     <ClCompile Include="..\..\src\slib\core\app.cpp" />
     <ClCompile Include="..\..\src\slib\core\array.cpp" />

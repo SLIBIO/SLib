@@ -1,0 +1,8 @@
+<sapp>
+	<configuration>
+		<generate-cpp>
+			<target-path>gen</target-path>
+			<namespace>slib</namespace>
+		</generate-cpp>
+	</configuration>
+</sapp>

@@ -130,16 +130,4 @@ if (locale == localeSource || slib::Locale(locale.getLanguage()) == localeSource
 #define SLIB_DEFINE_RAW_RESOURCE_MAP_BEGIN SLIB_DEFINE_RESOURCE_MAP_BEGIN(slib::Memory)
 #define SLIB_DEFINE_RAW_RESOURCE_MAP_END SLIB_DEFINE_RESOURCE_MAP_END(slib::Memory, sl_null)
 
-namespace slib
-{
-	namespace res
-	{
-		namespace string
-		{
-			SLIB_DECLARE_STRING_RESOURCE(ok)
-			SLIB_DECLARE_STRING_RESOURCE(cancel)
-		}
-	};
-}
-
 #endif

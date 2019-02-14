@@ -343,6 +343,14 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/ui/view_pager.cpp"
  "${SLIB_PATH}/src/slib/ui/web_view.cpp"
  "${SLIB_PATH}/src/slib/ui/window.cpp"
+
+ "${SLIB_PATH}/src/res/gen/colors.cpp"
+ "${SLIB_PATH}/src/res/gen/drawables.cpp"
+ "${SLIB_PATH}/src/res/gen/layouts.cpp"
+ "${SLIB_PATH}/src/res/gen/menus.cpp"
+ "${SLIB_PATH}/src/res/gen/raws.cpp"
+ "${SLIB_PATH}/src/res/gen/strings.cpp"
+
 )
 
 if(ANDROID)

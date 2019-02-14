@@ -47,23 +47,5 @@ namespace slib
 		}
 		return name;
 	}
-	
-	
-	namespace res
-	{
-		namespace string
-		{
-			SLIB_DEFINE_STRING_RESOURCE_BEGIN(cancel, "Cancel")
-				SLIB_DEFINE_STRING_RESOURCE_VALUE(ko, "\xec\xb7\xa8\xec\x86\x8c")
-				SLIB_DEFINE_STRING_RESOURCE_VALUE(zh, "\xe5\x8f\x96\xe6\xb6\x88")
-			SLIB_DEFINE_STRING_RESOURCE_END
-			
-			SLIB_DEFINE_STRING_RESOURCE_BEGIN(ok, "OK")
-				SLIB_DEFINE_STRING_RESOURCE_VALUE(ko, "\xed\x99\x95\xec\x9d\xb8")
-				SLIB_DEFINE_STRING_RESOURCE_VALUE(zh, "\xe5\xa5\xbd")
-			SLIB_DEFINE_STRING_RESOURCE_END
-			
-		}
-	}
 
 }

@@ -43,6 +43,9 @@
     <Filter Include="src\social">
       <UniqueIdentifier>{1237d79f-474e-4bde-823e-5ebaea64f22c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{572efd35-6590-4275-b55f-ca4f6a47928f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\slib\core\async_config.h">
@@ -904,6 +907,24 @@
     </ClCompile>
     <ClCompile Include="..\..\src\slib\ui\image_view_url.cpp">
       <Filter>src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\res\gen\colors.cpp">
+      <Filter>res</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\res\gen\drawables.cpp">
+      <Filter>res</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\res\gen\layouts.cpp">
+      <Filter>res</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\res\gen\menus.cpp">
+      <Filter>res</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\res\gen\raws.cpp">
+      <Filter>res</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\res\gen\strings.cpp">
+      <Filter>res</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
