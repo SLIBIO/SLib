@@ -188,7 +188,7 @@ namespace slib
 		m_textBox.update(m_text, m_flagHyperText, getFont(), (sl_real)width, m_multiLineMode, m_ellipsizeMode, m_textAlignment);
 		if (flagHorizontal) {
 			width = (sl_ui_pos)(m_textBox.getContentWidth());
-			m_textBox.setWidth(width);
+			m_textBox.setWidth((sl_real)width);
 			setLayoutWidth(width + paddingWidth);
 		}
 		if (flagVertical) {
