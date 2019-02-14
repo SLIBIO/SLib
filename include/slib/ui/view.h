@@ -471,6 +471,8 @@ namespace slib
 		
 		void setMinimumWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
+		sl_bool isMaximumWidthDefined();
+
 		sl_ui_len getMaximumWidth();
 		
 		void setMaximumWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
@@ -478,7 +480,9 @@ namespace slib
 		sl_ui_len getMinimumHeight();
 		
 		void setMinimumHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
-		
+
+		sl_bool isMaximumHeightDefined();
+
 		sl_ui_len getMaximumHeight();
 		
 		void setMaximumHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);

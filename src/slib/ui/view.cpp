@@ -3525,6 +3525,15 @@ namespace slib
 			invalidateSelfAndParentLayout(mode);
 		}
 	}
+	
+	sl_bool View::isMaximumWidthDefined()
+	{
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->maxWidth != DEFAULT_MAX_SIZE;
+		}
+		return sl_false;
+	}
 
 	sl_ui_len View::getMaximumWidth()
 	{
@@ -3568,6 +3577,15 @@ namespace slib
 			attrs->minHeight = height;
 			invalidateSelfAndParentLayout(mode);
 		}
+	}
+
+	sl_bool View::isMaximumHeightDefined()
+	{
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->maxHeight != DEFAULT_MAX_SIZE;
+		}
+		return sl_false;
 	}
 
 	sl_ui_len View::getMaximumHeight()
