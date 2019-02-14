@@ -1533,7 +1533,7 @@ namespace slib
 	{
 	}
 
-	void SimpleTextBox::update(const String& text, sl_bool flagHyperText, const Ref<Font>& font, sl_real width, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& _align) noexcept
+	void SimpleTextBox::update(const String& text, sl_bool flagHyperText, const Ref<Font>& font, sl_real width, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& _align) noexcept
 	{
 		ObjectLocker lock(this);
 		
@@ -1548,21 +1548,24 @@ namespace slib
 		if (width < 0) {
 			width = 0;
 		}
-		
-		if (flagWrappingWidth) {
-			if (multiLineMode != MultiLineMode::Single) {
-				multiLineMode = MultiLineMode::Multiple;
-			}
-			ellipsizeMode = EllipsizeMode::None;
-		}
 		if (multiLineMode != MultiLineMode::Single) {
 			ellipsizeMode = EllipsizeMode::None;
 		}
 		
-		Alignment align = _align & Alignment::HorizontalMask;
+		Alignment align;
 		
-		if (align == Alignment::Left && (multiLineMode == MultiLineMode::Single || multiLineMode == MultiLineMode::Multiple) && ellipsizeMode == EllipsizeMode::None) {
+		if (width < SLIB_EPSILON) {
+			if (multiLineMode != MultiLineMode::Single) {
+				multiLineMode = MultiLineMode::Multiple;
+			}
+			ellipsizeMode = EllipsizeMode::None;
+			align = Alignment::Left;
 			width = 0;
+		} else {
+			align = _align & Alignment::HorizontalMask;
+			if (align == Alignment::Left && (multiLineMode == MultiLineMode::Single || multiLineMode == MultiLineMode::Multiple) && ellipsizeMode == EllipsizeMode::None) {
+				width = 0;
+			}
 		}
 		
 		sl_bool flagReLayout = sl_false;
@@ -1617,7 +1620,7 @@ namespace slib
 		}
 	}
 
-	void SimpleTextBox::draw(Canvas* canvas, const String& text, sl_bool flagHyperText, const Ref<Font>& font, const Rectangle& frame, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align, const Color& color) noexcept
+	void SimpleTextBox::draw(Canvas* canvas, const String& text, sl_bool flagHyperText, const Ref<Font>& font, const Rectangle& frame, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align, const Color& color) noexcept
 	{
 		if (color.isZero()) {
 			return;
@@ -1628,7 +1631,7 @@ namespace slib
 		}
 		ObjectLocker lock(this);
 		Ref<TextParagraph> paragraphOld = m_paragraph;
-		update(text, flagHyperText, font, width, flagWrappingWidth, multiLineMode, ellipsizeMode, align);
+		update(text, flagHyperText, font, width, multiLineMode, ellipsizeMode, align);
 		if (m_paragraph.isNotNull()) {
 			sl_real height = m_paragraph->getTotalHeight();
 			Alignment valign = align & Alignment::VerticalMask;
@@ -1651,6 +1654,11 @@ namespace slib
 			return m_paragraph->getTextItemAtPosition(x, y);
 		}
 		return sl_null;
+	}
+	
+	void SimpleTextBox::setWidth(sl_real width)
+	{
+		m_width = width;
 	}
 
 	sl_real SimpleTextBox::getContentWidth() noexcept

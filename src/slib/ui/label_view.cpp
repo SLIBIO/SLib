@@ -131,7 +131,7 @@ namespace slib
 	
 	void LabelView::onDraw(Canvas* canvas)
 	{
-		m_textBox.draw(canvas, m_text, m_flagHyperText, getFont(), getBoundsInnerPadding(), isWidthWrapping(), m_multiLineMode, m_ellipsizeMode, m_textAlignment, m_textColor);
+		m_textBox.draw(canvas, m_text, m_flagHyperText, getFont(), getBoundsInnerPadding(), m_multiLineMode, m_ellipsizeMode, m_textAlignment, m_textColor);
 	}
 	
 	void LabelView::onClickEvent(UIEvent* ev)
@@ -174,9 +174,22 @@ namespace slib
 		}
 		
 		sl_ui_pos paddingWidth = getPaddingLeft() + getPaddingRight();
-		m_textBox.update(m_text, m_flagHyperText, getFont(), (sl_real)(getLayoutWidth() - paddingWidth), isWidthWrapping(), m_multiLineMode, m_ellipsizeMode, m_textAlignment);
+		sl_ui_len width;
+		if (isWidthWrapping()) {
+			if (isMaximumWidthDefined()) {
+				width = getMaximumWidth() - paddingWidth;
+			} else {
+				width = 0;
+			}
+		} else {
+			width = getLayoutWidth() - paddingWidth;
+		}
+		
+		m_textBox.update(m_text, m_flagHyperText, getFont(), (sl_real)width, m_multiLineMode, m_ellipsizeMode, m_textAlignment);
 		if (flagHorizontal) {
-			setLayoutWidth((sl_ui_pos)(m_textBox.getContentWidth()) + paddingWidth);
+			width = (sl_ui_pos)(m_textBox.getContentWidth());
+			m_textBox.setWidth(width);
+			setLayoutWidth(width + paddingWidth);
 		}
 		if (flagVertical) {
 			setLayoutHeight((sl_ui_pos)(m_textBox.getContentHeight()) + getPaddingTop() + getPaddingBottom());

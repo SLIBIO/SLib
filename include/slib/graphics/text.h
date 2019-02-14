@@ -309,11 +309,13 @@ namespace slib
 		~SimpleTextBox() noexcept;
 
 	public:
-		void update(const String& text, sl_bool flagHyperText, const Ref<Font>& font, sl_real width, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align) noexcept;
+		void update(const String& text, sl_bool flagHyperText, const Ref<Font>& font, sl_real width, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align) noexcept;
 
-		void draw(Canvas* canvas, const String& text, sl_bool flagHyperText, const Ref<Font>& font, const Rectangle& frame, sl_bool flagWrappingWidth, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align, const Color& color) noexcept;
+		void draw(Canvas* canvas, const String& text, sl_bool flagHyperText, const Ref<Font>& font, const Rectangle& frame, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align, const Color& color) noexcept;
 
 		Ref<TextItem> getTextItemAtPosition(sl_real x, sl_real y) noexcept;
+		
+		void setWidth(sl_real width);
 
 		sl_real getContentWidth() noexcept;
 
