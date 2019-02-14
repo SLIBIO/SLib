@@ -31,6 +31,9 @@
 #include "../core/string.h"
 #include "../core/function.h"
 
+#include "../ui/window.h"
+#include "../ui/view.h"
+
 namespace slib
 {
 
@@ -51,8 +54,6 @@ namespace slib
 		Error = 4
 	};
 	
-	class Window;
-
 	class SLIB_EXPORT AlertDialog : public Referable
 	{
 	public:
@@ -157,6 +158,37 @@ namespace slib
 		
 	};
 
+	
+	class Toast
+	{
+	public:
+		Ref<View> parent;
+		String text;
+		float duration; // Seconds
+		Ref<Font> font;
+		
+	public:
+		Toast();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(Toast)
+		
+	public:
+		void show();
+		
+	public:
+		static void show(const String& text);
+		
+	public:
+		static float getDefaultDuration();
+		
+		static void setDefaultDuration(float duration);
+		
+		static Ref<Font> getDefaultFont();
+		
+		static void setDefaultFont(const Ref<Font>& font);
+		
+	};
+	
 }
 
 #endif

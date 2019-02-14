@@ -23,7 +23,10 @@
 #include "slib/ui/common_dialogs.h"
 
 #include "slib/ui/core.h"
-#include "slib/ui/window.h"
+#include "slib/ui/mobile_app.h"
+#include "slib/ui/label_view.h"
+
+#include "slib/core/safe_static.h"
 
 namespace slib
 {
@@ -339,4 +342,149 @@ namespace slib
 		return sl_null;
 	}
 
+/***************************************
+ 			Toast
+***************************************/
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(Toast)
+
+	Toast::Toast()
+	{
+		duration = getDefaultDuration();
+		font = getDefaultFont();
+	}
+	
+	class _priv_ToastManager
+	{
+	public:
+		Mutex lock;
+		Ref<LabelView> currentToast;
+		Ref<Animation> animation;
+		
+	public:
+		void show(Toast* toast)
+		{
+			MutexLocker locker(&lock);
+			if (currentToast.isNotNull()) {
+				currentToast->removeFromParent();
+				currentToast.setNull();
+				animation.setNull();
+			}
+			Ref<Font> font = toast->font;
+			if (font.isNull()) {
+				return;
+			}
+			Ref<View> parent = toast->parent;
+			if (parent.isNull()) {
+				Ref<MobileApp> app = MobileApp::getApp();
+				if (app.isNotNull()) {
+					parent = app->getContentView();
+				} else {
+					Ref<UIApp> ui = UIApp::getApp();
+					if (ui.isNotNull()) {
+						Ref<Window> window = ui->getMainWindow();
+						if (window.isNotNull()) {
+							parent = window->getContentView();
+						}
+					}
+				}
+			}
+			if (parent.isNull()) {
+				return;
+			}
+			Ref<LabelView> view = new LabelView;
+			if (view.isNull()) {
+				return;
+			}
+			view->setText(toast->text, UIUpdateMode::Init);
+			view->setMultiLine(MultiLineMode::WordWrap, UIUpdateMode::Init);
+			view->setWidthWrapping(UIUpdateMode::Init);
+			view->setHeightWrapping(UIUpdateMode::Init);
+			view->setMaximumWidth((sl_ui_len)(parent->getWidth() * 0.9f), UIUpdateMode::Init);
+			view->setFont(font, UIUpdateMode::Init);
+			view->setTextColor(Color::White, UIUpdateMode::Init);
+			view->setBackgroundColor(Color(0, 0, 0, 160), UIUpdateMode::Init);
+			view->setBoundRadius(font->getFontHeight() / 3, UIUpdateMode::Init);
+			view->setPadding(font->getFontHeight() / 3, UIUpdateMode::Init);
+			view->setCenterInParent(UIUpdateMode::Init);
+			view->setClipping(sl_true, UIUpdateMode::Init);
+			currentToast = view;
+			parent->addChild(view);
+			animation = view->startAlphaAnimation(0, 1, 0.3f, sl_null, AnimationCurve::Linear, AnimationFlags::NotSelfAlive);
+			
+			auto weak = ToWeakRef(view);
+			UI::dispatchToUiThread([this, weak]() {
+				auto view = ToRef(weak);
+				if (view.isNull()) {
+					return;
+				}
+				MutexLocker locker(&lock);
+				if (currentToast.isNotNull()) {
+					animation = currentToast->startAlphaAnimation(1, 0, 0.3f, [this, weak]() {
+						auto view = ToRef(weak);
+						if (view.isNull()) {
+							return;
+						}
+						MutexLocker locker(&lock);
+						if (currentToast.isNotNull()) {
+							currentToast->removeFromParent();
+							currentToast.setNull();
+							animation.setNull();
+						}
+					}, AnimationCurve::Linear, AnimationFlags::NotSelfAlive);
+				}
+			}, (sl_uint32)(toast->duration * 1000));
+		}
+		
+	};
+	SLIB_SAFE_STATIC_GETTER(_priv_ToastManager, _priv_getToastManager)
+	
+	void Toast::show()
+	{
+		_priv_ToastManager* manager = _priv_getToastManager();
+		if (manager) {
+			manager->show(this);
+		}
+	}
+	
+	void Toast::show(const String& text)
+	{
+		Toast toast;
+		toast.text = text;
+		toast.show();
+	}
+	
+	float _g_priv_Toast_defaultDuration = 2.0f;
+	
+	float Toast::getDefaultDuration()
+	{
+		return _g_priv_Toast_defaultDuration;
+	}
+	
+	void Toast::setDefaultDuration(float duration)
+	{
+		_g_priv_Toast_defaultDuration = duration;
+	}
+	
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Font>, _g_priv_Toast_defaultFont)
+	
+	Ref<Font> Toast::getDefaultFont()
+	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_Toast_defaultFont)) {
+			return sl_null;
+		}
+		if (_g_priv_Toast_defaultFont.isNull()) {
+			_g_priv_Toast_defaultFont = Font::create("Arial", UI::dpToPixel(20));
+		}
+		return _g_priv_Toast_defaultFont;
+	}
+	
+	void Toast::setDefaultFont(const Ref<Font>& font)
+	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_Toast_defaultFont)) {
+			return;
+		}
+		_g_priv_Toast_defaultFont = font;
+	}
+	
 }
