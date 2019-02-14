@@ -765,6 +765,10 @@
 		26C1B64620D51D3D00E36539 /* drawable_ext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C1B64520D51D3D00E36539 /* drawable_ext.cpp */; };
 		26C1B64820D51D4300E36539 /* canvas_ext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C1B64720D51D4300E36539 /* canvas_ext.cpp */; };
 		26C1B64A20D51D4D00E36539 /* bitmap_ext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C1B64920D51D4D00E36539 /* bitmap_ext.cpp */; };
+		26C7959C221538D90053C5A1 /* clipboard_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26C7959A221538D90053C5A1 /* clipboard_ios.mm */; };
+		26C7959D221538D90053C5A1 /* clipboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C7959B221538D90053C5A1 /* clipboard.cpp */; };
+		26C795A72215675C0053C5A1 /* url_request_param.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C795A62215675C0053C5A1 /* url_request_param.cpp */; };
+		26C795A9221567820053C5A1 /* image_view_url.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C795A8221567810053C5A1 /* image_view_url.cpp */; };
 		26CF4DF01ED69AD000954B7A /* ui_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CF4DEF1ED69AD000954B7A /* ui_text.cpp */; };
 		26CF4DF21ED69AD600954B7A /* ui_text_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26CF4DF11ED69AD600954B7A /* ui_text_ios.mm */; };
 		26D9D7F31E9628E0005F7BD3 /* box.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B571561C9D44690099E69B /* box.cpp */; };
@@ -2218,6 +2222,10 @@
 		26C1B64920D51D4D00E36539 /* bitmap_ext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_ext.cpp; sourceTree = "<group>"; };
 		26C267731DB9048200FA8FFD /* render_canvas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_canvas.cpp; sourceTree = "<group>"; };
 		26C72AD01E22484F00F7D6D0 /* collection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = collection.cpp; sourceTree = "<group>"; };
+		26C7959A221538D90053C5A1 /* clipboard_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = clipboard_ios.mm; sourceTree = "<group>"; };
+		26C7959B221538D90053C5A1 /* clipboard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clipboard.cpp; sourceTree = "<group>"; };
+		26C795A62215675C0053C5A1 /* url_request_param.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url_request_param.cpp; sourceTree = "<group>"; };
+		26C795A8221567810053C5A1 /* image_view_url.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image_view_url.cpp; sourceTree = "<group>"; };
 		26CA8D701C23A61D0049A658 /* system_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = system_apple.mm; sourceTree = "<group>"; };
 		26CB94C81D0126ED00D8A472 /* linear_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = linear_view.cpp; sourceTree = "<group>"; };
 		26CB94CA1D0126F900D8A472 /* tree_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tree_view.cpp; sourceTree = "<group>"; };
@@ -4068,6 +4076,7 @@
 				266DD3D41C1181B500D47AB0 /* tcpip.cpp */,
 				2631B77D1DDB14E600729A87 /* url.cpp */,
 				2631B77F1DDB14ED00729A87 /* url_request.cpp */,
+				26C795A62215675C0053C5A1 /* url_request_param.cpp */,
 				2631B7811DDB14F200729A87 /* url_request_apple.mm */,
 				26072FFF20D98466004EB272 /* url_request_curl.cpp */,
 				2607300320D985D3004EB272 /* url_request_common.inc */,
@@ -4102,6 +4111,8 @@
 				266DD4311C118FF200D47AB0 /* button.cpp */,
 				26A9B7611C172BCC004C9B0E /* camera_view.cpp */,
 				266DD4351C11901A00D47AB0 /* check_box.cpp */,
+				26C7959B221538D90053C5A1 /* clipboard.cpp */,
+				26C7959A221538D90053C5A1 /* clipboard_ios.mm */,
 				2649C23A1CBBD7BF003E7561 /* common_dialogs.cpp */,
 				2649C23C1CBBD7D4003E7561 /* common_dialogs_ios.mm */,
 				266DD41A1C118E4A00D47AB0 /* cursor.cpp */,
@@ -4110,6 +4121,7 @@
 				266DD43D1C1190AF00D47AB0 /* edit_view_ios.mm */,
 				E17DADEA1E0C9060006161F6 /* gesture.cpp */,
 				260107B11DAD3E5400C40723 /* image_view.cpp */,
+				26C795A8221567810053C5A1 /* image_view_url.cpp */,
 				266DD43F1C1190E800D47AB0 /* label_view.cpp */,
 				26CB94C81D0126ED00D8A472 /* linear_view.cpp */,
 				269394CB1D7609EB002B9B03 /* list_report_view.cpp */,
@@ -5308,6 +5320,7 @@
 				26D9D8C71E962976005F7BD3 /* motion_tracker.cpp in Sources */,
 				26D9D8BA1E962976005F7BD3 /* common_dialogs_ios.mm in Sources */,
 				26D9D8101E9628E0005F7BD3 /* mutex.cpp in Sources */,
+				26C795A72215675C0053C5A1 /* url_request_param.cpp in Sources */,
 				26D9D8531E96292E005F7BD3 /* database.cpp in Sources */,
 				260B73FC220DCA8E00858EEA /* oauth_login.cpp in Sources */,
 				26D9D8731E96294F005F7BD3 /* graphics_text.cpp in Sources */,
@@ -5330,6 +5343,7 @@
 				26D9D85F1E962937005F7BD3 /* globe.cpp in Sources */,
 				26D9D8151E9628E0005F7BD3 /* variant.cpp in Sources */,
 				26D9D8C91E962976005F7BD3 /* notification_ios.mm in Sources */,
+				26C7959D221538D90053C5A1 /* clipboard.cpp in Sources */,
 				26D9D8161E9628E0005F7BD3 /* platform_android.cpp in Sources */,
 				26D9D8171E9628E0005F7BD3 /* async_kqueue.cpp in Sources */,
 				26D9D88E1E96295A005F7BD3 /* take_photo.cpp in Sources */,
@@ -5371,6 +5385,7 @@
 				26D9D8641E96294F005F7BD3 /* bitmap_quartz.mm in Sources */,
 				26D9D8D51E962976005F7BD3 /* slider.cpp in Sources */,
 				26D9D8241E9628E0005F7BD3 /* setting.cpp in Sources */,
+				26C795A9221567820053C5A1 /* image_view_url.cpp in Sources */,
 				26D9D8D61E962976005F7BD3 /* split_view.cpp in Sources */,
 				26D9D8251E9628E0005F7BD3 /* quaternion.cpp in Sources */,
 				26D9D8841E96295A005F7BD3 /* audio_recorder_ios.mm in Sources */,
@@ -5411,6 +5426,7 @@
 				26D9D8A41E962962005F7BD3 /* socket_event.cpp in Sources */,
 				26D9D8691E96294F005F7BD3 /* drawable.cpp in Sources */,
 				263916F621C930DD008B335B /* qr_code_scanner.cpp in Sources */,
+				26C7959C221538D90053C5A1 /* clipboard_ios.mm in Sources */,
 				26D9D82F1E9628E0005F7BD3 /* time.cpp in Sources */,
 				26D9D8301E9628E0005F7BD3 /* resource.cpp in Sources */,
 				26D9D8DE1E962976005F7BD3 /* ui_core.cpp in Sources */,

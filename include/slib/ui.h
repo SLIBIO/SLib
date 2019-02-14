@@ -75,6 +75,7 @@
 #include "ui/mobile_app.h"
 #include "ui/mobile_game.h"
 
+#include "ui/clipboard.h"
 #include "ui/notification.h"
 
 #endif

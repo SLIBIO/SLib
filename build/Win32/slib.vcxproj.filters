@@ -893,5 +893,17 @@
     <ClCompile Include="..\..\src\slib\social\twitter_login.cpp">
       <Filter>src\social</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\clipboard.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\clipboard_win32.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\network\url_request_param.cpp">
+      <Filter>src\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\image_view_url.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

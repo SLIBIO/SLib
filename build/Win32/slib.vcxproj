@@ -217,6 +217,7 @@
     <ClCompile Include="..\..\src\slib\network\url.cpp" />
     <ClCompile Include="..\..\src\slib\network\url_request.cpp" />
     <ClCompile Include="..\..\src\slib\network\url_request_curl.cpp" />
+    <ClCompile Include="..\..\src\slib\network\url_request_param.cpp" />
     <ClCompile Include="..\..\src\slib\network\url_request_win32.cpp" />
     <ClCompile Include="..\..\src\slib\render\index_buffer.cpp" />
     <ClCompile Include="..\..\src\slib\render\opengl_egl.cpp" />
@@ -241,6 +242,8 @@
     <ClCompile Include="..\..\src\slib\ui\camera_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\check_box.cpp" />
     <ClCompile Include="..\..\src\slib\ui\check_box_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\clipboard.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\clipboard_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\common_dialogs.cpp" />
     <ClCompile Include="..\..\src\slib\ui\common_dialogs_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\cursor.cpp" />
@@ -250,6 +253,7 @@
     <ClCompile Include="..\..\src\slib\ui\edit_view_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\gesture.cpp" />
     <ClCompile Include="..\..\src\slib\ui\image_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\image_view_url.cpp" />
     <ClCompile Include="..\..\src\slib\ui\label_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\linear_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\list_report_view.cpp" />

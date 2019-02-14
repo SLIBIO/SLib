@@ -191,6 +191,7 @@ set (SLIB_CORE_FILES
  "${SLIB_PATH}/src/slib/network/tcpip.cpp"
  "${SLIB_PATH}/src/slib/network/url.cpp"
  "${SLIB_PATH}/src/slib/network/url_request.cpp"
+ "${SLIB_PATH}/src/slib/network/url_request_param.cpp"
  "${SLIB_PATH}/src/slib/network/url_request_curl.cpp"
 )
 if(ANDROID)
@@ -293,6 +294,7 @@ set (SLIB_EXTRA_FILES
 
  "${SLIB_PATH}/src/slib/ui/button.cpp"
  "${SLIB_PATH}/src/slib/ui/camera_view.cpp"
+ "${SLIB_PATH}/src/slib/ui/clipboard.cpp"
  "${SLIB_PATH}/src/slib/ui/check_box.cpp"
  "${SLIB_PATH}/src/slib/ui/common_dialogs.cpp"
  "${SLIB_PATH}/src/slib/ui/cursor.cpp"
@@ -300,6 +302,7 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/ui/edit_view.cpp"
  "${SLIB_PATH}/src/slib/ui/gesture.cpp"
  "${SLIB_PATH}/src/slib/ui/image_view.cpp"
+ "${SLIB_PATH}/src/slib/ui/image_view_url.cpp"
  "${SLIB_PATH}/src/slib/ui/label_view.cpp"
  "${SLIB_PATH}/src/slib/ui/linear_view.cpp"
  "${SLIB_PATH}/src/slib/ui/list_report_view.cpp"
@@ -362,6 +365,9 @@ if(ANDROID)
   "${SLIB_PATH}/src/slib/device/sensor_android.cpp"
   "${SLIB_PATH}/src/slib/device/vibrator_android.cpp"
 
+  "${SLIB_PATH}/src/slib/social/facebook_android.cpp"
+
+  "${SLIB_PATH}/src/slib/ui/clipboard_android.cpp"
   "${SLIB_PATH}/src/slib/ui/common_dialogs_android.cpp"
   "${SLIB_PATH}/src/slib/ui/edit_view_android.cpp"
   "${SLIB_PATH}/src/slib/ui/notification_android.cpp"
@@ -386,6 +392,7 @@ else ()
 
   "${SLIB_PATH}/src/slib/device/device_linux.cpp"
 
+  "${SLIB_PATH}/src/slib/ui/clipboard_gtk.cpp"
   "${SLIB_PATH}/src/slib/ui/common_dialogs_gtk.cpp"
   "${SLIB_PATH}/src/slib/ui/render_view_gtk.cpp"
   "${SLIB_PATH}/src/slib/ui/ui_core_gtk.cpp"
