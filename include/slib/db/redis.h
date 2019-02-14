@@ -113,8 +113,16 @@ namespace slib
 		
 		void setLoggingErrors(sl_bool flag);
 		
+		String getLastError();
+		
+	protected:
+		void processError(const String& error);
+		
+		void clearError();
+		
 	protected:
 		sl_bool m_flagLogErrors;
+		AtomicString m_lastError;
 		
 	};
 

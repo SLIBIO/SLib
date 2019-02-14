@@ -187,6 +187,24 @@ namespace slib
 		m_flagLogErrors = flag;
 	}
 	
+	String RedisDatabase::getLastError()
+	{
+		return m_lastError;
+	}
+	
+	void RedisDatabase::processError(const String& error)
+	{
+		m_lastError = error;
+		if (m_flagLogErrors) {
+			LogError(TAG, "%s", error);
+		}
+	}
+	
+	void RedisDatabase::clearError()
+	{
+		m_lastError.setNull();
+	}
+	
 	class _priv_RedisDatabase : public RedisDatabase
 	{
 	public:
@@ -216,15 +234,9 @@ namespace slib
 			return sl_null;
 		}
 		
-		void _logError(const String& error)
-		{
-			if (m_flagLogErrors) {
-				LogError(TAG, "%s", error);
-			}
-		}
-		
 		Variant _parseReply(redisReply* reply)
 		{
+			clearError();
 			if (reply) {
 				switch (reply->type) {
 					case REDIS_REPLY_INTEGER:
@@ -241,6 +253,7 @@ namespace slib
 						return list;
 					}
 					case REDIS_REPLY_ERROR:
+						processError(reply->str);
 						break;
 				}
 			}
@@ -251,7 +264,6 @@ namespace slib
 		{
 			if (reply) {
 				if (reply->type == REDIS_REPLY_ERROR) {
-					_logError(reply->str);
 					if (pValue) {
 						*pValue = String(reply->str);
 					}
@@ -263,7 +275,7 @@ namespace slib
 				freeReplyObject(reply);
 				return sl_true;
 			} else {
-				_logError("Cannot connect to the server");
+				processError("Cannot connect to the server");
 			}
 			return sl_false;
 		}
