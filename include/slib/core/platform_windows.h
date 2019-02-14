@@ -61,6 +61,9 @@ namespace slib
 		static sl_bool getGUIDFromString(const String& str, GUID* pguid);
 
 
+		static HGLOBAL createGlobalData(const void* data, sl_size size);
+
+
 		static sl_bool isWindowVisible(HWND hWnd);
 
 		static HWND getOwnerWindow(HWND hWnd);

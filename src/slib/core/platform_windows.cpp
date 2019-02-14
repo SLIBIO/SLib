@@ -59,6 +59,19 @@ namespace slib
 		return sl_false;
 	}
 
+	HGLOBAL Windows::createGlobalData(const void* data, sl_size size)
+	{
+		HGLOBAL handle = ::GlobalAlloc(GMEM_MOVEABLE, size);
+		if (handle) {
+			void* dst = ::GlobalLock(handle);
+			if (dst) {
+				Base::copyMemory(dst, data, size);
+				::GlobalUnlock(dst);
+			}
+		}
+		return handle;
+	}
+
 	sl_bool Windows::isWindowVisible(HWND hWnd)
 	{
 		if (!::IsWindow(hWnd)) {
