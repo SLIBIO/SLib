@@ -66,6 +66,8 @@ namespace slib
 
 		static NSData* getNSDataFromMemory(const Memory& memory);
 		
+		static NSString* getSystemLocalizedNSString(NSString* key);
+		
 #endif
 
 		static String getAssetFilePath(const String& path);
@@ -77,6 +79,8 @@ namespace slib
 		static sl_uint32 getSystemMinorVersion();
 
 		static String getMainBundlePath();
+		
+		static String getSystemLocalizedString(const String& key);
 	
 	};
 

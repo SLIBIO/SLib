@@ -136,8 +136,18 @@ namespace slib
 		if(memory.isNotNull()) {
 			return [NSData dataWithBytes:memory.getData() length:memory.getSize()];
 		}
-		
 		return nil;
+	}
+	
+	NSString* Apple::getSystemLocalizedNSString(NSString* str)
+	{
+#if defined(SLIB_PLATFORM_IS_IOS)
+		NSBundle* bundle = [NSBundle bundleForClass:[UIApplication class]];
+		if (bundle != nil) {
+			return [bundle localizedStringForKey:str value:str table:nil];
+		}
+#endif
+		return str;
 	}
 
 	String Apple::getAssetFilePath(const String &path)
@@ -228,6 +238,11 @@ namespace slib
 		return getStringFromNSString(path);
 	}
 
+	String Apple::getSystemLocalizedString(const String& key)
+	{
+		return getStringFromNSString(getSystemLocalizedNSString(getNSStringFromString(key)));
+	}
+	
 }
 
 #endif
