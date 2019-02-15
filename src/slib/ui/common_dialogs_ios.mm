@@ -28,8 +28,17 @@
 
 #include "slib/ui/core.h"
 #include "slib/ui/mobile_app.h"
-
+#include "slib/ui/resource.h"
 #include "slib/ui/platform.h"
+
+#include "../resources.h"
+
+@interface _priv_SLib_AlertDialog_LabelHelper : NSObject
+{
+}
++ (_priv_SLib_AlertDialog_LabelHelper*)sharedInstance;
+- (void)handleTapOnLabel:(UITapGestureRecognizer *)tapGesture;
+@end
 
 namespace slib
 {
@@ -49,6 +58,20 @@ namespace slib
 		_showOnUiThread();
 	}
 	
+	static void _priv_AlertDialog_enableLink(UIView* view)
+	{
+		for (UIView* subview in view.subviews) {
+			if ([subview isKindOfClass:[UILabel class]]) {
+				UILabel* label = (UILabel*)subview;
+				label.userInteractionEnabled = YES;
+				_priv_SLib_AlertDialog_LabelHelper* target = [_priv_SLib_AlertDialog_LabelHelper sharedInstance];
+				[label addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:target action:@selector(handleTapOnLabel:)]];
+			} else {
+				_priv_AlertDialog_enableLink(subview);
+			}
+		}
+	}
+	
 	sl_bool AlertDialog::_show()
 	{
 		AlertDialogButtons buttons = this->buttons;
@@ -56,19 +79,19 @@ namespace slib
 		NSString* text = Apple::getNSStringFromString(this->text);
 		NSString* titleOk = Apple::getNSStringFromString(this->titleOk);
 		if ([titleOk length] == 0) {
-			titleOk = @"OK";
+			titleOk = Apple::getSystemLocalizedNSString(@"OK");
 		}
 		NSString* titleCancel = Apple::getNSStringFromString(this->titleCancel);
 		if ([titleCancel length] == 0) {
-			titleCancel = @"Cancel";
+			titleCancel = Apple::getSystemLocalizedNSString(@"Cancel");
 		}
 		NSString* titleYes = Apple::getNSStringFromString(this->titleYes);
 		if ([titleYes length] == 0) {
-			titleYes = @"Yes";
+			titleYes = Apple::getNSStringFromString(string::yes::get());
 		}
 		NSString* titleNo = Apple::getNSStringFromString(this->titleNo);
 		if ([titleNo length] == 0) {
-			titleNo = @"No";
+			titleNo = Apple::getSystemLocalizedNSString(@"No");
 		}
 		Function<void()> onOk = this->onOk;
 		Function<void()> onCancel = this->onCancel;
@@ -125,6 +148,20 @@ namespace slib
 				[alert addAction:actionOK];
 			}
 			
+			if (flagHyperText) {
+				@try {
+					NSString* htmlText = [NSString stringWithFormat:@"<span style=\"font-family: Helvetica Neue; font-size: 18\">%@</span>", text];
+					NSMutableAttributedString* str = [[NSMutableAttributedString alloc] initWithData:[htmlText dataUsingEncoding:NSUTF8StringEncoding] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType, NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)} documentAttributes:nil error:nil];
+					if (str != nil) {
+						[alert setValue:str forKey: @"attributedMessage"];
+						UIView* view = alert.view;
+						if (view != nil) {
+							_priv_AlertDialog_enableLink(view);
+						}
+					}
+				} @catch (NSException*) {}
+			}
+			
 			UIWindow* window = nil;
 			Ref<Window> parentWindow = this->parent;
 			if (parentWindow.isNull()) {
@@ -167,5 +204,47 @@ namespace slib
 	}
 	
 }
+
+@implementation _priv_SLib_AlertDialog_LabelHelper
+
++ (_priv_SLib_AlertDialog_LabelHelper*)sharedInstance
+{
+	static _priv_SLib_AlertDialog_LabelHelper* instance = [[_priv_SLib_AlertDialog_LabelHelper alloc] init];
+	return instance;
+}
+
+- (void)handleTapOnLabel:(UITapGestureRecognizer *)tapGesture
+{
+	UILabel* label = (UILabel*)(tapGesture.view);
+	
+	NSAttributedString* text = label.attributedText;
+	CGSize sizeLabel = label.bounds.size;
+
+	NSLayoutManager *layoutManager = [[NSLayoutManager alloc] init];
+	NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:CGSizeZero];
+	NSTextStorage *textStorage = [[NSTextStorage alloc] initWithAttributedString:text];
+	
+	[layoutManager addTextContainer:textContainer];
+	[textStorage addLayoutManager:layoutManager];
+	
+	textContainer.lineFragmentPadding = 0.0;
+	textContainer.lineBreakMode = label.lineBreakMode;
+	textContainer.maximumNumberOfLines = label.numberOfLines;
+	textContainer.size = sizeLabel;
+
+	CGPoint pos = [tapGesture locationInView:label];
+	CGRect rcText = [layoutManager usedRectForTextContainer:textContainer];
+	pos.x -= (sizeLabel.width - rcText.size.width) / 2;
+	pos.y -= (sizeLabel.height - rcText.size.height) / 2;
+	NSUInteger index = [layoutManager characterIndexForPoint:pos inTextContainer:textContainer fractionOfDistanceBetweenInsertionPoints:nil];
+	
+	NSDictionary* attrs = [text attributesAtIndex:index effectiveRange:nil];
+	NSURL* url = attrs[NSLinkAttributeName];
+	if (url != nil) {
+		[[UIApplication sharedApplication] openURL:url];
+	}
+}
+
+@end
 
 #endif

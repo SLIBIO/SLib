@@ -24,6 +24,12 @@ package slib.platform.android.ui;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.os.Build;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.util.TypedValue;
+import android.widget.TextView;
+
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
 
@@ -36,6 +42,7 @@ public class Alert {
 	public static final int TYPE_YESNOCANCEL = 3;
 	
 	public String text;
+	public boolean flagHyperText;
 	public String caption;
 	
 	public String titleOk;
@@ -64,35 +71,41 @@ public class Alert {
 			});
 		} else {
 			try {
-				boolean flagRight = true;
-				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity, AlertDialog.THEME_HOLO_LIGHT);
 				alertDialogBuilder.setTitle(caption);
-				alertDialogBuilder.setMessage(text);
-				String titleOk = this.titleOk;
-				if (titleOk == null) {
-					titleOk = "OK";
-				}
-				String titleCancel = this.titleCancel;
-				if (titleCancel == null) {
-					titleCancel = "Cancel";
-				}
-				String titleYes = this.titleYes;
-				if (titleYes == null) {
-					titleYes = "Yes";
-				}
-				String titleNo = this.titleNo;
-				if (titleNo == null) {
-					titleNo = "No";
+				if (flagHyperText) {
+					TextView message = new TextView(activity);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						message.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT));
+					} else {
+						message.setText(Html.fromHtml(text));
+					}
+					int padding = (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, activity.getResources().getDisplayMetrics()));
+					message.setPadding(padding, padding, padding, padding);
+					message.setMovementMethod(LinkMovementMethod.getInstance());
+					message.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+					alertDialogBuilder.setView(message);
+				} else {
+					alertDialogBuilder.setMessage(text);
 				}
 				switch (type) {
 				case TYPE_OK:
-					alertDialogBuilder.setPositiveButton(titleOk, new AlertDialog.OnClickListener() {						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							nativeShowResult(nativeObject, RESULT_OK);
-						}
-					});
-					alertDialogBuilder.setOnCancelListener(new AlertDialog.OnCancelListener() {						
+					if (titleOk != null) {
+						alertDialogBuilder.setPositiveButton(titleOk, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_OK);
+							}
+						});
+					} else {
+						alertDialogBuilder.setPositiveButton(android.R.string.ok, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_OK);
+							}
+						});
+					}
+					alertDialogBuilder.setOnCancelListener(new AlertDialog.OnCancelListener() {
 						@Override
 						public void onCancel(DialogInterface dialog) {
 							nativeShowResult(nativeObject, RESULT_OK);
@@ -101,18 +114,36 @@ public class Alert {
 					alertDialogBuilder.setCancelable(true);
 					break;
 				case TYPE_OKCANCEL:
-					alertDialogBuilder.setPositiveButton(titleOk, new AlertDialog.OnClickListener() {						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							nativeShowResult(nativeObject, RESULT_OK);
-						}
-					});
-					alertDialogBuilder.setNegativeButton(titleCancel, new AlertDialog.OnClickListener() {						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							nativeShowResult(nativeObject, RESULT_CANCEL);
-						}
-					});
+					if (titleOk != null) {
+						alertDialogBuilder.setPositiveButton(titleOk, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_OK);
+							}
+						});
+					} else {
+						alertDialogBuilder.setPositiveButton(android.R.string.ok, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_OK);
+							}
+						});
+					}
+					if (titleCancel != null) {
+						alertDialogBuilder.setNegativeButton(titleCancel, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_CANCEL);
+							}
+						});
+					} else {
+						alertDialogBuilder.setNegativeButton(android.R.string.cancel, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_CANCEL);
+							}
+						});
+					}
 					alertDialogBuilder.setOnCancelListener(new AlertDialog.OnCancelListener() {						
 						@Override
 						public void onCancel(DialogInterface dialog) {
@@ -122,39 +153,84 @@ public class Alert {
 					alertDialogBuilder.setCancelable(true);
 					break;
 				case TYPE_YESNO:
-					alertDialogBuilder.setPositiveButton(titleYes, new AlertDialog.OnClickListener() {						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							nativeShowResult(nativeObject, RESULT_YES);
-						}
-					});
-					alertDialogBuilder.setNegativeButton(titleNo, new AlertDialog.OnClickListener() {						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							nativeShowResult(nativeObject, RESULT_NO);
-						}
-					});
+					if (titleYes != null) {
+						alertDialogBuilder.setPositiveButton(titleYes, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_YES);
+							}
+						});
+					} else {
+						alertDialogBuilder.setPositiveButton(android.R.string.yes, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_YES);
+							}
+						});
+					}
+					if (titleNo != null) {
+						alertDialogBuilder.setNeutralButton(titleNo, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_NO);
+							}
+						});
+					} else {
+						alertDialogBuilder.setNeutralButton(android.R.string.no, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_NO);
+							}
+						});
+					}
 					alertDialogBuilder.setCancelable(false);
 					break;
 				case TYPE_YESNOCANCEL:
-					alertDialogBuilder.setPositiveButton(titleYes, new AlertDialog.OnClickListener() {						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							nativeShowResult(nativeObject, RESULT_YES);
-						}
-					});
-					alertDialogBuilder.setNeutralButton(titleNo, new AlertDialog.OnClickListener() {						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							nativeShowResult(nativeObject, RESULT_NO);
-						}
-					});
-					alertDialogBuilder.setNegativeButton(titleCancel, new AlertDialog.OnClickListener() {						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							nativeShowResult(nativeObject, RESULT_CANCEL);
-						}
-					});
+					if (titleYes != null) {
+						alertDialogBuilder.setPositiveButton(titleYes, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_YES);
+							}
+						});
+					} else {
+						alertDialogBuilder.setPositiveButton(android.R.string.yes, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_YES);
+							}
+						});
+					}
+					if (titleNo != null) {
+						alertDialogBuilder.setNeutralButton(titleNo, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_NO);
+							}
+						});
+					} else {
+						alertDialogBuilder.setNeutralButton(android.R.string.no, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_NO);
+							}
+						});
+					}
+					if (titleCancel != null) {
+						alertDialogBuilder.setNegativeButton(titleCancel, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_CANCEL);
+							}
+						});
+					} else {
+						alertDialogBuilder.setNegativeButton(android.R.string.cancel, new AlertDialog.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								nativeShowResult(nativeObject, RESULT_CANCEL);
+							}
+						});
+					}
 					alertDialogBuilder.setOnCancelListener(new AlertDialog.OnCancelListener() {						
 						@Override
 						public void onCancel(DialogInterface dialog) {
@@ -164,13 +240,12 @@ public class Alert {
 					alertDialogBuilder.setCancelable(true);
 					break;
 				default:
-					flagRight = false;
+					return false;
 				}
-				if (flagRight) {
-					AlertDialog alertDialog = alertDialogBuilder.create();
-					alertDialog.show();
-					return true;
-				}
+
+				AlertDialog alertDialog = alertDialogBuilder.create();
+				alertDialog.show();
+				return true;
 			} catch (Throwable e) {
 				Logger.exception(e);
 			}

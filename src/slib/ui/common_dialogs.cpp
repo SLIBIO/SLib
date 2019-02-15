@@ -39,6 +39,7 @@ namespace slib
 	
 	AlertDialog::AlertDialog()
 	{
+		flagHyperText = sl_false;
 		buttons = AlertDialogButtons::Ok;
 		icon = AlertDialogIcon::None;
 	}
@@ -405,7 +406,7 @@ namespace slib
 			view->setTextColor(Color::White, UIUpdateMode::Init);
 			view->setBackgroundColor(Color(0, 0, 0, 160), UIUpdateMode::Init);
 			view->setBoundRadius(font->getFontHeight() / 3, UIUpdateMode::Init);
-			view->setPadding(font->getFontHeight() / 3, UIUpdateMode::Init);
+			view->setPadding((sl_ui_pos)(font->getFontHeight() / 3), UIUpdateMode::Init);
 			view->setCenterInParent(UIUpdateMode::Init);
 			view->setClipping(sl_true, UIUpdateMode::Init);
 			currentToast = view;

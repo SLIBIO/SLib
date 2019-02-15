@@ -24,11 +24,12 @@
 
 #if defined(SLIB_UI_IS_MACOS)
 
+#include "slib/core/file.h"
 #include "slib/ui/core.h"
 #include "slib/ui/common_dialogs.h"
-#include "slib/core/file.h"
-
 #include "slib/ui/platform.h"
+
+#include "../resources.h"
 
 namespace slib
 {
@@ -48,19 +49,19 @@ namespace slib
 		NSString* text = Apple::getNSStringFromString(this->text);
 		NSString* titleOk = Apple::getNSStringFromString(this->titleOk);
 		if ([titleOk length] == 0) {
-			titleOk = @"OK";
+			titleOk = Apple::getNSStringFromString(string::ok::get());
 		}
 		NSString* titleCancel = Apple::getNSStringFromString(this->titleCancel);
 		if ([titleCancel length] == 0) {
-			titleCancel = @"Cancel";
+			titleCancel = Apple::getNSStringFromString(string::cancel::get());
 		}
 		NSString* titleYes = Apple::getNSStringFromString(this->titleYes);
 		if ([titleYes length] == 0) {
-			titleYes = @"Yes";
+			titleYes = Apple::getNSStringFromString(string::yes::get());
 		}
 		NSString* titleNo = Apple::getNSStringFromString(this->titleNo);
 		if ([titleNo length] == 0) {
-			titleNo = @"No";
+			titleNo = Apple::getNSStringFromString(string::no::get());
 		}
 		
 		DialogResult result1 = DialogResult::Cancel;

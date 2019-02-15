@@ -30,6 +30,8 @@
 #include "slib/ui/platform.h"
 #include "slib/core/safe_static.h"
 
+#include "../resources.h"
+
 namespace slib
 {
 
@@ -54,6 +56,7 @@ namespace slib
 	SLIB_JNI_BEGIN_CLASS(JAndroidAlert, "slib/platform/android/ui/Alert")
 		SLIB_JNI_INT_FIELD(type);
 		SLIB_JNI_STRING_FIELD(text);
+		SLIB_JNI_BOOLEAN_FIELD(flagHyperText);
 		SLIB_JNI_STRING_FIELD(caption);
 		SLIB_JNI_STRING_FIELD(titleOk);
 		SLIB_JNI_STRING_FIELD(titleCancel);
@@ -100,12 +103,21 @@ namespace slib
 					JAndroidAlert::type.set(jalert, (int)(buttons));
 					JAndroidAlert::caption.set(jalert, caption);
 					JAndroidAlert::text.set(jalert, text);
+					JAndroidAlert::flagHyperText.set(jalert, flagHyperText);
 					jlong lresult = (jlong)(result.get());
 					JAndroidAlert::nativeObject.set(jalert, lresult);
 					JAndroidAlert::titleOk.set(jalert, titleOk);
 					JAndroidAlert::titleCancel.set(jalert, titleCancel);
-					JAndroidAlert::titleYes.set(jalert, titleYes);
-					JAndroidAlert::titleNo.set(jalert, titleNo);
+					String _titleYes = titleYes;
+					if (_titleYes.isEmpty()) {
+						_titleYes = string::yes::get();
+					}
+					JAndroidAlert::titleYes.set(jalert, _titleYes);
+					String _titleNo = titleNo;
+					if (_titleNo.isEmpty()) {
+						_titleNo = string::no::get();
+					}
+					JAndroidAlert::titleNo.set(jalert, _titleNo);
 					alertMap->put(lresult, result);
 					if (JAndroidAlert::show.callBoolean(jalert, jactivity)) {
 						return sl_true;

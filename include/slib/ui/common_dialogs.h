@@ -70,6 +70,7 @@ namespace slib
 		Ref<Window> parent;
 		String caption;
 		String text;
+		sl_bool flagHyperText;
 		AlertDialogButtons buttons;
 		AlertDialogIcon icon;
 
