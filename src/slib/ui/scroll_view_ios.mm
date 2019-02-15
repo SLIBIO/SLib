@@ -96,6 +96,9 @@ namespace slib
 			handle.showsHorizontalScrollIndicator = isHorizontalScrollBarVisible() ? YES : NO;
 			handle.showsVerticalScrollIndicator = isVerticalScrollBarVisible() ? YES : NO;
 			
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
+			[handle setContentOffsetFromAPI:CGPointMake((CGFloat)(getScrollX()) / f, (CGFloat)(getScrollY()) / f) animated:NO];
+
 			_applyContent(handle);
 		}
 		

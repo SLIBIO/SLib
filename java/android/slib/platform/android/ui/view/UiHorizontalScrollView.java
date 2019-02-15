@@ -45,6 +45,19 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 		super(context);
 	}
 
+	boolean flagInitedContent = false;
+	int initScrollX = 0;
+	int initScrollY = 0;
+
+	public void _scrollTo(int x, int y) {
+		if (flagInitedContent) {
+			scrollTo(x, y);
+		} else {
+			initScrollX = x;
+			initScrollY = y;
+		}
+	}
+
 	public void setPaging(boolean flagPaging, int pageWidth, int pageHeight) {
 		mPaging = flagPaging;
 		mPageWidth = pageWidth;
@@ -59,7 +72,9 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 	@Override
 	protected void onScrollChanged(int l, int t, int oldl, int oldt) {
 		super.onScrollChanged( l, t, oldl, oldt );
-		UiScrollView.onEventScroll(this, l, t);
+		if (flagInitedContent) {
+			UiScrollView.onEventScroll(this, l, t);
+		}
 	}
 
 	@Override
@@ -71,14 +86,12 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		super.onLayout(changed, l, t, r, b);
-		int count = getChildCount();
-		for (int i = 0; i < count; i++) {
-			View child = getChildAt(i);
-			if (child.getVisibility() != GONE) {
-				if (child instanceof IView) {
-					IView view = (IView)child;
-					Rect frame = view.getUIFrame();
-					child.layout(frame.left, frame.top, frame.right, frame.bottom);
+		if (getChildCount() > 0) {
+			View child = getChildAt(0);
+			if (child.getWidth() > 0) {
+				if (!flagInitedContent) {
+					scrollTo(initScrollX, initScrollY);
+					flagInitedContent = true;
 				}
 			}
 		}

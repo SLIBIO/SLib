@@ -65,6 +65,19 @@ namespace slib
 				handle.backgroundColor = GraphicsPlatform::getNSColorFromColor(backgroundColor);
 			}
 			_applyContent(handle);
+			_scrollTo(handle, getScrollX(), getScrollY(), sl_false);
+		}
+		
+		static void _scrollTo(NSScrollView* sv, sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate)
+		{
+			NSClipView* clip = [sv contentView];
+			if (clip != nil) {
+				NSPoint pt;
+				pt.x = (CGFloat)x;
+				pt.y = (CGFloat)y;
+				[clip scrollToPoint:pt];
+				[sv reflectScrolledClipView:clip];
+			}
 		}
 		
 		static void _onScroll(macOS_ViewInstance* instance, NSScrollView* sv)
@@ -111,14 +124,7 @@ namespace slib
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
 			NSScrollView* sv = (NSScrollView*)handle;
-			NSClipView* clip = [sv contentView];
-			if (clip != nil) {
-				NSPoint pt;
-				pt.x = (CGFloat)x;
-				pt.y = (CGFloat)y;
-				[clip scrollToPoint:pt];
-				[sv reflectScrolledClipView:clip];
-			}
+			_priv_ScrollView::_scrollTo(sv, x, y, flagAnimate);
 		}
 	}
 

@@ -80,18 +80,29 @@ namespace slib
 			} else {
 				Ref<View> view = getView();
 				if (_priv_ScrollView* sv = CastInstance<_priv_ScrollView>(view.get())) {
+					sl_bool flagUpdateScroll = sl_false;
 					if (sv->isHorizontalScrolling()) {
 						if (Windows::processWindowHorizontalScrollEvents(handle, msg, wParam, lParam, PRIV_SCROLL_LINE_SIZE, PRIV_SCROLL_WHEEL_SIZE)) {
-							_refreshContentPosition(sv, sl_true);
-							return sl_true;
+							flagUpdateScroll = sl_true;
 						}
 					}
 					if (sv->isVerticalScrolling()) {
 						if (Windows::processWindowVerticalScrollEvents(handle, msg, wParam, lParam, PRIV_SCROLL_LINE_SIZE, PRIV_SCROLL_WHEEL_SIZE)) {
-							_refreshContentPosition(sv, sl_true);
-							return sl_true;
+							flagUpdateScroll = sl_true;
 						}
 					}
+					if (flagUpdateScroll) {
+						SCROLLINFO si;
+						Base::zeroMemory(&si, sizeof(si));
+						si.fMask = SIF_POS;
+						::GetScrollInfo(handle, SB_HORZ, &si);
+						int x = si.nPos;
+						::GetScrollInfo(handle, SB_VERT, &si);
+						int y = si.nPos;
+						_refreshContentPosition(sv, (sl_scroll_pos)x, (sl_scroll_pos)y, sl_true);
+						return sl_true;
+					}
+
 				}
 			}
 			return sl_false;
@@ -103,7 +114,6 @@ namespace slib
 				viewChild->attachToNewInstance(this);
 			}
 			_refreshContentSize(viewParent);
-			_refreshContentPosition(viewParent, sl_false);
 		}
 
 		void _refreshContentSize(_priv_ScrollView* view)
@@ -118,29 +128,34 @@ namespace slib
 				if (view->isVerticalScrolling()) {
 					Windows::setWindowVerticalScrollParam(handle, 0, sizeContent.y - 1, sizeParent.y);
 				}
-				_refreshContentPosition(view, sl_false);
+				_refreshContentPosition(view, view->getScrollX(), view->getScrollY(), sl_false);
 			}
 		}
 
-		void _refreshContentPosition(_priv_ScrollView* view, sl_bool flagFromEvent)
+		void _refreshContentPosition(_priv_ScrollView* view, sl_scroll_pos x, sl_scroll_pos y, sl_bool flagFromEvent)
 		{
 			HWND handle = getHandle();
 			if (handle) {
-				SCROLLINFO si;
-				Base::zeroMemory(&si, sizeof(si));
-				si.fMask = SIF_POS;
-				::GetScrollInfo(handle, SB_HORZ, &si);
-				int x = si.nPos;
-				::GetScrollInfo(handle, SB_VERT, &si);
-				int y = si.nPos;
 				Ref<View> viewContent = view->getContentView();
 				if (viewContent.isNotNull()) {
 					viewContent->setLocation((sl_ui_pos)(-x), (sl_ui_pos)(-y));
 				}
 				if (flagFromEvent) {
-					view->_onScroll_NW((sl_scroll_pos)x, (sl_scroll_pos)y);
+					view->_onScroll_NW(x, y);
 				}
 			}
+		}
+
+		static void _scrollTo(HWND handle, sl_scroll_pos x, sl_scroll_pos y)
+		{
+			SCROLLINFO si;
+			Base::zeroMemory(&si, sizeof(si));
+			si.cbSize = sizeof(si);
+			si.fMask = SIF_POS;
+			si.nPos = (int)x;
+			::SetScrollInfo(handle, SB_HORZ, &si, TRUE);
+			si.nPos = (int)y;
+			::SetScrollInfo(handle, SB_VERT, &si, TRUE);
 		}
 	};
 
@@ -167,6 +182,7 @@ namespace slib
 		Ref<_priv_Win32_ScrollViewInstance> ret = Win32_ViewInstance::create<_priv_Win32_ScrollViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
 		if (ret.isNotNull()) {
 			ret->_setContentView(m_viewContent, (_priv_ScrollView*)this);
+			_priv_Win32_ScrollViewInstance::_scrollTo(ret->getHandle(), getScrollX(), getScrollY());
 			ret->m_backgroundColor = getBackgroundColor();
 		}
 		return ret;
@@ -192,21 +208,10 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			SCROLLINFO si;
-			Base::zeroMemory(&si, sizeof(si));
-			si.cbSize = sizeof(si);
-			si.fMask = SIF_POS;
-			if (isHorizontalScrolling()) {
-				si.nPos = (int)x;
-				::SetScrollInfo(handle, SB_HORZ, &si, TRUE);
-			}
-			if (isVerticalScrolling()) {
-				si.nPos = (int)y;
-				::SetScrollInfo(handle, SB_VERT, &si, TRUE);
-			}
+			_priv_Win32_ScrollViewInstance::_scrollTo(handle, x, y);
 			Ref<ViewInstance> instance = getViewInstance();
 			if (_priv_Win32_ScrollViewInstance* _instance = CastInstance<_priv_Win32_ScrollViewInstance>(instance.get())) {
-				_instance->_refreshContentPosition((_priv_ScrollView*)this, sl_false);
+				_instance->_refreshContentPosition((_priv_ScrollView*)this, x, y, sl_false);
 			}
 		}
 	}

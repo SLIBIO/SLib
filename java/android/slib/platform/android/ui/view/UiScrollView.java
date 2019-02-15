@@ -64,15 +64,29 @@ public class UiScrollView extends ScrollView implements IView {
 		view.setBackgroundColor(color);
 	}
 	
-	public static void _scrollTo(final View view, final int x, final int y) {
+	public static void _scrollTo(final View view, final int x, final int y, final boolean flagAnimate) {
 		if (!(UiThread.isUiThread())) {
 			view.post(new Runnable() {
 				public void run() {
-					_scrollTo(view, x, y);
+					_scrollTo(view, x, y, flagAnimate);
 				}
 			});
 		}
-		view.scrollTo(x, y);
+		if (view instanceof UiScrollView) {
+			if (flagAnimate) {
+				((UiScrollView)view).smoothScrollTo(x, y);
+			} else {
+				((UiScrollView)view)._scrollTo(x, y);
+			}
+		} else if (view instanceof UiHorizontalScrollView) {
+			if (flagAnimate) {
+				((UiHorizontalScrollView)view).smoothScrollTo(x, y);
+			} else {
+				((UiHorizontalScrollView)view)._scrollTo(x, y);
+			}
+		} else {
+			view.scrollTo(x, y);
+		}
 	}
 	
 	public static int _getScrollX(View view) {
@@ -123,10 +137,25 @@ public class UiScrollView extends ScrollView implements IView {
 		super.addView(view);
 	}
 
+	boolean flagInitedContent = false;
+	int initScrollX = 0;
+	int initScrollY = 0;
+
+	public void _scrollTo(int x, int y) {
+		if (flagInitedContent) {
+			scrollTo(x, y);
+		} else {
+			initScrollX = x;
+			initScrollY = y;
+		}
+	}
+
 	@Override
 	protected void onScrollChanged(int l, int t, int oldl, int oldt) {	    
 	    super.onScrollChanged( l, t, oldl, oldt );
-		onEventScroll(this, l, t);
+	    if (flagInitedContent) {
+		    onEventScroll(this, l, t);
+	    }
 	}
 
 	@Override
@@ -138,14 +167,12 @@ public class UiScrollView extends ScrollView implements IView {
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		super.onLayout(changed, l, t, r, b);
-		int count = getChildCount();
-		for (int i = 0; i < count; i++) {
-			View child = getChildAt(i);
-			if (child.getVisibility() != GONE) {
-				if (child instanceof IView) {
-					IView view = (IView)child;
-					Rect frame = view.getUIFrame();
-					child.layout(frame.left, frame.top, frame.right, frame.bottom);
+		if (getChildCount() > 0) {
+			View child = getChildAt(0);
+			if (child.getHeight() > 0) {
+				if (!flagInitedContent) {
+					scrollTo(initScrollX, initScrollY);
+					flagInitedContent = true;
 				}
 			}
 		}

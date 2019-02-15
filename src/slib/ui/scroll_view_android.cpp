@@ -38,7 +38,7 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;Z)Landroid/view/View;");
 
 		SLIB_JNI_STATIC_METHOD(setBackgroundColor, "_setBackgroundColor", "(Landroid/view/View;I)V");
-		SLIB_JNI_STATIC_METHOD(scrollTo, "_scrollTo", "(Landroid/view/View;II)V");
+		SLIB_JNI_STATIC_METHOD(scrollTo, "_scrollTo", "(Landroid/view/View;IIZ)V");
 		SLIB_JNI_STATIC_METHOD(getScrollX, "_getScrollX", "(Landroid/view/View;)I");
 		SLIB_JNI_STATIC_METHOD(getScrollY, "_getScrollY", "(Landroid/view/View;)I");
 		SLIB_JNI_STATIC_METHOD(setPaging, "_setPaging", "(Landroid/view/View;ZII)V");
@@ -68,6 +68,7 @@ namespace slib
 			}
 			JAndroidScrollView::setScrollBarsVisible.call(sl_null, handle, isHorizontalScrollBarVisible(), isVerticalScrollBarVisible());
 			_applyContent(handle, scrollViewInstance);
+			JAndroidScrollView::scrollTo.call(sl_null, handle, (int)(getScrollX()), (int)(getScrollY()), 0);
 		}
 
 		void _onScroll(int x, int y)
@@ -118,7 +119,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			JAndroidScrollView::scrollTo.call(sl_null, handle, (int)x, (int)y);
+			JAndroidScrollView::scrollTo.call(sl_null, handle, (int)x, (int)y, flagAnimate ? 1 : 0);
 		}
 	}
 
