@@ -1964,7 +1964,6 @@ namespace slib
 			sl_ui_pos height = frame.getHeight();
 			
 			switch (widthMode) {
-				case SizeMode::Filling:
 				case SizeMode::Weight:
 					width = (sl_ui_pos)((sl_real)parentWidth * layoutAttrs->widthWeight);
 					break;
@@ -1973,7 +1972,6 @@ namespace slib
 			}
 			
 			switch (heightMode) {
-				case SizeMode::Filling:
 				case SizeMode::Weight:
 					height = (sl_ui_pos)((sl_real)parentHeight * layoutAttrs->heightWeight);
 					break;
@@ -2106,9 +2104,6 @@ namespace slib
 				if (frame.right < frame.left) {
 					frame.right = frame.left;
 				}
-				if (width > 0 && width < frame.right - frame.left) {
-					frame.right = frame.left + width;
-				}
 			} else {
 				if (leftMode == PositionMode::Free && rightMode != PositionMode::Free) {
 					frame.left = frame.right - width;
@@ -2119,9 +2114,6 @@ namespace slib
 			if (heightMode == SizeMode::Filling) {
 				if (frame.bottom < frame.top) {
 					frame.bottom = frame.top;
-				}
-				if (height > 0 && height < frame.bottom - frame.top) {
-					frame.bottom = frame.top + height;
 				}
 			} else {
 				if (topMode == PositionMode::Free && bottomMode != PositionMode::Free) {
