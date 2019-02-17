@@ -258,7 +258,9 @@ namespace slib
 	
 	sl_bool SAppDocument::_openImageResources()
 	{
-		for (auto& fileName : File::getFiles(m_pathApp)) {
+		List<String> fileList = File::getFiles(m_pathApp);
+		fileList.sort();
+		for (auto& fileName : fileList) {
 			if (fileName.isNotNull()) {
 				if (fileName == "image") {
 					if (!(_registerImageResources("image", m_pathApp + "/image", Locale::Unknown))) {
