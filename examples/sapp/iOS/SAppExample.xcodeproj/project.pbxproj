@@ -7,12 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2639190821CC02AA008B335B /* layouts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639190221CC02A9008B335B /* layouts.cpp */; };
-		2639190921CC02AA008B335B /* drawables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639190321CC02AA008B335B /* drawables.cpp */; };
-		2639190A21CC02AA008B335B /* menus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639190421CC02AA008B335B /* menus.cpp */; };
-		2639190B21CC02AA008B335B /* strings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639190521CC02AA008B335B /* strings.cpp */; };
-		2639190C21CC02AA008B335B /* raws.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639190621CC02AA008B335B /* raws.cpp */; };
-		2639190D21CC02AA008B335B /* colors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639190721CC02AA008B335B /* colors.cpp */; };
 		2639191121CC25CF008B335B /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2639191021CC25CE008B335B /* CoreMedia.framework */; };
 		2639191321CC25D5008B335B /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2639191221CC25D5008B335B /* CoreVideo.framework */; };
 		2639191521CC25DB008B335B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2639191421CC25DB008B335B /* AVFoundation.framework */; };
@@ -23,6 +17,12 @@
 		264AF1CD21B8F378004E58CB /* LaunchScreen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF1CB21B8F377004E58CB /* LaunchScreen.cpp */; };
 		26B92D5F21D4DA48003F6F82 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26B92D5E21D4DA48003F6F82 /* UserNotifications.framework */; };
 		26B92D6421D62565003F6F82 /* ControlScreenPage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D6321D62565003F6F82 /* ControlScreenPage.cpp */; };
+		26BADFCC2219A70F0085B5AB /* layouts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BADFC62219A70F0085B5AB /* layouts.cpp */; };
+		26BADFCD2219A70F0085B5AB /* menus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BADFC72219A70F0085B5AB /* menus.cpp */; };
+		26BADFCE2219A70F0085B5AB /* drawables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BADFC82219A70F0085B5AB /* drawables.cpp */; };
+		26BADFCF2219A70F0085B5AB /* raws.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BADFC92219A70F0085B5AB /* raws.cpp */; };
+		26BADFD02219A70F0085B5AB /* colors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BADFCA2219A70F0085B5AB /* colors.cpp */; };
+		26BADFD12219A70F0085B5AB /* strings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BADFCB2219A70F0085B5AB /* strings.cpp */; };
 		26F2DDF0216BDE39007CE8E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDEF216BDE39007CE8E6 /* UIKit.framework */; };
 		26F2DDF2216BDE44007CE8E6 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF1216BDE44007CE8E6 /* GLKit.framework */; };
 		26F2DDF4216BDE4D007CE8E6 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF3216BDE4D007CE8E6 /* OpenGLES.framework */; };
@@ -37,13 +37,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2639190221CC02A9008B335B /* layouts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layouts.cpp; path = ../../src/gen/layouts.cpp; sourceTree = "<group>"; };
-		2639190321CC02AA008B335B /* drawables.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = drawables.cpp; path = ../../src/gen/drawables.cpp; sourceTree = "<group>"; };
-		2639190421CC02AA008B335B /* menus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = menus.cpp; path = ../../src/gen/menus.cpp; sourceTree = "<group>"; };
-		2639190521CC02AA008B335B /* strings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = strings.cpp; path = ../../src/gen/strings.cpp; sourceTree = "<group>"; };
-		2639190621CC02AA008B335B /* raws.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raws.cpp; path = ../../src/gen/raws.cpp; sourceTree = "<group>"; };
-		2639190721CC02AA008B335B /* colors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = colors.cpp; path = ../../src/gen/colors.cpp; sourceTree = "<group>"; };
-		2639190E21CC02CF008B335B /* ui */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ui; path = ../../src/gen/ui; sourceTree = "<group>"; };
 		2639190F21CC02DB008B335B /* sapp */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sapp; path = ../src/sapp; sourceTree = "<group>"; };
 		2639191021CC25CE008B335B /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		2639191221CC25D5008B335B /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
@@ -60,6 +53,13 @@
 		26B92D5E21D4DA48003F6F82 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		26B92D6221D62565003F6F82 /* ControlScreenPage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ControlScreenPage.h; sourceTree = "<group>"; };
 		26B92D6321D62565003F6F82 /* ControlScreenPage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ControlScreenPage.cpp; sourceTree = "<group>"; };
+		26BADFC62219A70F0085B5AB /* layouts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layouts.cpp; path = ../src/gen/layouts.cpp; sourceTree = "<group>"; };
+		26BADFC72219A70F0085B5AB /* menus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = menus.cpp; path = ../src/gen/menus.cpp; sourceTree = "<group>"; };
+		26BADFC82219A70F0085B5AB /* drawables.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = drawables.cpp; path = ../src/gen/drawables.cpp; sourceTree = "<group>"; };
+		26BADFC92219A70F0085B5AB /* raws.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raws.cpp; path = ../src/gen/raws.cpp; sourceTree = "<group>"; };
+		26BADFCA2219A70F0085B5AB /* colors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = colors.cpp; path = ../src/gen/colors.cpp; sourceTree = "<group>"; };
+		26BADFCB2219A70F0085B5AB /* strings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = strings.cpp; path = ../src/gen/strings.cpp; sourceTree = "<group>"; };
+		26BADFD22219A71C0085B5AB /* ui */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ui; path = ../src/gen/ui; sourceTree = "<group>"; };
 		26F2DDEF216BDE39007CE8E6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		26F2DDF1216BDE44007CE8E6 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		26F2DDF3216BDE4D007CE8E6 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -111,15 +111,15 @@
 		2639190121CC028D008B335B /* gen */ = {
 			isa = PBXGroup;
 			children = (
-				2639190721CC02AA008B335B /* colors.cpp */,
-				2639190321CC02AA008B335B /* drawables.cpp */,
-				2639190221CC02A9008B335B /* layouts.cpp */,
-				2639190421CC02AA008B335B /* menus.cpp */,
-				2639190621CC02AA008B335B /* raws.cpp */,
-				2639190521CC02AA008B335B /* strings.cpp */,
-				2639190E21CC02CF008B335B /* ui */,
+				26BADFCA2219A70F0085B5AB /* colors.cpp */,
+				26BADFC82219A70F0085B5AB /* drawables.cpp */,
+				26BADFC62219A70F0085B5AB /* layouts.cpp */,
+				26BADFC72219A70F0085B5AB /* menus.cpp */,
+				26BADFC92219A70F0085B5AB /* raws.cpp */,
+				26BADFCB2219A70F0085B5AB /* strings.cpp */,
+				26BADFD22219A71C0085B5AB /* ui */,
 			);
-			path = gen;
+			name = gen;
 			sourceTree = "<group>";
 		};
 		264AF17A21B41323004E58CB /* cpp */ = {
@@ -282,17 +282,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				26B92D6421D62565003F6F82 /* ControlScreenPage.cpp in Sources */,
-				2639190821CC02AA008B335B /* layouts.cpp in Sources */,
-				2639190A21CC02AA008B335B /* menus.cpp in Sources */,
-				2639190C21CC02AA008B335B /* raws.cpp in Sources */,
 				26F5DE322051ACD500BC4998 /* main.mm in Sources */,
+				26BADFD12219A70F0085B5AB /* strings.cpp in Sources */,
+				26BADFCD2219A70F0085B5AB /* menus.cpp in Sources */,
 				264AF19B21B41A77004E58CB /* MainMenu.cpp in Sources */,
 				2639191821CC2B58008B335B /* QRCodeScannerPage.cpp in Sources */,
-				2639190D21CC02AA008B335B /* colors.cpp in Sources */,
-				2639190921CC02AA008B335B /* drawables.cpp in Sources */,
 				264AF17D21B41323004E58CB /* app.cpp in Sources */,
-				2639190B21CC02AA008B335B /* strings.cpp in Sources */,
+				26BADFCE2219A70F0085B5AB /* drawables.cpp in Sources */,
 				264AF1CD21B8F378004E58CB /* LaunchScreen.cpp in Sources */,
+				26BADFCF2219A70F0085B5AB /* raws.cpp in Sources */,
+				26BADFCC2219A70F0085B5AB /* layouts.cpp in Sources */,
+				26BADFD02219A70F0085B5AB /* colors.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
