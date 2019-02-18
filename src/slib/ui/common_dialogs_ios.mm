@@ -150,10 +150,15 @@ namespace slib
 			
 			if (flagHyperText) {
 				@try {
-					NSString* htmlText = [NSString stringWithFormat:@"<span style=\"font-family: Helvetica Neue; font-size: 18\">%@</span>", text];
-					NSMutableAttributedString* str = [[NSMutableAttributedString alloc] initWithData:[htmlText dataUsingEncoding:NSUTF8StringEncoding] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType, NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)} documentAttributes:nil error:nil];
-					if (str != nil) {
-						[alert setValue:str forKey: @"attributedMessage"];
+					NSMutableAttributedString* hyperCaption = [[NSMutableAttributedString alloc] initWithString:caption attributes:@{ NSFontAttributeName: [UIFont fontWithName:@"Helvetica Neue" size:20] }];
+					if (hyperCaption != nil) {
+						[alert setValue:hyperCaption forKey: @"attributedTitle"];
+					}
+
+					NSString* htmlText = [NSString stringWithFormat:@"<span style=\"font-family: Helvetica Neue; font-size: 16\">%@</span>", text];
+					NSMutableAttributedString* hyperText = [[NSMutableAttributedString alloc] initWithData:[htmlText dataUsingEncoding:NSUTF8StringEncoding] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType, NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)} documentAttributes:nil error:nil];
+					if (hyperText != nil) {
+						[alert setValue:hyperText forKey: @"attributedMessage"];
 						UIView* view = alert.view;
 						if (view != nil) {
 							_priv_AlertDialog_enableLink(view);
