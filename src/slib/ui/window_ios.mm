@@ -800,7 +800,7 @@ CGRect _g_slib_ui_keyboard_scrollview_original_frame;
 	UIScrollView* scroll = nil;
 	UIView* parent = view;
 	while (parent != nil) {
-		if ([parent isKindOfClass:[UIScrollView class]]) {
+		if ([parent isKindOfClass:[UIScrollView class]] && ![parent isKindOfClass:[UITextView class]]) {
 			scroll = (UIScrollView*)parent;
 			break;
 		}

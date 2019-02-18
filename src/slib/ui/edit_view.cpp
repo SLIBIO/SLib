@@ -441,6 +441,7 @@ namespace slib
 	TextArea::TextArea()
 	{
 		m_flagMultiLine = sl_true;
+		m_flagAutoDismissKeyboard = sl_false;
 		setReturnKeyType(UIReturnKeyType::Return);
 	}
 

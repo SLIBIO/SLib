@@ -242,7 +242,7 @@ namespace slib
 			Ref<View> _view = instance->getView();
 			if (EditView_Impl* view = CastInstance<EditView_Impl>(_view.get())) {
 				view->dispatchReturnKey();
-				if (view->isAutoDismissKeyboard()) {
+				if (!(view->isMultiLine()) && view->isAutoDismissKeyboard()) {
 					if (field != nil) {
 						[field resignFirstResponder];
 					}
@@ -595,8 +595,16 @@ IOS_VIEW_DEFINE_ON_FOCUS
 		[self setDelegate:self];
 		[self setPlaceholder:@""];
 		[self setPlaceholderColor:[UIColor lightGrayColor]];
+		self.contentInset = UIEdgeInsetsZero;
+		self.clipsToBounds = YES;
 	}
 	return self;
+}
+
+-(void)textViewDidBeginEditing:(UITextView *)textView
+{
+	self.contentInset = UIEdgeInsetsZero;
+	self.clipsToBounds = YES;
 }
 
 -(void) refreshPlaceholder {
