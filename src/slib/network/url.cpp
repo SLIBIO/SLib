@@ -22,7 +22,10 @@
 
 #include "slib/network/url.h"
 
+#include "slib/core/string_buffer.h"
 #include "slib/core/scoped.h"
+
+#include "slib/network/http_common.h"
 
 namespace slib
 {
@@ -149,74 +152,107 @@ namespace slib
 	{
 	}
 	
+	Url::Url(const String& url)
+	{
+		parse(url);
+	}
+	
 	void Url::parse(const String& url)
 	{
 		const sl_char8* str = url.getData();
 		sl_reg n = url.getLength();
-		sl_reg indexHost = 0;
+		sl_reg indexHost = -1;
 		sl_reg indexPath = -1;
 		sl_reg indexQuery = -1;
+		sl_reg indexFragment = -1;
 		sl_reg index = 0;
 		while (index < n) {
 			sl_char8 ch = str[index];
-			do {
-				if (indexHost == 0) {
-					if (ch == ':') {
-						if (index + 3 <= n && str[index + 1] == '/' && str[index + 2] == '/') {
-							indexHost = index + 3;
-							index = indexHost;
-						} else {
-							index++;
-						}
-						break;
-					}
-				}
-				if (indexPath < 0) {
-					if (ch == '/') {
-						indexPath = index;
-						index++;
-						break;
-					}
-				}
-				if (indexQuery < 0) {
+			if (indexFragment < 0) {
+				if (ch == '#') {
+					indexFragment = index;
+					break;
+				} else if (indexQuery < 0) {
 					if (ch == '?') {
-						indexQuery = index + 1;
-						index = indexQuery;
-						break;
+						indexQuery = index;
+					} else if (indexPath < 0) {
+						if (ch == '/') {
+							indexPath = index;
+						} else if (indexHost < 0) {
+							if (ch == ':') {
+								if (index + 3 <= n && str[index + 1] == '/' && str[index + 2] == '/') {
+									indexHost = index;
+									index += 2;
+								}
+							}
+						}
 					}
 				}
-				index++;
-			} while (0);
-		}
-		if (indexQuery > 0) {
-			if (indexPath < 0 || indexPath >= indexQuery) {
-				indexPath = indexQuery - 1;
 			}
+			index++;
 		}
-		if (indexPath >= 0) {
-			if (indexHost > indexPath) {
-				indexHost = 0;
-			}
-		}
-		if (indexHost >= 3) {
-			scheme = String(str, indexHost - 3);
+		if (indexFragment >= 0) {
+			fragment = String(str + indexFragment + 1, n - indexFragment - 1);
+			n = indexFragment;
 		} else {
-			scheme.setNull();
+			fragment.setNull();
 		}
-		if (indexPath >= 0) {
-			host = String(str + indexHost, indexPath - indexHost);
-			if (indexQuery > 0) {
-				path = String(str + indexPath, indexQuery - 1 - indexPath);
-				query = String(str + indexQuery, n - indexQuery);
-			} else {
-				path = String(str + indexPath, n - indexPath);
-				query.setNull();
-			}
+		if (indexQuery >= 0) {
+			query = String(str + indexQuery + 1, n - indexQuery - 1);
+			n = indexQuery;
 		} else {
-			host = String(str + indexHost, n - indexHost);
-			path.setNull();
 			query.setNull();
 		}
+		if (indexPath >= 0) {
+			path = String(str + indexPath, n - indexPath);
+			n = indexPath;
+		} else {
+			path.setNull();
+		}
+		if (indexHost >= 0) {
+			scheme = String(str, indexHost);
+			host = String(str + indexHost + 3, n - indexHost - 3);
+		} else {
+			scheme.setNull();
+			host = String(str, n);
+		}
+	}
+	
+	String Url::toString() const
+	{
+		StringBuffer buf;
+		if (scheme.isNotNull()) {
+			buf.add(scheme);
+			buf.addStatic("://", 3);
+		}
+		if (host.isNotNull()) {
+			buf.add(host);
+		}
+		if (path.isNotNull()) {
+			if (!(path.startsWith('/'))) {
+				buf.addStatic("/", 1);
+			}
+			buf.add(path);
+		}
+		if (query.isNotNull()) {
+			buf.addStatic("?", 1);
+			buf.add(query);
+		}
+		if (fragment.isNotNull()) {
+			buf.addStatic("#", 1);
+			buf.add(fragment);
+		}
+		return buf.merge();
+	}
+	
+	HashMap<String, String> Url::getQueryParameters() const
+	{
+		return HttpRequest::parseParameters(query);
+	}
+	
+	void Url::setQueryParameters(const HashMap<String, String>& params)
+	{
+		query = HttpRequest::buildFormUrlEncodedFromHashMap(params);
 	}
 	
 	String _priv_URL_encodePercentByUTF8(const String& value, const sl_bool patternUnreserved[128])

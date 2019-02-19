@@ -32,6 +32,7 @@
 #include "definition.h"
 
 #include "../core/string.h"
+#include "../core/hash_map.h"
 
 namespace slib
 {
@@ -39,18 +40,27 @@ namespace slib
 	class SLIB_EXPORT Url
 	{
 	public:
-		AtomicString scheme;
-		AtomicString host;
-		AtomicString path;
-		AtomicString query;
+		String scheme;
+		String host;
+		String path;
+		String query;
+		String fragment;
 		
 	public:
 		Url();
+		
+		Url(const String& url);
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(Url)
 		
 	public:
 		void parse(const String& url);
+		
+		String toString() const;
+		
+		HashMap<String, String> getQueryParameters() const;
+		
+		void setQueryParameters(const HashMap<String, String>& params);
 		
 	public:
 		static String encodePercentByUTF8(const String& value);
