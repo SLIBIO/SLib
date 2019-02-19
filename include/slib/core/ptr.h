@@ -178,8 +178,12 @@ namespace slib
 		sl_bool isWeak() const noexcept;
 
 		Ptr<T> lock() const noexcept;
+		
+		Ptr<T> toWeak() const noexcept;
 
 	public:
+		T* get() const noexcept;
+		
 		void setPointer(T* pointer) noexcept;
 
 		template <class O>
@@ -553,6 +557,15 @@ namespace slib
 		T* operator->() const noexcept;
 
 	};
+	
+	template <class T>
+	Ptr<T> SharedPtr(T* ptr);
+	
+	template <class T, class Deleter>
+	Ptr<T> SharedPtr(T* ptr, const Deleter& deleter);
+
+	template <class T, class... Args>
+	Ptr<T> MakeShared(Args&&... args);
 
 }
 

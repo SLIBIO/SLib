@@ -204,6 +204,13 @@ namespace slib
 	
 	template <class T>
 	template <class O>
+	SLIB_INLINE Ptr<T> Ptr<T>::fromRef(T* pointer, O* reference) noexcept
+	{
+		return Ptr<T>(pointer, Ref<O>(reference));
+	}
+	
+	template <class T>
+	template <class O>
 	SLIB_INLINE Ptr<T> Ptr<T>::fromRef(const Ref<O>& reference) noexcept
 	{
 		return Ptr<T>(reference);
@@ -263,6 +270,13 @@ namespace slib
 	SLIB_INLINE Ptr<T> Ptr<T>::fromWeak(O* reference) noexcept
 	{
 		return Ptr<T>(reference, Ref<Referable>(reference ? reference->_getWeakObject() : sl_null));
+	}
+	
+	template <class T>
+	template <class O>
+	SLIB_INLINE Ptr<T> Ptr<T>::fromWeak(T* pointer, O* o) noexcept
+	{
+		return Ptr<T>(o ? pointer : sl_null, Ref<Referable>(o ? o->_getWeakObject() : sl_null));
 	}
 	
 	template <class T>
@@ -398,8 +412,27 @@ namespace slib
 		}
 		return sl_null;
 	}
-	
-	
+
+	template <class T>
+	Ptr<T> Ptr<T>::toWeak() const noexcept
+	{
+		if (_ptr) {
+			Referable* obj = ref._ptr;
+			if (obj && !(obj->_isWeakRef())) {
+				return Ptr<T>(_ptr, WeakRef<Referable>(obj));
+			} else {
+				return *this;
+			}
+		}
+		return sl_null;
+	}
+
+	template <class T>
+	SLIB_INLINE T* Ptr<T>::get() const noexcept
+	{
+		return _ptr;
+	}
+
 	template <class T>
 	void Ptr<T>::setPointer(T* pointer) noexcept
 	{
@@ -1529,6 +1562,77 @@ namespace slib
 	SLIB_INLINE T* PtrLocker<T>::operator->() const noexcept
 	{
 		return m_ptr._ptr;
+	}
+
+
+	template <class T>
+	class _priv_SharedPtrContainer : public Referable
+	{
+	public:
+		T* ptr;
+		
+	public:
+		SLIB_INLINE _priv_SharedPtrContainer(T* _ptr) : ptr(_ptr) {}
+		SLIB_INLINE ~_priv_SharedPtrContainer() { delete ptr; }
+		
+	};
+	
+	template <class T>
+	SLIB_INLINE Ptr<T> SharedPtr(T* ptr)
+	{
+		if (ptr) {
+			return Ptr<T>::fromRef(ptr, new _priv_SharedPtrContainer<T>(ptr));
+		} else {
+			return sl_null;
+		}
+	}
+
+
+	template <class T, class DELETER>
+	class _priv_SharedPtrContainerWithDeleter : public Referable
+	{
+	public:
+		T* ptr;
+		DELETER deleter;
+		
+	public:
+		SLIB_INLINE _priv_SharedPtrContainerWithDeleter(T* _ptr, const DELETER& _deleter) : ptr(_ptr), deleter(_deleter) {}
+		SLIB_INLINE ~_priv_SharedPtrContainerWithDeleter() { deleter(ptr); }
+		
+	};
+	
+	template <class T, class DELETER>
+	SLIB_INLINE Ptr<T> SharedPtr(T* ptr, const DELETER& deleter)
+	{
+		if (ptr) {
+			return Ptr<T>::fromRef(ptr, new _priv_SharedPtrContainerWithDeleter<T, DELETER>(ptr, deleter));
+		} else {
+			return sl_null;
+		}
+	}
+	
+	
+	template <class T>
+	class _priv_SharedPtrObjectContainer : public Referable
+	{
+	public:
+		T object;
+		
+	public:
+		template <class... ARGS>
+		SLIB_INLINE _priv_SharedPtrObjectContainer(ARGS&&... args) : object(Forward<ARGS>(args)...) {}
+		
+	};
+	
+	template<class T, class... ARGS>
+	SLIB_INLINE Ptr<T> MakeShared(ARGS&&... args)
+	{
+		_priv_SharedPtrObjectContainer<T>* ptr = new _priv_SharedPtrObjectContainer<T>(Forward<ARGS>(args)...);
+		if (ptr) {
+			return Ptr<T>::fromRef(&(ptr->object), ptr);
+		} else {
+			return sl_null;
+		}
 	}
 
 }
