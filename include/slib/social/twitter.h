@@ -30,7 +30,7 @@
 namespace slib
 {
 	
-	class TwitterParam : public OAuthParam
+	class SLIB_EXPORT TwitterParam : public OAuthParam
 	{
 	public:
 		TwitterParam();
