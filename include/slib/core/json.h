@@ -653,6 +653,32 @@ public: \
 		SLIB_JSON_ADD_MEMBERS(__VA_ARGS__) \
 	}
 
+
+#define SLIB_DECLARE_JSON \
+public: \
+	slib::Json toJson() const; \
+	void fromJson(const slib::Json& json); \
+	void doJson(slib::Json& json, sl_bool isFromJson);
+
+#define SLIB_DEFINE_JSON(CLASS) \
+	slib::Json CLASS::toJson() const \
+	{ \
+		slib::Json json = slib::Json::createMap(); \
+		slib::RemoveConstPointerVariable(this)->doJson(json, sl_false); \
+		return json; \
+	} \
+	void CLASS::fromJson(const slib::Json& json) \
+	{ \
+		doJson(*((slib::Json*)&json), sl_true); \
+	} \
+	void CLASS::doJson(slib::Json& json, sl_bool isFromJson)
+
+#define SLIB_DEFINE_JSON_MEMBERS(CLASS, ...) \
+	SLIB_DEFINE_JSON(CLASS) \
+	{ \
+		SLIB_JSON_ADD_MEMBERS(__VA_ARGS__) \
+	}
+
 #include "detail/json.inc"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
