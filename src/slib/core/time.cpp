@@ -225,6 +225,17 @@ namespace slib
 		return time * TIME_SECOND;
 	}
 
+	Time& Time::setUnixTimef(double time) noexcept
+	{
+		m_time = (sl_int64)(time * TIME_SECOND);
+		return *this;
+	}
+	
+	Time Time::fromUnixTimef(double time) noexcept
+	{
+		return (sl_int64)(time * TIME_SECOND);
+	}
+
 	Time& Time::add(sl_int64 time) noexcept
 	{
 		m_time += time;

@@ -225,6 +225,12 @@ namespace slib
 		
 		static Time fromUnixTime(sl_int64 time) noexcept;
 		
+		double toUnixTimef() const noexcept;
+		
+		Time& setUnixTimef(double time) noexcept;
+		
+		static Time fromUnixTimef(double time) noexcept;
+		
 		Time& add(sl_int64 time) noexcept;
 
 		Time& add(const Time& other) noexcept;

@@ -43,6 +43,11 @@ namespace slib
 		return n;
 	}
 
+	SLIB_INLINE double Time::toUnixTimef() const noexcept
+	{
+		return (double)(m_time / 1000000);
+	}
+
 	SLIB_INLINE Time& Time::operator=(const Time& other) noexcept
 	{
 		m_time = other.m_time;

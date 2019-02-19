@@ -793,6 +793,8 @@ namespace slib
 				}
 				break;
 			}
+			case VariantType::Time:
+				return (sl_int32)(REF_VAR(Time const, _value).toUnixTime());
 			default:
 				break;
 		}
@@ -854,6 +856,8 @@ namespace slib
 				}
 				break;
 			}
+			case VariantType::Time:
+				return (sl_uint32)(REF_VAR(Time const, _value).toUnixTime());
 			default:
 				break;
 		}
@@ -915,6 +919,8 @@ namespace slib
 				}
 				break;
 			}
+			case VariantType::Time:
+				return REF_VAR(Time const, _value).toUnixTime();
 			default:
 				break;
 		}
@@ -976,6 +982,8 @@ namespace slib
 				}
 				break;
 			}
+			case VariantType::Time:
+				return REF_VAR(Time const, _value).toUnixTime();
 			default:
 				break;
 		}
@@ -1048,6 +1056,8 @@ namespace slib
 				}
 				break;
 			}
+			case VariantType::Time:
+				return (float)(REF_VAR(Time const, _value).toUnixTimef());
 			default:
 				break;
 		}
@@ -1105,6 +1115,8 @@ namespace slib
 				}
 				break;
 			}
+			case VariantType::Time:
+				return REF_VAR(Time const, _value).toUnixTimef();
 			default:
 				break;
 		}
@@ -1473,6 +1485,18 @@ namespace slib
 	Time Variant::getTime(const Time& def) const noexcept
 	{
 		switch (_type) {
+			case VariantType::Int32:
+				return Time::fromUnixTime(REF_VAR(sl_int32 const, _value));
+			case VariantType::Uint32:
+				return Time::fromUnixTime(REF_VAR(sl_uint32 const, _value));
+			case VariantType::Int64:
+				return Time::fromUnixTime(REF_VAR(sl_int64 const, _value));
+			case VariantType::Uint64:
+				return Time::fromUnixTime(REF_VAR(sl_uint64 const, _value));
+			case VariantType::Float:
+				return Time::fromUnixTimef(REF_VAR(float const, _value));
+			case VariantType::Double:
+				return Time::fromUnixTimef(REF_VAR(double const, _value));
 			case VariantType::Time:
 				return REF_VAR(Time const, _value);
 			case VariantType::String8:
