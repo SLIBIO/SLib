@@ -44,6 +44,10 @@ namespace slib
 		flagCancel = sl_false;
 	}
 	
+	sl_bool OAuthLoginResult::isSuccess() const
+	{
+		return !(flagError || flagCancel);
+	}
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(OAuthLoginParam)
 	

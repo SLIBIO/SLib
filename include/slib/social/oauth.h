@@ -78,6 +78,9 @@ namespace slib
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(OAuthLoginResult)
 		
+	public:
+		sl_bool isSuccess() const;
+		
 	};
 	
 	class SLIB_EXPORT OAuthLoginParam
