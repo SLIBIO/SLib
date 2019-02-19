@@ -82,9 +82,9 @@ namespace slib
 			_load(handle);
 		}
 		
-		void _onStartLoad(OSWebView* handle)
+		void _onStartLoad(OSWebView* handle, NSURL* url)
 		{
-			dispatchStartLoad(getURL());
+			dispatchStartLoad(Apple::getStringFromNSString(url.absoluteString));
 		}
 		
 		void _onFinishLoad(OSWebView* handle)
@@ -95,6 +95,13 @@ namespace slib
 		void _onLoadError(OSWebView* handle, NSError* error)
 		{
 			m_lastErrorMessage = Apple::getStringFromNSString([error localizedDescription]);
+			if (error != nil && error.userInfo != nil) {
+				NSString* url = error.userInfo[NSURLErrorFailingURLStringErrorKey];
+				if (url != nil) {
+					dispatchFinishLoad(Apple::getStringFromNSString(url), sl_true);
+					return;
+				}
+			}
 			dispatchFinishLoad(getURL(), sl_true);
 		}
 		
@@ -376,13 +383,20 @@ namespace slib
 
 - (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(null_unspecified WKNavigation *)navigation
 {
-	slib::Ref<WebViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		slib::Ref<slib::View> _view = instance->getView();
-		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
-			view->_onStartLoad(self);
+}
+
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
+{
+	if (navigationAction.targetFrame != nil && navigationAction.targetFrame.mainFrame) {
+		slib::Ref<WebViewInstance> instance = m_viewInstance;
+		if (instance.isNotNull()) {
+			slib::Ref<slib::View> _view = instance->getView();
+			if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
+				view->_onStartLoad(self, navigationAction.request.URL);
+			}
 		}
 	}
+	decisionHandler(WKNavigationActionPolicyAllow);
 }
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(null_unspecified WKNavigation *)navigation
