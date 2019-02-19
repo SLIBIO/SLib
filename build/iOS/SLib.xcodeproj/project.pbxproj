@@ -758,6 +758,8 @@
 		26B92D5921D3E4FC003F6F82 /* web_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D5621D3E4FC003F6F82 /* web_service.cpp */; };
 		26B92D5B21D4CF22003F6F82 /* device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D5A21D4CF22003F6F82 /* device.cpp */; };
 		26B92D5D21D4CF29003F6F82 /* device_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D5C21D4CF28003F6F82 /* device_ios.mm */; };
+		26BAE008221BEE530085B5AB /* etsy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE007221BEE530085B5AB /* etsy.cpp */; };
+		26BAE00A221BEE590085B5AB /* etsy_login.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE009221BEE580085B5AB /* etsy_login.cpp */; };
 		26BB17CE21F4BA5D0089C7EC /* ui_adapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17CD21F4BA5D0089C7EC /* ui_adapter.cpp */; };
 		26BB17D621F4E4550089C7EC /* view_page_navigation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17D521F4E4550089C7EC /* view_page_navigation.cpp */; };
 		26BB17D821F4E45C0089C7EC /* view_pager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17D721F4E45C0089C7EC /* view_pager.cpp */; };
@@ -2213,6 +2215,8 @@
 		26B92D5621D3E4FC003F6F82 /* web_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = web_service.cpp; sourceTree = "<group>"; };
 		26B92D5A21D4CF22003F6F82 /* device.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = device.cpp; sourceTree = "<group>"; };
 		26B92D5C21D4CF28003F6F82 /* device_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = device_ios.mm; sourceTree = "<group>"; };
+		26BAE007221BEE530085B5AB /* etsy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = etsy.cpp; sourceTree = "<group>"; };
+		26BAE009221BEE580085B5AB /* etsy_login.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = etsy_login.cpp; sourceTree = "<group>"; };
 		26BB17CD21F4BA5D0089C7EC /* ui_adapter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_adapter.cpp; sourceTree = "<group>"; };
 		26BB17D521F4E4550089C7EC /* view_page_navigation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view_page_navigation.cpp; sourceTree = "<group>"; };
 		26BB17D721F4E45C0089C7EC /* view_pager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view_pager.cpp; sourceTree = "<group>"; };
@@ -3868,6 +3872,8 @@
 		26ACB3B7220978310093FF3F /* social */ = {
 			isa = PBXGroup;
 			children = (
+				26BAE007221BEE530085B5AB /* etsy.cpp */,
+				26BAE009221BEE580085B5AB /* etsy_login.cpp */,
 				26ACB3B8220978310093FF3F /* facebook.cpp */,
 				26C795AA2215A8940053C5A1 /* facebook_ios.mm */,
 				260B73EE220CAD1C00858EEA /* oauth.cpp */,
@@ -5450,6 +5456,7 @@
 				26ACB3F6220985EE0093FF3F /* device_audio_ios.mm in Sources */,
 				26D9D8871E96295A005F7BD3 /* camera.cpp in Sources */,
 				26A39D8C20EFE16D004707C9 /* calculator.cpp in Sources */,
+				26BAE008221BEE530085B5AB /* etsy.cpp in Sources */,
 				26B92D5D21D4CF29003F6F82 /* device_ios.mm in Sources */,
 				26D9D89E1E962962005F7BD3 /* network_async_unix.cpp in Sources */,
 				26D9D82D1E9628E0005F7BD3 /* timer.cpp in Sources */,
@@ -5477,6 +5484,7 @@
 				26D9D8CF1E962976005F7BD3 /* render_view_ios.mm in Sources */,
 				26D9D8A61E962962005F7BD3 /* tcpip.cpp in Sources */,
 				26C1B64A20D51D4D00E36539 /* bitmap_ext.cpp in Sources */,
+				26BAE00A221BEE590085B5AB /* etsy_login.cpp in Sources */,
 				26D9D87F1E96295A005F7BD3 /* audio_player_dsound.cpp in Sources */,
 				26D9D8CC1E962976005F7BD3 /* progress_bar.cpp in Sources */,
 				26D9D8541E96292E005F7BD3 /* sqlite.cpp in Sources */,

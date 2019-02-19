@@ -926,5 +926,11 @@
     <ClCompile Include="..\..\src\res\gen\strings.cpp">
       <Filter>res</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\etsy.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\etsy_login.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

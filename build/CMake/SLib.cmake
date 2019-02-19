@@ -286,6 +286,8 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/web/web_controller.cpp"
  "${SLIB_PATH}/src/slib/web/web_service.cpp"
 
+ "${SLIB_PATH}/src/slib/social/etsy.cpp"
+ "${SLIB_PATH}/src/slib/social/etsy_login.cpp"
  "${SLIB_PATH}/src/slib/social/facebook.cpp"
  "${SLIB_PATH}/src/slib/social/oauth.cpp"
  "${SLIB_PATH}/src/slib/social/oauth_login.cpp"

@@ -27,5 +27,6 @@
 
 #include "social/facebook.h"
 #include "social/twitter.h"
+#include "social/etsy.h"
 
 #endif
