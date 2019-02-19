@@ -103,7 +103,7 @@ namespace slib
 	{
 		auto onComplete = param.onComplete;
 		auto weak = ToWeakRef(this);
-		getLoginUrl([weak, onComplete](const String& url, const String& token, const String& secret) {
+		getLoginUrl(param.requestTokenParams, [weak, onComplete](const String& url, const String& token, const String& secret) {
 			if (url.isEmpty()) {
 				OAuthLoginResult result;
 				onComplete(result);
@@ -132,69 +132,65 @@ namespace slib
 				}
 				if (url.startsWith(thiz->m_callbackUrl)) {
 					Log(TAG, "Redirected to Callback URL: %s", url);
-					sl_reg indexQuery = url.indexOf('?');
-					if (indexQuery >= 0) {
-						String query = url.substring(indexQuery + 1);
-						auto params = HttpRequest::parseParameters(query);
-						String token = params["oauth_token"];
-						String tokenVerifier = params["oauth_verifier"];
-						if (token.isEmpty() || tokenVerifier.isEmpty()) {
+					auto params = Url(url).getQueryParameters();
+					String token = params["oauth_token"];
+					String tokenVerifier = params["oauth_verifier"];
+					if (token.isEmpty() || tokenVerifier.isEmpty()) {
+						OAuthLoginResult result;
+						onComplete(result);
+						return;
+					}
+					UrlRequestParam request;
+					request.method = HttpMethod::POST;
+					request.url = thiz->m_accessTokenUrl;
+					request.setRequestBodyAsString("oauth_verifier=" + Url::encodeUriComponentByUTF8(tokenVerifier));
+					thiz->authorizeRequest(request, token, secret, sl_null);
+					request.onComplete = [weak, weakDlg, onComplete](UrlRequest* request) {
+						auto thiz = ToRef(weak);
+						if (thiz.isNull()) {
 							OAuthLoginResult result;
 							onComplete(result);
 							return;
 						}
-						UrlRequestParam request;
-						request.method = HttpMethod::POST;
-						request.url = thiz->m_accessTokenUrl;
-						request.setRequestBodyAsString("oauth_verifier=" + Url::encodeUriComponentByUTF8(tokenVerifier));
-						thiz->authorizeRequest(request, token, secret, sl_null);
-						request.onComplete = [weak, weakDlg, onComplete](UrlRequest* request) {
-							auto thiz = ToRef(weak);
-							if (thiz.isNull()) {
-								OAuthLoginResult result;
-								onComplete(result);
-								return;
-							}
-							if (request->isError()) {
-								logUrlRequestError(request);
-								OAuthLoginResult result;
-								onComplete(result);
-								return;
-							}
-							
-							String response = request->getResponseContentAsString();
-							Log(TAG, "AccessToken Response: %s", response);
-							
-							auto params = HttpRequest::parseParameters(response);
-							String token = params["oauth_token"];
-							String tokenSecret = params["oauth_token_secret"];
-							if (token.isEmpty() || tokenSecret.isEmpty()) {
-								OAuthLoginResult result;
-								onComplete(result);
-								return;
-							}
-
-							thiz->m_token = token;
-							thiz->m_tokenSecret = tokenSecret;
-							
-							auto dlg = ToRef(weakDlg);
-							if (dlg.isNotNull()) {
-								dlg->close();
-								auto window = ToRef(dlg->window);
-								if (window.isNotNull()) {
-									window->decreaseReference();
-								}
-							}
-							
+						if (request->isError()) {
+							logUrlRequestError(request);
 							OAuthLoginResult result;
-							result.flagError = sl_false;
-							result.token = token;
-							result.tokenSecret = tokenSecret;
-							result.parameters = params;
 							onComplete(result);
-						};
-						UrlRequest::send(request);
-					}
+							return;
+						}
+						
+						String response = request->getResponseContentAsString();
+						Log(TAG, "AccessToken Response: %s", response);
+						
+						auto params = HttpRequest::parseParameters(response);
+						String token = params["oauth_token"];
+						String tokenSecret = params["oauth_token_secret"];
+						if (token.isEmpty() || tokenSecret.isEmpty()) {
+							OAuthLoginResult result;
+							onComplete(result);
+							return;
+						}
+
+						thiz->m_token = token;
+						thiz->m_tokenSecret = tokenSecret;
+						
+						auto dlg = ToRef(weakDlg);
+						if (dlg.isNotNull()) {
+							dlg->close();
+							auto window = ToRef(dlg->window);
+							if (window.isNotNull()) {
+								window->decreaseReference();
+							}
+						}
+						
+						OAuthLoginResult result;
+						result.flagError = sl_false;
+						result.token = token;
+						result.tokenSecret = tokenSecret;
+						result.parameters = params;
+						onComplete(result);
+					};
+					UrlRequest::send(request);
 				}
 			});
 #ifdef SLIB_PLATFORM_IS_MOBILE

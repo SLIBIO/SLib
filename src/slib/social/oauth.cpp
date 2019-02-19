@@ -205,11 +205,12 @@ namespace slib
 		authorizeRequest(param, m_token, m_tokenSecret, sl_null);
 	}
 	
-	void OAuth1::getLoginUrl(const Function<void(const String& url, const String& token, const String& tokenSecret)>& callback)
+	void OAuth1::getLoginUrl(const HashMap<String, String>& requestParams, const Function<void(const String& url, const String& token, const String& tokenSecret)>& callback)
 	{
 		UrlRequestParam param;
 		param.method = HttpMethod::POST;
 		param.url = m_requestTokenUrl;
+		param.parameters.putAll(requestParams);
 		String authenticateUrl = m_authenticateUrl;
 		auto weak = ToWeakRef(this);
 		param.onComplete = [weak, callback](UrlRequest* request) {
@@ -228,7 +229,11 @@ namespace slib
 			auto params = HttpRequest::parseParameters(response);
 			String token = params["oauth_token"];
 			String tokenSecret = params["oauth_token_secret"];
-			callback(_this->m_authenticateUrl.arg(Url::encodePercentByUTF8(token)), token, tokenSecret);
+			String loginUrl = params["login_url"];
+			if (loginUrl.isEmpty()) {
+				loginUrl = _this->m_authenticateUrl.arg(Url::encodePercentByUTF8(token));
+			}
+			callback(loginUrl, token, tokenSecret);
 		};
 		authorizeRequest(param, sl_null, sl_null, m_callbackUrl);
 		UrlRequest::send(param);

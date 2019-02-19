@@ -85,6 +85,8 @@ namespace slib
 	public:
 		Function<void(OAuthLoginResult& result)> onComplete;
 		
+		HashMap<String, String> requestTokenParams;
+		
 	public:
 		OAuthLoginParam();
 		
@@ -120,7 +122,7 @@ namespace slib
 		
 		void authorizeRequest(UrlRequestParam& param);
 
-		void getLoginUrl(const Function<void(const String& url, const String& token, const String& tokenSecret)>& callback);
+		void getLoginUrl(const HashMap<String, String>& requestParams, const Function<void(const String& url, const String& token, const String& tokenSecret)>& callback);
 		
 		void login(const OAuthLoginParam& param);
 		
