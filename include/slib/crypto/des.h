@@ -84,6 +84,10 @@ namespace slib
 
 		sl_size decrypt_CBC_PKCS7Padding(const void* src, sl_size size, void* dst) const;
 
+		Memory encrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size) const;
+		
+		Memory decrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size) const;
+
 		Memory encrypt_CBC_PKCS7Padding(const void* src, sl_size size) const;
 
 		Memory decrypt_CBC_PKCS7Padding(const void* src, sl_size size) const;
@@ -150,6 +154,10 @@ namespace slib
 		
 		sl_size decrypt_CBC_PKCS7Padding(const void* src, sl_size size, void* dst) const;
 		
+		Memory encrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size) const;
+		
+		Memory decrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size) const;
+
 		Memory encrypt_CBC_PKCS7Padding(const void* src, sl_size size) const;
 		
 		Memory decrypt_CBC_PKCS7Padding(const void* src, sl_size size) const;

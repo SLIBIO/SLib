@@ -218,6 +218,20 @@ namespace slib
 		return p + block;
 	}
 
+	template <class BlockCipher, class Padding>
+	Memory BlockCipher_CBC<BlockCipher, Padding>::encrypt(const BlockCipher* crypto, const void* iv, const void* src, sl_size size)
+	{
+		sl_uint32 block = crypto->getBlockSize();
+		Memory mem = Memory::create(size + block);
+		if (mem.isNotNull()) {
+			sl_size n = encrypt(crypto, iv, src, size, mem.getData());
+			if (n) {
+				return mem.sub(0, n);
+			}
+		}
+		return sl_null;
+	}
+
 	// Output Size = (size / block + 2) * block (< size + block*2)
 	template <class BlockCipher, class Padding>
 	sl_size BlockCipher_CBC<BlockCipher, Padding>::encrypt(const BlockCipher* crypto, const void* src, sl_size size, void* dst)
@@ -271,6 +285,19 @@ namespace slib
 		} else {
 			return 0;
 		}
+	}
+
+	template <class BlockCipher, class Padding>
+	Memory BlockCipher_CBC<BlockCipher, Padding>::decrypt(const BlockCipher* crypto, const void* iv, const void* src, sl_size size)
+	{
+		Memory mem = Memory::create(size);
+		if (mem.isNotNull()) {
+			sl_size n = decrypt(crypto, iv, src, size, mem.getData());
+			if (n) {
+				return mem.sub(0, n);
+			}
+		}
+		return sl_null;
 	}
 
 	// destination buffer size must equals to or greater than size
@@ -399,6 +426,10 @@ namespace slib
 	{ return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::encrypt(this, src, size, dst); } \
 	sl_size CLASS::decrypt_CBC_PKCS7Padding(const void* src, sl_size size, void* dst) const \
 	{ return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::decrypt(this, src, size, dst); } \
+	Memory CLASS::encrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size) const \
+	{ return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::encrypt(this, iv, src, size); } \
+	Memory CLASS::decrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size) const \
+	{ return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::decrypt(this, iv, src, size); } \
 	Memory CLASS::encrypt_CBC_PKCS7Padding(const void* src, sl_size size) const \
 	{ return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::encrypt(this, src, size); } \
 	Memory CLASS::decrypt_CBC_PKCS7Padding(const void* src, sl_size size) const \

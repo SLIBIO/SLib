@@ -93,6 +93,8 @@ namespace slib
 		// Output Size = (size / block + 1) * block (< size + block)
 		static sl_size encrypt(const BlockCipher* crypto, const void* iv, const void* src, sl_size size, void* dst);
 
+		static Memory encrypt(const BlockCipher* crypto, const void* iv, const void* src, sl_size size);
+
 		// Output Size = (size / block + 2) * block (< size + block*2)
 		static sl_size encrypt(const BlockCipher* crypto, const void* src, sl_size size, void* dst);
 
@@ -100,6 +102,8 @@ namespace slib
 
 		// destination buffer size must equals to or greater than size
 		static sl_size decrypt(const BlockCipher* crypto, const void* iv, const void* src, sl_size size, void* dst);
+
+		static Memory decrypt(const BlockCipher* crypto, const void* iv, const void* src, sl_size size);
 
 		// destination buffer size must equals to or greater than size
 		static sl_size decrypt(const BlockCipher* crypto, const void* src, sl_size size, void* dst);
