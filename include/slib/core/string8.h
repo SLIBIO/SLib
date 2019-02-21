@@ -1086,6 +1086,13 @@ namespace slib
 		sl_bool parseHexString(void* output) const noexcept;
 		
 		/**
+		 * Parses this hex string and returns hex data. Format example, "a1a1a1a1" is converted to 4 bytes of 0xA1.
+		 *
+		 * @return parsed hex data
+		 */
+		Memory parseHexString() const noexcept;
+		
+		/**
 		 * @return the string representation of 32 bit integer argument.
 		 *
 		 * @param value The integer to be parsed.
@@ -2002,6 +2009,13 @@ namespace slib
 		 * @return `true` if the conversion is success
 		 */
 		sl_bool parseHexString(void* output) const noexcept;
+				
+		/**
+		 * Parses this hex string and returns hex data. Format example, "a1a1a1a1" is converted to 4 bytes of 0xA1.
+		 *
+		 * @return parsed hex data
+		 */
+		Memory parseHexString() const noexcept;
 		
 		/**
 		 * Formats the current string which contains conversion specifications with arbitrary list of arguments.

@@ -7041,7 +7041,7 @@ namespace slib
 	template <class CT>
 	SLIB_INLINE static sl_reg _priv_String_parseHexString(const CT* sz, sl_size i, sl_size n, void* _out) noexcept
 	{
-		if (i >= n) {
+		if (i >= n || (n & 1)) {
 			return SLIB_PARSE_ERROR;
 		}
 		sl_uint8* buf = (sl_uint8*)(_out);
@@ -7117,6 +7117,45 @@ namespace slib
 		return s.parseHexString(_out);
 	}
 
+	Memory String::parseHexString() const noexcept
+	{
+		sl_size n = getLength();
+		if (n > 0 && !(n & 1)) {
+			Memory mem = Memory::create(n >> 1);
+			if (mem.isNotNull()) {
+				if (_priv_String_parseHexString(getData(), 0, n, mem.getData()) == (sl_reg)n) {
+					return mem;
+				}
+			}
+		}
+		return sl_null;
+	}
+
+	Memory String16::parseHexString() const noexcept
+	{
+		sl_size n = getLength();
+		if (n > 0 && !(n & 1)) {
+			Memory mem = Memory::create(n >> 1);
+			if (mem.isNotNull()) {
+				if (_priv_String_parseHexString(getData(), 0, n, mem.getData()) == (sl_reg)n) {
+					return mem;
+				}
+			}
+		}
+		return sl_null;
+	}
+
+	Memory Atomic<String>::parseHexString() const noexcept
+	{
+		String s(*this);
+		return s.parseHexString();
+	}
+	
+	Memory Atomic<String16>::parseHexString() const noexcept
+	{
+		String16 s(*this);
+		return s.parseHexString();
+	}
 
 
 	template <class IT, class UT, class ST, class CT>
