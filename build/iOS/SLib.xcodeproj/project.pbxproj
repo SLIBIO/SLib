@@ -59,7 +59,6 @@
 		260B73EF220CAD1C00858EEA /* oauth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B73EE220CAD1C00858EEA /* oauth.cpp */; };
 		260B73F8220D872600858EEA /* twitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B73F7220D872600858EEA /* twitter.cpp */; };
 		260B73FC220DCA8E00858EEA /* oauth_login.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B73FB220DCA8D00858EEA /* oauth_login.cpp */; };
-		260B7400220E012400858EEA /* twitter_login.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B73FF220E012400858EEA /* twitter_login.cpp */; };
 		260D834820C7DB5A0013B34E /* gzclose.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D833920C7DB590013B34E /* gzclose.c */; };
 		260D834920C7DB5A0013B34E /* infback.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D833A20C7DB590013B34E /* infback.c */; };
 		260D834A20C7DB5A0013B34E /* crc32.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D833B20C7DB590013B34E /* crc32.c */; };
@@ -760,6 +759,10 @@
 		26B92D5D21D4CF29003F6F82 /* device_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D5C21D4CF28003F6F82 /* device_ios.mm */; };
 		26BAE008221BEE530085B5AB /* etsy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE007221BEE530085B5AB /* etsy.cpp */; };
 		26BAE00A221BEE590085B5AB /* etsy_login.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE009221BEE580085B5AB /* etsy_login.cpp */; };
+		26BAE017221EDD960085B5AB /* facebook_login.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE015221EDD960085B5AB /* facebook_login.cpp */; };
+		26BAE01A221FFC830085B5AB /* facebook_sdk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE019221FFC830085B5AB /* facebook_sdk.cpp */; };
+		26BAE020222157F40085B5AB /* linkedin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE01F222157F40085B5AB /* linkedin.cpp */; };
+		26BAE02822239EA80085B5AB /* linkedin_login.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE02722239EA80085B5AB /* linkedin_login.cpp */; };
 		26BB17CE21F4BA5D0089C7EC /* ui_adapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17CD21F4BA5D0089C7EC /* ui_adapter.cpp */; };
 		26BB17D621F4E4550089C7EC /* view_page_navigation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17D521F4E4550089C7EC /* view_page_navigation.cpp */; };
 		26BB17D821F4E45C0089C7EC /* view_pager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17D721F4E45C0089C7EC /* view_pager.cpp */; };
@@ -1201,7 +1204,6 @@
 		260B73EE220CAD1C00858EEA /* oauth.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = oauth.cpp; sourceTree = "<group>"; };
 		260B73F7220D872600858EEA /* twitter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = twitter.cpp; sourceTree = "<group>"; };
 		260B73FB220DCA8D00858EEA /* oauth_login.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = oauth_login.cpp; sourceTree = "<group>"; };
-		260B73FF220E012400858EEA /* twitter_login.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = twitter_login.cpp; sourceTree = "<group>"; };
 		260D833920C7DB590013B34E /* gzclose.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gzclose.c; path = ../../external/src/zlib/gzclose.c; sourceTree = "<group>"; };
 		260D833A20C7DB590013B34E /* infback.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = infback.c; path = ../../external/src/zlib/infback.c; sourceTree = "<group>"; };
 		260D833B20C7DB590013B34E /* crc32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crc32.c; path = ../../external/src/zlib/crc32.c; sourceTree = "<group>"; };
@@ -2217,6 +2219,10 @@
 		26B92D5C21D4CF28003F6F82 /* device_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = device_ios.mm; sourceTree = "<group>"; };
 		26BAE007221BEE530085B5AB /* etsy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = etsy.cpp; sourceTree = "<group>"; };
 		26BAE009221BEE580085B5AB /* etsy_login.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = etsy_login.cpp; sourceTree = "<group>"; };
+		26BAE015221EDD960085B5AB /* facebook_login.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = facebook_login.cpp; sourceTree = "<group>"; };
+		26BAE019221FFC830085B5AB /* facebook_sdk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = facebook_sdk.cpp; sourceTree = "<group>"; };
+		26BAE01F222157F40085B5AB /* linkedin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = linkedin.cpp; sourceTree = "<group>"; };
+		26BAE02722239EA80085B5AB /* linkedin_login.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = linkedin_login.cpp; sourceTree = "<group>"; };
 		26BB17CD21F4BA5D0089C7EC /* ui_adapter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_adapter.cpp; sourceTree = "<group>"; };
 		26BB17D521F4E4550089C7EC /* view_page_navigation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view_page_navigation.cpp; sourceTree = "<group>"; };
 		26BB17D721F4E45C0089C7EC /* view_pager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view_pager.cpp; sourceTree = "<group>"; };
@@ -3875,11 +3881,14 @@
 				26BAE007221BEE530085B5AB /* etsy.cpp */,
 				26BAE009221BEE580085B5AB /* etsy_login.cpp */,
 				26ACB3B8220978310093FF3F /* facebook.cpp */,
+				26BAE015221EDD960085B5AB /* facebook_login.cpp */,
+				26BAE019221FFC830085B5AB /* facebook_sdk.cpp */,
 				26C795AA2215A8940053C5A1 /* facebook_ios.mm */,
+				26BAE01F222157F40085B5AB /* linkedin.cpp */,
+				26BAE02722239EA80085B5AB /* linkedin_login.cpp */,
 				260B73EE220CAD1C00858EEA /* oauth.cpp */,
 				260B73FB220DCA8D00858EEA /* oauth_login.cpp */,
 				260B73F7220D872600858EEA /* twitter.cpp */,
-				260B73FF220E012400858EEA /* twitter_login.cpp */,
 			);
 			path = social;
 			sourceTree = "<group>";
@@ -5342,7 +5351,6 @@
 				26D9D80B1E9628E0005F7BD3 /* function.cpp in Sources */,
 				26D9D88A1E96295A005F7BD3 /* codec_opus.cpp in Sources */,
 				26D9D86A1E96294F005F7BD3 /* drawable_quartz.mm in Sources */,
-				260B7400220E012400858EEA /* twitter_login.cpp in Sources */,
 				26D9D80C1E9628E0005F7BD3 /* matrix4.cpp in Sources */,
 				26D9D8D01E962976005F7BD3 /* scroll_bar.cpp in Sources */,
 				26D9D8C01E962976005F7BD3 /* label_view.cpp in Sources */,
@@ -5378,6 +5386,7 @@
 				26D9D8B91E962976005F7BD3 /* common_dialogs.cpp in Sources */,
 				26D9D8C21E962976005F7BD3 /* linear_view.cpp in Sources */,
 				26D9D8E21E962976005F7BD3 /* ui_event.cpp in Sources */,
+				26BAE01A221FFC830085B5AB /* facebook_sdk.cpp in Sources */,
 				26D9D85F1E962937005F7BD3 /* globe.cpp in Sources */,
 				26D9D8151E9628E0005F7BD3 /* variant.cpp in Sources */,
 				26D9D8C91E962976005F7BD3 /* notification_ios.mm in Sources */,
@@ -5459,6 +5468,7 @@
 				26BAE008221BEE530085B5AB /* etsy.cpp in Sources */,
 				26B92D5D21D4CF29003F6F82 /* device_ios.mm in Sources */,
 				26D9D89E1E962962005F7BD3 /* network_async_unix.cpp in Sources */,
+				26BAE017221EDD960085B5AB /* facebook_login.cpp in Sources */,
 				26D9D82D1E9628E0005F7BD3 /* timer.cpp in Sources */,
 				26ACB3B9220978310093FF3F /* facebook.cpp in Sources */,
 				26D9D8851E96295A005F7BD3 /* audio_recorder_opensl_es.cpp in Sources */,
@@ -5504,6 +5514,7 @@
 				26B92D5821D3E4FC003F6F82 /* web_controller.cpp in Sources */,
 				26D9D8CA1E962976005F7BD3 /* picker_view.cpp in Sources */,
 				26D9D85D1E962937005F7BD3 /* geo_location.cpp in Sources */,
+				26BAE02822239EA80085B5AB /* linkedin_login.cpp in Sources */,
 				2628EAE321C410CF00D8CD00 /* jwt.cpp in Sources */,
 				26ACB3F4220984FF0093FF3F /* ui_core_badge_ios.mm in Sources */,
 				26D9D83C1E9628E0005F7BD3 /* object.cpp in Sources */,
@@ -5536,6 +5547,7 @@
 				26D9D8451E9628E0005F7BD3 /* line_segment.cpp in Sources */,
 				2671F99121E07F7400B39842 /* drawer.cpp in Sources */,
 				26D9D8DC1E962976005F7BD3 /* ui_animation_apple.mm in Sources */,
+				26BAE020222157F40085B5AB /* linkedin.cpp in Sources */,
 				26D9D8831E96295A005F7BD3 /* audio_recorder_dsound.cpp in Sources */,
 				26D9D8461E9628E0005F7BD3 /* locale.cpp in Sources */,
 				26C795CA2215FC7C0053C5A1 /* menus.cpp in Sources */,

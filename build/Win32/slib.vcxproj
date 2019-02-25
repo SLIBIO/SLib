@@ -241,10 +241,13 @@
     <ClCompile Include="..\..\src\slib\social\etsy.cpp" />
     <ClCompile Include="..\..\src\slib\social\etsy_login.cpp" />
     <ClCompile Include="..\..\src\slib\social\facebook.cpp" />
+    <ClCompile Include="..\..\src\slib\social\facebook_login.cpp" />
+    <ClCompile Include="..\..\src\slib\social\facebook_sdk.cpp" />
+    <ClCompile Include="..\..\src\slib\social\linkedin.cpp" />
+    <ClCompile Include="..\..\src\slib\social\linkedin_login.cpp" />
     <ClCompile Include="..\..\src\slib\social\oauth.cpp" />
     <ClCompile Include="..\..\src\slib\social\oauth_login.cpp" />
     <ClCompile Include="..\..\src\slib\social\twitter.cpp" />
-    <ClCompile Include="..\..\src\slib\social\twitter_login.cpp" />
     <ClCompile Include="..\..\src\slib\ui\button.cpp" />
     <ClCompile Include="..\..\src\slib\ui\button_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\camera_view.cpp" />

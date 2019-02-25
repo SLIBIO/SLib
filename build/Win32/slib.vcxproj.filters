@@ -893,9 +893,6 @@
     <ClCompile Include="..\..\src\slib\social\oauth_login.cpp">
       <Filter>src\social</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\slib\social\twitter_login.cpp">
-      <Filter>src\social</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\slib\ui\clipboard.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>
@@ -930,6 +927,18 @@
       <Filter>src\social</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\slib\social\etsy_login.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\facebook_login.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\facebook_sdk.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\linkedin.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\linkedin_login.cpp">
       <Filter>src\social</Filter>
     </ClCompile>
   </ItemGroup>
