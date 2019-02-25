@@ -28,29 +28,9 @@
 
 using namespace slib;
 
-class MainMenu : public example::ui::MainMenu
+class ListViewPage : public example::ui::ListView
 {
 public:
 	void onOpen() override;
-	
-	void onClickHelloWorld(View* view);
-	
-	void onClickViewPager(View* view);
-	
-	void onClickListView(View* view);
-	
-	void onClickDrawer(View* view);
-	
-	void onClickVideoView(View* view);
-
-	void onClickCameraView(View* view);
-
-	void onClickWebView(View* view);
-
-	void onClickControlScreen(View* view);
-	
-	void onClickLoginPage(View* view);
-	
-	void onClickQRCodeScanner(View* view);
 	
 };

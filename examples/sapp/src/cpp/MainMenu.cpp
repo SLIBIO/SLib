@@ -22,6 +22,7 @@
 
 #include "MainMenu.h"
 
+#include "ListViewPage.h"
 #include "ControlScreenPage.h"
 #include "QRCodeScannerPage.h"
 
@@ -29,6 +30,7 @@ void MainMenu::onOpen()
 {
 	btnHelloWorld->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickHelloWorld, this));
 	btnViewPager->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickViewPager, this));
+	btnListView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickListView, this));
 	btnDrawer->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickDrawer, this));
 	btnVideoView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickVideoView, this));
 	btnCameraView->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickCameraView, this));
@@ -46,6 +48,11 @@ void MainMenu::onClickHelloWorld(View* view)
 void MainMenu::onClickViewPager(View* view)
 {
 	goToPage(new example::ui::ViewPager);
+}
+
+void MainMenu::onClickListView(View* view)
+{
+	goToPage(new ListViewPage);
 }
 
 void MainMenu::onClickDrawer(View* view)

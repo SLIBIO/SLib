@@ -15,6 +15,7 @@ set (SOURCE_FILES
         "${CMAKE_CURRENT_LIST_DIR}/../../src/cpp/app.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/../../src/cpp/MainMenu.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/../../src/cpp/LaunchScreen.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/../../src/cpp/ListViewPage.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/../../src/cpp/ControlScreenPage.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/../../src/cpp/QRCodeScannerPage.cpp"
 )

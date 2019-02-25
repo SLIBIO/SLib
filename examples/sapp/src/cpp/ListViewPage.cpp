@@ -20,37 +20,31 @@
  *   THE SOFTWARE.
  */
 
-#pragma once
+#include "ListViewPage.h"
 
-#include <slib.h>
-
-#include "../gen/resources.h"
-
-using namespace slib;
-
-class MainMenu : public example::ui::MainMenu
+struct MyListItem
 {
-public:
-	void onOpen() override;
-	
-	void onClickHelloWorld(View* view);
-	
-	void onClickViewPager(View* view);
-	
-	void onClickListView(View* view);
-	
-	void onClickDrawer(View* view);
-	
-	void onClickVideoView(View* view);
-
-	void onClickCameraView(View* view);
-
-	void onClickWebView(View* view);
-
-	void onClickControlScreen(View* view);
-	
-	void onClickLoginPage(View* view);
-	
-	void onClickQRCodeScanner(View* view);
-	
+	int id;
+	Ref<Drawable> icon;
+	String name;
 };
+
+void ListViewPage::onOpen()
+{
+	List<MyListItem> list;
+	for (int i = 0; i < 100; i++) {
+		MyListItem item;
+		item.id = i;
+		item.icon = i % 2 ? example::drawable::lion::get() : example::drawable::tiger::get();
+		item.name = String::format("List Row %d", i);
+		list.add(item);
+	}
+	listView->setAdapter(ListViewAdapter<MyListItem, example::ui::ListViewItem>::create(list, [](MyListItem& data, example::ui::ListViewItem* row, View*) {
+		row->icon->setSource(data.icon);
+		row->text->setText(data.name);
+		int id = data.id;
+		row->btnDetail->setOnClick([id](View*) {
+			UI::showAlert(String::format("Row %d is clicked on", id));
+		});
+	}));
+}

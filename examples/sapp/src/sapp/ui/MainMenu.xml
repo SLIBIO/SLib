@@ -14,6 +14,8 @@
 
 					<button name='btnViewPager' text='ViewPager' style='menu_button'/>
 
+					<button name='btnListView' text='ListView' style='menu_button'/>
+
 					<button name='btnDrawer' text='Drawer' style='menu_button'/>
 
 					<button name='btnVideoView' text='VideoView' style='menu_button'/>

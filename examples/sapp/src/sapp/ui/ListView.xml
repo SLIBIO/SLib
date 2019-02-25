@@ -1,0 +1,12 @@
+<sapp>
+	<layout
+		type='page'
+		background='white'
+		>
+		<button
+			name='btnBack'
+			style='button_back'
+			/>
+		<list name='listView' width='fill' height='fill' below='btnBack' />
+ 	</layout>
+</sapp>

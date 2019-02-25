@@ -1,0 +1,16 @@
+<sapp>
+	<layout
+		type='view'
+		width='fill'
+		padding='2%smin'
+		>
+
+		<hlinear width='fill'>
+			<image name='icon' src='@drawable/lion' height='fill' aspectRatio='1' centerVertical='true' />
+			<label name='text' text='Text' width='fill' fontSize='6%smin' marginLeft='2%smin' centerVertical='true' />
+			<button name='btnDetail' style='button_normal' text='Detail' centerVertical='true' padding='3%smin' />
+		</hlinear>
+		
+ 	</layout>
+
+</sapp>
