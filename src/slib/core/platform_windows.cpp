@@ -491,7 +491,11 @@ namespace slib
 			flagOpened = sl_true;
 		}
 		sl_bool flagSuccess = sl_false;
-		if (value.isInt64() || value.isUint64()) {
+		if (value.isNull()) {
+			if (ERROR_SUCCESS == ::RegDeleteValueW(hKey, (LPCWSTR)(name.getData()))) {
+				flagSuccess = sl_true;
+			}
+		} else if (value.isInt64() || value.isUint64()) {
 			sl_uint64 n = value.getUint64();
 			if (ERROR_SUCCESS == ::RegSetValueExW(hKey, (LPCWSTR)(name.getData()), NULL, REG_QWORD, reinterpret_cast<BYTE*>(&n), 8)) {
 				flagSuccess = sl_true;
