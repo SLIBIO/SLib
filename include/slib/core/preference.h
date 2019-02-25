@@ -36,6 +36,8 @@ namespace slib
 	public:
 		static void setValue(const String& key, const Json& value);
 		
+		static void removeValue(const String& key);
+		
 		static Json getValue(const String& key);
 
 		template <class T>
@@ -49,6 +51,7 @@ namespace slib
 		{
 			getValue(key).get(_out, _def);
 		}
+		
 
 		// used for Win32 applications
 		static String getApplicationKeyName();

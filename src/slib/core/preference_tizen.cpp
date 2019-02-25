@@ -39,8 +39,12 @@ namespace slib
 		if (key.isEmpty()) {
 			return;
 		}
-		String json = value.toJsonString();
-		::preference_set_string(key.getData(), json.getData());
+		if (value.isNotNull()) {
+			String json = value.toJsonString();
+			::preference_set_string(key.getData(), json.getData());
+		} else {
+			::preference_remove(key.getData());
+		}
 	}
 
 	Json Preference::getValue(const String& key)

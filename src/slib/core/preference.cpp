@@ -26,6 +26,11 @@
 
 namespace slib
 {
+	
+	void Preference::removeValue(const String& key)
+	{
+		setValue(key, sl_null);
+	}
 
 	SLIB_STATIC_ZERO_INITIALIZED(AtomicString, _g_preference_app_key)
 

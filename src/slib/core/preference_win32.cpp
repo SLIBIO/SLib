@@ -41,7 +41,11 @@ namespace slib
 		if (appName.isEmpty()) {
 			return;
 		}
-		Windows::setRegistryValue(HKEY_CURRENT_USER, "Software\\" + appName, key, value.toJsonString());
+		if (value.isNotNull()) {
+			Windows::setRegistryValue(HKEY_CURRENT_USER, "Software\\" + appName, key, value.toJsonString());
+		} else {
+			Windows::setRegistryValue(HKEY_CURRENT_USER, "Software\\" + appName, key, sl_null);
+		}
 	}
 
 	Json Preference::getValue(const String& key)

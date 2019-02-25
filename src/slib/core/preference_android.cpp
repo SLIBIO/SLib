@@ -42,9 +42,13 @@ namespace slib
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JniLocal<jstring> jkey = Jni::getJniString(key);
-			String _value = value.toJsonString();
-			JniLocal<jstring> jvalue = Jni::getJniString(_value);
-			_priv_AndroidPreference::setValue.call(sl_null, jactivity, jkey.get(), jvalue.get());
+			if (value.isNotNull()) {
+				String _value = value.toJsonString();
+				JniLocal<jstring> jvalue = Jni::getJniString(_value);
+				_priv_AndroidPreference::setValue.call(sl_null, jactivity, jkey.get(), jvalue.get());
+			} else {
+				_priv_AndroidPreference::setValue.call(sl_null, jactivity, jkey.get(), sl_null);
+			}
 		}
 	}
 

@@ -39,31 +39,28 @@ namespace slib
 		if (key.isEmpty()) {
 			return;
 		}
-		NSString* _key = Apple::getNSStringFromString(key);
-		String jsonString = value.toJsonString();
-		if (jsonString.getLength() <= 0) {
-			return;
-		}
-		NSString* _value = Apple::getNSStringFromString(jsonString);
 		NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-		[defaults setValue:_value forKey:_key];
+		NSString* _key = Apple::getNSStringFromString(key);
+		if (value.isNotNull()) {
+			String json = value.toJsonString();
+			NSString* _value = Apple::getNSStringFromString(json);
+			[defaults setObject:_value forKey:_key];
+		} else {
+			[defaults removeObjectForKey:_key];
+		}
 		[defaults synchronize];
 	}
 
 	Json Preference::getValue(const String& key)
 	{
-		if (key.isEmpty()) {
-			return sl_null;
+		if (key.isNotEmpty()) {
+			NSString* _key = Apple::getNSStringFromString(key);
+			NSString* _value = [[NSUserDefaults standardUserDefaults] stringForKey:_key];
+			if (_value != nil) {
+				return Json::parseJson(Apple::getStringFromNSString(_value));
+			}
 		}
-		
-		NSString* _key = Apple::getNSStringFromString(key);
-		NSString* _value = [[NSUserDefaults standardUserDefaults] stringForKey:_key];
-		
-		if (_value == nil) {
-			return sl_null;
-		}
-		
-		return Json::parseJson(Apple::getStringFromNSString(_value));
+		return sl_null;
 	}
 
 }

@@ -35,7 +35,11 @@ public class Preference {
         try {
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
             SharedPreferences.Editor editor = sp.edit();
-            editor.putString(key, value);
+            if (value != null) {
+	            editor.putString(key, value);
+            } else {
+            	editor.remove(key);
+            }
             editor.commit();
         } catch (Exception e) {
             Logger.exception(e);
