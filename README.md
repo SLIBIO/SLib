@@ -426,9 +426,9 @@ Edit `CMakeLists.txt` as following
 
 ## Contributing
 
-We sincerely appreciate your support and suggestions. For contributing pull requests, please make sure to contact us at <fred1218zh@outlook.com>.
+We sincerely appreciate your support and suggestions. For contributing pull requests, please make sure to contact us at <slib.io@outlook.com>.
 
 
 ## License
 
-SLib is dual-licensed. It is currently licensed under the MIT License, but also under a separate proprietary license. If you feel like you need to purchase a proprietary license for SLib, please contact us at <fred1218zh@outlook.com>
+SLib is dual-licensed. It is currently licensed under the MIT License, but also under a separate proprietary license. If you feel like you need to purchase a proprietary license for SLib, please contact us at <slib.io@outlook.com>
