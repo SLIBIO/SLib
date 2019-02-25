@@ -95,9 +95,9 @@ namespace slib
 		m_deviceId = deviceId;
 	}
 	
-	SLIB_DEFINE_EVENT_HANDLER(CameraView, Capture, VideoCaptureFrame* frame)
+	SLIB_DEFINE_EVENT_HANDLER(CameraView, Capture, VideoCaptureFrame& frame)
 
-	void CameraView::dispatchCapture(VideoCaptureFrame* frame)
+	void CameraView::dispatchCapture(VideoCaptureFrame& frame)
 	{
 		SLIB_INVOKE_EVENT_HANDLER(Capture, frame)
 		
@@ -111,7 +111,7 @@ namespace slib
 		}
 	}
 	
-	void CameraView::_onCaptureCameraFrame(VideoCapture* capture, VideoCaptureFrame* frame)
+	void CameraView::_onCaptureCameraFrame(VideoCapture* capture, VideoCaptureFrame& frame)
 	{
 		dispatchCapture(frame);
 	}

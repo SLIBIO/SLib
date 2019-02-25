@@ -439,13 +439,13 @@ namespace slib
 		return m_flagDecompressing;
 	}
 
-	void HttpContentReader::onReadStream(AsyncStreamResult* result)
+	void HttpContentReader::onReadStream(AsyncStreamResult& result)
 	{
-		if (result->flagError) {
+		if (result.flagError) {
 			setReadingEnded();
 		}
 		AsyncStreamFilter::onReadStream(result);
-		if (result->flagError) {
+		if (result.flagError) {
 			setError();
 		}
 	}
@@ -464,7 +464,7 @@ namespace slib
 		setReadingError();
 	}
 
-	sl_bool HttpContentReader::write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref)
+	sl_bool HttpContentReader::write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult&)>& callback, Referable* ref)
 	{
 		return sl_false;
 	}

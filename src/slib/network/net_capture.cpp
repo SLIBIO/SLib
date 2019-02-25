@@ -92,7 +92,7 @@ namespace slib
 		m_onCapturePacket = param.onCapturePacket;
 	}
 	
-	void NetCapture::_onCapturePacket(NetCapturePacket* packet)
+	void NetCapture::_onCapturePacket(NetCapturePacket& packet)
 	{
 		m_onCapturePacket(this, packet);
 	}
@@ -248,7 +248,7 @@ namespace slib
 						packet.data = buf;
 						packet.length = n;
 						packet.time = 0;
-						_onCapturePacket(&packet);
+						_onCapturePacket(packet);
 					} else {
 						break;
 					}
@@ -450,7 +450,7 @@ namespace slib
 						packet.data = buf;
 						packet.length = n;
 						packet.time = 0;
-						_onCapturePacket(&packet);
+						_onCapturePacket(packet);
 					} else {
 						break;
 					}
@@ -462,7 +462,7 @@ namespace slib
 						packet.data = buf;
 						packet.length = n;
 						packet.time = 0;
-						_onCapturePacket(&packet);
+						_onCapturePacket(packet);
 					} else {
 						break;
 					}
@@ -474,7 +474,7 @@ namespace slib
 						packet.data = buf;
 						packet.length = n;
 						packet.time = 0;
-						_onCapturePacket(&packet);
+						_onCapturePacket(packet);
 					} else {
 						break;
 					}

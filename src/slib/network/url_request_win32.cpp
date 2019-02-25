@@ -481,17 +481,17 @@ namespace slib
 			}
 		}
 
-		void _onWriteDownloadFile(AsyncStreamResult* result)
+		void _onWriteDownloadFile(AsyncStreamResult& result)
 		{
-			if (result->size > 0) {
-				onDownloadContent(result->size);
-				Base::interlockedAdd(&m_sizeDownloadWriting, -((sl_reg)(result->size)));
+			if (result.size > 0) {
+				onDownloadContent(result.size);
+				Base::interlockedAdd(&m_sizeDownloadWriting, -((sl_reg)(result.size)));
 			}
-			if (result->flagError) {
+			if (result.flagError) {
 				processError("Error on writing download file");
 				return;
 			}
-			if (m_sizeContentReceived >= m_sizeContentTotal || (m_step == STEP_FINISHED_RECEIVING && result->size == 0)) {
+			if (m_sizeContentReceived >= m_sizeContentTotal || (m_step == STEP_FINISHED_RECEIVING && result.size == 0)) {
 				processComplete();
 			} else {
 				downloadData();

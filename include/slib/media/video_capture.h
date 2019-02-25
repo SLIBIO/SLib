@@ -49,7 +49,7 @@ namespace slib
 	public:
 		sl_bool flagAutoStart;
 		
-		Function<void(VideoCapture*, VideoCaptureFrame*)> onCaptureVideoFrame;
+		Function<void(VideoCapture*, VideoCaptureFrame&)> onCaptureVideoFrame;
 		
 	public:
 		VideoCaptureParam();
@@ -79,12 +79,12 @@ namespace slib
 		virtual sl_bool isRunning() = 0;
 		
 	public:
-		SLIB_PROPERTY_FUNCTION(void(VideoCapture*, VideoCaptureFrame*), OnCaptureVideoFrame)
+		SLIB_PROPERTY_FUNCTION(void(VideoCapture*, VideoCaptureFrame&), OnCaptureVideoFrame)
 		
 	protected:
 		void _init(const VideoCaptureParam& param);
 		
-		void _onCaptureVideoFrame(VideoCaptureFrame* frame);
+		void _onCaptureVideoFrame(VideoCaptureFrame& frame);
 		
 	};	
 }

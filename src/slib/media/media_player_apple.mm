@@ -277,7 +277,7 @@ namespace slib
 											frame.image.data1 = baseAddress + (sl_int32)(Endian::swap32LE(p->componentInfoCbCr.offset));
 											frame.image.pitch1 = Endian::swap32LE(p->componentInfoCbCr.rowBytes);
 										}
-										param.onUpdateFrame(&frame);
+										param.onUpdateFrame(frame);
 										
 										param.flagUpdated = sl_true;
 									}

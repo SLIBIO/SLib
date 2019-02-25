@@ -172,7 +172,7 @@ namespace slib
 		canvas->fillRectangle(width_half + box_half - corner_depth, height_half + box_half - corner_length, corner_depth, corner_length, colorFillCorner);
 	}
 
-	void QRCodeScanner::onCapture(VideoCaptureFrame* frame)
+	void QRCodeScanner::onCapture(VideoCaptureFrame& frame)
 	{
 		m_flagUpdateCameraFrame = sl_true;
 	}

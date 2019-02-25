@@ -221,7 +221,7 @@ namespace slib
 					sl_uint64 t = info->ts.tv_sec;
 					t = t * 1000000 + info->ts.tv_usec;
 					packet.time = t;
-					_onCapturePacket(&packet);
+					_onCapturePacket(packet);
 				} else if (ret < 0) {
 					break;
 				}

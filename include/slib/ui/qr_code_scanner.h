@@ -54,7 +54,7 @@ namespace slib
 	protected:
 		void onDraw(Canvas* canvas) override;
 		
-		void onCapture(VideoCaptureFrame* frame) override;
+		void onCapture(VideoCaptureFrame& frame) override;
 		
 		void onRunScanner(Timer* timer);
 

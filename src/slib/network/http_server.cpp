@@ -421,13 +421,13 @@ namespace slib
 		}
 	}
 
-	void HttpServerConnection::onReadStream(AsyncStreamResult* result)
+	void HttpServerConnection::onReadStream(AsyncStreamResult& result)
 	{
 		m_flagReading = sl_false;
-		if (result->flagError) {
+		if (result.flagError) {
 			close();
 		} else {
-			_processInput(result->data, result->size);
+			_processInput(result.data, result.size);
 		}
 	}
 
@@ -469,7 +469,7 @@ namespace slib
 			m_connection = connection;
 		}
 
-		void onWriteStream(AsyncStreamResult* result)
+		void onWriteStream(AsyncStreamResult& result)
 		{
 			Ref<HttpServerConnection> connection = m_connection;
 			if (connection.isNotNull()) {

@@ -219,33 +219,33 @@ namespace slib
 		}
 	}
 	
-	void VideoView::updateCurrentFrame(const VideoFrame* frame)
+	void VideoView::updateCurrentFrame(VideoFrame& frame)
 	{
-		ColorSpace colorSpace = BitmapFormats::getColorSpace(frame->image.format);
+		ColorSpace colorSpace = BitmapFormats::getColorSpace(frame.image.format);
 		if (colorSpace != ColorSpace::RGB && colorSpace != ColorSpace::YUV) {
 			return;
 		}
 		Ref<Texture> texture = m_textureFrame;
 		if (texture.isNotNull()) {
-			if (texture->getWidth() != frame->image.width || texture->getHeight() != frame->image.height) {
+			if (texture->getWidth() != frame.image.width || texture->getHeight() != frame.image.height) {
 				texture.setNull();
 			}
 		}
 		if (texture.isNull()) {
-			texture = Texture::create(frame->image.width, frame->image.height);
+			texture = Texture::create(frame.image.width, frame.image.height);
 		}
 		if (texture.isNotNull()) {
 			Ref<Image> image = Ref<Image>::from(texture->getSource());
 			BitmapData bitmapData(image->getWidth(), image->getHeight(), image->getColors());
-			if (BitmapFormats::getColorSpace(frame->image.format) == ColorSpace::YUV) {
+			if (BitmapFormats::getColorSpace(frame.image.format) == ColorSpace::YUV) {
 				bitmapData.format = BitmapFormat::YUVA;
 				m_flagYUV = sl_true;
 			} else {
 				m_flagYUV = sl_false;
 			}
-			m_rotationFrame = frame->rotation;
-			m_flipFrame = frame->flip;
-			bitmapData.copyPixelsFrom(frame->image);
+			m_rotationFrame = frame.rotation;
+			m_flipFrame = frame.flip;
+			bitmapData.copyPixelsFrom(frame.image);
 			texture->update();
 			m_textureFrame = texture;
 		}

@@ -379,7 +379,7 @@ namespace slib
 					} while (0);
 					
 					if (frame.image.format != BitmapFormat::None) {
-						_onCaptureVideoFrame(&frame);
+						_onCaptureVideoFrame(frame);
 					}
 				}
 				

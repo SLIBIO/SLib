@@ -210,22 +210,22 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool AsyncTcpSocket::receive(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
+	sl_bool AsyncTcpSocket::receive(void* data, sl_uint32 size, const Function<void(AsyncStreamResult&)>& callback, Referable* userObject)
 	{
 		return AsyncStreamBase::read(data, size, callback, userObject);
 	}
 
-	sl_bool AsyncTcpSocket::receive(const Memory& mem, const Function<void(AsyncStreamResult*)>& callback)
+	sl_bool AsyncTcpSocket::receive(const Memory& mem, const Function<void(AsyncStreamResult&)>& callback)
 	{
 		return AsyncStreamBase::read(mem.getData(), (sl_uint32)(mem.getSize()), callback, mem.ref.get());
 	}
 
-	sl_bool AsyncTcpSocket::send(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
+	sl_bool AsyncTcpSocket::send(void* data, sl_uint32 size, const Function<void(AsyncStreamResult&)>& callback, Referable* userObject)
 	{
 		return AsyncStreamBase::write(data, size, callback, userObject);
 	}
 
-	sl_bool AsyncTcpSocket::send(const Memory& mem, const Function<void(AsyncStreamResult*)>& callback)
+	sl_bool AsyncTcpSocket::send(const Memory& mem, const Function<void(AsyncStreamResult&)>& callback)
 	{
 		return AsyncStreamBase::write(mem.getData(), (sl_uint32)(mem.getSize()), callback, mem.ref.get());
 	}

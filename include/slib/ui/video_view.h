@@ -89,7 +89,7 @@ namespace slib
 		void setControlsVisible(sl_bool flag);
 		
 		
-		void updateCurrentFrame(const VideoFrame* frame);
+		void updateCurrentFrame(VideoFrame& frame);
 		
 	protected:
 		void onDraw(Canvas* canvas) override;

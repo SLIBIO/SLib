@@ -164,7 +164,7 @@ namespace slib
 		void _completeResponse(HttpServerContext* context);
 		
 	protected:
-		void onReadStream(AsyncStreamResult* result);
+		void onReadStream(AsyncStreamResult& result);
 
 		void onAsyncOutputEnd(AsyncOutput* output, sl_bool flagError);
 		

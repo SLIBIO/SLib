@@ -83,7 +83,7 @@ namespace slib
 	{
 	public:
 		// in
-		Function<void(VideoFrame*)> onUpdateFrame;
+		Function<void(VideoFrame&)> onUpdateFrame;
 		
 		// in
 		Ref<GLRenderEngine> glEngine;

@@ -394,7 +394,7 @@ namespace slib
 		const void* _data,
 		sl_uint32 _size,
 		Referable* _userObject,
-		const Function<void(AsyncStreamResult*)>& _callback,
+		const Function<void(AsyncStreamResult&)>& _callback,
 		sl_bool _flagRead)
 	 : data((void*)_data), size(_size), userObject(_userObject), callback(_callback), flagRead(_flagRead)
 	{
@@ -408,7 +408,7 @@ namespace slib
 		void* data,
 		sl_uint32 size,
 		Referable* userObject,
-		const Function<void(AsyncStreamResult*)>& callback)
+		const Function<void(AsyncStreamResult&)>& callback)
 	{
 		return new AsyncStreamRequest(data, size, userObject, callback, sl_true);
 	}
@@ -417,7 +417,7 @@ namespace slib
 		const void* data,
 		sl_uint32 size,
 		Referable* userObject,
-		const Function<void(AsyncStreamResult*)>& callback)
+		const Function<void(AsyncStreamResult&)>& callback)
 	{
 		return new AsyncStreamRequest(data, size, userObject, callback, sl_false);
 	}
@@ -432,7 +432,7 @@ namespace slib
 			result.requestSize = size;
 			result.userObject = userObject.get();
 			result.flagError = flagError;
-			callback(&result);
+			callback(result);
 		}
 	}
 
@@ -447,7 +447,7 @@ namespace slib
 	{
 	}
 
-	sl_bool AsyncStreamInstance::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
+	sl_bool AsyncStreamInstance::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult&)>& callback, Referable* userObject)
 	{
 		Ref<AsyncStreamRequest> req = AsyncStreamRequest::createRead(data, size, userObject, callback);
 		if (req.isNotNull()) {
@@ -457,7 +457,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool AsyncStreamInstance::write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
+	sl_bool AsyncStreamInstance::write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult&)>& callback, Referable* userObject)
 	{
 		Ref<AsyncStreamRequest> req = AsyncStreamRequest::createWrite(data, size, userObject, callback);
 		if (req.isNotNull()) {
@@ -576,7 +576,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_bool AsyncStream::readToMemory(const Memory& mem, const Function<void(AsyncStreamResult*)>& callback)
+	sl_bool AsyncStream::readToMemory(const Memory& mem, const Function<void(AsyncStreamResult&)>& callback)
 	{
 		sl_size size = mem.getSize();
 		if (size > 0x40000000) {
@@ -585,7 +585,7 @@ namespace slib
 		return read(mem.getData(), (sl_uint32)(size), callback, mem.ref.get());
 	}
 
-	sl_bool AsyncStream::writeFromMemory(const Memory& mem, const Function<void(AsyncStreamResult*)>& callback)
+	sl_bool AsyncStream::writeFromMemory(const Memory& mem, const Function<void(AsyncStreamResult&)>& callback)
 	{
 		sl_size size = mem.getSize();
 		if (size > 0x40000000) {
@@ -644,7 +644,7 @@ namespace slib
 		return getIoInstance().isNotNull();
 	}
 
-	sl_bool AsyncStreamBase::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
+	sl_bool AsyncStreamBase::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult&)>& callback, Referable* userObject)
 	{
 		Ref<AsyncIoLoop> loop = getIoLoop();
 		if (loop.isNull()) {
@@ -660,7 +660,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool AsyncStreamBase::write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
+	sl_bool AsyncStreamBase::write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult&)>& callback, Referable* userObject)
 	{
 		Ref<AsyncIoLoop> loop = getIoLoop();
 		if (loop.isNull()) {
@@ -737,7 +737,7 @@ namespace slib
 	{
 	}
 
-	sl_bool AsyncStreamSimulator::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
+	sl_bool AsyncStreamSimulator::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult&)>& callback, Referable* userObject)
 	{
 		if (isOpened()) {
 			Ref<AsyncStreamRequest> req = AsyncStreamRequest::createRead(data, size, userObject, callback);
@@ -748,7 +748,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool AsyncStreamSimulator::write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
+	sl_bool AsyncStreamSimulator::write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult&)>& callback, Referable* userObject)
 	{
 		if (isOpened()) {
 			Ref<AsyncStreamRequest> req = AsyncStreamRequest::createWrite(data, size, userObject, callback);
@@ -870,7 +870,7 @@ namespace slib
 		m_reader.setNull();
 	}
 
-	sl_bool AsyncReader::write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
+	sl_bool AsyncReader::write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult&)>& callback, Referable* userObject)
 	{
 		return sl_false;
 	}
@@ -949,7 +949,7 @@ namespace slib
 		m_writer.setNull();
 	}
 
-	sl_bool AsyncWriter::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& listener, Referable* userObject)
+	sl_bool AsyncWriter::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult&)>& listener, Referable* userObject)
 	{
 		return sl_false;
 	}
@@ -1293,14 +1293,14 @@ namespace slib
 		return m_bufferWriting.isNotNull();
 	}
 
-	void AsyncCopy::onReadStream(AsyncStreamResult* result)
+	void AsyncCopy::onReadStream(AsyncStreamResult& result)
 	{
 		ObjectLocker lock(this);
 		if (!m_flagRunning) {
 			return;
 		}
 
-		if (result->flagError) {
+		if (result.flagError) {
 			m_flagReadError = sl_true;
 		}
 
@@ -1308,8 +1308,8 @@ namespace slib
 		m_bufferReading.setNull();
 
 		if (bufferReading.isNotNull()) {
-			m_sizeRead += result->size;
-			Memory memWrite = bufferReading->mem.sub(0, result->size);
+			m_sizeRead += result.size;
+			Memory memWrite = bufferReading->mem.sub(0, result.size);
 			if (memWrite.isNull()) {
 				m_flagReadError = sl_true;
 			} else {
@@ -1328,13 +1328,13 @@ namespace slib
 
 	}
 
-	void AsyncCopy::onWriteStream(AsyncStreamResult* result)
+	void AsyncCopy::onWriteStream(AsyncStreamResult& result)
 	{
 		ObjectLocker lock(this);
 		if (!m_flagRunning) {
 			return;
 		}
-		if (result->flagError) {
+		if (result.flagError) {
 			m_flagWriteError = sl_true;
 		}
 
@@ -1342,7 +1342,7 @@ namespace slib
 		m_bufferWriting.setNull();
 
 		if (bufferWriting.isNotNull()) {
-			m_sizeWritten += result->size;
+			m_sizeWritten += result.size;
 			bufferWriting->memWrite.setNull();
 			m_buffersRead.pushBack(bufferWriting);
 			dispatchWrite();
@@ -1778,10 +1778,10 @@ namespace slib
 		}
 	}
 
-	void AsyncOutput::onWriteStream(AsyncStreamResult* result)
+	void AsyncOutput::onWriteStream(AsyncStreamResult& result)
 	{
 		m_flagWriting = sl_false;
-		if (result->flagError) {
+		if (result.flagError) {
 			_onError();
 			return;
 		}
@@ -1848,7 +1848,7 @@ namespace slib
 		return m_flagOpened;
 	}
 
-	sl_bool AsyncStreamFilter::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
+	sl_bool AsyncStreamFilter::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult&)>& callback, Referable* userObject)
 	{
 		Ref<AsyncStreamRequest> request = AsyncStreamRequest::createRead(data, size, userObject, callback);
 		if (request.isNotNull()) {
@@ -1916,7 +1916,7 @@ namespace slib
 			return sl_false;
 		}
 		do {
-			Function<void(AsyncStreamResult*)> callback = SLIB_FUNCTION_WEAKREF(AsyncStreamFilter, onReadStream, this);
+			Function<void(AsyncStreamResult&)> callback = SLIB_FUNCTION_WEAKREF(AsyncStreamFilter, onReadStream, this);
 			if (m_bufReadConverted.getSize() > 0) {
 				if (!(stream->read(sl_null, 0, callback))) {
 					break;
@@ -1940,17 +1940,17 @@ namespace slib
 		return sl_false;
 	}
 
-	void AsyncStreamFilter::onReadStream(AsyncStreamResult* result)
+	void AsyncStreamFilter::onReadStream(AsyncStreamResult& result)
 	{
 		MutexLocker lock(&m_lockReading);
 		m_flagReading = sl_false;
 		if (!m_flagOpened) {
 			return;
 		}
-		if (result->size > 0) {
-			addReadData(result->data, result->size, result->userObject);
+		if (result.size > 0) {
+			addReadData(result.data, result.size, result.userObject);
 		}
-		if (result->flagError) {
+		if (result.flagError) {
 			m_flagReadingError = sl_true;
 		}
 		if (m_bufReadConverted.getSize() > 0) {
@@ -1991,14 +1991,14 @@ namespace slib
 		Memory memConverted;
 		
 	public:
-		_priv_AsyncStreamFilter_WriteRequest(const Memory& _memConv, const void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult*)>& callback)
+		_priv_AsyncStreamFilter_WriteRequest(const Memory& _memConv, const void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult&)>& callback)
 		 : AsyncStreamRequest(data, size, userObject, callback, sl_false), memConverted(_memConv)
 		{
 		}
 		
 	};
 
-	sl_bool AsyncStreamFilter::write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
+	sl_bool AsyncStreamFilter::write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult&)>& callback, Referable* userObject)
 	{
 		MutexLocker lock(&m_lockWriting);
 		Ref<AsyncStream> stream = m_stream;
@@ -2023,12 +2023,12 @@ namespace slib
 		return sl_false;
 	}
 
-	void AsyncStreamFilter::onWriteStream(AsyncStreamResult* result)
+	void AsyncStreamFilter::onWriteStream(AsyncStreamResult& result)
 	{
-		if (result->flagError) {
+		if (result.flagError) {
 			m_flagWritingError = sl_true;
 		}
-		_priv_AsyncStreamFilter_WriteRequest* req = (_priv_AsyncStreamFilter_WriteRequest*)(result->userObject);
+		_priv_AsyncStreamFilter_WriteRequest* req = (_priv_AsyncStreamFilter_WriteRequest*)(result.userObject);
 		if (req) {
 			req->runCallback(this, req->size, m_flagWritingError);
 		}

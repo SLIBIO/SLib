@@ -62,7 +62,7 @@ namespace slib
 		
 		sl_bool flagAutoStart;
 		
-		Function<void(AudioRecorder*, AudioData const&)> onRecordAudio;
+		Function<void(AudioRecorder*, AudioData&)> onRecordAudio;
 		Ref<Event> event;
 		
 	public:
@@ -112,7 +112,7 @@ namespace slib
 		sl_uint32 m_nChannels;
 		AtomicArray<sl_int16> m_processData;
 		
-		Function<void(AudioRecorder*, AudioData const&)> m_onRecordAudio;
+		Function<void(AudioRecorder*, AudioData&)> m_onRecordAudio;
 		Ref<Event> m_event;
 		
 	};	

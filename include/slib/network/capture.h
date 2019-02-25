@@ -92,7 +92,7 @@ namespace slib
 		
 		sl_bool flagAutoStart; // default: true
 		
-		Function<void(NetCapture*, NetCapturePacket*)> onCapturePacket;
+		Function<void(NetCapture*, NetCapturePacket&)> onCapturePacket;
 		
 	public:
 		NetCaptureParam();
@@ -144,10 +144,10 @@ namespace slib
 	protected:
 		void _initWithParam(const NetCaptureParam& param);
 		
-		void _onCapturePacket(NetCapturePacket* packet);
+		void _onCapturePacket(NetCapturePacket& packet);
 		
 	protected:
-		Function<void(NetCapture*, NetCapturePacket*)> m_onCapturePacket;
+		Function<void(NetCapture*, NetCapturePacket&)> m_onCapturePacket;
 		
 	};
 	
