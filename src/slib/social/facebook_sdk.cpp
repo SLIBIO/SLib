@@ -22,10 +22,12 @@
 
 #include "slib/social/facebook.h"
 
-#if defined(SLIB_PLATFORM_IS_ANDROID)
+#include "slib/core/safe_static.h"
 
 namespace slib
 {
+	
+#if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID)
 	
 	void FacebookSDK::initialize()
 	{
@@ -33,12 +35,44 @@ namespace slib
 	
 	void FacebookSDK::login(const FacebookLoginParam& param)
 	{
+		Ref<Facebook> instance = Facebook::getInstance();
+		if (instance.isNotNull()) {
+			instance->login(param);
+		}
 	}
 	
-	void FacebookSDK::_updateCurrentToken(Facebook* instance)
+	Ref<Facebook> FacebookSDK::getInstance()
 	{
+		return Facebook::getInstance();
 	}
 
-}
+#else
+
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Facebook>, _g_priv_social_facebook_sdk_instance)
+
+	Ref<Facebook> FacebookSDK::getInstance()
+	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_facebook_sdk_instance)) {
+			return sl_null;
+		}
+		Ref<Facebook> instance = _g_priv_social_facebook_sdk_instance;
+		if (instance.isNull()) {
+			FacebookParam param;
+			_g_priv_social_facebook_sdk_instance = new Facebook(param);
+		}
+		if (instance.isNotNull()) {
+			_updateCurrentToken(instance.get());
+		}
+		return instance;
+	}
 
 #endif
+	
+	void FacebookSDK::login(const Function<void(FacebookLoginResult& result)>& onComplete)
+	{
+		FacebookLoginParam param;
+		param.onComplete = onComplete;
+		login(param);
+	}
+	
+}

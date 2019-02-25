@@ -25,59 +25,47 @@
 
 #include "definition.h"
 
-#include "../core/function.h"
-#include "../core/string.h"
-#include "../core/list.h"
-#include "../core/time.h"
+#include "oauth.h"
 
 namespace slib
 {
 	
-	class SLIB_EXPORT FacebookAccessToken
+	class SLIB_EXPORT FacebookUser
 	{
 	public:
-		String userId;
-		String token;
-		Time expirationDate;
-		Time refreshDate;
-		List<String> permissions;
-		List<String> declinedPermissions;
+		String id;
+		String email;
+		String name;
+		String name_format;
+		String first_name;
+		String middle_name;
+		String last_name;
+		String short_name;
+		String gender;
+		String birthday;
+		String quotes;
+		String profile_pic;
+		
+		Json json;
 		
 	public:
-		FacebookAccessToken();
+		FacebookUser();
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FacebookAccessToken)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FacebookUser)
+		
+		SLIB_DECLARE_JSON
 		
 	};
 	
-	class SLIB_EXPORT FacebookLoginResult
-	{
-	public:
-		sl_bool flagError;
-		String errorMessage;
-
-		sl_bool flagCancel;
-		
-		List<String> grantedPermissions;
-		List<String> declinedPermissions;
-		
-		FacebookAccessToken token;
-		
-	public:
-		FacebookLoginResult();
-		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FacebookLoginResult)
-
-	};
+	typedef OAuthLoginResult FacebookLoginResult;
 	
-	class SLIB_EXPORT FacebookLoginParam
+	typedef OAuthApiResult FacebookResult;
+	
+	class SLIB_EXPORT FacebookLoginParam : public OAuthLoginParam
 	{
 	public:
 		sl_bool flagPublishPermissions;
-		List<String> permissions;
-		
-		Function<void(FacebookLoginResult& result)> onComplete;
-		
+
 	public:
 		FacebookLoginParam();
 		
@@ -85,17 +73,90 @@ namespace slib
 		
 	};
 	
-	class SLIB_EXPORT Facebook
+	class SLIB_EXPORT FacebookResolveUserUrlParam
 	{
 	public:
-		// call this function at `onStart()` in your application class
-		static void initializeOnStartApp();
+		OAuthWebRedirectDialogOptions dialogOptions;
+		Ptr<OAuthWebRedirectDialog> dialog;
 		
-		static sl_bool getCurrentToken(FacebookAccessToken* _out = sl_null);
+		Function<void(const String& url)> onComplete;
+		
+	public:
+		FacebookResolveUserUrlParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FacebookResolveUserUrlParam)
+		
+	};
+	
+	class SLIB_EXPORT FacebookParam : public OAuthParam
+	{
+	public:
+		String version;
+		
+	public:
+		FacebookParam();
+		
+		FacebookParam(const String& version);
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FacebookParam)
+		
+	};
+	
+	class Facebook : public OAuth2
+	{
+		SLIB_DECLARE_OBJECT
+		
+	protected:
+		Facebook(const FacebookParam& param);
+		
+		~Facebook();
+		
+	public:
+		static Ref<Facebook> create(const FacebookParam& param);
+		
+		static void initialize(const FacebookParam& param);
+		
+		static void initialize(const String& redirectUrl, const String& appId, const String& appSecret = String::null());
+
+		static Ref<Facebook> getInstance();
+		
+	public:
+		void login(const FacebookLoginParam& param);
+		
+		void login(const Function<void(FacebookLoginResult& result)>& onComplete);
+		
+		static void resolveUserUrl(const FacebookResolveUserUrlParam& param);
+		
+		static void resolveUserUrl(const Function<void(const String& url)>& onComplete);
+		
+	public:
+		String getRequestUrl(const String& path);
+		
+		void getUser(const String& personId, const String& fields, const Function<void(FacebookResult&, FacebookUser&)>& onComplete);
+		
+		void getUser(const String& personId, const List<String>& fields, const Function<void(FacebookResult&, FacebookUser&)>& onComplete);
+
+		void getUser(const String& personId, const Function<void(FacebookResult&, FacebookUser&)>& onComplete);
+
+	protected:
+		String m_version;
+		
+		friend class FacebookSDK;
+	};
+	
+	class FacebookSDK
+	{
+	public:
+		static void initialize(); // Must be called in `Application::onStart()` override
 		
 		static void login(const FacebookLoginParam& param);
 		
-		static void loginWithReadPermissions(const Function<void(FacebookLoginResult&)>& callback);
+		static void login(const Function<void(FacebookLoginResult& result)>& onComplete);
+
+		static Ref<Facebook> getInstance();
+
+	protected:
+		static void _updateCurrentToken(Facebook* instance);
 		
 	};
 	

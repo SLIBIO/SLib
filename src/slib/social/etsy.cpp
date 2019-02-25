@@ -38,7 +38,6 @@ namespace slib
 		score = 0;
 	}
 	
-	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(EtsyUser)
 	
 	SLIB_DEFINE_JSON_MEMBERS(EtsyUser, user_id, login_name, primary_email, creation_tsz, user_pub_key, referred_by_user_id, feedback_info, awaiting_feedback_count, use_new_inventory_endpoints)
@@ -51,11 +50,18 @@ namespace slib
 		use_new_inventory_endpoints = sl_false;
 	}
 	
-	String EtsyUser::getUrl() const
+	String EtsyUser::getPublicProfileURL(const String& loginName)
 	{
-		return "https://www.etsy.com/people/" + login_name;
+		if (loginName.isNotEmpty()) {
+			return "https://www.etsy.com/people/" + loginName;
+		}
+		return sl_null;
 	}
-	
+
+	String EtsyUser::getPublicProfileURL() const
+	{
+		return getPublicProfileURL(login_name);
+	}
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(EtsyParam)
 	
@@ -65,7 +71,6 @@ namespace slib
 		authenticateUrl = "https://www.etsy.com/oauth/signin";
 		accessTokenUrl = "https://openapi.etsy.com/v2/oauth/access_token";
 	}
-	
 	
 	SLIB_DEFINE_OBJECT(Etsy, OAuth1)
 	
@@ -93,16 +98,14 @@ namespace slib
 		_g_priv_social_etsy_instance = create(param);
 	}
 	
-	void Etsy::initialize(const String& consumerKey, const String& consumerSecret, const String& callbackUrl)
+	void Etsy::initialize(const String& callbackUrl, const String& consumerKey, const String& consumerSecret)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_etsy_instance)) {
-			return;
-		}
 		EtsyParam param;
+		param.preferenceName = "etsy";
 		param.consumerKey = consumerKey;
 		param.consumerSecret = consumerSecret;
 		param.callbackUrl = callbackUrl;
-		_g_priv_social_etsy_instance = create(param);
+		initialize(param);
 	}
 	
 	Ref<Etsy> Etsy::getInstance()
@@ -112,10 +115,32 @@ namespace slib
 		}
 		return _g_priv_social_etsy_instance;
 	}
-
-	Ptr<EtsyUser> Etsy::getLoginedUser()
+	
+	String Etsy::getRequestUrl(const String& path)
 	{
-		return m_userLoggined;
+		return "https://openapi.etsy.com/v2/" + path;
+	}
+	
+	void Etsy::getUser(const String& userId, const Function<void(EtsyResult&, EtsyUser&)>& onComplete)
+	{
+		UrlRequestParam rp;
+		rp.method = HttpMethod::GET;
+		if (userId.isNotEmpty()) {
+			rp.url = getRequestUrl("/users/" + userId);
+		} else {
+			rp.url = getRequestUrl("/users/__SELF__");
+		}
+		rp.onComplete = [onComplete](UrlRequest* request) {
+			EtsyResult result(request);
+			EtsyUser user;
+			if (!(request->isError())) {
+				FromJson(result.response["results"][0], user);
+				result.flagSuccess = user.user_id.isNotEmpty();
+			}
+			onComplete(result, user);
+		};
+		authorizeRequest(rp);
+		UrlRequest::send(rp);
 	}
 	
 }

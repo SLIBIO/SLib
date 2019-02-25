@@ -25,99 +25,24 @@
 namespace slib
 {
 	
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(EtsyLoginResult)
-	
-	EtsyLoginResult::EtsyLoginResult()
-	{
-	}
-	
-	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(EtsyLoginParam)
 	
 	EtsyLoginParam::EtsyLoginParam()
 	{
 	}
 	
-	
 	void Etsy::login(const EtsyLoginParam& _param)
 	{
-		void* _thiz = this;
-		if (!_thiz) {
-			EtsyLoginResult result;
-			_param.onComplete(result);
-			return;
-		}
-		auto onComplete = _param.onComplete;
-		
-		OAuthLoginParam param = _param;
-		HashMap<String, String> requestTokenParams;
-		requestTokenParams.putAll_NoLock(_param.requestTokenParams);
+		OAuth1_LoginParam param = _param;
+		HashMap<String, Variant> requestTokenParams;
+		requestTokenParams.putAll_NoLock(_param.authorization.customParameters);
 		if (_param.scopes.isNotEmpty()) {
 			requestTokenParams.put_NoLock("scope", StringBuffer::join(" ", _param.scopes));
 		} else {
 			requestTokenParams.put_NoLock("scope", "listings_r");
 		}
-		param.requestTokenParams = requestTokenParams;
+		param.authorization.customParameters = requestTokenParams;
 		
-		auto weak = ToWeakRef(this);
-		param.onComplete = [weak, onComplete](OAuthLoginResult& _result) {
-			auto thiz = ToRef(weak);
-			if (thiz.isNull()) {
-				EtsyLoginResult result;
-				*((OAuthLoginResult*)&result) = _result;
-				result.flagError = sl_true;
-				onComplete(result);
-				return;
-			}
-			if (_result.flagError || _result.flagCancel) {
-				EtsyLoginResult result;
-				*((OAuthLoginResult*)&result) = _result;
-				onComplete(result);
-				return;
-			}
-			UrlRequestParam rp;
-			rp.method = HttpMethod::GET;
-			rp.url = "https://openapi.etsy.com/v2/users/__SELF__";
-			thiz->authorizeRequest(rp);
-			rp.onComplete = [weak, _result, onComplete](UrlRequest* request) {
-				EtsyLoginResult result;
-				*((OAuthLoginResult*)&result) = _result;
-				auto thiz = ToRef(weak);
-				if (thiz.isNull()) {
-					result.flagError = sl_true;
-					onComplete(result);
-					return;
-				}
-				if (request->isError()) {
-					logUrlRequestError(request);
-					result.flagError = sl_true;
-					onComplete(result);
-					return;
-				}
-				
-				Json content = request->getResponseContentAsJson();
-				Json jsonUser = content["results"][0];
-				if (jsonUser.isNull()) {
-					result.flagError = sl_true;
-					onComplete(result);
-					return;
-				}
-				
-				Ptr<EtsyUser> user = MakeShared<EtsyUser>();
-				if (user.isNull()) {
-					result.flagError = sl_true;
-					onComplete(result);
-					return;
-				}
-				
-				FromJson(jsonUser, *user);
-
-				result.user = *user;
-				thiz->m_userLoggined = user;
-				onComplete(result);
-			};
-			UrlRequest::send(rp);
-		};
 		OAuth1::login(param);
 	}
 	

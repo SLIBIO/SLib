@@ -33,7 +33,7 @@
 namespace slib
 {
 	
-	void Facebook::initializeOnStartApp()
+	void FacebookSDK::initialize()
 	{
 		UIPlatform::registerDidFinishLaunchingCallback([](NSDictionary* launchOptions) {
 			[[FBSDKApplicationDelegate sharedInstance] application:([::UIApplication sharedApplication]) didFinishLaunchingWithOptions:launchOptions];
@@ -70,12 +70,11 @@ namespace slib
 		
 	};
 	
-	static void _priv_Facebook_getToken(FacebookAccessToken& _out, FBSDKAccessToken* _in)
+	static void _priv_Facebook_getToken(OAuthAccessToken& _out, FBSDKAccessToken* _in)
 	{
-		_out.userId = Apple::getStringFromNSString(_in.userID);
 		_out.token = Apple::getStringFromNSString(_in.tokenString);
-		_out.expirationDate = Apple::getTimeFromNSDate(_in.expirationDate);
-		_out.refreshDate = Apple::getTimeFromNSDate(_in.refreshDate);
+		_out.expirationTime = Apple::getTimeFromNSDate(_in.expirationDate);
+		_out.refreshTime = Apple::getTimeFromNSDate(_in.refreshDate);
 		{
 			List<String> permissions;
 			if (_in.permissions != nil) {
@@ -84,33 +83,21 @@ namespace slib
 					permissions.add_NoLock(Apple::getStringFromNSString(s));
 				}
 			}
-			_out.permissions = permissions;
-		}
-		{
-			List<String> permissions;
-			if (_in.declinedPermissions != nil) {
-				for (id item in _in.declinedPermissions) {
-					NSString* s = (NSString*)item;
-					permissions.add_NoLock(Apple::getStringFromNSString(s));
-				}
-			}
-			_out.declinedPermissions = permissions;
+			_out.scopes = permissions;
 		}
 	}
 	
-	sl_bool Facebook::getCurrentToken(FacebookAccessToken* _out)
+	void FacebookSDK::_updateCurrentToken(Facebook* instance)
 	{
 		FBSDKAccessToken* token = [FBSDKAccessToken currentAccessToken];
 		if (token != nil) {
-			if (_out) {
-				_priv_Facebook_getToken(*_out, token);
-			}
-			return sl_true;
+			OAuthAccessToken oauthToken;
+			_priv_Facebook_getToken(oauthToken, token);
+			instance->setAccessToken(oauthToken);
 		}
-		return sl_false;
 	}
 	
-	void Facebook::login(const FacebookLoginParam& param)
+	void FacebookSDK::login(const FacebookLoginParam& param)
 	{
 		FBSDKLoginManager* manager = _priv_FacebookLoginManager::get();
 		if (manager == nil) {
@@ -120,12 +107,12 @@ namespace slib
 		}
 		NSMutableArray* array = [[NSMutableArray alloc] init];
 		{
-			List<String> permissions = param.permissions;
-			if (param.permissions.isEmpty()) {
+			List<String> permissions;
+			if (param.authorization.scopes.isEmpty()) {
 				permissions.add_NoLock("public_profile");
 				permissions.add_NoLock("email");
 			} else {
-				permissions = param.permissions;
+				permissions = param.authorization.scopes;
 			}
 			ListLocker<String> items(permissions);
 			for (sl_size i = 0; i < items.count; i++) {
@@ -133,52 +120,30 @@ namespace slib
 				[array addObject:s];
 			}
 		}
-		Function<void(FacebookLoginResult&)> callback = param.onComplete;
+		Function<void(FacebookLoginResult&)> onComplete = param.onComplete;
 		UIViewController* controller = UIPlatform::getKeyWindow().rootViewController;
 		auto func = ^(FBSDKLoginManagerLoginResult *result, NSError *error) {
 			FacebookLoginResult login;
 			if (error != nil) {
 				NSString* message = [error localizedDescription];
 				NSLog(@"Facebook Login Error: %@", message);
-				login.errorMessage = Apple::getStringFromNSString(message);
-				callback(login);
+				login.errorDescription = Apple::getStringFromNSString(message);
+				onComplete(login);
 				return;
 			}
-			login.flagError = sl_false;
 			if (result.isCancelled) {
 				login.flagCancel = sl_true;
-				callback(login);
+				onComplete(login);
 				return;
-			}
-			{
-				List<String> permissions;
-				if (result.grantedPermissions != nil) {
-					for (id item in result.grantedPermissions) {
-						NSString* s = (NSString*)item;
-						permissions.add_NoLock(Apple::getStringFromNSString(s));
-					}
-				}
-				login.grantedPermissions = permissions;
-			}
-			{
-				List<String> permissions;
-				if (result.declinedPermissions != nil) {
-					for (id item in result.declinedPermissions) {
-						NSString* s = (NSString*)item;
-						permissions.add_NoLock(Apple::getStringFromNSString(s));
-					}
-				}
-				login.declinedPermissions = permissions;
 			}
 			FBSDKAccessToken* token = result.token;
 			if (token == nil) {
-				NSLog(@"Facebook Login Error: Token is not returned!");
-				login.flagError = sl_true;
-				callback(login);
+				onComplete(login);
 				return;
 			}
-			_priv_Facebook_getToken(login.token, token);
-			callback(login);
+			login.flagSuccess = sl_true;
+			_priv_Facebook_getToken(login.accessToken, token);
+			onComplete(login);
 		};
 		if (param.flagPublishPermissions) {
 			[manager logInWithPublishPermissions:array fromViewController:controller handler:func];

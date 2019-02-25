@@ -27,8 +27,6 @@
 
 #include "oauth.h"
 
-#include "../core/ptr.h"
-
 namespace slib
 {
 
@@ -68,42 +66,34 @@ namespace slib
 		SLIB_DECLARE_JSON
 		
 	public:
-		String getUrl() const;
+		static String getPublicProfileURL(const String& userId);
+		
+		String getPublicProfileURL() const;
 		
 	};
 	
-	class SLIB_EXPORT EtsyParam : public OAuthParam
-	{
-	public:
-		EtsyParam();
-		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(EtsyParam)
-		
-	};
+	typedef OAuthApiResult EtsyResult;
 	
-	class SLIB_EXPORT EtsyLoginResult : public OAuthLoginResult
-	{
-	public:
-		EtsyUser user;
-		
-	public:
-		EtsyLoginResult();
-		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(EtsyLoginResult)
-		
-	};
-
-	class SLIB_EXPORT EtsyLoginParam : public OAuthLoginParam
+	typedef OAuth1_LoginResult EtsyLoginResult;
+	
+	class SLIB_EXPORT EtsyLoginParam : public OAuth1_LoginParam
 	{
 	public:
 		List<String> scopes;
-		
-		Function<void(EtsyLoginResult& result)> onComplete;
 		
 	public:
 		EtsyLoginParam();
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(EtsyLoginParam)
+		
+	};
+	
+	class SLIB_EXPORT EtsyParam : public OAuth1_Param
+	{
+	public:
+		EtsyParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(EtsyParam)
 		
 	};
 	
@@ -121,7 +111,7 @@ namespace slib
 		
 		static void initialize(const EtsyParam& param);
 		
-		static void initialize(const String& consumerKey, const String& consumerSecret, const String& callbackUrl);
+		static void initialize(const String& callbackUrl, const String& consumerKey, const String& consumerSecret);
 
 		static Ref<Etsy> getInstance();
 
@@ -133,10 +123,9 @@ namespace slib
 		void login(const List<String>& scopes, const Function<void(EtsyLoginResult& result)>& onComplete);
 		
 	public:
-		Ptr<EtsyUser> getLoginedUser();
+		String getRequestUrl(const String& path);
 		
-	protected:
-		AtomicPtr<EtsyUser> m_userLoggined;
+		void getUser(const String& userId, const Function<void(EtsyResult&, EtsyUser&)>& onComplete);
 		
 	};
 	

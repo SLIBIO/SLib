@@ -30,37 +30,54 @@
 namespace slib
 {
 	
-	class SLIB_EXPORT TwitterParam : public OAuthParam
+	class SLIB_EXPORT TwitterUser
+	{
+	public:
+		sl_uint64 id;
+		String screen_name; // The screen name, handle, or alias that this user identifies themselves with. screen_names are unique but subject to change.
+		String name; // The name of the user, as they’ve defined it. Not necessarily a person’s name. Typically capped at 20 characters, but subject to change.
+		String location; // The user-defined location for this account’s profile. Not necessarily a location, nor machine-parseable. This field will occasionally be fuzzily interpreted by the Search service.
+		String url; // A URL provided by the user in association with their profile.
+		String description; // The user-defined UTF-8 string describing their account.
+		sl_uint32 followers_count; // The number of followers this account currently has. Under certain conditions of duress, this field will temporarily indicate “0”.
+		sl_uint32 friends_count; // The number of users this account is following (AKA their “followings”). Under certain conditions of duress, this field will temporarily indicate “0”.
+		sl_uint32 listed_count; // The number of public lists that this user is a member of.
+		sl_uint32 favourites_count; // The number of Tweets this user has liked in the account’s lifetime. British spelling used in the field name for historical reasons.
+		sl_uint32 statuses_count; // The number of Tweets (including retweets) issued by the user.
+		String created_at; // The UTC datetime that the user account was created on Twitter.
+		String lang; // The BCP 47 code for the user’s self-declared user interface language. May or may not have anything to do with the content of their Tweets.
+		String profile_image_url; // A HTTP-based URL pointing to the user’s profile image.
+		String profile_image_url_https; // A HTTPS-based URL pointing to the user’s profile image.
+		
+		Json json; // raw-response data from API
+		
+	public:
+		TwitterUser();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TwitterUser)
+		
+		SLIB_DECLARE_JSON
+		
+	public:
+		static String getPublicProfileURL(const String& screenName);
+		
+		// Url for User Home Page
+		String getPublicProfileURL() const;
+		
+	};
+	
+	typedef OAuthApiResult TwitterResult;
+	
+	typedef OAuth1_LoginResult TwitterLoginResult;
+	
+	typedef OAuth1_LoginParam TwitterLoginParam;
+	
+	class SLIB_EXPORT TwitterParam : public OAuth1_Param
 	{
 	public:
 		TwitterParam();
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TwitterParam)
-		
-	};
-	
-	class SLIB_EXPORT TwitterLoginResult : public OAuthLoginResult
-	{
-	public:
-		String userId;
-		String userScreenName;
-		
-	public:
-		TwitterLoginResult();
-		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TwitterLoginResult)
-		
-	};
-
-	class SLIB_EXPORT TwitterLoginParam : public OAuthLoginParam
-	{
-	public:
-		Function<void(TwitterLoginResult& result)> onComplete;
-		
-	public:
-		TwitterLoginParam();
-		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TwitterLoginParam)
 		
 	};
 	
@@ -78,27 +95,15 @@ namespace slib
 		
 		static void initialize(const TwitterParam& param);
 		
-		static void initialize(const String& consumerKey, const String& consumerSecret, const String& callbackUrl);
+		static void initialize(const String& callbackUrl, const String& consumerKey, const String& consumerSecret);
 
 		static Ref<Twitter> getInstance();
 
 	public:
-		void login(const TwitterLoginParam& param);
+		String getRequestUrl(const String& path);
 		
-		void login(const Function<void(TwitterLoginResult& result)>& onComplete);
-		
-	public:
-		String getUserId();
-		
-		void setUserId(const String& userId);
-		
-		String getUserScreenName();
-		
-		void setUserScreenName(const String& name);
-		
-	protected:
-		AtomicString m_userId;
-		AtomicString m_userScreenName;
+		// get user by userId or screenName (if two arguments are empty, then the loginned user will be returned)
+		void getUser(const String& userId, const String& screenName, const Function<void(TwitterResult&, TwitterUser&)>& callback);
 		
 	};
 	
