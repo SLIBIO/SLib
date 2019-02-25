@@ -46,7 +46,7 @@ namespace slib
 		SLIB_ALIGN(8) char t[sizeof(T)];
 		{
 			SpinLocker lock(&m_lock);
-			((T*)t)->T::T(Move(m_value));
+			new ((T*)t) T(Move(m_value));
 			m_value = other;
 		}
 		((T*)t)->~T();
@@ -59,7 +59,7 @@ namespace slib
 		SLIB_ALIGN(8) char t[sizeof(T)];
 		{
 			SpinLocker lock(&m_lock);
-			((T*)t)->T::T(Move(m_value));
+			new ((T*)t) T(Move(m_value));
 			m_value = Move(other);
 		}
 		((T*)t)->~T();
@@ -72,7 +72,7 @@ namespace slib
 		SLIB_ALIGN(8) char t[sizeof(T)];
 		{
 			SpinLocker lock(&m_lock);
-			((T*)t)->T::T(m_value);
+			new ((T*)t) T(m_value);
 		}
 		return *((T*)t);
 	}
