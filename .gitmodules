@@ -1,3 +1,7 @@
 [submodule "external/bin/FacebookSDK"]
 	path = external/bin/FacebookSDK
 	url = https://github.com/SLIBIO/SLibExternalBin_FacebookSDK.git
+[submodule "external/bin/OpenSSL"]
+	path = external/bin/OpenSSL
+	url = https://github.com/SLIBIO/SLibExternalBin_OpenSSL.git
+	branch = master
