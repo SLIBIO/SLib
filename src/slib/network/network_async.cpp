@@ -78,7 +78,7 @@ namespace slib
 	{
 		Ref<AsyncTcpSocket> object = Ref<AsyncTcpSocket>::from(getObject());
 		if (object.isNotNull()) {
-			object->_onConnect(m_addressRequestConnect, flagError);
+			object->_onConnect(flagError);
 		}
 	}
 
@@ -199,10 +199,10 @@ namespace slib
 					}
 				} else {
 					if (socket->connectAndWait(address)) {
-						_onConnect(address, sl_false);
+						_onConnect(sl_true);
 						return sl_true;
 					} else {
-						_onConnect(address, sl_true);
+						_onConnect(sl_false);
 					}
 				}
 			}
@@ -229,7 +229,7 @@ namespace slib
 	{
 		return AsyncStreamBase::write(mem.getData(), (sl_uint32)(mem.getSize()), callback, mem.ref.get());
 	}
-
+	
 	Ref<AsyncTcpSocketInstance> AsyncTcpSocket::_getIoInstance()
 	{
 		return Ref<AsyncTcpSocketInstance>::from(AsyncStreamBase::getIoInstance());
@@ -251,9 +251,12 @@ namespace slib
 		}
 	}
 
-	void AsyncTcpSocket::_onConnect(const SocketAddress& address, sl_bool flagError)
+	void AsyncTcpSocket::_onConnect(sl_bool flagError)
 	{
-		m_onConnect(this, address, flagError);
+		m_onConnect(this, flagError);
+		if (flagError) {
+			_onError();
+		}
 	}
 
 	void AsyncTcpSocket::_onError()

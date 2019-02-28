@@ -46,7 +46,7 @@ namespace slib
 		sl_bool flagLogError; // default: true
 		Ref<AsyncIoLoop> ioLoop;
 		
-		Function<void(AsyncTcpSocket*, const SocketAddress&, sl_bool)> onConnect;
+		Function<void(AsyncTcpSocket*, sl_bool flagError)> onConnect;
 		Function<void(AsyncTcpSocket*)> onError;
 		
 	public:
@@ -88,7 +88,7 @@ namespace slib
 		
 		void _onSend(AsyncStreamRequest* req, sl_uint32 size, sl_bool flagError);
 		
-		void _onConnect(const SocketAddress& address, sl_bool flagError);
+		void _onConnect(sl_bool flagError);
 		
 		void _onError();
 		
@@ -96,7 +96,7 @@ namespace slib
 		static Ref<AsyncTcpSocketInstance> _createInstance(const Ref<Socket>& socket);
 		
 	protected:
-		Function<void(AsyncTcpSocket*, const SocketAddress&, sl_bool flagError)> m_onConnect;
+		Function<void(AsyncTcpSocket*, sl_bool flagError)> m_onConnect;
 		Function<void(AsyncTcpSocket*)> m_onError;
 		
 		friend class AsyncTcpSocketInstance;
