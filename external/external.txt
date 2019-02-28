@@ -18,5 +18,7 @@ gl
 cairo 1.14.2
 curl 7.59.0
 libmariadb-client 3.0.4
+openssl 1.1.1a
 pcap 1.8.1
 WinPcap 4.1.3
+FacebookSDK 4.39.1
