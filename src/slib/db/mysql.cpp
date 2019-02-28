@@ -93,12 +93,13 @@ namespace slib
 #endif
 		Ref<Thread> thread = Thread::getCurrent();
 		if (thread.isNotNull()) {
-			Ref<Referable> ref = thread->getAttachedObject("MYSQL");
+			SLIB_STATIC_STRING(name, "_SLIB_MYSQL")
+			Ref<Referable> ref = thread->getAttachedObject(name);
 			if (ref.isNull()) {
 				::mysql_thread_init();
 				ref = new _priv_MySQL_Database_ThreadHandler;
 				if (ref.isNotNull()) {
-					thread->attachObject("MYSQL", ref.get());
+					thread->attachObject(name, ref.get());
 				}
 			}
 		} else {
