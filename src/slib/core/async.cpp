@@ -194,7 +194,7 @@ namespace slib
 			LinkedQueue< Function<void()> > tasks;
 			tasks.merge(&m_queueTasks);
 			Function<void()> task;
-			while (m_queueTasks.pop(&task)) {
+			while (tasks.pop(&task)) {
 				task();
 			}
 		}
