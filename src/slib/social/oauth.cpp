@@ -460,10 +460,14 @@ namespace slib
 			return;
 		}
 		tokenType = params.getValue("token_type");
-		sl_uint32 nSecondsExpiresIn = params.getValue("expires_in").parseUint32();
 		refreshTime = Time::now();
-		expirationTime = refreshTime;
-		expirationTime.addSeconds(nSecondsExpiresIn);
+		if (params.find("expires_in")) {
+			sl_uint32 nSecondsExpiresIn = params.getValue("expires_in").parseUint32();
+			expirationTime = refreshTime;
+			expirationTime.addSeconds(nSecondsExpiresIn);
+		} else {
+			expirationTime.setZero();
+		}
 		refreshToken = params.getValue("refresh_token");
 		scopes = params.getValue("scope").split(" ");
 	}
