@@ -30,6 +30,7 @@
 #include "socket_address.h"
 
 #include "../core/thread_pool.h"
+#include "../crypto/tls.h"
 
 namespace slib
 {
@@ -294,13 +295,19 @@ namespace slib
 		void removeConnectionProvider(const Ref<HttpServerConnectionProvider>& provider);
 		
 		
-		sl_bool addHttpServer(const SocketAddress& addr);
+		sl_bool addHttpBinding(const SocketAddress& addr);
 		
-		sl_bool addHttpServer(sl_uint32 port = 80);
+		sl_bool addHttpBinding(sl_uint32 port = 80);
 		
-		sl_bool addHttpServer(const IPAddress& addr, sl_uint32 port = 80);
+		sl_bool addHttpBinding(const IPAddress& addr, sl_uint32 port = 80);
 		
+		sl_bool addHttpsBinding(const TlsAcceptStreamParam& param, const SocketAddress& addr);
 		
+		sl_bool addHttpsBinding(const TlsAcceptStreamParam& param, sl_uint32 port = 443);
+		
+		sl_bool addHttpsBinding(const TlsAcceptStreamParam& param, const IPAddress& addr, sl_uint32 port = 443);
+		
+
 	protected:
 		sl_bool _init(const HttpServerParam& param);
 		

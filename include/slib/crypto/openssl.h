@@ -20,30 +20,58 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_CRYPTO_HEADER
-#define CHECKHEADER_SLIB_CRYPTO_HEADER
+#ifndef CHECKHEADER_SLIB_CRYPTO_OPENSSL
+#define CHECKHEADER_SLIB_CRYPTO_OPENSSL
 
-#include "crypto/base64.h"
+#include "definition.h"
 
-#include "crypto/md5.h"
-#include "crypto/sha1.h"
-#include "crypto/sha2.h"
-#include "crypto/hash.h"
-#include "crypto/hmac.h"
+#include "tls.h"
 
-#include "crypto/gcm.h"
-#include "crypto/block_cipher.h"
-#include "crypto/aes.h"
-#include "crypto/blowfish.h"
-#include "crypto/des.h"
+struct ssl_ctx_st;
+struct ssl_st;
 
-#include "crypto/rsa.h"
+namespace slib
+{
+	
+	class SLIB_EXPORT OpenSSL_Context : public TlsContext
+	{
+		SLIB_DECLARE_OBJECT
+		
+	protected:
+		OpenSSL_Context();
+		
+		~OpenSSL_Context();
+		
+	public:
+		virtual ssl_ctx_st* getContext() = 0;
+		
+	};
+	
+	class SLIB_EXPORT OpenSSL_AsyncStream : public TlsAsyncStream
+	{
+		SLIB_DECLARE_OBJECT
+		
+	protected:
+		OpenSSL_AsyncStream();
+		
+		~OpenSSL_AsyncStream();
+		
+	public:
+		virtual ssl_st* getSSL() = 0;
 
-#include "crypto/tls.h"
+	};
+	
+	class SLIB_EXPORT OpenSSL
+	{
+	public:
+		static Ref<OpenSSL_Context> createContext(const TlsContextParam& param);
+		
+		static Ref<OpenSSL_AsyncStream> connectStream(const Ref<AsyncStream>& baseStream, const TlsConnectStreamParam& param);
+		
+		static Ref<OpenSSL_AsyncStream> acceptStream(const Ref<AsyncStream>& baseStream, const TlsAcceptStreamParam& param);
+		
+	};
 
-#include "crypto/jwt.h"
-
-#include "crypto/zlib.h"
-#include "crypto/openssl.h"
+}
 
 #endif

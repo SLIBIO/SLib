@@ -582,7 +582,7 @@ namespace slib
 			return sl_null;
 		}
 		
-		void release()
+		void release() override
 		{
 			ObjectLocker lock(this);
 			if (m_server.isNotNull()) {
@@ -720,7 +720,7 @@ namespace slib
 				m_threadPool = threadPool;
 				m_param = param;
 				if (param.port) {
-					if (! (addHttpServer(param.addressBind, param.port))) {
+					if (! (addHttpBinding(param.addressBind, param.port))) {
 						return sl_false;
 					}
 				}
@@ -1136,7 +1136,7 @@ namespace slib
 		m_connectionProviders.remove(provider);
 	}
 
-	sl_bool HttpServer::addHttpServer(const SocketAddress& addr)
+	sl_bool HttpServer::addHttpBinding(const SocketAddress& addr)
 	{
 		Ref<HttpServerConnectionProvider> provider = _priv_DefaultHttpServerConnectionProvider::create(this, addr);
 		if (provider.isNotNull()) {
@@ -1146,14 +1146,14 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool HttpServer::addHttpServer(sl_uint32 port)
+	sl_bool HttpServer::addHttpBinding(sl_uint32 port)
 	{
-		return addHttpServer(SocketAddress(port));
+		return addHttpBinding(SocketAddress(port));
 	}
 
-	sl_bool HttpServer::addHttpServer(const IPAddress& addr, sl_uint32 port)
+	sl_bool HttpServer::addHttpBinding(const IPAddress& addr, sl_uint32 port)
 	{
-		return addHttpServer(SocketAddress(addr, port));
+		return addHttpBinding(SocketAddress(addr, port));
 	}
 
 }
