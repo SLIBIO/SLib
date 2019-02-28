@@ -950,5 +950,8 @@
     <ClCompile Include="..\..\src\slib\crypto\tls.cpp">
       <Filter>src\crypto</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\pinterest.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

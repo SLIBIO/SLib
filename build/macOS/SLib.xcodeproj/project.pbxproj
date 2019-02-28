@@ -1196,6 +1196,7 @@
 		26D9D9F11E964693005F7BD3 /* web_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CBDF001DED5EC700B1B13B /* web_controller.cpp */; };
 		26D9D9F21E964693005F7BD3 /* web_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26912BC21DEA81D5008C5FFD /* web_service.cpp */; };
 		26D9D9F41E968240005F7BD3 /* http_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D9D9F31E968240005F7BD3 /* http_io.cpp */; };
+		26E1B858222841AC007C222E /* pinterest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E1B857222841AB007C222E /* pinterest.cpp */; };
 		26F2F8D91EC2E0EB0074C29E /* red_black_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F2F8D81EC2E0EB0074C29E /* red_black_tree.cpp */; };
 		26FADD30215676D50057F7EA /* stun.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FADD2F215676D40057F7EA /* stun.cpp */; };
 		26FBB34B1ED5581F0086C27A /* ui_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FBB34A1ED5581F0086C27A /* ui_text.cpp */; };
@@ -2441,6 +2442,7 @@
 		26D9D9531E9645CE005F7BD3 /* libslib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libslib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		26D9D9F31E968240005F7BD3 /* http_io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_io.cpp; sourceTree = "<group>"; };
 		26DA34F91C4B47CF004DC204 /* video_frame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_frame.cpp; sourceTree = "<group>"; };
+		26E1B857222841AB007C222E /* pinterest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pinterest.cpp; path = social/pinterest.cpp; sourceTree = "<group>"; };
 		26E376D61C984CC400B178E6 /* vector2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vector2.cpp; sourceTree = "<group>"; };
 		26E376D81C9858A000B178E6 /* vector3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vector3.cpp; sourceTree = "<group>"; };
 		26E376DA1C985EA100B178E6 /* vector4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vector4.cpp; sourceTree = "<group>"; };
@@ -3773,6 +3775,7 @@
 				26BAE0292223A07D0085B5AB /* linkedin_login.cpp */,
 				260B73F4220D7DF600858EEA /* oauth.cpp */,
 				260B73FD220DCB1D00858EEA /* oauth_login.cpp */,
+				26E1B857222841AB007C222E /* pinterest.cpp */,
 				260B73F9220D872F00858EEA /* twitter.cpp */,
 			);
 			name = social;
@@ -6125,6 +6128,7 @@
 				26D9D9021E9645CE005F7BD3 /* list.cpp in Sources */,
 				26D9D9031E9645CE005F7BD3 /* system_unix.cpp in Sources */,
 				26D9D9041E9645CE005F7BD3 /* event.cpp in Sources */,
+				26E1B858222841AC007C222E /* pinterest.cpp in Sources */,
 				260B73F5220D7DF600858EEA /* facebook.cpp in Sources */,
 				26D9D95A1E96465E005F7BD3 /* vibrator.cpp in Sources */,
 				26D9D9051E9645CE005F7BD3 /* timer.cpp in Sources */,
