@@ -941,5 +941,14 @@
     <ClCompile Include="..\..\src\slib\social\linkedin_login.cpp">
       <Filter>src\social</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\crypto\openssl.cpp">
+      <Filter>src\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\network\http_openssl.cpp">
+      <Filter>src\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\crypto\tls.cpp">
+      <Filter>src\crypto</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

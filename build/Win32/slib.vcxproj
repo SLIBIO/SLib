@@ -103,9 +103,11 @@
     <ClCompile Include="..\..\src\slib\crypto\gcm.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\jwt.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\md5.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\openssl.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\rsa.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\sha1.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\sha2.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\tls.cpp" />
     <ClCompile Include="..\..\src\slib\db\database.cpp" />
     <ClCompile Include="..\..\src\slib\db\database_cursor.cpp" />
     <ClCompile Include="..\..\src\slib\db\database_statement.cpp" />
@@ -203,6 +205,7 @@
     <ClCompile Include="..\..\src\slib\network\ethernet.cpp" />
     <ClCompile Include="..\..\src\slib\network\http_common.cpp" />
     <ClCompile Include="..\..\src\slib\network\http_io.cpp" />
+    <ClCompile Include="..\..\src\slib\network\http_openssl.cpp" />
     <ClCompile Include="..\..\src\slib\network\http_server.cpp" />
     <ClCompile Include="..\..\src\slib\network\icmp.cpp" />
     <ClCompile Include="..\..\src\slib\network\ip_address.cpp" />

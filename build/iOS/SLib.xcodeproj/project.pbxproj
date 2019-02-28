@@ -763,6 +763,9 @@
 		26BAE01A221FFC830085B5AB /* facebook_sdk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE019221FFC830085B5AB /* facebook_sdk.cpp */; };
 		26BAE020222157F40085B5AB /* linkedin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE01F222157F40085B5AB /* linkedin.cpp */; };
 		26BAE02822239EA80085B5AB /* linkedin_login.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE02722239EA80085B5AB /* linkedin_login.cpp */; };
+		26BAE02F2223CEB80085B5AB /* openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE02E2223CEB80085B5AB /* openssl.cpp */; };
+		26BAE0352223E3D40085B5AB /* http_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE0342223E3D40085B5AB /* http_openssl.cpp */; };
+		26BAE04522267D100085B5AB /* tls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE04422267D100085B5AB /* tls.cpp */; };
 		26BB17CE21F4BA5D0089C7EC /* ui_adapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17CD21F4BA5D0089C7EC /* ui_adapter.cpp */; };
 		26BB17D621F4E4550089C7EC /* view_page_navigation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17D521F4E4550089C7EC /* view_page_navigation.cpp */; };
 		26BB17D821F4E45C0089C7EC /* view_pager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17D721F4E45C0089C7EC /* view_pager.cpp */; };
@@ -1038,7 +1041,7 @@
 			outputFiles = (
 				"$(DERIVED_FILE_DIR)/${arch}/${INPUT_FILE_NAME}.o",
 			);
-			script = "outfmt=\"macho32\"\nif [ $arch = \"x86_64\" ]\nthen\n outfmt=\"macho64\"\nfi\n\"${PROJECT_DIR}/../../bin/macOS/yasm\" -Xvc -f${outfmt} -I\"${PROJECT_DIR}/../../external/src/libvpx\" -I\"${PROJECT_DIR}/../../external/src/libvpx/gen/asm/${arch}\" -o \"${DERIVED_FILE_DIR}/${arch}/${INPUT_FILE_NAME}.o\" \"${INPUT_FILE_PATH}\"";
+			script = "outfmt=\"macho32\"\nif [ $arch = \"x86_64\" ]\nthen\n outfmt=\"macho64\"\nfi\n\"${PROJECT_DIR}/../../bin/macOS/yasm\" -Xvc -f${outfmt} -I\"${PROJECT_DIR}/../../external/src/libvpx\" -I\"${PROJECT_DIR}/../../external/src/libvpx/gen/asm/${arch}\" -o \"${DERIVED_FILE_DIR}/${arch}/${INPUT_FILE_NAME}.o\" \"${INPUT_FILE_PATH}\"\n";
 		};
 /* End PBXBuildRule section */
 
@@ -2223,6 +2226,9 @@
 		26BAE019221FFC830085B5AB /* facebook_sdk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = facebook_sdk.cpp; sourceTree = "<group>"; };
 		26BAE01F222157F40085B5AB /* linkedin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = linkedin.cpp; sourceTree = "<group>"; };
 		26BAE02722239EA80085B5AB /* linkedin_login.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = linkedin_login.cpp; sourceTree = "<group>"; };
+		26BAE02E2223CEB80085B5AB /* openssl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = openssl.cpp; sourceTree = "<group>"; };
+		26BAE0342223E3D40085B5AB /* http_openssl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_openssl.cpp; sourceTree = "<group>"; };
+		26BAE04422267D100085B5AB /* tls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tls.cpp; sourceTree = "<group>"; };
 		26BB17CD21F4BA5D0089C7EC /* ui_adapter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_adapter.cpp; sourceTree = "<group>"; };
 		26BB17D521F4E4550089C7EC /* view_page_navigation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view_page_navigation.cpp; sourceTree = "<group>"; };
 		26BB17D721F4E45C0089C7EC /* view_pager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view_pager.cpp; sourceTree = "<group>"; };
@@ -4043,9 +4049,11 @@
 				266DD37A1C117A3100D47AB0 /* gcm.cpp */,
 				2628EAE221C410CF00D8CD00 /* jwt.cpp */,
 				266DD37B1C117A3100D47AB0 /* md5.cpp */,
+				26BAE02E2223CEB80085B5AB /* openssl.cpp */,
 				266DD37C1C117A3100D47AB0 /* rsa.cpp */,
 				266DD37E1C117A3100D47AB0 /* sha1.cpp */,
 				266DD37F1C117A3100D47AB0 /* sha2.cpp */,
+				26BAE04422267D100085B5AB /* tls.cpp */,
 			);
 			path = crypto;
 			sourceTree = "<group>";
@@ -4101,6 +4109,7 @@
 				266DD3BE1C1181B500D47AB0 /* http_common.cpp */,
 				26D9D9F61E968364005F7BD3 /* http_io.cpp */,
 				266DD3C01C1181B500D47AB0 /* http_server.cpp */,
+				26BAE0342223E3D40085B5AB /* http_openssl.cpp */,
 				266DD3C11C1181B500D47AB0 /* icmp.cpp */,
 				266DD3C21C1181B500D47AB0 /* ip_address.cpp */,
 				266DD3C31C1181B500D47AB0 /* mac_address.cpp */,
@@ -5366,6 +5375,7 @@
 				26D9D8C71E962976005F7BD3 /* motion_tracker.cpp in Sources */,
 				26D9D8BA1E962976005F7BD3 /* common_dialogs_ios.mm in Sources */,
 				26D9D8101E9628E0005F7BD3 /* mutex.cpp in Sources */,
+				26BAE04522267D100085B5AB /* tls.cpp in Sources */,
 				26C795A72215675C0053C5A1 /* url_request_param.cpp in Sources */,
 				26D9D8531E96292E005F7BD3 /* database.cpp in Sources */,
 				260B73FC220DCA8E00858EEA /* oauth_login.cpp in Sources */,
@@ -5433,6 +5443,7 @@
 				26D9D8641E96294F005F7BD3 /* bitmap_quartz.mm in Sources */,
 				26D9D8D51E962976005F7BD3 /* slider.cpp in Sources */,
 				26D9D8241E9628E0005F7BD3 /* setting.cpp in Sources */,
+				26BAE0352223E3D40085B5AB /* http_openssl.cpp in Sources */,
 				26C795A9221567820053C5A1 /* image_view_url.cpp in Sources */,
 				26D9D8D61E962976005F7BD3 /* split_view.cpp in Sources */,
 				26C795C82215FC7C0053C5A1 /* layouts.cpp in Sources */,
@@ -5473,6 +5484,7 @@
 				26ACB3B9220978310093FF3F /* facebook.cpp in Sources */,
 				26D9D8851E96295A005F7BD3 /* audio_recorder_opensl_es.cpp in Sources */,
 				26D9D82E1E9628E0005F7BD3 /* system.cpp in Sources */,
+				26BAE02F2223CEB80085B5AB /* openssl.cpp in Sources */,
 				26D9D8CB1E962976005F7BD3 /* picker_view_ios.mm in Sources */,
 				2628EAD121C184D400D8CD00 /* regex.cpp in Sources */,
 				26D9D8A41E962962005F7BD3 /* socket_event.cpp in Sources */,
@@ -5985,7 +5997,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../external/include",
-					"$(PROJECT_DIR)/../../external/include/facebook",
+					"$(PROJECT_DIR)/../../external/include/FacebookSDK/iOS",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6004,7 +6016,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../include",
 					"$(PROJECT_DIR)/../../external/include",
-					"$(PROJECT_DIR)/../../external/include/facebook",
+					"$(PROJECT_DIR)/../../external/include/FacebookSDK/iOS",
 				);
 				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;

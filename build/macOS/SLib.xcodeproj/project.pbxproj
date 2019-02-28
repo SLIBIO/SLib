@@ -933,6 +933,9 @@
 		26BAE01E222062D20085B5AB /* facebook_sdk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE01D222062D10085B5AB /* facebook_sdk.cpp */; };
 		26BAE024222183400085B5AB /* linkedin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE023222183400085B5AB /* linkedin.cpp */; };
 		26BAE02A2223A07D0085B5AB /* linkedin_login.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE0292223A07D0085B5AB /* linkedin_login.cpp */; };
+		26BAE0312223CEC70085B5AB /* openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE0302223CEC60085B5AB /* openssl.cpp */; };
+		26BAE0332223E3BC0085B5AB /* http_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE0322223E3BB0085B5AB /* http_openssl.cpp */; };
+		26BAE04322267D060085B5AB /* tls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BAE04222267D060085B5AB /* tls.cpp */; };
 		26BB17D021F4BA690089C7EC /* ui_adapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17CF21F4BA680089C7EC /* ui_adapter.cpp */; };
 		26BB17D221F4C6970089C7EC /* view_pager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17D121F4C6970089C7EC /* view_pager.cpp */; };
 		26BB17D421F4C7F40089C7EC /* view_page_navigation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB17D321F4C7F40089C7EC /* view_page_navigation.cpp */; };
@@ -2381,6 +2384,9 @@
 		26BAE01D222062D10085B5AB /* facebook_sdk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = facebook_sdk.cpp; path = social/facebook_sdk.cpp; sourceTree = "<group>"; };
 		26BAE023222183400085B5AB /* linkedin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = linkedin.cpp; path = social/linkedin.cpp; sourceTree = "<group>"; };
 		26BAE0292223A07D0085B5AB /* linkedin_login.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = linkedin_login.cpp; path = social/linkedin_login.cpp; sourceTree = "<group>"; };
+		26BAE0302223CEC60085B5AB /* openssl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = openssl.cpp; sourceTree = "<group>"; };
+		26BAE0322223E3BB0085B5AB /* http_openssl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_openssl.cpp; sourceTree = "<group>"; };
+		26BAE04222267D060085B5AB /* tls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tls.cpp; sourceTree = "<group>"; };
 		26BB17CF21F4BA680089C7EC /* ui_adapter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_adapter.cpp; sourceTree = "<group>"; };
 		26BB17D121F4C6970089C7EC /* view_pager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view_pager.cpp; sourceTree = "<group>"; };
 		26BB17D321F4C7F40089C7EC /* view_page_navigation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view_page_navigation.cpp; sourceTree = "<group>"; };
@@ -4261,6 +4267,7 @@
 				266DD4C11C11940A00D47AB0 /* http_common.cpp */,
 				26D9D9F31E968240005F7BD3 /* http_io.cpp */,
 				266DD4C31C11940A00D47AB0 /* http_server.cpp */,
+				26BAE0322223E3BB0085B5AB /* http_openssl.cpp */,
 				266DD4C41C11940A00D47AB0 /* icmp.cpp */,
 				266DD4C51C11940A00D47AB0 /* ip_address.cpp */,
 				266DD4C61C11940A00D47AB0 /* mac_address.cpp */,
@@ -4615,9 +4622,11 @@
 				266DD45C1C11930800D47AB0 /* gcm.cpp */,
 				2628EAE821C410ED00D8CD00 /* jwt.cpp */,
 				266DD45D1C11930800D47AB0 /* md5.cpp */,
+				26BAE0302223CEC60085B5AB /* openssl.cpp */,
 				266DD45E1C11930800D47AB0 /* rsa.cpp */,
 				266DD45F1C11930800D47AB0 /* sha1.cpp */,
 				266DD4601C11930800D47AB0 /* sha2.cpp */,
+				26BAE04222267D060085B5AB /* tls.cpp */,
 			);
 			path = crypto;
 			sourceTree = "<group>";
@@ -6173,6 +6182,7 @@
 				26D9D9101E9645CE005F7BD3 /* math.cpp in Sources */,
 				26D9D9561E964659005F7BD3 /* database.cpp in Sources */,
 				26D9D9D81E96468D005F7BD3 /* tab_view_macos.mm in Sources */,
+				26BAE04322267D060085B5AB /* tls.cpp in Sources */,
 				26D9D9621E964669005F7BD3 /* bitmap_data.cpp in Sources */,
 				26D9D9111E9645CE005F7BD3 /* xml.cpp in Sources */,
 				26BB17D021F4BA690089C7EC /* ui_adapter.cpp in Sources */,
@@ -6258,6 +6268,7 @@
 				26D9D9291E9645CE005F7BD3 /* line.cpp in Sources */,
 				26D9D9AD1E964683005F7BD3 /* render_canvas.cpp in Sources */,
 				26D9D9D21E96468D005F7BD3 /* scroll_view_macos.mm in Sources */,
+				26BAE0312223CEC70085B5AB /* openssl.cpp in Sources */,
 				26D9D9691E96466A005F7BD3 /* drawable.cpp in Sources */,
 				26D9D92A1E9645CE005F7BD3 /* platform_apple.mm in Sources */,
 				26D9D9D71E96468D005F7BD3 /* tab_view.cpp in Sources */,
@@ -6289,6 +6300,7 @@
 				26D9D9DE1E96468D005F7BD3 /* ui_app.cpp in Sources */,
 				26D9D92F1E9645CE005F7BD3 /* vector4.cpp in Sources */,
 				26D9D9B31E964683005F7BD3 /* vertex_buffer.cpp in Sources */,
+				26BAE0332223E3BC0085B5AB /* http_openssl.cpp in Sources */,
 				26D9D9301E9645CE005F7BD3 /* parse.cpp in Sources */,
 				26BAE02A2223A07D0085B5AB /* linkedin_login.cpp in Sources */,
 				26D9D9311E9645CE005F7BD3 /* asset.cpp in Sources */,
