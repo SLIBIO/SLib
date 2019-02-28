@@ -220,7 +220,7 @@ Edit the `build.gradle` in your app module as following.
         ...
       }
       ndk {
-        abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86'
+        abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
       }
 
       ...
