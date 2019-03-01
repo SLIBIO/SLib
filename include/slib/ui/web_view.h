@@ -62,6 +62,8 @@ namespace slib
 		
 		virtual void clearCache();
 		
+		virtual void clearCookie();
+
 		
 		String getErrorMessage();
 		
@@ -101,6 +103,8 @@ namespace slib
 		void _runJavaScript_NW(const String& script);
 		
 		void _clearCache_NW();
+		
+		void _clearCookie_NW();
 		
 		void _setCustomUserAgent_NW();
 		

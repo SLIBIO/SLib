@@ -33,6 +33,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.view.KeyEvent;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
@@ -223,7 +225,6 @@ public class UiWebView extends WebView implements IView {
 			});
 			return;
 		}
-
 		if (view instanceof WebView) {
 			final WebView wv = (WebView)view;
 			try {
@@ -236,6 +237,41 @@ public class UiWebView extends WebView implements IView {
 			} catch (Exception e) {
 				Logger.exception(e);
 			}
+		}
+	}
+
+	public static void _clearCookie(final View view) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_clearCookie(view);
+				}
+			});
+			return;
+		}
+		try {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				CookieManager manager = CookieManager.getInstance();
+				if (manager != null) {
+					manager.removeAllCookies(null);
+					manager.removeSessionCookies(null);
+					manager.flush();
+				}
+			} else {
+				CookieSyncManager sync = CookieSyncManager.createInstance(view.getContext());
+				if (sync != null) {
+					sync.startSync();
+					CookieManager manager = CookieManager.getInstance();
+					if (manager != null) {
+						manager.removeAllCookie();
+						manager.removeSessionCookie();
+						sync.stopSync();
+						sync.sync();
+					}
+				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 

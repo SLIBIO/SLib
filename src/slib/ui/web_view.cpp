@@ -130,6 +130,12 @@ namespace slib
 		}
 #endif
 	}
+
+	void WebView::clearCookie()
+	{
+		_clearCookie_NW();
+	}
+	
 	
 	String WebView::getErrorMessage()
 	{

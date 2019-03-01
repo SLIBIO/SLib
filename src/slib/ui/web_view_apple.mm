@@ -257,8 +257,14 @@ namespace slib
 		
 		NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
 
-		[[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{
-		}];
+		[[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{}];
+	}
+	
+	void WebView::_clearCookie_NW()
+	{
+		NSSet* websiteDataTypes = [NSSet setWithArray:@[WKWebsiteDataTypeCookies]];
+		NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
+		[[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{}];
 	}
 	
 	void WebView::_setCustomUserAgent_NW()

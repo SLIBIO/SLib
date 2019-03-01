@@ -1043,6 +1043,10 @@ namespace slib
 		}
 	}
 
+	void WebView::_clearCookie_NW()
+	{
+	}
+
 	void WebView::_setCustomUserAgent_NW()
 	{
 	}
