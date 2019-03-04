@@ -1,0 +1,3 @@
+.vs
+*.vcxproj.user
+/build
