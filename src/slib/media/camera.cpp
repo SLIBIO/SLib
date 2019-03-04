@@ -63,25 +63,6 @@ namespace slib
 		return deviceId == "BACK";
 	}
 	
-	TakePhoto::TakePhoto()
-	{
-		
-	}
-	
-	TakePhoto::~TakePhoto()
-	{
-		
-	}
-	
-	
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TakePhotoParam)
-	
-	TakePhotoParam::TakePhotoParam()
-	{
-		
-	}
-	
-	
 	SLIB_DEFINE_OBJECT(Camera, VideoCapture)
 
 	Camera::Camera()

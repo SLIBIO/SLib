@@ -30,7 +30,7 @@
 #include "../core/object.h"
 #include "../core/string.h"
 #include "../core/function.h"
-
+#include "../graphics/image.h"
 #include "../ui/window.h"
 #include "../ui/view.h"
 
@@ -158,7 +158,58 @@ namespace slib
 		sl_bool _runOnUiThread();
 		
 	};
+	
+	class SLIB_EXPORT TakePhotoResult
+	{
+	public:
+		sl_bool flagSuccess;
+		sl_bool flagCancel;
 
+	public:
+		TakePhotoResult();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TakePhotoResult)
+		
+	public:
+		String getFilePath();
+		
+		Memory getFileContent();
+		
+		Ref<Drawable> getDrawable();
+		
+		Ref<Bitmap> getBitmap();
+		
+		Ref<Image> getImage();
+		
+	protected:
+		String filePath;
+		Memory fileContent;
+		Ref<Drawable> drawable;
+		
+	};
+	
+	class SLIB_EXPORT TakePhoto
+	{
+	public:
+		Ref<Window> parent;
+		String outputFilePath;
+		Function<void(TakePhotoResult&)> onComplete;
+		
+	public:
+		TakePhoto();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TakePhoto)
+		
+	public:
+		void takeFromCamera();
+		
+		static void takeFromCamera(const Function<void(TakePhotoResult&)>& onComplete);
+		
+		void chooseFromLibrary();
+
+		static void chooseFromLibrary(const Function<void(TakePhotoResult&)>& onComplete);
+		
+	};
 	
 	class Toast
 	{

@@ -70,47 +70,6 @@ namespace slib
 		
 	};
 	
-    enum class TakePhotoResult
-    {
-        Successed = 0,
-        Failed = 1,
-        Canceled = 2
-    };
-    
-    class SLIB_EXPORT TakePhoto
-	{
-	public:
-		String outputFilePath;
-		TakePhotoResult result;
-
-	public:
-		TakePhoto();
-		
-		~TakePhoto();
-		
-	public:
-		String getFilePath();
-		
-        Ref<Image> getImage(sl_uint32 width = 0, sl_uint32 height = 0);
-
-	private:
-		Ref<Image> image;
-		
-	};
-	
-	class SLIB_EXPORT TakePhotoParam
-	{
-	public:
-		String outputFilePath;
-		Function<void(TakePhoto*)> onComplete;
-		
-	public:
-		TakePhotoParam();
-		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TakePhotoParam)
-		
-	};
-	
 	class SLIB_EXPORT Camera : public VideoCapture
 	{
 		SLIB_DECLARE_OBJECT
@@ -124,12 +83,6 @@ namespace slib
 		static Ref<Camera> create(const CameraParam& param);
 		
 		static List<CameraInfo> getCamerasList();
-		
-		static void takePhoto(const TakePhotoParam& param);
-		
-		static void takePhoto(const String& outputFilePath, const Function<void(TakePhoto*)>& onComplete);
-		
-		static void takePhoto(const Function<void(TakePhoto*)>& callback);
 		
 	};
 

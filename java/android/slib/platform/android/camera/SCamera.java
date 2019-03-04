@@ -27,6 +27,8 @@ import java.util.Vector;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
@@ -40,24 +42,21 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 
 	private final static Object sync = new Object();
 	private static Vector<SCamera> cameraObjectList = new Vector<SCamera>();
-	private static Activity lastRunningActivity;
 	private static boolean flagRunningActivity = false;
 	private static boolean flagRequestPermission = false;
 
-	static {
-		startMonitor();
-	}
-
 	public static void onResumeActivity(Activity activity)
 	{
+		if (!(Permissions.hasFeature(activity, PackageManager.FEATURE_CAMERA_ANY))) {
+			return;
+		}
 		synchronized (sync) {
 			try {
-				lastRunningActivity = activity;
 				flagRunningActivity = true;
 				if (flagRequestPermission) {
 					flagRequestPermission = false;
-					if (!(grantPermission())) {
-						onRequestPermissionsResult();
+					if (!(grantPermission(activity))) {
+						onRequestPermissionsResult(activity);
 					}
 				}
 				for (SCamera camera : cameraObjectList) {
@@ -73,6 +72,9 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 
 	public static void onPauseActivity(Activity activity)
 	{
+		if (!(Permissions.hasFeature(activity, PackageManager.FEATURE_CAMERA_ANY))) {
+			return;
+		}
 		synchronized (sync) {
 			try {
 				flagRunningActivity = false;
@@ -154,20 +156,24 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 		}
 	}
 
-	public static SCamera create(String id, long nativeObject) {
+	public static SCamera create(Activity activity, String id, long nativeObject) {
 		try {
+			if (!(Permissions.hasFeature(activity, PackageManager.FEATURE_CAMERA_ANY))) {
+				return null;
+			}
 			SCameraInfo info = queryCameraInfo(id);
 			if (info == null) {
 				return null;
 			}
-			if (grantPermission()) {
-				SCamera ret = new SCamera(null, info, nativeObject);
+			if (grantPermission(activity)) {
+				flagRequestPermission = true;
+				SCamera ret = new SCamera(activity,null, info, nativeObject);
 				cameraObjectList.add(ret);
 				return ret;
 			}
 			Camera camera = Camera.open(info.index);
 			synchronized (sync) {
-				SCamera ret = new SCamera(camera, info, nativeObject);
+				SCamera ret = new SCamera(activity, camera, info, nativeObject);
 				cameraObjectList.add(ret);
 				return ret;
 			}
@@ -177,25 +183,16 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 		return null;
 	}
 
-	private static boolean grantPermission() {
-		Activity activity = lastRunningActivity;
-		if (activity == null) {
-			flagRequestPermission = true;
-			return true;
-		}
+	private static boolean grantPermission(Activity activity) {
 		return Permissions.grantPermission(activity, Manifest.permission.CAMERA, SlibActivity.REQUEST_SCAMERA_PERMISSION);
 	}
 
-	private static boolean checkPermission() {
-		Activity activity = lastRunningActivity;
-		if (activity == null) {
-			return false;
-		}
-		return Permissions.checkPermission(activity, Manifest.permission.CAMERA);
+	private static boolean checkPermission(Context context) {
+		return Permissions.checkPermission(context, Manifest.permission.CAMERA);
 	}
 
-	public static void onRequestPermissionsResult() {
-		if (!(checkPermission())) {
+	public static void onRequestPermissionsResult(Activity activity) {
+		if (!(checkPermission(activity))) {
 			return;
 		}
 		synchronized (sync) {
@@ -219,6 +216,7 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 		}
 	}
 
+	private Activity activity;
 	private Camera camera;
 	private SCameraInfo info;
 	private long nativeObject;
@@ -234,8 +232,9 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 	private long timeLastFrame;
 	private long timeLastStart;
 	
-	public SCamera(Camera camera, SCameraInfo info, long nativeObject) {
-		
+	public SCamera(Activity activity, Camera camera, SCameraInfo info, long nativeObject) {
+
+		this.activity = activity;
 		this.camera = camera;
 		this.info = info;
 		this.nativeObject = nativeObject;
@@ -360,7 +359,7 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 		}
 	}
 	
-	public void stopCamera() {
+	private void stopCamera() {
 		try {
 			if (camera == null) {
 				return;
@@ -418,10 +417,6 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 
 	private int calculateDisplayOrientation() {
 		int orientation = info.cameraInfo.orientation;
-		Activity activity = lastRunningActivity;
-		if (activity == null) {
-			return orientation;
-		}
 		int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
 		int degrees = 0;
 		switch (rotation) {
@@ -450,9 +445,12 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 	}
 
 
-	public static boolean flagRunMonitor = false;
+	private static boolean flagRunMonitor = false;
 
 	static private void startMonitor() {
+		if (flagRunMonitor) {
+			return;
+		}
 		flagRunMonitor = true;
 		new Thread(new Runnable() {
 			@Override

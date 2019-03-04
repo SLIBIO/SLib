@@ -48,11 +48,12 @@ import android.widget.FrameLayout;
 
 public class SlibActivity extends Activity {
 
-	public static final int REQUEST_IMAGE_CAPTURE = 0x000100;
+	public static final int REQUEST_TAKE_PHOTO = 0x000100;
 	public static final int REQUEST_WEBVIEW_CHOOSE_FILE = 0x000101;
 
 	public static final int REQUEST_PERMISSIONS = 0x000200;
 	public static final int REQUEST_SCAMERA_PERMISSION = 0x000201;
+	public static final int REQUEST_TAKE_PHOTO_PERMISSION = 0x000202;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -198,7 +199,7 @@ public class SlibActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
-			case REQUEST_IMAGE_CAPTURE:
+			case REQUEST_TAKE_PHOTO:
 				TakePhoto.onResult(this, resultCode, data);
 				break;
 			case REQUEST_WEBVIEW_CHOOSE_FILE:
@@ -211,10 +212,13 @@ public class SlibActivity extends Activity {
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 		switch (requestCode) {
 			case REQUEST_PERMISSIONS:
-				Device.onRequestPermissionsResult();
+				Device.onRequestPermissionsResult(this);
 				break;
 			case REQUEST_SCAMERA_PERMISSION:
-				SCamera.onRequestPermissionsResult();
+				SCamera.onRequestPermissionsResult(this);
+				break;
+			case REQUEST_TAKE_PHOTO_PERMISSION:
+				TakePhoto.onRequestPermissionsResult(this);
 				break;
 		}
 	}

@@ -72,6 +72,31 @@ namespace slib
 		}
 	}
 	
+	static UIViewController* _priv_AlertDialog_getRootViewController(Ref<Window> parentWindow)
+	{
+		UIWindow* window = nil;
+		if (parentWindow.isNull()) {
+			Ref<MobileApp> app = MobileApp::getApp();
+			if (app.isNotNull()) {
+				parentWindow = app->getMainWindow();
+			}
+		}
+		if (parentWindow.isNotNull()) {
+			Ref<WindowInstance> instance = parentWindow->getWindowInstance();
+			UIView* view = UIPlatform::getWindowHandle(instance.get());
+			if ([view isKindOfClass:[UIWindow class]]) {
+				window = (UIWindow*)view;
+			}
+		}
+		if (window == nil) {
+			window = UIPlatform::getKeyWindow();
+		}
+		if (window != nil) {
+			return [window rootViewController];
+		}
+		return nil;
+	}
+	
 	sl_bool AlertDialog::_show()
 	{
 		AlertDialogButtons buttons = this->buttons;
@@ -167,30 +192,10 @@ namespace slib
 				} @catch (NSException*) {}
 			}
 			
-			UIWindow* window = nil;
-			Ref<Window> parentWindow = this->parent;
-			if (parentWindow.isNull()) {
-				Ref<MobileApp> app = MobileApp::getApp();
-				if (app.isNotNull()) {
-					parentWindow = app->getMainWindow();
-				}
-			}
-			if (parentWindow.isNotNull()) {
-				Ref<WindowInstance> instance = parentWindow->getWindowInstance();
-				UIView* view = UIPlatform::getWindowHandle(instance.get());
-				if ([view isKindOfClass:[UIWindow class]]) {
-					window = (UIWindow*)view;
-				}
-			}
-			if (window == nil) {
-				window = UIPlatform::getKeyWindow();
-			}
-			if (window != nil) {
-				UIViewController* rootController = [window rootViewController];
-				if (rootController != nil) {
-					[rootController presentViewController:alert animated:YES completion:nil];
-					return sl_true;
-				}
+			UIViewController* controller = _priv_AlertDialog_getRootViewController(parent);
+			if (controller != nil) {
+				[controller presentViewController:alert animated:YES completion:nil];
+				return sl_true;
 			}
 		}
 		
@@ -248,6 +253,119 @@ namespace slib
 	if (url != nil) {
 		[[UIApplication sharedApplication] openURL:url];
 	}
+}
+
+@end
+
+@interface _priv_SLib_TakePictureController : UIImagePickerController<UINavigationControllerDelegate, UIImagePickerControllerDelegate>
+{
+	@public slib::TakePhoto takePhoto;
+}
+@end
+
+namespace slib
+{
+	
+	class _priv_TakePhotoResult : public TakePhotoResult
+	{
+	public:
+		void setResult(UIImage* image)
+		{
+			if (image != nil) {
+				drawable = GraphicsPlatform::createImageDrawable(image.CGImage);
+				if (drawable.isNotNull()) {
+					UIImageOrientation orientation = image.imageOrientation;
+					if (orientation != UIImageOrientationUp) {
+						switch (orientation) {
+							case UIImageOrientationDown:
+								drawable = drawable->rotate(RotationMode::Rotate180);
+								break;
+							case UIImageOrientationLeft:
+								drawable = drawable->rotate(RotationMode::Rotate270);
+								break;
+							case UIImageOrientationRight:
+								drawable = drawable->rotate(RotationMode::Rotate90);
+								break;
+							case UIImageOrientationUpMirrored:
+								drawable = drawable->flip(FlipMode::Horizontal);
+								break;
+							case UIImageOrientationDownMirrored:
+								drawable = drawable->flip(FlipMode::Vertical);
+								break;
+							case UIImageOrientationLeftMirrored:
+								drawable = drawable->rotate(RotationMode::Rotate270, FlipMode::Horizontal);
+								break;
+							case UIImageOrientationRightMirrored:
+								drawable = drawable->rotate(RotationMode::Rotate90, FlipMode::Horizontal);
+								break;
+							default:
+								break;
+						}
+						if (drawable.isNull()) {
+							return;
+						}
+					}
+					flagSuccess = sl_true;
+				}
+			}
+		}		
+	};
+	
+	static void _priv_TakePhoto_run(TakePhoto& takePhoto, _priv_SLib_TakePictureController* controller)
+	{
+		controller->takePhoto = takePhoto;
+		[controller setDelegate:controller];
+		
+		UIViewController* rootController = _priv_AlertDialog_getRootViewController(takePhoto.parent);
+		if (rootController != nil) {
+			[rootController presentViewController:controller animated:YES completion:nil];
+		} else {
+			TakePhotoResult result;
+			takePhoto.onComplete(result);
+		}
+	}
+	
+	void TakePhoto::takeFromCamera()
+	{
+		_priv_SLib_TakePictureController* controller = [[_priv_SLib_TakePictureController alloc] init];
+		if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+			[controller setSourceType:UIImagePickerControllerSourceTypeCamera];
+			_priv_TakePhoto_run(*this, controller);
+		} else {
+			TakePhotoResult result;
+			onComplete(result);
+		}
+	}
+	
+	void TakePhoto::chooseFromLibrary()
+	{
+		_priv_SLib_TakePictureController* controller = [[_priv_SLib_TakePictureController alloc] init];
+		[controller setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
+		_priv_TakePhoto_run(*this, controller);
+	}
+
+}
+
+@implementation _priv_SLib_TakePictureController
+
+- (void)imagePickerController:(UIImagePickerController*)picker didFinishPickingMediaWithInfo:(NSDictionary*)info
+{
+	[picker dismissViewControllerAnimated:YES completion:nil];
+	UIImage *image = [info objectForKey:UIImagePickerControllerEditedImage];
+	if (image == nil) {
+		image = [info objectForKey:UIImagePickerControllerOriginalImage];
+	}
+	slib::_priv_TakePhotoResult result;
+	result.setResult(image);
+	takePhoto.onComplete(result);
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController*)picker
+{
+	[picker dismissViewControllerAnimated:YES completion:nil];
+	slib::TakePhotoResult result;
+	result.flagCancel = sl_true;
+	takePhoto.onComplete(result);
 }
 
 @end

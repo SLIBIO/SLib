@@ -26,6 +26,7 @@
 #include "slib/ui/mobile_app.h"
 #include "slib/ui/label_view.h"
 
+#include "slib/core/file.h"
 #include "slib/core/safe_static.h"
 
 namespace slib
@@ -342,6 +343,85 @@ namespace slib
 		}
 		return sl_null;
 	}
+	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TakePhotoResult)
+	
+	TakePhotoResult::TakePhotoResult()
+	 : flagSuccess(sl_false), flagCancel(sl_false)
+	{
+	}
+	
+	String TakePhotoResult::getFilePath()
+	{
+		return filePath;
+	}
+	
+	Memory TakePhotoResult::getFileContent()
+	{
+		if (fileContent.isNotNull()) {
+			return fileContent;
+		}
+		if (filePath.isNotEmpty()) {
+			return File::readAllBytes(filePath);
+		}
+		return sl_null;
+	}
+	
+	Ref<Drawable> TakePhotoResult::getDrawable()
+	{
+		if (drawable.isNotNull()) {
+			return drawable;
+		}
+		return PlatformDrawable::loadFromMemory(getFileContent());
+	}
+	
+	Ref<Bitmap> TakePhotoResult::getBitmap()
+	{
+		if (drawable.isNotNull()) {
+			return drawable->toBitmap();
+		}
+		return Bitmap::loadFromMemory(getFileContent());
+	}
+
+	Ref<Image> TakePhotoResult::getImage()
+	{
+		if (drawable.isNotNull()) {
+			return drawable->toImage();
+		}
+		return Image::loadFromMemory(getFileContent());
+	}
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TakePhoto)
+	
+	TakePhoto::TakePhoto()
+	{
+	}
+	
+	void TakePhoto::takeFromCamera(const Function<void(TakePhotoResult&)>& onComplete)
+	{
+		TakePhoto takePhoto;
+		takePhoto.onComplete = onComplete;
+		takePhoto.takeFromCamera();
+	}
+
+	void TakePhoto::chooseFromLibrary(const Function<void(TakePhotoResult&)>& onComplete)
+	{
+		TakePhoto takePhoto;
+		takePhoto.onComplete = onComplete;
+		takePhoto.chooseFromLibrary();
+	}
+	
+#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
+	void TakePhoto::takeFromCamera()
+	{
+	}
+	
+	void TakePhoto::chooseFromLibrary()
+	{
+	}
+#endif
+
 
 /***************************************
  			Toast

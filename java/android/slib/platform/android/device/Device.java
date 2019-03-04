@@ -165,12 +165,12 @@ public class Device {
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
-		onRequestPermissionsResult();
+		nativeOnCallbackGrantPermissions();
 	}
 
 	private static native void nativeOnCallbackGrantPermissions();
 
-	public static void onRequestPermissionsResult() {
+	public static void onRequestPermissionsResult(Activity activity) {
 		nativeOnCallbackGrantPermissions();
 	}
 

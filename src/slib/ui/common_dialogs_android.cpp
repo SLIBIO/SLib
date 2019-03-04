@@ -28,6 +28,8 @@
 
 #include "slib/ui/core.h"
 #include "slib/ui/platform.h"
+
+#include "slib/core/file.h"
 #include "slib/core/safe_static.h"
 
 #include "../resources.h"
@@ -167,6 +169,149 @@ namespace slib
 	{
 		return sl_false;
 	}
+
+
+	void _priv_TakePhoto_onComplete(JNIEnv* env, jobject _this, jstring filePath, jint fd, jint rotation, jboolean flipHorz, jboolean flipVert, jboolean flagCancel);
+
+	SLIB_JNI_BEGIN_CLASS(JAndroidTakePhoto, "slib/platform/android/camera/TakePhoto")
+		SLIB_JNI_STATIC_METHOD(open, "open", "(Landroid/app/Activity;ZLjava/lang/String;)V");
+		SLIB_JNI_NATIVE(onComplete, "navtiveOnComplete", "(Ljava/lang/String;IIZZZ)V", _priv_TakePhoto_onComplete);
+	SLIB_JNI_END_CLASS
+
+	class _priv_TakePhotoResult : public TakePhotoResult
+	{
+	public:
+		void setResult(String path, int fd, RotationMode rotation, sl_bool flipHorz, sl_bool flipVert)
+		{
+			flagSuccess = sl_false;
+			Memory mem;
+			if (path.isNotEmpty()) {
+				filePath = path;
+				mem = File::readAllBytes(path);
+			} else {
+				File file(fd);
+				mem = file.readAllBytes();
+				fileContent = mem;
+				file.clearHandle();
+			}
+			if (mem.isNull()) {
+				return;
+			}
+			FlipMode flip;
+			if (flipHorz) {
+				if (flipVert) {
+					flip = FlipMode::Both;
+				} else {
+					flip = FlipMode::Horizontal;
+				}
+			} else {
+				if (flipVert) {
+					flip = FlipMode::Vertical;
+				} else {
+					flip = FlipMode::None;
+				}
+			}
+			NormalizeRotateAndFlip(rotation, flip);
+			if (rotation == RotationMode::Rotate0 && flip == FlipMode::None) {
+				flagSuccess = sl_true;
+			} else {
+				filePath.setNull();
+				fileContent.setNull();
+				if (mem.isNotNull()) {
+					Ref<Image> image = Image::loadFromMemory(mem);
+					if (image.isNotNull()) {
+						drawable = image->rotate(rotation, flip);
+						if (drawable.isNotNull()) {
+							flagSuccess = sl_true;
+						}
+					}
+				}
+			}
+		}
+	};
+
+	class _priv_TakePhoto_Static
+	{
+	public:
+		Mutex lock;
+		Function<void(TakePhotoResult&)> callback;
+
+		void run(TakePhoto& takePhoto, sl_bool flagCamera)
+		{
+			Function<void(TakePhotoResult&)> oldCallback;
+			MutexLocker locker(&lock);
+			if (callback.isNotNull()) {
+				oldCallback = callback;
+				callback.setNull();
+			}
+			jobject jactivity = Android::getCurrentActivity();
+			if (jactivity) {
+				callback = takePhoto.onComplete;
+				locker.unlock();
+				if (oldCallback.isNotNull()) {
+					TakePhotoResult result;
+					oldCallback(result);
+				}
+				JniLocal<jstring> jpath = Jni::getJniString(takePhoto.outputFilePath);
+				JAndroidTakePhoto::open.call(sl_null, jactivity, flagCamera, jpath.get());
+			} else {
+				locker.unlock();
+				if (oldCallback.isNotNull()) {
+					TakePhotoResult result;
+					oldCallback(result);
+				}
+				if (takePhoto.onComplete.isNotNull()) {
+					TakePhotoResult result;
+					takePhoto.onComplete(result);
+				}
+			}
+		}
+
+		void onComplete(String filePath, int fd, RotationMode rotation, sl_bool flipHorz, sl_bool flipVert, sl_bool flagCancel)
+		{
+			Function<void(TakePhotoResult&)> callback;
+			{
+				MutexLocker locker(&lock);
+				callback = this->callback;
+				this->callback.setNull();
+			}
+			if (callback.isNotNull()) {
+				_priv_TakePhotoResult result;
+				if (!flagCancel && (filePath.isNotEmpty() || fd != (int)SLIB_FILE_INVALID_HANDLE)) {
+					result.setResult(filePath, fd, rotation, flipHorz, flipVert);
+				}
+				result.flagCancel = flagCancel;
+				callback(result);
+			}
+		}
+	};
+	SLIB_SAFE_STATIC_GETTER(_priv_TakePhoto_Static, _g_priv_TakePhoto_get);
+
+	static void _priv_TakePhoto_run(TakePhoto& takePhoto, sl_bool flagCamera)
+	{
+		_priv_TakePhoto_Static* p = _g_priv_TakePhoto_get();
+		if (p) {
+			p->run(takePhoto, flagCamera);
+		}
+	}
+
+	void TakePhoto::takeFromCamera()
+	{
+		_priv_TakePhoto_run(*this, sl_true);
+	}
+
+	void TakePhoto::chooseFromLibrary()
+	{
+		_priv_TakePhoto_run(*this, sl_false);
+	}
+
+    void _priv_TakePhoto_onComplete(JNIEnv* env, jobject _this, jstring filePath, jint fd, jint rotation, jboolean flipHorz, jboolean flipVert, jboolean flagCancel)
+    {
+	    _priv_TakePhoto_Static* p = _g_priv_TakePhoto_get();
+	    if (p) {
+	    	p->onComplete(Jni::getString(filePath), (int)fd, (slib::RotationMode)rotation, flipHorz, flipVert, flagCancel);
+	    }
+    }
 
 }
 

@@ -22,119 +22,243 @@
 
 package slib.platform.android.camera;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.media.ExifInterface;
 import android.net.Uri;
-import android.os.Environment;
+import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+
+import java.io.InputStream;
 
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
+import slib.platform.android.helper.Permissions;
 import slib.platform.android.ui.UiThread;
+import slib.platform.android.ui.helper.FileChooser;
+import slib.platform.android.ui.helper.FileChooserListener;
 
 public class TakePhoto {
 
-	static Uri currentPhotoPath = null;
-
-	public static void takePhoto(final Activity context, final String outputFilePath) {
-
+	public static void open(final Activity activity, final boolean flagCamera, final String outputFilePath) {
 		if (!(UiThread.isUiThread())) {
 			UiThread.post(new Runnable() {
 				public void run() {
-					takePhoto(context, outputFilePath);
+					open(activity, flagCamera, outputFilePath);
 				}
 			});
 			return;
 		}
-
 		try {
+			FileChooser chooser = new FileChooser(activity, SlibActivity.REQUEST_TAKE_PHOTO, new FileChooserListener() {
+				@Override
+				public void onChooseFile(Uri uri, Object content) {
+					ParcelFileDescriptor pfd = null;
+					try {
+						if (uri != null) {
+							String filePath = null;
+							int fd = -1;
+							int orientation = ExifInterface.ORIENTATION_UNDEFINED;
+							int rotation = 0;
 
-			if (outputFilePath == null || outputFilePath.isEmpty()) {
+							String scheme = uri.getScheme();
+							if (scheme != null && scheme.equals("file")) {
+								filePath = uri.getPath();
+								if (filePath != null) {
+									ExifInterface exif = new ExifInterface(filePath);
+									orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+								}
+							} else {
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+									InputStream stream = null;
+									try {
+										stream = activity.getContentResolver().openInputStream(uri);
+										if (stream != null) {
+											ExifInterface exif = new ExifInterface(stream);
+											orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+										}
+									} catch (Exception e) {
+										Logger.exception(e);
+									}
+									try {
+										if (stream != null) {
+											stream.close();
+										}
+									} catch (Exception e) {
+										Logger.exception(e);
+									}
+								} else {
+									Cursor cursor = null;
+									try {
+										cursor = activity.getContentResolver().query(uri, new String[] { MediaStore.Images.ImageColumns.ORIENTATION }, null, null, null);
+										if (cursor != null) {
+											if (cursor.getCount() == 1) {
+												cursor.moveToFirst();
+												rotation = cursor.getInt(0);
+											}
+										}
+									} catch (Exception e) {
+										Logger.exception(e);
+									}
+									try {
+										if (cursor != null) {
+											cursor.close();
+										}
+									} catch (Exception e) {
+										Logger.exception(e);
+									}
+								}
+								pfd = activity.getContentResolver().openFileDescriptor(uri, "r");
+								if (pfd != null) {
+									fd = pfd.getFd();
+								}
+							}
+							if (filePath != null || pfd != null) {
+								boolean flipHorz = false;
+								boolean flipVert = false;
+								switch (orientation) {
+									case ExifInterface.ORIENTATION_ROTATE_90:
+										rotation = 90;
+										break;
+									case ExifInterface.ORIENTATION_ROTATE_180:
+										rotation = 180;
+										break;
+									case ExifInterface.ORIENTATION_ROTATE_270:
+										rotation = 270;
+										break;
+									case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+										flipHorz = true;
+										break;
+									case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+										flipVert = true;
+										break;
+									case ExifInterface.ORIENTATION_TRANSPOSE:
+										rotation = 90;
+										flipHorz = true;
+										break;
+									case ExifInterface.ORIENTATION_TRANSVERSE:
+										rotation = 270;
+										flipHorz = true;
+										break;
+								}
+								onSuccess(filePath, fd, rotation, flipHorz, flipVert);
+								if (pfd != null) {
+									pfd.close();
+								}
+								return;
+							}
+						}
 
-				String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath();
-				String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-				String fileName = "Photo_" + timeStamp;
-				File file = File.createTempFile(
-						fileName,
-						".jpg",
-						new File(path)
-				);
-				file.deleteOnExit();
-				currentPhotoPath = Uri.fromFile(file);
-			} else {
-				String path;
-				if (outputFilePath.charAt(0) == '/') {
-					path = outputFilePath;
-				} else {
-					path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/" + outputFilePath;
+					} catch (Exception e) {
+						Logger.exception(e);
+					}
+					try {
+						if (pfd != null) {
+							pfd.close();
+						}
+					} catch (Exception e) {
+						Logger.exception(e);
+					}
+					onError();
 				}
-				int index = path.lastIndexOf('/');
-				if (index < 0) {
-					onFailure();
-					return;
-				}
-				String dirPath = path.substring(0, index);
-				File dir = new File(dirPath);
-				if (!dir.exists() || !dir.isDirectory()) {
-					onFailure();
-					return;
-				}
-				currentPhotoPath = Uri.fromFile(new File(path));
+			});
+			TakePhoto request = new TakePhoto();
+			request.chooser = chooser;
+			request.flagCamera = flagCamera;
+			request.outputFilePath = outputFilePath;
+			if (!flagCamera) {
+				request.run();
+				return;
 			}
-
-			Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-			if (takePhotoIntent.resolveActivity(context.getPackageManager()) != null) {
-				takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, currentPhotoPath);
-				context.startActivityForResult(takePhotoIntent, SlibActivity.REQUEST_IMAGE_CAPTURE);
-			} else {
-				onFailure();
+			if (!(Permissions.hasFeature(activity, PackageManager.FEATURE_CAMERA_ANY))) {
+				onError();
+				return;
 			}
-
+			lastRequest = request;
+			if (grantPermission(activity)) {
+				return;
+			}
+			request.run();
 		} catch (Exception e) {
 			Logger.exception(e);
-			onFailure();
+			onError();
+		}
+
+	}
+
+	private void run() {
+		try {
+			lastRequest = this;
+			if (flagCamera) {
+				if (!(chooser.captureImage(outputFilePath))) {
+					onError();
+				}
+			} else {
+				chooser.chooseImageFile();
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+			onError();
+		}
+	}
+
+	private static native void navtiveOnComplete(String filePath, int fd, int rotation, boolean flipHorz, boolean flipVert, boolean flagCancel);
+
+	private static void onSuccess(String filePath, int fd, int rotation, boolean flipHorz, boolean flipVert) {
+		lastRequest = null;
+		navtiveOnComplete(filePath, fd, rotation, flipHorz, flipVert, false);
+	}
+
+	private static void onError() {
+		lastRequest = null;
+		navtiveOnComplete(null, 0, 0, false, false, false);
+	}
+
+	private static void onCancel() {
+		lastRequest = null;
+		navtiveOnComplete(null, 0, 0, false, false, true);
+	}
+
+	private static boolean checkPermission(Context context) {
+		return Permissions.checkPermission(context, Manifest.permission.CAMERA);
+	}
+
+	private static boolean grantPermission(Activity activity) {
+		return Permissions.grantPermission(activity, Manifest.permission.CAMERA, SlibActivity.REQUEST_TAKE_PHOTO_PERMISSION);
+	}
+
+	public static void onRequestPermissionsResult(Activity activity) {
+		if (!(checkPermission(activity))) {
+			if (lastRequest != null) {
+				onError();
+			}
+			return;
+		}
+		if (lastRequest != null) {
+			lastRequest.run();
 		}
 	}
 
 	public static void onResult(Activity activity, int resultCode, Intent data) {
-		if (resultCode == SlibActivity.RESULT_OK && currentPhotoPath != null) {
-			final String path = currentPhotoPath.getPath();
-			new Thread(new Runnable() {
-				public void run() {
-					try {
-						int orientation = 0;
-						int i = 0;
-						for (i = 0; i < 500; i++) {
-							if (new File(path).exists()) {
-								break;
-							}
-							try {
-								Thread.sleep(10);
-							} catch (Exception e) {
-							}
-						}
-						if (i == 300) {
-							onFailure();
-							return;
-						}
-						onSuccess(path);
-					} catch (Exception e) {
-						onFailure();
-						Logger.exception(e);
-					}
-				}
-			}).start();
+		if (resultCode == SlibActivity.RESULT_OK) {
+			if (lastRequest != null) {
+				lastRequest.chooser.processActivityResult(resultCode, data);
+			}
 		} else if (resultCode == SlibActivity.RESULT_CANCELED) {
-			onCanceled();
+			if (lastRequest != null) {
+				onCancel();
+			}
 		}
 	}
 
-	private static native void onSuccess(String path);
-	private static native void onFailure();
-	private static native void onCanceled();
+	private static TakePhoto lastRequest;
+	private FileChooser chooser;
+	private boolean flagCamera;
+	private String outputFilePath;
 
 }

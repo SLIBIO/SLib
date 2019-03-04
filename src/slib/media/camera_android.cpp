@@ -41,7 +41,7 @@ namespace slib
 	SLIB_JNI_BEGIN_CLASS(JAndroidCamera, "slib/platform/android/camera/SCamera")
 
 		SLIB_JNI_STATIC_METHOD(getCamerasList, "getCamerasList", "()[Lslib/platform/android/camera/SCameraInfo;");
-		SLIB_JNI_STATIC_METHOD(create, "create", "(Ljava/lang/String;J)Lslib/platform/android/camera/SCamera;");
+		SLIB_JNI_STATIC_METHOD(create, "create", "(Landroid/app/Activity;Ljava/lang/String;J)Lslib/platform/android/camera/SCamera;");
 
 		SLIB_JNI_METHOD(setSettings, "setSettings", "(II)V");
 		SLIB_JNI_METHOD(release, "release", "()V");
@@ -73,6 +73,10 @@ namespace slib
 	public:
 		static Ref<_priv_Android_Camera> _create(const CameraParam& param)
 		{
+			jobject jactivity = Android::getCurrentActivity();
+			if (!jactivity) {
+				return sl_null;
+			}
 			_priv_AndroidCameraMap* cameraMap = _priv_AndroidCameras_get();
 			if (!cameraMap) {
 				return sl_null;
@@ -82,7 +86,7 @@ namespace slib
 				jlong instance = (jlong)(ret.get());
 				cameraMap->put(instance, ret);
 				JniLocal<jstring> jid = Jni::getJniString(param.deviceId);
-				JniLocal<jobject> jcamera = JAndroidCamera::create.callObject(sl_null, jid.get(), instance);
+				JniLocal<jobject> jcamera = JAndroidCamera::create.callObject(sl_null, jactivity, jid.get(), instance);
 				if (jcamera.isNotNull()) {
 					ret->m_camera = jcamera;
 					ret->_init(param);

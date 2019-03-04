@@ -75,4 +75,8 @@ public class Permissions {
 		}
 	}
 
+	public static boolean hasFeature(Context context, String feature) {
+		return context.getPackageManager().hasSystemFeature(feature);
+	}
+
 }
