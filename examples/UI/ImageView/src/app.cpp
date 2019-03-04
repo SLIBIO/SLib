@@ -32,9 +32,97 @@ void ExampleImageViewApp::onStart()
 {
 	getMainWindow()->setResizable(sl_true);
 	getMainWindow()->setTitle("Example - ImageView");
-	Ref<ImageView> imageView = new ImageView;
-	imageView->setWidthFilling();
-	imageView->setHeightFilling();
-	imageView->setSource(Image::loadFromAsset("images/slib.png"));
-	addViewToContent(imageView);
+	
+	sl_real fontSize;
+#if defined(SLIB_PLATFORM_IS_DESKTOP)
+	fontSize = UIResource::dpToPixel(25);
+#else
+	fontSize = UIResource::dpToPixel(18);
+	getContentView()->setBackgroundColor(Color::White);
+#endif
+	
+	Ref<LinearView> linear1 = new LinearView;
+	linear1->setWidthFilling();
+	linear1->setHeightFilling();
+	
+	Ref<ImageView> image = new ImageView;
+	image->setWidthFilling();
+	image->setHeightFilling();
+	image->setScaleMode(ScaleMode::Contain);
+	image->setSource(Image::loadFromAsset("images/slib.png"));
+	linear1->addChild(image);
+	
+	Ref<HorizontalLinearView> linear2 = new HorizontalLinearView;
+	linear2->setWidthWrapping();
+	linear2->setHeightWrapping();
+	linear2->setCenterHorizontal();
+	linear2->setMarginTop((sl_ui_len)fontSize / 2);
+	{
+		Ref<Button> button = new Button;
+		button->setText("Rotate90");
+		button->setWidthWrapping();
+		button->setHeightWrapping();
+		button->setFontSize(fontSize);
+		button->setOnClick([image](View*) {
+			image->setSource(image->getSource()->rotate(RotationMode::Rotate90));
+		});
+		linear2->addChild(button);
+	}
+	{
+		Ref<Button> button = new Button;
+		button->setText("Rotate180");
+		button->setWidthWrapping();
+		button->setHeightWrapping();
+		button->setFontSize(fontSize);
+		button->setOnClick([image](View*) {
+			image->setSource(image->getSource()->rotate(RotationMode::Rotate180));
+		});
+		button->setMarginLeft((sl_ui_len)fontSize);
+		linear2->addChild(button);
+	}
+	{
+		Ref<Button> button = new Button;
+		button->setText("Rotate270");
+		button->setWidthWrapping();
+		button->setHeightWrapping();
+		button->setFontSize(fontSize);
+		button->setOnClick([image](View*) {
+			image->setSource(image->getSource()->rotate(RotationMode::Rotate270));
+		});
+		button->setMarginLeft((sl_ui_len)fontSize);
+		linear2->addChild(button);
+	}
+	linear1->addChild(linear2);
+
+	Ref<HorizontalLinearView> linear3 = new HorizontalLinearView;
+	linear3->setWidthWrapping();
+	linear3->setHeightWrapping();
+	linear3->setCenterHorizontal();
+	linear3->setMargin((sl_ui_len)fontSize / 2);
+	{
+		Ref<Button> button = new Button;
+		button->setText("Flip Horizontal");
+		button->setWidthWrapping();
+		button->setHeightWrapping();
+		button->setFontSize(fontSize);
+		button->setOnClick([image](View*) {
+			image->setSource(image->getSource()->flip(FlipMode::Horizontal));
+		});
+		linear3->addChild(button);
+	}
+	{
+		Ref<Button> button = new Button;
+		button->setText("Flip Vertical");
+		button->setWidthWrapping();
+		button->setHeightWrapping();
+		button->setFontSize(fontSize);
+		button->setOnClick([image](View*) {
+			image->setSource(image->getSource()->flip(FlipMode::Vertical));
+		});
+		button->setMarginLeft((sl_ui_len)fontSize);
+		linear3->addChild(button);
+	}
+	linear1->addChild(linear3);
+	
+	addViewToContent(linear1);
 }
