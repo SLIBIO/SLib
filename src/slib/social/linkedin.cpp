@@ -109,7 +109,7 @@ namespace slib
 		param.preferenceName = "linkedin";
 		param.clientId = clientId;
 		param.clientSecret = clientSecret;
-		param.loginRedirectUri = redirectUri;
+		param.redirectUri = redirectUri;
 		initialize(param);
 	}
 	

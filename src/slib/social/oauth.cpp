@@ -597,6 +597,7 @@ namespace slib
 		m_authorizeUrl = param.authorizeUrl;
 		m_accessTokenUrl = param.accessTokenUrl;
 		m_accessTokenMethod = param.accessTokenMethod;
+		m_redirectUri = param.redirectUri;
 		m_loginRedirectUri = param.loginRedirectUri;
 		m_defaultScopes = param.defaultScopes;
 		m_flagSupportTokenGrantType = param.flagSupportTokenGrantType;
@@ -657,16 +658,6 @@ namespace slib
 		return sl_null;
 	}
 	
-	String OAuth2::getLoginRedirectUri()
-	{
-		return m_loginRedirectUri;
-	}
-	
-	void OAuth2::setLoginRedirectUri(const String& uri)
-	{
-		m_loginRedirectUri = uri;
-	}
-	
 	void OAuth2::setLoggingErrors(sl_bool flag)
 	{
 		m_flagLogErrors = flag;
@@ -700,7 +691,7 @@ namespace slib
 		params.put_NoLock("client_id", m_clientId);
 		String redirectUri = param.redirectUri;
 		if (redirectUri.isEmpty()) {
-			redirectUri = m_loginRedirectUri;
+			redirectUri = m_redirectUri;
 		}
 		if (redirectUri.isNotEmpty()) {
 			params.put_NoLock("redirect_uri", redirectUri);
@@ -788,7 +779,7 @@ namespace slib
 	
 	void OAuth2::requestAccessToken(const String& code, const Function<void(OAuthAccessTokenResult&)>& onComplete)
 	{
-		requestAccessToken(code, m_loginRedirectUri, onComplete);
+		requestAccessToken(code, m_redirectUri, onComplete);
 	}
 	
 	void OAuth2::requestRefreshToken(const String& refreshToken, const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete)

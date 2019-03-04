@@ -56,7 +56,7 @@ namespace slib
 		auto onComplete = param.onComplete;
 		auto dialog = param.dialog;
 		if (dialog.isNull()) {
-			dialog = OAuthWebRedirectDialog::createDefault();
+			dialog = OAuthWebRedirectDialog::getDefault();
 		}
 		OAuthWebRedirectDialogParam dialogParam;
 		dialogParam.url = "https://www.facebook.com/me";

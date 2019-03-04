@@ -35,6 +35,10 @@ namespace slib
 	{
 	}
 	
+	void FacebookSDK::clearAccessToken()
+	{
+	}
+	
 	void FacebookSDK::_updateCurrentToken(Facebook* instance)
 	{
 	}

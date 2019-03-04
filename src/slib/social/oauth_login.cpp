@@ -56,6 +56,10 @@ namespace slib
 	{
 	}
 	
+	void OAuthWebRedirectDialog::clearCookie()
+	{
+	}
+	
 	class _priv_DefaultOAuthWebRedirectDialog : public ViewPage, public OAuthWebRedirectDialog
 	{
 	public:
@@ -148,16 +152,28 @@ namespace slib
 			}
 		}
 		
+		void clearCookie() override
+		{
+			m_webView->clearCookie();
+		}
+		
 	};
 	
-	Ptr<OAuthWebRedirectDialog> OAuthWebRedirectDialog::createDefault()
+	Ptr<OAuthWebRedirectDialog> OAuthWebRedirectDialog::getDefault()
 	{
-		return ToRef(new _priv_DefaultOAuthWebRedirectDialog);
+		SLIB_STATIC_ZERO_INITIALIZED(AtomicPtr<OAuthWebRedirectDialog>, dlg);
+		if (SLIB_SAFE_STATIC_CHECK_FREED(dlg)) {
+			return sl_null;
+		}
+		if (dlg.isNull()) {
+			dlg = ToRef(new _priv_DefaultOAuthWebRedirectDialog);
+		}
+		return dlg;
 	}
 	
 	void OAuthWebRedirectDialog::showDefault(const OAuthWebRedirectDialogParam& param)
 	{
-		auto dialog = OAuthWebRedirectDialog::createDefault();
+		auto dialog = OAuthWebRedirectDialog::getDefault();
 		if (dialog.isNotNull()) {
 			dialog->show(param);
 		}
@@ -182,7 +198,7 @@ namespace slib
 
 			auto dialog = param.dialog;
 			if (dialog.isNull()) {
-				dialog = OAuthWebRedirectDialog::createDefault();
+				dialog = OAuthWebRedirectDialog::getDefault();
 			}
 			
 			OAuthWebRedirectDialogParam dialogParam;
@@ -277,7 +293,7 @@ namespace slib
 	{
 		String redirectUri = param.authorization.redirectUri;
 		if (redirectUri.isEmpty()) {
-			redirectUri = m_loginRedirectUri;
+			redirectUri = m_redirectUri;
 		}
 		List<String> scopes = param.authorization.scopes;
 		if (scopes.isNull()) {
@@ -289,18 +305,26 @@ namespace slib
 			
 			auto dialog = param.dialog;
 			if (dialog.isNull()) {
-				dialog = OAuthWebRedirectDialog::createDefault();
+				dialog = OAuthWebRedirectDialog::getDefault();
 			}
 			
 			OAuthWebRedirectDialogParam dialogParam;
 			dialogParam.url = param.url;
 			dialogParam.options = param.dialogOptions;
 
+			String loginRedirectUri = param.loginRedirectUri;
+			if (loginRedirectUri.isEmpty()) {
+				loginRedirectUri = m_loginRedirectUri;
+				if (loginRedirectUri.isEmpty()) {
+					loginRedirectUri = redirectUri;
+				}
+			}
+
 			auto thiz = ToRef(this);
 			auto onComplete = param.onComplete;
 			auto weakDialog = dialog.toWeak();
 
-			dialogParam.onRedirect = [thiz, weakDialog, redirectUri, scopes, state, onComplete](const String& url) {
+			dialogParam.onRedirect = [thiz, weakDialog, loginRedirectUri, scopes, state, onComplete](const String& url) {
 				
 				if (url.isEmpty()) {
 					OAuthLoginResult result;
@@ -309,7 +333,16 @@ namespace slib
 					return;
 				}
 				
-				if (url.startsWith(redirectUri)) {
+				sl_bool flagRedirected = sl_false;
+				ListElements<String> urls(loginRedirectUri.split(","));
+				for (sl_size i = 0; i < urls.count; i++) {
+					String pattern = urls[i].trim();
+					if (pattern.isNotEmpty() && url.startsWith(pattern)) {
+						flagRedirected = sl_true;
+						break;
+					}
+				}
+				if (flagRedirected) {
 					Log(TAG, "Redirected to URI: %s", url);
 					OAuthLoginResult result;
 					result.parseRedirectUrl(url);

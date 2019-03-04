@@ -82,7 +82,7 @@ namespace slib
 		param.preferenceName = "pinterest";
 		param.clientId = appId;
 		param.clientSecret = appSecret;
-		param.loginRedirectUri = redirectUri;
+		param.redirectUri = redirectUri;
 		initialize(param);
 	}
 	

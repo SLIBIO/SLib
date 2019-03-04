@@ -86,8 +86,10 @@ namespace slib
 		
 		virtual void close() = 0;
 		
+		virtual void clearCookie();
+		
 	public:
-		static Ptr<OAuthWebRedirectDialog> createDefault();
+		static Ptr<OAuthWebRedirectDialog> getDefault();
 		
 		static void showDefault(const OAuthWebRedirectDialogParam& param);
 
@@ -432,6 +434,7 @@ namespace slib
 		Ptr<OAuthWebRedirectDialog> dialog;
 
 		sl_bool flagIgnoreExistingAccessToken; // Ignored if `url` is not empty
+		String loginRedirectUri; // If empty, uses `authorization`'s `redirectUri`
 		
 		Function<void(OAuthLoginResult&)> onComplete;
 		
@@ -453,6 +456,7 @@ namespace slib
 		String authorizeUrl;
 		HttpMethod accessTokenMethod;
 		String accessTokenUrl;
+		String redirectUri;
 		String loginRedirectUri;
 		List<String> defaultScopes;
 		sl_bool flagSupportTokenGrantType;
@@ -491,10 +495,6 @@ namespace slib
 		List<String> getAccessTokenScopes();
 		
 		Json getAccessTokenAttribute(const String& key);
-		
-		String getLoginRedirectUri();
-		
-		void setLoginRedirectUri(const String& uri);
 
 		void setLoggingErrors(sl_bool flag);
 
@@ -540,7 +540,8 @@ namespace slib
 		String m_authorizeUrl;
 		String m_accessTokenUrl;
 		HttpMethod m_accessTokenMethod;
-		AtomicString m_loginRedirectUri;
+		String m_redirectUri;
+		String m_loginRedirectUri;
 		List<String> m_defaultScopes;
 		sl_bool m_flagSupportTokenGrantType;
 		

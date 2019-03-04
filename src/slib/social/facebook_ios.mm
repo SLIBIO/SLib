@@ -152,6 +152,14 @@ namespace slib
 		}
 	}
 	
+	void FacebookSDK::clearAccessToken()
+	{
+		FBSDKLoginManager* manager = _priv_FacebookLoginManager::get();
+		if (manager == nil) {
+			[manager logOut];
+		}
+	}
+	
 }
 
 #endif

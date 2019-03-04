@@ -95,7 +95,7 @@ namespace slib
 		param.preferenceName = "facebook";
 		param.clientId = appId;
 		param.clientSecret = appSecret;
-		param.loginRedirectUri = redirectUri;
+		param.redirectUri = redirectUri;
 		initialize(param);
 	}
 	

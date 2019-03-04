@@ -36,7 +36,7 @@ namespace slib
 		auto onComplete = param.onComplete;
 		auto dialog = param.dialog;
 		if (dialog.isNull()) {
-			dialog = OAuthWebRedirectDialog::createDefault();
+			dialog = OAuthWebRedirectDialog::getDefault();
 		}
 		OAuthWebRedirectDialogParam dialogParam;
 		dialogParam.url = "https://www.linkedin.com/in/me/detail/contact-info/";

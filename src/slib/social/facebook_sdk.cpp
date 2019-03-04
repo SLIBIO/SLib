@@ -41,6 +41,14 @@ namespace slib
 		}
 	}
 	
+	void FacebookSDK::clearAccessToken()
+	{
+		Ref<Facebook> instance = Facebook::getInstance();
+		if (instance.isNotNull()) {
+			instance->clearAccessToken();
+		}
+	}
+
 	Ref<Facebook> FacebookSDK::getInstance()
 	{
 		return Facebook::getInstance();
