@@ -57,9 +57,15 @@ namespace slib
 		if (isImage()) {
 			return (Image*)this;
 		}
+		if (RotateFlipDrawable* r = CastInstance<RotateFlipDrawable>(this)) {
+			Ref<Drawable> src = r->getSource();
+			if (Image* image = CastInstance<Image>(src.get())) {
+				return image->rotateImage(r->getRotation(), r->getFlip());
+			}
+		}
 		Ref<Bitmap> bitmap = toBitmap();
 		if (bitmap.isNotNull()) {
-			return Image::create(bitmap);
+			return Image::createCopyBitmap(bitmap);
 		}
 		return sl_null;
 	}

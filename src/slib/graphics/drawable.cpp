@@ -626,6 +626,21 @@ namespace slib
 		}
 		return sl_null;
 	}
+
+	const Ref<Drawable>& RotateFlipDrawable::getSource()
+	{
+		return m_src;
+	}
+
+	RotationMode RotateFlipDrawable::getRotation()
+	{
+		return m_rotate;
+	}
+	
+	FlipMode RotateFlipDrawable::getFlip()
+	{
+		return m_flip;
+	}
 	
 	sl_real RotateFlipDrawable::getDrawableWidth()
 	{

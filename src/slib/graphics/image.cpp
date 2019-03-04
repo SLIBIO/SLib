@@ -52,27 +52,63 @@ namespace slib
 		return createStatic(desc.width, desc.height, desc.colors, desc.stride, desc.ref.get());
 	}
 
-	Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride)
-	{
-		return createStatic(width, height, pixels, stride, sl_null);
-	}
-
 	Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride, Referable* ref)
 	{
-		Ref<Image> ret;
 		if (width == 0 || height == 0 || pixels == sl_null) {
-			return ret;
+			return sl_null;
 		}
 		if (stride == 0) {
 			stride = width;
 		}
-		ret = new Image;
-		if (ret.isNotNull()) {
-			ret->m_desc.colors = (Color*)pixels;
-			ret->m_desc.width = width;
-			ret->m_desc.height = height;
-			ret->m_desc.stride = stride;
-			ret->m_desc.ref = ref;
+		Ref<Image> ret = new Image;
+		if (ret.isNull()) {
+			return sl_null;
+		}
+		ImageDesc& desc = ret->m_desc;
+		desc.colors = (Color*)pixels;
+		desc.width = width;
+		desc.height = height;
+		desc.stride = stride;
+		desc.ref = ref;
+		return ret;
+	}
+
+	Ref<Image> Image::create(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride)
+	{
+		if (width <= 0 || height <= 0) {
+			return sl_null;
+		}
+		sl_uint32 size = (width*height) << 2;
+		Memory mem = Memory::create(size);
+		if (mem.isNull()) {
+			return sl_null;
+		}
+		Ref<Image> ret = new Image;
+		if (ret.isNull()) {
+			return sl_null;
+		}
+		ImageDesc& desc = ret->m_desc;
+		desc.width = width;
+		desc.height = height;
+		desc.stride = width;
+		desc.ref = mem.ref;
+		desc.colors = (Color*)(mem.getData());
+		if (pixels) {
+			const Color* sr = pixels;
+			Color* dr = desc.colors;
+			for (sl_uint32 i = 0; i < height; i++) {
+				const Color* ss = sr;
+				Color* ds = dr;
+				for (sl_uint32 j = 0; j < width; j++) {
+					*ds = *ss;
+					ss++;
+					ds++;
+				}
+				sr += stride;
+				dr += width;
+			}
+		} else {
+			Base::zeroMemory(desc.colors, size);
 		}
 		return ret;
 	}
@@ -81,118 +117,208 @@ namespace slib
 	{
 		return create(desc.width, desc.height, desc.colors, desc.stride);
 	}
-
-	Ref<Image> Image::create(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride)
+	
+	Ref<Image> Image::create(const ImageDesc& desc, RotationMode rotate, FlipMode flip)
 	{
-		if (pixels) {
-			BitmapData bitmapData(width, height, pixels, stride);
-			return create(bitmapData);
-		} else {
-			Ref<Image> ret;
-			sl_uint32 size = (width*height) << 2;
-			Memory mem = Memory::create(size);
-			if (mem.isNotNull()) {
-				ret = new Image;
-				if (ret.isNotNull()) {
-					ret->m_desc.width = width;
-					ret->m_desc.height = height;
-					ret->m_desc.stride = width;
-					ret->m_desc.ref = mem.ref;
-					ret->m_desc.colors = (Color*)(mem.getData());
-					Base::zeroMemory(ret->m_desc.colors, size);
-				}
-			}
-			return ret;
-
+		NormalizeRotateAndFlip(rotate, flip);
+		if (rotate == RotationMode::Rotate0 && flip == FlipMode::None) {
+			return create(desc.width, desc.height, desc.colors, desc.stride);
 		}
+		sl_uint32 width = desc.width;
+		sl_uint32 height = desc.height;
+		if (width <= 0 || height <= 0) {
+			return sl_null;
+		}
+		sl_uint32 size = (width*height) << 2;
+		Memory mem = Memory::create(size);
+		if (mem.isNull()) {
+			return sl_null;
+		}
+		Ref<Image> ret = new Image;
+		if (ret.isNull()) {
+			return sl_null;
+		}
+		sl_int32 widthDst, heightDst;
+		if (rotate == RotationMode::Rotate90 || rotate == RotationMode::Rotate270) {
+			widthDst = height;
+			heightDst = width;
+		} else {
+			widthDst = desc.width;
+			heightDst = height;
+		}
+		ImageDesc& descDst = ret->m_desc;
+		descDst.width = widthDst;
+		descDst.height = heightDst;
+		descDst.stride = widthDst;
+		descDst.ref = mem.ref;
+		descDst.colors = (Color*)(mem.getData());
+		const Color* colors = desc.colors;
+		if (!colors) {
+			Base::zeroMemory(desc.colors, size);
+			return ret;
+		}
+		sl_uint32 stride = desc.stride;
+		const Color* sr = colors;
+		Color* dr = descDst.colors;
+		sl_int32 incCol, incRow;
+		if (rotate == RotationMode::Rotate0) {
+			if (flip == FlipMode::Horizontal) {
+				incCol = -1;
+				incRow = widthDst;
+				dr += (widthDst - 1);
+			} else { // always FlipMode::Vertical
+				incCol = 1;
+				incRow = -widthDst;
+				dr += widthDst * (heightDst - 1);
+			}
+		} else if (rotate == RotationMode::Rotate180) {
+			// always FlipMode::None
+			incCol = -1;
+			incRow = -widthDst;
+			dr += widthDst * heightDst - 1;
+		} else if (rotate == RotationMode::Rotate90) {
+			if (flip == FlipMode::Horizontal) {
+				incCol = widthDst;
+				incRow = 1;
+			} else { // always FlipMode::None
+				incCol = widthDst;
+				incRow = -1;
+				dr += (widthDst - 1);
+			}
+		} else { // always RotationMode::Rotate270
+			if (flip == FlipMode::Horizontal) {
+				incCol = -widthDst;
+				incRow = -1;
+				dr += widthDst * heightDst - 1;
+			} else { // always FlipMode::None
+				incCol = -widthDst;
+				incRow = 1;
+				dr += widthDst * (heightDst - 1);
+			}
+		}
+		for (sl_uint32 i = 0; i < height; i++) {
+			const Color* ss = sr;
+			Color* ds = dr;
+			for (sl_uint32 j = 0; j < width; j++) {
+				*ds = *ss;
+				ss++;
+				ds += incCol;
+			}
+			sr += stride;
+			dr += incRow;
+		}
+		return ret;
 	}
 
 	Ref<Image> Image::create(const BitmapData& bitmapData)
 	{
-		Ref<Image> ret;
 		sl_uint32 width = bitmapData.width;
 		sl_uint32 height = bitmapData.height;
 		if (width == 0 || height == 0) {
-			return ret;
+			return sl_null;
 		}
 		sl_uint32 size = (width*height) << 2;
 		Memory mem = Memory::create(size);
-		if (mem.isNotNull()) {
-			ret = new Image;
-			if (ret.isNotNull()) {
-				ret->m_desc.width = width;
-				ret->m_desc.height = height;
-				ret->m_desc.stride = width;
-				ret->m_desc.ref = mem.ref;
-				ret->m_desc.colors = (Color*)(mem.getData());
-				BitmapData dst(width, height, (Color*)(mem.getData()));
-				if (BitmapFormats::isPrecomputedAlpha(bitmapData.format)) {
-					dst.format = BitmapFormats::getPrecomputedAlphaFormat(dst.format);
-				}
-				dst.copyPixelsFrom(bitmapData);
-			}
+		if (mem.isNull()) {
+			return sl_null;
 		}
+		Ref<Image> ret = new Image;
+		if (ret.isNull()) {
+			return sl_null;
+		}
+		ImageDesc& desc = ret->m_desc;
+		desc.width = width;
+		desc.height = height;
+		desc.stride = width;
+		desc.ref = mem.ref;
+		desc.colors = (Color*)(mem.getData());
+		BitmapData dst(width, height, desc.colors);
+		if (BitmapFormats::isPrecomputedAlpha(bitmapData.format)) {
+			dst.format = BitmapFormats::getPrecomputedAlphaFormat(dst.format);
+		}
+		dst.copyPixelsFrom(bitmapData);
 		return ret;
 	}
 
-	Ref<Image> Image::create(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
+	Ref<Image> Image::createCopy(const Ref<Image>& image)
 	{
-		Ref<Image> ret;
+		if (image.isNotNull()) {
+			ImageDesc& desc = image->m_desc;
+			return create(desc.width, desc.height, desc.colors, desc.stride);
+		}
+		return sl_null;
+	}
+	
+	Ref<Image> Image::createCopy(const Ref<Image>& image, RotationMode rotate, FlipMode flip)
+	{
+		if (image.isNotNull()) {
+			ImageDesc& desc = image->m_desc;
+			return create(desc, rotate, flip);
+		}
+		return sl_null;
+	}
+	
+	Ref<Image> Image::createCopyBitmap(const Ref<Bitmap>& bitmap)
+	{
 		if (bitmap.isNull()) {
-			return ret;
+			return sl_null;
+		}
+		sl_uint32 width = bitmap->getWidth();
+		sl_uint32 height = bitmap->getHeight();
+		if (width <= 0 || height <= 0) {
+			return sl_null;
+		}
+		Memory mem = Memory::create((width*height) << 2);
+		if (mem.isNull()) {
+			return sl_null;
+		}
+		Color* buf = (Color*)(mem.getData());
+		if (bitmap->readPixels(0, 0, width, height, buf)) {
+			ImageDesc desc;
+			desc.width = width;
+			desc.height = height;
+			desc.stride = width;
+			desc.colors = buf;
+			desc.ref = mem.ref;
+			return Image::createStatic(desc);
+		}
+		return sl_null;
+	}
+
+	Ref<Image> Image::createCopyBitmap(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
+	{
+		if (bitmap.isNull()) {
+			return sl_null;
 		}
 		sl_uint32 bw = bitmap->getWidth();
 		sl_uint32 bh = bitmap->getHeight();
 		if (x >= bw) {
-			return ret;
+			return sl_null;
 		}
 		if (y >= bh) {
-			return ret;
+			return sl_null;
 		}
 		if (width > bw - x) {
-			return ret;
+			return sl_null;
 		}
 		if (height > bh - y) {
-			return ret;
+			return sl_null;
 		}
 		Memory mem = Memory::create((width*height) << 2);
-		if (mem.isNotNull()) {
-			Color* buf = (Color*)(mem.getData());
-			if (bitmap->readPixels(x, y, width, height, buf)) {
-				ImageDesc desc;
-				desc.width = width;
-				desc.height = height;
-				desc.stride = width;
-				desc.colors = buf;
-				desc.ref = mem.ref;
-				return Image::createStatic(desc);
-			}
+		if (mem.isNull()) {
+			return sl_null;
 		}
-		return ret;
-	}
-
-	Ref<Image> Image::create(const Ref<Bitmap>& bitmap)
-	{
-		Ref<Image> ret;
-		if (bitmap.isNull()) {
-			return ret;
+		Color* buf = (Color*)(mem.getData());
+		if (bitmap->readPixels(x, y, width, height, buf)) {
+			ImageDesc desc;
+			desc.width = width;
+			desc.height = height;
+			desc.stride = width;
+			desc.colors = buf;
+			desc.ref = mem.ref;
+			return Image::createStatic(desc);
 		}
-		sl_uint32 width = bitmap->getWidth();
-		sl_uint32 height = bitmap->getHeight();
-		Memory mem = Memory::create((width*height) << 2);
-		if (mem.isNotNull()) {
-			Color* buf = (Color*)(mem.getData());
-			if (bitmap->readPixels(0, 0, width, height, buf)) {
-				ImageDesc desc;
-				desc.width = width;
-				desc.height = height;
-				desc.stride = width;
-				desc.colors = buf;
-				desc.ref = mem.ref;
-				return Image::createStatic(desc);
-			}
-		}
-		return ret;
+		return sl_null;
 	}
 
 	sl_uint32 Image::getWidth() const
@@ -1263,6 +1389,38 @@ namespace slib
 		}
 		return sl_null;
 	}
+	
+	Ref<Image> Image::duplicate() const
+	{
+		return create(m_desc);
+	}
+	
+	Ref<Image> Image::duplicate(RotationMode rotate, FlipMode flip) const
+	{
+		return create(m_desc, rotate, flip);
+	}
+	
+	Ref<Image> Image::duplicate(FlipMode flip) const
+	{
+		return create(m_desc, RotationMode::Rotate0, flip);
+	}
+	
+	Ref<Image> Image::rotateImage(RotationMode rotate, FlipMode flip)
+	{
+		NormalizeRotateAndFlip(rotate, flip);
+		if (rotate == RotationMode::Rotate0 && flip == FlipMode::None) {
+			return this;
+		}
+		return create(m_desc, rotate, flip);
+	}
+	
+	Ref<Image> Image::flipImage(FlipMode flip)
+	{
+		if (flip == FlipMode::None) {
+			return this;
+		}
+		return create(m_desc, RotationMode::Rotate0, flip);
+	}
 
 	ImageFileType Image::getFileType(const void* _mem, sl_size size)
 	{
@@ -1333,7 +1491,7 @@ namespace slib
 			return loadFromMemory(mem, width, height);
 		}
 #if defined(SLIB_PLATFORM_IS_APPLE)
-		Ref<Image> ret = Image::create(Bitmap::loadFromAsset(path));
+		Ref<Image> ret = Image::createCopyBitmap(Bitmap::loadFromAsset(path));
 		if (ret.isNotNull()) {
 			if (width == 0 || height == 0) {
 				return ret;

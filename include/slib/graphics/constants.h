@@ -156,12 +156,32 @@ namespace slib
 		return (FlipMode)((int)a ^ (int)b);
 	};
 	
-	// Convert Flip::Both to Rotate180
+	// Convert Flip::Both to 180 rotation, and then Convert 180 rotation to flip, and then Convert Flip::Vertical to Flip::Horizontal on 90/270 rotation
 	SLIB_INLINE void NormalizeRotateAndFlip(RotationMode& rotation, FlipMode& flip)
 	{
 		if (flip == FlipMode::Both) {
 			rotation = rotation + RotationMode::Rotate180;
 			flip = FlipMode::None;
+			return;
+		}
+		if (flip == FlipMode::None) {
+			return;
+		}
+		if (rotation == RotationMode::Rotate0) {
+			return;
+		}
+		if (rotation == RotationMode::Rotate180) {
+			if (flip == FlipMode::Horizontal) {
+				flip = FlipMode::Vertical;
+			} else { // always FlipMode::Vertical;
+				flip = FlipMode::Horizontal;
+			}
+			rotation = RotationMode::Rotate0;
+			return;
+		}
+		if (flip == FlipMode::Vertical) {
+			rotation = -rotation;
+			flip = FlipMode::Horizontal;
 		}
 	}
 

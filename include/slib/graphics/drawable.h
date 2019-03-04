@@ -339,6 +339,13 @@ namespace slib
 		static Ref<Drawable> apply(const Ref<Drawable>& src, RotationMode rotate, FlipMode flip);
 		
 	public:
+		const Ref<Drawable>& getSource();
+		
+		RotationMode getRotation();
+		
+		FlipMode getFlip();
+		
+	public:
 		sl_real getDrawableWidth() override;
 		
 		sl_real getDrawableHeight() override;

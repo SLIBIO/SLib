@@ -65,19 +65,23 @@ namespace slib
 	public:
 		static Ref<Image> createStatic(const ImageDesc& desc);
 
-		static Ref<Image> createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride = 0);
-
-		static Ref<Image> createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride, Referable* ref);
-
-		static Ref<Image> create(const ImageDesc& desc);
+		static Ref<Image> createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride = 0, Referable* ref = sl_null);
 
 		static Ref<Image> create(sl_uint32 width, sl_uint32 height, const Color* pixels = sl_null, sl_int32 strideSource = 0);
 
-		static Ref<Image> create(const BitmapData& bitmapData);
-	
-		static Ref<Image> create(const Ref<Bitmap>& bitmap);
+		static Ref<Image> create(const ImageDesc& desc);
 
-		static Ref<Image> create(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height);
+		static Ref<Image> create(const ImageDesc& desc, RotationMode rotate, FlipMode flip = FlipMode::None);
+		
+		static Ref<Image> create(const BitmapData& bitmapData);
+
+		static Ref<Image> createCopy(const Ref<Image>& image);
+		
+		static Ref<Image> createCopy(const Ref<Image>& image, RotationMode rotate, FlipMode flip = FlipMode::None);
+
+		static Ref<Image> createCopyBitmap(const Ref<Bitmap>& bitmap);
+
+		static Ref<Image> createCopyBitmap(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height);
 
 	public:
 		sl_uint32 getWidth() const;
@@ -142,6 +146,16 @@ namespace slib
 		Ref<Image> scale(sl_uint32 width, sl_uint32 height, StretchMode stretch = StretchMode::Default) const;
 
 		Ref<Image> scaleToSmall(sl_uint32 requiredWidth, sl_uint32 requiredHeight, StretchMode stretch = StretchMode::Default) const;
+
+		Ref<Image> duplicate() const;
+
+		Ref<Image> duplicate(RotationMode rotate, FlipMode flip = FlipMode::None) const;
+		
+		Ref<Image> duplicate(FlipMode flip) const;
+		
+		Ref<Image> rotateImage(RotationMode rotate, FlipMode flip = FlipMode::None);
+
+		Ref<Image> flipImage(FlipMode flip);
 
 
 		static ImageFileType getFileType(const void* mem, sl_size size);

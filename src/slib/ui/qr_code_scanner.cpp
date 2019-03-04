@@ -196,7 +196,7 @@ namespace slib
 		}
 		Ref<Image> image = Ref<Image>::from(bitmap);
 		if (m_flagYUV) {
-			image = Image::create(image);
+			image = Image::createCopy(image);
 			if (image.isNull()) {
 				return;
 			}
