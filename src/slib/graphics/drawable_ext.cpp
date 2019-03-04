@@ -41,6 +41,7 @@ namespace slib
 		if (width > 0 && height > 0) {
 			Ref<Bitmap> bitmap = Bitmap::create(width, height);
 			if (bitmap.isNotNull()) {
+				bitmap->resetPixels(Color::None);
 				Ref<Canvas> canvas = bitmap->getCanvas();
 				if (canvas.isNotNull()) {
 					canvas->draw(Rectangle(0, 0, (sl_real)width, (sl_real)height), this);
