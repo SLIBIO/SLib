@@ -452,7 +452,7 @@ namespace slib
 		return sl_null;
 	}
 
-	void GraphicsPlatform::drawImage(Canvas* _canvas, const Rectangle& rectDst, cairo_surface_t* image, const Rectangle& rectSrc, const DrawParam& param)
+	void GraphicsPlatform::drawImage(Canvas* _canvas, const Rectangle& rectDst, cairo_surface_t* image, const DrawParam& param)
 	{
 		if (!image) {
 			return;
@@ -469,43 +469,50 @@ namespace slib
 			return;
 		}
 
+		sl_real sw = cairo_image_surface_get_width(image);
+		sl_real sh = cairo_image_surface_get_height(image);
+		if (sw < SLIB_EPSILON || sh < SLIB_EPSILON) {
+			return;
+		}
+
+		cairo_t* graphics = canvas->m_graphics;
+
+		sl_bool flagOpaque = param.isOpaque();
+		sl_real alpha = 1;
+		if (param.useAlpha && !flagOpaque) {
+			alpha = param.alpha;
+		}
+		
+		cairo_save(graphics);
+		cairo_translate(graphics, rectDst.left, rectDst.top);
+		cairo_scale(graphics, dw / sw, dh / sh);
+		cairo_set_source_surface(graphics, image, 0, 0);
+		if (alpha == 1) {
+			cairo_paint(graphics);
+		} else {
+			cairo_paint_with_alpha(graphics, alpha);
+		}
+		cairo_restore(graphics);
+
+	}
+
+	void GraphicsPlatform::drawImage(Canvas* canvas, const Rectangle& rectDst, cairo_surface_t* image, const Rectangle& rectSrc, const DrawParam& param)
+	{
+		sl_real dw = rectDst.getWidth();
+		sl_real dh = rectDst.getHeight();
+		if (dw < SLIB_EPSILON || dh < SLIB_EPSILON) {
+			return;
+		}
 		sl_real sw = rectSrc.getWidth();
 		sl_real sh = rectSrc.getHeight();
 		if (sw < SLIB_EPSILON || sh < SLIB_EPSILON) {
 			return;
 		}
-
-		cairo_pattern_t* pattern = ::cairo_pattern_create_for_surface(image);
-		if (!pattern) {
-			return;
+		cairo_surface_t* sub = cairo_surface_create_for_rectangle(image, rectSrc.left, rectSrc.top, sw, sh);
+		if (sub) {
+			drawImage(canvas, rectDst, sub, param);
+			cairo_surface_destroy(sub);
 		}
-
-		double fw = sw / dw;
-		double fh = sh / dh;
-
-		cairo_matrix_t mat;
-		mat.xx = fw;
-		mat.xy = 0;
-		mat.yx = 0;
-		mat.yy = fh;
-		mat.x0 = rectSrc.left;
-		mat.y0 = rectSrc.top;
-		::cairo_pattern_set_matrix(pattern, &mat);
-
-		if (param.tiled) {
-			::cairo_pattern_set_extend(pattern, CAIRO_EXTEND_REPEAT);
-		}
-		if (canvas->isAntiAlias()) {
-			::cairo_pattern_set_filter(pattern, CAIRO_FILTER_GOOD);
-		}
-
-		cairo_t* graphics = canvas->m_graphics;
-		::cairo_set_source(graphics, pattern);
-		::cairo_rectangle(graphics, rectDst.left, rectDst.top, dw, dh);
-		::cairo_fill(graphics);
-
-		::cairo_pattern_destroy(pattern);
-
 	}
 
 }

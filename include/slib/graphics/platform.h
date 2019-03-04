@@ -121,6 +121,7 @@ namespace slib
 		static Ref<Canvas> createCanvas(CanvasType type, cairo_t* graphics, sl_uint32 width, sl_uint32 height);
 		static cairo_t* getCanvasHandle(Canvas* canvas);
 
+		static void drawImage(Canvas* canvas, const Rectangle& rectDst, cairo_surface_t* image, const DrawParam& param);
 		static void drawImage(Canvas* canvas, const Rectangle& rectDst, cairo_surface_t* image, const Rectangle& rectSrc, const DrawParam& param);
 
 #endif

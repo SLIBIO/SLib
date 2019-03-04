@@ -219,6 +219,12 @@ namespace slib
 			GraphicsPlatform::drawImage(canvas, rectDst, m_bitmap, rectSrc, param);
 		}
 
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
+		{
+			::cairo_surface_flush(m_bitmap);
+			GraphicsPlatform::drawImage(canvas, rectDst, m_bitmap, param);
+		}
+
 	};
 
 	SLIB_DEFINE_OBJECT(_priv_Cairo_Bitmap, Bitmap)
