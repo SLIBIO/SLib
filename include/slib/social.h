@@ -29,6 +29,7 @@
 #include "social/twitter.h"
 #include "social/linkedin.h"
 #include "social/pinterest.h"
+#include "social/ebay.h"
 #include "social/etsy.h"
 
 #endif
