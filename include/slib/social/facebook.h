@@ -152,6 +152,8 @@ namespace slib
 		static void login(const FacebookLoginParam& param);
 		
 		static void login(const Function<void(FacebookLoginResult& result)>& onComplete);
+		
+		static void clearAccessToken();
 
 		static Ref<Facebook> getInstance();
 

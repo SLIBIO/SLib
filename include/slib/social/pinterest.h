@@ -92,9 +92,6 @@ namespace slib
 		
 		void getUser(const String& userId, const Function<void(PinterestResult&, PinterestUser&)>& onComplete);
 		
-	protected:
-		String m_version;
-		
 	};
 	
 }
