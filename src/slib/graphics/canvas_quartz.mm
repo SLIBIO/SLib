@@ -587,6 +587,11 @@ namespace slib
 			}
 		}
 		
+		sl_real alpha = 1;
+		if (param.useAlpha && !flagOpaque) {
+			alpha = param.alpha;
+		}
+		
 		if (ciImage != nil) {
 #if defined(SLIB_PLATFORM_IS_MACOS)
 			NSGraphicsContext* oldContext = [NSGraphicsContext currentContext];
@@ -620,7 +625,7 @@ namespace slib
 			rectSrc.origin.y = 0;
 			rectSrc.size.width = CGImageGetWidth(image);
 			rectSrc.size.height = CGImageGetHeight(image);
-			[ciImage drawInRect:rectDst fromRect:rectSrc operation:NSCompositeSourceOver fraction:((flagOpaque?1:param.alpha) * canvas->getAlpha())];
+			[ciImage drawInRect:rectDst fromRect:rectSrc operation:NSCompositeSourceOver fraction:(alpha * canvas->getAlpha())];
 
 			if (!flagFlipY) {
 				CGContextRestoreGState(graphics);
@@ -636,7 +641,7 @@ namespace slib
 				flagFlipY = flagFlipY;
 			}
 
-			[[UIImage imageWithCIImage:ciImage] drawInRect:rectDst blendMode:kCGBlendModeNormal alpha:((flagOpaque?1:param.alpha) * canvas->getAlpha())];
+			[[UIImage imageWithCIImage:ciImage] drawInRect:rectDst blendMode:kCGBlendModeNormal alpha:(alpha * canvas->getAlpha())];
 
 			if (flagFlipY) {
 				CGContextRestoreGState(graphics);
@@ -655,7 +660,7 @@ namespace slib
 				CGContextSaveGState(graphics);
 			}
 			if (!flagOpaque) {
-				CGContextSetAlpha(graphics, canvas->getAlpha() * param.alpha);
+				CGContextSetAlpha(graphics, canvas->getAlpha() * alpha);
 			}
 			
 			CGRect rectDst;
