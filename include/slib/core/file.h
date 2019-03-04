@@ -113,11 +113,10 @@ namespace slib
 		SLIB_DECLARE_OBJECT
 	
 	private:
-		String m_path;
 		sl_file m_file;
-	
-	private:
-		File();
+
+	public:
+		File(sl_file file);
 	
 		~File();
 	
@@ -154,10 +153,12 @@ namespace slib
 		void close() override;
 
 		sl_bool isOpened() const;
-	
-		String getPath() const;
-	
+		
 		sl_file getHandle() const;
+		
+		void setHandle(sl_file handle);
+		
+		void clearHandle();
 
 		sl_uint64 getPosition() override;
 

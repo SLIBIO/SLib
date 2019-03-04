@@ -30,9 +30,8 @@ namespace slib
 
 	SLIB_DEFINE_OBJECT(File, IO)
 
-	File::File()
+	File::File(sl_file file): m_file(file)
 	{
-		m_file = SLIB_FILE_INVALID_HANDLE;
 	}
 
 	File::~File()
@@ -44,16 +43,11 @@ namespace slib
 	{
 		sl_file file = _open(filePath, mode, permissions);
 		if (file != SLIB_FILE_INVALID_HANDLE) {
-			Ref<File> ret = new File();
-			if (ret.isNotNull()) {
-				ret->m_file = file;
-				ret->m_path = filePath;
-				if (mode & FileMode::SeekToEnd) {
-					ret->seekToEnd();
-				}
-				return ret;
+			Ref<File> ret = new File(file);
+			if (mode & FileMode::SeekToEnd) {
+				ret->seekToEnd();
 			}
-			_close(file);
+			return ret;
 		}
 		return sl_null;
 	}
@@ -122,14 +116,19 @@ namespace slib
 		return m_file != SLIB_FILE_INVALID_HANDLE;
 	}
 
-	String File::getPath() const
-	{
-		return m_path;
-	}
-
 	sl_file File::getHandle() const
 	{
 		return m_file;
+	}
+	
+	void File::setHandle(sl_file handle)
+	{
+		m_file = handle;
+	}
+	
+	void File::clearHandle()
+	{
+		m_file = SLIB_FILE_INVALID_HANDLE;
 	}
 
 	sl_uint64 File::getSize()

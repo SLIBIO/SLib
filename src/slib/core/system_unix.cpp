@@ -283,6 +283,7 @@ namespace slib
 	public:
 		String m_name;
 		Ref<File> m_file;
+		String m_filePath;
 		
 	public:
 		_priv_GlobalUniqueInstance()
@@ -293,7 +294,7 @@ namespace slib
 		{
 			m_file->unlock();
 			m_file->close();
-			File::deleteFile(m_file->getPath());
+			File::deleteFile(m_filePath);
 			_priv_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
 			if (list) {
 				list->remove(m_name);
@@ -319,17 +320,18 @@ namespace slib
 		
 		Ref<_priv_GlobalUniqueInstance> instance = new _priv_GlobalUniqueInstance;
 		if (instance.isNotNull()) {
-			String fileName = "/tmp/.slib_global_lock_" + name;
-			Ref<File> file = File::openForWrite(fileName);
+			String filePath = "/tmp/.slib_global_lock_" + name;
+			Ref<File> file = File::openForWrite(filePath);
 			if (file.isNotNull()) {
 				if (file->lock()) {
 					instance->m_name = name;
 					instance->m_file = file;
+					instance->m_filePath = filePath;
 					list->add(name);
 					return instance;
 				}
 				file->close();
-				File::deleteFile(fileName);
+				File::deleteFile(filePath);
 			}
 		}
 		return sl_null;
