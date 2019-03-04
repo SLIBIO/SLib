@@ -1131,7 +1131,7 @@ namespace slib
 		HashMap<String, String> ret;
 		sl_char8* buf = (sl_char8*)data;
 		sl_size start = 0;
-		sl_size indexSplit = 0;
+		sl_reg indexSplit = -1;
 		sl_size pos = 0;
 		for (; pos <= len; pos++) {
 			sl_char8 ch;
@@ -1141,9 +1141,11 @@ namespace slib
 				ch = buf[pos];
 			}
 			if (ch == '=') {
-				indexSplit = pos;
+				if (indexSplit < 0) {
+					indexSplit = pos;
+				}
 			} else if (ch == '&') {
-				if (indexSplit > start) {
+				if (indexSplit > (sl_reg)start) {
 					String name = String::fromUtf8(buf + start, indexSplit - start);
 					indexSplit++;
 					String value = String::fromUtf8(buf + indexSplit, pos - indexSplit);
@@ -1154,7 +1156,7 @@ namespace slib
 					ret.add_NoLock(name, String::null());
 				}
 				start = pos + 1;
-				indexSplit = start;
+				indexSplit = -1;
 			}
 		}
 		return ret;
