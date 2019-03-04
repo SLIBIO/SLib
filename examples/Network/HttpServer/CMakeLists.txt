@@ -8,6 +8,5 @@ add_executable(ExampleHttpServer main.cpp)
 target_link_libraries (
   ExampleHttpServer
   slib
-  zlib
   pthread
 )

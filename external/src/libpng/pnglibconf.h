@@ -22,7 +22,7 @@
 #	else
 #		define PNG_ARM_NEON_CHECK_SUPPORTED
 #		if defined(__ANDROID__)
-#	    	define PNG_ARM_NEON_FILE "contrib/arm-neon/android-ndk.c"
+#	    	define PNG_ARM_NEON_FILE "../contrib/arm-neon/android-ndk.c"
 #		endif
 #	endif
 #else

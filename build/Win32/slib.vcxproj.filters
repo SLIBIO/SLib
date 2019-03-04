@@ -46,6 +46,18 @@
     <Filter Include="res">
       <UniqueIdentifier>{572efd35-6590-4275-b55f-ca4f6a47928f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="external">
+      <UniqueIdentifier>{00282b1a-ca51-4d8f-9fd1-265ce8cb1975}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\zlib">
+      <UniqueIdentifier>{e11a6e96-ca72-43ec-9ad2-6d1cc49da91c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\libpng">
+      <UniqueIdentifier>{1fe06a41-787f-4ae4-b803-dacedeb1c14e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\libjpeg">
+      <UniqueIdentifier>{c2cc6705-3a2b-4638-a9f2-fca0fb708924}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\slib\core\async_config.h">
@@ -952,6 +964,243 @@
     </ClCompile>
     <ClCompile Include="..\..\src\slib\social\pinterest.cpp">
       <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\ebay.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\adler32.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\compress.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\crc32.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\deflate.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\gzclose.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\gzlib.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\gzread.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\gzwrite.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\infback.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\inffast.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\inflate.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\inftrees.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\trees.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\uncompr.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\zlib\zutil.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\png.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\pngerror.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\pngget.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\pngmem.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\pngpread.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\pngread.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\pngrio.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\pngrtran.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\pngrutil.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\pngset.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\pngtrans.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\pngwio.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\pngwrite.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\pngwtran.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\pngwutil.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\intel\filter_sse2_intrinsics.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libpng\intel\intel_init.c">
+      <Filter>external\libpng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jaricom.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jcapimin.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jcapistd.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jcarith.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jccoefct.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jccolor.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jcdctmgr.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jchuff.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jcinit.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jcmainct.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jcmarker.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jcmaster.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jcomapi.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jcparam.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jcprepct.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jcsample.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jctrans.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdapimin.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdapistd.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdarith.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdatadst.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdatasrc.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdcoefct.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdcolor.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jddctmgr.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdhuff.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdinput.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdmainct.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdmarker.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdmaster.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdmerge.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdpostct.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdsample.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jdtrans.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jerror.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jfdctflt.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jfdctfst.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jfdctint.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jidctflt.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jidctfst.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jidctint.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jmemmgr.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jmemnobs.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jquant1.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jquant2.c">
+      <Filter>external\libjpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\libjpeg\jutils.c">
+      <Filter>external\libjpeg</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

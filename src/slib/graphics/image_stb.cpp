@@ -43,6 +43,9 @@ namespace slib
 
 	Ref<Image> Image::loadSTB(const void* content, sl_size size)
 	{
+		if (!content || !size) {
+			return sl_null;
+		}
 		Ref<Image> ret;
 		int width = 0;
 		int height = 0;
@@ -62,6 +65,9 @@ namespace slib
 
 	Ref<AnimationDrawable> Image::loadSTB_GIF(const void* content, sl_size size)
 	{
+		if (!content || !size) {
+			return sl_null;
+		}
 		Ref<AnimationDrawable> ret;
 		int* delays = sl_null;
 		int width = 0;

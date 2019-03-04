@@ -2,6 +2,8 @@
 /* This file also works for Borland C++ 32-bit (bcc32) on Windows 9x or NT. */
 /* see jconfig.txt for explanations */
 
+#include "libjpeg_slib.h"
+
 #define HAVE_PROTOTYPES
 #define HAVE_UNSIGNED_CHAR
 #define HAVE_UNSIGNED_SHORT

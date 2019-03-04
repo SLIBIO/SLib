@@ -262,7 +262,6 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/media/codec_opus.cpp"
  "${SLIB_PATH}/src/slib/media/codec_vpx.cpp"
  "${SLIB_PATH}/src/slib/media/media_player.cpp"
- "${SLIB_PATH}/src/slib/media/take_photo.cpp"
  "${SLIB_PATH}/src/slib/media/video_capture.cpp"
  "${SLIB_PATH}/src/slib/media/video_codec.cpp"
  "${SLIB_PATH}/src/slib/media/video_frame.cpp"
@@ -289,6 +288,7 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/web/web_controller.cpp"
  "${SLIB_PATH}/src/slib/web/web_service.cpp"
 
+ "${SLIB_PATH}/src/slib/social/ebay.cpp"
  "${SLIB_PATH}/src/slib/social/etsy.cpp"
  "${SLIB_PATH}/src/slib/social/etsy_login.cpp"
  "${SLIB_PATH}/src/slib/social/facebook.cpp"
@@ -376,7 +376,6 @@ if(ANDROID)
   "${SLIB_PATH}/src/slib/media/audio_recorder_android.cpp"
   "${SLIB_PATH}/src/slib/media/camera_android.cpp"
   "${SLIB_PATH}/src/slib/media/media_player_android.cpp"
-  "${SLIB_PATH}/src/slib/media/take_photo_android.cpp"
 
   "${SLIB_PATH}/src/slib/device/device_android.cpp"
   "${SLIB_PATH}/src/slib/device/sensor_android.cpp"
@@ -419,12 +418,120 @@ else ()
  )
 endif()
 
+set (ZLIB_ROOT_DIR "${SLIB_PATH}/external/src/zlib")
+set (
+ ZLIB_FILES
+ "${ZLIB_ROOT_DIR}/adler32.c"
+ "${ZLIB_ROOT_DIR}/compress.c"
+ "${ZLIB_ROOT_DIR}/crc32.c"
+ "${ZLIB_ROOT_DIR}/deflate.c"
+ "${ZLIB_ROOT_DIR}/gzclose.c"
+ "${ZLIB_ROOT_DIR}/gzlib.c"
+ "${ZLIB_ROOT_DIR}/gzread.c"
+ "${ZLIB_ROOT_DIR}/gzwrite.c"
+ "${ZLIB_ROOT_DIR}/infback.c"
+ "${ZLIB_ROOT_DIR}/inffast.c"
+ "${ZLIB_ROOT_DIR}/inflate.c"
+ "${ZLIB_ROOT_DIR}/inftrees.c"
+ "${ZLIB_ROOT_DIR}/trees.c"
+ "${ZLIB_ROOT_DIR}/uncompr.c"
+ "${ZLIB_ROOT_DIR}/zutil.c"
+)
+
+set (LIBPNG_ROOT_DIR "${SLIB_PATH}/external/src/libpng")
+set (
+ LIBPNG_FILES
+ "${LIBPNG_ROOT_DIR}/png.c"
+ "${LIBPNG_ROOT_DIR}/pngerror.c"
+ "${LIBPNG_ROOT_DIR}/pngget.c"
+ "${LIBPNG_ROOT_DIR}/pngmem.c"
+ "${LIBPNG_ROOT_DIR}/pngpread.c"
+ "${LIBPNG_ROOT_DIR}/pngread.c"
+ "${LIBPNG_ROOT_DIR}/pngrio.c"
+ "${LIBPNG_ROOT_DIR}/pngrtran.c"
+ "${LIBPNG_ROOT_DIR}/pngrutil.c"
+ "${LIBPNG_ROOT_DIR}/pngset.c"
+ "${LIBPNG_ROOT_DIR}/pngtrans.c"
+ "${LIBPNG_ROOT_DIR}/pngwio.c"
+ "${LIBPNG_ROOT_DIR}/pngwrite.c"
+ "${LIBPNG_ROOT_DIR}/pngwtran.c"
+ "${LIBPNG_ROOT_DIR}/pngwutil.c"
+)
+if (SLIB_ARM)
+ list (
+  APPEND LIBPNG_FILES
+  "${LIBPNG_ROOT_DIR}/arm/arm_init.c"
+  "${LIBPNG_ROOT_DIR}/arm/filter_neon_intrinsics.c"
+ )
+endif ()
+if (SLIB_X86)
+ list (
+  APPEND LIBPNG_FILES
+  "${LIBPNG_ROOT_DIR}/intel/intel_init.c"
+  "${LIBPNG_ROOT_DIR}/intel/filter_sse2_intrinsics.c"
+ )
+endif ()
+
+set (LIBJPEG_ROOT_DIR "${SLIB_PATH}/external/src/libjpeg")
+set (
+ LIBJPEG_FILES
+ "${LIBJPEG_ROOT_DIR}/jaricom.c"
+ "${LIBJPEG_ROOT_DIR}/jcapimin.c"
+ "${LIBJPEG_ROOT_DIR}/jcapistd.c"
+ "${LIBJPEG_ROOT_DIR}/jcarith.c"
+ "${LIBJPEG_ROOT_DIR}/jccoefct.c"
+ "${LIBJPEG_ROOT_DIR}/jccolor.c"
+ "${LIBJPEG_ROOT_DIR}/jcdctmgr.c"
+ "${LIBJPEG_ROOT_DIR}/jchuff.c"
+ "${LIBJPEG_ROOT_DIR}/jcinit.c"
+ "${LIBJPEG_ROOT_DIR}/jcmainct.c"
+ "${LIBJPEG_ROOT_DIR}/jcmarker.c"
+ "${LIBJPEG_ROOT_DIR}/jcmaster.c"
+ "${LIBJPEG_ROOT_DIR}/jcomapi.c"
+ "${LIBJPEG_ROOT_DIR}/jcparam.c"
+ "${LIBJPEG_ROOT_DIR}/jcprepct.c"
+ "${LIBJPEG_ROOT_DIR}/jcsample.c"
+ "${LIBJPEG_ROOT_DIR}/jctrans.c"
+ "${LIBJPEG_ROOT_DIR}/jdapimin.c"
+ "${LIBJPEG_ROOT_DIR}/jdapistd.c"
+ "${LIBJPEG_ROOT_DIR}/jdarith.c"
+ "${LIBJPEG_ROOT_DIR}/jdatadst.c"
+ "${LIBJPEG_ROOT_DIR}/jdatasrc.c"
+ "${LIBJPEG_ROOT_DIR}/jdcoefct.c"
+ "${LIBJPEG_ROOT_DIR}/jdcolor.c"
+ "${LIBJPEG_ROOT_DIR}/jddctmgr.c"
+ "${LIBJPEG_ROOT_DIR}/jdhuff.c"
+ "${LIBJPEG_ROOT_DIR}/jdinput.c"
+ "${LIBJPEG_ROOT_DIR}/jdmainct.c"
+ "${LIBJPEG_ROOT_DIR}/jdmarker.c"
+ "${LIBJPEG_ROOT_DIR}/jdmaster.c"
+ "${LIBJPEG_ROOT_DIR}/jdmerge.c"
+ "${LIBJPEG_ROOT_DIR}/jdpostct.c"
+ "${LIBJPEG_ROOT_DIR}/jdsample.c"
+ "${LIBJPEG_ROOT_DIR}/jdtrans.c"
+ "${LIBJPEG_ROOT_DIR}/jerror.c"
+ "${LIBJPEG_ROOT_DIR}/jfdctflt.c"
+ "${LIBJPEG_ROOT_DIR}/jfdctfst.c"
+ "${LIBJPEG_ROOT_DIR}/jfdctint.c"
+ "${LIBJPEG_ROOT_DIR}/jidctflt.c"
+ "${LIBJPEG_ROOT_DIR}/jidctfst.c"
+ "${LIBJPEG_ROOT_DIR}/jidctint.c"
+ "${LIBJPEG_ROOT_DIR}/jmemmgr.c"
+ "${LIBJPEG_ROOT_DIR}/jmemnobs.c"
+ "${LIBJPEG_ROOT_DIR}/jquant1.c"
+ "${LIBJPEG_ROOT_DIR}/jquant2.c"
+ "${LIBJPEG_ROOT_DIR}/jutils.c"
+)
+
 add_library (
  slib STATIC
  ${SLIB_CORE_FILES}
  ${SLIB_CORE_PLATFORM_FILES}
  ${SLIB_EXTRA_FILES}
  ${SLIB_EXTRA_PLATFORM_FILES}
+ ${ZLIB_FILES}
+ ${LIBPNG_FILES}
+ ${LIBJPEG_FILES}
 )
 set_target_properties (
  slib
@@ -432,9 +539,6 @@ set_target_properties (
  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_LIB_PATH}"
 )
 
-include ("${CMAKE_CURRENT_LIST_DIR}/external/zlib.cmake")
-include ("${CMAKE_CURRENT_LIST_DIR}/external/libpng.cmake")
-include ("${CMAKE_CURRENT_LIST_DIR}/external/libjpeg.cmake")
 include ("${CMAKE_CURRENT_LIST_DIR}/external/freetype.cmake")
 include ("${CMAKE_CURRENT_LIST_DIR}/external/sqlite.cmake")
 include ("${CMAKE_CURRENT_LIST_DIR}/external/yasm.cmake")

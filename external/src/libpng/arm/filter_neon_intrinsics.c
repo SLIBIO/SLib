@@ -12,6 +12,8 @@
  * and license in png.h
  */
 
+#if defined(__arm64__) || defined(__arm64) || defined(__aarch64__) || defined(__arm__) || defined(__arm) || defined(ARM) || defined(_ARM_) || defined(__ARM__) || defined(_M_ARM)
+
 #include "../pngpriv.h"
 
 #ifdef PNG_READ_SUPPORTED
@@ -385,3 +387,5 @@ png_read_filter_row_paeth4_neon(png_row_infop row_info, png_bytep row,
 #endif /* PNG_ARM_NEON_OPT > 0 */
 #endif /* PNG_ARM_NEON_IMPLEMENTATION == 1 (intrinsics) */
 #endif /* READ */
+
+#endif

@@ -24,6 +24,10 @@
 
 #include "zlib/zlib.h"
 
+#undef compress
+#undef adler32
+#undef crc32
+
 #define STREAM ((z_stream*)(this->m_stream))
 #define GZIP_HEADER ((gz_header*)(this->m_gzipHeader))
 
@@ -327,7 +331,7 @@ namespace slib
 			if (size < n) {
 				n = (sl_uint32)size;
 			}
-			adler = (sl_uint32)(::adler32(adler, (Bytef*)data, n));
+			adler = (sl_uint32)(::slib_z_adler32(adler, (Bytef*)data, n));
 			size -= n;
 			data += n;
 		}
@@ -357,7 +361,7 @@ namespace slib
 			if (size < n) {
 				n = (sl_uint32)size;
 			}
-			crc = (sl_uint32)(::crc32(crc, (Bytef*)data, n));
+			crc = (sl_uint32)(::slib_z_crc32(crc, (Bytef*)data, n));
 			size -= n;
 			data += n;
 		}

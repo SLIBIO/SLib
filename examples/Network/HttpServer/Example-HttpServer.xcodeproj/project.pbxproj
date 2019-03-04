@@ -243,7 +243,6 @@
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)";
 				OTHER_LDFLAGS = (
 					"-lslib",
-					"-lzlib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -257,7 +256,6 @@
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)";
 				OTHER_LDFLAGS = (
 					"-lslib",
-					"-lzlib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

@@ -28,48 +28,6 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "26D15F5E1E93D963003BD61A"
-               BuildableName = "libzlib.a"
-               BlueprintName = "zlib"
-               ReferencedContainer = "container:SLib.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "26D15F6D1E93D98D003BD61A"
-               BuildableName = "libpng.a"
-               BlueprintName = "png"
-               ReferencedContainer = "container:SLib.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "26D15F771E93D9B0003BD61A"
-               BuildableName = "libjpeg.a"
-               BlueprintName = "jpeg"
-               ReferencedContainer = "container:SLib.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "26D15F811E93D9C7003BD61A"
                BuildableName = "libfreetype.a"
                BlueprintName = "freetype"
@@ -155,6 +113,15 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "26D9D7F11E9628E0005F7BD3"
+            BuildableName = "libslib.a"
+            BlueprintName = "slib"
+            ReferencedContainer = "container:SLib.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -186,6 +153,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "26D9D7F11E9628E0005F7BD3"
+            BuildableName = "libslib.a"
+            BlueprintName = "slib"
+            ReferencedContainer = "container:SLib.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

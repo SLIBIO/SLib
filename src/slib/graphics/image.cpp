@@ -1292,6 +1292,13 @@ namespace slib
 
 	Ref<Image> Image::loadFromMemory(const void* mem, sl_size size, sl_uint32 width, sl_uint32 height)
 	{
+		ImageFileType type = getFileType(mem, size);
+		if (type == ImageFileType::JPEG) {
+			return loadJPEG(mem, size);
+		}
+		if (type == ImageFileType::PNG) {
+			return loadPNG(mem, size);
+		}
 		Ref<Image> ret = loadSTB(mem, size);
 		if (ret.isNotNull()) {
 			if (width == 0 || height == 0) {

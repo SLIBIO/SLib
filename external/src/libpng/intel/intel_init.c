@@ -12,6 +12,8 @@
  * and license in png.h
  */
 
+#if defined(__amd64__) || defined(__x86_64__) || defined(_M_X64) || defined(_M_AMD64) || defined(i386) || defined(__i386) || defined(__i386__) || defined(_X86_) || defined(_M_IX86) || defined(EMSCRIPTEN)
+
 #include "../pngpriv.h"
 
 #ifdef PNG_READ_SUPPORTED
@@ -51,3 +53,5 @@ png_init_filter_functions_sse2(png_structp pp, unsigned int bpp)
 
 #endif /* PNG_INTEL_SSE_IMPLEMENTATION > 0 */
 #endif /* PNG_READ_SUPPORTED */
+
+#endif

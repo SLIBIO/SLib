@@ -12,6 +12,9 @@
 /* Below, after checking __linux__, various non-C90 POSIX 1003.1 functions are
  * called.
  */
+
+#if defined(__arm64__) || defined(__arm64) || defined(__aarch64__) || defined(__arm__) || defined(__arm) || defined(ARM) || defined(_ARM_) || defined(__ARM__) || defined(_M_ARM)
+
 #define _POSIX_SOURCE 1
 
 #include "../pngpriv.h"
@@ -35,7 +38,7 @@
  */
 #ifndef PNG_ARM_NEON_FILE
 #  ifdef __linux__
-#     define PNG_ARM_NEON_FILE "contrib/arm-neon/linux.c"
+#     define PNG_ARM_NEON_FILE "../contrib/arm-neon/linux.c"
 #  endif
 #endif
 
@@ -134,3 +137,5 @@ png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
 }
 #endif /* PNG_ARM_NEON_OPT > 0 */
 #endif /* READ */
+
+#endif

@@ -20,6 +20,8 @@
 #ifndef PNGCONF_H
 #define PNGCONF_H
 
+#include "png_slib.h"
+
 #ifndef PNG_BUILDING_SYMBOL_TABLE /* else includes may cause problems */
 
 /* From libpng 1.6.0 libpng requires an ANSI X3.159-1989 ("ISOC90") compliant C

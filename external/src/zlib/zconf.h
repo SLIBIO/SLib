@@ -8,6 +8,8 @@
 #ifndef ZCONF_H
 #define ZCONF_H
 
+#include "zlib_slib.h"
+
 /*******  Custom configurations by SLib   *******/
 #if defined(__APPLE__) || defined(__linux__)
 #	include <unistd.h>

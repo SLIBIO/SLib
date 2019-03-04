@@ -32,6 +32,9 @@ namespace slib
 
 	Ref<Image> Image::loadPNG(const void* content, sl_size size)
 	{
+		if (!content || !size) {
+			return sl_null;
+		}
 		png_image image;
 		Base::resetMemory(&image, 0, sizeof(image));
 		image.version = PNG_IMAGE_VERSION;

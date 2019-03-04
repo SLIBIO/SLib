@@ -53,6 +53,9 @@ namespace slib
 
 	Ref<Image> Image::loadJPEG(const void* content, sl_size size)
 	{
+		if (!content || !size) {
+			return sl_null;
+		}
 		jpeg_decompress_struct cinfo;
 		_slib_image_ext_jpeg_error_mgr jerr;
 		cinfo.err = jpeg_std_error(&(jerr.pub));
