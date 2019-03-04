@@ -661,6 +661,7 @@ namespace slib
 				}
 			case WM_LBUTTONDBLCLK:
 				{
+					onEventMouse(UIAction::LeftButtonDown, wParam, lParam);
 					return onEventMouse(UIAction::LeftButtonDoubleClick, wParam, lParam);
 				}
 			case WM_LBUTTONUP:
@@ -678,6 +679,7 @@ namespace slib
 				}
 			case WM_RBUTTONDBLCLK:
 				{
+					onEventMouse(UIAction::RightButtonDown, wParam, lParam);
 					return onEventMouse(UIAction::RightButtonDoubleClick, wParam, lParam);
 				}
 			case WM_RBUTTONUP:
@@ -695,6 +697,7 @@ namespace slib
 				}
 			case WM_MBUTTONDBLCLK:
 				{
+					onEventMouse(UIAction::MiddleButtonDown, wParam, lParam);
 					return onEventMouse(UIAction::MiddleButtonDoubleClick, wParam, lParam);
 				}
 			case WM_MBUTTONUP:
