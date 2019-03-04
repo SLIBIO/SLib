@@ -90,6 +90,7 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(reload, "_reload", "(Landroid/view/View;)V");
 		SLIB_JNI_STATIC_METHOD(runJavaScript, "_runJavaScript", "(Landroid/view/View;Ljava/lang/String;)V");
 		SLIB_JNI_STATIC_METHOD(clearCache, "_clearCache", "(Landroid/view/View;)V");
+		SLIB_JNI_STATIC_METHOD(clearCookie, "_clearCookie", "(Landroid/view/View;)V");
 		SLIB_JNI_STATIC_METHOD(setCustomUserAgent, "_setCustomUserAgent", "(Landroid/view/View;Ljava/lang/String;)V");
 
 		SLIB_JNI_NATIVE(nativeOnStartLoad, "nativeOnStartLoad", "(JLjava/lang/String;)V", _priv_WebView::nativeOnStartLoad);
@@ -189,6 +190,14 @@ namespace slib
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			JAndroidWebView::clearCache.call(sl_null, handle);
+		}
+	}
+
+	void WebView::_clearCookie_NW()
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			JAndroidWebView::clearCookie.call(sl_null, handle);
 		}
 	}
 
