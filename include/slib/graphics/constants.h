@@ -127,7 +127,22 @@ namespace slib
 		Rotate180 = 180,
 		Rotate270 = 270
 	};
+	
+	constexpr RotationMode operator+(RotationMode a, RotationMode b)
+	{
+		return (RotationMode)(((int)a + (int)b) % 360);
+	}
 
+	constexpr RotationMode operator-(RotationMode a, RotationMode b)
+	{
+		return (RotationMode)(((int)a + 360 - (int)b) % 360);
+	}
+	
+	constexpr RotationMode operator-(RotationMode a)
+	{
+		return (RotationMode)((360 - (int)a) % 360);
+	}
+	
 	enum class FlipMode
 	{
 		None = 0,
@@ -135,6 +150,20 @@ namespace slib
 		Vertical = 2,
 		Both = 3 // Same effect with `RotationMode::Rotate180`
 	};
+	
+	constexpr FlipMode operator*(FlipMode a, FlipMode b)
+	{
+		return (FlipMode)((int)a ^ (int)b);
+	};
+	
+	// Convert Flip::Both to Rotate180
+	SLIB_INLINE void NormalizeRotateAndFlip(RotationMode& rotation, FlipMode& flip)
+	{
+		if (flip == FlipMode::Both) {
+			rotation = rotation + RotationMode::Rotate180;
+			flip = FlipMode::None;
+		}
+	}
 
 	enum class ScaleMode
 	{

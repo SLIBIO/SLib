@@ -81,6 +81,7 @@ namespace slib
 	};
 	
 	class ImageDesc;
+	class Bitmap;
 	class Image;
 	class Canvas;
 	
@@ -111,8 +112,12 @@ namespace slib
 
 	public:
 		sl_bool isBitmap();
+		
+		Ref<Bitmap> toBitmap();
 
 		sl_bool isImage();
+		
+		Ref<Image> toImage();
 		
 		sl_bool isColor();
 		
@@ -127,6 +132,10 @@ namespace slib
 		Ref<Drawable> filter(const ColorMatrix& colorMatrix, sl_real alpha = 1, sl_real blurRadius = 0);
 
 		Ref<Drawable> filter(sl_real alpha, sl_real blurRadius = 0);
+		
+		Ref<Drawable> rotate(RotationMode rotate, FlipMode flip = FlipMode::None);
+		
+		Ref<Drawable> flip(FlipMode flip);
 
 	public:
 		static Ref<Drawable> createColorDrawable(const Color& color);
@@ -144,6 +153,10 @@ namespace slib
 		static Ref<Drawable> filter(const Ref<Drawable>& src, const ColorMatrix& colorMatrix, sl_real alpha = 1, sl_real blurRadius = 0);
 
 		static Ref<Drawable> filter(const Ref<Drawable>& src, sl_real alpha, sl_real blurRadius = 0);
+
+		static Ref<Drawable> rotate(const Ref<Drawable>& src, RotationMode rotate, FlipMode flip = FlipMode::None);
+		
+		static Ref<Drawable> flip(const Ref<Drawable>& src, FlipMode flip);
 
 	};
 	
@@ -311,6 +324,34 @@ namespace slib
 		sl_real m_width;
 		sl_real m_height;
 
+	};
+	
+	class SLIB_EXPORT RotateFlipDrawable : public Drawable
+	{
+		SLIB_DECLARE_OBJECT
+		
+	protected:
+		RotateFlipDrawable();
+		
+		~RotateFlipDrawable();
+		
+	public:
+		static Ref<Drawable> apply(const Ref<Drawable>& src, RotationMode rotate, FlipMode flip);
+		
+	public:
+		sl_real getDrawableWidth() override;
+		
+		sl_real getDrawableHeight() override;
+		
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
+		
+		sl_bool getAnimationInfo(DrawableAnimationInfo* info) override;
+		
+	protected:
+		Ref<Drawable> m_src;
+		RotationMode m_rotate;
+		FlipMode m_flip;
+		
 	};
 	
 	class SLIB_EXPORT FilterDrawable : public Drawable

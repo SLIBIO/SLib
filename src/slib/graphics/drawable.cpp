@@ -156,7 +156,7 @@ namespace slib
 	{
 		return IsInstanceOf<Bitmap>(this);
 	}
-
+	
 	sl_bool Drawable::isImage()
 	{
 		return IsInstanceOf<Image>(this);
@@ -198,6 +198,16 @@ namespace slib
 	Ref<Drawable> Drawable::filter(sl_real alpha, sl_real blurRadius)
 	{
 		return FilterDrawable::create(this, alpha, blurRadius);
+	}
+
+	Ref<Drawable> Drawable::rotate(RotationMode rotate, FlipMode flip)
+	{
+		return RotateFlipDrawable::apply(this, rotate, flip);
+	}
+	
+	Ref<Drawable> Drawable::flip(FlipMode flip)
+	{
+		return RotateFlipDrawable::apply(this, RotationMode::Rotate0, flip);
 	}
 
 	Ref<Drawable> Drawable::createColorDrawable(const Color& color)
@@ -244,18 +254,22 @@ namespace slib
 
 	Ref<Drawable> Drawable::filter(const Ref<Drawable>& src, const ColorMatrix& colorMatrix, sl_real alpha, sl_real blurRadius)
 	{
-		if (src.isNotNull()) {
-			return src->filter(colorMatrix, alpha, blurRadius);
-		}
-		return sl_null;
+		return FilterDrawable::create(src, colorMatrix, alpha, blurRadius);
 	}
 
 	Ref<Drawable> Drawable::filter(const Ref<Drawable>& src, sl_real alpha, sl_real blurRadius)
 	{
-		if (src.isNotNull()) {
-			return src->filter(alpha, blurRadius);
-		}
-		return sl_null;
+		return FilterDrawable::create(src, alpha, blurRadius);
+	}
+
+	Ref<Drawable> Drawable::rotate(const Ref<Drawable>& src, RotationMode rotate, FlipMode flip)
+	{
+		return RotateFlipDrawable::apply(src, rotate, flip);
+	}
+	
+	Ref<Drawable> Drawable::flip(const Ref<Drawable>& src, FlipMode flip)
+	{
+		return RotateFlipDrawable::apply(src, RotationMode::Rotate0, flip);
 	}
 
 
@@ -555,6 +569,102 @@ namespace slib
 	}
 
 	sl_bool ScaledSubDrawable::getAnimationInfo(DrawableAnimationInfo* info)
+	{
+		return m_src->getAnimationInfo(info);
+	}
+	
+	
+	SLIB_DEFINE_OBJECT(RotateFlipDrawable, Drawable)
+	
+	RotateFlipDrawable::RotateFlipDrawable()
+	{
+		m_rotate = RotationMode::Rotate0;
+		m_flip = FlipMode::None;
+	}
+	
+	RotateFlipDrawable::~RotateFlipDrawable()
+	{
+	}
+	
+	Ref<Drawable> RotateFlipDrawable::apply(const Ref<Drawable>& src, RotationMode rotate, FlipMode flip)
+	{
+		if (src.isNull()) {
+			return sl_null;
+		}
+		NormalizeRotateAndFlip(rotate, flip);
+		if (rotate == RotationMode::Rotate0 && flip == FlipMode::None) {
+			return src;
+		}
+		if (RotateFlipDrawable* rf = CastInstance<RotateFlipDrawable>(src.get())) {
+			RotationMode rotateNew = rf->m_rotate;
+			FlipMode flipNew = rf->m_flip;
+			if (flipNew == FlipMode::None) {
+				rotateNew = rotateNew + rotate;
+			} else {
+				rotateNew = rotateNew - rotate;
+			}
+			flipNew = flipNew * flip;
+			NormalizeRotateAndFlip(rotateNew, flipNew);
+			if (rotateNew == RotationMode::Rotate0 && flipNew == FlipMode::None) {
+				return rf->m_src;
+			}
+			Ref<RotateFlipDrawable> ret = new RotateFlipDrawable;
+			if (ret.isNotNull()) {
+				ret->m_src = rf->m_src;
+				ret->m_rotate = rotateNew;
+				ret->m_flip = flipNew;
+				return ret;
+			}
+		} else {
+			Ref<RotateFlipDrawable> ret = new RotateFlipDrawable;
+			if (ret.isNotNull()) {
+				ret->m_src = src;
+				ret->m_rotate = rotate;
+				ret->m_flip = flip;
+				return ret;
+			}
+		}
+		return sl_null;
+	}
+	
+	sl_real RotateFlipDrawable::getDrawableWidth()
+	{
+		if (m_flip == FlipMode::None) {
+			return m_src->getDrawableWidth();
+		} else {
+			return m_src->getDrawableHeight();
+		}
+	}
+	
+	sl_real RotateFlipDrawable::getDrawableHeight()
+	{
+		if (m_flip == FlipMode::None) {
+			return m_src->getDrawableHeight();
+		} else {
+			return m_src->getDrawableWidth();
+		}
+	}
+	
+	void RotateFlipDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
+	{
+		CanvasStateScope scope(canvas);
+		Point center = rectDst.getCenter();
+		canvas->translate(center.x, center.y);
+		if (m_flip == FlipMode::Horizontal) {
+			canvas->scale(-1, 1);
+		} else if (m_flip == FlipMode::Vertical) {
+			canvas->scale(1, -1);
+		}
+		canvas->rotate((sl_real)((int)m_rotate) * SLIB_PI_DUAL / 360.0f);
+		sl_real width_half = rectDst.getWidth() / 2;
+		sl_real height_half = rectDst.getHeight() / 2;
+		if (m_flip != FlipMode::None) {
+			Swap(width_half, height_half);
+		}
+		canvas->draw(Rectangle(-width_half, -height_half, width_half, height_half), m_src, param);
+	}
+	
+	sl_bool RotateFlipDrawable::getAnimationInfo(DrawableAnimationInfo* info)
 	{
 		return m_src->getAnimationInfo(info);
 	}

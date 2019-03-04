@@ -30,6 +30,39 @@
 
 namespace slib
 {
+	
+	Ref<Bitmap> Drawable::toBitmap()
+	{
+		if (isBitmap()) {
+			return (Bitmap*)this;
+		}
+		sl_int32 width = (sl_int32)(getDrawableWidth());
+		sl_int32 height = (sl_int32)(getDrawableHeight());
+		if (width > 0 && height > 0) {
+			Ref<Bitmap> bitmap = Bitmap::create(width, height);
+			if (bitmap.isNotNull()) {
+				Ref<Canvas> canvas = bitmap->getCanvas();
+				if (canvas.isNotNull()) {
+					canvas->draw(Rectangle(0, 0, (sl_real)width, (sl_real)height), this);
+				}
+				return bitmap;
+			}
+		}
+		return sl_null;
+	}
+	
+	Ref<Image> Drawable::toImage()
+	{
+		if (isImage()) {
+			return (Image*)this;
+		}
+		Ref<Bitmap> bitmap = toBitmap();
+		if (bitmap.isNotNull()) {
+			return Image::create(bitmap);
+		}
+		return sl_null;
+	}
+
 	Ref<Drawable> PlatformDrawable::create(const Ref<Image>& image)
 	{
 		if (image.isNotNull()) {
