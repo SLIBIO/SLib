@@ -1388,14 +1388,14 @@ namespace slib
 		}
 		sl_uint32 width, height;
 		if (flagKeepAspectRatio) {
-			width = SLIB_MIN(requiredWidth, m_desc.width);
-			height = SLIB_MIN(requiredHeight, m_desc.height);
-		} else {
 			float fw = (float)requiredWidth / (float)(m_desc.width);
 			float fh = (float)requiredHeight / (float)(m_desc.height);
 			float f = SLIB_MIN(fw, fh);
 			width = (sl_uint32)((float)(m_desc.width) * f);
 			height = (sl_uint32)((float)(m_desc.height) * f);
+		} else {
+			width = SLIB_MIN(requiredWidth, m_desc.width);
+			height = SLIB_MIN(requiredHeight, m_desc.height);
 		}
 		return stretch(width, height, stretchMode);
 	}
