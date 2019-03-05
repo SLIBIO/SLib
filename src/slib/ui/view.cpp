@@ -266,8 +266,6 @@ namespace slib
 	}
 
 	View::DrawAttributes::DrawAttributes():
-		flagOnDrawBackgroundAlways(sl_false),
-		flagOnDrawBorderAlways(sl_false),
 		flagUsingFont(sl_false),
 		flagOpaque(sl_false),
 		flagLayer(sl_false),
@@ -4897,44 +4895,6 @@ namespace slib
 		}
 	}
 
-	sl_bool View::isAlwaysOnDrawBackground()
-	{
-		Ref<DrawAttributes>& attrs = m_drawAttrs;
-		if (attrs.isNotNull()) {
-			return attrs->flagOnDrawBackgroundAlways;
-		}
-		return sl_false;
-	}
-
-	void View::setAlwaysOnDrawBackground(sl_bool flagEnabled, UIUpdateMode mode)
-	{
-		_initializeDrawAttributes();
-		Ref<DrawAttributes>& attrs = m_drawAttrs;
-		if (attrs.isNotNull()) {
-			attrs->flagOnDrawBackgroundAlways = flagEnabled;
-			invalidate(mode);
-		}
-	}
-
-	sl_bool View::isAlwaysOnDrawBorder()
-	{
-		Ref<DrawAttributes>& attrs = m_drawAttrs;
-		if (attrs.isNotNull()) {
-			return attrs->flagOnDrawBorderAlways;
-		}
-		return sl_false;
-	}
-
-	void View::setAlwaysOnDrawBorder(sl_bool flagEnabled, UIUpdateMode mode)
-	{
-		_initializeDrawAttributes();
-		Ref<DrawAttributes>& attrs = m_drawAttrs;
-		if (attrs.isNotNull()) {
-			attrs->flagOnDrawBorderAlways = flagEnabled;
-			invalidate(mode);
-		}
-	}
-
 	Ref<Font> View::getFont()
 	{
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
@@ -7044,16 +7004,11 @@ namespace slib
 	void View::drawContent(Canvas* canvas)
 	{
 
-		Ref<DrawAttributes>& drawAttrs = m_drawAttrs;
 		Ref<ScrollAttributes>& scrollAttrs = m_scrollAttrs;
 	
 		if (m_flagSavingCanvasState || scrollAttrs.isNotNull() || getContentShape() != BoundShape::None) {
 			CanvasStateScope scope(canvas);
-			if (drawAttrs.isNotNull()) {
-				if (drawAttrs->flagOnDrawBackgroundAlways || getCurrentBackground().isNotNull()) {
-					onDrawBackground(canvas);
-				}
-			}
+			onDrawBackground(canvas);
 			if (scrollAttrs.isNotNull()) {
 				sl_real scrollX = (sl_real)(scrollAttrs->x);
 				sl_real scrollY = (sl_real)(scrollAttrs->y);
@@ -7064,11 +7019,7 @@ namespace slib
 			clipContentBounds(canvas);
 			SLIB_INVOKE_EVENT_HANDLER(Draw, canvas)
 		} else {
-			if (drawAttrs.isNotNull()) {
-				if (drawAttrs->flagOnDrawBackgroundAlways || getCurrentBackground().isNotNull()) {
-					onDrawBackground(canvas);
-				}
-			}
+			onDrawBackground(canvas);
 			SLIB_INVOKE_EVENT_HANDLER(Draw, canvas)
 		}
 		
@@ -7492,11 +7443,7 @@ namespace slib
 
 				draw(canvas);
 				
-				if (drawAttrs.isNotNull()) {
-					if (drawAttrs->flagOnDrawBorderAlways || drawAttrs->penBorder.isNotNull()) {
-						onDrawBorder(canvas);
-					}
-				}
+				onDrawBorder(canvas);
 				
 				getOnPostDraw()(this, canvas);
 

@@ -766,15 +766,6 @@ namespace slib
 		void setContentBoundPath(const Ref<GraphicsPath>& path, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 		
-		sl_bool isAlwaysOnDrawBackground();
-		
-		void setAlwaysOnDrawBackground(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		sl_bool isAlwaysOnDrawBorder();
-		
-		void setAlwaysOnDrawBorder(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
-
-		
 		Ref<Font> getFont();
 		
 		virtual void setFont(const Ref<Font>& font, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
@@ -1530,8 +1521,6 @@ namespace slib
 		class DrawAttributes : public Referable
 		{
 		public:
-			sl_bool flagOnDrawBackgroundAlways : 1;
-			sl_bool flagOnDrawBorderAlways : 1;
 			sl_bool flagUsingFont : 1;
 			sl_bool flagOpaque : 1;
 			sl_bool flagLayer : 1;

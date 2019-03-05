@@ -107,9 +107,6 @@ namespace slib
 		setCreatingNativeWidget(sl_false);
 		setFocusable(sl_true);
 		
-		setAlwaysOnDrawBackground(sl_true, UIUpdateMode::Init);
-		setAlwaysOnDrawBorder(sl_true, UIUpdateMode::Init);
-		
 		m_flagMultiLine = sl_false;
 		m_flagDefaultButton = sl_false;
 		
