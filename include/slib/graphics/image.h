@@ -143,9 +143,13 @@ namespace slib
 
 		Ref<Image> sub(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) const;
 
-		Ref<Image> scale(sl_uint32 width, sl_uint32 height, StretchMode stretch = StretchMode::Default) const;
+		Ref<Image> stretch(sl_uint32 width, sl_uint32 height, StretchMode stretch = StretchMode::Default) const;
 
-		Ref<Image> scaleToSmall(sl_uint32 requiredWidth, sl_uint32 requiredHeight, StretchMode stretch = StretchMode::Default) const;
+		Ref<Image> stretchToSmall(sl_uint32 requiredWidth, sl_uint32 requiredHeight, sl_bool flagKeepAspectRatio = sl_true, StretchMode stretch = StretchMode::Default) const;
+
+		Ref<Image> rotateImage(RotationMode rotate, FlipMode flip = FlipMode::None) const;
+		
+		Ref<Image> flipImage(FlipMode flip) const;
 
 		Ref<Image> duplicate() const;
 
@@ -153,22 +157,20 @@ namespace slib
 		
 		Ref<Image> duplicate(FlipMode flip) const;
 		
-		Ref<Image> rotateImage(RotationMode rotate, FlipMode flip = FlipMode::None);
-
-		Ref<Image> flipImage(FlipMode flip);
-
+		Ref<Image> duplicate(sl_uint32 newWidth, sl_uint32 newHeight, StretchMode stretch = StretchMode::Default) const;
+		
 
 		static ImageFileType getFileType(const void* mem, sl_size size);
 
 		static ImageFileType getFileType(Memory mem);
 
-		static Ref<Image> loadFromMemory(const void* mem, sl_size size, sl_uint32 width = 0, sl_uint32 height = 0);
+		static Ref<Image> loadFromMemory(const void* mem, sl_size size);
 
-		static Ref<Image> loadFromMemory(Memory mem, sl_uint32 width = 0, sl_uint32 height = 0);
+		static Ref<Image> loadFromMemory(Memory mem);
 
-		static Ref<Image> loadFromFile(const String& filePath, sl_uint32 width = 0, sl_uint32 height = 0);
+		static Ref<Image> loadFromFile(const String& filePath);
 
-		static Ref<Image> loadFromAsset(const String& path, sl_uint32 width = 0, sl_uint32 height = 0);
+		static Ref<Image> loadFromAsset(const String& path);
 		
 		static Ref<AnimationDrawable> loadAnimationFromMemory(const void* mem, sl_size size);
 		

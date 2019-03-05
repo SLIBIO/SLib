@@ -1315,7 +1315,7 @@ namespace slib
 		descSrc.stride = src->getStride();
 		draw(descDst, descSrc, blend, stretch);
 	}
-
+	
 	void Image::drawImage(const Rectanglei& rectDst
 						, const Ref<Image>& src, const Rectanglei& rectSrc
 						, BlendMode blend, StretchMode stretch)
@@ -1332,64 +1332,91 @@ namespace slib
 		drawImage(dx, dy, dw, dh, src, sx, sy, dw, dh, blend, stretch);
 	}
 
-	Ref<Drawable> Image::subDrawable(sl_real x, sl_real y, sl_real width, sl_real height)
+	Ref<Drawable> Image::subDrawable(sl_real _x, sl_real _y, sl_real _width, sl_real _height)
 	{
+		sl_int32 x = (sl_int32)_x;
+		sl_int32 y = (sl_int32)_y;
+		sl_int32 width = (sl_int32)_width;
+		sl_int32 height = (sl_int32)_height;
 		if (x >= 0 && y >= 0 && width > 0 && height > 0) {
-			sl_real _w = (sl_real)(m_desc.width);
-			sl_real _h = (sl_real)(m_desc.height);
-			if (x + width <= _w && y + height <= _h) {
-				return sub((sl_uint32)x, (sl_uint32)y, (sl_uint32)width, (sl_uint32)height);
-			}
+			return sub(x, y, width, height);
 		}
-		return Drawable::subDrawable(x, y, width, height);
+		return sl_null;
 	}
 
 	Ref<Image> Image::sub(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) const
 	{
-		if (width > 0 && height > 0) {
-			if (x < m_desc.width && y < m_desc.height) {
-				if (width <= m_desc.width - x && height <= m_desc.height - y) {
-					Ref<Image> ret = new Image;
-					if (ret.isNotNull()) {
-						ret->m_desc.colors = getColorsAt(x, y);
-						ret->m_desc.width = width;
-						ret->m_desc.height = height;
-						ret->m_desc.stride = m_desc.stride;
-						ret->m_desc.ref = m_desc.ref;
-						return ret;
-					}
-				}
-			}
+		if (x == 0 && y == 0 && width == m_desc.width && height == m_desc.height) {
+			return (Image*)this;
 		}
-		return sl_null;
-	}
-
-	Ref<Image> Image::scale(sl_uint32 width, sl_uint32 height, StretchMode stretch) const
-	{
-		if (width > 0 && height > 0) {
-			Ref<Image> ret = Image::create(width, height);
-			if (ret.isNotNull()) {
-				draw(ret->m_desc, m_desc, BlendMode::Copy, stretch);
-			}
+		if (width <= 0 || height <= 0) {
+			return sl_null;
+		}
+		if (x > m_desc.width || y > m_desc.height) {
+			return sl_null;
+		}
+		if (width > m_desc.width - x || height > m_desc.height - y) {
+			return sl_null;
+		}
+		Ref<Image> ret = new Image;
+		if (ret.isNotNull()) {
+			ret->m_desc.colors = getColorsAt(x, y);
+			ret->m_desc.width = width;
+			ret->m_desc.height = height;
+			ret->m_desc.stride = m_desc.stride;
+			ret->m_desc.ref = m_desc.ref;
 			return ret;
 		}
 		return sl_null;
 	}
 
-	Ref<Image> Image::scaleToSmall(sl_uint32 requiredWidth, sl_uint32 requiredHeight, StretchMode stretch) const
+	Ref<Image> Image::stretch(sl_uint32 width, sl_uint32 height, StretchMode stretchMode) const
 	{
-		sl_uint32 width = SLIB_MIN(requiredWidth, m_desc.width);
-		sl_uint32 height = SLIB_MIN(requiredHeight, m_desc.height);
-		if (width > 0 && height > 0) {
-			Ref<Image> ret = Image::create(width, height);
-			if (ret.isNotNull()) {
-				draw(ret->m_desc, m_desc, BlendMode::Copy, stretch);
-			}
-			return ret;
+		if (width == m_desc.width && height == m_desc.height) {
+			return (Image*)this;
 		}
-		return sl_null;
+		return duplicate(width, height, stretchMode);
+	}
+
+	Ref<Image> Image::stretchToSmall(sl_uint32 requiredWidth, sl_uint32 requiredHeight, sl_bool flagKeepAspectRatio, StretchMode stretchMode) const
+	{
+		if (requiredWidth <= 0 || requiredHeight <= 0) {
+			return sl_null;
+		}
+		if (requiredWidth >= m_desc.width && requiredHeight >= m_desc.height) {
+			return (Image*)this;
+		}
+		sl_uint32 width, height;
+		if (flagKeepAspectRatio) {
+			width = SLIB_MIN(requiredWidth, m_desc.width);
+			height = SLIB_MIN(requiredHeight, m_desc.height);
+		} else {
+			float fw = (float)requiredWidth / (float)(m_desc.width);
+			float fh = (float)requiredHeight / (float)(m_desc.height);
+			float f = SLIB_MIN(fw, fh);
+			width = (sl_uint32)((float)(m_desc.width) * f);
+			height = (sl_uint32)((float)(m_desc.height) * f);
+		}
+		return stretch(width, height, stretchMode);
 	}
 	
+	Ref<Image> Image::rotateImage(RotationMode rotate, FlipMode flip) const
+	{
+		NormalizeRotateAndFlip(rotate, flip);
+		if (rotate == RotationMode::Rotate0 && flip == FlipMode::None) {
+			return (Image*)this;
+		}
+		return create(m_desc, rotate, flip);
+	}
+	
+	Ref<Image> Image::flipImage(FlipMode flip) const
+	{
+		if (flip == FlipMode::None) {
+			return (Image*)this;
+		}
+		return create(m_desc, RotationMode::Rotate0, flip);
+	}
+
 	Ref<Image> Image::duplicate() const
 	{
 		return create(m_desc);
@@ -1405,23 +1432,18 @@ namespace slib
 		return create(m_desc, RotationMode::Rotate0, flip);
 	}
 	
-	Ref<Image> Image::rotateImage(RotationMode rotate, FlipMode flip)
+	Ref<Image> Image::duplicate(sl_uint32 width, sl_uint32 height, StretchMode stretch) const
 	{
-		NormalizeRotateAndFlip(rotate, flip);
-		if (rotate == RotationMode::Rotate0 && flip == FlipMode::None) {
-			return this;
+		if (width > 0 && height > 0) {
+			Ref<Image> ret = Image::create(width, height);
+			if (ret.isNotNull()) {
+				draw(ret->m_desc, m_desc, BlendMode::Copy, stretch);
+				return ret;
+			}
 		}
-		return create(m_desc, rotate, flip);
+		return sl_null;
 	}
 	
-	Ref<Image> Image::flipImage(FlipMode flip)
-	{
-		if (flip == FlipMode::None) {
-			return this;
-		}
-		return create(m_desc, RotationMode::Rotate0, flip);
-	}
-
 	ImageFileType Image::getFileType(const void* _mem, sl_size size)
 	{
 		sl_uint8* mem = (sl_uint8*)_mem;
@@ -1448,7 +1470,7 @@ namespace slib
 		return getFileType(mem.getData(), mem.getSize());
 	}
 
-	Ref<Image> Image::loadFromMemory(const void* mem, sl_size size, sl_uint32 width, sl_uint32 height)
+	Ref<Image> Image::loadFromMemory(const void* mem, sl_size size)
 	{
 		ImageFileType type = getFileType(mem, size);
 		if (type == ImageFileType::JPEG) {
@@ -1457,52 +1479,34 @@ namespace slib
 		if (type == ImageFileType::PNG) {
 			return loadPNG(mem, size);
 		}
-		Ref<Image> ret = loadSTB(mem, size);
-		if (ret.isNotNull()) {
-			if (width == 0 || height == 0) {
-				return ret;
-			}
-			if (ret->getWidth() != width && ret->getHeight() != height) {
-				ret = ret->scale(width, height);
-			}
-			return ret;
-		}
-		return sl_null;
+		return loadSTB(mem, size);
 	}
 
-	Ref<Image> Image::loadFromMemory(Memory mem, sl_uint32 width, sl_uint32 height)
+	Ref<Image> Image::loadFromMemory(Memory mem)
 	{
-		return loadFromMemory(mem.getData(), mem.getSize(), width, height);
+		return loadFromMemory(mem.getData(), mem.getSize());
 	}
 
-	Ref<Image> Image::loadFromFile(const String& filePath, sl_uint32 width, sl_uint32 height)
+	Ref<Image> Image::loadFromFile(const String& filePath)
 	{
 		Memory mem = File::readAllBytes(filePath);
 		if (mem.isNotNull()) {
-			return loadFromMemory(mem, width, height);
+			return loadFromMemory(mem);
 		}
 		return sl_null;
 	}
 
-	Ref<Image> Image::loadFromAsset(const String& path, sl_uint32 width, sl_uint32 height)
+	Ref<Image> Image::loadFromAsset(const String& path)
 	{
 		Memory mem = Assets::readAllBytes(path);
 		if (mem.isNotNull()) {
-			return loadFromMemory(mem, width, height);
+			return loadFromMemory(mem);
 		}
 #if defined(SLIB_PLATFORM_IS_APPLE)
-		Ref<Image> ret = Image::createCopyBitmap(Bitmap::loadFromAsset(path));
-		if (ret.isNotNull()) {
-			if (width == 0 || height == 0) {
-				return ret;
-			}
-			if (ret->getWidth() != width && ret->getHeight() != height) {
-				ret = ret->scale(width, height);
-			}
-			return ret;
-		}
-#endif
+		return Image::createCopyBitmap(Bitmap::loadFromAsset(path));
+#else
 		return sl_null;
+#endif
 	}
 	
 	Ref<AnimationDrawable> Image::loadAnimationFromMemory(const void* mem, sl_size size)

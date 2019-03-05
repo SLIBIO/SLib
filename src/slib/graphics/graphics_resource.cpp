@@ -83,7 +83,7 @@ namespace slib
 			if (t.isNotNull()) {
 				t->setCustomDrawable(Image::loadAnimationFromMemory(source_bytes, source_size));
 				zoomLevel >>= 1;
-				s = t->scale(width / zoomLevel, height / zoomLevel);
+				s = t->stretch(width / zoomLevel, height / zoomLevel);
 			}
 		}
 		return s;
