@@ -73,7 +73,7 @@ namespace slib
 								   "%s", text.getData())
 		);
 		if (!dialog) {
-			return DialogResult::Cancel;
+			return DialogResult::Error;
 		}
 		
 		gtk_window_set_title((GtkWindow*)dialog, caption.getData());
@@ -134,7 +134,7 @@ namespace slib
 			default:
 				break;
 		}
-		return DialogResult::Cancel;
+		return DialogResult::Error;
 	}
 
 	void AlertDialog::show()

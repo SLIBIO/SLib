@@ -91,16 +91,16 @@ namespace slib
 		::evas_object_del(container->popup);
 		switch (container->result) {
 			case DialogResult::Ok:
-				container->alert->onOk();
+				container->alert->_onResult(DialogResult::Ok);
 				break;
 			case DialogResult::Yes:
-				container->alert->onYes();
+				container->alert->_onResult(DialogResult::Yes);
 				break;
 			case DialogResult::No:
-				container->alert->onNo();
+				container->alert->_onResult(DialogResult::No);
 				break;
 			default:
-				container->alert->onCancel();
+				container->alert->_onResult(DialogResult::Cancel);
 				break;
 		}
 		delete container;

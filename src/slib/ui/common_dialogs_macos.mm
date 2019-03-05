@@ -128,7 +128,7 @@ namespace slib
 		} else if (result == NSAlertThirdButtonReturn) {
 			return result3;
 		}
-		return DialogResult::Cancel;
+		return DialogResult::Error;
 	}
 
 	void AlertDialog::show()

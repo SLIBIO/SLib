@@ -74,35 +74,17 @@ namespace slib
 			ev->wait();
 			return m.result;
 		}
-		return DialogResult::Cancel;
+		return DialogResult::Error;
 	}
 
 	class _priv_AlertDialog_CallbackRunByShow_UIThread
 	{
 	public:
-		DialogResult result = DialogResult::Cancel;
+		DialogResult result = DialogResult::Error;
 		
-		void onOk()
+		void onComplete(DialogResult _result)
 		{
-			result = DialogResult::Ok;
-			UI::quitLoop();
-		}
-	
-		void onCancel()
-		{
-			result = DialogResult::Cancel;
-			UI::quitLoop();
-		}
-		
-		void onYes()
-		{
-			result = DialogResult::Yes;
-			UI::quitLoop();
-		}
-		
-		void onNo()
-		{
-			result = DialogResult::No;
+			result = _result;
 			UI::quitLoop();
 		}
 
@@ -111,30 +93,12 @@ namespace slib
 	class _priv_AlertDialog_CallbackRunByShow_NonUIThread
 	{
 	public:
-		DialogResult result = DialogResult::Cancel;
+		DialogResult result = DialogResult::Error;
 		Ref<Event> event;
 		
-		void onOk()
+		void onComplete(DialogResult _result)
 		{
-			result = DialogResult::Ok;
-			event->set();
-		}
-		
-		void onCancel()
-		{
-			result = DialogResult::Cancel;
-			event->set();
-		}
-		
-		void onYes()
-		{
-			result = DialogResult::Yes;
-			event->set();
-		}
-
-		void onNo()
-		{
-			result = DialogResult::No;
+			result = _result;
 			event->set();
 		}
 		
@@ -143,22 +107,19 @@ namespace slib
 	void _priv_AlertDialog_runByShow(AlertDialog* alert, _priv_AlertDialog_CallbackRunByShow_NonUIThread* m)
 	{
 		if (!(alert->_show())) {
-			m->onCancel();
+			m->onComplete(DialogResult::Error);
 		}
 	}
 
 	DialogResult AlertDialog::_runByShow()
 	{
-		Ref<AlertDialog> alert = getReferable();
+		Ref<AlertDialog> alert = new AlertDialog(*this);
 		if (alert.isNull()) {
-			return DialogResult::Cancel;
+			return DialogResult::Error;
 		}
 		if (UI::isUiThread()) {
 			_priv_AlertDialog_CallbackRunByShow_UIThread m;
-			alert->onOk = SLIB_FUNCTION_CLASS(_priv_AlertDialog_CallbackRunByShow_UIThread, onOk, &m);
-			alert->onCancel = SLIB_FUNCTION_CLASS(_priv_AlertDialog_CallbackRunByShow_UIThread, onCancel, &m);
-			alert->onYes = SLIB_FUNCTION_CLASS(_priv_AlertDialog_CallbackRunByShow_UIThread, onYes, &m);
-			alert->onNo = SLIB_FUNCTION_CLASS(_priv_AlertDialog_CallbackRunByShow_UIThread, onNo, &m);
+			alert->onComplete = SLIB_FUNCTION_CLASS(_priv_AlertDialog_CallbackRunByShow_UIThread, onComplete, &m);
 			if (alert->_show()) {
 				UI::runLoop();
 				return m.result;
@@ -168,28 +129,19 @@ namespace slib
 			if (ev.isNotNull()) {
 				_priv_AlertDialog_CallbackRunByShow_NonUIThread m;
 				m.event = ev;
-				alert->onOk = SLIB_FUNCTION_CLASS(_priv_AlertDialog_CallbackRunByShow_NonUIThread, onOk, &m);
-				alert->onCancel = SLIB_FUNCTION_CLASS(_priv_AlertDialog_CallbackRunByShow_NonUIThread, onCancel, &m);
-				alert->onYes = SLIB_FUNCTION_CLASS(_priv_AlertDialog_CallbackRunByShow_NonUIThread, onYes, &m);
-				alert->onNo = SLIB_FUNCTION_CLASS(_priv_AlertDialog_CallbackRunByShow_NonUIThread, onNo, &m);
+				alert->onComplete = SLIB_FUNCTION_CLASS(_priv_AlertDialog_CallbackRunByShow_NonUIThread, onComplete, &m);
 				UI::dispatchToUiThread(Function<void()>::bind(&_priv_AlertDialog_runByShow, alert.get(), &m));
 				ev->wait();
 				return m.result;
 			}
 		}
-		return DialogResult::Cancel;
+		return DialogResult::Error;
 	}
 	
 	void _priv_AlertDialog_Show(const Ref<AlertDialog>& alert)
 	{
 		if (!(alert->_show())) {
-			if (alert->buttons == AlertDialogButtons::Ok) {
-				alert->onOk();
-			} else if (alert->buttons == AlertDialogButtons::YesNo) {
-				alert->onNo();
-			} else {
-				alert->onCancel();
-			}
+			alert->_onResult(DialogResult::Error);
 		}
 	}
 
@@ -208,26 +160,7 @@ namespace slib
 	void _priv_AlertDialog_showByRun(const Ref<AlertDialog>& alert)
 	{
 		DialogResult result = alert->_run();
-		switch (result) {
-			case DialogResult::Ok:
-				alert->onOk();
-				break;
-			case DialogResult::Yes:
-				alert->onYes();
-				break;
-			case DialogResult::No:
-				alert->onNo();
-				break;
-			default:
-				if (alert->buttons == AlertDialogButtons::Ok) {
-					alert->onOk();
-				} else if (alert->buttons == AlertDialogButtons::YesNo) {
-					alert->onNo();
-				} else {
-					alert->onCancel();
-				}
-				break;
-		}
+		alert->_onResult(result);
 	}
 
 	void AlertDialog::_showByRun()
@@ -235,6 +168,38 @@ namespace slib
 		Ref<AlertDialog> alert = getReferable();
 		if (alert.isNotNull()) {
 			UI::dispatchToUiThread(Function<void()>::bind(&_priv_AlertDialog_showByRun, alert));
+		}
+	}
+	
+	void AlertDialog::_onResult(DialogResult result)
+	{
+		onComplete(result);
+		switch (result) {
+			case DialogResult::Ok:
+				onOk();
+				break;
+			case DialogResult::Yes:
+				onYes();
+				break;
+			case DialogResult::No:
+				onNo();
+				break;
+			case DialogResult::Cancel:
+				onCancel();
+				break;
+			case DialogResult::Error:
+				onError();
+				if (onComplete.isNull() && onError.isNull()) {
+					if (buttons == AlertDialogButtons::Ok) {
+						onOk();
+					} else if (buttons == AlertDialogButtons::YesNo) {
+						onNo();
+					} else {
+						onCancel();
+					}
+				}
+			default:
+				break;
 		}
 	}
 	

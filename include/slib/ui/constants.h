@@ -328,9 +328,10 @@ namespace slib
 	public:
 		enum {
 			Ok = 0,
-			Yes = 1,
-			No = 2,
-			Cancel = 3
+			Yes = -1,
+			No = -2,
+			Cancel = -3,
+			Error = -4
 		};
 
 	public:

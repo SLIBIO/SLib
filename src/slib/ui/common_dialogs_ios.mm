@@ -99,6 +99,14 @@ namespace slib
 	
 	sl_bool AlertDialog::_show()
 	{
+		UIViewController* controller = _priv_AlertDialog_getRootViewController(parent);
+		if (controller == nil) {
+			return sl_false;
+		}
+		if (controller.presentedViewController != nil) {
+			return sl_false;
+		}
+
 		AlertDialogButtons buttons = this->buttons;
 		NSString* caption = Apple::getNSStringFromString(this->caption);
 		NSString* text = Apple::getNSStringFromString(this->text);
@@ -118,10 +126,10 @@ namespace slib
 		if ([titleNo length] == 0) {
 			titleNo = Apple::getSystemLocalizedNSString(@"No");
 		}
-		Function<void()> onOk = this->onOk;
-		Function<void()> onCancel = this->onCancel;
-		Function<void()> onYes = this->onYes;
-		Function<void()> onNo = this->onNo;
+		Function<void()> onOk = SLIB_BIND_REF(void(), AlertDialog, _onResult, this, DialogResult::Ok);
+		Function<void()> onCancel = SLIB_BIND_REF(void(), AlertDialog, _onResult, this, DialogResult::Cancel);
+		Function<void()> onYes = SLIB_BIND_REF(void(), AlertDialog, _onResult, this, DialogResult::Yes);
+		Function<void()> onNo = SLIB_BIND_REF(void(), AlertDialog, _onResult, this, DialogResult::No);
 		
 		UIAlertController* alert = [UIAlertController alertControllerWithTitle:caption message:text preferredStyle:UIAlertControllerStyleAlert];
 		
@@ -191,12 +199,9 @@ namespace slib
 					}
 				} @catch (NSException*) {}
 			}
-			
-			UIViewController* controller = _priv_AlertDialog_getRootViewController(parent);
-			if (controller != nil) {
-				[controller presentViewController:alert animated:YES completion:nil];
-				return sl_true;
-			}
+						
+			[controller presentViewController:alert animated:YES completion:nil];
+			return sl_true;
 		}
 		
 		return sl_false;
@@ -318,11 +323,13 @@ namespace slib
 		
 		UIViewController* rootController = _priv_AlertDialog_getRootViewController(takePhoto.parent);
 		if (rootController != nil) {
-			[rootController presentViewController:controller animated:YES completion:nil];
-		} else {
-			TakePhotoResult result;
-			takePhoto.onComplete(result);
+			if (![rootController isBeingPresented]) {
+				[rootController presentViewController:controller animated:YES completion:nil];
+				return;
+			}
 		}
+		TakePhotoResult result;
+		takePhoto.onComplete(result);
 	}
 	
 	void TakePhoto::takeFromCamera()

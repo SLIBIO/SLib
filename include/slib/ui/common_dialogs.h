@@ -83,11 +83,15 @@ namespace slib
 		Function<void()> onCancel;
 		Function<void()> onYes;
 		Function<void()> onNo;
+		Function<void()> onError;
+		Function<void(DialogResult)> onComplete;
 		
 	public:
 		DialogResult _run();
 		
 		sl_bool _show();
+		
+		void _onResult(DialogResult result);
 		
 	protected:
 		DialogResult _runOnUiThread();

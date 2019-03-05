@@ -76,10 +76,7 @@ namespace slib
 	class _priv_UiAlertResult : public Referable
 	{
 	public:
-		Function<void()> onOk;
-		Function<void()> onCancel;
-		Function<void()> onYes;
-		Function<void()> onNo;
+		Function<void(DialogResult)> onResult;
 	};
 
 	typedef CHashMap<jlong, Ref<_priv_UiAlertResult> > _priv_UiAlertMap;
@@ -95,10 +92,7 @@ namespace slib
 		if (jactivity) {
 			Ref<_priv_UiAlertResult> result = new _priv_UiAlertResult();
 			if (result.isNotNull()) {
-				result->onOk = onOk;
-				result->onCancel = onCancel;
-				result->onYes = onYes;
-				result->onNo = onNo;
+				result->onResult = SLIB_FUNCTION_REF(AlertDialog, _onResult, this);
 
 				JniLocal<jobject> jalert = JAndroidAlert::init.newObject(sl_null);
 				if (jalert.isNotNull()) {
@@ -144,16 +138,16 @@ namespace slib
 			alertMap->remove(_alert);
 			switch (result) {
 			case 0: // OK
-				alert->onOk();
+				alert->onResult(DialogResult::Ok);
 				break;
 			case 2: // Yes
-				alert->onYes();
+				alert->onResult(DialogResult::Yes);
 				break;
 			case 3: // No
-				alert->onNo();
+				alert->onResult(DialogResult::No);
 				break;
 			default: // Cancel
-				alert->onCancel();
+				alert->onResult(DialogResult::Cancel);
 				break;
 			}
 		}

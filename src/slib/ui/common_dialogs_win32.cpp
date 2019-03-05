@@ -165,7 +165,7 @@ namespace slib
 		case IDNO:
 			return DialogResult::No;
 		}
-		return DialogResult::Cancel;
+		return DialogResult::Error;
 	}
 
 	void AlertDialog::show()
