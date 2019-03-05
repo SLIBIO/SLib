@@ -1295,7 +1295,6 @@ namespace slib
 			item->setLayoutSize(size);
 			m_lineItems.add_NoLock(item);
 			m_x += size.x;
-			m_lineWidth = m_x;
 		}
 		
 		void processTab(TextTabItem* item) noexcept
@@ -1308,7 +1307,6 @@ namespace slib
 			item->setLayoutSize(Size(tabX - m_x, h));
 			m_lineItems.add_NoLock(item);
 			m_x = tabX;
-			m_lineWidth = m_x;
 		}
 		
 		void processLineBreak(TextLineBreakItem* item) noexcept
