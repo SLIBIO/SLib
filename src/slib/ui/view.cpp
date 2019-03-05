@@ -7050,7 +7050,7 @@ namespace slib
 		if (m_flagSavingCanvasState || scrollAttrs.isNotNull() || getContentShape() != BoundShape::None) {
 			CanvasStateScope scope(canvas);
 			if (drawAttrs.isNotNull()) {
-				if (drawAttrs->flagOnDrawBackgroundAlways || drawAttrs->background.isNotNull()) {
+				if (drawAttrs->flagOnDrawBackgroundAlways || getCurrentBackground().isNotNull()) {
 					onDrawBackground(canvas);
 				}
 			}
@@ -7065,7 +7065,7 @@ namespace slib
 			SLIB_INVOKE_EVENT_HANDLER(Draw, canvas)
 		} else {
 			if (drawAttrs.isNotNull()) {
-				if (drawAttrs->flagOnDrawBackgroundAlways || drawAttrs->background.isNotNull()) {
+				if (drawAttrs->flagOnDrawBackgroundAlways || getCurrentBackground().isNotNull()) {
 					onDrawBackground(canvas);
 				}
 			}
