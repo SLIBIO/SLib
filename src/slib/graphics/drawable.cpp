@@ -644,7 +644,7 @@ namespace slib
 	
 	sl_real RotateFlipDrawable::getDrawableWidth()
 	{
-		if (m_flip == FlipMode::None) {
+		if (m_rotate != RotationMode::Rotate90 && m_rotate != RotationMode::Rotate270) {
 			return m_src->getDrawableWidth();
 		} else {
 			return m_src->getDrawableHeight();
@@ -653,7 +653,7 @@ namespace slib
 	
 	sl_real RotateFlipDrawable::getDrawableHeight()
 	{
-		if (m_flip == FlipMode::None) {
+		if (m_rotate != RotationMode::Rotate90 && m_rotate != RotationMode::Rotate270) {
 			return m_src->getDrawableHeight();
 		} else {
 			return m_src->getDrawableWidth();
@@ -673,7 +673,7 @@ namespace slib
 		canvas->rotate((sl_real)((int)m_rotate) * SLIB_PI_DUAL / 360.0f);
 		sl_real width_half = rectDst.getWidth() / 2;
 		sl_real height_half = rectDst.getHeight() / 2;
-		if (m_flip != FlipMode::None) {
+		if (m_rotate == RotationMode::Rotate90 || m_rotate == RotationMode::Rotate270) {
 			Swap(width_half, height_half);
 		}
 		canvas->draw(Rectangle(-width_half, -height_half, width_half, height_half), m_src, param);
