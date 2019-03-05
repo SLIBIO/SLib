@@ -443,7 +443,7 @@ namespace slib
 		NODE* root = *pRoot;
 		if (root) {
 			int compare_result;
-			NODE* where = tryFind(pRoot, key, key_compare, compare_result);
+			NODE* where = tryFind(root, key, key_compare, compare_result);
 			if (compare_result == 0) {
 				return MapEmplaceReturn<NODE>(sl_false, where);
 			}

@@ -48,7 +48,7 @@ namespace slib
 		
 		SLIB_INLINE MapEmplaceReturn& operator=(const MapEmplaceReturn& other) noexcept = default;
 		
-		SLIB_INLINE explicit constexpr operator sl_bool() const noexcept
+		SLIB_INLINE constexpr operator sl_bool() const noexcept
 		{
 			return isSuccess;
 		}
