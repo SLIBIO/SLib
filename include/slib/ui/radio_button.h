@@ -75,6 +75,8 @@ namespace slib
 		~RadioGroup();
 
 	public:
+		List< Ref<RadioButton> > getButtons();
+		
 		void add(const Ref<RadioButton>& button);
 		
 		void remove(const Ref<RadioButton>& button);

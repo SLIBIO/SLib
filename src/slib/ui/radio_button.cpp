@@ -171,6 +171,12 @@ namespace slib
 	RadioGroup::~RadioGroup()
 	{
 	}
+	
+	List< Ref<RadioButton> > RadioGroup::getButtons()
+	{
+		ObjectLocker lock(this);
+		return m_buttons.duplicate_NoLock();
+	}
 
 	void RadioGroup::add(const Ref<RadioButton>& button)
 	{
