@@ -7,9 +7,3 @@
 
 #include <slib/ui.h>
 
-namespace slib
-{
-	namespace ui
-	{
-	}
-}

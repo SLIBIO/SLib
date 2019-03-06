@@ -883,6 +883,7 @@ namespace slib
 	class SAppLayoutResource : public SAppLayoutResourceItem
 	{
 	public:
+		String filePath;
 		SAppLayoutType layoutType;
 		
 		String baseClassName;

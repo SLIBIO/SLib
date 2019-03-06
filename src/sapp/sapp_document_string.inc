@@ -132,8 +132,7 @@ namespace slib
 		StringBuffer sbHeader, sbCpp, sbMap;
 		
 		sbHeader.add(String::format(
-									"#ifndef CHECKHEADER_RESOURCE_STRINGS_%s%n"
-									"#define CHECKHEADER_RESOURCE_STRINGS_%s%n%n"
+									"#pragma once%n%n"
 									"#include <slib/core/resource.h>%n%n"
 									"namespace %s%n"
 									"{%n\tnamespace string%n\t{%n%n"
@@ -200,7 +199,7 @@ namespace slib
 		
 		sbMap.add("\t\tSLIB_DEFINE_STRING_RESOURCE_MAP_END\r\n");
 		
-		sbHeader.add("\r\n\t\tSLIB_DECLARE_STRING_RESOURCE_MAP\r\n\r\n\t}\r\n}\r\n\r\n#endif");
+		sbHeader.add("\r\n\t\tSLIB_DECLARE_STRING_RESOURCE_MAP\r\n\r\n\t}\r\n}\r\n");
 		
 		sbCpp.link(sbMap);
 		sbCpp.add("\r\n\t}\r\n}\r\n");

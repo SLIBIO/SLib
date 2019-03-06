@@ -256,8 +256,7 @@ namespace slib
 		
 		StringBuffer sbHeader, sbCpp;
 		sbHeader.add(String::format(
-									"#ifndef CHECKHEADER_RESOURCE_MENUS_%s%n"
-									"#define CHECKHEADER_RESOURCE_MENUS_%s%n%n"
+									"#pragma once%n%n"
 									"#include <slib/ui/resource.h>%n%n"
 									"namespace %s%n"
 									"{%n\tnamespace menu%n\t{%n%n"
@@ -296,7 +295,7 @@ namespace slib
 		}
 		
 		
-		sbHeader.add("\t}\r\n}\r\n\r\n#endif");
+		sbHeader.add("\t}\r\n}\r\n");
 		sbCpp.add("\t}\r\n}\r\n");
 		
 		String pathHeader = targetPath + "/menus.h";

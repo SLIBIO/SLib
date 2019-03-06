@@ -153,7 +153,7 @@ namespace slib
 		return sl_true;
 	}
 	
-	sl_bool SAppDocument::_parseLayoutResource(const String& localNamespace, const Ref<XmlElement>& element)
+	sl_bool SAppDocument::_parseLayoutResource(const String& filePath, const String& localNamespace, const Ref<XmlElement>& element)
 	{
 		if (element.isNull()) {
 			return sl_false;
@@ -165,6 +165,7 @@ namespace slib
 			return sl_false;
 		}
 		
+		layout->filePath = filePath;
 		layout->element = element;
 
 		SAppLayoutType type;
@@ -340,35 +341,25 @@ namespace slib
 			}
 		}
 
-		StringBuffer sbHeader, sbCpp;
-		sbHeader.add(String::format(
-									"#ifndef CHECKHEADER_RESOURCE_UI_%s%n"
-									"#define CHECKHEADER_RESOURCE_UI_%s%n%n"
-									"#include <slib/ui/resource.h>%n"
-									, m_conf.generate_cpp_namespace));
+		StringBuffer sbHeader, sbHeaderBase, sbCpp;
+		sbHeaderBase.add("#pragma once\r\n\r\n#include <slib/ui/resource.h>\r\n\r\n");
 
 		{
 			ListLocker<String> includes(m_conf.generate_cpp_layout_include_headers);
 			for (sl_size i = 0; i < includes.count; i++) {
 				if (includes[i].isNotEmpty()) {
-					sbHeader.add(String::format("#include \"%s\"%n", includes[i]));
+					sbHeaderBase.add(String::format("#include \"%s\"%n", includes[i]));
 				}
 			}
 		}
 
-		sbHeader.add(String::format(
-									"%n"
-									"namespace %s%n"
-									"{%n\tnamespace ui%n\t{%n"
-									, m_conf.generate_cpp_namespace));
-		
 		sbCpp.add(String::format(
 								 "#include \"layouts.h\"%n%n"
 								 "#include \"strings.h\"%n"
 								 "#include \"colors.h\"%n"
 								 "#include \"drawables.h\"%n"
 								 "#include \"menus.h\"%n%n"
-								 "#include <slib/ui.h>%n"
+								 "#include <slib/ui.h>%n%n"
 								 , m_conf.generate_cpp_namespace));
 		
 		{
@@ -379,28 +370,24 @@ namespace slib
 				}
 			}
 		}
-		sbCpp.add(String::format(
-									"%n"
-									"namespace %s%n"
-									"{%n\tnamespace ui%n\t{%n"
-									, m_conf.generate_cpp_namespace));
-
+		
+		sbHeaderBase.add(String::format("%n" "namespace %s%n" "{%n\tnamespace ui%n\t{%n", m_conf.generate_cpp_namespace));
 		{
 			for (auto& pair : m_layouts) {
 				if (pair.value.isNotNull()) {
 					Ref<SAppLayoutResource> layout = pair.value;
-					sbHeader.add(String::format("\t\tclass %s;%n", pair.key));
+					sbHeaderBase.add(String::format("\t\tclass %s;%n", pair.key));
 				}
 			}
 		}
-		
-		sbHeader.add("\r\n");
-		
+		sbHeaderBase.add("\t}\r\n}\r\n");
+
 		{
+			String headerPrefix = sbHeader.merge();
 			for (auto& pair : m_layouts) {
 				if (pair.value.isNotNull()) {
-					sbHeader.add(String::format("\t\t#include \"ui/%s.h.inc\"%n", pair.key));
-					sbCpp.add(String::format("\t\t#include \"ui/%s.cpp.inc\"%n", pair.key));
+					sbHeader.add(String::format("#include \"ui/%s.h\"%n", pair.key));
+					sbCpp.add(String::format("#include \"ui/%s.cpp.inc\"%n", pair.key));
 					if (!(_generateLayoutsCpp_Layout(targetPath, pair.value.get()))) {
 						return sl_false;
 					}
@@ -408,8 +395,14 @@ namespace slib
 			}
 		}
 		
-		sbHeader.add("\t}\r\n}\r\n\r\n#endif");
-		sbCpp.add("\t}\r\n}\r\n");
+		String pathHeaderBase = targetPath + "/layouts_base.h";
+		String contentHeaderBase = sbHeaderBase.merge();
+		if (File::readAllTextUTF8(pathHeaderBase) != contentHeaderBase) {
+			if (!(File::writeAllTextUTF8(pathHeaderBase, contentHeaderBase))) {
+				_logError(_g_sdev_sapp_error_file_write_failed.arg(pathHeaderBase));
+				return sl_false;
+			}
+		}
 		
 		String pathHeader = targetPath + "/layouts.h";
 		String contentHeader = sbHeader.merge();
@@ -439,8 +432,11 @@ namespace slib
 		
 		StringBuffer sbHeader, sbCpp;
 		
-		sbHeader.add("\r\n\r\n");
-		sbCpp.add("\r\n\r\n");
+		sbHeader.add("#pragma once\r\n\r\n#include \"../layouts_base.h\"\r\n\r\n");
+
+		String namespacePrefix = String::format("namespace %s%n" "{%n\tnamespace ui%n\t{%n" , m_conf.generate_cpp_namespace);
+		sbHeader.add(namespacePrefix);
+		sbCpp.add(namespacePrefix);
 		
 		if (layout->baseClassName.isNotEmpty()) {
 			sbHeader.add(String::format("\t\tSLIB_DECLARE_UILAYOUT_BEGIN(%s, %s)%n", name, layout->baseClassName));
@@ -508,8 +504,11 @@ namespace slib
 				sbHeader.addStatic(strEndHeader, sizeof(strEndHeader)-1);
 			}
 		}
-			
-		String pathHeader = targetPath + "/ui/" + name + ".h.inc";
+		
+		sbHeader.add("\t}\r\n}\r\n");
+		sbCpp.add("\t}\r\n}\r\n");
+
+		String pathHeader = targetPath + "/ui/" + name + ".h";
 		String contentHeader = sbHeader.merge();
 		if (File::readAllTextUTF8(pathHeader) != contentHeader) {
 			if (!(File::writeAllTextUTF8(pathHeader, contentHeader))) {
@@ -2309,7 +2308,24 @@ namespace slib
 				return sl_false;
 			}
 			resourceItem->className = attr->layout;
-		} else if (op == OP_GENERATE_CPP) {
+		} else {
+			Ref<SAppLayoutResource> layoutImport;
+			if (!(m_layouts.get(attr->layout, &layoutImport))) {
+				do {
+					String path = File::getParentDirectoryPath(resource->filePath) + "/" + attr->layout;
+					if (File::isFile(path + ".xml")) {
+						path += ".xml";
+					} else if (File::isFile(path + ".uiml")) {
+						path += ".uiml";
+					} else {
+						break;
+					}
+					_openUiResource(path);
+				} while (0);
+				m_layouts.emplace(attr->layout, sl_null);
+			}
+		}
+		if (op == OP_GENERATE_CPP) {
 			Ref<SAppLayoutResource> layoutImport;
 			m_layouts.get(attr->layout, &layoutImport);
 			if (layoutImport.isNull()) {

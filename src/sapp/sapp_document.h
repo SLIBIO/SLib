@@ -176,7 +176,7 @@ namespace slib
 		sl_bool _parseLayoutStyle(const String& localNamespace, const Ref<XmlElement>& element);
 		sl_bool _parseLayoutInclude(const String& localNamespace, const Ref<XmlElement>& element);
 		sl_bool _parseLayoutUnit(const String& localNamespace, const Ref<XmlElement>& element);
-		sl_bool _parseLayoutResource(const String& localNamespace, const Ref<XmlElement>& element);
+		sl_bool _parseLayoutResource(const String& filePath, const String& localNamespace, const Ref<XmlElement>& element);
 		sl_bool _parseLayoutResourceItem(SAppLayoutResource* layout, SAppLayoutResourceItem* item, SAppLayoutResourceItem* parent);
 		Ref<SAppLayoutResourceItem> _parseLayoutResourceItemChild(SAppLayoutResource* layout, SAppLayoutResourceItem* parentItem, const Ref<XmlElement>& element);
 		sl_bool _generateLayoutsCpp(const String& targetPath);

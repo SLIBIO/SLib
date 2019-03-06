@@ -762,7 +762,7 @@ namespace slib
 			Ref<XmlElement>& child = children[i];
 			if (child.isNotNull()) {
 				if (child->getName() == "layout") {
-					if (!_parseLayoutResource(localNamespace, child)) {
+					if (!_parseLayoutResource(filePath, localNamespace, child)) {
 						return sl_false;
 					}
 				}
@@ -775,17 +775,14 @@ namespace slib
 	{
 		_log(_g_sdev_sapp_log_generate_cpp_resources_h_begin);
 		
-		String content = String::format(
-										"#ifndef CHECKHEADER_RESOURCES_H_%s%n"
-										"#define CHECKHEADER_RESOURCES_H_%s%n%n"
-										"#include \"raws.h\"%n"
-										"#include \"strings.h\"%n"
-										"#include \"colors.h\"%n"
-										"#include \"drawables.h\"%n"
-										"#include \"menus.h\"%n"
-										"#include \"layouts.h\"%n"
-										"%n#endif%n"
-										, m_conf.generate_cpp_namespace);
+		String content =
+			"#pragma once\r\n\r\n"
+			"#include \"raws.h\"\r\n"
+			"#include \"strings.h\"\r\n"
+			"#include \"colors.h\"\r\n"
+			"#include \"drawables.h\"\r\n"
+			"#include \"menus.h\"\r\n"
+			"#include \"layouts.h\"\r\n";
 		
 		String pathHeader = targetPath + "/resources.h";
 		if (File::readAllTextUTF8(pathHeader) != content) {

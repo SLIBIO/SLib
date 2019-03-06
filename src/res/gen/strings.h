@@ -1,5 +1,4 @@
-#ifndef CHECKHEADER_RESOURCE_STRINGS_slib
-#define CHECKHEADER_RESOURCE_STRINGS_slib
+#pragma once
 
 #include <slib/core/resource.h>
 
@@ -17,5 +16,3 @@ namespace slib
 
 	}
 }
-
-#endif

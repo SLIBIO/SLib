@@ -1,5 +1,4 @@
-#ifndef CHECKHEADER_RESOURCE_COLORS_slib
-#define CHECKHEADER_RESOURCE_COLORS_slib
+#pragma once
 
 #include <slib/graphics/resource.h>
 
@@ -13,5 +12,3 @@ namespace slib
 
 	}
 }
-
-#endif

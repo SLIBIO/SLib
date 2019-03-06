@@ -75,8 +75,7 @@ namespace slib
 		StringBuffer sbHeader, sbCpp, sbMap;
 		
 		sbHeader.add(String::format(
-									"#ifndef CHECKHEADER_RESOURCE_COLORS_%s%n"
-									"#define CHECKHEADER_RESOURCE_COLORS_%s%n%n"
+									"#pragma once%n%n"
 									"#include <slib/graphics/resource.h>%n%n"
 									"namespace %s%n"
 									"{%n\tnamespace color%n\t{%n%n"
@@ -105,7 +104,7 @@ namespace slib
 		
 		sbMap.add("\t\tSLIB_DEFINE_COLOR_RESOURCE_MAP_END\r\n");
 		
-		sbHeader.add("\r\n\t\tSLIB_DECLARE_COLOR_RESOURCE_MAP\r\n\r\n\t}\r\n}\r\n\r\n#endif");
+		sbHeader.add("\r\n\t\tSLIB_DECLARE_COLOR_RESOURCE_MAP\r\n\r\n\t}\r\n}\r\n");
 		
 		sbCpp.link(sbMap);
 		sbCpp.add("\r\n\t}\r\n}\r\n");

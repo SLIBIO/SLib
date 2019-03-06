@@ -1,5 +1,4 @@
-#ifndef CHECKHEADER_RESOURCES_H_slib
-#define CHECKHEADER_RESOURCES_H_slib
+#pragma once
 
 #include "raws.h"
 #include "strings.h"
@@ -7,5 +6,3 @@
 #include "drawables.h"
 #include "menus.h"
 #include "layouts.h"
-
-#endif
