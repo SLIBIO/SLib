@@ -126,10 +126,7 @@ namespace slib
 
 	void ViewPage::close()
 	{
-		Ref<ViewPageNavigationController> controller = getNavigationController();
-		if (controller.isNotNull()) {
-			controller->pop(this);
-		}
+		close(m_closingTransition);
 	}
 
 	void ViewPage::goToPage(const Ref<View>& page, const Transition& transition)
