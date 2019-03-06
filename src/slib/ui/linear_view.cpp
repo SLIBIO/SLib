@@ -170,7 +170,7 @@ namespace slib
 						}
 					} else {
 						if (child->getHeightMode() == SizeMode::Filling) {
-							sl_ui_len width = getLayoutWidth();
+							sl_ui_len width = child->getLayoutWidth();
 							sl_ui_len height = (sl_ui_len)(remainedSize * child->getHeightWeight() / sumFillWeights);
 							child->_restrictSize(width, height);
 							child->setLayoutSize(width, height);
