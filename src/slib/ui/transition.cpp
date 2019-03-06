@@ -29,20 +29,28 @@ namespace slib
 
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(Transition)
 	
-	Transition::Transition()
+	Transition::Transition():
+		type(TransitionType::Default),
+		direction(TransitionDirection::Default),
+		duration(0),
+		curve(AnimationCurve::Default)
 	{
-		type = TransitionType::Default;
-		direction = TransitionDirection::Default;
-		duration = 0;
-		curve = AnimationCurve::Default;
 	}
 	
-	Transition::Transition(TransitionType _type)
+	Transition::Transition(TransitionType _type):
+		type(_type),
+		direction(TransitionDirection::Default),
+		duration(0),
+		curve(AnimationCurve::Default)
 	{
-		type = _type;
-		direction = TransitionDirection::Default;
-		duration = 0;
-		curve = AnimationCurve::Default;
+	}
+	
+	Transition::Transition(TransitionType _type, TransitionDirection _direction, float _duration, AnimationCurve _curve):
+		type(_type),
+		direction(_direction),
+		duration(_duration),
+		curve(_curve)
+	{
 	}
 
 	Ref<Animation> Transition::start(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Function<void()>& onStop)

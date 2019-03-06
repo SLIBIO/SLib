@@ -44,6 +44,8 @@ namespace slib
 		
 		void setNavigationController(const Ref<ViewPageNavigationController>& controller);
 		
+		void setTransition(const Transition& opening, const Transition& closing);
+		
 		
 		void open(const Ref<ViewPageNavigationController>& controller, const Transition& transition);
 		
@@ -66,47 +68,6 @@ namespace slib
 		void goToHomePage(const Ref<View>& pageOther);
 		
 		
-		TransitionType getGlobalOpeningTransitionType();
-		
-		void setGlobalOpeningTransitionType(TransitionType type);
-		
-		TransitionType getGlobalClosingTransitionType();
-		
-		void setGlobalClosingTransitionType(TransitionType type);
-		
-		void setGlobalTransitionType(TransitionType type);
-		
-		TransitionDirection getGlobalOpeningTransitionDirection();
-		
-		void setGlobalOpeningTransitionDirection(TransitionDirection direction);
-		
-		TransitionDirection getGlobalClosingTransitionDirection();
-		
-		void setGlobalClosingTransitionDirection(TransitionDirection direction);
-		
-		void setGlobalTransitionDirection(TransitionDirection direction);
-		
-		float getGlobalOpeningTransitionDuration();
-		
-		void setGlobalOpeningTransitionDuration(float duration);
-		
-		float getGlobalClosingTransitionDuration();
-		
-		void setGlobalClosingTransitionDuration(float duration);
-		
-		void setGlobalTransitionDuration(float duration);
-		
-		AnimationCurve getGlobalOpeningTransitionCurve();
-		
-		void setGlobalOpeningTransitionCurve(AnimationCurve curve);
-		
-		AnimationCurve getGlobalClosingTransitionCurve();
-		
-		void setGlobalClosingTransitionCurve(AnimationCurve curve);
-		
-		void setGlobalTransitionCurve(AnimationCurve curve);
-		
-		
 		void popup(const Ref<View>& parent, const Transition& transition, sl_bool flagFillParentBackground = sl_true);
 		
 		void popup(const Ref<View>& parent, sl_bool flagFillParentBackground = sl_true);
@@ -121,49 +82,11 @@ namespace slib
 		
 		void setCloseOnClickBackground();
 		
-		TransitionType getGlobalOpeningPopupTransitionType();
+		static void setDefaultPopupTransition(const Transition& opening, const Transition& closing);
 		
-		void setGlobalOpeningPopupTransitionType(TransitionType type);
+		static Color getDefaultPopupBackgroundColor();
 		
-		TransitionType getGlobalClosingPopupTransitionType();
-		
-		void setGlobalClosingPopupTransitionType(TransitionType type);
-		
-		void setGlobalPopupTransitionType(TransitionType type);
-		
-		TransitionDirection getGlobalOpeningPopupTransitionDirection();
-		
-		void setGlobalOpeningPopupTransitionDirection(TransitionDirection direction);
-		
-		TransitionDirection getGlobalClosingPopupTransitionDirection();
-		
-		void setGlobalClosingPopupTransitionDirection(TransitionDirection direction);
-		
-		void setGlobalPopupTransitionDirection(TransitionDirection direction);
-		
-		float getGlobalOpeningPopupTransitionDuration();
-		
-		void setGlobalOpeningPopupTransitionDuration(float duration);
-		
-		float getGlobalClosingPopupTransitionDuration();
-		
-		void setGlobalClosingPopupTransitionDuration(float duration);
-		
-		void setGlobalPopupTransitionDuration(float duration);
-		
-		AnimationCurve getGlobalOpeningPopupTransitionCurve();
-		
-		void setGlobalOpeningPopupTransitionCurve(AnimationCurve curve);
-		
-		AnimationCurve getGlobalClosingPopupTransitionCurve();
-		
-		void setGlobalClosingPopupTransitionCurve(AnimationCurve curve);
-		
-		void setGlobalPopupTransitionCurve(AnimationCurve curve);
-		
-		Color getGlobalPopupBackgroundColor();
-		
-		void setGlobalPopupBackgroundColor(const Color& color);
+		static void setDefaultPopupBackgroundColor(const Color& color);
 
 	public:
 		SLIB_DECLARE_EVENT_HANDLER(ViewPage, Open)
@@ -205,9 +128,14 @@ namespace slib
 		};
 		PopupState m_popupState;
 		
+		Transition m_openingTransition;
+		Transition m_closingTransition;
+		
 		Color m_popupBackgroundColor;
 
 		sl_reg m_countActiveTransitionAnimations;
+		
+		friend class ViewPageNavigationController;
 		
 	};
 

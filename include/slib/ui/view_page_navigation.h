@@ -71,54 +71,16 @@ namespace slib
 		
 		void setSwipeNavigation(sl_bool flag);
 		
-		TransitionType getPushTransitionType();
-		
-		void setPushTransitionType(TransitionType type);
-		
-		TransitionType getPopTransitionType();
-		
-		void setPopTransitionType(TransitionType type);
-		
-		void setTransitionType(TransitionType type);
-		
-		TransitionDirection getPushTransitionDirection();
-		
-		void setPushTransitionDirection(TransitionDirection direction);
-		
-		TransitionDirection getPopTransitionDirection();
-		
-		void setPopTransitionDirection(TransitionDirection direction);
-		
-		void setTransitionDirection(TransitionDirection direction);
-		
-		float getPushTransitionDuration();
-		
-		void setPushTransitionDuration(float duration);
-
-		float getPopTransitionDuration();
-		
-		void setPopTransitionDuration(float duration);
-		
-		void setTransitionDuration(float duration);
-		
-		AnimationCurve getPushTransitionCurve();
-		
-		void setPushTransitionCurve(AnimationCurve curve);
-		
-		AnimationCurve getPopTransitionCurve();
-		
-		void setPopTransitionCurve(AnimationCurve curve);
-		
-		void setTransitionCurve(AnimationCurve curve);
-		
+		void setTransition(const Transition& transitionPush, const Transition& transitionPop);
+				
 	protected:
 		void _onFinishAnimation(const Ref<View>& page, UIPageAction action);
 		
 		void _resetAnimationStatus(const Ref<View>& page);
 		
-		void _push(const Ref<View>& page, sl_size countRemoveTop, const Transition& transition);
+		void _push(const Ref<View>& page, sl_size countRemoveTop, const Transition* transition);
 		
-		void _pop(const Ref<View>& page, const Transition& transition);
+		void _pop(const Ref<View>& page, const Transition* transition);
 		
 		void _applyDefaultPushTransition(Transition& transition);
 		
@@ -142,15 +104,9 @@ namespace slib
 
 		sl_bool m_flagSwipeNavigation;
 
-		TransitionType m_pushTransitionType;
-		TransitionType m_popTransitionType;
-		TransitionDirection m_pushTransitionDirection;
-		TransitionDirection m_popTransitionDirection;
-		float m_pushTransitionDuration; // seconds
-		float m_popTransitionDuration; // seconds
-		AnimationCurve m_pushTransitionCurve;
-		AnimationCurve m_popTransitionCurve;
-		
+		Transition m_pushTransition;
+		Transition m_popTransition;
+
 		sl_reg m_countActiveTransitionAnimations;
 		
 		friend class ViewPage;

@@ -58,37 +58,39 @@ namespace slib
 	{
 		m_navigationController = controller;
 	}
+	
+	void ViewPage::setTransition(const Transition& opening, const Transition& closing)
+	{
+		m_openingTransition = opening;
+		m_closingTransition = closing;
+	}
 
 	void ViewPage::open(const Ref<ViewPageNavigationController>& controller, const Transition& transition)
 	{
 		if (controller.isNotNull()) {
-			ObjectLocker lock(this);
-			if (m_popupState != PopupState::None) {
-				return;
-			}
 			controller->push(this, transition);
 		}
 	}
 
 	void ViewPage::open(const Ref<ViewPageNavigationController>& controller)
 	{
-		open(controller, Transition());
+		if (controller.isNotNull()) {
+			controller->push(this);
+		}
 	}
 
 	void ViewPage::openHome(const Ref<ViewPageNavigationController>& controller, const Transition& transition)
 	{
 		if (controller.isNotNull()) {
-			ObjectLocker lock(this);
-			if (m_popupState != PopupState::None) {
-				return;
-			}
 			controller->pushPageAfterPopAllPages(this, transition);
 		}
 	}
 
 	void ViewPage::openHome(const Ref<ViewPageNavigationController>& controller)
 	{
-		openHome(controller, Transition());
+		if (controller.isNotNull()) {
+			controller->pushPageAfterPopAllPages(this);
+		}
 	}
 
 	void ViewPage::close(const Transition& transition)
@@ -124,208 +126,41 @@ namespace slib
 
 	void ViewPage::close()
 	{
-		close(Transition());
+		Ref<ViewPageNavigationController> controller = getNavigationController();
+		if (controller.isNotNull()) {
+			controller->pop(this);
+		}
 	}
 
 	void ViewPage::goToPage(const Ref<View>& page, const Transition& transition)
 	{
 		Ref<ViewPageNavigationController> controller = m_navigationController;
 		if (controller.isNotNull()) {
-			if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
-				_page->open(controller, transition);
-			} else {
-				controller->push(page, transition);
-			}
+			controller->push(page, transition);
 		}
 	}
 
 	void ViewPage::goToPage(const Ref<View>& page)
 	{
-		goToPage(page, Transition());
+		Ref<ViewPageNavigationController> controller = m_navigationController;
+		if (controller.isNotNull()) {
+			controller->push(page);
+		}
 	}
 
 	void ViewPage::goToHomePage(const Ref<View>& page, const Transition& transition)
 	{
 		Ref<ViewPageNavigationController> controller = m_navigationController;
 		if (controller.isNotNull()) {
-			if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
-				_page->openHome(controller, transition);
-			} else {
-				controller->pushPageAfterPopAllPages(page, transition);
-			}
+			controller->pushPageAfterPopAllPages(page, transition);
 		}
 	}
 
 	void ViewPage::goToHomePage(const Ref<View>& page)
 	{
-		goToHomePage(page, Transition());
-	}
-
-	TransitionType ViewPage::getGlobalOpeningTransitionType()
-	{
 		Ref<ViewPageNavigationController> controller = m_navigationController;
 		if (controller.isNotNull()) {
-			return controller->getPushTransitionType();
-		}
-		return TransitionType::Default;
-	}
-
-	void ViewPage::setGlobalOpeningTransitionType(TransitionType type)
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			controller->setPushTransitionType(type);
-		}
-	}
-
-	TransitionType ViewPage::getGlobalClosingTransitionType()
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			return controller->getPopTransitionType();
-		}
-		return TransitionType::Default;
-	}
-
-	void ViewPage::setGlobalClosingTransitionType(TransitionType type)
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			controller->setPopTransitionType(type);
-		}
-	}
-
-	void ViewPage::setGlobalTransitionType(TransitionType type)
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			controller->setTransitionType(type);
-		}
-	}
-
-	TransitionDirection ViewPage::getGlobalOpeningTransitionDirection()
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			return controller->getPushTransitionDirection();
-		}
-		return TransitionDirection::Default;
-	}
-
-	void ViewPage::setGlobalOpeningTransitionDirection(TransitionDirection direction)
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			controller->setPushTransitionDirection(direction);
-		}
-	}
-
-	TransitionDirection ViewPage::getGlobalClosingTransitionDirection()
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			return controller->getPopTransitionDirection();
-		}
-		return TransitionDirection::Default;
-	}
-
-	void ViewPage::setGlobalClosingTransitionDirection(TransitionDirection direction)
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			controller->setPopTransitionDirection(direction);
-		}
-	}
-
-	void ViewPage::setGlobalTransitionDirection(TransitionDirection direction)
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			controller->setTransitionDirection(direction);
-		}
-	}
-
-	float ViewPage::getGlobalOpeningTransitionDuration()
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			return controller->getPushTransitionDuration();
-		}
-		return 0;
-	}
-
-	void ViewPage::setGlobalOpeningTransitionDuration(float duration)
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			controller->setPushTransitionDuration(duration);
-		}
-	}
-
-	float ViewPage::getGlobalClosingTransitionDuration()
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			return controller->getPopTransitionDuration();
-		}
-		return 0;
-	}
-
-	void ViewPage::setGlobalClosingTransitionDuration(float duration)
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			controller->setPopTransitionDuration(duration);
-		}
-	}
-
-	void ViewPage::setGlobalTransitionDuration(float duration)
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			controller->setTransitionDuration(duration);
-		}
-	}
-
-	AnimationCurve ViewPage::getGlobalOpeningTransitionCurve()
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			return controller->getPushTransitionCurve();
-		}
-		return AnimationCurve::Default;
-	}
-
-	void ViewPage::setGlobalOpeningTransitionCurve(AnimationCurve curve)
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			controller->setPushTransitionCurve(curve);
-		}
-	}
-
-	AnimationCurve ViewPage::getGlobalClosingTransitionCurve()
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			return controller->getPopTransitionCurve();
-		}
-		return AnimationCurve::Default;
-	}
-
-	void ViewPage::setGlobalClosingTransitionCurve(AnimationCurve curve)
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			controller->setPopTransitionCurve(curve);
-		}
-	}
-
-	void ViewPage::setGlobalTransitionCurve(AnimationCurve curve)
-	{
-		Ref<ViewPageNavigationController> controller = m_navigationController;
-		if (controller.isNotNull()) {
-			controller->setTransitionCurve(curve);
+			controller->pushPageAfterPopAllPages(page);
 		}
 	}
 
@@ -350,7 +185,7 @@ namespace slib
 			Ref<_priv_ViewPagePopupBackground> back = new _priv_ViewPagePopupBackground;
 			Color color = m_popupBackgroundColor;
 			if (color.isZero()) {
-				color = getGlobalPopupBackgroundColor();
+				color = getDefaultPopupBackgroundColor();
 			}
 			back->setBackgroundColor(color);
 			back->setWidthFilling(1, UIUpdateMode::Init);
@@ -503,7 +338,7 @@ namespace slib
 
 	void ViewPage::popup(const Ref<View>& parent, sl_bool flagFillParentBackground)
 	{
-		popup(parent, Transition(), flagFillParentBackground);
+		popup(parent, m_openingTransition, flagFillParentBackground);
 	}
 
 	Ref<Window> ViewPage::popupWindow(const Ref<Window>& parent)
@@ -584,159 +419,84 @@ namespace slib
 		});
 	}
 	
-	TransitionType _g_viewPage_globalOpeningPopupTransitionType = TransitionType::Zoom;
-	TransitionDirection _g_viewPage_globalOpeningPopupTransitionDirection = TransitionDirection::FromBottomToTop;
-	float _g_viewPage_globalOpeningPopupTransitionDuration = 0.25f;
-	AnimationCurve _g_viewPage_globalOpeningPopupTransitionCurve = AnimationCurve::Overshoot;
-	TransitionType _g_viewPage_globalClosingPopupTransitionType = TransitionType::Fade;
-	TransitionDirection _g_viewPage_globalClosingPopupTransitionDirection = TransitionDirection::FromTopToBottom;
-	float _g_viewPage_globalClosingPopupTransitionDuration = 0.2f;
-	AnimationCurve _g_viewPage_globalClosingPopupTransitionCurve = AnimationCurve::Linear;
-	SLIB_STATIC_COLOR(_g_viewPage_globalPopupBackgroundColor, 0, 0, 0, 120)
+	TransitionType _g_priv_ViewPage_defaultOpeningPopupTransitionType = TransitionType::Zoom;
+	TransitionDirection _g_priv_ViewPage_defaultOpeningPopupTransitionDirection = TransitionDirection::FromBottomToTop;
+	float _g_priv_ViewPage_defaultOpeningPopupTransitionDuration = 0.25f;
+	AnimationCurve _g_priv_ViewPage_defaultOpeningPopupTransitionCurve = AnimationCurve::Overshoot;
+	TransitionType _g_priv_ViewPage_defaultClosingPopupTransitionType = TransitionType::Fade;
+	TransitionDirection _g_priv_ViewPage_defaultClosingPopupTransitionDirection = TransitionDirection::FromTopToBottom;
+	float _g_priv_ViewPage_defaultClosingPopupTransitionDuration = 0.2f;
+	AnimationCurve _g_priv_ViewPage_defaultClosingPopupTransitionCurve = AnimationCurve::Linear;
 
-	TransitionType ViewPage::getGlobalOpeningPopupTransitionType()
+	void ViewPage::setDefaultPopupTransition(const Transition& opening, const Transition& closing)
 	{
-		return _g_viewPage_globalOpeningPopupTransitionType;
+		if (opening.type != TransitionType::Default) {
+			_g_priv_ViewPage_defaultOpeningPopupTransitionType = opening.type;
+		}
+		if (opening.direction != TransitionDirection::Default) {
+			_g_priv_ViewPage_defaultOpeningPopupTransitionDirection = opening.direction;
+		}
+		if (opening.duration > 0) {
+			_g_priv_ViewPage_defaultOpeningPopupTransitionDuration = opening.duration;
+		}
+		if (opening.curve != AnimationCurve::Default) {
+			_g_priv_ViewPage_defaultOpeningPopupTransitionCurve = opening.curve;
+		}
+		if (closing.type != TransitionType::Default) {
+			_g_priv_ViewPage_defaultClosingPopupTransitionType = closing.type;
+		}
+		if (closing.direction != TransitionDirection::Default) {
+			_g_priv_ViewPage_defaultClosingPopupTransitionDirection = closing.direction;
+		}
+		if (closing.duration > 0) {
+			_g_priv_ViewPage_defaultClosingPopupTransitionDuration = closing.duration;
+		}
+		if (closing.curve != AnimationCurve::Default) {
+			_g_priv_ViewPage_defaultClosingPopupTransitionCurve = closing.curve;
+		}
 	}
 
-	void ViewPage::setGlobalOpeningPopupTransitionType(TransitionType type)
+	SLIB_STATIC_COLOR(_g_priv_ViewPage_defaultPopupBackgroundColor, 0, 0, 0, 120)
+
+	Color ViewPage::getDefaultPopupBackgroundColor()
 	{
-		_g_viewPage_globalOpeningPopupTransitionType = type;
+		return _g_priv_ViewPage_defaultPopupBackgroundColor;
 	}
 
-	TransitionType ViewPage::getGlobalClosingPopupTransitionType()
+	void ViewPage::setDefaultPopupBackgroundColor(const Color& color)
 	{
-		return _g_viewPage_globalClosingPopupTransitionType;
-	}
-
-	void ViewPage::setGlobalClosingPopupTransitionType(TransitionType type)
-	{
-		_g_viewPage_globalClosingPopupTransitionType = type;
-	}
-
-	void ViewPage::setGlobalPopupTransitionType(TransitionType type)
-	{
-		_g_viewPage_globalOpeningPopupTransitionType = type;
-		_g_viewPage_globalClosingPopupTransitionType = type;
-	}
-
-	TransitionDirection ViewPage::getGlobalOpeningPopupTransitionDirection()
-	{
-		return _g_viewPage_globalOpeningPopupTransitionDirection;
-	}
-
-	void ViewPage::setGlobalOpeningPopupTransitionDirection(TransitionDirection direction)
-	{
-		_g_viewPage_globalOpeningPopupTransitionDirection = direction;
-	}
-
-	TransitionDirection ViewPage::getGlobalClosingPopupTransitionDirection()
-	{
-		return _g_viewPage_globalClosingPopupTransitionDirection;
-	}
-
-	void ViewPage::setGlobalClosingPopupTransitionDirection(TransitionDirection direction)
-	{
-		_g_viewPage_globalClosingPopupTransitionDirection = direction;
-	}
-
-	void ViewPage::setGlobalPopupTransitionDirection(TransitionDirection direction)
-	{
-		_g_viewPage_globalOpeningPopupTransitionDirection = direction;
-		_g_viewPage_globalClosingPopupTransitionDirection = direction;
-	}
-
-	float ViewPage::getGlobalOpeningPopupTransitionDuration()
-	{
-		return _g_viewPage_globalOpeningPopupTransitionDuration;
-	}
-
-	void ViewPage::setGlobalOpeningPopupTransitionDuration(float duration)
-	{
-		_g_viewPage_globalOpeningPopupTransitionDuration = duration;
-	}
-
-	float ViewPage::getGlobalClosingPopupTransitionDuration()
-	{
-		return _g_viewPage_globalClosingPopupTransitionDuration;
-	}
-
-	void ViewPage::setGlobalClosingPopupTransitionDuration(float duration)
-	{
-		_g_viewPage_globalClosingPopupTransitionDuration = duration;
-	}
-
-	void ViewPage::setGlobalPopupTransitionDuration(float duration)
-	{
-		_g_viewPage_globalOpeningPopupTransitionDuration = duration;
-		_g_viewPage_globalClosingPopupTransitionDuration = duration;
-	}
-
-	AnimationCurve ViewPage::getGlobalOpeningPopupTransitionCurve()
-	{
-		return _g_viewPage_globalOpeningPopupTransitionCurve;
-	}
-
-	void ViewPage::setGlobalOpeningPopupTransitionCurve(AnimationCurve curve)
-	{
-		_g_viewPage_globalOpeningPopupTransitionCurve = curve;
-	}
-
-	AnimationCurve ViewPage::getGlobalClosingPopupTransitionCurve()
-	{
-		return _g_viewPage_globalClosingPopupTransitionCurve;
-	}
-
-	void ViewPage::setGlobalClosingPopupTransitionCurve(AnimationCurve curve)
-	{
-		_g_viewPage_globalClosingPopupTransitionCurve = curve;
-	}
-
-	void ViewPage::setGlobalPopupTransitionCurve(AnimationCurve curve)
-	{
-		_g_viewPage_globalOpeningPopupTransitionCurve = curve;
-		_g_viewPage_globalClosingPopupTransitionCurve = curve;
-	}
-
-	Color ViewPage::getGlobalPopupBackgroundColor()
-	{
-		return _g_viewPage_globalPopupBackgroundColor;
-	}
-
-	void ViewPage::setGlobalPopupBackgroundColor(const Color& color)
-	{
-		_g_viewPage_globalPopupBackgroundColor = color;
+		_g_priv_ViewPage_defaultPopupBackgroundColor = color;
 	}
 
 	void ViewPage::_applyDefaultOpeningPopupTransition(Transition& transition)
 	{
 		if (transition.type == TransitionType::Default) {
-			transition.type = getGlobalOpeningPopupTransitionType();
+			transition.type = _g_priv_ViewPage_defaultOpeningPopupTransitionType;
 		}
 		if (transition.direction == TransitionDirection::Default) {
-			transition.direction = getGlobalOpeningPopupTransitionDirection();
+			transition.direction = _g_priv_ViewPage_defaultOpeningPopupTransitionDirection;
 		}
-		if (transition.duration < SLIB_EPSILON) {
-			transition.duration = getGlobalOpeningPopupTransitionDuration();
+		if (transition.duration <= 0) {
+			transition.duration = _g_priv_ViewPage_defaultOpeningPopupTransitionDuration;
 		}
 		if (transition.curve == AnimationCurve::Default) {
-			transition.curve = getGlobalOpeningPopupTransitionCurve();
+			transition.curve = _g_priv_ViewPage_defaultOpeningPopupTransitionCurve;
 		}
 	}
 
 	void ViewPage::_applyDefaultClosingPopupTransition(Transition& transition)
 	{
 		if (transition.type == TransitionType::Default) {
-			transition.type = getGlobalClosingPopupTransitionType();
+			transition.type = _g_priv_ViewPage_defaultClosingPopupTransitionType;
 		}
 		if (transition.direction == TransitionDirection::Default) {
-			transition.direction = getGlobalClosingPopupTransitionDirection();
+			transition.direction = _g_priv_ViewPage_defaultClosingPopupTransitionDirection;
 		}
 		if (transition.duration < SLIB_EPSILON) {
-			transition.duration = getGlobalClosingPopupTransitionDuration();
+			transition.duration = _g_priv_ViewPage_defaultClosingPopupTransitionDuration;
 		}
 		if (transition.curve == AnimationCurve::Default) {
-			transition.curve = getGlobalClosingPopupTransitionCurve();
+			transition.curve = _g_priv_ViewPage_defaultClosingPopupTransitionCurve;
 		}
 	}
 

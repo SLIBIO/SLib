@@ -64,6 +64,8 @@ namespace slib
 		
 		Transition(TransitionType type);
 		
+		Transition(TransitionType type, TransitionDirection direction, float duration = 0, AnimationCurve curve = AnimationCurve::Default);
+		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(Transition)
 
 	public:

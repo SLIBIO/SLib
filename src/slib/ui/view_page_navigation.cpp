@@ -42,14 +42,14 @@ namespace slib
 		
 		m_flagSwipeNavigation = sl_false;
 		
-		m_pushTransitionType = TransitionType::Slide;
-		m_pushTransitionDirection = TransitionDirection::FromRightToLeft;
-		m_pushTransitionCurve = AnimationCurve::EaseInOut;
-		m_pushTransitionDuration = 0.2f;
-		m_popTransitionType = TransitionType::Slide;
-		m_popTransitionDirection = TransitionDirection::FromLeftToRight;
-		m_popTransitionCurve = AnimationCurve::EaseInOut;
-		m_popTransitionDuration = 0.2f;
+		m_pushTransition.type = TransitionType::Slide;
+		m_pushTransition.direction = TransitionDirection::FromRightToLeft;
+		m_pushTransition.curve = AnimationCurve::EaseInOut;
+		m_pushTransition.duration = 0.2f;
+		m_popTransition.type = TransitionType::Slide;
+		m_popTransition.direction = TransitionDirection::FromLeftToRight;
+		m_popTransition.curve = AnimationCurve::EaseInOut;
+		m_popTransition.duration = 0.2f;
 		
 		m_countActiveTransitionAnimations = 0;
 	}
@@ -107,7 +107,7 @@ namespace slib
 		view->setAlpha(1, UIUpdateMode::Redraw);
 	}
 
-	void ViewPageNavigationController::_push(const Ref<View>& viewIn, sl_size countRemoveTop, const Transition& _transition)
+	void ViewPageNavigationController::_push(const Ref<View>& viewIn, sl_size countRemoveTop, const Transition* _transition)
 	{
 
 		if (viewIn.isNull()) {
@@ -123,7 +123,15 @@ namespace slib
 			return;
 		}
 
-		Transition transition(_transition);
+		if (!_transition) {
+			if (ViewPage* _page = CastInstance<ViewPage>(viewIn.get())) {
+				_transition = &(_page->m_openingTransition);
+			} else {
+				static Transition defaultTransition;
+				_transition = &defaultTransition;
+			}
+		}
+		Transition transition(*_transition);
 		
 		sl_size n = m_pages.getCount();
 		
@@ -226,21 +234,43 @@ namespace slib
 	
 	void ViewPageNavigationController::push(const Ref<View>& page)
 	{
-		pushPageAfterPopPages(page, 0, Transition());
+		pushPageAfterPopPages(page, 0);
 	}
 
 	void ViewPageNavigationController::pushPageAfterPopPages(const Ref<View>& page, sl_size countPop, const Transition& transition)
 	{
 		if (isDrawingThread()) {
-			_push(page, countPop, transition);
+			if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
+				ObjectLocker lock(_page);
+				if (_page->m_popupState != ViewPage::PopupState::None) {
+					return;
+				}
+				_push(page, countPop, &transition);
+			} else {
+				_push(page, countPop, &transition);
+			}
 		} else {
-			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPageNavigationController, _push, this, page, countPop, transition));
+			void (ViewPageNavigationController::*func)(const Ref<View>& page, sl_size countPop, const Transition& transition) = &ViewPageNavigationController::pushPageAfterPopPages;
+			dispatchToDrawingThread(Function<void()>::bindWeakRef(ToWeakRef(this), func, page, countPop, transition));
 		}
 	}
 	
 	void ViewPageNavigationController::pushPageAfterPopPages(const Ref<View>& page, sl_size countPop)
 	{
-		pushPageAfterPopPages(page, countPop, Transition());
+		if (isDrawingThread()) {
+			if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
+				ObjectLocker lock(_page);
+				if (_page->m_popupState != ViewPage::PopupState::None) {
+					return;
+				}
+				_push(page, countPop, sl_null);
+			} else {
+				_push(page, countPop, sl_null);
+			}
+		} else {
+			void (ViewPageNavigationController::*func)(const Ref<View>& page, sl_size countPop) = &ViewPageNavigationController::pushPageAfterPopPages;
+			dispatchToDrawingThread(Function<void()>::bindWeakRef(ToWeakRef(this), func, page, countPop));
+		}
 	}
 	
 	void ViewPageNavigationController::pushPageAfterPopAllPages(const Ref<View>& page, const Transition& transition)
@@ -250,10 +280,10 @@ namespace slib
 	
 	void ViewPageNavigationController::pushPageAfterPopAllPages(const Ref<View>& page)
 	{
-		pushPageAfterPopPages(page, SLIB_SIZE_MAX, Transition());
+		pushPageAfterPopPages(page, SLIB_SIZE_MAX);
 	}
 	
-	void ViewPageNavigationController::_pop(const Ref<View>& _viewOut, const Transition& _transition)
+	void ViewPageNavigationController::_pop(const Ref<View>& _viewOut, const Transition* _transition)
 	{
 
 		ObjectLocker lock(this);
@@ -262,8 +292,6 @@ namespace slib
 			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPageNavigationController, _pop, this, _viewOut, _transition), 100);
 			return;
 		}
-
-		Transition transition = _transition;
 		
 		sl_size n = m_pages.getCount();
 		
@@ -276,6 +304,16 @@ namespace slib
 			return;
 		}
 
+		if (!_transition) {
+			if (ViewPage* _page = CastInstance<ViewPage>(viewOut.get())) {
+				_transition = &(_page->m_closingTransition);
+			} else {
+				static Transition defaultTransition;
+				_transition = &defaultTransition;
+			}
+		}
+		Transition transition(*_transition);
+		
 #if defined(SLIB_UI_IS_ANDROID)
 		Android::dismissKeyboard();
 #endif
@@ -331,15 +369,21 @@ namespace slib
 	void ViewPageNavigationController::pop(const Ref<View>& viewOut, const Transition& transition)
 	{
 		if (isDrawingThread()) {
-			_pop(viewOut, transition);
+			_pop(viewOut, &transition);
 		} else {
-			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPageNavigationController, _pop, this, viewOut, transition));
+			void (ViewPageNavigationController::*func)(const Ref<View>& viewOut, const Transition& transition) = &ViewPageNavigationController::pop;
+			dispatchToDrawingThread(Function<void()>::bindWeakRef(ToWeakRef(this), func, viewOut, transition));
 		}
 	}
 
 	void ViewPageNavigationController::pop(const Ref<View>& viewOut)
 	{
-		pop(viewOut, Transition());
+		if (isDrawingThread()) {
+			_pop(viewOut, sl_null);
+		} else {
+			void (ViewPageNavigationController::*func)(const Ref<View>& viewOut) = &ViewPageNavigationController::pop;
+			dispatchToDrawingThread(Function<void()>::bindWeakRef(ToWeakRef(this), func, viewOut));
+		}
 	}
 
 	void ViewPageNavigationController::pop(const Transition& transition)
@@ -349,7 +393,7 @@ namespace slib
 
 	void ViewPageNavigationController::pop()
 	{
-		pop(Ref<View>::null(), Transition());
+		pop(Ref<View>::null());
 	}
 
 	void ViewPageNavigationController::setSwipeNavigation(sl_bool flag)
@@ -364,139 +408,63 @@ namespace slib
 		}
 	}
 
-	TransitionType ViewPageNavigationController::getPushTransitionType()
+	void ViewPageNavigationController::setTransition(const Transition& opening, const Transition& closing)
 	{
-		return m_pushTransitionType;
+		if (opening.type != TransitionType::Default) {
+			m_pushTransition.type = opening.type;
+		}
+		if (opening.direction != TransitionDirection::Default) {
+			m_pushTransition.direction = opening.direction;
+		}
+		if (opening.duration > 0) {
+			m_pushTransition.duration = opening.duration;
+		}
+		if (opening.curve != AnimationCurve::Default) {
+			m_pushTransition.curve = opening.curve;
+		}
+		if (closing.type != TransitionType::Default) {
+			m_popTransition.type = closing.type;
+		}
+		if (closing.direction != TransitionDirection::Default) {
+			m_popTransition.direction = closing.direction;
+		}
+		if (closing.duration > 0) {
+			m_popTransition.duration = closing.duration;
+		}
+		if (closing.curve != AnimationCurve::Default) {
+			m_popTransition.curve = closing.curve;
+		}
 	}
-
-	void ViewPageNavigationController::setPushTransitionType(TransitionType type)
-	{
-		m_pushTransitionType = type;
-	}
-
-	TransitionType ViewPageNavigationController::getPopTransitionType()
-	{
-		return m_popTransitionType;
-	}
-
-	void ViewPageNavigationController::setPopTransitionType(TransitionType type)
-	{
-		m_popTransitionType = type;
-	}
-
-	void ViewPageNavigationController::setTransitionType(TransitionType type)
-	{
-		m_pushTransitionType = type;
-		m_popTransitionType = type;
-	}
-
-	TransitionDirection ViewPageNavigationController::getPushTransitionDirection()
-	{
-		return m_pushTransitionDirection;
-	}
-
-	void ViewPageNavigationController::setPushTransitionDirection(TransitionDirection direction)
-	{
-		m_pushTransitionDirection = direction;
-	}
-
-	TransitionDirection ViewPageNavigationController::getPopTransitionDirection()
-	{
-		return m_popTransitionDirection;
-	}
-
-	void ViewPageNavigationController::setPopTransitionDirection(TransitionDirection direction)
-	{
-		m_popTransitionDirection = direction;
-	}
-
-	void ViewPageNavigationController::setTransitionDirection(TransitionDirection direction)
-	{
-		m_pushTransitionDirection = direction;
-		m_popTransitionDirection = direction;
-	}
-
-	float ViewPageNavigationController::getPushTransitionDuration()
-	{
-		return m_pushTransitionDuration;
-	}
-
-	void ViewPageNavigationController::setPushTransitionDuration(float duration)
-	{
-		m_pushTransitionDuration = duration;
-	}
-
-	float ViewPageNavigationController::getPopTransitionDuration()
-	{
-		return m_popTransitionDuration;
-	}
-
-	void ViewPageNavigationController::setPopTransitionDuration(float duration)
-	{
-		m_popTransitionDuration = duration;
-	}
-
-	void ViewPageNavigationController::setTransitionDuration(float duration)
-	{
-		m_pushTransitionDuration = duration;
-		m_popTransitionDuration = duration;
-	}
-
-	AnimationCurve ViewPageNavigationController::getPushTransitionCurve()
-	{
-		return m_pushTransitionCurve;
-	}
-
-	void ViewPageNavigationController::setPushTransitionCurve(AnimationCurve curve)
-	{
-		m_pushTransitionCurve = curve;
-	}
-
-	AnimationCurve ViewPageNavigationController::getPopTransitionCurve()
-	{
-		return m_popTransitionCurve;
-	}
-
-	void ViewPageNavigationController::setPopTransitionCurve(AnimationCurve curve)
-	{
-		m_popTransitionCurve = curve;
-	}
-
-	void ViewPageNavigationController::setTransitionCurve(AnimationCurve curve)
-	{
-		m_pushTransitionCurve = curve;
-		m_popTransitionCurve = curve;
-	}
-
+	
 	void ViewPageNavigationController::_applyDefaultPushTransition(Transition& transition)
 	{
 		if (transition.type == TransitionType::Default) {
-			transition.type = m_pushTransitionType;
+			transition.type = m_pushTransition.type;
 		}
 		if (transition.direction == TransitionDirection::Default) {
-			transition.direction = m_pushTransitionDirection;
+			transition.direction = m_pushTransition.direction;
 		}
-		if (transition.duration < SLIB_EPSILON) {
-			transition.duration = m_pushTransitionDuration;
+		if (transition.duration <= 0) {
+			transition.duration = m_pushTransition.duration;
 		}
 		if (transition.curve == AnimationCurve::Default) {
-			transition.curve = m_pushTransitionCurve;
+			transition.curve = m_pushTransition.curve;
 		}
 	}
 
 	void ViewPageNavigationController::_applyDefaultPopTransition(Transition& transition)
 	{
 		if (transition.type == TransitionType::Default) {
-			transition.type = m_popTransitionType;
+			transition.type = m_popTransition.type;
 		}
 		if (transition.direction == TransitionDirection::Default) {
-			transition.direction = m_popTransitionDirection;
+			transition.direction = m_popTransition.direction;
 		}
-		if (transition.duration < SLIB_EPSILON) {
-			transition.duration = m_popTransitionDuration;
+		if (transition.duration <= 0) {
+			transition.duration = m_popTransition.duration;
 		}
 		if (transition.curve == AnimationCurve::Default) {
-			transition.curve = m_popTransitionCurve;
+			transition.curve = m_popTransition.curve;
 		}
 	}
 	
