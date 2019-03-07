@@ -78,6 +78,12 @@ namespace slib
 		
 		void setAsynchronousResponse(sl_bool flagAsync);
 		
+		sl_bool isProcessed();
+		
+		void setProcessed(sl_bool flag = sl_true);
+		
+		sl_bool isCompleted();
+
 		void completeResponse();
 		
 	public:
@@ -91,7 +97,9 @@ namespace slib
 		MemoryQueue m_requestBodyBuffer;
 		AtomicMemory m_requestBody;
 		sl_bool m_flagAsynchronousResponse;
-		
+		sl_bool m_flagProcessed;
+		sl_bool m_flagCompleted;
+
 	private:
 		WeakRef<HttpServerConnection> m_connection;
 		
@@ -228,7 +236,9 @@ namespace slib
 	{
 	public:
 		HashMap<HttpMethod, HttpServerRoute> routes;
-		
+		HashMap<HttpMethod, HttpServerRoute> preRoutes;
+		HashMap<HttpMethod, HttpServerRoute> postRoutes;
+
 	public:
 		HttpServerRouter();
 		
@@ -236,10 +246,22 @@ namespace slib
 		
 	public:
 		sl_bool processRequest(const String& path, HttpServer* server, HttpServerContext* context);
-		
+
+		sl_bool preProcessRequest(const String& path, HttpServer* server, HttpServerContext* context);
+
+		sl_bool postProcessRequest(const String& path, HttpServer* server, HttpServerContext* context);
+
 		void add(HttpMethod method, const String& path, const HttpServerRoute& route);
 		
 		void add(HttpMethod method, const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		
+		void before(HttpMethod method, const String& path, const HttpServerRoute& route);
+		
+		void before(HttpMethod method, const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		
+		void after(HttpMethod method, const String& path, const HttpServerRoute& route);
+		
+		void after(HttpMethod method, const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
 		
 		void add(const String& path, const HttpServerRouter& router);
 		
@@ -295,10 +317,10 @@ namespace slib
 		sl_bool flagLogDebug;
 		
 		HttpServerRouter router;
-		
+
 		Function<sl_bool(HttpServer*, HttpServerContext*)> onRequest;
 		Function<sl_bool(HttpServer*, HttpServerContext*)> onPreRequest;
-		Function<void(HttpServer*, HttpServerContext*, sl_bool flagProcessed)> onPostRequest;
+		Function<void(HttpServer*, HttpServerContext*)> onPostRequest;
 
 	public:
 		HttpServerParam();
@@ -355,11 +377,11 @@ namespace slib
 	protected:
 		virtual sl_bool onRequest(HttpServerContext* context);
 		
-		sl_bool dispatchRequest(HttpServerContext* context);
+		void dispatchRequest(HttpServerContext* context);
 		
-		virtual void onPostRequest(HttpServerContext* context, sl_bool flagProcessed);
+		virtual void onPostRequest(HttpServerContext* context);
 		
-		void dispatchPostRequest(HttpServerContext* context, sl_bool flagProcessed);
+		void dispatchPostRequest(HttpServerContext* context);
 		
 	public:
 		void addConnectionProvider(const Ref<HttpServerConnectionProvider>& provider);

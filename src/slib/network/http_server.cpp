@@ -45,6 +45,8 @@ namespace slib
 	{
 		m_requestContentLength = 0;
 		m_flagAsynchronousResponse = sl_false;
+		m_flagProcessed = sl_false;
+		m_flagCompleted = sl_false;
 
 		setClosingConnection(sl_false);
 		setProcessingByThread(sl_true);
@@ -151,6 +153,21 @@ namespace slib
 	void HttpServerContext::setAsynchronousResponse(sl_bool flagAsync)
 	{
 		m_flagAsynchronousResponse = flagAsync;
+	}
+	
+	sl_bool HttpServerContext::isProcessed()
+	{
+		return m_flagProcessed;
+	}
+	
+	void HttpServerContext::setProcessed(sl_bool flag)
+	{
+		m_flagProcessed = flag;
+	}
+	
+	sl_bool HttpServerContext::isCompleted()
+	{
+		return m_flagCompleted;
 	}
 
 	void HttpServerContext::completeResponse()
@@ -390,12 +407,17 @@ namespace slib
 		}
 		server->processRequest(context.get());
 		if (!(context->isAsynchronousResponse())) {
-			context->completeResponse();
+			_completeResponse(context.get());
 		}
 	}
 
 	void HttpServerConnection::_completeResponse(HttpServerContext* context)
 	{
+		if (context->isCompleted()) {
+			return;
+		}
+		context->m_flagCompleted = sl_true;
+		
 		context->setResponseHeader(HttpHeaders::ContentLength, String::fromUint64(context->getResponseContentLength()));
 		String oldResponseContentType = context->getResponseContentType();
 		if (oldResponseContentType.isEmpty()) {
@@ -810,6 +832,48 @@ namespace slib
 		return sl_false;
 	}
 	
+	sl_bool HttpServerRouter::preProcessRequest(const String& path, HttpServer* server, HttpServerContext* context)
+	{
+		if (preRoutes.isNull()) {
+			return sl_false;
+		}
+		HttpMethod method = context->getMethod();
+		HttpServerRoute* route = preRoutes.getItemPointer(method);
+		if (route) {
+			if (route->processRequest(path, server, context)) {
+				return sl_true;
+			}
+		}
+		route = preRoutes.getItemPointer(HttpMethod::Unknown);
+		if (route) {
+			if (route->processRequest(path, server, context)) {
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	sl_bool HttpServerRouter::postProcessRequest(const String& path, HttpServer* server, HttpServerContext* context)
+	{
+		if (postRoutes.isNull()) {
+			return sl_false;
+		}
+		HttpMethod method = context->getMethod();
+		HttpServerRoute* route = postRoutes.getItemPointer(method);
+		if (route) {
+			if (route->processRequest(path, server, context)) {
+				return sl_true;
+			}
+		}
+		route = postRoutes.getItemPointer(HttpMethod::Unknown);
+		if (route) {
+			if (route->processRequest(path, server, context)) {
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
 	void HttpServerRouter::add(HttpMethod method, const String& path, const HttpServerRoute& _route)
 	{
 		HttpServerRoute* route = routes.getItemPointer(method);
@@ -828,10 +892,52 @@ namespace slib
 		route->add(path, onRequest);
 	}
 	
+	void HttpServerRouter::before(HttpMethod method, const String& path, const HttpServerRoute& _route)
+	{
+		HttpServerRoute* route = preRoutes.getItemPointer(method);
+		if (!route) {
+			route = &(preRoutes.emplace_NoLock(method).node->value);
+		}
+		route->add(path, _route);
+	}
+	
+	void HttpServerRouter::before(HttpMethod method, const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	{
+		HttpServerRoute* route = preRoutes.getItemPointer(method);
+		if (!route) {
+			route = &(preRoutes.emplace_NoLock(method).node->value);
+		}
+		route->add(path, onRequest);
+	}
+	
+	void HttpServerRouter::after(HttpMethod method, const String& path, const HttpServerRoute& _route)
+	{
+		HttpServerRoute* route = postRoutes.getItemPointer(method);
+		if (!route) {
+			route = &(postRoutes.emplace_NoLock(method).node->value);
+		}
+		route->add(path, _route);
+	}
+	
+	void HttpServerRouter::after(HttpMethod method, const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	{
+		HttpServerRoute* route = postRoutes.getItemPointer(method);
+		if (!route) {
+			route = &(postRoutes.emplace_NoLock(method).node->value);
+		}
+		route->add(path, onRequest);
+	}
+	
 	void HttpServerRouter::add(const String& path, const HttpServerRouter& router)
 	{
 		for (auto& item : router.routes) {
 			add(item.key, path, item.value);
+		}
+		for (auto& item : router.preRoutes) {
+			before(item.key, path, item.value);
+		}
+		for (auto& item : router.postRoutes) {
+			after(item.key, path, item.value);
 		}
 	}
 	
@@ -1088,7 +1194,8 @@ namespace slib
 		
 		do {
 			
-			if (dispatchRequest(context.get())) {
+			dispatchRequest(context.get());
+			if (context->isProcessed()) {
 				break;
 			}
 		
@@ -1158,12 +1265,13 @@ namespace slib
 				}
 			}
 			
-			dispatchPostRequest(context.get(), sl_false);
+			dispatchPostRequest(context.get());
 			return;
-		
+			
 		} while (0);
 		
-		dispatchPostRequest(context.get(), sl_true);
+		context->setProcessed();
+		dispatchPostRequest(context.get());
 		
 	}
 
@@ -1342,41 +1450,49 @@ namespace slib
 		return sl_false;
 	}
 	
-	sl_bool HttpServer::dispatchRequest(HttpServerContext* context)
+	void HttpServer::dispatchRequest(HttpServerContext* context)
 	{
 		if (m_param.onPreRequest.isNotNull()) {
 			if (m_param.onPreRequest(this, context)) {
-				return sl_true;
+				context->setProcessed();
+				return;
 			}
 		}
+		if (m_param.router.preProcessRequest(context->getPath(), this, context)) {
+			context->setProcessed();
+			return;
+		}
 		if (m_param.router.processRequest(context->getPath(), this, context)) {
-			return sl_true;
+			context->setProcessed();
+			return;
 		}
 		if (m_param.onRequest.isNotNull()) {
 			if (m_param.onRequest(this, context)) {
-				return sl_true;
+				context->setProcessed();
+				return;
 			}
 		}
 		if (onRequest(context)) {
-			return sl_true;
+			context->setProcessed();
+			return;
 		}
-		return sl_false;
 	}
 	
-	void HttpServer::onPostRequest(HttpServerContext* context, sl_bool flagProcessed)
+	void HttpServer::onPostRequest(HttpServerContext* context)
 	{
 	}
 	
-	void HttpServer::dispatchPostRequest(HttpServerContext* context, sl_bool flagProcessed)
+	void HttpServer::dispatchPostRequest(HttpServerContext* context)
 	{
-		if (!flagProcessed) {
+		if (!(context->isProcessed())) {
 			context->setResponseCode(HttpStatus::NotFound);
 		}
-		m_param.onPostRequest(this, context, flagProcessed);
-		onPostRequest(context, flagProcessed);
+		m_param.router.postProcessRequest(context->getPath(), this, context);
+		m_param.onPostRequest(this, context);
+		onPostRequest(context);
 		if (m_param.flagAllowCrossOrigin) {
 			context->setResponseAccessControlAllowOrigin("*");
-			if (!flagProcessed && context->getMethod() == HttpMethod::OPTIONS) {
+			if (!(context->isProcessed()) && context->getMethod() == HttpMethod::OPTIONS) {
 				context->setResponseCode(HttpStatus::OK);
 			}
 		}
