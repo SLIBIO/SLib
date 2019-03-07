@@ -214,7 +214,7 @@ namespace slib
 	};
 	
 	template <class T>
-	class Hash< Nullable<T> >
+	class Hash< Nullable<T>, sl_false >
 	{
 	public:
 		SLIB_INLINE sl_size operator()(const Nullable<T>& v) const

@@ -28,7 +28,7 @@
 namespace slib
 {
 
-	template <class T>
+	template <class T, sl_bool isEnum=__is_enum(T)>
 	class Hash;
 	
 	SLIB_INLINE constexpr sl_uint8 Rehash8(sl_uint8 x) noexcept
@@ -193,7 +193,7 @@ namespace slib
 	};
 
 	template <class T>
-	class Hash<T const*>
+	class Hash<T const*, sl_false>
 	{
 	public:
 		SLIB_INLINE sl_size operator()(T const* v) const noexcept
@@ -207,7 +207,7 @@ namespace slib
 	};
 
 	template <class T>
-	class Hash<T*>
+	class Hash<T*, sl_false>
 	{
 	public:
 		SLIB_INLINE sl_size operator()(T* v) const noexcept
@@ -220,6 +220,21 @@ namespace slib
 		}
 	};
 
+	template <class T>
+	class Hash<T, sl_true>
+	{
+	public:
+		SLIB_INLINE sl_size operator()(T v) const noexcept
+		{
+#ifdef SLIB_ARCH_IS_64BIT
+			return Rehash64((sl_uint64)((sl_int64)v));
+#else
+			return Rehash32((sl_uint32)((sl_int32)v));
+#endif
+		}
+		
+	};
+	
 }
 
 #endif

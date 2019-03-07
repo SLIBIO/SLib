@@ -78,7 +78,7 @@ namespace slib
 	};
 	
 	template <class FIRST_T, class SECOND_T>
-	class Hash< Pair<FIRST_T, SECOND_T> >
+	class Hash< Pair<FIRST_T, SECOND_T>, sl_false >
 	{
 	public:
 		constexpr sl_size operator()(const Pair<FIRST_T, SECOND_T>& pair) const noexcept
