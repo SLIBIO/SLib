@@ -442,6 +442,7 @@ namespace slib
 	{
 		m_flagMultiLine = sl_true;
 		m_flagAutoDismissKeyboard = sl_false;
+		m_textAlignment = Alignment::TopLeft;
 		setReturnKeyType(UIReturnKeyType::Return);
 	}
 
