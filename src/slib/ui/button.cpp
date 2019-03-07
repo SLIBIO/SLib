@@ -785,11 +785,6 @@ namespace slib
 		}
 	}
 
-	void Button::onClickEvent(UIEvent* ev)
-	{
-		dispatchOK(ev);
-	}
-
 	UISize Button::measureContentSize(sl_ui_len widthFrame, sl_ui_len heightFrame)
 	{
 		UISize size;
