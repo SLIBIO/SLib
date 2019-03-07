@@ -716,7 +716,7 @@ namespace slib
 				HashMap<String, String> subParams;
 				route = route->getRoute(subPath, subParams);
 				if (route) {
-					parameters.put_NoLock(list[i].first, name);
+					parameters.put_NoLock(list[i].first, Url::decodeUriComponentByUTF8(name));
 					if (subParams.isNotNull()) {
 						parameters.putAll_NoLock(subParams);
 					}
@@ -826,6 +826,13 @@ namespace slib
 			route = &(routes.emplace_NoLock(method).node->value);
 		}
 		route->add(path, onRequest);
+	}
+	
+	void HttpServerRouter::add(const String& path, const HttpServerRouter& router)
+	{
+		for (auto& item : router.routes) {
+			add(item.key, path, item.value);
+		}
 	}
 	
 	void HttpServerRouter::GET(const String& path, const HttpServerRoute& route)

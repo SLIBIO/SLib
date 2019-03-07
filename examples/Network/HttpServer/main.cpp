@@ -99,6 +99,10 @@ int main(int argc, const char * argv[])
 		context->write(String::format("UserId=%s, BookId=%s", context->getParameter("userId"), context->getParameter("bookId")));
 		return sl_true;
 	});
+	param.router.GET("/:bookId/users", [](HttpServer*, HttpServerContext* context) {
+		context->write(String::format("BookId=%s", context->getParameter("bookId")));
+		return sl_true;
+	});
 	param.router.GET("/1/*/a/:id", [](HttpServer*, HttpServerContext* context) {
 		context->write("Test1, id=" + context->getParameter("id"));
 		return sl_true;
@@ -111,6 +115,16 @@ int main(int argc, const char * argv[])
 		context->write("Test2");
 		return sl_true;
 	});
+	HttpServerRouter router;
+	router.GET("/", [](HttpServer*, HttpServerContext* context) {
+		context->write("Search All");
+		return sl_true;
+	});
+	router.GET("/:keyword", [](HttpServer*, HttpServerContext* context) {
+		context->write("Search Keyword: " + context->getParameter("keyword"));
+		return sl_true;
+	});
+	param.router.add("/search", router);
 
 	param.onRequest = [](HttpServer*, HttpServerContext* context) {
 		if (context->getPath() == "/example") {

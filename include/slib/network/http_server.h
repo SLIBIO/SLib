@@ -241,6 +241,8 @@ namespace slib
 		
 		void add(HttpMethod method, const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
 		
+		void add(const String& path, const HttpServerRouter& router);
+		
 		void GET(const String& path, const HttpServerRoute& route);
 		
 		void GET(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
