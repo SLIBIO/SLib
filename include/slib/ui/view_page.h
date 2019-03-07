@@ -102,8 +102,10 @@ namespace slib
 		SLIB_DECLARE_EVENT_HANDLER(ViewPage, ClickBackground, UIEvent* ev)
 
 	public:
+		using View::dispatchOK;
 		void dispatchOK(UIEvent* ev) override;
 
+		using View::dispatchCancel;
 		void dispatchCancel(UIEvent* ev) override;
 		
 	protected:
