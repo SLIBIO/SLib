@@ -172,7 +172,13 @@ namespace slib
 	
 	void MobileApp::popupPage(const Ref<ViewPage>& page, sl_bool flagFillParentBackground)
 	{
-		popupPage(page, Transition(), flagFillParentBackground);
+		if (page.isNull()) {
+			return;
+		}
+		Ref<View> content = m_contentView;
+		if (content.isNotNull()) {
+			page->popup(content, flagFillParentBackground);
+		}
 	}
 	
 	void MobileApp::closePopup(const Ref<ViewPage>& page, const Transition& transition)
@@ -190,7 +196,15 @@ namespace slib
 	
 	void MobileApp::closePopup(const Ref<ViewPage>& page)
 	{
-		closePopup(page, Transition());
+		if (page.isNull()) {
+			return;
+		}
+		ListLocker< Ref<ViewPage> > popups(m_popupPages);
+		if (popups.count > 0) {
+			if (page == popups[popups.count-1]) {
+				page->close();
+			}
+		}
 	}
 	
 	void MobileApp::closePopup(const Transition& transition)
@@ -206,7 +220,13 @@ namespace slib
 	
 	void MobileApp::closePopup()
 	{
-		closePopup(Transition());
+		ListLocker< Ref<ViewPage> > popups(m_popupPages);
+		if (popups.count > 0) {
+			Ref<ViewPage> page = popups[popups.count-1];
+			if (page.isNotNull()) {
+				page->close();
+			}
+		}
 	}
 	
 	void MobileApp::openStartupPage()
