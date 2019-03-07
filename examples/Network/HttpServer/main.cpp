@@ -38,10 +38,14 @@ int main(int argc, const char * argv[])
 		param.parseJsonFile("/etc/slib_http.conf");
 	} while (0);
 	
-	param.onRequest = [](HttpServer*, HttpServerContext* context) {
-		if (context->getPath() != "/") {
-			return sl_false;
+	param.onPreRequest = [](HttpServer*, HttpServerContext* context) {
+		if (context->getPath() == "/test") {
+			context->write("Intercepted!<br>");
 		}
+		return sl_false;
+	};
+	
+	param.router.GET("/", [](HttpServer*, HttpServerContext* context) {
 		Console::println("Method: %s, Path: %s", context->getMethodText(), context->getPath());
 		Console::println("Headers:");
 		for (auto& pair : context->getRequestHeaders()) {
@@ -60,7 +64,7 @@ int main(int argc, const char * argv[])
 		cookie.name = "Cookie2";
 		cookie.value = "This Cookie will be expired after 10 seconds";
 		context->addResponseCookie(cookie);
-
+		
 		Json data = {
 			JsonItem("remote", context->getRemoteAddress().toString()),
 			JsonItem("http", Json({
@@ -74,14 +78,46 @@ int main(int argc, const char * argv[])
 			JsonItem("cookie2", context->getRequestCookie("Cookie2"))
 		};
 		context->write(Ginger::render(SLIB_STRINGIFY(
-			Welcome ${remote} <BR>
-			Method: ${http.method} <BR>
-			Path: ${http.path} <BR>
-			Cookie1: ${cookie1} <BR>
-			Cookie2: ${cookie2} <BR>
-			$for x in http.list {{ ${x} }}
-		), data));
+													 Welcome ${remote} <BR>
+													 Method: ${http.method} <BR>
+													 Path: ${http.path} <BR>
+													 Cookie1: ${cookie1} <BR>
+													 Cookie2: ${cookie2} <BR>
+													 $for x in http.list {{ ${x} }}
+													 ), data));
 		return sl_true;
+	});
+	param.router.GET("/test", [](HttpServer*, HttpServerContext* context) {
+		context->write("Welcome Test!");
+		return sl_true;
+	});
+	param.router.GET("/test/me", [](HttpServer*, HttpServerContext* context) {
+		context->write("Welcome Test Me!");
+		return sl_true;
+	});
+	param.router.GET("/:userId/books/:bookId", [](HttpServer*, HttpServerContext* context) {
+		context->write(String::format("UserId=%s, BookId=%s", context->getParameter("userId"), context->getParameter("bookId")));
+		return sl_true;
+	});
+	param.router.GET("/1/*/a/:id", [](HttpServer*, HttpServerContext* context) {
+		context->write("Test1, id=" + context->getParameter("id"));
+		return sl_true;
+	});
+	param.router.GET("/2/**/b/:id", [](HttpServer*, HttpServerContext* context) {
+		context->write("Test2, id=" + context->getParameter("id"));
+		return sl_true;
+	});
+	param.router.GET("/2/**", [](HttpServer*, HttpServerContext* context) {
+		context->write("Test2");
+		return sl_true;
+	});
+
+	param.onRequest = [](HttpServer*, HttpServerContext* context) {
+		if (context->getPath() == "/example") {
+			context->write("Example!");
+			return sl_true;
+		}
+		return sl_false;
 	};
 	
 	param.onPostRequest = [](HttpServer*, HttpServerContext* context, sl_bool flagProcessed) {

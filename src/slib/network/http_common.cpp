@@ -1041,6 +1041,11 @@ namespace slib
 		return m_parameters;
 	}
 
+	HashMap<String, String>& HttpRequest::getParameters()
+	{
+		return m_parameters;
+	}
+
 	String HttpRequest::getParameter(const String& name) const
 	{
 		return m_parameters.getValue_NoLock(name, String::null());

@@ -611,10 +611,273 @@ namespace slib
 		}
 
 	};
-
+	
 /******************************************************
 					HttpServer
 ******************************************************/
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(HttpServerRoute)
+
+	HttpServerRoute::HttpServerRoute()
+	{
+	}
+	
+	HttpServerRoute* HttpServerRoute::createRoute(const String& path)
+	{
+		sl_reg indexStart = 0;
+		if (path.startsWith('/')) {
+			indexStart = 1;
+		}
+		if (indexStart == path.getLength()) {
+			return this;
+		}
+		sl_reg indexSubpath = path.indexOf('/', indexStart);
+		String name;
+		String subPath;
+		if (indexSubpath < 0) {
+			name = path.substring(indexStart);
+		} else {
+			name = path.substring(indexStart, indexSubpath);
+			subPath = path.substring(indexSubpath);
+		}
+		HttpServerRoute* route = sl_null;
+		if (name.getLength() >= 2 && name.startsWith(':')) {
+			name = name.substring(1);
+			ListElements< Pair<String, HttpServerRoute> > list(parameterRoutes);
+			for (sl_size i = 0; i < list.count; i++) {
+				if (list[i].first == name) {
+					route = &(list[i].second);
+					break;
+				}
+			}
+			if (!route) {
+				parameterRoutes.add_NoLock(name, HttpServerRoute());
+				Pair<String, HttpServerRoute>* p = parameterRoutes.getPointerAt(parameterRoutes.getCount() - 1);
+				if (p && p->first == name) {
+					route = &(p->second);
+				}
+			}
+		} else if (name == "*") {
+			if (defaultRoute.isNotNull()) {
+				route = defaultRoute.get();
+			} else {
+				defaultRoute = MakeShared<HttpServerRoute>();
+				route = defaultRoute.get();
+			}
+		} else if (name == "**") {
+			if (ellipsisRoute.isNotNull()) {
+				route = ellipsisRoute.get();
+			} else {
+				ellipsisRoute = MakeShared<HttpServerRoute>();
+				route = ellipsisRoute.get();
+			}
+		} else {
+			route = routes.getItemPointer(name);
+			if (!route) {
+				route = &(routes.emplace_NoLock(name).node->value);
+			}
+		}
+		return route->createRoute(subPath);
+	}
+	
+	HttpServerRoute* HttpServerRoute::getRoute(const String& path, HashMap<String, String>& parameters)
+	{
+		sl_reg indexStart = 0;
+		if (path.startsWith('/')) {
+			indexStart = 1;
+		}
+		if (indexStart == path.getLength()) {
+			return this;
+		}
+		sl_reg indexSubpath = path.indexOf('/', indexStart);
+		String name;
+		String subPath;
+		if (indexSubpath < 0) {
+			name = path.substring(indexStart);
+		} else {
+			name = path.substring(indexStart, indexSubpath);
+			subPath = path.substring(indexSubpath);
+		}
+		HttpServerRoute* route = routes.getItemPointer(name);
+		if (route) {
+			HashMap<String, String> subParams;
+			route = route->getRoute(subPath, subParams);
+			if (route) {
+				if (subParams.isNotNull()) {
+					parameters.putAll_NoLock(subParams);
+				}
+				return route;
+			}
+		}
+		{
+			ListElements< Pair<String, HttpServerRoute> > list(parameterRoutes);
+			for (sl_size i = 0; i < list.count; i++) {
+				route = &(list[i].second);
+				HashMap<String, String> subParams;
+				route = route->getRoute(subPath, subParams);
+				if (route) {
+					parameters.put_NoLock(list[i].first, name);
+					if (subParams.isNotNull()) {
+						parameters.putAll_NoLock(subParams);
+					}
+					return route;
+				}
+			}
+		}
+		if (defaultRoute.isNotNull()) {
+			HashMap<String, String> subParams;
+			route = defaultRoute->getRoute(subPath, subParams);
+			if (route) {
+				if (subParams.isNotNull()) {
+					parameters.putAll_NoLock(subParams);
+				}
+				return route;
+			}
+		}
+		if (ellipsisRoute.isNotNull()) {
+			for (;;) {
+				HashMap<String, String> subParams;
+				route = ellipsisRoute->getRoute(subPath, subParams);
+				if (route) {
+					if (subParams.isNotNull()) {
+						parameters.putAll_NoLock(subParams);
+					}
+					return route;
+				}
+				indexSubpath = subPath.indexOf('/', 1);
+				if (indexSubpath < 0) {
+					return ellipsisRoute.get();
+				}
+				subPath = subPath.substring(indexSubpath);
+			}
+		}
+		return sl_null;
+	}
+	
+	void HttpServerRoute::add(const String& path, const HttpServerRoute& _route)
+	{
+		HttpServerRoute* route = createRoute(path);
+		*route = _route;
+	}
+	
+	void HttpServerRoute::add(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	{
+		HttpServerRoute* route = createRoute(path);
+		route->onRequest = onRequest;
+	}
+	
+	sl_bool HttpServerRoute::processRequest(const String& path, HttpServer* server, HttpServerContext* context)
+	{
+		sl_bool result = sl_false;
+		HashMap<String, String> params;
+		HttpServerRoute* route = getRoute(path, params);
+		if (route) {
+			if (route->onRequest.isNotNull()) {
+				if (params.isNotNull()) {
+					context->getParameters().addAll_NoLock(params);
+				}
+				result = route->onRequest(server, context);
+			}
+		}
+		return result;
+	}
+	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(HttpServerRouter)
+	
+	HttpServerRouter::HttpServerRouter()
+	{
+	}
+	
+	sl_bool HttpServerRouter::processRequest(const String& path, HttpServer* server, HttpServerContext* context)
+	{
+		if (routes.isNull()) {
+			return sl_false;
+		}
+		HttpMethod method = context->getMethod();
+		HttpServerRoute* route = routes.getItemPointer(method);
+		if (route) {
+			if (route->processRequest(path, server, context)) {
+				return sl_true;
+			}
+		}
+		route = routes.getItemPointer(HttpMethod::Unknown);
+		if (route) {
+			if (route->processRequest(path, server, context)) {
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	void HttpServerRouter::add(HttpMethod method, const String& path, const HttpServerRoute& _route)
+	{
+		HttpServerRoute* route = routes.getItemPointer(method);
+		if (!route) {
+			route = &(routes.emplace_NoLock(method).node->value);
+		}
+		route->add(path, _route);
+	}
+	
+	void HttpServerRouter::add(HttpMethod method, const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	{
+		HttpServerRoute* route = routes.getItemPointer(method);
+		if (!route) {
+			route = &(routes.emplace_NoLock(method).node->value);
+		}
+		route->add(path, onRequest);
+	}
+	
+	void HttpServerRouter::GET(const String& path, const HttpServerRoute& route)
+	{
+		add(HttpMethod::GET, path, route);
+	}
+	
+	void HttpServerRouter::GET(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	{
+		add(HttpMethod::GET, path, onRequest);
+	}
+	
+	void HttpServerRouter::POST(const String& path, const HttpServerRoute& route)
+	{
+		add(HttpMethod::POST, path, route);
+	}
+	
+	void HttpServerRouter::POST(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	{
+		add(HttpMethod::POST, path, onRequest);
+	}
+	
+	void HttpServerRouter::PUT(const String& path, const HttpServerRoute& route)
+	{
+		add(HttpMethod::PUT, path, route);
+	}
+	
+	void HttpServerRouter::PUT(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	{
+		add(HttpMethod::PUT, path, onRequest);
+	}
+	
+	void HttpServerRouter::DELETE(const String& path, const HttpServerRoute& route)
+	{
+		add(HttpMethod::DELETE, path, route);
+	}
+	
+	void HttpServerRouter::DELETE(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	{
+		add(HttpMethod::DELETE, path, onRequest);
+	}
+	
+	void HttpServerRouter::ALL(const String& path, const HttpServerRoute& route)
+	{
+		add(HttpMethod::Unknown, path, route);
+	}
+	
+	void HttpServerRouter::ALL(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	{
+		add(HttpMethod::Unknown, path, onRequest);
+	}
+	
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(HttpServerParam)
 
@@ -1074,12 +1337,23 @@ namespace slib
 	
 	sl_bool HttpServer::dispatchRequest(HttpServerContext* context)
 	{
+		if (m_param.onPreRequest.isNotNull()) {
+			if (m_param.onPreRequest(this, context)) {
+				return sl_true;
+			}
+		}
+		if (m_param.router.processRequest(context->getPath(), this, context)) {
+			return sl_true;
+		}
 		if (m_param.onRequest.isNotNull()) {
 			if (m_param.onRequest(this, context)) {
 				return sl_true;
 			}
 		}
-		return onRequest(context);
+		if (onRequest(context)) {
+			return sl_true;
+		}
+		return sl_false;
 	}
 	
 	void HttpServer::onPostRequest(HttpServerContext* context, sl_bool flagProcessed)

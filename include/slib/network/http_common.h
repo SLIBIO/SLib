@@ -424,6 +424,8 @@ namespace slib
 		
 		const HashMap<String, String>& getParameters() const;
 		
+		HashMap<String, String>& getParameters();
+
 		String getParameter(const String& name) const;
 		
 		List<String> getParameterValues(const String& name) const;

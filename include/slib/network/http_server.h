@@ -30,6 +30,7 @@
 #include "socket_address.h"
 
 #include "../core/thread_pool.h"
+#include "../core/ptr.h"
 #include "../crypto/tls.h"
 
 namespace slib
@@ -196,6 +197,72 @@ namespace slib
 		
 	};
 	
+	class SLIB_EXPORT HttpServerRoute
+	{
+	public:
+		Function<sl_bool(HttpServer*, HttpServerContext*)> onRequest;
+		HashMap<String, HttpServerRoute> routes;
+		Ptr<HttpServerRoute> defaultRoute;
+		Ptr<HttpServerRoute> ellipsisRoute;
+		List< Pair<String, HttpServerRoute> > parameterRoutes;
+		
+	public:
+		HttpServerRoute();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(HttpServerRoute)
+		
+	public:
+		HttpServerRoute* createRoute(const String& path);
+		
+		HttpServerRoute* getRoute(const String& path, HashMap<String, String>& parameters);
+		
+		void add(const String& path, const HttpServerRoute& route);
+		
+		void add(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		
+		sl_bool processRequest(const String& path, HttpServer* server, HttpServerContext* context);
+		
+	};
+	
+	class SLIB_EXPORT HttpServerRouter
+	{
+	public:
+		HashMap<HttpMethod, HttpServerRoute> routes;
+		
+	public:
+		HttpServerRouter();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(HttpServerRouter)
+		
+	public:
+		sl_bool processRequest(const String& path, HttpServer* server, HttpServerContext* context);
+		
+		void add(HttpMethod method, const String& path, const HttpServerRoute& route);
+		
+		void add(HttpMethod method, const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		
+		void GET(const String& path, const HttpServerRoute& route);
+		
+		void GET(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		
+		void POST(const String& path, const HttpServerRoute& route);
+		
+		void POST(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		
+		void PUT(const String& path, const HttpServerRoute& route);
+		
+		void PUT(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		
+		void DELETE(const String& path, const HttpServerRoute& route);
+		
+		void DELETE(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		
+		void ALL(const String& path, const HttpServerRoute& route);
+		
+		void ALL(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		
+	};
+	
 	class SLIB_EXPORT HttpServerParam
 	{
 	public:
@@ -225,7 +292,10 @@ namespace slib
 		
 		sl_bool flagLogDebug;
 		
+		HttpServerRouter router;
+		
 		Function<sl_bool(HttpServer*, HttpServerContext*)> onRequest;
+		Function<sl_bool(HttpServer*, HttpServerContext*)> onPreRequest;
 		Function<void(HttpServer*, HttpServerContext*, sl_bool flagProcessed)> onPostRequest;
 
 	public:
