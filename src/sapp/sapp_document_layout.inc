@@ -2969,11 +2969,11 @@ namespace slib
 					if (contentItem.isNull()) {
 						return sl_false;
 					}
-					if (!(resourceItem->attrsView->scrollBars.flagDefined) || resourceItem->attrsView->scrollBars.verticalScrollBar) {
+					if (!(resourceItem->attrsView->scrolling.flagDefined) || resourceItem->attrsView->scrolling.vertical) {
 						contentItem->attrsView->topMode = PositionMode::Free;
 						contentItem->attrsView->bottomMode = PositionMode::Free;
 					}
-					if (!(resourceItem->attrsView->scrollBars.flagDefined) || resourceItem->attrsView->scrollBars.horizontalScrollBar) {
+					if (!(resourceItem->attrsView->scrolling.flagDefined) || resourceItem->attrsView->scrolling.horizontal) {
 						contentItem->attrsView->leftMode = PositionMode::Free;
 						contentItem->attrsView->rightMode = PositionMode::Free;
 					}
