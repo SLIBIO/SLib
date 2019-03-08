@@ -167,13 +167,13 @@ namespace slib
 		}
 
 		DWORD style = WS_CLIPCHILDREN;
-		if (isHorizontalScrolling()) {
-			style = WS_HSCROLL;
+		if (isHorizontalScrollBarVisible()) {
+			style |= WS_HSCROLL;
 		}
-		if (isVerticalScrolling()) {
+		if (isVerticalScrollBarVisible()) {
 			style |= WS_VSCROLL;
 		}
-
+		
 		DWORD styleEx = WS_EX_CONTROLPARENT;
 
 		if (isBorder()) {
@@ -276,6 +276,18 @@ namespace slib
 		Ref<ViewInstance> instance = getViewInstance();
 		if (_priv_Win32_ScrollViewInstance* _instance = CastInstance<_priv_Win32_ScrollViewInstance>(instance.get())) {
 			_instance->m_backgroundColor = color;
+		}
+	}
+
+	void ScrollView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
+	{
+		HWND handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			WINAPI_ShowScrollBar func = Windows::getAPI_ShowScrollBar();
+			if (func) {
+				func(handle, SB_HORZ, flagHorizontal);
+				func(handle, SB_VERT, flagVertical);
+			}
 		}
 	}
 

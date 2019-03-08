@@ -139,6 +139,13 @@ namespace slib
 		void _applyProperties(_priv_Slib_macOS_TextArea* handle)
 		{
 			NSTextView* tv = handle->m_textView;
+
+			[[tv textContainer] setWidthTracksTextView:(m_multiLine == MultiLineMode::WordWrap || m_multiLine == MultiLineMode::BreakWord) ? YES : NO];
+			[[tv textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
+
+			[handle setHasHorizontalScroller:(isHorizontalScrollBarVisible()?YES:NO)];
+			[handle setHasVerticalScroller:(isVerticalScrollBarVisible()?YES:NO)];
+			
 			[tv setString:(Apple::getNSStringFromString(m_text))];
 			[tv setAlignment:translateAlignment(m_textAlignment)];
 			[handle setBorderType:(isBorder() ? NSBezelBorder : NSNoBorder)];
@@ -361,8 +368,20 @@ namespace slib
 		}
 	}
 	
-	void EditView::_setMultiLine_NW(sl_bool flag)
+	void EditView::_setMultiLine_NW(MultiLineMode mode)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setMultiLine_NW, this, mode));
+			return;
+		}
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
+				[[tv->m_textView textContainer] setWidthTracksTextView:(mode == MultiLineMode::WordWrap || mode == MultiLineMode::BreakWord) ? YES : NO];
+				[[tv->m_textView textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
+			}
+		}
 	}
 
 	void EditView::_setTextColor_NW(const Color& color)
@@ -424,6 +443,20 @@ namespace slib
 		}
 	}
 
+	void EditView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
+	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setScrollBarsVisible_NW, this, flagHorizontal, flagVertical));
+			return;
+		}
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+			_priv_Slib_macOS_TextArea* sv = (_priv_Slib_macOS_TextArea*)handle;
+			[sv setHasHorizontalScroller:(flagHorizontal?YES:NO)];
+			[sv setHasVerticalScroller:(flagVertical?YES:NO)];
+		}
+	}
+
 }
 
 @implementation _priv_Slib_macOS_TextField
@@ -457,11 +490,7 @@ MACOS_VIEW_DEFINE_ON_KEY
 		[m_textView setHorizontallyResizable:YES];
 		[m_textView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
 		
-		[[m_textView textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
-		
 		[self setDocumentView:m_textView];
-		[self setHasVerticalScroller:TRUE];
-		[self setHasHorizontalScroller:TRUE];
 		
 		[m_textView setDelegate:self];
 	}

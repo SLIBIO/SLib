@@ -60,8 +60,6 @@ namespace slib
 		
 		void smoothScrollTo(const ScrollPoint& position, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode = UIUpdateMode::Redraw) override;
-		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
@@ -89,9 +87,9 @@ namespace slib
 		
 		void _setBackgroundColor_NW(const Color& color) override;
 		
-		void _setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight);
+		void _setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical) override;
 		
-		void _setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical);
+		void _setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight);
 		
 	protected:
 		void _onScroll_NW(sl_scroll_pos x, sl_scroll_pos y);

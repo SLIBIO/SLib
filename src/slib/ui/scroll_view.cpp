@@ -37,8 +37,7 @@ namespace slib
 		setClipping(sl_true, UIUpdateMode::Init);
 		setSavingCanvasState(sl_false);
 		
-		setHorizontalScrolling(sl_true);
-		setVerticalScrolling(sl_true);
+		setScrolling(sl_true, sl_true, UIUpdateMode::Init);
 		
 	}
 	
@@ -169,12 +168,6 @@ namespace slib
 		smoothScrollTo(position.x, position.y, mode);
 	}
 	
-	void ScrollView::setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode)
-	{
-		View::setScrollBarsVisible(flagHorizontal, flagVertical, mode);
-		_setScrollBarsVisible_NW(flagHorizontal, flagVertical);
-	}
-	
 	void ScrollView::dispatchScroll(sl_scroll_pos x, sl_scroll_pos y)
 	{
 		View::dispatchScroll(x, y);
@@ -253,22 +246,21 @@ namespace slib
 	void ScrollView::_setBackgroundColor_NW(const Color& color)
 	{
 	}
-#endif
-	
-#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
-	void ScrollView::_setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight)
-	{
-	}
 	
 	void ScrollView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
 	{
 	}
 #endif
 	
+#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
+	void ScrollView::_setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight)
+	{
+	}
+#endif
+
 	HorizontalScrollView::HorizontalScrollView()
 	{
-		setHorizontalScrolling(sl_true);
-		setVerticalScrolling(sl_false);
+		setScrolling(sl_true, sl_false, UIUpdateMode::Init);
 	}
 	
 	HorizontalScrollView::~HorizontalScrollView()
@@ -278,8 +270,7 @@ namespace slib
 
 	VerticalScrollView::VerticalScrollView()
 	{
-		setHorizontalScrolling(sl_false);
-		setVerticalScrolling(sl_true);
+		setScrolling(sl_false, sl_true, UIUpdateMode::Init);
 	}
 
 	VerticalScrollView::~VerticalScrollView()

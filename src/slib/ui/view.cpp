@@ -5731,15 +5731,6 @@ namespace slib
 		return sl_false;
 	}
 
-	void View::setHorizontalScrolling(sl_bool flagHorizontal)
-	{
-		_initializeScrollAttributes();
-		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
-		if (attrs.isNotNull()) {
-			attrs->flagHorz = flagHorizontal;
-		}
-	}
-
 	sl_bool View::isVerticalScrolling()
 	{
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
@@ -5749,12 +5740,24 @@ namespace slib
 		return sl_false;
 	}
 
-	void View::setVerticalScrolling(sl_bool flagVertical)
+	void View::setHorizontalScrolling(sl_bool flagHorizontal, UIUpdateMode mode)
+	{
+		setScrolling(flagHorizontal, isVerticalScrolling(), mode);
+	}
+
+	void View::setVerticalScrolling(sl_bool flagVertical, UIUpdateMode mode)
+	{
+		setScrolling(isHorizontalScrolling(), flagVertical, mode);
+	}
+	
+	void View::setScrolling(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode)
 	{
 		_initializeScrollAttributes();
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
+			attrs->flagHorz = flagHorizontal;
 			attrs->flagVert = flagVertical;
+			setScrollBarsVisible(attrs->flagHorzScrollBarVisible, attrs->flagVertScrollBarVisible, mode);
 		}
 	}
 
@@ -5798,68 +5801,44 @@ namespace slib
 		}
 	}
 
-	void View::createHorizontalScrollBar(UIUpdateMode mode)
-	{
-		setHorizontalScrollBar(_createHorizontalScrollBar(), mode);
-	}
-
-	void View::createVerticalScrollBar(UIUpdateMode mode)
-	{
-		setVerticalScrollBar(_createVerticalScrollBar(), mode);
-	}
-
-	void View::removeHorizontalScrollBar(UIUpdateMode mode)
-	{
-		setHorizontalScrollBar(Ref<ScrollBar>::null(), mode);
-	}
-
-	void View::removeVerticalScrollBar(UIUpdateMode mode)
-	{
-		setVerticalScrollBar(Ref<ScrollBar>::null(), mode);
-	}
-
-	void View::createScrollBars(UIUpdateMode mode)
-	{
-		setHorizontalScrollBar(_createHorizontalScrollBar(), UIUpdateMode::Init);
-		setVerticalScrollBar(_createVerticalScrollBar(), UIUpdateMode::Init);
-		refreshScroll(mode);
-	}
-
-	void View::removeScrollBars(UIUpdateMode mode)
-	{
-		setHorizontalScrollBar(Ref<ScrollBar>::null(), UIUpdateMode::Init);
-		setVerticalScrollBar(Ref<ScrollBar>::null(), UIUpdateMode::Init);
-		refreshScroll(mode);
-	}
-
 	sl_bool View::isHorizontalScrollBarVisible()
 	{
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
-			return attrs->flagHorzScrollBarVisible;
+			return attrs->flagHorz && attrs->flagHorzScrollBarVisible;
 		}
-		return sl_true;
+		return sl_false;
 	}
 
 	sl_bool View::isVerticalScrollBarVisible()
 	{
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
-			return attrs->flagVertScrollBarVisible;
+			return attrs->flagVert && attrs->flagVertScrollBarVisible;
 		}
-		return sl_true;
+		return sl_false;
 	}
 
 	void View::setHorizontalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode)
 	{
-		setScrollBarsVisible(flagVisible, isVerticalScrollBarVisible(), mode);
+		sl_bool flagVert = sl_true;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
+		if (attrs.isNotNull()) {
+			flagVert = attrs->flagVertScrollBarVisible;
+		}
+		setScrollBarsVisible(flagVisible, flagVert, mode);
 	}
-
+	
 	void View::setVerticalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode)
 	{
-		setScrollBarsVisible(isHorizontalScrollBarVisible(), flagVisible, mode);
+		sl_bool flagHorz = sl_true;
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
+		if (attrs.isNotNull()) {
+			flagHorz = attrs->flagHorzScrollBarVisible;
+		}
+		setScrollBarsVisible(flagHorz, flagVisible, mode);
 	}
-
+	
 	void View::setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode)
 	{
 		_initializeScrollAttributes();
@@ -5867,8 +5846,15 @@ namespace slib
 		if (attrs.isNotNull()) {
 			attrs->flagHorzScrollBarVisible = flagHorizontal;
 			attrs->flagVertScrollBarVisible = flagVertical;
+			flagHorizontal = flagHorizontal && attrs->flagHorz;
+			flagVertical = flagVertical && attrs->flagVert;
 		}
-		_initScrollBars(UIUpdateMode::None);
+		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
+			return;
+		}
+		if (flagHorizontal || flagVertical) {
+			_initScrollBars(UIUpdateMode::None);
+		}
 		Ref<ScrollBar> bar;
 		bar = getHorizontalScrollBar();
 		if (bar.isNotNull()) {
@@ -5879,24 +5865,9 @@ namespace slib
 			bar->setVisible(flagVertical, UIUpdateMode::None);
 		}
 		refreshScroll(mode);
-	}
-
-	sl_bool View::isHorizontalScrollBarValid()
-	{
-		Ref<ScrollBar> bar = getHorizontalScrollBar();
-		if (bar.isNotNull()) {
-			return bar->isVisible() && bar->isValid();
+		if (isNativeWidget()) {
+			_setScrollBarsVisible_NW(flagHorizontal, flagVertical);
 		}
-		return sl_false;
-	}
-
-	sl_bool View::isVerticalScrollBarValid()
-	{
-		Ref<ScrollBar> bar = getVerticalScrollBar();
-		if (bar.isNotNull()) {
-			return bar->isVisible() && bar->isValid();
-		}
-		return sl_false;
 	}
 
 	sl_scroll_pos View::getScrollX()
@@ -6314,24 +6285,6 @@ namespace slib
 		}
 	}
 
-	Ref<ScrollBar> View::_createHorizontalScrollBar()
-	{
-		Ref<ScrollBar> ret = new ScrollBar;
-		if (ret.isNotNull()) {
-			return ret;
-		}
-		return sl_null;
-	}
-
-	Ref<ScrollBar> View::_createVerticalScrollBar()
-	{
-		Ref<ScrollBar> ret = new ScrollBar;
-		if (ret.isNotNull()) {
-			return ret;
-		}
-		return sl_null;
-	}
-
 
 	void View::_getScrollBars(Ref<View> views[2])
 	{
@@ -6361,13 +6314,16 @@ namespace slib
 
 	void View::_initScrollBars(UIUpdateMode mode)
 	{
+		if (isNativeWidget()) {
+			return;
+		}
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
 			if (attrs->flagHorz && attrs->flagHorzScrollBarVisible) {
 				if (!(attrs->flagInitHorzScrollBar)) {
 					attrs->flagInitHorzScrollBar = sl_true;
 					if (attrs->horz.isNull()) {
-						createHorizontalScrollBar(mode);
+						setHorizontalScrollBar(new ScrollBar, mode);
 					}
 				}
 			}
@@ -6375,7 +6331,7 @@ namespace slib
 				if (!(attrs->flagInitVertScrollBar)) {
 					attrs->flagInitVertScrollBar = sl_true;
 					if (attrs->vert.isNull()) {
-						createVerticalScrollBar(mode);
+						setVerticalScrollBar(new ScrollBar, mode);
 					}
 				}
 			}
@@ -8854,7 +8810,11 @@ namespace slib
 	void View::_setFont_NW(const Ref<Font>& font)
 	{
 	}
-
+	
+	void View::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
+	{
+	}
+	
 /**********************
 	ViewInstance
 **********************/

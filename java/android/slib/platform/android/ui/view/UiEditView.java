@@ -465,6 +465,10 @@ public class UiEditView extends EditText implements IView {
 		});
 		this.setOnEditorActionListener(new OnEditorActionListener() {
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				int type = v.getInputType();
+				if ((type & EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE) != 0) {
+					return false;
+				}
 				if (event == null) {
 					onEventReturn(UiEditView.this);
 					Android.dismissKeyboard((Activity)(getContext()));

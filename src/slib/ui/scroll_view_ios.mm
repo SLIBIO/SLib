@@ -224,6 +224,20 @@ namespace slib
 		}
 	}
 	
+	void ScrollView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
+	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setScrollBarsVisible_NW, this, flagHorizontal, flagVertical));
+			return;
+		}
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
+			UIScrollView* sv = (UIScrollView*)handle;
+			sv.showsHorizontalScrollIndicator = flagHorizontal ? YES : NO;
+			sv.showsVerticalScrollIndicator = flagVertical ? YES : NO;
+		}
+	}
+	
 	void ScrollView::_setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight)
 	{
 		if (!(isUiThread())) {
@@ -237,19 +251,6 @@ namespace slib
 		}
 	}
 	
-	void ScrollView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
-	{
-		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setScrollBarsVisible_NW, this, flagHorizontal, flagVertical));
-			return;
-		}
-		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
-			UIScrollView* sv = (UIScrollView*)handle;
-			sv.showsHorizontalScrollIndicator = flagHorizontal ? YES : NO;
-			sv.showsVerticalScrollIndicator = flagVertical ? YES : NO;
-		}
-	}	
 }
 
 @implementation _priv_Slib_iOS_ScrollView

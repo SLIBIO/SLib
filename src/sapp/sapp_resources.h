@@ -425,7 +425,7 @@ namespace slib
 		SAppStringValue hintText;
 		SAppBooleanValue readOnly;
 		SAppBooleanValue password;
-		SAppBooleanValue multiLine;
+		SAppMultiLineModeValue multiLine;
 		SAppColorValue textColor;
 		SAppColorValue hintTextColor;
 		SAppUIReturnKeyTypeValue returnKey;

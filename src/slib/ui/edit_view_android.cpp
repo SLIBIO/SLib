@@ -58,15 +58,15 @@ namespace slib
 
 		SLIB_JNI_STATIC_METHOD(getText, "_getText", "(Landroid/view/View;)Ljava/lang/String;");
 		SLIB_JNI_STATIC_METHOD(setText, "_setText", "(Landroid/view/View;Ljava/lang/String;)Z");
-		SLIB_JNI_STATIC_METHOD(setBorder, "_setBorder", "(Landroid/view/View;Z)Z");
 		SLIB_JNI_STATIC_METHOD(setAlignment, "_setAlignment", "(Landroid/view/View;I)Z");
 		SLIB_JNI_STATIC_METHOD(setHintText, "_setHintText", "(Landroid/view/View;Ljava/lang/String;)Z");
 		SLIB_JNI_STATIC_METHOD(setReadOnly, "_setReadOnly", "(Landroid/view/View;Z)Z");
 		SLIB_JNI_STATIC_METHOD(setMultiLine, "_setMultiLine", "(Landroid/view/View;Z)Z");
 		SLIB_JNI_STATIC_METHOD(setTextColor, "_setTextColor", "(Landroid/view/View;I)Z");
 		SLIB_JNI_STATIC_METHOD(setHintTextColor, "_setHintTextColor", "(Landroid/view/View;I)Z");
-		SLIB_JNI_STATIC_METHOD(setBackgroundColor, "_setBackgroundColor", "(Landroid/view/View;I)Z");
 		SLIB_JNI_STATIC_METHOD(setFont, "_setFont", "(Landroid/view/View;Lslib/platform/android/ui/UiFont;)Z");
+		SLIB_JNI_STATIC_METHOD(setBorder, "_setBorder", "(Landroid/view/View;Z)Z");
+		SLIB_JNI_STATIC_METHOD(setBackgroundColor, "_setBackgroundColor", "(Landroid/view/View;I)Z");
 		SLIB_JNI_STATIC_METHOD(setReturnKeyType, "_setReturnKeyType", "(Landroid/view/View;I)Z");
 		SLIB_JNI_STATIC_METHOD(setInputType, "_setInputType", "(Landroid/view/View;IIZ)Z");
 
@@ -87,7 +87,7 @@ namespace slib
 			JniLocal<jstring> jhintText = Jni::getJniString(m_hintText);
 			JAndroidEditView::setHintText.callBoolean(sl_null, handle, jhintText.get());
 			JAndroidEditView::setReadOnly.callBoolean(sl_null, handle, m_flagReadOnly);
-			JAndroidEditView::setMultiLine.callBoolean(sl_null, handle, m_flagMultiLine);
+			JAndroidEditView::setMultiLine.callBoolean(sl_null, handle, m_multiLine != MultiLineMode::Single);
 			JAndroidEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
 			JAndroidEditView::setHintTextColor.callBoolean(sl_null, handle, m_hintTextColor.getARGB());
 			JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
@@ -148,14 +148,6 @@ namespace slib
 		}
 	}
 
-	void EditView::_setBorder_NW(sl_bool flag)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JAndroidEditView::setBorder.callBoolean(sl_null, handle, flag);
-		}
-	}
-
 	void EditView::_setTextAlignment_NW(Alignment align)
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
@@ -181,11 +173,11 @@ namespace slib
 		}
 	}
 
-	void EditView::_setMultiLine_NW(sl_bool flag)
+	void EditView::_setMultiLine_NW(MultiLineMode mode)
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			JAndroidEditView::setMultiLine.callBoolean(sl_null, handle, flag);
+			JAndroidEditView::setMultiLine.callBoolean(sl_null, handle, mode != MultiLineMode::Single);
 		}
 	}
 
@@ -205,14 +197,6 @@ namespace slib
 		}
 	}
 
-	void EditView::_setBackgroundColor_NW(const Color& color)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, color.getARGB());
-		}
-	}
-
 	void EditView::_setFont_NW(const Ref<Font>& font)
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
@@ -224,6 +208,26 @@ namespace slib
 		}
 	}
 
+	void EditView::_setBorder_NW(sl_bool flag)
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			JAndroidEditView::setBorder.callBoolean(sl_null, handle, flag);
+		}
+	}
+
+	void EditView::_setBackgroundColor_NW(const Color& color)
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, color.getARGB());
+		}
+	}
+
+	void EditView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
+	{
+	}
+	
 	void EditView::_setReturnKeyType_NW(UIReturnKeyType type)
 	{
 		jobject handle = UIPlatform::getViewHandle(this);

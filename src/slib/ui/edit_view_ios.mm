@@ -178,6 +178,8 @@ namespace slib
 		
 		void applyProperties(_priv_Slib_iOS_TextArea* handle)
 		{
+			[handle setShowsHorizontalScrollIndicator:isHorizontalScrollBarVisible()?YES:NO];
+			[handle setShowsVerticalScrollIndicator:isVerticalScrollBarVisible()?YES:NO];
 			[handle setText:(Apple::getNSStringFromString(m_text))];
 			[handle setTextAlignment:translateAlignment(m_textAlignment)];
 			if (isBorder()) {
@@ -243,7 +245,7 @@ namespace slib
 			Ref<View> _view = instance->getView();
 			if (EditView_Impl* view = CastInstance<EditView_Impl>(_view.get())) {
 				view->dispatchReturnKey();
-				if (!(view->isMultiLine()) && view->isAutoDismissKeyboard()) {
+				if (view->getMultiLine() == MultiLineMode::Single && view->isAutoDismissKeyboard()) {
 					if (field != nil) {
 						[field resignFirstResponder];
 					}
@@ -314,29 +316,6 @@ namespace slib
 		}
 	}
 	
-	void EditView::_setBorder_NW(sl_bool flag)
-	{
-		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setBorder_NW, this, flag));
-			return;
-		}
-		UIView* handle = UIPlatform::getViewHandle(this);
-		if (flag) {
-			if ([handle isKindOfClass:[UITextField class]]) {
-				UITextField* tv = (UITextField*)handle;
-				[tv setBorderStyle:(flag?UITextBorderStyleRoundedRect:UITextBorderStyleNone)];
-			} else if ([handle isKindOfClass:[UITextView class]]) {
-				UITextView* tv = (UITextView*)handle;
-				if (flag) {
-					[tv.layer setBorderColor:([[UIColor grayColor] CGColor])];
-					[tv.layer setBorderWidth:1];
-				} else {
-					[tv.layer setBorderWidth:0];
-				}
-			}
-		}
-	}
-	
 	void EditView::_setTextAlignment_NW(Alignment align)
 	{
 		if (!(isUiThread())) {
@@ -376,25 +355,6 @@ namespace slib
 		}
 	}
 	
-	void EditView::_setHintTextColor_NW(const Color& value)
-	{
-		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setHintTextColor_NW, this, value));
-			return;
-		}
-		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil) {
-			if ([handle isKindOfClass:[UITextField class]]) {
-				UITextField* tv = (UITextField*)handle;
-				((EditView_Impl*)this)->applyPlaceholder(tv);
-			} else if ([handle isKindOfClass:[_priv_Slib_iOS_TextArea class]]) {
-				_priv_Slib_iOS_TextArea* tv = (_priv_Slib_iOS_TextArea*)handle;
-				[tv setPlaceholderColor:(GraphicsPlatform::getUIColorFromColor(value))];
-				[tv refreshPlaceholder];
-			}
-		}
-	}
-
 	void EditView::_setReadOnly_NW(sl_bool flag)
 	{
 		if (!(isUiThread())) {
@@ -428,7 +388,7 @@ namespace slib
 		}
 	}
 	
-	void EditView::_setMultiLine_NW(sl_bool flag)
+	void EditView::_setMultiLine_NW(MultiLineMode mode)
 	{
 	}
 	
@@ -446,6 +406,73 @@ namespace slib
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
 				[tv setTextColor:(GraphicsPlatform::getUIColorFromColor(color))];
+			}
+		}
+	}
+	
+	void EditView::_setHintTextColor_NW(const Color& value)
+	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setHintTextColor_NW, this, value));
+			return;
+		}
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			if ([handle isKindOfClass:[UITextField class]]) {
+				UITextField* tv = (UITextField*)handle;
+				((EditView_Impl*)this)->applyPlaceholder(tv);
+			} else if ([handle isKindOfClass:[_priv_Slib_iOS_TextArea class]]) {
+				_priv_Slib_iOS_TextArea* tv = (_priv_Slib_iOS_TextArea*)handle;
+				[tv setPlaceholderColor:(GraphicsPlatform::getUIColorFromColor(value))];
+				[tv refreshPlaceholder];
+			}
+		}
+	}
+
+	void EditView::_setFont_NW(const Ref<Font>& font)
+	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setFont_NW, this, font));
+			return;
+		}
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			if ([handle isKindOfClass:[UITextField class]]) {
+				UITextField* tv = (UITextField*)handle;
+				UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
+				if (hFont != nil) {
+					[tv setFont:hFont];
+					((EditView_Impl*)this)->applyPlaceholder(tv);
+				}
+			} else if ([handle isKindOfClass:[UITextView class]]) {
+				UITextView* tv = (UITextView*)handle;
+				UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
+				if (hFont != nil) {
+					[tv setFont:hFont];
+				}
+			}
+		}
+	}
+	
+	void EditView::_setBorder_NW(sl_bool flag)
+	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setBorder_NW, this, flag));
+			return;
+		}
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (flag) {
+			if ([handle isKindOfClass:[UITextField class]]) {
+				UITextField* tv = (UITextField*)handle;
+				[tv setBorderStyle:(flag?UITextBorderStyleRoundedRect:UITextBorderStyleNone)];
+			} else if ([handle isKindOfClass:[UITextView class]]) {
+				UITextView* tv = (UITextView*)handle;
+				if (flag) {
+					[tv.layer setBorderColor:([[UIColor grayColor] CGColor])];
+					[tv.layer setBorderWidth:1];
+				} else {
+					[tv.layer setBorderWidth:0];
+				}
 			}
 		}
 	}
@@ -468,27 +495,18 @@ namespace slib
 		}
 	}
 	
-	void EditView::_setFont_NW(const Ref<Font>& font)
+	void EditView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setFont_NW, this, font));
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setScrollBarsVisible_NW, this, flagHorizontal, flagVertical));
 			return;
 		}
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
-			if ([handle isKindOfClass:[UITextField class]]) {
-				UITextField* tv = (UITextField*)handle;
-				UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
-				if (hFont != nil) {
-					[tv setFont:hFont];
-					((EditView_Impl*)this)->applyPlaceholder(tv);
-				}
-			} else if ([handle isKindOfClass:[UITextView class]]) {
+			if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
-				UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
-				if (hFont != nil) {
-					[tv setFont:hFont];
-				}
+				[tv setShowsHorizontalScrollIndicator:isHorizontalScrollBarVisible()?YES:NO];
+				[tv setShowsVerticalScrollIndicator:isVerticalScrollBarVisible()?YES:NO];
 			}
 		}
 	}

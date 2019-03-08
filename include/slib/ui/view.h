@@ -974,11 +974,13 @@ namespace slib
 		
 		sl_bool isHorizontalScrolling();
 		
-		void setHorizontalScrolling(sl_bool flagHorizontal);
-		
 		sl_bool isVerticalScrolling();
+
+		void setHorizontalScrolling(sl_bool flagHorizontal, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void setVerticalScrolling(sl_bool flagVertical);
+		void setVerticalScrolling(sl_bool flagVertical, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		virtual void setScrolling(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		Ref<ScrollBar> getHorizontalScrollBar();
 		
@@ -988,18 +990,6 @@ namespace slib
 		
 		void setVerticalScrollBar(const Ref<ScrollBar>& bar, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void createHorizontalScrollBar(UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		void createVerticalScrollBar(UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		void removeHorizontalScrollBar(UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		void removeVerticalScrollBar(UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		void createScrollBars(UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		void removeScrollBars(UIUpdateMode mode = UIUpdateMode::Redraw);
-		
 		sl_bool isHorizontalScrollBarVisible();
 		
 		sl_bool isVerticalScrollBarVisible();
@@ -1007,13 +997,9 @@ namespace slib
 		void setHorizontalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		void setVerticalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
+
 		virtual void setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		sl_bool isHorizontalScrollBarValid();
-		
-		sl_bool isVerticalScrollBarValid();
-
 		sl_scroll_pos getScrollX();
 		
 		sl_scroll_pos getScrollY();
@@ -1307,11 +1293,7 @@ namespace slib
 		
 		void _attachNativeAnimation(const Ref<Animation>& animation);
 
-		
-		Ref<ScrollBar> _createHorizontalScrollBar();
-		
-		Ref<ScrollBar> _createVerticalScrollBar();
-		
+				
 		void _getScrollBars(Ref<View> views[2]);
 		
 		void _initScrollBars(UIUpdateMode mode);
@@ -1344,6 +1326,8 @@ namespace slib
 
 		virtual void _setFont_NW(const Ref<Font>& font);
 
+		virtual void _setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical);
+		
 	private:
 		AtomicRef<ViewInstance> m_instance;
 		AtomicWeakRef<Window> m_window;

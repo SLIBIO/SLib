@@ -51,6 +51,12 @@ namespace slib
 		int cchLocaleName
 	);
 
+	typedef BOOL (WINAPI *WINAPI_ShowScrollBar)(
+		HWND hWnd,
+		int  wBar,
+		BOOL bShow
+	);
+
 	class Variant;
 
 	class SLIB_EXPORT Windows
@@ -98,6 +104,10 @@ namespace slib
 		static WINAPI_GetQueuedCompletionStatusEx getAPI_GetQueuedCompletionStatusEx();
 
 		static WINAPI_GetUserDefaultLocaleName getAPI_GetUserDefaultLocaleName();
+
+		static HMODULE loadLibrary_user32();
+
+		static WINAPI_ShowScrollBar getAPI_ShowScrollBar();
 
 		static HMODULE loadLibrary_wininet();
 

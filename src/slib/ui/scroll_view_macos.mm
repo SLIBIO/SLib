@@ -56,6 +56,8 @@ namespace slib
 		
 		void _applyProperties(NSScrollView* handle)
 		{
+			[handle setHasHorizontalScroller:(isHorizontalScrollBarVisible()?YES:NO)];
+			[handle setHasVerticalScroller:(isVerticalScrollBarVisible()?YES:NO)];
 			[handle setBorderType:(isBorder()?NSBezelBorder:NSNoBorder)];
 			Color backgroundColor = getBackgroundColor();
 			if (backgroundColor.a == 0) {
@@ -98,8 +100,6 @@ namespace slib
 		MACOS_VIEW_CREATE_INSTANCE_BEGIN
 		_priv_Slib_macOS_ScrollView* handle = [[_priv_Slib_macOS_ScrollView alloc] initWithFrame:frame];
 		if (handle != nil) {
-			[handle setHasVerticalScroller:(isVerticalScrolling()?YES:NO)];
-			[handle setHasHorizontalScroller:(isHorizontalScrolling()?YES:NO)];
 			((_priv_ScrollView*)this)->_applyProperties(handle);
 		}
 		MACOS_VIEW_CREATE_INSTANCE_END
@@ -172,6 +172,10 @@ namespace slib
 
 	void ScrollView::_setBorder_NW(sl_bool flag)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setBorder_NW, this, flag));
+			return;
+		}
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
 			NSScrollView* sv = (NSScrollView*)handle;
@@ -181,6 +185,10 @@ namespace slib
 
 	void ScrollView::_setBackgroundColor_NW(const Color& color)
 	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setBackgroundColor_NW, this, color));
+			return;
+		}
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
 			NSScrollView* sv = (NSScrollView*)handle;
@@ -190,6 +198,20 @@ namespace slib
 				sv.drawsBackground = TRUE;
 				sv.backgroundColor = GraphicsPlatform::getNSColorFromColor(color);
 			}
+		}
+	}
+	
+	void ScrollView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
+	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setScrollBarsVisible_NW, this, flagHorizontal, flagVertical));
+			return;
+		}
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
+			NSScrollView* sv = (NSScrollView*)handle;
+			[sv setHasHorizontalScroller:(flagHorizontal?YES:NO)];
+			[sv setHasVerticalScroller:(flagVertical?YES:NO)];
 		}
 	}
 

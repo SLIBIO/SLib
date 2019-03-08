@@ -165,19 +165,19 @@ namespace slib
 		}
 	}
 
-	void ScrollView::_setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JAndroidScrollView::setPaging.call(sl_null, handle, flagPaging, pageWidth, pageHeight);
-		}
-	}
-
 	void ScrollView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			JAndroidScrollView::setScrollBarsVisible.call(sl_null, handle, flagHorizontal, flagVertical);
+		}
+	}
+
+	void ScrollView::_setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight)
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			JAndroidScrollView::setPaging.call(sl_null, handle, flagPaging, pageWidth, pageHeight);
 		}
 	}
 

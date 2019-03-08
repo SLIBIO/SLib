@@ -383,10 +383,6 @@ namespace slib
 		}
 	}
 	
-	void EditView::_setBorder_NW(sl_bool flag)
-	{
-	}
-	
 	void EditView::_setTextAlignment_NW(Alignment align)
 	{
 		Evas_Object* handle = UIPlatform::getViewHandle(this);
@@ -403,14 +399,6 @@ namespace slib
 		}
 	}
 	
-	void EditView::_setHintTextColor_NW(const Color& value)
-	{
-		Evas_Object* handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((EditView_Impl*)this)->_setStyle(handle);
-		}
-	}
-
 	void EditView::_setReadOnly_NW(sl_bool flag)
 	{
 		Evas_Object* handle = UIPlatform::getViewHandle(this);
@@ -442,17 +430,33 @@ namespace slib
 			((EditView_Impl*)this)->_setStyle(handle);
 		}
 	}
-	
-	void EditView::_setBackgroundColor_NW(const Color& color)
+
+	void EditView::_setHintTextColor_NW(const Color& value)
 	{
+		Evas_Object* handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			((EditView_Impl*)this)->_setStyle(handle);
+		}
 	}
-	
+
 	void EditView::_setFont_NW(const Ref<Font>& font)
 	{
 		Evas_Object* handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			((EditView_Impl*)this)->_setStyle(handle);
 		}
+	}
+	
+	void EditView::_setBorder_NW(sl_bool flag)
+	{
+	}
+	
+	void EditView::_setBackgroundColor_NW(const Color& color)
+	{
+	}
+	
+	void EditView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
+	{
 	}
 	
 	void EditView::_setReturnKeyType_NW(UIReturnKeyType type)

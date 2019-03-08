@@ -38,7 +38,6 @@ namespace slib
 		Color m_colorText;
 		Color m_colorBackground;
 		HBRUSH m_hBrushBackground;
-		sl_bool m_flagMultiLine;
 		
 	public:
 		Win32_EditViewInstance()
@@ -46,7 +45,6 @@ namespace slib
 			m_hBrushBackground = NULL;
 			m_colorText = Color::zero();
 			m_colorBackground = Color::zero();
-			m_flagMultiLine = sl_false;
 		}
 
 		~Win32_EditViewInstance()
@@ -160,11 +158,23 @@ namespace slib
 				style |= ES_RIGHT;
 			}
 			if (type == 0) {
-				if (m_flagMultiLine) {
+				if (m_multiLine != MultiLineMode::Single) {
 					style |= ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN;
 				}
+				style |= ES_AUTOHSCROLL;
 			} else if (type == 2) {
-				style |= WS_HSCROLL | WS_VSCROLL | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL | ES_WANTRETURN;
+				style |= ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN;
+				if (isVerticalScrollBarVisible()) {
+					style |= WS_VSCROLL;
+				}
+				if (m_multiLine != MultiLineMode::WordWrap && m_multiLine != MultiLineMode::BreakWord) {
+					style |= ES_AUTOHSCROLL;
+					if (isHorizontalScrollBarVisible()) {
+						style |= WS_HSCROLL;
+					}
+				}
+			} else {
+				style |= ES_AUTOHSCROLL;
 			}
 			if (m_flagReadOnly) {
 				style |= ES_READONLY;
@@ -172,7 +182,6 @@ namespace slib
 			if (m_flagPassword) {
 				style |= ES_PASSWORD;
 			}
-			style |= ES_AUTOHSCROLL;
 			String16 text = m_text;
 			Ref<Win32_EditViewInstance> ret = Win32_ViewInstance::create<Win32_EditViewInstance>(this, parent, L"EDIT", (LPCWSTR)(text.getData()), style, 0);
 			if (ret.isNotNull()) {
@@ -189,7 +198,6 @@ namespace slib
 				::SendMessageW(handle, 0x1501 /*EM_SETCUEBANNER*/, FALSE, (LPARAM)(LPCWSTR)(hintText.getData()));
 				ret->setTextColor(m_textColor);
 				ret->setBackgroundColor(getBackgroundColor());
-				ret->m_flagMultiLine = m_flagMultiLine;
 			}
 			return ret;
 		}
@@ -267,12 +275,8 @@ namespace slib
 		}
 	}
 
-	void EditView::_setMultiLine_NW(sl_bool flag)
+	void EditView::_setMultiLine_NW(MultiLineMode multiple)
 	{
-		Ref<ViewInstance> _instance = getViewInstance();
-		if (Win32_EditViewInstance* instance = CastInstance<Win32_EditViewInstance>(_instance.get())) {
-			instance->setMultiLine(flag);
-		}
 	}
 
 	void EditView::_setTextColor_NW(const Color& color)
@@ -321,6 +325,17 @@ namespace slib
 		}
 	}
 
+	void EditView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
+	{
+		HWND handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			WINAPI_ShowScrollBar func = Windows::getAPI_ShowScrollBar();
+			if (func) {
+				func(handle, SB_HORZ, flagHorizontal);
+				func(handle, SB_VERT, flagVertical);
+			}
+		}
+	}
 }
 
 #endif

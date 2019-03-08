@@ -49,7 +49,7 @@ namespace slib
 		m_textAlignment = Alignment::MiddleCenter;
 		m_flagReadOnly = sl_false;
 		m_flagPassword = sl_false;
-		m_flagMultiLine = sl_false;
+		m_multiLine = MultiLineMode::Single;
 		m_textColor = Color::Black;
 		m_hintTextColor = Color(180, 180, 180);
 		setBorder(sl_true, UIUpdateMode::Init);
@@ -141,18 +141,19 @@ namespace slib
 		}
 	}
 
-	sl_bool EditView::isMultiLine()
+	
+	MultiLineMode EditView::getMultiLine()
 	{
-		return m_flagMultiLine;
+		return m_multiLine;
 	}
-
-	void EditView::setMultiLine(sl_bool flag, UIUpdateMode mode)
+	
+	void EditView::setMultiLine(MultiLineMode multiLineMode, UIUpdateMode updateMode)
 	{
-		m_flagMultiLine = flag;
+		m_multiLine = multiLineMode;
 		if (isNativeWidget()) {
-			_setMultiLine_NW(flag);
+			_setMultiLine_NW(multiLineMode);
 		} else {
-			invalidate(mode);
+			invalidate(updateMode);
 		}
 	}
 
@@ -313,10 +314,10 @@ namespace slib
 			m_editViewNative->setMargin(UIResource::getScreenMinimum()/20);
 			m_editViewNative->setBorder(sl_false, UIUpdateMode::Init);
 			m_editViewNative->setGravity(Alignment::TopLeft, UIUpdateMode::Init);
-			m_editViewNative->setMultiLine(isMultiLine(), UIUpdateMode::Init);
+			m_editViewNative->setMultiLine(getMultiLine(), UIUpdateMode::Init);
 			m_editViewNative->setOnChange(SLIB_FUNCTION_WEAKREF(EditView, _onChangeEditViewNative, this));
 			m_editViewNative->setOnReturnKey(SLIB_FUNCTION_WEAKREF(EditView, _onReturnKeyEditViewNative, this));
-			if (m_returnKeyType == UIReturnKeyType::Default && !m_flagMultiLine) {
+			if (m_returnKeyType == UIReturnKeyType::Default && m_multiLine == MultiLineMode::Single) {
 				m_editViewNative->setReturnKeyType(UIReturnKeyType::Done);
 			} else {
 				m_editViewNative->setReturnKeyType(m_returnKeyType);
@@ -329,7 +330,7 @@ namespace slib
 			m_windowEdit->setOnClose(SLIB_FUNCTION_WEAKREF(EditView, _onCloseWindowEditViewNative, this));
 			m_editViewNative->setFocus();
 
-			sl_bool flagDoneButton = m_flagMultiLine;
+			sl_bool flagDoneButton = m_multiLine != MultiLineMode::Single;
 #if defined(SLIB_UI_IS_ANDROID)
 			UI::dispatchToUiThread([] {
 				Android::showKeyboard();
@@ -358,7 +359,7 @@ namespace slib
 	void EditView::_onChangeEditViewNative(EditView* ev, String* text)
 	{
 		dispatchChange(text);
-		if (!m_flagMultiLine) {
+		if (m_multiLine == MultiLineMode::Single) {
 			sl_reg index = ParseUtil::indexOfLine(*text);
 			if (index >= 0) {
 				*text = text->mid(0, index);
@@ -368,7 +369,7 @@ namespace slib
 	
 	void EditView::_onReturnKeyEditViewNative(EditView* ev)
 	{
-		if (!m_flagMultiLine) {
+		if (m_multiLine == MultiLineMode::Single) {
 			_onDoneEditViewNativeButton(sl_null);
 		}
 		dispatchReturnKey();
@@ -411,7 +412,7 @@ namespace slib
 	
 	void EditView::dispatchKeyEvent(UIEvent* ev)
 	{
-		if (!(isMultiLine()) || ev->getKeycode() == Keycode::Escape) {
+		if (m_multiLine == MultiLineMode::Single || ev->getKeycode() == Keycode::Escape) {
 			if (ev->getAction() == UIAction::KeyDown) {
 				if (ev->getKeycode() == Keycode::Enter) {
 					dispatchReturnKey();
@@ -440,25 +441,16 @@ namespace slib
 
 	TextArea::TextArea()
 	{
-		m_flagMultiLine = sl_true;
+		m_multiLine = MultiLineMode::Multiple;
 		m_flagAutoDismissKeyboard = sl_false;
 		m_textAlignment = Alignment::TopLeft;
 		setReturnKeyType(UIReturnKeyType::Return);
+		setScrolling(sl_true, sl_true, UIUpdateMode::Init);
 	}
 
 	TextArea::~TextArea()
 	{
 	}
-
-	sl_bool TextArea::isMultiLine()
-	{
-		return sl_true;
-	}
-
-	void TextArea::setMultiLine(sl_bool flag, UIUpdateMode mode)
-	{
-	}
-
 
 #if !defined(SLIB_UI)
 	Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* parent)
@@ -490,7 +482,7 @@ namespace slib
 	{
 	}
 	
-	void EditView::_setMultiLine_NW(sl_bool flag)
+	void EditView::_setMultiLine_NW(MultiLineMode mode)
 	{
 	}
 
@@ -511,6 +503,10 @@ namespace slib
 	}
 
 	void EditView::_setBackgroundColor_NW(const Color& color)
+	{
+	}
+
+	void EditView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
 	{
 	}
 

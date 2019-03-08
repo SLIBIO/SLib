@@ -60,9 +60,9 @@ namespace slib
 		
 		virtual void setPassword(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		virtual sl_bool isMultiLine();
+		MultiLineMode getMultiLine();
 		
-		virtual void setMultiLine(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setMultiLine(MultiLineMode multiLineMode, UIUpdateMode updateMode = UIUpdateMode::UpdateLayout);
 		
 		Color getTextColor();
 		
@@ -119,7 +119,7 @@ namespace slib
 		
 		void _setPassword_NW(sl_bool flag);
 
-		void _setMultiLine_NW(sl_bool flag);
+		void _setMultiLine_NW(MultiLineMode mode);
 		
 		void _setTextColor_NW(const Color& color);
 		
@@ -137,6 +137,8 @@ namespace slib
 		
 		void _setBackgroundColor_NW(const Color& color) override;
 		
+		void _setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical) override;
+
 		void _onChangeEditViewNative(EditView* ev, String* text);
 		
 		void _onReturnKeyEditViewNative(EditView* ev);
@@ -151,7 +153,7 @@ namespace slib
 		AtomicString m_hintText;
 		sl_bool m_flagReadOnly;
 		sl_bool m_flagPassword;
-		sl_bool m_flagMultiLine;
+		MultiLineMode m_multiLine;
 		Color m_textColor;
 		Color m_hintTextColor;
 		UIReturnKeyType m_returnKeyType;
@@ -180,11 +182,6 @@ namespace slib
 		
 		~TextArea();
 
-	public:
-		sl_bool isMultiLine() override;
-		
-		void setMultiLine(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw) override;
-		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
