@@ -124,7 +124,25 @@ int main(int argc, const char * argv[])
 		context->write("Search Keyword: " + context->getParameter("keyword"));
 		return sl_true;
 	});
+	router.before(HttpMethod::GET, "/**", [](HttpServer*, HttpServerContext* context) {
+		context->write("Intercepted by Search<br><br>");
+		return sl_false;
+	});
+	router.after(HttpMethod::GET, "/**", [](HttpServer*, HttpServerContext* context) {
+		context->write("<br><br>Powered by Search");
+		return sl_true;
+	});
 	param.router.add("/search", router);
+	
+	param.router.before(HttpMethod::GET, "/test/**", [](HttpServer*, HttpServerContext* context) {
+		context->write("Intercepted Router<br><br>");
+		return sl_false;
+	});
+
+	param.router.after(HttpMethod::GET, "/test/**", [](HttpServer*, HttpServerContext* context) {
+		context->write("<br><br>Post Router");
+		return sl_true;
+	});
 
 	param.onRequest = [](HttpServer*, HttpServerContext* context) {
 		if (context->getPath() == "/example") {
@@ -134,8 +152,8 @@ int main(int argc, const char * argv[])
 		return sl_false;
 	};
 	
-	param.onPostRequest = [](HttpServer*, HttpServerContext* context, sl_bool flagProcessed) {
-		if (!flagProcessed) {
+	param.onPostRequest = [](HttpServer*, HttpServerContext* context) {
+		if (!(context->isProcessed())) {
 			context->setResponseCode(HttpStatus::NotFound);
 			context->write("Not found the specified file!");
 		}
