@@ -647,20 +647,25 @@ namespace slib
 		/**
 		 * @return a newly constructed string with its value initialized to a copy of a substring of this string.
 		 */
+		String16 copy(sl_reg start, sl_reg end = -1) const noexcept;
+		
+		/**
+		 * @return a view of the substring.
+		 */
 		String16 substring(sl_reg start, sl_reg end = -1) const noexcept;
 		
 		/**
-		 * @return a string containing a specified number of characters from the left side of this string.
+		 * @return a view of the left side of this string.
 		 */
 		String16 left(sl_reg len) const noexcept;
 		
 		/**
-		 * @return a string containing a specified number of characters from the right side of this string.
+		 * @return a view of the right side of this string.
 		 */
 		String16 right(sl_reg len) const noexcept;
 		
 		/**
-		 * @return a string that contains a specified number of characters starting from a specified position in this string.
+		 * @return a view of the substring that contains a specified number of characters starting from a specified position in this string.
 		 */
 		String16 mid(sl_reg start, sl_reg len) const noexcept;
 		
@@ -1670,20 +1675,25 @@ namespace slib
 		/**
 		 * @return a newly constructed string with its value initialized to a copy of a substring of this string.
 		 */
+		String16 copy(sl_reg start, sl_reg end = -1) const noexcept;
+		
+		/**
+		 * @return a view of the substring.
+		 */
 		String16 substring(sl_reg start, sl_reg end = -1) const noexcept;
 		
 		/**
-		 * @return a string containing a specified number of characters from the left side of this string.
+		 * @return a view of the left side of this string.
 		 */
 		String16 left(sl_reg len) const noexcept;
 		
 		/**
-		 * @return a string containing a specified number of characters from the right side of this string.
+		 * @return a view of the right side of this string.
 		 */
 		String16 right(sl_reg len) const noexcept;
 		
 		/**
-		 * @return a string that contains a specified number of characters starting from a specified position in a string.
+		 * @return a view of the substring that contains a specified number of characters starting from a specified position in this string.
 		 */
 		String16 mid(sl_reg start, sl_reg len) const noexcept;
 		

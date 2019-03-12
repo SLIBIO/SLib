@@ -94,7 +94,8 @@ namespace slib
 	enum STRING_CONTAINER_TYPES {
 		STRING_CONTAINER_TYPE_NORMAL = 0,
 		STRING_CONTAINER_TYPE_STD = 10,
-		STRING_CONTAINER_TYPE_REF = 11
+		STRING_CONTAINER_TYPE_REF = 11,
+		STRING_CONTAINER_TYPE_VIEW = 12
 	};
 
 	const _priv_String_Const _priv_String_Null = {sl_null, 0};
@@ -154,6 +155,18 @@ namespace slib
 		
 	};
 
+	class _priv_StringContainer_view : public StringContainer
+	{
+	public:
+		String str;
+		
+	public:
+		_priv_StringContainer_view(const String& _str): str(_str)
+		{
+		}
+		
+	};
+
 	SLIB_INLINE sl_reg StringContainer::decreaseReference() noexcept
 	{
 		if (ref > 0) {
@@ -165,6 +178,9 @@ namespace slib
 				} else if (type == STRING_CONTAINER_TYPE_REF) {
 					_priv_StringContainer_ref* container = static_cast<_priv_StringContainer_ref*>(this);
 					container->_priv_StringContainer_ref::~_priv_StringContainer_ref();
+				} else if (type == STRING_CONTAINER_TYPE_VIEW) {
+					_priv_StringContainer_view* container = static_cast<_priv_StringContainer_view*>(this);
+					container->_priv_StringContainer_view::~_priv_StringContainer_view();
 				}
 				Base::freeMemory(this);
 			}
@@ -200,7 +216,19 @@ namespace slib
 		}
 		
 	};
-
+	
+	class _priv_StringContainer16_view : public StringContainer16
+	{
+	public:
+		String str;
+		
+	public:
+		_priv_StringContainer16_view(const String& _str): str(_str)
+		{
+		}
+		
+	};
+	
 	SLIB_INLINE sl_reg StringContainer16::decreaseReference() noexcept
 	{
 		if (ref > 0) {
@@ -212,6 +240,9 @@ namespace slib
 				} else if (type == STRING_CONTAINER_TYPE_REF) {
 					_priv_StringContainer16_ref* container = static_cast<_priv_StringContainer16_ref*>(this);
 					container->_priv_StringContainer16_ref::~_priv_StringContainer16_ref();
+				} else if (type == STRING_CONTAINER_TYPE_VIEW) {
+					_priv_StringContainer16_view* container = static_cast<_priv_StringContainer16_view*>(this);
+					container->_priv_StringContainer16_view::~_priv_StringContainer16_view();
 				}
 				Base::freeMemory(this);
 			}
@@ -378,6 +409,42 @@ namespace slib
 			container->len = len;
 			container->hash = 0;
 			container->type = STRING_CONTAINER_TYPE_REF;
+			container->ref = 1;
+			return container;
+		}
+		return sl_null;
+	}
+	
+	SLIB_INLINE static StringContainer* _priv_String_alloc_view(const String& str, const sl_char8* sz, sl_size len) noexcept
+	{
+		if (len == 0) {
+			return _priv_String_Empty.container;
+		}
+		_priv_StringContainer_view* container = (_priv_StringContainer_view*)(Base::createMemory(sizeof(_priv_StringContainer_view)));
+		if (container) {
+			new (container) _priv_StringContainer_view(str);
+			container->sz = (sl_char8*)(sz);
+			container->len = len;
+			container->hash = 0;
+			container->type = STRING_CONTAINER_TYPE_VIEW;
+			container->ref = 1;
+			return container;
+		}
+		return sl_null;
+	}
+	
+	SLIB_INLINE static StringContainer16* _priv_String16_alloc_view(const String16& str, const sl_char16* sz, sl_size len) noexcept
+	{
+		if (len == 0) {
+			return _priv_String16_Empty.container;
+		}
+		_priv_StringContainer16_view* container = (_priv_StringContainer16_view*)(Base::createMemory(sizeof(_priv_StringContainer16_view)));
+		if (container) {
+			new (container) _priv_StringContainer16_view(str);
+			container->sz = (sl_char16*)(sz);
+			container->len = len;
+			container->hash = 0;
+			container->type = STRING_CONTAINER_TYPE_VIEW;
 			container->ref = 1;
 			return container;
 		}
@@ -4899,6 +4966,48 @@ namespace slib
 		return s.toUtf32();
 	}
 
+	String String::copy(sl_reg start, sl_reg end) const noexcept
+	{
+		sl_reg count = getLength();
+		if (start < 0) {
+			start = 0;
+		}
+		if (end < 0 || end > count) {
+			end = count;
+		}
+		if (start >= end) {
+			return sl_null;
+		}
+		return String(getData() + start, end - start);
+	}
+
+	String16 String16::copy(sl_reg start, sl_reg end) const noexcept
+	{
+		sl_reg count = getLength();
+		if (start < 0) {
+			start = 0;
+		}
+		if (end < 0 || end > count) {
+			end = count;
+		}
+		if (start >= end) {
+			return sl_null;
+		}
+		return String16(getData() + start, end - start);
+	}
+
+	String Atomic<String>::copy(sl_reg start, sl_reg end) const noexcept
+	{
+		String s(*this);
+		return s.copy(start, end);
+	}
+
+	String16 Atomic<String16>::copy(sl_reg start, sl_reg end) const noexcept
+	{
+		String16 s(*this);
+		return s.copy(start, end);
+	}
+
 	String String::substring(sl_reg start, sl_reg end) const noexcept
 	{
 		sl_reg count = getLength();
@@ -4914,9 +5023,9 @@ namespace slib
 		if (start == 0 && end == count) {
 			return *this;
 		}
-		return String(getData() + start, end - start);
+		return _priv_String_alloc_view(*this, getData() + start, end - start);
 	}
-
+	
 	String16 String16::substring(sl_reg start, sl_reg end) const noexcept
 	{
 		sl_reg count = getLength();
@@ -4932,21 +5041,21 @@ namespace slib
 		if (start == 0 && end == count) {
 			return *this;
 		}
-		return String16(getData() + start, end - start);
+		return _priv_String16_alloc_view(*this, getData() + start, end - start);
 	}
-
+	
 	String Atomic<String>::substring(sl_reg start, sl_reg end) const noexcept
 	{
 		String s(*this);
 		return s.substring(start, end);
 	}
-
+	
 	String16 Atomic<String16>::substring(sl_reg start, sl_reg end) const noexcept
 	{
 		String16 s(*this);
 		return s.substring(start, end);
 	}
-
+	
 	String String::left(sl_reg len) const noexcept
 	{
 		return substring(0, len);
@@ -4954,7 +5063,7 @@ namespace slib
 
 	String16 String16::left(sl_reg len) const noexcept
 	{
-		return substring( 0, len );
+		return substring(0, len);
 	}
 
 	String Atomic<String>::left(sl_reg len) const noexcept
