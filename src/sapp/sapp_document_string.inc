@@ -192,7 +192,7 @@ namespace slib
 					sbCpp.addStatic(strEnd, sizeof(strEnd)-1);
 				}
 				
-				sbMap.add(String::format("\t\t\tSLIB_DEFINE_RESOURCE_MAP_ITEM(%s)%n", pair.key));
+				sbMap.add(String::format("\t\t\tSLIB_DEFINE_STRING_RESOURCE_MAP_ITEM(%s)%n", pair.key));
 				
 			}
 		}

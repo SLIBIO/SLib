@@ -97,7 +97,7 @@ namespace slib
 				Color& color = pair.value->value;
 				sbCpp.add(String::format("\t\tSLIB_DEFINE_COLOR_RESOURCE(%s, %d, %d, %d, %d)%n", pair.key, color.r, color.g, color.b, color.a));
 				
-				sbMap.add(String::format("\t\t\tSLIB_DEFINE_RESOURCE_MAP_ITEM(%s)%n", pair.key));
+				sbMap.add(String::format("\t\t\tSLIB_DEFINE_COLOR_RESOURCE_MAP_ITEM(%s)%n", pair.key));
 				
 			}
 		}

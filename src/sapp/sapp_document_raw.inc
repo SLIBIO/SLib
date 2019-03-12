@@ -109,7 +109,7 @@ namespace slib
 				
 				sbCpp.add(String::format("\t\tSLIB_DEFINE_RAW_RESOURCE(%s, %d)%n", res->name, size));
 				
-				sbMap.add(String::format("\t\t\tSLIB_DEFINE_RESOURCE_MAP_ITEM(%s)%n", res->name));
+				sbMap.add(String::format("\t\t\tSLIB_DEFINE_RAW_RESOURCE_MAP_ITEM(%s)%n", res->name));
 				
 				sbData.add(String::format("\t\t#include \"raw/%s.inc\"%n", res->name));
 				

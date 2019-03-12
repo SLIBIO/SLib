@@ -555,7 +555,7 @@ namespace slib
 			
 		}
 		
-		sbMap.add(String::format("\t\t\tSLIB_DEFINE_RESOURCE_MAP_ITEM(%s)%n", res->name));
+		sbMap.add(String::format("\t\t\tSLIB_DEFINE_DRAWABLE_RESOURCE_MAP_ITEM(%s)%n", res->name));
 		
 		return sl_true;
 	}
@@ -799,7 +799,7 @@ namespace slib
 		
 		sbCpp.add(String::format("\t\tSLIB_DEFINE_NINEPIECES_RESOURCE(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)%n%n", res->name, attr->leftWidth.getAccessString(), attr->rightWidth.getAccessString(), attr->topHeight.getAccessString(), attr->bottomHeight.getAccessString(), strTopLeft, strTop, strTopRight, strLeft, strCenter, strRight, strBottomLeft, strBottom, strBottomRight));
 		
-		sbMap.add(String::format("\t\t\tSLIB_DEFINE_RESOURCE_MAP_ITEM(%s)%n", res->name));
+		sbMap.add(String::format("\t\t\tSLIB_DEFINE_DRAWABLE_RESOURCE_MAP_ITEM(%s)%n", res->name));
 		
 		return sl_true;
 	}
@@ -1001,7 +1001,7 @@ namespace slib
 		
 		sbCpp.add(String::format("\t\tSLIB_DEFINE_NINEPATCH_RESOURCE(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)%n%n", res->name, attr->dstLeftWidth.getAccessString(), attr->dstRightWidth.getAccessString(), attr->dstTopHeight.getAccessString(), attr->dstBottomHeight.getAccessString(), strSrc, attr->leftWidth, attr->rightWidth, attr->topHeight, attr->bottomHeight));
 		
-		sbMap.add(String::format("\t\t\tSLIB_DEFINE_RESOURCE_MAP_ITEM(%s)%n", res->name));
+		sbMap.add(String::format("\t\t\tSLIB_DEFINE_DRAWABLE_RESOURCE_MAP_ITEM(%s)%n", res->name));
 		
 		return sl_true;
 	}

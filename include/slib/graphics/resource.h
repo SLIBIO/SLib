@@ -47,6 +47,7 @@
 
 #define SLIB_DECLARE_COLOR_RESOURCE_MAP SLIB_DECLARE_RESOURCE_MAP(slib::Color)
 #define SLIB_DEFINE_COLOR_RESOURCE_MAP_BEGIN SLIB_DEFINE_RESOURCE_MAP_BEGIN(slib::Color)
+#define SLIB_DEFINE_COLOR_RESOURCE_MAP_ITEM(NAME) SLIB_DEFINE_RESOURCE_MAP_ITEM(NAME)
 #define SLIB_DEFINE_COLOR_RESOURCE_MAP_END SLIB_DEFINE_RESOURCE_MAP_END(slib::Color, 0)
 
 
@@ -138,6 +139,7 @@
 
 #define SLIB_DECLARE_DRAWABLE_RESOURCE(NAME) \
 	namespace NAME { \
+		slib::Ref<slib::Drawable> get(const slib::Locale& locale); \
 		slib::Ref<slib::Drawable> get(); \
 	}
 
@@ -154,6 +156,9 @@
 				value = slib::NinePiecesDrawable::create(LEFT_WIDTH, RIGHT_WIDTH, TOP_HEIGHT, BOTTOM_HEIGHT, TOP_LEFT, TOP, TOP_RIGHT, LEFT, CENTER, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT); \
 			} \
 			return value; \
+		} \
+		slib::Ref<slib::Drawable> get(const slib::Locale& locale) { \
+			return get(); \
 		} \
 	}
 
@@ -172,12 +177,16 @@
 			} \
 			return value; \
 		} \
+		slib::Ref<slib::Drawable> get(const slib::Locale& locale) { \
+			return get(); \
+		} \
 	}
 
 
-#define SLIB_DECLARE_DRAWABLE_RESOURCE_MAP SLIB_DECLARE_RESOURCE_MAP(slib::Ref<slib::Drawable>)
-#define SLIB_DEFINE_DRAWABLE_RESOURCE_MAP_BEGIN SLIB_DEFINE_RESOURCE_MAP_BEGIN(slib::Ref<slib::Drawable>)
-#define SLIB_DEFINE_DRAWABLE_RESOURCE_MAP_END SLIB_DEFINE_RESOURCE_MAP_END(slib::Ref<slib::Drawable>, sl_null)
+#define SLIB_DECLARE_DRAWABLE_RESOURCE_MAP SLIB_DECLARE_LOCALIZED_RESOURCE_MAP(slib::Ref<slib::Drawable>)
+#define SLIB_DEFINE_DRAWABLE_RESOURCE_MAP_BEGIN SLIB_DEFINE_LOCALIZED_RESOURCE_MAP_BEGIN(slib::Ref<slib::Drawable>)
+#define SLIB_DEFINE_DRAWABLE_RESOURCE_MAP_ITEM(NAME) SLIB_DEFINE_LOCALIZED_RESOURCE_MAP_ITEM(NAME)
+#define SLIB_DEFINE_DRAWABLE_RESOURCE_MAP_END SLIB_DEFINE_LOCALIZED_RESOURCE_MAP_END(slib::Ref<slib::Drawable>, sl_null)
 
 #include "detail/resource.inc"
 
