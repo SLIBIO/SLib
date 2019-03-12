@@ -133,6 +133,8 @@ namespace ginger {
 		void map(const std::function<void (object)>& f) const { holder_->map(f); }
 		std::string str() const { return holder_->str(); }
 		object operator[](std::string name) { return holder_->get(std::move(name)); }
+		
+		bool isNull() { return holder_ == nullptr; }
 	};
 	
 	typedef std::map<std::string, object> temple;
@@ -354,13 +356,24 @@ namespace ginger {
 					if (it2 != dic.end()) {
 						obj = it2->second;
 					} else {
-						throw std::string("Variable \"") + var + "\" is not found";
+						skip = true;
 					}
 				}
 				while (p.peek() == '.') {
 					p.read();
-					std::string var = p.read_variable_str();
-					obj = obj[var];
+					std::string sub = p.read_variable_str();
+					if (!skip) {
+						obj = obj[sub];
+						if (obj.isNull()) {
+							skip = true;
+						}
+					}
+					if (skip) {
+						var = var + "." + sub;
+					}
+				}
+				if (skip) {
+					obj = "${" + var + "}";
 				}
 				return obj;
 			}
