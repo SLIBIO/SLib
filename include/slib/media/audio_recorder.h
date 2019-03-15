@@ -98,6 +98,8 @@ namespace slib
 		virtual sl_bool isRunning() = 0;
 		
 	public:
+		const AudioRecorderParam& getParam();
+		
 		sl_bool read(const AudioData& audio);
 		
 	protected:
@@ -108,12 +110,10 @@ namespace slib
 		void _processFrame(sl_int16* s, sl_uint32 count);
 		
 	protected:
-		LoopQueue<sl_int16> m_queue;
-		sl_uint32 m_nChannels;
-		AtomicArray<sl_int16> m_processData;
+		AudioRecorderParam m_param;
 		
-		Function<void(AudioRecorder*, AudioData&)> m_onRecordAudio;
-		Ref<Event> m_event;
+		LoopQueue<sl_int16> m_queue;
+		AtomicArray<sl_int16> m_processData;
 		
 	};	
 }

@@ -215,7 +215,7 @@ namespace slib
 		AtomicArray<sl_int16> m_dataConvert;
 		void onConvert(sl_uint32 nFrames, AudioBufferList* data)
 		{
-			sl_uint32 nChannels = m_nChannels;
+			sl_uint32 nChannels = m_param.channelsCount;
 			sl_uint32 nSamples = nFrames * nChannels;
 
 			Array<sl_int16> dataConvert = _getProcessData(nSamples);

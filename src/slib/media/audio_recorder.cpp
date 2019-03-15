@@ -50,17 +50,21 @@ namespace slib
 
 	AudioRecorder::AudioRecorder()
 	{
-		m_nChannels = 1;
 	}
 
 	AudioRecorder::~AudioRecorder()
 	{
 	}
+	
+	const AudioRecorderParam& AudioRecorder::getParam()
+	{
+		return m_param;
+	}
 
 	sl_bool AudioRecorder::read(const AudioData& audioOut)
 	{
 		AudioFormat format;
-		sl_uint32 nChannels = m_nChannels;
+		sl_uint32 nChannels = m_param.channelsCount;
 		if (nChannels == 1) {
 			format = AudioFormat::Int16_Mono;
 		} else {
@@ -94,10 +98,8 @@ namespace slib
 
 	void AudioRecorder::_init(const AudioRecorderParam& param)
 	{
+		m_param = param;
 		m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
-		m_nChannels = param.channelsCount;
-		m_onRecordAudio = param.onRecordAudio;
-		m_event = param.event;
 	}
 
 	Array<sl_int16> AudioRecorder::_getProcessData(sl_uint32 count)
@@ -114,10 +116,10 @@ namespace slib
 
 	void AudioRecorder::_processFrame(sl_int16* s, sl_uint32 count)
 	{
-		if (m_onRecordAudio.isNotNull()) {
+		if (m_param.onRecordAudio.isNotNull()) {
 			AudioData audio;
 			AudioFormat format;
-			sl_uint32 nChannels = m_nChannels;
+			sl_uint32 nChannels = m_param.channelsCount;
 			if (nChannels == 1) {
 				format = AudioFormat::Int16_Mono;
 			} else {
@@ -126,11 +128,11 @@ namespace slib
 			audio.format = format;
 			audio.count = count / nChannels;
 			audio.data = s;
-			m_onRecordAudio(this, audio);
+			m_param.onRecordAudio(this, audio);
 		}
 		m_queue.push(s, count);
-		if (m_event.isNotNull()) {
-			m_event->set();
+		if (m_param.event.isNotNull()) {
+			m_param.event->set();
 		}
 	}
 

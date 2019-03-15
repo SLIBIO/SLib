@@ -53,7 +53,6 @@ namespace slib
 	AudioPlayerBuffer::AudioPlayerBuffer()
 	{
 		m_lastSample = 0;
-		m_nChannels = 1;
 	}
 
 	AudioPlayerBuffer::~AudioPlayerBuffer()
@@ -62,16 +61,19 @@ namespace slib
 	
 	void AudioPlayerBuffer::_init(const AudioPlayerBufferParam& param)
 	{
+		m_param = param;
 		m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
-		m_nChannels = param.channelsCount;
-		m_onRequireAudioData = param.onRequireAudioData;
-		m_event = param.event;
+	}
+	
+	const AudioPlayerBufferParam& AudioPlayerBuffer::getParam()
+	{
+		return m_param;
 	}
 
 	void AudioPlayerBuffer::write(const AudioData& audioIn)
 	{
 		AudioFormat format;
-		sl_uint32 nChannels = m_nChannels;
+		sl_uint32 nChannels = m_param.channelsCount;
 		if (nChannels == 1) {
 			format = AudioFormat::Int16_Mono;
 		} else {
@@ -80,22 +82,27 @@ namespace slib
 		if (audioIn.format == format && (((sl_size)(audioIn.data)) & 1) == 0) {
 			m_queue.push((sl_int16*)(audioIn.data), nChannels * audioIn.count);
 		} else {
-			sl_int16 samples[2048];
-			AudioData temp;
-			temp.format = format;
-			temp.data = samples;
-			temp.count = 1024;
-			sl_size n = audioIn.count;
-			while (n > 0) {
-				sl_size m = n;
-				if (m > 1024) {
-					m = 1024;
-				}
-				n -= m;
-				temp.copySamplesFrom(audioIn, m);
-				m_queue.push(samples, nChannels*m);
+			sl_uint32 countTotal = (sl_uint32)(nChannels * audioIn.count);
+			Array<sl_int16> buf = _getProcessData(countTotal);
+			if (buf.isNotNull()) {
+				AudioData temp;
+				temp.format = format;
+				temp.data = buf.getData();
+				temp.count = audioIn.count;
+				temp.copySamplesFrom(audioIn, audioIn.count);
+				m_queue.push(buf.getData(), countTotal);
 			}
 		}
+	}
+	
+	void AudioPlayerBuffer::flush()
+	{
+		m_queue.removeAll();
+	}
+	
+	sl_size AudioPlayerBuffer::getSamplesCountInQueue()
+	{
+		return m_queue.getCount();
 	}
 
 	Array<sl_int16> AudioPlayerBuffer::_getProcessData(sl_uint32 count)
@@ -112,10 +119,10 @@ namespace slib
 
 	void AudioPlayerBuffer::_processFrame(sl_int16* s, sl_uint32 count)
 	{
-		if (m_event.isNotNull()) {
-			m_event->set();
+		if (m_param.event.isNotNull()) {
+			m_param.event->set();
 		}
-		m_onRequireAudioData(this, count / m_nChannels);
+		m_param.onRequireAudioData(this, count / m_param.channelsCount);
 		if (!(m_queue.pop(s, count))) {
 			for (sl_uint32 i = 0; i < count; i++) {
 				s[i] = m_lastSample;

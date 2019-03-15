@@ -94,7 +94,13 @@ namespace slib
 		virtual sl_bool isRunning() = 0;
 		
 	public:
+		const AudioPlayerBufferParam& getParam();
+		
 		void write(const AudioData& audioPlay);
+		
+		void flush();
+		
+		sl_size getSamplesCountInQueue();
 		
 	protected:
 		void _init(const AudioPlayerBufferParam& param);
@@ -104,14 +110,11 @@ namespace slib
 		void _processFrame(sl_int16* s, sl_uint32 count);
 		
 	protected:
+		AudioPlayerBufferParam m_param;
+		
 		LoopQueue<sl_int16> m_queue;
 		sl_int16 m_lastSample;
-		sl_uint32 m_nChannels;
 		AtomicArray<sl_int16> m_processData;
-		
-		Function<void(AudioPlayerBuffer*, sl_uint32 requestedSamplesCount)> m_onRequireAudioData;
-		Ref<Event> m_event;
-		
 	};
 	
 	class SLIB_EXPORT AudioPlayerParam

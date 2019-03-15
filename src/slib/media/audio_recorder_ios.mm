@@ -281,7 +281,7 @@ namespace slib
 			const AudioBuffer& buffer = data->mBuffers[0];
 			sl_uint32 nFrames = buffer.mDataByteSize / m_formatSrc.mBytesPerPacket * m_formatDst.mSampleRate / m_formatSrc.mSampleRate * 2; // double buffer to be enough to convert all source packets
 			
-			sl_uint32 nChannels = m_nChannels;
+			sl_uint32 nChannels = m_param.channelsCount;
 			sl_uint32 nSamples = nFrames * nChannels;
 			
 			Array<sl_int16> arrData = _getProcessData(nSamples);
