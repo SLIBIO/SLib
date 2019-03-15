@@ -80,16 +80,15 @@ namespace slib
 	{
 		m_mediaPlayer = player;
 		if (player.isNotNull()) {
-			player->resume();
 			setRedrawMode(RedrawMode::Continuously);
 		} else {
 			setRedrawMode(RedrawMode::WhenDirty);
 		}
 	}
 	
-	void VideoView::openUrl(const String& url)
+	void VideoView::openUrl(const String& url, const MediaPlayerFlags& _flags)
 	{
-		MediaPlayerFlags flags = MediaPlayerFlags::NotSelfAlive | MediaPlayerFlags::Video | MediaPlayerFlags::NotStart;
+		MediaPlayerFlags flags = _flags | MediaPlayerFlags::NotSelfAlive;
 		if (m_flagRepeat) {
 			flags |= MediaPlayerFlags::Repeat;
 		}
@@ -99,9 +98,9 @@ namespace slib
 		}
 	}
 	
-	void VideoView::openFile(const String& filePath)
+	void VideoView::openFile(const String& filePath, const MediaPlayerFlags& _flags)
 	{
-		MediaPlayerFlags flags = MediaPlayerFlags::NotSelfAlive | MediaPlayerFlags::Video | MediaPlayerFlags::NotStart;
+		MediaPlayerFlags flags = _flags | MediaPlayerFlags::NotSelfAlive;
 		if (m_flagRepeat) {
 			flags |= MediaPlayerFlags::Repeat;
 		}
@@ -111,9 +110,9 @@ namespace slib
 		}
 	}
 	
-	void VideoView::openAsset(const String& fileName)
+	void VideoView::openAsset(const String& fileName, const MediaPlayerFlags& _flags)
 	{
-		MediaPlayerFlags flags = MediaPlayerFlags::NotSelfAlive | MediaPlayerFlags::Video | MediaPlayerFlags::NotStart;
+		MediaPlayerFlags flags = _flags | MediaPlayerFlags::NotSelfAlive;
 		if (m_flagRepeat) {
 			flags |= MediaPlayerFlags::Repeat;
 		}
@@ -123,15 +122,15 @@ namespace slib
 		}
 	}
 	
-	void VideoView::setSource(const String& source)
+	void VideoView::setSource(const String& source, const MediaPlayerFlags& flags)
 	{
 		if (source.isNotEmpty()) {
 			if (source.startsWith("asset://")) {
-				openAsset(source.substring(8));
+				openAsset(source.substring(8), flags);
 			} else if (source.indexOf(':') >= 0) {
-				openUrl(source);
+				openUrl(source, flags);
 			} else {
-				openFile(source);
+				openFile(source, flags);
 			}
 		}
 	}

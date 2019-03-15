@@ -254,6 +254,8 @@ namespace slib
 						
 						if (pixelBuffer != NULL) {
 							
+							lock.unlock();
+							
 							if (CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly) == kCVReturnSuccess) {
 															
 								sl_uint32 frameWidth = (sl_uint32)(CVPixelBufferGetWidth(pixelBuffer));

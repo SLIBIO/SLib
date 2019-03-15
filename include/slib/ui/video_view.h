@@ -50,13 +50,13 @@ namespace slib
 		void setMediaPlayer(const Ref<MediaPlayer>& player);
 		
 		
-		void openUrl(const String& url);
+		void openUrl(const String& url, const MediaPlayerFlags& flags = MediaPlayerFlags::Video);
 		
-		void openFile(const String& filePath);
+		void openFile(const String& filePath, const MediaPlayerFlags& flags = MediaPlayerFlags::Video);
 		
-		void openAsset(const String& fileName);
+		void openAsset(const String& fileName, const MediaPlayerFlags& flags = MediaPlayerFlags::Video);
 		
-		void setSource(const String& source);
+		void setSource(const String& source, const MediaPlayerFlags& flags = MediaPlayerFlags::Video);
 		
 		
 		sl_bool isRepeat();
