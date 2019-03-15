@@ -262,6 +262,7 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/media/codec_opus.cpp"
  "${SLIB_PATH}/src/slib/media/codec_vpx.cpp"
  "${SLIB_PATH}/src/slib/media/media_player.cpp"
+ "${SLIB_PATH}/src/slib/media/media_player_ffmpeg.cpp"
  "${SLIB_PATH}/src/slib/media/video_capture.cpp"
  "${SLIB_PATH}/src/slib/media/video_codec.cpp"
  "${SLIB_PATH}/src/slib/media/video_frame.cpp"

@@ -1202,5 +1202,8 @@
     <ClCompile Include="..\..\external\src\libjpeg\jutils.c">
       <Filter>external\libjpeg</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\media\media_player_ffmpeg.cpp">
+      <Filter>src\media</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

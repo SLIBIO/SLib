@@ -20,29 +20,29 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_MEDIA_HEADER
-#define CHECKHEADER_SLIB_MEDIA_HEADER
+#ifndef CHECKHEADER_SLIB_MEDIA_FFMPEG
+#define CHECKHEADER_SLIB_MEDIA_FFMPEG
 
-#include "media/audio_format.h"
-#include "media/audio_data.h"
-#include "media/audio_player.h"
-#include "media/audio_recorder.h"
-#include "media/audio_util.h"
+#include "definition.h"
 
-#include "media/video_frame.h"
-#include "media/video_capture.h"
-#include "media/camera.h"
-#include "media/media_player.h"
+#include "media_player.h"
 
-#include "media/audio_codec.h"
-#include "media/video_codec.h"
+namespace slib
+{
 
-#include "media/opensl_es.h"
-#include "media/dsound.h"
-#include "media/dshow.h"
-#include "media/ffmpeg.h"
-
-#include "media/codec_opus.h"
-#include "media/codec_vpx.h"
+	class SLIB_EXPORT FFmpeg
+	{
+	public:
+		static Ref<MediaPlayer> createMediaPlayer(const MediaPlayerParam& param);
+		
+		static Ref<MediaPlayer> openUrl(const String& url, const MediaPlayerFlags& flags = MediaPlayerFlags::Default);
+		
+		static Ref<MediaPlayer> openFile(const String& filePath, const MediaPlayerFlags& flags = MediaPlayerFlags::Default);
+		
+		static Ref<MediaPlayer> openAsset(const String& fileName, const MediaPlayerFlags& flags = MediaPlayerFlags::Default);
+		
+	};
+	
+}
 
 #endif

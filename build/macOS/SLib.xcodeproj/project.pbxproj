@@ -1118,6 +1118,7 @@
 		26D9D9F11E964693005F7BD3 /* web_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CBDF001DED5EC700B1B13B /* web_controller.cpp */; };
 		26D9D9F21E964693005F7BD3 /* web_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26912BC21DEA81D5008C5FFD /* web_service.cpp */; };
 		26D9D9F41E968240005F7BD3 /* http_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D9D9F31E968240005F7BD3 /* http_io.cpp */; };
+		26DA4B39223980B500706393 /* media_player_ffmpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DA4B38223980B500706393 /* media_player_ffmpeg.cpp */; };
 		26E1B858222841AC007C222E /* pinterest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E1B857222841AB007C222E /* pinterest.cpp */; };
 		26E1B85C22291D54007C222E /* ebay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E1B85B22291D53007C222E /* ebay.cpp */; };
 		26E1B85D222A8250007C222E /* adler32.c in Sources */ = {isa = PBXBuildFile; fileRef = 2605065820CF8E6E00032B2C /* adler32.c */; settings = {COMPILER_FLAGS = "-Os"; }; };
@@ -2440,6 +2441,7 @@
 		26D9D9531E9645CE005F7BD3 /* libslib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libslib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		26D9D9F31E968240005F7BD3 /* http_io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_io.cpp; sourceTree = "<group>"; };
 		26DA34F91C4B47CF004DC204 /* video_frame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_frame.cpp; sourceTree = "<group>"; };
+		26DA4B38223980B500706393 /* media_player_ffmpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = media_player_ffmpeg.cpp; sourceTree = "<group>"; };
 		26E1B857222841AB007C222E /* pinterest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pinterest.cpp; path = social/pinterest.cpp; sourceTree = "<group>"; };
 		26E1B85B22291D53007C222E /* ebay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ebay.cpp; path = social/ebay.cpp; sourceTree = "<group>"; };
 		26E376D61C984CC400B178E6 /* vector2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vector2.cpp; sourceTree = "<group>"; };
@@ -4233,6 +4235,7 @@
 				266DD4BA1C11940A00D47AB0 /* media_platform_macos.mm */,
 				26D8AC8D1E393F010092EB81 /* media_player.cpp */,
 				26D8AC8C1E393F010092EB81 /* media_player_apple.mm */,
+				26DA4B38223980B500706393 /* media_player_ffmpeg.cpp */,
 				266DD4BB1C11940A00D47AB0 /* video_capture.cpp */,
 				266DD4BC1C11940A00D47AB0 /* video_codec.cpp */,
 				26DA34F91C4B47CF004DC204 /* video_frame.cpp */,
@@ -5899,6 +5902,7 @@
 				26D9D8F91E9645CE005F7BD3 /* map.cpp in Sources */,
 				26D9D9A01E96467B005F7BD3 /* network_os.cpp in Sources */,
 				26E1B88E222ABAB2007C222E /* jdapimin.c in Sources */,
+				26DA4B39223980B500706393 /* media_player_ffmpeg.cpp in Sources */,
 				26FADD30215676D50057F7EA /* stun.cpp in Sources */,
 				26B92D7021D7C237003F6F82 /* device_macos.mm in Sources */,
 				26BAE00C221C8FFC0085B5AB /* etsy.cpp in Sources */,
