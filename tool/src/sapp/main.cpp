@@ -31,7 +31,7 @@ int main(int argc, const char * argv[])
 {
 	System::setDebugFlags();
 
-	CList<String> args;
+	List<String> args;
 	for (int i = 0; i < argc; i++) {
 		String arg = argv[i];
 		arg = arg.trim();
@@ -45,8 +45,13 @@ int main(int argc, const char * argv[])
 	if (args.getCount() < 2) {
 		while (1) {
 			Println("Input the command or file path");
-			command = Console::readLine().trim();
-			if (command.isNotNull()) {
+			String input = Console::readLine().trim();
+			args = input.split(" ");
+			if (args.isNotEmpty()) {
+				command = args[0];
+			}
+			args.insert_NoLock(0, sl_null);
+			if (command.isNotEmpty()) {
 				break;
 			}
 		}
