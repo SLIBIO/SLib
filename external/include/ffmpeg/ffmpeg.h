@@ -1,0 +1,6 @@
+#include "avcodec.h"
+#include "avformat.h"
+#include "avfilter.h"
+#include "avdevice.h"
+#include "swresample.h"
+#include "swscale.h"
