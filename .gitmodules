@@ -5,3 +5,6 @@
 	path = external/bin/OpenSSL
 	url = https://github.com/SLIBIO/SLibExternalBin_OpenSSL.git
 	branch = master
+[submodule "external/bin/FFmpeg"]
+	path = external/bin/FFmpeg
+	url = https://github.com/SLIBIO/SLibExternalBin_FFmpeg.git
