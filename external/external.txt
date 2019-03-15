@@ -13,12 +13,18 @@ hiredis 0.14.0
 stb_image 2.19
 ginger
 
+# Binaries
+OpenSSL 1.1.1a
+FFmpeg 4.1.1
+	lame 3.100
+	openh264 8.1.0
+	kvazaar 1.2.0
+FacebookSDK 4.39.1
+
 # Headers
 gl
 cairo 1.14.2
 curl 7.59.0
 libmariadb-client 3.0.4
-openssl 1.1.1a
 pcap 1.8.1
 WinPcap 4.1.3
-FacebookSDK 4.39.1
