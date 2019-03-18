@@ -8,3 +8,6 @@
 [submodule "external/bin/FFmpeg"]
 	path = external/bin/FFmpeg
 	url = https://github.com/SLIBIO/SLibExternalBin_FFmpeg.git
+[submodule "external/bin/libmysqlclient"]
+	path = external/bin/libmysqlclient
+	url = https://github.com/SLIBIO/SLibExternalBin_libmysqlclient.git

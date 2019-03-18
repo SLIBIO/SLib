@@ -20,6 +20,7 @@ FFmpeg 4.1.1
 	openh264 8.1.0
 	kvazaar 1.2.0
 FacebookSDK 4.39.1
+libmysqlclient 8.0
 
 # Headers
 gl
