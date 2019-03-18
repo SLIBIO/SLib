@@ -1385,7 +1385,7 @@ namespace slib
 						return sb.merge();
 					}
 				}
-				if (!(sb.add(String(buf, IO_READLINE_BUF_SIZE)))) {
+				if (!(sb.add(String(buf, n)))) {
 					return String::null();
 				}
 			} else {
