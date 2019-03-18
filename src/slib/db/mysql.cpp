@@ -184,7 +184,29 @@ namespace slib
 			initThread();
 			ObjectLocker lock(this);
 			if (0 == ::mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
-				return ::mysql_affected_rows(m_mysql);
+				sl_int64 ret = 0;
+				for (;;) {
+					MYSQL_RES* result = mysql_store_result(m_mysql);
+					if (result) {
+						mysql_free_result(result);
+					} else {
+						if (mysql_field_count(m_mysql) == 0) {
+							ret += mysql_affected_rows(m_mysql);
+						} else {
+							ret = -1;
+							break;
+						}
+					}
+					int status = mysql_next_result(m_mysql);
+					if (status > 0) {
+						ret = -1;
+						break;
+					}
+					if (status != 0) {
+						break;
+					}
+				}
+				return ret;
 			}
 			return -1;
 		}
