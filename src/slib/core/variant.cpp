@@ -1278,6 +1278,16 @@ namespace slib
 				return REF_VAR(sl_char16 const* const, _value);
 			case VariantType::Pointer:
 				return "#" + String::fromPointerValue(REF_VAR(void const* const, _value));
+			case VariantType::Object:
+				{
+					Ref<Referable> obj(getObject());
+					if (obj.isNotNull()) {
+						if (CMemory* p = CastInstance<CMemory>(obj._ptr)) {
+							return String::fromUtf8(p->getData(), p->getCount());
+						}
+					}
+				}
+				break;
 			default:
 				break;
 		}
@@ -1324,6 +1334,16 @@ namespace slib
 				return REF_VAR(sl_char16 const* const, _value);
 			case VariantType::Pointer:
 				return "#" + String16::fromPointerValue(REF_VAR(void const* const, _value));
+			case VariantType::Object:
+				{
+					Ref<Referable> obj(getObject());
+					if (obj.isNotNull()) {
+						if (CMemory* p = CastInstance<CMemory>(obj._ptr)) {
+							return String16::fromUtf8(p->getData(), p->getCount());
+						}
+					}
+				}
+				break;
 			default:
 				break;
 		}
