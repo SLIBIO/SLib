@@ -138,7 +138,7 @@ public class UiAnimation {
 					}
 					final float f = (Float) (va.getAnimatedValue());
 					if (flagTranslate || flagRotate || flagScale) {
-						float r = 0;
+						float r;
 						if (flagRotate) {
 							r = interpolateValue(f, rotateStart, rotateEnd);
 							float rd = (float) (r * 180 / Math.PI);
@@ -148,13 +148,13 @@ public class UiAnimation {
 						} else {
 							r = rotateStart;
 						}
-						float sx = 0, sy = 0;
+						float sx, sy;
 						if (flagScale) {
-							sx = interpolateValue(sx, sxStart, sxEnd);
+							sx = interpolateValue(f, sxStart, sxEnd);
 							if (Math.abs(view.getScaleX() - sx) > EPSILON) {
 								view.setScaleX(sx);
 							}
-							sy = interpolateValue(sy, syStart, syEnd);
+							sy = interpolateValue(f, syStart, syEnd);
 							if (Math.abs(view.getScaleY() - sy) > EPSILON) {
 								view.setScaleY(sy);
 							}
@@ -163,7 +163,7 @@ public class UiAnimation {
 							sy = syStart;
 						}
 						if (flagTranslate || flagAnchor) {
-							float tx = 0, ty = 0;
+							float tx, ty;
 							if (flagTranslate) {
 								tx = interpolateValue(f, txStart, txEnd);
 								ty = interpolateValue(f, tyStart, tyEnd);
