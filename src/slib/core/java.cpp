@@ -393,14 +393,7 @@ namespace slib
 
 	jstring Jni::getJniString(const String& str)
 	{
-		jstring ret = sl_null;
-		if (str.isNotNull()) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				ret = env->NewStringUTF(str.getData());
-			}
-		}
-		return ret;
+		return getJniString16(str);
 	}
 
 	jstring Jni::getJniString16(const String16& str)
@@ -417,19 +410,7 @@ namespace slib
 
 	String Jni::getString(jstring str)
 	{
-		String ret;
-		if (str) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				sl_uint32 len = (sl_uint32)(env->GetStringUTFLength(str));
-				const char* sz = env->GetStringUTFChars(str, sl_null);
-				if (sz) {
-					ret = String::fromUtf8(sz, len);
-					env->ReleaseStringUTFChars(str, sz);
-				}
-			}
-		}
-		return ret;
+		return getString16(str);
 	}
 
 	String16 Jni::getString16(jstring str)
