@@ -443,6 +443,10 @@ public class UiView {
 				if (((UiGroupView)view).gestureDetector == null) {
 					((UiGroupView)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener((IView)view));
 				}
+			} else if (view instanceof UiWindow) {
+				if (((UiWindow)view).gestureDetector == null) {
+					((UiWindow)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener((IView)view));
+				}
 			}
 		}
 	}

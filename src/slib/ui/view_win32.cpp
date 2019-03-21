@@ -30,8 +30,7 @@
 #include "slib/ui/window.h"
 #include "slib/ui/select_view.h"
 #include "slib/core/safe_static.h"
-
-#define USE_SCREEN_BACK_BUFFER
+#include "slib/math/transform2d.h"
 
 namespace slib
 {
@@ -58,9 +57,9 @@ namespace slib
 	}
 
 	HWND Win32_ViewInstance::createHandle(
-		View* view, ViewInstance* parent
-		, LPCWSTR wndClass, LPCWSTR text
-		, int style, int styleEx)
+		View* view, ViewInstance* parent,
+		LPCWSTR wndClass, LPCWSTR text, int style, int styleEx,
+		const UIRect& frame, const Matrix3& transform)
 	{
 
 		HWND hWndParent = UIPlatform::getViewHandle(parent);
@@ -68,7 +67,6 @@ namespace slib
 		if (hWndParent) {
 
 			HINSTANCE hInst = ::GetModuleHandleW(NULL);
-			UIRect frame = view->getFrame();
 			style |= WS_CHILD;
 			if (view->isVisible()) {
 				style |= WS_VISIBLE;
@@ -76,11 +74,9 @@ namespace slib
 
 			sl_ui_pos x = frame.left;
 			sl_ui_pos y = frame.top;
-			Vector2 t;
-			if (view->getFinalTranslationRotationScale(&t, NULL, NULL, NULL)) {
-				x += (sl_ui_pos)(t.x);
-				y += (sl_ui_pos)(t.y);
-			}
+			Vector2 t = Transform2::getTranslationFromMatrix(transform);
+			x += (sl_ui_pos)(t.x);
+			y += (sl_ui_pos)(t.y);
 
 			HWND hWnd = ::CreateWindowExW(
 				styleEx // ex-style
@@ -101,6 +97,12 @@ namespace slib
 			}
 		}
 		return NULL;
+	}
+
+	void Win32_ViewInstance::init(View* view, const UIRect& frame, const Matrix3& transform)
+	{
+		m_frame = frame;
+		m_translation = Transform2::getTranslationFromMatrix(transform);
 	}
 
 	HWND Win32_ViewInstance::getHandle()
@@ -175,6 +177,7 @@ namespace slib
 		if (isWindowContent()) {
 			return;
 		}
+		m_frame = frame;
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			UINT uFlags = SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE
@@ -182,7 +185,7 @@ namespace slib
 				| SWP_ASYNCWINDOWPOS
 				;
 			::SetWindowPos(hWnd, NULL
-				, (int)(frame.left), (int)(frame.top)
+				, (int)(frame.left + m_translation.x), (int)(frame.top + m_translation.y)
 				, (int)(frame.getWidth()), (int)(frame.getHeight())
 				, uFlags
 			);
@@ -191,6 +194,22 @@ namespace slib
 
 	void Win32_ViewInstance::setTransform(const Matrix3 &transform)
 	{
+		if (isWindowContent()) {
+			return;
+		}
+		m_translation = Transform2::getTranslationFromMatrix(transform);
+		HWND hWnd = m_handle;
+		if (hWnd) {
+			UINT uFlags = SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE
+				| SWP_NOCOPYBITS
+				| SWP_ASYNCWINDOWPOS
+				;
+			::SetWindowPos(hWnd, NULL
+				, (int)(m_frame.left + m_translation.x), (int)(m_frame.top + m_translation.y)
+				, (int)(m_frame.getWidth()), (int)(m_frame.getHeight())
+				, uFlags
+			);
+		}
 	}
 
 	void Win32_ViewInstance::setVisible(sl_bool flag)
@@ -229,7 +248,6 @@ namespace slib
 
 	void Win32_ViewInstance::setAlpha(sl_real alpha)
 	{
-		::InvalidateRect(m_handle, NULL, TRUE);
 	}
 
 	void Win32_ViewInstance::setClipping(sl_bool flag)
@@ -459,140 +477,9 @@ namespace slib
 		return sl_false;
 	}
 
-	class _priv_Win32_Draw_BackBuffer
+	Color _priv_View_getDefaultBackColor()
 	{
-	public:
-		Mutex mutex;
-		Ref<Bitmap> bitmapBuffer;
-		Ref<Canvas> canvasBuffer;
-		Gdiplus::Bitmap* bitmap;
-		Gdiplus::Graphics* graphics;
-
-	public:
-		_priv_Win32_Draw_BackBuffer()
-		{
-			bitmap = sl_null;
-			graphics = sl_null;
-		}
-
-		void allocateBackBuffer(sl_uint32 width, sl_uint32 height)
-		{
-			UISize screenSize = UI::getScreenSize();
-			if ((sl_ui_pos)width > screenSize.x) {
-				width = screenSize.x;
-			}
-			if ((sl_ui_pos)height > screenSize.y) {
-				height = screenSize.y;
-			}
-			if (bitmapBuffer.isNull() || canvasBuffer.isNull() || bitmapBuffer->getWidth() < width || bitmapBuffer->getHeight() < height) {
-				bitmap = sl_null;
-				graphics = sl_null;
-				bitmapBuffer = Bitmap::create((width + 255) & 0xFFFFFF00, (height + 255) & 0xFFFFFF00);
-				if (bitmapBuffer.isNull()) {
-					return;
-				}
-				canvasBuffer = bitmapBuffer->getCanvas();
-				if (canvasBuffer.isNull()) {
-					return;
-				}
-				bitmap = GraphicsPlatform::getBitmapHandle(bitmapBuffer.get());
-				graphics = GraphicsPlatform::getCanvasHandle(canvasBuffer.get());
-			}
-		}
-
-	};
-
-	static sl_size _priv_Win32_getSelfInvalidatableRects(View* view, UIRect bounds, UIRect* outRects, sl_size countRectsBuf)
-	{
-		if (!countRectsBuf) {
-			return 0;
-		}
-		sl_size count = 0;
-		ListElements< Ref<View> > children(view->getChildren());
-		for (sl_size i = 0; i < children.count; i++) {
-			Ref<View>& child = children[i];
-			if (child.isNotNull()) {
-				if (child->isVisible() && child->getWidth() > 0 && child->getHeight() > 0) {
-					if (child->checkSelfInvalidatable()) {
-						UIRect rect = child->getBoundsInParent();
-						if (child->isNativeWidget() && IsInstanceOf<SelectView>(child)) {
-							rect.setSize(child->getInstanceFrame().getSize());
-						}
-						if (rect.intersectRectangle(bounds, &rect)) {
-							*outRects = rect;
-							outRects++;
-							count++;
-							countRectsBuf--;
-							if (!countRectsBuf) {
-								return count;
-							}
-						}
-					} else {
-						sl_ui_pos x = child->getLeft();
-						sl_ui_pos y = child->getTop();
-						sl_size n = _priv_Win32_getSelfInvalidatableRects(child.get(), child->getBounds(), outRects, countRectsBuf);
-						sl_size m = 0;
-						for (sl_size k = 0; k < n; k++) {
-							outRects[k].left += x;
-							outRects[k].top += y;
-							outRects[k].right += x;
-							outRects[k].bottom += y;
-							if (outRects[k].intersectRectangle(bounds, &outRects[m])) {
-								m++;
-							}
-						}
-						count += m;
-						outRects += m;
-						countRectsBuf -= m;
-					}
-				}
-			}
-		}
-		return count;
-	}
-
-	static void _priv_Win32_DrawView(Canvas* canvas, View* view)
-	{
-		Color colorClear = Color::zero();
-		do {
-			if (view->isOpaque()) {
-				break;
-			}
-			Color color = view->getBackgroundColor();
-			if (color.a == 255) {
-				break;
-			}
-
-			Ref<Window> window = view->getWindow();
-			if (window.isNotNull() && window->getContentView() == view) {
-				colorClear = window->getBackgroundColor();
-				if (colorClear.a < 255) {
-					Color c = GraphicsPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
-					c.blend_PA_NPA(colorClear);
-					colorClear = c;
-				}
-				break;
-			} else {
-				colorClear = GraphicsPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
-			}
-		} while (0);
-		if (colorClear.isNotZero()) {
-			canvas->fillRectangle(view->getBounds(), colorClear);
-		}
-		view->dispatchDraw(canvas);
-	}
-
-	static void _priv_Win32_DrawViewRegion(Gdiplus::Graphics* graphics, View* view, RECT& rcPaint)
-	{
-		sl_uint32 widthRedraw = (sl_uint32)(rcPaint.right - rcPaint.left);
-		sl_uint32 heightRedraw = (sl_uint32)(rcPaint.bottom - rcPaint.top);
-		Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::Bitmap, graphics, widthRedraw, heightRedraw, sl_false);
-		if (canvas.isNotNull()) {
-			CanvasStateScope scope(canvas);
-			canvas->translate(-(sl_real)(rcPaint.left), -(sl_real)(rcPaint.top));
-			canvas->setInvalidatedRect(Rectangle((sl_real)(rcPaint.left), (sl_real)(rcPaint.top), (sl_real)(rcPaint.right), (sl_real)(rcPaint.bottom)));
-			_priv_Win32_DrawView(canvas.get(), view);
-		}
+		return GraphicsPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
 	}
 
 	sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
@@ -611,40 +498,13 @@ namespace slib
 					HDC hDC = ::BeginPaint(hWnd, &ps);
 					if (hDC) {
 						if (ps.rcPaint.right > ps.rcPaint.left && ps.rcPaint.bottom > ps.rcPaint.top) {
-							Ref<View> view = getView();
-							if (view.isNotNull() && view->checkSelfInvalidatable()) {
-								Gdiplus::Graphics graphics(hDC);
-#if defined(USE_SCREEN_BACK_BUFFER)
-								sl_uint32 widthRedraw = (sl_uint32)(ps.rcPaint.right - ps.rcPaint.left);
-								sl_uint32 heightRedraw = (sl_uint32)(ps.rcPaint.bottom - ps.rcPaint.top);
-								SLIB_SAFE_STATIC(_priv_Win32_Draw_BackBuffer, bb)
-								if (!(SLIB_SAFE_STATIC_CHECK_FREED(bb))) {
-									MutexLocker lock(&(bb.mutex));
-									bb.allocateBackBuffer(widthRedraw, heightRedraw);
-									if (bb.bitmap && bb.graphics) {
-										_priv_Win32_DrawViewRegion(bb.graphics, view.get(), ps.rcPaint);
-										Gdiplus::Rect rcPaint(ps.rcPaint.left, ps.rcPaint.top, widthRedraw, heightRedraw);
-										Gdiplus::Region region(rcPaint);
-										static UIRect rectsExclude[128];
-										sl_size n = _priv_Win32_getSelfInvalidatableRects(view.get(), UIRect(ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom), rectsExclude, 128);
-										if (n > 0) {
-											for (sl_size i = 0; i < n; i++) {
-												region.Exclude(Gdiplus::Rect(rectsExclude[i].left, rectsExclude[i].top, rectsExclude[i].getWidth(), rectsExclude[i].getHeight()));
-											}
-											graphics.IntersectClip(&region);
-										}
-										graphics.DrawImage(bb.bitmap, rcPaint, 0, 0, widthRedraw, heightRedraw, Gdiplus::UnitPixel);
-									}
-								}
-#else
-								RECT rect;
-								::GetClientRect(hWnd, &rect);
-								Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, &graphics, rect.right, rect.bottom, sl_false);
-								if (canvas.isNotNull()) {
-									canvas->setInvalidatedRect(Rectangle((sl_real)(ps.rcPaint.left), (sl_real)(ps.rcPaint.top), (sl_real)(ps.rcPaint.right), (sl_real)(ps.rcPaint.bottom)));
-									_priv_Win32_DrawView(canvas.get(), view.get());
-								}
-#endif
+							Gdiplus::Graphics graphics(hDC);
+							RECT rect;
+							::GetClientRect(hWnd, &rect);
+							Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, &graphics, rect.right, rect.bottom, sl_false);
+							if (canvas.isNotNull()) {
+								canvas->setInvalidatedRect(Rectangle((sl_real)(ps.rcPaint.left), (sl_real)(ps.rcPaint.top), (sl_real)(ps.rcPaint.right), (sl_real)(ps.rcPaint.bottom)));
+								onDraw(canvas.get());
 							}
 						}
 						::EndPaint(hWnd, &ps);
@@ -938,70 +798,13 @@ namespace slib
 		DWORD style = 0;
 		if (m_flagCreatingChildInstances) {
 			styleEx = WS_EX_CONTROLPARENT;
+			style = WS_CLIPCHILDREN;
 		}
 		Ref<Win32_ViewInstance> ret = Win32_ViewInstance::create<Win32_ViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
 		if (ret.isNotNull()) {
 			ret->setGenericView(sl_true);
 		}
 		return ret;
-	}
-
-	void View::_setFrame_NI(const UIRect& frame)
-	{
-		Ref<ViewInstance> instance = m_instance;
-		if (instance.isNotNull()) {
-			if (instance->isWindowContent()) {
-				return;
-			}
-			HWND hWnd = UIPlatform::getViewHandle(instance.get());
-			if (hWnd) {
-				UINT uFlags = SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE
-					| SWP_NOCOPYBITS
-					| SWP_ASYNCWINDOWPOS
-					;
-				int x = frame.left;
-				int y = frame.top;
-				Vector2 t;
-				if (getFinalTranslationRotationScale(&t, NULL, NULL, NULL)) {
-					x += (int)(t.x);
-					y += (int)(t.y);
-				}
-				::SetWindowPos(hWnd, NULL
-					, x, y
-					, (int)(frame.getWidth()), (int)(frame.getHeight())
-					, uFlags
-				);
-			}
-		}
-	}
-
-	void View::_setTransform_NI(const Matrix3& matrix)
-	{
-		Ref<ViewInstance> instance = m_instance;
-		if (instance.isNotNull()) {
-			if (instance->isWindowContent()) {
-				return;
-			}
-			HWND hWnd = UIPlatform::getViewHandle(instance.get());
-			if (hWnd) {
-				UINT uFlags = SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOSIZE
-					| SWP_NOCOPYBITS
-					| SWP_ASYNCWINDOWPOS
-					;
-				int x = (int)(m_frame.left);
-				int y = (int)(m_frame.top);
-				Vector2 t;
-				if (getFinalTranslationRotationScale(&t, NULL, NULL, NULL)) {
-					x += (int)(t.x);
-					y += (int)(t.y);
-				}
-				::SetWindowPos(hWnd, NULL
-					, x, y
-					, 0, 0
-					, uFlags
-				);
-			}
-		}
 	}
 
 /******************************************

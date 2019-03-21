@@ -30,7 +30,7 @@
 namespace slib
 {
 
-	class SLIB_EXPORT SplitView : public View
+	class SLIB_EXPORT SplitView : public ViewGroup
 	{
 		SLIB_DECLARE_OBJECT
 		

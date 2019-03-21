@@ -37,6 +37,8 @@ namespace slib
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
 		
+		setCreatingInstance(sl_true);
+		
 		m_popupState = PopupState::None;
 		m_popupBackgroundColor = Color::zero();
 		
@@ -180,6 +182,7 @@ namespace slib
 		Ref<View> viewAdd;
 		if (flagFillParentBackground) {
 			Ref<_priv_ViewPagePopupBackground> back = new _priv_ViewPagePopupBackground;
+			back->setCreatingInstance(sl_true);
 			Color color = m_popupBackgroundColor;
 			if (color.isZero()) {
 				color = getDefaultPopupBackgroundColor();

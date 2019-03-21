@@ -103,7 +103,7 @@ namespace slib
 			// create handle
 			HWND hWnd;
 			{
-				DWORD style = 0;
+				DWORD style = WS_CLIPCHILDREN;
 				DWORD styleEx = WS_EX_CONTROLPARENT;
 				if (param.flagBorderless || param.flagFullScreen) {
 					style |= WS_POPUP;

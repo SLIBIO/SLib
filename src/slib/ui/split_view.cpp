@@ -25,13 +25,12 @@
 
 namespace slib
 {
-	SLIB_DEFINE_OBJECT(SplitView, View)
+	SLIB_DEFINE_OBJECT(SplitView, ViewGroup)
 	
 	SplitView::SplitView()
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
 		
-		setCreatingChildInstances(sl_true);		
 		setSavingCanvasState(sl_false);
 
 		setCapturingChildInstanceEvents(SLIB_FUNCTION_WEAKREF(SplitView, _hitTestForCapturingChildInstanceEvents, this));

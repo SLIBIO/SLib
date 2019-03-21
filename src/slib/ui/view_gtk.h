@@ -136,10 +136,15 @@ namespace slib
 
 		void _release();
 
+		void _updateFrameAndTransform();
+
 	protected:
 		GtkWidget* m_handle;
 		GtkWidget* m_handleChildrenContainer;
 		UIAction m_actionDrag;
+
+		UIRect m_frame;
+		UIPoint m_translation;
 
 	};
 

@@ -26,6 +26,8 @@
 
 #include "view_android.h"
 
+#include "slib/math/transform2d.h"
+
 namespace slib
 {
 
@@ -258,9 +260,9 @@ namespace slib
 		_priv_View* view = (_priv_View*)_view;
 		jobject jhandle = m_handle.get();
 		if (jhandle) {
-			UIRect frame = view->getFrame();
+			UIRect frame = view->getFrameInInstance();
 			JAndroidView::setFrame.callBoolean(sl_null, jhandle, (int)(frame.left), (int)(frame.top), (int)(frame.right), (int)(frame.bottom));
-			JAndroidView::setVisible.call(sl_null, jhandle, view->isVisible());
+			JAndroidView::setVisible.call(sl_null, jhandle, view->isVisibleInInstance());
 			JAndroidView::setEnabled.call(sl_null, jhandle, view->isEnabled());
 			sl_real alpha = view->getAlpha();
 			JAndroidView::setClipping.call(sl_null, jhandle, view->isClipping());
@@ -271,13 +273,12 @@ namespace slib
 			if (view->isHardwareLayer()) {
 				JAndroidView::setLayered.call(sl_null, jhandle);
 			}
-			Vector2 t;
-			sl_real r;
-			Vector2 s;
-			Vector2 anchor;
-			if (view->getFinalTranslationRotationScale(&t, &r, &s, &anchor)) {
-				JAndroidView::setTransform.call(sl_null, jhandle, t.x, t.y, r, s.x, s.y, anchor.x, anchor.y);
-			}
+
+			Matrix3 transform = view->getFinalTransformInInstance();
+			Vector2 t = Transform2::getTranslationFromMatrix(transform);
+			sl_real r = Transform2::getRotationAngleFromMatrix(transform);
+			Vector2 s = Transform2::getScaleFromMatrix(transform);
+			JAndroidView::setTransform.call(sl_null, jhandle, t.x, t.y, r, s.x, s.y, 0, 0);
 
 			if (parent) {
 				jobject jparent = UIPlatform::getViewHandle(parent);
@@ -371,6 +372,13 @@ namespace slib
 
 	void Android_ViewInstance::setTransform(const Matrix3& transform)
 	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			Vector2 t = Transform2::getTranslationFromMatrix(transform);
+			sl_real r = Transform2::getRotationAngleFromMatrix(transform);
+			Vector2 s = Transform2::getScaleFromMatrix(transform);
+			JAndroidView::setTransform.call(sl_null, handle, t.x, t.y, r, s.x, s.y, 0, 0);
+		}
 	}
 
 	void Android_ViewInstance::setVisible(sl_bool flag)
@@ -490,20 +498,6 @@ namespace slib
 			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 		}
 		return ret;
-	}
-
-	void View::_setTransform_NI(const Matrix3& matrix)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			Vector2 t;
-			sl_real r;
-			Vector2 s;
-			Vector2 anchor;
-			if (getFinalTranslationRotationScale(&t, &r, &s, &anchor)) {
-				JAndroidView::setTransform.call(sl_null, handle, t.x, t.y, r, s.x, s.y, anchor.x, anchor.y);
-			}
-		}
 	}
 
 	/******************************************

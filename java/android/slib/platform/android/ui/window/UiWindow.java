@@ -28,17 +28,21 @@ import slib.platform.android.SlibActivity;
 import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.Util;
 import slib.platform.android.ui.view.IView;
+import slib.platform.android.ui.view.UiGestureDetector;
 import slib.platform.android.ui.view.UiScrollView;
 import slib.platform.android.ui.view.UiView;
 import slib.platform.android.ui.view.UiWebView;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +51,7 @@ import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
-public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLayoutListener {
+public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnGlobalLayoutListener {
 
 	private Activity activity;
 	public long instance;
@@ -56,6 +60,14 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 	private boolean flagFullScreen;
 	private int mLeft, mTop, mRight, mBottom;
 	private int mWidth, mHeight;
+
+	private long mViewInstance = 0;
+	public long getInstance() { return mViewInstance; }
+	public void setInstance(long instance) { this.mViewInstance = instance; }
+	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
+	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
+
+	public UiGestureDetector gestureDetector;
 
 	private UiWindow(Context context) {
 		super(context);
@@ -399,10 +411,14 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 	static IView keyboardScrollView = null;
 	static Rect originalFrame_keyboardScrollView = null;
 
+	static boolean isFocusableView(View view) {
+		return (view instanceof EditText || view instanceof UiWebView);
+	}
+
 	static void processKeyboardAppeared(Activity activity, int keyboardHeight) {
 		Logger.info("Keyboard is appeared, height=" + keyboardHeight);
 		View focusedView = activity.getCurrentFocus();
-		if (focusedView instanceof EditText || focusedView instanceof UiWebView) {
+		if (isFocusableView(focusedView)) {
 			IView scroll = null;
 			if (focusedView instanceof UiWebView) {
 				scroll = (UiWebView)focusedView;
@@ -470,7 +486,7 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 		super.dispatchTouchEvent(ev);
 		if (ev.getAction() == MotionEvent.ACTION_UP) {
 			View view = activity.getCurrentFocus();
-			if (view != null) {
+			if (view != null && isFocusableView(view) && view.isShown()) {
 				view.getLocationOnScreen(locationOfFoucsView);
 				getLocationOnScreen(locationOfWindow);
 				float x = ev.getX() + locationOfWindow[0];
@@ -478,7 +494,53 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 				if (x < locationOfFoucsView[0] || x > locationOfFoucsView[0] + view.getWidth() || y < locationOfFoucsView[1] || y > locationOfFoucsView[1] + view.getHeight()) {
 					Android.dismissKeyboard(activity);
 				}
+			} else {
+				Android.dismissKeyboard(activity);
 			}
+		}
+		if (gestureDetector != null) {
+			gestureDetector.onTouchEvent(ev);
+			super.dispatchTouchEvent(ev);
+			return true;
+		} else {
+			return super.dispatchTouchEvent(ev);
+		}
+	}
+
+	@Override
+	public void onDraw(Canvas canvas) {
+		UiView.onEventDraw(this, canvas);
+	}
+
+	@Override
+	public boolean onKeyDown(int keycode, KeyEvent event) {
+		if (!(UiView.onEventKey(this, true, keycode, event))) {
+			return super.onKeyDown(keycode, event);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean onKeyUp(int keycode, KeyEvent event) {
+		if (!(UiView.onEventKey(this, false, keycode, event))) {
+			return super.onKeyUp(keycode, event);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean onInterceptTouchEvent(MotionEvent event) {
+		if (UiView.onHitTestTouchEvent(this, (int)(event.getX()), (int)(event.getY()))) {
+			return true;
+		}
+		return false;
+	};
+
+	@SuppressLint("ClickableViewAccessibility")
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		if (!(UiView.onEventTouch(this, event))) {
+			super.onTouchEvent(event);
 		}
 		return true;
 	}

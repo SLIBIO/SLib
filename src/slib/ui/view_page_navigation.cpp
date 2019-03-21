@@ -40,6 +40,8 @@ namespace slib
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
 		
+		setCreatingInstance(sl_true);
+		
 		m_flagSwipeNavigation = sl_false;
 		
 		m_pushTransition.type = TransitionType::Slide;

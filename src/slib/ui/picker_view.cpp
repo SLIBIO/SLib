@@ -29,6 +29,10 @@
 
 #define ANIMATE_FRAME_MS 15
 
+#if defined(SLIB_UI_IS_IOS)
+#	define HAS_NATIVE_WIDGET_IMPL
+#endif
+
 namespace slib
 {
 
@@ -38,7 +42,9 @@ namespace slib
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
 		
+#ifdef HAS_NATIVE_WIDGET_IMPL
 		setCreatingNativeWidget(sl_true);
+#endif
 		setUsingFont(sl_true);
 		setClipping(sl_true, UIUpdateMode::Init);
 		
@@ -456,7 +462,7 @@ namespace slib
 		
 	}
 	
-#if !defined(SLIB_UI_IS_IOS)
+#if !defined(HAS_NATIVE_WIDGET_IMPL)
 	
 	Ref<ViewInstance> PickerView::createNativeWidget(ViewInstance* parent)
 	{

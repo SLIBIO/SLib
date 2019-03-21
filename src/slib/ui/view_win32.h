@@ -67,16 +67,24 @@ namespace slib
 			, LPCWSTR wndClass, LPCWSTR text
 			, int style, int styleEx)
 		{
-			HWND handle = createHandle(view, parent, wndClass, text, style, styleEx);
+			UIRect frame = view->getFrameInInstance();
+			Matrix3 transform = view->getFinalTransformInInstance();
+			HWND handle = createHandle(view, parent, wndClass, text, style, styleEx, frame, transform);
 			if (handle) {
-				return create<T>(handle, sl_true);
+				Ref<T> instance = create<T>(handle, sl_true);
+				if (instance.isNotNull()) {
+					instance->init(view, frame, transform);
+					return instance;
+				}
 			}
 			return sl_null;
 		}
 
 		static HWND createHandle(View* view, ViewInstance* parent
 			, LPCWSTR wndClass, LPCWSTR text
-			, int style, int styleEx);
+			, int style, int styleEx, const UIRect& rect, const Matrix3& transform);
+
+		void init(View* view, const UIRect& rect, const Matrix3& transform);
 
 		HWND getHandle();
 
@@ -148,6 +156,9 @@ namespace slib
 		sl_bool m_flagGenericView;
 		sl_bool m_flagDestroyOnRelease;
 		UIAction m_actionMouseCapture;
+		
+		UIRect m_frame;
+		Vector2 m_translation;
 
 	};
 

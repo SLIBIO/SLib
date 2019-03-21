@@ -117,6 +117,8 @@ namespace slib
 		
 		void detach();
 		
+		void detachAll();
+		
 		Ref<ViewInstance> attachToNewInstance(const Ref<ViewInstance>& parent);
 		
 		
@@ -154,16 +156,16 @@ namespace slib
 		
 		Ref<ViewInstance> getNearestViewInstance();
 		
+		Ref<View> getNearestViewCreatingChildInstances();
+		
 		Ref<ViewPage> getNearestViewPage();
 		
 		void removeFromParent();
 		
+		void removeAllViewInstances();
+		
 		void attachChild(const Ref<View>& child);
 		
-		void addChildInstance(const Ref<ViewInstance>& instance);
-		
-		void removeChildInstance(const Ref<ViewInstance>& instance);
-				
 		void bringToFront(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
 		
@@ -175,12 +177,9 @@ namespace slib
 		void invalidateBoundsInParent(UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		void updateAndInvalidateBoundsInParent(UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void updateInstanceFrames();
 
-		sl_bool checkSelfInvalidatable();
-		
-		
-		// parent coordinate
-		UIRect getInstanceFrame();
 		
 		// parent coordinate
 		const UIRect& getFrame();
@@ -229,6 +228,8 @@ namespace slib
 		// parent coordinate
 		void setLocation(sl_ui_pos x, sl_ui_pos y, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
+		UIRect getFrameInInstance();
+		
 		// local coordinate
 		UIRect getBounds();
 		
@@ -245,7 +246,11 @@ namespace slib
 		
 		sl_bool isVisible();
 		
+		sl_bool isVisibleInInstance();
+		
 		void setVisible(sl_bool flagVisible, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		
+		void setInstanceVisible(sl_bool flagVisible);
 		
 		sl_bool isEnabled();
 		
@@ -603,14 +608,14 @@ namespace slib
 		
 		sl_bool getFinalInverseTransform(Matrix3* _out);
 		
+		Matrix3 getFinalTransformInInstance();
+		
 		const Matrix3& getTransform();
 		
 		void setTransform(const Matrix3& matrix, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		void resetTransform(UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		sl_bool getFinalTranslationRotationScale(Vector2* translation = sl_null, sl_real* rotation = sl_null, Vector2* scale = sl_null, Vector2* anchor = sl_null);
-		
+				
 		sl_real getTranslationX();
 		
 		sl_real getTranslationY();
@@ -658,6 +663,8 @@ namespace slib
 		void setAnchorOffset(sl_real x, sl_real y, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		void setAnchorOffset(const Vector2& pt, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void updateInstanceTransforms();
 		
 
 		UIPointf convertCoordinateFromScreen(const UIPointf& ptScreen);
@@ -1246,6 +1253,8 @@ namespace slib
 
 		void _removeChild(View* child);
 		
+		void _removeChildInstances(View* child);
+				
 		void _setFocus(sl_bool flagFocused, sl_bool flagApplyInstance, UIUpdateMode mode);
 		
 		void _setFocusedFlag(sl_bool flagFocused, sl_bool flagApplyInstance);
@@ -1282,8 +1291,6 @@ namespace slib
 		
 		void _applyFinalTransform(UIUpdateMode mode);
 		
-		void _invalidateInstanceTransform();
-		
 		void _refreshBorderPen(UIUpdateMode mode);
 		
 		void _setFontInvalidateChildren();
@@ -1316,10 +1323,6 @@ namespace slib
 		
 		
 	public:
-		void _setFrame_NI(const UIRect& frame);
-		
-		void _setTransform_NI(const Matrix3& transform);
-		
 		virtual void _setBorder_NW(sl_bool flag);
 
 		virtual void _setBackgroundColor_NW(const Color& color);
@@ -1347,6 +1350,7 @@ namespace slib
 		sl_bool m_flagOkCancelEnabled : 1;
 		sl_bool m_flagTabStopEnabled : 1;
 		
+		sl_bool m_flagCurrentCreatingInstance : 1;
 		sl_bool m_flagInvalidLayout : 1;
 		sl_bool m_flagNeedApplyLayout : 1;
 		sl_bool m_flagCurrentDrawing : 1;
@@ -1609,6 +1613,8 @@ namespace slib
 		public:
 			sl_bool flagTouchMultipleChildren : 1;
 			sl_bool flagPassEventToChildren : 1;
+			
+			sl_bool flagHasInstances : 1;
 			
 			AtomicList< Ref<View> > children;
 			AtomicList< Ref<View> > childrenCache;

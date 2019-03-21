@@ -211,7 +211,7 @@ namespace slib
 		Ref<ViewInstance> instance;
 		if (orig.isNotNull()) {
 			instance = orig->getViewInstance();
-			orig->detach();
+			orig->removeAllViewInstances();
 		}
 		if (view.isNotNull()) {
 			if (instance.isNotNull()) {
@@ -1085,6 +1085,7 @@ namespace slib
 				Ref<View> view = m_viewContent;
 				if (view.isNotNull()) {
 					view->removeParent();
+					view->removeAllViewInstances();
 					contentViewInstance->setEnabled(view->isEnabled());
 					contentViewInstance->setOpaque(view->isOpaque());
 					contentViewInstance->setDrawing(view->isDrawing());

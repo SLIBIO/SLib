@@ -29,8 +29,31 @@
 #include "slib/ui/core.h"
 #include "slib/ui/view.h"
 
+#include "slib/math/transform2d.h"
+
 namespace slib
 {
+	
+	NSRect _priv_macOS_getViewFrameAndTransform(const UIRect& frame, const Matrix3& transform, sl_real& rotation)
+	{
+		rotation = Transform2::getRotationAngleFromMatrix(transform);
+		Vector2 translation = Transform2::getTranslationFromMatrix(transform);
+		NSRect ret;
+		ret.origin.x = frame.left + translation.x;
+		ret.origin.y = frame.top + translation.y;
+		ret.size.width = frame.getWidth();
+		ret.size.height = frame.getHeight();
+		if (!(Math::isAlmostZero(rotation))) {
+			sl_real ax = frame.getWidth() / 2;
+			sl_real ay = frame.getHeight() / 2;
+			sl_real cr = Math::cos(rotation);
+			sl_real sr = Math::sin(rotation);
+			ret.origin.x += (- ax * cr + ay * sr) + ax;
+			ret.origin.y += (- ax * sr - ay * cr) + ay;
+		}
+		return ret;
+	}
+	
 
 /******************************************
 			macOS_ViewInstance
@@ -39,6 +62,7 @@ namespace slib
 	macOS_ViewInstance::macOS_ViewInstance()
 	{
 		m_handle = nil;
+		m_transform = Matrix3::identity();
 	}
 
 	macOS_ViewInstance::~macOS_ViewInstance()
@@ -73,7 +97,7 @@ namespace slib
 			
 			if (instance.isNotNull()) {
 				
-				[handle setHidden:(view->isVisible() ? NO : YES)];
+				[handle setHidden:(view->isVisibleInInstance() ? NO : YES)];
 				
 				if (!(view->isEnabled())) {
 					if ([handle isKindOfClass:[NSControl class]]) {
@@ -186,27 +210,22 @@ namespace slib
 
 	void macOS_ViewInstance::setFrame(const UIRect& frame)
 	{
-		NSView* handle = m_handle;
-		if (handle != nil) {
-			NSRect frameNew;
-			frameNew.origin.x = (int)(frame.left);
-			frameNew.origin.y = (int)(frame.top);
-			frameNew.size.width = (int)(frame.getWidth());
-			frameNew.size.height = (int)(frame.getHeight());
-			if (UI::isUiThread()) {
-				[handle setFrame:frameNew];
-				[handle setNeedsDisplay:YES];
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[handle setFrame:frameNew];
-					[handle setNeedsDisplay:YES];
-				});
-			}
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), macOS_ViewInstance, setFrame, this, frame));
+			return;
 		}
+		m_frame = frame;
+		updateFrameAndTransform();
 	}
 
 	void macOS_ViewInstance::setTransform(const Matrix3 &transform)
 	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), macOS_ViewInstance, setTransform, this, transform));
+			return;
+		}
+		m_transform = transform;
+		updateFrameAndTransform();
 	}
 
 	void macOS_ViewInstance::setVisible(sl_bool flag)
@@ -529,6 +548,16 @@ namespace slib
 		}
 	}
 
+	void macOS_ViewInstance::updateFrameAndTransform()
+	{
+		NSView* handle = m_handle;
+		if (handle != nil) {
+			sl_real rotation = 0;
+			handle.frame = _priv_macOS_getViewFrameAndTransform(m_frame, m_transform, rotation);
+			handle.frameRotation = Math::getDegreesFromRadian(rotation);
+			[handle setNeedsDisplay:YES];
+		}
+	}
 
 /******************************************
 				View
@@ -540,138 +569,6 @@ namespace slib
 		_priv_Slib_macOS_ViewHandle* handle = [[_priv_Slib_macOS_ViewHandle alloc] initWithFrame:frame];
 		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
-	}
-
-	void View::_setFrame_NI(const UIRect& _frame)
-	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil) {
-			UIRect _frame = getFrame();
-			Vector2 t;
-			sl_real r;
-			Vector2 s;
-			Vector2 anchor;
-			if (getFinalTranslationRotationScale(&t, &r, &s, &anchor)) {
-				NSPoint pt;
-				NSSize size;
-				_priv_macOS_transformViewFrame(pt, size, _frame, t.x, t.y, s.x, s.y, r, anchor.x, anchor.y);
-				NSRect bounds;
-				bounds.origin.x = 0;
-				bounds.origin.y = 0;
-				bounds.size.width = (CGFloat)(_frame.getWidth());
-				bounds.size.height = (CGFloat)(_frame.getHeight());
-				if (UI::isUiThread()) {
-					[handle setFrameOrigin:pt];
-					[handle setFrameSize:size];
-					handle.bounds = bounds;
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[handle setFrameOrigin:pt];
-						[handle setFrameSize:size];
-						handle.bounds = bounds;
-					});
-				}
-			} else {
-				NSRect frame;
-				frame.origin.x = (CGFloat)(_frame.left);
-				frame.origin.y = (CGFloat)(_frame.top);
-				frame.size.width = (CGFloat)(_frame.getWidth());
-				frame.size.height = (CGFloat)(_frame.getHeight());
-				if (UI::isUiThread()) {
-					handle.frame = frame;
-					[handle setNeedsDisplay:YES];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						handle.frame = frame;
-						[handle setNeedsDisplay:YES];
-					});
-				}
-			}
-		}
-	}
-
-	void View::_setTransform_NI(const Matrix3& matrix)
-	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil) {
-			UIRect _frame = getFrame();
-			Vector2 t;
-			sl_real r;
-			Vector2 s;
-			Vector2 anchor;
-			if (getFinalTranslationRotationScale(&t, &r, &s, &anchor)) {
-				NSPoint pt;
-				NSSize size;
-				_priv_macOS_transformViewFrame(pt, size, _frame, t.x, t.y, s.x, s.y, r, anchor.x, anchor.y);
-				NSRect bounds;
-				bounds.origin.x = 0;
-				bounds.origin.y = 0;
-				bounds.size.width = (CGFloat)(_frame.getWidth());
-				bounds.size.height = (CGFloat)(_frame.getHeight());
-				if (UI::isUiThread()) {
-					handle.frameRotation = Math::getDegreesFromRadian(r);
-					[handle setFrameOrigin:pt];
-					[handle setFrameSize:size];
-					handle.bounds = bounds;
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						handle.frameRotation = Math::getDegreesFromRadian(r);
-						[handle setFrameOrigin:pt];
-						[handle setFrameSize:size];
-						handle.bounds = bounds;
-					});
-				}
-			} else {
-				NSRect frame;
-				frame.origin.x = (CGFloat)(_frame.left);
-				frame.origin.y = (CGFloat)(_frame.top);
-				frame.size.width = (CGFloat)(_frame.getWidth());
-				frame.size.height = (CGFloat)(_frame.getHeight());
-				if (UI::isUiThread()) {
-					handle.frame = frame;
-					[handle setNeedsDisplay:YES];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						handle.frame = frame;
-						[handle setNeedsDisplay:YES];
-					});
-				}
-			}
-		}
-	}
-
-
-	void _priv_macOS_transformViewFrame(NSPoint& origin, NSSize& size, const UIRect& frame, sl_real tx, sl_real ty, sl_real sx, sl_real sy, sl_real r, sl_real anchorOffsetX, sl_real anchorOffsetY)
-	{
-		sl_ui_pos x = frame.left;
-		sl_ui_pos y = frame.top;
-		sl_ui_pos w = frame.getWidth();
-		sl_ui_pos h = frame.getHeight();
-		sl_bool flagScale = !(Math::isAlmostZero(sx - 1) && Math::isAlmostZero(sy - 1));
-		sl_bool flagRotate = !(Math::isAlmostZero(r));
-		if (flagScale || flagRotate) {
-			sl_real ax = (sl_real)(w) / 2 + anchorOffsetX;
-			sl_real ay = (sl_real)(h) / 2 + anchorOffsetY;
-			sl_bool flagAnchor = !(Math::isAlmostZero(ax) && Math::isAlmostZero(ay));
-			if (flagAnchor) {
-				sl_real cr = Math::cos(r);
-				sl_real sr = Math::sin(r);
-				tx += (- ax * cr + ay * sr) * sx + ax;
-				ty += (- ax * sr - ay * cr) * sy + ay;
-			}
-		}
-		if (!(Math::isAlmostZero(tx) && Math::isAlmostZero(ty))) {
-			x += (sl_ui_pos)tx;
-			y += (sl_ui_pos)ty;
-		}
-		if (flagScale) {
-			w = (sl_ui_pos)(w * sx);
-			h = (sl_ui_pos)(h * sy);
-		}
-		origin.x = x;
-		origin.y = y;
-		size.width = w;
-		size.height = h;
 	}
 
 }

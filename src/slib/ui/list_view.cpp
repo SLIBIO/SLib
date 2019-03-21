@@ -82,6 +82,7 @@ namespace slib
 #ifdef USE_CONTENT_VIEW
 		ScrollView::setContentView(m_contentView);
 #else
+		m_contentView->setCreatingInstance(sl_true);
 		m_contentView->setAttachMode(UIAttachMode::AttachInNativeWidget);
 		addChild(m_contentView, UIUpdateMode::Init);
 		setCreatingChildInstances(sl_true);
@@ -369,6 +370,7 @@ namespace slib
 	{
 		Ref<View> view = adapter->getView(index, original, m_contentView.get());
 		if (view.isNotNull()) {
+			view->setCreatingInstance(sl_true);
 			View::LayoutAttributes* attrs = view->m_layoutAttrs.get();
 			if (attrs) {
 				attrs->topMode = PositionMode::Free;

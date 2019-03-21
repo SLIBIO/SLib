@@ -32,6 +32,7 @@ namespace slib
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
 		
+		setCreatingInstance(sl_true);
 		setSavingCanvasState(sl_false);
 		
 		setWidthWeight(1, UIUpdateMode::Init);

@@ -344,7 +344,8 @@ namespace slib
 		NotAttach = 0,
 		AttachAlways = 1,
 		NotAttachInNativeWidget = 2,
-		AttachInNativeWidget = 3
+		AttachInNativeWidget = 3,
+		AttachInInstance = 4
 	};
 	
 	enum class GestureType

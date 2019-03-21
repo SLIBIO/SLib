@@ -48,7 +48,7 @@ namespace slib
 	SLIB_DEFINE_OBJECT(View, Object)
 
 	View::View():
-		m_flagCreatingInstance(sl_true),
+		m_flagCreatingInstance(sl_false),
 		m_flagCreatingChildInstances(sl_false),
 		m_flagCreatingNativeWidget(sl_false),
 		m_flagUsingChildLayouts(sl_true),
@@ -62,6 +62,7 @@ namespace slib
 		m_flagOkCancelEnabled(sl_true),
 		m_flagTabStopEnabled(sl_true),
 	
+		m_flagCurrentCreatingInstance(sl_false),
 		m_flagInvalidLayout(sl_true),
 		m_flagNeedApplyLayout(sl_false),
 		m_flagCurrentDrawing(sl_false),
@@ -353,7 +354,8 @@ namespace slib
 
 	View::ChildAttributes::ChildAttributes():
 		flagTouchMultipleChildren(sl_false),
-		flagPassEventToChildren(sl_true)
+		flagPassEventToChildren(sl_true),
+		flagHasInstances(sl_false)
 	{}
 	
 	View::ChildAttributes::~ChildAttributes()
@@ -454,9 +456,6 @@ namespace slib
 	void View::setCreatingChildInstances(sl_bool flag)
 	{
 		m_flagCreatingChildInstances = flag;
-		if (flag) {
-			m_flagCreatingInstance = sl_true;
-		}
 	}
 
 	sl_bool View::isCreatingNativeWidget()
@@ -490,14 +489,19 @@ namespace slib
 	Ref<ViewInstance> View::createInstance(ViewInstance* parent)
 	{
 		if (m_flagCreatingInstance) {
+			Ref<ViewInstance> ret;
+			m_flagCurrentCreatingInstance = sl_true;
 			if (m_flagCreatingNativeWidget) {
-				Ref<ViewInstance> ret = createNativeWidget(parent);
+				ret = createNativeWidget(parent);
 				if (ret.isNotNull()) {
 					ret->setNativeWidget(sl_true);
+					m_flagCurrentCreatingInstance = sl_false;
 					return ret;
 				}
 			}
-			return createGenericInstance(parent);
+			ret = createGenericInstance(parent);
+			m_flagCurrentCreatingInstance = sl_false;
+			return ret;
 		}
 		return sl_null;
 	}
@@ -590,9 +594,17 @@ namespace slib
 
 	Ref<ViewInstance> View::attachToNewInstance(const Ref<ViewInstance>& parent)
 	{
+		ObjectLocker lock(this);
+		detach();
 		Ref<ViewInstance> instance = createInstance(parent.get());
 		if (instance.isNotNull()) {
-			attach(instance);
+			m_instance = instance;
+			instance->setView(this);
+			if (UI::isUiThread()) {
+				_processAttachOnUiThread();
+			} else {
+				UI::dispatchToUiThread(SLIB_FUNCTION_WEAKREF(View, _processAttachOnUiThread, this));
+			}
 		}
 		return instance;
 	}
@@ -607,14 +619,20 @@ namespace slib
 			dispatchDetach();
 		}
 	}
+	
+	void View::detachAll()
+	{
+		ListElements< Ref<View> > children(getChildren());
+		for (sl_size i = 0; i < children.count; i++) {
+			children[i]->detachAll();
+		}
+		detach();
+	}
 
 	void View::_processAttachOnUiThread()
 	{
 		Ref<ViewInstance> instance = m_instance;
 		if (instance.isNotNull()) {
-#if defined(SLIB_UI_IS_WIN32)
-			updateAndInvalidateBoundsInParent(UIUpdateMode::None);
-#endif
 			if (m_flagFocused && m_flagFocusable) {
 				instance->setFocus(sl_true);
 			}
@@ -622,14 +640,33 @@ namespace slib
 			if (gesture.isNotNull()) {
 				gesture->enableNative();
 			}
-			if (getParent().isNull()) {
+			Ref<View> parent = m_parent;
+			if (parent.isNull()) {
 				if (IsInstanceOf<RenderView>(this)) {
 					dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(View, _updateAndApplyLayout, this));
 				} else {
 					_updateAndApplyLayout();
 				}
+			} else {
+				for (;;) {
+					if (parent->isInstance() || parent->m_flagCurrentCreatingInstance) {
+						break;
+					}
+					Ref<ChildAttributes>& attrs = parent->m_childAttrs;
+					if (attrs.isNotNull()) {
+						attrs->flagHasInstances = sl_true;
+					}
+					parent = parent->m_parent;
+					if (parent.isNull()) {
+						break;
+					}
+				}
 			}
-			sl_bool flagDrawChildren = sl_false;
+			dispatchAttach();
+		}
+		Ref<View> viewCreatingChildInstances = getNearestViewCreatingChildInstances();
+		if (viewCreatingChildInstances.isNotNull()) {
+			sl_bool flagNativeWidget = viewCreatingChildInstances->isNativeWidget();
 			ListElements< Ref<View> > children(getChildren());
 			for (sl_size i = 0; i < children.count; i++) {
 #if defined(SLIB_UI_IS_WIN32)
@@ -637,35 +674,38 @@ namespace slib
 #else
 				Ref<View>& child = children[i];
 #endif
-				if (m_flagCreatingChildInstances && child->m_flagCreatingInstance) {
-					switch(child->getAttachMode()) {
-						case UIAttachMode::NotAttach:
-							break;
-						case UIAttachMode::AttachAlways:
-							attachChild(child);
-							break;
-						case UIAttachMode::NotAttachInNativeWidget:
-							if (!(isNativeWidget())) {
-								attachChild(child);
-							}
-							break;
-						case UIAttachMode::AttachInNativeWidget:
-							if (isNativeWidget()) {
-								attachChild(child);
-							}
-							break;
+				if (!(child->isInstance())) {
+					if (child->m_flagCreatingInstance) {
+						switch(child->m_attachMode) {
+							case UIAttachMode::NotAttach:
+								break;
+							case UIAttachMode::AttachAlways:
+								viewCreatingChildInstances->attachChild(child);
+								break;
+							case UIAttachMode::NotAttachInNativeWidget:
+								if (!flagNativeWidget) {
+									viewCreatingChildInstances->attachChild(child);
+								}
+								break;
+							case UIAttachMode::AttachInNativeWidget:
+								if (flagNativeWidget) {
+									viewCreatingChildInstances->attachChild(child);
+								}
+								break;
+							case UIAttachMode::AttachInInstance:
+								if (isInstance()) {
+									viewCreatingChildInstances->attachChild(child);
+								}
+								break;
+						}
+						if (!(child->isInstance())) {
+							child->_processAttachOnUiThread();
+						}
+					} else {
+						child->_processAttachOnUiThread();
 					}
-					if (!(child->isInstance())) {
-						flagDrawChildren = sl_true;
-					}
-				} else {
-					flagDrawChildren = sl_true;
 				}
 			}
-			if (!m_flagDrawing && flagDrawChildren) {
-				setDrawing(sl_true);
-			}
-			dispatchAttach();
 		}
 	}
 
@@ -920,6 +960,21 @@ namespace slib
 		return sl_null;
 	}
 	
+	Ref<View> View::getNearestViewCreatingChildInstances()
+	{
+		if (!m_flagCreatingChildInstances) {
+			return sl_null;
+		}
+		if (m_instance.isNotNull()) {
+			return this;
+		}
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			return parent->getNearestViewCreatingChildInstances();
+		}
+		return sl_null;
+	}
+	
 	Ref<ViewPage> View::getNearestViewPage()
 	{
 		Ref<View> parent = m_parent;
@@ -941,6 +996,28 @@ namespace slib
 		}
 	}
 
+	void View::removeAllViewInstances()
+	{
+		Ref<View> viewWithInstance;
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			viewWithInstance = parent->getNearestViewWithInstance();
+		}
+		if (viewWithInstance.isNotNull()) {
+			viewWithInstance->_removeChildInstances(this);
+		} else {
+			if (isInstance()) {
+				ListElements< Ref<View> > children(getChildren());
+				for (sl_size i = 0; i < children.count; i++) {
+					_removeChildInstances(children[i].get());
+				}
+				detach();
+			} else {
+				detachAll();
+			}
+		}
+	}
+	
 	void View::attachChild(const Ref<View>& child)
 	{
 		if (m_flagCreatingChildInstances) {
@@ -952,34 +1029,6 @@ namespace slib
 				Ref<ViewInstance> parentInstance = getViewInstance();
 				if (parentInstance.isNotNull()) {
 					child->attachToNewInstance(parentInstance);
-				}
-			}
-		}
-	}
-
-	void View::addChildInstance(const Ref<ViewInstance>& child)
-	{
-		if (child.isNotNull()) {
-			Ref<ViewInstance> instance = m_instance;
-			if (instance.isNotNull()) {
-				if (UI::isUiThread()) {
-					instance->addChildInstance(child);
-				} else {
-					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), View, addChildInstance, this, child));
-				}
-			}
-		}
-	}
-
-	void View::removeChildInstance(const Ref<ViewInstance>& child)
-	{
-		if (child.isNotNull()) {
-			Ref<ViewInstance> instance = m_instance;
-			if (instance.isNotNull()) {
-				if (UI::isUiThread()) {
-					instance->removeChildInstance(child);
-				} else {
-					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), View, removeChildInstance, this, child));
 				}
 			}
 		}
@@ -1021,44 +1070,53 @@ namespace slib
 		child->setParent(this);
 		onAddChild(child);
 		
-		if (!SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
-			if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
-				if (child->isDrawingThread()) {
-					_updateAndApplyChildLayout(child);
+		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
+			return;
+		}
+		
+		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
+			if (child->isDrawingThread()) {
+				_updateAndApplyChildLayout(child);
+			}
+		} else {
+			child->invalidateLayout(UIUpdateMode::None);
+		}
+		
+		child->removeAllViewInstances();
+		
+		Ref<View> viewCreatingChildInstances = getNearestViewCreatingChildInstances();
+		if (viewCreatingChildInstances.isNotNull()) {
+			if (child->m_flagCreatingInstance) {
+				switch(child->getAttachMode()) {
+					case UIAttachMode::NotAttach:
+						break;
+					case UIAttachMode::AttachAlways:
+						viewCreatingChildInstances->attachChild(child);
+						break;
+					case UIAttachMode::NotAttachInNativeWidget:
+						if (!(viewCreatingChildInstances->isNativeWidget())) {
+							viewCreatingChildInstances->attachChild(child);
+						}
+						break;
+					case UIAttachMode::AttachInNativeWidget:
+						if (viewCreatingChildInstances->isNativeWidget()) {
+							viewCreatingChildInstances->attachChild(child);
+						}
+						break;
+					case UIAttachMode::AttachInInstance:
+						if (viewCreatingChildInstances == this) {
+							viewCreatingChildInstances->attachChild(child);
+						}
+						break;
+				}
+				if (!(child->isInstance())) {
+					child->_processAttachOnUiThread();
 				}
 			} else {
-				child->invalidateLayout(UIUpdateMode::None);
+				child->_processAttachOnUiThread();
 			}
-			if (isInstance()) {
-				sl_bool flagAttach = sl_false;
-				if (m_flagCreatingChildInstances && child->m_flagCreatingInstance) {
-					switch(child->getAttachMode()) {
-						case UIAttachMode::NotAttach:
-							break;
-						case UIAttachMode::AttachAlways:
-							attachChild(child);
-							flagAttach = sl_true;
-							break;
-						case UIAttachMode::NotAttachInNativeWidget:
-							if (!(isNativeWidget())) {
-								attachChild(child);
-								flagAttach = sl_true;
-							}
-							break;
-						case UIAttachMode::AttachInNativeWidget:
-							if (isNativeWidget()) {
-								attachChild(child);
-								flagAttach = sl_true;
-							}
-							break;
-					}
-				}
-				if (!m_flagDrawing && !flagAttach && !(isNativeWidget())) {
-					setDrawing(sl_true, UIUpdateMode::None);
-				}
-			}
-			invalidateLayout(mode);
 		}
+		invalidateLayout(mode);
 	}
 	
 	void View::_removeChild(View* child)
@@ -1067,14 +1125,36 @@ namespace slib
 
 		onRemoveChild(child);
 		
-		Ref<ViewInstance> instanceChild = child->getViewInstance();
-		if (instanceChild.isNotNull()) {
-			removeChildInstance(instanceChild);
-			child->detach();
-		}
+		child->removeAllViewInstances();
 		child->removeParent(this);
 	}
-
+	
+	void View::_removeChildInstances(View* child)
+	{
+		Ref<ViewInstance> instanceParent = m_instance;
+		if (instanceParent.isNull()) {
+			return;
+		}
+		Ref<ViewInstance> instanceChild = child->m_instance;
+		if (instanceChild.isNotNull()) {
+			if (UI::isUiThread()) {
+				instanceParent->removeChildInstance(instanceChild);
+			} else {
+				UI::dispatchToUiThread(SLIB_BIND_REF(void(), ViewInstance, removeChildInstance, instanceParent, instanceChild));
+			}
+			child->detach();
+			ListElements< Ref<View> > children(child->getChildren());
+			for (sl_size i = 0; i < children.count; i++) {
+				children[i]->detachAll();
+			}
+		} else {
+			ListElements< Ref<View> > children(child->getChildren());
+			for (sl_size i = 0; i < children.count; i++) {
+				_removeChildInstances(children[i].get());
+			}
+		}
+	}
+	
 	void View::invalidate(UIUpdateMode mode)
 	{
 		if (!SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
@@ -1093,19 +1173,12 @@ namespace slib
 				}
 			}
 			invalidateLayer();
-#if defined(SLIB_UI_IS_WIN32)
-			if (checkSelfInvalidatable()) {
-				if (instance.isNotNull()) {
-					instance->invalidate();
-				}
-				return;
-			}
-#else
+			
 			if (instance.isNotNull()) {
 				instance->invalidate();
 				return;
 			}
-#endif
+
 			Ref<View> parent = m_parent;
 			if (parent.isNotNull()) {
 				parent->invalidate(m_boundsInParent, mode);
@@ -1132,19 +1205,12 @@ namespace slib
 				}
 			}
 			invalidateLayer(rectIntersect);
-#if defined(SLIB_UI_IS_WIN32)
-			if (checkSelfInvalidatable()) {
-				if (instance.isNotNull()) {
-					instance->invalidate(rectIntersect);
-				}
-				return;
-			}
-#else
+			
 			if (instance.isNotNull()) {
 				instance->invalidate(rectIntersect);
 				return;
 			}
-#endif
+
 			Ref<View> parent = m_parent;
 			if (parent.isNotNull()) {
 				parent->invalidate(convertCoordinateToParent(rectIntersect), mode);
@@ -1155,7 +1221,7 @@ namespace slib
 	void View::invalidateBoundsInParent(UIUpdateMode mode)
 	{
 		Ref<View> parent = m_parent;
-		if (parent.isNull() || checkSelfInvalidatable()) {
+		if (parent.isNull() || isInstance()) {
 			return;
 		}
 		parent->invalidate(m_boundsInParent, mode);
@@ -1168,7 +1234,7 @@ namespace slib
 			return;
 		}
 		Ref<View> parent = m_parent;
-		if (parent.isNull() || checkSelfInvalidatable()) {
+		if (parent.isNull() || isInstance()) {
 			m_boundsInParent = convertCoordinateToParent(getBounds());
 			return;
 		}
@@ -1192,46 +1258,23 @@ namespace slib
 			parent->invalidate(boundsNew, mode);
 		}
 	}
-
-	sl_bool View::checkSelfInvalidatable()
-	{
-		Ref<ViewInstance> instance = m_instance;
-#if defined(SLIB_UI_IS_WIN32)
-		if (instance.isNotNull()) {
-			if (instance->isNativeWidget()) {
-				return sl_true;
-			}
-			if (isOpaque()) {
-				return sl_true;
-			}
-			Ref<View> parent = m_parent;
-			if (parent.isNotNull()) {
-				Ref<ViewInstance> parentInstance = parent->m_instance;
-				if (parentInstance.isNull()) {
-					return sl_true;
-				}
-				if (parentInstance->isNativeWidget()) {
-					return sl_true;
-				}
-				return sl_false;
-			}
-			return sl_true;
-		}
-		return sl_false;
-#else
-		return instance.isNotNull();
-#endif
-	}
-
-	UIRect View::getInstanceFrame()
-	{
-		Ref<ViewInstance> instance = m_instance;
-		if (instance.isNotNull()) {
-			return instance->getFrame();
-		}
-		return m_frame;
-	}
 	
+	void View::updateInstanceFrames()
+	{
+		Ref<ViewInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			instance->setFrame(getFrameInInstance());
+		} else {
+			Ref<ChildAttributes>& attrs = m_childAttrs;
+			if (attrs.isNotNull() && attrs->flagHasInstances) {
+				ListElements< Ref<View> > children(getChildren());
+				for (sl_size i = 0; i < children.count; i++) {
+					children[i]->updateInstanceFrames();
+				}
+			}
+		}
+	}
+
 	const UIRect& View::getFrame()
 	{
 		return m_frame;
@@ -1269,9 +1312,7 @@ namespace slib
 			return;
 		}
 		
-		if (m_instance.isNotNull()) {
-			_setFrame_NI(frame);
-		}
+		updateInstanceFrames();
 		
 		if (!(flagNotResizeWidth && flagNotResizeHeight)) {
 			Ref<PaddingAttributes>& paddingAttrs = m_paddingAttrs;
@@ -1472,6 +1513,24 @@ namespace slib
 	{
 		return UIRect(0, 0, m_frame.getWidth(), m_frame.getHeight());
 	}
+	
+	UIRect View::getFrameInInstance()
+	{
+		UIRect ret = m_frame;
+		Ref<View> parent = m_parent;
+		while (parent.isNotNull()) {
+			if (parent->isInstance() || parent->m_flagCurrentCreatingInstance) {
+				break;
+			}
+			UIRect& frameParent = parent->m_frame;
+			ret.left += frameParent.left;
+			ret.top += frameParent.top;
+			ret.right += frameParent.left;
+			ret.bottom += frameParent.top;
+			parent = parent->m_parent;
+		}
+		return ret;
+	}
 
 	UIRect View::getBoundsInnerPadding()
 	{
@@ -1501,11 +1560,11 @@ namespace slib
 		if (visibility != Visibility::Visible) {
 			_cancelPressState();
 		}
-		Ref<ViewInstance> instance = m_instance;
-		if (instance.isNotNull()) {
-			instance->setVisible(visibility == Visibility::Visible);
-		}
+		
+		setInstanceVisible(visibility == Visibility::Visible);
+		
 		dispatchChangeVisibility(oldVisibility, visibility);
+		
 		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 			return;
 		}
@@ -1515,13 +1574,9 @@ namespace slib
 				if (oldVisibility == Visibility::Gone) {
 					invalidateParentLayout(mode);
 				} else {
-#if defined(SLIB_PLATFORM_IS_WIN32)
-					invalidateBoundsInParent(mode);
-#else
-					if (instance.isNull()) {
+					if (!(isInstance())) {
 						invalidateBoundsInParent(mode);
 					}
-#endif
 				}
 				break;
 			case Visibility::Gone:
@@ -1534,6 +1589,24 @@ namespace slib
 	{
 		return m_visibility == Visibility::Visible;
 	}
+	
+	sl_bool View::isVisibleInInstance()
+	{
+		if (m_visibility != Visibility::Visible) {
+			return sl_false;
+		}
+		Ref<View> parent = m_parent;
+		while (parent.isNotNull()) {
+			if (parent->isInstance() || parent->m_flagCurrentCreatingInstance) {
+				return sl_true;
+			}
+			if (parent->m_visibility != Visibility::Visible) {
+				return sl_false;
+			}
+			parent = parent->m_parent;
+		}
+		return sl_true;
+	}
 
 	void View::setVisible(sl_bool flag, UIUpdateMode mode)
 	{
@@ -1544,6 +1617,22 @@ namespace slib
 		}
 	}
 
+	void View::setInstanceVisible(sl_bool flag)
+	{
+		Ref<ViewInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			instance->setVisible(flag && m_visibility == Visibility::Visible);
+		} else {
+			Ref<ChildAttributes>& attrs = m_childAttrs;
+			if (attrs.isNotNull() && attrs->flagHasInstances) {
+				ListElements< Ref<View> > children(getChildren());
+				for (sl_size i = 0; i < children.count; i++) {
+					children[i]->setInstanceVisible(flag && m_visibility == Visibility::Visible);
+				}
+			}
+		}
+	}
+	
 	sl_bool View::isEnabled()
 	{
 		return m_flagEnabled;
@@ -3893,19 +3982,19 @@ namespace slib
 								flagInited = sl_true;
 							}
 						}
-						if (flagRotate) {
-							if (flagInited) {
-								Transform2::rotate(mat, r);
-							} else {
-								mat = Transform2::getRotationMatrix(r);
-								flagInited = sl_true;
-							}
-						}
 						if (flagScale) {
 							if (flagInited) {
 								Transform2::scale(mat, sx, sy);
 							} else {
 								mat = Transform2::getScalingMatrix(sx, sy);
+								flagInited = sl_true;
+							}
+						}
+						if (flagRotate) {
+							if (flagInited) {
+								Transform2::rotate(mat, r);
+							} else {
+								mat = Transform2::getRotationMatrix(r);
 								flagInited = sl_true;
 							}
 						}
@@ -3977,6 +4066,26 @@ namespace slib
 		return sl_false;
 	}
 
+	Matrix3 View::getFinalTransformInInstance()
+	{
+		Matrix3 ret;
+		if (!(getFinalTransform(&ret))) {
+			ret = Matrix3::identity();
+		}
+		Ref<View> parent = m_parent;
+		while (parent.isNotNull()) {
+			if (parent->isInstance() || parent->m_flagCurrentCreatingInstance) {
+				break;
+			}
+			Matrix3 t;
+			if (parent->getFinalTransform(&t)) {
+				ret = t * ret;
+			}
+			parent = parent->m_parent;
+		}
+		return ret;
+	}
+
 	const Matrix3& View::getTransform()
 	{
 		Ref<TransformAttributes>& attrs = m_transformAttrs;
@@ -4005,31 +4114,7 @@ namespace slib
 			_applyFinalTransform(mode);
 		}
 	}
-
-	sl_bool View::getFinalTranslationRotationScale(Vector2* translation, sl_real* rotation, Vector2* scale, Vector2* anchor)
-	{
-		Ref<TransformAttributes>& attrs = m_transformAttrs;
-		if (attrs.isNull()) {
-			return sl_false;
-		}
-		if (translation) {
-			translation->x = attrs->translation.x;
-			translation->y = attrs->translation.y;
-		}
-		if (scale) {
-			scale->x = attrs->scale.x;
-			scale->y = attrs->scale.y;
-		}
-		if (rotation) {
-			*rotation = attrs->rotationAngle;
-		}
-		if (anchor) {
-			anchor->x = attrs->anchorOffset.x;
-			anchor->y = attrs->anchorOffset.y;
-		}
-		return sl_true;
-	}
-
+	
 	sl_real View::getTranslationX()
 	{
 		Ref<TransformAttributes>& attrs = m_transformAttrs;
@@ -4244,6 +4329,22 @@ namespace slib
 		setAnchorOffset(pt.x, pt.y, mode);
 	}
 
+	void View::updateInstanceTransforms()
+	{
+		Ref<ViewInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			instance->setTransform(getFinalTransformInInstance());
+		} else {
+			Ref<ChildAttributes>& attrs = m_childAttrs;
+			if (attrs.isNotNull() && attrs->flagHasInstances) {
+				ListElements< Ref<View> > children(getChildren());
+				for (sl_size i = 0; i < children.count; i++) {
+					children[i]->updateInstanceTransforms();
+				}
+			}
+		}
+	}
+
 	void View::_applyCalcTransform(UIUpdateMode mode)
 	{
 		Ref<TransformAttributes>& attrs = m_transformAttrs;
@@ -4260,21 +4361,8 @@ namespace slib
 		Ref<TransformAttributes>& attrs = m_transformAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagTransformFinalInvalid = sl_true;
-			_invalidateInstanceTransform();
+			updateInstanceTransforms();
 			updateAndInvalidateBoundsInParent(mode);
-		}
-	}
-
-	void View::_invalidateInstanceTransform()
-	{
-		if (m_instance.isNull()) {
-			return;
-		}
-		Matrix3 mat;
-		if (getFinalTransform(&mat)) {
-			_setTransform_NI(mat);
-		} else {
-			_setTransform_NI(Matrix3::identity());
 		}
 	}
 
@@ -4314,17 +4402,6 @@ namespace slib
 		sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
 		sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
 		
-#if defined(SLIB_UI_IS_WIN32)
-		if (isInstance()) {
-			Vector2 t;
-			if (getFinalTranslationRotationScale(&t, sl_null, sl_null, sl_null)) {
-				offx += (sl_ui_pos)(t.x);
-				offy += (sl_ui_pos)(t.y);
-			}
-			return UIPointf(ptParent.x - offx, ptParent.y - offy);
-		}
-#endif
-		
 		UIPointf pt = ptParent;
 		pt.x -= offx;
 		pt.y -= offy;
@@ -4345,17 +4422,6 @@ namespace slib
 	{
 		sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
 		sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
-		
-#if defined(SLIB_UI_IS_WIN32)
-		if (isInstance()) {
-			Vector2 t;
-			if (getFinalTranslationRotationScale(&t, sl_null, sl_null, sl_null)) {
-				offx += (sl_ui_pos)(t.x);
-				offy += (sl_ui_pos)(t.y);
-			}
-			return UIRectf(rcParent.left - offx, rcParent.top - offy, rcParent.right - offx, rcParent.bottom - offy);
-		}
-#endif
 		
 		Matrix3 mat;
 		if (getFinalInverseTransform(&mat)) {
@@ -4381,17 +4447,6 @@ namespace slib
 		sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
 		sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
 
-#if defined(SLIB_UI_IS_WIN32)
-		if (isInstance()) {
-			Vector2 t;
-			if (getFinalTranslationRotationScale(&t, sl_null, sl_null, sl_null)) {
-				offx += (sl_ui_pos)(t.x);
-				offy += (sl_ui_pos)(t.y);
-			}
-			return UIPointf(ptView.x + offx, ptView.y + offy);
-		}
-#endif
-		
 		UIPointf pt = ptView;
 		Matrix3 mat;
 		if (getFinalTransform(&mat)) {
@@ -4413,17 +4468,6 @@ namespace slib
 		sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
 		sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
 
-#if defined(SLIB_UI_IS_WIN32)
-		if (isInstance()) {
-			Vector2 t;
-			if (getFinalTranslationRotationScale(&t, sl_null, sl_null, sl_null)) {
-				offx += (sl_ui_pos)(t.x);
-				offy += (sl_ui_pos)(t.y);
-			}
-			return UIRectf(rcView.left + offx, rcView.top + offy, rcView.right + offx, rcView.bottom + offy);
-		}
-#endif
-		
 		Matrix3 mat;
 		if (getFinalTransform(&mat)) {
 			UIPointf pts[4];
@@ -4458,9 +4502,6 @@ namespace slib
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->background = drawable;
-			if (drawable.isNotNull()) {
-				setDrawing(sl_true, UIUpdateMode::None);
-			}
 			if (isNativeWidget()) {
 				Color color;
 				if (ColorDrawable::check(drawable, &color)) {
@@ -4501,9 +4542,6 @@ namespace slib
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->backgroundPressed = drawable;
-			if (drawable.isNotNull()) {
-				setDrawing(sl_true, UIUpdateMode::None);
-			}
 			invalidate(mode);
 		}
 	}
@@ -4537,9 +4575,6 @@ namespace slib
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->backgroundHover = drawable;
-			if (drawable.isNotNull()) {
-				setDrawing(sl_true, UIUpdateMode::None);
-			}
 			invalidate(mode);
 		}
 	}
@@ -4611,11 +4646,6 @@ namespace slib
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->penBorder = pen;
-			if (pen.isNotNull()) {
-				if (pen->getWidth() > 0) {
-					setDrawing(sl_true, UIUpdateMode::None);
-				}
-			}
 			invalidate(mode);
 		}
 	}
@@ -4697,9 +4727,6 @@ namespace slib
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->borderWidth = width;
-			if (width > 0) {
-				setDrawing(sl_true, UIUpdateMode::None);
-			}
 			_refreshBorderPen(mode);
 		}
 	}
@@ -5057,16 +5084,12 @@ namespace slib
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->alpha = alpha;
-#if defined(SLIB_UI_IS_WIN32)
-			invalidateBoundsInParent(mode);
-#else
 			Ref<ViewInstance> instance = m_instance;
 			if (instance.isNotNull()) {
 				instance->setAlpha(alpha);
 			} else {
 				invalidateBoundsInParent(mode);
 			}
-#endif
 		}
 	}
 
@@ -5085,7 +5108,6 @@ namespace slib
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->flagLayer = flagLayer;
-			setDrawing(sl_true, UIUpdateMode::None);
 			invalidate(mode);
 		}
 	}
@@ -6887,67 +6909,45 @@ namespace slib
 				
 				View* child = children[i].get();
 			
-				if (child && child->isVisible()) {
+				if (child && child->isVisible() && !(child->isInstance())) {
 					
-					if (child->isInstance()) {
-#if defined(SLIB_UI_IS_WIN32)
-						if (!(child->checkSelfInvalidatable())) {
-							sl_ui_pos offx = child->m_frame.left;
-							sl_ui_pos offy = child->m_frame.top;
-							Vector2 t;
-							if (child->getFinalTranslationRotationScale(&t, sl_null, sl_null, sl_null)) {
-								offx += (sl_ui_pos)(t.x);
-								offy += (sl_ui_pos)(t.y);
-							}
-							UIRect rcInvalidated(rcInvalidatedParent.left - offx, rcInvalidatedParent.top - offy, rcInvalidatedParent.right - offx, rcInvalidatedParent.bottom - offy);
-							if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
-								CanvasStateScope scope(canvas);
-								canvas->translate((sl_real)(offx), (sl_real)(offy));
-								canvas->setAlpha(alphaParent * child->getAlpha());
-								canvas->setInvalidatedRect(rcInvalidated);
-								child->dispatchDraw(canvas);
-							}
-						}
-#endif
-					} else {
-						sl_ui_pos offx = child->m_frame.left;
-						sl_ui_pos offy = child->m_frame.top;
-						Matrix3 mat;
-						sl_bool flagTranslation = sl_true;
-						if (child->getFinalTransform(&mat)) {
-							if (Transform2::isTranslation(mat)) {
-								offx += (sl_ui_pos)(mat.m20);
-								offy += (sl_ui_pos)(mat.m21);
-							} else {
-								flagTranslation = sl_false;
-							}
-						}
-						if (flagTranslation) {
-							UIRect rcInvalidated(rcInvalidatedParent.left - offx, rcInvalidatedParent.top - offy, rcInvalidatedParent.right - offx, rcInvalidatedParent.bottom - offy);
-							if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
-								CanvasStateScope scope(canvas);
-								canvas->translate((sl_real)(offx), (sl_real)(offy));
-								canvas->setAlpha(alphaParent * child->getAlpha());
-								canvas->setInvalidatedRect(rcInvalidated);
-								child->dispatchDraw(canvas);
-							}
+					sl_ui_pos offx = child->m_frame.left;
+					sl_ui_pos offy = child->m_frame.top;
+					Matrix3 mat;
+					sl_bool flagTranslation = sl_true;
+					if (child->getFinalTransform(&mat)) {
+						if (Transform2::isTranslation(mat)) {
+							offx += (sl_ui_pos)(mat.m20);
+							offy += (sl_ui_pos)(mat.m21);
 						} else {
-							UIRect rcInvalidated = child->convertCoordinateFromParent(rcInvalidatedParent);
-							rcInvalidated.left -= 1;
-							rcInvalidated.top -= 1;
-							rcInvalidated.right += 1;
-							rcInvalidated.bottom += 1;
-							if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
-								CanvasStateScope scope(canvas);
-								sl_real ax = (sl_real)(child->getWidth()) / 2;
-								sl_real ay = (sl_real)(child->getHeight()) / 2;
-								mat.m20 = -ax * mat.m00 - ay * mat.m10 + mat.m20 + ax + (sl_real)(offx);
-								mat.m21 = -ax * mat.m01 - ay * mat.m11 + mat.m21 + ay + (sl_real)(offy);
-								canvas->concatMatrix(mat);
-								canvas->setAlpha(alphaParent * child->getAlpha());
-								canvas->setInvalidatedRect(rcInvalidated);
-								child->dispatchDraw(canvas);
-							}
+							flagTranslation = sl_false;
+						}
+					}
+					if (flagTranslation) {
+						UIRect rcInvalidated(rcInvalidatedParent.left - offx, rcInvalidatedParent.top - offy, rcInvalidatedParent.right - offx, rcInvalidatedParent.bottom - offy);
+						if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
+							CanvasStateScope scope(canvas);
+							canvas->translate((sl_real)(offx), (sl_real)(offy));
+							canvas->setAlpha(alphaParent * child->getAlpha());
+							canvas->setInvalidatedRect(rcInvalidated);
+							child->dispatchDraw(canvas);
+						}
+					} else {
+						UIRect rcInvalidated = child->convertCoordinateFromParent(rcInvalidatedParent);
+						rcInvalidated.left -= 1;
+						rcInvalidated.top -= 1;
+						rcInvalidated.right += 1;
+						rcInvalidated.bottom += 1;
+						if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
+							CanvasStateScope scope(canvas);
+							sl_real ax = (sl_real)(child->getWidth()) / 2;
+							sl_real ay = (sl_real)(child->getHeight()) / 2;
+							mat.m20 = -ax * mat.m00 - ay * mat.m10 + mat.m20 + ax + (sl_real)(offx);
+							mat.m21 = -ax * mat.m01 - ay * mat.m11 + mat.m21 + ay + (sl_real)(offy);
+							canvas->concatMatrix(mat);
+							canvas->setAlpha(alphaParent * child->getAlpha());
+							canvas->setInvalidatedRect(rcInvalidated);
+							child->dispatchDraw(canvas);
 						}
 					}
 				}
@@ -7157,12 +7157,10 @@ namespace slib
 					ObjectLocker lock(this);
 					if (attrs->runAfterDrawCallbacks.isNull()) {
 						attrs->runAfterDrawCallbacks.pushBack(callback);
-						setDrawing(sl_true, UIUpdateMode::None);
 						forceDraw(flagInvalidate);
 						return;
 					}
 				}
-				setDrawing(sl_true, UIUpdateMode::None);
 				attrs->runAfterDrawCallbacks.pushBack(callback);
 				forceDraw(flagInvalidate);
 			}
@@ -8779,26 +8777,6 @@ namespace slib
 	}
 #endif
 
-#if !(defined(SLIB_UI_IS_MACOS)) && !(defined(SLIB_UI_IS_WIN32))
-	void View::_setFrame_NI(const UIRect& frame)
-	{
-		Ref<ViewInstance> instance = m_instance;
-		if (instance.isNotNull()) {
-			instance->setFrame(frame);
-		}
-	}
-#endif
-
-#if !(defined(SLIB_UI_IS_MACOS)) && !(defined(SLIB_UI_IS_WIN32)) && !(defined(SLIB_UI_IS_ANDROID))
-	void View::_setTransform_NI(const Matrix3& matrix)
-	{
-		Ref<ViewInstance> instance = m_instance;
-		if (instance.isNotNull()) {
-			instance->setTransform(matrix);
-		}
-	}
-#endif
-
 	void View::_setBorder_NW(sl_bool flag)
 	{
 	}
@@ -8861,6 +8839,8 @@ namespace slib
 		m_flagWindowContent = flag;
 	}
 
+	Color _priv_View_getDefaultBackColor();
+
 	void ViewInstance::onDraw(Canvas* canvas)
 	{
 		Ref<View> view = getView();
@@ -8879,7 +8859,72 @@ namespace slib
 				canvas->setAlpha(alpha);
 			}
 #endif
+#if defined(SLIB_UI_IS_WIN32)
+			{
+				static Ref<Bitmap> bitmap;
+				static Ref<Canvas> canvasBitmap;
+				UIRect rc = canvas->getInvalidatedRect();
+				UISize size = rc.getSize();
+				if (size.x < 1) {
+					return;
+				}
+				if (size.y < 1) {
+					return;
+				}
+				UISize screenSize = UI::getScreenSize();
+				if (size.x > screenSize.x) {
+					size.x = screenSize.x;
+				}
+				if (size.y > screenSize.y) {
+					size.y = screenSize.y;
+				}
+				if (bitmap.isNull() || canvasBitmap.isNull() || bitmap->getWidth() < (sl_uint32)(size.x) || bitmap->getHeight() < (sl_uint32)(size.y)) {
+					bitmap = Bitmap::create(size.x, size.y);
+					if (bitmap.isNull()) {
+						return;
+					}
+					canvasBitmap = bitmap->getCanvas();
+					if (canvasBitmap.isNull()) {
+						return;
+					}
+				}
+				Color colorClear = Color::zero();
+				do {
+					if (view->isOpaque()) {
+						break;
+					}
+					Color color = view->getBackgroundColor();
+					if (color.a == 255) {
+						break;
+					}
+					Ref<Window> window = view->getWindow();
+					if (window.isNotNull() && window->getContentView() == view) {
+						colorClear = window->getBackgroundColor();
+						if (colorClear.a < 255) {
+							Color c = _priv_View_getDefaultBackColor();
+							c.blend_PA_NPA(colorClear);
+							colorClear = c;
+						}
+						break;
+					} else {
+						colorClear = _priv_View_getDefaultBackColor();
+					}
+				} while (0);
+				UIRect rcBack = {0, 0, size.x, size.y};
+				rc.setSize(size);
+				if (colorClear.isNotZero()) {
+					bitmap->resetPixels(rcBack.left, rcBack.top, rcBack.getWidth(), rcBack.getHeight(), colorClear);
+				}
+				canvasBitmap->setInvalidatedRect(rc);
+				CanvasStateScope scope(canvasBitmap.get());
+				canvasBitmap->translate(-(sl_real)(rc.left), -(sl_real)(rc.top));
+				view->dispatchDraw(canvasBitmap.get());
+				canvasBitmap->translate((sl_real)(rc.left), (sl_real)(rc.top));
+				canvas->draw(rc, bitmap, rcBack);
+			}
+#else
 			view->dispatchDraw(canvas);
+#endif
 		}
 	}
 
@@ -9033,7 +9078,6 @@ namespace slib
 		SLIB_REFERABLE_CONSTRUCTOR
 		
 		setCreatingChildInstances(sl_true);
-		setDrawing(sl_false, UIUpdateMode::Init);
 		
 	}
 

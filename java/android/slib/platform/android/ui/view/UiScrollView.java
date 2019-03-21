@@ -161,7 +161,7 @@ public class UiScrollView extends ScrollView implements IView {
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		setMeasuredDimension(resolveSizeAndState(mRight-mLeft, widthMeasureSpec, 0), resolveSizeAndState(mBottom-mTop, heightMeasureSpec, 0));
+		setMeasuredDimension(UiView.resolveMeasure(mRight-mLeft, widthMeasureSpec), UiView.resolveMeasure(mBottom-mTop, heightMeasureSpec));
 	}
 
 	@Override
@@ -169,6 +169,11 @@ public class UiScrollView extends ScrollView implements IView {
 		super.onLayout(changed, l, t, r, b);
 		if (getChildCount() > 0) {
 			View child = getChildAt(0);
+			if (child instanceof IView) {
+				IView view = (IView)child;
+				Rect frame = view.getUIFrame();
+				child.layout(frame.left, frame.top, frame.right, frame.bottom);
+			}
 			if (child.getHeight() > 0) {
 				if (!flagInitedContent) {
 					scrollTo(initScrollX, initScrollY);

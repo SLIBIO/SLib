@@ -22,6 +22,11 @@
 
 #include "slib/ui/list_report_view.h"
 
+#if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_WIN32)
+#	define HAS_NATIVE_WIDGET_IMPL
+#endif
+
+
 namespace slib
 {
 	
@@ -46,7 +51,9 @@ namespace slib
 	
 	ListReportView::ListReportView()
 	{
+#ifdef HAS_NATIVE_WIDGET_IMPL
 		setCreatingNativeWidget(sl_true);
+#endif
 		setUsingFont(sl_true);
 		
 		m_columns.setCount(1);
@@ -314,7 +321,7 @@ namespace slib
 	}
 	
 	
-#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_WIN32)
+#if !defined(HAS_NATIVE_WIDGET_IMPL)
 	Ref<ViewInstance> ListReportView::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;

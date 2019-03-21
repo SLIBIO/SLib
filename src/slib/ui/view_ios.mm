@@ -80,7 +80,7 @@ namespace slib
 				
 				[handle setClipsToBounds:(view->isClipping() ? YES : NO)];
 				
-				[handle setHidden:(view->isVisible() ? NO : YES)];
+				[handle setHidden:(view->isVisibleInInstance() ? NO : YES)];
 				
 				if (!(view->isEnabled())) {
 					if ([handle isKindOfClass:[UIControl class]]) {
@@ -99,12 +99,10 @@ namespace slib
 					}
 				}
 				
-				Matrix3 transform;
-				if (view->getFinalTransform(&transform)) {
-					CGAffineTransform t;
-					GraphicsPlatform::getCGAffineTransform(t, transform, UIPlatform::getGlobalScaleFactor(), 0, 0);
-					[handle setTransform: t];
-				}
+				Matrix3 transform = view->getFinalTransformInInstance();
+				CGAffineTransform t;
+				GraphicsPlatform::getCGAffineTransform(t, transform, UIPlatform::getGlobalScaleFactor(), 0, 0);
+				[handle setTransform: t];
 				
 				if (parent != nil) {
 					[parent addSubview:handle];

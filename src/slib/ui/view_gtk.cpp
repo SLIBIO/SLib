@@ -27,6 +27,7 @@
 #include "view_gtk.h"
 
 #include "slib/ui/core.h"
+#include "slib/math/transform2d.h"
 
 namespace slib
 {
@@ -73,18 +74,14 @@ namespace slib
 		if (_parent) {
 			parent = ((GTK_ViewInstance*)_parent)->m_handleChildrenContainer;
 		}
-		UIRect frame = view->getFrame();
+		m_frame = view->getFrameInInstance();
+		m_translation = Transform2::getTranslationFromMatrix(view->getFinalTransformInInstance());
 		if (parent && GTK_IS_FIXED(parent)) {
-			sl_ui_pos x = frame.left;
-			sl_ui_pos y = frame.top;
-			Vector2 t;
-			if (view->getFinalTranslationRotationScale(&t, NULL, NULL, NULL)) {
-				x += (sl_ui_pos)(t.x);
-				y += (sl_ui_pos)(t.y);
-			}
+			sl_ui_pos x = m_frame.left + m_translation.x;
+			sl_ui_pos y = m_frame.top + m_translation.y;
 			gtk_fixed_put((GtkFixed*)parent, handle, x, y);
 		}
-		gtk_widget_set_size_request(handle, frame.getWidth(), frame.getHeight());
+		gtk_widget_set_size_request(handle, m_frame.getWidth(), m_frame.getHeight());
 
 		if (view->isVisible()) {
 			gtk_widget_show(handle);
@@ -170,16 +167,34 @@ namespace slib
 				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_ViewInstance, setFrame, this, frame));
 				return;
 			}
-			GtkWidget* parent = gtk_widget_get_parent(handle);
-			if (parent && GTK_IS_FIXED(parent)) {
-				gtk_fixed_move((GtkFixed*)parent, handle, frame.left, frame.top);
-			}
-			gtk_widget_set_size_request(handle, frame.getWidth(), frame.getHeight());
+			m_frame = frame;
+			_updateFrameAndTransform();
 		}
 	}
 	
 	void GTK_ViewInstance::setTransform(const Matrix3& m)
 	{
+		GtkWidget* handle = m_handle;
+		if (handle) {
+			if (!(UI::isUiThread())) {
+				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_ViewInstance, setTransform, this, m));
+				return;
+			}
+			m_translation = Transform2::getTranslationFromMatrix(m);
+			_updateFrameAndTransform();
+		}
+	}
+
+	void GTK_ViewInstance::_updateFrameAndTransform()
+	{
+		GtkWidget* handle = m_handle;
+		if (handle) {
+			GtkWidget* parent = gtk_widget_get_parent(handle);
+			if (parent && GTK_IS_FIXED(parent)) {
+				gtk_fixed_move((GtkFixed*)parent, handle, m_frame.left + m_translation.x, m_frame.top + m_translation.y);
+			}
+			gtk_widget_set_size_request(handle, m_frame.getWidth(), m_frame.getHeight());
+		}
 	}
 	
 	void GTK_ViewInstance::setVisible(sl_bool flag)

@@ -88,6 +88,11 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 		super.onLayout(changed, l, t, r, b);
 		if (getChildCount() > 0) {
 			View child = getChildAt(0);
+			if (child instanceof IView) {
+				IView view = (IView)child;
+				Rect frame = view.getUIFrame();
+				child.layout(frame.left, frame.top, frame.right, frame.bottom);
+			}
 			if (child.getWidth() > 0) {
 				if (!flagInitedContent) {
 					scrollTo(initScrollX, initScrollY);

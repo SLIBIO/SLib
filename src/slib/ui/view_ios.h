@@ -121,7 +121,7 @@ namespace slib
 	UIView* parent = UIPlatform::getViewHandle(_parent); \
 	CGRect frame; \
 	CGFloat f = UIPlatform::getGlobalScaleFactor();	\
-	UIRect _frame = getFrame(); \
+	UIRect _frame = getFrameInInstance(); \
 	frame.origin.x = (CGFloat)(_frame.left) / f; \
 	frame.origin.y = (CGFloat)(_frame.top) / f; \
 	frame.size.width = (CGFloat)(_frame.getWidth()) / f; \

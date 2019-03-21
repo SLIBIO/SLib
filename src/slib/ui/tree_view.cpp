@@ -489,7 +489,8 @@ namespace slib
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
 		
-		ScrollView::setCreatingNativeWidget(sl_false);
+		setCreatingInstance(sl_false);
+		setCreatingNativeWidget(sl_false);
 		setUsingFont(sl_true);
 		setSavingCanvasState(sl_false);
 		

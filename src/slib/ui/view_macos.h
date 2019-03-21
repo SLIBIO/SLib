@@ -99,15 +99,21 @@ namespace slib
 		
 		void applyModifiers(UIEvent* ev, NSEvent* event);
 		
+		void updateFrameAndTransform();
+		
 	private:
 		void _release();
 		
 	protected:
 		NSView* m_handle;
 		
+	public:
+		UIRect m_frame;
+		Matrix3 m_transform;
+		
 	};
 
-	void _priv_macOS_transformViewFrame(NSPoint& origin, NSSize& size, const UIRect& frame, sl_real translationX, sl_real translationY, sl_real scaleX, sl_real scaleY, sl_real rotationRadian, sl_real anchorOffsetX, sl_real anchorOffsetY);
+	NSRect _priv_macOS_getViewFrameAndTransform(const UIRect& frame, const Matrix3& transform, sl_real& rotation);
 
 }
 
@@ -136,29 +142,20 @@ namespace slib
 #define MACOS_VIEW_CREATE_INSTANCE_BEGIN \
 	Ref<macOS_ViewInstance> ret; \
 	NSView* parent = UIPlatform::getViewHandle(_parent); \
-	UIRect _frame = getFrame(); \
-	NSRect frame; \
-	frame.origin.x = (CGFloat)(_frame.left); \
-	frame.origin.y = (CGFloat)(_frame.top); \
-	frame.size.width = (CGFloat)(_frame.getWidth()); \
-	frame.size.height = (CGFloat)(_frame.getHeight());
+	UIRect frameView = getFrameInInstance(); \
+	Matrix3 transformView = getFinalTransformInInstance(); \
+	sl_real rotation; \
+	NSRect frame = _priv_macOS_getViewFrameAndTransform(frameView, transformView, rotation); \
 
 #define MACOS_VIEW_CREATE_INSTANCE_END \
 	if (handle != nil) { \
-		Vector2 t; \
-		sl_real r; \
-		Vector2 s; \
-		Vector2 anchor; \
-		if (getFinalTranslationRotationScale(&t, &r, &s, &anchor)) { \
-			NSPoint pt; \
-			NSSize size; \
-			_priv_macOS_transformViewFrame(pt, size, _frame, t.x, t.y, s.x, s.y, r, anchor.x, anchor.y); \
-			[handle setFrameOrigin:pt]; \
-			[handle setFrameSize:size]; \
-			handle.frameRotation = Math::getDegreesFromRadian(r); \
+		if (!(Math::isAlmostZero(rotation))) { \
+			handle.frameRotation = Math::getDegreesFromRadian(rotation); \
 		} \
 		ret = macOS_ViewInstance::create(handle, parent, this); \
 		if (ret.isNotNull()) { \
+			ret->m_frame = frameView; \
+			ret->m_transform = transformView; \
 			handle->m_viewInstance = ret; \
 		} \
 	}

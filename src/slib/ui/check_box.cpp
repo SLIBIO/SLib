@@ -120,9 +120,7 @@ namespace slib
 	}
 
 	CheckBox::CheckBox(sl_uint32 nCategories, ButtonCategory* categories) : Button(nCategories, categories)
-	{
-		setCreatingNativeWidget(sl_false);
-		
+	{		
 		m_flagChecked = sl_false;
 		
 		setGravity(Alignment::MiddleLeft, UIUpdateMode::Init);

@@ -24,6 +24,10 @@
 
 #include "slib/core/safe_static.h"
 
+#if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_IOS) || defined(SLIB_UI_IS_WIN32) || defined(SLIB_UI_IS_ANDROID)
+#	define HAS_NATIVE_WIDGET_IMPL
+#endif
+
 namespace slib
 {
 
@@ -108,7 +112,9 @@ namespace slib
 	
 	SelectView::SelectView()
 	{
+#ifdef HAS_NATIVE_WIDGET_IMPL
 		setCreatingNativeWidget(sl_true);
+#endif
 		setUsingFont(sl_true);
 		setBorder(sl_true, UIUpdateMode::Init);
 		setBackgroundColor(Color::White, UIUpdateMode::Init);
@@ -533,7 +539,7 @@ namespace slib
 		return ret;
 	}
 	
-#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_WIN32) && !defined(SLIB_UI_IS_ANDROID)
+#if !defined(HAS_NATIVE_WIDGET_IMPL)
 	Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;

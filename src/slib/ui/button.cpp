@@ -104,7 +104,6 @@ namespace slib
 
 	Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 	{
-		setCreatingNativeWidget(sl_false);
 		setFocusable(sl_true);
 		
 		m_flagMultiLine = sl_false;
