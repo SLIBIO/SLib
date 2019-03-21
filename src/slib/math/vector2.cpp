@@ -95,11 +95,7 @@ namespace slib
 	template <class T, class FT>
 	FT Vector2T<T, FT>::getCosBetween(const Vector2T<T, FT>& other) const noexcept
 	{
-		FT ret = (FT)(dot(other)) / Math::sqrt((FT)(getLength2p() * other.getLength2p()));
-		if (ret > 1) {
-			ret = 1;
-		}
-		return ret;
+		return (FT)(dot(other)) / Math::sqrt((FT)(getLength2p() * other.getLength2p()));
 	}
 
 	template <class T, class FT>
