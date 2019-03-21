@@ -91,7 +91,14 @@ namespace slib
 		static void setTransformFromDirToDir(Matrix3T<T>& _out, const Vector2T<T>& from, const Vector2T<T>& to) noexcept;
 
 		static Matrix3T<T> getTransformMatrixFromDirToDir(const Vector2T<T>& from, const Vector2T<T>& to) noexcept;
-
+		
+		
+		static Vector2T<T> getScaleFromMatrix(const Matrix3T<T>& mat);
+		
+		static T getRotationAngleFromMatrix(const Matrix3T<T>& mat);
+		
+		static Vector2T<T> getTranslationFromMatrix(const Matrix3T<T>& mat);
+		
 	};
 	
 	extern template class Transform2T<float>;

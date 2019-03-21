@@ -245,6 +245,37 @@ namespace slib
 		return ret;
 	}
 
+	template <class T>
+	Vector2T<T> Transform2T<T>::getScaleFromMatrix(const Matrix3T<T>& mat)
+	{
+		Vector2T<T> ret;
+		ret.x = Math::sqrt(mat.m00 * mat.m00 + mat.m01 * mat.m01);
+		ret.y = Math::sqrt(mat.m10 * mat.m10 + mat.m11 * mat.m11);
+		return ret;
+	}
+	
+	template <class T>
+	T Transform2T<T>::getRotationAngleFromMatrix(const Matrix3T<T>& mat)
+	{
+		T x = mat.m00;
+		T y = mat.m01;
+		T cos = x / Math::sqrt(x * x + y * y);
+		T a = Math::arccos(cos);
+		if (y < 0) {
+			a = -a;
+		}
+		return a;
+	}
+	
+	template <class T>
+	Vector2T<T> Transform2T<T>::getTranslationFromMatrix(const Matrix3T<T>& mat)
+	{
+		Vector2T<T> ret;
+		ret.x = mat.m20;
+		ret.y = mat.m21;
+		return ret;
+	}
+
 	SLIB_DEFINE_GEOMETRY_TYPE(Transform2)
 
 }
