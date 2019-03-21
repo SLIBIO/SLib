@@ -10,7 +10,7 @@ android {
         versionName "1.1"
         externalNativeBuild {
             cmake {
-                targets 'slib', 'cpufeatures', 'freetype', 'sqlite3', 'opus', 'vpx', 'zxing', 'hiredis'
+                targets 'slib', 'freetype', 'sqlite3', 'opus', 'vpx', 'zxing', 'hiredis'
                 arguments '-DANDROID_ARM_MODE=arm', '-DANDROID_ARM_NEON=TRUE'
             }
         }

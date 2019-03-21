@@ -39,6 +39,7 @@ if (ANDROID)
  include_directories (
   "${SLIB_PATH}/include"
   "${SLIB_PATH}/external/include"
+  "${SLIB_PATH}/external/src/android"
  )
 else ()
  include_directories (
@@ -62,17 +63,6 @@ if (ANDROID AND SLIB_X86)
   "<CMAKE_ASM_NASM_COMPILER> <FLAGS> -o <OBJECT> <SOURCE>"
  )
 endif ()
-
-if(ANDROID)
- include_directories("${ANDROID_NDK}/sources/android/cpufeatures")
- add_library(cpufeatures "${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c")
- target_link_libraries(cpufeatures dl)
- set_target_properties (
-  cpufeatures
-  PROPERTIES
-  ARCHIVE_OUTPUT_DIRECTORY "${SLIB_LIB_PATH}"
- )
-endif()
 
 set (SLIB_CORE_FILES
  "${SLIB_PATH}/src/slib/core/animation.cpp"
@@ -397,6 +387,8 @@ if(ANDROID)
   "${SLIB_PATH}/src/slib/ui/view_android.cpp"
   "${SLIB_PATH}/src/slib/ui/web_view_android.cpp"
   "${SLIB_PATH}/src/slib/ui/window_android.cpp"
+
+  "${SLIB_PATH}/external/src/android/cpu-features.c"
  )
 else ()
  set (SLIB_EXTRA_PLATFORM_FILES

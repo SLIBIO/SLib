@@ -1,0 +1,6 @@
+#define android_getCpuFamily slib_android_getCpuFamily
+#define android_getCpuFeatures slib_android_getCpuFeatures
+#define android_getCpuCount slib_android_getCpuCount
+#define android_setCpu slib_android_setCpu
+#define android_getCpuIdArm slib_android_getCpuIdArm
+#define android_setCpuArm slib_android_setCpuArm
