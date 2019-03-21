@@ -115,6 +115,8 @@ public class Android {
 				View view = activity.getCurrentFocus();
 				if (view != null) {
 					imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+				} else {
+					imm.hideSoftInputFromWindow(activity.getWindow().getDecorView().getWindowToken(), 0);
 				}
 			}
 		} catch (Exception e) {
