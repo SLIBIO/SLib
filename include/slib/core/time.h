@@ -195,7 +195,43 @@ namespace slib
 	
 	public:
 		static Time now() noexcept;
+		
+		static Time withMicroseconds(sl_int64 s) noexcept;
+		
+		static Time withMicrosecondsf(double s) noexcept;
 
+		static Time withMilliseconds(sl_int64 s) noexcept;
+		
+		static Time withMillisecondsf(double s) noexcept;
+
+		static Time withSeconds(sl_int64 s) noexcept;
+		
+		static Time withSecondsf(double s) noexcept;
+
+		static Time withMinutes(sl_int64 minutes) noexcept;
+		
+		static Time withMinutesf(double minutes) noexcept;
+		
+		static Time withHours(sl_int64 hours) noexcept;
+		
+		static Time withHoursf(double hours) noexcept;
+		
+		static Time withDays(sl_int64 days) noexcept;
+		
+		static Time withDaysf(double days) noexcept;
+		
+		static Time withTime(sl_int64 hours, sl_int64 minutes, sl_int64 seconds) noexcept;
+		
+		static Time withTimef(double hours, double minutes, double seconds) noexcept;
+
+		static Time withTime(sl_int64 hours, sl_int64 minutes, sl_int64 seconds, sl_int64 milliseconds) noexcept;
+		
+		static Time withTimef(double hours, double minutes, double seconds, double milliseconds) noexcept;
+
+		static Time withTime(sl_int64 hours, sl_int64 minutes, sl_int64 seconds, sl_int64 milliseconds, sl_int64 microseconds) noexcept;
+		
+		static Time withTimef(double hours, double minutes, double seconds, double milliseconds, double microseconds) noexcept;
+		
 		SLIB_INLINE constexpr static Time zero()
 		{
 			return 0;
@@ -506,6 +542,10 @@ namespace slib
 		String getTimeString(const TimeZone& zone = TimeZone::Local) const noexcept;
 
 		String16 getTimeString16(const TimeZone& zone = TimeZone::Local) const noexcept;
+		
+		String getPeriodString(const Time& minUnit = Time::withSeconds(1), const Time& maxUnit = Time::zero(), const Locale& locale = Locale::Unknown) const noexcept;
+		
+		String getDiffString(const Time& timeFrom, const Time& minUnit = Time::withSeconds(1), const Time& maxUnit = Time::zero(), const Locale& locale = Locale::Unknown) const noexcept;
 		
 
 		sl_bool setString(const String& str, const TimeZone& zone = TimeZone::Local) noexcept;

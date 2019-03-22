@@ -202,7 +202,97 @@ namespace slib
 		ret.setNow();
 		return ret;
 	}
-
+	
+	Time Time::withMicroseconds(sl_int64 s) noexcept
+	{
+		return s;
+	}
+	
+	Time Time::withMicrosecondsf(double s) noexcept
+	{
+		return (sl_int64)(s);
+	}
+	
+	Time Time::withMilliseconds(sl_int64 s) noexcept
+	{
+		return s * TIME_MILLIS;
+	}
+	
+	Time Time::withMillisecondsf(double s) noexcept
+	{
+		return (sl_int64)(s * TIME_MILLISF);
+	}
+	
+	Time Time::withSeconds(sl_int64 s) noexcept
+	{
+		return s * TIME_SECOND;
+	}
+	
+	Time Time::withSecondsf(double s) noexcept
+	{
+		return (sl_int64)(s * TIME_SECONDF);
+	}
+	
+	Time Time::withMinutes(sl_int64 minutes) noexcept
+	{
+		return minutes * TIME_MINUTE;
+	}
+	
+	Time Time::withMinutesf(double minutes) noexcept
+	{
+		return (sl_int64)(minutes * TIME_MINUTEF);
+	}
+	
+	Time Time::withHours(sl_int64 hours) noexcept
+	{
+		return hours * TIME_HOUR;
+	}
+	
+	Time Time::withHoursf(double hours) noexcept
+	{
+		return (sl_int64)(hours * TIME_HOURF);
+	}
+	
+	Time Time::withDays(sl_int64 days) noexcept
+	{
+		return days * TIME_DAY;
+	}
+	
+	Time Time::withDaysf(double days) noexcept
+	{
+		return (sl_int64)(days * TIME_DAYF);
+	}
+	
+	Time Time::withTime(sl_int64 hours, sl_int64 minutes, sl_int64 seconds) noexcept
+	{
+		return hours * TIME_HOUR + minutes * TIME_MINUTE + seconds * TIME_SECOND;
+	}
+	
+	Time Time::withTimef(double hours, double minutes, double seconds) noexcept
+	{
+		return (sl_int64)(hours * TIME_HOURF + minutes * TIME_MINUTEF + seconds * TIME_SECONDF);
+	}
+	
+	Time Time::withTime(sl_int64 hours, sl_int64 minutes, sl_int64 seconds, sl_int64 milliseconds) noexcept
+	{
+		return hours * TIME_HOUR + minutes * TIME_MINUTE + seconds * TIME_SECOND + milliseconds * TIME_MILLIS;
+	}
+	
+	Time Time::withTimef(double hours, double minutes, double seconds, double milliseconds) noexcept
+	{
+		return (sl_int64)(hours * TIME_HOURF + minutes * TIME_MINUTEF + seconds * TIME_SECONDF + milliseconds * TIME_MILLISF);
+	}
+	
+	Time Time::withTime(sl_int64 hours, sl_int64 minutes, sl_int64 seconds, sl_int64 milliseconds, sl_int64 microseconds) noexcept
+	{
+		return hours * TIME_HOUR + minutes * TIME_MINUTE + seconds * TIME_SECOND + milliseconds * TIME_MILLIS + microseconds;
+	}
+	
+	Time Time::withTimef(double hours, double minutes, double seconds, double milliseconds, double microseconds) noexcept
+	{
+		return (sl_int64)(hours * TIME_HOURF + minutes * TIME_MINUTEF + seconds * TIME_SECONDF + milliseconds * TIME_MILLISF + microseconds);
+	}
+	
 	Time& Time::setInt(sl_int64 time) noexcept
 	{
 		m_time = time;
@@ -1313,6 +1403,142 @@ namespace slib
 		}
 		sb.add(String16::fromInt32(d.second, 10, 2));
 		return sb.merge();
+	}
+	
+	String Time::getPeriodString(const Time& minUnit, const Time& maxUnit, const Locale& locale) const noexcept
+	{
+		sl_int64 n = m_time;
+		if (n < 0) {
+			n = -n;
+		}
+		if (n < minUnit.m_time) {
+			return sl_null;
+		}
+		sl_int64 max = maxUnit.m_time;
+		if (max <= 0) {
+			max = TIME_DAY * 1000;
+		}
+		Language lang = locale.getLanguage();
+		if (n < TIME_SECOND || max < TIME_SECOND) {
+			sl_int64 t = getMillisecondsCount();
+			return String::fromInt64(t) + "ms";
+		} else if (n < TIME_MINUTE || max <= TIME_SECOND) {
+			sl_int64 t = getSecondsCount();
+			if (lang == Language::Korean) {
+				return String::fromInt64(t) + "\xEC\xB4\x88";
+			} else {
+				if (t == 1) {
+					SLIB_RETURN_STRING("1 second");
+				} else {
+					return String::fromInt64(t) + " seconds";
+				}
+			}
+		} else if (n < TIME_HOUR || max <= TIME_MINUTE) {
+			sl_int64 t = getMinutesCount();
+			if (lang == Language::Korean) {
+				return String::fromInt64(t) + "\xEB\xB6\x84";
+			} else {
+				if (t == 1) {
+					SLIB_RETURN_STRING("1 minute");
+				} else {
+					return String::fromInt64(t) + " minutes";
+				}
+			}
+		} else if (n < TIME_DAY || max <= TIME_HOUR) {
+			sl_int64 t = getHoursCount();
+			if (lang == Language::Korean) {
+				return String::fromInt64(t) + "\xEC\x8B\x9C\xEA\xB0\x84";
+			} else {
+				if (t == 1) {
+					SLIB_RETURN_STRING("1 hour");
+				} else {
+					return String::fromInt64(t) + " hours";
+				}
+			}
+		} else if (n < TIME_DAY*32 || max <= TIME_DAY) {
+			sl_int64 t = getDaysCount();
+			if (lang == Language::Korean) {
+				return String::fromInt64(t) + "\xEC\x9D\xBC";
+			} else {
+				if (t == 1) {
+					SLIB_RETURN_STRING("1 day");
+				} else {
+					return String::fromInt64(t) + " days";
+				}
+			}
+		} else if (n < TIME_DAY*366 || max < TIME_DAY*32) {
+			sl_int64 t = (sl_int64)(getDaysCountf() / 30.5);
+			if (lang == Language::Korean) {
+				return String::fromInt64(t) + "\xEB\x8B\xAC";
+			} else {
+				if (t == 1) {
+					SLIB_RETURN_STRING("1 month");
+				} else {
+					return String::fromInt64(t) + " months";
+				}
+			}
+		} else {
+			sl_int64 t = (sl_int64)(getDaysCountf() / 365.25);
+			if (lang == Language::Korean) {
+				return String::fromInt64(t) + "\xEB\x85\x84";
+			} else {
+				if (t == 1) {
+					SLIB_RETURN_STRING("1 year");
+				} else {
+					return String::fromInt64(t) + " years";
+				}
+			}
+		}
+	}
+	
+	String Time::getDiffString(const Time& timeFrom, const Time& minUnit, const Time& maxUnit, const Locale& locale) const noexcept
+	{
+		Time diff = *this - timeFrom;
+		sl_bool flagAgo;
+		if (diff.m_time > 0) {
+			flagAgo = sl_false;
+		} else {
+			flagAgo = sl_true;
+			diff.m_time = - (diff.m_time);
+		}
+		Language lang = locale.getLanguage();
+		if (diff < minUnit) {
+			if (lang == Language::Korean) {
+				if (minUnit.m_time < TIME_DAY) {
+					SLIB_RETURN_STRING("\xEB\xB0\xA9\xEA\xB8\x88");
+				} else {
+					SLIB_RETURN_STRING("\xEC\x98\xA4\xEB\x8A\x98");
+				}
+			} else {
+				if (minUnit.m_time < TIME_DAY) {
+					SLIB_RETURN_STRING("Just now");
+				} else {
+					SLIB_RETURN_STRING("Today");
+				}
+			}
+		}
+		String s = diff.getPeriodString(minUnit, maxUnit, locale);
+		if (lang == Language::Korean) {
+			if (locale.getCountry() == Country::DPRK) {
+				if (flagAgo) {
+					return s + "\xEC\xA0\x84";
+				} else {
+					return s + "\xED\x9B\x84";
+				}
+			} else {
+				if (flagAgo) {
+					return s + " \xEC\xA0\x84";
+				} else {
+					return s + " \xED\x9B\x84";
+				}
+			}
+		} else {
+			if (flagAgo) {
+				return s + " ago";
+			} else {
+				return s + " later";
+			}
+		}
 	}
 	
 	sl_bool Time::setString(const String& str, const TimeZone& zone) noexcept
