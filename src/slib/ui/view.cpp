@@ -2021,8 +2021,8 @@ namespace slib
 		
 		if (widthMode == SizeMode::Filling) {
 			if (leftMode == PositionMode::CenterInParent || leftMode == PositionMode::CenterInOther) {
-				widthMode = SizeMode::Weight;
-				rightMode = PositionMode::Free;
+				leftMode = PositionMode::ParentEdge;
+				rightMode = PositionMode::ParentEdge;
 			}
 		} else {
 			if (leftMode != PositionMode::Free) {
@@ -2031,8 +2031,8 @@ namespace slib
 		}
 		if (heightMode == SizeMode::Filling) {
 			if (topMode == PositionMode::CenterInParent || topMode == PositionMode::CenterInOther) {
-				heightMode = SizeMode::Weight;
-				bottomMode = PositionMode::Free;
+				topMode = PositionMode::ParentEdge;
+				bottomMode = PositionMode::ParentEdge;
 			}
 		} else {
 			if (topMode != PositionMode::Free) {
@@ -2419,8 +2419,8 @@ namespace slib
 		PositionMode rightMode = layoutAttrs->rightMode;
 		if (widthMode == SizeMode::Filling) {
 			if (leftMode == PositionMode::CenterInParent || leftMode == PositionMode::CenterInOther) {
-				widthMode = SizeMode::Weight;
-				rightMode = PositionMode::Free;
+				leftMode = PositionMode::ParentEdge;
+				rightMode = PositionMode::ParentEdge;
 			}
 		} else {
 			if (leftMode != PositionMode::Free) {
@@ -2509,8 +2509,8 @@ namespace slib
 		PositionMode bottomMode = layoutAttrs->bottomMode;
 		if (heightMode == SizeMode::Filling) {
 			if (topMode == PositionMode::CenterInParent || topMode == PositionMode::CenterInOther) {
-				heightMode = SizeMode::Weight;
-				bottomMode = PositionMode::Free;
+				topMode = PositionMode::ParentEdge;
+				bottomMode = PositionMode::ParentEdge;
 			}
 		} else {
 			if (topMode != PositionMode::Free) {
