@@ -27,6 +27,7 @@
 #include "view_ios.h"
 
 #include "slib/ui/core.h"
+#include "slib/ui/scroll_view.h"
 
 namespace slib
 {
@@ -430,7 +431,18 @@ namespace slib
 				Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, context, (sl_uint32)(rectBound.size.width), (sl_uint32)(rectBound.size.height));
 				
 				if (canvas.isNotNull()) {
-					canvas->setInvalidatedRect(Rectangle((sl_real)(rectDirty.origin.x * f), (sl_real)(rectDirty.origin.y * f), (sl_real)((rectDirty.origin.x + rectDirty.size.width) * f), (sl_real)((rectDirty.origin.y + rectDirty.size.height) * f)));
+					Rectangle rectInvalidate((sl_real)(rectDirty.origin.x * f), (sl_real)(rectDirty.origin.y * f), (sl_real)((rectDirty.origin.x + rectDirty.size.width) * f), (sl_real)((rectDirty.origin.y + rectDirty.size.height) * f));
+					if ([handle isKindOfClass:[UIScrollView class]]) {
+						CGPoint pt = ((UIScrollView*)handle).contentOffset;
+						sl_real sx = (sl_real)(pt.x * f);
+						sl_real sy = (sl_real)(pt.y * f);
+						rectInvalidate.left += sx;
+						rectInvalidate.top += sy;
+						rectInvalidate.right += sx;
+						rectInvalidate.bottom += sy;
+						canvas->translate(-sx, -sy);
+					}
+					canvas->setInvalidatedRect(rectInvalidate);
 					ViewInstance::onDraw(canvas.get());
 				}
 			}
@@ -507,7 +519,12 @@ namespace slib
 	Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_iOS_ViewHandle* handle = [[_priv_Slib_iOS_ViewHandle alloc] initWithFrame:frame];
+		_priv_Slib_iOS_ViewHandle* handle;
+		if (IsInstanceOf<ScrollView>(getParent())) {
+			handle = [[_priv_Slib_iOS_ScrollContentViewHandle alloc] initWithFrame:frame];
+		} else {
+			handle = [[_priv_Slib_iOS_ViewHandle alloc] initWithFrame:frame];
+		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
@@ -546,6 +563,15 @@ namespace slib
 }
 
 IOS_VIEW_EVENTS
+
+@end
+
+@implementation _priv_Slib_iOS_ScrollContentViewHandle
+
++(Class)layerClass
+{
+	return CATiledLayer.class;
+}
 
 @end
 

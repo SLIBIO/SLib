@@ -27,10 +27,6 @@
 #define MAX_ITEMS_VISIBLE 500
 #define MAX_MID_HEIGHT 1000000
 
-#if !defined(SLIB_UI_IS_WIN32) && !defined(SLIB_UI_IS_IOS)
-#	define USE_CONTENT_VIEW
-#endif
-
 namespace slib
 {
 	class _priv_ListContentView : public ViewGroup
@@ -79,15 +75,8 @@ namespace slib
 		
 		m_contentView = new _priv_ListContentView;
 		m_contentView->m_lv = this;
-#ifdef USE_CONTENT_VIEW
-		ScrollView::setContentView(m_contentView);
-#else
-		m_contentView->setCreatingInstance(sl_true);
-		m_contentView->setAttachMode(UIAttachMode::AttachInNativeWidget);
-		addChild(m_contentView, UIUpdateMode::Init);
-		setCreatingChildInstances(sl_true);
-#endif
-		
+
+		ScrollView::setContentView(m_contentView);		
 	}
 	
 	ListView::~ListView()
@@ -370,7 +359,9 @@ namespace slib
 	{
 		Ref<View> view = adapter->getView(index, original, m_contentView.get());
 		if (view.isNotNull()) {
+#if !defined(SLIB_UI_IS_WIN32)
 			view->setCreatingInstance(sl_true);
+#endif
 			View::LayoutAttributes* attrs = view->m_layoutAttrs.get();
 			if (attrs) {
 				attrs->topMode = PositionMode::Free;
@@ -727,12 +718,7 @@ namespace slib
 				
 				// layout views
 				{
-					sl_ui_pos y;
-#if defined(USE_CONTENT_VIEW)
-					y = yStart;
-#else
-					y = yStart - scrollY;
-#endif
+					sl_ui_pos y = yStart;
 					for (sl_size i = 0; i < countVisibleItems; i++) {
 						Ref<View> view = viewsVisibleItems[i];
 						sl_ui_pos b = y + heightsVisibleItems[i];
@@ -771,21 +757,6 @@ namespace slib
 					scrollTo(0, (sl_scroll_pos)scrollY);
 				}
 				
-#if !defined(USE_CONTENT_VIEW)
-#if defined(SLIB_UI_IS_IOS)
-				if (isNativeWidget()) {
-					UIRect rcContent = getBounds();
-					rcContent.top += scrollY;
-					rcContent.bottom += scrollY;
-					rcContent.fixSizeError();
-					contentView->setFrame(rcContent, UIUpdateMode::None);
-				} else {
-					contentView->setFrame(getBounds(), UIUpdateMode::None);
-				}
-#else
-				contentView->setFrame(getBounds(), UIUpdateMode::None);
-#endif
-#endif
 				if (!fromDraw) {
 					contentView->invalidate();
 				}

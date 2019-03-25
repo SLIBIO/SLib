@@ -115,6 +115,12 @@ namespace slib
 
 @end
 
+@interface _priv_Slib_iOS_ScrollContentViewHandle : _priv_Slib_iOS_ViewHandle {
+		
+}
+
+@end
+
 
 #define IOS_VIEW_CREATE_INSTANCE_BEGIN \
 	Ref<iOS_ViewInstance> ret; \

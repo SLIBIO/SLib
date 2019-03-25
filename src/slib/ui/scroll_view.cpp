@@ -39,12 +39,10 @@ namespace slib
 #ifdef HAS_NATIVE_WIDGET_IMPL
 		setCreatingNativeWidget(sl_true);
 #endif
-		setCreatingChildInstances(sl_false);
-		setClipping(sl_true, UIUpdateMode::Init);
 		setSavingCanvasState(sl_false);
-		
+
+		setClipping(sl_true, UIUpdateMode::Init);
 		setScrolling(sl_true, sl_true, UIUpdateMode::Init);
-		
 	}
 	
 	ScrollView::~ScrollView()
@@ -68,8 +66,7 @@ namespace slib
 		m_viewContent = view;
 		if (view.isNotNull()) {
 			view->setParent(this);
-			view->setCreatingInstance(sl_true);
-			view->setAttachMode(UIAttachMode::NotAttach);
+			view->setAttachMode(UIAttachMode::NotAttachInNativeWidget);
 			if (isVerticalScrolling()) {
 				view->setTopFree(UIUpdateMode::Init);
 				view->setBottomFree(UIUpdateMode::Init);

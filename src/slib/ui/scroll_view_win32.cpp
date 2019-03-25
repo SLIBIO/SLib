@@ -50,69 +50,38 @@ namespace slib
 		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
 		{
 			HWND handle = getHandle();
-			if (msg == WM_ERASEBKGND) {
-				Ref<View> view = getView();
-				if (_priv_ScrollView* sv = CastInstance<_priv_ScrollView>(view.get())) {
-					Ref<View> cv = sv->getContentView();
-					if (cv.isNotNull()) {
-						if (cv->getWidth() >= sv->getWidth() && cv->getHeight() >= sv->getHeight()) {
-							result = TRUE;
-							return sl_true;
-						}
+			Ref<View> view = getView();
+			if (_priv_ScrollView* sv = CastInstance<_priv_ScrollView>(view.get())) {
+				sl_bool flagUpdateScroll = sl_false;
+				if (sv->isHorizontalScrolling()) {
+					if (Windows::processWindowHorizontalScrollEvents(handle, msg, wParam, lParam, PRIV_SCROLL_LINE_SIZE, PRIV_SCROLL_WHEEL_SIZE)) {
+						flagUpdateScroll = sl_true;
 					}
 				}
-				Color color = m_backgroundColor;
-				if (color.a < 255) {
-					Color c = GraphicsPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
-					c.blend_PA_NPA(color);
-					color = c;
+				if (sv->isVerticalScrolling()) {
+					if (Windows::processWindowVerticalScrollEvents(handle, msg, wParam, lParam, PRIV_SCROLL_LINE_SIZE, PRIV_SCROLL_WHEEL_SIZE)) {
+						flagUpdateScroll = sl_true;
+					}
 				}
-				HBRUSH hbr = ::CreateSolidBrush(RGB(color.r, color.g, color.b));
-				if (hbr) {
-					HDC hDC = (HDC)(wParam);
-					RECT rc;
-					::GetClientRect(handle, &rc);
-					::FillRect(hDC, &rc, hbr);
-					::DeleteObject(hbr);
-					result = TRUE;
+				if (flagUpdateScroll) {
+					SCROLLINFO si;
+					Base::zeroMemory(&si, sizeof(si));
+					si.cbSize = sizeof(si);
+					si.fMask = SIF_POS;
+					::GetScrollInfo(handle, SB_HORZ, &si);
+					int x = si.nPos;
+					::GetScrollInfo(handle, SB_VERT, &si);
+					int y = si.nPos;
+					_refreshContentPosition(sv, (sl_scroll_pos)x, (sl_scroll_pos)y, sl_true);
+					result = 0;
 					return sl_true;
 				}
-			} else {
-				Ref<View> view = getView();
-				if (_priv_ScrollView* sv = CastInstance<_priv_ScrollView>(view.get())) {
-					sl_bool flagUpdateScroll = sl_false;
-					if (sv->isHorizontalScrolling()) {
-						if (Windows::processWindowHorizontalScrollEvents(handle, msg, wParam, lParam, PRIV_SCROLL_LINE_SIZE, PRIV_SCROLL_WHEEL_SIZE)) {
-							flagUpdateScroll = sl_true;
-						}
-					}
-					if (sv->isVerticalScrolling()) {
-						if (Windows::processWindowVerticalScrollEvents(handle, msg, wParam, lParam, PRIV_SCROLL_LINE_SIZE, PRIV_SCROLL_WHEEL_SIZE)) {
-							flagUpdateScroll = sl_true;
-						}
-					}
-					if (flagUpdateScroll) {
-						SCROLLINFO si;
-						Base::zeroMemory(&si, sizeof(si));
-						si.fMask = SIF_POS;
-						::GetScrollInfo(handle, SB_HORZ, &si);
-						int x = si.nPos;
-						::GetScrollInfo(handle, SB_VERT, &si);
-						int y = si.nPos;
-						_refreshContentPosition(sv, (sl_scroll_pos)x, (sl_scroll_pos)y, sl_true);
-						return sl_true;
-					}
-
-				}
 			}
-			return sl_false;
+			return Win32_ViewInstance::processWindowMessage(msg, wParam, lParam, result);
 		}
 
 		void _setContentView(const Ref<View>& viewChild, _priv_ScrollView* viewParent)
 		{
-			if (viewChild.isNotNull()) {
-				viewChild->attachToNewInstance(this);
-			}
 			_refreshContentSize(viewParent);
 		}
 
@@ -138,7 +107,7 @@ namespace slib
 			if (handle) {
 				Ref<View> viewContent = view->getContentView();
 				if (viewContent.isNotNull()) {
-					viewContent->setLocation((sl_ui_pos)(-x), (sl_ui_pos)(-y));
+					viewContent->setLocation((sl_ui_pos)(-x), (sl_ui_pos)(-y), UIUpdateMode::Redraw);
 				}
 				if (flagFromEvent) {
 					view->_onScroll_NW(x, y);

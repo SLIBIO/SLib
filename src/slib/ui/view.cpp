@@ -28,6 +28,7 @@
 #include "slib/ui/render_view.h"
 #include "slib/ui/animation.h"
 #include "slib/ui/resource.h"
+#include "slib/ui/scroll_view.h"
 
 #include "slib/core/scoped.h"
 #include "slib/core/timer.h"
@@ -70,7 +71,7 @@ namespace slib
 		m_flagPressed(sl_false),
 		m_flagHover(sl_false),
 	
-		m_attachMode(UIAttachMode::NotAttachInNativeWidget),
+		m_attachMode(UIAttachMode::AttachAlways),
 		m_visibility(Visibility::Visible),
 	
 		m_frame(0, 0, 0, 0),
@@ -488,22 +489,18 @@ namespace slib
 
 	Ref<ViewInstance> View::createInstance(ViewInstance* parent)
 	{
-		if (m_flagCreatingInstance) {
-			Ref<ViewInstance> ret;
-			m_flagCurrentCreatingInstance = sl_true;
-			if (m_flagCreatingNativeWidget) {
-				ret = createNativeWidget(parent);
-				if (ret.isNotNull()) {
-					ret->setNativeWidget(sl_true);
-					m_flagCurrentCreatingInstance = sl_false;
-					return ret;
-				}
+		m_flagCurrentCreatingInstance = sl_true;
+		if (m_flagCreatingNativeWidget) {
+			Ref<ViewInstance> ret = createNativeWidget(parent);
+			if (ret.isNotNull()) {
+				ret->setNativeWidget(sl_true);
+				m_flagCurrentCreatingInstance = sl_false;
+				return ret;
 			}
-			ret = createGenericInstance(parent);
-			m_flagCurrentCreatingInstance = sl_false;
-			return ret;
 		}
-		return sl_null;
+		Ref<ViewInstance> ret = createGenericInstance(parent);
+		m_flagCurrentCreatingInstance = sl_false;
+		return ret;
 	}
 
 	sl_bool View::isNativeWidget()
@@ -1162,7 +1159,13 @@ namespace slib
 		}
 		Ref<ViewInstance> instance = m_instance;
 		if (instance.isNotNull() && instance->isNativeWidget()) {
+#if defined(SLIB_UI_IS_WIN32)
+			if (!(IsInstanceOf<ScrollView>(this))) {
+				return;
+			}
+#else
 			return;
+#endif
 		}
 		if (m_frame.getWidth() > 0 && m_frame.getHeight() > 0) {
 			if (isDrawingThread()) {
@@ -1193,7 +1196,13 @@ namespace slib
 		}
 		Ref<ViewInstance> instance = m_instance;
 		if (instance.isNotNull() && instance->isNativeWidget()) {
+#if defined(SLIB_UI_IS_WIN32)
+			if (!(IsInstanceOf<ScrollView>(this))) {
+				return;
+			}
+#else
 			return;
+#endif
 		}
 		UIRect rectIntersect;
 		if (getBounds().intersectRectangle(rect, &rectIntersect)) {
@@ -2330,6 +2339,7 @@ namespace slib
 		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 
 		if (!m_flagNeedApplyLayout) {
+			invalidate(mode);
 			return;
 		}
 		m_flagNeedApplyLayout = sl_false;
@@ -7414,7 +7424,7 @@ namespace slib
 				}
 			}
 			
-			if (m_scrollAttrs.isNotNull()) {
+			if (m_scrollAttrs.isNotNull() && !isNativeWidget()) {
 				Ref<View> scrollBars[2];
 				_getScrollBars(scrollBars);
 				if (scrollBars[0].isNotNull() || scrollBars[1].isNotNull()) {

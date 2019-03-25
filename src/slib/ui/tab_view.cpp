@@ -183,7 +183,6 @@ namespace slib
 			if (item->contentView != view) {
 				removeChild(item->contentView, SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::None);
 				if (view.isNotNull()) {
-					view->setCreatingInstance(sl_true);
 					view->setAttachMode(UIAttachMode::NotAttachInNativeWidget);
 					view->setFrame(getTabContentRegion(), SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::UpdateLayout);
 					addChild(view, SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::UpdateLayout);
