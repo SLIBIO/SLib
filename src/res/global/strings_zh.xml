@@ -4,5 +4,7 @@
 		<string name='cancel'>取消</string>
 		<string name='yes'>是</string>
 		<string name='no'>否</string>
+		<string name='today'>今天</string>
+		<string name='yesterday'>昨天</string>
 	</strings>
 </sapp>

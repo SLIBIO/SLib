@@ -4,5 +4,7 @@
 		<string name='cancel'>취소</string>
 		<string name='yes'>예</string>
 		<string name='no'>아니</string>
+		<string name='today'>오늘</string>
+		<string name='yesterday'>어제</string>
 	</strings>
 </sapp>
