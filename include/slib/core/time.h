@@ -136,6 +136,46 @@ namespace slib
 		Short = 1,
 		SingleChar = 2
 	};
+	
+	enum class TimeFormat
+	{
+		DateTime,
+		ShortDateTime,
+		DateTime_12Hour,
+		ShortDateTime_12Hour,
+		Date,
+		ShortDate,
+		Time,
+		ShortTime,
+		Time_12Hour,
+		ShortTime_12Hour,
+		Year,
+		Month,
+		ShortMonth,
+		Day,
+		Hour,
+		Hour_12,
+		Hour_AM_PM,
+		AM_PM,
+		Minute,
+		Second,
+		YearMonth,
+		ShortYearMonth,
+		MonthDay,
+		ShortMonthDay,
+		HourMinute,
+		HourMinute_12Hour,
+		ShortHourMinute_12Hour,
+		MinuteSecond,
+		Weekday,
+		ShortWeakday,
+		WeekdayDateTime,
+		ShortWeekdayDateTime,
+		WeekdayDateTime_12Hour,
+		ShortWeekdayDateTime_12Hour,
+		WeakdayDate,
+		ShortWeekdayDate
+	};
 
 	class SLIB_EXPORT TimeComponents
 	{
@@ -493,6 +533,8 @@ namespace slib
 
 		sl_int32 getQuarter(const TimeZone& zone = TimeZone::Local) const noexcept;
 		
+		Time getDateOnly(const TimeZone& zone = TimeZone::Local) const noexcept;
+
 		Time getTimeOnly(const TimeZone& zone = TimeZone::Local) const noexcept;
 
 		
@@ -509,6 +551,11 @@ namespace slib
 		String getWeekday(const TimeZone& zone, const Locale& locale = Locale::Unknown) const noexcept;
 		
 		String getWeekday(const Locale& locale = Locale::Unknown) const noexcept;
+		
+		
+		static String getAM_Text(const Locale& locale) noexcept;
+
+		static String getPM_Text(const Locale& locale) noexcept;
 
 		
 		// English
@@ -529,37 +576,24 @@ namespace slib
 		
 		String toString(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		String16 toString16(const TimeZone& zone = TimeZone::Local) const noexcept;
-
 		String getDateString(const TimeZone& zone = TimeZone::Local) const noexcept;
-
-		String16 getDateString16(const TimeZone& zone = TimeZone::Local) const noexcept;
 
 		String getDateString(sl_char8 delimiter, const TimeZone& zone = TimeZone::Local) const noexcept;
 		
-		String16 getDateString16(sl_char16 delimiter, const TimeZone& zone = TimeZone::Local) const noexcept;
-
 		String getTimeString(const TimeZone& zone = TimeZone::Local) const noexcept;
 
-		String16 getTimeString16(const TimeZone& zone = TimeZone::Local) const noexcept;
-		
 		String getPeriodString(const Time& minUnit = Time::withSeconds(1), const Time& maxUnit = Time::zero(), const Locale& locale = Locale::Unknown) const noexcept;
 		
 		String getDiffString(const Time& timeFrom, const Time& minUnit = Time::withSeconds(1), const Time& maxUnit = Time::zero(), const Locale& locale = Locale::Unknown) const noexcept;
 		
-
-		sl_bool setString(const String& str, const TimeZone& zone = TimeZone::Local) noexcept;
-
-		sl_bool setString(const String16& str, const TimeZone& zone = TimeZone::Local) noexcept;
-
-		sl_bool setString(const AtomicString& str, const TimeZone& zone = TimeZone::Local) noexcept;
-
-		sl_bool setString(const AtomicString16& str, const TimeZone& zone = TimeZone::Local) noexcept;
-
-		sl_bool setString(const sl_char8* str, const TimeZone& zone = TimeZone::Local) noexcept;
-
-		sl_bool setString(const sl_char16* str, const TimeZone& zone = TimeZone::Local) noexcept;
-
+		
+		static String format(const TimeComponents& comps, TimeFormat fmt, const Locale& locale = Locale::Unknown) noexcept;
+		
+		String format(TimeFormat fmt, const TimeZone& zone, const Locale& locale = Locale::Unknown) const noexcept;
+		
+		String format(TimeFormat fmt, const Locale& locale = Locale::Unknown) const noexcept;
+		
+		
 		String format(const String& fmt) const noexcept;
 
 		String format(const AtomicString& fmt) const noexcept;
@@ -572,6 +606,20 @@ namespace slib
 
 		String format(const sl_char16* fmt) const noexcept;
 	
+		
+		sl_bool setString(const String& str, const TimeZone& zone = TimeZone::Local) noexcept;
+		
+		sl_bool setString(const String16& str, const TimeZone& zone = TimeZone::Local) noexcept;
+		
+		sl_bool setString(const AtomicString& str, const TimeZone& zone = TimeZone::Local) noexcept;
+		
+		sl_bool setString(const AtomicString16& str, const TimeZone& zone = TimeZone::Local) noexcept;
+		
+		sl_bool setString(const sl_char8* str, const TimeZone& zone = TimeZone::Local) noexcept;
+		
+		sl_bool setString(const sl_char16* str, const TimeZone& zone = TimeZone::Local) noexcept;
+		
+		
 		template <class ST>
 		static sl_bool parse(const ST& str, TimeComponents* _out) noexcept
 		{

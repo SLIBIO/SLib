@@ -7940,25 +7940,19 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 									}
 									break;
 								case 'D':
-									if (sizeof(CT) == 1) {
-										content = time.getDateString(*zone);
-									} else {
-										content = time.getDateString16(*zone);
-									}
+									content = time.getDateString(*zone);
 									break;
 								case 'T':
-									if (sizeof(CT) == 1) {
-										content = time.getTimeString(*zone);
-									} else {
-										content = time.getTimeString16(*zone);
-									}
+									content = time.getTimeString(*zone);
+									break;
+								case 'O':
+									content = time.getMonthLong(*zone);
+									break;
+								case 'o':
+									content = time.getMonthShort(*zone);
 									break;
 								case 's':
-									if (sizeof(CT) == 1) {
-										content = time.toString(*zone);
-									} else {
-										content = time.toString16(*zone);
-									}
+									content = time.toString(*zone);
 									break;
 								default:
 									flagError = sl_true;
