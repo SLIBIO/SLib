@@ -2706,7 +2706,7 @@ namespace slib
 	template <class VALUE>
 	sl_bool Atomic< List<T> >::insertAll(sl_size index, const List<VALUE>& _other) noexcept
 	{
-		CList<VALUE>* other = _other.object;
+		CList<VALUE>* other = _other.ref._ptr;
 		if (!other) {
 			return sl_true;
 		}
@@ -2818,7 +2818,7 @@ namespace slib
 	template <class VALUE>
 	sl_bool Atomic< List<T> >::addAll(const List<VALUE>& _other) noexcept
 	{
-		CList<VALUE>* other = _other.object;
+		CList<VALUE>* other = _other.ref._ptr;
 		if (!other) {
 			return sl_true;
 		}
