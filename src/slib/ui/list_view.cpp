@@ -25,6 +25,7 @@
 #include "slib/ui/core.h"
 
 #define MAX_ITEMS_VISIBLE 500
+#define MAX_ITEMS_SAVE_HEIGHTS 10000
 #define MAX_MID_HEIGHT 1000000
 
 namespace slib
@@ -65,10 +66,10 @@ namespace slib
 		m_viewsGoUpItems = m_viewsGoDownItems + MAX_ITEMS_VISIBLE;
 		m_viewsFreeItems = m_viewsGoUpItems + MAX_ITEMS_VISIBLE;
 		
-		m_heightsVisibleItems = (sl_ui_len*)(Base::createMemory(sizeof(sl_ui_len)*MAX_ITEMS_VISIBLE*5));
+		m_heightsVisibleItems = (sl_ui_len*)(Base::createMemory(sizeof(sl_ui_len)*(MAX_ITEMS_VISIBLE*3+MAX_ITEMS_SAVE_HEIGHTS*2)));
 		m_heightsTopItems = m_heightsVisibleItems + MAX_ITEMS_VISIBLE;
-		m_heightsBottomItems = m_heightsTopItems + MAX_ITEMS_VISIBLE;
-		m_heightsGoDownItems = m_heightsBottomItems + MAX_ITEMS_VISIBLE;
+		m_heightsBottomItems = m_heightsTopItems + MAX_ITEMS_SAVE_HEIGHTS;
+		m_heightsGoDownItems = m_heightsBottomItems + MAX_ITEMS_SAVE_HEIGHTS;
 		m_heightsGoUpItems = m_heightsGoDownItems + MAX_ITEMS_VISIBLE;
 		
 		_initStatus();
@@ -151,7 +152,7 @@ namespace slib
 		m_averageMidItemHeight = 0;
 		m_heightTotalItems = 0;
 		m_lastScrollY = 0;
-		for (sl_uint32 i = 0; i < MAX_ITEMS_VISIBLE; i++) {
+		for (sl_uint32 i = 0; i < MAX_ITEMS_SAVE_HEIGHTS; i++) {
 			m_heightsTopItems[i] = 0;
 			m_heightsBottomItems[i] = 0;
 		}
@@ -173,7 +174,7 @@ namespace slib
 		averageMidHeight = (double)(averageHeight);
 		sl_uint32 i;
 		sl_ui_len s = 0;
-		for (i = 0; i < MAX_ITEMS_VISIBLE; i++) {
+		for (i = 0; i < MAX_ITEMS_SAVE_HEIGHTS; i++) {
 			if (i >= count) {
 				return s;
 			}
@@ -183,11 +184,11 @@ namespace slib
 			}
 			s += h;
 		}
-		count -= MAX_ITEMS_VISIBLE;
+		count -= MAX_ITEMS_SAVE_HEIGHTS;
 		if (count == 0) {
 			return s;
 		}
-		for (i = 0; i < MAX_ITEMS_VISIBLE; i++) {
+		for (i = 0; i < MAX_ITEMS_SAVE_HEIGHTS; i++) {
 			if (i >= count) {
 				return s;
 			}
@@ -197,7 +198,7 @@ namespace slib
 			}
 			s += h;
 		}
-		count -= MAX_ITEMS_VISIBLE;
+		count -= MAX_ITEMS_SAVE_HEIGHTS;
 		if (count == 0 || averageHeight == 0) {
 			return s;
 		}
@@ -219,7 +220,7 @@ namespace slib
 		sl_uint32 i;
 		sl_ui_len s = 0;
 		sl_uint32 n = 0;
-		for (i = 0; i < MAX_ITEMS_VISIBLE; i++) {
+		for (i = 0; i < MAX_ITEMS_SAVE_HEIGHTS; i++) {
 			if (i >= count) {
 				break;
 			}
@@ -229,10 +230,10 @@ namespace slib
 				n++;
 			}
 		}
-		if (count > MAX_ITEMS_VISIBLE) {
-			count -= MAX_ITEMS_VISIBLE;
+		if (count > MAX_ITEMS_SAVE_HEIGHTS) {
+			count -= MAX_ITEMS_SAVE_HEIGHTS;
 			if (count > 0) {
-				for (i = 0; i < MAX_ITEMS_VISIBLE; i++) {
+				for (i = 0; i < MAX_ITEMS_SAVE_HEIGHTS; i++) {
 					if (i >= count) {
 						break;
 					}
@@ -255,7 +256,7 @@ namespace slib
 		if (index > count) {
 			index = count;
 		}
-		if (index <= MAX_ITEMS_VISIBLE) {
+		if (index <= MAX_ITEMS_SAVE_HEIGHTS) {
 			sl_ui_len y = 0;
 			sl_uint32 n = (sl_uint32)index;
 			for (sl_uint32 i = 0; i < n; i++) {
@@ -267,7 +268,7 @@ namespace slib
 			}
 			return y;
 		}
-		if (count - index <= MAX_ITEMS_VISIBLE) {
+		if (count - index <= MAX_ITEMS_SAVE_HEIGHTS) {
 			sl_ui_len y = 0;
 			sl_uint32 n = (sl_uint32)(count - index);
 			for (sl_uint32 i = 0; i < n; i++) {
@@ -285,14 +286,14 @@ namespace slib
 			return y;
 		}
 		sl_ui_len y = 0;
-		for (sl_uint32 i = 0; i < MAX_ITEMS_VISIBLE; i++) {
+		for (sl_uint32 i = 0; i < MAX_ITEMS_SAVE_HEIGHTS; i++) {
 			sl_ui_len h = topHeights[i];
 			if (h <= 0) {
 				h = averageHeight;
 			}
 			y += h;
 		}
-		return y + (sl_ui_len)((double)(index - MAX_ITEMS_VISIBLE) * averageMidHeight);
+		return y + (sl_ui_len)((double)(index - MAX_ITEMS_SAVE_HEIGHTS) * averageMidHeight);
 	}
 	
 	template <class T>
@@ -359,7 +360,7 @@ namespace slib
 	{
 		Ref<View> view = adapter->getView(index, original, m_contentView.get());
 		if (view.isNotNull()) {
-#if !defined(SLIB_UI_IS_WIN32)
+#if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_IOS) || defined(SLIB_UI_IS_ANDROID)
 			view->setCreatingInstance(sl_true);
 #endif
 			View::LayoutAttributes* attrs = view->m_layoutAttrs.get();
@@ -542,7 +543,7 @@ namespace slib
 					if (scrollY != 0 && lastAverageItemHeight > 0) {
 						
 						sl_uint32 i;
-						for (i = 0; i < MAX_ITEMS_VISIBLE; i++) {
+						for (i = 0; i < MAX_ITEMS_SAVE_HEIGHTS; i++) {
 							if (i >= countTotalItems) {
 								break;
 							}
@@ -679,11 +680,11 @@ namespace slib
 				{
 					for (sl_uint32 i = 0; i < countVisibleItems; i++) {
 						sl_uint64 index = indexStart + i;
-						if (index < MAX_ITEMS_VISIBLE) {
+						if (index < MAX_ITEMS_SAVE_HEIGHTS) {
 							heightsTopItems[(sl_uint32)index] = heightsVisibleItems[i];
 						}
 						if (index < countTotalItems) {
-							if (countTotalItems - index <= MAX_ITEMS_VISIBLE) {
+							if (countTotalItems - index <= MAX_ITEMS_SAVE_HEIGHTS) {
 								heightsBottomItems[(sl_uint32)(countTotalItems - 1 - index)] = heightsVisibleItems[i];
 							}
 						}
