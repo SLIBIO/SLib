@@ -33,6 +33,7 @@
 #include "slib/core/json.h"
 #include "slib/core/cast.h"
 #include "slib/core/math.h"
+#include "slib/core/locale.h"
 
 namespace slib
 {
@@ -7692,7 +7693,7 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 */
 
 	template <class ST, class CT, class BT>
-	SLIB_INLINE static ST _priv_String_format(const CT* format, sl_size len, const Variant* params, sl_size _nParams) noexcept
+	SLIB_INLINE static ST _priv_String_format(const Locale& locale, const CT* format, sl_size len, const Variant* params, sl_size _nParams) noexcept
 	{
 		if (len == 0) {
 			return ST::getEmpty();
@@ -7866,6 +7867,9 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 										content = ST::fromInt32(time.getYear(*zone));
 									}
 									break;
+								case 'Y':
+									content = ST::fromInt32(time.getYear(*zone) % 100, 10, 2);
+									break;
 								case 'm':
 									if (flagZeroPadded) {
 										if (flagZeroPadded) {
@@ -7891,10 +7895,10 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 									}
 									break;
 								case 'w':
-									content = time.getWeekdayShort(*zone);
+									content = time.getWeekdayShort(*zone, locale);
 									break;
 								case 'W':
-									content = time.getWeekdayLong(*zone);
+									content = time.getWeekdayLong(*zone, locale);
 									break;
 								case 'H':
 									if (flagZeroPadded) {
@@ -7907,6 +7911,21 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 									} else {
 										content = ST::fromInt32(time.getHour(*zone));
 									}
+									break;
+								case 'h': // Hour-12
+									if (flagZeroPadded) {
+										if (flagZeroPadded) {
+											if (minWidth < 2) {
+												minWidth = 2;
+											}
+										}
+										content = ST::fromInt32(time.getHour12(*zone), 10, minWidth);
+									} else {
+										content = ST::fromInt32(time.getHour12(*zone));
+									}
+									break;
+								case 'a':
+									content = time.getAM_PM(*zone, locale);
 									break;
 								case 'M':
 									if (flagZeroPadded) {
@@ -8167,22 +8186,42 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 
 	String String::formatBy(const String& format, const Variant *params, sl_size nParams) noexcept
 	{
-		return _priv_String_format<String, sl_char8, StringBuffer>(format.getData(), format.getLength(), params, nParams);
+		return _priv_String_format<String, sl_char8, StringBuffer>(Locale::Unknown, format.getData(), format.getLength(), params, nParams);
 	}
 
 	String16 String16::formatBy(const String16& format, const Variant *params, sl_size nParams) noexcept
 	{
-		return _priv_String_format<String16, sl_char16, StringBuffer16>(format.getData(), format.getLength(), params, nParams);
+		return _priv_String_format<String16, sl_char16, StringBuffer16>(Locale::Unknown, format.getData(), format.getLength(), params, nParams);
 	}
 
 	String String::formatBy(const sl_char8* format, const Variant *params, sl_size nParams) noexcept
 	{
-		return _priv_String_format<String, sl_char8, StringBuffer>(format, Base::getStringLength(format), params, nParams);
+		return _priv_String_format<String, sl_char8, StringBuffer>(Locale::Unknown, format, Base::getStringLength(format), params, nParams);
 	}
 
 	String16 String16::formatBy(const sl_char16* format, const Variant *params, sl_size nParams) noexcept
 	{
-		return _priv_String_format<String16, sl_char16, StringBuffer16>(format, Base::getStringLength2(format), params, nParams);
+		return _priv_String_format<String16, sl_char16, StringBuffer16>(Locale::Unknown, format, Base::getStringLength2(format), params, nParams);
+	}
+
+	String String::formatBy(const Locale& locale, const String& format, const Variant *params, sl_size nParams) noexcept
+	{
+		return _priv_String_format<String, sl_char8, StringBuffer>(locale, format.getData(), format.getLength(), params, nParams);
+	}
+	
+	String16 String16::formatBy(const Locale& locale, const String16& format, const Variant *params, sl_size nParams) noexcept
+	{
+		return _priv_String_format<String16, sl_char16, StringBuffer16>(locale, format.getData(), format.getLength(), params, nParams);
+	}
+	
+	String String::formatBy(const Locale& locale, const sl_char8* format, const Variant *params, sl_size nParams) noexcept
+	{
+		return _priv_String_format<String, sl_char8, StringBuffer>(locale, format, Base::getStringLength(format), params, nParams);
+	}
+	
+	String16 String16::formatBy(const Locale& locale, const sl_char16* format, const Variant *params, sl_size nParams) noexcept
+	{
+		return _priv_String_format<String16, sl_char16, StringBuffer16>(locale, format, Base::getStringLength2(format), params, nParams);
 	}
 
 	String String::format(const String& strFormat) noexcept

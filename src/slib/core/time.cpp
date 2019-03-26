@@ -574,6 +574,42 @@ namespace slib
 		return *this;
 	}
 
+	constexpr static sl_uint32 _priv_Time_getHour12(sl_uint32 hour)
+	{
+		return hour % 12 ? hour % 12 : 12;
+	}
+	
+	sl_int32 Time::getHour12(const TimeZone& zone) const noexcept
+	{
+		TimeComponents comps;
+		get(comps, zone);
+		return _priv_Time_getHour12(comps.hour);
+	}
+	
+	sl_bool Time::isAM(const TimeZone& zone) const noexcept
+	{
+		TimeComponents comps;
+		get(comps, zone);
+		return comps.hour < 12;
+	}
+	
+	sl_bool Time::isPM(const TimeZone& zone) const noexcept
+	{
+		TimeComponents comps;
+		get(comps, zone);
+		return comps.hour >= 12;
+	}
+	
+	String Time::getAM_PM(const TimeZone& zone, const Locale& locale) const noexcept
+	{
+		return format(TimeFormat::AM_PM, zone, locale);
+	}
+	
+	String Time::getAM_PM(const Locale& locale) const noexcept
+	{
+		return format(TimeFormat::AM_PM, locale);
+	}
+
 	sl_int32 Time::getMinute(const TimeZone& zone) const noexcept
 	{
 		TimeComponents comps;
@@ -1559,13 +1595,18 @@ namespace slib
 				switch (fmt) {
 					case TimeFormat::DateTime:
 						return String::format("%d\xEB\x85\x84 %d\xEC\x9B\x94 %d\xEC\x9D\xBC %d\xEC\x8B\x9C %d\xEB\xB6\x84 %d\xEC\xB4\x88", d.year, d.month, d.day, d.hour, d.minute, d.second);
+					case TimeFormat::MediumDateTime:
+						return String::format("%d\xEB\x85\x84 %d\xEC\x9B\x94 %d\xEC\x9D\xBC %02d:%02d:%02d", d.year, d.month, d.day, d.hour, d.minute, d.second);
 					case TimeFormat::ShortDateTime:
 						return String::format("%d.%d.%d %02d:%02d:%02d", d.year, d.month, d.day, d.hour, d.minute, d.second);
 					case TimeFormat::DateTime_12Hour:
-						return String::format("%d\xEB\x85\x84 %d\xEC\x9B\x94 %d\xEC\x9D\xBC %s %d\xEC\x8B\x9C %d\xEB\xB6\x84 %d\xEC\xB4\x88", d.year, d.month, d.day, format(d, TimeFormat::AM_PM, locale), d.hour % 12, d.minute, d.second);
+						return String::format("%d\xEB\x85\x84 %d\xEC\x9B\x94 %d\xEC\x9D\xBC %s %d\xEC\x8B\x9C %d\xEB\xB6\x84 %d\xEC\xB4\x88", d.year, d.month, d.day, format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute, d.second);
+					case TimeFormat::MediumDateTime_12Hour:
+						return String::format("%d\xEB\x85\x84 %d\xEC\x9B\x94 %d\xEC\x9D\xBC %s %d:%02d:%02d", d.year, d.month, d.day, format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute, d.second);
 					case TimeFormat::ShortDateTime_12Hour:
-						return String::format("%d.%d.%d %s %d:%02d:%02d", d.year, d.month, d.day, format(d, TimeFormat::AM_PM, locale), d.hour % 12, d.minute, d.second);
+						return String::format("%d.%d.%d %s %d:%02d:%02d", d.year, d.month, d.day, format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute, d.second);
 					case TimeFormat::Date:
+					case TimeFormat::MediumDate:
 						return String::format("%d\xEB\x85\x84 %d\xEC\x9B\x94 %d\xEC\x9D\xBC", d.year, d.month, d.day);
 					case TimeFormat::ShortDate:
 						return String::format("%d.%d.%d", d.year, d.month, d.day);
@@ -1574,9 +1615,9 @@ namespace slib
 					case TimeFormat::ShortTime:
 						return String::format("%02d:%02d:%02d", d.hour, d.minute, d.second);
 					case TimeFormat::Time_12Hour:
-						return String::format("%s %d\xEC\x8B\x9C %d\xEB\xB6\x84 %d\xEC\xB4\x88", format(d, TimeFormat::AM_PM, locale), d.hour % 12, d.minute, d.second);
+						return String::format("%s %d\xEC\x8B\x9C %d\xEB\xB6\x84 %d\xEC\xB4\x88", format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute, d.second);
 					case TimeFormat::ShortTime_12Hour:
-						return String::format("%s %d:%02d:%02d", format(d, TimeFormat::AM_PM, locale), d.hour % 12, d.minute, d.second);
+						return String::format("%s %d:%02d:%02d", format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute, d.second);
 					case TimeFormat::Year:
 						return String::fromInt32(d.year) + "\xEB\x85\x84";
 					case TimeFormat::Month:
@@ -1587,9 +1628,9 @@ namespace slib
 					case TimeFormat::Hour:
 						return String::fromUint32(d.hour) + "\xEC\x8B\x9C";
 					case TimeFormat::Hour_12:
-						return String::fromUint32(d.hour % 12) + "\xEC\x8B\x9C";
+						return String::fromUint32(_priv_Time_getHour12(d.hour)) + "\xEC\x8B\x9C";
 					case TimeFormat::Hour_AM_PM:
-						return String::format("%s %d\xEC\x8B\x9C", format(d, TimeFormat::AM_PM, locale), d.hour % 12);
+						return String::format("%s %d\xEC\x8B\x9C", format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour));
 					case TimeFormat::AM_PM:
 						if (d.hour >= 12) {
 							return getPM_Text(locale);
@@ -1609,9 +1650,9 @@ namespace slib
 					case TimeFormat::HourMinute:
 						return String::format("%d\xEC\x8B\x9C %d\xEB\xB6\x84", d.hour, d.minute);
 					case TimeFormat::HourMinute_12Hour:
-						return String::format("%s %d\xEC\x8B\x9C %d\xEB\xB6\x84", format(d, TimeFormat::AM_PM, locale), d.hour % 12, d.minute);
+						return String::format("%s %d\xEC\x8B\x9C %d\xEB\xB6\x84", format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute);
 					case TimeFormat::ShortHourMinute_12Hour:
-						return String::format("%s %d:%02d", format(d, TimeFormat::AM_PM, locale), d.hour % 12, d.minute);
+						return String::format("%s %d:%02d", format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute);
 					case TimeFormat::MinuteSecond:
 						return String::format("%d\xEB\xB6\x84 %d\xEC\xB4\x88", d.minute, d.second);
 					case TimeFormat::Weekday:
@@ -1620,14 +1661,20 @@ namespace slib
 						return getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale);
 					case TimeFormat::WeekdayDateTime:
 						return String::format("%d\xEB\x85\x84 %d\xEC\x9B\x94 %d\xEC\x9D\xBC %s %d\xEC\x8B\x9C %d\xEB\xB6\x84 %d\xEC\xB4\x88", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), d.hour, d.minute, d.second);
+					case TimeFormat::MediumWeekdayDateTime:
+						return String::format("%d\xEB\x85\x84 %d\xEC\x9B\x94 %d\xEC\x9D\xBC %s %02d:%02d:%02d", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), d.hour, d.minute, d.second);
 					case TimeFormat::ShortWeekdayDateTime:
 						return String::format("%d.%d.%d(%s) %02d:%02d:%02d", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), d.hour, d.minute, d.second);
 					case TimeFormat::WeekdayDateTime_12Hour:
-						return String::format("%d\xEB\x85\x84 %d\xEC\x9B\x94 %d\xEC\x9D\xBC %s %s %d\xEC\x8B\x9C %d\xEB\xB6\x84 %d\xEC\xB4\x88", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), format(d, TimeFormat::AM_PM, locale), d.hour % 12, d.minute, d.second);
+						return String::format("%d\xEB\x85\x84 %d\xEC\x9B\x94 %d\xEC\x9D\xBC %s %s %d\xEC\x8B\x9C %d\xEB\xB6\x84 %d\xEC\xB4\x88", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute, d.second);
+					case TimeFormat::MediumWeekdayDateTime_12Hour:
+						return String::format("%d\xEB\x85\x84 %d\xEC\x9B\x94 %d\xEC\x9D\xBC %s %s %d:%02d:%02d", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute, d.second);
 					case TimeFormat::ShortWeekdayDateTime_12Hour:
-						return String::format("%d.%d.%d(%s) %s %d:%02d:%02d", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), format(d, TimeFormat::AM_PM, locale), d.hour % 12, d.minute, d.second);
-					case TimeFormat::WeakdayDate:
+						return String::format("%d.%d.%d(%s) %s %d:%02d:%02d", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute, d.second);
+					case TimeFormat::WeekdayDate:
 						return String::format("%d\xEB\x85\x84 %d\xEC\x9B\x94 %d\xEC\x9D\xBC %s", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale));
+					case TimeFormat::MediumWeekdayDate:
+						return String::format("%d\xEB\x85\x84 %d\xEC\x9B\x94 %d\xEC\x9D\xBC (%s)", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale));
 					case TimeFormat::ShortWeekdayDate:
 						return String::format("%d.%d.%d(%s)", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale));
 				}
@@ -1636,20 +1683,26 @@ namespace slib
 			case Language::Japanese:
 				switch (fmt) {
 					case TimeFormat::DateTime:
-					case TimeFormat::ShortDateTime:
+					case TimeFormat::MediumDateTime:
 						return String::format("%d\xE5\xB9\xB4%d\xE6\x9C\x88%d\xE6\x97\xA5 %02d:%02d:%02d", d.year, d.month, d.day, d.hour, d.minute, d.second);
+					case TimeFormat::ShortDateTime:
+						return String::format("%d/%d/%d %02d:%02d:%02d", d.year, d.month, d.day, d.hour, d.minute, d.second);
 					case TimeFormat::DateTime_12Hour:
+					case TimeFormat::MediumDateTime_12Hour:
+						return String::format("%d\xE5\xB9\xB4%d\xE6\x9C\x88%d\xE6\x97\xA5 %s%d:%02d:%02d", d.year, d.month, d.day, format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute, d.second);
 					case TimeFormat::ShortDateTime_12Hour:
-						return String::format("%d\xE5\xB9\xB4%d\xE6\x9C\x88%d\xE6\x97\xA5 %s%d:%02d:%02d", d.year, d.month, d.day, format(d, TimeFormat::AM_PM, locale), d.hour % 12, d.minute, d.second);
+						return String::format("%d/%d/%d %s%d:%02d:%02d", d.year, d.month, d.day, format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute, d.second);
 					case TimeFormat::Date:
-					case TimeFormat::ShortDate:
+					case TimeFormat::MediumDate:
 						return String::format("%d\xE5\xB9\xB4%d\xE6\x9C\x88%d\xE6\x97\xA5", d.year, d.month, d.day);
+					case TimeFormat::ShortDate:
+						return String::format("%d/%d/%d", d.year, d.month, d.day);
 					case TimeFormat::Time:
 					case TimeFormat::ShortTime:
 						return String::format("%02d:%02d:%02d", d.hour, d.minute, d.second);
 					case TimeFormat::Time_12Hour:
 					case TimeFormat::ShortTime_12Hour:
-						return String::format("%s%d:%02d:%02d", format(d, TimeFormat::AM_PM, locale), d.hour % 12, d.minute, d.second);
+						return String::format("%s%d:%02d:%02d", format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute, d.second);
 					case TimeFormat::Year:
 						return String::fromInt32(d.year) + "\xE5\xB9\xB4";
 					case TimeFormat::Month:
@@ -1670,12 +1723,12 @@ namespace slib
 					case TimeFormat::Hour_12:
 						if (lang == Language::Chinese) {
 							if (locale.getScript() == LanguageScript::ChineseTraditional) {
-								return String::fromUint32(d.hour % 12) + "\xE9\xBB\x9E";
+								return String::fromUint32(_priv_Time_getHour12(d.hour)) + "\xE9\xBB\x9E";
 							} else {
-								return String::fromUint32(d.hour % 12) + "\xE7\x82\xB9";
+								return String::fromUint32(_priv_Time_getHour12(d.hour)) + "\xE7\x82\xB9";
 							}
 						} else {
-							return String::fromUint32(d.hour % 12) + "\xE6\x99\x82";
+							return String::fromUint32(_priv_Time_getHour12(d.hour)) + "\xE6\x99\x82";
 						}
 					case TimeFormat::Hour_AM_PM:
 						if (lang == Language::Chinese && d.hour < 12) {
@@ -1703,7 +1756,7 @@ namespace slib
 						return String::format("%s%d\xE5\x88\x86", format(d, TimeFormat::Hour, locale), d.minute);
 					case TimeFormat::HourMinute_12Hour:
 					case TimeFormat::ShortHourMinute_12Hour:
-						return String::format("%s%d:%02d", format(d, TimeFormat::AM_PM, locale), d.hour % 12, d.minute);
+						return String::format("%s%d:%02d", format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute);
 					case TimeFormat::MinuteSecond:
 						return String::format("%d\xE5\x88\x86%d\xE7\xA7\x92", d.minute, d.second);
 					case TimeFormat::Weekday:
@@ -1712,16 +1765,22 @@ namespace slib
 						return getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale);
 					case TimeFormat::WeekdayDateTime:
 						return String::format("%d\xE5\xB9\xB4%d\xE6\x9C\x88%d\xE6\x97\xA5 %s %02d:%02d:%02d", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), d.hour, d.minute, d.second);
-					case TimeFormat::ShortWeekdayDateTime:
+					case TimeFormat::MediumWeekdayDateTime:
 						return String::format("%d\xE5\xB9\xB4%d\xE6\x9C\x88%d\xE6\x97\xA5(%s) %02d:%02d:%02d", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), d.hour, d.minute, d.second);
+					case TimeFormat::ShortWeekdayDateTime:
+						return String::format("%d/%d/%d(%s) %02d:%02d:%02d", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), d.hour, d.minute, d.second);
 					case TimeFormat::WeekdayDateTime_12Hour:
-						return String::format("%d\xE5\xB9\xB4%d\xE6\x9C\x88%d\xE6\x97\xA5 %s %s%d:%02d:%02d", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), format(d, TimeFormat::AM_PM, locale), d.hour % 12, d.minute, d.second);
+						return String::format("%d\xE5\xB9\xB4%d\xE6\x9C\x88%d\xE6\x97\xA5 %s %s%d:%02d:%02d", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute, d.second);
+					case TimeFormat::MediumWeekdayDateTime_12Hour:
+						return String::format("%d\xE5\xB9\xB4%d\xE6\x9C\x88%d\xE6\x97\xA5(%s) %s%d:%02d:%02d", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute, d.second);
 					case TimeFormat::ShortWeekdayDateTime_12Hour:
-						return String::format("%d\xE5\xB9\xB4%d\xE6\x9C\x88%d\xE6\x97\xA5(%s) %s%d:%02d:%02d", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), format(d, TimeFormat::AM_PM, locale), d.hour % 12, d.minute, d.second);
-					case TimeFormat::WeakdayDate:
+						return String::format("%d/%d/%d(%s) %s%d:%02d:%02d", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), format(d, TimeFormat::AM_PM, locale), _priv_Time_getHour12(d.hour), d.minute, d.second);
+					case TimeFormat::WeekdayDate:
 						return String::format("%d\xE5\xB9\xB4%d\xE6\x9C\x88%d\xE6\x97\xA5 %s", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale));
-					case TimeFormat::ShortWeekdayDate:
+					case TimeFormat::MediumWeekdayDate:
 						return String::format("%d\xE5\xB9\xB4%d\xE6\x9C\x88%d\xE6\x97\xA5(%s)", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale));
+					case TimeFormat::ShortWeekdayDate:
+						return String::format("%d/%d/%d(%s)", d.year, d.month, d.day, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale));
 				}
 				break;
 			default:
@@ -1732,23 +1791,35 @@ namespace slib
 						} else {
 							return String::format("%02d:%02d:%02d, %d %s %d", d.hour, d.minute, d.second, d.day, getMonthText(d.month, TimeTextType::Long), d.year);
 						}
-					case TimeFormat::ShortDateTime:
+					case TimeFormat::MediumDateTime:
 						if (_priv_Time_isMDY(locale)) {
 							return String::format("%02d:%02d:%02d, %s %d, %d", d.hour, d.minute, d.second, getMonthText(d.month, TimeTextType::Short), d.day, d.year);
 						} else {
 							return String::format("%02d:%02d:%02d, %d %s %d", d.hour, d.minute, d.second, d.day, getMonthText(d.month, TimeTextType::Short), d.year);
 						}
+					case TimeFormat::ShortDateTime:
+						if (_priv_Time_isMDY(locale)) {
+							return String::format("%02d:%02d:%02d, %d/%d/%d", d.hour, d.minute, d.second, d.month, d.day, d.year);
+						} else {
+							return String::format("%02d:%02d:%02d, %d/%d/%d", d.hour, d.minute, d.second, d.day, d.month, d.year);
+						}
 					case TimeFormat::DateTime_12Hour:
 						if (_priv_Time_isMDY(locale)) {
-							return String::format("%d:%02d:%02d %s, %s %d, %d", d.hour % 12, d.minute, d.second, d.hour>=12?"PM":"AM", getMonthText(d.month, TimeTextType::Long), d.day, d.year);
+							return String::format("%d:%02d:%02d %s, %s %d, %d", _priv_Time_getHour12(d.hour), d.minute, d.second, d.hour>=12?"PM":"AM", getMonthText(d.month, TimeTextType::Long), d.day, d.year);
 						} else {
-							return String::format("%d:%02d:%02d %s, %d %s %d", d.hour % 12, d.minute, d.second, d.hour>=12?"PM":"AM", d.day, getMonthText(d.month, TimeTextType::Long), d.year);
+							return String::format("%d:%02d:%02d %s, %d %s %d", _priv_Time_getHour12(d.hour), d.minute, d.second, d.hour>=12?"PM":"AM", d.day, getMonthText(d.month, TimeTextType::Long), d.year);
+						}
+					case TimeFormat::MediumDateTime_12Hour:
+						if (_priv_Time_isMDY(locale)) {
+							return String::format("%d:%02d:%02d %s, %s %d, %d", _priv_Time_getHour12(d.hour), d.minute, d.second, d.hour>=12?"PM":"AM", getMonthText(d.month, TimeTextType::Short), d.day, d.year);
+						} else {
+							return String::format("%d:%02d:%02d %s, %d %s %d", _priv_Time_getHour12(d.hour), d.minute, d.second, d.hour>=12?"PM":"AM", d.day, getMonthText(d.month, TimeTextType::Short), d.year);
 						}
 					case TimeFormat::ShortDateTime_12Hour:
 						if (_priv_Time_isMDY(locale)) {
-							return String::format("%d:%02d:%02d %s, %s %d, %d", d.hour % 12, d.minute, d.second, d.hour>=12?"PM":"AM", getMonthText(d.month, TimeTextType::Short), d.day, d.year);
+							return String::format("%d:%02d:%02d %s, %d/%d/%d", _priv_Time_getHour12(d.hour), d.minute, d.second, d.hour>=12?"PM":"AM", d.month, d.day, d.year);
 						} else {
-							return String::format("%d:%02d:%02d %s, %d %s %d", d.hour % 12, d.minute, d.second, d.hour>=12?"PM":"AM", d.day, getMonthText(d.month, TimeTextType::Short), d.year);
+							return String::format("%d:%02d:%02d %s, %d/%d/%d", _priv_Time_getHour12(d.hour), d.minute, d.second, d.hour>=12?"PM":"AM", d.day, d.month, d.year);
 						}
 					case TimeFormat::Date:
 						if (_priv_Time_isMDY(locale)) {
@@ -1756,18 +1827,24 @@ namespace slib
 						} else {
 							return String::format("%d %s %d", d.day, getMonthText(d.month, TimeTextType::Long), d.year);
 						}
-					case TimeFormat::ShortDate:
+					case TimeFormat::MediumDate:
 						if (_priv_Time_isMDY(locale)) {
 							return String::format("%s %d, %d", getMonthText(d.month, TimeTextType::Short), d.day, d.year);
 						} else {
 							return String::format("%d %s %d", d.day, getMonthText(d.month, TimeTextType::Short), d.year);
+						}
+					case TimeFormat::ShortDate:
+						if (_priv_Time_isMDY(locale)) {
+							return String::format("%d/%d/%d", d.month, d.day, d.year);
+						} else {
+							return String::format("%d/%d/%d", d.day, d.month, d.year);
 						}
 					case TimeFormat::Time:
 					case TimeFormat::ShortTime:
 						return String::format("%02d:%02d:%02d", d.hour, d.minute, d.second);
 					case TimeFormat::Time_12Hour:
 					case TimeFormat::ShortTime_12Hour:
-						return String::format("%d:%02d:%02d %s", d.hour % 12, d.minute, d.second, d.hour>=12?"PM":"AM");
+						return String::format("%d:%02d:%02d %s", _priv_Time_getHour12(d.hour), d.minute, d.second, d.hour>=12?"PM":"AM");
 					case TimeFormat::Year:
 						return String::fromInt32(d.year);
 					case TimeFormat::Month:
@@ -1779,9 +1856,9 @@ namespace slib
 					case TimeFormat::Hour:
 						return String::format("%d o'clock", d.hour);
 					case TimeFormat::Hour_12:
-						return String::format("%d o'clock", d.hour % 12);
+						return String::format("%d o'clock", _priv_Time_getHour12(d.hour));
 					case TimeFormat::Hour_AM_PM:
-						return String::format("%d %s", d.hour % 12, d.hour>=12?"PM":"AM");
+						return String::format("%d %s", _priv_Time_getHour12(d.hour), d.hour>=12?"PM":"AM");
 					case TimeFormat::AM_PM:
 						if (d.hour >= 12) {
 							return getPM_Text(locale);
@@ -1825,35 +1902,53 @@ namespace slib
 						} else {
 							return String::format("%02d:%02d:%02d, %s, %d %s %d", d.hour, d.minute, d.second, getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), d.day, getMonthText(d.month, TimeTextType::Long), d.year);
 						}
-					case TimeFormat::ShortWeekdayDateTime:
+					case TimeFormat::MediumWeekdayDateTime:
 						if (_priv_Time_isMDY(locale)) {
 							return String::format("%02d:%02d:%02d, %s, %s %d, %d", d.hour, d.minute, d.second, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), getMonthText(d.month, TimeTextType::Short), d.day, d.year);
 						} else {
 							return String::format("%02d:%02d:%02d, %s, %d %s %d", d.hour, d.minute, d.second, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), d.day, getMonthText(d.month, TimeTextType::Short), d.year);
 						}
+					case TimeFormat::ShortWeekdayDateTime:
+						if (_priv_Time_isMDY(locale)) {
+							return String::format("%02d:%02d:%02d, %s, %d/%d/%d", d.hour, d.minute, d.second, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), d.month, d.day, d.year);
+						} else {
+							return String::format("%02d:%02d:%02d, %s, %d/%d/%d", d.hour, d.minute, d.second, getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), d.day, d.month, d.year);
+						}
 					case TimeFormat::WeekdayDateTime_12Hour:
 						if (_priv_Time_isMDY(locale)) {
-							return String::format("%d:%02d:%02d %s, %s, %s %d, %d", d.hour % 12, d.minute, d.second, d.hour>=12?"PM":"AM", getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), getMonthText(d.month, TimeTextType::Long), d.day, d.year);
+							return String::format("%d:%02d:%02d %s, %s, %s %d, %d", _priv_Time_getHour12(d.hour), d.minute, d.second, d.hour>=12?"PM":"AM", getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), getMonthText(d.month, TimeTextType::Long), d.day, d.year);
 						} else {
-							return String::format("%d:%02d:%02d %s, %s, %d %s %d", d.hour % 12, d.minute, d.second, d.hour>=12?"PM":"AM", getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), d.day, getMonthText(d.month, TimeTextType::Long), d.year);
+							return String::format("%d:%02d:%02d %s, %s, %d %s %d", _priv_Time_getHour12(d.hour), d.minute, d.second, d.hour>=12?"PM":"AM", getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), d.day, getMonthText(d.month, TimeTextType::Long), d.year);
+						}
+					case TimeFormat::MediumWeekdayDateTime_12Hour:
+						if (_priv_Time_isMDY(locale)) {
+							return String::format("%d:%02d:%02d %s, %s, %s %d, %d", _priv_Time_getHour12(d.hour), d.minute, d.second, d.hour>=12?"PM":"AM", getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), getMonthText(d.month, TimeTextType::Short), d.day, d.year);
+						} else {
+							return String::format("%d:%02d:%02d %s, %s, %d %s %d", _priv_Time_getHour12(d.hour), d.minute, d.second, d.hour>=12?"PM":"AM", getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), d.day, getMonthText(d.month, TimeTextType::Short), d.year);
 						}
 					case TimeFormat::ShortWeekdayDateTime_12Hour:
 						if (_priv_Time_isMDY(locale)) {
-							return String::format("%d:%02d:%02d %s, %s, %s %d, %d", d.hour % 12, d.minute, d.second, d.hour>=12?"PM":"AM", getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), getMonthText(d.month, TimeTextType::Short), d.day, d.year);
+							return String::format("%d:%02d:%02d %s, %s, %d/%d/%d", _priv_Time_getHour12(d.hour), d.minute, d.second, d.hour>=12?"PM":"AM", getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), d.month, d.day, d.year);
 						} else {
-							return String::format("%d:%02d:%02d %s, %s, %d %s %d", d.hour % 12, d.minute, d.second, d.hour>=12?"PM":"AM", getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), d.day, getMonthText(d.month, TimeTextType::Short), d.year);
+							return String::format("%d:%02d:%02d %s, %s, %d/%d/%d", _priv_Time_getHour12(d.hour), d.minute, d.second, d.hour>=12?"PM":"AM", getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), d.day, d.month, d.year);
 						}
-					case TimeFormat::WeakdayDate:
+					case TimeFormat::WeekdayDate:
 						if (_priv_Time_isMDY(locale)) {
 							return String::format("%s, %s %d, %d", getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), getMonthText(d.month, TimeTextType::Long), d.day, d.year);
 						} else {
 							return String::format("%s, %d %s %d", getWeekdayText(d.dayOfWeek, TimeTextType::Long, locale), d.day, getMonthText(d.month, TimeTextType::Long), d.year);
 						}
-					case TimeFormat::ShortWeekdayDate:
+					case TimeFormat::MediumWeekdayDate:
 						if (_priv_Time_isMDY(locale)) {
 							return String::format("%s, %s %d, %d", getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), getMonthText(d.month, TimeTextType::Short), d.day, d.year);
 						} else {
 							return String::format("%s, %d %s %d", getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), d.day, getMonthText(d.month, TimeTextType::Short), d.year);
+						}
+					case TimeFormat::ShortWeekdayDate:
+						if (_priv_Time_isMDY(locale)) {
+							return String::format("%s, %d/%d/%d", getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), d.month, d.day, d.year);
+						} else {
+							return String::format("%s, %d/%d/%d", getWeekdayText(d.dayOfWeek, TimeTextType::Short, locale), d.day, d.month, d.year);
 						}
 				}
 				break;
@@ -1873,34 +1968,34 @@ namespace slib
 		return format(fmt, TimeZone::Local, locale);
 	}
 
-	String Time::format(const String& fmt) const noexcept
+	String Time::format(const String& fmt, const Locale& locale) const noexcept
 	{
-		return String::format(fmt, *this);
+		return String::format(locale, fmt, *this);
 	}
 
-	String Time::format(const AtomicString& fmt) const noexcept
+	String Time::format(const AtomicString& fmt, const Locale& locale) const noexcept
 	{
-		return String::format(fmt, *this);
+		return String::format(locale, fmt, *this);
 	}
 
-	String Time::format(const String16& fmt) const noexcept
+	String Time::format(const String16& fmt, const Locale& locale) const noexcept
 	{
-		return String16::format(fmt, *this);
+		return String16::format(locale, fmt, *this);
 	}
 
-	String Time::format(const AtomicString16& fmt) const noexcept
+	String Time::format(const AtomicString16& fmt, const Locale& locale) const noexcept
 	{
-		return String16::format(fmt, *this);
+		return String16::format(locale, fmt, *this);
 	}
 
-	String Time::format(const sl_char8* fmt) const noexcept
+	String Time::format(const sl_char8* fmt, const Locale& locale) const noexcept
 	{
-		return String::format(fmt, *this);
+		return String::format(locale, fmt, *this);
 	}
 
-	String Time::format(const sl_char16* fmt) const noexcept
+	String Time::format(const sl_char16* fmt, const Locale& locale) const noexcept
 	{
-		return String16::format(fmt, *this);
+		return String16::format(locale, fmt, *this);
 	}
 
 	sl_bool Time::setString(const String& str, const TimeZone& zone) noexcept

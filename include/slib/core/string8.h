@@ -48,6 +48,7 @@ namespace slib
 	typedef Atomic<String16> AtomicString16;
 	class StringData;
 	class Variant;
+	class Locale;
 
 	class SLIB_EXPORT StringContainer
 	{
@@ -1223,7 +1224,13 @@ namespace slib
 		static String format(const sl_char8* strFormat, ARGS&&... args) noexcept;
 		static String formatBy(const String& strFormat, const Variant* params, sl_size nParams) noexcept;
 		static String formatBy(const sl_char8* strFormat, const Variant* params, sl_size nParams) noexcept;
-		
+		template <class... ARGS>
+		static String format(const Locale& locale, const String& strFormat, ARGS&&... args) noexcept;
+		template <class... ARGS>
+		static String format(const Locale& locale, const sl_char8* strFormat, ARGS&&... args) noexcept;
+		static String formatBy(const Locale& locale, const String& strFormat, const Variant* params, sl_size nParams) noexcept;
+		static String formatBy(const Locale& locale, const sl_char8* strFormat, const Variant* params, sl_size nParams) noexcept;
+
 		/**
 		 * Formats the current string which contains conversion specifications with arbitrary list of arguments.
 		 * It is same as `String::format(*this, ...)`.

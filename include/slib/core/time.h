@@ -140,10 +140,13 @@ namespace slib
 	enum class TimeFormat
 	{
 		DateTime,
+		MediumDateTime,
 		ShortDateTime,
 		DateTime_12Hour,
+		MediumDateTime_12Hour,
 		ShortDateTime_12Hour,
 		Date,
+		MediumDate,
 		ShortDate,
 		Time,
 		ShortTime,
@@ -170,10 +173,13 @@ namespace slib
 		Weekday,
 		ShortWeakday,
 		WeekdayDateTime,
+		MediumWeekdayDateTime,
 		ShortWeekdayDateTime,
 		WeekdayDateTime_12Hour,
+		MediumWeekdayDateTime_12Hour,
 		ShortWeekdayDateTime_12Hour,
-		WeakdayDate,
+		WeekdayDate,
+		MediumWeekdayDate,
 		ShortWeekdayDate
 	};
 
@@ -420,6 +426,16 @@ namespace slib
 
 		Time& addHoursf(double hours) noexcept;
 
+		sl_int32 getHour12(const TimeZone& zone = TimeZone::Local) const noexcept;
+
+		sl_bool isAM(const TimeZone& zone = TimeZone::Local) const noexcept;
+
+		sl_bool isPM(const TimeZone& zone = TimeZone::Local) const noexcept;
+
+		String getAM_PM(const TimeZone& zone, const Locale& locale = Locale::Unknown) const noexcept;
+
+		String getAM_PM(const Locale& locale = Locale::Unknown) const noexcept;
+
 		sl_int32 getMinute(const TimeZone& zone = TimeZone::Local) const noexcept;
 
 		Time& setMinute(sl_int32 minute, const TimeZone& zone = TimeZone::Local) noexcept;
@@ -594,17 +610,17 @@ namespace slib
 		String format(TimeFormat fmt, const Locale& locale = Locale::Unknown) const noexcept;
 		
 		
-		String format(const String& fmt) const noexcept;
+		String format(const String& fmt, const Locale& locale = Locale::Unknown) const noexcept;
 
-		String format(const AtomicString& fmt) const noexcept;
+		String format(const AtomicString& fmt, const Locale& locale = Locale::Unknown) const noexcept;
 
-		String format(const String16& fmt) const noexcept;
+		String format(const String16& fmt, const Locale& locale = Locale::Unknown) const noexcept;
 
-		String format(const AtomicString16& fmt) const noexcept;
+		String format(const AtomicString16& fmt, const Locale& locale = Locale::Unknown) const noexcept;
 
-		String format(const sl_char8* fmt) const noexcept;
+		String format(const sl_char8* fmt, const Locale& locale = Locale::Unknown) const noexcept;
 
-		String format(const sl_char16* fmt) const noexcept;
+		String format(const sl_char16* fmt, const Locale& locale = Locale::Unknown) const noexcept;
 	
 		
 		sl_bool setString(const String& str, const TimeZone& zone = TimeZone::Local) noexcept;

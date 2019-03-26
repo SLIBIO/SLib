@@ -60,7 +60,35 @@ namespace slib
 		Variant params[] = {Forward<ARGS>(args)...};
 		return formatBy(strFormat, params, sizeof...(args));
 	}
-	
+
+	template <class... ARGS>
+	String String::format(const Locale& locale, const sl_char8* szFormat, ARGS&&... args) noexcept
+	{
+		Variant params[] = {Forward<ARGS>(args)...};
+		return formatBy(locale, szFormat, params, sizeof...(args));
+	}
+
+	template <class... ARGS>
+	String String::format(const Locale& locale, const String& strFormat, ARGS&&... args) noexcept
+	{
+		Variant params[] = {Forward<ARGS>(args)...};
+		return formatBy(locale, strFormat, params, sizeof...(args));
+	}
+
+	template <class... ARGS>
+	String16 String16::format(const Locale& locale, const sl_char16* szFormat, ARGS&&... args) noexcept
+	{
+		Variant params[] = {Forward<ARGS>(args)...};
+		return formatBy(locale, szFormat, params, sizeof...(args));
+	}
+
+	template <class... ARGS>
+	String16 String16::format(const Locale& locale, const String16& strFormat, ARGS&&... args) noexcept
+	{
+		Variant params[] = {Forward<ARGS>(args)...};
+		return formatBy(locale, strFormat, params, sizeof...(args));
+	}
+
 	template <class... ARGS>
 	String String::arg(ARGS&&... args) const noexcept
 	{
