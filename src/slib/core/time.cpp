@@ -1543,23 +1543,11 @@ namespace slib
 			flagAgo = sl_true;
 			diff.m_time = - (diff.m_time);
 		}
-		Language lang = locale.getLanguage();
 		if (diff < minUnit) {
-			if (lang == Language::Korean) {
-				if (minUnit.m_time < TIME_DAY) {
-					SLIB_RETURN_STRING("\xEB\xB0\xA9\xEA\xB8\x88");
-				} else {
-					SLIB_RETURN_STRING("\xEC\x98\xA4\xEB\x8A\x98");
-				}
-			} else {
-				if (minUnit.m_time < TIME_DAY) {
-					SLIB_RETURN_STRING("Just now");
-				} else {
-					SLIB_RETURN_STRING("Today");
-				}
-			}
+			return sl_null;
 		}
 		String s = diff.getPeriodString(minUnit, maxUnit, locale);
+		Language lang = locale.getLanguage();
 		if (lang == Language::Korean) {
 			if (locale.getCountry() == Country::DPRK) {
 				if (flagAgo) {
