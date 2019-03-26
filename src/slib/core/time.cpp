@@ -1858,6 +1858,7 @@ namespace slib
 				}
 				break;
 		}
+		return sl_null;
 	}
 	
 	String Time::format(TimeFormat fmt, const TimeZone& zone, const Locale& locale) const noexcept
