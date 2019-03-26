@@ -263,6 +263,13 @@ public: \
 	CLASS& CLASS::operator=(CLASS const& other) = default; \
 	CLASS& CLASS::operator=(CLASS&& other) = default;
 
+#define SLIB_DEFINE_MEMBER_CLASS_DEFAULT_MEMBERS(PARENT, CLASS) \
+	PARENT::CLASS::~CLASS() {} \
+	PARENT::CLASS::CLASS(PARENT::CLASS const& other) = default; \
+	PARENT::CLASS::CLASS(PARENT::CLASS&& other) = default; \
+	PARENT::CLASS& PARENT::CLASS::operator=(PARENT::CLASS const& other) = default; \
+	PARENT::CLASS& PARENT::CLASS::operator=(PARENT::CLASS&& other) = default;
+
 #define SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(CLASS) \
 	public: \
 		SLIB_INLINE constexpr CLASS(CLASS const& other) noexcept = default; \
