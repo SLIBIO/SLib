@@ -49,6 +49,8 @@ namespace slib
 		
 		void refreshItems();
 		
+		List< Ref<View> > getVisibleItemViews();
+		
 	protected:
 		void onScroll(sl_scroll_pos x, sl_scroll_pos y) override;
 		
@@ -80,6 +82,7 @@ namespace slib
 		sl_uint64 m_indexFirstItem;
 		sl_uint32 m_countVisibleItems;
 		sl_ui_pos m_yFirstItem;
+		Mutex m_lockVisibleItems;
 		Ref<View>* m_viewsVisibleItems;
 		Ref<View>* m_viewsGoDownItems;
 		Ref<View>* m_viewsGoUpItems;

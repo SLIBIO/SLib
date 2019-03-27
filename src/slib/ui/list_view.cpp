@@ -109,6 +109,18 @@ namespace slib
 		runOnDrawingThread(SLIB_BIND_WEAKREF(void(), ListView, _checkUpdateContent, this, sl_false));
 	}
 	
+	List< Ref<View> > ListView::getVisibleItemViews()
+	{
+		List< Ref<View> > ret;
+		MutexLocker lock(&m_lockVisibleItems);
+		for (sl_size i = 0; i < m_countVisibleItems; i++) {
+			if (m_viewsVisibleItems[i].isNotNull()) {
+				ret.add_NoLock(m_viewsVisibleItems[i]);
+			}
+		}
+		return ret;
+	}
+	
 	void ListView::onScroll(sl_scroll_pos _x, sl_scroll_pos _y)
 	{
 		sl_ui_pos y = (sl_ui_pos)(_y);
@@ -162,8 +174,12 @@ namespace slib
 	{
 		m_contentView->removeAllChildren();
 		setContentHeight(0);
-		for (sl_size i = 0; i < m_countVisibleItems; i++) {
-			m_viewsVisibleItems[i].setNull();
+		{
+			MutexLocker lock(&m_lockVisibleItems);
+			for (sl_size i = 0; i < m_countVisibleItems; i++) {
+				m_viewsVisibleItems[i].setNull();
+			}
+			m_countVisibleItems = 0;
 		}
 		_initStatus();
 		scrollTo(0, 0);
@@ -400,6 +416,7 @@ namespace slib
 				
 				View* contentView = m_contentView.get();
 				
+				MutexLocker lock(&m_lockVisibleItems);
 				Ref<View>* viewsVisibleItems = m_viewsVisibleItems;
 				sl_ui_len* heightsVisibleItems = m_heightsVisibleItems;
 				sl_ui_len* heightsTopItems = m_heightsTopItems;
