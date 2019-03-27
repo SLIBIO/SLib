@@ -466,6 +466,10 @@ namespace slib
 				prefix = "drawer";
 				pN = &nAutoIncreaseNameDrawer;
 				break;
+			case SAppLayoutItemType::Chat:
+				prefix = "chat";
+				pN = &nAutoIncreaseNameChat;
+				break;
 			default:
 				return String::null();
 		}
@@ -547,6 +551,8 @@ namespace slib
 			type = SAppLayoutItemType::QRCodeScanner;
 		} else if (strType == "drawer") {
 			type = SAppLayoutItemType::Drawer;
+		} else if (strType == "chat") {
+			type = SAppLayoutItemType::Chat;
 		}
 		return type;
 	}

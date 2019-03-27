@@ -761,6 +761,12 @@ namespace slib
 		
 	};
 	
+	class SAppLayoutChatAttributes : public Referable
+	{
+	public:
+		
+	};
+
 	class SAppLayoutStyle : public Referable
 	{
 	public:
@@ -825,7 +831,8 @@ namespace slib
 		Video = 0x0247,
 		Camera = 0x0248,
 		QRCodeScanner = 0x0249,
-		Drawer = 0x024a
+		Drawer = 0x024a,
+		Chat = 0x024b
 	};
 
 	class SAppLayoutResourceItem : public Referable
@@ -868,6 +875,7 @@ namespace slib
 		Ref<SAppLayoutVideoAttributes> attrsVideo;
 		Ref<SAppLayoutCameraAttributes> attrsCamera;
 		Ref<SAppLayoutDrawerAttributes> attrsDrawer;
+		Ref<SAppLayoutChatAttributes> attrsChat;
 
 		CList< Ref<SAppLayoutStyle> > styles;
 		CList< Ref<SAppLayoutResourceItem> > children;
@@ -924,6 +932,7 @@ namespace slib
 		sl_uint32 nAutoIncreaseNameCamera = 0;
 		sl_uint32 nAutoIncreaseNameQRCodeScanner = 0;
 		sl_uint32 nAutoIncreaseNameDrawer = 0;
+		sl_uint32 nAutoIncreaseNameChat = 0;
 
 	public:
 		SAppLayoutResource();

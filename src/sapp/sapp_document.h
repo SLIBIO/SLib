@@ -177,6 +177,7 @@ namespace slib
 		sl_bool _parseLayoutInclude(const String& localNamespace, const Ref<XmlElement>& element);
 		sl_bool _parseLayoutUnit(const String& localNamespace, const Ref<XmlElement>& element);
 		sl_bool _parseLayoutResource(const String& filePath, const String& localNamespace, const Ref<XmlElement>& element);
+		void _openLayoutResource(SAppLayoutResource* layout, const String& fileName);
 		sl_bool _parseLayoutResourceItem(SAppLayoutResource* layout, SAppLayoutResourceItem* item, SAppLayoutResourceItem* parent);
 		Ref<SAppLayoutResourceItem> _parseLayoutResourceItemChild(SAppLayoutResource* layout, SAppLayoutResourceItem* parentItem, const Ref<XmlElement>& element);
 		sl_bool _generateLayoutsCpp(const String& targetPath);
@@ -244,6 +245,7 @@ namespace slib
 		sl_bool _processLayoutResourceControl_Camera(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_QRCodeScanner(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Drawer(LayoutControlProcessParams* params);
+		sl_bool _processLayoutResourceControl_Chat(LayoutControlProcessParams* params);
 
 	private:
 		sl_bool m_flagOpened;

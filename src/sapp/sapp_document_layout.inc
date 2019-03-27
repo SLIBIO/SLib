@@ -201,6 +201,25 @@ namespace slib
 		
 		return sl_true;
 	}
+	
+	void SAppDocument::_openLayoutResource(SAppLayoutResource* layout, const String& fileName)
+	{
+		Ref<SAppLayoutResource> layoutImport;
+		if (!(m_layouts.get(fileName, &layoutImport))) {
+			do {
+				String path = File::getParentDirectoryPath(layout->filePath) + "/" + fileName;
+				if (File::isFile(path + ".xml")) {
+					path += ".xml";
+				} else if (File::isFile(path + ".uiml")) {
+					path += ".uiml";
+				} else {
+					break;
+				}
+				_openUiResource(path);
+			} while (0);
+			m_layouts.emplace(fileName, sl_null);
+		}
+	}
 
 	sl_bool SAppDocument::_parseLayoutResourceItem(SAppLayoutResource* layout, SAppLayoutResourceItem* item, SAppLayoutResourceItem* parent)
 	{
@@ -875,6 +894,7 @@ namespace slib
 			PROCESS_CONTROL_SWITCH(Camera)
 			PROCESS_CONTROL_SWITCH(QRCodeScanner)
 			PROCESS_CONTROL_SWITCH(Drawer)
+			PROCESS_CONTROL_SWITCH(Chat)
 			default:
 				return sl_false;
 		}
@@ -2309,21 +2329,7 @@ namespace slib
 			}
 			resourceItem->className = attr->layout;
 		} else {
-			Ref<SAppLayoutResource> layoutImport;
-			if (!(m_layouts.get(attr->layout, &layoutImport))) {
-				do {
-					String path = File::getParentDirectoryPath(resource->filePath) + "/" + attr->layout;
-					if (File::isFile(path + ".xml")) {
-						path += ".xml";
-					} else if (File::isFile(path + ".uiml")) {
-						path += ".uiml";
-					} else {
-						break;
-					}
-					_openUiResource(path);
-				} while (0);
-				m_layouts.emplace(attr->layout, sl_null);
-			}
+			_openLayoutResource(resource, attr->layout);
 		}
 		if (op == OP_GENERATE_CPP) {
 			Ref<SAppLayoutResource> layoutImport;
@@ -3065,6 +3071,8 @@ namespace slib
 		if (op == OP_PARSE) {
 			attr->itemLayout = resourceItem->getXmlAttribute("item");
 		} else if (op == OP_SIMULATE) {
+			_openLayoutResource(resource, attr->itemLayout);
+			
 			if (attr->itemLayout.isNotEmpty()) {
 				
 				Ref<SAppLayoutResource> layoutItem;
@@ -4113,6 +4121,38 @@ namespace slib
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR(drawerSize, setDrawerSize, checkSize)
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR(dragEdgeSize, setDragEdgeSize, checkSize)
 		LAYOUT_CONTROL_GENERIC_ATTR(gravity, setGravity)
+		
+		LAYOUT_CONTROL_ADD_STATEMENT
+	}
+	END_PROCESS_LAYOUT_CONTROL
+	
+	BEGIN_PROCESS_LAYOUT_CONTROL(Chat, ChatView)
+	{
+		LAYOUT_CONTROL_PROCESS_SUPER(View)
+		
+		if (op == OP_SIMULATE) {
+			if (!flagOnLayout) {
+				List<ChatViewItem> items;
+				Ref<Drawable> iconCustomer = Drawable::createColorDrawable(Color::Red)->clipEllipse();
+				Ref<Drawable> iconMe = Drawable::createColorDrawable(Color::Blue)->clipEllipse();
+				for (sl_size i = 0; i < 1000; i++) {
+					ChatViewItem item;
+					if (i % 2) {
+						item.userName = "Customer";
+						item.userIcon = iconCustomer;
+						item.flagMe = sl_false;
+						item.message = String::format("Chat Message %d", i);
+					} else {
+						item.userIcon = iconMe;
+						item.flagMe = sl_true;
+						item.message = String::format("Welcome to this message %d. This is the test message for multi-line wrapping.", i);
+					}
+					item.time = Time::now() - Time::withMinutes((1000 - i) * 30);
+					items.add_NoLock(item);
+				}
+				view->setItems(items);
+			}
+		}
 		
 		LAYOUT_CONTROL_ADD_STATEMENT
 	}

@@ -665,6 +665,7 @@
 		2639196A21CD4605008B335B /* sds.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639196421CD4605008B335B /* sds.c */; };
 		2639196B21CD4605008B335B /* hiredis.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639196521CD4605008B335B /* hiredis.c */; };
 		2639196E21CD469E008B335B /* redis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639196C21CD469B008B335B /* redis.cpp */; };
+		264DF0EE22455E3B007DB734 /* chat_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264DF0ED22455E3B007DB734 /* chat_view.cpp */; };
 		266E66EC21D9566300D92386 /* locale_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266E66EB21D9566300D92386 /* locale_apple.mm */; };
 		2671F99121E07F7400B39842 /* drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2671F99021E07F7300B39842 /* drawer.cpp */; };
 		26A39D8C20EFE16D004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8B20EFE16D004707C9 /* calculator.cpp */; };
@@ -2043,6 +2044,7 @@
 		2648D54D1D098AE800819E09 /* ui_platform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_platform.cpp; sourceTree = "<group>"; };
 		2649C23A1CBBD7BF003E7561 /* common_dialogs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = common_dialogs.cpp; sourceTree = "<group>"; };
 		2649C23C1CBBD7D4003E7561 /* common_dialogs_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = common_dialogs_ios.mm; sourceTree = "<group>"; };
+		264DF0ED22455E3B007DB734 /* chat_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_view.cpp; sourceTree = "<group>"; };
 		265335901E2E96A900199C76 /* ui_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_animation.cpp; sourceTree = "<group>"; };
 		265EBF2A1C23051F00AD81D9 /* database_cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_cursor.cpp; sourceTree = "<group>"; };
 		265EBF2B1C23051F00AD81D9 /* database_statement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_statement.cpp; sourceTree = "<group>"; };
@@ -4115,6 +4117,7 @@
 			children = (
 				266DD4311C118FF200D47AB0 /* button.cpp */,
 				26A9B7611C172BCC004C9B0E /* camera_view.cpp */,
+				264DF0ED22455E3B007DB734 /* chat_view.cpp */,
 				266DD4351C11901A00D47AB0 /* check_box.cpp */,
 				26C7959B221538D90053C5A1 /* clipboard.cpp */,
 				26C7959A221538D90053C5A1 /* clipboard_ios.mm */,
@@ -5182,6 +5185,7 @@
 				26D9D80B1E9628E0005F7BD3 /* function.cpp in Sources */,
 				26D9D88A1E96295A005F7BD3 /* codec_opus.cpp in Sources */,
 				26D9D86A1E96294F005F7BD3 /* drawable_quartz.mm in Sources */,
+				264DF0EE22455E3B007DB734 /* chat_view.cpp in Sources */,
 				26D9D80C1E9628E0005F7BD3 /* matrix4.cpp in Sources */,
 				26D9D8D01E962976005F7BD3 /* scroll_bar.cpp in Sources */,
 				26E1B8DD222ABCDD007C222E /* jctrans.c in Sources */,

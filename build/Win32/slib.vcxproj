@@ -335,6 +335,7 @@
     <ClCompile Include="..\..\src\slib\ui\button.cpp" />
     <ClCompile Include="..\..\src\slib\ui\button_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\camera_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\chat_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\check_box.cpp" />
     <ClCompile Include="..\..\src\slib\ui\check_box_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\clipboard.cpp" />

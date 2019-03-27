@@ -66,6 +66,7 @@
 #include "ui/video_view.h"
 #include "ui/camera_view.h"
 #include "ui/qr_code_scanner.h"
+#include "ui/chat_view.h"
 
 #include "ui/transition.h"
 #include "ui/motion_tracker.h"

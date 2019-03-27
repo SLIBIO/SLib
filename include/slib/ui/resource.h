@@ -337,6 +337,7 @@ namespace slib
 	class CameraView;
 	class QRCodeScanner;
 	class Drawer;
+	class ChatView;
 
 }
 
