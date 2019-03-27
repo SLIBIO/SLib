@@ -965,6 +965,9 @@ namespace slib
 		if (m_instance.isNotNull()) {
 			return this;
 		}
+		if (m_flagCreatingInstance) {
+			return sl_null;
+		}
 		Ref<View> parent = m_parent;
 		if (parent.isNotNull()) {
 			return parent->getNearestViewCreatingChildInstances();
