@@ -210,6 +210,16 @@ namespace slib
 		return RotateFlipDrawable::apply(this, RotationMode::Rotate0, flip);
 	}
 
+	Ref<Drawable> Drawable::clipEllipse()
+	{
+		return ClipEllipseDrawable::create(this);
+	}
+
+	Ref<Drawable> Drawable::clipRoundRect(const Size& radius)
+	{
+		return ClipRoundRectDrawable::create(this, radius);
+	}
+
 	Ref<Drawable> Drawable::createColorDrawable(const Color& color)
 	{
 		return ColorDrawable::create(color);
@@ -272,7 +282,17 @@ namespace slib
 		return RotateFlipDrawable::apply(src, RotationMode::Rotate0, flip);
 	}
 
+	Ref<Drawable> Drawable::clipEllipse(const Ref<Drawable>& src)
+	{
+		return ClipEllipseDrawable::create(src);
+	}
 
+	Ref<Drawable> Drawable::clipRoundRect(const Ref<Drawable>& src, const Size& radius)
+	{
+		return ClipRoundRectDrawable::create(src, radius);
+	}
+	
+	
 	SLIB_DEFINE_OBJECT(ColorDrawable, Drawable)
 
 	ColorDrawable::ColorDrawable()
@@ -684,6 +704,99 @@ namespace slib
 		return m_src->getAnimationInfo(info);
 	}
 	
+	
+	SLIB_DEFINE_OBJECT(ClipEllipseDrawable, Drawable)
+	
+	ClipEllipseDrawable::ClipEllipseDrawable()
+	{
+	}
+	
+	ClipEllipseDrawable::~ClipEllipseDrawable()
+	{
+	}
+	
+	Ref<Drawable> ClipEllipseDrawable::create(const Ref<Drawable>& src)
+	{
+		if (src.isNull()) {
+			return sl_null;
+		}
+		Ref<ClipEllipseDrawable> ret = new ClipEllipseDrawable;
+		if (ret.isNotNull()) {
+			ret->m_src = src;
+			return ret;
+		}
+		return sl_null;
+	}
+	
+	sl_real ClipEllipseDrawable::getDrawableWidth()
+	{
+		return m_src->getDrawableWidth();
+	}
+	
+	sl_real ClipEllipseDrawable::getDrawableHeight()
+	{
+		return m_src->getDrawableHeight();
+	}
+	
+	void ClipEllipseDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
+	{
+		CanvasStateScope scope(canvas);
+		canvas->clipToEllipse(rectDst);
+		canvas->draw(rectDst, m_src, param);
+	}
+	
+	sl_bool ClipEllipseDrawable::getAnimationInfo(DrawableAnimationInfo* info)
+	{
+		return m_src->getAnimationInfo(info);
+	}
+	
+	
+	SLIB_DEFINE_OBJECT(ClipRoundRectDrawable, Drawable)
+	
+	ClipRoundRectDrawable::ClipRoundRectDrawable()
+	{
+	}
+	
+	ClipRoundRectDrawable::~ClipRoundRectDrawable()
+	{
+	}
+	
+	Ref<Drawable> ClipRoundRectDrawable::create(const Ref<Drawable>& src, const Size& radius)
+	{
+		if (src.isNull()) {
+			return sl_null;
+		}
+		Ref<ClipRoundRectDrawable> ret = new ClipRoundRectDrawable;
+		if (ret.isNotNull()) {
+			ret->m_src = src;
+			ret->m_radius = radius;
+			return ret;
+		}
+		return sl_null;
+	}
+	
+	sl_real ClipRoundRectDrawable::getDrawableWidth()
+	{
+		return m_src->getDrawableWidth();
+	}
+	
+	sl_real ClipRoundRectDrawable::getDrawableHeight()
+	{
+		return m_src->getDrawableHeight();
+	}
+	
+	void ClipRoundRectDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
+	{
+		CanvasStateScope scope(canvas);
+		canvas->clipToRoundRect(rectDst, m_radius);
+		canvas->draw(rectDst, m_src, param);
+	}
+	
+	sl_bool ClipRoundRectDrawable::getAnimationInfo(DrawableAnimationInfo* info)
+	{
+		return m_src->getAnimationInfo(info);
+	}
+
 
 	SLIB_DEFINE_OBJECT(FilterDrawable, Drawable)
 

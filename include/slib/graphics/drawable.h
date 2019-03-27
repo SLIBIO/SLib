@@ -137,6 +137,10 @@ namespace slib
 		
 		Ref<Drawable> flip(FlipMode flip);
 
+		Ref<Drawable> clipEllipse();
+		
+		Ref<Drawable> clipRoundRect(const Size& radius);
+		
 	public:
 		static Ref<Drawable> createColorDrawable(const Color& color);
 
@@ -158,6 +162,10 @@ namespace slib
 		
 		static Ref<Drawable> flip(const Ref<Drawable>& src, FlipMode flip);
 
+		static Ref<Drawable> clipEllipse(const Ref<Drawable>& src);
+
+		static Ref<Drawable> clipRoundRect(const Ref<Drawable>& src, const Size& radius);
+		
 	};
 	
 	class SLIB_EXPORT PlatformDrawable
@@ -358,6 +366,59 @@ namespace slib
 		Ref<Drawable> m_src;
 		RotationMode m_rotate;
 		FlipMode m_flip;
+		
+	};
+	
+	class SLIB_EXPORT ClipEllipseDrawable : public Drawable
+	{
+		SLIB_DECLARE_OBJECT
+		
+	protected:
+		ClipEllipseDrawable();
+		
+		~ClipEllipseDrawable();
+		
+	public:
+		static Ref<Drawable> create(const Ref<Drawable>& src);
+		
+	public:
+		sl_real getDrawableWidth() override;
+		
+		sl_real getDrawableHeight() override;
+		
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
+		
+		sl_bool getAnimationInfo(DrawableAnimationInfo* info) override;
+		
+	protected:
+		Ref<Drawable> m_src;
+
+	};
+	
+	class SLIB_EXPORT ClipRoundRectDrawable : public Drawable
+	{
+		SLIB_DECLARE_OBJECT
+		
+	protected:
+		ClipRoundRectDrawable();
+		
+		~ClipRoundRectDrawable();
+		
+	public:
+		static Ref<Drawable> create(const Ref<Drawable>& src, const Size& radius);
+		
+	public:
+		sl_real getDrawableWidth() override;
+		
+		sl_real getDrawableHeight() override;
+		
+		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override;
+		
+		sl_bool getAnimationInfo(DrawableAnimationInfo* info) override;
+		
+	protected:
+		Ref<Drawable> m_src;
+		Size m_radius;
 		
 	};
 	
