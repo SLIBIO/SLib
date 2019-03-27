@@ -124,7 +124,7 @@ namespace slib
 		{
 			ListLocker<DataType> list(m_list);
 			if (index < list.count) {
-				onBindView(list[index], view, parent);
+				onBindView(list[(sl_size)index], view, parent);
 			}
 		}
 		
