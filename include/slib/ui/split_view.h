@@ -38,6 +38,9 @@ namespace slib
 		SplitView();
 		
 		~SplitView();
+
+	protected:
+		void init() override;
 		
 	public:
 		LayoutOrientation getOrientation();

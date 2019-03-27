@@ -67,9 +67,9 @@ namespace slib
 		WeakRef<Window> m_window;
 		
 	public:
-		_priv_DefaultOAuthWebRedirectDialog()
+		void init() override
 		{
-			SLIB_REFERABLE_CONSTRUCTOR
+			ViewPage::init();
 			
 			Ref<Button> btnCancel = new Button;
 			btnCancel->setCancelOnClick();

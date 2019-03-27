@@ -108,7 +108,7 @@ namespace slib
 		}
 	}
 
-	void _priv_HashTable::init(HashTableStructBase* table, sl_size capacityMinimum, sl_size capacityMaximum) noexcept
+	void _priv_HashTable::initialize(HashTableStructBase* table, sl_size capacityMinimum, sl_size capacityMaximum) noexcept
 	{
 		table->nodes = sl_null;
 		table->count = 0;

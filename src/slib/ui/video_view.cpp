@@ -32,9 +32,7 @@ namespace slib
 	SLIB_DEFINE_OBJECT(VideoView, RenderView)
 	
 	VideoView::VideoView()
-	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
+	{		
 		setSavingCanvasState(sl_false);
 		
 		setBackgroundColor(Color::Black, UIUpdateMode::Init);
@@ -53,9 +51,7 @@ namespace slib
 		m_programRGB = new RenderProgram2D_PositionTexture;
 		m_programYUV = new RenderProgram2D_PositionTextureYUV;
 		m_programOES = new RenderProgram2D_PositionTextureOES;
-		
-		m_renderVideoParam.onUpdateFrame = SLIB_FUNCTION_WEAKREF(VideoView, updateCurrentFrame, this);
-		
+				
 		m_flipFrameApplied = FlipMode::None;
 		m_rotationFrameApplied = RotationMode::Rotate0;
 		m_flipApplied = FlipMode::None;
@@ -69,6 +65,13 @@ namespace slib
 	
 	VideoView::~VideoView()
 	{
+	}
+
+	void VideoView::init()
+	{
+		RenderView::init();
+
+		m_renderVideoParam.onUpdateFrame = SLIB_FUNCTION_WEAKREF(VideoView, updateCurrentFrame, this);
 	}
 	
 	Ref<MediaPlayer> VideoView::getMediaPlayer()

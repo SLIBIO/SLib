@@ -39,6 +39,9 @@ namespace slib
 		Drawer();
 		
 		~Drawer();
+
+	protected:
+		void init() override;
 		
 	public:
 		sl_bool isOpened();

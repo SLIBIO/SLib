@@ -49,9 +49,6 @@ namespace slib
 	
 	ProgressBar::ProgressBar(LayoutOrientation orientation)
 	{
-		
-		SLIB_REFERABLE_CONSTRUCTOR
-		
 		setSavingCanvasState(sl_false);
 		
 		m_orientation = orientation;

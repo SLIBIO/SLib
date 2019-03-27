@@ -386,14 +386,19 @@ namespace slib
 	
 	WindowLayout::WindowLayout()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		Ref<View> view = Window::getContentView();
-		m_contentViewRef = view;
-		m_contentView = view.get();
 	}
 	
 	WindowLayout::~WindowLayout()
 	{
+	}
+
+	void WindowLayout::init()
+	{
+		Window::init();
+
+		Ref<View> view = Window::getContentView();
+		m_contentViewRef = view;
+		m_contentView = view.get();
 	}
 
 	UISize WindowLayout::getContentSize()
@@ -418,12 +423,17 @@ namespace slib
 	
 	ViewLayout::ViewLayout()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		m_contentView = this;
 	}
 	
 	ViewLayout::~ViewLayout()
 	{
+	}
+
+	void ViewLayout::init()
+	{
+		ViewGroup::init();
+
+		m_contentView = this;
 	}
 
 	UISize ViewLayout::getContentSize()
@@ -442,12 +452,17 @@ namespace slib
 	
 	PageLayout::PageLayout()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		m_contentView = this;
 	}
 	
 	PageLayout::~PageLayout()
 	{
+	}
+
+	void PageLayout::init()
+	{
+		ViewPage::init();
+
+		m_contentView = this;
 	}
 
 	UISize PageLayout::getContentSize()

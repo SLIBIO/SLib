@@ -44,8 +44,6 @@ namespace slib
 
 	Timer::~Timer()
 	{
-		SLIB_REFERABLE_DESTRUCTOR
-		stop();
 	}
 	
 	Ref<Timer> Timer::create(const Function<void(Timer*)>& task, sl_uint64 interval_ms)

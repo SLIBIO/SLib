@@ -39,9 +39,7 @@ namespace slib
 	SLIB_DEFINE_OBJECT(PickerView, View)
 	
 	PickerView::PickerView()
-	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
+	{		
 #ifdef HAS_NATIVE_WIDGET_IMPL
 		setCreatingNativeWidget(sl_true);
 #endif

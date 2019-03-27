@@ -853,13 +853,13 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	SLIB_INLINE void Map<KT, VT, KEY_COMPARE>::init() noexcept
+	SLIB_INLINE void Map<KT, VT, KEY_COMPARE>::initialize() noexcept
 	{
 		ref = new CMAP();
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	SLIB_INLINE void Map<KT, VT, KEY_COMPARE>::init(const KEY_COMPARE& compare) noexcept
+	SLIB_INLINE void Map<KT, VT, KEY_COMPARE>::initialize(const KEY_COMPARE& compare) noexcept
 	{
 		ref = new CMAP(compare);
 	}
@@ -1744,13 +1744,13 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	void Atomic< Map<KT, VT, KEY_COMPARE> >::init() noexcept
+	void Atomic< Map<KT, VT, KEY_COMPARE> >::initialize() noexcept
 	{
 		ref = new CMAP;
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
-	void Atomic< Map<KT, VT, KEY_COMPARE> >::init(const KEY_COMPARE& compare) noexcept
+	void Atomic< Map<KT, VT, KEY_COMPARE> >::initialize(const KEY_COMPARE& compare) noexcept
 	{
 		ref = new CMAP;
 	}

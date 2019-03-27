@@ -67,35 +67,34 @@ namespace slib
 		m_weak = sl_null;
 	}
 
-	Referable::~Referable() noexcept
+	Referable::~Referable()
 	{
 		_clearWeak();
 	}
 
 	sl_reg Referable::increaseReference() noexcept
 	{
-		if (m_nRefCount >= 0) {
 #ifdef SLIB_DEBUG_REFERENCE
-			_checkValid();
+		_checkValid();
 #endif
-			return Base::interlockedIncrement(&m_nRefCount);
+		sl_reg nRefCountOld = m_nRefCount;
+		sl_reg nRefCountNew = Base::interlockedIncrement(&m_nRefCount);
+		if (!nRefCountOld) {
+			init();
 		}
-		return 1;
+		return nRefCountNew;
 	}
 
 	sl_reg Referable::decreaseReference() noexcept
 	{
-		if (m_nRefCount > 0) {
 #ifdef SLIB_DEBUG_REFERENCE
-			_checkValid();
+		_checkValid();
 #endif
-			sl_reg nRef = Base::interlockedDecrement(&m_nRefCount);
-			if (nRef == 0) {
-				_free();
-			}
-			return nRef;
+		sl_reg nRef = Base::interlockedDecrement(&m_nRefCount);
+		if (nRef == 0) {
+			_free();
 		}
-		return 1;
+		return nRef;
 	}
 	
 	sl_reg Referable::getReferenceCount() noexcept
@@ -114,9 +113,8 @@ namespace slib
 		return 1;
 	}
 
-	void Referable::makeNeverFree() noexcept
+	void Referable::init()
 	{
-		m_nRefCount = -1;
 	}
 	
 	sl_object_type Referable::ObjectType() noexcept
@@ -226,18 +224,6 @@ namespace slib
 			m_object = sl_null;
 		}
 		decreaseReference();
-	}
-
-
-	ReferableKeeper::ReferableKeeper(Referable* object) noexcept
-	{
-		m_object = object;
-		object->increaseReference();
-	}
-
-	ReferableKeeper::~ReferableKeeper() noexcept
-	{
-		m_object->decreaseReferenceNoFree();
 	}
 
 }

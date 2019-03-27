@@ -73,7 +73,7 @@ namespace slib
 			if (handle) {
 				Ref<T> instance = create<T>(handle, sl_true);
 				if (instance.isNotNull()) {
-					instance->init(view, frame, transform);
+					instance->initialize(view, frame, transform);
 					return instance;
 				}
 			}
@@ -84,7 +84,7 @@ namespace slib
 			, LPCWSTR wndClass, LPCWSTR text
 			, int style, int styleEx, const UIRect& rect, const Matrix3& transform);
 
-		void init(View* view, const UIRect& rect, const Matrix3& transform);
+		void initialize(View* view, const UIRect& rect, const Matrix3& transform);
 
 		HWND getHandle();
 

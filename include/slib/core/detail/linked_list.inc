@@ -38,7 +38,7 @@ namespace slib
 	}
 	
 	template <class T>
-	SLIB_INLINE void CLinkedList<T>::init() noexcept
+	SLIB_INLINE void CLinkedList<T>::initialize() noexcept
 	{
 		m_front = sl_null;
 		m_back = sl_null;
@@ -46,7 +46,7 @@ namespace slib
 	}
 	
 	template <class T>
-	SLIB_INLINE void CLinkedList<T>::init(Link<T>* front, Link<T>* back, sl_size count) noexcept
+	SLIB_INLINE void CLinkedList<T>::initialize(Link<T>* front, Link<T>* back, sl_size count) noexcept
 	{
 		m_front = front;
 		m_back = back;
@@ -54,7 +54,7 @@ namespace slib
 	}
 	
 	template <class T>
-	SLIB_INLINE void CLinkedList<T>::init(const CLinkedList<T>* other) noexcept
+	SLIB_INLINE void CLinkedList<T>::initialize(const CLinkedList<T>* other) noexcept
 	{
 		m_front = other->m_front;
 		m_back = other->m_back;
@@ -369,7 +369,7 @@ namespace slib
 	{
 		Link<T>* front = m_front;
 		sl_size count = m_count;
-		init();
+		initialize();
 		freeLink(front);
 		return count;
 	}
@@ -383,7 +383,7 @@ namespace slib
 			ObjectLocker lock(this);
 			front = m_front;
 			count = m_count;
-			init();
+			initialize();
 		}
 		freeLink(front);
 		return count;
@@ -458,7 +458,7 @@ namespace slib
 				m_front = _front;
 			}
 			m_back = _back;
-			other->init();
+			other->initialize();
 			m_count = countNew;
 		}
 	}
@@ -1157,8 +1157,8 @@ namespace slib
 		} else {
 			obj = new CLinkedList<T>;
 			if (obj) {
-				obj->init(other);
-				other->init();
+				obj->initialize(other);
+				other->initialize();
 				ref = obj;
 			}
 		}

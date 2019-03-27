@@ -46,7 +46,7 @@ namespace slib
 	SLIB_INLINE CHashMap<KT, VT, HASH, KEY_COMPARE>::CHashMap(sl_size capacityMinimum, sl_size capacityMaximum, const HASH& hash, const KEY_COMPARE& compare) noexcept
 	 : m_hash(hash), m_compare(compare)
 	{
-		_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), capacityMinimum, capacityMaximum);
+		_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), capacityMinimum, capacityMaximum);
 		m_nodeFirst = sl_null;
 		m_nodeLast = sl_null;
 	}
@@ -900,7 +900,7 @@ namespace slib
 		}
 		sl_size count = m_table.count;
 		_free();
-		_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
+		_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
 		m_nodeFirst = sl_null;
 		m_nodeLast = sl_null;
 		return count;
@@ -920,7 +920,7 @@ namespace slib
 			first = m_nodeFirst;
 			nodes = m_table.nodes;
 			count = m_table.count;
-			_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
+			_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
 			m_nodeFirst = sl_null;
 			m_nodeLast = sl_null;
 		}
@@ -969,7 +969,7 @@ namespace slib
 		_free();
 		m_nodeFirst = sl_null;
 		m_nodeLast = sl_null;
-		_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), other.m_table.capacityMinimum, other.m_table.capacityMaximum);
+		_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), other.m_table.capacityMinimum, other.m_table.capacityMaximum);
         return _copyFrom(&other);
 	}
 	
@@ -1232,7 +1232,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
-	SLIB_INLINE void HashMap<KT, VT, HASH, KEY_COMPARE>::init(sl_size capacityMinimum, sl_size capacityMaximum, const HASH& hash, const KEY_COMPARE& compare) noexcept
+	SLIB_INLINE void HashMap<KT, VT, HASH, KEY_COMPARE>::initialize(sl_size capacityMinimum, sl_size capacityMaximum, const HASH& hash, const KEY_COMPARE& compare) noexcept
 	{
 		ref = new CMAP(capacityMinimum, capacityMaximum, hash, compare);
 	}
@@ -2169,7 +2169,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
-	void Atomic< HashMap<KT, VT, HASH, KEY_COMPARE> >::init(sl_size capacityMinimum, sl_size capacityMaximum, const HASH& hash, const KEY_COMPARE& compare) noexcept
+	void Atomic< HashMap<KT, VT, HASH, KEY_COMPARE> >::initialize(sl_size capacityMinimum, sl_size capacityMaximum, const HASH& hash, const KEY_COMPARE& compare) noexcept
 	{
 		ref = new CMAP(capacityMinimum, capacityMaximum, hash, compare);
 	}

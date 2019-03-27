@@ -30,8 +30,6 @@ namespace slib
 	
 	Drawer::Drawer()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
 		setCreatingInstance(sl_true);
 		setSavingCanvasState(sl_false);
 		
@@ -39,20 +37,25 @@ namespace slib
 		setHeightFilling(1, UIUpdateMode::Init);
 		setBackgroundColor(Color(0, 0, 0, 100), UIUpdateMode::Init);
 		setVisible(sl_false, UIUpdateMode::Init);
-		
+
 		m_flagOpened = sl_false;
 		m_drawerSize = 0;
 		m_dragEdgeSize = 0;
 		m_gravity = Alignment::Left;
-		
-		m_callbackParentMouseEvent = SLIB_FUNCTION_WEAKREF(Drawer, _onParentMouseEvent, this);
-		
+
 		m_flagMouseDown = sl_false;
 		m_posMouseDown = 0;
 	}
-	
+
 	Drawer::~Drawer()
 	{
+	}
+
+	void Drawer::init()
+	{
+		ViewGroup::init();
+
+		m_callbackParentMouseEvent = SLIB_FUNCTION_WEAKREF(Drawer, _onParentMouseEvent, this);
 	}
 	
 	sl_bool Drawer::isOpened()

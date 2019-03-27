@@ -99,7 +99,7 @@ namespace slib
 		return NULL;
 	}
 
-	void Win32_ViewInstance::init(View* view, const UIRect& frame, const Matrix3& transform)
+	void Win32_ViewInstance::initialize(View* view, const UIRect& frame, const Matrix3& transform)
 	{
 		m_frame = frame;
 		m_translation = Transform2::getTranslationFromMatrix(transform);

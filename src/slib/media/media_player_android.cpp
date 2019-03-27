@@ -87,7 +87,6 @@ namespace slib
 
 		~_priv_Android_MediaPlayer()
 		{
-			SLIB_REFERABLE_DESTRUCTOR
 			release();
 			_priv_AndroidMediaPlayerMap* map = _priv_AndroidMediaPlayerMap_get();
 			if (map) {

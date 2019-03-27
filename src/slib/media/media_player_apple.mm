@@ -71,7 +71,6 @@ namespace slib
 		
 		~_priv_AVPlayer()
 		{
-			SLIB_REFERABLE_DESTRUCTOR
 			_release(sl_true, sl_false);
 		}
 		

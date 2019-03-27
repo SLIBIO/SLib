@@ -376,7 +376,7 @@ namespace slib
 		template <class KEY, class VALUE, class OTHER_HASH, class OTHER_COMPARE>
 		static const HashMap& from(const HashMap<KEY, VALUE, OTHER_HASH, OTHER_COMPARE>& other) noexcept;
 		
-		void init(sl_size capacityMinimum = 0, sl_size capacityMaximum = 0, const HASH& hash = HASH(), const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
+		void initialize(sl_size capacityMinimum = 0, sl_size capacityMaximum = 0, const HASH& hash = HASH(), const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
 
 	public:
 #ifdef SLIB_SUPPORT_STD_TYPES
@@ -610,7 +610,7 @@ namespace slib
 		template <class KEY, class VALUE, class OTHER_HASH, class OTHER_COMPARE>
 		static const Atomic& from(const Atomic< HashMap<KEY, VALUE, OTHER_HASH, OTHER_COMPARE> >& other) noexcept;
 		
-		void init(sl_size capacityMinimum = 0, sl_size capacityMaximum = 0, const HASH& hash = HASH(), const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
+		void initialize(sl_size capacityMinimum = 0, sl_size capacityMaximum = 0, const HASH& hash = HASH(), const KEY_COMPARE& compare = KEY_COMPARE()) noexcept;
 		
 	public:
 #ifdef SLIB_SUPPORT_STD_TYPES

@@ -34,8 +34,6 @@ namespace slib
 	
 	ScrollView::ScrollView()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
 #ifdef HAS_NATIVE_WIDGET_IMPL
 		setCreatingNativeWidget(sl_true);
 #endif

@@ -40,6 +40,9 @@ namespace slib
 		RenderView();
 		
 		~RenderView();
+
+	protected:
+		void init() override;
 		
 	public:
 		RedrawMode getRedrawMode();

@@ -37,9 +37,7 @@ namespace slib
 	SLIB_DEFINE_OBJECT(ViewPageNavigationController, ViewGroup)
 
 	ViewPageNavigationController::ViewPageNavigationController()
-	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
+	{		
 		setCreatingInstance(sl_true);
 		
 		m_flagSwipeNavigation = sl_false;

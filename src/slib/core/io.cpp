@@ -1514,17 +1514,17 @@ namespace slib
 	
 	MemoryIO::MemoryIO(sl_size size, sl_bool flagResizable)
 	{
-		_init(size, flagResizable);
+		_initialize(size, flagResizable);
 	}
 	
 	MemoryIO::MemoryIO(const void* data, sl_size size, sl_bool flagResizable)
 	{
-		_init(data, size, flagResizable);
+		_initialize(data, size, flagResizable);
 	}
 
 	MemoryIO::MemoryIO(const Memory& mem)
 	{
-		_init(mem);
+		_initialize(mem);
 	}
 
 	MemoryIO::~MemoryIO()
@@ -1532,7 +1532,7 @@ namespace slib
 		_free();
 	}
 
-	void MemoryIO::_init(const void* data, sl_size size, sl_bool flagResizable)
+	void MemoryIO::_initialize(const void* data, sl_size size, sl_bool flagResizable)
 	{
 		if (size > 0) {
 			m_buf = Base::createMemory(size);
@@ -1552,30 +1552,30 @@ namespace slib
 		m_flagResizable = flagResizable;
 	}
 	
-	void MemoryIO::init(const void* data, sl_size size, sl_bool flagResizable)
+	void MemoryIO::initialize(const void* data, sl_size size, sl_bool flagResizable)
 	{
 		_free();
-		_init(data, size, flagResizable);
+		_initialize(data, size, flagResizable);
 	}
 
-	void MemoryIO::_init(sl_size size, sl_bool flagResizable)
+	void MemoryIO::_initialize(sl_size size, sl_bool flagResizable)
 	{
-		_init(sl_null, size, flagResizable);
+		_initialize(sl_null, size, flagResizable);
 	}
 	
-	void MemoryIO::init(sl_size size, sl_bool flagResizable)
+	void MemoryIO::initialize(sl_size size, sl_bool flagResizable)
 	{
-		init(sl_null, size, flagResizable);
+		initialize(sl_null, size, flagResizable);
 	}
 	
-	void MemoryIO::_init(const Memory& mem)
+	void MemoryIO::_initialize(const Memory& mem)
 	{
-		_init(mem.getData(), mem.getSize(), sl_false);
+		_initialize(mem.getData(), mem.getSize(), sl_false);
 	}
 
-	void MemoryIO::init(const Memory& mem)
+	void MemoryIO::initialize(const Memory& mem)
 	{
-		init(mem.getData(), mem.getSize(), sl_false);
+		initialize(mem.getData(), mem.getSize(), sl_false);
 	}
 	
 	void MemoryIO::_free()
@@ -1722,19 +1722,19 @@ namespace slib
 
 	MemoryReader::MemoryReader(const Memory& mem)
 	{
-		init(mem);
+		initialize(mem);
 	}
 
 	MemoryReader::MemoryReader(const void* buf, sl_size size)
 	{
-		init(buf, size);
+		initialize(buf, size);
 	}
 
 	MemoryReader::~MemoryReader()
 	{
 	}
 	
-	void MemoryReader::init(const Memory& mem)
+	void MemoryReader::initialize(const Memory& mem)
 	{
 		m_mem = mem;
 		m_buf = mem.getData();
@@ -1742,7 +1742,7 @@ namespace slib
 		m_offset = 0;
 	}
 	
-	void MemoryReader::init(const void* buf, sl_size size)
+	void MemoryReader::initialize(const void* buf, sl_size size)
 	{
 		m_buf = buf;
 		m_size = size;
@@ -1819,31 +1819,31 @@ namespace slib
 
 	MemoryWriter::MemoryWriter()
 	{
-		init();
+		initialize();
 	}
 
 	MemoryWriter::MemoryWriter(const Memory& mem)
 	{
-		init(mem);
+		initialize(mem);
 	}
 
 	MemoryWriter::MemoryWriter(void* buf, sl_size size)
 	{
-		init(buf, size);
+		initialize(buf, size);
 	}
 
 	MemoryWriter::~MemoryWriter()
 	{
 	}
 	
-	void MemoryWriter::init()
+	void MemoryWriter::initialize()
 	{
 		m_buf = sl_null;
 		m_size = 0;
 		m_offset = 0;
 	}
 	
-	void MemoryWriter::init(const Memory& mem)
+	void MemoryWriter::initialize(const Memory& mem)
 	{
 		m_mem = mem;
 		m_buf = mem.getData();
@@ -1851,7 +1851,7 @@ namespace slib
 		m_offset = 0;
 	}
 	
-	void MemoryWriter::init(void* buf, sl_size size)
+	void MemoryWriter::initialize(void* buf, sl_size size)
 	{
 		if (!buf) {
 			size = 0;

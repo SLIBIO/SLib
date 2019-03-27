@@ -193,7 +193,7 @@ namespace slib
 				if (dict != nil && [dict count] > 0) {
 					HttpHeaderMap map;
 					
-					map.init();
+					map.initialize();
 					auto cmap = map.ref.get();
 					if (cmap) {
 						[dict enumerateKeysAndObjectsUsingBlock:^(id _key, id _value, BOOL *stop) {

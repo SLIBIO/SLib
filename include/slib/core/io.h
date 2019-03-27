@@ -322,11 +322,11 @@ namespace slib
 		~MemoryIO();
 	
 	public:
-		void init(const void* data, sl_size size, sl_bool flagResizable = sl_true);
+		void initialize(const void* data, sl_size size, sl_bool flagResizable = sl_true);
 	
-		void init(sl_size size = 0, sl_bool flagResizable = sl_true);
+		void initialize(sl_size size = 0, sl_bool flagResizable = sl_true);
 		
-		void init(const Memory& mem);
+		void initialize(const Memory& mem);
 
 		sl_size getOffset();
 
@@ -351,11 +351,11 @@ namespace slib
 		sl_bool isResizable();
 		
 	protected:
-		void _init(const void* data, sl_size size, sl_bool flagResizable);
+		void _initialize(const void* data, sl_size size, sl_bool flagResizable);
 
-		void _init(sl_size size, sl_bool flagResizable);
+		void _initialize(sl_size size, sl_bool flagResizable);
 		
-		void _init(const Memory& mem);
+		void _initialize(const Memory& mem);
 		
 		void _free();
 		
@@ -377,9 +377,9 @@ namespace slib
 		~MemoryReader();
 	
 	public:
-		void init(const Memory& mem);
+		void initialize(const Memory& mem);
 
-		void init(const void* buf, sl_size size);
+		void initialize(const void* buf, sl_size size);
 	
 		sl_size getOffset();
 
@@ -416,11 +416,11 @@ namespace slib
 		~MemoryWriter();
 	
 	public:
-		void init();
+		void initialize();
 
-		void init(const Memory& mem);
+		void initialize(const Memory& mem);
 
-		void init(void* buf, sl_size size);
+		void initialize(void* buf, sl_size size);
 
 		sl_reg write(const void* buf, sl_size size) override;
 

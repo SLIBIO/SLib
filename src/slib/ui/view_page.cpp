@@ -34,9 +34,7 @@ namespace slib
 	SLIB_DEFINE_OBJECT(ViewPage, ViewGroup)
 
 	ViewPage::ViewPage()
-	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
+	{		
 		setCreatingInstance(sl_true);
 		
 		m_popupState = PopupState::None;

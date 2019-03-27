@@ -49,7 +49,7 @@ namespace slib
 		
 		Referable(Referable&& other) noexcept;
 
-		virtual ~Referable() noexcept;
+		virtual ~Referable();
 
 	public:
 		sl_reg increaseReference() noexcept;
@@ -59,8 +59,9 @@ namespace slib
 		sl_reg decreaseReferenceNoFree() noexcept;
 		
 		sl_reg getReferenceCount() noexcept;
-
-		void makeNeverFree() noexcept;
+		
+	protected:
+		virtual void init();
 
 	public:
 		static sl_object_type ObjectType() noexcept;
@@ -701,24 +702,13 @@ namespace slib
 		void release() noexcept;
 		
 	};
+
 	
-	class SLIB_EXPORT ReferableKeeper
-	{
-	public:
-		ReferableKeeper(Referable* object) noexcept;
+	template <class T>
+	Ref<T> New() noexcept;
 
-		~ReferableKeeper() noexcept;
-
-	private:
-		Referable* m_object;
-
-	};
-	
-	template <class T, class... ARGS>
-	Ref<T> New(ARGS&&... args) noexcept;
-
-	template <class T, class... ARGS>
-	Ref<T> Init(ARGS&&... args) noexcept;
+	template <class T, class ARG, class... ARGS>
+	Ref<T> New(ARG&& arg, ARGS&&... args) noexcept;
 
 	template <class T, class OTHER>
 	sl_bool IsInstanceOf(OTHER* object) noexcept;

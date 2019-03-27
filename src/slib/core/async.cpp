@@ -768,18 +768,18 @@ namespace slib
 		return sl_false;
 	}
 
-	void AsyncStreamSimulator::init()
+	void AsyncStreamSimulator::initialize()
 	{
 		m_dispatchLoop = DispatchLoop::create();
 		m_dispatcher = m_dispatchLoop;
 	}
 
-	void AsyncStreamSimulator::init(const Ref<Dispatcher>& dispatcher)
+	void AsyncStreamSimulator::initialize(const Ref<Dispatcher>& dispatcher)
 	{
 		if (dispatcher.isNotNull()) {
 			m_dispatcher = dispatcher;
 		} else {
-			init();
+			initialize();
 		}
 	}
 
@@ -839,7 +839,7 @@ namespace slib
 			Ref<AsyncReader> ret = new AsyncReader;
 			if (ret.isNotNull()) {
 				ret->m_reader = reader;
-				ret->init();
+				ret->initialize();
 				return ret;
 			}
 		}
@@ -852,7 +852,7 @@ namespace slib
 			Ref<AsyncReader> ret = new AsyncReader;
 			if (ret.isNotNull()) {
 				ret->m_reader = reader;
-				ret->init(dispatcher);
+				ret->initialize(dispatcher);
 				return ret;
 			}
 		}
@@ -918,7 +918,7 @@ namespace slib
 			Ref<AsyncWriter> ret = new AsyncWriter;
 			if (ret.isNotNull()) {
 				ret->m_writer = writer;
-				ret->init();
+				ret->initialize();
 				return ret;
 			}
 		}
@@ -931,7 +931,7 @@ namespace slib
 			Ref<AsyncWriter> ret = new AsyncWriter;
 			if (ret.isNotNull()) {
 				ret->m_writer = writer;
-				ret->init(dispatcher);
+				ret->initialize(dispatcher);
 				return ret;
 			}
 		}
@@ -998,7 +998,7 @@ namespace slib
 			Ref<AsyncFile> ret = new AsyncFile;
 			if (ret.isNotNull()) {
 				ret->m_file = file;
-				ret->init();
+				ret->initialize();
 				return ret;
 			}
 		}
@@ -1011,7 +1011,7 @@ namespace slib
 			Ref<AsyncFile> ret = new AsyncFile;
 			if (ret.isNotNull()) {
 				ret->m_file = file;
-				ret->init(dispatcher);
+				ret->initialize(dispatcher);
 				return ret;
 			}
 		}

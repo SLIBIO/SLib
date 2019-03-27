@@ -33,20 +33,33 @@ private:
 	List<Ref<ExampleNode>> children;
 
 public:
-	ExampleNode(const String& name, Ref<ExampleNode> parent = nullptr): name(name)
+	ExampleNode()
 	{
-		SLIB_KEEP_REF;
+		Println("Constructor called");
+		// Not safe to access `this` reference
+	}
+	
+	~ExampleNode()
+	{
+		Println("Destructor called: %s", name);
+	}
+
+	void init() override
+	{
+		Object::init();
 		
-		Println("Constructor called: %s", name);
+		Println("Initializer called");
+		// Safe to access `this` reference
+	}
+	
+	void init(const String& name, Ref<ExampleNode> parent = nullptr)
+	{
+		this->name = name;
+		Println("Init called: %s", name);
 		if (parent != nullptr) {
 			this->parent = parent;
 			parent->children.add(this);
 		}
-	}
-
-	~ExampleNode()
-	{
-		Println("Destructor called: %s", name);
 	}
 
 	void print()
@@ -70,13 +83,14 @@ public:
 
 int main(int argc, const char * argv[]) {
 	
-	Ref<ExampleNode> node = new ExampleNode("Node0");
-	Ref<ExampleNode> node1 = new ExampleNode("Node1", node);
-	Ref<ExampleNode> node11 = new ExampleNode("Node1-1", node1);
-	Ref<ExampleNode> node12 = new ExampleNode("Node1-2", node1);
-	Ref<ExampleNode> node2 = new ExampleNode("Node2", node);
-	Ref<ExampleNode> node21 = new ExampleNode("Node2-1", node2);
-	Ref<ExampleNode> node22 = new ExampleNode("Node2-2", node2);
+	Ref<ExampleNode> node0 = New<ExampleNode>();
+	Ref<ExampleNode> node = New<ExampleNode>("Root");
+	Ref<ExampleNode> node1 = New<ExampleNode>("Node1", node);
+	Ref<ExampleNode> node11 = New<ExampleNode>("Node1-1", node1);
+	Ref<ExampleNode> node12 = New<ExampleNode>("Node1-2", node1);
+	Ref<ExampleNode> node2 = New<ExampleNode>("Node2", node);
+	Ref<ExampleNode> node21 = New<ExampleNode>("Node2-1", node2);
+	Ref<ExampleNode> node22 = New<ExampleNode>("Node2-2", node2);
 	
 	node->print();
 	

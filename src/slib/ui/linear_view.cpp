@@ -30,9 +30,7 @@ namespace slib
 	SLIB_DEFINE_OBJECT(LinearView, ViewGroup)
 	
 	LinearView::LinearView()
-	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
+	{		
 		setAlwaysOnUpdateLayout(sl_true, UIUpdateMode::Init);
 		setSavingCanvasState(sl_false);
 		

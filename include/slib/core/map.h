@@ -340,9 +340,9 @@ namespace slib
 		template <class KEY, class VALUE, class OTHER_COMPARE>
 		static const Map& from(const Map<KEY, VALUE, OTHER_COMPARE>& other) noexcept;
 		
-		void init() noexcept;
+		void initialize() noexcept;
 		
-		void init(const KEY_COMPARE& compare) noexcept;
+		void initialize(const KEY_COMPARE& compare) noexcept;
 
 	public:
 #ifdef SLIB_SUPPORT_STD_TYPES
@@ -565,9 +565,9 @@ namespace slib
 		template <class KEY, class VALUE, class OTHER_COMPARE>
 		static const Atomic& from(const Atomic< Map<KEY, VALUE, OTHER_COMPARE> >& other) noexcept;
 		
-		void init() noexcept;
+		void initialize() noexcept;
 		
-		void init(const KEY_COMPARE& compare) noexcept;
+		void initialize(const KEY_COMPARE& compare) noexcept;
 
 	public:
 #ifdef SLIB_SUPPORT_STD_TYPES

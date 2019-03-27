@@ -40,8 +40,6 @@ namespace slib
 	
 	ChatView::ChatView()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
 		m_chatWidth = 0;
 		m_chatWidthWeight = 0.6f;
 		m_userIconSize = 0;
@@ -83,10 +81,10 @@ namespace slib
 	class _priv_ChatViewItemView : public ViewGroup
 	{
 	public:
-		_priv_ChatViewItemView()
+		void init() override
 		{
-			SLIB_REFERABLE_CONSTRUCTOR
-			
+			ViewGroup::init();
+
 			setWidthFilling(1, UIUpdateMode::Init);
 			setHeightWrapping(UIUpdateMode::Init);
 			

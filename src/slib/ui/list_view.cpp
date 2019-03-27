@@ -37,9 +37,7 @@ namespace slib
 		
 	public:
 		_priv_ListContentView()
-		{
-			SLIB_REFERABLE_CONSTRUCTOR
-			
+		{			
 			setSavingCanvasState(sl_false);
 		}
 		
@@ -54,8 +52,6 @@ namespace slib
 	
 	ListView::ListView()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
 		m_lockCountLayouting = 0;
 		
 		m_flagResetAdapter = sl_true;
@@ -73,13 +69,8 @@ namespace slib
 		m_heightsGoUpItems = m_heightsGoDownItems + MAX_ITEMS_VISIBLE;
 		
 		_initStatus();
-		
-		m_contentView = new _priv_ListContentView;
-		m_contentView->m_lv = this;
-
-		ScrollView::setContentView(m_contentView);		
 	}
-	
+
 	ListView::~ListView()
 	{
 		for (sl_size i = 0; i < MAX_ITEMS_VISIBLE*3; i++) {
@@ -89,6 +80,15 @@ namespace slib
 		}
 		Base::freeMemory(m_viewsVisibleItems);
 		Base::freeMemory(m_heightsVisibleItems);
+	}
+	
+	void ListView::init()
+	{
+		VerticalScrollView::init();
+
+		m_contentView = new _priv_ListContentView;
+		m_contentView->m_lv = this;
+		ScrollView::setContentView(m_contentView);		
 	}
 	
 	Ref<ViewAdapter> ListView::getAdapter()

@@ -73,14 +73,6 @@ namespace slib
 
 	Window::Window()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR;
-		
-		Ref<View> view = new ViewGroup;
-		if (view.isNotNull()) {
-			view->setWindow(this);
-			m_viewContent = view;
-		}
-		
 		m_frame.left = 100;
 		m_frame.top = 100;
 		m_frame.right = 500;
@@ -134,6 +126,17 @@ namespace slib
 
 	Window::~Window()
 	{
+	}
+	
+	void Window::init()
+	{
+		Object::init();
+		
+		Ref<View> view = new ViewGroup;
+		if (view.isNotNull()) {
+			view->setWindow(this);
+			m_viewContent = view;
+		}
 	}
 
 	void Window::close()

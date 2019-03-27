@@ -169,6 +169,7 @@ namespace slib
 	public: \
 		NAME(); \
 	protected: \
+		void init() override; \
 		void initialize(); \
 		void layoutViews(sl_ui_len width, sl_ui_len height) override; \
 	public:
@@ -178,9 +179,10 @@ namespace slib
 	
 #define SLIB_DEFINE_UILAYOUT(NAME, BASE_CLASS) \
 	SLIB_DEFINE_OBJECT(NAME, BASE_CLASS) \
-	NAME::NAME() \
+	NAME::NAME() {} \
+	void NAME::init() \
 	{ \
-		SLIB_REFERABLE_CONSTRUCTOR \
+		BASE_CLASS::init(); \
 		initialize(); \
 		setInitialized(); \
 		slib::UISize size = getContentSize(); \
@@ -243,6 +245,9 @@ namespace slib
 		
 		~WindowLayout();
 
+	protected:
+		void init() override;
+
 	public:
 		UISize getContentSize();
 		
@@ -271,6 +276,9 @@ namespace slib
 		
 		~ViewLayout();
 
+	protected:
+		void init() override;
+
 	public:
 		UISize getContentSize();
 		
@@ -297,6 +305,9 @@ namespace slib
 		PageLayout();
 		
 		~PageLayout();
+
+	protected:
+		void init() override;
 
 	public:
 		UISize getContentSize();

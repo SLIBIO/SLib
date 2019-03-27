@@ -383,22 +383,26 @@ namespace slib
 		_priv_OpenSSL_Stream(const Ref<AsyncStream>& baseStream)
 		 : m_baseStream(baseStream)
 		{
-			SLIB_REFERABLE_CONSTRUCTOR
-			
 			m_flagReadingBase = sl_false;
 			m_flagWritingBase = sl_false;
 			m_flagReadingError = sl_false;
 			m_flagWritingError = sl_false;
 			m_sizeWritingBase = 0;
-			m_callbackRead = SLIB_FUNCTION_WEAKREF(_priv_OpenSSL_Stream, onRead, this);
-			m_callbackWrite = SLIB_FUNCTION_WEAKREF(_priv_OpenSSL_Stream, onWrite, this);
-			m_doStartWritingBase = SLIB_FUNCTION_WEAKREF(_priv_OpenSSL_Stream, startWritingBase, this);
 
 			m_sizeWritten = 0;
-			m_doStartWriting = SLIB_FUNCTION_WEAKREF(_priv_OpenSSL_Stream, startWriting, this);
 			
 			m_flagHandshaking = sl_true;
 			m_flagInitHandshake = sl_false;
+		}
+
+		void init() override
+		{
+			OpenSSL_AsyncStream::init();
+			
+			m_callbackRead = SLIB_FUNCTION_WEAKREF(_priv_OpenSSL_Stream, onRead, this);
+			m_callbackWrite = SLIB_FUNCTION_WEAKREF(_priv_OpenSSL_Stream, onWrite, this);
+			m_doStartWritingBase = SLIB_FUNCTION_WEAKREF(_priv_OpenSSL_Stream, startWritingBase, this);
+			m_doStartWriting = SLIB_FUNCTION_WEAKREF(_priv_OpenSSL_Stream, startWriting, this);
 		}
 		
 		~_priv_OpenSSL_Stream()

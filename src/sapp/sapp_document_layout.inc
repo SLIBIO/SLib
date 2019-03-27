@@ -2356,7 +2356,7 @@ namespace slib
 			if (!flagOnLayout) {
 				Ref<SAppLayoutImportView> _view = new SAppLayoutImportView;
 				if (_view.isNotNull()) {
-					_view->init(params->simulator, layoutImport.get());
+					_view->initialize(params->simulator, layoutImport.get());
 				} else {
 					return sl_false;
 				}
@@ -3057,7 +3057,7 @@ namespace slib
 			}
 			Ref<SAppLayoutImportView> view = new SAppLayoutImportView;
 			if (view.isNotNull()) {
-				view->init(simulator, layout.get());
+				view->initialize(simulator, layout.get());
 			}
 			return view;
 		}

@@ -109,9 +109,6 @@ namespace slib
 	
 	ScrollBar::ScrollBar(LayoutOrientation orientation)
 	{
-		
-		SLIB_REFERABLE_CONSTRUCTOR
-		
 		setSavingCanvasState(sl_false);
 		
 		m_orientation = orientation;

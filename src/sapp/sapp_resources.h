@@ -996,6 +996,9 @@ namespace slib
 	{
 	public:
 		SAppLayoutSimulationWindow();
+
+	protected:
+		void init() override;
 		
 	public:
 		void open(SAppDocument* doc, SAppLayoutResource* layout);
@@ -1013,9 +1016,12 @@ namespace slib
 	{
 	public:
 		SAppLayoutImportView();
+
+	protected:
+		void init() override;
 		
 	public:
-		void init(SAppLayoutSimulator* simulator, SAppLayoutResource* layout);
+		void initialize(SAppLayoutSimulator* simulator, SAppLayoutResource* layout);
 		
 		void layoutViews(sl_ui_len width, sl_ui_len height) override;
 		

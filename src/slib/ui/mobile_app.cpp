@@ -33,7 +33,16 @@ namespace slib
 
 	MobileApp::MobileApp()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
+	}
+
+	MobileApp::~MobileApp()
+	{
+		Locale::removeOnChangeCurrentLocale(m_callbackOnChangeLocale);
+	}
+
+	void MobileApp::init()
+	{
+		UIApp::init();
 		
 		Ref<MobileMainWindow> window = new MobileMainWindow;
 		setMainWindow(window);
@@ -52,11 +61,6 @@ namespace slib
 		Locale::addOnChangeCurrentLocale(m_callbackOnChangeLocale);
 	}
 	
-	MobileApp::~MobileApp()
-	{
-		Locale::removeOnChangeCurrentLocale(m_callbackOnChangeLocale);
-	}
-
 	Ref<MobileApp> MobileApp::getApp()
 	{
 		return CastRef<MobileApp>(Application::getApp());
@@ -463,7 +467,6 @@ namespace slib
 	
 	MobileMainWindow::MobileMainWindow()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR;
 	}
 	
 	MobileMainWindow::~MobileMainWindow()

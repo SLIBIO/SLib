@@ -41,6 +41,9 @@ namespace slib
 		ListView();
 		
 		~ListView();
+
+	protected:
+		void init() override;
 		
 	public:
 		Ref<ViewAdapter> getAdapter();

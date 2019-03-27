@@ -52,7 +52,7 @@ namespace slib
 		
 		static void updateThresholds(TABLE* table) noexcept;
 		
-		static void init(TABLE* table, sl_size capacityMinimum, sl_size capacityMaximum) noexcept;
+		static void initialize(TABLE* table, sl_size capacityMinimum, sl_size capacityMaximum) noexcept;
 		
 		static void move(TABLE* dst, TABLE* src) noexcept;
 
@@ -133,7 +133,7 @@ namespace slib
 	HashTable<KT, VT, HASH, KEY_EQUALS>::HashTable(sl_size capacityMinimum, sl_size capacityMaximum, const HASH& hash, const KEY_EQUALS& equals) noexcept
 	 : m_hash(hash), m_equals(equals)
 	{
-		_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), capacityMinimum, capacityMaximum);
+		_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), capacityMinimum, capacityMaximum);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
@@ -676,7 +676,7 @@ namespace slib
 		}
 		sl_size count = m_table.count;
 		_priv_HashTable::free(&m_table);
-		_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
+		_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
 		return count;
 	}
 	
@@ -693,7 +693,7 @@ namespace slib
 		m_hash = other.m_hash;
 		m_equals = other.m_equals;
 		sl_size capacity = other.m_table.capacity;
-		_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), other.m_table.capacityMinimum, other.m_table.capacityMaximum);
+		_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), other.m_table.capacityMinimum, other.m_table.capacityMaximum);
 		if (capacity == 0) {
 			return sl_true;
 		}
@@ -712,7 +712,7 @@ namespace slib
 					*link = nodeTarget;
 					if (!nodeTarget) {
 						_priv_HashTable::free(&m_table);
-						_priv_HashTable::init(reinterpret_cast<HashTableStructBase*>(&m_table), other.m_table.capacityMinimum, other.m_table.capacityMaximum);
+						_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), other.m_table.capacityMinimum, other.m_table.capacityMaximum);
 						return sl_false;
 					}
 					nodeTarget->hash = nodeSource->hash;

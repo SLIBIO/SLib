@@ -182,6 +182,9 @@ namespace slib
 		
 		~TreeView();
 
+	protected:
+		void init() override;
+
 	public:
 		Ref<TreeViewItem> getRootItem();
 		

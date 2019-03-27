@@ -39,9 +39,7 @@ namespace slib
 	SLIB_DEFINE_OBJECT(EditView, View)
 
 	EditView::EditView()
-	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
+	{		
 		setCreatingNativeWidget(sl_true);
 		setUsingFont(sl_true);
 		setFocusable(sl_true);

@@ -31,32 +31,18 @@ namespace slib
 	struct _priv_Ref_Const;
 	extern const _priv_Ref_Const _priv_Ref_Null;
 
-	template <class T, class... ARGS>
-	SLIB_INLINE Ref<T> New(ARGS&&... args) noexcept
+	template <class T>
+	SLIB_INLINE Ref<T> New() noexcept
 	{
-		return new T(Forward<ARGS>(args)...);
+		return new T;
 	}
 	
-	template <class REF, class T>
-	struct _priv_InitHelper
-	{
-		template <class... ARGS>
-		SLIB_INLINE static void init(REF* o, ARGS&&... args) noexcept { (*o) = (*o)->init(Forward<ARGS>(args)...); }
-	};
-	
-	template <class REF>
-	struct _priv_InitHelper<REF, void>
-	{
-		template <class... ARGS>
-		SLIB_INLINE static void init(REF* o, ARGS&&... args) noexcept { (*o)->init(Forward<ARGS>(args)...); }
-	};
-	
-	template <class T, class... ARGS>
-	SLIB_INLINE Ref<T> Init(ARGS&&... args) noexcept
+	template <class T, class ARG, class... ARGS>
+	SLIB_INLINE Ref<T> New(ARG&& arg, ARGS&&... args) noexcept
 	{
 		Ref<T> o = new T;
 		if (o.isNotNull()) {
-			_priv_InitHelper<Ref<T>, decltype(o->init(args...))>::init(&o, Forward<ARGS>(args)...);
+			o->init(Forward<ARG>(arg), Forward<ARGS>(args)...);
 			return o;
 		}
 		return sl_null;

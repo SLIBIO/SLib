@@ -29,7 +29,15 @@ namespace slib
 	
 	MobileGame::MobileGame()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
+	}
+
+	MobileGame::~MobileGame()
+	{
+	}
+
+	void MobileGame::init()
+	{
+		MobileApp::init();
 		
 		m_gameView = new MobileGameView;
 		
@@ -42,10 +50,6 @@ namespace slib
 		m_gameView->setOpaque(sl_true, UIUpdateMode::Init);
 		m_gameView->addChild(m_navigationController, UIUpdateMode::Init);
 		
-	}
-	
-	MobileGame::~MobileGame()
-	{
 	}
 
 	Ref<MobileGame> MobileGame::getApp()
@@ -63,11 +67,8 @@ namespace slib
 	
 	MobileGameView::MobileGameView()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
 		setRedrawMode(RedrawMode::WhenDirty);
-		setDispatchingEventsToRenderingThread(sl_true);
-		
+		setDispatchingEventsToRenderingThread(sl_true);		
 	}
 
 	MobileGameView::~MobileGameView()

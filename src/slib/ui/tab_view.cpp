@@ -44,10 +44,7 @@ namespace slib
 	SLIB_DEFINE_OBJECT(TabView, ViewGroup)
 
 	TabView::TabView()
-	{
-		
-		SLIB_REFERABLE_CONSTRUCTOR
-		
+	{		
 #ifdef HAS_NATIVE_WIDGET_IMPL
 		setCreatingNativeWidget(sl_true);
 #endif

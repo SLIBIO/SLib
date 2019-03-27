@@ -487,15 +487,10 @@ namespace slib
 	
 	TreeView::TreeView()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
 		setCreatingInstance(sl_false);
 		setCreatingNativeWidget(sl_false);
 		setUsingFont(sl_true);
 		setSavingCanvasState(sl_false);
-		
-		_createRootItem();
-		_createContentView();
 		
 		m_flagInvalidLayout = sl_true;
 		
@@ -517,6 +512,14 @@ namespace slib
 	
 	TreeView::~TreeView()
 	{
+	}
+
+	void TreeView::init()
+	{
+		ScrollView::init();
+		
+		_createRootItem();
+		_createContentView();
 	}
 
 	Ref<TreeViewItem> TreeView::getRootItem()

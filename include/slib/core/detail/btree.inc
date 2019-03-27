@@ -152,7 +152,7 @@ namespace slib
 		m_order = order;
 		m_maxLength = 0;
 		m_totalCount = 0;
-		init();
+		initialize();
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
@@ -164,7 +164,7 @@ namespace slib
 		m_order = order;
 		m_maxLength = 0;
 		m_totalCount = 0;
-		init();
+		initialize();
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>
@@ -1443,7 +1443,7 @@ namespace slib
 	}
 
 	template <class KT, class VT, class KEY_COMPARE>
-	void BTree<KT, VT, KEY_COMPARE>::init()
+	void BTree<KT, VT, KEY_COMPARE>::initialize()
 	{
 		m_rootNode = _createNodeData();
 	}

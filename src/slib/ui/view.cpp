@@ -83,8 +83,6 @@ namespace slib
 
 	View::~View()
 	{
-		SLIB_REFERABLE_DESTRUCTOR
-		detach();
 	}
 
 #define DEFAULT_MAX_SIZE 0x3fffffff
@@ -1061,8 +1059,6 @@ namespace slib
 
 	void View::_addChild(View* child, UIUpdateMode mode)
 	{
-		SLIB_REFERABLE_MEMBER
-		
 		if (!SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 			child->setFocus(sl_false, UIUpdateMode::None);
 		}
@@ -1564,6 +1560,11 @@ namespace slib
 
 	void View::setVisibility(Visibility visibility, UIUpdateMode mode)
 	{
+		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
+			m_visibility = visibility;
+			return;
+		}
+
 		Visibility oldVisibility = m_visibility;
 		m_visibility = visibility;
 		if (oldVisibility == visibility) {
@@ -1577,9 +1578,6 @@ namespace slib
 		
 		dispatchChangeVisibility(oldVisibility, visibility);
 		
-		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
-			return;
-		}
 		switch (visibility) {
 			case Visibility::Visible:
 			case Visibility::Hidden:
@@ -9088,10 +9086,7 @@ namespace slib
 
 	ViewGroup::ViewGroup()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
-		setCreatingChildInstances(sl_true);
-		
+		setCreatingChildInstances(sl_true);	
 	}
 
 	ViewGroup::~ViewGroup()

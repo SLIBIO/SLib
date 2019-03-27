@@ -49,7 +49,7 @@ namespace slib
 		_release();
 	}
 	
-	sl_bool EFL_ViewInstance::init(EFL_ViewType type, Evas_Object* handle)
+	sl_bool EFL_ViewInstance::initialize(EFL_ViewType type, Evas_Object* handle)
 	{
 		if (handle) {
 			m_type = type;

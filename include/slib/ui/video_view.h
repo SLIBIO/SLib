@@ -43,6 +43,9 @@ namespace slib
 		VideoView();
 		
 		~VideoView();
+
+	protected:
+		void init() override;
 		
 	public:
 		Ref<MediaPlayer> getMediaPlayer();

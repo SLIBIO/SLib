@@ -338,7 +338,7 @@ namespace slib
 				} else {
 					HttpHeaderMap headers = m_responseHeaders;
 					if (headers.isNull()) {
-						headers.init();
+						headers.initialize();
 						m_responseHeaders = headers;
 					}
 					headers.add(name, value);

@@ -42,6 +42,9 @@ namespace slib
 		
 		~MobileGame();
 
+	protected:
+		void init() override;
+
 	public:
 		static Ref<MobileGame> getApp();
 		

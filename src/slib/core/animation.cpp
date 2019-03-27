@@ -63,7 +63,6 @@ namespace slib
 
 	Animation::~Animation()
 	{
-		SLIB_REFERABLE_DESTRUCTOR
 		stop();
 	}
 	
@@ -989,16 +988,15 @@ namespace slib
 		Ref<Thread> m_thread;
 
 	public:
-		_priv_DefaultAnimationLoop()
+		void init() override
 		{
-			SLIB_REFERABLE_CONSTRUCTOR
-
+			AnimationLoop::init();
+			
 			if (m_thread.isNull()) {
 				m_thread = Thread::start(SLIB_FUNCTION_CLASS(_priv_DefaultAnimationLoop, run, this));
 			} else {
 				m_thread->wake();
 			}
-	
 		}
 
 		~_priv_DefaultAnimationLoop()

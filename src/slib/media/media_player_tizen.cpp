@@ -54,7 +54,6 @@ namespace slib
 
 		~_priv_MediaPlayer()
 		{
-			SLIB_REFERABLE_DESTRUCTOR
 			_release(sl_true);
 		}
 

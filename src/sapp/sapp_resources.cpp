@@ -610,7 +610,11 @@ namespace slib
 
 	SAppLayoutSimulationWindow::SAppLayoutSimulationWindow()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
+	}
+
+	void SAppLayoutSimulationWindow::init()
+	{
+		WindowLayout::init();
 		m_simulationWindow = this;
 		m_refer = this;
 	}
@@ -679,11 +683,15 @@ namespace slib
 
 	SAppLayoutImportView::SAppLayoutImportView()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
+	}
+
+	void SAppLayoutImportView::init()
+	{
+		ViewLayout::init();
 		m_refer = this;
 	}
 
-	void SAppLayoutImportView::init(SAppLayoutSimulator* simulator, SAppLayoutResource* layout)
+	void SAppLayoutImportView::initialize(SAppLayoutSimulator* simulator, SAppLayoutResource* layout)
 	{
 		Ref<SAppDocument> document = simulator->getDocument();
 		m_document = document;

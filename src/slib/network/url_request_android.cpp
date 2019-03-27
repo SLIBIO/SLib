@@ -143,7 +143,7 @@ namespace slib
 				sl_uint32 n = Jni::getArrayLength(headers);
 				if (n > 0) {
 					HttpHeaderMap map;
-					map.init();
+					map.initialize();
 					if (map.isNotNull()) {
 						for (sl_uint32 i = 0; i < n - 1; i += 2) {
 							String key = Jni::getStringArrayElement(headers, i);

@@ -97,7 +97,6 @@ namespace slib
 		
 		~_priv_FFmpegMediaPlayer()
 		{
-			SLIB_REFERABLE_DESTRUCTOR
 			_release();
 		}
 		

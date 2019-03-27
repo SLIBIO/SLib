@@ -44,6 +44,9 @@ namespace slib
 		
 		~MobileApp();
 
+	protected:
+		void init() override;
+
 	public:
 		static Ref<MobileApp> getApp();
 		

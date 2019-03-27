@@ -26,8 +26,8 @@ namespace slib
 	template <class KT, class VT>
 	ExpiringMap<KT, VT>::ExpiringMap()
 	{
-		m_mapCurrent.init();
-		m_mapBackup.init();
+		m_mapCurrent.initialize();
+		m_mapBackup.initialize();
 
 		m_duration = 0;
 	}
@@ -171,7 +171,7 @@ namespace slib
 	{
 		ObjectLocker lock(this);
 		m_mapBackup = m_mapCurrent;
-		m_mapCurrent.init();
+		m_mapCurrent.initialize();
 	}
 
 	template <class KT, class VT>

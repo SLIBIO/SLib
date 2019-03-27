@@ -101,13 +101,13 @@ namespace slib
 
 	public:
 		// not-free existing links
-		void init() noexcept;
+		void initialize() noexcept;
 	
 		// not-free existing links
-		void init(Link<T>* front, Link<T>* back, sl_size count) noexcept;
+		void initialize(Link<T>* front, Link<T>* back, sl_size count) noexcept;
 
 		// not-free existing links
-		void init(const CLinkedList<T>* other) noexcept;
+		void initialize(const CLinkedList<T>* other) noexcept;
 
 	public:
 		Link<T>* getFront() const noexcept;

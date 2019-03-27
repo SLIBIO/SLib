@@ -29,11 +29,7 @@ namespace slib
 	
 	SplitView::SplitView()
 	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
 		setSavingCanvasState(sl_false);
-
-		setCapturingChildInstanceEvents(SLIB_FUNCTION_WEAKREF(SplitView, _hitTestForCapturingChildInstanceEvents, this));
 		
 		m_orientation = LayoutOrientation::Horizontal;
 		
@@ -58,6 +54,13 @@ namespace slib
 	
 	SplitView::~SplitView()
 	{
+	}
+
+	void SplitView::init()
+	{
+		ViewGroup::init();
+
+		setCapturingChildInstanceEvents(SLIB_FUNCTION_WEAKREF(SplitView, _hitTestForCapturingChildInstanceEvents, this));
 	}
 	
 	SplitView::Item::Item()

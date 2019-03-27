@@ -254,7 +254,7 @@ namespace slib
 		NodeData* m_rootNode;
 	
 	protected:
-		virtual void init();
+		virtual void initialize();
 
 		virtual void free();
 		

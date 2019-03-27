@@ -90,6 +90,9 @@ namespace slib
 		
 		~Window();
 		
+	protected:
+		void init() override;
+		
 	public:
 		virtual void close();
 		

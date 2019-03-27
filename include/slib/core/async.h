@@ -395,9 +395,9 @@ namespace slib
 		virtual void processRequest(AsyncStreamRequest* request) = 0;
 	
 	protected:
-		void init();
+		void initialize();
 
-		void init(const Ref<Dispatcher>& dispatcher);
+		void initialize(const Ref<Dispatcher>& dispatcher);
 
 	protected:
 		sl_bool _addRequest(AsyncStreamRequest* request);

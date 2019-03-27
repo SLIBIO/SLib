@@ -61,9 +61,7 @@ namespace slib
 	};
 
 	RenderView::RenderView()
-	{
-		SLIB_REFERABLE_CONSTRUCTOR
-		
+	{		
 		setCreatingNativeWidget(sl_true);
 		setCreatingChildInstances(sl_false);
 		setDrawing(sl_true, UIUpdateMode::Init);
@@ -73,7 +71,6 @@ namespace slib
 		m_redrawMode = RedrawMode::Continuously;
 		m_flagDispatchEventsToRenderingThread = sl_false;
 		
-		m_animationLoop = new _priv_RenderView_AnimationLoop(this);
 		m_lastRenderingThreadId = 0;
 		
 		m_flagDebugTextVisible = sl_false;
@@ -84,6 +81,13 @@ namespace slib
 
 	RenderView::~RenderView()
 	{
+	}
+
+	void RenderView::init()
+	{
+		ViewGroup::init();
+		
+		m_animationLoop = new _priv_RenderView_AnimationLoop(this);
 	}
 
 	RedrawMode RenderView::getRedrawMode()

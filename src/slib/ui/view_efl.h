@@ -47,7 +47,7 @@ namespace slib
 			if (handle) {
 				Ref<T> ret = new T();
 				if (ret.isNotNull()) {
-					if (ret->init(type, handle)) {
+					if (ret->initialize(type, handle)) {
 						ret->m_flagFreeOnRelease = flagFreeOnRelease;
 						return ret;
 					}
@@ -72,7 +72,7 @@ namespace slib
 		}
 
 	public:
-		sl_bool init(EFL_ViewType type, Evas_Object* handle);
+		sl_bool initialize(EFL_ViewType type, Evas_Object* handle);
 
 		sl_bool applyProperties(View* view, ViewInstance* parent);
 
