@@ -301,6 +301,12 @@ namespace slib
 	targetContentOffset->y = round(ty / m_pageHeight) * 100;
 }
 
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)theEvent
+{
+	[self.window endEditing:NO];
+	[super touchesEnded:touches withEvent:theEvent];
+}
+
 @end
 
 #endif
