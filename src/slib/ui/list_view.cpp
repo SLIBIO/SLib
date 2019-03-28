@@ -455,7 +455,6 @@ namespace slib
 						break;
 					}
 				}
-				sl_ui_pos originalScrollY = scrollY;
 
 				sl_ui_pos windowStart = scrollY - heightListView / 2;
 				if (windowStart < 0) {
