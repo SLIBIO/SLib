@@ -62,11 +62,11 @@ namespace slib
 		
 		float getValue();
 		
-		void setValue(float value, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setValue(float value, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		float getSecondaryValue();
 		
-		void setSecondaryValue(float value, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setSecondaryValue(float value, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		sl_bool isDualValues();
 		
