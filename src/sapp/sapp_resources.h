@@ -764,6 +764,15 @@ namespace slib
 	class SAppLayoutChatAttributes : public Referable
 	{
 	public:
+		SAppDimensionValue chatWidth;
+		SAppDimensionValue userIconSize;
+		SAppStringValue dateFormat;
+		SAppStringValue timeFormat;
+		SAppColorValue receivedChatBackColor;
+		SAppColorValue receivedChatTextColor;
+		SAppColorValue sentChatBackColor;
+		SAppColorValue sentChatTextColor;
+		SAppColorValue dateTextColor;
 		
 	};
 

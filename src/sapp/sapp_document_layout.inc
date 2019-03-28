@@ -1136,16 +1136,20 @@ namespace slib
 		} \
 	} else if (op == OP_GENERATE_CPP) { \
 		if (attr->NAME.flagDefined) { \
-			if (attr->NAME.isNeededOnLayoutFunction()) { \
-				params->sbDefineLayout->add(String::format("%s%s->" #SETFUNC "(%s);%n", strTab, name, attr->NAME.getAccessString())); \
-			} else { \
-				params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s);%n", strTab, name, attr->NAME.getAccessString())); \
+			if (!(SAppDimensionValue::isRelativeUnit(attr->NAME.unit))) { \
+				if (attr->NAME.isNeededOnLayoutFunction()) { \
+					params->sbDefineLayout->add(String::format("%s%s->" #SETFUNC "(%s);%n", strTab, name, attr->NAME.getAccessString())); \
+				} else { \
+					params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s);%n", strTab, name, attr->NAME.getAccessString())); \
+				} \
 			} \
 		} \
 	} else if (op == OP_SIMULATE) { \
 		if (flagOnLayout) { \
 			if (attr->NAME.flagDefined) { \
-				view->SETFUNC(_getDimension##TYPE##Value(attr->NAME)); \
+				if (!(SAppDimensionValue::isRelativeUnit(attr->NAME.unit))) { \
+					view->SETFUNC(_getDimension##TYPE##Value(attr->NAME)); \
+				} \
 			} \
 		} \
 	}
@@ -1163,16 +1167,20 @@ namespace slib
 		} \
 	} else if (op == OP_GENERATE_CPP) { \
 		if (attr->NAME.flagDefined) { \
-			if (attr->NAME.isNeededOnLayoutFunction()) { \
-				params->sbDefineLayout->add(String::format("%s%s->" #SETFUNC "(%s);%n", strTab, name, attr->NAME.getAccessString())); \
-			} else { \
-				params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s, slib::UIUpdateMode::Init);%n", strTab, name, attr->NAME.getAccessString())); \
+			if (!(SAppDimensionValue::isRelativeUnit(attr->NAME.unit))) { \
+				if (attr->NAME.isNeededOnLayoutFunction()) { \
+					params->sbDefineLayout->add(String::format("%s%s->" #SETFUNC "(%s);%n", strTab, name, attr->NAME.getAccessString())); \
+				} else { \
+					params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s, slib::UIUpdateMode::Init);%n", strTab, name, attr->NAME.getAccessString())); \
+				} \
 			} \
 		} \
 	} else if (op == OP_SIMULATE) { \
 		if (flagOnLayout) { \
 			if (attr->NAME.flagDefined) { \
-				view->SETFUNC(_getDimension##TYPE##Value(attr->NAME)); \
+				if (!(SAppDimensionValue::isRelativeUnit(attr->NAME.unit))) { \
+					view->SETFUNC(_getDimension##TYPE##Value(attr->NAME)); \
+				} \
 			} \
 		} \
 	}
@@ -4118,8 +4126,8 @@ namespace slib
 	{
 		LAYOUT_CONTROL_PROCESS_SUPER(ViewGroup)
 		
-		LAYOUT_CONTROL_INT_DIMENSION_ATTR(drawerSize, setDrawerSize, checkSize)
-		LAYOUT_CONTROL_INT_DIMENSION_ATTR(dragEdgeSize, setDragEdgeSize, checkSize)
+		LAYOUT_CONTROL_INT_DIMENSION_ATTR(drawerSize, setDrawerSize, checkScalarSize)
+		LAYOUT_CONTROL_INT_DIMENSION_ATTR(dragEdgeSize, setDragEdgeSize, checkScalarSize)
 		LAYOUT_CONTROL_GENERIC_ATTR(gravity, setGravity)
 		
 		LAYOUT_CONTROL_ADD_STATEMENT
@@ -4130,6 +4138,34 @@ namespace slib
 	{
 		LAYOUT_CONTROL_PROCESS_SUPER(View)
 		
+		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(chatWidth, setChatWidth, checkScalarSizeOrWeight)
+		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(userIconSize, setUserIconSize, checkScalarSizeOrWeight)
+		if (op == OP_GENERATE_CPP) {
+			if (attr->chatWidth.flagDefined && attr->chatWidth.unit == SAppDimensionValue::WEIGHT) {
+				params->sbDefineInit->add(String::format("%s%s->setChatWidthWeight(%ff, slib::UIUpdateMode::Init);%n", strTab, name, attr->chatWidth.amount));
+			}
+			if (attr->userIconSize.flagDefined && attr->userIconSize.unit == SAppDimensionValue::WEIGHT) {
+				params->sbDefineInit->add(String::format("%s%s->setUserIconSizeWeight(%ff, slib::UIUpdateMode::Init);%n", strTab, name, attr->userIconSize.amount));
+			}
+		} else if (op == OP_SIMULATE) {
+			if (flagOnLayout) {
+				if (attr->chatWidth.flagDefined && attr->chatWidth.unit == SAppDimensionValue::WEIGHT) {
+					view->setChatWidthWeight(attr->chatWidth.amount);
+				}
+				if (attr->userIconSize.flagDefined && attr->userIconSize.unit == SAppDimensionValue::WEIGHT) {
+					view->setUserIconSizeWeight(attr->userIconSize.amount);
+				}
+			}
+		}
+		
+		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(dateFormat, setDateFormat)
+		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(timeFormat, setTimeFormat)
+		LAYOUT_CONTROL_COLOR_ATTR(receivedChatBackColor, setReceivedChatBackColor)
+		LAYOUT_CONTROL_COLOR_ATTR(receivedChatTextColor, setReceivedChatTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR(sentChatBackColor, setSentChatBackColor)
+		LAYOUT_CONTROL_COLOR_ATTR(sentChatTextColor, setSentChatTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR(dateTextColor, setDateTextColor)
+
 		if (op == OP_SIMULATE) {
 			if (!flagOnLayout) {
 				List<ChatViewItem> items;

@@ -87,6 +87,8 @@ namespace slib
 		
 		sl_bool checkScalarSize();
 		
+		sl_bool checkScalarSizeOrWeight();
+		
 		sl_bool checkMargin();
 		
 		sl_bool checkForWindow();

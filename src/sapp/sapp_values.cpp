@@ -514,6 +514,14 @@ namespace slib
 		return amount >= 0 && !isRelativeUnit(unit);
 	}
 
+	sl_bool SAppDimensionValue::checkScalarSizeOrWeight()
+	{
+		if (!flagDefined) {
+			return sl_true;
+		}
+		return amount >= 0 && (unit == WEIGHT || !isRelativeUnit(unit));
+	}
+
 	sl_bool SAppDimensionValue::checkMargin()
 	{
 		if (!flagDefined) {
