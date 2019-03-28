@@ -6277,12 +6277,12 @@ namespace slib
 				barVert->setOnChange(SLIB_FUNCTION_WEAKREF(View, _onScrollBarChangeValue, this));
 				attrs->flagValidVert = barVert->isValid();
 			}
-			sl_scroll_pos rx = attrs->contentWidth - (sl_scroll_pos)(getWidth());
-			sl_scroll_pos x = _priv_View_clampScrollPos(attrs->x, rx);
-			sl_scroll_pos ry = attrs->contentHeight - (sl_scroll_pos)(getHeight());
-			sl_scroll_pos y = _priv_View_clampScrollPos(attrs->y, ry);
-			if (_scrollTo(x, y, sl_true, sl_false)) {
-				invalidate(mode);
+			sl_scroll_pos x = _priv_View_clampScrollPos(attrs->x, attrs->contentWidth - (sl_scroll_pos)(getWidth()));
+			sl_scroll_pos y = _priv_View_clampScrollPos(attrs->y, attrs->contentHeight - (sl_scroll_pos)(getHeight()));
+			if (!(Math::isAlmostZero(x - attrs->x) && Math::isAlmostZero(y - attrs->y))) {
+				if (_scrollTo(x, y, sl_true, sl_false)) {
+					invalidate(mode);
+				}
 			}
 		}
 	}
@@ -8712,7 +8712,9 @@ namespace slib
 			scrollAttrs->speedFlow = speedOrTarget;
 		}
 		scrollAttrs->timeFlowFrameBefore = Time::now();
-		scrollAttrs->timerFlow = startTimer(SLIB_FUNCTION_WEAKREF(View, _processContentScrollingFlow, this), SMOOTH_SCROLL_FRAME_MS);
+		if (scrollAttrs->timerFlow.isNull()) {
+			scrollAttrs->timerFlow = startTimer(SLIB_FUNCTION_WEAKREF(View, _processContentScrollingFlow, this), SMOOTH_SCROLL_FRAME_MS);
+		}
 	}
 
 	void View::_stopContentScrollingFlow()

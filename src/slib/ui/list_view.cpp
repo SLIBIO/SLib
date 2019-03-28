@@ -773,9 +773,6 @@ namespace slib
 				if (!(Math::isAlmostZero(getContentHeight() - (sl_scroll_pos)heightTotalItems)) || !(Math::isAlmostZero(getContentWidth() - (sl_scroll_pos)widthListView))) {
 					setContentSize((sl_scroll_pos)widthListView, (sl_scroll_pos)heightTotalItems);
 				}
-				if (!(Math::isAlmostZero(scrollY - originalScrollY))) {
-					scrollToY((sl_scroll_pos)scrollY);
-				}
 				
 				if (!fromDraw) {
 					contentView->invalidate();

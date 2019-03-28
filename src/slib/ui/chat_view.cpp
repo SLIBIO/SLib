@@ -528,7 +528,28 @@ namespace slib
 		adapter->params.textColorDate = m_textColorDate;
 		adapter->setList(m_items);
 		setAdapter(adapter);
-		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, scrollToEndY, this, UIUpdateMode::Redraw), 100);
+		auto weak = ToWeakRef(this);
+		dispatchToDrawingThread([weak]() {
+			auto ref = ToRef(weak);
+			if (ref.isNull()) {
+				return;
+			}
+			ref->scrollToEndY();
+			ref->dispatchToDrawingThread([weak]() {
+				auto ref = ToRef(weak);
+				if (ref.isNull()) {
+					return;
+				}
+				ref->scrollToEndY();
+				ref->dispatchToDrawingThread([weak]() {
+					auto ref = ToRef(weak);
+					if (ref.isNull()) {
+						return;
+					}
+					ref->scrollToEndY();
+				}, 50);
+			}, 50);
+		}, 50);
 	}
 	
 	void ChatView::_addListContent(UIUpdateMode mode)
@@ -536,11 +557,37 @@ namespace slib
 		if (!SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
 			return;
 		}
+		if (m_items.isEmpty()) {
+			return;
+		}
 		Ref<_priv_ChatViewAdapter> adapter = Ref<_priv_ChatViewAdapter>::from(getAdapter());
 		if (adapter.isNotNull()) {
 			adapter->setList(m_items);
 			refreshItems();
-			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, scrollToEndY, this, UIUpdateMode::Redraw), 100);
+			auto weak = ToWeakRef(this);
+			dispatchToDrawingThread([weak]() {
+				auto ref = ToRef(weak);
+				if (ref.isNull()) {
+					return;
+				}
+				ref->smoothScrollToEndY();
+				ref->dispatchToDrawingThread([weak]() {
+					auto ref = ToRef(weak);
+					if (ref.isNull()) {
+						return;
+					}
+					ref->smoothScrollToEndY();
+					ref->dispatchToDrawingThread([weak]() {
+						auto ref = ToRef(weak);
+						if (ref.isNull()) {
+							return;
+						}
+						ref->smoothScrollToEndY();
+					}, 50);
+				}, 50);
+			}, 50);
+		} else {
+			_updateListContent(mode);
 		}
 	}
 	
