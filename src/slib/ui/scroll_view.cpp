@@ -88,8 +88,6 @@ namespace slib
 				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setContentView_NW, this, view));
 			}
 		} else {
-			UIPoint pt = View::getScrollPosition();
-			scrollTo(pt.x, pt.y, UIUpdateMode::None);
 			invalidate(mode);
 		}
 	}
@@ -107,17 +105,12 @@ namespace slib
 		ObjectLocker lock(this);
 		Ref<View> viewContent = m_viewContent;
 		if (viewContent.isNotNull()) {
-			viewContent->setSize(width, height, mode);
+			viewContent->setSize(width, height, SLIB_UI_UPDATE_MODE_IS_REDRAW(mode) ? UIUpdateMode::UpdateLayout : mode);
 		}
 		View::setContentSize(_width, _height, mode);
 		if (isNativeWidget()) {
 			_refreshContentSize_NW();
 		}
-	}
-	
-	void ScrollView::setContentSize(const ScrollPoint& size, UIUpdateMode mode)
-	{
-		setContentSize(size.x, size.y, mode);
 	}
 	
 	ScrollPoint ScrollView::getScrollPosition()
@@ -134,39 +127,6 @@ namespace slib
 			return _getScrollRange_NW();
 		}
 		return View::getScrollRange();
-	}
-	
-	void ScrollView::scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
-	{
-		Ref<View> view = m_viewContent;
-		if (view.isNotNull()) {
-			if (isNativeWidget()) {
-				_scrollTo_NW(x, y, sl_false);
-			}
-		}
-		View::scrollTo(x, y, mode);
-	}
-	
-	void ScrollView::scrollTo(const ScrollPoint& position, UIUpdateMode mode)
-	{
-		scrollTo(position.x, position.y, mode);
-	}
-	
-	void ScrollView::smoothScrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
-	{
-		Ref<View> view = m_viewContent;
-		if (view.isNotNull()) {
-			if (isNativeWidget()) {
-				_scrollTo_NW(x, y, sl_true);
-				return;
-			}
-		}
-		View::smoothScrollTo(x, y, mode);
-	}
-	
-	void ScrollView::smoothScrollTo(const ScrollPoint& position, UIUpdateMode mode)
-	{
-		smoothScrollTo(position.x, position.y, mode);
 	}
 	
 	void ScrollView::dispatchScroll(sl_scroll_pos x, sl_scroll_pos y)
@@ -203,14 +163,6 @@ namespace slib
 			_setPaging_NW(isPaging(), getPageWidth(), getPageHeight());
 		}
 	}
-	
-	void ScrollView::_onScroll_NW(sl_scroll_pos x, sl_scroll_pos y)
-	{
-		if (isNativeWidget()) {
-			View::scrollTo(x, y, UIUpdateMode::None);
-		}
-	}
-	
 	
 #if !defined(HAS_NATIVE_WIDGET_IMPL)
 	Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* parent)

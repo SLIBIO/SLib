@@ -54,9 +54,9 @@ namespace slib
 		
 		sl_scroll_pos getValue();
 		
-		void setValue(sl_scroll_pos value, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setValue(sl_scroll_pos value, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void setValueOfOutRange(sl_scroll_pos value, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setValueOfOutRange(sl_scroll_pos value, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		sl_scroll_pos getPage();
 		
@@ -141,6 +141,8 @@ namespace slib
 		void onMouseWheelEvent(UIEvent* ev) override;
 		
 	protected:
+		void changeValue(sl_scroll_pos value);
+		
 		void _setHoverThumb(sl_bool flag);
 		
 	protected:

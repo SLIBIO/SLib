@@ -44,21 +44,13 @@ namespace slib
 		
 		virtual void setContentView(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::UpdateLayout) override;
+		using ViewGroup::setContentSize;
 		
-		void setContentSize(const ScrollPoint& size, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		void setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 		
 		ScrollPoint getScrollPosition() override;
 		
 		ScrollPoint getScrollRange() override;
-		
-		void scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw) override;
-		
-		void scrollTo(const ScrollPoint& position, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		void smoothScrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw) override;
-		
-		void smoothScrollTo(const ScrollPoint& position, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
@@ -77,8 +69,6 @@ namespace slib
 		
 		void _setContentView_NW(const Ref<View>& view);
 		
-		void _scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate);
-		
 		ScrollPoint _getScrollPosition_NW();
 		
 		ScrollPoint _getScrollRange_NW();
@@ -87,12 +77,12 @@ namespace slib
 		
 		void _setBackgroundColor_NW(const Color& color) override;
 		
-		void _setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical) override;
-		
 		void _setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight);
 		
 	protected:
-		void _onScroll_NW(sl_scroll_pos x, sl_scroll_pos y);
+		void _setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical) override;
+		
+		void _scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate) override;
 		
 	protected:
 		AtomicRef<View> m_viewContent;

@@ -324,7 +324,7 @@ namespace slib
 		flagInitHorzScrollBar(sl_false),
 		flagInitVertScrollBar(sl_false),
 		flagDownContent(sl_false),
-	
+
 		x(0),
 		y(0),
 		contentWidth(0),
@@ -5852,26 +5852,6 @@ namespace slib
 		return sl_false;
 	}
 
-	void View::setHorizontalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode)
-	{
-		sl_bool flagVert = sl_true;
-		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
-		if (attrs.isNotNull()) {
-			flagVert = attrs->flagVertScrollBarVisible;
-		}
-		setScrollBarsVisible(flagVisible, flagVert, mode);
-	}
-	
-	void View::setVerticalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode)
-	{
-		sl_bool flagHorz = sl_true;
-		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
-		if (attrs.isNotNull()) {
-			flagHorz = attrs->flagHorzScrollBarVisible;
-		}
-		setScrollBarsVisible(flagHorz, flagVisible, mode);
-	}
-	
 	void View::setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode)
 	{
 		_initializeScrollAttributes();
@@ -5903,24 +5883,26 @@ namespace slib
 		}
 	}
 
-	sl_scroll_pos View::getScrollX()
+	void View::setHorizontalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode)
 	{
+		sl_bool flagVert = sl_true;
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
-			return attrs->x;
+			flagVert = attrs->flagVertScrollBarVisible;
 		}
-		return 0;
+		setScrollBarsVisible(flagVisible, flagVert, mode);
 	}
-
-	sl_scroll_pos View::getScrollY()
+	
+	void View::setVerticalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode)
 	{
+		sl_bool flagHorz = sl_true;
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
-			return attrs->y;
+			flagHorz = attrs->flagHorzScrollBarVisible;
 		}
-		return 0;
+		setScrollBarsVisible(flagHorz, flagVisible, mode);
 	}
-
+	
 	ScrollPoint View::getScrollPosition()
 	{
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
@@ -5930,30 +5912,39 @@ namespace slib
 		return ScrollPoint::zero();
 	}
 
+	sl_scroll_pos View::getScrollX()
+	{
+		return getScrollPosition().x;
+	}
+	
+	sl_scroll_pos View::getScrollY()
+	{
+		return getScrollPosition().y;
+	}
+
+	static sl_scroll_pos _priv_View_clampScrollPos(sl_scroll_pos x, sl_scroll_pos max)
+	{
+		if (x > max) {
+			x = max;
+		}
+		if (x < 0) {
+			x = 0;
+		}
+		return x;
+	}
+	
 	void View::scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
 	{
 		_initializeScrollAttributes();
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
-		
 		if (attrs.isNotNull()) {
-			
-			sl_scroll_pos rx = attrs->contentWidth - getWidth();
-			if (x > rx) {
-				x = rx;
-			}
-			if (x < 0) {
-				x = 0;
-			}
-			sl_scroll_pos ry = attrs->contentHeight - getHeight();
-			if (y > ry) {
-				y = ry;
-			}
-			if (y < 0) {
-				y = 0;
-			}
-			
+			x = _priv_View_clampScrollPos(x, attrs->contentWidth - (sl_scroll_pos)(getWidth()));
+			y = _priv_View_clampScrollPos(y, attrs->contentHeight - (sl_scroll_pos)(getHeight()));
 			if (_scrollTo(x, y, sl_true, sl_false)) {
 				invalidate(mode);
+			}
+			if (isNativeWidget()) {
+				_scrollTo_NW(x, y, sl_false);
 			}
 		}
 	}
@@ -5963,55 +5954,87 @@ namespace slib
 		scrollTo(position.x, position.y, mode);
 	}
 
+	void View::scrollToX(sl_scroll_pos x, UIUpdateMode mode)
+	{
+		scrollTo(x, getScrollY(), mode);
+	}
+	
+	void View::scrollToY(sl_scroll_pos y, UIUpdateMode mode)
+	{
+		scrollTo(getScrollX(), y, mode);
+	}
+
 	void View::smoothScrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
 	{
 		_initializeScrollAttributes();
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
-		
 		if (attrs.isNotNull()) {
-			
-			sl_scroll_pos rx = attrs->contentWidth - getWidth();
-			if (x > rx) {
-				x = rx;
+			x = _priv_View_clampScrollPos(x, attrs->contentWidth - (sl_scroll_pos)(getWidth()));
+			y = _priv_View_clampScrollPos(y, attrs->contentHeight - (sl_scroll_pos)(getHeight()));
+			if (isNativeWidget()) {
+				_scrollTo_NW(x, y, sl_true);
+			} else {
+				_startContentScrollingFlow(sl_true, Pointlf(x, y));
+				invalidate(mode);
 			}
-			if (x < 0) {
-				x = 0;
-			}
-			sl_scroll_pos ry = attrs->contentHeight - getHeight();
-			if (y > ry) {
-				y = ry;
-			}
-			if (y < 0) {
-				y = 0;
-			}
-			
-			_startContentScrollingFlow(sl_true, Pointlf(x, y));
-			
-			invalidate(mode);
 		}
 	}
 
 	void View::smoothScrollTo(const ScrollPoint& position, UIUpdateMode mode)
 	{
-		scrollTo(position.x, position.y, mode);
+		smoothScrollTo(position.x, position.y, mode);
+	}
+	
+	void View::smoothScrollToX(sl_scroll_pos x, UIUpdateMode mode)
+	{
+		smoothScrollTo(x, getScrollY(), mode);
+	}
+
+	void View::smoothScrollToY(sl_scroll_pos y, UIUpdateMode mode)
+	{
+		smoothScrollTo(getScrollX(), y, mode);
+	}
+	
+	void View::scrollToEndX(UIUpdateMode mode)
+	{
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
+		if (attrs.isNotNull()) {
+			scrollToX(attrs->contentWidth - (sl_scroll_pos)(getWidth()), mode);
+		}
+	}
+	
+	void View::scrollToEndY(UIUpdateMode mode)
+	{
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
+		if (attrs.isNotNull()) {
+			scrollToY(attrs->contentHeight - (sl_scroll_pos)(getHeight()), mode);
+		}
+	}
+	
+	void View::smoothScrollToEndX(UIUpdateMode mode)
+	{
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
+		if (attrs.isNotNull()) {
+			smoothScrollToX(attrs->contentWidth - (sl_scroll_pos)(getWidth()), mode);
+		}
+	}
+	
+	void View::smoothScrollToEndY(UIUpdateMode mode)
+	{
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
+		if (attrs.isNotNull()) {
+			smoothScrollToY(attrs->contentHeight - (sl_scroll_pos)(getHeight()), mode);
+		}
 	}
 
 	void View::setScrollX(sl_scroll_pos x, UIUpdateMode mode)
 	{
-		_initializeScrollAttributes();
-		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
-		if (attrs.isNotNull()) {
-			scrollTo(x, attrs->y, mode);
-		}
+		scrollToX(x, mode);
 	}
 
 	void View::setScrollY(sl_scroll_pos y, UIUpdateMode mode)
 	{
-		_initializeScrollAttributes();
-		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
-		if (attrs.isNotNull()) {
-			scrollTo(attrs->x, y, mode);
-		}
+		scrollToY(y, mode);
 	}
 
 	sl_scroll_pos View::getContentWidth()
@@ -6207,7 +6230,6 @@ namespace slib
 		}
 	}
 
-
 	void View::_onScrollBarChangeValue(ScrollBar* scrollBar, sl_scroll_pos value)
 	{
 		sl_scroll_pos sx = 0;
@@ -6255,9 +6277,13 @@ namespace slib
 				barVert->setOnChange(SLIB_FUNCTION_WEAKREF(View, _onScrollBarChangeValue, this));
 				attrs->flagValidVert = barVert->isValid();
 			}
-
-			scrollTo(attrs->x, attrs->y, UIUpdateMode::None);
-			invalidate(mode);
+			sl_scroll_pos rx = attrs->contentWidth - (sl_scroll_pos)(getWidth());
+			sl_scroll_pos x = _priv_View_clampScrollPos(attrs->x, rx);
+			sl_scroll_pos ry = attrs->contentHeight - (sl_scroll_pos)(getHeight());
+			sl_scroll_pos y = _priv_View_clampScrollPos(attrs->y, ry);
+			if (_scrollTo(x, y, sl_true, sl_false)) {
+				invalidate(mode);
+			}
 		}
 	}
 
@@ -6318,7 +6344,6 @@ namespace slib
 		}
 	}
 
-
 	void View::_getScrollBars(Ref<View> views[2])
 	{
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
@@ -6371,7 +6396,7 @@ namespace slib
 		}
 	}
 
-#define BOUNCE_WEIGHT 0.07f
+#define BOUNCE_WEIGHT 0.15f
 
 	sl_bool View::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagFinish, sl_bool flagAnimate)
 	{
@@ -8802,6 +8827,15 @@ namespace slib
 	
 	void View::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
 	{
+	}
+	
+	void View::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate)
+	{
+	}
+	
+	void View::_onScroll_NW(sl_scroll_pos x, sl_scroll_pos y)
+	{
+		_scrollTo(x, y, sl_true, sl_false);
 	}
 	
 /**********************

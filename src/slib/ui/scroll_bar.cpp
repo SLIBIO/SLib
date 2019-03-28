@@ -191,7 +191,6 @@ namespace slib
 			return;
 		}
 		m_value = value;
-		dispatchChange(value);
 		invalidate(mode);
 	}
 	
@@ -531,18 +530,18 @@ namespace slib
 				if (pos < pos_begin) {
 					m_valueDown = getValueFromThumbPosition(pos);
 					if (page > 0) {
-						setValue(value - page);
+						changeValue(value - page);
 					} else {
-						setValue(m_valueDown);
+						changeValue(m_valueDown);
 					}
 				} else if (pos <= pos_end) {
 					m_valueDown = value;
 				} else {
 					m_valueDown = getValueFromThumbPosition(pos);
 					if (page > 0) {
-						setValue(value + page);
+						changeValue(value + page);
 					} else {
-						setValue(m_valueDown);
+						changeValue(m_valueDown);
 					}
 				}
 				break;
@@ -550,7 +549,7 @@ namespace slib
 			case UIAction::LeftButtonDrag:
 			case UIAction::TouchMove:
 				if (isPressedState()) {
-					setValue(m_valueDown + (sl_scroll_pos)(pos - m_posDown) * ratioValuePos);
+					changeValue(m_valueDown + (sl_scroll_pos)(pos - m_posDown) * ratioValuePos);
 				}
 				break;
 			case UIAction::LeftButtonUp:
@@ -558,7 +557,7 @@ namespace slib
 			case UIAction::TouchCancel:
 				if (isPressedState()) {
 					if (m_posDown != pos) {
-						setValue(m_valueDown + (sl_scroll_pos)(pos - m_posDown) * ratioValuePos);
+						changeValue(m_valueDown + (sl_scroll_pos)(pos - m_posDown) * ratioValuePos);
 					}
 				}
 				break;
@@ -591,9 +590,9 @@ namespace slib
 			delta = ev->getDeltaX();
 		}
 		if (delta > SLIB_EPSILON) {
-			setValue(value - line);
+			changeValue(value - line);
 		} else if (delta < -SLIB_EPSILON) {
-			setValue(value + line);
+			changeValue(value + line);
 		}
 		
 		ev->stopPropagation();
@@ -605,6 +604,24 @@ namespace slib
 	void ScrollBar::dispatchChange(sl_scroll_pos value)
 	{
 		SLIB_INVOKE_EVENT_HANDLER(Change, value)
+	}
+	
+	void ScrollBar::changeValue(sl_scroll_pos value)
+	{
+		sl_scroll_pos _max = m_value_max - m_page;
+		if (value > _max) {
+			value = _max;
+		}
+		if (value < m_value_min) {
+			value = m_value_min;
+		}
+		if (Math::isAlmostZero(value - m_value)) {
+			m_value = value;
+			return;
+		}
+		m_value = value;
+		dispatchChange(value);
+		invalidate();
 	}
 	
 	void ScrollBar::_setHoverThumb(sl_bool flag)

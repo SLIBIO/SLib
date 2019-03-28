@@ -182,7 +182,7 @@ namespace slib
 			m_countVisibleItems = 0;
 		}
 		_initStatus();
-		scrollTo(0, 0);
+		scrollToY(0);
 	}
 	
 	static sl_ui_len _priv_ListView_getTotalHeights(sl_uint64 count, sl_ui_len averageHeight, sl_ui_len* topHeights, sl_ui_len* bottomHeights, double& averageMidHeight)
@@ -377,7 +377,9 @@ namespace slib
 		Ref<View> view = adapter->getView(index, original, m_contentView.get());
 		if (view.isNotNull()) {
 #if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_IOS) || defined(SLIB_UI_IS_ANDROID)
-			view->setCreatingInstance(sl_true);
+			if (isCreatingInstance()) {
+				view->setCreatingInstance(sl_true);
+			}
 #endif
 			View::LayoutAttributes* attrs = view->m_layoutAttrs.get();
 			if (attrs) {
@@ -772,7 +774,7 @@ namespace slib
 					setContentSize((sl_scroll_pos)widthListView, (sl_scroll_pos)heightTotalItems);
 				}
 				if (!(Math::isAlmostZero(scrollY - originalScrollY))) {
-					scrollTo(0, (sl_scroll_pos)scrollY);
+					scrollToY((sl_scroll_pos)scrollY);
 				}
 				
 				if (!fromDraw) {

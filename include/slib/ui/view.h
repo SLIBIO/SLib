@@ -1001,25 +1001,41 @@ namespace slib
 		
 		sl_bool isVerticalScrollBarVisible();
 		
+		virtual void setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
 		void setHorizontalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		void setVerticalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode = UIUpdateMode::Redraw);
 
-		virtual void setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual Pointlf getScrollPosition();
 		
 		sl_scroll_pos getScrollX();
 		
 		sl_scroll_pos getScrollY();
 		
-		virtual Pointlf getScrollPosition();
-		
 		virtual void scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		void scrollTo(const Pointlf& position, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		void scrollToX(sl_scroll_pos x, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void scrollToY(sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
 		virtual void smoothScrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		void smoothScrollTo(const Pointlf& position, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void smoothScrollToX(sl_scroll_pos x, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void smoothScrollToY(sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void scrollToEndX(UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void scrollToEndY(UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void smoothScrollToEndX(UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void smoothScrollToEndY(UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		void setScrollX(sl_scroll_pos x, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
@@ -1300,15 +1316,15 @@ namespace slib
 		
 		void _attachNativeAnimation(const Ref<Animation>& animation);
 
-				
+		
 		void _getScrollBars(Ref<View> views[2]);
 		
 		void _initScrollBars(UIUpdateMode mode);
 		
 		void _onScrollBarChangeValue(ScrollBar* scrollBar, sl_scroll_pos value);
-		
+				
 		sl_bool _scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagFinish, sl_bool flagAnimate);
-		
+
 		void _cancelPressState();
 		
 		void _processEventForStateAndClick(UIEvent* ev);
@@ -1322,7 +1338,7 @@ namespace slib
 		void _processContentScrollingFlow(Timer* timer);
 		
 		
-	public:
+	protected:
 		virtual void _setBorder_NW(sl_bool flag);
 
 		virtual void _setBackgroundColor_NW(const Color& color);
@@ -1330,6 +1346,11 @@ namespace slib
 		virtual void _setFont_NW(const Ref<Font>& font);
 
 		virtual void _setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical);
+		
+		virtual void _scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate);
+		
+	protected:
+		virtual void _onScroll_NW(sl_scroll_pos x, sl_scroll_pos y);
 		
 	private:
 		AtomicRef<ViewInstance> m_instance;
@@ -1570,7 +1591,7 @@ namespace slib
 			sl_bool flagContentScrollingByMouseWheel : 1;
 			sl_bool flagContentScrollingByKeyboard : 1;
 			sl_bool flagSmoothContentScrolling : 1;
-
+			
 			sl_bool flagValidHorz : 1;
 			sl_bool flagValidVert : 1;
 			sl_bool flagInitHorzScrollBar : 1;
