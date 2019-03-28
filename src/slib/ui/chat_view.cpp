@@ -274,13 +274,13 @@ namespace slib
 	void ChatView::addItem(const ChatViewItem& item, UIUpdateMode mode)
 	{
 		m_items.add(item);
-		_updateListContent(mode);
+		_addListContent(mode);
 	}
 	
 	void ChatView::addItems(const List<ChatViewItem>& items, UIUpdateMode mode)
 	{
 		m_items.addAll(items);
-		_updateListContent(mode);
+		_addListContent(mode);
 	}
 
 	sl_ui_len ChatView::getChatWidth()
@@ -528,6 +528,20 @@ namespace slib
 		adapter->params.textColorDate = m_textColorDate;
 		adapter->setList(m_items);
 		setAdapter(adapter);
+		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, scrollToEndY, this, UIUpdateMode::Redraw), 100);
+	}
+	
+	void ChatView::_addListContent(UIUpdateMode mode)
+	{
+		if (!SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
+			return;
+		}
+		Ref<_priv_ChatViewAdapter> adapter = Ref<_priv_ChatViewAdapter>::from(getAdapter());
+		if (adapter.isNotNull()) {
+			adapter->setList(m_items);
+			refreshItems();
+			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, scrollToEndY, this, UIUpdateMode::Redraw), 100);
+		}
 	}
 	
 }

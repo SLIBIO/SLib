@@ -114,6 +114,8 @@ namespace slib
 	protected:
 		void _updateListContent(UIUpdateMode mode);
 		
+		void _addListContent(UIUpdateMode mode);
+
 	protected:
 		AtomicList<ChatViewItem> m_items;
 		sl_ui_len m_chatWidth;
