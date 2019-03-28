@@ -56,13 +56,13 @@ namespace slib
 	{
 	}
 	
-#define CHAT_BODY_MARGIN_WEIGHT 0.4f
 #define CHAT_MARGIN_WEIGHT 0.4f
 #define CHAT_ROUND_WEIGHT 0.3f
 #define CHAT_SPACE_WEIGHT 0.4f
 #define USER_ICON_MARGIN_WEIGHT 0.3f
-#define CHAT_DATE_HEIGHT_WEIGHT 1.5f
-#define CHAT_TIME_HEIGHT_WEIGHT 1.5f
+#define CHAT_DATE_HEIGHT_WEIGHT 2.0f
+#define CHAT_TIME_HEIGHT_WEIGHT 1.3f
+#define BOTTOM_MARGIN_WEIGHT 0.7f
 
 	struct _priv_ChatView_ItemViewParams
 	{
@@ -128,15 +128,14 @@ namespace slib
 				canvas->drawText(strDate, (sl_real)(width / 2 - size.x / 2), (sl_real)(h / 2 - size.y / 2), font, params.textColorDate);
 				y += h;
 			}
-			sl_ui_len marginBody = (sl_ui_len)(fontSize * CHAT_BODY_MARGIN_WEIGHT);
 			sl_ui_len marginIcon = (sl_ui_len)(fontSize * USER_ICON_MARGIN_WEIGHT);
 			sl_ui_len marginChat = (sl_ui_len)(fontSize * CHAT_MARGIN_WEIGHT);
 			sl_ui_len chatSpace = (sl_ui_len)(fontSize * CHAT_SPACE_WEIGHT);
 			if (userIcon.isNotNull()) {
 				if (flagMe) {
-					canvas->draw((sl_real)(width - marginIcon - params.userIconSize), (sl_real)(y + marginBody + marginIcon), (sl_real)(params.userIconSize), (sl_real)(params.userIconSize), userIcon);
+					canvas->draw((sl_real)(width - marginIcon - params.userIconSize), (sl_real)(y + marginIcon), (sl_real)(params.userIconSize), (sl_real)(params.userIconSize), userIcon);
 				} else {
-					canvas->draw((sl_real)marginIcon, (sl_real)(y + marginBody + marginIcon), (sl_real)(params.userIconSize), (sl_real)(params.userIconSize), userIcon);
+					canvas->draw((sl_real)marginIcon, (sl_real)(y + marginIcon), (sl_real)(params.userIconSize), (sl_real)(params.userIconSize), userIcon);
 				}
 			}
 			sl_ui_len heightTime = (sl_ui_len)(fontSize * CHAT_TIME_HEIGHT_WEIGHT);
@@ -183,12 +182,12 @@ namespace slib
 			sl_real fontSize = getFontSize();
 			sl_ui_len marginChat = (sl_ui_len)(fontSize * CHAT_MARGIN_WEIGHT);
 			sl_ui_len marginIcon = (sl_ui_len)(fontSize * USER_ICON_MARGIN_WEIGHT);
-			sl_ui_len marginBody = (sl_ui_len)(fontSize * CHAT_BODY_MARGIN_WEIGHT);
+			sl_ui_len marginBottom = (sl_ui_len)(fontSize * BOTTOM_MARGIN_WEIGHT);
 			lblMessage->setPadding(marginChat, UIUpdateMode::None);
-			lblMessage->setMarginBottom(marginBody, UIUpdateMode::None);
+			lblMessage->setMarginBottom(marginBottom, UIUpdateMode::None);
 			sl_ui_len marginX = (sl_ui_len)(fontSize * CHAT_SPACE_WEIGHT) + 2 * marginIcon + params.userIconSize;
-			sl_ui_len marginY = marginBody;
-			marginBody *= 2;
+			sl_ui_len marginY = 0;
+			sl_ui_len marginBody = marginBottom;
 			if (flagShowDate) {
 				sl_ui_len m = (sl_ui_len)(fontSize * CHAT_DATE_HEIGHT_WEIGHT);
 				marginY += m;
@@ -260,6 +259,7 @@ namespace slib
 				ChatViewItem& item = list[index];
 				view->params = params;
 				view->flagShowDate = index <= 0 || item.time.getDateOnly() != list[index - 1].time.getDateOnly();
+				view->setFont(parent->getFont(), UIUpdateMode::Init);
 				view->setData(item);
 			}
 		}
@@ -482,6 +482,12 @@ namespace slib
 		}
 	}
 	
+	void ChatView::setFont(const Ref<Font>& font, UIUpdateMode mode)
+	{
+		View::setFont(font, UIUpdateMode::None);
+		_updateListContent(mode);
+	}
+	
 	void ChatView::onResize(sl_ui_len width, sl_ui_len height)
 	{
 		sl_bool flagUpdateList = sl_false;
@@ -507,6 +513,9 @@ namespace slib
 	
 	void ChatView::_updateListContent(UIUpdateMode mode)
 	{
+		if (!SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
+			return;
+		}
 		Ref<_priv_ChatViewAdapter> adapter = new _priv_ChatViewAdapter;
 		adapter->params.chatWidth = m_chatWidth;
 		adapter->params.userIconSize = m_userIconSize;

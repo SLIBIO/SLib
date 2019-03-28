@@ -105,6 +105,8 @@ namespace slib
 		Color getDateTextColor();
 		
 		void setDateTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void setFont(const Ref<Font>& font, UIUpdateMode mode = UIUpdateMode::UpdateLayout) override;
 
 	protected:
 		void onResize(sl_ui_len width, sl_ui_len height) override;
