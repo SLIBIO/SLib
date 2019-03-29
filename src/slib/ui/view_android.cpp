@@ -95,7 +95,7 @@ namespace slib
 		return 0;
 	}
 
-	jboolean JNICALL _priv_AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int _action, jobjectArray jpoints, jlong time)
+	jint JNICALL _priv_AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int _action, jobjectArray jpoints, jlong time)
 	{
 		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 		if (instance.isNotNull()) {
@@ -120,9 +120,7 @@ namespace slib
 					if (ev.isNotNull()) {
 						ev->addFlag(UIEventFlags::DispatchToParentInstance);
 						instance->onTouchEvent(ev.get());
-						if (ev->isPreventedDefault()) {
-							return 1;
-						}
+						return ev->getFlags();
 					}
 				}
 			}
@@ -207,7 +205,7 @@ namespace slib
 
 		SLIB_JNI_NATIVE(nativeOnDraw, "nativeOnDraw", "(JLslib/platform/android/ui/Graphics;)V", _priv_AndroidView_nativeOnDraw);
 		SLIB_JNI_NATIVE(nativeOnKeyEvent, "nativeOnKeyEvent", "(JZIZZZZJ)Z", _priv_AndroidView_nativeOnKeyEvent);
-		SLIB_JNI_NATIVE(nativeOnTouchEvent, "nativeOnTouchEvent", "(JI[Lslib/platform/android/ui/view/UiTouchPoint;J)Z", _priv_AndroidView_nativeOnTouchEvent);
+		SLIB_JNI_NATIVE(nativeOnTouchEvent, "nativeOnTouchEvent", "(JI[Lslib/platform/android/ui/view/UiTouchPoint;J)I", _priv_AndroidView_nativeOnTouchEvent);
 		SLIB_JNI_NATIVE(nativeOnSetFocus, "nativeOnSetFocus", "(J)V", _priv_AndroidView_nativeOnSetFocus);
 		SLIB_JNI_NATIVE(nativeOnClick, "nativeOnClick", "(J)V", _priv_AndroidView_nativeOnClick);
 		SLIB_JNI_NATIVE(nativeHitTestTouchEvent, "nativeHitTestTouchEvent", "(JII)Z", _priv_AndroidView_nativeHitTestTouchEvent);

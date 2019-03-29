@@ -83,7 +83,9 @@ namespace slib
 		m_indexHoverThumb = -1;
 		m_indexPressedThumb = -1;
 		
+#if !defined(SLIB_PLATFORM_IS_MOBILE)
 		setFocusable(sl_true);
+#endif
 	}
 	
 	Slider::~Slider()

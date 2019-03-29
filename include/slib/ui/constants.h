@@ -75,7 +75,8 @@ namespace slib
 			StopPropagation = 0x0002,
 			PassToNext = 0x0004,
 			DispatchToParentInstance = 0x1000,
-			FromChildInstance = 0x2000
+			FromChildInstance = 0x2000,
+			KeepKeyboard = 0x4000
 		};
 	};
 	

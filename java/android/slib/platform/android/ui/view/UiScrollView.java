@@ -30,6 +30,7 @@ import android.view.View;
 import android.widget.ScrollView;
 import slib.platform.android.Logger;
 import slib.platform.android.ui.UiThread;
+import slib.platform.android.ui.window.UiWindow;
 
 public class UiScrollView extends ScrollView implements IView {
 
@@ -197,6 +198,7 @@ public class UiScrollView extends ScrollView implements IView {
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
+		UiWindow.dismissKeyboard(this, ev);
 		flagFling = false;
 		boolean flag = super.onTouchEvent(ev);
 		if (mPaging) {

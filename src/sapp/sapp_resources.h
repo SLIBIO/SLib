@@ -326,7 +326,8 @@ namespace slib
 		SAppBooleanValue okCancelEnabled;
 		SAppBooleanValue ok;
 		SAppBooleanValue cancel;
-		
+		SAppBooleanValue keepKeyboard;
+
 	public:
 		SAppLayoutViewAttributes();
 		

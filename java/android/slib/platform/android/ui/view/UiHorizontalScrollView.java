@@ -29,6 +29,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.HorizontalScrollView;
 
+import slib.platform.android.ui.window.UiWindow;
+
 public class UiHorizontalScrollView extends HorizontalScrollView implements IView {
 
 	private long mInstance = 0;
@@ -116,6 +118,7 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
+		UiWindow.dismissKeyboard(this, ev);
 		flagFling = false;
 		boolean flag = super.onTouchEvent(ev);
 		if (mPaging) {

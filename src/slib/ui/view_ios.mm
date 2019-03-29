@@ -497,8 +497,13 @@ namespace slib
 					
 					if (ev.isNotNull()) {
 						onTouchEvent(ev.get());
-						[handle.window endEditing:NO];
-						return ev->getFlags();
+						UIEventFlags flags = ev->getFlags();
+						if (flags & UIEventFlags::KeepKeyboard) {
+							flags |= UIEventFlags::StopPropagation;
+						} else {
+							[handle.window endEditing:NO];
+						}
+						return flags;
 					}
 
 				}

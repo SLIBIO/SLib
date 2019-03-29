@@ -119,7 +119,9 @@ namespace slib
 		setBorder(sl_true, UIUpdateMode::Init);
 		setBackgroundColor(Color::White, UIUpdateMode::Init);
 		setSavingCanvasState(sl_false);
+#if !defined(SLIB_PLATFORM_IS_MOBILE)
 		setFocusable(sl_true);
+#endif
 		
 		m_indexSelected = 0;
 		

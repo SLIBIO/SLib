@@ -1135,6 +1135,10 @@ namespace slib
 		
 		void setPreviousTabStop(const Ref<View>& view);
 		
+		sl_bool isKeepKeyboard();
+		
+		void setKeepKeyboard(sl_bool flag);
+		
 		
 		Function<sl_bool(const UIPoint& pt)> getCapturingChildInstanceEvents();
 		
@@ -1370,6 +1374,7 @@ namespace slib
 		sl_bool m_flagSavingCanvasState : 1;
 		sl_bool m_flagOkCancelEnabled : 1;
 		sl_bool m_flagTabStopEnabled : 1;
+		sl_bool m_flagKeepKeyboard : 1;
 		
 		sl_bool m_flagCurrentCreatingInstance : 1;
 		sl_bool m_flagInvalidLayout : 1;

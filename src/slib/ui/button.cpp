@@ -104,8 +104,9 @@ namespace slib
 
 	Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 	{
+#if !defined(SLIB_PLATFORM_IS_MOBILE)
 		setFocusable(sl_true);
-		
+#endif
 		m_flagMultiLine = sl_false;
 		m_flagDefaultButton = sl_false;
 		

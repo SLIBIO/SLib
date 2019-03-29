@@ -33,7 +33,9 @@ namespace slib
 	public:
 		TreeContentViewImpl()
 		{
+#if !defined(SLIB_PLATFORM_IS_MOBILE)
 			setFocusable(sl_true);
+#endif
 		}
 		
 	public:

@@ -481,23 +481,45 @@ public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnG
 	int locationOfFoucsView[] = new int[2];
 	int locationOfWindow[] = new int[2];
 
-	@Override
-	public boolean dispatchTouchEvent(MotionEvent ev) {
-		super.dispatchTouchEvent(ev);
-		if (ev.getAction() == MotionEvent.ACTION_UP) {
-			View view = activity.getCurrentFocus();
-			if (view != null && isFocusableView(view) && view.isShown()) {
-				view.getLocationOnScreen(locationOfFoucsView);
-				getLocationOnScreen(locationOfWindow);
-				float x = ev.getX() + locationOfWindow[0];
-				float y = ev.getY() + locationOfWindow[1];
-				if (x < locationOfFoucsView[0] || x > locationOfFoucsView[0] + view.getWidth() || y < locationOfFoucsView[1] || y > locationOfFoucsView[1] + view.getHeight()) {
-					Android.dismissKeyboard(activity);
-				}
-			} else {
+	public void dismissKeyboard(MotionEvent ev) {
+		if (ev.getAction() != MotionEvent.ACTION_UP) {
+			return;
+		}
+		View view = activity.getCurrentFocus();
+		if (view != null && isFocusableView(view) && view.isShown()) {
+			view.getLocationOnScreen(locationOfFoucsView);
+			getLocationOnScreen(locationOfWindow);
+			float x = ev.getX() + locationOfWindow[0];
+			float y = ev.getY() + locationOfWindow[1];
+			if (x < locationOfFoucsView[0] || x > locationOfFoucsView[0] + view.getWidth() || y < locationOfFoucsView[1] || y > locationOfFoucsView[1] + view.getHeight()) {
 				Android.dismissKeyboard(activity);
 			}
+		} else {
+			Android.dismissKeyboard(activity);
 		}
+	}
+
+	public static void dismissKeyboard(View view, MotionEvent ev) {
+		UiWindow window = null;
+		while (view != null) {
+			if (view instanceof UiWindow) {
+				window = (UiWindow)view;
+				break;
+			}
+			ViewParent parent = view.getParent();
+			if (parent instanceof View) {
+				view = (View)parent;
+			} else {
+				return;
+			}
+		}
+		if (window != null) {
+			window.dismissKeyboard(ev);
+		}
+	}
+
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent ev) {
 		if (gestureDetector != null) {
 			gestureDetector.onTouchEvent(ev);
 			super.dispatchTouchEvent(ev);

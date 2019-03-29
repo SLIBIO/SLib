@@ -480,7 +480,7 @@ public class UiView {
 		return false;
 	}
 	
-	private static native boolean nativeOnTouchEvent(long instance, int action, UiTouchPoint[] pts, long time);
+	private static native int nativeOnTouchEvent(long instance, int action, UiTouchPoint[] pts, long time);
 	
 	public static boolean onEventTouch(IView view, MotionEvent event) {
 		long instance = view.getInstance();
@@ -535,7 +535,15 @@ public class UiView {
 					}
 					pts[i] = pt;
 				}
-				return nativeOnTouchEvent(instance, action, pts, event.getEventTime());
+				int ret = nativeOnTouchEvent(instance, action, pts, event.getEventTime());
+				if ((ret & 0x4000) == 0) {
+					// Keep Keyboard
+					UiWindow.dismissKeyboard((View)view, event);
+				}
+				if ((ret & 0x0001) != 0) {
+					// Prevent Default
+					return true;
+				}
 			}
 		}
 		return false;

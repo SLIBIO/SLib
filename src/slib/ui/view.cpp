@@ -62,6 +62,7 @@ namespace slib
 		m_flagSavingCanvasState(sl_true),
 		m_flagOkCancelEnabled(sl_true),
 		m_flagTabStopEnabled(sl_true),
+		m_flagKeepKeyboard(sl_false),
 	
 		m_flagCurrentCreatingInstance(sl_false),
 		m_flagInvalidLayout(sl_true),
@@ -6736,6 +6737,16 @@ namespace slib
 			}
 		}
 	}
+	
+	sl_bool View::isKeepKeyboard()
+	{
+		return m_flagKeepKeyboard;
+	}
+	
+	void View::setKeepKeyboard(sl_bool flag)
+	{
+		m_flagKeepKeyboard = flag;
+	}
 
 	Function<sl_bool(const UIPoint& pt)> View::getCapturingChildInstanceEvents()
 	{
@@ -7770,7 +7781,13 @@ namespace slib
 			}
 		}
 		
-		ev->resetFlags();
+		{
+			int flags = ev->getFlags() & UIEventFlags::KeepKeyboard;
+			ev->resetFlags();
+			if (flags || m_flagKeepKeyboard) {
+				ev->addFlag(UIEventFlags::KeepKeyboard);
+			}
+		}
 		
 		_priv_View_DuringEventScope scope(this, ev);
 
