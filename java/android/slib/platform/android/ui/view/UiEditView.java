@@ -32,8 +32,11 @@ import slib.platform.android.ui.Util;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Build;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.Layout;
+import android.text.StaticLayout;
 import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -114,25 +117,7 @@ public class UiEditView extends EditText implements IView {
 		}
 		return false;
 	}
-	
-	public static boolean _setBorder(final View view, final boolean flag) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setBorder(view, flag);
-				}
-			});
-			return true;
-		}
-		if (view instanceof UiEditView) {
-			UiEditView tv = (UiEditView)view;
-			tv.mFlagBorder = flag;
-			tv.applyBackground();
-			return true;
-		}
-		return false;
-	}
-	
+
 	public static boolean _setAlignment(final View view, final int align) {
 		if (!(UiThread.isUiThread())) {
 			view.post(new Runnable() {
@@ -239,47 +224,6 @@ public class UiEditView extends EditText implements IView {
 			TextView tv = (TextView)view;
 			tv.setHintTextColor(color);
 			return true;
-		}
-		return false;
-	}
-	
-	public static boolean _setBackgroundColor(final View view, final int color) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setBackgroundColor(view, color);
-				}
-			});
-			return true;
-		}
-		if (view instanceof UiEditView) {
-			UiEditView tv = (UiEditView) view;
-			tv.mBackgroundColor = color;
-			tv.applyBackground();
-		} else if (view instanceof TextView) {
-			TextView tv = (TextView)view;
-			tv.setBackgroundColor(color);				
-			return true;
-		}
-		return false;
-	}
-	
-	public static boolean _setFont(final View view, final UiFont font) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setFont(view, font);
-				}
-			});
-			return true;
-		}
-		if (view instanceof TextView) {
-			if (font != null) {
-				TextView tv = (TextView)view;
-				tv.setTypeface(font.getTypeface());
-				tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, font.getSize());
-				return true;				
-			}
 		}
 		return false;
 	}
@@ -434,6 +378,77 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 
+	public static int _measureHeight(final View view) {
+		try {
+			if (view instanceof UiEditView) {
+				UiEditView edit = (UiEditView) view;
+				return edit.measureHeight();
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return 0;
+	}
+
+	public static boolean _setFont(final View view, final UiFont font) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setFont(view, font);
+				}
+			});
+			return true;
+		}
+		if (view instanceof TextView) {
+			if (font != null) {
+				TextView tv = (TextView)view;
+				tv.setTypeface(font.getTypeface());
+				tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, font.getSize());
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean _setBorder(final View view, final boolean flag) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setBorder(view, flag);
+				}
+			});
+			return true;
+		}
+		if (view instanceof UiEditView) {
+			UiEditView tv = (UiEditView)view;
+			tv.mFlagBorder = flag;
+			tv.applyBackground();
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean _setBackgroundColor(final View view, final int color) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setBackgroundColor(view, color);
+				}
+			});
+			return true;
+		}
+		if (view instanceof UiEditView) {
+			UiEditView tv = (UiEditView) view;
+			tv.mBackgroundColor = color;
+			tv.applyBackground();
+		} else if (view instanceof TextView) {
+			TextView tv = (TextView)view;
+			tv.setBackgroundColor(color);				
+			return true;
+		}
+		return false;
+	}
+
 	private static native void nativeOnChange(long instance);
 	public static void onEventChange(IView view) {
 		long instance = view.getInstance();
@@ -491,6 +506,22 @@ public class UiEditView extends EditText implements IView {
 		if (focused) {
 			UiView.onEventSetFocus(this);
 		}
+	}
+
+	public int measureHeight() {
+		CharSequence text = getText();
+		int width = mRight - mLeft;
+		width -= getCompoundPaddingLeft();
+		width -= getCompoundPaddingRight();
+		StaticLayout layout;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			layout = StaticLayout.Builder.obtain(text, 0, text.length(), getPaint(), width).build();
+		} else {
+			layout = new StaticLayout(text, getPaint(), width, Layout.Alignment.ALIGN_NORMAL, 1, 0, true);
+		}
+		int height = layout.getHeight();
+		height += getCompoundPaddingTop() + getCompoundPaddingBottom();
+		return height;
 	}
 
 	@Override

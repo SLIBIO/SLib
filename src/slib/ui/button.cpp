@@ -804,7 +804,7 @@ namespace slib
 	UISize Button::measureLayoutContentSize(sl_ui_len widthFrame, sl_ui_len heightFrame)
 	{
 #if defined(SLIB_UI_IS_MACOS)
-		if (isCreatingNativeWidget()) {
+		if (isNativeWidget()) {
 			return _priv_Button_macOS_measureSize(this);
 		}
 #endif

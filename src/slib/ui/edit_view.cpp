@@ -74,8 +74,15 @@ namespace slib
 		m_text = text;
 		if (isNativeWidget()) {
 			_setText_NW(text);
+			if (isHeightWrapping()) {
+				invalidateLayoutOfWrappingControl(mode);
+			}
 		} else {
-			invalidate(mode);
+			if (isHeightWrapping()) {
+				invalidateLayoutOfWrappingControl(mode);
+			} else {
+				invalidate(mode);
+			}
 		}
 	}
 
@@ -264,16 +271,24 @@ namespace slib
 		}
 		if (flagVertical) {
 			sl_ui_pos height = 0;
-			if (font.isNotNull()) {
-				height = (sl_ui_pos)(font->getFontHeight() * 1.5f);
+			do {
+				if (isNativeWidget()) {
+					height = _measureHeight_NW();
+					if (height > 0) {
+						break;
+					}
+				}
+				if (font.isNotNull()) {
+					height = (sl_ui_pos)(font->getFontHeight() * 1.5f);
+					if (height < 0) {
+						height = 0;
+					}
+				}
+				height += getPaddingTop() + getPaddingBottom();
 				if (height < 0) {
 					height = 0;
 				}
-			}
-			height += getPaddingTop() + getPaddingBottom();
-			if (height < 0) {
-				height = 0;
-			}
+			} while (0);
 			setLayoutHeight(height);
 		}
 	}
@@ -397,8 +412,17 @@ namespace slib
 
 	void EditView::dispatchChange(String* value)
 	{
+		if (*value == m_text) {
+			return;
+		}
 		SLIB_INVOKE_EVENT_HANDLER(Change, value)
+		if (*value == m_text) {
+			return;
+		}
 		m_text = *value;
+		if (isNativeWidget()) {
+			invalidateLayoutOfWrappingControl();
+		}
 	}
 
 	SLIB_DEFINE_EVENT_HANDLER(EditView, ReturnKey)
@@ -490,6 +514,11 @@ namespace slib
 	
 	void EditView::_setHintTextColor_NW(const Color& color)
 	{
+	}
+	
+	sl_ui_len EditView::_measureHeight_NW()
+	{
+		return 0;
 	}
 
 	void EditView::_setFont_NW(const Ref<Font>& font)

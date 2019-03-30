@@ -54,53 +54,32 @@
 }
 @end
 
-@interface _priv_Slib_macOS_TextFieldCell : NSTextFieldCell {
-}
-@end
-
-@interface _priv_Slib_macOS_SecureTextFieldCell : NSSecureTextFieldCell {
-}
-@end
-
 namespace slib
 {
 
 	class EditView_Impl : public EditView
 	{
 	public:
-		void _applyPlaceholder(NSView* handle)
+		void _applyPlaceholder(NSView* handle, NSFont* hFont)
 		{
-			NSAttributedString* attr;
-			
-			String _text = m_hintText;
-			if (_text.isEmpty()) {
-				attr = nil;
-			} else {
-				NSString* text = Apple::getNSStringFromString(_text);
-				NSColor* color = GraphicsPlatform::getNSColorFromColor(m_hintTextColor);
-				NSMutableParagraphStyle* paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-				[paragraphStyle setAlignment:translateAlignment(m_textAlignment)];
-				NSFont* hFont = nil;
-				if ([handle isKindOfClass:[NSTextField class]]) {
-					NSTextField* tv = (NSTextField*)handle;
-					hFont = tv.font;
-				} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
-					_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
-					hFont = tv->m_textView.font;
-				}
-
-				if (hFont != nil) {
+			NSAttributedString* attr = nil;
+			if (hFont == nil) {
+				Ref<Font> font = getFont();
+				hFont = GraphicsPlatform::getNSFont(font.get());
+			}
+			if (hFont != nil) {
+				String _text = m_hintText;
+				if (_text.isNotEmpty()) {
+					NSString* text = Apple::getNSStringFromString(_text, @"");
+					NSColor* color = GraphicsPlatform::getNSColorFromColor(m_hintTextColor);
+					NSMutableParagraphStyle* paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+					[paragraphStyle setAlignment:translateAlignment(m_textAlignment)];
 					attr = [[NSAttributedString alloc] initWithString:text attributes:@{NSForegroundColorAttributeName: color, NSParagraphStyleAttributeName: paragraphStyle, NSFontAttributeName: hFont}];
-				} else {
-					attr = [[NSAttributedString alloc] initWithString:text attributes:@{NSForegroundColorAttributeName: color, NSParagraphStyleAttributeName: paragraphStyle}];
 				}
 			}
-			
 			if ([handle isKindOfClass:[NSTextField class]]) {
 				NSTextField* tv = (NSTextField*)handle;
-				if (attr != [[tv cell] placeholderAttributedString]) {
-					[[tv cell] setPlaceholderAttributedString:attr];
-				}
+				[[tv cell] setPlaceholderAttributedString:attr];
 			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
 				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
 				tv->m_textView->m_placeholderString = attr;
@@ -112,28 +91,29 @@ namespace slib
 
 		void _applyProperties(NSTextField* handle)
 		{
-			NSTextFieldCell* cell;
 			if (m_flagPassword) {
-				cell = [[_priv_Slib_macOS_SecureTextFieldCell alloc] init];
+				handle.cell = [[NSSecureTextFieldCell alloc] init];
 			} else {
-				cell = [[_priv_Slib_macOS_TextFieldCell alloc] init];
+				handle.cell = [[NSTextFieldCell alloc] init];
 			}
-			handle.cell = cell;
-			[handle setStringValue:(Apple::getNSStringFromString(m_text))];
-			[handle setAlignment:translateAlignment(m_textAlignment)];
-			[handle setBordered: (isBorder() ? YES : NO)];
-			[handle setBezeled: (isBorder() ? YES : NO)];
-			_applyPlaceholder(handle);
-			[handle setTextColor:(GraphicsPlatform::getNSColorFromColor(m_textColor))];
-			[handle setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
-			[handle setEditable:(m_flagReadOnly? NO : YES)];
-			[handle setSelectable:YES];
 			
 			Ref<Font> font = getFont();
 			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 			if (hFont != nil) {
 				[handle setFont:hFont];
 			}
+			
+			[handle setStringValue:(Apple::getNSStringFromString(m_text, @""))];
+			[handle setAlignment:translateAlignment(m_textAlignment)];
+			[handle setBordered: (isBorder() ? YES : NO)];
+			[handle setBezeled: (isBorder() ? YES : NO)];
+			[handle setTextColor:(GraphicsPlatform::getNSColorFromColor(m_textColor))];
+			[handle setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
+			[handle setEditable:(m_flagReadOnly? NO : YES)];
+			[handle setSelectable:YES];
+			
+			_applyPlaceholder(handle, hFont);
+
 		}
 		
 		void _applyProperties(_priv_Slib_macOS_TextArea* handle)
@@ -144,21 +124,38 @@ namespace slib
 			[[tv textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
 
 			[handle setHasHorizontalScroller:(isHorizontalScrollBarVisible()?YES:NO)];
-			[handle setHasVerticalScroller:(isVerticalScrollBarVisible()?YES:NO)];
+			[handle setHasVerticalScroller:(isVerticalScrollBarVisible() && (!isHeightWrapping())?YES:NO)];
 			
-			[tv setString:(Apple::getNSStringFromString(m_text))];
+			Ref<Font> font = getFont();
+			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
+			_applyFont(tv, hFont, sl_false);
+			
+			NSString* text = Apple::getNSStringFromString(m_text, @"");
+			[tv setString:text];
 			[tv setAlignment:translateAlignment(m_textAlignment)];
 			[handle setBorderType:(isBorder() ? NSBezelBorder : NSNoBorder)];
-			_applyPlaceholder(handle);
 			[tv setTextColor:(GraphicsPlatform::getNSColorFromColor(m_textColor))];
 			[tv setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
 			[tv setEditable:(m_flagReadOnly?NO:YES)];
 			[tv setSelectable:YES];
 			
-			Ref<Font> font = getFont();
-			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-			if (hFont != nil) {
-				[tv setFont:hFont];
+			_applyPlaceholder(handle, hFont);
+		}
+		
+		static void _applyFont(NSTextView* tv, NSFont* font, sl_bool flagSet)
+		{
+			if (font != nil) {
+				[tv setFont:font];
+			}
+			NSMutableParagraphStyle *paragraph = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+			CGFloat height = font.leading + font.ascender - font.descender;
+			[paragraph setLineSpacing:2];
+			[paragraph setMaximumLineHeight:height];
+			[paragraph setMinimumLineHeight:height];
+			[tv setDefaultParagraphStyle:paragraph];
+			if (flagSet) {
+				NSMutableAttributedString* text = (NSMutableAttributedString*)([tv attributedString]);
+				[text addAttribute:NSParagraphStyleAttributeName value:paragraph range:NSMakeRange(0, text.length)];
 			}
 		}
 		
@@ -181,7 +178,7 @@ namespace slib
 				String textNew = text;
 				view->dispatchChange(&textNew);
 				if (text != textNew) {
-					NSString* str = Apple::getNSStringFromString(textNew);
+					NSString* str = Apple::getNSStringFromString(textNew, @"");
 					[control setStringValue:str];
 				}
 			}
@@ -195,7 +192,7 @@ namespace slib
 				String textNew = text;
 				view->dispatchChange(&textNew);
 				if (text != textNew) {
-					NSString* str = Apple::getNSStringFromString(textNew);
+					NSString* str = Apple::getNSStringFromString(textNew, @"");
 					[control->m_textView setString:str];
 				}
 			}
@@ -253,31 +250,13 @@ namespace slib
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
-			NSString* value = Apple::getNSStringFromString(_value);
+			NSString* value = Apple::getNSStringFromString(_value, @"");
 			if ([handle isKindOfClass:[NSTextField class]]) {
 				NSTextField* tv = (NSTextField*)handle;
 				[tv setStringValue:value];
 			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
 				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
 				[tv->m_textView setString:value];
-			}
-		}
-	}
-
-	void EditView::_setBorder_NW(sl_bool flag)
-	{
-		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setBorder_NW, this, flag));
-			return;
-		}
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil) {
-			if ([handle isKindOfClass:[NSTextField class]]) {
-				NSTextField* tv = (NSTextField*)handle;
-				[tv setBordered:(flag?TRUE:FALSE)];
-			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
-				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
-				[tv setBorderType:(flag?NSBezelBorder:NSNoBorder)];
 			}
 		}
 	}
@@ -293,11 +272,11 @@ namespace slib
 			if ([handle isKindOfClass:[NSTextField class]]) {
 				NSTextField* tv = (NSTextField*)handle;
 				[tv setAlignment:EditView_Impl::translateAlignment(align)];
-				((EditView_Impl*)this)->_applyPlaceholder(handle);
+				((EditView_Impl*)this)->_applyPlaceholder(handle, nil);
 			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
 				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
 				[tv->m_textView setAlignment:EditView_Impl::translateAlignment(align)];
-				((EditView_Impl*)this)->_applyPlaceholder(handle);
+				((EditView_Impl*)this)->_applyPlaceholder(handle, nil);
 			}
 		}
 	}
@@ -310,19 +289,7 @@ namespace slib
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
-			((EditView_Impl*)this)->_applyPlaceholder(handle);
-		}
-	}
-	
-	void EditView::_setHintTextColor_NW(const Color& value)
-	{
-		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setHintTextColor_NW, this, value));
-			return;
-		}
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil) {
-			((EditView_Impl*)this)->_applyPlaceholder(handle);
+			((EditView_Impl*)this)->_applyPlaceholder(handle, nil);
 		}
 	}
 	
@@ -355,11 +322,11 @@ namespace slib
 			if ([handle isKindOfClass:[NSTextField class]]) {
 				NSTextField* tv = (NSTextField*)handle;
 				if (m_flagPassword) {
-					if ([tv.cell isKindOfClass:[_priv_Slib_macOS_SecureTextFieldCell class]]) {
+					if ([tv.cell isKindOfClass:[NSSecureTextFieldCell class]]) {
 						return;
 					}
 				} else {
-					if ([tv.cell isKindOfClass:[_priv_Slib_macOS_TextFieldCell class]]) {
+					if (!([tv.cell isKindOfClass:[NSSecureTextFieldCell class]])) {
 						return;
 					}
 				}
@@ -401,6 +368,80 @@ namespace slib
 			}
 		}
 	}
+	
+	void EditView::_setHintTextColor_NW(const Color& value)
+	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setHintTextColor_NW, this, value));
+			return;
+		}
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			((EditView_Impl*)this)->_applyPlaceholder(handle, nil);
+		}
+	}
+	
+	sl_ui_len EditView::_measureHeight_NW()
+	{
+		sl_ui_len height = 0;
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			if ([handle isKindOfClass:[NSTextField class]]) {
+				height = (sl_ui_len)([handle fittingSize].height);
+			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+				_priv_Slib_macOS_TextArea* textArea = (_priv_Slib_macOS_TextArea*)handle;
+				NSTextView* tv = textArea->m_textView;
+				NSLayoutManager* layoutManager = tv.layoutManager;
+				NSTextContainer* textContainer = tv.textContainer;
+				[layoutManager ensureLayoutForTextContainer:textContainer];
+				NSRect usedRect = [layoutManager usedRectForTextContainer:textContainer];
+				NSSize inset = [tv textContainerInset];
+				height = (sl_ui_len)(usedRect.size.height + inset.height * 2) + 4;
+			}
+		}
+		return height;
+	}
+	
+	void EditView::_setFont_NW(const Ref<Font>& font)
+	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setFont_NW, this, font));
+			return;
+		}
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
+			if (hFont != nil) {
+				if ([handle isKindOfClass:[NSTextField class]]) {
+					NSTextField* tv = (NSTextField*)handle;
+					[tv setFont:hFont];
+					((EditView_Impl*)this)->_applyPlaceholder(handle, hFont);
+				} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+					_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
+					EditView_Impl::_applyFont(tv->m_textView, hFont, sl_true);
+					((EditView_Impl*)this)->_applyPlaceholder(handle, hFont);
+				}
+			}
+		}
+	}
+
+	void EditView::_setBorder_NW(sl_bool flag)
+	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setBorder_NW, this, flag));
+			return;
+		}
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			if ([handle isKindOfClass:[NSTextField class]]) {
+				NSTextField* tv = (NSTextField*)handle;
+				[tv setBordered:(flag?TRUE:FALSE)];
+			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
+				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
+				[tv setBorderType:(flag?NSBezelBorder:NSNoBorder)];
+			}
+		}
+	}
 
 	void EditView::_setBackgroundColor_NW(const Color& color)
 	{
@@ -416,29 +457,6 @@ namespace slib
 			} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
 				_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
 				[tv->m_textView setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(color))];
-			}
-		}
-	}
-
-	void EditView::_setFont_NW(const Ref<Font>& font)
-	{
-		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setFont_NW, this, font));
-			return;
-		}
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil) {
-			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-			if (hFont != nil) {
-				if ([handle isKindOfClass:[NSTextField class]]) {
-					NSTextField* tv = (NSTextField*)handle;
-					[tv setFont:hFont];
-					((EditView_Impl*)this)->_applyPlaceholder(handle);
-				} else if ([handle isKindOfClass:[_priv_Slib_macOS_TextArea class]]) {
-					_priv_Slib_macOS_TextArea* tv = (_priv_Slib_macOS_TextArea*)handle;
-					[tv->m_textView setFont:hFont];
-					((EditView_Impl*)this)->_applyPlaceholder(handle);
-				}
 			}
 		}
 	}
@@ -484,6 +502,7 @@ MACOS_VIEW_DEFINE_ON_KEY
 		if (m_textView == nil) {
 			return nil;
 		}
+		[m_textView setTextContainerInset:NSMakeSize(3, 3)];
 		[m_textView setMinSize:NSMakeSize(0.0, 0.0)];
 		[m_textView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
 		[m_textView setVerticallyResizable:YES];
@@ -535,70 +554,12 @@ MACOS_VIEW_DEFINE_ON_KEY
 {
 	[super drawRect:rect];
 	if (self->m_placeholderString != nil) {
-		if ([[self string] isEqualToString:@""] && self != [[self window] firstResponder]) {
-			[self->m_placeholderString drawInRect:[self bounds]];
+		if ([[self string] length] == 0 && self != [[self window] firstResponder]) {
+			NSRect rc = [self bounds];
+			rc.origin.x += 2;
+			rc.size.width -= 4;
+			[self->m_placeholderString drawInRect:rc];
 		}
-	}
-}
-
-@end
-
-@implementation _priv_Slib_macOS_TextFieldCell
-
-#define TEXT_HEIGHT_FACTOR 1.5
-#define TEXT_PADDING_FACTOR 0.4
-#define LABEL_PADDING_FACTOR 0.1
-
-- (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
-{
-	if (((NSTextField*)controlView).currentEditor == nil) {
-		cellFrame = [self drawingRectForBounds:cellFrame];
-		if (self.font != nil) {
-			cellFrame.origin.y -= self.font.pointSize * LABEL_PADDING_FACTOR;
-		}
-		[self.attributedStringValue drawInRect:cellFrame];
-	}
-}
-
-- (NSRect)drawingRectForBounds:(NSRect)rect
-{
-	if (self.font != nil) {
-		rect = [super drawingRectForBounds: rect];
-		rect.origin.y -= self.font.pointSize * TEXT_PADDING_FACTOR;
-		rect.size.height = self.font.pointSize * TEXT_HEIGHT_FACTOR;
-		return rect;
-	} else {
-		return [super drawingRectForBounds: rect];
-	}
-}
-
-@end
-
-@implementation _priv_Slib_macOS_SecureTextFieldCell
-
-- (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
-{
-	if (((NSTextField*)controlView).currentEditor == nil) {
-		cellFrame = [self drawingRectForBounds:cellFrame];
-		if (self.font != nil) {
-			cellFrame.origin.y -= self.font.pointSize * LABEL_PADDING_FACTOR;
-		}
-		NSMutableAttributedString* password = [self.attributedStringValue mutableCopy];
-		NSMutableString* str = password.mutableString;
-		[str setString:[@"" stringByPaddingToLength:str.length withString:@"•" startingAtIndex:0]];
-		[password drawInRect:cellFrame];
-	}
-}
-
-- (NSRect)drawingRectForBounds:(NSRect)rect
-{
-	if (self.font != nil) {
-		rect = [super drawingRectForBounds: rect];
-		rect.origin.y -= self.font.pointSize * TEXT_PADDING_FACTOR;
-		rect.size.height = self.font.pointSize * TEXT_HEIGHT_FACTOR;
-		return rect;
-	} else {
-		return [super drawingRectForBounds: rect];
 	}
 }
 

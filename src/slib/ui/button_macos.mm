@@ -92,19 +92,6 @@ namespace slib
 			NSButton* button = (NSButton*)handle;
 			NSSize size = button.fittingSize;
 			return UISize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
-		} else {
-			NSButton* button = [[NSButton alloc] init];
-			if (button != nil) {
-				button.title = Apple::getNSStringFromString(view->getText());
-				Ref<Font> font = view->getFont();
-				NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-				if (hFont != nil) {
-					[button setFont:hFont];
-				}
-				button.bezelStyle = NSRoundedBezelStyle;
-				NSSize size = button.fittingSize;
-				return UISize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
-			}
 		}
 		return UISize::zero();
 	}

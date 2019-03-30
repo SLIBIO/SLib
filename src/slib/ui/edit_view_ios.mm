@@ -178,8 +178,9 @@ namespace slib
 		
 		void applyProperties(_priv_Slib_iOS_TextArea* handle)
 		{
+			[handle setScrollEnabled:!(isHeightWrapping())];
 			[handle setShowsHorizontalScrollIndicator:isHorizontalScrollBarVisible()?YES:NO];
-			[handle setShowsVerticalScrollIndicator:isVerticalScrollBarVisible()?YES:NO];
+			[handle setShowsVerticalScrollIndicator:(isVerticalScrollBarVisible() && !(isHeightWrapping()))?YES:NO];
 			[handle setText:(Apple::getNSStringFromString(m_text))];
 			[handle setTextAlignment:translateAlignment(m_textAlignment)];
 			if (isBorder()) {
@@ -262,7 +263,6 @@ namespace slib
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
 		_priv_Slib_iOS_TextField* handle = [[_priv_Slib_iOS_TextField alloc] initWithFrame:frame];
-		
 		if (handle != nil) {
 			((EditView_Impl*)this)->applyProperties(handle);
 		}
@@ -280,7 +280,6 @@ namespace slib
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
-	
 	
 	void EditView::_getText_NW()
 	{
@@ -429,6 +428,70 @@ namespace slib
 		}
 	}
 
+	void EditView::_setReturnKeyType_NW(UIReturnKeyType type)
+	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setReturnKeyType_NW, this, type));
+			return;
+		}
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			if ([handle isKindOfClass:[UITextField class]]) {
+				UITextField* tv = (UITextField*)handle;
+				[tv setReturnKeyType:EditView_Impl::convertReturnKeyType(type)];
+			} else if ([handle isKindOfClass:[UITextView class]]) {
+				UITextView* tv = (UITextView*)handle;
+				[tv setReturnKeyType:EditView_Impl::convertReturnKeyType(type)];
+			}
+		}
+	}
+	
+	void EditView::_setKeyboardType_NW(UIKeyboardType type)
+	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setKeyboardType_NW, this, type));
+			return;
+		}
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			if ([handle isKindOfClass:[UITextField class]]) {
+				UITextField* tv = (UITextField*)handle;
+				[tv setKeyboardType:EditView_Impl::convertKeyboardType(type)];
+			} else if ([handle isKindOfClass:[UITextView class]]) {
+				UITextView* tv = (UITextView*)handle;
+				[tv setKeyboardType:EditView_Impl::convertKeyboardType(type)];
+			}
+		}
+	}
+	
+	void EditView::_setAutoCapitalizationType_NW(UIAutoCapitalizationType type)
+	{
+		if (!(isUiThread())) {
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setAutoCapitalizationType_NW, this, type));
+			return;
+		}
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			if ([handle isKindOfClass:[UITextField class]]) {
+				UITextField* tv = (UITextField*)handle;
+				[tv setAutocapitalizationType:EditView_Impl::convertAutoCapitalizationType(type)];
+			} else if ([handle isKindOfClass:[UITextView class]]) {
+				UITextView* tv = (UITextView*)handle;
+				[tv setAutocapitalizationType:EditView_Impl::convertAutoCapitalizationType(type)];
+			}
+		}
+	}
+	
+	sl_ui_len EditView::_measureHeight_NW()
+	{
+		CGFloat f = UIPlatform::getGlobalScaleFactor();
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			return (sl_ui_len)([handle sizeThatFits:CGSizeMake((CGFloat)(getLayoutWidth() / f), CGFLOAT_MAX)].height * f);
+		}
+		return 0;
+	}
+	
 	void EditView::_setFont_NW(const Ref<Font>& font)
 	{
 		if (!(isUiThread())) {
@@ -506,64 +569,11 @@ namespace slib
 			if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
 				[tv setShowsHorizontalScrollIndicator:isHorizontalScrollBarVisible()?YES:NO];
-				[tv setShowsVerticalScrollIndicator:isVerticalScrollBarVisible()?YES:NO];
+				[tv setShowsVerticalScrollIndicator:(isVerticalScrollBarVisible() && !(isHeightWrapping()))?YES:NO];
 			}
 		}
 	}
 	
-	void EditView::_setReturnKeyType_NW(UIReturnKeyType type)
-	{
-		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setReturnKeyType_NW, this, type));
-			return;
-		}
-		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil) {
-			if ([handle isKindOfClass:[UITextField class]]) {
-				UITextField* tv = (UITextField*)handle;
-				[tv setReturnKeyType:EditView_Impl::convertReturnKeyType(type)];
-			} else if ([handle isKindOfClass:[UITextView class]]) {
-				UITextView* tv = (UITextView*)handle;
-				[tv setReturnKeyType:EditView_Impl::convertReturnKeyType(type)];
-			}
-		}
-	}
-	
-	void EditView::_setKeyboardType_NW(UIKeyboardType type)
-	{
-		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setKeyboardType_NW, this, type));
-			return;
-		}
-		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil) {
-			if ([handle isKindOfClass:[UITextField class]]) {
-				UITextField* tv = (UITextField*)handle;
-				[tv setKeyboardType:EditView_Impl::convertKeyboardType(type)];
-			} else if ([handle isKindOfClass:[UITextView class]]) {
-				UITextView* tv = (UITextView*)handle;
-				[tv setKeyboardType:EditView_Impl::convertKeyboardType(type)];
-			}
-		}
-	}
-	
-	void EditView::_setAutoCapitalizationType_NW(UIAutoCapitalizationType type)
-	{
-		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setAutoCapitalizationType_NW, this, type));
-			return;
-		}
-		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil) {
-			if ([handle isKindOfClass:[UITextField class]]) {
-				UITextField* tv = (UITextField*)handle;
-				[tv setAutocapitalizationType:EditView_Impl::convertAutoCapitalizationType(type)];
-			} else if ([handle isKindOfClass:[UITextView class]]) {
-				UITextView* tv = (UITextView*)handle;
-				[tv setAutocapitalizationType:EditView_Impl::convertAutoCapitalizationType(type)];
-			}
-		}
-	}
 }
 
 @implementation _priv_Slib_iOS_TextField
@@ -610,7 +620,6 @@ IOS_VIEW_DEFINE_ON_FOCUS
 {
 	self = [super initWithFrame:frame];
 	if (self != nil) {
-		[self setScrollEnabled:TRUE];
 		[self setDelegate:self];
 		[self setPlaceholder:@""];
 		[self setPlaceholderColor:[UIColor lightGrayColor]];

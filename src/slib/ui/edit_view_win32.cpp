@@ -28,6 +28,8 @@
 
 #include "view_win32.h"
 
+#include <Richedit.h>
+
 namespace slib
 {
 
@@ -38,13 +40,16 @@ namespace slib
 		Color m_colorText;
 		Color m_colorBackground;
 		HBRUSH m_hBrushBackground;
-		
+
+		sl_uint32 m_heightRequested;
+
 	public:
 		Win32_EditViewInstance()
 		{
 			m_hBrushBackground = NULL;
 			m_colorText = Color::zero();
 			m_colorBackground = Color::zero();
+			m_heightRequested = 0;
 		}
 
 		~Win32_EditViewInstance()
@@ -111,6 +116,22 @@ namespace slib
 			return sl_false;
 		}
 
+		sl_bool processNotify(NMHDR* nmhdr, LRESULT& result) override
+		{
+			switch (nmhdr->code) {
+			case EN_REQUESTRESIZE:
+				{
+					Ref<View> _view = getView();
+					if (EditView* view = CastInstance<EditView>(_view.get())) {
+						REQRESIZE* req = (REQRESIZE*)nmhdr;
+						m_heightRequested = req->rc.bottom - req->rc.top;
+					}
+					return sl_true;
+				}
+			}
+			return sl_false;
+		}
+
 		sl_bool processControlColor(UINT msg, HDC hDC, HBRUSH& result) override
 		{
 			HBRUSH hbr = m_hBrushBackground;
@@ -134,18 +155,14 @@ namespace slib
 	class EditView_Impl : public EditView
 	{
 	public:
-		/*
-			type
-				0 - EditView
-				1 - PasswordView
-				2 - TextArea
-		*/
-		Ref<ViewInstance> _createInstance(ViewInstance* parent, int type)
+		Ref<ViewInstance> _createInstance(ViewInstance* parent, sl_bool flagTextArea)
 		{
 			Win32_UI_Shared* shared = Win32_UI_Shared::get();
 			if (!shared) {
 				return sl_null;
 			}
+
+			LPCWSTR className = L"Edit";
 
 			int style = WS_TABSTOP;
 			if (isBorder()) {
@@ -157,12 +174,14 @@ namespace slib
 			} else if (align == Alignment::Right) {
 				style |= ES_RIGHT;
 			}
-			if (type == 0) {
-				if (m_multiLine != MultiLineMode::Single) {
-					style |= ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN;
+			if (flagTextArea) {
+				HMODULE hModule = LoadLibraryW(L"Msftedit.dll");
+				if (hModule) {
+					className = MSFTEDIT_CLASS;
+				} else {
+					LoadLibraryW(L"Riched20.dll");
+					className = RICHEDIT_CLASSW;
 				}
-				style |= ES_AUTOHSCROLL;
-			} else if (type == 2) {
 				style |= ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN;
 				if (isVerticalScrollBarVisible()) {
 					style |= WS_VSCROLL;
@@ -174,6 +193,9 @@ namespace slib
 					}
 				}
 			} else {
+				if (m_multiLine != MultiLineMode::Single) {
+					style |= ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN;
+				}
 				style |= ES_AUTOHSCROLL;
 			}
 			if (m_flagReadOnly) {
@@ -183,7 +205,7 @@ namespace slib
 				style |= ES_PASSWORD;
 			}
 			String16 text = m_text;
-			Ref<Win32_EditViewInstance> ret = Win32_ViewInstance::create<Win32_EditViewInstance>(this, parent, L"EDIT", (LPCWSTR)(text.getData()), style, 0);
+			Ref<Win32_EditViewInstance> ret = Win32_ViewInstance::create<Win32_EditViewInstance>(this, parent, className, (LPCWSTR)(text.getData()), style, 0);
 			if (ret.isNotNull()) {
 				
 				HWND handle = ret->getHandle();
@@ -198,6 +220,10 @@ namespace slib
 				::SendMessageW(handle, 0x1501 /*EM_SETCUEBANNER*/, FALSE, (LPARAM)(LPCWSTR)(hintText.getData()));
 				ret->setTextColor(m_textColor);
 				ret->setBackgroundColor(getBackgroundColor());
+
+				if (flagTextArea) {
+					SendMessageW(handle, EM_SETEVENTMASK, 0, ENM_REQUESTRESIZE | ENM_CHANGE);
+				}
 			}
 			return ret;
 		}
@@ -208,12 +234,12 @@ namespace slib
 
 	Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* parent)
 	{
-		return ((EditView_Impl*)this)->_createInstance(parent, 0);
+		return ((EditView_Impl*)this)->_createInstance(parent, sl_false);
 	}
 
 	Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* parent)
 	{
-		return ((EditView_Impl*)this)->_createInstance(parent, 2);
+		return ((EditView_Impl*)this)->_createInstance(parent, sl_true);
 	}
 
 	void EditView::_getText_NW()
@@ -291,6 +317,43 @@ namespace slib
 	{
 	}
 
+	sl_ui_len EditView::_measureHeight_NW()
+	{
+		if (IsInstanceOf<TextArea>(this)) {
+			Ref<ViewInstance> _instance = getViewInstance();
+			if (Win32_EditViewInstance* instance = CastInstance<Win32_EditViewInstance>(_instance.get())) {
+				SendMessageW(instance->getHandle(), EM_REQUESTRESIZE, 0, 0);
+				sl_ui_len height = instance->m_heightRequested;
+				if (height > 0) {
+					if (isBorder()) {
+						height += 8;
+					}
+					return height;
+				}
+			}
+		} else {
+			HWND handle = UIPlatform::getViewHandle(this);
+			if (handle) {
+				int nLines = 1;
+				if (getMultiLine() != MultiLineMode::Single) {
+					nLines = (int)(SendMessageW(handle, EM_GETLINECOUNT, 0, 0));
+					if (nLines < 1) {
+						nLines = 1;
+					}
+				}
+				Ref<Font> font = getFont();
+				if (font.isNotNull()) {
+					sl_ui_len height = (sl_ui_len)(nLines * font->getFontHeight());
+					if (isBorder()) {
+						height += 2;
+					}
+					return height;
+				}
+			}
+		}
+		return 0;
+	}
+
 	void EditView::_setFont_NW(const Ref<Font>& font)
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
@@ -336,6 +399,7 @@ namespace slib
 			}
 		}
 	}
+
 }
 
 #endif

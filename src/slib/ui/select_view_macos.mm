@@ -181,18 +181,6 @@ namespace slib
 			NSPopUpButton* button = (NSPopUpButton*)handle;
 			NSSize size = button.fittingSize;
 			return UISize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
-		} else {
-			NSPopUpButton* button = [[NSPopUpButton alloc] init];
-			if (button != nil) {
-				[button setPullsDown:NO];
-				Ref<Font> font = view->getFont();
-				NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-				if (hFont != nil) {
-					[button setFont:hFont];
-				}
-				NSSize size = button.fittingSize;
-				return UISize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
-			}
 		}
 		return UISize::zero();
 	}

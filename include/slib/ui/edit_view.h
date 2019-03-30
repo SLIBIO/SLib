@@ -42,7 +42,7 @@ namespace slib
 	public:
 		String getText();
 		
-		virtual void setText(const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setText(const String& text, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		Alignment getGravity();
 		
@@ -131,6 +131,9 @@ namespace slib
 		
 		void _setAutoCapitalizationType_NW(UIAutoCapitalizationType type);
 		
+		sl_ui_len _measureHeight_NW();
+		
+		
 		void _setFont_NW(const Ref<Font>& font) override;
 		
 		void _setBorder_NW(sl_bool flag) override;
@@ -138,6 +141,7 @@ namespace slib
 		void _setBackgroundColor_NW(const Color& color) override;
 		
 		void _setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical) override;
+		
 
 		void _onChangeEditViewNative(EditView* ev, String* text);
 		

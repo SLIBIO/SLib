@@ -442,7 +442,7 @@ namespace slib
 		}
 		
 #ifdef SLIB_UI_IS_MACOS
-		if (isCreatingNativeWidget()) {
+		if (isNativeWidget()) {
 			UISize size = _priv_SelectView_macOS_measureSize(this);
 			if (flagHorizontal) {
 				setLayoutWidth(size.x);
