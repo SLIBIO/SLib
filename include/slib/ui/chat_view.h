@@ -114,6 +114,8 @@ namespace slib
 	protected:
 		void _updateListContent(UIUpdateMode mode);
 		
+		void _updateChatSize(UIUpdateMode mode);
+		
 		void _addListContent(UIUpdateMode mode);
 
 	protected:

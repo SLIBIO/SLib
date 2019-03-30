@@ -292,7 +292,7 @@ namespace slib
 	{
 		m_chatWidth = width;
 		m_chatWidthWeight = 0;
-		_updateListContent(mode);
+		_updateChatSize(mode);
 	}
 	
 	sl_real ChatView::getChatWidthWeight()
@@ -306,7 +306,7 @@ namespace slib
 		if (weight > 0) {
 			m_chatWidth = (sl_ui_len)(getWidth() * weight);
 		}
-		_updateListContent(mode);
+		_updateChatSize(mode);
 	}
 	
 	sl_ui_len ChatView::getUserIconSize()
@@ -318,7 +318,7 @@ namespace slib
 	{
 		m_userIconSize = width;
 		m_userIconSizeWeight = 0;
-		_updateListContent(mode);
+		_updateChatSize(mode);
 	}
 	
 	sl_real ChatView::getUserIconSizeWeight()
@@ -332,7 +332,7 @@ namespace slib
 		if (weight > 0) {
 			m_userIconSize = (sl_ui_len)(getWidth() * weight);
 		}
-		_updateListContent(mode);
+		_updateChatSize(mode);
 	}
 	
 	String ChatView::getDateFormat()
@@ -485,11 +485,12 @@ namespace slib
 	void ChatView::setFont(const Ref<Font>& font, UIUpdateMode mode)
 	{
 		View::setFont(font, UIUpdateMode::None);
-		_updateListContent(mode);
+		refreshItems();
 	}
 	
 	void ChatView::onResize(sl_ui_len width, sl_ui_len height)
 	{
+		ViewGroup::onResize(width, height);
 		sl_bool flagUpdateList = sl_false;
 		{
 			sl_real weight = m_chatWidthWeight;
@@ -506,9 +507,8 @@ namespace slib
 			}
 		}
 		if (flagUpdateList) {
-			_updateListContent(UIUpdateMode::UpdateLayout);
+			_updateChatSize(UIUpdateMode::UpdateLayout);
 		}
-		ViewGroup::onResize(width, height);
 	}
 	
 	void ChatView::_updateListContent(UIUpdateMode mode)
@@ -550,6 +550,22 @@ namespace slib
 				}, 50);
 			}, 50);
 		}, 50);
+	}
+	
+	void ChatView::_updateChatSize(UIUpdateMode mode)
+	{
+		if (!SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
+			return;
+		}
+		if (m_items.isEmpty()) {
+			return;
+		}
+		Ref<_priv_ChatViewAdapter> adapter = Ref<_priv_ChatViewAdapter>::from(getAdapter());
+		if (adapter.isNotNull()) {
+			adapter->params.chatWidth = m_chatWidth;
+			adapter->params.userIconSize = m_userIconSize;
+		}
+		refreshItems();
 	}
 	
 	void ChatView::_addListContent(UIUpdateMode mode)

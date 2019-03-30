@@ -309,9 +309,19 @@ namespace slib
 		
 		void measureLayoutWrappingSize(sl_bool flagHorizontalWrapping, sl_bool flagVerticalWrapping);
 		
-		sl_bool isAlwaysOnUpdateLayout();
+		struct UpdateLayoutFrameParam
+		{
+			UIRect parentContentFrame;
+			sl_bool flagUseLayout;
+			sl_bool flagHorizontal;
+			sl_bool flagVertical;
+		};
 		
-		void setAlwaysOnUpdateLayout(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		void updateLayoutFrameInParent(const UpdateLayoutFrameParam& param);
+		
+		sl_bool isCustomLayout();
+		
+		void setCustomLayout(sl_bool flagCustom);
 		
 		const UIRect& getLayoutFrame();
 		
@@ -1287,15 +1297,13 @@ namespace slib
 		
 		void _restrictSize(UIRect& rect);
 		
-		UIRect _updateLayoutFrameInParent_getReferFrame(void* param, View* refer);
-		
-		void _updateLayoutFrameInParent(void* param);
+		UIRect _updateLayoutFrameInParent_getReferFrame(const UpdateLayoutFrameParam& param, View* refer);
 		
 		void _updateLayout();
 		
 		void _applyLayout(UIUpdateMode mode);
 		
-		void _updateChildLayout(View* child);
+		void _updateChildLayout(View* child, sl_bool flagHorizontal, sl_bool flagVertical);
 
 		void _updateAndApplyChildLayout(View* child);
 
@@ -1403,7 +1411,7 @@ namespace slib
 			sl_bool flagMarginTopWeight : 1;
 			sl_bool flagMarginRightWeight : 1;
 			sl_bool flagMarginBottomWeight : 1;
-			sl_bool flagAlwaysOnUpdateLayout : 1;
+			sl_bool flagCustomLayout : 1;
 			
 			sl_bool flagInvalidLayoutInParent : 1;
 			sl_bool flagRequestedFrame : 1;

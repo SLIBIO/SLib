@@ -31,7 +31,7 @@ namespace slib
 	
 	LinearView::LinearView()
 	{		
-		setAlwaysOnUpdateLayout(sl_true, UIUpdateMode::Init);
+		setCustomLayout(sl_true);
 		setSavingCanvasState(sl_false);
 		
 		m_orientation = LayoutOrientation::Vertical;
@@ -88,16 +88,49 @@ namespace slib
 	
 	void LinearView::onUpdateLayout()
 	{
+		ListElements< Ref<View> > children(getChildren());
+		
+		if (!(children.count)) {
+			if (isWidthWrapping()) {
+				setLayoutWidth(getPaddingLeft() + getPaddingRight());
+			}
+			if (isHeightWrapping()) {
+				setLayoutHeight(getPaddingTop() + getPaddingBottom());
+			}
+			return;
+		}
+
 		sl_bool flagHorizontalLayout = m_orientation == LayoutOrientation::Horizontal;
 		
 		sl_ui_pos sizeSum = 0;
 		sl_uint32 countFill = 0;
 		sl_real sumFillWeights = 0;
 
-		sl_ui_len widthContainer = getLayoutWidth() - getPaddingLeft() - getPaddingTop();
-		sl_ui_len heightContainer = getLayoutHeight() - getPaddingTop() - getPaddingBottom();
+		UIRect layoutFrameContainer = getLayoutFrame();
+		sl_ui_len widthLayout = layoutFrameContainer.getWidth();
+		sl_ui_len heightLayout = layoutFrameContainer.getHeight();
+		sl_ui_len widthContainer = widthLayout - getPaddingLeft() - getPaddingTop();
+		sl_ui_len heightContainer = heightLayout - getPaddingTop() - getPaddingBottom();
+		
+		UpdateLayoutFrameParam updateLayoutParam;
+		{
+			Ref<PaddingAttributes>& paddingAttrs = m_paddingAttrs;
+			if (paddingAttrs.isNotNull()) {
+				updateLayoutParam.parentContentFrame.left = paddingAttrs->paddingLeft;
+				updateLayoutParam.parentContentFrame.top = paddingAttrs->paddingTop;
+				updateLayoutParam.parentContentFrame.right = widthLayout - paddingAttrs->paddingRight;
+				updateLayoutParam.parentContentFrame.bottom = heightLayout - paddingAttrs->paddingBottom;
+			} else {
+				updateLayoutParam.parentContentFrame.left = 0;
+				updateLayoutParam.parentContentFrame.top = 0;
+				updateLayoutParam.parentContentFrame.right = widthLayout;
+				updateLayoutParam.parentContentFrame.bottom = heightLayout;
+			}
+			updateLayoutParam.flagUseLayout = sl_true;
+			updateLayoutParam.flagHorizontal = !flagHorizontalLayout;
+			updateLayoutParam.flagVertical = flagHorizontalLayout;
+		}
 
-		ListElements< Ref<View> > children(getChildren());
 		
 		SLIB_SCOPED_BUFFER(Size, 512, childSizes, children.count);
 		
@@ -105,10 +138,15 @@ namespace slib
 		for (i = 0; i < children.count; i++) {
 			Ref<View>& child = children[i];
 			if (child->getVisibility() != Visibility::Gone) {
+				Ref<LayoutAttributes>& childLayoutAttrs = child->m_layoutAttrs;
+				if (childLayoutAttrs.isNotNull()) {
+					childLayoutAttrs->flagInvalidLayoutInParent = sl_true;
+				}
 				childSizes[i] = child->getLayoutSize();
 				if (flagHorizontalLayout) {
 					sizeSum += child->getMarginLeft();
 					if (child->getWidthMode() != SizeMode::Filling) {
+						child->updateLayoutFrameInParent(updateLayoutParam);
 						sizeSum += child->getLayoutWidth();
 					} else {
 						countFill++;
@@ -118,6 +156,7 @@ namespace slib
 				} else {
 					sizeSum += child->getMarginTop();
 					if (child->getHeightMode() != SizeMode::Filling) {
+						child->updateLayoutFrameInParent(updateLayoutParam);
 						sizeSum += child->getLayoutHeight();
 					} else {
 						countFill++;
@@ -165,11 +204,19 @@ namespace slib
 							sl_ui_len height = child->getLayoutHeight();
 							child->_restrictSize(width, height);
 							child->setLayoutSize(width, height);
+							child->updateLayoutFrameInParent(updateLayoutParam);
+							height = child->getLayoutHeight();
+							child->_restrictSize(width, height);
+							child->setLayoutSize(width, height);
 						}
 					} else {
 						if (child->getHeightMode() == SizeMode::Filling) {
 							sl_ui_len width = child->getLayoutWidth();
 							sl_ui_len height = (sl_ui_len)(remainedSize * child->getHeightWeight() / sumFillWeights);
+							child->_restrictSize(width, height);
+							child->setLayoutSize(width, height);
+							child->updateLayoutFrameInParent(updateLayoutParam);
+							width = child->getLayoutWidth();
 							child->_restrictSize(width, height);
 							child->setLayoutSize(width, height);
 						}

@@ -209,6 +209,9 @@ namespace slib
 			CGRect bounds;
 			bounds.origin.x = 0;
 			bounds.origin.y = 0;
+			if ([handle isKindOfClass:[UIScrollView class]]) {
+				bounds.origin = handle.bounds.origin;
+			}
 			bounds.size.width = (CGFloat)(frame.getWidth()) / f;
 			bounds.size.height = (CGFloat)(frame.getHeight()) / f;
 			center.x = (CGFloat)(frame.left) / f + bounds.size.width / 2;

@@ -773,8 +773,12 @@ namespace slib
 					setContentSize((sl_scroll_pos)widthListView, (sl_scroll_pos)heightTotalItems);
 				}
 				
-				if (!fromDraw) {
-					contentView->invalidate();
+				if (Math::isAlmostZero(getScrollY() - scrollY)) {
+					if (!fromDraw) {
+						contentView->invalidate();
+					}
+				} else {
+					dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, this, sl_false, sl_true, sl_false));
 				}
 				
 			} while (0);
@@ -803,7 +807,7 @@ namespace slib
 							width = (sl_ui_len)((sl_real)widthList * itemView->getWidthWeight());
 							break;
 						case SizeMode::Wrapping:
-							_updateChildLayout(itemView.get());
+							_updateChildLayout(itemView.get(), sl_true, sl_true);
 							width = itemView->getLayoutWidth();
 							break;
 						default:
@@ -855,7 +859,7 @@ namespace slib
 							ret = (sl_ui_len)((sl_real)heightList * itemView->getHeightWeight());
 							break;
 						case SizeMode::Wrapping:
-							_updateChildLayout(itemView.get());
+							_updateChildLayout(itemView.get(), sl_true, sl_true);
 							ret = itemView->getLayoutHeight();
 							break;
 						default:
