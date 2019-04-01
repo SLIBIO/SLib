@@ -46,6 +46,8 @@ namespace slib
 		
 		virtual sl_ui_len getAverageItemHeight(View* parent);
 		
+		virtual sl_ui_len getItemHeight(sl_uint64 index, View* parent);
+		
 		void populateInto(View* parent, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		void populateInto(const Ref<View>& parent, UIUpdateMode mode = UIUpdateMode::UpdateLayout);

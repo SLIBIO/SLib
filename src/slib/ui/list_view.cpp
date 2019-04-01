@@ -39,6 +39,7 @@ namespace slib
 		_priv_ListContentView()
 		{			
 			setSavingCanvasState(sl_false);
+			setUsingChildLayouts(sl_false);
 		}
 		
 	public:
@@ -164,16 +165,55 @@ namespace slib
 		m_averageMidItemHeight = 0;
 		m_heightTotalItems = 0;
 		m_lastScrollY = 0;
-		for (sl_uint32 i = 0; i < MAX_ITEMS_SAVE_HEIGHTS; i++) {
-			m_heightsTopItems[i] = 0;
-			m_heightsBottomItems[i] = 0;
+		if (m_adapter.isNotNull()) {
+			Ref<ViewAdapter> adapter = m_adapter;
+			if (adapter.isNotNull()) {
+				View* parent = m_contentView.get();
+				sl_uint64 nTotal = adapter->getItemsCount();
+				sl_uint32 i;
+				if (nTotal <= MAX_ITEMS_SAVE_HEIGHTS) {
+					for (i = 0; i < nTotal; i++) {
+						sl_ui_len height = adapter->getItemHeight(i, parent);
+						m_heightsTopItems[i] = height;
+						sl_uint64 k = nTotal - 1 - i;
+						m_heightsBottomItems[(sl_uint32)k] = height;
+					}
+					for (i = (sl_uint32)nTotal; i < MAX_ITEMS_SAVE_HEIGHTS; i++) {
+						m_heightsTopItems[i] = 0;
+						m_heightsBottomItems[i] = 0;
+					}
+				} else if (nTotal < 2 * MAX_ITEMS_SAVE_HEIGHTS) {
+					for (i = 0; i < nTotal; i++) {
+						sl_ui_len height = adapter->getItemHeight(i, parent);
+						if (i < MAX_ITEMS_SAVE_HEIGHTS) {
+							m_heightsTopItems[i] = height;
+						}
+						sl_uint64 k = nTotal - 1 - i;
+						if (k < MAX_ITEMS_SAVE_HEIGHTS) {
+							m_heightsBottomItems[(sl_uint32)k] = height;
+						}
+					}
+				} else {
+					for (i = 0; i < MAX_ITEMS_SAVE_HEIGHTS; i++) {
+						m_heightsTopItems[i] = adapter->getItemHeight(i, parent);
+						sl_uint64 k = nTotal - 1 - i;
+						m_heightsBottomItems[i] = adapter->getItemHeight(k, parent);
+					}
+				}
+				m_countTotalItems = nTotal;
+			}
+		} else {
+			for (sl_uint32 i = 0; i < MAX_ITEMS_SAVE_HEIGHTS; i++) {
+				m_heightsTopItems[i] = 0;
+				m_heightsBottomItems[i] = 0;
+			}
 		}
 	}
 	
 	void ListView::_resetAdapter()
 	{
+		_initStatus();
 		m_contentView->removeAllChildren();
-		setContentHeight(0);
 		{
 			MutexLocker lock(&m_lockVisibleItems);
 			for (sl_size i = 0; i < m_countVisibleItems; i++) {
@@ -181,8 +221,6 @@ namespace slib
 			}
 			m_countVisibleItems = 0;
 		}
-		_initStatus();
-		scrollToY(0);
 	}
 	
 	static sl_ui_len _priv_ListView_getTotalHeights(sl_uint64 count, sl_ui_len averageHeight, sl_ui_len* topHeights, sl_ui_len* bottomHeights, double& averageMidHeight)
@@ -517,7 +555,7 @@ namespace slib
 					// reuse visible items
 					for (; iItem < lastCountVisibleItems && yItem < windowEnd; iItem++) {
 						Ref<View> view = viewsVisibleItems[iItem];
-						sl_ui_len h = _measureItemHeight(view, heightListView);
+						sl_ui_len h = _updateItemLayout(view, widthListView, heightListView);
 						yItem += h;
 						viewsGoDownItems[countGoDownViews] = view;
 						heightsGoDownItems[countGoDownViews] = h;
@@ -624,7 +662,7 @@ namespace slib
 							}
 						}
 						Ref<View> view = _getView(adapter.get(), indexGoUp - 1, viewFree.get());
-						sl_ui_len h = _measureItemHeight(view, heightListView);
+						sl_ui_len h = _updateItemLayout(view, widthListView, heightListView);
 						viewsGoUpItems[countGoUpViews] = view;
 						heightsGoUpItems[countGoUpViews] = h;
 						countGoUpViews++;
@@ -651,7 +689,7 @@ namespace slib
 							}
 						}
 						Ref<View> view = _getView(adapter.get(), indexGoDown, viewFree.get());
-						sl_ui_len h = _measureItemHeight(view, heightListView);
+						sl_ui_len h = _updateItemLayout(view, widthListView, heightListView);
 						viewsGoDownItems[countGoDownViews] = view;
 						heightsGoDownItems[countGoDownViews] = h;
 						countGoDownViews++;
@@ -730,7 +768,7 @@ namespace slib
 				// remove free views
 				{
 					for (sl_size iItem = 0; iItem < countFreeViews; iItem++) {
-						contentView->removeChild(viewsFreeItems[iItem]);
+						contentView->removeChild(viewsFreeItems[iItem], UIUpdateMode::None);
 						viewsFreeItems[iItem].setNull();
 					}
 				}
@@ -740,23 +778,17 @@ namespace slib
 					sl_ui_pos y = yStart;
 					for (sl_size i = 0; i < countVisibleItems; i++) {
 						Ref<View> view = viewsVisibleItems[i];
-						sl_ui_pos b = y + heightsVisibleItems[i];
 						if (view.isNotNull()) {
-							UIRect rect;
-							_measureItemLeftRight(view, widthListView, rect.left, rect.right);
+							UIRect rect = view->getLayoutFrame();
 							rect.top = y + view->getMarginTop();
-							rect.bottom = b - view->getMarginBottom();
-							rect.fixSizeError();
-							if (!(view->m_frame.isAlmostEqual(rect))) {
-								view->setFrame(rect, UIUpdateMode::None);
-								view->m_flagInvalidLayout = sl_true;
-								view->_updateAndApplyLayoutWithMode(UIUpdateMode::None);
-							}
+							y += heightsVisibleItems[i];
+							rect.bottom = y - view->getMarginBottom();
+							view->setLayoutFrame(rect);
+							view->_applyLayout(UIUpdateMode::None);
 							if (view->getParent() != contentView) {
 								contentView->addChild(view, UIUpdateMode::None);
 							}
 						}
-						y = b;
 					}
 				}
 				
@@ -770,7 +802,7 @@ namespace slib
 				m_lastScrollY = scrollY;
 				
 				if (!(Math::isAlmostZero(getContentHeight() - (sl_scroll_pos)heightTotalItems)) || !(Math::isAlmostZero(getContentWidth() - (sl_scroll_pos)widthListView))) {
-					setContentSize((sl_scroll_pos)widthListView, (sl_scroll_pos)heightTotalItems);
+					setContentSize((sl_scroll_pos)widthListView, (sl_scroll_pos)heightTotalItems, UIUpdateMode::None);
 				}
 				
 				if (Math::isAlmostZero(getScrollY() - scrollY)) {
@@ -785,98 +817,40 @@ namespace slib
 			
 			Base::interlockedDecrement32(&m_lockCountLayouting);
 			
+		} else {
+			setContentHeight(0);
 		}
 	}
 	
-	void ListView::_measureItemLeftRight(const Ref<View>& itemView, sl_ui_len widthList, sl_ui_pos& left, sl_ui_pos& right)
+	sl_ui_len ListView::_updateItemLayout(const Ref<View>& itemView, sl_ui_len widthList, sl_ui_len heightList)
 	{
-		left = 0;
-		right = widthList;
 		if (itemView.isNotNull()) {
 			Ref<LayoutAttributes>& layoutAttrs = itemView->m_layoutAttrs;
 			if (layoutAttrs.isNotNull()) {
-				sl_ui_len width = 0;
-				if (layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustWidth) {
-					sl_ui_len height = _measureItemHeight(itemView, getHeight());
-					width = (sl_ui_pos)(height * layoutAttrs->aspectRatio);
-				} else {
-					SizeMode mode = itemView->getWidthMode();
-					switch (mode) {
-						case SizeMode::Filling:
-						case SizeMode::Weight:
-							width = (sl_ui_len)((sl_real)widthList * itemView->getWidthWeight());
-							break;
-						case SizeMode::Wrapping:
-							_updateChildLayout(itemView.get(), sl_true, sl_true);
-							width = itemView->getLayoutWidth();
-							break;
-						default:
-							width = itemView->getWidth();
-							break;
-					}
-				}
-				width = Math::clamp(width, layoutAttrs->minWidth, layoutAttrs->maxWidth);
-				layoutAttrs->applyMarginWeightsX(widthList);
-				if (layoutAttrs->leftMode == PositionMode::Free && layoutAttrs->rightMode == PositionMode::ParentEdge) {
-					right = widthList - layoutAttrs->marginRight;
-					left = right - width;
-				} else if (layoutAttrs->leftMode == PositionMode::CenterInParent) {
-					left = (widthList - layoutAttrs->marginLeft - layoutAttrs->marginRight - width) / 2 + layoutAttrs->marginLeft;
-					right = left + width;
-				} else if (layoutAttrs->leftMode != PositionMode::Free) {
-					left = layoutAttrs->marginLeft;
-					right = left + width;
-				} else {
-					left = itemView->getLeft();
-					right = left + width;
-				}
-			} else {
-				left = itemView->getLeft();
-				right = left + itemView->getWidth();
-			}
-		}
-	}
-	
-	sl_ui_len ListView::_measureItemHeight(const Ref<View>& itemView, sl_ui_len heightList)
-	{
-		sl_ui_len ret = 0;
-		if (itemView.isNotNull()) {
-			Ref<LayoutAttributes>& layoutAttrs = itemView->m_layoutAttrs;
-			if (layoutAttrs.isNotNull()) {
-				if (layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustHeight) {
-					sl_ui_pos left, right;
-					if (layoutAttrs->aspectRatio > 0.0000001f) {
-						_measureItemLeftRight(itemView, getWidth(), left, right);
-						ret = (sl_ui_pos)((right - left) / layoutAttrs->aspectRatio);
-					} else {
-						ret = 0;
-					}
-				} else {
-					SizeMode mode = itemView->getHeightMode();
-					switch (mode) {
-						case SizeMode::Filling:
-						case SizeMode::Weight:
-							ret = (sl_ui_len)((sl_real)heightList * itemView->getHeightWeight());
-							break;
-						case SizeMode::Wrapping:
-							_updateChildLayout(itemView.get(), sl_true, sl_true);
-							ret = itemView->getLayoutHeight();
-							break;
-						default:
-							ret = itemView->getHeight();
-							break;
-					}
-					ret = Math::clamp(ret, layoutAttrs->minHeight, layoutAttrs->maxHeight);
-					layoutAttrs->applyMarginWeightsY(heightList);
-					ret += layoutAttrs->marginTop + layoutAttrs->marginBottom;
+				layoutAttrs->flagInvalidLayoutInParent = sl_true;
+				SizeMode mode = itemView->getHeightMode();
+				if (mode == SizeMode::Filling) {
+					layoutAttrs->layoutFrame.setHeight((sl_ui_len)((sl_real)heightList * itemView->getHeightWeight()));
 				}
 			}
+			UpdateLayoutFrameParam param;
+			param.parentContentFrame.left = 0;
+			param.parentContentFrame.right = widthList;
+			param.parentContentFrame.top = 0;
+			param.parentContentFrame.bottom = 0;
+			param.flagUseLayout = sl_true;
+			param.flagHorizontal = sl_true;
+			param.flagVertical = sl_false;
+			itemView->updateLayoutFrameInParent(param);
+			sl_ui_len height = itemView->getLayoutHeight() + itemView->getMarginTop() + itemView->getMarginBottom();
+			sl_ui_len minItemHeight = (heightList / MAX_ITEMS_VISIBLE) + 1;
+			if (height < minItemHeight) {
+				itemView->setLayoutHeight(minItemHeight);
+				height = minItemHeight;
+			}
+			return height;
 		}
-		sl_ui_len minItemHeight = (heightList / MAX_ITEMS_VISIBLE) + 1;
-		if (ret < minItemHeight) {
-			ret = minItemHeight;
-		}
-		return ret;
+		return 0;
 	}
 	
 	void _priv_ListContentView::dispatchDraw(Canvas* canvas)

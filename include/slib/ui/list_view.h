@@ -70,9 +70,7 @@ namespace slib
 		
 		void _layoutItemViews(sl_bool flagFromDraw, sl_bool flagFromScroll, sl_bool flagRefresh);
 		
-		void _measureItemLeftRight(const Ref<View>& itemView, sl_ui_len heightList, sl_ui_pos& left, sl_ui_pos& right);
-		
-		sl_ui_len _measureItemHeight(const Ref<View>& itemView, sl_ui_len heightList);
+		sl_ui_len _updateItemLayout(const Ref<View>& itemView, sl_ui_len widthList, sl_ui_len heightList);
 		
 	protected:
 		AtomicRef<ViewAdapter> m_adapter;
