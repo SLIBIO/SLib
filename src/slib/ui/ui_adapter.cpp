@@ -42,6 +42,11 @@ namespace slib
 		return 0;
 	}
 	
+	sl_ui_len ViewAdapter::getItemHeight(sl_uint64 index, View* parent)
+	{
+		return 0;
+	}
+	
 	void ViewAdapter::populateInto(View* parent, UIUpdateMode mode)
 	{
 		if (!parent) {
