@@ -207,7 +207,7 @@ namespace slib
 				Queue< Ref<View> > children;
 				for (sl_uint32 i = 0; i < n; i++) {
 					Ref<View> child = group->getChild(i);
-					Ref<View> childNew = adapter->getView(start + i, child.get(), group.get());
+					Ref<View> childNew = adapter->getView(start + i, child.get(), parent);
 					if (child != childNew) {
 						flagRebuild = sl_true;
 					}
@@ -240,6 +240,31 @@ namespace slib
 			return adapter->getAverageItemHeight(parent);
 		}
 		return ViewAdapter::getAverageItemHeight(parent);
+	}
+	
+	sl_ui_len ViewRowAdapter::getItemHeight(sl_uint64 index, View* parent)
+	{
+		Ref<ViewAdapter> adapter = m_itemAdapter;
+		if (adapter.isNotNull()) {
+			sl_uint32 m = m_nColumns;
+			if (m >= 1) {
+				sl_uint64 nTotal = adapter->getItemsCount();
+				sl_uint64 start = index * m;
+				sl_uint32 n = m;
+				if (start + n > nTotal) {
+					n = (sl_uint32)(nTotal - start);
+				}
+				sl_ui_len height = 0;
+				for (sl_uint32 i = 0; i < n; i++) {
+					sl_ui_len heightItem = adapter->getItemHeight(start + i, parent);
+					if (heightItem > height) {
+						height = heightItem;
+					}
+				}
+				return height;
+			}
+		}
+		return ViewAdapter::getItemHeight(index, parent);
 	}
 	
 }

@@ -195,6 +195,8 @@ namespace slib
 		
 		sl_ui_len getAverageItemHeight(View* parent) override;
 		
+		sl_ui_len getItemHeight(sl_uint64 index, View* parent) override;
+		
 	protected:
 		sl_uint32 m_nColumns;
 		AtomicRef<ViewAdapter> m_itemAdapter;

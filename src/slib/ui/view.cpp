@@ -2143,6 +2143,8 @@ namespace slib
 						frame.right = frame.left + width;
 					}
 				}
+			} else {
+				frame.right = frame.left + width;
 			}
 			if (param.flagVertical) {
 				switch (topMode) {
@@ -2216,6 +2218,8 @@ namespace slib
 						frame.bottom = frame.top + height;
 					}
 				}
+			} else {
+				frame.bottom = frame.top + height;
 			}
 			
 			_restrictSize(frame);

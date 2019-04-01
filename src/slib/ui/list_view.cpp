@@ -168,7 +168,7 @@ namespace slib
 		if (m_adapter.isNotNull()) {
 			Ref<ViewAdapter> adapter = m_adapter;
 			if (adapter.isNotNull()) {
-				View* parent = m_contentView.get();
+				View* parent = this;
 				sl_uint64 nTotal = adapter->getItemsCount();
 				sl_uint32 i;
 				if (nTotal <= MAX_ITEMS_SAVE_HEIGHTS) {
@@ -412,7 +412,7 @@ namespace slib
 	
 	Ref<View> ListView::_getView(ViewAdapter* adapter, sl_uint64 index, View* original)
 	{
-		Ref<View> view = adapter->getView(index, original, m_contentView.get());
+		Ref<View> view = adapter->getView(index, original, this);
 		if (view.isNotNull()) {
 #if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_IOS) || defined(SLIB_UI_IS_ANDROID)
 			if (isCreatingInstance()) {
@@ -837,7 +837,7 @@ namespace slib
 			param.parentContentFrame.left = 0;
 			param.parentContentFrame.right = widthList;
 			param.parentContentFrame.top = 0;
-			param.parentContentFrame.bottom = 0;
+			param.parentContentFrame.bottom = heightList;
 			param.flagUseLayout = sl_true;
 			param.flagHorizontal = sl_true;
 			param.flagVertical = sl_false;
