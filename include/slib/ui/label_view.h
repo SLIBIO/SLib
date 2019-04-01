@@ -66,8 +66,13 @@ namespace slib
 		
 		virtual void setEllipsize(EllipsizeMode ellipsizeMode, UIUpdateMode updateMode = UIUpdateMode::UpdateLayout);
 		
+		UISize measureSize();
+		
 	public:
 		SLIB_DECLARE_EVENT_HANDLER(LabelView, ClickLink, const String& href, UIEvent* ev)
+		
+	protected:
+		void _updateTextBox(sl_ui_len width);
 		
 	protected:
 		void onDraw(Canvas* canvas) override;

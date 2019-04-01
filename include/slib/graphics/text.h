@@ -299,6 +299,37 @@ namespace slib
 
 	};
 	
+	class SLIB_EXPORT SimpleTextBoxParam
+	{
+	public:
+		Ref<Font> font;
+		String text;
+		sl_bool flagHyperText;
+		sl_real width;
+		MultiLineMode multiLineMode;
+		EllipsizeMode ellipsizeMode;
+		Alignment align;
+		
+	public:
+		SimpleTextBoxParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(SimpleTextBoxParam)
+		
+	};
+	
+	class SLIB_EXPORT SimpleTextBoxDrawParam
+	{
+	public:
+		Rectangle frame;
+		Color color;
+		
+	public:
+		SimpleTextBoxDrawParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(SimpleTextBoxDrawParam)
+
+	};
+	
 	class SLIB_EXPORT SimpleTextBox : public Object
 	{
 		SLIB_DECLARE_OBJECT
@@ -306,32 +337,42 @@ namespace slib
 	public:
 		SimpleTextBox() noexcept;
 
-		~SimpleTextBox() noexcept;
+		~SimpleTextBox();
 
 	public:
-		void update(const String& text, sl_bool flagHyperText, const Ref<Font>& font, sl_real width, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align) noexcept;
+		void update(const SimpleTextBoxParam& param) noexcept;
 
-		void draw(Canvas* canvas, const String& text, sl_bool flagHyperText, const Ref<Font>& font, const Rectangle& frame, MultiLineMode multiLineMode, EllipsizeMode ellipsizeMode, const Alignment& align, const Color& color) noexcept;
+		void draw(Canvas* canvas, const SimpleTextBoxDrawParam& param) const noexcept;
 
-		Ref<TextItem> getTextItemAtPosition(sl_real x, sl_real y) noexcept;
+		Ref<TextItem> getTextItemAtPosition(sl_real x, sl_real y) const noexcept;
 		
-		void setWidth(sl_real width);
+		sl_real getContentWidth() const noexcept;
 
-		sl_real getContentWidth() noexcept;
-
-		sl_real getContentHeight() noexcept;
+		sl_real getContentHeight() const noexcept;
+		
+	public:
+		Ref<Font> getFont() const noexcept;
+		
+		String getText() const noexcept;
+		
+		MultiLineMode getMultiLineMode() const noexcept;
+		
+		EllipsizeMode getEllipsizeMode() const noexcept;
+		
+		Alignment getAlignment() const noexcept;
 
 	protected:
 		Ref<TextParagraph> m_paragraph;
+		Ref<TextStyle> m_style;
 
+		Ref<Font> m_font;
 		String m_text;
 		sl_bool m_flagHyperText;
-		Ref<TextStyle> m_style;
-		Ref<Font> m_font;
-		sl_real m_width;
 		MultiLineMode m_multiLineMode;
 		EllipsizeMode m_ellipsisMode;
-		Alignment m_align;
+		Alignment m_alignHorizontal;
+		Alignment m_alignVertical;
+		sl_real m_width;
 
 		sl_real m_contentWidth;
 		sl_real m_contentHeight;

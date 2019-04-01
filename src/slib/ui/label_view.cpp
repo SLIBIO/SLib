@@ -116,6 +116,15 @@ namespace slib
 		invalidate(updateMode);
 	}
 	
+	UISize LabelView::measureSize()
+	{
+		_updateTextBox(getWidth());
+		sl_ui_len width = (sl_ui_len)(m_textBox.getContentWidth());
+		sl_ui_len height = (sl_ui_len)(m_textBox.getContentHeight());
+		width += getPaddingLeft() + getPaddingRight();
+		height += getPaddingTop() + getPaddingBottom();
+		return UISize(width, height);
+	}
 	
 	SLIB_DEFINE_EVENT_HANDLER(LabelView, ClickLink, const String& href, UIEvent* ev)
 	
@@ -128,10 +137,44 @@ namespace slib
 		UI::openUrl(href);
 	}
 	
+	void LabelView::_updateTextBox(sl_ui_len width)
+	{
+		sl_ui_len widthText;
+		sl_ui_pos paddingWidth = getPaddingLeft() + getPaddingRight();
+		if (isWidthWrapping()) {
+			if (isMaximumWidthDefined()) {
+				widthText = getMaximumWidth() - paddingWidth;
+			} else {
+				widthText = 0;
+			}
+		} else {
+			widthText = width - paddingWidth;
+			if (widthText < 1) {
+				return;
+			}
+		}
+		SimpleTextBoxParam param;
+		param.font = getFont();
+		param.text = m_text;
+		param.flagHyperText = m_flagHyperText;
+		param.width = (sl_real)widthText;
+		param.multiLineMode = m_multiLineMode;
+		param.ellipsizeMode = m_ellipsizeMode;
+		param.align = m_textAlignment;
+		m_textBox.update(param);
+	}
 	
 	void LabelView::onDraw(Canvas* canvas)
 	{
-		m_textBox.draw(canvas, m_text, m_flagHyperText, getFont(), getBoundsInnerPadding(), m_multiLineMode, m_ellipsizeMode, m_textAlignment, m_textColor);
+		UIRect bounds = getBoundsInnerPadding();
+		if (bounds.getWidth() < 1 || bounds.getHeight() < 1) {
+			return;
+		}
+		_updateTextBox(getWidth());
+		SimpleTextBoxDrawParam param;
+		param.frame = bounds;
+		param.color = m_textColor;
+		m_textBox.draw(canvas, param);
 	}
 	
 	void LabelView::onClickEvent(UIEvent* ev)
@@ -172,27 +215,14 @@ namespace slib
 		if (!flagVertical && !flagHorizontal) {
 			return;
 		}
-		
-		sl_ui_pos paddingWidth = getPaddingLeft() + getPaddingRight();
-		sl_ui_len width;
-		if (isWidthWrapping()) {
-			if (isMaximumWidthDefined()) {
-				width = getMaximumWidth() - paddingWidth;
-			} else {
-				width = 0;
-			}
-		} else {
-			width = getLayoutWidth() - paddingWidth;
-		}
-		
-		m_textBox.update(m_text, m_flagHyperText, getFont(), (sl_real)width, m_multiLineMode, m_ellipsizeMode, m_textAlignment);
+		_updateTextBox(getLayoutWidth());
 		if (flagHorizontal) {
-			width = (sl_ui_pos)(m_textBox.getContentWidth());
-			m_textBox.setWidth((sl_real)width);
-			setLayoutWidth(width + paddingWidth);
+			sl_ui_len width = (sl_ui_len)(m_textBox.getContentWidth());
+			setLayoutWidth(width + getPaddingLeft() + getPaddingRight());
 		}
 		if (flagVertical) {
-			setLayoutHeight((sl_ui_pos)(m_textBox.getContentHeight()) + getPaddingTop() + getPaddingBottom());
+			sl_ui_len height = (sl_ui_len)(m_textBox.getContentHeight());
+			setLayoutHeight(height + getPaddingTop() + getPaddingBottom());
 		}		
 	}
 	
