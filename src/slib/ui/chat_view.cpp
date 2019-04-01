@@ -58,7 +58,7 @@ namespace slib
 	
 #define CHAT_MARGIN_WEIGHT 0.4f
 #define CHAT_ROUND_WEIGHT 0.3f
-#define CHAT_SPACE_WEIGHT 0.4f
+#define CHAT_SPACE_WEIGHT 0.3f
 #define USER_ICON_MARGIN_WEIGHT 0.3f
 #define CHAT_DATE_HEIGHT_WEIGHT 2.0f
 #define CHAT_TIME_HEIGHT_WEIGHT 1.3f
@@ -81,69 +81,101 @@ namespace slib
 	class _priv_ChatViewItemView : public ViewGroup
 	{
 	public:
-		void init() override
-		{
-			ViewGroup::init();
-
-			setWidthFilling(1, UIUpdateMode::Init);
-			setHeightWrapping(UIUpdateMode::Init);
-			
-			lblMessage = new LabelView;
-			lblMessage->setAlignParentTop(UIUpdateMode::Init);
-			lblMessage->setWidthWrapping(UIUpdateMode::Init);
-			lblMessage->setHeightWrapping(UIUpdateMode::Init);
-			lblMessage->setMultiLine(MultiLineMode::WordWrap, UIUpdateMode::Init);
-			lblMessage->setGravity(Alignment::TopLeft, UIUpdateMode::Init);
-			addChild(lblMessage, UIUpdateMode::Init);
-		}
-		
-	public:
 		sl_bool flagMe;
 		Ref<Drawable> userIcon;
 		String userName;
 		sl_bool flagShowDate;
-		Time m_time;
-		
-		_priv_ChatView_ItemViewParams params;
+		String message;
+		Time time;
+		Ref<Font> font;
 
-		Ref<LabelView> lblMessage;
+		_priv_ChatView_ItemViewParams params;
+		
+		Ref<LabelView> label;
 		
 	public:
+		void init() override
+		{
+			ViewGroup::init();
+			
+			setWidthFilling(1, UIUpdateMode::Init);
+			
+			label = new LabelView;
+			label->setAlignParentTop(UIUpdateMode::Init);
+			label->setWidthWrapping(UIUpdateMode::Init);
+			label->setHeightWrapping(UIUpdateMode::Init);
+			label->setMultiLine(MultiLineMode::WordWrap, UIUpdateMode::Init);
+			label->setGravity(Alignment::TopLeft, UIUpdateMode::Init);
+			addChild(label, UIUpdateMode::Init);
+		}
+
+	public:
+		class Layout
+		{
+		public:
+			sl_real fontSize;
+			sl_ui_len marginChat;
+			sl_ui_len marginIcon;
+			sl_ui_len marginBottom;
+			sl_ui_len heightDate;
+			sl_ui_len heightTime;
+			sl_ui_len chatSpace;
+			sl_ui_len y;
+			sl_ui_len xLabel;
+			
+			Layout(const Ref<Font>& font, sl_bool flagShowDate, sl_ui_len chatWidth, sl_ui_len userIconSize)
+			{
+				fontSize = font->getFontHeight();
+				marginChat = (sl_ui_len)(fontSize * CHAT_MARGIN_WEIGHT);
+				marginIcon = (sl_ui_len)(fontSize * USER_ICON_MARGIN_WEIGHT);
+				marginBottom = (sl_ui_len)(fontSize * BOTTOM_MARGIN_WEIGHT);
+				heightDate = (sl_ui_pos)(fontSize * CHAT_DATE_HEIGHT_WEIGHT);
+				heightTime = (sl_ui_len)(fontSize * CHAT_TIME_HEIGHT_WEIGHT);
+				chatSpace = (sl_ui_len)(fontSize * CHAT_SPACE_WEIGHT);
+				y = 0;
+				if (flagShowDate) {
+					y += heightDate;
+				}
+				xLabel = marginIcon * 2 + userIconSize + chatSpace;
+			}
+		};
+		
 		void onDraw(Canvas* canvas) override
 		{
-			Ref<Font> font = getFont();
+			sl_ui_len width = getWidth();
+			if (width < 1) {
+				return;
+			}
+			if (getHeight() < 1) {
+				return;
+			}
 			if (font.isNull()) {
 				return;
 			}
-			sl_real fontSize = font->getSize();
-			sl_ui_len width = getWidth();
-			sl_ui_pos y = 0;
+
+			Layout layout(font, flagShowDate, params.chatWidth, params.userIconSize);
 			if (flagShowDate) {
-				sl_ui_pos h = (sl_ui_pos)(fontSize * CHAT_DATE_HEIGHT_WEIGHT);
+				sl_ui_pos h = layout.heightDate;
 				String strDate = getDateText();
 				Size size = font->measureText(strDate);
 				Ref<Pen> pen = Pen::createSolidPen(1, params.textColorDate);
-				canvas->drawLine(0, (sl_real)(h/2), (sl_real)(width / 2 - size.x / 2 - fontSize), (sl_real)(h/2), pen);
-				canvas->drawLine((sl_real)(width / 2 + size.x / 2 + fontSize), (sl_real)(h/2), (sl_real)width, (sl_real)(h/2), pen);
+				canvas->drawLine(0, (sl_real)(h/2), (sl_real)(width / 2 - size.x / 2 - layout.fontSize), (sl_real)(h/2), pen);
+				canvas->drawLine((sl_real)(width / 2 + size.x / 2 + layout.fontSize), (sl_real)(h/2), (sl_real)width, (sl_real)(h/2), pen);
 				canvas->drawText(strDate, (sl_real)(width / 2 - size.x / 2), (sl_real)(h / 2 - size.y / 2), font, params.textColorDate);
-				y += h;
 			}
-			sl_ui_len marginIcon = (sl_ui_len)(fontSize * USER_ICON_MARGIN_WEIGHT);
-			sl_ui_len marginChat = (sl_ui_len)(fontSize * CHAT_MARGIN_WEIGHT);
-			sl_ui_len chatSpace = (sl_ui_len)(fontSize * CHAT_SPACE_WEIGHT);
 			if (userIcon.isNotNull()) {
+				sl_ui_len y = layout.y + layout.marginIcon;
 				if (flagMe) {
-					canvas->draw((sl_real)(width - marginIcon - params.userIconSize), (sl_real)(y + marginIcon), (sl_real)(params.userIconSize), (sl_real)(params.userIconSize), userIcon);
+					canvas->draw((sl_real)(width - layout.marginIcon - params.userIconSize), (sl_real)(y), (sl_real)(params.userIconSize), (sl_real)(params.userIconSize), userIcon);
 				} else {
-					canvas->draw((sl_real)marginIcon, (sl_real)(y + marginIcon), (sl_real)(params.userIconSize), (sl_real)(params.userIconSize), userIcon);
+					canvas->draw((sl_real)(layout.marginIcon), (sl_real)(y), (sl_real)(params.userIconSize), (sl_real)(params.userIconSize), userIcon);
 				}
 			}
-			sl_ui_len heightTime = (sl_ui_len)(fontSize * CHAT_TIME_HEIGHT_WEIGHT);
 			{
 				String strTime = getTimeText();
 				Size size = font->measureText(strTime);
-				sl_ui_len l = marginIcon * 2 + params.userIconSize + chatSpace + marginChat;
-				sl_ui_len m = y + heightTime / 2 - (sl_ui_len)(size.y / 2);
+				sl_ui_len l = layout.marginIcon * 2 + params.userIconSize + layout.chatSpace + layout.marginChat;
+				sl_ui_len m = layout.y + layout.heightTime / 2 - (sl_ui_len)(size.y / 2);
 				if (flagMe) {
 					canvas->drawText(strTime, (sl_real)(width - l - size.x), (sl_real)m, font, params.textColorDate);
 				} else {
@@ -151,24 +183,47 @@ namespace slib
 				}
 			}
 			{
-				sl_ui_len round = (sl_ui_len)(fontSize * CHAT_ROUND_WEIGHT);
-				UIRect rect = lblMessage->getFrame();
+				sl_ui_len y = layout.y + layout.heightTime;
+				sl_ui_len round = (sl_ui_len)(layout.fontSize * CHAT_ROUND_WEIGHT);
 				Point pts[3];
-				sl_ui_len o = rect.top + round * 2 + chatSpace;
+				sl_ui_len o = y + round * 2 + layout.chatSpace;
+				UIRect rect;
+				rect.top = y;
+				rect.bottom = y + label->getHeight();
+				sl_ui_len w = label->getWidth();
+				sl_ui_len l = layout.xLabel;
 				if (flagMe) {
-					canvas->fillRoundRect(rect, UISize(round, round), params.backColorSent);
-					pts[0].x = (sl_real)(rect.right + chatSpace); pts[0].y = (sl_real)(o);
-					pts[1].x = (sl_real)(rect.right); pts[1].y = (sl_real)(o - chatSpace);
-					pts[2].x = (sl_real)(rect.right); pts[2].y = (sl_real)(o + chatSpace);
+					rect.right = width - l;
+					rect.left = rect.right - w;
+					pts[0].x = (sl_real)(rect.right + layout.chatSpace); pts[0].y = (sl_real)(o);
+					pts[1].x = (sl_real)(rect.right); pts[1].y = (sl_real)(o - layout.chatSpace);
+					pts[2].x = (sl_real)(rect.right); pts[2].y = (sl_real)(o + layout.chatSpace);
 					canvas->fillPolygon(pts, 3, params.backColorSent);
+					canvas->fillRoundRect(rect, UISize(round, round), params.backColorSent);
 				} else {
-					canvas->fillRoundRect(rect, UISize(round, round), params.backColorReceived);
-					pts[0].x = (sl_real)(rect.left - chatSpace); pts[0].y = (sl_real)(o);
-					pts[1].x = (sl_real)(rect.left); pts[1].y = (sl_real)(o - chatSpace);
-					pts[2].x = (sl_real)(rect.left); pts[2].y = (sl_real)(o + chatSpace);
+					rect.left = l;
+					rect.right = l + w;
+					pts[0].x = (sl_real)(rect.left - layout.chatSpace); pts[0].y = (sl_real)(o);
+					pts[1].x = (sl_real)(rect.left); pts[1].y = (sl_real)(o - layout.chatSpace);
+					pts[2].x = (sl_real)(rect.left); pts[2].y = (sl_real)(o + layout.chatSpace);
 					canvas->fillPolygon(pts, 3, params.backColorReceived);
+					canvas->fillRoundRect(rect, UISize(round, round), params.backColorReceived);
 				}
 			}
+		}
+		
+		static sl_ui_len measureHeight(const Ref<Font>& font, const String& message, sl_bool flagShowDate, sl_ui_len chatWidth, sl_ui_len userIconSize)
+		{
+			SimpleTextBoxParam tp;
+			tp.font = font;
+			tp.text = message;
+			tp.width = chatWidth;
+			SimpleTextBox box;
+			box.update(tp);
+			Layout layout(font, flagShowDate, chatWidth, userIconSize);
+			sl_ui_len bottomUserIcon = layout.y + layout.marginIcon * 2 + userIconSize + layout.marginBottom;
+			sl_ui_len bottomChat = layout.y + layout.heightTime + box.getContentHeight() + 2 * layout.marginChat + layout.marginBottom;
+			return Math::max(bottomUserIcon, bottomChat);
 		}
 		
 		void setData(const ChatViewItem& item)
@@ -176,48 +231,43 @@ namespace slib
 			flagMe = item.flagMe;
 			userIcon = item.userIcon;
 			userName = item.userName;
-			m_time = item.time;
-			lblMessage->setText(item.message, UIUpdateMode::None);
-			lblMessage->setMaximumWidth(params.chatWidth, UIUpdateMode::None);
-			sl_real fontSize = getFontSize();
-			sl_ui_len marginChat = (sl_ui_len)(fontSize * CHAT_MARGIN_WEIGHT);
-			sl_ui_len marginIcon = (sl_ui_len)(fontSize * USER_ICON_MARGIN_WEIGHT);
-			sl_ui_len marginBottom = (sl_ui_len)(fontSize * BOTTOM_MARGIN_WEIGHT);
-			lblMessage->setPadding(marginChat, UIUpdateMode::None);
-			lblMessage->setMarginBottom(marginBottom, UIUpdateMode::None);
-			sl_ui_len marginX = (sl_ui_len)(fontSize * CHAT_SPACE_WEIGHT) + 2 * marginIcon + params.userIconSize;
-			sl_ui_len marginY = 0;
-			sl_ui_len marginBody = marginBottom;
-			if (flagShowDate) {
-				sl_ui_len m = (sl_ui_len)(fontSize * CHAT_DATE_HEIGHT_WEIGHT);
-				marginY += m;
-				marginBody += m;
-			}
-			setMinimumHeight(marginBody + marginIcon * 2 + params.userIconSize, UIUpdateMode::None);
-			marginY += (sl_ui_len)(fontSize * CHAT_TIME_HEIGHT_WEIGHT);
-			lblMessage->setMarginTop(marginY, UIUpdateMode::None);
+			time = item.time;
+			message = item.message;
+
+			Layout layout(font, flagShowDate, params.chatWidth, params.userIconSize);
+
+			label->setFont(font, UIUpdateMode::None);
+			label->setText(message, UIUpdateMode::None);
+			label->setPadding(layout.marginChat, UIUpdateMode::None);
+			label->setMaximumWidth(params.chatWidth + layout.marginChat * 2, UIUpdateMode::None);
+			label->setMarginTop(layout.y + layout.heightTime, UIUpdateMode::None);
+
 			if (flagMe) {
-				lblMessage->setTextColor(params.textColorSent, UIUpdateMode::Init);
-				lblMessage->setMarginLeft(0, UIUpdateMode::None);
-				lblMessage->setMarginRight(marginX, UIUpdateMode::None);
-				lblMessage->setLeftFree(UIUpdateMode::None);
-				lblMessage->setAlignParentRight();
+				label->setTextColor(params.textColorSent, UIUpdateMode::None);
+				label->setMarginLeft(0, UIUpdateMode::None);
+				label->setMarginRight(layout.xLabel, UIUpdateMode::None);
+				label->setLeftFree(UIUpdateMode::None);
+				label->setAlignParentRight(UIUpdateMode::None);
 			} else {
-				lblMessage->setTextColor(params.textColorReceived, UIUpdateMode::Init);
-				lblMessage->setMarginLeft(marginX, UIUpdateMode::None);
-				lblMessage->setMarginRight(0, UIUpdateMode::None);
-				lblMessage->setRightFree(UIUpdateMode::None);
-				lblMessage->setAlignParentLeft();
+				label->setTextColor(params.textColorReceived, UIUpdateMode::None);
+				label->setMarginLeft(layout.xLabel, UIUpdateMode::None);
+				label->setMarginRight(0, UIUpdateMode::None);
+				label->setRightFree(UIUpdateMode::None);
+				label->setAlignParentLeft(UIUpdateMode::None);
 			}
+			UISize sizeChat = label->measureSize();
+			sl_ui_len bottomUserIcon = layout.y + layout.marginIcon * 2 + params.userIconSize + layout.marginBottom;
+			sl_ui_len bottomChat = layout.y + layout.heightTime + sizeChat.y + layout.marginBottom;
+			setHeight(Math::max(bottomUserIcon, bottomChat), UIUpdateMode::None);
 		}
 		
 		String getDateText()
 		{
 			if (params.formatDate.isNotEmpty()) {
-				return m_time.format(params.formatDate);
+				return time.format(params.formatDate);
 			} else {
 				Time today = Time::now().getDateOnly();
-				Time date = m_time.getDateOnly();
+				Time date = time.getDateOnly();
 				if (today == date) {
 					return string::today::get();
 				}
@@ -225,7 +275,7 @@ namespace slib
 				if (today == date) {
 					return string::yesterday::get();
 				}
-				return m_time.format(TimeFormat::WeekdayDate);
+				return time.format(TimeFormat::WeekdayDate);
 			}
 		}
 		
@@ -233,9 +283,9 @@ namespace slib
 		{
 			String s;
 			if (params.formatTime.isNotEmpty()) {
-				s = m_time.format(params.formatTime);
+				s = time.format(params.formatTime);
 			} else {
-				s = m_time.format(TimeFormat::HourMinute_12Hour);
+				s = time.format(TimeFormat::HourMinute_12Hour);
 			}
 			if (userName.isNotEmpty()) {
 				s = userName + ", " + s;
@@ -253,15 +303,35 @@ namespace slib
 	public:
 		void onBindView(sl_uint64 _index, _priv_ChatViewItemView* view, View* parent) override
 		{
+			Ref<Font> font = parent->getFont();
+			if (font.isNull()) {
+				return;
+			}
 			sl_size index = (sl_size)_index;
 			ListLocker<ChatViewItem> list(m_list);
 			if (index < list.count) {
 				ChatViewItem& item = list[index];
+				view->font = font;
 				view->params = params;
 				view->flagShowDate = index <= 0 || item.time.getDateOnly() != list[index - 1].time.getDateOnly();
-				view->setFont(parent->getFont(), UIUpdateMode::Init);
 				view->setData(item);
 			}
+		}
+		
+		sl_ui_len getItemHeight(sl_uint64 _index, View* parent) override
+		{
+			Ref<Font> font = parent->getFont();
+			if (font.isNull()) {
+				return 0;
+			}
+			sl_size index = (sl_size)_index;
+			ListLocker<ChatViewItem> list(m_list);
+			if (index < list.count) {
+				ChatViewItem& item = list[index];
+				sl_bool flagShowDate = index <= 0 || item.time.getDateOnly() != list[index - 1].time.getDateOnly();
+				return _priv_ChatViewItemView::measureHeight(font, item.message, flagShowDate, params.chatWidth, params.userIconSize);
+			}
+			return 0;
 		}
 	};
 	
@@ -292,7 +362,7 @@ namespace slib
 	{
 		m_chatWidth = width;
 		m_chatWidthWeight = 0;
-		_updateChatSize(mode);
+		_updateListContent(mode);
 	}
 	
 	sl_real ChatView::getChatWidthWeight()
@@ -306,7 +376,7 @@ namespace slib
 		if (weight > 0) {
 			m_chatWidth = (sl_ui_len)(getWidth() * weight);
 		}
-		_updateChatSize(mode);
+		_updateListContent(mode);
 	}
 	
 	sl_ui_len ChatView::getUserIconSize()
@@ -318,7 +388,7 @@ namespace slib
 	{
 		m_userIconSize = width;
 		m_userIconSizeWeight = 0;
-		_updateChatSize(mode);
+		_updateListContent(mode);
 	}
 	
 	sl_real ChatView::getUserIconSizeWeight()
@@ -332,7 +402,7 @@ namespace slib
 		if (weight > 0) {
 			m_userIconSize = (sl_ui_len)(getWidth() * weight);
 		}
-		_updateChatSize(mode);
+		_updateListContent(mode);
 	}
 	
 	String ChatView::getDateFormat()
@@ -485,7 +555,7 @@ namespace slib
 	void ChatView::setFont(const Ref<Font>& font, UIUpdateMode mode)
 	{
 		View::setFont(font, UIUpdateMode::None);
-		refreshItems();
+		_updateListContent(UIUpdateMode::UpdateLayout);
 	}
 	
 	void ChatView::onResize(sl_ui_len width, sl_ui_len height)
@@ -507,7 +577,7 @@ namespace slib
 			}
 		}
 		if (flagUpdateList) {
-			_updateChatSize(UIUpdateMode::UpdateLayout);
+			_updateListContent(UIUpdateMode::UpdateLayout);
 		}
 	}
 	
@@ -516,6 +586,14 @@ namespace slib
 		if (!SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
 			return;
 		}
+		sl_bool flagInit = getAdapter().isNull();
+		if (m_items.isEmpty()) {
+			if (!flagInit) {
+				setAdapter(sl_null);
+			}
+			return;
+		}
+		
 		Ref<_priv_ChatViewAdapter> adapter = new _priv_ChatViewAdapter;
 		adapter->params.chatWidth = m_chatWidth;
 		adapter->params.userIconSize = m_userIconSize;
@@ -528,6 +606,10 @@ namespace slib
 		adapter->params.textColorDate = m_textColorDate;
 		adapter->setList(m_items);
 		setAdapter(adapter);
+		
+		if (!flagInit) {
+			return;
+		}
 		auto weak = ToWeakRef(this);
 		dispatchToDrawingThread([weak]() {
 			auto ref = ToRef(weak);
@@ -550,22 +632,6 @@ namespace slib
 				}, 50);
 			}, 50);
 		}, 50);
-	}
-	
-	void ChatView::_updateChatSize(UIUpdateMode mode)
-	{
-		if (!SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
-			return;
-		}
-		if (m_items.isEmpty()) {
-			return;
-		}
-		Ref<_priv_ChatViewAdapter> adapter = Ref<_priv_ChatViewAdapter>::from(getAdapter());
-		if (adapter.isNotNull()) {
-			adapter->params.chatWidth = m_chatWidth;
-			adapter->params.userIconSize = m_userIconSize;
-		}
-		refreshItems();
 	}
 	
 	void ChatView::_addListContent(UIUpdateMode mode)
