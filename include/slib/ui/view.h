@@ -323,6 +323,14 @@ namespace slib
 		
 		void setCustomLayout(sl_bool flagCustom);
 		
+		const UIRect& getRequestedFrame();
+		
+		UISize getRequestedSize();
+		
+		sl_ui_len getRequestedWidth();
+		
+		sl_ui_len getRequestedHeight();
+		
 		const UIRect& getLayoutFrame();
 		
 		void setLayoutFrame(const UIRect& frame);
@@ -1303,8 +1311,6 @@ namespace slib
 		
 		void _applyLayout(UIUpdateMode mode);
 		
-		void _updateChildLayout(View* child, sl_bool flagHorizontal, sl_bool flagVertical);
-
 		void _updateAndApplyChildLayout(View* child);
 
 		void _updateAndApplyLayoutWithMode(UIUpdateMode mode);

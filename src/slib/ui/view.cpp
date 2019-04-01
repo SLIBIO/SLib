@@ -1080,8 +1080,6 @@ namespace slib
 					_updateAndApplyChildLayout(child);
 				}
 			}
-		} else {
-			child->invalidateLayout(UIUpdateMode::None);
 		}
 		
 		child->removeAllViewInstances();
@@ -1347,7 +1345,7 @@ namespace slib
 	void View::requestFrame(const UIRect& frame, UIUpdateMode mode)
 	{
 		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
-		if (layoutAttrs.isNotNull()) {
+		if (layoutAttrs.isNotNull() && m_parent.isNotNull()) {
 			layoutAttrs->requestedFrame = frame;
 			_restrictSize(layoutAttrs->requestedFrame);
 			layoutAttrs->flagRequestedFrame = sl_true;
@@ -1366,7 +1364,7 @@ namespace slib
 	{
 		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
 			Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
-			if (layoutAttrs.isNotNull()) {
+			if (layoutAttrs.isNotNull() && m_parent.isNotNull()) {
 				layoutAttrs->requestedFrame.setWidth(width);
 				_restrictSize(layoutAttrs->requestedFrame);
 				layoutAttrs->flagRequestedFrame = sl_true;
@@ -1392,7 +1390,7 @@ namespace slib
 	{
 		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
 			Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
-			if (layoutAttrs.isNotNull()) {
+			if (layoutAttrs.isNotNull() && m_parent.isNotNull()) {
 				layoutAttrs->requestedFrame.setHeight(height);
 				_restrictSize(layoutAttrs->requestedFrame);
 				layoutAttrs->flagRequestedFrame = sl_true;
@@ -1423,7 +1421,7 @@ namespace slib
 	{
 		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
 			Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
-			if (layoutAttrs.isNotNull()) {
+			if (layoutAttrs.isNotNull() && m_parent.isNotNull()) {
 				layoutAttrs->requestedFrame.setSize(width, height);
 				_restrictSize(layoutAttrs->requestedFrame);
 				layoutAttrs->flagRequestedFrame = sl_true;
@@ -1449,7 +1447,7 @@ namespace slib
 	{
 		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
 			Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
-			if (layoutAttrs.isNotNull()) {
+			if (layoutAttrs.isNotNull() && m_parent.isNotNull()) {
 				layoutAttrs->requestedFrame.setLocationLeft(x);
 				_restrictSize(layoutAttrs->requestedFrame);
 				layoutAttrs->flagRequestedFrame = sl_true;
@@ -1475,7 +1473,7 @@ namespace slib
 	{
 		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
 			Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
-			if (layoutAttrs.isNotNull()) {
+			if (layoutAttrs.isNotNull() && m_parent.isNotNull()) {
 				layoutAttrs->requestedFrame.setLocationTop(y);
 				_restrictSize(layoutAttrs->requestedFrame);
 				layoutAttrs->flagRequestedFrame = sl_true;
@@ -1506,7 +1504,7 @@ namespace slib
 	{
 		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
 			Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
-			if (layoutAttrs.isNotNull()) {
+			if (layoutAttrs.isNotNull() && m_parent.isNotNull()) {
 				layoutAttrs->requestedFrame.setLocation(x, y);
 				_restrictSize(layoutAttrs->requestedFrame);
 				layoutAttrs->flagRequestedFrame = sl_true;
@@ -2236,7 +2234,18 @@ namespace slib
 			_updateLayout();
 			
 			frame = layoutAttrs->layoutFrame;
-			if (frame.isAlmostEqual(oldFrame)) {
+			sl_bool flagRelayout = sl_false;
+			if (param.flagHorizontal) {
+				if (!(Math::isAlmostZero(oldFrame.getWidth() - frame.getWidth()))) {
+					flagRelayout = sl_true;
+				}
+			}
+			if (param.flagVertical) {
+				if (!(Math::isAlmostZero(oldFrame.getHeight() - frame.getHeight()))) {
+					flagRelayout = sl_true;
+				}
+			}
+			if (!flagRelayout) {
 				break;
 			}
 		}
@@ -2359,22 +2368,6 @@ namespace slib
 		invalidate(mode);
 	}
 
-	void View::_updateChildLayout(View* child, sl_bool flagHorizontal, sl_bool flagVertical)
-	{
-		Ref<LayoutAttributes>& childLayoutAttrs = child->m_layoutAttrs;
-		if (childLayoutAttrs.isNotNull()) {
-			childLayoutAttrs->flagInvalidLayoutInParent = sl_true;
-			UpdateLayoutFrameParam param;
-			param.parentContentFrame = getBoundsInnerPadding();
-			param.flagUseLayout = m_flagUsingChildLayouts;
-			param.flagHorizontal = flagHorizontal;
-			param.flagVertical = flagVertical;
-			child->updateLayoutFrameInParent(param);
-		} else {
-			child->_updateLayout();
-		}
-	}
-
 	void View::_updateAndApplyChildLayout(View* child)
 	{
 		Ref<LayoutAttributes>& childLayoutAttrs = child->m_layoutAttrs;
@@ -2397,6 +2390,7 @@ namespace slib
 		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		
 		if (!m_flagInvalidLayout) {
+			invalidate(mode);
 			return;
 		}
 		
@@ -2718,6 +2712,42 @@ namespace slib
 		}
 	}
 	
+	const UIRect& View::getRequestedFrame()
+	{
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->requestedFrame;
+		}
+		return m_frame;
+	}
+	
+	UISize View::getRequestedSize()
+	{
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->requestedFrame.getSize();
+		}
+		return m_frame.getSize();
+	}
+	
+	sl_ui_len View::getRequestedWidth()
+	{
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->requestedFrame.getWidth();
+		}
+		return m_frame.getWidth();
+	}
+	
+	sl_ui_len View::getRequestedHeight()
+	{
+		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->requestedFrame.getHeight();
+		}
+		return m_frame.getHeight();
+	}
+	
 	const UIRect& View::getLayoutFrame()
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
@@ -2859,8 +2889,10 @@ namespace slib
 			}
 		}
 		view->dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(View, _updateAndApplyLayout, view.get()));
-		void (View::*f)(UIUpdateMode) = &View::invalidate;
-		view->dispatchToDrawingThread(Function<void()>::bindWeakRef(WeakRef<View>(this), f, mode));
+		if (view != this) {
+			void (View::*f)(UIUpdateMode) = &View::invalidate;
+			view->dispatchToDrawingThread(Function<void()>::bindWeakRef(WeakRef<View>(this), f, mode));
+		}
 	}
 
 	void View::invalidateParentLayout(UIUpdateMode mode)
@@ -2877,8 +2909,8 @@ namespace slib
 			return;
 		}
 		m_flagInvalidLayout = sl_true;
+		Ref<View> parent = m_parent;
 		if (!(SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode))) {
-			Ref<View> parent = m_parent;
 			if (parent.isNotNull()) {
 				parent->m_flagInvalidLayout = sl_true;
 			}
@@ -2886,7 +2918,6 @@ namespace slib
 			return;
 		}
 		Ref<View> view = this;
-		Ref<View> parent = m_parent;
 		while (parent.isNotNull()) {
 			view = parent;
 			view->m_flagInvalidLayout = sl_true;
@@ -7234,15 +7265,18 @@ namespace slib
 
 	void View::dispatchToDrawingThread(const Function<void()>& callback, sl_uint32 delayMillis)
 	{
-		if (isInstance()) {
+		if (m_instance.isNotNull()) {
 			UI::dispatchToUiThread(callback, delayMillis);
 		} else {
-			Ref<View> parent = m_parent;
-			if (parent.isNotNull()) {
-				parent->dispatchToDrawingThread(callback, delayMillis);
-			} else {
-				UI::dispatchToUiThread(callback, delayMillis);
+			Ref<View> view = m_parent;
+			while (view.isNotNull()) {
+				if (view->m_instance.isNotNull()) {
+					view->dispatchToDrawingThread(callback, delayMillis);
+					return;
+				}
+				view = view->m_parent;
 			}
+			UI::dispatchToUiThread(callback, delayMillis);
 		}
 	}
 

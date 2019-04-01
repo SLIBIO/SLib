@@ -161,7 +161,9 @@ namespace slib
 		if (handle != nil) {
 			if (UI::isUiThread()) {
 				[handle setNeedsDisplay: YES];
-				[handle displayIfNeeded];
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[handle displayIfNeeded];
+				});
 			} else {
 				dispatch_async(dispatch_get_main_queue(), ^{
 					[handle setNeedsDisplay: YES];
@@ -182,7 +184,9 @@ namespace slib
 			_rect.size.height = (CGFloat)(rect.getHeight());
 			if (UI::isUiThread()) {
 				[handle setNeedsDisplayInRect: _rect];
-				[handle displayIfNeeded];
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[handle displayIfNeeded];
+				});
 			} else {
 				dispatch_async(dispatch_get_main_queue(), ^{
 					[handle setNeedsDisplayInRect: _rect];
