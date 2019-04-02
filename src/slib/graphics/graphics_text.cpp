@@ -1315,6 +1315,7 @@ namespace slib
 			applyLineHeight(item, h);
 			item->setLayoutSize(Size(h / 2, h));
 			m_lineItems.add_NoLock(item);
+			m_lineWidth = m_x;
 			endLine();
 			item->setLayoutPosition(Point(m_x, m_y));
 			if (m_multiLineMode == MultiLineMode::Single) {
@@ -1385,6 +1386,7 @@ namespace slib
 				}
 			}
 			
+			m_lineWidth = m_x;
 			endLine();
 
 		}
