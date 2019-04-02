@@ -48,6 +48,7 @@ namespace slib
 		SLIB_JNI_FLOAT_FIELD(y);
 		SLIB_JNI_FLOAT_FIELD(pressure);
 		SLIB_JNI_INT_FIELD(phase);
+		SLIB_JNI_INT_FIELD(pointerId);
 	SLIB_JNI_END_CLASS
 
 	void JNICALL _priv_AndroidView_nativeOnDraw(JNIEnv* env, jobject _this, jlong jinstance, jobject jcanvas)
@@ -112,11 +113,10 @@ namespace slib
 							pts[i].point.y = (sl_ui_posf)(JAndroidTouchPoint::y.get(jpt));
 							pts[i].pressure = JAndroidTouchPoint::pressure.get(jpt);
 							pts[i].phase = (TouchPhase)(JAndroidTouchPoint::phase.get(jpt));
+							pts[i].pointerId = JAndroidTouchPoint::pointerId.get(jpt);
 						}
 					}
-					Time t;
-					t.setMillisecondsCount(time);
-					Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, t);
+					Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, Time::withSeconds(time));
 					if (ev.isNotNull()) {
 						ev->addFlag(UIEventFlags::DispatchToParentInstance);
 						instance->onTouchEvent(ev.get());

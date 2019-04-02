@@ -6436,7 +6436,7 @@ namespace slib
 		}
 	}
 
-#define BOUNCE_WEIGHT 0.15f
+#define BOUNCE_WEIGHT 0
 
 	sl_bool View::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagFinish, sl_bool flagAnimate)
 	{
@@ -7876,7 +7876,7 @@ namespace slib
 								}
 								childAttrs->childMouseDown = child;
 								m_actionMouseDown = action;
-								break;
+								return sl_true;
 							}
 						}
 					}
@@ -7888,6 +7888,7 @@ namespace slib
 					dispatchTouchEventToChild(ev, oldChild.get());
 					return sl_true;
 				}
+				break;
 			case UIAction::TouchEnd:
 			case UIAction::TouchCancel:
 				oldChild = childAttrs->childMouseDown;
@@ -7899,6 +7900,7 @@ namespace slib
 					}
 					return sl_true;
 				}
+				break;
 			default:
 				return sl_true;
 		}
@@ -8588,11 +8590,14 @@ namespace slib
 			case UIAction::LeftButtonDown:
 			case UIAction::TouchBegin:
 				_stopContentScrollingFlow();
-				scrollAttrs->flagDownContent = sl_true;
-				scrollAttrs->mousePointBefore = ev->getPoint();
-				if (scrollAttrs->flagSmoothContentScrolling) {
-					scrollAttrs->motionTracker->clearMovements();
-					scrollAttrs->motionTracker->addMovement(ev);
+				if (!scrollAttrs->flagDownContent) {
+					scrollAttrs->flagDownContent = sl_true;
+					scrollAttrs->mousePointBefore = ev->getPoint();
+					scrollAttrs->touchPointerIdBefore = ev->getTouchPoint().pointerId;
+					if (scrollAttrs->flagSmoothContentScrolling) {
+						scrollAttrs->motionTracker->clearMovements();
+						scrollAttrs->motionTracker->addMovement(ev);
+					}
 				}
 				ev->stopPropagation();
 				break;
@@ -8600,39 +8605,42 @@ namespace slib
 			case UIAction::TouchMove:
 				_stopContentScrollingFlow();
 				if (scrollAttrs->flagDownContent) {
-					Point offset = ev->getPoint() - scrollAttrs->mousePointBefore;
-					scrollAttrs->mousePointBefore = ev->getPoint();
-					sl_scroll_pos sx = scrollAttrs->x;
-					sl_scroll_pos sy = scrollAttrs->y;
-					if (flagHorz) {
-						sx -= offset.x;
-					}
-					if (flagVert) {
-						sy -= offset.y;
-					}
-					if (scrollAttrs->flagSmoothContentScrolling) {
-						_scrollTo(sx, sy, sl_true, sl_false);
-						scrollAttrs->motionTracker->addMovement(ev);
-						invalidate();
-					} else {
-						scrollTo(sx, sy);
-					}
+					if (ev->getTouchPoint().pointerId == scrollAttrs->touchPointerIdBefore) {
+						Point offset = ev->getPoint() - scrollAttrs->mousePointBefore;
+						sl_scroll_pos sx = scrollAttrs->x;
+						sl_scroll_pos sy = scrollAttrs->y;
+						if (flagHorz) {
+							sx -= offset.x;
+						}
+						if (flagVert) {
+							sy -= offset.y;
+						}
+						if (scrollAttrs->flagSmoothContentScrolling) {
+							_scrollTo(sx, sy, sl_true, sl_false);
+							scrollAttrs->motionTracker->addMovement(ev);
+							invalidate();
+						} else {
+							scrollTo(sx, sy);
+						}
 #if defined(SLIB_PLATFORM_IS_MOBILE)
-					sl_real T = (sl_real)(UIResource::getScreenMinimum() / 200);
+						sl_real T = (sl_real)(UIResource::getScreenMinimum() / 200);
 #else
-					sl_real T = 2;
+						sl_real T = 2;
 #endif
-					Ref<ChildAttributes>& childAttrs = m_childAttrs;
-					if (childAttrs.isNotNull()) {
-						if (offset.getLength2p() > T * T) {
-							Ref<View> view = childAttrs->childMouseDown;
-							if (view.isNotNull()) {
-								ev->setAction(UIAction::TouchCancel);
-								dispatchTouchEventToChild(ev, view.get());
-								ev->setAction(action);
+						Ref<ChildAttributes>& childAttrs = m_childAttrs;
+						if (childAttrs.isNotNull()) {
+							if (offset.getLength2p() > T * T) {
+								Ref<View> view = childAttrs->childMouseDown;
+								if (view.isNotNull()) {
+									ev->setAction(UIAction::TouchCancel);
+									dispatchTouchEventToChild(ev, view.get());
+									ev->setAction(action);
+								}
 							}
 						}
 					}
+					scrollAttrs->mousePointBefore = ev->getPoint();
+					scrollAttrs->touchPointerIdBefore = ev->getTouchPoint().pointerId;
 					ev->stopPropagation();
 				}
 				break;

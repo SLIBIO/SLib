@@ -32,27 +32,35 @@ namespace slib
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TouchPoint)
 
-	TouchPoint::TouchPoint(): pressure(0), phase(TouchPhase::Move)
+	TouchPoint::TouchPoint(): pressure(0), phase(TouchPhase::Move), pointerId(0)
 	{
 	}
 
-	TouchPoint::TouchPoint(const UIPointf& _point) : point(_point), pressure(0), phase(TouchPhase::Move)
+	TouchPoint::TouchPoint(const UIPointf& _point) : point(_point), pressure(0), phase(TouchPhase::Move), pointerId(0)
 	{
 	}
 
-	TouchPoint::TouchPoint(const UIPointf& _point, sl_real _pressure, TouchPhase _phase) : point(_point), pressure(_pressure), phase(_phase)
+	TouchPoint::TouchPoint(const UIPointf& _point, sl_real _pressure, TouchPhase _phase) : point(_point), pressure(_pressure), phase(_phase), pointerId(0)
 	{
 	}
 
-	TouchPoint::TouchPoint(sl_ui_posf x, sl_ui_posf y) : point(x, y), pressure(0), phase(TouchPhase::Move)
+	TouchPoint::TouchPoint(const UIPointf& _point, sl_real _pressure, TouchPhase _phase, sl_uint64 _pointerId) : point(_point), pressure(_pressure), phase(_phase), pointerId(_pointerId)
 	{
 	}
 
-	TouchPoint::TouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real _pressure) : point(x, y), pressure(_pressure), phase(TouchPhase::Move)
+	TouchPoint::TouchPoint(sl_ui_posf x, sl_ui_posf y) : point(x, y), pressure(0), phase(TouchPhase::Move), pointerId(0)
 	{
 	}
 
-	TouchPoint::TouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real _pressure, TouchPhase _phase) : point(x, y), pressure(_pressure), phase(_phase)
+	TouchPoint::TouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real _pressure) : point(x, y), pressure(_pressure), phase(TouchPhase::Move), pointerId(0)
+	{
+	}
+
+	TouchPoint::TouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real _pressure, TouchPhase _phase) : point(x, y), pressure(_pressure), phase(_phase), pointerId(0)
+	{
+	}
+
+	TouchPoint::TouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real _pressure, TouchPhase _phase, sl_uint64 _pointerId) : point(x, y), pressure(_pressure), phase(_phase), pointerId(_pointerId)
 	{
 	}
 

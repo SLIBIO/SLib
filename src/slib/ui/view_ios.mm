@@ -458,46 +458,69 @@ namespace slib
 		
 		if (handle != nil) {
 			
-			sl_uint32 n = (sl_uint32)([touches count]);
-			
-			if (n > 0) {
-			
-				Array<TouchPoint> points = Array<TouchPoint>::create(n);
-				
-				if (points.isNotNull()) {
+			if (touches.count > 0) {
 
-					TouchPoint* pts = points.getData();
-					
-					CGFloat f = UIPlatform::getGlobalScaleFactor();
-					
-					sl_uint32 i = 0;
-					for (UITouch* touch in touches) {
-						CGPoint pt = [touch locationInView:handle];
-						sl_real pressure = (sl_real)([touch force]);
-						UITouchPhase _phase = [touch phase];
-						TouchPhase phase;
-						if (_phase == UITouchPhaseBegan) {
-							phase = TouchPhase::Begin;
-						} else if (_phase == UITouchPhaseEnded) {
-							phase = TouchPhase::End;
-						} else if (_phase == UITouchPhaseCancelled) {
-							phase = TouchPhase::Cancel;
-						} else {
-							phase = TouchPhase::Move;
-						}
-						TouchPoint point((sl_ui_posf)(pt.x * f), (sl_ui_posf)(pt.y * f), pressure, phase);
-						pts[i] = point;
-						i++;
-						if (i >= n) {
-							break;
+				if (action == UIAction::TouchBegin) {
+					ListLocker<UITouch*> current(m_touchesCurrent);
+					for (sl_size i = 0; i < current.count; i++) {
+						if (current[i].phase == UITouchPhaseEnded || current[i].phase == UITouchPhaseCancelled) {
+							current[i] = nil;
 						}
 					}
-					
-					Time t;
-					t.setSecondsCountf(event.timestamp);
-					
-					Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, t);
-					
+					m_touchesCurrent.removeValues_NoLock(nil);
+					if (m_touchesCurrent.isNotEmpty()) {
+						action = UIAction::TouchMove;
+					}
+					for (UITouch* touch in touches) {
+						if (touch != nil) {
+							m_touchesCurrent.addIfNotExist_NoLock(touch);
+						}
+					}
+				}
+				
+				Array<TouchPoint> points;
+				{
+					ListLocker<UITouch*> current(m_touchesCurrent);
+					if (current.count > 0) {
+						points = Array<TouchPoint>::create(current.count);
+						if (points.isNotNull()) {
+							TouchPoint* pts = points.getData();
+							CGFloat f = UIPlatform::getGlobalScaleFactor();
+							for (sl_size i = 0; i < current.count; i++) {
+								UITouch* touch = current[i];
+								CGPoint pt = [touch locationInView:handle];
+								sl_real pressure = (sl_real)([touch force]);
+								UITouchPhase _phase = [touch phase];
+								TouchPhase phase;
+								if (_phase == UITouchPhaseBegan) {
+									phase = TouchPhase::Begin;
+								} else if (_phase == UITouchPhaseEnded) {
+									phase = TouchPhase::End;
+								} else if (_phase == UITouchPhaseCancelled) {
+									phase = TouchPhase::Cancel;
+								} else {
+									phase = TouchPhase::Move;
+								}
+								pts[i] = TouchPoint((sl_ui_posf)(pt.x * f), (sl_ui_posf)(pt.y * f), pressure, phase, (sl_size)((__bridge void*)touch));
+							}
+						}
+					}
+				}
+				
+				if (action == UIAction::TouchCancel) {
+					m_touchesCurrent.removeAll();
+				} else if (action == UIAction::TouchEnd) {
+					ListLocker<UITouch*> current(m_touchesCurrent);
+					for (UITouch* touch in touches) {
+						m_touchesCurrent.remove_NoLock(touch);
+					}
+					if (m_touchesCurrent.isNotEmpty()) {
+						action = UIAction::TouchMove;
+					}
+				}
+
+				if (points.isNotNull()) {
+					Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, Time::withSecondsf(event.timestamp));
 					if (ev.isNotNull()) {
 						onTouchEvent(ev.get());
 						UIEventFlags flags = ev->getFlags();
@@ -508,7 +531,6 @@ namespace slib
 						}
 						return flags;
 					}
-
 				}
 				
 			}

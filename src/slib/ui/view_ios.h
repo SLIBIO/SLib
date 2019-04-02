@@ -96,6 +96,7 @@ namespace slib
 		UIView* m_handle;
 		sl_bool m_flagDrawing;
 		
+		List<UITouch*> m_touchesCurrent;
 		UISwipeGestureRecognizer* m_gestureSwipeLeft;
 		UISwipeGestureRecognizer* m_gestureSwipeRight;
 		UISwipeGestureRecognizer* m_gestureSwipeUp;
