@@ -853,7 +853,9 @@ namespace slib
 		SAppLayoutItemType itemType;
 		String name;
 		sl_bool flagGeneratedName;
-		
+		String arrayName;
+		sl_int32 arrayIndex;
+
 		String className;
 		
 		Ref<SAppLayoutWindowAttributes> attrsWindow;
@@ -910,6 +912,12 @@ namespace slib
 		CHashMap< String, Ref<SAppLayoutResourceItem> > itemsByName;
 		CMap<String, sl_bool> customClasses;
 		CMap<String, sl_bool> radioGroups;
+		struct ItemArrayDesc
+		{
+			String className;
+			sl_uint32 itemsCount;
+		};
+		CMap<String, ItemArrayDesc> itemArrays;
 
 		sl_uint32 nAutoIncreaseNameView = 0;
 		sl_uint32 nAutoIncreaseNameViewGroup = 0;

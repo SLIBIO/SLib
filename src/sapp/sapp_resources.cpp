@@ -305,6 +305,7 @@ namespace slib
 
 	SAppLayoutResourceItem::SAppLayoutResourceItem()
 	{
+		arrayIndex = -1;
 		itemType = SAppLayoutItemType::Unknown;
 		flagGeneratedName = sl_false;
 	}

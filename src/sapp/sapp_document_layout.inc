@@ -261,8 +261,10 @@ namespace slib
 		
 		if (parent) {
 			String name = element->getAttribute("name");
+			String arrayName;
+			sl_int32 arrayIndex = -1;
 			if (name.isNotEmpty()) {
-				if (!(SAppUtil::checkName(name.getData(), name.getLength()))) {
+				if (!(SAppUtil::checkNameOrArrayMember(name, &arrayName, &arrayIndex))) {
 					_logError(element, _g_sdev_sapp_error_resource_layout_name_invalid.arg(name));
 					return sl_false;
 				}
@@ -279,6 +281,8 @@ namespace slib
 				item->flagGeneratedName = sl_true;
 			}
 			item->name = name;
+			item->arrayName = arrayName;
+			item->arrayIndex = arrayIndex;
 		}
 		
 		LayoutControlProcessParams pp;
@@ -317,6 +321,23 @@ namespace slib
 			if (!(layout->itemsByName.put(item->name, item))) {
 				_logError(element, _g_sdev_sapp_error_out_of_memory);
 				return sl_false;
+			}
+		}
+		if (item->arrayIndex >= 0) {
+			sl_uint32 n = item->arrayIndex + 1;
+			SAppLayoutResource::ItemArrayDesc desc;
+			if (layout->itemArrays.get(item->arrayName, &desc)) {
+				if (desc.className != item->className) {
+					_logError(element, _g_sdev_sapp_error_resource_layout_name_array_item_class_different.arg(item->name));
+				}
+				if (desc.itemsCount < n) {
+					desc.itemsCount = n;
+					layout->itemArrays.put(item->arrayName, desc);
+				}
+			} else {
+				desc.className = item->className;
+				desc.itemsCount = n;
+				layout->itemArrays.put(item->arrayName, desc);
 			}
 		}
 		
@@ -488,6 +509,15 @@ namespace slib
 				sbCpp.add("\r\n");
 			}
 		}
+		{
+			ObjectLocker lock(&(layout->itemArrays));
+			for (auto& item : layout->itemArrays) {
+				sbHeader.add(String::format("\t\t\tslib::Ref<%s> %s[%d];%n", item.value.className, item.key, item.value.itemsCount));
+			}
+			if (layout->itemArrays.isNotEmpty()) {
+				sbHeader.add("\r\n");
+			}
+		}
 		
 		StringBuffer sbLayout;
 		
@@ -554,7 +584,9 @@ namespace slib
 		String name;
 		if (parent) {
 			name = item->name;
-			sbDeclare.add(String::format("\t\t\tslib::Ref<%s> %s;%n", item->className, name));
+			if (item->arrayIndex < 0) {
+				sbDeclare.add(String::format("\t\t\tslib::Ref<%s> %s;%n", item->className, name));
+			}
 			sbDefineInit.add(String::format("\t\t\t%2$s = new %1$s;%n", item->className, name));
 		} else {
 			name = "this";
@@ -1493,12 +1525,12 @@ namespace slib
 			if (!(resourceItem->attrsView->width.flagDefined)) {
 				resourceItem->attrsView->width.flagDefined = sl_true;
 				resourceItem->attrsView->width.amount = 1;
-				resourceItem->attrsView->width.unit = SAppDimensionValue::SW;
+				resourceItem->attrsView->width.unit = SAppDimensionValue::FILL;
 			}
 			if (!(resourceItem->attrsView->height.flagDefined)) {
 				resourceItem->attrsView->height.flagDefined = sl_true;
 				resourceItem->attrsView->height.amount = 1;
-				resourceItem->attrsView->height.unit = SAppDimensionValue::SH;
+				resourceItem->attrsView->height.unit = SAppDimensionValue::FILL;
 			}
 		}
 

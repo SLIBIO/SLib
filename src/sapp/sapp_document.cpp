@@ -119,6 +119,7 @@ namespace slib
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_name_is_empty, "Layout Resource: name attribute is empty")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_name_invalid, "Layout Resource: Invalid name attribute value: %s")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_name_redefined, "Layout Resource: name is redefined: %s")
+	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_name_array_item_class_different, "Layout Resource: different class is used for array item: %s")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_value_invalid, "Layout Resource: Invalid value: %s")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_attribute_invalid, "Layout Resource: Invalid %s attribute value: %s")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_scrollview_must_contain_one_child, "Layout Resource: ScrollView can contain only one child")

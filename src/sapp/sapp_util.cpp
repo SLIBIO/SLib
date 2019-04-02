@@ -67,6 +67,41 @@ namespace slib
 	{
 		return _SAppUtil_checkName(sz, len);
 	}
+	
+	sl_bool SAppUtil::checkNameOrArrayMember(const String& input, String* outName, sl_int32* outIndex)
+	{
+		if (input.endsWith(']')) {
+			sl_reg indexBracket = input.indexOf('[');
+			if (indexBracket <= 0) {
+				return sl_false;
+			}
+			String strNumber = input.substring(indexBracket + 1, input.getLength() - 1);
+			sl_uint32 index;
+			if (strNumber.parseUint32(10, &index)) {
+				String name = input.substring(0, indexBracket);
+				if (checkName(name.getData(), name.getLength())) {
+					if (outName) {
+						*outName = name;
+					}
+					if (outIndex) {
+						*outIndex = index;
+					}
+					return sl_true;
+				}
+			}
+		} else {
+			if (checkName(input.getData(), input.getLength())) {
+				if (outName) {
+					*outName = input;
+				}
+				if (outIndex) {
+					*outIndex = -1;
+				}
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
 
 	String SAppUtil::generateBytesArrayDefinition(const void* data, sl_size size, sl_size countPerLine, sl_size tabCount)
 	{
