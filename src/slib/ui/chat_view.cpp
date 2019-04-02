@@ -217,12 +217,12 @@ namespace slib
 			SimpleTextBoxParam tp;
 			tp.font = font;
 			tp.text = message;
-			tp.width = chatWidth;
+			tp.width = (sl_real)chatWidth;
 			SimpleTextBox box;
 			box.update(tp);
 			Layout layout(font, flagShowDate, chatWidth, userIconSize);
 			sl_ui_len bottomUserIcon = layout.y + layout.marginIcon * 2 + userIconSize + layout.marginBottom;
-			sl_ui_len bottomChat = layout.y + layout.heightTime + box.getContentHeight() + 2 * layout.marginChat + layout.marginBottom;
+			sl_ui_len bottomChat = layout.y + layout.heightTime + (sl_ui_len)(box.getContentHeight()) + 2 * layout.marginChat + layout.marginBottom;
 			return Math::max(bottomUserIcon, bottomChat);
 		}
 		
