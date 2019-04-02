@@ -1628,6 +1628,7 @@ namespace slib
 			sl_ui_pos pageHeight;
 			
 			Point mousePointBefore;
+			sl_uint64 touchPointerIdBefore;
 			Ref<MotionTracker> motionTracker;
 			Ref<Timer> timerFlow;
 			Time timeFlowFrameBefore;

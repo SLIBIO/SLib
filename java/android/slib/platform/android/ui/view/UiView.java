@@ -533,6 +533,7 @@ public class UiView {
 							pt.phase = 0;
 						}
 					}
+					pt.pointerId = event.getPointerId(i);
 					pts[i] = pt;
 				}
 				int ret = nativeOnTouchEvent(instance, action, pts, event.getEventTime());

@@ -46,6 +46,7 @@ namespace slib
 		UIPointf point;
 		sl_real pressure;
 		TouchPhase phase;
+		sl_uint64 pointerId;
 
 	public:
 		TouchPoint();
@@ -56,11 +57,15 @@ namespace slib
 		
 		TouchPoint(const UIPointf& point, sl_real pressure, TouchPhase phase);
 		
+		TouchPoint(const UIPointf& point, sl_real pressure, TouchPhase phase, sl_uint64 pointerId);
+		
 		TouchPoint(sl_ui_posf x, sl_ui_posf y);
 		
 		TouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real pressure);
 		
 		TouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real pressure, TouchPhase phase);
+		
+		TouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real pressure, TouchPhase phase, sl_uint64 pointerId);
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TouchPoint)
 
