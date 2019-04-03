@@ -442,6 +442,7 @@ namespace slib
 			if (view.isNull()) {
 				return;
 			}
+			view->setCreatingInstance(sl_true);
 			view->setText(toast->text, UIUpdateMode::Init);
 			view->setMultiLine(MultiLineMode::WordWrap, UIUpdateMode::Init);
 			view->setWidthWrapping(UIUpdateMode::Init);
