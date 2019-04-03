@@ -231,7 +231,7 @@ namespace slib
 		UIRect getFrameInInstance();
 		
 		// local coordinate
-		UIRect getBounds();
+		virtual UIRect getBounds();
 		
 		// local coordinate
 		UIRect getBoundsInnerPadding();

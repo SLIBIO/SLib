@@ -1547,7 +1547,11 @@ namespace slib
 	UIRect View::getBoundsInnerPadding()
 	{
 		UIEdgeInsets padding = getPadding();
-		UIRect ret(padding.left, padding.top, m_frame.getWidth() - padding.right, m_frame.getHeight() - padding.bottom);
+		UIRect ret(getBounds());
+		ret.left += padding.left;
+		ret.top += padding.top;
+		ret.right -= padding.right;
+		ret.bottom -= padding.bottom;
 		ret.fixSizeError();
 		return ret;
 	}
@@ -7272,15 +7276,12 @@ namespace slib
 		if (m_instance.isNotNull()) {
 			UI::dispatchToUiThread(callback, delayMillis);
 		} else {
-			Ref<View> view = m_parent;
-			while (view.isNotNull()) {
-				if (view->m_instance.isNotNull()) {
-					view->dispatchToDrawingThread(callback, delayMillis);
-					return;
-				}
-				view = view->m_parent;
+			Ref<View> parent = m_parent;
+			if (parent.isNotNull()) {
+				parent->dispatchToUiThread(callback);
+			} else {
+				UI::dispatchToUiThread(callback);
 			}
-			UI::dispatchToUiThread(callback, delayMillis);
 		}
 	}
 

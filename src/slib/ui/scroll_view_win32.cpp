@@ -225,6 +225,17 @@ namespace slib
 		return ScrollPoint::zero();
 	}
 
+	UIRect ScrollView::_getBounds_NW()
+	{
+		HWND handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			RECT rc;
+			GetClientRect(handle, &rc);
+			return UIRect(0, 0, rc.right, rc.bottom);
+		}
+		return ViewGroup::getBounds();
+	}
+
 	void ScrollView::_setBorder_NW(sl_bool flag)
 	{
 		HWND handle = UIPlatform::getViewHandle(this);

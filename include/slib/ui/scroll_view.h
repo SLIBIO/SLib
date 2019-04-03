@@ -52,6 +52,8 @@ namespace slib
 		
 		ScrollPoint getScrollRange() override;
 		
+		UIRect getBounds() override;
+		
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
@@ -72,6 +74,8 @@ namespace slib
 		ScrollPoint _getScrollPosition_NW();
 		
 		ScrollPoint _getScrollRange_NW();
+		
+		UIRect _getBounds_NW();
 		
 		void _setBorder_NW(sl_bool flag) override;
 		
