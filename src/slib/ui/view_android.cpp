@@ -116,7 +116,7 @@ namespace slib
 							pts[i].pointerId = JAndroidTouchPoint::pointerId.get(jpt);
 						}
 					}
-					Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, Time::withSeconds(time));
+					Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, Time::withMilliseconds(time));
 					if (ev.isNotNull()) {
 						ev->addFlag(UIEventFlags::DispatchToParentInstance);
 						instance->onTouchEvent(ev.get());
