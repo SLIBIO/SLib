@@ -2912,6 +2912,15 @@ namespace slib
 				if (itemXml.isNotNull()) {
 					SAppLayoutSelectItem subItem;
 					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., title)
+					if (!(subItem.title.flagDefined)) {
+						String text = itemXml->getText();
+						if (text.isNotEmpty()) {
+							if (!(subItem.title.parse(text))) {
+								LOG_ERROR_LAYOUT_CONTROL_XML_ATTR(itemXml, title);
+								return sl_false;
+							}
+						}
+					}
 					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., value)
 					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., selected)
 					subItem.element = itemXml;
