@@ -74,9 +74,9 @@ namespace slib
 				view->setRightFree(UIUpdateMode::Init);
 			}
 			addChild(view);
-			View::setContentSize(view->getWidth(), view->getHeight(), uiUpdateModeNone);
+			ViewGroup::setContentSize(view->getWidth(), view->getHeight(), uiUpdateModeNone);
 		} else {
-			View::setContentSize(0, 0, uiUpdateModeNone);
+			ViewGroup::setContentSize(0, 0, uiUpdateModeNone);
 		}
 		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 			return;
@@ -107,7 +107,7 @@ namespace slib
 		if (viewContent.isNotNull()) {
 			viewContent->setSize(width, height, SLIB_UI_UPDATE_MODE_IS_REDRAW(mode) ? UIUpdateMode::UpdateLayout : mode);
 		}
-		View::setContentSize(_width, _height, mode);
+		ViewGroup::setContentSize(_width, _height, mode);
 		if (isNativeWidget()) {
 			_refreshContentSize_NW();
 		}
@@ -118,7 +118,7 @@ namespace slib
 		if (isNativeWidget()) {
 			return _getScrollPosition_NW();
 		}
-		return View::getScrollPosition();
+		return ViewGroup::getScrollPosition();
 	}
 	
 	ScrollPoint ScrollView::getScrollRange()
@@ -126,12 +126,20 @@ namespace slib
 		if (isNativeWidget()) {
 			return _getScrollRange_NW();
 		}
-		return View::getScrollRange();
+		return ViewGroup::getScrollRange();
+	}
+	
+	UIRect ScrollView::getBounds()
+	{
+		if (isNativeWidget()) {
+			return _getBounds_NW();
+		}
+		return ViewGroup::getBounds();
 	}
 	
 	void ScrollView::dispatchScroll(sl_scroll_pos x, sl_scroll_pos y)
 	{
-		View::dispatchScroll(x, y);
+		ViewGroup::dispatchScroll(x, y);
 		Ref<View> view = m_viewContent;
 		if (view.isNotNull()) {
 			if (!(isNativeWidget())) {
@@ -150,7 +158,7 @@ namespace slib
 	void ScrollView::onResizeChild(View* child, sl_ui_len width, sl_ui_len height)
 	{
 		if (child == m_viewContent) {
-			View::setContentSize(width, height);
+			ViewGroup::setContentSize(width, height);
 			if (isNativeWidget()) {
 				_refreshContentSize_NW();
 			}
@@ -211,6 +219,13 @@ namespace slib
 	}
 #endif
 
+#if !defined(SLIB_UI_IS_WIN32)
+	UIRect ScrollView::_getBounds_NW()
+	{
+		return ViewGroup::getBounds();
+	}
+#endif
+	
 	HorizontalScrollView::HorizontalScrollView()
 	{
 		setScrolling(sl_true, sl_false, UIUpdateMode::Init);

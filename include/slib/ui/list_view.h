@@ -31,6 +31,30 @@
 namespace slib
 {
 	
+	class SLIB_EXPORT ListViewRefreshParam
+	{
+	public:
+		sl_bool flagScrollToLastItem;
+		
+	public:
+		ListViewRefreshParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(ListViewRefreshParam)
+		
+	};
+	
+	class SLIB_EXPORT ListViewSetAdapterParam : public ListViewRefreshParam
+	{
+	public:
+		Ref<ViewAdapter> adapter;
+		
+	public:
+		ListViewSetAdapterParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(ListViewSetAdapterParam)
+		
+	};
+	
 	class _priv_ListContentView;
 	
 	class SLIB_EXPORT ListView : public VerticalScrollView
@@ -50,21 +74,23 @@ namespace slib
 		
 		void setAdapter(const Ref<ViewAdapter>& adapter);
 		
+		void setAdapter(const ListViewSetAdapterParam& param);
+		
 		void refreshItems();
 		
-		List< Ref<View> > getVisibleItemViews();
-		
+		void refreshItems(const ListViewRefreshParam& param);
+
 	protected:
 		void onScroll(sl_scroll_pos x, sl_scroll_pos y) override;
 		
 		void onResize(sl_ui_len x, sl_ui_len y) override;
 		
 	protected:
-		void _checkUpdateContent(sl_bool fromDraw);
+		void _checkUpdateContent();
 		
 		void _initStatus();
-		
-		void _resetAdapter();
+				
+		void _initHeights(ViewAdapter* adapter);
 		
 		Ref<View> _getView(ViewAdapter* adapter, sl_uint64 index, View* original);
 		
@@ -77,13 +103,14 @@ namespace slib
 		
 		Ref<_priv_ListContentView> m_contentView;
 		sl_bool m_flagResetAdapter;
+		sl_bool m_flagResetingAdapter;
 		sl_bool m_flagRefreshItems;
-		
+		sl_bool m_flagScrollToLastItem;
+		sl_bool m_flagSmoothScrollToLastItem;
+
 		sl_uint64 m_countTotalItems;
 		sl_uint64 m_indexFirstItem;
-		sl_uint32 m_countVisibleItems;
 		sl_ui_pos m_yFirstItem;
-		Mutex m_lockVisibleItems;
 		Ref<View>* m_viewsVisibleItems;
 		Ref<View>* m_viewsGoDownItems;
 		Ref<View>* m_viewsGoUpItems;

@@ -414,15 +414,11 @@ namespace slib
 	{
 		m_formatDate = format;
 		if (SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
-			ListElements< Ref<View> > views(getVisibleItemViews());
-			for (sl_size i = 0; i < views.count; i++) {
-				((_priv_ChatViewItemView*)(views[i].get()))->params.formatDate = format;
-				views[i]->invalidate();
-			}
 			Ref<_priv_ChatViewAdapter> adapter = Ref<_priv_ChatViewAdapter>::from(getAdapter());
 			if (adapter.isNotNull()) {
 				adapter->params.formatDate = format;
 			}
+			refreshItems();
 		}
 	}
 	
@@ -435,15 +431,11 @@ namespace slib
 	{
 		m_formatTime = format;
 		if (SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
-			ListElements< Ref<View> > views(getVisibleItemViews());
-			for (sl_size i = 0; i < views.count; i++) {
-				((_priv_ChatViewItemView*)(views[i].get()))->params.formatTime = format;
-				views[i]->invalidate();
-			}
 			Ref<_priv_ChatViewAdapter> adapter = Ref<_priv_ChatViewAdapter>::from(getAdapter());
 			if (adapter.isNotNull()) {
 				adapter->params.formatTime = format;
 			}
+			refreshItems();
 		}
 	}
 	
@@ -456,15 +448,11 @@ namespace slib
 	{
 		m_backColorReceived = color;
 		if (SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
-			ListElements< Ref<View> > views(getVisibleItemViews());
-			for (sl_size i = 0; i < views.count; i++) {
-				((_priv_ChatViewItemView*)(views[i].get()))->params.backColorReceived = color;
-				views[i]->invalidate();
-			}
 			Ref<_priv_ChatViewAdapter> adapter = Ref<_priv_ChatViewAdapter>::from(getAdapter());
 			if (adapter.isNotNull()) {
 				adapter->params.backColorReceived = color;
 			}
+			refreshItems();
 		}
 	}
 	
@@ -477,15 +465,11 @@ namespace slib
 	{
 		m_textColorReceived = color;
 		if (SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
-			ListElements< Ref<View> > views(getVisibleItemViews());
-			for (sl_size i = 0; i < views.count; i++) {
-				((_priv_ChatViewItemView*)(views[i].get()))->params.textColorReceived = color;
-				views[i]->invalidate();
-			}
 			Ref<_priv_ChatViewAdapter> adapter = Ref<_priv_ChatViewAdapter>::from(getAdapter());
 			if (adapter.isNotNull()) {
 				adapter->params.textColorReceived = color;
 			}
+			refreshItems();
 		}
 	}
 	
@@ -498,15 +482,11 @@ namespace slib
 	{
 		m_backColorSent = color;
 		if (SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
-			ListElements< Ref<View> > views(getVisibleItemViews());
-			for (sl_size i = 0; i < views.count; i++) {
-				((_priv_ChatViewItemView*)(views[i].get()))->params.backColorSent = color;
-				views[i]->invalidate();
-			}
 			Ref<_priv_ChatViewAdapter> adapter = Ref<_priv_ChatViewAdapter>::from(getAdapter());
 			if (adapter.isNotNull()) {
 				adapter->params.backColorSent = color;
 			}
+			refreshItems();
 		}
 	}
 	
@@ -519,15 +499,11 @@ namespace slib
 	{
 		m_textColorSent = color;
 		if (SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
-			ListElements< Ref<View> > views(getVisibleItemViews());
-			for (sl_size i = 0; i < views.count; i++) {
-				((_priv_ChatViewItemView*)(views[i].get()))->params.textColorSent = color;
-				views[i]->invalidate();
-			}
 			Ref<_priv_ChatViewAdapter> adapter = Ref<_priv_ChatViewAdapter>::from(getAdapter());
 			if (adapter.isNotNull()) {
 				adapter->params.textColorSent = color;
 			}
+			refreshItems();
 		}
 	}
 	
@@ -540,22 +516,18 @@ namespace slib
 	{
 		m_textColorDate = color;
 		if (SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
-			ListElements< Ref<View> > views(getVisibleItemViews());
-			for (sl_size i = 0; i < views.count; i++) {
-				((_priv_ChatViewItemView*)(views[i].get()))->params.textColorDate = color;
-				views[i]->invalidate();
-			}
 			Ref<_priv_ChatViewAdapter> adapter = Ref<_priv_ChatViewAdapter>::from(getAdapter());
 			if (adapter.isNotNull()) {
 				adapter->params.textColorDate = color;
 			}
+			refreshItems();
 		}
 	}
 	
 	void ChatView::setFont(const Ref<Font>& font, UIUpdateMode mode)
 	{
 		View::setFont(font, UIUpdateMode::None);
-		_updateListContent(UIUpdateMode::UpdateLayout);
+		dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ChatView, _updateListContent, this, UIUpdateMode::UpdateLayout));
 	}
 	
 	void ChatView::onResize(sl_ui_len width, sl_ui_len height)
@@ -565,19 +537,25 @@ namespace slib
 		{
 			sl_real weight = m_chatWidthWeight;
 			if (weight > 0) {
-				m_chatWidth = (sl_ui_len)(width * weight);
-				flagUpdateList = sl_true;
+				sl_ui_len w = (sl_ui_len)(width * weight);
+				if (m_chatWidth != w) {
+					m_chatWidth = w;
+					flagUpdateList = sl_true;
+				}
 			}
 		}
 		{
 			sl_real weight = m_userIconSizeWeight;
 			if (weight > 0) {
-				m_userIconSize = (sl_ui_len)(width * weight);
-				flagUpdateList = sl_true;
+				sl_ui_len w = (sl_ui_len)(width * weight);
+				if (m_userIconSize != w) {
+					m_userIconSize = w;
+					flagUpdateList = sl_true;
+				}
 			}
 		}
 		if (flagUpdateList) {
-			_updateListContent(UIUpdateMode::UpdateLayout);
+			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ChatView, _updateListContent, this, UIUpdateMode::UpdateLayout));
 		}
 	}
 	
@@ -586,6 +564,10 @@ namespace slib
 		if (!SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
 			return;
 		}
+		if (getWidth() < 1 || getHeight() < 1) {
+			return;
+		}
+		
 		sl_bool flagInit = getAdapter().isNull();
 		if (m_items.isEmpty()) {
 			if (!flagInit) {
@@ -605,33 +587,10 @@ namespace slib
 		adapter->params.textColorSent = m_textColorSent;
 		adapter->params.textColorDate = m_textColorDate;
 		adapter->setList(m_items);
-		setAdapter(adapter);
-		
-		if (!flagInit) {
-			return;
-		}
-		auto weak = ToWeakRef(this);
-		dispatchToDrawingThread([weak]() {
-			auto ref = ToRef(weak);
-			if (ref.isNull()) {
-				return;
-			}
-			ref->scrollToEndY();
-			ref->dispatchToDrawingThread([weak]() {
-				auto ref = ToRef(weak);
-				if (ref.isNull()) {
-					return;
-				}
-				ref->scrollToEndY();
-				ref->dispatchToDrawingThread([weak]() {
-					auto ref = ToRef(weak);
-					if (ref.isNull()) {
-						return;
-					}
-					ref->scrollToEndY();
-				}, 50);
-			}, 50);
-		}, 50);
+		ListViewSetAdapterParam param;
+		param.adapter = adapter;
+		param.flagScrollToLastItem = flagInit;
+		setAdapter(param);
 	}
 	
 	void ChatView::_addListContent(UIUpdateMode mode)
@@ -639,35 +598,18 @@ namespace slib
 		if (!SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
 			return;
 		}
+		if (getWidth() < 1 || getHeight() < 1) {
+			return;
+		}
+		
 		if (m_items.isEmpty()) {
 			return;
 		}
 		Ref<_priv_ChatViewAdapter> adapter = Ref<_priv_ChatViewAdapter>::from(getAdapter());
 		if (adapter.isNotNull()) {
-			adapter->setList(m_items);
-			refreshItems();
-			auto weak = ToWeakRef(this);
-			dispatchToDrawingThread([weak]() {
-				auto ref = ToRef(weak);
-				if (ref.isNull()) {
-					return;
-				}
-				ref->smoothScrollToEndY();
-				ref->dispatchToDrawingThread([weak]() {
-					auto ref = ToRef(weak);
-					if (ref.isNull()) {
-						return;
-					}
-					ref->smoothScrollToEndY();
-					ref->dispatchToDrawingThread([weak]() {
-						auto ref = ToRef(weak);
-						if (ref.isNull()) {
-							return;
-						}
-						ref->smoothScrollToEndY();
-					}, 50);
-				}, 50);
-			}, 50);
+			ListViewRefreshParam param;
+			param.flagScrollToLastItem = sl_true;
+			refreshItems(param);
 		} else {
 			_updateListContent(mode);
 		}
