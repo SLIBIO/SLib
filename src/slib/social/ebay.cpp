@@ -52,7 +52,9 @@ namespace slib
 	{
 		flagSuccess = sl_false;
 		request = _request;
-		response = _request->getResponseContentAsString();
+		if (_request) {
+			response = _request->getResponseContentAsString();
+		}
 	}
 
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(EbayParam)
