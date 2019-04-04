@@ -72,34 +72,9 @@ namespace slib
 		}
 	}
 	
-	static UIViewController* _priv_AlertDialog_getRootViewController(Ref<Window> parentWindow)
-	{
-		UIWindow* window = nil;
-		if (parentWindow.isNull()) {
-			Ref<MobileApp> app = MobileApp::getApp();
-			if (app.isNotNull()) {
-				parentWindow = app->getMainWindow();
-			}
-		}
-		if (parentWindow.isNotNull()) {
-			Ref<WindowInstance> instance = parentWindow->getWindowInstance();
-			UIView* view = UIPlatform::getWindowHandle(instance.get());
-			if ([view isKindOfClass:[UIWindow class]]) {
-				window = (UIWindow*)view;
-			}
-		}
-		if (window == nil) {
-			window = UIPlatform::getKeyWindow();
-		}
-		if (window != nil) {
-			return [window rootViewController];
-		}
-		return nil;
-	}
-	
 	sl_bool AlertDialog::_show()
 	{
-		UIViewController* controller = _priv_AlertDialog_getRootViewController(parent);
+		UIViewController* controller = UIPlatform::getCurrentViewController(parent);
 		if (controller == nil) {
 			return sl_false;
 		}
@@ -321,7 +296,7 @@ namespace slib
 		controller->takePhoto = takePhoto;
 		[controller setDelegate:controller];
 		
-		UIViewController* rootController = _priv_AlertDialog_getRootViewController(takePhoto.parent);
+		UIViewController* rootController = UIPlatform::getCurrentViewController(takePhoto.parent);
 		if (rootController != nil) {
 			if (![rootController isBeingPresented]) {
 				[rootController presentViewController:controller animated:YES completion:nil];

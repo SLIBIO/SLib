@@ -146,6 +146,8 @@ namespace slib
 		
 		static UIWindow* getMainWindow();
 		static UIWindow* getKeyWindow();
+		static UIViewController* getCurrentViewController();
+		static UIViewController* getCurrentViewController(const Ref<Window>& parentWindow);
 		static UIView* findFirstResponder(UIView* rootView);
 		
 		static CGFloat getGlobalScaleFactor();
