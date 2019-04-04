@@ -37,11 +37,6 @@ namespace slib
 		_priv_Slib_macOS_Button* handle = [[_priv_Slib_macOS_Button alloc] initWithFrame:frame];
 		if (handle != nil) {
 			handle.title = Apple::getNSStringFromString(m_text);
-			Ref<Font> font = getFont();
-			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-			if (hFont != nil) {
-				[handle setFont:hFont];
-			}
 			if (m_flagDefaultButton) {
 				[handle setKeyEquivalent:@"\r"];
 			}
@@ -75,14 +70,6 @@ namespace slib
 
 	void Button::_setFont_NW(const Ref<Font>& font)
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-			NSButton* v = (NSButton*)handle;
-			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-			if (hFont != nil) {
-				[v setFont:hFont];
-			}
-		}
 	}
 	
 	UISize _priv_Button_macOS_measureSize(Button* view)

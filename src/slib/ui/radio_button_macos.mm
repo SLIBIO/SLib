@@ -39,12 +39,6 @@ namespace slib
 			handle.title = Apple::getNSStringFromString(getText());
 			[handle setButtonType:NSRadioButton];
 			[handle setState: (isChecked() ? NSOnState : NSOffState)];
-			
-			Ref<Font> font = getFont();
-			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-			if (hFont != nil) {
-				[handle setFont:hFont];
-			}
 		}
 		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;

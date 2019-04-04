@@ -115,12 +115,6 @@ namespace slib
 		if (handle != nil) {
 			[handle setPullsDown:NO];
 			((_priv_SelectView*)this)->_copyItems(handle);
-			
-			Ref<Font> font = getFont();
-			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-			if (hFont != nil) {
-				[handle setFont:hFont];
-			}
 		}
 		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -164,14 +158,6 @@ namespace slib
 
 	void SelectView::_setFont_NW(const Ref<Font>& font)
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
-			NSPopUpButton* v = (NSPopUpButton*)handle;
-			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-			if (hFont != nil) {
-				[v setFont:hFont];
-			}
-		}
 	}
 
 	UISize _priv_SelectView_macOS_measureSize(SelectView* view)
