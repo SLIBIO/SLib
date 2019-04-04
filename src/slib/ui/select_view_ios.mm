@@ -25,6 +25,7 @@
 #if defined(SLIB_UI_IS_IOS)
 
 #include "slib/ui/select_view.h"
+#include "slib/ui/core.h"
 
 #include "view_ios.h"
 
@@ -91,6 +92,19 @@ namespace slib
 			}
 			return NSTextAlignmentLeft;
 		}
+		
+		static void setBorder(_priv_Slib_iOS_SelectView* handle, sl_bool flagBorder)
+		{
+			if (flagBorder) {
+				[handle.layer setBorderColor:[UIColor grayColor].CGColor];
+				[handle.layer setBorderWidth:(UI::dpToPixel(1) / UIPlatform::getGlobalScaleFactor())];
+				[handle.layer setCornerRadius:(UI::dpToPixel(5) / UIPlatform::getGlobalScaleFactor())];
+			} else {
+				[handle.layer setBorderWidth:0];
+				[handle.layer setCornerRadius:0];
+			}
+		}
+		
 	};
 	
 	Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
@@ -102,7 +116,7 @@ namespace slib
 			
 			[handle setTextAlignment:(_priv_SelectView::translateAlignment(m_textAlignment))];
 			[handle setTextColor:(GraphicsPlatform::getUIColorFromColor(m_textColor))];
-			[handle setBorderStyle:isBorder() ? UITextBorderStyleRoundedRect : UITextBorderStyleNone];
+			_priv_SelectView::setBorder(handle, isBorder());
 			Color backColor = getBackgroundColor();
 			[handle setBackgroundColor:(backColor.isZero() ? nil : GraphicsPlatform::getUIColorFromColor(backColor))];
 			
@@ -203,7 +217,7 @@ namespace slib
 		UIView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
 			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
-			[v setBorderStyle:flag ? UITextBorderStyleRoundedRect : UITextBorderStyleNone];
+			_priv_SelectView::setBorder(v, flag);
 		}
 	}
 	
@@ -271,10 +285,10 @@ namespace slib
 	CGContextMoveToPoint(context, pl, ph);
 	CGContextAddLineToPoint(context, pl + (DROP_ICON_WIDTH - pl - pr) / 2, DROP_ICON_HEIGHT - ph);
 	CGContextAddLineToPoint(context, DROP_ICON_WIDTH - pr, ph);
-	CGContextSetLineWidth(context, 2);
+	CGContextSetLineWidth(context, slib::UI::dpToPixel(2) / slib::UIPlatform::getGlobalScaleFactor());
 	CGContextSetLineCap(context, kCGLineCapRound);
 	CGContextSetLineJoin(context, kCGLineJoinRound);
-	CGContextSetRGBStrokeColor(context, 0.4, 0.4, 0.4, 1);
+	CGContextSetRGBStrokeColor(context, 0.5, 0.5, 0.5, 1);
 	CGContextStrokePath(context);
 }
 
@@ -298,7 +312,6 @@ IOS_VIEW_DEFINE_ON_FOCUS
 		self->m_selectionBefore = 0;
 		
 		[self setDelegate:self];
-		[self setBackgroundColor:[UIColor whiteColor]];
 		
 		// hide the caret and its blinking
 		[[self valueForKey:@"textInputTraits"] setValue:[UIColor clearColor] forKey:@"insertionPointColor"];
@@ -329,6 +342,18 @@ IOS_VIEW_DEFINE_ON_FOCUS
 		self.inputAccessoryView = toolbar;
 	}
 	return self;
+}
+
+- (CGRect)textRectForBounds:(CGRect)bounds
+{
+	bounds.origin.x += slib::UI::dpToPixel(4) / slib::UIPlatform::getGlobalScaleFactor();
+	bounds.size.width -= slib::UI::dpToPixel(8) / slib::UIPlatform::getGlobalScaleFactor();
+	return bounds;
+}
+
+- (CGRect)editingRectForBounds:(CGRect)bounds
+{
+	return [self textRectForBounds:bounds];
 }
 
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView;
