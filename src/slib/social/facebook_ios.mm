@@ -20,12 +20,12 @@
  *   THE SOFTWARE.
  */
 
-#include <slib/social/facebook.h>
+#include "slib/social/facebook.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
-#include <slib/ui/platform.h>
-#include <slib/core/safe_static.h>
+#include "slib/ui/platform.h"
+#include "slib/core/safe_static.h"
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 #import <FBSDKLoginKit/FBSDKLoginKit.h>
