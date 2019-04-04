@@ -41,6 +41,14 @@ namespace slib
 	{
 	}
 	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FacebookShareParam)
+	
+	FacebookShareParam::FacebookShareParam()
+	{
+	}
+	
+	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FacebookParam)
 	
 	FacebookParam::FacebookParam() : FacebookParam(sl_null)

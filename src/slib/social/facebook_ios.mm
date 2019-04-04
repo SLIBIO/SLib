@@ -29,6 +29,7 @@
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 #import <FBSDKLoginKit/FBSDKLoginKit.h>
+#import <FBSDKShareKit/FBSDKShareKit.h>
 
 namespace slib
 {
@@ -150,6 +151,26 @@ namespace slib
 		} else {
 			[manager logInWithReadPermissions:array fromViewController:controller handler:func];
 		}
+	}
+	
+	void FacebookSDK::share(const FacebookShareParam& param)
+	{
+		if (param.url.isEmpty()) {
+			return;
+		}
+		FBSDKShareLinkContent *content = [FBSDKShareLinkContent new];
+		content.contentURL = [NSURL URLWithString:Apple::getNSStringFromString(param.url)];
+		if (param.quote.isNotEmpty()) {
+			content.quote = Apple::getNSStringFromString(param.quote);
+		}
+		if (param.hashTag.isNotEmpty()) {
+			content.hashtag = [FBSDKHashtag hashtagWithString:Apple::getNSStringFromString(param.hashTag)];
+		}
+		FBSDKShareDialog *dialog = [FBSDKShareDialog new];
+		dialog.fromViewController = UIPlatform::getCurrentViewController();
+		dialog.shareContent = content;
+		dialog.mode = FBSDKShareDialogModeAutomatic;
+		[dialog show];
 	}
 	
 	void FacebookSDK::clearAccessToken()

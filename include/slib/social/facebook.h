@@ -88,6 +88,20 @@ namespace slib
 		
 	};
 	
+	class SLIB_EXPORT FacebookShareParam
+	{
+	public:
+		String url;
+		String quote;
+		String hashTag;
+		
+	public:
+		FacebookShareParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FacebookShareParam)
+
+	};
+
 	class SLIB_EXPORT FacebookParam : public OAuthParam
 	{
 	public:
@@ -149,10 +163,14 @@ namespace slib
 	public:
 		static void initialize(); // Must be called in `Application::onStart()` override
 		
+	public:
 		static void login(const FacebookLoginParam& param);
 		
 		static void login(const Function<void(FacebookLoginResult& result)>& onComplete);
 		
+		static void share(const FacebookShareParam& param);
+		
+	public:
 		static void clearAccessToken();
 
 		static Ref<Facebook> getInstance();
