@@ -552,6 +552,9 @@ namespace slib
 		_priv_Slib_iOS_ViewHandle* handle;
 		if (IsInstanceOf<ScrollView>(getParent())) {
 			handle = [[_priv_Slib_iOS_ScrollContentViewHandle alloc] initWithFrame:frame];
+			UISize screenSize = UI::getScreenSize();
+			CGFloat m = Math::min(screenSize.x, screenSize.y);
+			((CATiledLayer*)(handle.layer)).tileSize = CGSizeMake(m, m);
 		} else {
 			handle = [[_priv_Slib_iOS_ViewHandle alloc] initWithFrame:frame];
 		}
