@@ -577,6 +577,7 @@ namespace slib
 	OAuthParam::OAuthParam()
 	{
 		accessTokenMethod = HttpMethod::POST;
+		flagUseBasicAuthorizationForAccessToken = sl_false;
 		flagSupportTokenGrantType = sl_true;
 		flagLoggingErrors = sl_true;
 	}
@@ -597,6 +598,7 @@ namespace slib
 		m_authorizeUrl = param.authorizeUrl;
 		m_accessTokenUrl = param.accessTokenUrl;
 		m_accessTokenMethod = param.accessTokenMethod;
+		m_flagUseBasicAuthorizationForAccessToken = param.flagUseBasicAuthorizationForAccessToken;
 		m_redirectUri = param.redirectUri;
 		m_loginRedirectUri = param.loginRedirectUri;
 		m_defaultScopes = param.defaultScopes;
@@ -742,11 +744,15 @@ namespace slib
 			onComplete(result);
 			return;
 		}
-		params.put_NoLock("client_id", m_clientId);
-		params.put_NoLock("client_secret", m_clientSecret);
 		UrlRequestParam rp;
 		rp.method = m_accessTokenMethod;
 		rp.url = m_accessTokenUrl;
+		if (m_flagUseBasicAuthorizationForAccessToken) {
+			rp.requestHeaders.put_NoLock("Authorization", "Basic " + Base64::encode(m_clientId + ":" + m_clientSecret));
+		} else {
+			params.put_NoLock("client_id", m_clientId);
+			params.put_NoLock("client_secret", m_clientSecret);
+		}
 		if (rp.method == HttpMethod::POST) {
 			rp.setRequestBodyAsHashMap(params);
 		} else {
@@ -766,6 +772,13 @@ namespace slib
 			onComplete(result);
 		};
 		UrlRequest::send(rp);
+	}
+	
+	void OAuth2::requestAccessToken(const Function<void(OAuthAccessTokenResult&)>& onComplete)
+	{
+		HashMap<String, Variant> params;
+		params.put_NoLock("grant_type", "client_credentials");
+		requestAccessToken(params, onComplete);
 	}
 	
 	void OAuth2::requestAccessToken(const String& code, const String& redirectUri, const Function<void(OAuthAccessTokenResult&)>& onComplete)
@@ -842,7 +855,9 @@ namespace slib
 	{
 		flagSuccess = sl_false;
 		request = _request;
-		response = _request->getResponseContentAsJson();
+		if (_request) {
+			response = _request->getResponseContentAsJson();
+		}
 	}
 	
 }

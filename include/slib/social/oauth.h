@@ -455,6 +455,7 @@ namespace slib
 		
 		String authorizeUrl;
 		HttpMethod accessTokenMethod;
+		sl_bool flagUseBasicAuthorizationForAccessToken;
 		String accessTokenUrl;
 		String redirectUri;
 		String loginRedirectUri;
@@ -511,12 +512,19 @@ namespace slib
 
 		void requestAccessToken(HashMap<String, Variant>& params, const Function<void(OAuthAccessTokenResult&)>& onComplete);
 		
+		// grant_type=client_credentials
+		void requestAccessToken(const Function<void(OAuthAccessTokenResult&)>& onComplete);
+
+		// grant_type=authorization_code
 		void requestAccessToken(const String& code, const String& redirectUri, const Function<void(OAuthAccessTokenResult&)>& onComplete);
 		
+		// grant_type=authorization_code
 		void requestAccessToken(const String& code, const Function<void(OAuthAccessTokenResult&)>& onComplete);
 
+		// grant_type=refresh_token
 		void requestRefreshToken(const String& refreshToken, const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete);
 
+		// grant_type=refresh_token
 		void requestRefreshToken(const String& refreshToken, const Function<void(OAuthAccessTokenResult&)>& onComplete);
 		
 		void login(const OAuthLoginParam& param);
@@ -540,6 +548,7 @@ namespace slib
 		String m_authorizeUrl;
 		String m_accessTokenUrl;
 		HttpMethod m_accessTokenMethod;
+		sl_bool m_flagUseBasicAuthorizationForAccessToken;
 		String m_redirectUri;
 		String m_loginRedirectUri;
 		List<String> m_defaultScopes;
