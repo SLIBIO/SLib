@@ -289,6 +289,8 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/social/linkedin_login.cpp"
  "${SLIB_PATH}/src/slib/social/oauth.cpp"
  "${SLIB_PATH}/src/slib/social/oauth_login.cpp"
+ "${SLIB_PATH}/src/slib/social/paypal.cpp"
+ "${SLIB_PATH}/src/slib/social/paypal_ui.cpp"
  "${SLIB_PATH}/src/slib/social/pinterest.cpp"
  "${SLIB_PATH}/src/slib/social/twitter.cpp"
 

@@ -32,4 +32,6 @@
 #include "social/ebay.h"
 #include "social/etsy.h"
 
+#include "social/paypal.h"
+
 #endif

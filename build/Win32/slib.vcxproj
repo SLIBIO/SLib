@@ -330,6 +330,8 @@
     <ClCompile Include="..\..\src\slib\social\linkedin_login.cpp" />
     <ClCompile Include="..\..\src\slib\social\oauth.cpp" />
     <ClCompile Include="..\..\src\slib\social\oauth_login.cpp" />
+    <ClCompile Include="..\..\src\slib\social\paypal.cpp" />
+    <ClCompile Include="..\..\src\slib\social\paypal_ui.cpp" />
     <ClCompile Include="..\..\src\slib\social\pinterest.cpp" />
     <ClCompile Include="..\..\src\slib\social\twitter.cpp" />
     <ClCompile Include="..\..\src\slib\ui\button.cpp" />

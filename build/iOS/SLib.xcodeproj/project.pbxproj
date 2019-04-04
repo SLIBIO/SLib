@@ -668,6 +668,8 @@
 		264DF0EE22455E3B007DB734 /* chat_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264DF0ED22455E3B007DB734 /* chat_view.cpp */; };
 		266E66EC21D9566300D92386 /* locale_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266E66EB21D9566300D92386 /* locale_apple.mm */; };
 		2671F99121E07F7400B39842 /* drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2671F99021E07F7300B39842 /* drawer.cpp */; };
+		269E31A72255EAAF005CD0ED /* paypal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31A62255EAAF005CD0ED /* paypal.cpp */; };
+		269E31AB2255F4F2005CD0ED /* paypal_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31AA2255F4F2005CD0ED /* paypal_ui.cpp */; };
 		26A39D8C20EFE16D004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8B20EFE16D004707C9 /* calculator.cpp */; };
 		26ACB3B9220978310093FF3F /* facebook.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3B8220978310093FF3F /* facebook.cpp */; };
 		26ACB3F4220984FF0093FF3F /* ui_core_badge_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3F3220984FF0093FF3F /* ui_core_badge_ios.mm */; };
@@ -2152,6 +2154,8 @@
 		2692222F1DC12F600055095F /* image_stb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image_stb.cpp; sourceTree = "<group>"; };
 		269394CB1D7609EB002B9B03 /* list_report_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_report_view.cpp; sourceTree = "<group>"; };
 		269462091CAD1C47001B2130 /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xml.cpp; sourceTree = "<group>"; };
+		269E31A62255EAAF005CD0ED /* paypal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = paypal.cpp; sourceTree = "<group>"; };
+		269E31AA2255F4F2005CD0ED /* paypal_ui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = paypal_ui.cpp; sourceTree = "<group>"; };
 		26A39D8B20EFE16D004707C9 /* calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = calculator.cpp; sourceTree = "<group>"; };
 		26A9B7611C172BCC004C9B0E /* camera_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_view.cpp; sourceTree = "<group>"; };
 		26A9B7631C172BDE004C9B0E /* video_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_view.cpp; sourceTree = "<group>"; };
@@ -3847,6 +3851,8 @@
 				26BAE02722239EA80085B5AB /* linkedin_login.cpp */,
 				260B73EE220CAD1C00858EEA /* oauth.cpp */,
 				260B73FB220DCA8D00858EEA /* oauth_login.cpp */,
+				269E31A62255EAAF005CD0ED /* paypal.cpp */,
+				269E31AA2255F4F2005CD0ED /* paypal_ui.cpp */,
 				26E1B85522283BD3007C222E /* pinterest.cpp */,
 				260B73F7220D872600858EEA /* twitter.cpp */,
 			);
@@ -5447,11 +5453,13 @@
 				26E1B8BE222ABBE7007C222E /* pngpread.c in Sources */,
 				26E1B8CB222ABC05007C222E /* filter_sse2_intrinsics.c in Sources */,
 				26BB17D621F4E4550089C7EC /* view_page_navigation.cpp in Sources */,
+				269E31A72255EAAF005CD0ED /* paypal.cpp in Sources */,
 				26E1B8B1222ABBDC007C222E /* gzread.c in Sources */,
 				26D9D8EC1E962976005F7BD3 /* web_view_apple.mm in Sources */,
 				26E1B8DF222ABCDD007C222E /* jdapistd.c in Sources */,
 				26D9D8931E962962005F7BD3 /* arp.cpp in Sources */,
 				26D9D8721E96294F005F7BD3 /* graphics_resource.cpp in Sources */,
+				269E31AB2255F4F2005CD0ED /* paypal_ui.cpp in Sources */,
 				26E1B8AD222ABBDC007C222E /* crc32.c in Sources */,
 				26D9D8E71E962976005F7BD3 /* video_view.cpp in Sources */,
 				26D9D8D31E962976005F7BD3 /* select_view.cpp in Sources */,
