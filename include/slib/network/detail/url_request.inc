@@ -35,4 +35,11 @@ namespace slib
 		setRequestBodyAsString(HttpRequest::buildFormUrlEncodedFromHashMap(params));
 	}
 
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	void UrlRequestParam::setFormData(const HashMap<KT, VT, HASH, KEY_COMPARE>& params)
+	{
+		setContentType(ContentType::WebForm);
+		setRequestBodyAsHashMap(params);
+	}
+
 }

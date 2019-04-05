@@ -556,6 +556,12 @@ namespace slib
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(HttpUploadFile)
 	
+	SLIB_DEFINE_ROOT_OBJECT(HttpUploadFile)
+	
+	HttpUploadFile::HttpUploadFile() : m_data(sl_null), m_size(0)
+	{
+	}
+	
 	HttpUploadFile::HttpUploadFile(const String& fileName, const HttpHeaderMap& headers, void* data, sl_size size, const Ref<Referable>& ref)
 	 : m_fileName(fileName), m_headers(headers), m_data(data), m_size(size), m_ref(ref)
 	{
@@ -564,6 +570,11 @@ namespace slib
 	String HttpUploadFile::getFileName()
 	{
 		return m_fileName;
+	}
+	
+	void HttpUploadFile::setFileName(const String& fileName)
+	{
+		m_fileName = fileName;
 	}
 	
 	const HttpHeaderMap& HttpUploadFile::getHeaders()
@@ -576,11 +587,26 @@ namespace slib
 		return m_headers.getValue_NoLock(name);
 	}
 	
+	void HttpUploadFile::setHeader(const String& name, const String& value)
+	{
+		m_headers.put_NoLock(name, value);
+	}
+	
 	String HttpUploadFile::getContentType()
 	{
 		return getHeader(HttpHeaders::ContentType);
 	}
 	
+	void HttpUploadFile::setContentType(const ContentType& contentType)
+	{
+		setHeader(HttpHeaders::ContentType, ContentTypes::toString(contentType));
+	}
+	
+	void HttpUploadFile::setContentType(const String& contentType)
+	{
+		setHeader(HttpHeaders::ContentType, contentType);
+	}
+
 	void* HttpUploadFile::getData()
 	{
 		return m_data;
@@ -589,6 +615,25 @@ namespace slib
 	sl_size HttpUploadFile::getSize()
 	{
 		return m_size;
+	}
+	
+	Memory HttpUploadFile::getDataMemory()
+	{
+		return Memory::createStatic(m_data, m_size, this);
+	}
+	
+	void HttpUploadFile::setData(const void* data, sl_size size)
+	{
+		m_data = (void*)data;
+		m_size = size;
+		m_ref.setNull();
+	}
+	
+	void HttpUploadFile::setData(const Memory& data)
+	{
+		m_data = data.getData();
+		m_size = data.getSize();
+		m_ref = data.ref;
 	}
 	
 	sl_bool HttpUploadFile::saveToFile(const String& path)
@@ -1278,11 +1323,9 @@ namespace slib
 		msg.addStatic("\r\n", 2);
 
 		for (auto& pair : m_requestHeaders) {
-			String str = pair.key;
-			msg.addStatic(str.getData(), str.getLength());
+			msg.addStatic(pair.key.getData(), pair.key.getLength());
 			msg.addStatic(": ", 2);
-			str = pair.value;
-			msg.addStatic(str.getData(), str.getLength());
+			msg.addStatic(pair.value.getData(), pair.value.getLength());
 			msg.addStatic("\r\n", 2);
 		}
 		msg.addStatic("\r\n", 2);
@@ -1364,7 +1407,95 @@ namespace slib
 			return iRet;
 		}
 	}
+	
+	sl_bool HttpRequest::buildMultipartFormData(MemoryBuffer& output, const String& _boundary, HashMap<String, Variant>& parameters)
+	{
+		Memory boundary = _boundary.toMemory();
+		
+		for (auto& item: parameters) {
+			
+			String& name = item.key;
+			Variant& value = item.value;
+			
+			String fileName;
+			HttpHeaderMap const* headers = sl_null;
+			Memory memData;
 
+			Ref<Referable> ref = value.getObject();
+			if (ref.isNotNull()) {
+				if (IsInstanceOf<CMemory>(ref)) {
+					memData = (CMemory*)(ref.get());
+				} else if (IsInstanceOf<HttpUploadFile>(ref)) {
+					HttpUploadFile* file = (HttpUploadFile*)(ref.get());
+					memData = file->getDataMemory();
+					fileName = HttpHeaders::makeSafeValue(file->getFileName());
+					headers = &(file->getHeaders());
+				}
+			} else {
+				memData = value.getString().toMemory();
+			}
+			if (memData.isNotNull()) {
+				char* data = (char*)(memData.getData());
+				sl_size size = memData.getSize();
+				char* dataBoundary = (char*)(boundary.getData());
+				sl_size sizeBoundary = boundary.getSize();
+				if (size >= sizeBoundary + 2) {
+					sl_size n = size - sizeBoundary - 2;
+					for (sl_size i = 0; i <= n; i++) {
+						if (data[i] == '-' && data[i+1] == '-') {
+							if (Base::equalsMemory(data + 2, dataBoundary, sizeBoundary)) {
+								return sl_false;
+							}
+						}
+					}
+				}
+			}
+			
+			output.addStatic("--", 2);
+			output.add(boundary);
+			output.addStatic("\r\n", 2);
+			{
+				const char s[] = "Content-Disposition: form-data; name=\"";
+				output.addStatic(s, sizeof(s)-1);
+			}
+			output.addStatic(name.getData(), name.getLength());
+			if (fileName.isNotNull()) {
+				const char s[] = "; filename=\"";
+				output.addStatic(s, sizeof(s)-1);
+				output.addStatic(fileName.getData(), fileName.getLength());
+				output.addStatic("\"\r\n", 3);
+			} else {
+				output.addStatic("\"\r\n", 3);
+			}
+			if (headers) {
+				for (auto& header: *headers) {
+					if (header.key.equalsIgnoreCase(HttpHeaders::ContentDisposition)) {
+						continue;
+					}
+					output.addStatic(header.key.getData(), header.key.getLength());
+					output.addStatic(": ", 2);
+					output.addStatic(header.value.getData(), header.value.getLength());
+					output.addStatic("\r\n", 2);
+				}
+			}
+			output.addStatic("\r\n", 2);
+			output.add(memData);
+			output.addStatic("\r\n", 2);
+		}
+		output.addStatic("--", 2);
+		output.add(boundary);
+		output.addStatic("--\r\n", 4);
+		return sl_true;
+	}
+
+	Memory HttpRequest::buildMultipartFormData(const String& boundary, const HashMap<String, Variant>& parameters)
+	{
+		MemoryBuffer buf;
+		if (buildMultipartFormData(buf, boundary, *((HashMap<String, Variant>*)&parameters))) {
+			return buf.merge();
+		}
+		return sl_null;
+	}
 
 /***********************************************************************
 							HttpResponse

@@ -42,6 +42,16 @@ namespace slib
 		dispatcher = UrlRequest::getDefaultDispatcher();
 	}
 	
+	void UrlRequestParam::setContentType(const ContentType& contentType)
+	{
+		requestHeaders.put_NoLock(HttpHeaders::ContentType, ContentTypes::toString(contentType));
+	}
+	
+	void UrlRequestParam::setContentType(const String& contentType)
+	{
+		requestHeaders.put_NoLock(HttpHeaders::ContentType, contentType);
+	}
+	
 	void UrlRequestParam::setRequestBodyAsMemory(const Memory &mem)
 	{
 		requestBody = mem;
@@ -101,6 +111,21 @@ namespace slib
 			}
 		} else {
 			requestBody.setNull();
+		}
+	}
+	
+	void UrlRequestParam::setMultipartFormData(const HashMap<String, Variant>& params)
+	{
+		for (;;) {
+			char memBoundary[32];
+			Math::randomMemory(memBoundary, 32);
+			String boundary = String::makeHexString(memBoundary, 32);
+			Memory data = HttpRequest::buildMultipartFormData(boundary, params);
+			if (data.isNotNull()) {
+				setContentType("multipart/form-data; boundary=" + boundary);
+				setRequestBodyAsMemory(data);
+				return;
+			}
 		}
 	}
 	

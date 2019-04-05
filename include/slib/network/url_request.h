@@ -70,6 +70,11 @@ namespace slib
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(UrlRequestParam)
 		
 	public:
+		void setContentType(const ContentType& contentType);
+		
+		void setContentType(const String& contentType);
+		
+		
 		void setRequestBodyAsMemory(const Memory& mem);
 		
 		void setRequestBodyAsString(const String& str);
@@ -85,6 +90,12 @@ namespace slib
 		void setRequestBodyAsHashMap(const HashMap<KT, VT, HASH, KEY_COMPARE>& map);
 		
 		void setRequestBody(const Variant& var);
+		
+
+		template <class KT, class VT, class HASH, class KEY_COMPARE>
+		void setFormData(const HashMap<KT, VT, HASH, KEY_COMPARE>& map);
+		
+		void setMultipartFormData(const HashMap<String, Variant>& params);
 		
 	};
 	

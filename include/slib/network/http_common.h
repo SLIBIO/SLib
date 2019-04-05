@@ -190,11 +190,11 @@ namespace slib
 		 <0: error
 		 =0: incomplete packet
 		 >0: size of the headers (ending with [CR][LF][CR][LF])
-		 No Thread Safe
+		 not thread-safe
 		 */
 		static sl_reg parseHeaders(HttpHeaderMap& outMap, const void* headers, sl_size size);
 		
-		// No Thread Safe
+		// not thread-safe
 		static void splitValue(const String& value, List<String>* values, HttpHeaderValueMap* map, HashMap<String, String>* mapCaseSensitive, sl_char8 delimiter=',');
 		
 		static List<String> splitValueToList(const String& value, sl_char8 delimiter=',');
@@ -267,9 +267,14 @@ namespace slib
 		
 	};
 	
+	// not thread-safe
 	class SLIB_EXPORT HttpUploadFile : public Referable
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
+		HttpUploadFile();
+		
 		HttpUploadFile(const String& fileName, const HttpHeaderMap& headers, void* data, sl_size size, const Ref<Referable>& ref);
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(HttpUploadFile)
@@ -277,15 +282,29 @@ namespace slib
 	public:
 		String getFileName();
 		
+		void setFileName(const String& fileName);
+		
 		const HttpHeaderMap& getHeaders();
 		
 		String getHeader(const String& name);
 		
+		void setHeader(const String& name, const String& value);
+		
 		String getContentType();
+		
+		void setContentType(const ContentType& contentType);
+		
+		void setContentType(const String& contentType);
 		
 		void* getData();
 		
 		sl_size getSize();
+		
+		Memory getDataMemory();
+
+		void setData(const void* data, sl_size size);
+
+		void setData(const Memory& data);
 		
 		sl_bool saveToFile(const String& path);
 		
@@ -483,6 +502,10 @@ namespace slib
 		
 		template <class KT, class VT, class HASH, class KEY_COMPARE>
 		static String buildFormUrlEncodedFromHashMap(const HashMap<KT, VT, HASH, KEY_COMPARE>& map);
+		
+		static sl_bool buildMultipartFormData(MemoryBuffer& output, const String& boundary, HashMap<String, Variant>& parameters);
+		
+		static Memory buildMultipartFormData(const String& boundary, const HashMap<String, Variant>& parameters);
 		
 	protected:
 		HttpMethod m_method;
