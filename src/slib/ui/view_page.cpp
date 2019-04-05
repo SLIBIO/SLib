@@ -198,6 +198,9 @@ namespace slib
 					_page->dispatchClickBackground(ev);
 				}
 			});
+			back->setOnTouchEvent([](View* view, UIEvent* ev) {
+				ev->stopPropagation();
+			});
 			back->addChild(this, UIUpdateMode::Init);
 			viewAdd = back;
 		} else {
@@ -412,7 +415,11 @@ namespace slib
 
 	void ViewPage::setCloseOnClickBackground()
 	{
-		setOnClickBackground([](ViewPage* page, UIEvent*) {
+		setOnClickBackground([](ViewPage* page, UIEvent* ev) {
+			page->dispatchBack(ev);
+			if (ev->isPreventedDefault()) {
+				return;
+			}
 			page->close();
 		});
 	}
@@ -592,11 +599,9 @@ namespace slib
 		SLIB_INVOKE_EVENT_HANDLER(Cancel, ev)
 
 		dispatchBack(ev);
-		
 		if (ev->isPreventedDefault()) {
 			return;
 		}
-		
 		close();
 	}
 
