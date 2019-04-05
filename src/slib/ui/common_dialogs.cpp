@@ -24,10 +24,14 @@
 
 #include "slib/ui/core.h"
 #include "slib/ui/mobile_app.h"
-#include "slib/ui/label_view.h"
 
 #include "slib/core/file.h"
 #include "slib/core/safe_static.h"
+
+#include "../resources.h"
+
+#include "slib/ui/label_view.h"
+#include "slib/ui/button.h"
 
 namespace slib
 {
@@ -120,10 +124,17 @@ namespace slib
 		if (UI::isUiThread()) {
 			_priv_AlertDialog_CallbackRunByShow_UIThread m;
 			alert->onComplete = SLIB_FUNCTION_CLASS(_priv_AlertDialog_CallbackRunByShow_UIThread, onComplete, &m);
+#if defined(SLIB_UI_IS_IOS)
+			if (alert->_showMobilePopup()) {
+				UI::runLoop();
+				return m.result;
+			}
+#else
 			if (alert->_show()) {
 				UI::runLoop();
 				return m.result;
 			}
+#endif
 		} else {
 			Ref<Event> ev = Event::create(sl_false);
 			if (ev.isNotNull()) {
@@ -203,6 +214,96 @@ namespace slib
 		}
 	}
 	
+	sl_bool AlertDialog::_showMobilePopup()
+	{
+		Ref<MobileApp> app = MobileApp::getApp();
+		if (app.isNull()) {
+			return sl_false;
+		}
+
+		Ref<ui::MobileAlertDialog> dlg = new ui::MobileAlertDialog;
+		
+		if (caption.isNotNull()) {
+			dlg->txtTitle->setText(caption, UIUpdateMode::Init);
+		} else {
+			dlg->txtTitle->setVisibility(Visibility::Gone, UIUpdateMode::Init);
+		}
+		if (flagHyperText) {
+			dlg->txtContent->setHyperText(text, UIUpdateMode::Init);
+		} else {
+			dlg->txtContent->setText(text, UIUpdateMode::Init);
+		}
+		
+		auto alert = ToRef(this);
+		dlg->btnOK->setVisibility(Visibility::Gone, UIUpdateMode::Init);
+		if (titleOk.isNotNull()) {
+			dlg->btnOK->setText(titleOk, UIUpdateMode::Init);
+		}
+		dlg->btnOK->setOnClick([alert](View* view) {
+			alert->_onResult(DialogResult::Ok);
+			view->getNearestViewPage()->close();
+		});
+		
+		dlg->btnYes->setVisibility(Visibility::Gone, UIUpdateMode::Init);
+		if (titleYes.isNotNull()) {
+			dlg->btnYes->setText(titleYes, UIUpdateMode::Init);
+		}
+		dlg->btnYes->setOnClick([alert](View* view) {
+			alert->_onResult(DialogResult::Yes);
+			view->getNearestViewPage()->close();
+		});
+
+		dlg->btnNo->setVisibility(Visibility::Gone, UIUpdateMode::Init);
+		if (titleNo.isNotNull()) {
+			dlg->btnNo->setText(titleNo, UIUpdateMode::Init);
+		}
+		dlg->btnNo->setOnClick([alert](View* view) {
+			alert->_onResult(DialogResult::No);
+			view->getNearestViewPage()->close();
+		});
+
+		dlg->btnCancel->setVisibility(Visibility::Gone, UIUpdateMode::Init);
+		if (titleCancel.isNotNull()) {
+			dlg->btnCancel->setText(titleCancel, UIUpdateMode::Init);
+		}
+		dlg->btnCancel->setOnClick([alert](View* view) {
+			alert->_onResult(DialogResult::Cancel);
+			view->getNearestViewPage()->close();
+		});
+
+		dlg->setOnBack([alert](ViewPage*, UIEvent* ev) {
+			if (alert->buttons == AlertDialogButtons::YesNo) {
+				ev->preventDefault();
+			} else {
+				alert->_onResult(DialogResult::Cancel);
+			}
+		});
+		
+		if (buttons == AlertDialogButtons::OkCancel) {
+			dlg->btnOK->setVisibility(Visibility::Visible, UIUpdateMode::Init);
+			dlg->btnCancel->setVisibility(Visibility::Visible, UIUpdateMode::Init);
+			dlg->btnCancel->removeAllChildren(UIUpdateMode::Init);
+		} else if (buttons == AlertDialogButtons::YesNo) {
+			dlg->btnYes->setVisibility(Visibility::Visible, UIUpdateMode::Init);
+			dlg->btnNo->setVisibility(Visibility::Visible, UIUpdateMode::Init);
+			dlg->btnNo->removeAllChildren(UIUpdateMode::Init);
+		} else if (buttons == AlertDialogButtons::YesNoCancel) {
+			dlg->btnYes->setVisibility(Visibility::Visible, UIUpdateMode::Init);
+			dlg->btnNo->setVisibility(Visibility::Visible, UIUpdateMode::Init);
+			dlg->btnCancel->setVisibility(Visibility::Visible, UIUpdateMode::Init);
+			dlg->btnCancel->removeAllChildren(UIUpdateMode::Init);
+		} else {
+			dlg->btnOK->setVisibility(Visibility::Visible, UIUpdateMode::Init);
+			dlg->btnOK->removeAllChildren(UIUpdateMode::Init);
+			dlg->setCloseOnClickBackground();
+		}
+
+		app->popupPage(dlg);
+		
+		return sl_true;
+		
+	}
+	
 	AlertDialog* AlertDialog::getReferable()
 	{
 		if (getReferenceCount() > 0) {
@@ -211,7 +312,6 @@ namespace slib
 			return new AlertDialog(*this);
 		}
 	}
-
 
 /***************************************
 		FileDialog

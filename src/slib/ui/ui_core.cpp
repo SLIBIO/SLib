@@ -352,18 +352,18 @@ namespace slib
 		alert.run();
 	}
 
-	void UI::alert(const Ref<Window>& parent, const String& text)
-	{
-		AlertDialog alert;
-		alert.parent = parent;
-		alert.text = text;
-		alert.run();
-	}
-
 	void UI::alert(const String& caption, const String& text)
 	{
 		AlertDialog alert;
 		alert.caption = caption;
+		alert.text = text;
+		alert.run();
+	}
+
+	void UI::alert(const Ref<Window>& parent, const String& text)
+	{
+		AlertDialog alert;
+		alert.parent = parent;
 		alert.text = text;
 		alert.run();
 	}
@@ -375,13 +375,6 @@ namespace slib
 		alert.caption = caption;
 		alert.text = text;
 		alert.run();
-	}
-
-	void UI::showAlert(const String& text)
-	{
-		AlertDialog alert;
-		alert.text = text;
-		alert.show();
 	}
 
 	void UI::showAlert(const String& text, const Function<void()>& onOk)
@@ -401,6 +394,125 @@ namespace slib
 		alert.show();
 	}
 
+	void UI::showAlert(const Ref<Window>& parent, const String& text, const Function<void()>& onOk)
+	{
+		AlertDialog alert;
+		alert.parent = parent;
+		alert.text = text;
+		alert.onOk = onOk;
+		alert.show();
+	}
+	
+	void UI::showAlert(const Ref<Window>& parent, const String& caption, const String& text, const Function<void()>& onOk)
+	{
+		AlertDialog alert;
+		alert.parent = parent;
+		alert.caption = caption;
+		alert.text = text;
+		alert.onOk = onOk;
+		alert.show();
+	}
+
+	sl_bool UI::confirm(const String& text)
+	{
+		AlertDialog alert;
+		alert.buttons = AlertDialogButtons::OkCancel;
+		alert.text = text;
+		return alert.run() == DialogResult::Ok;
+	}
+	
+	sl_bool UI::confirm(const String& caption, const String& text)
+	{
+		AlertDialog alert;
+		alert.buttons = AlertDialogButtons::OkCancel;
+		alert.caption = caption;
+		alert.text = text;
+		return alert.run() == DialogResult::Ok;
+	}
+	
+	sl_bool UI::confirm(const Ref<Window>& parent, const String& text)
+	{
+		AlertDialog alert;
+		alert.buttons = AlertDialogButtons::OkCancel;
+		alert.parent = parent;
+		alert.text = text;
+		return alert.run() == DialogResult::Ok;
+	}
+	
+	sl_bool UI::confirm(const Ref<Window>& parent, const String& caption, const String& text)
+	{
+		AlertDialog alert;
+		alert.buttons = AlertDialogButtons::OkCancel;
+		alert.parent = parent;
+		alert.caption = caption;
+		alert.text = text;
+		return alert.run() == DialogResult::Ok;
+	}
+	
+	void UI::showConfirm(const String& text, const Function<void(sl_bool)>& onResult)
+	{
+		AlertDialog alert;
+		alert.buttons = AlertDialogButtons::OkCancel;
+		alert.text = text;
+		alert.onComplete = [onResult](DialogResult result) {
+			if (result == DialogResult::Ok) {
+				onResult(sl_true);
+			} else {
+				onResult(sl_false);
+			}
+		};
+		alert.show();
+	}
+	
+	void UI::showConfirm(const String& caption, const String& text, const Function<void(sl_bool)>& onResult)
+	{
+		AlertDialog alert;
+		alert.buttons = AlertDialogButtons::OkCancel;
+		alert.caption = caption;
+		alert.text = text;
+		alert.onComplete = [onResult](DialogResult result) {
+			if (result == DialogResult::Ok) {
+				onResult(sl_true);
+			} else {
+				onResult(sl_false);
+			}
+		};
+		alert.show();
+	}
+	
+	void UI::showConfirm(const Ref<Window>& parent, const String& text, const Function<void(sl_bool)>& onResult)
+	{
+		AlertDialog alert;
+		alert.buttons = AlertDialogButtons::OkCancel;
+		alert.parent = parent;
+		alert.text = text;
+		alert.onComplete = [onResult](DialogResult result) {
+			if (result == DialogResult::Ok) {
+				onResult(sl_true);
+			} else {
+				onResult(sl_false);
+			}
+		};
+		alert.show();
+	}
+	
+	void UI::showConfirm(const Ref<Window>& parent, const String& caption, const String& text, const Function<void(sl_bool)>& onResult)
+	{
+		AlertDialog alert;
+		alert.buttons = AlertDialogButtons::OkCancel;
+		alert.parent = parent;
+		alert.caption = caption;
+		alert.text = text;
+		alert.onComplete = [onResult](DialogResult result) {
+			if (result == DialogResult::Ok) {
+				onResult(sl_true);
+			} else {
+				onResult(sl_false);
+			}
+		};
+		alert.show();
+	}
+	
 	void UI::runOnUiThread(const Function<void()>& callback)
 	{
 		if (callback.isNotNull()) {

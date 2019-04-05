@@ -174,7 +174,6 @@ namespace slib
 					}
 				} @catch (NSException*) {}
 			}
-						
 			[controller presentViewController:alert animated:YES completion:nil];
 			return sl_true;
 		}

@@ -1,0 +1,95 @@
+<sapp>
+	<layout
+		type='page'
+		width='80%'
+		maxWidth='500dp'
+		height='wrap'
+		alignCenter='true'
+		boundRadius='12dp'
+		clipping='true'
+		instance='false'
+		>
+
+		<linear width='fill'>
+
+			<label
+				name='txtTitle'
+				text='Title'
+				fontSize='25dp'
+				fontBold='true'
+				gravity='center'
+				width='fill'
+				multiLine='word-wrap'
+				marginTop='10dp'
+				/>
+
+			<scroll
+				width='fill'
+				maxHeight='160dp'
+				>
+				<label
+					name='txtContent'
+					text='Content'
+					fontSize='20dp'
+					centerHorizontal='true'
+					width='fill'
+					minHeight='80dp'
+					padding='10dp'
+					gravity='center'
+					multiLine='word-wrap'
+					/>
+			</scroll>
+			
+			<view
+				width='fill'
+				height='1dp'
+				marginTop='1dp'
+				background='#b0b0b0'
+				/>
+
+			<hlinear
+				width='fill'
+				>
+				<button
+					name='btnOK'
+					style='button'
+					text='@string/ok'
+					/>
+				<button
+					name='btnYes'
+					style='button'
+					text='@string/yes'
+					/>
+				<button
+					name='btnNo'
+					style='button'
+					text='@string/no'
+					/>
+				<button
+					name='btnCancel'
+					style='button'
+					text='@string/cancel'
+					/>
+			</hlinear>
+
+		</linear>
+
+ 	</layout>
+
+	<style
+		name='button'
+		width='*'
+		fontSize='25dp'
+		height='40dp'
+		padding='0'
+		>
+		<view
+			width='1dp'
+			height='fill'
+			background='#b0b0b0'
+			alignBottom='true'
+			alignRight='true'
+			/>
+	</style>
+
+</sapp>

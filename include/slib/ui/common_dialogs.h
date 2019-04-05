@@ -91,6 +91,8 @@ namespace slib
 		
 		sl_bool _show();
 		
+		sl_bool _showMobilePopup();
+		
 		void _onResult(DialogResult result);
 		
 	protected:

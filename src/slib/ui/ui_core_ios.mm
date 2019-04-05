@@ -184,9 +184,7 @@ namespace slib
 	
 	void UIPlatform::runLoop(sl_uint32 level)
 	{
-		@autoreleasepool {
-			CFRunLoopRun();
-		}
+		CFRunLoopRun();
 	}
 	
 	void UIPlatform::quitLoop()

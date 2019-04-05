@@ -7,5 +7,6 @@ namespace slib
 {
 	namespace ui
 	{
+		class MobileAlertDialog;
 	}
 }

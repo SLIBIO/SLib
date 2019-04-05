@@ -130,25 +130,39 @@ namespace slib
 		static sl_real dpToPixel(sl_real dp);
 		
 		// Message Box
-		// Run on UI thread
 		static void alert(const String& text);
 
-		// Run on UI thread
-		static void alert(const Ref<Window>& parent, const String& text);
-
-		// Run on UI thread
 		static void alert(const String& caption, const String& text);
 		
-		// Run on UI thread
+		static void alert(const Ref<Window>& parent, const String& text);
+		
 		static void alert(const Ref<Window>& parent, const String& caption, const String& text);
 		
-		static void showAlert(const String& text);
+		static void showAlert(const String& text, const Function<void()>& onOk = Function<void()>::null());
 		
-		static void showAlert(const String& text, const Function<void()>& onOk);
+		static void showAlert(const String& caption, const String& text, const Function<void()>& onOk = Function<void()>::null());
 		
-		static void showAlert(const String& caption, const String& text, const Function<void()>& onOk);
+		static void showAlert(const Ref<Window>& parent, const String& text, const Function<void()>& onOk = Function<void()>::null());
 		
+		static void showAlert(const Ref<Window>& parent, const String& caption, const String& text, const Function<void()>& onOk = Function<void()>::null());
 		
+		static sl_bool confirm(const String& text);
+
+		static sl_bool confirm(const String& caption, const String& text);
+
+		static sl_bool confirm(const Ref<Window>& parent, const String& text);
+
+		static sl_bool confirm(const Ref<Window>& parent, const String& caption, const String& text);
+		
+		static void showConfirm(const String& text, const Function<void(sl_bool)>& onResult = Function<void(sl_bool)>::null());
+		
+		static void showConfirm(const String& caption, const String& text, const Function<void(sl_bool)>& onResult = Function<void(sl_bool)>::null());
+		
+		static void showConfirm(const Ref<Window>& parent, const String& text, const Function<void(sl_bool)>& onResult = Function<void(sl_bool)>::null());
+		
+		static void showConfirm(const Ref<Window>& parent, const String& caption, const String& text, const Function<void(sl_bool)>& onResult = Function<void(sl_bool)>::null());
+		
+
 		// HID related functions (Platform Specific)
 #if defined(SLIB_UI_IS_WIN32) || defined(SLIB_UI_IS_MACOS)
 		static sl_bool checkKeyPressed(Keycode key);
