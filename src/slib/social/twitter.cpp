@@ -23,6 +23,7 @@
 #include "slib/social/twitter.h"
 
 #include "slib/core/safe_static.h"
+#include "slib/core/log.h"
 
 namespace slib
 {
@@ -55,6 +56,21 @@ namespace slib
 	{
 		return getPublicProfileURL(screen_name);
 	}
+	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TwitterShareResult)
+	
+	TwitterShareResult::TwitterShareResult(UrlRequest* request): TwitterResult(request)
+	{
+	}
+	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TwitterShareParam)
+	
+	TwitterShareParam::TwitterShareParam()
+	{
+	}
+	
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TwitterParam)
 	
@@ -137,6 +153,82 @@ namespace slib
 		};
 		authorizeRequest(rp);
 		UrlRequest::send(rp);
+	}
+
+	void Twitter::share(const TwitterShareParam& _param)
+	{
+		class Params : public TwitterShareParam
+		{
+		public:
+			Params(const TwitterShareParam& param): TwitterShareParam(param) {}
+		public:
+			sl_size indexMedia;
+			List<String> mediaIds;
+			Ref<Twitter> twitter;
+		};
+		static Function<void(Params param, UrlRequest*)> callback;
+		if (callback.isNull()) {
+			callback = [](Params param, UrlRequest* request) {
+				if (request) {
+					TwitterShareResult result(request);
+					if (request->isError()) {
+						LogError("Twitter Sharing", "%s", result.response);
+						param.onComplete(result);
+						return;
+					}
+					String mediaId = result.response["media_id"].getString();
+					if (mediaId.isEmpty()) {
+						LogError("Twitter Sharing", "%s", result.response);
+						param.onComplete(result);
+						return;
+					}
+					param.mediaIds.add(mediaId);
+					param.indexMedia++;
+				}
+				UrlRequestParam rp;
+				if (param.indexMedia < param.medias.getCount()) {
+					rp.method = HttpMethod::POST;
+					rp.url = "https://upload.twitter.com/1.1/media/upload.json";
+					VariantHashMap map;
+					map.put("media", param.medias.getValueAt(param.indexMedia));
+					rp.setMultipartFormData(map);
+					rp.onComplete = Function<void(UrlRequest*)>::bind(callback, param);
+				} else {
+					rp.method = HttpMethod::POST;
+					rp.url = getRequestUrl("statuses/update.json");
+					VariantHashMap map;
+					map.put("status", param.status);
+					if (param.mediaIds.isNotEmpty()) {
+						map.put("media_ids", StringBuffer::join(",", param.mediaIds));
+					}
+					rp.setFormData(map);
+					rp.onComplete = [param](UrlRequest* request) {
+						TwitterShareResult result(request);
+						if (request->isError()) {
+							LogError("Twitter Sharing", "%s", result.response);
+							param.onComplete(result);
+							return;
+						}
+						String id = result.response["id"].getString();
+						if (id.isEmpty()) {
+							LogError("Twitter Sharing", "%s", result.response);
+							param.onComplete(result);
+							return;
+						}
+						result.flagSuccess = sl_true;
+						param.onComplete(result);
+					};
+				}
+				param.twitter->authorizeRequest(rp);
+				UrlRequest::send(rp);
+			};
+		}
+		
+		Params param(_param);
+		param.indexMedia = 0;
+		param.mediaIds = List<String>::create();
+		param.twitter = this;
+		callback(param, sl_null);
 	}
 	
 }

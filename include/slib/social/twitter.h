@@ -27,6 +27,8 @@
 
 #include "oauth.h"
 
+#include "../graphics/image.h"
+
 namespace slib
 {
 	
@@ -72,6 +74,30 @@ namespace slib
 	
 	typedef OAuth1_LoginParam TwitterLoginParam;
 	
+	class SLIB_EXPORT TwitterShareResult : public TwitterResult
+	{
+	public:
+		TwitterShareResult(UrlRequest* request);
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TwitterShareResult)
+		
+	};
+	
+	class SLIB_EXPORT TwitterShareParam
+	{
+	public:
+		String status;
+		List<Memory> medias;
+		
+		Function<void(TwitterShareResult& result)> onComplete;
+		
+	public:
+		TwitterShareParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TwitterShareParam)
+		
+	};
+	
 	class SLIB_EXPORT TwitterParam : public OAuth1_Param
 	{
 	public:
@@ -100,10 +126,12 @@ namespace slib
 		static Ref<Twitter> getInstance();
 
 	public:
-		String getRequestUrl(const String& path);
+		static String getRequestUrl(const String& path);
 		
 		// get user by userId or screenName (if two arguments are empty, then the loginned user will be returned)
 		void getUser(const String& userId, const String& screenName, const Function<void(TwitterResult&, TwitterUser&)>& callback);
+		
+		void share(const TwitterShareParam& param);
 		
 	};
 	
