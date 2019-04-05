@@ -932,15 +932,18 @@ namespace slib
 		}
 		
 		switch (resourceItem->itemType) {
-			case SAppLayoutItemType::ViewGroup:
-			case SAppLayoutItemType::Linear:
-			case SAppLayoutItemType::Render:
-			case SAppLayoutItemType::Drawer:
+			case SAppLayoutItemType::Scroll:
+				break;
+			default:
 				if (op == OP_PARSE) {
 					ListLocker< Ref<XmlElement> > children(_getLayoutItemChildElements(resourceItem, params->resource->name, String::null()));
 					for (sl_size i = 0; i < children.count; i++) {
 						const Ref<XmlElement>& child = children[i];
 						if (child.isNotNull()) {
+							String tagName = child->getName();
+							if (tagName == "item" || tagName == "column") {
+								continue;
+							}
 							Ref<SAppLayoutResourceItem> childItem = _parseLayoutResourceItemChild(params->resource, resourceItem, child);
 							if (childItem.isNull()) {
 								return sl_false;
@@ -1000,8 +1003,6 @@ namespace slib
 						}
 					}
 				}
-				break;
-			default:
 				break;
 		}
 
