@@ -49,11 +49,93 @@ namespace slib
 		
 	};
 	
+	class SLIB_EXPORT PinterestBoard
+	{
+	public:
+		String id;
+		String name;
+		String url;
+
+		Json json;
+		
+	public:
+		PinterestBoard();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(PinterestBoard)
+		
+		SLIB_DECLARE_JSON
+		
+	};
+	
 	typedef OAuthLoginResult PinterestLoginResult;
 	
 	typedef OAuthApiResult PinterestResult;
 	
-	typedef OAuthLoginParam PinterestLoginParam;
+	class SLIB_EXPORT PinterestLoginParam: public OAuthLoginParam
+	{
+	public:
+		PinterestLoginParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(PinterestLoginParam)
+		
+	public:
+		void addScopeForWritingPublic();
+		
+	};
+	
+	
+	class SLIB_EXPORT PinterestCreateBoardResult : public PinterestResult
+	{
+	public:
+		PinterestBoard createdBoard;
+		
+	public:
+		PinterestCreateBoardResult(UrlRequest* request);
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(PinterestCreateBoardResult)
+		
+	};
+	
+	class SLIB_EXPORT PinterestCreateBoardParam
+	{
+	public:
+		String name; // required
+		String description;
+		
+		Function<void(PinterestCreateBoardResult& result)> onComplete;
+		
+	public:
+		PinterestCreateBoardParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(PinterestCreateBoardParam)
+		
+	};
+	
+	class SLIB_EXPORT PinterestCreatePinResult : public PinterestResult
+	{
+	public:
+		PinterestCreatePinResult(UrlRequest* request);
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(PinterestCreatePinResult)
+		
+	};
+	
+	class SLIB_EXPORT PinterestCreatePinParam
+	{
+	public:
+		String board; // required
+		String note; // required
+		String link;
+		String imageUrl;
+		
+		Function<void(PinterestCreatePinResult& result)> onComplete;
+		
+	public:
+		PinterestCreatePinParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(PinterestCreatePinParam)
+		
+	};
 	
 	class SLIB_EXPORT PinterestParam : public OAuthParam
 	{
@@ -91,6 +173,12 @@ namespace slib
 		String getRequestUrl(const String& path);
 		
 		void getUser(const String& userId, const Function<void(PinterestResult&, PinterestUser&)>& onComplete);
+		
+		void getMyBoards(const Function<void(PinterestResult&, List<PinterestBoard>& boards)>& onComplete);
+		
+		void createBoard(const PinterestCreateBoardParam& param);
+		
+		void createPin(const PinterestCreatePinParam& param);
 		
 	};
 	

@@ -23,6 +23,7 @@
 #include "slib/social/pinterest.h"
 
 #include "slib/core/safe_static.h"
+#include "slib/core/log.h"
 
 namespace slib
 {
@@ -41,6 +42,22 @@ namespace slib
 	{
 	}
 	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(PinterestBoard)
+	
+	SLIB_DEFINE_JSON(PinterestBoard)
+	{
+		if (isFromJson) {
+			this->json = json;
+		}
+		SLIB_JSON_ADD_MEMBERS(id, name, url)
+	}
+	
+	PinterestBoard::PinterestBoard()
+	{
+	}
+	
+	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(PinterestParam)
 	
 	PinterestParam::PinterestParam()
@@ -50,6 +67,7 @@ namespace slib
 		defaultScopes.add_NoLock("read_public");
 	}
 
+	
 	SLIB_DEFINE_OBJECT(Pinterest, OAuth2)
 	
 	Pinterest::Pinterest(const PinterestParam& param) : OAuth2(param)
@@ -121,6 +139,103 @@ namespace slib
 				result.flagSuccess = user.id.isNotEmpty();
 			}
 			onComplete(result, user);
+		};
+		authorizeRequest(rp);
+		UrlRequest::send(rp);
+	}
+	
+	void Pinterest::getMyBoards(const Function<void(PinterestResult&, List<PinterestBoard>& boards)>& onComplete)
+	{
+		UrlRequestParam rp;
+		rp.url = getRequestUrl("me/boards/");
+		rp.onComplete = [onComplete](UrlRequest* request) {
+			PinterestResult result(request);
+			List<PinterestBoard> boards;
+			if (!(request->isError()) && result.response["data"].isNotNull()) {
+				FromJson(result.response["data"], boards);
+				result.flagSuccess = sl_true;
+			}
+			onComplete(result, boards);
+		};
+		authorizeRequest(rp);
+		UrlRequest::send(rp);
+	}
+	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(PinterestCreateBoardResult)
+	
+	PinterestCreateBoardResult::PinterestCreateBoardResult(UrlRequest* request): PinterestResult(request)
+	{
+	}
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(PinterestCreateBoardParam)
+	
+	PinterestCreateBoardParam::PinterestCreateBoardParam()
+	{
+	}
+	
+	void Pinterest::createBoard(const PinterestCreateBoardParam& param)
+	{
+		UrlRequestParam rp;
+		rp.method = HttpMethod::POST;
+		rp.url = getRequestUrl("boards/");
+		HashMap<String, String> body;
+		body.put_NoLock("name", param.name);
+		if (param.description.isNotEmpty()) {
+			body.put_NoLock("description", param.description);
+		}
+		rp.setFormData(body);
+		rp.onComplete = [param](UrlRequest* request) {
+			PinterestCreateBoardResult result(request);
+			FromJson(result.response["data"], result.createdBoard);
+			if (result.createdBoard.id.isEmpty()) {
+				LogError("Pinterest CreateBoard", "%s", result.response);
+				param.onComplete(result);
+				return;
+			}
+			result.flagSuccess = sl_true;
+			param.onComplete(result);
+		};
+		authorizeRequest(rp);
+		UrlRequest::send(rp);
+	}
+	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(PinterestCreatePinResult)
+	
+	PinterestCreatePinResult::PinterestCreatePinResult(UrlRequest* request): PinterestResult(request)
+	{
+	}
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(PinterestCreatePinParam)
+	
+	PinterestCreatePinParam::PinterestCreatePinParam()
+	{
+	}
+	
+	void Pinterest::createPin(const PinterestCreatePinParam& param)
+	{
+		UrlRequestParam rp;
+		rp.method = HttpMethod::POST;
+		rp.url = getRequestUrl("pins/");
+		HashMap<String, String> body;
+		body.put_NoLock("board", param.board);
+		body.put_NoLock("note", param.note);
+		if (param.link.isNotEmpty()) {
+			body.put_NoLock("link", param.link);
+		}
+		body.put_NoLock("image_url", param.imageUrl);
+		rp.setFormData(body);
+		rp.onComplete = [param](UrlRequest* request) {
+			PinterestCreatePinResult result(request);
+			String id = result.response["data"]["id"].getString();
+			if (id.isEmpty()) {
+				LogError("Pinterest CreatePin", "%s", result.response);
+				param.onComplete(result);
+				return;
+			}
+			result.flagSuccess = sl_true;
+			param.onComplete(result);
 		};
 		authorizeRequest(rp);
 		UrlRequest::send(rp);
