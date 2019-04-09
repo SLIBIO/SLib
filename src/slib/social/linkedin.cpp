@@ -23,6 +23,7 @@
 #include "slib/social/linkedin.h"
 
 #include "slib/core/safe_static.h"
+#include "slib/core/log.h"
 
 namespace slib
 {
@@ -160,6 +161,75 @@ namespace slib
 	void Linkedin::getUser(const String& userId, const Function<void(LinkedinResult&, LinkedinUser&)>& onComplete)
 	{
 		getUser(userId, String::null(), onComplete);
+	}
+	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(LinkedinShareResult)
+	
+	LinkedinShareResult::LinkedinShareResult(UrlRequest* request): LinkedinResult(request)
+	{
+	}
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(LinkedinShareParam)
+	
+	LinkedinShareParam::LinkedinShareParam()
+	{
+	}
+	
+	void Linkedin::share(const LinkedinShareParam& param)
+	{
+		auto linkedin = ToRef(this);
+		getUser(sl_null, [linkedin, param](LinkedinResult& result, LinkedinUser& user) {
+			if (user.id.isEmpty()) {
+				LogError("Linkedin Share", "%s", result.response);
+				LinkedinShareResult r(sl_null);
+				*((LinkedinResult*)&r) = result;
+				param.onComplete(r);
+				return;
+			}
+			UrlRequestParam rp;
+			rp.method = HttpMethod::POST;
+			rp.url = getRequestUrl("shares");
+			rp.requestHeaders.put_NoLock("X-RestLi-Protocol-Version", "2.0.0");
+			Json json;
+			json.putItem("owner", "urn:li:person:" + user.id);
+			if (param.text.isNotEmpty()) {
+				Json text;
+				text.putItem("text", param.text);
+				json.putItem("text", text);
+			}
+			if (param.contentEntities.isNotEmpty()) {
+				Json entities;
+				for (auto& entity: param.contentEntities) {
+					Json location;
+					location.putItem("entityLocation", entity);
+					entities.addElement(location);
+				}
+				Json content;
+				content.putItem("contentEntities", entities);
+				if (param.contentTitle.isNotEmpty()) {
+					content.putItem("title", param.contentTitle);
+				}
+				if (param.contentDescription.isNotEmpty()) {
+					content.putItem("description", param.contentDescription);
+				}
+				json.putItem("content", content);
+			}
+			rp.setJsonData(json);
+			rp.onComplete = [param](UrlRequest* request) {
+				LinkedinShareResult result(request);
+				String id = result.response["id"].getString();
+				if (id.isEmpty()) {
+					LogError("Linkedin Share", "%s", result.response);
+					param.onComplete(result);
+					return;
+				}
+				result.flagSuccess = sl_true;
+				param.onComplete(result);
+			};
+			linkedin->authorizeRequest(rp);
+			UrlRequest::send(rp);
+		});
 	}
 
 }

@@ -25,6 +25,20 @@
 namespace slib
 {
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(LinkedinLoginParam)
+	
+	LinkedinLoginParam::LinkedinLoginParam()
+	{
+		authorization.scopes.add_NoLock("r_liteprofile");
+		authorization.scopes.add_NoLock("r_emailaddress");
+	}
+	
+	void LinkedinLoginParam::addScopeForSharing()
+	{
+		authorization.scopes.addIfNotExist_NoLock("w_member_social");
+	}
+	
+	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(LinkedinResolveUserUrlParam)
 	
 	LinkedinResolveUserUrlParam::LinkedinResolveUserUrlParam()

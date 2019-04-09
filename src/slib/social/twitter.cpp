@@ -58,20 +58,6 @@ namespace slib
 	}
 	
 	
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TwitterShareResult)
-	
-	TwitterShareResult::TwitterShareResult(UrlRequest* request): TwitterResult(request)
-	{
-	}
-	
-	
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TwitterShareParam)
-	
-	TwitterShareParam::TwitterShareParam()
-	{
-	}
-	
-	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TwitterParam)
 	
 	TwitterParam::TwitterParam()
@@ -155,6 +141,19 @@ namespace slib
 		UrlRequest::send(rp);
 	}
 
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TwitterShareResult)
+	
+	TwitterShareResult::TwitterShareResult(UrlRequest* request): TwitterResult(request)
+	{
+	}
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TwitterShareParam)
+	
+	TwitterShareParam::TwitterShareParam()
+	{
+	}
+	
 	void Twitter::share(const TwitterShareParam& _param)
 	{
 		class Params : public TwitterShareParam
