@@ -1877,7 +1877,7 @@ namespace slib
 						return String::format("%02d:%02d", d.hour, d.minute);
 					case TimeFormat::HourMinute_12Hour:
 					case TimeFormat::ShortHourMinute_12Hour:
-						return String::format("%d:%02d %s", d.hour, d.minute, d.hour>=12?"PM":"AM");
+						return String::format("%d:%02d %s", _priv_Time_getHour12(d.hour), d.minute, d.hour>=12?"PM":"AM");
 					case TimeFormat::MinuteSecond:
 						return String::format("%02d:%02d", d.minute, d.second);
 					case TimeFormat::Weekday:
