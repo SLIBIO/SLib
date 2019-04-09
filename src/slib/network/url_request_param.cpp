@@ -129,6 +129,12 @@ namespace slib
 		}
 	}
 	
+	void UrlRequestParam::setJsonData(const Json& json)
+	{
+		setContentType(ContentType::Json);
+		setRequestBodyAsJson(json);
+	}
+	
 	
 	sl_uint32 _g_priv_UrlRequest_default_timeout = 60000;
 	

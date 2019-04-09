@@ -97,6 +97,8 @@ namespace slib
 		
 		void setMultipartFormData(const HashMap<String, Variant>& params);
 		
+		void setJsonData(const Json& json);
+		
 	};
 	
 	class Event;
