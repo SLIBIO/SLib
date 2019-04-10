@@ -55,9 +55,15 @@ namespace slib
 		if (userInfo.isNotNull()) {
 			Json aps = userInfo["aps"];
 			Json alert = aps["alert"];
-			message.title = alert["title"].getString();
-			message.content = alert["body"].getString();
-			message.data = userInfo["custom"];
+			if (alert.isString()) {
+				message.title.setNull();
+				message.content = alert.getString();
+			} else {
+				message.title = alert["title"].getString();
+				message.content = alert["body"].getString();
+			}
+			message.badge = aps["badge"].getInt32(message.badge);
+			message.data = userInfo;
 			return sl_true;
 		}
 		return sl_false;
