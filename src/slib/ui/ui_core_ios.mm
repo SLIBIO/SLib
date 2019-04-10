@@ -309,6 +309,16 @@ namespace slib
 	{
 		_g_slib_ios_callbacks_openURL.add(callback);
 	}
+	
+	static BOOL _priv_UIPlatform_onOpenUrl(NSURL* url, NSDictionary* options)
+	{
+		for (auto& callback : _g_slib_ios_callbacks_openURL) {
+			if (callback(url, options)) {
+				return YES;
+			}
+		}
+		return MobileApp::dispatchOpenUrlToApp(Apple::getStringFromNSString(url.absoluteString));
+	}
 
 	void _priv_slib_ui_reset_orienation();
 
@@ -420,10 +430,14 @@ namespace slib
 }
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url options:(NSDictionary *)options {
-	for (auto& callback : slib::_g_slib_ios_callbacks_openURL) {
-		if (callback(url, options)) {
-			return YES;
-		}
+	return slib::_priv_UIPlatform_onOpenUrl(url, options);
+}
+
+- (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler
+{
+	if ([userActivity.activityType isEqualToString:NSUserActivityTypeBrowsingWeb]) {
+		NSURL* url = userActivity.webpageURL;
+		return slib::_priv_UIPlatform_onOpenUrl(url, @{});
 	}
 	return NO;
 }
