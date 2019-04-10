@@ -34,7 +34,11 @@ namespace slib
 	void FacebookSDK::login(const FacebookLoginParam& param)
 	{
 	}
-	
+
+	void FacebookSDK::share(const FacebookShareParam& param)
+	{
+	}
+
 	void FacebookSDK::clearAccessToken()
 	{
 	}
