@@ -106,6 +106,7 @@ namespace slib
 		SLIB_DECLARE_EVENT_HANDLER(MobileApp, DestroyActivity)
 		SLIB_DECLARE_EVENT_HANDLER(MobileApp, Resize, sl_ui_len width, sl_ui_len height)
 		SLIB_DECLARE_EVENT_HANDLER(MobileApp, ChangeCurrentLocale)
+		SLIB_DECLARE_EVENT_HANDLER(MobileApp, OpenUrl, UIEvent* ev)
 
 	public:
 		void dispatchStart() override;
@@ -121,6 +122,8 @@ namespace slib
 		static void dispatchDestroyActivityToApp();
 		
 		static void dispatchResizeToApp(sl_ui_len width, sl_ui_len height);
+		
+		static sl_bool dispatchOpenUrlToApp(const String& url);
 		
 	protected:
 		static sl_bool m_flagPaused;

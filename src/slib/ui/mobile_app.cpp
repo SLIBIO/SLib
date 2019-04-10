@@ -462,6 +462,28 @@ namespace slib
 		SLIB_INVOKE_EVENT_HANDLER(ChangeCurrentLocale)
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(MobileApp, OpenUrl, UIEvent* ev)
+	
+	void MobileApp::dispatchOpenUrl(UIEvent* ev)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(OpenUrl, ev);
+	}
+	
+	sl_bool MobileApp::dispatchOpenUrlToApp(const String& url)
+	{
+		Ref<MobileApp> app = getApp();
+		if (app.isNotNull()) {
+			Ref<UIEvent> ev = UIEvent::createOpenUrlEvent(url);
+			if (ev.isNotNull()) {
+				app->dispatchOpenUrl(ev.get());
+				if (ev->isPreventedDefault()) {
+					return sl_false;
+				}
+			}
+		}
+		return sl_true;
+	}
+	
 	
 	SLIB_DEFINE_OBJECT(MobileMainWindow, Window)
 	

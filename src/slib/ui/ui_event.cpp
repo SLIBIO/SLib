@@ -222,8 +222,9 @@ sl_bool UIEvent::is##NAME##Key() const \
 		Ref<UIEvent> ret = new UIEvent;
 		if (ret.isNotNull()) {
 			ret->setAction(action);
+			return ret;
 		}
-		return ret;
+		return sl_null;
 	}
 
 	Ref<UIEvent> UIEvent::createKeyEvent(UIAction action, Keycode keycode, sl_uint32 systemKeycode, const Time& time)
@@ -234,8 +235,9 @@ sl_bool UIEvent::is##NAME##Key() const \
 			ret->setKeycode(keycode);
 			ret->setSystemKeycode(systemKeycode);
 			ret->setTime(time);
+			return ret;
 		}
-		return ret;
+		return sl_null;
 	}
 
 	Ref<UIEvent> UIEvent::createMouseEvent(UIAction action, sl_ui_posf x, sl_ui_posf y, const Time& time)
@@ -246,8 +248,9 @@ sl_bool UIEvent::is##NAME##Key() const \
 			ret->setX(x);
 			ret->setY(y);
 			ret->setTime(time);
+			return ret;
 		}
-		return ret;
+		return sl_null;
 	}
 
 	Ref<UIEvent> UIEvent::createMouseWheelEvent(sl_ui_posf mouseX, sl_ui_posf mouseY, sl_real deltaX, sl_real deltaY, const Time& time)
@@ -260,8 +263,9 @@ sl_bool UIEvent::is##NAME##Key() const \
 			ret->setDeltaX(deltaX);
 			ret->setDeltaY(deltaY);
 			ret->setTime(time);
+			return ret;
 		}
-		return ret;
+		return sl_null;
 	}
 
 	Ref<UIEvent> UIEvent::createTouchEvent(UIAction action, const Array<TouchPoint>& points, const Time& time)
@@ -274,8 +278,9 @@ sl_bool UIEvent::is##NAME##Key() const \
 				ret->setTouchPoint((points.getData())[0]);
 			}
 			ret->setTime(time);
+			return ret;
 		}
-		return ret;
+		return sl_null;
 	}
 	
 	Ref<UIEvent> UIEvent::createTouchEvent(UIAction action, const TouchPoint& point, const Time& time)
@@ -285,8 +290,9 @@ sl_bool UIEvent::is##NAME##Key() const \
 			ret->setAction(action);
 			ret->setTouchPoint(point);
 			ret->setTime(time);
+			return ret;
 		}
-		return ret;
+		return sl_null;
 	}
 
 	Ref<UIEvent> UIEvent::createSetCursorEvent(sl_ui_posf x, sl_ui_posf y, const Time& time)
@@ -296,6 +302,17 @@ sl_bool UIEvent::is##NAME##Key() const \
 			ret->setAction(UIAction::SetCursor);
 			ret->setPoint(x, y);
 			ret->setTime(time);
+			return ret;
+		}
+		return sl_null;
+	}
+	
+	Ref<UIEvent> UIEvent::createOpenUrlEvent(const String& url)
+	{
+		Ref<UIEvent> ret = new UIEvent;
+		if (ret.isNotNull()) {
+			ret->setAction(UIAction::OpenUrl);
+			ret->setUrl(url);
 		}
 		return ret;
 	}
@@ -543,6 +560,16 @@ sl_bool UIEvent::is##NAME##Key() const \
 		}
 	}
 
+	const String& UIEvent::getUrl() const
+	{
+		return m_url;
+	}
+	
+	void UIEvent::setUrl(const String& url)
+	{
+		m_url = url;
+	}
+	
 	UIEventFlags UIEvent::getFlags() const
 	{
 		return m_flags;
