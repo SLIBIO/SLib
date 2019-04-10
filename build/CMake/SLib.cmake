@@ -285,6 +285,7 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/social/facebook.cpp"
  "${SLIB_PATH}/src/slib/social/facebook_ui.cpp"
  "${SLIB_PATH}/src/slib/social/facebook_sdk.cpp"
+ "${SLIB_PATH}/src/slib/social/instagram.cpp"
  "${SLIB_PATH}/src/slib/social/linkedin.cpp"
  "${SLIB_PATH}/src/slib/social/linkedin_ui.cpp"
  "${SLIB_PATH}/src/slib/social/oauth.cpp"
@@ -377,6 +378,7 @@ if(ANDROID)
   "${SLIB_PATH}/src/slib/device/vibrator_android.cpp"
 
   "${SLIB_PATH}/src/slib/social/facebook_android.cpp"
+  "${SLIB_PATH}/src/slib/social/instagram_android.cpp"
 
   "${SLIB_PATH}/src/slib/ui/clipboard_android.cpp"
   "${SLIB_PATH}/src/slib/ui/common_dialogs_android.cpp"

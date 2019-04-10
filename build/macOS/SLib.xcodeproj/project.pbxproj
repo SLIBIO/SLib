@@ -844,6 +844,7 @@
 		264DF0F022455E46007DB734 /* chat_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264DF0EF22455E46007DB734 /* chat_view.cpp */; };
 		266E66E121D7F68F00D92386 /* locale_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266E66E021D7F68F00D92386 /* locale_apple.mm */; };
 		2671F99321E07F8200B39842 /* drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2671F99221E07F8100B39842 /* drawer.cpp */; };
+		267B9D69225D14640057DF2A /* instagram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D68225D14640057DF2A /* instagram.cpp */; };
 		2682569F21E464630079600F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2682569E21E464630079600F /* IOKit.framework */; };
 		269E31A92255F431005CD0ED /* paypal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31A82255F430005CD0ED /* paypal.cpp */; };
 		269E31AD2255F53B005CD0ED /* paypal_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31AC2255F53B005CD0ED /* paypal_ui.cpp */; };
@@ -2348,6 +2349,7 @@
 		266E66E021D7F68F00D92386 /* locale_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = locale_apple.mm; sourceTree = "<group>"; };
 		266F12B21C97A13F00DE26FF /* block_cipher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = block_cipher.cpp; sourceTree = "<group>"; };
 		2671F99221E07F8100B39842 /* drawer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = drawer.cpp; sourceTree = "<group>"; };
+		267B9D68225D14640057DF2A /* instagram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = instagram.cpp; path = social/instagram.cpp; sourceTree = "<group>"; };
 		267C16B81CE779D8000318C2 /* scroll_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scroll_bar.cpp; sourceTree = "<group>"; };
 		267D008B1E32AA5A002CC949 /* render_drawable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_drawable.cpp; sourceTree = "<group>"; };
 		2682569E21E464630079600F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
@@ -3760,6 +3762,7 @@
 				260B73F3220D7DF600858EEA /* facebook.cpp */,
 				26BAE01B2220552F0085B5AB /* facebook_ui.cpp */,
 				26BAE01D222062D10085B5AB /* facebook_sdk.cpp */,
+				267B9D68225D14640057DF2A /* instagram.cpp */,
 				26BAE023222183400085B5AB /* linkedin.cpp */,
 				26BAE0292223A07D0085B5AB /* linkedin_ui.cpp */,
 				260B73F4220D7DF600858EEA /* oauth.cpp */,
@@ -5979,6 +5982,7 @@
 				264DF0F022455E46007DB734 /* chat_view.cpp in Sources */,
 				26E1B860222A8250007C222E /* deflate.c in Sources */,
 				26C1B63D20D51D1D00E36539 /* canvas_quartz.mm in Sources */,
+				267B9D69225D14640057DF2A /* instagram.cpp in Sources */,
 				26E1B886222ABAB2007C222E /* jcmainct.c in Sources */,
 				26E1B871222ABA51007C222E /* pngread.c in Sources */,
 				26D9D9831E964675005F7BD3 /* audio_recorder_dsound.cpp in Sources */,

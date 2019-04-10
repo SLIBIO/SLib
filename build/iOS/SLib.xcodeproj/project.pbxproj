@@ -669,6 +669,8 @@
 		264DF0EE22455E3B007DB734 /* chat_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264DF0ED22455E3B007DB734 /* chat_view.cpp */; };
 		266E66EC21D9566300D92386 /* locale_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266E66EB21D9566300D92386 /* locale_apple.mm */; };
 		2671F99121E07F7400B39842 /* drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2671F99021E07F7300B39842 /* drawer.cpp */; };
+		267B9D65225D11450057DF2A /* instagram_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D64225D11450057DF2A /* instagram_ios.mm */; };
+		267B9D67225D11760057DF2A /* instagram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D66225D11760057DF2A /* instagram.cpp */; };
 		269E31A72255EAAF005CD0ED /* paypal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31A62255EAAF005CD0ED /* paypal.cpp */; };
 		269E31AB2255F4F2005CD0ED /* paypal_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31AA2255F4F2005CD0ED /* paypal_ui.cpp */; };
 		26A39D8C20EFE16D004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8B20EFE16D004707C9 /* calculator.cpp */; };
@@ -2143,6 +2145,8 @@
 		266F926D1D51CD5D0040166C /* render_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_resource.cpp; sourceTree = "<group>"; };
 		266F926F1D51CD7A0040166C /* graphics_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphics_resource.cpp; sourceTree = "<group>"; };
 		2671F99021E07F7300B39842 /* drawer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = drawer.cpp; sourceTree = "<group>"; };
+		267B9D64225D11450057DF2A /* instagram_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = instagram_ios.mm; sourceTree = "<group>"; };
+		267B9D66225D11760057DF2A /* instagram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = instagram.cpp; sourceTree = "<group>"; };
 		267D00891E32AA3B002CC949 /* render_drawable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_drawable.cpp; sourceTree = "<group>"; };
 		2682C3ED1E2D35A200E9CB98 /* parse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parse.cpp; sourceTree = "<group>"; };
 		2682C3F01E2D5C6C00E9CB98 /* ui_core_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_core_apple.mm; sourceTree = "<group>"; };
@@ -3849,6 +3853,8 @@
 				26BAE015221EDD960085B5AB /* facebook_ui.cpp */,
 				26BAE019221FFC830085B5AB /* facebook_sdk.cpp */,
 				26C795AA2215A8940053C5A1 /* facebook_ios.mm */,
+				267B9D66225D11760057DF2A /* instagram.cpp */,
+				267B9D64225D11450057DF2A /* instagram_ios.mm */,
 				26BAE01F222157F40085B5AB /* linkedin.cpp */,
 				26BAE02722239EA80085B5AB /* linkedin_ui.cpp */,
 				260B73EE220CAD1C00858EEA /* oauth.cpp */,
@@ -5185,6 +5191,7 @@
 				26E1B8B8222ABBDC007C222E /* uncompr.c in Sources */,
 				26E1B85622283BD3007C222E /* pinterest.cpp in Sources */,
 				26D9D87B1E96295A005F7BD3 /* audio_codec.cpp in Sources */,
+				267B9D67225D11760057DF2A /* instagram.cpp in Sources */,
 				26D9D8E61E962976005F7BD3 /* ui_resource.cpp in Sources */,
 				26D9D8A31E962962005F7BD3 /* socket_event_unix.cpp in Sources */,
 				26B92D5B21D4CF22003F6F82 /* device.cpp in Sources */,
@@ -5220,6 +5227,7 @@
 				26D9D8531E96292E005F7BD3 /* database.cpp in Sources */,
 				260B73FC220DCA8E00858EEA /* oauth_ui.cpp in Sources */,
 				26D9D8731E96294F005F7BD3 /* graphics_text.cpp in Sources */,
+				267B9D65225D11450057DF2A /* instagram_ios.mm in Sources */,
 				26D9D8111E9628E0005F7BD3 /* math.cpp in Sources */,
 				26E1B8F5222ABCDD007C222E /* jidctint.c in Sources */,
 				26BB17E92200E1FE0089C7EC /* switch_view.cpp in Sources */,

@@ -20,19 +20,23 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_SOCIAL_HEADER
-#define CHECKHEADER_SLIB_SOCIAL_HEADER
+#ifndef CHECKHEADER_SLIB_SOCIAL_INSTAGRAM
+#define CHECKHEADER_SLIB_SOCIAL_INSTAGRAM
 
-#include "social/oauth.h"
+#include "definition.h"
 
-#include "social/facebook.h"
-#include "social/instagram.h"
-#include "social/twitter.h"
-#include "social/linkedin.h"
-#include "social/pinterest.h"
-#include "social/ebay.h"
-#include "social/etsy.h"
+#include "../core/memory.h"
 
-#include "social/paypal.h"
+namespace slib
+{
+	
+	class Instagram
+	{
+	public:
+		static void openInstagramAppSharingFile(const Memory& data);
+		
+	};
+	
+}
 
 #endif

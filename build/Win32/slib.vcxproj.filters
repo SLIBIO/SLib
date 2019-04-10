@@ -1217,5 +1217,8 @@
     <ClCompile Include="..\..\src\slib\social\pinterest_ui.cpp">
       <Filter>src\social</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\instagram.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -326,6 +326,7 @@
     <ClCompile Include="..\..\src\slib\social\facebook.cpp" />
     <ClCompile Include="..\..\src\slib\social\facebook_ui.cpp" />
     <ClCompile Include="..\..\src\slib\social\facebook_sdk.cpp" />
+    <ClCompile Include="..\..\src\slib\social\instagram.cpp" />
     <ClCompile Include="..\..\src\slib\social\linkedin.cpp" />
     <ClCompile Include="..\..\src\slib\social\linkedin_ui.cpp" />
     <ClCompile Include="..\..\src\slib\social\oauth.cpp" />
