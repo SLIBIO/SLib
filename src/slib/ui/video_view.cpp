@@ -56,6 +56,8 @@ namespace slib
 		m_rotationFrameApplied = RotationMode::Rotate0;
 		m_flipApplied = FlipMode::None;
 		m_rotationApplied = RotationMode::Rotate0;
+		m_sizeLastFrame.x = 0;
+		m_sizeLastFrame.y = 0;
 
 		m_scaleMode = ScaleMode::Stretch;
 		m_gravity = Alignment::MiddleCenter;
@@ -157,9 +159,10 @@ namespace slib
 		return m_rotation;
 	}
 	
-	void VideoView::setRotation(const RotationMode& rotation)
+	void VideoView::setRotation(const RotationMode& rotation, UIUpdateMode mode)
 	{
 		m_rotation = rotation;
+		invalidate(mode);
 	}
 	
 	FlipMode VideoView::getFlip()
@@ -167,9 +170,10 @@ namespace slib
 		return m_flip;
 	}
 	
-	void VideoView::setFlip(const FlipMode& flip)
+	void VideoView::setFlip(const FlipMode& flip, UIUpdateMode mode)
 	{
 		m_flip = flip;
+		invalidate(mode);
 	}
 	
 	ScaleMode VideoView::getScaleMode()
@@ -177,10 +181,10 @@ namespace slib
 		return m_scaleMode;
 	}
 	
-	void VideoView::setScaleMode(ScaleMode scaleMode)
+	void VideoView::setScaleMode(ScaleMode scaleMode, UIUpdateMode mode)
 	{
 		m_scaleMode = scaleMode;
-		requestRender();
+		invalidate(mode);
 	}
 	
 	Alignment VideoView::getGravity()
@@ -188,18 +192,18 @@ namespace slib
 		return m_gravity;
 	}
 	
-	void VideoView::setGravity(Alignment align)
+	void VideoView::setGravity(Alignment align, UIUpdateMode mode)
 	{
 		m_gravity = align;
-		requestRender();
+		invalidate(mode);
 	}
 	
 	sl_bool VideoView::isControlsVisible()
 	{
-		return m_gravity;
+		return m_flagControlsVisible;
 	}
 	
-	void VideoView::setControlsVisible(sl_bool flag)
+	void VideoView::setControlsVisible(sl_bool flag, UIUpdateMode mode)
 	{
 		ObjectLocker lock(this);
 		m_flagControlsVisible = flag;
@@ -210,14 +214,14 @@ namespace slib
 					m_sliderSeek->setWidthFilling(1.0f, UIUpdateMode::Init);
 					m_sliderSeek->setHeightWeight(0.05f, UIUpdateMode::Init);
 					m_sliderSeek->setAlignParentBottom(UIUpdateMode::Init);
-					addChild(m_sliderSeek);
+					addChild(m_sliderSeek, mode);
 					m_sliderSeek->setOnChange(SLIB_FUNCTION_WEAKREF(VideoView, _onSeek, this));
 				}
 			}
-			_updateControls();
+			_updateControls(mode);
 		}
 		if (m_sliderSeek.isNotNull()) {
-			m_sliderSeek->setVisible(sl_true);
+			m_sliderSeek->setVisible(flag, mode);
 		}
 	}
 	
@@ -250,14 +254,55 @@ namespace slib
 			bitmapData.copyPixelsFrom(frame.image);
 			texture->update();
 			m_textureFrame = texture;
+			m_sizeLastFrame.x = frame.image.width;
+			m_sizeLastFrame.y = frame.image.height;
 		}
 		requestRender();
 	}
 	
+	Sizei VideoView::getLastFrameSize()
+	{
+		return m_sizeLastFrame;
+	}
+	
+	sl_bool VideoView::convertCoordinateToTexture(Point& pt)
+	{
+		sl_int32 sw = m_sizeLastFrame.x;
+		sl_int32 sh = m_sizeLastFrame.y;
+		if (sw <= 0 || sh <= 0) {
+			return sl_false;
+		}
+		if (m_rotationFrameApplied == RotationMode::Rotate90 || m_rotationFrameApplied == RotationMode::Rotate270) {
+			Swap(sw, sh);
+		}
+		if (m_rotationApplied == RotationMode::Rotate90 || m_rotationApplied == RotationMode::Rotate270) {
+			Swap(sw, sh);
+		}
+		Rectangle rectDraw;
+		GraphicsUtil::calculateAlignRectangle(rectDraw, getBoundsInnerPadding(), (sl_real)sw, (sl_real)sh, m_scaleMode, m_gravity);
+		sl_real w = rectDraw.getWidth();
+		if (w < SLIB_EPSILON) {
+			return sl_false;
+		}
+		sl_real h = rectDraw.getHeight();
+		if (h < SLIB_EPSILON) {
+			return sl_false;
+		}
+		sl_real x = (pt.x - rectDraw.left) / w;
+		sl_real y = (pt.y - rectDraw.top) / h;
+		RotatePoint(x, y, (sl_real)1, (sl_real)1, -(m_rotationApplied));
+		FlipPoint(x, y, (sl_real)1, (sl_real)1, m_flipApplied);
+		RotatePoint(x, y, (sl_real)1, (sl_real)1, -(m_rotationFrameApplied));
+		FlipPoint(x, y, (sl_real)1, (sl_real)1, m_flipFrameApplied);
+		pt.x = x;
+		pt.y = y;
+		return sl_true;
+	}
+	
 	void VideoView::onDraw(Canvas* _canvas)
 	{
-		_updateControls();
-		Rectangle rectBounds = getBounds();
+		_updateControls(UIUpdateMode::None);
+		Rectangle rectBounds = getBoundsInnerPadding();
 		if (rectBounds.getWidth() < SLIB_EPSILON || rectBounds.getHeight() < SLIB_EPSILON) {
 			return;
 		}
@@ -277,6 +322,8 @@ namespace slib
 					texture = m_renderVideoParam.glTextureOES;
 					textureMatrix = m_renderVideoParam.glTextureTransformOES;
 					program = m_programOES;
+					m_sizeLastFrame.x = texture->getWidth();
+					m_sizeLastFrame.y = texture->getHeight();
 				} else {
 					texture = m_textureFrame;
 					textureMatrix = Matrix3::identity();
@@ -411,7 +458,7 @@ namespace slib
 		return vb;
 	}
 	
-	void VideoView::_updateControls()
+	void VideoView::_updateControls(UIUpdateMode mode)
 	{
 		Ref<MediaPlayer> player = m_mediaPlayer;
 		if (player.isNull()) {
@@ -421,10 +468,10 @@ namespace slib
 			double duration = player->getDuration();
 			if (duration > 0) {
 				m_sliderSeek->setMaximumValue((float)duration, UIUpdateMode::None);
-				m_sliderSeek->setValue((float)(player->getCurrentTime()));
+				m_sliderSeek->setValue((float)(player->getCurrentTime()), mode);
 			} else {
 				m_sliderSeek->setMaximumValue(1, UIUpdateMode::None);
-				m_sliderSeek->setValue(0);
+				m_sliderSeek->setValue(0, mode);
 			}
 		}
 	}

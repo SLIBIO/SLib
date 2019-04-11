@@ -184,6 +184,48 @@ namespace slib
 			flip = FlipMode::Horizontal;
 		}
 	}
+	
+	template <class T>
+	SLIB_INLINE void RotatePoint(T& x, T& y, T w, T h, RotationMode rotation)
+	{
+		T sx = x;
+		T sy = y;
+		switch (rotation) {
+			case RotationMode::Rotate90:
+				x = h - sy;
+				y = sx;
+				break;
+			case RotationMode::Rotate180:
+				x = w - sx;
+				y = h - sy;
+				break;
+			case RotationMode::Rotate270:
+				x = sy;
+				y = w - sx;
+				break;
+			default:
+				break;
+		}
+	}
+
+	template <class T>
+	SLIB_INLINE void FlipPoint(T& x, T& y, T w, T h, FlipMode flip)
+	{
+		switch (flip) {
+			case FlipMode::Horizontal:
+				x = w - x;
+				break;
+			case FlipMode::Vertical:
+				y = h - y;
+				break;
+			case FlipMode::Both:
+				x = w - x;
+				y = h - y;
+				break;
+			default:
+				break;
+		}
+	}
 
 	enum class ScaleMode
 	{

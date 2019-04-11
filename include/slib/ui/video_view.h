@@ -69,30 +69,35 @@ namespace slib
 		
 		RotationMode getRotation();
 		
-		void setRotation(const RotationMode& rotation);
+		void setRotation(const RotationMode& rotation, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		
 		FlipMode getFlip();
 		
-		void setFlip(const FlipMode& flip);
+		void setFlip(const FlipMode& flip, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 		
 		ScaleMode getScaleMode();
 		
-		void setScaleMode(ScaleMode scaleMode);
+		void setScaleMode(ScaleMode scaleMode, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		
 		Alignment getGravity();
 		
-		virtual void setGravity(Alignment align);
+		virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		
 		sl_bool isControlsVisible();
 		
-		void setControlsVisible(sl_bool flag);
+		virtual void setControlsVisible(sl_bool flag, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		
 		void updateCurrentFrame(VideoFrame& frame);
+		
+		Sizei getLastFrameSize();
+		
+		// texture coordinate: [0, 0] - left top, [1, 1] - right bottom
+		sl_bool convertCoordinateToTexture(Point& pt);
 		
 	protected:
 		void onDraw(Canvas* canvas) override;
@@ -100,7 +105,7 @@ namespace slib
 	protected:
 		Ref<VertexBuffer> _applyFrameRotationAndFlip(FlipMode frameFlip, RotationMode frameRotation, FlipMode userFlip, RotationMode userRotation);
 		
-		void _updateControls();
+		void _updateControls(UIUpdateMode mode);
 		
 		void _onSeek(Slider* slider, float value);
 				
@@ -124,6 +129,7 @@ namespace slib
 		RotationMode m_rotationFrameApplied;
 		FlipMode m_flipApplied;
 		RotationMode m_rotationApplied;
+		Sizei m_sizeLastFrame;
 
 		MediaPlayerRenderVideoParam m_renderVideoParam;
 		
