@@ -146,6 +146,10 @@ namespace slib
 		
 		Ref<View> getChildAt(const UIPoint& point);
 		
+		Ref<View> getTopmostViewAt(sl_ui_pos x, sl_ui_pos y);
+		
+		Ref<View> getTopmostViewAt(const UIPoint& point);
+		
 		Ref<View> getChildById(const String& _id);
 		
 		Ref<View> getRootView();

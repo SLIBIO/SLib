@@ -901,6 +901,26 @@ namespace slib
 		return getChildAt(point.x, point.y);
 	}
 
+	Ref<View> View::getTopmostViewAt(sl_ui_pos x, sl_ui_pos y)
+	{
+		ListElements< Ref<View> > children(getChildren());
+		for (sl_size i = children.count - 1, ii = 0; ii < children.count; i--, ii++) {
+			Ref<View>& child = children[i];
+			if (child->isVisible() && child->isHitTestable()) {
+				UIPoint pt = child->convertCoordinateFromParent(UIPointf((sl_ui_posf)x, (sl_ui_posf)y));
+				if (child->hitTest(pt)) {
+					return child->getTopmostViewAt(pt.x, pt.y);
+				}
+			}
+		}
+		return this;
+	}
+
+	Ref<View> View::getTopmostViewAt(const UIPoint& point)
+	{
+		return getTopmostViewAt(point.x, point.y);
+	}
+
 	Ref<View> View::getChildById(const String& _id)
 	{
 		if (m_id == _id) {
