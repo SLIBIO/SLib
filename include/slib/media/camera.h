@@ -26,7 +26,9 @@
 #include "definition.h"
 
 #include "video_capture.h"
+
 #include "../graphics/image.h"
+#include "../core/function.h"
 
 namespace slib
 {
@@ -41,6 +43,64 @@ namespace slib
 		CameraInfo();
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(CameraInfo)
+		
+	};
+	
+	enum class CameraFlashMode
+	{
+		Auto = 0,
+		On = 1,
+		Off = 2
+	};
+	
+	enum class CameraFocusMode
+	{
+		Locked = 0,
+		AutoFocus = 1,
+		SmoothAutoFocus = 2
+	};
+	
+	class SLIB_EXPORT CameraTakePictureResult
+	{
+	public:
+		sl_bool flagSuccess;
+		
+		RotationMode rotation;
+		FlipMode flip;
+
+	public:
+		CameraTakePictureResult();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(CameraTakePictureResult)
+		
+	public:
+		Ref<Image> getImage();
+		
+		Ref<Drawable> getDrawable();
+		
+		Memory getJpeg();
+		
+		void setFrame(const VideoCaptureFrame& frame);
+		
+		void setJpeg(const Memory& jpeg);
+		
+	protected:
+		const VideoCaptureFrame* frame;
+		Memory jpeg;
+		
+	};
+	
+	class SLIB_EXPORT CameraTakePictureParam
+	{
+	public:
+		CameraFlashMode flashMode;
+		
+		Function<void(CameraTakePictureResult& frame)> onComplete;
+		
+	public:
+		CameraTakePictureParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(CameraTakePictureParam)
 		
 	};
 	
@@ -80,9 +140,27 @@ namespace slib
 		~Camera();
 		
 	public:
+		virtual void takePicture(const CameraTakePictureParam& param);
+		
+		virtual void setFocusMode(CameraFocusMode mode);
+		
+		virtual void autoFocus();
+		
+		// x, y: 0~1
+		virtual void autoFocusOnPoint(sl_real x, sl_real y);
+		
+		virtual sl_bool isAdjustingFocus();
+		
+	public:
 		static Ref<Camera> create(const CameraParam& param);
 		
 		static List<CameraInfo> getCamerasList();
+		
+	protected:
+		void onCaptureVideoFrame(VideoCaptureFrame& frame) override;
+		
+	protected:
+		Queue<CameraTakePictureParam> m_queueTakePictureRequests;
 		
 	};
 

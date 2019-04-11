@@ -84,7 +84,7 @@ namespace slib
 	protected:
 		void _init(const VideoCaptureParam& param);
 		
-		void _onCaptureVideoFrame(VideoCaptureFrame& frame);
+		virtual void onCaptureVideoFrame(VideoCaptureFrame& frame);
 		
 	};	
 }

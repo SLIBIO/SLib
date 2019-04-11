@@ -32,6 +32,75 @@ namespace slib
 	CameraInfo::CameraInfo()
 	{
 	}
+	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(CameraTakePictureResult)
+	
+	CameraTakePictureResult::CameraTakePictureResult()
+	{
+		flagSuccess = sl_false;
+		
+		rotation = RotationMode::Rotate0;
+		flip = FlipMode::None;
+		
+		frame = sl_null;
+	}
+	
+	Ref<Image> CameraTakePictureResult::getImage()
+	{
+		if (frame) {
+			return Image::create(frame->image);
+		}
+		if (jpeg.isNotNull()) {
+			return Image::loadJPEG(jpeg.getData(), jpeg.getSize());
+		}
+		return sl_null;
+	}
+	
+	Ref<Drawable> CameraTakePictureResult::getDrawable()
+	{
+		if (frame) {
+			return Image::create(frame->image);
+		}
+		if (jpeg.isNotNull()) {
+			return PlatformDrawable::loadFromMemory(jpeg.getData(), jpeg.getSize());
+		}
+		return sl_null;
+	}
+	
+	Memory CameraTakePictureResult::getJpeg()
+	{
+		if (jpeg.isNotNull()) {
+			return jpeg;
+		}
+		if (frame) {
+			Ref<Image> image = Image::create(frame->image);
+			if (image.isNotNull()) {
+				return image->saveJPEG();
+			}
+		}
+		return sl_null;
+	}
+	
+	void CameraTakePictureResult::setFrame(const VideoCaptureFrame& _frame)
+	{
+		frame = &_frame;
+		rotation = frame->rotation;
+		flip = frame->flip;
+	}
+	
+	void CameraTakePictureResult::setJpeg(const Memory& _jpeg)
+	{
+		jpeg = _jpeg;
+	}
+	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(CameraTakePictureParam)
+	
+	CameraTakePictureParam::CameraTakePictureParam()
+	{
+		flashMode = CameraFlashMode::Auto;
+	}
 
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(CameraParam)
@@ -71,6 +140,52 @@ namespace slib
 
 	Camera::~Camera()
 	{
+		CameraTakePictureParam param;
+		while (m_queueTakePictureRequests.pop_NoLock(&param)) {
+			CameraTakePictureResult result;
+			param.onComplete(result);
+		}
+	}
+	
+	void Camera::takePicture(const CameraTakePictureParam& param)
+	{
+		if (!(isRunning()) || m_queueTakePictureRequests.getCount() > 100) {
+			CameraTakePictureResult result;
+			param.onComplete(result);
+			return;
+		}
+		m_queueTakePictureRequests.push(param);
+	}
+	
+	void Camera::setFocusMode(CameraFocusMode mode)
+	{
+	}
+	
+	void Camera::autoFocus()
+	{
+	}
+	
+	void Camera::autoFocusOnPoint(sl_real x, sl_real y)
+	{
+	}
+	
+	sl_bool Camera::isAdjustingFocus()
+	{
+		return sl_false;
+	}
+	
+	void Camera::onCaptureVideoFrame(VideoCaptureFrame& frame)
+	{
+		VideoCapture::onCaptureVideoFrame(frame);
+		if (m_queueTakePictureRequests.isNotEmpty()) {
+			CameraTakePictureParam param;
+			if (m_queueTakePictureRequests.pop(&param)) {
+				CameraTakePictureResult result;
+				result.flagSuccess = sl_true;
+				result.setFrame(frame);
+				param.onComplete(result);
+			}
+		}
 	}
 	
 }

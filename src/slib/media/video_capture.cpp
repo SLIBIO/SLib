@@ -55,7 +55,7 @@ namespace slib
 		setOnCaptureVideoFrame(param.onCaptureVideoFrame);
 	}
 
-	void VideoCapture::_onCaptureVideoFrame(VideoCaptureFrame& frame)
+	void VideoCapture::onCaptureVideoFrame(VideoCaptureFrame& frame)
 	{
 		getOnCaptureVideoFrame()(this, frame);
 	}

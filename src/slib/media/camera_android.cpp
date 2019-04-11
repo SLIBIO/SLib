@@ -200,7 +200,7 @@ namespace slib
 					frame.rotation = RotationMode::Rotate0;
 					break;
 			}
-			_onCaptureVideoFrame(frame);
+			onCaptureVideoFrame(frame);
 		}
 
 	};
