@@ -1,0 +1,34 @@
+<sapp>
+	<layout
+		type='page'
+		background='black'
+		>
+		
+		<camera
+			name='camera'
+			width='fill'
+			height='fill'
+			autoStart='true'
+			device='front'
+			scale='cover'
+			controls='true'
+			touchFocus='true'
+			>
+
+			<button
+				name='btnBack'
+				style='button_back'
+				colorOverlay='white'
+				colorOverlayPressed='blue'
+				alignBottom='true'
+				marginBottom='50dp'
+				centerHorizontal='true'
+				marginRight='50%'
+				width='80dp'
+				height='80dp'
+				/>
+
+		</camera>
+
+ 	</layout>
+</sapp>

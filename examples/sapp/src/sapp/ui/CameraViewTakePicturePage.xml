@@ -3,21 +3,18 @@
 		type='page'
 		background='black'
 		>
+
+		<image
+			name='picture'
+			width='fill'
+			height='fill'
+			scale='contain'
+			/>
 		
 		<button
-			name='btnBack'
 			style='button_back'
 			colorOverlay='white'
 			colorOverlayPressed='blue'
-			/>
-
-		<camera
-			below='btnBack'
-			width='fill'
-			height='fill'
-			autoStart='true'
-			device='front'
-			scale='contain'
 			/>
 
  	</layout>

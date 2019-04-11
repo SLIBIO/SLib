@@ -23,6 +23,7 @@
 #include "MainMenu.h"
 
 #include "ListViewPage.h"
+#include "CameraViewPage.h"
 #include "ControlScreenPage.h"
 #include "QRCodeScannerPage.h"
 
@@ -67,7 +68,7 @@ void MainMenu::onClickVideoView(View* view)
 
 void MainMenu::onClickCameraView(View* view)
 {
-	goToPage(new example::ui::CameraView);
+	goToPage(new CameraViewPage);
 }
 
 void MainMenu::onClickWebView(View* view)

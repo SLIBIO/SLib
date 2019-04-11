@@ -15,6 +15,7 @@
 		264AF19B21B41A77004E58CB /* MainMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF19A21B41A77004E58CB /* MainMenu.cpp */; };
 		264AF1BB21B51167004E58CB /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF1BA21B51167004E58CB /* WebKit.framework */; };
 		264AF1CD21B8F378004E58CB /* LaunchScreen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF1CB21B8F377004E58CB /* LaunchScreen.cpp */; };
+		267B9D6C225E5D7C0057DF2A /* CameraViewPage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D6A225E5D7C0057DF2A /* CameraViewPage.cpp */; };
 		26B92D5F21D4DA48003F6F82 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26B92D5E21D4DA48003F6F82 /* UserNotifications.framework */; };
 		26B92D6421D62565003F6F82 /* ControlScreenPage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D6321D62565003F6F82 /* ControlScreenPage.cpp */; };
 		26BADFCC2219A70F0085B5AB /* layouts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BADFC62219A70F0085B5AB /* layouts.cpp */; };
@@ -51,6 +52,8 @@
 		264AF1BA21B51167004E58CB /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		264AF1CB21B8F377004E58CB /* LaunchScreen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LaunchScreen.cpp; sourceTree = "<group>"; };
 		264AF1CC21B8F378004E58CB /* LaunchScreen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LaunchScreen.h; sourceTree = "<group>"; };
+		267B9D6A225E5D7C0057DF2A /* CameraViewPage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CameraViewPage.cpp; sourceTree = "<group>"; };
+		267B9D6B225E5D7C0057DF2A /* CameraViewPage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraViewPage.h; sourceTree = "<group>"; };
 		26B92D5E21D4DA48003F6F82 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		26B92D6221D62565003F6F82 /* ControlScreenPage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ControlScreenPage.h; sourceTree = "<group>"; };
 		26B92D6321D62565003F6F82 /* ControlScreenPage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ControlScreenPage.cpp; sourceTree = "<group>"; };
@@ -136,6 +139,8 @@
 				26BAE02C2223C2240085B5AB /* ListViewPage.h */,
 				264AF19A21B41A77004E58CB /* MainMenu.cpp */,
 				264AF19921B41A77004E58CB /* MainMenu.h */,
+				267B9D6A225E5D7C0057DF2A /* CameraViewPage.cpp */,
+				267B9D6B225E5D7C0057DF2A /* CameraViewPage.h */,
 				26B92D6321D62565003F6F82 /* ControlScreenPage.cpp */,
 				26B92D6221D62565003F6F82 /* ControlScreenPage.h */,
 				2639191621CC2B58008B335B /* QRCodeScannerPage.cpp */,
@@ -298,6 +303,7 @@
 				26BAE02D2223C2240085B5AB /* ListViewPage.cpp in Sources */,
 				26BADFCF2219A70F0085B5AB /* raws.cpp in Sources */,
 				26BADFCC2219A70F0085B5AB /* layouts.cpp in Sources */,
+				267B9D6C225E5D7C0057DF2A /* CameraViewPage.cpp in Sources */,
 				26BADFD02219A70F0085B5AB /* colors.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
