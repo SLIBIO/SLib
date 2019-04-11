@@ -742,7 +742,7 @@ namespace slib
 		SAppScaleModeValue scale;
 		SAppAlignmentValue gravity;
 		SAppBooleanValue controls;
-		
+
 	};
 
 	class SAppLayoutCameraAttributes : public Referable
@@ -750,7 +750,8 @@ namespace slib
 	public:
 		SAppStringValue device;
 		SAppBooleanValue autoStart;
-		
+		SAppBooleanValue touchFocus;
+
 	};
 	
 	class SAppLayoutDrawerAttributes : public Referable

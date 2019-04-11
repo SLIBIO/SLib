@@ -4116,11 +4116,11 @@ namespace slib
 		LAYOUT_CONTROL_PROCESS_SUPER(View)
 		
 		LAYOUT_CONTROL_GENERIC_ATTR(repeat, setRepeat)
-		LAYOUT_CONTROL_GENERIC_ATTR(rotation, setRotation)
-		LAYOUT_CONTROL_GENERIC_ATTR(flip, setFlip)
-		LAYOUT_CONTROL_GENERIC_ATTR(scale, setScaleMode)
-		LAYOUT_CONTROL_GENERIC_ATTR(gravity, setGravity)
-		LAYOUT_CONTROL_GENERIC_ATTR(controls, setControlsVisible)
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(rotation, setRotation)
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(flip, setFlip)
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(scale, setScaleMode)
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(gravity, setGravity)
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(controls, setControlsVisible)
 
 		if (op == OP_PARSE || op == OP_GENERATE_CPP) {
 			LAYOUT_CONTROL_STRING_ATTR(src, setSource)
@@ -4150,7 +4150,8 @@ namespace slib
 		
 		LAYOUT_CONTROL_STRING_ATTR(device, setDeviceId)
 		LAYOUT_CONTROL_GENERIC_ATTR(autoStart, setAutoStart)
-		
+		LAYOUT_CONTROL_GENERIC_ATTR(touchFocus, setTouchFocusEnabled)
+
 		LAYOUT_CONTROL_ADD_STATEMENT
 	}
 	END_PROCESS_LAYOUT_CONTROL

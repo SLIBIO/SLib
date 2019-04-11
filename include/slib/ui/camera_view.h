@@ -26,6 +26,7 @@
 #include "definition.h"
 
 #include "video_view.h"
+#include "button.h"
 
 #include "../media/camera.h"
 
@@ -56,19 +57,58 @@ namespace slib
 		
 		void setDeviceId(const String& deviceId);
 		
+		Ref<Camera> getCamera();
+		
+		
+		void setControlsVisible(sl_bool flagVisible, UIUpdateMode mode) override;
+		
+		Ref<Button> getShutterButton();
+		
+		Ref<Button> getSwitchCameraButton();
+
+		Ref<Button> getChangeFlashModeButton();
+		
+		
+		CameraFlashMode getFlashMode();
+		
+		void setFlashMode(CameraFlashMode flashMode, UIUpdateMode updateMode = UIUpdateMode::Redraw);
+		
+		sl_bool isTouchFocusEnabled();
+		
+		void setTouchFocusEnabled(sl_bool flag);
+
 	public:
 		SLIB_DECLARE_EVENT_HANDLER(CameraView, Capture, VideoCaptureFrame& frame)
+
+		SLIB_DECLARE_EVENT_HANDLER(CameraView, TakePicture, CameraTakePictureResult& result)
 
 	protected:
 		void onAttach() override;
 		
+		void onDraw(Canvas* canvas) override;
+		
+		void onClickEvent(UIEvent* ev) override;
+		
+		void onClickShutter();
+		
 	private:
 		void _onCaptureCameraFrame(VideoCapture* capture, VideoCaptureFrame& frame);
+		
+		void _onTakePicture(CameraTakePictureResult& result);
 
 	protected:
-		AtomicRef<Camera> m_camera;
+		Ref<Camera> m_camera;
 		sl_bool m_flagAutoStart;
-		AtomicString m_deviceId;
+		String m_deviceId;
+		
+		CameraFlashMode m_flashMode;
+		
+		Ref<View> m_controls;
+		
+		sl_bool m_flagTouchFocus;
+		sl_bool m_flagDuringTouchFocusEffect;
+		Time m_timeTouchFocusBegan;
+		UIPoint m_pointTouchFocus;
 		
 	};
 
