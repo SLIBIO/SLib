@@ -48,6 +48,7 @@ namespace slib
 		SLIB_JNI_METHOD(start, "start", "()V");
 		SLIB_JNI_METHOD(stop, "stop", "()V");
 		SLIB_JNI_METHOD(isRunning, "isRunning", "()Z");
+		SLIB_JNI_METHOD(takePicture, "takePicture", "(I)V");
 
 	SLIB_JNI_END_CLASS
 
@@ -113,7 +114,7 @@ namespace slib
 			return camera;
 		}
 
-		void release()
+		void release() override
 		{
 			ObjectLocker lock(this);
 
@@ -131,12 +132,12 @@ namespace slib
 			}
 		}
 
-		sl_bool isOpened()
+		sl_bool isOpened() override
 		{
 			return m_camera.isNotNull();
 		}
 
-		void start()
+		void start() override
 		{
 			jobject jcamera = m_camera.get();
 			if (jcamera) {
@@ -144,7 +145,7 @@ namespace slib
 			}
 		}
 
-		void stop()
+		void stop() override
 		{
 			jobject jcamera = m_camera.get();
 			if (jcamera) {
@@ -152,7 +153,7 @@ namespace slib
 			}
 		}
 
-		sl_bool isRunning()
+		sl_bool isRunning() override
 		{
 			jobject jcamera = m_camera.get();
 			if (jcamera) {
@@ -161,8 +162,36 @@ namespace slib
 			return sl_false;
 		}
 
+		static RotationMode _getRotation(jint rotation)
+		{
+			switch (rotation) {
+				case 90:
+					return RotationMode::Rotate90;
+				case 180:
+					return RotationMode::Rotate180;
+				case 270:
+					return RotationMode::Rotate270;
+				default:
+					return RotationMode::Rotate0;
+			}
+		}
+
+		static FlipMode _getFlip(jint flip)
+		{
+			switch (flip) {
+				case 1:
+					return FlipMode::Horizontal;
+				case 2:
+					return FlipMode::Vertical;
+				case 3:
+					return FlipMode::Both;
+				default:
+					return FlipMode::None;
+			}
+		}
+
 		Memory m_memFrame;
-		void _onFrame(jbyteArray jdata, jint width, jint height, jint orientation) {
+		void _onFrame(jbyteArray jdata, jint width, jint height, jint orientation, jint flip) {
 			if (width & 1) {
 				return;
 			}
@@ -186,32 +215,65 @@ namespace slib
 			frame.image.data = mem.getData();
 			frame.image.pitch = 0;
 			frame.image.ref = mem.ref;
-			switch (orientation) {
-				case 90:
-					frame.rotation = RotationMode::Rotate90;
-					break;
-				case 180:
-					frame.rotation = RotationMode::Rotate180;
-					break;
-				case 270:
-					frame.rotation = RotationMode::Rotate270;
-					break;
-				default:
-					frame.rotation = RotationMode::Rotate0;
-					break;
-			}
+			frame.rotation = _getRotation(orientation);
+			frame.flip = _getFlip(flip);
 			onCaptureVideoFrame(frame);
+		}
+
+		void takePicture(const CameraTakePictureParam& param) override
+		{
+			ObjectLocker lock(this);
+			jobject jcamera = m_camera.get();
+			if (!jcamera || !isRunning()) {
+				CameraTakePictureResult result;
+				param.onComplete(result);
+				return;
+			}			
+			m_queueTakePictureRequests.push(param);
+			JAndroidCamera::takePicture.call(jcamera, (int)(param.flashMode));
+		}
+
+		void _onPicture(jbyteArray jdata, jint orientation, jint flip) {
+			CameraTakePictureParam param;
+			if (m_queueTakePictureRequests.pop(&param)) {
+				CameraTakePictureResult result;
+				if (jdata) {
+					sl_uint32 size = Jni::getArrayLength(jdata);
+					Memory mem = Memory::create(size);
+					if (mem.isNotNull()) {
+						Jni::getByteArrayRegion(jdata, 0, size, (jbyte*)(mem.getData()));
+						result.flagSuccess = sl_true;
+						result.setJpeg(mem);
+						result.rotation = _getRotation(orientation);
+						result.flip = _getFlip(flip);
+					}
+				}
+				param.onComplete(result);
+			}
+		}
+
+		void onCaptureVideoFrame(VideoCaptureFrame& frame) override
+		{
+			VideoCapture::onCaptureVideoFrame(frame);
 		}
 
 	};
 
 
 	SLIB_JNI_BEGIN_CLASS_SECTION(JAndroidCamera)
-		SLIB_JNI_NATIVE_IMPL(nativeOnFrame, "nativeOnFrame", "(J[BIII)V", void, jlong instance, jbyteArray data, jint width, jint height, jint orientation)
+		SLIB_JNI_NATIVE_IMPL(nativeOnFrame, "nativeOnFrame", "(J[BIIII)V", void, jlong instance, jbyteArray data, jint width, jint height, jint orientation, jint flip)
 		{
 			Ref<_priv_Android_Camera> camera = _priv_Android_Camera::get(instance);
 			if (camera.isNotNull()) {
-				camera->_onFrame(data, width, height, orientation);
+				camera->_onFrame(data, width, height, orientation, flip);
+			}
+		}
+
+		SLIB_JNI_NATIVE_IMPL(nativeOnPicture, "nativeOnPicture", "(J[BII)V", void, jlong instance, jbyteArray data, jint orientation, jint flip)
+		{
+			Ref<_priv_Android_Camera> camera = _priv_Android_Camera::get(instance);
+			if (camera.isNotNull()) {
+				camera->_onPicture(data, orientation, flip);
 			}
 		}
 	SLIB_JNI_END_CLASS_SECTION

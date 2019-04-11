@@ -38,7 +38,7 @@ import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
 import slib.platform.android.helper.Permissions;
 
-public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
+public class SCamera implements Camera.PreviewCallback, Camera.PictureCallback, Camera.ErrorCallback {
 
 	private final static Object sync = new Object();
 	private static Vector<SCamera> cameraObjectList = new Vector<SCamera>();
@@ -383,7 +383,7 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 		return flagRunning;
 	}
 	
-	private native void nativeOnFrame(long nativeObject, byte[] data, int width, int height, int orientation);
+	private native void nativeOnFrame(long nativeObject, byte[] data, int width, int height, int orientation, int flip);
 	public void onPreviewFrame(byte[] data, Camera camera) {
 		timeLastFrame = System.currentTimeMillis();
 		if (camera == null) {
@@ -391,10 +391,61 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 		}
 		if (flagRunning) {
 			Size size = camera.getParameters().getPreviewSize();
-			int orientation = calculateDisplayOrientation();
-			nativeOnFrame(nativeObject, data, size.width, size.height, orientation);
+			int flip;
+			int orientation = (info.cameraInfo.orientation - getDisplayOrientation() + 360) % 360;
+			if (info.cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+				flip = 1; // Horizontal
+				orientation = (orientation + 180) % 360;
+			} else {
+				flip = 0;
+			}
+			nativeOnFrame(nativeObject, data, size.width, size.height, orientation, flip);
 		}
 		camera.addCallbackBuffer(data);
+	}
+
+	public void takePicture(int flashMode) {
+		if (info.cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+			try {
+				Camera.Parameters params = camera.getParameters();
+				switch (flashMode) {
+					case 1:
+						params.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
+						break;
+					case 2:
+						params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+						break;
+					default:
+						params.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
+						break;
+				}
+				camera.setParameters(params);
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
+		try {
+			camera.takePicture(null, null, null, this);
+		} catch (Exception e) {
+			nativeOnPicture(nativeObject, null, 0, 0);
+			Logger.exception(e);
+		}
+	}
+
+	private native void nativeOnPicture(long nativeObject, byte[] data, int orientation, int flip);
+	@Override
+	public void onPictureTaken(byte[] data, Camera camera) {
+		int flip;
+		int orientation;
+		if (info.cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+			flip = 1; // Horizontal
+			orientation = (info.cameraInfo.orientation + getDisplayOrientation()) % 360;
+		} else {
+			flip = 0;
+			orientation = (info.cameraInfo.orientation - getDisplayOrientation() + 360) % 360;
+		}
+		nativeOnPicture(nativeObject, data, orientation, flip);
+		camera.startPreview();
 	}
 
 	@Override
@@ -415,29 +466,19 @@ public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 		}
 	}
 
-	private int calculateDisplayOrientation() {
-		int orientation = info.cameraInfo.orientation;
+	private int getDisplayOrientation() {
 		int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-		int degrees = 0;
 		switch (rotation) {
 			case Surface.ROTATION_0:
-				degrees = 0;
-				break;
+				return 0;
 			case Surface.ROTATION_90:
-				degrees = 90;
-				break;
+				return 90;
 			case Surface.ROTATION_180:
-				degrees = 180;
-				break;
+				return 180;
 			case Surface.ROTATION_270:
-				degrees = 270;
-				break;
+				return 270;
 		}
-		if (info.cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-			return (orientation + degrees) % 360;
-		} else {
-			return (orientation - degrees + 360) % 360;
-		}
+		return 0;
 	}
 
 	private void log(String s) {
