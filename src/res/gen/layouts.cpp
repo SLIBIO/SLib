@@ -7,4 +7,5 @@
 
 #include <slib/ui.h>
 
+#include "ui/CameraControlView.cpp.inc"
 #include "ui/MobileAlertDialog.cpp.inc"

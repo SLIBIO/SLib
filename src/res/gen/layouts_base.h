@@ -7,6 +7,7 @@ namespace slib
 {
 	namespace ui
 	{
+		class CameraControlView;
 		class MobileAlertDialog;
 	}
 }

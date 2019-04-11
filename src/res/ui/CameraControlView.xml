@@ -1,0 +1,41 @@
+<sapp>
+	<layout
+		type='view'
+		width='100%'
+		height='100%'
+		>
+
+		<button
+			name='btnShutter'
+			width='100dp'
+			height='100dp'
+			boundShape='ellipse'
+			clipping='true'
+			background='#e0e0e0'
+			alignBottom='true'
+			marginBottom='40dp'
+			centerHorizontal='true'
+			/>
+
+		<button
+			name='btnSwitch'
+			width='40dp'
+			height='40dp'
+			icon='@drawable/camera_view_control_switch'
+			alignRight='true'
+			marginRight='30dp'
+			marginTop='30dp'
+			/>
+
+		<button
+			name='btnFlash'
+			width='40dp'
+			height='40dp'
+			icon='@drawable/camera_view_control_flash_auto'
+			marginLeft='30dp'
+			marginTop='30dp'
+			/>
+
+	</layout>
+
+</sapp>
