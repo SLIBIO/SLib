@@ -101,8 +101,6 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 	public UiGLView(Context context) {
 		super(context);
 
-		setZOrderOnTop(true);
-		
 		setEGLContextClientVersion(2);
 		setEGLConfigChooser(new ConfigChooser(true, false));
 		
