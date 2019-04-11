@@ -122,12 +122,16 @@ namespace slib
 
 	void RenderView::invalidate(UIUpdateMode mode)
 	{
-		requestRender();
+		if (SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
+			requestRender();
+		}
 	}
 
 	void RenderView::invalidate(const UIRect& rect, UIUpdateMode mode)
 	{
-		requestRender();
+		if (SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
+			requestRender();
+		}
 	}
 
 	void RenderView::renderViewContent(RenderEngine* engine)
