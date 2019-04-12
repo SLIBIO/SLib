@@ -49,6 +49,9 @@ namespace slib
 		SLIB_JNI_METHOD(stop, "stop", "()V");
 		SLIB_JNI_METHOD(isRunning, "isRunning", "()Z");
 		SLIB_JNI_METHOD(takePicture, "takePicture", "(I)V");
+		SLIB_JNI_METHOD(setFocusMode, "setFocusMode", "(I)V");
+		SLIB_JNI_METHOD(autoFocus, "autoFocus", "()V");
+		SLIB_JNI_METHOD(autoFocusOnPoint, "autoFocusOnPoint", "(FF)V");
 
 	SLIB_JNI_END_CLASS
 
@@ -139,6 +142,7 @@ namespace slib
 
 		void start() override
 		{
+			ObjectLocker lock(this);
 			jobject jcamera = m_camera.get();
 			if (jcamera) {
 				JAndroidCamera::start.call(jcamera);
@@ -147,6 +151,7 @@ namespace slib
 
 		void stop() override
 		{
+			ObjectLocker lock(this);
 			jobject jcamera = m_camera.get();
 			if (jcamera) {
 				JAndroidCamera::stop.call(jcamera);
@@ -155,6 +160,7 @@ namespace slib
 
 		sl_bool isRunning() override
 		{
+			ObjectLocker lock(this);
 			jobject jcamera = m_camera.get();
 			if (jcamera) {
 				return JAndroidCamera::isRunning.callBoolean(jcamera) != 0;
@@ -230,7 +236,7 @@ namespace slib
 				return;
 			}			
 			m_queueTakePictureRequests.push(param);
-			JAndroidCamera::takePicture.call(jcamera, (int)(param.flashMode));
+			JAndroidCamera::takePicture.call(jcamera, (jint)((int)(param.flashMode)));
 		}
 
 		void _onPicture(jbyteArray jdata, jint orientation, jint flip) {
@@ -255,6 +261,33 @@ namespace slib
 		void onCaptureVideoFrame(VideoCaptureFrame& frame) override
 		{
 			VideoCapture::onCaptureVideoFrame(frame);
+		}
+
+		void setFocusMode(CameraFocusMode mode) override
+		{
+			ObjectLocker lock(this);
+			jobject jcamera = m_camera.get();
+			if (jcamera) {
+				JAndroidCamera::setFocusMode.call(jcamera, (jint)((int)mode));
+			}
+		}
+
+		void autoFocus() override
+		{
+			ObjectLocker lock(this);
+			jobject jcamera = m_camera.get();
+			if (jcamera) {
+				JAndroidCamera::autoFocus.call(jcamera);
+			}
+		}
+
+		void autoFocusOnPoint(sl_real x, sl_real y) override
+		{
+			ObjectLocker lock(this);
+			jobject jcamera = m_camera.get();
+			if (jcamera) {
+				JAndroidCamera::autoFocusOnPoint.call(jcamera, (jfloat)x, (jfloat)y);
+			}
 		}
 
 	};

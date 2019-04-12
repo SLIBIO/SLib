@@ -55,9 +55,9 @@ namespace slib
 	
 	enum class CameraFocusMode
 	{
-		Locked = 0,
-		AutoFocus = 1,
-		SmoothAutoFocus = 2
+		None = 0,
+		ContinuousAutoFocus = 1,
+		SmoothContinuousAutoFocus = 2
 	};
 	
 	class SLIB_EXPORT CameraTakePictureResult

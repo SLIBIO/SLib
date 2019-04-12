@@ -22,6 +22,7 @@
 
 package slib.platform.android.camera;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -29,6 +30,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
@@ -446,6 +448,97 @@ public class SCamera implements Camera.PreviewCallback, Camera.PictureCallback, 
 		}
 		nativeOnPicture(nativeObject, data, orientation, flip);
 		camera.startPreview();
+	}
+
+	public void setFocusMode(int mode) {
+		try {
+			Camera.Parameters params = camera.getParameters();
+			switch (mode) {
+				case 1: // ContinuousAutoFocus
+					params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+					break;
+				case 2: // SmoothContinuousAutoFocus
+					params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+					break;
+				default:
+					params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+					break;
+			}
+			camera.setParameters(params);
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	public void autoFocus() {
+		try {
+			camera.cancelAutoFocus();
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		try {
+			Camera.Parameters params = camera.getParameters();
+			params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+			camera.setParameters(params);
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		try {
+			camera.autoFocus(new Camera.AutoFocusCallback() {
+				@Override
+				public void onAutoFocus(boolean success, Camera camera) {
+				}
+			});
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	static int clampFocusArea(int x) {
+		if (x < -1000) {
+			return -1000;
+		}
+		if (x > 1000) {
+			return 1000;
+		}
+		return x;
+	}
+
+	public void autoFocusOnPoint(float x, float y) {
+		try {
+			camera.cancelAutoFocus();
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		try {
+			Camera.Parameters params = camera.getParameters();
+			ArrayList<Camera.Area> areas = new ArrayList<Camera.Area>();
+			int cx = clampFocusArea((int)(x * 2000) - 1000);
+			int cy = clampFocusArea((int)(y * 2000) - 1000);
+			int w = 100;
+			Rect rect = new Rect();
+			rect.left = clampFocusArea(cx - w);
+			rect.top = clampFocusArea(cy - w);
+			rect.right = clampFocusArea(cx + w);
+			rect.bottom = clampFocusArea(cy + w);
+			Camera.Area area = new Camera.Area(rect, 200);
+			areas.add(area);
+			params.setFocusAreas(areas);
+			params.setMeteringAreas(areas);
+			params.setFocusMode(Camera.Parameters.FOCUS_MODE_MACRO);
+			camera.setParameters(params);
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		try {
+			camera.autoFocus(new Camera.AutoFocusCallback() {
+				@Override
+				public void onAutoFocus(boolean success, Camera camera) {
+				}
+			});
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
 	}
 
 	@Override

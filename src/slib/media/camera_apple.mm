@@ -128,7 +128,13 @@ namespace slib
 				logError("Camera is not found: " + param.deviceId);
 				return ret;
 			}
-			
+#if defined(SLIB_PLATFORM_IS_IOS)
+			if ([device lockForConfiguration:nil]) {
+				if ([device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
+					[device setFocusMode:AVCaptureFocusModeContinuousAutoFocus];
+				}
+			}
+#endif
 			NSError* error;
 			AVCaptureDeviceInput* input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
 			if (input == nil) {
@@ -191,7 +197,6 @@ namespace slib
 #endif
 				
 				ret->_init(param);
-				ret->setFocusMode(CameraFocusMode::SmoothAutoFocus);
 				
 				if (param.flagAutoStart) {
 					ret->start();
@@ -462,7 +467,7 @@ namespace slib
 			}
 			if ([device lockForConfiguration:nil]) {
 				switch (mode) {
-					case CameraFocusMode::AutoFocus:
+					case CameraFocusMode::ContinuousAutoFocus:
 						if ([device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
 							[device setFocusMode:AVCaptureFocusModeContinuousAutoFocus];
 #if defined(SLIB_PLATFORM_IS_IOS)
@@ -472,7 +477,7 @@ namespace slib
 #endif
 						}
 						break;
-					case CameraFocusMode::SmoothAutoFocus:
+					case CameraFocusMode::SmoothContinuousAutoFocus:
 						if ([device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
 							[device setFocusMode:AVCaptureFocusModeContinuousAutoFocus];
 #if defined(SLIB_PLATFORM_IS_IOS)
