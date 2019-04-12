@@ -4238,7 +4238,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 260D88E220C912440013B34E /* Build configuration list for PBXNativeTarget "vpx" */;
 			buildPhases = (
-				260504ED20CF789C00032B2C /* ShellScript */,
 				260D88B320C912440013B34E /* Sources */,
 				260D88E020C912440013B34E /* Frameworks */,
 				260D88E120C912440013B34E /* CopyFiles */,
@@ -4386,22 +4385,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		260504ED20CF789C00032B2C /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd \"${PROJECT_DIR}/../../build/macOS\"\nif ! [ -e \"${PROJECT_DIR}/../../bin/macOS/yasm\" ]\nthen\n    ${DEVELOPER_BIN_DIR}/xcodebuild -project SLib.xcodeproj -scheme yasm -configuration Release -derivedDataPath \"${DERIVED_FILE_DIR}/yasm\"\nfi\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		260D88B320C912440013B34E /* Sources */ = {
