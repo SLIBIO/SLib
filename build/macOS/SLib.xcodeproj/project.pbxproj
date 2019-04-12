@@ -1219,7 +1219,7 @@
 			outputFiles = (
 				"$(DERIVED_FILE_DIR)/${INPUT_FILE_NAME}.o",
 			);
-			script = "\"${PROJECT_DIR}/../../bin/macOS/yasm\" -Xvc -fmacho64 -I\"${PROJECT_DIR}/../../external/src/libvpx\" -I\"${PROJECT_DIR}/../../external/src/libvpx/gen/asm/${arch}\" -o \"${DERIVED_FILE_DIR}/${INPUT_FILE_NAME}.o\" \"${INPUT_FILE_PATH}\"";
+			script = "\"${PROJECT_DIR}/../../bin/macOS/yasm\" -Xvc -fmacho64 -I\"${PROJECT_DIR}/../../external/src/libvpx\" -I\"${PROJECT_DIR}/../../external/src/libvpx/gen/asm/${arch}\" -o \"${DERIVED_FILE_DIR}/${INPUT_FILE_NAME}.o\" \"${INPUT_FILE_PATH}\"\n";
 		};
 /* End PBXBuildRule section */
 
@@ -6593,7 +6593,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../include";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-lslib";
@@ -6617,7 +6617,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../include";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-lslib";
 				PRODUCT_NAME = "$(TARGET_NAME)";

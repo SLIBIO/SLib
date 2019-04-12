@@ -112,9 +112,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2605036220CEC39100032B2C"
-               BuildableName = "yasm"
-               BlueprintName = "yasm"
+               BlueprintIdentifier = "264AF12021B0590C004E58CB"
+               BuildableName = "libsapp.a"
+               BlueprintName = "libsapp"
                ReferencedContainer = "container:SLib.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -126,9 +126,23 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "264AF12021B0590C004E58CB"
-               BuildableName = "libsapp.a"
-               BlueprintName = "libsapp"
+               BlueprintIdentifier = "260D8CCA20CBDC7C0013B34E"
+               BuildableName = "libyasm.a"
+               BlueprintName = "libyasm"
+               ReferencedContainer = "container:SLib.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "2605036220CEC39100032B2C"
+               BuildableName = "yasm"
+               BlueprintName = "yasm"
                ReferencedContainer = "container:SLib.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
