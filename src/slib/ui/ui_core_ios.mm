@@ -156,9 +156,9 @@ namespace slib
 	
 	UIEdgeInsets UI::getSafeAreaInsets()
 	{
-		UIWindow* window = UIPlatform::getMainWindow();
-		if (window != nil) {
-			if (@available(iOS 11.0, *)) {
+		if (@available(iOS 12.0, *)) {
+			UIWindow* window = UIPlatform::getMainWindow();
+			if (window != nil && !(window.isHidden)) {
 				::UIEdgeInsets insets = window.safeAreaInsets;
 				UIEdgeInsets ret;
 				ret.left = (sl_ui_len)(insets.left * UIPlatform::getGlobalScaleFactor());

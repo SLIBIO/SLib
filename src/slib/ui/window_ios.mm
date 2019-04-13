@@ -891,6 +891,12 @@ CGRect _g_slib_ui_keyboard_scrollview_original_frame;
 												  object:nil];
 }
 
+- (void)viewSafeAreaInsetsDidChange
+{
+	[super viewSafeAreaInsetsDidChange];
+	slib::UIResource::updateDefaultScreenSize();
+}
+
 @end
 
 
