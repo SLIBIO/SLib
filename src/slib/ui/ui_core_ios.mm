@@ -156,7 +156,7 @@ namespace slib
 	
 	UIEdgeInsets UI::getSafeAreaInsets()
 	{
-		UIWindow* window = UIPlatform::getKeyWindow();
+		UIWindow* window = UIPlatform::getMainWindow();
 		if (window != nil) {
 			if (@available(iOS 11.0, *)) {
 				::UIEdgeInsets insets = window.safeAreaInsets;

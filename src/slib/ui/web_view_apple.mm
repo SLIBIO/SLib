@@ -304,9 +304,8 @@ namespace slib
 	[alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
 		completionHandler();
 	}]];
-	UIWindow* window = slib::UIPlatform::getKeyWindow();
-	if (window != nil) {
-		UIViewController* rootController = [window rootViewController];
+	UIViewController* rootController = slib::UIPlatform::getCurrentViewController();
+	if (rootController != nil) {
 		[rootController presentViewController:alertController animated:YES completion:nil];
 	}
 #else
@@ -328,9 +327,8 @@ namespace slib
 	[alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *) {
 		completionHandler(NO);
 	 }]];
-	UIWindow* window = slib::UIPlatform::getKeyWindow();
-	if (window != nil) {
-		UIViewController* rootController = [window rootViewController];
+	UIViewController* rootController = slib::UIPlatform::getCurrentViewController();
+	if (rootController != nil) {
 		[rootController presentViewController:alertController animated:YES completion:nil];
 	}
 #else
@@ -363,9 +361,8 @@ namespace slib
 	[alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
 		completionHandler(nil);
 	}]];
-	UIWindow* window = slib::UIPlatform::getKeyWindow();
-	if (window != nil) {
-		UIViewController* rootController = [window rootViewController];
+	UIViewController* rootController = slib::UIPlatform::getCurrentViewController();
+	if (rootController != nil) {
 		[rootController presentViewController:alertController animated:YES completion:nil];
 	}
 #else

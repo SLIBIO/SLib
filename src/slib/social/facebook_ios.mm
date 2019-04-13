@@ -122,7 +122,12 @@ namespace slib
 			}
 		}
 		Function<void(FacebookLoginResult&)> onComplete = param.onComplete;
-		UIViewController* controller = UIPlatform::getKeyWindow().rootViewController;
+		UIViewController* controller = UIPlatform::getCurrentViewController();
+		if (controller == nil) {
+			FacebookLoginResult result;
+			param.onComplete(result);
+			return;
+		}
 		auto func = ^(FBSDKLoginManagerLoginResult *result, NSError *error) {
 			FacebookLoginResult login;
 			if (error != nil) {

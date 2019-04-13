@@ -40,11 +40,11 @@ namespace slib
 
 	SLIB_JNI_BEGIN_CLASS(JAndroidCamera, "slib/platform/android/camera/SCamera")
 
-		SLIB_JNI_STATIC_METHOD(getCamerasList, "getCamerasList", "()[Lslib/platform/android/camera/SCameraInfo;");
+		SLIB_JNI_STATIC_METHOD(getCamerasList, "getCamerasList", "(Landroid/app/Activity;)[Lslib/platform/android/camera/SCameraInfo;");
 		SLIB_JNI_STATIC_METHOD(create, "create", "(Landroid/app/Activity;Ljava/lang/String;J)Lslib/platform/android/camera/SCamera;");
 
-		SLIB_JNI_METHOD(setSettings, "setSettings", "(II)V");
 		SLIB_JNI_METHOD(release, "release", "()V");
+		SLIB_JNI_METHOD(setSettings, "setSettings", "(II)V");
 		SLIB_JNI_METHOD(start, "start", "()V");
 		SLIB_JNI_METHOD(stop, "stop", "()V");
 		SLIB_JNI_METHOD(isRunning, "isRunning", "()Z");
@@ -198,12 +198,6 @@ namespace slib
 
 		Memory m_memFrame;
 		void _onFrame(jbyteArray jdata, jint width, jint height, jint orientation, jint flip) {
-			if (width & 1) {
-				return;
-			}
-			if (height & 1) {
-				return;
-			}
 			sl_uint32 size = Jni::getArrayLength(jdata);
 			Memory mem = m_memFrame;
 			if (mem.isNull()) {
@@ -221,6 +215,26 @@ namespace slib
 			frame.image.data = mem.getData();
 			frame.image.pitch = 0;
 			frame.image.ref = mem.ref;
+			frame.rotation = _getRotation(orientation);
+			frame.flip = _getFlip(flip);
+			onCaptureVideoFrame(frame);
+		}
+
+		void _onFrame2(jobject Y, jint nY, jobject U, jint nU, jobject V, jint nV, jint width, jint height, jint orientation, jint flip) {
+			JNIEnv* env = Jni::getCurrent();
+			if (!env) {
+				return;
+			}
+			VideoCaptureFrame frame;
+			frame.image.width = (sl_uint32)(width);
+			frame.image.height = (sl_uint32)(height);
+			frame.image.format = BitmapFormat::YUV_I420;
+			frame.image.data = env->GetDirectBufferAddress(Y);
+			frame.image.pitch = nY;
+			frame.image.data1 = env->GetDirectBufferAddress(U);
+			frame.image.pitch1 = nU;
+			frame.image.data2 = env->GetDirectBufferAddress(V);
+			frame.image.pitch2 = nV;
 			frame.rotation = _getRotation(orientation);
 			frame.flip = _getFlip(flip);
 			onCaptureVideoFrame(frame);
@@ -302,6 +316,14 @@ namespace slib
 			}
 		}
 
+		SLIB_JNI_NATIVE_IMPL(nativeOnFrame2, "nativeOnFrame2", "(JLjava/nio/ByteBuffer;ILjava/nio/ByteBuffer;ILjava/nio/ByteBuffer;IIIII)V", void, jlong instance, jobject Y, jint nY, jobject U, jint nU, jobject V, jint nV, jint width, jint height, jint orientation, jint flip)
+		{
+			Ref<_priv_Android_Camera> camera = _priv_Android_Camera::get(instance);
+			if (camera.isNotNull()) {
+				camera->_onFrame2(Y, nY, U, nU, V, nV, width, height, orientation, flip);
+			}
+		}
+
 		SLIB_JNI_NATIVE_IMPL(nativeOnPicture, "nativeOnPicture", "(J[BII)V", void, jlong instance, jbyteArray data, jint orientation, jint flip)
 		{
 			Ref<_priv_Android_Camera> camera = _priv_Android_Camera::get(instance);
@@ -309,6 +331,7 @@ namespace slib
 				camera->_onPicture(data, orientation, flip);
 			}
 		}
+		
 	SLIB_JNI_END_CLASS_SECTION
 
 	Ref<Camera> Camera::create(const CameraParam& param)
@@ -318,8 +341,12 @@ namespace slib
 
 	List<CameraInfo> Camera::getCamerasList()
 	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (!jactivity) {
+			return sl_null;
+		}
 		List<CameraInfo> ret;
-		JniLocal<jobjectArray> arr = (jobjectArray)(JAndroidCamera::getCamerasList.callObject(sl_null));
+		JniLocal<jobjectArray> arr = (jobjectArray)(JAndroidCamera::getCamerasList.callObject(sl_null, jactivity));
 		sl_uint32 len = Jni::getArrayLength(arr);
 		for (sl_uint32 i = 0; i < len; i++) {
 			JniLocal<jobject> jinfo = Jni::getObjectArrayElement(arr, i);
