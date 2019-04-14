@@ -1,3 +1,2 @@
-$(dirname $0)/../macOS/build-release.sh
-THIS_PATH=$(dirname $0)
-xcodebuild -project "${THIS_PATH}/SLib.xcodeproj" -scheme SLib -configuration Release -derivedDataPath "${THIS_PATH}/build"
+$(dirname $0)//build-device-release.sh
+$(dirname $0)//build-simulator-release.sh
