@@ -2069,6 +2069,13 @@ namespace slib
 				}
 				LAYOUT_CONTROL_COLOR_ATTR(borderColor, setBorderColor)
 				LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(borderStyle, setBorderStyle)
+				if (!(attr->borderWidth.flagDefined)) {
+					if (attr->borderColor.flagDefined || attr->borderStyle.flagDefined) {
+						attr->borderWidth.flagDefined = sl_true;
+						attr->borderWidth.amount = 1;
+						attr->borderWidth.unit = SAppDimensionValue::PX;
+					}
+				}
 			} else if (op == OP_GENERATE_CPP){
 				if (attr->borderWidth.flagDefined) {
 					if (Math::isAlmostZero(attr->borderWidth.amount)) {
@@ -2548,6 +2555,14 @@ namespace slib
 					BUTTON_STATE_GET_VALUE(borderWidth, this)
 					BUTTON_STATE_GET_VALUE(borderColor)
 					BUTTON_STATE_GET_VALUE(colorOverlay)
+					
+					if (!(category.borderWidth[k].flagDefined)) {
+						if (category.borderColor[k].flagDefined || category.borderStyle[k].flagDefined) {
+							category.borderWidth[k].flagDefined = sl_true;
+							category.borderWidth[k].amount = 1;
+							category.borderWidth[k].unit = SAppDimensionValue::PX;
+						}
+					}
 
 				} else if (op == OP_GENERATE_CPP) {
 					if (category.textColor[k].flagDefined) {
