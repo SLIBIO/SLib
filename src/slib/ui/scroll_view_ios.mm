@@ -259,6 +259,9 @@ namespace slib
 {
 	self = [super initWithFrame:frame];
 	if (self != nil) {
+		if (@available(iOS 11.0, *)) {
+			self.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+		}
 		[self setDelegate:self];
 	}
 	return self;
