@@ -197,9 +197,16 @@ namespace slib
 		}
 
 		Memory m_memFrame;
-		void _onFrame(jbyteArray jdata, jint width, jint height, jint orientation, jint flip) {
+
+		void _onFrame(jbyteArray jdata, jint width, jint height, jint orientation, jint flip)
+		{
 			sl_uint32 size = Jni::getArrayLength(jdata);
 			Memory mem = m_memFrame;
+			if (mem.isNotNull()) {
+				if (mem.getSize() != size) {
+					mem.setNull();
+				}
+			}
 			if (mem.isNull()) {
 				mem = Memory::create(size);
 				if (mem.isNull()) {
@@ -220,23 +227,74 @@ namespace slib
 			onCaptureVideoFrame(frame);
 		}
 
-		void _onFrame2(jobject Y, jint nY, jobject U, jint nU, jobject V, jint nV, jint width, jint height, jint orientation, jint flip) {
+		void _onFrame2(jint width, jint height, jobject Y, jobject U, jobject V, int rowStrideY, int rowStrideUV, int pixelStrideUV, jint orientation, jint flip)
+		{
 			JNIEnv* env = Jni::getCurrent();
 			if (!env) {
 				return;
 			}
+
+			sl_uint8* pY = (sl_uint8*)(env->GetDirectBufferAddress(Y));
+			sl_uint8* pU = (sl_uint8*)(env->GetDirectBufferAddress(U));
+			sl_uint8* pV = (sl_uint8*)(env->GetDirectBufferAddress(V));
+			sl_uint32 nY = (sl_uint32)(env->GetDirectBufferCapacity(Y));
+			sl_uint32 nU = (sl_uint32)(env->GetDirectBufferCapacity(U));
+			sl_uint32 nV = (sl_uint32)(env->GetDirectBufferCapacity(V));
+
+			if (pU == pV + 1) {
+				nV = Math::max(nV, 1 + nU);
+				nU = 0;
+			} else if (pU + 1 == pV) {
+				nU = Math::max(nU, 1 + nV);
+				nV = 0;
+			}
+			sl_uint32 size = nY + nU + nV;
+
+			Memory mem = m_memFrame;
+			if (mem.isNotNull()) {
+				if (mem.getSize() != size) {
+					mem.setNull();
+				}
+			}
+			if (mem.isNull()) {
+				mem = Memory::create(size);
+				if (mem.isNull()) {
+					return;
+				}
+				m_memFrame = mem;
+			}
+
+			sl_uint8* data = (sl_uint8*)(mem.getData());
+			Base::copyMemory(data, pY, nY);
+			if (nU) {
+				Base::copyMemory(data + nY, pU, nU);
+			}
+			if (nV) {
+				Base::copyMemory(data + nY + nU, pV, nV);
+			}
+
 			VideoCaptureFrame frame;
 			frame.image.width = (sl_uint32)(width);
 			frame.image.height = (sl_uint32)(height);
 			frame.image.format = BitmapFormat::YUV_I420;
-			frame.image.data = env->GetDirectBufferAddress(Y);
-			frame.image.pitch = nY;
-			frame.image.data1 = env->GetDirectBufferAddress(U);
-			frame.image.pitch1 = nU;
-			frame.image.data2 = env->GetDirectBufferAddress(V);
-			frame.image.pitch2 = nV;
+			frame.image.pitch = rowStrideY;
+			frame.image.pitch1 = rowStrideUV;
+			frame.image.sampleStride1 = pixelStrideUV;
+			frame.image.pitch2 = rowStrideUV;
+			frame.image.sampleStride2 = pixelStrideUV;
 			frame.rotation = _getRotation(orientation);
 			frame.flip = _getFlip(flip);
+			
+			frame.image.data = data;
+			frame.image.ref = mem.ref;
+			frame.image.data1 = data + nY;
+			frame.image.data2 = data + nY + nU;
+			if (pU == pV + 1) {
+				frame.image.data1 = (char*)(frame.image.data2) + 1;
+			} else if (pU + 1 == pV) {
+				frame.image.data2 = (char*)(frame.image.data1) + 1;
+			}
+
 			onCaptureVideoFrame(frame);
 		}
 
@@ -266,6 +324,28 @@ namespace slib
 						result.setJpeg(mem);
 						result.rotation = _getRotation(orientation);
 						result.flip = _getFlip(flip);
+					}
+				}
+				param.onComplete(result);
+			}
+		}
+
+		void _onPicture2(jobject jdata, jint orientation, jint flip) {
+			CameraTakePictureParam param;
+			if (m_queueTakePictureRequests.pop(&param)) {
+				CameraTakePictureResult result;
+				if (jdata) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						sl_uint8* data = (sl_uint8*)(env->GetDirectBufferAddress(jdata));
+						sl_uint32 size = env->GetDirectBufferCapacity(jdata);
+						Memory mem = Memory::createStatic(data, size);
+						if (mem.isNotNull()) {
+							result.flagSuccess = sl_true;
+							result.setJpeg(mem);
+							result.rotation = _getRotation(orientation);
+							result.flip = _getFlip(flip);
+						}
 					}
 				}
 				param.onComplete(result);
@@ -316,11 +396,11 @@ namespace slib
 			}
 		}
 
-		SLIB_JNI_NATIVE_IMPL(nativeOnFrame2, "nativeOnFrame2", "(JLjava/nio/ByteBuffer;ILjava/nio/ByteBuffer;ILjava/nio/ByteBuffer;IIIII)V", void, jlong instance, jobject Y, jint nY, jobject U, jint nU, jobject V, jint nV, jint width, jint height, jint orientation, jint flip)
+		SLIB_JNI_NATIVE_IMPL(nativeOnFrame2, "nativeOnFrame2", "(JIILjava/nio/ByteBuffer;Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;IIIII)V", void, jlong instance, jint width, jint height, jobject Y, jobject U, jobject V, int rowStrideY, int rowStrideUV, int pixelStrideUV, jint orientation, jint flip)
 		{
 			Ref<_priv_Android_Camera> camera = _priv_Android_Camera::get(instance);
 			if (camera.isNotNull()) {
-				camera->_onFrame2(Y, nY, U, nU, V, nV, width, height, orientation, flip);
+				camera->_onFrame2(width, height, Y, U, V, rowStrideY, rowStrideUV, pixelStrideUV, orientation, flip);
 			}
 		}
 
@@ -329,6 +409,14 @@ namespace slib
 			Ref<_priv_Android_Camera> camera = _priv_Android_Camera::get(instance);
 			if (camera.isNotNull()) {
 				camera->_onPicture(data, orientation, flip);
+			}
+		}
+		
+		SLIB_JNI_NATIVE_IMPL(nativeOnPicture2, "nativeOnPicture2", "(JLjava/nio/ByteBuffer;II)V", void, jlong instance, jobject data, jint orientation, jint flip)
+		{
+			Ref<_priv_Android_Camera> camera = _priv_Android_Camera::get(instance);
+			if (camera.isNotNull()) {
+				camera->_onPicture2(data, orientation, flip);
 			}
 		}
 		

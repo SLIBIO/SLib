@@ -22,13 +22,9 @@
 
 package slib.platform.android.camera;
 
-import android.hardware.Camera;
-
 public class SCameraInfo {
 
-	public int index;
 	public String id;
 	public String name;
-	public Camera.CameraInfo cameraInfo;
-	
+
 }
