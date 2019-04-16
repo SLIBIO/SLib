@@ -39,8 +39,8 @@ namespace slib
 		sl_uint32 width;
 		sl_uint32 height;
 		void* data;
-		sl_int32 sample_stride; // bytes offset between samples on a row
 		sl_int32 pitch; // bytes of a physical row
+		sl_int32 sampleStride; // The distance between adjacent pixel samples, in bytes
 		Ref<Referable> ref;
 
 	public:
@@ -60,21 +60,25 @@ namespace slib
 		// plane0
 		void* data; // samples
 		sl_int32 pitch; // number of bytes of a row
+		sl_int32 sampleStride; // The distance between adjacent pixel samples, in bytes
 		Ref<Referable> ref; // reference for samples
 
 		// plane1
 		void* data1; // samples
 		sl_int32 pitch1; // number of bytes of a row
+		sl_int32 sampleStride1; // The distance between adjacent pixel samples, in bytes
 		Ref<Referable> ref1; // reference for samples
 	
 		// plane2
 		void* data2; // samples
 		sl_int32 pitch2; // number of bytes of a row
+		sl_int32 sampleStride2; // The distance between adjacent pixel samples, in bytes
 		Ref<Referable> ref2; // reference for samples
 
 		// plane3
 		void* data3; // samples
 		sl_int32 pitch3; // number of bytes of a row
+		sl_int32 sampleStride3; // The distance between adjacent pixel samples, in bytes
 		Ref<Referable> ref3; // reference for samples
 	
 	public:
@@ -87,11 +91,15 @@ namespace slib
 	public:
 		void*& planeData(sl_uint32 plane);
 
-		void* const& planeData(sl_uint32 plane) const;
+		void* planeData(sl_uint32 plane) const;
 	
 		sl_int32& planePitch(sl_uint32 plane);
 
-		sl_int32 const& planePitch(sl_uint32 plane) const;
+		sl_int32 planePitch(sl_uint32 plane) const;
+
+		sl_int32& planeSampleStride(sl_uint32 plane);
+
+		sl_int32 planeSampleStride(sl_uint32 plane) const;
 
 		static sl_int32 calculatePitchAlign1(sl_uint32 width, sl_uint32 bitsPerSample);
 
