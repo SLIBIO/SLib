@@ -462,6 +462,30 @@ namespace slib
 				t.setSecondsCountf([event timestamp]);
 				Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y, t);
 				if (ev.isNotNull()) {
+					switch (action) {
+						case UIAction::LeftButtonDown:
+						case UIAction::RightButtonDown:
+						case UIAction::MiddleButtonDown:
+						case UIAction::LeftButtonDoubleClick:
+						case UIAction::RightButtonDoubleClick:
+						case UIAction::MiddleButtonDoubleClick:
+						case UIAction::MouseMove:
+						case UIAction::MouseEnter:
+							if ([[window contentView] hitTest:pw] != handle) {
+								ev->addFlag(UIEventFlags::FromChildInstance);
+							}
+							break;
+						case UIAction::LeftButtonDrag:
+						case UIAction::RightButtonDrag:
+						case UIAction::MiddleButtonDrag:
+						case UIAction::LeftButtonUp:
+						case UIAction::RightButtonUp:
+						case UIAction::MiddleButtonUp:
+						case UIAction::MouseLeave:
+							break;
+						default:
+							break;
+					}
 					applyModifiers(ev.get(), event);
 					onMouseEvent(ev.get());
 					return ev->getFlags();

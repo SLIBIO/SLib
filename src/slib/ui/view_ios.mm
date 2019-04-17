@@ -522,6 +522,23 @@ namespace slib
 				if (points.isNotNull()) {
 					Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, Time::withSecondsf(event.timestamp));
 					if (ev.isNotNull()) {
+						if (action == UIAction::TouchBegin) {
+							UIWindow* window = handle.window;
+							if (window != nil) {
+								UITouch* touchDown = nil;
+								for (UITouch* touch in touches) {
+									if (touch != nil && touch.phase == UITouchPhaseBegan) {
+										touchDown = touch;
+										break;
+									}
+								}
+								if (touchDown != nil) {
+									if ([window hitTest:[touchDown locationInView:window] withEvent:event] != handle) {
+										ev->addFlag(UIEventFlags::FromChildInstance);
+									}
+								}
+							}
+						}
 						onTouchEvent(ev.get());
 						UIEventFlags flags = ev->getFlags();
 						if (flags & UIEventFlags::KeepKeyboard) {
