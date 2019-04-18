@@ -458,7 +458,7 @@ namespace slib
 		
 		if (handle != nil) {
 			
-			if (touches.count > 0) {
+			if (touches != nil && touches.count > 0) {
 
 				if (action == UIAction::TouchBegin) {
 					ListLocker<UITouch*> current(m_touchesCurrent);
@@ -550,6 +550,12 @@ namespace slib
 					}
 				}
 				
+			} else {
+				Ref<UIEvent> ev = UIEvent::createTouchEvent(action, sl_null, Time::now());
+				if (ev.isNotNull()) {
+					ev->addFlag(UIEventFlags::FromChildInstance);
+					onTouchEvent(ev.get());
+				}
 			}
 			
 		}

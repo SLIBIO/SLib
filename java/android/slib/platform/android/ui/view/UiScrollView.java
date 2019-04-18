@@ -212,6 +212,15 @@ public class UiScrollView extends ScrollView implements IView {
 		return flag;
 	}
 
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent ev) {
+		int action = ev.getAction();
+		if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+			UiView.onEventTouch(this, ev);
+		}
+		return super.dispatchTouchEvent(ev);
+	}
+
 	void scrollToPage(int velocity) {
 		int height = mPageHeight;
 		if (height <= 0) {

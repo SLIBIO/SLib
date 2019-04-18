@@ -261,6 +261,7 @@ namespace slib
 	if (self != nil) {
 		if (@available(iOS 11.0, *)) {
 			self.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+			self.delaysContentTouches = NO;
 		}
 		[self setDelegate:self];
 	}
@@ -292,6 +293,10 @@ namespace slib
 
 - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
 {
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onEventTouch(slib::UIAction::TouchEnd, nil, nil);
+	}
 	if (!m_flagPaging) {
 		return;
 	}
@@ -304,10 +309,13 @@ namespace slib
 	targetContentOffset->y = round(ty / m_pageHeight) * 100;
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)theEvent
+- (BOOL)touchesShouldBegin:(NSSet*)touches withEvent:(UIEvent *)event inContentView:(UIView *)view
 {
-	[self.window endEditing:NO];
-	[super touchesEnded:touches withEvent:theEvent];
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onEventTouch(slib::UIAction::TouchBegin, touches, event);
+	}
+	return [super touchesShouldBegin:touches withEvent:event inContentView:view];
 }
 
 @end
