@@ -53,7 +53,7 @@ namespace slib
 			dialog = OAuthWebRedirectDialog::getDefault();
 		}
 		OAuthWebRedirectDialogParam dialogParam;
-		dialogParam.url = "https://www.linkedin.com/in/me/detail/contact-info/";
+		dialogParam.url = "https://www.linkedin.com/in/";
 		dialogParam.options = param.dialogOptions;
 		auto weakDialog = dialog.toWeak();
 		dialogParam.onRedirect = [weakDialog, onComplete](const String& _url) {
@@ -63,13 +63,13 @@ namespace slib
 			}
 			if (_url.startsWith("https://www.linkedin.com/in/")) {
 				Url url(_url);
-				String path = url.path.substring(3);
-				sl_size n = path.getLength();
-				if (n >= 4) {
-					sl_char8* sz = path.getData();
-					sl_bool flagValid = sz[0] == '/';
+				String name = url.path.substring(4);
+				sl_size n = name.getLength();
+				if (n > 1) {
+					sl_char8* sz = name.getData();
+					sl_bool flagValid = sl_true;
 					if (flagValid) {
-						for (sl_size i = 1; i < n; i++) {
+						for (sl_size i = 0; i < n; i++) {
 							sl_char8 ch = sz[i];
 							if (!(SLIB_CHAR_IS_ALNUM(ch) || ch == '-')) {
 								flagValid = sl_false;
@@ -82,7 +82,7 @@ namespace slib
 						if (dialog.isNotNull()) {
 							dialog->close();
 						}
-						onComplete("https://www.linkedin.com/in" + path);
+						onComplete("https://www.linkedin.com/in/" + name);
 					}
 				}
 			}
