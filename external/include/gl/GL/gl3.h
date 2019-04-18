@@ -92,7 +92,7 @@
 #endif
 
 
-#if defined(__APPLE__)
+#ifndef GL3_PROTOTYPES
 #define GL3_PROTOTYPES
 #endif
 
