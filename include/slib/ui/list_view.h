@@ -100,6 +100,7 @@ namespace slib
 		
 	protected:
 		AtomicRef<ViewAdapter> m_adapter;
+		Ref<ViewAdapter> m_adapterCurrent;
 		
 		Ref<_priv_ListContentView> m_contentView;
 		sl_bool m_flagResetAdapter;

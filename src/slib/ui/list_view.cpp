@@ -192,6 +192,11 @@ namespace slib
 						}
 						_initStatus();
 						m_flagResetingAdapter = sl_false;
+						m_adapterCurrent = adapter;
+						m_contentView->removeAllChildren(UIUpdateMode::None);
+						for (sl_size i = 0; i < MAX_ITEMS_VISIBLE; i++) {
+							m_viewsVisibleItems[i].setNull();
+						}
 						_layoutItemViews(sl_false, sl_false, sl_true);
 						if (adapter != m_adapter) {
 							m_flagResetAdapter = sl_true;
@@ -206,6 +211,7 @@ namespace slib
 				for (sl_size i = 0; i < MAX_ITEMS_VISIBLE; i++) {
 					m_viewsVisibleItems[i].setNull();
 				}
+				m_adapterCurrent = adapter;
 				_layoutItemViews(sl_false, sl_false, sl_true);
 				if (adapter != m_adapter) {
 					m_flagResetAdapter = sl_true;
@@ -446,7 +452,7 @@ namespace slib
 			return;
 		}
 		
-		Ref<ViewAdapter> adapter(m_adapter);
+		Ref<ViewAdapter>& adapter = m_adapterCurrent;
 		
 		if (adapter.isNotNull()) {
 			
