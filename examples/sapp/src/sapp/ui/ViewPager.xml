@@ -14,15 +14,19 @@
 			width='fill'
 			height='fill'
 			margin='10%'
+			instance='true'
 		>
 			<item>
-				<view
-					background='red'
+				<image
+					instance='true'
+					scale="contain"
+					url="https://raw.githubusercontent.com/SLIBIO/SLib/master/examples/sapp/src/sapp/image/slib_icon.png"
 					/>
 			</item>
 
 			<item selected='true'>
 				<group
+					instance='true'
 					background='green'
 				>
 					<label alignCenter='true' text='Swipe' fontSize='20%sw'/>
@@ -31,6 +35,7 @@
 
 			<item>
 				<group
+					instance='true'
 					background='blue'
 				>
 					<button 
