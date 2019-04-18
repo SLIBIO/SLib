@@ -143,7 +143,7 @@ namespace slib
 			widthDst = height;
 			heightDst = width;
 		} else {
-			widthDst = desc.width;
+			widthDst = width;
 			heightDst = height;
 		}
 		ImageDesc& descDst = ret->m_desc;

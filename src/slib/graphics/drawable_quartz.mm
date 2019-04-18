@@ -51,7 +51,9 @@ namespace slib
 		sl_uint32 stride = desc.stride;
 		Ref<Drawable> ret;
 		Ref<Referable> refData = desc.ref;
-		refData->increaseReference();
+		if (refData.isNotNull()) {
+			refData->increaseReference();
+		}
 		CGDataProviderRef provider = CGDataProviderCreateWithData(refData.get(), desc.colors, (stride * height) << 2, _priv_Drawable_DataProviderRelease);
 		if (provider) {
 			CGColorSpaceRef colorSpaceRef = CGColorSpaceCreateDeviceRGB();
@@ -67,7 +69,9 @@ namespace slib
 			}
 			CGDataProviderRelease(provider);
 		} else {
-			refData->decreaseReference();
+			if (refData.isNotNull()) {
+				refData->decreaseReference();
+			}
 		}
 		return ret;
 	}

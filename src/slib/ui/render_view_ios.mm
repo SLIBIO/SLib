@@ -131,8 +131,8 @@ namespace slib
 		return;
 	}
 	BOOL flagVisible = NO;
-	sl_uint32 width = (sl_uint32)(view.frame.size.width * view.contentScaleFactor);
-	sl_uint32 height = (sl_uint32)(view.frame.size.height * view.contentScaleFactor);
+	sl_uint32 width = (sl_uint32)(view.bounds.size.width * view.contentScaleFactor);
+	sl_uint32 height = (sl_uint32)(view.bounds.size.height * view.contentScaleFactor);
 	view->m_viewportWidth = width;
 	view->m_viewportHeight = height;
 	if (width > 0 && height > 0) {
