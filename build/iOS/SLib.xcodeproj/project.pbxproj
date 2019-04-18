@@ -667,6 +667,8 @@
 		2639196B21CD4605008B335B /* hiredis.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639196521CD4605008B335B /* hiredis.c */; };
 		2639196E21CD469E008B335B /* redis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639196C21CD469B008B335B /* redis.cpp */; };
 		264DF0EE22455E3B007DB734 /* chat_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264DF0ED22455E3B007DB734 /* chat_view.cpp */; };
+		26635C9F226706F3005E4BA6 /* ui_photo_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26635C9E226706F3005E4BA6 /* ui_photo_ios.mm */; };
+		26635CA1226706FD005E4BA6 /* ui_photo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26635CA0226706FD005E4BA6 /* ui_photo.cpp */; };
 		266E66EC21D9566300D92386 /* locale_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266E66EB21D9566300D92386 /* locale_apple.mm */; };
 		2671F99121E07F7400B39842 /* drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2671F99021E07F7300B39842 /* drawer.cpp */; };
 		267B9D65225D11450057DF2A /* instagram_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D64225D11450057DF2A /* instagram_ios.mm */; };
@@ -2056,6 +2058,8 @@
 		265EBF2B1C23051F00AD81D9 /* database_statement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_statement.cpp; sourceTree = "<group>"; };
 		265EBF2C1C23051F00AD81D9 /* database.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database.cpp; sourceTree = "<group>"; };
 		265EBF2D1C23051F00AD81D9 /* sqlite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sqlite.cpp; sourceTree = "<group>"; };
+		26635C9E226706F3005E4BA6 /* ui_photo_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_photo_ios.mm; sourceTree = "<group>"; };
+		26635CA0226706FD005E4BA6 /* ui_photo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_photo.cpp; sourceTree = "<group>"; };
 		266DD3591C1170BD00D47AB0 /* audio_codec.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_codec.cpp; path = media/audio_codec.cpp; sourceTree = "<group>"; };
 		266DD35A1C1170BD00D47AB0 /* audio_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_format.cpp; path = media/audio_format.cpp; sourceTree = "<group>"; };
 		266DD35B1C1170BD00D47AB0 /* audio_player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_player.cpp; path = media/audio_player.cpp; sourceTree = "<group>"; };
@@ -4187,6 +4191,8 @@
 				A25F2F291B039EF600854DAF /* ui_event.cpp */,
 				A2774E271B1CBBF600538A7B /* ui_event_ios.mm */,
 				2621F7201CCF174B00C4615C /* ui_menu.cpp */,
+				26635CA0226706FD005E4BA6 /* ui_photo.cpp */,
+				26635C9E226706F3005E4BA6 /* ui_photo_ios.mm */,
 				2648D54D1D098AE800819E09 /* ui_platform.cpp */,
 				266F92691D51CD290040166C /* ui_resource.cpp */,
 				26CF4DEF1ED69AD000954B7A /* ui_text.cpp */,
@@ -5119,6 +5125,7 @@
 				26E1B8E0222ABCDD007C222E /* jdarith.c in Sources */,
 				26CF4DF01ED69AD000954B7A /* ui_text.cpp in Sources */,
 				26E1B8F1222ABCDD007C222E /* jfdctfst.c in Sources */,
+				26635C9F226706F3005E4BA6 /* ui_photo_ios.mm in Sources */,
 				26D9D8D11E962976005F7BD3 /* scroll_view.cpp in Sources */,
 				26E1B8B6222ABBDC007C222E /* inftrees.c in Sources */,
 				26D9D89D1E962962005F7BD3 /* net_capture.cpp in Sources */,
@@ -5455,6 +5462,7 @@
 				26D9D8931E962962005F7BD3 /* arp.cpp in Sources */,
 				26D9D8721E96294F005F7BD3 /* graphics_resource.cpp in Sources */,
 				269E31AB2255F4F2005CD0ED /* paypal_ui.cpp in Sources */,
+				26635CA1226706FD005E4BA6 /* ui_photo.cpp in Sources */,
 				26E1B8AD222ABBDC007C222E /* crc32.c in Sources */,
 				26D9D8E71E962976005F7BD3 /* video_view.cpp in Sources */,
 				26D9D8D31E962976005F7BD3 /* select_view.cpp in Sources */,

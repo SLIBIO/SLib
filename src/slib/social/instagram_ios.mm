@@ -20,45 +20,32 @@
  *   THE SOFTWARE.
  */
 
-#include "slib/social/instagram.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
-#include "slib/core/platform_apple.h"
+#include "slib/social/instagram.h"
 
-#include <Photos/Photos.h>
+#include "slib/ui/photo.h"
+#include "slib/ui/core.h"
+#include "slib/core/platform_apple.h"
 
 namespace slib
 {
 	
 	void Instagram::openInstagramAppSharingFile(const Memory& mem)
 	{
-		if (mem.isNull()) {
-			return;
-		}
-		NSData* data = Apple::getNSDataFromMemory(mem);
-		NSString *writePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"instagram.ig"];
-		if (![data writeToFile:writePath atomically:YES]) {
-			return;
-		}
-		NSURL* url = [NSURL fileURLWithPath:writePath];
-		__block PHAssetChangeRequest* changeRequest = nil;
-		__block PHObjectPlaceholder* placeholder;
-		[[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
-			NSData* data = [NSData dataWithContentsOfURL:url];
-			UIImage *image = [UIImage imageWithData:data];
-			changeRequest = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
-			placeholder = changeRequest.placeholderForCreatedAsset;
-		} completionHandler:^(BOOL success, NSError *error) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				if (success) {
-					NSURL* instagramURL = [NSURL URLWithString:[NSString stringWithFormat:@"instagram://library?LocalIdentifier=%@", [placeholder localIdentifier]]];
+		PhotoKit::saveImageWithFileContent(mem, [](const String& localIdentifier) {
+			if (localIdentifier.isNotNull()) {
+				String url = "instagram://library?LocalIdentifier=" + localIdentifier;
+				UI::runOnUiThread([url]() {
+					NSURL* instagramURL = [NSURL URLWithString:Apple::getNSStringFromString(url)];
 					if ([[UIApplication sharedApplication] canOpenURL:instagramURL]) {
 						[[UIApplication sharedApplication] openURL:instagramURL options:@{} completionHandler:NULL];
 					}
-				}
-			});
-		}];
+				});
+			}
+		});
 	}
 	
 }

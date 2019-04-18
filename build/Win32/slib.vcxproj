@@ -392,6 +392,7 @@
     <ClCompile Include="..\..\src\slib\ui\ui_event_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\ui_menu.cpp" />
     <ClCompile Include="..\..\src\slib\ui\ui_menu_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_photo.cpp" />
     <ClCompile Include="..\..\src\slib\ui\ui_platform.cpp" />
     <ClCompile Include="..\..\src\slib\ui\ui_resource.cpp" />
     <ClCompile Include="..\..\src\slib\ui\video_view.cpp" />

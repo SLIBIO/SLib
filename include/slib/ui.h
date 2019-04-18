@@ -78,5 +78,6 @@
 
 #include "ui/clipboard.h"
 #include "ui/notification.h"
+#include "ui/photo.h"
 
 #endif

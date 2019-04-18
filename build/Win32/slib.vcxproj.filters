@@ -1220,5 +1220,8 @@
     <ClCompile Include="..\..\src\slib\social\instagram.cpp">
       <Filter>src\social</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\ui_photo.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
