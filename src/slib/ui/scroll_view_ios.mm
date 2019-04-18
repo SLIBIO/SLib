@@ -318,6 +318,12 @@ namespace slib
 	return [super touchesShouldBegin:touches withEvent:event inContentView:view];
 }
 
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)theEvent
+{
+	[self.window endEditing:NO];
+	[super touchesEnded:touches withEvent:theEvent];
+}
+
 @end
 
 #endif
