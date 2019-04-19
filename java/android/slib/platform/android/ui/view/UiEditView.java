@@ -513,6 +513,9 @@ public class UiEditView extends EditText implements IView {
 		int width = mRight - mLeft;
 		width -= getCompoundPaddingLeft();
 		width -= getCompoundPaddingRight();
+		if (width <= 0) {
+			return 0;
+		}
 		StaticLayout layout;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			layout = StaticLayout.Builder.obtain(text, 0, text.length(), getPaint(), width).build();
