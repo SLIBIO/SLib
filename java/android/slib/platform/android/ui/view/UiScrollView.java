@@ -214,10 +214,7 @@ public class UiScrollView extends ScrollView implements IView {
 
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
-		int action = ev.getAction();
-		if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
-			UiView.onEventTouch(this, ev);
-		}
+		UiView.onEventTouch(this, ev, true, true);
 		return super.dispatchTouchEvent(ev);
 	}
 

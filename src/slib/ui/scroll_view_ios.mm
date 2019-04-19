@@ -33,7 +33,7 @@
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 	
 	@public UIView* m_contentView;
-	
+
 	sl_bool m_flagPaging;
 	sl_ui_len m_pageWidth;
 	sl_ui_len m_pageHeight;
@@ -44,6 +44,11 @@
 
 - (void)setPaging:(sl_bool)flagPaging :(sl_ui_len)pageWidth :(sl_ui_len)pageHeight;
 
+@end
+
+@interface _priv_Slib_iOS_ScrollView_GestureRecognizer : UIGestureRecognizer<UIGestureRecognizerDelegate> {
+	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
+}
 @end
 
 namespace slib
@@ -122,6 +127,13 @@ namespace slib
 			((_priv_ScrollView*)this)->_applyProperties(handle);
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
+		if (handle != nil && handle->m_viewInstance.isNotNull()) {
+			_priv_Slib_iOS_ScrollView_GestureRecognizer* gesture = [[_priv_Slib_iOS_ScrollView_GestureRecognizer alloc] init];
+			gesture->m_viewInstance = handle->m_viewInstance;
+			gesture.cancelsTouchesInView = NO;
+			gesture.delegate = gesture;
+			[handle addGestureRecognizer:gesture];
+		}
 		return ret;
 	}
 	
@@ -293,10 +305,6 @@ namespace slib
 
 - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		instance->onEventTouch(slib::UIAction::TouchEnd, nil, nil);
-	}
 	if (!m_flagPaging) {
 		return;
 	}
@@ -309,19 +317,46 @@ namespace slib
 	targetContentOffset->y = round(ty / m_pageHeight) * 100;
 }
 
-- (BOOL)touchesShouldBegin:(NSSet*)touches withEvent:(UIEvent *)event inContentView:(UIView *)view
+@end
+
+@implementation _priv_Slib_iOS_ScrollView_GestureRecognizer
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)theEvent
+{
+	self.state = UIGestureRecognizerStateBegan;
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onEventTouch(slib::UIAction::TouchBegin, touches, theEvent, sl_false);
+	}
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)theEvent
 {
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		instance->onEventTouch(slib::UIAction::TouchBegin, touches, event);
+		instance->onEventTouch(slib::UIAction::TouchMove, touches, theEvent, sl_false);
 	}
-	return [super touchesShouldBegin:touches withEvent:event inContentView:view];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)theEvent
 {
-	[self.window endEditing:NO];
-	[super touchesEnded:touches withEvent:theEvent];
+	self.state = UIGestureRecognizerStateEnded;
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onEventTouch(slib::UIAction::TouchEnd, touches, theEvent, sl_false);
+	}
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)theEvent
+{
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onEventTouch(slib::UIAction::TouchCancel, touches, theEvent, sl_false);
+	}
+}
+
+-(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+	return YES;
 }
 
 @end
