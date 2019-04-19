@@ -1225,6 +1225,10 @@ namespace slib
 		
 		virtual void onRemoveChild(View* child);
 
+		virtual void onAttachChild(View* child);
+		
+		virtual void onDetachChild(View* child);
+		
 		virtual void onUpdateLayout();
 		
 		virtual void onChangePadding();

@@ -610,9 +610,9 @@ namespace slib
 		ObjectLocker lock(this);
 		Ref<ViewInstance> instance = m_instance;
 		if (instance.isNotNull()) {
+			dispatchDetach();
 			instance->setView(sl_null);
 			m_instance.setNull();
-			dispatchDetach();
 		}
 	}
 	
@@ -7370,6 +7370,14 @@ namespace slib
 	{
 	}
 	
+	void View::onAttachChild(View* child)
+	{
+	}
+	
+	void View::onDetachChild(View* child)
+	{
+	}
+	
 	void View::onUpdateLayout()
 	{
 		if (getChildrenCount() > 0) {
@@ -7459,6 +7467,10 @@ namespace slib
 	{
 		SLIB_INVOKE_EVENT_HANDLER(Attach)
 		_attachNativeAnimations();
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			parent->onAttachChild(this);
+		}
 	}
 
 	DEFINE_VIEW_EVENT_HANDLER(Detach)
@@ -7466,6 +7478,10 @@ namespace slib
 	void View::dispatchDetach()
 	{
 		SLIB_INVOKE_EVENT_HANDLER(Detach)
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			parent->onDetachChild(this);
+		}
 	}
 	
 	DEFINE_VIEW_EVENT_HANDLER(Draw, Canvas* canvas)
