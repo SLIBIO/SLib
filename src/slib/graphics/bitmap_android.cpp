@@ -35,7 +35,7 @@ namespace slib
 
 	SLIB_JNI_BEGIN_CLASS(JAndroidBitmap, "slib/platform/android/ui/UiBitmap")
 		SLIB_JNI_STATIC_METHOD(create, "create", "(II)Lslib/platform/android/ui/UiBitmap;");
-		SLIB_JNI_STATIC_METHOD(load, "load", "([B)Lslib/platform/android/ui/UiBitmap;");
+		SLIB_JNI_STATIC_METHOD(load, "load", "(Landroid/app/Activity;[B)Lslib/platform/android/ui/UiBitmap;");
 		SLIB_JNI_METHOD(getWidth, "getWidth", "()I");
 		SLIB_JNI_METHOD(getHeight, "getHeight", "()I");
 		SLIB_JNI_METHOD(recycle, "recycle", "()V");
@@ -128,7 +128,7 @@ namespace slib
 			JniLocal<jbyteArray> imageData = Jni::newByteArray(size);
 			if (imageData.isNotNull()) {
 				Jni::setByteArrayRegion(imageData, 0, size, (jbyte*)buf);
-				return JAndroidBitmap::load.callObject(sl_null, imageData.value);
+				return JAndroidBitmap::load.callObject(sl_null, Android::getCurrentActivity(), imageData.value);
 			}
 			return 0;
 		}

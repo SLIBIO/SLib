@@ -25,12 +25,15 @@ package slib.platform.android.ui;
 import java.util.Vector;
 
 import slib.platform.android.Logger;
+
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
@@ -54,11 +57,42 @@ public class UiBitmap {
 		}
 		return null;
 	}
-	
+
 	public static UiBitmap load(byte[] data) {
 		try {
 			Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-			if (bitmap != null) {				
+			if (bitmap != null) {
+				if (bitmap.getWidth() > 0 && bitmap.getHeight() > 0) {
+					UiBitmap ret = new UiBitmap();
+					ret.bitmap = bitmap;
+					return ret;
+				}
+				bitmap.recycle();
+			}
+		} catch (Throwable e) {
+			Logger.exception(e);
+		}
+		return null;
+	}
+
+	public static UiBitmap load(Activity activity, byte[] data) {
+		if (activity != null) {
+			Point size = Util.getDisplaySize(activity);
+			return load(data, size.x / 2, size.y / 2);
+		} else {
+			return load(data);
+		}
+	}
+
+	public static UiBitmap load(byte[] data, int reqWidth, int reqHeight) {
+		try {
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inJustDecodeBounds = true;
+			BitmapFactory.decodeByteArray(data, 0, data.length, options);
+			options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+			options.inJustDecodeBounds = false;
+			Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+			if (bitmap != null) {
 				if (bitmap.getWidth() > 0 && bitmap.getHeight() > 0) {
 					UiBitmap ret = new UiBitmap();
 					ret.bitmap = bitmap;
@@ -92,7 +126,8 @@ public class UiBitmap {
 	
 	public void recycle() {
 		try {
-			bitmap.recycle();			
+			bitmap.recycle();
+			bitmap = null;
 		} catch (Throwable e) {
 			Logger.exception(e);
 		}
@@ -284,4 +319,19 @@ public class UiBitmap {
 			}
 		}
 	}
+
+	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+		final int height = options.outHeight;
+		final int width = options.outWidth;
+		int inSampleSize = 1;
+		if (height > reqHeight || width > reqWidth) {
+			final int halfHeight = height / 2;
+			final int halfWidth = width / 2;
+			while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+				inSampleSize *= 2;
+			}
+		}
+		return inSampleSize;
+	}
+
 }
