@@ -472,7 +472,7 @@ namespace slib
 						case UIAction::MouseMove:
 						case UIAction::MouseEnter:
 							if ([[window contentView] hitTest:pw] != handle) {
-								ev->addFlag(UIEventFlags::FromChildInstance);
+								ev->addFlag(UIEventFlags::NotDispatchToChildren);
 							}
 							break;
 						case UIAction::LeftButtonDrag:

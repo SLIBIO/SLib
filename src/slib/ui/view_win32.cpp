@@ -344,7 +344,7 @@ namespace slib
 			Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey, t);
 			if (ev.isNotNull()) {
 				applyModifiers(ev.get());
-				ev->addFlag(UIEventFlags::DispatchToParentInstance);
+				ev->addFlag(UIEventFlags::DispatchToParent);
 				onKeyEvent(ev.get());
 				if (ev->isPreventedDefault()) {
 					return sl_true;
@@ -369,7 +369,7 @@ namespace slib
 			Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y, t);
 			if (ev.isNotNull()) {
 				applyModifiers(ev.get());
-				ev->addFlag(UIEventFlags::DispatchToParentInstance);
+				ev->addFlag(UIEventFlags::DispatchToParent);
 				onMouseEvent(ev.get());
 				if (ev->isPreventedDefault()) {
 					return sl_true;

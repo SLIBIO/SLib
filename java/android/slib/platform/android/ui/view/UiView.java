@@ -461,10 +461,9 @@ public class UiView {
 		}
 	}
 	
-	private static native boolean nativeOnKeyEvent(long instance, boolean flagDown, int vkey
-			, boolean flagControl, boolean flagShift, boolean flagAlt, boolean flagWin, long time);
+	private static native boolean nativeOnKeyEvent(long instance, boolean flagDown, int vkey, boolean flagControl, boolean flagShift, boolean flagAlt, boolean flagWin, long time, boolean flagDispatchToParent, boolean flagNotDispatchToChildren);
 
-	public static boolean onEventKey(IView view, boolean flagDown, int keycode, KeyEvent event) {
+	public static boolean onEventKey(IView view, boolean flagDown, int keycode, KeyEvent event, boolean flagDispatchToParent, boolean flagNotDispatchToChildren) {
 		long instance = view.getInstance();
 		if (instance != 0) {
 			return nativeOnKeyEvent(
@@ -474,15 +473,21 @@ public class UiView {
 					event.isShiftPressed(),
 					event.isAltPressed(),
 					event.isMetaPressed(),
-					event.getEventTime()
+					event.getEventTime(),
+					flagDispatchToParent,
+					flagNotDispatchToChildren
 			);
 		}
 		return false;
 	}
-	
-	private static native int nativeOnTouchEvent(long instance, int action, UiTouchPoint[] pts, long time);
-	
-	public static boolean onEventTouch(IView view, MotionEvent event) {
+
+	public static boolean onEventKey(IView view, boolean flagDown, int keycode, KeyEvent event) {
+		return onEventKey(view, flagDown, keycode, event, false, false);
+	}
+
+	private static native int nativeOnTouchEvent(long instance, int action, UiTouchPoint[] pts, long time, boolean flagDispatchToParent, boolean flagNotDispatchToChildren);
+
+	public static boolean onEventTouch(IView view, MotionEvent event, boolean flagDispatchToParent, boolean flagNotDispatchToChildren) {
 		long instance = view.getInstance();
 		if (instance != 0) {
 			int action = 0;
@@ -536,7 +541,7 @@ public class UiView {
 					pt.pointerId = event.getPointerId(i);
 					pts[i] = pt;
 				}
-				int ret = nativeOnTouchEvent(instance, action, pts, event.getEventTime());
+				int ret = nativeOnTouchEvent(instance, action, pts, event.getEventTime(), flagDispatchToParent, flagNotDispatchToChildren);
 				if ((ret & 0x4000) == 0) {
 					// Keep Keyboard
 					UiWindow.dismissKeyboard((View)view, event);
@@ -548,6 +553,10 @@ public class UiView {
 			}
 		}
 		return false;
+	}
+
+	public static boolean onEventTouch(IView view, MotionEvent event) {
+		return onEventTouch(view, event, false, false);
 	}
 
 	private static native void nativeOnSetFocus(long instance);

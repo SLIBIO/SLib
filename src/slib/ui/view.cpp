@@ -7593,7 +7593,7 @@ namespace slib
 		UIAction action = ev->getAction();
 		
 		// pass event to children
-		if (!(ev->getFlags() & UIEventFlags::FromChildInstance)) {
+		if (!(ev->getFlags() & UIEventFlags::NotDispatchToChildren)) {
 			Ref<View> scrollBars[2];
 			_getScrollBars(scrollBars);
 			Ref<ChildAttributes>& childAttrs = m_childAttrs;
@@ -7809,7 +7809,7 @@ namespace slib
 		UIAction action = ev->getAction();
 		
 		// pass event to children
-		if (!(ev->getFlags() & UIEventFlags::FromChildInstance)) {
+		if (!(ev->getFlags() & UIEventFlags::NotDispatchToChildren)) {
 			Ref<View> scrollBars[2];
 			_getScrollBars(scrollBars);
 			Ref<ChildAttributes>& childAttrs = m_childAttrs;
@@ -8223,7 +8223,7 @@ namespace slib
 			return;
 		}
 		
-		if (!(ev->getFlags() & UIEventFlags::FromChildInstance)) {
+		if (!(ev->getFlags() & UIEventFlags::NotDispatchToChildren)) {
 			Ref<ChildAttributes>& childAttrs = m_childAttrs;
 			if (childAttrs.isNotNull()) {
 				Ref<View> viewFocusedChild = childAttrs->childFocused;
@@ -9075,12 +9075,12 @@ namespace slib
 	{
 		Ref<View> view = getView();
 		if (view.isNotNull()) {
-			if (ev->getFlags() & UIEventFlags::DispatchToParentInstance) {
+			if (ev->getFlags() & UIEventFlags::DispatchToParent) {
 				view->dispatchKeyEvent(ev);
 				view = view->getParent();
 				while (view.isNotNull()) {
 					if (!(view->isNativeWidget())) {
-						ev->addFlag(UIEventFlags::FromChildInstance);
+						ev->addFlag(UIEventFlags::NotDispatchToChildren);
 						view->dispatchKeyEvent(ev);
 					}
 					view = view->getParent();
@@ -9095,7 +9095,7 @@ namespace slib
 	{
 		Ref<View> view = getView();
 		if (view.isNotNull()) {
-			if (ev->getFlags() & UIEventFlags::DispatchToParentInstance) {
+			if (ev->getFlags() & UIEventFlags::DispatchToParent) {
 				view->dispatchMouseEvent(ev);
 				UIPoint pt = ev->getPoint();
 				Ref<View> child = view;
@@ -9104,7 +9104,7 @@ namespace slib
 					pt = child->convertCoordinateToParent(pt);
 					if (!(view->isNativeWidget())) {
 						ev->setPoint(pt);
-						ev->addFlag(UIEventFlags::FromChildInstance);
+						ev->addFlag(UIEventFlags::NotDispatchToChildren);
 						view->dispatchMouseEvent(ev);
 					}
 					child = view;
@@ -9122,7 +9122,7 @@ namespace slib
 		
 		if (view.isNotNull()) {
 		
-			if (ev->getFlags() & UIEventFlags::DispatchToParentInstance) {
+			if (ev->getFlags() & UIEventFlags::DispatchToParent) {
 			
 				view->dispatchTouchEvent(ev);
 				
@@ -9153,7 +9153,7 @@ namespace slib
 					if (!(view->isNativeWidget())) {
 						ev->setPoint(pt);
 						ev->setTouchPoints(arrPts);
-						ev->addFlag(UIEventFlags::FromChildInstance);
+						ev->addFlag(UIEventFlags::NotDispatchToChildren);
 						view->dispatchTouchEvent(ev);
 					}
 					child = view;

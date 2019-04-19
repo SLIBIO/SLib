@@ -452,7 +452,7 @@ namespace slib
 		}
 	}
 	
-	UIEventFlags iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event)
+	UIEventFlags iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event, sl_bool flagDispatchToChildren)
 	{
 		UIView* handle = m_handle;
 		
@@ -489,6 +489,11 @@ namespace slib
 							for (sl_size i = 0; i < current.count; i++) {
 								UITouch* touch = current[i];
 								CGPoint pt = [touch locationInView:handle];
+								if ([handle isKindOfClass:[UIScrollView class]]) {
+									UIScrollView* scroll = (UIScrollView*)handle;
+									pt.x -= scroll.contentOffset.x;
+									pt.y -= scroll.contentOffset.y;
+								}
 								sl_real pressure = (sl_real)([touch force]);
 								UITouchPhase _phase = [touch phase];
 								TouchPhase phase;
@@ -522,22 +527,26 @@ namespace slib
 				if (points.isNotNull()) {
 					Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, Time::withSecondsf(event.timestamp));
 					if (ev.isNotNull()) {
-						if (action == UIAction::TouchBegin) {
-							UIWindow* window = handle.window;
-							if (window != nil) {
-								UITouch* touchDown = nil;
-								for (UITouch* touch in touches) {
-									if (touch != nil && touch.phase == UITouchPhaseBegan) {
-										touchDown = touch;
-										break;
+						if (flagDispatchToChildren) {
+							if (action == UIAction::TouchBegin) {
+								UIWindow* window = handle.window;
+								if (window != nil) {
+									UITouch* touchDown = nil;
+									for (UITouch* touch in touches) {
+										if (touch != nil && touch.phase == UITouchPhaseBegan) {
+											touchDown = touch;
+											break;
+										}
 									}
-								}
-								if (touchDown != nil) {
-									if ([window hitTest:[touchDown locationInView:window] withEvent:event] != handle) {
-										ev->addFlag(UIEventFlags::FromChildInstance);
+									if (touchDown != nil) {
+										if ([window hitTest:[touchDown locationInView:window] withEvent:event] != handle) {
+											ev->addFlag(UIEventFlags::NotDispatchToChildren);
+										}
 									}
 								}
 							}
+						} else {
+							ev->addFlag(UIEventFlags::NotDispatchToChildren);
 						}
 						onTouchEvent(ev.get());
 						UIEventFlags flags = ev->getFlags();
@@ -550,12 +559,6 @@ namespace slib
 					}
 				}
 				
-			} else {
-				Ref<UIEvent> ev = UIEvent::createTouchEvent(action, sl_null, Time::now());
-				if (ev.isNotNull()) {
-					ev->addFlag(UIEventFlags::FromChildInstance);
-					onTouchEvent(ev.get());
-				}
 			}
 			
 		}

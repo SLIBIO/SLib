@@ -87,7 +87,7 @@ namespace slib
 	public:
 		void onDraw(CGRect rectDirty);
 		
-		UIEventFlags onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event);
+		UIEventFlags onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event, sl_bool flagDispatchToChildren = sl_true);
 		
 	private:
 		void _release();

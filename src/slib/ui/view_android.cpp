@@ -62,8 +62,7 @@ namespace slib
 		}
 	}
 
-	jboolean JNICALL _priv_AndroidView_nativeOnKeyEvent(JNIEnv* env, jobject _this, jlong jinstance, jboolean flagDown, int keycode
-		, jboolean flagControl, jboolean flagShift, jboolean flagAlt, jboolean flagWin, jlong time)
+	jboolean JNICALL _priv_AndroidView_nativeOnKeyEvent(JNIEnv* env, jobject _this, jlong jinstance, jboolean flagDown, int keycode, jboolean flagControl, jboolean flagShift, jboolean flagAlt, jboolean flagWin, jlong time, jboolean flagDispatchToParent, jboolean flagNotDispatchToChildren)
 	{
 		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 		if (instance.isNotNull()) {
@@ -86,7 +85,12 @@ namespace slib
 				if (flagWin) {
 					ev->setWindowsKey();
 				}
-				ev->addFlag(UIEventFlags::DispatchToParentInstance);
+				if (flagDispatchToParent) {
+					ev->addFlag(UIEventFlags::DispatchToParent);
+				}
+				if (flagNotDispatchToChildren) {
+					ev->addFlag(UIEventFlags::NotDispatchToChildren);
+				}
 				instance->onKeyEvent(ev.get());
 				if (ev->isPreventedDefault()) {
 					return 1;
@@ -96,7 +100,7 @@ namespace slib
 		return 0;
 	}
 
-	jint JNICALL _priv_AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int _action, jobjectArray jpoints, jlong time)
+	jint JNICALL _priv_AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int _action, jobjectArray jpoints, jlong time, jboolean flagDispatchToParent, jboolean flagNotDispatchToChildren)
 	{
 		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 		if (instance.isNotNull()) {
@@ -118,7 +122,12 @@ namespace slib
 					}
 					Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, Time::withMilliseconds(time));
 					if (ev.isNotNull()) {
-						ev->addFlag(UIEventFlags::DispatchToParentInstance);
+						if (flagDispatchToParent) {
+							ev->addFlag(UIEventFlags::DispatchToParent);
+						}
+						if (flagNotDispatchToChildren) {
+							ev->addFlag(UIEventFlags::NotDispatchToChildren);
+						}
 						instance->onTouchEvent(ev.get());
 						return ev->getFlags();
 					}
@@ -204,8 +213,8 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(enableGesture, "enableGesture", "(Landroid/view/View;)V");
 
 		SLIB_JNI_NATIVE(nativeOnDraw, "nativeOnDraw", "(JLslib/platform/android/ui/Graphics;)V", _priv_AndroidView_nativeOnDraw);
-		SLIB_JNI_NATIVE(nativeOnKeyEvent, "nativeOnKeyEvent", "(JZIZZZZJ)Z", _priv_AndroidView_nativeOnKeyEvent);
-		SLIB_JNI_NATIVE(nativeOnTouchEvent, "nativeOnTouchEvent", "(JI[Lslib/platform/android/ui/view/UiTouchPoint;J)I", _priv_AndroidView_nativeOnTouchEvent);
+		SLIB_JNI_NATIVE(nativeOnKeyEvent, "nativeOnKeyEvent", "(JZIZZZZJZZ)Z", _priv_AndroidView_nativeOnKeyEvent);
+		SLIB_JNI_NATIVE(nativeOnTouchEvent, "nativeOnTouchEvent", "(JI[Lslib/platform/android/ui/view/UiTouchPoint;JZZ)I", _priv_AndroidView_nativeOnTouchEvent);
 		SLIB_JNI_NATIVE(nativeOnSetFocus, "nativeOnSetFocus", "(J)V", _priv_AndroidView_nativeOnSetFocus);
 		SLIB_JNI_NATIVE(nativeOnClick, "nativeOnClick", "(J)V", _priv_AndroidView_nativeOnClick);
 		SLIB_JNI_NATIVE(nativeHitTestTouchEvent, "nativeHitTestTouchEvent", "(JII)Z", _priv_AndroidView_nativeHitTestTouchEvent);
