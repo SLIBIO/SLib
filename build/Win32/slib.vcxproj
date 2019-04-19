@@ -367,6 +367,7 @@
     <ClCompile Include="..\..\src\slib\ui\qr_code_scanner.cpp" />
     <ClCompile Include="..\..\src\slib\ui\radio_button.cpp" />
     <ClCompile Include="..\..\src\slib\ui\radio_button_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\refresh_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\render_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\render_view_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\scroll_bar.cpp" />

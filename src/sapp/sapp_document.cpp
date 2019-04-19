@@ -124,6 +124,7 @@ namespace slib
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_attribute_invalid, "Layout Resource: Invalid %s attribute value: %s")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_scrollview_must_contain_one_child, "Layout Resource: ScrollView can contain only one child")
 	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_item_must_contain_one_child, "Layout Resource: item can contain only one child")
+	SLIB_STATIC_STRING(_g_sdev_sapp_error_resource_layout_refreshview_must_contain_one_child, "Layout Resource: RefreshView can contain only one child")
 	SLIB_STATIC_STRING(_g_sdev_sapp_log_generate_cpp_layouts_begin, "Generating: layouts.h, layouts.cpp")
 
 #define RAW_MAX_SIZE 0x1000000 // 16MB

@@ -1223,5 +1223,8 @@
     <ClCompile Include="..\..\src\slib\ui\ui_photo.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\refresh_view.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

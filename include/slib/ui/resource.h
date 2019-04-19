@@ -349,6 +349,7 @@ namespace slib
 	class QRCodeScanner;
 	class Drawer;
 	class ChatView;
+	class RefreshView;
 
 }
 

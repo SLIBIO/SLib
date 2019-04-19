@@ -778,6 +778,12 @@ namespace slib
 		
 	};
 
+	class SAppLayoutRefreshAttributes : public Referable
+	{
+	public:
+		
+	};
+	
 	class SAppLayoutStyle : public Referable
 	{
 	public:
@@ -843,7 +849,8 @@ namespace slib
 		Camera = 0x0248,
 		QRCodeScanner = 0x0249,
 		Drawer = 0x024a,
-		Chat = 0x024b
+		Chat = 0x024b,
+		Refresh = 0x024c
 	};
 
 	class SAppLayoutResourceItem : public Referable
@@ -889,6 +896,7 @@ namespace slib
 		Ref<SAppLayoutCameraAttributes> attrsCamera;
 		Ref<SAppLayoutDrawerAttributes> attrsDrawer;
 		Ref<SAppLayoutChatAttributes> attrsChat;
+		Ref<SAppLayoutRefreshAttributes> attrsRefresh;
 
 		CList< Ref<SAppLayoutStyle> > styles;
 		CList< Ref<SAppLayoutResourceItem> > children;
@@ -952,6 +960,7 @@ namespace slib
 		sl_uint32 nAutoIncreaseNameQRCodeScanner = 0;
 		sl_uint32 nAutoIncreaseNameDrawer = 0;
 		sl_uint32 nAutoIncreaseNameChat = 0;
+		sl_uint32 nAutoIncreaseNameRefresh = 0;
 
 	public:
 		SAppLayoutResource();

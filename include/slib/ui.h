@@ -60,6 +60,7 @@
 #include "ui/tree_view.h"
 #include "ui/view_pager.h"
 #include "ui/drawer.h"
+#include "ui/refresh_view.h"
 
 #include "ui/render_view.h"
 #include "ui/web_view.h"

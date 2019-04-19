@@ -20,37 +20,51 @@
  *   THE SOFTWARE.
  */
 
-#include "ListViewPage.h"
+#ifndef CHECKHEADER_SLIB_UI_REFRESH_VIEW
+#define CHECKHEADER_SLIB_UI_REFRESH_VIEW
 
-struct MyListItem
-{
-	int id;
-	Ref<Drawable> icon;
-	String name;
-};
+#include "definition.h"
 
-void ListViewPage::onOpen()
+#include "view.h"
+
+namespace slib
 {
-	List<MyListItem> list;
-	for (int i = 0; i < 100; i++) {
-		MyListItem item;
-		item.id = i;
-		item.icon = i % 2 ? example::drawable::lion::get() : example::drawable::tiger::get();
-		item.name = String::format("List Row %d", i);
-		list.add(item);
-	}
-	listView->setAdapter(ListViewAdapter<MyListItem, example::ui::ListViewItem>::create(list, [](MyListItem& data, example::ui::ListViewItem* row, View*) {
-		row->icon->setSource(data.icon);
-		row->text->setText(data.name);
-		int id = data.id;
-		row->btnDetail->setOnClick([id](View*) {
-			UI::showAlert(String::format("Row %d is clicked on", id));
-		});
-	}));
-	refreshControl->setOnRefresh([this](RefreshView*) {
-		auto thiz = ToRef(this);
-		Dispatch::setTimeout([thiz, this]() {
-			refreshControl->setRefreshing(sl_false);
-		}, 2000);
-	});
+
+	class SLIB_EXPORT RefreshView : public ViewGroup
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		RefreshView();
+		
+		~RefreshView();
+
+	public:
+		sl_bool isRefreshing();
+		
+		void setRefreshing(sl_bool flag);
+		
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(RefreshView, Refresh)
+		
+	public:
+		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
+		
+	protected:
+		void onAttachChild(View* child) override;
+		
+	protected:
+		void _setRefreshing_NW(sl_bool flag);
+		
+		void _onRefresh_NW();
+		
+	protected:
+		sl_bool m_flagRefreshing;
+		
+		Ref<Referable> m_platformContainer;
+		
+	};
+
 }
+
+#endif

@@ -673,6 +673,8 @@
 		2671F99121E07F7400B39842 /* drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2671F99021E07F7300B39842 /* drawer.cpp */; };
 		267B9D65225D11450057DF2A /* instagram_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D64225D11450057DF2A /* instagram_ios.mm */; };
 		267B9D67225D11760057DF2A /* instagram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D66225D11760057DF2A /* instagram.cpp */; };
+		2698A54A226A1C4300662528 /* refresh_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2698A549226A1C4300662528 /* refresh_view.cpp */; };
+		2698A54C226A1C4C00662528 /* refresh_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2698A54B226A1C4B00662528 /* refresh_view_ios.mm */; };
 		269E31A72255EAAF005CD0ED /* paypal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31A62255EAAF005CD0ED /* paypal.cpp */; };
 		269E31AB2255F4F2005CD0ED /* paypal_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31AA2255F4F2005CD0ED /* paypal_ui.cpp */; };
 		26A39D8C20EFE16D004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8B20EFE16D004707C9 /* calculator.cpp */; };
@@ -2164,6 +2166,8 @@
 		2692222F1DC12F600055095F /* image_stb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image_stb.cpp; sourceTree = "<group>"; };
 		269394CB1D7609EB002B9B03 /* list_report_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_report_view.cpp; sourceTree = "<group>"; };
 		269462091CAD1C47001B2130 /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xml.cpp; sourceTree = "<group>"; };
+		2698A549226A1C4300662528 /* refresh_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = refresh_view.cpp; sourceTree = "<group>"; };
+		2698A54B226A1C4B00662528 /* refresh_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = refresh_view_ios.mm; sourceTree = "<group>"; };
 		269E31A62255EAAF005CD0ED /* paypal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = paypal.cpp; sourceTree = "<group>"; };
 		269E31AA2255F4F2005CD0ED /* paypal_ui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = paypal_ui.cpp; sourceTree = "<group>"; };
 		26A39D8B20EFE16D004707C9 /* calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = calculator.cpp; sourceTree = "<group>"; };
@@ -4163,6 +4167,8 @@
 				2634DCE61D8A82EA00E8F19E /* progress_bar.cpp */,
 				263916F521C930DD008B335B /* qr_code_scanner.cpp */,
 				266DD4451C11914200D47AB0 /* radio_button.cpp */,
+				2698A549226A1C4300662528 /* refresh_view.cpp */,
+				2698A54B226A1C4B00662528 /* refresh_view_ios.mm */,
 				266DD4471C11917700D47AB0 /* render_view.cpp */,
 				266DD4491C11918300D47AB0 /* render_view_ios.mm */,
 				26FD28F51CFCB67D003E95FB /* scroll_bar.cpp */,
@@ -5105,6 +5111,7 @@
 				26D9D85B1E962937005F7BD3 /* earth.cpp in Sources */,
 				26D9D7F81E9628E0005F7BD3 /* preference.cpp in Sources */,
 				26D9D7F91E9628E0005F7BD3 /* animation.cpp in Sources */,
+				2698A54A226A1C4300662528 /* refresh_view.cpp in Sources */,
 				2607300020D98466004EB272 /* url_request_curl.cpp in Sources */,
 				26E1B8B4222ABBDC007C222E /* inffast.c in Sources */,
 				26E1B8BD222ABBE7007C222E /* pngmem.c in Sources */,
@@ -5442,6 +5449,7 @@
 				26D9D8831E96295A005F7BD3 /* audio_recorder_dsound.cpp in Sources */,
 				26D9D8461E9628E0005F7BD3 /* locale.cpp in Sources */,
 				26C795CA2215FC7C0053C5A1 /* menus.cpp in Sources */,
+				2698A54C226A1C4C00662528 /* refresh_view_ios.mm in Sources */,
 				26CF4DF21ED69AD600954B7A /* ui_text_ios.mm in Sources */,
 				26D9D8471E9628E0005F7BD3 /* compress_zlib.cpp in Sources */,
 				26D9D8481E9628E0005F7BD3 /* rsa.cpp in Sources */,

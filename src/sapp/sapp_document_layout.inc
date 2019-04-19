@@ -927,6 +927,7 @@ namespace slib
 			PROCESS_CONTROL_SWITCH(QRCodeScanner)
 			PROCESS_CONTROL_SWITCH(Drawer)
 			PROCESS_CONTROL_SWITCH(Chat)
+			PROCESS_CONTROL_SWITCH(Refresh)
 			default:
 				return sl_false;
 		}
@@ -956,6 +957,13 @@ namespace slib
 									childItem->attrsView->leftMode = PositionMode::Free;
 									childItem->attrsView->rightMode = PositionMode::Free;
 								}
+							} else if (resourceItem->itemType == SAppLayoutItemType::Refresh) {
+								childItem->attrsView->width.flagDefined = sl_true;
+								childItem->attrsView->width.amount = 1;
+								childItem->attrsView->width.unit = SAppDimensionValue::FILL;
+								childItem->attrsView->height.flagDefined = sl_true;
+								childItem->attrsView->height.amount = 1;
+								childItem->attrsView->height.unit = SAppDimensionValue::FILL;
 							}
 							if (!(resourceItem->children.add(childItem))) {
 								_logError(resourceItem->element, _g_sdev_sapp_error_out_of_memory);
@@ -4253,4 +4261,24 @@ namespace slib
 	}
 	END_PROCESS_LAYOUT_CONTROL
 	
+	BEGIN_PROCESS_LAYOUT_CONTROL(Refresh, RefreshView)
+	{
+		
+		LAYOUT_CONTROL_PROCESS_SUPER(ViewGroup)
+		
+		LAYOUT_CONTROL_ADD_STATEMENT
+		
+		if (op == OP_PARSE) {
+			sl_size nChildren = element->getChildElementsCount();
+			if (nChildren > 0) {
+				if (nChildren != 1) {
+					_logError(element, _g_sdev_sapp_error_resource_layout_refreshview_must_contain_one_child);
+					return sl_false;
+				}
+			}
+		}
+		
+	}
+	END_PROCESS_LAYOUT_CONTROL
+
 }

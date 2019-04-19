@@ -471,6 +471,10 @@ namespace slib
 				prefix = "chat";
 				pN = &nAutoIncreaseNameChat;
 				break;
+			case SAppLayoutItemType::Refresh:
+				prefix = "refresh";
+				pN = &nAutoIncreaseNameChat;
+				break;
 			default:
 				return String::null();
 		}
@@ -554,6 +558,8 @@ namespace slib
 			type = SAppLayoutItemType::Drawer;
 		} else if (strType == "chat") {
 			type = SAppLayoutItemType::Chat;
+		} else if (strType == "refresh") {
+			type = SAppLayoutItemType::Refresh;
 		}
 		return type;
 	}
