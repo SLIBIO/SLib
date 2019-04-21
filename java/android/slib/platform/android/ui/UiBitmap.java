@@ -78,24 +78,36 @@ public class UiBitmap {
 	public static UiBitmap load(Activity activity, byte[] data) {
 		if (activity != null) {
 			Point size = Util.getDisplaySize(activity);
-			return load(data, size.x / 2, size.y / 2);
+			int s = Math.min(size.x, size.y);
+			return load(data, s, s);
 		} else {
 			return load(data);
 		}
 	}
 
-	public static UiBitmap load(byte[] data, int reqWidth, int reqHeight) {
+	public static UiBitmap load(byte[] data, int maxWidth, int maxHeight) {
+		byte[] buf = getTempStorage();
 		try {
 			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inTempStorage = buf;
 			options.inJustDecodeBounds = true;
 			BitmapFactory.decodeByteArray(data, 0, data.length, options);
-			options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+			if (maxWidth > 0 && maxHeight > 0){
+				final int height = options.outHeight;
+				final int width = options.outWidth;
+				int inSampleSize = 1;
+				if ((width / inSampleSize) > maxWidth || (height / inSampleSize) > maxHeight) {
+					inSampleSize *= 2;
+				}
+				options.inSampleSize = inSampleSize;
+			}
 			options.inJustDecodeBounds = false;
-			Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+			Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, options);
 			if (bitmap != null) {
 				if (bitmap.getWidth() > 0 && bitmap.getHeight() > 0) {
 					UiBitmap ret = new UiBitmap();
 					ret.bitmap = bitmap;
+					returnTempStorage(buf);
 					return ret;						
 				}
 				bitmap.recycle();
@@ -103,6 +115,7 @@ public class UiBitmap {
 		} catch (Throwable e) {
 			Logger.exception(e);
 		}
+		returnTempStorage(buf);
 		return null;
 	}
 	
@@ -320,18 +333,28 @@ public class UiBitmap {
 		}
 	}
 
-	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-		final int height = options.outHeight;
-		final int width = options.outWidth;
-		int inSampleSize = 1;
-		if (height > reqHeight || width > reqWidth) {
-			final int halfHeight = height / 2;
-			final int halfWidth = width / 2;
-			while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
-				inSampleSize *= 2;
+	private static byte[] mTempStorage = null;
+	private static boolean mInitTempStorage = false;
+	private static final Object mSyncTempStorage = new Object();
+
+	public static byte[] getTempStorage() {
+		synchronized (mSyncTempStorage) {
+			if (!mInitTempStorage) {
+				mInitTempStorage = true;
+				mTempStorage = new byte[16*1024];
 			}
+			byte[] temp = mTempStorage;
+			mTempStorage = null;
+			return temp;
 		}
-		return inSampleSize;
 	}
 
+	public static void returnTempStorage(byte[] buf) {
+		if (buf == null) {
+			return;
+		}
+		synchronized (mSyncTempStorage) {
+			mTempStorage = buf;
+		}
+	}
 }
