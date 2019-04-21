@@ -20,17 +20,45 @@
  *   THE SOFTWARE.
  */
 
-#include "slib/ui/notification.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
+#include "slib/ui/notification.h"
+
 #include "slib/ui/core.h"
 #include "slib/ui/platform.h"
+#include "slib/core/file.h"
 
 namespace slib
 {
 	void PushNotification::_doInit()
 	{
+		if (getEnvironment() == PushNotificationEnvironment::Undefined) {
+			NSString* path = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"embedded.mobileprovision"];
+			Memory mem = File::readAllBytes(Apple::getStringFromNSString(path));
+			sl_uint8* p = (sl_uint8*)(mem.getData());
+			sl_size n = mem.getSize();
+			if (n > 26) {
+				for (sl_size i = 0; i < n - 26; i++) {
+					if (Base::compareMemory(p + i, (sl_uint8*)("<key>aps-environment</key>"), 26) == 0) {
+						i += 26;
+						for (; i < n; i++) {
+							sl_uint8 c = p[i];
+							if (c != 0 && c != '\r' && c != '\n' && c != ' ' && c != '\t') {
+								break;
+							}
+						}
+						if (i + 28 <= n && Base::compareMemory(p + i, (sl_uint8*)("<string>development</string>"), 28) == 0) {
+							setEnvironment(PushNotificationEnvironment::Development);
+						} else if (i + 27 <= n && Base::compareMemory(p + i, (sl_uint8*)("<string>production</string>"), 27) == 0) {
+							setEnvironment(PushNotificationEnvironment::Production);
+						}
+					}
+				}
+			}
+		}
+		
 		UIPlatform::registerDidReceiveRemoteNotificationCallback([](NSDictionary* _userInfo) {
 			PushNotificationMessage message;
 			if (UIPlatform::parseRemoteNotificationInfo(_userInfo, message)) {

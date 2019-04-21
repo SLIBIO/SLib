@@ -33,7 +33,19 @@ namespace slib
 		badge = -1;
 		flagClicked = sl_false;
 	}
-
+	
+	
+	PushNotificationEnvironment _g_slib_ui_notification_environment = PushNotificationEnvironment::Undefined;
+	
+	PushNotificationEnvironment PushNotification::getEnvironment()
+	{
+		return _g_slib_ui_notification_environment;
+	}
+	
+	void PushNotification::setEnvironment(PushNotificationEnvironment environment)
+	{
+		_g_slib_ui_notification_environment = environment;
+	}
 	
 	SLIB_STATIC_ZERO_INITIALIZED(AtomicString, _g_slib_ui_notification_token);
 
@@ -53,7 +65,6 @@ namespace slib
 			return;
 		}
 		_g_slib_ui_notification_listTokenRefreshCallback.addIfNotExist(callback);
-		_init();
 	}
 	
 	void PushNotification::removeTokenRefreshCallback(const Function<void(String)>& callback)
@@ -81,10 +92,10 @@ namespace slib
 		}
 		_g_slib_ui_notification_listNotificationReceivedCallback.remove(callback);
 	}
-	
+
 	SLIB_STATIC_ZERO_INITIALIZED(SpinLock, _g_slib_ui_notification_lock);
 	
-	void PushNotification::_init()
+	void PushNotification::start()
 	{
 		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ui_notification_lock)) {
 			return;
