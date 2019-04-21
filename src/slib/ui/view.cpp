@@ -1581,6 +1581,24 @@ namespace slib
 		return m_boundsInParent;
 	}
 
+	sl_bool View::getVisibleBounds(UIRect* outBounds)
+	{
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			UIRect boundsParent;
+			if (!(parent->getVisibleBounds(&boundsParent))) {
+				return sl_false;
+			}
+			boundsParent = convertCoordinateFromParent(boundsParent);
+			return getBounds().intersectRectangle(boundsParent, outBounds);
+		} else {
+			if (outBounds) {
+				*outBounds = getBounds();
+			}
+			return sl_true;
+		}
+	}
+	
 	Visibility View::getVisibility()
 	{
 		return m_visibility;
@@ -4474,6 +4492,18 @@ namespace slib
 
 	UIPointf View::convertCoordinateFromParent(const UIPointf& ptParent)
 	{
+		if (m_instance.isNotNull() && m_parent.isNotNull()) {
+			Ref<ViewInstance> instance = m_instance;
+			Ref<View> parent = m_parent;
+			if (instance.isNotNull() && parent.isNotNull() && parent->m_instance.isNotNull()) {
+				Ref<ViewInstance> instanceParent = parent->m_instance;
+				if (instanceParent.isNotNull()) {
+					UIPointf pt = instanceParent->convertCoordinateFromViewToScreen(ptParent);
+					return instance->convertCoordinateFromScreenToView(pt);
+				}
+			}
+		}
+		
 		sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
 		sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
 		
@@ -4495,6 +4525,36 @@ namespace slib
 
 	UIRectf View::convertCoordinateFromParent(const UIRectf& rcParent)
 	{
+		if (m_instance.isNotNull() && m_parent.isNotNull()) {
+			Ref<ViewInstance> instance = m_instance;
+			Ref<View> parent = m_parent;
+			if (instance.isNotNull() && parent.isNotNull() && parent->m_instance.isNotNull()) {
+				Ref<ViewInstance> instanceParent = parent->m_instance;
+				if (instanceParent.isNotNull()) {
+					if (getFinalTransform(sl_null)) {
+						UIPointf pts[4];
+						rcParent.getCornerPoints(pts);
+						for (int i = 0; i < 4; i++) {
+							UIPointf pt = instanceParent->convertCoordinateFromViewToScreen(pts[i]);
+							pts[i] = instance->convertCoordinateFromScreenToView(pt);
+						}
+						UIRectf rc;
+						rc.setFromPoints(pts, 4);
+						return rc;
+					} else {
+						UIPointf pt = instanceParent->convertCoordinateFromViewToScreen(rcParent.getLocation());
+						pt = instance->convertCoordinateFromScreenToView(pt);
+						UIRectf rc;
+						rc.left = pt.x;
+						rc.top = pt.y;
+						rc.right = pt.x + rcParent.getWidth();
+						rc.bottom = pt.y + rcParent.getHeight();
+						return rc;
+					}
+				}
+			}
+		}
+		
 		sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
 		sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
 		
@@ -4519,6 +4579,18 @@ namespace slib
 
 	UIPointf View::convertCoordinateToParent(const UIPointf& ptView)
 	{
+		if (m_instance.isNotNull() && m_parent.isNotNull()) {
+			Ref<ViewInstance> instance = m_instance;
+			Ref<View> parent = m_parent;
+			if (instance.isNotNull() && parent.isNotNull() && parent->m_instance.isNotNull()) {
+				Ref<ViewInstance> instanceParent = parent->m_instance;
+				if (instanceParent.isNotNull()) {
+					UIPointf pt = instance->convertCoordinateFromViewToScreen(ptView);
+					return instanceParent->convertCoordinateFromScreenToView(pt);
+				}
+			}
+		}
+		
 		sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
 		sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
 
@@ -4540,6 +4612,36 @@ namespace slib
 
 	UIRectf View::convertCoordinateToParent(const UIRectf& rcView)
 	{
+		if (m_instance.isNotNull() && m_parent.isNotNull()) {
+			Ref<ViewInstance> instance = m_instance;
+			Ref<View> parent = m_parent;
+			if (instance.isNotNull() && parent.isNotNull() && parent->m_instance.isNotNull()) {
+				Ref<ViewInstance> instanceParent = parent->m_instance;
+				if (instanceParent.isNotNull()) {
+					if (getFinalTransform(sl_null)) {
+						UIPointf pts[4];
+						rcView.getCornerPoints(pts);
+						for (int i = 0; i < 4; i++) {
+							UIPointf pt = instance->convertCoordinateFromViewToScreen(pts[i]);
+							pts[i] = instanceParent->convertCoordinateFromScreenToView(pt);
+						}
+						UIRectf rc;
+						rc.setFromPoints(pts, 4);
+						return rc;
+					} else {
+						UIPointf pt = instance->convertCoordinateFromViewToScreen(rcView.getLocation());
+						pt = instanceParent->convertCoordinateFromScreenToView(pt);
+						UIRectf rc;
+						rc.left = pt.x;
+						rc.top = pt.y;
+						rc.right = pt.x + rcView.getWidth();
+						rc.bottom = pt.y + rcView.getHeight();
+						return rc;
+					}
+				}
+			}
+		}
+		
 		sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
 		sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
 

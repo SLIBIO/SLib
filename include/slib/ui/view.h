@@ -242,6 +242,9 @@ namespace slib
 		
 		// parent coordinate
 		UIRect getBoundsInParent();
+		
+		// local coordinate
+		sl_bool getVisibleBounds(UIRect* outBounds = sl_null);
 
 		
 		Visibility getVisibility();
@@ -688,17 +691,22 @@ namespace slib
 		
 		void updateInstanceTransforms();
 		
-
+		// Call in UI Thread
 		UIPointf convertCoordinateFromScreen(const UIPointf& ptScreen);
 		
+		// Call in UI Thread
 		UIPointf convertCoordinateToScreen(const UIPointf& ptView);
 		
+		// Call in UI Thread
 		UIPointf convertCoordinateFromParent(const UIPointf& ptParent);
 		
+		// Call in UI Thread
 		UIRectf convertCoordinateFromParent(const UIRectf& rectParent);
 		
+		// Call in UI Thread
 		UIPointf convertCoordinateToParent(const UIPointf& ptView);
 
+		// Call in UI Thread
 		UIRectf convertCoordinateToParent(const UIRectf& rectView);
 
 		

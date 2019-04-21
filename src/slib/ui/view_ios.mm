@@ -329,19 +329,20 @@ namespace slib
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
-			UIWindow* window = [handle window];
-			if (window != nil) {
-				CGPoint pt;
-				CGFloat f = UIPlatform::getGlobalScaleFactor();
-				pt.x = ptScreen.x / f;
-				pt.y = ptScreen.y / f;
-				pt = [window convertPoint:pt fromWindow:nil];
-				pt = [window convertPoint:pt toView:handle];
-				UIPointf ret;
-				ret.x = (sl_ui_posf)(pt.x * f);
-				ret.y = (sl_ui_posf)(pt.y * f);
-				return ret;
+			CGPoint pt;
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
+			pt.x = ptScreen.x / f;
+			pt.y = ptScreen.y / f;
+			pt = [handle convertPoint:pt fromCoordinateSpace:handle.window.screen.coordinateSpace];
+			if ([handle isKindOfClass:[UIScrollView class]]) {
+				UIScrollView* scroll = (UIScrollView*)handle;
+				pt.x -= scroll.contentOffset.x;
+				pt.y -= scroll.contentOffset.y;
 			}
+			UIPointf ret;
+			ret.x = (sl_ui_posf)(pt.x * f);
+			ret.y = (sl_ui_posf)(pt.y * f);
+			return ret;
 		}
 		return ptScreen;
 	}
@@ -350,19 +351,20 @@ namespace slib
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
-			UIWindow* window = [handle window];
-			if (window != nil) {
-				CGPoint pt;
-				CGFloat f = UIPlatform::getGlobalScaleFactor();
-				pt.x = ptView.x / f;
-				pt.y = ptView.y / f;
-				pt = [window convertPoint:pt fromView:handle];
-				pt = [window convertPoint:pt toWindow:nil];
-				UIPointf ret;
-				ret.x = (sl_ui_posf)(pt.x * f);
-				ret.y = (sl_ui_posf)(pt.y * f);
-				return ret;
+			CGPoint pt;
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
+			pt.x = ptView.x / f;
+			pt.y = ptView.y / f;
+			if ([handle isKindOfClass:[UIScrollView class]]) {
+				UIScrollView* scroll = (UIScrollView*)handle;
+				pt.x += scroll.contentOffset.x;
+				pt.y += scroll.contentOffset.y;
 			}
+			pt = [handle convertPoint:pt toCoordinateSpace:handle.window.screen.coordinateSpace];
+			UIPointf ret;
+			ret.x = (sl_ui_posf)(pt.x * f);
+			ret.y = (sl_ui_posf)(pt.y * f);
+			return ret;
 		}
 		return ptView;
 	}
@@ -578,9 +580,6 @@ namespace slib
 		_priv_Slib_iOS_ViewHandle* handle;
 		if (IsInstanceOf<ScrollView>(getParent())) {
 			handle = [[_priv_Slib_iOS_ScrollContentViewHandle alloc] initWithFrame:frame];
-			UISize screenSize = UI::getScreenSize();
-			CGFloat m = Math::min(screenSize.x, screenSize.y);
-			((CATiledLayer*)(handle.layer)).tileSize = CGSizeMake(m, m);
 		} else {
 			handle = [[_priv_Slib_iOS_ViewHandle alloc] initWithFrame:frame];
 		}
@@ -625,11 +624,60 @@ IOS_VIEW_EVENTS
 
 @end
 
+@interface _priv_Slib_iOS_TiledLayer : CATiledLayer
+{
+	@public sl_int32 m_updateId;
+}
+@end
+
+@implementation _priv_Slib_iOS_TiledLayer
+
++(CFTimeInterval)fadeDuration {
+	return 0.0;
+}
+
+-(id)init
+{
+	self = [super init];
+	if (self != nil) {
+		m_updateId = 0;
+		slib::UISize screenSize = slib::UI::getScreenSize();
+		CGFloat m = slib::Math::min(screenSize.x, screenSize.y);
+		self.tileSize = CGSizeMake(m, m);
+	}
+	return self;
+}
+
+-(void)setNeedsDisplay
+{
+	slib::Base::interlockedIncrement32(&m_updateId);
+	[super setNeedsDisplay];
+}
+
+-(void)setNeedsDisplayInRect:(CGRect)r
+{
+	slib::Base::interlockedIncrement32(&m_updateId);
+	[super setNeedsDisplayInRect:r];
+}
+
+-(void)drawInContext:(CGContextRef)ctx
+{
+	sl_int32 updateId = m_updateId;
+	[super drawInContext:ctx];
+	dispatch_async(dispatch_get_main_queue(), ^{
+		if (updateId != self->m_updateId) {
+			[self setNeedsDisplay];
+		}
+	});
+}
+
+@end
+
 @implementation _priv_Slib_iOS_ScrollContentViewHandle
 
 +(Class)layerClass
 {
-	return CATiledLayer.class;
+	return _priv_Slib_iOS_TiledLayer.class;
 }
 
 @end
