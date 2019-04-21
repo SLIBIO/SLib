@@ -71,8 +71,7 @@ public class UiView {
 
 	public static View createGeneric(Context context) {
 		try {
-			UiGenericView view = new UiGenericView(context);
-			return view;
+			return new UiGenericView(context);
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
@@ -81,8 +80,7 @@ public class UiView {
 	
 	public static View createGroup(Context context) {
 		try {
-			UiGroupView view = new UiGroupView(context);
-			return view;
+			return new UiGroupView(context);
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
@@ -300,7 +298,9 @@ public class UiView {
 	
 	public static void setLayered(final View view) {
 		try {
-			view.setLayerType(View.LAYER_TYPE_HARDWARE, null);			
+			if (view.getLayerType() == View.LAYER_TYPE_NONE) {
+				view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+			}
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
@@ -442,6 +442,10 @@ public class UiView {
 			} else if (view instanceof UiGroupView) {
 				if (((UiGroupView)view).gestureDetector == null) {
 					((UiGroupView)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener((IView)view));
+				}
+			} else if (view instanceof UiScrollView) {
+				if (((UiScrollView)view).gestureDetector == null) {
+					((UiScrollView)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener((IView)view));
 				}
 			} else if (view instanceof UiWindow) {
 				if (((UiWindow)view).gestureDetector == null) {

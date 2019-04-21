@@ -41,6 +41,8 @@ public class UiScrollView extends ScrollView implements IView {
 	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
 	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
 
+	UiGestureDetector gestureDetector;
+
 	public static View _create(Context context, boolean flagVertical) {
 		try {
 			if (flagVertical) {
@@ -214,6 +216,9 @@ public class UiScrollView extends ScrollView implements IView {
 
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
+		if (gestureDetector != null) {
+			gestureDetector.onTouchEvent(ev);
+		}
 		UiView.onEventTouch(this, ev, true, true);
 		return super.dispatchTouchEvent(ev);
 	}
