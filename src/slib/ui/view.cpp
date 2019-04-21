@@ -6106,7 +6106,7 @@ namespace slib
 		if (attrs.isNotNull()) {
 			x = _priv_View_clampScrollPos(x, attrs->contentWidth - (sl_scroll_pos)(getWidth()));
 			y = _priv_View_clampScrollPos(y, attrs->contentHeight - (sl_scroll_pos)(getHeight()));
-			if (_scrollTo(x, y, sl_true, sl_false)) {
+			if (_scrollTo(x, y, sl_true, sl_true, sl_false)) {
 				invalidate(mode);
 			}
 			if (isNativeWidget()) {
@@ -6446,7 +6446,7 @@ namespace slib
 			sl_scroll_pos x = _priv_View_clampScrollPos(attrs->x, attrs->contentWidth - (sl_scroll_pos)(getWidth()));
 			sl_scroll_pos y = _priv_View_clampScrollPos(attrs->y, attrs->contentHeight - (sl_scroll_pos)(getHeight()));
 			if (!(Math::isAlmostZero(x - attrs->x) && Math::isAlmostZero(y - attrs->y))) {
-				if (_scrollTo(x, y, sl_true, sl_false)) {
+				if (_scrollTo(x, y, sl_true, sl_true, sl_false)) {
 					invalidate(mode);
 				}
 			}
@@ -6564,56 +6564,59 @@ namespace slib
 
 #define BOUNCE_WEIGHT 0
 
-	sl_bool View::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagFinish, sl_bool flagAnimate)
+	sl_bool View::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagPreprocess, sl_bool flagFinish, sl_bool flagAnimate)
 	{
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNull()) {
 			return sl_false;
 		}
 		
+		sl_real width = (sl_real)(getWidth());;
+		sl_real height = (sl_real)(getHeight());
+
 		sl_bool flagFinishX = flagFinish;
 		sl_bool flagFinishY = flagFinish;
 		
-		sl_scroll_pos comp;
-		sl_real w = 0;
-		if (attrs->flagHorz) {
-			w = (sl_real)(getWidth());
-			if (attrs->contentWidth > w) {
-				comp = -(w * BOUNCE_WEIGHT);
-				if (x < comp) {
-					x = comp;
-					flagFinishX = sl_true;
-				}
-				comp = attrs->contentWidth - w + (w * BOUNCE_WEIGHT);
-				if (x > comp) {
-					x = comp;
+		if (flagPreprocess) {
+			sl_scroll_pos comp;
+			if (attrs->flagHorz) {
+				sl_real w = width;
+				if (attrs->contentWidth > w) {
+					comp = -(w * BOUNCE_WEIGHT);
+					if (x < comp) {
+						x = comp;
+						flagFinishX = sl_true;
+					}
+					comp = attrs->contentWidth - w + (w * BOUNCE_WEIGHT);
+					if (x > comp) {
+						x = comp;
+						flagFinishX = sl_true;
+					}
+				} else {
 					flagFinishX = sl_true;
 				}
 			} else {
 				flagFinishX = sl_true;
 			}
-		} else {
-			flagFinishX = sl_true;
-		}
-		sl_real h = 0;
-		if (attrs->flagVert) {
-			h = (sl_real)(getHeight());
-			if (attrs->contentHeight > h) {
-				comp = -(h * BOUNCE_WEIGHT);
-				if (y < comp) {
-					y = comp;
-					flagFinishY = sl_true;
-				}
-				comp = attrs->contentHeight - h + (h * BOUNCE_WEIGHT);
-				if (y > comp) {
-					y = comp;
+			if (attrs->flagVert) {
+				sl_real h = height;
+				if (attrs->contentHeight > h) {
+					comp = -(h * BOUNCE_WEIGHT);
+					if (y < comp) {
+						y = comp;
+						flagFinishY = sl_true;
+					}
+					comp = attrs->contentHeight - h + (h * BOUNCE_WEIGHT);
+					if (y > comp) {
+						y = comp;
+						flagFinishY = sl_true;
+					}
+				} else {
 					flagFinishY = sl_true;
 				}
 			} else {
 				flagFinishY = sl_true;
 			}
-		} else {
-			flagFinishY = sl_true;
 		}
 		
 		sl_bool flagUpdated = sl_false;
@@ -6647,9 +6650,9 @@ namespace slib
 						x = 0;
 						flagTarget = sl_true;
 					}
-					if (attrs->contentWidth > w) {
-						if (x > attrs->contentWidth - w) {
-							x = attrs->contentWidth - w;
+					if (attrs->contentWidth > width) {
+						if (x > attrs->contentWidth - width) {
+							x = attrs->contentWidth - width;
 							flagTarget = sl_true;
 						}
 					}
@@ -6659,9 +6662,9 @@ namespace slib
 						y = 0;
 						flagTarget = sl_true;
 					}
-					if (attrs->contentHeight > h) {
-						if (y > attrs->contentHeight - h) {
-							y = attrs->contentHeight - h;
+					if (attrs->contentHeight > height) {
+						if (y > attrs->contentHeight - height) {
+							y = attrs->contentHeight - height;
 							flagTarget = sl_true;
 						}
 					}
@@ -8700,6 +8703,9 @@ namespace slib
 		if (scrollAttrs.isNull()) {
 			return;
 		}
+		if (isNativeWidget()) {
+			return;
+		}
 		sl_bool flagHorz = scrollAttrs->flagHorz;
 		if (flagHorz && scrollAttrs->contentWidth <= (sl_scroll_pos)(getWidth())) {
 			flagHorz = sl_false;
@@ -8755,7 +8761,7 @@ namespace slib
 							sy -= offset.y;
 						}
 						if (scrollAttrs->flagSmoothContentScrolling) {
-							_scrollTo(sx, sy, sl_true, sl_false);
+							_scrollTo(sx, sy, sl_true, sl_true, sl_false);
 							scrollAttrs->motionTracker->addMovement(ev);
 							invalidate();
 						} else {
@@ -8986,7 +8992,7 @@ namespace slib
 			_priv_View_smoothScrollElement(x, scrollAttrs->xSmoothTarget, dt, T, flagX);
 			_priv_View_smoothScrollElement(y, scrollAttrs->ySmoothTarget, dt, T, flagY);
 			
-			_scrollTo(x, y, sl_false, sl_true);
+			_scrollTo(x, y, sl_true, sl_false, sl_true);
 			
 			if (!flagX && !flagY) {
 				_stopContentScrollingFlow();
@@ -9006,7 +9012,7 @@ namespace slib
 				scrollAttrs->speedFlow *= 0.95f;
 			}
 
-			_scrollTo(x, y, flagFinish, sl_true);
+			_scrollTo(x, y, sl_true, flagFinish, sl_true);
 			
 		}
 		
@@ -9043,7 +9049,7 @@ namespace slib
 	
 	void View::_onScroll_NW(sl_scroll_pos x, sl_scroll_pos y)
 	{
-		_scrollTo(x, y, sl_true, sl_false);
+		_scrollTo(x, y, sl_false, sl_true, sl_false);
 	}
 	
 /**********************

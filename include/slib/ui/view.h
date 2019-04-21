@@ -1357,7 +1357,7 @@ namespace slib
 		
 		void _onScrollBarChangeValue(ScrollBar* scrollBar, sl_scroll_pos value);
 				
-		sl_bool _scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagFinish, sl_bool flagAnimate);
+		sl_bool _scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagPreprocess, sl_bool flagFinish, sl_bool flagAnimate);
 
 		void _cancelPressState();
 		
