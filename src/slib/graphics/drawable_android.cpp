@@ -206,7 +206,8 @@ namespace slib
 
 	Ref<Drawable> PlatformDrawable::create(const ImageDesc& desc)
 	{
-		return _priv_Android_ImageDrawable::create(desc);
+		//return _priv_Android_ImageDrawable::create(desc);
+		return Bitmap::create(desc);
 	}
 
 	Ref<Drawable> PlatformDrawable::loadFromMemory(const void* buf, sl_size size)
