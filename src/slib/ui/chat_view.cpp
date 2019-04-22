@@ -22,6 +22,7 @@
 
 #include "slib/ui/chat_view.h"
 
+#include "slib/ui/core.h"
 #include "slib/ui/label_view.h"
 
 #include "../resources.h"
@@ -530,9 +531,17 @@ namespace slib
 		dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ChatView, _updateListContent, this, UIUpdateMode::UpdateLayout));
 	}
 	
+	sl_bool ChatView::onSetFrame(UIRect& frame)
+	{
+		if (Math::isAlmostZero(getScrollY() - getScrollRange().y)) {
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), View, smoothScrollToEndY, this, UIUpdateMode::Redraw));
+		}
+		return sl_true;
+	}
+	
 	void ChatView::onResize(sl_ui_len width, sl_ui_len height)
 	{
-		ViewGroup::onResize(width, height);
+		ListView::onResize(width, height);
 		sl_bool flagUpdateList = sl_false;
 		{
 			sl_real weight = m_chatWidthWeight;

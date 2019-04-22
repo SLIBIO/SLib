@@ -109,6 +109,8 @@ namespace slib
 		void setFont(const Ref<Font>& font, UIUpdateMode mode = UIUpdateMode::UpdateLayout) override;
 
 	protected:
+		sl_bool onSetFrame(UIRect& frame) override;
+		
 		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
 	protected:
