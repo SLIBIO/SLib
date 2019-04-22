@@ -185,7 +185,7 @@ namespace slib
 						return;
 					}
 					_initHeights(adapter.get());
-					UI::dispatchToUiThread([weak, this, adapter]() {
+					dispatchToDrawingThread([weak, this, adapter]() {
 						auto ref = ToRef(weak);
 						if (ref.isNull()) {
 							return;
