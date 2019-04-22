@@ -29,6 +29,7 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import slib.platform.android.ui.UiThread;
@@ -118,6 +119,27 @@ public class Android {
 				} else {
 					imm.hideSoftInputFromWindow(activity.getWindow().getDecorView().getWindowToken(), 0);
 				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	public static final int KEYBOARD_ADJUST_PAN = 1;
+	public static final int KEYBOARD_ADJUST_RESIZE = 2;
+
+	public static void setKeyboardAdjustMode(final Activity activity, int mode) {
+		try {
+			switch (mode) {
+				case KEYBOARD_ADJUST_PAN:
+					activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+					break;
+				case KEYBOARD_ADJUST_RESIZE:
+					activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+					break;
+				default:
+					activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+					break;
 			}
 		} catch (Exception e) {
 			Logger.exception(e);

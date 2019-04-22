@@ -402,6 +402,13 @@ namespace slib
 		AsciiNumpad = 12
 	};
 	
+	enum class UIKeyboardAdjustMode
+	{
+		None = 0,
+		Pan = 1,
+		Resize = 2
+	};
+	
 	enum class UIAutoCapitalizationType
 	{
 		None = 0,

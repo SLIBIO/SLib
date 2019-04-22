@@ -633,7 +633,29 @@ namespace slib
 	void UI::dismissKeyboard()
 	{
 	}
+#endif
 	
+	UIKeyboardAdjustMode _g_priv_ui_keyboardAdjustMode = UIKeyboardAdjustMode::Pan;
+	
+	UIKeyboardAdjustMode UI::getKeyboardAdjustMode()
+	{
+		return _g_priv_ui_keyboardAdjustMode;
+	}
+	
+	
+#if defined(SLIB_UI_IS_ANDROID)
+	void _priv_UI_updateKeyboardAdjustMode(UIKeyboardAdjustMode mode);
+#endif
+
+	void UI::setKeyboardAdjustMode(UIKeyboardAdjustMode mode)
+	{
+		_g_priv_ui_keyboardAdjustMode = mode;
+#if defined(SLIB_UI_IS_ANDROID)
+		_priv_UI_updateKeyboardAdjustMode(mode);
+#endif
+	}
+	
+#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
 	UIEdgeInsets UI::getSafeAreaInsets()
 	{
 		UIEdgeInsets ret;

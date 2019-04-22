@@ -41,6 +41,9 @@ namespace slib
 @interface _priv_Slib_iOS_Window_RootViewController : UIViewController
 {
 	@public slib::WeakRef<slib::iOS_Window> m_window;
+	
+	@public slib::UISize m_sizeClient;
+	@public slib::UISize m_sizeClientResizedByKeyboard;
 }
 @end
 
@@ -134,6 +137,8 @@ namespace slib
 				}
 				_priv_Slib_iOS_Window_RootViewController* controller = [[_priv_Slib_iOS_Window_RootViewController alloc] init];
 				if (controller != nil) {
+					controller->m_sizeClient = _rect.getSize();
+					controller->m_sizeClientResizedByKeyboard = controller->m_sizeClient;
 					_priv_Slib_iOS_ViewHandle* view = [[_priv_Slib_iOS_ViewHandle alloc] init];
 					if (view != nil) {
 						view.opaque = NO;
@@ -250,6 +255,14 @@ namespace slib
 				rect.size.width = (CGFloat)(frame.getWidth()) / f;
 				rect.size.height = (CGFloat)(frame.getHeight()) / f;
 				[window setFrame:rect];
+				if ([window isKindOfClass:[UIWindow class]]) {
+					UIViewController* controller = ((UIWindow*)window).rootViewController;
+					if (controller != nil && [controller isKindOfClass:[_priv_Slib_iOS_Window_RootViewController class]]) {
+						UISize size = frame.getSize();
+						((_priv_Slib_iOS_Window_RootViewController*)controller)->m_sizeClient = size;
+						((_priv_Slib_iOS_Window_RootViewController*)controller)->m_sizeClientResizedByKeyboard = size;
+					}
+				}
 				return sl_true;
 			}
 			return sl_false;
@@ -264,6 +277,12 @@ namespace slib
 		{
 			UIView* window = m_window;
 			if (window != nil) {
+				if ([window isKindOfClass:[UIWindow class]]) {
+					UIViewController* controller = ((UIWindow*)window).rootViewController;
+					if (controller != nil && [controller isKindOfClass:[_priv_Slib_iOS_Window_RootViewController class]]) {
+						return ((_priv_Slib_iOS_Window_RootViewController*)controller)->m_sizeClientResizedByKeyboard;
+					}
+				}
 				CGFloat f = UIPlatform::getGlobalScaleFactor();
 				CGRect rect = [window frame];
 				UISize ret;
@@ -288,6 +307,13 @@ namespace slib
 				frame.size.width = (CGFloat)(size.x) / f;
 				frame.size.height = (CGFloat)(size.y) / f;
 				[window setFrame:frame];
+				if ([window isKindOfClass:[UIWindow class]]) {
+					UIViewController* controller = ((UIWindow*)window).rootViewController;
+					if (controller != nil && [controller isKindOfClass:[_priv_Slib_iOS_Window_RootViewController class]]) {
+						((_priv_Slib_iOS_Window_RootViewController*)controller)->m_sizeClient = size;
+						((_priv_Slib_iOS_Window_RootViewController*)controller)->m_sizeClientResizedByKeyboard = size;
+					}
+				}
 				return sl_true;
 			}
 			return sl_false;
@@ -698,6 +724,16 @@ namespace slib
 
 @implementation _priv_Slib_iOS_Window_RootViewController
 
+- (id)init
+{
+	self = [super init];
+	if (self != nil) {
+		self->m_sizeClient = slib::UISize::zero();
+		self->m_sizeClientResizedByKeyboard = slib::UISize::zero();
+	}
+	return self;
+}
+
 - (BOOL)prefersStatusBarHidden
 {
 	if (slib::_g_priv_ui_flag_set_statusbar_style) {
@@ -737,10 +773,19 @@ namespace slib
 	if (slib::_g_priv_ui_flag_set_statusbar_style) {
 		[self setNeedsStatusBarAppearanceUpdate];
 	}
-	slib::Ref<slib::iOS_Window> w = m_window;
-	if (w.isNotNull()) {
-		slib::Size size = w->getClientSize();
-		w->onResize(size.x, size.y);
+	slib::Ref<slib::iOS_Window> window = m_window;
+	if (window.isNotNull()) {
+		UIView* handle = window->m_window;
+		if (handle != nil) {
+			CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
+			CGSize _size = handle.frame.size;
+			slib::UISize size;
+			size.x = (sl_ui_pos)(_size.width * f);
+			size.y = (sl_ui_pos)(_size.height * f);
+			self->m_sizeClient = size;
+			self->m_sizeClientResizedByKeyboard = size;
+			window->onResize(size.x, size.y);
+		}
 	}
 }
 
@@ -749,20 +794,22 @@ namespace slib
 	[super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
-		
 		slib::_priv_slib_ui_reset_orienation();
-		
-		UIWindow* window = self.view.window;
-		if (window == nil) {
-			return;
-		}
-		slib::Ref<slib::iOS_Window> w = self->m_window;
-		if (w.isNotNull()) {
-			CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
-			CGRect r = window.frame;
+		UIWindow* handle = self.view.window;
+		if (handle != nil) {
+			CGRect r = handle.frame;
 			r.size = size;
-			window.frame = r;
-			w->onResize((sl_ui_pos)(size.width * f), (sl_ui_pos)(size.height * f));
+			handle.frame = r;
+		}
+		CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
+		slib::UISize sizeContent;
+		sizeContent.x = (sl_ui_pos)(size.width * f);
+		sizeContent.y = (sl_ui_pos)(size.height * f);
+		self->m_sizeClient = sizeContent;
+		self->m_sizeClientResizedByKeyboard = sizeContent;
+		slib::Ref<slib::iOS_Window> window = self->m_window;
+		if (window.isNotNull()) {
+			window->onResize(sizeContent.x, sizeContent.y);
 		}
 	});
 }
@@ -811,56 +858,90 @@ CGRect _g_slib_ui_keyboard_scrollview_original_frame;
 		[self restoreKeyboardScrollView];
 	}
 	
-	NSDictionary* info = [aNotification userInfo];
-	CGSize kbSize = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
-	CGRect rcScreen = [[UIScreen mainScreen] bounds];
-	CGRect rcTextLocal = view.bounds;
-	CGRect rcTextScreen = [view convertRect:rcTextLocal toView:self.view];
-	CGFloat yText = rcTextScreen.origin.y + rcTextScreen.size.height + rcScreen.size.height / 100;
+	slib::UIKeyboardAdjustMode adjustMode = slib::UI::getKeyboardAdjustMode();
 	
-	if (scroll != nil) {
-		CGRect rcScrollLocal = scroll.bounds;
-		if (_g_slib_ui_keyboard_scrollview == scroll) {
-			rcScrollLocal.size = _g_slib_ui_keyboard_scrollview_original_frame.size;
-		}
-		CGRect rcScrollScreen = [scroll convertRect:rcScrollLocal toView:nil];
-		CGFloat yScroll = rcScrollScreen.origin.y + rcScrollScreen.size.height;
-		if (yScroll > rcScreen.size.height - kbSize.height) {
-			CGRect rc = scroll.frame;
-			if (_g_slib_ui_keyboard_scrollview == scroll) {
-				rc = _g_slib_ui_keyboard_scrollview_original_frame;
-			}
-			_g_slib_ui_keyboard_scrollview_original_frame = rc;
-			rc.size.height -= yScroll - (rcScreen.size.height - kbSize.height);
-			scroll.frame = rc;
-			_g_slib_ui_keyboard_scrollview = scroll;
-		}
-	}
-	if (yText > rcScreen.size.height - kbSize.height) {
-		CGFloat offset = rcScreen.size.height - kbSize.height - yText;
+	if (adjustMode == slib::UIKeyboardAdjustMode::Pan) {
+		NSDictionary* info = [aNotification userInfo];
+		CGSize kbSize = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
+		CGRect rcScreen = [[UIScreen mainScreen] bounds];
+		CGRect rcTextLocal = view.bounds;
+		CGRect rcTextScreen = [view convertRect:rcTextLocal toView:self.view];
+		CGFloat yText = rcTextScreen.origin.y + rcTextScreen.size.height + rcScreen.size.height / 100;
+		
 		if (scroll != nil) {
-			if (!([scroll isKindOfClass:[UITextView class]])) {
-				CGPoint pos = scroll.contentOffset;
-				pos.y -= offset;
-				scroll.contentOffset = pos;
+			CGRect rcScrollLocal = scroll.bounds;
+			if (_g_slib_ui_keyboard_scrollview == scroll) {
+				rcScrollLocal.size = _g_slib_ui_keyboard_scrollview_original_frame.size;
 			}
-			self.view.transform = CGAffineTransformIdentity;
+			CGRect rcScrollScreen = [scroll convertRect:rcScrollLocal toView:nil];
+			CGFloat yScroll = rcScrollScreen.origin.y + rcScrollScreen.size.height;
+			if (yScroll > rcScreen.size.height - kbSize.height) {
+				CGRect rc = scroll.frame;
+				if (_g_slib_ui_keyboard_scrollview == scroll) {
+					rc = _g_slib_ui_keyboard_scrollview_original_frame;
+				}
+				_g_slib_ui_keyboard_scrollview_original_frame = rc;
+				rc.size.height -= yScroll - (rcScreen.size.height - kbSize.height);
+				scroll.frame = rc;
+				_g_slib_ui_keyboard_scrollview = scroll;
+			}
+		}
+		if (yText > rcScreen.size.height - kbSize.height) {
+			CGFloat offset = rcScreen.size.height - kbSize.height - yText;
+			if (scroll != nil) {
+				if (!([scroll isKindOfClass:[UITextView class]])) {
+					CGPoint pos = scroll.contentOffset;
+					pos.y -= offset;
+					scroll.contentOffset = pos;
+				}
+				self.view.transform = CGAffineTransformIdentity;
+			} else {
+				CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, offset);
+				[UIView animateWithDuration:0.3 animations:^(void) {
+					self.view.transform = transform;
+				}];
+			}
 		} else {
-			CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, offset);
-			[UIView animateWithDuration:0.3 animations:^(void) {
-				self.view.transform = transform;
-			}];
+			self.view.transform = CGAffineTransformIdentity;
 		}
 	} else {
 		self.view.transform = CGAffineTransformIdentity;
 	}
+	slib::Ref<slib::iOS_Window> window = self->m_window;
+	if (window.isNotNull()) {
+		if (adjustMode == slib::UIKeyboardAdjustMode::Resize) {
+			NSDictionary* info = [aNotification userInfo];
+			sl_ui_len heightKeyboard = (sl_ui_len)([[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height * slib::UIPlatform::getGlobalScaleFactor());
+			slib::UISize size = self->m_sizeClient;
+			size.y -= heightKeyboard;
+			self->m_sizeClientResizedByKeyboard = size;
+			window->onResize(size.x, size.y);
+		} else {
+			if (self->m_sizeClient.y != self->m_sizeClientResizedByKeyboard.y) {
+				slib::UISize size = self->m_sizeClient;
+				self->m_sizeClientResizedByKeyboard = size;
+				window->onResize(size.x, size.y);
+			}
+		}
+	}
 }
 
 -(void)keyboardWillHide {
-	[UIView animateWithDuration:0.3 animations:^(void) {
-		self.view.transform = CGAffineTransformIdentity;
-	}];
+	if (!(slib::Math::isAlmostZero(self.view.transform.ty))) {
+		[UIView animateWithDuration:0.3 animations:^(void) {
+			self.view.transform = CGAffineTransformIdentity;
+		}];
+	}
 	[self restoreKeyboardScrollView];
+	
+	slib::Ref<slib::iOS_Window> window = self->m_window;
+	if (window.isNotNull()) {
+		if (self->m_sizeClient.y != self->m_sizeClientResizedByKeyboard.y) {
+			slib::UISize size = self->m_sizeClient;
+			self->m_sizeClientResizedByKeyboard = size;
+			window->onResize(size.x, size.y);
+		}
+	}
 }
 
 - (void)viewWillAppear:(BOOL)animated

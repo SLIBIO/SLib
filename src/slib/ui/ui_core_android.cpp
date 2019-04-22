@@ -88,6 +88,8 @@ namespace slib
 	void _priv_Android_onChangeWindowInsets(JNIEnv* env, jobject _this, jobject activity);
 
 	SLIB_JNI_BEGIN_CLASS(JAndroid, "slib/platform/android/Android")
+		SLIB_JNI_STATIC_METHOD(setKeyboardAdjustMode, "setKeyboardAdjustMode", "(Landroid/app/Activity;I)V");
+
 		SLIB_JNI_NATIVE(onCreateActivity, "nativeOnCreateActivity", "(Landroid/app/Activity;)V", _priv_Android_onCreateActivity);
 		SLIB_JNI_NATIVE(onDestroyActivity, "nativeOnDestroyActivity", "(Landroid/app/Activity;)V", _priv_Android_onDestroyActivity);
 		SLIB_JNI_NATIVE(onResumeActivity, "nativeOnResumeActivity", "(Landroid/app/Activity;)V", _priv_Android_onResumeActivity);
@@ -219,6 +221,14 @@ namespace slib
 	void UI::dismissKeyboard()
 	{
 		Android::dismissKeyboard();
+	}
+	
+	void _priv_UI_updateKeyboardAdjustMode(UIKeyboardAdjustMode mode)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JAndroid::setKeyboardAdjustMode.call(sl_null, jactivity, (jint)mode);
+		}
 	}
 
 	UIEdgeInsets UI::getSafeAreaInsets()

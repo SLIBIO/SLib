@@ -209,6 +209,10 @@ namespace slib
 		
 		static void dismissKeyboard();
 		
+		static UIKeyboardAdjustMode getKeyboardAdjustMode();
+		
+		static void setKeyboardAdjustMode(UIKeyboardAdjustMode mode);
+		
 		static UIEdgeInsets getSafeAreaInsets();
 		
 		static sl_ui_len getStatusBarHeight();
