@@ -1286,6 +1286,8 @@ namespace slib
 		
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, ChangeFocus, sl_bool flagFocused)
 
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Move, sl_ui_pos x, sl_ui_pos y)
+
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Resize, sl_ui_len width, sl_ui_len height)
 		
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, ChangeVisibility, Visibility oldVisibility, Visibility newVisibility)
@@ -1731,6 +1733,7 @@ namespace slib
 			AtomicFunction<void(View*, UIEvent*)> onClickEvent;
 			AtomicFunction<void(View*, UIEvent*)> onSetCursor;
 			AtomicFunction<void(View*, sl_bool flagFocused)> onChangeFocus;
+			AtomicFunction<void(View*, sl_ui_pos, sl_ui_pos)> onMove;
 			AtomicFunction<void(View*, sl_ui_len, sl_ui_len)> onResize;
 			AtomicFunction<void(View*, Visibility, Visibility)> onChangeVisibility;
 			AtomicFunction<void(View*, sl_scroll_pos, sl_scroll_pos)> onScroll;

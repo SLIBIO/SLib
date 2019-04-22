@@ -1346,6 +1346,9 @@ namespace slib
 		
 		updateInstanceFrames();
 		
+		if (!(flagNotMoveX && flagNotMoveY)) {
+			dispatchMove(frame.left, frame.top);
+		}
 		if (!(flagNotResizeWidth && flagNotResizeHeight)) {
 			Ref<PaddingAttributes>& paddingAttrs = m_paddingAttrs;
 			if (paddingAttrs.isNotNull()) {
@@ -8527,6 +8530,13 @@ namespace slib
 	void View::dispatchChangeFocus(sl_bool flagFocused)
 	{
 		SLIB_INVOKE_EVENT_HANDLER(ChangeFocus, flagFocused)
+	}
+
+	DEFINE_VIEW_EVENT_HANDLER(Move, sl_ui_pos x, sl_ui_pos y)
+	
+	void View::dispatchMove(sl_ui_pos x, sl_ui_pos y)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(Move, x, y)
 	}
 
 	DEFINE_VIEW_EVENT_HANDLER(Resize, sl_ui_len width, sl_ui_len height)
