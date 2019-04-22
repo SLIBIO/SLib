@@ -1334,16 +1334,25 @@ namespace slib
 		sl_bool flagNotResizeWidth = Math::isAlmostZero(frameOld.getWidth() - newWidth);
 		sl_bool flagNotResizeHeight = Math::isAlmostZero(frameOld.getHeight() - newHeight);
 		
+		if (flagNotMoveX && flagNotMoveY && flagNotResizeWidth && flagNotResizeHeight) {
+			m_frame = frame;
+			if (layoutAttrs.isNotNull()) {
+				layoutAttrs->requestedFrame = frame;
+				layoutAttrs->layoutFrame = frame;
+			}
+			return;
+		}
+		
+		if (!(onSetFrame(frame))) {
+			return;
+		}
+		
 		m_frame = frame;
 		if (layoutAttrs.isNotNull()) {
 			layoutAttrs->requestedFrame = frame;
 			layoutAttrs->layoutFrame = frame;
 		}
-		
-		if (flagNotMoveX && flagNotMoveY && flagNotResizeWidth && flagNotResizeHeight) {
-			return;
-		}
-		
+
 		updateInstanceFrames();
 		
 		if (!(flagNotMoveX && flagNotMoveY)) {
@@ -7507,6 +7516,11 @@ namespace slib
 			}
 #endif
 		}
+	}
+	
+	sl_bool View::onSetFrame(UIRect& frame)
+	{
+		return sl_true;
 	}
 	
 	void View::onChangePadding()

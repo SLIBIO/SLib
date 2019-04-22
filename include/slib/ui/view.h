@@ -1239,6 +1239,9 @@ namespace slib
 		
 		virtual void onUpdateLayout();
 		
+		// When return false, cancel the modifying frame
+		virtual sl_bool onSetFrame(UIRect& frame);
+		
 		virtual void onChangePadding();
 		
 		virtual void onUpdatePaging();
