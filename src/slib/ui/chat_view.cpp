@@ -24,6 +24,7 @@
 
 #include "slib/ui/core.h"
 #include "slib/ui/label_view.h"
+#include "slib/ui/clipboard.h"
 
 #include "../resources.h"
 
@@ -57,6 +58,29 @@ namespace slib
 	{
 	}
 	
+	class _priv_ChatView : public ChatView
+	{
+	public:
+		void _onRemoveItem(const String& itemId)
+		{
+			ChatViewItem item;
+			sl_size index = 0;
+			sl_bool flagFound = sl_false;
+			ListLocker<ChatViewItem> items(m_items);
+			for (sl_size i = 0; i < items.count; i++) {
+				if (items[i].itemId == itemId) {
+					flagFound = sl_true;
+					index = i;
+					break;
+				}
+			}
+			m_items.removeAt(index);
+			dispatchDeleteItem(itemId);
+			refreshItems();
+		}
+		
+	};
+	
 #define CHAT_MARGIN_WEIGHT 0.4f
 #define CHAT_ROUND_WEIGHT 0.3f
 #define CHAT_SPACE_WEIGHT 0.3f
@@ -82,6 +106,8 @@ namespace slib
 	class _priv_ChatViewItemView : public ViewGroup
 	{
 	public:
+		_priv_ChatView* chatView;
+		String itemId;
 		sl_bool flagMe;
 		Ref<Drawable> userIcon;
 		String userName;
@@ -108,6 +134,8 @@ namespace slib
 			label->setMultiLine(MultiLineMode::WordWrap, UIUpdateMode::Init);
 			label->setGravity(Alignment::TopLeft, UIUpdateMode::Init);
 			addChild(label, UIUpdateMode::Init);
+
+			setOnTouchEvent(SLIB_FUNCTION_WEAKREF(_priv_ChatViewItemView, onTouchMessage, this));
 		}
 
 	public:
@@ -199,16 +227,28 @@ namespace slib
 					pts[0].x = (sl_real)(rect.right + layout.chatSpace); pts[0].y = (sl_real)(o);
 					pts[1].x = (sl_real)(rect.right); pts[1].y = (sl_real)(o - layout.chatSpace);
 					pts[2].x = (sl_real)(rect.right); pts[2].y = (sl_real)(o + layout.chatSpace);
-					canvas->fillPolygon(pts, 3, params.backColorSent);
-					canvas->fillRoundRect(rect, UISize(round, round), params.backColorSent);
+					Color color = params.backColorSent;
+					if (isPressedState()) {
+						color.r = (sl_uint8)(color.r * 0.8);
+						color.g = (sl_uint8)(color.g * 0.8);
+						color.b = (sl_uint8)(color.b * 0.8);
+					}
+					canvas->fillPolygon(pts, 3, color);
+					canvas->fillRoundRect(rect, UISize(round, round), color);
 				} else {
 					rect.left = l;
 					rect.right = l + w;
 					pts[0].x = (sl_real)(rect.left - layout.chatSpace); pts[0].y = (sl_real)(o);
 					pts[1].x = (sl_real)(rect.left); pts[1].y = (sl_real)(o - layout.chatSpace);
 					pts[2].x = (sl_real)(rect.left); pts[2].y = (sl_real)(o + layout.chatSpace);
-					canvas->fillPolygon(pts, 3, params.backColorReceived);
-					canvas->fillRoundRect(rect, UISize(round, round), params.backColorReceived);
+					Color color = params.backColorReceived;
+					if (isPressedState()) {
+						color.r = (sl_uint8)(color.r * 0.8);
+						color.g = (sl_uint8)(color.g * 0.8);
+						color.b = (sl_uint8)(color.b * 0.8);
+					}
+					canvas->fillPolygon(pts, 3, color);
+					canvas->fillRoundRect(rect, UISize(round, round), color);
 				}
 			}
 		}
@@ -229,6 +269,7 @@ namespace slib
 		
 		void setData(const ChatViewItem& item)
 		{
+			itemId = item.itemId;
 			flagMe = item.flagMe;
 			userIcon = item.userIcon;
 			userName = item.userName;
@@ -294,11 +335,59 @@ namespace slib
 			return s;
 		}
 		
+		sl_bool m_flagTrySelect = sl_false;
+		
+		void onTouchMessage(View*, UIEvent* ev)
+		{
+			UIAction action = ev->getAction();
+			if (action == UIAction::TouchBegin) {
+				if (flagMe) {
+					if (ev->getX() > label->getLeft()) {
+						setPressedState(sl_true);
+					}
+				} else {
+					if (ev->getX() < label->getFrame().right) {
+						setPressedState(sl_true);
+					}
+				}
+				m_flagTrySelect = sl_true;
+				auto ref = ToRef(this);
+				UIPoint pt = convertCoordinateToScreen(ev->getPoint());
+				Dispatch::setTimeout([this, ref, pt]() {
+					ObjectLocker lock(this);
+					if (m_flagTrySelect) {
+						m_flagTrySelect = sl_false;
+						popupMenu(pt);
+					}
+				}, 500);
+			} else if (action == UIAction::TouchEnd || action == UIAction::TouchCancel) {
+				m_flagTrySelect = sl_false;
+				setPressedState(sl_false);
+			}
+			ev->preventDefault();
+		}
+		
+		void popupMenu(const UIPoint& pt)
+		{
+			auto popup = menu::PopupMenuChatItem::get();
+			auto chatView = this->chatView;
+			String itemId = this->itemId;
+			String text = this->message;
+			popup->copy->setAction([text]() {
+				Clipboard::setText(text);
+			});
+			popup->remove->setAction([chatView, itemId]() {
+				chatView->_onRemoveItem(itemId);
+			});
+			popup->root->show(pt);
+		}
+		
 	};
 	
 	class _priv_ChatViewAdapter : public ListViewAdapter<ChatViewItem, _priv_ChatViewItemView>
 	{
 	public:
+		ChatView* chatView;
 		_priv_ChatView_ItemViewParams params;
 		
 	public:
@@ -312,6 +401,7 @@ namespace slib
 			ListLocker<ChatViewItem> list(m_list);
 			if (index < list.count) {
 				ChatViewItem& item = list[index];
+				view->chatView = (_priv_ChatView*)chatView;
 				view->font = font;
 				view->params = params;
 				view->flagShowDate = index <= 0 || item.time.getDateOnly() != list[index - 1].time.getDateOnly();
@@ -525,18 +615,33 @@ namespace slib
 		}
 	}
 	
+	void ChatView::setFrame(const UIRect& frame, UIUpdateMode mode)
+	{
+		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
+			ListView::setFrame(frame, mode);
+			return;
+		}
+		sl_bool flagEnd = sl_false;
+		if (Math::abs(getScrollY() - getScrollRange().y) < 2) {
+			flagEnd = sl_true;
+		}
+		ListView::setFrame(frame, mode);
+		if (flagEnd) {
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), View, smoothScrollToEndY, this, UIUpdateMode::Redraw));
+		}
+	}
+	
 	void ChatView::setFont(const Ref<Font>& font, UIUpdateMode mode)
 	{
-		View::setFont(font, UIUpdateMode::None);
+		ListView::setFont(font, UIUpdateMode::None);
 		dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ChatView, _updateListContent, this, UIUpdateMode::UpdateLayout));
 	}
 	
-	sl_bool ChatView::onSetFrame(UIRect& frame)
+	SLIB_DEFINE_EVENT_HANDLER(ChatView, DeleteItem, const String& itemId)
+	
+	void ChatView::dispatchDeleteItem(const String& itemId)
 	{
-		if (Math::isAlmostZero(getScrollY() - getScrollRange().y)) {
-			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), View, smoothScrollToEndY, this, UIUpdateMode::Redraw));
-		}
-		return sl_true;
+		SLIB_INVOKE_EVENT_HANDLER(DeleteItem, itemId)
 	}
 	
 	void ChatView::onResize(sl_ui_len width, sl_ui_len height)
@@ -586,6 +691,7 @@ namespace slib
 		}
 		
 		Ref<_priv_ChatViewAdapter> adapter = new _priv_ChatViewAdapter;
+		adapter->chatView = this;
 		adapter->params.chatWidth = m_chatWidth;
 		adapter->params.userIconSize = m_userIconSize;
 		adapter->params.formatDate = m_formatDate;

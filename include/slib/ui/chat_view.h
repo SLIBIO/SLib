@@ -33,6 +33,7 @@ namespace slib
 	class SLIB_EXPORT ChatViewItem
 	{
 	public:
+		String itemId;
 		Ref<Drawable> userIcon;
 		String userName;
 		sl_bool flagMe;
@@ -106,18 +107,21 @@ namespace slib
 		
 		void setDateTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		void setFrame(const UIRect& frame, UIUpdateMode mode = UIUpdateMode::UpdateLayout) override;
+		
 		void setFont(const Ref<Font>& font, UIUpdateMode mode = UIUpdateMode::UpdateLayout) override;
+		
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(ChatView, DeleteItem, const String& itemId)
 
 	protected:
-		sl_bool onSetFrame(UIRect& frame) override;
-		
 		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
 	protected:
 		void _updateListContent(UIUpdateMode mode);
 				
 		void _addListContent(UIUpdateMode mode);
-
+		
 	protected:
 		AtomicList<ChatViewItem> m_items;
 		sl_ui_len m_chatWidth;
