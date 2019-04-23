@@ -189,7 +189,7 @@ namespace slib
 		const UIRect& getFrame();
 		
 		// parent coordinate
-		void setFrame(const UIRect& frame, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		virtual void setFrame(const UIRect& frame, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		// parent coordinate
 		void setFrame(sl_ui_pos x, sl_ui_pos y, sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
@@ -1239,9 +1239,6 @@ namespace slib
 		
 		virtual void onUpdateLayout();
 		
-		// When return false, cancel the modifying frame
-		virtual sl_bool onSetFrame(UIRect& frame);
-		
 		virtual void onChangePadding();
 		
 		virtual void onUpdatePaging();
@@ -1338,6 +1335,8 @@ namespace slib
 
 		void _updateAndApplyLayout();
 		
+		void _setInvalidateLayout();
+		
 		sl_ui_len _measureLayoutWrappingSize_Horz(View* view, Pair<sl_ui_len, sl_ui_len>& insets, HashMap< View*, Pair<sl_ui_len, sl_ui_len> >& map, sl_ui_pos paddingLeft, sl_ui_pos paddingRight);
 		
 		sl_ui_len _measureLayoutWrappingSize_Vert(View* view, Pair<sl_ui_len, sl_ui_len>& insets, HashMap< View*, Pair<sl_ui_len, sl_ui_len> >& map, sl_ui_pos paddingTop, sl_ui_pos paddingBottom);
@@ -1426,6 +1425,7 @@ namespace slib
 		UIRect m_frame;
 		UIRect m_boundsInParent;
 		UIRect m_rectCurrentDrawing;
+		sl_int32 m_idUpdateInvalidateLayout;
 		
 		UIAction m_actionMouseDown;
 		AtomicRef<UIEvent> m_currentEvent;

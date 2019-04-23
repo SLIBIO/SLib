@@ -77,6 +77,7 @@ namespace slib
 	
 		m_frame(0, 0, 0, 0),
 		m_boundsInParent(0, 0, 0, 0),
+		m_idUpdateInvalidateLayout(0),
 	
 		m_actionMouseDown(UIAction::Unknown)
 	{
@@ -1343,10 +1344,6 @@ namespace slib
 			return;
 		}
 		
-		if (!(onSetFrame(frame))) {
-			return;
-		}
-		
 		m_frame = frame;
 		if (layoutAttrs.isNotNull()) {
 			layoutAttrs->requestedFrame = frame;
@@ -2057,7 +2054,7 @@ namespace slib
 		
 		if (!(param.flagUseLayout)) {
 			if (!(oldFrame.getSize().isAlmostEqual(frame.getSize()))) {
-				m_flagInvalidLayout = sl_true;
+				_setInvalidateLayout();
 			}
 			layoutAttrs->layoutFrame = frame;
 			_updateLayout();
@@ -2283,7 +2280,7 @@ namespace slib
 			}
 				
 			if (!(oldFrame.getSize().isAlmostEqual(frame.getSize()))) {
-				m_flagInvalidLayout = sl_true;
+				_setInvalidateLayout();
 			}
 
 			oldFrame = frame;
@@ -2322,85 +2319,91 @@ namespace slib
 	{
 		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
 		
-		if (!m_flagInvalidLayout) {
-			return;
-		}
-		m_flagInvalidLayout = sl_false;
-		
-		UIRect frame = getLayoutFrame();
-		
-		sl_size i;
-		ListElements< Ref<View> > children(getChildren());
-		for (int step = 0; step < 2; step++) {
-			sl_ui_len width = frame.getWidth();
-			sl_ui_len height = frame.getHeight();
-			Ref<PaddingAttributes>& paddingAttrs = m_paddingAttrs;
-			if (paddingAttrs.isNotNull()) {
-				paddingAttrs->applyPaddingWeights(width, height);
-			}
-			if (children.count > 0 && (layoutAttrs.isNull() || !(layoutAttrs->flagCustomLayout))) {
-				UpdateLayoutFrameParam param;
+		while (m_flagInvalidLayout) {
+			
+			sl_int32 updateId = m_idUpdateInvalidateLayout;
+
+			UIRect frame = getLayoutFrame();
+			
+			sl_size i;
+			ListElements< Ref<View> > children(getChildren());
+			for (int step = 0; step < 2; step++) {
+				sl_ui_len width = frame.getWidth();
+				sl_ui_len height = frame.getHeight();
 				Ref<PaddingAttributes>& paddingAttrs = m_paddingAttrs;
 				if (paddingAttrs.isNotNull()) {
-					param.parentContentFrame.left = paddingAttrs->paddingLeft;
-					param.parentContentFrame.top = paddingAttrs->paddingTop;
-					param.parentContentFrame.right = width - paddingAttrs->paddingRight;
-					param.parentContentFrame.bottom = height - paddingAttrs->paddingBottom;
-				} else {
-					param.parentContentFrame.left = 0;
-					param.parentContentFrame.top = 0;
-					param.parentContentFrame.right = width;
-					param.parentContentFrame.bottom = height;
+					paddingAttrs->applyPaddingWeights(width, height);
 				}
-				param.flagUseLayout = m_flagUsingChildLayouts;
-				param.flagHorizontal = sl_true;
-				param.flagVertical = sl_true;
-				for (i = 0; i < children.count; i++) {
-					Ref<View>& child = children[i];
-					Ref<LayoutAttributes>& childLayoutAttrs = child->m_layoutAttrs;
-					if (childLayoutAttrs.isNotNull()) {
-						childLayoutAttrs->flagInvalidLayoutInParent = sl_true;
+				if (children.count > 0 && (layoutAttrs.isNull() || !(layoutAttrs->flagCustomLayout))) {
+					UpdateLayoutFrameParam param;
+					Ref<PaddingAttributes>& paddingAttrs = m_paddingAttrs;
+					if (paddingAttrs.isNotNull()) {
+						param.parentContentFrame.left = paddingAttrs->paddingLeft;
+						param.parentContentFrame.top = paddingAttrs->paddingTop;
+						param.parentContentFrame.right = width - paddingAttrs->paddingRight;
+						param.parentContentFrame.bottom = height - paddingAttrs->paddingBottom;
+					} else {
+						param.parentContentFrame.left = 0;
+						param.parentContentFrame.top = 0;
+						param.parentContentFrame.right = width;
+						param.parentContentFrame.bottom = height;
 					}
-				}
-				for (i = 0; i < children.count; i++) {
-					Ref<View>& child = children[i];
-					child->updateLayoutFrameInParent(param);
-					if (child->m_flagNeedApplyLayout) {
-						m_flagNeedApplyLayout = sl_true;
-					}
-				}
-			}
-			if (layoutAttrs.isNull()) {
-				break;
-			}
-			if (layoutAttrs->flagCustomLayout || layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
-				onUpdateLayout();
-				if (!m_flagNeedApplyLayout) {
+					param.flagUseLayout = m_flagUsingChildLayouts;
+					param.flagHorizontal = sl_true;
+					param.flagVertical = sl_true;
 					for (i = 0; i < children.count; i++) {
 						Ref<View>& child = children[i];
+						Ref<LayoutAttributes>& childLayoutAttrs = child->m_layoutAttrs;
+						if (childLayoutAttrs.isNotNull()) {
+							childLayoutAttrs->flagInvalidLayoutInParent = sl_true;
+						}
+					}
+					for (i = 0; i < children.count; i++) {
+						Ref<View>& child = children[i];
+						child->updateLayoutFrameInParent(param);
 						if (child->m_flagNeedApplyLayout) {
 							m_flagNeedApplyLayout = sl_true;
 						}
 					}
 				}
-				_restrictSize(layoutAttrs->layoutFrame);
-				if (!m_flagUsingChildLayouts) {
+				if (layoutAttrs.isNull()) {
 					break;
 				}
-				if (step != 0) {
-					break;
+				if (layoutAttrs->flagCustomLayout || layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
+					onUpdateLayout();
+					if (!m_flagNeedApplyLayout) {
+						for (i = 0; i < children.count; i++) {
+							Ref<View>& child = children[i];
+							if (child->m_flagNeedApplyLayout) {
+								m_flagNeedApplyLayout = sl_true;
+							}
+						}
+					}
+					_restrictSize(layoutAttrs->layoutFrame);
+					if (!m_flagUsingChildLayouts) {
+						break;
+					}
+					if (step != 0) {
+						break;
+					}
+					UIRect oldFrame = frame;
+					frame = layoutAttrs->layoutFrame;
+					if (frame.isAlmostEqual(oldFrame)) {
+						break;
+					}
 				}
-				UIRect oldFrame = frame;
-				frame = layoutAttrs->layoutFrame;
-				if (frame.isAlmostEqual(oldFrame)) {
+				if (children.count == 0) {
 					break;
 				}
 			}
-			if (children.count == 0) {
+			
+			if (Base::interlockedIncrement32(&m_idUpdateInvalidateLayout) == updateId + 1) {
+				m_flagInvalidLayout = sl_false;
 				break;
+			} else {
+				m_flagInvalidLayout = sl_true;
 			}
 		}
-		m_flagInvalidLayout = sl_false;
 		
 	}
 	
@@ -2473,6 +2476,12 @@ namespace slib
 	void View::_updateAndApplyLayout()
 	{
 		_updateAndApplyLayoutWithMode(UIUpdateMode::Redraw);
+	}
+	
+	void View::_setInvalidateLayout()
+	{
+		m_flagInvalidLayout = sl_true;
+		Base::interlockedIncrement32(&m_idUpdateInvalidateLayout);
 	}
 	
 	sl_ui_len View::_measureLayoutWrappingSize_Horz(View* view, Pair<sl_ui_len, sl_ui_len>& insets, HashMap< View*, Pair<sl_ui_len, sl_ui_len> >& map, sl_ui_pos paddingLeft, sl_ui_pos paddingRight)
@@ -2925,13 +2934,13 @@ namespace slib
 			return;
 		}
 		if (!(SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode))) {
-			m_flagInvalidLayout = sl_true;
+			_setInvalidateLayout();
 			invalidate(mode);
 			return;
 		}
 		Ref<View> view = this;
 		for (;;) {
-			view->m_flagInvalidLayout = sl_true;
+			view->_setInvalidateLayout();
 			Ref<LayoutAttributes>& layoutAttrs = view->m_layoutAttrs;
 			if (layoutAttrs.isNull()) {
 				break;
@@ -2966,11 +2975,11 @@ namespace slib
 		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 			return;
 		}
-		m_flagInvalidLayout = sl_true;
+		_setInvalidateLayout();
 		Ref<View> parent = m_parent;
 		if (!(SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode))) {
 			if (parent.isNotNull()) {
-				parent->m_flagInvalidLayout = sl_true;
+				parent->_setInvalidateLayout();
 			}
 			invalidate(mode);
 			return;
@@ -2978,7 +2987,7 @@ namespace slib
 		Ref<View> view = this;
 		while (parent.isNotNull()) {
 			view = parent;
-			view->m_flagInvalidLayout = sl_true;
+			view->_setInvalidateLayout();
 			Ref<LayoutAttributes>& layoutAttrs = view->m_layoutAttrs;
 			if (layoutAttrs.isNull()) {
 				break;
@@ -3007,7 +3016,14 @@ namespace slib
 	
 	void View::forceUpdateLayout()
 	{
-		m_flagInvalidLayout = sl_true;
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
+		if (layoutAttrs.isNotNull()) {
+			if (layoutAttrs->flagRequestedFrame) {
+				layoutAttrs->layoutFrame = layoutAttrs->requestedFrame;
+				layoutAttrs->flagRequestedFrame = sl_false;
+			}
+		}
+		_setInvalidateLayout();
 		_updateLayout();
 	}
 
@@ -7516,11 +7532,6 @@ namespace slib
 			}
 #endif
 		}
-	}
-	
-	sl_bool View::onSetFrame(UIRect& frame)
-	{
-		return sl_true;
 	}
 	
 	void View::onChangePadding()
