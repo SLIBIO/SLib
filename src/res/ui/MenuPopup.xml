@@ -1,0 +1,12 @@
+<sapp>
+	<layout
+		type='view'
+		background='@drawable/round_shadow_back,nine-patch(16dp,16dp,16dp,16dp,32,32,32,32)'
+		padding='10dp'
+		left='0'
+		top='0'
+		>
+		<linear name='container'>
+		</linear>
+	</layout>
+</sapp>

@@ -8,6 +8,7 @@ namespace slib
 	namespace ui
 	{
 		class CameraControlView;
+		class MenuPopup;
 		class MobileAlertDialog;
 	}
 }

@@ -1,0 +1,7 @@
+<sapp>
+	<menu name='PopupMenuChatItem'>
+		<item name='copy' title='Copy' />
+		<separator/>
+		<item name='remove' title='Delete' />
+	</menu>
+</sapp>

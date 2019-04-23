@@ -22,6 +22,13 @@
 
 #include "slib/ui/menu.h"
 
+#include "slib/ui/core.h"
+#include "slib/ui/mobile_app.h"
+#include "slib/ui/button.h"
+#include "slib/ui/linear_view.h"
+
+#include "../resources.h"
+
 namespace slib
 {
 	SLIB_DEFINE_OBJECT(MenuItem, Object)
@@ -285,13 +292,173 @@ namespace slib
 		return sl_false;
 	}
 	
+	class _priv_MenuImpl;
 	
-#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_WIN32)
+	class _priv_MenuItemImpl : public MenuItem
+	{
+	public:
+		Ref<Button> m_button;
+		
+	public:
+		void setText(const String& text) override
+		{
+			m_button->setText(text);
+		}
+		
+		void setEnabled(sl_bool flag) override
+		{
+			m_button->setEnabled(flag);
+		}
+		
+		void setChecked(sl_bool flag) override
+		{
+			m_button->setCurrentCategory(flag ? 1 : 0);
+		}
+		
+		void setIcon(const Ref<Bitmap>& icon) override
+		{
+			m_button->setIcon(icon);
+		}
+		
+		void setCheckedIcon(const Ref<Bitmap>& icon) override
+		{
+			m_button->setIcon(icon, ButtonState::Normal, 1);
+		}
+		
+	};
 	
+#if defined(SLIB_PLATFORM_IS_MOBILE)
+	
+	class _priv_MenuImpl : public Menu
+	{
+	public:
+		Ref<ui::MenuPopup> m_view;
+		
+	public:
+		static Ref<_priv_MenuImpl> create()
+		{
+			Ref<ui::MenuPopup> view = new ui::MenuPopup;
+			if (view.isNotNull()) {
+				view->setOnTouchEvent([](View*, UIEvent* ev) {
+					ev->stopPropagation();
+				});
+				Ref<_priv_MenuImpl> ret = new _priv_MenuImpl();
+				if (ret.isNotNull()) {
+					ret->m_view = view;
+					return ret;
+				}
+			}
+			return sl_null;
+		}
+		
+		Ref<MenuItem> addMenuItem(const MenuItemParam& param) override
+		{
+			Ref<Button> button = new Button;
+			button->setWidthWrapping(UIUpdateMode::Init);
+			button->setHeightWrapping(UIUpdateMode::Init);
+			button->setFontSize(UIResource::dpToPixel(20), UIUpdateMode::Init);
+			button->setTextColor(Color::Black, ButtonState::Normal, 0, UIUpdateMode::Init);
+			button->setText(param.text, UIUpdateMode::Init);
+			button->setPadding(UIResource::dpToPixel(4), UIUpdateMode::Init);
+			if (param.icon.isNotNull()) {
+				button->setIcon(param.icon, UIUpdateMode::Init);
+			}
+			if (param.checkedIcon.isNotNull()) {
+				button->setIcon(param.icon, ButtonState::Normal, 1, UIUpdateMode::Init);
+			}
+			if (param.flagChecked) {
+				button->setCurrentCategory(1, UIUpdateMode::Init);
+			}
+			if (!(param.flagEnabled)) {
+				button->setEnabled(sl_false, UIUpdateMode::Init);
+			}
+			Ref<_priv_MenuItemImpl> item = new _priv_MenuItemImpl;
+			item->m_button = button;
+			item->setAction(param.action);
+			_priv_MenuItemImpl* pItem = item.get();
+			button->setOnClick([pItem, this](View*) {
+				pItem->getAction()();
+				Ref<View> back = m_view->getParent();
+				if (back.isNotNull()) {
+					back->removeFromParent();
+				}
+			});
+			ObjectLocker lock(this);
+			m_view->container->addChild(button);
+			m_items.add(item);
+			return item;
+		}
+		
+		Ref<MenuItem> insertMenuItem(sl_uint32 index, const MenuItemParam& param) override
+		{
+			return sl_null;
+		}
+		
+		Ref<MenuItem> addSeparator() override
+		{
+			Ref<MenuItem> item = MenuItem::createSeparator();
+			Ref<View> border = new View;
+			border->setWidthFilling(1, UIUpdateMode::Init);
+			border->setHeight(UIResource::dpToPixel(1), UIUpdateMode::Init);
+			border->setBackgroundColor(Color::Gray, UIUpdateMode::Init);
+			ObjectLocker lock(this);
+			m_view->container->addChild(border);
+			m_items.add(item);
+			return item;
+		}
+		
+		Ref<MenuItem> insertSeparator(sl_uint32 index) override
+		{
+			return sl_null;
+		}
+		
+		void removeMenuItem(sl_uint32 index) override
+		{
+		}
+		
+		void removeMenuItem(const Ref<MenuItem>& item) override
+		{
+		}
+		
+		void show(sl_ui_pos x, sl_ui_pos y) override
+		{
+			if (!(UI::isUiThread())) {
+				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), _priv_MenuImpl, show, this, x, y));
+				return;
+			}
+			Ref<MobileApp> app = MobileApp::getApp();
+			if (app.isNotNull()) {
+				Ref<View> parent = app->getContentView();
+				if (parent.isNotNull()) {
+					Ref<ViewGroup> back = new ViewGroup;
+					back->setCreatingInstance(sl_true);
+					back->setWidthFilling(1, UIUpdateMode::Init);
+					back->setHeightFilling(1, UIUpdateMode::Init);
+					back->setOnTouchEvent([](View* view, UIEvent* ev) {
+						ev->stopPropagation();
+						view->removeFromParent();
+					});
+					m_view->forceUpdateLayout();
+					if (x > m_view->getLayoutWidth()) {
+						x = x - m_view->getLayoutWidth();
+					}
+					if (y > m_view->getLayoutHeight()) {
+						y = y - m_view->getLayoutHeight();
+					}
+					m_view->setLocation(x, y, UIUpdateMode::Init);
+					back->addChild(m_view, UIUpdateMode::Init);
+					parent->addChild(back);
+				}
+			}
+		}
+		
+	};
+
 	Ref<Menu> Menu::create()
 	{
-		return sl_null;
+		return Ref<Menu>::from(_priv_MenuImpl::create());
 	}
 	
 #endif
+	
 }
