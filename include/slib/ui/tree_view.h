@@ -303,7 +303,7 @@ namespace slib
 		
 	private:
 		Ref<TreeContentViewImpl> m_content;
-		sl_bool m_flagInvalidLayout;
+		sl_bool m_flagInvalidTreeLayout;
 		
 		Ref<TreeViewItem> m_root;
 		

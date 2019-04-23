@@ -494,8 +494,8 @@ namespace slib
 		setUsingFont(sl_true);
 		setSavingCanvasState(sl_false);
 		
-		m_flagInvalidLayout = sl_true;
-		
+		m_flagInvalidTreeLayout = sl_true;
+
 		m_selectedItemBackgroundColor = Color(0, 0, 0, 50);
 		m_itemTextColor = Color::Black;
 		m_hoverItemTextColor = Color(0, 0, 200);
@@ -838,7 +838,7 @@ namespace slib
 	{
 		Ref<TreeContentViewImpl> content = m_content;
 		if (content.isNotNull()) {
-			m_flagInvalidLayout = sl_true;
+			m_flagInvalidTreeLayout = sl_true;
 			content->invalidate(mode);
 		}
 	}
@@ -861,10 +861,10 @@ namespace slib
 	
 	void TreeView::_makeLayoutContent()
 	{
-		if (!m_flagInvalidLayout) {
+		if (!m_flagInvalidTreeLayout) {
 			return;
 		}
-		m_flagInvalidLayout = sl_false;
+		m_flagInvalidTreeLayout = sl_false;
 		
 		Ref<TreeViewItem> root = m_root;
 		if (root.isNotNull()) {
