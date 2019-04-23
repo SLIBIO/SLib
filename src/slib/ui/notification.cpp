@@ -34,19 +34,6 @@ namespace slib
 		flagClicked = sl_false;
 	}
 	
-	
-	PushNotificationEnvironment _g_slib_ui_notification_environment = PushNotificationEnvironment::Undefined;
-	
-	PushNotificationEnvironment PushNotification::getEnvironment()
-	{
-		return _g_slib_ui_notification_environment;
-	}
-	
-	void PushNotification::setEnvironment(PushNotificationEnvironment environment)
-	{
-		_g_slib_ui_notification_environment = environment;
-	}
-	
 	SLIB_STATIC_ZERO_INITIALIZED(AtomicString, _g_slib_ui_notification_token);
 
 	String PushNotification::getDeviceToken()

@@ -54,20 +54,9 @@ namespace slib
 
 	};
 	
-	enum class PushNotificationEnvironment
-	{
-		Undefined = 0,
-		Production = 1,
-		Development = 2
-	};
-	
 	class SLIB_EXPORT PushNotification
 	{
 	public:
-		static PushNotificationEnvironment getEnvironment();
-		
-		static void setEnvironment(PushNotificationEnvironment environment);
-		
 		static String getDeviceToken();
 		
 		static void addTokenRefreshCallback(const Function<void(String)>& callback);
