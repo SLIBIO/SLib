@@ -415,43 +415,44 @@ namespace slib
 	
 	void iOS_ViewInstance::onDraw(CGRect rectDirty)
 	{
-		
 		if (!m_flagDrawing) {
 			return;
 		}
 		
-		UIView* handle = m_handle;
-		
-		if (handle != nil) {
-			
-			CGRect rectBound = [handle bounds];
-			
-			CGContextRef context = UIGraphicsGetCurrentContext();
-			
-			if (context != nil) {
-				
-				CGFloat f = UIPlatform::getGlobalScaleFactor();
-				CGContextScaleCTM(context, 1/f, 1/f);
-				
-				Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, context, (sl_uint32)(rectBound.size.width), (sl_uint32)(rectBound.size.height));
-				
-				if (canvas.isNotNull()) {
-					Rectangle rectInvalidate((sl_real)(rectDirty.origin.x * f), (sl_real)(rectDirty.origin.y * f), (sl_real)((rectDirty.origin.x + rectDirty.size.width) * f), (sl_real)((rectDirty.origin.y + rectDirty.size.height) * f));
-					if ([handle isKindOfClass:[UIScrollView class]]) {
-						CGPoint pt = ((UIScrollView*)handle).contentOffset;
-						sl_real sx = (sl_real)(pt.x * f);
-						sl_real sy = (sl_real)(pt.y * f);
-						rectInvalidate.left += sx;
-						rectInvalidate.top += sy;
-						rectInvalidate.right += sx;
-						rectInvalidate.bottom += sy;
-						canvas->translate(-sx, -sy);
-					}
-					canvas->setInvalidatedRect(rectInvalidate);
-					ViewInstance::onDraw(canvas.get());
-				}
-			}
+		Ref<View> view = m_view;
+		if (view.isNull()) {
+			return;
 		}
+		UIView* handle = m_handle;
+		if (handle == nil) {
+			return;
+		}
+		CGContextRef context = UIGraphicsGetCurrentContext();
+		if (!context) {
+			return;
+		}
+		Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, context, (sl_uint32)(view->getWidth()), (sl_uint32)(view->getHeight()));
+		if (canvas.isNull()) {
+			return;
+		}
+		
+		CGFloat f = UIPlatform::getGlobalScaleFactor();
+		CGContextScaleCTM(context, 1/f, 1/f);
+		
+		Rectangle rectInvalidate((sl_real)(rectDirty.origin.x * f), (sl_real)(rectDirty.origin.y * f), (sl_real)((rectDirty.origin.x + rectDirty.size.width) * f), (sl_real)((rectDirty.origin.y + rectDirty.size.height) * f));
+		if ([handle isKindOfClass:[UIScrollView class]]) {
+			CGPoint pt = ((UIScrollView*)handle).contentOffset;
+			sl_real sx = (sl_real)(pt.x * f);
+			sl_real sy = (sl_real)(pt.y * f);
+			rectInvalidate.left += sx;
+			rectInvalidate.top += sy;
+			rectInvalidate.right += sx;
+			rectInvalidate.bottom += sy;
+			canvas->translate(-sx, -sy);
+		}
+		canvas->setInvalidatedRect(rectInvalidate);
+		
+		view->dispatchDraw(canvas.get());
 	}
 	
 	UIEventFlags iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event, sl_bool flagDispatchToChildren)
