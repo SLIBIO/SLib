@@ -57,6 +57,26 @@ namespace slib
 		BOOL bShow
 	);
 
+	typedef LONG (WINAPI* WINAPI_BCryptOpenAlgorithmProvider)(
+		PVOID *phAlgorithm,
+		LPCWSTR pszAlgId,
+		LPCWSTR pszImplementation,
+		ULONG dwFlags
+	);
+
+	typedef LONG (WINAPI* WINAPI_BCryptCloseAlgorithmProvider)(
+		PVOID hAlgorithm,
+		ULONG dwFlags
+	);
+
+	typedef LONG (WINAPI* WINAPI_BCryptGenRandom)(
+		PVOID hAlgorithm,
+		PUCHAR pbBuffer,
+		ULONG cbBuffer,
+		ULONG dwFlags
+	);
+
+
 	class Variant;
 
 	class SLIB_EXPORT Windows
@@ -110,6 +130,14 @@ namespace slib
 		static WINAPI_ShowScrollBar getAPI_ShowScrollBar();
 
 		static HMODULE loadLibrary_wininet();
+
+		static HMODULE loadLibrary_bcrypt();
+
+		static WINAPI_BCryptOpenAlgorithmProvider getAPI_BCryptOpenAlgorithmProvider();
+
+		static WINAPI_BCryptCloseAlgorithmProvider getAPI_BCryptCloseAlgorithmProvider();
+
+		static WINAPI_BCryptGenRandom getAPI_BCryptGenRandom();
 
 	
 		static Ref<Event> createEvent(HANDLE hEvent, sl_bool flagCloseOnRelease = sl_true);

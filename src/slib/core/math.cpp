@@ -23,14 +23,20 @@
 #include "slib/core/math.h"
 
 #include "slib/core/time.h"
-#include "slib/crypto/sha2.h"
 #include "slib/core/system.h"
+#include "slib/core/file.h"
+#include "slib/crypto/sha2.h"
 
 #include <math.h>
 #include <stdlib.h>
 
 #if defined(SLIB_PLATFORM_IS_UWP)
 #include "float.h"
+#endif
+
+#if defined(_WIN32)
+#include <slib/core/platform_windows.h>
+#include <wincrypt.h>
 #endif
 
 namespace slib
@@ -373,6 +379,95 @@ namespace slib
 	
 	void Math::randomMemory(void* _mem, sl_size size) noexcept
 	{
+		if (!size) {
+			return;
+		}
+#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)
+		{
+			SLIB_STATIC_STRING(path, "/dev/urandom")
+			Ref<File> file = File::open(path, FileMode::Read);
+			if (file.isNotNull()) {
+				sl_size sizeRead = file->read(_mem, size);
+				if (sizeRead == size) {
+					return;
+				}
+			}
+		}
+#elif defined(_WIN32)
+		{
+			HMODULE hBcrypt = Windows::loadLibrary_bcrypt();
+			if (hBcrypt) {
+				WINAPI_BCryptOpenAlgorithmProvider funcBCryptOpenAlgorithmProvider = Windows::getAPI_BCryptOpenAlgorithmProvider();
+				WINAPI_BCryptCloseAlgorithmProvider funcBCryptCloseAlgorithmProvider = Windows::getAPI_BCryptCloseAlgorithmProvider();
+				WINAPI_BCryptGenRandom funcBCryptGenRandom = Windows::getAPI_BCryptGenRandom();
+				PVOID hAlgorithm;
+				if (funcBCryptOpenAlgorithmProvider(&hAlgorithm, L"RNG", L"Microsoft Primitive Provider", 0) == 0) {
+					sl_bool flagSuccess = sl_true;
+#if defined(SLIB_ARCH_IS_64BIT)
+					if (size >> 32) {
+						sl_size segment = 0x40000000;
+						while (size) {
+							sl_size n = size;
+							if (n > segment) {
+								n = segment;
+							}
+							if (funcBCryptGenRandom(hAlgorithm, (PUCHAR)_mem, (ULONG)n, 0) != 0) {
+								flagSuccess = sl_false;
+								break;
+							}
+							size -= n;
+						}
+					} else {
+						if (funcBCryptGenRandom(hAlgorithm, (PUCHAR)_mem, (ULONG)size, 0) != 0) {
+							flagSuccess = sl_false;
+						}
+					}
+#else
+					if (funcBCryptGenRandom(hAlgorithm, (PUCHAR)_mem, size, 0) != 0) {
+						flagSuccess = sl_false;
+					}
+#endif
+					funcBCryptCloseAlgorithmProvider(hAlgorithm, 0);
+					if (flagSuccess) {
+						return;
+					}
+				}
+			}
+			sl_bool flagSuccess = sl_true;
+			HCRYPTPROV hCryptProv;
+			if (CryptAcquireContextW(&hCryptProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
+#if defined(SLIB_ARCH_IS_64BIT)
+				if (size >> 32) {
+					sl_size segment = 0x40000000;
+					while (size) {
+						sl_size n = size;
+						if (n > segment) {
+							n = segment;
+						}
+						if (!CryptGenRandom(hCryptProv, (DWORD)n, (BYTE*)_mem)) {
+							flagSuccess = sl_false;
+							break;
+						}
+						size -= n;
+					}
+				} else {
+					if (!CryptGenRandom(hCryptProv, (DWORD)size, (BYTE*)_mem)) {
+						flagSuccess = sl_false;
+					}
+				}
+#else
+				if (!CryptGenRandom(hCryptProv, (DWORD)size, (BYTE*)_mem)) {
+					flagSuccess = sl_false;
+				}
+#endif
+				CryptReleaseContext(hCryptProv, 0);
+				if (flagSuccess) {
+					return;
+				}
+			}
+		}
+#endif
+
 #define RANDOM_BLOCK 64
 		sl_size nSections = size / RANDOM_BLOCK;
 		if (size % RANDOM_BLOCK) {

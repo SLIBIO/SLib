@@ -372,6 +372,10 @@ namespace slib
 
 	LOAD_LIBRARY(wininet, "wininet.dll")
 
+	LOAD_LIBRARY(bcrypt, "bcrypt.dll")
+	GET_API(bcrypt, BCryptOpenAlgorithmProvider)
+	GET_API(bcrypt, BCryptCloseAlgorithmProvider)
+	GET_API(bcrypt, BCryptGenRandom)
 
 	sl_bool Windows::getRegistryValue(HKEY hKeyParent, const String16& path, const String16& name, Variant* out)
 	{
