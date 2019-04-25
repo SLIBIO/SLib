@@ -23,6 +23,7 @@
 #include "slib/crypto/openssl.h"
 
 #include "openssl/ssl.h"
+#include "openssl/rand.h"
 
 namespace slib
 {
@@ -824,5 +825,63 @@ namespace slib
 	{
 		return Ref<OpenSSL_AsyncStream>::from(_priv_OpenSSL_Stream::acceptStream(baseStream, param));
 	}
+
 	
+	sl_bool OpenSSL::isProbablePrime(const void* num_BigEndian, sl_uint32 nBytes, sl_bool* pFlagError)
+	{
+		if (!nBytes) {
+			if (pFlagError) {
+				*pFlagError = sl_false;
+			}
+			return sl_false;
+		}
+		BIGNUM* num = BN_bin2bn((unsigned char*)num_BigEndian, nBytes, sl_null);
+		if (num) {
+			int ret = BN_is_prime_fasttest_ex(num, 0, sl_null, sl_false, sl_null);
+			BN_free(num);
+			if (pFlagError) {
+				if (ret < 0) {
+					*pFlagError = sl_true;
+				} else {
+					*pFlagError = sl_false;
+				}
+			}
+			return ret == 1;
+		} else {
+			if (pFlagError) {
+				*pFlagError = sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	Memory OpenSSL::generatePrime(sl_uint32 nBits)
+	{
+		BIGNUM* prime = BN_new();
+		if (BN_generate_prime_ex(prime, (int)nBits, sl_false, sl_null, sl_null, sl_null)) {
+			sl_size n = (sl_size)(BN_num_bytes(prime));
+			Memory ret = Memory::create(n);
+			if (ret.isNotNull()) {
+				BN_bn2bin(prime, (unsigned char*)(ret.getData()));
+			}
+			BN_free(prime);
+			return ret;
+		}
+		return sl_null;
+	}
+	
+	sl_bool OpenSSL::randomBytes(void* bytes, sl_uint32 nBytes, sl_bool flagPrivate)
+	{
+		if (flagPrivate) {
+			if (RAND_priv_bytes((unsigned char*)bytes, (int)nBytes) == 1) {
+				return sl_true;
+			}
+		} else {
+			if (RAND_bytes((unsigned char*)bytes, (int)nBytes) == 1) {
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+
 }

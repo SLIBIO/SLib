@@ -70,6 +70,14 @@ namespace slib
 		
 		static Ref<OpenSSL_AsyncStream> acceptStream(const Ref<AsyncStream>& baseStream, const TlsAcceptStreamParam& param);
 		
+		
+		static sl_bool isProbablePrime(const void* num_BigEndian, sl_uint32 nBytes, sl_bool* pFlagError = sl_null);
+		
+		// returns value in Big-endian form
+		static Memory generatePrime(sl_uint32 nBits);
+		
+		static sl_bool randomBytes(void* bytes, sl_uint32 nBytes, sl_bool flagPrivate = sl_false);
+		
 	};
 
 }
