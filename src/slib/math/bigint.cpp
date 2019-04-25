@@ -2728,7 +2728,6 @@ namespace slib
 		}
 		sl_uint32 nChecks = _priv_CBigInt_getDefaultCheckPrimeCounts(nBits);
 		_priv_CBigInt_ProbablePrimeCheckContext contextCheckPrime;
-		int count = 0;
 		for (;;) {
 			if (!(random(nBits))) {
 				return sl_false;
@@ -2744,7 +2743,6 @@ namespace slib
 			if (flagError) {
 				return sl_false;
 			}
-			count++;
 		}
 		return sl_true;
 	}
