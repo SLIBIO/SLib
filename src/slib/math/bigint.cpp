@@ -4151,6 +4151,20 @@ namespace slib
 		}
 		return sl_false;
 	}
+	
+	BigInt BigInt::abs() const noexcept
+	{
+		CBigInt* a = ref._ptr;
+		if (a) {
+			if (a->sign > 0) {
+				return *this;
+			} else {
+				return -(*this);
+			}
+		} else {
+			return sl_true;
+		}
+	}
 
 	BigInt BigInt::pow(const BigInt& A, const BigInt& E, const BigInt* pM) noexcept
 	{

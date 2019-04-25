@@ -669,6 +669,9 @@ namespace slib
 		static BigInt shiftRight(const BigInt& A, sl_size n) noexcept;
 
 		sl_bool shiftRight(sl_size n) noexcept;
+		
+		
+		BigInt abs() const noexcept;
 	
 
 		/*
