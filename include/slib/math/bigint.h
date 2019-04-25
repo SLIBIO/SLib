@@ -66,7 +66,7 @@ namespace slib
 	
 		sl_bool getBit(sl_size pos) const noexcept;
 
-		void setBit(sl_size pos, sl_bool bit) noexcept;
+		sl_bool setBit(sl_size pos, sl_bool bit) noexcept;
 	
 		// get size in elements
 		sl_size getMostSignificantElements() const noexcept;
@@ -175,6 +175,17 @@ namespace slib
 		}
 
 
+		sl_bool equals(const CBigInt& other) const noexcept;
+		
+		sl_bool equals(sl_int32 v) const noexcept;
+		
+		sl_bool equals(sl_uint32 v) const noexcept;
+		
+		sl_bool equals(sl_int64 v) const noexcept;
+		
+		sl_bool equals(sl_uint64 v) const noexcept;
+		
+		
 		// compare returns
 		//  0: equal,  negative: less than, positive: greater than
 		sl_int32 compareAbs(const CBigInt& other) const noexcept;
@@ -342,7 +353,16 @@ namespace slib
 		*/
 		sl_bool gcd(const CBigInt& A, const CBigInt& B) noexcept;
 
-		sl_bool gcd(const CBigInt& B) noexcept;
+		sl_bool gcd(const CBigInt& B) noexcept;		
+		
+		/*
+		 	prime check and generation
+		*/
+		sl_bool isProbablePrime(sl_uint32 nChecks = 0, sl_bool* pFlagError = sl_null) const noexcept;
+		
+		sl_bool generatePrime(sl_size nBits) noexcept;
+		
+		sl_bool random(sl_size nBits) noexcept;
 	
 	private:
 		void _free() noexcept;
@@ -504,7 +524,18 @@ namespace slib
 
 		String toHexString() const noexcept;
 
-
+		
+		sl_bool equals(const BigInt& other) const noexcept;
+		
+		sl_bool equals(sl_int32 v) const noexcept;
+		
+		sl_bool equals(sl_uint32 v) const noexcept;
+		
+		sl_bool equals(sl_int64 v) const noexcept;
+		
+		sl_bool equals(sl_uint64 v) const noexcept;
+		
+		
 		// compare returns
 		//  0: equal,  negative: less than, positive: greater than
 		sl_int32 compare(const BigInt& other) const noexcept;
@@ -681,6 +712,15 @@ namespace slib
 		*/
 		static BigInt gcd(const BigInt& A, const BigInt& B) noexcept;
 	
+		/*
+		 	prime check and generation
+		*/
+		sl_bool isProbablePrime(sl_uint32 nChecks = 0, sl_bool* pFlagError = sl_null) const noexcept;
+		
+		static BigInt generatePrime(sl_size nBits) noexcept;
+		
+		static BigInt random(sl_size nBits) noexcept;
+		
 	public:
 		BigInt& operator=(sl_int32 n) noexcept;
 
