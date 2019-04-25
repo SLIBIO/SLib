@@ -52,6 +52,68 @@ namespace slib
 	{
 		return (sl_uint32)(N.getMostSignificantBytes());
 	}
+	
+	void RSAPrivateKey::generate(sl_uint32 nBits)
+	{
+		sl_uint32 h = nBits >> 1;
+		nBits = h << 1;
+		for (;;) {
+			P = BigInt::generatePrime(h);
+			Q = BigInt::generatePrime(h);
+			if (generateFromPrimes(nBits)) {
+				return;
+			}
+		}
+	}
+	
+	sl_bool RSAPrivateKey::generateFromPrimes(sl_uint32 nBits)
+	{
+		sl_uint32 h = nBits >> 1;
+		if (h > 100) {
+			if (BigInt::shiftRight((P-Q).abs(), h - 100).isZero()) {
+				return sl_false;
+			}
+		} else {
+			if (P == Q) {
+				return sl_false;
+			}
+		}
+		N = P * Q;
+		BigInt P1 = P - 1;
+		BigInt Q1 = Q - 1;
+		BigInt L = BigInt::lcm(P1, Q1);
+		if (E.isZero()) {
+			if (nBits > 20) {
+				E = 65537;
+			} else if (nBits > 8) {
+				E = 17;
+			} else {
+				E = 3;
+			}
+		}
+		if (E < 3) {
+			return sl_false;
+		}
+		if (E >= L) {
+			return sl_false;
+		}
+		if (BigInt::gcd(E, L) != 1) {
+			return sl_false;
+		}
+		D = BigInt::inverseMod(E, L);
+		DP = BigInt::mod(D, P1);
+		DQ = BigInt::mod(D, Q1);
+		IQ = BigInt::inverseMod(Q, P);
+		
+		// Test
+		BigInt a = 3;
+		BigInt b = BigInt::pow_montgomery(a, E, N);
+		BigInt TP = BigInt::pow_montgomery(b, DP, P);
+		BigInt TQ = BigInt::pow_montgomery(b, DQ, Q);
+		BigInt c = ((TP - TQ) * IQ) % P;
+		c = TQ + c * Q;
+		return c == 3;
+	}
 
 
 	sl_bool RSA::executePublic(const RSAPublicKey& key, const void* src, void* dst)
@@ -61,7 +123,7 @@ namespace slib
 		if (T >= key.N) {
 			return sl_false;
 		}
-		T = T.pow_montgomery(key.E, key.N);
+		T = BigInt::pow_montgomery(T, key.E, key.N);
 		if (T.isNotNull()) {
 			if (T.getBytesBE(dst, n)) {
 				return sl_true;
@@ -78,10 +140,10 @@ namespace slib
 			return sl_false;
 		}
 		if (key.flagUseOnlyD) {
-			T = T.pow_montgomery(key.D, key.N);
+			T = BigInt::pow_montgomery(T, key.D, key.N);
 		} else {
-			BigInt TP = T.pow_montgomery(key.DP, key.P);
-			BigInt TQ = T.pow_montgomery(key.DQ, key.Q);
+			BigInt TP = BigInt::pow_montgomery(T, key.DP, key.P);
+			BigInt TQ = BigInt::pow_montgomery(T, key.DQ, key.Q);
 			T = ((TP - TQ) * key.IQ) % key.P;
 			T = TQ + T * key.Q;
 		}

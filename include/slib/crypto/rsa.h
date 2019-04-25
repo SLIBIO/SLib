@@ -70,6 +70,10 @@ namespace slib
 
 	public:
 		sl_uint32 getLength() const;
+		
+		void generate(sl_uint32 nBits);
+
+		sl_bool generateFromPrimes(sl_uint32 nBits);
 
 	};
 	

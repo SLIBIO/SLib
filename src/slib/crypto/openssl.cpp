@@ -884,4 +884,17 @@ namespace slib
 		return sl_false;
 	}
 
+	void OpenSSL::generateRSA(RSAPrivateKey& key, sl_uint32 nBits)
+	{
+		sl_uint32 h = nBits >> 1;
+		nBits = h << 1;
+		for (;;) {
+			key.P = BigInt::fromBytesBE(generatePrime(h));
+			key.Q = BigInt::fromBytesBE(generatePrime(h));
+			if (key.generateFromPrimes(nBits)) {
+				return;
+			}
+		}
+	}
+	
 }

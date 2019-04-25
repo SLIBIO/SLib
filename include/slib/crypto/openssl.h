@@ -26,6 +26,7 @@
 #include "definition.h"
 
 #include "tls.h"
+#include "rsa.h"
 
 struct ssl_ctx_st;
 struct ssl_st;
@@ -77,6 +78,9 @@ namespace slib
 		static Memory generatePrime(sl_uint32 nBits);
 		
 		static sl_bool randomBytes(void* bytes, sl_uint32 nBytes, sl_bool flagPrivate = sl_false);
+		
+		
+		static void generateRSA(RSAPrivateKey& _output, sl_uint32 nBits);
 		
 	};
 
