@@ -356,6 +356,13 @@ namespace slib
 		sl_bool gcd(const CBigInt& B) noexcept;		
 		
 		/*
+		 	lcm - least common multiple
+		*/
+		sl_bool lcm(const CBigInt& A, const CBigInt& B) noexcept;
+		
+		sl_bool lcm(const CBigInt& B) noexcept;
+		
+		/*
 		 	prime check and generation
 		*/
 		sl_bool isProbablePrime(sl_uint32 nChecks = 0, sl_bool* pFlagError = sl_null) const noexcept;
@@ -711,7 +718,12 @@ namespace slib
 			gcd - greatest common divisor
 		*/
 		static BigInt gcd(const BigInt& A, const BigInt& B) noexcept;
-	
+		
+		/*
+		 	lcm - least common multiple
+		 */
+		static BigInt lcm(const BigInt& A, const BigInt& B) noexcept;
+		
 		/*
 		 	prime check and generation
 		*/

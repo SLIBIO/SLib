@@ -2576,6 +2576,32 @@ namespace slib
 		return gcd(*this, B);
 	}
 
+	sl_bool CBigInt::lcm(const CBigInt& inA, const CBigInt& inB) noexcept
+	{
+		if (!(gcd(inA, inB))) {
+			return sl_false;
+		}
+		CBigInt a, b;
+		if (!(CBigInt::div(inA, *this, &a))) {
+			return sl_false;
+		}
+		if (!(CBigInt::div(inB, *this, &b))) {
+			return sl_false;
+		}
+		if (!(mul(a))) {
+			return sl_false;
+		}
+		if (!(mul(b))) {
+			return sl_false;
+		}
+		return sl_true;
+	}
+	
+	sl_bool CBigInt::lcm(const CBigInt& B) noexcept
+	{
+		return lcm(*this, B);
+	}
+
 	/*
 	 				Miller–Rabin primality test
 	 
@@ -4338,6 +4364,24 @@ namespace slib
 				CBigInt* r = new CBigInt;
 				if (r) {
 					if (r->gcd(*a, *b)) {
+						return r;
+					}
+					delete r;
+				}
+			}
+		}
+		return sl_null;
+	}
+
+	BigInt BigInt::lcm(const BigInt& A, const BigInt& B) noexcept
+	{
+		CBigInt* a = A.ref._ptr;
+		CBigInt* b = B.ref._ptr;
+		if (a) {
+			if (b) {
+				CBigInt* r = new CBigInt;
+				if (r) {
+					if (r->lcm(*a, *b)) {
 						return r;
 					}
 					delete r;
