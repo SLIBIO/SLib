@@ -44,7 +44,7 @@ namespace slib
 
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(RSAPrivateKey)
 	
-	RSAPrivateKey::RSAPrivateKey()
+	RSAPrivateKey::RSAPrivateKey(): flagUseOnlyD(sl_false)
 	{
 	}
 	

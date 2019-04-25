@@ -61,7 +61,7 @@ namespace slib
 		BigInt IQ; // Q^-1 mod P
 
 		// Use N and D only for decryption
-		sl_bool flagUseOnlyD = sl_false;
+		sl_bool flagUseOnlyD;
 	
 	public:
 		RSAPrivateKey();
