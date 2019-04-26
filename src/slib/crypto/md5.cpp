@@ -23,7 +23,6 @@
 #include "slib/crypto/md5.h"
 
 #include "slib/core/mio.h"
-#include "slib/core/io.h"
 #include "slib/core/math.h"
 
 namespace slib

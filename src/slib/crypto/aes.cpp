@@ -42,11 +42,6 @@ namespace slib
 	{
 	}
 
-	sl_uint32 AES::getBlockSize()
-	{
-		return BlockSize;
-	}
-
 #define TO_BYTE(x) ((sl_uint8)(x))
 
 	// S-Box: substitution values for the byte xy

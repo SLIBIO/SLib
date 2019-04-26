@@ -83,18 +83,18 @@ namespace slib
 
 	};
 	
-	template <class BlockCipher>
+	template <class CLASS>
 	class SLIB_EXPORT GCM : public GCM_Base
 	{
 	public:
 		GCM();
 
-		GCM(const BlockCipher* cipher);
+		GCM(const CLASS* cipher);
 
 		~GCM();
 
 	public:
-		sl_bool setCipher(const BlockCipher* cipher);
+		sl_bool setCipher(const CLASS* cipher);
 
 		sl_bool start(const void* IV, sl_size lenIV);
 
@@ -132,13 +132,12 @@ namespace slib
 		);
 
 	protected:
-		const BlockCipher* m_cipher;
+		const CLASS* m_cipher;
 
 	};
 	
-	class AES;
-	extern template class GCM<AES>;
-
 }
+
+#include "detail/gcm.inc"
 
 #endif

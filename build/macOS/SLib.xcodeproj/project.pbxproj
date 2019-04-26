@@ -906,7 +906,6 @@
 		26D9D9031E9645CE005F7BD3 /* system_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE1D8A1B383BB000A74698 /* system_unix.cpp */; };
 		26D9D9041E9645CE005F7BD3 /* event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F2FA61B03A33700854DAF /* event.cpp */; };
 		26D9D9051E9645CE005F7BD3 /* timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2609E5591E37E03A00CFBDBB /* timer.cpp */; };
-		26D9D9061E9645CE005F7BD3 /* crypto_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD45A1C11930800D47AB0 /* crypto_hash.cpp */; };
 		26D9D9071E9645CE005F7BD3 /* thread_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = A25F2FBD1B03A33700854DAF /* thread_apple.mm */; };
 		26D9D9081E9645CE005F7BD3 /* async.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F2F9D1B03A33700854DAF /* async.cpp */; };
 		26D9D9091E9645CE005F7BD3 /* function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FBC26C1DF9E83F00D76774 /* function.cpp */; };
@@ -2249,7 +2248,6 @@
 		26694BF61C9AB4330047E67C /* audio_util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_util.cpp; sourceTree = "<group>"; };
 		26694BF81C9B2CBC0047E67C /* arp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = arp.cpp; sourceTree = "<group>"; };
 		266DD4591C11930800D47AB0 /* aes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = aes.cpp; sourceTree = "<group>"; };
-		266DD45A1C11930800D47AB0 /* crypto_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crypto_hash.cpp; sourceTree = "<group>"; };
 		266DD45C1C11930800D47AB0 /* gcm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gcm.cpp; sourceTree = "<group>"; };
 		266DD45D1C11930800D47AB0 /* md5.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = md5.cpp; sourceTree = "<group>"; };
 		266DD45E1C11930800D47AB0 /* rsa.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rsa.cpp; sourceTree = "<group>"; };
@@ -4620,7 +4618,6 @@
 				266F12B21C97A13F00DE26FF /* block_cipher.cpp */,
 				268A13011E7AE8BD0048F2CE /* blowfish.cpp */,
 				266DD4611C11930800D47AB0 /* compress_zlib.cpp */,
-				266DD45A1C11930800D47AB0 /* crypto_hash.cpp */,
 				26B92D4821D33E6E003F6F82 /* des.cpp */,
 				266DD45C1C11930800D47AB0 /* gcm.cpp */,
 				2628EAE821C410ED00D8CD00 /* jwt.cpp */,
@@ -5979,7 +5976,6 @@
 				26C1B62C20D4305100E36539 /* bitmap.cpp in Sources */,
 				2671F99321E07F8200B39842 /* drawer.cpp in Sources */,
 				26D9D9CF1E96468D005F7BD3 /* render_view_macos.mm in Sources */,
-				26D9D9061E9645CE005F7BD3 /* crypto_hash.cpp in Sources */,
 				26E1B892222ABAB2007C222E /* jdatasrc.c in Sources */,
 				26D9D9CA1E96468D005F7BD3 /* picker_view.cpp in Sources */,
 				26D9D9071E9645CE005F7BD3 /* thread_apple.mm in Sources */,

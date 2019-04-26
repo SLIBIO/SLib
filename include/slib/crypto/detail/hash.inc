@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -20,59 +20,48 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_CRYPTO_BLOWFISH
-#define CHECKHEADER_SLIB_CRYPTO_BLOWFISH
-
-#include "definition.h"
-
-#include "../core/string.h"
-
-#include "block_cipher.h"
-
-/*
-	BlowFish
-
-	User Key Size - 32 bits to 448 bits
-	Block Size - 64 bits (8 bytes)
-*/
-
 namespace slib
 {
 
-	class SLIB_EXPORT Blowfish : public BlockCipher<Blowfish>
+	/*
+	 Public-Key Cryptography Standards (PKCS) #1: RSA Cryptography Specifications Version 2.1
+	 Appendix B.2 Masking Generation Functions
+	 
+	 https://tools.ietf.org/html/rfc3447#appendix-B.2
+	 */
+	template <class CLASS>
+	void CryptoHash<CLASS>::applyMask_MGF1(const void* seed, sl_uint32 sizeSeed, void* _target, sl_uint32 sizeTarget)
 	{
-	public:
-		enum {
-			BlockSize = 8
-		};
-		
-	public:
-		Blowfish();
-
-		~Blowfish();
-
-	public:
-		sl_bool setKey(const void* key, sl_uint32 lenKey /* 4 to 56 bytes */);
-
-		void setKey_SHA256(const String& key);
-		
-		void encrypt(sl_uint32& d0, sl_uint32& d1) const;
-		
-		void decrypt(sl_uint32& d0, sl_uint32& d1) const;
-
-		// 64 bit (8 byte) block
-		void encryptBlock(const void* src, void* dst) const;
-
-		// 64 bit (8 byte) block
-		void decryptBlock(const void* src, void* dst) const;
-
-	private:
-		/* The subkeys used by the blowfish cipher */
-		sl_uint32 m_P[18];
-		sl_uint32 m_S[4][256];
-
-	};
+		CLASS* thiz = ((CLASS*)this);
+		sl_uint32 n = CLASS::HashSize;
+		if (n == 0) {
+			return;
+		}
+		SLIB_SCOPED_BUFFER(sl_uint8, 128, h, n);
+		sl_uint8* target = (sl_uint8*)(_target);
+		sl_uint32 i = 0;
+		sl_uint8 C[4];
+		while (sizeTarget >= n) {
+			thiz->start();
+			thiz->update(seed, sizeSeed);
+			MIO::writeUint32BE(C, i);
+			thiz->update(C, 4);
+			thiz->finish(h);
+			for (sl_uint32 k = 0; k < n; k++) {
+				target[k] ^= h[k];
+			}
+			i++;
+			target += n;
+			sizeTarget -= n;
+		}
+		thiz->start();
+		thiz->update(seed, sizeSeed);
+		MIO::writeUint32BE(C, i);
+		thiz->update(C, 4);
+		thiz->finish(h);
+		for (sl_uint32 k = 0; k < sizeTarget; k++) {
+			target[k] ^= h[k];
+		}
+	}
 	
 }
-
-#endif

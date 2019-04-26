@@ -22,10 +22,6 @@
 
 #include "slib/crypto/rsa.h"
 
-#include "slib/crypto/sha2.h"
-#include "slib/core/math.h"
-#include "slib/core/io.h"
-#include "slib/core/scoped.h"
 
 namespace slib
 {
@@ -155,8 +151,7 @@ namespace slib
 		return sl_false;
 	}
 
-	static sl_bool _rsa_execute(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate
-		, const void* src, void* dst)
+	sl_bool RSA::execute(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate, const void* src, void* dst)
 	{
 		if (keyPublic) {
 			return RSA::executePublic(*keyPublic, src, dst);
@@ -168,8 +163,7 @@ namespace slib
 #define RSA_PKCS1_SIGN		1
 #define RSA_PKCS1_CRYPT		2
 
-	static sl_bool _rsa_encrypt_pkcs1_v15(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate
-		, const void* src, sl_uint32 n, void* dst)
+	sl_bool RSA::encrypt_pkcs1_v15(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate, const void* src, sl_uint32 n, void* dst)
 	{
 		sl_uint32 len;
 		if (keyPublic) {
@@ -208,11 +202,10 @@ namespace slib
 			}
 		}
 		*(p++) = 0;
-		return _rsa_execute(keyPublic, keyPrivate, dst, dst);
+		return execute(keyPublic, keyPrivate, dst, dst);
 	}
 
-	static sl_uint32 _rsa_decrypt_pkcs1_v15(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate
-		, const void* src, void* dst, sl_uint32 n, sl_bool* pFlagSign)
+	sl_uint32 RSA::decrypt_pkcs1_v15(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate, const void* src, void* dst, sl_uint32 n, sl_bool* pFlagSign)
 	{
 		sl_uint32 len;
 		if (keyPublic) {
@@ -227,7 +220,7 @@ namespace slib
 		if (!buf) {
 			return 0;
 		}
-		if (!_rsa_execute(keyPublic, keyPrivate, src, buf)) {
+		if (!(execute(keyPublic, keyPrivate, src, buf))) {
 			return 0;
 		}
 		if (buf[0] != 0) {
@@ -258,144 +251,22 @@ namespace slib
 
 	sl_bool RSA::encryptPublic_pkcs1_v15(const RSAPublicKey& key, const void* src, sl_uint32 n, void* dst)
 	{
-		return _rsa_encrypt_pkcs1_v15(&key, sl_null, src, n, dst);
+		return encrypt_pkcs1_v15(&key, sl_null, src, n, dst);
 	}
 
 	sl_bool RSA::encryptPrivate_pkcs1_v15(const RSAPrivateKey& key, const void* src, sl_uint32 n, void* dst)
 	{
-		return _rsa_encrypt_pkcs1_v15(sl_null, &key, src, n, dst);
+		return encrypt_pkcs1_v15(sl_null, &key, src, n, dst);
 	}
 
 	sl_uint32 RSA::decryptPublic_pkcs1_v15(const RSAPublicKey& key, const void* src, void* dst, sl_uint32 n, sl_bool* pFlagSign)
 	{
-		return _rsa_decrypt_pkcs1_v15(&key, sl_null, src, dst, n, pFlagSign);
+		return decrypt_pkcs1_v15(&key, sl_null, src, dst, n, pFlagSign);
 	}
 
 	sl_uint32 RSA::decryptPrivate_pkcs1_v15(const RSAPrivateKey& key, const void* src, void* dst, sl_uint32 n, sl_bool* pFlagSign)
 	{
-		return _rsa_decrypt_pkcs1_v15(sl_null, &key, src, dst, n, pFlagSign);
-	}
-
-/*
-	Public-Key Cryptography Standards (PKCS) #1: RSA Cryptography Specifications Version 2.1
-
-	https://tools.ietf.org/html/rfc3447#section-7.1
-
-	Section 7.1 RSAES-OAEP
-*/
-	static sl_bool _rsa_encrypt_oaep_v21(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate, const Ref<CryptoHash>& hash
-		, const void* _input, sl_uint32 sizeInput, void* _output, const void* label, sl_uint32 sizeLabel)
-	{
-		if (hash.isNull()) {
-			return 0;
-		}
-		sl_uint32 sizeRSA;
-		if (keyPublic) {
-			sizeRSA = keyPublic->getLength();
-		} else {
-			sizeRSA = keyPrivate->getLength();
-		}
-		sl_uint32 sizeHash = hash->getSize();
-		if (sizeInput == 0 || sizeHash == 0 || sizeRSA < sizeInput + 2 * sizeHash + 2) {
-			return sl_false;
-		}
-
-		const sl_uint8* input = (const sl_uint8*)_input;
-		sl_uint8* output = (sl_uint8*)_output;
-		sl_uint8* seed = output + 1;
-		sl_uint8* DB = seed + sizeHash;
-		sl_uint32 sizeDB = sizeRSA - sizeHash - 1;
-		sl_uint8* lHash = DB;
-		sl_uint8* PS = lHash + sizeHash; // Zero Area
-		sl_uint8* M = output + (sizeRSA - sizeInput);
-
-		// avoid error when input=output
-		for (sl_uint32 i = sizeInput; i > 0; i--) {
-			M[i - 1] = input[i - 1];
-		}
-		*output = 0;
-		Math::randomMemory(seed, sizeHash);
-		hash->execute(label, sizeLabel, lHash);
-		Base::zeroMemory(PS, M - PS - 1);
-		*(M - 1) = 1;
-		hash->applyMask_MGF1(seed, sizeHash, DB, sizeDB);
-		hash->applyMask_MGF1(DB, sizeDB, seed, sizeHash);
-
-		return _rsa_execute(keyPublic, keyPrivate, output, output);
-	}
-
-	static sl_uint32 _rsa_decrypt_oaep_v21(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate, const Ref<CryptoHash>& hash
-		, const void* input, void* output, sl_uint32 sizeOutputBuffer, const void* label, sl_uint32 sizeLabel)
-	{
-		if (hash.isNull()) {
-			return 0;
-		}
-		sl_uint32 sizeRSA;
-		if (keyPublic) {
-			sizeRSA = keyPublic->getLength();
-		} else {
-			sizeRSA = keyPrivate->getLength();
-		}
-		sl_uint32 sizeHash = hash->getSize();
-		if (sizeHash == 0 || sizeRSA < 2 * sizeHash + 2) {
-			return 0;
-		}
-		SLIB_SCOPED_BUFFER(sl_uint8, 4096, buf, sizeRSA);
-		if (!buf) {
-			return 0;
-		}
-		if (!_rsa_execute(keyPublic, keyPrivate, input, buf)) {
-			return 0;
-		}
-
-		sl_uint8* seed = buf + 1;
-		sl_uint8* DB = seed + sizeHash;
-		sl_uint32 sizeDB = sizeRSA - sizeHash - 1;
-		sl_uint8* lHash = DB;
-
-		hash->applyMask_MGF1(DB, sizeDB, seed, sizeHash);
-		hash->applyMask_MGF1(seed, sizeHash, DB, sizeDB);
-		
-		hash->execute(label, sizeLabel, seed);
-		sl_uint8 _check = buf[0];
-		sl_uint32 i;
-		for (i = 0; i < sizeHash; i++) {
-			_check |= (seed[i] - lHash[i]);
-		}
-		for (i = sizeHash; i < sizeDB; i++) {
-			if (_check == 0 && DB[i] == 1) {
-				sl_uint32 size = sizeDB - i - 1;
-				if (size > sizeOutputBuffer) {
-					size = sizeOutputBuffer;
-				}
-				Base::copyMemory(output, DB + i + 1, size);
-				return size;
-			}
-			if (DB[i] != 0) {
-				_check = 1;
-			}
-		}
-		return 0;
-	}
-
-	sl_bool RSA::encryptPublic_oaep_v21(const RSAPublicKey& key, const Ref<CryptoHash>& hash, const void* input, sl_uint32 sizeInput, void* output, const void* label, sl_uint32 sizeLabel)
-	{
-		return _rsa_encrypt_oaep_v21(&key, sl_null, hash, input, sizeInput, output, label, sizeLabel);
-	}
-
-	sl_bool RSA::encryptPrivate_oaep_v21(const RSAPrivateKey& key, const Ref<CryptoHash>& hash, const void* input, sl_uint32 sizeInput, void* output, const void* label, sl_uint32 sizeLabel)
-	{
-		return _rsa_encrypt_oaep_v21(sl_null, &key, hash, input, sizeInput, output, label, sizeLabel);
-	}
-
-	sl_uint32 RSA::decryptPublic_oaep_v21(const RSAPublicKey& key, const Ref<CryptoHash>& hash, const void* input, void* output, sl_uint32 sizeOutputBuffer, const void* label, sl_uint32 sizeLabel)
-	{
-		return _rsa_decrypt_oaep_v21(&key, sl_null, hash, input, output, sizeOutputBuffer, label, sizeLabel);
-	}
-
-	sl_uint32 RSA::decryptPrivate_oaep_v21(const RSAPrivateKey& key, const Ref<CryptoHash>& hash, const void* input, void* output, sl_uint32 sizeOutputBuffer, const void* label, sl_uint32 sizeLabel)
-	{
-		return _rsa_decrypt_oaep_v21(sl_null, &key, hash, input, output, sizeOutputBuffer, label, sizeLabel);
+		return decrypt_pkcs1_v15(sl_null, &key, src, dst, n, pFlagSign);
 	}
 
 }

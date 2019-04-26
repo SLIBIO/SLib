@@ -27,66 +27,69 @@
 
 #include "../core/string.h"
 #include "../core/memory.h"
-#include "../core/object.h"
-
-/*
-	Supported Hash Functions
-		MD5, SHA1, SHA2(224, 256, 384, 512)
-
-	Attention: Hash classes are not thread-safe
-*/
+#include "../core/mio.h"
+#include "../core/scoped.h"
 
 namespace slib
 {
 	
-	enum class CryptoHashType
-	{
-		MD5 = 0,
-		SHA1 = 101,
-		SHA224 = 102,
-		SHA256 = 103,
-		SHA384 = 104,
-		SHA512 = 105
-	};
-	
-	class SLIB_EXPORT CryptoHash : public Object
+	template <class CLASS>
+	class SLIB_EXPORT CryptoHash
 	{
 	public:
-		CryptoHash();
-
-		~CryptoHash();
-
-	public:
-		static Ref<CryptoHash> create(CryptoHashType type);
-
-		static Ref<CryptoHash> md5();
-
-		static Ref<CryptoHash> sha1();
-
-		static Ref<CryptoHash> sha224();
-
-		static Ref<CryptoHash> sha256();
-
-		static Ref<CryptoHash> sha384();
-
-		static Ref<CryptoHash> sha512();
-	
-	public:
-		virtual sl_uint32 getSize() const = 0;
-
-		virtual void start() = 0;
-
-		virtual void update(const void* input, sl_size n) = 0;
-
-		virtual void finish(void* output) = 0;
-	
-
-		void execute(const void* input, sl_size n, void* output);
-	
+		void execute(const void* input, sl_size n, void* output)
+		{
+			CLASS& h = *((CLASS*)this);
+			h.start();
+			h.update(input, n);
+			h.finish(output);
+		}
+		
+		static void hash(const void* input, sl_size n, void* output)
+		{
+			CLASS h;
+			h.start();
+			h.update(input, n);
+			h.finish(output);
+		}
+		
+		static void hash(const String& s, void* output)
+		{
+			hash(s.getData(), s.getLength(), output);
+		}
+		
+		static void hash(const Memory& data, void* output)
+		{
+			hash(data.getData(), data.getSize(), output);
+		}
+		
+		static Memory hash(const void* input, sl_size n)
+		{
+			char v[CLASS::HashSize];
+			hash(input, n, v);
+			return Memory::create(v, CLASS::HashSize);
+		}
+		
+		static Memory hash(const String& s)
+		{
+			char v[CLASS::HashSize];
+			hash(s.getData(), s.getLength(), v);
+			return Memory::create(v, CLASS::HashSize);
+		}
+		
+		static Memory hash(const Memory& data)
+		{
+			char v[CLASS::HashSize];
+			hash(data.getData(), data.getSize(), v);
+			return Memory::create(v, CLASS::HashSize);
+		}
+		
 		void applyMask_MGF1(const void* seed, sl_uint32 sizeSeed, void* target, sl_uint32 sizeTarget);
 
 	};
-
+	
 }
+
+#include "detail/hash.inc"
 
 #endif

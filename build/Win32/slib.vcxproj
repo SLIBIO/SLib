@@ -176,7 +176,6 @@
     <ClCompile Include="..\..\src\slib\crypto\block_cipher.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\blowfish.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\compress_zlib.cpp" />
-    <ClCompile Include="..\..\src\slib\crypto\crypto_hash.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\des.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\gcm.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\jwt.cpp" />

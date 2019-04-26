@@ -772,7 +772,6 @@
 		26D9D8281E9628E0005F7BD3 /* spin_lock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FBC2701DF9FB0200D76774 /* spin_lock.cpp */; };
 		26D9D8291E9628E0005F7BD3 /* bigint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3AB1C117B1200D47AB0 /* bigint.cpp */; };
 		26D9D82A1E9628E0005F7BD3 /* asset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B571421C9D43A70099E69B /* asset.cpp */; };
-		26D9D82B1E9628E0005F7BD3 /* crypto_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3791C117A3100D47AB0 /* crypto_hash.cpp */; };
 		26D9D82C1E9628E0005F7BD3 /* view_frustum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B571691C9D44720099E69B /* view_frustum.cpp */; };
 		26D9D82D1E9628E0005F7BD3 /* timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D8AC841E3871EA0092EB81 /* timer.cpp */; };
 		26D9D82E1E9628E0005F7BD3 /* system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F2EE51B039EF600854DAF /* system.cpp */; };
@@ -2073,7 +2072,6 @@
 		266DD36C1C1171B800D47AB0 /* audio_player_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = audio_player_ios.mm; path = media/audio_player_ios.mm; sourceTree = "<group>"; };
 		266DD3721C1171E400D47AB0 /* audio_recorder_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = audio_recorder_ios.mm; path = media/audio_recorder_ios.mm; sourceTree = "<group>"; };
 		266DD3781C117A3100D47AB0 /* aes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = aes.cpp; sourceTree = "<group>"; };
-		266DD3791C117A3100D47AB0 /* crypto_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crypto_hash.cpp; sourceTree = "<group>"; };
 		266DD37A1C117A3100D47AB0 /* gcm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gcm.cpp; sourceTree = "<group>"; };
 		266DD37B1C117A3100D47AB0 /* md5.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = md5.cpp; sourceTree = "<group>"; };
 		266DD37C1C117A3100D47AB0 /* rsa.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rsa.cpp; sourceTree = "<group>"; };
@@ -4021,7 +4019,6 @@
 				26B571501C9D442D0099E69B /* block_cipher.cpp */,
 				268A13031E7B16340048F2CE /* blowfish.cpp */,
 				266DD46B1C11934A00D47AB0 /* compress_zlib.cpp */,
-				266DD3791C117A3100D47AB0 /* crypto_hash.cpp */,
 				26B92D4F21D357AD003F6F82 /* des.cpp */,
 				266DD37A1C117A3100D47AB0 /* gcm.cpp */,
 				2628EAE221C410CF00D8CD00 /* jwt.cpp */,
@@ -5325,7 +5322,6 @@
 				26D9D8801E96295A005F7BD3 /* audio_player_ios.mm in Sources */,
 				26BB17D821F4E45C0089C7EC /* view_pager.cpp in Sources */,
 				26D9D82A1E9628E0005F7BD3 /* asset.cpp in Sources */,
-				26D9D82B1E9628E0005F7BD3 /* crypto_hash.cpp in Sources */,
 				26E1B8B5222ABBDC007C222E /* inflate.c in Sources */,
 				26E1B8CC222ABC05007C222E /* intel_init.c in Sources */,
 				26D9D8821E96295A005F7BD3 /* audio_recorder.cpp in Sources */,

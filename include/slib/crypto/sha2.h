@@ -40,7 +40,7 @@
 namespace slib
 {
 	
-	class SLIB_EXPORT _priv_SHA256Base : public CryptoHash
+	class SLIB_EXPORT _priv_SHA256Base
 	{
 	public:
 		_priv_SHA256Base();
@@ -48,7 +48,7 @@ namespace slib
 		~_priv_SHA256Base();
 
 	public:
-		void update(const void* input, sl_size n) final;
+		void update(const void* input, sl_size n);
 	
 	protected:
 		void _start();
@@ -64,7 +64,7 @@ namespace slib
 		sl_uint32 h[8];
 	};
 	
-	class SLIB_EXPORT SHA224 : public _priv_SHA256Base
+	class SLIB_EXPORT SHA224 : public _priv_SHA256Base, public CryptoHash<SHA224>
 	{
 	public:
 		enum {
@@ -78,28 +78,13 @@ namespace slib
 		~SHA224();
 
 	public:
-		void start() final;
+		void start();
 
-		void finish(void* output) final;
-	
-	public: /* common functions for CryptoHash */
-		static void hash(const void* input, sl_size n, void* output);
-
-		static void hash(const String& s, void* output);
-
-		static void hash(const Memory& data, void* output);
-
-		static Memory hash(const void* input, sl_size n);
-
-		static Memory hash(const String& s);
-
-		static Memory hash(const Memory& data);
-
-		sl_uint32 getSize() const final;
+		void finish(void* output);
 
 	};
 	
-	class SLIB_EXPORT SHA256 : public _priv_SHA256Base
+	class SLIB_EXPORT SHA256 : public _priv_SHA256Base, public CryptoHash<SHA256>
 	{
 	public:
 		enum {
@@ -113,31 +98,16 @@ namespace slib
 		~SHA256();
 
 	public:
-		void start() final;
+		void start();
 
-		void finish(void* output) final;
+		void finish(void* output);
 
 	public:
 		static sl_uint32 make32bitChecksum(const void* input, sl_size n);
 
-	public: /* common functions for CryptoHash */
-		static void hash(const void* input, sl_size n, void* output);
-
-		static void hash(const String& s, void* output);
-
-		static void hash(const Memory& data, void* output);
-
-		static Memory hash(const void* input, sl_size n);
-
-		static Memory hash(const String& s);
-
-		static Memory hash(const Memory& data);
-
-		sl_uint32 getSize() const final;
-
 	};
 	
-	class SLIB_EXPORT _priv_SHA512Base : public CryptoHash
+	class SLIB_EXPORT _priv_SHA512Base
 	{
 	public:
 		_priv_SHA512Base();
@@ -145,7 +115,7 @@ namespace slib
 		~_priv_SHA512Base();
 	
 	public:
-		void update(const void* input, sl_size n) final;
+		void update(const void* input, sl_size n);
 	
 	protected:
 		void _start();
@@ -162,7 +132,7 @@ namespace slib
 
 	};
 	
-	class SLIB_EXPORT SHA384 : public _priv_SHA512Base
+	class SLIB_EXPORT SHA384 : public _priv_SHA512Base, public CryptoHash<SHA384>
 	{
 	public:
 		enum {
@@ -176,28 +146,13 @@ namespace slib
 		~SHA384();
 
 	public:
-		void start() final;
+		void start();
 
-		void finish(void* output) final;
-
-	public: /* common functions for CryptoHash */
-		static void hash(const void* input, sl_size n, void* output);
-
-		static void hash(const String& s, void* output);
-
-		static void hash(const Memory& data, void* output);
-
-		static Memory hash(const void* input, sl_size n);
-
-		static Memory hash(const String& s);
-
-		static Memory hash(const Memory& data);
-
-		sl_uint32 getSize() const final;
+		void finish(void* output);
 
 	};
 	
-	class SLIB_EXPORT SHA512 : public _priv_SHA512Base
+	class SLIB_EXPORT SHA512 : public _priv_SHA512Base, public CryptoHash<SHA512>
 	{
 	public:
 		enum {
@@ -211,24 +166,9 @@ namespace slib
 		~SHA512();
 
 	public:
-		void start() final;
+		void start();
 
-		void finish(void* output) final;
-
-	public: /* common functions for CryptoHash */
-		static void hash(const void* input, sl_size n, void* output);
-
-		static void hash(const String& s, void* output);
-
-		static void hash(const Memory& data, void* output);
-
-		static Memory hash(const void* input, sl_size n);
-
-		static Memory hash(const String& s);
-
-		static Memory hash(const Memory& data);
-
-		sl_uint32 getSize() const final;
+		void finish(void* output);
 
 	};
 

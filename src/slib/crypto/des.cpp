@@ -23,7 +23,6 @@
 #include "slib/crypto/des.h"
 
 #include "slib/core/mio.h"
-#include "slib/crypto/sha2.h"
 
 /*
 	DES - Data Encryption Standard
@@ -168,11 +167,6 @@ namespace slib
 	{
 	}
 
-	sl_uint32 DES::getBlockSize()
-	{
-		return BlockSize;
-	}
-
 	void DES::setKey(const void* key)
 	{
 		setKey(MIO::readUint64BE(key));
@@ -293,11 +287,6 @@ namespace slib
 	
 	TripleDES::~TripleDES()
 	{
-	}
-	
-	sl_uint32 TripleDES::getBlockSize()
-	{
-		return BlockSize;
 	}
 	
 	void TripleDES::setKey(const void* key1, const void* key2, const void* key3)

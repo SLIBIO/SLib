@@ -28,6 +28,8 @@
 #include "hash.h"
 
 #include "../math/bigint.h"
+#include "../core/scoped.h"
+#include "../core/math.h"
 
 namespace slib
 {
@@ -84,9 +86,15 @@ namespace slib
 
 		static sl_bool executePrivate(const RSAPrivateKey& key, const void* src, void* dst);
 	
+		static sl_bool execute(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate, const void* src, void* dst);
+
 		/*
 			PKCS#1 v1.5 Random Padding
 		*/
+		static sl_bool encrypt_pkcs1_v15(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate, const void* src, sl_uint32 n, void* dst);
+
+		static sl_uint32 decrypt_pkcs1_v15(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate, const void* src, void* dst, sl_uint32 n, sl_bool* pFlagSign = sl_null);
+
 		static sl_bool encryptPublic_pkcs1_v15(const RSAPublicKey& key, const void* input, sl_uint32 sizeInput, void* output);
 
 		static sl_bool encryptPrivate_pkcs1_v15(const RSAPrivateKey& key, const void* input, sl_uint32 sizeInput, void* output);
@@ -98,17 +106,29 @@ namespace slib
 		/*
 			PKCS#1 v2.1 OAEP - Optimal Asymmetric Encryption Padding
 		*/
-		static sl_bool encryptPublic_oaep_v21(const RSAPublicKey& key, const Ref<CryptoHash>& hash, const void* input, sl_uint32 sizeInput, void* output, const void* label = 0, sl_uint32 sizeLabel = 0);
+		template <class HASH>
+		static sl_bool encrypt_oaep_v21(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate, HASH& hash, const void* _input, sl_uint32 sizeInput, void* _output, const void* label = 0, sl_uint32 sizeLabel = 0);
 
-		static sl_bool encryptPrivate_oaep_v21(const RSAPrivateKey& key, const Ref<CryptoHash>& hash, const void* input, sl_uint32 sizeInput, void* output, const void* label = 0, sl_uint32 sizeLabel = 0);
+		template <class HASH>
+		static sl_uint32 decrypt_oaep_v21(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate, HASH& hash, const void* input, void* output, sl_uint32 sizeOutputBuffer, const void* label = 0, sl_uint32 sizeLabel = 0);
 
-		static sl_uint32 decryptPublic_oaep_v21(const RSAPublicKey& key, const Ref<CryptoHash>& hash, const void* input, void* output, sl_uint32 sizeOutputBuffer, const void* label = 0, sl_uint32 sizeLabel = 0);
+		template <class HASH>
+		static sl_bool encryptPublic_oaep_v21(const RSAPublicKey& key, HASH& hash, const void* input, sl_uint32 sizeInput, void* output, const void* label = 0, sl_uint32 sizeLabel = 0);
 
-		static sl_uint32 decryptPrivate_oaep_v21(const RSAPrivateKey& key, const Ref<CryptoHash>& hash, const void* input, void* output, sl_uint32 sizeOutputBuffer, const void* label = 0, sl_uint32 sizeLabel = 0);
+		template <class HASH>
+		static sl_bool encryptPrivate_oaep_v21(const RSAPrivateKey& key, HASH& hash, const void* input, sl_uint32 sizeInput, void* output, const void* label = 0, sl_uint32 sizeLabel = 0);
+
+		template <class HASH>
+		static sl_uint32 decryptPublic_oaep_v21(const RSAPublicKey& key, HASH& hash, const void* input, void* output, sl_uint32 sizeOutputBuffer, const void* label = 0, sl_uint32 sizeLabel = 0);
+
+		template <class HASH>
+		static sl_uint32 decryptPrivate_oaep_v21(const RSAPrivateKey& key, HASH& hash, const void* input, void* output, sl_uint32 sizeOutputBuffer, const void* label = 0, sl_uint32 sizeLabel = 0);
 	
 	};
 
 }
+
+#include "detail/rsa.inc"
 
 #endif
 

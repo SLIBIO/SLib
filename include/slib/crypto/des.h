@@ -25,8 +25,6 @@
 
 #include "definition.h"
 
-#include "../core/string.h"
-
 #include "block_cipher.h"
 
 /*
@@ -39,20 +37,19 @@
 namespace slib
 {
 
-	class SLIB_EXPORT DES : public Object
+	class SLIB_EXPORT DES : public BlockCipher<DES>
 	{
 	public:
 		enum {
 			BlockSize = 8
 		};
+		
 	public:
 		DES();
 
 		~DES();
 
 	public:
-		static sl_uint32 getBlockSize();
-
 		// 64 bit (8 bytes), note that most significant bit of each byte is not used
 		void setKey(const void* key);
 		void setKey(sl_uint64 key);
@@ -67,60 +64,24 @@ namespace slib
 		// 64 bits (8 bytes) block
 		void decryptBlock(const void* src, void* dst) const;
 
-	public: /* common functions for block ciphers */
-		sl_size encryptBlocks(const void* src, void* dst, sl_size size) const;
-
-		sl_size decryptBlocks(const void* src, void* dst, sl_size size) const;
-
-		sl_size encrypt_ECB_PKCS7Padding(const void* src, sl_size size, void* dst) const;
-
-		sl_size decrypt_ECB_PKCS7Padding(const void* src, sl_size size, void* dst) const;
-
-		sl_size encrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size, void* dst) const;
-
-		sl_size decrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size, void* dst) const;
-
-		sl_size encrypt_CBC_PKCS7Padding(const void* src, sl_size size, void* dst) const;
-
-		sl_size decrypt_CBC_PKCS7Padding(const void* src, sl_size size, void* dst) const;
-
-		Memory encrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size) const;
-		
-		Memory decrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size) const;
-
-		Memory encrypt_CBC_PKCS7Padding(const void* src, sl_size size) const;
-
-		Memory decrypt_CBC_PKCS7Padding(const void* src, sl_size size) const;
-
-		Memory encrypt_CBC_PKCS7Padding(const Memory& mem) const;
-
-		Memory decrypt_CBC_PKCS7Padding(const Memory& mem) const;
-
-		sl_size encrypt_CTR(const void* input, sl_size size, void* output, void* counter, sl_uint32 offset = 0) const;
-
-		sl_size encrypt_CTR(const void* iv, sl_uint64 counter, sl_uint32 offset, const void* input, sl_size size, void* output) const;
-
-		sl_size encrypt_CTR(const void* iv, sl_uint64 pos, const void* input, sl_size size, void* output) const;
-
 	private:
 		sl_uint64 m_K[16];
 		
 	};
 	
-	class SLIB_EXPORT TripleDES : public Object
+	class SLIB_EXPORT TripleDES : public BlockCipher<TripleDES>
 	{
 	public:
 		enum {
 			BlockSize = 8
 		};
+		
 	public:
 		TripleDES();
 		
 		~TripleDES();
 		
-	public:
-		static sl_uint32 getBlockSize();
-		
+	public:		
 		// 3 x 64 bit (8 bytes), note that most significant bit of each byte is not used
 		void setKey(const void* key1, const void* key2, const void* key3);
 		void setKey(sl_uint64 key1, sl_uint64 key2, sl_uint64 key3);
@@ -136,41 +97,6 @@ namespace slib
 		
 		// 64 bits (8 bytes) block
 		void decryptBlock(const void* src, void* dst) const;
-		
-	public: /* common functions for block ciphers */
-		sl_size encryptBlocks(const void* src, void* dst, sl_size size) const;
-		
-		sl_size decryptBlocks(const void* src, void* dst, sl_size size) const;
-		
-		sl_size encrypt_ECB_PKCS7Padding(const void* src, sl_size size, void* dst) const;
-		
-		sl_size decrypt_ECB_PKCS7Padding(const void* src, sl_size size, void* dst) const;
-		
-		sl_size encrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size, void* dst) const;
-		
-		sl_size decrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size, void* dst) const;
-		
-		sl_size encrypt_CBC_PKCS7Padding(const void* src, sl_size size, void* dst) const;
-		
-		sl_size decrypt_CBC_PKCS7Padding(const void* src, sl_size size, void* dst) const;
-		
-		Memory encrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size) const;
-		
-		Memory decrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size) const;
-
-		Memory encrypt_CBC_PKCS7Padding(const void* src, sl_size size) const;
-		
-		Memory decrypt_CBC_PKCS7Padding(const void* src, sl_size size) const;
-		
-		Memory encrypt_CBC_PKCS7Padding(const Memory& mem) const;
-		
-		Memory decrypt_CBC_PKCS7Padding(const Memory& mem) const;
-		
-		sl_size encrypt_CTR(const void* input, sl_size size, void* output, void* counter, sl_uint32 offset = 0) const;
-		
-		sl_size encrypt_CTR(const void* iv, sl_uint64 counter, sl_uint32 offset, const void* input, sl_size size, void* output) const;
-		
-		sl_size encrypt_CTR(const void* iv, sl_uint64 pos, const void* input, sl_size size, void* output) const;
 		
 	private:
 		DES m_des1;

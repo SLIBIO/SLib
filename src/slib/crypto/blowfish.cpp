@@ -44,11 +44,6 @@ namespace slib
 	Blowfish::~Blowfish()
 	{
 	}
-
-	sl_uint32 Blowfish::getBlockSize()
-	{
-		return BlockSize;
-	}
 	
 #define BLOWFISH_ROUNDS 16
 

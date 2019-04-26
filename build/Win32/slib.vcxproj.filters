@@ -185,9 +185,6 @@
     <ClCompile Include="..\..\src\slib\crypto\compress_zlib.cpp">
       <Filter>src\crypto</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\slib\crypto\crypto_hash.cpp">
-      <Filter>src\crypto</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\slib\crypto\gcm.cpp">
       <Filter>src\crypto</Filter>
     </ClCompile>

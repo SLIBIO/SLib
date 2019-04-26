@@ -26,9 +26,9 @@
 #include "definition.h"
 
 #include "../core/memory.h"
-
-#define SLIB_CRYPTO_BLOCK_CIPHER_BLOCK_MAX_LEN 128
-
+#include "../core/base.h"
+#include "../core/mio.h"
+#include "../core/math.h"
 
 namespace slib
 {
@@ -54,79 +54,149 @@ namespace slib
 		static sl_uint32 removePadding(const void* buf, sl_uint32 blockSize);
 
 	};
-	
-	
-	template <class BlockCipher>
-	class SLIB_EXPORT BlockCipher_Blocks
-	{
-	public:
-		// Output Size = (size / block) * block
-		static sl_size encryptBlocks(const BlockCipher* crypto, const void* _src, void* _dst, sl_size size);
-
-		// Output Size = (size / block) * block
-		static sl_size decryptBlocks(const BlockCipher* crypto, const void* _src, void* _dst, sl_size size);
-	
-	};
 
 /*
 	Electronic codebook (ECB)
 */
-	template <class BlockCipher, class Padding>
+	template <class CLASS, class PADDING>
 	class SLIB_EXPORT BlockCipher_ECB
 	{
 	public:
 		// Output Size = (size / block + 1) * block (< size + block)
-		static sl_size encrypt(const BlockCipher* crypto, const void* _src, sl_size size, void* _dst);
+		static sl_size encrypt(const CLASS* crypto, const void* _src, sl_size size, void* _dst);
 
 		// destination buffer size must equals to or greater than size
-		static sl_size decrypt(const BlockCipher* crypto, const void* _src, sl_size size, void* _dst);
+		static sl_size decrypt(const CLASS* crypto, const void* _src, sl_size size, void* _dst);
 	
 	};
 
 /*
 	Cipher-block chaining (CBC)
 */
-	template <class BlockCipher, class Padding>
+	template <class CLASS, class PADDING>
 	class SLIB_EXPORT BlockCipher_CBC
 	{
 	public:
 		// Output Size = (size / block + 1) * block (< size + block)
-		static sl_size encrypt(const BlockCipher* crypto, const void* iv, const void* src, sl_size size, void* dst);
+		static sl_size encrypt(const CLASS* crypto, const void* iv, const void* src, sl_size size, void* dst);
 
-		static Memory encrypt(const BlockCipher* crypto, const void* iv, const void* src, sl_size size);
+		static Memory encrypt(const CLASS* crypto, const void* iv, const void* src, sl_size size);
 
 		// Output Size = (size / block + 2) * block (< size + block*2)
-		static sl_size encrypt(const BlockCipher* crypto, const void* src, sl_size size, void* dst);
+		static sl_size encrypt(const CLASS* crypto, const void* src, sl_size size, void* dst);
 
-		static Memory encrypt(const BlockCipher* crypto, const void* src, sl_size size);
-
-		// destination buffer size must equals to or greater than size
-		static sl_size decrypt(const BlockCipher* crypto, const void* iv, const void* src, sl_size size, void* dst);
-
-		static Memory decrypt(const BlockCipher* crypto, const void* iv, const void* src, sl_size size);
+		static Memory encrypt(const CLASS* crypto, const void* src, sl_size size);
 
 		// destination buffer size must equals to or greater than size
-		static sl_size decrypt(const BlockCipher* crypto, const void* src, sl_size size, void* dst);
+		static sl_size decrypt(const CLASS* crypto, const void* iv, const void* src, sl_size size, void* dst);
 
-		static Memory decrypt(const BlockCipher* crypto, const void* src, sl_size size);
+		static Memory decrypt(const CLASS* crypto, const void* iv, const void* src, sl_size size);
+
+		// destination buffer size must equals to or greater than size
+		static sl_size decrypt(const CLASS* crypto, const void* src, sl_size size, void* dst);
+
+		static Memory decrypt(const CLASS* crypto, const void* src, sl_size size);
 
 	};
 
 /*
 	Counter Mode (CTR)
 */
-	template <class BlockCipher>
+	template <class CLASS>
 	class SLIB_EXPORT BlockCipher_CTR
 	{
 	public:
-		static sl_size encrypt(const BlockCipher* crypto, const void* input, sl_size size, void* output, void* counter, sl_uint32 offset);
+		static sl_size encrypt(const CLASS* crypto, const void* input, sl_size size, void* output, void* counter, sl_uint32 offset);
 
-		static sl_size encrypt(const BlockCipher* crypto, const void* iv, sl_uint64 counter, sl_uint32 offset, const void* input, sl_size size, void* output);
+		static sl_size encrypt(const CLASS* crypto, const void* iv, sl_uint64 counter, sl_uint32 offset, const void* input, sl_size size, void* output);
 
-		static sl_size encrypt(const BlockCipher* crypto, const void* iv, sl_uint64 pos, const void* input, sl_size size, void* output);
+		static sl_size encrypt(const CLASS* crypto, const void* iv, sl_uint64 pos, const void* input, sl_size size, void* output);
 
 	};
-
+	
+	template <class CLASS>
+	class SLIB_EXPORT BlockCipher
+	{
+	public:
+		sl_size encrypt_ECB_PKCS7Padding(const void* src, sl_size size, void* dst) const
+		{
+			return BlockCipher_ECB<CLASS, BlockCipherPadding_PKCS7>::encrypt((CLASS*)this, src, size, dst);
+		}
+		
+		sl_size decrypt_ECB_PKCS7Padding(const void* src, sl_size size, void* dst) const
+		{
+			return BlockCipher_ECB<CLASS, BlockCipherPadding_PKCS7>::decrypt((CLASS*)this, src, size, dst);
+		}
+		
+		sl_size encrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size, void* dst) const
+		{
+			return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::encrypt((CLASS*)this, iv, src, size, dst);
+		}
+		
+		sl_size decrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size, void* dst) const
+		{
+			return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::decrypt((CLASS*)this, iv, src, size, dst);
+		}
+		
+		sl_size encrypt_CBC_PKCS7Padding(const void* src, sl_size size, void* dst) const
+		{
+			return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::encrypt((CLASS*)this, src, size, dst);
+		}
+		
+		sl_size decrypt_CBC_PKCS7Padding(const void* src, sl_size size, void* dst) const
+		{
+			return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::decrypt((CLASS*)this, src, size, dst);
+		}
+		
+		Memory encrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size) const
+		{
+			return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::encrypt((CLASS*)this, iv, src, size);
+		}
+		
+		Memory decrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size) const
+		{
+			return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::decrypt((CLASS*)this, iv, src, size);
+		}
+	
+		Memory encrypt_CBC_PKCS7Padding(const void* src, sl_size size) const
+		{
+			return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::encrypt((CLASS*)this, src, size);
+		}
+		
+		Memory decrypt_CBC_PKCS7Padding(const void* src, sl_size size) const
+		{
+			return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::decrypt((CLASS*)this, src, size);
+		}
+		
+		Memory encrypt_CBC_PKCS7Padding(const Memory& mem) const
+		{
+			return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::encrypt((CLASS*)this, mem.getData(), mem.getSize());
+		}
+		
+		Memory decrypt_CBC_PKCS7Padding(const Memory& mem) const
+		{
+			return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::decrypt((CLASS*)this, mem.getData(), mem.getSize());
+		}
+		
+		sl_size encrypt_CTR(const void* input, sl_size size, void* output, void* counter, sl_uint32 offset) const
+		{
+			return BlockCipher_CTR<CLASS>::encrypt((CLASS*)this, input, size, output, counter, offset);
+		}
+		
+		sl_size encrypt_CTR(const void* iv, sl_uint64 counter, sl_uint32 offset, const void* input, sl_size size, void* output) const
+		{
+			return BlockCipher_CTR<CLASS>::encrypt((CLASS*)this, iv, counter, offset, input, size, output);
+		}
+		
+		sl_size encrypt_CTR(const void* iv, sl_uint64 pos, const void* input, sl_size size, void* output) const
+		{
+			return BlockCipher_CTR<CLASS>::encrypt((CLASS*)this, iv, pos, input, size, output);
+		}
+		
+	};
+	
 }
+
+#include "detail/block_cipher.inc"
 
 #endif
