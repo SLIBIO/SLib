@@ -22,11 +22,65 @@
 
 #include "slib/crypto/openssl.h"
 
+#include "slib/crypto/sha2.h"
+
 #include "openssl/ssl.h"
+#include "openssl/aes.h"
 #include "openssl/rand.h"
 
 namespace slib
 {
+	
+	OpenSSL_AES::OpenSSL_AES()
+	{
+		m_keyEnc = sl_null;
+		m_keyDec = sl_null;
+	}
+	
+	OpenSSL_AES::~OpenSSL_AES()
+	{
+		if (m_keyEnc) {
+			Base::freeMemory(m_keyEnc);
+		}
+		if (m_keyDec) {
+			Base::freeMemory(m_keyDec);
+		}
+	}
+	
+	sl_bool OpenSSL_AES::setKey(const void* key, sl_uint32 lenKey)
+	{
+		if (!m_keyEnc) {
+			m_keyEnc = Base::createMemory(sizeof(AES_KEY));
+		}
+		if (AES_set_encrypt_key((unsigned char*)key, lenKey << 3, (AES_KEY*)m_keyEnc) != 0) {
+			return sl_false;
+		}
+		if (!m_keyDec) {
+			m_keyDec = Base::createMemory(sizeof(AES_KEY));
+		}
+		if (AES_set_decrypt_key((unsigned char*)key, lenKey << 3, (AES_KEY*)m_keyDec) != 0) {
+			return sl_false;
+		}
+		return sl_true;
+	}
+	
+	void OpenSSL_AES::setKey_SHA256(const String& key)
+	{
+		char sig[32];
+		SHA256::hash(key, sig);
+		setKey(sig, 32);
+	}
+	
+	void OpenSSL_AES::encryptBlock(const void* src, void* dst) const
+	{
+		AES_encrypt((unsigned char*)src, (unsigned char*)dst, (AES_KEY*)m_keyEnc);
+	}
+	
+	void OpenSSL_AES::decryptBlock(const void* src, void* dst) const
+	{
+		AES_decrypt((unsigned char*)src, (unsigned char*)dst, (AES_KEY*)m_keyDec);
+	}
+
 	
 	SLIB_DEFINE_OBJECT(OpenSSL_Context, TlsContext)
 	

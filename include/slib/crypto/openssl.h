@@ -27,6 +27,7 @@
 
 #include "tls.h"
 #include "rsa.h"
+#include "block_cipher.h"
 
 struct ssl_ctx_st;
 struct ssl_st;
@@ -60,6 +61,35 @@ namespace slib
 	public:
 		virtual ssl_st* getSSL() = 0;
 
+	};
+	
+	class SLIB_EXPORT OpenSSL_AES : public BlockCipher<OpenSSL_AES>
+	{
+	public:
+		enum {
+			BlockSize = 16
+		};
+
+	public:
+		OpenSSL_AES();
+		
+		~OpenSSL_AES();
+		
+	public:
+		sl_bool setKey(const void* key, sl_uint32 lenKey /* 16, 24, 32 bytes */);
+		
+		void setKey_SHA256(const String& key);
+		
+		// 128 bits (16 bytes) block
+		void encryptBlock(const void* src, void* dst) const;
+		
+		// 128 bits (16 bytes) block
+		void decryptBlock(const void* src, void* dst) const;
+
+	private:
+		void* m_keyEnc;
+		void* m_keyDec;
+		
 	};
 	
 	class SLIB_EXPORT OpenSSL
