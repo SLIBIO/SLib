@@ -37,16 +37,16 @@ namespace slib
 	{
 	public:
 		IPAddress ip;
-		sl_uint32 port;
+		sl_uint16 port;
 		
 	public:
 		SocketAddress() noexcept;
 		
 		SocketAddress(const SocketAddress& other) noexcept;
 		
-		SocketAddress(sl_int32 port) noexcept;
+		SocketAddress(sl_uint16 port) noexcept;
 		
-		SocketAddress(const IPAddress& ip, sl_int32 port) noexcept;
+		SocketAddress(const IPAddress& ip, sl_uint16 port) noexcept;
 		
 		SocketAddress(const String& str) noexcept;
 		
@@ -94,7 +94,7 @@ namespace slib
 		
 		static sl_bool parseIPv4Range(const String& str, IPv4Address* from = sl_null, IPv4Address* to = sl_null) noexcept;
 		
-		static sl_bool parsePortRange(const String& str, sl_uint32* from = sl_null, sl_uint32* to = sl_null) noexcept;
+		static sl_bool parsePortRange(const String& str, sl_uint16* from = sl_null, sl_uint16* to = sl_null) noexcept;
 		
 	public:
 		SocketAddress& operator=(const SocketAddress& other) noexcept;
@@ -112,7 +112,7 @@ namespace slib
 				IPAddressType type;
 				sl_uint8 data[PRIV_SLIB_NET_IPADDRESS_SIZE];
 			} ip;
-			sl_uint32 port;
+			sl_uint16 port;
 		};
 		
 		static const _socket_address _none;

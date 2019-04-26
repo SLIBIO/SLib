@@ -149,12 +149,12 @@ namespace slib
 		return sl_false;
 	}
 	
-	sl_bool HttpServer::addHttpsBinding(const TlsAcceptStreamParam& param, sl_uint32 port)
+	sl_bool HttpServer::addHttpsBinding(const TlsAcceptStreamParam& param, sl_uint16 port)
 	{
 		return addHttpsBinding(param, SocketAddress(port));
 	}
 	
-	sl_bool HttpServer::addHttpsBinding(const TlsAcceptStreamParam& param, const IPAddress& addr, sl_uint32 port)
+	sl_bool HttpServer::addHttpsBinding(const TlsAcceptStreamParam& param, const IPAddress& addr, sl_uint16 port)
 	{
 		return addHttpsBinding(param, SocketAddress(addr, port));
 	}

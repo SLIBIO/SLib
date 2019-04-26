@@ -1543,12 +1543,12 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool HttpServer::addHttpBinding(sl_uint32 port)
+	sl_bool HttpServer::addHttpBinding(sl_uint16 port)
 	{
 		return addHttpBinding(SocketAddress(port));
 	}
 
-	sl_bool HttpServer::addHttpBinding(const IPAddress& addr, sl_uint32 port)
+	sl_bool HttpServer::addHttpBinding(const IPAddress& addr, sl_uint16 port)
 	{
 		return addHttpBinding(SocketAddress(addr, port));
 	}

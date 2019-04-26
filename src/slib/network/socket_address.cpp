@@ -69,7 +69,7 @@ namespace slib
 	{
 		int c = ip.compare(other.ip);
 		if (c == 0) {
-			return Compare<sl_int32>()(port, other.port);
+			return Compare<sl_uint16>()(port, other.port);
 		}
 		return c;
 	}
@@ -82,11 +82,11 @@ namespace slib
 	String SocketAddress::toString() const noexcept
 	{
 		if (ip.isIPv4()) {
-			return ip.toString() + ":" + String::fromInt32(port);
+			return ip.toString() + ":" + String::fromUint32(port);
 		} else if (ip.isIPv6()) {
-			return "[" + ip.toString() + "]:" + String::fromInt32(port);
+			return "[" + ip.toString() + "]:" + String::fromUint32(port);
 		} else {
-			return ":" + String::fromInt32(port);
+			return ":" + String::fromUint32(port);
 		}
 	}
 	
@@ -107,7 +107,7 @@ namespace slib
 			Base::resetMemory(&out, 0, sizeof(sockaddr_in));
 			out.sin_family = AF_INET;
 			ip.getIPv4().getBytes(&(out.sin_addr));
-			out.sin_port = htons((sl_uint16)(port));
+			out.sin_port = htons(port);
 			return sizeof(sockaddr_in);
 		} else if (ip.isIPv6()) {
 			IPv6Address ipv6 = ip.getIPv6();
@@ -115,7 +115,7 @@ namespace slib
 			Base::resetMemory(&out, 0, sizeof(sockaddr_in6));
 			out.sin6_family = AF_INET6;
 			ip.getIPv6().getBytes(&(out.sin6_addr));
-			out.sin6_port = htons((sl_uint16)(port));
+			out.sin6_port = htons(port);
 			return sizeof(sockaddr_in6);
 		}
 		return 0;
@@ -149,7 +149,11 @@ namespace slib
 			port = 0;
 			return ip.setHostName(address);
 		} else {
-			port = address.substring(index + 1).parseInt32();
+			sl_uint32 _port = address.substring(index + 1).parseUint32();
+			if (_port >> 16) {
+				return sl_false;
+			}
+			port = (sl_uint16)(_port);
 			return ip.setHostName(address.substring(0, index));
 		}
 	}
@@ -194,9 +198,12 @@ namespace slib
 		if (pos == SLIB_PARSE_ERROR) {
 			return SLIB_PARSE_ERROR;
 		}
+		if (port >> 16) {
+			return SLIB_PARSE_ERROR;
+		}
 		if (obj) {
 			obj->ip = ip;
-			obj->port = port;
+			obj->port = (sl_uint16)port;
 		}
 		return pos;
 	}
@@ -247,9 +254,24 @@ namespace slib
 		return sl_false;
 	}
 	
-	sl_bool SocketAddress::parsePortRange(const String& str, sl_uint32* from, sl_uint32* to) noexcept
+	sl_bool SocketAddress::parsePortRange(const String& str, sl_uint16* from, sl_uint16* to) noexcept
 	{
-		return SettingUtil::parseUint32Range(str, from, to);
+		sl_uint32 n1, n2;
+		if (SettingUtil::parseUint32Range(str, &n1, &n2)) {
+			if (n1 >> 16) {
+				return sl_false;
+			}
+			if (n2 >> 16) {
+				return sl_false;
+			}
+			if (from) {
+				*from = (sl_uint16)n1;
+			}
+			if (to) {
+				*to = (sl_uint16)n2;
+			}
+		}
+		return sl_false;
 	}
 	
 	SocketAddress& SocketAddress::operator=(const String& str) noexcept

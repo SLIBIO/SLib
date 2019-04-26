@@ -38,7 +38,7 @@ namespace slib
 	{
 	public:
 		String host;
-		sl_uint32 port;
+		sl_uint16 port;
 		String user;
 		String password;
 		String db;

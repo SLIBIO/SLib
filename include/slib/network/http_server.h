@@ -391,15 +391,15 @@ namespace slib
 		
 		sl_bool addHttpBinding(const SocketAddress& addr);
 		
-		sl_bool addHttpBinding(sl_uint32 port = 80);
+		sl_bool addHttpBinding(sl_uint16 port = 80);
 		
-		sl_bool addHttpBinding(const IPAddress& addr, sl_uint32 port = 80);
+		sl_bool addHttpBinding(const IPAddress& addr, sl_uint16 port = 80);
 		
 		sl_bool addHttpsBinding(const TlsAcceptStreamParam& param, const SocketAddress& addr);
 		
-		sl_bool addHttpsBinding(const TlsAcceptStreamParam& param, sl_uint32 port = 443);
+		sl_bool addHttpsBinding(const TlsAcceptStreamParam& param, sl_uint16 port = 443);
 		
-		sl_bool addHttpsBinding(const TlsAcceptStreamParam& param, const IPAddress& addr, sl_uint32 port = 443);
+		sl_bool addHttpsBinding(const TlsAcceptStreamParam& param, const IPAddress& addr, sl_uint16 port = 443);
 		
 
 	protected:

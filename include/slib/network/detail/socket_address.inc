@@ -31,11 +31,11 @@ namespace slib
 	 : port(0)
 	 {}
 	
-	SLIB_INLINE SocketAddress::SocketAddress(sl_int32 _port) noexcept
+	SLIB_INLINE SocketAddress::SocketAddress(sl_uint16 _port) noexcept
 	 : port(_port)
 	 {}
 	
-	SLIB_INLINE SocketAddress::SocketAddress(const IPAddress& _ip, sl_int32 _port) noexcept
+	SLIB_INLINE SocketAddress::SocketAddress(const IPAddress& _ip, sl_uint16 _port) noexcept
 	 : ip(_ip), port(_port)
 	 {}
 
