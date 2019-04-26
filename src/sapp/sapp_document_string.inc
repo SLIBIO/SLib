@@ -89,7 +89,12 @@ namespace slib
 		}
 		
 		name = getNameInLocalNamespace(localNamespace, name);
-		String value = source.substring(element->getStartContentPositionInSource(), element->getEndContentPositionInSource());
+		String value;
+		if (element->getChildElementsCount() > 0 || element->getAttribute("raw") == "true") {
+			value = source.substring(element->getStartContentPositionInSource(), element->getEndContentPositionInSource());
+		} else {
+			value = element->getText();
+		}
 		
 		Ref<SAppStringResource> res = m_strings.getValue(name, Ref<SAppStringResource>::null());
 		if (res.isNull()) {

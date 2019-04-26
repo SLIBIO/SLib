@@ -704,26 +704,30 @@ namespace slib
 			_logError(root, _g_sdev_sapp_error_invalid_root_tag);
 			return sl_false;
 		}
+		
+		String fileName = File::getFileNameOnly(filePath);
+		Locale locale = Locale::Unknown;
+		if (fileName.startsWith("strings_")) {
+			locale = Locale(fileName.substring(8));
+			if (locale.isInvalid()) {
+				locale = Locale::Unknown;
+			}
+		}
+
 		ListLocker< Ref<XmlElement> > children(root->getChildElements());
 		sl_size i;
 		for (i = 0; i < children.count; i++) {
 			Ref<XmlElement>& child = children[i];
 			if (child.isNotNull()) {
-				if (child->getName() == "strings") {
-					String fileName = File::getFileNameOnly(filePath);
-					Locale locale = Locale::Unknown;
-					if (fileName.startsWith("strings_")) {
-						locale = Locale(fileName.substring(8));
-						if (locale.isInvalid()) {
-							locale = Locale::Unknown;
+				if (child->getName() == "strings" || child->getName() == "string") {
+					if (child->getName() == "strings") {
+						if (!_parseStringResources(localNamespace, child, locale, textXML)) {
+							return sl_false;
 						}
-					}
-					if (!_parseStringResources(localNamespace, child, locale, textXML)) {
-						return sl_false;
-					}
-				} else if (child->getName() == "string") {
-					if (!_parseStringResource(localNamespace, child, Locale::Unknown, textXML)) {
-						return sl_false;
+					} else {
+						if (!_parseStringResource(localNamespace, child, locale, textXML)) {
+							return sl_false;
+						}
 					}
 				} else if (child->getName() == "color") {
 					if (!_parseColorResource(localNamespace, child)) {
