@@ -70,6 +70,12 @@ namespace slib
 				window->addOnDestroy([](Window*) {
 					UI::quitApp();
 				});
+#ifdef SLIB_UI_IS_MACOS
+				Ref<Menu> menu = window->getMenu();
+				if (menu.isNotNull()) {
+					setMenu(menu);
+				}
+#endif
 			}
 #endif
 		}
