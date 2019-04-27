@@ -1296,11 +1296,10 @@ namespace slib
 	void Window::dispatchCancel(UIEvent* ev)
 	{
 		SLIB_INVOKE_EVENT_HANDLER(Cancel, ev)
-
 		if (ev->isPreventedDefault()) {
 			return;
 		}
-		dispatchClose(ev);
+		SLIB_INVOKE_EVENT_HANDLER(Close, ev)
 		if (ev->isPreventedDefault()) {
 			return;
 		}
