@@ -147,6 +147,8 @@ namespace slib
 
 		Ref<Image> stretchToSmall(sl_uint32 requiredWidth, sl_uint32 requiredHeight, sl_bool flagKeepAspectRatio = sl_true, StretchMode stretch = StretchMode::Default) const;
 
+		Ref<Image> stretchToSmall(sl_uint32 sampleSize) const;
+
 		Ref<Image> rotateImage(RotationMode rotate, FlipMode flip = FlipMode::None) const;
 		
 		Ref<Image> flipImage(FlipMode flip) const;

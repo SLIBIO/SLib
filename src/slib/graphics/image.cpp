@@ -1400,6 +1400,78 @@ namespace slib
 		return stretch(width, height, stretchMode);
 	}
 	
+	Ref<Image> Image::stretchToSmall(sl_uint32 sampleSize) const
+	{
+		if (!sampleSize) {
+			return sl_null;
+		}
+		sl_uint32 width = m_desc.width / sampleSize;
+		sl_uint32 height = m_desc.height / sampleSize;
+		if (width == 0 || height == 0) {
+			return sl_null;
+		}
+		Memory temp = Memory::create(width<<4);
+		if (temp.isNull()) {
+			return sl_null;
+		}
+		Ref<Image> ret = Image::create(width, height);
+		if (ret.isNull()) {
+			return sl_null;
+		}
+		Color* row_d = ret->m_desc.colors;
+		sl_int32 pitch_d = ret->m_desc.stride;
+		Color* row_s = m_desc.colors;
+		sl_int32 pitch_s = m_desc.stride;
+		sl_uint32* t = (sl_uint32*)(temp.getData());
+		sl_uint32 i, j, row, col;
+		sl_uint32 n = sampleSize * sampleSize;
+		sl_uint32 nShift;
+		if (!(n & (n - 1))) {
+			nShift = Math::getMostSignificantBits(n) - 1;
+		} else {
+			nShift = 0;
+		}
+		for (row = 0; row < height; row++) {
+			Base::zeroMemory(t, width << 4);
+			for (i = 0; i < sampleSize; i++) {
+				sl_uint32* c_d = t;
+				Color* c_s = row_s;
+				for (col = 0; col < width; col++) {
+					for (j = 0; j < sampleSize; j++) {
+						*c_d += c_s->r;
+						c_d[1] += c_s->g;
+						c_d[2] += c_s->b;
+						c_d[3] += c_s->a;
+						c_s++;
+					}
+					c_d += 4;
+				}
+				row_s += pitch_s;
+			}
+			if (nShift) {
+				for (col = 0; col < width; col++) {
+					Color& c = row_d[col];
+					i = col<<2;
+					c.r = t[i] >> nShift;
+					c.g = t[i+1] >> nShift;
+					c.b = t[i+2] >> nShift;
+					c.a = t[i+3] >> nShift;
+				}
+			} else {
+				for (col = 0; col < width; col++) {
+					Color& c = row_d[col];
+					i = col<<2;
+					c.r = t[i] / n;
+					c.g = t[i+1] / n;
+					c.b = t[i+2] / n;
+					c.a = t[i+3] / n;
+				}
+			}
+			row_d += pitch_d;
+		}
+		return ret;
+	}
+	
 	Ref<Image> Image::rotateImage(RotationMode rotate, FlipMode flip) const
 	{
 		NormalizeRotateAndFlip(rotate, flip);

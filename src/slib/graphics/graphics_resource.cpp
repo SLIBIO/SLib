@@ -72,18 +72,18 @@ namespace slib
 			heightZoom >>= 1;
 			zoomLevel <<= 1;
 		}
-		if (zoomLevel <= 2) {
+		Ref<Drawable> animation = Image::loadAnimationFromMemory(source_bytes, source_size);
+		if (animation.isNotNull() || zoomLevel <= 2) {
 			s = Image::loadFromMemory(source_bytes, source_size);
 			if (s.isNotNull()) {
-				s->setCustomDrawable(Image::loadAnimationFromMemory(source_bytes, source_size));
+				s->setCustomDrawable(animation);
 			}
 			flag_load = sl_true;
 		} else {
 			Ref<Image> t = Image::loadFromMemory(source_bytes, source_size);
 			if (t.isNotNull()) {
-				t->setCustomDrawable(Image::loadAnimationFromMemory(source_bytes, source_size));
 				zoomLevel >>= 1;
-				s = t->stretch(width / zoomLevel, height / zoomLevel);
+				s = t->stretchToSmall(zoomLevel);
 			}
 		}
 		return s;
