@@ -28,6 +28,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Build;
+import android.os.Environment;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -75,6 +76,10 @@ public class Android {
 			Logger.exception(e);
 		}
 		return null;
+	}
+
+	public static String getPicturesDirectory() {
+		return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath();
 	}
 
 	public static void showKeyboard(final Activity activity) {

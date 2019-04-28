@@ -42,7 +42,7 @@ namespace slib
 		SLIB_JNI_NATIVE(onComplete, "navtiveOnComplete", "(Ljava/lang/String;IIZZZ)V", _priv_TakePhoto_onComplete);
 	SLIB_JNI_END_CLASS
 
-	SLIB_JNI_BEGIN_CLASS(JUtil, "slib/platform/android/helper/Util")
+	SLIB_JNI_BEGIN_CLASS(JUtil, "slib/platform/android/Android")
 		SLIB_JNI_STATIC_METHOD(getPicturesDirectory, "getPicturesDirectory", "()Ljava/lang/String;");
 	SLIB_JNI_END_CLASS
 
