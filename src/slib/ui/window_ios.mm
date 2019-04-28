@@ -859,15 +859,33 @@ CGRect _g_slib_ui_keyboard_scrollview_original_frame;
 	}
 	
 	slib::UIKeyboardAdjustMode adjustMode = slib::UI::getKeyboardAdjustMode();
+	slib::Ref<slib::iOS_Window> window = self->m_window;
+	if (window.isNotNull()) {
+		if (adjustMode == slib::UIKeyboardAdjustMode::Resize) {
+			NSDictionary* info = [aNotification userInfo];
+			sl_ui_len heightKeyboard = (sl_ui_len)([[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height * slib::UIPlatform::getGlobalScaleFactor());
+			slib::UISize size = self->m_sizeClient;
+			size.y -= heightKeyboard;
+			self->m_sizeClientResizedByKeyboard = size;
+			window->onResize(size.x, size.y);
+		} else {
+			if (self->m_sizeClient.y != self->m_sizeClientResizedByKeyboard.y) {
+				slib::UISize size = self->m_sizeClient;
+				self->m_sizeClientResizedByKeyboard = size;
+				window->onResize(size.x, size.y);
+			}
+		}
+	}
 	
-	if (adjustMode == slib::UIKeyboardAdjustMode::Pan) {
+	if (adjustMode == slib::UIKeyboardAdjustMode::Pan || scroll != nil) {
 		NSDictionary* info = [aNotification userInfo];
 		CGSize kbSize = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
 		CGRect rcScreen = [[UIScreen mainScreen] bounds];
 		CGRect rcTextLocal = view.bounds;
 		CGRect rcTextScreen = [view convertRect:rcTextLocal toView:self.view];
 		CGFloat yText = rcTextScreen.origin.y + rcTextScreen.size.height + rcScreen.size.height / 100;
-		
+		CGFloat yBottomLimit = rcScreen.size.height - kbSize.height;
+
 		if (scroll != nil) {
 			CGRect rcScrollLocal = scroll.bounds;
 			if (_g_slib_ui_keyboard_scrollview == scroll) {
@@ -886,8 +904,9 @@ CGRect _g_slib_ui_keyboard_scrollview_original_frame;
 				_g_slib_ui_keyboard_scrollview = scroll;
 			}
 		}
-		if (yText > rcScreen.size.height - kbSize.height) {
-			CGFloat offset = rcScreen.size.height - kbSize.height - yText;
+		
+		if (yText > yBottomLimit) {
+			CGFloat offset = yBottomLimit - yText;
 			if (scroll != nil) {
 				if (!([scroll isKindOfClass:[UITextView class]])) {
 					CGPoint pos = scroll.contentOffset;
@@ -907,23 +926,7 @@ CGRect _g_slib_ui_keyboard_scrollview_original_frame;
 	} else {
 		self.view.transform = CGAffineTransformIdentity;
 	}
-	slib::Ref<slib::iOS_Window> window = self->m_window;
-	if (window.isNotNull()) {
-		if (adjustMode == slib::UIKeyboardAdjustMode::Resize) {
-			NSDictionary* info = [aNotification userInfo];
-			sl_ui_len heightKeyboard = (sl_ui_len)([[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height * slib::UIPlatform::getGlobalScaleFactor());
-			slib::UISize size = self->m_sizeClient;
-			size.y -= heightKeyboard;
-			self->m_sizeClientResizedByKeyboard = size;
-			window->onResize(size.x, size.y);
-		} else {
-			if (self->m_sizeClient.y != self->m_sizeClientResizedByKeyboard.y) {
-				slib::UISize size = self->m_sizeClient;
-				self->m_sizeClientResizedByKeyboard = size;
-				window->onResize(size.x, size.y);
-			}
-		}
-	}
+	
 }
 
 -(void)keyboardWillHide {
