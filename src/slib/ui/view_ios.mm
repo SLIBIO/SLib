@@ -530,11 +530,12 @@ namespace slib
 				if (points.isNotNull()) {
 					Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, Time::withSecondsf(event.timestamp));
 					if (ev.isNotNull()) {
+						UIWindow* window = handle.window;
+						UITouch* touchDown = nil;
+
 						if (flagDispatchToChildren) {
 							if (action == UIAction::TouchBegin) {
-								UIWindow* window = handle.window;
 								if (window != nil) {
-									UITouch* touchDown = nil;
 									for (UITouch* touch in touches) {
 										if (touch != nil && touch.phase == UITouchPhaseBegan) {
 											touchDown = touch;
@@ -551,12 +552,18 @@ namespace slib
 						} else {
 							ev->addFlag(UIEventFlags::NotDispatchToChildren);
 						}
+
 						onTouchEvent(ev.get());
 						UIEventFlags flags = ev->getFlags();
+						
 						if (flags & UIEventFlags::KeepKeyboard) {
 							flags |= UIEventFlags::StopPropagation;
 						} else {
-							[handle.window endEditing:NO];
+							if (window != nil && touchDown != nil) {
+								if ([window hitTest:[touchDown locationInView:window] withEvent:event] == handle) {
+									[window endEditing:YES];
+								}
+							}
 						}
 						return flags;
 					}
