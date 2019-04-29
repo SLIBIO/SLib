@@ -52,7 +52,9 @@ namespace slib
 			if (x < t) {
 				return sl_true;
 			}
-			x = radius.x + x - t;
+			x = x - t;
+		} else {
+			x -= radius.x;
 		}
 		y -= rect.top;
 		if (y > radius.y) {
@@ -60,7 +62,9 @@ namespace slib
 			if (y < t) {
 				return sl_true;
 			}
-			y = radius.y + y - t;
+			y = y - t;
+		} else {
+			y -= radius.y;
 		}
 		if (Math::isAlmostZero(radius.x)) {
 			return sl_false;

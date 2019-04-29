@@ -1767,7 +1767,7 @@ namespace slib
 
 	sl_bool View::hitTest(sl_ui_pos x, sl_ui_pos y)
 	{
-		UIRect rc(0, 0, getWidth(), getHeight());
+		UIRect rc(getBounds());
 		switch (getBoundShape()) {
 			case BoundShape::RoundRect:
 				return GraphicsUtil::containsPointInRoundRect(Point((sl_real)x, (sl_real)y), rc, getBoundRadius());
