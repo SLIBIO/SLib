@@ -573,9 +573,11 @@ namespace slib
 	template <class T>
 	SLIB_INLINE void Ref<T>::_move_init(void* _other) noexcept
 	{
-		Ref<T>& other = *(reinterpret_cast<Ref<T>*>(_other));
-		_ptr = other._ptr;
-		other._ptr = sl_null;
+		if ((void*)this != _other) {
+			Ref<T>& other = *(reinterpret_cast<Ref<T>*>(_other));
+			_ptr = other._ptr;
+			other._ptr = sl_null;
+		}
 	}
 	
 	template <class T>
@@ -1063,9 +1065,11 @@ namespace slib
 	template <class T>
 	SLIB_INLINE void Atomic< Ref<T> >::_move_init(void* _other) noexcept
 	{
-		AtomicRef<T>& other = *(reinterpret_cast<AtomicRef<T>*>(_other));
-		_ptr = other._ptr;
-		other._ptr = sl_null;
+		if ((void*)this != _other) {
+			AtomicRef<T>& other = *(reinterpret_cast<AtomicRef<T>*>(_other));
+			_ptr = other._ptr;
+			other._ptr = sl_null;
+		}
 	}
 	
 	template <class T>
