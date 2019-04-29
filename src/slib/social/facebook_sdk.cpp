@@ -66,7 +66,8 @@ namespace slib
 		Ref<Facebook> instance = _g_priv_social_facebook_sdk_instance;
 		if (instance.isNull()) {
 			FacebookParam param;
-			_g_priv_social_facebook_sdk_instance = new Facebook(param);
+			instance = new Facebook(param);
+			_g_priv_social_facebook_sdk_instance = instance;
 		}
 		if (instance.isNotNull()) {
 			_updateCurrentToken(instance.get());

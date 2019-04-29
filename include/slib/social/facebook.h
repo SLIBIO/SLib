@@ -88,12 +88,27 @@ namespace slib
 		
 	};
 	
+	class SLIB_EXPORT FacebookShareResult
+	{
+	public:
+		sl_bool flagSuccess;
+		sl_bool flagCancel;
+
+	public:
+		FacebookShareResult();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FacebookShareResult)
+		
+	};
+	
 	class SLIB_EXPORT FacebookShareParam
 	{
 	public:
 		String url;
 		String quote;
 		String hashTag;
+		
+		Function<void(FacebookShareResult&)> onComplete;
 		
 	public:
 		FacebookShareParam();

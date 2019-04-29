@@ -42,6 +42,14 @@ namespace slib
 	}
 	
 	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FacebookShareResult)
+	
+	FacebookShareResult::FacebookShareResult()
+	{
+		flagSuccess = sl_false;
+		flagCancel = sl_false;
+	}
+	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FacebookShareParam)
 	
 	FacebookShareParam::FacebookShareParam()

@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '28.0.3'
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 26
@@ -37,9 +36,20 @@ android {
     }
 }
 
+repositories {
+    flatDir{
+        dirs "../../../external/bin/FacebookAndroid"
+    }
+}
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':external_ShortcutBadger')
+    implementation ':facebook@aar'
+    implementation ':facebook-core@aar'
+    implementation ':facebook-common@aar'
+    implementation ':facebook-login@aar'
+    implementation ':facebook-share@aar'
     implementation 'com.google.firebase:firebase-core:10.2.1'
     implementation 'com.google.firebase:firebase-messaging:10.2.1'
 }
@@ -48,7 +58,7 @@ tasks.all { task ->
     if (task.name == "assembleDebug" || task.name == "assembleRelease") {
         task.dependsOn(project(":external_ShortcutBadger").getTasksByName(task.name, true)[0])
         task.doLast {
-            def copyArr = { srcDir, srcFileName, dstFileName ->
+            def copyAAR = { srcDir, srcFileName, dstFileName ->
                 def sourceFile = projectDir.getPath() + "/" + srcDir + "/" + srcFileName + (task.name == "assembleDebug" ? "-debug.aar" : "-release.aar");
                 def targetDir = projectDir.getPath() + "/../../../lib/Android";
                 def targetFileName = dstFileName + ".aar";
@@ -58,8 +68,8 @@ tasks.all { task ->
                 new File(sourceFile).renameTo(targetFile);
             }
             System.out.println("Moving slib.aar into lib!")
-            copyArr("build/outputs/aar", "slib", "slib")
-            copyArr("../../../external/java/ShortcutBadger/build/outputs/aar", "external_ShortcutBadger", "ShortcutBadger")
+            copyAAR("build/outputs/aar", "slib", "slib")
+            copyAAR("../../../external/java/ShortcutBadger/build/outputs/aar", "external_ShortcutBadger", "ShortcutBadger")
         }
     }
 }
