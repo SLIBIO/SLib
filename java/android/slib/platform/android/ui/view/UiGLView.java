@@ -30,8 +30,10 @@ import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.opengles.GL10;
 
 import slib.platform.android.Logger;
+import slib.platform.android.SlibActivity;
 import slib.platform.android.ui.UiThread;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.opengl.GLSurfaceView;
@@ -50,13 +52,13 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 
 	UiGestureDetector gestureDetector;
 
-	static Object sync = new Object();
-	static Vector<UiGLView> glViewList = new Vector<UiGLView>();
+	private static final Object sync = new Object();
+	private static Vector<UiGLView> glViewList = new Vector<UiGLView>();
 	
 	public static UiGLView _create(Context context) {
 		try {
-			UiGLView ret = new UiGLView(context);
-			return ret;
+			initialize();
+			return new UiGLView(context);
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
@@ -191,42 +193,56 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 			}
 		}
 	}
-	
-	public static void onPauseViews() {
-		synchronized (sync) {
-			try {
-				for (UiGLView view : glViewList) {
-					try {
-						view.onPause();
-					} catch (Exception e) {
-						Logger.exception(e);
-					}
-				}
-			} catch (Exception e) {
-				Logger.exception(e);
-			}
-		}
-	}
-
-	public static void onResumeViews() {
-		synchronized (sync) {
-			try {
-				for (UiGLView view : glViewList) {
-					try {
-						view.onResume();
-					} catch (Exception e) {
-						Logger.exception(e);
-					}
-				}
-			} catch (Exception e) {
-				Logger.exception(e);
-			}
-		}
-	}
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		setMeasuredDimension(UiView.resolveMeasure(mRight-mLeft, widthMeasureSpec), UiView.resolveMeasure(mBottom-mTop, heightMeasureSpec));
+	}
+
+
+	private static boolean mFlagInitialized = false;
+
+	private static synchronized void initialize() {
+		if (mFlagInitialized) {
+			return;
+		}
+		mFlagInitialized = true;
+		SlibActivity.addResumeActivityListener(new SlibActivity.ResumeActivityListener() {
+			@Override
+			public void onResumeActivity(Activity activity) {
+				synchronized (sync) {
+					try {
+						for (UiGLView view : glViewList) {
+							try {
+								view.onResume();
+							} catch (Exception e) {
+								Logger.exception(e);
+							}
+						}
+					} catch (Exception e) {
+						Logger.exception(e);
+					}
+				}
+			}
+		});
+		SlibActivity.addPauseActivityListener(new SlibActivity.PauseActivityListener() {
+			@Override
+			public void onPauseActivity(Activity activity) {
+				synchronized (sync) {
+					try {
+						for (UiGLView view : glViewList) {
+							try {
+								view.onPause();
+							} catch (Exception e) {
+								Logger.exception(e);
+							}
+						}
+					} catch (Exception e) {
+						Logger.exception(e);
+					}
+				}
+			}
+		});
 	}
 
 

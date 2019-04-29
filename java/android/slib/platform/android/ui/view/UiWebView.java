@@ -61,8 +61,8 @@ public class UiWebView extends WebView implements IView {
 
 	public static UiWebView _create(Context context) {
 		try {
-			UiWebView ret = new UiWebView(context);
-			return ret;
+			initialize();
+			return new UiWebView(context);
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
@@ -486,23 +486,23 @@ public class UiWebView extends WebView implements IView {
 		}
 
 		public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
-			fileChooser = new WebViewFileChooser(webView, SlibActivity.REQUEST_WEBVIEW_CHOOSE_FILE);
+			fileChooser = new WebViewFileChooser(webView, SlibActivity.REQUEST_ACTIVITY_WEBVIEW_CHOOSE_FILE);
 			fileChooser.chooseFile(filePathCallback, fileChooserParams);
 			return true;
 		}
 
 		public void openFileChooser(ValueCallback<Uri> uploadMsg) {
-			fileChooser = new WebViewFileChooser(UiWebView.this, SlibActivity.REQUEST_WEBVIEW_CHOOSE_FILE);
+			fileChooser = new WebViewFileChooser(UiWebView.this, SlibActivity.REQUEST_ACTIVITY_WEBVIEW_CHOOSE_FILE);
 			fileChooser.chooseFile(uploadMsg);
 		}
 
 		public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType) {
-			fileChooser = new WebViewFileChooser(UiWebView.this, SlibActivity.REQUEST_WEBVIEW_CHOOSE_FILE);
+			fileChooser = new WebViewFileChooser(UiWebView.this, SlibActivity.REQUEST_ACTIVITY_WEBVIEW_CHOOSE_FILE);
 			fileChooser.chooseFile(uploadMsg, acceptType);
 		}
 
 		public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
-			fileChooser = new WebViewFileChooser(UiWebView.this, SlibActivity.REQUEST_WEBVIEW_CHOOSE_FILE);
+			fileChooser = new WebViewFileChooser(UiWebView.this, SlibActivity.REQUEST_ACTIVITY_WEBVIEW_CHOOSE_FILE);
 			fileChooser.chooseFile(uploadMsg, acceptType, capture);
 		}
 
@@ -516,13 +516,24 @@ public class UiWebView extends WebView implements IView {
 		}
 	}
 
-	static WebViewFileChooser fileChooser;
+	private static WebViewFileChooser fileChooser;
 
-	public static void onResult(Activity activity, int resultCode, Intent data) {
-		if (fileChooser != null) {
-			fileChooser.processActivityResult(resultCode, data);
-			fileChooser = null;
+	private static boolean mFlagInitialized = false;
+
+	private static synchronized void initialize() {
+		if (mFlagInitialized) {
+			return;
 		}
+		mFlagInitialized = true;
+		SlibActivity.addActivityResultListener(SlibActivity.REQUEST_ACTIVITY_WEBVIEW_CHOOSE_FILE, new SlibActivity.ActivityResultListener() {
+			@Override
+			public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+				if (fileChooser != null) {
+					fileChooser.processActivityResult(resultCode, data);
+					fileChooser = null;
+				}
+			}
+		});
 	}
 
 }

@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Vector;
 
 import slib.platform.android.Logger;
+import slib.platform.android.SlibActivity;
 
 public class SCamera1 extends SCamera implements Camera.PreviewCallback, Camera.PictureCallback, Camera.ErrorCallback {
 
@@ -176,7 +177,8 @@ public class SCamera1 extends SCamera implements Camera.PreviewCallback, Camera.
 
 	@Override
 	protected boolean startCamera() throws Exception {
-		if (!mFlagRunningActivity) {
+
+		if (!(SlibActivity.isRunningGlobal())) {
 			return false;
 		}
 		Camera.Parameters params;
@@ -406,7 +408,7 @@ public class SCamera1 extends SCamera implements Camera.PreviewCallback, Camera.
 	static private void runMonitor() {
 		while (mFlagRunMonitor) {
 			synchronized (mSync) {
-				if (mFlagRunningActivity) {
+				if (SlibActivity.isRunningGlobal()) {
 					try {
 						long t = System.currentTimeMillis();
 						for (SCamera obj : mCameras) {

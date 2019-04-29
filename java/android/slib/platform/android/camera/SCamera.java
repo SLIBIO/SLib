@@ -82,6 +82,7 @@ public abstract class SCamera {
 				return null;
 			}
 			checkSupportsCamera2(activity);
+			initialize();
 			SCamera camera;
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && supportsCamera2) {
 				camera = new SCamera2();
@@ -304,7 +305,7 @@ public abstract class SCamera {
 	}
 
 	public static boolean grantPermission(Activity activity) {
-		return Permissions.grantPermission(activity, Manifest.permission.CAMERA, SlibActivity.REQUEST_SCAMERA_PERMISSION);
+		return Permissions.grantPermission(activity, Manifest.permission.CAMERA, SlibActivity.REQUEST_PERMISSION_SCAMERA);
 	}
 
 	public static boolean checkPermission(Context context) {
@@ -339,7 +340,6 @@ public abstract class SCamera {
 
 	static final Object mSync = new Object();
 	static Vector<SCamera> mCameras = new Vector<SCamera>();
-	static boolean mFlagRunningActivity = false;
 	private static boolean mFlagRequestPermission = false;
 
 	Activity mActivity;
@@ -367,50 +367,65 @@ public abstract class SCamera {
 	protected abstract void autoFocusCamera() throws Exception;
 	protected abstract void autoFocusOnPointCamera(float x, float y) throws Exception;
 
-
-	public static void onResumeActivity(Activity activity) {
-		if (!(hasFeature(activity))) {
+	private static boolean mFlagInitialized = false;
+	private synchronized static void initialize() {
+		if (mFlagInitialized) {
 			return;
 		}
-		synchronized (mSync) {
-			mFlagRunningActivity = true;
-			try {
-				if (mFlagRequestPermission) {
-					mFlagRequestPermission = false;
-					if (!(grantPermission(activity))) {
-						onRequestPermissionsResult(activity);
+		mFlagInitialized = true;
+		SlibActivity.addResumeActivityListener(new SlibActivity.ResumeActivityListener() {
+			@Override
+			public void onResumeActivity(Activity activity) {
+				if (!(hasFeature(activity))) {
+					return;
+				}
+				synchronized (mSync) {
+					try {
+						if (mFlagRequestPermission) {
+							mFlagRequestPermission = false;
+							if (!(grantPermission(activity))) {
+								onRequestPermissionsResult(activity);
+							}
+						}
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && supportsCamera2) {
+							SCamera2.doResumeActivity();
+						} else {
+							SCamera1.doResumeActivity();
+						}
+					} catch (Exception e) {
+						Logger.exception(e);
 					}
 				}
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && supportsCamera2) {
-					SCamera2.doResumeActivity();
-				} else {
-					SCamera1.doResumeActivity();
-				}
-			} catch (Exception e) {
-				Logger.exception(e);
 			}
-		}
+		});
+		SlibActivity.addPauseActivityListener(new SlibActivity.PauseActivityListener() {
+			@Override
+			public void onPauseActivity(Activity activity) {
+				if (!(hasFeature(activity))) {
+					return;
+				}
+				synchronized (mSync) {
+					try {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && supportsCamera2) {
+							SCamera2.doPauseActivity();
+						} else {
+							SCamera1.doPauseActivity();
+						}
+					} catch (Exception e) {
+						Logger.exception(e);
+					}
+				}
+			}
+		});
+		SlibActivity.addPermissionResultListener(SlibActivity.REQUEST_PERMISSION_SCAMERA, new SlibActivity.PermissionResultListener() {
+			@Override
+			public void onPermissionResult(Activity activity, int requestCode, String[] permissions, int[] grantResults) {
+				onRequestPermissionsResult(activity);
+			}
+		});
 	}
 
-	public static void onPauseActivity(Activity activity) {
-		if (!(hasFeature(activity))) {
-			return;
-		}
-		synchronized (mSync) {
-			mFlagRunningActivity = false;
-			try {
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && supportsCamera2) {
-					SCamera2.doPauseActivity();
-				} else {
-					SCamera1.doPauseActivity();
-				}
-			} catch (Exception e) {
-				Logger.exception(e);
-			}
-		}
-	}
-
-	public static void onRequestPermissionsResult(Activity activity) {
+	private static void onRequestPermissionsResult(Activity activity) {
 		if (!(checkPermission(activity))) {
 			return;
 		}

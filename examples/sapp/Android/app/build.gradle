@@ -10,7 +10,6 @@ project.afterEvaluate {
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "io.slib.SAppExample"
         minSdkVersion 15
@@ -48,4 +47,5 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation ':slib@aar'
+    implementation 'com.android.support:support-v4:26.1.0'
 }

@@ -46,6 +46,9 @@ import slib.platform.android.ui.helper.FileChooserListener;
 public class TakePhoto {
 
 	public static void open(final Activity activity, final boolean flagCamera, final String outputFilePath) {
+
+		initialize();
+
 		if (!(UiThread.isUiThread())) {
 			UiThread.post(new Runnable() {
 				public void run() {
@@ -54,8 +57,9 @@ public class TakePhoto {
 			});
 			return;
 		}
+
 		try {
-			FileChooser chooser = new FileChooser(activity, SlibActivity.REQUEST_TAKE_PHOTO, new FileChooserListener() {
+			FileChooser chooser = new FileChooser(activity, SlibActivity.REQUEST_ACTIVITY_TAKE_PHOTO, new FileChooserListener() {
 				@Override
 				public void onChooseFile(Uri uri, Object content) {
 					ParcelFileDescriptor pfd = null;
@@ -229,31 +233,45 @@ public class TakePhoto {
 	}
 
 	private static boolean grantPermission(Activity activity) {
-		return Permissions.grantPermission(activity, Manifest.permission.CAMERA, SlibActivity.REQUEST_TAKE_PHOTO_PERMISSION);
+		return Permissions.grantPermission(activity, Manifest.permission.CAMERA, SlibActivity.REQUEST_PERMISSION_TAKE_PHOTO);
 	}
 
-	public static void onRequestPermissionsResult(Activity activity) {
-		if (!(checkPermission(activity))) {
-			if (lastRequest != null) {
-				onError();
-			}
+
+	private static boolean mFlagInitialized = false;
+
+	private static synchronized void initialize() {
+		if (mFlagInitialized) {
 			return;
 		}
-		if (lastRequest != null) {
-			lastRequest.run();
-		}
-	}
-
-	public static void onResult(Activity activity, int resultCode, Intent data) {
-		if (resultCode == SlibActivity.RESULT_OK) {
-			if (lastRequest != null) {
-				lastRequest.chooser.processActivityResult(resultCode, data);
+		mFlagInitialized = true;
+		SlibActivity.addActivityResultListener(SlibActivity.REQUEST_ACTIVITY_TAKE_PHOTO, new SlibActivity.ActivityResultListener() {
+			@Override
+			public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+				if (resultCode == SlibActivity.RESULT_OK) {
+					if (lastRequest != null) {
+						lastRequest.chooser.processActivityResult(resultCode, data);
+					}
+				} else if (resultCode == SlibActivity.RESULT_CANCELED) {
+					if (lastRequest != null) {
+						onCancel();
+					}
+				}
 			}
-		} else if (resultCode == SlibActivity.RESULT_CANCELED) {
-			if (lastRequest != null) {
-				onCancel();
+		});
+		SlibActivity.addPermissionResultListener(SlibActivity.REQUEST_PERMISSION_TAKE_PHOTO, new SlibActivity.PermissionResultListener() {
+			@Override
+			public void onPermissionResult(Activity activity, int requestCode, String[] permissions, int[] grantResults) {
+				if (!(checkPermission(activity))) {
+					if (lastRequest != null) {
+						onError();
+					}
+					return;
+				}
+				if (lastRequest != null) {
+					lastRequest.run();
+				}
 			}
-		}
+		});
 	}
 
 	private static TakePhoto lastRequest;

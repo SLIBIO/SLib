@@ -22,14 +22,11 @@
 
 package slib.platform.android;
 
+import java.util.HashMap;
 import java.util.Vector;
 
-import slib.platform.android.camera.SCamera;
-import slib.platform.android.camera.TakePhoto;
 import slib.platform.android.device.Device;
 import slib.platform.android.ui.UiThread;
-import slib.platform.android.ui.view.UiGLView;
-import slib.platform.android.ui.view.UiWebView;
 import slib.platform.android.ui.window.UiWindow;
 
 import android.app.Activity;
@@ -38,6 +35,7 @@ import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -48,12 +46,59 @@ import android.widget.FrameLayout;
 
 public class SlibActivity extends Activity {
 
-	public static final int REQUEST_TAKE_PHOTO = 0x000100;
-	public static final int REQUEST_WEBVIEW_CHOOSE_FILE = 0x000101;
+	public static final int REQUEST_ACTIVITY_TAKE_PHOTO = 0x000100;
+	public static final int REQUEST_ACTIVITY_WEBVIEW_CHOOSE_FILE = 0x000101;
 
 	public static final int REQUEST_PERMISSIONS = 0x000200;
-	public static final int REQUEST_SCAMERA_PERMISSION = 0x000201;
-	public static final int REQUEST_TAKE_PHOTO_PERMISSION = 0x000202;
+	public static final int REQUEST_PERMISSION_SCAMERA = 0x000201;
+	public static final int REQUEST_PERMISSION_TAKE_PHOTO = 0x000202;
+
+	public interface ActivityResultListener {
+		void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data);
+	}
+
+	public static void addActivityResultListener(int requestCode, ActivityResultListener listener) {
+		mActivityResultListeners.put(requestCode, listener);
+	}
+
+	public static void addActivityResultListener(ActivityResultListener listener) {
+		mListActivityResultListeners.add(listener);
+	}
+
+	public interface PermissionResultListener {
+		void onPermissionResult(Activity activity, int requestCode, String[] permissions, int[] grantResults);
+	}
+
+	public static void addPermissionResultListener(int requestCode, PermissionResultListener listener) {
+		mPermissionResultListeners.put(requestCode, listener);
+	}
+
+	public static void addPermissionResultListener(PermissionResultListener listener) {
+		mListPermissionResultListeners.add(listener);
+	}
+
+	public interface ResumeActivityListener {
+		void onResumeActivity(Activity activity);
+	}
+
+	public static void addResumeActivityListener(ResumeActivityListener listener) {
+		mListResumeActivityListeners.add(listener);
+	}
+
+	public interface PauseActivityListener {
+		void onPauseActivity(Activity activity);
+	}
+
+	public static void addPauseActivityListener(PauseActivityListener listener) {
+		mListPauseActivityListeners.add(listener);
+	}
+
+	private static HashMap<Integer, ActivityResultListener> mActivityResultListeners = new HashMap<Integer, ActivityResultListener>();
+	private static Vector<ActivityResultListener> mListActivityResultListeners = new Vector<ActivityResultListener>();
+	private static HashMap<Integer, PermissionResultListener> mPermissionResultListeners = new HashMap<Integer, PermissionResultListener>();
+	private static Vector<PermissionResultListener> mListPermissionResultListeners = new Vector<PermissionResultListener>();
+	private static Vector<ResumeActivityListener> mListResumeActivityListeners = new Vector<ResumeActivityListener>();
+	private static Vector<PauseActivityListener> mListPauseActivityListeners = new Vector<PauseActivityListener>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,19 +135,29 @@ public class SlibActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		mFlagRunningGlobal = false;
 		Android.onPauseActivity(this);
-		SCamera.onPauseActivity(this);
-		UiGLView.onPauseViews();
-		flagVisible = false;
+		for (PauseActivityListener listener : mListPauseActivityListeners) {
+			try {
+				listener.onPauseActivity(this);
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		mFlagRunningGlobal = true;
 		Android.onResumeActivity(this);
-		SCamera.onResumeActivity(this);
-		UiGLView.onResumeViews();
-		flagVisible = true;
+		for (ResumeActivityListener listener : mListResumeActivityListeners) {
+			try {
+				listener.onResumeActivity(this);
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
 	}
 
 	@Override
@@ -145,8 +200,8 @@ public class SlibActivity extends Activity {
 		super.finish();
 	}
 
-	public boolean isVisible() {
-		return flagVisible;
+	public static boolean isRunningGlobal() {
+		return mFlagRunningGlobal;
 	}
 
 	public Rect getLatestInsets() {
@@ -198,32 +253,63 @@ public class SlibActivity extends Activity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch (requestCode) {
-			case REQUEST_TAKE_PHOTO:
-				TakePhoto.onResult(this, resultCode, data);
-				break;
-			case REQUEST_WEBVIEW_CHOOSE_FILE:
-				UiWebView.onResult(this, resultCode, data);
-				break;
+		try {
+			{
+				ActivityResultListener listener = mActivityResultListeners.get(requestCode);
+				if (listener != null) {
+					try {
+						listener.onActivityResult(this, requestCode, resultCode, data);
+					} catch (Exception e) {
+						Logger.exception(e);
+					}
+				}
+			}
+			for (ActivityResultListener listener : mListActivityResultListeners) {
+				try {
+					listener.onActivityResult(this, requestCode, resultCode, data);
+				} catch (Exception e) {
+					Logger.exception(e);
+				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 
 	@Override
-	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-		switch (requestCode) {
-			case REQUEST_PERMISSIONS:
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		if (requestCode == REQUEST_PERMISSIONS) {
+			try {
 				Device.onRequestPermissionsResult(this);
-				break;
-			case REQUEST_SCAMERA_PERMISSION:
-				SCamera.onRequestPermissionsResult(this);
-				break;
-			case REQUEST_TAKE_PHOTO_PERMISSION:
-				TakePhoto.onRequestPermissionsResult(this);
-				break;
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
+		try {
+			{
+				PermissionResultListener listener = mPermissionResultListeners.get(requestCode);
+				if (listener != null) {
+					try {
+						listener.onPermissionResult(this, requestCode, permissions, grantResults);
+					} catch (Exception e) {
+						Logger.exception(e);
+					}
+				}
+			}
+			for (PermissionResultListener listener : mListPermissionResultListeners) {
+				try {
+					listener.onPermissionResult(this, requestCode, permissions, grantResults);
+				} catch (Exception e) {
+					Logger.exception(e);
+				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 
-	boolean flagVisible;
 	Rect latestInsets;
+
+	private static boolean mFlagRunningGlobal;
 
 }
