@@ -20,15 +20,23 @@
  *   THE SOFTWARE.
  */
 
-#include "slib/social/instagram.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_ANDROID)
+
+#include "slib/social/instagram.h"
+
+#include "slib/ui/photo.h"
+#include "slib/core/platform_android.h"
 
 namespace slib
 {
 	
 	void Instagram::openInstagramAppSharingFile(const Memory& data)
 	{
+		PhotoKit::saveImageWithFileContent(data, [](const String& localIdentifier) {
+			Android::sendFile(localIdentifier, "image/*", "Share to");
+		});
 	}
 
 }
