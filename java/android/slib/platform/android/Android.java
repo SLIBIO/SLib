@@ -22,11 +22,14 @@
 
 package slib.platform.android;
 
+import java.io.File;
 import java.io.InputStream;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.view.View;
@@ -150,6 +153,29 @@ public class Android {
 			Logger.exception(e);
 		}
 	}
+
+	public static void sendFile(final Activity activity, final String filePath, final String mimeType, final String titleChooser) {
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Intent intent = new Intent(Intent.ACTION_SEND);
+					intent.setType(mimeType);
+					File file = new File(filePath);
+					Uri uri = Uri.fromFile(file);
+					intent.putExtra(Intent.EXTRA_STREAM, uri);
+					String title = titleChooser;
+					if (title == null || title.length() == 0) {
+						title = "Send";
+					}
+					activity.startActivity(Intent.createChooser(intent, title));
+				} catch (Exception e) {
+					Logger.exception(e);
+				}
+			}
+		});
+	}
+
 
 	public static void onCreateActivity(Activity activity)
 	{

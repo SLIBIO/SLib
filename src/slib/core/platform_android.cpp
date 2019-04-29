@@ -37,6 +37,7 @@ namespace slib
 		SLIB_JNI_STATIC_METHOD(openAsset, "openAsset", "(Landroid/app/Activity;Ljava/lang/String;)Ljava/io/InputStream;")
 		SLIB_JNI_STATIC_METHOD(showKeyboard, "showKeyboard", "(Landroid/app/Activity;)V")
 		SLIB_JNI_STATIC_METHOD(dismissKeyboard, "dismissKeyboard", "(Landroid/app/Activity;)V")
+		SLIB_JNI_STATIC_METHOD(sendFile, "sendFile", "(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")
 	SLIB_JNI_END_CLASS
 
 	void Android::initialize(JavaVM* jvm)
@@ -122,6 +123,17 @@ namespace slib
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JAndroid::dismissKeyboard.call(sl_null, jactivity);
+		}
+	}
+
+	void Android::sendFile(const String& filePath, const String& mimeType, const String& chooserTitle)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JniLocal<jstring> jfilePath = Jni::getJniString(filePath);
+			JniLocal<jstring> jmimeType = Jni::getJniString(mimeType);
+			JniLocal<jstring> jchooserTitle = Jni::getJniString(chooserTitle);
+			return JAndroid::sendFile.call(sl_null, jactivity, jfilePath.value, jmimeType.value, jchooserTitle.value);
 		}
 	}
 

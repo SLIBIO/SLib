@@ -56,6 +56,9 @@ namespace slib
 		static void showKeyboard();
 	
 		static void dismissKeyboard();
+
+
+		static void sendFile(const String& filePath, const String& mimeType, const String& chooserTitle = String::null());
 	
 	};
 
