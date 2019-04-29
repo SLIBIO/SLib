@@ -27,6 +27,30 @@
 
 namespace slib
 {
+	
+	sl_uint32 _g_priv_graphics_resource_screenWidth = 0;
+	sl_uint32 _g_priv_graphics_resource_screenHeight = 0;
+	
+	sl_uint32 GraphicsResource::getScreenWidth()
+	{
+		return _g_priv_graphics_resource_screenWidth;
+	}
+	
+	void GraphicsResource::setScreenWidth(sl_uint32 width)
+	{
+		_g_priv_graphics_resource_screenWidth = width;
+	}
+	
+	sl_uint32 GraphicsResource::getScreenHeight()
+	{
+		return _g_priv_graphics_resource_screenHeight;
+	}
+	
+	void GraphicsResource::setScreenHeight(sl_uint32 height)
+	{
+		_g_priv_graphics_resource_screenHeight = height;
+	}
+	
 
 	Ref<Image> _priv_ImageResourceEntry::getImage()
 	{

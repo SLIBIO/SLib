@@ -21,7 +21,9 @@
  */
 
 #include "slib/ui/resource.h"
+
 #include "slib/ui/core.h"
+#include "slib/graphics/resource.h"
 
 namespace slib
 {
@@ -55,6 +57,8 @@ namespace slib
 		_g_priv_ui_resource_defaultSafeAreaTop = insets.top;
 		_g_priv_ui_resource_defaultSafeAreaRight = insets.right;
 		_g_priv_ui_resource_defaultSafeAreaBottom = insets.bottom;
+		GraphicsResource::setScreenWidth(size.x);
+		GraphicsResource::setScreenHeight(size.y);
 	}
 	
 	sl_ui_len UIResource::getScreenWidth()

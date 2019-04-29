@@ -28,6 +28,7 @@
 
 #include "slib/graphics/image.h"
 #include "slib/graphics/platform.h"
+#include "slib/graphics/resource.h"
 #include "slib/core/scoped.h"
 
 namespace slib
@@ -207,6 +208,24 @@ namespace slib
 	Ref<Drawable> PlatformDrawable::create(const ImageDesc& desc)
 	{
 		//return _priv_Android_ImageDrawable::create(desc);
+		sl_uint32 widthScreen = GraphicsResource::getScreenWidth();
+		sl_uint32 heightScreen = GraphicsResource::getScreenHeight();
+		if (widthScreen > 0 && heightScreen > 0) {
+			sl_uint32 shift = 0;
+			while ((desc.width >> shift) > widthScreen || (desc.height >> shift) > heightScreen) {
+				shift++;
+			}
+			if (shift > 0) {
+				Ref<Image> image = Image::createStatic(desc);
+				if (image.isNotNull()) {
+					image = image->stretchToSmall(1 << shift);
+					if (image.isNotNull()) {
+						return Bitmap::create(image);
+					}
+				}
+				return sl_null;
+			}
+		}
 		return Bitmap::create(desc);
 	}
 

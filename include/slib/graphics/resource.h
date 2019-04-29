@@ -32,6 +32,23 @@
 #include "../core/list.h"
 #include "../core/resource.h"
 
+namespace slib
+{
+	
+	class SLIB_EXPORT GraphicsResource
+	{
+	public:
+		static sl_uint32 getScreenWidth();
+		
+		static void setScreenWidth(sl_uint32 width);
+		
+		static sl_uint32 getScreenHeight();
+		
+		static void setScreenHeight(sl_uint32 height);
+		
+	};
+	
+}
 
 #define SLIB_DECLARE_COLOR_RESOURCE(NAME) \
 	namespace NAME { \
