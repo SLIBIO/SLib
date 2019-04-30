@@ -36,6 +36,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
+import slib.platform.android.helper.FileHelper;
 import slib.platform.android.ui.UiThread;
 
 public class Android {
@@ -162,8 +163,13 @@ public class Android {
 					Intent intent = new Intent(Intent.ACTION_SEND);
 					intent.setType(mimeType);
 					File file = new File(filePath);
-					Uri uri = Uri.fromFile(file);
+					Uri uri = FileHelper.getUriForFile(activity, file);
+					if (uri == null) {
+						Logger.error("File exposed beyond app: " + filePath);
+						return;
+					}
 					intent.putExtra(Intent.EXTRA_STREAM, uri);
+					intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 					String title = titleChooser;
 					if (title == null || title.length() == 0) {
 						title = "Send";

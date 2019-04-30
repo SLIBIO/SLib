@@ -27,10 +27,8 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
 import java.io.File;
@@ -38,6 +36,7 @@ import java.util.Vector;
 
 import io.slib.R;
 import slib.platform.android.Logger;
+import slib.platform.android.helper.FileHelper;
 import slib.platform.android.helper.Permissions;
 import slib.util.Time;
 
@@ -184,23 +183,12 @@ public class FileChooser {
 				filePathImageCapture = file.getAbsolutePath();
 				fileCapture = file;
 			}
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-				Uri photoURI = null;
-				try {
-					photoURI = FileProvider.getUriForFile(activity, activity.getPackageName() + ".slib.filechooser", fileCapture);
-				} catch (Exception e2) {}
-				if (photoURI == null) {
-					try {
-						photoURI = FileProvider.getUriForFile(activity, activity.getPackageName() + ".android.fileprovider", fileCapture);
-					} catch (Exception e3) {}
-				}
-				if (photoURI == null) {
-					return null;
-				}
-				intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-			} else {
-				intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(fileCapture));
+			Uri uri = FileHelper.getUriForFile(activity, fileCapture);
+			if (uri == null) {
+				Logger.error("File exposed beyond app: " + fileCapture.getAbsolutePath());
+				return null;
 			}
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
 			return intent;
 		} catch (Exception e) {
 			Logger.exception(e);

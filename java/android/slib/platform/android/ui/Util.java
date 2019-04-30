@@ -39,11 +39,13 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.io.File;
 import java.lang.reflect.Field;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
+import slib.platform.android.helper.FileHelper;
 
 public class Util {
 
@@ -293,8 +295,26 @@ public class Util {
 			@Override
 			public void run() {
 				try {
-					Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-					activity.startActivity(intent);
+					if (url.startsWith("file://")) {
+						File file = new File(url.substring(7));
+						Uri uri = FileHelper.getUriForFile(activity, file);
+						if (uri == null) {
+							Logger.error("File exposed beyond app: " + file.getAbsolutePath());
+							return;
+						}
+						Intent intent;
+						if (url.endsWith("jpg") || url.endsWith("jpeg") || url.endsWith("png")) {
+							intent = new Intent(Intent.ACTION_VIEW);
+							intent.setDataAndType(uri, "image/*");
+						} else {
+							intent = new Intent(Intent.ACTION_VIEW, uri);
+						}
+						intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+						activity.startActivity(intent);
+					} else {
+						Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+						activity.startActivity(intent);
+					}
 				} catch (Exception e) {
 					Logger.exception(e);
 				}
