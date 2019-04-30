@@ -888,7 +888,7 @@ namespace slib
 							if (flagNoChangeHeight) {
 								dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, this, sl_false, sl_true, sl_false));
 							} else {
-								smoothScrollToEndY();
+								dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ListView, smoothScrollToEndY, this, UIUpdateMode::Redraw));
 							}
 						} else {
 							scrollToEndY();
