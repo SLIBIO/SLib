@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 12
         versionName "1.1"
         externalNativeBuild {
@@ -36,30 +36,33 @@ android {
     }
 }
 
-repositories {
-    flatDir{
-        dirs "../../../external/bin/FacebookAndroid"
-    }
-}
+ext.SUPPORT_LIBRARY_VERSION = "27.1.1"
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    
     implementation project(':external_ShortcutBadger')
-    implementation ':facebook@aar'
-    implementation ':facebook-core@aar'
-    implementation ':facebook-common@aar'
-    implementation ':facebook-login@aar'
-    implementation ':facebook-share@aar'
-    implementation 'com.google.firebase:firebase-core:10.2.1'
-    implementation 'com.google.firebase:firebase-messaging:10.2.1'
+    implementation project(':slib_fcm')
+
+    implementation "com.android.support:support-v4:$SUPPORT_LIBRARY_VERSION"
+    implementation "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
+    implementation "com.android.support:cardview-v7:$SUPPORT_LIBRARY_VERSION"
+    implementation "com.android.support:customtabs:$SUPPORT_LIBRARY_VERSION"
+
+    implementation "com.google.android.gms:play-services-ads:17.2.0"
+    implementation "com.google.firebase:firebase-messaging:17.6.0"
+
+    implementation "com.facebook.android:facebook-login:4.42.0"
+    implementation "com.facebook.android:facebook-share:4.42.0"
 }
 
 tasks.all { task ->
     if (task.name == "assembleDebug" || task.name == "assembleRelease") {
         task.dependsOn(project(":external_ShortcutBadger").getTasksByName(task.name, true)[0])
+        task.dependsOn(project(":slib_fcm").getTasksByName(task.name, true)[0])
         task.doLast {
             def copyAAR = { srcDir, srcFileName, dstFileName ->
-                def sourceFile = projectDir.getPath() + "/" + srcDir + "/" + srcFileName + (task.name == "assembleDebug" ? "-debug.aar" : "-release.aar");
+                def sourceFile = projectDir.getPath() + "/" + srcDir + "/" + srcFileName + ".aar";
                 def targetDir = projectDir.getPath() + "/../../../lib/Android";
                 def targetFileName = dstFileName + ".aar";
                 def targetFile = targetDir + "/" + targetFileName;
@@ -69,6 +72,7 @@ tasks.all { task ->
             }
             System.out.println("Moving slib.aar into lib!")
             copyAAR("build/outputs/aar", "slib", "slib")
+            copyAAR("../slib_fcm/build/outputs/aar", "slib_fcm", "slib_fcm")
             copyAAR("../../../external/java/ShortcutBadger/build/outputs/aar", "external_ShortcutBadger", "ShortcutBadger")
         }
     }

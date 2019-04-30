@@ -25,7 +25,9 @@
 
 #include "definition.h"
 
+#include "../core/object.h"
 #include "../core/string.h"
+#include "../core/list.h"
 #include "../core/json.h"
 #include "../core/function.h"
 
@@ -46,6 +48,7 @@ namespace slib
 		
 		// Received Params
 		sl_bool flagClicked;
+		sl_bool flagBackground;
 		
 	public:
 		PushNotificationMessage();
@@ -54,31 +57,80 @@ namespace slib
 
 	};
 	
-	class SLIB_EXPORT PushNotification
+	class SLIB_EXPORT PushNotificationService : public Object
 	{
-	public:
-		static String getDeviceToken();
-		
-		static void addTokenRefreshCallback(const Function<void(String)>& callback);
-		
-		static void removeTokenRefreshCallback(const Function<void(String)>& callback);
-
-		static void addNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback);
-		
-		static void removeNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback);
-		
-		static void start();
-
-	private:		
-		static void _doInit();
+		SLIB_DECLARE_OBJECT
 		
 	public:
-		static void _onRefreshToken(const String& token);
+		PushNotificationService();
 		
-		static void _onNotificationReceived(PushNotificationMessage& message);
+		~PushNotificationService();
+		
+	public:
+		String getDeviceToken();
+		
+		void addTokenRefreshCallback(const Function<void(String)>& callback);
+		
+		void removeTokenRefreshCallback(const Function<void(String)>& callback);
+
+		void addNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback);
+		
+		void removeNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback);
+		
+		void start();
+		
+	public:
+		void dispatchTokenRefresh(const String& deviceToken);
+		
+		void dispatchNotificationReceived(PushNotificationMessage& message);
+		
+	protected:
+		virtual void onStart();
+		
+	protected:
+		sl_bool m_flagStarted;
+		AtomicString m_deviceToken;
+		List< Function<void(String)> > m_listTokenRefreshCallbacks;
+		List< Function<void(PushNotificationMessage&)> > m_listNotificationReceivedCallbacks;
+
+	};
+	
+	// Apple Push Notification service
+	class SLIB_EXPORT APNs : public PushNotificationService
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		APNs();
+		
+		~APNs();
+		
+	protected:
+		void onStart() override;
+		
+	public:
+		static Ref<APNs> getInstance();
 		
 	};
 
+	// Firebase Cloud Messaging
+	class SLIB_EXPORT FCM : public PushNotificationService
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		FCM();
+		
+		~FCM();
+		
+	public:
+		void onStart() override;
+		
+	public:		
+		static Ref<FCM> getInstance();
+		
+	};
+	
 }
 
 #endif

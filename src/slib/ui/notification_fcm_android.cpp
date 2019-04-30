@@ -25,39 +25,56 @@
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 
 #include "slib/ui/notification.h"
+
 #include "slib/ui/platform.h"
 #include "slib/core/json.h"
+
+#include "slib/core/safe_static.h"
 
 namespace slib
 {
 
-	void _priv_Notification_onTokenRefresh(JNIEnv* env, jobject _this, jstring token);
-	void _priv_Notification_onMessageReceived(JNIEnv* env, jobject _this, jstring title, jstring body, jobjectArray data);
+	void _priv_FCM_onToken(JNIEnv* env, jobject _this, jstring token);
+	void _priv_FCM_onMessageReceived(JNIEnv* env, jobject _this, jstring title, jstring content, jobjectArray data, jboolean flagClicked, jboolean flagBackground);
 
-	SLIB_JNI_BEGIN_CLASS(JAndroidFirebaseInstanceIDService, "slib/platform/android/ui/FirebaseInstanceIDService")
-		SLIB_JNI_NATIVE(onCompleted, "nativeOnTokenRefresh", "(Ljava/lang/String;)V", _priv_Notification_onTokenRefresh);
-		SLIB_JNI_STATIC_METHOD(getToken, "getToken", "()V");
+	SLIB_JNI_BEGIN_CLASS(JAndroidFCM, "slib/platform/android/notification/FCM")
+		SLIB_JNI_STATIC_METHOD(initialize, "initialize", "(Landroid/app/Activity;)V");
+		SLIB_JNI_NATIVE(onToken, "nativeOnToken", "(Ljava/lang/String;)V", _priv_FCM_onToken);
+		SLIB_JNI_NATIVE(onReceive, "nativeOnMessageReceived", "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;ZZ)V", _priv_FCM_onMessageReceived);
 	SLIB_JNI_END_CLASS
-
-	SLIB_JNI_BEGIN_CLASS(JAndroidFirebaseMessagingService, "slib/platform/android/ui/FirebaseMessagingService")
-		SLIB_JNI_NATIVE(onPrepared, "nativeOnMessageReceived", "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)V", _priv_Notification_onMessageReceived);
-	SLIB_JNI_END_CLASS
-
-
-	void PushNotification::_doInit()
+	
+	Ref<FCM> FCM::getInstance()
 	{
-		JAndroidFirebaseInstanceIDService::getToken.call(sl_null);
+		SLIB_SAFE_STATIC(Ref<FCM>, instance, new FCM)
+		if (SLIB_SAFE_STATIC_CHECK_FREED(instance)) {
+			return sl_null;
+		}
+		return instance;
 	}
 
-	void _priv_Notification_onTokenRefresh(JNIEnv* env, jobject _this, jstring _token)
+	void FCM::onStart()
 	{
-		String token = Jni::getString(_token);
-		PushNotification::_onRefreshToken(token);
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JAndroidFCM::initialize.call(sl_null, jactivity);
+		}
 	}
 
-
-	void _priv_Notification_onMessageReceived(JNIEnv* env, jobject _this, jstring title, jstring content, jobjectArray data)
+	void _priv_FCM_onToken(JNIEnv* env, jobject _this, jstring _token)
 	{
+		Ref<FCM> instance = FCM::getInstance();
+		if (instance.isNotNull()) {
+			String token = Jni::getString(_token);
+			instance->dispatchTokenRefresh(token);
+		}
+	}
+
+	void _priv_FCM_onMessageReceived(JNIEnv* env, jobject _this, jstring title, jstring content, jobjectArray data, jboolean flagClicked, jboolean flagBackground)
+	{
+		Ref<FCM> instance = FCM::getInstance();
+		if (instance.isNull()) {
+			return;
+		}
 		JsonMap _data;
 		if (data) {
 			sl_uint32 n = Jni::getArrayLength(data);
@@ -88,8 +105,10 @@ namespace slib
 		message.title = _title;
 		message.content = _content;
 		message.data = _data;
+		message.flagClicked = flagClicked;
+		message.flagBackground = flagBackground;
 
-		PushNotification::_onNotificationReceived(message);
+		instance->dispatchNotificationReceived(message);
 	}
 
 }

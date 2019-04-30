@@ -29,21 +29,54 @@
 #include "slib/ui/core.h"
 #include "slib/ui/platform.h"
 
+#include "slib/core/safe_static.h"
+
 namespace slib
 {
-	void PushNotification::_doInit()
+	
+	Ref<APNs> APNs::getInstance()
 	{
-		UIPlatform::registerDidReceiveRemoteNotificationCallback([](NSDictionary* _userInfo) {
+		SLIB_SAFE_STATIC(Mutex, lock)
+		if (SLIB_SAFE_STATIC_CHECK_FREED(lock)) {
+			return sl_null;
+		}
+		
+		MutexLocker locker(&lock);
+		SLIB_STATIC_ZERO_INITIALIZED(Ref<APNs>, instance);
+		if (SLIB_SAFE_STATIC_CHECK_FREED(instance)) {
+			return sl_null;
+		}
+		if (instance.isNotNull()) {
+			return instance;
+		}
+		locker.unlock();
+		
+		instance = new APNs;
+		UIPlatform::registerDidRegisterForRemoteNotifications([&instance](NSData* deviceToken, NSError* error) {
+			if (SLIB_SAFE_STATIC_CHECK_FREED(instance)) {
+				return;
+			}
+			slib::String token = slib::String::makeHexString([deviceToken bytes], [deviceToken length]);
+			instance->dispatchTokenRefresh(token);
+		});
+		UIPlatform::registerDidReceiveRemoteNotificationCallback([&instance](NSDictionary* _userInfo) {
+			if (SLIB_SAFE_STATIC_CHECK_FREED(instance)) {
+				return;
+			}
 			PushNotificationMessage message;
 			if (UIPlatform::parseRemoteNotificationInfo(_userInfo, message)) {
-				_onNotificationReceived(message);
+				instance->dispatchNotificationReceived(message);
 			}
 		});
-		
+		return instance;
+	}
+	
+	void APNs::onStart()
+	{
 		UIApplication* application = [UIApplication sharedApplication];
 		
 		[application registerForRemoteNotifications];
-
+		
 		UIUserNotificationSettings* notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert categories:nil];
 		[application registerUserNotificationSettings:notificationSettings];
 	}

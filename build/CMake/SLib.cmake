@@ -384,7 +384,7 @@ if(ANDROID)
   "${SLIB_PATH}/src/slib/ui/clipboard_android.cpp"
   "${SLIB_PATH}/src/slib/ui/common_dialogs_android.cpp"
   "${SLIB_PATH}/src/slib/ui/edit_view_android.cpp"
-  "${SLIB_PATH}/src/slib/ui/notification_android.cpp"
+  "${SLIB_PATH}/src/slib/ui/notification_fcm_android.cpp"
   "${SLIB_PATH}/src/slib/ui/refresh_view_android.cpp"
   "${SLIB_PATH}/src/slib/ui/render_view_android.cpp"
   "${SLIB_PATH}/src/slib/ui/scroll_view_android.cpp"

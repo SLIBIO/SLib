@@ -21,7 +21,6 @@
  */
 
 #include "slib/ui/notification.h"
-#include "slib/core/safe_static.h"
 
 namespace slib
 {
@@ -32,102 +31,123 @@ namespace slib
 	{
 		badge = -1;
 		flagClicked = sl_false;
+		flagBackground = sl_false;
 	}
 	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicString, _g_slib_ui_notification_token);
-
-	String PushNotification::getDeviceToken()
+	
+	SLIB_DEFINE_OBJECT(PushNotificationService, Object)
+	
+	PushNotificationService::PushNotificationService()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ui_notification_token)) {
-			return sl_null;
-		}
-		return _g_slib_ui_notification_token;
+		m_flagStarted = sl_false;
+		m_listTokenRefreshCallbacks.create();
+		m_listNotificationReceivedCallbacks.create();
 	}
 	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicList<Function<void(String)>>, _g_slib_ui_notification_listTokenRefreshCallback);
-
-	void PushNotification::addTokenRefreshCallback(const Function<void(String)>& callback)
+	PushNotificationService::~PushNotificationService()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ui_notification_tokenRefreshCallback)) {
-			return;
-		}
-		_g_slib_ui_notification_listTokenRefreshCallback.addIfNotExist(callback);
 	}
 	
-	void PushNotification::removeTokenRefreshCallback(const Function<void(String)>& callback)
+	String PushNotificationService::getDeviceToken()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ui_notification_tokenRefreshCallback)) {
-			return;
-		}
-		_g_slib_ui_notification_listTokenRefreshCallback.remove(callback);
+		return m_deviceToken;
 	}
 	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicList<Function<void(PushNotificationMessage&)>>, _g_slib_ui_notification_listNotificationReceivedCallback);
-
-	void PushNotification::addNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback)
+	void PushNotificationService::addTokenRefreshCallback(const Function<void(String)>& callback)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ui_notification_listNotificationReceivedCallback)) {
-			return;
-		}
-		_g_slib_ui_notification_listNotificationReceivedCallback.addIfNotExist(callback);
+		m_listTokenRefreshCallbacks.add(callback);
 	}
 	
-	void PushNotification::removeNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback)
+	void PushNotificationService::removeTokenRefreshCallback(const Function<void(String)>& callback)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ui_notification_listNotificationReceivedCallback)) {
-			return;
-		}
-		_g_slib_ui_notification_listNotificationReceivedCallback.remove(callback);
+		m_listTokenRefreshCallbacks.remove(callback);
 	}
-
-	SLIB_STATIC_ZERO_INITIALIZED(SpinLock, _g_slib_ui_notification_lock);
 	
-	void PushNotification::start()
+	void PushNotificationService::addNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ui_notification_lock)) {
-			return;
-		}
+		m_listNotificationReceivedCallbacks.add(callback);
+	}
+	
+	void PushNotificationService::removeNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback)
+	{
+		m_listNotificationReceivedCallbacks.remove(callback);
+	}
+	
+	void PushNotificationService::start()
+	{
 		{
-			SpinLocker lock(&_g_slib_ui_notification_lock);
-			static sl_bool flagInitialized = sl_false;
-			if (flagInitialized) {
+			ObjectLocker lock(this);
+			if (m_flagStarted) {
 				return;
 			}
-			flagInitialized = sl_true;
+			m_flagStarted = sl_true;
 		}
-		_doInit();
+		onStart();
 	}
 	
-	void PushNotification::_onRefreshToken(const String& token)
+	void PushNotificationService::dispatchTokenRefresh(const String& token)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ui_notification_token)) {
-			return;
-		}
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ui_notification_listTokenRefreshCallback)) {
-			return;
-		}
-		_g_slib_ui_notification_token = token;
-		for (auto& callback : _g_slib_ui_notification_listTokenRefreshCallback) {
+		m_deviceToken = token;
+		for (auto& callback : m_listTokenRefreshCallbacks) {
 			if (callback.isNotNull()) {
 				callback(token);
 			}
 		}
 	}
 	
-	void PushNotification::_onNotificationReceived(PushNotificationMessage& message)
+	void PushNotificationService::dispatchNotificationReceived(PushNotificationMessage& message)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ui_notification_listNotificationReceivedCallback)) {
-			return;
-		}
-		for (auto& callback : _g_slib_ui_notification_listNotificationReceivedCallback) {
+		for (auto& callback : m_listNotificationReceivedCallbacks) {
 			if (callback.isNotNull()) {
 				callback(message);
 			}
 		}
 	}
 	
-#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
-	void PushNotification::_doInit()
+	void PushNotificationService::onStart()
+	{
+	}
+	
+	
+	SLIB_DEFINE_OBJECT(APNs, PushNotificationService)
+	
+	APNs::APNs()
+	{
+	}
+	
+	APNs::~APNs()
+	{
+	}
+	
+#if !defined(SLIB_UI_IS_IOS)
+	Ref<APNs> APNs::getInstance()
+	{
+		return sl_null;
+	}
+
+	void APNs::onStart()
+	{
+	}
+#endif
+	
+	
+	SLIB_DEFINE_OBJECT(FCM, PushNotificationService)
+	
+	FCM::FCM()
+	{
+	}
+	
+	FCM::~FCM()
+	{
+	}
+	
+#if !defined(SLIB_UI_IS_ANDROID)
+	Ref<FCM> FCM::getInstance()
+	{
+		return sl_null;
+	}
+
+	void FCM::onStart()
 	{
 	}
 #endif

@@ -293,13 +293,29 @@ namespace slib
 	
 	void UIPlatform::registerDidFinishLaunchingCallback(const Function<void(NSDictionary*)>& callback)
 	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ios_callback_didFinishLaunching)) {
+			return;
+		}
 		_g_slib_ios_callback_didFinishLaunching.add(callback);
+	}
+	
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void(NSData*, NSError*)>, _g_slib_ios_callback_didRegisterForRemoteNotifications);
+
+	void UIPlatform::registerDidRegisterForRemoteNotifications(const Function<void(NSData*, NSError*)>& callback)
+	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ios_callback_didRegisterForRemoteNotifications)) {
+			return;
+		}
+		_g_slib_ios_callback_didRegisterForRemoteNotifications.add(callback);
 	}
 
 	SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void(NSDictionary*)>, _g_slib_ios_callback_didReceiveRemoteNotification);
 	
 	void UIPlatform::registerDidReceiveRemoteNotificationCallback(const Function<void(NSDictionary*)>& callback)
 	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ios_callback_didReceiveRemoteNotification)) {
+			return;
+		}
 		_g_slib_ios_callback_didReceiveRemoteNotification.add(callback);
 	}
 	
@@ -307,6 +323,9 @@ namespace slib
 	
 	void UIPlatform::registerOpenUrlCallback(const Function<BOOL(NSURL*, NSDictionary*)>& callback)
 	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ios_callbacks_openURL)) {
+			return;
+		}
 		_g_slib_ios_callbacks_openURL.add(callback);
 	}
 	
@@ -414,13 +433,12 @@ namespace slib
 }
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-	slib::String token = slib::String::makeHexString([deviceToken bytes], [deviceToken length]);
-	slib::PushNotification::_onRefreshToken(token);
+	slib::_g_slib_ios_callback_didRegisterForRemoteNotifications(deviceToken, nil);
 }
 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
 {
-	slib::PushNotification::_onRefreshToken(sl_null);
+	slib::_g_slib_ios_callback_didRegisterForRemoteNotifications(nil, error);
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {

@@ -53,6 +53,8 @@ public class SlibActivity extends Activity {
 	public static final int REQUEST_PERMISSION_SCAMERA = 0x000201;
 	public static final int REQUEST_PERMISSION_TAKE_PHOTO = 0x000202;
 
+	public static final int REQUEST_INTENT_REMOTE_NOTIFICATION = 0x000300;
+
 	public interface ActivityResultListener {
 		void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data);
 	}
@@ -93,12 +95,21 @@ public class SlibActivity extends Activity {
 		mListPauseActivityListeners.add(listener);
 	}
 
+	public interface IntentListener {
+		void onIntent(Intent intent);
+	}
+
+	public static void addIntentListener(IntentListener listener) {
+		mListIntentListeners.add(listener);
+	}
+
 	private static HashMap<Integer, ActivityResultListener> mActivityResultListeners = new HashMap<Integer, ActivityResultListener>();
 	private static Vector<ActivityResultListener> mListActivityResultListeners = new Vector<ActivityResultListener>();
 	private static HashMap<Integer, PermissionResultListener> mPermissionResultListeners = new HashMap<Integer, PermissionResultListener>();
 	private static Vector<PermissionResultListener> mListPermissionResultListeners = new Vector<PermissionResultListener>();
 	private static Vector<ResumeActivityListener> mListResumeActivityListeners = new Vector<ResumeActivityListener>();
 	private static Vector<PauseActivityListener> mListPauseActivityListeners = new Vector<PauseActivityListener>();
+	private static Vector<IntentListener> mListIntentListeners = new Vector<IntentListener>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -130,6 +141,7 @@ public class SlibActivity extends Activity {
 
 		Android.onCreateActivity(this);
 
+		processIntent(getIntent());
 	}
 
 	@Override
@@ -299,6 +311,26 @@ public class SlibActivity extends Activity {
 			for (PermissionResultListener listener : mListPermissionResultListeners) {
 				try {
 					listener.onPermissionResult(this, requestCode, permissions, grantResults);
+				} catch (Exception e) {
+					Logger.exception(e);
+				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	@Override
+	public void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		processIntent(intent);
+	}
+
+	private void processIntent(Intent intent) {
+		try {
+			for (IntentListener listener : mListIntentListeners) {
+				try {
+					listener.onIntent(intent);
 				} catch (Exception e) {
 					Logger.exception(e);
 				}

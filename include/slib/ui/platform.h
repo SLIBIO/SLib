@@ -154,6 +154,7 @@ namespace slib
 		static void setGlobalScaleFactor(CGFloat factor);
 				
 		static void registerDidFinishLaunchingCallback(const Function<void(NSDictionary*)>& callback);
+		static void registerDidRegisterForRemoteNotifications(const Function<void(NSData*, NSError*)>& callback);
 		static void registerDidReceiveRemoteNotificationCallback(const Function<void(NSDictionary*)>& callback);
 		static void registerOpenUrlCallback(const Function<BOOL(NSURL*, NSDictionary*)>& callback);
 
