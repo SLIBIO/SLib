@@ -238,6 +238,9 @@ namespace slib
 	if (slib::RenderView* view = slib::CastInstance<slib::RenderView>(_view.get())) {
 		if (m_engine.isNull()) {
 			m_engine = slib::GLES::createEngine();
+			if (m_engine.isNotNull()) {
+				view->dispatchCreateEngine(m_engine.get());
+			}
 		}
 		if (m_engine.isNotNull()) {
 			m_engine->setViewport(0, 0, m_viewportWidth, m_viewportHeight);

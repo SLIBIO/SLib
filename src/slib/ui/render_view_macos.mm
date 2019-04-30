@@ -91,6 +91,8 @@ namespace slib
 			return;
 		}
 		
+		sl_bool flagFirstFrame = sl_true;
+		
 		TimeCounter timer;
 		NSOpenGLContext* context = nil;
 		
@@ -169,12 +171,16 @@ namespace slib
 						if (viewportWidth != 0 && viewportHeight != 0) {
 						
 							[context makeCurrentContext];
-							engine->setViewport(0, 0, viewportWidth, viewportHeight);
 							
 							Ref<macOS_ViewInstance> instance = handle->m_viewInstance;
 							if (instance.isNotNull()) {
 								Ref<View> _view = instance->getView();
 								if (RenderView* view = CastInstance<RenderView>(_view.get())) {
+									if (flagFirstFrame) {
+										flagFirstFrame = sl_false;
+										view->dispatchCreateEngine(engine.get());
+									}
+									engine->setViewport(0, 0, viewportWidth, viewportHeight);
 									view->dispatchFrame(engine.get());
 								}
 							} else {

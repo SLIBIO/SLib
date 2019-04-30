@@ -266,6 +266,13 @@ namespace slib
 		}
 	}
 
+	SLIB_DEFINE_EVENT_HANDLER(RenderView, CreateEngine, RenderEngine* engine)
+	
+	void RenderView::dispatchCreateEngine(RenderEngine* engine)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(CreateEngine, engine)
+	}
+
 	SLIB_DEFINE_EVENT_HANDLER_WITHOUT_ON(RenderView, Frame, RenderEngine* engine)
 	
 	void RenderView::onFrame(RenderEngine* engine)

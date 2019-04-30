@@ -85,6 +85,8 @@ namespace slib
 		SLIB_PROPERTY(RenderEngineType, PreferredEngineType)
 		
 	public:
+		SLIB_DECLARE_EVENT_HANDLER(RenderView, CreateEngine, RenderEngine* engine)
+		
 		SLIB_DECLARE_EVENT_HANDLER(RenderView, Frame, RenderEngine* engine)
 
 	protected:

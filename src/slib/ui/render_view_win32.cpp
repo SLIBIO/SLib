@@ -36,10 +36,12 @@ namespace slib
 	{
 	public:
 		AtomicRef<Renderer> m_renderer;
+		RenderEngine* m_pLastEngine;
 
 	public:
 		Win32_RenderViewInstance()
 		{
+			m_pLastEngine = sl_null;
 		}
 
 		~Win32_RenderViewInstance()
@@ -81,7 +83,11 @@ namespace slib
 		{
 			Ref<View> _view = getView();
 			if (RenderView* view = CastInstance<RenderView>(_view.get())) {
+				if (m_pLastEngine != engine) {
+					view->dispatchCreateEngine(engine);
+				}
 				view->dispatchFrame(engine);
+				m_pLastEngine = engine;
 			}
 		}
 	};

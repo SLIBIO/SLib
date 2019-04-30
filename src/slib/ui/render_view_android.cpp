@@ -56,6 +56,7 @@ namespace slib
 				if (engine.isNull()) {
 					engine = GLES::createEngine();
 					instance->m_renderEngine = engine;
+					view->dispatchCreateEngine(engine.get());
 				}
 				if (engine.isNotNull()) {
 					if (width > 0 && height > 0) {

@@ -68,6 +68,9 @@ namespace slib
 			Ref<EFL_RenderViewInstance> instance = Ref<EFL_RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
 			if (instance.isNotNull()) {
 				instance->m_renderEngine = GLES::createEngine();
+				if (RenderView* view = CastInstance<RenderView>(_view.get())) {
+					view->dispatchCreateEngine(instance->m_renderEngine.get());
+				}
 			}
 		}
 
