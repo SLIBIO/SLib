@@ -167,6 +167,7 @@ namespace slib
 				} else {
 					cameraView->setDeviceId("FRONT");
 				}
+				cameraView->start();
 			});
 			btnFlash->setIcon(getFlashIcon(cameraView->getFlashMode()), UIUpdateMode::Init);
 			btnFlash->setOnClick([this](View* view) {

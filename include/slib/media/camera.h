@@ -60,6 +60,13 @@ namespace slib
 		SmoothContinuousAutoFocus = 2
 	};
 	
+	enum class CameraTorchMode
+	{
+		Auto = 0,
+		On = 1,
+		Off = 2,
+	};
+	
 	class SLIB_EXPORT CameraTakePictureResult
 	{
 	public:
@@ -151,10 +158,18 @@ namespace slib
 		
 		virtual sl_bool isAdjustingFocus();
 		
+		virtual sl_bool isTorchActive();
+		
+		virtual void setTorchMode(CameraTorchMode mode, float level = 1.0f);
+		
 	public:
 		static Ref<Camera> create(const CameraParam& param);
 		
 		static List<CameraInfo> getCamerasList();
+		
+		static sl_bool isMobileDeviceTorchActive();
+		
+		static void setMobileDeviceTorchMode(CameraTorchMode mode, float level = 1.0f);
 		
 	protected:
 		void onCaptureVideoFrame(VideoCaptureFrame& frame) override;

@@ -53,4 +53,5 @@ public:
 	
 	void onClickQRCodeScanner(View* view);
 	
+	void onClickToggleTorch(View* view);
 };

@@ -34,29 +34,31 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
-import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.MeteringRectangle;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.support.annotation.NonNull;
 import android.util.Size;
 import android.view.Surface;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Vector;
 
 import slib.platform.android.Logger;
 
-@TargetApi(21)
+@TargetApi(Build.VERSION_CODES.M)
 public class SCamera2 extends SCamera {
 
 	static Vector<SCameraInfo> getCameras(Activity activity) throws Exception {
 		Vector<SCameraInfo> ret = new Vector<SCameraInfo>();
 		CameraManager manager = getManager(activity);
-		String ids[] = manager.getCameraIdList();
+		String[] ids = manager.getCameraIdList();
 		boolean flagFirstFront = true;
 		boolean flagFirstBack = true;
 		for (String id : ids) {
@@ -152,7 +154,7 @@ public class SCamera2 extends SCamera {
 		try {
 			manager.openCamera(mId, new CameraDevice.StateCallback() {
 				@Override
-				public void onOpened(CameraDevice device) {
+				public void onOpened(@NonNull CameraDevice device) {
 					synchronized (mSync) {
 						if (!mFlagReleased) {
 							mDevice = device;
@@ -164,7 +166,7 @@ public class SCamera2 extends SCamera {
 				}
 
 				@Override
-				public void onClosed(CameraDevice device) {
+				public void onClosed(@NonNull CameraDevice device) {
 					synchronized (mSync) {
 						for (SCamera obj : mCameras) {
 							if (obj instanceof SCamera2) {
@@ -183,12 +185,12 @@ public class SCamera2 extends SCamera {
 				}
 
 				@Override
-				public void onDisconnected(CameraDevice device) {
+				public void onDisconnected(@NonNull CameraDevice device) {
 					release();
 				}
 
 				@Override
-				public void onError(CameraDevice camera, int error) {
+				public void onError(@NonNull CameraDevice camera, int error) {
 					log("Error: " + error);
 				}
 			}, mBackgroundHandler);
@@ -256,7 +258,7 @@ public class SCamera2 extends SCamera {
 		surfaces.add(mImageReaderPhoto.getSurface());
 		mDevice.createCaptureSession(surfaces, new CameraCaptureSession.StateCallback() {
 			@Override
-			public void onConfigured(CameraCaptureSession session) {
+			public void onConfigured(@NonNull CameraCaptureSession session) {
 				synchronized (mSync) {
 					if (!mFlagReleased && mFlagRunningRequest) {
 						mSession = session;
@@ -271,7 +273,7 @@ public class SCamera2 extends SCamera {
 			}
 
 			@Override
-			public void onConfigureFailed(CameraCaptureSession session) {
+			public void onConfigureFailed(@NonNull CameraCaptureSession session) {
 				log("Failed to create session");
 			}
 		}, mBackgroundHandler);
@@ -296,29 +298,24 @@ public class SCamera2 extends SCamera {
 		if (flashMode == FLASH_MODE_OFF) {
 			mPhotoRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
 			mPhotoRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
-			mPreviewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
 			mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
 			runCapture();
 			return;
 		}
-		mPreviewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
 		mPhotoRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
-		switch (flashMode) {
-			case FLASH_MODE_ON:
-				mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH);
-				mPhotoRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH);
-				break;
-			default:
-				mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-				mPhotoRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-				break;
+		if (flashMode == FLASH_MODE_ON) {
+			mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH);
+			mPhotoRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH);
+		} else {
+			mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+			mPhotoRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
 		}
 		runPreview();
 		mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_START);
 		mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER, CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
 		mSession.capture(mPreviewRequestBuilder.build(), new CameraCaptureSession.CaptureCallback() {
 			@Override
-			public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
+			public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
 				mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_CANCEL);
 				runCapture();
 				mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
@@ -352,14 +349,13 @@ public class SCamera2 extends SCamera {
 			return;
 		}
 		mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO);
-		mPreviewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
 		mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
 		runPreview();
 		mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_START);
 		mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER, CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
 		mSession.capture(mPreviewRequestBuilder.build(), new CameraCaptureSession.CaptureCallback() {
 			@Override
-			public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
+			public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
 				mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_CANCEL);
 				runPreview();
 				mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
@@ -390,7 +386,6 @@ public class SCamera2 extends SCamera {
 			return;
 		}
 		mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO);
-		mPreviewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
 		mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
 		runPreview();
 		{
@@ -407,7 +402,7 @@ public class SCamera2 extends SCamera {
 		mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER, CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
 		mSession.capture(mPreviewRequestBuilder.build(), new CameraCaptureSession.CaptureCallback() {
 			@Override
-			public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
+			public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
 				mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_CANCEL);
 				runPreview();
 				mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
@@ -420,9 +415,130 @@ public class SCamera2 extends SCamera {
 		}
 	}
 
+	@Override
+	protected boolean isTorchActiveCamera() {
+		Integer value = mPreviewRequestBuilder.get(CaptureRequest.FLASH_MODE);
+		return value != null && value == CaptureRequest.FLASH_MODE_TORCH;
+	}
+
+	@Override
+	protected void setTorchModeCamera(int mode, float level) throws Exception {
+		if (mode == TORCH_MODE_ON) {
+			mPreviewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH);
+		} else {
+			mPreviewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
+		}
+		runPreview();
+	}
+
+	static boolean isMobileDeviceTorchActive2(Activity activity) {
+		try {
+			CameraManager manager = getManager(activity);
+			if (manager != null) {
+				String id = getBackCameraId(manager);
+				if (id != null) {
+					synchronized (mSync) {
+						for (SCamera camera : mCameras) {
+							try {
+								if (camera.mId != null && camera.mId.equals(id)) {
+									return camera.isTorchActive();
+								}
+							} catch (Exception e) {
+								Logger.exception(e);
+							}
+						}
+					}
+					return mTorchDevices.contains(id);
+				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return false;
+	}
+
+	static void setMobileDeviceTorchMode2(Activity activity, int mode, float level) {
+		try {
+			CameraManager manager = getManager(activity);
+			if (manager != null) {
+				String id = getBackCameraId(manager);
+				if (id != null) {
+					synchronized (mSync) {
+						for (SCamera camera : mCameras) {
+							try {
+								if (camera.mId != null && camera.mId.equals(id)) {
+									if (camera.isRunning()) {
+										camera.setTorchMode(mode, level);
+										return;
+									}
+									break;
+								}
+							} catch (Exception e) {
+								Logger.exception(e);
+							}
+						}
+					}
+					manager.setTorchMode(id, mode == TORCH_MODE_ON);
+				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	private static String getBackCameraId(CameraManager manager) throws Exception {
+		String[] ids = manager.getCameraIdList();
+		for (String id : ids) {
+			try {
+				CameraCharacteristics characteristics = manager.getCameraCharacteristics(id);
+				Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
+				if (facing != null) {
+					if (facing == CameraCharacteristics.LENS_FACING_BACK) {
+						return id;
+					}
+				}
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
+		return null;
+	}
+
+	private static boolean mFlagInitializedCameraManager = false;
+	private static final Object mLockInitizingCameraManager = new Object();
+	private static HashSet<String> mTorchDevices = new HashSet<String>();
 
 	private static CameraManager getManager(Activity activity) {
-		return (CameraManager)(activity.getSystemService(Context.CAMERA_SERVICE));
+		CameraManager manager = (CameraManager)(activity.getSystemService(Context.CAMERA_SERVICE));
+		if (manager != null) {
+			if (!mFlagInitializedCameraManager) {
+				synchronized (mLockInitizingCameraManager) {
+					if (!mFlagInitializedCameraManager) {
+						mFlagInitializedCameraManager = true;
+						try {
+							manager.registerTorchCallback(new CameraManager.TorchCallback() {
+								@Override
+								public void onTorchModeUnavailable(@NonNull String cameraId) {
+									mTorchDevices.remove(cameraId);
+								}
+
+								@Override
+								public void onTorchModeChanged(@NonNull String cameraId, boolean enabled) {
+									if (enabled) {
+										mTorchDevices.add(cameraId);
+									} else {
+										mTorchDevices.remove(cameraId);
+									}
+								}
+							}, mBackgroundHandler);
+						} catch (Exception e) {
+							Logger.exception(e);
+						}
+					}
+				}
+			}
+		}
+		return manager;
 	}
 
 	private static String resolveCameraId(Activity activity, String id) {
@@ -431,7 +547,7 @@ public class SCamera2 extends SCamera {
 		if (flagBack || flagFront) {
 			try {
 				CameraManager manager = getManager(activity);
-				String ids[] = manager.getCameraIdList();
+				String[] ids = manager.getCameraIdList();
 				for (String dev : ids) {
 					try {
 						CameraCharacteristics characteristics = manager.getCameraCharacteristics(dev);

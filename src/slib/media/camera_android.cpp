@@ -42,6 +42,8 @@ namespace slib
 
 		SLIB_JNI_STATIC_METHOD(getCamerasList, "getCamerasList", "(Landroid/app/Activity;)[Lslib/platform/android/camera/SCameraInfo;");
 		SLIB_JNI_STATIC_METHOD(create, "create", "(Landroid/app/Activity;Ljava/lang/String;J)Lslib/platform/android/camera/SCamera;");
+		SLIB_JNI_STATIC_METHOD(isMobileDeviceTorchActive, "isMobileDeviceTorchActive", "(Landroid/app/Activity;)Z");
+		SLIB_JNI_STATIC_METHOD(setMobileDeviceTorchMode, "setMobileDeviceTorchMode", "(Landroid/app/Activity;IF)V");
 
 		SLIB_JNI_METHOD(release, "release", "()V");
 		SLIB_JNI_METHOD(setSettings, "setSettings", "(II)V");
@@ -52,6 +54,8 @@ namespace slib
 		SLIB_JNI_METHOD(setFocusMode, "setFocusMode", "(I)V");
 		SLIB_JNI_METHOD(autoFocus, "autoFocus", "()V");
 		SLIB_JNI_METHOD(autoFocusOnPoint, "autoFocusOnPoint", "(FF)V");
+		SLIB_JNI_METHOD(isTorchActive, "isTorchActive", "()Z");
+		SLIB_JNI_METHOD(setTorchMode, "setTorchMode", "(IF)V");
 
 	SLIB_JNI_END_CLASS
 
@@ -384,6 +388,25 @@ namespace slib
 			}
 		}
 
+		sl_bool isTorchActive() override
+		{
+			ObjectLocker lock(this);
+			jobject jcamera = m_camera.get();
+			if (jcamera) {
+				return JAndroidCamera::isTorchActive.callBoolean(jcamera) != 0;
+			}
+			return sl_false;
+		}
+
+		void setTorchMode(CameraTorchMode mode, float level) override
+		{
+			ObjectLocker lock(this);
+			jobject jcamera = m_camera.get();
+			if (jcamera) {
+				JAndroidCamera::setTorchMode.call(jcamera, (jint)((int)mode), (jfloat)level);
+			}
+		}
+
 	};
 
 
@@ -446,6 +469,23 @@ namespace slib
 			}
 		}
 		return ret;
+	}
+
+	sl_bool Camera::isMobileDeviceTorchActive()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			return JAndroidCamera::isMobileDeviceTorchActive.callBoolean(sl_null, jactivity);
+		}
+		return sl_false;
+	}
+
+	void Camera::setMobileDeviceTorchMode(CameraTorchMode mode, float level)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JAndroidCamera::setMobileDeviceTorchMode.call(sl_null, jactivity, (jint)((int)mode), (jfloat)level);
+		}
 	}
 
 }

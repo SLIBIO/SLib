@@ -540,6 +540,53 @@ namespace slib
 			return sl_false;
 		}
 		
+#if defined(SLIB_PLATFORM_IS_IOS)
+		sl_bool isTorchActive() override
+		{
+			ObjectLocker lock(this);
+			AVCaptureDevice* device = m_device;
+			if (device != nil) {
+				if (device.torchActive) {
+					return sl_true;
+				}
+			}
+			return sl_false;
+		}
+		
+		void setTorchMode(CameraTorchMode mode, float level) override
+		{
+			ObjectLocker lock(this);
+			AVCaptureDevice* device = m_device;
+			if (device != nil) {
+				if (!(device.hasTorch)) {
+					return;
+				}
+				if ([device lockForConfiguration:nil]) {
+					switch (mode) {
+						case CameraTorchMode::Off:
+							if ([device isTorchModeSupported:AVCaptureTorchModeOff]) {
+								device.torchMode = AVCaptureTorchModeOff;
+							}
+							break;
+						case CameraTorchMode::On:
+							if ([device isTorchModeSupported:AVCaptureTorchModeOn]) {
+								if (device.torchAvailable) {
+									[device setTorchModeOnWithLevel:level error:nil];
+								}
+							}
+							break;
+						case CameraTorchMode::Auto:
+							if ([device isTorchModeSupported:AVCaptureTorchModeAuto]) {
+								device.torchMode = AVCaptureTorchModeAuto;
+							}
+							break;
+					}
+					[device unlockForConfiguration];
+				}
+			}
+		}
+#endif
+		
 	};
 
 
@@ -562,7 +609,59 @@ namespace slib
 		}
 		return ret;
 	}
-
+	
+#if defined(SLIB_PLATFORM_IS_IOS)
+	sl_bool Camera::isMobileDeviceTorchActive()
+	{
+		NSArray *devices = [AVCaptureDevice devices];
+		for (AVCaptureDevice* device in devices) {
+			if ([device hasMediaType:AVMediaTypeVideo]) {
+				if (device.position == AVCaptureDevicePositionBack) {
+					if (device.hasTorch && device.isTorchActive) {
+						return sl_true;
+					}
+				}
+			}
+		}
+		return sl_false;
+	}
+	
+	void Camera::setMobileDeviceTorchMode(CameraTorchMode mode, float level)
+	{
+		NSArray *devices = [AVCaptureDevice devices];
+		for (AVCaptureDevice* device in devices) {
+			if ([device hasMediaType:AVMediaTypeVideo]) {
+				if (device.position == AVCaptureDevicePositionBack) {
+					if (device.hasTorch) {
+						if ([device lockForConfiguration:nil]) {
+							switch (mode) {
+								case CameraTorchMode::Off:
+									if ([device isTorchModeSupported:AVCaptureTorchModeOff]) {
+										device.torchMode = AVCaptureTorchModeOff;
+									}
+									break;
+								case CameraTorchMode::On:
+									if ([device isTorchModeSupported:AVCaptureTorchModeOn]) {
+										if (device.torchAvailable) {
+											[device setTorchModeOnWithLevel:level error:nil];
+										}
+									}
+									break;
+								case CameraTorchMode::Auto:
+									if ([device isTorchModeSupported:AVCaptureTorchModeAuto]) {
+										device.torchMode = AVCaptureTorchModeAuto;
+									}
+									break;
+							}
+							[device unlockForConfiguration];
+						}
+					}
+				}
+			}
+		}
+	}
+#endif
+	
 }
 
 @implementation _priv_AVFoundation_Camera_Callback

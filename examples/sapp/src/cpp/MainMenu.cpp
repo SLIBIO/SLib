@@ -39,6 +39,7 @@ void MainMenu::onOpen()
 	btnControlScreen->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickControlScreen, this));
 	btnLoginPage->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickLoginPage, this));
 	btnQRCodeScanner->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickQRCodeScanner, this));
+	btnToggleTorch->setOnClick(SLIB_FUNCTION_WEAKREF(MainMenu, onClickToggleTorch, this));
 }
 
 void MainMenu::onClickHelloWorld(View* view)
@@ -89,4 +90,13 @@ void MainMenu::onClickLoginPage(View* view)
 void MainMenu::onClickQRCodeScanner(View* view)
 {
 	goToPage(new QRCodeScannerPage);
+}
+
+void MainMenu::onClickToggleTorch(View* view)
+{
+	if (Camera::isMobileDeviceTorchActive()) {
+		Camera::setMobileDeviceTorchMode(CameraTorchMode::Off);
+	} else {
+		Camera::setMobileDeviceTorchMode(CameraTorchMode::On);
+	}
 }

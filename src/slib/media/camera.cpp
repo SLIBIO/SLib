@@ -174,6 +174,15 @@ namespace slib
 		return sl_false;
 	}
 	
+	sl_bool Camera::isTorchActive()
+	{
+		return sl_false;
+	}
+	
+	void Camera::setTorchMode(CameraTorchMode mode, float level)
+	{
+	}
+	
 	void Camera::onCaptureVideoFrame(VideoCaptureFrame& frame)
 	{
 		VideoCapture::onCaptureVideoFrame(frame);
@@ -187,5 +196,16 @@ namespace slib
 			}
 		}
 	}
+	
+#if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID)
+	sl_bool Camera::isMobileDeviceTorchActive()
+	{
+		return sl_false;
+	}
+	
+	void Camera::setMobileDeviceTorchMode(CameraTorchMode mode, float level)
+	{
+	}
+#endif
 	
 }

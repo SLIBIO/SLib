@@ -30,6 +30,8 @@
 
 					<button name='btnQRCodeScanner' text='QRCodeScanner' style='menu_button'/>
 
+					<button name='btnToggleTorch' text='Toggle Torch' style='menu_button'/>
+
 				</linear>
 			</group>
 		</scroll>

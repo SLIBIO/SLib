@@ -15,7 +15,19 @@
 			width='fill'
 			height='70%'
 			autoStart='true'
-			/>
+		>
+
+			<button
+				name='btnToggleTorch'
+				background='#50000000'
+				text='Torch: Off'
+				textColorNormal='white'
+				alignRight='true'
+				margin='10dp'
+				fontSize='30dp'			
+				/>
+
+		</QRCodeScanner>
 
 		<TextArea
 			name='result'

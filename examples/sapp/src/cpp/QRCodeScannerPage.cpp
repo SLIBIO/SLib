@@ -27,4 +27,14 @@ void QRCodeScannerPage::onOpen()
 	scanner->setOnDetect([this](slib::QRCodeScanner*, String qr_code) {
 		result->setText(String::format("%s\n\nDetected on %s", qr_code, Time::now()));
 	});
+	
+	btnToggleTorch->setOnClick([this](View*) {
+		if (Camera::isMobileDeviceTorchActive()) {
+			Camera::setMobileDeviceTorchMode(CameraTorchMode::Off);
+			btnToggleTorch->setText("Torch: Off");
+		} else {
+			Camera::setMobileDeviceTorchMode(CameraTorchMode::On);
+			btnToggleTorch->setText("Torch: On");
+		}
+	});
 }

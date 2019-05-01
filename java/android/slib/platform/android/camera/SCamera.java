@@ -49,11 +49,15 @@ public abstract class SCamera {
 	public static final int FOCUS_MODE_CONTINUOUS_AUTO_FOCUS = 1;
 	public static final int FOCUS_MODE_SMOOTH_CONTINUOUS_AUTO_FOCUS = 2;
 
+	public static final int TORCH_MODE_AUTO = 0;
+	public static final int TORCH_MODE_ON = 1;
+	public static final int TORCH_MODE_OFF = 2;
+
 
 	public static SCameraInfo[] getCamerasList(Activity activity) {
 		try {
 			checkSupportsCamera2(activity);
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && supportsCamera2) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && supportsCamera2) {
 				return SCamera2.getCameras(activity).toArray(new SCameraInfo[]{});
 			} else {
 				return SCamera1.getCameras().toArray(new SCameraInfo[]{});
@@ -65,7 +69,7 @@ public abstract class SCamera {
 	}
 
 	private static void checkSupportsCamera2(Activity activity) {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && supportsCamera2) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && supportsCamera2) {
 			if (!mCheckSupportsCamera2) {
 				supportsCamera2 = !(SCamera2.isLegacyDevice(activity));
 				mCheckSupportsCamera2 = true;
@@ -84,7 +88,7 @@ public abstract class SCamera {
 			checkSupportsCamera2(activity);
 			initialize();
 			SCamera camera;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && supportsCamera2) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && supportsCamera2) {
 				camera = new SCamera2();
 			} else {
 				camera = new SCamera1();
@@ -237,6 +241,48 @@ public abstract class SCamera {
 		}
 	}
 
+	public boolean isTorchActive() {
+		synchronized (mSync) {
+			if (!(isOpenedCamera())) {
+				return false;
+			}
+			try {
+				return isTorchActiveCamera();
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
+		return false;
+	}
+
+	public void setTorchMode(int mode, float level) {
+		synchronized (mSync) {
+			if (!(isOpenedCamera())) {
+				return;
+			}
+			try {
+				setTorchModeCamera(mode, level);
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
+	}
+
+	public static boolean isMobileDeviceTorchActive(Activity activity) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && supportsCamera2) {
+			return SCamera2.isMobileDeviceTorchActive2(activity);
+		} else {
+			return SCamera1.isMobileDeviceTorchActive1();
+		}
+	}
+
+	public static void setMobileDeviceTorchMode(Activity activity, int mode, float level) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && supportsCamera2) {
+			SCamera2.setMobileDeviceTorchMode2(activity, mode, level);
+		} else {
+			SCamera1.setMobileDeviceTorchMode1(mode, level);
+		}
+	}
 
 	private static native void nativeOnFrame(long nativeObject, byte[] data, int width, int height, int orientation, int flip);
 
@@ -366,6 +412,8 @@ public abstract class SCamera {
 	protected abstract void setFocusModeCamera(int focusMode) throws Exception;
 	protected abstract void autoFocusCamera() throws Exception;
 	protected abstract void autoFocusOnPointCamera(float x, float y) throws Exception;
+	protected abstract boolean isTorchActiveCamera() throws Exception;
+	protected abstract void setTorchModeCamera(int torchMode, float level) throws Exception;
 
 	private static boolean mFlagInitialized = false;
 	private synchronized static void initialize() {
@@ -387,7 +435,7 @@ public abstract class SCamera {
 								onRequestPermissionsResult(activity);
 							}
 						}
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && supportsCamera2) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && supportsCamera2) {
 							SCamera2.doResumeActivity();
 						} else {
 							SCamera1.doResumeActivity();
@@ -406,7 +454,7 @@ public abstract class SCamera {
 				}
 				synchronized (mSync) {
 					try {
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && supportsCamera2) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && supportsCamera2) {
 							SCamera2.doPauseActivity();
 						} else {
 							SCamera1.doPauseActivity();

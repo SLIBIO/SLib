@@ -102,7 +102,35 @@ public class SCamera1 extends SCamera implements Camera.PreviewCallback, Camera.
 
 	@Override
 	protected void openCamera() {
-		mCamera = Camera.open(mCameraIndex);
+		if (mCameraTorch != null) {
+			if (mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+				mCamera = mCameraTorch;
+				mCameraTorch = null;
+				try {
+					setMobileDeviceTorchMode1(mCamera, false);
+					mCamera.stopPreview();
+				} catch (Exception e) {
+				}
+				Logger.info("Camera: Opened Using Torch: " + mCameraIndex);
+			} else {
+				try {
+					setMobileDeviceTorchMode1(mCameraTorch, false);
+					mCameraTorch.stopPreview();
+				} catch (Exception e) {
+				}
+				try {
+					mCameraTorch.release();
+					Logger.info("Camera: Released Torch");
+				} catch (Exception e) {
+				}
+				mCameraTorch = null;
+				mCamera = Camera.open(mCameraIndex);
+				Logger.info("Camera: Opened: " + mCameraIndex);
+			}
+		} else {
+			mCamera = Camera.open(mCameraIndex);
+			Logger.info("Camera: Opened: " + mCameraIndex);
+		}
 		mCamera.setErrorCallback(this);
 		try {
 			configureCamera();
@@ -116,6 +144,7 @@ public class SCamera1 extends SCamera implements Camera.PreviewCallback, Camera.
 		if (mCamera != null) {
 			try {
 				mCamera.release();
+				Logger.info("Camera: Released: " + mCameraIndex);
 			} catch (Exception e) {
 				Logger.exception(e);
 			}
@@ -352,6 +381,99 @@ public class SCamera1 extends SCamera implements Camera.PreviewCallback, Camera.
 			public void onAutoFocus(boolean success, Camera camera) {
 			}
 		});
+	}
+
+	@Override
+	protected boolean isTorchActiveCamera() {
+		Camera.Parameters parameters = mCamera.getParameters();
+		return parameters.getFlashMode().equals(Camera.Parameters.FLASH_MODE_TORCH);
+	}
+
+	@Override
+	protected void setTorchModeCamera(int mode, float level) {
+		setMobileDeviceTorchMode1(mCamera, mode == TORCH_MODE_ON);
+	}
+
+	private static Camera mCameraTorch = null;
+
+	static boolean isMobileDeviceTorchActive1() {
+		try {
+			synchronized (mSync) {
+				if (mCameraTorch != null) {
+					return true;
+				}
+				for (SCamera obj : mCameras) {
+					try {
+						if (obj instanceof SCamera1) {
+							SCamera1 camera = (SCamera1)obj;
+							if (camera.mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+								return camera.isTorchActive();
+							}
+						}
+					} catch (Exception e) {
+						Logger.exception(e);
+					}
+				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return false;
+	}
+
+	private static void setMobileDeviceTorchMode1(Camera camera, boolean flag) {
+		Camera.Parameters parameters = camera.getParameters();
+		if (flag) {
+			parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+		} else {
+			parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
+		}
+		camera.setParameters(parameters);
+	}
+
+	static void setMobileDeviceTorchMode1(int mode, float level) {
+		try {
+			synchronized (mSync) {
+				if (mCameraTorch != null) {
+					if (mode != TORCH_MODE_ON) {
+						setMobileDeviceTorchMode1(mCameraTorch, false);
+						try {
+							mCameraTorch.stopPreview();
+						} catch (Exception e) {
+						}
+						mCameraTorch.release();
+						mCameraTorch = null;
+						Logger.info("Camera: Released Torch");
+					}
+					return;
+				}
+				for (SCamera obj : mCameras) {
+					try {
+						if (obj instanceof SCamera1) {
+							SCamera1 camera = (SCamera1)obj;
+							if (camera.mCameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+								camera.setTorchMode(mode, level);
+								return;
+							}
+						}
+					} catch (Exception e) {
+						Logger.exception(e);
+					}
+				}
+				if (mode == TORCH_MODE_ON) {
+					mCameraTorch = Camera.open();
+					if (mCameraTorch != null) {
+						Logger.info("Camera: Opened Torch");
+						setMobileDeviceTorchMode1(mCameraTorch, true);
+						mCameraTorch.startPreview();
+					} else {
+						Logger.info("Camera: Failed to Open Torch");
+					}
+				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
 	}
 
 	@Override
