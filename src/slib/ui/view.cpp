@@ -67,7 +67,6 @@ namespace slib
 		m_flagCurrentCreatingInstance(sl_false),
 		m_flagInvalidLayout(sl_true),
 		m_flagNeedApplyLayout(sl_false),
-		m_flagCurrentDrawing(sl_false),
 		m_flagFocused(sl_false),
 		m_flagPressed(sl_false),
 		m_flagHover(sl_false),
@@ -1181,6 +1180,13 @@ namespace slib
 		if (!SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
 			return;
 		}
+		
+		if (!(isDrawingThread())) {
+			void (View::*f)(UIUpdateMode) = &View::invalidate;
+			dispatchToDrawingThread(Function<void()>::bindWeakRef(WeakRef<View>(this), f, mode));
+			return;
+		}
+		
 		Ref<ViewInstance> instance = m_instance;
 		if (instance.isNotNull() && instance->isNativeWidget()) {
 #if defined(SLIB_UI_IS_WIN32)
@@ -1192,13 +1198,7 @@ namespace slib
 #endif
 		}
 		if (m_frame.getWidth() > 0 && m_frame.getHeight() > 0) {
-			if (isDrawingThread()) {
-				if (m_flagCurrentDrawing) {
-					if (m_rectCurrentDrawing.containsRectangle(getBounds())) {
-						return;
-					}
-				}
-			}
+
 			invalidateLayer();
 			
 			if (instance.isNotNull()) {
@@ -1213,11 +1213,18 @@ namespace slib
 		}
 	}
 
-	void View::invalidate(const UIRect &rect, UIUpdateMode mode)
+	void View::invalidate(const UIRect& rect, UIUpdateMode mode)
 	{
 		if (!SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
 			return;
 		}
+		
+		if (!(isDrawingThread())) {
+			void (View::*f)(const UIRect&, UIUpdateMode) = &View::invalidate;
+			dispatchToDrawingThread(Function<void()>::bindWeakRef(WeakRef<View>(this), f, rect, mode));
+			return;
+		}
+
 		Ref<ViewInstance> instance = m_instance;
 		if (instance.isNotNull() && instance->isNativeWidget()) {
 #if defined(SLIB_UI_IS_WIN32)
@@ -1230,13 +1237,7 @@ namespace slib
 		}
 		UIRect rectIntersect;
 		if (getBounds().intersectRectangle(rect, &rectIntersect)) {
-			if (isDrawingThread()) {
-				if (m_flagCurrentDrawing) {
-					if (m_rectCurrentDrawing.containsRectangle(rectIntersect)) {
-						return;
-					}
-				}
-			}
+
 			invalidateLayer(rectIntersect);
 			
 			if (instance.isNotNull()) {
@@ -1907,7 +1908,14 @@ namespace slib
 	{
 		if (m_flagPressed != flagState) {
 			m_flagPressed = flagState;
-			invalidate(mode);
+			if (SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
+				Ref<DrawAttributes>& attrs = m_drawAttrs;
+				if (attrs.isNotNull()) {
+					if (attrs->backgroundPressed.isNotNull() && attrs->background != attrs->backgroundPressed) {
+						invalidate();
+					}
+				}
+			}
 		}
 	}
 
@@ -7629,8 +7637,6 @@ namespace slib
 			drawAttrs->flagForcedDraw = sl_false;
 		}
 		
-		m_flagCurrentDrawing = sl_true;
-		
 		do {
 			
 			Rectangle rcInvalidated = canvas->getInvalidatedRect();
@@ -7646,11 +7652,6 @@ namespace slib
 			}
 
 			if (m_flagDrawing) {
-				
-				m_rectCurrentDrawing.left = (sl_ui_pos)(rcInvalidated.left - SLIB_EPSILON);
-				m_rectCurrentDrawing.top = (sl_ui_pos)(rcInvalidated.top - SLIB_EPSILON);
-				m_rectCurrentDrawing.right = (sl_ui_pos)(rcInvalidated.right + SLIB_EPSILON);
-				m_rectCurrentDrawing.bottom = (sl_ui_pos)(rcInvalidated.bottom + SLIB_EPSILON);
 				
 				getOnPreDraw()(this, canvas);
 
@@ -7682,8 +7683,6 @@ namespace slib
 			}
 			
 		} while (0);
-		
-		m_flagCurrentDrawing = sl_false;
 		
 		if (drawAttrs.isNotNull()) {
 			sl_size n = drawAttrs->runAfterDrawCallbacks.getCount();

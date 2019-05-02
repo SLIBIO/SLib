@@ -1413,7 +1413,6 @@ namespace slib
 		sl_bool m_flagCurrentCreatingInstance : 1;
 		sl_bool m_flagInvalidLayout : 1;
 		sl_bool m_flagNeedApplyLayout : 1;
-		sl_bool m_flagCurrentDrawing : 1;
 		sl_bool m_flagFocused : 1;
 		sl_bool m_flagPressed : 1;
 		sl_bool m_flagHover : 1;
@@ -1424,7 +1423,6 @@ namespace slib
 
 		UIRect m_frame;
 		UIRect m_boundsInParent;
-		UIRect m_rectCurrentDrawing;
 		sl_int32 m_idUpdateInvalidateLayout;
 		
 		UIAction m_actionMouseDown;
