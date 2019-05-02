@@ -7487,10 +7487,9 @@ namespace slib
 			} else {
 				precision = 15 - nInt;
 			}
-			if (precision < 0) {
-				precision = 0;
-			}
-			if (precision > 50) {
+			if (precision < 1) {
+				precision = 1;
+			} else if (precision > 50) {
 				precision = 50;
 			}
 		}
