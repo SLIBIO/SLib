@@ -85,6 +85,8 @@ namespace slib
 		
 		sl_bool isLoopback() const noexcept;
 		
+		sl_bool isLinkLocal() const noexcept;
+		
 		sl_bool isMulticast() const noexcept;
 		
 		sl_bool isBroadcast() const noexcept;
@@ -260,6 +262,8 @@ namespace slib
 		
 		sl_bool isLoopback() const noexcept;
 		
+		sl_bool isLinkLocal() const noexcept;
+		
 		IPv4Address getIPv4Transition() const noexcept;
 		
 		void setIPv4Transition(const IPv4Address& ipv4) noexcept;
@@ -310,7 +314,8 @@ namespace slib
 	private:
 		static const sl_uint8 _zero[16];
 		static const sl_uint8 _loopback[16];
-		
+		static const sl_uint8 _loopback_linkLocal[16];
+
 	};
 	
 	template <>

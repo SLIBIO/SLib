@@ -74,6 +74,11 @@ namespace slib
 		return a == 127;
 	}
 
+	sl_bool IPv4Address::isLinkLocal() const noexcept
+	{
+		return a == 169 && b == 254;
+	}
+
 	sl_bool IPv4Address::isMulticast() const noexcept
 	{
 		return a >= 224 && a <= 239;
@@ -301,6 +306,7 @@ namespace slib
 
 	SLIB_ALIGN(8) const sl_uint8 IPv6Address::_zero[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	SLIB_ALIGN(8) const sl_uint8 IPv6Address::_loopback[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
+	SLIB_ALIGN(8) const sl_uint8 IPv6Address::_loopback_linkLocal[16] = { 0xFE, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
 
 	IPv6Address::IPv6Address(const IPv6Address& other) noexcept = default;
 
@@ -405,9 +411,14 @@ namespace slib
 
 	sl_bool IPv6Address::isLoopback() const noexcept
 	{
-		return Base::equalsMemory(_loopback, m, 16);
+		return Base::equalsMemory(_loopback, m, 16) || Base::equalsMemory(_loopback_linkLocal, m, 16);
 	}
 
+	sl_bool IPv6Address::isLinkLocal() const noexcept
+	{
+		return m[0] == 0xFE && (m[1] & 0xC0) == 0x80;
+	}
+	
 	IPv4Address IPv6Address::getIPv4Transition() const noexcept
 	{
 		if (isIPv4Transition()) {

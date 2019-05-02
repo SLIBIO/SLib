@@ -67,6 +67,21 @@ namespace slib
 		return list;
 	}
 
+	List<IPv6Address> Network::findAllIPv6Addresses()
+	{
+		List<IPv6Address> list;
+		ListElements<NetworkInterfaceInfo> devices(Network::findAllInterfaces());
+		for (sl_size i = 0; i < devices.count; i++) {
+			ListElements<IPv6Address> addrs(devices[i].addresses_IPv6);
+			for (sl_size k = 0; k < addrs.count; k++) {
+				if (addrs[k].isNotZero() && !(addrs[k].isLoopback()) && !(addrs[k].isIPv4Transition())) {
+					list.add_NoLock(addrs[k]);
+				}
+			}
+		}
+		return list;
+	}
+	
 	List<MacAddress> Network::findAllMacAddresses()
 	{
 		List<MacAddress> list;

@@ -68,6 +68,8 @@ namespace slib
 		
 		static List<IPv4AddressInfo> findAllIPv4AddressInfos();
 		
+		static List<IPv6Address> findAllIPv6Addresses();
+		
 		static List<MacAddress> findAllMacAddresses();
 		
 		
