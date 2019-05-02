@@ -126,8 +126,19 @@ namespace slib
 		}
 		return 64;
 	}
+	
+	sl_size Base64::getDecodeOutputSize(sl_size len)
+	{
+		sl_size size = (len >> 2) * 3;
+		if ((len & 3) == 2) {
+			size++;
+		} else if ((len & 3) == 3) {
+			size += 2;
+		}
+		return size;
+	}
 
-	sl_size Base64::decode(const String& str, void* buf, sl_size size, sl_char8 padding)
+	sl_size Base64::decode(const String& str, void* buf, sl_char8 padding)
 	{
 		sl_uint8* output = (sl_uint8*)buf;
 		sl_size len = str.getLength();
@@ -183,20 +194,18 @@ namespace slib
 
 	Memory Base64::decode(const String& base64, sl_char8 padding)
 	{
-		sl_size len = base64.getLength();
-		sl_size size = (len >> 2) * 3;
-		if ((len & 3) == 2) {
-			size++;
-		} else if ((len & 3) == 3) {
-			size += 2;
-		}
+		sl_size size = getDecodeOutputSize(base64.getLength());
 		Memory mem = Memory::create(size);
 		if (mem.isNull()) {
 			return sl_null;
 		}
-		sl_size sizeOutput = decode(base64, mem.getData(), size, padding);
-		if (sizeOutput > 0) {
-			return mem.sub(0, sizeOutput);
+		sl_size sizeOutput = decode(base64, mem.getData(), padding);
+		if (sizeOutput) {
+			if (size == sizeOutput) {
+				return mem;
+			} else {
+				return mem.sub(0, sizeOutput);
+			}
 		}
 		return sl_null;
 	}
