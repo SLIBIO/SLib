@@ -82,11 +82,23 @@ namespace slib
 	String SocketAddress::toString() const noexcept
 	{
 		if (ip.isIPv4()) {
-			return ip.toString() + ":" + String::fromUint32(port);
+			if (port) {
+				return ip.toString() + ":" + String::fromUint32(port);
+			} else {
+				return ip.toString();
+			}
 		} else if (ip.isIPv6()) {
-			return "[" + ip.toString() + "]:" + String::fromUint32(port);
+			if (port) {
+				return "[" + ip.toString() + "]:" + String::fromUint32(port);
+			} else {
+				return ip.toString();
+			}
 		} else {
-			return ":" + String::fromUint32(port);
+			if (port) {
+				return ":" + String::fromUint32(port);
+			} else {
+				return String::null();
+			}
 		}
 	}
 	
