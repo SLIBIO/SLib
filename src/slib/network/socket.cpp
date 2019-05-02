@@ -873,7 +873,7 @@ namespace slib
 
 	sl_uint32 Socket::getOption(int level, int option) const
 	{
-		sl_uint32 v;
+		sl_uint32 v = 0;
 		if (getOption(level, option, &v, 4)) {
 			return v != 0;
 		} else {
