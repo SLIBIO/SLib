@@ -218,6 +218,10 @@ public class Util {
 		}
 	}
 
+	public static final int STATUS_BAR_STYLE_HIDDEN = 0;
+	public static final int STATUS_BAR_STYLE_DARK = 1;
+	public static final int STATUS_BAR_STYLE_LIGHT = 2;
+
 	public static void setStatusBarStyle(final Activity activity, final int style) {
 		if (!(UiThread.isUiThread())) {
 			activity.runOnUiThread(new Runnable() {
@@ -230,13 +234,15 @@ public class Util {
 		}
 		try {
 			Window window = activity.getWindow();
-			if (style > 0) {
+			if (style == STATUS_BAR_STYLE_HIDDEN) {
+				window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			} else {
 				window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 					window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 					int flagSystemUI = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-					if (style == 1) {
+					if (style == STATUS_BAR_STYLE_DARK) {
 						flagSystemUI |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
 					}
 					window.getDecorView().setSystemUiVisibility(flagSystemUI);
@@ -246,8 +252,6 @@ public class Util {
 						window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 					}
 				}
-			} else {
-				window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
