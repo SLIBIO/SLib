@@ -1455,14 +1455,14 @@ namespace slib
 			output.add(boundary);
 			output.addStatic("\r\n", 2);
 			{
-				const char s[] = "Content-Disposition: form-data; name=\"";
+				static const char s[] = "Content-Disposition: form-data; name=\"";
 				output.addStatic(s, sizeof(s)-1);
 			}
 			output.addStatic(name.getData(), name.getLength());
 			if (fileName.isNotNull()) {
-				const char s[] = "; filename=\"";
+				static const char s[] = "; filename=\"";
 				output.addStatic(s, sizeof(s)-1);
-				output.addStatic(fileName.getData(), fileName.getLength());
+				output.add(Memory::create(fileName.getData(), fileName.getLength()));
 				output.addStatic("\"\r\n", 3);
 			} else {
 				output.addStatic("\"\r\n", 3);
