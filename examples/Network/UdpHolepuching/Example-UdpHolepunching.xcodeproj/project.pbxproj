@@ -106,6 +106,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 26FADD5B215932390057F7EA;
 			productRefGroup = 26FADD65215932390057F7EA /* Products */;
@@ -244,9 +245,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)";
-				OTHER_LDFLAGS = (
-					"-lslib",
-				);
+				OTHER_LDFLAGS = "-lslib";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -257,9 +256,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)";
-				OTHER_LDFLAGS = (
-					"-lslib",
-				);
+				OTHER_LDFLAGS = "-lslib";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
