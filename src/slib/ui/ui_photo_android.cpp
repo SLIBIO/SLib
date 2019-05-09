@@ -28,6 +28,7 @@
 
 #include "slib/ui/core.h"
 #include "slib/ui/platform.h"
+#include "slib/device/device.h"
 
 #include "slib/core/file.h"
 #include "slib/core/safe_static.h"
@@ -184,24 +185,30 @@ namespace slib
 
 	void PhotoKit::saveImage(const PhotoKit::SaveImageParam& param)
 	{
-		Memory content;
-		if (param.image.isNotNull()) {
-			Ref<Image> image = param.image->toImage();
-			if (image.isNotNull()) {
-				content = image->saveJPEG();
+		Device::grantPermissions(DevicePermissions::WriteExternalStorage, [param]() {
+			if (Device::checkPermissions(DevicePermissions::WriteExternalStorage)) {
+				Memory content;
+				if (param.image.isNotNull()) {
+					Ref<Image> image = param.image->toImage();
+					if (image.isNotNull()) {
+						content = image->saveJPEG();
+					}
+				} else if (param.content.isNotNull()) {
+					content = param.content;
+				}
+				if (content.isNotNull()) {
+					String path = JUtil::getPicturesDirectory.callString(sl_null) + "/" + Time::now().format("%04y-%02m-%02d_%02H%02M%02S.jpg");
+					sl_size nWritten = File::writeAllBytes(path, content);
+					if (nWritten == content.getSize()) {
+						param.onComplete(path);
+						return;
+					}
+				}
+				param.onComplete(sl_null);
+			} else {
+				param.onComplete(sl_null);
 			}
-		} else if (param.content.isNotNull()) {
-			content = param.content;
-		}
-		if (content.isNotNull()) {
-			String path = JUtil::getPicturesDirectory.callString(sl_null) + "/" + Time::now().format("%04y-%02m-%02d_%02H%02M%02S.jpg");
-			sl_size nWritten = File::writeAllBytes(path, content);
-			if (nWritten == content.getSize()) {
-				param.onComplete(path);
-				return;
-			}
-		}
-		param.onComplete(sl_null);
+		});
 	}
 
 }
