@@ -33,6 +33,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -327,6 +328,9 @@ public class SlibActivity extends Activity {
 	}
 
 	private void processIntent(Intent intent) {
+		if (intent == null) {
+			return;
+		}
 		try {
 			for (IntentListener listener : mListIntentListeners) {
 				try {
@@ -337,6 +341,18 @@ public class SlibActivity extends Activity {
 			}
 		} catch (Exception e) {
 			Logger.exception(e);
+		}
+		String action = intent.getAction();
+		if (action != null) {
+			if (action.equals(Intent.ACTION_VIEW)) {
+				Uri uri = intent.getData();
+				if (uri != null) {
+					String path = uri.toString();
+					if (path != null) {
+						Android.onOpenUrl(this, path);
+					}
+				}
+			}
 		}
 	}
 

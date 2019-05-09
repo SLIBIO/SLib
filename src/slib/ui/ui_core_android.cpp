@@ -86,6 +86,7 @@ namespace slib
 	jboolean _priv_Android_onBack(JNIEnv* env, jobject _this, jobject activity);
 	void _priv_Android_onConfigurationChanged(JNIEnv* env, jobject _this, jobject activity);
 	void _priv_Android_onChangeWindowInsets(JNIEnv* env, jobject _this, jobject activity);
+	void _priv_Android_onOpenUrl(JNIEnv* env, jobject _this, jobject activity, jstring url);
 
 	SLIB_JNI_BEGIN_CLASS(JAndroid, "slib/platform/android/Android")
 		SLIB_JNI_STATIC_METHOD(setKeyboardAdjustMode, "setKeyboardAdjustMode", "(Landroid/app/Activity;I)V");
@@ -97,6 +98,7 @@ namespace slib
 		SLIB_JNI_NATIVE(onBack, "nativeOnBack", "(Landroid/app/Activity;)Z", _priv_Android_onBack);
 		SLIB_JNI_NATIVE(onConfigurationChanged, "nativeOnConfigurationChanged", "(Landroid/app/Activity;)V", _priv_Android_onConfigurationChanged);
 		SLIB_JNI_NATIVE(onChangeWindowInsets, "nativeOnChangeWindowInsets", "(Landroid/app/Activity;)V", _priv_Android_onChangeWindowInsets);
+		SLIB_JNI_NATIVE(onOpenUrl, "nativeOnOpenUrl", "(Landroid/app/Activity;Ljava/lang/String;)V", _priv_Android_onOpenUrl);
 	SLIB_JNI_END_CLASS
 
 	class _priv_Android_Screen : public Screen
@@ -356,6 +358,13 @@ namespace slib
 	{
 		Log("Activity", "onChangeWindowInsets");
 		UIResource::updateDefaultScreenSize();
+	}
+
+	void _priv_Android_onOpenUrl(JNIEnv* env, jobject _this, jobject activity, jstring jurl)
+	{
+		String url = Jni::getString(jurl);
+		Log("Activity", "onOpenUrl: %s", url);
+		MobileApp::dispatchOpenUrlToApp(url);
 	}
 
 }

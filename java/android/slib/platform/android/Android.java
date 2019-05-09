@@ -216,6 +216,10 @@ public class Android {
 		nativeOnChangeWindowInsets(activity);
 	}
 
+	public static void onOpenUrl(Activity activity, String url) {
+		nativeOnOpenUrl(activity, url);
+	}
+
 	private static native void nativeOnCreateActivity(Activity activity);
 	private static native void nativeOnResumeActivity(Activity activity);
 	private static native void nativeOnPauseActivity(Activity activity);
@@ -223,5 +227,6 @@ public class Android {
 	private static native boolean nativeOnBack(Activity activity);
 	private static native void nativeOnConfigurationChanged(Activity activity);
 	private static native void nativeOnChangeWindowInsets(Activity activity);
+	private static native void nativeOnOpenUrl(Activity activity, String url);
 
 }
