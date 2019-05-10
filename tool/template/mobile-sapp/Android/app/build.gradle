@@ -10,7 +10,6 @@ project.afterEvaluate {
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "SLIB_TEMPLATE_APP_ID"
         minSdkVersion 15
