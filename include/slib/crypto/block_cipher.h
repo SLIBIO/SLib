@@ -118,6 +118,30 @@ namespace slib
 	class SLIB_EXPORT BlockCipher
 	{
 	public:
+		void encryptBlocks(const void* _src, void* _dst, sl_size size) const
+		{
+			const sl_uint8* src = (const sl_uint8*)_src;
+			sl_uint8* dst = (sl_uint8*)_dst;
+			sl_size nBlocks = size / CLASS::BlockSize;
+			for (sl_size i = 0; i < nBlocks; i++) {
+				((CLASS*)this)->encryptBlock(src, dst);
+				src += CLASS::BlockSize;
+				dst += CLASS::BlockSize;
+			}
+		}
+		
+		void decryptBlocks(const void* _src, void* _dst, sl_size size) const
+		{
+			const sl_uint8* src = (const sl_uint8*)_src;
+			sl_uint8* dst = (sl_uint8*)_dst;
+			sl_size nBlocks = size / CLASS::BlockSize;
+			for (sl_size i = 0; i < nBlocks; i++) {
+				((CLASS*)this)->decryptBlock(src, dst);
+				src += CLASS::BlockSize;
+				dst += CLASS::BlockSize;
+			}
+		}
+		
 		sl_size encrypt_ECB_PKCS7Padding(const void* src, sl_size size, void* dst) const
 		{
 			return BlockCipher_ECB<CLASS, BlockCipherPadding_PKCS7>::encrypt((CLASS*)this, src, size, dst);
