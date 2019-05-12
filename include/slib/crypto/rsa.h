@@ -93,16 +93,28 @@ namespace slib
 		*/
 		static sl_bool encrypt_pkcs1_v15(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate, const void* src, sl_uint32 n, void* dst);
 
+		static Memory encrypt_pkcs1_v15(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate, const void* src, sl_uint32 n);
+		
 		static sl_uint32 decrypt_pkcs1_v15(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate, const void* src, void* dst, sl_uint32 n, sl_bool* pFlagSign = sl_null);
+		
+		static Memory decrypt_pkcs1_v15(const RSAPublicKey* keyPublic, const RSAPrivateKey* keyPrivate, const void* src, sl_bool* pFlagSign = sl_null);
 
 		static sl_bool encryptPublic_pkcs1_v15(const RSAPublicKey& key, const void* input, sl_uint32 sizeInput, void* output);
 
+		static Memory encryptPublic_pkcs1_v15(const RSAPublicKey& key, const void* input, sl_uint32 sizeInput);
+
 		static sl_bool encryptPrivate_pkcs1_v15(const RSAPrivateKey& key, const void* input, sl_uint32 sizeInput, void* output);
+
+		static Memory encryptPrivate_pkcs1_v15(const RSAPrivateKey& key, const void* input, sl_uint32 sizeInput);
 
 		static sl_uint32 decryptPublic_pkcs1_v15(const RSAPublicKey& key, const void* input, void* output, sl_uint32 sizeOutputBuffer, sl_bool* pFlagSign = sl_null);
 
+		static Memory decryptPublic_pkcs1_v15(const RSAPublicKey& key, const void* input, sl_bool* pFlagSign = sl_null);
+
 		static sl_uint32 decryptPrivate_pkcs1_v15(const RSAPrivateKey& key, const void* input, void* output, sl_uint32 sizeOutputBuffer, sl_bool* pFlagSign = sl_null);
 	
+		static Memory decryptPrivate_pkcs1_v15(const RSAPrivateKey& key, const void* input, sl_bool* pFlagSign = sl_null);
+		
 		/*
 			PKCS#1 v2.1 OAEP - Optimal Asymmetric Encryption Padding
 		*/
