@@ -27,7 +27,7 @@
 namespace slib
 {
 	
-	RC4::RC4()
+	RC4::RC4() : m_i(0), m_j(0)
 	{
 	}
 	
@@ -51,6 +51,8 @@ namespace slib
 			j = (sl_uint8)(j + S[i] + key[i % lenKey]);
 			Swap(S[i], S[j]);
 		}
+		m_i = 0;
+		m_j = 0;
 		return sl_true;
 	}
 	
@@ -59,10 +61,11 @@ namespace slib
 		const sl_uint8* src = (const sl_uint8*)_src;
 		sl_uint8* dst = (sl_uint8*)_dst;
 		sl_uint8* S = m_S;
-		sl_uint32 i = 0, j = 0;
+		sl_uint8& i = m_i;
+		sl_uint8& j = m_j;
 		for (sl_size k = 0; k < len; k++) {
-			i = (sl_uint8)(i + 1);
-			j = (sl_uint8)(j + S[i]);
+			i = i + 1;
+			j = j + S[i];
 			Swap(S[i], S[j]);
 			sl_uint8 K = S[(sl_uint8)(S[i] + S[j])];
 			dst[k] = src[k] ^ K;

@@ -32,8 +32,8 @@
  https://en.wikipedia.org/wiki/RC4
  
  Stream Cipher
- 	Key Size: 40–2048 bits
- 	State Size: 2064 bits
+ 	Key Size: 40–2048 bits (5-256 bytes)
+ 	State Size: 2064 bits (258 bytes)
 */
 
 namespace slib
@@ -55,6 +55,8 @@ namespace slib
 
 	private:
 		sl_uint8 m_S[256];
+		sl_uint8 m_i;
+		sl_uint8 m_j;
 
 	};
 
