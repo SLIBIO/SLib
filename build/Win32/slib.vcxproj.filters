@@ -1226,5 +1226,8 @@
     <ClCompile Include="..\..\src\slib\crypto\rc4.cpp">
       <Filter>src\crypto</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\crypto\chacha.cpp">
+      <Filter>src\crypto</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -679,6 +679,7 @@
 		269E31AB2255F4F2005CD0ED /* paypal_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31AA2255F4F2005CD0ED /* paypal_ui.cpp */; };
 		26A39D8C20EFE16D004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8B20EFE16D004707C9 /* calculator.cpp */; };
 		26A3DA8C228A03440031CBDA /* rc4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA8B228A03430031CBDA /* rc4.cpp */; };
+		26A3DA90228AAE4D0031CBDA /* chacha.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA8F228AAE4D0031CBDA /* chacha.cpp */; };
 		26ACB3B9220978310093FF3F /* facebook.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3B8220978310093FF3F /* facebook.cpp */; };
 		26ACB3F4220984FF0093FF3F /* ui_core_badge_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3F3220984FF0093FF3F /* ui_core_badge_ios.mm */; };
 		26ACB3F6220985EE0093FF3F /* device_audio_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3F5220985EE0093FF3F /* device_audio_ios.mm */; };
@@ -2171,6 +2172,7 @@
 		269E31AA2255F4F2005CD0ED /* paypal_ui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = paypal_ui.cpp; sourceTree = "<group>"; };
 		26A39D8B20EFE16D004707C9 /* calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = calculator.cpp; sourceTree = "<group>"; };
 		26A3DA8B228A03430031CBDA /* rc4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rc4.cpp; sourceTree = "<group>"; };
+		26A3DA8F228AAE4D0031CBDA /* chacha.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chacha.cpp; sourceTree = "<group>"; };
 		26A9B7611C172BCC004C9B0E /* camera_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_view.cpp; sourceTree = "<group>"; };
 		26A9B7631C172BDE004C9B0E /* video_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_view.cpp; sourceTree = "<group>"; };
 		26ACB3B8220978310093FF3F /* facebook.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = facebook.cpp; sourceTree = "<group>"; };
@@ -4020,6 +4022,7 @@
 				2628EADF21C410C000D8CD00 /* base64.cpp */,
 				26B571501C9D442D0099E69B /* block_cipher.cpp */,
 				268A13031E7B16340048F2CE /* blowfish.cpp */,
+				26A3DA8F228AAE4D0031CBDA /* chacha.cpp */,
 				266DD46B1C11934A00D47AB0 /* compress_zlib.cpp */,
 				26B92D4F21D357AD003F6F82 /* des.cpp */,
 				266DD37A1C117A3100D47AB0 /* gcm.cpp */,
@@ -5451,6 +5454,7 @@
 				26D9D8461E9628E0005F7BD3 /* locale.cpp in Sources */,
 				26C795CA2215FC7C0053C5A1 /* menus.cpp in Sources */,
 				2698A54C226A1C4C00662528 /* refresh_view_ios.mm in Sources */,
+				26A3DA90228AAE4D0031CBDA /* chacha.cpp in Sources */,
 				26CF4DF21ED69AD600954B7A /* ui_text_ios.mm in Sources */,
 				26D9D8471E9628E0005F7BD3 /* compress_zlib.cpp in Sources */,
 				26D9D8481E9628E0005F7BD3 /* rsa.cpp in Sources */,
