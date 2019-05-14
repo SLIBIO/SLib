@@ -30,6 +30,8 @@
  
 #include "slib/crypto/chacha.h"
 
+#include "slib/core/mio.h"
+
 namespace slib
 {
 	
@@ -51,17 +53,17 @@ namespace slib
 		namespace chacha
 		{
 			
-			static void salsa20_wordtobyte(sl_uint8 output[64], const sl_uint32 input[12], sl_uint32 counter0, sl_uint32 counter1, sl_uint32 iv0, sl_uint32 iv1)
+			static void salsa20_wordtobyte(sl_uint8 output[64], const sl_uint32 input[12], sl_uint32 nonce0, sl_uint32 nonce1, sl_uint32 nonce2, sl_uint32 nonce3)
 			{
 				sl_uint32 x[16];
 				sl_uint32 i;
 				for (i = 0; i < 12; i++) {
 					x[i] = input[i];
 				}
-				x[12] = counter0;
-				x[13] = counter1;
-				x[14] = iv0;
-				x[15] = iv1;
+				x[12] = nonce0;
+				x[13] = nonce1;
+				x[14] = nonce2;
+				x[15] = nonce3;
 				for (i = ROUNDS; i > 0; i -= 2) {
 					QUARTERROUND(0, 4, 8, 12)
 					QUARTERROUND(1, 5, 9, 13)
@@ -83,17 +85,17 @@ namespace slib
 				}
 			}
 			
-			static void salsa20_wordtobyte(const sl_uint8 data[64], sl_uint8 output[64], const sl_uint32 input[12], sl_uint64 counter, sl_uint32 iv0, sl_uint32 iv1)
+			static void salsa20_wordtobyte(const sl_uint8 data[64], sl_uint8 output[64], const sl_uint32 input[12], sl_uint32 nonce0, sl_uint32 nonce1, sl_uint32 nonce2, sl_uint32 nonce3)
 			{
 				sl_uint32 x[16];
 				sl_uint32 i;
 				for (i = 0; i < 12; i++) {
 					x[i] = input[i];
 				}
-				x[12] = (sl_uint32)counter;
-				x[13] = (sl_uint32)(counter >> 32);
-				x[14] = iv0;
-				x[15] = iv1;
+				x[12] = nonce0;
+				x[13] = nonce1;
+				x[14] = nonce2;
+				x[15] = nonce3;
 				for (i = ROUNDS; i > 0; i -= 2) {
 					QUARTERROUND(0, 4, 8, 12)
 					QUARTERROUND(1, 5, 9, 13)
@@ -158,19 +160,19 @@ namespace slib
 		return sl_true;
 	}
 	
-	void ChaCha20_Core::generateBlock(sl_uint64 counter, sl_uint32 iv0, sl_uint32 iv1, void* output) const
+	void ChaCha20_Core::generateBlock(sl_uint32 nonce0, sl_uint32 nonce1, sl_uint32 nonce2, sl_uint32 nonce3, void* output) const
 	{
-		priv::chacha::salsa20_wordtobyte((sl_uint8*)output, m_input, (sl_uint32)counter, (sl_uint32)(counter >> 32), iv0, iv1);
+		priv::chacha::salsa20_wordtobyte((sl_uint8*)output, m_input, nonce0, nonce1, nonce2, nonce3);
 	}
 	
-	void ChaCha20_Core::encryptBlock(sl_uint64 counter, sl_uint32 iv0, sl_uint32 iv1, const void* input, void* output) const
+	void ChaCha20_Core::encryptBlock(sl_uint32 nonce0, sl_uint32 nonce1, sl_uint32 nonce2, sl_uint32 nonce3, const void* input, void* output) const
 	{
-		priv::chacha::salsa20_wordtobyte((const sl_uint8*)input, (sl_uint8*)output, m_input, counter, iv0, iv1);
+		priv::chacha::salsa20_wordtobyte((const sl_uint8*)input, (sl_uint8*)output, m_input, nonce0, nonce1, nonce2, nonce3);
 	}
 	
-	void ChaCha20_Core::decryptBlock(sl_uint64 counter, sl_uint32 iv0, sl_uint32 iv1, const void* input, void* output) const
+	void ChaCha20_Core::decryptBlock(sl_uint32 nonce0, sl_uint32 nonce1, sl_uint32 nonce2, sl_uint32 nonce3, const void* input, void* output) const
 	{
-		encryptBlock(counter, iv0, iv1, input, output);
+		priv::chacha::salsa20_wordtobyte((const sl_uint8*)input, (sl_uint8*)output, m_input, nonce0, nonce1, nonce2, nonce3);
 	}
 	
 	
@@ -182,23 +184,44 @@ namespace slib
 	{
 	}
 	
+	void ChaCha20::start(sl_uint32 nonce0, sl_uint32 nonce1, sl_uint32 nonce2, sl_uint32 nonce3)
+	{
+		m_nonce[0] = nonce0;
+		m_nonce[1] = nonce1;
+		m_nonce[2] = nonce2;
+		m_nonce[3] = nonce3;
+		m_pos = 0;
+		m_flagCounter32 = sl_false;
+	}
+	
 	void ChaCha20::start(const void* _iv, sl_uint64 counter)
 	{
 		const sl_uint8* iv = (const sl_uint8*)_iv;
-		m_iv[0] = U8TO32_LITTLE(iv[0], iv[1], iv[2], iv[3]);
-		m_iv[1] = U8TO32_LITTLE(iv[4], iv[5], iv[6], iv[7]);
-		m_counter = counter;
+		m_nonce[0] = (sl_uint32)counter;
+		m_nonce[1] = (sl_uint32)(counter >> 32);
+		m_nonce[2] = U8TO32_LITTLE(iv[0], iv[1], iv[2], iv[3]);
+		m_nonce[3] = U8TO32_LITTLE(iv[4], iv[5], iv[6], iv[7]);
 		m_pos = 0;
 		m_flagCounter32 = sl_false;
+	}
+	
+	void ChaCha20::start32(sl_uint32 nonce0, sl_uint32 nonce1, sl_uint32 nonce2, sl_uint32 nonce3)
+	{
+		m_nonce[0] = nonce0;
+		m_nonce[1] = nonce1;
+		m_nonce[2] = nonce2;
+		m_nonce[3] = nonce3;
+		m_pos = 0;
+		m_flagCounter32 = sl_true;
 	}
 	
 	void ChaCha20::start32(const void* _iv, sl_uint32 counter)
 	{
 		const sl_uint8* iv = (const sl_uint8*)_iv;
-		m_iv[0] = U8TO32_LITTLE(iv[0], iv[1], iv[2], iv[3]);
-		m_iv[1] = U8TO32_LITTLE(iv[4], iv[5], iv[6], iv[7]);
-		m_iv[2] = U8TO32_LITTLE(iv[8], iv[9], iv[10], iv[11]);
-		m_counter32 = counter;
+		m_nonce[0] = counter;
+		m_nonce[1] = U8TO32_LITTLE(iv[0], iv[1], iv[2], iv[3]);
+		m_nonce[2] = U8TO32_LITTLE(iv[4], iv[5], iv[6], iv[7]);
+		m_nonce[3] = U8TO32_LITTLE(iv[8], iv[9], iv[10], iv[11]);
 		m_pos = 0;
 		m_flagCounter32 = sl_true;
 	}
@@ -211,12 +234,12 @@ namespace slib
 		sl_uint32 pos = m_pos;
 		for (sl_size k = 0; k < len; k++) {
 			if (!pos) {
-				if (m_flagCounter32) {
-					priv::chacha::salsa20_wordtobyte(y, m_input, m_counter32, m_iv[0], m_iv[1], m_iv[2]);
-					m_counter32++;
-				} else {
-					priv::chacha::salsa20_wordtobyte(y, m_input, (sl_uint32)m_counter, (sl_uint32)(m_counter >> 32), m_iv[0], m_iv[1]);
-					m_counter++;
+				priv::chacha::salsa20_wordtobyte(y, m_input, m_nonce[0], m_nonce[1], m_nonce[2], m_nonce[3]);
+				m_nonce[0]++;
+				if (!m_flagCounter32) {
+					if (!m_nonce[0]) {
+						m_nonce[1]++;
+					}
 				}
 			}
 			dst[k] = src[k] ^ y[pos];
@@ -238,6 +261,133 @@ namespace slib
 	void ChaCha20::set32BitCounter(sl_bool flag)
 	{
 		m_flagCounter32 = flag;
+	}
+	
+	
+	ChaCha20_Poly1305::ChaCha20_Poly1305()
+	{
+	}
+	
+	ChaCha20_Poly1305::~ChaCha20_Poly1305()
+	{
+	}
+	
+	void ChaCha20_Poly1305::setKey(const void* key)
+	{
+		m_cipher.setKey(key, 32);
+	}
+	
+	void ChaCha20_Poly1305::start(sl_uint32 senderId, const void* _iv)
+	{
+		const sl_uint8* iv = (const sl_uint8*)_iv;
+		sl_uint32 n0 = U8TO32_LITTLE(iv[0], iv[1], iv[2], iv[3]);
+		sl_uint32 n1 = U8TO32_LITTLE(iv[4], iv[5], iv[6], iv[7]);
+		m_cipher.start32(1, senderId, n0, n1);
+		sl_uint8 block0[64];
+		m_cipher.generateBlock(0, senderId, n0, n1, block0);
+		m_auth.start(block0); // use first 32 bytes
+		m_lenAAD = 0;
+		m_lenInput = 0;
+	}
+	
+	void ChaCha20_Poly1305::putAAD(const void* data, sl_size len)
+	{
+		m_auth.update(data, len);
+		m_lenAAD += len;
+	}
+	
+	void ChaCha20_Poly1305::finishAAD()
+	{
+		sl_uint32 n = (sl_uint32)(m_lenAAD & 15);
+		if (n) {
+			static const sl_uint8 zeros[16] = {0};
+			m_auth.update(zeros, 16 - n);
+		}
+	}
+
+	void ChaCha20_Poly1305::encrypt(const void* src, void* dst, sl_size len)
+	{
+		m_cipher.encrypt(src, dst, len);
+		m_auth.update(dst, len);
+		m_lenInput += len;
+	}
+	
+	void ChaCha20_Poly1305::decrypt(const void* src, void* dst, sl_size len)
+	{
+		m_auth.update(src, len);
+		m_cipher.encrypt(src, dst, len);
+		m_lenInput += len;
+	}
+	
+	void ChaCha20_Poly1305::check(const void* src, sl_size len)
+	{
+		m_auth.update(src, len);
+		m_lenInput += len;
+	}
+	
+	void ChaCha20_Poly1305::finish(void* outputTag)
+	{
+		sl_uint32 n = (sl_uint32)(m_lenInput & 15);
+		if (n) {
+			static const sl_uint8 zeros[16] = {0};
+			m_auth.update(zeros, 16 - n);
+		}
+		sl_uint8 len[16];
+		MIO::writeUint64LE(len, m_lenAAD);
+		MIO::writeUint64LE(len + 8, m_lenInput);
+		m_auth.update(len, 16);
+		m_auth.finish(outputTag);
+	}
+	
+	sl_bool ChaCha20_Poly1305::finishAndCheckTag(const void* _tag)
+	{
+		const sl_uint8* tag = (const sl_uint8*)_tag;
+		sl_uint8 outputTag[16];
+		finish(outputTag);
+		sl_uint32 n = 0;
+		for (sl_uint32 i = 0; i < 16; i++) {
+			n |= (outputTag[i] ^ tag[i]);
+		}
+		return n == 0;
+	}
+	
+	void ChaCha20_Poly1305::encrypt(sl_uint32 senderId, const void* iv, const void* AAD, sl_size lenAAD, const void* src, void* dst, sl_size len, void* outputTag)
+	{
+		start(senderId, iv);
+		if (lenAAD) {
+			putAAD(AAD, lenAAD);
+			finishAAD();
+		}
+		if (len) {
+			encrypt(src, dst, len);
+		}
+		finish(outputTag);
+	}
+	
+	sl_bool ChaCha20_Poly1305::decrypt(sl_uint32 senderId, const void* iv, const void* AAD, sl_size lenAAD, const void* src, void* dst, sl_size len, const void* tag)
+	{
+		start(senderId, iv);
+		if (lenAAD) {
+			putAAD(AAD, lenAAD);
+			finishAAD();
+		}
+		if (len) {
+			decrypt(src, dst, len);
+		}
+		return finishAndCheckTag(tag);
+	}
+
+	sl_bool ChaCha20_Poly1305::check(sl_uint32 senderId, const void* iv, const void* AAD, sl_size lenAAD, const void* src, sl_size len, const void* tag)
+	{
+		start(senderId, iv);
+		if (lenAAD) {
+			putAAD(AAD, lenAAD);
+			finishAAD();
+		}
+		if (len) {
+			check(src, len);
+		}
+		return finishAndCheckTag(tag);
 	}
 	
 }

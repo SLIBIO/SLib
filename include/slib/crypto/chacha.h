@@ -25,6 +25,8 @@
 
 #include "definition.h"
 
+#include "poly1305.h"
+
 /*
 	ChaCha20
 
@@ -50,13 +52,13 @@ namespace slib
 		sl_bool setKey(const void* key, sl_uint32 lenKey);
 		
 		// output: 64 bytes
-		void generateBlock(sl_uint64 counter, sl_uint32 iv0, sl_uint32 iv1, void* output) const;
+		void generateBlock(sl_uint32 nonce0, sl_uint32 nonce1, sl_uint32 nonce2, sl_uint32 nonce3, void* output) const;
 		
 		// input, output: 64 bytes
-		void encryptBlock(sl_uint64 counter, sl_uint32 iv0, sl_uint32 iv1, const void* input, void* output) const;
+		void encryptBlock(sl_uint32 nonce0, sl_uint32 nonce1, sl_uint32 nonce2, sl_uint32 nonce3, const void* input, void* output) const;
 		
 		// input, output: 64 bytes
-		void decryptBlock(sl_uint64 counter, sl_uint32 iv0, sl_uint32 iv1, const void* input, void* output) const;
+		void decryptBlock(sl_uint32 nonce0, sl_uint32 nonce1, sl_uint32 nonce2, sl_uint32 nonce3, const void* input, void* output) const;
 
 	protected:
 		sl_uint32 m_input[12];
@@ -71,9 +73,13 @@ namespace slib
 		~ChaCha20();
 		
 	public:
+		void start(sl_uint32 nonce0, sl_uint32 nonce1, sl_uint32 nonce2, sl_uint32 nonce3);
+		
 		// IV: 8 bytes
 		void start(const void* IV, sl_uint64 counter = 0);
 		
+		void start32(sl_uint32 nonce0, sl_uint32 nonce1, sl_uint32 nonce2, sl_uint32 nonce3);
+
 		// IV: 12 bytes
 		void start32(const void* IV, sl_uint32 counter = 0);
 		
@@ -86,14 +92,69 @@ namespace slib
 		void set32BitCounter(sl_bool flag = sl_true);
 
 	private:
-		union {
-			sl_uint64 m_counter;
-			sl_uint32 m_counter32;
-		};
-		sl_uint32 m_iv[3];
+		sl_uint32 m_nonce[4];
 		sl_uint8 m_output[64];
 		sl_uint32 m_pos;
 		sl_bool m_flagCounter32;
+		
+	};
+	
+	/*
+	 	https://tools.ietf.org/html/rfc8439
+	*/
+	
+	class SLIB_EXPORT ChaCha20_Poly1305
+	{
+	public:
+		ChaCha20_Poly1305();
+		
+		~ChaCha20_Poly1305();
+		
+	public:
+		// key: 32 bytes (256 bits)
+		void setKey(const void* key);
+
+		// IV: 8 bytes (64 bits)
+		void start(sl_uint32 senderId, const void* IV);
+		
+		// put on AAD (additional authenticated data)
+		void putAAD(const void* data, sl_size len);
+		
+		void finishAAD();
+		
+		void encrypt(const void* src, void* dst, sl_size len);
+		
+		void decrypt(const void* src, void* dst, sl_size len);
+		
+#ifdef check
+#undef check
+#endif
+		// src: cipher text
+		void check(const void* src, sl_size len);
+		
+		// outputTag: 16 bytes (128 bits)
+		void finish(void* outputTag);
+		
+		// tag: 16 bytes (128 bits)
+		sl_bool finishAndCheckTag(const void* tag);
+
+		// IV: 8 bytes (64 bits)
+		// outputTag: 16 bytes (128 bits)
+		void encrypt(sl_uint32 senderId, const void* IV, const void* AAD, sl_size lenAAD, const void* src, void* dst, sl_size len, void* outputTag);
+		
+		// IV: 8 bytes (64 bits)
+		// tag: 16 bytes (128 bits)
+		sl_bool decrypt(sl_uint32 senderId, const void* IV, const void* AAD, sl_size lenAAD, const void* src, void* dst, sl_size len, const void* tag);
+		
+		// IV: 8 bytes (64 bits)
+		// tag: 16 bytes (128 bits)
+		sl_bool check(sl_uint32 senderId, const void* IV, const void* AAD, sl_size lenAAD, const void* src, sl_size len, const void* tag);
+		
+	private:
+		ChaCha20 m_cipher;
+		Poly1305 m_auth;
+		sl_size m_lenAAD;
+		sl_size m_lenInput;
 		
 	};
 
