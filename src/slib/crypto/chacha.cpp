@@ -53,15 +53,15 @@ namespace slib
 		namespace chacha
 		{
 			
-			static void salsa20_wordtobyte(sl_uint8 output[64], const sl_uint32 input[12], sl_uint64 counter, sl_uint32 iv0, sl_uint32 iv1)
+			static void salsa20_wordtobyte(sl_uint8 output[64], const sl_uint32 input[12], sl_uint32 counter0, sl_uint32 counter1, sl_uint32 iv0, sl_uint32 iv1)
 			{
 				sl_uint32 x[16];
 				sl_uint32 i;
 				for (i = 0; i < 12; i++) {
 					x[i] = input[i];
 				}
-				x[12] = (sl_uint32)counter;
-				x[13] = (sl_uint32)(counter >> 32);
+				x[12] = counter0;
+				x[13] = counter1;
 				x[14] = iv0;
 				x[15] = iv1;
 				for (i = ROUNDS; i > 0; i -= 2) {
@@ -162,7 +162,7 @@ namespace slib
 	
 	void ChaCha20_Core::generateBlock(sl_uint64 counter, sl_uint32 iv0, sl_uint32 iv1, void* output) const
 	{
-		priv::chacha::salsa20_wordtobyte((sl_uint8*)output, m_input, counter, iv0, iv1);
+		priv::chacha::salsa20_wordtobyte((sl_uint8*)output, m_input, (sl_uint32)counter, (sl_uint32)(counter >> 32), iv0, iv1);
 	}
 	
 	void ChaCha20_Core::encryptBlock(sl_uint64 counter, sl_uint32 iv0, sl_uint32 iv1, const void* input, void* output) const
@@ -191,6 +191,18 @@ namespace slib
 		m_iv[1] = U8TO32_LITTLE(iv[4], iv[5], iv[6], iv[7]);
 		m_counter = counter;
 		m_pos = 0;
+		m_flagCounter32 = sl_false;
+	}
+	
+	void ChaCha20::start32(const void* _iv, sl_uint32 counter)
+	{
+		const sl_uint8* iv = (const sl_uint8*)_iv;
+		m_iv[0] = U8TO32_LITTLE(iv[0], iv[1], iv[2], iv[3]);
+		m_iv[1] = U8TO32_LITTLE(iv[4], iv[5], iv[6], iv[7]);
+		m_iv[2] = U8TO32_LITTLE(iv[8], iv[9], iv[10], iv[11]);
+		m_counter32 = counter;
+		m_pos = 0;
+		m_flagCounter32 = sl_true;
 	}
 	
 	void ChaCha20::encrypt(const void* _src, void* _dst, sl_size len)
@@ -201,10 +213,11 @@ namespace slib
 		sl_uint32 pos = m_pos;
 		for (sl_size k = 0; k < len; k++) {
 			if (!pos) {
-				priv::chacha::salsa20_wordtobyte(y, m_input, m_counter, m_iv[0], m_iv[1]);
 				if (m_flagCounter32) {
+					priv::chacha::salsa20_wordtobyte(y, m_input, m_counter32, m_iv[0], m_iv[1], m_iv[2]);
 					m_counter32++;
 				} else {
+					priv::chacha::salsa20_wordtobyte(y, m_input, (sl_uint32)m_counter, (sl_uint32)(m_counter >> 32), m_iv[0], m_iv[1]);
 					m_counter++;
 				}
 			}

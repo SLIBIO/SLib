@@ -74,6 +74,9 @@ namespace slib
 		// IV: 8 bytes
 		void start(const void* IV, sl_uint64 counter = 0);
 		
+		// IV: 12 bytes
+		void start32(const void* IV, sl_uint32 counter = 0);
+		
 		void encrypt(const void* src, void* dst, sl_size len);
 		
 		void decrypt(const void* src, void* dst, sl_size len);
@@ -87,7 +90,7 @@ namespace slib
 			sl_uint64 m_counter;
 			sl_uint32 m_counter32;
 		};
-		sl_uint32 m_iv[2];
+		sl_uint32 m_iv[3];
 		sl_uint8 m_output[64];
 		sl_uint32 m_pos;
 		sl_bool m_flagCounter32;
