@@ -30,8 +30,6 @@
  
 #include "slib/crypto/chacha.h"
 
-#include "slib/core/macro.h"
-
 namespace slib
 {
 	
