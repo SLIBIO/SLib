@@ -680,6 +680,7 @@
 		26A39D8C20EFE16D004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8B20EFE16D004707C9 /* calculator.cpp */; };
 		26A3DA8C228A03440031CBDA /* rc4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA8B228A03430031CBDA /* rc4.cpp */; };
 		26A3DA90228AAE4D0031CBDA /* chacha.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA8F228AAE4D0031CBDA /* chacha.cpp */; };
+		26A3DA94228B43EA0031CBDA /* poly1305.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA93228B43EA0031CBDA /* poly1305.cpp */; };
 		26ACB3B9220978310093FF3F /* facebook.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3B8220978310093FF3F /* facebook.cpp */; };
 		26ACB3F4220984FF0093FF3F /* ui_core_badge_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3F3220984FF0093FF3F /* ui_core_badge_ios.mm */; };
 		26ACB3F6220985EE0093FF3F /* device_audio_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3F5220985EE0093FF3F /* device_audio_ios.mm */; };
@@ -2173,6 +2174,7 @@
 		26A39D8B20EFE16D004707C9 /* calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = calculator.cpp; sourceTree = "<group>"; };
 		26A3DA8B228A03430031CBDA /* rc4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rc4.cpp; sourceTree = "<group>"; };
 		26A3DA8F228AAE4D0031CBDA /* chacha.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chacha.cpp; sourceTree = "<group>"; };
+		26A3DA93228B43EA0031CBDA /* poly1305.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = poly1305.cpp; sourceTree = "<group>"; };
 		26A9B7611C172BCC004C9B0E /* camera_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_view.cpp; sourceTree = "<group>"; };
 		26A9B7631C172BDE004C9B0E /* video_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_view.cpp; sourceTree = "<group>"; };
 		26ACB3B8220978310093FF3F /* facebook.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = facebook.cpp; sourceTree = "<group>"; };
@@ -4029,6 +4031,7 @@
 				2628EAE221C410CF00D8CD00 /* jwt.cpp */,
 				266DD37B1C117A3100D47AB0 /* md5.cpp */,
 				26BAE02E2223CEB80085B5AB /* openssl.cpp */,
+				26A3DA93228B43EA0031CBDA /* poly1305.cpp */,
 				26A3DA8B228A03430031CBDA /* rc4.cpp */,
 				266DD37C1C117A3100D47AB0 /* rsa.cpp */,
 				266DD37E1C117A3100D47AB0 /* sha1.cpp */,
@@ -5134,6 +5137,7 @@
 				26D9D8991E962962005F7BD3 /* ip_address.cpp in Sources */,
 				26D9D8651E96294F005F7BD3 /* brush.cpp in Sources */,
 				26E1B8F0222ABCDD007C222E /* jfdctflt.c in Sources */,
+				26A3DA94228B43EA0031CBDA /* poly1305.cpp in Sources */,
 				26E1B8E0222ABCDD007C222E /* jdarith.c in Sources */,
 				26CF4DF01ED69AD000954B7A /* ui_text.cpp in Sources */,
 				26E1B8F1222ABCDD007C222E /* jfdctfst.c in Sources */,

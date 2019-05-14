@@ -182,6 +182,7 @@
     <ClCompile Include="..\..\src\slib\crypto\jwt.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\md5.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\openssl.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\poly1305.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\rc4.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\rsa.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\sha1.cpp" />

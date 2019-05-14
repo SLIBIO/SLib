@@ -853,6 +853,7 @@
 		26A39D8920EFBCBB004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8820EFBCBB004707C9 /* calculator.cpp */; };
 		26A3DA8A2289ED9C0031CBDA /* rc4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA892289ED9B0031CBDA /* rc4.cpp */; };
 		26A3DA8E228A08D40031CBDA /* chacha.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA8D228A08D40031CBDA /* chacha.cpp */; };
+		26A3DA92228AFDDE0031CBDA /* poly1305.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA91228AFDDE0031CBDA /* poly1305.cpp */; };
 		26ACB3F82209872C0093FF3F /* device_id_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3F72209872B0093FF3F /* device_id_macos.mm */; };
 		26B92D4921D33E6E003F6F82 /* des.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D4821D33E6E003F6F82 /* des.cpp */; };
 		26B92D4E21D34698003F6F82 /* ginger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D4D21D34698003F6F82 /* ginger.cpp */; };
@@ -2371,6 +2372,7 @@
 		26A39D8820EFBCBB004707C9 /* calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = calculator.cpp; sourceTree = "<group>"; };
 		26A3DA892289ED9B0031CBDA /* rc4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rc4.cpp; sourceTree = "<group>"; };
 		26A3DA8D228A08D40031CBDA /* chacha.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chacha.cpp; sourceTree = "<group>"; };
+		26A3DA91228AFDDE0031CBDA /* poly1305.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = poly1305.cpp; sourceTree = "<group>"; };
 		26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tree_view.cpp; sourceTree = "<group>"; };
 		26ACB3F72209872B0093FF3F /* device_id_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = device_id_macos.mm; sourceTree = "<group>"; };
 		26AE7BEF1C98F8CB0026C2D9 /* line_segment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = line_segment.cpp; sourceTree = "<group>"; };
@@ -4628,6 +4630,7 @@
 				2628EAE821C410ED00D8CD00 /* jwt.cpp */,
 				266DD45D1C11930800D47AB0 /* md5.cpp */,
 				26BAE0302223CEC60085B5AB /* openssl.cpp */,
+				26A3DA91228AFDDE0031CBDA /* poly1305.cpp */,
 				26A3DA892289ED9B0031CBDA /* rc4.cpp */,
 				266DD45E1C11930800D47AB0 /* rsa.cpp */,
 				266DD45F1C11930800D47AB0 /* sha1.cpp */,
@@ -6053,6 +6056,7 @@
 				26D9D9D81E96468D005F7BD3 /* tab_view_macos.mm in Sources */,
 				26E1B87D222ABAB2007C222E /* jaricom.c in Sources */,
 				26BAE04322267D060085B5AB /* tls.cpp in Sources */,
+				26A3DA92228AFDDE0031CBDA /* poly1305.cpp in Sources */,
 				26D9D9621E964669005F7BD3 /* bitmap_data.cpp in Sources */,
 				26D9D9111E9645CE005F7BD3 /* xml.cpp in Sources */,
 				26BB17D021F4BA690089C7EC /* ui_adapter.cpp in Sources */,
