@@ -126,6 +126,7 @@ set (SLIB_CORE_FILES
  "${SLIB_PATH}/src/slib/crypto/chacha.cpp"
  "${SLIB_PATH}/src/slib/crypto/compress_zlib.cpp"
  "${SLIB_PATH}/src/slib/crypto/des.cpp"
+ "${SLIB_PATH}/src/slib/crypto/ecc.cpp"
  "${SLIB_PATH}/src/slib/crypto/gcm.cpp"
  "${SLIB_PATH}/src/slib/crypto/jwt.cpp"
  "${SLIB_PATH}/src/slib/crypto/md5.cpp"

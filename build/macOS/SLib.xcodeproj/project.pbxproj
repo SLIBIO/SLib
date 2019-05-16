@@ -814,6 +814,8 @@
 		2628F34F21C429FE00D8CD00 /* ZXNumeric.h in Headers */ = {isa = PBXBuildFile; fileRef = 2628F23621C429FD00D8CD00 /* ZXNumeric.h */; };
 		2628F35021C429FE00D8CD00 /* ZXStrConvWorkaround.h in Headers */ = {isa = PBXBuildFile; fileRef = 2628F23721C429FD00D8CD00 /* ZXStrConvWorkaround.h */; };
 		2628F35121C429FE00D8CD00 /* ZXTestSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 2628F23821C429FD00D8CD00 /* ZXTestSupport.h */; };
+		262ED4DF228DD35B0029F409 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262ED4DE228DD35B0029F409 /* main.cpp */; };
+		262ED4E2228DD6ED0029F409 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF11B21AEE6BE004E58CB /* Cocoa.framework */; };
 		263051D1225CA21700A6609E /* pinterest_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263051D0225CA21700A6609E /* pinterest_ui.cpp */; };
 		263916EC21C8F462008B335B /* qr_code_scanner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263916EB21C8F462008B335B /* qr_code_scanner.cpp */; };
 		263918EE21CBA121008B335B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 263918ED21CBA121008B335B /* MainMenu.xib */; };
@@ -854,6 +856,7 @@
 		26A3DA8A2289ED9C0031CBDA /* rc4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA892289ED9B0031CBDA /* rc4.cpp */; };
 		26A3DA8E228A08D40031CBDA /* chacha.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA8D228A08D40031CBDA /* chacha.cpp */; };
 		26A3DA92228AFDDE0031CBDA /* poly1305.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA91228AFDDE0031CBDA /* poly1305.cpp */; };
+		26A3DA96228B698A0031CBDA /* ecc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA95228B69890031CBDA /* ecc.cpp */; };
 		26ACB3F82209872C0093FF3F /* device_id_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3F72209872B0093FF3F /* device_id_macos.mm */; };
 		26B92D4921D33E6E003F6F82 /* des.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D4821D33E6E003F6F82 /* des.cpp */; };
 		26B92D4E21D34698003F6F82 /* ginger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D4D21D34698003F6F82 /* ginger.cpp */; };
@@ -1273,6 +1276,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		262ED4D4228DD3340029F409 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		264AF10E21AED095004E58CB /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2183,6 +2195,10 @@
 		2628F23621C429FD00D8CD00 /* ZXNumeric.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZXNumeric.h; sourceTree = "<group>"; };
 		2628F23721C429FD00D8CD00 /* ZXStrConvWorkaround.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZXStrConvWorkaround.h; sourceTree = "<group>"; };
 		2628F23821C429FD00D8CD00 /* ZXTestSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZXTestSupport.h; sourceTree = "<group>"; };
+		262ED4D6228DD3340029F409 /* GenerateEllipticCurvePow2G */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GenerateEllipticCurvePow2G; sourceTree = BUILT_PRODUCTS_DIR; };
+		262ED4DE228DD35B0029F409 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../tool/src/GenerateEllipticCurvePow2G/main.cpp; sourceTree = "<group>"; };
+		262ED4E0228DD6D70029F409 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		262ED4E8228DDA5D0029F409 /* ecc_secp256k1.inc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = ecc_secp256k1.inc; sourceTree = "<group>"; };
 		263051D0225CA21700A6609E /* pinterest_ui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pinterest_ui.cpp; path = social/pinterest_ui.cpp; sourceTree = "<group>"; };
 		263916EB21C8F462008B335B /* qr_code_scanner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = qr_code_scanner.cpp; sourceTree = "<group>"; };
 		263918D221CB90DD008B335B /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
@@ -2373,6 +2389,7 @@
 		26A3DA892289ED9B0031CBDA /* rc4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rc4.cpp; sourceTree = "<group>"; };
 		26A3DA8D228A08D40031CBDA /* chacha.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chacha.cpp; sourceTree = "<group>"; };
 		26A3DA91228AFDDE0031CBDA /* poly1305.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = poly1305.cpp; sourceTree = "<group>"; };
+		26A3DA95228B69890031CBDA /* ecc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ecc.cpp; sourceTree = "<group>"; };
 		26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tree_view.cpp; sourceTree = "<group>"; };
 		26ACB3F72209872B0093FF3F /* device_id_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = device_id_macos.mm; sourceTree = "<group>"; };
 		26AE7BEF1C98F8CB0026C2D9 /* line_segment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = line_segment.cpp; sourceTree = "<group>"; };
@@ -2549,6 +2566,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		262ED4D3228DD3340029F409 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				262ED4E2228DD6ED0029F409 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		263918D621CBA047008B335B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2680,6 +2705,7 @@
 		2605036A20CEC3C500032B2C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				262ED4E0228DD6D70029F409 /* Foundation.framework */,
 				2682569E21E464630079600F /* IOKit.framework */,
 				263918F421CBA1AF008B335B /* CoreVideo.framework */,
 				263918D221CB90DD008B335B /* CoreMedia.framework */,
@@ -4154,6 +4180,14 @@
 			path = textcodec;
 			sourceTree = "<group>";
 		};
+		262ED4DD228DD34C0029F409 /* GenerateEllipticCurvePow2 */ = {
+			isa = PBXGroup;
+			children = (
+				262ED4DE228DD35B0029F409 /* main.cpp */,
+			);
+			name = GenerateEllipticCurvePow2;
+			sourceTree = "<group>";
+		};
 		2639193021CD23BB008B335B /* hiredis */ = {
 			isa = PBXGroup;
 			children = (
@@ -4172,6 +4206,7 @@
 			children = (
 				264AF14621B05BC9004E58CB /* sapp */,
 				264AF10821AECFA4004E58CB /* AddCopyrightNotice */,
+				262ED4DD228DD34C0029F409 /* GenerateEllipticCurvePow2 */,
 			);
 			name = tool;
 			sourceTree = "<group>";
@@ -4507,6 +4542,7 @@
 				2628EB1921C41FFF00D8CD00 /* libzxing.a */,
 				263918D921CBA047008B335B /* sapp.app */,
 				2639192F21CD2389008B335B /* libhiredis.a */,
+				262ED4D6228DD3340029F409 /* GenerateEllipticCurvePow2G */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -4626,6 +4662,8 @@
 				26A3DA8D228A08D40031CBDA /* chacha.cpp */,
 				266DD4611C11930800D47AB0 /* compress_zlib.cpp */,
 				26B92D4821D33E6E003F6F82 /* des.cpp */,
+				26A3DA95228B69890031CBDA /* ecc.cpp */,
+				262ED4E8228DDA5D0029F409 /* ecc_secp256k1.inc */,
 				266DD45C1C11930800D47AB0 /* gcm.cpp */,
 				2628EAE821C410ED00D8CD00 /* jwt.cpp */,
 				266DD45D1C11930800D47AB0 /* md5.cpp */,
@@ -4959,6 +4997,23 @@
 			productReference = 2628EB1921C41FFF00D8CD00 /* libzxing.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		262ED4D5228DD3340029F409 /* GenerateEllipticCurvePow2G */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 262ED4DC228DD3340029F409 /* Build configuration list for PBXNativeTarget "GenerateEllipticCurvePow2G" */;
+			buildPhases = (
+				262ED4D2228DD3340029F409 /* Sources */,
+				262ED4D3228DD3340029F409 /* Frameworks */,
+				262ED4D4228DD3340029F409 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GenerateEllipticCurvePow2G;
+			productName = GenerateEllipticCurvePow2G;
+			productReference = 262ED4D6228DD3340029F409 /* GenerateEllipticCurvePow2G */;
+			productType = "com.apple.product-type.tool";
+		};
 		263918D821CBA047008B335B /* sapp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 263918E721CBA049008B335B /* Build configuration list for PBXNativeTarget "sapp" */;
@@ -5125,10 +5180,15 @@
 		28CE364A1A0FEDC600AB513C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				DefaultBuildSystemTypeForWorkspace = Original;
 				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = SLIBIO;
 				TargetAttributes = {
 					2605036220CEC39100032B2C = {
+						ProvisioningStyle = Automatic;
+					};
+					262ED4D5228DD3340029F409 = {
+						CreatedOnToolsVersion = 10.2.1;
 						ProvisioningStyle = Automatic;
 					};
 					263918D821CBA047008B335B = {
@@ -5170,6 +5230,7 @@
 				264AF12021B0590C004E58CB /* libsapp */,
 				263918D821CBA047008B335B /* sapp */,
 				264AF10F21AED095004E58CB /* AddCopyrightNotice */,
+				262ED4D5228DD3340029F409 /* GenerateEllipticCurvePow2G */,
 			);
 		};
 /* End PBXProject section */
@@ -5408,6 +5469,14 @@
 				2628F28A21C429FE00D8CD00 /* MCDecoder.cpp in Sources */,
 				2628F31B21C429FE00D8CD00 /* QRMatrixUtil.cpp in Sources */,
 				2628F2D121C429FE00D8CD00 /* ODRSSFieldParser.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		262ED4D2228DD3340029F409 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				262ED4DF228DD35B0029F409 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5977,6 +6046,7 @@
 				26E1B858222841AC007C222E /* pinterest.cpp in Sources */,
 				260B73F5220D7DF600858EEA /* facebook.cpp in Sources */,
 				26D9D95A1E96465E005F7BD3 /* vibrator.cpp in Sources */,
+				26A3DA96228B698A0031CBDA /* ecc.cpp in Sources */,
 				26D9D9051E9645CE005F7BD3 /* timer.cpp in Sources */,
 				26E1B8A0222ABAB2007C222E /* jfdctflt.c in Sources */,
 				26E1B876222ABA51007C222E /* pngtrans.c in Sources */,
@@ -6486,6 +6556,49 @@
 				PRODUCT_MODULE_NAME = slib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USE_HEADERMAP = NO;
+			};
+			name = Release;
+		};
+		262ED4DA228DD3340029F409 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../include";
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "-lslib";
+				PRODUCT_NAME = GenerateEllipticCurvePow2G;
+			};
+			name = Debug;
+		};
+		262ED4DB228DD3340029F409 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../include";
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../../lib/macOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "-lslib";
+				PRODUCT_NAME = GenerateEllipticCurvePow2G;
 			};
 			name = Release;
 		};
@@ -7043,6 +7156,15 @@
 			buildConfigurations = (
 				2628EB1721C41FFF00D8CD00 /* Debug */,
 				2628EB1821C41FFF00D8CD00 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		262ED4DC228DD3340029F409 /* Build configuration list for PBXNativeTarget "GenerateEllipticCurvePow2G" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				262ED4DA228DD3340029F409 /* Debug */,
+				262ED4DB228DD3340029F409 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
