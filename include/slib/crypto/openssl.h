@@ -27,6 +27,7 @@
 
 #include "tls.h"
 #include "rsa.h"
+#include "ecc.h"
 #include "block_cipher.h"
 
 struct ssl_ctx_st;
@@ -112,6 +113,19 @@ namespace slib
 		
 		static void generateRSA(RSAPrivateKey& _output, sl_uint32 nBits);
 		
+		
+		static sl_bool generate_ECKey_secp256k1(ECPrivateKey& _output);
+		
+		static ECDSA_Signature sign_ECDSA_secp256k1(const ECPrivateKey& key, const BigInt& z);
+		
+		static ECDSA_Signature sign_ECDSA_SHA256_secp256k1(const ECPrivateKey& key, const void* data, sl_size size);
+		
+		static sl_bool verify_ECDSA_secp256k1(const ECPublicKey& key, const BigInt& z, const ECDSA_Signature& signature);
+		
+		static sl_bool verify_ECDSA_SHA256_secp256k1(const ECPublicKey& key, const void* data, sl_size size, const ECDSA_Signature& signature);
+		
+		static BigInt getSharedKey_ECDH_secp256k1(const ECPrivateKey& keyLocal, const ECPublicKey& keyRemote);
+
 	};
 
 }
