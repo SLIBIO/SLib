@@ -42,6 +42,52 @@ namespace slib
 		return y.isZero();
 	}
 	
+	Memory ECPoint::toUncompressedFormat(const EllipticCurve& curve) const
+	{
+		return toUncompressedFormat(curve.n.getMostSignificantBytes());
+	}
+	
+	Memory ECPoint::toUncompressedFormat(sl_size nBytesPerComponent) const
+	{
+		if (isO()) {
+			sl_uint8 c = 0;
+			return Memory::create(&c, 1);
+		}
+		Memory ret = Memory::create((nBytesPerComponent << 1) + 1);
+		if (ret.isNotNull()) {
+			sl_uint8* buf = (sl_uint8*)(ret.getData());
+			buf[0] = 4;
+			if (x.getBytesBE(buf + 1, nBytesPerComponent)) {
+				if (y.getBytesBE(buf + 1 + nBytesPerComponent, nBytesPerComponent)) {
+					return ret;
+				}
+			}
+		}
+		return sl_null;
+	}
+	
+	void ECPoint::parseUncompressedFormat(const void* _buf, sl_size size)
+	{
+		const sl_uint8* buf = (const sl_uint8*)_buf;
+		if (size) {
+			if (buf[0] == 4) {
+				size--;
+				if (!(size & 1)) {
+					size >>= 1;
+					x = BigInt::fromBytesBE(buf + 1, size);
+					if (x.isNotZero()) {
+						y = BigInt::fromBytesBE(buf + 1 + size, size);
+					} else {
+						y.setNull();
+					}
+					return;
+				}
+			}
+		}
+		x.setNull();
+		y.setNull();
+	}
+	
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(EllipticCurve)
 

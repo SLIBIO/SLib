@@ -39,6 +39,8 @@
 namespace slib
 {
 	
+	class EllipticCurve;
+	
 	class SLIB_EXPORT ECPoint
 	{
 	public:
@@ -53,6 +55,12 @@ namespace slib
 	public:
 		sl_bool isO() const;
 
+		Memory toUncompressedFormat(const EllipticCurve& curve) const;
+		
+		Memory toUncompressedFormat(sl_size nBytesPerComponent) const;
+		
+		void parseUncompressedFormat(const void* buf, sl_size n);
+		
 	};
 	
 	class SLIB_EXPORT EllipticCurve
