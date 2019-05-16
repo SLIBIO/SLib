@@ -2504,7 +2504,6 @@ namespace slib
 		if (!copyFrom(T2a)) {
 			return sl_false;
 		}
-		sign = A.sign;
 		return sl_true;
 	}
 
