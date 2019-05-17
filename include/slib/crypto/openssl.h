@@ -93,6 +93,116 @@ namespace slib
 		
 	};
 	
+	class SLIB_EXPORT OpenSSL_ChaCha20
+	{
+	public:
+		OpenSSL_ChaCha20();
+		
+		~OpenSSL_ChaCha20();
+		
+	public:
+		// key: 32 bytes (256 bits)
+		void setKey(const void* key);
+		
+		void generateBlock(sl_uint32 nonce0, sl_uint32 nonce1, sl_uint32 nonce2, sl_uint32 nonce3, void* output);
+
+		void start(sl_uint32 nonce0, sl_uint32 nonce1, sl_uint32 nonce2, sl_uint32 nonce3);
+		
+		// IV: 12 bytes
+		void start(const void* IV, sl_uint32 counter = 0);
+		
+		void encrypt(const void* src, void* dst, sl_size len);
+		
+		void decrypt(const void* src, void* dst, sl_size len);
+		
+	private:
+		sl_uint32 m_key[8];
+		sl_uint32 m_nonce[4];
+		sl_uint8 m_lastBlock[64];
+		sl_uint32 m_pos;
+		
+	};
+	
+	class SLIB_EXPORT OpenSSL_Poly1305
+	{
+	public:
+		OpenSSL_Poly1305();
+		
+		~OpenSSL_Poly1305();
+		
+	public:
+		// key: 32 bytes (256 bits)
+		void start(const void* key);
+		
+		void update(const void* input, sl_size n);
+		
+		// output: 16 bytes (128 bits)
+		void finish(void* output);
+		
+		// key: 32 bytes (256 bits)
+		// output: 16 bytes (128 bits)
+		static void execute(const void* key, const void* message, sl_size lenMessage, void* output);
+		
+	private:
+		void* m_context;
+		
+	};
+	
+	class SLIB_EXPORT OpenSSL_ChaCha20_Poly1305
+	{
+	public:
+		OpenSSL_ChaCha20_Poly1305();
+		
+		~OpenSSL_ChaCha20_Poly1305();
+		
+	public:
+		// key: 32 bytes (256 bits)
+		void setKey(const void* key);
+		
+		// IV: 8 bytes (64 bits)
+		void start(sl_uint32 senderId, const void* IV);
+		
+		// put on AAD (additional authenticated data)
+		void putAAD(const void* data, sl_size len);
+		
+		void finishAAD();
+		
+		void encrypt(const void* src, void* dst, sl_size len);
+		
+		void decrypt(const void* src, void* dst, sl_size len);
+		
+#ifdef check
+#undef check
+#endif
+		// src: cipher text
+		void check(const void* src, sl_size len);
+		
+		// outputTag: 16 bytes (128 bits)
+		void finish(void* outputTag);
+		
+		// tag: 16 bytes (128 bits)
+		sl_bool finishAndCheckTag(const void* tag);
+		
+		// IV: 8 bytes (64 bits)
+		// outputTag: 16 bytes (128 bits)
+		void encrypt(sl_uint32 senderId, const void* IV, const void* AAD, sl_size lenAAD, const void* src, void* dst, sl_size len, void* outputTag);
+		
+		// IV: 8 bytes (64 bits)
+		// tag: 16 bytes (128 bits)
+		sl_bool decrypt(sl_uint32 senderId, const void* IV, const void* AAD, sl_size lenAAD, const void* src, void* dst, sl_size len, const void* tag);
+		
+		// IV: 8 bytes (64 bits)
+		// tag: 16 bytes (128 bits)
+		sl_bool check(sl_uint32 senderId, const void* IV, const void* AAD, sl_size lenAAD, const void* src, sl_size len, const void* tag);
+		
+	private:
+		OpenSSL_ChaCha20 m_cipher;
+		OpenSSL_Poly1305 m_auth;
+		sl_size m_lenAAD;
+		sl_size m_lenInput;
+		
+	};
+	
 	class SLIB_EXPORT OpenSSL
 	{
 	public:
