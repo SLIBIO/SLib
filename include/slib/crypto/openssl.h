@@ -226,6 +226,8 @@ namespace slib
 		
 		static sl_bool generate_ECKey_secp256k1(ECPrivateKey& _output);
 		
+		static sl_bool check_ECKey_secp256k1(const ECPublicKey& key);
+		
 		static ECDSA_Signature sign_ECDSA_secp256k1(const ECPrivateKey& key, const BigInt& z);
 		
 		static ECDSA_Signature sign_ECDSA_SHA256_secp256k1(const ECPrivateKey& key, const void* data, sl_size size);

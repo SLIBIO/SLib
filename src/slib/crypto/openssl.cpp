@@ -1452,6 +1452,21 @@ namespace slib
 		return flagSuccess;
 	}
 	
+	sl_bool OpenSSL::check_ECKey_secp256k1(const ECPublicKey& key)
+	{
+		sl_bool flagSuccess = sl_false;
+		EC_GROUP* group = EC_GROUP_new_by_curve_name(NID_secp256k1);
+		if (group) {
+			EC_KEY* ek = get_EC_KEY_from_ECPublicKey(group, key);
+			if (ek) {
+				flagSuccess = EC_KEY_check_key(ek) == 1;
+				EC_KEY_free(ek);
+			}
+			EC_GROUP_free(group);
+		}
+		return flagSuccess;
+	}
+	
 	ECDSA_Signature OpenSSL::sign_ECDSA_secp256k1(const ECPrivateKey& key, const BigInt& z)
 	{
 		Memory mem = z.getBytesBE();
