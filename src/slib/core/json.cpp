@@ -1182,6 +1182,16 @@ namespace slib
 		json.setTime(_in);
 	}
 	
+	void FromJson(const Json& json, Memory& _out)
+	{
+		_out = json.getString().parseHexString();
+	}
+	
+	void ToJson(Json& json, const Memory& _in)
+	{
+		json.setString(String::makeHexString(_in));
+	}
+	
 	void FromJson(const Json& json, VariantList& _out)
 	{
 		_out = json.getVariantList();

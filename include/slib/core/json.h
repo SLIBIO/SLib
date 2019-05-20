@@ -437,6 +437,9 @@ namespace slib
 	void FromJson(const Json& json, Time& _out, const Time& def);
 	void ToJson(Json& json, const Time& _in);
 	
+	void FromJson(const Json& json, Memory& _out);
+	void ToJson(Json& json, const Memory& _in);
+	
 	template <class T>
 	void FromJson(const Json& json, Nullable<T>& _out);
 	template <class T>
