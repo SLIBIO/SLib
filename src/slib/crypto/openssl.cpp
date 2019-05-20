@@ -1476,6 +1476,11 @@ namespace slib
 		return do_sign_ECDSA_secp256k1(key, mem.getData(), mem.getSize());
 	}
 	
+	ECDSA_Signature OpenSSL::sign_ECDSA_secp256k1(const ECPrivateKey& key, const void* hash, sl_size size)
+	{
+		return do_sign_ECDSA_secp256k1(key, hash, size);
+	}
+	
 	ECDSA_Signature OpenSSL::sign_ECDSA_SHA256_secp256k1(const ECPrivateKey& key, const void* data, sl_size size)
 	{
 		sl_uint8 hash[SHA256::HashSize];
@@ -1490,6 +1495,11 @@ namespace slib
 			return sl_false;
 		}
 		return do_verify_ECDSA_secp256k1(key, mem.getData(), mem.getSize(), signature);
+	}
+	
+	sl_bool OpenSSL::verify_ECDSA_secp256k1(const ECPublicKey& key, const void* hash, sl_size size, const ECDSA_Signature& signature)
+	{
+		return do_verify_ECDSA_secp256k1(key, hash, size, signature);
 	}
 	
 	sl_bool OpenSSL::verify_ECDSA_SHA256_secp256k1(const ECPublicKey& key, const void* data, sl_size size, const ECDSA_Signature& signature)

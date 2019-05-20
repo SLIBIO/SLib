@@ -251,18 +251,15 @@ namespace slib
 	{
 		namespace ecdsa
 		{
-			template <class HASH>
-			static BigInt makeZ(const EllipticCurve& curve, const void* data, sl_size size)
+			static BigInt makeZ(const EllipticCurve& curve, const void* hash, sl_size hashSize)
 			{
-				sl_uint8 hash[HASH::HashSize];
-				HASH::hash(data, size, hash);
 				sl_size nBits = curve.n.getMostSignificantBits();
 				if (!nBits) {
 					return BigInt::null();
 				}
-				sl_uint32 hashBits = sizeof(hash) << 3;
+				sl_size hashBits = hashSize << 3;
 				if (nBits > hashBits) {
-					return BigInt::fromBytesBE(hash, sizeof(hash));
+					return BigInt::fromBytesBE(hash, hashSize);
 				} else {
 					sl_uint32 leftBits = (sl_uint32)(nBits & 7);
 					if (leftBits) {
@@ -334,12 +331,16 @@ namespace slib
 		return ret;
 	}
 	
+	ECDSA_Signature ECDSA::sign(const EllipticCurve& curve, const ECPrivateKey& key, const void* hash, sl_size size, BigInt* k)
+	{
+		return sign(curve, key, priv::ecdsa::makeZ(curve, hash, size), k);
+	}
+	
 	ECDSA_Signature ECDSA::sign_SHA256(const EllipticCurve& curve, const ECPrivateKey& key, const void* data, sl_size size, BigInt* k)
 	{
-		if (curve.n < 2) {
-			return ECDSA_Signature();
-		}
-		return sign(curve, key, priv::ecdsa::makeZ<SHA256>(curve, data, size), k);
+		sl_uint8 hash[SHA256::HashSize];
+		SHA256::hash(data, size, hash);
+		return sign(curve, key, priv::ecdsa::makeZ(curve, hash, SHA256::HashSize), k);
 	}
 	
 	sl_bool ECDSA::verify(const EllipticCurve& curve, const ECPublicKey& key, const BigInt& z, const ECDSA_Signature& signature)
@@ -371,12 +372,16 @@ namespace slib
 		return kG.x == signature.r;
 	}
 	
+	sl_bool ECDSA::verify(const EllipticCurve& curve, const ECPublicKey& key, const void* hash, sl_size size, const ECDSA_Signature& signature)
+	{
+		return verify(curve, key, priv::ecdsa::makeZ(curve, hash, size), signature);
+	}
+	
 	sl_bool ECDSA::verify_SHA256(const EllipticCurve& curve, const ECPublicKey& key, const void* data, sl_size size, const ECDSA_Signature& signature)
 	{
-		if (curve.n < 2) {
-			return sl_false;
-		}
-		return verify(curve, key, priv::ecdsa::makeZ<SHA256>(curve, data, size), signature);
+		sl_uint8 hash[SHA256::HashSize];
+		SHA256::hash(data, size, hash);
+		return verify(curve, key, priv::ecdsa::makeZ(curve, hash, SHA256::HashSize), signature);
 	}
 	
 	BigInt ECDH::getSharedKey(const EllipticCurve& curve, const ECPrivateKey& keyLocal, const ECPublicKey& keyRemote)

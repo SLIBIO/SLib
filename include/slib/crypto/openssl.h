@@ -230,9 +230,13 @@ namespace slib
 		
 		static ECDSA_Signature sign_ECDSA_secp256k1(const ECPrivateKey& key, const BigInt& z);
 		
+		static ECDSA_Signature sign_ECDSA_secp256k1(const ECPrivateKey& key, const void* hash, sl_size sizeHash);
+		
 		static ECDSA_Signature sign_ECDSA_SHA256_secp256k1(const ECPrivateKey& key, const void* data, sl_size size);
 		
 		static sl_bool verify_ECDSA_secp256k1(const ECPublicKey& key, const BigInt& z, const ECDSA_Signature& signature);
+		
+		static sl_bool verify_ECDSA_secp256k1(const ECPublicKey& key, const void* hash, sl_size sizeHash, const ECDSA_Signature& signature);
 		
 		static sl_bool verify_ECDSA_SHA256_secp256k1(const ECPublicKey& key, const void* data, sl_size size, const ECDSA_Signature& signature);
 		
