@@ -2796,6 +2796,15 @@ namespace slib
 		return sl_false;
 	}
 	
+	sl_size CBigInt::hash() const noexcept
+	{
+		if (length) {
+			return HashBytes(elements, length<<2);
+		}
+		return 0;
+	}
+
+	
 /*
 	BigInt
 */
@@ -4437,6 +4446,15 @@ namespace slib
 		return sl_null;
 	}
 	
+	sl_size BigInt::hash() const noexcept
+	{
+		CBigInt* ret = new CBigInt;
+		if (ret) {
+			return ret->hash();
+		}
+		return 0;
+	}
+	
 	BigInt& BigInt::operator=(sl_int32 n) noexcept
 	{
 		ref = CBigInt::fromInt32(n);
@@ -4742,6 +4760,36 @@ namespace slib
 		return sl_null;
 	}
 
+	sl_int32 Atomic<BigInt>::equals(const BigInt& other) const noexcept
+	{
+		BigInt o(*this);
+		return o.equals(other);
+	}
+	
+	sl_int32 Atomic<BigInt>::equals(sl_int32 v) const noexcept
+	{
+		BigInt o(*this);
+		return o.equals(v);
+	}
+	
+	sl_int32 Atomic<BigInt>::equals(sl_uint32 v) const noexcept
+	{
+		BigInt o(*this);
+		return o.equals(v);
+	}
+	
+	sl_int32 Atomic<BigInt>::equals(sl_int64 v) const noexcept
+	{
+		BigInt o(*this);
+		return o.equals(v);
+	}
+	
+	sl_int32 Atomic<BigInt>::equals(sl_uint64 v) const noexcept
+	{
+		BigInt o(*this);
+		return o.equals(v);
+	}
+
 	sl_int32 Atomic<BigInt>::compare(const BigInt& other) const noexcept
 	{
 		BigInt o(*this);
@@ -4776,6 +4824,12 @@ namespace slib
 	{
 		BigInt o(*this);
 		return o.negative();
+	}
+
+	sl_size Atomic<BigInt>::hash() const noexcept
+	{
+		BigInt o(*this);
+		return o.hash();
 	}
 
 	AtomicBigInt& Atomic<BigInt>::operator=(sl_int32 n) noexcept
@@ -5332,4 +5386,35 @@ namespace slib
 		return BigInt::shiftRight(a, n);
 	}
 
+	
+	sl_int32 Compare<BigInt>::operator()(const BigInt& a, const BigInt& b) const noexcept
+	{
+		return a.compare(b);
+	}
+	
+	sl_int32 Compare<AtomicBigInt>::operator()(const AtomicBigInt& a, const AtomicBigInt& b) const noexcept
+	{
+		return a.compare(b);
+	}
+
+	sl_bool Equals<BigInt>::operator()(const BigInt& a, const BigInt& b) const noexcept
+	{
+		return a.equals(b);
+	}
+
+	sl_bool Equals<AtomicBigInt>::operator()(const AtomicBigInt& a, const AtomicBigInt& b) const noexcept
+	{
+		return a.equals(b);
+	}
+	
+	sl_size Hash<BigInt>::operator()(const BigInt& a) const noexcept
+	{
+		return a.hash();
+	}
+
+	sl_size Hash<AtomicBigInt>::operator()(const AtomicBigInt& a) const noexcept
+	{
+		return a.hash();
+	}
+	
 }

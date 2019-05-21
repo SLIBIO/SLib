@@ -370,6 +370,9 @@ namespace slib
 		sl_bool generatePrime(sl_size nBits) noexcept;
 		
 		sl_bool random(sl_size nBits) noexcept;
+		
+		
+		sl_size hash() const noexcept;
 	
 	private:
 		void _free() noexcept;
@@ -423,6 +426,16 @@ namespace slib
 
 		String toHexString() const noexcept;
 
+		sl_int32 equals(const BigInt& other) const noexcept;
+		
+		sl_int32 equals(sl_int32 v) const noexcept;
+		
+		sl_int32 equals(sl_uint32 v) const noexcept;
+		
+		sl_int32 equals(sl_int64 v) const noexcept;
+		
+		sl_int32 equals(sl_uint64 v) const noexcept;
+		
 		// compare returns
 		//  0: equal,  negative: less than, positive: greater than
 		sl_int32 compare(const BigInt& other) const noexcept;
@@ -436,6 +449,8 @@ namespace slib
 		sl_int32 compare(sl_uint64 v) const noexcept;
 
 		BigInt negative() const noexcept;
+
+		sl_size hash() const noexcept;
 
 	public:
 		Atomic& operator=(sl_int32 n) noexcept;
@@ -736,6 +751,9 @@ namespace slib
 		
 		static BigInt random(sl_size nBits) noexcept;
 		
+
+		sl_size hash() const noexcept;
+
 	public:
 		BigInt& operator=(sl_int32 n) noexcept;
 
@@ -1026,6 +1044,48 @@ namespace slib
 	BigInt operator>>(const BigInt& a, sl_size n) noexcept;
 
 
+	template <>
+	class Compare<BigInt>
+	{
+	public:
+		sl_int32 operator()(const BigInt& a, const BigInt& b) const noexcept;
+	};
+	
+	template <>
+	class Compare<AtomicBigInt>
+	{
+	public:
+		sl_int32 operator()(const AtomicBigInt& a, const AtomicBigInt& b) const noexcept;
+	};
+	
+	template <>
+	class Equals<BigInt>
+	{
+	public:
+		sl_bool operator()(const BigInt& a, const BigInt& b) const noexcept;
+	};
+	
+	template <>
+	class Equals<AtomicBigInt>
+	{
+	public:
+		sl_bool operator()(const AtomicBigInt& a, const AtomicBigInt& b) const noexcept;
+	};
+	
+	template <>
+	class Hash<BigInt>
+	{
+	public:
+		sl_size operator()(const BigInt& a) const noexcept;
+	};
+	
+	template <>
+	class Hash<AtomicBigInt>
+	{
+	public:
+		sl_size operator()(const AtomicBigInt& a) const noexcept;
+	};
+	
 }
 
 #endif
