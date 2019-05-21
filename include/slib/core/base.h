@@ -26,6 +26,7 @@
 #include "definition.h"
 
 #include "cpp.h"
+#include "compare.h"
 
 namespace slib
 {
@@ -81,21 +82,21 @@ namespace slib
 		static sl_bool equalsMemory8(const sl_int64* mem1, const sl_int64* mem2, sl_size count) noexcept;
 
 
-		static sl_int32 compareMemory(const sl_uint8* mem1, const sl_uint8* mem2, sl_size count) noexcept;
+		static sl_compare_result compareMemory(const sl_uint8* mem1, const sl_uint8* mem2, sl_size count) noexcept;
 
-		static sl_int32 compareMemory(const sl_int8* mem1, const sl_int8* mem2, sl_size count) noexcept;
+		static sl_compare_result compareMemory(const sl_int8* mem1, const sl_int8* mem2, sl_size count) noexcept;
 		
-		static sl_int32 compareMemory2(const sl_uint16* mem1, const sl_uint16* mem2, sl_size count) noexcept;
+		static sl_compare_result compareMemory2(const sl_uint16* mem1, const sl_uint16* mem2, sl_size count) noexcept;
 
-		static sl_int32 compareMemory2(const sl_int16* mem1, const sl_int16* mem2, sl_size count) noexcept;
+		static sl_compare_result compareMemory2(const sl_int16* mem1, const sl_int16* mem2, sl_size count) noexcept;
 
-		static sl_int32 compareMemory4(const sl_uint32* mem1, const sl_uint32* sl_uint32, sl_size count) noexcept;
+		static sl_compare_result compareMemory4(const sl_uint32* mem1, const sl_uint32* sl_uint32, sl_size count) noexcept;
 
-		static sl_int32 compareMemory4(const sl_int32* mem1, const sl_int32* sl_int32, sl_size count) noexcept;
+		static sl_compare_result compareMemory4(const sl_int32* mem1, const sl_int32* sl_int32, sl_size count) noexcept;
 
-		static sl_int32 compareMemory8(const sl_uint64* mem1, const sl_uint64* mem2, sl_size count) noexcept;
+		static sl_compare_result compareMemory8(const sl_uint64* mem1, const sl_uint64* mem2, sl_size count) noexcept;
 
-		static sl_int32 compareMemory8(const sl_int64* mem1, const sl_int64* mem2, sl_size count) noexcept;
+		static sl_compare_result compareMemory8(const sl_int64* mem1, const sl_int64* mem2, sl_size count) noexcept;
 
 
 		static sl_bool equalsMemoryZero(const void* mem, sl_size count) noexcept;
@@ -113,21 +114,21 @@ namespace slib
 		static sl_bool equalsMemoryZero8(const sl_int64* mem, sl_size count) noexcept;
 	
 
-		static sl_int32 compareMemoryZero(const sl_uint8* mem, sl_size count) noexcept;
+		static sl_compare_result compareMemoryZero(const sl_uint8* mem, sl_size count) noexcept;
 
-		static sl_int32 compareMemoryZero(const sl_int8* mem, sl_size count) noexcept;
+		static sl_compare_result compareMemoryZero(const sl_int8* mem, sl_size count) noexcept;
 
-		static sl_int32 compareMemoryZero2(const sl_uint16* mem, sl_size count) noexcept;
+		static sl_compare_result compareMemoryZero2(const sl_uint16* mem, sl_size count) noexcept;
 
-		static sl_int32 compareMemoryZero2(const sl_int16* mem, sl_size count) noexcept;
+		static sl_compare_result compareMemoryZero2(const sl_int16* mem, sl_size count) noexcept;
 
-		static sl_int32 compareMemoryZero4(const sl_uint32* mem, sl_size count) noexcept;
+		static sl_compare_result compareMemoryZero4(const sl_uint32* mem, sl_size count) noexcept;
 
-		static sl_int32 compareMemoryZero4(const sl_int32* mem, sl_size count) noexcept;
+		static sl_compare_result compareMemoryZero4(const sl_int32* mem, sl_size count) noexcept;
 
-		static sl_int32 compareMemoryZero8(const sl_uint64* mem, sl_size count) noexcept;
+		static sl_compare_result compareMemoryZero8(const sl_uint64* mem, sl_size count) noexcept;
 
-		static sl_int32 compareMemoryZero8(const sl_int64* mem, sl_size count) noexcept;
+		static sl_compare_result compareMemoryZero8(const sl_int64* mem, sl_size count) noexcept;
 
 
 		static const sl_uint8* findMemory(const void* mem, sl_uint8 pattern, sl_size count) noexcept;
@@ -172,11 +173,11 @@ namespace slib
 		static sl_bool equalsString4(const sl_char32* s1, const sl_char32* s2, sl_reg count = -1) noexcept;
 	
 
-		static sl_int32 compareString(const sl_char8* s1, const sl_char8* s2, sl_reg count = -1) noexcept;
+		static sl_compare_result compareString(const sl_char8* s1, const sl_char8* s2, sl_reg count = -1) noexcept;
 
-		static sl_int32 compareString2(const sl_char16* s1, const sl_char16* s2, sl_reg count = -1) noexcept;
+		static sl_compare_result compareString2(const sl_char16* s1, const sl_char16* s2, sl_reg count = -1) noexcept;
 
-		static sl_int32 compareString4(const sl_char32* s1, const sl_char32* s2, sl_reg count = -1) noexcept;
+		static sl_compare_result compareString4(const sl_char32* s1, const sl_char32* s2, sl_reg count = -1) noexcept;
 
 
 		static sl_size copyString(sl_char8* dst, const sl_char8* src, sl_reg count = -1) noexcept;

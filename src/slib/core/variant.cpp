@@ -33,58 +33,61 @@
 namespace slib
 {
 
-	int Compare<Variant>::operator()(const Variant& a, const Variant& b) const noexcept
+	namespace priv
 	{
-		return Compare<sl_uint64>()(a._value, b._value);
-	}
+		namespace variant
+		{
+			
+			const char g_variantMap_ClassID[] = "VariantMap";
+			const char g_variantHashMap_ClassID[] = "VariantHashMap";
+			const char g_variantList_ClassID[] = "VariantList";
+			const char g_variantMapList_ClassID[] = "VariantMapList";
+			const char g_variantHashMapList_ClassID[] = "VariantHashMapList";
+			
+			const ConstContainer g_undefined = {0, VariantType::Null, 0};
+			const ConstContainer g_null = {1, VariantType::Null, 0};
 
-	SLIB_INLINE static void _priv_Variant_copy(VariantType src_type, sl_uint64 src_value, sl_uint64& dst_value) noexcept
-	{
-		switch (src_type) {
-			case VariantType::String8:
-				new PTR_VAR(String, dst_value) String(REF_VAR(String, src_value));
-				break;
-			case VariantType::String16:
-				new PTR_VAR(String16, dst_value) String16(REF_VAR(String16, src_value));
-				break;
-			case VariantType::Object:
-			case VariantType::Weak:
-				new PTR_VAR(Ref<Referable>, dst_value) Ref<Referable>(REF_VAR(Ref<Referable>, src_value));
-				break;
-			default:
-				dst_value = src_value;
-				break;
+			SLIB_INLINE static void copy(VariantType src_type, sl_uint64 src_value, sl_uint64& dst_value) noexcept
+			{
+				switch (src_type) {
+					case VariantType::String8:
+						new PTR_VAR(String, dst_value) String(REF_VAR(String, src_value));
+						break;
+					case VariantType::String16:
+						new PTR_VAR(String16, dst_value) String16(REF_VAR(String16, src_value));
+						break;
+					case VariantType::Object:
+					case VariantType::Weak:
+						new PTR_VAR(Ref<Referable>, dst_value) Ref<Referable>(REF_VAR(Ref<Referable>, src_value));
+						break;
+					default:
+						dst_value = src_value;
+						break;
+				}
+			}
+
+			SLIB_INLINE static void free(VariantType type, sl_uint64 value) noexcept
+			{
+				switch (type)
+				{
+					case VariantType::String8:
+						REF_VAR(String, value).String::~String();
+						break;
+					case VariantType::String16:
+						REF_VAR(String16, value).String16::~String16();
+						break;
+					case VariantType::Object:
+					case VariantType::Weak:
+						REF_VAR(Ref<Referable>, value).Ref<Referable>::~Ref();
+						break;
+					default:
+						break;
+				}
+			}
+
 		}
 	}
 	
-	SLIB_INLINE static void _priv_Variant_free(VariantType type, sl_uint64 value) noexcept
-	{
-		switch (type)
-		{
-			case VariantType::String8:
-				REF_VAR(String, value).String::~String();
-				break;
-			case VariantType::String16:
-				REF_VAR(String16, value).String16::~String16();
-				break;
-			case VariantType::Object:
-			case VariantType::Weak:
-				REF_VAR(Ref<Referable>, value).Ref<Referable>::~Ref();
-				break;
-			default:
-				break;
-		}
-	}
-
-	const char _priv_VariantMap_ClassID[] = "VariantMap";
-	const char _priv_VariantHashMap_ClassID[] = "VariantHashMap";
-	const char _priv_VariantList_ClassID[] = "VariantList";
-	const char _priv_VariantMapList_ClassID[] = "VariantMapList";
-	const char _priv_VariantHashMapList_ClassID[] = "VariantHashMapList";
-
-	const _priv_Variant_Const _priv_Variant_Undefined = {0, VariantType::Null, 0};
-	const _priv_Variant_Const _priv_Variant_Null = {1, VariantType::Null, 0};
-
 	void Variant::_constructorRef(const void* ptr)
 	{
 		const Ref<Referable>& ref = *reinterpret_cast<Ref<Referable> const*>(ptr);
@@ -135,25 +138,25 @@ namespace slib
 	
 	void Variant::_assignRef(const void* ptr)
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		_constructorRef(ptr);
 	}
 	
 	void Variant::_assignAtomicRef(const void* ptr)
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		_constructorAtomicRef(ptr);
 	}
 	
 	void Variant::_assignWeakRef(const void* ptr)
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		_constructorWeakRef(ptr);
 	}
 	
 	void Variant::_assignAtomicWeakRef(const void* ptr)
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		_constructorAtomicWeakRef(ptr);
 	}
 	
@@ -255,18 +258,18 @@ namespace slib
 	
 	void Variant::_free(VariantType type, sl_uint64 value) noexcept
 	{
-		_priv_Variant_free(type, value);
+		priv::variant::free(type, value);
 	}
 
 	SLIB_INLINE void Atomic<Variant>::_retain(VariantType& type, sl_uint64& value) const noexcept
 	{
-		if ((void*)(this) == (void*)(&_priv_Variant_Null)) {
+		if ((void*)(this) == (void*)(&priv::variant::g_null)) {
 			type = VariantType::Null;
 			value = 0;
 		} else {
 			SpinLocker lock(&m_lock);
 			type = _type;
-			_priv_Variant_copy(_type, _value, value);
+			priv::variant::copy(_type, _value, value);
 		}
 	}
 
@@ -281,7 +284,7 @@ namespace slib
 			_type = type;
 			_value = value;
 		}
-		_priv_Variant_free(typeOld, valueOld);
+		priv::variant::free(typeOld, valueOld);
 	}
 
 
@@ -295,7 +298,7 @@ namespace slib
 	Variant::Variant(const Variant& other) noexcept
 	{
 		_type = other._type;
-		_priv_Variant_copy(_type, other._value, _value);
+		priv::variant::copy(_type, other._value, _value);
 	}
 
 	Variant::Variant(AtomicVariant&& _other) noexcept
@@ -313,7 +316,7 @@ namespace slib
 
 	Variant::~Variant() noexcept
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 	}
 	
 	Variant::Variant(signed char value) noexcept
@@ -675,7 +678,7 @@ namespace slib
 	Variant& Variant::operator=(Variant&& other) noexcept
 	{
 		if (this != &other) {
-			_priv_Variant_free(_type, _value);
+			priv::variant::free(_type, _value);
 			_type = other._type;
 			_value = other._value;
 			other._type = VariantType::Null;
@@ -686,9 +689,9 @@ namespace slib
 	Variant& Variant::operator=(const Variant& other) noexcept
 	{
 		if (this != &other) {
-			_priv_Variant_free(_type, _value);
+			priv::variant::free(_type, _value);
 			_type = other._type;
-			_priv_Variant_copy(_type, other._value, _value);
+			priv::variant::copy(_type, other._value, _value);
 		}
 		return *this;
 	}
@@ -696,7 +699,7 @@ namespace slib
 	Variant& Variant::operator=(AtomicVariant&& other) noexcept
 	{
 		if ((void*)this != (void*)(&other)) {
-			_priv_Variant_free(_type, _value);
+			priv::variant::free(_type, _value);
 			_type = other._type;
 			_value = other._value;
 			other._type = VariantType::Null;
@@ -706,7 +709,7 @@ namespace slib
 
 	Variant& Variant::operator=(const AtomicVariant& other) noexcept
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		other._retain(_type, _value);
 		return *this;
 	}
@@ -730,7 +733,7 @@ namespace slib
 	void Variant::setUndefined() noexcept
 	{
 		if (_type != VariantType::Null) {
-			_priv_Variant_free(_type, _value);
+			priv::variant::free(_type, _value);
 			_type = VariantType::Null;
 		}
 		_value = 0;
@@ -739,7 +742,7 @@ namespace slib
 	void Variant::setNull() noexcept
 	{
 		if (_type != VariantType::Null) {
-			_priv_Variant_free(_type, _value);
+			priv::variant::free(_type, _value);
 			_type = VariantType::Null;
 		}
 		_value = 1;
@@ -803,7 +806,7 @@ namespace slib
 
 	void Variant::setInt32(sl_int32 value) noexcept
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		_type = VariantType::Int32;
 		REF_VAR(sl_int32, _value) = value;
 	}
@@ -866,7 +869,7 @@ namespace slib
 
 	void Variant::setUint32(sl_uint32 value) noexcept
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		_type = VariantType::Uint32;
 		REF_VAR(sl_uint32, _value) = value;
 	}
@@ -929,7 +932,7 @@ namespace slib
 
 	void Variant::setInt64(sl_int64 value) noexcept
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		_type = VariantType::Int64;
 		REF_VAR(sl_int64, _value) = value;
 	}
@@ -992,7 +995,7 @@ namespace slib
 
 	void Variant::setUint64(sl_uint64 value) noexcept
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		_type = VariantType::Uint64;
 		REF_VAR(sl_uint64, _value) = value;
 	}
@@ -1066,7 +1069,7 @@ namespace slib
 
 	void Variant::setFloat(float value) noexcept
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		_type = VariantType::Float;
 		REF_VAR(float, _value) = value;
 	}
@@ -1125,7 +1128,7 @@ namespace slib
 
 	void Variant::setDouble(double value) noexcept
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		_type = VariantType::Double;
 		REF_VAR(double, _value) = value;
 	}
@@ -1213,7 +1216,7 @@ namespace slib
 
 	void Variant::setBoolean(sl_bool value) noexcept
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		_type = VariantType::Boolean;
 		REF_VAR(sl_bool, _value) = value;
 	}
@@ -1398,7 +1401,7 @@ namespace slib
 	void Variant::setString(const String& value) noexcept
 	{
 		if (value.isNotNull()) {
-			_priv_Variant_free(_type, _value);
+			priv::variant::free(_type, _value);
 			_type = VariantType::String8;
 			new PTR_VAR(String, _value) String(value);
 		} else {
@@ -1409,7 +1412,7 @@ namespace slib
 	void Variant::setString(const String16& value) noexcept
 	{
 		if (value.isNotNull()) {
-			_priv_Variant_free(_type, _value);
+			priv::variant::free(_type, _value);
 			_type = VariantType::String16;
 			new PTR_VAR(String16, _value) String16(value);
 		} else {
@@ -1421,7 +1424,7 @@ namespace slib
 	{
 		String value(s);
 		if (value.isNotNull()) {
-			_priv_Variant_free(_type, _value);
+			priv::variant::free(_type, _value);
 			_type = VariantType::String8;
 			new PTR_VAR(String, _value) String(value);
 		} else {
@@ -1433,7 +1436,7 @@ namespace slib
 	{
 		String value(s);
 		if (value.isNotNull()) {
-			_priv_Variant_free(_type, _value);
+			priv::variant::free(_type, _value);
 			_type = VariantType::String16;
 			new PTR_VAR(String16, _value) String16(value);
 		} else {
@@ -1444,7 +1447,7 @@ namespace slib
 	void Variant::setString(const sl_char8* value) noexcept
 	{
 		if (value) {
-			_priv_Variant_free(_type, _value);
+			priv::variant::free(_type, _value);
 			_type = VariantType::Sz8;
 			REF_VAR(const sl_char8*, _value) = value;
 		} else {
@@ -1455,7 +1458,7 @@ namespace slib
 	void Variant::setString(const sl_char16* value) noexcept
 	{
 		if (value) {
-			_priv_Variant_free(_type, _value);
+			priv::variant::free(_type, _value);
 			_type = VariantType::Sz16;
 			REF_VAR(const sl_char16*, _value) = value;
 		} else {
@@ -1485,14 +1488,14 @@ namespace slib
 	
 	void Variant::setString(const std::string& value) noexcept
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		_type = VariantType::String8;
 		new PTR_VAR(String, _value) String(value);
 	}
 	
 	void Variant::setString(const std::u16string& value) noexcept
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		_type = VariantType::String16;
 		new PTR_VAR(String16, _value) String16(value);
 	}
@@ -1540,7 +1543,7 @@ namespace slib
 
 	void Variant::setTime(const Time& value) noexcept
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 		_type = VariantType::Time;
 		REF_VAR(Time, _value) = value;
 	}
@@ -1561,7 +1564,7 @@ namespace slib
 	void Variant::setPointer(const void *ptr) noexcept
 	{
 		if (ptr) {
-			_priv_Variant_free(_type, _value);
+			priv::variant::free(_type, _value);
 			_type = VariantType::Pointer;
 			REF_VAR(const void*, _value) = ptr;
 		} else {
@@ -1920,190 +1923,197 @@ namespace slib
 		return sl_false;
 	}
 
-	static sl_bool _priv_Variant_getVariantListJsonString(StringBuffer& ret, const List<Variant>& list) noexcept;
-	static sl_bool _priv_Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map) noexcept;
-	static sl_bool _priv_Variant_getVariantHashMapJsonString(StringBuffer& ret, const HashMap<String, Variant>& map) noexcept;
-	static sl_bool _priv_Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list) noexcept;
-	static sl_bool _priv_Variant_getVariantHashMapListJsonString(StringBuffer& ret, const List< HashMap<String, Variant> >& list) noexcept;
-	
-	static sl_bool _priv_Variant_getVariantJsonString(StringBuffer& ret, const Variant& v) noexcept
+	namespace priv
 	{
-		if (v.isObject()) {
-			Ref<Referable> obj(v.getObject());
-			if (obj.isNotNull()) {
-				if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
-					if (!_priv_Variant_getVariantListJsonString(ret, p1)) {
-						return sl_false;
+		namespace variant
+		{
+			static sl_bool getVariantListJsonString(StringBuffer& ret, const List<Variant>& list) noexcept;
+			static sl_bool getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map) noexcept;
+			static sl_bool getVariantHashMapJsonString(StringBuffer& ret, const HashMap<String, Variant>& map) noexcept;
+			static sl_bool getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list) noexcept;
+			static sl_bool getVariantHashMapListJsonString(StringBuffer& ret, const List< HashMap<String, Variant> >& list) noexcept;
+			
+			static sl_bool getVariantJsonString(StringBuffer& ret, const Variant& v) noexcept
+			{
+				if (v.isObject()) {
+					Ref<Referable> obj(v.getObject());
+					if (obj.isNotNull()) {
+						if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
+							if (!priv::variant::getVariantListJsonString(ret, p1)) {
+								return sl_false;
+							}
+						} else if (CMap<String, Variant>* p2 = CastInstance< CMap<String, Variant> >(obj._ptr)) {
+							if (!priv::variant::getVariantMapJsonString(ret, p2)) {
+								return sl_false;
+							}
+						} else if (CHashMap<String, Variant>* p3 = CastInstance< CHashMap<String, Variant> >(obj._ptr)) {
+							if (!priv::variant::getVariantHashMapJsonString(ret, p3)) {
+								return sl_false;
+							}
+						} else if (CList< Map<String, Variant> >* p4 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
+							if (!priv::variant::getVariantMapListJsonString(ret, p4)) {
+								return sl_false;
+							}
+						} else if (CList< HashMap<String, Variant> >* p5 = CastInstance< CList< HashMap<String, Variant> > >(obj._ptr)) {
+							if (!priv::variant::getVariantHashMapListJsonString(ret, p5)) {
+								return sl_false;
+							}
+						}
 					}
-				} else if (CMap<String, Variant>* p2 = CastInstance< CMap<String, Variant> >(obj._ptr)) {
-					if (!_priv_Variant_getVariantMapJsonString(ret, p2)) {
-						return sl_false;
-					}
-				} else if (CHashMap<String, Variant>* p3 = CastInstance< CHashMap<String, Variant> >(obj._ptr)) {
-					if (!_priv_Variant_getVariantHashMapJsonString(ret, p3)) {
-						return sl_false;
-					}
-				} else if (CList< Map<String, Variant> >* p4 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
-					if (!_priv_Variant_getVariantMapListJsonString(ret, p4)) {
-						return sl_false;
-					}
-				} else if (CList< HashMap<String, Variant> >* p5 = CastInstance< CList< HashMap<String, Variant> > >(obj._ptr)) {
-					if (!_priv_Variant_getVariantHashMapListJsonString(ret, p5)) {
+				} else {
+					String valueText = v.toJsonString();
+					if (!(ret.add(valueText))) {
 						return sl_false;
 					}
 				}
+				return sl_true;
 			}
-		} else {
-			String valueText = v.toJsonString();
-			if (!(ret.add(valueText))) {
-				return sl_false;
+			
+			static sl_bool getVariantListJsonString(StringBuffer& ret, const List<Variant>& list) noexcept
+			{
+				ListLocker<Variant> l(list);
+				sl_size n = l.count;
+				Variant* lb = l.data;
+				
+				if (!(ret.addStatic("[", 1))) {
+					return sl_false;
+				}
+				for (sl_size i = 0; i < n; i++) {
+					Variant& v = lb[i];
+					if (i) {
+						if (!(ret.addStatic(", ", 2))) {
+							return sl_false;
+						}
+					}
+					if (!priv::variant::getVariantJsonString(ret, v)) {
+						return sl_false;
+					}
+				}
+				if (!(ret.addStatic("]", 1))) {
+					return sl_false;
+				}
+				return sl_true;
 			}
-		}
-		return sl_true;
-	}
+			
+			static sl_bool getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map) noexcept
+			{
+				MutexLocker lock(map.getLocker());
+				if (!(ret.addStatic("{", 1))) {
+					return sl_false;
+				}
+				sl_bool flagFirst = sl_true;
+				for (auto& pair : map) {
+					Variant& v = pair.value;
+					if (v.isNotUndefined()) {
+						if (!flagFirst) {
+							if (!(ret.addStatic(", ", 2))) {
+								return sl_false;
+							}
+						}
+						if (!(ret.add(ParseUtil::applyBackslashEscapes(pair.key)))) {
+							return sl_false;
+						}
+						if (!(ret.addStatic(": ", 2))) {
+							return sl_false;
+						}
+						if (!priv::variant::getVariantJsonString(ret, v)) {
+							return sl_false;
+						}
+						flagFirst = sl_false;
+					}
+				}
+				if (!(ret.addStatic("}", 1))) {
+					return sl_false;
+				}
+				return sl_true;
+			}
+			
+			static sl_bool getVariantHashMapJsonString(StringBuffer& ret, const HashMap<String, Variant>& map) noexcept
+			{
+				MutexLocker lock(map.getLocker());
+				if (!(ret.addStatic("{", 1))) {
+					return sl_false;
+				}
+				sl_bool flagFirst = sl_true;
+				for (auto& pair : map) {
+					Variant& v = pair.value;
+					if (v.isNotUndefined()) {
+						if (!flagFirst) {
+							if (!(ret.addStatic(", ", 2))) {
+								return sl_false;
+							}
+						}
+						if (!(ret.add(ParseUtil::applyBackslashEscapes(pair.key)))) {
+							return sl_false;
+						}
+						if (!(ret.addStatic(": ", 2))) {
+							return sl_false;
+						}
+						if (!priv::variant::getVariantJsonString(ret, v)) {
+							return sl_false;
+						}
+						flagFirst = sl_false;
+					}
+				}
+				if (!(ret.addStatic("}", 1))) {
+					return sl_false;
+				}
+				return sl_true;
+			}
+			
+			static sl_bool getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list) noexcept
+			{
+				ListLocker< Map<String, Variant> > l(list);
+				sl_size n = l.count;
+				Map<String, Variant>* lb = l.data;
+				
+				if (!(ret.addStatic("[", 1))) {
+					return sl_false;
+				}
+				for (sl_size i = 0; i < n; i++) {
+					Map<String, Variant>& v = lb[i];
+					if (i) {
+						if (!(ret.addStatic(", ", 2))) {
+							return sl_false;
+						}
+					}
+					if (!priv::variant::getVariantMapJsonString(ret, v)) {
+						return sl_false;
+					}
+				}
+				if (!(ret.addStatic("]", 1))) {
+					return sl_false;
+				}
+				return sl_true;
+			}
+			
+			static sl_bool getVariantHashMapListJsonString(StringBuffer& ret, const List< HashMap<String, Variant> >& list) noexcept
+			{
+				ListLocker< HashMap<String, Variant> > l(list);
+				sl_size n = l.count;
+				HashMap<String, Variant>* lb = l.data;
+				
+				if (!(ret.addStatic("[", 1))) {
+					return sl_false;
+				}
+				for (sl_size i = 0; i < n; i++) {
+					HashMap<String, Variant>& v = lb[i];
+					if (i) {
+						if (!(ret.addStatic(", ", 2))) {
+							return sl_false;
+						}
+					}
+					if (!priv::variant::getVariantHashMapJsonString(ret, v)) {
+						return sl_false;
+					}
+				}
+				if (!(ret.addStatic("]", 1))) {
+					return sl_false;
+				}
+				return sl_true;
+			}
 
-	static sl_bool _priv_Variant_getVariantListJsonString(StringBuffer& ret, const List<Variant>& list) noexcept
-	{
-		ListLocker<Variant> l(list);
-		sl_size n = l.count;
-		Variant* lb = l.data;
-		
-		if (!(ret.addStatic("[", 1))) {
-			return sl_false;
 		}
-		for (sl_size i = 0; i < n; i++) {
-			Variant& v = lb[i];
-			if (i) {
-				if (!(ret.addStatic(", ", 2))) {
-					return sl_false;
-				}
-			}
-			if (!_priv_Variant_getVariantJsonString(ret, v)) {
-				return sl_false;
-			}
-		}
-		if (!(ret.addStatic("]", 1))) {
-			return sl_false;
-		}
-		return sl_true;
-	}
-
-	static sl_bool _priv_Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map) noexcept
-	{
-		MutexLocker lock(map.getLocker());
-		if (!(ret.addStatic("{", 1))) {
-			return sl_false;
-		}
-		sl_bool flagFirst = sl_true;
-		for (auto& pair : map) {
-			Variant& v = pair.value;
-			if (v.isNotUndefined()) {
-				if (!flagFirst) {
-					if (!(ret.addStatic(", ", 2))) {
-						return sl_false;
-					}
-				}
-				if (!(ret.add(ParseUtil::applyBackslashEscapes(pair.key)))) {
-					return sl_false;
-				}
-				if (!(ret.addStatic(": ", 2))) {
-					return sl_false;
-				}
-				if (!_priv_Variant_getVariantJsonString(ret, v)) {
-					return sl_false;
-				}
-				flagFirst = sl_false;
-			}
-		}
-		if (!(ret.addStatic("}", 1))) {
-			return sl_false;
-		}
-		return sl_true;
-	}
-
-	static sl_bool _priv_Variant_getVariantHashMapJsonString(StringBuffer& ret, const HashMap<String, Variant>& map) noexcept
-	{
-		MutexLocker lock(map.getLocker());
-		if (!(ret.addStatic("{", 1))) {
-			return sl_false;
-		}
-		sl_bool flagFirst = sl_true;
-		for (auto& pair : map) {
-			Variant& v = pair.value;
-			if (v.isNotUndefined()) {
-				if (!flagFirst) {
-					if (!(ret.addStatic(", ", 2))) {
-						return sl_false;
-					}
-				}
-				if (!(ret.add(ParseUtil::applyBackslashEscapes(pair.key)))) {
-					return sl_false;
-				}
-				if (!(ret.addStatic(": ", 2))) {
-					return sl_false;
-				}
-				if (!_priv_Variant_getVariantJsonString(ret, v)) {
-					return sl_false;
-				}
-				flagFirst = sl_false;
-			}
-		}
-		if (!(ret.addStatic("}", 1))) {
-			return sl_false;
-		}
-		return sl_true;
-	}
-
-	static sl_bool _priv_Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list) noexcept
-	{
-		ListLocker< Map<String, Variant> > l(list);
-		sl_size n = l.count;
-		Map<String, Variant>* lb = l.data;
-		
-		if (!(ret.addStatic("[", 1))) {
-			return sl_false;
-		}
-		for (sl_size i = 0; i < n; i++) {
-			Map<String, Variant>& v = lb[i];
-			if (i) {
-				if (!(ret.addStatic(", ", 2))) {
-					return sl_false;
-				}
-			}
-			if (!_priv_Variant_getVariantMapJsonString(ret, v)) {
-				return sl_false;
-			}
-		}
-		if (!(ret.addStatic("]", 1))) {
-			return sl_false;
-		}
-		return sl_true;
-	}
-
-	static sl_bool _priv_Variant_getVariantHashMapListJsonString(StringBuffer& ret, const List< HashMap<String, Variant> >& list) noexcept
-	{
-		ListLocker< HashMap<String, Variant> > l(list);
-		sl_size n = l.count;
-		HashMap<String, Variant>* lb = l.data;
-		
-		if (!(ret.addStatic("[", 1))) {
-			return sl_false;
-		}
-		for (sl_size i = 0; i < n; i++) {
-			HashMap<String, Variant>& v = lb[i];
-			if (i) {
-				if (!(ret.addStatic(", ", 2))) {
-					return sl_false;
-				}
-			}
-			if (!_priv_Variant_getVariantHashMapJsonString(ret, v)) {
-				return sl_false;
-			}
-		}
-		if (!(ret.addStatic("]", 1))) {
-			return sl_false;
-		}
-		return sl_true;
 	}
 
 	String Variant::toString() const noexcept
@@ -2132,31 +2142,31 @@ namespace slib
 					if (obj.isNotNull()) {
 						if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_priv_Variant_getVariantListJsonString(ret, p1)) {
+							if (!priv::variant::getVariantListJsonString(ret, p1)) {
 								return "<json-error>";
 							}
 							return ret.merge();
 						} else if (CMap<String, Variant>* p2 = CastInstance< CMap<String, Variant> >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_priv_Variant_getVariantMapJsonString(ret, p2)) {
+							if (!priv::variant::getVariantMapJsonString(ret, p2)) {
 								return "<json-error>";
 							}
 							return ret.merge();
 						} else if (CHashMap<String, Variant>* p3 = CastInstance< CHashMap<String, Variant> >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_priv_Variant_getVariantHashMapJsonString(ret, p3)) {
+							if (!priv::variant::getVariantHashMapJsonString(ret, p3)) {
 								return "<json-error>";
 							}
 							return ret.merge();
 						} else if (CList< Map<String, Variant> >* p4 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_priv_Variant_getVariantMapListJsonString(ret, p4)) {
+							if (!priv::variant::getVariantMapListJsonString(ret, p4)) {
 								return "<json-error>";
 							}
 							return ret.merge();
 						} else if (CList< HashMap<String, Variant> >* p5 = CastInstance< CList< HashMap<String, Variant> > >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_priv_Variant_getVariantHashMapListJsonString(ret, p5)) {
+							if (!priv::variant::getVariantHashMapListJsonString(ret, p5)) {
 								return "<json-error>";
 							}
 							return ret.merge();
@@ -2200,31 +2210,31 @@ namespace slib
 					if (obj.isNotNull()) {
 						if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_priv_Variant_getVariantListJsonString(ret, p1)) {
+							if (!priv::variant::getVariantListJsonString(ret, p1)) {
 								return strNull;
 							}
 							return ret.merge();
 						} else if (CMap<String, Variant>* p2 = CastInstance< CMap<String, Variant> >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_priv_Variant_getVariantMapJsonString(ret, p2)) {
+							if (!priv::variant::getVariantMapJsonString(ret, p2)) {
 								return strNull;
 							}
 							return ret.merge();
 						} else if (CHashMap<String, Variant>* p3 = CastInstance< CHashMap<String, Variant> >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_priv_Variant_getVariantHashMapJsonString(ret, p3)) {
+							if (!priv::variant::getVariantHashMapJsonString(ret, p3)) {
 								return strNull;
 							}
 							return ret.merge();
 						} else if (CList< Map<String, Variant> >* p4 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_priv_Variant_getVariantMapListJsonString(ret, p4)) {
+							if (!priv::variant::getVariantMapListJsonString(ret, p4)) {
 								return strNull;
 							}
 							return ret.merge();
 						} else if (CList< HashMap<String, Variant> >* p5 = CastInstance< CList< HashMap<String, Variant> > >(obj._ptr)) {
 							StringBuffer ret;
-							if (!_priv_Variant_getVariantHashMapListJsonString(ret, p5)) {
+							if (!priv::variant::getVariantHashMapListJsonString(ret, p5)) {
 								return strNull;
 							}
 							return ret.merge();
@@ -2729,12 +2739,12 @@ namespace slib
 	Atomic<Variant>::Atomic(const Variant& other) noexcept
 	{
 		_type = other._type;
-		_priv_Variant_copy(_type, other._value, _value);
+		priv::variant::copy(_type, other._value, _value);
 	}
 
 	Atomic<Variant>::~Atomic() noexcept
 	{
-		_priv_Variant_free(_type, _value);
+		priv::variant::free(_type, _value);
 	}
 	
 	Atomic<Variant>::Atomic(signed char value) noexcept
@@ -3005,7 +3015,7 @@ namespace slib
 	{
 		VariantType type = other._type;
 		sl_uint64 value;
-		_priv_Variant_copy(type, other._value, value);
+		priv::variant::copy(type, other._value, value);
 		_replace(type, value);
 		return *this;
 	}
@@ -4060,658 +4070,711 @@ namespace slib
 		_assignAtomicRef(&_in);
 	}
 	
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const sl_int32* v2) noexcept
+	namespace priv
 	{
-		return *v1 == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const sl_uint32* v2) noexcept
-	{
-		sl_int32 n = *v1;
-		if (n >= 0) {
-			return (sl_uint32)(n) == *v2;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v2, const sl_int32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const sl_int64* v2) noexcept
-	{
-		return (sl_int64)(*v1) == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v2, const sl_int32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const sl_uint64* v2) noexcept
-	{
-		sl_int32 n = *v1;
-		if (n >= 0) {
-			return (sl_uint64)((sl_uint32)n) == *v2;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v2, const sl_int32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
+		namespace variant
+		{
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int32* v1, const sl_int32* v2) noexcept
+			{
+				return *v1 == *v2;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int32* v1, const sl_uint32* v2) noexcept
+			{
+				sl_int32 n = *v1;
+				if (n >= 0) {
+					return (sl_uint32)(n) == *v2;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint32* v2, const sl_int32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int32* v1, const sl_int64* v2) noexcept
+			{
+				return (sl_int64)(*v1) == *v2;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int64* v2, const sl_int32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int32* v1, const sl_uint64* v2) noexcept
+			{
+				sl_int32 n = *v1;
+				if (n >= 0) {
+					return (sl_uint64)((sl_uint32)n) == *v2;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint64* v2, const sl_int32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int32* v1, const float* v2) noexcept
+			{
+				return Math::isAlmostZero((float)(*v1) - *v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const float* v2, const sl_int32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int32* v1, const double* v2) noexcept
+			{
+				return Math::isAlmostZero((double)(*v1) - *v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const double* v2, const sl_int32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int32* v1, const String* v2) noexcept
+			{
+				sl_int32 n;
+				if (v2->parseInt32(10, &n)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String* v2, const sl_int32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int32* v1, const String16* v2) noexcept
+			{
+				sl_int32 n;
+				if (v2->parseInt32(10, &n)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String16* v2, const sl_int32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int32* v1, sl_char8 const* const* v2) noexcept
+			{
+				sl_int32 n;
+				if (String::parseInt32(10, &n, *v2)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v2, const sl_int32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int32* v1, sl_char16 const* const* v2) noexcept
+			{
+				sl_int32 n;
+				if (String16::parseInt32(10, &n, *v2)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v2, const sl_int32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint32* v1, const sl_uint32* v2) noexcept
+			{
+				return *v1 == *v2;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint32* v1, const sl_int64* v2) noexcept
+			{
+				return (sl_int64)(*v1) == *v2;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int64* v2, const sl_uint32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint32* v1, const sl_uint64* v2) noexcept
+			{
+				return (sl_uint64)(*v1) == *v2;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint64* v2, const sl_uint32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint32* v1, const float* v2) noexcept
+			{
+				return Math::isAlmostZero((float)(*v1) - *v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const float* v2, const sl_uint32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint32* v1, const double* v2) noexcept
+			{
+				return Math::isAlmostZero((double)(*v1) - *v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const double* v2, const sl_uint32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint32* v1, const String* v2) noexcept
+			{
+				sl_uint32 n;
+				if (v2->parseUint32(10, &n)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String* v2, const sl_uint32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint32* v1, const String16* v2) noexcept
+			{
+				sl_uint32 n;
+				if (v2->parseUint32(10, &n)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String16* v2, const sl_uint32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint32* v1, sl_char8 const* const* v2) noexcept
+			{
+				sl_uint32 n;
+				if (String::parseUint32(10, &n, *v2)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v2, const sl_uint32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint32* v1, sl_char16 const* const* v2) noexcept
+			{
+				sl_uint32 n;
+				if (String16::parseUint32(10, &n, *v2)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v2, const sl_uint32* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int64* v1, const sl_int64* v2) noexcept
+			{
+				return *v1 == *v2;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int64* v1, const sl_uint64* v2) noexcept
+			{
+				sl_int64 n = *v1;
+				if (n >= 0) {
+					return (sl_uint64)(n) == *v2;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint64* v2, const sl_int64* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int64* v1, const float* v2) noexcept
+			{
+				return Math::isAlmostZero((float)(*v1) - *v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const float* v2, const sl_int64* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int64* v1, const double* v2) noexcept
+			{
+				return Math::isAlmostZero((double)(*v1) - *v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const double* v2, const sl_int64* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int64* v1, const String* v2) noexcept
+			{
+				sl_int64 n;
+				if (v2->parseInt64(10, &n)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String* v2, const sl_int64* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int64* v1, const String16* v2) noexcept
+			{
+				sl_int64 n;
+				if (v2->parseInt64(10, &n)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String16* v2, const sl_int64* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int64* v1, sl_char8 const* const* v2) noexcept
+			{
+				sl_int64 n;
+				if (String::parseInt64(10, &n, *v2)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v2, const sl_int64* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_int64* v1, sl_char16 const* const* v2) noexcept
+			{
+				sl_int64 n;
+				if (String16::parseInt64(10, &n, *v2)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v2, const sl_int64* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint64* v1, const sl_uint64* v2) noexcept
+			{
+				return *v1 == *v2;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint64* v1, const float* v2) noexcept
+			{
+				return Math::isAlmostZero((float)(*v1) - *v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const float* v2, const sl_uint64* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint64* v1, const double* v2) noexcept
+			{
+				return Math::isAlmostZero((double)(*v1) - *v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const double* v2, const sl_uint64* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint64* v1, const String* v2) noexcept
+			{
+				sl_uint64 n;
+				if (v2->parseUint64(10, &n)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String* v2, const sl_uint64* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint64* v1, const String16* v2) noexcept
+			{
+				sl_uint64 n;
+				if (v2->parseUint64(10, &n)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String16* v2, const sl_uint64* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint64* v1, sl_char8 const* const* v2) noexcept
+			{
+				sl_uint64 n;
+				if (String::parseUint64(10, &n, *v2)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v2, const sl_uint64* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_uint64* v1, sl_char16 const* const* v2) noexcept
+			{
+				sl_uint64 n;
+				if (String16::parseUint64(10, &n, *v2)) {
+					return *v1 == n;
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v2, const sl_uint64* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			
+			SLIB_INLINE static sl_bool equals_element(const float* v1, const float* v2) noexcept
+			{
+				return Math::isAlmostZero(*v1 - *v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const float* v1, const double* v2) noexcept
+			{
+				return Math::isAlmostZero((double)(*v1) - *v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const double* v2, const float* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const float* v1, const String* v2) noexcept
+			{
+				float n;
+				if (v2->parseFloat(&n)) {
+					return Math::isAlmostZero(*v1 - n);
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String* v2, const float* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const float* v1, const String16* v2) noexcept
+			{
+				float n;
+				if (v2->parseFloat(&n)) {
+					return Math::isAlmostZero(*v1 - n);
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String16* v2, const float* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const float* v1, sl_char8 const* const* v2) noexcept
+			{
+				float n;
+				if (String::parseFloat(&n, *v2)) {
+					return Math::isAlmostZero(*v1 - n);
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v2, const float* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const float* v1, sl_char16 const* const* v2) noexcept
+			{
+				float n;
+				if (String16::parseFloat(&n, *v2)) {
+					return Math::isAlmostZero(*v1 - n);
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v2, const float* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			
+			SLIB_INLINE static sl_bool equals_element(const double* v1, const double* v2) noexcept
+			{
+				return Math::isAlmostZero(*v1 - *v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const double* v1, const String* v2) noexcept
+			{
+				double n;
+				if (v2->parseDouble(&n)) {
+					return Math::isAlmostZero(*v1 - n);
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String* v2, const double* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const double* v1, const String16* v2) noexcept
+			{
+				double n;
+				if (v2->parseDouble(&n)) {
+					return Math::isAlmostZero(*v1 - n);
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String16* v2, const double* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const double* v1, sl_char8 const* const* v2) noexcept
+			{
+				double n;
+				if (String::parseDouble(&n, *v2)) {
+					return Math::isAlmostZero(*v1 - n);
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v2, const double* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const double* v1, sl_char16 const* const* v2) noexcept
+			{
+				double n;
+				if (String16::parseDouble(&n, *v2)) {
+					return Math::isAlmostZero(*v1 - n);
+				}
+				return sl_false;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v2, const double* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			
+			SLIB_INLINE static sl_bool equals_element(const String* v1, const String* v2) noexcept
+			{
+				return *v1 == *v2;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String* v1, const String16* v2) noexcept
+			{
+				return *v1 == *v2;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String16* v2, const String* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String* v1, sl_char8 const* const* v2) noexcept
+			{
+				return *v1 == *v2;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v2, const String* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String* v1, sl_char16 const* const* v2) noexcept
+			{
+				return *v1 == *v2;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v2, const String* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			
+			SLIB_INLINE static sl_bool equals_element(const String16* v1, const String16* v2) noexcept
+			{
+				return *v1 == *v2;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String16* v1, sl_char8 const* const* v2) noexcept
+			{
+				return *v1 == *v2;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v2, const String16* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const String16* v1, sl_char16 const* const* v2) noexcept
+			{
+				return *v1 == *v2;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v2, const String16* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v1, sl_char8 const* const* v2) noexcept
+			{
+				return Base::compareString(*v1, *v2) == 0;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v1, sl_char16 const* const* v2) noexcept
+			{
+				return *v1 == String(*v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v2, sl_char8 const* const* v1) noexcept
+			{
+				return priv::variant::equals_element(v1, v2);
+			}
+			
+			
+			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v1, sl_char16 const* const* v2) noexcept
+			{
+				return Base::compareString2(*v1, *v2) == 0;
+			}
+			
+			
+			template <class T>
+			SLIB_INLINE static sl_bool equals(const T* v1, const Variant& v2) noexcept
+			{
+				VariantType type = v2._type;
+				switch (type) {
+					case VariantType::Int32:
+						return priv::variant::equals_element(v1, PTR_VAR(sl_int32 const, v2._value));
+					case VariantType::Uint32:
+						return priv::variant::equals_element(v1, PTR_VAR(sl_uint32 const, v2._value));
+					case VariantType::Int64:
+						return priv::variant::equals_element(v1, PTR_VAR(sl_int64 const, v2._value));
+					case VariantType::Uint64:
+						return priv::variant::equals_element(v1, PTR_VAR(sl_uint64 const, v2._value));
+					case VariantType::Float:
+						return priv::variant::equals_element(v1, PTR_VAR(float const, v2._value));
+					case VariantType::Double:
+						return priv::variant::equals_element(v1, PTR_VAR(double const, v2._value));
+					case VariantType::String8:
+						return priv::variant::equals_element(v1, PTR_VAR(String const, v2._value));
+					case VariantType::String16:
+						return priv::variant::equals_element(v1, PTR_VAR(String16 const, v2._value));
+					case VariantType::Sz8:
+						return priv::variant::equals_element(v1, PTR_VAR(sl_char8 const* const, v2._value));
+					case VariantType::Sz16:
+						return priv::variant::equals_element(v1, PTR_VAR(sl_char16 const* const, v2._value));
+					default:
+						break;
+				}
+				return sl_false;
+			}
 
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const float* v2) noexcept
-	{
-		return Math::isAlmostZero((float)(*v1) - *v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v2, const sl_int32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const double* v2) noexcept
-	{
-		return Math::isAlmostZero((double)(*v1) - *v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const sl_int32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const String* v2) noexcept
-	{
-		sl_int32 n;
-		if (v2->parseInt32(10, &n)) {
-			return *v1 == n;
 		}
-		return sl_false;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const sl_int32* v1) noexcept
+	sl_compare_result Variant::compare(const Variant& v2) const noexcept
 	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, const String16* v2) noexcept
-	{
-		sl_int32 n;
-		if (v2->parseInt32(10, &n)) {
-			return *v1 == n;
+		const Variant& v1 = *this;
+		VariantType type = v1._type;
+		if (type == v2._type) {
+			switch (type) {
+				case VariantType::Null:
+					return 0;
+				case VariantType::Int32:
+					return ComparePrimitiveValues(REF_VAR(sl_int32 const, v1._value), REF_VAR(sl_int32 const, v2._value));
+				case VariantType::Uint32:
+				case VariantType::Boolean:
+					return ComparePrimitiveValues(REF_VAR(sl_uint32 const, v1._value), REF_VAR(sl_uint32 const, v2._value));
+				case VariantType::Int64:
+					return ComparePrimitiveValues(REF_VAR(sl_int64 const, v1._value), REF_VAR(sl_int64 const, v2._value));
+				case VariantType::Float:
+					return ComparePrimitiveValues(REF_VAR(float const, v1._value), REF_VAR(float const, v2._value));
+				case VariantType::Double:
+					return ComparePrimitiveValues(REF_VAR(double const, v1._value), REF_VAR(double const, v2._value));
+				case VariantType::Sz8:
+					return Base::compareString(REF_VAR(sl_char8 const* const, v1._value), REF_VAR(sl_char8 const* const, v2._value));
+				case VariantType::Sz16:
+					return Base::compareString2(REF_VAR(sl_char16 const* const, v1._value), REF_VAR(sl_char16 const* const, v2._value));
+				case VariantType::String8:
+					return REF_VAR(String const, v1._value).compare(REF_VAR(String const, v2._value));
+				case VariantType::String16:
+					return REF_VAR(String16 const, v1._value).compare(REF_VAR(String16 const, v2._value));
+				case VariantType::Pointer:
+				case VariantType::Object:
+					return ComparePrimitiveValues(REF_VAR(sl_size const, v1._value), REF_VAR(sl_size const, v2._value));
+				default:
+					return ComparePrimitiveValues(v1._value, v2._value);
+			}
+		} else {
+			ComparePrimitiveValues((int)type, (int)(v2._type));
 		}
-		return sl_false;
+		return 0;
 	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const sl_int32* v1) noexcept
+	sl_compare_result Atomic<Variant>::compare(const Variant& v2) const noexcept
 	{
-		return _priv_Variant_equals_element(v1, v2);
+		Variant v1(*this);
+		return v1.compare(v2);
 	}
-
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, sl_char8 const* const* v2) noexcept
-	{
-		sl_int32 n;
-		if (String::parseInt32(10, &n, *v2)) {
-			return *v1 == n;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const sl_int32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int32* v1, sl_char16 const* const* v2) noexcept
-	{
-		sl_int32 n;
-		if (String16::parseInt32(10, &n, *v2)) {
-			return *v1 == n;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const sl_int32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const sl_uint32* v2) noexcept
-	{
-		return *v1 == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const sl_int64* v2) noexcept
-	{
-		return (sl_int64)(*v1) == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v2, const sl_uint32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const sl_uint64* v2) noexcept
-	{
-		return (sl_uint64)(*v1) == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v2, const sl_uint32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const float* v2) noexcept
-	{
-		return Math::isAlmostZero((float)(*v1) - *v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v2, const sl_uint32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const double* v2) noexcept
-	{
-		return Math::isAlmostZero((double)(*v1) - *v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const sl_uint32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const String* v2) noexcept
-	{
-		sl_uint32 n;
-		if (v2->parseUint32(10, &n)) {
-			return *v1 == n;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const sl_uint32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, const String16* v2) noexcept
-	{
-		sl_uint32 n;
-		if (v2->parseUint32(10, &n)) {
-			return *v1 == n;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const sl_uint32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, sl_char8 const* const* v2) noexcept
-	{
-		sl_uint32 n;
-		if (String::parseUint32(10, &n, *v2)) {
-			return *v1 == n;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const sl_uint32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint32* v1, sl_char16 const* const* v2) noexcept
-	{
-		sl_uint32 n;
-		if (String16::parseUint32(10, &n, *v2)) {
-			return *v1 == n;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const sl_uint32* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const sl_int64* v2) noexcept
-	{
-		return *v1 == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const sl_uint64* v2) noexcept
-	{
-		sl_int64 n = *v1;
-		if (n >= 0) {
-			return (sl_uint64)(n) == *v2;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v2, const sl_int64* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const float* v2) noexcept
-	{
-		return Math::isAlmostZero((float)(*v1) - *v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v2, const sl_int64* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const double* v2) noexcept
-	{
-		return Math::isAlmostZero((double)(*v1) - *v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const sl_int64* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const String* v2) noexcept
-	{
-		sl_int64 n;
-		if (v2->parseInt64(10, &n)) {
-			return *v1 == n;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const sl_int64* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, const String16* v2) noexcept
-	{
-		sl_int64 n;
-		if (v2->parseInt64(10, &n)) {
-			return *v1 == n;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const sl_int64* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, sl_char8 const* const* v2) noexcept
-	{
-		sl_int64 n;
-		if (String::parseInt64(10, &n, *v2)) {
-			return *v1 == n;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const sl_int64* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_int64* v1, sl_char16 const* const* v2) noexcept
-	{
-		sl_int64 n;
-		if (String16::parseInt64(10, &n, *v2)) {
-			return *v1 == n;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const sl_int64* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const sl_uint64* v2) noexcept
-	{
-		return *v1 == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const float* v2) noexcept
-	{
-		return Math::isAlmostZero((float)(*v1) - *v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v2, const sl_uint64* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const double* v2) noexcept
-	{
-		return Math::isAlmostZero((double)(*v1) - *v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const sl_uint64* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const String* v2) noexcept
-	{
-		sl_uint64 n;
-		if (v2->parseUint64(10, &n)) {
-			return *v1 == n;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const sl_uint64* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
 	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, const String16* v2) noexcept
-	{
-		sl_uint64 n;
-		if (v2->parseUint64(10, &n)) {
-			return *v1 == n;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const sl_uint64* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, sl_char8 const* const* v2) noexcept
-	{
-		sl_uint64 n;
-		if (String::parseUint64(10, &n, *v2)) {
-			return *v1 == n;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const sl_uint64* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const sl_uint64* v1, sl_char16 const* const* v2) noexcept
-	{
-		sl_uint64 n;
-		if (String16::parseUint64(10, &n, *v2)) {
-			return *v1 == n;
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const sl_uint64* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, const float* v2) noexcept
-	{
-		return Math::isAlmostZero(*v1 - *v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, const double* v2) noexcept
-	{
-		return Math::isAlmostZero((double)(*v1) - *v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v2, const float* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, const String* v2) noexcept
-	{
-		float n;
-		if (v2->parseFloat(&n)) {
-			return Math::isAlmostZero(*v1 - n);
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const float* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, const String16* v2) noexcept
-	{
-		float n;
-		if (v2->parseFloat(&n)) {
-			return Math::isAlmostZero(*v1 - n);
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const float* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, sl_char8 const* const* v2) noexcept
-	{
-		float n;
-		if (String::parseFloat(&n, *v2)) {
-			return Math::isAlmostZero(*v1 - n);
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const float* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const float* v1, sl_char16 const* const* v2) noexcept
-	{
-		float n;
-		if (String16::parseFloat(&n, *v2)) {
-			return Math::isAlmostZero(*v1 - n);
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const float* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, const double* v2) noexcept
-	{
-		return Math::isAlmostZero(*v1 - *v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, const String* v2) noexcept
-	{
-		double n;
-		if (v2->parseDouble(&n)) {
-			return Math::isAlmostZero(*v1 - n);
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v2, const double* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, const String16* v2) noexcept
-	{
-		double n;
-		if (v2->parseDouble(&n)) {
-			return Math::isAlmostZero(*v1 - n);
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const double* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, sl_char8 const* const* v2) noexcept
-	{
-		double n;
-		if (String::parseDouble(&n, *v2)) {
-			return Math::isAlmostZero(*v1 - n);
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const double* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const double* v1, sl_char16 const* const* v2) noexcept
-	{
-		double n;
-		if (String16::parseDouble(&n, *v2)) {
-			return Math::isAlmostZero(*v1 - n);
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const double* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v1, const String* v2) noexcept
-	{
-		return *v1 == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v1, const String16* v2) noexcept
-	{
-		return *v1 == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v2, const String* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v1, sl_char8 const* const* v2) noexcept
-	{
-		return *v1 == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const String* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String* v1, sl_char16 const* const* v2) noexcept
-	{
-		return *v1 == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const String* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v1, const String16* v2) noexcept
-	{
-		return *v1 == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v1, sl_char8 const* const* v2) noexcept
-	{
-		return *v1 == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v2, const String16* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(const String16* v1, sl_char16 const* const* v2) noexcept
-	{
-		return *v1 == *v2;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, const String16* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v1, sl_char8 const* const* v2) noexcept
-	{
-		return Base::compareString(*v1, *v2) == 0;
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char8 const* const* v1, sl_char16 const* const* v2) noexcept
-	{
-		return *v1 == String(*v2);
-	}
-	
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v2, sl_char8 const* const* v1) noexcept
-	{
-		return _priv_Variant_equals_element(v1, v2);
-	}
-
-
-	SLIB_INLINE static sl_bool _priv_Variant_equals_element(sl_char16 const* const* v1, sl_char16 const* const* v2) noexcept
-	{
-		return Base::compareString2(*v1, *v2) == 0;
-	}
-	
-	
-	template <class T>
-	SLIB_INLINE static sl_bool _priv_Variant_equals(const T* v1, const Variant& v2) noexcept
-	{
-		VariantType type = v2._type;
-		switch (type) {
-			case VariantType::Int32:
-				return _priv_Variant_equals_element(v1, PTR_VAR(sl_int32 const, v2._value));
-			case VariantType::Uint32:
-				return _priv_Variant_equals_element(v1, PTR_VAR(sl_uint32 const, v2._value));
-			case VariantType::Int64:
-				return _priv_Variant_equals_element(v1, PTR_VAR(sl_int64 const, v2._value));
-			case VariantType::Uint64:
-				return _priv_Variant_equals_element(v1, PTR_VAR(sl_uint64 const, v2._value));
-			case VariantType::Float:
-				return _priv_Variant_equals_element(v1, PTR_VAR(float const, v2._value));
-			case VariantType::Double:
-				return _priv_Variant_equals_element(v1, PTR_VAR(double const, v2._value));
-			case VariantType::String8:
-				return _priv_Variant_equals_element(v1, PTR_VAR(String const, v2._value));
-			case VariantType::String16:
-				return _priv_Variant_equals_element(v1, PTR_VAR(String16 const, v2._value));
-			case VariantType::Sz8:
-				return _priv_Variant_equals_element(v1, PTR_VAR(sl_char8 const* const, v2._value));
-			case VariantType::Sz16:
-				return _priv_Variant_equals_element(v1, PTR_VAR(sl_char16 const* const, v2._value));
-			default:
-				break;
-		}
-		return sl_false;
-	}
-
-	sl_bool operator==(const Variant& v1, const Variant& v2) noexcept
+	sl_bool Variant::equals(const Variant& v2) const noexcept
 	{
+		const Variant& v1 = *this;
 		VariantType type = v1._type;
 		if (type == v2._type) {
 			switch (type) {
@@ -4743,35 +4806,96 @@ namespace slib
 		} else {
 			switch (type) {
 				case VariantType::Int32:
-					return _priv_Variant_equals(PTR_VAR(sl_int32 const, v1._value), v2);
+					return priv::variant::equals(PTR_VAR(sl_int32 const, v1._value), v2);
 				case VariantType::Uint32:
-					return _priv_Variant_equals(PTR_VAR(sl_uint32 const, v1._value), v2);
+					return priv::variant::equals(PTR_VAR(sl_uint32 const, v1._value), v2);
 				case VariantType::Int64:
-					return _priv_Variant_equals(PTR_VAR(sl_int64 const, v1._value), v2);
+					return priv::variant::equals(PTR_VAR(sl_int64 const, v1._value), v2);
 				case VariantType::Uint64:
-					return _priv_Variant_equals(PTR_VAR(sl_uint64 const, v1._value), v2);
+					return priv::variant::equals(PTR_VAR(sl_uint64 const, v1._value), v2);
 				case VariantType::Float:
-					return _priv_Variant_equals(PTR_VAR(float const, v1._value), v2);
+					return priv::variant::equals(PTR_VAR(float const, v1._value), v2);
 				case VariantType::Double:
-					return _priv_Variant_equals(PTR_VAR(double const, v1._value), v2);
+					return priv::variant::equals(PTR_VAR(double const, v1._value), v2);
 				case VariantType::String8:
-					return _priv_Variant_equals(PTR_VAR(String const, v1._value), v2);
+					return priv::variant::equals(PTR_VAR(String const, v1._value), v2);
 				case VariantType::String16:
-					return _priv_Variant_equals(PTR_VAR(String16 const, v1._value), v2);
+					return priv::variant::equals(PTR_VAR(String16 const, v1._value), v2);
 				case VariantType::Sz8:
-					return _priv_Variant_equals(PTR_VAR(sl_char8 const* const, v1._value), v2);
+					return priv::variant::equals(PTR_VAR(sl_char8 const* const, v1._value), v2);
 				case VariantType::Sz16:
-					return _priv_Variant_equals(PTR_VAR(sl_char16 const* const, v1._value), v2);
+					return priv::variant::equals(PTR_VAR(sl_char16 const* const, v1._value), v2);
 				default:
 					break;
 			}
 		}
 		return sl_false;
 	}
+	
+	sl_bool Atomic<Variant>::equals(const Variant& v2) const noexcept
+	{
+		Variant v1(*this);
+		return v1.equals(v2);
+	}
+	
+	sl_size Variant::getHashCode() const noexcept
+	{
+		VariantType type = _type;
+		switch (type) {
+			case VariantType::Null:
+				return 0;
+			case VariantType::Int32:
+			case VariantType::Uint32:
+			case VariantType::Boolean:
+			case VariantType::Float:
+				return Rehash32(REF_VAR(sl_int32 const, _value));
+			case VariantType::Sz8:
+				return getString().getHashCode();
+			case VariantType::String8:
+				return REF_VAR(String const, _value).getHashCode();
+			case VariantType::Sz16:
+				return getString16().getHashCode();
+			case VariantType::String16:
+				return REF_VAR(String16 const, _value).getHashCode();
+			case VariantType::Pointer:
+			case VariantType::Object:
+				return Rehash(REF_VAR(sl_size const, _value));
+			default:
+				return Rehash64ToSize(_value);
+		}
+		return 0;
+	}
+	
+	sl_size Atomic<Variant>::getHashCode() const noexcept
+	{
+		Variant v(*this);
+		return v.getHashCode();
+	}
+	
+	sl_bool operator==(const Variant& v1, const Variant& v2) noexcept
+	{
+		return v1.equals(v2);
+	}
 
 	sl_bool operator!=(const Variant& v1, const Variant& v2) noexcept
 	{
-		return !(v1 == v2);
+		return !(v1.equals(v2));
+	}
+
+	
+	sl_compare_result Compare<Variant>::operator()(const Variant& a, const Variant& b) const noexcept
+	{
+		return a.compare(b);
+	}
+	
+	sl_bool Equals<Variant>::operator()(const Variant& a, const Variant& b) const noexcept
+	{
+		return a.equals(b);
+	}
+	
+	sl_size Hash<Variant>::operator()(const Variant& a) const noexcept
+	{
+		return a.getHashCode();
 	}
 
 }

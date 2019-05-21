@@ -538,7 +538,7 @@ public:
 		sl_bool operator==(const IPv4PacketIdentifier& other) const;
 
 	public:
-		sl_size hashCode() const;
+		sl_size getHashCode() const;
 		
 	};
 
@@ -546,7 +546,7 @@ public:
 	class Compare<IPv4PacketIdentifier>
 	{
 	public:
-		int operator()(const IPv4PacketIdentifier& a, const IPv4PacketIdentifier& b) const;
+		sl_compare_result operator()(const IPv4PacketIdentifier& a, const IPv4PacketIdentifier& b) const;
 		
 	};
 

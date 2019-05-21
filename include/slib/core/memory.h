@@ -89,6 +89,12 @@ namespace slib
 
 		sl_bool getData(MemoryData& data) const;
 
+		sl_compare_result compare(const Memory& other) const;
+		
+		sl_bool equals(const Memory& other) const;
+		
+		sl_size getHashCode() const;
+		
 	};
 	
 	class SLIB_EXPORT Memory
@@ -124,10 +130,54 @@ namespace slib
 		Memory duplicate() const;
 
 		sl_bool getData(MemoryData& data) const;
+		
+		sl_compare_result compare(const Memory& other) const;
 
+		sl_bool equals(const Memory& other) const;
+		
+		sl_size getHashCode() const;
+		
 	};
 	
 	typedef Atomic<Memory> AtomicMemory;
+	
+	
+	sl_bool operator==(const Memory& a, const Memory& b) noexcept;
+	
+	sl_bool operator!=(const Memory& a, const Memory& b) noexcept;
+	
+	sl_bool operator>=(const Memory& a, const Memory& b) noexcept;
+	
+	sl_bool operator>(const Memory& a, const Memory& b) noexcept;
+	
+	sl_bool operator<=(const Memory& a, const Memory& b) noexcept;
+	
+	sl_bool operator<(const Memory& a, const Memory& b) noexcept;
+	
+	Memory operator+(const Memory& a, const Memory& b) noexcept;
+	
+	
+	template <>
+	class Compare<Memory>
+	{
+	public:
+		sl_compare_result operator()(const Memory& a, const Memory& b) const noexcept;
+	};
+	
+	template <>
+	class Equals<Memory>
+	{
+	public:
+		sl_bool operator()(const Memory& a, const Memory& b) const noexcept;
+	};
+	
+	template <>
+	class Hash<Memory>
+	{
+	public:
+		sl_size operator()(const Memory& a) const noexcept;
+	};
+	
 	
 	class SLIB_EXPORT MemoryData
 	{

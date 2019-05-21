@@ -26,8 +26,17 @@
 namespace slib
 {
 
-	const char _priv_Map_ClassID[] = "map";
-	
-	const char _priv_HashMap_ClassID[] = "hash_map";
+	namespace priv
+	{
+		namespace map
+		{
+			const char g_classID[] = "map";
+		}
+
+		namespace hash_map
+		{	
+			const char g_classID[] = "hash_map";
+		}
+	}
 
 }

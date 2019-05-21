@@ -277,26 +277,26 @@ namespace slib
 		return source == other.source && destination == other.destination && identification == other.identification && protocol == other.protocol;
 	}
 	
-	sl_size IPv4PacketIdentifier::hashCode() const
+	sl_size IPv4PacketIdentifier::getHashCode() const
 	{
-		sl_uint64 t = source.hashCode();
+		sl_uint64 t = source.getHashCode();
 		t *= 961;
-		t += destination.hashCode();
+		t += destination.getHashCode();
 		t *= 31;
 		t += SLIB_MAKE_DWORD2(identification, protocol);
 		return Rehash64ToSize(t);
 	}
 	
-	int Compare<IPv4PacketIdentifier>::operator()(const IPv4PacketIdentifier& a, const IPv4PacketIdentifier& b) const
+	sl_compare_result Compare<IPv4PacketIdentifier>::operator()(const IPv4PacketIdentifier& a, const IPv4PacketIdentifier& b) const
 	{
-		sl_size _a = a.hashCode();
-		sl_size _b = b.hashCode();
+		sl_size _a = a.getHashCode();
+		sl_size _b = b.getHashCode();
 		return (_a < _b) ? -1 : (_a > _b);
 	}
 
 	sl_size Hash<IPv4PacketIdentifier>::operator()(const IPv4PacketIdentifier& v) const
 	{
-		return v.hashCode();
+		return v.getHashCode();
 	}
 	
 	

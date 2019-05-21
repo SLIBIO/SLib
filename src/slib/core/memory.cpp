@@ -218,6 +218,59 @@ namespace slib
 			return sl_false;
 		}
 	}
+	
+	sl_compare_result Memory::compare(const Memory& other) const
+	{
+		sl_size size1 = getSize();
+		sl_size size2 = other.getSize();
+		if (size1 == size2) {
+			if (!size1) {
+				return 0;
+			}
+			return Base::compareMemory((sl_uint8*)(getData()), (sl_uint8*)(other.getData()), size1);
+		} else if (size1 > size2) {
+			if (!size2) {
+				return 1;
+			}
+			sl_compare_result result = Base::compareMemory((sl_uint8*)(getData()), (sl_uint8*)(other.getData()), size2);
+			if (result == 0) {
+				return 1;
+			}
+			return result;
+		} else {
+			if (!size1) {
+				return -1;
+			}
+			sl_compare_result result = Base::compareMemory((sl_uint8*)(getData()), (sl_uint8*)(other.getData()), size1);
+			if (result == 0) {
+				return -1;
+			}
+			return result;
+		}
+	}
+	
+	sl_bool Memory::equals(const Memory& other) const
+	{
+		sl_size size1 = getSize();
+		sl_size size2 = other.getSize();
+		if (size1 == size2) {
+			if (!size1) {
+				return sl_true;
+			}
+			return Base::equalsMemory(getData(), other.getData(), size1);
+		} else {
+			return sl_false;
+		}
+	}
+	
+	sl_size Memory::getHashCode() const
+	{
+		sl_size size = getSize();
+		if (size) {
+			return HashBytes(getData(), size);
+		}
+		return 0;
+	}
 
 
 	sl_size Atomic<Memory>::getSize() const
@@ -289,7 +342,91 @@ namespace slib
 		return mem.getData(data);
 	}
 
+	sl_compare_result Atomic<Memory>::compare(const Memory& other) const
+	{
+		Memory mem(*this);
+		return mem.compare(other);
+	}
 
+	sl_bool Atomic<Memory>::equals(const Memory& other) const
+	{
+		Memory mem(*this);
+		return mem.equals(other);
+	}
+
+	sl_size Atomic<Memory>::getHashCode() const
+	{
+		Memory mem(*this);
+		return mem.getHashCode();
+	}
+	
+	
+	sl_bool operator==(const Memory& a, const Memory& b) noexcept
+	{
+		return a.equals(b);
+	}
+	
+	sl_bool operator!=(const Memory& a, const Memory& b) noexcept
+	{
+		return !(a.equals(b));
+	}
+	
+	sl_bool operator>=(const Memory& a, const Memory& b) noexcept
+	{
+		return a.compare(b) >= 0;
+	}
+	
+	sl_bool operator>(const Memory& a, const Memory& b) noexcept
+	{
+		return a.compare(b) > 0;
+	}
+	
+	sl_bool operator<=(const Memory& a, const Memory& b) noexcept
+	{
+		return a.compare(b) <= 0;
+	}
+	
+	sl_bool operator<(const Memory& a, const Memory& b) noexcept
+	{
+		return a.compare(b) < 0;
+	}
+	
+	Memory operator+(const Memory& a, const Memory& b) noexcept
+	{
+		if (a.isNull()) {
+			return b;
+		}
+		if (b.isNull()) {
+			return a;
+		}
+		sl_size n1 = a.getSize();
+		sl_size n2 = b.getSize();
+		Memory ret = Memory::create(n1 + n2);
+		if (ret.isNotNull()) {
+			sl_uint8* data = (sl_uint8*)(ret.getData());
+			Base::copyMemory(data, a.getData(), n1);
+			Base::copyMemory(data + n1, b.getData(), n2);
+			return ret;
+		}
+		return sl_null;
+	}
+	
+	sl_compare_result Compare<Memory>::operator()(const Memory& a, const Memory& b) const noexcept
+	{
+		return a.compare(b);
+	}
+
+	sl_bool Equals<Memory>::operator()(const Memory& a, const Memory& b) const noexcept
+	{
+		return a.equals(b);
+	}
+
+	sl_size Hash<Memory>::operator()(const Memory& a) const noexcept
+	{
+		return a.getHashCode();
+	}
+
+	
 /*******************************************
 			MemoryData
 *******************************************/

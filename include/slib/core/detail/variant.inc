@@ -23,15 +23,28 @@
 namespace slib
 {
 	
-	struct _priv_Variant_Const
+	namespace priv
 	{
-		sl_uint64 value;
-		VariantType type;
-		sl_int32 lock;
-	};
+		namespace variant
+		{
+			struct ConstContainer
+			{
+				sl_uint64 value;
+				VariantType type;
+				sl_int32 lock;
+			};
+
+			extern const ConstContainer g_undefined;
+			extern const ConstContainer g_null;
+
+			extern const char g_variantMap_ClassID[];
+			extern const char g_variantHashMap_ClassID[];
+			extern const char g_variantList_ClassID[];
+			extern const char g_variantMapList_ClassID[];
+			extern const char g_variantHashMapList_ClassID[];
 	
-	extern const _priv_Variant_Const _priv_Variant_Undefined;
-	extern const _priv_Variant_Const _priv_Variant_Null;
+		}
+	}
 	
 	template <class... ARGS>
 	String String::format(const sl_char8* szFormat, ARGS&&... args) noexcept
@@ -155,12 +168,12 @@ namespace slib
 
 	SLIB_INLINE const Variant& Variant::undefined() noexcept
 	{
-		return *(reinterpret_cast<Variant const*>(&_priv_Variant_Undefined));
+		return *(reinterpret_cast<Variant const*>(&(priv::variant::g_undefined)));
 	}
 
 	SLIB_INLINE const Variant& Variant::null() noexcept
 	{
-		return *(reinterpret_cast<Variant const*>(&_priv_Variant_Null));
+		return *(reinterpret_cast<Variant const*>(&(priv::variant::g_null)));
 	}
 	
 	template <class T>
@@ -340,12 +353,12 @@ namespace slib
 
 	SLIB_INLINE const AtomicVariant& Atomic<Variant>::undefined() noexcept
 	{
-		return *(reinterpret_cast<AtomicVariant const*>(&_priv_Variant_Undefined));
+		return *(reinterpret_cast<AtomicVariant const*>(&(priv::variant::g_undefined)));
 	}
 
 	SLIB_INLINE const AtomicVariant& Atomic<Variant>::null() noexcept
 	{
-		return *(reinterpret_cast<AtomicVariant const*>(&_priv_Variant_Null));
+		return *(reinterpret_cast<AtomicVariant const*>(&(priv::variant::g_null)));
 	}
 	
 	template <class T>
@@ -469,22 +482,16 @@ namespace slib
 	}
 	
 	
-	extern const char _priv_VariantMap_ClassID[];
-	extern const char _priv_VariantHashMap_ClassID[];
-	extern const char _priv_VariantList_ClassID[];
-	extern const char _priv_VariantMapList_ClassID[];
-	extern const char _priv_VariantHashMapList_ClassID[];
-	
 	template <>
 	SLIB_INLINE sl_object_type CMap<String, Variant>::ObjectType() noexcept
 	{
-		return _priv_VariantMap_ClassID;
+		return priv::variant::g_variantMap_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CMap<String, Variant>::isDerivedFrom(sl_object_type type) noexcept
 	{
-		if (type == _priv_VariantMap_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantMap_ClassID || type == priv::map::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -493,13 +500,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CMap<String, Variant>::getObjectType() const noexcept
 	{
-		return _priv_VariantMap_ClassID;
+		return priv::variant::g_variantMap_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CMap<String, Variant>::isInstanceOf(sl_object_type type) const noexcept
 	{
-		if (type == _priv_VariantMap_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantMap_ClassID || type == priv::map::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -509,13 +516,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CHashMap<String, Variant>::ObjectType() noexcept
 	{
-		return _priv_VariantHashMap_ClassID;
+		return priv::variant::g_variantHashMap_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CHashMap<String, Variant>::isDerivedFrom(sl_object_type type) noexcept
 	{
-		if (type == _priv_VariantHashMap_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantHashMap_ClassID || type == priv::hash_map::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -524,13 +531,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CHashMap<String, Variant>::getObjectType() const noexcept
 	{
-		return _priv_VariantHashMap_ClassID;
+		return priv::variant::g_variantHashMap_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CHashMap<String, Variant>::isInstanceOf(sl_object_type type) const noexcept
 	{
-		if (type == _priv_VariantHashMap_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantHashMap_ClassID || type == priv::hash_map::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -540,13 +547,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CList<Variant>::ObjectType() noexcept
 	{
-		return _priv_VariantList_ClassID;
+		return priv::variant::g_variantList_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CList<Variant>::isDerivedFrom(sl_object_type type) noexcept
 	{
-		if (type == _priv_VariantList_ClassID || type == _priv_List_ClassID) {
+		if (type == priv::variant::g_variantList_ClassID || type == priv::list::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -555,13 +562,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CList<Variant>::getObjectType() const noexcept
 	{
-		return _priv_VariantList_ClassID;
+		return priv::variant::g_variantList_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CList<Variant>::isInstanceOf(sl_object_type type) const noexcept
 	{
-		if (type == _priv_VariantList_ClassID || type == _priv_List_ClassID) {
+		if (type == priv::variant::g_variantList_ClassID || type == priv::list::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -571,13 +578,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CList< Map<String, Variant> >::ObjectType() noexcept
 	{
-		return _priv_VariantMapList_ClassID;
+		return priv::variant::g_variantMapList_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CList< Map<String, Variant> >::isDerivedFrom(sl_object_type type) noexcept
 	{
-		if (type == _priv_VariantMapList_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantMapList_ClassID || type == priv::list::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -586,13 +593,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CList< Map<String, Variant> >::getObjectType() const noexcept
 	{
-		return _priv_VariantMapList_ClassID;
+		return priv::variant::g_variantMapList_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CList< Map<String, Variant> >::isInstanceOf(sl_object_type type) const noexcept
 	{
-		if (type == _priv_VariantMapList_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantMapList_ClassID || type == priv::list::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -602,13 +609,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CList< HashMap<String, Variant> >::ObjectType() noexcept
 	{
-		return _priv_VariantHashMapList_ClassID;
+		return priv::variant::g_variantHashMapList_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CList< HashMap<String, Variant> >::isDerivedFrom(sl_object_type type) noexcept
 	{
-		if (type == _priv_VariantHashMapList_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantHashMapList_ClassID || type == priv::list::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -617,13 +624,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CList< HashMap<String, Variant> >::getObjectType() const noexcept
 	{
-		return _priv_VariantHashMapList_ClassID;
+		return priv::variant::g_variantHashMapList_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CList< HashMap<String, Variant> >::isInstanceOf(sl_object_type type) const noexcept
 	{
-		if (type == _priv_VariantHashMapList_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantHashMapList_ClassID || type == priv::list::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);

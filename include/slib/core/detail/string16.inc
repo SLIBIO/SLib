@@ -23,14 +23,20 @@
 namespace slib
 {
 	
-	struct _priv_String16_Const
+	namespace priv
 	{
-		StringContainer16* container;
-		sl_int32 lock;
-	};
-	
-	extern const _priv_String16_Const _priv_String16_Null;
-	extern const _priv_String16_Const _priv_String16_Empty;
+		namespace string
+		{
+			struct ConstContainer16
+			{
+				StringContainer16* container;
+				sl_int32 lock;
+			};
+
+			extern const ConstContainer16 g_null16;
+			extern const ConstContainer16 g_empty16;
+		}
+	}
 	
 	SLIB_INLINE String16::String16(String16&& src) noexcept
 	{
@@ -46,18 +52,18 @@ namespace slib
 	
 	SLIB_INLINE const String16& String16::null() noexcept
 	{
-		return *(reinterpret_cast<String16 const*>(&_priv_String16_Null));
+		return *(reinterpret_cast<String16 const*>(&(priv::string::g_null16)));
 	}
 	
 	SLIB_INLINE const String16& String16::getEmpty() noexcept
 	{
-		return *(reinterpret_cast<String16 const*>(&_priv_String16_Empty));
+		return *(reinterpret_cast<String16 const*>(&(priv::string::g_empty16)));
 	}
 
 	SLIB_INLINE const String16& String16::getNotNull() const noexcept
 	{
 		if (!m_container) {
-			return *(reinterpret_cast<String16 const*>(&_priv_String16_Empty));
+			return *(reinterpret_cast<String16 const*>(&(priv::string::g_empty16)));
 		}
 		return *this;
 	}
@@ -123,12 +129,12 @@ namespace slib
 
 	SLIB_INLINE const AtomicString16& AtomicString16::null() noexcept
 	{
-		return *(reinterpret_cast<AtomicString16 const*>(&_priv_String16_Null));
+		return *(reinterpret_cast<AtomicString16 const*>(&(priv::string::g_null16)));
 	}
 	
 	SLIB_INLINE const AtomicString16& AtomicString16::getEmpty() noexcept
 	{
-		return *(reinterpret_cast<AtomicString16 const*>(&_priv_String16_Empty));
+		return *(reinterpret_cast<AtomicString16 const*>(&(priv::string::g_empty16)));
 	}
 	
 	SLIB_INLINE sl_bool AtomicString16::isNull() const noexcept

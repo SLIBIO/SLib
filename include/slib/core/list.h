@@ -41,12 +41,18 @@ namespace slib
 	template <class T>
 	using AtomicList = Atomic< List<T> >;
 	
-	extern const char _priv_List_ClassID[];
+	namespace priv
+	{
+		namespace list
+		{
+			extern const char g_classID[];
+		}
+	}
 	
 	template <class T>
 	class SLIB_EXPORT CList : public Object
 	{
-		SLIB_TEMPLATE_OBJECT(Object, _priv_List_ClassID)
+		SLIB_TEMPLATE_OBJECT(Object, priv::list::g_classID)
 
 	protected:
 		T* m_data;

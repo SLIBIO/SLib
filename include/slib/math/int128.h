@@ -64,7 +64,11 @@ namespace slib
 
 		void setZero() noexcept;
 	
-		int compare(const Uint128& other) const noexcept;
+		sl_compare_result compare(const Uint128& other) const noexcept;
+		
+		sl_bool equals(const Uint128& other) const noexcept;
+		
+		sl_size getHashCode() const noexcept;
 
 		static sl_bool div(const Uint128& a, const Uint128& b, Uint128* quotient = sl_null, Uint128* remainder = sl_null) noexcept;
 	
@@ -288,7 +292,7 @@ namespace slib
 	class Compare<Uint128>
 	{
 	public:
-		int operator()(const Uint128& a, const Uint128& b) const noexcept;
+		sl_compare_result operator()(const Uint128& a, const Uint128& b) const noexcept;
 	};
 	
 	template <>

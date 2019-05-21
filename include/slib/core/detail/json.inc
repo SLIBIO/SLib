@@ -88,12 +88,12 @@ namespace slib
 
 	SLIB_INLINE const Json& Json::undefined()
 	{
-		return *(reinterpret_cast<Json const*>(&_priv_Variant_Undefined));
+		return *(reinterpret_cast<Json const*>(&(priv::variant::g_undefined)));
 	}
 
 	SLIB_INLINE const Json& Json::null()
 	{
-		return *(reinterpret_cast<Json const*>(&_priv_Variant_Null));
+		return *(reinterpret_cast<Json const*>(&(priv::variant::g_null)));
 	}
 
 	template <class T>
@@ -442,13 +442,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CMap<String, Json>::ObjectType() noexcept
 	{
-		return _priv_VariantMap_ClassID;
+		return priv::variant::g_variantMap_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CMap<String, Json>::isDerivedFrom(sl_object_type type) noexcept
 	{
-		if (type == _priv_VariantMap_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantMap_ClassID || type == priv::map::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -457,13 +457,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CMap<String, Json>::getObjectType() const noexcept
 	{
-		return _priv_VariantMap_ClassID;
+		return priv::variant::g_variantMap_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CMap<String, Json>::isInstanceOf(sl_object_type type) const noexcept
 	{
-		if (type == _priv_VariantMap_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantMap_ClassID || type == priv::map::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -473,13 +473,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CHashMap<String, Json>::ObjectType() noexcept
 	{
-		return _priv_VariantHashMap_ClassID;
+		return priv::variant::g_variantHashMap_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CHashMap<String, Json>::isDerivedFrom(sl_object_type type) noexcept
 	{
-		if (type == _priv_VariantHashMap_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantHashMap_ClassID || type == priv::hash_map::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -488,13 +488,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CHashMap<String, Json>::getObjectType() const noexcept
 	{
-		return _priv_VariantHashMap_ClassID;
+		return priv::variant::g_variantHashMap_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CHashMap<String, Json>::isInstanceOf(sl_object_type type) const noexcept
 	{
-		if (type == _priv_VariantHashMap_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantHashMap_ClassID || type == priv::hash_map::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -504,13 +504,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CList<Json>::ObjectType() noexcept
 	{
-		return _priv_VariantList_ClassID;
+		return priv::variant::g_variantList_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CList<Json>::isDerivedFrom(sl_object_type type) noexcept
 	{
-		if (type == _priv_VariantList_ClassID || type == _priv_List_ClassID) {
+		if (type == priv::variant::g_variantList_ClassID || type == priv::list::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -519,13 +519,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CList<Json>::getObjectType() const noexcept
 	{
-		return _priv_VariantList_ClassID;
+		return priv::variant::g_variantList_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CList<Json>::isInstanceOf(sl_object_type type) const noexcept
 	{
-		if (type == _priv_VariantList_ClassID || type == _priv_List_ClassID) {
+		if (type == priv::variant::g_variantList_ClassID || type == priv::list::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -535,13 +535,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CList< Map<String, Json> >::ObjectType() noexcept
 	{
-		return _priv_VariantMapList_ClassID;
+		return priv::variant::g_variantMapList_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CList< Map<String, Json> >::isDerivedFrom(sl_object_type type) noexcept
 	{
-		if (type == _priv_VariantMapList_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantMapList_ClassID || type == priv::list::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -550,13 +550,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CList< Map<String, Json> >::getObjectType() const noexcept
 	{
-		return _priv_VariantMapList_ClassID;
+		return priv::variant::g_variantMapList_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CList< Map<String, Json> >::isInstanceOf(sl_object_type type) const noexcept
 	{
-		if (type == _priv_VariantMapList_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantMapList_ClassID || type == priv::list::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -566,13 +566,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CList< HashMap<String, Json> >::ObjectType() noexcept
 	{
-		return _priv_VariantHashMapList_ClassID;
+		return priv::variant::g_variantHashMapList_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CList< HashMap<String, Json> >::isDerivedFrom(sl_object_type type) noexcept
 	{
-		if (type == _priv_VariantHashMapList_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantHashMapList_ClassID || type == priv::list::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
@@ -581,13 +581,13 @@ namespace slib
 	template <>
 	SLIB_INLINE sl_object_type CList< HashMap<String, Json> >::getObjectType() const noexcept
 	{
-		return _priv_VariantHashMapList_ClassID;
+		return priv::variant::g_variantHashMapList_ClassID;
 	}
 	
 	template <>
 	SLIB_INLINE sl_bool CList< HashMap<String, Json> >::isInstanceOf(sl_object_type type) const noexcept
 	{
-		if (type == _priv_VariantHashMapList_ClassID || type == _priv_Map_ClassID) {
+		if (type == priv::variant::g_variantHashMapList_ClassID || type == priv::list::g_classID) {
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);

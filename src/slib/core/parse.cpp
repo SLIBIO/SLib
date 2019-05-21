@@ -96,8 +96,8 @@ namespace slib
 							sl_uint8 t = (sl_uint8)c;
 							buf[d++] = '\\';
 							buf[d++] = 'x';
-							buf[d++] = _priv_StringConv_radixPatternLower[(t >> 4) & 15];
-							buf[d++] = _priv_StringConv_radixPatternLower[t & 15];
+							buf[d++] = priv::string::g_conv_radixPatternLower[(t >> 4) & 15];
+							buf[d++] = priv::string::g_conv_radixPatternLower[t & 15];
 						} else {
 							d += 4;
 						}
@@ -106,10 +106,10 @@ namespace slib
 							sl_uint16 t = (sl_uint16)c;
 							buf[d++] = '\\';
 							buf[d++] = 'x';
-							buf[d++] = _priv_StringConv_radixPatternLower[(t >> 12) & 15];
-							buf[d++] = _priv_StringConv_radixPatternLower[(t >> 8) & 15];
-							buf[d++] = _priv_StringConv_radixPatternLower[(t >> 4) & 15];
-							buf[d++] = _priv_StringConv_radixPatternLower[t & 15];
+							buf[d++] = priv::string::g_conv_radixPatternLower[(t >> 12) & 15];
+							buf[d++] = priv::string::g_conv_radixPatternLower[(t >> 8) & 15];
+							buf[d++] = priv::string::g_conv_radixPatternLower[(t >> 4) & 15];
+							buf[d++] = priv::string::g_conv_radixPatternLower[t & 15];
 						} else {
 							d += 6;
 						}

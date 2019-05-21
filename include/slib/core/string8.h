@@ -430,15 +430,15 @@ namespace slib
 		 * @return <0: Either the value of the first character that does not match is lower in the compared string, or all compared characters match but the compared string is shorter.
 		 * @return >0: Either the value of the first character that does not match is greater in the compared string, or all compared characters match but the compared string is longer.
 		 */
-		sl_int32 compare(const String& other) const noexcept;
-		sl_int32 compare(const String16& other) const noexcept;
-		sl_int32 compare(const AtomicString& other) const noexcept;
-		sl_int32 compare(const AtomicString16& other) const noexcept;
-		sl_int32 compare(const sl_char8* other) const noexcept;
-		sl_int32 compare(const sl_char16* other) const noexcept;
-		sl_int32 compare(const sl_char32* other) const noexcept;
+		sl_compare_result compare(const String& other) const noexcept;
+		sl_compare_result compare(const String16& other) const noexcept;
+		sl_compare_result compare(const AtomicString& other) const noexcept;
+		sl_compare_result compare(const AtomicString16& other) const noexcept;
+		sl_compare_result compare(const sl_char8* other) const noexcept;
+		sl_compare_result compare(const sl_char16* other) const noexcept;
+		sl_compare_result compare(const sl_char32* other) const noexcept;
 #ifdef SLIB_SUPPORT_STD_TYPES
-		sl_int32 compare(const std::string& other) const noexcept;
+		sl_compare_result compare(const std::string& other) const noexcept;
 #endif
 		
 		/**
@@ -450,7 +450,7 @@ namespace slib
 		 * @return <0: Either the value of the first character that does not match is lower in the compared string, or all compared characters match but the compared string is shorter.
 		 * @return >0: Either the value of the first character that does not match is greater in the compared string, or all compared characters match but the compared string is longer.
 		 */
-		sl_int32 compare(const String& other, sl_size len) const noexcept;
+		sl_compare_result compare(const String& other, sl_size len) const noexcept;
 		
 		/**
 		 * @return true if this string is equal to the specified string ignoring the case.
@@ -465,7 +465,7 @@ namespace slib
 		 * @return <0: Either the value of the first character that does not match is lower in the compared string, or all compared characters match but the compared string is shorter.
 		 * @return >0: Either the value of the first character that does not match is greater in the compared string, or all compared characters match but the compared string is longer.
 		 */
-		sl_int32 compareIgnoreCase(const String& other) const noexcept;
+		sl_compare_result compareIgnoreCase(const String& other) const noexcept;
 		
 	public:
 		/**
@@ -1478,15 +1478,15 @@ namespace slib
 		 * @return <0: Either the value of the first character that does not match is lower in the compared string, or all compared characters match but the compared string is shorter.
 		 * @return >0: Either the value of the first character that does not match is greater in the compared string, or all compared characters match but the compared string is longer.
 		 */
-		sl_int32 compare(const String& other) const noexcept;
-		sl_int32 compare(const String16& other) const noexcept;
-		sl_int32 compare(const AtomicString& other) const noexcept;
-		sl_int32 compare(const AtomicString16& other) const noexcept;
-		sl_int32 compare(const sl_char8* other) const noexcept;
-		sl_int32 compare(const sl_char16* other) const noexcept;
-		sl_int32 compare(const sl_char32* other) const noexcept;
+		sl_compare_result compare(const String& other) const noexcept;
+		sl_compare_result compare(const String16& other) const noexcept;
+		sl_compare_result compare(const AtomicString& other) const noexcept;
+		sl_compare_result compare(const AtomicString16& other) const noexcept;
+		sl_compare_result compare(const sl_char8* other) const noexcept;
+		sl_compare_result compare(const sl_char16* other) const noexcept;
+		sl_compare_result compare(const sl_char32* other) const noexcept;
 #ifdef SLIB_SUPPORT_STD_TYPES
-		sl_int32 compare(const std::string& other) const noexcept;
+		sl_compare_result compare(const std::string& other) const noexcept;
 #endif
 		
 		/**
@@ -1498,7 +1498,7 @@ namespace slib
 		 * @return <0: Either the value of the first character that does not match is lower in the compared string, or all compared characters match but the compared string is shorter.
 		 * @return >0: Either the value of the first character that does not match is greater in the compared string, or all compared characters match but the compared string is longer.
 		 */
-		sl_int32 compare(const String& other, sl_size len) const noexcept;
+		sl_compare_result compare(const String& other, sl_size len) const noexcept;
 		
 		/**
 		 * @return true if this string is equal to the specified string ignoring the case.
@@ -1513,7 +1513,7 @@ namespace slib
 		 * @return <0: Either the value of the first character that does not match is lower in the compared string, or all compared characters match but the compared string is shorter.
 		 * @return >0: Either the value of the first character that does not match is greater in the compared string, or all compared characters match but the compared string is longer.
 		 */
-		sl_int32 compareIgnoreCase(const String& other) const noexcept;
+		sl_compare_result compareIgnoreCase(const String& other) const noexcept;
 		
 	public:
 		/**
@@ -2045,14 +2045,7 @@ namespace slib
 	class Compare<String>
 	{
 	public:
-		int operator()(const String& a, const String& b) const noexcept;
-	};
-	
-	template <>
-	class Compare<AtomicString>
-	{
-	public:
-		int operator()(const AtomicString& a, const AtomicString& b) const noexcept;
+		sl_compare_result operator()(const String& a, const String& b) const noexcept;
 	};
 	
 	template <>
@@ -2063,30 +2056,16 @@ namespace slib
 	};
 	
 	template <>
-	class Equals<AtomicString>
-	{
-	public:
-		sl_bool operator()(const AtomicString& a, const AtomicString& b) const noexcept;
-	};
-	
-	template <>
 	class Hash<String>
 	{
 	public:
 		sl_size operator()(const String& a) const noexcept;
 	};
 	
-	template <>
-	class Hash<AtomicString>
-	{
-	public:
-		sl_size operator()(const AtomicString& a) const noexcept;
-	};
-	
 	class CompareIgnoreCaseString
 	{
 	public:
-		int operator()(const String& a, const String& b) const noexcept;
+		sl_compare_result operator()(const String& a, const String& b) const noexcept;
 	};
 	
 	class EqualsIgnoreCaseString

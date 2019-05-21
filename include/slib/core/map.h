@@ -78,12 +78,18 @@ namespace slib
 		
 	};
 	
-	extern const char _priv_Map_ClassID[];
+	namespace priv
+	{
+		namespace map
+		{
+			extern const char g_classID[];
+		}
+	}
 	
 	template < class KT, class VT, class KEY_COMPARE = Compare<KT> >
 	class SLIB_EXPORT CMap : public Object
 	{
-		SLIB_TEMPLATE_OBJECT(Object, _priv_Map_ClassID)
+		SLIB_TEMPLATE_OBJECT(Object, priv::map::g_classID)
 		
 	public:
 		typedef MapNode<KT, VT> NODE;

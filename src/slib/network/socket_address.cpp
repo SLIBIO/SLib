@@ -65,18 +65,18 @@ namespace slib
 		return ip.isNone() || port == 0;
 	}
 	
-	int SocketAddress::compare(const SocketAddress& other) const noexcept
+	sl_compare_result SocketAddress::compare(const SocketAddress& other) const noexcept
 	{
-		int c = ip.compare(other.ip);
+		sl_compare_result c = ip.compare(other.ip);
 		if (c == 0) {
-			return Compare<sl_uint16>()(port, other.port);
+			return ComparePrimitiveValues(port, other.port);
 		}
 		return c;
 	}
 	
-	sl_size SocketAddress::hashCode() const noexcept
+	sl_size SocketAddress::getHashCode() const noexcept
 	{
-		return Rehash64ToSize((((sl_uint64)port) << 32) ^ ip.hashCode());
+		return Rehash64ToSize((((sl_uint64)port) << 32) ^ ip.getHashCode());
 	}
 	
 	String SocketAddress::toString() const noexcept
@@ -170,66 +170,71 @@ namespace slib
 		}
 	}
 	
-	
-	template <class CT>
-	static sl_reg _priv_SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_size pos, sl_size posEnd) noexcept
+	namespace priv
 	{
-		if (pos >= posEnd) {
-			return SLIB_PARSE_ERROR;
-		}
-		IPAddress ip;
-		if (sz[0] == '[') {
-			IPv6Address addr;
-			pos++;
-			pos = Parser<IPv6Address, CT>::parse(&addr, sz, pos, posEnd);
-			if (pos == SLIB_PARSE_ERROR || pos >= posEnd) {
-				return SLIB_PARSE_ERROR;
+		namespace socket_address
+		{
+			template <class CT>
+			static sl_reg parse(SocketAddress* obj, const CT* sz, sl_size pos, sl_size posEnd) noexcept
+			{
+				if (pos >= posEnd) {
+					return SLIB_PARSE_ERROR;
+				}
+				IPAddress ip;
+				if (sz[0] == '[') {
+					IPv6Address addr;
+					pos++;
+					pos = Parser<IPv6Address, CT>::parse(&addr, sz, pos, posEnd);
+					if (pos == SLIB_PARSE_ERROR || pos >= posEnd) {
+						return SLIB_PARSE_ERROR;
+					}
+					if (sz[pos] != ']') {
+						return SLIB_PARSE_ERROR;
+					}
+					pos++;
+					ip = addr;
+				} else {
+					IPv4Address addr;
+					pos = Parser<IPv4Address, CT>::parse(&addr, sz, pos, posEnd);
+					if (pos == SLIB_PARSE_ERROR) {
+						return SLIB_PARSE_ERROR;
+					}
+					ip = addr;
+				}
+				if (pos >= posEnd) {
+					return SLIB_PARSE_ERROR;
+				}
+				if (sz[pos] != ':') {
+					return SLIB_PARSE_ERROR;
+				}
+				pos++;
+				sl_uint32 port;
+				pos = StringTypeFromCharType<CT>::Type::parseUint32(10, &port, sz, pos, posEnd);
+				if (pos == SLIB_PARSE_ERROR) {
+					return SLIB_PARSE_ERROR;
+				}
+				if (port >> 16) {
+					return SLIB_PARSE_ERROR;
+				}
+				if (obj) {
+					obj->ip = ip;
+					obj->port = (sl_uint16)port;
+				}
+				return pos;
 			}
-			if (sz[pos] != ']') {
-				return SLIB_PARSE_ERROR;
-			}
-			pos++;
-			ip = addr;
-		} else {
-			IPv4Address addr;
-			pos = Parser<IPv4Address, CT>::parse(&addr, sz, pos, posEnd);
-			if (pos == SLIB_PARSE_ERROR) {
-				return SLIB_PARSE_ERROR;
-			}
-			ip = addr;
 		}
-		if (pos >= posEnd) {
-			return SLIB_PARSE_ERROR;
-		}
-		if (sz[pos] != ':') {
-			return SLIB_PARSE_ERROR;
-		}
-		pos++;
-		sl_uint32 port;
-		pos = StringTypeFromCharType<CT>::Type::parseUint32(10, &port, sz, pos, posEnd);
-		if (pos == SLIB_PARSE_ERROR) {
-			return SLIB_PARSE_ERROR;
-		}
-		if (port >> 16) {
-			return SLIB_PARSE_ERROR;
-		}
-		if (obj) {
-			obj->ip = ip;
-			obj->port = (sl_uint16)port;
-		}
-		return pos;
 	}
 	
 	template <>
 	sl_reg Parser<SocketAddress, sl_char8>::parse(SocketAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
-		return _priv_SocketAddress_parse(_out, sz, posBegin, posEnd);
+		return priv::socket_address::parse(_out, sz, posBegin, posEnd);
 	}
 	
 	template <>
 	sl_reg Parser<SocketAddress, sl_char16>::parse(SocketAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
-		return _priv_SocketAddress_parse(_out, sz, posBegin, posEnd);
+		return priv::socket_address::parse(_out, sz, posBegin, posEnd);
 	}
 	
 	sl_bool SocketAddress::parseIPv4Range(const String& str, IPv4Address* _from, IPv4Address* _to) noexcept
@@ -302,7 +307,7 @@ namespace slib
 		return port != other.port || ip != other.ip;
 	}
 	
-	int Compare<SocketAddress>::operator()(const SocketAddress& a, const SocketAddress& b) const noexcept
+	sl_compare_result Compare<SocketAddress>::operator()(const SocketAddress& a, const SocketAddress& b) const noexcept
 	{
 		return a.compare(b);
 	}
@@ -314,7 +319,7 @@ namespace slib
 	
 	sl_size Hash<SocketAddress>::operator()(const SocketAddress& a) const noexcept
 	{
-		return a.hashCode();
+		return a.getHashCode();
 	}
 	
 }

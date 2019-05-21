@@ -28,29 +28,44 @@
 namespace slib
 {
 
+	typedef sl_int32 sl_compare_result;
+
+	template <class T1, class T2>
+	SLIB_INLINE constexpr sl_compare_result ComparePrimitiveValues(T1 a, T2 b)
+	{
+		return (a < b) ? (sl_compare_result)-1 : ((sl_compare_result)(a > b));
+	}
+
 	template <class T1, class T2 = T1>
 	class SLIB_EXPORT Compare
 	{
 	public:
-		int operator()(const T1& a, const T2& b) const noexcept;
+		sl_compare_result operator()(const T1& a, const T2& b) const noexcept
+		{
+			return (a < b) ? (sl_compare_result)-1 : ((sl_compare_result)(a > b));
+		}
 	};
-
+	
 	template <class T1, class T2 = T1>
 	class SLIB_EXPORT CompareDescending
 	{
 	public:
-		int operator()(const T1& a, const T2& b) const noexcept;
+		sl_compare_result operator()(const T1& a, const T2& b) const noexcept
+		{
+			return -(Compare<T1, T2>()(a, b));
+		}
 	};
 
 	template <class T1, class T2 = T1>
 	class SLIB_EXPORT Equals
 	{
 	public:
-		sl_bool operator()(const T1& a, const T2& b) const noexcept;
+		sl_bool operator()(const T1& a, const T2& b) const noexcept
+		{
+			return a == b;
+		}
 	};
-
+	
 }
-
-#include "detail/compare.inc"
 
 #endif

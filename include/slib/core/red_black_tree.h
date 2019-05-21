@@ -55,7 +55,7 @@ namespace slib
 		static NODE* getLastNode(NODE* root) noexcept;
 		
 		template <class NODE, class KEY, class KEY_COMPARE>
-		static NODE* tryFind(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, int& compare_result) noexcept;
+		static NODE* tryFind(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, sl_compare_result& compare_result) noexcept;
 		
 		template <class NODE, class KEY, class KEY_COMPARE>
 		static sl_bool getEqualRange(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, NODE** pStart = sl_null, NODE** pEnd = sl_null) noexcept;
@@ -82,7 +82,7 @@ namespace slib
 		static void getValuesByKeyAndValue(List<VT>& list, NODE* look, const KEY& key, const KEY_COMPARE& key_compare, const VALUE& value, const VALUE_EQUALS& value_equals) noexcept;
 		
 		template <class NODE>
-		static void insertNode(NODE** pRoot, NODE* node, NODE* where, int compare_result) noexcept;
+		static void insertNode(NODE** pRoot, NODE* node, NODE* where, sl_compare_result compare_result) noexcept;
 		
 		template <class NODE, class KEY_COMPARE>
 		static void addNode(NODE** pRoot, NODE* node, const KEY_COMPARE& key_compare) noexcept;

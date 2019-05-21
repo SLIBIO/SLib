@@ -113,14 +113,14 @@ namespace slib
 		return sl_false;
 	}
 
-	int IPv4Address::compare(const IPv4Address& other) const noexcept
+	sl_compare_result IPv4Address::compare(const IPv4Address& other) const noexcept
 	{
 		sl_uint32 p1 = getInt();
 		sl_uint32 p2 = other.getInt();
-		return (p1 < p2) ? -1 : (p1 > p2);
+		return ComparePrimitiveValues(p1, p2);
 	}
 
-	sl_size IPv4Address::hashCode() const noexcept
+	sl_size IPv4Address::getHashCode() const noexcept
 	{
 		return Rehash32(getInt());
 	}
@@ -183,59 +183,64 @@ namespace slib
 		return isNotZero();
 	}
 
-
-	template <class CT>
-	SLIB_INLINE static sl_reg _priv_IPv4Address_parse(IPv4Address* obj, const CT* sz, sl_size i, sl_size n) noexcept
+	namespace priv
 	{
-		if (i >= n) {
-			return SLIB_PARSE_ERROR;
-		}
-		int v[4];
-		for (int k = 0; k < 4; k++) {
-			int t = 0;
-			int s = 0;
-			for (; i < n; i++) {
-				int h = sz[i];
-				if (h >= '0' && h <= '9') {
-					s = s * 10 + (h - '0');
-					if (s > 255) {
-						return SLIB_PARSE_ERROR;
-					}
-					t++;
-				} else {
-					break;
-				}
-			}
-			if (t == 0) {
-				return SLIB_PARSE_ERROR;
-			}
-			if (k < 3) {
-				if (i >= n || sz[i] != '.') {
+		namespace ipv4address
+		{
+			template <class CT>
+			SLIB_INLINE static sl_reg parse(IPv4Address* obj, const CT* sz, sl_size i, sl_size n) noexcept
+			{
+				if (i >= n) {
 					return SLIB_PARSE_ERROR;
 				}
-				i++;
+				int v[4];
+				for (int k = 0; k < 4; k++) {
+					int t = 0;
+					int s = 0;
+					for (; i < n; i++) {
+						int h = sz[i];
+						if (h >= '0' && h <= '9') {
+							s = s * 10 + (h - '0');
+							if (s > 255) {
+								return SLIB_PARSE_ERROR;
+							}
+							t++;
+						} else {
+							break;
+						}
+					}
+					if (t == 0) {
+						return SLIB_PARSE_ERROR;
+					}
+					if (k < 3) {
+						if (i >= n || sz[i] != '.') {
+							return SLIB_PARSE_ERROR;
+						}
+						i++;
+					}
+					v[k] = s;
+				}
+				if (obj) {
+					obj->a = (sl_uint8)(v[0]);
+					obj->b = (sl_uint8)(v[1]);
+					obj->c = (sl_uint8)(v[2]);
+					obj->d = (sl_uint8)(v[3]);
+				}
+				return i;
 			}
-			v[k] = s;
 		}
-		if (obj) {
-			obj->a = (sl_uint8)(v[0]);
-			obj->b = (sl_uint8)(v[1]);
-			obj->c = (sl_uint8)(v[2]);
-			obj->d = (sl_uint8)(v[3]);
-		}
-		return i;
 	}
 
 	template <>
 	sl_reg Parser<IPv4Address, sl_char8>::parse(IPv4Address* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
-		return _priv_IPv4Address_parse(_out, sz, posBegin, posEnd);
+		return priv::ipv4address::parse(_out, sz, posBegin, posEnd);
 	}
 
 	template <>
 	sl_reg Parser<IPv4Address, sl_char16>::parse(IPv4Address* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
-		return _priv_IPv4Address_parse(_out, sz, posBegin, posEnd);
+		return priv::ipv4address::parse(_out, sz, posBegin, posEnd);
 	}
 
 
@@ -265,7 +270,7 @@ namespace slib
 		return getInt() < other.getInt();
 	}
 
-	int Compare<IPv4Address>::operator()(const IPv4Address& a, const IPv4Address& b) const noexcept
+	sl_compare_result Compare<IPv4Address>::operator()(const IPv4Address& a, const IPv4Address& b) const noexcept
 	{
 		return a.compare(b);
 	}
@@ -277,7 +282,7 @@ namespace slib
 
 	sl_size Hash<IPv4Address>::operator()(const IPv4Address& a) const noexcept
 	{
-		return a.hashCode();
+		return a.getHashCode();
 	}
 
 
@@ -293,7 +298,7 @@ namespace slib
 		networkPrefixLength = mask.getNetworkPrefixLengthFromMask();
 	}
 
-	int Compare<IPv4AddressInfo>::operator()(const IPv4AddressInfo& a, const IPv4AddressInfo& b) const noexcept
+	sl_compare_result Compare<IPv4AddressInfo>::operator()(const IPv4AddressInfo& a, const IPv4AddressInfo& b) const noexcept
 	{
 		return a.address.compare(b.address);
 	}
@@ -438,12 +443,12 @@ namespace slib
 		return m[0] == 0 && m[1] == 0 && m[2] == 0 && m[3] == 0 && m[4] == 0 && m[5] == 0 && m[6] == 0 && m[7] == 0 && m[8] == 0 && m[9] == 0 && m[10] == 255 && m[11] == 255;
 	}
 
-	int IPv6Address::compare(const IPv6Address& other) const noexcept
+	sl_compare_result IPv6Address::compare(const IPv6Address& other) const noexcept
 	{
 		return Base::compareMemory(m, other.m, 16);
 	}
 
-	sl_size IPv6Address::hashCode() const noexcept
+	sl_size IPv6Address::getHashCode() const noexcept
 	{
 		return Rehash64ToSize(SLIB_MAKE_QWORD(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7]) ^ SLIB_MAKE_QWORD(m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]));
 	}
@@ -476,111 +481,116 @@ namespace slib
 		return isNotZero();
 	}
 
-
-	template <class CT>
-	SLIB_INLINE static sl_reg _priv_IPv6Address_parse(IPv6Address* obj, const CT* sz, sl_size i, sl_size n) noexcept
+	namespace priv
 	{
-		if (i >= n) {
-			return SLIB_PARSE_ERROR;
-		}
-		int k = 0;
-		sl_uint16 v[8];
-		int skip_START = -1;
-		for (k = 0; k < 8;) {
-			int t = 0;
-			int s = 0;
-			for (; i < n; i++) {
-				int h = sz[i];
-				int x = 0;
-				if (h >= '0' && h <= '9') {
-					x = h - '0';
-				} else if (h >= 'A' && h <= 'F') {
-					x = h - ('A' - 10);
-				} else if (h >= 'a' && h <= 'f') {
-					x = h - ('a' - 10);
-				} else {
-					break;
-				}
-				s = (s << 4) | x;
-				if (s > 0x10000) {
+		namespace ipv6address
+		{
+			template <class CT>
+			SLIB_INLINE static sl_reg parse(IPv6Address* obj, const CT* sz, sl_size i, sl_size n) noexcept
+			{
+				if (i >= n) {
 					return SLIB_PARSE_ERROR;
 				}
-				t++;
-			}
-			if (i >= n || sz[i] != ':') {
-				if (t == 0) {
-					if (skip_START != k) {
-						return SLIB_PARSE_ERROR;
+				int k = 0;
+				sl_uint16 v[8];
+				int skip_START = -1;
+				for (k = 0; k < 8;) {
+					int t = 0;
+					int s = 0;
+					for (; i < n; i++) {
+						int h = sz[i];
+						int x = 0;
+						if (h >= '0' && h <= '9') {
+							x = h - '0';
+						} else if (h >= 'A' && h <= 'F') {
+							x = h - ('A' - 10);
+						} else if (h >= 'a' && h <= 'f') {
+							x = h - ('a' - 10);
+						} else {
+							break;
+						}
+						s = (s << 4) | x;
+						if (s > 0x10000) {
+							return SLIB_PARSE_ERROR;
+						}
+						t++;
 					}
-				} else {
-					v[k] = (sl_uint16)s;
-					k++;
-				}
-				break;
-			}
-			if (t == 0) {
-				if (k == 0) {
-					if (i < n - 1 && sz[i + 1] == ':') {
-						skip_START = 0;
-						i += 2;
+					if (i >= n || sz[i] != ':') {
+						if (t == 0) {
+							if (skip_START != k) {
+								return SLIB_PARSE_ERROR;
+							}
+						} else {
+							v[k] = (sl_uint16)s;
+							k++;
+						}
+						break;
+					}
+					if (t == 0) {
+						if (k == 0) {
+							if (i < n - 1 && sz[i + 1] == ':') {
+								skip_START = 0;
+								i += 2;
+							} else {
+								return SLIB_PARSE_ERROR;
+							}
+						} else {
+							if (skip_START >= 0) {
+								return SLIB_PARSE_ERROR;
+							}
+							skip_START = k;
+							i++;
+						}
 					} else {
-						return SLIB_PARSE_ERROR;
+						v[k] = (sl_uint16)s;
+						k++;
+						i++;
 					}
-				} else {
+				}
+				if (k == 8) {
 					if (skip_START >= 0) {
 						return SLIB_PARSE_ERROR;
+					} else {
+						if (obj) {
+							for (int q = 0; q < 8; q++) {
+								obj->setElement(q, v[q]);
+							}
+						}
 					}
-					skip_START = k;
-					i++;
+				} else {
+					if (skip_START < 0) {
+						return SLIB_PARSE_ERROR;
+					} else {
+						if (obj) {
+							int q;
+							for (q = 0; q < skip_START; q++) {
+								obj->setElement(q, v[q]);
+							}
+							int x = skip_START + 8 - k;
+							for (; q < x; q++) {
+								obj->setElement(q, 0);
+							}
+							for (; q < 8; q++) {
+								obj->setElement(q, v[q - 8 + k]);
+							}
+						}
+					}
 				}
-			} else {
-				v[k] = (sl_uint16)s;
-				k++;
-				i++;
+				return i;
 			}
 		}
-		if (k == 8) {
-			if (skip_START >= 0) {
-				return SLIB_PARSE_ERROR;
-			} else {
-				if (obj) {
-					for (int q = 0; q < 8; q++) {
-						obj->setElement(q, v[q]);
-					}
-				}
-			}
-		} else {
-			if (skip_START < 0) {
-				return SLIB_PARSE_ERROR;
-			} else {
-				if (obj) {
-					int q;
-					for (q = 0; q < skip_START; q++) {
-						obj->setElement(q, v[q]);
-					}
-					int x = skip_START + 8 - k;
-					for (; q < x; q++) {
-						obj->setElement(q, 0);
-					}
-					for (; q < 8; q++) {
-						obj->setElement(q, v[q - 8 + k]);
-					}
-				}
-			}
-		}
-		return i;
 	}
 
 	template <>
 	sl_reg Parser<IPv6Address, sl_char8>::parse(IPv6Address* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
-		return _priv_IPv6Address_parse(_out, sz, posBegin, posEnd);
+		return priv::ipv6address::parse(_out, sz, posBegin, posEnd);
 	}
 
 	template <>
 	sl_reg Parser<IPv6Address, sl_char16>::parse(IPv6Address* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
-		return _priv_IPv6Address_parse(_out, sz, posBegin, posEnd);
+		return priv::ipv6address::parse(_out, sz, posBegin, posEnd);
 	}
 
 	IPv6Address& IPv6Address::operator=(const IPv6Address& other) noexcept = default;
@@ -621,7 +631,7 @@ namespace slib
 		return Base::compareMemory(m, other.m, 16) > 0;
 	}
 
-	int Compare<IPv6Address>::operator()(const IPv6Address& a, const IPv6Address& b) const noexcept
+	sl_compare_result Compare<IPv6Address>::operator()(const IPv6Address& a, const IPv6Address& b) const noexcept
 	{
 		return a.compare(b);
 	}
@@ -633,7 +643,7 @@ namespace slib
 
 	sl_size Hash<IPv6Address>::operator()(const IPv6Address& a) const noexcept
 	{
-		return a.hashCode();
+		return a.getHashCode();
 	}
 
 
@@ -688,7 +698,7 @@ namespace slib
 		*(reinterpret_cast<IPv6Address*>(m)) = addr;
 	}
 
-	int IPAddress::compare(const IPAddress& other) const noexcept
+	sl_compare_result IPAddress::compare(const IPAddress& other) const noexcept
 	{
 		if (type < other.type) {
 			return -1;
@@ -707,15 +717,15 @@ namespace slib
 		return 0;
 	}
 
-	sl_size IPAddress::hashCode() const noexcept
+	sl_size IPAddress::getHashCode() const noexcept
 	{
 		switch (type) {
 			case IPAddressType::None:
 				return 0;
 			case IPAddressType::IPv4:
-				return (reinterpret_cast<IPv4Address const*>(m))->hashCode();
+				return (reinterpret_cast<IPv4Address const*>(m))->getHashCode();
 			case IPAddressType::IPv6:
-				return (reinterpret_cast<IPv6Address const*>(m))->hashCode();
+				return (reinterpret_cast<IPv6Address const*>(m))->getHashCode();
 		}
 		return 0;
 	}
@@ -748,43 +758,48 @@ namespace slib
 		return isNotNone();
 	}
 
-
-	template <class CT>
-	SLIB_INLINE static sl_reg _priv_IPAddress_parse(IPAddress* obj, const CT* sz, sl_size posStart, sl_size posEnd) noexcept
+	namespace priv
 	{
-		if (posStart >= posEnd) {
-			return SLIB_PARSE_ERROR;
-		}
-		sl_reg index;
-		IPv4Address a4;
-		index = Parser<IPv4Address, CT>::parse(&a4, sz, posStart, posEnd);
-		if (index != SLIB_PARSE_ERROR) {
-			if (obj) {
-				*obj = a4;
+		namespace ipaddress
+		{
+			template <class CT>
+			SLIB_INLINE static sl_reg parse(IPAddress* obj, const CT* sz, sl_size posStart, sl_size posEnd) noexcept
+			{
+				if (posStart >= posEnd) {
+					return SLIB_PARSE_ERROR;
+				}
+				sl_reg index;
+				IPv4Address a4;
+				index = Parser<IPv4Address, CT>::parse(&a4, sz, posStart, posEnd);
+				if (index != SLIB_PARSE_ERROR) {
+					if (obj) {
+						*obj = a4;
+					}
+					return index;
+				}
+				IPv6Address a6;
+				index = Parser<IPv6Address, CT>::parse(&a6, sz, posStart, posEnd);
+				if (index != SLIB_PARSE_ERROR) {
+					if (obj) {
+						*obj = a6;
+					}
+					return index;
+				}
+				return SLIB_PARSE_ERROR;
 			}
-			return index;
 		}
-		IPv6Address a6;
-		index = Parser<IPv6Address, CT>::parse(&a6, sz, posStart, posEnd);
-		if (index != SLIB_PARSE_ERROR) {
-			if (obj) {
-				*obj = a6;
-			}
-			return index;
-		}
-		return SLIB_PARSE_ERROR;
 	}
 
 	template <>
 	sl_reg Parser<IPAddress, sl_char8>::parse(IPAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
-		return _priv_IPAddress_parse(_out, sz, posBegin, posEnd);
+		return priv::ipaddress::parse(_out, sz, posBegin, posEnd);
 	}
 
 	template <>
 	sl_reg Parser<IPAddress, sl_char16>::parse(IPAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
-		return _priv_IPAddress_parse(_out, sz, posBegin, posEnd);
+		return priv::ipaddress::parse(_out, sz, posBegin, posEnd);
 	}
 
 	IPAddress& IPAddress::operator=(const IPAddress& other) noexcept = default;
@@ -830,7 +845,7 @@ namespace slib
 		return !(*this == other);
 	}
 
-	int Compare<IPAddress>::operator()(const IPAddress& a, const IPAddress& b) const noexcept
+	sl_compare_result Compare<IPAddress>::operator()(const IPAddress& a, const IPAddress& b) const noexcept
 	{
 		return a.compare(b);
 	}
@@ -842,7 +857,7 @@ namespace slib
 
 	sl_size Hash<IPAddress>::operator()(const IPAddress& a) const noexcept
 	{
-		return a.hashCode();
+		return a.getHashCode();
 	}
 
 }

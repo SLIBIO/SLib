@@ -23,14 +23,17 @@
 namespace slib
 {
 	
-	class _priv_CList
+	namespace priv
 	{
-	public:
-		static sl_bool setCapacity(void* pData, sl_size elementSize, sl_size* pCapacity, sl_size* pCount, sl_size newCapacity) noexcept;
-		
-		static sl_bool adjustCapacity(void* pData, sl_size elementSize, sl_size* pCapacity, sl_size* pCount, sl_size newCount) noexcept;
-		
-	};
+		namespace list
+		{
+
+			sl_bool setCapacity(void* pData, sl_size elementSize, sl_size* pCapacity, sl_size* pCount, sl_size newCapacity) noexcept;
+			
+			sl_bool adjustCapacity(void* pData, sl_size elementSize, sl_size* pCapacity, sl_size* pCount, sl_size newCount) noexcept;		
+
+		}
+	}
 
 	template <class T>
 	SLIB_INLINE CList<T>::CList() noexcept
@@ -423,40 +426,40 @@ namespace slib
 	template <class T>
 	SLIB_INLINE sl_bool CList<T>::setCapacity_NoLock(sl_size capacity) noexcept
 	{
-		return _priv_CList::setCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, &m_count, capacity);
+		return priv::list::setCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, &m_count, capacity);
 	}
 	
 	template <class T>
 	sl_bool CList<T>::setCapacity(sl_size capacity) noexcept
 	{
 		ObjectLocker lock(this);
-		return _priv_CList::setCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, &m_count, capacity);
+		return priv::list::setCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, &m_count, capacity);
 	}
 	
 	template <class T>
 	SLIB_INLINE sl_bool CList<T>::adjustCapacity_NoLock(sl_size count) noexcept
 	{
-		return _priv_CList::adjustCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, &m_count, count);
+		return priv::list::adjustCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, &m_count, count);
 	}
 	
 	template <class T>
 	sl_bool CList<T>::adjustCapacity(sl_size count) noexcept
 	{
 		ObjectLocker lock(this);
-		return _priv_CList::adjustCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, &m_count, count);
+		return priv::list::adjustCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, &m_count, count);
 	}
 
 	template <class T>
 	SLIB_INLINE sl_bool CList<T>::shrinkToFit_NoLock() noexcept
 	{
-		return _priv_CList::setCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, &m_count, m_count);
+		return priv::list::setCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, &m_count, m_count);
 	}
 	
 	template <class T>
 	sl_bool CList<T>::shrinkToFit() noexcept
 	{
 		ObjectLocker lock(this);
-		return _priv_CList::setCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, &m_count, m_count);
+		return priv::list::setCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, &m_count, m_count);
 	}
 	
 	template <class T>

@@ -59,9 +59,9 @@ namespace slib
 		
 		sl_bool isInvalid() const noexcept;
 		
-		int compare(const SocketAddress& other) const noexcept;
+		sl_compare_result compare(const SocketAddress& other) const noexcept;
 		
-		sl_size hashCode() const noexcept;
+		sl_size getHashCode() const noexcept;
 		
 		/*
 		 Address Format
@@ -129,7 +129,7 @@ namespace slib
 	class Compare<SocketAddress>
 	{
 	public:
-		int operator()(const SocketAddress& a, const SocketAddress& b) const noexcept;
+		sl_compare_result operator()(const SocketAddress& a, const SocketAddress& b) const noexcept;
 	};
 	
 	template <>

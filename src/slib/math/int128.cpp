@@ -34,7 +34,7 @@ namespace slib
 
 	SLIB_ALIGN(8) const sl_uint64 Uint128::_zero[2] = { 0, 0 };
 
-	int Uint128::compare(const Uint128& other) const noexcept
+	sl_compare_result Uint128::compare(const Uint128& other) const noexcept
 	{
 		if (high > other.high) {
 			return 1;
@@ -45,6 +45,16 @@ namespace slib
 		return (low < other.low) ? -1 : (low > other.low);
 	}
 
+	sl_bool Uint128::equals(const Uint128& other) const noexcept
+	{
+		return high == other.high && low == other.low;
+	}
+	
+	sl_size Uint128::getHashCode() const noexcept
+	{
+		return Rehash64ToSize(high ^ low);
+	}
+	
 	sl_bool Uint128::div(const Uint128& a, const Uint128& b, Uint128* quotient, Uint128* remainder) noexcept
 	{
 		if (b.isZero()) {
@@ -812,7 +822,7 @@ namespace slib
 				if (div(m, _radix, &m, &r)) {
 					sl_uint32 v = (sl_uint32)(r.low);
 					if (v < radix) {
-						buf[posBuf] = _priv_StringConv_radixPatternUpper[v];
+						buf[posBuf] = priv::string::g_conv_radixPatternUpper[v];
 					} else {
 						buf[posBuf] = '?';
 					}
@@ -844,7 +854,7 @@ namespace slib
 		sl_size pos = posBegin;
 		Uint128 m;
 		m.setZero();
-		const sl_uint8* pattern = radix <= 36 ? _priv_StringConv_radixInversePatternSmall : _priv_StringConv_radixInversePatternBig;
+		const sl_uint8* pattern = radix <= 36 ? priv::string::g_conv_radixInversePatternSmall : priv::string::g_conv_radixInversePatternBig;
 		if (radix == 16) {
 			for (; pos < len; pos++) {
 				sl_uint32 c = (sl_uint8)(sz[pos]);
@@ -889,19 +899,19 @@ namespace slib
 	}
 
 
-	int Compare<Uint128>::operator()(const Uint128& a, const Uint128& b) const noexcept
+	sl_compare_result Compare<Uint128>::operator()(const Uint128& a, const Uint128& b) const noexcept
 	{
 		return a.compare(b);
 	}
 
 	sl_bool Equals<Uint128>::operator()(const Uint128& a, const Uint128& b) const noexcept
 	{
-		return a == b;
+		return a.equals(b);
 	}
 
 	sl_size Hash<Uint128>::operator()(const Uint128& v) const noexcept
 	{
-		return Rehash64ToSize(v.high ^ v.low);
+		return v.getHashCode();
 	}
 
 }

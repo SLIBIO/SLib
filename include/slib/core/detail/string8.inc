@@ -22,16 +22,28 @@
 
 namespace slib
 {
-	
-	struct _priv_String_Const
+
+	namespace priv
 	{
-		StringContainer* container;
-		sl_int32 lock;
-	};
-	
-	extern const _priv_String_Const _priv_String_Null;
-	extern const _priv_String_Const _priv_String_Empty;
-	
+		namespace string
+		{
+			struct ConstContainer
+			{
+				StringContainer* container;
+				sl_int32 lock;
+			};
+
+			extern const ConstContainer g_null;
+			extern const ConstContainer g_empty;
+
+			extern const char* g_conv_radixPatternUpper;
+			extern const char* g_conv_radixPatternLower;
+			extern const sl_uint8* g_conv_radixInversePatternBig;
+			extern const sl_uint8* g_conv_radixInversePatternSmall;
+
+		}
+	}
+
 	SLIB_INLINE String::String(String&& src) noexcept
 	{
 		m_container = src.m_container;
@@ -46,18 +58,18 @@ namespace slib
 	
 	SLIB_INLINE const String& String::null() noexcept
 	{
-		return *(reinterpret_cast<String const*>(&_priv_String_Null));
+		return *(reinterpret_cast<String const*>(&(priv::string::g_null)));
 	}
 	
 	SLIB_INLINE const String& String::getEmpty() noexcept
 	{
-		return *(reinterpret_cast<String const*>(&_priv_String_Empty));
+		return *(reinterpret_cast<String const*>(&(priv::string::g_empty)));
 	}
 
 	SLIB_INLINE const String& String::getNotNull() const noexcept
 	{
 		if (!m_container) {
-			return *(reinterpret_cast<String const*>(&_priv_String_Empty));
+			return *(reinterpret_cast<String const*>(&(priv::string::g_empty)));
 		}
 		return *this;
 	}
@@ -123,12 +135,12 @@ namespace slib
 
 	SLIB_INLINE const AtomicString& AtomicString::null() noexcept
 	{
-		return *(reinterpret_cast<AtomicString const*>(&_priv_String_Null));
+		return *(reinterpret_cast<AtomicString const*>(&(priv::string::g_null)));
 	}
 	
 	SLIB_INLINE const AtomicString& AtomicString::getEmpty() noexcept
 	{
-		return *(reinterpret_cast<AtomicString const*>(&_priv_String_Empty));
+		return *(reinterpret_cast<AtomicString const*>(&(priv::string::g_empty)));
 	}
 
 	SLIB_INLINE sl_bool AtomicString::isNull() const noexcept
@@ -140,11 +152,5 @@ namespace slib
 	{
 		return m_container != sl_null;
 	}
-
-
-	extern const char* _priv_StringConv_radixPatternUpper;
-	extern const char* _priv_StringConv_radixPatternLower;
-	extern const sl_uint8* _priv_StringConv_radixInversePatternBig;
-	extern const sl_uint8* _priv_StringConv_radixInversePatternSmall;
 
 }

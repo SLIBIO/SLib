@@ -77,12 +77,18 @@ namespace slib
 		
 	};
 	
-	extern const char _priv_HashMap_ClassID[];
+	namespace priv
+	{
+		namespace hash_map
+		{
+			extern const char g_classID[];
+		}
+	}
 	
 	template < class KT, class VT, class HASH = Hash<KT>, class KEY_COMPARE = Compare<KT> >
 	class SLIB_EXPORT CHashMap : public Object
 	{
-		SLIB_TEMPLATE_OBJECT(Object, _priv_HashMap_ClassID)
+		SLIB_TEMPLATE_OBJECT(Object, priv::hash_map::g_classID)
 		
 	public:
 		typedef HashMapNode<KT, VT> NODE;

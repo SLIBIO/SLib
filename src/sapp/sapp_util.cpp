@@ -145,8 +145,8 @@ namespace slib
 			sz[pos++] = '0';
 			sz[pos++] = 'x';
 			sl_uint32 n = ((sl_uint8*)data)[i];
-			sz[pos++] = _priv_StringConv_radixPatternLower[(n >> 4) & 15];
-			sz[pos++] = _priv_StringConv_radixPatternLower[n & 15];
+			sz[pos++] = priv::string::g_conv_radixPatternUpper[(n >> 4) & 15];
+			sz[pos++] = priv::string::g_conv_radixPatternLower[n & 15];
 			col++;
 		}
 		sz[pos++] = 0;

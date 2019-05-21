@@ -173,44 +173,44 @@ namespace slib
 		return ::memcmp(m1, m2, count << 3) == 0;
 	}
 
-	sl_int32 Base::compareMemory(const sl_uint8* m1, const sl_uint8* m2, sl_size count) noexcept
+	sl_compare_result Base::compareMemory(const sl_uint8* m1, const sl_uint8* m2, sl_size count) noexcept
 	{
-		return ::memcmp(m1, m2, count);
+		return (sl_compare_result)(::memcmp(m1, m2, count));
 	}
 
-	sl_int32 Base::compareMemory(const sl_int8* m1, const sl_int8* m2, sl_size count) noexcept
+	sl_compare_result Base::compareMemory(const sl_int8* m1, const sl_int8* m2, sl_size count) noexcept
 	{
-		return std::char_traits<sl_int8>::compare(m1, m2, count);
+		return (sl_compare_result)(std::char_traits<sl_int8>::compare(m1, m2, count));
 	}
 
-	sl_int32 Base::compareMemory2(const sl_uint16* m1, const sl_uint16* m2, sl_size count) noexcept
+	sl_compare_result Base::compareMemory2(const sl_uint16* m1, const sl_uint16* m2, sl_size count) noexcept
 	{
-		return std::char_traits<_base_char16>::compare((_base_char16*)m1, (_base_char16*)m2, count);
+		return (sl_compare_result)(std::char_traits<_base_char16>::compare((_base_char16*)m1, (_base_char16*)m2, count));
 	}
 
-	sl_int32 Base::compareMemory2(const sl_int16* m1, const sl_int16* m2, sl_size count) noexcept
+	sl_compare_result Base::compareMemory2(const sl_int16* m1, const sl_int16* m2, sl_size count) noexcept
 	{
-		return std::char_traits<sl_int16>::compare(m1, m2, count);
+		return (sl_compare_result)(std::char_traits<sl_int16>::compare(m1, m2, count));
 	}
 
-	sl_int32 Base::compareMemory4(const sl_uint32* m1, const sl_uint32* m2, sl_size count) noexcept
+	sl_compare_result Base::compareMemory4(const sl_uint32* m1, const sl_uint32* m2, sl_size count) noexcept
 	{
-		return std::char_traits<_base_char32>::compare((_base_char32*)m1, (_base_char32*)m2, count);
+		return (sl_compare_result)(std::char_traits<_base_char32>::compare((_base_char32*)m1, (_base_char32*)m2, count));
 	}
 
-	sl_int32 Base::compareMemory4(const sl_int32* m1, const sl_int32* m2, sl_size count) noexcept
+	sl_compare_result Base::compareMemory4(const sl_int32* m1, const sl_int32* m2, sl_size count) noexcept
 	{
-		return std::char_traits<sl_int32>::compare(m1, m2, count);
+		return (sl_compare_result)(std::char_traits<sl_int32>::compare(m1, m2, count));
 	}
 
-	sl_int32 Base::compareMemory8(const sl_uint64* m1, const sl_uint64* m2, sl_size count) noexcept
+	sl_compare_result Base::compareMemory8(const sl_uint64* m1, const sl_uint64* m2, sl_size count) noexcept
 	{
-		return std::char_traits<sl_uint64>::compare(m1, m2, count);
+		return (sl_compare_result)(std::char_traits<sl_uint64>::compare(m1, m2, count));
 	}
 
-	sl_int32 Base::compareMemory8(const sl_int64* m1, const sl_int64* m2, sl_size count) noexcept
+	sl_compare_result Base::compareMemory8(const sl_int64* m1, const sl_int64* m2, sl_size count) noexcept
 	{
-		return std::char_traits<sl_int64>::compare(m1, m2, count);
+		return (sl_compare_result)(std::char_traits<sl_int64>::compare(m1, m2, count));
 	}
 
 	sl_bool Base::equalsMemoryZero(const void* _m, sl_size count) noexcept
@@ -284,7 +284,7 @@ namespace slib
 		return sl_true;
 	}
 
-	sl_int32 Base::compareMemoryZero(const sl_uint8* m, sl_size count) noexcept
+	sl_compare_result Base::compareMemoryZero(const sl_uint8* m, sl_size count) noexcept
 	{
 		for (sl_size i = 0; i < count; i++) {
 			if (m[i]) {
@@ -294,7 +294,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_int32 Base::compareMemoryZero(const sl_int8* m, sl_size count) noexcept
+	sl_compare_result Base::compareMemoryZero(const sl_int8* m, sl_size count) noexcept
 	{
 		for (sl_size i = 0; i < count; i++) {
 			sl_int8 v = m[i];
@@ -309,7 +309,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_int32 Base::compareMemoryZero2(const sl_uint16* m, sl_size count) noexcept
+	sl_compare_result Base::compareMemoryZero2(const sl_uint16* m, sl_size count) noexcept
 	{
 		for (sl_size i = 0; i < count; i++) {
 			if (m[i]) {
@@ -319,7 +319,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_int32 Base::compareMemoryZero2(const sl_int16* m, sl_size count) noexcept
+	sl_compare_result Base::compareMemoryZero2(const sl_int16* m, sl_size count) noexcept
 	{
 		for (sl_size i = 0; i < count; i++) {
 			sl_int16 v = m[i];
@@ -334,7 +334,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_int32 Base::compareMemoryZero4(const sl_uint32* m, sl_size count) noexcept
+	sl_compare_result Base::compareMemoryZero4(const sl_uint32* m, sl_size count) noexcept
 	{
 		for (sl_size i = 0; i < count; i++) {
 			if (m[i]) {
@@ -344,7 +344,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_int32 Base::compareMemoryZero4(const sl_int32* m, sl_size count) noexcept
+	sl_compare_result Base::compareMemoryZero4(const sl_int32* m, sl_size count) noexcept
 	{
 		for (sl_size i = 0; i < count; i++) {
 			sl_int32 v = m[i];
@@ -359,7 +359,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_int32 Base::compareMemoryZero8(const sl_uint64* m, sl_size count) noexcept
+	sl_compare_result Base::compareMemoryZero8(const sl_uint64* m, sl_size count) noexcept
 	{
 		for (sl_size i = 0; i < count; i++) {
 			if (m[i]) {
@@ -369,7 +369,7 @@ namespace slib
 		return 0;
 	}
 
-	sl_int32 Base::compareMemoryZero8(const sl_int64* m, sl_size count) noexcept
+	sl_compare_result Base::compareMemoryZero8(const sl_int64* m, sl_size count) noexcept
 	{
 		for (sl_size i = 0; i < count; i++) {
 			sl_int64 v = m[i];
@@ -561,21 +561,21 @@ namespace slib
 #endif
 	}
 
-	sl_int32 Base::compareString(const sl_char8 *s1, const sl_char8 *s2, sl_reg count) noexcept
+	sl_compare_result Base::compareString(const sl_char8 *s1, const sl_char8 *s2, sl_reg count) noexcept
 	{
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
-		return ::strncmp(s1, s2, count);
+		return (sl_compare_result)(::strncmp(s1, s2, count));
 	}
 
-	sl_int32 Base::compareString2(const sl_char16 *s1, const sl_char16 *s2, sl_reg count) noexcept
+	sl_compare_result Base::compareString2(const sl_char16 *s1, const sl_char16 *s2, sl_reg count) noexcept
 	{
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
 #if SLIB_WCHAR_SIZE == 2
-		return ::wcsncmp((wchar_t*)s1, (wchar_t*)s2, count);
+		return (sl_compare_result)(::wcsncmp((wchar_t*)s1, (wchar_t*)s2, count));
 #else
 		for (sl_reg i = 0; i < count; i++) {
 			if (s1[i] < s2[i]) {
@@ -591,13 +591,13 @@ namespace slib
 #endif
 	}
 
-	sl_int32 Base::compareString4(const sl_char32 *s1, const sl_char32 *s2, sl_reg count) noexcept
+	sl_compare_result Base::compareString4(const sl_char32 *s1, const sl_char32 *s2, sl_reg count) noexcept
 	{
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
 #if SLIB_WCHAR_SIZE == 4
-		return ::wcsncmp((wchar_t*)s1, (wchar_t*)s2, count);
+		return (sl_compare_result)(::wcsncmp((wchar_t*)s1, (wchar_t*)s2, count));
 #else
 		for (sl_reg i = 0; i < count; i++) {
 			if (s1[i] < s2[i]) {

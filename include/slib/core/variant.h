@@ -466,6 +466,13 @@ namespace slib
 	
 		String toJsonString() const noexcept;
 		
+		
+		sl_compare_result compare(const Variant& other) const noexcept;
+		
+		sl_bool equals(const Variant& other) const noexcept;
+		
+		sl_size getHashCode() const noexcept;
+		
 	public:
 		void get(Variant& _out) const noexcept;
 		void set(const Variant& _in) noexcept;
@@ -996,6 +1003,12 @@ namespace slib
 		String toJsonString() const noexcept;
 		
 		
+		sl_compare_result compare(const Variant& other) const noexcept;
+		
+		sl_bool equals(const Variant& other) const noexcept;
+		
+		sl_size getHashCode() const noexcept;
+
 	public:
 		void get(Variant& _out) const noexcept;
 		void set(const Variant& _in) noexcept;
@@ -1187,7 +1200,21 @@ namespace slib
 	class Compare<Variant>
 	{
 	public:
-		int operator()(const Variant &a, const Variant &b) const noexcept;
+		sl_compare_result operator()(const Variant &a, const Variant &b) const noexcept;
+	};
+	
+	template <>
+	class Equals<Variant>
+	{
+	public:
+		sl_bool operator()(const Variant &a, const Variant &b) const noexcept;
+	};
+	
+	template <>
+	class Hash<Variant>
+	{
+	public:
+		sl_size operator()(const Variant &a) const noexcept;
 	};
 
 	typedef List<Variant> VariantList;

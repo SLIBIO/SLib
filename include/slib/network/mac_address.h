@@ -78,9 +78,9 @@ namespace slib
 		
 		void setBytes(const sl_uint8* _m) noexcept;
 		
-		int compare(const MacAddress& other) const noexcept;
+		sl_compare_result compare(const MacAddress& other) const noexcept;
 		
-		sl_size hashCode() const noexcept;
+		sl_size getHashCode() const noexcept;
 		
 		// m0-m1-m2-m3-m4-m5, m0:m1:m2:m3:m4:m5
 		String toString(sl_char8 sep = '-') const noexcept;
@@ -126,7 +126,7 @@ namespace slib
 	class Compare<MacAddress>
 	{
 	public:
-		int operator()(const MacAddress& a, const MacAddress& b) const noexcept;
+		sl_compare_result operator()(const MacAddress& a, const MacAddress& b) const noexcept;
 	};
 	
 	template <>

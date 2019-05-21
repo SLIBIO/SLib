@@ -95,9 +95,9 @@ namespace slib
 		
 		sl_bool isPrivate() const noexcept;
 		
-		int compare(const IPv4Address& other) const noexcept;
+		sl_compare_result compare(const IPv4Address& other) const noexcept;
 		
-		sl_size hashCode() const noexcept;
+		sl_size getHashCode() const noexcept;
 		
 		// "a.b.c.d"
 		String toString() const noexcept;
@@ -161,7 +161,7 @@ namespace slib
 	class Compare<IPv4Address>
 	{
 	public:
-		int operator()(const IPv4Address& a, const IPv4Address& b) const noexcept;
+		sl_compare_result operator()(const IPv4Address& a, const IPv4Address& b) const noexcept;
 	};
 	
 	template <>
@@ -196,7 +196,7 @@ namespace slib
 	class Compare<IPv4AddressInfo>
 	{
 	public:
-		int operator()(const IPv4AddressInfo& a, const IPv4AddressInfo& b) const noexcept;
+		sl_compare_result operator()(const IPv4AddressInfo& a, const IPv4AddressInfo& b) const noexcept;
 	};
 	
 	template <>
@@ -270,9 +270,9 @@ namespace slib
 		
 		sl_bool isIPv4Transition() const noexcept;
 		
-		int compare(const IPv6Address& other) const noexcept;
+		sl_compare_result compare(const IPv6Address& other) const noexcept;
 		
-		sl_size hashCode() const noexcept;
+		sl_size getHashCode() const noexcept;
 		
 		// "s0:s1:s2:s3:s4:s5:s6:s7"
 		String toString() const noexcept;
@@ -328,7 +328,7 @@ namespace slib
 	class Compare<IPv6Address>
 	{
 	public:
-		int operator()(const IPv6Address& a, const IPv6Address& b) const noexcept;
+		sl_compare_result operator()(const IPv6Address& a, const IPv6Address& b) const noexcept;
 	};
 	
 	template <>
@@ -393,9 +393,9 @@ namespace slib
 		
 		void setIPv6(const IPv6Address& addr) noexcept;
 		
-		int compare(const IPAddress& other) const noexcept;
+		sl_compare_result compare(const IPAddress& other) const noexcept;
 		
-		sl_size hashCode() const noexcept;
+		sl_size getHashCode() const noexcept;
 		
 		String toString() const noexcept;
 		
@@ -449,7 +449,7 @@ namespace slib
 	class Compare<IPAddress>
 	{
 	public:
-		int operator()(const IPAddress& a, const IPAddress& b) const noexcept;
+		sl_compare_result operator()(const IPAddress& a, const IPAddress& b) const noexcept;
 	};
 	
 	template <>

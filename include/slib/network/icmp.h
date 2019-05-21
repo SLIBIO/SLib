@@ -262,9 +262,9 @@ namespace slib
 		sl_uint16 sequenceNumber;
 		
 	public:
-		int compare(const IcmpEchoAddress& other) const;
+		sl_compare_result compare(const IcmpEchoAddress& other) const;
 		
-		sl_size hashCode() const;
+		sl_size getHashCode() const;
 		
 	public:
 		sl_bool operator==(const IcmpEchoAddress& other) const;
@@ -277,7 +277,7 @@ namespace slib
 	class Compare<IcmpEchoAddress>
 	{
 	public:
-		int operator()(const IcmpEchoAddress& a, const IcmpEchoAddress& b) const;
+		sl_compare_result operator()(const IcmpEchoAddress& a, const IcmpEchoAddress& b) const;
 		
 	};
 	

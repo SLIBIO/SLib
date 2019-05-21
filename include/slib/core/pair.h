@@ -67,9 +67,9 @@ namespace slib
 	class Compare< Pair<FIRST_T, SECOND_T> >
 	{
 	public:
-		int operator()(const Pair<FIRST_T, SECOND_T>& a, const Pair<FIRST_T, SECOND_T>& b) const noexcept
+		sl_compare_result operator()(const Pair<FIRST_T, SECOND_T>& a, const Pair<FIRST_T, SECOND_T>& b) const noexcept
 		{
-			int ret = Compare<FIRST_T>()(a.first, b.first);
+			sl_compare_result ret = Compare<FIRST_T>()(a.first, b.first);
 			if (ret) {
 				return ret;
 			}

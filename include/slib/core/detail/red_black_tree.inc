@@ -75,9 +75,9 @@ namespace slib
 	}
 
 	template <class NODE, class KEY, class KEY_COMPARE>
-	NODE* RedBlackTree::tryFind(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, int& compare_result) noexcept
+	NODE* RedBlackTree::tryFind(NODE* look, const KEY& key, const KEY_COMPARE& key_compare, sl_compare_result& compare_result) noexcept
 	{
-		int comp;
+		sl_compare_result comp;
 		for (;;) {
 			comp = key_compare(look->key, key);
 			if (comp == 0) {
@@ -108,7 +108,7 @@ namespace slib
 		if (!look) {
 			return sl_false;
 		}
-		int compare_result;
+		sl_compare_result compare_result;
 		look = tryFind(look, key, key_compare, compare_result);
 		if (compare_result != 0) {
 			return sl_false;
@@ -179,7 +179,7 @@ namespace slib
 				*pGreaterEqual = sl_null;
 			}
 		}
-		int compare_result;
+		sl_compare_result compare_result;
 		NODE* node = tryFind(look, key, key_compare, compare_result);
 		if (compare_result == 0) {
 			if (pLessEqual) {
@@ -267,7 +267,7 @@ namespace slib
 		if (!look) {
 			return sl_null;
 		}
-		int compare_result;
+		sl_compare_result compare_result;
 		NODE* node = tryFind(look, key, key_compare, compare_result);
 		if (compare_result == 0) {
 			return node;
@@ -326,7 +326,7 @@ namespace slib
 	}
 	
 	template <class NODE>
-	void RedBlackTree::insertNode(NODE** pRoot, NODE* node, NODE* where, int compare_result) noexcept
+	void RedBlackTree::insertNode(NODE** pRoot, NODE* node, NODE* where, sl_compare_result compare_result) noexcept
 	{
 		if (compare_result > 0) {
 			where->left = node;
@@ -374,7 +374,7 @@ namespace slib
 	{
 		NODE* root = *pRoot;
 		if (root) {
-			int compare_result;
+			sl_compare_result compare_result;
 			NODE* where = tryFind(root, key, key_compare, compare_result);
 			if (compare_result == 0) {
 				where->value = Forward<VALUE>(value);
@@ -415,7 +415,7 @@ namespace slib
 		if (!root) {
 			return sl_null;
 		}
-		int compare_result;
+		sl_compare_result compare_result;
 		NODE* node = tryFind(root, key, key_compare, compare_result);
 		if (compare_result == 0) {
 			node->value = Forward<VALUE>(value);
@@ -442,7 +442,7 @@ namespace slib
 	{
 		NODE* root = *pRoot;
 		if (root) {
-			int compare_result;
+			sl_compare_result compare_result;
 			NODE* where = tryFind(root, key, key_compare, compare_result);
 			if (compare_result == 0) {
 				return MapEmplaceReturn<NODE>(sl_false, where);
@@ -526,7 +526,7 @@ namespace slib
 	{
 		NODE* root = *pRoot;
 		if (root) {
-			int compare_result;
+			sl_compare_result compare_result;
 			NODE* node = tryFind(root, key, key_compare, compare_result);
 			if (compare_result == 0) {
 				if (outValue) {
