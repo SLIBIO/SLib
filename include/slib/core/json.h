@@ -28,6 +28,8 @@
 #include "variant.h"
 #include "cast.h"
 
+#include "../math/bigint.h"
+
 #ifdef SLIB_SUPPORT_STD_TYPES
 #include <initializer_list>
 #include <string>
@@ -439,6 +441,9 @@ namespace slib
 	
 	void FromJson(const Json& json, Memory& _out);
 	void ToJson(Json& json, const Memory& _in);
+	
+	void FromJson(const Json& json, BigInt& _out);
+	void ToJson(Json& json, const BigInt& _in);
 	
 	template <class T>
 	void FromJson(const Json& json, Nullable<T>& _out);
