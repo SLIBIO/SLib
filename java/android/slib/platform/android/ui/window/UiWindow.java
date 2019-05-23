@@ -48,6 +48,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
@@ -60,6 +62,7 @@ public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnG
 	private boolean flagFullScreen;
 	private int mLeft, mTop, mRight, mBottom;
 	private int mWidth, mHeight;
+	private int mWidthDispatchResize, mHeightDispatchResize;
 
 	private long mViewInstance = 0;
 	public long getInstance() { return mViewInstance; }
@@ -193,8 +196,13 @@ public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnG
 
 	public Point getSize() {
 		Point ret = new Point();
-		ret.x = mWidth;
-		ret.y = mHeight;
+		if (flagFullScreen) {
+			ret.x = mWidthDispatchResize;
+			ret.y = mHeightDispatchResize;
+		} else {
+			ret.x = mWidth;
+			ret.y = mHeight;
+		}
 		return ret;
 	}
 
@@ -289,14 +297,24 @@ public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnG
 
 	private static native void nativeOnResize(long instance, int w, int h);
 
+	void dispatchSizeChanged(int w, int h)
+	{
+		if (mWidthDispatchResize == w && mHeightDispatchResize == h) {
+			return;
+		}
+		mWidthDispatchResize = w;
+		mHeightDispatchResize = h;
+		if (instance != 0) {
+			nativeOnResize(instance, w, h);
+		}
+	}
+
 	public void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
 		Logger.info("Window Resized - Size(" + w + "," + h + ")");
 		mWidth = w;
 		mHeight = h;
-		if (instance != 0) {
-			nativeOnResize(instance, w, h);
-		}
+		dispatchSizeChanged(w, h);
 	}
 
 	private static native boolean nativeOnClose(long instance);
@@ -388,23 +406,43 @@ public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnG
 		if (!flagAttachedNativeWindow) {
 			return;
 		}
-		Rect rc = new Rect();
-		View rootView = getRootView();
-		rootView.getWindowVisibleDisplayFrame(rc);
-		if (savedRootViewBottom == 0) {
+
+		Window window = activity.getWindow();
+
+		int softInputMode = window.getAttributes().softInputMode;
+
+		if (flagFullScreen) {
+			if (softInputMode == WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE) {
+				Rect rc = new Rect();
+				getWindowVisibleDisplayFrame(rc);
+				int[] loc = new int[2];
+				getLocationOnScreen(loc);
+				dispatchSizeChanged(mWidth, rc.bottom - loc[1]);
+			} else {
+				dispatchSizeChanged(mWidth, mHeight);
+			}
+		}
+		if (softInputMode == WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN) {
+			View rootView = getRootView();
+			Rect rc = new Rect();
+			rootView.getWindowVisibleDisplayFrame(rc);
+			if (savedRootViewBottom == 0) {
+				savedRootViewBottom = rc.bottom;
+				return;
+			}
+			if (savedRootViewBottom == rc.bottom) {
+				return;
+			}
 			savedRootViewBottom = rc.bottom;
-			return;
-		}
-		if (savedRootViewBottom == rc.bottom) {
-			return;
-		}
-		savedRootViewBottom = rc.bottom;
-		int heightKeyboard = Util.getDisplaySize(activity).y - rc.bottom;
-		int heightKeyboardMin = (int)(60 * Util.getDisplayDensity(activity));
-		if (heightKeyboard > heightKeyboardMin) {
-			processKeyboardAppeared(activity, heightKeyboard);
+			int heightKeyboard = Util.getDisplaySize(activity).y - rc.bottom;
+			int heightKeyboardMin = (int) (60 * Util.getDisplayDensity(activity));
+			if (heightKeyboard > heightKeyboardMin) {
+				processKeyboardAppeared(activity, heightKeyboard);
+			} else {
+				processKeyboardDisappeared();
+			}
 		} else {
-			processKeyboardDisappeared();
+			restoreKeyboardScrollView();
 		}
 	}
 
@@ -478,8 +516,8 @@ public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnG
 		}
 	}
 
-	int locationOfFoucsView[] = new int[2];
-	int locationOfWindow[] = new int[2];
+	int[] locationOfFoucsView = new int[2];
+	int[] locationOfWindow = new int[2];
 
 	public void dismissKeyboard(MotionEvent ev) {
 		if (ev.getAction() != MotionEvent.ACTION_UP) {
