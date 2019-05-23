@@ -158,7 +158,7 @@ namespace slib
 	{
 		if (@available(iOS 12.0, *)) {
 			UIWindow* window = UIPlatform::getMainWindow();
-			if (window != nil && !(window.isHidden)) {
+			if (window != nil) {
 				::UIEdgeInsets insets = window.safeAreaInsets;
 				UIEdgeInsets ret;
 				ret.left = (sl_ui_len)(insets.left * UIPlatform::getGlobalScaleFactor());
