@@ -6954,16 +6954,22 @@ namespace slib
 
 	sl_int32 String::parseInt32(sl_int32 radix, sl_int32 def) const noexcept
 	{
-		sl_int32 _out = def;
-		parseInt32(radix, &_out);
-		return _out;
+		sl_int32 _out;
+		if (parseInt32(radix, &_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	sl_int32 String16::parseInt32(sl_int32 radix, sl_int32 def) const noexcept
 	{
-		sl_int32 _out = def;
-		parseInt32(radix, &_out);
-		return _out;
+		sl_int32 _out;
+		if (parseInt32(radix, &_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	sl_int32 Atomic<String>::parseInt32(sl_int32 radix, sl_int32 def) const noexcept
@@ -7021,16 +7027,22 @@ namespace slib
 
 	sl_uint32 String::parseUint32(sl_int32 radix, sl_uint32 def) const noexcept
 	{
-		sl_uint32 _out = def;
-		parseUint32(radix, &_out);
-		return _out;
+		sl_uint32 _out;
+		if (parseUint32(radix, &_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	sl_uint32 String16::parseUint32(sl_int32 radix, sl_uint32 def) const noexcept
 	{
-		sl_uint32 _out = def;
-		parseUint32(radix, &_out);
-		return _out;
+		sl_uint32 _out;
+		if (parseUint32(radix, &_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	sl_uint32 Atomic<String>::parseUint32(sl_int32 radix, sl_uint32 def) const noexcept
@@ -7088,16 +7100,22 @@ namespace slib
 
 	sl_int64 String::parseInt64(sl_int32 radix, sl_int64 def) const noexcept
 	{
-		sl_int64 _out = def;
-		parseInt64(radix, &_out);
-		return _out;
+		sl_int64 _out;
+		if (parseInt64(radix, &_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	sl_int64 String16::parseInt64(sl_int32 radix, sl_int64 def) const noexcept
 	{
-		sl_int64 _out = def;
-		parseInt64(radix, &_out);
-		return _out;
+		sl_int64 _out;
+		if (parseInt64(radix, &_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	sl_int64 Atomic<String>::parseInt64(sl_int32 radix, sl_int64 def) const noexcept
@@ -7155,16 +7173,22 @@ namespace slib
 
 	sl_uint64 String::parseUint64(sl_int32 radix, sl_uint64 def) const noexcept
 	{
-		sl_uint64 _out = def;
-		parseUint64(radix, &_out);
-		return _out;
+		sl_uint64 _out;
+		if (parseUint64(radix, &_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	sl_uint64 String16::parseUint64(sl_int32 radix, sl_uint64 def) const noexcept
 	{
-		sl_uint64 _out = def;
-		parseUint64(radix, &_out);
-		return _out;
+		sl_uint64 _out;
+		if (parseUint64(radix, &_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	sl_uint64 Atomic<String>::parseUint64(sl_int32 radix, sl_uint64 def) const noexcept
@@ -7212,16 +7236,22 @@ namespace slib
 
 	sl_reg String::parseInt(sl_int32 radix, sl_reg def) const noexcept
 	{
-		sl_reg _out = def;
-		parseInt(radix, &_out);
-		return _out;
+		sl_reg _out;
+		if (parseInt(radix, &_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	sl_reg String16::parseInt(sl_int32 radix, sl_reg def) const noexcept
 	{
-		sl_reg _out = def;
-		parseInt(radix, &_out);
-		return _out;
+		sl_reg _out;
+		if (parseInt(radix, &_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	sl_reg Atomic<String>::parseInt(sl_int32 radix, sl_reg def) const noexcept
@@ -7269,16 +7299,22 @@ namespace slib
 
 	sl_size String::parseSize(sl_int32 radix, sl_size def) const noexcept
 	{
-		sl_size _out = def;
-		parseSize(radix, &_out);
-		return _out;
+		sl_size _out;
+		if (parseSize(radix, &_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	sl_size String16::parseSize(sl_int32 radix, sl_size def) const noexcept
 	{
-		sl_size _out = def;
-		parseSize(radix, &_out);
-		return _out;
+		sl_size _out;
+		if (parseSize(radix, &_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	sl_size Atomic<String>::parseSize(sl_int32 radix, sl_size def) const noexcept
@@ -7335,16 +7371,22 @@ namespace slib
 
 	float String::parseFloat(float def) const noexcept
 	{
-		float _out = def;
-		parseFloat(&_out);
-		return _out;
+		float _out;
+		if (parseFloat(&_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	float String16::parseFloat(float def) const noexcept
 	{
-		float _out = def;
-		parseFloat(&_out);
-		return _out;
+		float _out;
+		if (parseFloat(&_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	float Atomic<String>::parseFloat(float def) const noexcept
@@ -7402,16 +7444,22 @@ namespace slib
 
 	double String::parseDouble(double def) const noexcept
 	{
-		double _out = def;
-		parseDouble(&_out);
-		return _out;
+		double _out;
+		if (parseDouble(&_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	double String16::parseDouble(double def) const noexcept
 	{
-		double _out = def;
-		parseDouble(&_out);
-		return _out;
+		double _out;
+		if (parseDouble(&_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	double Atomic<String>::parseDouble(double def) const noexcept
@@ -7468,16 +7516,22 @@ namespace slib
 
 	sl_bool String::parseBoolean(sl_bool def) const noexcept
 	{
-		sl_bool _out = def;
-		parseBoolean(&_out);
-		return _out;
+		sl_bool _out;
+		if (parseBoolean(&_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	sl_bool String16::parseBoolean(sl_bool def) const noexcept
 	{
-		sl_bool _out = def;
-		parseBoolean(&_out);
-		return _out;
+		sl_bool _out;
+		if (parseBoolean(&_out)) {
+			return _out;
+		} else {
+			return def;
+		}
 	}
 
 	sl_bool Atomic<String>::parseBoolean(sl_bool def) const noexcept
