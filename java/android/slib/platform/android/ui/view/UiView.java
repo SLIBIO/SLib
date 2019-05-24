@@ -27,7 +27,6 @@ import slib.platform.android.ui.Graphics;
 import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.window.UiWindow;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Point;
@@ -41,7 +40,6 @@ import android.view.ViewParent;
 import android.widget.AbsoluteLayout;
 import android.widget.FrameLayout;
 
-@SuppressWarnings("deprecation")
 public class UiView {
 	
 	private UiView() {
@@ -118,10 +116,18 @@ public class UiView {
 	}
 	
 	public static void invalidateRect(View view, int left, int top, int right, int bottom) {
-		if (UiThread.isUiThread()) {
-			view.invalidate(left, top, right, bottom);			
+		if (Build.VERSION.SDK_INT >= 28) {
+			if (UiThread.isUiThread()) {
+				view.invalidate();
+			} else {
+				view.postInvalidate();
+			}
 		} else {
-			view.postInvalidate(left, top, right, bottom);			
+			if (UiThread.isUiThread()) {
+				view.invalidate(left, top, right, bottom);
+			} else {
+				view.postInvalidate(left, top, right, bottom);
+			}
 		}
 	}
 	
@@ -197,7 +203,7 @@ public class UiView {
 		return false;
 	}
 
-	static final float EPSILON = 0.000001f;
+	private static final float EPSILON = 0.000001f;
 	public static void setTransform(final View view, final float _tx, final float _ty, final float rotate, final float sx, final float sy, final float ax, final float ay) {
 		if (UiThread.isUiThread()) {
 			float r = (float)(rotate * 180 / Math.PI);
