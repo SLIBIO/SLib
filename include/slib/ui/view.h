@@ -83,6 +83,16 @@ namespace slib
 		// set before attaching
 		void setCreatingNativeWidget(sl_bool flag);
 		
+		sl_bool isCreatingLargeContent();
+		
+		// set before attaching
+		void setCreatingLargeContent(sl_bool flag);
+		
+		sl_bool isCreatingEmptyContent();
+		
+		// set before attaching
+		void setCreatingEmptyContent(sl_bool flag);
+		
 		UIAttachMode getAttachMode();
 		
 		// set before attaching
@@ -1398,6 +1408,8 @@ namespace slib
 		sl_bool m_flagCreatingInstance : 1;
 		sl_bool m_flagCreatingChildInstances : 1;
 		sl_bool m_flagCreatingNativeWidget : 1;
+		sl_bool m_flagCreatingLargeContent: 1;
+		sl_bool m_flagCreatingEmptyContent: 1;
 		sl_bool m_flagUsingChildLayouts : 1;
 		sl_bool m_flagEnabled : 1;
 		sl_bool m_flagHitTestable : 1;

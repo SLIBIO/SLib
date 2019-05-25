@@ -26,206 +26,214 @@
 
 #include "view_android.h"
 
+#include "slib/ui/scroll_view.h"
 #include "slib/math/transform2d.h"
 
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(JAndroidPoint, "android/graphics/Point")
-		SLIB_JNI_INT_FIELD(x);
-		SLIB_JNI_INT_FIELD(y);
-	SLIB_JNI_END_CLASS
-
-	SLIB_JNI_BEGIN_CLASS(JAndroidRect, "android/graphics/Rect")
-		SLIB_JNI_INT_FIELD(left);
-		SLIB_JNI_INT_FIELD(top);
-		SLIB_JNI_INT_FIELD(right);
-		SLIB_JNI_INT_FIELD(bottom);
-	SLIB_JNI_END_CLASS
-
-	SLIB_JNI_BEGIN_CLASS(JAndroidTouchPoint, "slib/platform/android/ui/view/UiTouchPoint")
-		SLIB_JNI_FLOAT_FIELD(x);
-		SLIB_JNI_FLOAT_FIELD(y);
-		SLIB_JNI_FLOAT_FIELD(pressure);
-		SLIB_JNI_INT_FIELD(phase);
-		SLIB_JNI_INT_FIELD(pointerId);
-	SLIB_JNI_END_CLASS
-
-	void JNICALL _priv_AndroidView_nativeOnDraw(JNIEnv* env, jobject _this, jlong jinstance, jobject jcanvas)
+	namespace priv
 	{
-		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
-		if (instance.isNotNull()) {
-			Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, jcanvas);
-			if (canvas.isNotNull()) {
-				instance->onDraw(canvas.get());
-			}
-		}
-	}
+		namespace view_android
+		{
 
-	jboolean JNICALL _priv_AndroidView_nativeOnKeyEvent(JNIEnv* env, jobject _this, jlong jinstance, jboolean flagDown, int keycode, jboolean flagControl, jboolean flagShift, jboolean flagAlt, jboolean flagWin, jlong time, jboolean flagDispatchToParent, jboolean flagNotDispatchToChildren)
-	{
-		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
-		if (instance.isNotNull()) {
-			UIAction action = flagDown ? UIAction::KeyDown : UIAction::KeyUp;
-			sl_uint32 vkey = keycode;
-			Keycode key = UIEvent::getKeycodeFromSystemKeycode(keycode);
-			Time t;
-			t.setMillisecondsCount(time);
-			Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey, t);
-			if (ev.isNotNull()) {
-				if (flagControl) {
-					ev->setControlKey();
-				}
-				if (flagShift) {
-					ev->setShiftKey();
-				}
-				if (flagAlt) {
-					ev->setAltKey();
-				}
-				if (flagWin) {
-					ev->setWindowsKey();
-				}
-				if (flagDispatchToParent) {
-					ev->addFlag(UIEventFlags::DispatchToParent);
-				}
-				if (flagNotDispatchToChildren) {
-					ev->addFlag(UIEventFlags::NotDispatchToChildren);
-				}
-				instance->onKeyEvent(ev.get());
-				if (ev->isPreventedDefault()) {
-					return 1;
-				}
-			}
-		}
-		return 0;
-	}
+			SLIB_JNI_BEGIN_CLASS(JPoint, "android/graphics/Point")
+				SLIB_JNI_INT_FIELD(x);
+				SLIB_JNI_INT_FIELD(y);
+			SLIB_JNI_END_CLASS
 
-	jint JNICALL _priv_AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int _action, jobjectArray jpoints, jlong time, jboolean flagDispatchToParent, jboolean flagNotDispatchToChildren)
-	{
-		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
-		if (instance.isNotNull()) {
-			UIAction action = (UIAction)_action;
-			sl_uint32 nPts = Jni::getArrayLength(jpoints);
-			if (nPts > 0) {
-				Array<TouchPoint> points = Array<TouchPoint>::create(nPts);
-				if (points.isNotNull()) {
-					TouchPoint* pts = points.getData();
-					for (sl_uint32 i = 0; i < nPts; i++) {
-						JniLocal<jobject> jpt = Jni::getObjectArrayElement(jpoints, i);
-						if (jpt.isNotNull()) {
-							pts[i].point.x = (sl_ui_posf)(JAndroidTouchPoint::x.get(jpt));
-							pts[i].point.y = (sl_ui_posf)(JAndroidTouchPoint::y.get(jpt));
-							pts[i].pressure = JAndroidTouchPoint::pressure.get(jpt);
-							pts[i].phase = (TouchPhase)(JAndroidTouchPoint::phase.get(jpt));
-							pts[i].pointerId = JAndroidTouchPoint::pointerId.get(jpt);
-						}
+			SLIB_JNI_BEGIN_CLASS(JRect, "android/graphics/Rect")
+				SLIB_JNI_INT_FIELD(left);
+				SLIB_JNI_INT_FIELD(top);
+				SLIB_JNI_INT_FIELD(right);
+				SLIB_JNI_INT_FIELD(bottom);
+			SLIB_JNI_END_CLASS
+
+			SLIB_JNI_BEGIN_CLASS(JTouchPoint, "slib/platform/android/ui/view/UiTouchPoint")
+				SLIB_JNI_FLOAT_FIELD(x);
+				SLIB_JNI_FLOAT_FIELD(y);
+				SLIB_JNI_FLOAT_FIELD(pressure);
+				SLIB_JNI_INT_FIELD(phase);
+				SLIB_JNI_INT_FIELD(pointerId);
+			SLIB_JNI_END_CLASS
+
+			void JNICALL nativeOnDraw(JNIEnv* env, jobject _this, jlong jinstance, jobject jcanvas, jint left, jint top, jint right, jint bottom)
+			{
+				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
+				if (instance.isNotNull()) {
+					Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, jcanvas);
+					if (canvas.isNotNull()) {
+						canvas->setInvalidatedRect(Rectangle((sl_real)left, (sl_real)top, (sl_real)right, (sl_real)bottom));
+						instance->onDraw(canvas.get());
 					}
-					Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, Time::withMilliseconds(time));
+				}
+			}
+
+			jboolean JNICALL nativeOnKeyEvent(JNIEnv* env, jobject _this, jlong jinstance, jboolean flagDown, int keycode, jboolean flagControl, jboolean flagShift, jboolean flagAlt, jboolean flagWin, jlong time, jboolean flagDispatchToParent, jboolean flagNotDispatchToChildren)
+			{
+				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
+				if (instance.isNotNull()) {
+					UIAction action = flagDown ? UIAction::KeyDown : UIAction::KeyUp;
+					sl_uint32 vkey = keycode;
+					Keycode key = UIEvent::getKeycodeFromSystemKeycode(keycode);
+					Time t;
+					t.setMillisecondsCount(time);
+					Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey, t);
 					if (ev.isNotNull()) {
+						if (flagControl) {
+							ev->setControlKey();
+						}
+						if (flagShift) {
+							ev->setShiftKey();
+						}
+						if (flagAlt) {
+							ev->setAltKey();
+						}
+						if (flagWin) {
+							ev->setWindowsKey();
+						}
 						if (flagDispatchToParent) {
 							ev->addFlag(UIEventFlags::DispatchToParent);
 						}
 						if (flagNotDispatchToChildren) {
 							ev->addFlag(UIEventFlags::NotDispatchToChildren);
 						}
-						instance->onTouchEvent(ev.get());
-						return ev->getFlags();
+						instance->onKeyEvent(ev.get());
+						if (ev->isPreventedDefault()) {
+							return 1;
+						}
 					}
 				}
+				return 0;
 			}
-		}
-		return 0;
-	}
 
-	void JNICALL _priv_AndroidView_nativeOnSetFocus(JNIEnv* env, jobject _this, jlong jinstance)
-	{
-		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
-		if (instance.isNotNull()) {
-			instance->onSetFocus();
-		}
-	}
-
-	void JNICALL _priv_AndroidView_nativeOnClick(JNIEnv* env, jobject _this, jlong jinstance)
-	{
-		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
-		if (instance.isNotNull()) {
-			instance->onClick();
-		}
-	}
-
-	jboolean JNICALL _priv_AndroidView_nativeHitTestTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int x, int y)
-	{
-		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
-		if (instance.isNotNull()) {
-			Ref<View> view = instance->getView();
-			if (view.isNotNull()) {
-				if (!(view->isEnabled())) {
-					return 1;
-				}
-				Function<sl_bool(const UIPoint&)> hitTestCapture(view->getCapturingChildInstanceEvents());
-				if (hitTestCapture.isNotNull()) {
-					if (hitTestCapture(UIPoint((sl_ui_pos)x, (sl_ui_pos)y))) {
-						return 1;
+			jint JNICALL nativeOnTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int _action, jobjectArray jpoints, jlong time, jboolean flagDispatchToParent, jboolean flagNotDispatchToChildren)
+			{
+				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
+				if (instance.isNotNull()) {
+					UIAction action = (UIAction)_action;
+					sl_uint32 nPts = Jni::getArrayLength(jpoints);
+					if (nPts > 0) {
+						Array<TouchPoint> points = Array<TouchPoint>::create(nPts);
+						if (points.isNotNull()) {
+							TouchPoint* pts = points.getData();
+							for (sl_uint32 i = 0; i < nPts; i++) {
+								JniLocal<jobject> jpt = Jni::getObjectArrayElement(jpoints, i);
+								if (jpt.isNotNull()) {
+									pts[i].point.x = (sl_ui_posf)(JTouchPoint::x.get(jpt));
+									pts[i].point.y = (sl_ui_posf)(JTouchPoint::y.get(jpt));
+									pts[i].pressure = JTouchPoint::pressure.get(jpt);
+									pts[i].phase = (TouchPhase)(JTouchPoint::phase.get(jpt));
+									pts[i].pointerId = JTouchPoint::pointerId.get(jpt);
+								}
+							}
+							Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, Time::withMilliseconds(time));
+							if (ev.isNotNull()) {
+								if (flagDispatchToParent) {
+									ev->addFlag(UIEventFlags::DispatchToParent);
+								}
+								if (flagNotDispatchToChildren) {
+									ev->addFlag(UIEventFlags::NotDispatchToChildren);
+								}
+								instance->onTouchEvent(ev.get());
+								return ev->getFlags();
+							}
+						}
 					}
 				}
+				return 0;
 			}
+
+			void JNICALL nativeOnSetFocus(JNIEnv* env, jobject _this, jlong jinstance)
+			{
+				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
+				if (instance.isNotNull()) {
+					instance->onSetFocus();
+				}
+			}
+
+			void JNICALL nativeOnClick(JNIEnv* env, jobject _this, jlong jinstance)
+			{
+				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
+				if (instance.isNotNull()) {
+					instance->onClick();
+				}
+			}
+
+			jboolean JNICALL nativeHitTestTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int x, int y)
+			{
+				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
+				if (instance.isNotNull()) {
+					Ref<View> view = instance->getView();
+					if (view.isNotNull()) {
+						if (!(view->isEnabled())) {
+							return 1;
+						}
+						Function<sl_bool(const UIPoint&)> hitTestCapture(view->getCapturingChildInstanceEvents());
+						if (hitTestCapture.isNotNull()) {
+							if (hitTestCapture(UIPoint((sl_ui_pos)x, (sl_ui_pos)y))) {
+								return 1;
+							}
+						}
+					}
+				}
+				return 0;
+			}
+
+			void JNICALL nativeOnSwipe(JNIEnv* env, jobject _this, jlong jinstance, int type)
+			{
+				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
+				if (instance.isNotNull()) {
+					instance->onSwipe((GestureType)type);
+				}
+			}
+
+			SLIB_JNI_BEGIN_CLASS(JView, "slib/platform/android/ui/view/UiView")
+
+				SLIB_JNI_STATIC_METHOD(getContext, "getContext", "(Landroid/view/View;)Landroid/content/Context;");
+				SLIB_JNI_STATIC_METHOD(setInstance, "setInstance", "(Landroid/view/View;J)V");
+				SLIB_JNI_STATIC_METHOD(freeView, "freeView", "(Landroid/view/View;)V");
+
+				SLIB_JNI_STATIC_METHOD(createGeneric, "createGeneric", "(Landroid/content/Context;)Landroid/view/View;");
+				SLIB_JNI_STATIC_METHOD(createGroup, "createGroup", "(Landroid/content/Context;)Landroid/view/View;");
+				SLIB_JNI_STATIC_METHOD(createScrollContent, "createScrollContent", "(Landroid/content/Context;)Landroid/view/View;");
+
+				SLIB_JNI_STATIC_METHOD(setFocus, "setFocus", "(Landroid/view/View;Z)V");
+				SLIB_JNI_STATIC_METHOD(invalidate, "invalidate", "(Landroid/view/View;)V");
+				SLIB_JNI_STATIC_METHOD(invalidateRect, "invalidateRect", "(Landroid/view/View;IIII)V");
+				SLIB_JNI_STATIC_METHOD(getFrame, "getFrame", "(Landroid/view/View;)Landroid/graphics/Rect;");
+				SLIB_JNI_STATIC_METHOD(setFrame, "setFrame", "(Landroid/view/View;IIII)Z");
+				SLIB_JNI_STATIC_METHOD(setTransform, "setTransform", "(Landroid/view/View;FFFFFFF)V");
+				SLIB_JNI_STATIC_METHOD(isVisible, "isVisible", "(Landroid/view/View;)Z");
+				SLIB_JNI_STATIC_METHOD(setVisible, "setVisible", "(Landroid/view/View;Z)V");
+				SLIB_JNI_STATIC_METHOD(isEnabled, "isEnabled", "(Landroid/view/View;)Z");
+				SLIB_JNI_STATIC_METHOD(setEnabled, "setEnabled", "(Landroid/view/View;Z)V");
+				SLIB_JNI_STATIC_METHOD(setAlpha, "setAlpha", "(Landroid/view/View;F)V");
+				SLIB_JNI_STATIC_METHOD(setClipping, "setClipping", "(Landroid/view/View;Z)V");
+				SLIB_JNI_STATIC_METHOD(setDrawing, "setDrawing", "(Landroid/view/View;Z)V");
+				SLIB_JNI_STATIC_METHOD(setLayered, "setLayered", "(Landroid/view/View;)V");
+				SLIB_JNI_STATIC_METHOD(convertCoordinateFromScreenToView, "convertCoordinateFromScreenToView", "(Landroid/view/View;II)Landroid/graphics/Point;");
+				SLIB_JNI_STATIC_METHOD(convertCoordinateFromViewToScreen, "convertCoordinateFromViewToScreen", "(Landroid/view/View;II)Landroid/graphics/Point;");
+
+				SLIB_JNI_STATIC_METHOD(addChild, "addChild", "(Landroid/view/View;Landroid/view/View;)V");
+				SLIB_JNI_STATIC_METHOD(removeChild, "removeChild", "(Landroid/view/View;Landroid/view/View;)V");
+				SLIB_JNI_STATIC_METHOD(bringToFront, "bringToFront", "(Landroid/view/View;)V");
+				SLIB_JNI_STATIC_METHOD(enableGesture, "enableGesture", "(Landroid/view/View;)V");
+
+				SLIB_JNI_NATIVE(onDraw, "nativeOnDraw", "(JLslib/platform/android/ui/Graphics;IIII)V", nativeOnDraw);
+				SLIB_JNI_NATIVE(onKeyEvent, "nativeOnKeyEvent", "(JZIZZZZJZZ)Z", nativeOnKeyEvent);
+				SLIB_JNI_NATIVE(onTouchEvent, "nativeOnTouchEvent", "(JI[Lslib/platform/android/ui/view/UiTouchPoint;JZZ)I", nativeOnTouchEvent);
+				SLIB_JNI_NATIVE(onSetFocus, "nativeOnSetFocus", "(J)V", nativeOnSetFocus);
+				SLIB_JNI_NATIVE(onClick, "nativeOnClick", "(J)V", nativeOnClick);
+				SLIB_JNI_NATIVE(hitTestTouchEvent, "nativeHitTestTouchEvent", "(JII)Z", nativeHitTestTouchEvent);
+				SLIB_JNI_NATIVE(onSwipe, "nativeOnSwipe", "(JI)V", nativeOnSwipe);
+
+			SLIB_JNI_END_CLASS
+
 		}
-		return 0;
 	}
 
-	void JNICALL _priv_AndroidView_nativeOnSwipe(JNIEnv* env, jobject _this, jlong jinstance, int type)
-	{
-		Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
-		if (instance.isNotNull()) {
-			instance->onSwipe((GestureType)type);
-		}
-	}
-
-	SLIB_JNI_BEGIN_CLASS(JAndroidView, "slib/platform/android/ui/view/UiView")
-
-		SLIB_JNI_STATIC_METHOD(getContext, "getContext", "(Landroid/view/View;)Landroid/content/Context;");
-		SLIB_JNI_STATIC_METHOD(setInstance, "setInstance", "(Landroid/view/View;J)V");
-		SLIB_JNI_STATIC_METHOD(freeView, "freeView", "(Landroid/view/View;)V");
-
-		SLIB_JNI_STATIC_METHOD(createGeneric, "createGeneric", "(Landroid/content/Context;)Landroid/view/View;");
-		SLIB_JNI_STATIC_METHOD(createGroup, "createGroup", "(Landroid/content/Context;)Landroid/view/View;");
-
-		SLIB_JNI_STATIC_METHOD(setFocus, "setFocus", "(Landroid/view/View;Z)V");
-		SLIB_JNI_STATIC_METHOD(invalidate, "invalidate", "(Landroid/view/View;)V");
-		SLIB_JNI_STATIC_METHOD(invalidateRect, "invalidateRect", "(Landroid/view/View;IIII)V");
-		SLIB_JNI_STATIC_METHOD(getFrame, "getFrame", "(Landroid/view/View;)Landroid/graphics/Rect;");
-		SLIB_JNI_STATIC_METHOD(setFrame, "setFrame", "(Landroid/view/View;IIII)Z");
-		SLIB_JNI_STATIC_METHOD(setTransform, "setTransform", "(Landroid/view/View;FFFFFFF)V");
-		SLIB_JNI_STATIC_METHOD(isVisible, "isVisible", "(Landroid/view/View;)Z");
-		SLIB_JNI_STATIC_METHOD(setVisible, "setVisible", "(Landroid/view/View;Z)V");
-		SLIB_JNI_STATIC_METHOD(isEnabled, "isEnabled", "(Landroid/view/View;)Z");
-		SLIB_JNI_STATIC_METHOD(setEnabled, "setEnabled", "(Landroid/view/View;Z)V");
-		SLIB_JNI_STATIC_METHOD(setAlpha, "setAlpha", "(Landroid/view/View;F)V");
-		SLIB_JNI_STATIC_METHOD(setClipping, "setClipping", "(Landroid/view/View;Z)V");
-		SLIB_JNI_STATIC_METHOD(setDrawing, "setDrawing", "(Landroid/view/View;Z)V");
-		SLIB_JNI_STATIC_METHOD(setLayered, "setLayered", "(Landroid/view/View;)V");
-		SLIB_JNI_STATIC_METHOD(convertCoordinateFromScreenToView, "convertCoordinateFromScreenToView", "(Landroid/view/View;II)Landroid/graphics/Point;");
-		SLIB_JNI_STATIC_METHOD(convertCoordinateFromViewToScreen, "convertCoordinateFromViewToScreen", "(Landroid/view/View;II)Landroid/graphics/Point;");
-
-		SLIB_JNI_STATIC_METHOD(addChild, "addChild", "(Landroid/view/View;Landroid/view/View;)V");
-		SLIB_JNI_STATIC_METHOD(removeChild, "removeChild", "(Landroid/view/View;Landroid/view/View;)V");
-		SLIB_JNI_STATIC_METHOD(bringToFront, "bringToFront", "(Landroid/view/View;)V");
-		SLIB_JNI_STATIC_METHOD(enableGesture, "enableGesture", "(Landroid/view/View;)V");
-
-		SLIB_JNI_NATIVE(nativeOnDraw, "nativeOnDraw", "(JLslib/platform/android/ui/Graphics;)V", _priv_AndroidView_nativeOnDraw);
-		SLIB_JNI_NATIVE(nativeOnKeyEvent, "nativeOnKeyEvent", "(JZIZZZZJZZ)Z", _priv_AndroidView_nativeOnKeyEvent);
-		SLIB_JNI_NATIVE(nativeOnTouchEvent, "nativeOnTouchEvent", "(JI[Lslib/platform/android/ui/view/UiTouchPoint;JZZ)I", _priv_AndroidView_nativeOnTouchEvent);
-		SLIB_JNI_NATIVE(nativeOnSetFocus, "nativeOnSetFocus", "(J)V", _priv_AndroidView_nativeOnSetFocus);
-		SLIB_JNI_NATIVE(nativeOnClick, "nativeOnClick", "(J)V", _priv_AndroidView_nativeOnClick);
-		SLIB_JNI_NATIVE(nativeHitTestTouchEvent, "nativeHitTestTouchEvent", "(JII)Z", _priv_AndroidView_nativeHitTestTouchEvent);
-		SLIB_JNI_NATIVE(nativeOnSwipe, "nativeOnSwipe", "(JI)V", _priv_AndroidView_nativeOnSwipe);
-
-	SLIB_JNI_END_CLASS
-
-	class _priv_View : public View
-	{
-		friend class Android_ViewInstance;
-	};
+	using namespace priv::view_android;
 
 /******************************************
 			Android_ViewInstance
@@ -239,14 +247,14 @@ namespace slib
 		jobject jhandle = m_handle.get();
 		if (jhandle) {
 			UIPlatform::removeViewInstance(jhandle);
-			JAndroidView::freeView.call(sl_null, jhandle);
+			JView::freeView.call(sl_null, jhandle);
 		}
 	}
 
 	sl_bool Android_ViewInstance::initialize(jobject jhandle)
 	{
 		if (jhandle) {
-			JniLocal<jobject> jcontext = JAndroidView::getContext.callObject(sl_null, jhandle);
+			JniLocal<jobject> jcontext = JView::getContext.callObject(sl_null, jhandle);
 			JniGlobal<jobject> context = jcontext;
 			JniGlobal<jobject> handle = jhandle;
 			if (context.isNotNull() && handle.isNotNull()) {
@@ -254,7 +262,7 @@ namespace slib
 				m_handle = handle;
 				jhandle = handle.get();
 				jlong instance = (jlong)(jhandle);
-				JAndroidView::setInstance.call(sl_null, jhandle, instance);
+				JView::setInstance.call(sl_null, jhandle, instance);
 				UIPlatform::registerViewInstance(jhandle, this);
 				return sl_true;
 			}
@@ -262,35 +270,34 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool Android_ViewInstance::applyProperties(View* _view, ViewInstance* parent)
+	sl_bool Android_ViewInstance::applyProperties(View* view, ViewInstance* parent)
 	{
-		_priv_View* view = (_priv_View*)_view;
 		jobject jhandle = m_handle.get();
 		if (jhandle) {
 			UIRect frame = view->getFrameInInstance();
-			JAndroidView::setFrame.callBoolean(sl_null, jhandle, (int)(frame.left), (int)(frame.top), (int)(frame.right), (int)(frame.bottom));
-			JAndroidView::setVisible.call(sl_null, jhandle, view->isVisibleInInstance());
-			JAndroidView::setEnabled.call(sl_null, jhandle, view->isEnabled());
+			JView::setFrame.callBoolean(sl_null, jhandle, (int)(frame.left), (int)(frame.top), (int)(frame.right), (int)(frame.bottom));
+			JView::setVisible.call(sl_null, jhandle, view->isVisibleInInstance());
+			JView::setEnabled.call(sl_null, jhandle, view->isEnabled());
 			sl_real alpha = view->getAlpha();
-			JAndroidView::setClipping.call(sl_null, jhandle, view->isClipping());
-			JAndroidView::setDrawing.call(sl_null, jhandle, view->isDrawing());
+			JView::setClipping.call(sl_null, jhandle, view->isClipping());
+			JView::setDrawing.call(sl_null, jhandle, view->isDrawing());
 			if (alpha < 0.995f) {
-				JAndroidView::setAlpha.call(sl_null, jhandle, alpha);
+				JView::setAlpha.call(sl_null, jhandle, alpha);
 			}
 			if (view->isHardwareLayer()) {
-				JAndroidView::setLayered.call(sl_null, jhandle);
+				JView::setLayered.call(sl_null, jhandle);
 			}
 
 			Matrix3 transform = view->getFinalTransformInInstance();
 			Vector2 t = Transform2::getTranslationFromMatrix(transform);
 			sl_real r = Transform2::getRotationAngleFromMatrix(transform);
 			Vector2 s = Transform2::getScaleFromMatrix(transform);
-			JAndroidView::setTransform.call(sl_null, jhandle, t.x, t.y, r, s.x, s.y, 0, 0);
+			JView::setTransform.call(sl_null, jhandle, t.x, t.y, r, s.x, s.y, 0, 0);
 
 			if (parent) {
 				jobject jparent = UIPlatform::getViewHandle(parent);
 				if (jparent) {
-					JAndroidView::addChild.call(sl_null, jparent, jhandle);            
+					JView::addChild.call(sl_null, jparent, jhandle);            
 				}            
 			}
 			return sl_true;
@@ -331,7 +338,7 @@ namespace slib
 	{
 		jobject handle = m_handle.get();
 		if (handle) {
-			JAndroidView::setFocus.call(sl_null, handle, flag ? sl_true : sl_false);
+			JView::setFocus.call(sl_null, handle, flag ? sl_true : sl_false);
 		}
 	}
 
@@ -339,7 +346,7 @@ namespace slib
 	{
 		jobject handle = m_handle.get();
 		if (handle) {
-			JAndroidView::invalidate.call(sl_null, handle);
+			JView::invalidate.call(sl_null, handle);
 		}
 	}
 
@@ -347,7 +354,7 @@ namespace slib
 	{
 		jobject handle = m_handle.get();
 		if (handle) {
-			JAndroidView::invalidateRect.call(sl_null, handle, (int)(rect.left), (int)(rect.top), (int)(rect.right), (int)(rect.bottom));
+			JView::invalidateRect.call(sl_null, handle, (int)(rect.left), (int)(rect.top), (int)(rect.right), (int)(rect.bottom));
 		}
 	}
 
@@ -355,13 +362,13 @@ namespace slib
 	{
 		jobject handle = m_handle.get();
 		if (handle) {
-			JniLocal<jobject> jrect = JAndroidView::getFrame.callObject(sl_null, handle);
+			JniLocal<jobject> jrect = JView::getFrame.callObject(sl_null, handle);
 			if (jrect.isNotNull()) {
 				UIRect ret;
-				ret.left = (sl_ui_pos)(JAndroidRect::left.get(jrect));
-				ret.top = (sl_ui_pos)(JAndroidRect::top.get(jrect));
-				ret.right = (sl_ui_pos)(JAndroidRect::right.get(jrect));
-				ret.bottom = (sl_ui_pos)(JAndroidRect::bottom.get(jrect));
+				ret.left = (sl_ui_pos)(JRect::left.get(jrect));
+				ret.top = (sl_ui_pos)(JRect::top.get(jrect));
+				ret.right = (sl_ui_pos)(JRect::right.get(jrect));
+				ret.bottom = (sl_ui_pos)(JRect::bottom.get(jrect));
 				ret.fixSizeError();
 				return ret;
 			}
@@ -373,7 +380,7 @@ namespace slib
 	{
 		jobject handle = m_handle.get();
 		if (handle) {
-			JAndroidView::setFrame.callBoolean(sl_null, handle, (int)(frame.left), (int)(frame.top), (int)(frame.right), (int)(frame.bottom));
+			JView::setFrame.callBoolean(sl_null, handle, (int)(frame.left), (int)(frame.top), (int)(frame.right), (int)(frame.bottom));
 		}
 	}
 
@@ -384,7 +391,7 @@ namespace slib
 			Vector2 t = Transform2::getTranslationFromMatrix(transform);
 			sl_real r = Transform2::getRotationAngleFromMatrix(transform);
 			Vector2 s = Transform2::getScaleFromMatrix(transform);
-			JAndroidView::setTransform.call(sl_null, handle, t.x, t.y, r, s.x, s.y, 0, 0);
+			JView::setTransform.call(sl_null, handle, t.x, t.y, r, s.x, s.y, 0, 0);
 		}
 	}
 
@@ -392,7 +399,7 @@ namespace slib
 	{
 		jobject handle = m_handle.get();
 		if (handle) {
-			JAndroidView::setVisible.call(sl_null, handle, flag);
+			JView::setVisible.call(sl_null, handle, flag);
 		}
 	}
 
@@ -400,7 +407,7 @@ namespace slib
 	{
 		jobject handle = m_handle.get();
 		if (handle) {
-			JAndroidView::setEnabled.call(sl_null, handle, flag);
+			JView::setEnabled.call(sl_null, handle, flag);
 		}
 	}
 
@@ -412,7 +419,7 @@ namespace slib
 	{
 		jobject handle = m_handle.get();
 		if (handle) {
-			JAndroidView::setAlpha.call(sl_null, handle, (float)alpha);
+			JView::setAlpha.call(sl_null, handle, (float)alpha);
 		}
 	}
 
@@ -420,7 +427,7 @@ namespace slib
 	{
 		jobject handle = m_handle.get();
 		if (handle) {
-			JAndroidView::setClipping.call(sl_null, handle, flag);
+			JView::setClipping.call(sl_null, handle, flag);
 		}
 	}
 
@@ -428,7 +435,7 @@ namespace slib
 	{
 		jobject handle = m_handle.get();
 		if (handle) {
-			JAndroidView::setDrawing.call(sl_null, handle, flag);
+			JView::setDrawing.call(sl_null, handle, flag);
 		}
 	}
 
@@ -436,11 +443,11 @@ namespace slib
 	{
 		jobject handle = m_handle.get();
 		if (handle) {
-			JniLocal<jobject> jpt = JAndroidView::convertCoordinateFromScreenToView.callObject(sl_null, handle, 0, 0);
+			JniLocal<jobject> jpt = JView::convertCoordinateFromScreenToView.callObject(sl_null, handle, 0, 0);
 			if (jpt.isNotNull()) {
 				UIPointf ret;
-				ret.x = ptScreen.x + (sl_ui_pos)(JAndroidPoint::x.get(jpt));
-				ret.y = ptScreen.y + (sl_ui_pos)(JAndroidPoint::y.get(jpt));
+				ret.x = ptScreen.x + (sl_ui_pos)(JPoint::x.get(jpt));
+				ret.y = ptScreen.y + (sl_ui_pos)(JPoint::y.get(jpt));
 				return ret;
 			}
 		}
@@ -451,11 +458,11 @@ namespace slib
 	{
 		jobject handle = m_handle.get();
 		if (handle) {
-			JniLocal<jobject> jpt = JAndroidView::convertCoordinateFromViewToScreen.callObject(sl_null, handle, 0, 0);
+			JniLocal<jobject> jpt = JView::convertCoordinateFromViewToScreen.callObject(sl_null, handle, 0, 0);
 			if (jpt.isNotNull()) {
 				UIPointf ret;
-				ret.x = ptView.x + (sl_ui_pos)(JAndroidPoint::x.get(jpt));
-				ret.y = ptView.y + (sl_ui_pos)(JAndroidPoint::y.get(jpt));
+				ret.x = ptView.x + (sl_ui_pos)(JPoint::x.get(jpt));
+				ret.y = ptView.y + (sl_ui_pos)(JPoint::y.get(jpt));
 				return ret;
 			}
 		}
@@ -467,7 +474,7 @@ namespace slib
 		jobject handle = m_handle.get();
 		jobject child = UIPlatform::getViewHandle(_child.get());
 		if (handle && child) {
-			JAndroidView::addChild.call(sl_null, handle, child);
+			JView::addChild.call(sl_null, handle, child);
 		}
 	}
 
@@ -476,7 +483,7 @@ namespace slib
 		jobject handle = m_handle.get();
 		jobject child = UIPlatform::getViewHandle(_child.get());
 		if (handle && child) {
-			JAndroidView::removeChild.call(sl_null, handle, child);
+			JView::removeChild.call(sl_null, handle, child);
 		}
 	}
 
@@ -484,7 +491,7 @@ namespace slib
 	{
 		jobject handle = m_handle.get();
 		if (handle) {
-			JAndroidView::bringToFront.call(sl_null, handle);
+			JView::bringToFront.call(sl_null, handle);
 		}
 	}
 
@@ -497,10 +504,14 @@ namespace slib
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
 			JniLocal<jobject> handle;
-			if (m_flagCreatingChildInstances) {
-				handle = JAndroidView::createGroup.callObject(sl_null, parent->getContext());
+			if (IsInstanceOf<ScrollView>(getParent()) && isCreatingLargeContent()) {
+				handle = JView::createScrollContent.callObject(sl_null, parent->getContext());
 			} else {
-				handle = JAndroidView::createGeneric.callObject(sl_null, parent->getContext());
+				if (m_flagCreatingChildInstances) {
+					handle = JView::createGroup.callObject(sl_null, parent->getContext());
+				} else {
+					handle = JView::createGeneric.callObject(sl_null, parent->getContext());
+				}
 			}
 			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 		}
@@ -566,7 +577,7 @@ namespace slib
 					case GestureType::SwipeRight:
 					case GestureType::SwipeUp:
 					case GestureType::SwipeDown:
-						JAndroidView::enableGesture.call(sl_null, handle);
+						JView::enableGesture.call(sl_null, handle);
 						return sl_true;
 					default:
 						break;

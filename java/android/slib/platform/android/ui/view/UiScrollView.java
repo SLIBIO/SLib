@@ -39,7 +39,12 @@ public class UiScrollView extends ScrollView implements IView {
 	public void setInstance(long instance) { this.mInstance = instance; }
 	private int mLeft, mTop, mRight, mBottom;
 	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
-	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
+	public void setUIFrame(int left, int top, int right, int bottom) {
+		mLeft = left; mTop = top; mRight = right; mBottom = bottom;
+		if (mContent instanceof UiScrollContentView) {
+			((UiScrollContentView)mContent).setupTiles(this);
+		}
+	}
 
 	UiGestureDetector gestureDetector;
 
@@ -124,6 +129,7 @@ public class UiScrollView extends ScrollView implements IView {
 
 	boolean mPaging = false;
 	int mPageHeight = 0;
+	View mContent;
 
 	public UiScrollView(Context context) {
 		super(context);
@@ -136,8 +142,12 @@ public class UiScrollView extends ScrollView implements IView {
 
 	@Override
 	public void addView(View view) {
+		mContent = view;
 		removeAllViews();
 		super.addView(view);
+		if (view instanceof UiScrollContentView) {
+			((UiScrollContentView)view).setupTiles(this);
+		}
 	}
 
 	boolean flagInitedContent = false;
@@ -158,6 +168,9 @@ public class UiScrollView extends ScrollView implements IView {
 	    super.onScrollChanged( l, t, oldl, oldt );
 	    if (flagInitedContent) {
 		    onEventScroll(this, l, t);
+	    }
+	    if (mContent instanceof UiScrollContentView) {
+		    ((UiScrollContentView)mContent).setupTiles(this);
 	    }
 	}
 

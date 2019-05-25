@@ -84,7 +84,16 @@ public class UiView {
 		}
 		return null;
 	}
-	
+
+	public static View createScrollContent(Context context) {
+		try {
+			return new UiScrollContentView(context);
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return null;
+	}
+
 	public static void setFocus(final View view, final boolean flag) {
 		try {
 			if (!(UiThread.isUiThread())) {
@@ -116,7 +125,7 @@ public class UiView {
 	}
 	
 	public static void invalidateRect(View view, int left, int top, int right, int bottom) {
-		if (Build.VERSION.SDK_INT >= 28) {
+		if (Build.VERSION.SDK_INT >= 28 && !(view instanceof UiScrollContentView)) {
 			if (UiThread.isUiThread()) {
 				view.invalidate();
 			} else {
@@ -462,15 +471,24 @@ public class UiView {
 	}
 	
 	// events
-	private static native void nativeOnDraw(long instance, Graphics graphics);
+	private static native void nativeOnDraw(long instance, Graphics graphics, int left, int top, int right, int bottom);
+
 	public static void onEventDraw(IView view, Canvas canvas) {
 		long instance = view.getInstance();
 		if (instance != 0) {
 			Graphics graphics = new Graphics(canvas);
-			nativeOnDraw(instance, graphics);
+			nativeOnDraw(instance, graphics, 0, 0, canvas.getWidth(), canvas.getHeight());
 		}
 	}
-	
+
+	public static void onEventDraw(IView view, Canvas canvas, int left, int top, int right, int bottom) {
+		long instance = view.getInstance();
+		if (instance != 0) {
+			Graphics graphics = new Graphics(canvas);
+			nativeOnDraw(instance, graphics, left, top, right, bottom);
+		}
+	}
+
 	private static native boolean nativeOnKeyEvent(long instance, boolean flagDown, int vkey, boolean flagControl, boolean flagShift, boolean flagAlt, boolean flagWin, long time, boolean flagDispatchToParent, boolean flagNotDispatchToChildren);
 
 	public static boolean onEventKey(IView view, boolean flagDown, int keycode, KeyEvent event, boolean flagDispatchToParent, boolean flagNotDispatchToChildren) {

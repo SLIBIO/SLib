@@ -52,6 +52,8 @@ namespace slib
 		m_flagCreatingInstance(sl_false),
 		m_flagCreatingChildInstances(sl_false),
 		m_flagCreatingNativeWidget(sl_false),
+		m_flagCreatingLargeContent(sl_false),
+		m_flagCreatingEmptyContent(sl_false),
 		m_flagUsingChildLayouts(sl_true),
 		m_flagEnabled(sl_true),
 		m_flagHitTestable(sl_true),
@@ -469,6 +471,26 @@ namespace slib
 		if (flag) {
 			m_flagCreatingInstance = sl_true;
 		}
+	}
+	
+	sl_bool View::isCreatingLargeContent()
+	{
+		return m_flagCreatingLargeContent;
+	}
+	
+	void View::setCreatingLargeContent(sl_bool flag)
+	{
+		m_flagCreatingLargeContent = flag;
+	}
+
+	sl_bool View::isCreatingEmptyContent()
+	{
+		return m_flagCreatingEmptyContent;
+	}
+	
+	void View::setCreatingEmptyContent(sl_bool flag)
+	{
+		m_flagCreatingEmptyContent = flag;
 	}
 
 	UIAttachMode View::getAttachMode()

@@ -321,6 +321,8 @@ namespace slib
 		SAppBooleanValue instance;
 		SAppBooleanValue childInstances;
 		SAppBooleanValue nativeWidget;
+		SAppBooleanValue largeContent;
+		SAppBooleanValue emptyContent;
 		SAppBooleanValue hardwareLayer;
 		
 		SAppBooleanValue okCancelEnabled;

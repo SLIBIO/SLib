@@ -2348,6 +2348,8 @@ namespace slib
 		if (flagView) {
 			LAYOUT_CONTROL_GENERIC_ATTR(instance, setCreatingInstance)
 			LAYOUT_CONTROL_GENERIC_ATTR(nativeWidget, setCreatingNativeWidget)
+			LAYOUT_CONTROL_GENERIC_ATTR(largeContent, setCreatingLargeContent)
+			LAYOUT_CONTROL_GENERIC_ATTR(emptyContent, setCreatingEmptyContent)
 			LAYOUT_CONTROL_GENERIC_ATTR(hardwareLayer, setHardwareLayer)
 		}
 		LAYOUT_CONTROL_GENERIC_ATTR(childInstances, setCreatingChildInstances)
