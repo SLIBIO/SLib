@@ -490,7 +490,12 @@ namespace slib
 
 	void SelectView::dispatchSelectItem(sl_uint32 index)
 	{
+		ObjectLocker lock(this);
+		if (m_indexSelected == index) {
+			return;
+		}
 		m_indexSelected = index;
+		lock.unlock();
 		
 		SLIB_INVOKE_EVENT_HANDLER(SelectItem, index)
 	}
