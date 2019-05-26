@@ -50,7 +50,6 @@ namespace slib
 #endif
 		setUsingChildLayouts(sl_false);
 		setUsingFont(sl_true);
-		setDrawing(sl_true, UIUpdateMode::Init);
 		setSavingCanvasState(sl_false);
 		
 		m_items.setCount(1);

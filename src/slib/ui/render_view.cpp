@@ -64,7 +64,6 @@ namespace slib
 	{		
 		setCreatingNativeWidget(sl_true);
 		setCreatingChildInstances(sl_false);
-		setDrawing(sl_true, UIUpdateMode::Init);
 		
 		setPreferredEngineType(RenderEngineType::OpenGL_ES);
 		
