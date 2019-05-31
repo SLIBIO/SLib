@@ -123,7 +123,7 @@ namespace slib
 		if (thread.isNull()) {
 			return;
 		}
-		while (m_flagRunning && Thread::isNotStoppingCurrent()) {
+		while (m_flagRunning && thread->isNotStopping()) {
 			Function<void()> task;
 			if (m_tasks.pop(&task)) {
 				task();

@@ -334,7 +334,8 @@ namespace slib
 
 	void DispatchLoop::_runLoop()
 	{
-		while (Thread::isNotStoppingCurrent()) {
+		Ref<Thread> thread = Thread::getCurrent();
+		while (thread.isNull() || thread->isNotStopping()) {
 
 			// Async Tasks
 			{

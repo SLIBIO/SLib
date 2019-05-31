@@ -250,7 +250,8 @@ namespace slib
 		void run()
 		{
 			::CoInitializeEx(NULL, COINIT_MULTITHREADED);
-			while (Thread::isNotStoppingCurrent()) {
+			Ref<Thread> thread = Thread::getCurrent();
+			while (thread.isNull() || thread->isNotStopping()) {
 				DWORD dwWait = ::WaitForMultipleObjects(2, m_hNotificationEvents, FALSE, INFINITE);
 				if (dwWait == WAIT_OBJECT_0) {
 					onFrame();

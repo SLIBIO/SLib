@@ -132,9 +132,10 @@ namespace slib
 			}
 
 			TimeCounter timer;
-			while (Thread::isNotStoppingCurrent()) {
+			Ref<Thread> thread = Thread::getCurrent();
+			while (thread.isNull() || thread->isNotStopping()) {
 				runStep(engine.get());
-				if (Thread::isNotStoppingCurrent()) {
+				if (thread.isNull() || thread->isNotStopping()) {
 					sl_uint64 t = timer.getElapsedMilliseconds();
 					if (t < 10) {
 						Thread::sleep(10 - (sl_uint32)(t));

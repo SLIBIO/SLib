@@ -240,7 +240,8 @@ namespace slib
 			sl_uint8* buf = (sl_uint8*)(m_bufPacket.getData());
 			sl_uint32 sizeBuf = (sl_uint32)(m_bufPacket.getSize());
 			
-			while (Thread::isNotStoppingCurrent()) {
+			Ref<Thread> thread = Thread::getCurrent();
+			while (thread.isNull() || thread->isNotStopping()) {
 				while (1) {
 					L2PacketInfo info;
 					sl_int32 n = socket->receivePacket(buf, sizeBuf, info);
@@ -442,7 +443,8 @@ namespace slib
 			
 			sl_uint8* buf = (sl_uint8*)(m_bufPacket.getData());
 			sl_uint32 sizeBuf = (sl_uint32)(m_bufPacket.getSize());
-			while (Thread::isNotStoppingCurrent()) {
+			Ref<Thread> thread = Thread::getCurrent();
+			while (thread.isNull() || thread->isNotStopping()) {
 				while (1) {
 					SocketAddress address;
 					sl_int32 n = socketTCP->receiveFrom(address, buf, sizeBuf);

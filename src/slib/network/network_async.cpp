@@ -503,25 +503,6 @@ namespace slib
 		return m_socket;
 	}
 
-#define UDP_QUEUE_MAX_SIZE 1024000
-
-	sl_bool AsyncUdpSocketInstance::sendTo(const SocketAddress& addressTo, const Memory& data)
-	{
-		if (isOpened()) {
-			if (data.isNotNull()) {
-				SendRequest request;
-				request.addressTo = addressTo;
-				request.data = data;
-				if (m_queueSendRequests.getCount() < UDP_QUEUE_MAX_SIZE) {
-					if (m_queueSendRequests.push(request)) {
-						return sl_true;
-					}
-				}
-			}
-		}
-		return sl_false;
-	}
-
 	void AsyncUdpSocketInstance::_onReceive(const SocketAddress& address, sl_uint32 size)
 	{
 		Ref<AsyncUdpSocket> object = Ref<AsyncUdpSocket>::from(getObject());
@@ -684,25 +665,18 @@ namespace slib
 
 	sl_bool AsyncUdpSocket::sendTo(const SocketAddress& addressTo, const void* data, sl_uint32 size)
 	{
-		return sendTo(addressTo, Memory::create(data, size));
-	}
-
-	sl_bool AsyncUdpSocket::sendTo(const SocketAddress& addressTo, const Memory& mem)
-	{
-		Ref<AsyncIoLoop> loop = getIoLoop();
-		if (loop.isNull()) {
-			return sl_false;
-		}
-		Ref<AsyncUdpSocketInstance> instance = _getIoInstance();
-		if (instance.isNotNull()) {
-			if (instance->sendTo(addressTo, mem)) {
-				loop->requestOrder(instance.get());
-				return sl_true;
-			}
+		Ref<Socket> socket = getSocket();
+		if (socket.isNotNull()) {
+			return socket->sendTo(addressTo, data, size) == size;
 		}
 		return sl_false;
 	}
 
+	sl_bool AsyncUdpSocket::sendTo(const SocketAddress& addressTo, const Memory& mem)
+	{
+		return sendTo(addressTo, mem.getData(), (sl_uint32)(mem.getSize()));
+	}
+	
 	Ref<AsyncUdpSocketInstance> AsyncUdpSocket::_getIoInstance()
 	{
 		return Ref<AsyncUdpSocketInstance>::from(AsyncIoObject::getIoInstance());

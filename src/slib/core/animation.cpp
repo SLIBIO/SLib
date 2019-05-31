@@ -1016,7 +1016,8 @@ namespace slib
 
 		void run()
 		{
-			while (Thread::isNotStoppingCurrent()) {
+			Ref<Thread> thread = Thread::getCurrent();
+			while (thread.isNull() || thread->isNotStopping()) {
 				sl_int32 n = _runStep();
 				if (n < 0) {
 					Thread::sleep(100000);

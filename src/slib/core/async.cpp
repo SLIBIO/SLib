@@ -802,7 +802,8 @@ namespace slib
 	void AsyncStreamSimulator::_runProcessor()
 	{
 		if (isOpened()) {
-			while (Thread::isNotStoppingCurrent()) {
+			Ref<Thread> thread = Thread::getCurrent();
+			while (thread.isNull() || thread->isNotStopping()) {
 				Ref<AsyncStreamRequest> req;
 				{
 					ObjectLocker lock(this);

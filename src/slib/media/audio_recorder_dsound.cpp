@@ -320,7 +320,8 @@ namespace slib
 		void run()
 		{
 			::CoInitializeEx(NULL, COINIT_MULTITHREADED);
-			while (Thread::isNotStoppingCurrent()) {
+			Ref<Thread> thread = Thread::getCurrent();
+			while (thread.isNull() || thread->isNotStopping()) {
 				DWORD dwWait = ::WaitForMultipleObjects(3, m_events, FALSE, INFINITE);
 				if (dwWait >= WAIT_OBJECT_0 && dwWait < WAIT_OBJECT_0 + 2) {
 					onFrame(dwWait - WAIT_OBJECT_0);

@@ -109,8 +109,6 @@ namespace slib
 		
 		Ref<Socket> getSocket();
 		
-		sl_bool sendTo(const SocketAddress& address, const Memory& data);
-		
 	protected:
 		void _onReceive(const SocketAddress& address, sl_uint32 size);
 		
@@ -119,13 +117,6 @@ namespace slib
 
 		sl_bool m_flagRunning;
 		Memory m_buffer;
-		
-		struct SendRequest
-		{
-			SocketAddress addressTo;
-			Memory data;
-		};
-		LinkedQueue<SendRequest> m_queueSendRequests;
 		
 	};
 	

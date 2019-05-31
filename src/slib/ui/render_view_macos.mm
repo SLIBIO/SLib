@@ -115,7 +115,8 @@ namespace slib
 			
 			sl_bool flagWorking = sl_false;
 			
-			if (Thread::isNotStoppingCurrent()) {
+			Ref<Thread> thread = Thread::getCurrent();
+			if (thread.isNull() || thread->isNotStopping()) {
 				
 				_priv_Slib_macOS_GLView* handle = _handle;
 				if (handle == nil) {
@@ -200,7 +201,7 @@ namespace slib
 				break;
 			}
 			
-			if (Thread::isNotStoppingCurrent()) {
+			if (thread.isNull() || thread->isNotStopping()) {
 				if (flagWorking) {
 					sl_uint64 t = timer.getElapsedMilliseconds();
 					if (t < 10) {

@@ -207,7 +207,8 @@ namespace slib
 
 			sl_uint8 buf[MAX_PACKET_SIZE];
 
-			while (Thread::isNotStoppingCurrent() && m_flagRunning) {
+			Ref<Thread> thread = Thread::getCurrent();
+			while ((thread.isNull() || thread->isNotStopping()) && m_flagRunning) {
 				pcap_pkthdr* info = sl_null;
 				const sl_uint8* data = sl_null;
 				int ret = pcap_next_ex(m_handle, &info, &data);
