@@ -410,6 +410,9 @@ namespace slib
 		Referable* userObject,
 		const Function<void(AsyncStreamResult&)>& callback)
 	{
+		if (!size) {
+			return sl_null;
+		}
 		return new AsyncStreamRequest(data, size, userObject, callback, sl_true);
 	}
 
@@ -419,6 +422,9 @@ namespace slib
 		Referable* userObject,
 		const Function<void(AsyncStreamResult&)>& callback)
 	{
+		if (!size) {
+			return sl_null;
+		}
 		return new AsyncStreamRequest(data, size, userObject, callback, sl_false);
 	}
 
