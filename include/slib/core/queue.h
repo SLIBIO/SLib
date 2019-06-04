@@ -34,9 +34,11 @@ namespace slib
 	class SLIB_EXPORT Queue : public CONTAINER
 	{
 	public:
-		sl_bool push_NoLock(const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		sl_bool push_NoLock(ARGS&&... args) noexcept;
 
-		sl_bool push(const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		sl_bool push(ARGS&&... args) noexcept;
 
 		sl_bool pushAll(const Queue<T, CONTAINER>* other) noexcept;
 
@@ -54,9 +56,11 @@ namespace slib
 	class SLIB_EXPORT Stack : public CONTAINER
 	{
 	public:
-		sl_bool push_NoLock(const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		sl_bool push_NoLock(ARGS&&... args) noexcept;
 
-		sl_bool push(const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		sl_bool push(ARGS&&... args) noexcept;
 
 		sl_bool pushAll(const Stack<T, CONTAINER>* other) noexcept;
 

@@ -79,17 +79,17 @@ namespace slib
 	
 		sl_bool isNotEmpty() const noexcept;
 
-		sl_bool pushBack_NoLock(const Ref<T>& object, sl_size countLimit = 0) noexcept;
+		sl_bool pushBack_NoLock(const Ref<T>& object) noexcept;
 
-		sl_bool pushBack(const Ref<T>& object, sl_size countLimit = 0) noexcept;
+		sl_bool pushBack(const Ref<T>& object) noexcept;
 
 		sl_bool popBack_NoLock(Ref<T>* _out = sl_null) noexcept;
 
 		sl_bool popBack(Ref<T>* _out = sl_null) noexcept;
 
-		sl_bool pushFront_NoLock(const Ref<T>& object, sl_size countLimit = 0) noexcept;
+		sl_bool pushFront_NoLock(const Ref<T>& object) noexcept;
 
-		sl_bool pushFront(const Ref<T>& object, sl_size countLimit = 0) noexcept;
+		sl_bool pushFront(const Ref<T>& object) noexcept;
 
 		sl_bool popFront_NoLock(Ref<T>* _out = sl_null) noexcept;
 
@@ -122,11 +122,11 @@ namespace slib
 	protected:
 		void _init() noexcept;
 
-		Ref<T> _pushBack(const Ref<T>& object, sl_size countLimit) noexcept;
+		void _pushBack(const Ref<T>& object) noexcept;
 
 		Ref<T> _popBack() noexcept;
 
-		Ref<T> _pushFront(const Ref<T>& object, sl_size countLimit) noexcept;
+		void _pushFront(const Ref<T>& object) noexcept;
 
 		Ref<T> _popFront() noexcept;
 

@@ -72,11 +72,12 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool QueueChannelArray<T>::pushBack(sl_size channelNo, const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	sl_bool QueueChannelArray<T>::pushBack(sl_size channelNo, ARGS&&... args) noexcept
 	{
 		LinkedList<T> queue(_activateChannelQueue(channelNo));
 		if (queue.isNotNull()) {
-			return queue.pushBack(value, countLimit);
+			return queue.pushBack(Forward<ARGS>(args)...);
 		}
 		return sl_null;
 	}
@@ -92,11 +93,12 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool QueueChannelArray<T>::pushFront(sl_size channelNo, const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	sl_bool QueueChannelArray<T>::pushFront(sl_size channelNo, ARGS&&... args) noexcept
 	{
 		LinkedList<T> queue(_activateChannelQueue(channelNo));
 		if (queue.isNotNull()) {
-			return queue.pushFront(value, countLimit);
+			return queue.pushFront(Forward<ARGS>(args)...);
 		}
 		return sl_null;
 	}

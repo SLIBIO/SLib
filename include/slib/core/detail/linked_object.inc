@@ -68,26 +68,23 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool LinkedObjectList<T>::pushBack_NoLock(const Ref<T>& object, sl_size countLimit) noexcept
+	sl_bool LinkedObjectList<T>::pushBack_NoLock(const Ref<T>& object) noexcept
 	{
 		if (object.isNull()) {
 			return sl_false;
 		}
-		_pushBack(object, countLimit);
+		_pushBack(object);
 		return sl_true;
 	}
 	
 	template <class T>
-	sl_bool LinkedObjectList<T>::pushBack(const Ref<T>& object, sl_size countLimit) noexcept
+	sl_bool LinkedObjectList<T>::pushBack(const Ref<T>& object) noexcept
 	{
 		if (object.isNull()) {
 			return sl_false;
 		}
-		Ref<T> old;
-		{
-			ObjectLocker lock(this);
-			old = _pushBack(object, countLimit);
-		}
+		ObjectLocker lock(this);
+		_pushBack(object);
 		return sl_true;
 	}
 	
@@ -124,26 +121,23 @@ namespace slib
 	}
 	
 	template <class T>
-	sl_bool LinkedObjectList<T>::pushFront_NoLock(const Ref<T>& object, sl_size countLimit) noexcept
+	sl_bool LinkedObjectList<T>::pushFront_NoLock(const Ref<T>& object) noexcept
 	{
 		if (object.isNull()) {
 			return sl_false;
 		}
-		_pushFront(object, countLimit);
+		_pushFront(object);
 		return sl_true;
 	}
 
 	template <class T>
-	sl_bool LinkedObjectList<T>::pushFront(const Ref<T>& object, sl_size countLimit) noexcept
+	sl_bool LinkedObjectList<T>::pushFront(const Ref<T>& object) noexcept
 	{
 		if (object.isNull()) {
-			return sl_null;
+			return sl_false;
 		}
-		Ref<T> old;
-		{
-			ObjectLocker lock(this);
-			old = _pushFront(object, countLimit);
-		}
+		ObjectLocker lock(this);
+		_pushFront(object);
 		return sl_true;
 	}
 
@@ -318,12 +312,8 @@ namespace slib
 	}
 
 	template <class T>
-	Ref<T> LinkedObjectList<T>::_pushBack(const Ref<T>& object, sl_size countLimit) noexcept
+	void LinkedObjectList<T>::_pushBack(const Ref<T>& object) noexcept
 	{
-		Ref<T> old;
-		if (countLimit > 0 && m_count >= countLimit) {
-			old = _popFront();
-		}
 		if (m_back.isNotNull()) {
 			m_back->next = object;
 			object->before = m_back;
@@ -334,7 +324,6 @@ namespace slib
 			m_back = object;
 		}
 		m_count++;
-		return old;
 	}
 
 	template <class T>
@@ -358,12 +347,8 @@ namespace slib
 	}
 
 	template <class T>
-	Ref<T> LinkedObjectList<T>::_pushFront(const Ref<T>& object, sl_size countLimit) noexcept
+	void LinkedObjectList<T>::_pushFront(const Ref<T>& object) noexcept
 	{
-		Ref<T> old;
-		if (countLimit > 0 && m_count >= countLimit) {
-			old = _popBack();
-		}
 		if (m_front.isNotNull()) {
 			object->next = m_front;
 			object->before.setNull();
@@ -374,7 +359,6 @@ namespace slib
 			m_back = object;
 		}
 		m_count++;
-		return old;
 	}
 
 	template <class T>

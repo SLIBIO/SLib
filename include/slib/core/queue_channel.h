@@ -56,11 +56,13 @@ namespace slib
 
 		sl_size removeAll() noexcept;
 
-		sl_bool pushBack(sl_size channelNo, const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		sl_bool pushBack(sl_size channelNo, ARGS&&... args) noexcept;
 
 		sl_bool popBack(sl_size channelNo, T* _out = sl_null) noexcept;
-	
-		sl_bool pushFront(sl_size channelNo, const T& value, sl_size countLimit = 0) noexcept;
+
+		template <class... ARGS>
+		sl_bool pushFront(sl_size channelNo, ARGS&&... args) noexcept;
 
 		sl_bool popFront(sl_size channelNo, T* _out = sl_null) noexcept;
 

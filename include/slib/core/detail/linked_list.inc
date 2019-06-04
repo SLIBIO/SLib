@@ -152,35 +152,28 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::pushBack_NoLock(const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	Link<T>* CLinkedList<T>::pushBack_NoLock(ARGS&&... args) noexcept
 	{
-		Link<T>* item = _createItem(value);
-		if (!item) {
-			return sl_null;
+		Link<T>* item = _createItem(Forward<ARGS>(args)...);
+		if (item) {
+			_pushBackItem(item);
+			return item;
 		}
-		Link<T>* old = _pushBackItem(item, countLimit);
-		if (old) {
-			_freeItem(old);
-		}
-		return item;
+		return sl_null;
 	}
 	
 	template <class T>
-	sl_bool CLinkedList<T>::pushBack(const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	sl_bool CLinkedList<T>::pushBack(ARGS&&... args) noexcept
 	{
-		Link<T>* item = _createItem(value);
-		if (!item) {
-			return sl_false;
-		}
-		Link<T>* old;
-		{
+		Link<T>* item = _createItem(Forward<ARGS>(args)...);
+		if (item) {
 			ObjectLocker lock(this);
-			old = _pushBackItem(item, countLimit);
+			_pushBackItem(item);
+			return sl_true;
 		}
-		if (old) {
-			_freeItem(old);
-		}
-		return sl_true;
+		return sl_false;
 	}
 	
 	template <class T>
@@ -240,33 +233,26 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::pushFront_NoLock(const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	Link<T>* CLinkedList<T>::pushFront_NoLock(ARGS&&... args) noexcept
 	{
-		Link<T>* item = _createItem(value);
-		if (!item) {
-			return sl_null;
+		Link<T>* item = _createItem(Forward<ARGS>(args)...);
+		if (item) {
+			_pushFrontItem(item);
+			return item;
 		}
-		Link<T>* old = _pushFrontItem(item, countLimit);
-		if (old) {
-			_freeItem(old);
-		}
-		return item;
+		return sl_null;
 	}
 	
 	template <class T>
-	sl_bool CLinkedList<T>::pushFront(const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	sl_bool CLinkedList<T>::pushFront(ARGS&&... args) noexcept
 	{
-		Link<T>* item = _createItem(value);
-		if (!item) {
-			return sl_false;
-		}
-		Link<T>* old;
-		{
+		Link<T>* item = _createItem(Forward<ARGS>(args)...);
+		if (item) {
 			ObjectLocker lock(this);
-			old = _pushFrontItem(item, countLimit);
-		}
-		if (old) {
-			_freeItem(old);
+			_pushFrontItem(item);
+			return sl_false;
 		}
 		return sl_true;
 	}
@@ -328,30 +314,32 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::insertBefore(Link<T>* itemWhere, const T& value) noexcept
+	template <class... ARGS>
+	Link<T>* CLinkedList<T>::insertBefore(Link<T>* itemWhere, ARGS&&... args) noexcept
 	{
 		if (itemWhere) {
-			Link<T>* itemNew = _createItem(value);
+			Link<T>* itemNew = _createItem(Forward<ARGS>(args)...);
 			if (itemNew) {
 				_insertBefore(itemWhere, itemNew);
 			}
 			return itemNew;
 		} else {
-			return pushFront_NoLock(value);
+			return pushFront_NoLock(Forward<ARGS>(args)...);
 		}
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::insertAfter(Link<T>* itemWhere, const T& value) noexcept
+	template <class... ARGS>
+	Link<T>* CLinkedList<T>::insertAfter(Link<T>* itemWhere, ARGS&&... args) noexcept
 	{
 		if (itemWhere) {
-			Link<T>* itemNew = _createItem(value);
+			Link<T>* itemNew = _createItem(Forward<ARGS>(args)...);
 			if (itemNew) {
 				_insertAfter(itemWhere, itemNew);
 			}
 			return itemNew;
 		} else {
-			return pushBack_NoLock(value);
+			return pushBack_NoLock(Forward<ARGS>(args)...);
 		}
 	}
 	
@@ -578,7 +566,8 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::_createItem(const T& value) noexcept
+	template <class... ARGS>
+	Link<T>* CLinkedList<T>::_createItem(ARGS&&... args) noexcept
 	{
 		Link<T>* item = (Link<T>*)(Base::createMemory(sizeof(Link<T>)));
 		if (!item) {
@@ -586,7 +575,7 @@ namespace slib
 		}
 		item->next = sl_null;
 		item->before = sl_null;
-		new (&(item->value)) T(value);
+		new (&(item->value)) T(Forward<ARGS>(args)...);
 		return item;
 	}
 	
@@ -599,14 +588,8 @@ namespace slib
 	
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::_pushBackItem(Link<T>* item, sl_size countLimit) noexcept
+	void CLinkedList<T>::_pushBackItem(Link<T>* item) noexcept
 	{
-		Link<T>* old;
-		if (countLimit > 0 && m_count >= countLimit) {
-			old = _popFrontItem();
-		} else {
-			old = sl_null;
-		}
 		if (m_back) {
 			m_back->next = item;
 			item->before = m_back;
@@ -616,7 +599,6 @@ namespace slib
 			m_back = item;
 		}
 		m_count++;
-		return old;
 	}
 	
 	template <class T>
@@ -638,14 +620,8 @@ namespace slib
 	}
 	
 	template <class T>
-	Link<T>* CLinkedList<T>::_pushFrontItem(Link<T>* item, sl_size countLimit) noexcept
+	void CLinkedList<T>::_pushFrontItem(Link<T>* item) noexcept
 	{
-		Link<T>* old;
-		if (countLimit > 0 && m_count >= countLimit) {
-			old = _popBackItem();
-		} else {
-			old = sl_null;
-		}
 		if (m_front) {
 			item->next = m_front;
 			m_front->before = item;
@@ -655,7 +631,6 @@ namespace slib
 			m_back = item;
 		}
 		m_count++;
-		return old;
 	}
 	
 	template <class T>
@@ -844,39 +819,41 @@ namespace slib
 	}
 
 	template <class T>
-	Link<T>* LinkedList<T>::pushBack_NoLock(const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	Link<T>* LinkedList<T>::pushBack_NoLock(ARGS&&... args) noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->pushBack_NoLock(value, countLimit);
+			return obj->pushBack_NoLock(Forward<ARGS>(args)...);
 		} else {
 			obj = new CLinkedList<T>;
 			if (obj) {
 				ref = obj;
-				return obj->pushBack_NoLock(value, countLimit);
+				return obj->pushBack_NoLock(Forward<ARGS>(args)...);
 			}
 		}
 		return sl_null;
 	}
 
 	template <class T>
-	sl_bool LinkedList<T>::pushBack(const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	sl_bool LinkedList<T>::pushBack(ARGS&&... args) noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->pushBack(value, countLimit);
+			return obj->pushBack(Forward<ARGS>(args)...);
 		} else {
 			SpinLocker lock(SpinLockPoolForList::get(this));
 			obj = ref._ptr;
 			if (obj) {
 				lock.unlock();
-				return obj->pushBack(value, countLimit);
+				return obj->pushBack(Forward<ARGS>(args)...);
 			}
 			obj = new CLinkedList<T>;
 			if (obj) {
 				ref = obj;
 				lock.unlock();
-				return obj->pushBack(value, countLimit);
+				return obj->pushBack(Forward<ARGS>(args)...);
 			}
 		}
 		return sl_false;
@@ -948,39 +925,41 @@ namespace slib
 	}
 
 	template <class T>
-	Link<T>* LinkedList<T>::pushFront_NoLock(const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	Link<T>* LinkedList<T>::pushFront_NoLock(ARGS&&... args) noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->pushFront_NoLock(value, countLimit);
+			return obj->pushFront_NoLock(Forward<ARGS>(args)...);
 		} else {
 			obj = new CLinkedList<T>;
 			if (obj) {
 				ref = obj;
-				return obj->pushFront_NoLock(value, countLimit);
+				return obj->pushFront_NoLock(Forward<ARGS>(args)...);
 			}
 		}
 		return sl_null;
 	}
 
 	template <class T>
-	sl_bool LinkedList<T>::pushFront(const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	sl_bool LinkedList<T>::pushFront(ARGS&&... args) noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			return obj->pushFront(value, countLimit);
+			return obj->pushFront(Forward<ARGS>(args)...);
 		} else {
 			SpinLocker lock(SpinLockPoolForList::get(this));
 			obj = ref._ptr;
 			if (obj) {
 				lock.unlock();
-				return obj->pushFront(value, countLimit);
+				return obj->pushFront(Forward<ARGS>(args)...);
 			}
 			obj = new CLinkedList<T>;
 			if (obj) {
 				ref = obj;
 				lock.unlock();
-				return obj->pushFront(value, countLimit);
+				return obj->pushFront(Forward<ARGS>(args)...);
 			}
 		}
 		return sl_false;
@@ -1052,21 +1031,23 @@ namespace slib
 	}
 
 	template <class T>
-	Link<T>* LinkedList<T>::insertBefore(Link<T>* itemWhere, const T& value) const noexcept
+	template <class... ARGS>
+	Link<T>* LinkedList<T>::insertBefore(Link<T>* itemWhere, ARGS&&... args) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			obj->insertBefore(itemWhere, value);
+			obj->insertBefore(itemWhere, Forward<ARGS>(args)...);
 		}
 		return sl_null;
 	}
 
 	template <class T>
-	Link<T>* LinkedList<T>::insertAfter(Link<T>* itemWhere, const T& value) const noexcept
+	template <class... ARGS>
+	Link<T>* LinkedList<T>::insertAfter(Link<T>* itemWhere, ARGS&&... args) const noexcept
 	{
 		CLinkedList<T>* obj = ref._ptr;
 		if (obj) {
-			obj->insertAfter(itemWhere, value);
+			obj->insertAfter(itemWhere, Forward<ARGS>(args)...);
 		}
 		return sl_null;
 	}
@@ -1331,23 +1312,24 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool Atomic< LinkedList<T> >::pushBack(const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	sl_bool Atomic< LinkedList<T> >::pushBack(ARGS&&... args) noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->pushBack(value, countLimit);
+			return obj->pushBack(Forward<ARGS>(args)...);
 		} else {
 			SpinLocker lock(SpinLockPoolForList::get(this));
 			obj = ref;
 			if (obj.isNotNull()) {
 				lock.unlock();
-				return obj->pushBack(value, countLimit);
+				return obj->pushBack(Forward<ARGS>(args)...);
 			}
 			obj = new CLinkedList<T>;
 			if (obj.isNotNull()) {
 				ref = obj;
 				lock.unlock();
-				return obj->pushBack(value, countLimit);
+				return obj->pushBack(Forward<ARGS>(args)...);
 			}
 		}
 		return sl_false;
@@ -1392,23 +1374,24 @@ namespace slib
 	}
 
 	template <class T>
-	sl_bool Atomic< LinkedList<T> >::pushFront(const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	sl_bool Atomic< LinkedList<T> >::pushFront(ARGS&&... args) noexcept
 	{
 		Ref< CLinkedList<T> > obj(ref);
 		if (obj.isNotNull()) {
-			return obj->pushFront(value, countLimit);
+			return obj->pushFront(Forward<ARGS>(args)...);
 		} else {
 			SpinLocker lock(SpinLockPoolForList::get(this));
 			obj = ref;
 			if (obj.isNotNull()) {
 				lock.unlock();
-				return obj->pushFront(value, countLimit);
+				return obj->pushFront(Forward<ARGS>(args)...);
 			}
 			obj = new CLinkedList<T>;
 			if (obj.isNotNull()) {
 				ref = obj;
 				lock.unlock();
-				return obj->pushFront(value, countLimit);
+				return obj->pushFront(Forward<ARGS>(args)...);
 			}
 		}
 		return sl_false;

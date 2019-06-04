@@ -135,9 +135,11 @@ namespace slib
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
 		sl_bool find(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
 
-		Link<T>* pushBack_NoLock(const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		Link<T>* pushBack_NoLock(ARGS&&... args) noexcept;
 
-		sl_bool pushBack(const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		sl_bool pushBack(ARGS&&... args) noexcept;
 		
 		template <class VALUE>
 		sl_bool pushBackAll_NoLock(const CLinkedList<VALUE>* other) noexcept;
@@ -149,9 +151,11 @@ namespace slib
 
 		sl_bool popBack(T* _out = sl_null) noexcept;
 
-		Link<T>* pushFront_NoLock(const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		Link<T>* pushFront_NoLock(ARGS&&... args) noexcept;
 
-		sl_bool pushFront(const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		sl_bool pushFront(ARGS&&... args) noexcept;
 		
 		template <class VALUE>
 		sl_bool pushFrontAll_NoLock(const CLinkedList<VALUE>* other) noexcept;
@@ -164,10 +168,12 @@ namespace slib
 		sl_bool popFront(T* _out = sl_null) noexcept;
 
 		/* unsynchronized function */
-		Link<T>* insertBefore(Link<T>* itemWhere, const T& value) noexcept;
+		template <class... ARGS>
+		Link<T>* insertBefore(Link<T>* itemWhere, ARGS&&... args) noexcept;
 
 		/* unsynchronized function */
-		Link<T>* insertAfter(Link<T>* itemWhere, const T& value) noexcept;
+		template <class... ARGS>
+		Link<T>* insertAfter(Link<T>* itemWhere, ARGS&&... args) noexcept;
 
 		/* unsynchronized function */
 		void removeAt(Link<T>* item) noexcept;
@@ -211,15 +217,16 @@ namespace slib
 		static void freeLink(Link<T>* link) noexcept;
 
 	protected:
-		static Link<T>* _createItem(const T& value) noexcept;
+		template <class... ARGS>
+		static Link<T>* _createItem(ARGS&&... args) noexcept;
 
 		static void _freeItem(Link<T>* item) noexcept;
 
-		Link<T>* _pushBackItem(Link<T>* item, sl_size countLimit) noexcept;
+		void _pushBackItem(Link<T>* item) noexcept;
 
 		Link<T>* _popBackItem() noexcept;
 
-		Link<T>* _pushFrontItem(Link<T>* item, sl_size countLimit) noexcept;
+		void _pushFrontItem(Link<T>* item) noexcept;
 
 		Link<T>* _popFrontItem() noexcept;
 
@@ -267,9 +274,11 @@ namespace slib
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
 		sl_bool find(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
 
-		Link<T>* pushBack_NoLock(const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		Link<T>* pushBack_NoLock(ARGS&&... args) noexcept;
 
-		sl_bool pushBack(const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		sl_bool pushBack(ARGS&&... args) noexcept;
 
 		template <class VALUE>
 		sl_bool pushBackAll_NoLock(const LinkedList<VALUE>& other) noexcept;
@@ -281,9 +290,11 @@ namespace slib
 
 		sl_bool popBack(T* _out = sl_null) const noexcept;
 
-		Link<T>* pushFront_NoLock(const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		Link<T>* pushFront_NoLock(ARGS&&... args) noexcept;
 
-		sl_bool pushFront(const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		sl_bool pushFront(ARGS&&... args) noexcept;
 		
 		template <class VALUE>
 		sl_bool pushFrontAll_NoLock(const LinkedList<VALUE>& other) noexcept;
@@ -296,10 +307,12 @@ namespace slib
 		sl_bool popFront(T* _out = sl_null) const noexcept;
 
 		/* unsynchronized function */
-		Link<T>* insertBefore(Link<T>* itemWhere, const T& value) const noexcept;
+		template <class... ARGS>
+		Link<T>* insertBefore(Link<T>* itemWhere, ARGS&&... args) const noexcept;
 		
 		/* unsynchronized function */
-		Link<T>* insertAfter(Link<T>* itemWhere, const T& value) const noexcept;
+		template <class... ARGS>
+		Link<T>* insertAfter(Link<T>* itemWhere, ARGS&&... args) const noexcept;
 		
 		/* unsynchronized function */
 		void removeAt(Link<T>* item) const noexcept;
@@ -364,14 +377,16 @@ namespace slib
 		template < class VALUE, class EQUALS = Equals<T, VALUE> >
 		sl_bool find(const VALUE& value, const EQUALS& equals = EQUALS()) const noexcept;
 
-		sl_bool pushBack(const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		sl_bool pushBack(ARGS&&... args) noexcept;
 
 		template <class VALUE>
 		sl_bool pushBackAll(const LinkedList<VALUE>& other) noexcept;
 
 		sl_bool popBack(T* _out = sl_null) const noexcept;
 
-		sl_bool pushFront(const T& value, sl_size countLimit = 0) noexcept;
+		template <class... ARGS>
+		sl_bool pushFront(ARGS&&... args) noexcept;
 
 		template <class VALUE>
 		sl_bool pushFrontAll(const LinkedList<VALUE>& other) noexcept;

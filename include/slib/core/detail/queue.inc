@@ -24,15 +24,17 @@ namespace slib
 {
 	
 	template <class T, class CONTAINER>
-	sl_bool Queue<T, CONTAINER>::push_NoLock(const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	sl_bool Queue<T, CONTAINER>::push_NoLock(ARGS&&... args) noexcept
 	{
-		return this->pushBack_NoLock(value, countLimit) != sl_null;
+		return this->pushBack_NoLock(Forward<ARGS>(args)...) != sl_null;
 	}
 
 	template <class T, class CONTAINER>
-	sl_bool Queue<T, CONTAINER>::push(const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	sl_bool Queue<T, CONTAINER>::push(ARGS&&... args) noexcept
 	{
-		return this->pushBack(value, countLimit);
+		return this->pushBack(Forward<ARGS>(args)...);
 	}
 	
 	template <class T, class CONTAINER>
@@ -69,15 +71,17 @@ namespace slib
 	
 	
 	template <class T, class CONTAINER>
-	sl_bool Stack<T, CONTAINER>::push_NoLock(const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	sl_bool Stack<T, CONTAINER>::push_NoLock(ARGS&&... args) noexcept
 	{
-		return this->pushBack_NoLock(value, countLimit) != sl_null;
+		return this->pushBack_NoLock(Forward<ARGS>(args)...) != sl_null;
 	}
 	
 	template <class T, class CONTAINER>
-	sl_bool Stack<T, CONTAINER>::push(const T& value, sl_size countLimit) noexcept
+	template <class... ARGS>
+	sl_bool Stack<T, CONTAINER>::push(ARGS&&... args) noexcept
 	{
-		return this->pushBack(value, countLimit);
+		return this->pushBack(Forward<ARGS>(args)...);
 	}
 	
 	template <class T, class CONTAINER>
