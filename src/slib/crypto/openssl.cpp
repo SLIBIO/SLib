@@ -203,10 +203,9 @@ namespace slib
 	
 	void OpenSSL_Poly1305::start(const void* key)
 	{
-		if (m_context) {
-			Base::freeMemory(m_context);
+		if (!m_context) {
+			m_context = Base::createMemory((sl_size)(Poly1305_ctx_size()));
 		}
-		m_context = Base::createMemory((sl_size)(Poly1305_ctx_size()));
 		Poly1305_Init((POLY1305*)m_context, (const unsigned char*)key);
 	}
 	
