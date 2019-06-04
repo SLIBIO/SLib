@@ -204,7 +204,7 @@ namespace slib
 		Link<T>* old = _popBackItem();
 		if (old) {
 			if (_out) {
-				*_out = old->value;
+				*_out = Move(old->value);
 			}
 			_freeItem(old);
 			return sl_true;
@@ -223,7 +223,7 @@ namespace slib
 		}
 		if (old) {
 			if (_out) {
-				*_out = old->value;
+				*_out = Move(old->value);
 			}
 			_freeItem(old);
 			return sl_true;
@@ -285,7 +285,7 @@ namespace slib
 		Link<T>* old = _popFrontItem();
 		if (old) {
 			if (_out) {
-				*_out = old->value;
+				*_out = Move(old->value);
 			}
 			_freeItem(old);
 			return sl_true;
@@ -304,7 +304,7 @@ namespace slib
 		}
 		if (old) {
 			if (_out) {
-				*_out = old->value;
+				*_out = Move(old->value);
 			}
 			_freeItem(old);
 			return sl_true;

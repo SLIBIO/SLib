@@ -94,7 +94,7 @@ namespace slib
 		Ref<T> old = _popBack();
 		if (old.isNotNull()) {
 			if (_out) {
-				*_out = old;
+				*_out = Move(old);
 			}
 			return sl_true;
 		} else {
@@ -110,9 +110,9 @@ namespace slib
 			ObjectLocker lock(this);
 			old = _popBack();
 		}
-		if (old) {
+		if (old.isNotNull()) {
 			if (_out) {
-				*_out = old;
+				*_out = Move(old);
 			}
 			return sl_true;
 		} else {
@@ -145,9 +145,9 @@ namespace slib
 	sl_bool LinkedObjectList<T>::popFront_NoLock(Ref<T>* _out) noexcept
 	{
 		Ref<T> old = _popFront();
-		if (old) {
+		if (old.isNotNull()) {
 			if (_out) {
-				*_out = old;
+				*_out = Move(old);
 			}
 			return sl_true;
 		} else {
@@ -163,9 +163,9 @@ namespace slib
 			ObjectLocker lock(this);
 			old = _popFront();
 		}
-		if (old) {
+		if (old.isNotNull()) {
 			if (_out) {
-				*_out = old;
+				*_out = Move(old);
 			}
 			return sl_true;
 		} else {
@@ -205,7 +205,7 @@ namespace slib
 		sl_size count;
 		{
 			ObjectLocker lock(this);
-			front = m_front;
+			front = Move(m_front);
 			count = m_count;
 			_init();
 		}
@@ -241,17 +241,16 @@ namespace slib
 			return;
 		}
 		MultipleObjectsLocker lock(this, other);
-		Ref<T> _front = other->getFront();
-		Ref<T> _back = other->getBack();
+		T* _front = other->m_front.get();
 		if (_front) {
 			sl_size countNew = m_count + other->getCount();
-			if (m_back) {
-				m_back->next = _front;
-				_front->before = m_back;
+			if (m_back.isNotNull()) {
+				m_back->next = Move(other->m_front);
+				_front->before = Move(m_back);
 			} else {
-				m_front = _front;
+				m_front = Move(other->m_front);
 			}
-			m_back = _back;
+			m_back = Move(other->m_back);
 			other->_init();
 			m_count = countNew;
 		}
@@ -266,10 +265,10 @@ namespace slib
 			if (ret.isNotNull()) {
 				Ref<T>* buf = ret.getData();
 				sl_size index = 0;
-				Ref<T> now = m_front;
+				T* now = m_front.get();
 				while (now) {
 					buf[index] = now;
-					now = now->next;
+					now = now->next.get();
 					index++;
 				}
 			}
@@ -293,10 +292,10 @@ namespace slib
 			if (ret.isNotNull()) {
 				ListElements< Ref<T> > list(ret);
 				sl_size index = 0;
-				Ref<T> now = m_front;
+				T* now = m_front.get();
 				while (now) {
 					list[index] = now;
-					now = now->next;
+					now = now->next.get();
 					index++;
 				}
 			}
@@ -316,7 +315,7 @@ namespace slib
 	{
 		if (m_back.isNotNull()) {
 			m_back->next = object;
-			object->before = m_back;
+			object->before = Move(m_back);
 			object->next.setNull();
 			m_back = object;
 		} else {
@@ -329,18 +328,17 @@ namespace slib
 	template <class T>
 	Ref<T> LinkedObjectList<T>::_popBack() noexcept
 	{
-		Ref<T> back = m_back;
+		Ref<T> back = Move(m_back);
 		if (back.isNotNull()) {
 			m_count--;
-			Ref<T> before = back->before;
+			Ref<T>& before = back->before;
 			if (before.isNotNull()) {
 				before->next.setNull();
-				m_back = before;
+				m_back = Move(before);
 			} else {
 				m_front.setNull();
 				m_back.setNull();
 			}
-			back->before.setNull();
 			back->next.setNull();
 		}
 		return back;
@@ -350,9 +348,9 @@ namespace slib
 	void LinkedObjectList<T>::_pushFront(const Ref<T>& object) noexcept
 	{
 		if (m_front.isNotNull()) {
-			object->next = m_front;
-			object->before.setNull();
 			m_front->before = object;
+			object->next = Move(m_front);
+			object->before.setNull();
 			m_front = object;
 		} else {
 			m_front = object;
@@ -364,19 +362,18 @@ namespace slib
 	template <class T>
 	Ref<T> LinkedObjectList<T>::_popFront() noexcept
 	{
-		Ref<T> front = m_front;
+		Ref<T> front = Move(m_front);
 		if (front.isNotNull()) {
 			m_count--;
-			Ref<T> next = front->next;
+			Ref<T>& next = front->next;
 			if (next.isNotNull()) {
 				next->before.setNull();
-				m_front = next;
+				m_front = Move(next);
 			} else {
 				m_front.setNull();
 				m_back.setNull();
 			}
 			front->before.setNull();
-			front->next.setNull();
 		}
 		return front;
 	}
@@ -384,37 +381,35 @@ namespace slib
 	template <class T>
 	void LinkedObjectList<T>::_remove(const Ref<T>& object) noexcept
 	{
-		Ref<T> before = object->before;
-		Ref<T> next = object->next;
+		T* before = object->before.get();
+		T* next = object->next.get();
 		if (m_front == object) {
-			m_front = next;
-		} else if (before.isNotNull()) {
-			before->next = next;
+			m_front = Move(object->next);
+		} else if (before) {
+			before->next = Move(object->next);
 		} else {
 			return;
 		}
 		if (m_back == object) {
-			m_back = before;
-		} else if (next.isNotNull()) {
-			next->before = before;
+			m_back = Move(object->before);
+		} else if (next) {
+			next->before = Move(object->before);
 		} else {
 			return;
 		}
 		m_count--;
-		object->before.setNull();
-		object->next.setNull();
 	}
 
 	template <class T>
 	void LinkedObjectList<T>::_insertBefore(const Ref<T>& objectWhere, const Ref<T>& objectNew) noexcept
 	{
 		objectNew->next = objectWhere;
-		Ref<T> before = objectWhere->before;
-		objectNew->before = before;
+		T* before = objectWhere->before.get();
+		objectNew->before = Move(objectWhere->before);
 		objectWhere->before = objectNew;
 		if (m_front == objectWhere) {
 			m_front = objectNew;
-		} else if (before.isNotNull()) {
+		} else if (before) {
 			before->next = objectNew;
 		} else {
 			return;
@@ -426,12 +421,12 @@ namespace slib
 	void LinkedObjectList<T>::_insertAfter(const Ref<T>& objectWhere, const Ref<T>& objectNew) noexcept
 	{
 		objectNew->before = objectWhere;
-		Ref<T> next = objectWhere->next;
-		objectNew->next = next;
+		T* next = objectWhere->next.get();
+		objectNew->next = Move(objectWhere->next);
 		objectWhere->next = objectNew;
 		if (m_back == objectWhere) {
 			m_back = objectNew;
-		} else if (next.isNotNull()) {
+		} else if (next) {
 			next->before = objectNew;
 		} else {
 			return;
