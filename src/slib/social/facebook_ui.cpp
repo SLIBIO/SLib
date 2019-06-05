@@ -25,26 +25,6 @@
 namespace slib
 {
 	
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FacebookLoginParam)
-	
-	FacebookLoginParam::FacebookLoginParam()
-	{
-		flagPublishPermissions = sl_false;
-	}
-	
-	void Facebook::login(const FacebookLoginParam& param)
-	{
-		OAuth2::login(param);
-	}
-	
-	void Facebook::login(const Function<void(FacebookLoginResult& result)>& onComplete)
-	{
-		FacebookLoginParam param;
-		param.onComplete = onComplete;
-		login(param);
-	}
-	
-	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FacebookResolveUserUrlParam)
 	
 	FacebookResolveUserUrlParam::FacebookResolveUserUrlParam()

@@ -33,7 +33,7 @@
 #import <FBSDKLoginKit/FBSDKLoginKit.h>
 #import <FBSDKShareKit/FBSDKShareKit.h>
 
-@interface _priv_SLib_FacebookDelegate : NSObject<FBSDKSharingDelegate>
+@interface SLIBFacebookDelegate : NSObject<FBSDKSharingDelegate>
 {
 	@public slib::Function<void(slib::FacebookShareResult&)> onComplete;
 }
@@ -41,6 +41,74 @@
 
 namespace slib
 {
+	
+	namespace priv
+	{
+		namespace facebook
+		{
+			
+			class FacebookSDKContext : public Referable
+			{
+			public:
+				FBSDKLoginManager* loginManager;
+				SLIBFacebookDelegate* shareDelegate;
+				
+			public:
+				FacebookSDKContext()
+				{
+					loginManager = [[FBSDKLoginManager alloc] init];
+					shareDelegate = [[SLIBFacebookDelegate alloc] init];
+				}
+				
+				static FacebookSDKContext* get()
+				{
+					SLIB_SAFE_STATIC(Ref<FacebookSDKContext>, s, new FacebookSDKContext)
+					if (SLIB_SAFE_STATIC_CHECK_FREED(s)) {
+						return sl_null;
+					}
+					return s.get();
+				}
+				
+				static FBSDKLoginManager* getLoginManager()
+				{
+					FacebookSDKContext* sdk = get();
+					if (sdk) {
+						return sdk->loginManager;
+					}
+					return nil;
+				}
+				
+				static SLIBFacebookDelegate* getShareDelegate()
+				{
+					FacebookSDKContext* sdk = get();
+					if (sdk) {
+						return sdk->shareDelegate;
+					}
+					return nil;
+				}
+			};
+			
+			static void getToken(OAuthAccessToken& _out, FBSDKAccessToken* _in)
+			{
+				_out.token = Apple::getStringFromNSString(_in.tokenString);
+				_out.expirationTime = Apple::getTimeFromNSDate(_in.expirationDate);
+				_out.refreshTime = Apple::getTimeFromNSDate(_in.refreshDate);
+				{
+					List<String> permissions;
+					if (_in.permissions != nil) {
+						for (id item in _in.permissions) {
+							NSString* s = (NSString*)item;
+							permissions.add_NoLock(Apple::getStringFromNSString(s));
+						}
+					}
+					_out.scopes = permissions;
+				}
+			}
+			
+		}
+	}
+	
+	using namespace priv::facebook;
 	
 	void FacebookSDK::initialize()
 	{
@@ -56,78 +124,19 @@ namespace slib
 		});
 	}
 	
-	class _priv_FacebookSDK : public Referable
-	{
-	public:
-		FBSDKLoginManager* loginManager;
-		_priv_SLib_FacebookDelegate* shareDelegate;
-		
-	public:
-		_priv_FacebookSDK()
-		{
-			loginManager = [[FBSDKLoginManager alloc] init];
-			loginManager.loginBehavior = FBSDKLoginBehaviorNative;
-			shareDelegate = [[_priv_SLib_FacebookDelegate alloc] init];
-		}
-		
-		static _priv_FacebookSDK* get()
-		{
-			SLIB_SAFE_STATIC(Ref<_priv_FacebookSDK>, s, new _priv_FacebookSDK)
-			if (SLIB_SAFE_STATIC_CHECK_FREED(s)) {
-				return sl_null;
-			}
-			return s.get();
-		}
-		
-		static FBSDKLoginManager* getLoginManager()
-		{
-			_priv_FacebookSDK* sdk = get();
-			if (sdk) {
-				return sdk->loginManager;
-			}
-			return nil;
-		}
-		
-		static _priv_SLib_FacebookDelegate* getShareDelegate()
-		{
-			_priv_FacebookSDK* sdk = get();
-			if (sdk) {
-				return sdk->shareDelegate;
-			}
-			return nil;
-		}
-	};
-	
-	static void _priv_Facebook_getToken(OAuthAccessToken& _out, FBSDKAccessToken* _in)
-	{
-		_out.token = Apple::getStringFromNSString(_in.tokenString);
-		_out.expirationTime = Apple::getTimeFromNSDate(_in.expirationDate);
-		_out.refreshTime = Apple::getTimeFromNSDate(_in.refreshDate);
-		{
-			List<String> permissions;
-			if (_in.permissions != nil) {
-				for (id item in _in.permissions) {
-					NSString* s = (NSString*)item;
-					permissions.add_NoLock(Apple::getStringFromNSString(s));
-				}
-			}
-			_out.scopes = permissions;
-		}
-	}
-	
 	void FacebookSDK::_updateCurrentToken(Facebook* instance)
 	{
 		FBSDKAccessToken* token = [FBSDKAccessToken currentAccessToken];
 		if (token != nil) {
 			OAuthAccessToken oauthToken;
-			_priv_Facebook_getToken(oauthToken, token);
+			getToken(oauthToken, token);
 			instance->setAccessToken(oauthToken);
 		}
 	}
 	
 	void FacebookSDK::login(const FacebookLoginParam& param)
 	{
-		FBSDKLoginManager* manager = _priv_FacebookSDK::getLoginManager();
+		FBSDKLoginManager* manager = FacebookSDKContext::getLoginManager();
 		if (manager == nil) {
 			FacebookLoginResult result;
 			param.onComplete(result);
@@ -162,7 +171,7 @@ namespace slib
 			param.onComplete(result);
 			return;
 		}
-		auto func = ^(FBSDKLoginManagerLoginResult *result, NSError *error) {
+		[manager logInWithPermissions:array fromViewController:controller handler:^(FBSDKLoginManagerLoginResult *result, NSError *error) {
 			FacebookLoginResult login;
 			if (error != nil) {
 				NSString* message = [error localizedDescription];
@@ -182,14 +191,9 @@ namespace slib
 				return;
 			}
 			login.flagSuccess = sl_true;
-			_priv_Facebook_getToken(login.accessToken, token);
+			getToken(login.accessToken, token);
 			onComplete(login);
-		};
-		if (param.flagPublishPermissions) {
-			[manager logInWithPublishPermissions:array fromViewController:controller handler:func];
-		} else {
-			[manager logInWithReadPermissions:array fromViewController:controller handler:func];
-		}
+		}];
 	}
 	
 	void FacebookSDK::share(const FacebookShareParam& param)
@@ -199,7 +203,7 @@ namespace slib
 			param.onComplete(result);
 			return;
 		}
-		_priv_SLib_FacebookDelegate* delegate = _priv_FacebookSDK::getShareDelegate();
+		SLIBFacebookDelegate* delegate = FacebookSDKContext::getShareDelegate();
 		if (delegate == nil) {
 			FacebookShareResult result;
 			param.onComplete(result);
@@ -237,7 +241,7 @@ namespace slib
 	
 	void FacebookSDK::clearAccessToken()
 	{
-		FBSDKLoginManager* manager = _priv_FacebookSDK::getLoginManager();
+		FBSDKLoginManager* manager = FacebookSDKContext::getLoginManager();
 		if (manager == nil) {
 			[manager logOut];
 		}
@@ -245,7 +249,7 @@ namespace slib
 	
 }
 
-@implementation _priv_SLib_FacebookDelegate
+@implementation SLIBFacebookDelegate
 
 - (void)sharer:(id<FBSDKSharing>)sharer didCompleteWithResults:(NSDictionary *)results
 {

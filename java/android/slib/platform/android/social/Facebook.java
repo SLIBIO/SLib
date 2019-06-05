@@ -95,7 +95,7 @@ public class Facebook {
 		return null;
 	}
 
-	public static void login(Activity activity, boolean flagPublish, String scopes) {
+	public static void login(Activity activity, String scopes) {
 		try {
 			List<String> permissions;
 			if (scopes == null || scopes.isEmpty()) {
@@ -106,11 +106,7 @@ public class Facebook {
 				permissions = new ArrayList<String>();
 				Collections.addAll(permissions, scopes.split(","));
 			}
-			if (flagPublish) {
-				loginManager.logInWithPublishPermissions(activity, permissions);
-			} else {
-				loginManager.logInWithReadPermissions(activity, permissions);
-			}
+			loginManager.logIn(activity, permissions);
 		} catch (Exception e) {
 			Logger.exception(e);
 			nativeOnLoginResult(null, false);

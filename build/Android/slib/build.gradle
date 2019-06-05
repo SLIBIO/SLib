@@ -52,8 +52,8 @@ dependencies {
     implementation "com.google.android.gms:play-services-ads:17.2.0"
     implementation "com.google.firebase:firebase-messaging:17.6.0"
 
-    implementation "com.facebook.android:facebook-login:4.42.0"
-    implementation "com.facebook.android:facebook-share:4.42.0"
+    implementation "com.facebook.android:facebook-login:5.0.1"
+    implementation "com.facebook.android:facebook-share:5.0.1"
 }
 
 tasks.all { task ->

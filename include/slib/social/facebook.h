@@ -61,17 +61,7 @@ namespace slib
 	
 	typedef OAuthApiResult FacebookResult;
 	
-	class SLIB_EXPORT FacebookLoginParam : public OAuthLoginParam
-	{
-	public:
-		sl_bool flagPublishPermissions;
-
-	public:
-		FacebookLoginParam();
-		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FacebookLoginParam)
-		
-	};
+	typedef OAuthLoginParam FacebookLoginParam;
 	
 	class SLIB_EXPORT FacebookResolveUserUrlParam
 	{
@@ -150,10 +140,6 @@ namespace slib
 		static Ref<Facebook> getInstance();
 		
 	public:
-		void login(const FacebookLoginParam& param);
-		
-		void login(const Function<void(FacebookLoginResult& result)>& onComplete);
-		
 		static void resolveUserUrl(const FacebookResolveUserUrlParam& param);
 		
 		static void resolveUserUrl(const Function<void(const String& url)>& onComplete);
