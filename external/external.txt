@@ -19,7 +19,7 @@ FFmpeg 4.1.1
 	lame 3.100
 	openh264 8.1.0
 	kvazaar 1.2.0
-FacebookSDK(iOS) 4.39.1
+FacebookSDK(iOS) 5.0.1
 FacebookSDK(Android) 4.42.0
 libmysqlclient 8.0
 
