@@ -93,7 +93,7 @@ namespace slib
 				[handle setOpaque:(view->isOpaque() ? YES : NO)];
 				[handle setClearsContextBeforeDrawing: (view->isOpaque()? NO : YES)];
 				
-				if (!([handle isKindOfClass:[_priv_Slib_iOS_ViewHandle class]])) {
+				if (!([handle isKindOfClass:[SLIBViewHandle class]])) {
 					sl_real alpha = view->getAlpha();
 					if (alpha < 0.995f) {
 						[handle setAlpha: alpha];
@@ -585,11 +585,11 @@ namespace slib
 	Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_iOS_ViewHandle* handle;
+		SLIBViewHandle* handle;
 		if (IsInstanceOf<ScrollView>(getParent())) {
-			handle = [[_priv_Slib_iOS_ScrollContentViewHandle alloc] initWithFrame:frame];
+			handle = [[SLIBScrollContentViewHandle alloc] initWithFrame:frame];
 		} else {
-			handle = [[_priv_Slib_iOS_ViewHandle alloc] initWithFrame:frame];
+			handle = [[SLIBViewHandle alloc] initWithFrame:frame];
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -597,7 +597,7 @@ namespace slib
 	
 }
 
-@implementation _priv_Slib_iOS_ViewHandle
+@implementation SLIBViewHandle
 
 - (void)drawRect:(CGRect)dirtyRect
 {
@@ -632,15 +632,16 @@ IOS_VIEW_EVENTS
 
 @end
 
-@interface _priv_Slib_iOS_TiledLayer : CATiledLayer
+@interface SLIBViewTiledLayer : CATiledLayer
 {
 	@public sl_int32 m_updateId;
 }
 @end
 
-@implementation _priv_Slib_iOS_TiledLayer
+@implementation SLIBViewTiledLayer
 
-+(CFTimeInterval)fadeDuration {
++(CFTimeInterval)fadeDuration
+{
 	return 0.0;
 }
 
@@ -681,11 +682,11 @@ IOS_VIEW_EVENTS
 
 @end
 
-@implementation _priv_Slib_iOS_ScrollContentViewHandle
+@implementation SLIBScrollContentViewHandle
 
 +(Class)layerClass
 {
-	return _priv_Slib_iOS_TiledLayer.class;
+	return SLIBViewTiledLayer.class;
 }
 
 @end
@@ -791,16 +792,20 @@ namespace slib
 #endif
 
 
-@interface SLibEmptyViewController : UIViewController
+@interface SLIBEmptyViewController : UIViewController
 @end
 
-@implementation SLibEmptyViewController
-- (void)viewDidLoad {
+@implementation SLIBEmptyViewController
+
+- (void)viewDidLoad
+{
 	[super viewDidLoad];
 }
 
-- (void)didReceiveMemoryWarning {
+- (void)didReceiveMemoryWarning
+{
 	[super didReceiveMemoryWarning];
 }
+
 @end
 

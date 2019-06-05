@@ -34,7 +34,13 @@ namespace slib
 {
 	
 #if defined(SLIB_PLATFORM_IS_IOS)
-	UIInterfaceOrientation _g_slib_ui_screen_orientation = UIInterfaceOrientationPortrait;
+	namespace priv
+	{
+		namespace platform
+		{
+			UIInterfaceOrientation g_screenOrientation = UIInterfaceOrientationPortrait;
+		}
+	}
 #endif
 
 	NSString* Apple::getNSStringFromString(const String& str, NSString* def)
@@ -163,73 +169,81 @@ namespace slib
 		NSString *filePath = [[NSBundle mainBundle] pathForResource:strFileName ofType:strFileExtension inDirectory:strFolderPath];
 		return Apple::getStringFromNSString(filePath);
 	}
-
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicString, _g_system_version);
-	sl_uint32 _g_system_version_major = 0;
-	sl_uint32 _g_system_version_minor = 0;
-	sl_bool _g_system_flagInitVersion = sl_true;
-
-	void _priv_Apple_initSystemVersion()
+	
+	namespace priv
 	{
-		if (_g_system_flagInitVersion) {
+		namespace platform
+		{
+			
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicString, g_systemVersion);
+			sl_uint32 g_systemVersionMajor = 0;
+			sl_uint32 g_systemVersionMinor = 0;
+			sl_bool g_flagInitSystemVersion = sl_true;
+			
+			void initSystemVersion()
+			{
+				if (g_flagInitSystemVersion) {
 #if defined(SLIB_PLATFORM_IS_MACOS)
-			double v = NSAppKitVersionNumber;
-			if (v >= NSAppKitVersionNumber10_10) {
-				NSOperatingSystemVersion version = [[NSProcessInfo processInfo] operatingSystemVersion];
-				_g_system_version_major = (sl_uint32)(version.majorVersion);
-				_g_system_version_minor = (sl_uint32)(version.minorVersion);
-				_g_system_version = String::format("%d.%d", _g_system_version_major, _g_system_version_minor);
-			} else if (v >= NSAppKitVersionNumber10_9) {
-				_g_system_version = "10.9";
-				_g_system_version_major = 10;
-				_g_system_version_minor = 9;
-			} else if (v >= NSAppKitVersionNumber10_8) {
-				_g_system_version = "10.8";
-				_g_system_version_major = 10;
-				_g_system_version_minor = 8;
-			} else if (v >= NSAppKitVersionNumber10_7) {
-				_g_system_version = "10.7";
-				_g_system_version_major = 10;
-				_g_system_version_minor = 7;
-			} else if (v >= NSAppKitVersionNumber10_6) {
-				_g_system_version = "10.6";
-				_g_system_version_major = 10;
-				_g_system_version_minor = 6;
-			}
-#elif defined(SLIB_PLATFORM_IS_IOS)
-			NSString* _version = [[UIDevice currentDevice] systemVersion];
-			String version = Apple::getStringFromNSString(_version);
-			if (version.isNotEmpty()) {
-				ListLocker<String> list(version.split("."));
-				if (list.count > 0) {
-					_g_system_version_major = list[0].parseUint32();
-					if (list.count > 1) {
-						_g_system_version_minor = list[1].parseUint32();
+					double v = NSAppKitVersionNumber;
+					if (v >= NSAppKitVersionNumber10_10) {
+						NSOperatingSystemVersion version = [[NSProcessInfo processInfo] operatingSystemVersion];
+						g_systemVersionMajor = (sl_uint32)(version.majorVersion);
+						g_systemVersionMinor = (sl_uint32)(version.minorVersion);
+						g_systemVersion = String::format("%d.%d", g_systemVersionMajor, g_systemVersionMinor);
+					} else if (v >= NSAppKitVersionNumber10_9) {
+						g_systemVersion = "10.9";
+						g_systemVersionMajor = 10;
+						g_systemVersionMinor = 9;
+					} else if (v >= NSAppKitVersionNumber10_8) {
+						g_systemVersion = "10.8";
+						g_systemVersionMajor = 10;
+						g_systemVersionMinor = 8;
+					} else if (v >= NSAppKitVersionNumber10_7) {
+						g_systemVersion = "10.7";
+						g_systemVersionMajor = 10;
+						g_systemVersionMinor = 7;
+					} else if (v >= NSAppKitVersionNumber10_6) {
+						g_systemVersion = "10.6";
+						g_systemVersionMajor = 10;
+						g_systemVersionMinor = 6;
 					}
+#elif defined(SLIB_PLATFORM_IS_IOS)
+					NSString* _version = [[UIDevice currentDevice] systemVersion];
+					String version = Apple::getStringFromNSString(_version);
+					if (version.isNotEmpty()) {
+						ListLocker<String> list(version.split("."));
+						if (list.count > 0) {
+							g_systemVersionMajor = list[0].parseUint32();
+							if (list.count > 1) {
+								g_systemVersionMinor = list[1].parseUint32();
+							}
+						}
+					}
+					g_systemVersion = version;
+#endif
+					g_flagInitSystemVersion = sl_false;
 				}
 			}
-			_g_system_version = version;
-#endif
-			_g_system_flagInitVersion = sl_false;
 		}
 	}
 
+
 	String Apple::getSystemVersion()
 	{
-		_priv_Apple_initSystemVersion();
-		return _g_system_version;
+		priv::platform::initSystemVersion();
+		return priv::platform::g_systemVersion;
 	}
 
 	sl_uint32 Apple::getSystemMajorVersion()
 	{
-		_priv_Apple_initSystemVersion();
-		return _g_system_version_major;
+		priv::platform::initSystemVersion();
+		return priv::platform::g_systemVersionMajor;
 	}
 
 	sl_uint32 Apple::getSystemMinorVersion()
 	{
-		_priv_Apple_initSystemVersion();
-		return _g_system_version_minor;
+		priv::platform::initSystemVersion();
+		return priv::platform::g_systemVersionMinor;
 	}
 
 	String Apple::getMainBundlePath()

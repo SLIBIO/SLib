@@ -36,63 +36,99 @@
 #include "slib/core/safe_static.h"
 #include "slib/core/platform_apple.h"
 
-@interface _priv_Slib_iOS_AppDelegate : UIResponder <UIApplicationDelegate>
-@property (strong, nonatomic) UIWindow *window;
+@interface SLIBAppDelegate : UIResponder <UIApplicationDelegate>
+	@property (strong, nonatomic) UIWindow *window;
 @end
 
 namespace slib
 {
-	class _iOS_Screen : public Screen
+	
+	namespace priv
 	{
-	public:
-		UIScreen* m_screen;
-		
-	public:
-		static Ref<_iOS_Screen> create(UIScreen* screen)
+
+		namespace window
 		{
-			Ref<_iOS_Screen> ret;
-			if (screen != nil) {
-				ret = new _iOS_Screen();
-				if (ret.isNotNull()) {
-					ret->m_screen = screen;
+			void resetOrientation();
+		}
+
+		using namespace window;
+
+		namespace ui_core
+		{
+			
+			CGFloat g_fGlobalScaleFactor = 0;
+			
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void(NSDictionary*)>, g_callbackDidFinishLaunching);
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void(NSData*, NSError*)>, g_callbackDidRegisterForRemoteNotifications);
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void(NSDictionary*)>, g_callbackDidReceiveRemoteNotification);
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<BOOL(NSURL*, NSDictionary*)> >, g_callbackOpenURL);
+
+			class ScreenImpl : public Screen
+			{
+			public:
+				UIScreen* m_screen;
+				
+			public:
+				static Ref<ScreenImpl> create(UIScreen* screen)
+				{
+					Ref<ScreenImpl> ret;
+					if (screen != nil) {
+						ret = new ScreenImpl();
+						if (ret.isNotNull()) {
+							ret->m_screen = screen;
+						}
+					}
+					return ret;
 				}
+				
+				static UIScreen* getPrimaryScreen()
+				{
+					NSArray* arr = [UIScreen screens];
+					sl_size n = [arr count];
+					if (n == 0) {
+						return nil;
+					}
+					UIScreen* primary = [arr objectAtIndex:0];
+					return primary;
+				}
+				
+				UIRect getRegion() override
+				{
+					CGRect rect = [m_screen bounds];
+					CGFloat f = UIPlatform::getGlobalScaleFactor();
+					UIRect region;
+					region.left = (sl_ui_pos)(rect.origin.x * f);
+					region.top = (sl_ui_pos)(rect.origin.y * f);
+					region.setWidth((sl_ui_pos)(rect.size.width * f));
+					region.setHeight((sl_ui_pos)(rect.size.height * f));
+					return region;
+				}
+				
+			};
+			
+			static BOOL UIPlatform_onOpenUrl(NSURL* url, NSDictionary* options)
+			{
+				for (auto& callback : g_callbackOpenURL) {
+					if (callback(url, options)) {
+						return YES;
+					}
+				}
+				return MobileApp::dispatchOpenUrlToApp(Apple::getStringFromNSString(url.absoluteString));
 			}
-			return ret;
+			
 		}
-		
-		static UIScreen* getPrimaryScreen()
-		{
-			NSArray* arr = [UIScreen screens];
-			sl_size n = [arr count];
-			if (n == 0) {
-				return nil;
-			}
-			UIScreen* primary = [arr objectAtIndex:0];
-			return primary;
-		}
-		
-		UIRect getRegion() override
-		{
-			CGRect rect = [m_screen bounds];
-			CGFloat f = UIPlatform::getGlobalScaleFactor();
-			UIRect region;
-			region.left = (sl_ui_pos)(rect.origin.x * f);
-			region.top = (sl_ui_pos)(rect.origin.y * f);
-			region.setWidth((sl_ui_pos)(rect.size.width * f));
-			region.setHeight((sl_ui_pos)(rect.size.height * f));
-			return region;
-		}
-		
-	};
+	}
+	
+	using namespace priv::ui_core;
 	
 	Ref<Screen> UIPlatform::createScreen(UIScreen* screen)
 	{
-		return _iOS_Screen::create(screen);
+		return ScreenImpl::create(screen);
 	}
 	
 	UIScreen* UIPlatform::getScreenHandle(Screen* _screen)
 	{
-		_iOS_Screen* screen = (_iOS_Screen*)_screen;
+		ScreenImpl* screen = (ScreenImpl*)_screen;
 		if (screen) {
 			return screen->m_screen;
 		}
@@ -109,14 +145,14 @@ namespace slib
 		}
 		for (sl_size i = 0; i < n; i++) {
 			UIScreen* _screen = [arr objectAtIndex:i];
-			ret.add_NoLock(_iOS_Screen::create(_screen));
+			ret.add_NoLock(ScreenImpl::create(_screen));
 		}
 		return ret;
 	}
 	
 	Ref<Screen> UI::getPrimaryScreen()
 	{
-		UIScreen* screen = _iOS_Screen::getPrimaryScreen();
+		UIScreen* screen = ScreenImpl::getPrimaryScreen();
 		return UIPlatform::createScreen(screen);
 	}
 	
@@ -193,10 +229,10 @@ namespace slib
 	}
 	
 	void UIPlatform::runApp()
-	{
+	{		
 		char* args[] = {sl_null};
 		@autoreleasepool {
-			UIApplicationMain(0, args, nil, NSStringFromClass([_priv_Slib_iOS_AppDelegate class]));
+			UIApplicationMain(0, args, nil, NSStringFromClass([SLIBAppDelegate class]));
 		}
 	}
 	
@@ -206,7 +242,7 @@ namespace slib
 	
 	UIWindow* UIPlatform::getMainWindow()
 	{
-		_priv_Slib_iOS_AppDelegate* app = (_priv_Slib_iOS_AppDelegate*)([[UIApplication sharedApplication] delegate]);
+		SLIBAppDelegate* app = (SLIBAppDelegate*)([[UIApplication sharedApplication] delegate]);
 		if (app != nil) {
 			return app.window;
 		}
@@ -267,93 +303,76 @@ namespace slib
 		return nil;
 	}
 	
-	CGFloat _g_slib_ios_global_scale_factor = 0;
 	
 	CGFloat UIPlatform::getGlobalScaleFactor()
 	{
-		if (_g_slib_ios_global_scale_factor == 0) {
-			UIScreen* screen = _iOS_Screen::getPrimaryScreen();
+		if (g_fGlobalScaleFactor == 0) {
+			UIScreen* screen = ScreenImpl::getPrimaryScreen();
 			if (screen != nil) {
 				CGFloat f = screen.scale;
-				_g_slib_ios_global_scale_factor = f;
+				g_fGlobalScaleFactor = f;
 				return f;
 			} else {
 				return 1;
 			}
 		}
-		return _g_slib_ios_global_scale_factor;
+		return g_fGlobalScaleFactor;
 	}
 	
 	void UIPlatform::setGlobalScaleFactor(CGFloat factor)
 	{
-		_g_slib_ios_global_scale_factor = factor;
+		g_fGlobalScaleFactor = factor;
 	}
-	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void(NSDictionary*)>, _g_slib_ios_callback_didFinishLaunching);
 	
 	void UIPlatform::registerDidFinishLaunchingCallback(const Function<void(NSDictionary*)>& callback)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ios_callback_didFinishLaunching)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_callbackDidFinishLaunching)) {
 			return;
 		}
-		_g_slib_ios_callback_didFinishLaunching.add(callback);
+		g_callbackDidFinishLaunching.add(callback);
 	}
 	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void(NSData*, NSError*)>, _g_slib_ios_callback_didRegisterForRemoteNotifications);
 
 	void UIPlatform::registerDidRegisterForRemoteNotifications(const Function<void(NSData*, NSError*)>& callback)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ios_callback_didRegisterForRemoteNotifications)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_callbackDidRegisterForRemoteNotifications)) {
 			return;
 		}
-		_g_slib_ios_callback_didRegisterForRemoteNotifications.add(callback);
+		g_callbackDidRegisterForRemoteNotifications.add(callback);
 	}
-
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void(NSDictionary*)>, _g_slib_ios_callback_didReceiveRemoteNotification);
 	
 	void UIPlatform::registerDidReceiveRemoteNotificationCallback(const Function<void(NSDictionary*)>& callback)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ios_callback_didReceiveRemoteNotification)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_callbackDidReceiveRemoteNotification)) {
 			return;
 		}
-		_g_slib_ios_callback_didReceiveRemoteNotification.add(callback);
+		g_callbackDidReceiveRemoteNotification.add(callback);
 	}
-	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicList< Function<BOOL(NSURL*, NSDictionary*)> >, _g_slib_ios_callbacks_openURL);
 	
 	void UIPlatform::registerOpenUrlCallback(const Function<BOOL(NSURL*, NSDictionary*)>& callback)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_slib_ios_callbacks_openURL)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_callbackOpenURL)) {
 			return;
 		}
-		_g_slib_ios_callbacks_openURL.add(callback);
+		g_callbackOpenURL.add(callback);
 	}
 	
-	static BOOL _priv_UIPlatform_onOpenUrl(NSURL* url, NSDictionary* options)
-	{
-		for (auto& callback : _g_slib_ios_callbacks_openURL) {
-			if (callback(url, options)) {
-				return YES;
-			}
-		}
-		return MobileApp::dispatchOpenUrlToApp(Apple::getStringFromNSString(url.absoluteString));
-	}
-
-	void _priv_slib_ui_reset_orienation();
-
 }
 
-@implementation _priv_Slib_iOS_AppDelegate
+using namespace slib::priv::ui_core;
+using namespace slib::priv::window;
+
+@implementation SLIBAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	
 	slib::Log("App", "Finished Launching");
 	
-	slib::_priv_slib_ui_reset_orienation();
+	resetOrientation();
 	
 	slib::UIApp::dispatchStartToApp();
 	
-	slib::_g_slib_ios_callback_didFinishLaunching(launchOptions);
+	g_callbackDidFinishLaunching(launchOptions);
 	
 	slib::MobileApp::dispatchCreateActivityToApp();
 	
@@ -382,7 +401,7 @@ namespace slib
 	
 	slib::Log("App", "Enter Foreground");
 
-	slib::_priv_slib_ui_reset_orienation();
+	resetOrientation();
 
 }
 
@@ -391,7 +410,7 @@ namespace slib
 
 	slib::Log("App", "Become Active");
 
-	slib::_priv_slib_ui_reset_orienation();
+	resetOrientation();
 	
 	slib::MobileApp::dispatchResumeToApp();
 }
@@ -433,29 +452,29 @@ namespace slib
 }
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-	slib::_g_slib_ios_callback_didRegisterForRemoteNotifications(deviceToken, nil);
+	g_callbackDidRegisterForRemoteNotifications(deviceToken, nil);
 }
 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
 {
-	slib::_g_slib_ios_callback_didRegisterForRemoteNotifications(nil, error);
+	g_callbackDidRegisterForRemoteNotifications(nil, error);
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
 	
-	slib::_g_slib_ios_callback_didReceiveRemoteNotification(userInfo);
+	g_callbackDidReceiveRemoteNotification(userInfo);
 	completionHandler(UIBackgroundFetchResultNewData);
 }
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url options:(NSDictionary *)options {
-	return slib::_priv_UIPlatform_onOpenUrl(url, options);
+	return UIPlatform_onOpenUrl(url, options);
 }
 
 - (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler
 {
 	if ([userActivity.activityType isEqualToString:NSUserActivityTypeBrowsingWeb]) {
 		NSURL* url = userActivity.webpageURL;
-		return slib::_priv_UIPlatform_onOpenUrl(url, @{});
+		return UIPlatform_onOpenUrl(url, @{});
 	}
 	return NO;
 }

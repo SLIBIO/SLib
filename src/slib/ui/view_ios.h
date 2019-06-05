@@ -108,16 +108,15 @@ namespace slib
 	
 }
 
-@interface _priv_Slib_iOS_ViewHandle : UIView {
-
+@interface SLIBViewHandle : UIView
+{
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
-
 }
 
 @end
 
-@interface _priv_Slib_iOS_ScrollContentViewHandle : _priv_Slib_iOS_ViewHandle {
-		
+@interface SLIBScrollContentViewHandle : SLIBViewHandle
+{
 }
 
 @end
