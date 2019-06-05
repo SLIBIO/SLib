@@ -21,7 +21,7 @@
  */
 
 #include "ui_text_ios.h"
-
+/*
 @interface _priv_Slib_iOS_TextInput : UIResponder<UITextInput>
 {
 	@public slib::Ref<slib::TextInput> m_textInput;
@@ -213,3 +213,4 @@ namespace slib
 @synthesize markedTextStyle;
 
 @end
+*/
