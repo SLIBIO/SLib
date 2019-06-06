@@ -35,22 +35,28 @@
 namespace slib
 {
 	
-	SLIB_INLINE static sl_bool _priv_SpinLock_tryLock(const sl_int32* lock)
+	namespace priv
 	{
+		namespace spinlock
+		{
+			SLIB_INLINE static sl_bool tryLock(const sl_int32* lock)
+			{
 #if defined(USE_CPP_ATOMIC)
-		std::atomic_flag* p = (std::atomic_flag*)(lock);
-		return p->test_and_set(std::memory_order_acquire);
+				std::atomic_flag* p = (std::atomic_flag*)(lock);
+				return p->test_and_set(std::memory_order_acquire);
 #else
-		bool* p = (bool*)(lock);
-		// __atomic_test_and_set equals __atomic_exchange(p, true, mem_order)
-		return !(__atomic_test_and_set(p, __ATOMIC_ACQUIRE));
+				bool* p = (bool*)(lock);
+				// __atomic_test_and_set equals __atomic_exchange(p, true, mem_order)
+				return !(__atomic_test_and_set(p, __ATOMIC_ACQUIRE));
 #endif
+			}
+		}
 	}
 
 	void SpinLock::lock() const noexcept
 	{
 		sl_uint32 count = 0;
-		while (!(_priv_SpinLock_tryLock(&m_flagLock))) {
+		while (!(priv::spinlock::tryLock(&m_flagLock))) {
 			System::yield(count);
 			count++;
 		}
@@ -58,7 +64,7 @@ namespace slib
 
 	sl_bool SpinLock::tryLock() const noexcept
 	{
-		return _priv_SpinLock_tryLock(&m_flagLock);
+		return priv::spinlock::tryLock(&m_flagLock);
 	}
 
 	void SpinLock::unlock() const noexcept
@@ -148,6 +154,8 @@ namespace slib
 	template class SpinLockPool<-10>;
 
 	template class SpinLockPool<-11>;
+
+	template class SpinLockPool<-12>;
 
 	template class SpinLockPool<-20>;
 

@@ -195,7 +195,7 @@ public: \
 	SLIB_INLINE WRAPPER(WRAPPER&& other) noexcept : ref(Move(other.ref)) {} \
 	WRAPPER(const Atomic<WRAPPER>& other) noexcept : ref(*(reinterpret_cast<const AtomicRef<__VA_ARGS__>*>(&other))) {} \
 	WRAPPER(Atomic<WRAPPER>&& other) noexcept : ref(Move(*(reinterpret_cast<AtomicRef<__VA_ARGS__>*>(&other)))) {} \
-	SLIB_INLINE static const WRAPPER& null() noexcept { return *(reinterpret_cast<WRAPPER const*>(&_priv_Ref_Null)); } \
+	SLIB_INLINE static const WRAPPER& null() noexcept { return *(reinterpret_cast<WRAPPER const*>(&(priv::ref::g_null))); } \
 	SLIB_INLINE sl_bool isNull() const noexcept { return ref.isNull(); } \
 	SLIB_INLINE sl_bool isNotNull() const noexcept { return ref.isNotNull(); } \
 	void setNull() noexcept { ref.setNull(); } \

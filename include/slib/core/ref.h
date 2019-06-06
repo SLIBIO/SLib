@@ -29,10 +29,6 @@
 #include "atomic.h"
 #include "macro.h"
 
-#ifdef SLIB_DEBUG
-#define SLIB_DEBUG_REFERENCE
-#endif
-
 typedef const void* sl_object_type;
 
 namespace slib
@@ -88,16 +84,8 @@ namespace slib
 		Referable& operator=(Referable&& other);
 
 	private:
-		sl_reg m_signature;
-#if defined(SLIB_DEBUG_REFERENCE)
-		void _checkValid() noexcept;
-#endif
-
-	private:
 		sl_reg m_nRefCount;
-		sl_bool m_flagWeakRef;
 		CWeakRef* m_weak;
-		SpinLock m_lockWeak;
 
 		friend class CWeakRef;
 		

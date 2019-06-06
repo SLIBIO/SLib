@@ -23,13 +23,15 @@
 namespace slib
 {
 
-	SLIB_INLINE sl_bool Referable::_isWeakRef() const noexcept
+	namespace priv
 	{
-		return m_flagWeakRef;
-	}
+		namespace ref
+		{
+			struct ConstStruct;
 
-	struct _priv_Ref_Const;
-	extern const _priv_Ref_Const _priv_Ref_Null;
+			extern const ConstStruct g_null;
+		}
+	}
 
 	template <class T>
 	SLIB_INLINE Ref<T> New() noexcept
@@ -239,7 +241,7 @@ namespace slib
 	template <class T>
 	SLIB_INLINE const Ref<T>& Ref<T>::null() noexcept
 	{
-		return *(reinterpret_cast<Ref<T> const*>(&_priv_Ref_Null));
+		return *(reinterpret_cast<Ref<T> const*>(&(priv::ref::g_null)));
 	}
 	
 	template <class T>
@@ -726,7 +728,7 @@ namespace slib
 	template <class T>
 	SLIB_INLINE const AtomicRef<T>& Atomic< Ref<T> >::null() noexcept
 	{
-		return *(reinterpret_cast<AtomicRef<T> const*>(&_priv_Ref_Null));
+		return *(reinterpret_cast<AtomicRef<T> const*>(&(priv::ref::g_null)));
 	}
 	
 	template <class T>
@@ -1181,7 +1183,7 @@ namespace slib
 	template <class T>
 	SLIB_INLINE const WeakRef<T>& WeakRef<T>::null() noexcept
 	{
-		return *(reinterpret_cast<WeakRef<T> const*>(&_priv_Ref_Null));
+		return *(reinterpret_cast<WeakRef<T> const*>(&(priv::ref::g_null)));
 	}
 	
 	template <class T>
@@ -1532,7 +1534,7 @@ namespace slib
 	template <class T>
 	SLIB_INLINE const AtomicWeakRef<T>& Atomic< WeakRef<T> >::null() noexcept
 	{
-		return *(reinterpret_cast<AtomicWeakRef<T> const*>(&_priv_Ref_Null));
+		return *(reinterpret_cast<AtomicWeakRef<T> const*>(&(priv::ref::g_null)));
 	}
 
 	template <class T>

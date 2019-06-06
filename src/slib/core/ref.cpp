@@ -27,44 +27,33 @@
 namespace slib
 {
 
-	struct _priv_Ref_Const
+	namespace priv
 	{
-		void* ptr;
-		sl_int32 lock;
-	};
+		namespace ref
+		{
+			struct ConstStruct
+			{
+				void* ptr;
+				sl_int32 lock;
+			};
 
-	const _priv_Ref_Const _priv_Ref_Null = {0, 0};
+			const ConstStruct g_null = {0, 0};
+		}
+	}
 
 	Referable::Referable() noexcept
+	 : m_nRefCount(0), m_weak(sl_null)
 	{
-#ifdef SLIB_DEBUG_REFERENCE
-		m_signature = PRIV_SIGNATURE;
-#else
-		SLIB_UNUSED(m_signature);
-#endif
-		m_nRefCount = 0;
-		m_flagWeakRef = sl_false;
-		m_weak = sl_null;
 	}
 
 	Referable::Referable(const Referable& other) noexcept
+	 : m_nRefCount(0), m_weak(sl_null)
 	{
-#ifdef SLIB_DEBUG_REFERENCE
-		m_signature = PRIV_SIGNATURE;
-#endif
-		m_nRefCount = 0;
-		m_flagWeakRef = sl_false;
-		m_weak = sl_null;
 	}
 	
 	Referable::Referable(Referable&& other) noexcept
+	 : m_nRefCount(0), m_weak(sl_null)
 	{
-#ifdef SLIB_DEBUG_REFERENCE
-		m_signature = PRIV_SIGNATURE;
-#endif
-		m_nRefCount = 0;
-		m_flagWeakRef = sl_false;
-		m_weak = sl_null;
 	}
 
 	Referable::~Referable()
@@ -74,9 +63,6 @@ namespace slib
 
 	sl_reg Referable::increaseReference() noexcept
 	{
-#ifdef SLIB_DEBUG_REFERENCE
-		_checkValid();
-#endif
 		sl_reg nRefCountOld = m_nRefCount;
 		sl_reg nRefCountNew = Base::interlockedIncrement(&m_nRefCount);
 		if (!nRefCountOld) {
@@ -87,9 +73,6 @@ namespace slib
 
 	sl_reg Referable::decreaseReference() noexcept
 	{
-#ifdef SLIB_DEBUG_REFERENCE
-		_checkValid();
-#endif
 		sl_reg nRef = Base::interlockedDecrement(&m_nRefCount);
 		if (nRef == 0) {
 			_free();
@@ -105,9 +88,6 @@ namespace slib
 	sl_reg Referable::decreaseReferenceNoFree() noexcept
 	{
 		if (m_nRefCount > 0) {
-#ifdef SLIB_DEBUG_REFERENCE
-			_checkValid();
-#endif
 			return Base::interlockedDecrement(&m_nRefCount);
 		}
 		return 1;
@@ -136,11 +116,20 @@ namespace slib
 	{
 		return sl_false;
 	}
+	
+	sl_bool Referable::_isWeakRef() const noexcept
+	{
+		static CWeakRef weak;
+		return *((sl_size*)(void*)this) == *((sl_size*)(void*)&weak);
+	}
 
 	CWeakRef* Referable::_getWeakObject() noexcept
 	{
-		SpinLocker lock(&m_lockWeak);
-		if (! m_weak) {
+		if (m_weak) {
+			return m_weak;
+		}
+		SpinLocker lock(SpinLockPoolForWeakRef::get(this));
+		if (!m_weak) {
 			m_weak = CWeakRef::create(this);
 		}
 		return m_weak;
@@ -159,15 +148,6 @@ namespace slib
 		_clearWeak();
 		delete this;
 	}
-
-#ifdef SLIB_DEBUG_REFERENCE
-	void Referable::_checkValid() noexcept
-	{
-		if (m_signature != PRIV_SIGNATURE) {
-			SLIB_ABORT("Not-Referable object is referenced");
-		}
-	}
-#endif
 	
 	Referable& Referable::operator=(const Referable& other)
 	{
@@ -185,7 +165,6 @@ namespace slib
 	CWeakRef::CWeakRef() noexcept
 	{
 		m_object = sl_null;
-		m_flagWeakRef = sl_true;
 	}
 
 	CWeakRef::~CWeakRef() noexcept
