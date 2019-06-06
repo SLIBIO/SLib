@@ -57,10 +57,18 @@ namespace slib
 
 		Memory toUncompressedFormat(const EllipticCurve& curve) const;
 		
-		Memory toUncompressedFormat(sl_size nBytesPerComponent) const;
+		Memory toUncompressedFormat(sl_size nBytesPerComponent = 0) const;
 		
 		void parseUncompressedFormat(const void* buf, sl_size n);
 		
+		String toUncompressedFormatString(const EllipticCurve& curve) const;
+		
+		String toUncompressedFormatString(sl_size nBytesPerComponent = 0) const;
+		
+		void parseUncompressedFormatString(const sl_char8* sz, sl_size n);
+		
+		void parseUncompressedFormatString(const String& str);
+
 	};
 	
 	class SLIB_EXPORT EllipticCurve

@@ -24,6 +24,7 @@
 
 #include "slib/crypto/sha2.h"
 
+#include "slib/core/string_buffer.h"
 #include "slib/core/safe_static.h"
 
 #include "ecc_secp256k1.inc"
@@ -52,6 +53,9 @@ namespace slib
 		if (isO()) {
 			sl_uint8 c = 0;
 			return Memory::create(&c, 1);
+		}
+		if (!nBytesPerComponent) {
+			nBytesPerComponent = Math::max(x.getMostSignificantBytes(), y.getMostSignificantBytes());
 		}
 		Memory ret = Memory::create((nBytesPerComponent << 1) + 1);
 		if (ret.isNotNull()) {
@@ -88,6 +92,60 @@ namespace slib
 		y.setNull();
 	}
 	
+	String ECPoint::toUncompressedFormatString(const EllipticCurve& curve) const
+	{
+		return toUncompressedFormatString(curve.n.getMostSignificantBytes());
+	}
+	
+	String ECPoint::toUncompressedFormatString(sl_size nBytesPerComponent) const
+	{
+		if (isO()) {
+			SLIB_RETURN_STRING("00");
+		}
+		if (!nBytesPerComponent) {
+			nBytesPerComponent = Math::max(x.getMostSignificantBytes(), y.getMostSignificantBytes());
+		}
+		SLIB_SCOPED_BUFFER(sl_uint8, 1024, buf, nBytesPerComponent);
+		if (buf) {
+			StringBuffer sb;
+			sb.addStatic("04", 2);
+			if (x.getBytesBE(buf, nBytesPerComponent)) {
+				sb.add(String::makeHexString(buf, nBytesPerComponent, sl_false));
+				if (y.getBytesBE(buf, nBytesPerComponent)) {
+					sb.add(String::makeHexString(buf, nBytesPerComponent, sl_false));
+					return sb.merge();
+				}
+			}
+		}
+		return sl_null;
+	}
+	
+	void ECPoint::parseUncompressedFormatString(const sl_char8* sz, sl_size n)
+	{
+		if (n && !(n & 1)) {
+			if (sz[0] == '0' && sz[1] == '4') {
+				sl_size m = (n - 2) >> 1;
+				if (!(m & 1)) {
+					BigInt _x = BigInt::fromHexString(sz + 2, m);
+					if (_x.isNotNull()) {
+						y = BigInt::fromHexString(sz + (2 + m), m);
+						if (y.isNotNull()) {
+							x = _x;
+							return;
+						}
+					}
+				}
+			}
+		}
+		x.setNull();
+		y.setNull();
+	}
+	
+	void ECPoint::parseUncompressedFormatString(const String& str)
+	{
+		parseUncompressedFormatString(str.getData(), str.getLength());
+	}
+
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(EllipticCurve)
 
