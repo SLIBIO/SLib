@@ -910,99 +910,7 @@ namespace slib
 		}
 		return sl_null;
 	}
-
-	CBigInt* CBigInt::fromString(const String& s, sl_uint32 radix) noexcept
-	{
-		CBigInt* ret = new CBigInt;
-		if (ret) {
-			ret->parse(s, radix);
-		}
-		return ret;
-	}
-
-	String CBigInt::toString(sl_uint32 radix) const noexcept
-	{
-		if (radix < 2 || radix > 64) {
-			return sl_null;
-		}
-		sl_size nb = getMostSignificantBits();
-		if (nb == 0) {
-			SLIB_RETURN_STRING("0");
-		}
-		if (radix == 16) {
-			sl_size nh = (nb + 3) >> 2;
-			sl_size ns;
-			if (sign < 0) {
-				ns = nh + 1;
-			} else {
-				ns = nh;
-			}
-			String ret = String::allocate(ns);
-			if (ret.isNotNull()) {
-				sl_char8* buf = ret.getData();
-				if (sign < 0) {
-					buf[0] = '-';
-					buf++;
-				}
-				sl_size ih = nh - 1;
-				for (sl_size i = 0; i < nh; i++) {
-					sl_size ie = ih >> 3;
-					sl_uint32 ib = (sl_uint32)((ih << 2) & 31);
-					sl_uint32 vh = (sl_uint32)((elements[ie] >> ib) & 15);
-					if (vh < 10) {
-						buf[i] = (sl_char8)(vh + 0x30);
-					} else {
-						buf[i] = (sl_char8)(vh + 0x37);
-					}
-					ih--;
-				}
-			}
-			return ret;
-		} else {
-			sl_size ne = (nb + 31) >> 5;
-			sl_size n = (sl_size)(Math::ceil((nb + 1) / Math::log2((double)radix))) + 1;
-			SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, a, ne);
-			if (!a) {
-				return sl_null;
-			}
-			SLIB_SCOPED_BUFFER(sl_char8, STACK_BUFFER_SIZE, s, n + 2);
-			if (!s) {
-				return sl_null;
-			}
-			s = s + n;
-			s[1] = 0;
-			Base::copyMemory(a, elements, ne * 4);
-			sl_size l = 0;
-			for (; ne > 0;) {
-				sl_uint32 v = priv::bigint::div_uint32(a, a, ne, radix, 0);
-				ne = priv::bigint::mse(a, ne);
-				if (v < radix) {
-					*s = priv::string::g_conv_radixPatternUpper[v];
-				} else {
-					*s = '?';
-				}
-				s--;
-				l++;
-			}
-			if (sign < 0) {
-				*s = '-';
-				s--;
-				l++;
-			}
-			return String(s + 1, l);
-		}
-	}
-
-	CBigInt* CBigInt::fromHexString(const String& str) noexcept
-	{
-		return fromString(str, 16);
-	}
-
-	String CBigInt::toHexString() const noexcept
-	{
-		return toString(16);
-	}
-
+	
 	namespace priv
 	{
 		namespace bigint
@@ -1103,6 +1011,123 @@ namespace slib
 	sl_reg IntParser<CBigInt, sl_char16>::parse(CBigInt* _out, sl_uint32 radix, const sl_char16 *sz, sl_size posBegin, sl_size len) noexcept
 	{
 		return priv::bigint::parseString(_out, sz, posBegin, len, radix);
+	}
+	
+	CBigInt* CBigInt::fromString(sl_uint32 radix, const sl_char8* sz, sl_size len) noexcept
+	{
+		if (sz && len) {
+			CBigInt* ret = new CBigInt;
+			if (ret) {
+				if (priv::bigint::parseString(ret, sz, 0, len, radix) == len) {
+					return ret;
+				}
+				delete ret;
+			}
+		}
+		return sl_null;
+	}
+	
+	CBigInt* CBigInt::fromString(sl_uint32 radix, const String& str) noexcept
+	{
+		return fromString(radix, str.getData(), str.getLength());
+	}
+	
+	CBigInt* CBigInt::fromString(const sl_char8* sz, sl_size len) noexcept
+	{
+		return fromString(10, sz, len);
+	}
+	
+	CBigInt* CBigInt::fromString(const String& str) noexcept
+	{
+		return fromString(10, str.getData(), str.getLength());
+	}
+	
+	String CBigInt::toString(sl_uint32 radix) const noexcept
+	{
+		if (radix < 2 || radix > 64) {
+			return sl_null;
+		}
+		sl_size nb = getMostSignificantBits();
+		if (nb == 0) {
+			SLIB_RETURN_STRING("0");
+		}
+		if (radix == 16) {
+			sl_size nh = (nb + 3) >> 2;
+			sl_size ns;
+			if (sign < 0) {
+				ns = nh + 1;
+			} else {
+				ns = nh;
+			}
+			String ret = String::allocate(ns);
+			if (ret.isNotNull()) {
+				sl_char8* buf = ret.getData();
+				if (sign < 0) {
+					buf[0] = '-';
+					buf++;
+				}
+				sl_size ih = nh - 1;
+				for (sl_size i = 0; i < nh; i++) {
+					sl_size ie = ih >> 3;
+					sl_uint32 ib = (sl_uint32)((ih << 2) & 31);
+					sl_uint32 vh = (sl_uint32)((elements[ie] >> ib) & 15);
+					if (vh < 10) {
+						buf[i] = (sl_char8)(vh + 0x30);
+					} else {
+						buf[i] = (sl_char8)(vh + 0x37);
+					}
+					ih--;
+				}
+			}
+			return ret;
+		} else {
+			sl_size ne = (nb + 31) >> 5;
+			sl_size n = (sl_size)(Math::ceil((nb + 1) / Math::log2((double)radix))) + 1;
+			SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, a, ne);
+			if (!a) {
+				return sl_null;
+			}
+			SLIB_SCOPED_BUFFER(sl_char8, STACK_BUFFER_SIZE, s, n + 2);
+			if (!s) {
+				return sl_null;
+			}
+			s = s + n;
+			s[1] = 0;
+			Base::copyMemory(a, elements, ne * 4);
+			sl_size l = 0;
+			for (; ne > 0;) {
+				sl_uint32 v = priv::bigint::div_uint32(a, a, ne, radix, 0);
+				ne = priv::bigint::mse(a, ne);
+				if (v < radix) {
+					*s = priv::string::g_conv_radixPatternUpper[v];
+				} else {
+					*s = '?';
+				}
+				s--;
+				l++;
+			}
+			if (sign < 0) {
+				*s = '-';
+				s--;
+				l++;
+			}
+			return String(s + 1, l);
+		}
+	}
+	
+	CBigInt* CBigInt::fromHexString(const sl_char8* sz, sl_size len) noexcept
+	{
+		return fromString(16, sz, len);
+	}
+
+	CBigInt* CBigInt::fromHexString(const String& str) noexcept
+	{
+		return fromString(16, str);
+	}
+	
+	String CBigInt::toHexString() const noexcept
+	{
+		return toString(16);
 	}
 
 	sl_bool CBigInt::equals(const CBigInt& other) const noexcept
@@ -2893,14 +2918,34 @@ namespace slib
 		return CBigInt::fromBytesBE(mem.getData(), mem.getSize());
 	}
 
-	BigInt BigInt::fromString(const String& str, sl_uint32 radix) noexcept
+	BigInt BigInt::fromString(sl_uint32 radix, const sl_char8* sz, sl_size len) noexcept
 	{
-		return CBigInt::fromString(str, radix);
+		return CBigInt::fromString(radix, sz, len);
 	}
 
+	BigInt BigInt::fromString(sl_uint32 radix, const String& str) noexcept
+	{
+		return CBigInt::fromString(radix, str);
+	}
+
+	BigInt BigInt::fromString(const sl_char8* sz, sl_size len) noexcept
+	{
+		return CBigInt::fromString(sz, len);
+	}
+	
+	BigInt BigInt::fromString(const String& str) noexcept
+	{
+		return CBigInt::fromString(str);
+	}
+
+	BigInt BigInt::fromHexString(const sl_char8* sz, sl_size len) noexcept
+	{
+		return CBigInt::fromHexString(sz, len);
+	}
+	
 	BigInt BigInt::fromHexString(const String& str) noexcept
 	{
-		return CBigInt::fromString(str, 16);
+		return CBigInt::fromHexString(str);
 	}
 
 	CBigInt& BigInt::instance() const noexcept

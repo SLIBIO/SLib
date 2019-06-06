@@ -153,9 +153,17 @@ namespace slib
 
 		static CBigInt* fromUint64(sl_uint64 v) noexcept;
 
-		static CBigInt* fromString(const String& str, sl_uint32 radix = 10) noexcept;
+		static CBigInt* fromString(sl_uint32 radix, const sl_char8* sz, sl_size len) noexcept;
+
+		static CBigInt* fromString(sl_uint32 radix, const String& str) noexcept;
+		
+		static CBigInt* fromString(const sl_char8* sz, sl_size len) noexcept;
+		
+		static CBigInt* fromString(const String& str) noexcept;
 
 		String toString(sl_uint32 radix = 10) const noexcept;
+
+		static CBigInt* fromHexString(const sl_char8* sz, sl_size len) noexcept;
 
 		static CBigInt* fromHexString(const String& str) noexcept;
 
@@ -500,8 +508,16 @@ namespace slib
 
 		static BigInt fromBytesBE(const Memory& mem) noexcept;
 
-		static BigInt fromString(const String& str, sl_uint32 radix = 10) noexcept;
+		static BigInt fromString(sl_uint32 radix, const sl_char8* sz, sl_size len) noexcept;
+		
+		static BigInt fromString(sl_uint32 radix, const String& str) noexcept;
 
+		static BigInt fromString(const sl_char8* sz, sl_size len) noexcept;
+		
+		static BigInt fromString(const String& str) noexcept;
+
+		static BigInt fromHexString(const sl_char8* sz, sl_size len) noexcept;
+		
 		static BigInt fromHexString(const String& str) noexcept;
 
 		CBigInt& instance() const noexcept;
