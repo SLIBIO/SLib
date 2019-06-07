@@ -65,9 +65,9 @@ namespace slib
 		
 		String toUncompressedFormatString(sl_size nBytesPerComponent = 0) const;
 		
-		void parseUncompressedFormatString(const sl_char8* sz, sl_size n);
+		sl_bool parseUncompressedFormatString(const sl_char8* sz, sl_size n);
 		
-		void parseUncompressedFormatString(const String& str);
+		sl_bool parseUncompressedFormatString(const String& str);
 
 	};
 	

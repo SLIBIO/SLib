@@ -120,7 +120,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	void ECPoint::parseUncompressedFormatString(const sl_char8* sz, sl_size n)
+	sl_bool ECPoint::parseUncompressedFormatString(const sl_char8* sz, sl_size n)
 	{
 		if (n && !(n & 1)) {
 			if (sz[0] == '0' && sz[1] == '4') {
@@ -128,22 +128,22 @@ namespace slib
 				if (!(m & 1)) {
 					BigInt _x = BigInt::fromHexString(sz + 2, m);
 					if (_x.isNotNull()) {
-						y = BigInt::fromHexString(sz + (2 + m), m);
-						if (y.isNotNull()) {
-							x = _x;
-							return;
+						BigInt _y = BigInt::fromHexString(sz + (2 + m), m);
+						if (_y.isNotNull()) {
+							x = Move(_x);
+							y = Move(_y);
+							return sl_true;
 						}
 					}
 				}
 			}
 		}
-		x.setNull();
-		y.setNull();
+		return sl_false;
 	}
 	
-	void ECPoint::parseUncompressedFormatString(const String& str)
+	sl_bool ECPoint::parseUncompressedFormatString(const String& str)
 	{
-		parseUncompressedFormatString(str.getData(), str.getLength());
+		return parseUncompressedFormatString(str.getData(), str.getLength());
 	}
 
 	
