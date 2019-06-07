@@ -70,7 +70,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	void ECPoint::parseUncompressedFormat(const void* _buf, sl_size size)
+	sl_bool ECPoint::parseUncompressedFormat(const void* _buf, sl_size size)
 	{
 		const sl_uint8* buf = (const sl_uint8*)_buf;
 		if (size) {
@@ -78,18 +78,19 @@ namespace slib
 				size--;
 				if (!(size & 1)) {
 					size >>= 1;
-					x = BigInt::fromBytesBE(buf + 1, size);
-					if (x.isNotZero()) {
-						y = BigInt::fromBytesBE(buf + 1 + size, size);
-					} else {
-						y.setNull();
+					BigInt _x = BigInt::fromBytesBE(buf + 1, size);
+					if (_x.isNotNull()) {
+						BigInt _y = BigInt::fromBytesBE(buf + 1 + size, size);
+						if (_y.isNotNull()) {
+							x = Move(_x);
+							y = Move(_y);
+							return sl_true;
+						}
 					}
-					return;
 				}
 			}
 		}
-		x.setNull();
-		y.setNull();
+		return sl_false;
 	}
 	
 	String ECPoint::toUncompressedFormatString(const EllipticCurve& curve) const

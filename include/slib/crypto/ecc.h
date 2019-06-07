@@ -59,7 +59,7 @@ namespace slib
 		
 		Memory toUncompressedFormat(sl_size nBytesPerComponent = 0) const;
 		
-		void parseUncompressedFormat(const void* buf, sl_size n);
+		sl_bool parseUncompressedFormat(const void* buf, sl_size n);
 		
 		String toUncompressedFormatString(const EllipticCurve& curve) const;
 		
