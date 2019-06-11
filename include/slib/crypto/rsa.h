@@ -50,11 +50,9 @@ namespace slib
 
 	};
 	
-	class SLIB_EXPORT RSAPrivateKey
+	class SLIB_EXPORT RSAPrivateKey : public RSAPublicKey
 	{
 	public:
-		BigInt N; // modulus
-		BigInt E; // public exponent
 		BigInt D; // private exponent
 		BigInt P; // prime 1
 		BigInt Q; // prime 2
@@ -71,8 +69,6 @@ namespace slib
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(RSAPrivateKey)
 
 	public:
-		sl_uint32 getLength() const;
-		
 		void generate(sl_uint32 nBits);
 
 		sl_bool generateFromPrimes(sl_uint32 nBits);

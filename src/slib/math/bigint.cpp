@@ -911,6 +911,55 @@ namespace slib
 		return sl_null;
 	}
 	
+	sl_int32 CBigInt::getInt32() const noexcept
+	{
+		if (length) {
+			sl_int32 v = elements[0] & 0x7FFFFFFF;
+			if (sign > 0) {
+				return v;
+			} else {
+				return -v;
+			}
+		}
+		return 0;
+	}
+	
+	sl_uint32 CBigInt::getUint32() const noexcept
+	{
+		if (length) {
+			return elements[0];
+		}
+		return 0;
+	}
+	
+	sl_int64 CBigInt::getInt64() const noexcept
+	{
+		if (length) {
+			sl_int64 v = elements[0];
+			if (length > 1) {
+				v |= (elements[1] & 0x7FFFFFFF);
+			}
+			if (sign > 0) {
+				return v;
+			} else {
+				return -v;
+			}
+		}
+		return 0;
+	}
+	
+	sl_uint64 CBigInt::getUint64() const noexcept
+	{
+		if (length) {
+			sl_uint64 v = elements[0];
+			if (length > 1) {
+				v |= elements[1];
+			}
+			return v;
+		}
+		return 0;
+	}
+
 	namespace priv
 	{
 		namespace bigint
@@ -1909,15 +1958,19 @@ namespace slib
 		return sl_true;
 	}
 
-	sl_bool CBigInt::div(const CBigInt& a, const CBigInt& b, CBigInt* quotient, CBigInt* remainder) noexcept
+	sl_bool CBigInt::div(const CBigInt& a, const CBigInt& b, CBigInt* quotient, CBigInt* remainder, sl_bool flagNonNegativeRemainder) noexcept
 	{
 		if (divAbs(a, b, quotient, remainder)) {
 			if (quotient) {
 				if (a.sign < 0) {
-					if (quotient->addAbs(*quotient, (sl_uint32)1)) {
-						quotient->sign = -b.sign;
+					if (flagNonNegativeRemainder) {
+						if (quotient->addAbs(*quotient, (sl_uint32)1)) {
+							quotient->sign = -b.sign;
+						} else {
+							return sl_false;
+						}
 					} else {
-						return sl_false;
+						quotient->sign = -b.sign;
 					}
 				} else {
 					quotient->sign = b.sign;
@@ -1925,10 +1978,14 @@ namespace slib
 			}
 			if (remainder) {
 				if (a.sign < 0) {
-					if (remainder->subAbs(b, *remainder)) {
-						remainder->sign = 1;
+					if (flagNonNegativeRemainder) {
+						if (remainder->subAbs(b, *remainder)) {
+							remainder->sign = 1;
+						} else {
+							return sl_false;
+						}
 					} else {
-						return sl_false;
+						remainder->sign = -1;
 					}
 				} else {
 					remainder->sign = 1;
@@ -1939,10 +1996,11 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool CBigInt::div(const CBigInt& a, sl_int32 b, CBigInt* quotient, sl_uint32* remainder) noexcept
+	sl_bool CBigInt::divInt32(const CBigInt& a, sl_int32 b, CBigInt* quotient, sl_int32* remainder, sl_bool flagNonNegativeRemainder) noexcept
 	{
-		sl_int32 v;
 		sl_int32 s;
+		sl_uint32 v;
+		sl_uint32 r;
 		if (b > 0) {
 			v = b;
 			s = 1;
@@ -1950,13 +2008,17 @@ namespace slib
 			v = -b;
 			s = -1;
 		}
-		if (divAbs(a, (sl_uint32)v, quotient, remainder)) {
+		if (divAbs(a, v, quotient, &r)) {
 			if (quotient) {
 				if (a.sign < 0) {
-					if (quotient->addAbs(*quotient, (sl_uint32)1)) {
-						quotient->sign = -s;
+					if (flagNonNegativeRemainder) {
+						if (quotient->addAbs(*quotient, (sl_uint32)1)) {
+							quotient->sign = -s;
+						} else {
+							return sl_false;
+						}
 					} else {
-						return sl_false;
+						quotient->sign = -s;
 					}
 				} else {
 					quotient->sign = s;
@@ -1964,7 +2026,13 @@ namespace slib
 			}
 			if (remainder) {
 				if (a.sign < 0) {
-					*remainder = b - *remainder;
+					if (flagNonNegativeRemainder) {
+						*remainder = v - r;
+					} else {
+						*remainder = -((sl_int32)r);
+					}
+				} else {
+					*remainder = r;
 				}
 			}
 			return sl_true;
@@ -1972,7 +2040,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool CBigInt::div(const CBigInt& a, sl_uint32 b, CBigInt* quotient, sl_uint32* remainder) noexcept
+	sl_bool CBigInt::divUint32(const CBigInt& a, sl_uint32 b, CBigInt* quotient, sl_uint32* remainder) noexcept
 	{
 		if (divAbs(a, b, quotient, remainder)) {
 			if (quotient) {
@@ -1996,7 +2064,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool CBigInt::div(const CBigInt& a, sl_int64 b, CBigInt* quotient, sl_uint64* remainder) noexcept
+	sl_bool CBigInt::divInt64(const CBigInt& a, sl_int64 b, CBigInt* quotient, sl_int64* remainder, sl_bool flagNonNegativeRemainder) noexcept
 	{
 		CBIGINT_INT64(o, b);
 		CBigInt* r;
@@ -2008,18 +2076,16 @@ namespace slib
 		} else {
 			r = sl_null;
 		}
-		if (div(a, o, quotient, r)) {
+		if (div(a, o, quotient, r, flagNonNegativeRemainder)) {
 			if (remainder) {
-				sl_uint8 bytes[8];
-				r->getBytesLE(bytes, 8);
-				*remainder = MIO::readUint64(bytes);
+				*remainder = r->getInt64();
 			}
 			return sl_true;
 		}
 		return sl_false;
 	}
 
-	sl_bool CBigInt::div(const CBigInt& a, sl_uint64 b, CBigInt* quotient, sl_uint64* remainder) noexcept
+	sl_bool CBigInt::divUint64(const CBigInt& a, sl_uint64 b, CBigInt* quotient, sl_uint64* remainder) noexcept
 	{
 		CBIGINT_UINT64(o, b);
 		CBigInt* r;
@@ -2033,9 +2099,7 @@ namespace slib
 		}
 		if (div(a, o, quotient, r)) {
 			if (remainder) {
-				sl_uint8 bytes[8] = {0};
-				r->getBytesLE(bytes, 8);
-				*remainder = MIO::readUint64(bytes);
+				*remainder = r->getUint64();
 			}
 			return sl_true;
 		}
@@ -2186,7 +2250,7 @@ namespace slib
 					return sl_false;
 				}
 				if (pM) {
-					if (!CBigInt::div(*this, *pM, sl_null, this)) {
+					if (!CBigInt::div(*this, *pM, sl_null, this, sl_true)) {
 						return sl_false;
 					}
 				}
@@ -2195,7 +2259,7 @@ namespace slib
 				return sl_false;
 			}
 			if (pM) {
-				if (!CBigInt::div(T, *pM, sl_null, &T)) {
+				if (!CBigInt::div(T, *pM, sl_null, &T, sl_true)) {
 					return sl_false;
 				}
 			}
@@ -2444,7 +2508,7 @@ namespace slib
 			return sl_false;
 		}
 		CBigInt Xa;
-		if (!CBigInt::div(A, M, sl_null, &Xa)) {
+		if (!CBigInt::div(A, M, sl_null, &Xa, sl_true)) {
 			return sl_false;
 		}
 		CBigInt Xb;
@@ -2624,10 +2688,10 @@ namespace slib
 			return sl_false;
 		}
 		CBigInt a, b;
-		if (!(CBigInt::div(inA, *this, &a))) {
+		if (!(CBigInt::div(inA, *this, &a, sl_null, sl_true))) {
 			return sl_false;
 		}
-		if (!(CBigInt::div(inB, *this, &b))) {
+		if (!(CBigInt::div(inB, *this, &b, sl_null, sl_true))) {
 			return sl_false;
 		}
 		if (!(mul(a))) {
@@ -2720,7 +2784,7 @@ namespace slib
 							if (!(y.mul(x, x))) {
 								RETURN_ERROR;
 							}
-							if (!(CBigInt::div(y, n, sl_null, &x))) {
+							if (!(CBigInt::div(y, n, sl_null, &x, sl_true))) {
 								RETURN_ERROR;
 							}
 							if (x.equals((sl_uint32)1)) {
@@ -3867,7 +3931,7 @@ namespace slib
 		return sl_false;
 	}
 
-	BigInt BigInt::div(const BigInt& A, const BigInt& B, BigInt* remainder) noexcept
+	BigInt BigInt::div(const BigInt& A, const BigInt& B, BigInt* remainder, sl_bool flagNonNegativeRemainder) noexcept
 	{
 		CBigInt* a = A.ref._ptr;
 		CBigInt* b = B.ref._ptr;
@@ -3878,14 +3942,14 @@ namespace slib
 					if (remainder) {
 						CBigInt* r = new CBigInt;
 						if (r) {
-							if (CBigInt::div(*a, *b, q, r)) {
+							if (CBigInt::div(*a, *b, q, r, flagNonNegativeRemainder)) {
 								*remainder = r;
 								return q;
 							}
 							delete r;
 						}
 					} else {
-						if (CBigInt::div(*a, *b, q, sl_null)) {
+						if (CBigInt::div(*a, *b, q, sl_null, flagNonNegativeRemainder)) {
 							return q;
 						}
 					}
@@ -3899,7 +3963,7 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool BigInt::div(const BigInt& other, BigInt* remainder) noexcept
+	sl_bool BigInt::div(const BigInt& other, BigInt* remainder, sl_bool flagNonNegativeRemainder) noexcept
 	{
 		CBigInt* a = ref._ptr;
 		CBigInt* b = other.ref._ptr;
@@ -3908,14 +3972,14 @@ namespace slib
 				if (remainder) {
 					CBigInt* r = new CBigInt;
 					if (r) {
-						if (CBigInt::div(*a, *b, a, r)) {
+						if (CBigInt::div(*a, *b, a, r, flagNonNegativeRemainder)) {
 							*remainder = r;
 							return sl_true;
 						}
 						delete r;
 					}
 				} else {
-					if (CBigInt::div(*a, *b, a, sl_null)) {
+					if (CBigInt::div(*a, *b, a, sl_null, flagNonNegativeRemainder)) {
 						return sl_true;
 					}
 				}
@@ -3929,14 +3993,14 @@ namespace slib
 		return sl_false;
 	}
 
-	BigInt BigInt::div(const BigInt& A, sl_int32 v, sl_uint32* remainder) noexcept
+	BigInt BigInt::divInt32(const BigInt& A, sl_int32 v, sl_int32* remainder, sl_bool flagNonNegativeRemainder) noexcept
 	{
 		CBigInt* a = A.ref._ptr;
 		if (v) {
 			if (a) {
 				CBigInt* q = new CBigInt;
 				if (q) {
-					if (CBigInt::div(*a, v, q, remainder)) {
+					if (CBigInt::divInt32(*a, v, q, remainder, flagNonNegativeRemainder)) {
 						return q;
 					}
 					delete q;
@@ -3949,12 +4013,12 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool BigInt::div(sl_int32 v, sl_uint32* remainder) noexcept
+	sl_bool BigInt::divInt32(sl_int32 v, sl_int32* remainder, sl_bool flagNonNegativeRemainder) noexcept
 	{
 		CBigInt* a = ref._ptr;
 		if (v) {
 			if (a) {
-				if (CBigInt::div(*a, v, a, remainder)) {
+				if (CBigInt::divInt32(*a, v, a, remainder, flagNonNegativeRemainder)) {
 					return sl_true;
 				}
 			} else {
@@ -3967,14 +4031,14 @@ namespace slib
 		return sl_false;
 	}
 
-	BigInt BigInt::div(const BigInt& A, sl_uint32 v, sl_uint32* remainder) noexcept
+	BigInt BigInt::divUint32(const BigInt& A, sl_uint32 v, sl_uint32* remainder) noexcept
 	{
 		CBigInt* a = A.ref._ptr;
 		if (v) {
 			if (a) {
 				CBigInt* q = new CBigInt;
 				if (q) {
-					if (CBigInt::div(*a, v, q, remainder)) {
+					if (CBigInt::divUint32(*a, v, q, remainder)) {
 						return q;
 					}
 					delete q;
@@ -3987,12 +4051,12 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool BigInt::div(sl_uint32 v, sl_uint32* remainder) noexcept
+	sl_bool BigInt::divUint32(sl_uint32 v, sl_uint32* remainder) noexcept
 	{
 		CBigInt* a = ref._ptr;
 		if (v) {
 			if (a) {
-				if (CBigInt::div(*a, v, a, remainder)) {
+				if (CBigInt::divUint32(*a, v, a, remainder)) {
 					return sl_true;
 				}
 			} else {
@@ -4005,14 +4069,14 @@ namespace slib
 		return sl_false;
 	}
 
-	BigInt BigInt::div(const BigInt& A, sl_int64 v, sl_uint64* remainder) noexcept
+	BigInt BigInt::divInt64(const BigInt& A, sl_int64 v, sl_int64* remainder, sl_bool flagNonNegativeRemainder) noexcept
 	{
 		CBigInt* a = A.ref._ptr;
 		if (v) {
 			if (a) {
 				CBigInt* q = new CBigInt;
 				if (q) {
-					if (CBigInt::div(*a, v, q, remainder)) {
+					if (CBigInt::divInt64(*a, v, q, remainder, flagNonNegativeRemainder)) {
 						return q;
 					}
 					delete q;
@@ -4025,12 +4089,12 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool BigInt::div(sl_int64 v, sl_uint64* remainder) noexcept
+	sl_bool BigInt::divInt64(sl_int64 v, sl_int64* remainder, sl_bool flagNonNegativeRemainder) noexcept
 	{
 		CBigInt* a = ref._ptr;
 		if (v) {
 			if (a) {
-				if (CBigInt::div(*a, v, a, remainder)) {
+				if (CBigInt::divInt64(*a, v, a, remainder, flagNonNegativeRemainder)) {
 					return sl_true;
 				}
 			} else {
@@ -4043,14 +4107,14 @@ namespace slib
 		return sl_false;
 	}
 
-	BigInt BigInt::div(const BigInt& A, sl_uint64 v, sl_uint64* remainder) noexcept
+	BigInt BigInt::divUint64(const BigInt& A, sl_uint64 v, sl_uint64* remainder) noexcept
 	{
 		CBigInt* a = A.ref._ptr;
 		if (v) {
 			if (a) {
 				CBigInt* q = new CBigInt;
 				if (q) {
-					if (CBigInt::div(*a, v, q, remainder)) {
+					if (CBigInt::divUint64(*a, v, q, remainder)) {
 						return q;
 					}
 					delete q;
@@ -4063,12 +4127,12 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool BigInt::div(sl_uint64 v, sl_uint64* remainder) noexcept
+	sl_bool BigInt::divUint64(sl_uint64 v, sl_uint64* remainder) noexcept
 	{
 		CBigInt* a = ref._ptr;
 		if (v) {
 			if (a) {
-				if (CBigInt::div(*a, v, a, remainder)) {
+				if (CBigInt::divUint64(*a, v, a, remainder)) {
 					return sl_true;
 				}
 			} else {
@@ -4099,6 +4163,24 @@ namespace slib
 		return sl_null;
 	}
 
+	BigInt BigInt::mod_NonNegativeRemainder(const BigInt& A, const BigInt& B) noexcept
+	{
+		CBigInt* a = A.ref._ptr;
+		CBigInt* b = B.ref._ptr;
+		if (b) {
+			if (a) {
+				CBigInt* r = new CBigInt;
+				if (r) {
+					if (CBigInt::div(*a, *b, sl_null, r, sl_true)) {
+						return r;
+					}
+					delete r;
+				}
+			}
+		}
+		return sl_null;
+	}
+	
 	sl_bool BigInt::mod(const BigInt& other) noexcept
 	{
 		CBigInt* a = ref._ptr;
@@ -4113,48 +4195,86 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_uint32 BigInt::mod(const BigInt& A, sl_int32 v) noexcept
+	sl_bool BigInt::mod_NonNegativeRemainder(const BigInt& other) noexcept
+	{
+		CBigInt* a = ref._ptr;
+		CBigInt* b = other.ref._ptr;
+		if (b) {
+			if (a) {
+				return CBigInt::div(*a, *b, sl_null, a, sl_true);
+			} else {
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+
+	sl_int32 BigInt::modInt32(const BigInt& A, sl_int32 v) noexcept
+	{
+		CBigInt* a = A.ref._ptr;
+		if (a) {
+			sl_int32 r = 0;
+			if (CBigInt::divInt32(*a, v, sl_null, &r)) {
+				return r;
+			}
+		}
+		return 0;
+	}
+
+	sl_int32 BigInt::modInt32_NonNegativeRemainder(const BigInt& A, sl_int32 v) noexcept
+	{
+		CBigInt* a = A.ref._ptr;
+		if (a) {
+			sl_int32 r = 0;
+			if (CBigInt::divInt32(*a, v, sl_null, &r, sl_true)) {
+				return r;
+			}
+		}
+		return 0;
+	}
+
+	sl_uint32 BigInt::modUint32(const BigInt& A, sl_uint32 v) noexcept
 	{
 		CBigInt* a = A.ref._ptr;
 		if (a) {
 			sl_uint32 r = 0;
-			if (CBigInt::div(*a, v, sl_null, &r)) {
+			if (CBigInt::divUint32(*a, v, sl_null, &r)) {
 				return r;
 			}
 		}
 		return 0;
 	}
 
-	sl_uint32 BigInt::mod(const BigInt& A, sl_uint32 v) noexcept
+	sl_int64 BigInt::modInt64(const BigInt& A, sl_int64 v) noexcept
 	{
 		CBigInt* a = A.ref._ptr;
 		if (a) {
-			sl_uint32 r = 0;
-			if (CBigInt::div(*a, v, sl_null, &r)) {
+			sl_int64 r;
+			if (CBigInt::divInt64(*a, v, sl_null, &r)) {
 				return r;
 			}
 		}
 		return 0;
 	}
 
-	sl_uint64 BigInt::mod(const BigInt& A, sl_int64 v) noexcept
+	sl_int64 BigInt::modInt64_NonNegativeRemainder(const BigInt& A, sl_int64 v) noexcept
+	{
+		CBigInt* a = A.ref._ptr;
+		if (a) {
+			sl_int64 r;
+			if (CBigInt::divInt64(*a, v, sl_null, &r, sl_true)) {
+				return r;
+			}
+		}
+		return 0;
+	}
+
+	sl_uint64 BigInt::modUint64(const BigInt& A, sl_uint64 v) noexcept
 	{
 		CBigInt* a = A.ref._ptr;
 		if (a) {
 			sl_uint64 r;
-			if (CBigInt::div(*a, v, sl_null, &r)) {
-				return r;
-			}
-		}
-		return 0;
-	}
-
-	sl_uint64 BigInt::mod(const BigInt& A, sl_uint64 v) noexcept
-	{
-		CBigInt* a = A.ref._ptr;
-		if (a) {
-			sl_uint64 r;
-			if (CBigInt::div(*a, v, sl_null, &r)) {
+			if (CBigInt::divUint64(*a, v, sl_null, &r)) {
 				return r;
 			}
 		}
@@ -4702,25 +4822,7 @@ namespace slib
 
 	BigInt& BigInt::operator%=(sl_int32 v) noexcept
 	{
-		mod(v);
-		return *this;
-	}
-
-	BigInt& BigInt::operator%=(sl_uint32 v) noexcept
-	{
-		mod(v);
-		return *this;
-	}
-
-	BigInt& BigInt::operator%=(sl_int64 v) noexcept
-	{
-		mod(v);
-		return *this;
-	}
-
-	BigInt& BigInt::operator%=(sl_uint64 v) noexcept
-	{
-		mod(v);
+		*this = modInt32(*this, v);
 		return *this;
 	}
 
@@ -5404,9 +5506,9 @@ namespace slib
 		return BigInt::mod(a, b);
 	}
 
-	sl_uint32 operator%(const BigInt& a, sl_int32 v) noexcept
+	sl_int32 operator%(const BigInt& a, sl_int32 v) noexcept
 	{
-		return BigInt::mod(a, v);
+		return BigInt::modInt32(a, v);
 	}
 
 	BigInt operator%(sl_int32 v, const BigInt& b) noexcept
@@ -5414,29 +5516,19 @@ namespace slib
 		return BigInt::mod(BigInt::fromInt32(v), b);
 	}
 
-	sl_uint32 operator%(const BigInt& a, sl_uint32 v) noexcept
-	{
-		return BigInt::mod(a, v);
-	}
-
 	BigInt operator%(sl_uint32 v, const BigInt& b) noexcept
 	{
 		return BigInt::mod(BigInt::fromUint32(v), b);
 	}
 
-	sl_uint64 operator%(const BigInt& a, sl_int64 v) noexcept
+	sl_int64 operator%(const BigInt& a, sl_int64 v) noexcept
 	{
-		return BigInt::mod(a, v);
+		return BigInt::modInt64(a, v);
 	}
 
 	BigInt operator%(sl_int64 v, const BigInt& b) noexcept
 	{
 		return BigInt::mod(BigInt::fromInt64(v), b);
-	}
-
-	sl_uint64 operator%(const BigInt& a, sl_uint64 v) noexcept
-	{
-		return BigInt::mod(a, v);
 	}
 
 	BigInt operator%(sl_uint64 v, const BigInt& b) noexcept

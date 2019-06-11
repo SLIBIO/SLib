@@ -39,7 +39,7 @@ namespace slib
 		} else {
 			sizeRSA = keyPrivate->getLength();
 		}
-		if (sizeInput == 0 || sizeRSA < sizeInput + 2 * HASH::HashSize + 2) {
+		if (sizeInput == 0 || (sizeInput & 0x80000000) || sizeRSA < sizeInput + 2 * HASH::HashSize + 2) {
 			return sl_false;
 		}
 		

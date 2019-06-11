@@ -44,11 +44,6 @@ namespace slib
 	{
 	}
 	
-	sl_uint32 RSAPrivateKey::getLength() const
-	{
-		return (sl_uint32)(N.getMostSignificantBytes());
-	}
-	
 	void RSAPrivateKey::generate(sl_uint32 nBits)
 	{
 		sl_uint32 h = nBits >> 1;
@@ -106,7 +101,7 @@ namespace slib
 		BigInt b = BigInt::pow_montgomery(a, E, N);
 		BigInt TP = BigInt::pow_montgomery(b, DP, P);
 		BigInt TQ = BigInt::pow_montgomery(b, DQ, Q);
-		BigInt c = ((TP - TQ) * IQ) % P;
+		BigInt c = BigInt::mod_NonNegativeRemainder((TP - TQ) * IQ, P);
 		c = TQ + c * Q;
 		return c == 3;
 	}
@@ -140,7 +135,7 @@ namespace slib
 		} else {
 			BigInt TP = BigInt::pow_montgomery(T, key.DP, key.P);
 			BigInt TQ = BigInt::pow_montgomery(T, key.DQ, key.Q);
-			T = ((TP - TQ) * key.IQ) % key.P;
+			T = BigInt::mod_NonNegativeRemainder((TP - TQ) * key.IQ, key.P);
 			T = TQ + T * key.Q;
 		}
 		if (T.isNotNull()) {
@@ -172,7 +167,7 @@ namespace slib
 			len = keyPrivate->getLength();
 		}
 		// check (len - 8 < n + 3), 8 bytes is for enough random region
-		if (n == 0 || len < n + 11) {
+		if (n == 0 || (n & 0x80000000) || len < n + 11) {
 			return sl_false;
 		}
 		char* p = (char*)dst;
@@ -214,7 +209,7 @@ namespace slib
 			len = keyPrivate->getLength();
 		}
 		// check (len - 8 < n + 3), 8 bytes is for enough random region
-		if (n == 0 || len < n + 11) {
+		if (n == 0 || (n & 0x80000000) || len < n + 11) {
 			return sl_null;
 		}
 		Memory mem = Memory::create(len);

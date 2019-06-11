@@ -150,6 +150,14 @@ namespace slib
 		static CBigInt* fromInt64(sl_int64 v) noexcept;
 
 		sl_bool setValue(sl_uint64 v) noexcept;
+		
+		sl_int32 getInt32() const noexcept;
+
+		sl_uint32 getUint32() const noexcept;
+		
+		sl_int64 getInt64() const noexcept;
+
+		sl_uint64 getUint64() const noexcept;
 
 		static CBigInt* fromUint64(sl_uint64 v) noexcept;
 
@@ -292,15 +300,17 @@ namespace slib
 
 		static sl_bool divAbs(const CBigInt& a, sl_uint32 b, CBigInt* quotient = sl_null, sl_uint32* remainder = sl_null) noexcept;
 
-		static sl_bool div(const CBigInt& a, const CBigInt& b, CBigInt* quotient = sl_null, CBigInt* remainder = sl_null) noexcept;
+		static sl_bool div(const CBigInt& a, const CBigInt& b, CBigInt* quotient = sl_null, CBigInt* remainder = sl_null, sl_bool flagNonNegativeRemainder = sl_false) noexcept;
 
-		static sl_bool div(const CBigInt& a, sl_int32 b, CBigInt* quotient = sl_null, sl_uint32* remainder = sl_null) noexcept;
+		static sl_bool divInt32(const CBigInt& a, sl_int32 b, CBigInt* quotient = sl_null, sl_int32* remainder = sl_null, sl_bool flagNonNegativeRemainder = sl_false) noexcept;
 
-		static sl_bool div(const CBigInt& a, sl_uint32 b, CBigInt* quotient = sl_null, sl_uint32* remainder = sl_null) noexcept;
+		// always non-negative remainder
+		static sl_bool divUint32(const CBigInt& a, sl_uint32 b, CBigInt* quotient = sl_null, sl_uint32* remainder = sl_null) noexcept;
 
-		static sl_bool div(const CBigInt& a, sl_int64 b, CBigInt* quotient = sl_null, sl_uint64* remainder = sl_null) noexcept;
+		static sl_bool divInt64(const CBigInt& a, sl_int64 b, CBigInt* quotient = sl_null, sl_int64* remainder = sl_null, sl_bool flagNonNegativeRemainder = sl_false) noexcept;
 
-		static sl_bool div(const CBigInt& a, sl_uint64 b, CBigInt* quotient = sl_null, sl_uint64* remainder = sl_null) noexcept;
+		// always non-negative remainder
+		static sl_bool divUint64(const CBigInt& a, sl_uint64 b, CBigInt* quotient = sl_null, sl_uint64* remainder = sl_null) noexcept;
 	
 
 		sl_bool shiftLeft(const CBigInt& other, sl_size n) noexcept;
@@ -659,38 +669,52 @@ namespace slib
 		sl_bool mul(sl_uint64 v) noexcept;
 
 
-		static BigInt div(const BigInt& A, const BigInt& B, BigInt* remainder = sl_null) noexcept;
+		static BigInt div(const BigInt& A, const BigInt& B, BigInt* remainder = sl_null, sl_bool flagNonNegativeRemainder = sl_false) noexcept;
 
-		sl_bool div(const BigInt& other, BigInt* remainder = sl_null) noexcept;
+		sl_bool div(const BigInt& other, BigInt* remainder = sl_null, sl_bool flagNonNegativeRemainder = sl_false) noexcept;
 
-		static BigInt div(const BigInt& A, sl_int32 v, sl_uint32* remainder = sl_null) noexcept;
+		static BigInt divInt32(const BigInt& A, sl_int32 v, sl_int32* remainder = sl_null, sl_bool flagNonNegativeRemainder = sl_false) noexcept;
 
-		sl_bool div(sl_int32 v, sl_uint32* remainder = sl_null) noexcept;
+		sl_bool divInt32(sl_int32 v, sl_int32* remainder = sl_null, sl_bool flagNonNegativeRemainder = sl_false) noexcept;
 
-		static BigInt div(const BigInt& A, sl_uint32 v, sl_uint32* remainder = sl_null) noexcept;
+		// always non-negative remainder
+		static BigInt divUint32(const BigInt& A, sl_uint32 v, sl_uint32* remainder = sl_null) noexcept;
 
-		sl_bool div(sl_uint32 v, sl_uint32* remainder = sl_null) noexcept;
+		// always non-negative remainder
+		sl_bool divUint32(sl_uint32 v, sl_uint32* remainder = sl_null) noexcept;
 
-		static BigInt div(const BigInt& A, sl_int64 v, sl_uint64* remainder = sl_null) noexcept;
+		static BigInt divInt64(const BigInt& A, sl_int64 v, sl_int64* remainder = sl_null, sl_bool flagNonNegativeRemainder = sl_false) noexcept;
 
-		sl_bool div(sl_int64 v, sl_uint64* remainder = sl_null) noexcept;
+		sl_bool divInt64(sl_int64 v, sl_int64* remainder = sl_null, sl_bool flagNonNegativeRemainder = sl_false) noexcept;
 
-		static BigInt div(const BigInt& A, sl_uint64 v, sl_uint64* remainder = sl_null) noexcept;
+		// always non-negative remainder
+		static BigInt divUint64(const BigInt& A, sl_uint64 v, sl_uint64* remainder = sl_null) noexcept;
 
-		sl_bool div(sl_uint64 v, sl_uint64* remainder = sl_null) noexcept;
+		// always non-negative remainder
+		sl_bool divUint64(sl_uint64 v, sl_uint64* remainder = sl_null) noexcept;
 
 
 		static BigInt mod(const BigInt& A, const BigInt& B) noexcept;
 	
+		static BigInt mod_NonNegativeRemainder(const BigInt& A, const BigInt& B) noexcept;
+		
 		sl_bool mod(const BigInt& other) noexcept;
 
-		static sl_uint32 mod(const BigInt& A, sl_int32 v) noexcept;
+		sl_bool mod_NonNegativeRemainder(const BigInt& other) noexcept;
 
-		static sl_uint32 mod(const BigInt& A, sl_uint32 v) noexcept;
+		static sl_int32 modInt32(const BigInt& A, sl_int32 v) noexcept;
 
-		static sl_uint64 mod(const BigInt& A, sl_int64 v) noexcept;
+		static sl_int32 modInt32_NonNegativeRemainder(const BigInt& A, sl_int32 v) noexcept;
 
-		static sl_uint64 mod(const BigInt& A, sl_uint64 v) noexcept;
+		// non-negative remainder
+		static sl_uint32 modUint32(const BigInt& A, sl_uint32 v) noexcept;
+
+		static sl_int64 modInt64(const BigInt& A, sl_int64 v) noexcept;
+
+		static sl_int64 modInt64_NonNegativeRemainder(const BigInt& A, sl_int64 v) noexcept;
+
+		// non-negative remainder
+		static sl_uint64 modUint64(const BigInt& A, sl_uint64 v) noexcept;
 	
 
 		static BigInt shiftLeft(const BigInt& A, sl_size n) noexcept;
@@ -830,12 +854,6 @@ namespace slib
 		BigInt& operator%=(const BigInt& other) noexcept;
 
 		BigInt& operator%=(sl_int32 v) noexcept;
-
-		BigInt& operator%=(sl_uint32 v) noexcept;
-	
-		BigInt& operator%=(sl_int64 v) noexcept;
-
-		BigInt& operator%=(sl_uint64 v) noexcept;
 
 		BigInt& operator<<=(sl_uint32 n) noexcept;
 
@@ -1038,19 +1056,15 @@ namespace slib
 	
 	BigInt operator%(const BigInt& a, const BigInt& b) noexcept;
 	
-	sl_uint32 operator%(const BigInt& a, sl_int32 v) noexcept;
+	sl_int32 operator%(const BigInt& a, sl_int32 v) noexcept;
 	
 	BigInt operator%(sl_int32 v, const BigInt& b) noexcept;
 	
-	sl_uint32 operator%(const BigInt& a, sl_uint32 v) noexcept;
-	
 	BigInt operator%(sl_uint32 v, const BigInt& b) noexcept;
 	
-	sl_uint64 operator%(const BigInt& a, sl_int64 v) noexcept;
+	sl_int64 operator%(const BigInt& a, sl_int64 v) noexcept;
 	
 	BigInt operator%(sl_int64 v, const BigInt& b) noexcept;
-	
-	sl_uint64 operator%(const BigInt& a, sl_uint64 v) noexcept;
 	
 	BigInt operator%(sl_uint64 v, const BigInt& b) noexcept;
 	
