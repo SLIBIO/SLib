@@ -20,44 +20,45 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_CRYPTO_HEADER
-#define CHECKHEADER_SLIB_CRYPTO_HEADER
+#include "slib/core/asm.h"
 
-// Hash, Checksum
-#include "crypto/hash.h"
-#include "crypto/md5.h"
-#include "crypto/sha1.h"
-#include "crypto/sha2.h"
-#include "crypto/crc32c.h"
+#ifdef SLIB_ARCH_IS_X64
 
-// Block Cipher
-#include "crypto/block_cipher.h"
-#include "crypto/aes.h"
-#include "crypto/blowfish.h"
-#include "crypto/des.h"
-#include "crypto/gcm.h"
+#if defined(SLIB_COMPILER_IS_VC)
+#	include <intrin.h>
+#else
+#	include <cpuid.h>
+#endif
 
-// Stream Cipher
-#include "crypto/rc4.h"
-#include "crypto/chacha.h"
+namespace slib
+{
+	
+	namespace priv
+	{
+		namespace asm_x64
+		{
+			
+			static sl_bool CanUseSse42()
+			{
+#if defined(SLIB_COMPILER_IS_VC)
+				int cpu_info[4];
+				__cpuid(cpu_info, 1);
+				return (cpu_info[2] & (1 << 20)) != 0;
+#else
+				unsigned int eax, ebx, ecx, edx;
+				return __get_cpuid(1, &eax, &ebx, &ecx, &edx) && ((ecx & (1 << 20)) != 0);
+#endif
+			}
 
-// Message authentication code
-#include "crypto/hmac.h"
-#include "crypto/poly1305.h"
-
-// Public-key cryptosystems
-#include "crypto/rsa.h"
-#include "crypto/ecc.h"
-
-// Transport Protocol
-#include "crypto/tls.h"
-
-// Other
-#include "crypto/base64.h"
-#include "crypto/jwt.h"
-
-// Third-party
-#include "crypto/zlib.h"
-#include "crypto/openssl.h"
+		}
+	}
+	
+	sl_bool CanUseSse42()
+	{
+		static sl_bool f = priv::asm_x64::CanUseSse42();
+		return f;
+	}
+	
+}
 
 #endif

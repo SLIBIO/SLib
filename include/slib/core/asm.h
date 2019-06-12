@@ -20,44 +20,23 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_CRYPTO_HEADER
-#define CHECKHEADER_SLIB_CRYPTO_HEADER
+#ifndef CHECKHEADER_SLIB_CORE_ASM
+#define CHECKHEADER_SLIB_CORE_ASM
 
-// Hash, Checksum
-#include "crypto/hash.h"
-#include "crypto/md5.h"
-#include "crypto/sha1.h"
-#include "crypto/sha2.h"
-#include "crypto/crc32c.h"
+#include "definition.h"
 
-// Block Cipher
-#include "crypto/block_cipher.h"
-#include "crypto/aes.h"
-#include "crypto/blowfish.h"
-#include "crypto/des.h"
-#include "crypto/gcm.h"
-
-// Stream Cipher
-#include "crypto/rc4.h"
-#include "crypto/chacha.h"
-
-// Message authentication code
-#include "crypto/hmac.h"
-#include "crypto/poly1305.h"
-
-// Public-key cryptosystems
-#include "crypto/rsa.h"
-#include "crypto/ecc.h"
-
-// Transport Protocol
-#include "crypto/tls.h"
-
-// Other
-#include "crypto/base64.h"
-#include "crypto/jwt.h"
-
-// Third-party
-#include "crypto/zlib.h"
-#include "crypto/openssl.h"
+namespace slib
+{
+	
+#ifdef SLIB_ARCH_IS_X64
+	sl_bool CanUseSse42();
+#else
+	SLIB_INLINE static sl_bool CanUseSse42()
+	{
+		return sl_false;
+	}
+#endif
+	
+}
 
 #endif

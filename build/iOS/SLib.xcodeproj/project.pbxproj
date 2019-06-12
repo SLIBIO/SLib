@@ -685,6 +685,8 @@
 		26ACB3B9220978310093FF3F /* facebook.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3B8220978310093FF3F /* facebook.cpp */; };
 		26ACB3F4220984FF0093FF3F /* ui_core_badge_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3F3220984FF0093FF3F /* ui_core_badge_ios.mm */; };
 		26ACB3F6220985EE0093FF3F /* device_audio_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3F5220985EE0093FF3F /* device_audio_ios.mm */; };
+		26AFC60122B197E30034C634 /* crc32c.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AFC60022B197E30034C634 /* crc32c.cpp */; };
+		26AFC60522B198340034C634 /* asm_x64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AFC60322B198340034C634 /* asm_x64.cpp */; };
 		26B92D5021D357AD003F6F82 /* des.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D4F21D357AD003F6F82 /* des.cpp */; };
 		26B92D5721D3E4FC003F6F82 /* ginger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D5421D3E4FC003F6F82 /* ginger.cpp */; };
 		26B92D5821D3E4FC003F6F82 /* web_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D5521D3E4FC003F6F82 /* web_controller.cpp */; };
@@ -2183,6 +2185,8 @@
 		26ACB3F3220984FF0093FF3F /* ui_core_badge_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_core_badge_ios.mm; sourceTree = "<group>"; };
 		26ACB3F5220985EE0093FF3F /* device_audio_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = device_audio_ios.mm; sourceTree = "<group>"; };
 		26ACCB901C4A35DD00330F88 /* codec_vpx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = codec_vpx.cpp; path = media/codec_vpx.cpp; sourceTree = "<group>"; };
+		26AFC60022B197E30034C634 /* crc32c.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crc32c.cpp; sourceTree = "<group>"; };
+		26AFC60322B198340034C634 /* asm_x64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = asm_x64.cpp; sourceTree = "<group>"; };
 		26B1C99E1DC76BF50092C84F /* text_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = text_view.cpp; sourceTree = "<group>"; };
 		26B571421C9D43A70099E69B /* asset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = asset.cpp; sourceTree = "<group>"; };
 		26B571441C9D43AC0099E69B /* array.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = array.cpp; sourceTree = "<group>"; };
@@ -3958,6 +3962,7 @@
 				260107851DACE89F00C40723 /* animation.cpp */,
 				A25F2EC71B039EF600854DAF /* app.cpp */,
 				26B571441C9D43AC0099E69B /* array.cpp */,
+				26AFC60322B198340034C634 /* asm_x64.cpp */,
 				26B571421C9D43A70099E69B /* asset.cpp */,
 				A25F2EC81B039EF600854DAF /* async.cpp */,
 				A25F2EC91B039EF600854DAF /* async_config.h */,
@@ -4028,6 +4033,7 @@
 				268A13031E7B16340048F2CE /* blowfish.cpp */,
 				26A3DA8F228AAE4D0031CBDA /* chacha.cpp */,
 				266DD46B1C11934A00D47AB0 /* compress_zlib.cpp */,
+				26AFC60022B197E30034C634 /* crc32c.cpp */,
 				26B92D4F21D357AD003F6F82 /* des.cpp */,
 				262ED4E9228DEBEE0029F409 /* ecc.cpp */,
 				266DD37A1C117A3100D47AB0 /* gcm.cpp */,
@@ -5441,6 +5447,7 @@
 				26D9D8421E9628E0005F7BD3 /* line.cpp in Sources */,
 				26D9D8631E96294F005F7BD3 /* bitmap_format.cpp in Sources */,
 				26E1B8F7222ABCDD007C222E /* jmemnobs.c in Sources */,
+				26AFC60122B197E30034C634 /* crc32c.cpp in Sources */,
 				2607301120DD22C9004EB272 /* rw_lock.cpp in Sources */,
 				26E1B8EC222ABCDD007C222E /* jdpostct.c in Sources */,
 				26D9D8431E9628E0005F7BD3 /* service.cpp in Sources */,
@@ -5485,6 +5492,7 @@
 				269E31AB2255F4F2005CD0ED /* paypal_ui.cpp in Sources */,
 				26635CA1226706FD005E4BA6 /* ui_photo.cpp in Sources */,
 				26E1B8AD222ABBDC007C222E /* crc32.c in Sources */,
+				26AFC60522B198340034C634 /* asm_x64.cpp in Sources */,
 				26D9D8E71E962976005F7BD3 /* video_view.cpp in Sources */,
 				26D9D8D31E962976005F7BD3 /* select_view.cpp in Sources */,
 				26E1B8FA222ABCDD007C222E /* jutils.c in Sources */,

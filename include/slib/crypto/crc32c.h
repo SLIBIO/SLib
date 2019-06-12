@@ -20,44 +20,29 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_CRYPTO_HEADER
-#define CHECKHEADER_SLIB_CRYPTO_HEADER
+#ifndef CHECKHEADER_SLIB_CRYPTO_CRC32C
+#define CHECKHEADER_SLIB_CRYPTO_CRC32C
 
-// Hash, Checksum
-#include "crypto/hash.h"
-#include "crypto/md5.h"
-#include "crypto/sha1.h"
-#include "crypto/sha2.h"
-#include "crypto/crc32c.h"
+#include "definition.h"
 
-// Block Cipher
-#include "crypto/block_cipher.h"
-#include "crypto/aes.h"
-#include "crypto/blowfish.h"
-#include "crypto/des.h"
-#include "crypto/gcm.h"
+#include "../core/memory.h"
 
-// Stream Cipher
-#include "crypto/rc4.h"
-#include "crypto/chacha.h"
+namespace slib
+{
+	
+	class SLIB_EXPORT Crc32c
+	{
+	public:
+		static sl_uint32 extend(sl_uint32 crc, const void* data, sl_size size);
 
-// Message authentication code
-#include "crypto/hmac.h"
-#include "crypto/poly1305.h"
+		static sl_uint32 execute(const void* data, sl_size size);
 
-// Public-key cryptosystems
-#include "crypto/rsa.h"
-#include "crypto/ecc.h"
+		static sl_uint32 extend(sl_uint32 crc, const Memory& mem);
 
-// Transport Protocol
-#include "crypto/tls.h"
+		static sl_uint32 execute(const Memory& mem);
 
-// Other
-#include "crypto/base64.h"
-#include "crypto/jwt.h"
+	};
 
-// Third-party
-#include "crypto/zlib.h"
-#include "crypto/openssl.h"
+}
 
 #endif

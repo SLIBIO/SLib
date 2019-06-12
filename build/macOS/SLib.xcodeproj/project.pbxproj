@@ -858,6 +858,8 @@
 		26A3DA92228AFDDE0031CBDA /* poly1305.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA91228AFDDE0031CBDA /* poly1305.cpp */; };
 		26A3DA96228B698A0031CBDA /* ecc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA95228B69890031CBDA /* ecc.cpp */; };
 		26ACB3F82209872C0093FF3F /* device_id_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3F72209872B0093FF3F /* device_id_macos.mm */; };
+		26AFC5FD22B05B580034C634 /* crc32c.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AFC5FC22B05B580034C634 /* crc32c.cpp */; settings = {COMPILER_FLAGS = "-mavx2"; }; };
+		26AFC5FF22B1773F0034C634 /* asm_x64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AFC5FE22B1773F0034C634 /* asm_x64.cpp */; };
 		26B92D4921D33E6E003F6F82 /* des.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D4821D33E6E003F6F82 /* des.cpp */; };
 		26B92D4E21D34698003F6F82 /* ginger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D4D21D34698003F6F82 /* ginger.cpp */; };
 		26B92D6621D770F0003F6F82 /* device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D6521D770F0003F6F82 /* device.cpp */; };
@@ -2406,6 +2408,8 @@
 		26AE7C051C99AF9D0026C2D9 /* transform2d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = transform2d.cpp; sourceTree = "<group>"; };
 		26AE7C071C99B3280026C2D9 /* transform3d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = transform3d.cpp; sourceTree = "<group>"; };
 		26AE7CCB1D8450F80095AACA /* split_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = split_view.cpp; sourceTree = "<group>"; };
+		26AFC5FC22B05B580034C634 /* crc32c.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crc32c.cpp; sourceTree = "<group>"; };
+		26AFC5FE22B1773F0034C634 /* asm_x64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = asm_x64.cpp; sourceTree = "<group>"; };
 		26AFF77A1C34CE2B00AF9470 /* atomic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = atomic.cpp; sourceTree = "<group>"; };
 		26B0AF831C13E08600CD8673 /* bitmap_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_data.cpp; sourceTree = "<group>"; };
 		26B0AF841C13E08600CD8673 /* bitmap_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_format.cpp; sourceTree = "<group>"; };
@@ -4592,6 +4596,7 @@
 			children = (
 				26F900641D994ED0001A6EE9 /* animation.cpp */,
 				A25F2F9C1B03A33700854DAF /* app.cpp */,
+				26AFC5FE22B1773F0034C634 /* asm_x64.cpp */,
 				262041261C8895C900AF48F2 /* array.cpp */,
 				260272E51C81877F0079E2F2 /* asset.cpp */,
 				A25F2F9D1B03A33700854DAF /* async.cpp */,
@@ -4661,6 +4666,7 @@
 				268A13011E7AE8BD0048F2CE /* blowfish.cpp */,
 				26A3DA8D228A08D40031CBDA /* chacha.cpp */,
 				266DD4611C11930800D47AB0 /* compress_zlib.cpp */,
+				26AFC5FC22B05B580034C634 /* crc32c.cpp */,
 				26B92D4821D33E6E003F6F82 /* des.cpp */,
 				26A3DA95228B69890031CBDA /* ecc.cpp */,
 				262ED4E8228DDA5D0029F409 /* ecc_secp256k1.inc */,
@@ -5987,6 +5993,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26AFC5FF22B1773F0034C634 /* asm_x64.cpp in Sources */,
 				26D9D98F1E964675005F7BD3 /* video_capture.cpp in Sources */,
 				26D9D9551E964659005F7BD3 /* database_statement.cpp in Sources */,
 				26E1B891222ABAB2007C222E /* jdatadst.c in Sources */,
@@ -5996,6 +6003,7 @@
 				26D9D8F81E9645CE005F7BD3 /* service.cpp in Sources */,
 				26D9D9EF1E96468D005F7BD3 /* window.cpp in Sources */,
 				26D9D8F91E9645CE005F7BD3 /* map.cpp in Sources */,
+				26AFC5FD22B05B580034C634 /* crc32c.cpp in Sources */,
 				26D9D9A01E96467B005F7BD3 /* network_os.cpp in Sources */,
 				26E1B88E222ABAB2007C222E /* jdapimin.c in Sources */,
 				26DA4B39223980B500706393 /* media_player_ffmpeg.cpp in Sources */,

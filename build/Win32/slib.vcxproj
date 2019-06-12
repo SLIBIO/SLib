@@ -118,6 +118,7 @@
     <ClCompile Include="..\..\src\slib\core\animation.cpp" />
     <ClCompile Include="..\..\src\slib\core\app.cpp" />
     <ClCompile Include="..\..\src\slib\core\array.cpp" />
+    <ClCompile Include="..\..\src\slib\core\asm_x64.cpp" />
     <ClCompile Include="..\..\src\slib\core\async.cpp" />
     <ClCompile Include="..\..\src\slib\core\async_iocp.cpp" />
     <ClCompile Include="..\..\src\slib\core\async_win32.cpp" />
@@ -177,6 +178,7 @@
     <ClCompile Include="..\..\src\slib\crypto\blowfish.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\chacha.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\compress_zlib.cpp" />
+    <ClCompile Include="..\..\src\slib\crypto\crc32c.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\des.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\ecc.cpp" />
     <ClCompile Include="..\..\src\slib\crypto\gcm.cpp" />

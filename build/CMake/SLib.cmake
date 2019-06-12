@@ -68,6 +68,7 @@ set (SLIB_CORE_FILES
  "${SLIB_PATH}/src/slib/core/animation.cpp"
  "${SLIB_PATH}/src/slib/core/app.cpp"
  "${SLIB_PATH}/src/slib/core/array.cpp"
+ "${SLIB_PATH}/src/slib/core/asm_x64.cpp"
  "${SLIB_PATH}/src/slib/core/asset.cpp"
  "${SLIB_PATH}/src/slib/core/async.cpp"
  "${SLIB_PATH}/src/slib/core/async_epoll.cpp"
@@ -125,6 +126,7 @@ set (SLIB_CORE_FILES
  "${SLIB_PATH}/src/slib/crypto/blowfish.cpp"
  "${SLIB_PATH}/src/slib/crypto/chacha.cpp"
  "${SLIB_PATH}/src/slib/crypto/compress_zlib.cpp"
+ "${SLIB_PATH}/src/slib/crypto/crc32c.cpp"
  "${SLIB_PATH}/src/slib/crypto/des.cpp"
  "${SLIB_PATH}/src/slib/crypto/ecc.cpp"
  "${SLIB_PATH}/src/slib/crypto/gcm.cpp"
@@ -422,6 +424,10 @@ else ()
   "${SLIB_PATH}/src/slib/ui/view_gtk.cpp"
   "${SLIB_PATH}/src/slib/ui/window_gtk.cpp"
  )
+endif()
+
+if (SLIB_X86_64)
+ SET_PROPERTY( SOURCE ${SLIB_PATH}/src/slib/crypto/crc32c.cpp PROPERTY COMPILE_FLAGS -mavx2 )
 endif()
 
 set (ZLIB_ROOT_DIR "${SLIB_PATH}/external/src/zlib")
