@@ -29,6 +29,38 @@
 
 namespace slib
 {
+	
+	namespace priv
+	{
+		namespace endian
+		{
+			
+			static sl_bool checkLittleEndianRuntime()
+			{
+				sl_uint32 n = 0x12345678;
+				return *(sl_uint8*)(&n) == 0x78;
+			}
+			
+			static sl_bool checkBigEndianRuntime()
+			{
+				sl_uint32 n = 0x12345678;
+				return *(sl_uint8*)(&n) != 0x78;
+			}
+
+		}
+	}
+	
+	sl_bool Endian::checkLittleEndianRuntime()
+	{
+		static sl_bool f = priv::endian::checkLittleEndianRuntime();
+		return f;
+	}
+	
+	sl_bool Endian::checkBigEndianRuntime()
+	{
+		static sl_bool f = priv::endian::checkBigEndianRuntime();
+		return f;
+	}
 
 /***************
 	IReader

@@ -31,17 +31,9 @@ namespace slib
 	class SLIB_EXPORT Endian
 	{
 	public:
-		static SLIB_INLINE sl_bool checkLittleEndianRuntime()
-		{
-			sl_uint32 n = 0x12345678;
-			return *(sl_uint8*)(&n) == 0x78;
-		}
-
-		static SLIB_INLINE sl_bool checkBigEndianRuntime()
-		{
-			sl_uint32 n = 0x12345678;
-			return *(sl_uint8*)(&n) != 0x78;
-		}
+		sl_bool checkLittleEndianRuntime();
+		
+		sl_bool checkBigEndianRuntime();
 		
 		static SLIB_INLINE sl_bool isLE()
 		{
