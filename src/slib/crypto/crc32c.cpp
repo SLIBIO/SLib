@@ -681,7 +681,7 @@ namespace slib
 		return priv::crc32c::extend(crc, data, size);
 	}
 	
-	sl_uint32 Crc32c::execute(const void* data, sl_size size)
+	sl_uint32 Crc32c::get(const void* data, sl_size size)
 	{
 		return priv::crc32c::extend(0, data, size);
 	}
@@ -691,7 +691,7 @@ namespace slib
 		return priv::crc32c::extend(crc, mem.getData(), mem.getSize());
 	}
 	
-	sl_uint32 Crc32c::execute(const Memory& mem)
+	sl_uint32 Crc32c::get(const Memory& mem)
 	{
 		return priv::crc32c::extend(0, mem.getData(), mem.getSize());
 	}

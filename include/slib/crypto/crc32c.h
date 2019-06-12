@@ -35,11 +35,11 @@ namespace slib
 	public:
 		static sl_uint32 extend(sl_uint32 crc, const void* data, sl_size size);
 
-		static sl_uint32 execute(const void* data, sl_size size);
+		static sl_uint32 get(const void* data, sl_size size);
 
 		static sl_uint32 extend(sl_uint32 crc, const Memory& mem);
 
-		static sl_uint32 execute(const Memory& mem);
+		static sl_uint32 get(const Memory& mem);
 
 	};
 
