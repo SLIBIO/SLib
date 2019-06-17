@@ -297,16 +297,16 @@ namespace slib
 		return sl_null;
 	}
 	
-	String16 File::readAllTextUTF16(sl_bool flagBigEndian, sl_size maxSize)
+	String16 File::readAllTextUTF16(EndianType endian, sl_size maxSize)
 	{
-		return IO::readAllTextUTF16(flagBigEndian, maxSize);
+		return IO::readAllTextUTF16(endian, maxSize);
 	}
 
-	String16 File::readAllTextUTF16(const String& path, sl_bool flagBigEndian, sl_size maxSize)
+	String16 File::readAllTextUTF16(const String& path, EndianType endian, sl_size maxSize)
 	{
 		Ref<File> file = File::openForRead(path);
 		if (file.isNotNull()) {
-			return file->readAllTextUTF16(flagBigEndian, maxSize);
+			return file->readAllTextUTF16(endian, maxSize);
 		}
 		return sl_null;
 	}

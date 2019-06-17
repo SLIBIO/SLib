@@ -251,9 +251,9 @@ namespace slib
 
 		static String readAllTextUTF8(const String& path, sl_size maxSize = SLIB_SIZE_MAX);
 
-		String16 readAllTextUTF16(sl_bool flagBigEndian = sl_false, sl_size maxSize = SLIB_SIZE_MAX);
+		String16 readAllTextUTF16(EndianType endian = Endian::Little, sl_size maxSize = SLIB_SIZE_MAX);
 		
-		static String16 readAllTextUTF16(const String& path, sl_bool flagBigEndian = sl_false, sl_size maxSize = SLIB_SIZE_MAX);
+		static String16 readAllTextUTF16(const String& path, EndianType endian = Endian::Little, sl_size maxSize = SLIB_SIZE_MAX);
 		
 		String readAllText(Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
 

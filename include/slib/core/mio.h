@@ -156,9 +156,9 @@ namespace slib
 			return readInt16LE(src);
 		}
 
-		SLIB_INLINE static sl_int16 readInt16(const void* src, sl_bool flagBigEndian)
+		SLIB_INLINE static sl_int16 readInt16(const void* src, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				return readInt16BE(src);
 			} else {
 				return readInt16LE(src);
@@ -186,9 +186,9 @@ namespace slib
 			writeInt16LE(dst, v);
 		}
 
-		SLIB_INLINE static void writeInt16(void* dst, sl_int16 v, sl_bool flagBigEndian)
+		SLIB_INLINE static void writeInt16(void* dst, sl_int16 v, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				writeInt16BE(dst, v);
 			} else {
 				writeInt16LE(dst, v);
@@ -213,9 +213,9 @@ namespace slib
 			return readUint16LE(src);
 		}
 
-		SLIB_INLINE static sl_uint16 readUint16(const void* src, sl_bool flagBigEndian)
+		SLIB_INLINE static sl_uint16 readUint16(const void* src, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				return readUint16BE(src);
 			} else {
 				return readUint16LE(src);
@@ -241,9 +241,9 @@ namespace slib
 			writeUint16LE(dst, v);
 		}
 
-		SLIB_INLINE static void writeUint16(void* dst, sl_uint16 v, sl_bool flagBigEndian)
+		SLIB_INLINE static void writeUint16(void* dst, sl_uint16 v, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				writeUint16BE(dst, v);
 			} else {
 				writeUint16LE(dst, v);
@@ -268,9 +268,9 @@ namespace slib
 			return readInt32LE(src);
 		}
 
-		SLIB_INLINE static sl_int32 readInt32(const void* src, sl_bool flagBigEndian)
+		SLIB_INLINE static sl_int32 readInt32(const void* src, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				return readInt32BE(src);
 			} else {
 				return readInt32LE(src);
@@ -302,9 +302,9 @@ namespace slib
 			writeInt32LE(dst, v);
 		}
 
-		SLIB_INLINE static void writeInt32(void* dst, sl_int32 v, sl_bool flagBigEndian)
+		SLIB_INLINE static void writeInt32(void* dst, sl_int32 v, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				writeInt32BE(dst, v);
 			} else {
 				writeInt32LE(dst, v);
@@ -329,9 +329,9 @@ namespace slib
 			return readUint32LE(src);
 		}
 
-		SLIB_INLINE static sl_uint32 readUint32(const void* src, sl_bool flagBigEndian)
+		SLIB_INLINE static sl_uint32 readUint32(const void* src, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				return readUint32BE(src);
 			} else {
 				return readUint32LE(src);
@@ -361,9 +361,9 @@ namespace slib
 			writeUint32LE(dst, v);
 		}
 
-		SLIB_INLINE static void writeUint32(void* dst, sl_uint32 v, sl_bool flagBigEndian)
+		SLIB_INLINE static void writeUint32(void* dst, sl_uint32 v, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				writeUint32BE(dst, v);
 			} else {
 				writeUint32LE(dst, v);
@@ -390,9 +390,9 @@ namespace slib
 			return readInt64LE(src);
 		}
 
-		SLIB_INLINE static sl_int64 readInt64(const void* src, sl_bool flagBigEndian)
+		SLIB_INLINE static sl_int64 readInt64(const void* src, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				return readInt64BE(src);
 			} else {
 				return readInt64LE(src);
@@ -433,9 +433,9 @@ namespace slib
 			writeInt64LE(dst, v);
 		}
 
-		SLIB_INLINE static void writeInt64(void* dst, sl_int64 v, sl_bool flagBigEndian)
+		SLIB_INLINE static void writeInt64(void* dst, sl_int64 v, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				writeInt64BE(dst, v);
 			} else {
 				writeInt64LE(dst, v);
@@ -462,9 +462,9 @@ namespace slib
 			return readUint64LE(src);
 		}
 
-		SLIB_INLINE static sl_uint64 readUint64(const void* src, sl_bool flagBigEndian)
+		SLIB_INLINE static sl_uint64 readUint64(const void* src, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				return readUint64BE(src);
 			} else {
 				return readUint64LE(src);
@@ -502,9 +502,9 @@ namespace slib
 			writeUint64LE(dst, v);
 		}
 
-		SLIB_INLINE static void writeUint64(void* dst, sl_uint64 v, sl_bool flagBigEndian)
+		SLIB_INLINE static void writeUint64(void* dst, sl_uint64 v, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				writeUint64BE(dst, v);
 			} else {
 				writeUint64LE(dst, v);
@@ -529,9 +529,9 @@ namespace slib
 			return readFloatLE(src);
 		}
 
-		SLIB_INLINE static float readFloat(const void* src, sl_bool flagBigEndian)
+		SLIB_INLINE static float readFloat(const void* src, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				return readFloatBE(src);
 			} else {
 				return readFloatLE(src);
@@ -553,9 +553,9 @@ namespace slib
 			writeFloatLE(dst, v);
 		}
 
-		SLIB_INLINE static void writeFloat(void* dst, float v, sl_bool flagBigEndian)
+		SLIB_INLINE static void writeFloat(void* dst, float v, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				writeFloatBE(dst, v);
 			} else {
 				writeFloatLE(dst, v);
@@ -580,9 +580,9 @@ namespace slib
 			return readDoubleLE(src);
 		}
 
-		SLIB_INLINE static double readDouble(const void* src, sl_bool flagBigEndian)
+		SLIB_INLINE static double readDouble(const void* src, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				return readDoubleBE(src);
 			} else {
 				return readDoubleLE(src);
@@ -604,9 +604,9 @@ namespace slib
 			writeDoubleLE(dst, v);
 		}
 
-		SLIB_INLINE static void writeDouble(void* dst, double v, sl_bool flagBigEndian)
+		SLIB_INLINE static void writeDouble(void* dst, double v, EndianType endian)
 		{
-			if (flagBigEndian) {
+			if (endian == Endian::Big) {
 				writeDoubleBE(dst, v);
 			} else {
 				writeDoubleLE(dst, v);

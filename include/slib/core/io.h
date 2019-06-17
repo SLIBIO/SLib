@@ -27,6 +27,7 @@
 
 #include "object.h"
 #include "memory.h"
+#include "endian.h"
 #include "time.h"
 
 #include "../math/bigint.h"
@@ -64,37 +65,37 @@ namespace slib
 
 		sl_uint8 readUint8(sl_uint8 def = 0);
 
-		sl_bool readInt16(sl_int16* output, sl_bool flagBigEndian = sl_false);
+		sl_bool readInt16(sl_int16* output, EndianType endian = Endian::Little);
 
-		sl_int16 readInt16(sl_int16 def = 0, sl_bool flagBigEndian = sl_false);
+		sl_int16 readInt16(sl_int16 def = 0, EndianType endian = Endian::Little);
 	
-		sl_bool readUint16(sl_uint16* output, sl_bool flagBigEndian = sl_false);
+		sl_bool readUint16(sl_uint16* output, EndianType endian = Endian::Little);
 
-		sl_uint16 readUint16(sl_uint16 def = 0, sl_bool flagBigEndian = sl_false);
+		sl_uint16 readUint16(sl_uint16 def = 0, EndianType endian = Endian::Little);
 	
-		sl_bool readInt32(sl_int32* output, sl_bool flagBigEndian = sl_false);
+		sl_bool readInt32(sl_int32* output, EndianType endian = Endian::Little);
 
-		sl_int32 readInt32(sl_int32 def = 0, sl_bool flagBigEndian = sl_false);
+		sl_int32 readInt32(sl_int32 def = 0, EndianType endian = Endian::Little);
 
-		sl_bool readUint32(sl_uint32* output, sl_bool flagBigEndian = sl_false);
+		sl_bool readUint32(sl_uint32* output, EndianType endian = Endian::Little);
 
-		sl_uint32 readUint32(sl_uint32 def = 0, sl_bool flagBigEndian = sl_false);
+		sl_uint32 readUint32(sl_uint32 def = 0, EndianType endian = Endian::Little);
 
-		sl_bool readInt64(sl_int64* output, sl_bool flagBigEndian = sl_false);
+		sl_bool readInt64(sl_int64* output, EndianType endian = Endian::Little);
 
-		sl_int64 readInt64(sl_int64 def = 0, sl_bool flagBigEndian = sl_false);
+		sl_int64 readInt64(sl_int64 def = 0, EndianType endian = Endian::Little);
 	
-		sl_bool readUint64(sl_uint64* output, sl_bool flagBigEndian = sl_false);
+		sl_bool readUint64(sl_uint64* output, EndianType endian = Endian::Little);
 	
-		sl_uint64 readUint64(sl_uint64 def = 0, sl_bool flagBigEndian = sl_false);
+		sl_uint64 readUint64(sl_uint64 def = 0, EndianType endian = Endian::Little);
 
-		sl_bool readFloat(float* output, sl_bool flagBigEndian = sl_false);
+		sl_bool readFloat(float* output, EndianType endian = Endian::Little);
 
-		float readFloat(float def = 0, sl_bool flagBigEndian = sl_false);
+		float readFloat(float def = 0, EndianType endian = Endian::Little);
 	
-		sl_bool readDouble(double* output, sl_bool flagBigEndian = sl_false);
+		sl_bool readDouble(double* output, EndianType endian = Endian::Little);
 
-		double readDouble(double def = 0, sl_bool flagBigEndian = sl_false);
+		double readDouble(double def = 0, EndianType endian = Endian::Little);
 
 		//  CVLI (Chain Variable Length Integer)
 		sl_bool readUint32CVLI(sl_uint32* output);
@@ -154,7 +155,7 @@ namespace slib
 	
 		String readTextUTF8(sl_size size);
 
-		String16 readTextUTF16(sl_size size, sl_bool flagBigEndian = sl_false);
+		String16 readTextUTF16(sl_size size, EndianType endian = Endian::Little);
 
 		String readText(sl_size size, Charset* outCharset = sl_null);
 
@@ -182,21 +183,21 @@ namespace slib
 
 		sl_bool writeUint8(sl_uint8 value);
 
-		sl_bool writeInt16(sl_int16 value, sl_bool flagBigEndian = sl_false);
+		sl_bool writeInt16(sl_int16 value, EndianType endian = Endian::Little);
 
-		sl_bool writeUint16(sl_uint16 value, sl_bool flagBigEndian = sl_false);
+		sl_bool writeUint16(sl_uint16 value, EndianType endian = Endian::Little);
 
-		sl_bool writeInt32(sl_int32 value, sl_bool flagBigEndian = sl_false);
+		sl_bool writeInt32(sl_int32 value, EndianType endian = Endian::Little);
 
-		sl_bool writeUint32(sl_uint32 value, sl_bool flagBigEndian = sl_false);
+		sl_bool writeUint32(sl_uint32 value, EndianType endian = Endian::Little);
 
-		sl_bool writeInt64(sl_int64 value, sl_bool flagBigEndian = sl_false);
+		sl_bool writeInt64(sl_int64 value, EndianType endian = Endian::Little);
 
-		sl_bool writeUint64(sl_uint64 value, sl_bool flagBigEndian = sl_false);
+		sl_bool writeUint64(sl_uint64 value, EndianType endian = Endian::Little);
 
-		sl_bool writeFloat(float value, sl_bool flagBigEndian = sl_false);
+		sl_bool writeFloat(float value, EndianType endian = Endian::Little);
 	
-		sl_bool writeDouble(double value, sl_bool flagBigEndian = sl_false);
+		sl_bool writeDouble(double value, EndianType endian = Endian::Little);
 	
 		//  CVLI (Chain Variable Length Integer)
 		sl_bool writeUint32CVLI(sl_uint32 value);
@@ -302,7 +303,7 @@ namespace slib
 		
 		String readAllTextUTF8(sl_size maxSize = SLIB_SIZE_MAX);
 		
-		String16 readAllTextUTF16(sl_bool flagBigEndian = sl_false, sl_size maxSize = SLIB_SIZE_MAX);
+		String16 readAllTextUTF16(EndianType endian = Endian::Little, sl_size maxSize = SLIB_SIZE_MAX);
 		
 		String readAllText(Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
 		

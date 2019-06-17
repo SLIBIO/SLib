@@ -176,11 +176,11 @@ namespace slib
 		}
 	}
 
-	sl_bool IReader::readInt16(sl_int16* output, sl_bool flagBigEndian)
+	sl_bool IReader::readInt16(sl_int16* output, EndianType endian)
 	{
 		if (readFully(output, 2) == 2) {
 			if (output) {
-				if (flagBigEndian) {
+				if (endian == Endian::Big) {
 					*output = Endian::swap16LE(*output);
 				} else {
 					*output = Endian::swap16BE(*output);
@@ -192,21 +192,21 @@ namespace slib
 		}
 	}
 
-	sl_int16 IReader::readInt16(sl_int16 def, sl_bool flagBigEndian)
+	sl_int16 IReader::readInt16(sl_int16 def, EndianType endian)
 	{
 		sl_int16 ret;
-		if (readInt16(&ret, flagBigEndian)) {
+		if (readInt16(&ret, endian)) {
 			return ret;
 		} else {
 			return def;
 		}
 	}
 
-	sl_bool IReader::readUint16(sl_uint16* output, sl_bool flagBigEndian)
+	sl_bool IReader::readUint16(sl_uint16* output, EndianType endian)
 	{
 		if (readFully(output, 2) == 2) {
 			if (output) {
-				if (flagBigEndian) {
+				if (endian == Endian::Big) {
 					*output = Endian::swap16LE(*output);
 				} else {
 					*output = Endian::swap16BE(*output);
@@ -218,21 +218,21 @@ namespace slib
 		}
 	}
 
-	sl_uint16 IReader::readUint16(sl_uint16 def, sl_bool flagBigEndian)
+	sl_uint16 IReader::readUint16(sl_uint16 def, EndianType endian)
 	{
 		sl_uint16 ret;
-		if (readUint16(&ret, flagBigEndian)) {
+		if (readUint16(&ret, endian)) {
 			return ret;
 		} else {
 			return def;
 		}
 	}
 
-	sl_bool IReader::readInt32(sl_int32* output, sl_bool flagBigEndian)
+	sl_bool IReader::readInt32(sl_int32* output, EndianType endian)
 	{
 		if (readFully(output, 4) == 4) {
 			if (output) {
-				if (flagBigEndian) {
+				if (endian == Endian::Big) {
 					*output = Endian::swap32LE(*output);
 				} else {
 					*output = Endian::swap32BE(*output);
@@ -244,21 +244,21 @@ namespace slib
 		}
 	}
 
-	sl_int32 IReader::readInt32(sl_int32 def, sl_bool flagBigEndian)
+	sl_int32 IReader::readInt32(sl_int32 def, EndianType endian)
 	{
 		sl_int32 ret;
-		if (readInt32(&ret, flagBigEndian)) {
+		if (readInt32(&ret, endian)) {
 			return ret;
 		} else {
 			return def;
 		}
 	}
 
-	sl_bool IReader::readUint32(sl_uint32* output, sl_bool flagBigEndian)
+	sl_bool IReader::readUint32(sl_uint32* output, EndianType endian)
 	{
 		if (readFully(output, 4) == 4) {
 			if (output) {
-				if (flagBigEndian) {
+				if (endian == Endian::Big) {
 					*output = Endian::swap32LE(*output);
 				} else {
 					*output = Endian::swap32BE(*output);
@@ -270,21 +270,21 @@ namespace slib
 		}
 	}
 
-	sl_uint32 IReader::readUint32(sl_uint32 def, sl_bool flagBigEndian)
+	sl_uint32 IReader::readUint32(sl_uint32 def, EndianType endian)
 	{
 		sl_uint32 ret;
-		if (readUint32(&ret, flagBigEndian)) {
+		if (readUint32(&ret, endian)) {
 			return ret;
 		} else {
 			return def;
 		}
 	}
 
-	sl_bool IReader::readInt64(sl_int64* output, sl_bool flagBigEndian)
+	sl_bool IReader::readInt64(sl_int64* output, EndianType endian)
 	{
 		if (readFully(output, 8) == 8) {
 			if (output) {
-				if (flagBigEndian) {
+				if (endian == Endian::Big) {
 					*output = Endian::swap64LE(*output);
 				} else {
 					*output = Endian::swap64BE(*output);
@@ -296,21 +296,21 @@ namespace slib
 		}
 	}
 
-	sl_int64 IReader::readInt64(sl_int64 def, sl_bool flagBigEndian)
+	sl_int64 IReader::readInt64(sl_int64 def, EndianType endian)
 	{
 		sl_int64 ret;
-		if (readInt64(&ret, flagBigEndian)) {
+		if (readInt64(&ret, endian)) {
 			return ret;
 		} else {
 			return def;
 		}
 	}
 
-	sl_bool IReader::readUint64(sl_uint64* output, sl_bool flagBigEndian)
+	sl_bool IReader::readUint64(sl_uint64* output, EndianType endian)
 	{
 		if (readFully(output, 8) == 8) {
 			if (output) {
-				if (flagBigEndian) {
+				if (endian == Endian::Big) {
 					*output = Endian::swap64LE(*output);
 				} else {
 					*output = Endian::swap64BE(*output);
@@ -322,21 +322,21 @@ namespace slib
 		}
 	}
 
-	sl_uint64 IReader::readUint64(sl_uint64 def, sl_bool flagBigEndian)
+	sl_uint64 IReader::readUint64(sl_uint64 def, EndianType endian)
 	{
 		sl_uint64 ret;
-		if (readUint64(&ret, flagBigEndian)) {
+		if (readUint64(&ret, endian)) {
 			return ret;
 		} else {
 			return def;
 		}
 	}
 
-	sl_bool IReader::readFloat(float* output, sl_bool flagBigEndian)
+	sl_bool IReader::readFloat(float* output, EndianType endian)
 	{
 		if (readFully(output, 4) == 4) {
 			if (output) {
-				if (flagBigEndian) {
+				if (endian == Endian::Big) {
 					*output = Endian::swapFloatLE(*output);
 				} else {
 					*output = Endian::swapFloatBE(*output);
@@ -348,21 +348,21 @@ namespace slib
 		}
 	}
 
-	float IReader::readFloat(float def, sl_bool flagBigEndian)
+	float IReader::readFloat(float def, EndianType endian)
 	{
 		float ret;
-		if (readFloat(&ret, flagBigEndian)) {
+		if (readFloat(&ret, endian)) {
 			return ret;
 		} else {
 			return def;
 		}
 	}
 
-	sl_bool IReader::readDouble(double* output, sl_bool flagBigEndian)
+	sl_bool IReader::readDouble(double* output, EndianType endian)
 	{
 		if (readFully(output, 8) == 8) {
 			if (output) {
-				if (flagBigEndian) {
+				if (endian == Endian::Big) {
 					*output = Endian::swapDoubleLE(*output);
 				} else {
 					*output = Endian::swapDoubleBE(*output);
@@ -374,10 +374,10 @@ namespace slib
 		}
 	}
 
-	double IReader::readDouble(double def, sl_bool flagBigEndian)
+	double IReader::readDouble(double def, EndianType endian)
 	{
 		double ret;
-		if (readDouble(&ret, flagBigEndian)) {
+		if (readDouble(&ret, endian)) {
 			return ret;
 		} else {
 			return def;
@@ -730,14 +730,14 @@ namespace slib
 		return sl_null;
 	}
 
-	String16 IReader::readTextUTF16(sl_size size, sl_bool flagBigEndian)
+	String16 IReader::readTextUTF16(sl_size size, EndianType endian)
 	{
 		if (size == 0) {
 			return String16::getEmpty();
 		}
 		sl_size len = (size >> 1) + (size & 1);
 		sl_uint16 first;
-		if (readUint16(&first, flagBigEndian)) {
+		if (readUint16(&first, endian)) {
 			len--;
 			// check BOM(Byte Order Mark = U+FEFF)
 			String16 str;
@@ -765,7 +765,7 @@ namespace slib
 			}
 			buf[len - 1] = 0;
 			if (read(buf, size) == (sl_reg)size) {
-				if ((flagBigEndian && Endian::isLE()) || (!flagBigEndian && Endian::isBE())) {
+				if ((endian == Endian::Big && Endian::isLE()) || (endian == Endian::Little && Endian::isBE())) {
 					for (sl_size i = 0; i < len; i++) {
 						sl_uint16 c = (sl_uint16)(buf[i]);
 						buf[i] = (sl_char16)((c >> 8) | (c << 8));
@@ -1031,9 +1031,9 @@ namespace slib
 		return writeInt8(value);
 	}
 
-	sl_bool IWriter::writeInt16(sl_int16 value, sl_bool flagBigEndian)
+	sl_bool IWriter::writeInt16(sl_int16 value, EndianType endian)
 	{
-		if (flagBigEndian) {
+		if (endian == Endian::Big) {
 			value = Endian::swap16LE(value);
 		} else {
 			value = Endian::swap16BE(value);
@@ -1041,14 +1041,14 @@ namespace slib
 		return writeFully(&value, 2) == 2;
 	}
 
-	sl_bool IWriter::writeUint16(sl_uint16 value, sl_bool flagBigEndian)
+	sl_bool IWriter::writeUint16(sl_uint16 value, EndianType endian)
 	{
-		return writeInt16(value, flagBigEndian);
+		return writeInt16(value, endian);
 	}
 
-	sl_bool IWriter::writeInt32(sl_int32 value, sl_bool flagBigEndian)
+	sl_bool IWriter::writeInt32(sl_int32 value, EndianType endian)
 	{
-		if (flagBigEndian) {
+		if (endian == Endian::Big) {
 			value = Endian::swap32LE(value);
 		} else {
 			value = Endian::swap32BE(value);
@@ -1056,14 +1056,14 @@ namespace slib
 		return writeFully(&value, 4) == 4;
 	}
 
-	sl_bool IWriter::writeUint32(sl_uint32 value, sl_bool flagBigEndian)
+	sl_bool IWriter::writeUint32(sl_uint32 value, EndianType endian)
 	{
-		return writeInt32(value, flagBigEndian);
+		return writeInt32(value, endian);
 	}
 
-	sl_bool IWriter::writeInt64(sl_int64 value, sl_bool flagBigEndian)
+	sl_bool IWriter::writeInt64(sl_int64 value, EndianType endian)
 	{
-		if (flagBigEndian) {
+		if (endian == Endian::Big) {
 			value = Endian::swap64LE(value);
 		} else {
 			value = Endian::swap64BE(value);
@@ -1071,14 +1071,14 @@ namespace slib
 		return writeFully(&value, 8) == 8;
 	}
 
-	sl_bool IWriter::writeUint64(sl_uint64 value, sl_bool flagBigEndian)
+	sl_bool IWriter::writeUint64(sl_uint64 value, EndianType endian)
 	{
-		return writeInt64(value, flagBigEndian);
+		return writeInt64(value, endian);
 	}
 
-	sl_bool IWriter::writeFloat(float value, sl_bool flagBigEndian)
+	sl_bool IWriter::writeFloat(float value, EndianType endian)
 	{
-		if (flagBigEndian) {
+		if (endian == Endian::Big) {
 			value = Endian::swapFloatLE(value);
 		} else {
 			value = Endian::swapFloatBE(value);
@@ -1086,9 +1086,9 @@ namespace slib
 		return writeFully(&value, 4) == 4;
 	}
 
-	sl_bool IWriter::writeDouble(double value, sl_bool flagBigEndian)
+	sl_bool IWriter::writeDouble(double value, EndianType endian)
 	{
-		if (flagBigEndian) {
+		if (endian == Endian::Big) {
 			value = Endian::swapDoubleLE(value);
 		} else {
 			value = Endian::swapDoubleBE(value);
@@ -1480,7 +1480,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	String16 IO::readAllTextUTF16(sl_bool flagBigEndian, sl_size maxSize)
+	String16 IO::readAllTextUTF16(EndianType endian, sl_size maxSize)
 	{
 #if defined(SLIB_ARCH_IS_64BIT)
 		sl_uint64 size = getSize();
@@ -1495,7 +1495,7 @@ namespace slib
 			size = maxSize;
 		}
 		if (seekToBegin()) {
-			return readTextUTF16(size, flagBigEndian);
+			return readTextUTF16(size, endian);
 		}
 		return sl_null;
 	}
