@@ -56,7 +56,7 @@ namespace slib
 	
 		void clearTimer();
 
-		void setupTimer(sl_uint32 period_ms);
+		void setupTimer(sl_uint32 expiring_duration_ms);
 	
 		sl_bool get(const KT& key, VT* _out = sl_null, sl_bool flagUpdateLifetime = sl_true);
 

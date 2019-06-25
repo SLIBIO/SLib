@@ -80,9 +80,9 @@ namespace slib
 	}
 	
 	template <class KT, class VT>
-	void ExpiringMap<KT, VT>::setupTimer(sl_uint32 period_ms)
+	void ExpiringMap<KT, VT>::setupTimer(sl_uint32 expiring_duration_ms)
 	{
-		setupTimer(period_ms, Ref<DispatchLoop>::null());
+		setupTimer(expiring_duration_ms, Ref<DispatchLoop>::null());
 	}
 	
 	template <class KT, class VT>
