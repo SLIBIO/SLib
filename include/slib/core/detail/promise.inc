@@ -97,6 +97,24 @@ namespace slib
 	}
 	
 	template <class T>
+	SLIB_INLINE const Promise<T>& Promise<T>::from(const Promise<T>& other)
+	{
+		return other;
+	}
+	
+	template <class T>
+	template <class OTHER>
+	Promise<T> Promise<T>::from(const Promise<OTHER>& other)
+	{
+		Promise<T> ret;
+		ret.initialize();
+		other.then([ret](OTHER& result) {
+			ret.resolve(result);
+		});
+		return ret;
+	}
+	
+	template <class T>
 	SLIB_INLINE void Promise<T>::initialize()
 	{
 		ref = new CPromise<T>();

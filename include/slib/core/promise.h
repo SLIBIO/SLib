@@ -101,6 +101,11 @@ namespace slib
 		template <class... ARGS>
 		static Promise<T> fromValue(ARGS&&... args);
 		
+		static const Promise<T>& from(const Promise<T>& other);
+		
+		template <class OTHER>
+		static Promise<T> from(const Promise<OTHER>& other);
+		
 		void initialize();
 		
 		PromiseState getState() const;
