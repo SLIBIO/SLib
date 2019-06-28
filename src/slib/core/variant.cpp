@@ -44,6 +44,8 @@ namespace slib
 			const char g_variantMapList_ClassID[] = "VariantMapList";
 			const char g_variantHashMapList_ClassID[] = "VariantHashMapList";
 			
+			const char g_variantPromise_ClassID[] = "VariantPromise";
+
 			const ConstContainer g_undefined = {0, VariantType::Null, 0};
 			const ConstContainer g_null = {1, VariantType::Null, 0};
 
@@ -554,6 +556,16 @@ namespace slib
 		_constructorAtomicRef(&list);
 	}
 	
+	Variant::Variant(const Promise<Variant>& promise) noexcept
+	{
+		_constructorRef(&promise);
+	}
+	
+	Variant::Variant(const AtomicPromise<Variant>& promise) noexcept
+	{
+		_constructorAtomicRef(&promise);
+	}
+	
 	Variant Variant::createList() noexcept
 	{
 		return List<Variant>::create();
@@ -673,7 +685,11 @@ namespace slib
 	{
 		return value;
 	}
-
+	
+	Variant Variant::fromVariantPromise(const Promise<Variant>& value) noexcept
+	{
+		return value;
+	}
 
 	Variant& Variant::operator=(Variant&& other) noexcept
 	{
@@ -1922,7 +1938,26 @@ namespace slib
 		}
 		return sl_false;
 	}
-
+	
+	sl_bool Variant::isVariantPromise() const noexcept
+	{
+		return IsInstanceOf< Promise<Variant> >(getObject());
+	}
+	
+	Promise<Variant> Variant::getVariantPromise() const noexcept
+	{
+		Ref<Referable> obj(getObject());
+		if (CPromise<Variant>* p = CastInstance< CPromise<Variant> >(obj._ptr)) {
+			return p;
+		}
+		return sl_null;
+	}
+	
+	void Variant::setVariantPromise(const Promise<Variant>& promise) noexcept
+	{
+		_assignRef(&promise);
+	}
+	
 	namespace priv
 	{
 		namespace variant
@@ -2716,7 +2751,26 @@ namespace slib
 		_assignAtomicRef(&_in);
 	}
 	
+	void Variant::get(Promise<Variant>& _out) const noexcept
+	{
+		_out = getVariantPromise();
+	}
 	
+	void Variant::set(const Promise<Variant>& _in) noexcept
+	{
+		_assignRef(&_in);
+	}
+	
+	void Variant::get(AtomicPromise<Variant>& _out) const noexcept
+	{
+		_out = getVariantPromise();
+	}
+	
+	void Variant::set(const AtomicPromise<Variant>& _in) noexcept
+	{
+		_assignAtomicRef(&_in);
+	}
+
 	Atomic<Variant>::Atomic(AtomicVariant&& other) noexcept
 	{
 		_type = other._type;
@@ -2980,6 +3034,16 @@ namespace slib
 	Atomic<Variant>::Atomic(const AtomicVariantHashMapList& list) noexcept
 	{
 		_constructorAtomicRef(&list);
+	}
+	
+	Atomic<Variant>::Atomic(const Promise<Variant>& promise) noexcept
+	{
+		_constructorRef(&promise);
+	}
+	
+	Atomic<Variant>::Atomic(const AtomicPromise<Variant>& promise) noexcept
+	{
+		_constructorAtomicRef(&promise);
 	}
 	
 	AtomicVariant& Atomic<Variant>::operator=(AtomicVariant&& other) noexcept
@@ -3592,6 +3656,23 @@ namespace slib
 		Variant var(*this);
 		return var.removeItem(key);
 	}
+	
+	sl_bool Atomic<Variant>::isVariantPromise() const noexcept
+	{
+		Variant var(*this);
+		return var.isVariantPromise();
+	}
+	
+	Promise<Variant> Atomic<Variant>::getVariantPromise() const noexcept
+	{
+		Variant var(*this);
+		return var.getVariantPromise();
+	}
+	
+	void Atomic<Variant>::setVariantPromise(const Promise<Variant>& promise) noexcept
+	{
+		_assignRef(&promise);
+	}
 
 	String Atomic<Variant>::toString() const noexcept
 	{
@@ -4066,6 +4147,26 @@ namespace slib
 	}
 	
 	void Atomic<Variant>::set(const AtomicVariantHashMapList& _in) noexcept
+	{
+		_assignAtomicRef(&_in);
+	}
+	
+	void Atomic<Variant>::get(Promise<Variant>& _out) const noexcept
+	{
+		_out = getVariantPromise();
+	}
+
+	void Atomic<Variant>::set(const Promise<Variant>& _in) noexcept
+	{
+		_assignRef(&_in);
+	}
+	
+	void Atomic<Variant>::get(AtomicPromise<Variant>& _out) const noexcept
+	{
+		_out = getVariantPromise();
+	}
+	
+	void Atomic<Variant>::set(const AtomicPromise<Variant>& _in) noexcept
 	{
 		_assignAtomicRef(&_in);
 	}

@@ -350,18 +350,24 @@ namespace slib
 	}
 
 	
-	extern const char _priv_FunctionList_ClassID[];
+	namespace priv
+	{
+		namespace function_list
+		{
+			extern const char g_classID[];
+		}
+	}
 
 	template <class RET_TYPE, class... ARGS>
 	SLIB_INLINE sl_object_type FunctionList<RET_TYPE(ARGS...)>::ObjectType() noexcept
 	{
-		return _priv_FunctionList_ClassID;
+		return priv::function_list::g_classID;
 	}
 	
 	template <class RET_TYPE, class... ARGS>
 	SLIB_INLINE sl_bool FunctionList<RET_TYPE(ARGS...)>::isDerivedFrom(sl_object_type type) noexcept
 	{
-		if (type == _priv_FunctionList_ClassID) {
+		if (type == priv::function_list::g_classID) {
 			return sl_true;
 		}
 		return CallableBase::isDerivedFrom(type);
@@ -370,13 +376,13 @@ namespace slib
 	template <class RET_TYPE, class... ARGS>
 	SLIB_INLINE sl_object_type FunctionList<RET_TYPE(ARGS...)>::getObjectType() const noexcept
 	{
-		return _priv_FunctionList_ClassID;
+		return priv::function_list::g_classID;
 	}
 	
 	template <class RET_TYPE, class... ARGS>
 	SLIB_INLINE sl_bool FunctionList<RET_TYPE(ARGS...)>::isInstanceOf(sl_object_type type) const noexcept
 	{
-		if (type == _priv_FunctionList_ClassID) {
+		if (type == priv::function_list::g_classID) {
 			return sl_true;
 		}
 		return CallableBase::isDerivedFrom(type);

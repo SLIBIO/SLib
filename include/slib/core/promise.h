@@ -49,20 +49,19 @@ namespace slib
 		Completed = 2
 	};
 	
-	class SLIB_EXPORT CPromiseBase : public Referable
+	namespace priv
 	{
-		SLIB_DECLARE_OBJECT
-		
-	public:
-		CPromiseBase() noexcept;
-		
-		~CPromiseBase() noexcept;
-		
-	};
+		namespace promise
+		{
+			extern const char g_classID[];
+		}
+	}
 	
 	template <class T>
-	class SLIB_EXPORT CPromise : public CPromiseBase
+	class SLIB_EXPORT CPromise : public Referable
 	{
+		SLIB_TEMPLATE_ROOT_OBJECT(priv::promise::g_classID)
+
 	private:
 		PromiseState m_state;
 		Function<void(T& result)> m_callback;
@@ -83,8 +82,8 @@ namespace slib
 		template <class... ARGS>
 		void resolve(ARGS&&... args);
 		
-		template <class CALLBACK>
-		void then(CALLBACK&& callback);
+		template <class CALLBACK_TYPE>
+		void then(CALLBACK_TYPE&& callback);
 		
 	};
 	
@@ -113,8 +112,8 @@ namespace slib
 		template <class... ARGS>
 		void resolve(ARGS&&... args) const;
 		
-		template <class CALLBACK>
-		void then(CALLBACK&& callback) const;
+		template <class CALLBACK_TYPE>
+		void then(CALLBACK_TYPE&& callback) const;
 
 		template <class RET>
 		Promise<RET> thenReturn(const Function<RET(T& result)>& callback) const;

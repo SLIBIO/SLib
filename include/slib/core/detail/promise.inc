@@ -69,8 +69,8 @@ namespace slib
 	}
 	
 	template <class T>
-	template <class CALLBACK>
-	void CPromise<T>::then(CALLBACK&& callback)
+	template <class CALLBACK_TYPE>
+	void CPromise<T>::then(CALLBACK_TYPE&& callback)
 	{
 		SpinLocker lock(&m_lock);
 		if (m_state == PromiseState::Resolved) {
@@ -78,7 +78,7 @@ namespace slib
 			lock.unlock();
 			callback(*((T*)((void*)m_result)));
 		} else if (m_state == PromiseState::Pending) {
-			m_callback = Forward<CALLBACK>(callback);
+			m_callback = Forward<CALLBACK_TYPE>(callback);
 		}
 	}
 	
@@ -142,12 +142,12 @@ namespace slib
 	}
 	
 	template <class T>
-	template <class CALLBACK>
-	SLIB_INLINE void Promise<T>::then(CALLBACK&& callback) const
+	template <class CALLBACK_TYPE>
+	SLIB_INLINE void Promise<T>::then(CALLBACK_TYPE&& callback) const
 	{
 		CPromise<T>* object = ref._ptr;
 		if (object) {
-			object->then(Forward<CALLBACK>(callback));
+			object->then(Forward<CALLBACK_TYPE>(callback));
 		} else {
 			T result = NullValue<T>::get();
 			callback(result);

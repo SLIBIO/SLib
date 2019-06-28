@@ -43,9 +43,9 @@ namespace slib
 
 namespace slib
 {
-	
 	namespace priv
 	{
+		
 		namespace map
 		{
 			const char g_classID[] = "map";
@@ -55,8 +55,8 @@ namespace slib
 		{
 			const char g_classID[] = "hash_map";
 		}
+		
 	}
-	
 }
 
 
@@ -108,16 +108,22 @@ namespace slib
 
 namespace slib
 {
-	
-	struct _priv_Ptr_Const
+	namespace priv
 	{
-		void* _ptr;
-		void* ref;
-		sl_int32 lock;
-	};
-	
-	const _priv_Ptr_Const _priv_Ptr_Null = {0, 0, 0};
-	
+		namespace ptr
+		{
+			
+			struct ConstStruct
+			{
+				void* _ptr;
+				void* ref;
+				sl_int32 lock;
+			};
+			
+			const ConstStruct g_null = {0, 0, 0};
+			
+		}
+	}
 }
 
 
@@ -128,7 +134,13 @@ namespace slib
 	
 	SLIB_DEFINE_ROOT_OBJECT(CallableBase)
 	
-	const char _priv_FunctionList_ClassID[] = "FunctionList";
+	namespace priv
+	{
+		namespace function_list
+		{
+			const char g_classID[] = "FunctionList";
+		}
+	}
 	
 }
 
@@ -137,15 +149,11 @@ namespace slib
 
 namespace slib
 {
-	
-	SLIB_DEFINE_ROOT_OBJECT(CPromiseBase)
-	
-	CPromiseBase::CPromiseBase() noexcept
+	namespace priv
 	{
+		namespace promise
+		{
+			const char g_classID[] = "promise";
+		}
 	}
-	
-	CPromiseBase::~CPromiseBase() noexcept
-	{
-	}
-	
 }

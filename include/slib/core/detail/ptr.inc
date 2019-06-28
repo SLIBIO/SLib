@@ -25,8 +25,14 @@
 namespace slib
 {
 	
-	struct _priv_Ptr_Const;
-	extern const _priv_Ptr_Const _priv_Ptr_Null;
+	namespace priv
+	{
+		namespace ptr
+		{
+			struct ConstStruct;
+			extern const ConstStruct g_null;
+		}
+	}
 
 	template <class T>
 	SLIB_INLINE Ptr<T>::Ptr() noexcept
@@ -345,7 +351,7 @@ namespace slib
 	template <class T>
 	SLIB_INLINE const Ptr<T>& Ptr<T>::null() noexcept
 	{
-		return *(reinterpret_cast<Ptr<T> const*>(&_priv_Ptr_Null));
+		return *(reinterpret_cast<Ptr<T> const*>(&(priv::ptr::g_null)));
 	}
 	
 	template <class T>
@@ -1031,7 +1037,7 @@ namespace slib
 	template <class T>
 	SLIB_INLINE const AtomicPtr<T>& Atomic< Ptr<T> >::null() noexcept
 	{
-		return *(reinterpret_cast<AtomicPtr<T> const*>(&_priv_Ptr_Null));
+		return *(reinterpret_cast<AtomicPtr<T> const*>(&(priv::ptr::g_null)));
 	}
 	
 	template <class T>
@@ -1467,7 +1473,7 @@ namespace slib
 	template <class T>
 	SLIB_INLINE T* Atomic< Ptr<T> >::_retain(Ref<Referable>& reference) const noexcept
 	{
-		if ((void*)this == (void*)(&_priv_Ptr_Null)) {
+		if ((void*)this == (void*)(&(priv::ptr::g_null))) {
 			return sl_null;
 		} else {
 			SpinLocker lock(&m_lock);

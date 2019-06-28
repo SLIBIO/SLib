@@ -31,6 +31,7 @@
 #include "list.h"
 #include "map.h"
 #include "hash_map.h"
+#include "promise.h"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 #include <string>
@@ -171,6 +172,10 @@ namespace slib
 		
 		Variant(const AtomicList< HashMap<String, Variant> >& list) noexcept;
 		
+		Variant(const Promise<Variant>& promise) noexcept;
+		
+		Variant(const AtomicPromise<Variant>& promise) noexcept;
+		
 	public:
 		static const Variant& undefined() noexcept;
 		
@@ -234,6 +239,8 @@ namespace slib
 		static Variant fromVariantMapList(const List< Map<String, Variant> >& value) noexcept;
 		
 		static Variant fromVariantHashMapList(const List< HashMap<String, Variant> >& value) noexcept;
+		
+		static Variant fromVariantPromise(const Promise<Variant>& value) noexcept;
 		
 	public:
 		Variant& operator=(Variant&& other) noexcept;
@@ -461,6 +468,13 @@ namespace slib
 		
 		sl_bool removeItem(const String& key) noexcept;
 	
+		
+		sl_bool isVariantPromise() const noexcept;
+		
+		Promise<Variant> getVariantPromise() const noexcept;
+		
+		void setVariantPromise(const Promise<Variant>& promise) noexcept;
+
 
 		String toString() const noexcept;
 	
@@ -630,6 +644,12 @@ namespace slib
 		void get(AtomicList< HashMap<String, Variant> >& _out) const noexcept;
 		void set(const AtomicList< HashMap<String, Variant> >& _in) noexcept;
 
+		void get(Promise<Variant>& _out) const noexcept;
+		void set(const Promise<Variant>& _in) noexcept;
+		
+		void get(AtomicPromise<Variant>& _out) const noexcept;
+		void set(const AtomicPromise<Variant>& _in) noexcept;
+
 	private:
 		void _constructorRef(const void* ptr);
 		
@@ -764,6 +784,10 @@ namespace slib
 		Atomic(const List< HashMap<String, Variant> >& list) noexcept;
 		
 		Atomic(const AtomicList< HashMap<String, Variant> >& list) noexcept;
+
+		Atomic(const Promise<Variant>& promise) noexcept;
+		
+		Atomic(const AtomicPromise<Variant>& promise) noexcept;
 
 	public:
 		static const AtomicVariant& undefined() noexcept;
@@ -996,7 +1020,14 @@ namespace slib
 		sl_bool putItem(const String& key, const Variant& value) noexcept;
 
 		sl_bool removeItem(const String& key) noexcept;
-
+		
+		
+		sl_bool isVariantPromise() const noexcept;
+		
+		Promise<Variant> getVariantPromise() const noexcept;
+		
+		void setVariantPromise(const Promise<Variant>& promise) noexcept;
+		
 
 		String toString() const noexcept;
 
@@ -1166,6 +1197,12 @@ namespace slib
 		void get(AtomicList< HashMap<String, Variant> >& _out) const noexcept;
 		void set(const AtomicList< HashMap<String, Variant> >& _in) noexcept;
 		
+		void get(Promise<Variant>& _out) const noexcept;
+		void set(const Promise<Variant>& _in) noexcept;
+		
+		void get(AtomicPromise<Variant>& _out) const noexcept;
+		void set(const AtomicPromise<Variant>& _in) noexcept;
+		
 	private:
 		void _constructorRef(const void* ptr);
 		
@@ -1227,6 +1264,8 @@ namespace slib
 	typedef AtomicList< Map<String, Variant> > AtomicVariantMapList;
 	typedef List< HashMap<String, Variant> > VariantHashMapList;
 	typedef AtomicList< HashMap<String, Variant> > AtomicVariantHashMapList;
+	
+	typedef Promise<Variant> VariantPromise;
 
 }
 

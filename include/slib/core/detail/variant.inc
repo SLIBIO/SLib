@@ -43,6 +43,8 @@ namespace slib
 			extern const char g_variantMapList_ClassID[];
 			extern const char g_variantHashMapList_ClassID[];
 	
+			extern const char g_variantPromise_ClassID[];
+
 		}
 	}
 	
@@ -634,6 +636,31 @@ namespace slib
 			return sl_true;
 		}
 		return Object::isDerivedFrom(type);
+	}
+	
+	
+	template <>
+	SLIB_INLINE sl_object_type CPromise<Variant>::ObjectType() noexcept
+	{
+		return priv::variant::g_variantPromise_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CPromise<Variant>::isDerivedFrom(sl_object_type type) noexcept
+	{
+		return type == priv::variant::g_variantPromise_ClassID || type == priv::promise::g_classID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_object_type CPromise<Variant>::getObjectType() const noexcept
+	{
+		return priv::variant::g_variantPromise_ClassID;
+	}
+	
+	template <>
+	SLIB_INLINE sl_bool CPromise<Variant>::isInstanceOf(sl_object_type type) const noexcept
+	{
+		return type == priv::variant::g_variantPromise_ClassID || type == priv::promise::g_classID;
 	}
 	
 }
