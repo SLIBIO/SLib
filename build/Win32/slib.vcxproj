@@ -117,7 +117,6 @@
     <ClCompile Include="..\..\src\res\gen\strings.cpp" />
     <ClCompile Include="..\..\src\slib\core\animation.cpp" />
     <ClCompile Include="..\..\src\slib\core\app.cpp" />
-    <ClCompile Include="..\..\src\slib\core\array.cpp" />
     <ClCompile Include="..\..\src\slib\core\asm_x64.cpp" />
     <ClCompile Include="..\..\src\slib\core\async.cpp" />
     <ClCompile Include="..\..\src\slib\core\async_iocp.cpp" />
@@ -132,14 +131,12 @@
     <ClCompile Include="..\..\src\slib\core\event_windows.cpp" />
     <ClCompile Include="..\..\src\slib\core\file.cpp" />
     <ClCompile Include="..\..\src\slib\core\file_win32.cpp" />
-    <ClCompile Include="..\..\src\slib\core\function.cpp" />
     <ClCompile Include="..\..\src\slib\core\hash.cpp" />
     <ClCompile Include="..\..\src\slib\core\io.cpp" />
     <ClCompile Include="..\..\src\slib\core\json.cpp" />
     <ClCompile Include="..\..\src\slib\core\list.cpp" />
     <ClCompile Include="..\..\src\slib\core\locale.cpp" />
     <ClCompile Include="..\..\src\slib\core\log.cpp" />
-    <ClCompile Include="..\..\src\slib\core\map.cpp" />
     <ClCompile Include="..\..\src\slib\core\math.cpp" />
     <ClCompile Include="..\..\src\slib\core\memory.cpp" />
     <ClCompile Include="..\..\src\slib\core\mutex.cpp" />
@@ -151,7 +148,6 @@
     <ClCompile Include="..\..\src\slib\core\platform_windows.cpp" />
     <ClCompile Include="..\..\src\slib\core\preference.cpp" />
     <ClCompile Include="..\..\src\slib\core\preference_win32.cpp" />
-    <ClCompile Include="..\..\src\slib\core\ptr.cpp" />
     <ClCompile Include="..\..\src\slib\core\asset.cpp" />
     <ClCompile Include="..\..\src\slib\core\red_black_tree.cpp" />
     <ClCompile Include="..\..\src\slib\core\ref.cpp" />

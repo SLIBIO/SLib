@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,46 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *   THE SOFTWARE.
  */
+
+#include "slib/core/array.h"
+
+namespace slib
+{
+	
+	SLIB_DEFINE_ROOT_OBJECT(CArrayBase)
+	
+	CArrayBase::CArrayBase() noexcept
+	{
+	}
+	
+	CArrayBase::~CArrayBase() noexcept
+	{
+	}
+	
+}
+
+
+#include "slib/core/map.h"
+#include "slib/core/hash_map.h"
+
+namespace slib
+{
+	
+	namespace priv
+	{
+		namespace map
+		{
+			const char g_classID[] = "map";
+		}
+		
+		namespace hash_map
+		{
+			const char g_classID[] = "hash_map";
+		}
+	}
+	
+}
+
 
 #include "slib/core/linked_list.h"
 #include "slib/core/loop_queue.h"
@@ -58,6 +98,53 @@ namespace slib
 	}
 
 	LinkedObjectListBase::~LinkedObjectListBase() noexcept
+	{
+	}
+	
+}
+
+
+#include "slib/core/ptr.h"
+
+namespace slib
+{
+	
+	struct _priv_Ptr_Const
+	{
+		void* _ptr;
+		void* ref;
+		sl_int32 lock;
+	};
+	
+	const _priv_Ptr_Const _priv_Ptr_Null = {0, 0, 0};
+	
+}
+
+
+#include "slib/core/function.h"
+
+namespace slib
+{
+	
+	SLIB_DEFINE_ROOT_OBJECT(CallableBase)
+	
+	const char _priv_FunctionList_ClassID[] = "FunctionList";
+	
+}
+
+
+#include "slib/core/promise.h"
+
+namespace slib
+{
+	
+	SLIB_DEFINE_ROOT_OBJECT(CPromiseBase)
+	
+	CPromiseBase::CPromiseBase() noexcept
+	{
+	}
+	
+	CPromiseBase::~CPromiseBase() noexcept
 	{
 	}
 	
