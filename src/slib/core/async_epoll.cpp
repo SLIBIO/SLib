@@ -38,11 +38,19 @@
 namespace slib
 {
 
-	struct _priv_AsyncIoLoopHandle
+	namespace priv
 	{
-		int fdEpoll;
-		Ref<PipeEvent> eventWake;
-	};
+		namespace async_epoll
+		{
+			struct AsyncIoLoopHandle
+			{
+				int fdEpoll;
+				Ref<PipeEvent> eventWake;
+			};
+		}
+	}
+
+	using namespace priv::async_epoll;
 
 	void* AsyncIoLoop::_native_createHandle()
 	{
@@ -57,7 +65,7 @@ namespace slib
 		fdEpoll = ::epoll_create1(0);
 #endif
 		if (fdEpoll >= 0) {
-			_priv_AsyncIoLoopHandle* handle = new _priv_AsyncIoLoopHandle;
+			AsyncIoLoopHandle* handle = new AsyncIoLoopHandle;
 			if (handle) {
 				handle->fdEpoll = fdEpoll;
 				handle->eventWake = pipe;
@@ -77,14 +85,14 @@ namespace slib
 
 	void AsyncIoLoop::_native_closeHandle(void* _handle)
 	{
-		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)_handle;
+		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)_handle;
 		::close(handle->fdEpoll);
 		delete handle;
 	}
 
 	void AsyncIoLoop::_native_runLoop()
 	{
-		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
+		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)m_handle;
 
 		epoll_event waitEvents[ASYNC_MAX_WAIT_EVENT];
 
@@ -142,13 +150,13 @@ namespace slib
 
 	void AsyncIoLoop::_native_wake()
 	{
-		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
+		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)m_handle;
 		handle->eventWake->set();
 	}
 
 	sl_bool AsyncIoLoop::_native_attachInstance(AsyncIoInstance* instance, AsyncIoMode mode)
 	{
-		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
+		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)m_handle;
 		int hObject = (int)(instance->getHandle());
 		epoll_event ev;
 		ev.data.ptr = (void*)instance;
@@ -182,7 +190,7 @@ namespace slib
 
 	void AsyncIoLoop::_native_detachInstance(AsyncIoInstance* instance)
 	{
-		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
+		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)m_handle;
 		int hObject = (int)(instance->getHandle());
 		epoll_event ev;
 		int ret = ::epoll_ctl(handle->fdEpoll, EPOLL_CTL_DEL, hObject, &ev);

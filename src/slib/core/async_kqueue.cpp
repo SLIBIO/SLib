@@ -35,12 +35,20 @@
 namespace slib
 {
 
-	struct _priv_AsyncIoLoopHandle
+	namespace priv
 	{
-		int kq;
-		Ref<PipeEvent> eventWake;
-	};
-
+		namespace async_kqueue
+		{
+			struct AsyncIoLoopHandle
+			{
+				int kq;
+				Ref<PipeEvent> eventWake;
+			};
+		}
+	}
+	
+	using namespace priv::async_kqueue;
+	
 	void* AsyncIoLoop::_native_createHandle()
 	{
 		Ref<PipeEvent> pipe = PipeEvent::create();
@@ -50,7 +58,7 @@ namespace slib
 		int kq;
 		kq = ::kqueue();
 		if (kq != -1) {
-			_priv_AsyncIoLoopHandle* handle = new _priv_AsyncIoLoopHandle;
+			AsyncIoLoopHandle* handle = new AsyncIoLoopHandle;
 			if (handle) {
 				handle->kq = kq;
 				handle->eventWake = pipe;
@@ -69,14 +77,14 @@ namespace slib
 
 	void AsyncIoLoop::_native_closeHandle(void* _handle)
 	{
-		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)_handle;
+		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)_handle;
 		::close(handle->kq);
 		delete handle;
 	}
 
 	void AsyncIoLoop::_native_runLoop()
 	{
-		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
+		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)m_handle;
 
 		struct kevent waitEvents[ASYNC_MAX_WAIT_EVENT];
 
@@ -125,13 +133,13 @@ namespace slib
 
 	void AsyncIoLoop::_native_wake()
 	{
-		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
+		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)m_handle;
 		handle->eventWake->set();
 	}
 
 	sl_bool AsyncIoLoop::_native_attachInstance(AsyncIoInstance* instance, AsyncIoMode mode)
 	{
-		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
+		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)m_handle;
 		int hObject = (int)(instance->getHandle());
 		
 		struct kevent ke[2];
@@ -163,7 +171,7 @@ namespace slib
 
 	void AsyncIoLoop::_native_detachInstance(AsyncIoInstance* instance)
 	{
-		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
+		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)m_handle;
 		int hObject = (int)(instance->getHandle());
 		
 		AsyncIoMode mode = instance->getMode();

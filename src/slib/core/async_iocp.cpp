@@ -30,17 +30,25 @@
 namespace slib
 {
 
-	struct _priv_AsyncIoLoopHandle
+	namespace priv
 	{
-		HANDLE hCompletionPort;
-		OVERLAPPED overlappedWake;
-	};
+		namespace async_iocp
+		{
+			struct AsyncIoLoopHandle
+			{
+				HANDLE hCompletionPort;
+				OVERLAPPED overlappedWake;
+			};
+		}
+	}
 
+	using namespace priv::async_iocp;
+	
 	void* AsyncIoLoop::_native_createHandle()
 	{
 		HANDLE hCompletionPort = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 1);
 		if (hCompletionPort) {
-			_priv_AsyncIoLoopHandle* handle = new _priv_AsyncIoLoopHandle;
+			AsyncIoLoopHandle* handle = new AsyncIoLoopHandle;
 			if (handle) {
 				handle->hCompletionPort = hCompletionPort;
 				return handle;
@@ -52,7 +60,7 @@ namespace slib
 
 	void AsyncIoLoop::_native_closeHandle(void* _handle)
 	{
-		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)_handle;
+		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)_handle;
 		::CloseHandle(handle->hCompletionPort);
 		delete handle;
 	}
@@ -82,7 +90,7 @@ namespace slib
 
 	void AsyncIoLoop::_native_runLoop()
 	{
-		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
+		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)m_handle;
 
 		WINAPI_GetQueuedCompletionStatusEx fGetQueuedCompletionStatusEx = Windows::getAPI_GetQueuedCompletionStatusEx();
 		if (!fGetQueuedCompletionStatusEx) {
@@ -123,14 +131,14 @@ namespace slib
 
 	void AsyncIoLoop::_native_wake()
 	{
-		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
+		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)m_handle;
 		Base::resetMemory(&(handle->overlappedWake), 0, sizeof(OVERLAPPED));
 		::PostQueuedCompletionStatus(handle->hCompletionPort, 0, 0, &(handle->overlappedWake));
 	}
 
 	sl_bool AsyncIoLoop::_native_attachInstance(AsyncIoInstance* instance, AsyncIoMode mode)
 	{
-		_priv_AsyncIoLoopHandle* handle = (_priv_AsyncIoLoopHandle*)m_handle;
+		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)m_handle;
 		HANDLE hObject = (HANDLE)(instance->getHandle());
 		HANDLE hPort = ::CreateIoCompletionPort(hObject, handle->hCompletionPort, (ULONG_PTR)instance, 0);
 		if (hPort) {
