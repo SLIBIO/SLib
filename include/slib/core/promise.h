@@ -123,9 +123,15 @@ namespace slib
 		// don't use mixed with `then()`, timeoutMilliseconds: negative means infinite timeout
 		sl_bool wait(T* _output, sl_int32 timeoutMilliseconds = -1) const;
 		
-		static Promise< List<T> > all(const List< Promise<T> >& promises);
+		template <class... PROMISES>
+		static Promise< List<T> > all(PROMISES&&... promises);
 
-		static Promise<T> race(const List< Promise<T> >& promises);
+		static Promise< List<T> > allList(const List< Promise<T> >& promises);
+		
+		template <class... PROMISES>
+		static Promise<T> race(PROMISES&&... promises);
+		
+		static Promise<T> raceList(const List< Promise<T> >& promises);
 		
 	};
 	

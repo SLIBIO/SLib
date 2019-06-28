@@ -202,7 +202,38 @@ namespace slib
 	}
 	
 	template <class T>
-	Promise< List<T> > Promise<T>::all(const List< Promise<T> >& _promises)
+	template <class... PROMISES>
+	Promise< List<T> > Promise<T>::all(PROMISES&&... _promises)
+	{
+		Promise<T> promises[] = {Forward<PROMISES>(_promises)...};
+		sl_size n = sizeof...(_promises);
+		if (!n) {
+			return sl_null;
+		}
+		Ref< priv::promise::PromiseAllContext<T> > refContext = new priv::promise::PromiseAllContext<T>;
+		priv::promise::PromiseAllContext<T>* context = refContext.get();
+		context->results = List<T>::create(n);
+		if (context->results.isNull()) {
+			return sl_null;
+		}
+		context->nCompleted = 0;
+		Promise< List<T> > ret;
+		ret.initialize();
+		for (sl_size i = 0; i < n; i++) {
+			Promise<T>& promise = promises[i];
+			sl_size index = i;
+			promise.then([ret, index, n, context, refContext](T& result) {
+				context->results.setAt_NoLock(index, Move(result));
+				if (Base::interlockedIncrement(&(context->nCompleted)) == n) {
+					ret.resolve(context->results);
+				}
+			});
+		}
+		return ret;
+	}
+	
+	template <class T>
+	Promise< List<T> > Promise<T>::allList(const List< Promise<T> >& _promises)
 	{
 		sl_size n = _promises.getCount();
 		if (!n) {
@@ -235,7 +266,27 @@ namespace slib
 	}
 	
 	template <class T>
-	Promise<T> Promise<T>::race(const List< Promise<T> >& _promises)
+	template <class... PROMISES>
+	Promise<T> Promise<T>::race(PROMISES&&... _promises)
+	{
+		Promise<T> promises[] = {Forward<PROMISES>(_promises)...};
+		sl_size n = sizeof...(_promises);
+		if (!n) {
+			return sl_null;
+		}
+		Promise<T> ret;
+		ret.initialize();
+		for (sl_size i = 0; i < n; i++) {
+			Promise<T>& promise = promises[i];
+			promise.then([ret](T& result) {
+				ret.resolve(Move(result));
+			});
+		}
+		return ret;
+	}
+	
+	template <class T>
+	Promise<T> Promise<T>::raceList(const List< Promise<T> >& _promises)
 	{
 		sl_size n = _promises.getCount();
 		if (!n) {
@@ -255,6 +306,5 @@ namespace slib
 		}
 		return ret;
 	}
-
 
 }
