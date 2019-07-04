@@ -154,7 +154,7 @@ namespace slib
 		descDst.colors = (Color*)(mem.getData());
 		const Color* colors = desc.colors;
 		if (!colors) {
-			Base::zeroMemory(desc.colors, size);
+			Base::zeroMemory(descDst.colors, size);
 			return ret;
 		}
 		sl_uint32 stride = desc.stride;
@@ -465,752 +465,762 @@ namespace slib
 		}
 	}
 
-	class _priv_ImageStretch_FillColor
+	namespace priv
 	{
-	public:
-		template <class BLEND_OP>
-		static void stretch(ImageDesc& dst, const ImageDesc& src)
+		namespace image
 		{
-			Color* colorsDst = dst.colors;
-			Color color = *(src.colors);
-			for (sl_uint32 y = 0; y < dst.height; y++) {
-				for (sl_uint32 x = 0; x < dst.width; x++) {
-					BLEND_OP::blend(colorsDst[x], color);
-				}
-				colorsDst += dst.stride;
-			}
-		}
-	};
-
-	class _priv_ImageStretch_Copy
-	{
-	public:
-		template <class BLEND_OP>
-		static void stretch(ImageDesc& dst, const ImageDesc& src)
-		{
-			Color* colorsDst = dst.colors;
-			const Color* colorsSrc = src.colors;
-			for (sl_uint32 y = 0; y < dst.height; y++) {
-				for (sl_uint32 x = 0; x < dst.width; x++) {
-					BLEND_OP::blend(colorsDst[x], colorsSrc[x]);
-				}
-				colorsDst += dst.stride;
-				colorsSrc += src.stride;
-			}
-		}
-	};
-
-	class _priv_ImageStretch_Nearest
-	{
-	public:
-		template <class BLEND_OP>
-		static void stretchX(ImageDesc& dst, const ImageDesc& src)
-		{
-			sl_uint32 dx, dy;
 			
-			SLIB_SCOPED_BUFFER(sl_uint32, 1024, mapx, dst.width);
-			sl_uint32 tx = 0;
-			for (dx = 0; dx < dst.width; dx++) {
-				mapx[dx] = tx / dst.width;
-				tx += src.width;
-			}
-			
-			Color* colorsDst = dst.colors;
-			const Color* colorsSrc = src.colors;
-			for (dy = 0; dy < dst.height; dy++) {
-				for (dx = 0; dx < dst.width; dx++) {
-					BLEND_OP::blend(colorsDst[dx], colorsSrc[mapx[dx]]);
+			class Stretch_FillColor
+			{
+			public:
+				template <class BLEND_OP>
+				static void stretch(ImageDesc& dst, const ImageDesc& src)
+				{
+					Color* colorsDst = dst.colors;
+					Color color = *(src.colors);
+					for (sl_uint32 y = 0; y < dst.height; y++) {
+						for (sl_uint32 x = 0; x < dst.width; x++) {
+							BLEND_OP::blend(colorsDst[x], color);
+						}
+						colorsDst += dst.stride;
+					}
 				}
-				colorsDst += dst.stride;
-				colorsSrc += src.stride;
-			}
-		}
-		
-		template <class BLEND_OP>
-		static void stretchY(ImageDesc& dst, const ImageDesc& src)
-		{
-			sl_uint32 dx, dy;
+			};
 			
-			Color* colorsDst = dst.colors;
-			for (dy = 0; dy < dst.height; dy++) {
-				const Color* colorsSrc = src.colors + ((dy * src.height) / dst.height) * src.stride;
-				for (dx = 0; dx < dst.width; dx++) {
-					BLEND_OP::blend(colorsDst[dx], colorsSrc[dx]);
+			class Stretch_Copy
+			{
+			public:
+				template <class BLEND_OP>
+				static void stretch(ImageDesc& dst, const ImageDesc& src)
+				{
+					Color* colorsDst = dst.colors;
+					const Color* colorsSrc = src.colors;
+					for (sl_uint32 y = 0; y < dst.height; y++) {
+						for (sl_uint32 x = 0; x < dst.width; x++) {
+							BLEND_OP::blend(colorsDst[x], colorsSrc[x]);
+						}
+						colorsDst += dst.stride;
+						colorsSrc += src.stride;
+					}
 				}
-				colorsDst += dst.stride;
-			}
-		}
-		
-		template <class BLEND_OP>
-		static void stretch(ImageDesc& dst, const ImageDesc& src)
-		{
-			if (src.width == dst.width) {
-				stretchX<BLEND_OP>(dst, src);
-				return;
-			}
-			if (src.height == dst.height) {
-				stretchY<BLEND_OP>(dst, src);
-				return;
-			}
-			
-			sl_uint32 dx, dy;
-			
-			SLIB_SCOPED_BUFFER(sl_uint32, 1024, mapx, dst.width);
-			sl_uint32 tx = 0;
-			for (dx = 0; dx < dst.width; dx++) {
-				mapx[dx] = tx / dst.width;
-				tx += src.width;
-			}
-			
-			Color* colorsDst = dst.colors;
-			for (dy = 0; dy < dst.height; dy++) {
-				const Color* colorsSrc = src.colors + ((dy * src.height) / dst.height) * src.stride;
-				for (dx = 0; dx < dst.width; dx++) {
-					BLEND_OP::blend(colorsDst[dx], colorsSrc[mapx[dx]]);
+			};
+
+			class Stretch_Nearest
+			{
+			public:
+				template <class BLEND_OP>
+				static void stretchX(ImageDesc& dst, const ImageDesc& src)
+				{
+					sl_uint32 dx, dy;
+					
+					SLIB_SCOPED_BUFFER(sl_uint32, 1024, mapx, dst.width);
+					sl_uint32 tx = 0;
+					for (dx = 0; dx < dst.width; dx++) {
+						mapx[dx] = tx / dst.width;
+						tx += src.width;
+					}
+					
+					Color* colorsDst = dst.colors;
+					const Color* colorsSrc = src.colors;
+					for (dy = 0; dy < dst.height; dy++) {
+						for (dx = 0; dx < dst.width; dx++) {
+							BLEND_OP::blend(colorsDst[dx], colorsSrc[mapx[dx]]);
+						}
+						colorsDst += dst.stride;
+						colorsSrc += src.stride;
+					}
 				}
-				colorsDst += dst.stride;
-			}
-		}
-		
-	};
-
-	struct _priv_ImageStretch_FilterParam
-	{
-		sl_bool flagBox;
-		float filterSize;
-	};
-
-	class _priv_ImageStretch_Smooth_LinearFilter
-	{
-	public:
-		SLIB_INLINE static void getColorAt(Color& _out, const Color* colors, float fx, float fy, sl_uint32 stride, const _priv_ImageStretch_FilterParam& px, const _priv_ImageStretch_FilterParam& py)
-		{
-			const Color& c00 = *colors;
-			const Color& c01 = colors[1];
-			const Color& c10 = colors[stride];
-			const Color& c11 = colors[stride + 1];
-			float sx = 1 - fx;
-			float ex = fx;
-			float sy = 1 - fy;
-			float ey = fy;
-			float f00 = sx * sy;
-			float f01 = ex * sy;
-			float f10 = sx * ey;
-			float f11 = ex * ey;
-			float r = (float)(c00.r) * f00 + (float)(c01.r) * f01 + (float)(c10.r) * f10 + (float)(c11.r) * f11;
-			float g = (float)(c00.g) * f00 + (float)(c01.g) * f01 + (float)(c10.g) * f10 + (float)(c11.g) * f11;
-			float b = (float)(c00.b) * f00 + (float)(c01.b) * f01 + (float)(c10.b) * f10 + (float)(c11.b) * f11;
-			float a = (float)(c00.a) * f00 + (float)(c01.a) * f01 + (float)(c10.a) * f10 + (float)(c11.a) * f11;
-			_out.r = (sl_uint8)(r);
-			_out.g = (sl_uint8)(g);
-			_out.b = (sl_uint8)(b);
-			_out.a = (sl_uint8)(a);
-		}
-		
-		SLIB_INLINE static void getColorAtX(Color& _out, const Color* colors, float fx, const _priv_ImageStretch_FilterParam& px)
-		{
-			const Color& c0 = *colors;
-			const Color& c1 = colors[1];
-			float f0 = 1 - fx;
-			float f1 = fx;
-			float r = (float)(c0.r) * f0 + (float)(c1.r) * f1;
-			float g = (float)(c0.g) * f0 + (float)(c1.g) * f1;
-			float b = (float)(c0.b) * f0 + (float)(c1.b) * f1;
-			float a = (float)(c0.a) * f0 + (float)(c1.a) * f1;
-			_out.r = (sl_uint8)(r);
-			_out.g = (sl_uint8)(g);
-			_out.b = (sl_uint8)(b);
-			_out.a = (sl_uint8)(a);
-		}
-		
-		SLIB_INLINE static void getColorAtY(Color& _out, const Color* colors, float fy, sl_uint32 stride, const _priv_ImageStretch_FilterParam& py)
-		{
-			const Color& c0 = *colors;
-			const Color& c1 = colors[stride];
-			float f0 = 1 - fy;
-			float f1 = fy;
-			float r = (float)(c0.r) * f0 + (float)(c1.r) * f1;
-			float g = (float)(c0.g) * f0 + (float)(c1.g) * f1;
-			float b = (float)(c0.b) * f0 + (float)(c1.b) * f1;
-			float a = (float)(c0.a) * f0 + (float)(c1.a) * f1;
-			_out.r = (sl_uint8)(r);
-			_out.g = (sl_uint8)(g);
-			_out.b = (sl_uint8)(b);
-			_out.a = (sl_uint8)(a);
-		}
-
-	};
-
-	class _priv_ImageStretch_Smooth_BoxFilter
-	{
-	public:
-		SLIB_INLINE static void prepareFilter(float f, const _priv_ImageStretch_FilterParam& p, float& s, float& e, int& n, float& area)
-		{
-			if (p.flagBox) {
-				s = 1 - f;
-				e = f + p.filterSize; // p.filterSize > 1
-				n = (int)(e - 0.0001);
-				e -= (float)n;
-				n -= 1;
-				area = p.filterSize;
-			} else {
-				s = 1 - f;
-				e = f;
-				n = 0;
-				area = 1;
-			}
-		}
-		
-		SLIB_INLINE static void getColorAt(Color& _out, const Color* colors, float fx, float fy, sl_uint32 stride, const _priv_ImageStretch_FilterParam& px, const _priv_ImageStretch_FilterParam& py)
-		{
-			float sx, ex, ax; int nx;
-			prepareFilter(fx, px, sx, ex, nx, ax);
-			float sy, ey, ay; int ny;
-			prepareFilter(fy, py, sy, ey, ny, ay);
-			int ix, iy;
-			float r = sx * (float)(colors[0].r) + ex * (float)(colors[nx + 1].r);
-			float g = sx * (float)(colors[0].g) + ex * (float)(colors[nx + 1].g);
-			float b = sx * (float)(colors[0].b) + ex * (float)(colors[nx + 1].b);
-			float a = sx * (float)(colors[0].a) + ex * (float)(colors[nx + 1].a);
-			for (ix = 0; ix < nx; ix++) {
-				r += (float)(colors[1 + ix].r);
-				g += (float)(colors[1 + ix].g);
-				b += (float)(colors[1 + ix].b);
-				a += (float)(colors[1 + ix].a);
-			}
-			r *= sy;
-			g *= sy;
-			b *= sy;
-			a *= sy;
-			colors += stride;
-			for (iy = 0; iy < ny; iy++) {
-				r += sx * (float)(colors[0].r) + ex * (float)(colors[nx + 1].r);
-				g += sx * (float)(colors[0].g) + ex * (float)(colors[nx + 1].g);
-				b += sx * (float)(colors[0].b) + ex * (float)(colors[nx + 1].b);
-				a += sx * (float)(colors[0].a) + ex * (float)(colors[nx + 1].a);
-				for (ix = 0; ix < nx; ix++) {
-					r += (float)(colors[1 + ix].r);
-					g += (float)(colors[1 + ix].g);
-					b += (float)(colors[1 + ix].b);
-					a += (float)(colors[1 + ix].a);
+				
+				template <class BLEND_OP>
+				static void stretchY(ImageDesc& dst, const ImageDesc& src)
+				{
+					sl_uint32 dx, dy;
+					
+					Color* colorsDst = dst.colors;
+					for (dy = 0; dy < dst.height; dy++) {
+						const Color* colorsSrc = src.colors + ((dy * src.height) / dst.height) * src.stride;
+						for (dx = 0; dx < dst.width; dx++) {
+							BLEND_OP::blend(colorsDst[dx], colorsSrc[dx]);
+						}
+						colorsDst += dst.stride;
+					}
 				}
-				colors += stride;
+				
+				template <class BLEND_OP>
+				static void stretch(ImageDesc& dst, const ImageDesc& src)
+				{
+					if (src.width == dst.width) {
+						stretchX<BLEND_OP>(dst, src);
+						return;
+					}
+					if (src.height == dst.height) {
+						stretchY<BLEND_OP>(dst, src);
+						return;
+					}
+					
+					sl_uint32 dx, dy;
+					
+					SLIB_SCOPED_BUFFER(sl_uint32, 1024, mapx, dst.width);
+					sl_uint32 tx = 0;
+					for (dx = 0; dx < dst.width; dx++) {
+						mapx[dx] = tx / dst.width;
+						tx += src.width;
+					}
+					
+					Color* colorsDst = dst.colors;
+					for (dy = 0; dy < dst.height; dy++) {
+						const Color* colorsSrc = src.colors + ((dy * src.height) / dst.height) * src.stride;
+						for (dx = 0; dx < dst.width; dx++) {
+							BLEND_OP::blend(colorsDst[dx], colorsSrc[mapx[dx]]);
+						}
+						colorsDst += dst.stride;
+					}
+				}
+				
+			};
+			
+			struct Stretch_FilterParam
+			{
+				sl_bool flagBox;
+				float filterSize;
+			};
+			
+			class Stretch_Smooth_LinearFilter
+			{
+			public:
+				SLIB_INLINE static void getColorAt(Color& _out, const Color* colors, float fx, float fy, sl_uint32 stride, const Stretch_FilterParam& px, const Stretch_FilterParam& py)
+				{
+					const Color& c00 = *colors;
+					const Color& c01 = colors[1];
+					const Color& c10 = colors[stride];
+					const Color& c11 = colors[stride + 1];
+					float sx = 1 - fx;
+					float ex = fx;
+					float sy = 1 - fy;
+					float ey = fy;
+					float f00 = sx * sy;
+					float f01 = ex * sy;
+					float f10 = sx * ey;
+					float f11 = ex * ey;
+					float r = (float)(c00.r) * f00 + (float)(c01.r) * f01 + (float)(c10.r) * f10 + (float)(c11.r) * f11;
+					float g = (float)(c00.g) * f00 + (float)(c01.g) * f01 + (float)(c10.g) * f10 + (float)(c11.g) * f11;
+					float b = (float)(c00.b) * f00 + (float)(c01.b) * f01 + (float)(c10.b) * f10 + (float)(c11.b) * f11;
+					float a = (float)(c00.a) * f00 + (float)(c01.a) * f01 + (float)(c10.a) * f10 + (float)(c11.a) * f11;
+					_out.r = (sl_uint8)(r);
+					_out.g = (sl_uint8)(g);
+					_out.b = (sl_uint8)(b);
+					_out.a = (sl_uint8)(a);
+				}
+				
+				SLIB_INLINE static void getColorAtX(Color& _out, const Color* colors, float fx, const Stretch_FilterParam& px)
+				{
+					const Color& c0 = *colors;
+					const Color& c1 = colors[1];
+					float f0 = 1 - fx;
+					float f1 = fx;
+					float r = (float)(c0.r) * f0 + (float)(c1.r) * f1;
+					float g = (float)(c0.g) * f0 + (float)(c1.g) * f1;
+					float b = (float)(c0.b) * f0 + (float)(c1.b) * f1;
+					float a = (float)(c0.a) * f0 + (float)(c1.a) * f1;
+					_out.r = (sl_uint8)(r);
+					_out.g = (sl_uint8)(g);
+					_out.b = (sl_uint8)(b);
+					_out.a = (sl_uint8)(a);
+				}
+				
+				SLIB_INLINE static void getColorAtY(Color& _out, const Color* colors, float fy, sl_uint32 stride, const Stretch_FilterParam& py)
+				{
+					const Color& c0 = *colors;
+					const Color& c1 = colors[stride];
+					float f0 = 1 - fy;
+					float f1 = fy;
+					float r = (float)(c0.r) * f0 + (float)(c1.r) * f1;
+					float g = (float)(c0.g) * f0 + (float)(c1.g) * f1;
+					float b = (float)(c0.b) * f0 + (float)(c1.b) * f1;
+					float a = (float)(c0.a) * f0 + (float)(c1.a) * f1;
+					_out.r = (sl_uint8)(r);
+					_out.g = (sl_uint8)(g);
+					_out.b = (sl_uint8)(b);
+					_out.a = (sl_uint8)(a);
+				}
+				
+			};
+			
+			class Stretch_Smooth_BoxFilter
+			{
+			public:
+				SLIB_INLINE static void prepareFilter(float f, const Stretch_FilterParam& p, float& s, float& e, int& n, float& area)
+				{
+					if (p.flagBox) {
+						s = 1 - f;
+						e = f + p.filterSize; // p.filterSize > 1
+						n = (int)(e - 0.0001);
+						e -= (float)n;
+						n -= 1;
+						area = p.filterSize;
+					} else {
+						s = 1 - f;
+						e = f;
+						n = 0;
+						area = 1;
+					}
+				}
+				
+				SLIB_INLINE static void getColorAt(Color& _out, const Color* colors, float fx, float fy, sl_uint32 stride, const Stretch_FilterParam& px, const Stretch_FilterParam& py)
+				{
+					float sx, ex, ax; int nx;
+					prepareFilter(fx, px, sx, ex, nx, ax);
+					float sy, ey, ay; int ny;
+					prepareFilter(fy, py, sy, ey, ny, ay);
+					int ix, iy;
+					float r = sx * (float)(colors[0].r) + ex * (float)(colors[nx + 1].r);
+					float g = sx * (float)(colors[0].g) + ex * (float)(colors[nx + 1].g);
+					float b = sx * (float)(colors[0].b) + ex * (float)(colors[nx + 1].b);
+					float a = sx * (float)(colors[0].a) + ex * (float)(colors[nx + 1].a);
+					for (ix = 0; ix < nx; ix++) {
+						r += (float)(colors[1 + ix].r);
+						g += (float)(colors[1 + ix].g);
+						b += (float)(colors[1 + ix].b);
+						a += (float)(colors[1 + ix].a);
+					}
+					r *= sy;
+					g *= sy;
+					b *= sy;
+					a *= sy;
+					colors += stride;
+					for (iy = 0; iy < ny; iy++) {
+						r += sx * (float)(colors[0].r) + ex * (float)(colors[nx + 1].r);
+						g += sx * (float)(colors[0].g) + ex * (float)(colors[nx + 1].g);
+						b += sx * (float)(colors[0].b) + ex * (float)(colors[nx + 1].b);
+						a += sx * (float)(colors[0].a) + ex * (float)(colors[nx + 1].a);
+						for (ix = 0; ix < nx; ix++) {
+							r += (float)(colors[1 + ix].r);
+							g += (float)(colors[1 + ix].g);
+							b += (float)(colors[1 + ix].b);
+							a += (float)(colors[1 + ix].a);
+						}
+						colors += stride;
+					}
+					r += ey * (sx * (float)(colors[0].r) + ex * (float)(colors[nx + 1].r));
+					g += ey * (sx * (float)(colors[0].g) + ex * (float)(colors[nx + 1].g));
+					b += ey * (sx * (float)(colors[0].b) + ex * (float)(colors[nx + 1].b));
+					a += ey * (sx * (float)(colors[0].a) + ex * (float)(colors[nx + 1].a));
+					for (ix = 0; ix < nx; ix++) {
+						r += ey * (float)(colors[1 + ix].r);
+						g += ey * (float)(colors[1 + ix].g);
+						b += ey * (float)(colors[1 + ix].b);
+						a += ey * (float)(colors[1 + ix].a);
+					}
+					float area = ax * ay;
+					_out.r = (sl_uint8)(r / area);
+					_out.g = (sl_uint8)(g / area);
+					_out.b = (sl_uint8)(b / area);
+					_out.a = (sl_uint8)(a / area);
+				}
+				
+				SLIB_INLINE static void getColorAtX(Color& _out, const Color* colors, float fx, const Stretch_FilterParam& px)
+				{
+					float sx, ex, ax; int nx;
+					prepareFilter(fx, px, sx, ex, nx, ax);
+					int ix;
+					float r = sx * (float)(colors[0].r) + ex * (float)(colors[nx + 1].r);
+					float g = sx * (float)(colors[0].g) + ex * (float)(colors[nx + 1].g);
+					float b = sx * (float)(colors[0].b) + ex * (float)(colors[nx + 1].b);
+					float a = sx * (float)(colors[0].a) + ex * (float)(colors[nx + 1].a);
+					for (ix = 0; ix < nx; ix++) {
+						r += (float)(colors[1 + ix].r);
+						g += (float)(colors[1 + ix].g);
+						b += (float)(colors[1 + ix].b);
+						a += (float)(colors[1 + ix].a);
+					}
+					_out.r = (sl_uint8)(r / ax);
+					_out.g = (sl_uint8)(g / ax);
+					_out.b = (sl_uint8)(b / ax);
+					_out.a = (sl_uint8)(a / ax);
+				}
+				
+				SLIB_INLINE static void getColorAtY(Color& _out, const Color* colors, float fy, sl_uint32 stride, const Stretch_FilterParam& py)
+				{
+					float sy, ey, ay; int ny;
+					prepareFilter(fy, py, sy, ey, ny, ay);
+					int iy;
+					float r = sy * (float)(colors[0].r);
+					float g = sy * (float)(colors[0].g);
+					float b = sy * (float)(colors[0].b);
+					float a = sy * (float)(colors[0].a);
+					colors += stride;
+					for (iy = 0; iy < ny; iy++) {
+						r += (float)(colors[0].r);
+						g += (float)(colors[0].g);
+						b += (float)(colors[0].b);
+						a += (float)(colors[0].a);
+						colors += stride;
+					}
+					r += ey * (float)(colors[0].r);
+					g += ey * (float)(colors[0].g);
+					b += ey * (float)(colors[0].b);
+					a += ey * (float)(colors[0].a);
+					_out.r = (sl_uint8)(r / ay);
+					_out.g = (sl_uint8)(g / ay);
+					_out.b = (sl_uint8)(b / ay);
+					_out.a = (sl_uint8)(a / ay);
+				}
+				
+			};
+			
+			SLIB_INLINE static void Stretch_Smooth_Prepare(sl_int32 sw, sl_int32 dw, float& step, float& sx_start, sl_int32& dx_start, sl_int32& dx_end, Stretch_FilterParam& param)
+			{
+				if (sw >= dw) {
+					step = (float)(sw) / (float)(dw);
+					param.flagBox = sl_true;
+					param.filterSize = step;
+					sx_start = 0;
+					dx_start = 0;
+					dx_end = dw;
+				} else {
+					step = (float)(sw - 1) / (float)(dw - 1);
+					param.flagBox = sl_false;
+					param.filterSize = 1;
+					sx_start = step;
+					dx_start = 1;
+					dx_end = dw - 1;
+				}
 			}
-			r += ey * (sx * (float)(colors[0].r) + ex * (float)(colors[nx + 1].r));
-			g += ey * (sx * (float)(colors[0].g) + ex * (float)(colors[nx + 1].g));
-			b += ey * (sx * (float)(colors[0].b) + ex * (float)(colors[nx + 1].b));
-			a += ey * (sx * (float)(colors[0].a) + ex * (float)(colors[nx + 1].a));
-			for (ix = 0; ix < nx; ix++) {
-				r += ey * (float)(colors[1 + ix].r);
-				g += ey * (float)(colors[1 + ix].g);
-				b += ey * (float)(colors[1 + ix].b);
-				a += ey * (float)(colors[1 + ix].a);
-			}
-			float area = ax * ay;
-			_out.r = (sl_uint8)(r / area);
-			_out.g = (sl_uint8)(g / area);
-			_out.b = (sl_uint8)(b / area);
-			_out.a = (sl_uint8)(a / area);
-		}
-		
-		SLIB_INLINE static void getColorAtX(Color& _out, const Color* colors, float fx, const _priv_ImageStretch_FilterParam& px)
-		{
-			float sx, ex, ax; int nx;
-			prepareFilter(fx, px, sx, ex, nx, ax);
-			int ix;
-			float r = sx * (float)(colors[0].r) + ex * (float)(colors[nx + 1].r);
-			float g = sx * (float)(colors[0].g) + ex * (float)(colors[nx + 1].g);
-			float b = sx * (float)(colors[0].b) + ex * (float)(colors[nx + 1].b);
-			float a = sx * (float)(colors[0].a) + ex * (float)(colors[nx + 1].a);
-			for (ix = 0; ix < nx; ix++) {
-				r += (float)(colors[1 + ix].r);
-				g += (float)(colors[1 + ix].g);
-				b += (float)(colors[1 + ix].b);
-				a += (float)(colors[1 + ix].a);
-			}
-			_out.r = (sl_uint8)(r / ax);
-			_out.g = (sl_uint8)(g / ax);
-			_out.b = (sl_uint8)(b / ax);
-			_out.a = (sl_uint8)(a / ax);
-		}
-		
-		SLIB_INLINE static void getColorAtY(Color& _out, const Color* colors, float fy, sl_uint32 stride, const _priv_ImageStretch_FilterParam& py)
-		{
-			float sy, ey, ay; int ny;
-			prepareFilter(fy, py, sy, ey, ny, ay);
-			int iy;
-			float r = sy * (float)(colors[0].r);
-			float g = sy * (float)(colors[0].g);
-			float b = sy * (float)(colors[0].b);
-			float a = sy * (float)(colors[0].a);
-			colors += stride;
-			for (iy = 0; iy < ny; iy++) {
-				r += (float)(colors[0].r);
-				g += (float)(colors[0].g);
-				b += (float)(colors[0].b);
-				a += (float)(colors[0].a);
-				colors += stride;
-			}
-			r += ey * (float)(colors[0].r);
-			g += ey * (float)(colors[0].g);
-			b += ey * (float)(colors[0].b);
-			a += ey * (float)(colors[0].a);
-			_out.r = (sl_uint8)(r / ay);
-			_out.g = (sl_uint8)(g / ay);
-			_out.b = (sl_uint8)(b / ay);
-			_out.a = (sl_uint8)(a / ay);
-		}
-		
-	};
+			
+			template <class FILTER>
+			class Stretch_Smooth
+			{
+			public:
+				template <class BLEND_OP>
+				static void stretchX(ImageDesc& dst, const ImageDesc& src)
+				{
+					sl_int32 sw = src.width;
+					sl_int32 dw = dst.width;
+					float sx_step, sx_start;
+					sl_int32 isx, dx_start, dx_end;
+					Stretch_FilterParam px;
+					Stretch_Smooth_Prepare(sw, dw, sx_step, sx_start, dx_start, dx_end, px);
+					
+					sl_int32 dx, dy;
+					sl_int32 dh = dst.height;
+					float sx;
+					
+					Color* colorsDst;
+					const Color* colorsSrc;
+					Color color;
+					
+					if (dx_start) {
+						// left
+						colorsDst = dst.colors;
+						colorsSrc = src.colors;
+						for (dy = 0; dy < dh; dy++) {
+							BLEND_OP::blend(*colorsDst, *colorsSrc);
+							colorsDst += dst.stride;
+							colorsSrc += src.stride;
+						}
+						// right
+						colorsDst = dst.colors + (dw - 1);
+						colorsSrc = src.colors + (sw - 1);
+						for (dy = 0; dy < dh; dy++) {
+							BLEND_OP::blend(*colorsDst, *colorsSrc);
+							colorsDst += dst.stride;
+							colorsSrc += src.stride;
+						}
+					}
+					
+					colorsDst = dst.colors;
+					colorsSrc = src.colors;
+					for (dy = 0; dy < dh; dy++) {
+						for (dx = dx_start; dx < dx_end; dx++) {
+							sx = sx_start + (float)(dx) * sx_step;
+							isx = (sl_int32)sx;
+							FILTER::getColorAtX(color, colorsSrc + isx, sx - (float)isx, px);
+							BLEND_OP::blend(colorsDst[dx], color);
+						}
+						colorsDst += dst.stride;
+						colorsSrc += src.stride;
+					}
+				}
+				
+				template <class BLEND_OP>
+				static void stretchY(ImageDesc& dst, const ImageDesc& src)
+				{
+					sl_int32 sh = src.height;
+					sl_int32 dh = dst.height;
+					float sy_step, sy_start;
+					sl_int32 isy, dy_start, dy_end;
+					Stretch_FilterParam py;
+					Stretch_Smooth_Prepare(sh, dh, sy_step, sy_start, dy_start, dy_end, py);
+					
+					sl_int32 dx, dy;
+					sl_int32 dw = dst.width;
+					float sy;
+					
+					Color* colorsDst;
+					const Color* colorsSrc;
+					Color color;
+					
+					if (dy_start) {
+						// top
+						colorsDst = dst.colors;
+						colorsSrc = src.colors;
+						for (dx = 0; dx < dw; dx++) {
+							BLEND_OP::blend(colorsDst[dx], colorsSrc[dx]);
+						}
+						// bottom
+						colorsDst = dst.colors + (sl_uint32)(dh - 1) * dst.stride;
+						colorsSrc = src.colors + (sl_uint32)(sh - 1) * src.stride;
+						for (dx = 0; dx < dw; dx++) {
+							BLEND_OP::blend(colorsDst[dx], colorsSrc[dx]);
+						}
+					}
+					
+					colorsDst = dst.colors + dy_start * dst.stride;
+					colorsSrc = src.colors;
+					for (dy = dy_start; dy < dy_end; dy++) {
+						sy = sy_start + (float)(dy) * sy_step;
+						isy = (sl_int32)sy;
+						float fsy = sy - (float)isy;
+						const Color* lineSrc = colorsSrc + (sl_uint32)isy * src.stride;
+						for (dx = 0; dx < dw; dx++) {
+							FILTER::getColorAtY(color, lineSrc + dx, fsy, src.stride, py);
+							BLEND_OP::blend(colorsDst[dx], color);
+						}
+						colorsDst += dst.stride;
+					}
+				}
+				
+				template <class BLEND_OP>
+				static void stretchOneRowSrc(ImageDesc& dst, const ImageDesc& src)
+				{
+					sl_int32 sw = src.width;
+					sl_int32 dw = dst.width;
+					float sx_step, sx_start;
+					sl_int32 isx, dx_start, dx_end;
+					Stretch_FilterParam px;
+					Stretch_Smooth_Prepare(sw, dw, sx_step, sx_start, dx_start, dx_end, px);
+					
+					sl_int32 dx, dy;
+					sl_int32 dh = dst.height;
+					float sx;
+					
+					Color* colorsDst;
+					Color color;
+					
+					if (dx_start) {
+						// left
+						colorsDst = dst.colors;
+						color = *(src.colors);
+						for (dy = 0; dy < dh; dy++) {
+							BLEND_OP::blend(*colorsDst, color);
+							colorsDst += dst.stride;
+						}
+						// right
+						colorsDst = dst.colors + (dw - 1);
+						color = *(src.colors + (sw - 1));
+						for (dy = 0; dy < dh; dy++) {
+							BLEND_OP::blend(*colorsDst, color);
+							colorsDst += dst.stride;
+						}
+					}
+					
+					for (dx = dx_start; dx < dx_end; dx++) {
+						sx = sx_start + (float)(dx) * sx_step;
+						isx = (sl_int32)sx;
+						FILTER::getColorAtX(color, src.colors + isx, sx - (float)isx, px);
+						colorsDst = dst.colors + dx;
+						for (dy = 0; dy < dh; dy++) {
+							BLEND_OP::blend(*(colorsDst), color);
+							colorsDst += dst.stride;
+						}
+					}
+				}
+				
+				template <class BLEND_OP>
+				static void stretchOneColSrc(ImageDesc& dst, const ImageDesc& src)
+				{
+					sl_int32 sh = src.height;
+					sl_int32 dh = dst.height;
+					float sy_step, sy_start;
+					sl_int32 isy, dy_start, dy_end;
+					Stretch_FilterParam py;
+					Stretch_Smooth_Prepare(sh, dh, sy_step, sy_start, dy_start, dy_end, py);
+					
+					sl_int32 dx, dy;
+					sl_int32 dw = dst.width;
+					float sy;
+					
+					Color* colorsDst;
+					Color color;
+					
+					if (dy_start) {
+						// top
+						colorsDst = dst.colors;
+						color = *(src.colors);
+						for (dx = 0; dx < dw; dx++) {
+							BLEND_OP::blend(colorsDst[dx], color);
+						}
+						// bottom
+						colorsDst = dst.colors + (dh - 1) * dst.stride;
+						color = *(src.colors + (sh - 1) * src.stride);
+						for (dx = 0; dx < dw; dx++) {
+							BLEND_OP::blend(colorsDst[dx], color);
+						}
+					}
+					
+					colorsDst = dst.colors + dy_start * dst.stride;
+					for (dy = dy_start; dy < dy_end; dy++) {
+						sy = sy_start + (float)(dy) * sy_step;
+						isy = (sl_int32)sy;
+						float fsy = sy - (float)isy;
+						FILTER::getColorAtY(color, src.colors + isy * src.stride, fsy, src.stride, py);
+						for (dx = 0; dx < dw; dx++) {
+							BLEND_OP::blend(colorsDst[dx], color);
+						}
+						colorsDst += dst.stride;
+					}
+				}
+				
+				template <class BLEND_OP>
+				static void stretch(ImageDesc& dst, const ImageDesc& src)
+				{
+					if (src.width == dst.width) {
+						stretchY<BLEND_OP>(dst, src);
+						return;
+					}
+					if (src.height == dst.height) {
+						stretchX<BLEND_OP>(dst, src);
+						return;
+					}
+					if (src.width == 1) {
+						stretchOneColSrc<BLEND_OP>(dst, src);
+						return;
+					}
+					if (src.height == 1) {
+						stretchOneRowSrc<BLEND_OP>(dst, src);
+						return;
+					}
+					
+					sl_int32 sw = src.width;
+					sl_int32 dw = dst.width;
+					float sx_step, sx_start;
+					sl_int32 isx, dx_start, dx_end;
+					Stretch_FilterParam px;
+					Stretch_Smooth_Prepare(sw, dw, sx_step, sx_start, dx_start, dx_end, px);
+					
+					sl_int32 sh = src.height;
+					sl_int32 dh = dst.height;
+					float sy_step, sy_start;
+					sl_int32 isy, dy_start, dy_end;
+					Stretch_FilterParam py;
+					Stretch_Smooth_Prepare(sh, dh, sy_step, sy_start, dy_start, dy_end, py);
+					
+					sl_int32 dx, dy;
+					float sx, sy;
+					
+					Color color;
+					Color* colorsDst;
+					const Color* colorsSrc;
+					
+					// 4-corners
+					if (dx_start && dy_start) {
+						colorsDst = dst.colors;
+						colorsSrc = src.colors;
+						BLEND_OP::blend(colorsDst[0], colorsSrc[0]);
+						BLEND_OP::blend(colorsDst[dw - 1], colorsSrc[sw - 1]);
+						BLEND_OP::blend(colorsDst[(dh - 1) * dst.stride], colorsSrc[(sh - 1) * src.stride]);
+						BLEND_OP::blend(colorsDst[(dh - 1) * dst.stride + dw - 1], colorsSrc[(sh - 1) * src.stride + sw - 1]);
+					}
+					
+					if (dy_start) {
+						// top
+						colorsDst = dst.colors;
+						colorsSrc = src.colors;
+						for (dx = dx_start; dx < dx_end; dx++) {
+							sx = sx_start + (float)(dx) * sx_step;
+							isx = (sl_int32)sx;
+							FILTER::getColorAtX(color, colorsSrc + isx, sx - (float)isx, px);
+							BLEND_OP::blend(colorsDst[dx], color);
+						}
+						// bottom
+						colorsDst = dst.colors + (dh - 1) * dst.stride;
+						colorsSrc = src.colors + (sh - 1) * src.stride;
+						for (dx = dx_start; dx < dx_end; dx++) {
+							sx = sx_start + (float)(dx) * sx_step;
+							isx = (sl_int32)sx;
+							FILTER::getColorAtX(color, colorsSrc + isx, sx - (float)isx, px);
+							BLEND_OP::blend(colorsDst[dx], color);
+						}
+					}
+					if (dx_start) {
+						// left
+						colorsDst = dst.colors + dy_start * dst.stride;
+						colorsSrc = src.colors;
+						for (dy = dy_start; dy < dy_end; dy++) {
+							sy = sy_start + (float)(dy) * sy_step;
+							isy = (sl_int32)sy;
+							FILTER::getColorAtY(color, colorsSrc + isy * src.stride, sy - (float)isy, src.stride, py);
+							BLEND_OP::blend(*colorsDst, color);
+							colorsDst += dst.stride;
+						}
+						// right
+						colorsDst = dst.colors + (dy_start * dst.stride + dw - 1);
+						colorsSrc = src.colors + (sw - 1);
+						for (dy = dy_start; dy < dy_end; dy++) {
+							sy = sy_start + (float)(dy) * sy_step;
+							isy = (sl_int32)sy;
+							FILTER::getColorAtY(color, colorsSrc + isy * src.stride, sy - (float)isy, src.stride, py);
+							BLEND_OP::blend(*colorsDst, color);
+							colorsDst += dst.stride;
+						}
+					}
+					
+					colorsDst = dst.colors + dy_start * dst.stride;
+					colorsSrc = src.colors;
+					for (dy = dy_start; dy < dy_end; dy++) {
+						sy = sy_start + (float)(dy) * sy_step;
+						isy = (sl_int32)sy;
+						float fsy = sy - (float)isy;
+						const Color* lineSrc = colorsSrc + isy * src.stride;
+						for (dx = dx_start; dx < dx_end; dx++) {
+							sx = sx_start + (float)(dx) * sx_step;
+							isx = (sl_int32)sx;
+							FILTER::getColorAt(color, lineSrc + isx, sx - (float)isx, fsy, src.stride, px, py);
+							BLEND_OP::blend(colorsDst[dx], color);
+						}
+						colorsDst += dst.stride;
+					}
+				}
+			};
 
-	SLIB_INLINE static void _priv_ImageStretch_Smooth_Prepare(sl_int32 sw, sl_int32 dw, float& step, float& sx_start, sl_int32& dx_start, sl_int32& dx_end, _priv_ImageStretch_FilterParam& param)
-	{
-		if (sw >= dw) {
-			step = (float)(sw) / (float)(dw);
-			param.flagBox = sl_true;
-			param.filterSize = step;
-			sx_start = 0;
-			dx_start = 0;
-			dx_end = dw;
-		} else {
-			step = (float)(sw - 1) / (float)(dw - 1);
-			param.flagBox = sl_false;
-			param.filterSize = 1;
-			sx_start = step;
-			dx_start = 1;
-			dx_end = dw - 1;
+			class Stretch_Smooth_IntBox
+			{
+			public:
+				template <class BLEND_OP>
+				static void stretch(ImageDesc& dst, const ImageDesc& src)
+				{
+					sl_uint32 dw = dst.width;
+					sl_uint32 sw = src.width;
+					sl_uint32 fx = sw / dw;
+					if (fx == 0) {
+						return;
+					}
+					sl_uint32 dx, sx;
+					
+					sl_uint32 dh = dst.height;
+					sl_uint32 sh = src.height;
+					sl_uint32 fy = sh / dh;
+					if (fy == 0) {
+						return;
+					}
+					sl_uint32 dy, sy;
+					
+					Color* colorsDst = dst.colors;
+					const Color* colorsSrc = src.colors;
+					sl_uint32 ly = fy * src.stride;
+					
+					sl_uint32 area = fx * fy;
+					sl_uint32 n = Math::getMostSignificantBits(area) - 1;
+					if (area == (1U << n)) {
+						for (dy = 0; dy < dst.height; dy++) {
+							const Color* cs = colorsSrc;
+							for (dx = 0; dx < dst.width; dx++) {
+								sl_uint32 r = 0;
+								sl_uint32 g = 0;
+								sl_uint32 b = 0;
+								sl_uint32 a = 0;
+								const Color* c = cs;
+								for (sy = 0; sy < fy; sy++) {
+									for (sx = 0; sx < fx; sx++) {
+										r += c[sx].r;
+										g += c[sx].g;
+										b += c[sx].b;
+										a += c[sx].a;
+									}
+									c += src.stride;
+								}
+								cs += fx;
+								Color& t = colorsDst[dx];
+								t.r = (sl_uint8)(r >> n);
+								t.g = (sl_uint8)(g >> n);
+								t.b = (sl_uint8)(b >> n);
+								t.a = (sl_uint8)(a >> n);
+							}
+							colorsDst += dst.stride;
+							colorsSrc += ly;
+						}
+					} else {
+						for (dy = 0; dy < dst.height; dy++) {
+							const Color* cs = colorsSrc;
+							for (dx = 0; dx < dst.width; dx++) {
+								sl_uint32 r = 0;
+								sl_uint32 g = 0;
+								sl_uint32 b = 0;
+								sl_uint32 a = 0;
+								const Color* c = cs;
+								for (sy = 0; sy < fy; sy++) {
+									for (sx = 0; sx < fx; sx++) {
+										r += c[sx].r;
+										g += c[sx].g;
+										b += c[sx].b;
+										a += c[sx].a;
+									}
+									c += src.stride;
+								}
+								cs += fx;
+								Color& t = colorsDst[dx];
+								t.r = (sl_uint8)(r / area);
+								t.g = (sl_uint8)(g / area);
+								t.b = (sl_uint8)(b / area);
+								t.a = (sl_uint8)(a / area);
+							}
+							colorsDst += dst.stride;
+							colorsSrc += ly;
+						}
+					}
+				}
+				
+			};
+			
+			class Blend_Copy
+			{
+			public:
+				SLIB_INLINE static void blend(Color& dst, const Color& src)
+				{
+					dst = src;
+				}
+			};
+			
+			class Blend_SrcAlpha
+			{
+			public:
+				SLIB_INLINE static void blend(Color& dst, const Color& src)
+				{
+					dst.blend_PA_NPA(src);
+				}
+			};
+
+			class Stretch
+			{
+			public:
+				template <class STRETCH_OP>
+				static void stretch(ImageDesc& dst, const ImageDesc& src, BlendMode blend)
+				{
+					switch (blend) {
+						case BlendMode::Copy:
+							STRETCH_OP::template stretch<Blend_Copy>(dst, src);
+							break;
+						case BlendMode::SrcAlpha:
+							STRETCH_OP::template stretch<Blend_SrcAlpha>(dst, src);
+							break;
+					}
+				}
+			};
+
 		}
 	}
-
-	template <class FILTER>
-	class _priv_ImageStretch_Smooth
-	{
-	public:
-		template <class BLEND_OP>
-		static void stretchX(ImageDesc& dst, const ImageDesc& src)
-		{
-			sl_int32 sw = src.width;
-			sl_int32 dw = dst.width;
-			float sx_step, sx_start;
-			sl_int32 isx, dx_start, dx_end;
-			_priv_ImageStretch_FilterParam px;
-			_priv_ImageStretch_Smooth_Prepare(sw, dw, sx_step, sx_start, dx_start, dx_end, px);
-			
-			sl_int32 dx, dy;
-			sl_int32 dh = dst.height;
-			float sx;
-			
-			Color* colorsDst;
-			const Color* colorsSrc;
-			Color color;
-			
-			if (dx_start) {
-				// left
-				colorsDst = dst.colors;
-				colorsSrc = src.colors;
-				for (dy = 0; dy < dh; dy++) {
-					BLEND_OP::blend(*colorsDst, *colorsSrc);
-					colorsDst += dst.stride;
-					colorsSrc += src.stride;
-				}
-				// right
-				colorsDst = dst.colors + (dw - 1);
-				colorsSrc = src.colors + (sw - 1);
-				for (dy = 0; dy < dh; dy++) {
-					BLEND_OP::blend(*colorsDst, *colorsSrc);
-					colorsDst += dst.stride;
-					colorsSrc += src.stride;
-				}
-			}
-			
-			colorsDst = dst.colors;
-			colorsSrc = src.colors;
-			for (dy = 0; dy < dh; dy++) {
-				for (dx = dx_start; dx < dx_end; dx++) {
-					sx = sx_start + (float)(dx) * sx_step;
-					isx = (sl_int32)sx;
-					FILTER::getColorAtX(color, colorsSrc + isx, sx - (float)isx, px);
-					BLEND_OP::blend(colorsDst[dx], color);
-				}
-				colorsDst += dst.stride;
-				colorsSrc += src.stride;
-			}
-		}
-		
-		template <class BLEND_OP>
-		static void stretchY(ImageDesc& dst, const ImageDesc& src)
-		{
-			sl_int32 sh = src.height;
-			sl_int32 dh = dst.height;
-			float sy_step, sy_start;
-			sl_int32 isy, dy_start, dy_end;
-			_priv_ImageStretch_FilterParam py;
-			_priv_ImageStretch_Smooth_Prepare(sh, dh, sy_step, sy_start, dy_start, dy_end, py);
-			
-			sl_int32 dx, dy;
-			sl_int32 dw = dst.width;
-			float sy;
-			
-			Color* colorsDst;
-			const Color* colorsSrc;
-			Color color;
-			
-			if (dy_start) {
-				// top
-				colorsDst = dst.colors;
-				colorsSrc = src.colors;
-				for (dx = 0; dx < dw; dx++) {
-					BLEND_OP::blend(colorsDst[dx], colorsSrc[dx]);
-				}
-				// bottom
-				colorsDst = dst.colors + (sl_uint32)(dh - 1) * dst.stride;
-				colorsSrc = src.colors + (sl_uint32)(sh - 1) * src.stride;
-				for (dx = 0; dx < dw; dx++) {
-					BLEND_OP::blend(colorsDst[dx], colorsSrc[dx]);
-				}
-			}
-			
-			colorsDst = dst.colors + dy_start * dst.stride;
-			colorsSrc = src.colors;
-			for (dy = dy_start; dy < dy_end; dy++) {
-				sy = sy_start + (float)(dy) * sy_step;
-				isy = (sl_int32)sy;
-				float fsy = sy - (float)isy;
-				const Color* lineSrc = colorsSrc + (sl_uint32)isy * src.stride;
-				for (dx = 0; dx < dw; dx++) {
-					FILTER::getColorAtY(color, lineSrc + dx, fsy, src.stride, py);
-					BLEND_OP::blend(colorsDst[dx], color);
-				}
-				colorsDst += dst.stride;
-			}
-		}
-		
-		template <class BLEND_OP>
-		static void stretchOneRowSrc(ImageDesc& dst, const ImageDesc& src)
-		{
-			sl_int32 sw = src.width;
-			sl_int32 dw = dst.width;
-			float sx_step, sx_start;
-			sl_int32 isx, dx_start, dx_end;
-			_priv_ImageStretch_FilterParam px;
-			_priv_ImageStretch_Smooth_Prepare(sw, dw, sx_step, sx_start, dx_start, dx_end, px);
-			
-			sl_int32 dx, dy;
-			sl_int32 dh = dst.height;
-			float sx;
-			
-			Color* colorsDst;
-			Color color;
-			
-			if (dx_start) {
-				// left
-				colorsDst = dst.colors;
-				color = *(src.colors);
-				for (dy = 0; dy < dh; dy++) {
-					BLEND_OP::blend(*colorsDst, color);
-					colorsDst += dst.stride;
-				}
-				// right
-				colorsDst = dst.colors + (dw - 1);
-				color = *(src.colors + (sw - 1));
-				for (dy = 0; dy < dh; dy++) {
-					BLEND_OP::blend(*colorsDst, color);
-					colorsDst += dst.stride;
-				}
-			}
-			
-			for (dx = dx_start; dx < dx_end; dx++) {
-				sx = sx_start + (float)(dx) * sx_step;
-				isx = (sl_int32)sx;
-				FILTER::getColorAtX(color, src.colors + isx, sx - (float)isx, px);
-				colorsDst = dst.colors + dx;
-				for (dy = 0; dy < dh; dy++) {
-					BLEND_OP::blend(*(colorsDst), color);
-					colorsDst += dst.stride;
-				}
-			}
-		}
-		
-		template <class BLEND_OP>
-		static void stretchOneColSrc(ImageDesc& dst, const ImageDesc& src)
-		{
-			sl_int32 sh = src.height;
-			sl_int32 dh = dst.height;
-			float sy_step, sy_start;
-			sl_int32 isy, dy_start, dy_end;
-			_priv_ImageStretch_FilterParam py;
-			_priv_ImageStretch_Smooth_Prepare(sh, dh, sy_step, sy_start, dy_start, dy_end, py);
-			
-			sl_int32 dx, dy;
-			sl_int32 dw = dst.width;
-			float sy;
-			
-			Color* colorsDst;
-			Color color;
-			
-			if (dy_start) {
-				// top
-				colorsDst = dst.colors;
-				color = *(src.colors);
-				for (dx = 0; dx < dw; dx++) {
-					BLEND_OP::blend(colorsDst[dx], color);
-				}
-				// bottom
-				colorsDst = dst.colors + (dh - 1) * dst.stride;
-				color = *(src.colors + (sh - 1) * src.stride);
-				for (dx = 0; dx < dw; dx++) {
-					BLEND_OP::blend(colorsDst[dx], color);
-				}
-			}
-			
-			colorsDst = dst.colors + dy_start * dst.stride;
-			for (dy = dy_start; dy < dy_end; dy++) {
-				sy = sy_start + (float)(dy) * sy_step;
-				isy = (sl_int32)sy;
-				float fsy = sy - (float)isy;
-				FILTER::getColorAtY(color, src.colors + isy * src.stride, fsy, src.stride, py);
-				for (dx = 0; dx < dw; dx++) {
-					BLEND_OP::blend(colorsDst[dx], color);
-				}
-				colorsDst += dst.stride;
-			}
-		}
-		
-		template <class BLEND_OP>
-		static void stretch(ImageDesc& dst, const ImageDesc& src)
-		{
-			if (src.width == dst.width) {
-				stretchY<BLEND_OP>(dst, src);
-				return;
-			}
-			if (src.height == dst.height) {
-				stretchX<BLEND_OP>(dst, src);
-				return;
-			}
-			if (src.width == 1) {
-				stretchOneColSrc<BLEND_OP>(dst, src);
-				return;
-			}
-			if (src.height == 1) {
-				stretchOneRowSrc<BLEND_OP>(dst, src);
-				return;
-			}
-
-			sl_int32 sw = src.width;
-			sl_int32 dw = dst.width;
-			float sx_step, sx_start;
-			sl_int32 isx, dx_start, dx_end;
-			_priv_ImageStretch_FilterParam px;
-			_priv_ImageStretch_Smooth_Prepare(sw, dw, sx_step, sx_start, dx_start, dx_end, px);
-			
-			sl_int32 sh = src.height;
-			sl_int32 dh = dst.height;
-			float sy_step, sy_start;
-			sl_int32 isy, dy_start, dy_end;
-			_priv_ImageStretch_FilterParam py;
-			_priv_ImageStretch_Smooth_Prepare(sh, dh, sy_step, sy_start, dy_start, dy_end, py);
-			
-			sl_int32 dx, dy;
-			float sx, sy;
-			
-			Color color;
-			Color* colorsDst;
-			const Color* colorsSrc;
-			
-			// 4-corners
-			if (dx_start && dy_start) {
-				colorsDst = dst.colors;
-				colorsSrc = src.colors;
-				BLEND_OP::blend(colorsDst[0], colorsSrc[0]);
-				BLEND_OP::blend(colorsDst[dw - 1], colorsSrc[sw - 1]);
-				BLEND_OP::blend(colorsDst[(dh - 1) * dst.stride], colorsSrc[(sh - 1) * src.stride]);
-				BLEND_OP::blend(colorsDst[(dh - 1) * dst.stride + dw - 1], colorsSrc[(sh - 1) * src.stride + sw - 1]);
-			}
-			
-			if (dy_start) {
-				// top
-				colorsDst = dst.colors;
-				colorsSrc = src.colors;
-				for (dx = dx_start; dx < dx_end; dx++) {
-					sx = sx_start + (float)(dx) * sx_step;
-					isx = (sl_int32)sx;
-					FILTER::getColorAtX(color, colorsSrc + isx, sx - (float)isx, px);
-					BLEND_OP::blend(colorsDst[dx], color);
-				}
-				// bottom
-				colorsDst = dst.colors + (dh - 1) * dst.stride;
-				colorsSrc = src.colors + (sh - 1) * src.stride;
-				for (dx = dx_start; dx < dx_end; dx++) {
-					sx = sx_start + (float)(dx) * sx_step;
-					isx = (sl_int32)sx;
-					FILTER::getColorAtX(color, colorsSrc + isx, sx - (float)isx, px);
-					BLEND_OP::blend(colorsDst[dx], color);
-				}
-			}
-			if (dx_start) {
-				// left
-				colorsDst = dst.colors + dy_start * dst.stride;
-				colorsSrc = src.colors;
-				for (dy = dy_start; dy < dy_end; dy++) {
-					sy = sy_start + (float)(dy) * sy_step;
-					isy = (sl_int32)sy;
-					FILTER::getColorAtY(color, colorsSrc + isy * src.stride, sy - (float)isy, src.stride, py);
-					BLEND_OP::blend(*colorsDst, color);
-					colorsDst += dst.stride;
-				}
-				// right
-				colorsDst = dst.colors + (dy_start * dst.stride + dw - 1);
-				colorsSrc = src.colors + (sw - 1);
-				for (dy = dy_start; dy < dy_end; dy++) {
-					sy = sy_start + (float)(dy) * sy_step;
-					isy = (sl_int32)sy;
-					FILTER::getColorAtY(color, colorsSrc + isy * src.stride, sy - (float)isy, src.stride, py);
-					BLEND_OP::blend(*colorsDst, color);
-					colorsDst += dst.stride;
-				}
-			}
-			
-			colorsDst = dst.colors + dy_start * dst.stride;
-			colorsSrc = src.colors;
-			for (dy = dy_start; dy < dy_end; dy++) {
-				sy = sy_start + (float)(dy) * sy_step;
-				isy = (sl_int32)sy;
-				float fsy = sy - (float)isy;
-				const Color* lineSrc = colorsSrc + isy * src.stride;
-				for (dx = dx_start; dx < dx_end; dx++) {
-					sx = sx_start + (float)(dx) * sx_step;
-					isx = (sl_int32)sx;
-					FILTER::getColorAt(color, lineSrc + isx, sx - (float)isx, fsy, src.stride, px, py);
-					BLEND_OP::blend(colorsDst[dx], color);
-				}
-				colorsDst += dst.stride;
-			}
-		}
-	};
-
-	class _priv_ImageStretch_Smooth_IntBox
-	{
-	public:
-		template <class BLEND_OP>
-		static void stretch(ImageDesc& dst, const ImageDesc& src)
-		{
-			sl_uint32 dw = dst.width;
-			sl_uint32 sw = src.width;
-			sl_uint32 fx = sw / dw;
-			if (fx == 0) {
-				return;
-			}
-			sl_uint32 dx, sx;
-			
-			sl_uint32 dh = dst.height;
-			sl_uint32 sh = src.height;
-			sl_uint32 fy = sh / dh;
-			if (fy == 0) {
-				return;
-			}
-			sl_uint32 dy, sy;
-			
-			Color* colorsDst = dst.colors;
-			const Color* colorsSrc = src.colors;
-			sl_uint32 ly = fy * src.stride;
-			
-			sl_uint32 area = fx * fy;
-			sl_uint32 n = Math::getMostSignificantBits(area) - 1;
-			if (area == (1U << n)) {
-				for (dy = 0; dy < dst.height; dy++) {
-					const Color* cs = colorsSrc;
-					for (dx = 0; dx < dst.width; dx++) {
-						sl_uint32 r = 0;
-						sl_uint32 g = 0;
-						sl_uint32 b = 0;
-						sl_uint32 a = 0;
-						const Color* c = cs;
-						for (sy = 0; sy < fy; sy++) {
-							for (sx = 0; sx < fx; sx++) {
-								r += c[sx].r;
-								g += c[sx].g;
-								b += c[sx].b;
-								a += c[sx].a;
-							}
-							c += src.stride;
-						}
-						cs += fx;
-						Color& t = colorsDst[dx];
-						t.r = (sl_uint8)(r >> n);
-						t.g = (sl_uint8)(g >> n);
-						t.b = (sl_uint8)(b >> n);
-						t.a = (sl_uint8)(a >> n);
-					}
-					colorsDst += dst.stride;
-					colorsSrc += ly;
-				}
-			} else {
-				for (dy = 0; dy < dst.height; dy++) {
-					const Color* cs = colorsSrc;
-					for (dx = 0; dx < dst.width; dx++) {
-						sl_uint32 r = 0;
-						sl_uint32 g = 0;
-						sl_uint32 b = 0;
-						sl_uint32 a = 0;
-						const Color* c = cs;
-						for (sy = 0; sy < fy; sy++) {
-							for (sx = 0; sx < fx; sx++) {
-								r += c[sx].r;
-								g += c[sx].g;
-								b += c[sx].b;
-								a += c[sx].a;
-							}
-							c += src.stride;
-						}
-						cs += fx;
-						Color& t = colorsDst[dx];
-						t.r = (sl_uint8)(r / area);
-						t.g = (sl_uint8)(g / area);
-						t.b = (sl_uint8)(b / area);
-						t.a = (sl_uint8)(a / area);
-					}
-					colorsDst += dst.stride;
-					colorsSrc += ly;
-				}
-			}
-		}
-		
-	};
-
-	class _priv_ImageBlend_Copy
-	{
-	public:
-		SLIB_INLINE static void blend(Color& dst, const Color& src)
-		{
-			dst = src;
-		}
-	};
-
-	class _priv_ImageBlend_SrcAlpha
-	{
-	public:
-		SLIB_INLINE static void blend(Color& dst, const Color& src)
-		{
-			dst.blend_PA_NPA(src);
-		}
-	};
-
-	class _priv_ImageStretch
-	{
-	public:
-		template <class STRETCH_OP>
-		static void stretch(ImageDesc& dst, const ImageDesc& src, BlendMode blend)
-		{
-			switch (blend) {
-				case BlendMode::Copy:
-					STRETCH_OP::template stretch<_priv_ImageBlend_Copy>(dst, src);
-					break;
-				case BlendMode::SrcAlpha:
-					STRETCH_OP::template stretch<_priv_ImageBlend_SrcAlpha>(dst, src);
-					break;
-			}
-		}
-	};
+	
+	using namespace priv::image;
 
 	void Image::draw(ImageDesc& dst, const ImageDesc& src, BlendMode blend, StretchMode stretch)
 	{
@@ -1221,27 +1231,27 @@ namespace slib
 			return;
 		}
 		if (src.width == dst.width && src.height == dst.height) {
-			_priv_ImageStretch::template stretch<_priv_ImageStretch_Copy>(dst, src, blend);
+			Stretch::template stretch<Stretch_Copy>(dst, src, blend);
 			return;
 		}
 		if (src.width == 1 && src.height == 1) {
-			_priv_ImageStretch::template stretch<_priv_ImageStretch_FillColor>(dst, src, blend);
+			Stretch::template stretch<Stretch_FillColor>(dst, src, blend);
 			return;
 		}
 		if (stretch == StretchMode::Nearest) {
-			_priv_ImageStretch::template stretch<_priv_ImageStretch_Nearest>(dst, src, blend);
+			Stretch::template stretch<Stretch_Nearest>(dst, src, blend);
 		} else if (stretch == StretchMode::Linear) {
-			_priv_ImageStretch::template stretch< _priv_ImageStretch_Smooth<_priv_ImageStretch_Smooth_LinearFilter> >(dst, src, blend);
+			Stretch::template stretch< Stretch_Smooth<Stretch_Smooth_LinearFilter> >(dst, src, blend);
 		} else {
 			if (src.width <= dst.width && src.height <= dst.height) {
-				_priv_ImageStretch::template stretch< _priv_ImageStretch_Smooth<_priv_ImageStretch_Smooth_LinearFilter> >(dst, src, blend);
+				Stretch::template stretch< Stretch_Smooth<Stretch_Smooth_LinearFilter> >(dst, src, blend);
 				return;
 			}
 			if (src.width % dst.width == 0 && src.height % dst.height == 0) {
-				_priv_ImageStretch::template stretch<_priv_ImageStretch_Smooth_IntBox>(dst, src, blend);
+				Stretch::template stretch<Stretch_Smooth_IntBox>(dst, src, blend);
 				return;
 			}
-			_priv_ImageStretch::template stretch< _priv_ImageStretch_Smooth<_priv_ImageStretch_Smooth_BoxFilter> >(dst, src, blend);
+			Stretch::template stretch< Stretch_Smooth<Stretch_Smooth_BoxFilter> >(dst, src, blend);
 		}
 	}
 

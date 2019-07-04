@@ -31,41 +31,54 @@
 namespace slib
 {
 
-	SLIB_THREAD Thread* _gt_threadCurrent = sl_null;
+	namespace priv
+	{
+		namespace thread
+		{
+			SLIB_THREAD Thread* g_currentThread = sl_null;
+			SLIB_THREAD sl_uint64 g_uniqueId = 0;
+		}
+	}
+
 	Thread* Thread::_nativeGetCurrentThread()
 	{
-		return _gt_threadCurrent;
+		return priv::thread::g_currentThread;
 	}
 
 	void Thread::_nativeSetCurrentThread(Thread* thread)
 	{
-		_gt_threadCurrent = thread;
+		priv::thread::g_currentThread = thread;
 	}
 
-	SLIB_THREAD sl_uint64 _gt_threadUniqueId = 0;
 	sl_uint64 Thread::_nativeGetCurrentThreadUniqueId()
 	{
-		return _gt_threadUniqueId;
+		return priv::thread::g_uniqueId;
 	}
 
 	void Thread::_nativeSetCurrentThreadUniqueId(sl_uint64 n)
 	{
-		_gt_threadUniqueId = n;
+		priv::thread::g_uniqueId = n;
 	}
 
-	static DWORD CALLBACK _priv_ThreadProc(LPVOID lpParam)
+	namespace priv
 	{
-		Thread* pThread = (Thread*)lpParam;
-		pThread->_run();
-		pThread->decreaseReference();
-		return 0;
+		namespace thread
+		{
+			static DWORD CALLBACK ThreadProc(LPVOID lpParam)
+			{
+				Thread* pThread = (Thread*)lpParam;
+				pThread->_run();
+				pThread->decreaseReference();
+				return 0;
+			}
+		}
 	}
 
 	void Thread::_nativeStart(sl_uint32 stackSize)
 	{
 		DWORD threadID = 0;
 		this->increaseReference();
-		m_handle = (void*)(CreateThread(NULL, stackSize, _priv_ThreadProc, (LPVOID)this, 0, &threadID));
+		m_handle = (void*)(CreateThread(NULL, stackSize, priv::thread::ThreadProc, (LPVOID)this, 0, &threadID));
 		if (!m_handle) {
 			this->decreaseReference();
 		}

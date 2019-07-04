@@ -28,10 +28,10 @@
 
 #include "slib/core/thread.h"
 
-@interface _priv_Slib_ThreadObject : NSObject
+@interface SLIBThread : NSObject
 @end
 
-@implementation _priv_Slib_ThreadObject
+@implementation SLIBThread
 -(void)run_callback: (NSMutableDictionary*)parameter
 {
 	long long _thread = [[parameter objectForKey:@"thread_object"] longLongValue];
@@ -88,7 +88,7 @@ namespace slib
 	{
 		this->increaseReference();
 
-		_priv_Slib_ThreadObject *obj = [[_priv_Slib_ThreadObject alloc] init];
+		SLIBThread *obj = [[SLIBThread alloc] init];
 		NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
 		params[@"thread_object"] = [NSNumber numberWithLong:(long)this];
 		NSThread* thread=[[NSThread alloc]initWithTarget:obj
