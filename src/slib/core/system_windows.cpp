@@ -98,9 +98,30 @@ namespace slib
 	sl_uint32 System::getTickCount()
 	{
 #if defined(SLIB_PLATFORM_IS_WIN32)
-		return ::GetTickCount();
+		return GetTickCount();
 #else
-		return (sl_uint32)(::GetTickCount64());
+		return (sl_uint32)(GetTickCount64());
+#endif
+	}
+
+	sl_uint64 System::getTickCount64()
+	{
+#if defined(SLIB_PLATFORM_IS_WIN32)
+		WINAPI_GetTickCount64 func = Windows::getAPI_GetTickCount64();
+		if (func) {
+			return (sl_uint64)(func());
+		}		
+		static sl_uint32 tickOld = 0;
+		static sl_uint32 tickHigh = 0;
+		SLIB_STATIC_SPINLOCKER(lock)
+		sl_uint32 tick = GetTickCount();
+		if (tick < tickOld) {
+			tickHigh++;
+		}
+		tickOld = tick;
+		return SLIB_MAKE_QWORD4(tickHigh, tick);
+#else
+		return (sl_uint64)(GetTickCount64());
 #endif
 	}
 
@@ -226,50 +247,58 @@ namespace slib
 	}
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
-	volatile double __signal_fpe_dummy = 0.0f;
-	SIGNAL_HANDLER _g_signal_crash_handler;
 
-	void _signal_crash_handler(int sig)
+	namespace priv
 	{
-		if (sig == SIGFPE) {
-			_fpreset();
-		}
-		_g_signal_crash_handler(sig);
-	}
+		namespace system
+		{
+			volatile double g_signal_fpe_dummy = 0.0f;
+			SIGNAL_HANDLER g_handlerSignalCrash;
 
-	LONG WINAPI _seh_crash_handler(PEXCEPTION_POINTERS pExceptionPtrs)
-	{
-		DWORD code = pExceptionPtrs->ExceptionRecord->ExceptionCode;
-		switch (code) {
-		case EXCEPTION_ACCESS_VIOLATION:
-		case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
-		case EXCEPTION_DATATYPE_MISALIGNMENT:
-		case EXCEPTION_FLT_DENORMAL_OPERAND:
-		case EXCEPTION_FLT_DIVIDE_BY_ZERO:
-		case EXCEPTION_FLT_INEXACT_RESULT:
-		case EXCEPTION_FLT_INVALID_OPERATION:
-		case EXCEPTION_FLT_OVERFLOW:
-		case EXCEPTION_FLT_STACK_CHECK:
-		case EXCEPTION_FLT_UNDERFLOW:
-		case EXCEPTION_ILLEGAL_INSTRUCTION:
-		case EXCEPTION_IN_PAGE_ERROR:
-		case EXCEPTION_INT_DIVIDE_BY_ZERO:
-		case EXCEPTION_INT_OVERFLOW:
-		case EXCEPTION_INVALID_DISPOSITION:
-		case EXCEPTION_NONCONTINUABLE_EXCEPTION:
-		case EXCEPTION_PRIV_INSTRUCTION:
-		case EXCEPTION_STACK_OVERFLOW:
-			_g_signal_crash_handler(-1);
-			break;
-		}
-		return EXCEPTION_EXECUTE_HANDLER;
-	}
+			static void handleSignalCrash(int sig)
+			{
+				if (sig == SIGFPE) {
+					_fpreset();
+				}
+				g_handlerSignalCrash(sig);
+			}
 
+			static LONG WINAPI handleException(PEXCEPTION_POINTERS pExceptionPtrs)
+			{
+				DWORD code = pExceptionPtrs->ExceptionRecord->ExceptionCode;
+				switch (code) {
+				case EXCEPTION_ACCESS_VIOLATION:
+				case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
+				case EXCEPTION_DATATYPE_MISALIGNMENT:
+				case EXCEPTION_FLT_DENORMAL_OPERAND:
+				case EXCEPTION_FLT_DIVIDE_BY_ZERO:
+				case EXCEPTION_FLT_INEXACT_RESULT:
+				case EXCEPTION_FLT_INVALID_OPERATION:
+				case EXCEPTION_FLT_OVERFLOW:
+				case EXCEPTION_FLT_STACK_CHECK:
+				case EXCEPTION_FLT_UNDERFLOW:
+				case EXCEPTION_ILLEGAL_INSTRUCTION:
+				case EXCEPTION_IN_PAGE_ERROR:
+				case EXCEPTION_INT_DIVIDE_BY_ZERO:
+				case EXCEPTION_INT_OVERFLOW:
+				case EXCEPTION_INVALID_DISPOSITION:
+				case EXCEPTION_NONCONTINUABLE_EXCEPTION:
+				case EXCEPTION_PRIV_INSTRUCTION:
+				case EXCEPTION_STACK_OVERFLOW:
+					g_handlerSignalCrash(-1);
+					break;
+				}
+				return EXCEPTION_EXECUTE_HANDLER;
+			}
+
+		}
+	}
+	
 	void System::setCrashHandler(SIGNAL_HANDLER handler)
 	{
-		_g_signal_crash_handler = handler;
-		::SetUnhandledExceptionFilter(_seh_crash_handler);
-		handler = _signal_crash_handler;
+		priv::system::g_handlerSignalCrash = handler;
+		::SetUnhandledExceptionFilter(priv::system::handleException);
+		handler = priv::system::handleSignalCrash;
 		signal(SIGFPE, handler);
 		signal(SIGSEGV, handler);
 		signal(SIGILL, handler);
@@ -285,21 +314,27 @@ namespace slib
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
-	class _priv_GlobalUniqueInstance : public GlobalUniqueInstance
+	namespace priv
 	{
-	public:
-		HANDLE m_hMutex;
-
-	public:
-		_priv_GlobalUniqueInstance()
+		namespace system
 		{
-		}
+			class GlobalUniqueInstanceImpl : public GlobalUniqueInstance
+			{
+			public:
+				HANDLE m_hMutex;
 
-		~_priv_GlobalUniqueInstance()
-		{
-			::CloseHandle(m_hMutex);
+			public:
+				GlobalUniqueInstanceImpl()
+				{
+				}
+
+				~GlobalUniqueInstanceImpl()
+				{
+					::CloseHandle(m_hMutex);
+				}
+			};
 		}
-	};
+	}
 
 
 	Ref<GlobalUniqueInstance> GlobalUniqueInstance::create(const String& _name)
@@ -313,7 +348,7 @@ namespace slib
 			::CloseHandle(hMutex);
 			return sl_null;
 		}
-		Ref<_priv_GlobalUniqueInstance> instance = new _priv_GlobalUniqueInstance;
+		Ref<priv::system::GlobalUniqueInstanceImpl> instance = new priv::system::GlobalUniqueInstanceImpl;
 		if (instance.isNotNull()) {
 			hMutex = ::CreateMutexW(NULL, FALSE, (LPCWSTR)(name.getData()));
 			if (hMutex) {
@@ -340,11 +375,14 @@ namespace slib
 
 #endif
 
-	void _abort(const char* msg, const char* file, sl_uint32 line) noexcept
+	namespace priv
 	{
+		void Abort(const char* msg, const char* file, sl_uint32 line) noexcept
+		{
 #if defined(SLIB_DEBUG)
-		slib::System::abort(msg, file, line);
+			slib::System::abort(msg, file, line);
 #endif
+		}
 	}
 
 	void Console::print(const String& _s)

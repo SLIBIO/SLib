@@ -366,6 +366,7 @@ namespace slib
 	LOAD_LIBRARY(kernel32, "kernel32.dll")
 	GET_API(kernel32, GetQueuedCompletionStatusEx)
 	GET_API(kernel32, GetUserDefaultLocaleName)
+	GET_API(kernel32, GetTickCount64)
 
 	LOAD_LIBRARY(user32, "user32.dll")
 	GET_API(user32, ShowScrollBar)

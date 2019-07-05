@@ -51,6 +51,8 @@ namespace slib
 		int cchLocaleName
 	);
 
+	typedef ULONGLONG (WINAPI *WINAPI_GetTickCount64)();
+
 	typedef BOOL (WINAPI *WINAPI_ShowScrollBar)(
 		HWND hWnd,
 		int  wBar,
@@ -124,6 +126,8 @@ namespace slib
 		static WINAPI_GetQueuedCompletionStatusEx getAPI_GetQueuedCompletionStatusEx();
 
 		static WINAPI_GetUserDefaultLocaleName getAPI_GetUserDefaultLocaleName();
+
+		static WINAPI_GetTickCount64 getAPI_GetTickCount64();
 
 		static HMODULE loadLibrary_user32();
 

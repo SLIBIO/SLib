@@ -131,15 +131,18 @@ typedef char32_t			sl_char32;
 
 namespace slib
 {
-	SLIB_INLINE void _blank_proc(const void*) noexcept {}
-	void _abort(const char* msg, const char* file, sl_uint32 line) noexcept;
+	namespace priv
+	{
+		SLIB_INLINE void BlankProc(const void*) noexcept {}
+		void Abort(const char* msg, const char* file, sl_uint32 line) noexcept;
+	}
 }
 
-#define SLIB_UNUSED(x)					slib::_blank_proc(&x);
+#define SLIB_UNUSED(x)					slib::priv::BlankProc(&x);
 
 #if defined(SLIB_DEBUG)
-#	define SLIB_ASSERT(EXPRESSION)		( (!!(EXPRESSION)) || (slib::_abort(#EXPRESSION, __FILE__, __LINE__), 0) )
-#	define SLIB_ABORT(MESSAGE)			(slib::_abort(MESSAGE, __FILE__, __LINE__))
+#	define SLIB_ASSERT(EXPRESSION)		( (!!(EXPRESSION)) || (slib::priv::Abort(#EXPRESSION, __FILE__, __LINE__), 0) )
+#	define SLIB_ABORT(MESSAGE)			(slib::priv::Abort(MESSAGE, __FILE__, __LINE__))
 #else
 #	define SLIB_ASSERT(EXPRESSION)
 #	define SLIB_ABORT(MESSAGE)

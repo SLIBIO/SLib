@@ -117,16 +117,45 @@ namespace slib
 		}
 		return sl_false;
 	}
-
+	
 	sl_uint32 System::getTickCount()
 	{
+		return (sl_uint32)(getTickCount64());
+	}
+	
+#if !defined(SLIB_PLATFORM_IS_APPLE)
+	sl_uint64 System::getTickCount64()
+	{
+#if defined(_POSIX_TIMERS) && _POSIX_TIMERS > 0 && defined(CLOCK_MONOTONIC)
+		{
+			static sl_bool flagCheck = sl_true;
+			static sl_bool flagEnabled = sl_false;
+			struct timespec ts;
+			if (flagEnabled) {
+				clock_gettime(CLOCK_MONOTONIC, &ts);
+				return (sl_uint64)(ts.tv_sec) * 1000 + (sl_uint64)(ts.tv_nsec) / 1000000;
+			} else {
+				if (flagCheck) {
+					int iRet = clock_gettime(CLOCK_MONOTONIC, &ts);
+					if (iRet < 0) {
+						flagCheck = sl_false;
+					} else {
+						flagEnabled = sl_true;
+						flagCheck = sl_false;
+						return (sl_uint64)(ts.tv_sec) * 1000 + (sl_uint64)(ts.tv_nsec) / 1000000;
+					}
+				}
+			}
+		}
+#endif
 		struct timeval tv;
 		if (gettimeofday(&tv, 0) == 0) {
-			return (sl_uint32)(tv.tv_sec) * 1000 + tv.tv_usec / 1000;
+			return (sl_uint64)(tv.tv_sec) * 1000 + tv.tv_usec / 1000;
 		} else {
 			return 0;
 		}
 	}
+#endif
 
 	sl_uint32 System::getProcessId()
 	{
@@ -252,7 +281,14 @@ namespace slib
 	}
 
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
-	volatile double __signal_fpe_dummy = 0.0f;
+	namespace priv
+	{
+		namespace system
+		{
+			volatile double g_signal_fpe_dummy = 0.0f;
+		}
+	}
+
 	void System::setCrashHandler(SIGNAL_HANDLER handler)
 	{
 		struct sigaction sa;
@@ -273,35 +309,43 @@ namespace slib
 #endif
 
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
-
-	typedef CList<String> _priv_GlobalUniqueInstanceList;
-
-	SLIB_SAFE_STATIC_GETTER(_priv_GlobalUniqueInstanceList, _getGlobalUniqueInstanceList)
-
-	class _priv_GlobalUniqueInstance : public GlobalUniqueInstance
+	
+	namespace priv
 	{
-	public:
-		String m_name;
-		Ref<File> m_file;
-		String m_filePath;
-		
-	public:
-		_priv_GlobalUniqueInstance()
+		namespace system
 		{
+			
+			typedef CList<String> GlobalUniqueInstanceList;
+			
+			SLIB_SAFE_STATIC_GETTER(GlobalUniqueInstanceList, getGlobalUniqueInstanceList)
+			
+			class GlobalUniqueInstanceImpl : public GlobalUniqueInstance
+			{
+			public:
+				String m_name;
+				Ref<File> m_file;
+				String m_filePath;
+				
+			public:
+				GlobalUniqueInstanceImpl()
+				{
+				}
+				
+				~GlobalUniqueInstanceImpl()
+				{
+					m_file->unlock();
+					m_file->close();
+					File::deleteFile(m_filePath);
+					GlobalUniqueInstanceList* list = getGlobalUniqueInstanceList();
+					if (list) {
+						list->remove(m_name);
+					}
+				}
+				
+			};
+
 		}
-		
-		~_priv_GlobalUniqueInstance()
-		{
-			m_file->unlock();
-			m_file->close();
-			File::deleteFile(m_filePath);
-			_priv_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
-			if (list) {
-				list->remove(m_name);
-			}
-		}
-		
-	};
+	}
 
 	Ref<GlobalUniqueInstance> GlobalUniqueInstance::create(const String& _name)
 	{
@@ -310,7 +354,7 @@ namespace slib
 		}
 		
 		String name = File::makeSafeFileName(_name);
-		_priv_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+		priv::system::GlobalUniqueInstanceList* list = priv::system::getGlobalUniqueInstanceList();
 		if (!list) {
 			return sl_null;
 		}
@@ -318,7 +362,7 @@ namespace slib
 			return sl_null;
 		}
 		
-		Ref<_priv_GlobalUniqueInstance> instance = new _priv_GlobalUniqueInstance;
+		Ref<priv::system::GlobalUniqueInstanceImpl> instance = new priv::system::GlobalUniqueInstanceImpl;
 		if (instance.isNotNull()) {
 			String filePath = "/tmp/.slib_global_lock_" + name;
 			Ref<File> file = File::openForWrite(filePath);
@@ -343,7 +387,7 @@ namespace slib
 			return sl_false;
 		}
 		String name = File::makeSafeFileName(_name);
-		_priv_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+		priv::system::GlobalUniqueInstanceList* list = priv::system::getGlobalUniqueInstanceList();
 		if (!list) {
 			return sl_false;
 		}
@@ -370,15 +414,18 @@ namespace slib
 
 #endif
 
-	void _abort(const char* msg, const char* file, sl_uint32 line) noexcept
+	namespace priv
 	{
+		void Abort(const char* msg, const char* file, sl_uint32 line) noexcept
+		{
 #if defined(SLIB_DEBUG)
 #	if defined(SLIB_PLATFORM_IS_ANDROID)
-		__assert(file, line, msg);
+			__assert(file, line, msg);
 #	else
-		__assert(msg, file, line);
+			__assert(msg, file, line);
 #	endif
 #endif
+		}
 	}
 
 	void Console::print(const String& s)

@@ -107,30 +107,39 @@ namespace slib
 	}
 
 #if defined(SLIB_PLATFORM_IS_MOBILE)
-
-	typedef CList<String> _priv_GlobalUniqueInstanceList;
-
-	SLIB_SAFE_STATIC_GETTER(_priv_GlobalUniqueInstanceList, _getGlobalUniqueInstanceList)
-
-	class _priv_GlobalUniqueInstance : public GlobalUniqueInstance
+	
+	namespace priv
 	{
-	public:
-		String m_name;
-		
-	public:
-		_priv_GlobalUniqueInstance()
+		namespace system
 		{
+			
+			typedef CList<String> GlobalUniqueInstanceList;
+			
+			SLIB_SAFE_STATIC_GETTER(GlobalUniqueInstanceList, getGlobalUniqueInstanceList)
+			
+			class GlobalUniqueInstanceImpl : public GlobalUniqueInstance
+			{
+			public:
+				String m_name;
+				
+			public:
+				GlobalUniqueInstanceImpl()
+				{
+				}
+				
+				~GlobalUniqueInstanceImpl()
+				{
+					GlobalUniqueInstanceList* list = getGlobalUniqueInstanceList();
+					if (list) {
+						list->remove(m_name);
+					}
+				}
+				
+			};
+
 		}
-		
-		~_priv_GlobalUniqueInstance()
-		{
-			_priv_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
-			if (list) {
-				list->remove(m_name);
-			}
-		}
-		
-	};
+	}
+
 
 	Ref<GlobalUniqueInstance> GlobalUniqueInstance::create(const String& _name)
 	{
@@ -139,14 +148,14 @@ namespace slib
 			return sl_null;
 		}
 		name = File::makeSafeFileName(name);
-		_priv_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+		priv::system::GlobalUniqueInstanceList* list = priv::system::getGlobalUniqueInstanceList();
 		if (!list) {
 			return sl_null;
 		}
 		if (list->indexOf(name) >= 0) {
 			return sl_null;
 		}
-		Ref<_priv_GlobalUniqueInstance> instance = new _priv_GlobalUniqueInstance();
+		Ref<priv::system::GlobalUniqueInstanceImpl> instance = new priv::system::GlobalUniqueInstanceImpl();
 		if (instance.isNotNull()) {
 			instance->m_name = name;
 			list->add(name);
@@ -162,7 +171,7 @@ namespace slib
 			return sl_false;
 		}
 		name = File::makeSafeFileName(name);
-		_priv_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+		priv::system::GlobalUniqueInstanceList* list = priv::system::getGlobalUniqueInstanceList();
 		if (!list) {
 			return sl_false;
 		}

@@ -51,8 +51,10 @@ namespace slib
 		static sl_bool setCurrentDirectory(const String& dir);
 	
 
-		// Tick count
+		// Tick count (milliseconds)
 		static sl_uint32 getTickCount();
+		
+		static sl_uint64 getTickCount64();
 	
 
 		// Process & Thread
