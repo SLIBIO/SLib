@@ -33,74 +33,84 @@
 namespace slib
 {
 
-	class _priv_Win32_SocketEvent : public SocketEvent
+	namespace priv
 	{
-	public:
-		WSAEVENT m_hEvent;
-
-	public:
-		_priv_Win32_SocketEvent()
+		namespace socket_event
 		{
-		}
 
-		~_priv_Win32_SocketEvent()
-		{
-			::WSACloseEvent(m_hEvent);
-		}
+			class SocketEventImpl : public SocketEvent
+			{
+			public:
+				WSAEVENT m_hEvent;
 
-	public:
-		static Ref<_priv_Win32_SocketEvent> create(const Ref<Socket>& socket)
-		{
-			Ref<_priv_Win32_SocketEvent> ret;
-			if (socket.isNotNull()) {
-				Socket::initializeSocket();
-				WSAEVENT hEvent = ::WSACreateEvent();
-				if (hEvent != WSA_INVALID_EVENT) {
-					ret = new _priv_Win32_SocketEvent;
-					if (ret.isNotNull()) {
-						ret->m_hEvent = hEvent;
-						ret->m_socket = socket;
-						return ret;
-					}
-					::WSACloseEvent(hEvent);
+			public:
+				SocketEventImpl()
+				{
 				}
-			}
-			return ret;
-		}
 
-		sl_bool _native_setup(sl_uint32 events)
-		{
-			sl_uint32 ev = 0;
-			if (events & SocketEvent::Read) {
-				ev = ev | FD_READ | FD_ACCEPT;
-			}
-			if (events & SocketEvent::Write) {
-				ev = ev | FD_WRITE | FD_CONNECT;
-			}
-			if (events & SocketEvent::Close) {
-				ev = ev | FD_CLOSE;
-			}
-			int ret = ::WSAEventSelect((SOCKET)(m_socket->getHandle()), m_hEvent, ev);
-			if (ret) {
-				return sl_false;
-			}
-			return sl_true;
-		}
+				~SocketEventImpl()
+				{
+					::WSACloseEvent(m_hEvent);
+				}
 
-		void _native_set()
-		{
-			::WSASetEvent(m_hEvent);
-		}
+			public:
+				static Ref<SocketEventImpl> create(const Ref<Socket>& socket)
+				{
+					Ref<SocketEventImpl> ret;
+					if (socket.isNotNull()) {
+						Socket::initializeSocket();
+						WSAEVENT hEvent = ::WSACreateEvent();
+						if (hEvent != WSA_INVALID_EVENT) {
+							ret = new SocketEventImpl;
+							if (ret.isNotNull()) {
+								ret->m_hEvent = hEvent;
+								ret->m_socket = socket;
+								return ret;
+							}
+							::WSACloseEvent(hEvent);
+						}
+					}
+					return ret;
+				}
 
-		void _native_reset()
-		{
-			::WSAResetEvent(m_hEvent);
+				sl_bool _native_setup(sl_uint32 events)
+				{
+					sl_uint32 ev = 0;
+					if (events & SocketEvent::Read) {
+						ev = ev | FD_READ | FD_ACCEPT;
+					}
+					if (events & SocketEvent::Write) {
+						ev = ev | FD_WRITE | FD_CONNECT;
+					}
+					if (events & SocketEvent::Close) {
+						ev = ev | FD_CLOSE;
+					}
+					int ret = ::WSAEventSelect((SOCKET)(m_socket->getHandle()), m_hEvent, ev);
+					if (ret) {
+						return sl_false;
+					}
+					return sl_true;
+				}
+
+				void _native_set()
+				{
+					::WSASetEvent(m_hEvent);
+				}
+
+				void _native_reset()
+				{
+					::WSAResetEvent(m_hEvent);
+				}
+			};
+
 		}
-	};
+	}
+
+	using namespace priv::socket_event;
 
 	Ref<SocketEvent> SocketEvent::create(const Ref<Socket>& socket)
 	{
-		return _priv_Win32_SocketEvent::create(socket);
+		return SocketEventImpl::create(socket);
 	}
 
 	sl_bool SocketEvent::_native_waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* status, sl_uint32 count, sl_int32 timeout)
@@ -110,7 +120,7 @@ namespace slib
 		SLIB_SCOPED_BUFFER(sl_uint32, 64, indexMap, count);
 		sl_uint32 cEvents = 0;
 		for (sl_uint32 i = 0; i < count; i++) {
-			Ref<_priv_Win32_SocketEvent> ev = Ref<_priv_Win32_SocketEvent>::from(events[i]);
+			Ref<SocketEventImpl> ev = Ref<SocketEventImpl>::from(events[i]);
 			if (ev.isNotNull()) {
 				Ref<Socket> sock = ev->getSocket();
 				if (sock.isNotNull() && sock->isOpened()) {
@@ -133,7 +143,7 @@ namespace slib
 			sl_uint32 index = indexMap[indexHandle];
 			WSANETWORKEVENTS ne;
 			ZeroMemory(&ne, sizeof(ne));
-			Ref<_priv_Win32_SocketEvent> ev = Ref<_priv_Win32_SocketEvent>::from(events[index]);
+			Ref<SocketEventImpl> ev = Ref<SocketEventImpl>::from(events[index]);
 			if (ev.isNotNull()) {
 				Ref<Socket> sock = ev->getSocket();
 				if (sock.isNotNull() && 0 == ::WSAEnumNetworkEvents((SOCKET)(sock->getHandle()), hEvents[indexHandle], &ne)) {

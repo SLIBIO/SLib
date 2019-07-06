@@ -34,61 +34,71 @@
 
 namespace slib
 {
-	class _priv_Unix_SocketEvent : public SocketEvent
+	
+	namespace priv
 	{
-	public:
-		Ref<PipeEvent> m_pipe;
-		sl_uint32 m_events;
-		
-	public:
-		_priv_Unix_SocketEvent()
+		namespace socket_event
 		{
-			m_events = 0;
-		}
-		
-		~_priv_Unix_SocketEvent()
-		{
-		}
-		
-	public:
-		static Ref<_priv_Unix_SocketEvent> create(const Ref<Socket>& socket)
-		{
-			Ref<_priv_Unix_SocketEvent> ret;
-			if (socket.isNotNull()) {
-				Socket::initializeSocket();
-				Ref<PipeEvent> ev = PipeEvent::create();
-				if (ev.isNotNull()) {
-					ret = new _priv_Unix_SocketEvent;
-					if (ret.isNotNull()) {
-						ret->m_pipe = ev;
-						ret->m_socket = socket;
-						return ret;
-					}
+			
+			class SocketEventImpl : public SocketEvent
+			{
+			public:
+				Ref<PipeEvent> m_pipe;
+				sl_uint32 m_events;
+				
+			public:
+				SocketEventImpl()
+				{
+					m_events = 0;
 				}
-			}
-			return ret;
+				
+				~SocketEventImpl()
+				{
+				}
+				
+			public:
+				static Ref<SocketEventImpl> create(const Ref<Socket>& socket)
+				{
+					if (socket.isNotNull()) {
+						Socket::initializeSocket();
+						Ref<PipeEvent> ev = PipeEvent::create();
+						if (ev.isNotNull()) {
+							Ref<SocketEventImpl> ret = new SocketEventImpl;
+							if (ret.isNotNull()) {
+								ret->m_pipe = ev;
+								ret->m_socket = socket;
+								return ret;
+							}
+						}
+					}
+					return sl_null;
+				}
+				
+				sl_bool _native_setup(sl_uint32 events) override
+				{
+					m_events = events;
+					return sl_true;
+				}
+				
+				void _native_set() override
+				{
+					m_pipe->set();
+				}
+				
+				void _native_reset() override
+				{
+					m_pipe->reset();
+				}
+			};
+			
 		}
-		
-		sl_bool _native_setup(sl_uint32 events) override
-		{
-			m_events = events;
-			return sl_true;
-		}
-		
-		void _native_set() override
-		{
-			m_pipe->set();
-		}
-		
-		void _native_reset() override
-		{
-			m_pipe->reset();
-		}
-	};
+	}
+	
+	using namespace priv::socket_event;
 	
 	Ref<SocketEvent> SocketEvent::create(const Ref<Socket>& socket)
 	{
-		return Ref<SocketEvent>::from(_priv_Unix_SocketEvent::create(socket));
+		return Ref<SocketEvent>::from(SocketEventImpl::create(socket));
 	}
 
 	sl_bool SocketEvent::_native_waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* status, sl_uint32 count, sl_int32 timeout)
@@ -98,7 +108,7 @@ namespace slib
 		Base::zeroMemory(fd, sizeof(pollfd)*2*count);
 		sl_uint32 cEvents = 0;
 		for (sl_uint32 i = 0; i < count; i++) {
-			Ref<_priv_Unix_SocketEvent> ev = Ref<_priv_Unix_SocketEvent>::from(events[i]);
+			Ref<SocketEventImpl> ev = Ref<SocketEventImpl>::from(events[i]);
 			if (ev.isNotNull()) {
 				Ref<Socket> sock = ev->getSocket();
 				if (sock.isNotNull()) {
@@ -132,7 +142,7 @@ namespace slib
 		if (cEvents == 0) {
 			return sl_false;
 		}
-			
+		
 		int t = timeout >= 0 ? (int)timeout : -1;
 		int ret = poll(fd, 2 * (int)cEvents, t);
 		if (ret > 0) {
@@ -156,7 +166,7 @@ namespace slib
 					status[indexMap[k]] = ret;
 				}
 				if (fd[k*2+1].revents) {
-					Ref<_priv_Unix_SocketEvent> ev = Ref<_priv_Unix_SocketEvent>::from(events[indexMap[k]]);
+					Ref<SocketEventImpl> ev = Ref<SocketEventImpl>::from(events[indexMap[k]]);
 					ev->reset();
 				}
 			}
