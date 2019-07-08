@@ -536,6 +536,7 @@ namespace slib
 								return;
 							}
 							m_flagReceiving = sl_false;
+							_onError();
 						}
 						processReceive();
 					}

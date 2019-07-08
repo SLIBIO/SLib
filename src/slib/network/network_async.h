@@ -112,6 +112,8 @@ namespace slib
 	protected:
 		void _onReceive(const SocketAddress& address, sl_uint32 size);
 		
+		void _onError();
+		
 	protected:
 		AtomicRef<Socket> m_socket;
 

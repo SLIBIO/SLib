@@ -188,6 +188,7 @@ namespace slib
 		Ref<AsyncIoLoop> ioLoop;
 		
 		Function<void(AsyncUdpSocket*, const SocketAddress&, void* data, sl_uint32 sizeReceived)> onReceiveFrom;
+		Function<void(AsyncUdpSocket*)> onError;
 		
 	public:
 		AsyncUdpSocketParam();
@@ -235,12 +236,15 @@ namespace slib
 		
 		void _onReceive(const SocketAddress& address, void* data, sl_uint32 sizeReceived);
 		
+		void _onError();
+		
 	protected:
 		static Ref<AsyncUdpSocketInstance> _createInstance(const Ref<Socket>& socket, sl_uint32 packetSize);
 		
 	protected:
 		Function<void(AsyncUdpSocket*, const SocketAddress&, void* data, sl_uint32 sizeReceived)> m_onReceiveFrom;
-		
+		Function<void(AsyncUdpSocket*)> m_onError;
+
 		friend class AsyncUdpSocketInstance;
 		
 	};

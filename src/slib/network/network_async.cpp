@@ -511,6 +511,13 @@ namespace slib
 		}
 	}
 
+	void AsyncUdpSocketInstance::_onError()
+	{
+		Ref<AsyncUdpSocket> object = Ref<AsyncUdpSocket>::from(getObject());
+		if (object.isNotNull()) {
+			object->_onError();
+		}
+	}
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AsyncUdpSocketParam)
 
@@ -687,4 +694,10 @@ namespace slib
 		m_onReceiveFrom(this, address, data, sizeReceived);
 	}
 
+	void AsyncUdpSocket::_onError()
+	{
+		close();
+		m_onError(this);
+	}
+	
 }

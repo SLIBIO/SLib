@@ -381,6 +381,9 @@ namespace slib
 						if (n > 0) {
 							_onReceive(addr, n);
 						} else {
+							if (n < 0) {
+								_onError();
+							}
 							break;
 						}
 					}
