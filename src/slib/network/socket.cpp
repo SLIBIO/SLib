@@ -78,18 +78,73 @@ namespace slib
 		Base::zeroMemory(hardwareAddress, 8);
 	}
 
-
-	SLIB_INLINE static sl_uint32 _priv_Socket_apply_address(SocketType type, sockaddr_storage& addr, SocketAddress in)
+	namespace priv
 	{
-		if (in.ip.isIPv4() && Socket::isIPv4(type)) {
-			return in.getSystemSocketAddress(&addr);
-		} else if ((in.ip.isIPv4() || in.ip.isIPv6()) && Socket::isIPv6(type)) {
-			if (in.ip.isIPv4()) {
-				in.ip = IPv6Address(in.ip.getIPv4());
+		namespace socket
+		{
+			
+			SLIB_INLINE static sl_uint32 applyAddress(SocketType type, sockaddr_storage& addr, SocketAddress in)
+			{
+				if (in.ip.isIPv4() && Socket::isIPv4(type)) {
+					return in.getSystemSocketAddress(&addr);
+				} else if ((in.ip.isIPv4() || in.ip.isIPv6()) && Socket::isIPv6(type)) {
+					if (in.ip.isIPv4()) {
+						in.ip = IPv6Address(in.ip.getIPv4());
+					}
+					return in.getSystemSocketAddress(&addr);
+				}
+				return 0;
 			}
-			return in.getSystemSocketAddress(&addr);
+			
+			SLIB_INLINE static void closeHandle(sl_socket socket)
+			{
+#if defined(SLIB_PLATFORM_IS_WINDOWS)
+				::closesocket((SOCKET)socket);
+#else
+				::close((SOCKET)socket);
+#endif
+			}
+
+			static sl_bool setNonBlocking(SOCKET fd, sl_bool flagEnable)
+			{
+#if defined(SLIB_PLATFORM_IS_WINDOWS)
+				u_long flag = flagEnable ? 1 : 0;
+				return ioctlsocket(fd, FIONBIO, &flag) == 0;
+#else
+#	if defined(FIONBIO)
+				sl_int32 flag = flagEnable ? 1 : 0;
+				return ioctl(fd, FIONBIO, &flag) == 0;
+#	else
+				return File::setNonBlocking(fd, flagEnable);
+#	endif
+#endif
+			}
+			
+			static sl_bool setPromiscuousMode(SOCKET fd, const char* deviceName, sl_bool flagEnable)
+			{
+#if defined(SLIB_PLATFORM_IS_LINUX)
+				ifreq ifopts;
+				Base::copyString(ifopts.ifr_name, deviceName, IFNAMSIZ-1);
+				int ret;
+				ret = ioctl(fd, SIOCGIFFLAGS, &ifopts);
+				if (ret == 0) {
+					if (flagEnable) {
+						ifopts.ifr_flags |= IFF_PROMISC;
+					} else {
+						ifopts.ifr_flags &= (~IFF_PROMISC);
+					}
+					ret = ioctl(fd, SIOCSIFFLAGS, &ifopts);
+					if (ret == 0) {
+						return sl_true;
+					}
+				}
+				return sl_false;
+#else
+				return sl_false;
+#endif
+			}
+
 		}
-		return 0;
 	}
 
 	void Socket::initializeSocket()
@@ -97,24 +152,18 @@ namespace slib
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 		static sl_bool flagInit = sl_false;
 		if (!flagInit) {
-			WSADATA wsaData;
-			int err = WSAStartup(MAKEWORD(2, 2), &wsaData);
-			if (err != 0) {
-				LogError("SOCKET", "WSA Startup failed");
+			SLIB_STATIC_SPINLOCKER(lock)
+			if (!flagInit) {
+				WSADATA wsaData;
+				int err = WSAStartup(MAKEWORD(2, 2), &wsaData);
+				if (err != 0) {
+					LogError("SOCKET", "WSA Startup failed");
+				}
+				flagInit = sl_true;
 			}
-			flagInit = sl_true;
 		}
 #else
 		//signal(SIGPIPE, SIG_IGN);
-#endif
-	}
-
-	SLIB_INLINE static void _priv_Socket_close(sl_socket socket)
-	{
-#if defined(SLIB_PLATFORM_IS_WINDOWS)
-		::closesocket((SOCKET)socket);
-#else
-		::close((SOCKET)socket);
 #endif
 	}
 
@@ -198,7 +247,7 @@ namespace slib
 #endif
 				return ret;
 			}
-			_priv_Socket_close(handle);
+			priv::socket::closeHandle(handle);
 		}
 		return sl_null;
 	}
@@ -266,7 +315,7 @@ namespace slib
 	void Socket::close()
 	{
 		if (m_socket != SLIB_SOCKET_INVALID_HANDLE) {
-			_priv_Socket_close(m_socket);
+			priv::socket::closeHandle(m_socket);
 			m_socket = SLIB_SOCKET_INVALID_HANDLE;
 		}
 		m_type = SocketType::None;
@@ -380,26 +429,26 @@ namespace slib
 			sl_uint32 size_addr = 0;
 			if (isIPv4()) {
 				if (address.ip.isIPv4()) {
-					size_addr = _priv_Socket_apply_address(m_type, addr, address);
+					size_addr = priv::socket::applyAddress(m_type, addr, address);
 				} else if (address.ip.isNone()) {
 					SocketAddress addrAny;
 					addrAny.ip = IPv4Address::zero();
 					addrAny.port = address.port;
-					size_addr = _priv_Socket_apply_address(m_type, addr, addrAny);
+					size_addr = priv::socket::applyAddress(m_type, addr, addrAny);
 				} else {
 					_setError(SocketError::BindInvalidAddress);
 					return sl_false;
 				}
 			} else if (isIPv6()) {
 				if (address.ip.isIPv4()) {
-					size_addr = _priv_Socket_apply_address(m_type, addr, address);
+					size_addr = priv::socket::applyAddress(m_type, addr, address);
 				} else if (address.ip.isIPv6()) {
-					size_addr = _priv_Socket_apply_address(m_type, addr, address);
+					size_addr = priv::socket::applyAddress(m_type, addr, address);
 				} else if (address.ip.isNone()) {
 					SocketAddress addrAny;
 					addrAny.ip = IPv6Address::zero();
 					addrAny.port = address.port;
-					size_addr = _priv_Socket_apply_address(m_type, addr, addrAny);
+					size_addr = priv::socket::applyAddress(m_type, addr, addrAny);
 				} else {
 					_setError(SocketError::BindInvalidAddress);
 					return sl_false;
@@ -464,7 +513,7 @@ namespace slib
 					socket->m_socket = client;
 					socketClient = socket;
 				} else {
-					_priv_Socket_close(client);
+					priv::socket::closeHandle(client);
 				}
 				return sl_true;
 			} else {
@@ -485,7 +534,7 @@ namespace slib
 				return sl_false;
 			}
 			sockaddr_storage addr;
-			sl_uint32 addr_size = _priv_Socket_apply_address(m_type, addr, address);
+			sl_uint32 addr_size = priv::socket::applyAddress(m_type, addr, address);
 			if (addr_size) {
 				int ret = ::connect((SOCKET)(m_socket), (sockaddr*)&addr, (int)addr_size);
 				if (ret != SOCKET_ERROR) {
@@ -581,7 +630,7 @@ namespace slib
 				return -1;
 			}
 			sockaddr_storage addr;
-			if (sl_uint32 addr_size = _priv_Socket_apply_address(m_type, addr, address)) {
+			if (sl_uint32 addr_size = priv::socket::applyAddress(m_type, addr, address)) {
 				sl_int32 ret = (sl_int32)(::sendto((SOCKET)(m_socket), (char*)buf, size, 0, (sockaddr*)&addr, (int)addr_size));
 				if (ret >= 0) {
 					if (ret == 0) {
@@ -730,53 +779,14 @@ namespace slib
 		return -1;
 	}
 
-	sl_bool _priv_Socket_setNonBlocking(SOCKET fd, sl_bool flagEnable)
-	{
-#if defined(SLIB_PLATFORM_IS_WINDOWS)
-		u_long flag = flagEnable ? 1 : 0;
-		return ioctlsocket(fd, FIONBIO, &flag) == 0;
-#else
-#	if defined(FIONBIO)
-		sl_int32 flag = flagEnable ? 1 : 0;
-		return ioctl(fd, FIONBIO, &flag) == 0;
-#	else
-		return File::setNonBlocking(fd, flagEnable);
-#	endif
-#endif
-	}
-
 	sl_bool Socket::setNonBlockingMode(sl_bool flagEnable)
 	{
 		if (isOpened()) {
-			if (_priv_Socket_setNonBlocking((SOCKET)(m_socket), flagEnable)) {
+			if (priv::socket::setNonBlocking((SOCKET)(m_socket), flagEnable)) {
 				return sl_true;
 			}
 		}
 		return sl_false;
-	}
-
-	sl_bool _priv_Socket_setPromiscuousMode(SOCKET fd, const char* deviceName, sl_bool flagEnable)
-	{
-#if defined(SLIB_PLATFORM_IS_LINUX)
-		ifreq ifopts;
-		Base::copyString(ifopts.ifr_name, deviceName, IFNAMSIZ-1);
-		int ret;
-		ret = ioctl(fd, SIOCGIFFLAGS, &ifopts);
-		if (ret == 0) {
-			if (flagEnable) {
-				ifopts.ifr_flags |= IFF_PROMISC;
-			} else {
-				ifopts.ifr_flags &= (~IFF_PROMISC);
-			}
-			ret = ioctl(fd, SIOCSIFFLAGS, &ifopts);
-			if (ret == 0) {
-				return sl_true;
-			}
-		}
-		return sl_false;
-#else
-		return sl_false;
-#endif
 	}
 
 	sl_bool Socket::setPromiscuousMode(const String& _deviceName, sl_bool flagEnable)
@@ -784,7 +794,7 @@ namespace slib
 		if (isOpened()) {
 			String deviceName = _deviceName;
 			if (deviceName.isNotEmpty()) {
-				if (_priv_Socket_setPromiscuousMode((SOCKET)(m_socket), deviceName.getData(), flagEnable)) {
+				if (priv::socket::setPromiscuousMode((SOCKET)(m_socket), deviceName.getData(), flagEnable)) {
 					return sl_true;
 				}
 			}
