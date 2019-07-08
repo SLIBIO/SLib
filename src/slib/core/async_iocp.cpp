@@ -34,11 +34,34 @@ namespace slib
 	{
 		namespace async_iocp
 		{
+
 			struct AsyncIoLoopHandle
 			{
 				HANDLE hCompletionPort;
 				OVERLAPPED overlappedWake;
 			};
+
+			BOOL WINAPI GetQueuedCompletionStatusExImpl(
+				HANDLE CompletionPort,
+				LPOVERLAPPED_ENTRY lpCompletionPortEntries,
+				ULONG ulCount,
+				PULONG ulNumEntriesRemoved,
+				DWORD dwMilliseconds,
+				BOOL fAlertable
+			)
+			{
+				::GetQueuedCompletionStatus(CompletionPort
+					, &(lpCompletionPortEntries[0].dwNumberOfBytesTransferred)
+					, &(lpCompletionPortEntries[0].lpCompletionKey)
+					, &(lpCompletionPortEntries[0].lpOverlapped), dwMilliseconds);
+				if (lpCompletionPortEntries[0].lpCompletionKey) {
+					*ulNumEntriesRemoved = 1;
+				} else {
+					*ulNumEntriesRemoved = 0;
+				}
+				return TRUE;
+			}
+
 		}
 	}
 
@@ -65,36 +88,13 @@ namespace slib
 		delete handle;
 	}
 
-
-	BOOL WINAPI _priv_GetQueuedCompletionStatusEx_Impl(
-		HANDLE CompletionPort,
-		LPOVERLAPPED_ENTRY lpCompletionPortEntries,
-		ULONG ulCount,
-		PULONG ulNumEntriesRemoved,
-		DWORD dwMilliseconds,
-		BOOL fAlertable
-	)
-	{
-		::GetQueuedCompletionStatus(CompletionPort
-			, &(lpCompletionPortEntries[0].dwNumberOfBytesTransferred)
-			, &(lpCompletionPortEntries[0].lpCompletionKey)
-			, &(lpCompletionPortEntries[0].lpOverlapped), dwMilliseconds);
-		if (lpCompletionPortEntries[0].lpCompletionKey) {
-			*ulNumEntriesRemoved = 1;
-		} else {
-			*ulNumEntriesRemoved = 0;
-		}
-		return TRUE;
-	}
-
-
 	void AsyncIoLoop::_native_runLoop()
 	{
 		AsyncIoLoopHandle* handle = (AsyncIoLoopHandle*)m_handle;
 
 		WINAPI_GetQueuedCompletionStatusEx fGetQueuedCompletionStatusEx = Windows::getAPI_GetQueuedCompletionStatusEx();
 		if (!fGetQueuedCompletionStatusEx) {
-			fGetQueuedCompletionStatusEx = _priv_GetQueuedCompletionStatusEx_Impl;
+			fGetQueuedCompletionStatusEx = GetQueuedCompletionStatusExImpl;
 		}
 
 		OVERLAPPED_ENTRY entries[ASYNC_MAX_WAIT_EVENT];

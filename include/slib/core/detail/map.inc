@@ -33,13 +33,13 @@ namespace slib
 	template <class KT, class VT>
 	SLIB_INLINE MapNode<KT, VT>* MapNode<KT, VT>::getNext() const noexcept
 	{
-		return reinterpret_cast<MapNode<KT, VT>*>(_priv_RedBlackTree::getNext(const_cast<RedBlackTreeNode*>(reinterpret_cast<RedBlackTreeNode const*>(this))));
+		return reinterpret_cast<MapNode<KT, VT>*>(priv::rb_tree::Helper::getNext(const_cast<RedBlackTreeNode*>(reinterpret_cast<RedBlackTreeNode const*>(this))));
 	}
 	
 	template <class KT, class VT>
 	SLIB_INLINE MapNode<KT, VT>* MapNode<KT, VT>::getPrevious() const noexcept
 	{
-		return reinterpret_cast<MapNode<KT, VT>*>(_priv_RedBlackTree::getPrevious(const_cast<RedBlackTreeNode*>(reinterpret_cast<RedBlackTreeNode const*>(this))));
+		return reinterpret_cast<MapNode<KT, VT>*>(priv::rb_tree::Helper::getPrevious(const_cast<RedBlackTreeNode*>(reinterpret_cast<RedBlackTreeNode const*>(this))));
 	}
 	
 	

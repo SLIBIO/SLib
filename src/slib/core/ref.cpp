@@ -128,10 +128,12 @@ namespace slib
 		if (m_weak) {
 			return m_weak;
 		}
-		SpinLocker lock(SpinLockPoolForWeakRef::get(this));
+		SpinLock* locker = SpinLockPoolForWeakRef::get(this);
+		locker->lock();
 		if (!m_weak) {
 			m_weak = CWeakRef::create(this);
 		}
+		locker->unlock();
 		return m_weak;
 	}
 
@@ -184,7 +186,10 @@ namespace slib
 	Ref<Referable> CWeakRef::lock() noexcept
 	{
 		Ref<Referable> ret;
-		SpinLocker lock(&m_lock);
+		if (!m_object) {
+			return sl_null;
+		}
+		m_lock.lock();
 		Referable* obj = m_object;
 		if (obj) {
 			sl_reg n = obj->increaseReference();
@@ -193,15 +198,15 @@ namespace slib
 			}
 			obj->decreaseReferenceNoFree();
 		}
+		m_lock.unlock();
 		return ret;
 	}
 
 	void CWeakRef::release() noexcept
 	{
-		{
-			SpinLocker lock(&m_lock);
-			m_object = sl_null;
-		}
+		m_lock.lock();
+		m_object = sl_null;
+		m_lock.unlock();
 		decreaseReference();
 	}
 

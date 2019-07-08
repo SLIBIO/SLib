@@ -27,7 +27,7 @@ namespace slib
 	CHashMap<KT, VT, HASH, KEY_COMPARE>::CHashMap(const std::initializer_list< Pair<KT, VT> >& l, sl_size capacityMinimum, sl_size capacityMaximum, const HASH& hash, const KEY_COMPARE& compare) noexcept
 	 : m_hash(hash), m_compare(compare)
 	{
-		_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), capacityMinimum, capacityMaximum);
+		priv::hash_table::Helper::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), capacityMinimum, capacityMaximum);
 		m_nodeFirst = sl_null;
 		m_nodeLast = sl_null;
 		const Pair<KT, VT>* data = l.begin();

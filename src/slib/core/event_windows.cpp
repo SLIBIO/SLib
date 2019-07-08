@@ -30,84 +30,92 @@
 namespace slib
 {
 
-	class _priv_Win32Event : public Event
+	namespace priv
 	{
-	public:
-		HANDLE m_hEvent;
-		sl_bool m_flagCloseOnRelease;
-
-		_priv_Win32Event()
+		namespace event
 		{
-		}
 
-		~_priv_Win32Event()
-		{
-			if (m_flagCloseOnRelease) {
-				::CloseHandle(m_hEvent);
-			}
-		}
+			class EventImpl : public Event
+			{
+			public:
+				HANDLE m_hEvent;
+				sl_bool m_flagCloseOnRelease;
 
-		static Ref<_priv_Win32Event> create(HANDLE hEvent, sl_bool flagCloseOnRelease)
-		{
-			Ref<_priv_Win32Event> ret;
-			if (hEvent) {
-				ret = new _priv_Win32Event;
-				if (ret.isNotNull()) {
-					ret->m_hEvent = hEvent;
-					ret->m_flagCloseOnRelease = flagCloseOnRelease;
+				EventImpl()
+				{
+				}
+
+				~EventImpl()
+				{
+					if (m_flagCloseOnRelease) {
+						::CloseHandle(m_hEvent);
+					}
+				}
+
+				static Ref<EventImpl> create(HANDLE hEvent, sl_bool flagCloseOnRelease)
+				{
+					Ref<EventImpl> ret;
+					if (hEvent) {
+						ret = new EventImpl;
+						if (ret.isNotNull()) {
+							ret->m_hEvent = hEvent;
+							ret->m_flagCloseOnRelease = flagCloseOnRelease;
+							return ret;
+						}
+						if (flagCloseOnRelease) {
+							::CloseHandle(hEvent);
+						}
+					}
 					return ret;
 				}
-				if (flagCloseOnRelease) {
-					::CloseHandle(hEvent);
-				}
-			}
-			return ret;
-		}
 
-		static Ref<_priv_Win32Event> create(sl_bool flagAutoReset)
-		{
-			HANDLE hEvent;
+				static Ref<EventImpl> create(sl_bool flagAutoReset)
+				{
+					HANDLE hEvent;
 #if defined(SLIB_PLATFORM_IS_WIN32)
-			hEvent = ::CreateEventW(NULL, flagAutoReset ? FALSE : TRUE, FALSE, NULL);
+					hEvent = ::CreateEventW(NULL, flagAutoReset ? FALSE : TRUE, FALSE, NULL);
 #else
-			hEvent = ::CreateEventEx(NULL, NULL, flagAutoReset ? CREATE_EVENT_INITIAL_SET : CREATE_EVENT_MANUAL_RESET, EVENT_ALL_ACCESS);
+					hEvent = ::CreateEventEx(NULL, NULL, flagAutoReset ? CREATE_EVENT_INITIAL_SET : CREATE_EVENT_MANUAL_RESET, EVENT_ALL_ACCESS);
 #endif
-			return create(hEvent, sl_true);
-		}
+					return create(hEvent, sl_true);
+				}
 
-		void _native_set() override
-		{
-			::SetEvent(m_hEvent);
-		}
+				void _native_set() override
+				{
+					::SetEvent(m_hEvent);
+				}
 
-		void _native_reset() override
-		{
-			::ResetEvent(m_hEvent);
-		}
+				void _native_reset() override
+				{
+					::ResetEvent(m_hEvent);
+				}
 
-		sl_bool _native_wait(sl_int32 timeout) override
-		{
-			DWORD t = INFINITE;
-			if (timeout >= 0) {
-				t = timeout;
-			}
-			DWORD ret = WaitForSingleObjectEx(m_hEvent, timeout, TRUE);
-			if (ret == WAIT_TIMEOUT) {
-				return sl_false;
-			} else {
-				return sl_true;
-			}
+				sl_bool _native_wait(sl_int32 timeout) override
+				{
+					DWORD t = INFINITE;
+					if (timeout >= 0) {
+						t = timeout;
+					}
+					DWORD ret = WaitForSingleObjectEx(m_hEvent, timeout, TRUE);
+					if (ret == WAIT_TIMEOUT) {
+						return sl_false;
+					} else {
+						return sl_true;
+					}
+				}
+			};
+
 		}
-	};
+	}
 
 	Ref<Event> Windows::createEvent(HANDLE hEvent, sl_bool flagCloseOnRelease)
 	{
-		return _priv_Win32Event::create(hEvent, flagCloseOnRelease);
+		return priv::event::EventImpl::create(hEvent, flagCloseOnRelease);
 	}
 
 	Ref<Event> Event::create(sl_bool flagAutoReset)
 	{
-		return _priv_Win32Event::create(flagAutoReset);
+		return priv::event::EventImpl::create(flagAutoReset);
 	}
 
 }

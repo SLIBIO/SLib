@@ -1992,18 +1992,24 @@ namespace slib
 		}
 	}
 
-	class _priv_AsyncStreamFilter_WriteRequest : public AsyncStreamRequest
+	namespace priv
 	{
-	public:
-		Memory memConverted;
-		
-	public:
-		_priv_AsyncStreamFilter_WriteRequest(const Memory& _memConv, const void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult&)>& callback)
-		 : AsyncStreamRequest(data, size, userObject, callback, sl_false), memConverted(_memConv)
+		namespace async
 		{
+			class AsyncStreamFilter_WriteRequest : public AsyncStreamRequest
+			{
+			public:
+				Memory memConverted;
+				
+			public:
+				AsyncStreamFilter_WriteRequest(const Memory& _memConv, const void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult&)>& callback)
+				: AsyncStreamRequest(data, size, userObject, callback, sl_false), memConverted(_memConv)
+				{
+				}
+				
+			};
 		}
-		
-	};
+	}
 
 	sl_bool AsyncStreamFilter::write(const void* data, sl_uint32 size, const Function<void(AsyncStreamResult&)>& callback, Referable* userObject)
 	{
@@ -2020,7 +2026,7 @@ namespace slib
 		}
 		if (data && size) {
 			Memory memConv = filterWrite(data, size, userObject);
-			Ref<_priv_AsyncStreamFilter_WriteRequest> req = new _priv_AsyncStreamFilter_WriteRequest(memConv, data, size, userObject, callback);
+			Ref<priv::async::AsyncStreamFilter_WriteRequest> req = new priv::async::AsyncStreamFilter_WriteRequest(memConv, data, size, userObject, callback);
 			if (req.isNotNull()) {
 				return stream->write(memConv.getData(), (sl_uint32)(memConv.getSize()), SLIB_FUNCTION_WEAKREF(AsyncStreamFilter, onWriteStream, this), req.get());
 			}
@@ -2035,7 +2041,7 @@ namespace slib
 		if (result.flagError) {
 			m_flagWritingError = sl_true;
 		}
-		_priv_AsyncStreamFilter_WriteRequest* req = (_priv_AsyncStreamFilter_WriteRequest*)(result.userObject);
+		priv::async::AsyncStreamFilter_WriteRequest* req = (priv::async::AsyncStreamFilter_WriteRequest*)(result.userObject);
 		if (req) {
 			req->runCallback(this, req->size, m_flagWritingError);
 		}

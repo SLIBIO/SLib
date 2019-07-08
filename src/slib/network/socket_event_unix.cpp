@@ -101,7 +101,7 @@ namespace slib
 		return Ref<SocketEvent>::from(SocketEventImpl::create(socket));
 	}
 
-	sl_bool SocketEvent::_native_waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* status, sl_uint32 count, sl_int32 timeout)
+	sl_bool SocketEvent::_native_waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* statuses, sl_uint32 count, sl_int32 timeout)
 	{
 		SLIB_SCOPED_BUFFER(pollfd, 64, fd, 2*count);
 		SLIB_SCOPED_BUFFER(sl_uint32, 64, indexMap, count);
@@ -134,8 +134,8 @@ namespace slib
 					indexMap[cEvents] = i;
 					cEvents++;
 				}
-				if (status) {
-					status[i] = 0;
+				if (statuses) {
+					statuses[i] = 0;
 				}
 			}
 		}
@@ -144,26 +144,26 @@ namespace slib
 		}
 		
 		int t = timeout >= 0 ? (int)timeout : -1;
-		int ret = poll(fd, 2 * (int)cEvents, t);
-		if (ret > 0) {
+		int iRet = poll(fd, 2 * (int)cEvents, t);
+		if (iRet > 0) {
 			for (sl_uint32 k = 0; k < cEvents; k++) {
-				sl_uint32 ret = 0;
+				sl_uint32 status = 0;
 				sl_uint32 revs = fd[k*2].revents;
 				if (revs & (POLLIN | POLLPRI)) {
-					ret |= SocketEvent::Read;
+					status |= SocketEvent::Read;
 				}
 				if (revs & POLLOUT) {
-					ret |= SocketEvent::Write;
+					status |= SocketEvent::Write;
 				}
 #if defined(SLIB_PLATFORM_IS_LINUX)
 				if (revs & (POLLERR | POLLHUP | POLLRDHUP)) {
 #else
 				if (revs & (POLLERR | POLLHUP)) {
 #endif
-					ret |= SocketEvent::Close;
+					status |= SocketEvent::Close;
 				}
-				if (status) {
-					status[indexMap[k]] = ret;
+				if (statuses) {
+					statuses[indexMap[k]] = status;
 				}
 				if (fd[k*2+1].revents) {
 					Ref<SocketEventImpl> ev = Ref<SocketEventImpl>::from(events[indexMap[k]]);

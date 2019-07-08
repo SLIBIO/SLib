@@ -676,8 +676,15 @@ namespace slib
 		}
 	}
 	
-	sl_uint64 _priv_Locale_Unknown = 0;
-	const Locale& Locale::Unknown = *((Locale*)&_priv_Locale_Unknown);
+	namespace priv
+	{
+		namespace locale
+		{
+			sl_uint64 g_localeUnknown = 0;
+		}
+	}
+	
+	const Locale& Locale::Unknown = *((Locale*)&(priv::locale::g_localeUnknown));
 
 	sl_bool Locale::isValid() const
 	{
@@ -803,93 +810,112 @@ namespace slib
 		return sl_null;
 	}
 	
-	template <class T>
-	SLIB_INLINE static sl_reg _priv_Locale_parse(Locale* _out, const T* sz, sl_size i, sl_size n)
+	namespace priv
 	{
-		if (i + 1 >= n) {
-			return SLIB_PARSE_ERROR;
-		}
-		
-		if (SLIB_CHAR_IS_ALPHA_UPPER(sz[i]) && SLIB_CHAR_IS_ALPHA_UPPER(sz[i+1])) {
-			if (_out) {
-				*_out = Locale(Language::Unknown, LanguageScript::Unknown, Locale::getCountryFromCode(sz));
-			}
-			return i + 2;
-		}
-
-		if (!(SLIB_CHAR_IS_ALPHA_LOWER(sz[i]) && SLIB_CHAR_IS_ALPHA_LOWER(sz[i+1]))) {
-			return SLIB_PARSE_ERROR;
-		}
-		
-		Language language = Locale::getLanguageFromCode(sz + i);
-		LanguageScript script = LanguageScript::Unknown;
-		Country country = Country::Unknown;
-		
-		i += 2;
-		if (i < n) {
-			if ((sz[i] == '-' || sz[i] == '_')) {
-				i++;
+		namespace locale
+		{
+			
+			template <class T>
+			SLIB_INLINE static sl_reg parse(Locale* _out, const T* sz, sl_size i, sl_size n)
+			{
 				if (i + 1 >= n) {
 					return SLIB_PARSE_ERROR;
 				}
-				if (!(SLIB_CHAR_IS_ALPHA_UPPER(sz[i]))) {
+				
+				if (SLIB_CHAR_IS_ALPHA_UPPER(sz[i]) && SLIB_CHAR_IS_ALPHA_UPPER(sz[i+1])) {
+					if (_out) {
+						*_out = Locale(Language::Unknown, LanguageScript::Unknown, Locale::getCountryFromCode(sz));
+					}
+					return i + 2;
+				}
+				
+				if (!(SLIB_CHAR_IS_ALPHA_LOWER(sz[i]) && SLIB_CHAR_IS_ALPHA_LOWER(sz[i+1]))) {
 					return SLIB_PARSE_ERROR;
 				}
-				if (SLIB_CHAR_IS_ALPHA_UPPER(sz[i+1])) {
-					country = Locale::getCountryFromCode(sz + i);
-					i += 2;
-				} else {
-					if (i + 3 >= n) {
-						return SLIB_PARSE_ERROR;
-					}
-					if (!(SLIB_CHAR_IS_ALPHA_LOWER(sz[i+1]) && SLIB_CHAR_IS_ALPHA_LOWER(sz[i+2]) && SLIB_CHAR_IS_ALPHA_LOWER(sz[i+3]))) {
-						return SLIB_PARSE_ERROR;
-					}
-					script = Locale::getScriptFromCode(sz + i);
-					i += 4;
-					if (i < n && (sz[i] == '-' || sz[i] == '_')) {
+				
+				Language language = Locale::getLanguageFromCode(sz + i);
+				LanguageScript script = LanguageScript::Unknown;
+				Country country = Country::Unknown;
+				
+				i += 2;
+				if (i < n) {
+					if ((sz[i] == '-' || sz[i] == '_')) {
 						i++;
 						if (i + 1 >= n) {
 							return SLIB_PARSE_ERROR;
 						}
-						if (!(SLIB_CHAR_IS_ALPHA_UPPER(sz[i]) && SLIB_CHAR_IS_ALPHA_UPPER(sz[i+1]))) {
+						if (!(SLIB_CHAR_IS_ALPHA_UPPER(sz[i]))) {
 							return SLIB_PARSE_ERROR;
 						}
-						country = Locale::getCountryFromCode(sz + i);
-						i += 2;
+						if (SLIB_CHAR_IS_ALPHA_UPPER(sz[i+1])) {
+							country = Locale::getCountryFromCode(sz + i);
+							i += 2;
+						} else {
+							if (i + 3 >= n) {
+								return SLIB_PARSE_ERROR;
+							}
+							if (!(SLIB_CHAR_IS_ALPHA_LOWER(sz[i+1]) && SLIB_CHAR_IS_ALPHA_LOWER(sz[i+2]) && SLIB_CHAR_IS_ALPHA_LOWER(sz[i+3]))) {
+								return SLIB_PARSE_ERROR;
+							}
+							script = Locale::getScriptFromCode(sz + i);
+							i += 4;
+							if (i < n && (sz[i] == '-' || sz[i] == '_')) {
+								i++;
+								if (i + 1 >= n) {
+									return SLIB_PARSE_ERROR;
+								}
+								if (!(SLIB_CHAR_IS_ALPHA_UPPER(sz[i]) && SLIB_CHAR_IS_ALPHA_UPPER(sz[i+1]))) {
+									return SLIB_PARSE_ERROR;
+								}
+								country = Locale::getCountryFromCode(sz + i);
+								i += 2;
+							}
+						}
 					}
 				}
+				if (_out) {
+					if (script == LanguageScript::Unknown) {
+						*_out = Locale(language, country);
+					} else {
+						*_out = Locale(language, script, country);
+					}
+				}
+				return i;
 			}
+			
 		}
-		if (_out) {
-			if (script == LanguageScript::Unknown) {
-				*_out = Locale(language, country);
-			} else {
-				*_out = Locale(language, script, country);
-			}
-		}
-		return i;
 	}
-
 	
 	template <>
 	sl_reg Parser<Locale, sl_char8>::parse(Locale* _out, const sl_char8 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
-		return _priv_Locale_parse(_out, sz, posBegin, posEnd);
+		return priv::locale::parse(_out, sz, posBegin, posEnd);
 	}
 	
 	template <>
 	sl_reg Parser<Locale, sl_char16>::parse(Locale* _out, const sl_char16 *sz, sl_size posBegin, sl_size posEnd) noexcept
 	{
-		return _priv_Locale_parse(_out, sz, posBegin, posEnd);
+		return priv::locale::parse(_out, sz, posBegin, posEnd);
 	}
 	
+	namespace priv
+	{
+		namespace locale
+		{
+			
+			Locale g_localeCurrent = Locale::Unknown;
+			Locale g_localeLastCurrent = Locale::Unknown;
+			
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void()>, g_callback_onChangeCurrent)
+			
+		}
+	}
 
-	static Locale _g_priv_locale_current = Locale::Unknown;
+	using namespace priv::locale;
 	
 	Locale Locale::getCurrent()
 	{
-		Locale locale = _g_priv_locale_current;
+		Locale locale = g_localeCurrent;
 		if (locale != Locale::Unknown) {
 			return locale;
 		}
@@ -898,18 +924,15 @@ namespace slib
 	
 	void Locale::setCurrent(const Locale& locale)
 	{
-		_g_priv_locale_current = locale;
+		g_localeCurrent = locale;
 	}
-
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void()>, _g_priv_locale_callback_onChangeCurrent)
-	Locale _g_priv_Locale_lastCurrent;
 
 	Function<void()> Locale::addOnChangeCurrentLocale(const Function<void()>& callback)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_locale_callback_onChangeCurrent)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_callback_onChangeCurrent)) {
 			return callback;
 		}
-		_g_priv_locale_callback_onChangeCurrent.add(callback);
+		g_callback_onChangeCurrent.add(callback);
 		{
 			SLIB_STATIC_SPINLOCKER(lock)
 			static sl_bool flagSetup = sl_false;
@@ -918,27 +941,27 @@ namespace slib
 			}
 			flagSetup = sl_true;
 		}
-		_g_priv_Locale_lastCurrent = _getCurrent();
+		g_localeLastCurrent = _getCurrent();
 		_setupOnChangeCurrentLocale();
 		return callback;
 	}
 	
 	void Locale::removeOnChangeCurrentLocale(const Function<void()>& callback)
 	{
-		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_locale_callback_onChangeCurrent))) {
-			_g_priv_locale_callback_onChangeCurrent.remove(callback);
+		if (!(SLIB_SAFE_STATIC_CHECK_FREED(g_callback_onChangeCurrent))) {
+			g_callback_onChangeCurrent.remove(callback);
 		}
 	}
 	
 	void Locale::dispatchChangeCurrentLocale()
 	{
 		Locale locale = _getCurrent();
-		if (_g_priv_Locale_lastCurrent == locale) {
+		if (g_localeLastCurrent == locale) {
 			return;
 		}
-		_g_priv_Locale_lastCurrent = locale;
-		if (!(SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_locale_callback_onChangeCurrent))) {
-			_g_priv_locale_callback_onChangeCurrent();
+		g_localeLastCurrent = locale;
+		if (!(SLIB_SAFE_STATIC_CHECK_FREED(g_callback_onChangeCurrent))) {
+			g_callback_onChangeCurrent();
 		}
 	}
 	
@@ -983,13 +1006,20 @@ namespace slib
 
 namespace slib
 {
-	SLIB_JNI_BEGIN_CLASS(JAndroid, "slib/platform/android/Android")
-		SLIB_JNI_STATIC_METHOD(getCurrentLocale, "getCurrentLocale", "()Ljava/lang/String;");
-	SLIB_JNI_END_CLASS
+	
+	namespace priv
+	{
+		namespace locale
+		{
+			SLIB_JNI_BEGIN_CLASS(JAndroid, "slib/platform/android/Android")
+				SLIB_JNI_STATIC_METHOD(getCurrentLocale, "getCurrentLocale", "()Ljava/lang/String;");
+			SLIB_JNI_END_CLASS
+		}
+	}
 
 	Locale Locale::_getCurrent()
 	{
-		String str = JAndroid::getCurrentLocale.callString(sl_null);
+		String str = priv::locale::JAndroid::getCurrentLocale.callString(sl_null);
 		return Locale(str);
 	}
 }

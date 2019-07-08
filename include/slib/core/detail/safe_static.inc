@@ -23,25 +23,31 @@
 namespace slib
 {
 	
-	template <class T>
-	class _priv_SafeStaticDestructor
+	namespace priv
 	{
-	public:
-		T* object;
-		volatile sl_bool flagFreed;
-
-	public:
-		SLIB_INLINE  _priv_SafeStaticDestructor(T* p)
-		 : object(p), flagFreed(sl_false)
+		namespace safe_static
 		{
-		}
 
-		~ _priv_SafeStaticDestructor()
-		{
-			flagFreed = sl_true;
-			object->~T();
-		}
+			template <class T>
+			class SafeStaticDestructor
+			{
+			public:
+				T* object;
+				volatile sl_bool flagFreed;
 
-	};
+			public:
+				SLIB_INLINE  SafeStaticDestructor(T* p): object(p), flagFreed(sl_false)
+				{
+				}
+
+				~ SafeStaticDestructor()
+				{
+					flagFreed = sl_true;
+					object->~T();
+				}
+			};
+
+		}
+	}
 
 }

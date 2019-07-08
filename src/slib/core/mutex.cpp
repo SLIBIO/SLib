@@ -66,27 +66,31 @@ namespace slib
 
 	void* Mutex::_initObject() const noexcept
 	{
-		SpinLocker lock(&m_lock);
 		void* object = m_object;
 		if (object) {
 			return object;
 		}
+		m_lock.lock();
+		object = m_object;
+		if (!object) {
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-		object = Base::createMemory(sizeof(CRITICAL_SECTION));
+			object = Base::createMemory(sizeof(CRITICAL_SECTION));
 #	if defined(SLIB_PLATFORM_IS_WIN32)
-		::InitializeCriticalSection((PCRITICAL_SECTION)object);
+			::InitializeCriticalSection((PCRITICAL_SECTION)object);
 #	else
-		::InitializeCriticalSectionEx((PCRITICAL_SECTION)object, NULL, NULL);
+			::InitializeCriticalSectionEx((PCRITICAL_SECTION)object, NULL, NULL);
 #	endif
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-		object = Base::createMemory(sizeof(pthread_mutex_t));
-		pthread_mutexattr_t attr;
-		::pthread_mutexattr_init(&attr);
-		::pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-		::pthread_mutex_init((pthread_mutex_t*)(object), &attr);
-		::pthread_mutexattr_destroy(&attr);
+			object = Base::createMemory(sizeof(pthread_mutex_t));
+			pthread_mutexattr_t attr;
+			::pthread_mutexattr_init(&attr);
+			::pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+			::pthread_mutex_init((pthread_mutex_t*)(object), &attr);
+			::pthread_mutexattr_destroy(&attr);
 #endif
-		m_object = object;
+			m_object = object;
+		}
+		m_lock.unlock();
 		return object;
 	}
 

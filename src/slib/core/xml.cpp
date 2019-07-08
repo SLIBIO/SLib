@@ -1417,121 +1417,124 @@ namespace slib
 		currentNode = sl_null;
 	}
 
-	template <class ST, class CT, class BT>
-	class _priv_Xml_Parser
+	namespace priv
 	{
-	public:
-		String sourceFilePath;
-		const CT* buf;
-		sl_size len;
-		sl_size pos;
-		sl_size lineNumber;
-		sl_size columnNumber;
-		sl_size posForLineColumn;
-		
-		Ref<XmlDocument> document;
-		XmlParseControl control;
-		
-		XmlParseParam param;
-		
-		sl_bool flagError;
-		String errorMessage;
-		
-	public:
-		_priv_Xml_Parser();
-		
-		void escapeWhiteSpaces();
-		
-		void calcLineNumber();
-		
-		void createWhiteSpace(XmlNodeGroup* parent, sl_size posStart, sl_size posEnd);
+		namespace xml
+		{
 
-		void unescapeEntity(BT* buf);
-		
-		void parseName(XmlString& name);
+			template <class ST, class CT, class BT>
+			class XmlParser
+			{
+			public:
+				String sourceFilePath;
+				const CT* buf;
+				sl_size len;
+				sl_size pos;
+				sl_size lineNumber;
+				sl_size columnNumber;
+				sl_size posForLineColumn;
+				
+				Ref<XmlDocument> document;
+				XmlParseControl control;
+				
+				XmlParseParam param;
+				
+				sl_bool flagError;
+				String errorMessage;
+				
+			public:
+				XmlParser();
+				
+				void escapeWhiteSpaces();
+				
+				void calcLineNumber();
+				
+				void createWhiteSpace(XmlNodeGroup* parent, sl_size posStart, sl_size posEnd);
 
-		void parseComment(XmlNodeGroup* parent);
+				void unescapeEntity(BT* buf);
+				
+				void parseName(XmlString& name);
 
-		void parseCDATA(XmlNodeGroup* parent);
-		
-		void parsePI(XmlNodeGroup* parent);
-		
-		void processPrefix(const XmlString& name, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces, XmlString& prefix, XmlString& uri, XmlString& localName);
-		
-		void parseAttribute(XmlString& name, XmlString& value);
-		
-		void parseElement(XmlNodeGroup* parent, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces);
-		
-		void parseText(XmlNodeGroup* parent);
-		
-		void parseNodes(XmlNodeGroup* parent, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces);
-		
-		void parseXml();
-		
-		static Ref<XmlDocument> parseXml(const String& sourceFilePath, const CT* buf, sl_size len, XmlParseParam& param);
-		
-	};
+				void parseComment(XmlNodeGroup* parent);
 
+				void parseCDATA(XmlNodeGroup* parent);
+				
+				void parsePI(XmlNodeGroup* parent);
+				
+				void processPrefix(const XmlString& name, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces, XmlString& prefix, XmlString& uri, XmlString& localName);
+				
+				void parseAttribute(XmlString& name, XmlString& value);
+				
+				void parseElement(XmlNodeGroup* parent, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces);
+				
+				void parseText(XmlNodeGroup* parent);
+				
+				void parseNodes(XmlNodeGroup* parent, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces);
+				
+				void parseXml();
+				
+				static Ref<XmlDocument> parseXml(const String& sourceFilePath, const CT* buf, sl_size len, XmlParseParam& param);
+				
+			};
 
-	// 1: valid, 2: invalid for starting, 0: invalid
-	const sl_uint8 _g_XML_check_name_pattern[128] = {
-		/*		NUL		SOH		STX		ETX		EOT		ENQ		ACK		BEL		*/
-		/*00*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		BS		HT		LF		VT		FF		CR		SO		SI		*/
-		/*08*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		DLE		DC1		DC2		DC3		DC4		NAK		SYN		ETB		*/
-		/*10*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		CAN		EM		SUB		ESC		FS		GS		RS		US		*/
-		/*18*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		SP		!		"		#		$		%		&		'		*/
-		/*20*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		(		)		*		+		,		-		.		/		*/
-		/*28*/	0,		0,		0,		0,		0,		2,		2,		0,
-		/*		0		1		2		3		4		5		6		7		*/
-		/*30*/	2,		2,		2,		2,		2,		2,		2,		2,
-		/*		8		9		:		;		<		=		>		?		*/
-		/*38*/	2,		2,		1,		0,		0,		0,		0,		0,
-		/*		@		A		B		C		D		E		F		G		*/
-		/*40*/	0,		1,		1,		1,		1,		1,		1,		1,
-		/*		H		I		J		K		L		M		N		O		*/
-		/*48*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		P		Q		R		S		T		U		V		W		*/
-		/*50*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		X		Y		Z		[		\		]		^		_		*/
-		/*58*/	1,		1,		1,		0,		0,		0,		0,		1,
-		/*		`		a		b		c		d		e		f		g		*/
-		/*60*/	0,		1,		1,		1,		1,		1,		1,		1,
-		/*		h		i		j		k		l		m		n		o		*/
-		/*68*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		p		q		r		s		t		u		v		w		*/
-		/*70*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		x		y		z		{		|		}		~		DEL		*/
-		/*78*/	1,		1,		1,		0,		0,		0,		1,		0
-	};
-
-
-	SLIB_STATIC_STRING(_g_xml_error_msg_unknown, "Unknown Error")
-	SLIB_STATIC_STRING(_g_xml_error_msg_memory_lack, "Lack of Memory")
-	SLIB_STATIC_STRING(_g_xml_error_msg_user_stop, "User stopped parsing")
-	SLIB_STATIC_STRING(_g_xml_error_msg_invalid_escape, "Invalid escaping entity")
-	SLIB_STATIC_STRING(_g_xml_error_msg_escape_not_end, "Missing semi-colon(;) at the end of entity definition")
-	SLIB_STATIC_STRING(_g_xml_error_msg_invalid_markup, "Invalid Markup")
-	SLIB_STATIC_STRING(_g_xml_error_msg_comment_double_hyphen, "Double-hyphen(--) is not allowed in comment text")
-	SLIB_STATIC_STRING(_g_xml_error_msg_comment_not_end, "Comment Section must be ended with -->")
-	SLIB_STATIC_STRING(_g_xml_error_msg_CDATA_not_end, "CDATA Section must be ended with ]]>")
-	SLIB_STATIC_STRING(_g_xml_error_msg_name_missing, "Name definition is missing")
-	SLIB_STATIC_STRING(_g_xml_error_msg_name_invalid_start, "Name definition is starting with invalid character")
-	SLIB_STATIC_STRING(_g_xml_error_msg_name_invalid_char, "Name definition is containing invalid character")
-	SLIB_STATIC_STRING(_g_xml_error_msg_PI_not_end, "Processing Instruction Section must be ended with ?>")
-	SLIB_STATIC_STRING(_g_xml_error_msg_element_tag_not_end, "Element tag definition must be ended with > or />")
-	SLIB_STATIC_STRING(_g_xml_error_msg_element_tag_not_matching_end_tag, "Element must be terminated by the matching end-tag")
-	SLIB_STATIC_STRING(_g_xml_error_msg_element_attr_required_assign, "An assign(=) symbol is required for attribute definition")
-	SLIB_STATIC_STRING(_g_xml_error_msg_element_attr_required_quot, "Attribute value definition must be started with \" or ' symbol")
-	SLIB_STATIC_STRING(_g_xml_error_msg_element_attr_not_end, "Attribute value definition does not be ended")
-	SLIB_STATIC_STRING(_g_xml_error_msg_element_attr_end_with_invalid_char, "Attribute value definition must be followed by >, /, or whitespaces")
-	SLIB_STATIC_STRING(_g_xml_error_msg_element_attr_duplicate, "Attribute name is already specified")
-	SLIB_STATIC_STRING(_g_xml_error_msg_content_include_lt, "Content must not include less-than(<) character")
-	SLIB_STATIC_STRING(_g_xml_error_msg_document_not_wellformed, "Document must be well-formed")
+			// 1: valid, 2: invalid for starting, 0: invalid
+			const sl_uint8 g_patternCheckName[128] = {
+				/*		NUL		SOH		STX		ETX		EOT		ENQ		ACK		BEL		*/
+				/*00*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		BS		HT		LF		VT		FF		CR		SO		SI		*/
+				/*08*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		DLE		DC1		DC2		DC3		DC4		NAK		SYN		ETB		*/
+				/*10*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		CAN		EM		SUB		ESC		FS		GS		RS		US		*/
+				/*18*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		SP		!		"		#		$		%		&		'		*/
+				/*20*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		(		)		*		+		,		-		.		/		*/
+				/*28*/	0,		0,		0,		0,		0,		2,		2,		0,
+				/*		0		1		2		3		4		5		6		7		*/
+				/*30*/	2,		2,		2,		2,		2,		2,		2,		2,
+				/*		8		9		:		;		<		=		>		?		*/
+				/*38*/	2,		2,		1,		0,		0,		0,		0,		0,
+				/*		@		A		B		C		D		E		F		G		*/
+				/*40*/	0,		1,		1,		1,		1,		1,		1,		1,
+				/*		H		I		J		K		L		M		N		O		*/
+				/*48*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		P		Q		R		S		T		U		V		W		*/
+				/*50*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		X		Y		Z		[		\		]		^		_		*/
+				/*58*/	1,		1,		1,		0,		0,		0,		0,		1,
+				/*		`		a		b		c		d		e		f		g		*/
+				/*60*/	0,		1,		1,		1,		1,		1,		1,		1,
+				/*		h		i		j		k		l		m		n		o		*/
+				/*68*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		p		q		r		s		t		u		v		w		*/
+				/*70*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		x		y		z		{		|		}		~		DEL		*/
+				/*78*/	1,		1,		1,		0,		0,		0,		1,		0
+			};
+			
+			SLIB_STATIC_STRING(g_strError_unknown, "Unknown Error")
+			SLIB_STATIC_STRING(g_strError_memory_lack, "Lack of Memory")
+			SLIB_STATIC_STRING(g_strError_user_stop, "User stopped parsing")
+			SLIB_STATIC_STRING(g_strError_invalid_escape, "Invalid escaping entity")
+			SLIB_STATIC_STRING(g_strError_escape_not_end, "Missing semi-colon(;) at the end of entity definition")
+			SLIB_STATIC_STRING(g_strError_invalid_markup, "Invalid Markup")
+			SLIB_STATIC_STRING(g_strError_comment_double_hyphen, "Double-hyphen(--) is not allowed in comment text")
+			SLIB_STATIC_STRING(g_strError_comment_not_end, "Comment Section must be ended with -->")
+			SLIB_STATIC_STRING(g_strError_CDATA_not_end, "CDATA Section must be ended with ]]>")
+			SLIB_STATIC_STRING(g_strError_name_missing, "Name definition is missing")
+			SLIB_STATIC_STRING(g_strError_name_invalid_start, "Name definition is starting with invalid character")
+			SLIB_STATIC_STRING(g_strError_name_invalid_char, "Name definition is containing invalid character")
+			SLIB_STATIC_STRING(g_strError_PI_not_end, "Processing Instruction Section must be ended with ?>")
+			SLIB_STATIC_STRING(g_strError_element_tag_not_end, "Element tag definition must be ended with > or />")
+			SLIB_STATIC_STRING(g_strError_element_tag_not_matching_end_tag, "Element must be terminated by the matching end-tag")
+			SLIB_STATIC_STRING(g_strError_element_attr_required_assign, "An assign(=) symbol is required for attribute definition")
+			SLIB_STATIC_STRING(g_strError_element_attr_required_quot, "Attribute value definition must be started with \" or ' symbol")
+			SLIB_STATIC_STRING(g_strError_element_attr_not_end, "Attribute value definition does not be ended")
+			SLIB_STATIC_STRING(g_strError_element_attr_end_with_invalid_char, "Attribute value definition must be followed by >, /, or whitespaces")
+			SLIB_STATIC_STRING(g_strError_element_attr_duplicate, "Attribute name is already specified")
+			SLIB_STATIC_STRING(g_strError_content_include_lt, "Content must not include less-than(<) character")
+			SLIB_STATIC_STRING(g_strError_document_not_wellformed, "Document must be well-formed")
 
 #define CALL_CALLBACK(NAME, NODE, ...) \
 	{ \
@@ -1543,7 +1546,7 @@ namespace slib
 			_callback(&control, __VA_ARGS__); \
 			if (control.flagStopParsing) { \
 				flagError = sl_true; \
-				errorMessage = _g_xml_error_msg_user_stop; \
+				errorMessage = g_strError_user_stop; \
 				return; \
 			} \
 			if (control.flagChangeSource) { \
@@ -1555,826 +1558,828 @@ namespace slib
 	}
 
 #define REPORT_ERROR(MSG) \
-		flagError = sl_true; \
-		errorMessage = MSG; \
-		return;
-
-
-	template <class ST, class CT, class BT>
-	_priv_Xml_Parser<ST, CT, BT>::_priv_Xml_Parser()
-	{
-		pos = 0;
-		lineNumber = 1;
-		columnNumber = 1;
-		posForLineColumn = 0;
-
-		buf = sl_null;
-		len = 0;
-		
-		flagError = sl_false;
-	}
-
-	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::escapeWhiteSpaces()
-	{
-		while (pos < len) {
-			CT ch = buf[pos];
-			if (!(SLIB_CHAR_IS_WHITE_SPACE(ch))) {
-				break;
-			}
-			pos++;
-		}
-	}
-
-	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::calcLineNumber()
-	{
-		for (sl_size i = posForLineColumn; i < pos; i++) {
-			CT ch = buf[i];
-			if (ch == '\r') {
-				lineNumber++;
-				columnNumber = 1;
-				if (i + 1 < len && buf[i+1] == '\n') {
-					i++;
-				}
-			} else if (ch == '\n') {
-				if (i == 0 || buf[i-1] != '\r') {
-					lineNumber++;
-					columnNumber = 1;
-				}
-			} else {
-				columnNumber++;
-			}
-		}
-		posForLineColumn = pos;
-	}
-
-	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::createWhiteSpace(XmlNodeGroup* parent, sl_size posStart, sl_size posEnd)
-	{
-		if (posEnd <= posStart) {
-			return;
-		}
-		if (param.flagCreateWhiteSpaces) {
-			if (parent) {
-				XmlString content(buf + posStart, posEnd - posStart);
-				if (content.isNull()) {
-					REPORT_ERROR(_g_xml_error_msg_memory_lack)
-				}
-				Ref<XmlWhiteSpace> node = XmlWhiteSpace::create(content);
-				if (node.isNull()) {
-					REPORT_ERROR(_g_xml_error_msg_memory_lack)
-				}
-				calcLineNumber();
-				node->setSourceFilePath(sourceFilePath);
-				node->setStartPositionInSource(posStart);
-				node->setEndPositionInSource(posEnd);
-				node->setLineNumberInSource(lineNumber);
-				node->setColumnNumberInSource(columnNumber);
-				if (!(parent->addChild(node))) {
-					REPORT_ERROR(_g_xml_error_msg_memory_lack)
-				}
-			}
-		}
-	}
+	flagError = sl_true; \
+	errorMessage = MSG; \
+	return;
 	
-	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::unescapeEntity(BT* sb)
-	{
-		if (pos + 2 < len && buf[pos] == 'l' && buf[pos+1] == 't' && buf[pos+2] == ';') {
-			static CT sc = '<';
-			if (sb) {
-				if (!(sb->addStatic(&sc, 1))) {
-					REPORT_ERROR(_g_xml_error_msg_memory_lack)
+			template <class ST, class CT, class BT>
+			XmlParser<ST, CT, BT>::XmlParser()
+			{
+				pos = 0;
+				lineNumber = 1;
+				columnNumber = 1;
+				posForLineColumn = 0;
+				
+				buf = sl_null;
+				len = 0;
+				
+				flagError = sl_false;
+			}
+			
+			template <class ST, class CT, class BT>
+			void XmlParser<ST, CT, BT>::escapeWhiteSpaces()
+			{
+				while (pos < len) {
+					CT ch = buf[pos];
+					if (!(SLIB_CHAR_IS_WHITE_SPACE(ch))) {
+						break;
+					}
+					pos++;
 				}
 			}
-			pos += 3;
-		} else if (pos + 2 < len && buf[pos] == 'g' && buf[pos+1] == 't' && buf[pos+2] == ';') {
-			static CT sc = '>';
-			if (sb) {
-				if (!(sb->addStatic(&sc, 1))) {
-					REPORT_ERROR(_g_xml_error_msg_memory_lack)
-				}
-			}
-			pos += 3;
-		} else if (pos + 3 < len && buf[pos] == 'a' && buf[pos+1] == 'm' && buf[pos+2] == 'p' && buf[pos+3] == ';') {
-			static CT sc = '&';
-			if (sb) {
-				if (!(sb->addStatic(&sc, 1))) {
-					REPORT_ERROR(_g_xml_error_msg_memory_lack)
-				}
-			}
-			pos += 4;
-		} else if (pos + 4 < len && buf[pos] == 'a' && buf[pos+1] == 'p' && buf[pos+2] == 'o' && buf[pos+3] == 's' && buf[pos+4] == ';') {
-			static CT sc = '\'';
-			if (sb) {
-				if (!(sb->addStatic(&sc, 1))) {
-					REPORT_ERROR(_g_xml_error_msg_memory_lack)
-				}
-			}
-			pos += 5;
-		} else if (pos + 4 < len && buf[pos] == 'q' && buf[pos+1] == 'u' && buf[pos+2] == 'o' && buf[pos+3] == 't' && buf[pos+4] == ';') {
-			static CT sc = '\"';
-			if (sb) {
-				if (!(sb->addStatic(&sc, 1))) {
-					REPORT_ERROR(_g_xml_error_msg_memory_lack)
-				}
-			}
-			pos += 5;
-		} else if (pos + 2 < len && buf[pos] == '#'){
-			pos++;
-			sl_uint32 n;
-			sl_reg parseRes;
-			if (buf[pos] == 'x') {
-				pos++;
-				parseRes = ST::parseUint32(16, &n, buf, pos, len);
-			} else {
-				parseRes = ST::parseUint32(10, &n, buf, pos, len);
-			}
-			if (parseRes == SLIB_PARSE_ERROR) {
-				REPORT_ERROR(_g_xml_error_msg_invalid_escape)
-			}
-			pos = parseRes;
-			if (pos >= len) {
-				REPORT_ERROR(_g_xml_error_msg_escape_not_end)
-			}
-			if (buf[pos] != ';') {
-				REPORT_ERROR(_g_xml_error_msg_escape_not_end)
-			}
-			sl_char32 _n = (sl_char32)n;
-			ST s(&_n, 1);
-			if (s.isNull()) {
-				REPORT_ERROR(_g_xml_error_msg_memory_lack)
-			}
-			if (sb) {
-				if (!(sb->add(s))) {
-					REPORT_ERROR(_g_xml_error_msg_memory_lack)
-				}
-			}
-			pos++;
-		} else {
-			REPORT_ERROR(_g_xml_error_msg_invalid_escape)
-		}
-	}
-
-	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parseName(XmlString& name)
-	{
-		if (pos >= len) {
-			REPORT_ERROR(_g_xml_error_msg_name_missing)
-		}
-		sl_uint32 ch = (sl_uint32)(buf[pos]);
-		if (ch < 128 && _g_XML_check_name_pattern[ch] != 1) {
-			REPORT_ERROR(_g_xml_error_msg_name_invalid_start)
-		}
-		sl_size start = pos;
-		pos++;
-		while (pos < len) {
-			ch = (sl_uint32)(buf[pos]);
-			if (ch < 128 && _g_XML_check_name_pattern[ch] == 0) {
-				break;
-			}
-			pos++;
-		}
-		name = XmlString(buf + start, pos - start);
-		if (name.isNull()) {
-			REPORT_ERROR(_g_xml_error_msg_memory_lack)
-		}
-	}
-
-
-	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parseComment(XmlNodeGroup* parent)
-	{
-		calcLineNumber();
-		sl_size startLine = lineNumber;
-		sl_size startColumn = columnNumber;
-		sl_size startComment = pos;
-		sl_bool flagEnded = sl_false;
-		while (pos + 2 < len) {
-			if (buf[pos] == '-' && buf[pos + 1] == '-') {
-				if (buf[pos + 2] == '>') {
-					if (param.flagCreateCommentNodes) {
-						XmlString str(buf + startComment, pos - startComment);
-						if (str.isNull()) {
-							REPORT_ERROR(_g_xml_error_msg_memory_lack)
+			
+			template <class ST, class CT, class BT>
+			void XmlParser<ST, CT, BT>::calcLineNumber()
+			{
+				for (sl_size i = posForLineColumn; i < pos; i++) {
+					CT ch = buf[i];
+					if (ch == '\r') {
+						lineNumber++;
+						columnNumber = 1;
+						if (i + 1 < len && buf[i+1] == '\n') {
+							i++;
 						}
-						if (parent) {
-							Ref<XmlComment> comment = XmlComment::create(str);
-							if (comment.isNull()) {
-								REPORT_ERROR(_g_xml_error_msg_memory_lack)
-							}
-							comment->setSourceFilePath(sourceFilePath);
-							comment->setStartPositionInSource(startComment);
-							comment->setEndPositionInSource(pos + 3);
-							comment->setLineNumberInSource(startLine);
-							comment->setColumnNumberInSource(startColumn);
-							if (!(parent->addChild(comment))) {
-								REPORT_ERROR(_g_xml_error_msg_memory_lack)
-							}
-							CALL_CALLBACK(onComment, comment.get(), str)
-						} else {
-							CALL_CALLBACK(onComment, sl_null, str)
+					} else if (ch == '\n') {
+						if (i == 0 || buf[i-1] != '\r') {
+							lineNumber++;
+							columnNumber = 1;
+						}
+					} else {
+						columnNumber++;
+					}
+				}
+				posForLineColumn = pos;
+			}
+			
+			template <class ST, class CT, class BT>
+			void XmlParser<ST, CT, BT>::createWhiteSpace(XmlNodeGroup* parent, sl_size posStart, sl_size posEnd)
+			{
+				if (posEnd <= posStart) {
+					return;
+				}
+				if (param.flagCreateWhiteSpaces) {
+					if (parent) {
+						XmlString content(buf + posStart, posEnd - posStart);
+						if (content.isNull()) {
+							REPORT_ERROR(g_strError_memory_lack)
+						}
+						Ref<XmlWhiteSpace> node = XmlWhiteSpace::create(content);
+						if (node.isNull()) {
+							REPORT_ERROR(g_strError_memory_lack)
+						}
+						calcLineNumber();
+						node->setSourceFilePath(sourceFilePath);
+						node->setStartPositionInSource(posStart);
+						node->setEndPositionInSource(posEnd);
+						node->setLineNumberInSource(lineNumber);
+						node->setColumnNumberInSource(columnNumber);
+						if (!(parent->addChild(node))) {
+							REPORT_ERROR(g_strError_memory_lack)
+						}
+					}
+				}
+			}
+			
+			template <class ST, class CT, class BT>
+			void XmlParser<ST, CT, BT>::unescapeEntity(BT* sb)
+			{
+				if (pos + 2 < len && buf[pos] == 'l' && buf[pos+1] == 't' && buf[pos+2] == ';') {
+					static CT sc = '<';
+					if (sb) {
+						if (!(sb->addStatic(&sc, 1))) {
+							REPORT_ERROR(g_strError_memory_lack)
 						}
 					}
 					pos += 3;
-					flagEnded = sl_true;
-					break;
-				} else {
-					REPORT_ERROR(_g_xml_error_msg_comment_double_hyphen)
-				}
-			} else {
-				pos++;
-			}
-		}
-		if (!flagEnded) {
-			REPORT_ERROR(_g_xml_error_msg_comment_not_end)
-		}
-	}
-
-	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parseCDATA(XmlNodeGroup* parent)
-	{
-		calcLineNumber();
-		sl_size startLine = lineNumber;
-		sl_size startColumn = columnNumber;
-		sl_size startCDATA = pos;
-		sl_bool flagEnded = sl_false;
-		while (pos + 2 < len) {
-			if (buf[pos] == ']' && buf[pos + 1] == ']' && buf[pos + 2] == '>') {
-				if (param.flagCreateTextNodes) {
-					XmlString str(buf + startCDATA, pos - startCDATA);
-					if (str.isNull()) {
-						REPORT_ERROR(_g_xml_error_msg_memory_lack)
+				} else if (pos + 2 < len && buf[pos] == 'g' && buf[pos+1] == 't' && buf[pos+2] == ';') {
+					static CT sc = '>';
+					if (sb) {
+						if (!(sb->addStatic(&sc, 1))) {
+							REPORT_ERROR(g_strError_memory_lack)
+						}
 					}
-					if (parent) {
-						Ref<XmlText> text = XmlText::createCDATA(str);
-						if (text.isNull()) {
-							REPORT_ERROR(_g_xml_error_msg_memory_lack)
+					pos += 3;
+				} else if (pos + 3 < len && buf[pos] == 'a' && buf[pos+1] == 'm' && buf[pos+2] == 'p' && buf[pos+3] == ';') {
+					static CT sc = '&';
+					if (sb) {
+						if (!(sb->addStatic(&sc, 1))) {
+							REPORT_ERROR(g_strError_memory_lack)
 						}
-						text->setSourceFilePath(sourceFilePath);
-						text->setStartPositionInSource(startCDATA);
-						text->setEndPositionInSource(pos + 3);
-						text->setLineNumberInSource(startLine);
-						text->setColumnNumberInSource(startColumn);
-						if (!(parent->addChild(text))) {
-							REPORT_ERROR(_g_xml_error_msg_memory_lack)
+					}
+					pos += 4;
+				} else if (pos + 4 < len && buf[pos] == 'a' && buf[pos+1] == 'p' && buf[pos+2] == 'o' && buf[pos+3] == 's' && buf[pos+4] == ';') {
+					static CT sc = '\'';
+					if (sb) {
+						if (!(sb->addStatic(&sc, 1))) {
+							REPORT_ERROR(g_strError_memory_lack)
 						}
-						CALL_CALLBACK(onCDATA, text.get(), str)
+					}
+					pos += 5;
+				} else if (pos + 4 < len && buf[pos] == 'q' && buf[pos+1] == 'u' && buf[pos+2] == 'o' && buf[pos+3] == 't' && buf[pos+4] == ';') {
+					static CT sc = '\"';
+					if (sb) {
+						if (!(sb->addStatic(&sc, 1))) {
+							REPORT_ERROR(g_strError_memory_lack)
+						}
+					}
+					pos += 5;
+				} else if (pos + 2 < len && buf[pos] == '#'){
+					pos++;
+					sl_uint32 n;
+					sl_reg parseRes;
+					if (buf[pos] == 'x') {
+						pos++;
+						parseRes = ST::parseUint32(16, &n, buf, pos, len);
 					} else {
-						CALL_CALLBACK(onCDATA, sl_null, str)
+						parseRes = ST::parseUint32(10, &n, buf, pos, len);
 					}
-				}
-				pos += 3;
-				flagEnded = sl_true;
-				break;
-			} else {
-				pos++;
-			}
-		}
-		if (!flagEnded) {
-			REPORT_ERROR(_g_xml_error_msg_CDATA_not_end)
-		}
-	}
-
-	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parsePI(XmlNodeGroup* parent)
-	{
-		XmlString target;
-		parseName(target);
-		if (flagError) {
-			return;
-		}
-		if (pos >= len) {
-			REPORT_ERROR(_g_xml_error_msg_PI_not_end)
-		}
-		CT ch = buf[pos];
-		if (ch != '?') {
-			if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
-				pos++;
-				escapeWhiteSpaces();
-			} else {
-				REPORT_ERROR(_g_xml_error_msg_name_invalid_char)
-			}
-		}
-		calcLineNumber();
-		sl_size startLine = lineNumber;
-		sl_size startColumn = columnNumber;
-		sl_size startPI = pos;
-		sl_bool flagEnded = sl_false;
-		while (pos + 1 < len) {
-			if (buf[pos] == '?' && buf[pos + 1] == '>') {
-				if (param.flagCreateProcessingInstructionNodes) {
-					XmlString str(buf + startPI, pos - startPI);
-					if (str.isNull()) {
-						REPORT_ERROR(_g_xml_error_msg_memory_lack)
+					if (parseRes == SLIB_PARSE_ERROR) {
+						REPORT_ERROR(g_strError_invalid_escape)
 					}
-					if (parent) {
-						Ref<XmlProcessingInstruction> PI = XmlProcessingInstruction::create(target, str);
-						if (PI.isNull()) {
-							REPORT_ERROR(_g_xml_error_msg_memory_lack)
-						}
-						PI->setSourceFilePath(sourceFilePath);
-						PI->setStartPositionInSource(startPI);
-						PI->setEndPositionInSource(pos + 2);
-						PI->setLineNumberInSource(startLine);
-						PI->setColumnNumberInSource(startColumn);
-						if (!(parent->addChild(PI))) {
-							REPORT_ERROR(_g_xml_error_msg_memory_lack)
-						}
-						CALL_CALLBACK(onProcessingInstruction, PI.get(), target, str)
-					} else {
-						CALL_CALLBACK(onProcessingInstruction, sl_null, target, str)
+					pos = parseRes;
+					if (pos >= len) {
+						REPORT_ERROR(g_strError_escape_not_end)
 					}
-				}
-				pos += 2;
-				flagEnded = sl_true;
-				break;
-			} else {
-				pos++;
-			}
-		}
-		if (!flagEnded) {
-			REPORT_ERROR(_g_xml_error_msg_PI_not_end)
-		}
-	}
-
-	template <class ST, class CT, class BT>
-	SLIB_INLINE void _priv_Xml_Parser<ST, CT, BT>::processPrefix(const XmlString& name, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces, XmlString& prefix, XmlString& uri, XmlString& localName)
-	{
-		sl_reg index = name.indexOf(':');
-		if (index >= 0) {
-			prefix = name.substring(0, index);
-			localName = name.substring(index+1);
-			namespaces.get(prefix, &uri);
-		} else {
-			localName = name;
-			uri = defNamespace;
-		}
-	}
-
-	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parseAttribute(XmlString& name, XmlString& value)
-	{
-		parseName(name);
-		if (flagError) {
-			return;
-		}
-		if (pos >= len) {
-			REPORT_ERROR(_g_xml_error_msg_element_tag_not_end)
-		}
-		CT ch = buf[pos];
-		if (ch != '=') {
-			if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
-				pos++;
-				escapeWhiteSpaces();
-			} else {
-				REPORT_ERROR(_g_xml_error_msg_name_invalid_char)
-			}
-		}
-		if (pos >= len) {
-			REPORT_ERROR(_g_xml_error_msg_element_attr_required_assign)
-		}
-		if (buf[pos] != '=') {
-			REPORT_ERROR(_g_xml_error_msg_element_attr_required_assign)
-		}
-		pos++;
-		escapeWhiteSpaces();
-		if (pos >= len) {
-			REPORT_ERROR(_g_xml_error_msg_element_attr_required_quot)
-		}
-		ch = buf[pos];
-		if (ch == '\"' || ch == '\'') {
-			pos++;
-			sl_size startAttrValue = pos;
-			sl_bool flagEnded = sl_false;
-			BT sb;
-			CT chQuot = ch;
-			while (pos < len) {
-				ch = buf[pos];
-				if (ch == '&') {
-					if (pos > startAttrValue) {
-						if (!(sb.addStatic(buf + startAttrValue, pos - startAttrValue))) {
-							REPORT_ERROR(_g_xml_error_msg_memory_lack)
+					if (buf[pos] != ';') {
+						REPORT_ERROR(g_strError_escape_not_end)
+					}
+					sl_char32 _n = (sl_char32)n;
+					ST s(&_n, 1);
+					if (s.isNull()) {
+						REPORT_ERROR(g_strError_memory_lack)
+					}
+					if (sb) {
+						if (!(sb->add(s))) {
+							REPORT_ERROR(g_strError_memory_lack)
 						}
 					}
 					pos++;
-					unescapeEntity(&sb);
-					if (flagError) {
-						return;
-					}
-					startAttrValue = pos;
-				} else if (ch == '<') {
-					REPORT_ERROR(_g_xml_error_msg_content_include_lt)
-				} else if (ch == chQuot) {
-					if (pos > startAttrValue) {
-						if (!(sb.addStatic(buf + startAttrValue, pos - startAttrValue))) {
-							REPORT_ERROR(_g_xml_error_msg_memory_lack)
-						}
-					}
-					pos++;
-					flagEnded = sl_true;
-					value = sb.merge();
-					if (value.isNull()) {
-						REPORT_ERROR(_g_xml_error_msg_memory_lack)
-					}
-					break;
 				} else {
-					pos++;
-				}
-			}
-			if (!flagEnded) {
-				REPORT_ERROR(_g_xml_error_msg_element_attr_not_end)
-			}
-		} else {
-			REPORT_ERROR(_g_xml_error_msg_element_attr_required_quot)
-		}
-	}
-
-	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const XmlString& _defNamespace, const HashMap<XmlString, XmlString>& _namespaces)
-	{
-		XmlString defNamespace = _defNamespace;
-		HashMap<XmlString, XmlString> namespaces = _namespaces;
-		
-		calcLineNumber();
-		sl_size startLine = lineNumber;
-		sl_size startColumn = columnNumber;
-		sl_size posNameStart = pos;
-		XmlString name;
-		parseName(name);
-		if (flagError) {
-			return;
-		}
-		sl_size lenName = pos - posNameStart;
-		
-		Ref<XmlElement> element = new XmlElement;
-		if (element.isNull()) {
-			REPORT_ERROR(_g_xml_error_msg_memory_lack)
-		}
-		
-		CList<XmlString> listPrefixMappings;
-		sl_size indexAttr = 0;
-		
-		while (pos < len) {
-			
-			sl_size startWhiteSpace = pos;
-			sl_size endWhiteSpace = pos;
-			
-			CT ch = buf[pos];
-			
-			if (ch != '>' && ch != '/') {
-				if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
-					pos++;
-					escapeWhiteSpaces();
-					endWhiteSpace = pos;
-				} else {
-					if (indexAttr == 0) {
-						REPORT_ERROR(_g_xml_error_msg_name_invalid_char)
-					} else {
-						REPORT_ERROR(_g_xml_error_msg_element_attr_end_with_invalid_char)
-					}
-				}
-			}
-			if (pos >= len) {
-				REPORT_ERROR(_g_xml_error_msg_element_tag_not_end)
-			}
-			
-			ch = buf[pos];
-			if (ch == '>' || ch == '/') {
-				break;
-			} else {
-				XmlAttribute attr;
-				parseAttribute(attr.name, attr.value);
-				if (flagError) {
-					return;
-				}
-				if (element->containsAttribute(attr.name)) {
-					REPORT_ERROR(_g_xml_error_msg_element_attr_duplicate)
-				}
-				XmlString prefix;
-				processPrefix(attr.name, defNamespace, namespaces, prefix, attr.uri, attr.localName);
-				if (param.flagCreateWhiteSpaces) {
-					if (endWhiteSpace > startWhiteSpace) {
-						XmlString ws(buf + startWhiteSpace, endWhiteSpace - startWhiteSpace);
-						if (ws.isNull()) {
-							REPORT_ERROR(_g_xml_error_msg_memory_lack)
-						}
-						attr.whiteSpacesBeforeName = ws;
-					}
-				}
-				if (!(element->setAttribute(attr))) {
-					REPORT_ERROR(_g_xml_error_msg_memory_lack)
-				}
-				if (param.flagProcessNamespaces) {
-					if (attr.name == "xmlns") {
-						defNamespace = attr.value;
-						if (!(listPrefixMappings.add(XmlString::null()))) {
-							REPORT_ERROR(_g_xml_error_msg_memory_lack)
-						}
-						CALL_CALLBACK(onStartPrefixMapping, element.get(), XmlString::null(), defNamespace);
-					} else if (prefix == "xmlns" && attr.localName.isNotEmpty() && attr.value.isNotEmpty()) {
-						if (namespaces == _namespaces) {
-							namespaces = _namespaces.duplicate();
-						}
-						if (!(namespaces.put(attr.localName, attr.value))) {
-							REPORT_ERROR(_g_xml_error_msg_memory_lack)
-						}
-						if (!(listPrefixMappings.add(attr.localName))) {
-							REPORT_ERROR(_g_xml_error_msg_memory_lack)
-						}
-						CALL_CALLBACK(onStartPrefixMapping, element.get(), attr.localName, attr.value)
-					}
+					REPORT_ERROR(g_strError_invalid_escape)
 				}
 			}
 			
-			indexAttr++;
-			
-		}
-		
-		if (pos >= len) {
-			REPORT_ERROR(_g_xml_error_msg_element_tag_not_end)
-		}
-		sl_bool flagEmptyTag = sl_false;
-		if (buf[pos] == '/') {
-			if (pos + 1 < len && buf[pos+1] == '>') {
-				flagEmptyTag = sl_true;
-				pos += 2;
-			} else {
-				REPORT_ERROR(_g_xml_error_msg_element_tag_not_end)
-			}
-		} else {
-			pos++;
-		}
-		
-		element->setSourceFilePath(sourceFilePath);
-		element->setStartPositionInSource(posNameStart);
-		element->setLineNumberInSource(startLine);
-		element->setColumnNumberInSource(startColumn);
-		element->setEndPositionInSource(pos);
-		element->setStartContentPositionInSource(posNameStart);
-		element->setEndContentPositionInSource(posNameStart);
-
-		XmlString prefix, uri, localName;
-		processPrefix(name, defNamespace, namespaces, prefix, uri, localName);
-		if (!(element->setName(name, uri, localName))) {
-			REPORT_ERROR(_g_xml_error_msg_unknown)
-		}
-
-		if (parent) {
-			if (!(parent->addChild(element))) {
-				REPORT_ERROR(_g_xml_error_msg_memory_lack)
-			}
-		}
-		CALL_CALLBACK(onStartElement, element.get(), element.get())
-		if (!flagEmptyTag) {
-			element->setStartContentPositionInSource(pos);
-			parseNodes(parent ? element.get() : sl_null, defNamespace, namespaces);
-			if (flagError) {
-				return;
-			}
-			if (pos + 3 + lenName > len) {
-				REPORT_ERROR(_g_xml_error_msg_element_tag_not_matching_end_tag)
-			}
-			if (buf[pos] != '<' || buf[pos+1] != '/') {
-				REPORT_ERROR(_g_xml_error_msg_element_tag_not_matching_end_tag)
-			}
-			element->setEndContentPositionInSource(pos);
-			pos += 2;
-			if (!(Base::equalsMemory(buf + posNameStart, buf + pos, lenName * sizeof(CT)))) {
-				REPORT_ERROR(_g_xml_error_msg_element_tag_not_matching_end_tag)
-			}
-			pos += lenName;
-			CT ch = buf[pos];
-			if (ch != '>') {
-				if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
-					pos++;
-					escapeWhiteSpaces();
-				} else {
-					REPORT_ERROR(_g_xml_error_msg_name_invalid_char)
+			template <class ST, class CT, class BT>
+			void XmlParser<ST, CT, BT>::parseName(XmlString& name)
+			{
+				if (pos >= len) {
+					REPORT_ERROR(g_strError_name_missing)
 				}
-			}
-			if (pos >= len) {
-				REPORT_ERROR(_g_xml_error_msg_element_tag_not_end)
-			}
-			if (buf[pos] != '>') {
-				REPORT_ERROR(_g_xml_error_msg_element_tag_not_end)
-			}
-			pos++;
-		}
-		element->setEndPositionInSource(pos);
-		CALL_CALLBACK(onEndElement, element.get(), element.get());
-		if (param.flagProcessNamespaces) {
-			ListLocker<XmlString> prefixes(listPrefixMappings);
-			for (sl_size i = 0; i < prefixes.count; i++) {
-				CALL_CALLBACK(onEndPrefixMapping, element.get(), prefixes[i]);
-			}
-		}
-	}
-
-	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parseText(XmlNodeGroup* parent)
-	{
-		calcLineNumber();
-		sl_size startLine = lineNumber;
-		sl_size startColumn = columnNumber;
-		sl_size startWhiteSpace = pos;
-		escapeWhiteSpaces();
-		if (pos > startWhiteSpace) {
-			createWhiteSpace(parent, startWhiteSpace, pos);
-			if (flagError) {
-				return;
-			}
-		}
-		sl_size startText = pos;
-		BT _sb;
-		BT* sb = param.flagCreateTextNodes ? &_sb : sl_null;
-		while (pos < len) {
-			CT ch = buf[pos];
-			if (ch == '&') {
-				if (sb) {
-					if (pos > startText) {
-						if (!(sb->addStatic(buf + startText, pos - startText))) {
-							REPORT_ERROR(_g_xml_error_msg_memory_lack)
-						}
-					}
+				sl_uint32 ch = (sl_uint32)(buf[pos]);
+				if (ch < 128 && g_patternCheckName[ch] != 1) {
+					REPORT_ERROR(g_strError_name_invalid_start)
 				}
+				sl_size start = pos;
 				pos++;
-				unescapeEntity(sb);
-				if (flagError) {
-					return;
-				}
-				startText = pos;
-			} else if (ch == '<') {
-				break;
-			} else {
-				pos++;
-			}
-		}
-		if (sb) {
-			if (pos > startText) {
-				sl_size endText = pos - 1;
-				while (endText >= startText) {
-					CT ch = buf[endText];
-					if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
-						endText--;
-					} else {
+				while (pos < len) {
+					ch = (sl_uint32)(buf[pos]);
+					if (ch < 128 && g_patternCheckName[ch] == 0) {
 						break;
 					}
-				}
-				if (endText >= startText) {
-					if (!(sb->addStatic(buf + startText, endText - startText + 1))) {
-						REPORT_ERROR(_g_xml_error_msg_memory_lack)
-					}
-				}
-				startWhiteSpace = endText + 1;
-			} else {
-				startWhiteSpace = pos;
-			}
-			XmlString text = sb->merge();
-			if (text.isNull()) {
-				REPORT_ERROR(_g_xml_error_msg_memory_lack)
-			}
-			if (text.isNotEmpty()) {
-				if (parent) {
-					Ref<XmlText> node = XmlText::create(text);
-					if (node.isNull()) {
-						REPORT_ERROR(_g_xml_error_msg_memory_lack)
-					}
-					node->setSourceFilePath(sourceFilePath);
-					node->setStartPositionInSource(startText);
-					node->setEndPositionInSource(pos);
-					node->setLineNumberInSource(startLine);
-					node->setColumnNumberInSource(startColumn);
-					if (!(parent->addChild(node))) {
-						REPORT_ERROR(_g_xml_error_msg_memory_lack)
-					}
-					CALL_CALLBACK(onText, node.get(), text)
-				} else {
-					CALL_CALLBACK(onText, sl_null, text)
-				}
-			}
-			createWhiteSpace(parent, startWhiteSpace, pos);
-			if (flagError) {
-				return;
-			}
-		}
-	}
-
-	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parseNodes(XmlNodeGroup* parent, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces)
-	{
-		while (pos < len) {
-			if (buf[pos] == '<') { // Element, Comment, PI, CDATA
-				pos++;
-				CT ch = buf[pos];
-				if (ch == '!') { // Comment, CDATA
 					pos++;
-					if (pos + 1 < len && buf[pos] == '-' && buf[pos+1] == '-') { // Comment
-						pos += 2;
-						parseComment(parent);
-						if (flagError) {
-							return;
-						}
-					} else if (pos + 6 < len && buf[pos] == '[' && buf[pos+1] == 'C' && buf[pos+2] == 'D' && buf[pos+3] == 'A' && buf[pos+4] == 'T' && buf[pos+5] == 'A' && buf[pos+6] == '[') { // CDATA
-						pos += 7;
-						parseCDATA(parent);
-						if (flagError) {
-							return;
+				}
+				name = XmlString(buf + start, pos - start);
+				if (name.isNull()) {
+					REPORT_ERROR(g_strError_memory_lack)
+				}
+			}
+			
+			
+			template <class ST, class CT, class BT>
+			void XmlParser<ST, CT, BT>::parseComment(XmlNodeGroup* parent)
+			{
+				calcLineNumber();
+				sl_size startLine = lineNumber;
+				sl_size startColumn = columnNumber;
+				sl_size startComment = pos;
+				sl_bool flagEnded = sl_false;
+				while (pos + 2 < len) {
+					if (buf[pos] == '-' && buf[pos + 1] == '-') {
+						if (buf[pos + 2] == '>') {
+							if (param.flagCreateCommentNodes) {
+								XmlString str(buf + startComment, pos - startComment);
+								if (str.isNull()) {
+									REPORT_ERROR(g_strError_memory_lack)
+								}
+								if (parent) {
+									Ref<XmlComment> comment = XmlComment::create(str);
+									if (comment.isNull()) {
+										REPORT_ERROR(g_strError_memory_lack)
+									}
+									comment->setSourceFilePath(sourceFilePath);
+									comment->setStartPositionInSource(startComment);
+									comment->setEndPositionInSource(pos + 3);
+									comment->setLineNumberInSource(startLine);
+									comment->setColumnNumberInSource(startColumn);
+									if (!(parent->addChild(comment))) {
+										REPORT_ERROR(g_strError_memory_lack)
+									}
+									CALL_CALLBACK(onComment, comment.get(), str)
+								} else {
+									CALL_CALLBACK(onComment, sl_null, str)
+								}
+							}
+							pos += 3;
+							flagEnded = sl_true;
+							break;
+						} else {
+							REPORT_ERROR(g_strError_comment_double_hyphen)
 						}
 					} else {
-						REPORT_ERROR(_g_xml_error_msg_invalid_markup)
-					}
-				} else if (ch == '?') { // PI
-					pos++;
-					parsePI(parent);
-					if (flagError) {
-						return;
-					}
-				} else if (ch == '/') { // Element End Tag
-					pos--;
-					return;
-				} else { // Element
-					parseElement(parent, defNamespace, namespaces);
-					if (flagError) {
-						return;
+						pos++;
 					}
 				}
-			} else {
-				parseText(parent);
+				if (!flagEnded) {
+					REPORT_ERROR(g_strError_comment_not_end)
+				}
+			}
+			
+			template <class ST, class CT, class BT>
+			void XmlParser<ST, CT, BT>::parseCDATA(XmlNodeGroup* parent)
+			{
+				calcLineNumber();
+				sl_size startLine = lineNumber;
+				sl_size startColumn = columnNumber;
+				sl_size startCDATA = pos;
+				sl_bool flagEnded = sl_false;
+				while (pos + 2 < len) {
+					if (buf[pos] == ']' && buf[pos + 1] == ']' && buf[pos + 2] == '>') {
+						if (param.flagCreateTextNodes) {
+							XmlString str(buf + startCDATA, pos - startCDATA);
+							if (str.isNull()) {
+								REPORT_ERROR(g_strError_memory_lack)
+							}
+							if (parent) {
+								Ref<XmlText> text = XmlText::createCDATA(str);
+								if (text.isNull()) {
+									REPORT_ERROR(g_strError_memory_lack)
+								}
+								text->setSourceFilePath(sourceFilePath);
+								text->setStartPositionInSource(startCDATA);
+								text->setEndPositionInSource(pos + 3);
+								text->setLineNumberInSource(startLine);
+								text->setColumnNumberInSource(startColumn);
+								if (!(parent->addChild(text))) {
+									REPORT_ERROR(g_strError_memory_lack)
+								}
+								CALL_CALLBACK(onCDATA, text.get(), str)
+							} else {
+								CALL_CALLBACK(onCDATA, sl_null, str)
+							}
+						}
+						pos += 3;
+						flagEnded = sl_true;
+						break;
+					} else {
+						pos++;
+					}
+				}
+				if (!flagEnded) {
+					REPORT_ERROR(g_strError_CDATA_not_end)
+				}
+			}
+			
+			template <class ST, class CT, class BT>
+			void XmlParser<ST, CT, BT>::parsePI(XmlNodeGroup* parent)
+			{
+				XmlString target;
+				parseName(target);
 				if (flagError) {
 					return;
 				}
+				if (pos >= len) {
+					REPORT_ERROR(g_strError_PI_not_end)
+				}
+				CT ch = buf[pos];
+				if (ch != '?') {
+					if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
+						pos++;
+						escapeWhiteSpaces();
+					} else {
+						REPORT_ERROR(g_strError_name_invalid_char)
+					}
+				}
+				calcLineNumber();
+				sl_size startLine = lineNumber;
+				sl_size startColumn = columnNumber;
+				sl_size startPI = pos;
+				sl_bool flagEnded = sl_false;
+				while (pos + 1 < len) {
+					if (buf[pos] == '?' && buf[pos + 1] == '>') {
+						if (param.flagCreateProcessingInstructionNodes) {
+							XmlString str(buf + startPI, pos - startPI);
+							if (str.isNull()) {
+								REPORT_ERROR(g_strError_memory_lack)
+							}
+							if (parent) {
+								Ref<XmlProcessingInstruction> PI = XmlProcessingInstruction::create(target, str);
+								if (PI.isNull()) {
+									REPORT_ERROR(g_strError_memory_lack)
+								}
+								PI->setSourceFilePath(sourceFilePath);
+								PI->setStartPositionInSource(startPI);
+								PI->setEndPositionInSource(pos + 2);
+								PI->setLineNumberInSource(startLine);
+								PI->setColumnNumberInSource(startColumn);
+								if (!(parent->addChild(PI))) {
+									REPORT_ERROR(g_strError_memory_lack)
+								}
+								CALL_CALLBACK(onProcessingInstruction, PI.get(), target, str)
+							} else {
+								CALL_CALLBACK(onProcessingInstruction, sl_null, target, str)
+							}
+						}
+						pos += 2;
+						flagEnded = sl_true;
+						break;
+					} else {
+						pos++;
+					}
+				}
+				if (!flagEnded) {
+					REPORT_ERROR(g_strError_PI_not_end)
+				}
 			}
-		}
-	}
-
-	template <class ST, class CT, class BT>
-	void _priv_Xml_Parser<ST, CT, BT>::parseXml()
-	{
-		CALL_CALLBACK(onStartDocument, document.get(), document.get())
-		parseNodes(document.get(), XmlString::null(), HashMap<XmlString, XmlString>::null());
-		if (flagError) {
-			return;
-		}
-		if (pos < len) {
-			REPORT_ERROR(_g_xml_error_msg_document_not_wellformed);
-		}
-		if (document.isNotNull() && param.flagCheckWellFormed) {
-			if (!(document->checkWellFormed())) {
-				REPORT_ERROR(_g_xml_error_msg_document_not_wellformed);
+			
+			template <class ST, class CT, class BT>
+			SLIB_INLINE void XmlParser<ST, CT, BT>::processPrefix(const XmlString& name, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces, XmlString& prefix, XmlString& uri, XmlString& localName)
+			{
+				sl_reg index = name.indexOf(':');
+				if (index >= 0) {
+					prefix = name.substring(0, index);
+					localName = name.substring(index+1);
+					namespaces.get(prefix, &uri);
+				} else {
+					localName = name;
+					uri = defNamespace;
+				}
 			}
-		}
-		CALL_CALLBACK(onEndDocument, document.get(), document.get())
-	}
+			
+			template <class ST, class CT, class BT>
+			void XmlParser<ST, CT, BT>::parseAttribute(XmlString& name, XmlString& value)
+			{
+				parseName(name);
+				if (flagError) {
+					return;
+				}
+				if (pos >= len) {
+					REPORT_ERROR(g_strError_element_tag_not_end)
+				}
+				CT ch = buf[pos];
+				if (ch != '=') {
+					if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
+						pos++;
+						escapeWhiteSpaces();
+					} else {
+						REPORT_ERROR(g_strError_name_invalid_char)
+					}
+				}
+				if (pos >= len) {
+					REPORT_ERROR(g_strError_element_attr_required_assign)
+				}
+				if (buf[pos] != '=') {
+					REPORT_ERROR(g_strError_element_attr_required_assign)
+				}
+				pos++;
+				escapeWhiteSpaces();
+				if (pos >= len) {
+					REPORT_ERROR(g_strError_element_attr_required_quot)
+				}
+				ch = buf[pos];
+				if (ch == '\"' || ch == '\'') {
+					pos++;
+					sl_size startAttrValue = pos;
+					sl_bool flagEnded = sl_false;
+					BT sb;
+					CT chQuot = ch;
+					while (pos < len) {
+						ch = buf[pos];
+						if (ch == '&') {
+							if (pos > startAttrValue) {
+								if (!(sb.addStatic(buf + startAttrValue, pos - startAttrValue))) {
+									REPORT_ERROR(g_strError_memory_lack)
+								}
+							}
+							pos++;
+							unescapeEntity(&sb);
+							if (flagError) {
+								return;
+							}
+							startAttrValue = pos;
+						} else if (ch == '<') {
+							REPORT_ERROR(g_strError_content_include_lt)
+						} else if (ch == chQuot) {
+							if (pos > startAttrValue) {
+								if (!(sb.addStatic(buf + startAttrValue, pos - startAttrValue))) {
+									REPORT_ERROR(g_strError_memory_lack)
+								}
+							}
+							pos++;
+							flagEnded = sl_true;
+							value = sb.merge();
+							if (value.isNull()) {
+								REPORT_ERROR(g_strError_memory_lack)
+							}
+							break;
+						} else {
+							pos++;
+						}
+					}
+					if (!flagEnded) {
+						REPORT_ERROR(g_strError_element_attr_not_end)
+					}
+				} else {
+					REPORT_ERROR(g_strError_element_attr_required_quot)
+				}
+			}
+			
+			template <class ST, class CT, class BT>
+			void XmlParser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const XmlString& _defNamespace, const HashMap<XmlString, XmlString>& _namespaces)
+			{
+				XmlString defNamespace = _defNamespace;
+				HashMap<XmlString, XmlString> namespaces = _namespaces;
+				
+				calcLineNumber();
+				sl_size startLine = lineNumber;
+				sl_size startColumn = columnNumber;
+				sl_size posNameStart = pos;
+				XmlString name;
+				parseName(name);
+				if (flagError) {
+					return;
+				}
+				sl_size lenName = pos - posNameStart;
+				
+				Ref<XmlElement> element = new XmlElement;
+				if (element.isNull()) {
+					REPORT_ERROR(g_strError_memory_lack)
+				}
+				
+				CList<XmlString> listPrefixMappings;
+				sl_size indexAttr = 0;
+				
+				while (pos < len) {
+					
+					sl_size startWhiteSpace = pos;
+					sl_size endWhiteSpace = pos;
+					
+					CT ch = buf[pos];
+					
+					if (ch != '>' && ch != '/') {
+						if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
+							pos++;
+							escapeWhiteSpaces();
+							endWhiteSpace = pos;
+						} else {
+							if (indexAttr == 0) {
+								REPORT_ERROR(g_strError_name_invalid_char)
+							} else {
+								REPORT_ERROR(g_strError_element_attr_end_with_invalid_char)
+							}
+						}
+					}
+					if (pos >= len) {
+						REPORT_ERROR(g_strError_element_tag_not_end)
+					}
+					
+					ch = buf[pos];
+					if (ch == '>' || ch == '/') {
+						break;
+					} else {
+						XmlAttribute attr;
+						parseAttribute(attr.name, attr.value);
+						if (flagError) {
+							return;
+						}
+						if (element->containsAttribute(attr.name)) {
+							REPORT_ERROR(g_strError_element_attr_duplicate)
+						}
+						XmlString prefix;
+						processPrefix(attr.name, defNamespace, namespaces, prefix, attr.uri, attr.localName);
+						if (param.flagCreateWhiteSpaces) {
+							if (endWhiteSpace > startWhiteSpace) {
+								XmlString ws(buf + startWhiteSpace, endWhiteSpace - startWhiteSpace);
+								if (ws.isNull()) {
+									REPORT_ERROR(g_strError_memory_lack)
+								}
+								attr.whiteSpacesBeforeName = ws;
+							}
+						}
+						if (!(element->setAttribute(attr))) {
+							REPORT_ERROR(g_strError_memory_lack)
+						}
+						if (param.flagProcessNamespaces) {
+							if (attr.name == "xmlns") {
+								defNamespace = attr.value;
+								if (!(listPrefixMappings.add(XmlString::null()))) {
+									REPORT_ERROR(g_strError_memory_lack)
+								}
+								CALL_CALLBACK(onStartPrefixMapping, element.get(), XmlString::null(), defNamespace);
+							} else if (prefix == "xmlns" && attr.localName.isNotEmpty() && attr.value.isNotEmpty()) {
+								if (namespaces == _namespaces) {
+									namespaces = _namespaces.duplicate();
+								}
+								if (!(namespaces.put(attr.localName, attr.value))) {
+									REPORT_ERROR(g_strError_memory_lack)
+								}
+								if (!(listPrefixMappings.add(attr.localName))) {
+									REPORT_ERROR(g_strError_memory_lack)
+								}
+								CALL_CALLBACK(onStartPrefixMapping, element.get(), attr.localName, attr.value)
+							}
+						}
+					}
+					
+					indexAttr++;
+					
+				}
+				
+				if (pos >= len) {
+					REPORT_ERROR(g_strError_element_tag_not_end)
+				}
+				sl_bool flagEmptyTag = sl_false;
+				if (buf[pos] == '/') {
+					if (pos + 1 < len && buf[pos+1] == '>') {
+						flagEmptyTag = sl_true;
+						pos += 2;
+					} else {
+						REPORT_ERROR(g_strError_element_tag_not_end)
+					}
+				} else {
+					pos++;
+				}
+				
+				element->setSourceFilePath(sourceFilePath);
+				element->setStartPositionInSource(posNameStart);
+				element->setLineNumberInSource(startLine);
+				element->setColumnNumberInSource(startColumn);
+				element->setEndPositionInSource(pos);
+				element->setStartContentPositionInSource(posNameStart);
+				element->setEndContentPositionInSource(posNameStart);
+				
+				XmlString prefix, uri, localName;
+				processPrefix(name, defNamespace, namespaces, prefix, uri, localName);
+				if (!(element->setName(name, uri, localName))) {
+					REPORT_ERROR(g_strError_unknown)
+				}
+				
+				if (parent) {
+					if (!(parent->addChild(element))) {
+						REPORT_ERROR(g_strError_memory_lack)
+					}
+				}
+				CALL_CALLBACK(onStartElement, element.get(), element.get())
+				if (!flagEmptyTag) {
+					element->setStartContentPositionInSource(pos);
+					parseNodes(parent ? element.get() : sl_null, defNamespace, namespaces);
+					if (flagError) {
+						return;
+					}
+					if (pos + 3 + lenName > len) {
+						REPORT_ERROR(g_strError_element_tag_not_matching_end_tag)
+					}
+					if (buf[pos] != '<' || buf[pos+1] != '/') {
+						REPORT_ERROR(g_strError_element_tag_not_matching_end_tag)
+					}
+					element->setEndContentPositionInSource(pos);
+					pos += 2;
+					if (!(Base::equalsMemory(buf + posNameStart, buf + pos, lenName * sizeof(CT)))) {
+						REPORT_ERROR(g_strError_element_tag_not_matching_end_tag)
+					}
+					pos += lenName;
+					CT ch = buf[pos];
+					if (ch != '>') {
+						if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
+							pos++;
+							escapeWhiteSpaces();
+						} else {
+							REPORT_ERROR(g_strError_name_invalid_char)
+						}
+					}
+					if (pos >= len) {
+						REPORT_ERROR(g_strError_element_tag_not_end)
+					}
+					if (buf[pos] != '>') {
+						REPORT_ERROR(g_strError_element_tag_not_end)
+					}
+					pos++;
+				}
+				element->setEndPositionInSource(pos);
+				CALL_CALLBACK(onEndElement, element.get(), element.get());
+				if (param.flagProcessNamespaces) {
+					ListLocker<XmlString> prefixes(listPrefixMappings);
+					for (sl_size i = 0; i < prefixes.count; i++) {
+						CALL_CALLBACK(onEndPrefixMapping, element.get(), prefixes[i]);
+					}
+				}
+			}
+			
+			template <class ST, class CT, class BT>
+			void XmlParser<ST, CT, BT>::parseText(XmlNodeGroup* parent)
+			{
+				calcLineNumber();
+				sl_size startLine = lineNumber;
+				sl_size startColumn = columnNumber;
+				sl_size startWhiteSpace = pos;
+				escapeWhiteSpaces();
+				if (pos > startWhiteSpace) {
+					createWhiteSpace(parent, startWhiteSpace, pos);
+					if (flagError) {
+						return;
+					}
+				}
+				sl_size startText = pos;
+				BT _sb;
+				BT* sb = param.flagCreateTextNodes ? &_sb : sl_null;
+				while (pos < len) {
+					CT ch = buf[pos];
+					if (ch == '&') {
+						if (sb) {
+							if (pos > startText) {
+								if (!(sb->addStatic(buf + startText, pos - startText))) {
+									REPORT_ERROR(g_strError_memory_lack)
+								}
+							}
+						}
+						pos++;
+						unescapeEntity(sb);
+						if (flagError) {
+							return;
+						}
+						startText = pos;
+					} else if (ch == '<') {
+						break;
+					} else {
+						pos++;
+					}
+				}
+				if (sb) {
+					if (pos > startText) {
+						sl_size endText = pos - 1;
+						while (endText >= startText) {
+							CT ch = buf[endText];
+							if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
+								endText--;
+							} else {
+								break;
+							}
+						}
+						if (endText >= startText) {
+							if (!(sb->addStatic(buf + startText, endText - startText + 1))) {
+								REPORT_ERROR(g_strError_memory_lack)
+							}
+						}
+						startWhiteSpace = endText + 1;
+					} else {
+						startWhiteSpace = pos;
+					}
+					XmlString text = sb->merge();
+					if (text.isNull()) {
+						REPORT_ERROR(g_strError_memory_lack)
+					}
+					if (text.isNotEmpty()) {
+						if (parent) {
+							Ref<XmlText> node = XmlText::create(text);
+							if (node.isNull()) {
+								REPORT_ERROR(g_strError_memory_lack)
+							}
+							node->setSourceFilePath(sourceFilePath);
+							node->setStartPositionInSource(startText);
+							node->setEndPositionInSource(pos);
+							node->setLineNumberInSource(startLine);
+							node->setColumnNumberInSource(startColumn);
+							if (!(parent->addChild(node))) {
+								REPORT_ERROR(g_strError_memory_lack)
+							}
+							CALL_CALLBACK(onText, node.get(), text)
+						} else {
+							CALL_CALLBACK(onText, sl_null, text)
+						}
+					}
+					createWhiteSpace(parent, startWhiteSpace, pos);
+					if (flagError) {
+						return;
+					}
+				}
+			}
+			
+			template <class ST, class CT, class BT>
+			void XmlParser<ST, CT, BT>::parseNodes(XmlNodeGroup* parent, const XmlString& defNamespace, const HashMap<XmlString, XmlString>& namespaces)
+			{
+				while (pos < len) {
+					if (buf[pos] == '<') { // Element, Comment, PI, CDATA
+						pos++;
+						CT ch = buf[pos];
+						if (ch == '!') { // Comment, CDATA
+							pos++;
+							if (pos + 1 < len && buf[pos] == '-' && buf[pos+1] == '-') { // Comment
+								pos += 2;
+								parseComment(parent);
+								if (flagError) {
+									return;
+								}
+							} else if (pos + 6 < len && buf[pos] == '[' && buf[pos+1] == 'C' && buf[pos+2] == 'D' && buf[pos+3] == 'A' && buf[pos+4] == 'T' && buf[pos+5] == 'A' && buf[pos+6] == '[') { // CDATA
+								pos += 7;
+								parseCDATA(parent);
+								if (flagError) {
+									return;
+								}
+							} else {
+								REPORT_ERROR(g_strError_invalid_markup)
+							}
+						} else if (ch == '?') { // PI
+							pos++;
+							parsePI(parent);
+							if (flagError) {
+								return;
+							}
+						} else if (ch == '/') { // Element End Tag
+							pos--;
+							return;
+						} else { // Element
+							parseElement(parent, defNamespace, namespaces);
+							if (flagError) {
+								return;
+							}
+						}
+					} else {
+						parseText(parent);
+						if (flagError) {
+							return;
+						}
+					}
+				}
+			}
+			
+			template <class ST, class CT, class BT>
+			void XmlParser<ST, CT, BT>::parseXml()
+			{
+				CALL_CALLBACK(onStartDocument, document.get(), document.get())
+				parseNodes(document.get(), XmlString::null(), HashMap<XmlString, XmlString>::null());
+				if (flagError) {
+					return;
+				}
+				if (pos < len) {
+					REPORT_ERROR(g_strError_document_not_wellformed);
+				}
+				if (document.isNotNull() && param.flagCheckWellFormed) {
+					if (!(document->checkWellFormed())) {
+						REPORT_ERROR(g_strError_document_not_wellformed);
+					}
+				}
+				CALL_CALLBACK(onEndDocument, document.get(), document.get())
+			}
 
-	template <class ST, class CT, class BT>
-	Ref<XmlDocument> _priv_Xml_Parser<ST, CT, BT>::parseXml(const String& sourceFilePath, const CT* buf, sl_size len, XmlParseParam& param)
-	{
-		param.flagError = sl_false;
-		
-		_priv_Xml_Parser<ST, CT, BT> parser;
-		parser.sourceFilePath = sourceFilePath;
-		parser.buf = buf;
-		parser.len = len;
-		
-		if (param.flagCreateDocument) {
-			parser.document = XmlDocument::create();
-			if (parser.document.isNull()) {
-				parser.document->setStartPositionInSource(0);
-				parser.document->setEndPositionInSource(len);
+			template <class ST, class CT, class BT>
+			Ref<XmlDocument> XmlParser<ST, CT, BT>::parseXml(const String& sourceFilePath, const CT* buf, sl_size len, XmlParseParam& param)
+			{
+				param.flagError = sl_false;
+				
+				XmlParser<ST, CT, BT> parser;
+				parser.sourceFilePath = sourceFilePath;
+				parser.buf = buf;
+				parser.len = len;
+				
+				if (param.flagCreateDocument) {
+					parser.document = XmlDocument::create();
+					if (parser.document.isNull()) {
+						parser.document->setStartPositionInSource(0);
+						parser.document->setEndPositionInSource(len);
+						param.flagError = sl_true;
+						param.errorMessage = g_strError_memory_lack;
+						return sl_null;
+					}
+				}
+				parser.param = param;
+				parser.control.source.sz8 = (sl_char8*)(buf);
+				parser.control.source.len = len;
+				parser.control.characterSize = sizeof(CT);
+				
+				parser.parseXml();
+				
+				if (!(parser.flagError)) {
+					return parser.document;
+				}
+				
 				param.flagError = sl_true;
-				param.errorMessage = _g_xml_error_msg_memory_lack;
+				param.errorPosition = parser.pos;
+				param.errorMessage = parser.errorMessage;
+				param.errorLine = ParseUtil::countLineNumber(buf, parser.pos, &(param.errorColumn));
+				
+				if (param.flagLogError) {
+					LogError("Xml", param.getErrorText());
+				}
+				
 				return sl_null;
+				
 			}
-		}
-		parser.param = param;
-		parser.control.source.sz8 = (sl_char8*)(buf);
-		parser.control.source.len = len;
-		parser.control.characterSize = sizeof(CT);
-		
-		parser.parseXml();
-		
-		if (!(parser.flagError)) {
-			return parser.document;
-		}
 
-		param.flagError = sl_true;
-		param.errorPosition = parser.pos;
-		param.errorMessage = parser.errorMessage;
-		param.errorLine = ParseUtil::countLineNumber(buf, parser.pos, &(param.errorColumn));
-		
-		if (param.flagLogError) {
-			LogError("Xml", param.getErrorText());
 		}
-		
-		return sl_null;
-		
 	}
 
 	Ref<XmlDocument> Xml::parseXml(const sl_char8* sz, sl_size len, XmlParseParam& param)
 	{
-		return _priv_Xml_Parser<String, sl_char8, StringBuffer>::parseXml(String::null(), sz, len, param);
+		return priv::xml::XmlParser<String, sl_char8, StringBuffer>::parseXml(String::null(), sz, len, param);
 	}
 
 	Ref<XmlDocument> Xml::parseXml(const sl_char8* sz, sl_size len)
@@ -2385,7 +2390,7 @@ namespace slib
 
 	Ref<XmlDocument> Xml::parseXml8(const String& xml, XmlParseParam& param)
 	{
-		return _priv_Xml_Parser<String, sl_char8, StringBuffer>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
+		return priv::xml::XmlParser<String, sl_char8, StringBuffer>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
 	}
 
 	Ref<XmlDocument> Xml::parseXml8(const String& xml)
@@ -2396,7 +2401,7 @@ namespace slib
 
 	Ref<XmlDocument> Xml::parseXml(const sl_char16* sz, sl_size len, XmlParseParam& param)
 	{
-		return _priv_Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(String::null(), sz, len, param);
+		return priv::xml::XmlParser<String16, sl_char16, StringBuffer16>::parseXml(String::null(), sz, len, param);
 	}
 
 	Ref<XmlDocument> Xml::parseXml(const sl_char16* sz, sl_size len)
@@ -2407,12 +2412,12 @@ namespace slib
 
 	Ref<XmlDocument> Xml::parseXml16(const String16& xml, XmlParseParam& param)
 	{
-		return _priv_Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
+		return priv::xml::XmlParser<String16, sl_char16, StringBuffer16>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
 	}
 
 	Ref<XmlDocument> Xml::parseXml(const XmlString& xml, XmlParseParam& param)
 	{
-		return _priv_Xml_Parser<XmlString, sl_char16, XmlStringBuffer>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
+		return priv::xml::XmlParser<XmlString, sl_char16, XmlStringBuffer>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
 	}
 
 	Ref<XmlDocument> Xml::parseXml16(const String16& xml)
@@ -2430,14 +2435,14 @@ namespace slib
 	Ref<XmlDocument> Xml::parseXmlFromTextFile(const String& filePath, XmlParseParam& param)
 	{
 		XmlString xml = File::readAllText16(filePath);
-		return _priv_Xml_Parser<XmlString, sl_char16, XmlStringBuffer>::parseXml(filePath, xml.getData(), xml.getLength(), param);
+		return priv::xml::XmlParser<XmlString, sl_char16, XmlStringBuffer>::parseXml(filePath, xml.getData(), xml.getLength(), param);
 	}
 
 	Ref<XmlDocument> Xml::parseXmlFromTextFile(const String& filePath)
 	{
 		XmlParseParam param;
 		XmlString xml = File::readAllText16(filePath);
-		return _priv_Xml_Parser<XmlString, sl_char16, XmlStringBuffer>::parseXml(filePath, xml.getData(), xml.getLength(), param);
+		return priv::xml::XmlParser<XmlString, sl_char16, XmlStringBuffer>::parseXml(filePath, xml.getData(), xml.getLength(), param);
 	}
 
 	
@@ -2593,33 +2598,39 @@ namespace slib
 		
 	}
 
-	template <class CT>
-	SLIB_INLINE sl_bool _priv_Xml_checkName(const CT* sz, sl_size len)
+	namespace priv
 	{
-		if (len == 0) {
-			return sl_false;
-		}
-		sl_uint32 ch = (sl_uint32)(sz[0]);
-		if (ch < 128 && _g_XML_check_name_pattern[ch] != 1) {
-			return sl_false;
-		}
-		for (sl_size i = 1; i < len; i++) {
-			ch = (sl_uint32)(sz[i]);
-			if (ch < 128 && _g_XML_check_name_pattern[ch] == 0) {
-				return sl_false;
+		namespace xml
+		{
+			template <class CT>
+			SLIB_INLINE sl_bool CheckName(const CT* sz, sl_size len)
+			{
+				if (len == 0) {
+					return sl_false;
+				}
+				sl_uint32 ch = (sl_uint32)(sz[0]);
+				if (ch < 128 && priv::xml::g_patternCheckName[ch] != 1) {
+					return sl_false;
+				}
+				for (sl_size i = 1; i < len; i++) {
+					ch = (sl_uint32)(sz[i]);
+					if (ch < 128 && priv::xml::g_patternCheckName[ch] == 0) {
+						return sl_false;
+					}
+				}
+				return sl_true;
 			}
 		}
-		return sl_true;
 	}
 
 	sl_bool Xml::checkName(const sl_char8* sz, sl_size len)
 	{
-		return _priv_Xml_checkName(sz, len);
+		return priv::xml::CheckName(sz, len);
 	}
 
 	sl_bool Xml::checkName(const sl_char16* sz, sl_size len)
 	{
-		return _priv_Xml_checkName(sz, len);
+		return priv::xml::CheckName(sz, len);
 	}
 
 	sl_bool Xml::checkName(const XmlString& tagName)

@@ -44,11 +44,10 @@ namespace slib
 	Atomic<T>& Atomic<T>::operator=(const T& other)
 	{
 		SLIB_ALIGN(8) char t[sizeof(T)];
-		{
-			SpinLocker lock(&m_lock);
-			new ((T*)t) T(Move(m_value));
-			m_value = other;
-		}
+		m_lock.lock();
+		new ((T*)t) T(Move(m_value));
+		m_value = other;
+		m_lock.unlock();
 		((T*)t)->~T();
 		return *this;
 	}
@@ -57,11 +56,10 @@ namespace slib
 	Atomic<T>& Atomic<T>::operator=(T&& other)
 	{
 		SLIB_ALIGN(8) char t[sizeof(T)];
-		{
-			SpinLocker lock(&m_lock);
-			new ((T*)t) T(Move(m_value));
-			m_value = Move(other);
-		}
+		m_lock.lock();
+		new ((T*)t) T(Move(m_value));
+		m_value = Move(other);
+		m_lock.unlock();
 		((T*)t)->~T();
 		return *this;
 	}
@@ -70,10 +68,9 @@ namespace slib
 	Atomic<T>::operator T() const
 	{
 		SLIB_ALIGN(8) char t[sizeof(T)];
-		{
-			SpinLocker lock(&m_lock);
-			new ((T*)t) T(m_value);
-		}
+		m_lock.lock();
+		new ((T*)t) T(m_value);
+		m_lock.unlock();
 		return *((T*)t);
 	}
 

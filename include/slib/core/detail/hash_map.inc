@@ -46,7 +46,7 @@ namespace slib
 	SLIB_INLINE CHashMap<KT, VT, HASH, KEY_COMPARE>::CHashMap(sl_size capacityMinimum, sl_size capacityMaximum, const HASH& hash, const KEY_COMPARE& compare) noexcept
 	 : m_hash(hash), m_compare(compare)
 	{
-		_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), capacityMinimum, capacityMaximum);
+		priv::hash_table::Helper::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), capacityMinimum, capacityMaximum);
 		m_nodeFirst = sl_null;
 		m_nodeLast = sl_null;
 	}
@@ -61,7 +61,7 @@ namespace slib
 	SLIB_INLINE CHashMap<KT, VT, HASH, KEY_COMPARE>::CHashMap(CHashMap<KT, VT, HASH, KEY_COMPARE>&& other) noexcept
 	 : m_hash(Move(other.m_hash)), m_compare(Move(other.m_compare))
 	{
-		_priv_HashTable::move(reinterpret_cast<HashTableStructBase*>(&m_table), reinterpret_cast<HashTableStructBase*>(&(other.m_table)));
+		priv::hash_table::Helper::move(reinterpret_cast<HashTableStructBase*>(&m_table), reinterpret_cast<HashTableStructBase*>(&(other.m_table)));
 		m_nodeFirst = other.m_nodeFirst;
 		m_nodeLast = other.m_nodeLast;
 		other.m_nodeFirst = sl_null;
@@ -72,7 +72,7 @@ namespace slib
 	SLIB_INLINE CHashMap<KT, VT, HASH, KEY_COMPARE>& CHashMap<KT, VT, HASH, KEY_COMPARE>::operator=(CHashMap<KT, VT, HASH, KEY_COMPARE>&& other) noexcept
 	{
 		_free();
-		_priv_HashTable::move(reinterpret_cast<HashTableStructBase*>(&m_table), reinterpret_cast<HashTableStructBase*>(&(other.m_table)));
+		priv::hash_table::Helper::move(reinterpret_cast<HashTableStructBase*>(&m_table), reinterpret_cast<HashTableStructBase*>(&(other.m_table)));
 		m_nodeFirst = other.m_nodeFirst;
 		m_nodeLast = other.m_nodeLast;
 		other.m_nodeFirst = sl_null;
@@ -115,7 +115,7 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	SLIB_INLINE void CHashMap<KT, VT, HASH, KEY_COMPARE>::setMinimumCapacity_NoLock(sl_size capacity) noexcept
 	{
-		_priv_HashTable::setMinimumCapacity(reinterpret_cast<HashTableStructBase*>(&m_table), capacity);
+		priv::hash_table::Helper::setMinimumCapacity(reinterpret_cast<HashTableStructBase*>(&m_table), capacity);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
@@ -134,7 +134,7 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	SLIB_INLINE void CHashMap<KT, VT, HASH, KEY_COMPARE>::setMaximumCapacity_NoLock(sl_size capacity) noexcept
 	{
-		_priv_HashTable::setMaximumCapacity(reinterpret_cast<HashTableStructBase*>(&m_table), capacity);
+		priv::hash_table::Helper::setMaximumCapacity(reinterpret_cast<HashTableStructBase*>(&m_table), capacity);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
@@ -378,7 +378,7 @@ namespace slib
 	template <class KEY, class VALUE>
 	HashMapNode<KT, VT>* CHashMap<KT, VT, HASH, KEY_COMPARE>::put_NoLock(KEY&& key, VALUE&& value, sl_bool* isInsertion) noexcept
 	{
-		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
+		if (!(priv::hash_table::Helper::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
 			return sl_null;
 		}
 		sl_size capacity = m_table.capacity;
@@ -436,7 +436,7 @@ namespace slib
 	template <class KEY, class... VALUE_ARGS>
 	HashMapNode<KT, VT>* CHashMap<KT, VT, HASH, KEY_COMPARE>::add_NoLock(KEY&& key, VALUE_ARGS&&... value_args) noexcept
 	{
-		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
+		if (!(priv::hash_table::Helper::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
 			return sl_null;
 		}
 		sl_size capacity = m_table.capacity;
@@ -464,7 +464,7 @@ namespace slib
 	template <class KEY, class... VALUE_ARGS>
 	MapEmplaceReturn< HashMapNode<KT, VT> > CHashMap<KT, VT, HASH, KEY_COMPARE>::emplace_NoLock(KEY&& key, VALUE_ARGS&&... value_args) noexcept
 	{
-		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
+		if (!(priv::hash_table::Helper::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
 			return sl_null;
 		}
 		sl_size capacity = m_table.capacity;
@@ -758,7 +758,7 @@ namespace slib
 					RedBlackTree::removeNode(pEntry, m_table.count, node);
 					break;
 				} else {
-					NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+					NODE* next = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 					_unlinkNode(node);
 					RedBlackTree::removeNode(pEntry, m_table.count, node);
 					node = next;
@@ -795,7 +795,7 @@ namespace slib
 					RedBlackTree::removeNode(pEntry, m_table.count, node);
 					break;
 				} else {
-					NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+					NODE* next = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 					_unlinkNode(node);
 					RedBlackTree::removeNode(pEntry, m_table.count, node);
 					node = next;
@@ -832,7 +832,7 @@ namespace slib
 				if (node == end) {
 					break;
 				}
-				node = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+				node = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 			}
 		}
 		return sl_false;
@@ -866,7 +866,7 @@ namespace slib
 						RedBlackTree::removeNode(pEntry, m_table.count, node);
 						break;
 					} else {
-						NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+						NODE* next = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 						_unlinkNode(node);
 						RedBlackTree::removeNode(pEntry, m_table.count, node);
 						node = next;
@@ -875,7 +875,7 @@ namespace slib
 					if (node == end) {
 						break;
 					}
-					node = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+					node = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 				}
 			}
 			return n;
@@ -900,7 +900,7 @@ namespace slib
 		}
 		sl_size count = m_table.count;
 		_free();
-		_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
+		priv::hash_table::Helper::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
 		m_nodeFirst = sl_null;
 		m_nodeLast = sl_null;
 		return count;
@@ -920,7 +920,7 @@ namespace slib
 			first = m_nodeFirst;
 			nodes = m_table.nodes;
 			count = m_table.count;
-			_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
+			priv::hash_table::Helper::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
 			m_nodeFirst = sl_null;
 			m_nodeLast = sl_null;
 		}
@@ -945,7 +945,7 @@ namespace slib
 			n = table->capacityMinimum;
 		}
 		if (n < table->capacity) {
-			if (_priv_HashTable::reallocNodes(reinterpret_cast<HashTableStructBase*>(table), n)) {
+			if (priv::hash_table::Helper::reallocNodes(reinterpret_cast<HashTableStructBase*>(table), n)) {
 				_rebuildTree(n);
 			}
 		}
@@ -969,7 +969,7 @@ namespace slib
 		_free();
 		m_nodeFirst = sl_null;
 		m_nodeLast = sl_null;
-		_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), other.m_table.capacityMinimum, other.m_table.capacityMaximum);
+		priv::hash_table::Helper::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), other.m_table.capacityMinimum, other.m_table.capacityMaximum);
         return _copyFrom(&other);
 	}
 	
@@ -1161,7 +1161,7 @@ namespace slib
 			// double capacity
 			sl_size n = table->capacity;
 			n *= 2;
-			if (_priv_HashTable::reallocNodes(reinterpret_cast<HashTableStructBase*>(table), n)) {
+			if (priv::hash_table::Helper::reallocNodes(reinterpret_cast<HashTableStructBase*>(table), n)) {
 				_rebuildTree(n);
 			}
 		}
@@ -1192,7 +1192,7 @@ namespace slib
         if (capacity == 0) {
             return sl_true;
         }
-        if (!(_priv_HashTable::reallocNodes(reinterpret_cast<HashTableStructBase*>(&m_table), capacity))) {
+        if (!(priv::hash_table::Helper::reallocNodes(reinterpret_cast<HashTableStructBase*>(&m_table), capacity))) {
             return sl_false;
         }
         NODE** nodes = m_table.nodes;

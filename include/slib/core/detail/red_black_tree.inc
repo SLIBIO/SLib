@@ -25,40 +25,46 @@ namespace slib
 	
 	#define PRIV_SLIB_RED_BLACK_TREE_MAX_DISTANCE 128
 	
-	class SLIB_EXPORT _priv_RedBlackTree
+	namespace priv
 	{
-	public:
-		static RedBlackTreeNode* getPrevious(RedBlackTreeNode* node) noexcept;
-		
-		static RedBlackTreeNode* getNext(RedBlackTreeNode* node) noexcept;
-		
-		static RedBlackTreeNode* getFirst(RedBlackTreeNode* node) noexcept;
-		
-		static RedBlackTreeNode* getLast(RedBlackTreeNode* node) noexcept;
-		
-		static void rebalanceAfterInsert(RedBlackTreeNode* node, RedBlackTreeNode** pRoot) noexcept;
-		
-		static void removeNode(RedBlackTreeNode* node, RedBlackTreeNode** pRoot) noexcept;
-		
-	};
+		namespace rb_tree
+		{
+			class SLIB_EXPORT Helper
+			{
+			public:
+				static RedBlackTreeNode* getPrevious(RedBlackTreeNode* node) noexcept;
+				
+				static RedBlackTreeNode* getNext(RedBlackTreeNode* node) noexcept;
+				
+				static RedBlackTreeNode* getFirst(RedBlackTreeNode* node) noexcept;
+				
+				static RedBlackTreeNode* getLast(RedBlackTreeNode* node) noexcept;
+				
+				static void rebalanceAfterInsert(RedBlackTreeNode* node, RedBlackTreeNode** pRoot) noexcept;
+				
+				static void removeNode(RedBlackTreeNode* node, RedBlackTreeNode** pRoot) noexcept;
+				
+			};
+		}
+	}
 	
 	template <class NODE>
 	SLIB_INLINE NODE* RedBlackTree::getNextNode(NODE* node) noexcept
 	{
-		return reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+		return reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 	}
 	
 	template <class NODE>
 	SLIB_INLINE NODE* RedBlackTree::getPreviousNode(NODE* node) noexcept
 	{
-		return reinterpret_cast<NODE*>(_priv_RedBlackTree::getPrevious(reinterpret_cast<RedBlackTreeNode*>(node)));
+		return reinterpret_cast<NODE*>(priv::rb_tree::Helper::getPrevious(reinterpret_cast<RedBlackTreeNode*>(node)));
 	}
 	
 	template <class NODE>
 	SLIB_INLINE NODE* RedBlackTree::getFirstNode(NODE* root) noexcept
 	{
 		if (root) {
-			return reinterpret_cast<NODE*>(_priv_RedBlackTree::getFirst(reinterpret_cast<RedBlackTreeNode*>(root)));
+			return reinterpret_cast<NODE*>(priv::rb_tree::Helper::getFirst(reinterpret_cast<RedBlackTreeNode*>(root)));
 		} else {
 			return sl_null;
 		}
@@ -68,7 +74,7 @@ namespace slib
 	SLIB_INLINE NODE* RedBlackTree::getLastNode(NODE* root) noexcept
 	{
 		if (root) {
-			return reinterpret_cast<NODE*>(_priv_RedBlackTree::getLast(reinterpret_cast<RedBlackTreeNode*>(root)));
+			return reinterpret_cast<NODE*>(priv::rb_tree::Helper::getLast(reinterpret_cast<RedBlackTreeNode*>(root)));
 		} else {
 			return sl_null;
 		}
@@ -190,7 +196,7 @@ namespace slib
 			}
 		} else if (compare_result > 0) {
 			if (pLessEqual) {
-				*pLessEqual = reinterpret_cast<NODE*>(_priv_RedBlackTree::getPrevious(reinterpret_cast<RedBlackTreeNode*>(node)));
+				*pLessEqual = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getPrevious(reinterpret_cast<RedBlackTreeNode*>(node)));
 			}
 			if (pGreaterEqual) {
 				*pGreaterEqual = node;
@@ -200,7 +206,7 @@ namespace slib
 				*pLessEqual = node;
 			}
 			if (pGreaterEqual) {
-				*pGreaterEqual = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+				*pGreaterEqual = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 			}
 		}
 	}
@@ -287,7 +293,7 @@ namespace slib
 				if (node == end) {
 					break;
 				}
-				node = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+				node = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 			}
 		}
 		return sl_null;
@@ -303,7 +309,7 @@ namespace slib
 				if (node == end) {
 					break;
 				}
-				node = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+				node = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 			}
 		}
 	}
@@ -320,7 +326,7 @@ namespace slib
 				if (node == end) {
 					break;
 				}
-				node = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+				node = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 			}
 		}
 	}
@@ -334,7 +340,7 @@ namespace slib
 			where->right = node;
 		}
 		node->parent = where;
-		_priv_RedBlackTree::rebalanceAfterInsert(reinterpret_cast<RedBlackTreeNode*>(node), reinterpret_cast<RedBlackTreeNode**>(pRoot));
+		priv::rb_tree::Helper::rebalanceAfterInsert(reinterpret_cast<RedBlackTreeNode*>(node), reinterpret_cast<RedBlackTreeNode**>(pRoot));
 	}
 	
 	template <class NODE, class KEY_COMPARE>
@@ -362,7 +368,7 @@ namespace slib
 				}
 			}
 			node->parent = look;
-			_priv_RedBlackTree::rebalanceAfterInsert(reinterpret_cast<RedBlackTreeNode*>(node), reinterpret_cast<RedBlackTreeNode**>(pRoot));
+			priv::rb_tree::Helper::rebalanceAfterInsert(reinterpret_cast<RedBlackTreeNode*>(node), reinterpret_cast<RedBlackTreeNode**>(pRoot));
 		} else {
 			*pRoot = node;
 		}
@@ -468,7 +474,7 @@ namespace slib
 	SLIB_INLINE void RedBlackTree::removeNode(NODE** pRoot, sl_size& count, NODE* node) noexcept
 	{
 		count--;
-		_priv_RedBlackTree::removeNode(reinterpret_cast<RedBlackTreeNode*>(node), reinterpret_cast<RedBlackTreeNode**>(pRoot));
+		priv::rb_tree::Helper::removeNode(reinterpret_cast<RedBlackTreeNode*>(node), reinterpret_cast<RedBlackTreeNode**>(pRoot));
 		delete node;
 	}
 	
@@ -480,7 +486,7 @@ namespace slib
 		}
 		sl_size n = countRemove - 1;
 		for (sl_size i = 0; i < n; i++) {
-			NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+			NODE* next = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 			removeNode(pRoot, count, node);
 			if (next) {
 				node = next;
@@ -498,7 +504,7 @@ namespace slib
 		if (!node) {
 			node = *pRoot;
 			if (node) {
-				node = reinterpret_cast<NODE*>(_priv_RedBlackTree::getFirst(reinterpret_cast<RedBlackTreeNode*>(node)));
+				node = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getFirst(reinterpret_cast<RedBlackTreeNode*>(node)));
 			} else {
 				return 0;
 			}
@@ -510,7 +516,7 @@ namespace slib
 				removeNode(pRoot, count, node);
 				break;
 			} else {
-				NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+				NODE* next = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 				removeNode(pRoot, count, node);
 				node = next;
 				if (!node) {
@@ -552,7 +558,7 @@ namespace slib
 					removeNode(pRoot, count, node);
 					break;
 				} else {
-					NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+					NODE* next = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 					removeNode(pRoot, count, node);
 					node = next;
 				}
@@ -577,7 +583,7 @@ namespace slib
 					removeNode(pRoot, count, node);
 					break;
 				} else {
-					NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+					NODE* next = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 					removeNode(pRoot, count, node);
 					node = next;
 				}
@@ -602,7 +608,7 @@ namespace slib
 				if (node == end) {
 					break;
 				}
-				node = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+				node = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 			}
 		}
 		return sl_false;
@@ -622,7 +628,7 @@ namespace slib
 						removeNode(pRoot, count, node);
 						break;
 					} else {
-						NODE* next = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+						NODE* next = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 						removeNode(pRoot, count, node);
 						node = next;
 					}
@@ -630,7 +636,7 @@ namespace slib
 					if (node == end) {
 						break;
 					}
-					node = reinterpret_cast<NODE*>(_priv_RedBlackTree::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
+					node = reinterpret_cast<NODE*>(priv::rb_tree::Helper::getNext(reinterpret_cast<RedBlackTreeNode*>(node)));
 				}
 			}
 			return n;

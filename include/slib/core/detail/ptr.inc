@@ -1475,23 +1475,23 @@ namespace slib
 	{
 		if ((void*)this == (void*)(&(priv::ptr::g_null))) {
 			return sl_null;
-		} else {
-			SpinLocker lock(&m_lock);
+		} else {			
+			m_lock.lock();
 			reference = _ref;
-			return _ptr;
+			T* ret = _ptr;
+			m_lock.unlock();
+			return ret;
 		}
 	}
 
 	template <class T>
 	SLIB_INLINE void Atomic< Ptr<T> >::_replace(T* pointer, const Ref<Referable>& reference) noexcept
 	{
-		Referable* refOld;
-		{
-			SpinLocker lock(&m_lock);
-			_ptr = pointer;
-			refOld = _ref._ptr;
-			new (&_ref) Ref<Referable>(reference);
-		}
+		m_lock.lock();
+		_ptr = pointer;
+		Referable* refOld = _ref._ptr;
+		new (&_ref) Ref<Referable>(reference);
+		m_lock.unlock();
 		if (refOld) {
 			refOld->decreaseReference();
 		}
@@ -1510,13 +1510,11 @@ namespace slib
 	{
 		if ((void*)this != _other) {
 			AtomicPtr<T>& other = *(reinterpret_cast<AtomicPtr<T>*>(_other));
-			Referable* refOld;
-			{
-				SpinLocker lock(&m_lock);
-				_ptr = other._ptr;
-				refOld = _ref._ptr;
-				_ref._move_init(&(other._ref));
-			}
+			m_lock.lock();
+			_ptr = other._ptr;
+			Referable* refOld = _ref._ptr;
+			_ref._move_init(&(other._ref));
+			m_lock.unlock();
 			if (refOld) {
 				refOld->decreaseReference();
 			}
@@ -1570,70 +1568,88 @@ namespace slib
 		return m_ptr._ptr;
 	}
 
-
-	template <class T>
-	class _priv_SharedPtrContainer : public Referable
+	namespace priv
 	{
-	public:
-		T* ptr;
-		
-	public:
-		SLIB_INLINE _priv_SharedPtrContainer(T* _ptr) : ptr(_ptr) {}
-		SLIB_INLINE ~_priv_SharedPtrContainer() { delete ptr; }
-		
-	};
-	
+		namespace ptr
+		{
+
+			template <class T>
+			class SharedPtrContainer : public Referable
+			{
+			public:
+				T* ptr;
+				
+			public:
+				SLIB_INLINE SharedPtrContainer(T* _ptr) : ptr(_ptr)
+				{					
+				}
+				
+				SLIB_INLINE ~SharedPtrContainer()
+				{
+					delete ptr;
+				}				
+			};
+
+			template <class T, class DELETER>
+			class SharedPtrContainerWithDeleter : public Referable
+			{
+			public:
+				T* ptr;
+				DELETER deleter;
+				
+			public:
+				SLIB_INLINE SharedPtrContainerWithDeleter(T* _ptr, const DELETER& _deleter): ptr(_ptr), deleter(_deleter)
+				{
+				}
+
+				SLIB_INLINE ~SharedPtrContainerWithDeleter()
+				{
+					deleter(ptr);
+				}
+				
+			};
+			
+			template <class T>
+			class SharedPtrObjectContainer : public Referable
+			{
+			public:
+				T object;
+				
+			public:
+				template <class... ARGS>
+				SLIB_INLINE SharedPtrObjectContainer(ARGS&&... args): object(Forward<ARGS>(args)...)
+				{
+				}
+				
+			};
+			
+		}
+	}
+
 	template <class T>
 	SLIB_INLINE Ptr<T> SharedPtr(T* ptr)
 	{
 		if (ptr) {
-			return Ptr<T>::fromRef(ptr, new _priv_SharedPtrContainer<T>(ptr));
+			return Ptr<T>::fromRef(ptr, new priv::ptr::SharedPtrContainer<T>(ptr));
 		} else {
 			return sl_null;
 		}
 	}
 
-
-	template <class T, class DELETER>
-	class _priv_SharedPtrContainerWithDeleter : public Referable
-	{
-	public:
-		T* ptr;
-		DELETER deleter;
-		
-	public:
-		SLIB_INLINE _priv_SharedPtrContainerWithDeleter(T* _ptr, const DELETER& _deleter) : ptr(_ptr), deleter(_deleter) {}
-		SLIB_INLINE ~_priv_SharedPtrContainerWithDeleter() { deleter(ptr); }
-		
-	};
-	
 	template <class T, class DELETER>
 	SLIB_INLINE Ptr<T> SharedPtr(T* ptr, const DELETER& deleter)
 	{
 		if (ptr) {
-			return Ptr<T>::fromRef(ptr, new _priv_SharedPtrContainerWithDeleter<T, DELETER>(ptr, deleter));
+			return Ptr<T>::fromRef(ptr, new priv::ptr::SharedPtrContainerWithDeleter<T, DELETER>(ptr, deleter));
 		} else {
 			return sl_null;
 		}
 	}
-	
-	
-	template <class T>
-	class _priv_SharedPtrObjectContainer : public Referable
-	{
-	public:
-		T object;
 		
-	public:
-		template <class... ARGS>
-		SLIB_INLINE _priv_SharedPtrObjectContainer(ARGS&&... args) : object(Forward<ARGS>(args)...) {}
-		
-	};
-	
 	template<class T, class... ARGS>
 	SLIB_INLINE Ptr<T> MakeShared(ARGS&&... args)
 	{
-		_priv_SharedPtrObjectContainer<T>* ptr = new _priv_SharedPtrObjectContainer<T>(Forward<ARGS>(args)...);
+		priv::ptr::SharedPtrObjectContainer<T>* ptr = new priv::ptr::SharedPtrObjectContainer<T>(Forward<ARGS>(args)...);
 		if (ptr) {
 			return Ptr<T>::fromRef(&(ptr->object), ptr);
 		} else {

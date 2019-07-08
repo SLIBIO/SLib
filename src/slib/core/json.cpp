@@ -293,375 +293,382 @@ namespace slib
 		return *this = Json(elements);
 	}
 	
-	template <class ST, class CT>
-	class _priv_Json_Parser
+	namespace priv
 	{
-	public:
-		const CT* buf = sl_null;
-		sl_size len = 0;
-		sl_bool flagSupportComments = sl_false;
-		
-		sl_size pos = 0;
-		
-		sl_bool flagError = sl_false;
-		String errorMessage;
-		
-		ST strUndefined;
-		ST strNull;
-		ST strTrue;
-		ST strFalse;
-		
-	public:
-		_priv_Json_Parser();
-		
-	public:
-		void escapeSpaceAndComments();
-		
-		Json parseJson();
+		namespace json
+		{
+			
+			template <class ST, class CT>
+			class Parser
+			{
+			public:
+				const CT* buf = sl_null;
+				sl_size len = 0;
+				sl_bool flagSupportComments = sl_false;
+				
+				sl_size pos = 0;
+				
+				sl_bool flagError = sl_false;
+				String errorMessage;
+				
+				ST strUndefined;
+				ST strNull;
+				ST strTrue;
+				ST strFalse;
+				
+			public:
+				Parser();
+				
+			public:
+				void escapeSpaceAndComments();
+				
+				Json parseJson();
 
-		static Json parseJson(const CT* buf, sl_size len, JsonParseParam& param);
-		
-	};
+				static Json parseJson(const CT* buf, sl_size len, JsonParseParam& param);
+				
+			};
 
-	template <>
-	_priv_Json_Parser<String, sl_char8>::_priv_Json_Parser()
-	{
-		SLIB_STATIC_STRING(_undefined, "undefined");
-		strUndefined = _undefined;
-		SLIB_STATIC_STRING(_null, "null");
-		strNull = _null;
-		SLIB_STATIC_STRING(_true, "true");
-		strTrue = _true;
-		SLIB_STATIC_STRING(_false, "false");
-		strFalse = _false;
-	}
+			template <>
+			Parser<String, sl_char8>::Parser()
+			{
+				SLIB_STATIC_STRING(_undefined, "undefined");
+				strUndefined = _undefined;
+				SLIB_STATIC_STRING(_null, "null");
+				strNull = _null;
+				SLIB_STATIC_STRING(_true, "true");
+				strTrue = _true;
+				SLIB_STATIC_STRING(_false, "false");
+				strFalse = _false;
+			}
 
-	template <>
-	_priv_Json_Parser<String16, sl_char16>::_priv_Json_Parser()
-	{
-		SLIB_STATIC_STRING16_BY_ARRAY(_undefined, 'u', 'n', 'd', 'e', 'f', 'i', 'n', 'e', 'd');
-		strUndefined = _undefined;
-		SLIB_STATIC_STRING16_BY_ARRAY(_null, 'n', 'u', 'l', 'l');
-		strNull = _null;
-		SLIB_STATIC_STRING16_BY_ARRAY(_true, 't', 'r', 'u', 'e');
-		strTrue = _true;
-		SLIB_STATIC_STRING16_BY_ARRAY(_false, 'f', 'a', 'l', 's', 'e');
-		strFalse = _false;
-	}
+			template <>
+			Parser<String16, sl_char16>::Parser()
+			{
+				SLIB_STATIC_STRING16_BY_ARRAY(_undefined, 'u', 'n', 'd', 'e', 'f', 'i', 'n', 'e', 'd');
+				strUndefined = _undefined;
+				SLIB_STATIC_STRING16_BY_ARRAY(_null, 'n', 'u', 'l', 'l');
+				strNull = _null;
+				SLIB_STATIC_STRING16_BY_ARRAY(_true, 't', 'r', 'u', 'e');
+				strTrue = _true;
+				SLIB_STATIC_STRING16_BY_ARRAY(_false, 'f', 'a', 'l', 's', 'e');
+				strFalse = _false;
+			}
 
-	template <class ST, class CT>
-	void _priv_Json_Parser<ST, CT>::escapeSpaceAndComments()
-	{
-		sl_bool flagLineComment = sl_false;
-		sl_bool flagBlockComment = sl_false;
-		while (pos < len) {
-			sl_bool flagEscape = sl_false;
-			CT ch = buf[pos];
-			if (flagSupportComments) {
-				if (flagLineComment) {
-					flagEscape = sl_true;
-					if (ch == '\r' || ch == '\n') {
-						flagLineComment = sl_false;
-					}
-				} else {
-					if (flagBlockComment) {
-						flagEscape = sl_true;
-						if (pos >= 2 && ch == '/' && buf[pos-1] == '*') {
-							flagBlockComment = sl_false;
-						}
-					} else {
-						if (pos + 2 <= len && ch == '/') {
-							if (buf[pos + 1] == '/') {
-								flagLineComment = sl_true;
+			template <class ST, class CT>
+			void Parser<ST, CT>::escapeSpaceAndComments()
+			{
+				sl_bool flagLineComment = sl_false;
+				sl_bool flagBlockComment = sl_false;
+				while (pos < len) {
+					sl_bool flagEscape = sl_false;
+					CT ch = buf[pos];
+					if (flagSupportComments) {
+						if (flagLineComment) {
+							flagEscape = sl_true;
+							if (ch == '\r' || ch == '\n') {
+								flagLineComment = sl_false;
+							}
+						} else {
+							if (flagBlockComment) {
 								flagEscape = sl_true;
-								pos++;
-							} else if (buf[pos + 1] == '*') {
-								flagBlockComment = sl_true;
-								flagEscape = sl_true;
-								pos++;
+								if (pos >= 2 && ch == '/' && buf[pos-1] == '*') {
+									flagBlockComment = sl_false;
+								}
+							} else {
+								if (pos + 2 <= len && ch == '/') {
+									if (buf[pos + 1] == '/') {
+										flagLineComment = sl_true;
+										flagEscape = sl_true;
+										pos++;
+									} else if (buf[pos + 1] == '*') {
+										flagBlockComment = sl_true;
+										flagEscape = sl_true;
+										pos++;
+									}
+								}
 							}
 						}
 					}
+					if (!flagEscape && !(SLIB_CHAR_IS_WHITE_SPACE(ch))) {
+						break;
+					}
+					pos++;
 				}
 			}
-			if (!flagEscape && !(SLIB_CHAR_IS_WHITE_SPACE(ch))) {
-				break;
-			}
-			pos++;
-		}
-	}
 
-	template <class ST, class CT>
-	Json _priv_Json_Parser<ST, CT>::parseJson()
-	{
-		escapeSpaceAndComments();
-		if (pos == len) {
-			return sl_null;
-		}
-		
-		CT first = buf[pos];
-		
-		// string
-		if (first == '"' || first == '\'') {
-			sl_size m = 0;
-			sl_bool f = sl_false;
-			ST str = ParseUtil::parseBackslashEscapes(buf + pos, len - pos, &m, &f);
-			pos += m;
-			if (f) {
-				flagError = sl_true;
-				errorMessage = "String: Missing character  \" or ' ";
-				return sl_null;
-			}
-			return str;
-		}
-		
-		// array
-		if (first == '[') {
-			pos++;
-			escapeSpaceAndComments();
-			if (pos == len) {
-				flagError = sl_true;
-				errorMessage = "Array: Missing character ] ";
-				return sl_null;
-			}
-			if (buf[pos] == ']') {
-				pos++;
-				return Json::createList();
-			}
-			JsonList list = JsonList::create();
-			while (pos < len) {
-				CT ch = buf[pos];
-				if (ch == ']' || ch == ',') {
-					list.add_NoLock(Json::null());
-				} else {
-					Json item = parseJson();
-					if (flagError) {
+			template <class ST, class CT>
+			Json Parser<ST, CT>::parseJson()
+			{
+				escapeSpaceAndComments();
+				if (pos == len) {
+					return sl_null;
+				}
+				
+				CT first = buf[pos];
+				
+				// string
+				if (first == '"' || first == '\'') {
+					sl_size m = 0;
+					sl_bool f = sl_false;
+					ST str = ParseUtil::parseBackslashEscapes(buf + pos, len - pos, &m, &f);
+					pos += m;
+					if (f) {
+						flagError = sl_true;
+						errorMessage = "String: Missing character  \" or ' ";
 						return sl_null;
 					}
-					list.add_NoLock(item);
+					return str;
+				}
+				
+				// array
+				if (first == '[') {
+					pos++;
 					escapeSpaceAndComments();
 					if (pos == len) {
 						flagError = sl_true;
 						errorMessage = "Array: Missing character ] ";
 						return sl_null;
 					}
-					ch = buf[pos];
-				}
-				if (ch == ']') {
-					pos++;
-					return list;
-				} else if (ch == ',') {
-					pos++;
-				} else {
-					flagError = sl_true;
-					errorMessage = "Array: Missing character ] ";
-					return sl_null;
-				}
-				escapeSpaceAndComments();
-				if (pos == len) {
-					flagError = sl_true;
-					errorMessage = "Array: Missing character ] ";
-					return sl_null;
-				}
-			}
-			flagError = sl_true;
-			errorMessage = "Array: Missing character ] ";
-			return sl_null;
-		}
-		
-		// object
-		if (first == '{') {
-			pos++;
-			if (pos == len) {
-				flagError = sl_true;
-				errorMessage = "Object: Missing character } ";
-				return sl_null;
-			}
-			JsonMap map = JsonMap::create();
-			sl_bool flagFirst = sl_true;
-			while (pos < len) {
-				escapeSpaceAndComments();
-				if (pos == len) {
-					flagError = sl_true;
-					errorMessage = "Object: Missing character } ";
-					return sl_null;
-				}
-				CT ch = buf[pos];
-				if (ch == '}') {
-					pos++;
-					return map;
-				}
-				if (!flagFirst) {
-					if (ch == ',') {
+					if (buf[pos] == ']') {
 						pos++;
-					} else {
+						return Json::createList();
+					}
+					JsonList list = JsonList::create();
+					while (pos < len) {
+						CT ch = buf[pos];
+						if (ch == ']' || ch == ',') {
+							list.add_NoLock(Json::null());
+						} else {
+							Json item = parseJson();
+							if (flagError) {
+								return sl_null;
+							}
+							list.add_NoLock(item);
+							escapeSpaceAndComments();
+							if (pos == len) {
+								flagError = sl_true;
+								errorMessage = "Array: Missing character ] ";
+								return sl_null;
+							}
+							ch = buf[pos];
+						}
+						if (ch == ']') {
+							pos++;
+							return list;
+						} else if (ch == ',') {
+							pos++;
+						} else {
+							flagError = sl_true;
+							errorMessage = "Array: Missing character ] ";
+							return sl_null;
+						}
+						escapeSpaceAndComments();
+						if (pos == len) {
+							flagError = sl_true;
+							errorMessage = "Array: Missing character ] ";
+							return sl_null;
+						}
+					}
+					flagError = sl_true;
+					errorMessage = "Array: Missing character ] ";
+					return sl_null;
+				}
+				
+				// object
+				if (first == '{') {
+					pos++;
+					if (pos == len) {
 						flagError = sl_true;
-						errorMessage = "Object: Missing character , ";
+						errorMessage = "Object: Missing character } ";
 						return sl_null;
 					}
-				}
-				escapeSpaceAndComments();
-				if (pos == len) {
+					JsonMap map = JsonMap::create();
+					sl_bool flagFirst = sl_true;
+					while (pos < len) {
+						escapeSpaceAndComments();
+						if (pos == len) {
+							flagError = sl_true;
+							errorMessage = "Object: Missing character } ";
+							return sl_null;
+						}
+						CT ch = buf[pos];
+						if (ch == '}') {
+							pos++;
+							return map;
+						}
+						if (!flagFirst) {
+							if (ch == ',') {
+								pos++;
+							} else {
+								flagError = sl_true;
+								errorMessage = "Object: Missing character , ";
+								return sl_null;
+							}
+						}
+						escapeSpaceAndComments();
+						if (pos == len) {
+							flagError = sl_true;
+							errorMessage = "Object: Missing character } ";
+							return sl_null;
+						}
+						ST key;
+						ch = buf[pos];
+						if (ch == '}') {
+							pos++;
+							return map;
+						} else if (ch == '"' || ch == '\'') {
+							sl_size m = 0;
+							sl_bool f = sl_false;
+							key = ParseUtil::parseBackslashEscapes(buf + pos, len - pos, &m, &f);
+							pos += m;
+							if (f) {
+								flagError = sl_true;
+								errorMessage = "Object Item Name: Missing terminating character \" or ' ";
+								return sl_null;
+							}
+						} else {
+							sl_size s = pos;
+							while (pos < len) {
+								CT ch = buf[pos];
+								if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || ch == '_' || (pos != s && ch >= '0' && ch <= '9')) {
+									pos++;
+								} else {
+									break;
+								}
+							}
+							if (pos == len) {
+								flagError = sl_true;
+								errorMessage = "Object: Missing character : ";
+								return sl_null;
+							}
+							key = ST(buf + s, pos - s);
+						}
+						escapeSpaceAndComments();
+						if (pos == len) {
+							flagError = sl_true;
+							errorMessage = "Object: Missing character : ";
+							return sl_null;
+						}
+						if (buf[pos] == ':') {
+							pos++;
+						} else {
+							flagError = sl_true;
+							errorMessage = "Object: Missing character : ";
+							return sl_null;
+						}
+						escapeSpaceAndComments();
+						if (pos == len) {
+							flagError = sl_true;
+							errorMessage = "Object: Missing Item value";
+							return sl_null;
+						}
+						if (buf[pos] == '}' || buf[pos] == ',') {
+							map.put_NoLock(key, Json::null());
+						} else {
+							Json item = parseJson();
+							if (flagError) {
+								return sl_null;
+							}
+							if (item.isNotUndefined()) {
+								map.put_NoLock(key, item);
+							}
+						}
+						flagFirst = sl_false;
+					}
 					flagError = sl_true;
 					errorMessage = "Object: Missing character } ";
 					return sl_null;
 				}
-				ST key;
-				ch = buf[pos];
-				if (ch == '}') {
-					pos++;
-					return map;
-				} else if (ch == '"' || ch == '\'') {
-					sl_size m = 0;
-					sl_bool f = sl_false;
-					key = ParseUtil::parseBackslashEscapes(buf + pos, len - pos, &m, &f);
-					pos += m;
-					if (f) {
-						flagError = sl_true;
-						errorMessage = "Object Item Name: Missing terminating character \" or ' ";
-						return sl_null;
-					}
-				} else {
+				{
 					sl_size s = pos;
 					while (pos < len) {
 						CT ch = buf[pos];
-						if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || ch == '_' || (pos != s && ch >= '0' && ch <= '9')) {
-							pos++;
-						} else {
+						if (ch == '\r' || ch == '\n' || ch == ' ' || ch == '\t' || ch == '/' || ch == ']' || ch == '}' || ch == ',') {
 							break;
+						} else {
+							pos++;
 						}
 					}
-					if (pos == len) {
+					if (pos == s) {
 						flagError = sl_true;
-						errorMessage = "Object: Missing character : ";
+						errorMessage = "Invalid token";
 						return sl_null;
 					}
-					key = ST(buf + s, pos - s);
-				}
-				escapeSpaceAndComments();
-				if (pos == len) {
-					flagError = sl_true;
-					errorMessage = "Object: Missing character : ";
-					return sl_null;
-				}
-				if (buf[pos] == ':') {
-					pos++;
-				} else {
-					flagError = sl_true;
-					errorMessage = "Object: Missing character : ";
-					return sl_null;
-				}
-				escapeSpaceAndComments();
-				if (pos == len) {
-					flagError = sl_true;
-					errorMessage = "Object: Missing Item value";
-					return sl_null;
-				}
-				if (buf[pos] == '}' || buf[pos] == ',') {
-					map.put_NoLock(key, Json::null());
-				} else {
-					Json item = parseJson();
-					if (flagError) {
+					ST str(buf + s, pos - s);
+					if (str == strUndefined) {
+						return Json::undefined();
+					}
+					if (str == strNull) {
 						return sl_null;
 					}
-					if (item.isNotUndefined()) {
-						map.put_NoLock(key, item);
+					if (str == strTrue) {
+						return Json::fromBoolean(sl_true);
+					}
+					if (str == strFalse) {
+						return Json::fromBoolean(sl_false);
+					}
+					sl_int64 vi64;
+					if (str.parseInt64(10, &vi64)) {
+						if (vi64 >= SLIB_INT64(-0x80000000) && vi64 < SLIB_INT64(0x7fffffff)) {
+							return (sl_int32)vi64;
+						} else {
+							return vi64;
+						}
+					}
+					double vf;
+					if (str.parseDouble(&vf)) {
+						return vf;
 					}
 				}
-				flagFirst = sl_false;
-			}
-			flagError = sl_true;
-			errorMessage = "Object: Missing character } ";
-			return sl_null;
-		}
-		{
-			sl_size s = pos;
-			while (pos < len) {
-				CT ch = buf[pos];
-				if (ch == '\r' || ch == '\n' || ch == ' ' || ch == '\t' || ch == '/' || ch == ']' || ch == '}' || ch == ',') {
-					break;
-				} else {
-					pos++;
-				}
-			}
-			if (pos == s) {
 				flagError = sl_true;
 				errorMessage = "Invalid token";
 				return sl_null;
 			}
-			ST str(buf + s, pos - s);
-			if (str == strUndefined) {
-				return Json::undefined();
-			}
-			if (str == strNull) {
-				return sl_null;
-			}
-			if (str == strTrue) {
-				return Json::fromBoolean(sl_true);
-			}
-			if (str == strFalse) {
-				return Json::fromBoolean(sl_false);
-			}
-			sl_int64 vi64;
-			if (str.parseInt64(10, &vi64)) {
-				if (vi64 >= SLIB_INT64(-0x80000000) && vi64 < SLIB_INT64(0x7fffffff)) {
-					return (sl_int32)vi64;
-				} else {
-					return vi64;
+
+			template <class ST, class CT>
+			Json Parser<ST, CT>::parseJson(const CT* buf, sl_size len, JsonParseParam& param)
+			{
+				param.flagError = sl_false;
+				
+				Parser<ST, CT> parser;
+				parser.buf = buf;
+				parser.len = len;
+				parser.flagSupportComments = param.flagSupportComments;
+				
+				parser.pos = 0;
+				parser.flagError = sl_false;
+				
+				Json var = parser.parseJson();
+				if (!(parser.flagError)) {
+					parser.escapeSpaceAndComments();
+					if (parser.pos != len) {
+						parser.flagError = sl_true;
+						parser.errorMessage = "Invalid token";
+					}
+					if (!(parser.flagError)) {
+						return var;
+					}
 				}
+				
+				param.flagError = sl_true;
+				param.errorPosition = parser.pos;
+				param.errorMessage = parser.errorMessage;
+				param.errorLine = ParseUtil::countLineNumber(buf, parser.pos, &(param.errorColumn));
+				
+				if (param.flagLogError) {
+					LogError("Json", param.getErrorText());
+				}
+				
+				return sl_null;
+				
 			}
-			double vf;
-			if (str.parseDouble(&vf)) {
-				return vf;
-			}
+			
 		}
-		flagError = sl_true;
-		errorMessage = "Invalid token";
-		return sl_null;
 	}
-
-	template <class ST, class CT>
-	Json _priv_Json_Parser<ST, CT>::parseJson(const CT* buf, sl_size len, JsonParseParam& param)
-	{
-		param.flagError = sl_false;
-		
-		_priv_Json_Parser<ST, CT> parser;
-		parser.buf = buf;
-		parser.len = len;
-		parser.flagSupportComments = param.flagSupportComments;
-		
-		parser.pos = 0;
-		parser.flagError = sl_false;
-		
-		Json var = parser.parseJson();
-		if (!(parser.flagError)) {
-			parser.escapeSpaceAndComments();
-			if (parser.pos != len) {
-				parser.flagError = sl_true;
-				parser.errorMessage = "Invalid token";
-			}
-			if (!(parser.flagError)) {
-				return var;
-			}
-		}
-		
-		param.flagError = sl_true;
-		param.errorPosition = parser.pos;
-		param.errorMessage = parser.errorMessage;
-		param.errorLine = ParseUtil::countLineNumber(buf, parser.pos, &(param.errorColumn));
-		
-		if (param.flagLogError) {
-			LogError("Json", param.getErrorText());
-		}
-		
-		return sl_null;
-		
-	}
-
 
 	Json Json::parseJson(const sl_char8* sz, sl_size len, JsonParseParam& param)
 	{
-		return _priv_Json_Parser<String, sl_char8>::parseJson(sz, len, param);
+		return priv::json::Parser<String, sl_char8>::parseJson(sz, len, param);
 	}
 
 	Json Json::parseJson(const sl_char8* sz, sl_size len)
@@ -672,7 +679,7 @@ namespace slib
 
 	Json Json::parseJson(const String& json, JsonParseParam& param)
 	{
-		return _priv_Json_Parser<String, sl_char8>::parseJson(json.getData(), json.getLength(), param);
+		return priv::json::Parser<String, sl_char8>::parseJson(json.getData(), json.getLength(), param);
 	}
 
 	Json Json::parseJson(const String& json)
@@ -684,7 +691,7 @@ namespace slib
 
 	Json Json::parseJson16(const sl_char16* sz, sl_size len, JsonParseParam& param)
 	{
-		return _priv_Json_Parser<String16, sl_char16>::parseJson(sz, len, param);
+		return priv::json::Parser<String16, sl_char16>::parseJson(sz, len, param);
 	}
 
 	Json Json::parseJson16(const sl_char16* sz, sl_size len)
@@ -695,7 +702,7 @@ namespace slib
 
 	Json Json::parseJson16(const String16& json, JsonParseParam& param)
 	{
-		return _priv_Json_Parser<String16, sl_char16>::parseJson(json.getData(), json.getLength(), param);
+		return priv::json::Parser<String16, sl_char16>::parseJson(json.getData(), json.getLength(), param);
 	}
 
 	Json Json::parseJson16(const String16& json)

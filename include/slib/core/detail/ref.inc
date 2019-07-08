@@ -1038,27 +1038,25 @@ namespace slib
 	template <class T>
 	SLIB_INLINE T* Atomic< Ref<T> >::_retainObject() const noexcept
 	{
-		if (_ptr) {
-			SpinLocker lock(&m_lock);
-			T* ptr = _ptr;
-			if (ptr) {
-				ptr->increaseReference();
-			}
-			return ptr;
-		} else {
+		if (!_ptr) {
 			return sl_null;
 		}
+		m_lock.lock();
+		T* ptr = _ptr;
+		if (ptr) {
+			ptr->increaseReference();
+		}
+		m_lock.unlock();
+		return ptr;
 	}
 	
 	template <class T>
 	SLIB_INLINE void Atomic< Ref<T> >::_replaceObject(T* other) noexcept
 	{
-		T* before;
-		{
-			SpinLocker lock(&m_lock);
-			before = _ptr;
-			_ptr = other;
-		}
+		m_lock.lock();
+		T* before = _ptr;
+		_ptr = other;
+		m_lock.unlock();
 		if (before) {
 			before->decreaseReference();
 		}

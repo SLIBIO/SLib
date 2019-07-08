@@ -269,23 +269,21 @@ namespace slib
 			type = VariantType::Null;
 			value = 0;
 		} else {
-			SpinLocker lock(&m_lock);
+			m_lock.lock();
 			type = _type;
 			priv::variant::copy(_type, _value, value);
+			m_lock.unlock();
 		}
 	}
 
 	SLIB_INLINE void Atomic<Variant>::_replace(VariantType type, sl_uint64 value) noexcept
 	{
-		VariantType typeOld;
-		sl_uint64 valueOld;
-		{
-			SpinLocker lock(&m_lock);
-			typeOld = _type;
-			valueOld = _value;
-			_type = type;
-			_value = value;
-		}
+		m_lock.lock();
+		VariantType typeOld = _type;
+		sl_uint64 valueOld = _value;
+		_type = type;
+		_value = value;
+		m_lock.unlock();
 		priv::variant::free(typeOld, valueOld);
 	}
 

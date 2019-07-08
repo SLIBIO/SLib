@@ -29,11 +29,11 @@
 #include "slib/core/platform_apple.h"
 
 #if defined(SLIB_PLATFORM_IS_MACOS)
-@interface _priv_Slib_ChangeLocaleNotificationObserver : NSObject
--(void)onChangeLocale:(NSNotification*)notification;
+@interface SLIBLocaleChangedNotificationObserver : NSObject
+	-(void)onChangeLocale:(NSNotification*)notification;
 @end
 
-@implementation _priv_Slib_ChangeLocaleNotificationObserver
+@implementation SLIBLocaleChangedNotificationObserver
 -(void)onChangeLocale:(NSNotification*)notification
 {
 	slib::Locale::dispatchChangeCurrentLocale();
@@ -67,7 +67,7 @@ namespace slib
 #if defined(SLIB_PLATFORM_IS_MACOS)
 	void Locale::_setupOnChangeCurrentLocale()
 	{
-		static _priv_Slib_ChangeLocaleNotificationObserver* observer = [[_priv_Slib_ChangeLocaleNotificationObserver alloc] init];
+		static SLIBLocaleChangedNotificationObserver* observer = [[SLIBLocaleChangedNotificationObserver alloc] init];
 		[[NSNotificationCenter defaultCenter] addObserver:observer selector:@selector(onChangeLocale:) name:NSCurrentLocaleDidChangeNotification object:nil];
 	}
 #endif

@@ -41,40 +41,47 @@ namespace slib
 		sl_size thresholdUp;
 	};
 	
-	class _priv_HashTable
+	namespace priv
 	{
-	public:
-		typedef HashTableNodeBase NODE;
-		typedef HashTableStructBase TABLE;
-		
-	public:
-		static void fixCapacityRange(TABLE* table) noexcept;
-		
-		static void updateThresholds(TABLE* table) noexcept;
-		
-		static void initialize(TABLE* table, sl_size capacityMinimum, sl_size capacityMaximum) noexcept;
-		
-		static void move(TABLE* dst, TABLE* src) noexcept;
+		namespace hash_table
+		{
 
-		static void clear(TABLE* table) noexcept;
-		
-		static void setMinimumCapacity(TABLE* table, sl_size capacity) noexcept;
-		
-		static void setMaximumCapacity(TABLE* table, sl_size capacity) noexcept;
+			class Helper
+			{
+			public:
+				typedef HashTableNodeBase NODE;
+				typedef HashTableStructBase TABLE;
+				
+			public:
+				static void fixCapacityRange(TABLE* table) noexcept;
+				
+				static void updateThresholds(TABLE* table) noexcept;
+				
+				static void initialize(TABLE* table, sl_size capacityMinimum, sl_size capacityMaximum) noexcept;
+				
+				static void move(TABLE* dst, TABLE* src) noexcept;
 
-		static sl_bool validateNodes(TABLE* table) noexcept;
-		
-		static sl_bool reallocNodes(TABLE* table, sl_size capacity) noexcept;
-		
-		static void expand(TABLE* table) noexcept;
-		
-		static void shrink(TABLE* table) noexcept;
-		
-		template <class KT, class VT>
-		static void free(HashTableStruct<KT, VT>* table) noexcept;
-		
-	};
-	
+				static void clear(TABLE* table) noexcept;
+				
+				static void setMinimumCapacity(TABLE* table, sl_size capacity) noexcept;
+				
+				static void setMaximumCapacity(TABLE* table, sl_size capacity) noexcept;
+
+				static sl_bool validateNodes(TABLE* table) noexcept;
+				
+				static sl_bool reallocNodes(TABLE* table, sl_size capacity) noexcept;
+				
+				static void expand(TABLE* table) noexcept;
+				
+				static void shrink(TABLE* table) noexcept;
+				
+				template <class KT, class VT>
+				static void free(HashTableStruct<KT, VT>* table) noexcept;
+				
+			};
+			
+		}
+	}
 	
 	template <class KT, class VT>
 	template <class KEY, class... VALUE_ARGS>
@@ -133,27 +140,27 @@ namespace slib
 	HashTable<KT, VT, HASH, KEY_EQUALS>::HashTable(sl_size capacityMinimum, sl_size capacityMaximum, const HASH& hash, const KEY_EQUALS& equals) noexcept
 	 : m_hash(hash), m_equals(equals)
 	{
-		_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), capacityMinimum, capacityMaximum);
+		priv::hash_table::Helper::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), capacityMinimum, capacityMaximum);
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	HashTable<KT, VT, HASH, KEY_EQUALS>::HashTable(HashTable<KT, VT, HASH, KEY_EQUALS>&& other) noexcept
 	: m_hash(Move(other.m_hash)), m_equals(Move(other.m_equals))
 	{
-		_priv_HashTable::move(reinterpret_cast<HashTableStructBase*>(&m_table), reinterpret_cast<HashTableStructBase*>(&(other.m_table)));
+		priv::hash_table::Helper::move(reinterpret_cast<HashTableStructBase*>(&m_table), reinterpret_cast<HashTableStructBase*>(&(other.m_table)));
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	HashTable<KT, VT, HASH, KEY_EQUALS>::~HashTable() noexcept
 	{
-		_priv_HashTable::free(&m_table);
+		priv::hash_table::Helper::free(&m_table);
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	HashTable<KT, VT, HASH, KEY_EQUALS>& HashTable<KT, VT, HASH, KEY_EQUALS>::operator=(HashTable<KT, VT, HASH, KEY_EQUALS>&& other) noexcept
 	{
-		_priv_HashTable::free(&m_table);
-		_priv_HashTable::move(reinterpret_cast<HashTableStructBase*>(&m_table), reinterpret_cast<HashTableStructBase*>(&(other.m_table)));
+		priv::hash_table::Helper::free(&m_table);
+		priv::hash_table::Helper::move(reinterpret_cast<HashTableStructBase*>(&m_table), reinterpret_cast<HashTableStructBase*>(&(other.m_table)));
 		m_hash = Move(other.m_hash);
 		m_equals = Move(other.m_equals);
 		return *this;
@@ -192,7 +199,7 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	SLIB_INLINE void HashTable<KT, VT, HASH, KEY_EQUALS>::setMinimumCapacity(sl_size capacity) noexcept
 	{
-		_priv_HashTable::setMinimumCapacity(reinterpret_cast<HashTableStructBase*>(&m_table), capacity);
+		priv::hash_table::Helper::setMinimumCapacity(reinterpret_cast<HashTableStructBase*>(&m_table), capacity);
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
@@ -204,7 +211,7 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	SLIB_INLINE void HashTable<KT, VT, HASH, KEY_EQUALS>::setMaximumCapacity(sl_size capacity) noexcept
 	{
-		_priv_HashTable::setMaximumCapacity(reinterpret_cast<HashTableStructBase*>(&m_table), capacity);
+		priv::hash_table::Helper::setMaximumCapacity(reinterpret_cast<HashTableStructBase*>(&m_table), capacity);
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
@@ -346,7 +353,7 @@ namespace slib
 	template <class KEY, class VALUE>
 	HashTableNode<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::put(KEY&& key, VALUE&& value, sl_bool* isInsertion) noexcept
 	{
-		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
+		if (!(priv::hash_table::Helper::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
 			return sl_null;
 		}
 		
@@ -373,7 +380,7 @@ namespace slib
 			node->hash = hash;
 			node->next = nodes[index];
 			nodes[index] = node;
-			_priv_HashTable::expand(reinterpret_cast<HashTableStructBase*>(&m_table));
+			priv::hash_table::Helper::expand(reinterpret_cast<HashTableStructBase*>(&m_table));
 			if (isInsertion) {
 				*isInsertion = sl_true;
 			}
@@ -401,7 +408,7 @@ namespace slib
 	template <class KEY, class... VALUE_ARGS>
 	HashTableNode<KT, VT>* HashTable<KT, VT, HASH, KEY_EQUALS>::add(KEY&& key, VALUE_ARGS&&... value_args) noexcept
 	{
-		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
+		if (!(priv::hash_table::Helper::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
 			return sl_null;
 		}
 		NODE* node = new NODE(Forward<KEY>(key), Forward<VALUE_ARGS>(value_args)...);
@@ -414,7 +421,7 @@ namespace slib
 			node->hash = hash;
 			node->next = nodes[index];
 			nodes[index] = node;
-			_priv_HashTable::expand(reinterpret_cast<HashTableStructBase*>(&m_table));
+			priv::hash_table::Helper::expand(reinterpret_cast<HashTableStructBase*>(&m_table));
 			return node;
 		}
 		return sl_null;
@@ -424,7 +431,7 @@ namespace slib
 	template <class KEY, class... VALUE_ARGS>
 	MapEmplaceReturn< HashTableNode<KT, VT> > HashTable<KT, VT, HASH, KEY_EQUALS>::emplace(KEY&& key, VALUE_ARGS&&... value_args) noexcept
 	{
-		if (!(_priv_HashTable::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
+		if (!(priv::hash_table::Helper::validateNodes(reinterpret_cast<HashTableStructBase*>(&m_table)))) {
 			return sl_null;
 		}
 		
@@ -447,7 +454,7 @@ namespace slib
 			node->hash = hash;
 			node->next = nodes[index];
 			nodes[index] = node;
-			_priv_HashTable::expand(reinterpret_cast<HashTableStructBase*>(&m_table));
+			priv::hash_table::Helper::expand(reinterpret_cast<HashTableStructBase*>(&m_table));
 			return MapEmplaceReturn< HashTableNode<KT, VT> >(sl_true, node);
 		}
 		return sl_null;
@@ -675,29 +682,29 @@ namespace slib
 			return 0;
 		}
 		sl_size count = m_table.count;
-		_priv_HashTable::free(&m_table);
-		_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
+		priv::hash_table::Helper::free(&m_table);
+		priv::hash_table::Helper::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), m_table.capacityMinimum, m_table.capacityMaximum);
 		return count;
 	}
 	
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	void HashTable<KT, VT, HASH, KEY_EQUALS>::shrink() noexcept
 	{
-		_priv_HashTable::shrink(reinterpret_cast<HashTableStructBase*>(&m_table));
+		priv::hash_table::Helper::shrink(reinterpret_cast<HashTableStructBase*>(&m_table));
 	}
 
 	template <class KT, class VT, class HASH, class KEY_EQUALS>
 	sl_bool HashTable<KT, VT, HASH, KEY_EQUALS>::copyFrom(const HashTable<KT, VT, HASH, KEY_EQUALS>& other) noexcept
 	{
-		_priv_HashTable::free(&m_table);
+		priv::hash_table::Helper::free(&m_table);
 		m_hash = other.m_hash;
 		m_equals = other.m_equals;
 		sl_size capacity = other.m_table.capacity;
-		_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), other.m_table.capacityMinimum, other.m_table.capacityMaximum);
+		priv::hash_table::Helper::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), other.m_table.capacityMinimum, other.m_table.capacityMaximum);
 		if (capacity == 0) {
 			return sl_true;
 		}
-		if (!(_priv_HashTable::reallocNodes(reinterpret_cast<HashTableStructBase*>(&m_table), capacity))) {
+		if (!(priv::hash_table::Helper::reallocNodes(reinterpret_cast<HashTableStructBase*>(&m_table), capacity))) {
 			return sl_false;
 		}
 		NODE** nodesTarget = m_table.nodes;
@@ -711,8 +718,8 @@ namespace slib
 					NODE* nodeTarget = new NODE(nodeSource->key, nodeSource->value);
 					*link = nodeTarget;
 					if (!nodeTarget) {
-						_priv_HashTable::free(&m_table);
-						_priv_HashTable::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), other.m_table.capacityMinimum, other.m_table.capacityMaximum);
+						priv::hash_table::Helper::free(&m_table);
+						priv::hash_table::Helper::initialize(reinterpret_cast<HashTableStructBase*>(&m_table), other.m_table.capacityMinimum, other.m_table.capacityMaximum);
 						return sl_false;
 					}
 					nodeTarget->hash = nodeSource->hash;
@@ -746,7 +753,7 @@ namespace slib
 	}
 	
 	template <class KT, class VT>
-	void _priv_HashTable::free(HashTableStruct<KT, VT>* table) noexcept
+	void priv::hash_table::Helper::free(HashTableStruct<KT, VT>* table) noexcept
 	{
 		HashTableNode<KT, VT>** nodes = table->nodes;
 		if (nodes) {

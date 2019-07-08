@@ -52,10 +52,16 @@ namespace slib
 	{
 		log(tag, content);
 	}
-
-	static String _priv_Log_getLineString(const String& tag, const String& content)
+	
+	namespace priv
 	{
-		return String::format("%s [%s] %s", Time::now(), tag, content);
+		namespace log
+		{
+			static String getLineString(const String& tag, const String& content)
+			{
+				return String::format("%s [%s] %s", Time::now(), tag, content);
+			}
+		}
 	}
 
 	FileLogger::FileLogger()
@@ -77,7 +83,7 @@ namespace slib
 		if (fileName.isEmpty()) {
 			return;
 		}
-		String s = _priv_Log_getLineString(tag, content) + "\r\n";
+		String s = priv::log::getLineString(tag, content) + "\r\n";
 		if (s.getLength() > 0) {
 			ObjectLocker lock(this);
 			File::appendAllTextUTF8(fileName, s);
@@ -108,7 +114,7 @@ namespace slib
 				::dlog_print(DLOG_INFO, tag.getData(), " ");
 			}
 #else
-			String s = _priv_Log_getLineString(tag, content);
+			String s = priv::log::getLineString(tag, content);
 			Console::println(s);
 #endif
 		}

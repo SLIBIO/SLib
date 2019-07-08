@@ -25,12 +25,16 @@
 #include "slib/core/hash_map.h"
 #include "slib/core/safe_static.h"
 
-#define DEFINE_CONTENT_TYPE(name, text) \
-	SLIB_STATIC_STRING(_g_szContentType_##name, text); \
-	const String& ContentTypes::name=_g_szContentType_##name;
-
 namespace slib
 {
+	
+#define DEFINE_CONTENT_TYPE(name, text) \
+	namespace priv { \
+		namespace content_type { \
+			SLIB_STATIC_STRING(g_##name, text); \
+		} \
+	} \
+	const String& ContentTypes::name=priv::content_type::g_##name;
 
 	DEFINE_CONTENT_TYPE(TextPlain, "text/plain")
 	DEFINE_CONTENT_TYPE(TextHtml, "text/html")
@@ -79,84 +83,84 @@ namespace slib
 	{
 		switch (type) {
 			case ContentType::TextPlain:
-				return _g_szContentType_TextPlain;
+				return priv::content_type::g_TextPlain;
 			case ContentType::TextHtml:
-				return _g_szContentType_TextHtml;
+				return priv::content_type::g_TextHtml;
 			case ContentType::TextHtml_Utf8:
-				return _g_szContentType_TextHtml_Utf8;
+				return priv::content_type::g_TextHtml_Utf8;
 			case ContentType::TextXml:
-				return _g_szContentType_TextXml;
+				return priv::content_type::g_TextXml;
 			case ContentType::TextCss:
-				return _g_szContentType_TextCss;
+				return priv::content_type::g_TextCss;
 			case ContentType::TextJavascript:
-				return _g_szContentType_TextJavascript;
+				return priv::content_type::g_TextJavascript;
 			case ContentType::TextRtf:
-				return _g_szContentType_TextRtf;
+				return priv::content_type::g_TextRtf;
 			case ContentType::TextCsv:
-				return _g_szContentType_TextCsv;
+				return priv::content_type::g_TextCsv;
 				
 			case ContentType::ImageGif:
-				return _g_szContentType_ImageGif;
+				return priv::content_type::g_ImageGif;
 			case ContentType::ImageJpeg:
-				return _g_szContentType_ImageJpeg;
+				return priv::content_type::g_ImageJpeg;
 			case ContentType::ImagePng:
-				return _g_szContentType_ImagePng;
+				return priv::content_type::g_ImagePng;
 			case ContentType::ImageBmp:
-				return _g_szContentType_ImageBmp;
+				return priv::content_type::g_ImageBmp;
 			case ContentType::ImageTiff:
-				return _g_szContentType_ImageTiff;
+				return priv::content_type::g_ImageTiff;
 				
 			case ContentType::AudioOgg:
-				return _g_szContentType_AudioOgg;
+				return priv::content_type::g_AudioOgg;
 			case ContentType::AudioOpus:
-				return _g_szContentType_AudioOpus;
+				return priv::content_type::g_AudioOpus;
 			case ContentType::AudioVorbis:
-				return _g_szContentType_AudioVorbis;
+				return priv::content_type::g_AudioVorbis;
 			case ContentType::AudioWebm:
-				return _g_szContentType_AudioWebm;
+				return priv::content_type::g_AudioWebm;
 			case ContentType::AudioMpeg:
-				return _g_szContentType_AudioMpeg;
+				return priv::content_type::g_AudioMpeg;
 			case ContentType::AudioMp4:
-				return _g_szContentType_AudioMp4;
+				return priv::content_type::g_AudioMp4;
 				
 			case ContentType::VideoAvi:
-				return _g_szContentType_VideoAvi;
+				return priv::content_type::g_VideoAvi;
 			case ContentType::VideoMpeg:
-				return _g_szContentType_VideoMpeg;
+				return priv::content_type::g_VideoMpeg;
 			case ContentType::VideoMp4:
-				return _g_szContentType_VideoMp4;
+				return priv::content_type::g_VideoMp4;
 			case ContentType::VideoOgg:
-				return _g_szContentType_VideoOgg;
+				return priv::content_type::g_VideoOgg;
 			case ContentType::VideoQuicktime:
-				return _g_szContentType_VideoQuicktime;
+				return priv::content_type::g_VideoQuicktime;
 			case ContentType::VideoWebm:
-				return _g_szContentType_VideoWebm;
+				return priv::content_type::g_VideoWebm;
 			case ContentType::VideoFlv:
-				return _g_szContentType_VideoFlv;
+				return priv::content_type::g_VideoFlv;
 			case ContentType::VideoMatroska:
-				return _g_szContentType_VideoMatroska;
+				return priv::content_type::g_VideoMatroska;
 				
 			case ContentType::OctetStream:
-				return _g_szContentType_OctetStream;
+				return priv::content_type::g_OctetStream;
 			case ContentType::Json:
-				return _g_szContentType_Json;
+				return priv::content_type::g_Json;
 			case ContentType::Pdf:
-				return _g_szContentType_Pdf;
+				return priv::content_type::g_Pdf;
 			case ContentType::FontWOFF:
-				return _g_szContentType_FontWOFF;
+				return priv::content_type::g_FontWOFF;
 			case ContentType::FontTTF:
-				return _g_szContentType_FontTTF;
+				return priv::content_type::g_FontTTF;
 			case ContentType::Zip:
-				return _g_szContentType_Zip;
+				return priv::content_type::g_Zip;
 			case ContentType::Gzip:
-				return _g_szContentType_Gzip;
+				return priv::content_type::g_Gzip;
 			case ContentType::Flash:
-				return _g_szContentType_Flash;
+				return priv::content_type::g_Flash;
 
 			case ContentType::WebForm:
-				return _g_szContentType_WebForm;
+				return priv::content_type::g_WebForm;
 			case ContentType::MultipartFormData:
-				return _g_szContentType_MultipartFormData;
+				return priv::content_type::g_MultipartFormData;
 			
 			default:
 				break;
@@ -164,65 +168,73 @@ namespace slib
 		return sl_null;
 	}
 
-	class _priv_ContentType_Mapping
+	namespace priv
 	{
-	public:
-		CHashMap<String, ContentType> maps;
-
-		_priv_ContentType_Mapping()
+		namespace content_type
 		{
-			maps.put("txt", ContentType::TextPlain);
-			maps.put("htm", ContentType::TextHtml);
-			maps.put("html", ContentType::TextHtml);
-			maps.put("xml", ContentType::TextXml);
-			maps.put("css", ContentType::TextCss);
-			maps.put("js", ContentType::TextJavascript);
-			maps.put("rtf", ContentType::TextRtf);
-			maps.put("csv", ContentType::TextCsv);
+			class Mapping
+			{
+			public:
+				CHashMap<String, ContentType> maps;
+				
+			public:
+				Mapping()
+				{
+					maps.put("txt", ContentType::TextPlain);
+					maps.put("htm", ContentType::TextHtml);
+					maps.put("html", ContentType::TextHtml);
+					maps.put("xml", ContentType::TextXml);
+					maps.put("css", ContentType::TextCss);
+					maps.put("js", ContentType::TextJavascript);
+					maps.put("rtf", ContentType::TextRtf);
+					maps.put("csv", ContentType::TextCsv);
+					
+					maps.put("gif", ContentType::ImageGif);
+					maps.put("jpeg", ContentType::ImageJpeg);
+					maps.put("jpg", ContentType::ImageJpeg);
+					maps.put("png", ContentType::ImagePng);
+					maps.put("bmp", ContentType::ImageBmp);
+					maps.put("tiff", ContentType::ImageTiff);
+					maps.put("tif", ContentType::ImageTiff);
+					
+					maps.put("oga", ContentType::AudioOgg);
+					maps.put("opus", ContentType::AudioOpus);
+					maps.put("weba", ContentType::AudioWebm);
+					maps.put("mpa", ContentType::AudioMpeg);
+					maps.put("mp1", ContentType::AudioMpeg);
+					maps.put("mp2", ContentType::AudioMpeg);
+					maps.put("mp3", ContentType::AudioMpeg);
+					maps.put("m4a", ContentType::AudioMp4);
+					maps.put("aac", ContentType::AudioMp4);
+					
+					maps.put("avi", ContentType::VideoAvi);
+					maps.put("mpg", ContentType::VideoMpeg);
+					maps.put("mpeg", ContentType::VideoMpeg);
+					maps.put("mpv", ContentType::VideoMpeg);
+					maps.put("mp4", ContentType::VideoMp4);
+					maps.put("m4v", ContentType::VideoMp4);
+					maps.put("ogg", ContentType::VideoOgg);
+					maps.put("ogv", ContentType::VideoOgg);
+					maps.put("webm", ContentType::VideoWebm);
+					maps.put("flv", ContentType::VideoFlv);
+					maps.put("mkv", ContentType::VideoMatroska);
+					
+					maps.put("json", ContentType::Json);
+					maps.put("pdf", ContentType::Pdf);
+					maps.put("woff", ContentType::FontWOFF);
+					maps.put("ttf", ContentType::FontTTF);
+					maps.put("zip", ContentType::Zip);
+					maps.put("gz", ContentType::Gzip);
+					maps.put("swf", ContentType::Flash);
+				}
+			};
 
-			maps.put("gif", ContentType::ImageGif);
-			maps.put("jpeg", ContentType::ImageJpeg);
-			maps.put("jpg", ContentType::ImageJpeg);
-			maps.put("png", ContentType::ImagePng);
-			maps.put("bmp", ContentType::ImageBmp);
-			maps.put("tiff", ContentType::ImageTiff);
-			maps.put("tif", ContentType::ImageTiff);
-
-			maps.put("oga", ContentType::AudioOgg);
-			maps.put("opus", ContentType::AudioOpus);
-			maps.put("weba", ContentType::AudioWebm);
-			maps.put("mpa", ContentType::AudioMpeg);
-			maps.put("mp1", ContentType::AudioMpeg);
-			maps.put("mp2", ContentType::AudioMpeg);
-			maps.put("mp3", ContentType::AudioMpeg);
-			maps.put("m4a", ContentType::AudioMp4);
-			maps.put("aac", ContentType::AudioMp4);
-
-			maps.put("avi", ContentType::VideoAvi);
-			maps.put("mpg", ContentType::VideoMpeg);
-			maps.put("mpeg", ContentType::VideoMpeg);
-			maps.put("mpv", ContentType::VideoMpeg);
-			maps.put("mp4", ContentType::VideoMp4);
-			maps.put("m4v", ContentType::VideoMp4);
-			maps.put("ogg", ContentType::VideoOgg);
-			maps.put("ogv", ContentType::VideoOgg);
-			maps.put("webm", ContentType::VideoWebm);
-			maps.put("flv", ContentType::VideoFlv);
-			maps.put("mkv", ContentType::VideoMatroska);
-
-			maps.put("json", ContentType::Json);
-			maps.put("pdf", ContentType::Pdf);
-			maps.put("woff", ContentType::FontWOFF);
-			maps.put("ttf", ContentType::FontTTF);
-			maps.put("zip", ContentType::Zip);
-			maps.put("gz", ContentType::Gzip);
-			maps.put("swf", ContentType::Flash);
 		}
-	};
+	}
 
 	ContentType ContentTypes::getFromFileExtension(const String& fileExt)
 	{
-		SLIB_SAFE_STATIC(_priv_ContentType_Mapping, t)
+		SLIB_SAFE_STATIC(priv::content_type::Mapping, t)
 		if (SLIB_SAFE_STATIC_CHECK_FREED(t)) {
 			return ContentType::Unknown;
 		}

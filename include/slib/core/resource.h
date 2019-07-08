@@ -100,28 +100,28 @@ if (locale == localeSource || slib::Locale(locale.getLanguage()) == localeSource
 	slib::List<slib::String> getAllNames();
 
 #define SLIB_DEFINE_RESOURCE_MAP_BEGIN(TYPE) \
-	typedef TYPE (*_getter_type)(); \
-	class  _priv_ResourceMap { \
+	typedef TYPE (*GETTER_TYPE)(); \
+	class  ResourceMap { \
 	public: \
-		slib::CHashMap< slib::String, _getter_type > map; \
+		slib::CHashMap< slib::String, GETTER_TYPE > map; \
 	public: \
-		 _priv_ResourceMap() {
+		 ResourceMap() {
 
 #define SLIB_DEFINE_RESOURCE_MAP_ITEM(NAME) \
 			{ \
 				SLIB_STATIC_STRING(_key_##NAME, #NAME); \
-				_getter_type f = &(NAME::get); \
+				GETTER_TYPE f = &(NAME::get); \
 				map.put_NoLock(_key_##NAME, f); \
 			}
 
 #define SLIB_DEFINE_RESOURCE_MAP_END(TYPE, DEFAULT_VALUE) \
 		} \
 	}; \
-	SLIB_SAFE_STATIC_GETTER(_priv_ResourceMap, _get_resource_map); \
+	SLIB_SAFE_STATIC_GETTER(ResourceMap, getResourceMap); \
 	TYPE get(const slib::String& name) { \
-		 _priv_ResourceMap* map = _get_resource_map(); \
+		 ResourceMap* map = getResourceMap(); \
 		if (map) { \
-			_getter_type getter; \
+			GETTER_TYPE getter; \
 			if (map->map.get_NoLock(name, &getter)) { \
 				return getter(); \
 			} \
@@ -129,7 +129,7 @@ if (locale == localeSource || slib::Locale(locale.getLanguage()) == localeSource
 		return DEFAULT_VALUE; \
 	} \
 	slib::List<slib::String> getAllNames() { \
-		_priv_ResourceMap* map = _get_resource_map(); \
+		ResourceMap* map = getResourceMap(); \
 		if (map) { \
 			return map->map.getAllKeys_NoLock(); \
 		} \
@@ -142,32 +142,32 @@ if (locale == localeSource || slib::Locale(locale.getLanguage()) == localeSource
 	slib::List<slib::String> getAllNames();
 
 #define SLIB_DEFINE_LOCALIZED_RESOURCE_MAP_BEGIN(TYPE) \
-	typedef TYPE (*_getter_type)(); \
-	typedef TYPE (*_getter_locale_type)(const slib::Locale& locale); \
-	class  _priv_ResourceMap { \
+	typedef TYPE (*GETTER_TYPE)(); \
+	typedef TYPE (*GETTER_LOCALE_TYPE)(const slib::Locale& locale); \
+	class  ResourceMap { \
 	public: \
-		slib::CHashMap< slib::String, _getter_type > map; \
-		slib::CHashMap< slib::String, _getter_locale_type > map_locale; \
+		slib::CHashMap< slib::String, GETTER_TYPE > map; \
+		slib::CHashMap< slib::String, GETTER_LOCALE_TYPE > map_locale; \
 	public: \
-		_priv_ResourceMap() {
+		ResourceMap() {
 
 #define SLIB_DEFINE_LOCALIZED_RESOURCE_MAP_ITEM(NAME) \
 			{ \
 				SLIB_STATIC_STRING(_key_##NAME, #NAME); \
-				_getter_type f1 = &(NAME::get); \
+				GETTER_TYPE f1 = &(NAME::get); \
 				map.put_NoLock(_key_##NAME, f1); \
-				_getter_locale_type f2 = &(NAME::get); \
+				GETTER_LOCALE_TYPE f2 = &(NAME::get); \
 				map_locale.put_NoLock(_key_##NAME, f2); \
 			}
 
 #define SLIB_DEFINE_LOCALIZED_RESOURCE_MAP_END(TYPE, DEFAULT_VALUE) \
 		} \
 	}; \
-	SLIB_SAFE_STATIC_GETTER(_priv_ResourceMap, _get_resource_map); \
+	SLIB_SAFE_STATIC_GETTER(ResourceMap, getResourceMap); \
 	TYPE get(const slib::String& name, const slib::Locale& locale) { \
-		_priv_ResourceMap* map = _get_resource_map(); \
+		ResourceMap* map = getResourceMap(); \
 		if (map) { \
-			_getter_locale_type getter; \
+			GETTER_LOCALE_TYPE getter; \
 			if (map->map_locale.get_NoLock(name, &getter)) { \
 				return getter(locale); \
 			} \
@@ -175,9 +175,9 @@ if (locale == localeSource || slib::Locale(locale.getLanguage()) == localeSource
 		return DEFAULT_VALUE; \
 	} \
 	TYPE get(const slib::String& name) { \
-		_priv_ResourceMap* map = _get_resource_map(); \
+		ResourceMap* map = getResourceMap(); \
 		if (map) { \
-			_getter_type getter; \
+			GETTER_TYPE getter; \
 			if (map->map.get_NoLock(name, &getter)) { \
 				return getter(); \
 			} \
@@ -185,7 +185,7 @@ if (locale == localeSource || slib::Locale(locale.getLanguage()) == localeSource
 		return DEFAULT_VALUE; \
 	} \
 	slib::List<slib::String> getAllNames() { \
-		_priv_ResourceMap* map = _get_resource_map(); \
+		ResourceMap* map = getResourceMap(); \
 		if (map) { \
 			return map->map.getAllKeys_NoLock(); \
 		} \

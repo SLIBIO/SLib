@@ -34,29 +34,599 @@
 namespace slib
 {
 
-	static void _logJniError(const String& text)
+	namespace priv
 	{
-		LogError("SLIB_JNI", text);
+		namespace java
+		{
+
+			static void logJniError(const String& text)
+			{
+				LogError("SLIB_JNI", text);
+			}
+
+
+			JavaVM* g_jvmShared = sl_null;
+			SLIB_THREAD JNIEnv* g_envCurrent = sl_null;
+
+
+			class SharedContext
+			{
+			public:
+				CHashMap<String, JniClass> classes;
+				
+				CList<JClass*> singleton_classes;
+				CList<JMethod*> singleton_methods;
+				CList<JStaticMethod*> singleton_static_methods;
+				CList<JField*> singleton_fields;
+				CList<JStaticField*> singleton_static_fields;
+				CList<JNativeMethod*> native_methods;
+			};
+
+			SLIB_SAFE_STATIC_GETTER(SharedContext, getSharedContext)
+
+
+			SLIB_JNI_BEGIN_CLASS(JInputStream, "java/io/InputStream")
+				SLIB_JNI_METHOD(read, "read", "([B)I");
+				SLIB_JNI_METHOD(close, "close", "()V");
+			SLIB_JNI_END_CLASS
+
+
+			JClass::JClass(const char* name)
+			{
+				this->name = name;
+				SharedContext* shared = getSharedContext();
+				if (shared) {
+					shared->singleton_classes.add(this);
+				}
+			}
+
+			JMethod::JMethod(JClass* gcls, const char* name, const char* sig)
+			{
+				this->gcls = gcls;
+				this->name = name;
+				this->sig = sig;
+				this->cls = sl_null;
+				this->id = sl_null;
+				SharedContext* shared = getSharedContext();
+				if (shared) {
+					shared->singleton_methods.add(this);
+				}
+			}
+
+			jobject JMethod::newObject(jobject _null, ...)
+			{
+				va_list args;
+				va_start(args, _null);
+				jobject ret = sl_null;
+				if (cls && id) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						ret = env->NewObjectV(cls, id, args);
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						}
+					}
+				}
+				va_end(args);
+				return ret;
+			}
+
+			void JMethod::call(jobject _this, ...)
+			{
+				va_list args;
+				va_start(args, _this);
+				if (cls && id && _this) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						env->CallVoidMethodV(_this, id, args);
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						}
+					}
+				}
+				va_end(args);
+			}
+
+			String JMethod::callString(jobject _this, ...)
+			{
+				va_list args;
+				va_start(args, _this);
+				String ret;
+				if (cls && id && _this) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						JniLocal<jstring> str((jstring)(env->CallObjectMethodV(_this, id, args)));
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						} else {
+							if (str.isNotNull()) {
+								ret = Jni::getString(str);
+							}
+						}
+					}
+				}
+				va_end(args);
+				return ret;
+			}
+
+			String16 JMethod::callString16(jobject _this, ...)
+			{
+				va_list args;
+				va_start(args, _this);
+				String16 ret;
+				if (cls && id && _this) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						JniLocal<jstring> str((jstring)(env->CallObjectMethodV(_this, id, args)));
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						} else {
+							if (str.isNotNull()) {
+								ret = Jni::getString16(str);
+							}
+						}
+					}
+				}
+				va_end(args);
+				return ret;
+			}
+
+			JStaticMethod::JStaticMethod(JClass* gcls, const char* name, const char* sig)
+			{
+				this->gcls = gcls;
+				this->name = name;
+				this->sig = sig;
+				this->cls = sl_null;
+				this->id = sl_null;
+				SharedContext* shared = getSharedContext();
+				if (shared) {
+					shared->singleton_static_methods.add(this);
+				}
+			}
+
+			void JStaticMethod::call(jobject _null, ...)
+			{
+				va_list args;
+				va_start(args, _null);
+				if (cls && id) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						env->CallStaticVoidMethodV(cls, id, args);
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						}
+					}
+				}
+				va_end(args);
+			}
+
+			String JStaticMethod::callString(jobject _null, ...)
+			{
+				va_list args;
+				va_start(args, _null);
+				String ret;
+				if (cls && id) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						JniLocal<jstring> str((jstring)(env->CallStaticObjectMethodV(cls, id, args)));
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						} else {
+							if (str.isNotNull()) {
+								ret = Jni::getString(str);
+							}
+						}
+					}
+				}
+				va_end(args);
+				return ret;
+			}
+
+			String16 JStaticMethod::callString16(jobject _null, ...)
+			{
+				va_list args;
+				va_start(args, _null);
+				String16 ret;
+				if (cls && id) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						JniLocal<jstring> str((jstring)(env->CallStaticObjectMethodV(cls, id, args)));
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						} else {
+							if (str.isNotNull()) {
+								ret = Jni::getString16(str);
+							}
+						}
+					}
+				}
+				va_end(args);
+				return ret;
+			}
+
+#define DEFINE_JMETHOD_MEMBERS(TYPE, NAME) \
+			TYPE JMethod::call##NAME(jobject _this, ...) \
+			{ \
+				va_list args; \
+				va_start(args, _this); \
+				TYPE ret = 0; \
+				if (cls && id && _this) { \
+					JNIEnv* env = Jni::getCurrent(); \
+					if (env) { \
+						ret = env->Call##NAME##MethodV(_this, id, args); \
+						if (Jni::checkException()) { \
+							Jni::printException(); \
+							Jni::clearException(); \
+						} \
+					} \
+				} \
+				return ret;\
+			} \
+			TYPE JStaticMethod::call##NAME(jobject _null, ...) \
+			{ \
+				va_list args; \
+				va_start(args, _null); \
+				TYPE ret = 0; \
+				if (cls && id) { \
+					JNIEnv* env = Jni::getCurrent(); \
+					if (env) { \
+						ret = env->CallStatic##NAME##MethodV(cls, id, args); \
+						if (Jni::checkException()) { \
+							Jni::printException(); \
+							Jni::clearException(); \
+						} \
+					} \
+				} \
+				return ret;\
+			}
+
+			DEFINE_JMETHOD_MEMBERS(jobject, Object)
+			DEFINE_JMETHOD_MEMBERS(jboolean, Boolean)
+			DEFINE_JMETHOD_MEMBERS(jbyte, Byte)
+			DEFINE_JMETHOD_MEMBERS(jchar, Char)
+			DEFINE_JMETHOD_MEMBERS(jshort, Short)
+			DEFINE_JMETHOD_MEMBERS(jint, Int)
+			DEFINE_JMETHOD_MEMBERS(jlong, Long)
+			DEFINE_JMETHOD_MEMBERS(jfloat, Float)
+			DEFINE_JMETHOD_MEMBERS(jdouble, Double)
+
+			JField::JField(JClass* gcls, const char* name, const char* sig)
+			{
+				this->gcls = gcls;
+				this->name = name;
+				this->sig = sig;
+				this->cls = sl_null;
+				this->id = sl_null;
+				SharedContext* shared = getSharedContext();
+				if (shared) {
+					shared->singleton_fields.add(this);
+				}
+			}
+
+			String JField::getString(jobject _this)
+			{
+				String ret;
+				if (cls && id) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						JniLocal<jstring> str((jstring)(env->GetObjectField(_this, id)));
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						} else {
+							if (str.isNotNull()) {
+								ret = Jni::getString(str);
+							}
+						}
+					}
+				}
+				return ret;
+			}
+
+			String16 JField::getString16(jobject _this)
+			{
+				String16 ret;
+				if (cls && id) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						JniLocal<jstring> str((jstring)(env->GetObjectField(_this, id)));
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						} else {
+							if (str.isNotNull()) {
+								ret = Jni::getString16(str);
+							}
+						}
+					}
+				}
+				return ret;
+			}
+
+			void JField::setString(jobject _this, const String& value)
+			{
+				if (cls && id && _this) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						JniLocal<jstring> str(Jni::getJniString(value));
+						env->SetObjectField(_this, id, str);
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						}
+					}
+				}
+			}
+
+			void JField::setString16(jobject _this, const String16& value)
+			{
+				if (cls && id && _this) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						JniLocal<jstring> str(Jni::getJniString16(value));
+						env->SetObjectField(_this, id, str);
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						}
+					}
+				}
+			}
+
+			JStaticField::JStaticField(JClass* gcls, const char* name, const char* sig)
+			{
+				this->gcls = gcls;
+				this->name = name;
+				this->sig = sig;
+				this->cls = sl_null;
+				this->id = sl_null;
+				SharedContext* shared = getSharedContext();
+				if (shared) {
+					shared->singleton_static_fields.add(this);
+				}
+			}
+
+			String JStaticField::getString(jobject _null)
+			{
+				String ret;
+				if (cls && id) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						JniLocal<jstring> str((jstring)(env->GetStaticObjectField(cls, id)));
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						} else {
+							if (str.isNotNull()) {
+								ret = Jni::getString(str);
+							}
+						}
+					}
+				}
+				return ret;
+			}
+
+			String16 JStaticField::getString16(jobject _null)
+			{
+				String16 ret;
+				if (cls && id) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						JniLocal<jstring> str((jstring)(env->GetStaticObjectField(cls, id)));
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						} else {
+							if (str.isNotNull()) {
+								ret = Jni::getString16(str);
+							}
+						}
+					}
+				}
+				return ret;
+			}
+
+			void JStaticField::setString(jobject _null, const String& value)
+			{
+				if (cls && id) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						JniLocal<jstring> str(Jni::getJniString(value));
+						env->SetObjectField(cls, id, str);
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						}
+					}
+				}
+			}
+
+			void JStaticField::setString16(jobject _null, const String16& value)
+			{
+				if (cls && id) {
+					JNIEnv* env = Jni::getCurrent();
+					if (env) {
+						JniLocal<jstring> str(Jni::getJniString16(value));
+						env->SetObjectField(cls, id, str);
+						if (Jni::checkException()) {
+							Jni::printException();
+							Jni::clearException();
+						}
+					}
+				}
+			}
+
+#define DEFINE_JFIELD_MEMBERS(TYPE, NAME) \
+			TYPE JField::get##NAME(jobject _this) \
+			{ \
+				TYPE ret = 0; \
+				if (cls && id && _this) { \
+					JNIEnv* env = Jni::getCurrent(); \
+					if (env) { \
+						ret = env->Get##NAME##Field(_this, id); \
+						if (Jni::checkException()) { \
+							Jni::printException(); \
+							Jni::clearException(); \
+						} \
+					} \
+				} \
+				return ret; \
+			} \
+			void JField::set##NAME(jobject _this, TYPE value) \
+			{ \
+				if (cls && id && _this) { \
+					JNIEnv* env = Jni::getCurrent(); \
+					if (env) { \
+						env->Set##NAME##Field(_this, id, value); \
+						if (Jni::checkException()) { \
+							Jni::printException(); \
+							Jni::clearException(); \
+						} \
+					} \
+				} \
+			} \
+			TYPE JStaticField::get##NAME(jobject _null) \
+			{ \
+				TYPE ret = 0; \
+				if (cls && id) { \
+					JNIEnv* env = Jni::getCurrent(); \
+					if (env) { \
+						ret = env->GetStatic##NAME##Field(cls, id); \
+						if (Jni::checkException()) { \
+							Jni::printException(); \
+							Jni::clearException(); \
+						} \
+					} \
+				} \
+				return ret; \
+			} \
+			void JStaticField::set##NAME(jobject _null, TYPE value) \
+			{ \
+				if (cls && id) { \
+					JNIEnv* env = Jni::getCurrent(); \
+					if (env) { \
+						env->SetStatic##NAME##Field(cls, id, value); \
+						if (Jni::checkException()) { \
+							Jni::printException(); \
+							Jni::clearException(); \
+						} \
+					} \
+				} \
+			}
+
+			DEFINE_JFIELD_MEMBERS(jobject, Object)
+			DEFINE_JFIELD_MEMBERS(jboolean, Boolean)
+			DEFINE_JFIELD_MEMBERS(jbyte, Byte)
+			DEFINE_JFIELD_MEMBERS(jchar, Char)
+			DEFINE_JFIELD_MEMBERS(jshort, Short)
+			DEFINE_JFIELD_MEMBERS(jint, Int)
+			DEFINE_JFIELD_MEMBERS(jlong, Long)
+			DEFINE_JFIELD_MEMBERS(jfloat, Float)
+			DEFINE_JFIELD_MEMBERS(jdouble, Double)
+
+#define DEFINE_JFIELD_TYPE_MEMBERS(TYPE, NAME, SIG) \
+			J##NAME##Field::J##NAME##Field(JClass* gcls, const char* name) \
+				: JField(gcls, name, SIG) \
+			{ \
+			} \
+			TYPE J##NAME##Field::get(jobject _this) \
+			{ \
+				return get##NAME(_this); \
+			} \
+			void J##NAME##Field::set(jobject _this, TYPE value) \
+			{ \
+				set##NAME(_this, value); \
+			} \
+
+			DEFINE_JFIELD_TYPE_MEMBERS(jboolean, Boolean, "Z")
+			DEFINE_JFIELD_TYPE_MEMBERS(sl_int8, Byte, "B")
+			DEFINE_JFIELD_TYPE_MEMBERS(sl_uint16, Char, "C")
+			DEFINE_JFIELD_TYPE_MEMBERS(sl_int16, Short, "S")
+			DEFINE_JFIELD_TYPE_MEMBERS(sl_int32, Int, "I")
+			DEFINE_JFIELD_TYPE_MEMBERS(sl_int64, Long, "J")
+			DEFINE_JFIELD_TYPE_MEMBERS(float, Float, "F")
+			DEFINE_JFIELD_TYPE_MEMBERS(double, Double, "D")
+			DEFINE_JFIELD_TYPE_MEMBERS(String, String, "Ljava/lang/String;")
+			DEFINE_JFIELD_TYPE_MEMBERS(String16, String16, "Ljava/lang/String;")
+
+			JObjectField::JObjectField(JClass* gcls, const char* name, const char* sig)
+				: JField(gcls, name, sig)
+			{
+			}
+
+			jobject JObjectField::get(jobject _this)
+			{
+				return getObject(_this);
+			}
+
+			void JObjectField::set(jobject _this, jobject value)
+			{
+				setObject(_this, value);
+			}
+
+			JStaticObjectField::JStaticObjectField(JClass* gcls, const char* name, const char* sig)
+				: JStaticField(gcls, name, sig)
+			{
+			}
+
+			jobject JStaticObjectField::get()
+			{
+				return getObject(sl_null);
+			}
+
+			void JStaticObjectField::set(jobject value)
+			{
+				setObject(sl_null, value);
+			}
+
+#define DEFINE_JSTATICFIELD_TYPE_MEMBERS(TYPE, NAME, SIG) \
+			JStatic##NAME##Field::JStatic##NAME##Field(JClass* gcls, const char* name) \
+				: JStaticField(gcls, name, SIG) \
+			{ \
+			} \
+			TYPE JStatic##NAME##Field::get() \
+			{ \
+				return get##NAME(sl_null); \
+			} \
+			void JStatic##NAME##Field::set(TYPE value) \
+			{ \
+				set##NAME(sl_null, value); \
+			} \
+
+			DEFINE_JSTATICFIELD_TYPE_MEMBERS(jboolean, Boolean, "Z")
+			DEFINE_JSTATICFIELD_TYPE_MEMBERS(sl_int8, Byte, "B")
+			DEFINE_JSTATICFIELD_TYPE_MEMBERS(sl_uint16, Char, "C")
+			DEFINE_JSTATICFIELD_TYPE_MEMBERS(sl_int16, Short, "S")
+			DEFINE_JSTATICFIELD_TYPE_MEMBERS(sl_int32, Int, "I")
+			DEFINE_JSTATICFIELD_TYPE_MEMBERS(sl_int64, Long, "J")
+			DEFINE_JSTATICFIELD_TYPE_MEMBERS(float, Float, "F")
+			DEFINE_JSTATICFIELD_TYPE_MEMBERS(double, Double, "D")
+			DEFINE_JSTATICFIELD_TYPE_MEMBERS(String, String, "Ljava/lang/String;")
+			DEFINE_JSTATICFIELD_TYPE_MEMBERS(String16, String16, "Ljava/lang/String;")
+
+			JNativeMethod::JNativeMethod(JClass* gcls, const char* name, const char* sig, const void* fn)
+			{
+				this->gcls = gcls;
+				this->name = name;
+				this->sig = sig;
+				this->fn = fn;
+				SharedContext* shared = getSharedContext();
+				if (shared) {
+					shared->native_methods.add(this);
+				}
+			}
+
+		}
 	}
 
-	JavaVM* _g_jvm_shared = sl_null;
-
-	SLIB_THREAD JNIEnv* _gt_jniCurrent = sl_null;
-
-	class _priv_Jni_Shared
-	{
-	public:
-		CHashMap<String, JniClass> classes;
-		
-		CList<_priv_JniSingletonClass*> singleton_classes;
-		CList<_priv_JniSingletonMethod*> singleton_methods;
-		CList<_priv_JniSingletonStaticMethod*> singleton_static_methods;
-		CList<_priv_JniSingletonField*> singleton_fields;
-		CList<_priv_JniSingletonStaticField*> singleton_static_fields;
-		CList<_priv_JniNativeMethod*> native_methods;
-	};
-
-	SLIB_SAFE_STATIC_GETTER(_priv_Jni_Shared, _priv_Jni_getShared)
+	using namespace priv::java;
 
 //#define JNI_LOG_INIT_LOAD
 
@@ -69,16 +639,16 @@ namespace slib
 			flagInit = sl_true;
 			Jni::setSharedJVM(jvm);
 
-			_priv_Jni_Shared* shared = _priv_Jni_getShared();
+			SharedContext* shared = getSharedContext();
 			if (!shared) {
 				return;
 			}
 
 			// singleton classes
 			{
-				ListLocker< _priv_JniSingletonClass* > list(shared->singleton_classes);
+				ListLocker< JClass* > list(shared->singleton_classes);
 				for (sl_size i = 0; i < list.count; i++) {
-					_priv_JniSingletonClass* obj = list[i];
+					JClass* obj = list[i];
 #if defined(JNI_LOG_INIT_LOAD)
 					Log("LOADING JAVA CLASS", obj->name);
 #endif
@@ -92,9 +662,9 @@ namespace slib
 
 			// singleton fields
 			{
-				ListLocker< _priv_JniSingletonField* > list(shared->singleton_fields);
+				ListLocker< JField* > list(shared->singleton_fields);
 				for (sl_size i = 0; i < list.count; i++) {
-					_priv_JniSingletonField* obj = list[i];
+					JField* obj = list[i];
 					JniClass cls = obj->gcls->cls;
 					if (cls.isNotNull()) {
 #if defined(JNI_LOG_INIT_LOAD)
@@ -110,9 +680,9 @@ namespace slib
 			}
 			// singleton static fields
 			{
-				ListLocker< _priv_JniSingletonStaticField* > list(shared->singleton_static_fields);
+				ListLocker< JStaticField* > list(shared->singleton_static_fields);
 				for (sl_size i = 0; i < list.count; i++) {
-					_priv_JniSingletonStaticField* obj = list[i];
+					JStaticField* obj = list[i];
 					JniClass cls = obj->gcls->cls;
 					if (cls.isNotNull()) {
 #if defined(JNI_LOG_INIT_LOAD)
@@ -128,9 +698,9 @@ namespace slib
 			}
 			// singleton methods
 			{
-				ListLocker< _priv_JniSingletonMethod* > list(shared->singleton_methods);
+				ListLocker< JMethod* > list(shared->singleton_methods);
 				for (sl_size i = 0; i < list.count; i++) {
-					_priv_JniSingletonMethod* obj = list[i];
+					JMethod* obj = list[i];
 					JniClass cls = obj->gcls->cls;
 					if (cls.isNotNull()) {
 #if defined(JNI_LOG_INIT_LOAD)
@@ -146,9 +716,9 @@ namespace slib
 			}
 			// singleton static methods
 			{
-				ListLocker< _priv_JniSingletonStaticMethod* > list(shared->singleton_static_methods);
+				ListLocker< JStaticMethod* > list(shared->singleton_static_methods);
 				for (sl_size i = 0; i < list.count; i++) {
-					_priv_JniSingletonStaticMethod* obj = list[i];
+					JStaticMethod* obj = list[i];
 					JniClass cls = obj->gcls->cls;
 					if (cls.isNotNull()) {
 #if defined(JNI_LOG_INIT_LOAD)
@@ -164,9 +734,9 @@ namespace slib
 			}
 			// native methods
 			{
-				ListLocker< _priv_JniNativeMethod* > list(shared->native_methods);
+				ListLocker< JNativeMethod* > list(shared->native_methods);
 				for (sl_size i = 0; i < list.count; i++) {
-					_priv_JniNativeMethod* obj = list[i];
+					JNativeMethod* obj = list[i];
 					JniClass cls = obj->gcls->cls;
 					if (cls.isNotNull()) {
 #if defined(JNI_LOG_INIT_LOAD)
@@ -183,19 +753,19 @@ namespace slib
 
 	void Jni::setSharedJVM(JavaVM *jvm)
 	{
-		if (_g_jvm_shared != jvm) {
-			_g_jvm_shared = jvm;
+		if (g_jvmShared != jvm) {
+			g_jvmShared = jvm;
 		}
 	}
 
 	JavaVM* Jni::getSharedJVM()
 	{
-		return _g_jvm_shared;
+		return g_jvmShared;
 	}
 
 	JNIEnv* Jni::getCurrent()
 	{
-		JNIEnv *env = _gt_jniCurrent;
+		JNIEnv *env = g_envCurrent;
 		if (! env) {
 			env = Jni::attachThread();
 		}
@@ -204,7 +774,7 @@ namespace slib
 
 	void Jni::setCurrent(JNIEnv* jni)
 	{
-		_gt_jniCurrent = jni;
+		g_envCurrent = jni;
 	}
 
 	JNIEnv* Jni::attachThread(JavaVM* jvm)
@@ -221,7 +791,7 @@ namespace slib
 				jint res = jvm->AttachCurrentThread((void**)&env, sl_null);
 #endif
 				if ((res < 0) || !env) {
-					_logJniError("Failed to attach thread");
+					logJniError("Failed to attach thread");
 				}
 				Jni::setCurrent(env);
 			}
@@ -248,7 +818,7 @@ namespace slib
 		if (env) {
 			JniLocal<jclass> cls = env->FindClass(className);
 			if (Jni::checkException()) {
-				_logJniError(String("Exception occurred while finding class: ") + className);
+				logJniError(String("Exception occurred while finding class: ") + className);
 				Jni::printException();
 				Jni::clearException();
 			} else {
@@ -262,7 +832,7 @@ namespace slib
 
 	JniClass Jni::getClass(const String& className)
 	{
-		_priv_Jni_Shared* shared = _priv_Jni_getShared();
+		SharedContext* shared = getSharedContext();
 		if (!shared) {
 			return sl_null;
 		}
@@ -279,7 +849,7 @@ namespace slib
 
 	void Jni::registerClass(const String& className, jclass cls)
 	{
-		_priv_Jni_Shared* shared = _priv_Jni_getShared();
+		SharedContext* shared = getSharedContext();
 		if (shared) {
 			shared->classes.put(className, cls);
 		}
@@ -287,7 +857,7 @@ namespace slib
 
 	void Jni::unregisterClass(const String& className)
 	{
-		_priv_Jni_Shared* shared = _priv_Jni_getShared();
+		SharedContext* shared = getSharedContext();
 		if (shared) {
 			shared->classes.remove(className);
 		}
@@ -624,16 +1194,10 @@ namespace slib
 		}
 	}
 
-
-	SLIB_JNI_BEGIN_CLASS(_priv_JniInputStream, "java/io/InputStream")
-		SLIB_JNI_METHOD(read, "read", "([B)I");
-		SLIB_JNI_METHOD(close, "close", "()V");
-	SLIB_JNI_END_CLASS
-
 	sl_int32 Jni::readFromInputStream(jobject stream, jbyteArray array)
 	{
 		if (stream && array) {
-			sl_int32 n = _priv_JniInputStream::read.callInt(stream, array);
+			sl_int32 n = JInputStream::read.callInt(stream, array);
 			if (n < 0) {
 				n = 0;
 			}
@@ -650,7 +1214,7 @@ namespace slib
 	void Jni::closeInputStream(jobject stream)
 	{
 		if (stream) {
-			_priv_JniInputStream::close.call(stream);
+			JInputStream::close.call(stream);
 			if (Jni::checkException()) {
 				Jni::printException();
 				Jni::clearException();
@@ -806,7 +1370,7 @@ namespace slib
 					ret = env->Call##NAME##MethodV(_this, method, args); \
 				} \
 			} else { \
-				_logJniError(String("Failed to get method id - ") + name + " " + sig); \
+				logJniError(String("Failed to get method id - ") + name + " " + sig); \
 			} \
 		} \
 		va_end(args); \
@@ -840,46 +1404,12 @@ namespace slib
 				ret = env->CallStatic##NAME##MethodV(cls, method, args); \
 			} \
 		} else { \
-			_logJniError(String("Failed to get static method id - ") + name + " " + sig); \
+			logJniError(String("Failed to get static method id - ") + name + " " + sig); \
 		} \
 		va_end(args); \
 		return ret; \
-	} \
-	TYPE _priv_JniSingletonMethod::call##NAME(jobject _this, ...) \
-	{ \
-		va_list args; \
-		va_start(args, _this); \
-		TYPE ret = 0; \
-		if (cls && id && _this) { \
-			JNIEnv* env = Jni::getCurrent(); \
-			if (env) { \
-				ret = env->Call##NAME##MethodV(_this, id, args); \
-				if (Jni::checkException()) { \
-					Jni::printException(); \
-					Jni::clearException(); \
-				} \
-			} \
-		} \
-		return ret;\
-	} \
-	TYPE _priv_JniSingletonStaticMethod::call##NAME(jobject _null, ...) \
-	{ \
-		va_list args; \
-		va_start(args, _null); \
-		TYPE ret = 0; \
-		if (cls && id) { \
-			JNIEnv* env = Jni::getCurrent(); \
-			if (env) { \
-				ret = env->CallStatic##NAME##MethodV(cls, id, args); \
-				if (Jni::checkException()) { \
-					Jni::printException(); \
-					Jni::clearException(); \
-				} \
-			} \
-		} \
-		return ret;\
 	}
-
+	
 	DEFINE_JNI_CALL_METHOD(jobject, Object)
 	DEFINE_JNI_CALL_METHOD(jboolean, Boolean)
 	DEFINE_JNI_CALL_METHOD(jbyte, Byte)
@@ -919,7 +1449,7 @@ namespace slib
 				ret = env->NewObjectV(cls, method, args);
 			}
 		} else {
-			_logJniError(String("Failed to get constructor id - <init> ") + sig);
+			logJniError(String("Failed to get constructor id - <init> ") + sig);
 		}
 		va_end(args);
 		return ret;
@@ -928,25 +1458,6 @@ namespace slib
 	jobject JniClass::newObject() const
 	{
 		return newObject("()V");
-	}
-
-	jobject _priv_JniSingletonMethod::newObject(jobject _null, ...)
-	{
-		va_list args;
-		va_start(args, _null);
-		jobject ret = sl_null;
-		if (cls && id) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				ret = env->NewObjectV(cls, id, args);
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				}
-			}
-		}
-		va_end(args);
-		return ret;
 	}
 
 	void JniClass::callVoidMethod(jmethodID method, jobject _this, ...) const
@@ -974,24 +1485,7 @@ namespace slib
 					env->CallVoidMethodV(_this, method, args);
 				}
 			} else {
-				_logJniError(String("Failed to get method id - ") + name + " " + sig);
-			}
-		}
-		va_end(args);
-	}
-
-	void _priv_JniSingletonMethod::call(jobject _this, ...)
-	{
-		va_list args;
-		va_start(args, _this);
-		if (cls && id && _this) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				env->CallVoidMethodV(_this, id, args);
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				}
+				logJniError(String("Failed to get method id - ") + name + " " + sig);
 			}
 		}
 		va_end(args);
@@ -1023,24 +1517,7 @@ namespace slib
 				env->CallStaticVoidMethodV(cls, method, args);
 			}
 		} else {
-			_logJniError(String("Failed to get static method id - ") + name + " " + sig);
-		}
-		va_end(args);
-	}
-
-	void _priv_JniSingletonStaticMethod::call(jobject _null, ...)
-	{
-		va_list args;
-		va_start(args, _null);
-		if (cls && id) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				env->CallStaticVoidMethodV(cls, id, args);
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				}
-			}
+			logJniError(String("Failed to get static method id - ") + name + " " + sig);
 		}
 		va_end(args);
 	}
@@ -1097,7 +1574,7 @@ namespace slib
 					}
 				}
 			} else {
-				_logJniError(String("Failed to get method id - ") + name + " " + sig);
+				logJniError(String("Failed to get method id - ") + name + " " + sig);
 			}
 		}
 		va_end(args);
@@ -1120,53 +1597,7 @@ namespace slib
 					}
 				}
 			} else {
-				_logJniError(String("Failed to get method id - ") + name + " " + sig);
-			}
-		}
-		va_end(args);
-		return ret;
-	}
-
-	String _priv_JniSingletonMethod::callString(jobject _this, ...)
-	{
-		va_list args;
-		va_start(args, _this);
-		String ret;
-		if (cls && id && _this) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				JniLocal<jstring> str((jstring)(env->CallObjectMethodV(_this, id, args)));
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				} else {
-					if (str.isNotNull()) {
-						ret = Jni::getString(str);
-					}
-				}
-			}
-		}
-		va_end(args);
-		return ret;
-	}
-
-	String16 _priv_JniSingletonMethod::callString16(jobject _this, ...)
-	{
-		va_list args;
-		va_start(args, _this);
-		String16 ret;
-		if (cls && id && _this) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				JniLocal<jstring> str((jstring)(env->CallObjectMethodV(_this, id, args)));
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				} else {
-					if (str.isNotNull()) {
-						ret = Jni::getString16(str);
-					}
-				}
+				logJniError(String("Failed to get method id - ") + name + " " + sig);
 			}
 		}
 		va_end(args);
@@ -1227,7 +1658,7 @@ namespace slib
 				}
 			}
 		} else {
-			_logJniError(String("Failed to get static method id - ") + name + " " + sig);
+			logJniError(String("Failed to get static method id - ") + name + " " + sig);
 		}
 		va_end(args);
 		return ret;
@@ -1249,53 +1680,7 @@ namespace slib
 				}
 			}
 		} else {
-			_logJniError(String("Failed to get static method id - ") + name + " " + sig);
-		}
-		va_end(args);
-		return ret;
-	}
-
-	String _priv_JniSingletonStaticMethod::callString(jobject _null, ...)
-	{
-		va_list args;
-		va_start(args, _null);
-		String ret;
-		if (cls && id) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				JniLocal<jstring> str((jstring)(env->CallStaticObjectMethodV(cls, id, args)));
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				} else {
-					if (str.isNotNull()) {
-						ret = Jni::getString(str);
-					}
-				}
-			}
-		}
-		va_end(args);
-		return ret;
-	}
-
-	String16 _priv_JniSingletonStaticMethod::callString16(jobject _null, ...)
-	{
-		va_list args;
-		va_start(args, _null);
-		String16 ret;
-		if (cls && id) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				JniLocal<jstring> str((jstring)(env->CallStaticObjectMethodV(cls, id, args)));
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				} else {
-					if (str.isNotNull()) {
-						ret = Jni::getString16(str);
-					}
-				}
-			}
+			logJniError(String("Failed to get static method id - ") + name + " " + sig);
 		}
 		va_end(args);
 		return ret;
@@ -1324,7 +1709,7 @@ namespace slib
 					ret = env->Get##NAME##Field(_this, field); \
 				} \
 			} else { \
-				_logJniError(String("Failed to get field id - ") + name + " " + sig); \
+				logJniError(String("Failed to get field id - ") + name + " " + sig); \
 			} \
 		} \
 		return ret; \
@@ -1352,7 +1737,7 @@ namespace slib
 				ret = env->GetStatic##NAME##Field(cls, field); \
 			} \
 		} else { \
-			_logJniError(String("Failed to get static field id - ") + name + " " + sig); \
+			logJniError(String("Failed to get static field id - ") + name + " " + sig); \
 		} \
 		return ret; \
 	} \
@@ -1375,7 +1760,7 @@ namespace slib
 					env->Set##NAME##Field(_this, field, value); \
 				} \
 			} else { \
-				_logJniError(String("Failed to get field id - ") + name + " " + sig); \
+				logJniError(String("Failed to get field id - ") + name + " " + sig); \
 			} \
 		} \
 	} \
@@ -1399,63 +1784,7 @@ namespace slib
 				env->SetStatic##NAME##Field(cls, field, value); \
 			} \
 		} else { \
-			_logJniError(String("Failed to get static field id - ") + name + " " + sig); \
-		} \
-	} \
-	TYPE _priv_JniSingletonField::get##NAME(jobject _this) \
-	{ \
-		TYPE ret = 0; \
-		if (cls && id && _this) { \
-			JNIEnv* env = Jni::getCurrent(); \
-			if (env) { \
-				ret = env->Get##NAME##Field(_this, id); \
-				if (Jni::checkException()) { \
-					Jni::printException(); \
-					Jni::clearException(); \
-				} \
-			} \
-		} \
-		return ret; \
-	} \
-	void _priv_JniSingletonField::set##NAME(jobject _this, TYPE value) \
-	{ \
-		if (cls && id && _this) { \
-			JNIEnv* env = Jni::getCurrent(); \
-			if (env) { \
-				env->Set##NAME##Field(_this, id, value); \
-				if (Jni::checkException()) { \
-					Jni::printException(); \
-					Jni::clearException(); \
-				} \
-			} \
-		} \
-	} \
-	TYPE _priv_JniSingletonStaticField::get##NAME(jobject _null) \
-	{ \
-		TYPE ret = 0; \
-		if (cls && id) { \
-			JNIEnv* env = Jni::getCurrent(); \
-			if (env) { \
-				ret = env->GetStatic##NAME##Field(cls, id); \
-				if (Jni::checkException()) { \
-					Jni::printException(); \
-					Jni::clearException(); \
-				} \
-			} \
-		} \
-		return ret; \
-	} \
-	void _priv_JniSingletonStaticField::set##NAME(jobject _null, TYPE value) \
-	{ \
-		if (cls && id) { \
-			JNIEnv* env = Jni::getCurrent(); \
-			if (env) { \
-				env->SetStatic##NAME##Field(cls, id, value); \
-				if (Jni::checkException()) { \
-					Jni::printException(); \
-					Jni::clearException(); \
-				} \
-			} \
+			logJniError(String("Failed to get static field id - ") + name + " " + sig); \
 		} \
 	}
 
@@ -1597,146 +1926,6 @@ namespace slib
 		setStaticObjectField(name, sig, str);
 	}
 
-	String _priv_JniSingletonField::getString(jobject _this)
-	{
-		String ret;
-		if (cls && id) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				JniLocal<jstring> str((jstring)(env->GetObjectField(_this, id)));
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				} else {
-					if (str.isNotNull()) {
-						ret = Jni::getString(str);
-					}
-				}
-			}
-		}
-		return ret;
-	}
-
-	String16 _priv_JniSingletonField::getString16(jobject _this)
-	{
-		String16 ret;
-		if (cls && id) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				JniLocal<jstring> str((jstring)(env->GetObjectField(_this, id)));
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				} else {
-					if (str.isNotNull()) {
-						ret = Jni::getString16(str);
-					}
-				}
-			}
-		}
-		return ret;
-	}
-
-	String _priv_JniSingletonStaticField::getString(jobject _null)
-	{
-		String ret;
-		if (cls && id) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				JniLocal<jstring> str((jstring)(env->GetStaticObjectField(cls, id)));
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				} else {
-					if (str.isNotNull()) {
-						ret = Jni::getString(str);
-					}
-				}
-			}
-		}
-		return ret;
-	}
-
-	String16 _priv_JniSingletonStaticField::getString16(jobject _null)
-	{
-		String16 ret;
-		if (cls && id) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				JniLocal<jstring> str((jstring)(env->GetStaticObjectField(cls, id)));
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				} else {
-					if (str.isNotNull()) {
-						ret = Jni::getString16(str);
-					}
-				}
-			}
-		}
-		return ret;
-	}
-
-	void _priv_JniSingletonField::setString(jobject _this, const String& value)
-	{
-		if (cls && id && _this) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				JniLocal<jstring> str(Jni::getJniString(value));
-				env->SetObjectField(_this, id, str);
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				}
-			}
-		}
-	}
-
-	void _priv_JniSingletonField::setString16(jobject _this, const String16& value)
-	{
-		if (cls && id && _this) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				JniLocal<jstring> str(Jni::getJniString16(value));
-				env->SetObjectField(_this, id, str);
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				}
-			}
-		}
-	}
-
-	void _priv_JniSingletonStaticField::setString(jobject _null, const String& value)
-	{
-		if (cls && id) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				JniLocal<jstring> str(Jni::getJniString(value));
-				env->SetObjectField(cls, id, str);
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				}
-			}
-		}
-	}
-
-	void _priv_JniSingletonStaticField::setString16(jobject _null, const String16& value)
-	{
-		if (cls && id) {
-			JNIEnv* env = Jni::getCurrent();
-			if (env) {
-				JniLocal<jstring> str(Jni::getJniString16(value));
-				env->SetObjectField(cls, id, str);
-				if (Jni::checkException()) {
-					Jni::printException();
-					Jni::clearException();
-				}
-			}
-		}
-	}
-
 	sl_bool JniClass::registerNative(const char* name, const char* sig, const void* fn) const
 	{
 		jclass cls = get();
@@ -1762,164 +1951,6 @@ namespace slib
 	{
 		ref = CJniGlobal<jclass>::from(cls);
 		return *this;
-	}
-
-	_priv_JniSingletonClass::_priv_JniSingletonClass(const char* name)
-	{
-		this->name = name;
-		_priv_Jni_Shared* shared = _priv_Jni_getShared();
-		if (shared) {
-			shared->singleton_classes.add(this);
-		}
-	}
-
-	_priv_JniSingletonMethod::_priv_JniSingletonMethod(_priv_JniSingletonClass* gcls, const char* name, const char* sig)
-	{
-		this->gcls = gcls;
-		this->name = name;
-		this->sig = sig;
-		this->cls = sl_null;
-		this->id = sl_null;
-		_priv_Jni_Shared* shared = _priv_Jni_getShared();
-		if (shared) {
-			shared->singleton_methods.add(this);
-		}
-	}
-
-	_priv_JniSingletonStaticMethod::_priv_JniSingletonStaticMethod(_priv_JniSingletonClass* gcls, const char* name, const char* sig)
-	{
-		this->gcls = gcls;
-		this->name = name;
-		this->sig = sig;
-		this->cls = sl_null;
-		this->id = sl_null;
-		_priv_Jni_Shared* shared = _priv_Jni_getShared();
-		if (shared) {
-			shared->singleton_static_methods.add(this);
-		}
-	}
-
-	_priv_JniSingletonField::_priv_JniSingletonField(_priv_JniSingletonClass* gcls, const char* name, const char* sig)
-	{
-		this->gcls = gcls;
-		this->name = name;
-		this->sig = sig;
-		this->cls = sl_null;
-		this->id = sl_null;
-		_priv_Jni_Shared* shared = _priv_Jni_getShared();
-		if (shared) {
-			shared->singleton_fields.add(this);
-		}
-	}
-
-	_priv_JniSingletonObjectField::_priv_JniSingletonObjectField(_priv_JniSingletonClass* gcls, const char* name, const char* sig)
-		: _priv_JniSingletonField(gcls, name, sig)
-	{
-	}
-
-	jobject _priv_JniSingletonObjectField::get(jobject _this)
-	{
-		return getObject(_this);
-	}
-
-	void _priv_JniSingletonObjectField::set(jobject _this, jobject value)
-	{
-		setObject(_this, value);
-	}
-
-
-#define PRIV_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(TYPE, NAME, SIG) \
-	_priv_JniSingleton##NAME##Field::_priv_JniSingleton##NAME##Field(_priv_JniSingletonClass* gcls, const char* name) \
-		: _priv_JniSingletonField(gcls, name, SIG) \
-	{ \
-	} \
-	TYPE _priv_JniSingleton##NAME##Field::get(jobject _this) \
-	{ \
-		return get##NAME(_this); \
-	} \
-	void _priv_JniSingleton##NAME##Field::set(jobject _this, TYPE value) \
-	{ \
-		set##NAME(_this, value); \
-	} \
-
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(jboolean, Boolean, "Z")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_int8, Byte, "B")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_uint16, Char, "C")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_int16, Short, "S")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_int32, Int, "I")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_int64, Long, "J")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(float, Float, "F")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(double, Double, "D")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(String, String, "Ljava/lang/String;")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(String16, String16, "Ljava/lang/String;")
-
-
-	_priv_JniSingletonStaticField::_priv_JniSingletonStaticField(_priv_JniSingletonClass* gcls, const char* name, const char* sig)
-	{
-		this->gcls = gcls;
-		this->name = name;
-		this->sig = sig;
-		this->cls = sl_null;
-		this->id = sl_null;
-		_priv_Jni_Shared* shared = _priv_Jni_getShared();
-		if (shared) {
-			shared->singleton_static_fields.add(this);
-		}
-	}
-
-
-	_priv_JniSingletonStaticObjectField::_priv_JniSingletonStaticObjectField(_priv_JniSingletonClass* gcls, const char* name, const char* sig)
-		: _priv_JniSingletonStaticField(gcls, name, sig)
-	{
-	}
-
-	jobject _priv_JniSingletonStaticObjectField::get()
-	{
-		return getObject(sl_null);
-	}
-
-	void _priv_JniSingletonStaticObjectField::set(jobject value)
-	{
-		setObject(sl_null, value);
-	}
-
-
-#define PRIV_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(TYPE, NAME, SIG) \
-	_priv_JniSingletonStatic##NAME##Field::_priv_JniSingletonStatic##NAME##Field(_priv_JniSingletonClass* gcls, const char* name) \
-		: _priv_JniSingletonStaticField(gcls, name, SIG) \
-	{ \
-	} \
-	TYPE _priv_JniSingletonStatic##NAME##Field::get() \
-	{ \
-		return get##NAME(sl_null); \
-	} \
-	void _priv_JniSingletonStatic##NAME##Field::set(TYPE value) \
-	{ \
-		set##NAME(sl_null, value); \
-	} \
-
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(jboolean, Boolean, "Z")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_int8, Byte, "B")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_uint16, Char, "C")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_int16, Short, "S")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_int32, Int, "I")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_int64, Long, "J")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(float, Float, "F")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(double, Double, "D")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(String, String, "Ljava/lang/String;")
-	PRIV_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(String16, String16, "Ljava/lang/String;")
-
-
-	_priv_JniNativeMethod::_priv_JniNativeMethod(_priv_JniSingletonClass* gcls, const char* name, const char* sig, const void* fn)
-	{
-		this->gcls = gcls;
-		this->name = name;
-		this->sig = sig;
-		this->fn = fn;
-		_priv_Jni_Shared* shared = _priv_Jni_getShared();
-		if (shared) {
-			shared->native_methods.add(this);
-		}
 	}
 
 }

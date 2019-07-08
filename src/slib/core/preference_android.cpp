@@ -32,10 +32,16 @@
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(_priv_AndroidPreference, "slib/platform/android/Preference")
-		SLIB_JNI_STATIC_METHOD(setValue, "setValue", "(Lslib/platform/android/SlibActivity;Ljava/lang/String;Ljava/lang/String;)V");
-		SLIB_JNI_STATIC_METHOD(getValue, "getValue", "(Lslib/platform/android/SlibActivity;Ljava/lang/String;)Ljava/lang/String;");
-	SLIB_JNI_END_CLASS
+	namespace priv
+	{
+		namespace preference
+		{
+			SLIB_JNI_BEGIN_CLASS(JPreference, "slib/platform/android/Preference")
+				SLIB_JNI_STATIC_METHOD(setValue, "setValue", "(Lslib/platform/android/SlibActivity;Ljava/lang/String;Ljava/lang/String;)V");
+				SLIB_JNI_STATIC_METHOD(getValue, "getValue", "(Lslib/platform/android/SlibActivity;Ljava/lang/String;)Ljava/lang/String;");
+			SLIB_JNI_END_CLASS
+		}
+	}
 
 	void Preference::setValue(const String& key, const Json& value)
 	{
@@ -45,9 +51,9 @@ namespace slib
 			if (value.isNotNull()) {
 				String _value = value.toJsonString();
 				JniLocal<jstring> jvalue = Jni::getJniString(_value);
-				_priv_AndroidPreference::setValue.call(sl_null, jactivity, jkey.get(), jvalue.get());
+				priv::preference::JPreference::setValue.call(sl_null, jactivity, jkey.get(), jvalue.get());
 			} else {
-				_priv_AndroidPreference::setValue.call(sl_null, jactivity, jkey.get(), sl_null);
+				priv::preference::JPreference::setValue.call(sl_null, jactivity, jkey.get(), sl_null);
 			}
 		}
 	}
@@ -57,7 +63,7 @@ namespace slib
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JniLocal<jstring> jkey = Jni::getJniString(key);
-			String value = _priv_AndroidPreference::getValue.callString(sl_null, jactivity, jkey.get());
+			String value = priv::preference::JPreference::getValue.callString(sl_null, jactivity, jkey.get());
 			return Json::parseJson(value);
 		}
 		return sl_null;

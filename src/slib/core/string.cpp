@@ -1060,28 +1060,30 @@ namespace slib
 
 	SLIB_INLINE StringContainer* Atomic<String>::_retainContainer() const noexcept
 	{
-		if (m_container) {
-			SpinLocker lock(&m_lock);
-			StringContainer* container = m_container;
-			if (container) {
-				container->increaseReference();
-			}
-			return container;
+		if (!m_container) {
+			return sl_null;
 		}
-		return sl_null;
+		m_lock.lock();
+		StringContainer* container = m_container;
+		if (container) {
+			container->increaseReference();
+		}
+		m_lock.unlock();
+		return container;
 	}
 
 	SLIB_INLINE StringContainer16* Atomic<String16>::_retainContainer() const noexcept
 	{
-		if (m_container) {
-			SpinLocker lock(&m_lock);
-			StringContainer16* container = m_container;
-			if (container) {
-				container->increaseReference();
-			}
-			return container;
+		if (!m_container) {
+			return sl_null;
 		}
-		return sl_null;
+		m_lock.lock();
+		StringContainer16* container = m_container;
+		if (container) {
+			container->increaseReference();
+		}
+		m_lock.unlock();
+		return container;
 	}
 
 
@@ -1103,12 +1105,10 @@ namespace slib
 
 	SLIB_INLINE void Atomic<String>::_replaceContainer(StringContainer* container) noexcept
 	{
-		StringContainer* before;
-		{
-			SpinLocker lock(&m_lock);
-			before = m_container;
-			m_container = container;
-		}
+		m_lock.lock();
+		StringContainer* before = m_container;
+		m_container = container;
+		m_lock.unlock();
 		if (before) {
 			before->decreaseReference();
 		}
@@ -1116,12 +1116,10 @@ namespace slib
 
 	SLIB_INLINE void Atomic<String16>::_replaceContainer(StringContainer16* container) noexcept
 	{
-		StringContainer16* before;
-		{
-			SpinLocker lock(&m_lock);
-			before = m_container;
-			m_container = container;
-		}
+		m_lock.lock();
+		StringContainer16* before = m_container;
+		m_container = container;
+		m_lock.unlock();
 		if (before) {
 			before->decreaseReference();
 		}
