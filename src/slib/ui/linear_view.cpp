@@ -261,13 +261,13 @@ namespace slib
 		}
 		
 		if (flagHorizontalLayout) {
-			measureLayoutWrappingSize(sl_false, isHeightWrapping());
+			measureAndSetLayoutWrappingSize(sl_false, isHeightWrapping());
 			if (isWidthWrapping()) {
 				pos += getPaddingRight();
 				setLayoutWidth(pos);
 			}
 		} else {
-			measureLayoutWrappingSize(isWidthWrapping(), sl_false);
+			measureAndSetLayoutWrappingSize(isWidthWrapping(), sl_false);
 			if (isHeightWrapping()) {
 				pos += getPaddingBottom();
 				setLayoutHeight(pos);

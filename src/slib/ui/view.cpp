@@ -2694,14 +2694,12 @@ namespace slib
 		}
 	}
 	
-	void View::measureLayoutWrappingSize(sl_bool flagHorizontal, sl_bool flagVertical)
+	UISize View::measureLayoutWrappingSize(sl_bool flagHorizontal, sl_bool flagVertical)
 	{
-		if (m_layoutAttrs.isNull()) {
-			return;
-		}
-		
+
+		UISize ret = {0, 0};
 		if (!flagVertical && !flagHorizontal) {
-			return;
+			return ret;
 		}
 		
 		HashMap< View*, Pair<sl_ui_len, sl_ui_len> > mapHorzInsets;
@@ -2769,7 +2767,7 @@ namespace slib
 					measuredWidth = (sl_ui_len)(measuredWidth / f);
 				}
 			}
-			setLayoutWidth(measuredWidth);
+			ret.x = measuredWidth;
 		}
 		if (flagVertical) {
 			if (paddingAttrs.isNotNull()) {
@@ -2787,10 +2785,28 @@ namespace slib
 					measuredHeight = (sl_ui_len)(measuredHeight / f);
 				}
 			}
-			setLayoutHeight(measuredHeight);
+			ret.y = measuredHeight;
 		}
+		return ret;
 	}
 	
+	void View::measureAndSetLayoutWrappingSize(sl_bool flagHorizontal, sl_bool flagVertical)
+	{
+		if (m_layoutAttrs.isNull()) {
+			return;
+		}		
+		if (!flagVertical && !flagHorizontal) {
+			return;
+		}
+		UISize size = measureLayoutWrappingSize(flagHorizontal, flagVertical);
+		if (flagHorizontal) {
+			setLayoutWidth(size.x);
+		}
+		if (flagVertical) {
+			setLayoutHeight(size.y);
+		}
+	}
+
 	sl_bool View::isCustomLayout()
 	{
 		Ref<LayoutAttributes>& attrs = m_layoutAttrs;
@@ -7544,7 +7560,7 @@ namespace slib
 	void View::onUpdateLayout()
 	{
 		if (getChildrenCount() > 0) {
-			measureLayoutWrappingSize(isWidthWrapping(), isHeightWrapping());
+			measureAndSetLayoutWrappingSize(isWidthWrapping(), isHeightWrapping());
 		} else {
 #if defined(SLIB_PLATFORM_IS_MOBILE)
 			if (isWidthWrapping()) {

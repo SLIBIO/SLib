@@ -324,8 +324,10 @@ namespace slib
 		void setCursor(const Ref<Cursor>& cursor);
 
 		
-		void measureLayoutWrappingSize(sl_bool flagHorizontalWrapping, sl_bool flagVerticalWrapping);
+		UISize measureLayoutWrappingSize(sl_bool flagHorizontalWrapping, sl_bool flagVerticalWrapping);
 		
+		void measureAndSetLayoutWrappingSize(sl_bool flagHorizontalWrapping, sl_bool flagVerticalWrapping);
+
 		struct UpdateLayoutFrameParam
 		{
 			UIRect parentContentFrame;
