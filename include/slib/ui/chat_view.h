@@ -47,6 +47,14 @@ namespace slib
 		
 	};
 	
+	namespace priv
+	{
+		namespace chat_view
+		{
+			class ChatItemView;
+		}
+	}
+	
 	class SLIB_EXPORT ChatView : public ListView
 	{
 		SLIB_DECLARE_OBJECT
@@ -122,6 +130,9 @@ namespace slib
 				
 		void _addListContent(UIUpdateMode mode);
 		
+	private:
+		void _onRemoveItem(const String& itemId);
+		
 	protected:
 		AtomicList<ChatViewItem> m_items;
 		sl_ui_len m_chatWidth;
@@ -136,6 +147,8 @@ namespace slib
 		Color m_backColorSent;
 		Color m_textColorSent;
 		Color m_textColorDate;
+		
+		friend class priv::chat_view::ChatItemView;
 
 	};
 

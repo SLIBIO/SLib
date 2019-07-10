@@ -32,65 +32,75 @@
 namespace slib
 {
 
-	class Win32_RenderViewInstance : public Win32_ViewInstance
+	namespace priv
 	{
-	public:
-		AtomicRef<Renderer> m_renderer;
-		RenderEngine* m_pLastEngine;
-
-	public:
-		Win32_RenderViewInstance()
+		namespace render_view
 		{
-			m_pLastEngine = sl_null;
-		}
 
-		~Win32_RenderViewInstance()
-		{
-			Ref<Renderer> renderer = m_renderer;
-			if (renderer.isNotNull()) {
-				renderer->release();
-			}
-		}
+			class RenderViewInstance : public Win32_ViewInstance
+			{
+			public:
+				AtomicRef<Renderer> m_renderer;
+				RenderEngine* m_pLastEngine;
 
-	public:
-		void setRenderer(const Ref<Renderer>& renderer, RedrawMode redrawMode)
-		{
-			m_renderer = renderer;
-			if (renderer.isNotNull()) {
-				renderer->setRenderingContinuously(redrawMode == RedrawMode::Continuously);
-			}
-		}
-
-		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
-		{
-			if (msg == WM_PAINT) {
-				PAINTSTRUCT ps;
-				::BeginPaint(m_handle, &ps);
-				::EndPaint(m_handle, &ps);
-				Ref<Renderer> renderer = m_renderer;
-				if (renderer.isNotNull()) {
-					renderer->requestRender();
+			public:
+				RenderViewInstance()
+				{
+					m_pLastEngine = sl_null;
 				}
-				return sl_true;
-			} else if (msg == WM_ERASEBKGND) {
-				result = TRUE;
-				return sl_true;
-			}
-			return Win32_ViewInstance::processWindowMessage(msg, wParam, lParam, result);
-		}
 
-		void onFrame(RenderEngine* engine)
-		{
-			Ref<View> _view = getView();
-			if (RenderView* view = CastInstance<RenderView>(_view.get())) {
-				if (m_pLastEngine != engine) {
-					view->dispatchCreateEngine(engine);
+				~RenderViewInstance()
+				{
+					Ref<Renderer> renderer = m_renderer;
+					if (renderer.isNotNull()) {
+						renderer->release();
+					}
 				}
-				view->dispatchFrame(engine);
-				m_pLastEngine = engine;
-			}
+
+			public:
+				void setRenderer(const Ref<Renderer>& renderer, RedrawMode redrawMode)
+				{
+					m_renderer = renderer;
+					if (renderer.isNotNull()) {
+						renderer->setRenderingContinuously(redrawMode == RedrawMode::Continuously);
+					}
+				}
+
+				sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
+				{
+					if (msg == WM_PAINT) {
+						PAINTSTRUCT ps;
+						::BeginPaint(m_handle, &ps);
+						::EndPaint(m_handle, &ps);
+						Ref<Renderer> renderer = m_renderer;
+						if (renderer.isNotNull()) {
+							renderer->requestRender();
+						}
+						return sl_true;
+					} else if (msg == WM_ERASEBKGND) {
+						result = TRUE;
+						return sl_true;
+					}
+					return Win32_ViewInstance::processWindowMessage(msg, wParam, lParam, result);
+				}
+
+				void onFrame(RenderEngine* engine)
+				{
+					Ref<View> _view = getView();
+					if (RenderView* view = CastInstance<RenderView>(_view.get())) {
+						if (m_pLastEngine != engine) {
+							view->dispatchCreateEngine(engine);
+						}
+						view->dispatchFrame(engine);
+						m_pLastEngine = engine;
+					}
+				}
+			};
+
 		}
-	};
+	}
+
+	using namespace priv::render_view;
 
 	Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* parent)
 	{
@@ -101,7 +111,7 @@ namespace slib
 
 		DWORD styleEx = 0;
 		DWORD style = 0;
-		Ref<Win32_RenderViewInstance> ret = Win32_ViewInstance::create<Win32_RenderViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
+		Ref<RenderViewInstance> ret = Win32_ViewInstance::create<RenderViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
 		if (ret.isNotNull()) {
 			RenderEngineType engineType = getPreferredEngineType();
 			if (engineType == RenderEngineType::OpenGL_ES) {
@@ -116,7 +126,7 @@ namespace slib
 			}
 			if (engineType == RenderEngineType::OpenGL_ES) {
 				RendererParam rp;
-				rp.onFrame = SLIB_FUNCTION_WEAKREF(Win32_RenderViewInstance, onFrame, ret);
+				rp.onFrame = SLIB_FUNCTION_WEAKREF(RenderViewInstance, onFrame, ret);
 				Ref<Renderer> renderer = EGL::createRenderer((void*)(ret->getHandle()), rp);
 				if (renderer.isNotNull()) {
 					ret->setRenderer(renderer, m_redrawMode);
@@ -124,7 +134,7 @@ namespace slib
 				}
 			} else if (engineType == RenderEngineType::OpenGL) {
 				RendererParam rp;
-				rp.onFrame = SLIB_FUNCTION_WEAKREF(Win32_RenderViewInstance, onFrame, ret);
+				rp.onFrame = SLIB_FUNCTION_WEAKREF(RenderViewInstance, onFrame, ret);
 				Ref<Renderer> renderer = WGL::createRenderer((void*)(ret->getHandle()), rp);
 				if (renderer.isNotNull()) {
 					ret->setRenderer(renderer, m_redrawMode);
@@ -137,7 +147,7 @@ namespace slib
 
 	void RenderView::_setRedrawMode_NW(RedrawMode mode)
 	{
-		Ref<Win32_RenderViewInstance> instance = Ref<Win32_RenderViewInstance>::from(getViewInstance());
+		Ref<RenderViewInstance> instance = Ref<RenderViewInstance>::from(getViewInstance());
 		if (instance.isNotNull()) {
 			Ref<Renderer> renderer = instance->m_renderer;
 			if (renderer.isNotNull()) {
@@ -148,7 +158,7 @@ namespace slib
 
 	void RenderView::_requestRender_NW()
 	{
-		Ref<Win32_RenderViewInstance> instance = Ref<Win32_RenderViewInstance>::from(getViewInstance());
+		Ref<RenderViewInstance> instance = Ref<RenderViewInstance>::from(getViewInstance());
 		if (instance.isNotNull()) {
 			Ref<Renderer> renderer = instance->m_renderer;
 			if (renderer.isNotNull()) {

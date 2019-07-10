@@ -31,19 +31,29 @@
 namespace slib
 {
 
-	class _priv_Win32_RadioButtonViewInstance : public Win32_ViewInstance
+	namespace priv
 	{
-	public:
-		sl_bool processCommand(SHORT code, LRESULT& result) override
+		namespace radio_button
 		{
-			if (code == BN_CLICKED) {
-				::SendMessageW(getHandle(), BM_SETCHECK, BST_CHECKED, 0);
-				onClick();
-				return sl_true;
-			}
-			return sl_false;
+
+			class RadioButtonInstance : public Win32_ViewInstance
+			{
+			public:
+				sl_bool processCommand(SHORT code, LRESULT& result) override
+				{
+					if (code == BN_CLICKED) {
+						::SendMessageW(getHandle(), BM_SETCHECK, BST_CHECKED, 0);
+						onClick();
+						return sl_true;
+					}
+					return sl_false;
+				}
+			};
+
 		}
-	};
+	}
+
+	using namespace priv::radio_button;
 
 	Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* parent)
 	{
@@ -54,7 +64,7 @@ namespace slib
 
 		String16 text = getText();
 		UINT style = BS_RADIOBUTTON | WS_TABSTOP;
-		Ref<_priv_Win32_RadioButtonViewInstance> ret = Win32_ViewInstance::create<_priv_Win32_RadioButtonViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
+		Ref<RadioButtonInstance> ret = Win32_ViewInstance::create<RadioButtonInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
 		if (ret.isNotNull()) {
 			HWND handle = ret->getHandle();
 			if (isChecked()) {

@@ -34,7 +34,7 @@ namespace slib
 	Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* _parent)
 	{
 		MACOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_macOS_Button* handle = [[_priv_Slib_macOS_Button alloc] initWithFrame:frame];
+		SLIBButtonHandle* handle = [[SLIBButtonHandle alloc] initWithFrame:frame];
 		if (handle != nil) {
 			handle.title = Apple::getNSStringFromString(getText());
 			[handle setButtonType:NSRadioButton];

@@ -121,88 +121,93 @@ namespace slib
 		return m_camera;
 	}
 	
-	class _priv_CameraView : public CameraView
+	namespace priv
 	{
-		friend class _priv_CameraView_Controls;
-	};
-	
-	class _priv_CameraView_ShutterIcon : public Drawable
-	{
-	public:
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
+		namespace camera
 		{
-			if (param.useColorMatrix) {
-				canvas->fillEllipse(rectDst, param.colorMatrix.transformColor(Color::White));
-			} else {
-				canvas->fillEllipse(rectDst, Color::White);
-			}
-		}
-		
-	};
-	
-	class _priv_CameraView_Controls : public ui::CameraControlView
-	{
-	public:
-		_priv_CameraView* cameraView;
-		
-	public:
-		_priv_CameraView_Controls(CameraView* _cameraView)
-		{
-			cameraView = (_priv_CameraView*)_cameraView;
-		}
-		
-	public:
-		void init() override
-		{
-			ui::CameraControlView::init();
-			btnShutter->setIcon(new _priv_CameraView_ShutterIcon, UIUpdateMode::Init);
-			btnShutter->setPadding((sl_ui_len)(UIResource::dpToPixel(10)), UIUpdateMode::Init);
-			btnShutter->setOnClick([this](View* view) {
-				cameraView->onClickShutter();
-			});
+			
+			class ShutterIcon : public Drawable
+			{
+			public:
+				void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
+				{
+					if (param.useColorMatrix) {
+						canvas->fillEllipse(rectDst, param.colorMatrix.transformColor(Color::White));
+					} else {
+						canvas->fillEllipse(rectDst, Color::White);
+					}
+				}
+				
+			};
+			
+			class Controls : public ui::CameraControlView
+			{
+			public:
+				CameraView* cameraView;
+				
+			public:
+				Controls(CameraView* _cameraView)
+				{
+					cameraView = (CameraView*)_cameraView;
+				}
+				
+			public:
+				void init() override
+				{
+					ui::CameraControlView::init();
+					btnShutter->setIcon(new ShutterIcon, UIUpdateMode::Init);
+					btnShutter->setPadding((sl_ui_len)(UIResource::dpToPixel(10)), UIUpdateMode::Init);
+					btnShutter->setOnClick([this](View* view) {
+						cameraView->onClickShutter();
+					});
 #if defined(SLIB_PLATFORM_IS_MOBILE)
-			btnSwitch->setOnClick([this](View* view) {
-				if (cameraView->getDeviceId().equalsIgnoreCase("FRONT")) {
-					cameraView->setDeviceId("BACK");
-				} else {
-					cameraView->setDeviceId("FRONT");
-				}
-				cameraView->start();
-			});
-			btnFlash->setIcon(getFlashIcon(cameraView->getFlashMode()), UIUpdateMode::Init);
-			btnFlash->setOnClick([this](View* view) {
-				switch (cameraView->getFlashMode()) {
-					case CameraFlashMode::On:
-						cameraView->setFlashMode(CameraFlashMode::Off);
-						break;
-					case CameraFlashMode::Off:
-						cameraView->setFlashMode(CameraFlashMode::Auto);
-						break;
-					default:
-						cameraView->setFlashMode(CameraFlashMode::On);
-						break;
-				}
-			});
+					btnSwitch->setOnClick([this](View* view) {
+						if (cameraView->getDeviceId().equalsIgnoreCase("FRONT")) {
+							cameraView->setDeviceId("BACK");
+						} else {
+							cameraView->setDeviceId("FRONT");
+						}
+						cameraView->start();
+					});
+					btnFlash->setIcon(getFlashIcon(cameraView->getFlashMode()), UIUpdateMode::Init);
+					btnFlash->setOnClick([this](View* view) {
+						switch (cameraView->getFlashMode()) {
+							case CameraFlashMode::On:
+								cameraView->setFlashMode(CameraFlashMode::Off);
+								break;
+							case CameraFlashMode::Off:
+								cameraView->setFlashMode(CameraFlashMode::Auto);
+								break;
+							default:
+								cameraView->setFlashMode(CameraFlashMode::On);
+								break;
+						}
+					});
 #else
-			btnSwitch->setVisible(sl_false, UIUpdateMode::Init);
-			btnFlash->setVisible(sl_false, UIUpdateMode::Init);
+					btnSwitch->setVisible(sl_false, UIUpdateMode::Init);
+					btnFlash->setVisible(sl_false, UIUpdateMode::Init);
 #endif
+				}
+				
+				static Ref<Drawable> getFlashIcon(CameraFlashMode flash)
+				{
+					switch (flash) {
+						case CameraFlashMode::On:
+							return drawable::camera_view_control_flash_on::get();
+						case CameraFlashMode::Off:
+							return drawable::camera_view_control_flash_off::get();
+						default:
+							break;
+					}
+					return drawable::camera_view_control_flash_auto::get();
+				}
+				
+			};
+
 		}
-		
-		static Ref<Drawable> getFlashIcon(CameraFlashMode flash)
-		{
-			switch (flash) {
-				case CameraFlashMode::On:
-					return drawable::camera_view_control_flash_on::get();
-				case CameraFlashMode::Off:
-					return drawable::camera_view_control_flash_off::get();
-				default:
-					break;
-			}
-			return drawable::camera_view_control_flash_auto::get();
-		}
-		
-	};
+	}
+	
+	using namespace priv::camera;
 	
 	void CameraView::setControlsVisible(sl_bool flagVisible, UIUpdateMode mode)
 	{
@@ -210,7 +215,7 @@ namespace slib
 		m_flagControlsVisible = flagVisible;
 		if (flagVisible) {
 			if (m_controls.isNull()) {
-				m_controls = new _priv_CameraView_Controls(this);
+				m_controls = new priv::camera::Controls(this);
 				addChild(m_controls, mode);
 			}
 		}
@@ -222,7 +227,7 @@ namespace slib
 	Ref<Button> CameraView::getShutterButton()
 	{
 		ObjectLocker lock(this);
-		_priv_CameraView_Controls* controls = (_priv_CameraView_Controls*)(m_controls.get());
+		Controls* controls = (Controls*)(m_controls.get());
 		if (controls) {
 			return controls->btnShutter;
 		}
@@ -232,7 +237,7 @@ namespace slib
 	Ref<Button> CameraView::getSwitchCameraButton()
 	{
 		ObjectLocker lock(this);
-		_priv_CameraView_Controls* controls = (_priv_CameraView_Controls*)(m_controls.get());
+		Controls* controls = (Controls*)(m_controls.get());
 		if (controls) {
 			return controls->btnSwitch;
 		}
@@ -242,7 +247,7 @@ namespace slib
 	Ref<Button> CameraView::getChangeFlashModeButton()
 	{
 		ObjectLocker lock(this);
-		_priv_CameraView_Controls* controls = (_priv_CameraView_Controls*)(m_controls.get());
+		Controls* controls = (Controls*)(m_controls.get());
 		if (controls) {
 			return controls->btnFlash;
 		}
@@ -260,7 +265,7 @@ namespace slib
 		if (SLIB_UI_UPDATE_MODE_IS_REDRAW(updateMode)) {
 			Ref<Button> button = getChangeFlashModeButton();
 			if (button.isNotNull()) {
-				button->setIcon(_priv_CameraView_Controls::getFlashIcon(flashMode));
+				button->setIcon(Controls::getFlashIcon(flashMode));
 			}
 		}
 	}

@@ -32,6 +32,14 @@
 
 namespace slib
 {
+	
+	namespace priv
+	{
+		namespace camera
+		{
+			class Controls;
+		}
+	}
 
 	class SLIB_EXPORT CameraView : public VideoView
 	{
@@ -109,6 +117,8 @@ namespace slib
 		sl_bool m_flagDuringTouchFocusEffect;
 		Time m_timeTouchFocusBegan;
 		UIPoint m_pointTouchFocus;
+		
+		friend class priv::camera::Controls;
 		
 	};
 

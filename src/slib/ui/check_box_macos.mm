@@ -34,7 +34,7 @@ namespace slib
 	Ref<ViewInstance> CheckBox::createNativeWidget(ViewInstance* _parent)
 	{
 		MACOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_macOS_Button* handle = [[_priv_Slib_macOS_Button alloc] initWithFrame:frame];
+		SLIBButtonHandle* handle = [[SLIBButtonHandle alloc] initWithFrame:frame];
 		if (handle != nil) {
 			handle.title = Apple::getNSStringFromString(getText());
 			[handle setButtonType:NSSwitchButton];
@@ -62,15 +62,21 @@ namespace slib
 		}
 	}
 
-	UISize _priv_CheckBox_macOS_measureSize(Button* view)
+	namespace priv
 	{
-		NSView* handle = UIPlatform::getViewHandle(view);
-		if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-			NSButton* button = (NSButton*)handle;
-			NSSize size = button.fittingSize;
-			return UISize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
+		namespace check_box
+		{
+			UISize measureNativeWidgetSize(CheckBox* view)
+			{
+				NSView* handle = UIPlatform::getViewHandle(view);
+				if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
+					NSButton* button = (NSButton*)handle;
+					NSSize size = button.fittingSize;
+					return UISize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
+				}
+				return UISize::zero();
+			}
 		}
-		return UISize::zero();
 	}
 	
 }

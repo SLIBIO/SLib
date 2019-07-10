@@ -34,7 +34,7 @@ namespace slib
 	Ref<ViewInstance> Button::createNativeWidget(ViewInstance* _parent)
 	{
 		MACOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_macOS_Button* handle = [[_priv_Slib_macOS_Button alloc] initWithFrame:frame];
+		SLIBButtonHandle* handle = [[SLIBButtonHandle alloc] initWithFrame:frame];
 		if (handle != nil) {
 			handle.title = Apple::getNSStringFromString(m_text);
 			if (m_flagDefaultButton) {
@@ -71,21 +71,27 @@ namespace slib
 	void Button::_setFont_NW(const Ref<Font>& font)
 	{
 	}
-	
-	UISize _priv_Button_macOS_measureSize(Button* view)
+
+	namespace priv
 	{
-		NSView* handle = UIPlatform::getViewHandle(view);
-		if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-			NSButton* button = (NSButton*)handle;
-			NSSize size = button.fittingSize;
-			return UISize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
+		namespace button
+		{
+			UISize measureNativeWidgetSize(Button* view)
+			{
+				NSView* handle = UIPlatform::getViewHandle(view);
+				if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
+					NSButton* button = (NSButton*)handle;
+					NSSize size = button.fittingSize;
+					return UISize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
+				}
+				return UISize::zero();
+			}
 		}
-		return UISize::zero();
 	}
 	
 }
 
-@implementation _priv_Slib_macOS_Button
+@implementation SLIBButtonHandle
 
 MACOS_VIEW_DEFINE_ON_FOCUS
 MACOS_VIEW_DEFINE_ON_KEY

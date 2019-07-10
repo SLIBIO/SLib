@@ -117,7 +117,7 @@ namespace slib
 
 }
 
-@interface _priv_Slib_macOS_ViewBase : NSView
+@interface SLIBViewBaseHandle : NSView
 {
 	@public sl_bool m_flagOpaque;
 	@public sl_bool m_flagClipping;
@@ -125,14 +125,14 @@ namespace slib
 }
 @end
 
-@interface _priv_Slib_macOS_ViewHandle : _priv_Slib_macOS_ViewBase
+@interface SLIBViewHandle : SLIBViewBaseHandle
 {
 	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 	NSTrackingArea* m_trackingArea;
 }
 @end
 
-@interface _priv_Slib_macOS_Button : NSButton
+@interface SLIBButtonHandle : NSButton
 {
 	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 }

@@ -31,18 +31,26 @@
 namespace slib
 {
 
-	class _priv_Win32_ButtonViewInstance : public Win32_ViewInstance
+	namespace priv
 	{
-	public:
-		sl_bool processCommand(SHORT code, LRESULT& result) override
+		namespace button
 		{
-			if (code == BN_CLICKED) {
-				onClick();
-				return sl_true;
-			}
-			return sl_false;
+			class ButtonInstance : public Win32_ViewInstance
+			{
+			public:
+				sl_bool processCommand(SHORT code, LRESULT& result) override
+				{
+					if (code == BN_CLICKED) {
+						onClick();
+						return sl_true;
+					}
+					return sl_false;
+				}
+			};
 		}
-	};
+	}
+
+	using namespace priv::button;
 
 	Ref<ViewInstance> Button::createNativeWidget(ViewInstance* parent)
 	{
@@ -55,7 +63,7 @@ namespace slib
 		if (m_flagDefaultButton) {
 			style |= BS_DEFPUSHBUTTON;
 		}
-		Ref<_priv_Win32_ButtonViewInstance> ret = Win32_ViewInstance::create<_priv_Win32_ButtonViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
+		Ref<ButtonInstance> ret = Win32_ViewInstance::create<ButtonInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
 		if (ret.isNotNull()) {
 			Ref<Font> font = getFont();
 			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());

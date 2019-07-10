@@ -33,7 +33,7 @@
 
 #include <GLKit/GLKit.h>
 
-@interface _priv_Slib_iOS_GLView : GLKView {
+@interface SLIBGLViewHandle : GLKView {
 	
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 	
@@ -59,9 +59,9 @@ namespace slib
 {
 	Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* _parent)
 	{
-		_priv_Slib_iOS_GLView* handle = nil;
+		SLIBGLViewHandle* handle = nil;
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		handle = [[_priv_Slib_iOS_GLView alloc] initWithFrame:frame];
+		handle = [[SLIBGLViewHandle alloc] initWithFrame:frame];
 		IOS_VIEW_CREATE_INSTANCE_END
 		if (handle != nil && ret.isNotNull()) {
 			[handle _init];
@@ -73,8 +73,8 @@ namespace slib
 	void RenderView::_setRedrawMode_NW(RedrawMode mode)
 	{
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_GLView class]]) {
-			_priv_Slib_iOS_GLView* v = (_priv_Slib_iOS_GLView*)handle;
+		if (handle != nil && [handle isKindOfClass:[SLIBGLViewHandle class]]) {
+			SLIBGLViewHandle* v = (SLIBGLViewHandle*)handle;
 			[v _setRenderContinuously:(mode == RedrawMode::Continuously)];
 		}
 	}
@@ -82,8 +82,8 @@ namespace slib
 	void RenderView::_requestRender_NW()
 	{
 		UIView* view = UIPlatform::getViewHandle(this);
-		if (view != nil && [view isKindOfClass:[_priv_Slib_iOS_GLView class]]) {
-			_priv_Slib_iOS_GLView* v = (_priv_Slib_iOS_GLView*)view;
+		if (view != nil && [view isKindOfClass:[SLIBGLViewHandle class]]) {
+			SLIBGLViewHandle* v = (SLIBGLViewHandle*)view;
 			[v _requestRender];
 		}
 	}	
@@ -91,7 +91,7 @@ namespace slib
 
 @interface SLib_iOS_GLViewRenderer : NSObject
 {
-	@public __weak _priv_Slib_iOS_GLView* m_view;
+	@public __weak SLIBGLViewHandle* m_view;
 	@public __weak CADisplayLink* m_displayLink;
 	
 	BOOL m_flagRunning;
@@ -107,7 +107,7 @@ namespace slib
 	if (!m_flagRunning) {
 		return;
 	}
-	_priv_Slib_iOS_GLView* view = m_view;
+	SLIBGLViewHandle* view = m_view;
 	if (view != nil) {
 		if (m_frameNumber % 10 == 0) {
 			dispatch_async(dispatch_get_main_queue(), ^{
@@ -126,7 +126,7 @@ namespace slib
 
 - (void)queryViewState
 {
-	_priv_Slib_iOS_GLView* view = m_view;
+	SLIBGLViewHandle* view = m_view;
 	if (view == nil) {
 		return;
 	}
@@ -182,7 +182,7 @@ namespace slib
 
 @end
 
-@implementation _priv_Slib_iOS_GLView
+@implementation SLIBGLViewHandle
 
 -(void)_init
 {

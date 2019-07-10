@@ -29,37 +29,6 @@
 namespace slib
 {
 
-	SLIB_DEFINE_OBJECT(Button, View)
-
-	const sl_real _g_button_colorMatrix_hover_buf[20] = {
-		0.5f, 0, 0, 0,
-		0, 0.5f, 0, 0,
-		0, 0, 0.5f, 0,
-		0, 0, 0, 1,
-		0.2f, 0.3f, 0.4f, 0
-	};
-	const ColorMatrix& _g_button_colorMatrix_hover = *((const ColorMatrix*)((void*)_g_button_colorMatrix_hover_buf));
-
-	const sl_real _g_button_colorMatrix_pressed_buf[20] = {
-		0.5f, 0, 0, 0,
-		0, 0.5f, 0, 0,
-		0, 0, 0.5f, 0,
-		0, 0, 0, 1,
-		0.3f, 0.4f, 0.6f, 0
-
-	};
-	const ColorMatrix& _g_button_colorMatrix_pressed = *((const ColorMatrix*)((void*)_g_button_colorMatrix_pressed_buf));
-
-	const sl_real _g_button_colorMatrix_disabled_buf[20] = {
-		0.2f, 0.2f, 0.2f, 0,
-		0.2f, 0.2f, 0.2f, 0,
-		0.2f, 0.2f, 0.2f, 0,
-		0, 0, 0, 1,
-		0, 0, 0, 0
-	};
-	const ColorMatrix& _g_button_colorMatrix_disabled = *((const ColorMatrix*)((void*)_g_button_colorMatrix_disabled_buf));
-
-	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ButtonCategoryProperties)
 	
 	ButtonCategoryProperties::ButtonCategoryProperties()
@@ -74,29 +43,68 @@ namespace slib
 	ButtonCategory::ButtonCategory()
 	{
 	}
+
+
+	namespace priv
+	{
+		namespace button
+		{
+
+			const sl_real g_colorMatrix_hover_buf[20] = {
+				0.5f, 0, 0, 0,
+				0, 0.5f, 0, 0,
+				0, 0, 0.5f, 0,
+				0, 0, 0, 1,
+				0.2f, 0.3f, 0.4f, 0
+			};
+			const ColorMatrix& g_colorMatrix_hover = *((const ColorMatrix*)((void*)g_colorMatrix_hover_buf));
+
+			const sl_real g_colorMatrix_pressed_buf[20] = {
+				0.5f, 0, 0, 0,
+				0, 0.5f, 0, 0,
+				0, 0, 0.5f, 0,
+				0, 0, 0, 1,
+				0.3f, 0.4f, 0.6f, 0
+
+			};
+			const ColorMatrix& g_colorMatrix_pressed = *((const ColorMatrix*)((void*)g_colorMatrix_pressed_buf));
+
+			const sl_real g_colorMatrix_disabled_buf[20] = {
+				0.2f, 0.2f, 0.2f, 0,
+				0.2f, 0.2f, 0.2f, 0,
+				0.2f, 0.2f, 0.2f, 0,
+				0, 0, 0, 1,
+				0, 0, 0, 0
+			};
+			const ColorMatrix& g_colorMatrix_disabled = *((const ColorMatrix*)((void*)g_colorMatrix_disabled_buf));
+
+			class Categories
+			{
+			public:
+				ButtonCategory categories[2];
+				
+			public:
+				Categories()
+				{
+					categories[1].properties[(int)(ButtonState::Normal)].border = Pen::create(PenStyle::Solid, 3, Color(0, 100, 250));
+				}
+				
+			public:
+				static ButtonCategory* getCategories()
+				{
+					SLIB_SAFE_STATIC(Categories, ret)
+					if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
+						return sl_null;
+					}
+					return ret.categories;
+				}
+			};
+			
+		}
+	}
 	
 
-	class _priv_Button_Categories
-	{
-	public:
-		ButtonCategory categories[2];
-		
-	public:
-		_priv_Button_Categories()
-		{
-			categories[1].properties[(int)(ButtonState::Normal)].border = Pen::create(PenStyle::Solid, 3, Color(0, 100, 250));
-		}
-		
-	public:
-		static ButtonCategory* getCategories()
-		{
-			SLIB_SAFE_STATIC(_priv_Button_Categories, ret)
-			if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
-				return sl_null;
-			}
-			return ret.categories;
-		}
-	};
+	SLIB_DEFINE_OBJECT(Button, View)
 
 	Button::Button() : Button(2)
 	{
@@ -141,7 +149,7 @@ namespace slib
 		m_nCategories = nCategories;
 		m_categories = NewHelper<ButtonCategory>::create(nCategories);
 		if (!categories) {
-			categories = _priv_Button_Categories::getCategories();
+			categories = priv::button::Categories::getCategories();
 			if (nCategories > 2) {
 				nCategories = 2;
 			}
@@ -798,14 +806,20 @@ namespace slib
 		}
 		return size;
 	}
-	
-	UISize _priv_Button_macOS_measureSize(Button* view);
 
+	namespace priv
+	{
+		namespace button
+		{
+			UISize measureNativeWidgetSize(Button* view);
+		}
+	}
+	
 	UISize Button::measureLayoutContentSize(sl_ui_len widthFrame, sl_ui_len heightFrame)
 	{
 #if defined(SLIB_UI_IS_MACOS)
 		if (isNativeWidget()) {
-			return _priv_Button_macOS_measureSize(this);
+			return priv::button::measureNativeWidgetSize(this);
 		}
 #endif
 		return measureContentSize(widthFrame, heightFrame);
@@ -1084,11 +1098,11 @@ namespace slib
 		if (flagUseDefaultFilter) {
 			switch (m_state) {
 				case ButtonState::Hover:
-					return &_g_button_colorMatrix_hover;
+					return &(priv::button::g_colorMatrix_hover);
 				case ButtonState::Pressed:
-					return &_g_button_colorMatrix_pressed;
+					return &(priv::button::g_colorMatrix_pressed);
 				case ButtonState::Disabled:
-					return &_g_button_colorMatrix_disabled;
+					return &(priv::button::g_colorMatrix_disabled);
 				default:
 					break;
 			}

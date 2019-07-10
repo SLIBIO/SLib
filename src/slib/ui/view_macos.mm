@@ -105,10 +105,10 @@ namespace slib
 						[control setEnabled:FALSE];
 					}
 				}
-				if ([handle isKindOfClass:[_priv_Slib_macOS_ViewBase class]]) {
-					((_priv_Slib_macOS_ViewBase*)handle)->m_flagOpaque = view->isOpaque();
-					((_priv_Slib_macOS_ViewBase*)handle)->m_flagClipping = view->isClipping();
-					((_priv_Slib_macOS_ViewBase*)handle)->m_flagDrawing = view->isDrawing();
+				if ([handle isKindOfClass:[SLIBViewBaseHandle class]]) {
+					((SLIBViewBaseHandle*)handle)->m_flagOpaque = view->isOpaque();
+					((SLIBViewBaseHandle*)handle)->m_flagClipping = view->isClipping();
+					((SLIBViewBaseHandle*)handle)->m_flagDrawing = view->isDrawing();
 				}
 				
 				if (parent != nil) {
@@ -267,8 +267,8 @@ namespace slib
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
-			if ([handle isKindOfClass:[_priv_Slib_macOS_ViewBase class]]) {
-				_priv_Slib_macOS_ViewBase* control = (_priv_Slib_macOS_ViewBase*)handle;
+			if ([handle isKindOfClass:[SLIBViewBaseHandle class]]) {
+				SLIBViewBaseHandle* control = (SLIBViewBaseHandle*)handle;
 				control->m_flagOpaque = flag;
 			}
 		}
@@ -292,8 +292,8 @@ namespace slib
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
-			if ([handle isKindOfClass:[_priv_Slib_macOS_ViewBase class]]) {
-				_priv_Slib_macOS_ViewBase* control = (_priv_Slib_macOS_ViewBase*)handle;
+			if ([handle isKindOfClass:[SLIBViewBaseHandle class]]) {
+				SLIBViewBaseHandle* control = (SLIBViewBaseHandle*)handle;
 				control->m_flagClipping = flag;
 			}
 		}
@@ -303,8 +303,8 @@ namespace slib
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
-			if ([handle isKindOfClass:[_priv_Slib_macOS_ViewBase class]]) {
-				_priv_Slib_macOS_ViewBase* control = (_priv_Slib_macOS_ViewBase*)handle;
+			if ([handle isKindOfClass:[SLIBViewBaseHandle class]]) {
+				SLIBViewBaseHandle* control = (SLIBViewBaseHandle*)handle;
 				control->m_flagDrawing = flag;
 			}
 		}
@@ -594,14 +594,14 @@ namespace slib
 	Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
 	{
 		MACOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_macOS_ViewHandle* handle = [[_priv_Slib_macOS_ViewHandle alloc] initWithFrame:frame];
+		SLIBViewHandle* handle = [[SLIBViewHandle alloc] initWithFrame:frame];
 		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
 	}
 
 }
 
-@implementation _priv_Slib_macOS_ViewBase
+@implementation SLIBViewBaseHandle
 
 - (BOOL)isFlipped
 {
@@ -615,7 +615,7 @@ namespace slib
 
 @end
 
-@implementation _priv_Slib_macOS_ViewHandle
+@implementation SLIBViewHandle
 
 MACOS_VIEW_DEFINE_ON_FOCUS
 

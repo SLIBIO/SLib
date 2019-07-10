@@ -34,57 +34,67 @@
 namespace slib
 {
 
-	class GTK_RenderViewInstance : public GTK_ViewInstance
+	namespace priv
 	{
-	public:
-		AtomicRef<Renderer> m_renderer;
-		RenderEngine* m_pLastEngine;
-
-	public:
-		GTK_RenderViewInstance()
+		namespace render_view
 		{
-			m_pLastEngine = sl_null;
-		}
 
-		~GTK_RenderViewInstance()
-		{
-			Ref<Renderer> renderer = m_renderer;
-			if (renderer.isNotNull()) {
-				renderer->release();
-			}
-		}
+			class RenderViewInstance : public GTK_ViewInstance
+			{
+			public:
+				AtomicRef<Renderer> m_renderer;
+				RenderEngine* m_pLastEngine;
 
-	public:
-		void setRenderer(const Ref<Renderer>& renderer, RedrawMode redrawMode)
-		{
-			m_renderer = renderer;
-			if (renderer.isNotNull()) {
-				renderer->setRenderingContinuously(redrawMode == RedrawMode::Continuously);
-			}
-		}
-
-		gboolean onExposeEvent(GdkEventExpose* event) override
-		{
-			Ref<Renderer> renderer = m_renderer;
-			if (renderer.isNotNull()) {
-				renderer->requestRender();
-				return sl_true;
-			}
-			return sl_false;
-		}
-
-		void onFrame(RenderEngine* engine)
-		{
-			Ref<View> _view = getView();
-			if (RenderView* view = CastInstance<RenderView>(_view.get())) {
-				if (m_pLastEngine != engine) {
-					view->dispatchCreateEngine(engine);
+			public:
+				RenderViewInstance()
+				{
+					m_pLastEngine = sl_null;
 				}
-				view->dispatchFrame(engine);
-				m_pLastEngine = engine;
-			}
+
+				~RenderViewInstance()
+				{
+					Ref<Renderer> renderer = m_renderer;
+					if (renderer.isNotNull()) {
+						renderer->release();
+					}
+				}
+
+			public:
+				void setRenderer(const Ref<Renderer>& renderer, RedrawMode redrawMode)
+				{
+					m_renderer = renderer;
+					if (renderer.isNotNull()) {
+						renderer->setRenderingContinuously(redrawMode == RedrawMode::Continuously);
+					}
+				}
+
+				gboolean onExposeEvent(GdkEventExpose* event) override
+				{
+					Ref<Renderer> renderer = m_renderer;
+					if (renderer.isNotNull()) {
+						renderer->requestRender();
+						return sl_true;
+					}
+					return sl_false;
+				}
+
+				void onFrame(RenderEngine* engine)
+				{
+					Ref<View> _view = getView();
+					if (RenderView* view = CastInstance<RenderView>(_view.get())) {
+						if (m_pLastEngine != engine) {
+							view->dispatchCreateEngine(engine);
+						}
+						view->dispatchFrame(engine);
+						m_pLastEngine = engine;
+					}
+				}
+			};
+
 		}
-	};
+	}
+
+	using namespace priv::render_view;
 
 	Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* _parent)
 	{
@@ -94,7 +104,7 @@ namespace slib
 		if (handle) {
 			GTK_WIDGET_UNSET_FLAGS(handle, GTK_NO_WINDOW);
 			GTK_WIDGET_SET_FLAGS(handle, GTK_CAN_FOCUS);
-			Ref<GTK_RenderViewInstance> ret = GTK_ViewInstance::create<GTK_RenderViewInstance>(this, parent, handle);
+			Ref<RenderViewInstance> ret = GTK_ViewInstance::create<RenderViewInstance>(this, parent, handle);
 			if (ret.isNotNull()) {
 				GtkWidget* handle = ret->getHandle();
 				if (handle) {
@@ -105,7 +115,7 @@ namespace slib
 						XID xwindow = GDK_WINDOW_XWINDOW(gwindow);
 						if (xdisplay && xwindow != None) {
 							RendererParam rp;
-							rp.onFrame = SLIB_FUNCTION_WEAKREF(GTK_RenderViewInstance, onFrame, ret);
+							rp.onFrame = SLIB_FUNCTION_WEAKREF(RenderViewInstance, onFrame, ret);
 							Ref<Renderer> renderer = GLX::createRenderer(xdisplay, xwindow, rp);
 							if (renderer.isNotNull()) {
 								ret->setRenderer(renderer, m_redrawMode);
@@ -124,7 +134,7 @@ namespace slib
 
 	void RenderView::_setRedrawMode_NW(RedrawMode mode)
 	{
-		Ref<GTK_RenderViewInstance> instance = Ref<GTK_RenderViewInstance>::from(getViewInstance());
+		Ref<RenderViewInstance> instance = Ref<RenderViewInstance>::from(getViewInstance());
 		if (instance.isNotNull()) {
 			Ref<Renderer> renderer = instance->m_renderer;
 			if (renderer.isNotNull()) {
@@ -135,7 +145,7 @@ namespace slib
 
 	void RenderView::_requestRender_NW()
 	{
-		Ref<GTK_RenderViewInstance> instance = Ref<GTK_RenderViewInstance>::from(getViewInstance());
+		Ref<RenderViewInstance> instance = Ref<RenderViewInstance>::from(getViewInstance());
 		if (instance.isNotNull()) {
 			Ref<Renderer> renderer = instance->m_renderer;
 			if (renderer.isNotNull()) {

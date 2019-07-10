@@ -31,18 +31,28 @@
 namespace slib
 {
 
-	class _priv_Win32_CheckBoxViewInstance : public Win32_ViewInstance
+	namespace priv
 	{
-	public:
-		sl_bool processCommand(SHORT code, LRESULT& result) override
+		namespace check_box
 		{
-			if (code == BN_CLICKED) {
-				onClick();
-				return sl_true;
-			}
-			return sl_false;
+
+			class CheckBoxInstance : public Win32_ViewInstance
+			{
+			public:
+				sl_bool processCommand(SHORT code, LRESULT& result) override
+				{
+					if (code == BN_CLICKED) {
+						onClick();
+						return sl_true;
+					}
+					return sl_false;
+				}
+			};
+
 		}
-	};
+	}
+
+	using namespace priv::check_box;
 
 	Ref<ViewInstance> CheckBox::createNativeWidget(ViewInstance* parent)
 	{
@@ -52,7 +62,7 @@ namespace slib
 		}
 		String16 text = getText();
 		UINT style = BS_AUTOCHECKBOX | WS_TABSTOP;
-		Ref<_priv_Win32_CheckBoxViewInstance> ret = Win32_ViewInstance::create<_priv_Win32_CheckBoxViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
+		Ref<CheckBoxInstance> ret = Win32_ViewInstance::create<CheckBoxInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
 		if (ret.isNotNull()) {
 			HWND handle = ret->getHandle();
 			if (m_flagChecked) {
@@ -90,17 +100,23 @@ namespace slib
 		}
 	}
 
-	UISize _priv_CheckBox_Win32_measureSize(Button* view)
+	namespace priv
 	{
-		Ref<Font> font = view->getFont();
-		if (font.isNotNull()) {
-			UISize size = font->measureText(view->getText());
-			size.x += (sl_ui_len)(::GetSystemMetrics(SM_CXMENUCHECK));
-			sl_ui_len cy = (sl_ui_len)(::GetSystemMetrics(SM_CYMENUCHECK));
-			size.y = SLIB_MAX(size.y, cy);
-			return size;
+		namespace check_box
+		{
+			UISize measureNativeWidgetSize(CheckBox* view)
+			{
+				Ref<Font> font = view->getFont();
+				if (font.isNotNull()) {
+					UISize size = font->measureText(view->getText());
+					size.x += (sl_ui_len)(::GetSystemMetrics(SM_CXMENUCHECK));
+					sl_ui_len cy = (sl_ui_len)(::GetSystemMetrics(SM_CYMENUCHECK));
+					size.y = SLIB_MAX(size.y, cy);
+					return size;
+				}
+				return UISize::zero();
+			}
 		}
-		return UISize::zero();
 	}
 
 }
