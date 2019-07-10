@@ -120,9 +120,9 @@ int main(int argc, const char * argv[])
 			SAppSimulateLayoutParam param;
 			String pathConfig = pathApp + "/.sapp.conf";
 			Json config = Json::parseJsonFromTextFile(pathConfig);
-			param.windowSize.x = config["simulator_window_width"].getInt32(param.windowSize.x);
-			param.windowSize.y = config["simulator_window_height"].getInt32(param.windowSize.y);
-			param.onCloseWindow = [pathConfig](Window* window, UIEvent* ev) {
+			param.pageSize.x = config["simulator_window_width"].getInt32(param.pageSize.x);
+			param.pageSize.y = config["simulator_window_height"].getInt32(param.pageSize.y);
+			param.onClosePage = [pathConfig](Window* window, UIEvent* ev) {
 				Json config = Json::parseJsonFromTextFile(pathConfig);
 				if (config.isNull()) {
 					config = Json::createMap();
@@ -131,6 +131,9 @@ int main(int argc, const char * argv[])
 				config.putItem("simulator_window_width", size.x);
 				config.putItem("simulator_window_height", size.y);
 				File::writeAllTextUTF8(pathConfig, config.toJsonString());
+				UI::quitApp();
+			};
+			param.onCloseWindow = [pathConfig](Window* window, UIEvent* ev) {
 				UI::quitApp();
 			};
 			doc->simulateLayoutInWindow(layoutName, param);

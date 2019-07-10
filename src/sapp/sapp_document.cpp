@@ -154,8 +154,8 @@ namespace slib
 	
 	SAppSimulateLayoutParam::SAppSimulateLayoutParam()
 	{
-		windowSize.x = 450;
-		windowSize.y = 800;
+		pageSize.x = 450;
+		pageSize.y = 800;
 	}
 	
 	

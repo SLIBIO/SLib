@@ -551,6 +551,9 @@ namespace slib
 		if (!flagDefined) {
 			return sl_true;
 		}
+		if (unit == WRAP) {
+			return sl_true;
+		}
 		return amount >= 0 && isGlobalUnit(unit);
 	}
 

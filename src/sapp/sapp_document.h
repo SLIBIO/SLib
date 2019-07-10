@@ -58,7 +58,8 @@ namespace slib
 	class SAppSimulateLayoutParam
 	{
 	public:
-		UISize windowSize;
+		UISize pageSize;
+		Function<void(Window*, UIEvent*)> onClosePage;
 		Function<void(Window*, UIEvent*)> onCloseWindow;
 
 	public:

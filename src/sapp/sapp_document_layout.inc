@@ -614,8 +614,12 @@ namespace slib
 	{
 		Ref<SAppLayoutSimulationWindow> window = new SAppLayoutSimulationWindow;
 		if (window.isNotNull()) {
-			window->setClientSize(param.windowSize);
-			window->setOnClose(param.onCloseWindow);
+			if (layout->layoutType == SAppLayoutType::Window) {
+				window->setOnClose(param.onCloseWindow);
+			} else {
+				window->setClientSize(param.pageSize);
+				window->setOnClose(param.onClosePage);
+			}
 			window->open(this, layout);
 		}
 	}
@@ -1471,20 +1475,49 @@ namespace slib
 		
 		LAYOUT_CONTROL_MENU_ATTR(menu, setMenu)
 		LAYOUT_CONTROL_STRING_ATTR(title, setTitle)
-		if (op == OP_SIMULATE) {
+		if (op == OP_PARSE) {
+			LAYOUT_CONTROL_INT_DIMENSION_ATTR(left, setLeft, checkForWindow)
+			LAYOUT_CONTROL_INT_DIMENSION_ATTR(top, setTop, checkForWindow)
+			LAYOUT_CONTROL_INT_DIMENSION_ATTR(width, setWidth, checkForWindowSize)
+			LAYOUT_CONTROL_INT_DIMENSION_ATTR(height, setHeight, checkForWindowSize)
+		} else if (op == OP_GENERATE_CPP) {
+			LAYOUT_CONTROL_INT_DIMENSION_ATTR(left, setLeft, checkForWindow)
+			LAYOUT_CONTROL_INT_DIMENSION_ATTR(top, setTop, checkForWindow)
+			if (attr->width.flagDefined) {
+				if (attr->width.unit == SAppDimensionValue::WRAP) {
+					params->sbDefineInit->add(String::format("%s%s->setWidthWrapping();%n", strTab, name));
+				} else {
+					LAYOUT_CONTROL_INT_DIMENSION_ATTR(width, setWidth, checkForWindowSize)
+				}
+			}
+			if (attr->height.flagDefined) {
+				if (attr->height.unit == SAppDimensionValue::WRAP) {
+					params->sbDefineInit->add(String::format("%s%s->setHeightWrapping();%n", strTab, name));
+				} else {
+					LAYOUT_CONTROL_INT_DIMENSION_ATTR(height, setHeight, checkForWindowSize)
+				}
+			}
+		} else if (op == OP_SIMULATE) {
 			if (!flagOnLayout) {
 				flagOnLayout = sl_true;
 				LAYOUT_CONTROL_INT_DIMENSION_ATTR(left, setLeft, checkForWindow)
 				LAYOUT_CONTROL_INT_DIMENSION_ATTR(top, setTop, checkForWindow)
-				LAYOUT_CONTROL_INT_DIMENSION_ATTR(width, setWidth, checkForWindow)
-				LAYOUT_CONTROL_INT_DIMENSION_ATTR(height, setHeight, checkForWindow)
+				if (attr->width.flagDefined) {
+					if (attr->width.unit == SAppDimensionValue::WRAP) {
+						view->setWidthWrapping();
+					} else {
+						LAYOUT_CONTROL_INT_DIMENSION_ATTR(width, setWidth, checkForWindowSize)
+					}
+				}
+				if (attr->height.flagDefined) {
+					if (attr->height.unit == SAppDimensionValue::WRAP) {
+						view->setHeightWrapping();
+					} else {
+						LAYOUT_CONTROL_INT_DIMENSION_ATTR(height, setHeight, checkForWindowSize)
+					}
+				}
 				flagOnLayout = sl_false;
 			}
-		} else {
-			LAYOUT_CONTROL_INT_DIMENSION_ATTR(left, setLeft, checkForWindow)
-			LAYOUT_CONTROL_INT_DIMENSION_ATTR(top, setTop, checkForWindow)
-			LAYOUT_CONTROL_INT_DIMENSION_ATTR(width, setWidth, checkForWindow)
-			LAYOUT_CONTROL_INT_DIMENSION_ATTR(height, setHeight, checkForWindow)		
 		}
 		
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR(minWidth, setMinimumWidth, checkForWindow)

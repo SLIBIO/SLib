@@ -425,39 +425,39 @@ namespace slib
 		AtomicString m_title;
 		Color m_backgroundColor;
 		
-		sl_bool m_flagVisible;
-		sl_bool m_flagMinimized;
-		sl_bool m_flagMaximized;
-		
-		sl_bool m_flagAlwaysOnTop;
-		sl_bool m_flagCloseButtonEnabled;
-		sl_bool m_flagMinimizeButtonEnabled;
-		sl_bool m_flagMaximizeButtonEnabled;
-		sl_bool m_flagResizable;
 		sl_real m_alpha;
-		sl_bool m_flagTransparent;
-		
-		sl_bool m_flagModal;
-		sl_bool m_flagSheet;
-		sl_bool m_flagDialog;
-		sl_bool m_flagBorderless;
-		sl_bool m_flagShowTitleBar;
-		sl_bool m_flagFullScreenOnCreate;
-		sl_bool m_flagCenterScreenOnCreate;
-		
 		UISize m_clientSizeRequested;
-		sl_bool m_flagUseClientSizeRequested;
 		
 		UISize m_sizeMin;
 		UISize m_sizeMax;
 		float m_aspectRatioMinimum;
 		float m_aspectRatioMaximum;
-		sl_bool m_flagStateResizingWidth;
-		sl_bool m_flagWidthWrapping;
-		sl_bool m_flagHeightWrapping;
 		
-		sl_bool m_flagStateDoModal;
-		sl_bool m_flagDispatchedDestroy;
+		sl_bool m_flagVisible : 1;
+		sl_bool m_flagMinimized : 1;
+		sl_bool m_flagMaximized : 1;
+		
+		sl_bool m_flagAlwaysOnTop : 1;
+		sl_bool m_flagCloseButtonEnabled : 1;
+		sl_bool m_flagMinimizeButtonEnabled : 1;
+		sl_bool m_flagMaximizeButtonEnabled : 1;
+		sl_bool m_flagResizable : 1;
+		sl_bool m_flagTransparent : 1;
+		
+		sl_bool m_flagModal : 1;
+		sl_bool m_flagSheet : 1;
+		sl_bool m_flagDialog : 1;
+		sl_bool m_flagBorderless: 1;
+		sl_bool m_flagShowTitleBar : 1;
+		sl_bool m_flagFullScreenOnCreate : 1;
+		sl_bool m_flagCenterScreenOnCreate : 1;
+		sl_bool m_flagWidthWrapping : 1;
+		sl_bool m_flagHeightWrapping : 1;
+
+		sl_bool m_flagUseClientSizeRequested : 1;
+		sl_bool m_flagStateResizingWidth : 1;
+		sl_bool m_flagStateDoModal : 1;
+		sl_bool m_flagDispatchedDestroy : 1;
 
 #if defined(SLIB_UI_IS_ANDROID)
 		// jobject

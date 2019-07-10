@@ -91,19 +91,27 @@ namespace slib
 					if (!flagHorz && !flagVert) {
 						return;
 					}
-					UISize sizeWindow = window->getClientSize();
-					UISize sizeOld = sizeWindow;
+					UISize sizeOld = window->getClientSize();
+					UISize sizeNew = sizeOld;
 					UISize sizeMeasured = measureLayoutWrappingSize(flagHorz, flagVert);
 					if (flagHorz) {
-						sizeWindow.x = sizeMeasured.x;
+						sizeNew.x = sizeMeasured.x;
 					}
 					if (flagVert) {
-						sizeWindow.y = sizeMeasured.y;
+						sizeNew.y = sizeMeasured.y;
 					}
-					if (sizeWindow.isAlmostEqual(sizeOld)) {
+					if (sizeNew.isAlmostEqual(sizeOld)) {
 						return;
 					}
-					window->setClientSize(sizeWindow);
+					if (window->getWindowInstance().isNotNull()) {
+						if (window->isCenterScreenOnCreate()) {
+							UIPoint posOld = window->getLocation();
+							window->setClientSize(sizeNew);
+							window->setLocation(posOld + (sizeOld - sizeNew) / 2);
+							return;
+						}
+					}
+					window->setClientSize(sizeNew);
 				}
 				
 			};
@@ -123,6 +131,15 @@ namespace slib
 		
 		m_backgroundColor = Color::zero();
 		
+		m_alpha = 1.0;
+		
+		m_sizeMin.x = 0;
+		m_sizeMin.y = 0;
+		m_sizeMax.x = 0;
+		m_sizeMax.y = 0;
+		m_aspectRatioMinimum = 0;
+		m_aspectRatioMaximum = 0;
+
 		m_flagVisible = sl_true;
 		m_flagMinimized = sl_false;
 		m_flagMaximized = sl_false;
@@ -132,8 +149,6 @@ namespace slib
 		m_flagMinimizeButtonEnabled = sl_false;
 		m_flagMaximizeButtonEnabled = sl_false;
 		m_flagResizable = sl_false;
-		
-		m_alpha = 1.0;
 		m_flagTransparent = sl_false;
 		
 		m_flagModal = sl_false;
@@ -148,19 +163,11 @@ namespace slib
 			sl_false;
 #endif
 		m_flagCenterScreenOnCreate = sl_false;
-		
-		m_flagUseClientSizeRequested = sl_false;
-		
-		m_sizeMin.x = 0;
-		m_sizeMin.y = 0;
-		m_sizeMax.x = 0;
-		m_sizeMax.y = 0;
-		m_aspectRatioMinimum = 0;
-		m_aspectRatioMaximum = 0;
-		m_flagStateResizingWidth = sl_false;
 		m_flagWidthWrapping = sl_false;
 		m_flagHeightWrapping = sl_false;
-		
+
+		m_flagUseClientSizeRequested = sl_false;
+		m_flagStateResizingWidth = sl_false;
 		m_flagStateDoModal = sl_false;
 		m_flagDispatchedDestroy = sl_false;
 
@@ -1047,6 +1054,22 @@ namespace slib
 		Ref<Window> parent = m_parent;
 		if (parent.isNotNull()) {
 			param.parent = parent->m_instance;
+		}
+		
+		if (m_flagWidthWrapping || m_flagHeightWrapping) {
+			UISize sizeMeasured = m_viewContent->measureLayoutWrappingSize(m_flagWidthWrapping, m_flagHeightWrapping);
+			if (m_flagWidthWrapping) {
+				if (sizeMeasured.x < 100) {
+					sizeMeasured.x = 100;
+				}
+				m_frame.setWidth(sizeMeasured.x);
+			}
+			if (m_flagHeightWrapping) {
+				if (sizeMeasured.y < 100) {
+					sizeMeasured.y = 100;
+				}
+				m_frame.setHeight(sizeMeasured.y);
+			}
 		}
 		
 		param.screen = m_screen;
