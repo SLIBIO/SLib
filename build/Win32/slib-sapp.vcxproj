@@ -75,7 +75,7 @@
     <OutDir>$(ProjectDir)..\..\bin\Windows\</OutDir>
     <IntDir>$(ProjectDir)Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\src\sapp;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\..\lib/win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\..\lib/Win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
     <TargetName>sapp</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -83,7 +83,7 @@
     <OutDir>$(ProjectDir)..\..\bin\Windows\</OutDir>
     <IntDir>$(ProjectDir)Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\src\sapp;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\..\lib/win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\..\lib/Win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
     <TargetName>sapp</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -91,7 +91,7 @@
     <OutDir>$(ProjectDir)..\..\bin\Windows\</OutDir>
     <IntDir>$(ProjectDir)Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\src\sapp;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\..\lib/win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\..\lib/Win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
     <TargetName>sapp</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -99,7 +99,7 @@
     <OutDir>$(ProjectDir)..\..\bin\Windows\</OutDir>
     <IntDir>$(ProjectDir)Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>$(ProjectDir)..\..\include;$(ProjectDir)..\..\src\sapp;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\..\lib/win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\..\lib/Win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
     <TargetName>sapp</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

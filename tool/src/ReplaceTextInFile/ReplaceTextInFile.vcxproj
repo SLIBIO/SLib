@@ -73,28 +73,28 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)..\..\..\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\..\..\lib/win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\..\..\lib/Win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
     <IntDir>$(ProjectDir)Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\..\bin\Windows\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)..\..\..\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\..\..\lib/win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\..\..\lib/Win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
     <IntDir>$(ProjectDir)Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\..\bin\Windows\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(ProjectDir)..\..\..\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\..\..\lib/win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\..\..\lib/Win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
     <IntDir>$(ProjectDir)Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\..\bin\Windows\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(ProjectDir)..\..\..\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\..\..\lib/win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\..\..\lib/Win32/$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
     <IntDir>$(ProjectDir)Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\..\bin\Windows\</OutDir>
   </PropertyGroup>
