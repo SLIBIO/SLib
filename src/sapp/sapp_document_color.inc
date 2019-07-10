@@ -31,37 +31,37 @@ namespace slib
 		
 		String name = element->getAttribute("name");
 		if (name.isEmpty()) {
-			_logError(element, _g_sdev_sapp_error_resource_color_name_is_empty);
+			_logError(element, g_str_error_resource_color_name_is_empty);
 			return sl_false;
 		}
 		if (!(SAppUtil::checkName(name.getData(), name.getLength()))) {
-			_logError(element, _g_sdev_sapp_error_resource_color_name_invalid.arg(name));
+			_logError(element, g_str_error_resource_color_name_invalid.arg(name));
 			return sl_false;
 		}
 		
 		name = getNameInLocalNamespace(localNamespace, name);
 		
 		if (m_colors.find(name)) {
-			_logError(element, _g_sdev_sapp_error_resource_color_name_redefined.arg(name));
+			_logError(element, g_str_error_resource_color_name_redefined.arg(name));
 			return sl_false;
 		}
 		
 		String valueText = element->getText();
 		Color value;
 		if (!(Color::parse(valueText, &value))) {
-			_logError(element, _g_sdev_sapp_error_resource_color_value_invalid.arg(valueText));
+			_logError(element, g_str_error_resource_color_value_invalid.arg(valueText));
 			return sl_false;
 		}
 		
 		Ref<SAppColorResource> res = new SAppColorResource;
 		if (res.isNull()) {
-			_logError(element, _g_sdev_sapp_error_out_of_memory);
+			_logError(element, g_str_error_out_of_memory);
 			return sl_false;
 		}
 		res->name = name;
 		res->value = value;
 		if (!(m_colors.put(name, res))) {
-			_logError(element, _g_sdev_sapp_error_out_of_memory);
+			_logError(element, g_str_error_out_of_memory);
 			return sl_false;
 		}
 		
@@ -70,7 +70,7 @@ namespace slib
 
 	sl_bool SAppDocument::_generateColorsCpp(const String& targetPath)
 	{
-		_log(_g_sdev_sapp_log_generate_cpp_colors_begin);
+		_log(g_str_log_generate_cpp_colors_begin);
 		
 		StringBuffer sbHeader, sbCpp, sbMap;
 		
@@ -113,7 +113,7 @@ namespace slib
 		String contentHeader = sbHeader.merge();
 		if (File::readAllTextUTF8(pathHeader) != contentHeader) {
 			if (!(File::writeAllTextUTF8(pathHeader, contentHeader))) {
-				_logError(_g_sdev_sapp_error_file_write_failed.arg(pathHeader));
+				_logError(g_str_error_file_write_failed.arg(pathHeader));
 				return sl_false;
 			}
 		}
@@ -122,7 +122,7 @@ namespace slib
 		String contentCpp = sbCpp.merge();
 		if (File::readAllTextUTF8(pathCpp) != contentCpp) {
 			if (!(File::writeAllTextUTF8(pathCpp, contentCpp))) {
-				_logError(_g_sdev_sapp_error_file_write_failed.arg(pathCpp));
+				_logError(g_str_error_file_write_failed.arg(pathCpp));
 				return sl_false;
 			}
 		}
@@ -187,7 +187,7 @@ namespace slib
 		if (getItemFromMap(m_colors, localNamespace, name, outName, outResource)) {
 			return sl_true;
 		} else {
-			_logError(element, _g_sdev_sapp_error_color_not_found.arg(name));
+			_logError(element, g_str_error_color_not_found.arg(name));
 			return sl_false;
 		}
 	}

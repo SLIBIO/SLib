@@ -32,14 +32,22 @@
 namespace slib
 {
 	
-	static sl_reg _priv_SApp_parseFloat(float* _out, const sl_char8* sz, sl_size start, sl_size end)
+	namespace priv
 	{
-		return Calculator::calculate(_out, sl_null, sz, start, end);
-	}
-	
-	static sl_bool _priv_SApp_parseFloat(float* _out, const String& str)
-	{
-		return Calculator::calculate(str, _out);
+		namespace sapp
+		{
+			
+			static sl_reg parseFloat(float* _out, const sl_char8* sz, sl_size start, sl_size end)
+			{
+				return Calculator::calculate(_out, sl_null, sz, start, end);
+			}
+			
+			static sl_bool parseFloat(float* _out, const String& str)
+			{
+				return Calculator::calculate(str, _out);
+			}
+
+		}
 	}
 
 	/************************************************
@@ -365,7 +373,7 @@ namespace slib
 			sl_size len = str.getLength();
 			
 			float f;
-			sl_reg ret = _priv_SApp_parseFloat(&f, sz, 0, str.endsWith('*') ? len - 1 : len);
+			sl_reg ret = priv::sapp::parseFloat(&f, sz, 0, str.endsWith('*') ? len - 1 : len);
 			if (ret == SLIB_PARSE_ERROR) {
 				return sl_false;
 			}
@@ -677,7 +685,7 @@ namespace slib
 			return sl_true;
 		}
 		float f;
-		if (_priv_SApp_parseFloat(&f, str)) {
+		if (priv::sapp::parseFloat(&f, str)) {
 			value = f;
 			flagDefined = sl_true;
 			return sl_true;
@@ -835,7 +843,7 @@ namespace slib
 		const sl_char8* sz = str.getData();
 		float f[2];
 		for (sl_size i = 0; i < 2; i++) {
-			sl_reg iRet = _priv_SApp_parseFloat(f+i, sz, pos, len);
+			sl_reg iRet = priv::sapp::parseFloat(f+i, sz, pos, len);
 			if (iRet == SLIB_PARSE_ERROR) {
 				return sl_false;
 			}
@@ -905,7 +913,7 @@ namespace slib
 		const sl_char8* sz = str.getData();
 		float f[3];
 		for (sl_size i = 0; i < 3; i++) {
-			sl_reg iRet = _priv_SApp_parseFloat(f+i, sz, pos, len);
+			sl_reg iRet = priv::sapp::parseFloat(f+i, sz, pos, len);
 			if (iRet == SLIB_PARSE_ERROR) {
 				return sl_false;
 			}
@@ -976,7 +984,7 @@ namespace slib
 		const sl_char8* sz = str.getData();
 		float f[4];
 		for (sl_size i = 0; i < 4; i++) {
-			sl_reg iRet = _priv_SApp_parseFloat(f+i, sz, pos, len);
+			sl_reg iRet = priv::sapp::parseFloat(f+i, sz, pos, len);
 			if (iRet == SLIB_PARSE_ERROR) {
 				return sl_false;
 			}
@@ -1338,7 +1346,7 @@ namespace slib
 							return sl_false;
 						}
 					}
-					sl_reg iRet = _priv_SApp_parseFloat(f+i, sz, pos, len);
+					sl_reg iRet = priv::sapp::parseFloat(f+i, sz, pos, len);
 					if (iRet == SLIB_PARSE_ERROR) {
 						return sl_false;
 					}

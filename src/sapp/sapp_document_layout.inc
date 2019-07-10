@@ -38,7 +38,7 @@ namespace slib
 		
 		Ref<SAppLayoutStyle> style = new SAppLayoutStyle;
 		if (style.isNull()) {
-			_logError(element, _g_sdev_sapp_error_out_of_memory);
+			_logError(element, g_str_error_out_of_memory);
 			return sl_false;
 		}
 		
@@ -46,20 +46,20 @@ namespace slib
 
 		String name = element->getAttribute("name").trim();
 		if (name.isEmpty()) {
-			_logError(element, _g_sdev_sapp_error_resource_layout_name_is_empty);
+			_logError(element, g_str_error_resource_layout_name_is_empty);
 			return sl_false;
 		}
 		
 		name = getNameInLocalNamespace(localNamespace, name);
 		
 		if (m_layoutStyles.find(name)) {
-			_logError(element, _g_sdev_sapp_error_resource_layout_name_redefined.arg(name));
+			_logError(element, g_str_error_resource_layout_name_redefined.arg(name));
 			return sl_false;
 		}
 		style->name = name;
 		
 		if (!(m_layoutStyles.put(name, style))) {
-			_logError(element, _g_sdev_sapp_error_out_of_memory);
+			_logError(element, g_str_error_out_of_memory);
 			return sl_false;
 		}
 		
@@ -73,7 +73,7 @@ namespace slib
 				if (inheritStyle.isNotNull()) {
 					style->inherit.add(inheritStyle);
 				} else {
-					_logError(element, _g_sdev_sapp_error_layout_style_not_found.arg(s));
+					_logError(element, g_str_error_layout_style_not_found.arg(s));
 					return sl_false;
 				}
 			}
@@ -90,7 +90,7 @@ namespace slib
 		
 		Ref<SAppLayoutInclude> include = new SAppLayoutInclude;
 		if (include.isNull()) {
-			_logError(element, _g_sdev_sapp_error_out_of_memory);
+			_logError(element, g_str_error_out_of_memory);
 			return sl_false;
 		}
 		
@@ -98,20 +98,20 @@ namespace slib
 		
 		String name = element->getAttribute("name").trim();
 		if (name.isEmpty()) {
-			_logError(element, _g_sdev_sapp_error_resource_layout_name_is_empty);
+			_logError(element, g_str_error_resource_layout_name_is_empty);
 			return sl_false;
 		}
 		
 		name = getNameInLocalNamespace(localNamespace, name);
 		
 		if (m_layoutIncludes.find(name)) {
-			_logError(element, _g_sdev_sapp_error_resource_layout_name_redefined.arg(name));
+			_logError(element, g_str_error_resource_layout_name_redefined.arg(name));
 			return sl_false;
 		}
 		include->name = name;
 		
 		if (!(m_layoutIncludes.put(name, include))) {
-			_logError(element, _g_sdev_sapp_error_out_of_memory);
+			_logError(element, g_str_error_out_of_memory);
 			return sl_false;
 		}
 		
@@ -126,14 +126,14 @@ namespace slib
 		
 		String name = element->getAttribute("name").trim();
 		if (name.isEmpty()) {
-			_logError(element, _g_sdev_sapp_error_resource_layout_name_is_empty);
+			_logError(element, g_str_error_resource_layout_name_is_empty);
 			return sl_false;
 		}
 		
 		name = getNameInLocalNamespace(localNamespace, name);
 		
 		if (m_layoutUnits.find(name)) {
-			_logError(element, _g_sdev_sapp_error_resource_layout_name_redefined.arg(name));
+			_logError(element, g_str_error_resource_layout_name_redefined.arg(name));
 			return sl_false;
 		}
 		
@@ -141,12 +141,12 @@ namespace slib
 		
 		SAppDimensionValue value;
 		if (!(value.parse(strValue, this))) {
-			_logError(element, _g_sdev_sapp_error_resource_layout_value_invalid.arg(strValue));
+			_logError(element, g_str_error_resource_layout_value_invalid.arg(strValue));
 			return sl_false;
 		}
 
 		if (!(m_layoutUnits.put(name, value))) {
-			_logError(element, _g_sdev_sapp_error_out_of_memory);
+			_logError(element, g_str_error_out_of_memory);
 			return sl_false;
 		}
 		
@@ -161,7 +161,7 @@ namespace slib
 		
 		Ref<SAppLayoutResource> layout = new SAppLayoutResource;
 		if (layout.isNull()) {
-			_logError(element, _g_sdev_sapp_error_out_of_memory);
+			_logError(element, g_str_error_out_of_memory);
 			return sl_false;
 		}
 		
@@ -177,13 +177,13 @@ namespace slib
 		} else if (strType == "page") {
 			type = SAppLayoutType::Page;
 		} else {
-			_logError(element, _g_sdev_sapp_error_resource_layout_type_invalid.arg(strType));
+			_logError(element, g_str_error_resource_layout_type_invalid.arg(strType));
 			return sl_false;
 		}
 		layout->layoutType = type;
 		
 		if (m_layouts.find(localNamespace)) {
-			_logError(element, _g_sdev_sapp_error_resource_layout_name_redefined.arg(localNamespace));
+			_logError(element, g_str_error_resource_layout_name_redefined.arg(localNamespace));
 			return sl_false;
 		}
 		layout->name = localNamespace;
@@ -195,7 +195,7 @@ namespace slib
 		}
 		
 		if (!(m_layouts.put(localNamespace, layout))) {
-			_logError(element, _g_sdev_sapp_error_out_of_memory);
+			_logError(element, g_str_error_out_of_memory);
 			return sl_false;
 		}
 		
@@ -238,7 +238,7 @@ namespace slib
 				if (style.isNotNull()) {
 					item->styles.add(style);
 				} else {
-					_logError(element, _g_sdev_sapp_error_layout_style_not_found.arg(s));
+					_logError(element, g_str_error_layout_style_not_found.arg(s));
 					return sl_false;
 				}
 			}
@@ -253,7 +253,7 @@ namespace slib
 				if (style.isNotNull()) {
 					item->styles.add(style);
 				} else {
-					_logError(element, _g_sdev_sapp_error_layout_style_not_found.arg(s));
+					_logError(element, g_str_error_layout_style_not_found.arg(s));
 					return sl_false;
 				}
 			}
@@ -265,15 +265,15 @@ namespace slib
 			sl_int32 arrayIndex = -1;
 			if (name.isNotEmpty()) {
 				if (!(SAppUtil::checkNameOrArrayMember(name, &arrayName, &arrayIndex))) {
-					_logError(element, _g_sdev_sapp_error_resource_layout_name_invalid.arg(name));
+					_logError(element, g_str_error_resource_layout_name_invalid.arg(name));
 					return sl_false;
 				}
 				if (layout->itemsByName.find(name)) {
-					_logError(element, _g_sdev_sapp_error_resource_layout_name_redefined.arg(name));
+					_logError(element, g_str_error_resource_layout_name_redefined.arg(name));
 					return sl_false;
 				}
 				if (layout->radioGroups.find(name)) {
-					_logError(element, _g_sdev_sapp_error_resource_layout_name_redefined.arg(name));
+					_logError(element, g_str_error_resource_layout_name_redefined.arg(name));
 					return sl_false;
 				}
 			} else {
@@ -301,7 +301,7 @@ namespace slib
 		
 		if (customClassName.isNotEmpty()) {
 			if (!(layout->customClasses.put(customClassName, sl_true))) {
-				_logError(element, _g_sdev_sapp_error_out_of_memory);
+				_logError(element, g_str_error_out_of_memory);
 				return sl_false;
 			}
 		}
@@ -309,17 +309,17 @@ namespace slib
 		if (!parent) {
 			String strSP = layout->getXmlAttribute("sp");
 			if (!(layout->sp.parse(strSP, this))) {
-				_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("sp", strSP));
+				_logError(element, g_str_error_resource_layout_attribute_invalid.arg("sp", strSP));
 			}
 			if (!(layout->sp.checkSP())) {
-				_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("sp", strSP));
+				_logError(element, g_str_error_resource_layout_attribute_invalid.arg("sp", strSP));
 				return sl_false;
 			}
 		}
 		
 		if (parent) {
 			if (!(layout->itemsByName.put(item->name, item))) {
-				_logError(element, _g_sdev_sapp_error_out_of_memory);
+				_logError(element, g_str_error_out_of_memory);
 				return sl_false;
 			}
 		}
@@ -328,7 +328,7 @@ namespace slib
 			SAppLayoutResource::ItemArrayDesc desc;
 			if (layout->itemArrays.get(item->arrayName, &desc)) {
 				if (desc.className != item->className) {
-					_logError(element, _g_sdev_sapp_error_resource_layout_name_array_item_class_different.arg(item->name));
+					_logError(element, g_str_error_resource_layout_name_array_item_class_different.arg(item->name));
 				}
 				if (desc.itemsCount < n) {
 					desc.itemsCount = n;
@@ -349,13 +349,13 @@ namespace slib
 		String strType = element->getName();
 		SAppLayoutItemType type = SAppLayoutResource::getTypeFromName(strType);
 		if (type == SAppLayoutItemType::Unknown) {
-			_logError(element, _g_sdev_sapp_error_resource_layout_type_invalid.arg(strType));
+			_logError(element, g_str_error_resource_layout_type_invalid.arg(strType));
 			return Ref<SAppLayoutResourceItem>::null();
 		}
 		
 		Ref<SAppLayoutResourceItem> childItem = new SAppLayoutResourceItem;
 		if (childItem.isNull()) {
-			_logError(element, _g_sdev_sapp_error_out_of_memory);
+			_logError(element, g_str_error_out_of_memory);
 			return Ref<SAppLayoutResourceItem>::null();
 		}
 		
@@ -371,12 +371,12 @@ namespace slib
 
 	sl_bool SAppDocument::_generateLayoutsCpp(const String& targetPath)
 	{
-		_log(_g_sdev_sapp_log_generate_cpp_layouts_begin);
+		_log(g_str_log_generate_cpp_layouts_begin);
 		
 		if (!(File::isDirectory(targetPath + "/ui"))) {
 			File::createDirectory(targetPath + "/ui");
 			if (!(File::isDirectory(targetPath + "/ui"))) {
-				_log(_g_sdev_sapp_error_directory_create_failed.arg(targetPath + "/ui"));
+				_log(g_str_error_directory_create_failed.arg(targetPath + "/ui"));
 				return sl_false;
 			}
 		}
@@ -439,7 +439,7 @@ namespace slib
 		String contentHeaderBase = sbHeaderBase.merge();
 		if (File::readAllTextUTF8(pathHeaderBase) != contentHeaderBase) {
 			if (!(File::writeAllTextUTF8(pathHeaderBase, contentHeaderBase))) {
-				_logError(_g_sdev_sapp_error_file_write_failed.arg(pathHeaderBase));
+				_logError(g_str_error_file_write_failed.arg(pathHeaderBase));
 				return sl_false;
 			}
 		}
@@ -448,7 +448,7 @@ namespace slib
 		String contentHeader = sbHeader.merge();
 		if (File::readAllTextUTF8(pathHeader) != contentHeader) {
 			if (!(File::writeAllTextUTF8(pathHeader, contentHeader))) {
-				_logError(_g_sdev_sapp_error_file_write_failed.arg(pathHeader));
+				_logError(g_str_error_file_write_failed.arg(pathHeader));
 				return sl_false;
 			}
 		}
@@ -457,7 +457,7 @@ namespace slib
 		String contentCpp = sbCpp.merge();
 		if (File::readAllTextUTF8(pathCpp) != contentCpp) {
 			if (!(File::writeAllTextUTF8(pathCpp, contentCpp))) {
-				_logError(_g_sdev_sapp_error_file_write_failed.arg(pathCpp));
+				_logError(g_str_error_file_write_failed.arg(pathCpp));
 				return sl_false;
 			}
 		}
@@ -561,7 +561,7 @@ namespace slib
 		String contentHeader = sbHeader.merge();
 		if (File::readAllTextUTF8(pathHeader) != contentHeader) {
 			if (!(File::writeAllTextUTF8(pathHeader, contentHeader))) {
-				_logError(_g_sdev_sapp_error_file_write_failed.arg(pathHeader));
+				_logError(g_str_error_file_write_failed.arg(pathHeader));
 				return sl_false;
 			}
 		}
@@ -570,7 +570,7 @@ namespace slib
 		String contentCpp = sbCpp.merge();
 		if (File::readAllTextUTF8(pathCpp) != contentCpp) {
 			if (!(File::writeAllTextUTF8(pathCpp, contentCpp))) {
-				_logError(_g_sdev_sapp_error_file_write_failed.arg(pathCpp));
+				_logError(g_str_error_file_write_failed.arg(pathCpp));
 				return sl_false;
 			}
 		}
@@ -836,7 +836,7 @@ namespace slib
 					if (name == "include") {
 						String src = child->getAttribute("src");
 						if (src.isEmpty()) {
-							_logError(child, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("src", name));
+							_logError(child, g_str_error_resource_layout_attribute_invalid.arg("src", name));
 							return sl_false;
 						}
 						Ref<SAppLayoutInclude> include;
@@ -846,7 +846,7 @@ namespace slib
 								return sl_false;
 							}
 						} else {
-							_logError(child, _g_sdev_sapp_error_layout_include_not_found.arg(name));
+							_logError(child, g_str_error_layout_include_not_found.arg(name));
 							return sl_false;
 						}
 					} else if (tagName.isEmpty() || name == tagName) {
@@ -966,7 +966,7 @@ namespace slib
 								childItem->attrsView->height.unit = SAppDimensionValue::FILL;
 							}
 							if (!(resourceItem->children.add(childItem))) {
-								_logError(resourceItem->element, _g_sdev_sapp_error_out_of_memory);
+								_logError(resourceItem->element, g_str_error_out_of_memory);
 								return sl_false;
 							}
 						}
@@ -1033,7 +1033,7 @@ namespace slib
 		if (op == OP_PARSE) { \
 			attr = new SAppLayout##NAME##Attributes; \
 			if (attr.isNull()) { \
-				_logError(element, _g_sdev_sapp_error_out_of_memory); \
+				_logError(element, g_str_error_out_of_memory); \
 				return sl_false; \
 			} \
 			resourceItem->attrs##NAME = attr; \
@@ -1059,7 +1059,7 @@ namespace slib
 
 
 #define LOG_ERROR_LAYOUT_CONTROL_XML_ATTR(XML, NAME) \
-	_logError(XML, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str_##NAME));
+	_logError(XML, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str_##NAME));
 
 #define LAYOUT_CONTROL_PARSE_XML_ATTR(XML, ATTR, NAME) \
 	String str_##NAME = XML->getAttribute(#NAME); \
@@ -1083,7 +1083,7 @@ namespace slib
 	}
 
 #define LOG_ERROR_LAYOUT_CONTROL_ATTR(NAME) \
-	_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str_##NAME));
+	_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str_##NAME));
 
 #define LAYOUT_CONTROL_PARSE_ATTR(ATTR, NAME) \
 	String str_##NAME = resourceItem->getXmlAttribute(#NAME); \
@@ -1110,7 +1110,7 @@ namespace slib
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str))) { \
-			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
 	} else if (op == OP_GENERATE_CPP) { \
@@ -1129,7 +1129,7 @@ namespace slib
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str))) { \
-			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
 	} else if (op == OP_GENERATE_CPP) { \
@@ -1149,7 +1149,7 @@ namespace slib
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str))) { \
-			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
 	} else if (op == OP_GENERATE_CPP) { \
@@ -1168,11 +1168,11 @@ namespace slib
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str, this))) { \
-			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
 		if (!(attr->NAME.CHECKFUNC())) { \
-			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
 	} else if (op == OP_GENERATE_CPP) { \
@@ -1199,11 +1199,11 @@ namespace slib
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str, this))) { \
-			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
 		if (!(attr->NAME.CHECKFUNC())) { \
-			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
 	} else if (op == OP_GENERATE_CPP) { \
@@ -1236,17 +1236,17 @@ namespace slib
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str, this))) { \
-			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
 		if (flagRoot) { \
 			if (!(attr->NAME.checkForRootViewMargin())) { \
-				_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+				_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 				return sl_false; \
 			} \
 		} else { \
 			if (!(attr->NAME.checkMargin())) { \
-				_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+				_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 				return sl_false; \
 			} \
 		} \
@@ -1282,7 +1282,7 @@ namespace slib
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str))) { \
-			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
 	} else if (op == OP_GENERATE_CPP) { \
@@ -1310,7 +1310,7 @@ namespace slib
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str))) { \
-			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
 	} else if (op == OP_GENERATE_CPP) { \
@@ -1338,7 +1338,7 @@ namespace slib
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str))) { \
-			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
 	} else if (op == OP_GENERATE_CPP) { \
@@ -1366,7 +1366,7 @@ namespace slib
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str, this))) { \
-			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
 	} else if (op == OP_GENERATE_CPP) { \
@@ -1394,7 +1394,7 @@ namespace slib
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str))) { \
-			_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
+			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
 	} else if (op == OP_GENERATE_CPP) { \
@@ -2383,7 +2383,7 @@ namespace slib
 		if (op == OP_PARSE) {
 			attr->layout = resourceItem->getXmlAttribute("layout");
 			if (attr->layout.isEmpty()) {
-				_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg("layout", attr->layout));
+				_logError(element, g_str_error_resource_layout_attribute_invalid.arg("layout", attr->layout));
 				return sl_false;
 			}
 			resourceItem->className = attr->layout;
@@ -2394,22 +2394,22 @@ namespace slib
 			Ref<SAppLayoutResource> layoutImport;
 			m_layouts.get(attr->layout, &layoutImport);
 			if (layoutImport.isNull()) {
-				_logError(element, _g_sdev_sapp_error_layout_not_found.arg(attr->layout));
+				_logError(element, g_str_error_layout_not_found.arg(attr->layout));
 				return sl_false;
 			}
 			if (layoutImport->layoutType != SAppLayoutType::View && layoutImport->layoutType != SAppLayoutType::Page) {
-				_logError(element, _g_sdev_sapp_error_layout_is_not_view.arg(attr->layout));
+				_logError(element, g_str_error_layout_is_not_view.arg(attr->layout));
 				return sl_false;
 			}
 		} else if (op == OP_SIMULATE) {
 			Ref<SAppLayoutResource> layoutImport;
 			m_layouts.get(attr->layout, &layoutImport);
 			if (layoutImport.isNull()) {
-				_logError(element, _g_sdev_sapp_error_layout_not_found.arg(attr->layout));
+				_logError(element, g_str_error_layout_not_found.arg(attr->layout));
 				return sl_false;
 			}
 			if (layoutImport->layoutType != SAppLayoutType::View && layoutImport->layoutType != SAppLayoutType::Page) {
-				_logError(element, _g_sdev_sapp_error_layout_is_not_view.arg(attr->layout));
+				_logError(element, g_str_error_layout_is_not_view.arg(attr->layout));
 				return sl_false;
 			}
 			if (!flagOnLayout) {
@@ -2554,7 +2554,7 @@ namespace slib
 						value_##NAME = resourceItem->getXmlAttribute(value_##NAME##_name); \
 					} \
 					if (!(category.NAME[k].parse(value_##NAME, ##__VA_ARGS__))) { \
-						_logError(element, _g_sdev_sapp_error_resource_layout_attribute_invalid.arg(value_##NAME##_name, value_##NAME)); \
+						_logError(element, g_str_error_resource_layout_attribute_invalid.arg(value_##NAME##_name, value_##NAME)); \
 						return sl_false; \
 					}
 
@@ -2761,11 +2761,11 @@ namespace slib
 			attr->group = resourceItem->getXmlAttribute("group");
 			if (attr->group.isNotEmpty()) {
 				if (!(SAppUtil::checkName(attr->group.getData(), attr->group.getLength()))) {
-					_logError(element, _g_sdev_sapp_error_resource_layout_name_invalid.arg(attr->group));
+					_logError(element, g_str_error_resource_layout_name_invalid.arg(attr->group));
 					return sl_false;
 				}
 				if (params->resource->itemsByName.find(attr->group)) {
-					_logError(element, _g_sdev_sapp_error_resource_layout_name_redefined.arg(attr->group));
+					_logError(element, g_str_error_resource_layout_name_redefined.arg(attr->group));
 					return sl_false;
 				}
 				params->resource->radioGroups.put(attr->group, sl_true);
@@ -2951,7 +2951,7 @@ namespace slib
 					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., selected)
 					subItem.element = itemXml;
 					if (!(attr->items.add(subItem))) {
-						_logError(itemXml, _g_sdev_sapp_error_out_of_memory);
+						_logError(itemXml, g_str_error_out_of_memory);
 						return sl_false;
 					}
 				}
@@ -3042,7 +3042,7 @@ namespace slib
 			sl_size nChildren = element->getChildElementsCount();
 			if (nChildren > 0) {
 				if (nChildren != 1) {
-					_logError(element, _g_sdev_sapp_error_resource_layout_scrollview_must_contain_one_child);
+					_logError(element, g_str_error_resource_layout_scrollview_must_contain_one_child);
 					return sl_false;
 				}
 				Ref<XmlElement> xmlChild = element->getFirstChildElement();
@@ -3154,11 +3154,11 @@ namespace slib
 				Ref<SAppLayoutResource> layoutItem;
 				m_layouts.get(attr->itemLayout, &layoutItem);
 				if (layoutItem.isNull()) {
-					_logError(element, _g_sdev_sapp_error_layout_not_found.arg(attr->itemLayout));
+					_logError(element, g_str_error_layout_not_found.arg(attr->itemLayout));
 					return sl_false;
 				}
 				if (layoutItem->layoutType != SAppLayoutType::View) {
-					_logError(element, _g_sdev_sapp_error_layout_is_not_view.arg(attr->itemLayout));
+					_logError(element, g_str_error_layout_is_not_view.arg(attr->itemLayout));
 					return sl_false;
 				}
 				
@@ -3199,7 +3199,7 @@ namespace slib
 					LAYOUT_CONTROL_PARSE_XML_ATTR(columnXml, column., headerAlign)
 					
 					if (!(attr->columns.add(column))) {
-						_logError(columnXml, _g_sdev_sapp_error_out_of_memory);
+						_logError(columnXml, g_str_error_out_of_memory);
 						return sl_false;
 					}
 				}
@@ -3361,7 +3361,7 @@ namespace slib
 					sl_size nViews = itemXml->getChildElementsCount();
 					if (nViews > 0) {
 						if (nViews != 1) {
-							_logError(itemXml, _g_sdev_sapp_error_resource_layout_item_must_contain_one_child);
+							_logError(itemXml, g_str_error_resource_layout_item_must_contain_one_child);
 							return sl_false;
 						}
 						Ref<XmlElement> xmlView= itemXml->getFirstChildElement();
@@ -3378,7 +3378,7 @@ namespace slib
 					subItem.element = itemXml;
 					
 					if (!(attr->items.add(subItem))) {
-						_logError(itemXml, _g_sdev_sapp_error_out_of_memory);
+						_logError(itemXml, g_str_error_out_of_memory);
 						return sl_false;
 					}
 				}
@@ -3566,7 +3566,7 @@ namespace slib
 					sl_size nViews = itemXml->getChildElementsCount();
 					if (nViews > 0) {
 						if (nViews != 1) {
-							_logError(itemXml, _g_sdev_sapp_error_resource_layout_item_must_contain_one_child);
+							_logError(itemXml, g_str_error_resource_layout_item_must_contain_one_child);
 							return sl_false;
 						}
 						Ref<XmlElement> xmlView= itemXml->getFirstChildElement();
@@ -3582,7 +3582,7 @@ namespace slib
 					subItem.element = itemXml;
 					
 					if (!(attr->items.add(subItem))) {
-						_logError(itemXml, _g_sdev_sapp_error_out_of_memory);
+						_logError(itemXml, g_str_error_out_of_memory);
 						return sl_false;
 					}
 				}
@@ -3947,7 +3947,7 @@ namespace slib
 					LAYOUT_CONTROL_PARSE_XML_ATTR(itemXml, subItem., selected)
 					subItem.element = itemXml;
 					if (!(attr->items.add(subItem))) {
-						_logError(itemXml, _g_sdev_sapp_error_out_of_memory);
+						_logError(itemXml, g_str_error_out_of_memory);
 						return sl_false;
 					}
 				}
@@ -4041,7 +4041,7 @@ namespace slib
 					sl_size nViews = itemXml->getChildElementsCount();
 					if (nViews > 0) {
 						if (nViews != 1) {
-							_logError(itemXml, _g_sdev_sapp_error_resource_layout_item_must_contain_one_child);
+							_logError(itemXml, g_str_error_resource_layout_item_must_contain_one_child);
 							return sl_false;
 						}
 						Ref<XmlElement> xmlView= itemXml->getFirstChildElement();
@@ -4058,7 +4058,7 @@ namespace slib
 					subItem.element = itemXml;
 					
 					if (!(attr->items.add(subItem))) {
-						_logError(itemXml, _g_sdev_sapp_error_out_of_memory);
+						_logError(itemXml, g_str_error_out_of_memory);
 						return sl_false;
 					}
 				}
@@ -4274,7 +4274,7 @@ namespace slib
 			sl_size nChildren = element->getChildElementsCount();
 			if (nChildren > 0) {
 				if (nChildren != 1) {
-					_logError(element, _g_sdev_sapp_error_resource_layout_refreshview_must_contain_one_child);
+					_logError(element, g_str_error_resource_layout_refreshview_must_contain_one_child);
 					return sl_false;
 				}
 			}
