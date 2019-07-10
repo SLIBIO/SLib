@@ -135,47 +135,55 @@ namespace slib
 		setRequestBodyAsJson(json);
 	}
 	
+	namespace priv
+	{
+		namespace url_request
+		{
+			
+			sl_uint32 g_default_timeout = 60000;
+			sl_bool g_default_allowInsecureConnection = sl_false;
+			
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Dispatcher>, g_default_dispatcher)
+			
+		}
+	}
 	
-	sl_uint32 _g_priv_UrlRequest_default_timeout = 60000;
+	using namespace priv::url_request;
 	
 	sl_uint32 UrlRequest::getDefaultTimeout()
 	{
-		return _g_priv_UrlRequest_default_timeout;
+		return g_default_timeout;
 	}
 	
 	void UrlRequest::setDefaultTimeout(sl_uint32 ms)
 	{
-		_g_priv_UrlRequest_default_timeout = ms;
+		g_default_timeout = ms;
 	}
 	
-	sl_bool _g_priv_UrlRequest_default_allowInsecureConnection = sl_false;
-
 	sl_bool UrlRequest::isDefaultAllowInsecureConnection()
 	{
-		return _g_priv_UrlRequest_default_allowInsecureConnection;
+		return g_default_allowInsecureConnection;
 	}
 	
 	void UrlRequest::setDefaultAllowInsecureConnection(sl_bool flag)
 	{
-		_g_priv_UrlRequest_default_allowInsecureConnection = flag;
+		g_default_allowInsecureConnection = flag;
 	}
-	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Dispatcher>, _g_priv_UrlRequest_default_dispatcher)
 	
 	Ref<Dispatcher> UrlRequest::getDefaultDispatcher()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_UrlRequest_default_dispatcher)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_default_dispatcher)) {
 			return sl_null;
 		}
-		return _g_priv_UrlRequest_default_dispatcher;
+		return g_default_dispatcher;
 	}
 	
 	void UrlRequest::setDefaultDispatcher(const Ref<Dispatcher>& dispatcher)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_UrlRequest_default_dispatcher)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_default_dispatcher)) {
 			return;
 		}
-		_g_priv_UrlRequest_default_dispatcher = dispatcher;
+		g_default_dispatcher = dispatcher;
 	}
 	
 }

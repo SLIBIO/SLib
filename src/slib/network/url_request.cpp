@@ -31,11 +31,20 @@
 
 namespace slib
 {
+
+	namespace priv
+	{
+		namespace url_request
+		{
+			typedef HashMap< UrlRequest*, Ref<UrlRequest> > UrlRequestMap;
+			SLIB_SAFE_STATIC_GETTER(UrlRequestMap, getUrlRequestMap)
+
+		}
+	}
+	
+	using namespace priv::url_request;
 	
 	SLIB_DEFINE_OBJECT(UrlRequest, Object)
-	
-	typedef HashMap< UrlRequest*, Ref<UrlRequest> > _priv_UrlRequestMap;
-	SLIB_SAFE_STATIC_GETTER(_priv_UrlRequestMap, _getUrlRequestMap)
 	
 	UrlRequest::UrlRequest()
 	{
@@ -270,7 +279,7 @@ namespace slib
 		m_flagAllowInsecureConnection = param.flagAllowInsecureConnection;
 		
 		if (m_flagSelfAlive) {
-			_priv_UrlRequestMap* map = _getUrlRequestMap();
+			UrlRequestMap* map = getUrlRequestMap();
 			if (map) {
 				map->put(this, this);
 			}
@@ -281,7 +290,7 @@ namespace slib
 	void UrlRequest::_removeFromMap()
 	{
 		if (m_flagSelfAlive) {
-			_priv_UrlRequestMap* map = _getUrlRequestMap();
+			UrlRequestMap* map = getUrlRequestMap();
 			if (map) {
 				map->remove(this);
 			}
