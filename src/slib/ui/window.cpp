@@ -66,7 +66,50 @@ namespace slib
 		frame.fixSizeError();
 		return frame;
 	}
-
+	
+	namespace priv
+	{
+		namespace window
+		{
+			class ContentView : public ViewGroup
+			{
+			protected:
+				void onResizeChild(View* child, sl_ui_len width, sl_ui_len height) override
+				{
+					applyWrappingContentSize();
+				}
+				
+			public:
+				void applyWrappingContentSize()
+				{
+					Ref<Window> window = getWindow();
+					if (window.isNull()) {
+						return;
+					}
+					sl_bool flagHorz = window->isWidthWrapping();
+					sl_bool flagVert = window->isHeightWrapping();
+					if (!flagHorz && !flagVert) {
+						return;
+					}
+					UISize sizeWindow = window->getClientSize();
+					UISize sizeOld = sizeWindow;
+					UISize sizeMeasured = measureLayoutWrappingSize(flagHorz, flagVert);
+					if (flagHorz) {
+						sizeWindow.x = sizeMeasured.x;
+					}
+					if (flagVert) {
+						sizeWindow.y = sizeMeasured.y;
+					}
+					if (sizeWindow.isAlmostEqual(sizeOld)) {
+						return;
+					}
+					window->setClientSize(sizeWindow);
+				}
+				
+			};
+		}
+	}
+	
 #define CHECK_INSTANCE(instance) (instance.isNotNull() && !(instance->isClosed()))
 
 	SLIB_DEFINE_OBJECT(Window, Object)
@@ -115,6 +158,8 @@ namespace slib
 		m_aspectRatioMinimum = 0;
 		m_aspectRatioMaximum = 0;
 		m_flagStateResizingWidth = sl_false;
+		m_flagWidthWrapping = sl_false;
+		m_flagHeightWrapping = sl_false;
 		
 		m_flagStateDoModal = sl_false;
 		m_flagDispatchedDestroy = sl_false;
@@ -132,11 +177,8 @@ namespace slib
 	{
 		Object::init();
 		
-		Ref<View> view = new ViewGroup;
-		if (view.isNotNull()) {
-			view->setWindow(this);
-			m_viewContent = view;
-		}
+		m_viewContent = new priv::window::ContentView;
+		m_viewContent->setWindow(this);
 	}
 
 	void Window::close()
@@ -201,30 +243,10 @@ namespace slib
 		m_screen = screen;
 	}
 
-	Ref<View> Window::getContentView()
+	const Ref<View>& Window::getContentView()
 	{
-		return m_viewContent;
+		return Ref<View>::from(m_viewContent);
 	}
-
-	void Window::setContentView(const Ref<View>& view)
-	{
-		ObjectLocker lock(this);
-		
-		Ref<View> orig = m_viewContent;
-		Ref<ViewInstance> instance;
-		if (orig.isNotNull()) {
-			instance = orig->getViewInstance();
-			orig->removeAllViewInstances();
-		}
-		if (view.isNotNull()) {
-			if (instance.isNotNull()) {
-				view->attach(instance);
-			}
-			view->setWindow(this);
-		}
-		m_viewContent = view;
-	}
-
 
 	Ref<Menu> Window::getMenu()
 	{
@@ -359,6 +381,32 @@ namespace slib
 		UIRect frame = getFrame();
 		frame.setHeight(height);
 		setFrame(frame);
+	}
+	
+	sl_bool Window::isWidthWrapping()
+	{
+		return m_flagWidthWrapping;
+	}
+	
+	void Window::setWidthWrapping(sl_bool flag)
+	{
+		m_flagWidthWrapping = flag;
+		if (flag) {
+			_applyContentWrappingSize();
+		}
+	}
+	
+	sl_bool Window::isHeightWrapping()
+	{
+		return m_flagHeightWrapping;
+	}
+	
+	void Window::setHeightWrapping(sl_bool flag)
+	{
+		m_flagHeightWrapping = flag;
+		if (flag) {
+			_applyContentWrappingSize();
+		}
 	}
 
 	UIRect Window::getClientFrame()
@@ -1398,6 +1446,11 @@ namespace slib
 		UISize size = frame.getSize();
 		_constrainSize(size, flagAdjustHeight);
 		frame.setSize(size);
+	}
+	
+	void Window::_applyContentWrappingSize()
+	{
+		m_viewContent->applyWrappingContentSize();
 	}
 	
 

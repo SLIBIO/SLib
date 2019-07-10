@@ -42,6 +42,14 @@ namespace slib
 	class ViewInstance;
 	class Window;
 	class WindowInstance;
+	
+	namespace priv
+	{
+		namespace window
+		{
+			class ContentView;
+		}
+	}
 
 	class SLIB_EXPORT WindowInstanceParam
 	{
@@ -111,9 +119,7 @@ namespace slib
 		void setScreen(const Ref<Screen>& screen);
 
 		
-		Ref<View> getContentView();
-		
-		virtual void setContentView(const Ref<View>& view);
+		const Ref<View>& getContentView();
 		
 		
 		Ref<Menu> getMenu();
@@ -158,6 +164,14 @@ namespace slib
 		
 		void setHeight(sl_ui_len height);
 
+		sl_bool isWidthWrapping();
+		
+		void setWidthWrapping(sl_bool flag = sl_true);
+		
+		sl_bool isHeightWrapping();
+		
+		void setHeightWrapping(sl_bool flag = sl_true);
+		
 		
 		UIRect getClientFrame();
 		
@@ -398,11 +412,13 @@ namespace slib
 		
 		void _constrainSize(UIRect& frame, sl_bool flagAdjustHeight);
 		
+		void _applyContentWrappingSize();
+		
 	private:
 		AtomicRef<WindowInstance> m_instance;
 		AtomicWeakRef<Window> m_parent;
+		Ref<priv::window::ContentView> m_viewContent;
 		AtomicRef<Screen> m_screen;
-		AtomicRef<View> m_viewContent;
 		AtomicRef<Menu> m_menu;
 		
 		UIRect m_frame;
@@ -437,6 +453,8 @@ namespace slib
 		float m_aspectRatioMinimum;
 		float m_aspectRatioMaximum;
 		sl_bool m_flagStateResizingWidth;
+		sl_bool m_flagWidthWrapping;
+		sl_bool m_flagHeightWrapping;
 		
 		sl_bool m_flagStateDoModal;
 		sl_bool m_flagDispatchedDestroy;

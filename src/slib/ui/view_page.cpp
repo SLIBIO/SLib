@@ -353,8 +353,14 @@ namespace slib
 		Ref<Window> window = new Window;
 		
 		if (window.isNotNull()) {
+			window->addView(this);
+			if (isWidthWrapping()) {
+				window->setWidthWrapping();
+			}
+			if (isHeightWrapping()) {
+				window->setHeightWrapping();
+			}
 			window->setParent(parent);
-			window->setContentView(this);
 			window->setDialog(sl_true);
 			if (isCenterVertical() && isCenterHorizontal()) {
 				window->setCenterScreenOnCreate(sl_true);
