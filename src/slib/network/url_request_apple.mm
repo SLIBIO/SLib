@@ -83,7 +83,7 @@ namespace slib
 				
 			};
 			
-			SLIB_SAFE_STATIC_GETTER(SharedContext, getSharedContext)
+			SLIB_SAFE_STATIC_GETTER(SharedContext, GetSharedContext)
 			
 			class UrlRequestImpl : public UrlRequest
 			{
@@ -106,7 +106,7 @@ namespace slib
 				
 				static Ref<UrlRequestImpl> create(const UrlRequestParam& param, const String& _url)
 				{
-					SharedContext* shared = getSharedContext();
+					SharedContext* shared = GetSharedContext();
 					if (shared) {
 						NSURLSession* session;
 						if (param.flagUseBackgroundSession) {
@@ -171,7 +171,7 @@ namespace slib
 					if (m_task != nil) {
 						[m_task cancel];
 						m_task = nil;
-						SharedContext* shared = getSharedContext();
+						SharedContext* shared = GetSharedContext();
 						if (shared) {
 							shared->requests.remove(m_taskId);
 						}
@@ -181,7 +181,7 @@ namespace slib
 				static Ref<UrlRequestImpl> fromTask(NSURLSessionTask* task)
 				{
 					if (task != nil) {
-						SharedContext* shared = getSharedContext();
+						SharedContext* shared = GetSharedContext();
 						if (shared) {
 							NSUInteger taskId = [task taskIdentifier];
 							return shared->requests.getValue(taskId, WeakRef<UrlRequestImpl>::null());
@@ -242,7 +242,7 @@ namespace slib
 				
 				void dispatchFinishDownload(NSURL* pathTempFile)
 				{
-					SharedContext* shared = getSharedContext();
+					SharedContext* shared = GetSharedContext();
 					if (shared) {
 						NSError* error = nil;
 						NSURL* pathDst = [NSURL fileURLWithPath:Apple::getNSStringFromString(m_downloadFilePath)];

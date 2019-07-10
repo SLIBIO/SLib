@@ -41,111 +41,147 @@ namespace slib
                  / "*" / "+" / "," / ";" / "="
 */
 
-	const sl_bool _priv_URL_unreserved_pattern[128] = {
-		/*		NUL		SOH		STX		ETX		EOT		ENQ		ACK		BEL		*/
-		/*00*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		BS		HT		LF		VT		FF		CR		SO		SI		*/
-		/*08*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		DLE		DC1		DC2		DC3		DC4		NAK		SYN		ETB		*/
-		/*10*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		CAN		EM		SUB		ESC		FS		GS		RS		US		*/
-		/*18*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		SP		!		"		#		$		%		&		'		*/
-		/*20*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		(		)		*		+		,		-		.		/		*/
-		/*28*/	0,		0,		0,		0,		0,		1,		1,		0,
-		/*		0		1		2		3		4		5		6		7		*/
-		/*30*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		8		9		:		;		<		=		>		?		*/
-		/*38*/	1,		1,		0,		0,		0,		0,		0,		0,
-		/*		@		A		B		C		D		E		F		G		*/
-		/*40*/	0,		1,		1,		1,		1,		1,		1,		1,
-		/*		H		I		J		K		L		M		N		O		*/
-		/*48*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		P		Q		R		S		T		U		V		W		*/
-		/*50*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		X		Y		Z		[		\		]		^		_		*/
-		/*58*/	1,		1,		1,		0,		0,		0,		0,		1,
-		/*		`		a		b		c		d		e		f		g		*/
-		/*60*/	0,		1,		1,		1,		1,		1,		1,		1,
-		/*		h		i		j		k		l		m		n		o		*/
-		/*68*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		p		q		r		s		t		u		v		w		*/
-		/*70*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		x		y		z		{		|		}		~		DEL		*/
-		/*78*/	1,		1,		1,		0,		0,		0,		1,		0
-	};
+	namespace priv
+	{
+		namespace url
+		{
+			
+			const sl_bool g_patternUnreserved[128] = {
+				/*		NUL		SOH		STX		ETX		EOT		ENQ		ACK		BEL		*/
+				/*00*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		BS		HT		LF		VT		FF		CR		SO		SI		*/
+				/*08*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		DLE		DC1		DC2		DC3		DC4		NAK		SYN		ETB		*/
+				/*10*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		CAN		EM		SUB		ESC		FS		GS		RS		US		*/
+				/*18*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		SP		!		"		#		$		%		&		'		*/
+				/*20*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		(		)		*		+		,		-		.		/		*/
+				/*28*/	0,		0,		0,		0,		0,		1,		1,		0,
+				/*		0		1		2		3		4		5		6		7		*/
+				/*30*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		8		9		:		;		<		=		>		?		*/
+				/*38*/	1,		1,		0,		0,		0,		0,		0,		0,
+				/*		@		A		B		C		D		E		F		G		*/
+				/*40*/	0,		1,		1,		1,		1,		1,		1,		1,
+				/*		H		I		J		K		L		M		N		O		*/
+				/*48*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		P		Q		R		S		T		U		V		W		*/
+				/*50*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		X		Y		Z		[		\		]		^		_		*/
+				/*58*/	1,		1,		1,		0,		0,		0,		0,		1,
+				/*		`		a		b		c		d		e		f		g		*/
+				/*60*/	0,		1,		1,		1,		1,		1,		1,		1,
+				/*		h		i		j		k		l		m		n		o		*/
+				/*68*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		p		q		r		s		t		u		v		w		*/
+				/*70*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		x		y		z		{		|		}		~		DEL		*/
+				/*78*/	1,		1,		1,		0,		0,		0,		1,		0
+			};
 
-	const sl_bool _priv_URL_unreserved_pattern_uri_components[128] = {
-		/*		NUL		SOH		STX		ETX		EOT		ENQ		ACK		BEL		*/
-		/*00*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		BS		HT		LF		VT		FF		CR		SO		SI		*/
-		/*08*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		DLE		DC1		DC2		DC3		DC4		NAK		SYN		ETB		*/
-		/*10*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		CAN		EM		SUB		ESC		FS		GS		RS		US		*/
-		/*18*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		SP		!		"		#		$		%		&		'		*/
-		/*20*/	0,		1,		0,		0,		0,		0,		0,		1,
-		/*		(		)		*		+		,		-		.		/		*/
-		/*28*/	1,		1,		1,		0,		0,		1,		1,		0,
-		/*		0		1		2		3		4		5		6		7		*/
-		/*30*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		8		9		:		;		<		=		>		?		*/
-		/*38*/	1,		1,		0,		0,		0,		0,		0,		0,
-		/*		@		A		B		C		D		E		F		G		*/
-		/*40*/	0,		1,		1,		1,		1,		1,		1,		1,
-		/*		H		I		J		K		L		M		N		O		*/
-		/*48*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		P		Q		R		S		T		U		V		W		*/
-		/*50*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		X		Y		Z		[		\		]		^		_		*/
-		/*58*/	1,		1,		1,		0,		0,		0,		0,		1,
-		/*		`		a		b		c		d		e		f		g		*/
-		/*60*/	0,		1,		1,		1,		1,		1,		1,		1,
-		/*		h		i		j		k		l		m		n		o		*/
-		/*68*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		p		q		r		s		t		u		v		w		*/
-		/*70*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		x		y		z		{		|		}		~		DEL		*/
-		/*78*/	1,		1,		1,		0,		0,		0,		1,		0
-	};
+			const sl_bool g_patternUnreserved_UriComponents[128] = {
+				/*		NUL		SOH		STX		ETX		EOT		ENQ		ACK		BEL		*/
+				/*00*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		BS		HT		LF		VT		FF		CR		SO		SI		*/
+				/*08*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		DLE		DC1		DC2		DC3		DC4		NAK		SYN		ETB		*/
+				/*10*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		CAN		EM		SUB		ESC		FS		GS		RS		US		*/
+				/*18*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		SP		!		"		#		$		%		&		'		*/
+				/*20*/	0,		1,		0,		0,		0,		0,		0,		1,
+				/*		(		)		*		+		,		-		.		/		*/
+				/*28*/	1,		1,		1,		0,		0,		1,		1,		0,
+				/*		0		1		2		3		4		5		6		7		*/
+				/*30*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		8		9		:		;		<		=		>		?		*/
+				/*38*/	1,		1,		0,		0,		0,		0,		0,		0,
+				/*		@		A		B		C		D		E		F		G		*/
+				/*40*/	0,		1,		1,		1,		1,		1,		1,		1,
+				/*		H		I		J		K		L		M		N		O		*/
+				/*48*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		P		Q		R		S		T		U		V		W		*/
+				/*50*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		X		Y		Z		[		\		]		^		_		*/
+				/*58*/	1,		1,		1,		0,		0,		0,		0,		1,
+				/*		`		a		b		c		d		e		f		g		*/
+				/*60*/	0,		1,		1,		1,		1,		1,		1,		1,
+				/*		h		i		j		k		l		m		n		o		*/
+				/*68*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		p		q		r		s		t		u		v		w		*/
+				/*70*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		x		y		z		{		|		}		~		DEL		*/
+				/*78*/	1,		1,		1,		0,		0,		0,		1,		0
+			};
 
-	const sl_bool _priv_URL_unreserved_pattern_uri[128] = {
-		/*		NUL		SOH		STX		ETX		EOT		ENQ		ACK		BEL		*/
-		/*00*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		BS		HT		LF		VT		FF		CR		SO		SI		*/
-		/*08*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		DLE		DC1		DC2		DC3		DC4		NAK		SYN		ETB		*/
-		/*10*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		CAN		EM		SUB		ESC		FS		GS		RS		US		*/
-		/*18*/	0,		0,		0,		0,		0,		0,		0,		0,
-		/*		SP		!		"		#		$		%		&		'		*/
-		/*20*/	0,		1,		0,		1,		1,		0,		1,		1,
-		/*		(		)		*		+		,		-		.		/		*/
-		/*28*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		0		1		2		3		4		5		6		7		*/
-		/*30*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		8		9		:		;		<		=		>		?		*/
-		/*38*/	1,		1,		1,		1,		0,		1,		0,		1,
-		/*		@		A		B		C		D		E		F		G		*/
-		/*40*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		H		I		J		K		L		M		N		O		*/
-		/*48*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		P		Q		R		S		T		U		V		W		*/
-		/*50*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		X		Y		Z		[		\		]		^		_		*/
-		/*58*/	1,		1,		1,		0,		0,		0,		0,		1,
-		/*		`		a		b		c		d		e		f		g		*/
-		/*60*/	0,		1,		1,		1,		1,		1,		1,		1,
-		/*		h		i		j		k		l		m		n		o		*/
-		/*68*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		p		q		r		s		t		u		v		w		*/
-		/*70*/	1,		1,		1,		1,		1,		1,		1,		1,
-		/*		x		y		z		{		|		}		~		DEL		*/
-		/*78*/	1,		1,		1,		0,		0,		0,		1,		0
-	};
+			const sl_bool g_patternUnreserved_Uri[128] = {
+				/*		NUL		SOH		STX		ETX		EOT		ENQ		ACK		BEL		*/
+				/*00*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		BS		HT		LF		VT		FF		CR		SO		SI		*/
+				/*08*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		DLE		DC1		DC2		DC3		DC4		NAK		SYN		ETB		*/
+				/*10*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		CAN		EM		SUB		ESC		FS		GS		RS		US		*/
+				/*18*/	0,		0,		0,		0,		0,		0,		0,		0,
+				/*		SP		!		"		#		$		%		&		'		*/
+				/*20*/	0,		1,		0,		1,		1,		0,		1,		1,
+				/*		(		)		*		+		,		-		.		/		*/
+				/*28*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		0		1		2		3		4		5		6		7		*/
+				/*30*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		8		9		:		;		<		=		>		?		*/
+				/*38*/	1,		1,		1,		1,		0,		1,		0,		1,
+				/*		@		A		B		C		D		E		F		G		*/
+				/*40*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		H		I		J		K		L		M		N		O		*/
+				/*48*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		P		Q		R		S		T		U		V		W		*/
+				/*50*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		X		Y		Z		[		\		]		^		_		*/
+				/*58*/	1,		1,		1,		0,		0,		0,		0,		1,
+				/*		`		a		b		c		d		e		f		g		*/
+				/*60*/	0,		1,		1,		1,		1,		1,		1,		1,
+				/*		h		i		j		k		l		m		n		o		*/
+				/*68*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		p		q		r		s		t		u		v		w		*/
+				/*70*/	1,		1,		1,		1,		1,		1,		1,		1,
+				/*		x		y		z		{		|		}		~		DEL		*/
+				/*78*/	1,		1,		1,		0,		0,		0,		1,		0
+			};
+
+			static String EncodePercentByUTF8(const String& value, const sl_bool patternUnreserved[128])
+			{
+				sl_size n = value.getLength();
+				if (n > 0) {
+					const sl_char8* src = value.getData();
+					SLIB_SCOPED_BUFFER(sl_char8, 1024, dst, n * 3);
+					if (dst == sl_null) {
+						return sl_null;
+					}
+					sl_size k = 0;
+					for (sl_size i = 0; i < n; i++) {
+						sl_uint32 v = (sl_uint32)(sl_uint8)(src[i]);
+						if (v < 128 && patternUnreserved[v]) {
+							dst[k++] = (sl_char8)(v);
+						} else {
+							dst[k++] = '%';
+							dst[k++] = priv::string::g_conv_radixPatternUpper[(v >> 4) & 15];
+							dst[k++] = priv::string::g_conv_radixPatternUpper[v & 15];
+						}
+					}
+					return String(dst, k);
+				} else {
+					return sl_null;
+				}
+			}
 	
+		}
+	}
+
+	using namespace priv::url;
+		
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(Url)
 	
 	Url::Url()
@@ -255,35 +291,9 @@ namespace slib
 		query = HttpRequest::buildFormUrlEncodedFromHashMap(params);
 	}
 	
-	String _priv_URL_encodePercentByUTF8(const String& value, const sl_bool patternUnreserved[128])
-	{
-		sl_size n = value.getLength();
-		if (n > 0) {
-			const sl_char8* src = value.getData();
-			SLIB_SCOPED_BUFFER(sl_char8, 1024, dst, n * 3);
-			if (dst == sl_null) {
-				return sl_null;
-			}
-			sl_size k = 0;
-			for (sl_size i = 0; i < n; i++) {
-				sl_uint32 v = (sl_uint32)(sl_uint8)(src[i]);
-				if (v < 128 && patternUnreserved[v]) {
-					dst[k++] = (sl_char8)(v);
-				} else {
-					dst[k++] = '%';
-					dst[k++] = priv::string::g_conv_radixPatternUpper[(v >> 4) & 15];
-					dst[k++] = priv::string::g_conv_radixPatternUpper[v & 15];
-				}
-			}
-			return String(dst, k);
-		} else {
-			return sl_null;
-		}
-	}
-	
 	String Url::encodePercentByUTF8(const String& value)
 	{
-		return _priv_URL_encodePercentByUTF8(value, _priv_URL_unreserved_pattern);
+		return EncodePercentByUTF8(value, g_patternUnreserved);
 	}
 	
 	String Url::decodePercentByUTF8(const String& value)
@@ -324,7 +334,7 @@ namespace slib
 	
 	String Url::encodeUriComponentByUTF8(const String& value)
 	{
-		return _priv_URL_encodePercentByUTF8(value, _priv_URL_unreserved_pattern_uri_components);
+		return EncodePercentByUTF8(value, g_patternUnreserved_UriComponents);
 	}
 	
 	String Url::decodeUriComponentByUTF8(const String& value)
@@ -334,7 +344,7 @@ namespace slib
 	
 	String Url::encodeUriByUTF8(const String& value)
 	{
-		return _priv_URL_encodePercentByUTF8(value, _priv_URL_unreserved_pattern_uri);
+		return EncodePercentByUTF8(value, g_patternUnreserved_Uri);
 	}
 	
 	String Url::decodeUriByUTF8(const String& value)

@@ -200,7 +200,7 @@ namespace slib
 					clean();
 				}
 
-				static Session* getSession()
+				static Session* GetSession()
 				{
 					SLIB_SAFE_STATIC(Session, session, callbackStatus);
 					if (SLIB_SAFE_STATIC_CHECK_FREED(session)) {
@@ -211,7 +211,7 @@ namespace slib
 
 				static Ref<UrlRequestImpl> create(const UrlRequestParam& param, const String& url)
 				{
-					Session* session = getSession();
+					Session* session = GetSession();
 					if (session) {
 						String16 path;
 						Ref<Connection> connection = session->getConnection(url, path);
@@ -274,7 +274,7 @@ namespace slib
 					if (m_hRequest) {
 						::WinHttpCloseHandle(m_hRequest);
 						m_hRequest = NULL;
-						Session* session = getSession();
+						Session* session = GetSession();
 						if (session) {
 							session->requests.remove(m_taskId);
 						}
@@ -507,7 +507,7 @@ namespace slib
 					if (dwContext == 0) {
 						return;
 					}
-					Session* session = getSession();
+					Session* session = GetSession();
 					if (!session) {
 						return;
 					}
@@ -544,7 +544,7 @@ namespace slib
 					onComplete();
 
 					if (m_sizeContentTotal == m_sizeContentReceived || m_responseHeaders.getValue("Transfer-Encoding").compareIgnoreCase("chunked") == 0) {
-						Session* session = getSession();
+						Session* session = GetSession();
 						if (session) {
 							if (session->connectionPool.getCount() > MAX_CONNECTION_POOL_SIZE) {
 								session->connectionPool.pop();
@@ -582,7 +582,7 @@ namespace slib
 			Connection::~Connection()
 			{
 				::WinHttpCloseHandle(hConnect);
-				Session* session = UrlRequestImpl::getSession();
+				Session* session = UrlRequestImpl::GetSession();
 				if (session) {
 					session->connections.remove(id);
 				}
