@@ -1038,6 +1038,7 @@
 		26E1B8F8222ABCDD007C222E /* jquant1.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D83E520C838F90013B34E /* jquant1.c */; };
 		26E1B8F9222ABCDD007C222E /* jquant2.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D83E420C838F90013B34E /* jquant2.c */; };
 		26E1B8FA222ABCDD007C222E /* jutils.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D83E320C838F90013B34E /* jutils.c */; };
+		26F5EA6422D6810A00CD1595 /* toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5EA6322D6810900CD1595 /* toast.cpp */; };
 		26FAA8861EC768C1007BC67F /* red_black_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FAA8851EC768C1007BC67F /* red_black_tree.cpp */; };
 		26FADD33215754860057F7EA /* stun.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FADD32215754860057F7EA /* stun.cpp */; };
 /* End PBXBuildFile section */
@@ -2281,6 +2282,7 @@
 		26F5B3231E90125200F9FB7F /* geo_rectangle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = geo_rectangle.cpp; sourceTree = "<group>"; };
 		26F5B3241E90125200F9FB7F /* globe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = globe.cpp; sourceTree = "<group>"; };
 		26F5B3251E90125200F9FB7F /* latlon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = latlon.cpp; sourceTree = "<group>"; };
+		26F5EA6322D6810900CD1595 /* toast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = toast.cpp; sourceTree = "<group>"; };
 		26FAA8851EC768C1007BC67F /* red_black_tree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = red_black_tree.cpp; sourceTree = "<group>"; };
 		26FADD32215754860057F7EA /* stun.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stun.cpp; sourceTree = "<group>"; };
 		26FBC2701DF9FB0200D76774 /* spin_lock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = spin_lock.cpp; sourceTree = "<group>"; };
@@ -4181,6 +4183,7 @@
 				26BB17E82200E1FE0089C7EC /* switch_view.cpp */,
 				266DD44F1C1191D400D47AB0 /* tab_view.cpp */,
 				26B1C99E1DC76BF50092C84F /* text_view.cpp */,
+				26F5EA6322D6810900CD1595 /* toast.cpp */,
 				261B4C841DB10149000A385A /* transition.cpp */,
 				26CB94CA1D0126F900D8A472 /* tree_view.cpp */,
 				26BB17CD21F4BA5D0089C7EC /* ui_adapter.cpp */,
@@ -5349,6 +5352,7 @@
 				26D9D82D1E9628E0005F7BD3 /* timer.cpp in Sources */,
 				26ACB3B9220978310093FF3F /* facebook.cpp in Sources */,
 				26D9D8851E96295A005F7BD3 /* audio_recorder_opensl_es.cpp in Sources */,
+				26F5EA6422D6810A00CD1595 /* toast.cpp in Sources */,
 				26D9D82E1E9628E0005F7BD3 /* system.cpp in Sources */,
 				26BAE02F2223CEB80085B5AB /* openssl.cpp in Sources */,
 				26E1B8D8222ABCDD007C222E /* jcmaster.c in Sources */,

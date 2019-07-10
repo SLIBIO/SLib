@@ -33,15 +33,37 @@
 
 #include "../resources.h"
 
-@interface _priv_SLib_AlertDialog_LabelHelper : NSObject
+@interface SLIBAlertDialogLabelHelper : NSObject
 {
 }
-+ (_priv_SLib_AlertDialog_LabelHelper*)sharedInstance;
++ (SLIBAlertDialogLabelHelper*)sharedInstance;
 - (void)handleTapOnLabel:(UITapGestureRecognizer *)tapGesture;
 @end
 
 namespace slib
 {
+	
+	namespace priv
+	{
+		namespace alert_dialog
+		{
+			
+			static void EnableLink(UIView* view)
+			{
+				for (UIView* subview in view.subviews) {
+					if ([subview isKindOfClass:[UILabel class]]) {
+						UILabel* label = (UILabel*)subview;
+						label.userInteractionEnabled = YES;
+						SLIBAlertDialogLabelHelper* target = [SLIBAlertDialogLabelHelper sharedInstance];
+						[label addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:target action:@selector(handleTapOnLabel:)]];
+					} else {
+						priv::alert_dialog::EnableLink(subview);
+					}
+				}
+			}
+			
+		}
+	}
 	
 	DialogResult AlertDialog::run()
 	{
@@ -56,20 +78,6 @@ namespace slib
 	void AlertDialog::show()
 	{
 		_showOnUiThread();
-	}
-	
-	static void _priv_AlertDialog_enableLink(UIView* view)
-	{
-		for (UIView* subview in view.subviews) {
-			if ([subview isKindOfClass:[UILabel class]]) {
-				UILabel* label = (UILabel*)subview;
-				label.userInteractionEnabled = YES;
-				_priv_SLib_AlertDialog_LabelHelper* target = [_priv_SLib_AlertDialog_LabelHelper sharedInstance];
-				[label addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:target action:@selector(handleTapOnLabel:)]];
-			} else {
-				_priv_AlertDialog_enableLink(subview);
-			}
-		}
 	}
 	
 	sl_bool AlertDialog::_show()
@@ -169,7 +177,7 @@ namespace slib
 						[alert setValue:hyperText forKey: @"attributedMessage"];
 						UIView* view = alert.view;
 						if (view != nil) {
-							_priv_AlertDialog_enableLink(view);
+							priv::alert_dialog::EnableLink(view);
 						}
 					}
 				} @catch (NSException*) {}
@@ -194,11 +202,11 @@ namespace slib
 	
 }
 
-@implementation _priv_SLib_AlertDialog_LabelHelper
+@implementation SLIBAlertDialogLabelHelper
 
-+ (_priv_SLib_AlertDialog_LabelHelper*)sharedInstance
++ (SLIBAlertDialogLabelHelper*)sharedInstance
 {
-	static _priv_SLib_AlertDialog_LabelHelper* instance = [[_priv_SLib_AlertDialog_LabelHelper alloc] init];
+	static SLIBAlertDialogLabelHelper* instance = [[SLIBAlertDialogLabelHelper alloc] init];
 	return instance;
 }
 

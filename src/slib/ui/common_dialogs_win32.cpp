@@ -39,67 +39,71 @@
 namespace slib
 {
 
-/***************************************
-		AlertDialog
-***************************************/
+	namespace priv
+	{
+		namespace alert_dialog
+		{
+
+			void ProcessCustomMsgBox(WPARAM wParam, LPARAM lParam)
+			{
+				HWND hWndMsg = ::FindWindowW(NULL, L"CustomizedMsgBox");
+				if (hWndMsg == NULL) {
+					return;
+				}
+				AlertDialog* alert = (AlertDialog*)lParam;
+				String16 caption = alert->caption;
+				::SetWindowTextW(hWndMsg, (LPCWSTR)(caption.getData()));
+
+				switch (alert->buttons) {
+				case AlertDialogButtons::Ok:
+					if (alert->titleOk.isNotNull()) {
+						String16 titleOk = alert->titleOk;
+						::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleOk.getData()));
+					}
+					break;
+				case AlertDialogButtons::OkCancel:
+					if (alert->titleOk.isNotNull()) {
+						String16 titleOk = alert->titleOk;
+						::SetDlgItemTextW(hWndMsg, 1, (LPCWSTR)(titleOk.getData()));
+					}
+					if (alert->titleCancel.isNotNull()) {
+						String16 titleCancel = alert->titleCancel;
+						::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getData()));
+					}
+					break;
+				case AlertDialogButtons::YesNo:
+					if (alert->titleYes.isNotNull()) {
+						String16 titleYes = alert->titleYes;
+						::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getData()));
+					}
+					if (alert->titleNo.isNotNull()) {
+						String16 titleNo = alert->titleNo;
+						::SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getData()));
+					}
+					break;
+				case AlertDialogButtons::YesNoCancel:
+					if (alert->titleYes.isNotNull()) {
+						String16 titleYes = alert->titleYes;
+						::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getData()));
+					}
+					if (alert->titleNo.isNotNull()) {
+						String16 titleNo = alert->titleNo;
+						::SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getData()));
+					}
+					if (alert->titleCancel.isNotNull()) {
+						String16 titleCancel = alert->titleCancel;
+						::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getData()));
+					}
+					break;
+				}
+			}
+
+		}
+	}
 
 	DialogResult AlertDialog::run()
 	{
 		return _runOnUiThread();
-	}
-
-	void _priv_Win32_processCustomMsgBox(WPARAM wParam, LPARAM lParam)
-	{
-		HWND hWndMsg = ::FindWindowW(NULL, L"CustomizedMsgBox");
-		if (hWndMsg == NULL) {
-			return;
-		}
-		AlertDialog* alert = (AlertDialog*)lParam;
-		String16 caption = alert->caption;
-		::SetWindowTextW(hWndMsg, (LPCWSTR)(caption.getData()));
-
-		switch (alert->buttons) {
-		case AlertDialogButtons::Ok:
-			if (alert->titleOk.isNotNull()) {
-				String16 titleOk = alert->titleOk;
-				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleOk.getData()));
-			}
-			break;
-		case AlertDialogButtons::OkCancel:
-			if (alert->titleOk.isNotNull()) {
-				String16 titleOk = alert->titleOk;
-				::SetDlgItemTextW(hWndMsg, 1, (LPCWSTR)(titleOk.getData()));
-			}
-			if (alert->titleCancel.isNotNull()) {
-				String16 titleCancel = alert->titleCancel;
-				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getData()));
-			}
-			break;
-		case AlertDialogButtons::YesNo:
-			if (alert->titleYes.isNotNull()) {
-				String16 titleYes = alert->titleYes;
-				::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getData()));
-			}
-			if (alert->titleNo.isNotNull()) {
-				String16 titleNo = alert->titleNo;
-				::SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getData()));
-			}
-			break;
-		case AlertDialogButtons::YesNoCancel:
-			if (alert->titleYes.isNotNull()) {
-				String16 titleYes = alert->titleYes;
-				::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getData()));
-			}
-			if (alert->titleNo.isNotNull()) {
-				String16 titleNo = alert->titleNo;
-				::SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getData()));
-			}
-			if (alert->titleCancel.isNotNull()) {
-				String16 titleCancel = alert->titleCancel;
-				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getData()));
-			}
-			break;
-		}
 	}
 
 	DialogResult AlertDialog::_run()
@@ -179,31 +183,35 @@ namespace slib
 	}
 
 
-/***************************************
-		FileDialog
-***************************************/
+	namespace priv
+	{
+		namespace file_dialog
+		{
+
+			struct Filter
+			{
+				String16 title;
+				String16 patterns;
+			};
+
+			static int CALLBACK BrowseDirCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM pData)
+			{
+				switch (uMsg) {
+					case BFFM_INITIALIZED:
+						if (pData) {
+							SendMessageW(hwnd, BFFM_SETSELECTION, TRUE, pData);
+						}
+						break;
+				}
+				return 0;
+			}
+
+		}
+	}
 
 	sl_bool FileDialog::run()
 	{
 		return _runOnUiThread();
-	}
-
-	struct _priv_FileDialog_FilterW
-	{
-		String16 title;
-		String16 patterns;
-	};
-
-	static int CALLBACK _priv_FileDialog_BrowseDirCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM pData)
-	{
-		switch (uMsg) {
-			case BFFM_INITIALIZED:
-				if (pData) {
-					SendMessageW(hwnd, BFFM_SETSELECTION, TRUE, pData);
-				}
-				break;
-		}
-		return 0;
 	}
 
 	sl_bool FileDialog::_run()
@@ -222,7 +230,7 @@ namespace slib
 					bi.lpszTitle = (LPWSTR)(_title.getData());
 				}
 				bi.ulFlags = BIF_NEWDIALOGSTYLE;
-				bi.lpfn = _priv_FileDialog_BrowseDirCallback;
+				bi.lpfn = priv::file_dialog::BrowseDirCallback;
 				String16 initialDir;
 				if (File::isDirectory(selectedPath)) {
 					initialDir = selectedPath;
@@ -253,9 +261,9 @@ namespace slib
 			ofn.lpstrDefExt = (LPCWSTR)(_defaultFileExt.getData());
 
 			sl_size lenSzFilters = 0;
-			CList<_priv_FileDialog_FilterW> wfilters;
+			CList<priv::file_dialog::Filter> wfilters;
 			{
-				_priv_FileDialog_FilterW wfilter;
+				priv::file_dialog::Filter wfilter;
 				ListLocker<Filter> list(filters);
 				for (sl_size i = 0; i < list.count; i++) {
 					wfilter.title = list[i].title;
@@ -272,7 +280,7 @@ namespace slib
 			{
 				sl_size pos = 0;
 				sl_size len;
-				ListElements<_priv_FileDialog_FilterW> list(wfilters);
+				ListElements<priv::file_dialog::Filter> list(wfilters);
 				for (sl_size i = 0; i < list.count; i++) {
 					len = list[i].title.getLength();
 					Base::copyMemory(szFilters + pos, list[i].title.getData(), len * 2);

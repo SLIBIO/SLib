@@ -25,14 +25,8 @@
 
 #include "definition.h"
 
-#include "constants.h"
-
 #include "window.h"
 #include "view.h"
-
-#include "../core/object.h"
-#include "../core/string.h"
-#include "../core/function.h"
 
 namespace slib
 {
@@ -162,36 +156,6 @@ namespace slib
 		
 	protected:
 		sl_bool _runOnUiThread();
-		
-	};
-	
-	class Toast
-	{
-	public:
-		Ref<View> parent;
-		String text;
-		float duration; // Seconds
-		Ref<Font> font;
-		
-	public:
-		Toast();
-		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(Toast)
-		
-	public:
-		void show();
-		
-	public:
-		static void show(const String& text);
-		
-	public:
-		static float getDefaultDuration();
-		
-		static void setDefaultDuration(float duration);
-		
-		static Ref<Font> getDefaultFont();
-		
-		static void setDefaultFont(const Ref<Font>& font);
 		
 	};
 	

@@ -30,9 +30,35 @@
 
 namespace slib
 {
+	
+	namespace priv
+	{
+		namespace view_page
+		{
+
+			TransitionType g_defaultOpeningPopupTransitionType = TransitionType::Zoom;
+			TransitionDirection g_defaultOpeningPopupTransitionDirection = TransitionDirection::FromBottomToTop;
+			float g_defaultOpeningPopupTransitionDuration = 0.25f;
+			AnimationCurve g_defaultOpeningPopupTransitionCurve = AnimationCurve::Overshoot;
+			TransitionType g_defaultClosingPopupTransitionType = TransitionType::Fade;
+			TransitionDirection g_defaultClosingPopupTransitionDirection = TransitionDirection::FromTopToBottom;
+			float g_defaultClosingPopupTransitionDuration = 0.2f;
+			AnimationCurve g_defaultClosingPopupTransitionCurve = AnimationCurve::Linear;
+
+			class PopupBackground : public ViewGroup
+			{
+				SLIB_DECLARE_OBJECT
+			};
+
+			SLIB_DEFINE_OBJECT(PopupBackground, ViewGroup)
+
+		}
+	}
 
 	SLIB_DEFINE_OBJECT(ViewPage, ViewGroup)
 
+	using namespace priv::view_page;
+	
 	ViewPage::ViewPage()
 	{		
 		setCreatingInstance(sl_true);
@@ -161,13 +187,6 @@ namespace slib
 		}
 	}
 
-	class _priv_ViewPagePopupBackground : public ViewGroup
-	{
-		SLIB_DECLARE_OBJECT
-	};
-
-	SLIB_DEFINE_OBJECT(_priv_ViewPagePopupBackground, ViewGroup)
-
 	void ViewPage::_openPopup(const Ref<View>& parent, Transition transition, sl_bool flagFillParentBackground)
 	{
 		ObjectLocker lock(this);
@@ -179,7 +198,7 @@ namespace slib
 		
 		Ref<View> viewAdd;
 		if (flagFillParentBackground) {
-			Ref<_priv_ViewPagePopupBackground> back = new _priv_ViewPagePopupBackground;
+			Ref<PopupBackground> back = new PopupBackground;
 			back->setCreatingInstance(sl_true);
 			Color color = m_popupBackgroundColor;
 			if (color.isZero()) {
@@ -262,7 +281,7 @@ namespace slib
 		
 		Ref<View> parent = getParent();
 		if (parent.isNotNull()) {
-			if (IsInstanceOf<_priv_ViewPagePopupBackground>(parent)) {
+			if (IsInstanceOf<PopupBackground>(parent)) {
 				parent->setBackgroundColor(Color::zero());
 			}
 		}
@@ -295,7 +314,7 @@ namespace slib
 			
 			Ref<View> parent = getParent();
 			if (parent.isNotNull()) {
-				if (IsInstanceOf<_priv_ViewPagePopupBackground>(parent)) {
+				if (IsInstanceOf<PopupBackground>(parent)) {
 					Ref<View> parent2 = parent->getParent();
 					if (parent2.isNotNull()) {
 						parent2->removeChild(parent);
@@ -430,84 +449,75 @@ namespace slib
 		});
 	}
 	
-	TransitionType _g_priv_ViewPage_defaultOpeningPopupTransitionType = TransitionType::Zoom;
-	TransitionDirection _g_priv_ViewPage_defaultOpeningPopupTransitionDirection = TransitionDirection::FromBottomToTop;
-	float _g_priv_ViewPage_defaultOpeningPopupTransitionDuration = 0.25f;
-	AnimationCurve _g_priv_ViewPage_defaultOpeningPopupTransitionCurve = AnimationCurve::Overshoot;
-	TransitionType _g_priv_ViewPage_defaultClosingPopupTransitionType = TransitionType::Fade;
-	TransitionDirection _g_priv_ViewPage_defaultClosingPopupTransitionDirection = TransitionDirection::FromTopToBottom;
-	float _g_priv_ViewPage_defaultClosingPopupTransitionDuration = 0.2f;
-	AnimationCurve _g_priv_ViewPage_defaultClosingPopupTransitionCurve = AnimationCurve::Linear;
-
 	void ViewPage::setDefaultPopupTransition(const Transition& opening, const Transition& closing)
 	{
 		if (opening.type != TransitionType::Default) {
-			_g_priv_ViewPage_defaultOpeningPopupTransitionType = opening.type;
+			g_defaultOpeningPopupTransitionType = opening.type;
 		}
 		if (opening.direction != TransitionDirection::Default) {
-			_g_priv_ViewPage_defaultOpeningPopupTransitionDirection = opening.direction;
+			g_defaultOpeningPopupTransitionDirection = opening.direction;
 		}
 		if (opening.duration > 0) {
-			_g_priv_ViewPage_defaultOpeningPopupTransitionDuration = opening.duration;
+			g_defaultOpeningPopupTransitionDuration = opening.duration;
 		}
 		if (opening.curve != AnimationCurve::Default) {
-			_g_priv_ViewPage_defaultOpeningPopupTransitionCurve = opening.curve;
+			g_defaultOpeningPopupTransitionCurve = opening.curve;
 		}
 		if (closing.type != TransitionType::Default) {
-			_g_priv_ViewPage_defaultClosingPopupTransitionType = closing.type;
+			g_defaultClosingPopupTransitionType = closing.type;
 		}
 		if (closing.direction != TransitionDirection::Default) {
-			_g_priv_ViewPage_defaultClosingPopupTransitionDirection = closing.direction;
+			g_defaultClosingPopupTransitionDirection = closing.direction;
 		}
 		if (closing.duration > 0) {
-			_g_priv_ViewPage_defaultClosingPopupTransitionDuration = closing.duration;
+			g_defaultClosingPopupTransitionDuration = closing.duration;
 		}
 		if (closing.curve != AnimationCurve::Default) {
-			_g_priv_ViewPage_defaultClosingPopupTransitionCurve = closing.curve;
+			g_defaultClosingPopupTransitionCurve = closing.curve;
 		}
 	}
 
-	SLIB_STATIC_COLOR(_g_priv_ViewPage_defaultPopupBackgroundColor, 0, 0, 0, 120)
+	SLIB_STATIC_COLOR(g_defaultPopupBackgroundColor, 0, 0, 0, 120)
 
 	Color ViewPage::getDefaultPopupBackgroundColor()
 	{
-		return _g_priv_ViewPage_defaultPopupBackgroundColor;
+		return g_defaultPopupBackgroundColor;
 	}
 
 	void ViewPage::setDefaultPopupBackgroundColor(const Color& color)
 	{
-		_g_priv_ViewPage_defaultPopupBackgroundColor = color;
+		g_defaultPopupBackgroundColor = color;
 	}
 
 	void ViewPage::_applyDefaultOpeningPopupTransition(Transition& transition)
 	{
 		if (transition.type == TransitionType::Default) {
-			transition.type = _g_priv_ViewPage_defaultOpeningPopupTransitionType;
+			transition.type = g_defaultOpeningPopupTransitionType;
 		}
 		if (transition.direction == TransitionDirection::Default) {
-			transition.direction = _g_priv_ViewPage_defaultOpeningPopupTransitionDirection;
+			transition.direction = g_defaultOpeningPopupTransitionDirection;
 		}
 		if (transition.duration <= 0) {
-			transition.duration = _g_priv_ViewPage_defaultOpeningPopupTransitionDuration;
+			transition.duration = g_defaultOpeningPopupTransitionDuration;
 		}
 		if (transition.curve == AnimationCurve::Default) {
-			transition.curve = _g_priv_ViewPage_defaultOpeningPopupTransitionCurve;
+			transition.curve = g_defaultOpeningPopupTransitionCurve;
 		}
 	}
 
 	void ViewPage::_applyDefaultClosingPopupTransition(Transition& transition)
 	{
 		if (transition.type == TransitionType::Default) {
-			transition.type = _g_priv_ViewPage_defaultClosingPopupTransitionType;
+			transition.type = g_defaultClosingPopupTransitionType;
 		}
 		if (transition.direction == TransitionDirection::Default) {
-			transition.direction = _g_priv_ViewPage_defaultClosingPopupTransitionDirection;
+			transition.direction = g_defaultClosingPopupTransitionDirection;
 		}
 		if (transition.duration < SLIB_EPSILON) {
-			transition.duration = _g_priv_ViewPage_defaultClosingPopupTransitionDuration;
+			transition.duration = g_defaultClosingPopupTransitionDuration;
 		}
 		if (transition.curve == AnimationCurve::Default) {
-			transition.curve = _g_priv_ViewPage_defaultClosingPopupTransitionCurve;
+			transition.curve = g_defaultClosingPopupTransitionCurve;
 		}
 	}
 

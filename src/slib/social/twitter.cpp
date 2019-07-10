@@ -28,6 +28,16 @@
 namespace slib
 {
 	
+	namespace priv
+	{
+		namespace twitter
+		{
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Twitter>, g_instance)
+		}
+	}
+	
+	using namespace priv::twitter;
+	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TwitterUser)
 	
 	SLIB_DEFINE_JSON(TwitterUser)
@@ -82,15 +92,12 @@ namespace slib
 		return new Twitter(param);
 	}
 	
-	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Twitter>, _g_priv_social_twitter_instance)
-
 	void Twitter::initialize(const TwitterParam& param)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_twitter_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return;
 		}
-		_g_priv_social_twitter_instance = create(param);
+		g_instance = create(param);
 	}
 	
 	void Twitter::initialize(const String& callbackUrl, const String& consumerKey, const String& consumerSecret)
@@ -105,10 +112,10 @@ namespace slib
 	
 	Ref<Twitter> Twitter::getInstance()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_twitter_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return sl_null;
 		}
-		return _g_priv_social_twitter_instance;
+		return g_instance;
 	}
 
 	String Twitter::getRequestUrl(const String& path)

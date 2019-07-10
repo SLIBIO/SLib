@@ -32,6 +32,105 @@
 
 namespace slib
 {
+	
+	namespace priv
+	{
+		namespace ui_core
+		{
+			
+			class DefaultContext
+			{
+			public:
+				sl_real fontSize;
+				AtomicString fontFamily;
+				AtomicRef<Font> font;
+				sl_ui_len scrollBarWidth;
+				
+			public:
+				DefaultContext()
+				{
+#if defined(SLIB_PLATFORM_IS_DESKTOP)
+					scrollBarWidth = 12;
+					fontSize = 12;
+#else
+					scrollBarWidth = SLIB_MIN(UI::getScreenWidth(), UI::getScreenHeight()) / 60;
+					fontSize = (sl_real)(SLIB_MIN(UI::getScreenWidth(), UI::getScreenHeight()) / 40);
+#endif
+					fontFamily = "Arial";
+					font = Font::create(fontFamily, fontSize);
+				}
+			};
+			
+			SLIB_SAFE_STATIC_GETTER(DefaultContext, getDefaultContext)
+
+			class UICallback : public Callable<void()>
+			{
+			public:
+				Function<void()> m_callback;
+				
+			public:
+				SLIB_INLINE UICallback(const Function<void()>& callback) noexcept
+				 : m_callback(callback)
+				{}
+				
+			public:
+				void invoke() noexcept override
+				{
+					if (UI::isUiThread()) {
+						m_callback();
+					} else {
+						UI::dispatchToUiThread(m_callback);
+					}
+				}
+				
+			};
+			
+			class DispatcherImpl : public Dispatcher
+			{
+			public:
+				sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms) override
+				{
+					if (delay_ms > 0x7fffffff) {
+						delay_ms = 0x7fffffff;
+					}
+					UI::dispatchToUiThread(callback, (sl_uint32)delay_ms);
+					return sl_true;
+				}
+			};
+			
+			static sl_int32 g_nLevelRunLoop = 0;
+			static sl_bool g_flagQuitApp = 0;
+			
+			static void QuitLoop()
+			{
+				if (g_nLevelRunLoop > 0) {
+					UIPlatform::quitLoop();
+				} else {
+					UIPlatform::quitApp();
+				}
+			}
+			
+			static void QuitApp()
+			{
+				if (g_flagQuitApp) {
+					return;
+				}
+				g_flagQuitApp = sl_true;
+				QuitLoop();
+			}
+			
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicList<ScreenOrientation>, g_listAvailableScreenOrientations);
+
+			UIKeyboardAdjustMode g_keyboardAdjustMode = UIKeyboardAdjustMode::Pan;
+			
+#if defined(SLIB_UI_IS_ANDROID)
+			void UpdateKeyboardAdjustMode(UIKeyboardAdjustMode mode);
+#endif
+			
+		}
+	}
+	
+	using namespace priv::ui_core;
 
 	SLIB_DEFINE_OBJECT(Screen, Object)
 
@@ -42,36 +141,10 @@ namespace slib
 	Screen::~Screen()
 	{
 	}
-
-
-	class _priv_UI_Core_Default
-	{
-	public:
-		sl_real fontSize;
-		AtomicString fontFamily;
-		AtomicRef<Font> font;
-		sl_ui_len scrollBarWidth;
-
-	public:
-		_priv_UI_Core_Default()
-		{
-	#if defined(SLIB_PLATFORM_IS_DESKTOP)
-			scrollBarWidth = 12;
-			fontSize = 12;
-	#else
-			scrollBarWidth = SLIB_MIN(UI::getScreenWidth(), UI::getScreenHeight()) / 60;
-			fontSize = (sl_real)(SLIB_MIN(UI::getScreenWidth(), UI::getScreenHeight()) / 40);
-	#endif
-			fontFamily = "Arial";
-			font = Font::create(fontFamily, fontSize);
-		}
-	};
-
-	SLIB_SAFE_STATIC_GETTER(_priv_UI_Core_Default, _priv_UI_Core_getDefault)
-
+	
 	sl_real UI::getDefaultFontSize()
 	{
-		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
+		DefaultContext* def = getDefaultContext();
 		if (!def) {
 			return 0;
 		}
@@ -80,7 +153,7 @@ namespace slib
 
 	void UI::setDefaultFontSize(sl_real fontSize)
 	{
-		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
+		DefaultContext* def = getDefaultContext();
 		if (!def) {
 			return;
 		}
@@ -97,7 +170,7 @@ namespace slib
 
 	String UI::getDefaultFontFamily()
 	{
-		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
+		DefaultContext* def = getDefaultContext();
 		if (!def) {
 			return sl_null;
 		}
@@ -106,7 +179,7 @@ namespace slib
 
 	void UI::setDefaultFontFamily(const String& fontFamily)
 	{
-		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
+		DefaultContext* def = getDefaultContext();
 		if (!def) {
 			return;
 		}
@@ -123,7 +196,7 @@ namespace slib
 
 	Ref<Font> UI::getDefaultFont()
 	{
-		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
+		DefaultContext* def = getDefaultContext();
 		if (!def) {
 			return sl_null;
 		}
@@ -132,7 +205,7 @@ namespace slib
 
 	void UI::setDefaultFont(const Ref<Font>& font)
 	{
-		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
+		DefaultContext* def = getDefaultContext();
 		if (!def) {
 			return;
 		}
@@ -145,7 +218,7 @@ namespace slib
 
 	sl_ui_len UI::getDefaultScrollBarWidth()
 	{
-		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
+		DefaultContext* def = getDefaultContext();
 		if (!def) {
 			return 0;
 		}
@@ -154,7 +227,7 @@ namespace slib
 
 	void UI::setDefaultScrollBarWidth(sl_ui_len len)
 	{
-		_priv_UI_Core_Default* def = _priv_UI_Core_getDefault();
+		DefaultContext* def = getDefaultContext();
 		if (!def) {
 			return;
 		}
@@ -224,22 +297,20 @@ namespace slib
 		return getScreenSize().y;
 	}
 
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicList<ScreenOrientation>, _g_ui_available_screen_orientations);
-	
 	List<ScreenOrientation> UI::getAvailableScreenOrientations()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_ui_available_screen_orientations)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_listAvailableScreenOrientations)) {
 			return sl_null;
 		}
-		return _g_ui_available_screen_orientations;
+		return g_listAvailableScreenOrientations;
 	}
 	
 	void UI::setAvailableScreenOrientations(const List<ScreenOrientation>& orientations)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_ui_available_screen_orientations)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_listAvailableScreenOrientations)) {
 			return;
 		}
-		_g_ui_available_screen_orientations = orientations;
+		g_listAvailableScreenOrientations = orientations;
 		attemptRotateScreenOrientation();
 	}
 	
@@ -524,73 +595,17 @@ namespace slib
 		}
 	}
 
-	class _priv_Ui_Callback : public Callable<void()>
-	{
-	public:
-		Function<void()> m_callback;
-
-	public:
-		SLIB_INLINE _priv_Ui_Callback(const Function<void()>& callback) noexcept
-		 : m_callback(callback)
-		 {}
-
-	public:
-		void invoke() noexcept override
-		{
-			if (UI::isUiThread()) {
-				m_callback();
-			} else {
-				UI::dispatchToUiThread(m_callback);
-			}
-		}
-
-	};
-
 	Function<void()> UI::getCallbackOnUiThread(const Function<void()>& callback)
 	{
 		if (callback.isNotNull()) {
-			return static_cast<Callable<void()>*>(new _priv_Ui_Callback(callback));
+			return static_cast<Callable<void()>*>(new UICallback(callback));
 		}
 		return sl_null;
 	}
 
-	class _priv_Ui_Dispatcher : public Dispatcher
-	{
-	public:
-		sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms) override
-		{
-			if (delay_ms > 0x7fffffff) {
-				delay_ms = 0x7fffffff;
-			}
-			UI::dispatchToUiThread(callback, (sl_uint32)delay_ms);
-			return sl_true;
-		}
-	};
-
 	Ref<Dispatcher> UI::getDispatcher()
 	{
-		return new _priv_Ui_Dispatcher();
-	}
-
-	static sl_int32 _g_ui_run_loop_level = 0;
-	static sl_bool _g_ui_flag_quit_app = 0;
-
-	static void _priv_UI_quitLoop()
-	{
-		if (_g_ui_run_loop_level > 0) {
-			UIPlatform::quitLoop();
-		} else {
-			UIPlatform::quitApp();
-		}
-	}
-
-	static void _priv_UI_quitApp()
-	{
-		if (_g_ui_flag_quit_app) {
-			return;
-		}
-		_g_ui_flag_quit_app = sl_true;
-		_priv_UI_quitLoop();
+		return new DispatcherImpl();
 	}
 
 	void UI::runLoop()
@@ -598,20 +613,20 @@ namespace slib
 		if (!(UI::isUiThread())) {
 			return;
 		}
-		_g_ui_run_loop_level++;
-		UIPlatform::runLoop(_g_ui_run_loop_level);
-		_g_ui_run_loop_level--;
-		if (_g_ui_flag_quit_app) {
-			_priv_UI_quitLoop();
+		g_nLevelRunLoop++;
+		UIPlatform::runLoop(g_nLevelRunLoop);
+		g_nLevelRunLoop--;
+		if (g_flagQuitApp) {
+			QuitLoop();
 		}
 	}
 
 	void UI::quitLoop()
 	{
 		if (UI::isUiThread()) {
-			_priv_UI_quitLoop();
+			QuitLoop();
 		} else {
-			UI::dispatchToUiThread(&_priv_UI_quitLoop);
+			UI::dispatchToUiThread(&QuitLoop);
 		}
 	}
 
@@ -623,9 +638,9 @@ namespace slib
 	void UI::quitApp()
 	{
 		if (UI::isUiThread()) {
-			_priv_UI_quitApp();
+			QuitApp();
 		} else {
-			UI::dispatchToUiThread(&_priv_UI_quitApp);
+			UI::dispatchToUiThread(&QuitApp);
 		}
 	}
 	
@@ -635,23 +650,17 @@ namespace slib
 	}
 #endif
 	
-	UIKeyboardAdjustMode _g_priv_ui_keyboardAdjustMode = UIKeyboardAdjustMode::Pan;
-	
 	UIKeyboardAdjustMode UI::getKeyboardAdjustMode()
 	{
-		return _g_priv_ui_keyboardAdjustMode;
+		return g_keyboardAdjustMode;
 	}
 	
 	
-#if defined(SLIB_UI_IS_ANDROID)
-	void _priv_UI_updateKeyboardAdjustMode(UIKeyboardAdjustMode mode);
-#endif
-
 	void UI::setKeyboardAdjustMode(UIKeyboardAdjustMode mode)
 	{
-		_g_priv_ui_keyboardAdjustMode = mode;
+		g_keyboardAdjustMode = mode;
 #if defined(SLIB_UI_IS_ANDROID)
-		_priv_UI_updateKeyboardAdjustMode(mode);
+		UpdateKeyboardAdjustMode(mode);
 #endif
 	}
 	

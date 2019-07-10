@@ -6162,24 +6162,30 @@ namespace slib
 		return getScrollPosition().y;
 	}
 
-	static sl_scroll_pos _priv_View_clampScrollPos(sl_scroll_pos x, sl_scroll_pos max)
+	namespace priv
 	{
-		if (x > max) {
-			x = max;
+		namespace view
+		{
+			SLIB_INLINE static sl_scroll_pos ClampScrollPos(sl_scroll_pos x, sl_scroll_pos max)
+			{
+				if (x > max) {
+					x = max;
+				}
+				if (x < 0) {
+					x = 0;
+				}
+				return x;
+			}			
 		}
-		if (x < 0) {
-			x = 0;
-		}
-		return x;
 	}
-	
+
 	void View::scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
 	{
 		_initializeScrollAttributes();
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
-			x = _priv_View_clampScrollPos(x, attrs->contentWidth - (sl_scroll_pos)(getWidth()));
-			y = _priv_View_clampScrollPos(y, attrs->contentHeight - (sl_scroll_pos)(getHeight()));
+			x = priv::view::ClampScrollPos(x, attrs->contentWidth - (sl_scroll_pos)(getWidth()));
+			y = priv::view::ClampScrollPos(y, attrs->contentHeight - (sl_scroll_pos)(getHeight()));
 			if (_scrollTo(x, y, sl_true, sl_true, sl_false)) {
 				invalidate(mode);
 			}
@@ -6209,8 +6215,8 @@ namespace slib
 		_initializeScrollAttributes();
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNotNull()) {
-			x = _priv_View_clampScrollPos(x, attrs->contentWidth - (sl_scroll_pos)(getWidth()));
-			y = _priv_View_clampScrollPos(y, attrs->contentHeight - (sl_scroll_pos)(getHeight()));
+			x = priv::view::ClampScrollPos(x, attrs->contentWidth - (sl_scroll_pos)(getWidth()));
+			y = priv::view::ClampScrollPos(y, attrs->contentHeight - (sl_scroll_pos)(getHeight()));
 			if (isNativeWidget()) {
 				_scrollTo_NW(x, y, sl_true);
 			} else {
@@ -6517,8 +6523,8 @@ namespace slib
 				barVert->setOnChange(SLIB_FUNCTION_WEAKREF(View, _onScrollBarChangeValue, this));
 				attrs->flagValidVert = barVert->isValid();
 			}
-			sl_scroll_pos x = _priv_View_clampScrollPos(attrs->x, attrs->contentWidth - (sl_scroll_pos)(getWidth()));
-			sl_scroll_pos y = _priv_View_clampScrollPos(attrs->y, attrs->contentHeight - (sl_scroll_pos)(getHeight()));
+			sl_scroll_pos x = priv::view::ClampScrollPos(attrs->x, attrs->contentWidth - (sl_scroll_pos)(getWidth()));
+			sl_scroll_pos y = priv::view::ClampScrollPos(attrs->y, attrs->contentHeight - (sl_scroll_pos)(getHeight()));
 			if (!(Math::isAlmostZero(x - attrs->x) && Math::isAlmostZero(y - attrs->y))) {
 				if (_scrollTo(x, y, sl_true, sl_true, sl_false)) {
 					invalidate(mode);
@@ -7733,35 +7739,44 @@ namespace slib
 		
 	}
 
-	static UIAction _priv_View_getActionUp(UIAction actionDown)
+	namespace priv
 	{
-		if (actionDown == UIAction::LeftButtonDown) {
-			return UIAction::LeftButtonUp;
-		} else if (actionDown == UIAction::RightButtonDown) {
-			return UIAction::RightButtonUp;
-		} else if (actionDown == UIAction::MiddleButtonDown) {
-			return UIAction::MiddleButtonUp;
+		namespace view
+		{
+
+			SLIB_INLINE static UIAction GetActionUp(UIAction actionDown)
+			{
+				if (actionDown == UIAction::LeftButtonDown) {
+					return UIAction::LeftButtonUp;
+				} else if (actionDown == UIAction::RightButtonDown) {
+					return UIAction::RightButtonUp;
+				} else if (actionDown == UIAction::MiddleButtonDown) {
+					return UIAction::MiddleButtonUp;
+				}
+				return UIAction::Unknown;
+			}
+			
+			class DuringEventScope
+			{
+			public:
+				View* view;
+				
+			public:
+				SLIB_INLINE DuringEventScope(View* view, UIEvent* ev)
+				{
+					this->view = view;
+					view->setCurrentEvent(ev);
+				}
+				
+				SLIB_INLINE ~DuringEventScope()
+				{
+					view->setCurrentEvent(sl_null);
+				}
+				
+			};
+
 		}
-		return UIAction::Unknown;
 	}
-	
-	class _priv_View_DuringEventScope
-	{
-	public:
-		View* view;
-		
-		SLIB_INLINE _priv_View_DuringEventScope(View* view, UIEvent* ev)
-		{
-			this->view = view;
-			view->setCurrentEvent(ev);
-		}
-		
-		SLIB_INLINE ~_priv_View_DuringEventScope()
-		{
-			view->setCurrentEvent(sl_null);
-		}
-		
-	};
 
 #define POINT_EVENT_CHECK_CHILD(c) (c && !(c->isInstance()) && c->isVisible() && c->isHitTestable())
 
@@ -7831,7 +7846,7 @@ namespace slib
 		
 		ev->resetFlags();
 		
-		_priv_View_DuringEventScope scope(this, ev);
+		priv::view::DuringEventScope scope(this, ev);
 		
 		SLIB_INVOKE_EVENT_HANDLER(MouseEvent, ev)
 
@@ -7917,7 +7932,7 @@ namespace slib
 				oldChild = childAttrs->childMouseDown;
 				if (oldChild.isNotNull()) {
 					dispatchMouseEventToChild(ev, oldChild.get());
-					if (action == _priv_View_getActionUp(m_actionMouseDown)) {
+					if (action == priv::view::GetActionUp(m_actionMouseDown)) {
 						childAttrs->childMouseDown.setNull();
 						m_actionMouseDown = UIAction::Unknown;
 					}
@@ -8038,7 +8053,7 @@ namespace slib
 			}
 		}
 		
-		_priv_View_DuringEventScope scope(this, ev);
+		priv::view::DuringEventScope scope(this, ev);
 
 		SLIB_INVOKE_EVENT_HANDLER(TouchEvent, ev)
 		SLIB_INVOKE_EVENT_HANDLER(MouseEvent, ev)
@@ -8345,7 +8360,7 @@ namespace slib
 		
 		ev->resetFlags();
 		
-		_priv_View_DuringEventScope scope(this, ev);
+		priv::view::DuringEventScope scope(this, ev);
 
 		SLIB_INVOKE_EVENT_HANDLER(MouseWheelEvent, ev)
 		
@@ -8425,7 +8440,7 @@ namespace slib
 		
 		ev->resetFlags();
 		
-		_priv_View_DuringEventScope scope(this, ev);
+		priv::view::DuringEventScope scope(this, ev);
 
 		SLIB_INVOKE_EVENT_HANDLER(KeyEvent, ev)
 		
@@ -8746,26 +8761,58 @@ namespace slib
 		}
 	}
 
-	static void _priv_View_scrollPagingElement(sl_scroll_pos& value, sl_scroll_pos speed, sl_scroll_pos pageSize)
+	namespace priv
 	{
-		if (pageSize < 1) {
-			return;
-		}
-		speed = -speed;
-		if (speed > pageSize * 0.4) {
-			speed = pageSize * 0.4;
-		}
-		if (speed < -pageSize * 0.4) {
-			speed = -pageSize * 0.4;
-		}
-		sl_scroll_pos page = Math::round(value / pageSize);
-		sl_scroll_pos offset = value - page * pageSize;
-		if (offset + speed > pageSize / 2) {
-			value = (page + 1) * pageSize;
-		} else if (offset + speed < - pageSize / 2) {
-			value = (page - 1) * pageSize;
-		} else {
-			value = page * pageSize;
+		namespace view
+		{
+
+			static void ScrollPagingElement(sl_scroll_pos& value, sl_scroll_pos speed, sl_scroll_pos pageSize)
+			{
+				if (pageSize < 1) {
+					return;
+				}
+				speed = -speed;
+				if (speed > pageSize * 0.4) {
+					speed = pageSize * 0.4;
+				}
+				if (speed < -pageSize * 0.4) {
+					speed = -pageSize * 0.4;
+				}
+				sl_scroll_pos page = Math::round(value / pageSize);
+				sl_scroll_pos offset = value - page * pageSize;
+				if (offset + speed > pageSize / 2) {
+					value = (page + 1) * pageSize;
+				} else if (offset + speed < - pageSize / 2) {
+					value = (page - 1) * pageSize;
+				} else {
+					value = page * pageSize;
+				}
+			}
+
+			static void SmoothScrollElement(sl_scroll_pos& value, sl_scroll_pos& target, sl_scroll_pos dt, sl_scroll_pos T, sl_bool& flagAnimating)
+			{
+				flagAnimating = sl_false;
+				sl_scroll_pos offset = target - value;
+				sl_scroll_pos offsetAbs = Math::abs(offset);
+				if (offsetAbs > 1) {
+					sl_scroll_pos speed;
+					if (offsetAbs > T) {
+						speed = offset;
+					} else {
+						speed = T * Math::sign(offset);
+					}
+					sl_scroll_pos add = speed * (dt * 3.5f);
+					if (Math::abs(add) < offsetAbs) {
+						value += add;
+						flagAnimating = sl_true;
+					} else {
+						value = target;
+					}
+				} else {
+					value = target;
+				}
+			}
+
 		}
 	}
 
@@ -8875,11 +8922,11 @@ namespace slib
 						}
 						if (flagHorz) {
 							sl_scroll_pos pageWidth = (sl_scroll_pos)(scrollAttrs->pageWidth == 0 ? getWidth() : scrollAttrs->pageWidth);
-							_priv_View_scrollPagingElement(x, speed.x, pageWidth);
+							priv::view::ScrollPagingElement(x, speed.x, pageWidth);
 						}
 						if (flagVert) {
 							sl_scroll_pos pageHeight = (sl_scroll_pos)(scrollAttrs->pageHeight == 0 ? getHeight() : scrollAttrs->pageHeight);
-							_priv_View_scrollPagingElement(y, speed.y, pageHeight);
+							priv::view::ScrollPagingElement(y, speed.y, pageHeight);
 						}
 						smoothScrollTo(x, y);
 					} else {
@@ -9014,30 +9061,6 @@ namespace slib
 		scrollAttrs->timerFlow.setNull();
 	}
 
-	static void _priv_View_smoothScrollElement(sl_scroll_pos& value, sl_scroll_pos& target, sl_scroll_pos dt, sl_scroll_pos T, sl_bool& flagAnimating)
-	{
-		flagAnimating = sl_false;
-		sl_scroll_pos offset = target - value;
-		sl_scroll_pos offsetAbs = Math::abs(offset);
-		if (offsetAbs > 1) {
-			sl_scroll_pos speed;
-			if (offsetAbs > T) {
-				speed = offset;
-			} else {
-				speed = T * Math::sign(offset);
-			}
-			sl_scroll_pos add = speed * (dt * 3.5f);
-			if (Math::abs(add) < offsetAbs) {
-				value += add;
-				flagAnimating = sl_true;
-			} else {
-				value = target;
-			}
-		} else {
-			value = target;
-		}
-	}
-
 	void View::_processContentScrollingFlow(Timer* timer)
 	{
 		Ref<ScrollAttributes>& scrollAttrs = m_scrollAttrs;
@@ -9061,8 +9084,8 @@ namespace slib
 			
 			sl_scroll_pos x = scrollAttrs->x;
 			sl_scroll_pos y = scrollAttrs->y;
-			_priv_View_smoothScrollElement(x, scrollAttrs->xSmoothTarget, dt, T, flagX);
-			_priv_View_smoothScrollElement(y, scrollAttrs->ySmoothTarget, dt, T, flagY);
+			priv::view::SmoothScrollElement(x, scrollAttrs->xSmoothTarget, dt, T, flagX);
+			priv::view::SmoothScrollElement(y, scrollAttrs->ySmoothTarget, dt, T, flagY);
 			
 			_scrollTo(x, y, sl_true, sl_false, sl_true);
 			
@@ -9170,7 +9193,13 @@ namespace slib
 		m_flagWindowContent = flag;
 	}
 
-	Color _priv_View_getDefaultBackColor();
+	namespace priv
+	{
+		namespace view
+		{
+			Color GetDefaultBackColor();
+		}
+	}
 
 	void ViewInstance::onDraw(Canvas* canvas)
 	{
@@ -9232,13 +9261,13 @@ namespace slib
 					if (window.isNotNull() && window->getContentView() == view) {
 						colorClear = window->getBackgroundColor();
 						if (colorClear.a < 255) {
-							Color c = _priv_View_getDefaultBackColor();
+							Color c = priv::view::GetDefaultBackColor();
 							c.blend_PA_NPA(colorClear);
 							colorClear = c;
 						}
 						break;
 					} else {
-						colorClear = _priv_View_getDefaultBackColor();
+						colorClear = priv::view::GetDefaultBackColor();
 					}
 				} while (0);
 				UIRect rcBack = {0, 0, size.x, size.y};

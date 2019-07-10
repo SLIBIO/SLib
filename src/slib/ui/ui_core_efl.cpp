@@ -49,60 +49,116 @@
 namespace slib
 {
 
-	pthread_t _g_main_thread = 0;
-
-	class _priv_EFL_Screen : public Screen
+	namespace priv
 	{
-	public:
-		int m_width;
-		int m_height;
-
-	public:
-		static Ref<_priv_EFL_Screen> create()
+		namespace ui_core
 		{
-			Ref<_priv_EFL_Screen> ret = new _priv_EFL_Screen();
-			if (ret.isNotNull()) {
-				ret->m_width = 0;
-				ret->m_height = 0;
+
+			pthread_t g_threadMain = 0;
+			sl_int32 g_nLevelMainLoop = 0;
+
+			class ScreenImpl : public Screen
+			{
+			public:
+				int m_width;
+				int m_height;
+
+			public:
+				static Ref<ScreenImpl> create()
+				{
+					Ref<ScreenImpl> ret = new ScreenImpl();
+					if (ret.isNotNull()) {
+						ret->m_width = 0;
+						ret->m_height = 0;
 #if defined(SLIB_PLATFORM_IS_TIZEN)
-				::system_info_get_platform_int("http://tizen.org/feature/screen.width", &(ret->m_width));
-				::system_info_get_platform_int("http://tizen.org/feature/screen.height", &(ret->m_height));
+						::system_info_get_platform_int("http://tizen.org/feature/screen.width", &(ret->m_width));
+						::system_info_get_platform_int("http://tizen.org/feature/screen.height", &(ret->m_height));
 #endif
-				return ret;
-			}			
-			return sl_null;
-		}
-
-	public:
-		UIRect getRegion() override
-		{
-			int rotation = 0;
-
-			Evas_Object* win = UIPlatform::getMainWindow();
-			if (win) {
-				rotation = ::elm_win_rotation_get(win);
-			}
-
-			List<ScreenOrientation> orientations = UI::getAvailableScreenOrientations();
-			if(orientations.getCount() > 0) {
-				if(orientations.indexOf((ScreenOrientation)rotation) == -1) {
-					rotation = (int)(orientations.getValueAt(0));
+						return ret;
+					}			
+					return sl_null;
 				}
+
+			public:
+				UIRect getRegion() override
+				{
+					int rotation = 0;
+
+					Evas_Object* win = UIPlatform::getMainWindow();
+					if (win) {
+						rotation = ::elm_win_rotation_get(win);
+					}
+
+					List<ScreenOrientation> orientations = UI::getAvailableScreenOrientations();
+					if(orientations.getCount() > 0) {
+						if(orientations.indexOf((ScreenOrientation)rotation) == -1) {
+							rotation = (int)(orientations.getValueAt(0));
+						}
+					}
+
+					UIRect ret;
+					ret.left = 0;
+					ret.top = 0;
+					if (rotation == 90 || rotation == 270) {
+						ret.right = (sl_ui_pos)m_height;
+						ret.bottom = (sl_ui_pos)m_width;
+					} else {
+						ret.right = (sl_ui_pos)m_width;
+						ret.bottom = (sl_ui_pos)m_height;
+					}
+					return ret;
+				}
+			};
+
+			static void DispatchCallback(void* data)
+			{
+				UIDispatcher::processCallbacks();
 			}
 
-			UIRect ret;
-			ret.left = 0;
-			ret.top = 0;
-			if (rotation == 90 || rotation == 270) {
-				ret.right = (sl_ui_pos)m_height;
-				ret.bottom = (sl_ui_pos)m_width;
-			} else {
-				ret.right = (sl_ui_pos)m_width;
-				ret.bottom = (sl_ui_pos)m_height;
+			static Eina_Bool DelayedDispatchCallback(void* data)
+			{
+				Callable<void()>* callable = reinterpret_cast<Callable<void()>*>(data);
+				callable->invoke();
+				callable->decreaseReference();
+				return ECORE_CALLBACK_CANCEL;
 			}
-			return ret;
+
+			static void QuitCallback(void* data)
+			{
+			}
+
+			static bool CreateCallback(void* data)
+			{
+				Log("App", "Create");
+				::elm_config_accel_preference_set("opengl");
+				UIApp::dispatchStartToApp();
+				MobileApp::dispatchCreateActivityToApp();
+				return true;
+			}
+
+			static void ResumeCallback(void* data)
+			{
+				Log("App", "Resume");
+				MobileApp::dispatchResumeToApp();
+			}
+
+			static void PauseCallback(void* data)
+			{
+				Log("App", "Pause");
+				MobileApp::dispatchPauseToApp();
+			}
+
+			static void TerminateCallback(void* data)
+			{
+				Log("App", "Terminate");
+				MobileApp::dispatchDestroyActivityToApp();
+				UIApp::dispatchExitToApp();
+			}
+
 		}
-	};
+	}
+
+	using namespace priv::ui_core;
 
 	Ref<Screen> UI::getPrimaryScreen()
 	{
@@ -111,7 +167,7 @@ namespace slib
 			return sl_null;
 		}
 		if (ret.isNull()) {
-			ret = _priv_EFL_Screen::create();
+			ret = ScreenImpl::create();
 		}
 		return ret;
 	}
@@ -145,89 +201,42 @@ namespace slib
 
 	sl_bool UI::isUiThread()
 	{
-		return _g_main_thread == ::pthread_self();
+		return g_threadMain == ::pthread_self();
 	}
 	
-	static void _ui_dispatch_callback(void* data)
-	{
-		_priv_UIDispatcher::processCallbacks();
-	}
-
-	static Eina_Bool _ui_dispatch_timer_callback(void* data)
-	{
-		Callable<void()>* callable = reinterpret_cast<Callable<void()>*>(data);
-		callable->invoke();
-		callable->decreaseReference();
-		return ECORE_CALLBACK_CANCEL;
-	}
-
 	void UI::dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMillis)
 	{
 		if (callback.isNull()) {
 			return;
 		}
 		if (delayMillis == 0) {
-			if (_priv_UIDispatcher::addCallback(callback)) {
-				::ecore_main_loop_thread_safe_call_async(_ui_dispatch_callback, sl_null);
+			if (UIDispatcher::addCallback(callback)) {
+				::ecore_main_loop_thread_safe_call_async(DispatchCallback, sl_null);
 			}
 		} else {
 			Callable<void()>* callable = callback.ref.get();
 			callable->increaseReference();
-			::ecore_timer_loop_add((double)delayMillis / 1000.0, _ui_dispatch_timer_callback, callable);
+			::ecore_timer_loop_add((double)delayMillis / 1000.0, DelayedDispatchCallback, callable);
 		}
 	}
 
-
-	sl_int32 _g_main_loop_level = 0;
 	void UIPlatform::runLoop(sl_uint32 level)
 	{
-		sl_int32 loopLevel = Base::interlockedIncrement32(&_g_main_loop_level);
-		while (loopLevel == _g_main_loop_level) {
+		sl_int32 loopLevel = Base::interlockedIncrement32(&g_nLevelMainLoop);
+		while (loopLevel == g_nLevelMainLoop) {
 			::ecore_main_loop_iterate();
 		}
 	}
 
-	static void _ui_quit_callback(void* data)
-	{
-	}
-
 	void UIPlatform::quitLoop()
 	{
-		Base::interlockedDecrement(&_g_main_loop_level);
-		::ecore_main_loop_thread_safe_call_async(_ui_quit_callback, sl_null);
-	}
-
-	static bool _ui_callback_app_create(void* data)
-	{
-		Log("App", "Create");
-		::elm_config_accel_preference_set("opengl");
-		UIApp::dispatchStartToApp();
-		MobileApp::dispatchCreateActivityToApp();
-		return true;
-	}
-
-	static void _ui_callback_app_resume(void* data)
-	{
-		Log("App", "Resume");
-		MobileApp::dispatchResumeToApp();
-	}
-
-	static void _ui_callback_app_pause(void* data)
-	{
-		Log("App", "Pause");
-		MobileApp::dispatchPauseToApp();
-	}
-
-	static void _ui_callback_app_terminate(void* data)
-	{
-		Log("App", "Terminate");
-		MobileApp::dispatchDestroyActivityToApp();
-		UIApp::dispatchExitToApp();
+		Base::interlockedDecrement(&g_nLevelMainLoop);
+		::ecore_main_loop_thread_safe_call_async(QuitCallback, sl_null);
 	}
 
 	void UIPlatform::runApp()
 	{
-		_g_main_thread = ::pthread_self();
+		g_threadMain = ::pthread_self();
 
 		Ref<Application> app = Application::getApp();
 		if (app.isNull()) {
@@ -242,10 +251,10 @@ namespace slib
 		}
 
 		ui_app_lifecycle_callback_s event_callback = {0,};
-		event_callback.create = _ui_callback_app_create;
-		event_callback.resume = _ui_callback_app_resume;
-		event_callback.pause = _ui_callback_app_pause;
-		event_callback.terminate = _ui_callback_app_terminate;
+		event_callback.create = CreateCallback;
+		event_callback.resume = ResumeCallback;
+		event_callback.pause = PauseCallback;
+		event_callback.terminate = TerminateCallback;
 
 		::ui_app_main(n, p, &event_callback, sl_null);
 

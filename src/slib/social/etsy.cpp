@@ -28,6 +28,16 @@
 namespace slib
 {
 	
+	namespace priv
+	{
+		namespace etsy
+		{
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Etsy>, g_instance)
+		}
+	}
+	
+	using namespace priv::etsy;
+	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(EtsyUserFeedbackInfo)
 	
 	SLIB_DEFINE_JSON_MEMBERS(EtsyUserFeedbackInfo, count, score)
@@ -87,15 +97,12 @@ namespace slib
 		return new Etsy(param);
 	}
 	
-	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Etsy>, _g_priv_social_etsy_instance)
-
 	void Etsy::initialize(const EtsyParam& param)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_etsy_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return;
 		}
-		_g_priv_social_etsy_instance = create(param);
+		g_instance = create(param);
 	}
 	
 	void Etsy::initialize(const String& callbackUrl, const String& consumerKey, const String& consumerSecret)
@@ -110,10 +117,10 @@ namespace slib
 	
 	Ref<Etsy> Etsy::getInstance()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_etsy_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return sl_null;
 		}
-		return _g_priv_social_etsy_instance;
+		return g_instance;
 	}
 	
 	String Etsy::getRequestUrl(const String& path)

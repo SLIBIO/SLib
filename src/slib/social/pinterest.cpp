@@ -28,6 +28,16 @@
 namespace slib
 {
 	
+	namespace priv
+	{
+		namespace pinterest
+		{
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Pinterest>, g_instance)
+		}
+	}
+	
+	using namespace priv::pinterest;
+	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(PinterestUser)
 	
 	SLIB_DEFINE_JSON(PinterestUser)
@@ -82,16 +92,13 @@ namespace slib
 	{
 		return new Pinterest(param);
 	}
-	
-	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Pinterest>, _g_priv_social_pinterest_instance)
-	
+		
 	void Pinterest::initialize(const PinterestParam& param)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_pinterest_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return;
 		}
-		_g_priv_social_pinterest_instance = create(param);
+		g_instance = create(param);
 	}
 	
 	void Pinterest::initialize(const String& redirectUri, const String& appId, const String& appSecret)
@@ -106,10 +113,10 @@ namespace slib
 	
 	Ref<Pinterest> Pinterest::getInstance()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_pinterest_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return sl_null;
 		}
-		return _g_priv_social_pinterest_instance;
+		return g_instance;
 	}
 
 	void Pinterest::authorizeRequest(UrlRequestParam& param, const OAuthAccessToken& token)

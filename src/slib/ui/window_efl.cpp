@@ -44,364 +44,373 @@
 namespace slib
 {
 
-	static sl_int32 _ui_active_windows_count = 0;
-
-	class _priv_EFL_Window;
-	SLIB_STATIC_ZERO_INITIALIZED(Ref<_priv_EFL_Window>, _ui_main_window)
-
-	class _priv_EFL_Window : public WindowInstance
+	namespace priv
 	{
-	public:
-		Evas_Object* m_window;
-		AtomicRef<ViewInstance> m_viewContent;
-		
-	public:
-		_priv_EFL_Window()
-		{
-			m_window = sl_null;
-		}
-		
-		~_priv_EFL_Window()
-		{
-			_release();
-		}
-		
-	public:
-		static Ref<_priv_EFL_Window> create(Evas_Object* window)
+		namespace window
 		{
 
-			if (window) {
+			static sl_int32 g_nCountActiveWindows = 0;
 
-				Ref<_priv_EFL_Window> ret = new _priv_EFL_Window();
+			class EFL_WindowInstance;
+			SLIB_STATIC_ZERO_INITIALIZED(Ref<EFL_WindowInstance>, g_windowMain)
 
-				if (ret.isNotNull()) {
+			class EFL_WindowInstance : public WindowInstance
+			{
+			public:
+				Evas_Object* m_window;
+				AtomicRef<ViewInstance> m_viewContent;
+				
+			public:
+				EFL_WindowInstance()
+				{
+					m_window = sl_null;
+				}
+				
+				~EFL_WindowInstance()
+				{
+					_release();
+				}
+				
+			public:
+				static Ref<EFL_WindowInstance> create(Evas_Object* window)
+				{
 
-					ret->m_window = window;
+					if (window) {
 
-					Ref<ViewInstance> content = UIPlatform::createViewInstance(EFL_ViewType::Window, window, sl_false);
-					if (content.isNotNull()) {
-						content->setWindowContent(sl_true);
-						ret->m_viewContent = content;
+						Ref<EFL_WindowInstance> ret = new EFL_WindowInstance();
+
+						if (ret.isNotNull()) {
+
+							ret->m_window = window;
+
+							Ref<ViewInstance> content = UIPlatform::createViewInstance(EFL_ViewType::Window, window, sl_false);
+							if (content.isNotNull()) {
+								content->setWindowContent(sl_true);
+								ret->m_viewContent = content;
+							}
+
+							Base::interlockedIncrement32(&g_nCountActiveWindows);
+							::evas_object_smart_callback_add(window, "delete,request", _ui_win_delete_request_cb, sl_null);
+							::evas_object_smart_callback_add(window, "wm,rotation,changed", _ui_win_rotate_cb, NULL);
+							::eext_object_event_callback_add(window, EEXT_CALLBACK_BACK, _ui_win_back_cb, sl_null);
+
+							::evas_object_show(window);
+
+							if (g_windowMain.isNull()) {
+								g_windowMain = ret;
+							}
+
+							UIPlatform::registerWindowInstance(window, ret.get());
+
+							return ret;
+
+						}
+
 					}
 
-					Base::interlockedIncrement32(&_ui_active_windows_count);
-					::evas_object_smart_callback_add(window, "delete,request", _ui_win_delete_request_cb, sl_null);
-					::evas_object_smart_callback_add(window, "wm,rotation,changed", _ui_win_rotate_cb, NULL);
-					::eext_object_event_callback_add(window, EEXT_CALLBACK_BACK, _ui_win_back_cb, sl_null);
-
-					::evas_object_show(window);
-
-					if (_ui_main_window.isNull()) {
-						_ui_main_window = ret;
-					}
-
-					UIPlatform::registerWindowInstance(window, ret.get());
-
-					return ret;
+					return sl_null;
 
 				}
-
-			}
-
-			return sl_null;
-
-		}
-		
-		static void _ui_win_delete_request_cb(void* data, Evas_Object* win, void* event_info)
-		{
-			Ref<WindowInstance> instance = UIPlatform::getWindowInstance(win);
-			if (instance.isNotNull()) {
-				(static_cast<_priv_EFL_Window*>(instance.get()))->m_window = sl_null;
-			}
-			UIPlatform::removeWindowInstance(win);
-			sl_int32 n = Base::interlockedDecrement32(&_ui_active_windows_count);
-			if (n <= 0) {
-				::ui_app_exit();
-			}
-		}
-
-		static void _ui_win_rotate_cb(void* data, Evas_Object* win, void* event_info)
-		{
-			Ref<WindowInstance> instance = UIPlatform::getWindowInstance(win);
-			if (instance.isNotNull()) {
-				UISize size = UI::getScreenSize();
-				instance->onResize(size.x, size.y);
-			}
-		}
-
-		static void _ui_win_back_cb(void* data, Evas_Object* win, void* event_info)
-		{
-			if (MobileApp::dispatchBackPressedToApp()) {
-				::elm_win_lower(win);
-			}
-		}
-
-		static Ref<WindowInstance> create(const WindowInstanceParam& param)
-		{
-			Evas_Object* win = ::elm_win_util_standard_add("", "");
-			if (win) {
-
-				List<ScreenOrientation> orientations = UI::getAvailableScreenOrientations();
-				if (orientations.isNotNull()) {
-					if (::elm_win_wm_rotation_supported_get(win)) {
-						::elm_win_wm_rotation_available_rotations_set(win, (int*)(orientations.getData()), (unsigned int)(orientations.getCount()));
+				
+				static void _ui_win_delete_request_cb(void* data, Evas_Object* win, void* event_info)
+				{
+					Ref<WindowInstance> instance = UIPlatform::getWindowInstance(win);
+					if (instance.isNotNull()) {
+						(static_cast<EFL_WindowInstance*>(instance.get()))->m_window = sl_null;
+					}
+					UIPlatform::removeWindowInstance(win);
+					sl_int32 n = Base::interlockedDecrement32(&g_nCountActiveWindows);
+					if (n <= 0) {
+						::ui_app_exit();
 					}
 				}
 
-				if (!(param.flagFullScreen)) {
-					UIRect screenFrame;
-					Ref<Screen> _screen = param.screen;
-					if (_screen.isNotNull()) {
-						screenFrame = _screen->getRegion();
-					} else {
-						_screen = UI::getPrimaryScreen();
-						if (_screen.isNotNull()) {
-							screenFrame = _screen->getRegion();
+				static void _ui_win_rotate_cb(void* data, Evas_Object* win, void* event_info)
+				{
+					Ref<WindowInstance> instance = UIPlatform::getWindowInstance(win);
+					if (instance.isNotNull()) {
+						UISize size = UI::getScreenSize();
+						instance->onResize(size.x, size.y);
+					}
+				}
+
+				static void _ui_win_back_cb(void* data, Evas_Object* win, void* event_info)
+				{
+					if (MobileApp::dispatchBackPressedToApp()) {
+						::elm_win_lower(win);
+					}
+				}
+
+				static Ref<WindowInstance> create(const WindowInstanceParam& param)
+				{
+					Evas_Object* win = ::elm_win_util_standard_add("", "");
+					if (win) {
+
+						List<ScreenOrientation> orientations = UI::getAvailableScreenOrientations();
+						if (orientations.isNotNull()) {
+							if (::elm_win_wm_rotation_supported_get(win)) {
+								::elm_win_wm_rotation_available_rotations_set(win, (int*)(orientations.getData()), (unsigned int)(orientations.getCount()));
+							}
+						}
+
+						if (!(param.flagFullScreen)) {
+							UIRect screenFrame;
+							Ref<Screen> _screen = param.screen;
+							if (_screen.isNotNull()) {
+								screenFrame = _screen->getRegion();
+							} else {
+								_screen = UI::getPrimaryScreen();
+								if (_screen.isNotNull()) {
+									screenFrame = _screen->getRegion();
+								} else {
+									screenFrame = UIRect::zero();
+								}
+							}
+							UIRect rect = param.calculateRegion(screenFrame);
+							/*
+							* Following move&resize code has no effect because Tizen policy fills the window in the screen.
+							* Just left for the further update.
+							*/
+							::evas_object_move(win, (Evas_Coord)(rect.left), (Evas_Coord)(rect.top));
+							::evas_object_resize(win, (Evas_Coord)(rect.getWidth()), (Evas_Coord)(rect.getHeight()));
+						}
+
+						Ref<EFL_WindowInstance> ret = create(win);
+						if (ret.isNotNull()) {
+							::elm_win_autodel_set(win, EINA_TRUE);
+							return ret;
+						}
+
+						::evas_object_del(win);
+
+					}
+					return sl_null;
+				}
+				
+				static void _release_handle(Evas_Object* window)
+				{
+					::elm_win_lower(window);
+					::evas_object_del(window);
+				}
+
+				void _release()
+				{
+					Evas_Object* window = m_window;
+					if (window) {
+						UIPlatform::removeWindowInstance(window);
+						if (UI::isUiThread()) {
+							_release_handle(window);
 						} else {
-							screenFrame = UIRect::zero();
+							UI::dispatchToUiThread(Function<void()>::bind(&_release_handle, window));
 						}
 					}
-					UIRect rect = param.calculateRegion(screenFrame);
-					/*
-					 * Following move&resize code has no effect because Tizen policy fills the window in the screen.
-					 * Just left for the further update.
-					 */
-					::evas_object_move(win, (Evas_Coord)(rect.left), (Evas_Coord)(rect.top));
-					::evas_object_resize(win, (Evas_Coord)(rect.getWidth()), (Evas_Coord)(rect.getHeight()));
+					m_viewContent.setNull();
+					m_window = sl_null;
 				}
+				
+				Ref<ViewInstance> getContentView()
+				{
+					return m_viewContent;
+				}
+				
+				void close()
+				{
+					Evas_Object* window = m_window;
+					if (window) {
+						if (!(UI::isUiThread())) {
+							UI::dispatchToUiThread(SLIB_FUNCTION_WEAKREF(EFL_WindowInstance, close, this));
+							return;
+						}
+						UIPlatform::removeWindowInstance(window);
+						::elm_win_lower(window);
+						::evas_object_del(window);
+					}
+					m_window = sl_null;
+					m_viewContent.setNull();
+				}
+				
+				sl_bool isClosed()
+				{
+					return m_window == sl_null;
+				}
+				
+				sl_bool setParent(const Ref<WindowInstance>& window)
+				{
+					return sl_false;
+				}
+				
+				sl_bool setFocus()
+				{
+					Evas_Object* window = m_window;
+					if (window) {
+						if (!(UI::isUiThread())) {
+							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EFL_WindowInstance, setFocus, this));
+							return sl_true;
+						}
+						::elm_win_raise(window);
+					}
+					return sl_false;
+				}
+				
+				UIRect getFrame()
+				{
+					return UI::getScreenBounds();
+				}
+				
+				sl_bool setFrame(const UIRect& _frame)
+				{
+					return sl_false;
+				}
+				
+				UIRect getClientFrame()
+				{
+					return getFrame();
+				}
+				
+				UISize getClientSize()
+				{
+					return getFrame().getSize();
+				}
+				
+				sl_bool setClientSize(const UISize& _size)
+				{
+					return sl_false;
+				}
+				
+				sl_bool setTitle(const String& title)
+				{
+					return sl_false;
+				}
+				
+				sl_bool setBackgroundColor(const Color& _color)
+				{
+					return sl_false;
+				}
+				
+				sl_bool isMinimized()
+				{
+					return sl_false;
+				}
+				
+				sl_bool setMinimized(sl_bool flag)
+				{
+					return sl_false;
+				}
+				
+				sl_bool isMaximized()
+				{
+					return sl_false;
+				}
+				
+				sl_bool setMaximized(sl_bool flag)
+				{
+					return sl_false;
+				}
+				
+				sl_bool setVisible(sl_bool flag)
+				{
+					Evas_Object* window = m_window;
+					if (window) {
+						if (!(UI::isUiThread())) {
+							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EFL_WindowInstance, setVisible, this, flag));
+							return sl_true;
+						}
+						if (flag) {
+							::evas_object_show(window);
+						} else {
+							::evas_object_hide(window);
+						}
+						return sl_true;
+					} else {
+						return sl_false;
+					}
+				}
+				
+				sl_bool setAlwaysOnTop(sl_bool flag)
+				{
+					return sl_false;
+				}
+				
+				sl_bool setCloseButtonEnabled(sl_bool flag)
+				{
+					return sl_false;
+				}
+				
+				sl_bool setMinimizeButtonEnabled(sl_bool flag)
+				{
+					return sl_false;
+				}
+				
+				sl_bool setMaximizeButtonEnabled(sl_bool flag)
+				{
+					return sl_false;
+				}
+				
+				sl_bool setResizable(sl_bool flag)
+				{
+					return sl_false;
+				}
+				
+				sl_bool setAlpha(sl_real _alpha)
+				{
+					return sl_false;
+				}
+				
+				sl_bool setTransparent(sl_bool flag)
+				{
+					return sl_false;
+				}
+				
+				UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen)
+				{
+					return ptScreen;
+				}
+				
+				UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow)
+				{
+					return ptWindow;
+				}
+				
+				UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen)
+				{
+					return convertCoordinateFromScreenToWindow(ptScreen);
+				}
+				
+				UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient)
+				{
+					return convertCoordinateFromWindowToScreen(ptClient);
+				}
+				
+				UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow)
+				{
+					return ptWindow;
+				}
+				
+				UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient)
+				{
+					return ptClient;
+				}
+				
+				UISize getWindowSizeFromClientSize(const UISize& sizeClient)
+				{
+					return sizeClient;
+				}
+				
+				UISize getClientSizeFromWindowSize(const UISize& sizeWindow)
+				{
+					return sizeWindow;
+				}
+				
+			};
+			
+		}
+	}
 
-				Ref<_priv_EFL_Window> ret = create(win);
-				if (ret.isNotNull()) {
-					::elm_win_autodel_set(win, EINA_TRUE);
-					return ret;
-				}
-
-				::evas_object_del(win);
-
-			}
-			return sl_null;
-		}
-		
-		static void _release_handle(Evas_Object* window)
-		{
-			::elm_win_lower(window);
-			::evas_object_del(window);
-		}
-
-		void _release()
-		{
-			Evas_Object* window = m_window;
-			if (window) {
-				UIPlatform::removeWindowInstance(window);
-				if (UI::isUiThread()) {
-					_release_handle(window);
-				} else {
-					UI::dispatchToUiThread(Function<void()>::bind(&_release_handle, window));
-				}
-			}
-			m_viewContent.setNull();
-			m_window = sl_null;
-		}
-		
-		Ref<ViewInstance> getContentView()
-		{
-			return m_viewContent;
-		}
-		
-		void close()
-		{
-			Evas_Object* window = m_window;
-			if (window) {
-				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThread(SLIB_FUNCTION_WEAKREF(_priv_EFL_Window, close, this));
-					return;
-				}
-				UIPlatform::removeWindowInstance(window);
-				::elm_win_lower(window);
-				::evas_object_del(window);
-			}
-			m_window = sl_null;
-			m_viewContent.setNull();
-		}
-		
-		sl_bool isClosed()
-		{
-			return m_window == sl_null;
-		}
-		
-		sl_bool setParent(const Ref<WindowInstance>& window)
-		{
-			return sl_false;
-		}
-		
-		sl_bool setFocus()
-		{
-			Evas_Object* window = m_window;
-			if (window) {
-				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), _priv_EFL_Window, setFocus, this));
-					return sl_true;
-				}
-				::elm_win_raise(window);
-			}
-			return sl_false;
-		}
-		
-		UIRect getFrame()
-		{
-			return UI::getScreenBounds();
-		}
-		
-		sl_bool setFrame(const UIRect& _frame)
-		{
-			return sl_false;
-		}
-		
-		UIRect getClientFrame()
-		{
-			return getFrame();
-		}
-		
-		UISize getClientSize()
-		{
-			return getFrame().getSize();
-		}
-		
-		sl_bool setClientSize(const UISize& _size)
-		{
-			return sl_false;
-		}
-		
-		sl_bool setTitle(const String& title)
-		{
-			return sl_false;
-		}
-		
-		sl_bool setBackgroundColor(const Color& _color)
-		{
-			return sl_false;
-		}
-		
-		sl_bool isMinimized()
-		{
-			return sl_false;
-		}
-		
-		sl_bool setMinimized(sl_bool flag)
-		{
-			return sl_false;
-		}
-		
-		sl_bool isMaximized()
-		{
-			return sl_false;
-		}
-		
-		sl_bool setMaximized(sl_bool flag)
-		{
-			return sl_false;
-		}
-		
-		sl_bool setVisible(sl_bool flag)
-		{
-			Evas_Object* window = m_window;
-			if (window) {
-				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), _priv_EFL_Window, setVisible, this, flag));
-					return sl_true;
-				}
-				if (flag) {
-					::evas_object_show(window);
-				} else {
-					::evas_object_hide(window);
-				}
-				return sl_true;
-			} else {
-				return sl_false;
-			}
-		}
-		
-		sl_bool setAlwaysOnTop(sl_bool flag)
-		{
-			return sl_false;
-		}
-		
-		sl_bool setCloseButtonEnabled(sl_bool flag)
-		{
-			return sl_false;
-		}
-		
-		sl_bool setMinimizeButtonEnabled(sl_bool flag)
-		{
-			return sl_false;
-		}
-		
-		sl_bool setMaximizeButtonEnabled(sl_bool flag)
-		{
-			return sl_false;
-		}
-		
-		sl_bool setResizable(sl_bool flag)
-		{
-			return sl_false;
-		}
-		
-		sl_bool setAlpha(sl_real _alpha)
-		{
-			return sl_false;
-		}
-		
-		sl_bool setTransparent(sl_bool flag)
-		{
-			return sl_false;
-		}
-		
-		UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen)
-		{
-			return ptScreen;
-		}
-		
-		UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow)
-		{
-			return ptWindow;
-		}
-		
-		UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen)
-		{
-			return convertCoordinateFromScreenToWindow(ptScreen);
-		}
-		
-		UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient)
-		{
-			return convertCoordinateFromWindowToScreen(ptClient);
-		}
-		
-		UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow)
-		{
-			return ptWindow;
-		}
-		
-		UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient)
-		{
-			return ptClient;
-		}
-		
-		UISize getWindowSizeFromClientSize(const UISize& sizeClient)
-		{
-			return sizeClient;
-		}
-		
-		UISize getClientSizeFromWindowSize(const UISize& sizeWindow)
-		{
-			return sizeWindow;
-		}
-		
-	};
-	
+	using namespace priv::window;
 	
 	Ref<WindowInstance> Window::createWindowInstance(const WindowInstanceParam& param)
 	{
-		return _priv_EFL_Window::create(param);
+		return EFL_WindowInstance::create(param);
 	}
 
 
@@ -411,7 +420,7 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		return _priv_EFL_Window::create(window);
+		return EFL_WindowInstance::create(window);
 	}
 	
 	void UIPlatform::registerWindowInstance(Evas_Object* window, WindowInstance* instance)
@@ -431,7 +440,7 @@ namespace slib
 	
 	Evas_Object* UIPlatform::getWindowHandle(WindowInstance* instance)
 	{
-		_priv_EFL_Window* window = static_cast<_priv_EFL_Window*>(instance);
+		EFL_WindowInstance* window = static_cast<EFL_WindowInstance*>(instance);
 		if (window) {
 			return window->m_window;
 		} else {
@@ -444,7 +453,7 @@ namespace slib
 		if (window) {
 			Ref<WindowInstance> _instance = window->getWindowInstance();
 			if (_instance.isNotNull()) {
-				_priv_EFL_Window* instance = static_cast<_priv_EFL_Window*>(_instance.get());
+				EFL_WindowInstance* instance = static_cast<EFL_WindowInstance*>(_instance.get());
 				return instance->m_window;
 			}
 		}
@@ -454,8 +463,8 @@ namespace slib
 
 	Evas_Object* UIPlatform::getMainWindow()
 	{
-		if (_ui_main_window.isNotNull()) {
-			return _ui_main_window->m_window;
+		if (g_windowMain.isNotNull()) {
+			return g_windowMain->m_window;
 		}
 		return sl_null;
 	}

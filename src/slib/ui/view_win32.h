@@ -162,6 +162,14 @@ namespace slib
 
 	};
 
+	namespace priv
+	{
+		namespace view
+		{
+			LRESULT CALLBACK ViewInstanceProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+		}
+	}
+
 }
 
 #endif

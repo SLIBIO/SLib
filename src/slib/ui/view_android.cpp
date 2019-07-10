@@ -34,7 +34,7 @@ namespace slib
 
 	namespace priv
 	{
-		namespace view_android
+		namespace view
 		{
 
 			SLIB_JNI_BEGIN_CLASS(JPoint, "android/graphics/Point")
@@ -233,7 +233,7 @@ namespace slib
 		}
 	}
 
-	using namespace priv::view_android;
+	using namespace priv::view;
 
 /******************************************
 			Android_ViewInstance

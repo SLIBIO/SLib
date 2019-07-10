@@ -60,104 +60,112 @@ namespace slib
 	{
 	}
 	
-	class _priv_DefaultOAuthWebRedirectDialog : public ViewPage, public OAuthWebRedirectDialog
+	namespace priv
 	{
-	public:
-		Ref<WebView> m_webView;
-		WeakRef<Window> m_window;
-		
-	public:
-		void init() override
+		namespace oauth
 		{
-			ViewPage::init();
 			
-			Ref<Button> btnCancel = new Button;
-			btnCancel->setCancelOnClick();
-			btnCancel->setText(string::cancel::get(), UIUpdateMode::Init);
-			btnCancel->setAlignParentLeft(UIUpdateMode::Init);
-			btnCancel->setAlignParentTop(UIUpdateMode::Init);
-			btnCancel->setWidthWrapping(UIUpdateMode::Init);
-			btnCancel->setHeightWrapping(UIUpdateMode::Init);
-			btnCancel->setMarginTop(UIResource::getSafeAreaInsetTop(), UIUpdateMode::Init);
+			class DefaultOAuthWebRedirectDialogImpl : public ViewPage, public OAuthWebRedirectDialog
+			{
+			public:
+				Ref<WebView> m_webView;
+				WeakRef<Window> m_window;
+				
+			public:
+				void init() override
+				{
+					ViewPage::init();
+					
+					Ref<Button> btnCancel = new Button;
+					btnCancel->setCancelOnClick();
+					btnCancel->setText(::slib::string::cancel::get(), UIUpdateMode::Init);
+					btnCancel->setAlignParentLeft(UIUpdateMode::Init);
+					btnCancel->setAlignParentTop(UIUpdateMode::Init);
+					btnCancel->setWidthWrapping(UIUpdateMode::Init);
+					btnCancel->setHeightWrapping(UIUpdateMode::Init);
+					btnCancel->setMarginTop(UIResource::getSafeAreaInsetTop(), UIUpdateMode::Init);
 #ifdef SLIB_PLATFORM_IS_MOBILE
-			sl_real fontSize = (sl_real)(UIResource::getScreenMinimum() / 20);
+					sl_real fontSize = (sl_real)(UIResource::getScreenMinimum() / 20);
 #else
-			sl_real fontSize = 20;
+					sl_real fontSize = 20;
 #endif
-			btnCancel->setFontSize(fontSize, UIUpdateMode::Init);
-			btnCancel->setPadding((sl_ui_pos)(fontSize / 3), UIUpdateMode::Init);
-			addChild(btnCancel, UIUpdateMode::Init);
-			
-			m_webView = new WebView;
-			m_webView->setAlignParentLeft(UIUpdateMode::Init);
-			m_webView->setBelow(btnCancel, UIUpdateMode::Init);
-			m_webView->setWidthFilling(1, UIUpdateMode::Init);
-			m_webView->setHeightFilling(1, UIUpdateMode::Init);
-			addChild(m_webView, UIUpdateMode::Init);
-			
-			setWidthFilling(1, UIUpdateMode::Init);
-			setHeightFilling(1, UIUpdateMode::Init);
-		}
-		
-	public:
-		Ref<WebView> getWebView() override
-		{
-			return m_webView;
-		}
-		
-		void show(const OAuthWebRedirectDialogParam& param) override
-		{
-			auto onRedirect = param.onRedirect;
-			
-			m_webView->setOnStartLoad([onRedirect](WebView*, const String& url) {
-				onRedirect(url);
-			});
-			setOnBack([onRedirect](View* view, UIEvent* ev) {
-				onRedirect(sl_null);
-			});
-			
-			m_webView->loadURL(param.url);
+					btnCancel->setFontSize(fontSize, UIUpdateMode::Init);
+					btnCancel->setPadding((sl_ui_pos)(fontSize / 3), UIUpdateMode::Init);
+					addChild(btnCancel, UIUpdateMode::Init);
+					
+					m_webView = new WebView;
+					m_webView->setAlignParentLeft(UIUpdateMode::Init);
+					m_webView->setBelow(btnCancel, UIUpdateMode::Init);
+					m_webView->setWidthFilling(1, UIUpdateMode::Init);
+					m_webView->setHeightFilling(1, UIUpdateMode::Init);
+					addChild(m_webView, UIUpdateMode::Init);
+					
+					setWidthFilling(1, UIUpdateMode::Init);
+					setHeightFilling(1, UIUpdateMode::Init);
+				}
+				
+			public:
+				Ref<WebView> getWebView() override
+				{
+					return m_webView;
+				}
+				
+				void show(const OAuthWebRedirectDialogParam& param) override
+				{
+					auto onRedirect = param.onRedirect;
+					
+					m_webView->setOnStartLoad([onRedirect](WebView*, const String& url) {
+						onRedirect(url);
+					});
+					setOnBack([onRedirect](View* view, UIEvent* ev) {
+						onRedirect(sl_null);
+					});
+					
+					m_webView->loadURL(param.url);
+					
+#ifdef SLIB_PLATFORM_IS_MOBILE
+					Ref<MobileApp> app = MobileApp::getApp();
+					if (app.isNotNull()) {
+						Transition transition;
+						transition.type = TransitionType::Cover;
+						transition.direction = TransitionDirection::FromBottomToTop;
+						transition.duration = 0.2f;
+						app->popupPage(this, transition);
+						return;
+					}
+					setSize(UIResource::getScreenWidth(), UIResource::getScreenHeight(), UIUpdateMode::Init);
+#else
+					setSize(400, 600, UIUpdateMode::Init);
+#endif
+					setLeft((UIResource::getScreenWidth() - getWidth()) / 2, UIUpdateMode::Init);
+					setTop((UIResource::getScreenHeight() - getHeight()) / 2, UIUpdateMode::Init);
+					Ref<Window> window = popupWindow(param.options.parentWindow);
+					if (window.isNull()) {
+						onRedirect(sl_null);
+						return;
+					}
+					window->increaseReference();
+					m_window = window;
+				}
+				
+				void close() override
+				{
+					ViewPage::close();
+					auto window = ToRef(m_window);
+					if (window.isNotNull()) {
+						window->decreaseReference();
+					}
+				}
+				
+				void clearCookie() override
+				{
+					m_webView->clearCookie();
+				}
+				
+			};
 
-#ifdef SLIB_PLATFORM_IS_MOBILE
-			Ref<MobileApp> app = MobileApp::getApp();
-			if (app.isNotNull()) {
-				Transition transition;
-				transition.type = TransitionType::Cover;
-				transition.direction = TransitionDirection::FromBottomToTop;
-				transition.duration = 0.2f;
-				app->popupPage(this, transition);
-				return;
-			}
-			setSize(UIResource::getScreenWidth(), UIResource::getScreenHeight(), UIUpdateMode::Init);
-#else
-			setSize(400, 600, UIUpdateMode::Init);
-#endif
-			setLeft((UIResource::getScreenWidth() - getWidth()) / 2, UIUpdateMode::Init);
-			setTop((UIResource::getScreenHeight() - getHeight()) / 2, UIUpdateMode::Init);
-			Ref<Window> window = popupWindow(param.options.parentWindow);
-			if (window.isNull()) {
-				onRedirect(sl_null);
-				return;
-			}
-			window->increaseReference();
-			m_window = window;
 		}
-		
-		void close() override
-		{
-			ViewPage::close();
-			auto window = ToRef(m_window);
-			if (window.isNotNull()) {
-				window->decreaseReference();
-			}
-		}
-		
-		void clearCookie() override
-		{
-			m_webView->clearCookie();
-		}
-		
-	};
+	}
 	
 	Ptr<OAuthWebRedirectDialog> OAuthWebRedirectDialog::getDefault()
 	{
@@ -166,7 +174,7 @@ namespace slib
 			return sl_null;
 		}
 		if (dlg.isNull()) {
-			dlg = ToRef(new _priv_DefaultOAuthWebRedirectDialog);
+			dlg = ToRef(new priv::oauth::DefaultOAuthWebRedirectDialogImpl);
 		}
 		return dlg;
 	}

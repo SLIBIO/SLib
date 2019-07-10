@@ -28,6 +28,16 @@
 namespace slib
 {
 	
+	namespace priv
+	{
+		namespace linkedin
+		{
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Linkedin>, g_instance)
+		}
+	}
+	
+	using namespace priv::linkedin;
+	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(LinkedinUser)
 	
 	SLIB_DEFINE_JSON(LinkedinUser)
@@ -92,16 +102,13 @@ namespace slib
 	{
 		return new Linkedin(param);
 	}
-	
-	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Linkedin>, _g_priv_social_linkedin_instance)
-	
+		
 	void Linkedin::initialize(const LinkedinParam& param)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_linkedin_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return;
 		}
-		_g_priv_social_linkedin_instance = create(param);
+		g_instance = create(param);
 	}
 	
 	void Linkedin::initialize(const String& redirectUri, const String& clientId, const String& clientSecret)
@@ -116,10 +123,10 @@ namespace slib
 	
 	Ref<Linkedin> Linkedin::getInstance()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_linkedin_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return sl_null;
 		}
-		return _g_priv_social_linkedin_instance;
+		return g_instance;
 	}
 	
 	String Linkedin::getRequestUrl(const String& path)

@@ -27,6 +27,16 @@
 namespace slib
 {
 	
+	namespace priv
+	{
+		namespace ebay
+		{
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Ebay>, g_instance)
+		}
+	}
+	
+	using namespace priv::ebay;
+	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(EbayUser)
 	
 	EbayUser::EbayUser()
@@ -94,15 +104,12 @@ namespace slib
 		return new Ebay(param);
 	}
 	
-	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Ebay>, _g_priv_social_ebay_instance)
-	
 	void Ebay::initialize(const EbayParam& param)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_ebay_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return;
 		}
-		_g_priv_social_ebay_instance = create(param);
+		g_instance = create(param);
 	}
 	
 	void Ebay::initialize(sl_bool flagProduction, const String& ruName, const String& redirectUri, const String& appId, const String& appSecret)
@@ -117,10 +124,10 @@ namespace slib
 	
 	Ref<Ebay> Ebay::getInstance()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_ebay_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return sl_null;
 		}
-		return _g_priv_social_ebay_instance;
+		return g_instance;
 	}
 	
 	String Ebay::getRequestUrl(const String& path)

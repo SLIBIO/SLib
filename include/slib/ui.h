@@ -32,6 +32,7 @@
 #include "ui/menu.h"
 #include "ui/adapter.h"
 #include "ui/common_dialogs.h"
+#include "ui/toast.h"
 
 #include "ui/view.h"
 #include "ui/view_page.h"

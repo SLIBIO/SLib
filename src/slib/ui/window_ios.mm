@@ -39,14 +39,14 @@ namespace slib
 	{
 		namespace window
 		{
-			class WindowInstanceImpl;
+			class iOS_WindowInstance;
 		}
 	}
 }
 
 @interface SLIBWindowRootViewController : UIViewController
 {
-	@public slib::WeakRef<slib::priv::window::WindowInstanceImpl> m_window;
+	@public slib::WeakRef<slib::priv::window::iOS_WindowInstance> m_window;
 	
 	@public slib::UISize m_sizeClient;
 	@public slib::UISize m_sizeClientResizedByKeyboard;
@@ -76,27 +76,27 @@ namespace slib
 			__weak UIScrollView* g_keyboardCurrentScrollView = nil;
 			CGRect g_keyboardCurrentScrollViewOriginalFrame;
 
-			class WindowInstanceImpl : public WindowInstance
+			class iOS_WindowInstance : public WindowInstance
 			{
 			public:
 				UIView* m_window;
 				AtomicRef<ViewInstance> m_viewContent;
 				
 			public:
-				WindowInstanceImpl()
+				iOS_WindowInstance()
 				{
 				}
 				
-				~WindowInstanceImpl()
+				~iOS_WindowInstance()
 				{
 					release();
 				}
 				
 			public:
-				static Ref<WindowInstanceImpl> create(UIView* window)
+				static Ref<iOS_WindowInstance> create(UIView* window)
 				{
 					if (window != nil) {
-						Ref<WindowInstanceImpl> ret = new WindowInstanceImpl();
+						Ref<iOS_WindowInstance> ret = new iOS_WindowInstance();
 						if (ret.isNotNull()) {
 							ret->m_window = window;
 							UIView* view;
@@ -171,7 +171,7 @@ namespace slib
 								view.opaque = NO;
 								controller.view = view;
 								window.rootViewController = controller;
-								Ref<WindowInstanceImpl> ret = create(window);
+								Ref<iOS_WindowInstance> ret = create(window);
 								if (ret.isNotNull()) {
 									controller->m_window = ret;
 									ret->setFocus();
@@ -236,7 +236,7 @@ namespace slib
 					UIView* view = m_window;
 					if (view != nil) {
 						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), WindowInstanceImpl, setFocus, this));
+							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, setFocus, this));
 							return sl_true;
 						}
 						if ([view isKindOfClass:[UIWindow class]]) {
@@ -272,7 +272,7 @@ namespace slib
 					UIView* window = m_window;
 					if (window != nil) {
 						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), WindowInstanceImpl, setFrame, this, frame));
+							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, setFrame, this, frame));
 							return sl_true;
 						}
 						CGFloat f = UIPlatform::getGlobalScaleFactor();
@@ -326,7 +326,7 @@ namespace slib
 					UIView* window = m_window;
 					if (window != nil) {
 						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), WindowInstanceImpl, setClientSize, this, size));
+							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, setClientSize, this, size));
 							return sl_true;
 						}
 						CGFloat f = UIPlatform::getGlobalScaleFactor();
@@ -374,7 +374,7 @@ namespace slib
 					UIView* window = m_window;
 					if (window != nil) {
 						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), WindowInstanceImpl, setBackgroundColor, this, _color));
+							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, setBackgroundColor, this, _color));
 							return sl_true;
 						}
 						UIColor* color;
@@ -429,7 +429,7 @@ namespace slib
 					UIView* window = m_window;
 					if (window != nil) {
 						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), WindowInstanceImpl, setVisible, this, flag));
+							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, setVisible, this, flag));
 							return sl_true;
 						}
 						[window setHidden:(flag ? NO : YES)];
@@ -461,7 +461,7 @@ namespace slib
 					if (view != nil) {
 						if ([view isKindOfClass:[UIWindow class]]) {
 							if (!(UI::isUiThread())) {
-								UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), WindowInstanceImpl, setAlwaysOnTop, this, flag));
+								UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, setAlwaysOnTop, this, flag));
 								return sl_true;
 							}
 							UIWindow* window = (UIWindow*)view;
@@ -531,7 +531,7 @@ namespace slib
 					UIView* window = m_window;
 					if (window != nil) {
 						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), WindowInstanceImpl, setAlpha, this, _alpha));
+							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, setAlpha, this, _alpha));
 							return sl_true;
 						}
 						sl_real alpha = _alpha;
@@ -697,7 +697,7 @@ namespace slib
 
 	Ref<WindowInstance> Window::createWindowInstance(const WindowInstanceParam& param)
 	{
-		return WindowInstanceImpl::create(param);
+		return iOS_WindowInstance::create(param);
 	}
 	
 	ScreenOrientation UI::getScreenOrientation()
@@ -801,7 +801,7 @@ using namespace slib::priv::window;
 	if (g_flagSetStatusBarStyle) {
 		[self setNeedsStatusBarAppearanceUpdate];
 	}
-	slib::Ref<slib::WindowInstanceImpl> window = m_window;
+	slib::Ref<slib::iOS_WindowInstance> window = m_window;
 	if (window.isNotNull()) {
 		UIView* handle = window->m_window;
 		if (handle != nil) {
@@ -835,7 +835,7 @@ using namespace slib::priv::window;
 		sizeContent.y = (sl_ui_pos)(size.height * f);
 		self->m_sizeClient = sizeContent;
 		self->m_sizeClientResizedByKeyboard = sizeContent;
-		slib::Ref<slib::WindowInstanceImpl> window = self->m_window;
+		slib::Ref<slib::iOS_WindowInstance> window = self->m_window;
 		if (window.isNotNull()) {
 			window->onResize(sizeContent.x, sizeContent.y);
 		}
@@ -884,7 +884,7 @@ using namespace slib::priv::window;
 	}
 	
 	slib::UIKeyboardAdjustMode adjustMode = slib::UI::getKeyboardAdjustMode();
-	slib::Ref<slib::WindowInstanceImpl> window = self->m_window;
+	slib::Ref<slib::iOS_WindowInstance> window = self->m_window;
 	if (window.isNotNull()) {
 		if (adjustMode == slib::UIKeyboardAdjustMode::Resize) {
 			NSDictionary* info = [aNotification userInfo];
@@ -962,7 +962,7 @@ using namespace slib::priv::window;
 	}
 	[self restoreKeyboardScrollView];
 	
-	slib::Ref<slib::WindowInstanceImpl> window = self->m_window;
+	slib::Ref<slib::iOS_WindowInstance> window = self->m_window;
 	if (window.isNotNull()) {
 		if (self->m_sizeClient.y != self->m_sizeClientResizedByKeyboard.y) {
 			slib::UISize size = self->m_sizeClient;
@@ -1017,7 +1017,7 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		return WindowInstanceImpl::create(window);
+		return iOS_WindowInstance::create(window);
 	}
 	
 	void UIPlatform::registerWindowInstance(UIView* window, WindowInstance* instance)
@@ -1037,7 +1037,7 @@ namespace slib
 	
 	UIView* UIPlatform::getWindowHandle(WindowInstance* instance)
 	{
-		WindowInstanceImpl* window = (WindowInstanceImpl*)instance;
+		iOS_WindowInstance* window = (iOS_WindowInstance*)instance;
 		if (window) {
 			return window->m_window;
 		} else {

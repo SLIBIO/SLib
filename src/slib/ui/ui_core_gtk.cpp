@@ -34,67 +34,91 @@
 
 namespace slib
 {
-	
-	pthread_t _g_main_thread = 0;
 
+	namespace priv
+	{
+		namespace ui_core
+		{
+
+			pthread_t g_threadMain = 0;
+
+			class ScreenImpl : public Screen
+			{
+			public:
+				GdkScreen* m_screen;
+				UIRect m_region;
+				
+			public:
+				ScreenImpl()
+				{
+					m_screen = sl_null;
+				}
+
+				~ScreenImpl()
+				{
+					_release();
+				}
+
+			public:
+				static Ref<ScreenImpl> create(GdkScreen* screen)
+				{
+					if (screen) {
+						Ref<ScreenImpl> ret = new ScreenImpl();
+						if (ret.isNotNull()) {
+							g_object_ref_sink(screen);
+							ret->m_screen = screen;
+							UIRect region;
+							region.left = 0;
+							region.top = 0;
+							region.right = gdk_screen_get_width(screen);
+							region.bottom = gdk_screen_get_height(screen);
+							ret->m_region = region;
+							return ret;
+						}
+					}
+					return sl_null;
+				}
+				
+			public:
+				void _release()
+				{
+					GdkScreen* screen = m_screen;
+					if (screen) {
+						m_screen = sl_null;
+						g_object_unref(screen);
+					}
+				}
+
+				UIRect getRegion() override
+				{
+					return m_region;
+				}
+				
+			};
+			
+			static gboolean DispatchCallback(gpointer user_data)
+			{
+				UIDispatcher::processCallbacks();
+				return sl_false;
+			}
+
+			static gboolean DelayedDispatchCallback(gpointer user_data)
+			{
+				Callable<void()>* callable = reinterpret_cast<Callable<void()>*>(user_data);
+				callable->invoke();
+				callable->decreaseReference();
+				return sl_false;
+			}
+
+		}
+	}
+
+	using namespace priv::ui_core;
+	
 	sl_bool UIPlatform::initializeGtk()
 	{
 		return gtk_init_check(NULL, NULL);
 	}
-	
-	class _priv_GTK_Screen : public Screen
-	{
-	public:
-		GdkScreen* m_screen;
-		UIRect m_region;
-		
-	public:
-		_priv_GTK_Screen()
-		{
-			m_screen = sl_null;
-		}
-
-		~_priv_GTK_Screen()
-		{
-			_release();
-		}
-
-	public:
-		static Ref<_priv_GTK_Screen> create(GdkScreen* screen)
-		{
-			if (screen) {
-				Ref<_priv_GTK_Screen> ret = new _priv_GTK_Screen();
-				if (ret.isNotNull()) {
-					g_object_ref_sink(screen);
-					ret->m_screen = screen;
-					UIRect region;
-					region.left = 0;
-					region.top = 0;
-					region.right = gdk_screen_get_width(screen);
-					region.bottom = gdk_screen_get_height(screen);
-					ret->m_region = region;
-					return ret;
-				}
-			}
-			return sl_null;
-		}
-		
-	public:
-		void _release()
-		{
-			GdkScreen* screen = m_screen;
-			if (screen) {
-				m_screen = sl_null;
-				g_object_unref(screen);
-			}
-		}
-
-		UIRect getRegion() override
-		{
-			return m_region;
-		}
-		
-	};
 	
 	Ref<Screen> UI::getPrimaryScreen()
 	{
@@ -103,7 +127,7 @@ namespace slib
 			return sl_null;
 		}
 		if (ret.isNull()) {
-			ret = _priv_GTK_Screen::create(gdk_screen_get_default());
+			ret = ScreenImpl::create(gdk_screen_get_default());
 		}
 		return ret;
 	}
@@ -125,12 +149,12 @@ namespace slib
 
 	Ref<Screen> UIPlatform::createScreen(GdkScreen* handle)
 	{
-		return _priv_GTK_Screen::create(handle);
+		return ScreenImpl::create(handle);
 	}
 	
 	GdkScreen* UIPlatform::getScreenHandle(Screen* _screen)
 	{
-		_priv_GTK_Screen* screen = (_priv_GTK_Screen*)_screen;
+		ScreenImpl* screen = (ScreenImpl*)_screen;
 		if (screen) {
 			return screen->m_screen;
 		}
@@ -145,36 +169,22 @@ namespace slib
 
 	sl_bool UI::isUiThread()
 	{
-		return _g_main_thread == ::pthread_self();
+		return g_threadMain == ::pthread_self();
 	}
 	
-	static gboolean _ui_dispatch_callback(gpointer user_data)
-	{
-		_priv_UIDispatcher::processCallbacks();
-		return sl_false;
-	}
-
-	static gboolean _ui_dispatch_timer_callback(gpointer user_data)
-	{
-		Callable<void()>* callable = reinterpret_cast<Callable<void()>*>(user_data);
-		callable->invoke();
-		callable->decreaseReference();
-		return sl_false;
-	}
-
 	void UI::dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMillis)
 	{
 		if (callback.isNull()) {
 			return;
 		}
 		if (delayMillis == 0) {
-			if (_priv_UIDispatcher::addCallback(callback)) {
-				g_idle_add(_ui_dispatch_callback, sl_null);
+			if (UIDispatcher::addCallback(callback)) {
+				g_idle_add(DispatchCallback, sl_null);
 			}
 		} else {
 			Callable<void()>* callable = callback.ref.get();
 			callable->increaseReference();
-			g_timeout_add(delayMillis, _ui_dispatch_timer_callback, callable);
+			g_timeout_add(delayMillis, DelayedDispatchCallback, callable);
 		}
 	}
 
@@ -190,7 +200,7 @@ namespace slib
 
 	void UIPlatform::runApp()
 	{
-		_g_main_thread = ::pthread_self();
+		g_threadMain = ::pthread_self();
 
 		UIPlatform::initializeGtk();
 		

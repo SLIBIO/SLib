@@ -35,9 +35,143 @@
 namespace slib
 {
 
-/******************************************
-		Win32_ViewInstance
-******************************************/
+	namespace priv
+	{
+		namespace view
+		{
+
+			Color GetDefaultBackColor()
+			{
+				return GraphicsPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
+			}
+
+			LRESULT CALLBACK ViewInstanceProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+			{
+				Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(hWnd));
+				if (instance.isNotNull()) {
+					LRESULT result = 0;
+					if (instance->processWindowMessage(uMsg, wParam, lParam, result)) {
+						return result;
+					}
+				}
+				switch (uMsg) {
+					case WM_COMMAND:
+						{
+							HWND hWndSender = (HWND)lParam;
+							if (hWndSender) {
+								Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(hWndSender));
+								if (instance.isNotNull()) {
+									SHORT code = HIWORD(wParam);
+									LRESULT result = 0;
+									if (instance->processCommand(code, result)) {
+										return result;
+									}
+								}
+							}
+						}
+						break;
+					case WM_NOTIFY:
+						{
+							NMHDR* nh = (NMHDR*)(lParam);
+							HWND hWndSender = (HWND)(nh->hwndFrom);
+							Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(hWndSender));
+							if (instance.isNotNull()) {
+								LRESULT result = 0;
+								if (instance->processNotify(nh, result)) {
+									return result;
+								}
+							}
+						}
+						break;
+					case WM_CTLCOLOREDIT:
+					case WM_CTLCOLORSTATIC:
+					case WM_CTLCOLORLISTBOX:
+					case WM_CTLCOLORBTN:
+					case WM_CTLCOLORSCROLLBAR:
+						{
+							HWND hWndSender = (HWND)lParam;
+							Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(hWndSender));
+							if (instance.isNotNull()) {
+								HDC hDC = (HDC)(wParam);
+								HBRUSH result = NULL;
+								if (!(instance->processControlColor(uMsg, hDC, result))) {
+									result = (HBRUSH)(::DefWindowProcW(hWnd, uMsg, wParam, lParam));
+								}
+								instance->processPostControlColor(uMsg, hDC, result);
+								return (LRESULT)result;
+							}
+						}
+						break;
+				}
+				return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
+			}
+
+			sl_bool CaptureChildInstanceEvents(View* view, UINT uMsg)
+			{
+				Ref<View> parent = view->getParent();
+				while (parent.isNotNull()) {
+					Function<sl_bool(const UIPoint&)> hitTestCapture(parent->getCapturingChildInstanceEvents());
+					if (hitTestCapture.isNotNull()) {
+						if (CaptureChildInstanceEvents(parent.get(), uMsg)) {
+							return sl_true;
+						}
+						Ref<ViewInstance> _instance = parent->getViewInstance();
+						if (_instance.isNotNull()) {
+							Win32_ViewInstance* instance = (Win32_ViewInstance*)(_instance.get());
+							HWND hWnd = instance->getHandle();
+							if (hWnd) {
+								DWORD lParam = ::GetMessagePos();
+								POINT pt;
+								pt.x = (short)(lParam & 0xffff);
+								pt.y = (short)((lParam >> 16) & 0xffff);
+								::ScreenToClient(hWnd, &pt);
+								if (hitTestCapture(UIPoint((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y)))) {
+									LPARAM lParam = POINTTOPOINTS(pt);
+									LRESULT res;
+									instance->processWindowMessage(uMsg, 0, lParam, res);
+									return sl_true;
+								}
+							}
+						}
+					}
+					parent = parent->getParent();
+				}
+				return sl_false;
+			}
+
+			sl_bool CaptureChildInstanceEvents(View* view, MSG& msg)
+			{
+				UINT uMsg = msg.message;
+				switch (uMsg) {
+				case WM_LBUTTONDOWN:
+				case WM_LBUTTONDBLCLK:
+				case WM_RBUTTONDOWN:
+				case WM_RBUTTONDBLCLK:
+				case WM_MBUTTONDOWN:
+				case WM_MBUTTONDBLCLK:
+				case WM_MOUSEMOVE:
+					break;
+				case WM_NCLBUTTONDOWN:
+					uMsg = WM_LBUTTONDOWN;
+					break;
+				case WM_NCRBUTTONDOWN:
+					uMsg = WM_RBUTTONDOWN;
+					break;
+				case WM_NCMBUTTONDOWN:
+					uMsg = WM_MBUTTONDOWN;
+					break;
+				case WM_NCMOUSEMOVE:
+					uMsg = WM_MOUSEMOVE;
+					break;
+				default:
+					return sl_false;
+				}
+				return CaptureChildInstanceEvents(view, uMsg);
+			}
+
+		}
+	}
+
 	Win32_ViewInstance::Win32_ViewInstance()
 	{
 		m_handle = NULL;
@@ -477,11 +611,6 @@ namespace slib
 		return sl_false;
 	}
 
-	Color _priv_View_getDefaultBackColor()
-	{
-		return GraphicsPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
-	}
-
 	sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 	{
 		HWND hWnd = m_handle;
@@ -648,145 +777,6 @@ namespace slib
 	{
 	}
 
-	LRESULT CALLBACK _priv_Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-	{
-		Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(hWnd));
-		if (instance.isNotNull()) {
-			LRESULT result = 0;
-			if (instance->processWindowMessage(uMsg, wParam, lParam, result)) {
-				return result;
-			}
-		}
-		switch (uMsg) {
-			case WM_COMMAND:
-				{
-					HWND hWndSender = (HWND)lParam;
-					if (hWndSender) {
-						Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(hWndSender));
-						if (instance.isNotNull()) {
-							SHORT code = HIWORD(wParam);
-							LRESULT result = 0;
-							if (instance->processCommand(code, result)) {
-								return result;
-							}
-						}
-					}
-				}
-				break;
-			case WM_NOTIFY:
-				{
-					NMHDR* nh = (NMHDR*)(lParam);
-					HWND hWndSender = (HWND)(nh->hwndFrom);
-					Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(hWndSender));
-					if (instance.isNotNull()) {
-						LRESULT result = 0;
-						if (instance->processNotify(nh, result)) {
-							return result;
-						}
-					}
-				}
-				break;
-			case WM_CTLCOLOREDIT:
-			case WM_CTLCOLORSTATIC:
-			case WM_CTLCOLORLISTBOX:
-			case WM_CTLCOLORBTN:
-			case WM_CTLCOLORSCROLLBAR:
-				{
-					HWND hWndSender = (HWND)lParam;
-					Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(hWndSender));
-					if (instance.isNotNull()) {
-						HDC hDC = (HDC)(wParam);
-						HBRUSH result = NULL;
-						if (!(instance->processControlColor(uMsg, hDC, result))) {
-							result = (HBRUSH)(::DefWindowProcW(hWnd, uMsg, wParam, lParam));
-						}
-						instance->processPostControlColor(uMsg, hDC, result);
-						return (LRESULT)result;
-					}
-				}
-				break;
-		}
-		return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
-	}
-
-	HWND UIPlatform::getViewHandle(View* view)
-	{
-		if (view) {
-			Ref<ViewInstance> _instance = view->getViewInstance();
-			Win32_ViewInstance* instance = (Win32_ViewInstance*)(_instance.get());
-			if (instance) {
-				return instance->getHandle();
-			}
-		}
-		return 0;
-	}
-
-	sl_bool _priv_Win32_captureChildInstanceEvents(View* view, UINT uMsg)
-	{
-		Ref<View> parent = view->getParent();
-		while (parent.isNotNull()) {
-			Function<sl_bool(const UIPoint&)> hitTestCapture(parent->getCapturingChildInstanceEvents());
-			if (hitTestCapture.isNotNull()) {
-				if (_priv_Win32_captureChildInstanceEvents(parent.get(), uMsg)) {
-					return sl_true;
-				}
-				Ref<ViewInstance> _instance = parent->getViewInstance();
-				if (_instance.isNotNull()) {
-					Win32_ViewInstance* instance = (Win32_ViewInstance*)(_instance.get());
-					HWND hWnd = instance->getHandle();
-					if (hWnd) {
-						DWORD lParam = ::GetMessagePos();
-						POINT pt;
-						pt.x = (short)(lParam & 0xffff);
-						pt.y = (short)((lParam >> 16) & 0xffff);
-						::ScreenToClient(hWnd, &pt);
-						if (hitTestCapture(UIPoint((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y)))) {
-							LPARAM lParam = POINTTOPOINTS(pt);
-							LRESULT res;
-							instance->processWindowMessage(uMsg, 0, lParam, res);
-							return sl_true;
-						}
-					}
-				}
-			}
-			parent = parent->getParent();
-		}
-		return sl_false;
-	}
-
-	sl_bool _priv_Win32_captureChildInstanceEvents(View* view, MSG& msg)
-	{
-		UINT uMsg = msg.message;
-		switch (uMsg) {
-		case WM_LBUTTONDOWN:
-		case WM_LBUTTONDBLCLK:
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONDBLCLK:
-		case WM_MBUTTONDOWN:
-		case WM_MBUTTONDBLCLK:
-		case WM_MOUSEMOVE:
-			break;
-		case WM_NCLBUTTONDOWN:
-			uMsg = WM_LBUTTONDOWN;
-			break;
-		case WM_NCRBUTTONDOWN:
-			uMsg = WM_RBUTTONDOWN;
-			break;
-		case WM_NCMBUTTONDOWN:
-			uMsg = WM_MBUTTONDOWN;
-			break;
-		case WM_NCMOUSEMOVE:
-			uMsg = WM_MOUSEMOVE;
-			break;
-		default:
-			return sl_false;
-		}
-		return _priv_Win32_captureChildInstanceEvents(view, uMsg);
-	}
-
-/******************************************
-				View
-******************************************/
 	Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)
 	{
 		Win32_UI_Shared* shared = Win32_UI_Shared::get();
@@ -807,9 +797,18 @@ namespace slib
 		return ret;
 	}
 
-/******************************************
-			UIPlatform
-******************************************/
+	HWND UIPlatform::getViewHandle(View* view)
+	{
+		if (view) {
+			Ref<ViewInstance> _instance = view->getViewInstance();
+			Win32_ViewInstance* instance = (Win32_ViewInstance*)(_instance.get());
+			if (instance) {
+				return instance->getHandle();
+			}
+		}
+		return 0;
+	}
+	
 	Ref<ViewInstance> UIPlatform::createViewInstance(HWND hWnd, sl_bool flagDestroyOnRelease)
 	{
 		Ref<ViewInstance> ret = UIPlatform::_getViewInstance((void*)hWnd);

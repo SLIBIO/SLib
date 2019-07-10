@@ -34,30 +34,31 @@
 namespace slib
 {
 	
-	NSRect _priv_macOS_getViewFrameAndTransform(const UIRect& frame, const Matrix3& transform, sl_real& rotation)
+	namespace priv
 	{
-		rotation = Transform2::getRotationAngleFromMatrix(transform);
-		Vector2 translation = Transform2::getTranslationFromMatrix(transform);
-		NSRect ret;
-		ret.origin.x = frame.left + translation.x;
-		ret.origin.y = frame.top + translation.y;
-		ret.size.width = frame.getWidth();
-		ret.size.height = frame.getHeight();
-		if (!(Math::isAlmostZero(rotation))) {
-			sl_real ax = frame.getWidth() / 2;
-			sl_real ay = frame.getHeight() / 2;
-			sl_real cr = Math::cos(rotation);
-			sl_real sr = Math::sin(rotation);
-			ret.origin.x += (- ax * cr + ay * sr) + ax;
-			ret.origin.y += (- ax * sr - ay * cr) + ay;
+		namespace view
+		{
+			NSRect GetViewFrameAndTransform(const UIRect& frame, const Matrix3& transform, sl_real& rotation)
+			{
+				rotation = Transform2::getRotationAngleFromMatrix(transform);
+				Vector2 translation = Transform2::getTranslationFromMatrix(transform);
+				NSRect ret;
+				ret.origin.x = frame.left + translation.x;
+				ret.origin.y = frame.top + translation.y;
+				ret.size.width = frame.getWidth();
+				ret.size.height = frame.getHeight();
+				if (!(Math::isAlmostZero(rotation))) {
+					sl_real ax = frame.getWidth() / 2;
+					sl_real ay = frame.getHeight() / 2;
+					sl_real cr = Math::cos(rotation);
+					sl_real sr = Math::sin(rotation);
+					ret.origin.x += (- ax * cr + ay * sr) + ax;
+					ret.origin.y += (- ax * sr - ay * cr) + ay;
+				}
+				return ret;
+			}
 		}
-		return ret;
 	}
-	
-
-/******************************************
-			macOS_ViewInstance
-******************************************/
 
 	macOS_ViewInstance::macOS_ViewInstance()
 	{
@@ -581,15 +582,11 @@ namespace slib
 		NSView* handle = m_handle;
 		if (handle != nil) {
 			sl_real rotation = 0;
-			handle.frame = _priv_macOS_getViewFrameAndTransform(m_frame, m_transform, rotation);
+			handle.frame = priv::view::GetViewFrameAndTransform(m_frame, m_transform, rotation);
 			handle.frameRotation = Math::getDegreesFromRadian(rotation);
 			[handle setNeedsDisplay:YES];
 		}
 	}
-
-/******************************************
-				View
-******************************************/
 
 	Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
 	{

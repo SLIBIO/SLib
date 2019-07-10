@@ -26,6 +26,16 @@
 
 namespace slib
 {
+
+	namespace priv
+	{
+		namespace facebook
+		{
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Facebook>, g_instance)
+		}
+	}
+	
+	using namespace priv::facebook;
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FacebookUser)
 	
@@ -93,16 +103,13 @@ namespace slib
 	{
 		return new Facebook(param);
 	}
-	
-	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Facebook>, _g_priv_social_facebook_instance)
-	
+		
 	void Facebook::initialize(const FacebookParam& param)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_facebook_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return;
 		}
-		_g_priv_social_facebook_instance = create(param);
+		g_instance = create(param);
 	}
 	
 	void Facebook::initialize(const String& redirectUri, const String& appId, const String& appSecret)
@@ -117,10 +124,10 @@ namespace slib
 	
 	Ref<Facebook> Facebook::getInstance()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_facebook_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return sl_null;
 		}
-		return _g_priv_social_facebook_instance;
+		return g_instance;
 	}
 	
 	String Facebook::getRequestUrl(const String& path)

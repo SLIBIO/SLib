@@ -27,20 +27,30 @@
 
 namespace slib
 {
-	class _priv_UIDispatcher
+	
+	namespace priv
 	{
-	public:
-		static sl_bool addCallback(const Function<void()>& callback);
-		
-		static void processCallbacks();
-		
-		static sl_bool addDelayedCallback(const Function<void()>& callback, sl_reg& ptr);
-		
-		static void processDelayedCallback(sl_reg ptr);
-		
-		static void removeAllCallbacks();
-		
-	};	
+		namespace ui_core
+		{
+			
+			class UIDispatcher
+			{
+			public:
+				static sl_bool addCallback(const Function<void()>& callback);
+				
+				static void processCallbacks();
+				
+				static sl_bool addDelayedCallback(const Function<void()>& callback, sl_reg& _id);
+				
+				static void processDelayedCallback(sl_reg _id);
+				
+				static void removeAllCallbacks();
+				
+			};
+
+		}
+	}
+	
 }
 
 #endif

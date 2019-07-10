@@ -88,7 +88,7 @@ namespace slib
 				}
 			};
 			
-			static void getToken(OAuthAccessToken& _out, FBSDKAccessToken* _in)
+			static void GetToken(OAuthAccessToken& _out, FBSDKAccessToken* _in)
 			{
 				_out.token = Apple::getStringFromNSString(_in.tokenString);
 				_out.expirationTime = Apple::getTimeFromNSDate(_in.expirationDate);
@@ -129,7 +129,7 @@ namespace slib
 		FBSDKAccessToken* token = [FBSDKAccessToken currentAccessToken];
 		if (token != nil) {
 			OAuthAccessToken oauthToken;
-			getToken(oauthToken, token);
+			GetToken(oauthToken, token);
 			instance->setAccessToken(oauthToken);
 		}
 	}
@@ -191,7 +191,7 @@ namespace slib
 				return;
 			}
 			login.flagSuccess = sl_true;
-			getToken(login.accessToken, token);
+			GetToken(login.accessToken, token);
 			onComplete(login);
 		}];
 	}

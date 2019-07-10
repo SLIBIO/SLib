@@ -113,7 +113,13 @@ namespace slib
 		
 	};
 
-	NSRect _priv_macOS_getViewFrameAndTransform(const UIRect& frame, const Matrix3& transform, sl_real& rotation);
+	namespace priv
+	{
+		namespace view
+		{
+			NSRect GetViewFrameAndTransform(const UIRect& frame, const Matrix3& transform, sl_real& rotation);
+		}
+	}
 
 }
 
@@ -145,7 +151,7 @@ namespace slib
 	UIRect frameView = getFrameInInstance(); \
 	Matrix3 transformView = getFinalTransformInInstance(); \
 	sl_real rotation; \
-	NSRect frame = _priv_macOS_getViewFrameAndTransform(frameView, transformView, rotation); \
+	NSRect frame = priv::view::GetViewFrameAndTransform(frameView, transformView, rotation); \
 
 #define MACOS_VIEW_CREATE_INSTANCE_END \
 	if (handle != nil) { \

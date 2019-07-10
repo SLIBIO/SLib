@@ -20,36 +20,46 @@
  *   THE SOFTWARE.
  */
 
-#include "slib/core/definition.h"
+#ifndef CHECKHEADER_SLIB_UI_TOAST
+#define CHECKHEADER_SLIB_UI_TOAST
 
-#if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_IOS)
+#include "definition.h"
 
-#include "slib/ui/core.h"
-#include "slib/core/platform_apple.h"
+#include "view.h"
 
 namespace slib
 {
-	sl_bool UI::isUiThread()
+
+	class Toast
 	{
-		return [NSThread isMainThread];
-	}
+	public:
+		Ref<View> parent;
+		String text;
+		float duration; // Seconds
+		Ref<Font> font;
+		
+	public:
+		Toast();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(Toast)
+		
+	public:
+		void show();
+		
+	public:
+		static void show(const String& text);
+		
+	public:
+		static float getDefaultDuration();
+		
+		static void setDefaultDuration(float duration);
+		
+		static Ref<Font> getDefaultFont();
+		
+		static void setDefaultFont(const Ref<Font>& font);
+		
+	};
 	
-	void UI::dispatchToUiThread(const Function<void()>& _callback, sl_uint32 delayMillis)
-	{
-		Function<void()> callback = _callback;
-		if (callback.isNotNull()) {
-			if (delayMillis == 0) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					callback();
-				});
-			} else {
-				dispatch_time_t t = dispatch_time(DISPATCH_TIME_NOW, (sl_int64)(delayMillis) * NSEC_PER_MSEC);
-				dispatch_after(t, dispatch_get_main_queue(), ^{
-					callback();
-				});
-			}
-		}
-	}
 }
 
 #endif

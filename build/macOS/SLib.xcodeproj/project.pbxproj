@@ -1209,6 +1209,7 @@
 		26E1B8A9222ABAB2007C222E /* jquant2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2605069C20CFB01400032B2C /* jquant2.c */; };
 		26E1B8AA222ABAB2007C222E /* jutils.c in Sources */ = {isa = PBXBuildFile; fileRef = 260506A720CFB01400032B2C /* jutils.c */; };
 		26F2F8D91EC2E0EB0074C29E /* red_black_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F2F8D81EC2E0EB0074C29E /* red_black_tree.cpp */; };
+		26F5EA6622D6835C00CD1595 /* toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5EA6522D6835B00CD1595 /* toast.cpp */; };
 		26FADD30215676D50057F7EA /* stun.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FADD2F215676D40057F7EA /* stun.cpp */; };
 		26FBB34B1ED5581F0086C27A /* ui_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FBB34A1ED5581F0086C27A /* ui_text.cpp */; };
 /* End PBXBuildFile section */
@@ -2489,6 +2490,7 @@
 		26F5B3161E9010D100F9FB7F /* geo_rectangle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = geo_rectangle.cpp; sourceTree = "<group>"; };
 		26F5B3171E9010D100F9FB7F /* globe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = globe.cpp; sourceTree = "<group>"; };
 		26F5B3181E9010D100F9FB7F /* latlon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = latlon.cpp; sourceTree = "<group>"; };
+		26F5EA6522D6835B00CD1595 /* toast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = toast.cpp; sourceTree = "<group>"; };
 		26F900641D994ED0001A6EE9 /* animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = animation.cpp; sourceTree = "<group>"; };
 		26FA807B1C98891B0074F76B /* quaternion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = quaternion.cpp; sourceTree = "<group>"; };
 		26FADD2F215676D40057F7EA /* stun.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stun.cpp; sourceTree = "<group>"; };
@@ -4401,6 +4403,7 @@
 				266DD5281C11940A00D47AB0 /* tab_view.cpp */,
 				266DD5291C11940A00D47AB0 /* tab_view_macos.mm */,
 				26B1C9A01DC7ABB60092C84F /* text_view.cpp */,
+				26F5EA6522D6835B00CD1595 /* toast.cpp */,
 				26C4E26A1DB47A7200A9211F /* transition.cpp */,
 				26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */,
 				26BB17CF21F4BA680089C7EC /* ui_adapter.cpp */,
@@ -6131,6 +6134,7 @@
 				26D9D9131E9645CE005F7BD3 /* log.cpp in Sources */,
 				26BB17D421F4C7F40089C7EC /* view_page_navigation.cpp in Sources */,
 				26D9D9141E9645CE005F7BD3 /* thread.cpp in Sources */,
+				26F5EA6622D6835C00CD1595 /* toast.cpp in Sources */,
 				26C1B63920D5153500E36539 /* bitmap_ext.cpp in Sources */,
 				26BAE024222183400085B5AB /* linkedin.cpp in Sources */,
 				2607300E20DCE368004EB272 /* rw_lock.cpp in Sources */,

@@ -56,18 +56,26 @@ namespace slib
 
 #else
 
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Facebook>, _g_priv_social_facebook_sdk_instance)
+	namespace priv
+	{
+		namespace facebook
+		{
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Facebook>, g_instanceSDK)
+		}
+	}
+
+	using namespace priv::facebook;
 
 	Ref<Facebook> FacebookSDK::getInstance()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_facebook_sdk_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instanceSDK)) {
 			return sl_null;
 		}
-		Ref<Facebook> instance = _g_priv_social_facebook_sdk_instance;
+		Ref<Facebook> instance = g_instanceSDK;
 		if (instance.isNull()) {
 			FacebookParam param;
 			instance = new Facebook(param);
-			_g_priv_social_facebook_sdk_instance = instance;
+			g_instanceSDK = instance;
 		}
 		if (instance.isNotNull()) {
 			_updateCurrentToken(instance.get());

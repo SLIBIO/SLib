@@ -36,6 +36,73 @@
 namespace slib
 {
 
+	namespace priv
+	{
+		namespace alert_dialog
+		{
+
+			void OnResultShowAlertDialog(JNIEnv* env, jobject _this, jlong _alert, int result);
+
+			SLIB_JNI_BEGIN_CLASS(JAndroidAlert, "slib/platform/android/ui/Alert")
+				SLIB_JNI_INT_FIELD(type);
+				SLIB_JNI_STRING_FIELD(text);
+				SLIB_JNI_BOOLEAN_FIELD(flagHyperText);
+				SLIB_JNI_STRING_FIELD(caption);
+				SLIB_JNI_STRING_FIELD(titleOk);
+				SLIB_JNI_STRING_FIELD(titleCancel);
+				SLIB_JNI_STRING_FIELD(titleYes);
+				SLIB_JNI_STRING_FIELD(titleNo);
+				SLIB_JNI_LONG_FIELD(nativeObject);
+
+				SLIB_JNI_NEW(init, "()V");
+				SLIB_JNI_METHOD(show, "show", "(Lslib/platform/android/SlibActivity;)Z");
+
+				SLIB_JNI_NATIVE(nativeShowAlertResult, "nativeShowResult", "(JI)V", OnResultShowAlertDialog);
+			SLIB_JNI_END_CLASS
+
+			class AlertDialogResult : public Referable
+			{
+			public:
+				Function<void(DialogResult)> onResult;
+			};
+
+			typedef CHashMap<jlong, Ref<AlertDialogResult> > AlertDialogMap;
+			SLIB_SAFE_STATIC_GETTER(AlertDialogMap, GetAlertDialogMap)
+
+			void OnResultShowAlertDialog(JNIEnv* env, jobject _this, jlong _alert, int result)
+			{
+				AlertDialogMap* alertMap = GetAlertDialogMap();
+				if (!alertMap) {
+					return;
+				}
+
+				Ref<AlertDialogResult> alert;
+				alertMap->get(_alert, &alert);
+				if (alert.isNotNull()) {
+					alertMap->remove(_alert);
+					switch (result) {
+					case 0: // OK
+						alert->onResult(DialogResult::Ok);
+						break;
+					case 2: // Yes
+						alert->onResult(DialogResult::Yes);
+						break;
+					case 3: // No
+						alert->onResult(DialogResult::No);
+						break;
+					default: // Cancel
+						alert->onResult(DialogResult::Cancel);
+						break;
+					}
+				}
+			}
+
+
+		}
+	}
+
+	using namespace priv::alert_dialog;
+
 	DialogResult AlertDialog::run()
 	{
 		return _runByShow();
@@ -51,45 +118,15 @@ namespace slib
 		_showOnUiThread();
 	}
 
-
-	void _priv_AndroidAlert_runShowResult(JNIEnv* env, jobject _this, jlong _alert, int result);
-
-	SLIB_JNI_BEGIN_CLASS(JAndroidAlert, "slib/platform/android/ui/Alert")
-		SLIB_JNI_INT_FIELD(type);
-		SLIB_JNI_STRING_FIELD(text);
-		SLIB_JNI_BOOLEAN_FIELD(flagHyperText);
-		SLIB_JNI_STRING_FIELD(caption);
-		SLIB_JNI_STRING_FIELD(titleOk);
-		SLIB_JNI_STRING_FIELD(titleCancel);
-		SLIB_JNI_STRING_FIELD(titleYes);
-		SLIB_JNI_STRING_FIELD(titleNo);
-		SLIB_JNI_LONG_FIELD(nativeObject);
-
-		SLIB_JNI_NEW(init, "()V");
-		SLIB_JNI_METHOD(show, "show", "(Lslib/platform/android/SlibActivity;)Z");
-
-		SLIB_JNI_NATIVE(nativeShowAlertResult, "nativeShowResult", "(JI)V", _priv_AndroidAlert_runShowResult);
-
-	SLIB_JNI_END_CLASS
-
-	class _priv_UiAlertResult : public Referable
-	{
-	public:
-		Function<void(DialogResult)> onResult;
-	};
-
-	typedef CHashMap<jlong, Ref<_priv_UiAlertResult> > _priv_UiAlertMap;
-	SLIB_SAFE_STATIC_GETTER(_priv_UiAlertMap, _priv_AndroidUi_alerts)
-
 	sl_bool AlertDialog::_show()
 	{
-		_priv_UiAlertMap* alertMap = _priv_AndroidUi_alerts();
+		AlertDialogMap* alertMap = GetAlertDialogMap();
 		if (!alertMap) {
 			return sl_false;
 		}
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			Ref<_priv_UiAlertResult> result = new _priv_UiAlertResult();
+			Ref<AlertDialogResult> result = new AlertDialogResult();
 			if (result.isNotNull()) {
 				result->onResult = SLIB_FUNCTION_REF(AlertDialog, _onResult, this);
 
@@ -122,34 +159,6 @@ namespace slib
 			}
 		}
 		return sl_false;
-	}
-
-	void _priv_AndroidAlert_runShowResult(JNIEnv* env, jobject _this, jlong _alert, int result)
-	{
-		_priv_UiAlertMap* alertMap = _priv_AndroidUi_alerts();
-		if (!alertMap) {
-			return;
-		}
-
-		Ref<_priv_UiAlertResult> alert;
-		alertMap->get(_alert, &alert);
-		if (alert.isNotNull()) {
-			alertMap->remove(_alert);
-			switch (result) {
-			case 0: // OK
-				alert->onResult(DialogResult::Ok);
-				break;
-			case 2: // Yes
-				alert->onResult(DialogResult::Yes);
-				break;
-			case 3: // No
-				alert->onResult(DialogResult::No);
-				break;
-			default: // Cancel
-				alert->onResult(DialogResult::Cancel);
-				break;
-			}
-		}
 	}
 
 

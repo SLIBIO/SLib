@@ -26,25 +26,38 @@
 
 namespace slib
 {
-	
-	static PayPalOrderStatus _priv_PayPal_parseOrderStatus(const String& strStatus)
+
+	namespace priv
 	{
-		if (strStatus == "CREATED") {
-			return PayPalOrderStatus::CREATED;
-		} else if (strStatus == "SAVED") {
-			return PayPalOrderStatus::SAVED;
-		} else if (strStatus == "APPROVED") {
-			return PayPalOrderStatus::APPROVED;
-		} else if (strStatus == "VOIDED") {
-			return PayPalOrderStatus::VOIDED;
-		} else if (strStatus == "COMPLETED") {
-			return PayPalOrderStatus::COMPLETED;
-		} else if (strStatus == "SAVED") {
-			return PayPalOrderStatus::SAVED;
-		} else {
-			return PayPalOrderStatus::None;
+		namespace paypal
+		{
+
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<PayPal>, g_instance)
+
+			static PayPalOrderStatus ParseOrderStatus(const String& strStatus)
+			{
+				if (strStatus == "CREATED") {
+					return PayPalOrderStatus::CREATED;
+				} else if (strStatus == "SAVED") {
+					return PayPalOrderStatus::SAVED;
+				} else if (strStatus == "APPROVED") {
+					return PayPalOrderStatus::APPROVED;
+				} else if (strStatus == "VOIDED") {
+					return PayPalOrderStatus::VOIDED;
+				} else if (strStatus == "COMPLETED") {
+					return PayPalOrderStatus::COMPLETED;
+				} else if (strStatus == "SAVED") {
+					return PayPalOrderStatus::SAVED;
+				} else {
+					return PayPalOrderStatus::None;
+				}
+			}
+
 		}
 	}
+	
+	using namespace priv::paypal;
+	
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(PayPalCreateOrderResult)
 	
@@ -58,7 +71,7 @@ namespace slib
 			return;
 		}
 		orderId = response["id"].getString();
-		status = _priv_PayPal_parseOrderStatus(response["status"].getString());
+		status = ParseOrderStatus(response["status"].getString());
 		for (auto& item : response["links"].getJsonList()) {
 			if (item["rel"].getString() == "approve") {
 				approveLink = item["href"].getString();
@@ -135,16 +148,13 @@ namespace slib
 	{
 		return new PayPal(param);
 	}
-	
-	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<PayPal>, _g_priv_social_paypal_instance)
-	
+		
 	void PayPal::initialize(const PayPalParam& param)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_paypal_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return;
 		}
-		_g_priv_social_paypal_instance = create(param);
+		g_instance = create(param);
 	}
 	
 	void PayPal::initialize(const String& clientId, const String& clientSecret)
@@ -175,10 +185,10 @@ namespace slib
 	
 	Ref<PayPal> PayPal::getInstance()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_social_paypal_instance)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return sl_null;
 		}
-		return _g_priv_social_paypal_instance;
+		return g_instance;
 	}
 	
 	String PayPal::getRequestUrl(const String& path)
