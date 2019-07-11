@@ -31,6 +31,24 @@
 namespace slib
 {
 
+	namespace priv
+	{
+		namespace jwt
+		{
+			
+			SLIB_STATIC_STRING(g_field_iss, "iss")
+			SLIB_STATIC_STRING(g_field_sub, "sub")
+			SLIB_STATIC_STRING(g_field_aud, "aud")
+			SLIB_STATIC_STRING(g_field_exp, "exp")
+			SLIB_STATIC_STRING(g_field_nbf, "nbf")
+			SLIB_STATIC_STRING(g_field_iat, "iat")
+			SLIB_STATIC_STRING(g_field_jti, "jti")
+			
+		}
+	}
+	
+	using namespace priv::jwt;
+
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(Jwt)
 	
 	Jwt::Jwt() noexcept
@@ -122,160 +140,152 @@ namespace slib
 		return Base64::encodeUrl(signature, sizeSignature);
 	}
 	
-	SLIB_STATIC_STRING(_g_jwt_field_typ, "typ")
-	SLIB_STATIC_STRING(_g_jwt_field_cty, "cty")
-	SLIB_STATIC_STRING(_g_jwt_field_alg, "alg")
+	SLIB_STATIC_STRING(g_field_typ, "typ")
+	SLIB_STATIC_STRING(g_field_cty, "cty")
+	SLIB_STATIC_STRING(g_field_alg, "alg")
 	
 	String Jwt::getType() const noexcept
 	{
-		return header.getItem(_g_jwt_field_typ).getString();
+		return header.getItem(g_field_typ).getString();
 	}
 	
 	void Jwt::setType(const String& value) noexcept
 	{
-		header.putItem(_g_jwt_field_typ, value);
+		header.putItem(g_field_typ, value);
 	}
 	
 	String Jwt::getContentType() const noexcept
 	{
-		return header.getItem(_g_jwt_field_cty).getString();
+		return header.getItem(g_field_cty).getString();
 	}
 	
 	void Jwt::setContentType(const String& value) noexcept
 	{
-		header.putItem(_g_jwt_field_cty, value);
+		header.putItem(g_field_cty, value);
 	}
 	
-	SLIB_STATIC_STRING(_g_jwt_alg_HS256, "HS256")
-	SLIB_STATIC_STRING(_g_jwt_alg_HS384, "HS384")
-	SLIB_STATIC_STRING(_g_jwt_alg_HS512, "HS512")
-	SLIB_STATIC_STRING(_g_jwt_alg_RS256, "RS256")
-	SLIB_STATIC_STRING(_g_jwt_alg_RS384, "RS384")
-	SLIB_STATIC_STRING(_g_jwt_alg_RS512, "RS512")
-	SLIB_STATIC_STRING(_g_jwt_alg_ES256, "ES256")
-	SLIB_STATIC_STRING(_g_jwt_alg_ES384, "ES384")
-	SLIB_STATIC_STRING(_g_jwt_alg_ES512, "ES512")
-	SLIB_STATIC_STRING(_g_jwt_alg_PS256, "PS256")
-	SLIB_STATIC_STRING(_g_jwt_alg_PS384, "PS384")
-	SLIB_STATIC_STRING(_g_jwt_alg_PS512, "PS512")
+	SLIB_STATIC_STRING(g_alg_HS256, "HS256")
+	SLIB_STATIC_STRING(g_alg_HS384, "HS384")
+	SLIB_STATIC_STRING(g_alg_HS512, "HS512")
+	SLIB_STATIC_STRING(g_alg_RS256, "RS256")
+	SLIB_STATIC_STRING(g_alg_RS384, "RS384")
+	SLIB_STATIC_STRING(g_alg_RS512, "RS512")
+	SLIB_STATIC_STRING(g_alg_ES256, "ES256")
+	SLIB_STATIC_STRING(g_alg_ES384, "ES384")
+	SLIB_STATIC_STRING(g_alg_ES512, "ES512")
+	SLIB_STATIC_STRING(g_alg_PS256, "PS256")
+	SLIB_STATIC_STRING(g_alg_PS384, "PS384")
+	SLIB_STATIC_STRING(g_alg_PS512, "PS512")
 	
 	JwtAlgorithm Jwt::getAlgorithm() const noexcept
 	{
-		String alg = header.getItem(_g_jwt_field_alg).getString();
-		if (alg.equalsIgnoreCase(_g_jwt_alg_HS256)) return JwtAlgorithm::HS256;
-		if (alg.equalsIgnoreCase(_g_jwt_alg_HS384)) return JwtAlgorithm::HS384;
-		if (alg.equalsIgnoreCase(_g_jwt_alg_HS512)) return JwtAlgorithm::HS512;
-		if (alg.equalsIgnoreCase(_g_jwt_alg_RS256)) return JwtAlgorithm::RS256;
-		if (alg.equalsIgnoreCase(_g_jwt_alg_RS384)) return JwtAlgorithm::RS384;
-		if (alg.equalsIgnoreCase(_g_jwt_alg_RS512)) return JwtAlgorithm::RS512;
-		if (alg.equalsIgnoreCase(_g_jwt_alg_ES256)) return JwtAlgorithm::ES256;
-		if (alg.equalsIgnoreCase(_g_jwt_alg_ES384)) return JwtAlgorithm::ES384;
-		if (alg.equalsIgnoreCase(_g_jwt_alg_ES512)) return JwtAlgorithm::ES512;
-		if (alg.equalsIgnoreCase(_g_jwt_alg_PS256)) return JwtAlgorithm::PS256;
-		if (alg.equalsIgnoreCase(_g_jwt_alg_PS384)) return JwtAlgorithm::PS384;
-		if (alg.equalsIgnoreCase(_g_jwt_alg_PS512)) return JwtAlgorithm::PS512;
+		String alg = header.getItem(g_field_alg).getString();
+		if (alg.equalsIgnoreCase(g_alg_HS256)) return JwtAlgorithm::HS256;
+		if (alg.equalsIgnoreCase(g_alg_HS384)) return JwtAlgorithm::HS384;
+		if (alg.equalsIgnoreCase(g_alg_HS512)) return JwtAlgorithm::HS512;
+		if (alg.equalsIgnoreCase(g_alg_RS256)) return JwtAlgorithm::RS256;
+		if (alg.equalsIgnoreCase(g_alg_RS384)) return JwtAlgorithm::RS384;
+		if (alg.equalsIgnoreCase(g_alg_RS512)) return JwtAlgorithm::RS512;
+		if (alg.equalsIgnoreCase(g_alg_ES256)) return JwtAlgorithm::ES256;
+		if (alg.equalsIgnoreCase(g_alg_ES384)) return JwtAlgorithm::ES384;
+		if (alg.equalsIgnoreCase(g_alg_ES512)) return JwtAlgorithm::ES512;
+		if (alg.equalsIgnoreCase(g_alg_PS256)) return JwtAlgorithm::PS256;
+		if (alg.equalsIgnoreCase(g_alg_PS384)) return JwtAlgorithm::PS384;
+		if (alg.equalsIgnoreCase(g_alg_PS512)) return JwtAlgorithm::PS512;
 		return JwtAlgorithm::None;
 	}
 	
 	void Jwt::setAlgorithm(const JwtAlgorithm& value) noexcept
 	{
 		switch (value) {
-			case JwtAlgorithm::HS256: header.putItem(_g_jwt_field_alg, _g_jwt_alg_HS256); break;
-			case JwtAlgorithm::HS384: header.putItem(_g_jwt_field_alg, _g_jwt_alg_HS384); break;
-			case JwtAlgorithm::HS512: header.putItem(_g_jwt_field_alg, _g_jwt_alg_HS512); break;
-			case JwtAlgorithm::RS256: header.putItem(_g_jwt_field_alg, _g_jwt_alg_RS256); break;
-			case JwtAlgorithm::RS384: header.putItem(_g_jwt_field_alg, _g_jwt_alg_RS384); break;
-			case JwtAlgorithm::RS512: header.putItem(_g_jwt_field_alg, _g_jwt_alg_RS512); break;
-			case JwtAlgorithm::ES256: header.putItem(_g_jwt_field_alg, _g_jwt_alg_ES256); break;
-			case JwtAlgorithm::ES384: header.putItem(_g_jwt_field_alg, _g_jwt_alg_ES384); break;
-			case JwtAlgorithm::ES512: header.putItem(_g_jwt_field_alg, _g_jwt_alg_ES512); break;
-			case JwtAlgorithm::PS256: header.putItem(_g_jwt_field_alg, _g_jwt_alg_PS256); break;
-			case JwtAlgorithm::PS384: header.putItem(_g_jwt_field_alg, _g_jwt_alg_PS384); break;
-			case JwtAlgorithm::PS512: header.putItem(_g_jwt_field_alg, _g_jwt_alg_PS512); break;
+			case JwtAlgorithm::HS256: header.putItem(g_field_alg, g_alg_HS256); break;
+			case JwtAlgorithm::HS384: header.putItem(g_field_alg, g_alg_HS384); break;
+			case JwtAlgorithm::HS512: header.putItem(g_field_alg, g_alg_HS512); break;
+			case JwtAlgorithm::RS256: header.putItem(g_field_alg, g_alg_RS256); break;
+			case JwtAlgorithm::RS384: header.putItem(g_field_alg, g_alg_RS384); break;
+			case JwtAlgorithm::RS512: header.putItem(g_field_alg, g_alg_RS512); break;
+			case JwtAlgorithm::ES256: header.putItem(g_field_alg, g_alg_ES256); break;
+			case JwtAlgorithm::ES384: header.putItem(g_field_alg, g_alg_ES384); break;
+			case JwtAlgorithm::ES512: header.putItem(g_field_alg, g_alg_ES512); break;
+			case JwtAlgorithm::PS256: header.putItem(g_field_alg, g_alg_PS256); break;
+			case JwtAlgorithm::PS384: header.putItem(g_field_alg, g_alg_PS384); break;
+			case JwtAlgorithm::PS512: header.putItem(g_field_alg, g_alg_PS512); break;
 			default:
-				header.removeItem(_g_jwt_field_alg);
+				header.removeItem(g_field_alg);
 				break;
 		}
 	}
 	
-	SLIB_STATIC_STRING(_g_jwt_field_iss, "iss")
-	SLIB_STATIC_STRING(_g_jwt_field_sub, "sub")
-	SLIB_STATIC_STRING(_g_jwt_field_aud, "aud")
-	SLIB_STATIC_STRING(_g_jwt_field_exp, "exp")
-	SLIB_STATIC_STRING(_g_jwt_field_nbf, "nbf")
-	SLIB_STATIC_STRING(_g_jwt_field_iat, "iat")
-	SLIB_STATIC_STRING(_g_jwt_field_jti, "jti")
-
 	String Jwt::getIssuer() const noexcept
 	{
-		return payload.getItem(_g_jwt_field_iss).getString();
+		return payload.getItem(g_field_iss).getString();
 	}
 	
 	void Jwt::setIssuer(const String& value) noexcept
 	{
-		payload.putItem(_g_jwt_field_iss, value);
+		payload.putItem(g_field_iss, value);
 	}
 	
 	String Jwt::getSubject() const noexcept
 	{
-		return payload.getItem(_g_jwt_field_sub).getString();
+		return payload.getItem(g_field_sub).getString();
 	}
 	
 	void Jwt::setSubject(const String& value) noexcept
 	{
-		payload.putItem(_g_jwt_field_sub, value);
+		payload.putItem(g_field_sub, value);
 	}
 	
 	String Jwt::getAudience() const noexcept
 	{
-		return payload.getItem(_g_jwt_field_aud).getString();
+		return payload.getItem(g_field_aud).getString();
 	}
 	
 	void Jwt::setAudience(const String& value) noexcept
 	{
-		payload.putItem(_g_jwt_field_aud, value);
+		payload.putItem(g_field_aud, value);
 	}
 	
 	Time Jwt::getExpirationTime() const noexcept
 	{
-		sl_int64 n = payload.getItem(_g_jwt_field_exp).getInt64();
+		sl_int64 n = payload.getItem(g_field_exp).getInt64();
 		return Time::fromUnixTime(n);
 	}
 	
 	void Jwt::setExpirationTime(const Time& value) noexcept
 	{
-		payload.putItem(_g_jwt_field_exp, value.toUnixTime());
+		payload.putItem(g_field_exp, value.toUnixTime());
 	}
 	
 	Time Jwt::getNotBefore() const noexcept
 	{
-		sl_int64 n = payload.getItem(_g_jwt_field_nbf).getInt64();
+		sl_int64 n = payload.getItem(g_field_nbf).getInt64();
 		return Time::fromUnixTime(n);
 	}
 	
 	void Jwt::setNotBefore(const Time& value) noexcept
 	{
-		payload.putItem(_g_jwt_field_nbf, value.toUnixTime());
+		payload.putItem(g_field_nbf, value.toUnixTime());
 	}
 	
 	String Jwt::getIssuedAt() const noexcept
 	{
-		return payload.getItem(_g_jwt_field_iat).getString();
+		return payload.getItem(g_field_iat).getString();
 	}
 	
 	void Jwt::setIssuedAt(const String& value) noexcept
 	{
-		payload.putItem(_g_jwt_field_iat, value);
+		payload.putItem(g_field_iat, value);
 	}
 	
 	String Jwt::getId() const noexcept
 	{
-		return payload.getItem(_g_jwt_field_jti).getString();
+		return payload.getItem(g_field_jti).getString();
 	}
 	
 	void Jwt::setId(const String& value) noexcept
 	{
-		payload.putItem(_g_jwt_field_jti, value);
+		payload.putItem(g_field_jti, value);
 	}
 
 }
