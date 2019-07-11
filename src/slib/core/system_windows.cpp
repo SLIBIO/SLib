@@ -95,6 +95,19 @@ namespace slib
 		return sl_false;
 	}
 
+	String System::getUserName()
+	{
+		WCHAR buf[512] = { 0 };
+		DWORD nBuf = 500;
+		GetUserNameW(buf, &nBuf);
+		return String::fromUtf16((sl_char16*)buf, (sl_reg)nBuf);
+	}
+	
+	String System::getFullUserName()
+	{
+		return getUserName();
+	}
+
 	sl_uint32 System::getTickCount()
 	{
 #if defined(SLIB_PLATFORM_IS_WIN32)

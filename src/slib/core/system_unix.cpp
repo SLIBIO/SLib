@@ -118,6 +118,22 @@ namespace slib
 		return sl_false;
 	}
 	
+	String System::getUserName()
+	{
+#	if defined(SLIB_PLATFORM_IS_MOBILE)
+		return "mobile";
+#	endif
+		return getlogin();
+	}
+	
+	String System::getFullUserName()
+	{
+#	if defined(SLIB_PLATFORM_IS_MOBILE)
+		return "Mobile User";
+#	endif
+		return getUserName();
+	}
+
 	sl_uint32 System::getTickCount()
 	{
 		return (sl_uint32)(getTickCount64());

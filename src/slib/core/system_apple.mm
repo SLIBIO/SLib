@@ -71,6 +71,16 @@ namespace slib
 		return Apple::getStringFromNSString(path);
 	}
 
+	String System::getUserName()
+	{
+		return Apple::getStringFromNSString(NSUserName());
+	}
+	
+	String System::getFullUserName()
+	{
+		return Apple::getStringFromNSString(NSFullUserName());
+	}
+
 	sl_uint64 System::getTickCount64()
 	{
 		static sl_bool flagInit = sl_true;

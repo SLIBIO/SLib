@@ -49,7 +49,12 @@ namespace slib
 		static String getCurrentDirectory();
 
 		static sl_bool setCurrentDirectory(const String& dir);
-	
+		
+		
+		static String getUserName();
+		
+		static String getFullUserName();
+
 
 		// Tick count (milliseconds)
 		static sl_uint32 getTickCount();
