@@ -467,15 +467,19 @@ namespace slib
 		
 		sl_bool containsPostParameter(const String& name) const;
 		
-		void applyPostParameters(const void* data, sl_size size);
+		void applyFormUrlEncoded(const void* data, sl_size size);
 		
-		void applyPostParameters(const String& str);
+		void applyFormUrlEncoded(const String& str);
 		
 		void applyQueryToParameters();
 		
-		static HashMap<String, String> parseParameters(const void* data, sl_size size);
+		static HashMap<String, String> parseQueryParameters(const void* data, sl_size size);
 		
-		static HashMap<String, String> parseParameters(const String& str);
+		static HashMap<String, String> parseQueryParameters(const String& str);
+		
+		static HashMap<String, String> parseFormUrlEncoded(const void* data, sl_size size);
+		
+		static HashMap<String, String> parseFormUrlEncoded(const String& str);
 		
 		const HashMap< String, Ref<HttpUploadFile> >& getUploadFiles() const;
 		
@@ -496,6 +500,12 @@ namespace slib
 		 >0: size of the HTTP header section (ending with [CR][LF][CR][LF])
 		 */
 		sl_reg parseRequestPacket(const void* packet, sl_size size);
+		
+		template <class KT, class VT, class KEY_COMPARE>
+		static String buildQueryFromMap(const Map<KT, VT, KEY_COMPARE>& map);
+		
+		template <class KT, class VT, class HASH, class KEY_COMPARE>
+		static String buildQueryFromHashMap(const HashMap<KT, VT, HASH, KEY_COMPARE>& map);
 		
 		template <class KT, class VT, class KEY_COMPARE>
 		static String buildFormUrlEncodedFromMap(const Map<KT, VT, KEY_COMPARE>& map);

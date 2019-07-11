@@ -27,6 +27,40 @@ namespace slib
 {
 	
 	template <class KT, class VT, class KEY_COMPARE>
+	String HttpRequest::buildQueryFromMap(const Map<KT, VT, KEY_COMPARE>& params)
+	{
+		StringBuffer sb;
+		sl_bool flagFirst = sl_true;
+		for (auto& pair : params) {
+			if (!flagFirst) {
+				sb.addStatic("&", 1);
+			}
+			flagFirst = sl_false;
+			sb.add(Cast<KT, String>()(pair.key));
+			sb.addStatic("=", 1);
+			sb.add(Url::encodePercent(Cast<VT, String>()(pair.value)));
+		}
+		return sb.merge();
+	}
+	
+	template <class KT, class VT, class HASH, class KEY_COMPARE>
+	String HttpRequest::buildQueryFromHashMap(const HashMap<KT, VT, HASH, KEY_COMPARE>& params)
+	{
+		StringBuffer sb;
+		sl_bool flagFirst = sl_true;
+		for (auto& pair : params) {
+			if (!flagFirst) {
+				sb.addStatic("&", 1);
+			}
+			flagFirst = sl_false;
+			sb.add(Cast<KT, String>()(pair.key));
+			sb.addStatic("=", 1);
+			sb.add(Url::encodePercent(Cast<VT, String>()(pair.value)));
+		}
+		return sb.merge();
+	}
+
+	template <class KT, class VT, class KEY_COMPARE>
 	String HttpRequest::buildFormUrlEncodedFromMap(const Map<KT, VT, KEY_COMPARE>& params)
 	{
 		StringBuffer sb;
@@ -38,7 +72,7 @@ namespace slib
 			flagFirst = sl_false;
 			sb.add(Cast<KT, String>()(pair.key));
 			sb.addStatic("=", 1);
-			sb.add(Url::encodeUriComponentByUTF8(Cast<VT, String>()(pair.value)));
+			sb.add(Url::encodeForm(Cast<VT, String>()(pair.value)));
 		}
 		return sb.merge();
 	}
@@ -55,7 +89,7 @@ namespace slib
 			flagFirst = sl_false;
 			sb.add(Cast<KT, String>()(pair.key));
 			sb.addStatic("=", 1);
-			sb.add(Url::encodeUriComponentByUTF8(Cast<VT, String>()(pair.value)));
+			sb.add(Url::encodeForm(Cast<VT, String>()(pair.value)));
 		}
 		return sb.merge();
 	}

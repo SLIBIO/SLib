@@ -63,19 +63,24 @@ namespace slib
 		void setQueryParameters(const HashMap<String, String>& params);
 		
 	public:
-		static String encodePercentByUTF8(const String& value);
+		static String encodePercent(const String& value);
 		
-		static String decodePercentByUTF8(const String& value);
-		
-		
-		static String encodeUriComponentByUTF8(const String& value);
-		
-		static String decodeUriComponentByUTF8(const String& value);
+		static String decodePercent(const String& value);
 		
 		
-		static String encodeUriByUTF8(const String& value);
+		static String encodeUriComponent(const String& value);
 		
-		static String decodeUriByUTF8(const String& value);
+		static String decodeUriComponent(const String& value);
+		
+		
+		static String encodeUri(const String& value);
+		
+		static String decodeUri(const String& value);
+		
+		
+		static String encodeForm(const String& value);
+		
+		static String decodeForm(const String& value);
 		
 	};
 

@@ -151,13 +151,13 @@ namespace slib
 				/*78*/	1,		1,		1,		0,		0,		0,		1,		0
 			};
 
-			static String EncodePercentByUTF8(const String& value, const sl_bool patternUnreserved[128])
+			static String EncodePercent(const String& value, const sl_bool patternUnreserved[128])
 			{
 				sl_size n = value.getLength();
 				if (n > 0) {
 					const sl_char8* src = value.getData();
 					SLIB_SCOPED_BUFFER(sl_char8, 1024, dst, n * 3);
-					if (dst == sl_null) {
+					if (!dst) {
 						return sl_null;
 					}
 					sl_size k = 0;
@@ -283,25 +283,28 @@ namespace slib
 	
 	HashMap<String, String> Url::getQueryParameters() const
 	{
-		return HttpRequest::parseParameters(query);
+		return HttpRequest::parseQueryParameters(query);
 	}
 	
 	void Url::setQueryParameters(const HashMap<String, String>& params)
 	{
-		query = HttpRequest::buildFormUrlEncodedFromHashMap(params);
+		query = HttpRequest::buildQueryFromHashMap(params);
 	}
 	
-	String Url::encodePercentByUTF8(const String& value)
+	String Url::encodePercent(const String& value)
 	{
-		return EncodePercentByUTF8(value, g_patternUnreserved);
+		return EncodePercent(value, g_patternUnreserved);
 	}
 	
-	String Url::decodePercentByUTF8(const String& value)
+	String Url::decodePercent(const String& value)
 	{
 		sl_size n = value.getLength();
 		if (n > 0) {
 			const sl_char8* src = value.getData();
-			sl_char8* dst = (sl_char8*)(Base::createMemory(n));
+			SLIB_SCOPED_BUFFER(sl_char8, 1024, dst, n);
+			if (!dst) {
+				return sl_null;
+			}
 			sl_size k = 0;
 			for (sl_size i = 0; i < n; i++) {
 				sl_uint32 v = (sl_uint32)(src[i]);
@@ -324,32 +327,97 @@ namespace slib
 					dst[k++] = (sl_char8)(v);
 				}
 			}
-			String ret = String::fromUtf8(dst, k);
-			Base::freeMemory(dst);
-			return ret;
+			return String(dst, k);
 		} else {
 			return sl_null;
 		}
 	}
 	
-	String Url::encodeUriComponentByUTF8(const String& value)
+	String Url::encodeUriComponent(const String& value)
 	{
-		return EncodePercentByUTF8(value, g_patternUnreserved_UriComponents);
+		return EncodePercent(value, g_patternUnreserved_UriComponents);
 	}
 	
-	String Url::decodeUriComponentByUTF8(const String& value)
+	String Url::decodeUriComponent(const String& value)
 	{
-		return decodePercentByUTF8(value);
+		return decodePercent(value);
 	}
 	
-	String Url::encodeUriByUTF8(const String& value)
+	String Url::encodeUri(const String& value)
 	{
-		return EncodePercentByUTF8(value, g_patternUnreserved_Uri);
+		return EncodePercent(value, g_patternUnreserved_Uri);
 	}
 	
-	String Url::decodeUriByUTF8(const String& value)
+	String Url::decodeUri(const String& value)
 	{
-		return decodePercentByUTF8(value);
+		return decodePercent(value);
 	}
 	
+	String Url::encodeForm(const String& value)
+	{
+		sl_size n = value.getLength();
+		if (n > 0) {
+			const sl_char8* src = value.getData();
+			SLIB_SCOPED_BUFFER(sl_char8, 1024, dst, n * 3);
+			if (!dst) {
+				return sl_null;
+			}
+			sl_size k = 0;
+			for (sl_size i = 0; i < n; i++) {
+				sl_uint32 v = (sl_uint32)(sl_uint8)(src[i]);
+				if (SLIB_CHAR_IS_ALNUM(v)) {
+					dst[k++] = (sl_char8)(v);
+				} else if (v == ' ') {
+					dst[k++] = '+';
+				} else {
+					dst[k++] = '%';
+					dst[k++] = priv::string::g_conv_radixPatternUpper[(v >> 4) & 15];
+					dst[k++] = priv::string::g_conv_radixPatternUpper[v & 15];
+				}
+			}
+			return String(dst, k);
+		} else {
+			return sl_null;
+		}
+	}
+	
+	String Url::decodeForm(const String& value)
+	{
+		sl_size n = value.getLength();
+		if (n > 0) {
+			const sl_char8* src = value.getData();
+			SLIB_SCOPED_BUFFER(sl_char8, 1024, dst, n);
+			if (!dst) {
+				return sl_null;
+			}
+			sl_size k = 0;
+			for (sl_size i = 0; i < n; i++) {
+				sl_uint32 v = (sl_uint32)(src[i]);
+				if (v == '%') {
+					if (i + 2 < n) {
+						sl_uint32 a1 = (sl_uint32)(src[i + 1]);
+						sl_uint32 h1 = SLIB_CHAR_HEX_TO_INT(a1);
+						if (h1 < 16) {
+							sl_uint32 a2 = (sl_uint32)(src[i + 2]);
+							sl_uint32 h2 = SLIB_CHAR_HEX_TO_INT(a2);
+							if (h2 < 16) {
+								dst[k++] = (sl_char8)((h1 << 4) | h2);
+								i += 2;
+							}
+						}
+					} else {
+						dst[k++] = '%';
+					}
+				} else if (v == '+') {
+					dst[k++] = ' ';
+				} else if (v < 256) {
+					dst[k++] = (sl_char8)(v);
+				}
+			}
+			return String(dst, k);
+		} else {
+			return sl_null;
+		}
+	}
+
 }

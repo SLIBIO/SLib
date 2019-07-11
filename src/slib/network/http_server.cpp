@@ -375,7 +375,7 @@ namespace slib
 					String reqContentType = context->getRequestContentTypeNoParams();
 					if (reqContentType == ContentTypes::WebForm) {
 						Memory body = context->getRequestBody();
-						context->applyPostParameters(body.getData(), body.getSize());
+						context->applyFormUrlEncoded(body.getData(), body.getSize());
 					}
 				}
 				
@@ -738,7 +738,7 @@ namespace slib
 				HashMap<String, String> subParams;
 				route = route->getRoute(subPath, subParams);
 				if (route) {
-					parameters.put_NoLock(list[i].first, Url::decodeUriComponentByUTF8(name));
+					parameters.put_NoLock(list[i].first, Url::decodePercent(name));
 					if (subParams.isNotNull()) {
 						parameters.putAll_NoLock(subParams);
 					}

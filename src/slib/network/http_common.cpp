@@ -233,7 +233,7 @@ namespace slib
 					}
 					endValue--;
 				}
-				value = Url::decodeUriComponentByUTF8(String::fromUtf8(data + startValue, endValue - startValue));
+				value = Url::decodePercent(String::fromUtf8(data + startValue, endValue - startValue));
 			} else {
 				name = String::fromUtf8(data + posStart, posCurrent - posStart);
 			}
@@ -1146,31 +1146,31 @@ namespace slib
 		return m_postParameters.find_NoLock(name) != sl_null;
 	}
 
-	void HttpRequest::applyPostParameters(const void* data, sl_size size)
+	void HttpRequest::applyFormUrlEncoded(const void* data, sl_size size)
 	{
-		HashMap<String, String> params = parseParameters(data, size);
+		HashMap<String, String> params = parseFormUrlEncoded(data, size);
 		m_postParameters.addAll_NoLock(params);
 		m_parameters.addAll_NoLock(params);
 	}
 
-	void HttpRequest::applyPostParameters(const String& str)
+	void HttpRequest::applyFormUrlEncoded(const String& str)
 	{
-		applyPostParameters(str.getData(), str.getLength());
+		applyFormUrlEncoded(str.getData(), str.getLength());
 	}
 
 	void HttpRequest::applyQueryToParameters()
 	{
-		HashMap<String, String> params = parseParameters(m_query);
+		HashMap<String, String> params = parseQueryParameters(m_query);
 		m_queryParameters.addAll_NoLock(params);
 		m_parameters.addAll_NoLock(params);
 	}
 
-	HashMap<String, String> HttpRequest::parseParameters(const String& str)
+	HashMap<String, String> HttpRequest::parseQueryParameters(const String& str)
 	{
-		return parseParameters(str.getData(), str.getLength());
+		return parseQueryParameters(str.getData(), str.getLength());
 	}
 
-	HashMap<String, String> HttpRequest::parseParameters(const void* data, sl_size len)
+	HashMap<String, String> HttpRequest::parseQueryParameters(const void* data, sl_size len)
 	{
 		if (!data) {
 			return sl_null;
@@ -1197,9 +1197,58 @@ namespace slib
 			} else if (ch == '&') {
 				if (indexSplit > (sl_reg)start) {
 					String name = String::fromUtf8(buf + start, indexSplit - start);
+					name = Url::decodePercent(name);
 					indexSplit++;
 					String value = String::fromUtf8(buf + indexSplit, pos - indexSplit);
-					value = Url::decodeUriComponentByUTF8(value);
+					value = Url::decodePercent(value);
+					ret.add_NoLock(name, value);
+				} else {
+					String name = String::fromUtf8(buf + start, pos - start);
+					ret.add_NoLock(name, String::null());
+				}
+				start = pos + 1;
+				indexSplit = -1;
+			}
+		}
+		return ret;
+	}
+	
+	HashMap<String, String> HttpRequest::parseFormUrlEncoded(const String& str)
+	{
+		return parseFormUrlEncoded(str.getData(), str.getLength());
+	}
+	
+	HashMap<String, String> HttpRequest::parseFormUrlEncoded(const void* data, sl_size len)
+	{
+		if (!data) {
+			return sl_null;
+		}
+		if (!len) {
+			return sl_null;
+		}
+		HashMap<String, String> ret;
+		sl_char8* buf = (sl_char8*)data;
+		sl_size start = 0;
+		sl_reg indexSplit = -1;
+		sl_size pos = 0;
+		for (; pos <= len; pos++) {
+			sl_char8 ch;
+			if (pos == len) {
+				ch = '&';
+			} else {
+				ch = buf[pos];
+			}
+			if (ch == '=') {
+				if (indexSplit < 0) {
+					indexSplit = pos;
+				}
+			} else if (ch == '&') {
+				if (indexSplit > (sl_reg)start) {
+					String name = String::fromUtf8(buf + start, indexSplit - start);
+					name = Url::decodeForm(name);
+					indexSplit++;
+					String value = String::fromUtf8(buf + indexSplit, pos - indexSplit);
+					value = Url::decodeForm(value);
 					ret.add_NoLock(name, value);
 				} else {
 					String name = String::fromUtf8(buf + start, pos - start);

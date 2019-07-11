@@ -89,7 +89,7 @@ namespace slib
 	{
 		Url url(_url);
 		
-		HashMap<String, String> params = HttpRequest::parseParameters(url.query);
+		HashMap<String, String> params = HttpRequest::parseQueryParameters(url.query);
 		
 		requestToken = params.getValue_NoLock("oauth_token");
 		verifier  = params.getValue_NoLock("oauth_verifier");
@@ -199,7 +199,7 @@ namespace slib
 	
 	String OAuth1::generateAuthorization(HttpMethod _method, const String& _url, HashMap<String, String>& parameters, const String& nonce, sl_int64 _timestamp, const String& token, const String& tokenSecret, const String& callbackUrl)
 	{
-		String consumerKey = Url::encodePercentByUTF8(m_consumerKey);
+		String consumerKey = Url::encodePercent(m_consumerKey);
 		String timestamp = String::fromInt64(_timestamp);
 
 		Map< Pair<String, String>, sl_bool > mapParams;
@@ -207,13 +207,13 @@ namespace slib
 		String url = _url;
 		sl_reg indexQuery = url.indexOf('?');
 		if (indexQuery > 0) {
-			for (auto& item : HttpRequest::parseParameters(url.substring(indexQuery + 1))) {
-				mapParams.add_NoLock(Pair<String, String>(Url::encodePercentByUTF8(item.key), Url::encodePercentByUTF8(item.value)), sl_true);
+			for (auto& item : HttpRequest::parseQueryParameters(url.substring(indexQuery + 1))) {
+				mapParams.add_NoLock(Pair<String, String>(Url::encodePercent(item.key), Url::encodePercent(item.value)), sl_true);
 			}
 			url = url.substring(0, indexQuery);
 		}
 		for (auto& item : parameters) {
-			mapParams.add_NoLock(Pair<String, String>(Url::encodePercentByUTF8(item.key), Url::encodePercentByUTF8(item.value)), sl_true);
+			mapParams.add_NoLock(Pair<String, String>(Url::encodePercent(item.key), Url::encodePercent(item.value)), sl_true);
 		}
 		mapParams.add_NoLock(Pair<String, String>("oauth_consumer_key", consumerKey), sl_true);
 		mapParams.add_NoLock(Pair<String, String>("oauth_nonce", nonce), sl_true);
@@ -221,10 +221,10 @@ namespace slib
 		mapParams.add_NoLock(Pair<String, String>("oauth_timestamp", timestamp), sl_true);
 		mapParams.add_NoLock(Pair<String, String>("oauth_version", "1.0"), sl_true);
 		if (token.isNotEmpty()) {
-			mapParams.add_NoLock(Pair<String, String>("oauth_token", Url::encodePercentByUTF8(token)), sl_true);
+			mapParams.add_NoLock(Pair<String, String>("oauth_token", Url::encodePercent(token)), sl_true);
 		}
 		if (callbackUrl.isNotEmpty()) {
-			mapParams.add_NoLock(Pair<String, String>("oauth_callback", Url::encodePercentByUTF8(callbackUrl)), sl_true);
+			mapParams.add_NoLock(Pair<String, String>("oauth_callback", Url::encodePercent(callbackUrl)), sl_true);
 		}
 		
 		StringBuffer sbParams;
@@ -245,17 +245,17 @@ namespace slib
 		StringBuffer sbSignature;
 		sbSignature.add(method);
 		sbSignature.addStatic("&", 1);
-		sbSignature.add(Url::encodePercentByUTF8(url));
+		sbSignature.add(Url::encodePercent(url));
 		sbSignature.addStatic("&", 1);
-		sbSignature.add(Url::encodePercentByUTF8(sbParams.merge()));
+		sbSignature.add(Url::encodePercent(sbParams.merge()));
 		String signatureBase = sbSignature.merge();
-		String signKey = Url::encodePercentByUTF8(m_consumerSecret) + "&";
+		String signKey = Url::encodePercent(m_consumerSecret) + "&";
 		if (tokenSecret.isNotEmpty()) {
-			signKey += Url::encodePercentByUTF8(tokenSecret);
+			signKey += Url::encodePercent(tokenSecret);
 		}
 		char bufSignature[SHA1::HashSize];
 		HMAC<SHA1>::execute(signKey.getData(), signKey.getLength(), signatureBase.getData(), signatureBase.getLength(), bufSignature);
-		String signature = Url::encodePercentByUTF8(Base64::encode(bufSignature, SHA1::HashSize));
+		String signature = Url::encodePercent(Base64::encode(bufSignature, SHA1::HashSize));
 
 		mapParams.add_NoLock(Pair<String, String>("oauth_signature", signature), sl_true);
 		StringBuffer sbAuthorization;
@@ -299,7 +299,7 @@ namespace slib
 			}
 			if (!(type.trim().equalsIgnoreCase(ContentTypes::MultipartFormData))) {
 				if (param.requestBody.isNotNull()) {
-					for (auto& item : HttpRequest::parseParameters(param.requestBody.getData(), param.requestBody.getSize())) {
+					for (auto& item : HttpRequest::parseFormUrlEncoded(param.requestBody.getData(), param.requestBody.getSize())) {
 						parameters.add_NoLock(item.key, item.value);
 					}
 				}
@@ -340,12 +340,12 @@ namespace slib
 				return;
 			}
 			String response = request->getResponseContentAsString();
-			auto params = HttpRequest::parseParameters(response);
+			auto params = HttpRequest::parseFormUrlEncoded(response);
 			String requestToken = params["oauth_token"];
 			String requestTokenSecret = params["oauth_token_secret"];
 			String loginUrl = params["login_url"];
 			if (loginUrl.isEmpty()) {
-				loginUrl = thiz->m_authenticateUrl.arg(Url::encodePercentByUTF8(requestToken));
+				loginUrl = thiz->m_authenticateUrl.arg(Url::encodePercent(requestToken));
 			}
 			onComplete(loginUrl, requestToken, requestTokenSecret);
 		};
@@ -365,14 +365,14 @@ namespace slib
 		rp.method = m_accessTokenMethod;
 		rp.url = m_accessTokenUrl;
 		if (rp.method == HttpMethod::POST) {
-			rp.setRequestBodyAsString("oauth_verifier=" + Url::encodeUriComponentByUTF8(verifier));
+			rp.setRequestBodyAsString("oauth_verifier=" + Url::encodePercent(verifier));
 		} else {
 			rp.parameters.put_NoLock("oauth_verifier", verifier);
 		}
 		auto thiz = ToRef(this);
 		rp.onComplete = [thiz, onComplete](UrlRequest* request) {
 			OAuth1_AccessTokenResult result;
-			result.setResponse(HttpRequest::parseParameters(request->getResponseContentAsString()));
+			result.setResponse(HttpRequest::parseFormUrlEncoded(request->getResponseContentAsString()));
 			if (request->isError()) {
 				thiz->logUrlRequestError(request);
 				result.flagSuccess = sl_false;
@@ -554,8 +554,8 @@ namespace slib
 		Url url(_url);
 		
 		HashMap<String, String> params;
-		params.addAll_NoLock(HttpRequest::parseParameters(url.query));
-		params.addAll_NoLock(HttpRequest::parseParameters(url.fragment));
+		params.addAll_NoLock(HttpRequest::parseQueryParameters(url.query));
+		params.addAll_NoLock(HttpRequest::parseQueryParameters(url.fragment));
 		
 		OAuthResult::setResponse(params);
 		flagCancel = errorCode == OAuthErrorCode::AccessDenied;
