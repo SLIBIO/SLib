@@ -8893,10 +8893,10 @@ https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 				StringData& s = item->value;
 				sl_size t = s.len;
 				if (offset + t > total) {
-					Base::copyMemory(buf + offset, s.sz16, (total - offset) * 2);
+					Base::copyMemory(buf + offset, s.sz16, (total - offset) << 1);
 					return ret;
 				}
-				Base::copyMemory(buf + offset, s.sz16, t * 2);
+				Base::copyMemory(buf + offset, s.sz16, t << 1);
 				offset += t;
 				item = item->next;
 			}

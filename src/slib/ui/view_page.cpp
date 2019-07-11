@@ -60,7 +60,7 @@ namespace slib
 	using namespace priv::view_page;
 	
 	ViewPage::ViewPage()
-	{		
+	{
 		setCreatingInstance(sl_true);
 		
 		m_popupState = PopupState::None;
