@@ -108,31 +108,39 @@ namespace slib
 	{
 	}
 
-	static double _thread_getMacPriority(ThreadPriority priority)
+	namespace priv
 	{
-		double min = 0;
-		double max = 1;
-		if (min < 0 || max < 0) {
-			return -1;
+		namespace thread
+		{
+			
+			static double GetMacPriority(ThreadPriority priority)
+			{
+				double min = 0;
+				double max = 1;
+				if (min < 0 || max < 0) {
+					return -1;
+				}
+				switch (priority) {
+					case ThreadPriority::Lowest:
+						return min;
+					case ThreadPriority::BelowNormal:
+						return (min * 3 + max) / 4;
+					case ThreadPriority::Normal:
+						return (min + max) / 2;
+					case ThreadPriority::AboveNormal:
+						return (min + max * 3) / 4;
+					case ThreadPriority::Highest:
+						return max;
+				}
+				return -1;
+			}
+
 		}
-		switch (priority) {
-			case ThreadPriority::Lowest:
-				return min;
-			case ThreadPriority::BelowNormal:
-				return (min * 3 + max) / 4;
-			case ThreadPriority::Normal:
-				return (min + max) / 2;
-			case ThreadPriority::AboveNormal:
-				return (min + max * 3) / 4;
-			case ThreadPriority::Highest:
-				return max;
-		}
-		return -1;
 	}
 
 	void Thread::_nativeSetPriority()
 	{
-		double p = _thread_getMacPriority(m_priority);
+		double p = priv::thread::GetMacPriority(m_priority);
 		NSThread* thread = (__bridge NSThread*)m_handle;
 		if(thread != NULL) {
 			[thread setThreadPriority:p];
