@@ -51,6 +51,25 @@
 
 #define PRIV_PATH_MAX 1024
 
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+
+#include "slib/core/platform_android.h"
+
+namespace slib
+{
+	namespace priv
+	{
+		namespace system
+		{
+			SLIB_JNI_BEGIN_CLASS(JAndroid, "slib/platform/android/Android")
+				SLIB_JNI_STATIC_METHOD(getDeviceNameOnSettings, "getDeviceNameOnSettings", "(Landroid/app/Activity;)Ljava/lang/String;")
+			SLIB_JNI_END_CLASS
+		}
+	}
+}
+
+#endif
+
 namespace slib
 {
 
@@ -118,21 +137,42 @@ namespace slib
 		return sl_false;
 	}
 	
+#if !defined(SLIB_PLATFORM_IS_APPLE)
+	String System::getComputerName()
+	{
+#	if defined(SLIB_PLATFORM_IS_ANDROID)
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			return priv::system::JAndroid::getDeviceNameOnSettings.callString(sl_null, jactivity);
+		}
+		return sl_null;
+#	elif defined(SLIB_PLATFORM_IS_MOBILE)
+		return "Mobile Device";
+#	else
+		char buf[512] = {0};
+		gethostname(buf, 500);
+		return buf;
+#	endif
+	}
+	
 	String System::getUserName()
 	{
 #	if defined(SLIB_PLATFORM_IS_MOBILE)
 		return "mobile";
-#	endif
+#	else
 		return getlogin();
+#	endif
 	}
 	
 	String System::getFullUserName()
 	{
 #	if defined(SLIB_PLATFORM_IS_MOBILE)
 		return "Mobile User";
-#	endif
+#	else
 		return getUserName();
+#	endif
 	}
+#endif
 
 	sl_uint32 System::getTickCount()
 	{

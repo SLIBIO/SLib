@@ -32,10 +32,12 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.Settings;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
+import slib.platform.android.device.Device;
 import slib.platform.android.helper.FileHelper;
 import slib.platform.android.ui.UiThread;
 
@@ -180,6 +182,21 @@ public class Android {
 				}
 			}
 		});
+	}
+
+	public static String getDeviceNameOnSettings(Activity activity) {
+		String str = null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+			try {
+				str = Settings.Global.getString(activity.getContentResolver(), "device_name");
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
+		if (str != null && str.length() > 0) {
+			return str;
+		}
+		return Device.getDeviceName();
 	}
 
 

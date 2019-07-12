@@ -70,6 +70,15 @@ namespace slib
 		NSString* path = NSTemporaryDirectory();
 		return Apple::getStringFromNSString(path);
 	}
+	
+	String System::getComputerName()
+	{
+#if defined(SLIB_PLATFORM_IS_MACOS)
+		return Apple::getStringFromNSString([[NSHost currentHost] localizedName]);
+#else
+		return Apple::getStringFromNSString([[UIDevice currentDevice] name]);
+#endif
+	}
 
 	String System::getUserName()
 	{

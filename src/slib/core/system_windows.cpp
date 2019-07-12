@@ -95,6 +95,14 @@ namespace slib
 		return sl_false;
 	}
 
+	String System::getComputerName()
+	{
+		WCHAR buf[512] = { 0 };
+		DWORD nBuf = 500;
+		GetComputerNameW(buf, &nBuf);
+		return String::fromUtf16((sl_char16*)buf, (sl_reg)nBuf);
+	}
+
 	String System::getUserName()
 	{
 		WCHAR buf[512] = { 0 };

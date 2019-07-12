@@ -51,6 +51,8 @@ namespace slib
 		static sl_bool setCurrentDirectory(const String& dir);
 		
 		
+		static String getComputerName();
+
 		static String getUserName();
 		
 		static String getFullUserName();
